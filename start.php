@@ -200,7 +200,25 @@ function activityfeed($mergeditems,$ajax = false) {
 	$duplicatejob = array(); 
 	
 	if(empty($mergeditems)) {
-		$activityfeed .= '<tr><td><h3><img src="img/icons/information.gif" />&nbsp;' . _L("No Recent Items.") . '</h3></td></tr>';
+		if(!$ajax)
+			$activityfeed .= '		<tr>
+									<td valign="top" width="60px"><img src="img/icons/information.gif" /></td>
+									<td >
+											<div class="feedtitle">
+												<a href="">	
+												' . _L("No Recent Items.") . '</a>
+											</div>											
+									</td>
+									</tr>';
+		else {
+			$activityfeed[] = array("itemid" => "",
+										"defaultlink" => "",
+										"defaultonclick" => "",
+										"icon" => "icons/information.gif",
+										"title" => _L("No Recent Items."),
+										"content" => "",
+										"tools" => "");
+		}	
 	} else {
 		while(!empty($mergeditems) && $limit > 0) {
 			$item = array_shift($mergeditems);
@@ -240,40 +258,40 @@ function activityfeed($mergeditems,$ajax = false) {
 					case "new":
 						$title = _L('%1$s Saved',$jobtype);
 						$defaultlink = "job.php?id=$itemid";
-						$icon = '<img src="img/largeicons/folderandfiles.jpg" />';
+						$icon = 'largeicons/folderandfiles.jpg';
 						break;
 					case "repeating":
 						$title = _L('Repeating Job Saved');
 						//$tools = action_link(_L("Run Now"),"page_go","jobs.php?runrepeating=$itemid", "return confirm('Are you sure you want to run this job now?');");						
-						$icon = '<img src="img/largeicons/calendar.jpg" />';
+						$icon = 'largeicons/calendar.jpg';
 						$defaultlink = "jobrepeating.php?id=$itemid";					
 						break;
 					case "complete":
 						$title = _L('%1$s Completed Successfully',$jobtype);
-						$icon = '<img src="img/largeicons/' . ($item["jobtype"]=="survey"?"checklist.jpg":"checkedgreen.jpg") .  '">';
+						$icon = 'largeicons/' . ($item["jobtype"]=="survey"?"checklist.jpg":"checkedgreen.jpg") .  '"';
 						$defaultlink = $item["jobtype"] == "survey" ? "reportsurveysummary.php?jobid=$itemid" : "reportjobsummary.php?jobid=$itemid";									
 
 						break;
 					case "cancelled":
 						$title = _L('%1$s Cancelled',$jobtype);
-						$icon = '<img src="img/largeicons/checkedgreen.jpg" />';
+						$icon = 'largeicons/checkedgreen.jpg';
 						$defaultlink = $item["jobtype"] == "survey" ? "reportsurveysummary.php?jobid=$itemid" : "reportjobsummary.php?jobid=$itemid";
 						break;
 					case "active":
 						$title = _L('%1$s Submitted, Status: Active',$jobtype);
-						$icon = '<img src="img/largeicons/ping.jpg" />';
+						$icon = 'largeicons/ping.jpg';
 						$defaultlink = "#";
 						$defaultonclick = "popup('jobmonitor.php?jobid=$id', 500, 450);";
 						break;
 					case "scheduled":
 						$title = _L('%1$s Submitted, Status: Scheduled',$jobtype);
-						$icon = '<img src="img/largeicons/clock.jpg" />';
+						$icon = 'largeicons/clock.jpg';
 						$defaultlink = "job.php?id=$itemid";
 						break;
 					case "procactive":
 						$title = _L('%1$s Submitted, Status: %2$s',$jobtype,escapehtml(fmt_status($job,$item["name"])));
 				//		$title = _L('%1$s Submitted, Status: %1$s',$jobtype,fmt_status($job,$item["name"]));
-						$icon = '<img src="img/largeicons/gear.jpg" />';
+						$icon = 'largeicons/gear.jpg';
 						$defaultlink = "job.php?id=$itemid";
 						break;								
 					default:
@@ -328,7 +346,7 @@ function activityfeed($mergeditems,$ajax = false) {
 
 				$tools = action_links (action_link("Edit", "pencil", "list.php?id=$itemid"),action_link("Preview", "application_view_list", "showlist.php?id=$itemid"));
 				$tools = str_replace("&nbsp;|&nbsp;","<br />",$tools);
-				$icon = '<img src="img/largeicons/addrbook.jpg">';			
+				$icon = 'largeicons/addrbook.jpg';			
 			} else if($item["type"] == "message" ) {
 				$messagetype = $item["messagetype"];
 				$title = _L('%1$s message %2$s',escapehtml(ucfirst($messagetype)),escapehtml($title));
@@ -340,24 +358,24 @@ function activityfeed($mergeditems,$ajax = false) {
 				$content = '<a href="' . $defaultlink . '" ' . $defaultonclick . '>' . $time .  ' - <b>' .  $item["name"] . '</b>' . '</a>';
 				switch($messagetype) {
 					case "phone":
-						$icon = '<img src="img/largeicons/phonehandset.jpg">';
+						$icon = 'largeicons/phonehandset.jpg';
 						break;
 					case "email":
-						$icon = '<img src="img/largeicons/email.jpg">';
+						$icon = 'largeicons/email.jpg';
 						break;
 					case "sms":
-						$icon = '<img src="img/largeicons/smschat.jpg">';
+						$icon = 'largeicons/smschat.jpg';
 						break;
 				}
 			} else if($item["type"] == "report" ) {
 				$title = "Report " . $title;				
 				$content = '<a href="' . $defaultlink . '" ' . $defaultonclick . '>' . 
 								$time .  ' - ' .  $item["name"] . '</a>';
-				$icon = '<img src="img/largeicons/savedreport.jpg">';
+				$icon = 'largeicons/savedreport.jpg';
 				$defaultlink = "reportjobsummary.php?id=$itemid";
 			} else if($item["type"] == "systemmessage" ) {
 				$content = '<a href="' . $defaultlink . '" ' . $defaultonclick . '>' . $item["message"] . '</a>';
-				$icon = '<img src="img/largeicons/notepad.jpg">';
+				$icon = 'largeicons/news.jpg';
 			}
 			
 			$defaultonclick = !isset($defaultonclick) ? "" : 'onclick="'. $defaultonclick. '"';
@@ -373,7 +391,7 @@ function activityfeed($mergeditems,$ajax = false) {
 			} else {	
 				
 				$activityfeed .= '<tr>	
-										<td valign="top" width="60px"><a href="' . $defaultlink . '" ' . $defaultonclick . '>' . $icon . '</a></td>
+										<td valign="top" width="60px"><a href="' . $defaultlink . '" ' . $defaultonclick . '><img src="img/' . $icon . '" /></a></td>
 										<td >
 											<div class="feedtitle">
 												<a href="' . $defaultlink . '" ' . $defaultonclick . '>	
@@ -421,26 +439,47 @@ function activityfeed($mergeditems,$ajax = false) {
 					}
 				}
 				function applyfilter(filter) {
+					
+					
 						new Ajax.Request('start.php?ajax=true&filter=' + filter, {
 							method:'get',
 							onSuccess: function (response) {
 								var result = response.responseJSON;
-								var html = '';
-								var size = result.length;
-								removefeedtools();
-								actionids = Array();
-								//alert('jobs returned ' + result[0].defaultlink + result[0]['itemid']);
-								for(i=0;i<size;i++){
-									var item = result[i];	
-									html += '<tr><td valign=\"top\" width=\"60px\"><a href=\"' + item.defaultlink + '\" ' + item.defaultonclick + '>' + item.icon + '</a></td><td ><div class=\"feedtitle\"><a href=\"' + item.defaultlink + '\" ' + item.defaultonclick + '>' + item.title + '</a></div><span>' + item.content + '</span></td>';
-									if(item.tools) {
-										html += '<td valign=\"middle\"><div id=\"actionlink_' + item.itemid + '\" style=\"cursor:pointer\" ><img src=\"img/largeicons/tiny20x20/tools.jpg\"/>&nbsp;Tools</div><div id=\"actions_' + item.itemid + '\" style=\"display:none;\">' + item.tools + '</div></td>';
+								if(result) {
+									var html = '';
+									var size = result.length;
+									removefeedtools();
+									actionids = Array();
+									//alert('jobs returned ' + result[0].defaultlink + result[0]['itemid']);
+									
+									for(i=0;i<size;i++){
+										var item = result[i];	
+										html += '<tr><td valign=\"top\" width=\"60px\"><a href=\"' + item.defaultlink + '\" ' + item.defaultonclick + '><img src=\"img/' + item.icon + '\" /></a></td><td ><div class=\"feedtitle\"><a href=\"' + item.defaultlink + '\" ' + item.defaultonclick + '>' + item.title + '</a></div><span>' + item.content + '</span></td>';
+										if(item.tools) {
+											html += '<td valign=\"middle\"><div id=\"actionlink_' + item.itemid + '\" style=\"cursor:pointer\" ><img src=\"img/largeicons/tiny20x20/tools.jpg\"/>&nbsp;Tools</div><div id=\"actions_' + item.itemid + '\" style=\"display:none;\">' + item.tools + '</div></td>';
+										}
+										if(item.tools != '') {
+											actionids.push(item.itemid);											
+										}
+										html += '</tr>';
 									}
-									actionids[i] = item.itemid;
-									html += '</tr>';
+									$('feeditems').innerHTML = html;									
+									addfeedtools();
+									
+									$(filter + 'filter').setStyle({
+	 									 color: '#005BC3'
+									});
+									var position = $(filter + 'filter').positionedOffset();
+  									$('selectedfilter').setStyle({
+  										top: (position[1]+3) + 'px',
+  										display: 'block',
+ 										fontSize: '12px'
+									});
+  									
+									
+									
 								}
-								$('feeditems').innerHTML = html;
-								addfeedtools();
+								
 							}
 						});
 	
@@ -477,8 +516,9 @@ if($USER->authorize("leavemessage")){
 include_once("nav.inc.php");
 
 ?>
-	<link href='css/timeline.css' type='text/css' rel='stylesheet' media='screen'>
-	<table border=0 cellpadding=0 cellspacing=5>
+<link href='css/timeline.css' type='text/css' rel='stylesheet' media='screen'>
+
+<table border=0 cellpadding=0 cellspacing=5>
 	<tr>
 		<td>
 			<div style="width:170px;top:0px;text-align:center;">
@@ -495,32 +535,36 @@ include_once("nav.inc.php");
 <?		
 			if ($USER->authorize("startstats")) {
 ?>
-			</td>
-			<td width="100%" valign="middle">
+		</td>
+		<td width="100%" valign="middle">
 <?
-	startWindow("Jobs Timeline");
-				include_once("inc/timeline.inc.php");
+	startWindow(_L("Jobs Timeline"));	
+		include_once("inc/timeline.inc.php");
 	endWindow();
 ?>
-			</td>
-			</tr>
-			<tr>
-			<td colspan="2">
+		</td>
+	</tr>
+	<tr>
+	<td colspan="2">
+	
 <? 		
+
 			startWindow(_L('Recent Activity'));
 			
 
 				//style="border: none;border-collapse: collapse;">
-				$activityfeed = '<table width="100%" name="recentactivity">
+				$activityfeed = '
+				<div id="selectedfilter" style="position: absolute;display:none;"><img src="img/arrow_right.gif"></div>
+				<table width="100%" name="recentactivity">
 				<tr>
 					<td class="feed" style="width: 180px;vertical-align: top;font-size: 12px;font-weight: bold;" >
 					<div class="feedfilter">					
-						<a href="start.php?filter=none" onclick="applyfilter(\'systemmessages\'); return false;"><img src="img/largeicons/tiny20x20/globe.jpg">Show&nbsp;All</a><br />
+						<a id="nonefilter" href="start.php?filter=none" onclick="applyfilter(\'none\'); return false;"><img src="img/largeicons/tiny20x20/globe.jpg">Show&nbsp;All</a><br />
 					</div>
 					<br />		
 					<h1>Filter By:</h1>
-					<div id="jobfilters" class="feedfilter">	
-						<a href="start.php?filter=jobs" onclick="applyfilter(\'jobs\'); return false;"><img src="img/largeicons/tiny20x20/ping.jpg">Jobs</a><br />
+					<div class="feedfilter">	
+						<a id="jobsfilter" href="start.php?filter=jobs" onclick="applyfilter(\'jobs\'); return false;"><img src="img/largeicons/tiny20x20/ping.jpg">Jobs</a><br />
 					</div>
 					<div id="jobsubfilters" style="display:none;">	
 							<a href="start.php?filter=savedjobs"><img src="img/largeicons/tiny20x20/folderandfiles.jpg">Saved</a><br />	
@@ -531,17 +575,17 @@ include_once("nav.inc.php");
 							
 					</div>
 					<div class="feedfilter">	
-						<a href="start.php?filter=messages" onclick="applyfilter(\'messages\'); return false;"><img src="img/largeicons/tiny20x20/letter.jpg">Messages</a><br />
+						<a id="messagesfilter" href="start.php?filter=messages" onclick="applyfilter(\'messages\'); return false;"><img src="img/largeicons/tiny20x20/letter.jpg">Messages</a><br />
 					</div>
-					<div id="jobsubfilters" style="display:none;">	
+					<div id="messagessubfilters" style="display:none;">	
 							<a href="start.php?filter=phonemessages"><img src="img/largeicons/tiny20x20/phonehandset.jpg">Phone</a><br />	
 							<a href="start.php?filter=emailmessages"><img src="img/largeicons/tiny20x20/email.jpg">Email</a><br />
 							<a href="start.php?filter=smsmessages"><img src="img/largeicons/tiny20x20/smschat.jpg">SMS</a><br />
 					</div>
 					<div class="feedfilter">	
-						<a href="start.php?filter=lists" onclick="applyfilter(\'lists\'); return false;"><img src="img/largeicons/tiny20x20/addrbook.jpg">Contacts</a><br />
-						<a href="start.php?filter=savedreports" onclick="applyfilter(\'savedreports\'); return false;"><img src="img/largeicons/tiny20x20/savedreport.jpg">Reports</a><br />
-						<a href="start.php?filter=systemmessages" onclick="applyfilter(\'savedreports\'); return false;"><img src="img/largeicons/tiny20x20/news.jpg">System&nbsp;Messages</a><br />
+						<a id="listsfilter" href="start.php?filter=lists" onclick="applyfilter(\'lists\'); return false;"><img src="img/largeicons/tiny20x20/addrbook.jpg">Contacts</a><br />
+						<a id="savedreportsfilter" href="start.php?filter=savedreports" onclick="applyfilter(\'savedreports\'); return false;"><img src="img/largeicons/tiny20x20/savedreport.jpg">Reports</a><br />
+						<a id="systemmessagesfilter" href="start.php?filter=systemmessages" onclick="applyfilter(\'systemmessages\'); return false;"><img src="img/largeicons/tiny20x20/news.jpg">System&nbsp;Messages</a><br />
 						
 					</div>
 					
@@ -561,7 +605,9 @@ include_once("nav.inc.php");
 			?> <? 
 			}
 
-	?></td></tr></table><?
+	?></td>
+	</tr>
+</table><?
 
 include_once("navbottom.inc.php");
 ?>

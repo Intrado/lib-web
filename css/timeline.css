@@ -46,12 +46,18 @@
 		font-weight: normal;
 		overflow: hidden;   
         white-space: nowrap;
-        cursor:pointer;
+        cursor:pointer;        
 	}
-	
 	.jobbar {
 		position:absolute;
 		height: 3px;
+		padding-top: 2px;
+		padding-bottom: 3px;
+		color: #000;
+		text-align: center;
+		font-size: 12px; 
+		font-weight: bold;
+		
 		left: -1px;
 		top: 17px;
 		width: 100%;
@@ -61,11 +67,18 @@
         white-space: nowrap;
 	}
 	
-	.box {
+	.jobname {
 		padding-top: 2px;
 		padding-left: 3px;
 	}
-
+		
+	.box {
+		color: #000;
+		text-align: center;	
+	}
+	.boxname {
+		font-size: 15px; 
+	}
 	
 	.dayline {
 		position:absolute;	
@@ -135,8 +148,8 @@
 
 
 	
-	img.right {	position:absolute; left: 100%;border:0px;}
-	img.left { position:absolute; right: 100%;border:0px;}
+	img.canvasright {	position:absolute; left: 100%;border:0px;}
+	img.canvasleft { position:absolute; right: 100%;border:0px;}
 
 
 	.bl {background: url(bl.gif) 0 100% no-repeat}
