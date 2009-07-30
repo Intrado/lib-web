@@ -17,7 +17,7 @@ require_once("obj/FormItem.obj.php");
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization
 ////////////////////////////////////////////////////////////////////////////////
-if (!$USER->authorize('managesystem') && !getSystemSetting("_hasportal", false) && !$USER->authorize('portalaccess')) {
+if (!$USER->authorize('managesystem') || !getSystemSetting("_hasportal", false) || !$USER->authorize('portalaccess')) {
 	redirect('unauthorized.php');
 }
 
