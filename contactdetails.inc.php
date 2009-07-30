@@ -311,7 +311,7 @@ if (!isset($_GET['ajax'])) {
 	}
 	startWindow('Contact');
 } else {
-	echo "<div style='width:240px; height:200px; overflow:auto'>";
+	echo "<div style='width:346px; height:200px; overflow:auto'>";
 }
 
 ?>
