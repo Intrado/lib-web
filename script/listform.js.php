@@ -159,9 +159,6 @@ function listform_load(listformID, formData, postURL, ruleEditorGuideContents) {
 			Tips.hideAll();
 			listformVars.guideSection = 'AddRule';
 			
-			var listSelectbox = $('listSelectboxContainer').down();
-			if (listSelectbox)
-				listSelectbox.selectedIndex = 0;
 			listform_refresh_guide(true);
 			
 			$('listchooseTotal').update();
@@ -211,9 +208,6 @@ function listform_load(listformID, formData, postURL, ruleEditorGuideContents) {
 		$('chooseListChoiceButton').hide();
 		$('chooseListWindow').show();
 		listform_hide_build_list_window();
-		var listSelectbox = $('listSelectboxContainer').down();
-		if (listSelectbox)
-			listSelectbox.selectedIndex = 0;
 		listformVars.pendingList = null;
 		listform_refresh_guide();
 	});
@@ -224,7 +218,6 @@ function listform_load(listformID, formData, postURL, ruleEditorGuideContents) {
 			listformVars.existingLists = transport.responseJSON;
 			if (!listformVars.existingLists)
 				listformVars.existingLists = {};
-			
 			listform_reset_list_selectbox();
 			
 			// Load From Session Data.
@@ -260,7 +253,6 @@ function listform_refresh_guide(reset, specificFieldset) {
 		if (fieldset != specificFieldset)
 			fieldset.style.border = 'solid 3px rgb(255,255,255)';
 		if (fieldset.id.include(listformVars.guideSection)) {
-				 //   console.debug(fieldset.id);
 			sectionFieldsets.push(fieldset);
 			if (specificFieldset == fieldset)
 				listformVars.guideStepIndex = sectionFieldsets.length - 1;
@@ -388,17 +380,17 @@ function listform_load_lists(listidsJSON) {
 				listform_update_grand_total();
 			
 				var hiddenTD = new Element('td').update(new Element('input',{'type':'hidden','value':listid})).hide();
-    			var commonStyle = 'border-bottom: solid 2px rgb(220,220,220)';
+    			var commonStyle = 'border-bottom: solid 2px rgb(220,220,220);white-space:nowrap';
 			    var nameTD = new Element('td', {'class':'List NameTD', 'width':'10%','style':'cursor:pointer; overflow: hidden; white-space: nowrap;' + commonStyle});
 			    nameTD.insert(data.name);
-			    var actionTD = new Element('td', {'class':'List ActionTD', 'style':commonStyle});
+			    var actionTD = new Element('td', {'width':'25%','class':'List ActionTD', 'style':commonStyle});
 			    actionTD.insert('<img src="img/icons/delete.gif" title="<?=addslashes(_L('Click to remove this list'))?>" />');
 			    var statisticsTD = new Element('td', {'class':'List', 'colspan':100, 'style':commonStyle}).update(format_thousands_separator(data.total));
 
 				$('listsTableBody').insert(new Element('tr').insert(hiddenTD).insert(nameTD).insert(actionTD).insert(statisticsTD));
 
 				if (!data.advancedlist) {
-					nameTD.observe('mouseover', function (event, listid) {
+					nameTD.up('tr').observe('click', function (event, listid) {
 						//$('listRulesPreview').update('Loading..');
 						cachedAjaxGet('ajax.php?type=listrules&listids='+[listid].toJSON(),
 							function (transport) {
@@ -426,10 +418,8 @@ function listform_load_lists(listidsJSON) {
 									else {
 										previewBox.update(new Element('table').insert(tbody));
 									}
-
-									var row = this.up('tr');
 									
-									new Tip (row, previewBox.innerHTML, {
+									new Tip (this, previewBox.innerHTML, {
 							        	style: "protogrey",
 							        	delay: 0.2,
 							        	hideOthers:true,
@@ -443,7 +433,7 @@ function listform_load_lists(listidsJSON) {
 							        	title: this.innerHTML
 						          	});
 
-									row.prototip.show();
+									this.prototip.show();
 								}
 							}.bindAsEventListener(nameTD),
 						null, false );
@@ -544,6 +534,8 @@ function listform_remove_list(event, listid, doconfirm) {
 }
 
 function listform_reset_list_selectbox() {
+	// If there are already checkboxes for existing lists, don't bother adding anymore.
+	// TODO: Refactor this function to be called only when necessary so that there's no need to check for any existing checkboxes.
 	if ($('listSelectboxContainer').down('input'))
 		return;
 		
