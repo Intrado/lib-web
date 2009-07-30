@@ -274,6 +274,13 @@ if(CheckFormSubmit($f,"Save") || CheckFormSubmit($f, "Return")) {
 				setCustomerSystemSetting('logindisableattempts', GetFormData($f, $s, 'logindisableattempts'), $custdb);
 				setCustomerSystemSetting('loginlockouttime', GetFormData($f, $s, 'loginlockouttime'), $custdb);
 
+				// this is a hack - subscriber languages English and Spanish are hardcoded - language needs redo post 7.0 release
+				if ($hasselfsignup) {
+					QuickUpdate("insert into persondatavalues (fieldnum, value, refcount, editlock) values ('f03','English',0,1),('f03','Spanish',0,1)", $custdb);
+				} else {
+					QuickUpdate("delete from persondatavalues where fieldnum='f03' and editlock=1", $custdb);
+				}
+
 				$oldlanguages = GetFormData($f, $s, "oldlanguages");
 				foreach($oldlanguages as $oldlanguage){
 					$lang = "Language" . $oldlanguage;
