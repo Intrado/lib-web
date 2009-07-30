@@ -70,43 +70,50 @@ class ListForm extends Form {
 				<tr>
 					<!-- MAIN CONTENT AREA -->
 					
-					<td valign=top width='70%' style='overflow:hidden; padding:0;margin:0;'>
+					<td valign=top style='padding:0;margin:0; '>
 							<div>
-								".icon_button(_L('Build List Using Rules'),'application_form_edit', null, null, ' id="buildListButton" style="display:none;margin-bottom:10px; "')."
-								<div id='buildListWindow' style='clear:both; overflow:hidden; border: solid 1px rgb(200,200,200);padding:0;margin:0;display:none'>
-									<div id='ruleWidgetContainer' style='overflow: auto'></div>
+								".icon_button(_L('Build List Using Rules'),'application_form_edit', null, null, ' id="buildListButton" style="display:none;margin;0 "')."
+								<div id='buildListWindow' style='clear:both; padding:0;margin:0;display:none;'>
+									<div id='ruleWidgetContainer' style='clear:both; white-space:nowrap;'>
+									</div>
+									<div style='width:550px'></div>
 								</div>
-							</div>
-							<hr style='clear:both; border: solid 2px rgb(200,200,200); display:none' id='divider' />
-							<div style='clear:both'>
-								".icon_button(_L('Choose an Existing List'),'arrow_turn_left', null, null, ' id="chooseListChoiceButton" style="display:none" ')."
-								<div id='chooseListWindow' style='display:none; clear:both'>
-									<table><tr>
-										<td valign=top>
-											<div id='listSelectboxContainer'></div>
-										</td>
-										<td valign=top>
-											<div id='listchooseStatus'></div>
-											<div id='listchooseTotalsContainer' style='display:none'>
-											<table>
-												<tr><th valign=top style='text-align:left'>"._L('List Total')."</th><td valign=top id='listchooseTotal'>0</td></tr>
-												<tr><td valign=top style='text-align:left'>"._L('Matched by Rules')."</td><td valign=top id='listchooseTotalRule'>0</td></tr>
-												<tr><td valign=top style='text-align:left'>"._L('Additions')."</td><td valign=top id='listchooseTotalAdded'>0</td></tr>
-												<tr><td valign=top style='text-align:left'>"._L('Skips')."</td><td valign=top id='listchooseTotalRemoved'>0</td></tr>
-											</table>
-											</div>
-										</td>
-									</tr></table>
+								<hr style='clear:both; border: solid 2px rgb(200,200,200); display:none' id='divider' />
+								<div style='clear:both'>
+									".icon_button(_L('Choose an Existing List'),'arrow_turn_left', null, null, ' id="chooseListChoiceButton" style="display:none" ')."
+									<div id='chooseListWindow' style='display:none; clear:both'>
+										<table style=''><tr>
+											<td valign=top>
+												<div id='listSelectboxContainer'></div>
+											</td>
+											<td valign=top>
+												<div id='listchooseStatus'></div>
+												<div id='listchooseTotalsContainer' style='display:none'>
+												<table>
+													<tr><th valign=top style='text-align:left'>"._L('List Total')."</th><td valign=top id='listchooseTotal'>0</td></tr>
+													<tr><td valign=top style='text-align:left'>"._L('Matched by Rules')."</td><td valign=top id='listchooseTotalRule'>0</td></tr>
+													<tr><td valign=top style='text-align:left'>"._L('Additions')."</td><td valign=top id='listchooseTotalAdded'>0</td></tr>
+													<tr><td valign=top style='text-align:left'>"._L('Skips')."</td><td valign=top id='listchooseTotalRemoved'>0</td></tr>
+												</table>
+												</div>
+											</td>
+										</tr></table>
+									</div>
 								</div>
 							</div>
 					</td>
 					<td valign=top>
 						<div id='allListsWindow' class='border'>
-							<table width='10%' style='table-layout:fixed; font-size:90%;   overflow: hidden; border-collapse: collapse'>
+							<table width='100%' style='table-layout:fixed; font-size:90%; overflow: hidden; border-collapse: collapse'>
+								<colgroup span='1'></colgroup>
+								<colgroup span='1' width='16'></colgroup>
+								<colgroup span='1' width='50' style='overflow: hidden; white-space: nowrap; text-align:left'></colgroup>
 								<thead>
-									<tr ><th style='width:90px; overflow: hidden; white-space: nowrap; text-align:left'> </th>
-									<th width='32px'></th>
-									<th colspan=100 style='overflow: hidden; width: 40px; white-space: nowrap; text-align:left'></th></tr>
+									<tr>
+										<th style='width:90px; overflow: hidden; white-space: nowrap; text-align:left'> </th>
+										<th></th>
+										<th colspan=100></th>
+									</tr>
 									<tr><td colspan=100 id='listsTableStatus'></td></tr>
 								</thead>
 								<tbody id='listsTableBody'></tbody>
