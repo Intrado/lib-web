@@ -154,8 +154,12 @@ function fmt_persontip ($row, $index) {
 }
 
 function fmt_jobs_actions ($obj, $name) {
-	global $USER;
+	return action_links(jobs_actionlinks ($obj));
+}
 
+function jobs_actionlinks ($obj) {
+	global $USER;
+	
 	$id = $obj->id;
 	$status = $obj->status;
 	$deleted = $obj->deleted;
@@ -272,7 +276,7 @@ function fmt_jobs_actions ($obj, $name) {
 			}
 			break;
 	}
-	return action_links($buttons);
+	return $buttons;
 }
 
 function fmt_job_enddate ($obj,$name) {
