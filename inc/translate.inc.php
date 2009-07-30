@@ -3,7 +3,7 @@
 
 
 function getSupportedLanguages() {
-	return array("arabic"=>"ar", "bulgarian"=>"bg", "catalan"=>"ca", "chinese"=>"zh", "croatian"=>"hr", "czech"=>"cs", "danish"=>"da", "dutch"=>"nl", "english"=>"en", "finnish"=>"fi", "french"=>"fr", "german"=>"de", "greek"=>"el", "hebrew"=>"iw", "hindi"=>"hi", "indonesian"=>"id", "italian"=>"it", "japanese"=>"ja", "korean"=>"ko", "latvian"=>"lv", "lithuanian"=>"lt", "norwegian"=>"no", "polish"=>"pl", "portuguese"=>"pt-PT", "romanian"=>"ro", "russian"=>"ru", "serbian"=>"sr", "slovak"=>"sk", "slovenian"=>"sl", "spanish"=>"es", "swedish"=>"sv", "ukrainian"=>"uk", "vietnamese"=>"vi");
+	return array("arabic"=>"ar", "bulgarian"=>"bg", "catalan"=>"ca", "chinese"=>"zh", "croatian"=>"hr", "czech"=>"cs", "danish"=>"da", "dutch"=>"nl", "english"=>"en", "filipino" => "tl","finnish"=>"fi", "french"=>"fr", "german"=>"de", "greek"=>"el", "hebrew"=>"iw", "hindi"=>"hi", "indonesian"=>"id", "italian"=>"it", "japanese"=>"ja", "korean"=>"ko", "latvian"=>"lv", "lithuanian"=>"lt", "norwegian"=>"no", "polish"=>"pl", "portuguese"=>"pt-PT", "romanian"=>"ro", "russian"=>"ru", "serbian"=>"sr", "slovak"=>"sk", "slovenian"=>"sl", "spanish"=>"es", "swedish"=>"sv", "ukrainian"=>"uk", "vietnamese"=>"vi");
 }
 
 function googletranslate($text, $lang_pairs) {
