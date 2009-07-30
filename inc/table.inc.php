@@ -196,11 +196,10 @@ function showPageMenu ($total,$start, $perpage, $link = NULL) {
 function ajax_table_handle_togglers($containerID) {
 	global $USER;
 	
-	if (!isset($_SESSION['ajaxtabletogglers'])) {
+	if (!isset($_SESSION['ajaxtabletogglers']))
 		$_SESSION['ajaxtabletogglers'] = array();
-	} else if (!isset($_SESSION['ajaxtabletogglers'][$containerID])) {
+	if (!isset($_SESSION['ajaxtabletogglers'][$containerID]))
 		$_SESSION['ajaxtabletogglers'][$containerID] = array();
-	}
 		
 	$togglers = $_SESSION['ajaxtabletogglers'][$containerID];
 	
