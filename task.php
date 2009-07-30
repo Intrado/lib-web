@@ -205,7 +205,7 @@ $TITLE = "Import Editor: " . ($IMPORT->id ? escapehtml($IMPORT->name) : 'New Imp
 include_once("nav.inc.php");
 
 NewForm($form);
-if (!$IMPORT->id) {
+if (!$IMPORT->id || !$IMPORT->datamodifiedtime) {
 	buttons(submit($form, $section));
 	$hover = "ImportEditor_Settings";
 } else {
