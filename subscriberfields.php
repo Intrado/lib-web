@@ -97,16 +97,16 @@ function fmt_values ($obj, $name) {
 	if ($obj->isOptionEnabled('static')) {
 		// TODO special case language
 		if ($obj->fieldnum == $languageField) {
-			return "English,Spanish,French"; // TODO
+			return "English,Spanish"; // TODO
 		} else {
 			$values = QuickQueryList("select value from persondatavalues where fieldnum=? and editlock=1", false, false, array($obj->fieldnum));
 			if (count($values) == 0)
 				return "";
 			$valcsv = implode(",", $values);
 			if (strlen($valcsv) > 25)
-				return substr($valcsv, 0, 25) . "...";
+				return htmlentities(substr($valcsv, 0, 25) . "...");
 			else
-				return $valcsv;
+				return htmlentities($valcsv);
 		}
 	} else
 		return "";
