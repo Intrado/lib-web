@@ -1,5 +1,16 @@
 <? 
 
+function fmt_timeline_jobs_actions ($obj, $name) {
+	$array = jobs_actionlinks($obj);
+	$links = is_array($array) ? $array : func_get_args();
+	
+	foreach ($links as $key => $link)
+		if ($link == "")
+			unset($links[$key]);
+	return implode("&nbsp; &nbsp;",$links); // breaking space in the middle is as designed
+}
+
+
 // Settings
 $jobhight = 20;		// Pixel height of each job
 $jobspacing = 4;	// Pixel vertical spacing between jobs
@@ -124,7 +135,7 @@ foreach($jobs as $job) {
 			$content .= '<div id="box_' . $i . '" style="display:none"><div class="box">';
 				$content .= '<div class="boxname">' . $job->name . '</div>';
 				$content .= '<div class="jobbar" style="position: relative;background-color: ' . $statuscolor . ';top:3px;height:auto;">Status:&nbsp;' .  ucfirst($job->status) . '</div>';				
-				$content .= '<p id="boxc_' . $i . '" >' . fmt_jobs_actions ($job,"job") . '</p>';
+				$content .= '<p id="boxc_' . $i . '" >' . fmt_timeline_jobs_actions($job,"job") . '</p>';
 				
 				//$content .= '<div style="width: 102%;background-color: ' . $statuscolor . ';left:-10%;height:auto;border:1px;margin:0px;">&nbsp;&nbsp;' .  ucfirst($job->status) . '</div>';				
 				
@@ -212,11 +223,10 @@ $minhight = $minhight * $jobhight + $minhight*$jobspacing ;
 		</table>
 		</div>
 	</div>
-		<table style="width: 100%;">
-		<tr>
-		<td style="width: 100%; float:right; padding-left: 18%;">
-			<div style="text-align:right;">
+
+			
 			<?=	icon_button(_L('Refresh'),"fugue/arrow_circle_double_135","window.location.reload()",null,'style="display:inline;"') ?>	
+			<div style="text-align:right;">
 			<div id="t_tools" style="cursor:pointer;display:inline;" ><img  src="img/largeicons/tiny20x20/tools.jpg" />&nbsp;Tools</div>
 			&nbsp;|&nbsp;<div id="t_legend" style="cursor:pointer;display:inline;" ><img src="img/largeicons/tiny20x20/flag.jpg" />&nbsp;Legend</div>
 			
@@ -228,11 +238,11 @@ $minhight = $minhight * $jobhight + $minhight*$jobspacing ;
 				<a href="start.php?timelinerange=0">1&nbsp;Day</a><br />	
 				<a href="start.php?timelinerange=1">3&nbsp;Days</a><br />
 				<a href="start.php?timelinerange=2">5&nbsp;Days</a><br />
-				<a href="start.php?timelinerange=3">9&nbsp;Days</a><br />
+				<a href="start.php?timelinerange=3">7&nbsp;Days</a><br />
 				<b>Quick Jump:<b><br />
 				<a href="start.php?timelineday=0">Today</a><br />	
-				<a href="start.php?timelineday=<?=($day+10) ?>">10&nbsp;Days&nbsp;forward</a><br />	
-				<a href="start.php?timelineday=<?=($day-10) ?>">10&nbsp;Days&nbsp;back</a><br />	
+				<a href="start.php?timelineday=<?=($day+10) ?>">10&nbsp;Days&nbsp;Forward</a><br />	
+				<a href="start.php?timelineday=<?=($day-10) ?>">10&nbsp;Days&nbsp;Back</a><br />	
 			<div>
 			<div id="timelinelegend" style="display:none;width: 100px;">	
 			<?
@@ -250,9 +260,7 @@ $minhight = $minhight * $jobhight + $minhight*$jobspacing ;
 			}
 			?>
 			</div>
-			</td>
-		</tr>
-		</table>
+
 <script>
 	var jobids=new Array(<?= implode(",",$jobids) ?>);
 	var jobstatus=new Array(<?= implode(",",$jobstatus) ?>);
@@ -270,7 +278,8 @@ $minhight = $minhight * $jobhight + $minhight*$jobspacing ;
 				hideAfter: 0.5,
 				stem: 'topRight',
 				hook: {  target: 'bottomMiddle', tip: 'topRight'  },
-				width: 'auto',
+				width: '300px',
+				viewport: true,
 				offset: { x: 0, y: -5 }
 			});
 			var w = $('__' + i).getWidth();
@@ -297,7 +306,7 @@ $minhight = $minhight * $jobhight + $minhight*$jobspacing ;
 			hideAfter: 0.5,
 			stem: 'topRight',
 			hook: {  target: 'bottomMiddle', tip: 'topRight'  },
-			width: 'auto',
+			width: '150px',
 			offset: { x: 0, y: -4 }
 		});
 
@@ -306,8 +315,8 @@ $minhight = $minhight * $jobhight + $minhight*$jobspacing ;
 	function getcontent(id) {
 		var content = $("box_" + id).innerHTML;
 	//	content += '<br /><a href="job.php?id=' + jobids[id] + '">Edit</a><br />';
-	//	if(jobstatus[id] == "Active")
-	//		content += '<img width="200px" src="graph_job.png.php?jobid=' + jobids[id] + '&junk=" />';		
+		if(jobstatus[id] == "Active" || jobstatus[id] == "Complete")
+			content += '<div class="boxmonitor" onclick="popup(\'jobmonitor.php?jobid=' + jobids[id] + '\', 500, 450);" ><img src="graph_job.png.php?jobid=' + jobids[id] + '&junk=' + Math.random() + '"/><br />Click for larger view.</div>';		
 		return content;
 	}
 	

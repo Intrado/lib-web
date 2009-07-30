@@ -417,6 +417,8 @@ function activityfeed($mergeditems,$ajax = false) {
 		$activityfeed .= "
 				<script>
 				var actionids = Array(" . implode(",",$actionids) . ");
+				var jobfiltes = Array('nonefilter','jobsfilter','messagesfilter','listsfilter','savedreportsfilter','systemmessagesfilter');
+				
 				function addfeedtools() {	
 					for(i=0;i<actionids.length;i++){
 						var id = actionids[i];
@@ -447,7 +449,8 @@ function activityfeed($mergeditems,$ajax = false) {
 								var result = response.responseJSON;
 								if(result) {
 									var html = '';
-									var size = result.length;
+									var size = result.length;			
+									
 									removefeedtools();
 									actionids = Array();
 									//alert('jobs returned ' + result[0].defaultlink + result[0]['itemid']);
@@ -463,20 +466,20 @@ function activityfeed($mergeditems,$ajax = false) {
 										}
 										html += '</tr>';
 									}
-									$('feeditems').innerHTML = html;									
+									$('feeditems').update(html);
 									addfeedtools();
 									
+									var filtercolor = $('filterby').getStyle('color');
+									if(!filtercolor)
+										filtercolor = '#000';
+										
+									size = jobfiltes.length;
+									for(i=0;i<size;i++){
+										$(jobfiltes[i]).setStyle({color: filtercolor});	
+									}
 									$(filter + 'filter').setStyle({
 	 									 color: '#005BC3'
-									});
-									var position = $(filter + 'filter').positionedOffset();
-  									$('selectedfilter').setStyle({
-  										top: (position[1]+3) + 'px',
-  										display: 'block',
- 										fontSize: '12px'
-									});
-  									
-									
+									});	
 									
 								}
 								
@@ -554,7 +557,6 @@ include_once("nav.inc.php");
 
 				//style="border: none;border-collapse: collapse;">
 				$activityfeed = '
-				<div id="selectedfilter" style="position: absolute;display:none;"><img src="img/arrow_right.gif"></div>
 				<table width="100%" name="recentactivity">
 				<tr>
 					<td class="feed" style="width: 180px;vertical-align: top;font-size: 12px;font-weight: bold;" >
@@ -562,9 +564,13 @@ include_once("nav.inc.php");
 						<a id="nonefilter" href="start.php?filter=none" onclick="applyfilter(\'none\'); return false;"><img src="img/largeicons/tiny20x20/globe.jpg">Show&nbsp;All</a><br />
 					</div>
 					<br />		
-					<h1>Filter By:</h1>
-					<div class="feedfilter">	
+					<h1 id="filterby">Filter By:</h1>
+					<div id="allfilters" class="feedfilter">	
 						<a id="jobsfilter" href="start.php?filter=jobs" onclick="applyfilter(\'jobs\'); return false;"><img src="img/largeicons/tiny20x20/ping.jpg">Jobs</a><br />
+						<a id="messagesfilter" href="start.php?filter=messages" onclick="applyfilter(\'messages\'); return false;"><img src="img/largeicons/tiny20x20/letter.jpg">Messages</a><br />
+						<a id="listsfilter" href="start.php?filter=lists" onclick="applyfilter(\'lists\'); return false;"><img src="img/largeicons/tiny20x20/addrbook.jpg">Contacts</a><br />
+						<a id="savedreportsfilter" href="start.php?filter=savedreports" onclick="applyfilter(\'savedreports\'); return false;"><img src="img/largeicons/tiny20x20/savedreport.jpg">Reports</a><br />
+						<a id="systemmessagesfilter" href="start.php?filter=systemmessages" onclick="applyfilter(\'systemmessages\'); return false;"><img src="img/largeicons/tiny20x20/news.jpg">System&nbsp;Messages</a><br />		
 					</div>
 					<div id="jobsubfilters" style="display:none;">	
 							<a href="start.php?filter=savedjobs"><img src="img/largeicons/tiny20x20/folderandfiles.jpg">Saved</a><br />	
@@ -574,21 +580,11 @@ include_once("nav.inc.php");
 							<a href="start.php?filter=repeatingjobs"><img src="img/largeicons/tiny20x20/calendar.jpg">Repeating</a><br />
 							
 					</div>
-					<div class="feedfilter">	
-						<a id="messagesfilter" href="start.php?filter=messages" onclick="applyfilter(\'messages\'); return false;"><img src="img/largeicons/tiny20x20/letter.jpg">Messages</a><br />
-					</div>
 					<div id="messagessubfilters" style="display:none;">	
 							<a href="start.php?filter=phonemessages"><img src="img/largeicons/tiny20x20/phonehandset.jpg">Phone</a><br />	
 							<a href="start.php?filter=emailmessages"><img src="img/largeicons/tiny20x20/email.jpg">Email</a><br />
 							<a href="start.php?filter=smsmessages"><img src="img/largeicons/tiny20x20/smschat.jpg">SMS</a><br />
 					</div>
-					<div class="feedfilter">	
-						<a id="listsfilter" href="start.php?filter=lists" onclick="applyfilter(\'lists\'); return false;"><img src="img/largeicons/tiny20x20/addrbook.jpg">Contacts</a><br />
-						<a id="savedreportsfilter" href="start.php?filter=savedreports" onclick="applyfilter(\'savedreports\'); return false;"><img src="img/largeicons/tiny20x20/savedreport.jpg">Reports</a><br />
-						<a id="systemmessagesfilter" href="start.php?filter=systemmessages" onclick="applyfilter(\'systemmessages\'); return false;"><img src="img/largeicons/tiny20x20/news.jpg">System&nbsp;Messages</a><br />
-						
-					</div>
-					
 					</td>
 					<td width="30px">&nbsp;</td>
 					<td class="feed" valign="top" >

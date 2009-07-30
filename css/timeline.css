@@ -76,6 +76,23 @@
 		color: #000;
 		text-align: center;	
 	}
+	
+	.box p {
+		text-decoration: none;
+		padding-left: 10%;
+		width: 80%;
+		cursor: pointer;
+	}
+	.boxmonitor {
+		text-align: center;	
+		cursor: pointer;
+	}
+	.boxmonitor img{
+		width: 270px;
+	}
+	
+	
+	
 	.boxname {
 		font-size: 15px; 
 	}
