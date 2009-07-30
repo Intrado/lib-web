@@ -42,15 +42,15 @@ var RuleWidget = Class.create({
 		this.rulesTableFootLastTR = new Element('tr'); // For rule editor
 		this.rulesTableBody = new Element('tbody');
 		this.container
-			.insert(new Element('table', {})
+			.insert(new Element('table', {'style':'margin-bottom:10px'})
 				.insert(this.rulesTableBody)
 				.insert(new Element('tfoot')
 					.insert(this.rulesTableAboveEditor)
 				)
 			)
+			.insert(this.ruleHelperDiv)
 			.insert(new Element('table', {style:'margin:3px'})
 				.insert(new Element('tbody')
-					.insert(new Element('tr').insert(new Element('td', {'colspan':'100'}).insert(this.ruleHelperDiv)))
 					.insert(this.rulesTableFootLastTR)
 				)
 			);
@@ -205,7 +205,7 @@ var RuleWidget = Class.create({
 		if (!this.delayActions || suppressFire) {
 			// Actions
 			if (this.ruleEditor) {
-					var actionTD = new Element('td', { 'style':'', 'valign':'top'}).update('<?=addslashes(icon_button(_L('Remove'), 'delete'))?>').insert('<br style=\"clear:both\"/>');
+					var actionTD = new Element('td', { 'style':'', 'valign':'top'}).update('<?=addslashes(icon_button(_L('Remove'), 'delete'))?><span style="clear:both"></span>');
 					var deleteRuleButton = actionTD.down('button');
 					tr.insert(actionTD);
 					deleteRuleButton.observe('click', function(event, tr, fieldnum) {
@@ -249,10 +249,10 @@ var RuleEditor = Class.create({
 	
 	var fieldsetCSS = 'padding:0px; margin:0;';
 
-	this.fieldTD = new Element('td',{'style':'', 'valign':'top'});
-		this.criteriaTD = new Element('td',{'style':'', 'valign':'top'});
-		this.valueTD = new Element('td',{'style':'', 'valign':'top'});
-		this.actionTD = new Element('td',{'style':'', 'valign':'top'});
+	this.fieldTD = new Element('td',{'style':'width:100px', 'valign':'top'});
+		this.criteriaTD = new Element('td',{'style':'width:100px', 'valign':'top'});
+		this.valueTD = new Element('td',{'style':'width:100px', 'valign':'top'});
+		this.actionTD = new Element('td',{'style':'width:100px', 'valign':'top'});
 		if (!this.ruleWidget.noHelper) {
 			this.fieldTD.update('<span style="font-style:italic; font-weight: bold;"><?=addslashes(_L('Field'))?></span>');
 			this.criteriaTD.update('<span style="font-style:italic; display:none; font-weight: bold;"><?=addslashes(_L('Criteria'))?></span>');
@@ -443,10 +443,10 @@ var RuleEditor = Class.create({
 				break;
 				
 			case 'numeric':
-				container.update(this.make_textbox(''));
+				container.update(this.make_textbox('',true));
 				if (op == 'num_range') {
-					container.insert(' <?=addslashes(_L('and'))?> ');
-					container.insert(this.make_textbox(''));
+					container.insert('<div><?=addslashes(_L('and'))?></div>');
+					container.insert(this.make_textbox('',true));
 				}
 				break;
 				
@@ -457,14 +457,14 @@ var RuleEditor = Class.create({
 				} else if (op == 'eq' || op == 'date_range') {
 					container.update(this.make_datebox(''));
 					if (op == 'date_range') {
-						container.insert(' <?=addslashes(_L('and'))?> ');
+						container.insert('<div><?=addslashes(_L('and'))?></div>');
 						container.insert(this.make_datebox(''));
 					}
 				} else if (op == 'date_offset' || op == 'reldate_range') {
-					container.update(this.make_textbox(''));
+					container.update(this.make_textbox('',true));
 					if (op == 'reldate_range') {
-						container.insert(' <?=addslashes(_L('and'))?> ');
-						container.insert(this.make_textbox(''));
+						container.insert('<div><?=addslashes(_L('and'))?></div>');
+						container.insert(this.make_textbox('',true));
 					}
 				}
 				break;
@@ -495,7 +495,7 @@ var RuleEditor = Class.create({
 			return;
 		}
 			
-		this.actionTD.down('fieldset').down('div').update('<?=addslashes(icon_button(_L('Add'), 'add'))?>').insert('<br style="clear:both"/>');
+		this.actionTD.down('fieldset').down('div').update('<?=addslashes(icon_button(_L('Add'), 'add'))?><span style="clear:both"></span>');
 		var addRuleButton = this.actionTD.down('button');
 		
 		// Events
@@ -509,13 +509,12 @@ var RuleEditor = Class.create({
 	reset: function() {
 		if (!this.ruleWidget.fieldmaps)
 			return;
-		var fieldSelectbox = new Element('select');
+		var fieldSelectbox = new Element('select', {'style':'font-size:90%'});
 		
 		fieldSelectbox.update(new Element('option', {'value':''}).insert('--<?=addslashes(_L('Choose a Field'))?>--'));
 		
-		var f = new Element('optgroup');
-		var g = new Element('optgroup', {'label':'-----------------------'});
-		var c = new Element('optgroup', {'label':'-----------------------'});
+		var g = [];
+		var c = [];
 		for (var fieldnum in this.ruleWidget.fieldmaps) {
 			// Don't allow adding the same rule twice.
 			if (this.ruleWidget.appliedRules[fieldnum])
@@ -524,18 +523,24 @@ var RuleEditor = Class.create({
 			var option = new Element('option', {'value':fieldnum}).update(this.ruleWidget.fieldmaps[fieldnum].name);
 			
 			if (fieldnum.charAt(0) == 'f')
-				f.insert(option);
+				fieldSelectbox.insert(option);
 			else if (fieldnum.charAt(0) == 'g')
-				g.insert(option);
+				g.push(option);
 			else if (fieldnum.charAt(0) == 'c')
-				c.insert(option);
+				c.push(option);
 		}
-		if (f.down('option'))
-			fieldSelectbox.insert(f);
-		if (g.down('option'))
-			fieldSelectbox.insert(g);
-		if (c.down('option'))
-			fieldSelectbox.insert(c);
+		if (g.length > 0) {
+			fieldSelectbox.insert(new Element('option', {'value':'', 'disabled':true}).update('-----------'));
+			g.each(function(option) {
+				fieldSelectbox.insert(option);
+			});
+		}
+		if (c.length > 0) {
+			fieldSelectbox.insert(new Element('option', {'value':'', 'disabled':true}).update('-----------'));
+			c.each(function(option) {
+				fieldSelectbox.insert(option);
+			});
+		}
 			
 		fieldSelectbox.disabled = fieldSelectbox.options.length < 2;
 		fieldSelectbox.observe('change', function(event) {
@@ -608,7 +613,7 @@ var RuleEditor = Class.create({
 			var text = paired ? data.text: data;
 			var value = paired ? data.value: data;
 			var checkbox = new Element('input', {'type':'checkbox', 'value':value, 'style':'font-size:90%'});
-			if (max == 1) {
+			if (!paired && max == 1) {
 				return "<select><option value='"+value+"'>" +text+"</option></select>";
 			}
 			var label = new Element('label', {'style':'margin:0;padding:1px; font-size:90%;', 'for':checkbox.identify()}).update(text.escapeHTML());
@@ -658,7 +663,7 @@ var RuleEditor = Class.create({
 	make_datebox: function(value, hidden) {
 		if (!value)
 			value = '';
-		var datebox = new Element('input', {'type':'text', 'style':'font-size:90%', 'value':value.escapeHTML()});
+		var datebox = new Element('input', {'type':'text', 'size':'10', 'style':'font-size:90%', 'value':value.escapeHTML()});
 		datebox.observe('focus', function(event) {
 			event.stop();
 			this.select();
@@ -675,10 +680,12 @@ var RuleEditor = Class.create({
 		return datebox;
 	},
 
-	make_textbox: function(value, hidden) {
+	make_textbox: function(value, small, hidden) {
 		if (!value)
 			value = '';
-		var textbox = new Element('input', {'type':'text', 'value':value.escapeHTML()});
+		var textbox = new Element('input', {'type':'text', 'style':'font-size:90%', 'value':value.escapeHTML()});
+		if (small)
+			textbox.size = '8';
 		if (hidden)
 			textbox.hide();
 		return textbox;
