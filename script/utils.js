@@ -453,6 +453,7 @@ function make_person_tip(personid, tiptitle){
 			offset: { x: 10, y: 0 },
 			showOn: 'click',
 			hideOn: 'click',
+			width: 360,
 			fixed: true,
 			hideOthers: true,
 			closeButton: true
