@@ -31,73 +31,82 @@ $maxsms = getSystemSetting("maxsms", 2);
 
 $formdata = array();
 $formdata["tokenlife"] = array(
-        "label" => _L("Activation Code Lifetime (1-365 days)"),
+        "label" => _L("Code Lifetime"),
+        "fieldhelp" => _L("The number of days Activation Code is valid after generation, before it is expired."),
         "value" => getSystemSetting('tokenlife', 30),
         "validators" => array(
-            array("ValLength","min" => 1,"max" => 3),
-            array("ValNumeric","min"=>1,"max"=>365)
+        	array("ValRequired"),
+            array("ValNumber","min"=>1,"max"=>365)
         ),
         "control" => array("TextField","maxlength" => 3),
         "helpstep" => 1
 );
-$checked = "false";
-if (getSystemSetting('portalphoneactivation', 0))
-	$checked = "true";
 $formdata["portalphoneactivation"] = array(
 		"label" => _L("Allow Activation via Phone"),
-        "value" => $checked,
+        "fieldhelp" => _L("Contact Manager users may use their phone to dial into the system to associate contacts.  Does not require Activation Code generation."),
+        "value" => getSystemSetting('portalphoneactivation', 0),
         "validators" => array(
         ),
         "control" => array("Checkbox"),
         "helpstep" => 1
 );
-$checked = "false";
-if (getSystemSetting('priorityenforcement', 0))
-	$checked = "true";
 $formdata["priorityenforcement"] = array(
-		"label" => _L("Require Phone Numbers for Emergency and High Priority Job Types"),
-        "value" => $checked,
+		"label" => _L("Require Emergency Phone"),
+        "fieldhelp" => _L("Require at least one phone number for every Emergency and High Priority Job Type."),
+        "value" => getSystemSetting('priorityenforcement', 0),
         "validators" => array(
         ),
         "control" => array("CheckBox"),
         "helpstep" => 1
 );
+
+$phonelabels = QuickQueryList("select sequence, label from destlabel where type='phone'", true);
+$emaillabels = QuickQueryList("select sequence, label from destlabel where type='email'", true);
+
 $restrictedfields = array(); // all fields
 $selectedvalues = array(); // selected fields
 for ($i=0; $i<$maxphones; $i++) {
-	$restrictedfields["lockedphone".$i] = "Phone ".($i+1); // TODO add phone label
+	$destlabel = "";
+	if (isset($phonelabels[$i]) && mb_strlen($phonelabels[$i]) > 0) {
+		$destlabel = " (" . $phonelabels[$i] . ")";
+	}
+	$restrictedfields["lockedphone".$i] = "Phone ".($i+1) . $destlabel;
 	if (getSystemSetting("lockedphone".$i, 0)) $selectedvalues[] = "lockedphone".$i;
 }
 for ($i=0; $i<$maxemails; $i++) {
-	$restrictedfields["lockedemail".$i] = "Email ".($i+1); // TODO add phone label
+	$destlabel = "";
+	if (isset($emaillabels[$i]) && mb_strlen($emaillabels[$i]) > 0) {
+		$destlabel = " (" . $emaillabels[$i] . ")";
+	}
+	$restrictedfields["lockedemail".$i] = "Email ".($i+1) . $destlabel;
 	if (getSystemSetting("lockedemail".$i, 0)) $selectedvalues[] = "lockedemail".$i;
 }
 if (getSystemSetting("_hassms", false)) {
+	$smslabels = QuickQueryList("select sequence, label from destlabel where type='sms'", true);
 	for ($i=0; $i<$maxsms; $i++) {
-		$restrictedfields["lockedsms".$i] = "SMS ".($i+1); // TODO add phone label
+		$destlabel = "";
+		if (isset($smslabels[$i]) && mb_strlen($smslabels[$i]) > 0) {
+			$destlabel = " (" . $smslabels[$i] . ")";
+		}
+		$restrictedfields["lockedsms".$i] = "SMS ".($i+1) . $destlabel;
 		if (getSystemSetting("lockedsms".$i, 0)) $selectedvalues[] = "lockedsms".$i;
 	}
 }
 $formdata["multicheckbox"] = array(
-        "label" => _L("Restricted Destination Fields"),
+        "label" => _L("Restricted Fields"),
+        "fieldhelp" => _L("Destination Fields that Contact Manager users are not allowed to edit."),
         "value" => $selectedvalues,
         "validators" => array(
-            array("ValRequired")
         ),
         "control" => array("MultiCheckbox", "height" => "100px", "values" => $restrictedfields),
         "helpstep" => 1
 );
 
 
-$helpsteps = array (
-	_L("Contact Manager Settings."),
-	_L("yes you can")
-);
-
 $buttons = array(submit_button(_L("Done"),"submit","accept"),
 				icon_button(_L("Cancel"),"cross",null,"settings.php"));
 
-$form = new Form("account", $formdata, $helpsteps, $buttons);
+$form = new Form("account", $formdata, null, $buttons);
 $form->ajaxsubmit = true;
 
 //check and handle an ajax request (will exit early)
