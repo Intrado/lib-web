@@ -554,14 +554,13 @@ div.scrollTableContainer {
 	font-weight: bold;
 	color: <?=$primary?>;
 }
-.feedfilter img{
+.feedfilter {
+	margin-left: 20px;
+}
+.feedfilter img {
 	position: relative;
 	top: 6px;
-	border: 0px;
-	padding: 0px;
-	padding-left: 20px;
 	padding-right: 4px;
-	margin: 0px;
 }
 
 .feed a {
@@ -574,6 +573,7 @@ div.scrollTableContainer {
 }
 .feed td {
 	padding-bottom:5px;
+	border-bottom: 1px solid <?=$theme2?>;
 }
 
 
