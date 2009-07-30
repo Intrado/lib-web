@@ -123,11 +123,11 @@ startWindow(_L('Details'), 'padding: 3px;');
 	<table width="100%" border="0" cellpadding="3" cellspacing="0">
 		<tr>
 			<th align="right" class="windowRowHeader bottomBorder"><?=_L("Message For")?>:</td>
-			<td class="bottomBorder"><?=$historicdata['f01'] . " " . $historicdata['f02']?></td>
+			<td class="bottomBorder"><?=escapehtml($historicdata['f01']) . " " . escapehtml($historicdata['f02'])?></td>
 		</tr>
 		<tr>
 			<th align="right" class="windowRowHeader bottomBorder"><?=_L("Job Name")?>:</td>
-			<td class="bottomBorder"><?=$historicdata['jobname']?></td>
+			<td class="bottomBorder"><?=escapehtml($historicdata['jobname'])?></td>
 		</tr>
 		<tr>
 			<th align="right" class="windowRowHeader bottomBorder"><?=_L("Date")?>:</td>
