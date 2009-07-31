@@ -23,6 +23,42 @@ var RuleWidget = Class.create({
 
 	// @param container, the DOM container for this widget.
 	initialize: function(container, readonly, allowedFields) {
+		this.ruleEditorGuideContents = <?=json_encode(array(
+			// Fieldmap
+			'additionalChooseFieldmap' => _L('To add another rule, Please choose a fieldmap....'), // Used instead of 'chooseFieldmap' if there are existing rules
+			'chooseFieldmap' => _L('Please choose a fieldmap....'),
+			// Criteria
+			'multisearch' => _L('Multisearch Choose a criteria for multisearch'),
+			'reldate' => _L('Reldate Choose a criteria for reldate'),
+			'text' => _L('Text Choose a criteria for text, but don\'t forget.'),
+			'numeric' => _L('Numeric Choose a criteria for numeric'),
+			// Value
+			'multisearch_in' => _L('Multisearch IN'),
+			'multisearch_not' => _L('Multisearch NOT'),
+			'reldate_eq' => _L('Reldate EQ'),
+			'reldate_reldate' => _L('Reldate RELDATE'),
+			'reldate_date_range' => _L('Reldate DATE_RANGE'),
+			'reldate_date_offset' => _L('Reldate DATE_OFFSET'),
+			'reldate_reldate_range' => _L('Reldate RELDATE_RANGE'),
+			'text_eq' => _L('Text EQ'),
+			'text_ne' => _L('Text NE'),
+			'text_sw' => _L('Text SW'),
+			'text_ew' => _L('Text EW'),
+			'text_cn' => _L('Text CN'),
+			'numeric_num_eq' => _L('Numeric EQ'),
+			'numeric_num_ne' => _L('Numeric NE'),
+			'numeric_num_gt' => _L('Numeric GT'),
+			'numeric_num_ge' => _L('Numeric GE'),
+			'numeric_num_lt' => _L('Numeric LT'),
+			'numeric_num_le' => _L('Numeric LE'),
+			'numeric_num_range' => _L('Numeric RANGE')
+		))?>;
+		
+		// Guide/Focus
+		this.guideDisabled = false;
+		this.guideStepIndex = 0;
+		this.guideFieldset = null;
+	
 		if (!allowedFields)
 			this.allowedFields = ['f','g','c'];
 		else
@@ -30,7 +66,7 @@ var RuleWidget = Class.create({
 			
 		this.container = container;
 		this.warningDiv = new Element('div', {'style':'color:red; padding:2px'});
-				this.warningDiv.hide();
+		this.warningDiv.hide();
 		this.container.insert(this.warningDiv);
 		this.ruleHelperDiv = new Element('div', {'style':''});
 		this.ruleHelperContentDiv = new Element('div');
@@ -49,7 +85,7 @@ var RuleWidget = Class.create({
 				)
 			)
 			.insert(this.ruleHelperDiv)
-			.insert(new Element('table', {style:'margin:3px'})
+			.insert(new Element('table', {style:''})
 				.insert(new Element('tbody')
 					.insert(this.rulesTableFootLastTR)
 				)
@@ -143,12 +179,12 @@ var RuleWidget = Class.create({
 		if (!data.type)
 			data.type = this.fieldmaps[data.fieldnum].type;
 		// FieldmapTD
-		var fieldmapTD = new Element('td', {'class':'list', 'style':'', 'valign':'top'}).insert(this.fieldmaps[data.fieldnum].name);
+		var fieldmapTD = new Element('td', {'class':'list', 'style':'font-size:90%', 'valign':'top'}).insert(this.fieldmaps[data.fieldnum].name);
 		// Keep track of the row's data.fieldnum by using a hidden input.
 		if (addHiddenFieldnum)
-			fieldmapTD.insert(new Element('input', {'type':'hidden', 'value':data.fieldnum}));
+			fieldmapTD.insert(new Element('input', {'type':'hidden', 'style':'font-size:90%','value':data.fieldnum}));
 		// CriteriaTD
-		var criteriaTD = new Element('td', {'class':'list', 'style':'', 'valign':'top'});
+		var criteriaTD = new Element('td', {'class':'list', 'style':'font-size:90%; width:50px', 'valign':'top'});
 		var criteria = this.operators[data.type][data.op];
 		if (data.op == 'in') {
 			criteria = '<?=addslashes(_L('is'))?>';
@@ -172,14 +208,75 @@ var RuleWidget = Class.create({
 		} else {
 			value = data.val.join(' <?=addslashes(_L('and'))?> ');
 		}
-		var widthCSS = (addHiddenFieldnum) ? ' width: 150px; ' : '';
+		var widthCSS = (addHiddenFieldnum) ? ' width: 80px; ' : '';
 		var heightCSS = (value.length > 400) ? ' overflow: auto; height: 300px; ' : '';
-		var valueTD = new Element('td', {'class':'list', 'valign':'top'}).update(new Element('div', {'style': 'overflow:hidden; ' + widthCSS + heightCSS}).update(value.escapeHTML().replace(/,/g, ',<br/>') + '&nbsp;'));
+		var valueTD = new Element('td', {'class':'list', 'style':'font-size:90%','valign':'top'}).update(new Element('div', {'style': 'overflow:hidden; ' + widthCSS + heightCSS}).update(value.escapeHTML().replace(/,/g, ',<br/>') + '&nbsp;'));
 		tr.insert(fieldmapTD).insert(criteriaTD).insert(valueTD);
 		
 		return true;
 	},
 	
+	refresh_guide: function (reset, specificFieldset) {
+		var sectionFieldsets = this.rulesTableFootLastTR.select('fieldset');
+		for (var i = 0; i < sectionFieldsets.length; i++) {
+			var fieldset = sectionFieldsets[i];
+			if (specificFieldset == fieldset) 
+				this.guideStepIndex = i;
+			else {
+				fieldset.style.borderWidth = '0';
+				fieldset.down('div').style.margin = '3px';
+			}
+		}
+		if (sectionFieldsets.length < 1 || this.guideDisabled) {
+			this.guideFieldset = null;
+			return;
+		}
+		this.guideStepIndex = (reset) ? 0 : Math.min(sectionFieldsets.length-1, Math.max(0, this.guideStepIndex));
+		var currentFieldset = sectionFieldsets[this.guideStepIndex];
+		// Visual effect.
+		currentFieldset.style.borderWidth = '3px';
+		currentFieldset.down('div').style.margin = '0';
+		this.guideFieldset = currentFieldset;
+	
+		helpContent = null;
+		// Guide Content
+		
+		var ruleCount = $H(this.appliedRules).keys().length;
+		var data = this.ruleEditor.get_data();
+		if (data) {
+			if (currentFieldset.id == 'AddRuleCriteria') {
+				helpContent = this.ruleEditorGuideContents[data.type];
+			}  else if (currentFieldset.id == 'AddRuleValue') {
+				// multisearch IS NOT
+				if (data.logical == 'and not')
+						data.op = 'not';
+				helpContent = this.ruleEditorGuideContents[data.type + '_' + data.op];
+			} else if (currentFieldset.id == 'AddRuleFieldmap') {
+				if (ruleCount <= 0)
+					helpContent = this.ruleEditorGuideContents['chooseFieldmap'];
+				else
+					helpContent = this.ruleEditorGuideContents['additionalChooseFieldmap'];
+			}
+		} else {
+			var fieldmap = this.ruleEditor.get_selected_fieldmap();
+			if (!fieldmap || currentFieldset.id == 'AddRuleFieldmap') {
+				if (ruleCount <= 0)
+					helpContent = this.ruleEditorGuideContents['chooseFieldmap'];
+				else
+					helpContent = this.ruleEditorGuideContents['additionalChooseFieldmap'];
+			} else {
+				helpContent = this.ruleEditorGuideContents[fieldmap.type];
+			}
+		}
+		
+		if (!helpContent) {
+				return;
+		}
+			
+		this.ruleHelperContentDiv.update(helpContent);
+		this.ruleHelperContentDiv.setStyle({'border':'solid 3px rgb(150,150,255)', 'padding':'2px'});
+	},
+
 	refresh_rules_table: function() {
 		var ruleCount = $H(this.appliedRules).keys().length + 1;
 		
@@ -205,7 +302,7 @@ var RuleWidget = Class.create({
 		if (!this.delayActions || suppressFire) {
 			// Actions
 			if (this.ruleEditor) {
-					var actionTD = new Element('td', { 'style':'', 'valign':'top'}).update('<?=addslashes(icon_button(_L('Remove'), 'delete'))?><span style="clear:both"></span>');
+					var actionTD = new Element('td', { 'style':'clear:both', 'valign':'top'}).update('<?=addslashes(icon_button(_L('Remove'), 'delete'))?><span style="clear:both"></span>');
 					var deleteRuleButton = actionTD.down('button');
 					tr.insert(actionTD);
 					deleteRuleButton.observe('click', function(event, tr, fieldnum) {
@@ -218,6 +315,7 @@ var RuleWidget = Class.create({
 								if (this.ruleEditor)
 									this.ruleEditor.reset();
 							}
+							this.refresh_guide(true);
 							this.container.fire('RuleWidget:DeleteRule', {'fieldnum':fieldnum});
 					}.bindAsEventListener(this, tr, data.fieldnum));
 			}
@@ -227,8 +325,12 @@ var RuleWidget = Class.create({
 			if (this.ruleEditor)
 				this.ruleEditor.reset();
 		}
-		if (!suppressFire)
-			this.container.fire('RuleWidget:AddRule', {'ruledata':$H(data)});
+		if (!suppressFire) {
+			this.refresh_guide();
+			this.container.fire('RuleWidget:AddRule', {
+				'ruledata': $H(data)
+			});
+		}
 		return true;
 	},
 
@@ -247,23 +349,23 @@ var RuleEditor = Class.create({
 	initialize: function(ruleWidget, containerTR) {
 	this.ruleWidget = ruleWidget;
 	
-	var fieldsetCSS = 'padding:0px; margin:0;';
-
-	this.fieldTD = new Element('td',{'style':'width:100px', 'valign':'top'});
-		this.criteriaTD = new Element('td',{'style':'width:100px', 'valign':'top'});
-		this.valueTD = new Element('td',{'style':'width:100px', 'valign':'top'});
-		this.actionTD = new Element('td',{'style':'width:100px', 'valign':'top'});
+	this.fieldTD = new Element('td',{'style':'', 'valign':'top'});
+		this.criteriaTD = new Element('td',{'style':'', 'valign':'top'});
+		this.valueTD = new Element('td',{'style':'', 'valign':'top'});
+		this.actionTD = new Element('td',{'style':'clear:both;', 'valign':'top'});
 		if (!this.ruleWidget.noHelper) {
 			this.fieldTD.update('<span style="font-style:italic; font-weight: bold;"><?=addslashes(_L('Field'))?></span>');
 			this.criteriaTD.update('<span style="font-style:italic; display:none; font-weight: bold;"><?=addslashes(_L('Criteria'))?></span>');
 			this.valueTD.update('<span style="font-style:italic; display:none; font-weight: bold;"><?=addslashes(_L('Value'))?></span>');
 			this.actionTD.update('<span style="font-style:italic; display:none; font-weight: bold;">&nbsp;</span>');
 		}
-			
-		this.fieldTD.insert(new Element('div', {'class':'RuleWidgetColumnDiv'})).insert(new Element('fieldset', {'id':'AddRuleFieldmap', style:fieldsetCSS}).insert(new Element('div')));
-		this.criteriaTD.insert(new Element('div', {'class':'RuleWidgetColumnDiv'})).insert(new Element('fieldset', {'id':'AddRuleCriteria', style:fieldsetCSS}).insert(new Element('div')));
-		this.valueTD.insert(new Element('div', {'class':'RuleWidgetColumnDiv'})).insert(new Element('fieldset', {'id':'AddRuleValue', style:fieldsetCSS}).insert(new Element('div', {style:'padding:3px'})));
-		this.actionTD.insert(new Element('div', {'class':'RuleWidgetColumnDiv'})).insert(new Element('fieldset', {'id':'AddRuleAction', style:fieldsetCSS}).insert(new Element('div')));
+		
+		var fieldsetCSS = 'padding:3px; margin:0px; border: solid 3px rgb(150,150,255)';
+		var fieldsetDivOptions = {'style':''};
+		this.fieldTD.insert(new Element('div', {'class':'RuleWidgetColumnDiv'})).insert(new Element('fieldset', {'id':'AddRuleFieldmap', style:fieldsetCSS}).insert(new Element('div', fieldsetDivOptions)));
+		this.criteriaTD.insert(new Element('div', {'class':'RuleWidgetColumnDiv'})).insert(new Element('fieldset', {'id':'AddRuleCriteria', style:fieldsetCSS}).insert(new Element('div', fieldsetDivOptions)));
+		this.valueTD.insert(new Element('div', {'class':'RuleWidgetColumnDiv'})).insert(new Element('fieldset', {'id':'AddRuleValue', style:fieldsetCSS}).insert(new Element('div', fieldsetDivOptions)));
+		this.actionTD.insert(new Element('div', {'class':'RuleWidgetColumnDiv'})).insert(new Element('fieldset', {'id':'AddRuleAction', style:fieldsetCSS}).insert(new Element('div', fieldsetDivOptions)));
 		
 		containerTR.insert(this.fieldTD).insert(this.criteriaTD).insert(this.valueTD).insert(this.actionTD);
 
@@ -285,6 +387,8 @@ var RuleEditor = Class.create({
 		else
 			return;
 			
+		if (column != 'action')
+			this.ruleWidget.refresh_guide(false, td.down('fieldset'));
 		this.ruleWidget.container.fire('RuleWidget:InColumn', {'td':td, 'column':column});
 	},
 
@@ -401,7 +505,8 @@ var RuleEditor = Class.create({
 		if (!op)
 			return;
 		op = op.getValue();
-				
+		
+		this.ruleWidget.container.style.width = '550px';
 		var container = new Element('div');
 		switch(type) {
 			case 'multisearch':
@@ -530,13 +635,15 @@ var RuleEditor = Class.create({
 				c.push(option);
 		}
 		if (g.length > 0) {
-			fieldSelectbox.insert(new Element('option', {'value':'', 'disabled':true}).update('-----------'));
+			if (fieldSelectbox.down('option',1)) // Add separator only if necessary
+				fieldSelectbox.insert(new Element('option', {'value':'', 'disabled':true}).update('-----------'));
 			g.each(function(option) {
 				fieldSelectbox.insert(option);
 			});
 		}
 		if (c.length > 0) {
-			fieldSelectbox.insert(new Element('option', {'value':'', 'disabled':true}).update('-----------'));
+			if (fieldSelectbox.down('option',1)) // Add separator only if necessary
+				fieldSelectbox.insert(new Element('option', {'value':'', 'disabled':true}).update('-----------'));
 			c.each(function(option) {
 				fieldSelectbox.insert(option);
 			});
@@ -548,17 +655,23 @@ var RuleEditor = Class.create({
 			this.show_criteria_column(fieldnum);
 			this.show_value_column(null);
 			this.show_action_column(true);
-			if (fieldnum !== '')
-				this.trigger_event_in_column(null,this.criteriaTD);
-			else
-				this.ruleWidget.container.fire('RuleWidget:ChangeField', {'fieldnum':''});
+			if (fieldnum !== '') 
+				this.trigger_event_in_column(null, this.criteriaTD);
+			else {
+				this.ruleWidget.refresh_guide(true);
+				this.ruleWidget.container.fire('RuleWidget:ChangeField', {
+					'fieldnum': ''
+				});
+			}
+			this.ruleWidget.container.style.width = '400px';
 		}.bindAsEventListener(this));
 		
 		this.fieldTD.down('fieldset').down('div').update(fieldSelectbox);
 		this.criteriaTD.down('fieldset').down('div').update();
 		this.valueTD.down('fieldset').down('div').update();
 		this.actionTD.down('fieldset').down('div').update();
-		
+		this.ruleWidget.container.style.width = '400px';
+			
 		this.criteriaTD.down('span').stopObserving('click').hide();
 		this.valueTD.down('span').stopObserving('click').hide();
 		this.actionTD.down('span').stopObserving('click').hide();
@@ -684,8 +797,7 @@ var RuleEditor = Class.create({
 		if (!value)
 			value = '';
 		var textbox = new Element('input', {'type':'text', 'style':'font-size:90%', 'value':value.escapeHTML()});
-		if (small)
-			textbox.size = '8';
+		textbox.size = small ? '8' : '12';
 		if (hidden)
 			textbox.hide();
 		return textbox;

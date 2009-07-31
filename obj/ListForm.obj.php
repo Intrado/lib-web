@@ -14,36 +14,7 @@ class ListForm extends Form {
 			'validators' => array( array("ValRequired"), array("ValLists") )
 		);
 
-		$this->ruleEditorGuideContents = array(
-			// Fieldmap
-			'additionalChooseFieldmap' => _L('To add another rule, Please choose a fieldmap....'), // Used instead of 'chooseFieldmap' if there are existing rules
-			'chooseFieldmap' => _L('Please choose a fieldmap....'),
-			// Criteria
-			'multisearch' => _L('Multisearch Choose a criteria for multisearch'),
-			'reldate' => _L('Reldate Choose a criteria for reldate'),
-			'text' => _L('Text Choose a criteria for text, but don\'t forget.'),
-			'numeric' => _L('Numeric Choose a criteria for numeric'),
-			// Value
-			'multisearch_in' => _L('Multisearch IN'),
-			'multisearch_not' => _L('Multisearch NOT'),
-			'reldate_eq' => _L('Reldate EQ'),
-			'reldate_reldate' => _L('Reldate RELDATE'),
-			'reldate_date_range' => _L('Reldate DATE_RANGE'),
-			'reldate_date_offset' => _L('Reldate DATE_OFFSET'),
-			'reldate_reldate_range' => _L('Reldate RELDATE_RANGE'),
-			'text_eq' => _L('Text EQ'),
-			'text_ne' => _L('Text NE'),
-			'text_sw' => _L('Text SW'),
-			'text_ew' => _L('Text EW'),
-			'text_cn' => _L('Text CN'),
-			'numeric_num_eq' => _L('Numeric EQ'),
-			'numeric_num_ne' => _L('Numeric NE'),
-			'numeric_num_gt' => _L('Numeric GT'),
-			'numeric_num_ge' => _L('Numeric GE'),
-			'numeric_num_lt' => _L('Numeric LT'),
-			'numeric_num_le' => _L('Numeric LE'),
-			'numeric_num_range' => _L('Numeric RANGE')
-		);
+		$this->ruleEditorGuideContents = 
 		
 		parent::Form($name, $formdata, null);
 	}
@@ -57,7 +28,6 @@ class ListForm extends Form {
 		
 		$formdataJSON = json_encode($this->formdata);
 		$posturlJSON = json_encode($posturl);
-		$ruleEditorJSON = json_encode($this->ruleEditorGuideContents);
 					
 		// HTML
 		$str = "
@@ -71,31 +41,32 @@ class ListForm extends Form {
 					<!-- MAIN CONTENT AREA -->
 					
 					<td valign=top style='padding:0;margin:0; '>
-							<div>
-								".icon_button(_L('Build List Using Rules'),'application_form_edit', null, null, ' id="buildListButton" style="display:none;margin;0 "')."
+							<div style='clear:both'>
+								".icon_button(_L('Build List Using Rules'),'application_form_edit', null, null, ' id="buildListButton" style="display:none;margin;0 "')."<span style='clear:both'></span>
 								<div id='buildListWindow' style='clear:both; padding:0;margin:0;display:none;'>
 									<div id='ruleWidgetContainer' style='clear:both; white-space:nowrap;'>
 									</div>
-									<div style='width:550px'></div>
+									<div></div>
 								</div>
 								<hr style='clear:both; border: solid 2px rgb(200,200,200); display:none' id='divider' />
 								<div style='clear:both'>
-									".icon_button(_L('Choose an Existing List'),'arrow_turn_left', null, null, ' id="chooseListChoiceButton" style="display:none" ')."
+									".icon_button(_L('Choose an Existing List'),'arrow_turn_left', null, null, ' id="chooseListChoiceButton" style="display:none" ')."<span style='clear:both'></span>
 									<div id='chooseListWindow' style='display:none; clear:both'>
 										<table style=''><tr>
 											<td valign=top>
 												<div id='listSelectboxContainer'></div>
 											</td>
 											<td valign=top>
-												<div id='listchooseStatus'></div>
-												<div id='listchooseTotalsContainer' style='display:none'>
-												<table>
-													<tr><th valign=top style='text-align:left'>"._L('List Total')."</th><td valign=top id='listchooseTotal'>0</td></tr>
-													<tr><td valign=top style='text-align:left'>"._L('Matched by Rules')."</td><td valign=top id='listchooseTotalRule'>0</td></tr>
-													<tr><td valign=top style='text-align:left'>"._L('Additions')."</td><td valign=top id='listchooseTotalAdded'>0</td></tr>
-													<tr><td valign=top style='text-align:left'>"._L('Skips')."</td><td valign=top id='listchooseTotalRemoved'>0</td></tr>
-												</table>
-												</div>
+												
+													<div id='listchooseStatus'></div>
+													<div id='listchooseTotalsContainer' style='display:none'>
+													<table>
+															<tr><th valign=top style='text-align:left'>"._L('List Total')."</th><td valign=top id='listchooseTotal'>0</td></tr>
+															<tr><td valign=top style='text-align:left'>"._L('Matched by Rules')."</td><td valign=top id='listchooseTotalRule'>0</td></tr>
+															<tr><td valign=top style='text-align:left'>"._L('Additions')."</td><td valign=top id='listchooseTotalAdded'>0</td></tr>
+															<tr><td valign=top style='text-align:left'>"._L('Skips')."</td><td valign=top id='listchooseTotalRemoved'>0</td></tr>
+														</table>
+													</div>
 											</td>
 										</tr></table>
 									</div>
@@ -103,22 +74,20 @@ class ListForm extends Form {
 							</div>
 					</td>
 					<td valign=top>
-						<div id='allListsWindow' class='border'>
-							<table width='100%' style='table-layout:fixed; font-size:90%; overflow: hidden; border-collapse: collapse'>
-								<colgroup span='1'></colgroup>
-								<colgroup span='1' width='16'></colgroup>
-								<colgroup span='1' width='50' style='overflow: hidden; white-space: nowrap; text-align:left'></colgroup>
+						<div id='allListsWindow' class='border' style='width:170px; overflow:hidden' >
+							<table width='100%' style='table-layout:fixed; font-size:90%; border-collapse: collapse'>
 								<thead>
 									<tr>
 										<th style='width:90px; overflow: hidden; white-space: nowrap; text-align:left'> </th>
-										<th></th>
-										<th colspan=100></th>
+										<th style='width:16px'></th>
+										<th colspan=100 style='width:50px'></th>
 									</tr>
 									<tr><td colspan=100 id='listsTableStatus'></td></tr>
 								</thead>
-								<tbody id='listsTableBody'></tbody>
+								<tbody id='listsTableBody'>
+								</tbody>
 							</table>
-							<div style='white-space: nowrap; padding: 2px; padding-top:10px'><b>"._L('Grand Total')."</b> <span id='listGrandTotal'  style='padding: 2px; padding-top:10px'>0</span></div>
+							<div style='text-align:left;white-space: nowrap; padding-top:10px'><b>"._L('Grand Total')."</b> <span id='listGrandTotal'>0</span></div>
 						</div>
 						<div id='listRulesPreview'></div>
 					</td>
@@ -150,9 +119,9 @@ class ListForm extends Form {
 					
 				document.observe('dom:loaded', function() {
 					// Initiatiate Page.
-					listform_load('{$this->name}', {$formdataJSON}, {$posturlJSON}, {$ruleEditorJSON});
+					listform_load('{$this->name}', {$formdataJSON}, {$posturlJSON});
 					
-					listform_refresh_guide(true);
+					ruleWidget.refresh_guide(true);
 					ruleWidget.startup();
 				});
 			</script>";

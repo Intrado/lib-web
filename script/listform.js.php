@@ -13,7 +13,7 @@ var ruleWidget = null;
 var ruleEditor = null;
 
 // Modified form load.
-function listform_load(listformID, formData, postURL, ruleEditorGuideContents) {
+function listform_load(listformID, formData, postURL) {
 	var form = $(listformID);
 	//set up formvars to save data, avoid memleaks in IE by not attaching anything to dom elements
 	if (!document.formvars) {
@@ -45,27 +45,12 @@ function listform_load(listformID, formData, postURL, ruleEditorGuideContents) {
 	var buildListFieldset = new Element('fieldset',{'style':'margin:0px;padding:0px;'});
 	buildListFieldset.insert('<?=addslashes(icon_button(_L('Done Adding Rules To This List'),'accept',null,null, ' id="saveRulesButton" '))?>');
 	ruleWidget.container.insert(buildListFieldset);
-
-	// Guide/Focus
-	listformVars.guideDisabled = false;
-	listformVars.ruleEditorGuideContents = ruleEditorGuideContents;
-	listformVars.guideSection = 'AddRule';
-	listformVars.guideStepIndex = 0;
-	listformVars.guideFieldset = null;
-	listformVars.guideMorphEffect = null;
 	
 	ruleWidget.container.observe('RuleWidget:ChangeField', function(event) {
-		listformVars.guideSection = 'AddRule';
-		
 		if (event.memo.fieldnum)
 			listform_set_rule_editor_status(true);
 		else
 			listform_set_rule_editor_status(false);
-		
-		listform_refresh_guide(true);
-	});
-	ruleWidget.container.observe('RuleWidget:ChangeCriteria', function() {
-		listform_refresh_guide();
 	});
 
 	$('saveRulesButton').observe('focus', function() {
@@ -73,19 +58,13 @@ function listform_load(listformID, formData, postURL, ruleEditorGuideContents) {
 	});
 	
 	ruleWidget.container.observe('RuleWidget:InColumn', function(event) {
-		var fieldset = event.memo.td.down('fieldset');
-
 		if (ruleEditor.get_selected_fieldmap())
 			listform_set_rule_editor_status(true);
 		else
 			listform_set_rule_editor_status(false);
-		
-		listform_refresh_guide(false, fieldset);
 	});
 					
 	ruleWidget.container.observe('RuleWidget:AddRule', function(event) {
-		listformVars.guideSection = 'AddRule';
-		listform_refresh_guide();
 		$('saveRulesButton').focus();
 		
 		listform_set_rule_editor_status(false);
@@ -111,9 +90,6 @@ function listform_load(listformID, formData, postURL, ruleEditorGuideContents) {
 		});
 	});
 	ruleWidget.container.observe('RuleWidget:DeleteRule', function(event) {
-		listformVars.guideSection = 'AddRule';
-		listform_refresh_guide(true);
-		
 		listform_set_rule_editor_status(false);
 		
 		$('listsTableStatus').update('<?=addslashes(_L('Updating..'))?>');
@@ -157,9 +133,8 @@ function listform_load(listformID, formData, postURL, ruleEditorGuideContents) {
 		
 		$('buildListButton').observe('click', function(event) {
 			Tips.hideAll();
-			listformVars.guideSection = 'AddRule';
 			
-			listform_refresh_guide(true);
+			ruleWidget.refresh_guide(true);
 			
 			$('listchooseTotal').update();
 			$('listchooseTotalAdded').update();
@@ -199,7 +174,7 @@ function listform_load(listformID, formData, postURL, ruleEditorGuideContents) {
 			
 			listformVars.pendingList = null;
 			listform_hide_build_list_window();
-			listform_refresh_guide();
+			ruleWidget.refresh_guide();
 		});
 	});
 	
@@ -209,7 +184,7 @@ function listform_load(listformID, formData, postURL, ruleEditorGuideContents) {
 		$('chooseListWindow').show();
 		listform_hide_build_list_window();
 		listformVars.pendingList = null;
-		listform_refresh_guide();
+		ruleWidget.refresh_guide();
 	});
 	
 	// Load Existing Lists
@@ -225,88 +200,10 @@ function listform_load(listformID, formData, postURL, ruleEditorGuideContents) {
 			if (listids.join && listids.length > 0)
 				listform_load_lists(listformVars.listidsElement.value);
 			else {
-				
-				listform_refresh_guide(true);
+				ruleWidget.refresh_guide(true);
 			}
 		}
-	);
-	
-	
-	
-	
-}
-
-
-
-
-
-
-function listform_refresh_guide(reset, specificFieldset) {
-	if (listformVars.guideMorphEffect) {
-		listformVars.guideMorphEffect.cancel();
-		listformVars.guideMorphEffect.element.style.borderColor = 'rgb(255,255,255)';
-	}
-
-	
-	var sectionFieldsets = [];
-	$$('fieldset').each(function(fieldset) {
-		if (fieldset != specificFieldset)
-			fieldset.style.border = 'solid 3px rgb(255,255,255)';
-		if (fieldset.id.include(listformVars.guideSection)) {
-			sectionFieldsets.push(fieldset);
-			if (specificFieldset == fieldset)
-				listformVars.guideStepIndex = sectionFieldsets.length - 1;
-		}
-	});
-	if (sectionFieldsets.length < 1 || listformVars.guideDisabled) {
-		listformVars.guideFieldset = null;
-		return;
-	}
-		
-	listformVars.guideStepIndex = (reset) ? 0 : Math.min(sectionFieldsets.length-1, Math.max(0, listformVars.guideStepIndex));
-	var currentFieldset = sectionFieldsets[listformVars.guideStepIndex];
-	// Visual effect.
-	currentFieldset.setStyle({'border': 'solid 3px rgb(150,150,255)'});
-	listformVars.guideMorphEffect = new Effect.Morph(currentFieldset, {style: 'border-color: rgb(150,150,255)', duration: 1.2, transition: Effect.Transitions.spring});
-	listformVars.guideFieldset = currentFieldset;
-
-	helpContent = null;
-	// Guide Content
-	if (listformVars.guideSection == 'AddRule') {
-		var ruleCount = $H(ruleWidget.appliedRules).keys().length;
-		var data = ruleEditor.get_data();
-		if (data) {
-			if (currentFieldset.id == 'AddRuleCriteria') {
-				helpContent = listformVars.ruleEditorGuideContents[data.type];
-			}  else if (currentFieldset.id == 'AddRuleValue') {
-				// multisearch IS NOT
-				if (data.logical == 'and not')
-						data.op = 'not';
-				helpContent = listformVars.ruleEditorGuideContents[data.type + '_' + data.op];
-			} else if (currentFieldset.id == 'AddRuleFieldmap') {
-				if (ruleCount <= 0)
-					helpContent = listformVars.ruleEditorGuideContents['chooseFieldmap'];
-				else
-					helpContent = listformVars.ruleEditorGuideContents['additionalChooseFieldmap'];
-			}
-		} else {
-			var fieldmap = ruleEditor.get_selected_fieldmap();
-			if (!fieldmap || currentFieldset.id == 'AddRuleFieldmap') {
-				if (ruleCount <= 0)
-					helpContent = listformVars.ruleEditorGuideContents['chooseFieldmap'];
-				else
-					helpContent = listformVars.ruleEditorGuideContents['additionalChooseFieldmap'];
-			} else {
-				helpContent = listformVars.ruleEditorGuideContents[fieldmap.type];
-			}
-		}
-	}
-	if (!helpContent) {
-			return;
-	}
-		
-	ruleWidget.ruleHelperContentDiv.update(helpContent);
-	ruleWidget.ruleHelperContentDiv.setStyle({'border':'solid 3px rgb(150,150,255)', 'padding':'2px'});
+	);	
 }
 
 // Adds listid to listformVars.listidsElement
@@ -448,7 +345,7 @@ function listform_load_lists(listidsJSON) {
 			}
 
 			listform_reset_list_selectbox();
-			listform_refresh_guide(true);
+			ruleWidget.refresh_guide(true);
 		},null,false
 	);
 }
@@ -472,7 +369,8 @@ function listform_hover_existing_list(event, listid) {
 			$('listchooseTotalRemoved').update(format_thousands_separator(data.totalremoved));
 			$('listchooseTotalRule').update(format_thousands_separator(data.totalrule));
 
-		new Tip (this, $('listchooseTotalsContainer').innerHTML, {
+		var li = this.up('li');
+		new Tip (li, $('listchooseTotalsContainer').innerHTML, {
 			style: "protogrey",
 			delay: 0.2,
 			hideOthers:true,
@@ -480,7 +378,8 @@ function listform_hover_existing_list(event, listid) {
 			offset:{x:0,y:0},
 			stem:"bottomLeft"
 		});
-		this.prototip.show();
+		li.prototip.show();
+
 	}.bindAsEventListener(this, listid));
 }
 
@@ -488,7 +387,7 @@ function listform_onclick_existing_list(event, listid) {
 	Tips.hideAll();
 	if (this.checked) {
 		if (listform_add_list(listid))
-			listform_refresh_guide(true);
+			ruleWidget.refresh_guide(true);
 	} else {
 		listform_remove_list(event, listid);
 	}
