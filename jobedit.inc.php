@@ -1542,11 +1542,13 @@ if ($JOBTYPE == "repeating" && getSystemSetting("disablerepeat") ) {
 	}
 
 	// Loading List View
+<?	if (!$submittedmode) { ?>
 	if(isCheckboxChecked('listradio_single')){
 		$('singlelist').show();$('multilist').hide();
 	} else {
 		$('singlelist').hide();$('multilist').show();
 	}
+<?  } ?>
 
 	function limit_chars(field) {
 		if (field.value.length > 160)
@@ -1698,15 +1700,15 @@ for(var i=0;i<types.length;i++){
 	if (!$(types[i] + 'select'))
 		continue;
 	if(isCheckboxChecked(types[i] + 'select')) {
-		Element.hide(types[i] + 'createmessage');
-		Element.show(types[i] + 'selectmessage');
+		$(types[i] + 'createmessage').hide();
+		$(types[i] + 'selectmessage').show();
 		if ($(types[i] + 'multilingualoption'))
-			Element.show(types[i] + 'multilingualoption');
+			$(types[i] + 'multilingualoption').show();
 	} else {
-		Element.show(types[i] + 'createmessage');
-		Element.hide(types[i] + 'selectmessage');
+		$(types[i] + 'createmessage').show();
+		$(types[i] + 'selectmessage').hide();
 		if ($(types[i] + 'multilingualoption'))
-			Element.hide(types[i] + 'multilingualoption');
+			$(types[i] + 'multilingualoption').hide();
 	}
 }
 
