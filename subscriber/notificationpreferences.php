@@ -178,7 +178,7 @@ foreach ($jobtypes as $jt) {
 $values = QuickQueryList("select jobtypeid from contactpref where personid=? and type='email' and sequence=0 and enabled=1", false, false, array($pid));
 
 $formdata["jobtypes"] = array(
-	"label" => _L(""),
+	"label" => "",
 	"value" => $values,
 	"validators" => array(),
 	"control" => array("MultiCheckbox","values" => $jtvalues),
