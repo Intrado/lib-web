@@ -10,7 +10,6 @@ function fmt_timeline_jobs_actions ($obj, $name) {
 	return implode("&nbsp; &nbsp;",$links); // breaking space in the middle is as designed
 }
 
-
 // Settings
 $jobhight = 20;		// Pixel height of each job
 $jobspacing = 4;	// Pixel vertical spacing between jobs
@@ -62,8 +61,7 @@ $centerposition = strtotime(date("m/j/Y") . "12:00") + (86400 * $day);
 
 $placments = array();
 $jobcount = count($jobs);
-$jobcolor = array("scheduled" => "#0000ff","processing"=>"#00ffff","active" => "#ffff00","complete" => "#00ff00","cancelling" => "#ff5500","cancelled" => "#ff0000");
-//$jobcolor = array("scheduled" => "#3399FF","processing"=>"#D0AA0D","active" => "#D0AA0D","complete" => "#00FF00","cancelling" => "#00FF00","cancelled" => "#00FF00");
+$jobcolor = array("scheduled" => "#3399FF","processing"=>"#00ffff","active" => "#ffff00","complete" => "#00ff00","cancelling" => "#ff5500","cancelled" => "#ff0000");
 $jobids = array();
 $jobstatus = array();
 
@@ -108,46 +106,28 @@ foreach($jobs as $job) {
 				}
 				if($endday >= $rangedays) {
 					$width = 102 - $startlocation;
-					$extracontent .= '<img style="position:absolute;border:0px;top: 0px;right: 0px" src="img/timeline/_' . $job->status .  'right' . $jobtypes[$job->jobtypeid]->systempriority . '.gif" alt=""/>';
 				}
-			}	
-			
-			//if($width < 2) // Set a minimum width for visablility
-			//	$width = 2;
-			$extracontent .= '<img style="position:absolute;border:0px;top: 0px;right: 0px" src="img/timeline/_' . $job->status . 'rightspecial' . $jobtypes[$job->jobtypeid]->systempriority . '.gif" alt=""/>';
-			
-				
-			//$content .= '<a class="job" id="_' . $i . '" href="job.php?id=' . $job->id. '">';
-			
+			}		
+					
 			$jobids[$i] = "'$job->id'";
 			$jobstatus[$i] = "'" . ucfirst($job->status) . "'";
 			$statuscolor = (isset($jobcolor[$job->status])?$jobcolor[$job->status]:"#000");
 			
-			//$content .= "<div id="__$i" class="" . $job->status . "job" style="left: " . $startlocation . "%;top: " . (($j*$jobhight) + ($j*$jobspacing)) . "px;height: " . $jobhight . "px;width: " . $width . "%;" . (($endday >= $rangedays)?"border-right:0px;":";") . ((!$leftborder)?"border-left:0px;":";") . "">\n";				
-			//$content .= "<div id="__$i" class="" . $job->status . "job" style="background: url(img/timeline/_" . $job->status . $jobtypes[$job->jobtypeid]->systempriority .  ".gif);left: " . $startlocation . "%;top: " . (($j*$jobhight) + ($j*$jobspacing)) . "px;height: " . $jobhight . "px;width: " . $width . "%;" . (($endday >= $rangedays)?"border-right:0px;":";") . ((!$leftborder)?"border-left:0px;":";") . "">\n";				
-			
 			$content .= '<div id="__' . $i. '" class="jobcontainer" style="left: ' . $startlocation . '%;top: ' . (($j*$jobhight) + ($j*$jobspacing)) . 'px;height: ' . $jobhight . 'px;width: ' . $width . '%;">';				
 			$content .= '<div class="jobname">';
-				$content .= $job->name;
-			//$content .= "\n<br /><hr>" . $jobtypes[$job->jobtypeid]->name . "\n<br /><hr>";
-			//$content .=  "Start Time: $job->startdate $job->starttime\n<br />End Time: $job->enddate $job->endtime\n\n";
-			$content .= "</div>";
-			$content .= '<div id="box_' . $i . '" style="display:none"><div class="box">';
-				$content .= '<div class="boxname">' . $job->name . '</div>';
-				$content .= '<div class="jobbar" style="position: relative;background-color: ' . $statuscolor . ';top:3px;height:auto;">Status:&nbsp;' .  ucfirst($job->status) . '</div>';				
-				$content .= '<p id="boxc_' . $i . '" >' . fmt_timeline_jobs_actions($job,"job") . '</p>';
-				
-				//$content .= '<div style="width: 102%;background-color: ' . $statuscolor . ';left:-10%;height:auto;border:1px;margin:0px;">&nbsp;&nbsp;' .  ucfirst($job->status) . '</div>';				
-				
-			$content .= "</div></div>";
+			$content .= escapehtml($job->name);
+			$content .= '</div>
+						<div id="box_' . $i . '" style="display:none"><div class="box">
+							<div class="boxname">' . escapehtml($job->name) . '</div>
+							<div class="jobbar" style="position: relative;background-color: ' . $statuscolor . ';top:3px;height:auto;">Status:&nbsp;' .  ucfirst($job->status) . '</div>
+							<p id="boxc_' . $i . '" >';
+			//$content .= 'Start Time: ' .$job->starttime. '<br />End Time: ' . $job->endtime. '<hr />';
+			$content .= fmt_timeline_jobs_actions($job,"job") . '</p>
+							</div>
+						</div>
+						<div class="jobbar" style="background-color: ' . $statuscolor . ';">&nbsp;</div>
+						</div>';
 			
-			
-			$content .= '<div class="jobbar" style="background-color: ' . $statuscolor . ';">&nbsp;</div>';				
-			
-	
-			$content .=  "</div>";//</a>\n";
-			
-		//	$content .=  "$extracontent</div></a>\n";
 			$i++;
 			if($minhight <= $j )
 				$minhight = $j + 1;
@@ -159,7 +139,6 @@ foreach($jobs as $job) {
 	}
 	
 }
-
 
 $minhight = $minhight * $jobhight + $minhight*$jobspacing ;
 ?>
@@ -178,7 +157,6 @@ $minhight = $minhight * $jobhight + $minhight*$jobspacing ;
 		<div id="canvas" style="height:<? echo $minhight ?>px;"> 
 			<img class="canvasleft" src="img/timeline/canvasleft.gif"  alt=""  width="2%" height="100%"/>
 			<img class="canvasright" src="img/timeline/canvasright.gif" alt="" width="2%" height="100%"/>
-		
 			<div class="daylineend" style="left: 0%;"></div>
 			
 			<?
@@ -190,18 +168,10 @@ $minhight = $minhight * $jobhight + $minhight*$jobspacing ;
 			 ?>
 			<div class="daylineend" style="left: 100%;"></div>
 		
-		<? if(0 && $day>=-$range && $day<=$range) { ?>
-			<div id="now" style="left: <? echo $timeposition ?>%;"></div>
-			<div id="nowtop" style="left: <? echo $timeposition ?>%;"></div>	
-			<div id="nowbottom" style="left: <? echo $timeposition ?>%;"></div>
-			
-			<div id="nowlabel" style="left: <? echo $timeposition - 10 ?>%;"><?=date("h:i a ")?></div>
-		<? } 
-		
+		<? 
 		$labelstart = ($centerposition - $rangestart) + 43200;
 		$today = date("M jS");
 		for($k=0;$k < $rangedays;$k++){
-			//$daylabel = str_replace(" ","&nbsp;",date("M jS", $labelstart + 86400 * $k));
 			$daylabel = date("M jS", $labelstart + 86400 * $k);
 			if($daylabel==$today) {
 				$daylabel = str_replace(" ","&nbsp;",$daylabel);
@@ -223,16 +193,11 @@ $minhight = $minhight * $jobhight + $minhight*$jobspacing ;
 		</table>
 		</div>
 	</div>
-
-			
 			<?=	icon_button(_L('Refresh'),"fugue/arrow_circle_double_135","window.location.reload()",null,'style="display:inline;"') ?>	
 			<div style="text-align:right;">
-			<div id="t_tools" style="cursor:pointer;display:inline;" ><img  src="img/largeicons/tiny20x20/tools.jpg" />&nbsp;Tools</div>
-			&nbsp;|&nbsp;<div id="t_legend" style="cursor:pointer;display:inline;" ><img src="img/largeicons/tiny20x20/flag.jpg" />&nbsp;Legend</div>
-			
+				<div id="t_tools" style="cursor:pointer;display:inline;" ><img  src="img/largeicons/tiny20x20/tools.jpg" />&nbsp;Tools</div>
+				&nbsp;|&nbsp;<div id="t_legend" style="cursor:pointer;display:inline;" ><img src="img/largeicons/tiny20x20/flag.jpg" />&nbsp;Legend</div>
 			</div>
-			
-			
 			<div id="timelinetools" style="display:none;">	
 				<b>Show:<b><br />
 				<a href="start.php?timelinerange=0">1&nbsp;Day</a><br />	
@@ -245,22 +210,15 @@ $minhight = $minhight * $jobhight + $minhight*$jobspacing ;
 				<a href="start.php?timelineday=<?=($day-10) ?>">10&nbsp;Days&nbsp;Back</a><br />	
 			<div>
 			<div id="timelinelegend" style="display:none;width: 100px;">	
-			<?
-			$legendcount = 0;
-			$legendoffset = 40;
-			
-			foreach($jobcolor as $name => $color) {
-				echo '
-					<div class="jobcontainer" style="position: relative;margin:5px;height: ' . $jobhight . 'px;width: 90%;">
-						<div class="box">' . ucfirst($name) . '</div>
-						<div class="jobbar" style="background-color: ' . $color . ';">&nbsp;</div>
-					  </div>
-				';
-				$legendcount++;
-			}
+				<?
+				foreach($jobcolor as $name => $color) {
+					echo '<div class="jobcontainer" style="position: relative;margin:5px;height: ' . $jobhight . 'px;width: 90%;">
+							<div class="box">' . ucfirst($name) . '</div>
+							<div class="jobbar" style="background-color: ' . $color . ';">&nbsp;</div>
+						  </div>';
+				}
 			?>
 			</div>
-
 <script>
 	var jobids=new Array(<?= implode(",",$jobids) ?>);
 	var jobstatus=new Array(<?= implode(",",$jobstatus) ?>);
@@ -314,12 +272,9 @@ $minhight = $minhight * $jobhight + $minhight*$jobspacing ;
 	});
 	function getcontent(id) {
 		var content = $("box_" + id).innerHTML;
-	//	content += '<br /><a href="job.php?id=' + jobids[id] + '">Edit</a><br />';
 		if(jobstatus[id] == "Active" || jobstatus[id] == "Complete")
 			content += '<div class="boxmonitor" onclick="popup(\'jobmonitor.php?jobid=' + jobids[id] + '\', 500, 450);" ><img src="graph_job.png.php?jobid=' + jobids[id] + '&junk=' + Math.random() + '"/><br />Click for larger view.</div>';		
 		return content;
 	}
-	
-	
 	
 </script>
