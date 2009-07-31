@@ -961,7 +961,7 @@ if ($JOBTYPE == "repeating" && getSystemSetting("disablerepeat") ) {
 	<tr valign="top">
 		<th align="right" class="windowRowHeader bottomBorder">Settings:<br></th>
 		<td class="bottomBorder">&nbsp;
-		<div id="settings" style="display: none">
+		<div id="settings">
 		<table border="0" cellpadding="2" cellspacing="0" width="100%">
 			<tr>
 				<td width="30%">Job Name</td>
@@ -1144,7 +1144,7 @@ if ($JOBTYPE == "repeating" && getSystemSetting("disablerepeat") ) {
 			<?	}	?>
 		</div>
 
-		<div id='phoneoptions' style="display: none">
+		<div id='phoneoptions'>
 		<table border="0" cellpadding="2" cellspacing="0" width=100%>
 			<tr>
 				<td width="30%" valign="top">Message <?= help('Job_PhoneDefaultMessage', NULL, 'small') ?></td>
@@ -1204,7 +1204,7 @@ if ($JOBTYPE == "repeating" && getSystemSetting("disablerepeat") ) {
 									</tr>
 									</table>
 									<div id='phoneexpandtxt_<? echo $language?>' style="display: none">
-										<? NewFormItem($f,$s,"phoneexpand_$language", "textarea", 45, 3,"id='phoneexpand_$language'"); ?>
+										<? NewFormItem($f,$s,"phoneexpand_$language", "textarea", 50, 3,"id='phoneexpand_$language' style='width: 99%;'"); ?>
 										<br />
 										<? NewFormItem($f,$s,"phoneedit_$language","checkbox",1, NULL,"id='phoneedit_$language' " . ($submittedmode ? "DISABLED" : " onclick=\"editlanguage('phone','$language')\"")); ?> Override Translation
 										<table style="display: inline"><tr><td><?= help('Job_OverrideTranslation',NULL,"small"); ?></td></tr></table>
@@ -1212,7 +1212,7 @@ if ($JOBTYPE == "repeating" && getSystemSetting("disablerepeat") ) {
 										Retranslation:<table style="display: inline"><tr><td><?= help('Job_Retranslation',NULL,"small"); ?></td></tr></table>
 										<a href="#" onclick="submitRetranslation('phone','<? echo $language?>');return false;">Show/Refresh</a>
 										<br />
-										<? NewFormItem($f,$s,"phoneverify_$language", "textarea", 45, 3,"id='phoneverify_$language' disabled"); ?>
+										<div id="phoneverify_<?=$language ?>" style="width: 99%; height: 50px; white-space: normal;border: 1px solid gray; color: gray; overflow:auto; clear:both"></div>
 									</div>
 								</td>
 								<td class="topBorder" valign="top" style="white-space:nowrap;">
@@ -1316,7 +1316,7 @@ if ($JOBTYPE == "repeating" && getSystemSetting("disablerepeat") ) {
 		}
 		?></div>
 
-		<div id='emailoptions' style="display: none">
+		<div id='emailoptions'>
 		<table border="0" cellpadding="2" cellspacing="0" width=100%>
 			<tr>
 				<td width="30%" valign="top">Message <?= help('Job_PhoneDefaultMessage', NULL, 'small') ?></td>
@@ -1379,7 +1379,7 @@ if ($JOBTYPE == "repeating" && getSystemSetting("disablerepeat") ) {
 									</tr>
 									</table>
 									<div id='emailexpandtxt_<? echo $language?>' style="display: none">
-										<? NewFormItem($f,$s,"emailexpand_$language", "textarea", 45, 3,"id='emailexpand_$language'"); ?>
+										<? NewFormItem($f,$s,"emailexpand_$language", "textarea", 50, 3,"id='emailexpand_$language' style='width: 99%;'"); ?>
 										<br />
 										<? NewFormItem($f,$s,"emailedit_$language","checkbox",1, NULL,"id='emailedit_$language'" . ($submittedmode ? "DISABLED" : " onclick=\"editlanguage('email','$language')\"")); ?> Override Translation
 										<table style="display: inline"><tr><td><?= help('Job_OverrideTranslation',NULL,"small"); ?></td></tr></table>
@@ -1387,7 +1387,8 @@ if ($JOBTYPE == "repeating" && getSystemSetting("disablerepeat") ) {
 										Retranslation:<table style="display: inline"><tr><td><?= help('Job_Retranslation',NULL,"small"); ?></td></tr></table>
 										<a href="#" onclick="submitRetranslation('email','<? echo $language?>');return false;">Show/Refresh</a>
 										<br />
-										<? NewFormItem($f,$s,"emailverify_$language", "textarea", 45, 3,"id='emailverify_$language' disabled"); ?>
+										<div id="emailverify_<?=$language ?>" style="width: 99%; height: 50px; white-space: normal; border: 1px solid gray; color: gray; overflow:auto; clear:both"></div>
+										<? //NewFormItem($f,$s,"emailverify_$language", "textarea", 45, 3,"id='emailverify_$language' disabled"); ?>
 									</div>
 								</td>
 								<td class="topBorder" valign="top" style="white-space:nowrap;">
@@ -1487,64 +1488,76 @@ if ($JOBTYPE == "repeating" && getSystemSetting("disablerepeat") ) {
 	?>
 		jobtypeinfo[<?=$infojobtype->id?>] = new Array("<?=$infojobtype->systempriority?>", "<?=$info?>");
 	<? } ?>
-	display_jobtype_info(new getObj('jobtypeid').obj.value);
+	display_jobtype_info($('jobtypeid').getValue());
 
 	var typeischecked = false;
 
 	<?
 	if($hassms && $USER->authorize('sendsms')) {
 	?>
-		var smsmessageobj = new getObj('smsmessageid').obj;
+		var smsmessageobj = $('smsmessageid');
 		if(smsmessageobj && smsmessageobj.value != ""){
-				new getObj('sendsms').obj.checked = true;
+				$('sendsms').checked = true;
 		}
-		var smsmessagedropdown = new getObj('smsmessageid').obj;
+		var smsmessagedropdown = $('smsmessageid');
 		if(smsmessagedropdown.value != ""){
-			Element.hide('smscreatemessage');
+			$('smscreatemessage').hide();
 		}
 		if(isCheckboxChecked('sendsms')){
 			typeischecked = true;
-			Element.show('smsoptions');
+			$('smsoptions').show();
+		} else {
+			$('smsoptions').hide();
 		}
+			
 	<?}?>
 
-	var phonemessageobj = new getObj('phonemessageid').obj;
+	var phonemessageobj = $('phonemessageid');
 	if(phonemessageobj  && phonemessageobj .value != ""){
-		new getObj('sendphone').obj.checked = true;
+		$('sendphone').checked = true;
 	}
-	var emailmessageobj = new getObj('emailmessageid').obj;
+	var emailmessageobj = $('emailmessageid');
 	if(emailmessageobj && emailmessageobj .value != ""){
-		new getObj('sendemail').obj.checked = true;
+		$('sendemail').checked = true;
 	}
+	
 	if(isCheckboxChecked('sendphone')){
 		typeischecked = true;
+		$('phoneoptions').show();
+	} else {
+		$('phoneoptions').hide();
 	}
+	
 	if(isCheckboxChecked('sendemail')){
 		typeischecked = true;
-		Element.show('emailoptions');
+		$('emailoptions').show();
+	} else {
+		$('emailoptions').hide();
 	}
+
 	if(	typeischecked == true ){
-		Element.show('settings');
+		$('settings').show();
+	} else {
+		$('settings').hide();
 	}
 
 	// Loading List View
 	if(isCheckboxChecked('listradio_single')){
-		Element.show('singlelist');Element.hide('multilist');
+		$('singlelist').show();$('multilist').hide();
 	} else {
-		Element.hide('singlelist');Element.show('multilist');
+		$('singlelist').hide();$('multilist').show();
 	}
 
 	function limit_chars(field) {
 		if (field.value.length > 160)
 			field.value = field.value.substring(0,160);
-		var status = new getObj('charsleft');
 		var remaining = 160 - field.value.length;
 		if (remaining <= 0)
-			status.obj.innerHTML="<b style='color:red;'>0</b>";
+			$('charsleft').update("<b style='color:red;'>0</b>");
 		else if (remaining <= 20)
-			status.obj.innerHTML="<b style='color:orange;'>" + remaining + "</b>";
+			$('charsleft').update("<b style='color:orange;'>" + remaining + "</b>");
 		else
-			status.obj.innerHTML=remaining;
+			$('charsleft').update(remaining);
 	}
 /*
 	Function to show the date in page text
@@ -1616,7 +1629,6 @@ function hideSection(section){
 		typeischecked = true;
 		Element.hide('displaysmsoptions');
 	}
-
 	if(typeischecked == false){
 		Element.hide('settings');
 	}
@@ -1635,7 +1647,7 @@ function clickIcon(section){
 
 
 function display_jobtype_info(value){
-	new getObj("jobtypeinfo").obj.innerHTML = jobtypeinfo[value][1];
+	$("jobtypeinfo").innerHTML = jobtypeinfo[value][1];
 	var jobtypetable = new getObj("jobtypetable").obj;
 	if(jobtypeinfo[value][0] == 1){
 		jobtypetable.style.border="3px double red";
@@ -1645,16 +1657,14 @@ function display_jobtype_info(value){
 <?
 	if(getSystemSetting('_dmmethod', "asp")=='hybrid'){
 ?>
-		var addinfo = new getObj("addinfo").obj;
-
 		if(jobtypeinfo[value][0] == 1){
-			addinfo.innerHTML = "High capacity emergency call routing";
+			$("addinfo").innerHTML = "High capacity emergency call routing";
 
 		} else {
-			addinfo.innerHTML = "Standard call routing";
+			$("addinfo").innerHTML = "Standard call routing";
 		}
 	if(value == ""){
-		new getObj("addinfo").obj.innerHTML ="";
+		$("addinfo").innerHTML ="";
 	}
 <?
 	}
@@ -1704,7 +1714,6 @@ for(var i=0;i<types.length;i++){
 
 <? // These scripts contol the translation ?>
 <? if($allowAutoTranslate) { ?>
-<script src='script/json2.js'></script>
 <script>
 <?
 $languagestring = "";
@@ -1863,8 +1872,7 @@ function langugaedetails(section,language, details){
 		Element.show(section + 'expandtxt_' + language);
 		Element.show(section + 'hide_' + language);
 		Element.hide(section + 'show_' + language);
-		var retranslation = new getObj(section + 'verify_' + language).obj;
-		retranslation.value = "";
+		$(section + 'verify_' + language).update("");
 	} else {
 		Element.show(section + 'txt_' + language);
 		Element.hide(section + 'expandtxt_' + language);
@@ -1885,8 +1893,7 @@ function langugaedetails(section,language, details){
 function editlanguage(section,language) {
 	var textbox = new getObj(section + 'expand_' + language).obj;
 	textbox.disabled = !isCheckboxChecked(section + 'edit_' + language);
-	var retranslation = new getObj(section + 'verify_' + language).obj;
-	retranslation.value = "";
+	$(section + 'verify_' + language).update("");
 	if(isCheckboxChecked(section + '_' + language) && isCheckboxChecked(section + 'edit_' + language)){
 		Element.show(section + 'lock_' + language);
 	} else {
@@ -1898,11 +1905,9 @@ function editlanguage(section,language) {
 	}
 }
 
-function setTranslations (html, langstring) {
+function setTranslations (response, langstring) {
 	section = callbacksection;
-
 	var trlanguages = langstring.split(";");
-	response = JSON.parse(html, function (key, value) {	return value;}); //See documentation at http://www.json.org/js.html on how this function can be used
 	result = response.responseData;
 	if (response.responseStatus != 200){
 		if (phonesubmitstate || emailsubmitstate){
@@ -1915,22 +1920,15 @@ function setTranslations (html, langstring) {
 		for ( i = 0;i < result.length;i++) {
 			var language = trlanguages.shift();
 			if (result[i].responseStatus == 200){
-				var tr = new getObj(section + 'txt_' + language).obj;
-				var trexpand = new getObj(section + 'expand_' + language).obj;
-				var retranslation = new getObj(section + 'verify_' + language).obj;
-				retranslation.value = "";
-				tr.innerHTML = result[i].responseData.translatedText;
-				trexpand.value = result[i].responseData.translatedText;
+				$(section + 'verify_' + language).update("");
+				$(section + 'txt_' + language).innerHTML = result[i].responseData.translatedText;
+				$(section + 'expand_' + language).value = result[i].responseData.translatedText;
 			}
 		}
 	} else {
-		var tr = new getObj(section + 'txt_' + trlanguages[0]).obj;
-		var trexpand = new getObj(section + 'expand_' + trlanguages[0]).obj;
-		tr.innerHTML = result.translatedText;
-		trexpand.value = result.translatedText;
-
-		var retranslation = new getObj(section + 'verify_' + trlanguages[0]).obj;
-		retranslation.value = "";
+		$(section + 'txt_' + language).innerHTML = result.translatedText;
+		$(section + 'expand_' + language).value = result.translatedText;
+		$(section + 'verify_' + trlanguages[0]).update("");
 	}
 	switch(section) {
 		case 'phone': phonetranslationstate = true; break;
@@ -1981,7 +1979,7 @@ function submitTranslations(section) {
 		new Ajax.Request('translate.php',
 			{ method:'post', postBody: "english=" + encodeURIComponent(text) + "&languages=" + seriallang, 
 				onSuccess: function(result) {
-					setTranslations(result.responseText, seriallang);
+					setTranslations(result.responseJSON, seriallang);
 				}
 			}
 		);
@@ -1996,14 +1994,12 @@ function submitTranslations(section) {
 	return false;
 }
 
-function setRetranslation (html, language) {
-	response = JSON.parse(html, function (key, value) {	return value;}); //See documentation at http://www.json.org/js.html on how this function can be used
+function setRetranslation (response, language) {
 	result = response.responseData;
 	if (response.responseStatus != 200){
 		return;
 	}
-	var retranslation = new getObj(callbacksection + 'verify_' + language).obj;
-	retranslation.value = result.translatedText;
+	$(section + 'verify_' + language).update(result.translatedText);
 }
 
 function submitRetranslation(section,language) {
@@ -2019,7 +2015,7 @@ function submitRetranslation(section,language) {
 	new Ajax.Request('translate.php',
 		{ method:'post', postBody:"text=" + encodeURIComponent(text) + "&language=" + urllang, 
 			onSuccess: function(result) {
-				setRetranslation(result.responseText, urllang);
+				setRetranslation(result.responseJSON, urllang);
 			}
 		}
 	);
