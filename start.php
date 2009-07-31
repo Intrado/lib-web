@@ -236,7 +236,7 @@ function activityfeed($mergeditems,$ajax = false) {
 						$title = _L('%1$s Submitted, Status: Active',$jobtype);
 						$icon = 'largeicons/ping.jpg';
 						$defaultlink = "#";
-						$defaultonclick = "popup('jobmonitor.php?jobid=$id', 500, 450);";
+						$defaultonclick = "popup('jobmonitor.php?jobid=$itemid', 500, 450);";
 						break;
 					case "scheduled":
 						$title = _L('%1$s Submitted, Status: Scheduled',$jobtype);
