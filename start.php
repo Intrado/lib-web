@@ -281,19 +281,18 @@ function activityfeed($mergeditems,$ajax = false) {
 				
 				
 			} else if($item["type"] == "list" ) {
-				$title = "Contact List " . $title;
+				$title = "Contact List " . escapehtml($title);
 				$defaultlink = "list.php?id=$itemid";
 				$content = '<a href="' . $defaultlink . '" ' . $defaultonclick . '>' . $time .  ' - <b>' .  $item["name"] . "</b>";
 				
 				$contacts = listcontacts($itemid,"list");
 				
-				$content .= 										'&nbsp;-&nbsp;This list ';
+				$content .= '&nbsp;-&nbsp;';
 				if(isset($item["lastused"]))
-					$content .= ' was last used: <i>' . date("M j, g:i a",strtotime($item["lastused"])) . "</i>";
+					$content .= 'This list was last used: <i>' . date("M j, g:i a",strtotime($item["lastused"])) . "</i>";
 				else
-					$content .= ' is never used';
-				$content .= " and have <b>" . ($contacts!=1?$contacts . "&nbsp;</b>contacts":"one</b>&nbsp;contact") . '</a>';
-
+					$content .= 'This list has never been used and ';
+				$content .= " and has <b>" . ($contacts!=1?$contacts . "&nbsp;</b>contacts":"one</b>&nbsp;contact") . '</a>';
 				$tools = action_links (action_link("Edit", "pencil", "list.php?id=$itemid"),action_link("Preview", "application_view_list", "showlist.php?id=$itemid"));
 				$tools = str_replace("&nbsp;|&nbsp;","<br />",$tools);
 				$icon = 'largeicons/addrbook.jpg';			
@@ -318,7 +317,7 @@ function activityfeed($mergeditems,$ajax = false) {
 						break;
 				}
 			} else if($item["type"] == "report" ) {
-				$title = "Report " . $title;				
+				$title = "Report " . escapehtml($title);				
 				$content = '<a href="' . $defaultlink . '" ' . $defaultonclick . '>' . 
 								$time .  ' - ' .  $item["name"] . '</a>';
 				$icon = 'largeicons/savedreport.jpg';
@@ -468,6 +467,9 @@ include_once("nav.inc.php");
 <table border=0 cellpadding=0 cellspacing=5>
 	<tr>
 		<td>
+<?		
+			if ($USER->authorize('sendphone') || $USER->authorize('sendemail') || $USER->authorize('sendsms')) {  
+?>
 			<div style="width:170px;top:0px;text-align:center;">
 					<img style="cursor:pointer;" src="img/largeicons/newjob.jpg" align="middle" alt="Start a new job" title="Start a new job" 
 							onclick="window.location = 'jobwizard.php?new'"
@@ -479,7 +481,7 @@ include_once("nav.inc.php");
 							onmouseover="this.src='img/largeicons/newemergency_over.jpg'"
 							onmouseout="this.src='img/largeicons/newemergency.jpg'" />			
 			</div>
-<?		
+<?			}
 			if ($USER->authorize("startstats")) {
 ?>
 		</td>
