@@ -222,12 +222,12 @@ function activityfeed($mergeditems,$ajax = false) {
 						$defaultlink = $item["jobtype"] == "survey" ? "reportsurveysummary.php?jobid=$itemid" : "reportjobsummary.php?jobid=$itemid";									
 
 						break;
-					case "cancelling":
+					case "cancelled":
 						$title = _L('%1$s Cancelled',$jobtype);
 						$icon = 'largeicons/checkedgreen.jpg';
 						$defaultlink = $item["jobtype"] == "survey" ? "reportsurveysummary.php?jobid=$itemid" : "reportjobsummary.php?jobid=$itemid";
 						break;
-					case "cancelled":
+					case "cancelling":
 						$title = _L('%1$s Cancelling',$jobtype);
 						$icon = 'largeicons/gear.jpg';
 						$defaultlink = $item["jobtype"] == "survey" ? "reportsurveysummary.php?jobid=$itemid" : "reportjobsummary.php?jobid=$itemid";
