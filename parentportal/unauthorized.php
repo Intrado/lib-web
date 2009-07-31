@@ -1,9 +1,11 @@
 <?
+include_once('common.inc.php');
+
 $PAGE = "start:start";
 $TITLE = _L("Unauthorized");
 
-include_once('common.inc.php');
 include_once('nav.inc.php');
+
 ?>
 <table border="0" cellpadding="0" cellspacing="0" height="400" width="100%">
 	<tr>
@@ -18,4 +20,4 @@ include_once('nav.inc.php');
 <?
 include_once('navbottom.inc.php');
 ?>
-<script language="javascript">setTimeout("window.location='<? print is_object($USER) ? 'start.php' : './'; ?>';", 10000);</script>
+<script language="javascript">setTimeout("window.location='start.php'", 10000);</script>

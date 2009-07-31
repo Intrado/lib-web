@@ -17,7 +17,6 @@ $code = $_SESSION['phoneactivationcode'];
 $pkeyok = $_SESSION['phoneactivationokpkeylist'];
 $phones = $_SESSION['phoneactivationokphonelist'];
 
-
 $f="addstudent";
 $s="main";
 $reloadform = 0;
@@ -137,7 +136,7 @@ startWindow(_L('Phone Activation'));
 			<td>Step 3.</td><td><?=_L("When prompted, select option 2.")?></td>
 		</tr>
 		<tr>
-			<td>Step 4.</td><td><?=_L("When prompted, enter this activation code %s", '<span style="font-weight:bold; font-size: 140%;' . escapehtml($code) . '</span></td>')?>
+			<td>Step 4.</td><td><?=_L("When prompted, enter this activation code ") . '<span style="font-weight:bold; font-size: 140%;">' . escapehtml($code) . '</span>'?></td>
 		</tr>
 		<tr>
 			<td>Step 5.</td><td><?=_L("When the call is complete, log back into your Contact Manager account to edit your notification preferences.")?></td>
