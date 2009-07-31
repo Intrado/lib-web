@@ -1088,7 +1088,7 @@ if ($JOBTYPE == "repeating" && getSystemSetting("disablerepeat") ) {
 		<? if ($JOBTYPE != "repeating") { ?>
 			<tr>
 				<td width="30%">Start date <?= help('Job_SettingsStartDate',NULL,"small"); ?></td>
-				<td><? NewFormItem($f,$s,"startdate","text", 30, NULL, ($completedmode ? "DISABLED" : "onfocus=\"this.select();lcs(this,false,true)\" onclick=\"event.cancelBubble=true;this.select();lcs(this,false,true)\"")); ?></td>
+				<td><? 	NewFormItem($f,$s,"startdate","text", 30, NULL,'id="startdate" ' . ($completedmode ? "DISABLED" :"")); ?></td>
 			</tr>
 			<? } ?>
 
@@ -1472,15 +1472,29 @@ if ($JOBTYPE == "repeating" && getSystemSetting("disablerepeat") ) {
 	<? } ?>
 </table>
 
+<script type="text/javascript" src="script/datepicker.js"></script>
 <script language="javascript">
-	var phonesubmitstate = false;
-	var emailsubmitstate = false;
-	var phonetranslationstate = false;
-	var emailtranslationstate = false;
-	var jobtypetablestyle = new getObj("jobtypetable").obj.style.border;
-	var jobtypeinfo = new Array();
 
-	jobtypeinfo[""] = new Array("", "");
+var types=Array('phone','email','sms');
+var phonesubmitstate = false;
+var emailsubmitstate = false;
+var phonetranslationstate = false;
+var emailtranslationstate = false;
+var jobtypetablestyle = new getObj("jobtypetable").obj.style.border;
+var jobtypeinfo = new Array();
+
+jobtypeinfo[""] = new Array("", "");
+
+document.observe('dom:loaded', function() {
+	new DatePicker({
+		relative:'startdate',
+		keepFieldEmpty:true,
+		language:'<?= substr($LOCALE,0,2) ?>',
+		enableCloseOnBlur:1,
+		topOffset:20,
+		dateFilter:DatePickerUtils.noDatesBefore(0)
+	});
+
 	<?
 	foreach($infojobtypes as $infojobtype){
 		$info = escapehtml($infojobtype->info);
@@ -1561,6 +1575,25 @@ if ($JOBTYPE == "repeating" && getSystemSetting("disablerepeat") ) {
 		else
 			$('charsleft').update(remaining);
 	}
+
+	//Loading Message View
+	for(var i=0;i<types.length;i++){
+		if (!$(types[i] + 'select'))
+			continue;
+		if(isCheckboxChecked(types[i] + 'select')) {
+			$(types[i] + 'createmessage').hide();
+			$(types[i] + 'selectmessage').show();
+			if ($(types[i] + 'multilingualoption'))
+				$(types[i] + 'multilingualoption').show();
+		} else {
+			$(types[i] + 'createmessage').show();
+			$(types[i] + 'selectmessage').hide();
+			if ($(types[i] + 'multilingualoption'))
+				$(types[i] + 'multilingualoption').hide();
+		}
+	}
+});
+
 /*
 	Function to show the date in page text
 */
@@ -1694,23 +1727,6 @@ function previewlanguage(language,female,male) {
 	popup('previewmessage.php?text=' + encodedtext + '&language=' + language +'&gender=' + voice, 400, 400);
 }
 
-//Loading Message View
-var types=Array('phone','email','sms');
-for(var i=0;i<types.length;i++){
-	if (!$(types[i] + 'select'))
-		continue;
-	if(isCheckboxChecked(types[i] + 'select')) {
-		$(types[i] + 'createmessage').hide();
-		$(types[i] + 'selectmessage').show();
-		if ($(types[i] + 'multilingualoption'))
-			$(types[i] + 'multilingualoption').show();
-	} else {
-		$(types[i] + 'createmessage').show();
-		$(types[i] + 'selectmessage').hide();
-		if ($(types[i] + 'multilingualoption'))
-			$(types[i] + 'multilingualoption').hide();
-	}
-}
 
 </script>
 
@@ -1734,40 +1750,42 @@ var googleready = false;
 var cancelgoogle = false;
 var callbacksection = 'phone';
 
-// Loading the translation setup
-for(var j=0;j<2;j++){
-	var type = types[j];
-	if(isCheckboxChecked(type + 'create')) {
-		var checked = false;
-		Element.show(type + 'translationsshow');
-		languages = phonelanguages;
-		if(type == 'email')
-			languages = emaillanguages;
-		for (i = 0; i < languages.length; i++) {
-			var language = languages[i];
-			if(isCheckboxChecked(type + '_' + language)){
-				Element.show(type + 'txt_' + language);
-				Element.show(type + 'show_' + language);
-				checked = true;
-			} else {
-				Element.hide(type + 'txt_' + language);
-				Element.hide(type + 'show_' + language);
+document.observe('dom:loaded', function() {
+	// Loading the translation setup
+	for(var j=0;j<2;j++){
+		var type = types[j];
+		if(isCheckboxChecked(type + 'create')) {
+			var checked = false;
+			Element.show(type + 'translationsshow');
+			languages = phonelanguages;
+			if(type == 'email')
+				languages = emaillanguages;
+			for (i = 0; i < languages.length; i++) {
+				var language = languages[i];
+				if(isCheckboxChecked(type + '_' + language)){
+					Element.show(type + 'txt_' + language);
+					Element.show(type + 'show_' + language);
+					checked = true;
+				} else {
+					Element.hide(type + 'txt_' + language);
+					Element.hide(type + 'show_' + language);
+				}
+				editlanguage(type,language);
+				Element.hide(type + 'expandtxt_' + language);
+				Element.hide(type + 'hide_' + language);
+				if(!isCheckboxChecked(type + 'edit_' + language)){
+					var x = new getObj(type + 'expand_' + language);
+					x.obj.disabled = true;
+				}
 			}
-			editlanguage(type,language);
-			Element.hide(type + 'expandtxt_' + language);
-			Element.hide(type + 'hide_' + language);
-			if(!isCheckboxChecked(type + 'edit_' + language)){
-				var x = new getObj(type + 'expand_' + language);
-				x.obj.disabled = true;
+			if(!checked) {
+				var x = new getObj(type + 'translatecheck');
+				x.obj.checked = false;
+				Element.hide(type + 'translationsshow');
 			}
-		}
-		if(!checked) {
-			var x = new getObj(type + 'translatecheck');
-			x.obj.checked = false;
-			Element.hide(type + 'translationsshow');
 		}
 	}
-}
+});
 
 <?
 /*
