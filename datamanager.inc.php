@@ -189,9 +189,12 @@ if (CheckFormSubmit($form, $section) || CheckFormSubmit($form, 'add')) {
 							$fieldnum != FieldMap::getStaffField() ) {
 
 							// only update options for non-specialfield
-							$updatefield->addOption($type);
+							if ($type !== null) $updatefield->updateFieldType($type);
+							
 							if ($searchable)
 								$updatefield->addOption('searchable');
+							else
+								$updatefield->removeOption('searchable');
 						}
 						$updatefield->update();
 					}
@@ -223,6 +226,7 @@ if( $reloadform )
 		$fieldnum = $field->fieldnum;
 		$name = $field->name;
 		$searchable = $field->isOptionEnabled('searchable');
+
 		if ($field->isOptionEnabled('language')) {
 			$type = 'language';
 		} else if ($field->isOptionEnabled('school')) {
@@ -409,7 +413,16 @@ break;
 				case "person" :
 ?>
 					<td>
-					<?NewFormItem($form, $section, 'searchable_' . $fieldnum, 'checkbox', null, null, 'DISABLED');?>
+<?
+					$issearch = 'DISABLED';
+					// firstname, lastname, language are always searchable, so checkbox disabled
+					if ($fieldnum != $field->getFirstNameField() &&
+						$fieldnum != $field->getLastNameField() &&
+						$fieldnum != $field->getLanguageField()) {
+							$issearch = '';
+						}
+					NewFormItem($form, $section, 'searchable_' . $fieldnum, 'checkbox', null, null, $issearch);
+?>
 					</td>
 					<td>
 <?

@@ -185,7 +185,8 @@ class FieldMap extends DBMappedObject {
 
 			$fieldnum = $this->fieldnum;
 
-			$query = "delete from persondatavalues where fieldnum='$fieldnum'";
+			// editlock=1 are subscriber static values
+			$query = "delete from persondatavalues where fieldnum='$fieldnum' and editlock=0";
 			QuickUpdate($query);
 
 			switch ($fieldnum[0]) {
@@ -246,6 +247,15 @@ class FieldMap extends DBMappedObject {
 			
 		$this->options = substr($this->options, 0, $pos) . substr($this->options, $pos+$len);
 		$this->optionsarray = explode(",",$this->options);
+	}
+	
+	function updateFieldType($newtype) {
+		// remove all types, then add the new type
+		$this->removeOption('text');
+		$this->removeOption('multisearch');
+		$this->removeOption('reldate');
+		$this->removeOption('numeric');
+		$this->addOption($newtype);
 	}
 }
 
