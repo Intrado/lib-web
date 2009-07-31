@@ -1082,17 +1082,8 @@ if ($JOBTYPE == "repeating" && getSystemSetting("disablerepeat") ) {
 ?>
 			</tr>
 		</table>
-		</div>
-
-		<div id='displaysettingsdetails' style="display: none"><a href="#"
-			onclick="displaySection('settings', true); return false; ">Show
-		advanced options</a></div>
-
-		<div id='displaysettingsbasic' style="display: none"><a href="#"
-			onclick="displaySection('settings', false); return false; ">Hide
-		advanced options</a></div>
-
-		<div id="settingsdetails" style="display: none">
+		
+		<div id="settingsdetails">
 		<table border="0" cellpadding="2" cellspacing="0" width="100%">
 		<? if ($JOBTYPE != "repeating") { ?>
 			<tr>
@@ -1135,6 +1126,7 @@ if ($JOBTYPE == "repeating" && getSystemSetting("disablerepeat") ) {
 				<td><? NewFormItem($f,$s,"sendreport","checkbox",1, NULL, ($completedmode ? "DISABLED" : "")); ?>Report</td>
 			</tr>
 		</table>
+		</div>
 		</div>
 
 		</td>
@@ -1243,17 +1235,9 @@ if ($JOBTYPE == "repeating" && getSystemSetting("disablerepeat") ) {
 				</td>
 			</tr>
 		</table>
-		</div>
 
-		<div id='displayphonedetails' style="display: none"><a href="#"
-			onclick="displaySection('phone', true); return false; ">Show advanced
-		options</a></div>
 
-		<div id='displayphonebasic' style="display: none"><a href="#"
-			onclick="displaySection('phone', false); return false; ">Hide
-		advanced options</a></div>
-
-		<div id='phonedetails' style="display: none"><? if($USER->authorize('sendmulti')) { ?>
+		<div id='phonedetails'><? if($USER->authorize('sendmulti')) { ?>
 		<div id='phonemultilingualoption' style="display: none">
 			<table border="0" cellpadding="2" cellspacing="0" width=100%>
 			<tr>
@@ -1314,7 +1298,7 @@ if ($JOBTYPE == "repeating" && getSystemSetting("disablerepeat") ) {
 			?>
 		</table>
 		</div>
-
+		</div>
 		</td>
 	</tr>
 	<? } ?>
@@ -1425,17 +1409,8 @@ if ($JOBTYPE == "repeating" && getSystemSetting("disablerepeat") ) {
 				</td>
 			</tr>
 		</table>
-		</div>
 
-		<div id='displayemaildetails' style="display: none"><a href="#"
-			onclick="displaySection('email', true); return false; ">Show advanced
-		options</a></div>
-
-		<div id='displayemailbasic' style="display: none"><a href="#"
-			onclick="displaySection('email', false); return false; ">Hide
-		advanced options</a></div>
-
-		<div id='emaildetails' style="display: none">
+		<div id='emaildetails'>
 		<div id='emailmultilingualoption' style="display: none">
 <? if($USER->authorize('sendmulti')) { ?>
 			<table border="0" cellpadding="2" cellspacing="0" width=100%>
@@ -1454,6 +1429,8 @@ if ($JOBTYPE == "repeating" && getSystemSetting("disablerepeat") ) {
 				</tr>
 			</table>
 		</div>
+		</div>
+		
 		</td>
 	</tr>
 	<? } ?>
@@ -1499,18 +1476,6 @@ if ($JOBTYPE == "repeating" && getSystemSetting("disablerepeat") ) {
 	var emailsubmitstate = false;
 	var phonetranslationstate = false;
 	var emailtranslationstate = false;
-	var displaysettingsdetailsstate = 'visible';
-	<? if ($hassettingsdetailerror) { ?>
-		displaysettingsdetailsstate = 'hidden';
-	<?}?>
-	var displayphonedetailsstate = 'visible';
-	<? if ($hasphonedetailerror) { ?>
-		displayphonedetailsstate = 'hidden';
-	<? } ?>
-	var displayemaildetailsstate = 'visible';
-	<? if ($hasemaildetailerror) { ?>
-		displayemaildetailsstate = 'hidden';
-	<? } ?>
 	var jobtypetablestyle = new getObj("jobtypetable").obj.style.border;
 	var jobtypeinfo = new Array();
 
@@ -1540,8 +1505,6 @@ if ($JOBTYPE == "repeating" && getSystemSetting("disablerepeat") ) {
 		if(isCheckboxChecked('sendsms')){
 			typeischecked = true;
 			Element.show('smsoptions');
-			Element.hide('displaysmsoptions');
-			Element.hide('displaysmsoptions');
 		}
 	<?}?>
 
@@ -1555,73 +1518,13 @@ if ($JOBTYPE == "repeating" && getSystemSetting("disablerepeat") ) {
 	}
 	if(isCheckboxChecked('sendphone')){
 		typeischecked = true;
-		Element.show('phoneoptions');
-		Element.hide('displayphoneoptions');
-
-		<?
-		if ($_SESSION['jobid'] != null) {
-			$diffvalues = $job->compareWithDefaults();
-		}
-		if (((isset($diffvalues['phonelang']) && $job->getSetting('jobcreatedphone') == "0")  ||
-			isset($diffvalues['maxcallattempts']) ||
-			isset($diffvalues['callerid']) ||
-			isset($diffvalues['skipduplicates']) ||
-			isset($diffvalues['leavemessage']) ||
-			isset($diffvalues['messageconfirmation'])) ||
-			(($_SESSION['jobid'] != null) && ($job->status == "complete" || $job->status == "cancelled" || $job->status == "cancelling"))) {
-		?>
-			displayphonedetailsstate = 'hidden';
-		<? } ?>
-		if (displayphonedetailsstate == 'visible') {
-			Element.show('displayphonedetails');
-		} else {
-			Element.show('phonedetails');
-			Element.show('displayphonebasic');
-		}
 	}
 	if(isCheckboxChecked('sendemail')){
 		typeischecked = true;
 		Element.show('emailoptions');
-		Element.hide('displayemailoptions');
-
-		<?
-		if ($_SESSION['jobid'] != null) {
-			$diffvalues = $job->compareWithDefaults();
-		}
-		if (((isset($diffvalues['emaillang']) && $job->getSetting('jobcreatedemail',"0") == "0") ||
-			isset($diffvalues['skipemailduplicates'])) ||
-			(($_SESSION['jobid'] != null) && ($job->status == "complete" || $job->status == "cancelled" || $job->status == "cancelling"))) {
-		?>
-			displayemaildetailsstate = 'hidden';
-		<? } ?>
-		if (displayemaildetailsstate == 'visible') {
-			Element.show('displayemaildetails');
-		} else {
-			Element.show('emaildetails');
-			Element.show('displayemailbasic');
-		}
 	}
 	if(	typeischecked == true ){
 		Element.show('settings');
-		<?
-		if ($_SESSION['jobid'] != null) {
-			$diffvalues = $job->compareWithDefaults();
-		}
-		if ((isset($diffvalues['startdate']) ||
-			isset($diffvalues['enddate']) ||
-			isset($diffvalues['starttime']) ||
-			isset($diffvalues['endtime']) ||
-			isset($diffvalues['sendreport'])) ||
-			(($_SESSION['jobid'] != null) && ($job->status == "complete" || $job->status == "cancelled" || $job->status == "cancelling"))) {
-		?>
-			displaysettingsdetailsstate = 'hidden';
-		<? } ?>
-		if (displaysettingsdetailsstate == 'visible') {
-			Element.show('displaysettingsdetails');
-		} else {
-			Element.show('settingsdetails');
-			Element.show('displaysettingsbasic');
-		}
 	}
 
 	// Loading List View
@@ -1668,28 +1571,10 @@ function displaySection(section, details){
 	switch(section){
 		case 'phone':
 			Element.show('phoneoptions');
-			if (details) {
-				Element.show('phonedetails');
-				Element.hide('displayphonedetails');
-				Element.show('displayphonebasic');
-			} else {
-				Element.hide('phonedetails');
-				Element.show('displayphonedetails');
-				Element.hide('displayphonebasic');
-			}
 			Element.hide('displayphoneoptions');
 			break;
 		case 'email':
 			Element.show('emailoptions');
-			if (details) {
-				Element.show('emaildetails');
-				Element.hide('displayemaildetails');
-				Element.show('displayemailbasic');
-			} else {
-				Element.hide('emaildetails');
-				Element.show('displayemaildetails');
-				Element.hide('displayemailbasic');
-			}
 			Element.hide('displayemailoptions');
 			break;
 		case 'sms':
@@ -1697,47 +1582,19 @@ function displaySection(section, details){
 			Element.hide('displaysmsoptions');
 			break;
 		case 'settings':
-			if (details) {
-				displaysettingsdetailsstate = 'hidden';
-				Element.show('settingsdetails');
-				Element.show('displaysettingsbasic');
-				Element.hide('displaysettingsdetails');
-			} else {
-				displaysettingsdetailsstate = 'visible';
-				Element.hide('settingsdetails');
-				Element.hide('displaysettingsbasic');
-				Element.show('displaysettingsdetails');
-			}
 			break;
 	}
 	Element.show('settings');
-
-	if (section != 'settings') {
-		if (displaysettingsdetailsstate == 'hidden') {
-			Element.show('displaysettingsbasic');
-			Element.hide('displaysettingsdetails');
-		} else {
-			displaysettingsdetailsstate = 'visible';
-			Element.hide('displaysettingsbasic');
-			Element.show('displaysettingsdetails');
-		}
-	}
 }
 
 function hideSection(section){
 	switch(section){
 		case 'phone':
 			Element.hide('phoneoptions');
-			Element.hide('displayphonedetails');
-			Element.hide('phonedetails');
-			Element.hide('displayphonebasic');
 			Element.show('displayphoneoptions');
 			break;
 		case 'email':
 			Element.hide('emailoptions');
-			Element.hide('displayemaildetails');
-			Element.hide('emaildetails');
-			Element.hide('displayemailbasic');
 			Element.show('displayemailoptions');
 			break;
 		case 'sms':
@@ -1762,10 +1619,6 @@ function hideSection(section){
 
 	if(typeischecked == false){
 		Element.hide('settings');
-		Element.hide('displaysettingsdetails');
-		Element.hide('settingsdetails');
-		Element.hide('displaysettingsbasic');
-		displaysettingsdetailsstate = 'visible';
 	}
 }
 
