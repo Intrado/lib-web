@@ -1486,6 +1486,7 @@ var jobtypeinfo = new Array();
 jobtypeinfo[""] = new Array("", "");
 
 document.observe('dom:loaded', function() {
+<?  if($JOBTYPE != "repeating") { ?>
 	new DatePicker({
 		relative:'startdate',
 		keepFieldEmpty:true,
@@ -1494,8 +1495,8 @@ document.observe('dom:loaded', function() {
 		topOffset:20,
 		dateFilter:DatePickerUtils.noDatesBefore(0)
 	});
-
-	<?
+<?  }
+	
 	foreach($infojobtypes as $infojobtype){
 		$info = escapehtml($infojobtype->info);
 		$info = str_replace(array("\r\n","\n","\r"),"<br>",$info);
@@ -2082,9 +2083,7 @@ function sendjobconfirm() {
 }
 </script>
 
-<? } // End of Translation - This block will be removed if it is a repeating job or sendmulti is not enabled   ?>
-<script SRC="script/calendar.js"></script>
-<?
+<? } // End of Translation - This block will be removed if it is a repeating job or sendmulti is not enabled   
 endWindow();
 buttons();
 EndForm();
