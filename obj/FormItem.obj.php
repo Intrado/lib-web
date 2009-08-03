@@ -243,4 +243,92 @@ class MultipleOrderBy extends FormItem {
 	}
 }
 
+// Replaces dateOptions() in reportutils.inc.php
+// $args['infinite'] = true or false
+class ReldateOptions extends FormItem {
+	// @param $valueJSON = ['reldate':'', 'xdays':'', 'startdate':'', 'enddate':'']
+	function render ($valueJSON) {
+		global $LOCALE;
+		
+		$n = $this->form->name."_".$this->name;
+		
+		$hiddenField = "<input id='$n' name='$n' type='hidden' value='".escapehtml($valueJSON)."' />";
+		
+		$data = json_decode($valueJSON, true);
+		if (!is_array($data) || empty($data))
+			$data = array('reldate' => '', 'xdays' => '', 'startdate' => '', 'enddate' => '');
+		
+		$onchange = "if (this.value != \"xdays\") { $(\"{$n}_xdaysContainer\").hide(); } else { $(\"{$n}_xdaysContainer\").show(); } if (this.value != \"daterange\") { $(\"{$n}_dateContainer\").hide(); } else { $(\"{$n}_dateContainer\").show(); } ";
+		$onchange .= " $(\"$n\").value = \$H({\"reldate\":this.value}).toJSON(); ";
+		$onchange .= " $(\"{$n}_xdays\").value = \"\"; $(\"{$n}_startdate\").value = \"\"; $(\"{$n}_enddate\").value = \"\";";
+		$selectbox = "<select id='{$n}_reldate' onchange='$onchange'>";
+			if (!empty($this->args['infinite']))
+				$selectbox .= "<option value=''>" . _L("-- Select Date Range --") . "</option>";
+			$reldateValues = array(
+				'today' => _L('Today'),
+				'yesterday' => _L('Yesterday'),
+				'lastweekday' => _L('Last Week Day'),
+				'weektodate' => _L('Week to Date'),
+				'monthtodate' => _L('Month to Date'),
+				'xdays' => _L('Last X Days'),
+				'daterange' => _L('Date Range(inclusive)')
+			);
+			foreach ($reldateValues as $optionValue => $text) {
+				$selected = ($data['reldate'] == $optionValue) ? 'selected' : '';
+				$selectbox .= "<option value='$optionValue' $selected>$text</option>";
+			}
+		$selectbox .= "</select>";
+		
+		$xdaysValue = !empty($data['xdays']) ? $data['xdays'] : '';
+		$xdaysChange = "$(\"$n\").value = \$H({\"reldate\":$(\"{$n}_reldate\").value, \"xdays\":this.value}).toJSON();";
+		$xdays = _L("Days: ") . "<input type='text' size='3' id='{$n}_xdays' value='$xdaysValue' onchange='$xdaysChange'/>";
+		
+		$dateChange = " $(\"$n\").value = \$H({\"reldate\":$(\"{$n}_reldate\").value, \"startdate\":$(\"{$n}_startdate\").value, \"enddate\":$(\"{$n}_enddate\").value}).toJSON();";
+		$dateBlur = " $dateChange; ";
+		$dateFocus = " this.select(); $dateChange; ";
+		$dateClick = " $dateFocus; ";
+		$startdateValue = !empty($data['startdate']) ? $data['startdate'] : '';
+		$enddateValue = !empty($data['enddate']) ? $data['enddate'] : '';
+		$dateboxes = _L("From: ") . "<input id='{$n}_startdate' value='$startdateValue' type='text' size='20' onblur='$dateBlur' onfocus='$dateFocus' onclick='$dateClick' onchange='$dateChange'/>";
+		$dateboxes .= _L("To: ") . "<input id='{$n}_enddate' value='$enddateValue' type='text' size='20' onblur='$dateBlur' onfocus='$dateFocus' onclick='$dateClick' onchange='$dateChange'/>";
+		
+		$xdaysHidden = ($data['reldate'] != 'xdays') ? 'display:none;' : '';
+		$dateHidden = ($data['reldate'] != 'daterange') ? 'display:none;' : '';
+		$datepickerJS = "
+			var {$n}_startdate_picker = new DatePicker({
+				relative: '{$n}_startdate',
+				keepFieldEmpty:true,
+				language:'" . substr($LOCALE,0,2) . "',
+				enableCloseOnBlur:1,
+				afterClose: function () {
+					$dateChange
+				},
+				topOffset:20
+			});
+			
+			var {$n}_enddate_picker = new DatePicker({
+				relative: '{$n}_enddate',
+				keepFieldEmpty:true,
+				language:'" . substr($LOCALE,0,2) . "',
+				enableCloseOnBlur:1,
+				afterClose: function () {
+					$dateChange
+				},
+				topOffset:20
+			});
+		";
+		return "<div style='position:relative'>
+				$hiddenField
+				$selectbox
+				<span style='white-space:nowrap'>
+					<span id='{$n}_xdaysContainer' style='$xdaysHidden'>$xdays</span>
+					<span id='{$n}_dateContainer' style='$dateHidden'>$dateboxes</span>
+				</span>
+			</div>
+			<script type='text/javascript' src='script/datepicker.js'></script>
+			<script type='text/javascript'>$datepickerJS</script>
+		";
+	}
+}
+
 ?>
