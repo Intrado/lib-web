@@ -75,6 +75,15 @@ list_handle_ajax_table($renderedlist, array($containerID));
 $formdata = array();
 
 if (!isset($_SESSION['listsearchpreview'])) {
+	$formdata["toggles"] = array(
+		"label" => _L('Search Options'),
+		"control" => array("FormHtml", 'html' => "
+			<input name='listsearch_searchOption' id='searchByRules' type='radio' onclick=\"choose_search_by_rules();\"><label for='searchByRules'> Search by Rules </label>
+			<input name='listsearch_searchOption' id='searchByPerson' type='radio' onclick=\"choose_search_by_person();\"><label for='searchByPerson'> Search for Person </label>
+		"),
+		"helpstep" => 2
+	);
+	
 	$formdata["ruledata"] = array(
 		"label" => _L('Rules'),
 		"value" => $rulesjson,
@@ -108,7 +117,7 @@ if (!isset($_SESSION['listsearchpreview'])) {
 
 	$formdata["searchbutton"] = array(
 		"label" => _L(''),
-		"control" => array("FormHtml", "html" => "<div id='searchButtonContainer'>" . submit_button(_L('Search by Person'),"search","magnifier") . "</div>"),
+		"control" => array("FormHtml", "html" => "<div id='searchButtonContainer'>" . submit_button(_L('Search'),"search","magnifier") . "</div>"),
 		"helpstep" => 2
 	);
 }
@@ -203,10 +212,37 @@ include_once("nav.inc.php");
 			ruleWidget.delayActions = true;
 			ruleWidget.container.observe('RuleWidget:AddRule', rulewidget_add_rule);
 			ruleWidget.container.observe('RuleWidget:DeleteRule', rulewidget_delete_rule);
+			
+			<?
+				if (!empty($_SESSION['listsearchrules']) || empty($_SESSION['listsearchperson']))
+					echo 'choose_search_by_rules();';
+				else
+					echo 'choose_search_by_person();';
+			?>
 		}
 		
 		$('<?=$containerID?>').update('<?=addslashes(list_get_results_html($containerID, $renderedlist))?>');
 	});
+
+	function choose_search_by_rules() {
+		$('searchByRules').checked = true;
+		$('searchByPerson').checked = false;
+		$('ruleWidgetContainer').up('tr').show();
+		$('<?=$form->name?>_pkey').up('tr').hide();
+		$('<?=$form->name?>_phone').up('tr').hide();
+		$('<?=$form->name?>_email').up('tr').hide();
+		$('searchButtonContainer').up('tr').hide();
+	}
+
+	function choose_search_by_person() {
+		$('searchByRules').checked = false;
+		$('searchByPerson').checked = true;
+		$('ruleWidgetContainer').up('tr').hide();
+		$('<?=$form->name?>_pkey').up('tr').show();
+		$('<?=$form->name?>_phone').up('tr').show();
+		$('<?=$form->name?>_email').up('tr').show();
+		$('searchButtonContainer').up('tr').show();
+	}
 
 	function list_clear_person() {
 		if (notpreview) {
