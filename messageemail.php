@@ -58,6 +58,7 @@ if (isset($_GET['id'])) {
 ////////////////////////////////////////////////////////////////////////////////
 $messagebody = '';
 
+$attachvalues = array();
 if(isset($_SESSION['messageid'])) {
 	$message = new Message($_SESSION['messageid']);
 	$message->readHeaders();	
@@ -65,7 +66,6 @@ if(isset($_SESSION['messageid'])) {
 	$messagebody = $message->format($parts);
 	
 	$attachments = DBFindMany("messageattachment","from messageattachment where not deleted and messageid=" . DBSafe($_SESSION['messageid']));
-	$attachvalues = array();
 	foreach ($attachments as $attachment) {
 		$attachvalues[$attachment->contentid] = array("size" => $attachment->size, "name" => $attachment->filename);
 	}
