@@ -2,27 +2,41 @@
 ////////////////////////////////////////////////////////////////////////////////
 // Includes
 ////////////////////////////////////////////////////////////////////////////////
-require_once("inc/common.inc.php");
-require_once("inc/securityhelper.inc.php");
-require_once("inc/table.inc.php");
-require_once("inc/html.inc.php");
-require_once("inc/form.inc.php");
-require_once("inc/reportutils.inc.php");
-require_once("inc/reportgeneratorutils.inc.php");
-require_once("inc/formatters.inc.php");
-require_once("obj/FieldMap.obj.php");
+include_once("inc/common.inc.php");
+include_once("inc/form.inc.php");
+include_once("inc/table.inc.php");
+include_once("inc/html.inc.php");
+include_once("inc/formatters.inc.php");
+include_once("inc/date.inc.php");
+include_once("obj/Person.obj.php");
+include_once("obj/PeopleList.obj.php");
+include_once("obj/ListEntry.obj.php");
+include_once("obj/RenderedList.obj.php");
+include_once("obj/Validator.obj.php");
+require_once("obj/Form.obj.php");
+include_once("obj/Rule.obj.php");
+include_once("obj/FieldMap.obj.php");
+require_once("obj/FormItem.obj.php");
 require_once("obj/Phone.obj.php");
 require_once("obj/Email.obj.php");
+require_once("obj/Sms.obj.php");
+require_once("inc/securityhelper.inc.php");
+include_once("ruleeditform.inc.php");
+require_once("inc/rulesutils.inc.php");
+require_once("obj/FormRuleWidget.fi.php");
+require_once("inc/reportutils.inc.php");
+require_once('list.inc.php');
+
+include_once("obj/Address.obj.php");
+include_once("obj/Language.obj.php");
+include_once("obj/JobType.obj.php");
+
+require_once("inc/reportgeneratorutils.inc.php");
 require_once("obj/ReportGenerator.obj.php");
 require_once("obj/ReportInstance.obj.php");
 require_once("obj/UserSetting.obj.php");
-require_once("obj/Rule.obj.php");
-require_once("inc/date.inc.php");
-require_once("obj/Person.obj.php");
 require_once("inc/rulesutils.inc.php");
 require_once("obj/PortalReport.obj.php");
-require_once("ruleeditform.inc.php");
-
 
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization
@@ -32,166 +46,215 @@ if (!getSystemSetting("_hasportal", false) || !$USER->authorize('portalaccess'))
 	redirect('unauthorized.php');
 }
 
-
 ////////////////////////////////////////////////////////////////////////////////
-// Data Handling
+// Action/Request Processing
 ////////////////////////////////////////////////////////////////////////////////
-
-
-if(isset($_GET['clear']) && $_GET['clear']){
-	unset($_SESSION['portal']['options']);
-	$_SESSION['saved_report'] = false;
-	redirect();
-}
-
-$options = isset($_SESSION['portal']['options']) ? $_SESSION['portal']['options'] : array("reporttype" => "portal");
-
-if(isset($_GET['deleterule'])) {
-	if(isset($options['rules'])){
-		unset($options['rules'][$_GET['deleterule']]);
-		if(!count($options['rules']))
-			unset($options['rules']);
-	}
-	$_SESSION['portal']['options'] = $options;
-	redirect();
-}
-
-if(isset($_GET['hideactivecodes'])){
-	if($_GET['hideactivecodes'] == "true"){
-		$options['hideactivecodes'] = 1;
-	} else {
-		$options['hideactivecodes'] = 0;
-	}
-	$_SESSION['portal']['options'] = $options;
-	redirect();
-}
-
-if(isset($_GET['hideassociated'])){
-	if($_GET['hideassociated'] == "true"){
-		$options['hideassociated'] = 1;
-	} else {
-		$options['hideassociated'] = 0;
-	}
-	$_SESSION['portal']['options'] = $options;
-	redirect();
-}
-
-if($USER->authorize('generatebulktokens')){
-	if(isset($_GET['generate'])){
-		$reportinstance = new ReportInstance();
-		$reportgenerator = new PortalReport();
-		$reportinstance->setParameters($options);
-		$reportgenerator->reportinstance = $reportinstance;
-		$reportgenerator->generateQuery();
-		if($reportgenerator->query){
-			$result = Query($reportgenerator->query);
-			$data = array();
-			while($row = DBGetRow($result)){
-				$data[] = $row[1];
-			}
-			generatePersonTokens($data);
-		}
-		redirect();
-	}
-}
-
-$RULES = false;
-if(isset($options['rules']) && $options['rules']){
-	$RULES = $options['rules'];
-}
-
 $fields = FieldMap::getOptionalAuthorizedFieldMaps() + FieldMap::getOptionalAuthorizedFieldMapsLike('g');
+$generateBulkTokens = $USER->authorize('generatebulktokens');
 
-$activefields = array();
-$fieldlist = array();
+if (isset($_GET['clear']) && $_GET['clear']) {
+	activationcodemanager_clear_search_session();
+}
 
-foreach($fields as $field){
-	// used in pdf
-	if(isset($_SESSION['report']['fields'][$field->fieldnum]) && $_SESSION['report']['fields'][$field->fieldnum]){
-		$activefields[] = $field->fieldnum;
+if (isset($_GET['hideactivecodes'])) {
+	$_SESSION['hideactivecodes'] = $_GET['hideactivecodes'] == "true" ? true : false;
+}
+if (isset($_GET['hideassociated'])) {
+	$_SESSION['hideassociated'] = $_GET['hideassociated'] == "true" ? true : false;
+}
+
+$rulesjson = '';
+if (isset($_GET['showall'])) {
+	activationcodemanager_clear_search_session();
+	$_SESSION['activationcodemanager_showall'] = true;
+} else if (!empty($_SESSION['activationcodemanager_rules'])) {
+	$rules = $_SESSION['activationcodemanager_rules'];
+	if (is_array($rules))
+		$rulesjson = json_encode(cleanObjects(array_values($rules)));
+}
+
+if ($generateBulkTokens && isset($_GET['generate'])) {
+	$reportinstance = new ReportInstance();
+	$reportinstance->setParameters(activationcodemanager_make_report_options());
+	$reportgenerator = new PortalReport();
+	$reportgenerator->reportinstance = $reportinstance;
+	$reportgenerator->generateQuery();
+	if ($reportgenerator->query) {
+		$result = Query($reportgenerator->query);
+		$data = array();
+		while($row = DBGetRow($result)){
+			$data[] = $row[1];
+		}
+		generatePersonTokens($data);
 	}
+	redirect();
 }
-$options['activefields'] = implode(",",$activefields);
+
+//////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////
+// APPLY REPORT GENERATOR SETTINGS
 $reportinstance = new ReportInstance();
-
-$pagestart = 0;
-if(isset($_GET['pagestart'])){
-	$pagestart = $_GET['pagestart']+0;
-}
-$options['pagestart'] = $pagestart;
-
-$reportinstance->setParameters($options);
+$reportinstance->setParameters(activationcodemanager_make_report_options());
 $reportgenerator = new PortalReport();
 $reportgenerator->reportinstance = $reportinstance;
 $reportgenerator->userid = $USER->id;
-if(isset($_GET['csv']) && $_GET['csv']){
+
+if (isset($_GET['csv']) && $_GET['csv']) {
 	$reportgenerator->format = "csv";
 } else {
 	$reportgenerator->format = "html";
 }
-$f = "person";
-$s = "all";
-$reloadform = 0;
 
-if(CheckFormSubmit($f,$s) || CheckFormSubmit($f, 'showall') || CheckFormSubmit($f, 'search') || CheckFormSubmit($f, 'refresh')){
-	//check to see if formdata is valid
-	if(CheckFormInvalid($f))
-	{
-		error('Form was edited in another window, reloading data');
-		$reloadform = 1;
-	}
-	else
-	{
-		MergeSectionFormData($f, $s);
-		if( CheckFormSection($f, $s) ) {
-			error('There was a problem trying to save your changes', 'Please verify that all required field information has been entered properly');
-		} else {
-
-			if(CheckFormSubmit($f, "showall")){
-				$options = array('reporttype' => "portal");
-				$options['showall'] = true;
-				$_SESSION['portal']['options'] = $options;
-				redirect();
-			} else {
-				$options['reporttype']="portal";
-				if(CheckFormSubmit($f, 'search') || CheckFormSubmit($f, $s))
-					unset($options['showall']);
-
-				if($rule = getRuleFromForm($f, $s)){
-					if(!isset($options['rules']))
-						$options['rules'] = array();
-					$options['rules'][] = $rule;
-					$rule->id = array_search($rule, $options['rules']);
-					$options['rules'][$rule->id] = $rule;
-				}
-
-				foreach($options as $index => $option){
-					if($option == "")
-						unset($options[$index]);
-				}
-				$options['hideactivecodes'] = GetFormData($f, $s, "hideactivecodes");
-				$options['hideassociated'] = GetFormData($f, $s, "hideassociated");
-				$_SESSION['portal']['options'] = $options;
-				redirect();
-			}
-		}
-	}
-} else {
-	$reloadform = 1;
+// FORM DATA
+$extrajs = '';
+if ($generateBulkTokens) {
+	$reportgenerator->generateQuery();
+	$query = $reportgenerator->testquery;
+	$result = ($query != "") ? QuickQuery($query) : false;
+	$extrajs = ($result) ? "if(confirmGenerateActive())" : "if(confirmGenerate())";
 }
 
-if($reloadform){
-	ClearFormData($f);
-	$options = isset($_SESSION['portal']['options']) ? $_SESSION['portal']['options'] : array();
+$checkHideActiveCodes = (!empty($_SESSION['hideactivecodes'])) ? 'checked' : '';
+$checkHideAssociated = (!empty($_SESSION['hideassociated'])) ? 'checked' : '';
 
-	putRuleFormData($f, $s);
-	PutFormData($f, $s, "hideactivecodes", isset($options['hideactivecodes']) ? $options['hideactivecodes'] : 0, "bool", 0, 1);
-	PutFormData($f, $s, "hideassociated", isset($options['hideassociated']) ? $options['hideassociated'] : 0, "bool", 0, 1);
+$formdata = array();
+$formdata["ruledata"] = array(
+	"label" => _L('Search'),
+	"value" => $rulesjson,
+	"control" => array("FormRuleWidget"),
+	"validators" => array(array('ValRules')),
+	"helpstep" => 1
+);
+
+$formdata["displayoptions"] = array(
+	"label" => _L("Display Options"),
+	"control" => array("FormHtml", "html" => "<div id='metadataDiv'></div>"),
+	"helpstep" => 1
+);
+
+$formdata["filter"] = array(
+	"label" => _L("Filter"),
+	"control" => array("FormHtml", "html" => "
+		<div><input type='checkbox' id='checkboxHideActiveCodes' onclick='location.href=\"?hideactivecodes=\" + this.checked' $checkHideActiveCodes><label for='checkboxHideActiveCodes'>"._L('Hide people with unexpired codes')."</label></div>
+		<div><input type='checkbox' id='checkboxHideAssociated' onclick='location.href=\"?hideassociated=\" + this.checked' $checkHideAssociated><label for='checkboxHideAssociated'>"._L('Hide people with Contact Manager accounts')."</label></div>
+	"),
+	"helpstep" => 1
+);
+
+if (!empty($_SESSION['activationcodemanager_rules']) || !empty($_SESSION['activationcodemanager_showall'])) {
+	$formdata["outputformat"] = array(
+		"label" => _L("Output Format"),
+		"control" => array("FormHtml", "html" => "<a href='activationcodemanager.php/report.csv?csv=true'>CSV</a>"),
+		"helpstep" => 1
+	);
+}
+
+$buttons = array(
+	icon_button(_L('Back'),"tick",null,"contacts.php"),
+	submit_button(_L('Refresh'),"refresh","arrow_refresh"),
+	icon_button(_L('Show All Contacts'),"tick",null,"?showall")
+);
+if ($generateBulkTokens)
+	$buttons[] = icon_button("Generate Activation Codes", "tick", "$extrajs window.location='?generate=1'", "activationcodemanager.php");
+
+$form = new Form('activationcodemanager',$formdata,array(),$buttons);
+$form->ajaxsubmit = true;
+///////////////////////////////////////////////////////////
+// FORM HANDLING
+$form->handleRequest();
+
+$datachange = false;
+$errors = false;
+
+//check for form submission
+if ($button = $form->getSubmit()) { //checks for submit and merges in post data
+	$ajax = $form->isAjaxSubmit(); //whether or not this requires an ajax response	
+	
+	if (($errors = $form->validate()) === false) { //checks all of the items in this form
+		$postdata = $form->getData(); //gets assoc array of all values {name:value,...}
+				
+		if ($ajax) {
+			switch ($button) {
+				case 'addrule':
+					activationcodemanager_clear_search_session('activationcodemanager_rules');
+					$data = json_decode($postdata['ruledata']);
+					if (isset($data->fieldnum, $data->logical, $data->op, $data->val) && $type = Rule::getType($data->fieldnum)) {
+						$data->val = prepareRuleVal($type, $data->op, $data->val);
+						if ($rule = Rule::initFrom($data->fieldnum, $data->logical, $data->op, $data->val)) {
+							if (!isset($_SESSION['activationcodemanager_rules']))
+								$_SESSION['activationcodemanager_rules'] = array();
+							$_SESSION['activationcodemanager_rules'][$data->fieldnum] = $rule;
+						}
+					}
+					$form->sendTo("activationcodemanager.php");
+					break;
+					
+				case 'deleterule':
+					activationcodemanager_clear_search_session('activationcodemanager_rules');
+					if (!empty($_SESSION['activationcodemanager_rules'])) {
+						$fieldnum = $postdata['ruledata'];
+						unset($_SESSION['activationcodemanager_rules'][$fieldnum]);
+					}
+					$form->sendTo("activationcodemanager.php");
+					break;
+					
+				case 'refresh':
+					$form->sendTo("activationcodemanager.php");
+					break;
+
+				case 'showall':
+					activationcodemanager_clear_search_session();
+					$_SESSION['activationcodemanager_showall'] = true;
+					$form->sendTo("activationcodemanager.php");
+					break;
+			}
+		} else {
+			redirect("activationcodemanager.php");
+		}
+	}
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Functions
 ////////////////////////////////////////////////////////////////////////////////
+function activationcodemanager_clear_search_session($keep = false) {
+	$_SESSION['saved_report'] = false;
+	
+	if ($keep != 'activationcodemanager_showall')
+		$_SESSION['activationcodemanager_showall'] = false;
+	
+	if ($keep != 'activationcodemanager_rules')
+		$_SESSION['activationcodemanager_rules'] = array();
+}
+
+
+function activationcodemanager_make_report_options() {
+	global $fields;
+	
+	$options = array("reporttype" => "portal");
+
+	if (!empty($_SESSION['activationcodemanager_showall'])) {
+		$options['showall'] = true;
+	} else if (!empty($_SESSION['activationcodemanager_rules'])) {
+		$options['rules'] = $_SESSION['activationcodemanager_rules'];
+	}
+	
+	$activefields = array();
+	foreach ($fields as $field){
+		// used in pdf
+		if (isset($_SESSION['report']['fields'][$field->fieldnum]) && $_SESSION['report']['fields'][$field->fieldnum]){
+			$activefields[] = $field->fieldnum;
+		}
+	}
+	$options['activefields'] = implode(",",$activefields);
+	
+	$options['hideactivecodes'] = !empty($_SESSION['hideactivecodes']) ? true : false;
+	$options['hideassociated'] = !empty($_SESSION['hideassociated']) ? true : false;
+	
+	$options['pagestart'] = isset($_GET['pagestart']) ? $_GET['pagestart'] : 0;
+
+	return $options;
+}
 
 //index 4 is token
 //index 5 is expiration date
@@ -204,112 +267,84 @@ function fmt_activation_code($row, $index){
 	return $row[$index];
 }
 
-if($reportgenerator->format == "csv"){
+////////////////////////////////////////////////////////////////////////////////
+// Display
+////////////////////////////////////////////////////////////////////////////////
+if ($reportgenerator->format == "csv") {
 	$reportgenerator->generate();
 } else {
-
-	////////////////////////////////////////////////////////////////////////////////
-	// Display
-	////////////////////////////////////////////////////////////////////////////////
 	$PAGE = "system:contacts";
 	$TITLE = "Activation Code Manager";
 
 	include_once("nav.inc.php");
-
-	NewForm($f);
-	if($USER->authorize('generatebulktokens')){
-		$reportgenerator->generateQuery();
-		$query = $reportgenerator->testquery;
-		if($query != ""){
-			$result = QuickQuery($query);
-		} else {
-			$result = false;
-		}
-		if($result){
-			$extrajs = "if(confirmGenerateActive())";
-		} else {
-			$extrajs = "if(confirmGenerate())";
-		}
-		buttons(button("Back", null, "contacts.php"), submit($f, 'refresh', 'Refresh'), submit($f, 'showall','Show All Contacts'), button("Generate Activation Codes", $extrajs . " window.location='?generate=1'"));
-	} else {
-		buttons(button("Back", null, "contacts.php"), submit($f, 'refresh', 'Refresh'), submit($f, 'showall','Show All Contacts'));
-	}
 	startWindow("Contact Search", "padding: 3px;");
-
+	
+	echo "<div id='metadataTempDiv' style='display:none'>";
+		select_metadata("$('searchresults')", 5, $fields);
+	echo "</div>";
+	
 	?>
-	<table border="0" cellpadding="3" cellspacing="0" width="100%">
-		<tr valign="top"><th align="right" class="windowRowHeader bottomBorder">Search:</th>
-			<td class="bottomBorder">
-				<table border="0" cellpadding="3" cellspacing="0" width="100%">
-					<tr>
-						<td>
-							<table border="0" cellpadding="3" cellspacing="0" width="100%" id="searchcriteria">
-								<tr>
-									<td>
-									<?
-										//$RULES is declared above
-										$RULEMODE = array('multisearch' => true, 'text' => true, 'reldate' => true, 'numeric' => true);
-
-										//include("ruleeditform.inc.php");
-										drawRuleTable($f, $s, false, true, true, true);
-
-									?>
-									</td>
-								</tr>
-							</table>
-						</td>
-					</tr>
-				</table>
-			</td>
-		</tr>
-		<tr valign="top"><th align="right" class="windowRowHeader bottomBorder">Display Fields:</th>
-			<td class="bottomBorder">
-		<?
-				select_metadata('portalresultstable', 5, $fields);
-		?>
-			</td>
-		</tr>
-		<tr valign="top"><th align="right" class="windowRowHeader bottomBorder">Filter:</th>
-			<td class="bottomBorder">
-				<table>
-					<tr><td><? NewFormItem($f, $s, "hideactivecodes", "checkbox", NULL, NULL, 'onclick="location.href=\'?hideactivecodes=\' + this.checked"') ?>Hide people with unexpired codes</td></tr>
-					<tr><td><? NewFormItem($f, $s, "hideassociated", "checkbox", NULL, NULL, 'onclick="location.href=\'?hideassociated=\' + this.checked"') ?>Hide people with Contact Manager accounts</td></tr>
-				</table>
-			</td>
-		</tr>
-		<?if((isset($options['rules']) && $options['rules'] != "") || isset($options['showall'])){?>
-			<tr>
-				<th align="right" class="windowRowHeader bottomBorder">Output Format:</th>
-				<td class="bottomBorder"><a href="activationcodemanager.php/report.csv?csv=true">CSV</a></td>
-			</tr>
-		<?}?>
-	</table>
-		<?
-	endWindow();
-
-	if((isset($options['rules']) && $options['rules'] != "") || isset($options['showall'])){
+		<script type="text/javascript">
+			<? Validator::load_validators(array("ValRules")); ?>
+		</script>
+	<?
+	
+	echo $form->render();
+	
+	if (isset($formdata['outputformat'])) {
 		$reportgenerator->generate();
 	}
-	buttons();
-	EndForm();
-?>
-<script SRC="script/calendar.js"></script>
-<?
+	
+	endWindow();
+	
+	?>
+		<script type="text/javascript">
+			document.observe('dom:loaded', function() {
+				ruleWidget.delayActions = true;
+				ruleWidget.container.observe('RuleWidget:AddRule', rulewidget_add_rule);
+				ruleWidget.container.observe('RuleWidget:DeleteRule', rulewidget_delete_rule);
+				
+				$('metadataDiv').update($('metadataTempDiv').innerHTML);
+			});
+
+			function rulewidget_add_rule(event) {
+				$('activationcodemanager_ruledata').value = event.memo.ruledata.toJSON();
+				form_submit(event, 'addrule');
+			}
+
+			function rulewidget_delete_rule(event) {
+				$('activationcodemanager_ruledata').value = event.memo.fieldnum;
+				form_submit(event, 'deleterule');
+			}
+			
+			function confirmGenerate () {
+			<?
+				if($reportgenerator->reporttotal > 0) {
+					$str = addslashes(_L("Are you sure you want to generate activation codes for these people?"));
+					echo "
+						return confirm('$str');
+					";
+				} else {
+					$str = addslashes(_L("There are no people in this list."));
+					echo "
+						window.alert('$str');
+						return false;
+					";
+				}
+			?>
+			}
+			
+			function confirmGenerateActive () {
+			<?
+				$str = addslashes(_L("Some activation codes exist in this list.  Are you sure you want to overwrite them?"));
+				echo "
+					return confirm('$str');
+				";
+			?>
+			}
+		</script>
+	<?
+
 	include_once("navbottom.inc.php");
-?>
-<script>
-	function confirmGenerate(){
-<? if($reportgenerator->reporttotal > 0){ ?>
-		return confirm("Are you sure you want to generate activation codes for these people?");
-<? } else { ?>
-		window.alert("There are no people in this list.");
-		return false;
-<? } ?>
-	}
-	function confirmGenerateActive(){
-		return confirm("Some activation codes exist in this list.  Are you sure you want to overwrite them?");
-	}
-</script>
-<?
 }
 ?>
