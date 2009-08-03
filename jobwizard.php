@@ -62,14 +62,15 @@ $wizdata = array(
 			"text" => new JobWiz_messageEmailText(_L("Compose Email")),
 			"translate" => new JobWiz_messageEmailTranslate(_L("Translations"))
 		)),
-		"sms" => new WizSection ("Txt",array(
-			"pick" => new JobWiz_messageSmsChoose(_L("Txt: Message")),
+		"sms" => new WizSection ("SMS",array(
+			"pick" => new JobWiz_messageSmsChoose(_L("SMS: Message")),
 			"text" => new JobWiz_messageSmsText(_L("Compose Txt"))
 		))
 	)),
 	"schedule" => new WizSection ("Schedule",array(
 		"options" => new JobWiz_scheduleOptions(_L("Schedule Options")),
-		"date" => new JobWiz_scheduleDate(_L("Schedule Date/Time"))
+		"date" => new JobWiz_scheduleDate(_L("Schedule Date/Time")),
+		"advanced" => new JobWiz_scheduleAdvanced(_L("Advanced Options"))
 	)),
 	"submit" => new WizSection ("Confirm",array(
 		"confirm" => new JobWiz_submitConfirm(_L("Review and Confirm"))
@@ -325,6 +326,7 @@ class FinishJobWizard extends WizFinish {
 				if (strtotime($callearly) + 3600 > strtotime($calllate))
 					 $calllate = date("g:i a", strtotime(strtotime($callearly) + 3600));
 				$schedule = array(
+					"maxjobdays" => isset($postdata["/schedule/advanced"]["maxjobdays"])?$postdata["/schedule/advanced"]["maxjobdays"]:1,
 					"date" => date('m/d/Y'),
 					"callearly" => date("g:i a"),
 					"calllate" => $USER->getCallLate()
@@ -332,6 +334,7 @@ class FinishJobWizard extends WizFinish {
 				break;
 			case "schedule":
 				$schedule = array(
+					"maxjobdays" => isset($postdata["/schedule/advanced"]["maxjobdays"])?$postdata["/schedule/advanced"]["maxjobdays"]:1,
 					"date" => date('m/d/Y', strtotime($postdata["/schedule/date"]["date"])),
 					"callearly" => $postdata["/schedule/date"]["callearly"],
 					"calllate" => $postdata["/schedule/date"]["calllate"]
@@ -339,6 +342,7 @@ class FinishJobWizard extends WizFinish {
 				break;
 			case "template": 
 				$schedule = array(
+					"maxjobdays" => isset($postdata["/schedule/advanced"]["maxjobdays"])?$postdata["/schedule/advanced"]["maxjobdays"]:1,
 					"date" => false,
 					"callearly" => false,
 					"calllate" => false
@@ -347,7 +351,14 @@ class FinishJobWizard extends WizFinish {
 			default:
 				break;
 		}
-
+		
+		// for all the job settings on the "Advanced" step. set some advanced options that will get stuffed into the job
+		$advanced = array();
+		if (isset($postdata["/schedule/options"]["advanced"]) && $postdata["/schedule/options"]["advanced"])
+			foreach (array("skipduplicates", "skipemailduplicates", "leavemessage", "messageconfirmation", "callerid") as $option)
+				if (isset($postdata["/schedule/advanced"][$option]))
+					$advanced[$option] = $postdata["/schedule/advanced"][$option];
+		
 		$jobsettings = array(
 			"jobtype" => $jobtype->id,
 			"jobname" => $jobname,
@@ -384,13 +395,11 @@ class FinishJobWizard extends WizFinish {
 		$job->modifydate = QuickQuery("select now()");
 		$job->createdate = QuickQuery("select now()");
 		$job->scheduleid = null;
-		if ($schedule['date']) {
+		if ($schedule['date'])
 			$job->startdate = date("Y-m-d", strtotime($schedule['date']));
-			$job->enddate = date("Y-m-d", strtotime($job->startdate) + (($USER->getSetting("maxjobdays", 1) - 1) * 86400));
-		} else {
+		else
 			$job->startdate = date("Y-m-d");
-			$job->enddate = date("Y-m-d", strtotime("today") + (1 * 86400));
-		}
+		$job->enddate = date("Y-m-d", strtotime($job->startdate) + (($schedule["maxjobdays"] - 1) * 86400));
 		$job->starttime = ($schedule['callearly'])?date("H:i", strtotime($schedule['callearly'])):date("H:i", strtotime($USER->getCallEarly()));
 		$job->endtime = ($schedule['calllate'])?date("H:i", strtotime($schedule['calllate'])):date("H:i", strtotime($USER->getCallLate()));
 		$job->finishdate = null;
@@ -472,6 +481,15 @@ class FinishJobWizard extends WizFinish {
 		
 		if ($jobsettings['smsmessagelink'])
 			$job->setSetting('smsmessagelink', "1");
+		
+		foreach ($advanced as $option => $value) {
+			if ($value == true)
+				$job->setSetting($option, 1);
+			elseif ($value == false)
+				$job->setSetting($option, 0);
+			else
+				$job->setSetting($option, $value);
+		}
 		
 		$job->update();
 		if ($schedule['date'])

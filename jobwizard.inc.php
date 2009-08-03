@@ -290,6 +290,121 @@ class JobWiz_start extends WizStep {
 			}
 		}
 		
+		$deliverytypes = array();
+		foreach (array('sendphone', 'sendemail', 'sendsms') as $deliverytype) {
+			if ($USER->authorize($deliverytype))
+				$deliverytypes[$deliverytype] = true;
+			else
+				$deliverytypes[$deliverytype] = false;
+		}
+		
+		if ($deliverytypes['sendphone'] && !$USER->authorize("starteasy"))
+			$deliverytypes['sendphone'] = false;
+
+		if ($deliverytypes['sendsms'] && !getSystemSetting('_hassms'))
+			$deliverytypes['sendsms'] = false;
+		
+		$packageDetails = array(
+			"easycall" => array(0 => "", 1 => "", "icon" => "img/largeicons/mic.jpg", "label" => _L("Record"), "enabled" => false),
+			"express" => array(0 => "", 1 => "", "icon" => "img/largeicons/writescript.jpg", "label" => _L("Write"), "enabled" => false),
+			"personalized" => array(0 => "", 1 => "", "icon" => "img/largeicons/micwrite.jpg", "label" => _L("Record & Write"), "enabled" => false),
+			"custom" => array(0 => "", 1 => "", "icon" => "img/largeicons/tools.jpg", "label" => _L("Customize"), "enabled" => false)
+		);
+		
+		// All delivery types allowed
+		if ($deliverytypes['sendphone'] && $deliverytypes['sendemail'] && $deliverytypes['sendsms']) {
+			$packageDetails["easycall"][0] = _L('Record Phone Message/ EasyCall');
+			$packageDetails["easycall"][1] = _L('Auto Email and Text Alerts');
+			$packageDetails["easycall"]["enabled"] = true;
+			$packageDetails["express"][0] = _L('Type, Phone, Email and Text Message / Text-To-Speech');
+			$packageDetails["express"][1] = _L('Automatic Translation');
+			$packageDetails["express"]["enabled"] = true;
+			$packageDetails["personalized"][0] = _L('Record Phone Message');
+			$packageDetails["personalized"][1] = _L('Type Email, and Text Messages with Automatic Translation');
+			$packageDetails["personalized"]["enabled"] = true;
+			$packageDetails["custom"][0] = _L('Select combination of message types');
+			$packageDetails["custom"][1] = _L('Automatic Translation');
+			$packageDetails["custom"]["enabled"] = true;
+		// Only phone
+		} elseif ($deliverytypes['sendphone'] && !$deliverytypes['sendemail'] && !$deliverytypes['sendsms']) {
+			$packageDetails["easycall"][0] = _L('Record Phone Message/ EasyCall');
+			$packageDetails["easycall"][1] = _L('Message delivered in your voice');
+			$packageDetails["easycall"]["enabled"] = true;
+			$packageDetails["custom"][0] = _L('Select message type');
+			$packageDetails["custom"][1] = _L('Create new or select saved');
+			$packageDetails["custom"]["enabled"] = true;
+		// Only email
+		} elseif ($deliverytypes['sendemail'] && !$deliverytypes['sendphone'] && !$deliverytypes['sendsms']) {
+			$packageDetails["express"][0] = _L('Type Email message');
+			$packageDetails["express"][1] = _L('Automatic Translation');
+			$packageDetails["express"]["enabled"] = true;
+			$packageDetails["custom"][0] = _L('Select message type');
+			$packageDetails["custom"][1] = _L('Create new or select saved');
+			$packageDetails["custom"]["enabled"] = true;
+		// Only SMS
+		} elseif ($deliverytypes['sendsms'] && !$deliverytypes['sendphone'] && !$deliverytypes['sendemail']) {
+			$packageDetails["express"][0] = _L('Type SMS message');
+			$packageDetails["express"][1] = _L('Automatic Translation');
+			$packageDetails["express"]["enabled"] = true;
+			$packageDetails["custom"][0] = _L('Select message type');
+			$packageDetails["custom"][1] = _L('Create new or select saved');
+			$packageDetails["custom"]["enabled"] = true;
+		// Phone and Email
+		} elseif ($deliverytypes['sendphone'] && $deliverytypes['sendemail'] && !$deliverytypes['sendsms']) {
+			$packageDetails["easycall"][0] = _L('Record Phone Message/ EasyCall');
+			$packageDetails["easycall"][1] = _L('Auto Email');
+			$packageDetails["easycall"]["enabled"] = true;
+			$packageDetails["express"][0] = _L('Type Phone and Email / Text-To-Speech');
+			$packageDetails["express"][1] = _L('Automatic Translation');
+			$packageDetails["express"]["enabled"] = true;
+			$packageDetails["personalized"][0] = _L('Record Phone Message');
+			$packageDetails["personalized"][1] = _L('Type Email with Automatic Translation');
+			$packageDetails["personalized"]["enabled"] = true;
+			$packageDetails["custom"][0] = _L('Select combination of message types');
+			$packageDetails["custom"][1] = _L('Automatic Translation');
+			$packageDetails["custom"]["enabled"] = true;
+		// Phone and SMS
+		} elseif ($deliverytypes['sendphone'] && !$deliverytypes['sendemail'] && $deliverytypes['sendsms']) {
+			$packageDetails["easycall"][0] = _L('Record Phone Message/ EasyCall');
+			$packageDetails["easycall"][1] = _L('Auto SMS');
+			$packageDetails["easycall"]["enabled"] = true;
+			$packageDetails["express"][0] = _L('Type Phone and SMS / Text-To-Speech');
+			$packageDetails["express"][1] = _L('Automatic Translation');
+			$packageDetails["express"]["enabled"] = true;
+			$packageDetails["personalized"][0] = _L('Record Phone Message');
+			$packageDetails["personalized"][1] = _L('Type Email with Automatic Translation');
+			$packageDetails["personalized"]["enabled"] = true;
+			$packageDetails["custom"][0] = _L('Select combination of message types');
+			$packageDetails["custom"][1] = _L('Automatic Translation');
+			$packageDetails["custom"]["enabled"] = true;
+		// Email and SMS
+		} elseif (!$deliverytypes['sendphone'] && $deliverytypes['sendemail'] && $deliverytypes['sendsms']) {
+			$packageDetails["express"][0] = _L('Type Email and SMS');
+			$packageDetails["express"][1] = _L('Automatic Translation');
+			$packageDetails["express"]["enabled"] = true;
+			$packageDetails["custom"][0] = _L('Select combination of message types');
+			$packageDetails["custom"][1] = _L('Automatic Translation');
+			$packageDetails["custom"]["enabled"] = true;
+		}
+		
+		$packages = array();
+		foreach ($packageDetails as $package => $details) {
+			if (!$details['enabled'])
+				continue;
+			$packages[$package] = '
+				<table align="left">
+					<tr>
+						<td align="center" width="70px"><img src="'.$details['icon'].'"/><div>'.escapehtml($details['label']).'</div></td>
+						<td align="left" valign="center">
+							<div>
+								<div style="clear:both"><img style="float:left" src="img/icons/bullet_blue.gif"/>&nbsp;'.escapehtml($details[0]).'</div>
+								<div style="clear:both"><img style="float:left" src="img/icons/bullet_blue.gif"/>&nbsp;'.escapehtml($details[1]).'</div>
+							</div>
+						</td>
+					</tr>
+				</table>';
+		}
+		
 		$formdata = array($this->title);
 		$formdata["name"] = array(
 			"label" => _L("Job Name"),
@@ -314,56 +429,6 @@ class JobWiz_start extends WizStep {
 			"helpstep" => 2
 		);
 		
-		$package = array();
-		if ($USER->authorize("starteasy"))
-			$package['easycall'] = '
-				<table align="left">
-					<tr>
-						<td align="center" width="70px"><img src="img/largeicons/mic.jpg"/><div>'.escapehtml(_L('Record')).'</div></td>
-						<td align="left" valign="center">
-							<div>
-								<div style="clear:both"><img style="float:left" src="img/icons/bullet_blue.gif"/>&nbsp;'.escapehtml(_L('Record Phone Message/ EasyCall')).'</div>
-								<div style="clear:both"><img style="float:left" src="img/icons/bullet_blue.gif"/>&nbsp;'.escapehtml(_L('Auto Email and Text Alerts')).'</div>
-							</div>
-						</td>
-					</tr>
-				</table>';
-		$package['express'] = '
-			<table align="left">
-				<tr>
-					<td align="center" width="70px"><img src="img/largeicons/writescript.jpg"/><div>'.escapehtml(_L('Write')).'</div></td>
-					<td align="left" valign="center">
-						<div>
-							<div style="clear:both"><img style="float:left" src="img/icons/bullet_blue.gif"/>&nbsp;'.escapehtml(_L('Type, Phone, Email and Text Message / Text-To-Speech')).'</div>
-							<div style="clear:both"><img style="float:left" src="img/icons/bullet_blue.gif"/>&nbsp;'.escapehtml(_L('Automatic Translation')).'</div>
-						</div>
-					</td>
-				</tr>
-			</table>';
-		$package['personalized'] = '
-			<table align="left">
-				<tr>
-					<td align="center" width="70px"><img src="img/largeicons/micwrite.jpg"/><div>'.escapehtml(_L('Record & Write')).'</div></td>
-					<td align="left" valign="center">
-						<div>
-							<div style="clear:both"><img style="float:left" src="img/icons/bullet_blue.gif"/>&nbsp;'.escapehtml(_L('Record Phone Message')).'</div>
-							<div style="clear:both"><img style="float:left" src="img/icons/bullet_blue.gif"/>&nbsp;'.escapehtml(_L('Type Email, and Text Messages with Automatic Translation')).'</div>
-						</div>
-					</td>
-				</tr>
-			</table>';
-		$package['custom'] = '
-			<table align="left">
-				<tr>
-					<td align="center" width="70px"><img src="img/largeicons/tools.jpg"/><div>'.escapehtml(_L('Customize')).'</div></td>
-					<td align="left" valign="center">
-						<div>
-							<div style="clear:both"><img style="float:left" src="img/icons/bullet_blue.gif"/>&nbsp;'.escapehtml(_L('Select combination of message types')).'</div>
-							<div style="clear:both"><img style="float:left" src="img/icons/bullet_blue.gif"/>&nbsp;'.escapehtml(_L('Automatic Translation')).'</div>
-						</div>
-					</td>
-				</tr>
-			</table>';
 		$formdata["package"] = array(
 			"label" => _L("Notification Method"),
 			"fieldhelp" => _L("These are commonly used notification packages. For other options, select Custom."),
@@ -371,7 +436,7 @@ class JobWiz_start extends WizStep {
 				array("ValRequired")
 			),
 			"value" => "",
-			"control" => array("HtmlRadioButton", "values" => $package),
+			"control" => array("HtmlRadioButton", "values" => $packages),
 			"helpstep" => 3
 		);
 		$helpsteps = array (
@@ -401,12 +466,14 @@ class JobWiz_messageType extends WizStep {
 		$deliverytypes = array(
 			'phone'=>array('sendphone', _L("Phone Call")),
 			'email'=>array('sendemail', _L("Email")),
-			'sms'=>array('sendsms', _L("Text Message")),
-			'print'=>array('sendmessage', _L("Print To Mail Document")));
+			'sms'=>array('sendsms', _L("Text Message")));
 		foreach ($deliverytypes as $checkvalue => $checkname)
 			if ($USER->authorize($checkname[0]))
 				$values[$checkvalue] = $checkname[1];
-				
+
+		if ($deliverytypes['sendsms'] && !getSystemSetting('_hassms'))
+			unset($values['sms']);
+		
 		$formdata[] = $this->title;
 		$helpsteps = array(_L("Select a method or methods for message delivery."));
 		$formdata["type"] = array(
@@ -1176,6 +1243,17 @@ class JobWiz_scheduleOptions extends WizStep {
 			"control" => array("RadioButton","values"=>$menu),
 			"helpstep" => 1
 		);
+		
+		$helpsteps[] = _L("Set advanced options such as duplicate removal and number of days to run.");
+		$formdata["advanced"] = array(
+			"label" => _L("Advanced Options"),
+			"fieldhelp" => _L('Check here if you would like to set additional options for this notification such as duplicate removal and number of days to run.'),
+			"value" => "",
+			"validators" => array(),
+			"control" => array("CheckBox"),
+			"helpstep" => 2
+		);
+		
 		return new Form("scheduleOptions",$formdata,$helpsteps);
 	}
 }
@@ -1262,6 +1340,91 @@ class JobWiz_scheduleDate extends WizStep {
 		} else {
 			return false;
 		}
+	}
+}
+class JobWiz_scheduleAdvanced extends WizStep {
+	function getForm($postdata, $curstep) {
+		global $USER;
+		global $ACCESS;
+		
+		$helpsteps = array(_L("Specify the number of days for which you would like your job to run before it stops."));
+		$maxjobdays = $USER->getSetting("maxjobdays", $ACCESS->getValue('maxjobdays'));
+		$maxdays = $ACCESS->getValue('maxjobdays', 7);
+		$formdata["maxjobdays"] = array(
+			"label" => _L("Days to Run"),
+			"fieldhelp" => ("Use this menu to set the default number of days your jobs should run."),
+			"value" => $maxjobdays,
+			"validators" => array(
+				array("ValInArray", "values" => range(1,$maxdays))
+			),
+			"control" => array("SelectMenu", "values"=>array_combine(range(1,$maxdays),range(1,$maxdays))),
+			"helpstep" => 1
+		);
+		
+		$helpsteps[] = _L("Indicates that duplicate phone numbers, Emails in the list should receive only one notification.");
+		$formdata["skipduplicates"] = array(
+			"label" => _L("Skip Duplicate Phones"),
+			"fieldhelp" => _L('Indicates that duplicate phone numbers in the list should receive only one call.'),
+			"value" => $USER->getSetting("skipduplicates", true),
+			"validators" => array(),
+			"control" => array("CheckBox"),
+			"helpstep" => 2
+		);
+		$formdata["skipemailduplicates"] = array(
+			"label" => _L("Skip Duplicate Emails"),
+			"fieldhelp" => _L('Indicates that duplicate Emailss in the list should receive only one message.'),
+			"value" => $USER->getSetting("skipemailduplicates", true),
+			"validators" => array(),
+			"control" => array("CheckBox"),
+			"helpstep" => 2
+		);
+		
+		if ($ACCESS->getPermission('leavemessage')) {
+			$helpsteps[] = _L("Enable the Voice Response feature to allow recipients to leave you a message. Make sure to include instructions in your message.");
+			$formdata["leavemessage"] = array(
+				"label" => _L("Voice Response"),
+				"fieldhelp" => _L('Allow call recipients to leave a message.'),
+				"value" => $USER->getSetting("leavemessage", true),
+				"validators" => array(),
+				"control" => array("CheckBox"),
+				"helpstep" => 3
+			);
+		}
+		
+		if ($ACCESS->getPermission('messageconfirmation')) {
+			$helpsteps[] = _L("This option allows recipients to respond to your phone message with a yess by pressing 1 or a no by pressing 2.");
+			$formdata["messageconfirmation"] = array(
+				"label" => _L("Confirmation"),
+				"fieldhelp" => _L('Allow message confirmation by recipients.'),
+				"value" => $USER->getSetting("messageconfirmation", false),
+				"validators" => array(),
+				"control" => array("CheckBox"),
+				"helpstep" => 4
+			);
+		}
+		
+		if ($ACCESS->getPermission('setcallerid')) {
+			$helpsteps[] = _L("This option will set the number displayed on the recipient's home or cellular phone.");
+			$formdata["callerid"] = array(
+				"label" => _L("Caller ID"),
+				"fieldhelp" => _L('This option will set the Caller ID when the person is called.'),
+				"value" => Phone::format($USER->getSetting("callerid","")),
+				"validators" => array(
+					array("ValLength","min" => 3,"max" => 20),
+					array("ValPhone")
+				),
+				"control" => array("TextField","maxlength" => 20, "size" => 15),
+				"helpstep" => 5
+			);
+		}
+		return new Form("scheduleAdvanced",$formdata,$helpsteps);
+	}
+	
+	//returns true if this step is enabled
+	function isEnabled($postdata, $step) {
+		if (isset($postdata['/schedule/options']['advanced']) && $postdata['/schedule/options']['advanced'])
+			return true;
+		return false;
 	}
 }
 
