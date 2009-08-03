@@ -293,7 +293,7 @@ class JobWiz_start extends WizStep {
 		$formdata = array($this->title);
 		$formdata["name"] = array(
 			"label" => _L("Job Name"),
-			"fieldhelp" => _L("Name is used for the job's email subject and to create reports."),
+			"fieldhelp" => _L("The name of your job will also become the subject line for generated emails. The best names are brief, but indicate the message content."),
 			"value" => "",
 			"validators" => array(
 				array("ValRequired"),
@@ -392,6 +392,7 @@ class JobWiz_listChoose extends WizStep {
 	}
 }
 
+//get here at the Message step after clicking Custom. Let's you pick the types of messages for the job.
 class JobWiz_messageType extends WizStep {
 	function getForm($postdata, $curstep) {
 		// Form Fields.
@@ -399,7 +400,7 @@ class JobWiz_messageType extends WizStep {
 		global $USER;
 		$deliverytypes = array(
 			'phone'=>array('sendphone', _L("Phone Call")),
-			'email'=>array('sendemail', _L("EMail")),
+			'email'=>array('sendemail', _L("Email")),
 			'sms'=>array('sendsms', _L("Text Message")),
 			'print'=>array('sendmessage', _L("Print To Mail Document")));
 		foreach ($deliverytypes as $checkvalue => $checkname)
@@ -410,6 +411,7 @@ class JobWiz_messageType extends WizStep {
 		$helpsteps = array(_L("Select a method or methods for message delivery."));
 		$formdata["type"] = array(
 			"label" => _L("Message Type"),
+			"fieldhelp" => _L("Choose the types of messages you would like to send."),
 			"value" => "",
 			"validators" => array(
 				array("ValRequired")
@@ -431,6 +433,7 @@ class JobWiz_messageType extends WizStep {
 	}
 }
 
+//Custom notification package Step: Message>MessageSource Let's you choose how you want to create messages in a custom package.
 class JobWiz_messageSelect extends WizStep {
 	function getForm($postdata, $curstep) {
 		// Form Fields.
@@ -447,6 +450,7 @@ class JobWiz_messageSelect extends WizStep {
 		if ($USER->authorize("sendphone") && in_array('phone', $postdata['/message/pick']['type'])) {
 			$formdata["phone"] = array(
 				"label" => _L("Phone Message"),
+				"fieldhelp" => _L("Contains the different ways you can create or reuse a phone message."),
 				"value" => "",
 				"validators" => array(
 					array("ValRequired"),
@@ -463,6 +467,7 @@ class JobWiz_messageSelect extends WizStep {
 		if ($USER->authorize("sendemail") && in_array('email',$postdata['/message/pick']['type'])) {
 			$formdata["email"] = array(
 				"label" => _L("Email Message"),
+				"fieldhelp" => _L("Contains the different ways you can create or reuse an email message."),
 				"value" => "",
 				"validators" => array(
 					array("ValRequired"),
@@ -518,6 +523,7 @@ class JobWiz_messageSelect extends WizStep {
 	}
 }
 
+//This is for selecting a saved phone message.
 class JobWiz_messagePhoneChoose extends WizStep {
 	function getForm($postdata, $curstep) {
 		// Form Fields.
@@ -562,6 +568,7 @@ class JobWiz_messagePhoneChoose extends WizStep {
 	}
 }
 
+//This is for typing in a phone message.
 class JobWiz_messagePhoneText extends WizStep {
 	function getForm($postdata, $curstep) {
 		global $USER;
@@ -571,7 +578,7 @@ class JobWiz_messagePhoneText extends WizStep {
 			$this->title,
 			"message" => array(
 				"label" => _L("Phone Message"),
-				"fieldhelp" => _L("This text will be converted to a voice and read over the phone."),
+				"fieldhelp" => _L('Enter the message you would like to send. Helpful tips for successful messages can be found at the Help link in the upper right corner.'),
 				"value" => "",
 				"validators" => array(
 					array("ValRequired"),
@@ -583,9 +590,10 @@ class JobWiz_messagePhoneText extends WizStep {
 		);
 		
 		if ($USER->authorize('sendmulti')) {
-			$helpsteps[] = _L("Automatically translate into alternate languages.");
+			$helpsteps[] = _L("Automatically translate into alternate languages powered by Google Translate.");
 			$formdata["translate"] = array(
 				"label" => _L("Translate"),
+				"fieldhelp" => _L('Check here if you would like to use automatic translation. Remember automatic translation is improving all the time, but it\'s not perfect yet. Be sure to preview and try reverse translation in the next screen.'),
 				"value" => ($postdata['/start']['package'] == "express")?true:false,
 				"validators" => array(),
 				"control" => array("CheckBox"),
@@ -612,6 +620,7 @@ class JobWiz_messagePhoneText extends WizStep {
 	}
 }
 
+//Displays the different message translations.
 class JobWiz_messagePhoneTranslate extends WizStep {
 	function getTranslationDataArray($language, $text, $gender = "female", $transient = true, $englishText = false) {
 		return array(
@@ -716,7 +725,7 @@ class JobWiz_messagePhoneTranslate extends WizStep {
 		
 		$helpsteps = array(
 			_L("This is the message that all contacts will recieve if they do not have any other language message specified"),
-			_L("This is an automated translation. Remember that the translation may not be 100% accurate so make sure to review the translations by translating back using the reverse translation feature. ")
+			_L("This is an automated translation powered by Google Translate. Please note that although machine translation is always improving, it is not perfect yet. You can try reverse translation for an idea of how well your message was translated.")
 		);
 		
 		
@@ -738,6 +747,7 @@ class JobWiz_messagePhoneTranslate extends WizStep {
 	}
 }
 
+//Call me to Record
 class JobWiz_messagePhoneCallMe extends WizStep {
 	function getForm($postdata, $curstep) {
 		// Form Fields.
@@ -767,7 +777,9 @@ class JobWiz_messagePhoneCallMe extends WizStep {
 			),
 			"helpstep" => 1
 		);
-		$helpsteps[] = _L("<p>Call Me sessions will ring the phone number you specify to record a selected language.</p><p>The 'Default' message is always required and will be delivered to any contacts who do not have a language specified, or who's prefered language is not recorded.</p><p>When you are ready...</p><p>Select the desired language you wish to record (Or Default)</p><p>Enter the phone number you are reachable at</p><p>Click the 'Call Me To Record' button</p><p>Listen carefully to the prompts when you receive the call.</p><p>You may record as many different languages as you need.</p>");
+		$helpsteps[] = _L("The system will call you at the number you enter in this form and guide you through a series of prompts to record your message. The default message is always required and will be sent to any recipients who do not have a language specified.<br><br>
+		Choose which language you will be recording in and enter the phone number where the system can reach you. Then click \"Call Me to Record\" to get started. Listen carefully to the prompts when you receive the call. You may record as many different langauges as you need.
+		");
 
 		return new Form("messagePhoneCallMe",$formdata,$helpsteps);
 	}
@@ -839,9 +851,10 @@ class JobWiz_messageEmailText extends WizStep {
 		$msgdata = isset($postdata['/message/phone/text']['message'])?json_decode($postdata['/message/phone/text']['message']):'{"text": ""}';
 		// Form Fields.
 		$formdata = array($this->title);
-		$helpsteps = array(_L("Enter the address to which replies should be sent."));
+		$helpsteps = array(_L("Enter the address where you would like to receive replies."));
 		$formdata["from"] = array(
 			"label" => _L("From"),
+			"fieldhelp" => _L('This is the address the email is coming from. Recipients will also be able to reply to this address.'),
 			"value" => $USER->email,
 			"validators" => array(
 				array("ValRequired"),
@@ -852,9 +865,10 @@ class JobWiz_messageEmailText extends WizStep {
 			"helpstep" => 1
 		);
 		
-		$helpsteps[] = _L("Email Subject.");
+		$helpsteps[] = _L("Enter the subject of the email here.");
 		$formdata["subject"] = array(
 			"label" => _L("Subject"),
+			"fieldhelp" => _L('The Subject will appear as the subject line of the email.'),
 			"value" => $postdata['/start']['name'],
 			"validators" => array(
 				array("ValRequired"),
@@ -864,19 +878,20 @@ class JobWiz_messageEmailText extends WizStep {
 			"helpstep" => 2
 		);
 
-		$helpsteps[] = '<ul><li>' . _L('Attach files up to 2 MB') . '<li>' . _L('Mention the attachments in the Message body') . '</ul>';
+		$helpsteps[] = _L("You may attach up to three files that are up to 2MB each. For greater security, only certain types of files are accepted.<br><br><b>Note:</b> Some email accounts may not accept attachments above a certain size and may reject your message.");
 		$formdata["attachments"] = array(
 			"label" => _L('Attachments'),
-			"fieldhelp" => _L("You may attach up to three files that are up to 2048kB each. For greater security, certain file types are not permitted."),
+			"fieldhelp" => _L("You may attach up to three files that are up to 2MB each. For greater security, certain file types are not permitted. Be aware that some email accounts may not accept attachments above a certain size and may reject your message."),
 			"value" => "",
 			"validators" => array(array("ValEmailAttach")),
 			"control" => array("EmailAttach","size" => 30, "maxlength" => 51),
 			"helpstep" => 3
 		);
 		
-		$helpsteps[] = _L("Email message body text goes here. Be sure to introduce yourself and give detailed information. Include a reply address or phone number if applicable.");
+		$helpsteps[] = _L("Email message body text goes here. Be sure to introduce yourself and give detailed information. For helpful message tips and ideas, click the Help link in the upper right corner of the screen.");
 		$formdata["message"] = array(
 			"label" => _L("Email Message"),
+			"fieldhelp" => _L('Enter the message you would like to send. Helpful tips for successful messages can be found at the Help link in the upper right corner.'),
 			"value" => $msgdata->text,
 			"validators" => array(
 				array("ValRequired"),
@@ -887,9 +902,10 @@ class JobWiz_messageEmailText extends WizStep {
 		);
 
 		if ($USER->authorize('sendmulti')) {
-			$helpsteps[] = _L("Automatically translate into alternate languages.");
+			$helpsteps[] = _L("Automatically translate into alternate languages. Please note that automatic translation is always improving, but is not perfect yet. Try reverse translating your message for a preview of how well it translated.");
 			$formdata["translate"] = array(
 				"label" => _L("Translate"),
+				"fieldhelp" => _L('Check this box to automatically translate your message using Google Translate.'),
 				"value" => ($postdata['/start']['package'] == "express")?true:false,
 				"validators" => array(),
 				"control" => array("CheckBox"),
@@ -1013,7 +1029,7 @@ class JobWiz_messageEmailTranslate extends WizStep {
 		
 		$helpsteps = array(
 			_L("This is the message that all contacts will recieve if they do not have any other language message specified"),
-			_L("This is an automated translation. Remember that the translation may not be 100% accurate so make sure to review the translations by translating back using the reverse translation feature. ")
+			_L("This translation was automatically generated. Please note that automatic translation is always improving, but is not perfect yet. Try reverse translating your message for a preview of how well it translated.")
 		);
 
 		return new Form("messageEmailTranslate",$formdata,$helpsteps);
