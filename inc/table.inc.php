@@ -369,7 +369,7 @@ function ajax_show_table ($containerID, $data, $titles, $formatters = array(), $
 		for ($column = 0; $column < count($indexes); $column++) {
 			$index = $indexes[$column];
 			if (isset($hiddencolumns[$index])) {
-				$onclick = "var table = $('$containerID').down('table'); if (table) { setColVisability(table, $column, this.checked); var action = this.checked ? 'addtoggler' : 'removetoggler'; cachedAjaxGet('?ajax=toggler&containerID=$containerID&'+action+'='+this.value, function() {},null,false); }";
+				$onclick = "var table = $('$containerID').down('table',1); if (table) { setColVisability(table, $column, this.checked); var action = this.checked ? 'addtoggler' : 'removetoggler'; cachedAjaxGet('?ajax=toggler&containerID=$containerID&'+action+'='+this.value, function() {},null,false); }";
 				$checkboxID = $containerID . '_toggler_index_' . $index;
 				$title = escapehtml($titles[$index]);
 				$checked = "";
