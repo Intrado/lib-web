@@ -76,27 +76,14 @@ $manageActivationCodes = getSystemSetting("_hasportal", false) && $USER->authori
 
 $formdata = array();
 
-$formdata["miscbuttons"] = array(
-	"label" => _L(""),
-	"control" => array("FormHtml", "html"=>
-		submit_button(_L('Refresh'),"refresh","arrow_refresh") 
-		. icon_button(_L('Show All Contacts'),"tick",null,"contacts.php?showall")
-		. ($manageActivationCodes ? icon_button("Manage Activation Codes", "tick", null, "activationcodemanager.php") : '')
-	),
-	"helpstep" => 1
-);
-
-$formdata[] = _L("Search by Rules");
-
 $formdata["ruledata"] = array(
-	"label" => _L('Rules'),
+	"label" => _L('Criteria'),
 	"value" => $rulesjson,
 	"control" => array("FormRuleWidget"),
 	"validators" => array(array('ValRules')),
 	"helpstep" => 2
 );
 
-$formdata[] = _L("Search by Person");
 $formdata["pkey"] = array(
 	"label" => _L('Person ID'),
 	"value" => !empty($_SESSION['systemcontact_pkey']) ? $_SESSION['systemcontact_pkey'] : '',
@@ -121,11 +108,15 @@ $formdata["email"] = array(
 
 $formdata["searchbutton"] = array(
 	"label" => _L(''),
-	"control" => array("FormHtml", "html" => "<div id='searchButtonContainer'>" . submit_button(_L('Search by Person'),"search","magnifier") . "</div>"),
+	"control" => array("FormHtml", "html" => "<div id='searchButtonContainer'>" . submit_button(_L('Search'),"search","magnifier") . "</div>"),
 	"helpstep" => 3
 );
 
-$formdata[] = _L("Results");
+$formdata["displayoptions"] = array(
+	"label" => _L("Display Fields"),
+	"control" => array("FormHtml", "html" => "<div id='metadataDiv'></div>"),
+	"helpstep" => 1
+);
 
 $formdata["multipleorderby"] = array(
 	"label" => _L('Sort By'),
@@ -135,13 +126,13 @@ $formdata["multipleorderby"] = array(
 	"helpstep" => 1
 );
 
-$helpsteps = array (
-	_L('You may search by list rules.'), // 1
-	_L('You may search by person.'), // 2
-	_L('Search results, sorting, and column toggling.'), // 3
+$buttons = array(
+	submit_button(_L('Refresh'),"refresh","arrow_refresh"),
+	icon_button(_L('Show All Contacts'),"tick",null,"contacts.php?showall")
 );
-
-$form = new Form('systemcontact',$formdata,$helpsteps,array());
+if ($manageActivationCodes)
+	$buttons[] = icon_button("Manage Activation Codes", "tick", null, "activationcodemanager.php");
+$form = new Form('systemcontact',$formdata,array(),$buttons);
 $form->ajaxsubmit = true;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -306,6 +297,11 @@ include_once("nav.inc.php");
 		ruleWidget.delayActions = true;
 		ruleWidget.container.observe('RuleWidget:AddRule', rulewidget_add_rule);
 		ruleWidget.container.observe('RuleWidget:DeleteRule', rulewidget_delete_rule);
+		
+		if ($('metadataTempDiv'))
+			$('metadataDiv').update($('metadataTempDiv').innerHTML);
+		else 
+			$('metadataDiv').up('tr').hide();
 	});
 
 	function systemcontact_clear_person() {
@@ -327,11 +323,12 @@ include_once("nav.inc.php");
 	}
 </script>
 <?
-
-echo $form->render();
+startWindow("Options");
+	echo $form->render();
+endWindow();
 
 if (!empty($_SESSION['systemcontact_showall']) || !empty($_SESSION['systemcontact_person']) || !empty($_SESSION['systemcontact_rules'])) {
-	echo "<div style='margin-top:10px'>";
+	echo "<div id='metadataTempDiv' style='display:none'>";
 		select_metadata("$('searchresults')", 5, $fields);
 	echo "</div>";
 	$reportgenerator->generate();
