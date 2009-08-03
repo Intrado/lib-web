@@ -1,27 +1,45 @@
 <?
-
 ////////////////////////////////////////////////////////////////////////////////
 // Includes
 ////////////////////////////////////////////////////////////////////////////////
 require_once("inc/common.inc.php");
-include_once("inc/securityhelper.inc.php");
-require_once("obj/Job.obj.php");
-require_once("inc/html.inc.php");
+require_once("inc/form.inc.php");
 require_once("inc/table.inc.php");
-require_once("inc/utils.inc.php");
+require_once("inc/html.inc.php");
 require_once("inc/formatters.inc.php");
+require_once("inc/date.inc.php");
+require_once("obj/Person.obj.php");
+require_once("obj/PeopleList.obj.php");
+require_once("obj/ListEntry.obj.php");
+require_once("obj/RenderedList.obj.php");
+require_once("obj/Validator.obj.php");
+require_once("obj/Form.obj.php");
+require_once("obj/Rule.obj.php");
 require_once("obj/FieldMap.obj.php");
+require_once("obj/FormItem.obj.php");
+require_once("obj/Phone.obj.php");
+require_once("obj/Email.obj.php");
+require_once("obj/Sms.obj.php");
+require_once("inc/securityhelper.inc.php");
+require_once("inc/rulesutils.inc.php");
+require_once("obj/FormRuleWidget.fi.php");
+require_once("obj/Job.obj.php");
+require_once("inc/reportutils.inc.php");
+require_once('list.inc.php');
+
+require_once("obj/Address.obj.php");
+require_once("obj/Language.obj.php");
+require_once("obj/JobType.obj.php");
+
+require_once("inc/reportgeneratorutils.inc.php");
+require_once("obj/ReportGenerator.obj.php");
+require_once("obj/CallsReport.obj.php");
 require_once("obj/ReportInstance.obj.php");
 require_once("obj/ReportSubscription.obj.php");
-require_once("inc/form.inc.php");
-require_once("inc/reportutils.inc.php");
-require_once("obj/UserSetting.obj.php");
-require_once("obj/ReportGenerator.obj.php");
 require_once("obj/JobDetailReport.obj.php");
-require_once("obj/JobType.obj.php");
-require_once("inc/date.inc.php");
+require_once("obj/UserSetting.obj.php");
 require_once("inc/rulesutils.inc.php");
-include_once("ruleeditform.inc.php");
+require_once("obj/PortalReport.obj.php");
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -31,42 +49,26 @@ if (!$USER->authorize('createreport') && !$USER->authorize('viewsystemreports'))
 	redirect('unauthorized.php');
 }
 
-//if this user can see systemwide reports, then lock them to the customerid
-//otherwise lock them to jobs that they own
-if (!$USER->authorize('viewsystemreports')) {
-	$userJoin = " and userid = $USER->id ";
-} else {
-	$userJoin = "";
-}
-
 ////////////////////////////////////////////////////////////////////////////////
-// Data Handling
+// Action/Request Processing
 ////////////////////////////////////////////////////////////////////////////////
-
-$clear = 0;
-$fieldlist = FieldMap::getOptionalAuthorizedFieldMaps() + FieldMap::getOptionalAuthorizedFieldMapsLike('g');
-
-if(isset($_GET['clear']) && $_GET['clear']){
-	unset($_SESSION['report']);
+if (isset($_GET['clear']) && $_GET['clear']) {
 	unset($_SESSION['reportid']);
-	$clear = 1;
+	unset($_SESSION['report']['options']);
 }
 
-if(isset($_GET['type'])){
+if (isset($_GET['type'])) {
 	$_SESSION['report']['type'] = $_GET['type'];
-	$clear = 1;
 }
 
-if($clear)
-	redirect();
-
-if(isset($_GET['reportid'])){
-	if(!userOwns("reportsubscription", $_GET['reportid']+0)){
+if (isset($_GET['reportid'])) {
+	if (!userOwns("reportsubscription", $_GET['reportid']+0)) {
 		redirect('unauthorized.php');
 	}
+	
 	$_SESSION['reportid'] = $_GET['reportid']+0;
 
-	$subscription = new ReportSubscription($_SESSION['reportid']+0);
+	$subscription = new ReportSubscription($_SESSION['reportid']);
 	$instance = new ReportInstance($subscription->reportinstanceid);
 	$options = $instance->getParameters();
 
@@ -92,306 +94,421 @@ if(isset($_GET['reportid'])){
 	}
 	$_SESSION['saved_report'] = true;
 	$_SESSION['report']['options'] = $options;
-	redirect();
 }
 
-$options= isset($_SESSION['report']['options']) ? $_SESSION['report']['options'] : array();
+////////////////////////////////////////////////////////////////////////////////
+// Data Handling
+////////////////////////////////////////////////////////////////////////////////
+$validOrdering = JobDetailReport::getOrdering();
+$fields = FieldMap::getOptionalAuthorizedFieldMaps() + FieldMap::getOptionalAuthorizedFieldMapsLike('g');
 
-if(isset($_GET['deleterule'])) {
-	if(isset($options['rules'])){
-		unset($options['rules'][$_GET['deleterule']]);
-		if(!count($options['rules']))
-			unset($options['rules']);
-	}
-	$_SESSION['report']['options'] = $options;
-	redirect();
-}
+if (!isset($_SESSION['report']['options']))
+	$_SESSION['report']['options'] = array('reporttype' => 'phonedetail');
 
-$RULES = false;
-if(isset($options['rules']) && $options['rules']){
-	$RULES = $options['rules'];
-}
-
-$options['reporttype'] = "phonedetail";
-if(isset($_SESSION['report']['type'])){
-	if ($_SESSION['report']['type'] == "email"){
-		$options['reporttype'] = "emaildetail";
-	} else if ($_SESSION['report']['type'] == "sms"){
-		$options['reporttype'] = "smsdetail";
-	}
-}
-if(isset($_SESSION['reportid'])){
-	$subscription = new ReportSubscription($_SESSION['reportid']);
+if (isset($_SESSION['reportid'])) {
+	$subscription = new ReportSubscription($_SESSION['reportid']+0);
 	$_SESSION['saved_report'] = true;
 } else {
 	$_SESSION['saved_report'] = false;
 }
-$_SESSION['report']['options'] = $options;
 
+set_session_options_reporttype();
+set_session_options_activefields();
+set_session_options_orderby();
+
+////////////////////////////////////////////////////////////////////////////////
+// FORM DATA
+////////////////////////////////////////////////////////////////////////////////
 $jobtypeobjs = DBFindMany("JobType", "from jobtype where deleted = '0' and not issurvey order by systempriority, name");
-$jobtypes = array();
+$jobtypenames = array();
 foreach($jobtypeobjs as $jobtype){
-	$jobtypes[$jobtype->id] = $jobtype->name;
+	$jobtypenames[$jobtype->id] = $jobtype->name;
 }
 
-$ordercount = 3;
-$ordering = JobDetailReport::getOrdering();
+
 
 switch($_SESSION['report']['type']){
 	case "phone":
-		$results = array("A" => "Answered",
-							"M" => "Machine",
-							"N" => "No Answer",
-							"B" => "Busy",
-							"F" => "Unknown",
-							"X" => "Disconnected",
-							"duplicate" => "Duplicate",
-							"blocked" => "Blocked",
-							"notattempted" => "Not Attempted",
-							"declined" => "No Phone Selected",
-							"confirmed" => "Confirmed",
-							"notconfirmed" => "Not Confirmed",
-							"noconfirmation" => "No Confirmation Response");
+		$possibleresults = array("A" => "Answered",
+			"M" => "Machine",
+			"N" => "No Answer",
+			"B" => "Busy",
+			"F" => "Unknown",
+			"X" => "Disconnected",
+			"duplicate" => "Duplicate",
+			"blocked" => "Blocked",
+			"notattempted" => "Not Attempted",
+			"declined" => "No Phone Selected",
+			"confirmed" => "Confirmed",
+			"notconfirmed" => "Not Confirmed",
+			"noconfirmation" => "No Confirmation Response");
 		break;
 
 	case "notcontacted":
-		$results = array("N" => "No Answer",
-						"B" => "Busy",
-						"F" => "Unknown",
-						"X" => "Disconnected",
-						"blocked" => "Blocked",
-						"notattempted" => "Not Attempted",
-						"unsent" => "Unsent",
-						"declined" => "No Destination Selected");
+		$possibleresults = array("N" => "No Answer",
+			"B" => "Busy",
+			"F" => "Unknown",
+			"X" => "Disconnected",
+			"blocked" => "Blocked",
+			"notattempted" => "Not Attempted",
+			"unsent" => "Unsent",
+			"declined" => "No Destination Selected");
 		break;
+		
 	case "email":
-		$results = array("sent" => "Sent",
-						"unsent" => "Unsent",
-						"duplicate" => "Duplicate",
-						"declined" => "No Email Selected");
+		$possibleresults = array("sent" => "Sent",
+			"unsent" => "Unsent",
+			"duplicate" => "Duplicate",
+			"declined" => "No Email Selected");
 
 		break;
+	
 	case "sms":
-		$results = array("sent" => "Sent",
-						"unsent" => "Unsent",
-						"duplicate" => "Duplicate",
-						"declined" => "No SMS Selected");
+		$possibleresults = array("sent" => "Sent",
+			"unsent" => "Unsent",
+			"duplicate" => "Duplicate",
+			"declined" => "No SMS Selected");
 		break;
+	
 	default:
-		$results = array("A" => "Answered",
-							"M" => "Machine",
-							"N" => "No Answer",
-							"B" => "Busy",
-							"F" => "Unknown",
-							"X" => "Disconnected",
-							"duplicate" => "Duplicate",
-							"blocked" => "Blocked",
-							"notattempted" => "Not Attempted",
-							"sent" => "Sent",
-							"unsent" => "Unsent",
-							"duplicate" => "Duplicate",
-							"declined" => "No Destination Selected");
+		$possibleresults = array("A" => "Answered",
+			"M" => "Machine",
+			"N" => "No Answer",
+			"B" => "Busy",
+			"F" => "Unknown",
+			"X" => "Disconnected",
+			"duplicate" => "Duplicate",
+			"blocked" => "Blocked",
+			"notattempted" => "Not Attempted",
+			"sent" => "Sent",
+			"unsent" => "Unsent",
+			"duplicate" => "Duplicate",
+			"declined" => "No Destination Selected");
 		break;
 }
+	
+$options = $_SESSION['report']['options'];
 
+$rulesjson = '';
+if (!empty($options['rules'])) {
+	$rules = $options['rules'];
+	if (is_array($rules))
+		$rulesjson = json_encode(cleanObjects(array_values($rules)));
+}
 
-$f="reports";
-$s="jobs";
-$reload=0;
+$savedjobtypes = array();
+if(isset($options['jobtypes'])){
+	$savedjobtypes = explode("','", $options['jobtypes']);
+}
 
-if(CheckFormSubmit($f, $s) || CheckFormSubmit($f, "save") || CheckFormSubmit($f, "view"))
-{
-	if(CheckFormInvalid($f))
-	{
-		error('Form was edited in another window, reloading data');
-		$reload = 1;
-	}
+$savedresults = array();
+if(isset($options['result'])) {
+	if ($options['result'] == "undelivered")
+		$savedresults = array("F", "B", "N", "X", "notattempted", "nocontacts", "blocked", "unsent");
 	else
-	{
-		MergeSectionFormData($f, $s);
-		//do check
+		$savedresults = explode("','", $options['result']);
+}
+	
+$jobid = isset($options['jobid']) ? $options['jobid']: '';
+$jobtypefilter = "";
+if (isset($_SESSION['report']['type'])) {
+	if ($_SESSION['report']['type'] == "phone") {
+		$jobtypefilter = " and phonemessageid is not null ";
+	} else if ($_SESSION['report']['type'] == "email") {
+		$jobtypefilter = " and emailmessageid is not null ";
+	} else if ($_SESSION['report']['type'] == "sms") {
+		$jobtypefilter = " and smsmessageid is not null ";
+	}
+}
+//if this user can see systemwide reports, then lock them to the customerid
+//otherwise lock them to jobs that they own
+$userJoin = "";
+if (!$USER->authorize('viewsystemreports')) {
+	$userJoin = " and userid = $USER->id ";
+}
+$jobs = DBFindMany("Job","from job j where deleted = 0 and status in ('active','complete','cancelled','cancelling') and j.questionnaireid is null $userJoin $jobtypefilter order by id desc limit 500");
+$jobids = array();
+foreach ($jobs as $job) {
+	$jobids[$job->id] = $job->name;
+}
+$jobidsarchived = array();
+$jobsarchived = DBFindMany("Job","from job j where deleted = 2 and status!='repeating' and j.questionnaireid is null $userJoin $jobtypefilter order by id desc limit 500");
+foreach ($jobsarchived as $job) {
+	$jobidsarchived[$job->id] = $job->name;
+}
+		
+$formdata = array();
+$formdata["radioselect"] = array(
+	"label" => _L("Search on job or date"),
+	"value" => isset($options['reldate']) ? 'job' : 'date',
+	"control" => array("RadioButton", "values" => array("job" => _L("Job"), "date" => _L("Date"))),
+	"validators" => array(array("ValRequired"), array("ValInArray", "values" => array('job', 'date'))),
+	"helpstep" => 1
+);
 
-		$startdate = TrimFormData($f, $s, "startdate");
-		$enddate = TrimFormData($f, $s, "enddate");
+$formdata["jobid"] = array(
+	"label" => _L("Jobs"),
+	"value" => isset($options['archived']) ? '' : $jobid,
+	"control" => array("SelectMenu", "values" => $jobids),
+	"validators" => array(array("ValInArray", "values" => array_keys($jobids))),
+	"helpstep" => 1
+);
 
-		if(GetFormData($f, $s, "relativedate") != "xdays") {
-			PutFormData($f, $s, 'xdays',"", "number");
-		} else {
-			TrimFormData($f, $s,'xdays');
-		}
+$formdata["jobidarchived"] = array(
+	"label" => _L("Archived Jobs"),
+	"value" => isset($options['archived']) ? $jobid : '',
+	"control" => array("SelectMenu", "values" => $jobidsarchived),
+	"validators" => array(array("ValInArray", "values" => array_keys($jobidsarchived))),
+	"helpstep" => 1
+);
 
-		if( CheckFormSection($f, $s) ) {
-			error('There was a problem trying to save your changes', 'Please verify that all required field information has been entered properly');
-		} else if(GetFormData($f, $s, "radioselect") == "date" && (GetFormData($f, $s, "relativedate") == "daterange") && !strtotime($startdate)){
-			error('Beginning Date is not in a valid format.  February 1, 2007 would be 02/01/07');
-		} else if(GetFormData($f, $s, "radioselect") == "date" && (GetFormData($f, $s, "relativedate") == "daterange") && !strtotime($enddate)){
-			error('Ending Date is not in a valid format.  February 1, 2007 would be 02/01/07');
-		} else if(GetFormData($f, $s, "radioselect") == "date" && (GetFormData($f, $s, "relativedate") == "xdays") && GetFormData($f, $s, "xdays") == ""){
-			error('You must enter a number for X days');
-		} else if(GetFormData($f, $s, "radioselect") == "job" && !GetFormData($f, $s, "jobid_archived") && !GetFormData($f, $s, "jobid")){
-			error("You must pick a job");
-		} else {
-			$options['reporttype'] = "phonedetail";
-			if($_SESSION['report']['type'] == "email"){
-				$options['reporttype'] = "emaildetail";
-			}else if($_SESSION['report']['type'] == "notcontacted"){
-				$options['reporttype'] = "notcontacted";
-			}else if($_SESSION['report']['type'] == "sms"){
-				$options['reporttype'] = "smsdetail";
-			}
+$formdata["checkarchived"] = array(
+	"label" => _L("Show archived jobs"),
+	"value" => isset($options['archived']) ? 1 : 0,
+	"control" => array("CheckBox"),
+	"validators" => array(),
+	"helpstep" => 1
+);
 
-			$radio = GetFormData($f, $s, "radioselect");
-			switch($radio){
-				case "job":
-					unset($options['reldate']);
-					unset($options['startdate']);
-					unset($options['enddate']);
-					unset($options['lastxdays']);
-					$check = GetFormData($f, $s, "check_archived");
-					if($check)
-						$options['jobid'] = GetFormData($f, $s, "jobid_archived");
-					else
-						$options['jobid'] = GetFormData($f, $s, "jobid");
-					$options['archived'] = $check;
-					break;
-				case "date":
-					unset($options['jobid']);
-					unset($options['archived']);
-					$options['reldate'] = GetFormData($f, $s, "relativedate");
+$formdata["dateoptions"] = array(
+	"label" => _L("Date Options"),
+	"value" => json_encode(array(
+		"reldate" => isset($options['reldate']) ? $options['reldate'] : '',
+		"xdays" => isset($options['lastxdays']) ? $options['lastxdays'] : '',
+		"startdate" => isset($options['startdate']) ? $options['startdate'] : '',
+		"enddate" => isset($options['enddate']) ? $options['enddate'] : ''
+	)),
+	"control" => array("ReldateOptions"),
+	"validators" => array(array("ValReldate")),
+	"helpstep" => 1
+);
 
-					if($options['reldate'] == "xdays"){
-						$options['lastxdays'] = GetFormData($f, $s, "xdays");
-					} else if($options['reldate'] == "daterange"){
-						$options['startdate'] = $startdate;
-						$options['enddate'] = $enddate;
-					}
-					break;
-			}
+$formdata[] = _L("Filter By");
+$formdata["ruledata"] = array(
+	"label" => _L('Criteria'),
+	"value" => $rulesjson,
+	"control" => array("FormRuleWidget", "allowedFields" => array('f','g')),
+	"validators" => array(array('ValRules', "allowedFields" => array('f','g'))),
+	"helpstep" => 1
+);
 
-			$savedjobtypes = GetFormData($f, $s, 'jobtypes');
-			if($savedjobtypes){
-				$temp = array();
-				foreach($savedjobtypes as $savedjobtype)
-					$temp[] = DBSafe($savedjobtype);
-				$options['jobtypes'] = implode("','", $temp);
-			}else
-				$options['jobtypes'] = "";
 
-			$savedresults = GetFormData($f, $s, "results");
-			if($savedresults){
-				$temp = array();
-				foreach($savedresults as $savedresult)
-					$temp[] = DBSafe($savedresult);
-				$options['result'] = implode("','", $temp);
-			}else
-				$options['result'] = "";
-			for($i=1; $i<=$ordercount; $i++){
-				$options["order$i"] = DBSafe(GetFormData($f, $s, "order$i"));
-			}
+$formdata["jobtype"] = array(
+	"label" => _L("Filter by job type"),
+	"value" => isset($options['jobtypes']) ? 1 : 0,
+	"control" => array("CheckBox"),
+	"validators" => array(),
+	"helpstep" => 1
+);
 
-			if($rule = getRuleFromForm($f, $s)){
-				if(!isset($options['rules']))
-					$options['rules'] = array();
-				$options['rules'][] = $rule;
-				$rule->id = array_search($rule, $options['rules']);
-				$options['rules'][$rule->id] = $rule;
-			}
+$formdata["jobtypes"] = array(
+	"label" => _L("Job Types"),
+	"value" => $savedjobtypes,
+	"control" => array("MultiCheckBox", "values" => $jobtypenames),
+	"validators" => array(array("ValInArray", "values" => array_keys($jobtypenames))),
+	"helpstep" => 1
+);
 
-			foreach($options as $index => $option){
-				if($option == "")
-					unset($options[$index]);
-			}
+$formdata["result"] = array(
+	"label" => _L("Filter by result"),
+	"value" => isset($options['result']) ? 1 : 0,
+	"control" => array("CheckBox"),
+	"validators" => array(),
+	"helpstep" => 1
+);
 
-			$_SESSION['report']['options'] = $options;
+$formdata["results"] = array(
+	"label" => _L("Results"),
+	"value" => $savedresults,
+	"control" => array("MultiCheckBox", "values" => $possibleresults),
+	"validators" => array(array("ValInArray", "values" => array_keys($possibleresults))),
+	"helpstep" => 1
+);
 
-			if(CheckFormSubmit($f, "save")){
-				$activefields = array();
-				foreach($fieldlist as $field){
-					if(isset($_SESSION['report']['fields'][$field->fieldnum]) && $_SESSION['report']['fields'][$field->fieldnum]){
-						$activefields[] = $field->fieldnum;
+$formdata[] = _L("Report Options");
+
+$formdata["displayoptions"] = array(
+	"label" => _L("Display Fields"),
+	"control" => array("FormHtml", "html" => "<div id='metadataDiv'></div>"),
+	"helpstep" => 1
+);
+
+$formdata["multipleorderby"] = array(
+	"label" => _L('Sort By'),
+	"value" => !empty($validOrdering) ? $validOrdering : '',
+	"control" => array("MultipleOrderBy", "count" => 3, "values" => $validOrdering),
+	"validators" => array(),
+	"helpstep" => 1
+);
+
+$buttons = array(
+	icon_button(_L('Back'), 'tick', null, 'reports.php'),
+	submit_button(_L("View Report"),"view","arrow_refresh"),
+	submit_button(_L("Save/Schedule"),"save","arrow_refresh")
+);
+
+$helpsteps = array(
+	_L("TEST")
+);
+
+$form = new Form('reportcallssearch',$formdata,array(),$buttons);
+$form->ajaxsubmit = true;
+///////////////////////////////////////////////////////////
+// FORM HANDLING
+$form->handleRequest();
+
+$datachange = false;
+$errors = false;
+
+//check for form submission
+if ($button = $form->getSubmit()) { //checks for submit and merges in post data
+	$ajax = $form->isAjaxSubmit(); //whether or not this requires an ajax response	
+	
+	if ($form->checkForDataChange()) {
+		$datachange = true;
+	} else if (($errors = $form->validate()) === false) { //checks all of the items in this form
+		$postdata = $form->getData(); //gets assoc array of all values {name:value,...}
+		
+		if ($ajax) {
+			if (in_array($button,array('addrule','deleterule','view', 'save'))) {
+				if (isset($_SESSION['report']['options']['rules']))
+					$rules = $_SESSION['report']['options']['rules'];
+				$_SESSION['report']['options'] = array(
+					'reporttype' => 'phonedetail',
+					'rules' => isset($rules) ? $rules : array()
+				);
+				set_session_options_reporttype();
+				
+				switch($postdata['radioselect']){
+					case "job":
+						if ($postdata['checkarchived'])
+							$_SESSION['report']['options']['jobid'] = $postdata["jobidarchived"];
+						else
+							$_SESSION['report']['options']['jobid'] = $postdata["jobid"];
+						$_SESSION['report']['options']['archived'] = $postdata['checkarchived'];
+						break;
+					case "date":
+						$dateOptions = json_decode($postdata['dateoptions'], true);
+						if (!empty($dateOptions['reldate'])) {
+							$_SESSION['report']['options']['reldate'] = $dateOptions['reldate'];
+							
+							if ($dateOptions['reldate'] == 'xdays' && !empty($dateOptions['xdays'])) {
+								$_SESSION['report']['options']['lastxdays'] = $dateOptions['xdays'];
+							} else if ($dateOptions['reldate'] == 'daterange') {
+								if (!empty($dateOptions['startdate']))
+									$_SESSION['report']['options']['startdate'] = $dateOptions['startdate'];
+								if (!empty($dateOptions['enddate']))
+									$_SESSION['report']['options']['enddate'] = $dateOptions['enddate'];
+							}
+						}
+						break;
+				}
+				
+				if (isset($postdata['multipleorderby'])) {
+					$multipleorderby = $postdata['multipleorderby'];
+					if (is_array($multipleorderby)) {
+						$_SESSION['reportjobdetailsearch_orderby'] = array();
+						foreach ($multipleorderby as $i=>$orderby) {
+							if (in_array($orderby, $validOrdering)) {
+								$_SESSION['reportjobdetailsearch_orderby'][] = $orderby;
+							}
+						}
+						set_session_options_orderby();
 					}
 				}
-
-				$options['activefields'] = implode(",",$activefields);
-				$_SESSION['report']['options'] = $options;
-				ClearFormData($f);
-				redirect("reportedit.php");
+					
+				if (!empty($postdata['jobtypes'])) {
+					$temp = array();
+					foreach($postdata['jobtypes'] as $savedjobtype) {
+						$temp[] = DBSafe($savedjobtype);
+					}
+					$_SESSION['report']['options']['jobtypes'] = implode("','", $temp);
+				}
+				if (!empty($postdata["results"])) {
+					$temp = array();
+					foreach($postdata["results"] as $savedresult)
+						$temp[] = DBSafe($savedresult);
+					$_SESSION['report']['options']['result'] = implode("','", $temp);
+				}
+				
+				switch ($button) {
+					case 'addrule':
+						$data = json_decode($postdata['ruledata']);
+						if (isset($data->fieldnum, $data->logical, $data->op, $data->val) && $type = Rule::getType($data->fieldnum)) {
+							$data->val = prepareRuleVal($type, $data->op, $data->val);
+							if ($rule = Rule::initFrom($data->fieldnum, $data->logical, $data->op, $data->val)) {
+								if (!isset($_SESSION['report']['options']['rules']))
+									$_SESSION['report']['options']['rules'] = array();
+								$_SESSION['report']['options']['rules'][$data->fieldnum] = $rule;
+							}
+						}
+						$form->sendTo("reportjobdetailsearch.php");
+						break;
+						
+					case 'deleterule':
+						if (!empty($_SESSION['report']['options']['rules'])) {
+							$fieldnum = $postdata['ruledata'];
+							unset($_SESSION['report']['options']['rules'][$fieldnum]);
+						}
+						$form->sendTo("reportjobdetailsearch.php");
+						break;
+						
+					case 'view':
+						$form->sendTo("reportjobdetails.php");
+						break;
+						
+					case 'save':
+						set_session_options_activefields();
+						$form->sendTo("reportedit.php");
+						break;
+				}
 			}
-			if(CheckFormSubmit($f, "view")){
-				ClearFormData($f);
-				redirect("reportjobdetails.php");
-			}
-			redirect();
+		} else {
+			redirect("reportjobdetailsearch.php");
 		}
 	}
-} else {
-	$reload=1;
+}//NEW
+
+////////////////////////////////////////////////////////////////////////////////
+// FUNCTIONS
+////////////////////////////////////////////////////////////////////////////////
+function set_session_options_reporttype() {
+	if (isset($_SESSION['report']['type'])) {
+		if ($_SESSION['report']['type'] == "phone") {
+			$_SESSION['report']['options']['reporttype'] = "phonedetail";
+		} else if ($_SESSION['report']['type'] == "email"){
+			$_SESSION['report']['options']['reporttype'] = "emaildetail";
+		} else if ($_SESSION['report']['type'] == "sms"){
+			$_SESSION['report']['options']['reporttype'] = "smsdetail";
+		} else if ($_SESSION['report']['type'] == "notcontacted"){
+			$_SESSION['report']['options']['reporttype'] = "notcontacted";
+		}
+	}
 }
 
-
-if($reload){
-	ClearFormData($f, $s);
-	if(!isset($options['reldate']))
-		$radio = "job";
-	else
-		$radio = "date";
-	PutFormData($f, $s, "radioselect", $radio);
-	PutFormData($f, $s, "relativedate", isset($options['reldate']) ? $options['reldate'] : "today");
-	PutFormData($f, $s, 'xdays', isset($options['lastxdays']) ? $options['lastxdays'] : "", "number");
-	PutFormData($f, $s, "startdate", isset($options['startdate']) ? $options['startdate'] : "", "text");
-	PutFormData($f, $s, "enddate", isset($options['enddate']) ? $options['enddate'] : "", "text");
-	if(isset($options['archived']) && $options['archived']){
-		PutFormData($f, $s, "jobid", "");
-		PutFormData($f, $s, "jobid_archived", isset($options['jobid']) ? $options['jobid'] : "");
-	} else {
-		PutFormData($f, $s, "jobid", isset($options['jobid']) ? $options['jobid']: "");
-		PutFormData($f, $s, "jobid_archived", "");
-	}
-	PutFormData($f, $s, "check_archived", isset($options['archived']) ? $options['archived'] : 0, "bool", "0", "1");
-	$result = array();
-	$checkbox=0;
-	if(isset($options['result'])){
-		if($options['result'] == "undelivered"){
-			$result = array("F", "B", "N", "X", "notattempted", "nocontacts", "blocked", "unsent");
-		} else {
-			$result = explode("','", $options['result']);
-		}
-		if($result != "")
-			$checkbox = 1;
-	}
-	PutFormData($f, $s, 'result', $checkbox, "bool", 0, 1);
-	PutFormData($f, $s, 'results', $result , "array", array_keys($results));
-	$savedjobtypes = array();
-	if(isset($options['jobtypes'])){
-		$savedjobtypes = explode("','", $options['jobtypes']);
-	}
-	PutFormData($f, $s, 'jobtype', isset($options['jobtypes']) && $options['jobtypes'] !="" ? 1 : 0, "bool", 0, 1);
-	PutFormData($f, $s, 'jobtypes', $savedjobtypes, "array", array_keys($jobtypes));
-
-	for($i=1;$i<=$ordercount;$i++){
-		$order="order$i";
-		if($i==1){
-			if(!isset($options[$order])){
-				if(isset($_SESSION['reportid']))
-					$orderquery = "";
-				else
-					$orderquery = "rp.pkey";
-			} else
-				$orderquery = $options[$order];
-			PutFormData($f, $s, $order, $orderquery);
-		} else {
-			PutFormData($f, $s, $order, isset($options[$order]) ? $options[$order] : "");
+function set_session_options_activefields() {
+	global $fields;
+	
+	$activefields = array();
+	foreach($fields as $field){
+		if(isset($_SESSION['report']['fields'][$field->fieldnum]) && $_SESSION['report']['fields'][$field->fieldnum]){
+			$activefields[] = $field->fieldnum;
 		}
 	}
-
-	putRuleFormData($f, $s);
-
-
+	$_SESSION['report']['options']['activefields'] = implode(",",$activefields);
 }
+
+function set_session_options_orderby() {
+	if (!empty($_SESSION['reportjobdetailsearch_orderby'])) {
+		foreach ($_SESSION['reportjobdetailsearch_orderby'] as $i => $orderby) {
+			$_SESSION['report']['options']["order" . ($i+1)] = $orderby;
+		}
+	}
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 // Display
 ////////////////////////////////////////////////////////////////////////////////
-
 $PAGE = "reports:reports";
 $TITLE = "Phone Log";
 
@@ -410,166 +527,105 @@ if(isset($_SESSION['report']['type'])){
 if(isset($_SESSION['reportid']))
 	$TITLE .= " - " . escapehtml($subscription->name);
 
-include_once("nav.inc.php");
-NewForm($f);
-buttons( button('Back',null, "reports.php"), submit($f, "view", "View Report"),
-			submit($f, "save", "Save/Schedule"));
+require_once("nav.inc.php");
 
-//--------------- Select window ---------------
-startWindow("Select ".help('ReportJobDetailSearch_Select'), NULL, false);
+startWindow(_L("Select"), "padding: 3px;");
+
+	echo "<div id='metadataTempDiv' style='display:none'>";
+		select_metadata(null, null, $fields);
+	echo "</div>";
+	
+	?>
+		<script type="text/javascript">
+			<? Validator::load_validators(array("ValRules", "ValReldate")); ?>
+		</script>
+	<?
+	echo $form->render();
+endWindow();
 ?>
-<table border="0" cellpadding="3" cellspacing="0" width="100%">
-	<tr valign="top">
-		<th align="right" class="windowRowHeader bottomBorder">Report Options:</th>
-		<td class="bottomBorder">
-			<table>
-				<tr>
-					<td>
-						<table>
-							<tr>
-								<td><? NewFormItem($f, $s, "radioselect", "radio", null, "job", "id=\"job\" onclick='$(\"daterange\").hide(); $(\"jobs\").show()'");?> Job</td>
-								<td><? NewFormItem($f, $s, "radioselect", "radio", null, "date", "onclick='$(\"jobs\").hide(); $(\"daterange\").show()'");?> Date</td>
-							</tr>
-						</table>
-					</td>
-				</tr>
-				<tr>
-					<td>
-<?
-					dateOptions($f, $s, "daterange");
-?>
-					</td>
-				</tr>
-				<tr>
-					<td>
-						<table border="0" cellpadding="3" cellspacing="0" width="100%" id="jobs">
-							<tr>
-								<td width="1%">
-								<?
-									NewFormItem($f, $s, "jobid", "selectstart", null, null, "id='jobid'");
-									NewFormItem($f, $s, "jobid", "selectoption", "-- Select a Job --", "");
+	<script type="text/javascript">
+		document.observe('dom:loaded', function() {
+			ruleWidget.delayActions = true;
+			ruleWidget.container.observe('RuleWidget:AddRule', rulewidget_add_rule);
+			ruleWidget.container.observe('RuleWidget:DeleteRule', rulewidget_delete_rule);
+			
+			$('<?=$form->name?>_radioselect').select('input').invoke('observe', 'click', function(event) {
+				var radio = event.element();
+				if (radio.value == 'job') {
+					$('<?=$form->name?>_dateoptions').up('tr').hide();
+					$('<?=$form->name?>_jobid').up('tr').show();
+					$('<?=$form->name?>_checkarchived').up('tr').show();
+				} else if (radio.value == 'date') {
+					$('<?=$form->name?>_dateoptions').up('tr').show();
+					$('<?=$form->name?>_jobid').up('tr').hide();
+					$('<?=$form->name?>_jobidarchived').up('tr').hide();
+					$('<?=$form->name?>_checkarchived').up('tr').hide();
+				}
+			});
+			
+			$('<?=$form->name?>_checkarchived').observe('click', function(event) {
+				if (event.element().checked) {
+					$('<?=$form->name?>_jobid').up('tr').hide();
+					$('<?=$form->name?>_jobidarchived').up('tr').show();
+				} else {
+					$('<?=$form->name?>_jobid').up('tr').show();
+					$('<?=$form->name?>_jobidarchived').up('tr').hide();
+				}
+			});
+			
+			var jobtypesCheckboxes = $('<?=$form->name?>_jobtypes').select('input');
+			$('<?=$form->name?>_jobtype').observe('click', function(event, jobtypesCheckboxes) {
+				if (!this.checked) {
+					jobtypesCheckboxes.each(function(checkbox){
+						checkbox.checked = false;
+					});
+				}
+			}.bindAsEventListener($('jobtype'), jobtypesCheckboxes));
+			jobtypesCheckboxes.invoke('observe', 'click', function(event) {
+				$('<?=$form->name?>_jobtype').checked = true;
+			});
+			
+			var resultsCheckboxes = $('<?=$form->name?>_results').select('input');
+			$('<?=$form->name?>_result').observe('click', function(event, resultsCheckboxes) {
+				if (!this.checked) {
+					resultsCheckboxes.each(function(checkbox){
+						checkbox.checked = false;
+					});
+				}
+			}.bindAsEventListener($('result'), resultsCheckboxes));
+			resultsCheckboxes.invoke('observe', 'click', function(event) {
+				$('<?=$form->name?>_result').checked = true;
+			});
+			
+			var radioselectchoice = $('<?=$form->name?>_radioselect').down('input:checked');
+			if (radioselectchoice && radioselectchoice.value == 'job')
+				$('<?=$form->name?>_dateoptions').up('tr').hide();
+			else {
+				$('<?=$form->name?>_jobid').up('tr').hide();
+				$('<?=$form->name?>_jobidarchived').up('tr').hide();
+				$('<?=$form->name?>_checkarchived').up('tr').hide();
+			}
+			
+			if ($('<?=$form->name?>_checkarchived').checked) {
+				$('<?=$form->name?>_jobid').up('tr').hide();
+				$('<?=$form->name?>_jobidarchived').up('tr').show();
+			} else {
+				$('<?=$form->name?>_jobidarchived').up('tr').hide();
+			}
+				
+			$('metadataDiv').update($('metadataTempDiv').innerHTML);
+		});
 
-									$jobtypefilter = "";
-									if (isset($_SESSION['report']['type'])) {
-										if ($_SESSION['report']['type'] == "phone") {
-											$jobtypefilter = " and phonemessageid is not null ";
-										} else if ($_SESSION['report']['type'] == "email") {
-											$jobtypefilter = " and emailmessageid is not null ";
-										} else if ($_SESSION['report']['type'] == "sms") {
-											$jobtypefilter = " and smsmessageid is not null ";
-										}
-									}
-									$jobs = DBFindMany("Job","from job j where deleted = 0 and status in ('active','complete','cancelled','cancelling') and j.questionnaireid is null $userJoin $jobtypefilter order by id desc limit 500");
+		function rulewidget_add_rule(event) {
+			$('<?=$form->name?>_ruledata').value = event.memo.ruledata.toJSON();
+			form_submit(event, 'addrule');
+		}
 
-									foreach ($jobs as $job) {
-										NewFormItem($f, $s, "jobid", "selectoption", $job->name, $job->id);
-									}
-									NewFormItem($f, $s, "jobid", "selectend");
-									NewFormItem($f, $s, "jobid_archived", "selectstart", null, null, "id='jobid_archived' style='display: none'");
-									NewFormItem($f, $s, "jobid_archived", "selectoption", "-- Select a Job --", "");
-									$jobs = DBFindMany("Job","from job j where deleted = 2 and status!='repeating' and j.questionnaireid is null $userJoin $jobtypefilter order by id desc limit 500");
-									foreach ($jobs as $job) {
-										NewFormItem($f, $s, "jobid_archived", "selectoption", $job->name, $job->id);
-									}
-									NewFormItem($f, $s, "jobid_archived", "selectend");
-								?>
-								</td>
-								<td align="left"><? NewFormItem($f, $s, "check_archived", "checkbox", null, null, "id='check_archived' onclick = \"setHiddenIfChecked(this, 'jobid'); setVisibleIfChecked(this, 'jobid_archived');\"") ?>
-								Show archived jobs</td>
-							</tr>
-
-						</table>
-					</td>
-				</tr>
-
-			</table>
-		</td>
-	</tr>
-	<tr valign="top"><th align="right" class="windowRowHeader bottomBorder">Filter by:</th>
-		<td class="bottomBorder">
-			<table width="100%">
-				<tr>
-					<td>
-						<table border="0" cellpadding="3" cellspacing="0" width="100%" id="searchcriteria">
-							<tr>
-								<td>
-								<?
-									//$RULES declared above
-									$RULEMODE = array('multisearch' => true, 'text' => true, 'reldate' => true, 'numeric' => true);
-
-									drawRuleTable($f, $s, false, true, true, false);
-
-								?>
-								</td>
-							</tr>
-						</table>
-					</td>
-				</tr>
-				<tr>
-					<td>
-						<table>
-							<tr valign="top">
-								<td><? NewFormItem($f,$s,"jobtype","checkbox",NULL,NULL,'id="jobtype" onclick="clearAllIfNotChecked(this,\'jobtypeselect\');"'); ?></td>
-								<td>Job Type: </td>
-								<td>
-									<?
-									NewFormItem($f, $s, 'jobtypes', 'selectmultiple', count($jobtypes), $jobtypes, 'id="jobtypeselect" onmousedown="setChecked(\'jobtype\');"');
-									?>
-								</td>
-							</tr>
-						</table>
-					</td>
-				</tr>
-				<tr>
-					<td>
-						<table>
-							<tr valign="top">
-								<td><? NewFormItem($f,$s,"result","checkbox",NULL,NULL,'id="result" onclick="clearAllIfNotChecked(this,\'resultselect\');"'); ?></td>
-								<td>Result:</td>
-								<td>
-									<?
-									NewFormItem($f, $s, 'results', 'selectmultiple',  "6", $results, 'id="resultselect" onmousedown="setChecked(\'result\');"');
-									?>
-								</td>
-							</tr>
-						</table>
-					</td>
-				</tr>
-
-			</table>
-		</td>
-	</tr>
-	<tr valign="top"><th align="right" class="windowRowHeader bottomBorder">Display Fields:</th>
-		<td class="bottomBorder">
-			<? select_metadata(null, null, $fieldlist);?>
-		</td>
-	</tr>
-	<tr valign="top"><th align="right" class="windowRowHeader">Sort By:</th>
-		<td >
-<?
-			selectOrderBy($f, $s, $ordercount, $ordering);
-?>
-		</td>
-	</tr>
-	<script>
-		setHiddenIfChecked(new getObj('check_archived').obj, 'jobid');
-		setVisibleIfChecked(new getObj('check_archived').obj, 'jobid_archived')
-		if(new getObj("job").obj.checked){
-			hide("daterange");
-		} else {
-			hide("jobs");
+		function rulewidget_delete_rule(event) {
+			$('<?=$form->name?>_ruledata').value = event.memo.fieldnum;
+			form_submit(event, 'deleterule');
 		}
 	</script>
-</table>
-
 <?
-endWindow();
-buttons();
-EndForm();
+	require_once("navbottom.inc.php");
 ?>
-<script SRC="script/calendar.js"></script>
-<?
-include_once("navbottom.inc.php");
-?>
-
-
