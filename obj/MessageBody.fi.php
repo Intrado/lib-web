@@ -87,7 +87,17 @@ if(isset($this->args['audiofiles'])) {
 				</td>
 				</tr>
 			</table>
-		</div>';
+		</div>
+			<script type="text/javascript">
+				function setselection() {
+					if(document.selection) this.sel = document.selection.createRange();
+				}
+				$("' . $n . '").focus();
+				$("' . $n . '").observe("keyup",setselection);
+				$("' . $n . '").observe("mouseup",setselection);
+				
+			</script>
+		';
 		return $str;
 	}
 }
