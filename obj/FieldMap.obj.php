@@ -185,6 +185,7 @@ class FieldMap extends DBMappedObject {
 
 			$fieldnum = $this->fieldnum;
 
+			// TODO: Field values should be passed as parameters?
 			// editlock=1 are subscriber static values
 			$query = "delete from persondatavalues where fieldnum='$fieldnum' and editlock=0";
 			QuickUpdate($query);
