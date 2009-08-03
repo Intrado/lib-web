@@ -252,6 +252,7 @@ function ajax_table_get_orderby($containerID, $validaliases) {
 
 function ajax_show_table ($containerID, $data, $titles, $formatters = array(), $sorting = array(), $repeatedColumns = false, $groupBy = false, $maxMultisort = 0, $showColumnTogglers = false, $scroll = true) {
 	global $USER;
+	
 	$ajaxtablesort = json_decode($USER->getSetting('ajaxtablesort', false, true), true);
 	$existingsort = array();
 	if (is_array($ajaxtablesort) && isset($ajaxtablesort[$containerID]))
@@ -260,7 +261,6 @@ function ajax_show_table ($containerID, $data, $titles, $formatters = array(), $
 	$hiddencolumns = array();
 	
 	$headerHtml = '<tr class="listHeader">';
-	
 	
 	foreach ($titles as $index => $title) {
 		$headerHtml .= '<th align="left" ';
@@ -358,11 +358,14 @@ function ajax_show_table ($containerID, $data, $titles, $formatters = array(), $
 		}
 	}
 	
-	$togglersHtml = "<div>";
+	$togglersHtml = "<div><table class='list' cellspacing=1>";
 	if ($showColumnTogglers) {
 		// NOTE: javascript does not know about the noncontinuous $index that we use in $titles, so we have to treat $titles as an indexed array.
 		$column = 0;
 		$indexes = array_keys($titles);
+		// Headers
+		$togglerHeaderHtml = '';
+		$togglerCheckboxesHtml = '';
 		for ($column = 0; $column < count($indexes); $column++) {
 			$index = $indexes[$column];
 			if (isset($hiddencolumns[$index])) {
@@ -372,11 +375,13 @@ function ajax_show_table ($containerID, $data, $titles, $formatters = array(), $
 				$checked = "";
 				if (isset($_SESSION["ajaxtabletogglers"][$containerID]) && !empty($_SESSION["ajaxtabletogglers"][$containerID][$index]))
 					$checked = "checked";
-				$togglersHtml .= "<input type=\"checkbox\" id=\"$checkboxID\" $checked value=\"$index\" onclick=\"$onclick\"><label for=\"$checkboxID\">$title</label>";
+				$togglerHeaderHtml .= "<th class='listHeader' style='' valign='top'><label style='padding: 2px; font-weight:normal;' for=\"$checkboxID\">$title</label></th>";
+				$togglerCheckboxesHtml .= "<td valign='top' style='text-align:center'><input type=\"checkbox\" id=\"$checkboxID\" $checked value=\"$index\" onclick=\"$onclick\"></td>";
 			}
 		}
+		$togglersHtml .= "<tr>$togglerHeaderHtml</tr><tr>$togglerCheckboxesHtml</tr>";
 	}
-	$togglersHtml .= "</div>";
+	$togglersHtml .= "</table></div>";
 	
 	$multisortHtml = '<div>';
 	if ($maxMultisort) {
