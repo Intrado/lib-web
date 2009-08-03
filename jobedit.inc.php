@@ -77,9 +77,6 @@ foreach ($voices as $voice) {
 	$voicearray[$voice->gender][$voice->language] = $voice->id;
 }
 
-$peoplelists = QuickQueryList("select id, name, (name +0) as foo from list where userid=$USER->id and deleted=0 order by foo,name", true);
-
-
 $expired = true;
 $joblangs = array("phone" => array(), "email" => array(), "sms" => array());
 if (isset($job->id)) {
@@ -593,9 +590,8 @@ if( $reloadform )
 
 	PopulateForm($f,$s,$job,$fields);
 
-	$selectedlists = array(); // ids
 	PutFormData($f,$s,"listradio","single");
-
+	$selectedlists = array(); // ids
 	if($job && $job->id){
 		$selectedlists = QuickQueryList("select listid from joblist where jobid=$job->id", false);
 		PutFormData($f,$s,"listradio",empty($selectedlists)?"single":"multi");
@@ -603,8 +599,9 @@ if( $reloadform )
 			$selectedlists[] = $job->listid;
 		}
 	}
+	$peoplelists = QuickQueryList("select id, name, (name +0) as foo from list where userid=$USER->id and (deleted=0 or id in (" . implode(",",array_values($selectedlists)) . ") ) order by foo,name", true);
 	PutFormData($f,$s,"listids",$selectedlists,"array",array_keys($peoplelists),"nomin","nomax");
-	SetRequired($f, $s, "listids", empty($selectedlists));// Since multiselect show required even when the ids are selected
+	SetRequired($f,$s,"listids", empty($selectedlists));// Since multiselect show required even when the ids are selected
 
 	PutFormData($f,$s,"voiceradio","female");
 	PutFormData($f,$s,"phonetextarea","","text");
