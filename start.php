@@ -183,7 +183,7 @@ function activityfeed($mergeditems,$ajax = false) {
 			$itemid = $item["id"];
 			$icon = "";
 			$defaultlink = "";
-			$defaultonclick = null;
+			$defaultonclick = "";
 			if($item["type"] == "job" ) {
 				if(array_search($itemid,$duplicatejob) !== false) {
 					continue;
@@ -236,7 +236,7 @@ function activityfeed($mergeditems,$ajax = false) {
 						$title = _L('%1$s Submitted, Status: Active',$jobtype);
 						$icon = 'largeicons/ping.jpg';
 						$defaultlink = "#";
-						$defaultonclick = "popup('jobmonitor.php?jobid=$itemid', 500, 450);";
+						$defaultonclick = "onclick=\"popup('jobmonitor.php?jobid=$itemid', 500, 450);\"";
 						break;
 					case "scheduled":
 						$title = _L('%1$s Submitted, Status: Scheduled',$jobtype);
@@ -283,7 +283,7 @@ function activityfeed($mergeditems,$ajax = false) {
 			} else if($item["type"] == "list" ) {
 				$title = "Contact List " . escapehtml($title);
 				$defaultlink = "list.php?id=$itemid";
-				$content = '<a href="' . $defaultlink . '" ' . $defaultonclick . '>' . $time .  ' - <b>' .  $item["name"] . "</b>";
+				$content = '<a href="' . $defaultlink . '">' . $time .  ' - <b>' .  $item["name"] . "</b>";
 				
 				$contacts = listcontacts($itemid,"list");
 				
@@ -304,7 +304,7 @@ function activityfeed($mergeditems,$ajax = false) {
 					action_link("Play","diagona/16/131",null,"popup('previewmessage.php?close=1&id=$itemid', 400, 500); return false;")
 					);	
 				$defaultlink = "message$messagetype.php?id=$itemid";
-				$content = '<a href="' . $defaultlink . '" ' . $defaultonclick . '>' . $time .  ' - <b>' .  $item["name"] . '</b>' . '</a>';
+				$content = '<a href="' . $defaultlink . '" ' . $defaultonclick . '>' . $time .  ' - <b>' .  escapehtml($item["name"]) . '</b>' . '</a>';
 				switch($messagetype) {
 					case "phone":
 						$icon = 'largeicons/phonehandset.jpg';
@@ -319,16 +319,14 @@ function activityfeed($mergeditems,$ajax = false) {
 			} else if($item["type"] == "report" ) {
 				$title = "Report " . escapehtml($title);				
 				$content = '<a href="' . $defaultlink . '" ' . $defaultonclick . '>' . 
-								$time .  ' - ' .  $item["name"] . '</a>';
+								$time .  ' - ' .  escapehtml($item["name"]) . '</a>';
 				$icon = 'largeicons/savedreport.jpg';
 				$defaultlink = "reportjobsummary.php?id=$itemid";
 			} else if($item["type"] == "systemmessage" ) {
 				$content = '<a href="' . $defaultlink . '" ' . $defaultonclick . '>' . $item["message"] . '</a>';
 				$icon = 'largeicons/news.jpg';
 			}
-			
-			$defaultonclick = !isset($defaultonclick) ? "" : 'onclick="'. $defaultonclick. '"';
-			
+						
 			if($ajax===true) {
 				$activityfeed[] = array("itemid" => $itemid,
 										"defaultlink" => $defaultlink,
