@@ -87,6 +87,18 @@ if (isset($job->id)) {
 }
 
 
+$selectedlists = array(); // ids
+$listradiostate = "single";
+if($job && $job->id){
+	$selectedlists = QuickQueryList("select listid from joblist where jobid=$job->id", false);
+	$listradiostate = empty($selectedlists)?"single":"multi";
+	if($job->listid) {
+		$selectedlists[] = $job->listid;
+	}
+}
+$peoplelists = QuickQueryList("select id, name, (name +0) as foo from list where userid=$USER->id and (deleted=0 or id in (" . implode(",",array_values($selectedlists)) . ") ) order by foo,name", true);
+
+
 /****************** main message section ******************/
 
 $f = "notification";
@@ -590,16 +602,7 @@ if( $reloadform )
 
 	PopulateForm($f,$s,$job,$fields);
 
-	PutFormData($f,$s,"listradio","single");
-	$selectedlists = array(); // ids
-	if($job && $job->id){
-		$selectedlists = QuickQueryList("select listid from joblist where jobid=$job->id", false);
-		PutFormData($f,$s,"listradio",empty($selectedlists)?"single":"multi");
-		if($job->listid) {
-			$selectedlists[] = $job->listid;
-		}
-	}
-	$peoplelists = QuickQueryList("select id, name, (name +0) as foo from list where userid=$USER->id and (deleted=0 or id in (" . implode(",",array_values($selectedlists)) . ") ) order by foo,name", true);
+	PutFormData($f,$s,"listradio",$listradiostate);
 	PutFormData($f,$s,"listids",$selectedlists,"array",array_keys($peoplelists),"nomin","nomax");
 	SetRequired($f,$s,"listids", empty($selectedlists));// Since multiselect show required even when the ids are selected
 
