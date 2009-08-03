@@ -96,6 +96,12 @@ if ($list->id) {
 }
 
 $formdata = array(
+	"hiddendone" => array(
+		"label" => _L(''),
+		"control" => array("FormHtml", "html" => hidden_submit_button('done')),
+		"helpstep" => 1
+	),
+	
 	"name" => array(
 		"label" => _L('List Name'),
 		"fieldhelp" => _L('This is the name of your list. The best names describe the list contents.'),
