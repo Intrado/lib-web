@@ -522,6 +522,31 @@ class ValTimeCheck extends Validator {
 	}
 }
 
+class ValReldate extends Validator {
+	var $onlyserverside = true;
+	
+	// @param $valueJSON = ['reldate':'', 'xdays':'', 'startdate':'', 'enddate':'']
+	function validate ($valueJSON, $args, $requiredvalues) {
+		$data = json_decode($valueJSON, true);
+		if (!is_array($data) || empty($data) || empty($data['reldate']))
+			return true; // Don't complain if there is no data.
+		
+		if ($data['reldate'] == 'daterange') {
+			if (empty($data['startdate']) || empty($data['enddate']))
+				return _L("You must specify both start and end dates");
+			if (!strtotime($data['startdate']))
+				return _L("The start date is in an invalid format");
+			if (!strtotime($data['enddate']))
+				return _L("The end date is in an invalid format");
+			if (strtotime($data['startdate']) > strtotime($data['enddate']))
+				return _L("The start date must be before the end date");
+		} else if ($data['reldate'] == 'xdays' && (!isset($data['xdays']) || !is_numeric($data['xdays']))) {
+			return _L("You must enter a number for X days");
+		}
+		
+		return true;
+	}
+}
 
 //alpha
 //alphanumeric
