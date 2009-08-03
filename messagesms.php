@@ -96,7 +96,7 @@ $helpsteps = array (
 );
 
 $buttons = array(submit_button(_L('Save'),"submit","tick"),
-				icon_button(_L('Cancel'),"cross",null,"start.php"));
+				icon_button(_L('Cancel'),"cross",null,"messages.php"));
 $form = new Form("smsform",$formdata,$helpsteps,$buttons);
 
 ////////////////////////////////////////////////////////////////////////////////
