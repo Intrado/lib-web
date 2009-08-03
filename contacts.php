@@ -76,6 +76,15 @@ $manageActivationCodes = getSystemSetting("_hasportal", false) && $USER->authori
 
 $formdata = array();
 
+$formdata["toggles"] = array(
+	"label" => _L('Search Options'),
+	"control" => array("FormHtml", 'html' => "
+		<input name='systemcontact_searchOption' id='searchByRules' type='radio' onclick=\"choose_search_by_rules();\"><label for='searchByRules'> Search by Rules </label>
+		<input name='systemcontact_searchOption' id='searchByPerson' type='radio' onclick=\"choose_search_by_person();\"><label for='searchByPerson'> Search for Person </label>
+	"),
+	"helpstep" => 2
+);
+
 $formdata["ruledata"] = array(
 	"label" => _L('Criteria'),
 	"value" => $rulesjson,
@@ -302,8 +311,35 @@ include_once("nav.inc.php");
 			$('metadataDiv').update($('metadataTempDiv').innerHTML);
 		else 
 			$('metadataDiv').up('tr').hide();
+			
+		<?
+			if (!empty($_SESSION['systemcontact_rules']) || empty($_SESSION['systemcontact_person']))
+				echo 'choose_search_by_rules();';
+			else
+				echo 'choose_search_by_person();';
+		?>
 	});
 
+	function choose_search_by_rules() {
+		$('searchByRules').checked = true;
+		$('searchByPerson').checked = false;
+		$('ruleWidgetContainer').up('tr').show();
+		$('<?=$form->name?>_pkey').up('tr').hide();
+		$('<?=$form->name?>_phone').up('tr').hide();
+		$('<?=$form->name?>_email').up('tr').hide();
+		$('searchButtonContainer').up('tr').hide();
+	}
+
+	function choose_search_by_person() {
+		$('searchByRules').checked = false;
+		$('searchByPerson').checked = true;
+		$('ruleWidgetContainer').up('tr').hide();
+		$('<?=$form->name?>_pkey').up('tr').show();
+		$('<?=$form->name?>_phone').up('tr').show();
+		$('<?=$form->name?>_email').up('tr').show();
+		$('searchButtonContainer').up('tr').show();
+	}
+	
 	function systemcontact_clear_person() {
 		$('systemcontact_pkey').value = '';
 		$('systemcontact_phone').value = '';
