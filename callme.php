@@ -13,6 +13,7 @@ require_once("obj/FormItem.obj.php");
 require_once("obj/Phone.obj.php");
 require_once("obj/Message.obj.php");
 require_once("obj/AudioFile.obj.php");
+require_once("obj/ValDuplicateNameCheck.val.php");
 
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization
@@ -68,7 +69,9 @@ $formdata = array(
 	"messagename" => array(
 		"label" => _L('Message Name'),
 		"value" => "",
-		"validators" => array(),
+		"validators" => array(
+				array("ValDuplicateNameCheck","type" => "phone")
+		),
 		"control" => array("TextField","size" => 30, "maxlength" => 30),
 		"helpstep" => 1
 	),
@@ -143,7 +146,7 @@ include_once('nav.inc.php');
 
 ?>
 <script type="text/javascript">
-<? Validator::load_validators(array("ValCallMeMessage")); ?>
+<? Validator::load_validators(array("ValDuplicateNameCheck","ValCallMeMessage")); ?>
 </script>
 <?
 
