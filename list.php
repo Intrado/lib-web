@@ -127,12 +127,17 @@ $formdata = array(
 );
 
 $formdata[] = _L('List Content');
+$formdata["clearrules"] = array(
+	"label" => _L('List Rules'),
+	"control" => array("FormHtml", 'html' => submit_button(_L('Clear Rules'),'clearrules','tick')),
+	"helpstep" => 2
+);
 $formdata["ruledelete"] = array(
 	"value" => "",
 	"control" => array("HiddenField")
 );
 $formdata["newrule"] = array(
-	"label" => _L('List Rules'),
+	"label" => _L(''),
 	"fieldhelp" => _L('Use rules to select groups of contacts from the data available to your account.'),
 	"value" => $rulesjson,
 	"validators" => array(
@@ -240,6 +245,11 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 						$fieldnum = $postdata['ruledelete'];
 						if ($USER->authorizeField($fieldnum))
 							QuickUpdate("DELETE le.*, r.* FROM listentry le, rule r WHERE le.ruleid=r.id AND le.listid=? AND r.fieldnum=?", false, array($list->id, $fieldnum));
+						$form->sendTo('list.php');
+						break;
+						
+					case 'clearrules':
+						QuickUpdate("DELETE le.*, r.* FROM listentry le, rule r WHERE le.ruleid=r.id AND le.listid=?", false, array($list->id));
 						$form->sendTo('list.php');
 						break;
 						
