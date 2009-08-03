@@ -64,22 +64,9 @@ function list_handle_ajax_table($renderedlist, $validContainers) {
 	
 	if (!isset($_GET['ajax']))
 		return;
-	if (empty($_GET['addpersonid']) && empty($_GET['removepersonid']) && empty($_GET['containerID']) && empty($_GET['id']) && empty($_GET['addtoggler']) && empty($_GET['removetoggler']))
+	if (empty($_GET['addpersonid']) && empty($_GET['removepersonid']) && empty($_GET['containerID']) && empty($_GET['addtoggler']) && empty($_GET['removetoggler']))
 		return;
-
-	// Handle PersonTip.
-	if (!empty($_GET['id'])) {
-		$person = new Person($_GET['id']+0);
-		if (!$person->id || $person->deleted)
-			exit(_L('Nothing found!'));
-		
-		// Global $USER is needed by viewcontact
-		echo "<div style='height:240px;overflow:auto'>";
-		include("viewcontact.php");
-		echo "</div>";
-		exit();
-	}
-		
+	
 	header('Content-Type: application/json');
 		$ajaxdata = false;
 		QuickUpdate("BEGIN");
@@ -171,8 +158,8 @@ function list_prepare_ajax_table($containerID, $renderedlist) {
 		
 		// Sequence and Destination Columns are repeated.
 		$repeatedColumns = array(6,7);
-		// Group by Person ID.
-		$groupBy = 2;
+		// Group by Person ID, not PKEY
+		$groupBy = 1;
 	} else {
 		$authorizedFieldmaps = FieldMap::getAuthorizedMapNames();
 		if (isset($authorizedFieldmaps[$renderedlist->language])) {
