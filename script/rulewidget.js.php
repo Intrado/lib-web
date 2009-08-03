@@ -784,8 +784,8 @@ var RuleEditor = Class.create({
 			new DatePicker({
 				relative:this.identify(),
 				keepFieldEmpty:true,
-				enableCloseOnBlur:0,
-				topOffset:0
+				enableCloseOnBlur:1,
+				topOffset:20
 			});
 		}.bindAsEventListener(datebox));
 		if (hidden)
