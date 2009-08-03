@@ -74,18 +74,7 @@ list_handle_ajax_table($renderedlist, array($containerID));
 
 $formdata = array();
 
-$formdata["miscbuttons"] = array(
-	"label" => _L(""),
-	"control" => array("FormHtml", "html"=>
-		submit_button(_L('Refresh'),"refresh","arrow_refresh")
-		. (!isset($_SESSION['listsearchpreview']) ? icon_button(_L('Show All Contacts'),"tick",null,"search.php?showall") : '')
-		. icon_button(_L('Done'),"tick",null,"list.php")
-	),
-	"helpstep" => 1
-);
-
 if (!isset($_SESSION['listsearchpreview'])) {
-	$formdata[] = _L("Search by Rules");
 	$formdata["ruledata"] = array(
 		"label" => _L('Rules'),
 		"value" => $rulesjson,
@@ -94,7 +83,6 @@ if (!isset($_SESSION['listsearchpreview'])) {
 		"helpstep" => 2
 	);
 
-	$formdata[] = _L("Search by Person");
 	$formdata["pkey"] = array(
 		"label" => _L('Person ID'),
 		"value" => !empty($_SESSION['listsearchpkey']) ? $_SESSION['listsearchpkey'] : '',
@@ -123,23 +111,16 @@ if (!isset($_SESSION['listsearchpreview'])) {
 		"control" => array("FormHtml", "html" => "<div id='searchButtonContainer'>" . submit_button(_L('Search by Person'),"search","magnifier") . "</div>"),
 		"helpstep" => 2
 	);
-	
-	$formdata[] = _L("Results");
 }
 
-$formdata["results"] = array(
-	"label" => _L(''),
-	"control" => array("FormHtml", 'html' => "<div id='$containerID'>"."</div>"),
-	"helpstep" => 2
+$buttons = array(
+	submit_button(_L('Refresh'),"refresh","arrow_refresh"),
 );
+if (!isset($_SESSION['listsearchpreview']))
+	$buttons[] = icon_button(_L('Show All Contacts'),"tick",null,"search.php?showall");
+$buttons[] = icon_button(_L('Done'),"tick",null,"list.php");
 
-$helpsteps = array (
-	_L('Please enter descriptive information about this list.'), // 1
-	_L('You may enter some rules for this list.'), // 2
-	_L('These are advanced list tools.'), // 3
-);
-
-$form = new Form('listsearch',$formdata,$helpsteps,array());
+$form = new Form('listsearch',$formdata,array(),$buttons);
 $form->ajaxsubmit = true;
 ////////////////////////////////////////////////////////////////////////////////
 // Form Data Handling
@@ -252,8 +233,17 @@ include_once("nav.inc.php");
 	}
 </script>
 <?
-
+if (!isset($_SESSION['listsearchpreview']))
+	startWindow("Search Options");
+	
 echo $form->render();
+
+if (!isset($_SESSION['listsearchpreview']))
+	endWindow();
+
+startWindow("Search Results");
+	echo "<div id='$containerID'></div>";
+endWindow();
 
 include_once("navbottom.inc.php");
 ?>
