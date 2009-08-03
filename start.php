@@ -132,6 +132,11 @@ function job_responses ($obj,$name) {
 function listcontacts ($obj,$name) {
 	$lists = array();
 	if($name == "job") {
+		if(in_array($obj->status,array("active","cancelling","cancelled","complete"))) {
+			$calccont = QuickQuery("select count(*) from reportperson where jobid=? and status='success'",false,array($obj->id));
+			$calctotal = QuickQuery("select count(*) from reportperson where jobid=?",false,array($obj->id));
+			return "<b>" . $calccont . "</b> out of <b>" . $calctotal . ($calctotal!=1?"&nbsp;</b>persons contacted":"</b>&nbsp;person&nbsp;contacted");
+		} 
 		$lists[] = QuickQuery("select listid from job where id=?",false, array($obj->id));
 		$lists = array_merge($lists, QuickQueryList("select listid from joblist where jobid = ?",false,false,array($obj->id)));
 	} else if($name == "list") {
@@ -144,7 +149,7 @@ function listcontacts ($obj,$name) {
 		$renderedlist->calcStats();
 		$calctotal = $calctotal + $renderedlist->total;
 	}
-	return $calctotal;
+	return "<b>" . $calctotal . ($calctotal!=1?$calctotal . "</b>&nbsp;contacts":"</b>&nbsp;contact");
 }
 
 function activityfeed($mergeditems,$ajax = false) {
@@ -243,7 +248,7 @@ function activityfeed($mergeditems,$ajax = false) {
 						$icon = 'largeicons/clock.jpg';
 						$defaultlink = "job.php?id=$itemid";
 						break;
-					case "procactive":
+					case "procactive" || "processing":
 						$title = _L('%1$s Submitted, Status: %2$s',$jobtype,escapehtml(fmt_status($job,$item["name"])));
 						$icon = 'largeicons/gear.jpg';
 						$defaultlink = "job.php?id=$itemid";
@@ -272,27 +277,21 @@ function activityfeed($mergeditems,$ajax = false) {
 					else
 						$content .= $alt . ",&nbsp;";
 					$typecount++;
-				}
-				$contacts = listcontacts($job,"job");
-				
-				$content .= "message&nbsp;with&nbsp;" . ($contacts!=1?$contacts . "&nbsp;contacts":"one contact") . '</a>';
+				}				
+				$content .= "message&nbsp;with&nbsp;" . listcontacts($job,"job") . '</a>';
 				$content .= job_responses($job,Null);
 				$content .= '</div>';
-				
-				
 			} else if($item["type"] == "list" ) {
 				$title = "Contact List " . escapehtml($title);
 				$defaultlink = "list.php?id=$itemid";
 				$content = '<a href="' . $defaultlink . '">' . $time .  ' - <b>' .  $item["name"] . "</b>";
-				
-				$contacts = listcontacts($itemid,"list");
-				
+								
 				$content .= '&nbsp;-&nbsp;';
 				if(isset($item["lastused"]))
 					$content .= 'This list was last used: <i>' . date("M j, g:i a",strtotime($item["lastused"])) . "</i>";
 				else
 					$content .= 'This list has never been used and ';
-				$content .= " and has <b>" . ($contacts!=1?$contacts . "&nbsp;</b>contacts":"one</b>&nbsp;contact") . '</a>';
+				$content .= " and has " . listcontacts($itemid,"list") . '</a>';
 				$tools = action_links (action_link("Edit", "pencil", "list.php?id=$itemid"),action_link("Preview", "application_view_list", "showlist.php?id=$itemid"));
 				$tools = str_replace("&nbsp;|&nbsp;","<br />",$tools);
 				$icon = 'largeicons/addrbook.jpg';			
