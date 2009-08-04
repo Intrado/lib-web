@@ -45,6 +45,9 @@ if (!$USER->authorize('sendphone') && !$USER->authorize('sendemail') && !$USER->
 	redirect('unauthorized.php');
 }
 
+if (isset($_GET['debug']))
+	$_SESSION['wizard_job']['debug'] = true;
+
 $wizdata = array(
 	"start" => new JobWiz_start(_L("Job Type")),
 	"list" => new JobWiz_listChoose(_L("List")),
@@ -206,10 +209,10 @@ class FinishJobWizard extends WizFinish {
 			//Express Text
 			case "express":
 				$phoneMsg = $this->phoneTextMessage(json_decode($postdata["/message/phone/text"]["message"]));
-				if ($postdata["/message/phone/text"]["translate"] == 'true')
+				if (isset($postdata["/message/phone/text"]["translate"]) && $postdata["/message/phone/text"]["translate"])
 					$phoneMsg = array_merge($phoneMsg, $this->phoneTextTranslation($postdata["/message/phone/translate"]));
 				$emailMsg = $this->emailTextMessage($postdata["/message/email/text"]);
-				if ($postdata["/message/email/text"]["translate"] == 'true')
+				if (isset($postdata["/message/email/text"]["translate"]) && $postdata["/message/email/text"]["translate"])
 					$emailMsg = array_merge($emailMsg, $this->emailTextTranslation($postdata["/message/email/text"], $postdata["/message/email/translate"]));
 				$smsMsg = array("Default" => array(
 					"id" => false,
@@ -221,7 +224,7 @@ class FinishJobWizard extends WizFinish {
 			case "personalized":
 				$phoneMsg = $this->phoneRecordedMessage(json_decode($postdata["/message/phone/callme"]["message"]));
 				$emailMsg = $this->emailTextMessage($postdata["/message/email/text"]);
-				if ($postdata["/message/email/text"]["translate"] == 'true')
+				if (isset($postdata["/message/email/text"]["translate"]) && $postdata["/message/email/text"]["translate"])
 					$emailMsg = array_merge($emailMsg, $this->emailTextTranslation($postdata["/message/email/text"], $postdata["/message/email/translate"]));
 				$smsMsg = array("Default" => array(
 					"id" => false,
@@ -239,7 +242,7 @@ class FinishJobWizard extends WizFinish {
 						case "text":
 							if ($postdata["/message/select"]["phone"] == "text") {
 								$phoneMsg = $this->phoneTextMessage(json_decode($postdata["/message/phone/text"]["message"]));
-								if ($postdata["/message/phone/text"]["translate"] == 'true')
+								if (isset($postdata["/message/phone/text"]["translate"]) && $postdata["/message/phone/text"]["translate"])
 									$phoneMsg = array_merge($phoneMsg, $this->phoneTextTranslation($postdata["/message/phone/translate"]));
 							}
 							break;
@@ -270,7 +273,7 @@ class FinishJobWizard extends WizFinish {
 							break;
 						case "text":
 							$emailMsg = $this->emailTextMessage($postdata["/message/email/text"]);
-							if ($postdata["/message/email/text"]["translate"] == 'true')
+							if (isset($postdata["/message/email/text"]["translate"]) && $postdata["/message/email/text"]["translate"])
 								$emailMsg = array_merge($emailMsg, $this->emailTextTranslation($postdata["/message/email/text"], $postdata["/message/email/translate"]));
 							break;
 						case "pick":
@@ -527,12 +530,10 @@ require_once("nav.inc.php");
 startWindow("");
 echo $wizard->render();
 endWindow();
-if (0) {
+if (isset($_SESSION['wizard_job']['debug']) && $_SESSION['wizard_job']['debug']) {
 	startWindow("Wizard Data");
 	echo "<pre>";
 	var_dump($_SESSION['wizard_job']);
-	//var_dump($_SERVER);
-	//var_dump($_SESSION['confirmedJobWizard']);
 	echo "</pre>";
 	endWindow();
 }

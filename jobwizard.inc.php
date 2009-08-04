@@ -1,5 +1,79 @@
 <?
 ////////////////////////////////////////////////////////////////////////////////
+// global wizard functions
+////////////////////////////////////////////////////////////////////////////////
+
+// Check the whole of the wizard post data and include user authorization to figure out if this wizard has an assigned valid phone message
+function wizHasPhone($postdata) {
+	global $USER;
+	if ($USER->authorize("sendphone") && (
+		(isset($postdata["/start"]["package"]) && $postdata["/start"]["package"] == "easycall" && isset($postdata["/message/phone/callme"]["message"]) && strlen($postdata["/message/phone/callme"]["message"]) > 2) ||
+		(isset($postdata["/start"]["package"]) && $postdata["/start"]["package"] == "express" && isset($postdata["/message/phone/text"]["message"]) && strlen($postdata["/message/phone/text"]["message"]) > 2) ||
+		(isset($postdata["/start"]["package"]) && $postdata["/start"]["package"] == "personalized" && isset($postdata["/message/phone/callme"]["message"]) && strlen($postdata["/message/phone/callme"]["message"]) > 2) ||
+		(isset($postdata["/start"]["package"]) && $postdata["/start"]["package"] == "custom" && isset($postdata["/message/pick"]["type"]) && in_array('phone', $postdata["/message/pick"]["type"]) && (
+			(isset($postdata["/message/select"]["phone"]) && $postdata["/message/select"]["phone"] == "record" && isset($postdata["/message/phone/callme"]["message"]) && strlen($postdata["/message/phone/callme"]["message"]) > 2) ||
+			(isset($postdata["/message/select"]["phone"]) && $postdata["/message/select"]["phone"] == "text" && isset($postdata["/message/phone/text"]["message"]) && strlen($postdata["/message/phone/text"]["message"]) > 2) || 
+			(isset($postdata["/message/select"]["phone"]) && $postdata["/message/select"]["phone"] == "pick" && isset($postdata["/message/phone/pick"]["message"]) && $postdata["/message/phone/pick"]["message"])
+		))))
+		return true;
+	return false;
+}
+
+// Check the whole of the wizard post data and include user authorization to figure out if this wizard has an assigned valid email message
+function wizHasEmail($postdata) {
+	global $USER;
+	if ($USER->authorize("sendemail") && (
+		(isset($postdata["/start"]["package"]) && $postdata["/start"]["package"] == "easycall" && isset($postdata["/message/phone/callme"]["message"]) && strlen($postdata["/message/phone/callme"]["message"]) > 2 && $USER->authorize("sendphone")) ||
+		(isset($postdata["/start"]["package"]) && $postdata["/start"]["package"] == "express" && isset($postdata["/message/email/text"]["message"]) && $postdata["/message/phone/text"]["message"]) ||
+		(isset($postdata["/start"]["package"]) && $postdata["/start"]["package"] == "personalized" &&isset($postdata["/message/email/text"]["message"]) && $postdata["/message/phone/text"]["message"]) ||
+		(isset($postdata["/start"]["package"]) && $postdata["/start"]["package"] == "custom" && isset($postdata["/message/pick"]["type"]) && in_array('email', $postdata["/message/pick"]["type"]) && (
+			(isset($postdata["/message/select"]["email"]) && $postdata["/message/select"]["email"] == "record" && $USER->authorize("sendphone") && (
+				(isset($postdata["/message/select"]["phone"]) && $postdata["/message/select"]["phone"] == "record" && isset($postdata["/message/phone/callme"]["message"]) && strlen($postdata["/message/phone/callme"]["message"]) > 2) ||
+				(isset($postdata["/message/select"]["phone"]) && $postdata["/message/select"]["phone"] == "text" && isset($postdata["/message/phone/text"]["message"]) && strlen($postdata["/message/phone/text"]["message"]) > 2) || 
+				(isset($postdata["/message/select"]["phone"]) && $postdata["/message/select"]["phone"] == "pick" && isset($postdata["/message/phone/pick"]["message"]) && $postdata["/message/phone/pick"]["message"])
+			)) ||
+			(isset($postdata["/message/select"]["email"]) && $postdata["/message/select"]["email"] == "text" && isset($postdata["/message/email/text"]["message"]) && $postdata["/message/email/text"]["message"]) || 
+			(isset($postdata["/message/select"]["email"]) && $postdata["/message/select"]["email"] == "pick" && isset($postdata["/message/email/pick"]["message"]) && $postdata["/message/email/pick"]["message"])
+		))))
+		return true;
+	return false;
+}
+
+// Check the whole of the wizard post data and include user authorization to figure out if this wizard has an assigned valid sms message
+function wizHasSms($postdata) {
+	global $USER;
+	if ($USER->authorize("sendsms") && getSystemSetting("_hassms") && (
+		(isset($postdata["/start"]["package"]) && $postdata["/start"]["package"] == "easycall" && isset($postdata["/message/phone/callme"]["message"]) && strlen($postdata["/message/phone/callme"]["message"]) > 2 && $USER->authorize("sendphone")) ||
+		(isset($postdata["/start"]["package"]) && $postdata["/start"]["package"] == "express" && isset($postdata["/message/sms/text"]["message"]) && $postdata["/message/sms/text"]["message"]) ||
+		(isset($postdata["/start"]["package"]) && $postdata["/start"]["package"] == "personalized" &&isset($postdata["/message/sms/text"]["message"]) && $postdata["/message/sms/text"]["message"]) ||
+		(isset($postdata["/start"]["package"]) && $postdata["/start"]["package"] == "custom" && isset($postdata["/message/pick"]["type"]) && in_array('sms', $postdata["/message/pick"]["type"]) && (
+			(isset($postdata["/message/select"]["sms"]) && $postdata["/message/select"]["sms"] == "record" && $USER->authorize("sendphone") && (
+				(isset($postdata["/message/select"]["phone"]) && $postdata["/message/select"]["phone"] == "record" && isset($postdata["/message/phone/callme"]["message"]) && strlen($postdata["/message/phone/callme"]["message"]) > 2) ||
+				(isset($postdata["/message/select"]["phone"]) && $postdata["/message/select"]["phone"] == "text" && isset($postdata["/message/phone/text"]["message"]) && strlen($postdata["/message/phone/text"]["message"]) > 2) || 
+				(isset($postdata["/message/select"]["phone"]) && $postdata["/message/select"]["phone"] == "pick" && isset($postdata["/message/phone/pick"]["message"]) && $postdata["/message/phone/pick"]["message"])
+			)) ||
+			(isset($postdata["/message/select"]["sms"]) && $postdata["/message/select"]["sms"] == "text" && isset($postdata["/message/sms/text"]["message"]) && $postdata["/message/sms/text"]["message"]) || 
+			(isset($postdata["/message/select"]["sms"]) && $postdata["/message/select"]["sms"] == "pick" && isset($postdata["/message/sms/pick"]["message"]) && $postdata["/message/sms/pick"]["message"])
+		))))
+		return true;
+	return false;
+}
+
+function wizHasTranslation($postdata) {
+	if (((isset($postdata["/start"]["package"]) && $postdata["/start"]["package"] == 'express' && isset($postdata['/message/email/text']['translate']) && $postdata['/message/email/text']['translate']) ||
+		(isset($postdata["/start"]["package"]) && $postdata["/start"]["package"] == 'personalized' && isset($postdata['/message/email/text']['translate']) && $postdata['/message/email/text']['translate']) ||
+		(isset($postdata["/start"]["package"]) && $postdata["/start"]["package"] == 'custom' && isset($postdata['/message/pick']['type']) && in_array('email', $postdata['/message/pick']['type']) && 
+			isset($postdata["/message/select"]['email']) && $postdata["/message/select"]['email'] == 'text' && isset($postdata['/message/email/text']['translate']) && $postdata['/message/email/text']['translate'])
+		) || ((isset($postdata["/start"]["package"]) && $postdata["/start"]["package"] == 'express' && isset($postdata['/message/phone/text']['translate']) && $postdata['/message/phone/text']['translate']) ||
+		(isset($postdata["/start"]["package"]) && $postdata["/start"]["package"] == 'custom' && isset($postdata['/message/pick']['type']) && in_array('phone', $postdata['/message/pick']['type']) && 
+			isset($postdata["/message/select"]['phone']) && $postdata["/message/select"]['phone'] == 'text' && isset($postdata['/message/phone/text']['translate']) && $postdata['/message/phone/text']['translate'])
+		)
+	)
+		return true;
+	return false;
+}
+
+////////////////////////////////////////////////////////////////////////////////
 // Custom Form Item Definitions
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -317,13 +391,17 @@ class JobWiz_start extends WizStep {
 			$packageDetails["easycall"][1] = _L('Auto Email and Text Alerts');
 			$packageDetails["easycall"]["enabled"] = true;
 			$packageDetails["express"][0] = _L('Type, Phone, Email and Text Message / Text-To-Speech');
-			$packageDetails["express"][1] = _L('Automatic Translation');
+			if ($USER->authorize("sendmulti"))
+				$packageDetails["express"][1] = _L('Automatic Translation');
 			$packageDetails["express"]["enabled"] = true;
 			$packageDetails["personalized"][0] = _L('Record Phone Message');
-			$packageDetails["personalized"][1] = _L('Type Email, and Text Messages with Automatic Translation');
+			$packageDetails["personalized"][1] = _L('Type Email, and Text Messages');
+			if ($USER->authorize("sendmulti"))
+				$packageDetails["personalized"][1] = _L('Type Email, and Text Messages with Automatic Translation');
 			$packageDetails["personalized"]["enabled"] = true;
 			$packageDetails["custom"][0] = _L('Select combination of message types');
-			$packageDetails["custom"][1] = _L('Automatic Translation');
+			if ($USER->authorize("sendmulti"))
+				$packageDetails["custom"][1] = _L('Automatic Translation');
 			$packageDetails["custom"]["enabled"] = true;
 		// Only phone
 		} elseif ($deliverytypes['sendphone'] && !$deliverytypes['sendemail'] && !$deliverytypes['sendsms']) {
@@ -336,7 +414,8 @@ class JobWiz_start extends WizStep {
 		// Only email
 		} elseif ($deliverytypes['sendemail'] && !$deliverytypes['sendphone'] && !$deliverytypes['sendsms']) {
 			$packageDetails["express"][0] = _L('Type Email message');
-			$packageDetails["express"][1] = _L('Automatic Translation');
+			if ($USER->authorize("sendmulti"))
+				$packageDetails["express"][1] = _L('Automatic Translation');
 			$packageDetails["express"]["enabled"] = true;
 			$packageDetails["custom"][0] = _L('Select message type');
 			$packageDetails["custom"][1] = _L('Create new or select saved');
@@ -344,7 +423,8 @@ class JobWiz_start extends WizStep {
 		// Only SMS
 		} elseif ($deliverytypes['sendsms'] && !$deliverytypes['sendphone'] && !$deliverytypes['sendemail']) {
 			$packageDetails["express"][0] = _L('Type SMS message');
-			$packageDetails["express"][1] = _L('Automatic Translation');
+			if ($USER->authorize("sendmulti"))
+				$packageDetails["express"][1] = _L('Automatic Translation');
 			$packageDetails["express"]["enabled"] = true;
 			$packageDetails["custom"][0] = _L('Select message type');
 			$packageDetails["custom"][1] = _L('Create new or select saved');
@@ -355,13 +435,15 @@ class JobWiz_start extends WizStep {
 			$packageDetails["easycall"][1] = _L('Auto Email');
 			$packageDetails["easycall"]["enabled"] = true;
 			$packageDetails["express"][0] = _L('Type Phone and Email / Text-To-Speech');
-			$packageDetails["express"][1] = _L('Automatic Translation');
+			if ($USER->authorize("sendmulti"))
+				$packageDetails["express"][1] = _L('Automatic Translation');
 			$packageDetails["express"]["enabled"] = true;
 			$packageDetails["personalized"][0] = _L('Record Phone Message');
 			$packageDetails["personalized"][1] = _L('Type Email with Automatic Translation');
 			$packageDetails["personalized"]["enabled"] = true;
 			$packageDetails["custom"][0] = _L('Select combination of message types');
-			$packageDetails["custom"][1] = _L('Automatic Translation');
+			if ($USER->authorize("sendmulti"))
+				$packageDetails["custom"][1] = _L('Automatic Translation');
 			$packageDetails["custom"]["enabled"] = true;
 		// Phone and SMS
 		} elseif ($deliverytypes['sendphone'] && !$deliverytypes['sendemail'] && $deliverytypes['sendsms']) {
@@ -369,21 +451,25 @@ class JobWiz_start extends WizStep {
 			$packageDetails["easycall"][1] = _L('Auto SMS');
 			$packageDetails["easycall"]["enabled"] = true;
 			$packageDetails["express"][0] = _L('Type Phone and SMS / Text-To-Speech');
-			$packageDetails["express"][1] = _L('Automatic Translation');
+			if ($USER->authorize("sendmulti"))
+				$packageDetails["express"][1] = _L('Automatic Translation');
 			$packageDetails["express"]["enabled"] = true;
 			$packageDetails["personalized"][0] = _L('Record Phone Message');
 			$packageDetails["personalized"][1] = _L('Type Email with Automatic Translation');
 			$packageDetails["personalized"]["enabled"] = true;
 			$packageDetails["custom"][0] = _L('Select combination of message types');
-			$packageDetails["custom"][1] = _L('Automatic Translation');
+			if ($USER->authorize("sendmulti"))
+				$packageDetails["custom"][1] = _L('Automatic Translation');
 			$packageDetails["custom"]["enabled"] = true;
 		// Email and SMS
 		} elseif (!$deliverytypes['sendphone'] && $deliverytypes['sendemail'] && $deliverytypes['sendsms']) {
 			$packageDetails["express"][0] = _L('Type Email and SMS');
-			$packageDetails["express"][1] = _L('Automatic Translation');
+			if ($USER->authorize("sendmulti"))
+				$packageDetails["express"][1] = _L('Automatic Translation');
 			$packageDetails["express"]["enabled"] = true;
 			$packageDetails["custom"][0] = _L('Select combination of message types');
-			$packageDetails["custom"][1] = _L('Automatic Translation');
+			if ($USER->authorize("sendmulti"))
+				$packageDetails["custom"][1] = _L('Automatic Translation');
 			$packageDetails["custom"]["enabled"] = true;
 		}
 		
@@ -398,7 +484,7 @@ class JobWiz_start extends WizStep {
 						<td align="left" valign="center">
 							<div>
 								<div style="clear:both"><img style="float:left" src="img/icons/bullet_blue.gif"/>&nbsp;'.escapehtml($details[0]).'</div>
-								<div style="clear:both"><img style="float:left" src="img/icons/bullet_blue.gif"/>&nbsp;'.escapehtml($details[1]).'</div>
+								'.(($details[1])?'<div style="clear:both"><img style="float:left" src="img/icons/bullet_blue.gif"/>&nbsp;'.escapehtml($details[1]).'</div>':'').'
 							</div>
 						</td>
 					</tr>
@@ -471,7 +557,7 @@ class JobWiz_messageType extends WizStep {
 			if ($USER->authorize($checkname[0]))
 				$values[$checkvalue] = $checkname[1];
 
-		if ($deliverytypes['sendsms'] && !getSystemSetting('_hassms'))
+		if (isset($values['sms']) && !getSystemSetting('_hassms'))
 			unset($values['sms']);
 		
 		$formdata[] = $this->title;
@@ -856,12 +942,12 @@ class JobWiz_messagePhoneCallMe extends WizStep {
 		global $USER;
 		if (!$USER->authorize("sendphone"))
 			return false;
-		if ((isset($postdata['/start']['package']) && 
-			($postdata['/start']['package'] == "easycall" ||
-				$postdata['/start']['package'] == "personalized") ||
-			(isset($postdata['/message/select']['phone']) &&
-				$postdata['/message/select']['phone'] == 'record'))
-		) {
+		if ($USER->authorize("sendphone") && (
+			(isset($postdata['/start']['package']) && 
+				($postdata['/start']['package'] == "easycall" || $postdata['/start']['package'] == "personalized") ||
+				($postdata['/start']['package'] == "custom" && isset($postdata['/message/select']['phone']) && $postdata['/message/select']['phone'] == 'record')
+			)
+		)) {
 			return true;
 		} else {
 			return false;
@@ -1211,7 +1297,9 @@ class JobWiz_scheduleOptions extends WizStep {
 	function getForm($postdata, $curstep) {
 		global $USER;
 		global $ACCESS;
-		// Form Fields.
+		$wizHasPhoneMsg = wizHasPhone($postdata);
+		$wizHasEmailMsg= wizHasEmail($postdata);
+
 		$callearly = date("g:i a");
 		$accessCallearly = $ACCESS->getValue("callearly");
 		if (!$accessCallearly)
@@ -1244,15 +1332,17 @@ class JobWiz_scheduleOptions extends WizStep {
 			"helpstep" => 1
 		);
 		
-		$helpsteps[] = _L("Set advanced options such as duplicate removal and number of days to run.");
-		$formdata["advanced"] = array(
-			"label" => _L("Advanced Options"),
-			"fieldhelp" => _L('Check here if you would like to set additional options for this notification such as duplicate removal and number of days to run.'),
-			"value" => "",
-			"validators" => array(),
-			"control" => array("CheckBox"),
-			"helpstep" => 2
-		);
+		if ($wizHasEmailMsg || $wizHasPhoneMsg) {
+			$helpsteps[] = _L("Set advanced options such as duplicate removal and number of days to run.");
+			$formdata["advanced"] = array(
+				"label" => _L("Advanced Options"),
+				"fieldhelp" => _L('Check here if you would like to set additional options for this notification such as duplicate removal and number of days to run.'),
+				"value" => "",
+				"validators" => array(),
+				"control" => array("CheckBox"),
+				"helpstep" => 2
+			);
+		}
 		
 		return new Form("scheduleOptions",$formdata,$helpsteps);
 	}
@@ -1264,18 +1354,7 @@ class JobWiz_scheduleDate extends WizStep {
 		global $ACCESS;
 		
 		// Check to see if translation is used anywhere in the wizard. If it is, the job cannot be scheduled out more than 7 days.
-		if (((isset($postdata["/start"]["package"]) && $postdata["/start"]["package"] == 'express' && isset($postdata['/message/email/text']['translate']) && $postdata['/message/email/text']['translate']) ||
-			(isset($postdata["/start"]["package"]) && $postdata["/start"]["package"] == 'personalized' && isset($postdata['/message/email/text']['translate']) && $postdata['/message/email/text']['translate']) ||
-			(isset($postdata["/start"]["package"]) && $postdata["/start"]["package"] == 'custom' && isset($postdata['/message/pick']['type']) && in_array('email', $postdata['/message/pick']['type']) && 
-				isset($postdata["/message/select"]['email']) && $postdata["/message/select"]['email'] == 'text' && isset($postdata['/message/email/text']['translate']) && $postdata['/message/email/text']['translate'])
-			) || ((isset($postdata["/start"]["package"]) && $postdata["/start"]["package"] == 'express' && isset($postdata['/message/phone/text']['translate']) && $postdata['/message/phone/text']['translate']) ||
-			(isset($postdata["/start"]["package"]) && $postdata["/start"]["package"] == 'custom' && isset($postdata['/message/pick']['type']) && in_array('phone', $postdata['/message/pick']['type']) && 
-				isset($postdata["/message/select"]['phone']) && $postdata["/message/select"]['phone'] == 'text' && isset($postdata['/message/phone/text']['translate']) && $postdata['/message/phone/text']['translate'])
-			)
-		)
-			$translated = true;
-		else
-			$translated = false;
+		$translated = wizHasTranslation($postdata);
 			
 		// Form Fields.
 		$formdata = array($this->title);
@@ -1346,83 +1425,94 @@ class JobWiz_scheduleAdvanced extends WizStep {
 	function getForm($postdata, $curstep) {
 		global $USER;
 		global $ACCESS;
+		$wizHasPhoneMsg = wizHasPhone($postdata);
+		$wizHasEmailMsg= wizHasEmail($postdata);
+		$helpstepnum = 1;
 		
 		$helpsteps = array(_L("Specify the number of days for which you would like your job to run before it stops."));
 		$maxjobdays = $USER->getSetting("maxjobdays", $ACCESS->getValue('maxjobdays'));
 		$maxdays = $ACCESS->getValue('maxjobdays', 7);
-		$formdata["maxjobdays"] = array(
-			"label" => _L("Days to Run"),
-			"fieldhelp" => ("Use this menu to set the default number of days your jobs should run."),
-			"value" => $maxjobdays,
-			"validators" => array(
-				array("ValInArray", "values" => range(1,$maxdays))
-			),
-			"control" => array("SelectMenu", "values"=>array_combine(range(1,$maxdays),range(1,$maxdays))),
-			"helpstep" => 1
-		);
 		
-		$helpsteps[] = _L("Indicates that duplicate phone numbers, Emails in the list should receive only one notification.");
-		$formdata["skipduplicates"] = array(
-			"label" => _L("Skip Duplicate Phones"),
-			"fieldhelp" => _L('Indicates that duplicate phone numbers in the list should receive only one call.'),
-			"value" => $USER->getSetting("skipduplicates", true),
-			"validators" => array(),
-			"control" => array("CheckBox"),
-			"helpstep" => 2
-		);
-		$formdata["skipemailduplicates"] = array(
-			"label" => _L("Skip Duplicate Emails"),
-			"fieldhelp" => _L('Indicates that duplicate Emailss in the list should receive only one message.'),
-			"value" => $USER->getSetting("skipemailduplicates", true),
-			"validators" => array(),
-			"control" => array("CheckBox"),
-			"helpstep" => 2
-		);
-		
-		if ($ACCESS->getPermission('leavemessage')) {
-			$helpsteps[] = _L("Enable the Voice Response feature to allow recipients to leave you a message. Make sure to include instructions in your message.");
-			$formdata["leavemessage"] = array(
-				"label" => _L("Voice Response"),
-				"fieldhelp" => _L('Allow call recipients to leave a message.'),
-				"value" => $USER->getSetting("leavemessage", true),
-				"validators" => array(),
-				"control" => array("CheckBox"),
-				"helpstep" => 3
-			);
-		}
-		
-		if ($ACCESS->getPermission('messageconfirmation')) {
-			$helpsteps[] = _L("This option allows recipients to respond to your phone message with a yess by pressing 1 or a no by pressing 2.");
-			$formdata["messageconfirmation"] = array(
-				"label" => _L("Confirmation"),
-				"fieldhelp" => _L('Allow message confirmation by recipients.'),
-				"value" => $USER->getSetting("messageconfirmation", false),
-				"validators" => array(),
-				"control" => array("CheckBox"),
-				"helpstep" => 4
-			);
-		}
-		
-		if ($ACCESS->getPermission('setcallerid')) {
-			$helpsteps[] = _L("This option will set the number displayed on the recipient's home or cellular phone.");
-			$formdata["callerid"] = array(
-				"label" => _L("Caller ID"),
-				"fieldhelp" => _L('This option will set the Caller ID when the person is called.'),
-				"value" => Phone::format($USER->getSetting("callerid","")),
+		$formdata = array($this->title);
+		if ($wizHasPhoneMsg) {
+			$formdata["maxjobdays"] = array(
+				"label" => _L("Days to Run"),
+				"fieldhelp" => ("Use this menu to set the default number of days your jobs should run."),
+				"value" => $maxjobdays,
 				"validators" => array(
-					array("ValLength","min" => 3,"max" => 20),
-					array("ValPhone")
+					array("ValInArray", "values" => range(1,$maxdays))
 				),
-				"control" => array("TextField","maxlength" => 20, "size" => 15),
-				"helpstep" => 5
+				"control" => array("SelectMenu", "values"=>array_combine(range(1,$maxdays),range(1,$maxdays))),
+				"helpstep" => $helpstepnum++
+			);
+			if ($ACCESS->getPermission('leavemessage')) {
+				$helpsteps[] = _L("Enable the Voice Response feature to allow recipients to leave you a message. Make sure to include instructions in your message.");
+				$formdata["leavemessage"] = array(
+					"label" => _L("Voice Response"),
+					"fieldhelp" => _L('Allow call recipients to leave a message.'),
+					"value" => $USER->getSetting("leavemessage", true),
+					"validators" => array(),
+					"control" => array("CheckBox"),
+					"helpstep" => $helpstepnum++
+				);
+			}
+			
+			if ($ACCESS->getPermission('messageconfirmation')) {
+				$helpsteps[] = _L("This option allows recipients to respond to your phone message with a yess by pressing 1 or a no by pressing 2.");
+				$formdata["messageconfirmation"] = array(
+					"label" => _L("Confirmation"),
+					"fieldhelp" => _L('Allow message confirmation by recipients.'),
+					"value" => $USER->getSetting("messageconfirmation", false),
+					"validators" => array(),
+					"control" => array("CheckBox"),
+					"helpstep" => $helpstepnum++
+				);
+			}
+			
+			if ($ACCESS->getPermission('setcallerid')) {
+				$helpsteps[] = _L("This option will set the number displayed on the recipient's home or cellular phone.");
+				$formdata["callerid"] = array(
+					"label" => _L("Caller ID"),
+					"fieldhelp" => _L('This option will set the Caller ID when the person is called.'),
+					"value" => Phone::format($USER->getSetting("callerid","")),
+					"validators" => array(
+						array("ValLength","min" => 3,"max" => 20),
+						array("ValPhone")
+					),
+					"control" => array("TextField","maxlength" => 20, "size" => 15),
+					"helpstep" => $helpstepnum++
+				);
+			}
+			$helpsteps[] = _L("Indicates that duplicate phone numbers in the list should receive only one notification.");
+			$formdata["skipduplicates"] = array(
+				"label" => _L("Skip Duplicate Phones"),
+				"fieldhelp" => _L('Indicates that duplicate phone numbers in the list should receive only one call.'),
+				"value" => $USER->getSetting("skipduplicates", true),
+				"validators" => array(),
+				"control" => array("CheckBox"),
+				"helpstep" => $helpstepnum++
 			);
 		}
+		if ($wizHasEmailMsg) {
+			$helpsteps[] = _L("Indicates that duplicate Emails in the list should receive only one notification.");
+			$formdata["skipemailduplicates"] = array(
+				"label" => _L("Skip Duplicate Emails"),
+				"fieldhelp" => _L('Indicates that duplicate Emailss in the list should receive only one message.'),
+				"value" => $USER->getSetting("skipemailduplicates", true),
+				"validators" => array(),
+				"control" => array("CheckBox"),
+				"helpstep" => $helpstepnum++
+			);
+		}
+		
 		return new Form("scheduleAdvanced",$formdata,$helpsteps);
 	}
 	
 	//returns true if this step is enabled
 	function isEnabled($postdata, $step) {
-		if (isset($postdata['/schedule/options']['advanced']) && $postdata['/schedule/options']['advanced'])
+		$wizHasPhoneMsg = wizHasPhone($postdata);
+		$wizHasEmailMsg= wizHasEmail($postdata);
+		if (isset($postdata['/schedule/options']['advanced']) && $postdata['/schedule/options']['advanced'] && ($wizHasEmailMsg || $wizHasPhoneMsg))
 			return true;
 		return false;
 	}
