@@ -172,11 +172,11 @@ var Easycall = Class.create({
 		$(this.formitemname+"_"+this.language+"_lang").update(this.language);
 		
 		if ($(this.formitemname+"_"+this.language+"_delete")) {
-			$(this.formitemname+"_"+this.language+"_delete").insert({ "before": action_link("<?=_L('Preview')?>", "control_play_blue", this.formitemname+"_"+this.language+"_play").setStyle({float: "left"}) });
-			$(this.formitemname+"_"+this.language+"_delete").insert({ "before": action_link("<?=_L('Re-record')?>", "control_repeat_blue", this.formitemname+"_"+this.language+"_rerecord").setStyle({float: "left"}) });
+			$(this.formitemname+"_"+this.language+"_delete").insert({ "before": icon_button("<?=_L('Preview')?>", "diagona/16/131", this.formitemname+"_"+this.language+"_play").setStyle({float: "left"}) });
+			$(this.formitemname+"_"+this.language+"_delete").insert({ "before": icon_button("<?=_L('Re-record')?>", "diagona/16/118", this.formitemname+"_"+this.language+"_rerecord").setStyle({float: "left"}) });
 		} else {
-			$(this.formitemname+"_"+this.language+"_action").insert(action_link("<?=_L('Preview')?>", "control_play_blue", this.formitemname+"_"+this.language+"_play").setStyle({float: "left"}));
-			$(this.formitemname+"_"+this.language+"_action").insert(action_link("<?=_L('Re-record')?>", "control_repeat_blue", this.formitemname+"_"+this.language+"_rerecord").setStyle({float: "left"}));
+			$(this.formitemname+"_"+this.language+"_action").insert(icon_button("<?=_L('Preview')?>", "diagona/16/131", this.formitemname+"_"+this.language+"_play").setStyle({float: "left"}));
+			$(this.formitemname+"_"+this.language+"_action").insert(icon_button("<?=_L('Re-record')?>", "diagona/16/118", this.formitemname+"_"+this.language+"_rerecord").setStyle({float: "left"}));
 		}
 		$(this.formitemname+"_"+this.language).insert(new Element("div", {style: "padding-top: 3px; margin-bottom: 5px; border-bottom: 1px solid gray; clear: both"}));
 
@@ -205,13 +205,13 @@ var Easycall = Class.create({
 		$(this.formitemname+"_"+this.language).update().insert(
 			new Element("div",{id: this.formitemname+"_"+this.language+"_lang", style: "font-size: large; float: left;"}).update(((easycallRecordings > 0)?this.language:''))
 		).insert(
-			new Element("div",{id: this.formitemname+"_"+this.language+"_action", style: "width: 80%; float: right;"})
+			new Element("div",{id: this.formitemname+"_"+this.language+"_action", style: "width: 80%; float: right; margin-bottom: 5px;"})
 		).insert(
 			new Element("div",{style: "clear: both;"})
 		);
 		
 		if (this.language !== "Default") {
-			$(this.formitemname+"_"+this.language+"_action").insert(action_link("<?=addslashes(_L("Remove"))?>", "delete", this.formitemname+"_"+this.language+"_delete").setStyle({float:"left"}));
+			$(this.formitemname+"_"+this.language+"_action").insert(icon_button("<?=addslashes(_L("Remove"))?>", "diagona/16/150", this.formitemname+"_"+this.language+"_delete").setStyle({float:"left"}));
 			$(this.formitemname+"_"+this.language+"_delete").observe("click", this.removeMessage.bind(this));
 		}
 
@@ -232,6 +232,12 @@ var Easycall = Class.create({
 		$(this.formitemname+"_"+this.language+"_phone").value = this.defaultphone;
 		blankFieldValue($(this.formitemname+"_"+this.language+"_phone"), this.nophone);
 		
+		$(this.formitemname+"_"+this.language+"_phone").observe("keydown", function (event) {
+			if (Event.KEY_RETURN == event.keyCode) {
+				Event.stop(event);
+				$(this.formitemname+"_"+this.language+"_callme").click();
+			}
+		}.bind(this));
 		$(this.formitemname+"_"+this.language+"_phone").observe("keyup", function (event) {
 			var e = event.element();
 			if (!this.valPhone(e.value, this.minlength, this.maxlength))
