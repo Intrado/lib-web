@@ -500,6 +500,10 @@ var RuleEditor = Class.create({
 			return false;
 		}
 		
+		if (this.datepickers) {
+			this.datepickers.invoke('close');
+		}
+		
 		var type = this.ruleWidget.fieldmaps[fieldnum].type;
 		var op = this.criteriaTD.down('input:checked');
 		if (!op)
@@ -614,6 +618,10 @@ var RuleEditor = Class.create({
 	reset: function() {
 		if (!this.ruleWidget.fieldmaps)
 			return;
+		if (this.datepickers) {
+			this.datepickers.invoke('close');
+		}
+		this.datepickers = [];
 		var fieldSelectbox = new Element('select', {'style':'font-size:90%'});
 		
 		fieldSelectbox.update(new Element('option', {'value':''}).insert('--<?=addslashes(_L('Choose a Field'))?>--'));
@@ -777,17 +785,10 @@ var RuleEditor = Class.create({
 		if (!value)
 			value = '';
 		var datebox = new Element('input', {'type':'text', 'size':'10', 'style':'font-size:90%', 'value':value.escapeHTML()});
-		datebox.observe('focus', function(event) {
-			event.stop();
-			this.select();
-			
-			new DatePicker({
-				relative:this.identify(),
-				keepFieldEmpty:true,
-				enableCloseOnBlur:1,
-				topOffset:20
-			});
-		}.bindAsEventListener(datebox));
+		datebox.observe('focus', function(event, ruleEditor) {
+			ruleEditor.datepickers.push(pickDate(this, true,true));
+		}.bindAsEventListener(datebox, this));
+		
 		if (hidden)
 			datebox.hide();
 		return datebox;
