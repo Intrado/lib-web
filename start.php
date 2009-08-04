@@ -472,12 +472,12 @@ include_once("nav.inc.php");
 			if ($USER->authorize('sendphone') || $USER->authorize('sendemail') || $USER->authorize('sendsms')) {  
 ?>
 			<div style="width:170px;top:0px;text-align:center;">
-					<img style="cursor:pointer;" src="img/largeicons/newjob.jpg" align="middle" alt="Start a new job" title="Start a new job" 
+					<img style="cursor:pointer;" src="img/largeicons/newjob.jpg" align="middle" alt="Start a new job" title="Start a new job (The button formerly known as EasyCall)" 
 							onclick="window.location = 'jobwizard.php?new'"
 							onmouseover="this.src='img/largeicons/newjob_over.jpg'"
 							onmouseout="this.src='img/largeicons/newjob.jpg'" />
 			<br />		
-					<img style="cursor:pointer;" src="img/largeicons/newemergency.jpg" align="middle" alt="Start a new job" title="Start a new job" 
+					<img style="cursor:pointer;" src="img/largeicons/newemergency.jpg" align="middle" alt="Start a new job" title="Start a new emergency job" 
 							onclick="window.location = 'jobwizard.php?new'"
 							onmouseover="this.src='img/largeicons/newemergency_over.jpg'"
 							onmouseout="this.src='img/largeicons/newemergency.jpg'" />			
