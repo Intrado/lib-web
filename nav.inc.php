@@ -205,10 +205,19 @@ header('Content-type: text/html; charset=UTF-8') ;
 	<script src="script/form.js.php" type="text/javascript"></script>
 
 	<link href="css.php?hash=<?=crc32(serialize($_SESSION['colorscheme']))?>" type="text/css" rel="stylesheet" media="screen, print">
-	<link href="css/style_print.css" type="text/css" rel="stylesheet" media="print">	
 	<link href="css/form.css.php" type="text/css" rel="stylesheet">
 	<link href="css/datepicker.css.php" type="text/css" rel="stylesheet">
 	<link href="css/prototip.css.php" type="text/css" rel="stylesheet">
+	<link href="css/style_print.css" type="text/css" rel="stylesheet" media="print">
+	
+<!--[if lte IE 6]>
+    <link href="css/ie6.css" type="text/css" rel="stylesheet"/>
+<![endif]-->
+
+<!--[if lte IE 7]>
+    <link href="css/ie7.css" type="text/css" rel="stylesheet"/>
+<![endif]-->
+
 </head>
 <body>
 	<script>
@@ -222,10 +231,11 @@ header('Content-type: text/html; charset=UTF-8') ;
 <table class="navlogoarea" border=0 cellspacing=0 cellpadding=0 width="100%">
 	<tr>
 		<td bgcolor="white"><div style="padding-left:10px; padding-bottom:10px;"><? doLogo() ?></div></td>
-		<td><img src="img/shwoosh.gif"></td>
+		<td><img src="img/shwoosh.gif" alt="" class="noprint"></td>
 		<td width="100%" align="right" style="padding-right: 10px;">
-			<div><img src="img/supporticon.gif" style="vertical-align: middle;"> Support: <a href="mailto:<?=$_SESSION['_supportemail']?>"><?=$_SESSION['_supportemail']?></a>&nbsp;|&nbsp;<?=substr($_SESSION['_supportphone'],0,3) . "." . substr($_SESSION['_supportphone'],3,3) . "." . substr($_SESSION['_supportphone'],6,4);?></div>
-			<table border=0 cellspacing=0 cellpadding=0>
+
+			<!-- <div><img src="img/supporticon.gif" style="vertical-align: middle;"> Support: <a href="mailto:<?=$_SESSION['_supportemail']?>"><?=$_SESSION['_supportemail']?></a>&nbsp;|&nbsp;<?=substr($_SESSION['_supportphone'],0,3) . "." . substr($_SESSION['_supportphone'],3,3) . "." . substr($_SESSION['_supportphone'],6,4);?></div>-->
+			<table border=0 cellspacing=0 cellpadding=0 class="noprint">
 				<tr>
 					<td><img src="img/accountlinksbg_left.gif"></td>
 					<td background="img/accountlinksbg_mid.gif">

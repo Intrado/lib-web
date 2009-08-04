@@ -17,8 +17,8 @@ if (!isset($_SESSION['colorscheme'])) {
 }
 
 $fade1 = "E5E5E5";
-$fade2 = "999999";
-$fade3 = "595959";
+$fade2 = "b9b9b9";
+$fade3 = "848484";
 
 $newfade1 = fadecolor($primary, $fade1, $globalratio);
 $newfade2 = fadecolor($primary, $fade2, $globalratio);
@@ -288,13 +288,12 @@ a:hover {
 	margin-top: 4px;
 	margin-right: 5px;
 
-	border: 2px outset;
+	border: 2px outset white;
 
 	width: 10px;
 	height: 10px;
 
 }
-
 
 .window {
 	width: 100%;
@@ -309,13 +308,14 @@ a:hover {
 }
 
 .windowbody {
-	padding-top: 5px;
-	display: block;
 }
 
 .windowtitle .hoverhelpicon {
 	display: inline;
 	float: none;
+}
+
+.windowtable {
 }
 
 /* **** button **** */
@@ -525,10 +525,9 @@ div.scrollTableContainer {
 }
 
 .actionlink img {
-	position: relative;
-	top: 0.2em;
 	border: 0px;
 	padding: 0px;
+	padding-top: 0.2em;
 	padding-left: 3px;
 	padding-right: 3px;
 	margin: 0px;
@@ -577,7 +576,7 @@ div.scrollTableContainer {
 }
 
 
-<? if ($theme == "classroom") { ?>
+<? if ($theme == "classroom") { /* TODO move this to theme based css includes */ ?>
 
 .navmenuspacer {
 	margin-left: 0px;

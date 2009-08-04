@@ -112,3 +112,11 @@ body {
 	margin: 0px;
 	padding: 0px;
 }
+
+.windowtable {
+	border: 1px solid black;
+}
+
+.windowtitle {
+	border-bottom: 1px dotted black;
+}

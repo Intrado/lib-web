@@ -1,0 +1,6 @@
+/* hacks for ie6 */
+
+/* Scrolling window style settings */
+div.scrollTableContainer {
+	margin-right: 20px;
+}

@@ -1,0 +1,6 @@
+/* hacks for ie7 */
+
+/* Scrolling window style settings */
+div.scrollTableContainer {
+	overflow-x: hidden;
+}
