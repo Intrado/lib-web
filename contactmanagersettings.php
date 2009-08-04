@@ -32,7 +32,7 @@ $maxsms = getSystemSetting("maxsms", 2);
 $formdata = array();
 $formdata["tokenlife"] = array(
         "label" => _L("Code Lifetime"),
-        "fieldhelp" => _L("The number of days Activation Code is valid after generation, before it is expired."),
+        "fieldhelp" => _L("The number of days Activation Code is valid after generation, before it is expired. 1-365 days."),
         "value" => getSystemSetting('tokenlife', 30),
         "validators" => array(
         	array("ValRequired"),
