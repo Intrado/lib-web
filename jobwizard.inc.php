@@ -1435,6 +1435,20 @@ class JobWiz_scheduleAdvanced extends WizStep {
 		
 		$formdata = array($this->title);
 		if ($wizHasPhoneMsg) {
+			if ($ACCESS->getPermission('setcallerid') && !getSystemSetting('_hascallback')) {
+				$helpsteps[] = _L("This option will set the number displayed on the recipient's home or cellular phone.");
+				$formdata["callerid"] = array(
+					"label" => _L("Caller ID"),
+					"fieldhelp" => _L('This option will set the Caller ID when the person is called.'),
+					"value" => Phone::format($USER->getSetting("callerid","")),
+					"validators" => array(
+						array("ValLength","min" => 3,"max" => 20),
+						array("ValPhone")
+					),
+					"control" => array("TextField","maxlength" => 20, "size" => 15),
+					"helpstep" => $helpstepnum++
+				);
+			}
 			$formdata["maxjobdays"] = array(
 				"label" => _L("Days to Run"),
 				"fieldhelp" => ("Use this menu to set the default number of days your jobs should run."),
@@ -1465,21 +1479,6 @@ class JobWiz_scheduleAdvanced extends WizStep {
 					"value" => $USER->getSetting("messageconfirmation", false),
 					"validators" => array(),
 					"control" => array("CheckBox"),
-					"helpstep" => $helpstepnum++
-				);
-			}
-			
-			if ($ACCESS->getPermission('setcallerid')) {
-				$helpsteps[] = _L("This option will set the number displayed on the recipient's home or cellular phone.");
-				$formdata["callerid"] = array(
-					"label" => _L("Caller ID"),
-					"fieldhelp" => _L('This option will set the Caller ID when the person is called.'),
-					"value" => Phone::format($USER->getSetting("callerid","")),
-					"validators" => array(
-						array("ValLength","min" => 3,"max" => 20),
-						array("ValPhone")
-					),
-					"control" => array("TextField","maxlength" => 20, "size" => 15),
 					"helpstep" => $helpstepnum++
 				);
 			}
