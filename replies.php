@@ -150,7 +150,7 @@ include_once("nav.inc.php");
 NewForm($f);
 
 buttons(button('Refresh',"window.location.reload()"),
-		button('Delete All Played Responses', "return confirm('$warning')", "replies.php?deleteplayed=true"));
+		button('Delete All Played Responses', "if (confirm('$warning')) {window.location.href='replies.php?deleteplayed=true';}"));
 
 startWindow("Display Options" . help('Replies_DisplayOptions'), "padding: 3px;");
 ?>
