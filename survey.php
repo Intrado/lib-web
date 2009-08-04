@@ -326,7 +326,7 @@ startWindow('Survey Information');
 				</tr>
 				<tr>
 					<td>Start Date <?= help('SurveyScheduler_StartDate',NULL,"small"); ?></td>
-					<td><? NewFormItem($f,$s,"startdate","text", 30, NULL, ($completedmode ? "DISABLED" : "onfocus=\"this.select();lcs(this,false,true)\" onclick=\"event.cancelBubble=true;this.select();lcs(this,false,true)\"")); ?>
+					<td><? NewFormItem($f,$s,"startdate","text", 30, NULL, ($completedmode ? "DISABLED" : "onfocus=\"this.select();pickDate(this,false,true)\" onclick=\"event.cancelBubble=true;\"")); ?>
 					</td>
 				</tr>
 				<tr>
@@ -415,7 +415,7 @@ function checkphonesurvey(id) {
 }
 
 </script>
-<script SRC="script/calendar.js"></script>
+<script SRC="script/datepicker.js"></script>
 
 <?
 include_once("navbottom.inc.php");

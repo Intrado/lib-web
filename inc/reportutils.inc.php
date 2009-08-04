@@ -204,7 +204,7 @@ function dateOptions($f, $s, $tablename = "", $infinite = false){
 				?>
 			</td>
 			<td><div id="xdays">Days: <? NewFormItem($f, $s, 'xdays', 'text', '3'); ?><div></td>
-			<td><div id="date">From: <? NewFormItem($f, $s, "startdate", "text", "20",NULL,"onfocus=\"this.select();lcs(this,true,false)\" onclick=\"event.cancelBubble=true;this.select();lcs(this,true,false)\"") ?> To: <? NewFormItem($f, $s, "enddate", "text", "20",NULL,"onfocus=\"this.select();lcs(this,true,false)\" onclick=\"event.cancelBubble=true;this.select();lcs(this,true,false)\"")?></div></td>
+			<td><div id="date">From: <? NewFormItem($f, $s, "startdate", "text", "20",NULL,"onfocus=\"this.select();pickDate(this,true,false)\" onclick=\"event.cancelBubble=true;\"") ?> To: <? NewFormItem($f, $s, "enddate", "text", "20",NULL,"onfocus=\"this.select();pickDate(this,true,false)\" onclick=\"event.cancelBubble=true;\"")?></div></td>
 		</tr>
 		<script>
 			if(new getObj("reldate").obj.value!="xdays"){
