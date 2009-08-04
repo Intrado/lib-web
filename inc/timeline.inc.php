@@ -61,7 +61,7 @@ $centerposition = strtotime(date("m/j/Y") . "12:00") + (86400 * $day);
 
 $placments = array();
 $jobcount = count($jobs);
-$jobcolor = array("scheduled" => "#3399FF","processing"=>"#00ffff","active" => "#ffff00","complete" => "#00ff00","cancelling" => "#ff5500","cancelled" => "#ff0000");
+$jobcolor = array("scheduled" => "#ffff00","processing"=>"#ff5500","active" => "#00ff00","complete" => "#3399ff","cancelling" => "#ff0000","cancelled" => "#00ffff");
 $jobids = array();
 $jobstatus = array();
 
@@ -201,13 +201,13 @@ $minhight = $minhight * $jobhight + $minhight*$jobspacing ;
 				<td style="width:33%;text-align:center;white-space:nowrap;">
 					<? 
 					if($range > 0 ) {
-						echo '<a href="start.php?timelinerange=' .  ($range-1) . '" style="text-decoration: none;"><img src="img/icons/fugue/magnifier_zoom.png"> Zoom in</a> |';
+						echo '<a href="start.php?timelinerange=' .  ($range-1) . '" style="text-decoration: none;"><img src="img/icons/fugue/magnifier_zoom.gif"> Zoom in</a> |';
 					}
 					?>
-					<a href="start.php?timelinerange=1&timelineday=0" style="text-decoration: none;"><img src="img/icons/fugue/arrow_circle_225.png"> Reset</a>	
+					<a href="start.php?timelinerange=1&timelineday=0" style="text-decoration: none;"><img src="img/icons/fugue/arrow_circle_225.gif"> Reset</a>	
 					<? 
 					if($range < 5 ) {
-						echo '| <a href="start.php?timelinerange=' .  ($range+1) . '" style="text-decoration: none;"><img src="img/icons/fugue/magnifier_zoom_out.png"> Zoom out</a>';
+						echo '| <a href="start.php?timelinerange=' .  ($range+1) . '" style="text-decoration: none;"><img src="img/icons/fugue/magnifier_zoom_out.gif"> Zoom out</a>';
 					}
 					?>	
 				</td>
@@ -266,7 +266,7 @@ $minhight = $minhight * $jobhight + $minhight*$jobspacing ;
 			hideAfter: 0.5,
 			stem: 'bottomMiddle',
 			hook: {  target: 'rightMiddle', tip: 'rightBottom'  },
-			width: 'auto',
+			width: '120px',
 			offset: { x: 0, y: -4 }
 		});
 

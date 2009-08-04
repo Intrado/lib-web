@@ -229,7 +229,7 @@ function activityfeed($mergeditems,$ajax = false) {
 						break;
 					case "cancelled":
 						$title = _L('%1$s Cancelled',$jobtype);
-						$icon = 'largeicons/checkedgreen.jpg';
+						$icon = 'largeicons/checkedbluegreen.jpg';
 						$defaultlink = $item["jobtype"] == "survey" ? "reportsurveysummary.php?jobid=$itemid" : "reportjobsummary.php?jobid=$itemid";
 						break;
 					case "cancelling":
@@ -290,7 +290,7 @@ function activityfeed($mergeditems,$ajax = false) {
 				if(isset($item["lastused"]))
 					$content .= 'This list was last used: <i>' . date("M j, g:i a",strtotime($item["lastused"])) . "</i>";
 				else
-					$content .= 'This list has never been used and ';
+					$content .= 'This list has never been used ';
 				$content .= " and has " . listcontacts($itemid,"list") . '</a>';
 				$tools = action_links (action_link("Edit", "pencil", "list.php?id=$itemid"),action_link("Preview", "application_view_list", "showlist.php?id=$itemid"));
 				$tools = str_replace("&nbsp;|&nbsp;","<br />",$tools);
