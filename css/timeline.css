@@ -25,10 +25,7 @@
 			
 	}
 	
-	a.toggle:link {text-decoration: none; color: #404040;}
-	a.toggle:visited {text-decoration: none; color: #404040;}
-	a.toggle:active {text-decoration: none; color: #404040;}
-	a.toggle:hover {text-decoration: none; color: #404040;}
+
 	a.job:link {text-decoration: none; color: #000;}
 	a.job:visited {text-decoration: none; color: #000;}
 	a.job:active {text-decoration: none; color: #000;}
@@ -56,8 +53,6 @@
 		color: #000;
 		text-align: center;
 		font-size: 12px; 
-		font-weight: bold;
-		
 		left: -1px;
 		top: 17px;
 		width: 100%;
@@ -90,8 +85,6 @@
 	.boxmonitor img{
 		width: 270px;
 	}
-	
-	
 	
 	.boxname {
 		font-size: 15px; 

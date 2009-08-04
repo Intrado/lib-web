@@ -147,7 +147,7 @@ $minhight = $minhight * $jobhight + $minhight*$jobspacing ;
 	<table>
 		<tr>
 			<td width="80px">
-			<a id="_backward" href="start.php?timelineday=<?= ($day-1) ?>">
+			<a id="_backward" href="start.php?timelineday=<?= ($day-($range>0?$range*2:1)) ?>">
 				<img style"align: right;" src="img/timeline/arrowleft.gif"  alt="Backward" border="0"/>
 			</a>
 			</td>
@@ -185,7 +185,7 @@ $minhight = $minhight * $jobhight + $minhight*$jobspacing ;
 		</div>
 			</td>
 			<td width="80px">	
-				<a id="_forward" href="start.php?timelineday=<?= ($day + 1) ?>">
+				<a id="_forward" href="start.php?timelineday=<?= ($day + ($range>0?$range*2:1)) ?>">
 					<img  src="img/timeline/arrowright.gif"  alt="Forward" border="0"/>
 				</a>
 			</td>
@@ -193,27 +193,34 @@ $minhight = $minhight * $jobhight + $minhight*$jobspacing ;
 		</table>
 		</div>
 	</div>
-			<?=	icon_button(_L('Refresh'),"fugue/arrow_circle_double_135","window.location.reload()",null,'style="display:inline;"') ?>	
-			<div style="text-align:right;">
-				<div id="t_tools" style="cursor:pointer;display:inline;" ><img  src="img/largeicons/tiny20x20/tools.jpg" />&nbsp;Tools</div>
-				&nbsp;|&nbsp;<div id="t_legend" style="cursor:pointer;display:inline;" ><img src="img/largeicons/tiny20x20/flag.jpg" />&nbsp;Legend</div>
-			</div>
-			<div id="timelinetools" style="display:none;">	
-				<b>Show:<b><br />
-				<a href="start.php?timelinerange=0">1&nbsp;Day</a><br />	
-				<a href="start.php?timelinerange=1">3&nbsp;Days</a><br />
-				<a href="start.php?timelinerange=2">5&nbsp;Days</a><br />
-				<a href="start.php?timelinerange=3">7&nbsp;Days</a><br />
-				<b>Quick Jump:<b><br />
-				<a href="start.php?timelineday=0">Today</a><br />	
-				<a href="start.php?timelineday=<?=($day+10) ?>">10&nbsp;Days&nbsp;Forward</a><br />	
-				<a href="start.php?timelineday=<?=($day-10) ?>">10&nbsp;Days&nbsp;Back</a><br />	
-			<div>
+			<table width="100%" >
+				<tr>
+				<td style="width:33%;padding-left: 2%;">
+					<?=	icon_button(_L('Refresh'),"fugue/arrow_circle_double_135","window.location.reload()",null,'style="display:inline;"') ?>	
+				<td>
+				<td style="width:33%;text-align:center;white-space:nowrap;">
+					<? 
+					if($range > 0 ) {
+						echo '<a href="start.php?timelinerange=' .  ($range-1) . '" style="text-decoration: none;"><img src="img/icons/fugue/magnifier_zoom.png"> Zoom in</a> |';
+					}
+					?>
+					<a href="start.php?timelinerange=1&timelineday=0" style="text-decoration: none;"><img src="img/icons/fugue/arrow_circle_225.png"> Reset</a>	
+					<? 
+					if($range < 5 ) {
+						echo '| <a href="start.php?timelinerange=' .  ($range+1) . '" style="text-decoration: none;"><img src="img/icons/fugue/magnifier_zoom_out.png"> Zoom out</a>';
+					}
+					?>	
+				</td>
+				<td style="text-align:right;padding-right: 2%;text-decoration:none;">
+					<div id="t_legend" style="cursor:pointer;display:inline;" ><img src="img/largeicons/tiny20x20/flag.jpg" />&nbsp;Legend</div>
+				</td>
+				</tr>
+			</table>
 			<div id="timelinelegend" style="display:none;width: 100px;">	
 				<?
 				foreach($jobcolor as $name => $color) {
-					echo '<div class="jobcontainer" style="position: relative;margin:5px;height: ' . $jobhight . 'px;width: 90%;">
-							<div class="box">' . ucfirst($name) . '</div>
+					echo '<div class="jobcontainer" style="cursor:default;position:relative;margin:5px;height: ' . $jobhight . 'px;">
+							<div class="box" style="padding-top:3px;">&nbsp;' . ucfirst($name) . '&nbsp;</div>
 							<div class="jobbar" style="background-color: ' . $color . ';">&nbsp;</div>
 						  </div>';
 				}
@@ -224,7 +231,6 @@ $minhight = $minhight * $jobhight + $minhight*$jobspacing ;
 	var jobstatus=new Array(<?= implode(",",$jobstatus) ?>);
 
 	document.observe('dom:loaded', function() {
-		$('canvas').blindDown({duration: 0.4});
 		var cw = $('canvas').getWidth();
 		for(i=0;i<<? echo $i ?>;i++){
 			$('__' + i).tip = new Tip('__' + i, getcontent(i), {
@@ -252,26 +258,15 @@ $minhight = $minhight * $jobhight + $minhight*$jobspacing ;
 			$('__' + i).style.width = "0%";
 			$('__' + i).morph('width:' + ((w/cw)*100) + '%;',{duration: 1.5});
 		}
-		new Tip('t_tools', $('timelinetools').innerHTML, {
-				style: 'protogrey',
-				radius: 4,
-				border: 4,
-				hideOn: false,
-				hideAfter: 0.5,
-				stem: 'topRight',
-				hook: {  target: 'bottomMiddle', tip: 'topRight'  },
-				width: 'auto',
-				offset: { x: 0, y: -4 }
-			});
 		new Tip('t_legend', $('timelinelegend').innerHTML, {
 			style: 'protogrey',
 			radius: 4,
 			border: 4,
 			hideOn: false,
 			hideAfter: 0.5,
-			stem: 'topRight',
-			hook: {  target: 'bottomMiddle', tip: 'topRight'  },
-			width: '150px',
+			stem: 'bottomMiddle',
+			hook: {  target: 'rightMiddle', tip: 'rightBottom'  },
+			width: 'auto',
 			offset: { x: 0, y: -4 }
 		});
 
