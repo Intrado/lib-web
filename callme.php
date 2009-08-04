@@ -69,9 +69,7 @@ $formdata = array(
 	"messagename" => array(
 		"label" => _L('Message Name'),
 		"value" => "",
-		"validators" => array(
-				array("ValDuplicateNameCheck","type" => "phone")
-		),
+		"validators" => array(),
 		"control" => array("TextField","size" => 30, "maxlength" => 30),
 		"helpstep" => 1
 	),
@@ -146,7 +144,7 @@ include_once('nav.inc.php');
 
 ?>
 <script type="text/javascript">
-<? Validator::load_validators(array("ValDuplicateNameCheck","ValCallMeMessage")); ?>
+<? Validator::load_validators(array("ValCallMeMessage")); ?>
 </script>
 <?
 
