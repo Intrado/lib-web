@@ -531,5 +531,23 @@ function setDefaultFieldValue(value, event) {
 			color: "gray"
 		});
 	}
+}
+
+// @param textbox, can also be an ID.
+function pickDate (textbox, allowPast, allowFuture, closeOnBlur) {
+	var element = $(textbox);
 	
+	var filter = new DatePickerFilter();
+	if (!allowPast)
+		filter.append(DatePickerUtils.noDatesBefore(0));
+	if (!allowFuture)
+		filter.append(DatepIckerUtils.noDatesAfter(0));
+	new DatePicker({
+		relative: element.identify(),
+		keepFieldEmpty:true,
+		enableCloseOnBlur: closeOnBlur ? true : false,
+		topOffset:20,
+		relativePosition: true,
+		dateFilter: filter
+	});
 }
