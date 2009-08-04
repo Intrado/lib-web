@@ -286,47 +286,22 @@ class ReldateOptions extends FormItem {
 		$dateChange = " $(\"$n\").value = \$H({\"reldate\":$(\"{$n}_reldate\").value, \"startdate\":$(\"{$n}_startdate\").value, \"enddate\":$(\"{$n}_enddate\").value}).toJSON();";
 		$dateBlur = " $dateChange; ";
 		$dateFocus = " this.select(); $dateChange; ";
-		$dateClick = " $dateFocus; ";
 		$startdateValue = !empty($data['startdate']) ? $data['startdate'] : '';
 		$enddateValue = !empty($data['enddate']) ? $data['enddate'] : '';
-		$dateboxes = _L("From: ") . "<input id='{$n}_startdate' value='$startdateValue' type='text' size='20' onblur='$dateBlur' onfocus='$dateFocus' onclick='$dateClick' onchange='$dateChange'/>";
-		$dateboxes .= _L("To: ") . "<input id='{$n}_enddate' value='$enddateValue' type='text' size='20' onblur='$dateBlur' onfocus='$dateFocus' onclick='$dateClick' onchange='$dateChange'/>";
+		$dateboxes = _L("From: ") . "<input id='{$n}_startdate' value='$startdateValue' type='text' size='20' onblur='$dateBlur' onfocus='$dateFocus ; pickDate(this, true,true)' onchange='$dateChange'/>";
+		$dateboxes .= _L("To: ") . "<input id='{$n}_enddate' value='$enddateValue' type='text' size='20' onblur='$dateBlur' onfocus='$dateFocus ; pickDate(this, true,true)' onchange='$dateChange'/>";
 		
 		$xdaysHidden = ($data['reldate'] != 'xdays') ? 'display:none;' : '';
 		$dateHidden = ($data['reldate'] != 'daterange') ? 'display:none;' : '';
-		$datepickerJS = "
-			var {$n}_startdate_picker = new DatePicker({
-				relative: '{$n}_startdate',
-				keepFieldEmpty:true,
-				language:'" . substr($LOCALE,0,2) . "',
-				enableCloseOnBlur:1,
-				afterClose: function () {
-					$dateChange
-				},
-				topOffset:20
-			});
-			
-			var {$n}_enddate_picker = new DatePicker({
-				relative: '{$n}_enddate',
-				keepFieldEmpty:true,
-				language:'" . substr($LOCALE,0,2) . "',
-				enableCloseOnBlur:1,
-				afterClose: function () {
-					$dateChange
-				},
-				topOffset:20
-			});
-		";
-		return "<div style='position:relative'>
+		return "<div>
 				$hiddenField
 				$selectbox
 				<span style='white-space:nowrap'>
-					<span id='{$n}_xdaysContainer' style='$xdaysHidden'>$xdays</span>
-					<span id='{$n}_dateContainer' style='$dateHidden'>$dateboxes</span>
+					<div id='{$n}_xdaysContainer' style='$xdaysHidden'>$xdays</div>
+					<div id='{$n}_dateContainer' style='$dateHidden'>$dateboxes</div>
 				</span>
 			</div>
 			<script type='text/javascript' src='script/datepicker.js'></script>
-			<script type='text/javascript'>$datepickerJS</script>
 		";
 	}
 }
