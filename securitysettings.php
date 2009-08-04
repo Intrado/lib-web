@@ -112,16 +112,18 @@ $formdata["logindisableattempts"] = array(
 	"helpstep" => $helpstepnum
 );
 
-$helpsteps[$helpstepnum++] = _L("This setting will require the entry of a valid student id when calling back to listen to messages.");
-$formdata["msgcallbackrequireid"] = array(
-	"label" => _L("Require Student ID on Call Back"),
-	"fieldhelp" => _L("Check this to require recipients to enter a valid student ID when retrieving messages."),
-	"value" => getSystemSetting('msgcallbackrequireid'),
-	"validators" => array(
-	),
-	"control" => array("CheckBox"),
-	"helpstep" => $helpstepnum
-);
+if (getSystemSetting('_hascallback', '0') && !getSystemSetting('_hasselfsignup', '0')) {
+	$helpsteps[$helpstepnum++] = _L("This setting will require the entry of a valid student id when calling back to listen to messages.");
+	$formdata["msgcallbackrequireid"] = array(
+		"label" => _L("Require Student ID on Call Back"),
+		"fieldhelp" => _L("Check this to require recipients to enter a valid student ID when retrieving messages."),
+		"value" => getSystemSetting('msgcallbackrequireid'),
+		"validators" => array(
+		),
+		"control" => array("CheckBox"),
+		"helpstep" => $helpstepnum
+	);
+}
 
 $buttons = array(submit_button(_L("Done"),"submit","accept"),
 				icon_button(_L("Cancel"),"cross",null,"settings.php"));
@@ -149,7 +151,12 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		setSystemSetting('loginlockoutattempts', $postdata['loginlockoutattempts']);
 		setSystemSetting('loginlockouttime', $postdata['loginlockouttime']);
 		setSystemSetting('logindisableattempts', $postdata['logindisableattempts']);
-		setSystemSetting('msgcallbackrequireid', $postdata['msgcallbackrequireid']);
+
+		if (getSystemSetting('_hascallback', '0') && !getSystemSetting('_hasselfsignup', '0')) {
+			$postdata['msgcallbackrequireid'] ? setSystemSetting('msgcallbackrequireid', '1') : setSystemSetting('msgcallbackrequireid', '0');
+		} else {
+			setSystemSetting('msgcallbackrequireid', '0');
+		}
 		
 		if ($ajax)
 			$form->sendTo("settings.php");
