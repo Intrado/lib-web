@@ -169,6 +169,14 @@ class FinishJobWizard extends WizFinish {
 	}
 	
 	function finish ($postdata) {
+		// If the job has not ben confirmed, don't try to process the data.
+		if (!isset($postdata["/submit/confirm"]["jobconfirm"])  || !$postdata["/submit/confirm"]["jobconfirm"] )
+			return false;
+		
+		$wizHasPhoneMsg = wizHasPhone($postdata);
+		$wizHasEmailMsg= wizHasEmail($postdata);
+		$wizHasSmsMsg= wizHasSms($postdata);
+		
 		global $USER;
 		$jobtype = DBFind("JobType", "from jobtype where id=?", false, array($postdata["/start"]["jobtype"]));
 		$jobname = $postdata["/start"]["name"];
@@ -182,59 +190,75 @@ class FinishJobWizard extends WizFinish {
 		switch ($postdata["/start"]["package"]) {
 			//If package is Easycall
 			case "easycall":
-				$phoneMsg = $this->phoneRecordedMessage(json_decode($postdata["/message/phone/callme"]["message"]));
-				$emailmessagelink = true;
-				$emailMsg = array("Default" => array(
-					"id" => "",
-					"from" => "contactme@schoolmessenger.com",
-					"fromname" => "SchoolMessenger",
-					"subject" => "Message from ". $_SESSION['custname'],
-					"attachments" => array(),
-					"text" => "An important telephone notification was sent to you by ". $_SESSION['custname']. ". Click the link below or copy and paste the link into your web browser to hear the message.\n\n",
-					"language" => "english",
-					"override" => true
-				));
-				if (getSystemSetting("_hascallback"))
-					$emailMsg["Default"]["text"] .= "You may also listen to this message over the phone by dialing the automated notification system at: ". Phone::format(getSystemSetting("inboundnumber")). "\n\n";
-				$emailMsg["Default"]["text"] .= "DO NOT REPLY: This is an automatically generated email. Please do not send a reply message.\nTo be removed from these alerts please contact ". $_SESSION['custname']. ".\n";
-				$smsmessagelink = true;
-				$smsMsg = array("Default" => array(
-					"id" => false,
-					"text" => "Phone message from ". $_SESSION['custname']. "\n",
-					"language" => "english"
-				));
-				if (getSystemSetting("_hascallback"))
-					$smsMsg["Default"]["text"] .= "To listen dial ". Phone::format(getSystemSetting("inboundnumber")). "\n\n";
+				if ($wizHasPhoneMsg)
+					$phoneMsg = $this->phoneRecordedMessage(json_decode($postdata["/message/phone/callme"]["message"]));
+				if ($wizHasEmailMsg) {
+					$emailmessagelink = true;
+					$emailMsg = array("Default" => array(
+						"id" => "",
+						"from" => "contactme@schoolmessenger.com",
+						"fromname" => "SchoolMessenger",
+						"subject" => "Message from ". $_SESSION['custname'],
+						"attachments" => array(),
+						"text" => "An important telephone notification was sent to you by ". $_SESSION['custname']. ". Click the link below or copy and paste the link into your web browser to hear the message.\n\n",
+						"language" => "english",
+						"override" => true
+					));
+					if (getSystemSetting("_hascallback"))
+						$emailMsg["Default"]["text"] .= "You may also listen to this message over the phone by dialing the automated notification system at: ". Phone::format(getSystemSetting("inboundnumber")). "\n\n";
+					$emailMsg["Default"]["text"] .= "DO NOT REPLY: This is an automatically generated email. Please do not send a reply message.\nTo be removed from these alerts please contact ". $_SESSION['custname']. ".\n";
+				}
+				if ($wizHasSmsMsg) {
+					$smsmessagelink = true;
+					$smsMsg = array("Default" => array(
+						"id" => false,
+						"text" => "Phone message from ". $_SESSION['custname']. "\n",
+						"language" => "english"
+					));
+					if (getSystemSetting("_hascallback"))
+						$smsMsg["Default"]["text"] .= "To listen dial ". Phone::format(getSystemSetting("inboundnumber")). "\n\n";
+				}
 				break;
 			//Express Text
 			case "express":
-				$phoneMsg = $this->phoneTextMessage(json_decode($postdata["/message/phone/text"]["message"]));
-				if (isset($postdata["/message/phone/text"]["translate"]) && $postdata["/message/phone/text"]["translate"])
-					$phoneMsg = array_merge($phoneMsg, $this->phoneTextTranslation($postdata["/message/phone/translate"]));
-				$emailMsg = $this->emailTextMessage($postdata["/message/email/text"]);
-				if (isset($postdata["/message/email/text"]["translate"]) && $postdata["/message/email/text"]["translate"])
-					$emailMsg = array_merge($emailMsg, $this->emailTextTranslation($postdata["/message/email/text"], $postdata["/message/email/translate"]));
-				$smsMsg = array("Default" => array(
-					"id" => false,
-					"text" => $postdata["/message/sms/text"]["message"],
-					"language" => "english"
-				));
+				if ($wizHasPhoneMsg) {
+					$phoneMsg = $this->phoneTextMessage(json_decode($postdata["/message/phone/text"]["message"]));
+					if (isset($postdata["/message/phone/text"]["translate"]) && $postdata["/message/phone/text"]["translate"])
+						$phoneMsg = array_merge($phoneMsg, $this->phoneTextTranslation($postdata["/message/phone/translate"]));
+				}
+				if ($wizHasEmailMsg) {
+					$emailMsg = $this->emailTextMessage($postdata["/message/email/text"]);
+					if (isset($postdata["/message/email/text"]["translate"]) && $postdata["/message/email/text"]["translate"])
+						$emailMsg = array_merge($emailMsg, $this->emailTextTranslation($postdata["/message/email/text"], $postdata["/message/email/translate"]));
+				}
+				if ($wizHasSmsMsg) {
+					$smsMsg = array("Default" => array(
+						"id" => false,
+						"text" => $postdata["/message/sms/text"]["message"],
+						"language" => "english"
+					));
+				}
 				break;
 			//Personalized
 			case "personalized":
-				$phoneMsg = $this->phoneRecordedMessage(json_decode($postdata["/message/phone/callme"]["message"]));
-				$emailMsg = $this->emailTextMessage($postdata["/message/email/text"]);
-				if (isset($postdata["/message/email/text"]["translate"]) && $postdata["/message/email/text"]["translate"])
-					$emailMsg = array_merge($emailMsg, $this->emailTextTranslation($postdata["/message/email/text"], $postdata["/message/email/translate"]));
-				$smsMsg = array("Default" => array(
-					"id" => false,
-					"text" => $postdata["/message/sms/text"]["message"],
-					"language" => "english"
-				));
+				if ($wizHasPhoneMsg)
+					$phoneMsg = $this->phoneRecordedMessage(json_decode($postdata["/message/phone/callme"]["message"]));
+				if ($wizHasEmailMsg) {
+					$emailMsg = $this->emailTextMessage($postdata["/message/email/text"]);
+					if (isset($postdata["/message/email/text"]["translate"]) && $postdata["/message/email/text"]["translate"])
+						$emailMsg = array_merge($emailMsg, $this->emailTextTranslation($postdata["/message/email/text"], $postdata["/message/email/translate"]));
+				}
+				if ($wizHasSmsMsg) {
+					$smsMsg = array("Default" => array(
+						"id" => false,
+						"text" => $postdata["/message/sms/text"]["message"],
+						"language" => "english"
+					));
+				}
 				break;
 			//Custom
 			case "custom":
-				if (in_array('phone', $postdata["/message/pick"]["type"])) {
+				if ($wizHasPhoneMsg) {
 					switch ($postdata["/message/select"]["phone"]) {
 						case "record":
 							$phoneMsg = $this->phoneRecordedMessage(json_decode($postdata["/message/phone/callme"]["message"]));
@@ -253,7 +277,7 @@ class FinishJobWizard extends WizFinish {
 							error_log($postdata["/message/select"]["phone"] . " is an unknown value for ['/message/select']['phone']");
 					}
 				}
-				if (in_array('email', $postdata["/message/pick"]["type"])) {
+				if ($wizHasEmailMsg) {
 					switch ($postdata["/message/select"]["email"]) {
 						case "record":
 							$emailmessagelink = true;
@@ -283,7 +307,7 @@ class FinishJobWizard extends WizFinish {
 							error_log($postdata["/message/select"]["email"] . " is an unknown value for ['/message/select']['email']");
 					}
 				}
-				if (in_array('sms', $postdata["/message/pick"]["type"])) {
+				if ($wizHasSmsMsg) {
 					switch ($postdata["/message/select"]["sms"]) {
 						case "record":
 							$smsmessagelink = true;
@@ -499,10 +523,15 @@ class FinishJobWizard extends WizFinish {
 			$job->runNow();
 		
 		Query("COMMIT");
-		
 	}
 	
 	function getFinishPage ($postdata) {
+		// If the job has not ben confirmed, don't send any page data
+		if (!isset($postdata["/submit/confirm"]["jobconfirm"])  || !$postdata["/submit/confirm"]["jobconfirm"] )
+			return '<h1>Invalid data submitted.</h1>
+				<script>
+					window.location="unauthorized.php";
+				</script>';
 		return "<h1>Job submitted</h1>";
 	}
 }
@@ -516,8 +545,7 @@ $wizard->handlerequest();
 ////////////////////////////////////////////////////////////////////////////////
 
 $PAGE = _L("notifications").":"._L("jobs");
-$TITLE = _L('Job Wizard');
-
+$TITLE = false;
 
 require_once("nav.inc.php");
 
@@ -527,7 +555,7 @@ require_once("nav.inc.php");
 </script>
 <?
 
-startWindow("");
+startWindow("MessageMaker");
 echo $wizard->render();
 endWindow();
 if (isset($_SESSION['wizard_job']['debug']) && $_SESSION['wizard_job']['debug']) {
