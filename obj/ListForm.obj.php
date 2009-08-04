@@ -50,7 +50,7 @@ class ListForm extends Form {
 								</div>
 								<hr style='clear:both; border: solid 2px rgb(200,200,200); display:none' id='divider' />
 								<div style='clear:both'>
-									".icon_button(_L('Choose an Existing List'),'arrow_turn_left', null, null, ' id="chooseListChoiceButton" style="display:none" ')."<span style='clear:both'></span>
+									".icon_button(_L('Choose an Existing List'),'application_view_list', null, null, ' id="chooseListChoiceButton" style="display:none" ')."<span style='clear:both'></span>
 									<div id='chooseListWindow' style='display:none; clear:both'>
 										<table style=''><tr>
 											<td valign=top>
@@ -74,20 +74,21 @@ class ListForm extends Form {
 							</div>
 					</td>
 					<td valign=top>
-						<div id='allListsWindow' class='border' style='width:170px; overflow:hidden' >
+						<div id='allListsWindow' style='width:170px; overflow:hidden' >
 							<table width='100%' style='table-layout:fixed; font-size:90%; border-collapse: collapse'>
 								<thead>
 									<tr>
-										<th style='width:90px; overflow: hidden; white-space: nowrap; text-align:left'> </th>
-										<th style='width:16px'></th>
-										<th colspan=100 style='width:50px'></th>
+										<th style='width:0px'></th>
+										<th style='width:90px; overflow: hidden; white-space: nowrap; text-align:left'>Lists</th>
+										<th style='width:50px'></th>
+										<th colspan=100 style='width:16px'></th>
 									</tr>
 									<tr><td colspan=100 id='listsTableStatus'></td></tr>
 								</thead>
 								<tbody id='listsTableBody'>
 								</tbody>
 							</table>
-							<div style='text-align:left;white-space: nowrap; padding-top:10px'><b>"._L('Grand Total')."</b> <span id='listGrandTotal'>0</span></div>
+							<div class='border' style='padding:3px; text-align:left;white-space: nowrap; '><b>"._L('Total')."</b> <span id='listGrandTotal'>0</span></div>
 						</div>
 						<div id='listRulesPreview'></div>
 					</td>

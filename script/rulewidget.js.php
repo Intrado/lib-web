@@ -25,33 +25,33 @@ var RuleWidget = Class.create({
 	initialize: function(container, readonly, allowedFields) {
 		this.ruleEditorGuideContents = <?=json_encode(array(
 			// Fieldmap
-			'additionalChooseFieldmap' => _L('To add another rule, Please choose a fieldmap....'), // Used instead of 'chooseFieldmap' if there are existing rules
-			'chooseFieldmap' => _L('Please choose a fieldmap....'),
+			'additionalChooseFieldmap' => _L('To add another filter rule select a field'), // Used instead of 'chooseFieldmap' if there are existing rules
+			'chooseFieldmap' => _L('Select a field to filter on'),
 			// Criteria
-			'multisearch' => _L('Multisearch Choose a criteria for multisearch'),
-			'reldate' => _L('Reldate Choose a criteria for reldate'),
-			'text' => _L('Text Choose a criteria for text, but don\'t forget.'),
-			'numeric' => _L('Numeric Choose a criteria for numeric'),
+			'multisearch' => _L('Select a comparison option'),
+			'reldate' => _L('Select a comparison option'),
+			'text' => _L('Select a comparison option.'),
+			'numeric' => _L('Select a comparison option'),
 			// Value
-			'multisearch_in' => _L('Multisearch IN'),
-			'multisearch_not' => _L('Multisearch NOT'),
-			'reldate_eq' => _L('Reldate EQ'),
-			'reldate_reldate' => _L('Reldate RELDATE'),
-			'reldate_date_range' => _L('Reldate DATE_RANGE'),
-			'reldate_date_offset' => _L('Reldate DATE_OFFSET'),
-			'reldate_reldate_range' => _L('Reldate RELDATE_RANGE'),
-			'text_eq' => _L('Text EQ'),
-			'text_ne' => _L('Text NE'),
-			'text_sw' => _L('Text SW'),
-			'text_ew' => _L('Text EW'),
-			'text_cn' => _L('Text CN'),
-			'numeric_num_eq' => _L('Numeric EQ'),
-			'numeric_num_ne' => _L('Numeric NE'),
-			'numeric_num_gt' => _L('Numeric GT'),
-			'numeric_num_ge' => _L('Numeric GE'),
-			'numeric_num_lt' => _L('Numeric LT'),
-			'numeric_num_le' => _L('Numeric LE'),
-			'numeric_num_range' => _L('Numeric RANGE')
+			'multisearch_in' => _L('Enter a value'),
+			'multisearch_not' => _L('Enter a value'),
+			'reldate_eq' => _L('Enter a value'),
+			'reldate_reldate' => _L('Enter a value'),
+			'reldate_date_range' => _L('Enter a value'),
+			'reldate_date_offset' => _L('Enter a value'),
+			'reldate_reldate_range' => _L('Enter a value'),
+			'text_eq' => _L('Enter a value'),
+			'text_ne' => _L('Enter a value'),
+			'text_sw' => _L('Enter a value'),
+			'text_ew' => _L('Enter a value'),
+			'text_cn' => _L('Enter a value'),
+			'numeric_num_eq' => _L('Enter a value'),
+			'numeric_num_ne' => _L('Enter a value'),
+			'numeric_num_gt' => _L('Enter a value'),
+			'numeric_num_ge' => _L('Enter a value'),
+			'numeric_num_lt' => _L('Enter a value'),
+			'numeric_num_le' => _L('Enter a value'),
+			'numeric_num_range' => _L('Enter a value')
 		))?>;
 		
 		// Guide/Focus
@@ -302,7 +302,7 @@ var RuleWidget = Class.create({
 		if (!this.delayActions || suppressFire) {
 			// Actions
 			if (this.ruleEditor) {
-					var actionTD = new Element('td', { 'style':'clear:both', 'valign':'top'}).update('<?=addslashes(icon_button(_L('Remove'), 'delete'))?><span style="clear:both"></span>');
+					var actionTD = new Element('td', { 'style':'clear:both', 'valign':'top'}).update('<?=addslashes(icon_button(_L('Remove'), 'diagona/10/101'))?><span style="clear:both"></span>');
 					var deleteRuleButton = actionTD.down('button');
 					tr.insert(actionTD);
 					deleteRuleButton.observe('click', function(event, tr, fieldnum) {
@@ -434,8 +434,6 @@ var RuleEditor = Class.create({
 				if (select)
 					multisearchValues.push(select.getValue());
 			}
-			if (multisearchValues.length < 1)
-				return false;
 			val = multisearchValues;
 		} else {
 			// RELDATE_RELDATE
@@ -510,11 +508,13 @@ var RuleEditor = Class.create({
 			return;
 		op = op.getValue();
 		
+		this.trigger_event_in_column.bindAsEventListener(this, this.valueTD);
+		
 		this.ruleWidget.container.style.width = '550px';
 		var container = new Element('div');
 		switch(type) {
 			case 'multisearch':
-				container.update('<img src="img/icons/loading.gif"/>');
+				container.update('<img src="img/ajax-loader.gif"/>');
 				if (this.ruleWidget.multisearchHTMLCache[fieldnum]) {
 					var multicheckboxHTML = this.ruleWidget.multisearchHTMLCache[fieldnum];
 					container.update(multicheckboxHTML);

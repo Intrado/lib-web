@@ -42,7 +42,7 @@ function listform_load(listformID, formData, postURL) {
 	ruleWidget = new RuleWidget($('ruleWidgetContainer'));
 	ruleEditor = ruleWidget.ruleEditor;
 	
-	var buildListFieldset = new Element('fieldset',{'style':'margin:0px;padding:0px;'});
+	var buildListFieldset = new Element('fieldset',{'style':'border: 0; margin:0px; margin-top:5px; padding:0px;'});
 	buildListFieldset.insert('<?=addslashes(icon_button(_L('Done Adding Rules To This List'),'accept',null,null, ' id="saveRulesButton" '))?>');
 	ruleWidget.container.insert(buildListFieldset);
 	
@@ -69,7 +69,7 @@ function listform_load(listformID, formData, postURL) {
 		
 		listform_set_rule_editor_status(false);
 		
-		$('listsTableStatus').update('<?=addslashes(_L('Updating..'))?>');
+		$('listsTableStatus').update('<img src="img/ajax-loader.gif"/>');
 		new Ajax.Request('ajaxlistform.php?type=addrule&listid=' + listformVars.pendingList, {
 			postBody: 'ruledata='+event.memo.ruledata.toJSON(),
 			onSuccess: function(transport) {
@@ -81,10 +81,13 @@ function listform_load(listformID, formData, postURL) {
 				}
 				
 				var listid = listformVars.pendingList;
+				
+				listform_refresh_preview(listid);
+				
 				if (!$('listsTableBody').down('input[value='+listid+']')) { // Add to the lists table if the pending list hasn't already been added.
 					listform_add_list(listid);
 				} else {
-					listform_refresh_liststats(listid);
+					listform_refresh_liststats(listid, true);
 				}
 			}
 		});
@@ -92,7 +95,7 @@ function listform_load(listformID, formData, postURL) {
 	ruleWidget.container.observe('RuleWidget:DeleteRule', function(event) {
 		listform_set_rule_editor_status(false);
 		
-		$('listsTableStatus').update('<?=addslashes(_L('Updating..'))?>');
+		$('listsTableStatus').update('<img src="img/ajax-loader.gif"/>');
 		new Ajax.Request('ajaxlistform.php?type=deleterule&listid=' + listformVars.pendingList, {
 			postBody: 'fieldnum='+event.memo.fieldnum,
 			onSuccess: function(transport) {
@@ -101,10 +104,12 @@ function listform_load(listformID, formData, postURL) {
 					return;
 				}
 				
+				listform_refresh_preview(listformVars.pendingList);
+				
 				if ($H(ruleWidget.appliedRules).keys().length <= 0) {
 					listform_remove_list(null, listformVars.pendingList);
 				} else {
-					listform_refresh_liststats(listformVars.pendingList);
+					listform_refresh_liststats(listformVars.pendingList, true);
 				}
 				$('listsTableStatus').update();
 			}
@@ -223,7 +228,9 @@ function listform_add_list(listid) {
 	return true;
 }
 
-function listform_refresh_liststats(listID) {
+function listform_refresh_liststats(listID, ignoreCache) {
+	doCache = ignoreCache ? false : true;
+	
 	cachedAjaxGet('ajax.php?type=liststats&listids='+[listID].toJSON(),
 		function(transport, listID) {
 			var stats = transport.responseJSON;
@@ -236,7 +243,7 @@ function listform_refresh_liststats(listID) {
 				var data = stats[listID];
 				var hiddenTD = $('listsTableBody').down('input[value='+listID+']').up('td');
 				var nameTD = hiddenTD.next('td');
-				var statisticsTD = nameTD.next('td',1);
+				var statisticsTD = nameTD.next('td',0);
 				nameTD.update(data.name);
 				statisticsTD.update(format_thousands_separator(data.total));
 				
@@ -244,7 +251,7 @@ function listform_refresh_liststats(listID) {
 				listform_update_grand_total();
 		}.bindAsEventListener(this, listID),
 		null,
-		false
+		doCache
 	);
 }
 
@@ -261,7 +268,7 @@ function listform_load_lists(listidsJSON) {
 	var listids = listidsJSON.evalJSON();
 	if (!listids.join)
 		return;
-	$('listsTableStatus').update('<?=addslashes(_L('Loading..'))?>');
+	$('listsTableStatus').update('<img src="img/ajax-loader.gif"/>');
 	cachedAjaxGet('ajax.php?type=liststats&listids='+listidsJSON,
 		function(transport) {
 			$('listsTableStatus').update();
@@ -276,87 +283,96 @@ function listform_load_lists(listidsJSON) {
 				listformVars.totals[listid] = data.total;
 				listform_update_grand_total();
 			
-				var hiddenTD = new Element('td').update(new Element('input',{'type':'hidden','value':listid})).hide();
-    			var commonStyle = 'border-bottom: solid 2px rgb(220,220,220);white-space:nowrap';
-			    var nameTD = new Element('td', {'class':'List NameTD', 'width':'10%','style':'cursor:pointer; overflow: hidden; white-space: nowrap;' + commonStyle});
+				var hiddenTD = new Element('td', {'style':'width:0px'
+				}).update(new Element('input',{'type':'hidden','value':listid}));
+    			var commonStyle = 'padding: 3px;';
+			    var nameTD = new Element('td', {'class':'border List NameTD', 'width':'10%','style':'overflow: hidden; white-space: nowrap;' + commonStyle});
 			    nameTD.insert(data.name);
-			    var actionTD = new Element('td', {'width':'25%','class':'List ActionTD', 'style':commonStyle});
-			    actionTD.insert('<img src="img/icons/delete.gif" title="<?=addslashes(_L('Click to remove this list'))?>" />');
-			    var statisticsTD = new Element('td', {'class':'List', 'colspan':100, 'style':commonStyle}).update(format_thousands_separator(data.total));
+			    var actionTD = new Element('td', {'width':'25%','class':'border List ActionTD', 'colspan':100, 'style':commonStyle + ' ; text-align:center'});
+			    actionTD.insert('<img src="img/icons/diagona/10/101.gif" title="<?=addslashes(_L('Click to remove this list'))?>" />');
+			    var statisticsTD = new Element('td', {'class':'border List', 'style':commonStyle}).update(format_thousands_separator(data.total));
 
-				$('listsTableBody').insert(new Element('tr').insert(hiddenTD).insert(nameTD).insert(actionTD).insert(statisticsTD));
+				$('listsTableBody').insert(new Element('tr').insert(hiddenTD).insert(nameTD).insert(statisticsTD).insert(actionTD));
 
 				if (!data.advancedlist) {
-					nameTD.up('tr').observe('click', function (event, listid) {
-						//$('listRulesPreview').update('Loading..');
-						cachedAjaxGet('ajax.php?type=listrules&listids='+[listid].toJSON(),
-							function (transport) {
-								var listRules = transport.responseJSON;
-								if (!listRules) {
-									alert('<?=addslashes(_L('Sorry cannot get list rules'))?>');
-									Tips.hideAll();
-									return;
-								}
-								// Expects a single listid; loop finished in one iteration.
-								for (var listid in listRules) {
-									var previewBox = new Element('div');//$('listRulesPreview');
-									var tbody = new Element('tbody');
-									for (var i in listRules[listid]) {
-										var rule = listRules[listid][i];
-										if (!rule.fieldnum)
-											break;
-										var tr = new Element('tr');
-										ruleWidget.format_readable_rule(rule, tr);
-										tbody.insert(tr);
-									}
-									if (!tbody.down('td')) {
-										previewBox.update('<?=addslashes(_L('No Rules Found for This List'))?>');
-									}
-									else {
-										previewBox.update(new Element('table').insert(tbody));
-									}
-									
-									new Tip (this, previewBox.innerHTML, {
-							        	style: "protogrey",
-							        	delay: 0.2,
-							        	hideOthers:true,
-							        	closeButton: true,
-							        	hideOn: 'close',
-							        	showOn: 'click',
-							        	hook:{target:"bottomLeft",tip:"topRight"},
-							        	offset:{x:0,y:0},
-							        	stem:"topRight",
-							        	hideAfter:2,
-							        	title: this.innerHTML
-						          	});
-
-									this.prototip.show();
-								}
-							}.bindAsEventListener(nameTD),
-						null, false );
+					listform_refresh_preview(listid);
+					nameTD.observe('mouseover', function (event, listid) {
+						if (!listformPreviewCache[listid])
+							return;
+							
+						var tr = this.up('tr');
+						new Tip (tr, listformPreviewCache[listid], {
+				        	style: "protogrey",
+				        	delay: 0.2,
+				        	hideOthers:true,
+				        	hook:{target:"bottomLeft",tip:"topRight"},
+				        	offset:{x:0,y:0},
+				        	stem:"topRight",
+				        	title: '<?=_L("List Name:")?> ' + this.innerHTML
+			          	});
+						tr.prototip.show();
+					}.bindAsEventListener(nameTD,listid));
+				} else {
+					nameTD.observe('mouseover', function (event, listid) {
+						listform_hover_existing_list(event, listid, this.up('tr'));
 					}.bindAsEventListener(nameTD,listid));
 				}
+				
 				var removeButton = actionTD.down('img');
 				removeButton.observe('click', listform_remove_list.bindAsEventListener(actionTD,listid,true));
 				
 				// Mark this list as 'added' so that the list selectbox no longer shows this list as an option.
-				if (listformVars.existingLists && listformVars.existingLists[listid])
+				if (listformVars.existingLists && listformVars.existingLists[listid]) {
 					listformVars.existingLists[listid].added = true;
+				}
 			}
 
 			listform_reset_list_selectbox();
 			ruleWidget.refresh_guide(true);
-		},null,false
+		}
 	);
 }
 
-function listform_hover_existing_list(event, listid) {
+var listformPreviewCache = {};
+function listform_refresh_preview (listid) {
+	cachedAjaxGet('ajax.php?type=listrules&listids='+[listid].toJSON(),
+		function (transport, listid) {
+			var listRules = transport.responseJSON;
+			if (!listRules) {
+				alert('<?=addslashes(_L('Sorry cannot get list rules'))?>');
+				Tips.hideAll();
+				return;
+			}
+
+			var previewBox = new Element('div');
+			var tbody = new Element('tbody');
+			for (var i in listRules[listid]) {
+				var rule = listRules[listid][i];
+				if (!rule.fieldnum)
+					break;
+				var tr = new Element('tr');
+				ruleWidget.format_readable_rule(rule, tr);
+				tbody.insert(tr);
+			}
+			if (!tbody.down('td')) {
+				previewBox.update('<?=addslashes(_L('No Rules Found for This List'))?>');
+			}
+			else {
+				previewBox.update(new Element('table').insert(tbody));
+			}
+			listformPreviewCache[listid] = previewBox.innerHTML;
+
+		},
+	listid, false);
+}
+
+function listform_hover_existing_list(nullableEvent, listid, tr) {
 	$('listchooseTotal').update();
 	$('listchooseTotalAdded').update();
 	$('listchooseTotalRemoved').update();
 	$('listchooseTotalRule').update();
 		
-	cachedAjaxGet('ajax.php?type=liststats&listids='+[listid].toJSON(), function(transport, listid) {
+	cachedAjaxGet('ajax.php?type=liststats&listids='+[listid].toJSON(), function(transport, listid, tr) {
 		var stats = transport.responseJSON;
 		if (!stats) {
 			alert('<?=addslashes(_L('No data available for this list, please check your internet connection and try again'))?>');
@@ -369,24 +385,29 @@ function listform_hover_existing_list(event, listid) {
 			$('listchooseTotalRemoved').update(format_thousands_separator(data.totalremoved));
 			$('listchooseTotalRule').update(format_thousands_separator(data.totalrule));
 
-		var li = this.up('li');
-		new Tip (li, $('listchooseTotalsContainer').innerHTML, {
+		var targetElement = (!tr) ? this.up('li') : tr;
+		var hookPreference = (!tr) ? {target:"topMiddle",tip:"bottomLeft"} : {target:"bottomLeft",tip:"topRight"};
+		var stemPreference = (!tr) ? "bottomLeft" : "topRight";
+		
+		Tips.hideAll();
+		new Tip (targetElement, $('listchooseTotalsContainer').innerHTML, {
 			style: "protogrey",
 			delay: 0.2,
-			hideOthers:true,
-			hook:{target:"topMiddle",tip:"bottomLeft"},
+			hideOthers: true,
+			hook: hookPreference,
 			offset:{x:0,y:0},
-			stem:"bottomLeft"
+			stem: stemPreference,
+			title: '<?=_L("List Name:")?> ' + data.name
 		});
-		li.prototip.show();
-
-	}.bindAsEventListener(this, listid));
+		targetElement.prototip.show();
+	}.bindAsEventListener(this, listid, tr));
 }
 
 function listform_onclick_existing_list(event, listid) {
 	Tips.hideAll();
+	
 	if (this.checked) {
-		if (listform_add_list(listid))
+		if (!listformVars.existingLists[listid].added && listform_add_list(listid))
 			ruleWidget.refresh_guide(true);
 	} else {
 		listform_remove_list(event, listid);
@@ -433,11 +454,6 @@ function listform_remove_list(event, listid, doconfirm) {
 }
 
 function listform_reset_list_selectbox() {
-	// If there are already checkboxes for existing lists, don't bother adding anymore.
-	// TODO: Refactor this function to be called only when necessary so that there's no need to check for any existing checkboxes.
-	if ($('listSelectboxContainer').down('input'))
-		return;
-		
 	var values = [];
 	for (var listid in listformVars.existingLists) {
 		var data = {text:listformVars.existingLists[listid].name, value:listid, checked: false, onclick:listform_onclick_existing_list, onhover:listform_hover_existing_list};
