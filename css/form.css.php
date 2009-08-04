@@ -164,6 +164,35 @@ form.newform {
 	vertical-align: top;
 }
 
+// HtmlRadioButtonBigCheck
+.newform .htmlradiobuttonbigcheck {
+	border: 0px;
+	padding: 0px;
+	margin: 0px;
+}
+.newform .htmlradiobuttonbigcheck div{
+	border: 0px;
+	padding: 0px;
+	margin: 0px;
+}
+.newform .htmlradiobuttonbigcheck table{
+	border: 0px;
+	padding: 0px;
+	margin: 0px;
+}
+.newform .htmlradiobuttonbigcheck td{
+	color: black;
+	border: 0px;
+	padding: 0px;
+	margin: 0px;
+}
+.newform .htmlradiobuttonbigcheck button{
+	background: none;
+	border: 0px;
+	padding: 0px;
+	margin: 0px;
+}
+
 .wiznav_disabled {
 	color: gray;
 }
