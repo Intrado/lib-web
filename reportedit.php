@@ -249,7 +249,7 @@ startWindow("Report Details ".help('ReportEdit_ReportDetails'));
 									<div style="display:<?if($radio=="dom"){echo('block');}else{echo('none');}?>" id='monthly'>Day of Month</div>
 								</td>
 								<td>
-									<div style="display:<?if($radio=="runonce"){echo('block');}else{echo('none');}?>" id='date2'><? NewFormItem($f, $s, 'date', 'text', '25',NULL,"onfocus=\"this.select();lcs(this,false,true)\" onclick=\"event.cancelBubble=true;this.select();lcs(this,false,true)\"")?></div>
+									<div style="display:<?if($radio=="runonce"){echo('block');}else{echo('none');}?>" id='date2'><? NewFormItem($f, $s, 'date', 'text', '25',NULL,"onfocus=\"this.select();pickDate(this,false,true)\" onclick=\"event.cancelBubble=true;\"")?></div>
 									<div style="display:<?if($radio=="dow"){echo('block');}else{echo('none');}?>" id='weekly2'>
 										<table border="0" cellpadding="2" cellspacing="1" class="list">
 											<tr class="listHeader" align="left" valign="bottom">
@@ -303,7 +303,7 @@ EndForm();
 
 include("navbottom.inc.php");
 ?>
-<script SRC="script/calendar.js"></script>
+<script SRC="script/datepicker.js"></script>
 <script>
 <?
 	switch($radio){
