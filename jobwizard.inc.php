@@ -99,7 +99,7 @@ class HtmlRadioButtonBigCheck extends FormItem {
 					container.select(\'[class="htmlRadioButtonBigCheck_checkImg"]\').each( function(i) {
 						$(i).src = "img/bigradiobutton.gif";
 					});
-					checkimg.src = "img/largeicons/bigradiobutton_checked.jpg";
+					checkimg.src = "img/bigradiobutton_checked.gif";
 				}
 			</script>
 		';
