@@ -133,8 +133,8 @@ function listcontacts ($obj,$name) {
 	$lists = array();
 	if($name == "job") {
 		if(in_array($obj->status,array("active","cancelling","cancelled","complete"))) {
-			$calccont = QuickQuery("select count(*) from reportperson where jobid=? and status='success'",false,array($obj->id));
-			$calctotal = QuickQuery("select count(*) from reportperson where jobid=?",false,array($obj->id));
+			$calccont = QuickQuery("select count(distinct personid) from reportperson where jobid=? and status='success'",false,array($obj->id));
+			$calctotal = QuickQuery("select count(distinct personid) from reportperson where jobid=?",false,array($obj->id));
 			return "<b>" . $calccont . "</b> out of <b>" . $calctotal . ($calctotal!=1?"&nbsp;</b>persons contacted":"</b>&nbsp;person&nbsp;contacted");
 		} 
 		$lists[] = QuickQuery("select listid from job where id=?",false, array($obj->id));
