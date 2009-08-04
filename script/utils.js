@@ -542,7 +542,7 @@ function pickDate (textbox, allowPast, allowFuture, closeOnBlur) {
 		filter.append(DatePickerUtils.noDatesBefore(0));
 	if (!allowFuture)
 		filter.append(DatepIckerUtils.noDatesAfter(0));
-	new DatePicker({
+	return new DatePicker({
 		relative: element.identify(),
 		keepFieldEmpty:true,
 		enableCloseOnBlur: closeOnBlur ? true : false,
