@@ -89,15 +89,18 @@ if (isset($job->id)) {
 
 $selectedlists = array(); // ids
 $listradiostate = "single";
-if($job && $job->id){
+if(isset($job->id)){
 	$selectedlists = QuickQueryList("select listid from joblist where jobid=$job->id", false);
 	$listradiostate = empty($selectedlists)?"single":"multi";
 	if($job->listid) {
 		$selectedlists[] = $job->listid;
 	}
 }
-$peoplelists = QuickQueryList("select id, name, (name +0) as foo from list where userid=$USER->id and (deleted=0 or id in (" . implode(",",array_values($selectedlists)) . ") ) order by foo,name", true);
-
+if(!empty($selectedlists)) {
+	$peoplelists = QuickQueryList("select id, name, (name +0) as foo from list where userid=$USER->id and (deleted=0 or id in (" . implode(",",array_values($selectedlists)) . ") ) order by foo,name", true);
+} else {
+	$peoplelists = QuickQueryList("select id, name, (name +0) as foo from list where userid=$USER->id and deleted=0 order by foo,name", true);
+}
 
 /****************** main message section ******************/
 
@@ -1448,7 +1451,7 @@ if ($JOBTYPE == "repeating" && getSystemSetting("disablerepeat") ) {
 			?> &nbsp; <?
 		}
 		?></div>
-		<div id='smsoptions' style="display: none">
+		<div id='smsoptions'>
 		<table border="0" cellpadding="2" cellspacing="0" width=100%>
 			<tr>
 				<td width="30%" valign="top">Message <?= help('Job_SMSDefaultMessage', NULL, 'small') ?></td>
