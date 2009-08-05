@@ -421,10 +421,11 @@ function activityfeed($mergeditems,$ajax = false) {
 										$('messagessubfilters').hide();
 									size = jobfiltes.length;
 									for(i=0;i<size;i++){
-										$(jobfiltes[i] + 'filter').setStyle({color: filtercolor});	
+										$(jobfiltes[i] + 'filter').setStyle({color: filtercolor, fontWeight: 'normal'});	
 									}
 									$(filter + 'filter').setStyle({
-	 									 color: '#005BC3'
+	 									 color: '#000000',
+										 fontWeight: 'bold',
 									});
 									
 								}
@@ -472,15 +473,15 @@ include_once("nav.inc.php");
 			if ($USER->authorize('sendphone') || $USER->authorize('sendemail') || $USER->authorize('sendsms')) {  
 ?>
 			<div style="width:170px;top:0px;text-align:center;">
-					<img style="cursor:pointer;" src="img/largeicons/newjob.jpg" align="middle" alt="Start a new job" title="Start a new job (The button formerly known as EasyCall)" 
+					<img style="cursor:pointer;" src="img/newjob.jpg" align="middle" alt="Start a new job" title="Start a new job (The button formerly known as EasyCall)" 
 							onclick="window.location = 'jobwizard.php?new&jobtype=normal'"
-							onmouseover="this.src='img/largeicons/newjob_over.jpg'"
-							onmouseout="this.src='img/largeicons/newjob.jpg'" />
+							onmouseover="this.src='img/newjob_over.jpg'"
+							onmouseout="this.src='img/newjob.jpg'" />
 			<br />		
-					<img style="cursor:pointer;" src="img/largeicons/newemergency.jpg" align="middle" alt="Start a new job" title="Start a new emergency job" 
+					<img style="cursor:pointer;" src="img/newemergency.jpg" align="middle" alt="Start a new job" title="Start a new emergency job" 
 							onclick="window.location = 'jobwizard.php?new&jobtype=emergency'"
-							onmouseover="this.src='img/largeicons/newemergency_over.jpg'"
-							onmouseout="this.src='img/largeicons/newemergency.jpg'" />			
+							onmouseover="this.src='img/newemergency_over.jpg'"
+							onmouseout="this.src='img/newemergency.jpg'" />			
 			</div>
 <?			}
 			if ($USER->authorize("startstats")) {
@@ -500,35 +501,35 @@ include_once("nav.inc.php");
 <? 		
 			startWindow(_L('Recent Activity'));
 $activityfeed = '
-				<table width="100%" name="recentactivity">
+				<table width="100%" name="recentactivity" style="padding-top: 7px;">
 				<tr>
-					<td class="feed" style="width: 180px;vertical-align: top;font-size: 12px;font-weight: bold;" >
-					<div class="feedfilter">					
-						<a id="nonefilter" href="start.php?filter=none" onclick="applyfilter(\'none\'); return false;"><img src="img/largeicons/tiny20x20/globe.jpg">Show&nbsp;All</a><br />
-					</div>
-					<br />		
-					<h1 id="filterby">Filter By:</h1>
-					<div id="allfilters" class="feedfilter">	
-						<a id="jobsfilter" href="start.php?filter=jobs" onclick="applyfilter(\'jobs\'); $(\'jobsubfilters\').toggle(); return false;"><img src="img/largeicons/tiny20x20/ping.jpg">Jobs</a><br />
-						<div id="jobsubfilters" style="' . (in_array($filter,array("savedjobs","scheduledjobs","activejobs","completedjobs","repeatingjobs"))?"display:block":"display:none") . ';padding-left:20px;">	
-							<a id="savedjobsfilter" href="start.php?filter=savedjobs" onclick="applyfilter(\'savedjobs\'); return false;"><img src="img/largeicons/tiny20x20/folderandfiles.jpg">Saved</a><br />	
-							<a id="scheduledjobsfilter" href="start.php?filter=scheduledjobs" onclick="applyfilter(\'scheduledjobs\'); return false;"><img src="img/largeicons/tiny20x20/clock.jpg">Scheduled</a><br />	
-							<a id="activejobsfilter" href="start.php?filter=activejobs" onclick="applyfilter(\'activejobs\'); return false;"><img src="img/largeicons/tiny20x20/ping.jpg">Active</a><br />
-							<a id="completedjobsfilter" href="start.php?filter=completedjobs" onclick="applyfilter(\'completedjobs\'); return false;"><img src="img/largeicons/tiny20x20/checkedgreen.jpg">Completed</a><br />
-							<a id="repeatingjobsfilter" href="start.php?filter=repeatingjobs" onclick="applyfilter(\'repeatingjobs\'); return false;"><img src="img/largeicons/tiny20x20/calendar.jpg">Repeating</a><br />	
+					<td class="feed" style="width: 180px;vertical-align: top;font-size: 12px;" >
+						<div class="feedfilter">					
+							<a id="nonefilter" href="start.php?filter=none" onclick="applyfilter(\'none\'); return false;"><img src="img/largeicons/tiny20x20/globe.jpg">Show&nbsp;All</a><br />
 						</div>
-						<a id="messagesfilter" href="start.php?filter=messages" onclick="applyfilter(\'messages\');  $(\'messagessubfilters\').toggle(); return false;"><img src="img/largeicons/tiny20x20/letter.jpg">Messages</a><br />
-						<div id="messagessubfilters" style="' . (in_array($filter,array("phonemessages","emailmessages","smsmessages"))?"display:block":"display:none") . ';padding-left:20px;">	
-							<a id="phonemessagesfilter" href="start.php?filter=phonemessages" onclick="applyfilter(\'phonemessages\'); return false;"><img src="img/largeicons/tiny20x20/phonehandset.jpg">Phone</a><br />	
-							<a id="emailmessagesfilter" href="start.php?filter=emailmessages" onclick="applyfilter(\'emailmessages\'); return false;"><img src="img/largeicons/tiny20x20/email.jpg">Email</a><br />
-							<a id="smsmessagesfilter" href="start.php?filter=smsmessages" onclick="applyfilter(\'smsmessages\'); return false;"><img src="img/largeicons/tiny20x20/smschat.jpg">SMS</a><br />
+						<br />		
+						<h1 id="filterby">Filter By:</h1>
+						<div id="allfilters" class="feedfilter">	
+							<a id="jobsfilter" href="start.php?filter=jobs" onclick="applyfilter(\'jobs\'); $(\'jobsubfilters\').toggle(); return false;"><img src="img/largeicons/tiny20x20/ping.jpg">Jobs</a><br />
+							<div id="jobsubfilters" style="' . (in_array($filter,array("savedjobs","scheduledjobs","activejobs","completedjobs","repeatingjobs"))?"display:block":"display:none") . ';padding-left:20px;">	
+								<a id="savedjobsfilter" href="start.php?filter=savedjobs" onclick="applyfilter(\'savedjobs\'); return false;"><img src="img/largeicons/tiny20x20/folderandfiles.jpg">Saved</a><br />	
+								<a id="scheduledjobsfilter" href="start.php?filter=scheduledjobs" onclick="applyfilter(\'scheduledjobs\'); return false;"><img src="img/largeicons/tiny20x20/clock.jpg">Scheduled</a><br />	
+								<a id="activejobsfilter" href="start.php?filter=activejobs" onclick="applyfilter(\'activejobs\'); return false;"><img src="img/largeicons/tiny20x20/ping.jpg">Active</a><br />
+								<a id="completedjobsfilter" href="start.php?filter=completedjobs" onclick="applyfilter(\'completedjobs\'); return false;"><img src="img/largeicons/tiny20x20/checkedgreen.jpg">Completed</a><br />
+								<a id="repeatingjobsfilter" href="start.php?filter=repeatingjobs" onclick="applyfilter(\'repeatingjobs\'); return false;"><img src="img/largeicons/tiny20x20/calendar.jpg">Repeating</a><br />	
+							</div>
+							<a id="messagesfilter" href="start.php?filter=messages" onclick="applyfilter(\'messages\');  $(\'messagessubfilters\').toggle(); return false;"><img src="img/largeicons/tiny20x20/letter.jpg">Messages</a><br />
+							<div id="messagessubfilters" style="' . (in_array($filter,array("phonemessages","emailmessages","smsmessages"))?"display:block":"display:none") . ';padding-left:20px;">	
+								<a id="phonemessagesfilter" href="start.php?filter=phonemessages" onclick="applyfilter(\'phonemessages\'); return false;"><img src="img/largeicons/tiny20x20/phonehandset.jpg">Phone</a><br />	
+								<a id="emailmessagesfilter" href="start.php?filter=emailmessages" onclick="applyfilter(\'emailmessages\'); return false;"><img src="img/largeicons/tiny20x20/email.jpg">Email</a><br />
+								<a id="smsmessagesfilter" href="start.php?filter=smsmessages" onclick="applyfilter(\'smsmessages\'); return false;"><img src="img/largeicons/tiny20x20/smschat.jpg">SMS</a><br />
+							</div>
+							<a id="listsfilter" href="start.php?filter=lists" onclick="applyfilter(\'lists\'); return false;"><img src="img/largeicons/tiny20x20/addrbook.jpg">Lists</a><br />
+							<a id="savedreportsfilter" href="start.php?filter=savedreports" onclick="applyfilter(\'savedreports\'); return false;"><img src="img/largeicons/tiny20x20/savedreport.jpg">Reports</a><br />
+							<a id="systemmessagesfilter" href="start.php?filter=systemmessages" onclick="applyfilter(\'systemmessages\'); return false;"><img src="img/largeicons/tiny20x20/news.jpg">System&nbsp;Messages</a><br />		
 						</div>
-						<a id="listsfilter" href="start.php?filter=lists" onclick="applyfilter(\'lists\'); return false;"><img src="img/largeicons/tiny20x20/addrbook.jpg">Lists</a><br />
-						<a id="savedreportsfilter" href="start.php?filter=savedreports" onclick="applyfilter(\'savedreports\'); return false;"><img src="img/largeicons/tiny20x20/savedreport.jpg">Reports</a><br />
-						<a id="systemmessagesfilter" href="start.php?filter=systemmessages" onclick="applyfilter(\'systemmessages\'); return false;"><img src="img/largeicons/tiny20x20/news.jpg">System&nbsp;Messages</a><br />		
-					</div>
 					</td>
-					<td width="30px">&nbsp;</td>
+					<td width="10px" style="border-left: 1px dotted gray;" >&nbsp;</td>
 					<td class="feed" valign="top" >
 					<table id="feeditems">		
 				';	
