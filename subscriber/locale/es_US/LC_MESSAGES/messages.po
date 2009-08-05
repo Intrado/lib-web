@@ -446,7 +446,7 @@ msgstr "Mensajes"
 
 #: nav.inc.php:24
 msgid "Contact Info"
-msgstr "Informacion de Contacto"
+msgstr "Contacto"
 
 #: nav.inc.php:25
 msgid "My Account"
