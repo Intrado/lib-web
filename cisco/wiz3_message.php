@@ -8,7 +8,7 @@ if (!$USER->authorize('sendphone')) {
 }
 
 if(isset($_GET['list'])) {
-	$_SESSION['newjob']['list'] = $_GET['list'];
+	$_SESSION['newjob']['list'] = $_GET['list']+0;
 }
 
 if(isset($_GET['info'])) {
