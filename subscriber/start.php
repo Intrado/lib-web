@@ -104,9 +104,9 @@ function sender($row, $index){
 	if(in_array("email", $types)){
 		$message = DBFind("Message", "from message m where m.id = '" . DBSafe($row[8]) . "'");
 		$messagedata = sane_parsestr($message->data);
-		return "<a href='mailto:" . $messagedata['fromemail'] . "'>" . $messagedata['fromname'] . "</a>";
+		return "<a href='mailto:" . $messagedata['fromemail'] . "'>" . escapehtml($messagedata['fromname']) . "</a>";
 	} else {
-		return $row[5] . " " . $row[6];
+		return escapehtml($row[5]) . " " . escapehtml($row[6]);
 	}
 }
 
