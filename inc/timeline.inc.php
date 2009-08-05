@@ -85,7 +85,6 @@ foreach($jobs as $job) {
 		$startlocation = -2;
 		$leftborder = false; 
 		$width = ($endlocation / $rangewidth) + 2;
-		$extracontent .= '<img style="position:absolute;border:0px;top: 0px;left: 0px" src="img/timeline/_' . $job->status . 'left' . $jobtypes[$job->jobtypeid]->systempriority . '.gif" alt=""/>';
 	} else {
 		$startday = floor($startlocation/86400);
 		$width = ($endlocation - $startlocation) / $rangewidth;
@@ -148,15 +147,15 @@ $minhight = $minhight * $jobhight + $minhight*$jobspacing ;
 		<tr>
 			<td width="80px">
 			<a id="_backward" href="start.php?timelineday=<?= ($day-($range>0?$range*2:1)) ?>">
-				<img style"align: right;" src="img/timeline/arrowleft.gif"  alt="Backward" border="0"/>
+				<img style"align: right;" src="img/timelinearrowleft.gif"  alt="Backward" border="0"/>
 			</a>
 			</td>
 			
 			<td width="100%">&nbsp;
 				
 		<div id="canvas" style="height:<? echo $minhight ?>px;"> 
-			<img class="canvasleft" src="img/timeline/canvasleft.gif"  alt=""  width="2%" height="100%"/>
-			<img class="canvasright" src="img/timeline/canvasright.gif" alt="" width="2%" height="100%"/>
+			<img class="canvasleft" src="img/timelineleft.gif"  alt=""  width="2%" height="100%"/>
+			<img class="canvasright" src="img/timelineright.gif" alt="" width="2%" height="100%"/>
 			<div class="daylineend" style="left: 0%;"></div>
 			
 			<?
@@ -186,7 +185,7 @@ $minhight = $minhight * $jobhight + $minhight*$jobspacing ;
 			</td>
 			<td width="80px">	
 				<a id="_forward" href="start.php?timelineday=<?= ($day + ($range>0?$range*2:1)) ?>">
-					<img  src="img/timeline/arrowright.gif"  alt="Forward" border="0"/>
+					<img  src="img/timelinearrowright.gif"  alt="Forward" border="0"/>
 				</a>
 			</td>
 		</tr>
