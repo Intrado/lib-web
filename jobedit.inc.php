@@ -1568,18 +1568,6 @@ document.observe('dom:loaded', function() {
 	}
 <?  } ?>
 
-	function limit_chars(field) {
-		if (field.value.length > 160)
-			field.value = field.value.substring(0,160);
-		var remaining = 160 - field.value.length;
-		if (remaining <= 0)
-			$('charsleft').update("<b style='color:red;'>0</b>");
-		else if (remaining <= 20)
-			$('charsleft').update("<b style='color:orange;'>" + remaining + "</b>");
-		else
-			$('charsleft').update(remaining);
-	}
-
 	//Loading Message View
 	for(var i=0;i<types.length;i++){
 		if (!$(types[i] + 'select'))
@@ -1597,6 +1585,18 @@ document.observe('dom:loaded', function() {
 		}
 	}
 });
+
+function limit_chars(field) {
+	if (field.value.length > 160)
+		field.value = field.value.substring(0,160);
+	var remaining = 160 - field.value.length;
+	if (remaining <= 0)
+		$('charsleft').update("<b style='color:red;'>0</b>");
+	else if (remaining <= 20)
+		$('charsleft').update("<b style='color:orange;'>" + remaining + "</b>");
+	else
+		$('charsleft').update(remaining);
+}
 
 /*
 	Function to show the date in page text
