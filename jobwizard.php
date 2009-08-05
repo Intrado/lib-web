@@ -568,7 +568,7 @@ require_once("nav.inc.php");
 </script>
 <?
 
-startWindow("MessageMaker");
+startWindow("MessageSender");
 echo $wizard->render();
 endWindow();
 if (isset($_SESSION['wizard_job']['debug']) && $_SESSION['wizard_job']['debug']) {
