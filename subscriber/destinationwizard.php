@@ -53,9 +53,9 @@ class DestWiz_whattype extends WizStep {
 		if (isset($available['phone']))
 			$values["phone"] = _L("Phone Call");
 		if (isset($available['phone']) && isset($available['sms']))
-			$values["both"] = _L("Phone Call and Text Message");
+			$values["both"] = _L("Phone Call and SMS Text");
 		if (isset($available['sms']))
-			$values["text"] = _L("Text Message");
+			$values["text"] = _L("SMS Text");
 		if (isset($available['email']))
 			$values["email"] = _L("Email");
 		
@@ -157,7 +157,7 @@ $wizdata = array(
 	"collectdata" => new DestWiz_collectdata(_L("Enter Contact Info"))
 	);
 
-$wizard = new Wizard("destwiz", $wizdata, new FinishDestWizard("Activate"));
+$wizard = new Wizard("destwiz", $wizdata, new FinishDestWizard(_L("Activate")));
 $wizard->doneurl = "notificationpreferences.php";
 $wizard->handleRequest();
 

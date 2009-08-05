@@ -176,7 +176,7 @@ startWindow(_L('User Information'));
 						<td colspan="2"><? NewFormItem($f,$s, 'notifysms', 'checkbox', null, "", "id=\"smscheck\" onclick=\"document.getElementById('smsbox').disabled=!this.checked\""); ?>&nbsp;<?=_L("Text me when I have a new phone message.")?></td>
 					</tr>
 					<tr>
-						<td align="right"><?=_L("Mobile Phone for Text Messaging")?>:</td>
+						<td align="right"><?=_L("Mobile Phone for SMS Text")?>:</td>
 						<td><? NewFormItem($f,$s, 'sms', 'text', 20, 20, "id=\"smsbox\" ". ($notifysms ? "" : "disabled=\"true\"")); ?></td>
 					</tr>
 

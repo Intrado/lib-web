@@ -103,7 +103,7 @@ foreach ($smsList as $sms) {
 	$dest->id = $sms->sequence;
 	$dest->tablename = "sms";
 	$dest->name = Phone::format($sms->sms);
-	$dest->type = _L("Text");
+	$dest->type = _L("SMS Text");
 	$dest->status = $STATUS_ACTIVE;
 	$dest->nodelete = false;
 	$destinations[] = $dest;
@@ -120,7 +120,7 @@ foreach ($pendingList as $p) {
 		$dest->type = _L("Email");
 	} else if ($p->type == 'sms') {
 		$dest->name = Phone::format($p->value);
-		$dest->type = _L("Text");
+		$dest->type = _L("SMS Text");
 	} else {
 		error_log("bad subscriberpending record, id ".$p->id);
 	}

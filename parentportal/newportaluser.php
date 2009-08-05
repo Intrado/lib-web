@@ -177,7 +177,7 @@ if(!$success){
 				<td colspan="2"><input type="checkbox" name="notifysms" value="1" <?=$notifysms ? "checked" : "" ?> onclick="document.getElementById('smsbox').disabled=!this.checked"/>&nbsp;<?=_L("Text me when I have a new phone message.")?></td>
 			</tr>
 			<tr>
-				<td><?=_L("Mobile Phone for Text Messaging")?>:</td>
+				<td><?=_L("Mobile Phone for SMS Text")?>:</td>
 				<td><input type="text" name="sms" id="smsbox" value="<?=Phone::format($sms)?>" size="20" maxlength="20" <?=$notifysms ? "" : "disabled=\"true\"" ?>/></td>
 			</tr>
 			<tr>
