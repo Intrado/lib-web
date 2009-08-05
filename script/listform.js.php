@@ -303,7 +303,6 @@ function listform_load_lists(listidsJSON) {
 						var tr = this.up('tr');
 						new Tip (tr, listformPreviewCache[listid], {
 				        	style: "protogrey",
-				        	delay: 0.2,
 				        	hideOthers:true,
 				        	hook:{target:"bottomLeft",tip:"topRight"},
 				        	offset:{x:0,y:0},
@@ -392,7 +391,6 @@ function listform_hover_existing_list(nullableEvent, listid, tr) {
 		Tips.hideAll();
 		new Tip (targetElement, $('listchooseTotalsContainer').innerHTML, {
 			style: "protogrey",
-			delay: 0.2,
 			hideOthers: true,
 			hook: hookPreference,
 			offset:{x:0,y:0},
