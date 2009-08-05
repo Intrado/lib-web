@@ -166,15 +166,15 @@ if (isset($renderedlist) && $renderedlist->totalremoved > 0) {
 }
 
 $advancedtools = '';
-$advancedtools .= '<tr><td>'.submit_button(_L('Search Contacts'),'search').'</td><td>'._L('Search for contacts in the database').'</td></tr>';
-$advancedtools .= '<tr><td>'.submit_button(_L('Enter Contacts'),'manualAdd').'</td><td>'._L('Manually add new contacts').'</td></tr>';
-$advancedtools .= '<tr><td>'.submit_button(_L('Open Address Book'),'addressBookAdd').'</td><td>'._L('Choose contacts from your address book').'</td></tr>';
+$advancedtools .= '<tr><td class="border">'.submit_button(_L('Search Contacts'),'search').'</td><td class="border">'._L('Search for contacts in the database').'</td></tr>';
+$advancedtools .= '<tr><td class="border">'.submit_button(_L('Enter Contacts'),'manualAdd').'</td><td class="border">'._L('Manually add new contacts').'</td></tr>';
+$advancedtools .= '<tr><td class="border">'.submit_button(_L('Open Address Book'),'addressBookAdd').'</td><td class="border">'._L('Choose contacts from your address book').'</td></tr>';
 if ($USER->authorize('listuploadids') || $USER->authorize('listuploadcontacts'))
-	$advancedtools .= '<tr><td>'.submit_button(_L('Upload List'),'uploadList').'</td><td>'._L('Upload a list of contacts using a CSV file').'</td></tr>';
+	$advancedtools .= '<tr><td class="border">'.submit_button(_L('Upload List'),'uploadList').'</td><td class="border">'._L('Upload a list of contacts using a CSV file').'</td></tr>';
 $formdata[] = _L('Advanced List Tools');
 $formdata["advancedtools"] = array(
 	"label" => '',
-	"control" => array("FormHtml", 'html' => "<table>$advancedtools</table>"),
+	"control" => array("FormHtml", 'html' => "<table style='border-collapse:collapse'>$advancedtools</table>"),
 	"helpstep" => 3
 );
 
