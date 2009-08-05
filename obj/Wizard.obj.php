@@ -206,7 +206,7 @@ class Wizard {
 	}
 	function render() {
 		$stepdata = $this->getStepData();
-		$navhtml = '<div class="wiznavcontainer"><h4>Wizard Progress</h4>' . $this->_renderNav($this->wizdata) . '</div>';
+		$navhtml = '<div class="wiznavcontainer"><h4>Progress</h4>' . $this->_renderNav($this->wizdata) . '</div>';
 		
 		
 		if ($stepdata instanceof WizStep)
