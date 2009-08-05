@@ -111,11 +111,11 @@ if($reloadform){
 	for($i=0; $i<$max; $i++){
 		$label = fetch_labels($type, $i, true);
 		if(in_array($label, $presetlabels)){
-			PutFormData($f, $s, $type . $i, $label, "text");
-			PutFormData($f, $s, $type . $i . "other", "", "text");
+			PutFormData($f, $s, $type . $i, $label, "alphanumeric");
+			PutFormData($f, $s, $type . $i . "other", "", "alphanumeric");
 		} else {
-			PutFormData($f, $s, $type . $i, "other", "text");
-			PutFormData($f, $s, $type . $i . "other", $label, "text");
+			PutFormData($f, $s, $type . $i, "other", "alphanumeric");
+			PutFormData($f, $s, $type . $i . "other", $label, "alphanumeric");
 		}
 		$notes = QuickQuery("select notes from destlabel where type = '" . $type . "' and sequence = " . $i);
 		PutFormData($f, $s, $type . $i . "notes", $notes, "text", 0, 255);
