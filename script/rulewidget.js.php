@@ -16,13 +16,14 @@ header("Cache-Control: private");
 //ruleWidget.container.observe('RuleWidget:AddRule',..);
 //ruleWidget.container.observe('RuleWidget:InColumn',..);
 //ruleWidget.container.observe('RuleWidget:ChangeField',..);
+//ruleWidget.container.observe('RuleWidget:RemoveAllRules',..);
 //ruleWidget.startup(); // Required, must be called AFTER registering ruleWidget.container.observe('RuleWidget:Ready',..)
 
 var RuleWidget = Class.create({
 	//----------------------------- PUBLIC FUNCTIONS --------------------------
 
 	// @param container, the DOM container for this widget.
-	initialize: function(container, readonly, allowedFields) {
+	initialize: function(container, readonly, allowedFields, showRemoveAllButton) {
 		this.ruleEditorGuideContents = <?=json_encode(array(
 			// Fieldmap
 			'additionalChooseFieldmap' => _L('To add another filter rule select a field'), // Used instead of 'chooseFieldmap' if there are existing rules
@@ -76,9 +77,11 @@ var RuleWidget = Class.create({
 														
 		this.rulesTableAboveEditor = new Element('tr'); // Right on top of rulesTableFootLastTR
 		this.rulesTableFootLastTR = new Element('tr'); // For rule editor
+		this.rulesTableHead = new Element('thead');
 		this.rulesTableBody = new Element('tbody');
 		this.container
 			.insert(new Element('table', {'style':'margin-bottom:10px'})
+				.insert(this.rulesTableHead)
 				.insert(this.rulesTableBody)
 				.insert(new Element('tfoot')
 					.insert(this.rulesTableAboveEditor)
@@ -90,6 +93,16 @@ var RuleWidget = Class.create({
 					.insert(this.rulesTableFootLastTR)
 				)
 			);
+		
+		if (showRemoveAllButton) {
+			var removeAllButtonHtml = '<div style="float:right">' + '<?=addslashes(icon_button(_L('Remove\'s All Rules'),'diagona/16/101'))?>' + '</div><span style="clear:both"></span>';
+			var td = new Element('td', {'colspan':'100'}).update(removeAllButtonHtml);
+			var button = td.down('button');
+			button.observe('click', function(event) {
+				this.container.fire('RuleWidget:RemoveAllRules');
+			}.bindAsEventListener(this));
+			this.rulesTableHead.insert(new Element('tr').insert(td));
+		}
 		
 		if (!readonly)
 			this.ruleEditor = new RuleEditor(this, this.rulesTableFootLastTR);

@@ -133,30 +133,26 @@ $formdata = array(
 );
 
 $formdata[] = _L('List Content');
-$formdata["clearrules"] = array(
-	"label" => _L('List Rules'),
-	"control" => array("FormHtml", 'html' => submit_button(_L('Clear Rules'),'clearrules','tick')),
-	"helpstep" => 2
-);
+
 $formdata["ruledelete"] = array(
 	"value" => "",
 	"control" => array("HiddenField")
 );
 $formdata["newrule"] = array(
-	"label" => _L(''),
+	"label" => _L('List Rules'),
 	"fieldhelp" => _L('Use rules to select groups of contacts from the data available to your account.'),
 	"value" => $rulesjson,
 	"validators" => array(
 		array("ValRules")
 	),
-	"control" => array("FormRuleWidget"),
+	"control" => array("FormRuleWidget", "showRemoveAllButton" => !empty($rules)),
 	"helpstep" => 2
 );
 
 if (isset($renderedlist) && $renderedlist->totaladded > 0) {
 	$formdata["additions"] = array(
 		"label" => _L('Additions'),
-		"control" => array("FormHtml", 'html' => submit_button(_L('Clear Additions'),'clearadditions','tick') .  "<div id='listAdditionsContainer' style='clear:both;margin:0; padding:0'></div>"),
+		"control" => array("FormHtml", 'html' => '<div style="float:right">' . submit_button(_L('Remove All Additions'),'clearadditions','diagona/16/101') .  "</div><div id='listAdditionsContainer' style='clear:both;margin:0; padding:0'></div>"),
 		"helpstep" => 2
 	);
 }
@@ -164,17 +160,17 @@ if (isset($renderedlist) && $renderedlist->totaladded > 0) {
 if (isset($renderedlist) && $renderedlist->totalremoved > 0) {
 	$formdata["skips"] = array(
 		"label" => _L('Skips'),
-		"control" => array("FormHtml", 'html' => submit_button(_L('Clear Skips'),'clearskips','tick') . "<div id='listSkipsContainer' style='clear:both;margin:0;padding:0'></div>"),
+		"control" => array("FormHtml", 'html' => '<div style="float:right">' . submit_button(_L('Remove All Skips'),'clearskips','diagona/16/101') . "</div><div id='listSkipsContainer' style='clear:both;margin:0;padding:0'></div>"),
 		"helpstep" => 2
 	);
 }
 
 $advancedtools = '';
-$advancedtools .= '<tr><td>'.submit_button(_L('Search Contacts'),'search','tick').'</td><td>'._L('Search for contacts in the database').'</td></tr>';
-$advancedtools .= '<tr><td>'.submit_button(_L('Enter Contacts'),'manualAdd','tick').'</td><td>'._L('Manually add new contacts').'</td></tr>';
-$advancedtools .= '<tr><td>'.submit_button(_L('Open Address Book'),'addressBookAdd','tick').'</td><td>'._L('Choose contacts from your address book').'</td></tr>';
+$advancedtools .= '<tr><td>'.submit_button(_L('Search Contacts'),'search').'</td><td>'._L('Search for contacts in the database').'</td></tr>';
+$advancedtools .= '<tr><td>'.submit_button(_L('Enter Contacts'),'manualAdd').'</td><td>'._L('Manually add new contacts').'</td></tr>';
+$advancedtools .= '<tr><td>'.submit_button(_L('Open Address Book'),'addressBookAdd').'</td><td>'._L('Choose contacts from your address book').'</td></tr>';
 if ($USER->authorize('listuploadids') || $USER->authorize('listuploadcontacts'))
-	$advancedtools .= '<tr><td>'.submit_button(_L('Upload List'),'uploadList','tick').'</td><td>'._L('Upload a list of contacts using a CSV file').'</td></tr>';
+	$advancedtools .= '<tr><td>'.submit_button(_L('Upload List'),'uploadList').'</td><td>'._L('Upload a list of contacts using a CSV file').'</td></tr>';
 $formdata[] = _L('Advanced List Tools');
 $formdata["advancedtools"] = array(
 	"label" => '',
@@ -338,6 +334,7 @@ endWindow();
 		ruleWidget.delayActions = true;
 		ruleWidget.container.observe('RuleWidget:AddRule', list_add_rule);
 		ruleWidget.container.observe('RuleWidget:DeleteRule', list_delete_rule);
+		ruleWidget.container.observe('RuleWidget:RemoveAllRules', list_clear_rules);
 		
 		<?php if (isset($renderedlist)) { ?>
 			if ($('listAdditionsContainer'))
@@ -354,6 +351,9 @@ endWindow();
 	function list_delete_rule(event) {
 		$('list_ruledelete').value = event.memo.fieldnum;
 		form_submit(event, 'deleterule');
+	}
+	function list_clear_rules(event) {
+		form_submit(event, 'clearrules');
 	}
 </script>
 <?
