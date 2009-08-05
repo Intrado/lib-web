@@ -8,7 +8,7 @@ function welcomemessage($hassubscriber, $hascallback, $hasphoneactivation, $disp
 ?>
 <voice>
 	<message name="welcome">
-		<tts gender="female" language="english">Welcome to the School Messenger Notification System for -- <?=$displayname?>.</tts>
+		<tts gender="female" language="english">Welcome to the School Messenger Notification System for -- <?=escapehtml($displayname)?>.</tts>
 		<goto message="choose" />
 	</message>
 	<message name="choose">
