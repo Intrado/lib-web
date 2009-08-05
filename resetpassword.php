@@ -76,7 +76,7 @@ if($success){
 		<tr>
 			<td>&nbsp;</td>
 			<td>
-				<div style="margin:5px">
+				<div style="padding:5px">
 					Thank you, your account has been activated.
 					<br>You will be redirected to the main page in 10 seconds or <a href="index.php">Click Here.</a>
 				</div>
@@ -90,9 +90,9 @@ if($success){
 if($form){
 ?>
 	<form method="POST" action="?f" name="activate">
-		<table width="100%" style="color: #<?=$primary?>; font-size: 12px;" >
+		<div><table width="100%" style="color: #<?=$primary?>; font-size: 12px;padding-left: 25px;" >
 			<tr>
-				<td colspan="2"><div style="font-size: 20px; font-weight: bold; text-align: left;"><?=$TITLE?></div></td>
+				<td colspan="2"><h1 style="font-size: 20px; "><?=$TITLE?></h1></td>
 			</tr>
 			<tr>
 				<td colspan="2">You should receive an email containing a confirmation code shortly.  Please enter the confirmation code below along with your new password.  Passwords must be 5 characters in length and cannot be similar to your first name, last name, or email address.  If you do not receive the email, please contact your System Administrator or call support for assistance.<br><br></td>
@@ -100,26 +100,26 @@ if($form){
 
 			<tr>
 				<td>Confirmation Code: </td>
-				<td><input type="text" name="token" value="<?=escapehtml($token)?>" size="35" /></td>
+				<td><input type="text" name="token" value="<?=escapehtml($token)?>" size="20" /></td>
 			</tr>
 
 			<tr>
 				<td>New Password:</td>
-				<td><input type="password" name="password1"  size="35" maxlength="50" /></td>
+				<td><input type="password" name="password1"  size="20" maxlength="50" /></td>
 			</tr>
 			<tr>
 				<td>Confirm Password:</td>
-				<td><input type="password" name="password2"  size="35" maxlength="50" /></td>
+				<td><input type="password" name="password2"  size="20" maxlength="50" /></td>
 			</tr>
 			<tr>
 				<td>&nbsp;</td>
-				<td><div><input type="image" src="img/submit.gif" onmouseover="this.src='img/submit_over.gif';" onmouseout="this.src='img/submit.gif';"></div></td>
+				<td><div><input type="submit" name="submit" value="Continue"</div></td>
 			</tr>
 			<tr>
 				<td>&nbsp;</td>
 				<td><a href="index.php">Return to Sign In</a></td>
 			</tr>
-		</table>
+		</table></div>
 	</form>
 <?
 }

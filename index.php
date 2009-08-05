@@ -149,47 +149,40 @@ if ($IS_COMMSUITE) {
 	<form action="index.php" method="POST">
 
 <? if ($custname) { ?>
-	
-		<table width="100%" style="color: #<?=$primary?>; text-align: right; ">
-			<tr>
+
+	<div style="margin-top: 50px; margin-left: 25px;">
+
 
 <? if ($badlogin) { ?>
-				<td width="100%" style="font-size: 12px; font-weight: bold; color: red;"><?=_L("Incorrect username/password. Please try again.")?></td>
+		<div style="font-size: 12px; font-weight: bold; color: red;"><?=_L("Incorrect username/password. Please try again.")?>
+		</div>
 <? } else if ($softlock) { ?>
-				<td width="100%" style="font-size: 12px; font-weight: bold; color: red;"><?=_L("You are temporarily locked out of the system.  Please contact your System Administrator if you have forgotten your password and try again later.")?></td>
-<? } else { ?>
-				<td width="100%">&nbsp;</td>
-<? } ?>
-				<td><img src="img/spacer.gif" width="25"></td>
-			</tr>
-		</table>
+		<div style="font-size: 12px; font-weight: bold; color: red;"><?=_L("You are temporarily locked out of the system.  Please contact your System Administrator if you have forgotten your password and try again later.")?></div>
+<? }  ?>
+		
+		<label class="indexform"><?=_L("Login:")?><br>
+		<input type="text" name="login" size="20" id="logintext">
+		</label>
+		
+		<br>
 
-		<div><table width="100%" style="color: #<?=$primary?>;" >
-			<tr>
-				<td width="20%">&nbsp;</td>
-				<td style="font-size: 12px;"><div style="margin-left: 50px;"><?=_L("Login:")?><br><input type="text" name="login" size="35" id="logintext"></div></td>
-				<td width="80%">&nbsp;</td>
-			</tr>
-			<tr>
-				<td>&nbsp;</td>
-				<td style="font-size: 12px;"><div style="margin-left: 50px;"><?=_L("Password:")?><br><input type="password" name="password" size="35" onkeypress="capslockCheck(event)"></div></td>
-				<td style="font-size: 12px;" align="left"><a href="forgotpassword.php"><?=_L("Forgot your password? Click Here")?></a></td>
-			</tr>
-			<tr>
-				<td>&nbsp;</td>
-				<td style="font-size: 12px;"><br><div id="capslockwarning"  style="padding-left:3px; float:right; display:none; color:red;"><?=_L("Warning! Your Caps Lock key is on.")?></div></td>
-				<td>&nbsp;</td>
-			</tr>
-			<tr>
-				<td>&nbsp;</td>
-				<td><div style="text-align: right;"><input type="image" src="img/themes/<?=$scheme['_brandtheme']?>/b1_signin_dark.gif" onmouseover="this.src='img/themes/<?=$scheme['_brandtheme']?>/b2_signin_dark.gif';" onmouseout="this.src='img/themes/<?=$scheme['_brandtheme']?>/b1_signin_dark.gif';"></div></td>
-				<td>&nbsp;</td>
-			</tr>
-			<tr>
-				<td>&nbsp;</td>
-				<td colspan="2" style="font-size: 9px; font-style: italic;"><div style="margin-left: 50px;"><?=_L("Usernames and passwords are case-sensitive.")?></div></td>
-			</tr>
-		</table>
+
+		<label class="indexform"><?=_L("Password:")?><br>
+		<input type="password" name="password" size="20" onkeypress="capslockCheck(event)">
+		</label>
+		<div id="capslockwarning"  style="padding-left:3px; display:none; color:red;"><?=_L("Warning! Your Caps Lock key is on.")?><br></div>
+
+		<br>
+		
+		<input type="submit" name="Submit" value="Sign In">
+
+
+
+		<div style="margin-left: 50px; font-size: 9px; font-style: italic;"><?=_L("Usernames and passwords are case-sensitive.")?></div>
+
+		<br><div style="font-size: 10pt;"><a href="forgotpassword.php"><?=_L("Forgot your password? Click Here")?></a><br></div>
+	</div>
+
 <? } else { ?>
 		<div width="100%" style="font-size: 16px; font-weight: bold; color: red;">&nbsp;&nbsp;<?=_L("Invalid customer URL. Please check the web address and try again.")?></div>
 <? }?>

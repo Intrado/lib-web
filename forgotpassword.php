@@ -49,35 +49,30 @@ $TITLE = "Password Assistance";
 include_once("logintop.inc.php");
 if(!$success){
 	?>
+		<div style="padding-top: 10px; padding-left: 25px; color: #<?=$primary?>">
+			<h1 style="font-size: 20px; "><?=$TITLE?></h1>
+			<p>To begin the password reset process, enter your username.</p>
 			<form method="POST" action="forgotpassword.php" name="forgotpassword">
-				<table width="100%" style="color: #<?=$primary?>; font-size: 12px;" >
-					<tr>
-						<td colspan="2"><div style="font-size: 20px; font-weight: bold; text-align: left;"><?=$TITLE?></div></td>
-					</tr>
-					<tr>
-						<td colspan="2">To begin the password reset process, enter your username.<BR><BR></td>
-					</tr>
-					<tr>
-						<td>Username:</td>
-						<td><input type="text" name="username1" size="50" maxlength="255" value="<?=escapehtml($username1)?>"></td>
-					</tr>
-					<tr>
-						<td>Confirm Username:</td>
-						<td><input type="text" name="username2" size="50" maxlength="255" value="<?=escapehtml($username2)?>"></td>
-					</tr>
-					<tr>
-						<td>&nbsp;</td>
-						<td><div><input type="image" src="img/submit.gif" onmouseover="this.src='img/submit_over.gif';" onmouseout="this.src='img/submit.gif';"></div></td>
-					</tr>
-					<tr>
-						<td>&nbsp;</td>
-						<td><br><a href="index.php">Return to Login</a></td>
-					</tr>
-				</table>
+			
+			<label class="indexform"><?=_L("Username:")?><br>
+			<input type="text" name="username1" size="20" alue="<?=escapehtml($username1)?>">
+			</label><br>
+
+			<label class="indexform"><?=_L("Confirm Username:")?><br>
+			<input type="text" name="username2" size="20" alue="<?=escapehtml($username2)?>">
+			</label><br>
+
+			<input type="submit" name="submit" value="Send Password Reset Email"><br>
+			
+			<br><a href="index.php">Return to Login Page</a>
+
 			</form>
+		</div>
 <?
 } else {
 ?>
+	<div style="margin-top: 50px; margin-left: 25px;">
+
 	<table  style="color: #365F8D;" >
 		<tr>
 			<td>&nbsp;</td>
@@ -90,6 +85,7 @@ if(!$success){
 			</td>
 		</tr>
 	</table>
+</div>
 <?
 }
 include_once("loginbottom.inc.php");
