@@ -161,7 +161,7 @@ function activityfeed($mergeditems,$ajax = false) {
 	if(empty($mergeditems)) {
 		if(!$ajax)
 			$activityfeed .= '		<tr>
-									<td valign="top" width="60px"><img src="img/icons/information.gif" /></td>
+									<td valign="top" width="60px"><img src="largeicons/information.jpg" /></td>
 									<td >
 											<div class="feedtitle">
 												<a href="">	
@@ -173,7 +173,7 @@ function activityfeed($mergeditems,$ajax = false) {
 			$activityfeed[] = array("itemid" => "",
 										"defaultlink" => "",
 										"defaultonclick" => "",
-										"icon" => "icons/information.gif",
+										"icon" => "largeicons/information.jpg",
 										"title" => _L("No Recent Items."),
 										"content" => "",
 										"tools" => "");
