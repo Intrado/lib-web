@@ -470,13 +470,21 @@ class FinishJobWizard extends WizFinish {
 						$newmessage->stuffHeaders();
 						$newmessage->create();
 						
+						/* This chunk parses the message contents and stuffs it in message parts. It is commented out and replaced by the next code that just stuffs all the text into one message part.
 						$parts = $newmessage->parse($message["text"]);
 						foreach ($parts as $part) {
 							$part->voiceid = $voiceid;
 							$part->messageid = $newmessage->id;
 							$part->create();
-						}
-						
+						}*/
+						$part = new MessagePart();
+						$part->messageid = $newmessage->id;
+						$part->type = "T";
+						$part->txt = $message["text"];
+						$part->voiceid = $voiceid;
+						$part->sequence = 0;
+						$part->create();
+							
 						if (isset($message['attachments']) && $message['attachments']) {
 							foreach ($message['attachments'] as $cid => $details) {
 								$msgattachment = new MessageAttachment();
