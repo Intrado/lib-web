@@ -354,10 +354,10 @@ var RuleEditor = Class.create({
 		this.valueTD = new Element('td',{'style':'', 'valign':'top'});
 		this.actionTD = new Element('td',{'style':'clear:both;', 'valign':'top'});
 		if (!this.ruleWidget.noHelper) {
-			this.fieldTD.update('<span style="font-style:italic; font-weight: bold;"><?=addslashes(_L('Field'))?></span>');
-			this.criteriaTD.update('<span style="font-style:italic; display:none; font-weight: bold;"><?=addslashes(_L('Criteria'))?></span>');
-			this.valueTD.update('<span style="font-style:italic; display:none; font-weight: bold;"><?=addslashes(_L('Value'))?></span>');
-			this.actionTD.update('<span style="font-style:italic; display:none; font-weight: bold;">&nbsp;</span>');
+			this.fieldTD.update('<span style="cursor:help; font-style:italic; font-weight: bold;"><?=addslashes(_L('Field'))?></span>');
+			this.criteriaTD.update('<span style="cursor:help; font-style:italic; display:none; font-weight: bold;"><?=addslashes(_L('Criteria'))?></span>');
+			this.valueTD.update('<span style="cursor:help; font-style:italic; display:none; font-weight: bold;"><?=addslashes(_L('Value'))?></span>');
+			this.actionTD.update('<span style="cursor:help; font-style:italic; display:none; font-weight: bold;">&nbsp;</span>');
 		}
 		
 		var fieldsetCSS = 'padding:3px; margin:0px; border: solid 3px rgb(150,150,255)';
