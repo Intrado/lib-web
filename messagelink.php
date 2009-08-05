@@ -35,6 +35,7 @@ $customer = ($messageinfo)?getSystemSetting("displayname"):"Not Found";
 $job = new Job($messageinfo['jobid']+0);
 $jobname = $job->name;
 $jobdescription = $job->description;
+$jobstarttime = strtotime($job->starttime);
 
 $TITLE = $customer;
 ?>
@@ -87,12 +88,13 @@ if (!$messageinfo) {
 <?
 } else {
 ?>
-	<div style="margin: 10px; padding: 5px; float: left; border: 1px solid #3e693f">
+	<div style="margin: 10px; margin-top: 15px; padding: 5px; float: left; border: 1px solid #3e693f">
+		Phone Message: <?=date('m/d/Y g:i a', $jobstarttime)?><br>
 		<div style="font-size: 20px; margin-bottom: 5px"><?=$customer?></div>
 		<div style="font-size: 16px; margin-bottom: 2px"><?=$jobname?></div>
 		<div style="font-size: 12px">&nbsp;&nbsp;<?=$jobdescription?></div>
 	</div>
-	<div style="margin:5px">
+	<div style="margin:10px; clear:both;">
 		<OBJECT ID="MediaPlayer" WIDTH=320 HEIGHT=42
 		CLASSID="CLSID:22D6F312-B0F6-11D0-94AB-0080C74C7E95"
 		STANDBY="Loading Windows Media Player components..."
@@ -102,6 +104,7 @@ if (!$messageinfo) {
 		<param name="controller" value="true">
 		<EMBED SRC="messagelink_preview.wav.php?jobcode=<?=$code?>" AUTOSTART="TRUE"></EMBED>
 		</OBJECT>
+		<br><a href="messagelink_preview.wav.php/message.wav?jobcode=<?=$code?>">Click Here</a>
 	</div>
 <?
 }
