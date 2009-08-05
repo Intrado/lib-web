@@ -281,7 +281,7 @@ class ValEasycall extends Validator {
 		if (!$USER->authorize("starteasy"))
 			return "$this->label "._L("is not allowed for this user account");
 		$values = json_decode($value);
-		if (count($values) < 1)
+		if ($value == "{}")
 			return "$this->label "._L("has messages that are not recorded");
 		foreach ($values as $lang => $message)
 			$msg = new Message($message+0);
@@ -656,28 +656,14 @@ class JobWiz_messageSelect extends WizStep {
 
 		if ($USER->authorize("sendsms") && in_array('sms',$postdata['/message/pick']['type'])) {
 			$formdata["sms"] = array(
-				"label" => _L("SMS Message"),
+				"label" => _L("SMS Text"),
+				"fieldhelp" => _L("Contains the different ways you can create or reuse an SMS Text."),
 				"value" => "",
 				"validators" => array(
 					array("ValRequired"),
 					array("ValHasMessage","type"=>"sms")
 				),
 				"control" => array("RadioButton","values"=>$values),
-				"helpstep" => 1
-			);
-		}
-
-		if ($USER->authorize("sendmessage") && in_array('print',$postdata['/message/pick']['type'])) {
-			$formdata["sms"] = array(
-				"label" => _L("SMS Message"),
-				"value" => "",
-				"validators" => array(
-					array("ValRequired"),
-					array("ValHasMessage","type"=>"print")
-				),
-				"control" => array("RadioButton","values"=>array(
-					"text"=>_L("Type A Message"), 
-					"pick"=>_L("Select Saved Message"))),
 				"helpstep" => 1
 			);
 		}
