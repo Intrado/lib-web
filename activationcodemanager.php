@@ -49,7 +49,7 @@ if (!getSystemSetting("_hasportal", false) || !$USER->authorize('portalaccess'))
 ////////////////////////////////////////////////////////////////////////////////
 // Action/Request Processing
 ////////////////////////////////////////////////////////////////////////////////
-$fields = FieldMap::getOptionalAuthorizedFieldMaps() + FieldMap::getOptionalAuthorizedFieldMapsLike('g');
+$fields = FieldMap::getOptionalAuthorizedFieldMaps();// + FieldMap::getOptionalAuthorizedFieldMapsLike('g');
 $generateBulkTokens = $USER->authorize('generatebulktokens');
 
 if (isset($_GET['clear']) && $_GET['clear']) {
@@ -280,7 +280,7 @@ if ($reportgenerator->format == "csv") {
 	startWindow("Contact Search", "padding: 3px;");
 	
 	echo "<div id='metadataTempDiv' style='display:none'>";
-		select_metadata("$('searchresults')", 5, $fields);
+		select_metadata("$('portalresults')", 5, $fields);
 	echo "</div>";
 	
 	?>
