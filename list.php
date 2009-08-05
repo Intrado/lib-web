@@ -152,7 +152,7 @@ $formdata["newrule"] = array(
 if (isset($renderedlist) && $renderedlist->totaladded > 0) {
 	$formdata["additions"] = array(
 		"label" => _L('Additions'),
-		"control" => array("FormHtml", 'html' => '<div style="float:right">' . submit_button(_L('Remove All Additions'),'clearadditions','diagona/16/101') .  "</div><div id='listAdditionsContainer' style='clear:both;margin:0; padding:0'></div>"),
+		"control" => array("FormHtml", 'html' => '<div style="float:right; margin-left:10px;">' . submit_button(_L('Remove All Additions'),'clearadditions','diagona/16/101') .  "</div><div id='listAdditionsContainer' style='margin:0; margin-bottom:10px; padding:0'></div>"),
 		"helpstep" => 2
 	);
 }
@@ -160,7 +160,7 @@ if (isset($renderedlist) && $renderedlist->totaladded > 0) {
 if (isset($renderedlist) && $renderedlist->totalremoved > 0) {
 	$formdata["skips"] = array(
 		"label" => _L('Skips'),
-		"control" => array("FormHtml", 'html' => '<div style="float:right">' . submit_button(_L('Remove All Skips'),'clearskips','diagona/16/101') . "</div><div id='listSkipsContainer' style='clear:both;margin:0;padding:0'></div>"),
+		"control" => array("FormHtml", 'html' => '<div style="float:right; margin-left:10px;">' . submit_button(_L('Remove All Skips'),'clearskips','diagona/16/101') . "</div><div id='listSkipsContainer' style='margin:0;padding:0'></div>"),
 		"helpstep" => 2
 	);
 }
@@ -171,10 +171,10 @@ $advancedtools .= '<tr><td class="border">'.submit_button(_L('Enter Contacts'),'
 $advancedtools .= '<tr><td class="border">'.submit_button(_L('Open Address Book'),'addressBookAdd').'</td><td class="border">'._L('Choose contacts from your address book').'</td></tr>';
 if ($USER->authorize('listuploadids') || $USER->authorize('listuploadcontacts'))
 	$advancedtools .= '<tr><td class="border">'.submit_button(_L('Upload List'),'uploadList').'</td><td class="border">'._L('Upload a list of contacts using a CSV file').'</td></tr>';
-$formdata[] = _L('Advanced List Tools');
+$formdata[] = _L('Additional List Tools');
 $formdata["advancedtools"] = array(
 	"label" => '',
-	"control" => array("FormHtml", 'html' => "<table style='border-collapse:collapse'>$advancedtools</table>"),
+	"control" => array("FormHtml", 'html' => "<table style='border-collapse:collapse; margin-bottom:10px;'>$advancedtools</table>"),
 	"helpstep" => 3
 );
 
