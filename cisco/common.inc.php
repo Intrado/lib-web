@@ -1,4 +1,6 @@
 <?
+setlocale(LC_ALL, 'en_US.UTF-8');
+
 $SETTINGS = parse_ini_file("../inc/settings.ini.php",true);
 $IS_COMMSUITE = $SETTINGS['feature']['is_commsuite'];
 
@@ -101,4 +103,5 @@ function isModel ($model) {
 		return true;
 }
 
+require_once('../inc/locale.inc.php');
 ?>
