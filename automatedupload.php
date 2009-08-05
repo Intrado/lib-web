@@ -58,8 +58,6 @@ if (isset($_GET['authCode']) && isset($_GET['sessionId'])) {
 	if (!$fp = fopen($_SESSION['filename'],"ab"))
 		exit("error can't write file");
 
-//	error_log("writing to file " . $_SESSION['filename']);
-
 	if (false !== ($numbytes = fwrite($fp,$HTTP_RAW_POST_DATA)))
 		exit("ok $numbytes written");
 

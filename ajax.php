@@ -23,7 +23,6 @@ function handleRequest() {
 	global $RULE_OPERATORS;
 	global $RELDATE_OPTIONS;
 	$type = isset($_GET['type'])?$_GET['type']:$_POST['type'];
-	error_log("AjaxRequest: ".$type);
 	
 	switch($type) {
 		//--------------------------- SIMPLE OBJECTS, should mirror objects in obj/*.obj.php (simplified to _fieldlist) -------------------------------
