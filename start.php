@@ -477,11 +477,22 @@ include_once("nav.inc.php");
 							onclick="window.location = 'jobwizard.php?new&jobtype=normal'"
 							onmouseover="this.src='img/newjob_over.jpg'"
 							onmouseout="this.src='img/newjob.jpg'" />
+			<? 
+				$hasemergency = false;
+				$jobtypes = QuickQueryList("select jt.systempriority from jobtype jt,userjobtypes ujt where ujt.jobtypeid = jt.id and ujt.userid=? and jt.deleted=0",false,false,array($USER->id));
+				if(count($jobtypes) === 0)
+					$hasemergency = true;
+				else {
+					$hasemergency = in_array(1,$jobtypes);
+				}	
+				if($hasemergency) {
+			 ?>
 			<br />		
 					<img style="cursor:pointer;" src="img/newemergency.jpg" align="middle" alt="Start a new job" title="Start a new emergency job" 
 							onclick="window.location = 'jobwizard.php?new&jobtype=emergency'"
 							onmouseover="this.src='img/newemergency_over.jpg'"
-							onmouseout="this.src='img/newemergency.jpg'" />			
+							onmouseout="this.src='img/newemergency.jpg'" />	
+			<? } ?>		
 			</div>
 <?			}
 			if ($USER->authorize("startstats")) {
