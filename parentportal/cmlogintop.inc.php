@@ -1,6 +1,7 @@
 
 <html>
 <head>
+	<meta http-equiv="Content-type" value="text/html; charset=UTF-8" />
 	<title><?=_L("Contact Manager")?><?=isset($TITLE) ? ": " . $TITLE : ""?></title>
 	<script src='script/utils.js'></script>
 	<link href='css/style_print.css' type='text/css' rel='stylesheet' media='print'>
