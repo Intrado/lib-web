@@ -100,9 +100,9 @@ if (!$messageinfo) {
 		STANDBY="Loading Windows Media Player components..."
 		TYPE="application/x-oleobject">
 
-		<PARAM NAME="FileName" VALUE="messagelink_preview.wav.php?jobcode=<?=$code?>">
+		<PARAM NAME="FileName" VALUE="messagelink_preview.wav.php/mediaplayer_preview.wav?jobcode=<?=$code?>">
 		<param name="controller" value="true">
-		<EMBED SRC="messagelink_preview.wav.php?jobcode=<?=$code?>" AUTOSTART="TRUE"></EMBED>
+		<EMBED SRC="messagelink_preview.wav.php/embed_preview.wav?jobcode=<?=$code?>" AUTOSTART="TRUE"></EMBED>
 		</OBJECT>
 		<br><a href="messagelink_preview.wav.php/message.wav?jobcode=<?=$code?>">Click Here</a>
 	</div>

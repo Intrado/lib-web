@@ -99,13 +99,13 @@ if ($dopreview) {
 	STANDBY="Loading Windows Media Player components..."
 	TYPE="application/x-oleobject">
 
-	<PARAM NAME="FileName" VALUE="preview.wav.php?id=<?= $messageid ?><?= $previewdata ?>&customerid=<?=$_SESSION['previewmessage_customerid']?>">
+	<PARAM NAME="FileName" VALUE="preview.wav.php/mediaplayer_preview.wav?id=<?= $messageid ?><?= $previewdata ?>&customerid=<?=$_SESSION['previewmessage_customerid']?>">
 	<param name="controller" value="true">
-	<EMBED SRC="preview.wav.php?id=<?= $messageid ?><?= $previewdata ?>&customerid=<?=$_SESSION['previewmessage_customerid']?>" AUTOSTART="TRUE"></EMBED>
+	<EMBED SRC="preview.wav.php/embed_preview.wav?id=<?= $messageid ?><?= $previewdata ?>&customerid=<?=$_SESSION['previewmessage_customerid']?>" AUTOSTART="TRUE"></EMBED>
 	</OBJECT>
 
 
-	<br><a href="preview.wav.php?id=<?= $messageid ?>&download=true<?= $previewdata ?>&customerid=<?=$_SESSION['previewmessage_customerid']?>">Click here to download</a>
+	<br><a href="preview.wav.php/download_preview.wav?id=<?= $messageid ?>&download=true<?= $previewdata ?>&customerid=<?=$_SESSION['previewmessage_customerid']?>">Click here to download</a>
 	</div>
 	</td></tr>
 </table>

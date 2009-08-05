@@ -175,13 +175,13 @@ if ($phone) {
 		STANDBY="<?=_L("Loading Windows Media Player components...")?>"
 		TYPE="application/x-oleobject">
 
-		<PARAM NAME="FileName" VALUE="preview.wav.php?jid=<?= $jobid ?>&pid=<?= $personid ?>">
+		<PARAM NAME="FileName" VALUE="preview.wav.php/mediaplayer_preview.wav?jid=<?= $jobid ?>&pid=<?= $personid ?>">
 		<param name="controller" value="true">
-		<EMBED SRC="preview.wav.php?jid=<?= $jobid ?>&pid=<?= $personid ?>" AUTOSTART="TRUE"></EMBED>
+		<EMBED SRC="preview.wav.php/embed_preview.wav?jid=<?= $jobid ?>&pid=<?= $personid ?>" AUTOSTART="TRUE"></EMBED>
 		</OBJECT>
 
 
-		<br><a href="preview.wav.php?jid=<?= $jobid ?>&pid=<?= $personid ?>&download=true"><?=_L("Click here to download")?></a>
+		<br><a href="preview.wav.php/download_preview.wav?jid=<?= $jobid ?>&pid=<?= $personid ?>&download=true"><?=_L("Click here to download")?></a>
 		</div>
 	<?
 	endWindow();
