@@ -10,7 +10,7 @@ class BrandTheme extends FormItem {
 		// Hidden input item to store values in
 		$str = '<input id="'.$n.'" name="'.$n.'" type="hidden" value="'.escapehtml($value).'" />';
 		if ($this->args['toggle'])
-			$str .= '<input id="'.$n.'customize" name="'.$n.'customize" type="checkbox" value="true" '. ($phpvalue->customize ? 'checked' : '').' onchange="showTheme()" />';
+			$str .= '<input id="'.$n.'customize" name="'.$n.'customize" type="checkbox" value="true" '. ($phpvalue->customize ? 'checked' : '').' onchange="showTheme()" onclick="showTheme()" />';
 		$str .= '<table id="'.$n.'themetable" name="'.$n.'themetable" class="msgdetails">
 			<tr>
 				<td class="msglabel">'._L("Theme").':</td>
