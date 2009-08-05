@@ -32,9 +32,7 @@ class Form {
 			return false; //nothing to do
 		
 		if (isset($_REQUEST['ajaxvalidator'])) {
-			
-			error_log("ajax REQUEST data: " .http_build_query($_REQUEST));
-			
+						
 			$jsondata = json_decode($_REQUEST['json'],true);
 			
 			$result = array();
@@ -86,6 +84,8 @@ class Form {
 					if ($controltype == "checkbox")
 						$this->formdata[$name]['value'] = false;
 					else if ($controltype == "multicheckbox")
+						$this->formdata[$name]['value'] = array();
+					else if ($controltype == "restrictedfields")
 						$this->formdata[$name]['value'] = array();
 				}
 			}
