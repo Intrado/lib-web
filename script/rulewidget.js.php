@@ -95,7 +95,7 @@ var RuleWidget = Class.create({
 			);
 		
 		if (showRemoveAllButton) {
-			var removeAllButtonHtml = '<div style="float:right">' + '<?=addslashes(icon_button(_L('Remove\'s All Rules'),'diagona/16/101'))?>' + '</div><span style="clear:both"></span>';
+			var removeAllButtonHtml = '<div style="float:right">' + '<?=addslashes(icon_button(_L('Remove All Rules'),'diagona/16/101'))?>' + '</div><span style="clear:both"></span>';
 			var td = new Element('td', {'colspan':'100'}).update(removeAllButtonHtml);
 			var button = td.down('button');
 			button.observe('click', function(event) {
