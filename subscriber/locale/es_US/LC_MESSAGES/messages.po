@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Subscriber Self-Signup 7.0.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2009-07-31 16:27-0800\n"
+"POT-Creation-Date: 2009-08-05 13:00-0800\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Gretel Baumgartner <gbaumgartner@schoolmessenger.com>\n"
 "Language-Team:  <gbaumgartner@schoolmessenger.com>\n"
@@ -292,11 +292,11 @@ msgid "Phone Call"
 msgstr "Llamada de teléfono."
 
 #: destinationwizard.php:56
-msgid "Phone Call and Text Message"
+msgid "Phone Call and SMS Text"
 msgstr "Llamada y Mensaje de Texto"
 
 #: destinationwizard.php:58
-msgid "Text Message"
+msgid "SMS Text"
 msgstr "Mensaje de Texto"
 
 #: destinationwizard.php:60
@@ -335,6 +335,10 @@ msgstr "Seleccione el tipo"
 #: destinationwizard.php:157
 msgid "Enter Contact Info"
 msgstr "Introduzca Información de Contacto"
+
+#: destinationwizard.php:160
+msgid "Activate"
+msgstr "Activar"
 
 #: destinationwizard.php:169
 msgid "Add Contact Information"
@@ -386,7 +390,7 @@ msgid "Invalid customer URL. Please check the web address and try again."
 msgstr "URL invalido.  Por favor revise la direccion del sitio y inténtelo de nuevo."
 
 #: index.php:129
-msgid "Phone, Email, and Text Messages"
+msgid "Phone, Email, and SMS Text Messages"
 msgstr "Teléfono, Correo Electrónico y Mensajes de Texto"
 
 #: index.php:131
@@ -579,11 +583,6 @@ msgstr "Esta forma contiene algunos errores."
 msgid "Please complete this form to create your account.  A confirmation code will be sent to activate your new account so a valid email address is required.  Your password must be at least 5 characters long and cannot be similiar to your first name, last name, or email address."
 msgstr "Por favor, llene esta forma para crear su cuenta.  Un codigo de confirmacion sera enviado para activar su cuenta, y entonces un correo electronico valido es requerido.  Su contraseña debe ser por lo menos 5 caracteres de largo y no puede ser parecido cu su nombre, apellido, o correo electrónico.  "
 
-#: notificationpreferences.php:106
-#: notificationpreferences.php:123
-msgid "Text"
-msgstr "Texto"
-
 #: notificationpreferences.php:133
 msgid "Contact Information"
 msgstr "Información del usuario"
@@ -754,6 +753,18 @@ msgstr "Si su servicion de teléfono tiene identificador de llamadas bloqueado, 
 msgid "Step 2: Call "
 msgstr "Paso 2: Llame"
 
+#: subscriberutils.inc.php:12
+msgid "Step 3: When prompted, select option 2.<br>"
+msgstr "Paso 3: Cuando se le pida, seleccione la opción 2. <br>"
+
+#: subscriberutils.inc.php:13
+msgid "Step 4: When prompted, enter this activation code"
+msgstr " Paso 4: Cuando se le pida, introduzca este código de activación"
+
+#: subscriberutils.inc.php:14
+msgid "Step 5: When the call is complete, log back into your account to edit your notification preferences.<br>"
+msgstr "Paso 5: Cuando la llamada se completa, vuelva a iniciar la sesión para editar sus preferencias de notificación. <br>"
+
 #: subscriberutils.inc.php:22
 msgid "Step 1: Check your email account"
 msgstr "Paso 1: Compruebe su correo electrónico"
@@ -773,6 +784,8 @@ msgstr "%1$s no es la contraseña correcta."
 msgid "%1$s is invalid.  "
 msgstr "%1$s no es valido."
 
+#~ msgid "Text Message"
+#~ msgstr "Mensaje de Texto"
 #~ msgid "Help"
 #~ msgstr "Ayuda"
 #~ msgid "ZIP Code"
@@ -1008,16 +1021,6 @@ msgstr "%1$s no es valido."
 #~ msgstr ""
 #~ "Por razones de seguridad, que han ocultado partes de su número de "
 #~ "teléfono con \"xxx\"."
-#~ msgid "When prompted, select option 2."
-#~ msgstr "Cuando se le pida, seleccione la opción 2."
-#~ msgid "When prompted, enter this activation code %s"
-#~ msgstr " \tCuando se le solicite, introduzca el código de activación de %s"
-#~ msgid ""
-#~ "When the call is complete, log back into your Contact Manager account to "
-#~ "edit your notification preferences."
-#~ msgstr ""
-#~ "Cuando la llamada se completa, volver a iniciar sesión en su cuenta "
-#~ "Contact Manager para editar sus preferencias de notificación."
 #~ msgid "Sorry, an unexpected error occured.  Please go back and try again."
 #~ msgstr ""
 #~ "Lo sentimos, se produjo un error inesperado. Por favor, regrese y vuelva "
