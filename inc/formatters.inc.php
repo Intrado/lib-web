@@ -299,7 +299,7 @@ function fmt_status($obj, $name) {
 	} else {
 		if ($obj->cancelleduserid && $obj->cancelleduserid != $USER->id) {
 			$usr = new User($obj->cancelleduserid);
-			return L('Cancelled (%1$s)', $usr->login);
+			return _L('Cancelled (%1$s)', $usr->login);
 		} else {
 			switch($obj->status) {
 				case "scheduled":
