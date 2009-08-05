@@ -86,13 +86,13 @@ class HtmlRadioButtonBigCheck extends FormItem {
 		foreach ($this->args['values'] as $val => $html)  {
 			$id = $n.'-'.$count++;
 			$str .= '<tr>
-				<td><img id="'.$id.'" name="'.$id.'" class="htmlRadioButtonBigCheck_checkImg" src="'.(($value == $val)?'img/bigradiobutton_checked.gif':'img/bigradiobutton.gif').'" onclick="htmlRadioButtonBigCheck_doCheck(\''.$n.'\',  \''.$id.'\', \''.$n.'-container\', \''.$val.'\')" /></td>
-				<td><label for="'.$id.'"><button type="button" style=" width: 100%;" onclick="htmlRadioButtonBigCheck_doCheck(\''.$n.'\',  \''.$id.'\', \''.$n.'-container\', \''.$val.'\')">'.($html).'</button></label></td></tr>
+				<td><img id="'.$id.'" name="'.$id.'" class="htmlRadioButtonBigCheck_checkImg" src="'.(($value == $val)?'img/bigradiobutton_checked.gif':'img/bigradiobutton.gif').'" onclick="htmlRadioButtonBigCheck_doCheck(\''.$this->form->name.'\', \''.$n.'\',  \''.$id.'\', \''.$n.'-container\', \''.$val.'\')" /></td>
+				<td><label for="'.$id.'"><button type="button" style=" width: 100%;" onclick="htmlRadioButtonBigCheck_doCheck(\''.$this->form->name.'\', \''.$n.'\',  \''.$id.'\', \''.$n.'-container\', \''.$val.'\')">'.($html).'</button></label></td></tr>
 				';
 		}
 		$str .= '</table>
 			<script>
-				function htmlRadioButtonBigCheck_doCheck(formitem, checkimg, container, value) {
+				function htmlRadioButtonBigCheck_doCheck(form, formitem, checkimg, container, value) {
 					var checkimg = $(checkimg);
 					var container =  $(container);
 					$(formitem).value = value;
@@ -100,6 +100,7 @@ class HtmlRadioButtonBigCheck extends FormItem {
 						$(i).src = "img/bigradiobutton.gif";
 					});
 					checkimg.src = "img/bigradiobutton_checked.gif";
+					form_do_validation($(form), $(formitem));
 				}
 			</script>
 		';
@@ -120,7 +121,7 @@ class TextAreaPhone extends FormItem {
 				<input id="'.$n.'-female" name="'.$n.'-gender" type="radio" value="female" '.($vals->gender == "female"?"checked":"").'/><label for="'.$n.'-female">'._L('Female').'</label><br />
 				<input id="'.$n.'-male" name="'.$n.'-gender" type="radio" value="male" '.($vals->gender == "male"?"checked":"").'/><label for="'.$n.'-male">'._L('Male').'</label><br />
 			</div>
-			<div>'.icon_button(_L("Play"),"diagona/16/131",null,null,"id=\"".$n."-play\"").'</div>
+			<div>'.icon_button(_L("Play"),"fugue/control",null,null,"id=\"".$n."-play\"").'</div>
 			<script type="text/javascript">
 				$("'.$n.'-play").observe("click", function(e) {
 					var val = $("'.$n.'-textarea").value;
@@ -529,7 +530,8 @@ class JobWiz_start extends WizStep {
 			"fieldhelp" => _L("These options determine how your message will be received."),
 			"value" => "",
 			"validators" => array(
-				array("ValRequired")
+				array("ValRequired"),
+				array("ValInArray", "values" => array_keys($jobtypes))
 			),
 			"control" => array("RadioButton", "values" => $jobtypes, "hover" => $jobtips),
 			"helpstep" => 2
@@ -1571,10 +1573,17 @@ class JobWiz_submitConfirm extends WizStep {
 			$renderedlist->calcStats();
 			$calctotal = $calctotal + $renderedlist->total;
 		}
+		
+		$html = '<div style="font-size: medium">';
 		if ($postdata['/schedule/options']['schedule'] == 'template')
-			$html = '<div style="font-size: medium">'._L('You are about to save a notification. If submitted now it would reach %1$s people using %2$s list(s). This total may change if you sumit the job at a later date.', $calctotal, count($lists)).'</div>';
-		else
-			$html = '<div style="font-size: medium">'._L('You are about to send a notification to %1$s people using %2$s list(s).', $calctotal, count($lists)).'</div>';
+			$html .= escapehtml(_L('You are about to save a notification to be used at a later date.')). "<br>". escapehtml(_L('Confirm and click Next to save this notification.'));
+		else {
+			if ($calctotal == 1)
+				$html = escapehtml(_L('Confirm and click Next to send this notification to the 1 person you selected'));
+			else
+				$html = escapehtml(_L('Confirm and click Next to send this notification to the %1$s people you selected.', $calctotal, count($lists)));
+		}
+		$html .= '</div>';
 		$formdata = array($this->title);
 		$formdata["jobinfo"] = array(
 			"label" => _L("Job Info"),
