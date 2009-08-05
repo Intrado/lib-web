@@ -94,7 +94,7 @@ switch ($filter) {
 		$mergeditems = array_merge($mergeditems, QuickQueryMultiRow("select 'report' as type,'Emailed' as status,id, name, lastrun as date from reportsubscription where userid=? and lastrun is not null order by lastrun desc limit 10",true,false,array($USER->id)));
 		break;
 	case "systemmessages":
-		$mergeditems = array_merge($mergeditems, QuickQueryMultiRow("select 'systemmessage' as type,'' as status,icon, message, modifydate as date from systemmessages where modifydate is not null order by modifydate desc limit 9",true));
+		$mergeditems = array_merge($mergeditems, QuickQueryMultiRow("select 'systemmessage' as type,'' as status,icon, message, modifydate as date from systemmessages where modifydate is not null order by modifydate desc limit 10",true));
 		break;	
 	default:
 		$mergeditems = array_merge($mergeditems,QuickQueryMultiRow("select 'list' as type,'Saved' as status, id, name, modifydate as date, lastused from list where userid=? and deleted = 0  and modifydate is not null order by modifydate desc limit 10",true,false,array($USER->id)));
@@ -103,7 +103,7 @@ switch ($filter) {
 		$mergeditems = array_merge($mergeditems,QuickQueryMultiRow("select 'job' as type,status,id, name, finishdate as date,'finishdate' as datetype,type as jobtype, deleted from job where userid=? and deleted = 0  and status!='repeating' and finishdate is not null order by finishdate desc limit 10",true,false,array($USER->id)));
 		$mergeditems = array_merge($mergeditems,QuickQueryMultiRow("select 'report' as type,'Saved' as status,id, name, modifydate as date from reportsubscription where userid=? and modifydate is not null order by modifydate desc limit 10",true,false,array($USER->id)));
 		$mergeditems = array_merge($mergeditems,QuickQueryMultiRow("select 'report' as type,'Emailed' as status,id, name, lastrun as date from reportsubscription where userid=? and lastrun is not null order by lastrun desc limit 10",true,false,array($USER->id)));
-		$mergeditems = array_merge($mergeditems, QuickQueryMultiRow("select 'systemmessage' as type,'' as status,icon, message, modifydate as date from systemmessages where modifydate is not null order by modifydate desc limit 9",true));
+		$mergeditems = array_merge($mergeditems, QuickQueryMultiRow("select 'systemmessage' as type,'' as status,icon, message, modifydate as date from systemmessages where modifydate is not null order by modifydate desc limit 10",true));
 		break;	
 } 
 
@@ -161,7 +161,7 @@ function activityfeed($mergeditems,$ajax = false) {
 	if(empty($mergeditems)) {
 		if(!$ajax)
 			$activityfeed .= '		<tr>
-									<td valign="top" width="60px"><img src="largeicons/information.jpg" /></td>
+									<td valign="top" width="60px"><img src="img/largeicons/information.jpg" /></td>
 									<td >
 											<div class="feedtitle">
 												<a href="">	
@@ -284,7 +284,7 @@ function activityfeed($mergeditems,$ajax = false) {
 			} else if($item["type"] == "list" ) {
 				$title = "Contact List " . escapehtml($title);
 				$defaultlink = "list.php?id=$itemid";
-				$content = '<a href="' . $defaultlink . '">' . $time .  ' - <b>' .  $item["name"] . "</b>";
+				$content = '<a href="' . $defaultlink . '">' . $time .  ' - <b>' .   escapehtml($item["name"]) . "</b>";
 								
 				$content .= '&nbsp;-&nbsp;';
 				if(isset($item["lastused"]))
@@ -322,7 +322,7 @@ function activityfeed($mergeditems,$ajax = false) {
 				$icon = 'largeicons/savedreport.jpg';
 				$defaultlink = "reportjobsummary.php?id=$itemid";
 			} else if($item["type"] == "systemmessage" ) {
-				$content = '<a href="' . $defaultlink . '" ' . $defaultonclick . '>' . $item["message"] . '</a>';
+				$content = '<a href="' . $defaultlink . '" ' . $defaultonclick . '>' . escapehtml($item["message"]) . '</a>';
 				$icon = 'largeicons/news.jpg';
 			}
 						
