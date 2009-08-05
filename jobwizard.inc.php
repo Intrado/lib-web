@@ -24,8 +24,8 @@ function wizHasEmail($postdata) {
 	global $USER;
 	if ($USER->authorize("sendemail") && (
 		(isset($postdata["/start"]["package"]) && $postdata["/start"]["package"] == "easycall" && isset($postdata["/message/phone/callme"]["message"]) && strlen($postdata["/message/phone/callme"]["message"]) > 2 && $USER->authorize("sendphone")) ||
-		(isset($postdata["/start"]["package"]) && $postdata["/start"]["package"] == "express" && isset($postdata["/message/email/text"]["message"]) && $postdata["/message/phone/text"]["message"]) ||
-		(isset($postdata["/start"]["package"]) && $postdata["/start"]["package"] == "personalized" &&isset($postdata["/message/email/text"]["message"]) && $postdata["/message/phone/text"]["message"]) ||
+		(isset($postdata["/start"]["package"]) && $postdata["/start"]["package"] == "express" && isset($postdata["/message/email/text"]["message"]) && $postdata["/message/email/text"]["message"]) ||
+		(isset($postdata["/start"]["package"]) && $postdata["/start"]["package"] == "personalized" &&isset($postdata["/message/email/text"]["message"]) && $postdata["/message/email/text"]["message"]) ||
 		(isset($postdata["/start"]["package"]) && $postdata["/start"]["package"] == "custom" && isset($postdata["/message/pick"]["type"]) && in_array('email', $postdata["/message/pick"]["type"]) && (
 			(isset($postdata["/message/select"]["email"]) && $postdata["/message/select"]["email"] == "record" && $USER->authorize("sendphone") && (
 				(isset($postdata["/message/select"]["phone"]) && $postdata["/message/select"]["phone"] == "record" && isset($postdata["/message/phone/callme"]["message"]) && strlen($postdata["/message/phone/callme"]["message"]) > 2) ||
@@ -530,7 +530,8 @@ class JobWiz_start extends WizStep {
 			"label" => _L("Notification Method"),
 			"fieldhelp" => _L("These are commonly used notification packages. For other options, select Custom."),
 			"validators" => array(
-				array("ValRequired")
+				array("ValRequired"),
+				array("ValInArray", "values" => array('easycall', 'express', 'personalized', 'custom'))
 			),
 			"value" => "",
 			"control" => array("HtmlRadioButtonBigCheck", "values" => $packages),
@@ -1021,7 +1022,7 @@ class JobWiz_messageEmailChoose extends WizStep {
 class JobWiz_messageEmailText extends WizStep {
 	function getForm($postdata, $curstep) {
 		global $USER;
-		$msgdata = isset($postdata['/message/phone/text']['message'])?json_decode($postdata['/message/phone/text']['message']):'{"text": ""}';
+		$msgdata = isset($postdata['/message/phone/text']['message'])?json_decode($postdata['/message/phone/text']['message']):json_decode('{"text": ""}');
 		// Form Fields.
 		$formdata = array($this->title);
 		$helpsteps = array(_L("Enter the address where you would like to receive replies."));
@@ -1257,7 +1258,7 @@ class JobWiz_messageSmsChoose extends WizStep {
 	//returns true if this step is enabled
 	function isEnabled($postdata, $step) {
 		global $USER;
-		if (!$USER->authorize("sendsms"))
+		if (!$USER->authorize("sendsms") || !getSystemSetting("_hassms"))
 			return false;
 		if (isset($postdata['/start']['package']) && $postdata['/start']['package'] == "custom" &&
 			isset($postdata['/message/select']['sms']) && $postdata['/message/select']['sms'] == "pick") {
@@ -1301,7 +1302,7 @@ class JobWiz_messageSmsText extends WizStep {
 	//returns true if this step is enabled
 	function isEnabled($postdata, $step) {
 		global $USER;
-		if (!$USER->authorize("sendsms"))
+		if (!$USER->authorize("sendsms") || !getSystemSetting("_hassms"))
 			return false;
 		if ((isset($postdata['/start']['package']) && ($postdata['/start']['package'] == "express" || $postdata['/start']['package'] == "personalized")) ||
 			(isset($postdata['/start']['package']) && $postdata['/start']['package'] == "custom" && isset($postdata['/message/select']['sms']) && $postdata['/message/select']['sms'] == "text")
