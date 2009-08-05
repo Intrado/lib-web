@@ -1408,7 +1408,7 @@ class JobWiz_scheduleDate extends WizStep {
 			),
 			"requires" => array("calllate"),
 			"control" => array("SelectMenu", "values"=>$startvalues),
-			"helpstep" => 3
+			"helpstep" => 2
 		);
 		$endvalues = newform_time_select(NULL, $ACCESS->getValue('callearly'), $ACCESS->getValue('calllate'), $USER->getCallLate());
 		$formdata["calllate"] = array(
@@ -1422,7 +1422,7 @@ class JobWiz_scheduleDate extends WizStep {
 			),
 			"requires" => array("callearly"),
 			"control" => array("SelectMenu", "values"=>$endvalues),
-			"helpstep" => 3
+			"helpstep" => 2
 		);
 
 		return new Form("scheduleDate",$formdata,$helpsteps);
