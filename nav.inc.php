@@ -233,7 +233,7 @@ header('Content-type: text/html; charset=UTF-8') ;
 		<td bgcolor="white"><div style="padding-left:10px; padding-bottom:10px;"><? doLogo() ?></div></td>
 		<td><img src="img/shwoosh.gif" alt="" class="noprint"></td>
 		<td width="100%" align="right" style="padding-right: 10px;">
-
+			<div class="custname"><?= escapehtml($_SESSION['custname']); ?></div>
 			<!-- <div><img src="img/supporticon.gif" style="vertical-align: middle;"> Support: <a href="mailto:<?=$_SESSION['_supportemail']?>"><?=$_SESSION['_supportemail']?></a>&nbsp;|&nbsp;<?=substr($_SESSION['_supportphone'],0,3) . "." . substr($_SESSION['_supportphone'],3,3) . "." . substr($_SESSION['_supportphone'],6,4);?></div>-->
 			<table border=0 cellspacing=0 cellpadding=0 class="noprint">
 				<tr>

@@ -81,12 +81,13 @@ a:hover {
 }
 
 .custname {
-	font-size: 12pt;
+	font-size: 12px;
 	color:<?=$primary?>;
 	white-space: nowrap;
 	text-align: right;
-	margin: 10px;
-	margin-right: 25px;
+	margin: 0px;
+	padding: 0px;
+	margin-right: 5px;
 }
 
 /* **** main nav **** */
