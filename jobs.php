@@ -78,6 +78,7 @@ if (isset($_GET['archive'])) {
 		$job = new Job($archiveid);
 		if ($job->status == "cancelled" || $job->status == "cancelling" || $job->status == "complete") {
 			$job->deleted = 2;
+			$job->modifydate = date("Y-m-d H:i:s", time());
 			$job->update();
 		}
 	}
@@ -90,6 +91,7 @@ if (isset($_GET['unarchive'])) {
 		$job = new Job($unarchiveid);
 		if ($job->status == "cancelled" || $job->status == "cancelling" || $job->status == "complete") {
 			$job->deleted = 0;
+			$job->modifydate = date("Y-m-d H:i:s", time());
 			$job->update();
 		}
 	}
