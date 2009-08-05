@@ -52,6 +52,7 @@ function form_default_get_value (form,targetname) {
 		//prototype doesn't handle radio boxes or multicheckboxes so well, so try to handle them here
 		var elements = form.elements[targetname] || form.elements[targetname + "[]"];
 		if (elements.length) {
+			
 			switch (elements[0].type) {
 			case "radio":
 				for (var i = 0; i < elements.length; i++) {
@@ -69,9 +70,14 @@ function form_default_get_value (form,targetname) {
 				}
 				break;
 			}
+		} else {
+			//single item with braces?
+			value = [];
+			if (elements.checked)
+				value.push(elements.value);
 		}
 	}
-	
+		
 	return value;
 }
 
