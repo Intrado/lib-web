@@ -172,10 +172,10 @@ var Easycall = Class.create({
 		$(this.formitemname+"_"+this.language+"_lang").update(this.language);
 		
 		if ($(this.formitemname+"_"+this.language+"_delete")) {
-			$(this.formitemname+"_"+this.language+"_delete").insert({ "before": icon_button("<?=_L('Play')?>", "diagona/16/131", this.formitemname+"_"+this.language+"_play").setStyle({float: "left"}) });
+			$(this.formitemname+"_"+this.language+"_delete").insert({ "before": icon_button("<?=_L('Play')?>", "fugue/control", this.formitemname+"_"+this.language+"_play").setStyle({float: "left"}) });
 			$(this.formitemname+"_"+this.language+"_delete").insert({ "before": icon_button("<?=_L('Re-record')?>", "diagona/16/118", this.formitemname+"_"+this.language+"_rerecord").setStyle({float: "left"}) });
 		} else {
-			$(this.formitemname+"_"+this.language+"_action").insert(icon_button("<?=_L('Play')?>", "diagona/16/131", this.formitemname+"_"+this.language+"_play").setStyle({float: "left"}));
+			$(this.formitemname+"_"+this.language+"_action").insert(icon_button("<?=_L('Play')?>", "fugue/control", this.formitemname+"_"+this.language+"_play").setStyle({float: "left"}));
 			$(this.formitemname+"_"+this.language+"_action").insert(icon_button("<?=_L('Re-record')?>", "diagona/16/118", this.formitemname+"_"+this.language+"_rerecord").setStyle({float: "left"}));
 		}
 		$(this.formitemname+"_"+this.language).insert(new Element("div", {style: "padding-top: 3px; margin-bottom: 5px; border-bottom: 1px solid gray; clear: both"}));
@@ -211,7 +211,7 @@ var Easycall = Class.create({
 		);
 		
 		if (this.language !== "Default") {
-			$(this.formitemname+"_"+this.language+"_action").insert(icon_button("<?=addslashes(_L("Remove"))?>", "diagona/16/150", this.formitemname+"_"+this.language+"_delete").setStyle({float:"left"}));
+			$(this.formitemname+"_"+this.language+"_action").insert(icon_button("<?=addslashes(_L("Remove"))?>", "cross", this.formitemname+"_"+this.language+"_delete").setStyle({float:"left"}));
 			$(this.formitemname+"_"+this.language+"_delete").observe("click", this.removeMessage.bind(this));
 		}
 
