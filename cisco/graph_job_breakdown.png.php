@@ -9,7 +9,7 @@ include ("../jpgraph/jpgraph_pie3d.php");
 include ("../jpgraph/jpgraph_canvas.php");
 
 
-$jobid = $_GET['jobid'];
+$jobid = $_GET['jobid']+0;
 
 if (!userOwns("job",$jobid) && !$USER->authorize('viewsystemreports')) {
 	header("Content-type: image/gif");
