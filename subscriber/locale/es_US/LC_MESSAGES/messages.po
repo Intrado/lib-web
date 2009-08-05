@@ -759,7 +759,7 @@ msgstr "Paso 3: Cuando se le pida, seleccione la opción 2. <br>"
 
 #: subscriberutils.inc.php:13
 msgid "Step 4: When prompted, enter this activation code"
-msgstr " Paso 4: Cuando se le pida, introduzca este código de activación"
+msgstr "Paso 4: Cuando se le pida, introduzca este código de activación"
 
 #: subscriberutils.inc.php:14
 msgid "Step 5: When the call is complete, log back into your account to edit your notification preferences.<br>"
