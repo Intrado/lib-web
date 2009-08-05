@@ -425,7 +425,7 @@ function activityfeed($mergeditems,$ajax = false) {
 									}
 									$(filter + 'filter').setStyle({
 	 									 color: '#000000',
-										 fontWeight: 'bold',
+										 fontWeight: 'bold'
 									});
 									
 								}
