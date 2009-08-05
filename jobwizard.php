@@ -45,6 +45,13 @@ if (!$USER->authorize('sendphone') && !$USER->authorize('sendemail') && !$USER->
 	redirect('unauthorized.php');
 }
 
+////////////////////////////////////////////////////////////////////////////////
+// Passed parameter checking
+////////////////////////////////////////////////////////////////////////////////
+// currently valid jobtypes that can be passed are 'emergency' and 'normal'
+if (isset($_GET['jobtype']))
+	$_SESSION['wizard_job_type'] = $_GET['jobtype'];
+
 if (isset($_GET['debug']))
 	$_SESSION['wizard_job']['debug'] = true;
 
@@ -539,6 +546,12 @@ class FinishJobWizard extends WizFinish {
 $wizard = new Wizard("wizard_job",$wizdata, new FinishJobWizard("Finish"));
 $wizard->doneurl = "start.php";
 $wizard->handlerequest();
+
+// After reload check session data for job type information
+if (isset($_SESSION['wizard_job_type'])) {
+	$_SESSION['wizard_job']['jobtype'] = $_SESSION['wizard_job_type'];
+	unset($_SESSION['wizard_job_type']);
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 // Display

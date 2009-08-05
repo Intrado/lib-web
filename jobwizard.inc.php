@@ -384,14 +384,26 @@ class ValDate extends Validator {
 class JobWiz_start extends WizStep {
 	function getForm($postdata, $curstep) {
 		global $USER;
+		
+		$wizJobType = isset($_SESSION['wizard_job']['jobtype'])?$_SESSION['wizard_job']['jobtype']:"all";
 		$userjobtypes = JobType::getUserJobTypes();
 		$jobtypes = array();
 		$jobtips = array();
 		foreach ($userjobtypes as $id => $jobtype) {
-			if (!$jobtype->issurvey) {
-				$jobtypes[$id] = $jobtype->name;
-				$jobtips[$id] = $jobtype->info;
+			switch ($wizJobType) {
+				case "emergency":
+					if ($jobtype->systempriority == 1)
+						$jobtypes[$id] = $jobtype->name;
+					break;
+				case "normal":
+					if ($jobtype->systempriority > 1)
+						$jobtypes[$id] = $jobtype->name;
+					break;
+				default:
+					$jobtypes[$id] = $jobtype->name;
+					break;
 			}
+			$jobtips[$id] = $jobtype->info;
 		}
 		
 		$deliverytypes = array();
@@ -401,9 +413,6 @@ class JobWiz_start extends WizStep {
 			else
 				$deliverytypes[$deliverytype] = false;
 		}
-		
-		if ($deliverytypes['sendphone'] && !$USER->authorize("starteasy"))
-			$deliverytypes['sendphone'] = false;
 
 		if ($deliverytypes['sendsms'] && !getSystemSetting('_hassms'))
 			$deliverytypes['sendsms'] = false;
