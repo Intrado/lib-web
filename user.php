@@ -253,7 +253,7 @@ $formdata["accessid"] = array(
 	"value" => $edituser->accessid,
 	"validators" => array(
 		array("ValRequired"),
-		array("ValInArray", array_keys($accessprofiles))
+		array("ValInArray", "values" => array_keys($accessprofiles))
 	),
 	"control" => array("SelectMenu", "values"=>$accessprofiles),
 	"helpstep" => 2
@@ -307,7 +307,7 @@ $formdata["datarules"] = array(
 	"validators" => array(
 		array("ValRules")
 	),
-	"control" => array("FormRuleWidget"),
+	"control" => array("FormRuleWidget", "ignoredFields" => array("c01")),
 	"helpstep" => 1
 );
 
