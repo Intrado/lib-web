@@ -14,11 +14,10 @@ class Wizard {
 		$this->wizdata = $wizdata;
 
 		if (!isset($_SESSION[$name])) {
-			error_log("initializing wizard data for $name");
 			$_SESSION[$name] = array("data" => array());
 		}
 
-		$this->filteredwizdata = $this->filter();		
+		$this->filteredwizdata = $this->filter();
 		//add finisher
 		$this->wizdata['finish'] = $finish;
 		$this->filteredwizdata['finish'] = $finish;
@@ -288,11 +287,9 @@ class Wizard {
 					$this->filteredwizdata = $this->filter();
 					$this->steplist = $this->getStepList();
 					
-					if ($ajax) {			
+					if ($ajax) {
 						if ($button == "next") {
 							$next = $this->getNextStep();
-							error_log("NEXT $next");
-							
 							
 							if ($next) {
 								$form->sendTo($_SERVER['SCRIPT_NAME']."?step=$next");
