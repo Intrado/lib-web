@@ -264,7 +264,6 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'phone') || CheckFormSubmit($f,'
 						if($type == "email") {
 							$message->subject = GetFormData($f, $s, 'emailsubject');
 							$message->fromname = GetFormData($f, $s, 'fromname');
-							$useremails = explode(";", $USER->email);
 							$message->fromemail = GetFormData($f, $s, 'fromemail');
 							$message->stuffHeaders();
 						}
@@ -471,8 +470,7 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'phone') || CheckFormSubmit($f,'
 									$message->subject = GetFormData($f, $s, 'emailsubject');
 									$message->fromname = $USER->firstname;
 									$message->fromaddress = $USER->lastname;
-									$useremails = explode(";", $USER->email);
-									$message->fromemail = $useremails[0];
+									$message->fromemail = GetFormData($f, $s, 'fromemail');
 									$message->stuffHeaders();
 								}
 								$message->update();
