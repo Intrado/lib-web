@@ -222,7 +222,7 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'phone') || CheckFormSubmit($f,'
 		} else if((bool)GetFormData($f,"email","newlangemail") XOR (bool)GetFormData($f,"email","newmessemail")) {
 			error('Select both a language and a message');
 			$hasemaildetailerror = true;
-		} else if($sendsms && GetFormData($f, $s,"smsradio") == "create" && !ereg("^[a-zA-Z0-9\<\>\?\,\.\/\{\}\|\~\!\@\#\$\%\&\(\)\_\+\']*$", GetFormData($f, $s, "smstextarea"))) {
+		} else if($sendsms && GetFormData($f, $s,"smsradio") == "create" && !ereg("^[a-zA-Z0-9\ \<\>\?\,\.\/\{\}\|\~\!\@\#\$\%\&\(\)\_\+\']*$", GetFormData($f, $s, "smstextarea"))) {
 			error('Invalid character(s) in SMS Message.');	
 		} else {
 			//submit changes
