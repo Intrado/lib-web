@@ -635,7 +635,7 @@ class JobWiz_messageSelect extends WizStep {
 		}
 		
 		if (isset($values["record"]))
-			$values["record"] = _L("Automatic Email Notification");
+			$values["record"] = _L("Automatic Email Alert");
 		
 		if ($USER->authorize("sendemail") && in_array('email',$postdata['/message/pick']['type'])) {
 			$formdata["email"] = array(
@@ -652,7 +652,7 @@ class JobWiz_messageSelect extends WizStep {
 		}
 		
 		if (isset($values["record"]))
-			$values["record"] = _L("Automatic Text Notification");
+			$values["record"] = _L("Automatic SMS Text Alert");
 
 		if ($USER->authorize("sendsms") && in_array('sms',$postdata['/message/pick']['type'])) {
 			$formdata["sms"] = array(

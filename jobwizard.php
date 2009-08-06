@@ -73,8 +73,8 @@ $wizdata = array(
 			"translate" => new JobWiz_messageEmailTranslate(_L("Translations"))
 		)),
 		"sms" => new WizSection ("SMS",array(
-			"pick" => new JobWiz_messageSmsChoose(_L("SMS: Message")),
-			"text" => new JobWiz_messageSmsText(_L("Compose Txt"))
+			"pick" => new JobWiz_messageSmsChoose(_L("SMS: SMS Text")),
+			"text" => new JobWiz_messageSmsText(_L("SMS Text"))
 		))
 	)),
 	"schedule" => new WizSection ("Schedule",array(
