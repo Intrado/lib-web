@@ -135,7 +135,7 @@ foreach($systemprioritynames as $index => $name){
 		<th align="left" class="windowRowHeader bottomBorder" valign="top" style="padding-top: 6px;">Name</th>
 		<th align="left" class="windowRowHeader bottomBorder" valign="top" style="padding-top: 6px;">Display Information</th>
 		<th align="left" class="windowRowHeader bottomBorder" valign="top" style="padding-top: 6px;">Default Notification Setting</th>
-		<th align="left" class="windowRowHeader bottomBorder" valign="top" style="padding-top: 6px;">&nbsp;</th>
+		<th align="left" class="windowRowHeader bottomBorder" colspan=100 valign="top" style="padding-top: 6px;">&nbsp;</th>
 	</tr>
 
 <?
@@ -155,7 +155,7 @@ if (getSystemSetting('_hassurvey', true)) {
 		<th align="left" class="windowRowHeader bottomBorder" valign="top" style="padding-top: 6px;">Name</th>
 		<th align="left" class="windowRowHeader bottomBorder" valign="top" style="padding-top: 6px;">Display Information</th>
 		<th align="left" class="windowRowHeader bottomBorder" valign="top" style="padding-top: 6px;">Default Notification Setting</th>
-		<th align="left" class="windowRowHeader bottomBorder" valign="top" style="padding-top: 6px;">&nbsp;</th>
+		<th align="left" class="windowRowHeader bottomBorder" colspan=100 valign="top" style="padding-top: 6px;">&nbsp;</th>
 	</tr>
 <?
 	foreach($surveytypes as $surveytype) {
@@ -361,9 +361,9 @@ function displayJobtypeForm($f, $s, $jobtypeid, $maxphones, $maxemails, $maxsms)
 		</td>
 <?
 		if(($type->systempriority == 2 && $IS_COMMSUITE) || $type->systempriority == 3) {
-			?><td class="bottomBorder" ><?=button("Delete", "if(confirmDelete()) submitForm('" . $f . "','delete','" . $jobtypeid. "');")?></td><?
+			?><td colspan=100 class="bottomBorder" ><?=button("Delete", "if(confirmDelete()) submitForm('" . $f . "','delete','" . $jobtypeid. "');")?></td><?
 		} else {
-			?><td class="bottomBorder" >&nbsp;</td><?
+			?><td colspan=100 class="bottomBorder" >&nbsp;</td><?
 		}
 ?>
 	</tr>
