@@ -252,13 +252,14 @@ $formdata["accessid"] = array(
 	"fieldhelp" => _L('Access Profiles define which sets of features a group of users may access.'),
 	"value" => $edituser->accessid,
 	"validators" => array(
-		array("ValRequired")
+		array("ValRequired"),
+		array("ValInArray", array_keys($accessprofiles))
 	),
 	"control" => array("SelectMenu", "values"=>$accessprofiles),
 	"helpstep" => 2
 );
 if (!count($accessprofiles)) {
-	$formdata["accessid"]["control"] = array("FormHtml","html" => _L("You have no Access Profiles defined! Go to the Admin->Profiles tab and create one."));
+	$formdata["accessid"]["control"] = array("FormHtml","html" => "<div id='accessprofilediv'></div><div style='color: red'>"._L("You have no Access Profiles defined! Go to the Admin->Profiles tab and create one.")."</div>");
 	unset($formdata["accessid"]["validators"]);
 }
 
@@ -403,6 +404,10 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		$datachange = true;
 	} else if (($errors = $form->validate()) === false) { //checks all of the items in this form
 		$postdata = $form->getData(); //gets assoc array of all values {name:value,...}
+		
+		if (!count($accessprofiles)) {
+			$form->modifyElement('accessprofilediv', '<script>alert("'._L("You have no Access Profiles defined! Go to the Admin->Profiles tab and create one.").'")</script>');
+		}
 		
 		if ($edituser->id == NULL) {
 			$edituser->enabled = 1;
