@@ -217,7 +217,7 @@ if ($USER->authorize('sendphone')) {
 			"validators" => array(
 				array("ValPhone")
 			),
-			"control" => array("TextField","size" => 13, "maxlength" => 20),
+			"control" => array("TextField","size" => 20, "maxlength" => 20),
 			"helpstep" => $helpstep
 		);
 		
