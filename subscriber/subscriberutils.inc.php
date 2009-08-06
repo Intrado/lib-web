@@ -6,11 +6,11 @@ function getPhoneReview($phone, $code) {
 	$formhtml = '<div style="height: 200px; overflow:auto;">' . 
 		_L("You must follow these steps within <b>24 hours</b> to complete this addition to your account.") . '<br><br>' .
 		button(_L("Print this page now"), "window.print()") . '<br><br><br>' .
-		_L("Step 1: You must call from the phone ") . '<b>' . Phone::format($phone) . '</b>' . _L(" in order to verify your caller ID.") . '<br>' .
+		_L("Step 1: You must call from the phone ") . ' <b>' . Phone::format($phone) . '</b> ' . _L(" in order to verify your caller ID.") . '<br>' .
 		'<img src="img/bug_lightbulb.gif" >&nbsp;&nbsp;' . _L("If your phone service has caller identification blocked, you must first dial *82 to unblock it for this call.") . '<br>' .
 		_L("Step 2: Call ") . '<b>' . Phone::format($inboundnumber) . '</b><br>' . 
 		_L('Step 3: When prompted, select option 2.<br>') .
-		_L('Step 4: When prompted, enter this activation code') . '<span style="font-weight:bold; font-size: 140%;">' . $code . '</span><br>' .
+		_L('Step 4: When prompted, enter this activation code') . '<span style="font-weight:bold; font-size: 140%;">  ' . $code . '</span><br>' .
 		_L('Step 5: When the call is complete, log back into your account to edit your notification preferences.<br>') .
 		'</div>';
 	return $formhtml;
