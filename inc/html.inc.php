@@ -14,6 +14,8 @@ function help($title, $extrahtml = NULL, $style = NULL) {
 	} else {
 		$link = "";
 	}
+	
+	$link = ""; //DISABLE ALL HELP LINKS
 
 	$contents = nl2br($contents);
 	
