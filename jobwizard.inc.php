@@ -93,14 +93,21 @@ class HtmlRadioButtonBigCheck extends FormItem {
 		$str .= '</table>
 			<script>
 				function htmlRadioButtonBigCheck_doCheck(form, formitem, checkimg, container, value) {
+					var form = $(form);
+					var formitem = $(formitem);
 					var checkimg = $(checkimg);
 					var container =  $(container);
-					$(formitem).value = value;
+					formitem.value = value;
 					container.select(\'[class="htmlRadioButtonBigCheck_checkImg"]\').each( function(i) {
 						$(i).src = "img/bigradiobutton.gif";
 					});
 					checkimg.src = "img/bigradiobutton_checked.gif";
-					form_do_validation($(form), $(formitem));
+					// set helper step and validate
+					var formvars = document.formvars[form.name];
+					var fieldset = formitem.up("fieldset");
+					var step = fieldset.id.substring(fieldset.id.lastIndexOf("_")+1)-1;
+					form_go_step(form,null,step);
+					form_do_validation(form, formitem);
 				}
 			</script>
 		';
