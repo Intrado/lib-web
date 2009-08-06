@@ -477,10 +477,11 @@ var RuleEditor = Class.create({
 		if (fieldmap.type == 'multisearch') {
 			var multisearchValues = [];
 			if (this.valueTD.down('input')) {
-				var checkboxes = this.valueTD.select('input');
-				for (var i = 0; i < checkboxes.length; ++i) {
-					if (checkboxes[i].checked)
-						multisearchValues.push(checkboxes[i].getValue());
+				var checkboxes = this.valueTD.select('input:checked');
+				var count = checkboxes.length;
+				for (var i = 0; i < count; ++i) {
+					var checkbox = checkboxes[i];
+					multisearchValues.push(checkbox.value);
 				}
 			} else {
 				var select = this.valueTD.down('select');
@@ -576,35 +577,21 @@ var RuleEditor = Class.create({
 					var multicheckboxHTML = this.ruleWidget.multisearchHTMLCache[fieldnum];
 					container.update(multicheckboxHTML);
 					this.add_multicheckbox_toolbar(container);
-					
-					if (container.down('input')) {
-						var boxes = container.select('input');
-						boxes.each(function(checkbox) {
-							checkbox.checked = false;
-						});
-					}
 				} else {
-					cachedAjaxGet('ajax.php?type=persondatavalues&fieldnum=' + fieldnum,
-						function(transport, fieldnum) {
+					new Ajax.Request('ajax.php?type=persondatavalues&fieldnum=' + fieldnum, {
+						onSuccess: function(transport, fieldnum) {
 							var section = this.valueTD.down('fieldset').down('div');
 							var data = transport.responseJSON;
 							if (!data) {
 								container.update('<?=addslashes(_L("No data found"))?>');
 							}
 							
-							var multicheckboxHTML = this.make_multicheckbox(data,false,true,true);
+							var multicheckboxHTML = this.make_multicheckbox(data);
 							this.ruleWidget.multisearchHTMLCache[fieldnum] = multicheckboxHTML;
 							container = new Element('div').update(multicheckboxHTML);
 							section.update(this.add_multicheckbox_toolbar(container));
-							// TODO: optimize input[type="checkbox"] to first and last element?
-							if (container.down('input')) {
-								var boxes = container.select('input');
-								boxes.each(function(input) {
-									input.observe('focus', this.trigger_event_in_column.bindAsEventListener(this, this.valueTD));
-								}.bind(this));
-							}
 						}.bindAsEventListener(this, fieldnum)
-					);
+					});
 				}
 				break;
 				
@@ -639,14 +626,6 @@ var RuleEditor = Class.create({
 				container.update(this.make_textbox(''));
 				break;
 		}
-			  
-		// TODO: optimize input[type="checkbox"] to first and last element?
-		container.select('input').each(function(input) {
-			input.observe('focus', this.trigger_event_in_column.bindAsEventListener(this, this.valueTD));
-		}.bind(this));
-		container.select('select').each(function(input) {
-			input.observe('focus', this.trigger_event_in_column.bindAsEventListener(this, this.valueTD));
-		}.bind(this));
 		
 		section.update(container);
 
@@ -750,14 +729,14 @@ var RuleEditor = Class.create({
 	add_multicheckbox_toolbar: function(multicheckboxContainer, threshold) {
 		if (!threshold)
 			threshold = 10;
-		var length = multicheckboxContainer.select('input').length;
 		// If necessary, add CheckAll and Clear, and limit height
-		if (length > threshold) {
+		if (multicheckboxContainer.down('input', threshold)) {
 			var checkAll = new Element('a', {'href':'#', 'style':'float:left; white-space: nowrap;'}).insert('<?=addslashes(_L('Check All'))?>');
 			checkAll.observe('click', function(event) {
 				event.stop();
 				var checkboxes = this.select('input');
-				for (var i = 0; i < checkboxes.length; ++i) {
+				var count = checkboxes.length;
+				for (var i = 0; i < count; ++i) {
 					checkboxes[i].checked = true;
 				}
 			}.bindAsEventListener(multicheckboxContainer));
@@ -765,7 +744,8 @@ var RuleEditor = Class.create({
 			clear.observe('click', function(event) {
 				event.stop();
 				var checkboxes = this.select('input');
-				for (var i = 0; i < checkboxes.length; ++i) {
+				var count = checkboxes.length;
+				for (var i = 0; i < count; ++i) {
 					checkboxes[i].checked = false;
 				}
 			}.bindAsEventListener(multicheckboxContainer));
@@ -778,45 +758,25 @@ var RuleEditor = Class.create({
 	// NOTE: If you want add a toolbar, do add_multicheckbox_toolbar(new Element('div').update(make_multicheckbox()));
 	// @param paired, if true, values[i] = {text:"Item i", value:"234", checked:true, onclick:callback, onhover:callback}
 	// @param returnHTML, returns as inline HTML, which means implies also that values[i].onclick is ignored.
-	make_multicheckbox: function(values, paired, returnHTML, fixedSize) {
+	make_multicheckbox: function(values) {
 		multicheckbox = new Element('div', {'style': 'border: solid 1px gray; background: white; overflow:hidden;'});
 		if (!values || !values.join)
 			values = [''];
 
-		// TODO: Determine if it's faster to insert as html or use DOM methods.
-		// NOTE: So far it looks like DOM is faster, because Internet Explorer 6 seems to get very slow when concatenating long string in javascript.
-		var ul = new Element('ul', {'style': 'clear:both; margin:0; padding:0; list-style:none; overflow:auto; ' + (fixedSize ? 'width: 180px;' : '')});
-		// TODO: max is temporary hack to stop browser from consuming too much memory! It needs to be removed when in production
-		//var max = (values.length > 100) ? 100 : values.length;
+		var ul = new Element('ul', {'style': 'clear:both; margin:0; padding:0; list-style:none; overflow:auto; width: 180px;'});
 		var max = values.length;
+		if (max == 1)
+			return "<select><option value='"+values[0]+"'>" +values[0]+"</option></select>";
 		for (var i = 0; i < max; ++i) {
-			var data = values[i];
-			var text = paired ? data.text: data;
-			var value = paired ? data.value: data;
+			var value = values[i];
 			var checkbox = new Element('input', {'type':'checkbox', 'value':value, 'style':'font-size:90%'});
-			if (!paired && max == 1) {
-				return "<select><option value='"+value+"'>" +text+"</option></select>";
-			}
-			var label = new Element('label', {'style':'margin:0;padding:1px; font-size:90%;', 'for':checkbox.identify()}).update(text.escapeHTML());
+			var label = new Element('label', {'style':'margin:0;padding:1px; font-size:90%;', 'for':checkbox.identify()}).update(value.escapeHTML());
 			var li = new Element('li', {'style':'white-space:nowrap; font-size:90%; margin:0;margin:1px;overflow: hidden; vertical-align:middle'}).insert(checkbox).insert(label);
-			if (paired && !returnHTML) {
-				if (data.checked) {
-					checkbox.checked = true;
-					checkbox.setAttribute('defaultChecked', true); // Workaround for Internet Explorer.
-				}
-				if (data.onclick)
-					checkbox.observe('click', data.onclick.bindAsEventListener(checkbox, value));
-				if (data.onhover)
-					label.observe('mouseover', data.onhover.bindAsEventListener(label, value));
-			}
 			ul.insert(li);
 		}
 		multicheckbox.insert(ul);
 		
-		if (returnHTML)
-			return new Element('div').update(multicheckbox).innerHTML;
-		else
-			return multicheckbox;
+		return new Element('div').update(multicheckbox).innerHTML;
 	},
 
 	make_selectbox: function(values, hidden) {

@@ -173,7 +173,7 @@ function listform_load(listformID, formData, postURL) {
 		$('saveRulesButton').observe('click', function(event) {
 			Tips.hideAll();
 			if (ruleEditor.get_selected_fieldmap()) {
-				alert('<?=addslashes(_L("Please click the add button, or clear the unused rule"))?>');
+				listform_warn_add_rule();
 				return;
 			}
 			
@@ -185,6 +185,11 @@ function listform_load(listformID, formData, postURL) {
 	
 	$('chooseListChoiceButton').observe('click', function(event) {
 		Tips.hideAll();
+		if (ruleEditor.get_selected_fieldmap()) {
+			listform_warn_add_rule();
+			return;
+		}
+			
 		$('chooseListChoiceButton').hide();
 		$('chooseListWindow').show();
 		listform_hide_build_list_window();
@@ -209,6 +214,10 @@ function listform_load(listformID, formData, postURL) {
 			}
 		}
 	);	
+}
+
+function listform_warn_add_rule() {
+	alert('<?=addslashes(_L("Please click the add button, or clear the unused rule"))?>');
 }
 
 // Adds listid to listformVars.listidsElement
@@ -374,7 +383,7 @@ function listform_hover_existing_list(nullableEvent, listid, tr) {
 	$('listchooseTotalAdded').update();
 	$('listchooseTotalRemoved').update();
 	$('listchooseTotalRule').update();
-		
+	
 	cachedAjaxGet('ajax.php?type=liststats&listids='+[listid].toJSON(), function(transport, listid, tr) {
 		var stats = transport.responseJSON;
 		if (!stats) {
@@ -456,19 +465,35 @@ function listform_remove_list(event, listid, doconfirm) {
 }
 
 function listform_reset_list_selectbox() {
-	var values = [];
+	var datas = [];
 	for (var listid in listformVars.existingLists) {
-		var data = {text:listformVars.existingLists[listid].name, value:listid, checked: false, onclick:listform_onclick_existing_list, onhover:listform_hover_existing_list};
+		var data = {text:listformVars.existingLists[listid].name, value:listid, checked: false};
 		if (listformVars.existingLists[listid].added)
 			data.checked = true;
-		values.push(data);
+		datas.push(data);
 	}
 
-	if (values.length > 0) {
-		var multicheckbox = ruleEditor.make_multicheckbox(values, true, false);
-		var ul = multicheckbox.down('ul');
-		ul.style.height = '200px';
-		ul.style.paddingRight = '4px';
+	if (datas.length > 0) {
+		multicheckbox = new Element('div', {'style': 'border: solid 1px gray; background: white; overflow:hidden;'});
+		var ul = new Element('ul', {'style': 'clear:both; margin:0; padding:0; list-style:none; overflow:auto; height:200px; padding-right:4px'});
+		var max = datas.length;
+		for (var i = 0; i < max; ++i) {
+			var data = datas[i];
+			var text = data.text;
+			var value = data.value;
+			var checkbox = new Element('input', {'type':'checkbox', 'value':value, 'style':'font-size:90%'});
+			var label = new Element('label', {'style':'margin:0;padding:1px; font-size:90%;', 'for':checkbox.identify()}).update(text.escapeHTML());
+			var li = new Element('li', {'style':'white-space:nowrap; font-size:90%; margin:0;margin:1px;overflow: hidden; vertical-align:middle'}).insert(checkbox).insert(label);
+			if (data.checked) {
+				checkbox.checked = true;
+				checkbox.setAttribute('defaultChecked', true); // Workaround for Internet Explorer.
+			}
+			checkbox.observe('click', listform_onclick_existing_list.bindAsEventListener(checkbox, value));
+			label.observe('mouseover', listform_hover_existing_list.bindAsEventListener(label, value));
+			ul.insert(li);
+		}
+		multicheckbox.insert(ul);
+
 		$('listSelectboxContainer').update(multicheckbox);
 	} else {
 		$('listSelectboxContainer').update('<?=addslashes(_L("There are no existing lists, you will need to build one."))?>');
