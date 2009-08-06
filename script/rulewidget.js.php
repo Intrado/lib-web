@@ -23,7 +23,11 @@ var RuleWidget = Class.create({
 	//----------------------------- PUBLIC FUNCTIONS --------------------------
 
 	// @param container, the DOM container for this widget.
-	initialize: function(container, readonly, allowedFields, showRemoveAllButton) {
+	// @param readonly, disables rule editor
+	// @param, allowedFields, single letters, example: ['f','g','c']
+	// @param, ignoredFields, specific fieldnums to ignore, example: ['c01']
+	// @param, showRemoveAllButton, "Remove All Rules" button, fires "RuleWidget:RemoveAllRules"
+	initialize: function(container, readonly, allowedFields, ignoredFields, showRemoveAllButton) {
 		this.ruleEditorGuideContents = <?=json_encode(array(
 			// Fieldmap
 			'additionalChooseFieldmap' => _L('To add another filter rule select a field'), // Used instead of 'chooseFieldmap' if there are existing rules
@@ -65,6 +69,11 @@ var RuleWidget = Class.create({
 		else
 			this.allowedFields = allowedFields;
 			
+		if (!ignoredFields)
+			this.ignoredFields = [];
+		else
+			this.ignoredFields = ignoredFields;
+			
 		this.container = container;
 		this.warningDiv = new Element('div', {'style':'color:red; padding:2px'});
 		this.warningDiv.hide();
@@ -96,7 +105,7 @@ var RuleWidget = Class.create({
 		
 		if (showRemoveAllButton) {
 			var removeAllButtonHtml = '<div style="float:right">' + '<?=addslashes(icon_button(_L('Remove All Rules'),'diagona/16/101'))?>' + '</div><span style="clear:both"></span>';
-			var td = new Element('td', {'colspan':'100'}).update(removeAllButtonHtml);
+			var td = new Element('td', {}).update(removeAllButtonHtml);
 			var button = td.down('button');
 			button.observe('click', function(event) {
 				this.container.fire('RuleWidget:RemoveAllRules');
@@ -135,8 +144,13 @@ var RuleWidget = Class.create({
 				// data['fieldmaps'] is indexed by record id, we prefer indexing by fieldnum.
 				for (var i in data['fieldmaps']) {
 					var fieldnum = data['fieldmaps'][i].fieldnum;
+					// Test first letter
 					if (this.allowedFields.indexOf(fieldnum.charAt(0)) < 0)
 						continue;
+					// Test fieldnum name
+					if (this.ignoredFields.indexOf(fieldnum) >= 0)
+						continue;
+						
 					this.fieldmaps[fieldnum] = data['fieldmaps'][i];
 					for (var type in this.operators) {
 						if (this.fieldmaps[fieldnum].options.match(type))
@@ -192,12 +206,12 @@ var RuleWidget = Class.create({
 		if (!data.type)
 			data.type = this.fieldmaps[data.fieldnum].type;
 		// FieldmapTD
-		var fieldmapTD = new Element('td', {'class':'list', 'style':'font-size:90%', 'valign':'top'}).insert(this.fieldmaps[data.fieldnum].name);
+		var fieldmapTD = new Element('td', {'class':'list', 'style':'white-space:normal;  width:auto; font-size:90%', 'valign':'top'}).insert(this.fieldmaps[data.fieldnum].name);
 		// Keep track of the row's data.fieldnum by using a hidden input.
 		if (addHiddenFieldnum)
-			fieldmapTD.insert(new Element('input', {'type':'hidden', 'style':'font-size:90%','value':data.fieldnum}));
+			fieldmapTD.insert(new Element('input', {'type':'hidden', 'value':data.fieldnum}));
 		// CriteriaTD
-		var criteriaTD = new Element('td', {'class':'list', 'style':'font-size:90%; width:50px', 'valign':'top'});
+		var criteriaTD = new Element('td', {'class':'list', 'style':'white-space:normal;  width:auto; font-size:90%; width:50px', 'valign':'top'});
 		var criteria = this.operators[data.type][data.op];
 		if (data.op == 'in') {
 			criteria = '<?=addslashes(_L('is'))?>';
@@ -207,6 +221,17 @@ var RuleWidget = Class.create({
 		criteriaTD.insert(criteria);
 		
 		// ValueTD
+		var value = this.format_readable_value(data);
+		var widthCSS = (addHiddenFieldnum) ? '  ' : '  ';
+		var heightCSS = (value.length > 400) ? ' overflow: auto; height: 300px; ' : '';
+		var valueDiv = new Element('div', {'style': 'width: 80px; overflow:hidden; white-space:normal; ' + widthCSS + heightCSS}).update(value);
+		var valueTD = new Element('td', {'class':'list',  'style':'overflow:hidden; white-space:normal; font-size:90%','valign':'top'}).update(valueDiv);
+		tr.insert(fieldmapTD).insert(criteriaTD).insert(valueTD);
+		
+		return true;
+	},
+	
+	format_readable_value: function(data) {
 		var value = '';
 		if (!data.val.join) {
 			if (data.type == 'multisearch') {
@@ -221,12 +246,7 @@ var RuleWidget = Class.create({
 		} else {
 			value = data.val.join(' <?=addslashes(_L('and'))?> ');
 		}
-		var widthCSS = (addHiddenFieldnum) ? ' width: 80px; ' : '';
-		var heightCSS = (value.length > 400) ? ' overflow: auto; height: 300px; ' : '';
-		var valueTD = new Element('td', {'class':'list', 'style':'font-size:90%','valign':'top'}).update(new Element('div', {'style': 'overflow:hidden; ' + widthCSS + heightCSS}).update(value.escapeHTML().replace(/,/g, ',<br/>') + '&nbsp;'));
-		tr.insert(fieldmapTD).insert(criteriaTD).insert(valueTD);
-		
-		return true;
+		return value.escapeHTML().replace(/,/g, ',<br/>') + ' ';
 	},
 	
 	refresh_guide: function (reset, specificFieldset) {
@@ -290,18 +310,34 @@ var RuleWidget = Class.create({
 		this.ruleHelperContentDiv.setStyle({'border':'solid 3px rgb(150,150,255)', 'padding':'2px'});
 	},
 
-	refresh_rules_table: function() {
-		var ruleCount = $H(this.appliedRules).keys().length + 1;
-		
+	refresh_rules_table: function(latestData) {
 		var rows = this.rulesTableBody.rows;
 		for (var i = 0; i < rows.length; i++) {
 			rows[i].cells[0].update('<?=addslashes(_L("Rule #"))?>' + (i+1));
+			
+			if (rows[i].cells.length == 5) {
+				var hiddenField = rows[i].cells[1].down('input');
+				if (hiddenField) {
+					var fieldnum = hiddenField.getValue();
+					if (latestData && fieldnum == latestData.fieldnum) {
+						// cells[3] is ValueTD
+						var valueDiv = rows[i].cells[3].down('div');
+						if (valueDiv)
+							valueDiv.update(this.format_readable_value(latestData));
+					}
+				}
+			}
 		}
 	},
 	
 	// @param data, {fieldnum, type, logical, op, val}
 	insert_rule: function(data, suppressFire) {
-		if (!data) {
+		var needWarning = false;
+		if (!data)
+			needWarning = true;
+		if (data.op && data.op == 'reldate' && (!data.val || !data.val.strip()))
+			needWarning = true;
+		if (needWarning) {
 			alert('<?=addslashes(_L('Please specify a value'))?>');
 			return false;
 		}
@@ -315,7 +351,7 @@ var RuleWidget = Class.create({
 		if (!this.delayActions || suppressFire) {
 			// Actions
 			if (this.ruleEditor) {
-					var actionTD = new Element('td', { 'style':'clear:both', 'valign':'top'}).update('<?=addslashes(icon_button(_L('Remove'), 'diagona/10/101'))?><span style="clear:both"></span>');
+					var actionTD = new Element('td', { 'style':'', 'valign':'top'}).update('<div style="clear:both"><?=addslashes(icon_button(_L('Remove'), 'diagona/10/101'))?></div><span style="clear:both"></span>');
 					var deleteRuleButton = actionTD.down('button');
 					tr.insert(actionTD);
 					deleteRuleButton.observe('click', function(event, tr, fieldnum) {
@@ -692,7 +728,7 @@ var RuleEditor = Class.create({
 		this.valueTD.down('fieldset').down('div').update();
 		this.actionTD.down('fieldset').down('div').update();
 		this.ruleWidget.container.style.width = '400px';
-			
+		
 		this.criteriaTD.down('span').stopObserving('click').hide();
 		this.valueTD.down('span').stopObserving('click').hide();
 		this.actionTD.down('span').stopObserving('click').hide();

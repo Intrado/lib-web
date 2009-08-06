@@ -342,7 +342,7 @@ function listform_refresh_preview (listid) {
 				Tips.hideAll();
 				return;
 			}
-
+			
 			var previewBox = new Element('div');
 			var tbody = new Element('tbody');
 			for (var i in listRules[listid]) {
@@ -352,6 +352,10 @@ function listform_refresh_preview (listid) {
 				var tr = new Element('tr');
 				ruleWidget.format_readable_rule(rule, tr);
 				tbody.insert(tr);
+				
+				if (listformVars.pendingList == listid) {
+					ruleWidget.refresh_rules_table(rule);
+				}
 			}
 			if (!tbody.down('td')) {
 				previewBox.update('<?=addslashes(_L('No Rules Found for This List'))?>');

@@ -1,7 +1,8 @@
 <?
 
 // optional $this->args["readonly"], example: true or false.
-// optional $this->args["allowedFields"], example: array('f','g','c')
+// optional $this->args["allowedFields"], single-letters, example: array('f','g','c')
+// optional $this->args["ignoredFields"], specific fieldnums, example: array('c01')
 // optional $this->args["showRemoveAll"], example: true or false
 class FormRuleWidget extends FormItem {
 	function render ($rulesJSON) {
@@ -9,6 +10,10 @@ class FormRuleWidget extends FormItem {
 			$allowedFields = json_encode($this->args["allowedFields"]);
 		else
 			$allowedFields = json_encode(array('f','g','c'));
+		if (!empty($this->args["ignoredFields"]))
+			$ignoredFields = json_encode($this->args["ignoredFields"]);
+		else
+			$ignoredFields = json_encode(array());
 			
 		$readonly = (!empty($this->args["readonly"])) ? json_encode(true) : json_encode(false);
 		$showRemoveAllButton = !empty($this->args["showRemoveAllButton"]) ? json_encode(true) : json_encode(false);
@@ -23,7 +28,7 @@ class FormRuleWidget extends FormItem {
 		$html .= '<script type="text/javascript" src="script/datepicker.js"></script>';
 		// custom javascript
 		$html .= "<script type='text/javascript'>
-			var ruleWidget = new RuleWidget($('ruleWidgetContainer'), $readonly, $allowedFields, $showRemoveAllButton);
+			var ruleWidget = new RuleWidget($('ruleWidgetContainer'), $readonly, $allowedFields, $ignoredFields, $showRemoveAllButton);
 			function rulewidget_update_value(event, pending, deleterule) {
 				$('$inputname').value = '';
 				if (!document.formvars) {
