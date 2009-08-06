@@ -422,6 +422,10 @@ var RuleEditor = Class.create({
 	},
 	
 	trigger_event_in_column: function(nullableEvent, td) {
+		if (this.datepickers) {
+			this.datepickers.invoke('close');
+		}
+		
 		if (nullableEvent && nullableEvent.element().tagName.toUpperCase() == 'LABEL')
 			return;
 		var column = '';
@@ -515,6 +519,10 @@ var RuleEditor = Class.create({
 	//----------------------------- PRIVATE FUNCTIONS --------------------------
 
 	show_criteria_column: function(fieldnum) {
+		if (this.datepickers) {
+			this.datepickers.invoke('close');
+		}
+		
 		var section = this.criteriaTD.down('fieldset').down('div');
 		if (!fieldnum) {
 			section.update();
@@ -539,16 +547,16 @@ var RuleEditor = Class.create({
 	
 	// Determines the appropriate input boxes to show, makes an ajax request for persondatavalues if necessary for multisearch.
 	show_value_column: function(fieldnum) {
+		if (this.datepickers) {
+			this.datepickers.invoke('close');
+		}
+		
 		var section = this.valueTD.down('fieldset').down('div');
 		if (!fieldnum) {
 			section.update();
 			this.show_action_column(true);
 			this.valueTD.down('span').stopObserving('click').hide();
 			return false;
-		}
-		
-		if (this.datepickers) {
-			this.datepickers.invoke('close');
 		}
 		
 		var type = this.ruleWidget.fieldmaps[fieldnum].type;
@@ -708,6 +716,9 @@ var RuleEditor = Class.create({
 			
 		fieldSelectbox.disabled = fieldSelectbox.options.length < 2;
 		fieldSelectbox.observe('change', function(event) {
+			if (this.datepickers) {
+				this.datepickers.invoke('close');
+			}
 			var fieldnum = this.fieldTD.down('select').getValue();
 			this.show_criteria_column(fieldnum);
 			this.show_value_column(null);
