@@ -14,11 +14,11 @@ class TextPasswordStrength extends FormItem {
 						<td>
 							<table style="border-width:0px; border-spacing:0px; padding:0px; border-style:solid; border-color:black">
 								<tr>
-									<td style="padding:0px"><div id="'.$n.'0" style="width:15px; height:12px; -moz-border-radius:5px; background-color:grey;"></div></td>
-									<td style="padding:0px"><div id="'.$n.'1" style="width:15px; height:12px; -moz-border-radius:5px; background-color:grey;"></div></td>
-									<td style="padding:0px"><div id="'.$n.'2" style="width:15px; height:12px; -moz-border-radius:5px; background-color:grey;"></div></td>
-									<td style="padding:0px"><div id="'.$n.'3" style="width:15px; height:12px; -moz-border-radius:5px; background-color:grey;"></div></td>
-									<td style="padding:0px"><div id="'.$n.'4" style="width:15px; height:12px; -moz-border-radius:5px; background-color:grey;"></div></td>
+									<td style="padding:0px"><div id="'.$n.'0" style="width:15px; height:12px; -moz-border-radius:5px; background-color:gray;"></div></td>
+									<td style="padding:0px"><div id="'.$n.'1" style="width:15px; height:12px; -moz-border-radius:5px; background-color:gray;"></div></td>
+									<td style="padding:0px"><div id="'.$n.'2" style="width:15px; height:12px; -moz-border-radius:5px; background-color:gray;"></div></td>
+									<td style="padding:0px"><div id="'.$n.'3" style="width:15px; height:12px; -moz-border-radius:5px; background-color:gray;"></div></td>
+									<td style="padding:0px"><div id="'.$n.'4" style="width:15px; height:12px; -moz-border-radius:5px; background-color:gray;"></div></td>
 								</tr>
 							</table>
 						</td>
@@ -41,11 +41,11 @@ class TextPasswordStrength extends FormItem {
 						if (pass.length > 10)
 							xlen = 1;
 						for (var i = 0; i < pass.length; i++) {
-							if (parseInt(pass[i]) > 0)
+							if (parseInt(pass.charAt(i)) > 0)
 								int = 1;
-							if ($A(specialchars).indexOf(pass[i]) > -1)
+							if ($A(specialchars).indexOf(pass.charAt(i)) > -1)
 								spe = 1;
-							if (pass[i].toUpperCase() <= "Z" &&  pass[i].toUpperCase() >= "A" && (pass[i] == pass[i].toUpperCase()))
+							if (pass.charAt(i).toUpperCase() <= "Z" && pass.charAt(i).toUpperCase() >= "A" && (pass.charAt(i) == pass.charAt(i).toUpperCase()))
 								ucase = 1;
 						}
 						var strength = int + spe + len + xlen + ucase;
