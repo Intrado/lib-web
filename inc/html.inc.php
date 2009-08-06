@@ -132,7 +132,7 @@ function button_bar() {
 
 
 function hidden_submit_button($value = "submit") {
-	$btn = '<button style="position: absolute; left: -1000px; top: -1000px;" type="submit" name="submit" value="'.escapehtml($value).'" onclick="return form_submit(event,\''.escapehtml($value).'\');"></button>';
+	$btn = '<input type="submit" name="submit" value="'.escapehtml($value).'" style="position: absolute; left: -1000px; top: -1000px;" onclick="return form_submit(event,\''.escapehtml($value).'\');"></button>';
 	return $btn;
 }
 
