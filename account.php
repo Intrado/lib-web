@@ -365,6 +365,8 @@ $formdata["actionlinks"] = array(
 	"helpstep" => 3
 );
 
+/*
+// release 7.0 not translated, take this option out for now
 $formdata["locale"] = array(
 	"label" => _L("Display Language"),
 	"fieldhelp" => ("Use this menu to select the language for the user interface."),
@@ -374,6 +376,7 @@ $formdata["locale"] = array(
 	"control" => array("SelectMenu", "values"=>$LOCALES),
 	"helpstep" => 3
 );
+*/
 
 $formdata["brandtheme"] = array(
 	"label" => _L("Customize Theme"),
@@ -444,8 +447,8 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		$USER->setSetting("maxjobdays", $postdata['maxjobdays']);
 		
 		$USER->setSetting("actionlinks", $postdata['actionlinks']);
-		$USER->setSetting("_locale", $postdata['locale']);
-		$_SESSION['_locale'] = $postdata['locale'];
+		//$USER->setSetting("_locale", $postdata['locale']);
+		//$_SESSION['_locale'] = $postdata['locale'];
 
 		$newTheme = json_decode($postdata['brandtheme']);
 		
