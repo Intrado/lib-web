@@ -1497,7 +1497,7 @@ class JobWiz_scheduleAdvanced extends WizStep {
 				$formdata["callerid"] = array(
 					"label" => _L("Caller ID"),
 					"fieldhelp" => _L('This option will set the Caller ID when the person is called.'),
-					"value" => Phone::format($USER->getSetting("callerid","")),
+					"value" => Phone::format($USER->getSetting("callerid", getSystemSetting("callerid"))),
 					"validators" => array(
 						array("ValLength","min" => 3,"max" => 20),
 						array("ValPhone")
@@ -1580,7 +1580,7 @@ class JobWiz_submitConfirm extends WizStep {
 		$wizHasEmailMsg= wizHasEmail($postdata);
 		$wizHasSmsMsg= wizHasSms($postdata);
 
-		// if something is missing from post data... NOTE THE NOT SYMBOL !!!
+		// if something is missing from post data send to unauthorized... NOTE THE NOT SYMBOL !!!
 		if (!(($wizHasPhoneMsg ||$wizHasEmailMsg || $wizHasSmsMsg) &&
 			isset($postdata["/schedule/options"]["schedule"]) &&
 			($postdata["/schedule/options"]["schedule"] == "now"  ||
