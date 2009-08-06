@@ -106,7 +106,7 @@ $jobtypenames = array();
 $jobtypehoverdata = array();
 foreach ($jobtypes as $jobtype) {
 	$jobtypenames[$jobtype->id] = $jobtype->name;
-	$jobtypehoverdata[$jobtype->id] = nl2br($jobtype->info);
+	$jobtypehoverdata[$jobtype->id] = escapehtml(nl2br($jobtype->info));
 }
 
 $types = array();
