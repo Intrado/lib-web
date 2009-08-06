@@ -16,6 +16,9 @@ require_once("parentportalutils.inc.php");
 // Data Handling
 ////////////////////////////////////////////////////////////////////////////////
 
+unset($_SESSION['phoneactivationcode']); // clear for next wizard, doubleclick
+
+
 $result = portalGetCustomerAssociations();
 if($result['result'] == ""){
 	$customerlist = $result['custmap'];

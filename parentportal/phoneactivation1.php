@@ -8,6 +8,8 @@ require_once("../inc/table.inc.php");
 if (!$INBOUND_ACTIVATION)
 	redirect("addcontact1.php");
 
+$_SESSION['doubleclick'] = false;
+
 $maxcontacts = 10;
 
 global $oktogo;

@@ -14,7 +14,9 @@ $phones = array();
 $code = "";
 $pkeyok = array();
 
-
+if ($_SESSION['doubleclick'] && $_SESSION['phoneactivationcode']) {
+	redirect("phoneactivation2.php");
+} else {
 $result = portalCreatePhoneActivation($_SESSION['customerid'], $_SESSION['portaluserid'], array_keys($_SESSION['phoneactivationpkeylist']), true);
 if ($result['result'] == "") {
 	$phones = $result['phonelist'];
@@ -32,6 +34,7 @@ if ($result['result'] == "") {
 	$_SESSION['phoneactivationokpkeylist'] = $pkeyok;
 	$_SESSION['phoneactivationokphonelist'] = $phones;
 	redirect("phoneactivation2.php");
+}
 }
 
 error_log("portalcreatephoneactivation failed for customer ".$_SESSION['customerid']." and portaluser ".$_SESSION['portaluserid']);
