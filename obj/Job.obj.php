@@ -101,20 +101,20 @@ class Job extends DBMappedObject {
 		$newjob->id = NULL;
 		if ($isrepeatingrunnow || $newjob->status == "repeating") {
 			$tmpDate = date("M j, g:i a");
-			$newjob->name = DBSafe(substr($newjob->name,0,47 - strlen($tmpDate)) . " - $tmpDate");
+			$newjob->name = substr($newjob->name,0,47 - strlen($tmpDate)) . " - $tmpDate";
 		} else {
 			$tmpJobName = $newjob->name;
 			$copySuffix = " (Copy)";
 			if (strlen($tmpJobName) > 40)
 				$tmpJobName = substr($tmpJobName,0,39) . "... ";
 			$copyCount = 1;
-			while (DBFind("Job", "from job where name = '".DBSafe($tmpJobName.$copySuffix)."' and deleted = 0 and cancelleduserid is NULL")) {
+			while (DBFind("Job", "from job where name =? and not deleted and cancelleduserid is NULL", false, array($tmpJobName.$copySuffix))) {
 				$copySuffix = " (Copy $copyCount)";
 				if (strlen($tmpJobName) > 39 - strlen($copyCount))
 					$tmpJobName = substr($tmpJobName,0,38 - strlen($copyCount)) . "... ";
 				$copyCount++;
 			}
-			$newjob->name = DBSafe($tmpJobName . $copySuffix);
+			$newjob->name = $tmpJobName . $copySuffix;
 		}
 
 		$newjob->status = "new";
@@ -147,7 +147,7 @@ class Job extends DBMappedObject {
 				$newjob->phonemessageid = $newmsg->id;
 				$newjob->update();
 			}
-			$joblangs = DBFindMany("JobLanguage", "from joblanguage where jobid=$this->id and type='phone'");
+			$joblangs = DBFindMany("JobLanguage", "from joblanguage where jobid=? and type='phone'", false, array($this->id));
 			foreach ($joblangs as $jl) {
 				$newmsg = Job::copyMessage($jl->messageid);
 
@@ -160,8 +160,8 @@ class Job extends DBMappedObject {
 		} else {
 			//copy all the job language settings
 			QuickUpdate("insert into joblanguage (jobid, messageid, type, language)
-				select $newjob->id, messageid, 'phone', language
-				from joblanguage where jobid=$this->id and type='phone'");
+				select ?, messageid, 'phone', language
+				from joblanguage where jobid=? and type='phone'", false, array($newjob->id, $this->id));
 		}
 		// email messages
 		if (!$isrepeatingrunnow && $newjob->isOption('jobcreatedemail')) {
@@ -171,7 +171,7 @@ class Job extends DBMappedObject {
 				$newjob->emailmessageid = $newmsg->id;
 				$newjob->update();
 			}
-			$joblangs = DBFindMany("JobLanguage", "from joblanguage where jobid=$this->id and type='email'");
+			$joblangs = DBFindMany("JobLanguage", "from joblanguage where jobid=? and type='email'", false, array($this->id));
 			foreach ($joblangs as $jl) {
 				$newmsg = Job::copyMessage($jl->messageid);
 
@@ -184,27 +184,27 @@ class Job extends DBMappedObject {
 		} else {
 			//copy all the job language settings
 			QuickUpdate("insert into joblanguage (jobid, messageid, type, language)
-				select $newjob->id, messageid, 'email', language
-				from joblanguage where jobid=$this->id and type='email'");
+				select ?, messageid, 'email', language
+				from joblanguage where jobid=? and type='email'", false, array($newjob->id, $this->id));
 		}
 		// sms has no translation or joblanguage, no need to copy
 
 
 		//copy all the job lists
 		QuickUpdate("insert into joblist (jobid,listid,thesql)
-			select $newjob->id, listid, thesql
-			from joblist where jobid=$this->id");
+			select ?, listid, thesql
+			from joblist where jobid=?", false, array($newjob->id, $this->id));
 
 		// do not need to copy jobsetting, these are handled by the job object
 		// remove the 'translationexpire' jobsetting to force retranslation
-		QuickUpdate("delete from jobsetting where jobid=$newjob->id and name='translationexpire'");
+		QuickUpdate("delete from jobsetting where jobid=? and name='translationexpire'", false, array($newjob->id));
 
 		// if _hascallback and user profile does not allow job callerid, be sure the option is set to use the default callerid
 		$a = getSystemSetting('_hascallback', "0");
 		$b = QuickQuery("select p.value from permission p join user u " .
-				"where p.name='setcallerid' and p.accessid=u.accessid and u.id=$newjob->userid");
+				"where p.name='setcallerid' and p.accessid=u.accessid and u.id=?", false, array($newjob->userid));
 		if ($a == "1" && $b != "1") {
-			QuickUpdate("delete from jobsetting where jobid=".$newjob->id." and name='callerid'");
+			QuickUpdate("delete from jobsetting where jobid=? and name='callerid'", false, array($newjob->id));
 		}
 		$newjob->loadSettings(); // reload without the ones we deleted
 
