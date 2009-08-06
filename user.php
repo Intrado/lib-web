@@ -67,6 +67,15 @@ $usersurveytypes = QuickQueryList("select id from jobtype where id in (select jo
 $surveytypes = QuickQueryList("select id, name from jobtype where not deleted and issurvey order by systempriority, name asc", true);
 
 ////////////////////////////////////////////////////////////////////////////////
+// Custom form items
+////////////////////////////////////////////////////////////////////////////////
+class InpageSubmitButton extends FormItem {
+	function render ($value) {
+		return submit_button(_L('Set Staff ID value'), 'submit', 'disk');
+	}
+}
+
+////////////////////////////////////////////////////////////////////////////////
 // Validators
 ////////////////////////////////////////////////////////////////////////////////
 class ValDataRules extends Validator {
@@ -107,43 +116,28 @@ $helpsteps = array();
 
 $formdata[] = _L("Account Information");
 
-if ($readonly) {
-	$formdata["firstname"] = array(
-		"label" => _L("First Name"),
-		"fieldhelp" => _L("The user's first name."),
-		"control" => array("FormHtml","html" => $edituser->firstname),
-		"helpstep" => 1
-	);
-	$formdata["lastname"] = array(
-		"label" => _L("Last Name"),
-		"fieldhelp" => _L("The user's last name."),
-		"control" => array("FormHtml","html" => $edituser->lastname),
-		"helpstep" => 1
-	);
-} else {
-	$formdata["firstname"] = array(
-		"label" => _L("First Name"),
-		"fieldhelp" => _L("The user's first name."),
-		"value" => $edituser->firstname,
-		"validators" => array(
-			array("ValRequired"),
-			array("ValLength","min" => 1,"max" => 50)
-		),
-		"control" => array("TextField","maxlength" => 50, "size" => 30),
-		"helpstep" => 1
-	);
-	$formdata["lastname"] = array(
-		"label" => _L("Last Name"),
-		"fieldhelp" => _L("The user's last name."),
-		"value" => $edituser->lastname,
-		"validators" => array(
-			array("ValRequired"),
-			array("ValLength","min" => 1,"max" => 50)
-		),
-		"control" => array("TextField","maxlength" => 50, "size" => 30),
-		"helpstep" => 1
-	);
-}
+$formdata["firstname"] = array(
+	"label" => _L("First Name"),
+	"fieldhelp" => _L("The user's first name."),
+	"value" => $edituser->firstname,
+	"validators" => array(
+		array("ValRequired"),
+		array("ValLength","min" => 1,"max" => 50)
+	),
+	"control" => array("TextField","maxlength" => 50, "size" => 30),
+	"helpstep" => 1
+);
+$formdata["lastname"] = array(
+	"label" => _L("Last Name"),
+	"fieldhelp" => _L("The user's last name."),
+	"value" => $edituser->lastname,
+	"validators" => array(
+		array("ValRequired"),
+		array("ValLength","min" => 1,"max" => 50)
+	),
+	"control" => array("TextField","maxlength" => 50, "size" => 30),
+	"helpstep" => 1
+);
 
 $formdata["description"] = array(
 	"label" => _L("Description"),
@@ -154,76 +148,44 @@ $formdata["description"] = array(
 	"helpstep" => 1
 );
 
-if ($readonly) {
-	$formdata["login"] = array(
-		"label" => _L("Username"),
-		"fieldhelp" => _L('The username that the user will use to log into the system.'),
-		"control" => array("FormHtml","html" => $edituser->login),
-		"helpstep" => 1
-	);
-} else {
-	$formdata["login"] = array(
-		"label" => _L("Username"),
-		"fieldhelp" => _L('The username that the user will use to log into the system.'),
-		"value" => $edituser->login,
-		"validators" => array(
-			array("ValRequired"),
-			array("ValLength","min" => getSystemSetting("usernamelength", 5),"max" => 20),
-			array("ValLogin", "userid" => $edituser->id)
-		),
-		"control" => array("TextField","maxlength" => 20, "size" => 20),
-		"helpstep" => 1
-	);
-}
+$formdata["login"] = array(
+	"label" => _L("Username"),
+	"fieldhelp" => _L('The username that the user will use to log into the system.'),
+	"value" => $edituser->login,
+	"validators" => array(
+		array("ValRequired"),
+		array("ValLength","min" => getSystemSetting("usernamelength", 5),"max" => 20),
+		array("ValLogin", "userid" => $edituser->id)
+	),
+	"control" => array("TextField","maxlength" => 20, "size" => 20),
+	"helpstep" => 1
+);
 
 if($IS_LDAP){
-	if ($readonly) {
-		$formdata["ldap"] = array(
-			"label" => _L("Use LDAP Auth"),
-			"control" => array("FormHtml","html" => $ldapuser?"True":"False"),
-			"helpstep" => 1
-		);
-	} else {
-		$formdata["ldap"] = array(
-			"label" => _L("Use LDAP Auth"),
-			"value" => $ldapuser,
-			"validators" => array(),
-			"control" => array("CheckBox"),
-			"helpstep" => 1
-		);
-	}
+	$formdata["ldap"] = array(
+		"label" => _L("Use LDAP Auth"),
+		"value" => $ldapuser,
+		"validators" => array(),
+		"control" => array("CheckBox"),
+		"helpstep" => 1
+	);
 }
 
 $pass = ($edituser->id && $edituser->id !== "new") ? '00000000' : '';
 $passlength = getSystemSetting("passwordlength", 5);
-if ($readonly) {
-	$formdata["password"] = array(
-		"label" => _L("Password"),
-		"fieldhelp" => _L('The password is used to log into the web interface.'),
-		"value" => $pass,
-		"validators" => array(
-			array("ValRequired"),
-			array("ValLength","min" => $passlength,"max" => 20),
-			array("ValPassword", "login" => $edituser->login, "firstname" => $edituser->firstname, "lastname" => $edituser->lastname)
-		),
-		"control" => array("PasswordField","maxlength" => 20, "size" => 25),
-		"helpstep" => 1
-	);
-} else {
-	$formdata["password"] = array(
-		"label" => _L("Password"),
-		"fieldhelp" => _L('The password is used to log into the web interface.'),
-		"value" => $pass,
-		"validators" => array(
-			array("ValRequired"),
-			array("ValLength","min" => $passlength,"max" => 20),
-			array("ValPassword", "login" => $edituser->login, "firstname" => $edituser->firstname, "lastname" => $edituser->lastname)
-		),
-		"requires" => array("firstname", "lastname", "login"),
-		"control" => array("TextPasswordStrength","maxlength" => 20, "size" => 25, "minlength" => $passlength),
-		"helpstep" => 1
-	);
-}
+$formdata["password"] = array(
+	"label" => _L("Password"),
+	"fieldhelp" => _L('The password is used to log into the web interface.'),
+	"value" => $pass,
+	"validators" => array(
+		array("ValRequired"),
+		array("ValLength","min" => $passlength,"max" => 20),
+		array("ValPassword", "login" => $edituser->login, "firstname" => $edituser->firstname, "lastname" => $edituser->lastname)
+	),
+	"requires" => array("firstname", "lastname", "login"),
+	"control" => array("TextPasswordStrength","maxlength" => 20, "size" => 25, "minlength" => $passlength),
+	"helpstep" => 1
+);
 
 $formdata["passwordconfirm"] = array(
 	"label" => _L("Confirm Password"),
@@ -239,54 +201,31 @@ $formdata["passwordconfirm"] = array(
 	"helpstep" => 1
 );
 
-if ($readonly) {
-	$formdata["accesscode"] = array(
-		"label" => _L("Phone User ID"),
-		"fieldhelp" => _L('The number in this field is like a username for logging into the system by phone.'),
-		"control" => array("FormHtml","html" => $edituser->accesscode),
-		"helpstep" => 1
-	);
-} else {
-	$formdata["accesscode"] = array(
-		"label" => _L("Phone User ID"),
-		"fieldhelp" => _L('The number in this field is like a username for logging into the system by phone.'),
-		"value" => $edituser->accesscode,
-		"validators" => array(
-			array("ValNumeric", "min" => 4),
-			array("ValAccesscode", "userid" => $edituser->id)
-		),
-		"control" => array("TextField","maxlength" => 20, "size" => 8),
-		"helpstep" => 1
-	);
-}
+$formdata["accesscode"] = array(
+	"label" => _L("Phone User ID"),
+	"fieldhelp" => _L('The number in this field is like a username for logging into the system by phone.'),
+	"value" => $edituser->accesscode,
+	"validators" => array(
+		array("ValNumeric", "min" => 4),
+		array("ValAccesscode", "userid" => $edituser->id)
+	),
+	"control" => array("TextField","maxlength" => 20, "size" => 8),
+	"helpstep" => 1
+);
 
 $pin = $edituser->accesscode ? '00000' : '';
-if ($readonly) {
-	$formdata["pin"] = array(
-		"label" => _L("Phone PIN Code"),
-		"fieldhelp" => _L('The number in this field is like a password for logging into the system by phone.'),
-		"value" => $pin,
-		"validators" => array(
-			array("ValNumeric", "min" => 4),
-			array("ValPin", "accesscode" => $edituser->accesscode)
-		),
-		"control" => array("PasswordField","maxlength" => 20, "size" => 8),
-		"helpstep" => 1
-	);
-} else {
-	$formdata["pin"] = array(
-		"label" => _L("Phone PIN Code"),
-		"fieldhelp" => _L('The number in this field is like a password for logging into the system by phone.'),
-		"value" => $pin,
-		"validators" => array(
-			array("ValNumeric", "min" => 4),
-			array("ValPin", "accesscode" => $edituser->accesscode)
-		),
-		"requires" => array("accesscode"),
-		"control" => array("PasswordField","maxlength" => 20, "size" => 8),
-		"helpstep" => 1
-	);
-}
+$formdata["pin"] = array(
+	"label" => _L("Phone PIN Code"),
+	"fieldhelp" => _L('The number in this field is like a password for logging into the system by phone.'),
+	"value" => $pin,
+	"validators" => array(
+		array("ValNumeric", "min" => 4),
+		array("ValPin", "accesscode" => $edituser->accesscode)
+	),
+	"requires" => array("accesscode"),
+	"control" => array("PasswordField","maxlength" => 20, "size" => 8),
+	"helpstep" => 1
+);
 
 $formdata["pinconfirm"] = array(
 	"label" => _L("Confirm PIN"),
@@ -301,95 +240,145 @@ $formdata["pinconfirm"] = array(
 	"helpstep" => 1
 );
 
-if ($readonly) {
-	$formdata["email"] = array(
-		"label" => _L("Account Email"),
-		"fieldhelp" => ("This is used for forgot passwords, reporting, and as the return address in email messages."),
-		"control" => array("FormHtml","html" => $edituser->email),
-		"helpstep" => 1
-	);
+$formdata["email"] = array(
+	"label" => _L("Account Email"),
+	"fieldhelp" => ("This is used for forgot passwords, reporting, and as the return address in email messages."),
+	"value" => $edituser->email,
+	"validators" => array(
+		array("ValLength","min" => 3,"max" => 255),
+		array("ValEmail")
+	),
+	"control" => array("TextField","maxlength" => 255, "size" => 35),
+	"helpstep" => 1
+);
 
-	$formdata["aremail"] = array(
-		"label" => _L("Auto Report Emails"),
-		"fieldhelp" => _L("Email addresses entered here will receive copies of any autoreports associated with this user. The user's email address will automatically receive reports and should not be entered here."),
-		"control" => array("FormHtml","html" => $edituser->aremail),
-		"helpstep" => 1
-	);
+$formdata["aremail"] = array(
+	"label" => _L("Auto Report Emails"),
+	"fieldhelp" => _L("Email addresses entered here will receive copies of any autoreports associated with this user. The user's email address will automatically receive reports and should not be entered here."),
+	"value" => $edituser->aremail,
+	"validators" => array(
+		array("ValLength","min" => 3,"max" => 1024),
+		array("ValEmailList")
+	),
+	"control" => array("TextField","maxlength" => 1024, "size" => 50),
+	"helpstep" => 1
+);
 
-	$formdata["phone"] = array(
-		"label" => _L("Phone"),
-		"fieldhelp" => _L('This is the direct access phone number for the user.'),
-		"control" => array("FormHtml","html" => Phone::format($edituser->phone)),
-		"helpstep" => 1
-	);
-} else {
-	$formdata["email"] = array(
-		"label" => _L("Account Email"),
-		"fieldhelp" => ("This is used for forgot passwords, reporting, and as the return address in email messages."),
-		"value" => $edituser->email,
-		"validators" => array(
-			array("ValLength","min" => 3,"max" => 255),
-			array("ValEmail")
-		),
-		"control" => array("TextField","maxlength" => 255, "size" => 35),
-		"helpstep" => 1
-	);
-
-	$formdata["aremail"] = array(
-		"label" => _L("Auto Report Emails"),
-		"fieldhelp" => _L("Email addresses entered here will receive copies of any autoreports associated with this user. The user's email address will automatically receive reports and should not be entered here."),
-		"value" => $edituser->aremail,
-		"validators" => array(
-			array("ValLength","min" => 3,"max" => 1024),
-			array("ValEmailList")
-		),
-		"control" => array("TextField","maxlength" => 1024, "size" => 50),
-		"helpstep" => 1
-	);
-
-	$formdata["phone"] = array(
-		"label" => _L("Phone"),
-		"fieldhelp" => _L('This is the direct access phone number for the user.'),
-		"value" => Phone::format($edituser->phone),
-		"validators" => array(
-			array("ValLength","min" => 2,"max" => 20),
-			array("ValPhone")
-		),
-		"control" => array("TextField","maxlength" => 20, "size" => 15),
-		"helpstep" => 1
-	);
-}
+$formdata["phone"] = array(
+	"label" => _L("Phone"),
+	"fieldhelp" => _L('This is the direct access phone number for the user.'),
+	"value" => Phone::format($edituser->phone),
+	"validators" => array(
+		array("ValLength","min" => 2,"max" => 20),
+		array("ValPhone")
+	),
+	"control" => array("TextField","maxlength" => 20, "size" => 15),
+	"helpstep" => 1
+);
 
 $formdata[] = _L("Account Restrictions");
 
-if ($readonly) {
-	$formdata["accessid"] = array(
-		"label" => _L("Access Profile"),
-		"fieldhelp" => _L('Access Profiles define which sets of features a group of users may access.'),
-		"control" => array("FormHtml","html" => $profilename),
-		"helpstep" => 1
-	);
-} else if (!count($accessprofiles)) {
-	$formdata["accessid"] = array(
-		"label" => _L("Access Profile"),
-		"fieldhelp" => _L('Access Profiles define which sets of features a group of users may access.'),
-		"control" => array("FormHtml","html" => _L("You have no Aceess Profiles defined! Go to the Admin->Profiles tab and create one.")),
-		"helpstep" => 1
-	);
-} else {
-	$formdata["accessid"] = array(
-		"label" => _L("Access Profile"),
-		"fieldhelp" => _L('Access Profiles define which sets of features a group of users may access.'),
-		"value" => $edituser->accessid,
+$formdata["accessid"] = array(
+	"label" => _L("Access Profile"),
+	"fieldhelp" => _L('Access Profiles define which sets of features a group of users may access.'),
+	"value" => $edituser->accessid,
+	"validators" => array(
+		array("ValRequired")
+	),
+	"control" => array("SelectMenu", "values"=>$accessprofiles),
+	"helpstep" => 2
+);
+if (!count($accessprofiles)) {
+	$formdata["accessid"]["control"] = array("FormHtml","html" => _L("You have no Access Profiles defined! Go to the Admin->Profiles tab and create one."));
+	unset($formdata["accessid"]["validators"]);
+}
+
+$formdata["jobtypes"] = array(
+	"label" => _L("Job Type Restriction"),
+	"fieldhelp" => _L('If the user should only be able to send certain types of jobs, check the job types here. Checking nothing will allow the user to send any job type.'),
+	"value" => $userjobtypeids,
+	"validators" => array(),
+	"control" => array("MultiCheckBox", "values"=>$jobtypes),
+	"helpstep" => 2
+);
+$formdata["surveytypes"] = array(
+	"label" => _L("Survey Type Restriction"),
+	"fieldhelp" => _L('If the user should only be able to send certain types of surveys, check the survey types here. Checking nothing will allow the user to send any survey type.'),
+	"value" => $usersurveytypes,
+	"validators" => array(),
+	"control" => array("MultiCheckBox", "values"=>$surveytypes),
+	"helpstep" => 2
+);
+
+$formdata[] = _L("Data View");
+
+if ($hasenrollment) {
+	$formdata["staffpkey"] = array(
+		"label" => _L("Staff ID"),
+		"value" => $edituser->staffpkey,
 		"validators" => array(
-			array("ValRequired")
+			array("ValStaffPKey")
 		),
-		"control" => array("SelectMenu", "values"=>$accessprofiles),
-		"helpstep" => 2
+		"requires" => array("datarules"),
+		"control" => array("TextField","maxlength" => 20, "size" => 12),
+		"helpstep" => 1
+	);
+	$formdata["submit"] = array(
+		"label" => "",
+		"control" => array("InpageSubmitButton"),
+		"helpstep" => 1
 	);
 }
 
+$rules = cleanObjects($edituser->rules());
+$formdata["datarules"] = array(
+	"label" => _L("Data Restriction"),
+	"fieldhelp" => _L('If the user should only be able to access certain data, you may create restriction rules here.'),
+	"value" => json_encode(array_values($rules)),
+	"validators" => array(
+		array("ValRules")
+	),
+	"control" => array("FormRuleWidget"),
+	"helpstep" => 1
+);
+if ($hasenrollment) {
+	//$formdata["datarules"]["validators"][] = array("ValDataRules");
+	//$formdata["datarules"]["requires"] = array("staffpkey");
+}
+
+// Read only users have some control items disabled and some validators removed
 if ($readonly) {
+	// First Name
+	$formdata["firstname"]["control"] = array("FormHtml","html" => $edituser->firstname);
+	unset($formdata["firstname"]["validators"]);
+	// Last Name
+	$formdata["lastname"]["control"] = array("FormHtml","html" => $edituser->lastname);
+	unset($formdata["lastname"]["validators"]);
+	// User Login
+	$formdata["login"]["control"] = array("FormHtml","html" => $edituser->login);
+	unset($formdata["login"]["validators"]);
+	// Use LDAP login auth
+	if($IS_LDAP) $formdata["ldap"]["control"] = array("FormHtml","html" => $ldapuser?"True":"False");
+	// Password
+	unset($formdata["password"]["requires"]);
+	// Access code
+	$formdata["accesscode"]["control"] = array("FormHtml","html" => $edituser->accesscode);
+	unset($formdata["accesscode"]["validators"]);
+	// Phone login PIN
+	unset($formdata["pin"]["requires"]);
+	// Account Email
+	$formdata["email"]["control"] = array("FormHtml","html" => $edituser->email);
+	unset($formdata["email"]["validators"]);
+	// Autoreport Email
+	$formdata["aremail"]["control"] = array("FormHtml","html" => $edituser->aremail);
+	unset($formdata["aremail"]["validators"]);
+	// Phone
+	$formdata["phone"]["control"] = array("FormHtml","html" => Phone::format($edituser->phone));
+	unset($formdata["phone"]["validators"]);
+	// Access Profile
+	$formdata["accessid"]["control"] = array("FormHtml","html" => $profilename);
+	unset($formdata["accessid"]["validators"]);
+	// Job Types
 	$displayjobtypes = "";
 	foreach ($jobtypes as $jobtypeid => $jobtypename) {
 		if (count($userjobtypeids)) {
@@ -398,6 +387,9 @@ if ($readonly) {
 		} else
 			$displayjobtypes .= $jobtypename. "<br>";
 	}
+	$formdata["jobtypes"]["control"] = array("FormHtml","html" => "<div style='border: 1px dotted;'>$displayjobtypes</div>");
+	unset($formdata["jobtypes"]["validators"]);
+	// Survey Types
 	$displaysurveytypes = "";
 	foreach ($surveytypes as $jobtypeid => $jobtypename) {
 		if (count($usersurveytypes)) {
@@ -406,98 +398,21 @@ if ($readonly) {
 		} else
 			$displaysurveytypes .= $jobtypename. "<br>";
 	}
-	$formdata["jobtypes"] = array(
-		"label" => _L("Job Type Restriction"),
-		"fieldhelp" => _L('If the user should only be able to send certain types of jobs, check the job types here. Checking nothing will allow the user to send any job type.'),
-		"control" => array("FormHtml","html" => "<div style='border: 1px dotted;'>$displayjobtypes</div>"),
-		"helpstep" => 1
-	);
-	$formdata["surveytypes"] = array(
-		"label" => _L("Survey Type Restriction"),
-		"fieldhelp" => _L('If the user should only be able to send certain types of surveys, check the survey types here. Checking nothing will allow the user to send any survey type.'),
-		"control" => array("FormHtml","html" => "<div style='border: 1px dotted;'>$displaysurveytypes</div>"),
-		"helpstep" => 1
-	);
-} else {
-	$formdata["jobtypes"] = array(
-		"label" => _L("Job Type Restriction"),
-		"fieldhelp" => _L('If the user should only be able to send certain types of jobs, check the job types here. Checking nothing will allow the user to send any job type.'),
-		"value" => $userjobtypeids,
-		"validators" => array(),
-		"control" => array("MultiCheckBox", "values"=>$jobtypes),
-		"helpstep" => 2
-	);
-	$formdata["surveytypes"] = array(
-		"label" => _L("Survey Type Restriction"),
-		"fieldhelp" => _L('If the user should only be able to send certain types of surveys, check the survey types here. Checking nothing will allow the user to send any survey type.'),
-		"value" => $usersurveytypes,
-		"validators" => array(),
-		"control" => array("MultiCheckBox", "values"=>$surveytypes),
-		"helpstep" => 2
-	);
-}
-
-$formdata[] = _L("Data View");
-$rules = cleanObjects($edituser->rules());
-if ($readonly) {
-	if ($edituser->staffpkey == null || strlen($edituser->staffpkey) == 0) {
-		if (count($rules)) {
-			$formdata["datarules"] = array(
-				"label" => _L("Data Restriction"),
-				"fieldhelp" => _L('If the user should only be able to access certain data, you may create restriction rules here.'),
-				"value" => json_encode(array_values($rules)),
-				"validators" => array(),
-				"requires" => array("staffpkey"),
-				"control" => array("FormRuleWidget", "readonly" => true),
-				"helpstep" => 1
-			);
-		}
-	} else {
-		$formdata["staffpkey"] = array(
-			"label" => _L("Staff ID"),
-			"control" => array("FormHtml","html" => "<div style='border: 1px dotted;'>".$edituser->staffpkey."</div>"),
-			"helpstep" => 1
-		);
-	}
-} else {
+	$formdata["surveytypes"]["control"] = array("FormHtml","html" => "<div style='border: 1px dotted;'>$displaysurveytypes</div>");
+	unset($formdata["surveytypes"]["validators"]);
+	// Staff Pkey value
 	if ($hasenrollment) {
-		$formdata["staffpkey"] = array(
-			"label" => _L("Staff ID"),
-			"value" => $edituser->staffpkey,
-			"validators" => array(
-				array("ValStaffPKey")
-			),
-			"requires" => array("datarules"),
-			"control" => array("TextField","maxlength" => 20, "size" => 12),
-			"helpstep" => 1
-		);
-		$formdata["or"] = array(
-			"label" => _L("Or"),
-			"control" => array("FormHtml","html" => ""),
-			"helpstep" => 1
-		);
-		$formdata["datarules"] = array(
-			"label" => _L("Data Restriction"),
-			"value" => json_encode(array_values($rules)),
-			"validators" => array(
-				array("ValDataRules"),
-				array("ValRules")
-			),
-			"requires" => array("staffpkey"),
-			"control" => array("FormRuleWidget"),
-			"helpstep" => 1
-		);
+		$formdata["staffpkey"]["control"] = array("FormHtml","html" => "<div style='border: 1px dotted;'>".$edituser->staffpkey."</div>");
+		unset($formdata["staffpkey"]["validators"]);
+		unset($formdata["staffpkey"]["requires"]);
+		unset($formdata["submit"]);
+	}
+	// Data restrictions
+	if (count($rules)) {
+		$formdata["datarules"]["control"] = array("FormRuleWidget", "readonly" => true);
 	} else {
-		$formdata["datarules"] = array(
-			"label" => _L("Data Restriction"),
-			"fieldhelp" => _L('If the user should only be able to access certain data, you may create restriction rules here.'),
-			"value" => json_encode(array_values($rules)),
-			"validators" => array(
-				array("ValRules")
-			),
-			"control" => array("FormRuleWidget"),
-			"helpstep" => 1
-		);
+		unset($formdata["datarules"]);
+		unset($formdata["and"]);
 	}
 }
 
@@ -561,17 +476,19 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 			
 			$edituser->setSetting("callerid",$userphone);
 
-			// Remove all existing user rules
+			// Remove all existing non-enrollment user rules
 			$rules = $edituser->rules();
 			if (count($rules)) {
 				foreach ($rules as $rule)
-					$delrules[] = $rule->id;
-				Query("delete from rule where userid =? and id in (?)", false, array($edituser->id, implode(",", $delrules)));
-				Query("delete from userrule where userid =?", false, array($edituser->id));
+					if (substr($rule->fieldnum, 0, 1) !== "c")
+						$delrules[] = $rule->id;
+				Query("delete from rule where id in (?)", false, array($edituser->id, implode(",", $delrules)));
+				Query("delete from userrule where userid =? and ruleid in (?)", false, array($edituser->id, implode(",", $delrules)));
 			}
 			
 			$edituser->staffpkey = "";
 			if (isset($postdata['staffpkey']) && strlen($postdata['staffpkey'])) {
+				// TODO: remove existing enrollment rule based on staffid
 				// create the c01 rule based on current staffid
 				$rule = Rule::initFrom("c01", "multisearch", "and", "in", array(array($postdata['staffpkey'])));
 				$rule->create();
