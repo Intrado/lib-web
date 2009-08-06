@@ -292,7 +292,7 @@ function getEmailRegExp() {
     # This code is licensed under a Creative Commons Attribution-ShareAlike 2.5 License
     # http://creativecommons.org/licenses/by-sa/2.5/
     #
-    # $Revision: 1.85 $
+    # $Revision: 1.86 $
     # http://www.iamcal.com/publish/articles/php/parsing_email/
     ##################################################################################
 
@@ -546,12 +546,9 @@ function jobtype_info($jobtype, $extrahtml = NULL) {
 	if($contents == ""){
 		$contents = "<br/>";
 	}
-	//TODO replace this with prototip
 	$hover = '<span ' . $extrahtml . '>';
-	$hover .= '<div style="color:#346799"';
-	$hover .= ' onmouseover="this.nextSibling.style.display = \'block\'; setIFrame(this.nextSibling);"';
-	$hover .= ' onmouseout="this.nextSibling.style.display = \'none\'; setIFrame(null);"';
-	$hover .= '>&nbsp;' . escapehtml($jobtype->name) . '&nbsp;</div><div class="hoverhelp">' . $contents . '</div></span>';
+	$mouseover = 'onmouseover="new Tip(this, \'' . addslashes($contents) . '\', {style:\'protogrey\'});"';
+	$hover .= '<div ' . $mouseover . ' style="color:#346799">&nbsp;' . escapehtml($jobtype->name) . '&nbsp;</div></span>';
 
 	return $hover;
 }
