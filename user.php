@@ -73,7 +73,9 @@ $surveytypes = QuickQueryList("select id, name from jobtype where not deleted an
 ////////////////////////////////////////////////////////////////////////////////
 class InpageSubmitButton extends FormItem {
 	function render ($value) {
-		return submit_button($this->args['name'], 'inpagesubmit', $this->args['icon']);
+		$n = $this->form->name."_".$this->name;
+		$str = '<input id="'.$n.'" name="'.$n.'" type="hidden" value=""/>';
+		return $str.submit_button($this->args['name'], 'inpagesubmit', $this->args['icon']);
 	}
 }
 
@@ -250,7 +252,7 @@ $formdata[] = _L("Account Restrictions");
 $formdata["accessid"] = array(
 	"label" => _L("Access Profile"),
 	"fieldhelp" => _L('Access Profiles define which sets of features a group of users may access.'),
-	"value" => $edituser->accessid,
+	"value" => ($edituser->accessid)?$edituser->accessid:"",
 	"validators" => array(
 		array("ValRequired"),
 		array("ValInArray", "values" => array_keys($accessprofiles))
@@ -285,6 +287,7 @@ $formdata[] = _L("Data View");
 if ($hasenrollment) {
 	$formdata["staffpkey"] = array(
 		"label" => _L("Staff ID"),
+		"fieldhelp" => _L("If the user is directly related to a staff ID and data access should be controlled based on it's value."),
 		"value" => $edituser->staffpkey,
 		"validators" => array(),
 		"control" => array("TextField","maxlength" => 20, "size" => 12),
@@ -300,6 +303,11 @@ if ($hasenrollment) {
 }
 
 $rules = cleanObjects($edituser->rules());
+$fields = QuickQueryMultiRow("select fieldnum from fieldmap where options not like '%multisearch%'");
+$ignoredFields = array();
+foreach ($fields as $fieldnum)
+	$ignoredFields[] = $fieldnum[0];
+if (!in_array('c01', $ignoredFields)) $ignoredFields[] = 'c01';
 $formdata["datarules"] = array(
 	"label" => _L("Data Restriction"),
 	"fieldhelp" => _L('If the user should only be able to access certain data, you may create restriction rules here.'),
@@ -307,7 +315,7 @@ $formdata["datarules"] = array(
 	"validators" => array(
 		array("ValRules")
 	),
-	"control" => array("FormRuleWidget", "ignoredFields" => array("c01")),
+	"control" => array("FormRuleWidget", "ignoredFields" => $ignoredFields),
 	"helpstep" => 1
 );
 
