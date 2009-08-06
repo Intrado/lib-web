@@ -34,6 +34,7 @@ var CallMe = Class.create({
 			this.handleEnd(validcheck);
 			return;
 		}
+		$(this.itemname+"phone").hide();
 		$(this.itemname+"recordbutton").hide();
 		$(this.itemname+"progress").innerHTML = "<img src=\""+this.loadingimg+"\" /><?=addslashes(_L("Starting session. Please wait."))?>";
 		new Ajax.Request('ajaxeasycall.php', {
@@ -110,6 +111,7 @@ var CallMe = Class.create({
 			default:
 				$(this.itemname+"progress").innerHTML = "<img src=\""+this.exclamationimg+"\" /><?=addslashes(_L("There was an error! Please try again."))?>";
 		}
+		$(this.itemname+"phone").show();
 		$(this.itemname+"recordbutton").show();
 	},
 	
