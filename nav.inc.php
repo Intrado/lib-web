@@ -20,8 +20,8 @@ if (isset($_GET['timer']) || isset($_SESSION['timer'])) {
 if ($USER->authorize(array('starteasy','sendmessage', 'sendemail', 'sendphone', 'sendsms'))) {
 	$SHORTCUTS['-- Jobs & Messages --'] = "false;";
 	if ($USER->authorize("starteasy")) {
-		$SHORTCUTS['Start EasyCall'] = "javascript: popup('easycallstart.php?id=new',500,450);";
-		$SHORTCUTS['Call Me to Record'] = "javascript: popup('callme.php?origin=message&id=new',500,450);";
+		$SHORTCUTS['EasyStart'] = "jobwizard.php?new";
+		$SHORTCUTS['Call Me to Record'] = "callme.php";
 	}
 	if ($USER->authorize(array('sendmessage', 'sendemail', 'sendphone', 'sendsms'))) {
 		$SHORTCUTS['My Messages'] = "messages.php";
