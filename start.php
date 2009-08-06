@@ -471,16 +471,27 @@ include_once("nav.inc.php");
 		<td>
 <?		
 			if ($USER->authorize('sendphone') || $USER->authorize('sendemail') || $USER->authorize('sendsms')) {  
+				$jobtypes = QuickQueryList("select jt.systempriority from jobtype jt,userjobtypes ujt where ujt.jobtypeid = jt.id and ujt.userid=? and jt.deleted=0",false,false,array($USER->id));			
+				$jobtypescount = count($jobtypes);
 ?>
 			<div style="width:170px;top:0px;text-align:center;">
+			<? 
+				$hasnewjob = false;
+				if($jobtypescount === 0)
+					$hasnewjob = true;
+				else {
+					$hasnewjob = (in_array(2,$jobtypes) || in_array(3,$jobtypes));				
+				}
+				if($hasnewjob) {
+			?>
 					<img style="cursor:pointer;" src="img/newjob.jpg" align="middle" alt="Start a new job" title="Start a new job (The button formerly known as EasyCall)" 
 							onclick="window.location = 'jobwizard.php?new&jobtype=normal'"
 							onmouseover="this.src='img/newjob_over.jpg'"
 							onmouseout="this.src='img/newjob.jpg'" />
 			<? 
+				}
 				$hasemergency = false;
-				$jobtypes = QuickQueryList("select jt.systempriority from jobtype jt,userjobtypes ujt where ujt.jobtypeid = jt.id and ujt.userid=? and jt.deleted=0",false,false,array($USER->id));
-				if(count($jobtypes) === 0)
+				if($jobtypescount === 0)
 					$hasemergency = true;
 				else {
 					$hasemergency = in_array(1,$jobtypes);
@@ -488,7 +499,7 @@ include_once("nav.inc.php");
 				if($hasemergency) {
 			 ?>
 			<br />		
-					<img style="cursor:pointer;" src="img/newemergency.jpg" align="middle" alt="Start a new job" title="Start a new emergency job" 
+					<img style="cursor:pointer;" src="img/newemergency.jpg" align="middle" alt="Start a new emergency job" title="Start a new emergency job" 
 							onclick="window.location = 'jobwizard.php?new&jobtype=emergency'"
 							onmouseover="this.src='img/newemergency_over.jpg'"
 							onmouseout="this.src='img/newemergency.jpg'" />	
