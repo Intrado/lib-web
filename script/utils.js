@@ -448,8 +448,8 @@ function make_person_tip(personid, tiptitle){
 			
 			title : tiptitle,
 			style: "protogrey",
-			stem: "bottomLeft",
-			hook: { tip: "bottomLeft", mouse: true },
+			stem: "leftMiddle",
+			hook: { target: "topRight", tip: "leftMiddle" },
 			offset: { x: 10, y: 0 },
 			showOn: 'click',
 			hideOn: 'click',
