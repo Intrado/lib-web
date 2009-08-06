@@ -133,9 +133,29 @@ function listcontacts ($obj,$name) {
 	$lists = array();
 	if($name == "job") {
 		if(in_array($obj->status,array("active","cancelling","cancelled","complete"))) {
-			$calccont = QuickQuery("select count(distinct personid) from reportperson where jobid=? and status='success'",false,array($obj->id));
-			$calctotal = QuickQuery("select count(distinct personid) from reportperson where jobid=?",false,array($obj->id));
-			return "<b>" . $calccont . "</b> out of <b>" . $calctotal . ($calctotal!=1?"&nbsp;</b>persons contacted":"</b>&nbsp;person&nbsp;contacted");
+			$content = "";
+			$result = Query("select rp.type,
+								sum(rp.numcontacts) as total,
+								100 * sum(rp.numcontacts and rp.status='success') / (sum(rp.numcontacts and rp.status != 'duplicate') +0.00) as success_rate
+								from reportperson rp
+								where rp.jobid = ?
+								group by rp.jobid, rp.type
+								",false,array($obj->id));
+			
+			while ($row = DBGetRow($result)) {
+				if($row[0] == "sms")
+					$alt = "SMS";
+				else {
+					$alt = escapehtml(ucfirst($row[0])) . ($row[1]!=1?"s":"");
+				}
+				$content .= $row[1] . " " . $alt . " (" . sprintf("%0.2f",(isset($row[2]) ? $row[2] : "")) . "% Contacted), ";
+			}
+			$content = trim($content,', ');
+			$andpos = strrpos($content,',');
+			if($andpos !== false)
+				$content = substr_replace($content," and ",strrpos($content,','),1) ;			
+			return $content;
+
 		} 
 		$lists[] = QuickQuery("select listid from job where id=?",false, array($obj->id));
 		$lists = array_merge($lists, QuickQueryList("select listid from joblist where jobid = ?",false,false,array($obj->id)));
@@ -150,6 +170,23 @@ function listcontacts ($obj,$name) {
 		$calctotal = $calctotal + $renderedlist->total;
 	}
 	return "<b>" . $calctotal . ($calctotal!=1?"</b>&nbsp;contacts":"</b>&nbsp;contact");
+}
+
+function typestring($str) {
+		$jobtypes = explode(",",$str);
+		$typesstr = "";
+		foreach($jobtypes as $jobtype) {
+			if($jobtype == "sms")
+				$alt = strtoupper($jobtype);
+			else
+				$alt = escapehtml(ucfirst($jobtype));
+			$typesstr .= $alt . ", ";	
+		}			
+		$typesstr = trim($typesstr,', ');
+		$andpos = strrpos($typesstr,',');
+		if($andpos !== false)
+			return substr_replace($typesstr," and ",$andpos,1);	
+		return $typesstr;		
 }
 
 function activityfeed($mergeditems,$ajax = false) {
@@ -212,6 +249,7 @@ function activityfeed($mergeditems,$ajax = false) {
 						$title = _L('%1$s Saved',$jobtype);
 						$defaultlink = "job.php?id=$itemid";
 						$icon = 'largeicons/folderandfiles.jpg';
+						$jobcontent = typestring($item["jobtype"]) . "&nbsp;message&nbsp;with&nbsp;" . listcontacts($job,"job");						
 						break;
 					case "repeating":
 						if($item["datetype"]=="finishdate")
@@ -219,39 +257,45 @@ function activityfeed($mergeditems,$ajax = false) {
 						else
 							$title = _L('Repeating Job Saved');
 						$icon = 'largeicons/calendar.jpg';
-						$defaultlink = "jobrepeating.php?id=$itemid";					
+						$defaultlink = "jobrepeating.php?id=$itemid";
+						$jobcontent = typestring($item["jobtype"]) . "&nbsp;message&nbsp;with&nbsp;" . listcontacts($job,"job");
 						break;
 					case "complete":
 						$title = _L('%1$s Completed Successfully',$jobtype);
 						$icon = 'largeicons/' . ($item["jobtype"]=="survey"?"checklist.jpg":"checkedgreen.jpg") .  '"';
 						$defaultlink = $item["jobtype"] == "survey" ? "reportsurveysummary.php?jobid=$itemid" : "reportjobsummary.php?jobid=$itemid";									
-
+						$jobcontent = listcontacts($job,"job");
 						break;
 					case "cancelled":
 						$title = _L('%1$s Cancelled',$jobtype);
 						$icon = 'largeicons/checkedbluegreen.jpg';
+						$jobcontent = listcontacts($job,"job");	
 						$defaultlink = $item["jobtype"] == "survey" ? "reportsurveysummary.php?jobid=$itemid" : "reportjobsummary.php?jobid=$itemid";
 						break;
 					case "cancelling":
 						$title = _L('%1$s Cancelling',$jobtype);
 						$icon = 'largeicons/gear.jpg';
+						$jobcontent = listcontacts($job,"job");						
 						$defaultlink = $item["jobtype"] == "survey" ? "reportsurveysummary.php?jobid=$itemid" : "reportjobsummary.php?jobid=$itemid";
 						break;
 					case "active":
 						$title = _L('%1$s Submitted, Status: Active',$jobtype);
 						$icon = 'largeicons/ping.jpg';
 						$defaultlink = "#";
+						$jobcontent = listcontacts($job,"job");	
 						$defaultonclick = "onclick=\"popup('jobmonitor.php?jobid=$itemid', 500, 450);\"";
 						break;
 					case "scheduled":
 						$title = _L('%1$s Submitted, Status: Scheduled',$jobtype);
 						$icon = 'largeicons/clock.jpg';
 						$defaultlink = "job.php?id=$itemid";
+						$jobcontent = typestring($item["jobtype"]) . "&nbsp;message&nbsp;with&nbsp;" . listcontacts($job,"job");
 						break;
 					case "procactive" || "processing":
 						$title = _L('%1$s Submitted, Status: %2$s',$jobtype,escapehtml(fmt_status($job,$item["name"])));
 						$icon = 'largeicons/gear.jpg';
 						$defaultlink = "job.php?id=$itemid";
+						$jobcontent = typestring($item["jobtype"]) . "&nbsp;message&nbsp;with&nbsp;" . listcontacts($job,"job");	
 						break;								
 					default:
 						$title = _L('Job %1$s',escapehtml(fmt_status($job,$item["name"])));
@@ -260,25 +304,9 @@ function activityfeed($mergeditems,$ajax = false) {
 				$content = '<a href="' . $defaultlink . '" ' . $defaultonclick . '>' .
 										$time .  '&nbsp;-&nbsp;<b>' .  escapehtml($item["name"]) . '</b>&nbsp;';
 				
-				$jobtypes = explode(",",$item["jobtype"]);
 				$content .= '</a><div style="margin-right:10px;margin-top:10px;">
 							<a href="' . $defaultlink . '" ' . $defaultonclick . '>';
-				$typelength = count($jobtypes) - 1;
-				$typecount = 1;
-				foreach($jobtypes as $jobtype) {
-					if($jobtype == "sms")
-						$alt = strtoupper($jobtype);
-					else
-						$alt = escapehtml(ucfirst($jobtype));
-					if($typecount == $typelength)
-						$content .= $alt . "&nbsp;and&nbsp;";
-					else if($typecount > $typelength)
-						$content .= $alt . "&nbsp;";
-					else
-						$content .= $alt . ",&nbsp;";
-					$typecount++;
-				}				
-				$content .= "message&nbsp;with&nbsp;" . listcontacts($job,"job") . '</a>';
+				$content .= $jobcontent . '</a>';
 				$content .= job_responses($job,Null);
 				$content .= '</div>';
 			} else if($item["type"] == "list" ) {
