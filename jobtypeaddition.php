@@ -55,12 +55,11 @@ if(CheckFormSubmit($f,$s))
 			$type = new JobType();
 			$type->name = GetFormData($f, $s, "jobtypename");
 			$type->info = GetFormData($f, $s, "jobtypedesc");
-			$type->systempriority = 3;
-			if($IS_COMMSUITE){
-				$type->systempriority = GetFormData($f, $s, "systempriority");
-			}
+			$type->systempriority = GetFormData($f, $s, "systempriority") + 0;
 			$type->issurvey = GetFormData($f, $s, "issurvey");
-			if($type->issurvey && $type->systempriority != 3){
+			if($type->systempriority < 0 || $type->systempriority > 3) {
+				error("Invalid System Priority");
+			} else if($type->issurvey && $type->systempriority != 3){
 				error("Survey job types can only have a system priority of General");
 			} else {
 				$type->create();
@@ -90,9 +89,7 @@ if($reloadform){
 	ClearFormData($f);
 	PutFormData($f, $s, "jobtypename", "", "text", 0, 50, true);
 	PutFormData($f, $s, "jobtypedesc", "", "text", 0, 255, true);
-	if($IS_COMMSUITE){
-		PutFormData($f, $s, "systempriority", "3", "number");
-	}
+	PutFormData($f, $s, "systempriority", "3", "number");
 	PutFormData($f, $s, "issurvey", (bool)0, "bool", 0, 1);
 	foreach($max as $index => $maxvalue){
 		for($i=0; $i<$maxvalue; $i++){
@@ -142,7 +139,11 @@ startWindow("Add a Job Type");
 								NewFormItem($f, $s, "systempriority", "selectoption", "General", "3");
 								NewFormItem($f, $s, "systempriority", "selectend");
 						} else {
-							echo "General";
+								NewFormItem($f, $s, "systempriority", "selectstart");
+								NewFormItem($f, $s, "systempriority", "selectoption", "Emergency", "1");	
+								NewFormItem($f, $s, "systempriority", "selectoption", "High Priority", "2");
+								NewFormItem($f, $s, "systempriority", "selectoption", "General", "3");
+								NewFormItem($f, $s, "systempriority", "selectend");
 						}
 ?>
 					</td>
