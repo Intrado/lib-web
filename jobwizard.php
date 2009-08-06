@@ -90,14 +90,16 @@ $wizdata = array(
 class FinishJobWizard extends WizFinish {
 	function phoneRecordedMessage($msgdata) {
 		$retval = array();
-		foreach ($msgdata as $lang => $data)
-			$retval[$lang] = array(
-				"id" => $data,
-				"text" => "",
-				"gender" => "",
-				"language" => ($lang == "Default")?"english":strtolower($lang),
-				"override" => true
-			);
+		foreach ($msgdata as $lang => $data) {
+			if ($data)
+				$retval[$lang] = array(
+					"id" => $data,
+					"text" => "",
+					"gender" => "",
+					"language" => ($lang == "Default")?"english":strtolower($lang),
+					"override" => false
+				);
+		}
 		return $retval;
 	}
 	
@@ -107,7 +109,7 @@ class FinishJobWizard extends WizFinish {
 			"text" => $msgdata->text,
 			"gender" => $msgdata->gender,
 			"language" => 'english',
-			"override" => true
+			"override" => false
 		));
 	}
 	
@@ -129,17 +131,19 @@ class FinishJobWizard extends WizFinish {
 	
 	function emailSavedMessage($msgdata) {
 		$retval = array();
-		foreach ($msgdata as $lang => $data)
-			$retval[$lang] = array(
-				"id" => $data,
-				"from" => "",
-				"fromname" => "",
-				"subject" => "",
-				"attachments" => "",
-				"text" => "",
-				"language" => ($lang == "Default")?"english":strtolower($lang),
-				"override" => true
-			);
+		foreach ($msgdata as $lang => $data) {
+			if ($data)
+				$retval[$lang] = array(
+					"id" => $data,
+					"from" => "",
+					"fromname" => "",
+					"subject" => "",
+					"attachments" => "",
+					"text" => "",
+					"language" => ($lang == "Default")?"english":strtolower($lang),
+					"override" => false
+				);
+		}
 		return $retval;
 	}
 
@@ -152,7 +156,7 @@ class FinishJobWizard extends WizFinish {
 			"attachments" => json_decode($msgdata["attachments"]),
 			"text" => $msgdata["message"],
 			"language" => "english",
-			"override" => true
+			"override" => false
 		));
 	}
 
@@ -209,7 +213,7 @@ class FinishJobWizard extends WizFinish {
 						"attachments" => array(),
 						"text" => "An important telephone notification was sent to you by ". $_SESSION['custname']. ". Click the link below or copy and paste the link into your web browser to hear the message.\n\n",
 						"language" => "english",
-						"override" => true
+						"override" => false
 					));
 					if (getSystemSetting("_hascallback"))
 						$emailMsg["Default"]["text"] .= "You may also listen to this message over the phone by dialing the automated notification system at: ". Phone::format(getSystemSetting("inboundnumber")). "\n\n";
@@ -278,7 +282,7 @@ class FinishJobWizard extends WizFinish {
 							}
 							break;
 						case "pick":
-							$phoneMsg = $this->phoneRecordedMessage(array("Default" => $postdata["/message/phone/pick"]["message"]));
+							$phoneMsg = $this->phoneRecordedMessage($postdata["/message/phone/pick"]);
 							break;
 						default:
 							error_log($postdata["/message/select"]["phone"] . " is an unknown value for ['/message/select']['phone']");
@@ -296,7 +300,7 @@ class FinishJobWizard extends WizFinish {
 								"attachments" => array(),
 								"text" => "An important telephone notification was sent to you by ". $_SESSION['custname']. ". Click the link below or copy and paste the link into your web browser to hear the message.\n\n",
 								"language" => "english",
-								"override" => true
+								"override" => false
 							));
 							if (getSystemSetting("_hascallback"))
 								$emailMsg["Default"]["text"] .= "You may also listen to this message over the phone by dialing the automated notification system at: ". Phone::format(getSystemSetting("inboundnumber")). "\n\n";
@@ -308,7 +312,7 @@ class FinishJobWizard extends WizFinish {
 								$emailMsg = array_merge($emailMsg, $this->emailTextTranslation($postdata["/message/email/text"], $postdata["/message/email/translate"]));
 							break;
 						case "pick":
-							$emailMsg = $this->emailSavedMessage(array("Default" => $postdata["/message/email/pick"]["message"]));
+							$emailMsg = $this->emailSavedMessage($postdata["/message/email/pick"]);
 							break;
 						default:
 							error_log($postdata["/message/select"]["email"] . " is an unknown value for ['/message/select']['email']");
@@ -547,7 +551,11 @@ class FinishJobWizard extends WizFinish {
 				<script>
 					window.location="unauthorized.php";
 				</script>';
-		return "<h1>Job submitted</h1>";
+				
+		$html = '<h1>Success! Your notification request has been submitted.</h1>';
+		//if ($postdata["/schedule/options"]["schedule"] == "template")
+			$html .= '<script>window.location="start.php";</script>';
+		return $html;
 	}
 }
 

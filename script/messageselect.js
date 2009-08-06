@@ -39,7 +39,12 @@ var MessageSelect = Class.create({
 		var text = "";
 		if (response) {
 			$(this.formname+"lastused").innerHTML = response.lastused || 'Never';
-			$(this.formname+"description").innerHTML = response.description;
+			if (response.description) {
+				$(this.formname+"-descTR").show();
+				$(this.formname+"description").innerHTML = response.description;
+			} else {
+				$(this.formname+"-descTR").hide();
+			}
 			if (this.type == "email") {
 				$(this.formname+"from").innerHTML = response.fromemail;
 				$(this.formname+"subject").innerHTML = response.subject;
@@ -57,9 +62,9 @@ var MessageSelect = Class.create({
 			if (this.type == "phone" ) {
 				$(this.formname+"play").observe('click', function(event) {popup("previewmessage.php?close=1&id="+this.messageid, 400, 500)}.bind(this));
 				if (response.simple)
-					$(this.formname+"body").hide();
+					$(this.formname+"-bodyTR").hide();
 				else 
-					$(this.formname+"body").show();
+					$(this.formname+"-bodyTR").show();
 			}
 		} else {
 			$(this.formname+"lastused").update();

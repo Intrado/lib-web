@@ -13,7 +13,7 @@ function wizHasPhone($postdata) {
 		(isset($postdata["/start"]["package"]) && $postdata["/start"]["package"] == "custom" && isset($postdata["/message/pick"]["type"]) && in_array('phone', $postdata["/message/pick"]["type"]) && (
 			(isset($postdata["/message/select"]["phone"]) && $postdata["/message/select"]["phone"] == "record" && isset($postdata["/message/phone/callme"]["message"]) && strlen($postdata["/message/phone/callme"]["message"]) > 2) ||
 			(isset($postdata["/message/select"]["phone"]) && $postdata["/message/select"]["phone"] == "text" && isset($postdata["/message/phone/text"]["message"]) && strlen($postdata["/message/phone/text"]["message"]) > 2) || 
-			(isset($postdata["/message/select"]["phone"]) && $postdata["/message/select"]["phone"] == "pick" && isset($postdata["/message/phone/pick"]["message"]) && $postdata["/message/phone/pick"]["message"])
+			(isset($postdata["/message/select"]["phone"]) && $postdata["/message/select"]["phone"] == "pick" && isset($postdata["/message/phone/pick"]["Default"]) && $postdata["/message/phone/pick"]["Default"])
 		))))
 		return true;
 	return false;
@@ -33,7 +33,7 @@ function wizHasEmail($postdata) {
 				(isset($postdata["/message/select"]["phone"]) && $postdata["/message/select"]["phone"] == "pick" && isset($postdata["/message/phone/pick"]["message"]) && $postdata["/message/phone/pick"]["message"])
 			)) ||
 			(isset($postdata["/message/select"]["email"]) && $postdata["/message/select"]["email"] == "text" && isset($postdata["/message/email/text"]["message"]) && $postdata["/message/email/text"]["message"]) || 
-			(isset($postdata["/message/select"]["email"]) && $postdata["/message/select"]["email"] == "pick" && isset($postdata["/message/email/pick"]["message"]) && $postdata["/message/email/pick"]["message"])
+			(isset($postdata["/message/select"]["email"]) && $postdata["/message/select"]["email"] == "pick" && isset($postdata["/message/email/pick"]["Default"]) && $postdata["/message/email/pick"]["Default"])
 		))))
 		return true;
 	return false;
@@ -572,7 +572,7 @@ class JobWiz_messageType extends WizStep {
 		$deliverytypes = array(
 			'phone'=>array('sendphone', _L("Phone Call")),
 			'email'=>array('sendemail', _L("Email")),
-			'sms'=>array('sendsms', _L("Text Message")));
+			'sms'=>array('sendsms', _L("SMS Text")));
 		foreach ($deliverytypes as $checkvalue => $checkname)
 			if ($USER->authorize($checkname[0]))
 				$values[$checkvalue] = $checkname[1];
@@ -685,21 +685,28 @@ class JobWiz_messageSelect extends WizStep {
 //This is for selecting a saved phone message.
 class JobWiz_messagePhoneChoose extends WizStep {
 	function getForm($postdata, $curstep) {
-		// Form Fields.
-		$formdata = array();
-		$phonemessage = array(array("name"=>"--- "._L('Select One')." ---"));
-		$values = array();
 		global $USER;
+		$phonemessage = array();
+		$values = array();
+		$langs = array();
+		if ($USER->authorize("sendmulti")) {
+			$syslangs = DBFindMany("Language","from language order by name");
+			foreach ($syslangs as $langid => $language)
+				if ($syslangs[$langid]->name !== "English")
+					$langs[] = $syslangs[$langid]->name;
+		}
 		
 		$messagelist = DBFindMany("Message","from message where userid=" . $USER->id ." and deleted=0 and type='phone' order by name");
 		foreach ($messagelist as $id => $message) {
 			$phonemessage[$id]['name'] = $message->name;
 			$values[] = $id;
 		}
+		$formdata = array();
 
 		$formdata[] = $this->title;
-		$formdata["message"] = array(
-			"label" => "Select A Message",
+		$helpsteps = array(_L("Select from list of existing messages. If you do not find an appropriate message, you may click the Message Source link from the navigation on the left and choose to create a new message."));
+		$formdata["Default"] = array(
+			"label" => _L("Select a Message"),
 			"value" => "",
 			"validators" => array(
 				array("ValRequired"),
@@ -708,8 +715,20 @@ class JobWiz_messagePhoneChoose extends WizStep {
 			"control" => array("SelectMessage", "type"=>"phone", "width"=>"80%", "values"=>$phonemessage),
 			"helpstep" => 1
 		);
-		$helpsteps = array(_L("Select from list of existing messages. If you do not find an appropriate message, you may click the Message Source link from the navigation on the left and choose to create a new message."));
-
+		if (count($langs)) $formdata[] = _L("Optional additional languages");
+		foreach ($langs as $lang) {
+			$helpsteps = array(_L("Select from list of existing messages. If you do not find an appropriate message, you may click the Message Source link from the navigation on the left and choose to create a new message."));
+			$formdata[$lang] = array(
+				"label" => $lang,
+				"value" => "",
+				"validators" => array(
+					array("ValInArray","values"=>$values)
+				),
+				"control" => array("SelectMessage", "type"=>"phone", "width"=>"80%", "values"=>$phonemessage),
+				"helpstep" => 1
+			);
+		}
+		
 		return new Form("messagePhoneChoose",$formdata,$helpsteps);
 	}
 	
@@ -975,10 +994,16 @@ class JobWiz_messagePhoneCallMe extends WizStep {
 
 class JobWiz_messageEmailChoose extends WizStep {
 	function getForm($postdata, $curstep) {
-		$messages = array(array("name"=>"--- "._L('Select One')." ---"));
+		$messages = array();
 		$values = array();
 		global $USER;
-		
+		$langs = array();
+		if ($USER->authorize("sendmulti")) {
+			$syslangs = DBFindMany("Language","from language order by name");
+			foreach ($syslangs as $langid => $language)
+				if ($syslangs[$langid]->name !== "English")
+					$langs[] = $syslangs[$langid]->name;
+		}
 		$messagelist = DBFindMany("Message","from message where userid=" . $USER->id ." and deleted=0 and type='email' order by name");
 		foreach ($messagelist as $id => $message) {
 			$messages[$id]['name'] = $message->name;
@@ -988,8 +1013,8 @@ class JobWiz_messageEmailChoose extends WizStep {
 		// Form Fields.
 		$formdata = array($this->title);
 		$helpsteps = array(_L("Select from list of existing messages. If you do not find an appropriate message, you may click the Message Source link from the navigation on the left and choose to create a new message."));
-		$formdata["message"] = array(
-			"label" => "Select A Message",
+		$formdata["Default"] = array(
+			"label" => _L("Select a Message"),
 			"validators" => array(
 				array("ValRequired"),
 				array("ValInArray", "values"=>$values)
@@ -998,7 +1023,21 @@ class JobWiz_messageEmailChoose extends WizStep {
 			"control" => array("SelectMessage","type"=>"email", "width"=>"80%", "values"=>$messages),
 			"helpstep" => 1
 		);
-		
+
+		if (count($langs)) $formdata[] = _L("Optional additional languages");
+		foreach ($langs as $lang) {
+			$helpsteps = array(_L("Select from list of existing messages. If you do not find an appropriate message, you may click the Message Source link from the navigation on the left and choose to create a new message."));
+			$formdata[$lang] = array(
+				"label" => $lang,
+				"value" => "",
+				"validators" => array(
+					array("ValInArray","values"=>$values)
+				),
+				"control" => array("SelectMessage", "type"=>"phone", "width"=>"80%", "values"=>$messages),
+				"helpstep" => 1
+			);
+		}
+
 		return new Form("messageEmailChoose",$formdata,$helpsteps);
 	}
 	
@@ -1226,7 +1265,7 @@ class JobWiz_messageSmsChoose extends WizStep {
 	function getForm($postdata, $curstep) {
 		// Form Fields.
 		$formdata = array();
-		$messages = array(array("name"=>"--- "._L('Select One')." ---"));
+		$messages = array();
 		$values = array();
 		global $USER;
 		
@@ -1238,7 +1277,7 @@ class JobWiz_messageSmsChoose extends WizStep {
 
 		$formdata[] = $this->title;
 		$formdata["message"] = array(
-			"label" => "Select A Message",
+			"label" => "Select a Message",
 			"validators" => array(
 				array("ValRequired"),
 				array("ValInArray", "values"=>$values)
@@ -1281,9 +1320,9 @@ class JobWiz_messageSmsText extends WizStep {
 
 		// Form Fields.
 		$formdata = array($this->title);
-		$helpsteps = array(_L("Enter the message you wish to deliver via Text Message."));
+		$helpsteps = array(_L("Enter the message you wish to deliver via SMS Text."));
 		$formdata["message"] = array(
-			"label" => _L("Text Message"),
+			"label" => _L("SMS Text"),
 			"value" => $text,
 			"validators" => array(
 				array("ValRequired"),
