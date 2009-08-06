@@ -300,7 +300,7 @@ buttons();
 EndForm();
 include_once("navbottom.inc.php");
 ?>
-<script SRC="script/calendar.js"></script>
+<script type="text/javascript" src="script/datepicker.js"></script>
 <script>
 	setHiddenIfChecked(new getObj('check_archived').obj, 'jobid');
 	setVisibleIfChecked(new getObj('check_archived').obj, 'jobid_archived');

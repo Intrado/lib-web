@@ -541,7 +541,7 @@ function pickDate (textbox, allowPast, allowFuture, closeOnBlur) {
 	if (!allowPast)
 		filter.append(DatePickerUtils.noDatesBefore(0));
 	if (!allowFuture)
-		filter.append(DatepIckerUtils.noDatesAfter(0));
+		filter.append(DatePickerUtils.noDatesAfter(0));
 	return new DatePicker({
 		relative: element.identify(),
 		keepFieldEmpty:true,

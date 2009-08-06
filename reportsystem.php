@@ -336,7 +336,7 @@ endWindow();
 buttons();
 endForm();
 ?>
-<script SRC="script/calendar.js"></script>
+<script type="text/javascript" src="script/datepicker.js"></script>
 <? 
 include_once("navbottom.inc.php");
 ?>
