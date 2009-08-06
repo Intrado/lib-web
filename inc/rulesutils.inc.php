@@ -36,7 +36,6 @@ function getRuleFromForm($f, $s){
 					$val = array($value4,$value5);
 			}
 			$rule = Rule::initFrom($fieldnum, $logic, $op, prepareRuleVal($type, $op, $val));
-			error_log(json_encode($rule));
 		}
 	}
 	return $rule;
