@@ -108,7 +108,7 @@ if (!$success) {
 					<?=_L("Check your email to receive the password reset link.")?>
 					<br><?=_L("You will be redirected to the Activation page in 10 seconds, or you can")?> <a href="index.php?f"><?=_L("Click Here to continue.")?></a>
 				</div>
-				<meta http-equiv="refresh" content="10;url=index.php?f"; ?>">
+				<meta http-equiv="refresh" content="10;url=index.php?f">
 			</td>
 		</tr>
 	</table>
