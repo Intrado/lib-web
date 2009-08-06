@@ -833,10 +833,10 @@ function alternate($type) {
 		?>
 
 		<tr valign="middle">
-			<td><?= $joblang->language ?></td>
+			<td><?= escapehtml($joblang->language) ?></td>
 			<td><? if ($type == "phone") { ?>
 			<div style="float: right;"><?= button('Play', "popup('previewmessage.php?id=" . $joblang->messageid . "', 400, 400);"); ?></div>
-			<? } ?> <?= $messages[$type][$joblang->messageid]->name ?></td>
+			<? } ?> <?= escapehtml($messages[$type][$joblang->messageid]->name) ?></td>
 			<td><? if (!$submittedmode) { ?> <a
 				href="<?= ($JOBTYPE == "repeating" ? "jobrepeating.php" : "job.php") ?>?deletejoblang=<?= $joblang->id ?>">Delete</a>
 				<? } ?></td>
@@ -1055,9 +1055,9 @@ if ($JOBTYPE == "repeating" && getSystemSetting("disablerepeat") ) {
 <?
 				$selectedlistnames = QuickQueryList("select list.name from joblist, list where joblist.jobid=$job->id and joblist.listid=list.id");
 				foreach ($selectedlistnames as $listname) {
-						echo $listname."<br>";
+						echo escapehtml($listname)."<br>";
 				}
-				echo $peoplelists[$job->listid];
+				echo escapehtml($peoplelists[$job->listid]);
 ?>
 				</td>
 

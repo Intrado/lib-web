@@ -169,7 +169,7 @@ foreach($multilist as $mlist) {
 	$rlist = $multirenderedlist[$count++];
 ?>
 			<tr valign="middle">
-				<td><?= $mlist->name ?>
+				<td><?= escapehtml($mlist->name) ?>
 				</td>
 				<td>
 					<?= $rlist->total ?>

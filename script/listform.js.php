@@ -244,7 +244,7 @@ function listform_refresh_liststats(listID, ignoreCache) {
 				var hiddenTD = $('listsTableBody').down('input[value='+listID+']').up('td');
 				var nameTD = hiddenTD.next('td');
 				var statisticsTD = nameTD.next('td',0);
-				nameTD.update(data.name);
+				nameTD.update(data.name.escapeHTML());
 				statisticsTD.update(format_thousands_separator(data.total));
 				
 				listformVars.totals[listID] = data.total;
@@ -287,7 +287,7 @@ function listform_load_lists(listidsJSON) {
 				}).update(new Element('input',{'type':'hidden','value':listid}));
     			var commonStyle = 'padding: 3px;';
 			    var nameTD = new Element('td', {'class':'border List NameTD', 'width':'10%','style':'overflow: hidden; white-space: nowrap;' + commonStyle});
-			    nameTD.insert(data.name);
+			    nameTD.insert(data.name.escapeHTML());
 			    var actionTD = new Element('td', {'width':'25%','class':'border List ActionTD', 'colspan':100, 'style':commonStyle + ' ; text-align:center'});
 			    actionTD.insert('<img src="img/icons/diagona/10/101.gif" title="<?=addslashes(_L('Click to remove this list'))?>" />');
 			    var statisticsTD = new Element('td', {'class':'border List', 'style':commonStyle}).update(format_thousands_separator(data.total));
@@ -399,7 +399,7 @@ function listform_hover_existing_list(nullableEvent, listid, tr) {
 			hook: hookPreference,
 			offset:{x:0,y:0},
 			stem: stemPreference,
-			title: '<?=_L("List Name:")?> ' + data.name
+			title: '<?=_L("List Name:")?> ' + data.name.escapeHTML()
 		});
 		targetElement.prototip.show();
 	}.bindAsEventListener(this, listid, tr));
