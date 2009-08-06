@@ -308,7 +308,7 @@ class ValLists extends Validator {
 		
 		
 		if (strpos($value, 'pending') !== false)
-			return _L('Please finish adding a rule!');
+			return _L('Please finish adding this rule, or unselect the field');
 			
 		$listids = json_decode($value);
 		if (empty($listids))
@@ -316,7 +316,7 @@ class ValLists extends Validator {
 		$allempty = true;
 		foreach ($listids as $listid) {
 			if (!userOwns('list', $listid))
-				return _L('You have specified an invalid list!');
+				return _L('You have specified an invalid list');
 			$list = new PeopleList($listid + 0);
 			$renderedlist = new RenderedList($list);
 			$renderedlist->calcStats();
@@ -324,7 +324,7 @@ class ValLists extends Validator {
 				$allempty = false;
 		}
 		if ($allempty)
-			return _L('All these lists are empty!');
+			return _L('All of these lists are empty');
 		return true;
 	}
 }

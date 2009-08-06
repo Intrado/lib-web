@@ -217,7 +217,7 @@ function listform_load(listformID, formData, postURL) {
 }
 
 function listform_warn_add_rule() {
-	alert('<?=addslashes(_L("Please click the add button, or clear the unused rule"))?>');
+	alert('<?=addslashes(_L("Please finish adding this rule, or unselect the field"))?>');
 }
 
 // Adds listid to listformVars.listidsElement

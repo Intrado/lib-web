@@ -660,7 +660,7 @@ var RuleEditor = Class.create({
 		this.datepickers = [];
 		var fieldSelectbox = new Element('select', {'style':'font-size:90%'});
 		
-		fieldSelectbox.update(new Element('option', {'value':''}).insert('--<?=addslashes(_L('Choose a Field'))?>--'));
+		fieldSelectbox.update(new Element('option', {'value':''}).insert('--<?=addslashes(_L('Select a Field'))?>--'));
 		
 		var g = [];
 		var c = [];
