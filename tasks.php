@@ -135,6 +135,7 @@ function fmt_actions ($import,$dummy) {
 		$deletewarning = "This will delete all enrollment data!";
 	break;
 	}
+	
 	$associatedjobcount = QuickQuery("Select count(*) from importjob where importid = '$import->id'");
 	$confirm = "Are you sure you want to run this import now?";
 	if($associatedjobcount > 0){
@@ -142,19 +143,24 @@ function fmt_actions ($import,$dummy) {
 		$extra = 'W A R N I N G:\nThis import has ' . "$associatedjobcount" .' repeating job(s) linked to it that will automatically run if you click OK.\n';
 		$confirm = $extra. $confirm;
 	}
-	$res = "<a href=\"taskupload.php?id=$import->id\">Upload</a>&nbsp;|&nbsp;";
+	
+	$links = array();
+	
+	$links[] = action_link(_L("Upload"), "folder", "taskupload.php?id=$import->id");
+		
 	if ($import->datamodifiedtime != null) {
-		$res .= "<a href=\"taskdownload.php?id=$import->id\">Download</a>&nbsp;|&nbsp;"
-			 . "<a href=\"task.php?run=$import->id\" onclick=\"return confirm('$confirm');\">Run&nbsp;Now</a>&nbsp;|&nbsp;";
+		$links[] = action_link(_L("Download"), "disk", "taskdownload.php?id=$import->id");
+		$links[] = action_link(_L("Run Now"), "database_go", "task.php?run=$import->id","return confirm('$confirm');");		
 	}
+	
 	if ($import->lastrun != null) {
-		$res .= "<a href=\"tasklog.php?id=$import->id\">Log</a>&nbsp;|&nbsp;";
+		$links[] = action_link(_L("Log"), "application_view_list", "tasklog.php?id=$import->id");
 	}
-	$res .= "<a href=\"task.php?id=$import->id\">Edit</a>&nbsp;|&nbsp;"
-		 ."<a href=\"tasks.php?delete=" . $import->id . "\" onclick=\"return confirm('Are you sure you want to delete this import item?\\n"
-		 . $deletewarning
-		 . "');\">Delete</a>";
-	return $res;
+	
+	$links[] = action_link(_L("Edit"), "pencil", "task.php?id=$import->id");
+	$links[] = action_link(_L("Delete"), "cross", "tasks.php?delete=$import->id", "return confirm('Are you sure you want to delete this import item?\\n$deletewarning');");
+	
+	return action_links($links);
 }
 
 

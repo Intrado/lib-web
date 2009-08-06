@@ -92,8 +92,8 @@ function fmt_blocking_actions($row, $index) {
 
 	// Only show the delete link in 'addonly' mode for blocked calls created by this user
 	if ($perm == 'editall' ||
-		($perm == 'addonly' && $USER->id == $ownerid)) {
-		return "<a href=\"blocked.php?delete=$id\" onclick=\"return confirmDelete();\">Delete</a>";
+		($perm == 'addonly' && $USER->id == $ownerid)) {		
+		return action_links(action_link(_L("Delete"),"cross","blocked.php?delete=$id","return confirmDelete();"));
 	} else {
 		return '';
 	}

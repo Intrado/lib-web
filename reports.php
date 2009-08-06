@@ -25,7 +25,13 @@ if (!$USER->authorize('createreport') && !$USER->authorize('viewsystemreports'))
 ////////////////////////////////////////////////////////////////////////////////
 
 function fmt_report_actions($obj){
-	return "<a href='reportedit.php?reportid=$obj->id' >Edit Schedule</a>&nbsp;|&nbsp;<a href='reportsavedoptions.php?reportid=$obj->id' >Edit Options</a>&nbsp;|&nbsp;<a href='reportsavedoptions.php?reportid=$obj->id&runreport=true' >View</a>&nbsp;|&nbsp;<a href='reports.php?delete=$obj->id' onclick='return confirm(\"Are you sure you want to delete this?\")';>Delete</a>";
+	
+	return action_links(
+		action_link(_L("Edit Schedule"),"calendar","reportedit.php?reportid=$obj->id"),
+		action_link(_L("Edit Options"),"pencil","reportsavedoptions.php?reportid=$obj->id"),
+		action_link(_L("View"),"layout_header","reportsavedoptions.php?reportid=$obj->id&runreport=true"),
+		action_link(_L("Delete"),"cross","reports.php?delete=$obj->id","return confirmDelete();")
+	);
 }
 
 function fmt_report_type($obj){

@@ -390,17 +390,25 @@ break;
 					<td>
 					<?NewFormItem($form, $section, 'searchable_' . $fieldnum, 'checkbox');?>
 					</td>
-					<td><a href='<?=$datapage?>?delete=<?=$field->id?>' onclick="return confirmDelete();">Delete</a>&nbsp;|&nbsp;<a href='<?=$datapage?>?clear=<?=$fieldnum?>' onclick="return confirm('Are you sure you want to clear (erase) all data for this field?');">Clear&nbsp;data</a></td>
+					<td><?= action_links(
+							action_link(_L("Delete"),"cross","$datapage?delete=$field->id","return confirmDelete();"),
+							action_link(_L("Clear Data"),"lightning","$datapage?clear=$fieldnum","return confirm('Are you sure you want to clear (erase) all data for this field?');")
+							) ?></td>
 <?
 				break;
 				case "group" :
 ?>
-					<td><a href='<?=$datapage?>?delete=<?=$field->id?>' onclick="return confirmDelete();">Delete</a>&nbsp;|&nbsp;<a href='<?=$datapage?>?clear=<?=$fieldnum?>' onclick="return confirm('Are you sure you want to clear (erase) all data for this field?');">Clear&nbsp;data</a></td>
+					<td><?= action_links(
+							action_link(_L("Delete"),"cross","$datapage?delete=$field->id","return confirmDelete();"),
+							action_link(_L("Clear Data"),"lightning","$datapage?clear=$fieldnum","return confirm('Are you sure you want to clear (erase) all data for this field?');")
+							) ?></td>
 <?
 				break;
 				case "schedule" :
 ?>
-					<td><a href='<?=$datapage?>?delete=<?=$field->id?>' onclick="return confirmDelete();">Delete</a></td>
+					<td><?= action_links(
+							action_link(_L("Delete"),"cross","$datapage?delete=$field->id","return confirmDelete();")
+							) ?></td>
 <?
 				break;
 				}
@@ -431,14 +439,20 @@ break;
 						$fieldnum != $field->getLastNameField() &&
 						$fieldnum != $field->getLanguageField()) {
 ?>
-					<a href='<?=$datapage?>?delete=<?=$field->id?>' onclick="return confirmDelete();">Delete</a>&nbsp;|&nbsp;<a href='<?=$datapage?>?clear=<?=$fieldnum?>' onclick="return confirm('Are you sure you want to clear (erase) all data for this field?');">Clear&nbsp;data</a>
+					<?= action_links(
+							action_link(_L("Delete"),"cross","$datapage?delete=$field->id","return confirmDelete();"),
+							action_link(_L("Clear Data"),"lightning","$datapage?clear=$fieldnum","return confirm('Are you sure you want to clear (erase) all data for this field?');")
+							) ?>
 <?
 					}
 					?></td><?
 				break;
 				case "group" :
 ?>
-					<td><a href='<?=$datapage?>?delete=<?=$field->id?>' onclick="return confirmDelete();">Delete</a>&nbsp;|&nbsp;<a href='<?=$datapage?>?clear=<?=$fieldnum?>' onclick="return confirm('Are you sure you want to clear (erase) all data for this field?');">Clear&nbsp;data</a></td>
+					<td><?= action_links(
+							action_link(_L("Delete"),"cross","$datapage?delete=$field->id","return confirmDelete();"),
+							action_link(_L("Clear Data"),"lightning","$datapage?clear=$fieldnum","return confirm('Are you sure you want to clear (erase) all data for this field?');")
+							) ?></td>
 <?
 				break;
 				case "schedule" :
