@@ -44,7 +44,8 @@ class ValSmsUnique extends Validator {
 
 class DestWiz_whattype extends WizStep {
 	function getForm($postdata, $curstep) {
-
+		$_SESSION['codegen'] = "reset";
+		
 		// find remaining phone/email/sms available (some already active and pending)
 		$available = findAvailableDestinationTypes();
 				
@@ -131,18 +132,45 @@ class FinishDestWizard extends WizFinish {
 	}
 	
 	function getFinishPage ($postdata) {
+
 		// start with failure condition
 		$formhtml = '<div style="height: 200px; overflow:auto;">' . _L("Sorry, an error occurred.  Please try again later.") . '</div>';
+		$good = false;
 	
 		// if code generation success, then generate form html
 		if ($postdata['/whattype']['whattype'] == "email") {
-			if (subscriberPrepareNewEmail($postdata['/collectdata']['newdata'])) {
+			if ($_SESSION['codegen'] == 'reset') {
+				$_SESSION['codegen'] = 'done';
+				if (subscriberPrepareNewEmail($postdata['/collectdata']['newdata'])) {
+					$good = true;
+				}
+			} else {
+				// assume that the first click was good and already sent email
+				$good = true;
+			}
+			if ($good) {
 				//$formhtml = '<div style="height: 200px; overflow:auto;">' . _L("You must check your email for an activation code.  This code is required to complete the process.") . '</div>';
 				$formhtml = getEmailReview($postdata['/collectdata']['newdata']);
 			}
 		} else {
 	        $options = json_encode(array('phonetextoption' => $postdata['/whattype']['whattype']));
-			if ($code = subscriberPrepareNewPhone($postdata['/collectdata']['newdata'], $options)) {
+	        
+			if ($_SESSION['codegen'] == 'reset') {
+				$_SESSION['codegen'] = 'done';
+				if ($code = subscriberPrepareNewPhone($postdata['/collectdata']['newdata'], $options)) {
+					$good = true;
+				}
+			} else {
+				// if 'both' just use 'phone' otherwise 'sms'
+				$pendingtype = 'phone';
+				if ($postdata['/whattype']['whattype'] == 'sms')
+					$pendingtype = 'sms';
+				// grab the code from subscriberpending
+				$code = QuickQuery("select token from subscriberpending where type=? and value=?", false, array($pendingtype, $postdata['/collectdata']['newdata']));
+				if ($code)
+					$good = true;
+			}
+			if ($good) {
 				//$formhtml = '<div style="height: 200px; overflow:auto;">Your activation code is: ' . $code . '</div>';
 				$formhtml = getPhoneReview($postdata['/collectdata']['newdata'], $code);
 			}

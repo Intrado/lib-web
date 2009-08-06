@@ -250,15 +250,24 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
         	
         $options = json_encode(array('firstname' => $postdata['firstname'], 'lastname' => $postdata['lastname'], 'locale' => $_SESSION['_locale']));
 		
-		$result = subscriberCreateAccount($CUSTOMERURL, $postdata['username'], $postdata['password'], $sitecode, $options);
-		if ($result['result'] != "") {
-			if ($result['result'] == "duplicate") {
-				$errordetails = _L("That email address is already in use, please Return to Sign In");
+		$good = false;
+		if ($_SESSION['codegen'] == 'reset') {
+			$_SESSION['codegen'] = 'done';
+			$result = subscriberCreateAccount($CUSTOMERURL, $postdata['username'], $postdata['password'], $sitecode, $options);
+			if ($result['result'] != "") {
+				if ($result['result'] == "duplicate") {
+					$errordetails = _L("That email address is already in use, please Return to Sign In");
+				} else {
+					$errordetails = _L("An unknown error occurred, please try again");
+				}
+				$errors .= _L("Your account was not created") . $errordetails;
 			} else {
-				$errordetails = _L("An unknown error occurred, please try again");
+				$good = true;
 			}
-			$errors .= _L("Your account was not created") . $errordetails;
 		} else {
+			$good = true;
+		}
+		if ($good) {
 			// success
         	if ($ajax)
             	$form->sendTo("activate.php");

@@ -10,5 +10,8 @@ doStartSession();
 $captcha = new AntiSpam();
 // NOTE captcha value is lowercase even when display shows uppercase letters, ValCaptcha made case-insensitive for this
 $_SESSION['captcha'] = $captcha->Rand(5);
+
+$_SESSION['codegen'] = 'reset';
+
 redirect("newsubscriber.php");
 ?>
