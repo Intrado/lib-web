@@ -220,15 +220,6 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 	}
 }
 
-$reportinstance = new ReportInstance();
-$reportinstance->setParameters(systemcontact_make_report_options());
-$reportgenerator = new ContactsReport();
-$reportgenerator->reportinstance = $reportinstance;
-$reportgenerator->userid = $USER->id;
-$reportgenerator->format = "html";
-
-
-
 ////////////////////////////////////////////////////////////////////////////////
 // Functions
 ////////////////////////////////////////////////////////////////////////////////
@@ -367,6 +358,12 @@ if (!empty($_SESSION['systemcontact_showall']) || !empty($_SESSION['systemcontac
 	echo "<div id='metadataTempDiv' style='display:none'>";
 		select_metadata("$('searchresults')", 5, $fields);
 	echo "</div>";
+	$reportinstance = new ReportInstance();
+	$reportinstance->setParameters(systemcontact_make_report_options());
+	$reportgenerator = new ContactsReport();
+	$reportgenerator->reportinstance = $reportinstance;
+	$reportgenerator->userid = $USER->id;
+	$reportgenerator->format = "html";
 	$reportgenerator->generate();
 }
 
