@@ -1,4 +1,4 @@
--- Upgrade from release 6.2 to 6.3
+-- Upgrade from release 6.2 to 7.0
 
 
 -- Add aditional import field types
@@ -33,6 +33,9 @@ update fieldmap set options = 'searchable,text,firstname,subscribe,dynamic' wher
 $$$
 
 update fieldmap set options = 'searchable,text,lastname,subscribe,dynamic' where options like '%lastname%'
+$$$
+
+update fieldmap set options = 'searchable,multisearch,language,subscribe,static' where options like '%language%'
 $$$
 
 CREATE TABLE `subscriberpending` (
