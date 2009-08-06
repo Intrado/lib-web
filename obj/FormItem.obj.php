@@ -64,8 +64,8 @@ class RadioButton extends FormItem {
 			$str .= '<input id="'.$id.'" name="'.$n.'" type="radio" value="'.escapehtml($radiovalue).'" '.($value == $radiovalue ? 'checked' : '').' /><label id="'.$id.'-label" for="'.$id.'">'.escapehtml($radioname).'</label><br />
 			';
 			if (isset($this->args['hover'])) {
-				$hoverdata[$id] = $this->args['hover'][$radiovalue];
-				$hoverdata[$id.'-label'] = $this->args['hover'][$radiovalue];
+				$hoverdata[$id] = escapehtml($this->args['hover'][$radiovalue]);
+				$hoverdata[$id.'-label'] = escapehtml($this->args['hover'][$radiovalue]);
 			}
 			$counter++;
 		}
