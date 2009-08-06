@@ -52,6 +52,8 @@ $profilename = QuickQuery("select name from access where id=?", false, array($ed
 
 $hasenrollment = QuickQuery("select count(id) from import where datatype = 'enrollment'")?true:false; 
 
+$hasstaffid = QuickQuery("select count(r.id) from userrule ur, rule r where ur.userid=? and ur.ruleid = r.id and r.fieldnum = 'c01'", false, array($edituser->id))?true:false; 
+
 if($IS_COMMSUITE) {
 	$accessprofiles = QuickQueryList("select id, name from access", true);
 }
@@ -71,40 +73,7 @@ $surveytypes = QuickQueryList("select id, name from jobtype where not deleted an
 ////////////////////////////////////////////////////////////////////////////////
 class InpageSubmitButton extends FormItem {
 	function render ($value) {
-		return submit_button(_L('Set Staff ID value'), 'submit', 'disk');
-	}
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// Validators
-////////////////////////////////////////////////////////////////////////////////
-class ValDataRules extends Validator {
-	var $onlyserverside = true;
-	function validate ($value, $args, $requiredvalues) {
-		$datarules = json_decode($value);
-		if (!$datarules)
-			return true;
-		if (isset($requiredvalues['staffpkey']) && strlen(trim($requiredvalues['staffpkey'])) !== 0) {
-			foreach ($datarules as $datarule) {
-				if (substr($datarule->fieldnum, 0, 1) == "c")
-					return "$this->label " . _L("Cannot have both Staff ID and Enrollment field data restriction rules. Delete one or the other.");
-			}
-		}
-		return true;
-	}
-}
-
-class ValStaffPKey extends Validator {
-	var $onlyserverside = true;
-	function validate ($value, $args, $requiredvalues) {
-		$datarules = json_decode($requiredvalues['datarules']);
-		if (strlen(trim($value)) && $datarules) {
-			foreach ($datarules as $datarule) {
-				if (substr($datarule->fieldnum, 0, 1) == "c")
-					return "$this->label " . _L("Cannot have both Staff ID and Enrollment field data restriction rules. Delete one or the other.");
-			}
-		}
-		return true;
+		return submit_button($this->args['name'], 'inpagesubmit', $this->args['icon']);
 	}
 }
 
@@ -316,16 +285,15 @@ if ($hasenrollment) {
 	$formdata["staffpkey"] = array(
 		"label" => _L("Staff ID"),
 		"value" => $edituser->staffpkey,
-		"validators" => array(
-			array("ValStaffPKey")
-		),
-		"requires" => array("datarules"),
+		"validators" => array(),
 		"control" => array("TextField","maxlength" => 20, "size" => 12),
 		"helpstep" => 1
 	);
 	$formdata["submit"] = array(
 		"label" => "",
-		"control" => array("InpageSubmitButton"),
+		"value" => "",
+		"validators" => array(),
+		"control" => array("InpageSubmitButton", "name" => (($hasstaffid)?_L('Remove Staff ID'):_L('Set Staff ID')), "icon" => (($hasstaffid)?"cross":"disk")),
 		"helpstep" => 1
 	);
 }
@@ -341,9 +309,10 @@ $formdata["datarules"] = array(
 	"control" => array("FormRuleWidget"),
 	"helpstep" => 1
 );
-if ($hasenrollment) {
-	//$formdata["datarules"]["validators"][] = array("ValDataRules");
-	//$formdata["datarules"]["requires"] = array("staffpkey");
+
+if ($hasstaffid) {
+	$formdata["staffpkey"]["control"] = array("FormHtml", "html" => '<div style="border: 1px solid gray; width: 20%">'.$edituser->staffpkey.'</div>');
+	$formdata["datarules"]["control"]["allowedFields"] = array('f', 'g');
 }
 
 // Read only users have some control items disabled and some validators removed
@@ -387,7 +356,7 @@ if ($readonly) {
 		} else
 			$displayjobtypes .= $jobtypename. "<br>";
 	}
-	$formdata["jobtypes"]["control"] = array("FormHtml","html" => "<div style='border: 1px dotted;'>$displayjobtypes</div>");
+	$formdata["jobtypes"]["control"] = array("FormHtml", "html" => "<div style='border: 1px dotted;'>$displayjobtypes</div>");
 	unset($formdata["jobtypes"]["validators"]);
 	// Survey Types
 	$displaysurveytypes = "";
@@ -398,13 +367,11 @@ if ($readonly) {
 		} else
 			$displaysurveytypes .= $jobtypename. "<br>";
 	}
-	$formdata["surveytypes"]["control"] = array("FormHtml","html" => "<div style='border: 1px dotted;'>$displaysurveytypes</div>");
+	$formdata["surveytypes"]["control"] = array("FormHtml", "html" => "<div style='border: 1px dotted;'>$displaysurveytypes</div>");
 	unset($formdata["surveytypes"]["validators"]);
 	// Staff Pkey value
 	if ($hasenrollment) {
-		$formdata["staffpkey"]["control"] = array("FormHtml","html" => "<div style='border: 1px dotted;'>".$edituser->staffpkey."</div>");
-		unset($formdata["staffpkey"]["validators"]);
-		unset($formdata["staffpkey"]["requires"]);
+		unset($formdata["staffpkey"]);
 		unset($formdata["submit"]);
 	}
 	// Data restrictions
@@ -479,40 +446,66 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 			// Remove all existing non-enrollment user rules
 			$rules = $edituser->rules();
 			if (count($rules)) {
-				foreach ($rules as $rule)
-					if (substr($rule->fieldnum, 0, 1) !== "c")
-						$delrules[] = $rule->id;
-				Query("delete from rule where id in (?)", false, array($edituser->id, implode(",", $delrules)));
-				Query("delete from userrule where userid =? and ruleid in (?)", false, array($edituser->id, implode(",", $delrules)));
+				foreach ($rules as $rule) {
+					if (substr($rule->fieldnum, 0, 1) !== "c") {
+						Query("delete from rule where id=?", false, array($rule->id));
+						Query("delete from userrule where userid =? and ruleid in (?)", false, array($edituser->id, $rule->id));
+					}
+				}
+			}
+
+			$existingstaffidrule = QuickQuery("select r.id from userrule ur, rule r where ur.userid=? and ur.ruleid = r.id and r.fieldnum = 'c01'", false, array($edituser->id));
+			if (isset($postdata['datarules']))
+				$datarules = json_decode($postdata['datarules']);
+
+			if ($button == 'inpagesubmit' && $hasstaffid) {
+				// remove existing c01 rule if exists
+				if ($existingstaffidrule) {
+					Query("delete from rule where id=?", false, array($existingstaffidrule));
+					Query("delete from userrule where userid=? and ruleid=?", false, array($edituser->id, $existingstaffidrule));
+				}
+				// remove current staff id from user
+				$edituser->staffpkey = "";
 			}
 			
-			$edituser->staffpkey = "";
-			if (isset($postdata['staffpkey']) && strlen($postdata['staffpkey'])) {
-				// TODO: remove existing enrollment rule based on staffid
+			if (!$hasstaffid && isset($postdata['staffpkey']) && strlen($postdata['staffpkey'])) {
+				// remove existing c01 rule if exists
+				if ($existingstaffidrule) {
+					Query("delete from rule where id=?", false, array($existingstaffidrule));
+					Query("delete from userrule where userid =? and ruleid in (?)", false, array($edituser->id, $existingstaffidrule));
+				}
 				// create the c01 rule based on current staffid
-				$rule = Rule::initFrom("c01", "multisearch", "and", "in", array(array($postdata['staffpkey'])));
+				$rule = new Rule();
+				$rule->fieldnum = "c01";
+				$rule->type = "multisearch";
+				$rule->logical = "and";
+				$rule->op = "in";
+				$rule->val =$postdata['staffpkey'];
 				$rule->create();
 				
 				Query("insert into userrule values (?, ?)", false, array($edituser->id, $rule->id));
 				
 				// set current staffid
 				$edituser->staffpkey = $postdata['staffpkey'];
+				
+				// remove any c fields from data rules
+				if (count($datarules))
+					foreach ($datarules as $index => $datarule)
+						if (substr($datarule->fieldnum, 0, 1) == "c")
+							unset($datarules[$index]);
 			}
 			
-			if (isset($postdata['datarules'])) {
-				$datarules = json_decode($postdata['datarules']);
-				if (count($datarules)) {
-					foreach ($datarules as $datarule) {
-						$rule = new Rule();
-						$rule->fieldnum = $datarule->fieldnum;
-						$rule->type = $datarule->type;
-						$rule->logical = $datarule->logical;
-						$rule->op = $datarule->op;
-						$rule->val = is_array($datarule->val)?implode("|", $datarule->val):$datarule->val;
-						$rule->create();
-						
-						Query("insert into userrule values (?, ?)", false, array($edituser->id, $rule->id));
-					}
+			if (count($datarules)) {
+				foreach ($datarules as $datarule) {
+					$rule = new Rule();
+					$rule->fieldnum = $datarule->fieldnum;
+					$rule->type = $datarule->type;
+					$rule->logical = $datarule->logical;
+					$rule->op = $datarule->op;
+					$rule->val = is_array($datarule->val)?implode("|", $datarule->val):$datarule->val;
+					$rule->create();
+					
+					Query("insert into userrule values (?, ?)", false, array($edituser->id, $rule->id));
 				}
 			}
 			
@@ -540,11 +533,17 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 			$edituser->setPincode($postdata['pin']);
 		
 		Query("COMMIT");
-
-		if ($ajax)
-			$form->sendTo("users.php");
-		else
-			redirect("users.php");
+		if ($button == 'inpagesubmit') {
+			if ($ajax)
+				$form->sendTo("user.php?id=".$edituser->id);
+			else
+				redirect("user.php?id=".$edituser->id);
+		} else {
+			if ($ajax)
+				$form->sendTo("users.php");
+			else
+				redirect("users.php");
+		}
 	}
 }
 
@@ -558,7 +557,7 @@ include_once("nav.inc.php");
 
 ?>
 <script type="text/javascript">
-<? Validator::load_validators(array("ValLogin", "ValPassword", "ValAccesscode", "ValPin", "ValStaffPKey", "ValDataRules", "ValRules")); ?>
+<? Validator::load_validators(array("ValLogin", "ValPassword", "ValAccesscode", "ValPin", "ValRules")); ?>
 </script>
 <?
 
