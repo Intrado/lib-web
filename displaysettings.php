@@ -24,7 +24,7 @@ if (!$USER->authorize('managesystem')) {
 
 $formdata = array();
 $helpstepnum = 1;
-
+/* Version 7.0 will not support UI translation
 $helpsteps = array(_L("Select the default language for the user interface."));
 $formdata["locale"] = array(
 	"label" => _L("Default Language"),
@@ -34,7 +34,7 @@ $formdata["locale"] = array(
 	),
 	"control" => array("SelectMenu","values"=>$LOCALES),
 	"helpstep" => $helpstepnum
-);
+);*/
 
 $helpsteps[$helpstepnum++] = _L("Choose a theme for the user interface.<br><br>Additionally, you can select a color which will be blended into the grey parts of certain interface components. The amount of tint is determined by the shader ratio.<br><br> Setting the theme will reset the color and ratio options to the theme defaults.");
 $formdata["brandtheme"] = array(
@@ -73,7 +73,8 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		$postdata = $form->getData(); //gets assoc array of all values {name:value,...}
 		
 		//save data here
-		setSystemSetting('_locale', $postdata['locale']);
+		/* Version 7.0 does not support UI translation
+		setSystemSetting('_locale', $postdata['locale']);*/
 		
 		$newTheme = json_decode($postdata['brandtheme']);
 		setSystemSetting('_brandtheme', $newTheme->theme);
