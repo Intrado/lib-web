@@ -535,7 +535,7 @@ class JobWiz_start extends WizStep {
 		);
 		$formdata["jobtype"] = array(
 			"label" => _L("Type/Category"),
-			"fieldhelp" => _L("These options determine how your message will be received."),
+			"fieldhelp" => _L("Select the option that best describes the type of notification you are sending."),
 			"value" => "",
 			"validators" => array(
 				array("ValRequired"),
@@ -547,7 +547,13 @@ class JobWiz_start extends WizStep {
 		
 		$formdata["package"] = array(
 			"label" => _L("Notification Method"),
-			"fieldhelp" => _L("These are commonly used notification packages. For other options, select Custom."),
+			"fieldhelp" => _L("Choose a notification method. <br><br><ul>
+			<li><b>Record</b> - Record a phone message in your voice. In addition to the phone call the system will automatically send email and SMS text message alerts.
+			<li><b>Write</b> - Type your phone, email and SMS text messages. The phone message text will be automatically converted to a call using text-to-speech. Auto-translation is optional.
+			<li><b>Record and Write</b> - Record a phone message in your voice. Type your phone and SMS text message.
+			<li><b>Customize</b> - Use the Customize option to manually select any combination of message options you require.
+			</ul>
+			<i><b>Note:</b> Email and SMS text messaging are optional features and may not be enabled.</i>"),
 			"validators" => array(
 				array("ValRequired"),
 				array("ValInArray", "values" => array('easycall', 'express', 'personalized', 'custom'))
@@ -557,9 +563,15 @@ class JobWiz_start extends WizStep {
 			"helpstep" => 3
 		);
 		$helpsteps = array (
-			_L("Welcome to the Job Wizard. This is a guided 5 step process. <br><br>Enter your Job's name. Job names are used for email subjects and reporting, so they should be descriptive.").'<br>'._L("Good examples include 'Standardized testing reminder', or 'Early dismissal'."),
-			_L("Job Types are used to determine which phones or emails will be contacted. Choosing the correct job type is important for effective communication.").'<br><br> <i><b>'._L("Note").':</b>'._L("Emergency jobs include a notification that the message is regarding an emergency.").'</i><br><br>',
-			_L("Choose a notification method. The first three options are preconfigured to ask you to fill out specific steps. Custom will allow you to choose from all available notification options.")
+			_L("Job names are used for email subjects and reporting, so they should be descriptive.<br><br><b>Note:</b> Before you send your first job, you should make a test list by selecting New List in the Shortcuts menu."),
+			_L("Job Types are used to determine which phones or emails will be contacted. Choosing the correct job type is important for effective communication.<br><br><b>Note:</b> Emergency jobs include a notification that the message is regarding an emergency."),
+			_L("Choose a notification method. The first three options are preconfigured to ask you to fill out specific steps. <br><br><ul>
+			<li><b>Record</b> - Record a phone message in your voice. In addition to the phone call the system will automatically send email and SMS text message alerts to those recipients with the appropriate email and SMS contact information and preference settings.
+			<li><b>Write</b> - Type your phone, email and SMS text messages. The phone message text will be automatically converted to a call using text-to-speech. Both the phone and email messages can also be automatically translated into the other languages defined in your account.
+			<li><b>Record and Write</b> - Record a phone message in your voice. Type your phone and SMS text message.
+			<li><b>Customize</b> - Use the Customize option to manually select any combination of message options you require. For advanced notification options, such as selecting from previously created messages, choose Customize.
+			</ul>
+			<b>Note:</b> Email and SMS text messaging are optional features and may not be enabled for some user accounts.")
 		);
 		return new Form("start",$formdata,$helpsteps);
 	}
