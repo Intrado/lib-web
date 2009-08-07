@@ -548,6 +548,25 @@ class ValReldate extends Validator {
 	}
 }
 
+class ValRegExp extends Validator {
+	function validate ($value, $args) {		
+		if (!ereg($args["pattern"], $value))
+			return _L("Invalid character in ")." ".$this->label;	
+		return true;
+	}
+	
+	function getJSValidator () {
+		return 
+			'function (name, label, value, args) {
+				var reg = new RegExp(args["pattern"]);
+				if (reg.exec(value) == null)
+					return "' . _L("Invalid character in ")  . '" + label ;
+				return true;
+			}';
+	}
+}
+
+
 //alpha
 //alphanumeric
 //phoneeasycall ??
