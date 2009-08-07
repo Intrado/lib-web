@@ -41,19 +41,19 @@ function loadSubscriberDisplaySettings() {
 
 	$theme = QuickQuery("select value from setting where name = '_brandtheme'");
 	if ($theme === false)
-		$theme = "3dblue";
+		$theme = "classroom";
 	$theme1 = QuickQuery("select value from setting where name = '_brandtheme1'");
 	if ($theme1 === false)
-		$theme1 = "89A3CE";
+		$theme1 = "3e693f";
 	$theme2 = QuickQuery("select value from setting where name = '_brandtheme2'");
 	if ($theme2 === false)
-		$theme2 = "89A3CE";
+		$theme2 = "b47727";
 	$primary = QuickQuery("select value from setting where name = '_brandprimary'");
 	if ($primary === false)
-		$primary = "26477D";
+		$primary = "3e693f";
 	$ratio = QuickQuery("select value from setting where name = '_brandratio'");
 	if ($ratio === false)
-		$ratio = ".3";
+		$ratio = ".2";
 	$_SESSION['colorscheme']['_brandtheme']   = $theme;
 	$_SESSION['colorscheme']['_brandtheme1']  = $theme1;
 	$_SESSION['colorscheme']['_brandtheme2']  = $theme2;

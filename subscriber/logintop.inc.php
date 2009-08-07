@@ -1,8 +1,12 @@
 <?
 $scheme = getCustomerData($CUSTOMERURL);
 if ($scheme == false) {
-	$scheme = array("_brandtheme" => "3dblue",
-					"colors" => array("_brandprimary" => "26477D"));
+	$scheme = array("_brandtheme" => "classroom",
+					"colors" => array(
+						"_brandprimary" => "3e693f",
+						"_brandtheme1" => "3e693f",
+						"_brandtheme2" => "b47727",
+						"_brandratio" => ".2"));
 }
 $primary = $scheme['colors']['_brandprimary'];
 

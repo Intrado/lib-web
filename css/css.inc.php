@@ -3,11 +3,11 @@
 // hack for pages not logged in (no session)
 if (!isset($_SESSION['colorscheme'])) {
 	// TODO these should come from customer display data (still brand the login pages)
-	$theme = "3dblue";
-	$primary = "26477D";
-	$theme1 = "89A3CE";
-	$theme2 = "89A3CE";
-	$globalratio = ".3";
+	$theme = "classroom";
+	$primary = "3e693f";
+	$theme1 = "3e693f";
+	$theme2 = "b47727";
+	$globalratio = ".2";	
 } else {
 	$theme = $_SESSION['colorscheme']['_brandtheme'];
 	$primary = $_SESSION['colorscheme']['_brandprimary'];

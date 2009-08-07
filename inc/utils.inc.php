@@ -292,7 +292,7 @@ function getEmailRegExp() {
     # This code is licensed under a Creative Commons Attribution-ShareAlike 2.5 License
     # http://creativecommons.org/licenses/by-sa/2.5/
     #
-    # $Revision: 1.88 $
+    # $Revision: 1.89 $
     # http://www.iamcal.com/publish/articles/php/parsing_email/
     ##################################################################################
 
@@ -614,7 +614,7 @@ function getBrandTheme(){
 	if (isset($_SESSION['colorscheme']))
 		return $_SESSION['colorscheme']['_brandtheme'];
 	else
-		return "3dblue"; // hack for buttons on pages not yet logged in
+		return "classroom"; // hack for buttons on pages not yet logged in
 }
 
 function getBrandPrimary(){
@@ -639,10 +639,15 @@ function loadDisplaySettings(){
 	// fetch default scheme
 	$scheme = getCustomerData($CUSTOMERURL);
 	if($scheme == false){
-		$scheme = array("_brandtheme" => "3dblue",
-						"_supportemail" => "support@schoolmessenger.com",
-						"_supportphone" => "8009203897",
-						"colors" => array("_brandprimary" => "26477D"));
+		$scheme = array(
+					"_supportemail" => "support@schoolmessenger.com",
+					"_supportphone" => "8009203897",
+					"_brandtheme" => "classroom",
+					"colors" => array(
+						"_brandprimary" => "3e693f",
+						"_brandtheme1" => "3e693f",
+						"_brandtheme2" => "b47727",
+						"_brandratio" => ".2"));
 	}
 	$userprefs = array();
 	$userprefs['_brandprimary'] = QuickQuery("select value from usersetting where userid=? and name = '_brandprimary'", false, array($USER->id));
