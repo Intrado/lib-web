@@ -10,6 +10,7 @@ class MessageBody extends FormItem {
 				<tr>
 					<td valign="top" rowspan="5">
 						<textarea id="'.$n.'" name="'.$n.'" rows="12" cols="50" />'.escapehtml($value).'</textarea>	';
+	/* TODO play does not work with inserts do not show play button until that works - next release	
 	if(!isset($this->args['playbutton']) || $this->args['playbutton'] === true) {
 		$str .= 		icon_button(_L("Play"),"fugue/control","var content = $('" . $n . "').getValue();
 																	if(content.length > 4000) {
@@ -23,8 +24,9 @@ class MessageBody extends FormItem {
 																	}
 																	if(content != '')
 																		popup('previewmessage.php?text=' + encodeURIComponent(content) + '&language=' + encodeURIComponent(language) + '&gender=' + encodeURIComponent(voice), 400, 400);");
+		
 	}
-	
+	*/
 	$str .= '	</td>
 				</tr>';
 				
