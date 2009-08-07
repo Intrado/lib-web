@@ -133,7 +133,7 @@ function listcontacts ($obj,$name) {
 	$lists = array();
 	if($name == "job") {
 		
-		if($obj->status == "new" || $obj->status == "processing"){
+		if(in_array($obj->status,array("new","procactive","processing"))){
 			$lists[] = QuickQuery("select listid from job where id=?",false, array($obj->id));
 			$lists = array_merge($lists, QuickQueryList("select listid from joblist where jobid = ?",false,false,array($obj->id)));
 		} else {
