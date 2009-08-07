@@ -456,13 +456,19 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 			
 			$edituser->setSetting("callerid",$userphone);
 
-			// Remove all existing non-enrollment user rules
+			// Remove all existing user rules
 			$rules = $edituser->rules();
 			if (count($rules)) {
 				foreach ($rules as $rule) {
-					if (substr($rule->fieldnum, 0, 1) !== "c") {
+					// don't remove c field rules if they are using a staff id
+					if ($hasstaffid) {
+						if (substr($rule->fieldnum, 0, 1) !== "c") {
+							Query("delete from rule where id=?", false, array($rule->id));
+							Query("delete from userrule where userid=? and ruleid=?", false, array($edituser->id, $rule->id));
+						}
+					 } else {
 						Query("delete from rule where id=?", false, array($rule->id));
-						Query("delete from userrule where userid =? and ruleid in (?)", false, array($edituser->id, $rule->id));
+						Query("delete from userrule where userid=? and ruleid=?", false, array($edituser->id, $rule->id));
 					}
 				}
 			}
@@ -485,7 +491,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 				// remove existing c01 rule if exists
 				if ($existingstaffidrule) {
 					Query("delete from rule where id=?", false, array($existingstaffidrule));
-					Query("delete from userrule where userid =? and ruleid in (?)", false, array($edituser->id, $existingstaffidrule));
+					Query("delete from userrule where userid=? and ruleid=?", false, array($edituser->id, $existingstaffidrule));
 				}
 				// create the c01 rule based on current staffid
 				$rule = new Rule();
