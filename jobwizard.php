@@ -189,6 +189,7 @@ class FinishJobWizard extends WizFinish {
 		$wizHasSmsMsg= wizHasSms($postdata);
 		
 		global $USER;
+		global $ACCESS;
 		$jobtype = DBFind("JobType", "from jobtype where id=?", false, array($postdata["/start"]["jobtype"]));
 		$jobname = $postdata["/start"]["name"];
 
@@ -358,16 +359,23 @@ class FinishJobWizard extends WizFinish {
 		switch ($postdata["/schedule/options"]["schedule"]) {
 			case "now":
 				$callearly = date("g:i a");
-				if (strtotime($callearly) < strtotime($USER->getCallEarly()))
-					$callearly = $USER->getCallEarly();
+				$accessCallearly = $ACCESS->getValue("callearly");
+				if (!$accessCallearly)
+					$accessCallearly = "12:00 am";
 				$calllate = $USER->getCallLate();
-				if (strtotime($callearly) + 3600 > strtotime($calllate))
-					 $calllate = date("g:i a", strtotime(strtotime($callearly) + 3600));
+				if ((strtotime($callearly) + 3600) > strtotime($calllate))
+					$calllate = date("g:i a", strtotime($callearly) + 3600);
+				$accessCalllate = $ACCESS->getValue("calllate");
+				if (!$accessCalllate)
+					$accessCalllate = "11:59 pm";
+				if (strtotime($calllate)  > strtotime($accessCalllate))
+					$calllate = $accessCalllate;
+				
 				$schedule = array(
 					"maxjobdays" => isset($postdata["/schedule/advanced"]["maxjobdays"])?$postdata["/schedule/advanced"]["maxjobdays"]:1,
 					"date" => date('m/d/Y'),
-					"callearly" => date("g:i a"),
-					"calllate" => $USER->getCallLate()
+					"callearly" => $callearly,
+					"calllate" => $calllate
 				);
 				break;
 			case "schedule":
