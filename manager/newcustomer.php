@@ -256,7 +256,7 @@ if( $reloadform ){
 	ClearFormData($f);
 	PutFormData($f,$s,"Submit", "");
 	PutFormData($f,$s,'name',"","text",1,50, true);
-	PutFormData($f,$s,'hostname',"","text",5,255, true);
+	PutFormData($f,$s,'hostname',"","text",3,255, true);
 	PutFormData($f,$s,'timezone', "");
 	PutFormData($f,$s,'shard', "", "number", "nomin", "nomax", true);
 	PutFormData($f,$s,'logo', null, null, null, null);
