@@ -205,7 +205,7 @@ foreach($languages as $language) {
 }
 
 $helpsteps = array (
-	_L('These intro messages will play before all phone messages. The best intro messages contain a brief greeting and let recipients know that they can press pound to repeat the message. Additionally, the Emergency intro message should state that the message is an emergency.'),
+	_L('These intro messages will play before all phone messages. The best intro messages contain a brief greeting and instructs the user to press "1" to hear the message. You should also let recipients know that they can press pound to place the call on hold. For example, <p>"<em>This is an important message from Springfield Independent School District. To hear this message now press 1. To place this call on hold press the pound key</em>".</p> Additionally, the Emergency intro message should state that the message is an emergency rather than simply "important."')
 );
 
 $buttons = array(submit_button(_L("Done"),"submit","tick"),
