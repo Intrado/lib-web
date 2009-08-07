@@ -723,9 +723,11 @@ class JobWiz_messagePhoneChoose extends WizStep {
 			"control" => array("SelectMessage", "type"=>"phone", "width"=>"80%", "values"=>$phonemessage),
 			"helpstep" => 1
 		);
-		if (count($langs)) $formdata[] = _L("Optional additional languages");
+		if (count($langs)) {
+			$formdata[] = _L("Optional additional languages");
+			$helpsteps[] = _L("Select from list of existing messages. If you do not find an appropriate message, you may click the Message Source link from the navigation on the left and choose to create a new message.");
+		}
 		foreach ($langs as $lang) {
-			$helpsteps = array(_L("Select from list of existing messages. If you do not find an appropriate message, you may click the Message Source link from the navigation on the left and choose to create a new message."));
 			$formdata[$lang] = array(
 				"label" => $lang,
 				"value" => "",
@@ -733,7 +735,7 @@ class JobWiz_messagePhoneChoose extends WizStep {
 					array("ValInArray","values"=>$values)
 				),
 				"control" => array("SelectMessage", "type"=>"phone", "width"=>"80%", "values"=>$phonemessage),
-				"helpstep" => 1
+				"helpstep" => 2
 			);
 		}
 		
@@ -1032,9 +1034,11 @@ class JobWiz_messageEmailChoose extends WizStep {
 			"helpstep" => 1
 		);
 
-		if (count($langs)) $formdata[] = _L("Optional additional languages");
+		if (count($langs)) {
+			$formdata[] = _L("Optional additional languages");
+			$helpsteps[] = _L("Select from list of existing messages. If you do not find an appropriate message, you may click the Message Source link from the navigation on the left and choose to create a new message.");
+		}
 		foreach ($langs as $lang) {
-			$helpsteps = array(_L("Select from list of existing messages. If you do not find an appropriate message, you may click the Message Source link from the navigation on the left and choose to create a new message."));
 			$formdata[$lang] = array(
 				"label" => $lang,
 				"value" => "",
@@ -1042,7 +1046,7 @@ class JobWiz_messageEmailChoose extends WizStep {
 					array("ValInArray","values"=>$values)
 				),
 				"control" => array("SelectMessage", "type"=>"phone", "width"=>"80%", "values"=>$messages),
-				"helpstep" => 1
+				"helpstep" => 2
 			);
 		}
 
@@ -1392,7 +1396,8 @@ class JobWiz_scheduleOptions extends WizStep {
 			"fieldhelp" => _L("Select when to send this message."),
 			"value" => "",
 			"validators" => array(
-				array("ValRequired")
+				array("ValRequired"),
+				array("ValInArray", "values" => array_keys($menu))
 			),
 			"control" => array("RadioButton","values"=>$menu),
 			"helpstep" => 1
