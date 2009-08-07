@@ -24,7 +24,14 @@ class Form {
 		if (isset($buttons))
 			$this->buttons = $buttons;
 		
-		$this->serialnum = md5(serialize($formdata));
+		//only use value data in hash, ignore labels, options, etc, etc
+		$values = array();
+		foreach ($formdata as $k => $v) {
+			if (isset($v['value']))
+				$values[$k] = $v['value'];
+		}
+		
+		$this->serialnum = md5(serialize($values));
 	}
 	
 	function handleRequest($dontexit = false) {
