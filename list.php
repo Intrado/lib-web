@@ -166,9 +166,9 @@ if (isset($renderedlist) && $renderedlist->totalremoved > 0) {
 }
 
 $advancedtools = '';
-$advancedtools .= '<tr><td class="border">'.submit_button(_L('Search Contacts'),'search').'</td><td class="border">'._L('Search for contacts in the database').'</td></tr>';
-$advancedtools .= '<tr><td class="border">'.submit_button(_L('Enter Contacts'),'manualAdd').'</td><td class="border">'._L('Manually add new contacts').'</td></tr>';
-$advancedtools .= '<tr><td class="border">'.submit_button(_L('Open Address Book'),'addressBookAdd').'</td><td class="border">'._L('Choose contacts from your address book').'</td></tr>';
+$advancedtools .= '<tr><td class="border">'.submit_button(_L('Enter Contacts'),'manualAdd').'</td><td class="border">'._L('Manually type in new contacts').'</td></tr>';
+$advancedtools .= '<tr><td class="border">'.submit_button(_L('Open Address Book'),'addressBookAdd').'</td><td class="border">'._L('Choose from contacts you manually typed into your address book').'</td></tr>';
+$advancedtools .= '<tr><td class="border">'.submit_button(_L('Search Contacts'),'search').'</td><td class="border">'._L('Search the system database for global contacts').'</td></tr>';
 if ($USER->authorize('listuploadids') || $USER->authorize('listuploadcontacts'))
 	$advancedtools .= '<tr><td class="border">'.submit_button(_L('Upload List'),'uploadList').'</td><td class="border">'._L('Upload a list of contacts using a CSV file').'</td></tr>';
 $formdata[] = _L('Additional List Tools');
