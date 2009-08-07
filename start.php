@@ -134,9 +134,9 @@ function listcontacts ($obj,$name) {
 	if($name == "job") {
 		if(in_array($obj->status,array("active","cancelling"))) {
 			$result = QuickQueryRow("select
-				sum(rc.type='phone' not in ('duplicate', 'nocontacts', 'blocked')) as total_phone,
-            	sum(rc.type='email' not in ('duplicate', 'nocontacts', 'blocked')) as total_email,
-            	sum(rc.type='sms' not in ('duplicate', 'nocontacts', 'blocked')) as total_sms,
+				sum(rc.type='phone' and rc.result not in ('duplicate', 'blocked')) as total_phone,
+            	sum(rc.type='email' and rc.result not in ('duplicate', 'blocked')) as total_email,
+            	sum(rc.type='sms' and rc.result not in ('duplicate', 'blocked')) as total_sms,
             	j.type LIKE '%phone%' AS has_phone,
 				j.type LIKE '%email%' AS has_email,
 				j.type LIKE '%sms%' AS has_sms,
