@@ -82,7 +82,8 @@ $formdata = array(
 		"fieldhelp" => "Short text message that can be sent to mobile phones. Can not be longer than 160 characters.",
 		"validators" => array(
 			array("ValRequired"),
-			array("ValLength","max"=>160)
+			array("ValLength","max"=>160),
+			array("ValRegExp","pattern" => "^[a-zA-Z0-9\x20\x09\x0a\x0b\x0C\x0d\x2a\x5e\<\>\?\,\.\/\{\}\|\~\!\@\#\$\%\&\(\)\_\+\']*$")
 		),
 		"control" => array("TextArea","rows"=>10,"counter"=>160),
 		"helpstep" => 2
@@ -162,7 +163,7 @@ include_once("nav.inc.php");
 
 ?>
 <script type="text/javascript">
-<? Validator::load_validators(array("ValDuplicateNameCheck")); ?>
+<? Validator::load_validators(array("ValDuplicateNameCheck","ValRegExp")); ?>
 </script>
 <?
 
