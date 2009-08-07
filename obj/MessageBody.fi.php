@@ -82,7 +82,10 @@ if(isset($this->args['audiofiles'])) {
 							</tr>
 						</table>	
 									'. icon_button(_L("Insert"),"fugue/arrow_turn_180","
-												sel = $('" . $n . "datafield'); def = $('" . $n . "datadefault').value; textInsert('<<' + sel.options[sel.selectedIndex].text + (def ? ':' : '') + def + '>>', $('$n'));") 
+												sel = $('" . $n . "datafield');
+												if (sel.options[sel.selectedIndex].value != '') { 
+													 def = $('" . $n . "datadefault').value; textInsert('<<' + sel.options[sel.selectedIndex].text + (def ? ':' : '') + def + '>>', $('$n'));
+												}") 
 									. '								
 				</td>
 				</tr>
