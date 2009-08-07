@@ -95,6 +95,10 @@ if ($list->id) {
 		unset($rules);
 }
 
+$total = isset($renderedlist) ? $renderedlist->total : '0';
+$showAdditions = isset($renderedlist) && $renderedlist->totaladded > 0;
+$showSkips = isset($renderedlist) && $renderedlist->totalremoved > 0;
+
 $formdata = array(
 	"hiddendone" => array(
 		"label" => _L(''),
@@ -127,7 +131,7 @@ $formdata = array(
 	"preview" => array(
 		"label" => 'Total',
 		"fieldhelp" => _L('This number indicates how many people are currently in your list. Click the preview button to view contact information.'),
-		"control" => array("FormHtml", 'html' => '<div id="listTotal" style="float:left; padding:5px; margin-right: 10px;">' . (isset($renderedlist) ? $renderedlist->total : '0') . '</div>' . submit_button(_L('Preview'), 'preview', 'tick')),
+		"control" => array("FormHtml", 'html' => '<div id="listTotal" style="float:left; padding:5px; margin-right: 10px;">0</div>' . submit_button(_L('Preview'), 'preview', 'tick')),
 		"helpstep" => 1
 	)
 );
@@ -149,21 +153,18 @@ $formdata["newrule"] = array(
 	"helpstep" => 2
 );
 
-if (isset($renderedlist) && $renderedlist->totaladded > 0) {
-	$formdata["additions"] = array(
-		"label" => _L('Additions'),
-		"control" => array("FormHtml", 'html' => '<div style="float:right; margin-left:10px;">' . submit_button(_L('Remove All Additions'),'clearadditions','diagona/16/101') .  "</div><div id='listAdditionsContainer' style='margin:0; margin-bottom:10px; padding:0'></div>"),
-		"helpstep" => 2
-	);
-}
 
-if (isset($renderedlist) && $renderedlist->totalremoved > 0) {
-	$formdata["skips"] = array(
-		"label" => _L('Skips'),
-		"control" => array("FormHtml", 'html' => '<div style="float:right; margin-left:10px;">' . submit_button(_L('Remove All Skips'),'clearskips','diagona/16/101') . "</div><div id='listSkipsContainer' style='margin:0;padding:0'></div>"),
-		"helpstep" => 2
-	);
-}
+$formdata["additions"] = array(
+	"label" => _L('Additions'),
+	"control" => array("FormHtml", 'html' => '<div id="removeAllAdditions" style="float:right; margin-left:10px;">' . submit_button(_L('Remove All Additions'),'clearadditions','diagona/16/101') .  "</div><div id='listAdditionsContainer' style='margin:0; margin-bottom:10px; padding:0'></div>"),
+	"helpstep" => 2
+);
+
+$formdata["skips"] = array(
+	"label" => _L('Skips'),
+	"control" => array("FormHtml", 'html' => '<div id="removeAllSkips" style="float:right; margin-left:10px;">' . submit_button(_L('Remove All Skips'),'clearskips','diagona/16/101') . "</div><div id='listSkipsContainer' style='margin:0;padding:0'></div>"),
+	"helpstep" => 2
+);
 
 $advancedtools = '<tr class="listHeader"><th style="text-align:left">' . _L("Tool") . '</th><th style="text-align:left">' . _L("Description") . '</th></tr>';
 $advancedtools .= '<tr><td>'.submit_button(_L('Enter Contacts'),'manualAdd').'</td><td>'._L('Manually type in new contacts').'</td></tr>';
@@ -336,12 +337,24 @@ endWindow();
 		ruleWidget.container.observe('RuleWidget:DeleteRule', list_delete_rule);
 		ruleWidget.container.observe('RuleWidget:RemoveAllRules', list_clear_rules);
 		
-		<?php if (isset($renderedlist)) { ?>
-			if ($('listAdditionsContainer'))
+		$('listAdditionsContainer').up('tr').hide();
+		$('listSkipsContainer').up('tr').hide();
+		
+		<?php if (isset($renderedlist) && $showAdditions) { ?>
+			if ($('listAdditionsContainer')) {
+				$('listAdditionsContainer').up('tr').show();
 				$('listAdditionsContainer').update('<?=addslashes(list_get_results_html('listAdditionsContainer', $renderedlist))?>');
-			if ($('listSkipsContainer'))
-				$('listSkipsContainer').update('<?=addslashes(list_get_results_html('listSkipsContainer', $renderedlist))?>');
+			}
 		<?php } ?>
+		
+		<?php if (isset($renderedlist) && $showSkips) { ?>
+			if ($('listSkipsContainer')) {
+				$('listSkipsContainer').up('tr').show();
+				$('listSkipsContainer').update('<?=addslashes(list_get_results_html('listSkipsContainer', $renderedlist))?>');
+			}
+		<?php } ?>
+		
+		$('listTotal').update(<?=$total?>);
 	});
 
 	function list_add_rule(event) {
