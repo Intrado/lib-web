@@ -132,53 +132,50 @@ function job_responses ($obj,$name) {
 function listcontacts ($obj,$name) {
 	$lists = array();
 	if($name == "job") {
-		
-		if(in_array($obj->status,array("new","procactive","processing"))){
+		if(in_array($obj->status,array("active","cancelling"))) {
+			$result = QuickQueryRow("select
+				sum(rc.type='phone' not in ('duplicate', 'nocontacts', 'blocked')) as total_phone,
+            	sum(rc.type='email' not in ('duplicate', 'nocontacts', 'blocked')) as total_email,
+            	sum(rc.type='sms' not in ('duplicate', 'nocontacts', 'blocked')) as total_sms,
+            	j.type LIKE '%phone%' AS has_phone,
+				j.type LIKE '%email%' AS has_email,
+				j.type LIKE '%sms%' AS has_sms,
+            	sum(rc.result not in ('A', 'M', 'duplicate', 'nocontacts', 'blocked') and rc.type='phone' and rc.numattempts < js.value) as remaining_phone,
+            	sum(rc.result not in ('sent', 'duplicate', 'nocontacts') and rc.type='email' and rc.numattempts < 1) as remaining_email,
+            	sum(rc.result not in ('sent', 'duplicate', 'nocontacts', 'blocked') and rc.type='sms' and rc.numattempts < 1) as remaining_sms,
+            	j.percentprocessed as percentprocessed
+				from job j
+           		left join reportcontact rc on j.id = rc.jobid
+      			left join jobsetting js on (js.jobid = j.id and js.name = 'maxcallattempts')
+            	where j.id=? group by j.id",true,false,array($obj->id));
+			$content = "";
+			if($result["has_phone"])
+				$content .= $result["total_phone"] . " Phone" . ($result["total_phone"]!=1?"s":"") . " (" .  sprintf("%0.2f",(100*$result["remaining_phone"]/$result["total_phone"])) . "%	Remaining), ";
+			if($result["has_email"])
+				$content .= $result["total_email"] . " Email" . ($result["total_email"]!=1?"s":"") . " (" .  sprintf("%0.2f",(100*$result["remaining_email"]/$result["total_email"])) . "%	Remaining), ";
+			if($result["has_sms"])
+				$content .= $result["total_sms"] . " SMS (" .  sprintf("%0.2f",(100*$result["remaining_sms"]/$result["total_sms"])) . "% Remaining)";		
+			return trim($content,", ");
+		} else if(in_array($obj->status,array("cancelled","complete"))) {	
+			$content = "";
+			$result = Query("select rp.type,
+							sum(rp.numcontacts and rp.status != 'duplicate') as total,
+							100 * sum(rp.numcontacts and rp.status='success') / (sum(rp.numcontacts and rp.status != 'duplicate') +0.00) as success_rate
+							from reportperson rp where rp.jobid = ?	group by rp.jobid, rp.type",false,array($obj->id));
+			while ($row = DBGetRow($result)) {
+				if($row[0] == "phone")
+					$content .= $row[1] . " Phone" . ($row[1]!=1?"s":"") . " (" . sprintf("%0.2f",(isset($row[2]) ? $row[2] : "")) . "% Contacted), ";
+				else if($row[0] == "email")
+					$content .= $row[1] . " Email" . ($row[1]!=1?"s":"") . " (" . sprintf("%0.2f",(isset($row[2]) ? $row[2] : "")) . "% Contacted), ";
+				else if($row[0] == "sms")
+					$content .= $row[1] . " SMS (" . sprintf("%0.2f",(isset($row[2]) ? $row[2] : "")) . "% Contacted)";		
+			
+			}
+			return trim($content,", ");
+		} else {
 			$lists[] = QuickQuery("select listid from job where id=?",false, array($obj->id));
 			$lists = array_merge($lists, QuickQueryList("select listid from joblist where jobid = ?",false,false,array($obj->id)));
-		} else {
-			if(in_array($obj->status,array("procactive","active","cancelling"))) {
-				$result = QuickQueryRow("select
-					sum(rc.type='phone' not in ('duplicate', 'nocontacts', 'blocked')) as total_phone,
-	            	sum(rc.type='email' not in ('duplicate', 'nocontacts', 'blocked')) as total_email,
-	            	sum(rc.type='sms' not in ('duplicate', 'nocontacts', 'blocked')) as total_sms,
-	            	j.type LIKE '%phone%' AS has_phone,
-					j.type LIKE '%email%' AS has_email,
-					j.type LIKE '%sms%' AS has_sms,
-	            	sum(rc.result not in ('A', 'M', 'duplicate', 'nocontacts', 'blocked') and rc.type='phone' and rc.numattempts < js.value) as remaining_phone,
-	            	sum(rc.result not in ('sent', 'duplicate', 'nocontacts') and rc.type='email' and rc.numattempts < 1) as remaining_email,
-	            	sum(rc.result not in ('sent', 'duplicate', 'nocontacts', 'blocked') and rc.type='sms' and rc.numattempts < 1) as remaining_sms,
-	            	j.percentprocessed as percentprocessed
-					from job j
-	           		left join reportcontact rc on j.id = rc.jobid
-	      			left join jobsetting js on (js.jobid = j.id and js.name = 'maxcallattempts')
-	            	where j.id=? group by j.id",true,false,array($obj->id));
-				$content = "";
-				if($result["has_phone"])
-					$content .= $result["total_phone"] . " Phone" . ($result["total_phone"]!=1?"s":"") . " (" .  sprintf("%0.2f",(100*$result["remaining_phone"]/$result["total_phone"])) . "%	Remaining), ";
-				if($result["has_email"])
-					$content .= $result["total_email"] . " Email" . ($result["total_email"]!=1?"s":"") . " (" .  sprintf("%0.2f",(100*$result["remaining_email"]/$result["total_email"])) . "%	Remaining), ";
-				if($result["has_sms"])
-					$content .= $result["total_sms"] . " SMS (" .  sprintf("%0.2f",(100*$result["remaining_sms"]/$result["total_sms"])) . "% Remaining)";		
-				return trim($content,", ");
-			}
-			if(in_array($obj->status,array("cancelled","complete"))) {	
-				$content = "";
-				$result = Query("select rp.type,
-								sum(rp.numcontacts and rp.status != 'duplicate') as total,
-								100 * sum(rp.numcontacts and rp.status='success') / (sum(rp.numcontacts and rp.status != 'duplicate') +0.00) as success_rate
-								from reportperson rp where rp.jobid = ?	group by rp.jobid, rp.type",false,array($obj->id));
-				while ($row = DBGetRow($result)) {
-					if($row[0] == "phone")
-						$content .= $row[1] . " Phone" . ($row[1]!=1?"s":"") . " (" . sprintf("%0.2f",(isset($row[2]) ? $row[2] : "")) . "% Contacted), ";
-					else if($row[0] == "email")
-						$content .= $row[1] . " Email" . ($row[1]!=1?"s":"") . " (" . sprintf("%0.2f",(isset($row[2]) ? $row[2] : "")) . "% Contacted), ";
-					else if($row[0] == "sms")
-						$content .= $row[1] . " SMS (" . sprintf("%0.2f",(isset($row[2]) ? $row[2] : "")) . "% Contacted)";		
-				
-				}
-				return trim($content,", ");
-			}
+			
 		}
 	} else if($name == "list") {
 		$lists[] = $obj;
