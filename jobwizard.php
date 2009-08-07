@@ -393,7 +393,7 @@ class FinishJobWizard extends WizFinish {
 		// for all the job settings on the "Advanced" step. set some advanced options that will get stuffed into the job
 		$advanced = array();
 		if (isset($postdata["/schedule/options"]["advanced"]) && $postdata["/schedule/options"]["advanced"])
-			foreach (array("skipduplicates", "skipemailduplicates", "leavemessage", "messageconfirmation", "callerid") as $option)
+			foreach (array("skipduplicates", "skipemailduplicates", "leavemessage", "messageconfirmation") as $option)
 				if (isset($postdata["/schedule/advanced"][$option]))
 					$advanced[$option] = $postdata["/schedule/advanced"][$option];
 		
@@ -535,6 +535,18 @@ class FinishJobWizard extends WizFinish {
 				$job->setSetting($option, 0);
 			else
 				$job->setSetting($option, $value);
+		}
+		
+		// set jobsetting 'callerid' blank for jobprocessor to lookup the current default at job start
+		if ($USER->authorize('setcallerid') && !getSystemSetting('_hascallback', false)) {
+			$callerid = '';
+			if (isset($postdata["/schedule/advanced"]['callerid'])) {
+				$callerid = Phone::parse($postdata["/schedule/advanced"]['callerid']);
+			}
+			// blank callerid is fine, save this setting and default will be looked up by job processor when job starts
+			$job->setOptionValue("callerid",$callerid);
+		} else {
+			$job->setOptionValue("callerid", getDefaultCallerID());
 		}
 		
 		$job->update();
