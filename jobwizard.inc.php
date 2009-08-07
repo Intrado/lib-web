@@ -411,7 +411,7 @@ class JobWiz_start extends WizStep {
 					$jobtypes[$id] = $jobtype->name;
 					break;
 			}
-			$jobtips[$id] = $jobtype->info;
+			$jobtips[$id] = escapehtml($jobtype->info);
 		}
 		
 		$deliverytypes = array();
