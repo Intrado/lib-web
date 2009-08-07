@@ -217,7 +217,7 @@ var Easycall = Class.create({
 
 		$(this.formitemname+"_"+this.language).insert(
 			new Element("div", {"id": this.formitemname+"_"+this.language+"_callcontrol"}).insert(
-				new Element("input", {"id": this.formitemname+"_"+this.language+"_phone", "class": "callmeinputphone", type: "text", style: "margin-bottom: 5px; border: 1px solid gray; "+((this.defaultphone == this.nophone)?"color: gray;":"")})
+				new Element("input", {"id": this.formitemname+"_"+this.language+"_phone", "class": "callmeinputphone", autocomplete:"off", type: "text", style: "margin-bottom: 5px; border: 1px solid gray; "+((this.defaultphone == this.nophone)?"color: gray;":"")})
 			).insert(
 				new Element("div", {style: "clear:both"})
 			).insert(
@@ -241,9 +241,9 @@ var Easycall = Class.create({
 		$(this.formitemname+"_"+this.language+"_phone").observe("keyup", function (event) {
 			var e = event.element();
 			if (!this.valPhone(e.value, this.minlength, this.maxlength))
-				e.setStyle({"background": "pink"});
+				e.setStyle({"background": "#ffb7b7"});
 			else
-				e.setStyle({"background": "lightgreen"});
+				e.setStyle({"background": "#ceffc6"});
 		}.bind(this));
 		$(this.formitemname+"_"+this.language+"_callme").observe("click", this.record.bind(this));
 		
