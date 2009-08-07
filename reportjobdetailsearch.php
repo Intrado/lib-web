@@ -52,6 +52,8 @@ if (!$USER->authorize('createreport') && !$USER->authorize('viewsystemreports'))
 ////////////////////////////////////////////////////////////////////////////////
 // Action/Request Processing
 ////////////////////////////////////////////////////////////////////////////////
+$fields = FieldMap::getOptionalAuthorizedFieldMaps() + FieldMap::getOptionalAuthorizedFieldMapsLike('g');
+
 if (isset($_GET['clear']) && $_GET['clear']) {
 	unset($_SESSION['reportid']);
 	unset($_SESSION['report']['options']);
@@ -85,7 +87,7 @@ if (isset($_GET['reportid'])) {
 	if(isset($options['activefields'])){
 		$activefields = explode(",", $options['activefields']) ;
 	}
-	foreach($fieldlist as $field){
+	foreach($fields as $field){
 		if(in_array($field->fieldnum, $activefields)){
 			$_SESSION['report']['fields'][$field->fieldnum] = true;
 		} else {
@@ -100,7 +102,6 @@ if (isset($_GET['reportid'])) {
 // Data Handling
 ////////////////////////////////////////////////////////////////////////////////
 $validOrdering = JobDetailReport::getOrdering();
-$fields = FieldMap::getOptionalAuthorizedFieldMaps() + FieldMap::getOptionalAuthorizedFieldMapsLike('g');
 
 if (!isset($_SESSION['report']['options']))
 	$_SESSION['report']['options'] = array('reporttype' => 'phonedetail');
@@ -236,11 +237,11 @@ $jobsarchived = DBFindMany("Job","from job j where deleted = 2 and status!='repe
 foreach ($jobsarchived as $job) {
 	$jobidsarchived[$job->id] = $job->name;
 }
-		
+	
 $formdata = array();
 $formdata["radioselect"] = array(
 	"label" => _L("Search on job or date"),
-	"value" => isset($options['reldate']) ? 'job' : 'date',
+	"value" => isset($options['jobid']) ? 'job' : 'date',
 	"control" => array("RadioButton", "values" => array("job" => _L("Job"), "date" => _L("Date"))),
 	"validators" => array(array("ValRequired"), array("ValInArray", "values" => array('job', 'date'))),
 	"helpstep" => 1
@@ -248,7 +249,7 @@ $formdata["radioselect"] = array(
 
 $formdata["jobid"] = array(
 	"label" => _L("Jobs"),
-	"value" => isset($options['archived']) ? '' : $jobid,
+	"value" => !empty($options['archived']) ? '' : $jobid,
 	"control" => array("SelectMenu", "values" => $jobids),
 	"validators" => array(array("ValInArray", "values" => array_keys($jobids))),
 	"helpstep" => 1
@@ -256,7 +257,7 @@ $formdata["jobid"] = array(
 
 $formdata["jobidarchived"] = array(
 	"label" => _L("Archived Jobs"),
-	"value" => isset($options['archived']) ? $jobid : '',
+	"value" => !empty($options['archived']) ? $jobid : '',
 	"control" => array("SelectMenu", "values" => $jobidsarchived),
 	"validators" => array(array("ValInArray", "values" => array_keys($jobidsarchived))),
 	"helpstep" => 1
@@ -264,7 +265,7 @@ $formdata["jobidarchived"] = array(
 
 $formdata["checkarchived"] = array(
 	"label" => _L("Show archived jobs"),
-	"value" => isset($options['archived']) ? 1 : 0,
+	"value" => !empty($options['archived']) ? 1 : 0,
 	"control" => array("CheckBox"),
 	"validators" => array(),
 	"helpstep" => 1
@@ -553,8 +554,15 @@ endWindow();
 				var radio = event.element();
 				if (radio.value == 'job') {
 					$('<?=$form->name?>_dateoptions').up('tr').hide();
-					$('<?=$form->name?>_jobid').up('tr').show();
 					$('<?=$form->name?>_checkarchived').up('tr').show();
+					
+					if ($('<?=$form->name?>_checkarchived').checked) {
+						$('<?=$form->name?>_jobid').up('tr').hide();
+						$('<?=$form->name?>_jobidarchived').up('tr').show();
+					} else {
+						$('<?=$form->name?>_jobid').up('tr').show();
+						$('<?=$form->name?>_jobidarchived').up('tr').hide();
+					}
 				} else if (radio.value == 'date') {
 					$('<?=$form->name?>_dateoptions').up('tr').show();
 					$('<?=$form->name?>_jobid').up('tr').hide();
@@ -598,19 +606,23 @@ endWindow();
 			});
 			
 			var radioselectchoice = $('<?=$form->name?>_radioselect').down('input:checked');
-			if (radioselectchoice && radioselectchoice.value == 'job')
+			if (radioselectchoice.value == 'job') {
 				$('<?=$form->name?>_dateoptions').up('tr').hide();
-			else {
+				$('<?=$form->name?>_checkarchived').up('tr').show();
+				
+				if ($('<?=$form->name?>_checkarchived').checked) {
+					$('<?=$form->name?>_jobid').up('tr').hide();
+					$('<?=$form->name?>_jobidarchived').up('tr').show();
+				} else {
+					$('<?=$form->name?>_jobid').up('tr').show();
+					$('<?=$form->name?>_jobidarchived').up('tr').hide();
+				}
+			} else if (radioselectchoice.value == 'date') {
+				$('<?=$form->name?>_dateoptions').up('tr').show();
+				$('<?=$form->name?>_checkarchived').up('tr').hide();
 				$('<?=$form->name?>_jobid').up('tr').hide();
 				$('<?=$form->name?>_jobidarchived').up('tr').hide();
 				$('<?=$form->name?>_checkarchived').up('tr').hide();
-			}
-			
-			if ($('<?=$form->name?>_checkarchived').checked) {
-				$('<?=$form->name?>_jobid').up('tr').hide();
-				$('<?=$form->name?>_jobidarchived').up('tr').show();
-			} else {
-				$('<?=$form->name?>_jobidarchived').up('tr').hide();
 			}
 				
 			$('metadataDiv').update($('metadataTempDiv').innerHTML);
