@@ -153,14 +153,14 @@ if($PERSONID){
 ///////////////////////////////////////////////////////////////////
 
 function contact_actions($obj, $index){
-	return "<a href='contactpreferences.php?id=" . urlencode($obj->pkey) . "#edit'>Edit</a>";
+	return "<a href='contactpreferences.php?id=" . urlencode($obj->pkey) . "#edit'>" . _L("Edit") . "</a>";
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Display
 ////////////////////////////////////////////////////////////////////////////////
 $PAGE = "contacts:contactpreferences";
-$TITLE = "Contact Preferences";
+$TITLE = _L("Contact Preferences");
 if($PERSONID){
 	$TITLE .= " - " . escapehtml($person->$firstnamefield) . " " . escapehtml($person->$lastnamefield);
 }

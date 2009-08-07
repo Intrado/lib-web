@@ -58,12 +58,12 @@ if( $reloadform )
 // Display
 ////////////////////////////////////////////////////////////////////////////////
 $PAGE = "contacts:contactpreferences";
-$TITLE = "Contact Activation - Step 1";
+$TITLE = _L("Contact Activation - Step 1");
 
 include_once("nav.inc.php");
 NewForm($f);
 
-startWindow('Activation Method');
+startWindow(_L('Activation Method'));
 ?>
 <table>
 	<tr><td><?=_L("Start by choosing the method you'll use to add people to your account.")?></td</tr>
@@ -83,7 +83,7 @@ startWindow('Activation Method');
 </table>
 <?
 endWindow();
-buttons(submit($f, $s, 'Next'), button(_L("Cancel"), NULL, "addcontact3.php"));
+buttons(submit($f, $s, _L('Next')), button(_L("Cancel"), NULL, "addcontact3.php"));
 EndForm();
 include_once("navbottom.inc.php");
 ?>

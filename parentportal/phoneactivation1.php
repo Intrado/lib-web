@@ -117,13 +117,13 @@ if ($reloadform) {
 // Display
 ////////////////////////////////////////////////////////////////////////////////
 $PAGE = "contacts:contactpreferences";
-$TITLE = "Contact Activation - Step 2";
+$TITLE = _L("Contact Activation - Step 2");
 
 include_once("nav.inc.php");
 NewForm($f);
 
 
-startWindow('Add Contact');
+startWindow(_L('Add Contact'));
 ?>
 <table cellpadding="3">
 
@@ -143,9 +143,9 @@ startWindow('Add Contact');
 	<tr><td class="bottomBorder">&nbsp;</td></tr>
 
 <tr><td><table border="1" cellpadding="3" cellspacing="0">
-<th>&nbsp;</th><th>ID Number</th>
+<th>&nbsp;</th><th><?=_L('ID Number')?></th>
 <? if (!$oktogo) { ?>
-<th>Status</th>
+<th><?=_L('Status')?></th>
 <? } ?>
 
 <? $i = 0; ?>
@@ -180,12 +180,12 @@ startWindow('Add Contact');
 
 </table></td></tr>
 
-	<tr><td> <? if ($i < $maxcontacts) echo submit($f, 'add', _('Add More')); ?>  </td></tr>
+	<tr><td> <? if ($i < $maxcontacts) echo submit($f, 'add', _L('Add More')); ?>  </td></tr>
 
 </table>
 <?
 endWindow();
-buttons(submit($f, $s, 'Next'), button(_L("Cancel"), NULL, "addcontact3.php"));
+buttons(submit($f, $s, _L('Next')), button(_L("Cancel"), NULL, "addcontact3.php"));
 EndForm();
 include_once("navbottom.inc.php");
 ?>

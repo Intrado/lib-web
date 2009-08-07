@@ -73,7 +73,7 @@ if( $reloadform )
 // Display
 ////////////////////////////////////////////////////////////////////////////////
 $PAGE = "account:account";
-$TITLE = "Change Email";
+$TITLE = _L("Change Email");
 
 include_once("nav.inc.php");
 
@@ -102,7 +102,7 @@ if($success){
 } else {
 	NewForm($f);
 	if(!$success)
-		buttons(submit($f, $s, 'Submit'), button(_L("Cancel"), NULL, "start.php"));
+		buttons(submit($f, $s, _L('Submit')), button(_L("Cancel"), NULL, "start.php"));
 	startWindow(_L('Change Email') . help("Changeemail"));
 ?>
 	<table>

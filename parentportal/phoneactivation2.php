@@ -130,16 +130,16 @@ startWindow(_L('Phone Activation'));
 			<td>&nbsp;</td><td><img src="img/bug_lightbulb.gif" > <?=_L("If your phone service has caller identification blocked, you must first dial *82 to unblock it for this call.")?></td>
 		</tr>
 		<tr>
-			<td>Step 2.</td><td>Call <b><?echo Phone::format($INBOUND_ACTIVATION) ?> </b></td>
+			<td><?=_L('Step 2')?>.</td><td><?=_L('Call')?> <b><?echo Phone::format($INBOUND_ACTIVATION) ?> </b></td>
 		</tr>
 		<tr>
-			<td>Step 3.</td><td><?=_L("When prompted, select option 2.")?></td>
+			<td><?=_L('Step 3')?>.</td><td><?=_L("When prompted, select option 2.")?></td>
 		</tr>
 		<tr>
-			<td>Step 4.</td><td><?=_L("When prompted, enter this activation code ") . '<span style="font-weight:bold; font-size: 140%;">' . escapehtml($code) . '</span>'?></td>
+			<td><?=_L('Step 4')?>.</td><td><?=_L("When prompted, enter this activation code ") . '<span style="font-weight:bold; font-size: 140%;">' . escapehtml($code) . '</span>'?></td>
 		</tr>
 		<tr>
-			<td>Step 5.</td><td><?=_L("When the call is complete, log back into your Contact Manager account to edit your notification preferences.")?></td>
+			<td><?=_L('Step 5')?>.</td><td><?=_L("When the call is complete, log back into your Contact Manager account to edit your notification preferences.")?></td>
 		</tr>
 		</table>
 		</td>

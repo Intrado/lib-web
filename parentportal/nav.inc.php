@@ -20,8 +20,8 @@ if (isset($_GET['timer']))
 //[[title,default link,access,selected,[[sub title,sub link,sub access,sub selected],...],...]
 
 $NAVTREE = array (
-	array("Messages","start.php",NULL,$MAINTAB=="messages",array()),
-	array("Contacts", "contactpreferences.php?clear=1", NULL, $MAINTAB=="contacts", array()
+	array(_L("Messages"),"start.php",NULL,$MAINTAB=="messages",array()),
+	array(_L("Contacts"), "contactpreferences.php?clear=1", NULL, $MAINTAB=="contacts", array()
 	)
 );
 
