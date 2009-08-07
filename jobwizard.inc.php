@@ -1539,7 +1539,7 @@ class JobWiz_scheduleAdvanced extends WizStep {
 			}
 			
 			if ($ACCESS->getPermission('messageconfirmation')) {
-				$helpsteps[] = _L("This option allows recipients to respond to your phone message with a yess by pressing 1 or a no by pressing 2.");
+				$helpsteps[] = _L("This option allows recipients to respond to your phone message with a yes by pressing 1 or a no by pressing 2.");
 				$formdata["messageconfirmation"] = array(
 					"label" => _L("Confirmation"),
 					"fieldhelp" => _L('Allow message confirmation by recipients.'),
@@ -1563,7 +1563,7 @@ class JobWiz_scheduleAdvanced extends WizStep {
 			$helpsteps[] = _L("Indicates that duplicate Emails in the list should receive only one notification.");
 			$formdata["skipemailduplicates"] = array(
 				"label" => _L("Skip Duplicate Emails"),
-				"fieldhelp" => _L('Indicates that duplicate Emailss in the list should receive only one message.'),
+				"fieldhelp" => _L('Indicates that duplicate Emails in the list should receive only one message.'),
 				"value" => $USER->getSetting("skipemailduplicates", true),
 				"validators" => array(),
 				"control" => array("CheckBox"),
