@@ -148,8 +148,8 @@ function fmt_persontip ($row, $index) {
 	if ($person->userid)
 		return "<a href=\"addressedit.php?id=$person->id&origin=preview\">  <img src=\"img/icons/pencil.png\"></a> $pkey";
 	
-	$onmouseover = "make_person_tip('$person->id', '');";
-	$icon = "<img id=\"persontip_$person->id\" style=\"cursor:pointer\" src=\"img/icons/diagona/16/049.gif\" onmouseover=\"$onmouseover\"/> $pkey ";
+	$onmouseover = "";//"make_person_tip('$person->id', '');"; // TODO: Make a better persontip
+	$icon =  "<a href=\"viewcontact.php?id={$person->id}\">" . "<img id=\"persontip_$person->id\" style=\"cursor:pointer\" src=\"img/icons/diagona/16/049.gif\" onmouseover=\"$onmouseover\"/>" . "</a>" . " $pkey ";
 	return $icon;
 }
 
