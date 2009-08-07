@@ -13,8 +13,10 @@ $ACTIVEMAINTABTITLE = "";
 
 $SHORTCUTS = array();
 
-if (isset($_GET['timer']))
+if (isset($_GET['timer']) || isset($_SESSION['timer'])) {
 	$PAGETIME = microtime(true);
+	$_SESSION['timer'] = true;
+}
 
 //tree format:
 //[[title,default link,access,selected,[[sub title,sub link,sub access,sub selected],...],...]
@@ -97,6 +99,15 @@ header('Content-type: text/html; charset=UTF-8') ;
 	<link href="../css/prototip.css.php" type="text/css" rel="stylesheet">
 	<link href='../css/style_print.css' type='text/css' rel='stylesheet' media='print'>
 	<link href="css.php?hash=<?=crc32(serialize($_SESSION['colorscheme']))?>" type="text/css" rel="stylesheet" media="screen, print">
+
+<!--[if lte IE 6]>
+    <link href="css/ie6.css" type="text/css" rel="stylesheet"/>
+<![endif]-->
+
+<!--[if lte IE 7]>
+    <link href="css/ie7.css" type="text/css" rel="stylesheet"/>
+<![endif]-->
+
 </head>
 <body>
 	<script>
@@ -107,38 +118,36 @@ header('Content-type: text/html; charset=UTF-8') ;
 
 <!-- ********************************************************************* -->
 
-<div>
-	<table width="100%" border=0 cellpadding=0 cellspacing=0 background="img/header_bg.gif" >
-		<tr><td style="font-size:8px;">&nbsp;</td></tr>
-	</table>
-</div>
-
-<div>
-	<table width="100%" border=0 cellpadding=0 cellspacing=0>
+<table class="navlogoarea" border=0 cellspacing=0 cellpadding=0 width="100%">
 	<tr>
-		<td><div style="padding-left:10px; padding-bottom:10px;"><? doLogo() ?></div></td>
-<?
-		if (!isset($hidenav) || !$hidenav) {
-?>
-		<td><div class="custname"><?= escapehtml($_SESSION['custname']); ?></div></td>
-<?
-		}
-?>
+		<td bgcolor="white"><div style="padding-left:10px; padding-bottom:10px;"><? doLogo() ?></div></td>
+		<td><img src="img/shwoosh.gif" alt="" class="noprint"></td>
+		<td width="100%" align="right" style="padding-right: 10px;">
+			<div class="custname"><?= escapehtml($_SESSION['custname']); ?></div>
+			<table border=0 cellspacing=0 cellpadding=0 class="noprint">
+				<tr>
+					<td><img src="img/accountlinksbg_left.gif"></td>
+					<td background="img/accountlinksbg_mid.gif">
+						<div class="applinks hoverlinks">
+							<a href="index.php?logout=1"><?=_L("Logout")?></a>
+						</div>
+					</td>
+					<td><img src="img/accountlinksbg_right.gif"></td>				
+				</tr>		
+			</table>
+		</td>
 	</tr>
-	</table>
+</table>
+<div class="navband1"><img src="img/pixel.gif"></div>
+<div class="navband2"><img src="img/pixel.gif"></div>
+
+<!-- =================================================== -->
+<div class="navmenuspacer">
+<div class="navmenu">
+	<?= $MAINTABS ?>
+</div>
 </div>
 
-	<div class="navmenuspacer">
-	<div class="navmenu">
-
-		<? echo $MAINTABS ?>
-
-		<div class="applinks hoverlinks">
-			<a href="index.php?logout=1"><?=_L("Logout")?></a>
-		</div>
-
-	</div>
-	</div>
 
 <div class="subnavmenu hoverlinks">
 	<?= $SUBTABS ?>
