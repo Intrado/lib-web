@@ -151,3 +151,40 @@ $$$
 
 ALTER TABLE `reportcontact` CHANGE `resultdata` `resultdata` VARCHAR( 255 ) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL 
 $$$
+
+
+-- set all 3dblue to classroom
+
+update setting s1
+inner join setting s2 on (s1.value='3dblue' and s2.name='_brandprimary')
+inner join setting s3 on (s1.value='3dblue' and s3.name='_brandtheme1')
+inner join setting s4 on (s1.value='3dblue' and s4.name='_brandtheme2')
+inner join setting s5 on (s1.value='3dblue' and s5.name='_brandratio')
+
+set s1.value='classroom',
+s2.value='3e693f',
+s3.value='3e693f',
+s4.value='b47727',
+s5.value='.2'
+
+where s1.name='_brandtheme' and s1.value='3dblue'
+
+$$$
+
+-- update user prefs from 3dblue to classroom
+
+update usersetting u1
+join usersetting u2 on (u1.userid = u2.userid and u2.name='_brandprimary')
+join usersetting u3 on (u1.userid = u3.userid and u3.name='_brandtheme1')
+join usersetting u4 on (u1.userid = u4.userid and u4.name='_brandtheme2')
+join usersetting u5 on (u1.userid = u5.userid and u5.name='_brandratio')
+
+set u1.value='classroom',
+u2.value='3e693f',
+u3.value='3e693f',
+u4.value='b47727',
+u5.value='.2'
+
+where u1.name = '_brandtheme' and u1.value='3dblue'
+
+$$$
