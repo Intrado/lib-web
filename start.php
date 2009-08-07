@@ -531,7 +531,7 @@ include_once("nav.inc.php");
 				}
 				if($hasnewjob) {
 			?>
-					<img style="cursor:pointer;" src="img/newjob.jpg" align="middle" alt="Start a new job" title="Start a new job (The button formerly known as EasyCall)" 
+					<img style="cursor:pointer;" src="img/newjob.jpg" align="middle" alt="Start a new job" title="Create a new notification job" 
 							onclick="window.location = 'jobwizard.php?new&jobtype=normal'"
 							onmouseover="this.src='img/newjob_over.jpg'"
 							onmouseout="this.src='img/newjob.jpg'" />
@@ -546,7 +546,7 @@ include_once("nav.inc.php");
 				if($hasemergency) {
 			 ?>
 			<br />		
-					<img style="cursor:pointer;" src="img/newemergency.jpg" align="middle" alt="Start a new emergency job" title="Start a new emergency job" 
+					<img style="cursor:pointer;" src="img/newemergency.jpg" align="middle" alt="Start a new emergency job" title="Create a new emergency notification job" 
 							onclick="window.location = 'jobwizard.php?new&jobtype=emergency'"
 							onmouseover="this.src='img/newemergency_over.jpg'"
 							onmouseout="this.src='img/newemergency.jpg'" />	
