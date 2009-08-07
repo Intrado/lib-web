@@ -77,11 +77,8 @@ function list_handle_ajax_table($renderedlist, $validContainers) {
 					list_add_person($validPerson);
 				}
 			} else if (!empty($_GET['removepersonid'])) {
-				$restrictUserSQL = $USER->userSQL("P");
-				if ($validPerson = QuickQuery("SELECT P.id FROM person P WHERE P.id=? AND (P.userid=0 OR P.userid=? OR (1 $restrictUserSQL))", false, array($_GET['removepersonid'], $USER->id))) {
-					$ajaxdata = true;
-					list_remove_person($validPerson);
-				}
+				$ajaxdata = true;
+				list_remove_person($_GET['removepersonid']);
 			} else if (isset($_GET['containerID']) && in_array($_GET['containerID'], $validContainers)) {
 				$ajaxdata = array('html' => list_prepare_ajax_table($_GET['containerID'], $renderedlist));
 			}
