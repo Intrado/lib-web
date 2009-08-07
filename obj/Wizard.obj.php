@@ -146,7 +146,7 @@ class Wizard {
 		//real buttons		
 		if ($this->getPrevStep())
 			$form->buttons[] = submit_button("Previous","prev","arrow_left");
-		$form->buttons[] = icon_button("Cancel","cross","if(confirm('".addslashes(_L("Are you sure you want to cancel?"))."')) window.location='?cancel';");
+		$form->buttons[] = icon_button("Cancel","cross","if(window.confirm('".addslashes(_L("Are you sure you want to cancel?"))."')) window.location='?cancel';");
 		$form->buttons[] = submit_button("Next","next","arrow_right");
 		
 		//merge in any existing wizard post data, except transient fields
