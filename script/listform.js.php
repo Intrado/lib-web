@@ -384,7 +384,7 @@ function listform_hover_existing_list(nullableEvent, listid, tr) {
 	$('listchooseTotalRemoved').update();
 	$('listchooseTotalRule').update();
 	
-	cachedAjaxGet('ajax.php?type=liststats&listids='+[listid].toJSON(), function(transport, listid, tr) {
+	cachedAjaxGet('ajax.php?type=liststats&listids='+$H(listformVars.existingLists).keys().toJSON(), function(transport, listid, tr) {
 		var stats = transport.responseJSON;
 		if (!stats) {
 			alert('<?=addslashes(_L('No data available for this list, please check your internet connection and try again'))?>');
