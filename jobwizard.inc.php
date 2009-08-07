@@ -1376,12 +1376,12 @@ class JobWiz_scheduleOptions extends WizStep {
 		$accessCalllate = $ACCESS->getValue("calllate");
 		if (!$accessCalllate)
 			$accessCalllate = "11:59 pm";
-		if (strtotime($callearly) + 3600 > strtotime($calllate))
-			$calllate = date("g:i a", strtotime(strtotime($callearly) + 3600));
+		if (strtotime($calllate)  > strtotime($accessCalllate))
+			$calllate = $accessCalllate;
 
 		$menu = array();
-		if ((strtotime($callearly) >= strtotime($accessCallearly)) && (strtotime($calllate) <= strtotime($accessCalllate)))
-			$menu["now"] = _L("Now");
+		if (!((strtotime($callearly) >= strtotime($calllate)) || (strtotime($callearly) <= strtotime($accessCallearly)) || (strtotime($calllate) >= strtotime($accessCalllate))))
+			$menu["now"] = _L("Now"). " ($callearly - $calllate)";
 		$menu["schedule"] = _L("Schedule and Send");
 		$menu["template"] = _L("Save for Later");
 		
@@ -1425,16 +1425,17 @@ class JobWiz_scheduleDate extends WizStep {
 		// Form Fields.
 		$formdata = array($this->title);
 		
+		$dayoffset = (strtotime("now") > strtotime($ACCESS->getValue("calllate")))?1:0;
 		$helpsteps = array(_L("Choose a date for this notification to be delivered."));
 		$formdata["date"] = array(
 			"label" => _L("Start Date"),
 			"fieldhelp" => _L("Notification will begin on the selected date."),
-			"value" => "today",
+			"value" => "now + $dayoffset days",
 			"validators" => array(
 				array("ValRequired"),
-				array("ValDate", "min" => date("m/d/Y"))
+				array("ValDate", "min" => date("m/d/Y", strtotime("now + $dayoffset days")))
 			),
-			"control" => array("TextDate", "size"=>12, "nodatesbefore" => 0),
+			"control" => array("TextDate", "size"=>12, "nodatesbefore" => $dayoffset),
 			"helpstep" => 1
 		);
 		// If translation is used. don't show any dates in the calendar past 7 days from now.
