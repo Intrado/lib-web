@@ -1,0 +1,37 @@
+<?xml version='1.0' encoding='utf-8' ?>
+<tocdata>
+<book name="Getting Started" >
+  <item name="Welcome" url="Getting_Started/Welcome.htm" />
+</book>
+<book name="Tips for Effective Communication" >
+  <item name="Messaging Tips" url="Tips_for_Effective_Communication/Messaging_Tips.htm" />
+  <item name="Message Templates" url="Tips_for_Effective_Communication/Simple_Message_Templates.htm" />
+  <item name="Communication Ideas" url="Tips_for_Effective_Communication/Communication_Ideas.htm" />
+</book>
+<book name="Surveys" >
+  <item name="Survey Overview" url="Surveys/Survey_Overview.htm" />
+  <item name="Important Tips for Creating Surveys" url="Surveys/Important_Tips_for_Creating_Surveys.htm" />
+  <item name="Building a Survey Template" url="Surveys/Building_a_Survey_Template.htm" />
+  <item name="About Web Survey Template Features" url="Surveys/More_on_Web_Survey_Template_Features.htm" />
+  <item name="Scheduling a Survey Job" url="Surveys/Scheduling_a_Survey_Job.htm" />
+</book>
+<book name="Remote Telephone Access" >
+  <item name="Remote Telephone Access Overview" url="Remote_Telephone_Access/Remote_Telephone_Access_Overview.htm" />
+  <item name="Remotely Create a Single Language Job" url="Remote_Telephone_Access/Remotely_Create_a_Single_Language_Job.htm" />
+  <item name="Remotely Create a Multilingual Job" url="Remote_Telephone_Access/Remotely_Create_a_Multilingual_Job.htm" />
+</book>
+<book name="Reports" >
+  <item name="Reports Overview" url="Reports/Reports.htm" />
+  <item name="Using the Report Builder" url="Reports/Querying_Report_Data.htm" />
+  <item name="Notification Summaries" url="Reports/Standard_Job_Reports.htm" />
+  <item name="Phone Logs" url="Reports/Understanding_Call_Logs.htm" />
+  <item name="Email Logs" url="Reports/Email_Logs.htm" />
+  <item name="SMS Logs" url="Reports/SMS_Logs.htm" />
+  <item name="Contact History Report" url="Reports/Contact_History_Report.htm" />
+  <item name="Survey Reports" url="Reports/Survey_Job_Reports.htm" />
+  <item name="Saving and Scheduling Reports" url="Reports/Saving_and_Scheduling_Reports.htm" />
+  <item name="Call Distribution Report" url="Reports/Call_Distribution_Report.htm" />
+  <item name="Usage Stats Report" url="Reports/Usage_Stats_Report.htm" />
+</book>
+
+</tocdata>

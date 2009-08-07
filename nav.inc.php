@@ -57,7 +57,7 @@ $SHORTCUTS['My Address Book'] = "addresses.php?origin=nav";
 if ($USER->authorize("viewcontacts"))
 	$SHORTCUTS['System Contacts'] = "contacts.php?clear=1";
 $SHORTCUTS['-- Help & Documentation --'] = "false;";
-$SHORTCUTS['Message Tips & Ideas'] = "javascript: popup('help/schoolmessenger_help.htm#getting_started/message_tips_and_ideas.htm',750,500);";
+$SHORTCUTS['Message Tips & Ideas'] = "javascript: popup('help/html/Tips_for_Effective_Communication/Messaging_Tips.htm',750,500);";
 $SHORTCUTS['Help'] = "javascript: popup('help/index.php',750,500);";
 
 //tree format:
