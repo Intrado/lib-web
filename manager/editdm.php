@@ -249,7 +249,7 @@ if ($dmType == 'customer') {?>
 		<td>Type: </td>
 		<td>
 			<?
-				NewFormItem($f, $s, "telco_type", "selectstart", null, null, "id='telco_type' onchange='if(this.value==\"Test\"){ show(\"weightedresult1\"); show(\"weightedresult2\"); show(\"hasdelay1\"); show(\"hasdelay2\"); } else { hide(\"weightedresult1\"); hide(\"weightedresult2\"); hide(\"hasdelay1\"); hide(\"hasdelay2\"); }'" );
+				NewFormItem($f, $s, "telco_type", "selectstart", null, null, "id='telco_type' onchange='if(this.value==\"Test\"){ $(\"weightedresult1\").show(); $(\"weightedresult2\").show(); $(\"hasdelay1\").show(); $(\"hasdelay2\").show(); } else { $(\"weightedresult1\").hide(); $(\"weightedresult2\").hide(); $(\"hasdelay1\").hide(); $(\"hasdelay2\").hide(); }'" );
 				foreach($telco_types as $telco_type){
 					NewFormItem($f, $s, "telco_type", "selectoption", $telco_type, $telco_type);
 				}
