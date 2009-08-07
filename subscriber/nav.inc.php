@@ -86,6 +86,8 @@ header('Content-type: text/html; charset=UTF-8') ;
 <html>
 <head>
 	<meta http-equiv="Content-type" value="text/html; charset=UTF-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7" />
+
 	<title><?= getBrand();?>: <?= $PAGETITLE ?></title>
 	
 	<script src='../script/utils.js'></script>

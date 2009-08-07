@@ -7,6 +7,8 @@ header('Content-type: text/html; charset=UTF-8') ;
 <html>
 <head>
 	<meta http-equiv="Content-type" value="text/html; charset=UTF-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7" />
+
 	<title><?= getBrand();?>: <?= $pagetitle ?></title>
 	
 	<script src="script/prototype.js" type="text/javascript"></script>
@@ -20,6 +22,15 @@ header('Content-type: text/html; charset=UTF-8') ;
 	<script src="script/form.js.php" type="text/javascript"></script>
 	<link href="css/form.css.php" type="text/css" rel="stylesheet">
 	<link href="css/datepicker.css.php" type="text/css" rel="stylesheet">
+	
+<!--[if lte IE 6]>
+    <link href="css/ie6.css" type="text/css" rel="stylesheet"/>
+<![endif]-->
+
+<!--[if lte IE 7]>
+    <link href="css/ie7.css" type="text/css" rel="stylesheet"/>
+<![endif]-->
+	
 </head>
 
 
