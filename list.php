@@ -165,16 +165,16 @@ if (isset($renderedlist) && $renderedlist->totalremoved > 0) {
 	);
 }
 
-$advancedtools = '';
-$advancedtools .= '<tr><td class="border">'.submit_button(_L('Enter Contacts'),'manualAdd').'</td><td class="border">'._L('Manually type in new contacts').'</td></tr>';
-$advancedtools .= '<tr><td class="border">'.submit_button(_L('Open Address Book'),'addressBookAdd').'</td><td class="border">'._L('Choose from contacts you manually typed into your address book').'</td></tr>';
-$advancedtools .= '<tr><td class="border">'.submit_button(_L('Search Contacts'),'search').'</td><td class="border">'._L('Search the system database for global contacts').'</td></tr>';
+$advancedtools = '<tr class="listHeader"><th style="text-align:left">' . _L("Tool") . '</th><th style="text-align:left">' . _L("Description") . '</th></tr>';
+$advancedtools .= '<tr><td>'.submit_button(_L('Enter Contacts'),'manualAdd').'</td><td>'._L('Manually type in new contacts').'</td></tr>';
+$advancedtools .= '<tr class="listAlt"><td>'.submit_button(_L('Open Address Book'),'addressBookAdd').'</td><td>'._L('Choose from contacts you manually typed into your personal address book').'</td></tr>';
+$advancedtools .= '<tr><td>'.submit_button(_L('Search Contacts'),'search').'</td><td>'._L('Search the shared system contact database').'</td></tr>';
 if ($USER->authorize('listuploadids') || $USER->authorize('listuploadcontacts'))
-	$advancedtools .= '<tr><td class="border">'.submit_button(_L('Upload List'),'uploadList').'</td><td class="border">'._L('Upload a list of contacts using a CSV file').'</td></tr>';
+	$advancedtools .= '<tr class="listAlt"><td>'.submit_button(_L('Upload List'),'uploadList').'</td><td>'._L('Upload a list of contacts using a CSV file').'</td></tr>';
 $formdata[] = _L('Additional List Tools');
 $formdata["advancedtools"] = array(
 	"label" => '',
-	"control" => array("FormHtml", 'html' => "<table style='border-collapse:collapse; margin-bottom:10px;'>$advancedtools</table>"),
+	"control" => array("FormHtml", 'html' => "<table  class='list' cellspacing='1' cellpadding='3' style='margin-bottom:10px;'>$advancedtools</table>"),
 	"helpstep" => 3
 );
 
