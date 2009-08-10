@@ -258,7 +258,6 @@ function activityfeed($mergeditems,$ajax = false) {
 				$job->status = $status;
 				$job->deleted = $item["deleted"];
 				$job->type = $item["jobtype"];
-				$job->percentprocessed = $item["percentprocessed"];
 				$tools = fmt_jobs_actions ($job,$item["name"]);
 				$tools = str_replace("&nbsp;|&nbsp;","<br />",$tools);
 				
@@ -310,7 +309,8 @@ function activityfeed($mergeditems,$ajax = false) {
 						$defaultlink = "job.php?id=$itemid";
 						$jobcontent = typestring($item["jobtype"]) . "&nbsp;message&nbsp;with&nbsp;" . listcontacts($job,"job");
 						break;
-					case "procactive" || "processing":						
+					case "procactive" || "processing":		
+						$job->percentprocessed = $item["percentprocessed"];	
 						$title = _L('%1$s Submitted, Status: %2$s',$jobtype,escapehtml(fmt_status($job,$item["name"])));
 						$icon = 'largeicons/gear.jpg';
 						$defaultlink = "job.php?id=$itemid";
@@ -392,16 +392,16 @@ function activityfeed($mergeditems,$ajax = false) {
 											</div>
 											<span>' . $content . '</span>
 											
-										</td>';
-				if($tools) {
-					$activityfeed .= '	<td valign="middle">
-											<div id="actionlink_'. $itemid .'" style="cursor:pointer" ><img src="img/largeicons/tiny20x20/tools.jpg" />&nbsp;Tools</div>
-											<div id="actions_'. $itemid .'" style="display:none;">' . $tools  . '</div>
-										</td>';
-					$actionids[] = "'$itemid'";
-				
-				}
-				$activityfeed .= 	'	</tr>';
+										</td>
+										<td valign="middle">';
+						if($tools) {
+								$activityfeed .= '  <div id="actionlink_'. $itemid .'" style="cursor:pointer" ><img src="img/largeicons/tiny20x20/tools.jpg" />&nbsp;Tools</div>
+													<div id="actions_'. $itemid .'" style="display:none;">' . $tools  . '</div>';
+								$actionids[] = "'$itemid'";
+						} else {
+								$activityfeed .= '&nbsp;';
+						}
+				$activityfeed .= 	'	</td>';
 			}
 			$limit--;
 		}
