@@ -410,7 +410,6 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		QuickUpdate("Begin");
 		QuickUpdate("delete from contactpref where personid=?", false, array($pid));
 		$query = substr($query, 0, strlen($query)-1); // remove trailing comma
-error_log($query);
 		if (count($values))
 			QuickUpdate($query, false, $values);
         QuickUpdate("Commit");
