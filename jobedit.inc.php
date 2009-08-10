@@ -17,7 +17,10 @@ if (isset($_GET['origin'])) {
 }
 
 $jobid = $_SESSION['jobid'];
-$hassms = getSystemSetting('_hassms', false);
+
+$cansendphone = $USER->authorize('sendphone');
+$cansendemail = $USER->authorize('sendemail');
+$cansendsms = getSystemSetting('_hassms', false) && $USER->authorize('sendsms');
 
 // Set up variables that determine later editability of the form
 /*
@@ -310,12 +313,11 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'phone') || CheckFormSubmit($f,'
 					$job->startdate = GetFormData($f, $s, 'startdate');
 				}
 
-				if(!$USER->authorize('sendphone'))
+				if(!$cansendphone)
 					$job->sendphone = false;
-				if(!$USER->authorize('sendemail'))
+				if(!$cansendemail)
 					$job->sendemail = false;
-								
-				if(!$hassms || !$USER->authorize('sendsms'))
+				if(!$cansendsms)
 					$job->sendsms = false;
 			}
 
@@ -336,7 +338,7 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'phone') || CheckFormSubmit($f,'
 			$job->printmessageid = NULL;
 			$job->sendprint = false;
 				
-			if ($hassms && $job->sendsms && $job->smsmessageid != 0) {
+			if ($cansendsms && $job->sendsms && $job->smsmessageid != 0) {
 				$jobtypes[] = "sms";
 			} else {
 				$job->smsmessageid = NULL;
@@ -908,7 +910,7 @@ if ($JOBTYPE == "repeating" && getSystemSetting("disablerepeat") ) {
 		<table border="0" cellpadding="2" cellspacing="0">
 			<tr>
 			<?
-			if($USER->authorize('sendphone')){
+			if($cansendphone){
 				?>
 				<td align="center" style="padding-left: 15px">
 				<div <?=$submittedmode ? "" : "onclick=\"clickIcon('phone')\"" ?>><img
@@ -917,7 +919,7 @@ if ($JOBTYPE == "repeating" && getSystemSetting("disablerepeat") ) {
 				</td>
 				<?
 			}
-			if($USER->authorize('sendemail')){
+			if($cansendemail){
 				?>
 				<td align="center" style="padding-left: 15px">
 				<div <?=$submittedmode ? "" : "onclick=\"clickIcon('email')\"" ?>><img
@@ -926,7 +928,7 @@ if ($JOBTYPE == "repeating" && getSystemSetting("disablerepeat") ) {
 				</td>
 				<?
 			}
-			if($hassms && $USER->authorize('sendsms')){
+			if($cansendsms){
 				?>
 				<td align="center" style="padding-left: 15px">
 				<div <?=$submittedmode ? "" : "onclick=\"clickIcon('sms')\""?>><img
@@ -939,18 +941,18 @@ if ($JOBTYPE == "repeating" && getSystemSetting("disablerepeat") ) {
 			</tr>
 			<tr>
 			<?
-			if($USER->authorize('sendphone')){
+			if($cansendphone){
 				?>
 				<td style="padding-left: 15px">Phone:<? NewFormItem($f,$s,"sendphone","checkbox",NULL,NULL,"id='sendphone' " . ($submittedmode ? "DISABLED" : "") . " onclick=\"if(this.checked) displaySection('phone'); else hideSection('phone')\""); ?></td>
 				<?
 			}
-			if($USER->authorize('sendemail')){
+			if($cansendemail){
 				?>
 
 				<td style="padding-left: 15px">Email:<? NewFormItem($f,$s,"sendemail","checkbox",NULL,NULL,"id='sendemail' " . ($submittedmode ? "DISABLED" : "") . " onclick=\"if(this.checked) displaySection('email'); else hideSection('email');\""); ?></td>
 				<?
 			}
-			if($hassms && $USER->authorize('sendsms')){
+			if($cansendsms){
 				?>
 				<td style="padding-left: 15px">SMS:<? NewFormItem($f,$s,"sendsms","checkbox",NULL,NULL,"id='sendsms' " . ($submittedmode ? "DISABLED" : "") . " onclick=\"if(this.checked) displaySection('sms'); else hideSection('sms');\""); ?></td>
 				<?
@@ -1134,7 +1136,7 @@ if ($JOBTYPE == "repeating" && getSystemSetting("disablerepeat") ) {
 
 		</td>
 	</tr>
-	<? if($USER->authorize('sendphone')) { ?>
+	<? if($cansendphone) { ?>
 	<tr valign="top">
 		<th align="right" class="windowRowHeader bottomBorder">Phone:</th>
 		<td class="bottomBorder">
@@ -1305,7 +1307,7 @@ if ($JOBTYPE == "repeating" && getSystemSetting("disablerepeat") ) {
 		</td>
 	</tr>
 	<? } ?>
-	<? if($USER->authorize('sendemail')) { ?>
+	<? if($cansendemail) { ?>
 	<tr valign="top">
 		<th align="right" class="windowRowHeader bottomBorder">Email:</th>
 		<td class="bottomBorder">
@@ -1438,7 +1440,7 @@ if ($JOBTYPE == "repeating" && getSystemSetting("disablerepeat") ) {
 		</td>
 	</tr>
 	<? } ?>
-	<? if($hassms && $USER->authorize('sendsms')) { ?>
+	<? if($cansendsms) { ?>
 	<tr valign="top">
 		<th align="right" class="windowRowHeader bottomBorder">SMS:</th>
 		<td class="bottomBorder">
@@ -1511,7 +1513,7 @@ document.observe('dom:loaded', function() {
 	var typeischecked = false;
 
 	<?
-	if($hassms && $USER->authorize('sendsms')) {
+	if($cansendsms) {
 	?>
 		var smsmessageobj = $('smsmessageid');
 		if(smsmessageobj && smsmessageobj.value != ""){
@@ -1524,35 +1526,43 @@ document.observe('dom:loaded', function() {
 		if(isCheckboxChecked('sendsms')){
 			typeischecked = true;
 			$('smsoptions').show();
+			$('displaysmsoptions').hide();
 		} else {
 			$('smsoptions').hide();
+		}	
+	<?
+	}
+	if($cansendphone) {
+	?>
+		var phonemessageobj = $('phonemessageid');
+		if(phonemessageobj  && phonemessageobj.value != ""){
+			$('sendphone').checked = true;
 		}
-			
-	<?}?>
-
-	var phonemessageobj = $('phonemessageid');
-	if(phonemessageobj  && phonemessageobj.value != ""){
-		$('sendphone').checked = true;
+		if(isCheckboxChecked('sendphone')){
+			typeischecked = true;
+			$('phoneoptions').show();
+			$('displayphoneoptions').hide();
+		} else {
+			$('phoneoptions').hide();
+		}	
+	<?
 	}
-	var emailmessageobj = $('emailmessageid');
-	if(emailmessageobj && emailmessageobj.value != ""){
-		$('sendemail').checked = true;
+	if($cansendemail) {
+	?>
+		var emailmessageobj = $('emailmessageid');
+		if(emailmessageobj && emailmessageobj.value != ""){
+			$('sendemail').checked = true;
+		}
+		if(isCheckboxChecked('sendemail')){
+			typeischecked = true;
+			$('emailoptions').show();
+			$('displayemailoptions').hide();
+		} else {
+			$('emailoptions').hide();
+		}
+		<?
 	}
-	
-	if(isCheckboxChecked('sendphone')){
-		typeischecked = true;
-		$('phoneoptions').show();
-	} else {
-		$('phoneoptions').hide();
-	}
-	
-	if(isCheckboxChecked('sendemail')){
-		typeischecked = true;
-		$('emailoptions').show();
-	} else {
-		$('emailoptions').hide();
-	}
-
+	?>
 	if(	typeischecked == true ){
 		$('settings').show();
 	} else {
@@ -2063,13 +2073,13 @@ function sendjobconfirm() {
 	phonesubmitstate = false;
 	emailsubmitstate = false;
 	scroll(0,0);
-<? if($USER->authorize('sendphone')) { ?>
+<? if($cansendphone) { ?>
 	if(isCheckboxChecked('sendphone') && isCheckboxChecked('phonecreate') && isCheckboxChecked('phonetranslatecheck') && !phonetranslationstate) {
 		phonesubmitstate = true;
 		submitTranslations('phone');
 	}
 <?}?>
-<? if($USER->authorize('sendemail')) { ?>
+<? if($cansendemail) { ?>
 	if(!phonesubmitstate && isCheckboxChecked('sendemail') && isCheckboxChecked('emailcreate') && isCheckboxChecked('emailtranslatecheck') && !emailtranslationstate) {
 		emailsubmitstate = true;
 		submitTranslations('email');
