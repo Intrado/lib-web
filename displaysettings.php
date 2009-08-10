@@ -23,7 +23,7 @@ if (!$USER->authorize('managesystem')) {
 ////////////////////////////////////////////////////////////////////////////////
 
 $formdata = array();
-$helpstepnum = 1;
+$helpstepnum = 0;
 /* Version 7.0 will not support UI translation
 $helpsteps = array(_L("Select the default language for the user interface."));
 $formdata["locale"] = array(
