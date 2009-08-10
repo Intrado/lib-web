@@ -99,7 +99,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 
 			// if static text field
 			if ($fieldmap->isOptionEnabled('text')) {
-				$value = $postdata['values'];
+				$value = trim($postdata['values']);
 				QuickUpdate("update person set ".$fieldmap->fieldnum."=? where importid is null and type='system'", false, array($value));
 			}
 
@@ -110,6 +110,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 	
 		$datavalues = explode("\n", $postdata['values']);
 		foreach ($datavalues as $value) {
+			$value = trim($value);
 			if (strlen($value) == 0) continue; // skip blank lines
 			$insertstmt .= "(?, ?, 0, 1),";
 			$insertvalues[] = $fieldmap->fieldnum;

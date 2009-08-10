@@ -183,12 +183,13 @@ class FinishSubscriberFieldWizard extends WizFinish {
 		if (isset($postdata['/staticvalues'])) {
 			// if static text field
 			if ($fieldmap->isOptionEnabled('text')) {
-				$value = $postdata['/staticvalues']['values'];
+				$value = trim($postdata['/staticvalues']['values']);
 				QuickUpdate("update person set ".$fieldmap->fieldnum."=? where importid is null and type='system'", false, array($value));
 			}
 			//
 			$datavalues = explode("\n", $postdata['/staticvalues']['values']);
 			foreach ($datavalues as $value) {
+				$value = trim($value);
 				if (strlen($value) == 0) continue; // skip blank lines
 				$insertstmt .= "(?, ?, 0, 1),";
 				$insertvalues[] = $fieldmap->fieldnum;
