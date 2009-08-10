@@ -24,14 +24,11 @@ if (isset($_SESSION['firstlogin'])) {
 	$firstnameField = FieldMap::getFirstNameField();
 	$lastnameField = FieldMap::getLastNameField();
 
-	$contactList = array($_SESSION['personid']);
-	$contactListString = implode("','", $contactList);
+	$pid = $_SESSION['personid'];
 	$contactCount=array();
 	$allData = array();
-	foreach ($contactList as $personid) {
-		$contactCount[$personid] = 1;
-		$allData[$personid] = array();
-	}
+	$contactCount[$pid] = 1;
+	$allData[$pid] = array();
 
 	$result = Query("select j.id, j.startdate, j.name, j.type, u.firstname, u.lastname, rp.personid, j.emailmessageid
 		from job j
@@ -40,12 +37,12 @@ if (isset($_SESSION['firstlogin'])) {
 		inner join user u on (u.id = j.userid)
 		where
 		j.startdate <= curdate() and j.startdate >= date_sub(curdate(),interval 30 day)
-		and rp.personid in ('" . $contactListString . "')
+		and rp.personid = ?
 		and j.status in ('active', 'complete')
 		and j.questionnaireid is null
 		and (js.value is null or js.value >= curdate())
 		group by j.id, rp.personid
-		order by j.startdate desc, j.starttime, j.id desc");
+		order by j.startdate desc, j.starttime, j.id desc", false, array($pid));
 		
 	while ($row = DBGetRow($result)) {
 			array_splice($row, 0, 0, $contactCount[$row[6]]);
@@ -124,10 +121,9 @@ require_once("nav.inc.php");
 	}
 
 	$counter = 1000;
-	foreach ($contactList as $personid) {
 		$counter++;
-		$data = $allData[$personid];
-		$person = new Person($personid);
+		$data = $allData[$pid];
+		$person = new Person($pid);
 		// if person id deleted and has no messages, do not show
 		if ($person->deleted && count($data) == 0) continue;
 
@@ -154,6 +150,5 @@ require_once("nav.inc.php");
 ?>
 		<br>
 <?
-	}
 require_once("navbottom.inc.php");
 ?>
