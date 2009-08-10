@@ -6,6 +6,7 @@
 // Includes
 ////////////////////////////////////////////////////////////////////////////////
 require_once("common.inc.php");
+require_once("../obj/FieldMap.obj.php");
 require_once("../inc/html.inc.php");
 require_once("../inc/table.inc.php");
 require_once("../inc/utils.inc.php");
