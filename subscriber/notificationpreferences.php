@@ -53,10 +53,10 @@ $subscribeFields = FieldMap::getSubscribeMapNames();
 $subscribeFieldValues = array();
 foreach ($subscribeFields as $fieldnum => $name) {
 	if ('f' == substr($fieldnum, 0, 1)) {
-		$subscribeFieldValues[$fieldnum] = QuickQueryList("select value, value from persondatavalues where fieldnum='".$fieldnum."' and editlock=1", true);
+		$subscribeFieldValues[$fieldnum] = QuickQueryList("select value, value from persondatavalues where fieldnum=? and editlock=1", true, false, array($fieldnum));
 	} else {
 		$gfield = substr($fieldnum, 1, 3);
-		$subscribeFieldValues[$fieldnum] = QuickQueryList("select value, value from groupdata where fieldnum='".$gfield."' and personid=0 and importid=0", true);
+		$subscribeFieldValues[$fieldnum] = QuickQueryList("select value, value from groupdata where fieldnum=? and personid=0 and importid=0", true, false, array($gfield));
 	}
 }
 
@@ -180,7 +180,9 @@ $values = QuickQueryList("select jobtypeid from contactpref where personid=? and
 $formdata["jobtypes"] = array(
 	"label" => "",
 	"value" => $values,
-	"validators" => array(),
+	"validators" => array(
+		array("ValInArray", 'values'=>$jtvalues)
+	),
 	"control" => array("MultiCheckbox","values" => $jtvalues),
 	"helpstep" => 1
 );
@@ -211,14 +213,15 @@ foreach ($fieldmaps as $fieldmap) {
    	    				"label" => _L("Language"),
        					"value" => $value,
        					"validators" => array(
-       						array("ValRequired")
+       						array("ValRequired"),
+       						array("ValInArray", 'values'=>$LOCALES)
        					),
        					"control" => array("RadioButton","values" => $LOCALES),
        					"helpstep" => 1
 					);
 				
 				} else {
-					$values = QuickQueryList("select value, value from persondatavalues where fieldnum='".$fieldnum."' and editlock=1", true);
+					$values = QuickQueryList("select value, value from persondatavalues where fieldnum=? and editlock=1", true, false, array($fieldnum));
 					if (count($values) > 0) {
 						$v = $person->$fieldnum;
 						if (count($values) == 1) {
@@ -229,7 +232,8 @@ foreach ($fieldmaps as $fieldmap) {
     	    				"label" => $fieldmap->name,
         					"value" => $v,
         					"validators" => array(
-        						array("ValRequired")
+        						array("ValRequired"),
+        						array("ValInArray", 'values'=>$values)
         					),
         					"control" => array("RadioButton","values" => $values),
         					"helpstep" => 1
@@ -260,13 +264,14 @@ foreach ($fieldmaps as $fieldmap) {
 			} else {
 				// dynamic multi, subscriber must select one (data from imports)
 			
-				$values = QuickQueryList("select value, value from persondatavalues where fieldnum='".$fieldnum."' and editlock=0", true);
+				$values = QuickQueryList("select value, value from persondatavalues where fieldnum=? and editlock=0", true, false, array($fieldnum));
 				if (count($values) > 0)
 					$formdata[$fieldnum] = array (
     	    			"label" => $fieldmap->name,
         				"value" => $person->$fieldnum,
         				"validators" => array(
-        					array("ValRequired")
+        					array("ValRequired"),
+        					array("ValInArray", 'values'=>$values)
         				),
         				"control" => array("RadioButton","values" => $values),
         				"helpstep" => 1
@@ -277,19 +282,21 @@ foreach ($fieldmaps as $fieldmap) {
 		if ($fieldmap->isOptionEnabled("static")) {
 				// static multi, subscriber must select one
 				
-				$values = QuickQueryList("select value, value from persondatavalues where fieldnum='".$fieldnum."' and editlock=1", true);
+				$values = QuickQueryList("select value, value from persondatavalues where fieldnum=? and editlock=1", true, false, array($fieldnum));
 		} else {
 				// dynamic multi, subscriber must select one (data from imports)
 			
-				$values = QuickQueryList("select value, value from persondatavalues where fieldnum='".$fieldnum."' and editlock=0", true);
+				$values = QuickQueryList("select value, value from persondatavalues where fieldnum=? and editlock=0", true, false, array($fieldnum));
 		}
 		$gfield = substr($fieldnum, 1, 3);
-		$arr = QuickQueryList("select value, value from groupdata where personid=".$person->id." and fieldnum=".$gfield);
+		$arr = QuickQueryList("select value, value from groupdata where personid=? and fieldnum=?", false, false, array($person->id, $gfield));
 				if (count($values) > 0)
 					$formdata[$fieldnum] = array (
     	    			"label" => _L($fieldmap->name),
         				"value" => $arr,
-        				"validators" => array(),
+        				"validators" => array(
+        					array("ValInArray", 'values'=>$values)
+        				),
         				"control" => array("MultiCheckbox","values" => $values),
         				"helpstep" => 1
 					);
@@ -319,19 +326,37 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
         $postdata = $form->getData(); //gets assoc array of all values {name:value,...}
             
         $emergencyjtid = QuickQueryList("select id from jobtype where systempriority = 1 and deleted = 0");
+        $nonemergencyjtid = QuickQueryList("select id from jobtype where systempriority != 1 and deleted = 0");
         
         //save data here
-        
+
 		// new contactpref rows
+		$query = "insert into contactpref (personid, jobtypeid, type, sequence, enabled) values ";
 		$values = array();
 		
 		foreach ($phoneList as $phone) {
 			if ($phone->phone == '') continue;
+			// add opt-in for these job types
 			foreach ($postdata["jobtypes"] as $jtid) {
-				$values[] = "(" . $pid . "," . $jtid . ",'phone'," . $phone->sequence . ", 1)";
+				$query .= "(?, ?, 'phone', ?, 1),";
+				$values[] = $pid;
+				$values[] = $jtid;
+				$values[] = $phone->sequence;
 			}
+			// always opt-in for emergency job types
 			foreach ($emergencyjtid as $jtid) {
-				$values[] = "(" . $pid . "," . $jtid . ",'phone'," . $phone->sequence . ", 1)";
+				$query .= "(?, ?, 'phone', ?, 1),";
+				$values[] = $pid;
+				$values[] = $jtid;
+				$values[] = $phone->sequence;
+			}
+			// add opt-out for these job types
+			foreach ($nonemergencyjtid as $jtid) {
+				if (in_array($jtid, $postdata['jobtypes'])) continue;
+				$query .= "(?, ?, 'phone', ?, 0),";
+				$values[] = $pid;
+				$values[] = $jtid;
+				$values[] = $phone->sequence;
 			}
 		}
 		// TODO be sure emaillist has e0 on it...
@@ -339,37 +364,64 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 			// email sequence 0 is special case, must always set because we read from it to load initial values
 			if ($email->sequence != 0 && $email->email == '') continue;
 			foreach ($postdata["jobtypes"] as $jtid) {
-				$values[] = "(" . $pid . "," . $jtid . ",'email'," . $email->sequence . ", 1)";
+				$query .= "(?, ?, 'email', ?, 1),";
+				$values[] = $pid;
+				$values[] = $jtid;
+				$values[] = $email->sequence;
 			}
 			foreach ($emergencyjtid as $jtid) {
-				$values[] = "(" . $pid . "," . $jtid . ",'email'," . $email->sequence . ", 1)";
+				$query .= "(?, ?, 'email', ?, 1),";
+				$values[] = $pid;
+				$values[] = $jtid;
+				$values[] = $email->sequence;
+			}
+			// add opt-out for these job types
+			foreach ($nonemergencyjtid as $jtid) {
+				if (in_array($jtid, $postdata['jobtypes'])) continue;
+				$query .= "(?, ?, 'email', ?, 0),";
+				$values[] = $pid;
+				$values[] = $jtid;
+				$values[] = $email->sequence;
 			}
 		}
 		foreach ($smsList as $sms) {
 			if ($sms->sms == '') continue;
 			foreach ($postdata["jobtypes"] as $jtid) {
-				$values[] = "(" . $pid . "," . $jtid . ",'sms'," . $sms->sequence . ", 1)";
+				$query .= "(?, ?, 'sms', ?, 1),";
+				$values[] = $pid;
+				$values[] = $jtid;
+				$values[] = $sms->sequence;
 			}
 			foreach ($emergencyjtid as $jtid) {
-				$values[] = "(" . $pid . "," . $jtid . ",'sms'," . $sms->sequence . ", 1)";
+				$query .= "(?, ?, 'sms', ?, 1),";
+				$values[] = $pid;
+				$values[] = $jtid;
+				$values[] = $sms->sequence;
 			}	
+			// add opt-out for these job types
+			foreach ($nonemergencyjtid as $jtid) {
+				if (in_array($jtid, $postdata['jobtypes'])) continue;
+				$query .= "(?, ?, 'sms', ?, 0),";
+				$values[] = $pid;
+				$values[] = $jtid;
+				$values[] = $sms->sequence;
+			}
 		}
-// TODO need to insert enabled=0 contactpref for those unselected jobtypes, or uses admin default jobtypepref
 		QuickUpdate("Begin");
 		QuickUpdate("delete from contactpref where personid=?", false, array($pid));
+		$query = substr($query, 0, strlen($query)-1); // remove trailing comma
 		if (count($values))
-			QuickUpdate("insert into contactpref (personid, jobtypeid, type, sequence, enabled)
-							values " . implode(",",$values));
+			QuickUpdate($query, false, $values);
         QuickUpdate("Commit");
 
 
 		// delete all groupdata for this person, rebuild from current selections
-		QuickUpdate("delete from groupdata where personid=".$person->id);
+		QuickUpdate("delete from groupdata where personid=?", false, array($person->id));
 		
 		// add all static text fields to this person
-		$staticList = QuickQueryList("select fieldnum from fieldmap where options like '%text%subscribe%static%'"); //TODO FIXME this breaks if the order of the options changes. 
+		$staticList = QuickQueryList("select fieldnum from fieldmap where options like '%text%' and options like '%subscribe%' and options like '%static%'"); 
 		foreach ($staticList as $fieldnum) {
-			$value = QuickQuery("select value from persondatavalues where fieldnum='".$fieldnum."' and editlock=1");
+			$value = QuickQuery("select value from persondatavalues where fieldnum=? and editlock=1", false, array($fieldnum));
 			if ($value) {
 				$person->$fieldnum = $value;
 			}
@@ -398,7 +450,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 						$args[] = $gfield;
 						$args[] = $v;
 					}
-					$query = substr($query, 0, strlen($query)-2); // remove trailing comma
+					$query = substr($query, 0, strlen($query)-2); // remove trailing comma and space
 					QuickUpdate($query, false, $args);
 				}
 			}
