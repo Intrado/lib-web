@@ -175,13 +175,13 @@ foreach ($jobtypes as $jt) {
 
 // NOTE: what if email sequence0 is deleted? could have set up account, added email, changed account to use email1 then removed e0
 // OK because e0 is never deleted, it is only set to empty email field
-$values = QuickQueryList("select jobtypeid from contactpref where personid=? and type='email' and sequence=0 and enabled=1", false, false, array($pid));
+$values = QuickQueryList("select cp.jobtypeid from contactpref cp join jobtype jt on (cp.jobtypeid=jt.id) where cp.personid=? and cp.type='email' and cp.sequence=0 and cp.enabled=1 and jt.systempriority != 1", false, false, array($pid));
 
 $formdata["jobtypes"] = array(
 	"label" => "",
 	"value" => $values,
 	"validators" => array(
-		array("ValInArray", 'values'=>$jtvalues)
+		array("ValInArray", 'values'=>array_keys($jtvalues))
 	),
 	"control" => array("MultiCheckbox","values" => $jtvalues),
 	"helpstep" => 1
@@ -214,7 +214,7 @@ foreach ($fieldmaps as $fieldmap) {
        					"value" => $value,
        					"validators" => array(
        						array("ValRequired"),
-       						array("ValInArray", 'values'=>$LOCALES)
+       						array("ValInArray", 'values'=>array_keys($LOCALES))
        					),
        					"control" => array("RadioButton","values" => $LOCALES),
        					"helpstep" => 1
@@ -233,7 +233,7 @@ foreach ($fieldmaps as $fieldmap) {
         					"value" => $v,
         					"validators" => array(
         						array("ValRequired"),
-        						array("ValInArray", 'values'=>$values)
+        						array("ValInArray", 'values'=>array_keys($values))
         					),
         					"control" => array("RadioButton","values" => $values),
         					"helpstep" => 1
@@ -271,7 +271,7 @@ foreach ($fieldmaps as $fieldmap) {
         				"value" => $person->$fieldnum,
         				"validators" => array(
         					array("ValRequired"),
-        					array("ValInArray", 'values'=>$values)
+        					array("ValInArray", 'values'=>array_keys($values))
         				),
         				"control" => array("RadioButton","values" => $values),
         				"helpstep" => 1
@@ -295,7 +295,7 @@ foreach ($fieldmaps as $fieldmap) {
     	    			"label" => _L($fieldmap->name),
         				"value" => $arr,
         				"validators" => array(
-        					array("ValInArray", 'values'=>$values)
+        					array("ValInArray", 'values'=>array_keys($values))
         				),
         				"control" => array("MultiCheckbox","values" => $values),
         				"helpstep" => 1
@@ -410,6 +410,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		QuickUpdate("Begin");
 		QuickUpdate("delete from contactpref where personid=?", false, array($pid));
 		$query = substr($query, 0, strlen($query)-1); // remove trailing comma
+error_log($query);
 		if (count($values))
 			QuickUpdate($query, false, $values);
         QuickUpdate("Commit");
