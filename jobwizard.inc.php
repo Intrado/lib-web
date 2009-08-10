@@ -1235,17 +1235,18 @@ class JobWiz_messageEmailTranslate extends WizStep {
 				"control" => array("FormHtml","html"=>'<div style="font-size: medium;">'._L('No Translations Available').'</div><br>'),
 				"helpstep" => 2
 			);
-		} else {
-			$i = 1;
+		} else {			
+			$languagesinstance = array_values($translationlanguages);
 			if(is_array($translations)) {
 				foreach($translations as $obj){
-					$transient = $this->isTransient($postdata, $translationlanguages[$i]);
-					$formdata[$translationlanguages[$i]] = $this->getTranslationDataArray($translationlanguages[$i],$obj->responseData->translatedText, false, $transient, ($transient?"":$englishtext));
-					$i++;
+					$language = array_shift($languagesinstance);
+					$transient = $this->isTransient($postdata,$language);
+					$formdata[$language] = $this->getTranslationDataArray($language,$obj->responseData->translatedText, false, $transient, ($transient?"":$englishtext));
 				}
 			} else {
-				$transient = $this->isTransient($postdata, $translationlanguages[$i]);
-				$formdata[$translationlanguages[$i]] = $this->getTranslationDataArray($translationlanguages[$i],$translations->translatedText, false, $transient, ($transient?"":$englishtext));
+				$language = array_shift($languagesinstance);
+				$transient = $this->isTransient($postdata, $language);
+				$formdata[$language] = $this->getTranslationDataArray($language,$translations->translatedText, false, $transient, ($transient?"":$englishtext));
 			}
 		}
 		
