@@ -1,7 +1,4 @@
 <?
-
-//Preview Message from portal only
-
 ////////////////////////////////////////////////////////////////////////////////
 // Includes
 ////////////////////////////////////////////////////////////////////////////////
@@ -21,7 +18,6 @@ require_once("../obj/AudioFile.obj.php");
 require_once("../obj/MessagePart.obj.php");
 require_once("../obj/MessageAttachment.obj.php");
 require_once("../obj/Voice.obj.php");
-//require_once("parentportalutils.inc.php");
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -37,12 +33,15 @@ if(isset($_GET['type'])){
 if (isset($_GET['jobid'])) {
 	$_SESSION['previewmessage_jobid'] = $_GET['jobid']+0;
 	$_SESSION['previewmessage_personid'] = $pid;
-	$query = "select messageid from reportperson where jobid = '" . $_SESSION['previewmessage_jobid'] . "'
-												 and personid = '" . $_SESSION['previewmessage_personid'] . "'";
+	$query = "select messageid from reportperson where jobid = ? and personid = ?";
+	$args = array();
+	$args[] = $_SESSION['previewmessage_jobid'];
+	$args[] = $_SESSION['previewmessage_personid'];
 	if(isset($_SESSION['type'])){
-		$query .= " and type = '" . DBSafe($_SESSION['type']) . "'";
+		$query .= " and type = ?";
+		$args[] = $_SESSION['type'];
 	}
-	$_SESSION['previewmessageid'] = QuickQuery($query);
+	$_SESSION['previewmessageid'] = QuickQuery($query, false, $args);
 	redirect();
 }
 
@@ -67,17 +66,21 @@ if ($jobid != 0 && $personid != 0) {
 			j.startdate as startdate
 			from reportperson rp
 			left join job j on (j.id = rp.jobid)
-			where j.id = '$jobid'
-			and rp.personid = '$personid'";
+			where j.id = ?
+			and rp.personid = ?";
+	$args = array();
+	$args[] = $jobid;
+	$args[] = $personid;
 	if(isset($_SESSION['type'])){
-		$query .= " and rp.type = '" . DBSafe($_SESSION['type']) . "'";
+		$query .= " and rp.type = ?";
+		$args[] = $_SESSION['type'];
 	}
-	$historicdata = QuickQueryRow($query, true);
+	$historicdata = QuickQueryRow($query, true, false, $args);
 }
 if($email || $sms){
 	$message = formatText($messageid, $historicdata);
 	if($email){
-		$attachments = DBFindMany("messageattachment","from messageattachment where messageid=" . DBSafe($messageid));
+		$attachments = DBFindMany("messageattachment","from messageattachment where messageid=?", false, array($messageid));
 	}
 }
 
@@ -88,7 +91,7 @@ if($email || $sms){
 ////////////////////////////////////////////////////////////////////////////////
 
 function formatText($messageid, $historicdata) {
-	$messageparts = DBFindMany("MessagePart", "from messagepart where messageid = " . $messageid . " order by sequence");
+	$messageparts = DBFindMany("MessagePart", "from messagepart where messageid = ? order by sequence", false, array($messageid));
 	$message = "";	
 	foreach ($messageparts as $part) {
 		switch ($part->type) {
