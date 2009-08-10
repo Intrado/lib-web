@@ -1531,11 +1531,11 @@ document.observe('dom:loaded', function() {
 	<?}?>
 
 	var phonemessageobj = $('phonemessageid');
-	if(phonemessageobj  && phonemessageobj .value != ""){
+	if(phonemessageobj  && phonemessageobj.value != ""){
 		$('sendphone').checked = true;
 	}
 	var emailmessageobj = $('emailmessageid');
-	if(emailmessageobj && emailmessageobj .value != ""){
+	if(emailmessageobj && emailmessageobj.value != ""){
 		$('sendemail').checked = true;
 	}
 	
@@ -1930,9 +1930,9 @@ function editlanguage(section,language) {
 }
 
 function setTranslations (response, langstring) {
-	section = callbacksection;
+	var section = callbacksection;
 	var trlanguages = langstring.split(";");
-	result = response.responseData;
+	var result = response.responseData;
 	if (response.responseStatus != 200){
 		if (phonesubmitstate || emailsubmitstate){
 			var status = new getObj('translationstatus').obj;
@@ -1940,7 +1940,7 @@ function setTranslations (response, langstring) {
 		}
 		return;
 	}
-	if(result instanceof Array) {
+	if(result instanceof Array) {	
 		for ( i = 0;i < result.length;i++) {
 			var language = trlanguages.shift();
 			if (result[i].responseStatus == 200){
@@ -1950,9 +1950,10 @@ function setTranslations (response, langstring) {
 			}
 		}
 	} else {
+		var language = trlanguages[0];
 		$(section + 'txt_' + language).innerHTML = result.translatedText;
 		$(section + 'expand_' + language).value = result.translatedText;
-		$(section + 'verify_' + trlanguages[0]).update("");
+		$(section + 'verify_' + language).update("");
 	}
 	switch(section) {
 		case 'phone': phonetranslationstate = true; break;
