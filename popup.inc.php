@@ -58,7 +58,7 @@ header('Content-type: text/html; charset=UTF-8') ;
 	<table width="100%" border=0 cellpadding=0 cellspacing=0>
 	<tr>
 <?	// LOGO ?>
-		<td><div style="padding-left:10px; padding-bottom:10px;"><?=$logo?></div></td>
+		<td><div style="padding-left:10px; "><?=$logo?></div></td>
 	</tr>
 	</table>
 </div>

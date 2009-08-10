@@ -231,7 +231,7 @@ header('Content-type: text/html; charset=UTF-8') ;
 
 <table class="navlogoarea" border=0 cellspacing=0 cellpadding=0 width="100%">
 	<tr>
-		<td bgcolor="white"><div style="padding-left:10px; padding-bottom:10px;"><? doLogo() ?></div></td>
+		<td bgcolor="white"><div style="padding-left:10px;"><? doLogo() ?></div></td>
 		<td><img src="img/shwoosh.gif" alt="" class="noprint"></td>
 		<td width="100%" align="right" style="padding-right: 10px;">
 			<div class="custname"><?= escapehtml($_SESSION['custname']); ?></div>
