@@ -121,7 +121,7 @@ function fmt_actions_en ($obj,$name) {
 	$links = array();
 	$links[] = action_link($obj->importid > 0 ? _L("View") : _L("Edit"),"pencil","user.php?id=$obj->id");
 	$links[] = action_link(_L("Login as this user"),"key_go","./?login=$obj->login");
-	$links[] = action_link(_L("Reset Password"),"fugue/lock__pencil","?resetpass=1&enable=$obj->id");
+	$links[] = action_link(_L("Reset Password"),"fugue/lock__pencil","", "if (window.confirm('"._L('Send an email reset reminder?')."')) window.location='?resetpass=1&enable=$obj->id'");
 	if ($obj->id != $USER->id)
 		$links[] = action_link(_L("Disable"),"user_delete","?disable=$obj->id");
 	
