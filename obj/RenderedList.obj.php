@@ -244,8 +244,11 @@ class RenderedList {
 				$fieldnumsAliased[] = "(select group_concat(value separator ', ') from groupdata where fieldnum=$i and personid=p.id) as $field->fieldnum";
 			}
 		}
-		$fieldsSQL = implode(',', $fieldnumsAliased);
-		
+		if (!empty($fieldnumsAliased))
+			$fieldsSQL = ", " . implode(',', $fieldnumsAliased);
+		else
+			$fieldsSQL = "";
+			
 		// NOTE: sequence and destination are placeholders to be filled when querying for destination data, which is in $this->render().
 		return "
 			p.id, pkey, $this->firstname, $this->lastname,
@@ -258,7 +261,7 @@ class RenderedList {
 			) as address,
 			0 as sequence,
 			0 as destination,
-			0 as destinationtype,
+			0 as destinationtype
 			$fieldsSQL
 		";
 	}
