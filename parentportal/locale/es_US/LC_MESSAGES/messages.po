@@ -722,7 +722,7 @@ msgstr "Paso 4"
 
 #: phoneactivation2.php:139
 msgid "When prompted, enter this activation code "
-msgstr "Cuando se le pida, introduzca este código de activación %s"
+msgstr "Cuando se le pida, introduzca este código de activación"
 
 #: phoneactivation2.php:142
 msgid "Step 5"
