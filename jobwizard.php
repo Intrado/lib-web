@@ -420,6 +420,10 @@ class FinishJobWizard extends WizFinish {
 		Query("BEGIN");
 		$job = Job::jobWithDefaults();
 
+		// Attach first list
+		$listids = $jobsettings['lists'];
+		$job->listid = array_shift($listids);
+
 		$job->userid = $USER->id;
 		$job->jobtypeid = $jobsettings['jobtype'];
 		$job->name = $jobsettings['jobname'];
@@ -522,9 +526,7 @@ class FinishJobWizard extends WizFinish {
 			}
 		}
 		
-		// Attach lists
-		$listids = $jobsettings['lists'];
-		$job->listid = array_shift($listids);
+		// attach additional lists
 		if ($listids)
 			foreach ($listids as $listid)
 				QuickUpdate("insert into joblist (jobid,listid) values (?,?)", false, array($job->id, $listid));
