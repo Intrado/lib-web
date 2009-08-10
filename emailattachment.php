@@ -63,7 +63,7 @@ if (isset($_FILES['emailattachment']['error']) && $_FILES['emailattachment']['er
 	} else if (!is_file($newname) || !is_readable($newname)) {
 		$errormessage .= _L('Unable to complete file upload. Please try again');
 	} else if (array_search(strtolower($ext),$unsafeext) !== false) {
-		$errormessage .= _L('The file you uploaded may pose a security risk and is not allowed').'\n'._L('Please check the help documentation for more information on safe and unsafe file types');
+		$errormessage .= _L('The file you uploaded may pose a security risk and is not allowed. ').'\n'._L('Please check the help documentation for more information on safe and unsafe file types');
 	} else if ($_FILES['emailattachment']['size'] >= $maxattachmentsize) {
 		$errormessage .= _L('The file you uploaded exceeds the maximum email attachment limit of 2048K');
 	} else if ($_FILES['emailattachment']['size'] <= 0) {
