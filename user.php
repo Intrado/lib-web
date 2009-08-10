@@ -247,6 +247,18 @@ $formdata["phone"] = array(
 	"helpstep" => 1
 );
 
+$formdata["callerid"] = array(
+	"label" => _L("Caller ID"),
+	"fieldhelp" => _L('This is the default Caller ID phone number for jobs sent by the user.'),
+	"value" => ($edituser->id +0 > 0)?Phone::format($edituser->getSetting("callerid", "")):"",
+	"validators" => array(
+		array("ValLength","min" => 2,"max" => 20),
+		array("ValPhone")
+	),
+	"control" => array("TextField","maxlength" => 20, "size" => 15),
+	"helpstep" => 1
+);
+
 $formdata[] = _L("Account Restrictions");
 
 $formdata["accessid"] = array(
@@ -353,6 +365,9 @@ if ($readonly) {
 	// Phone
 	$formdata["phone"]["control"] = array("FormHtml","html" => Phone::format($edituser->phone));
 	unset($formdata["phone"]["validators"]);
+	// Caller ID
+	$formdata["callerid"]["control"] = array("FormHtml","html" => ($edituser->id +0 > 0)?Phone::format($edituser->getSetting("callerid", "")):"");
+	unset($formdata["callerid"]["validators"]);
 	// Access Profile
 	$formdata["accessid"]["control"] = array("FormHtml","html" => $profilename);
 	unset($formdata["accessid"]["validators"]);
@@ -454,7 +469,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 			else
 				$edituser->update(); 
 			
-			$edituser->setSetting("callerid",$userphone);
+			$edituser->setSetting("callerid",$postdata['callerid']);
 
 			// Remove all existing user rules
 			$rules = $edituser->rules();
