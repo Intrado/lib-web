@@ -36,13 +36,33 @@ else
 class CallMe extends FormItem {
 	function render ($value) {
 		$n = $this->form->name."_".$this->name;
+		$nophone = _L("Phone Number");
+		$defaultphone = escapehtml((isset($this->args['phone']) && $this->args['phone'])?Phone::format($this->args['phone']):$nophone);
+		if (!$value)
+			$value = '{}';
 		// Hidden input item to store values in
-		$str = '<input id="'.$n.'" name="'.$n.'" type="hidden" value="" />
-			<table class="msgdetails" width="80%">
-			<tr><td><input style="float: left; margin-top: 3px" type="text" id="'.$n.'phone" value="'.$this->args['phone'].'" /></td></tr>
-			<tr><td>'.icon_button(_L("Call Me To Record"),"/diagona/16/151","new CallMe('".$this->form->name."','".$this->args['origin']."','".$n."','".$this->args['min']."','".$this->args['max']."').start();",null,'id="'.$n.'recordbutton"').'<div style="padding-top:4px;" id='.$n.'progress /></td></tr>
-			</table>
-			<script type="text/javascript" src="script/callme.js.php"></script>';
+		$str = '<input id="'.$n.'" name="'.$n.'" type="hidden" value="'.escapehtml($value).'" />
+		<div>
+			<div id="'.$n.'_messages" style="padding: 6px; white-space:nowrap"></div>
+			<div id="'.$n.'_altlangs" style="clear: both; padding: 5px; display: none"></div>
+		</div>
+		';
+		// include the easycall javascript object and setup to record
+		$str .= '<script type="text/javascript" src="script/easycall.js.php"></script>
+			<script type="text/javascript">
+				var msgs = '.$value.';
+				// Load default. it is a special case
+				new Easycall(
+					"'.$this->form->name.'",
+					"'.$n.'",
+					"Default",
+					"'.((isset($this->args['min']) && $this->args['min'])?$this->args['min']:"10").'",
+					"'.((isset($this->args['max']) && $this->args['max'])?$this->args['max']:"10").'",
+					"'.$defaultphone.'",
+					"'.$nophone.'",
+					"CallMe"
+				).load();
+			</script>';
 		return $str;
 	}
 }

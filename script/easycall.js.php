@@ -13,7 +13,7 @@ var easycallRecordings = 0;
 var Easycall = Class.create({
 
 	// Initialize with empty specialtask id
-	initialize: function(formname, formitemname, language, minlength, maxlength, defaultphoneval, nophoneval) {
+	initialize: function(formname, formitemname, language, minlength, maxlength, defaultphoneval, nophoneval, origin) {
 		this.formname = formname;
 		this.formitemname = formitemname;
 		this.language = language;
@@ -24,6 +24,8 @@ var Easycall = Class.create({
 		this.defaultphone = defaultphoneval;
 		this.nophone = nophoneval;
 		this.num = 0;
+		this.origin = origin;
+		this.keytimer = null;
 	},
 	
 	// Load initial form values
@@ -75,7 +77,7 @@ var Easycall = Class.create({
 				"phone": phone, 
 				"language": "Default",
 				"name": "Call Me",
-				"origin": "jobwizard"
+				"origin": this.origin
 			},
 			// hand result off to handleRecord
 			onSuccess: this.handleRecord.bindAsEventListener(this),
@@ -160,6 +162,8 @@ var Easycall = Class.create({
 		}
 		
 		if ($(this.formitemname+"_"+this.language+"_progress")) {
+			if (easycallRecordings)
+				easycallRecordings--;
 			if (this.language == "Default") {
 				$(this.formitemname+"_"+this.language+"_progress").observe("click", this.setupRecord.bind(this));
 			} else {
@@ -239,11 +243,19 @@ var Easycall = Class.create({
 			}
 		}.bind(this));
 		$(this.formitemname+"_"+this.language+"_phone").observe("keyup", function (event) {
+			// Set a timer to do phone number validation
+			if (this.keytimer)
+				window.clearTimeout(this.keytimer);
 			var e = event.element();
-			if (!this.valPhone(e.value, this.minlength, this.maxlength))
-				e.setStyle({"background": "#ffb7b7"});
-			else
-				e.setStyle({"background": "#ceffc6"});
+			this.keytimer = window.setTimeout(
+				function () {
+					if (this.valPhone(e.value, this.minlength, this.maxlength))
+						form_validation_display(this.formitemname, "valid", "");
+					else
+						form_validation_display(this.formitemname, "error", "<?=escapehtml(_L('The phone number entered is invalid'))?>");
+				}.bind(this),
+				500
+			);
 		}.bind(this));
 		$(this.formitemname+"_"+this.language+"_callme").observe("click", this.record.bind(this));
 		
