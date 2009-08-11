@@ -393,7 +393,7 @@ function activityfeed($mergeditems,$ajax = false) {
 											<span>' . $content . '</span>
 											
 										</td>
-										<td valign="middle">';
+										<td valign="middle" width="100px">';
 						if($tools) {
 								$activityfeed .= '  <div id="actionlink_'. $itemid .'" style="cursor:pointer" ><img src="img/largeicons/tiny20x20/tools.jpg" />&nbsp;Tools</div>
 													<div id="actions_'. $itemid .'" style="display:none;">' . $tools  . '</div>';
@@ -448,7 +448,7 @@ function activityfeed($mergeditems,$ajax = false) {
 										var item = result[i];	
 										html += '<tr><td valign=\"top\" width=\"60px\"><a href=\"' + item.defaultlink + '\" ' + item.defaultonclick + '><img src=\"img/' + item.icon + '\" /></a></td><td ><div class=\"feedtitle\"><a href=\"' + item.defaultlink + '\" ' + item.defaultonclick + '>' + item.title + '</a></div><span>' + item.content + '</span></td>';
 										if(item.tools) {
-											html += '<td valign=\"middle\"><div id=\"actionlink_' + item.itemid + '\" style=\"cursor:pointer\" ><img src=\"img/largeicons/tiny20x20/tools.jpg\"/>&nbsp;Tools</div><div id=\"actions_' + item.itemid + '\" style=\"display:none;\">' + item.tools + '</div></td>';
+											html += '<td valign=\"middle\" width=\"100px\"><div id=\"actionlink_' + item.itemid + '\" style=\"cursor:pointer\" ><img src=\"img/largeicons/tiny20x20/tools.jpg\"/>&nbsp;Tools</div><div id=\"actions_' + item.itemid + '\" style=\"display:none;\">' + item.tools + '</div></td>';
 										}
 										if(item.tools != '') {
 											actionids.push(item.itemid);											
