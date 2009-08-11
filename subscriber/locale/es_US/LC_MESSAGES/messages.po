@@ -731,7 +731,7 @@ msgstr "No hay mensajes."
 #: subscriberutils.inc.php:7
 #: subscriberutils.inc.php:21
 msgid "You must follow these steps within <b>24 hours</b> to complete this addition to your account."
-msgstr "Usted debe seguir estos pasos <b> dentro de 24 horas </ b> para completar esta adición a su cuenta."
+msgstr "Usted debe seguir estos pasos <b> dentro de 24 horas </b> para completar esta adición a su cuenta."
 
 #: subscriberutils.inc.php:8
 msgid "Print this page now"
