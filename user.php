@@ -473,7 +473,8 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 			else
 				$edituser->update(); 
 			
-			$edituser->setSetting("callerid",$postdata['callerid']);
+			if (isset($postdata['callerid']))
+				$edituser->setSetting("callerid",$postdata['callerid']);
 
 			// Remove all existing user rules
 			$rules = $edituser->rules();
