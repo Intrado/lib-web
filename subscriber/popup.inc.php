@@ -10,13 +10,13 @@ $pagetitle = preg_replace('/\\<.+>/','',(isset($TITLE) ? $TITLE : ""));
 <head>
 	<meta http-equiv="Content-type" value="text/html; charset=UTF-8" />
 	<title>SchoolMessenger: <?= $pagetitle ?></title>
-	<script src="../script/prototype.js" type="text/javascript"></script>
-	<script src="../script/scriptaculous.js" type="text/javascript"></script>
-	<script src="../script/prototip.js.php" type="text/javascript"></script>
-	<script src='../script/utils.js'></script>
-	<script src='../script/sorttable.js'></script>
-	<link href='../css/style_print.css' type='text/css' rel='stylesheet' media='print'>
-	<link href='../css.php' type='text/css' rel='stylesheet' media='screen'>
+	<script src='script/utils.js'></script>
+	<script src='script/sorttable.js'></script>
+	<link href='css/style_print.css' type='text/css' rel='stylesheet' media='print'>
+	<link href='css.php' type='text/css' rel='stylesheet' media='screen'>
+	<script src="script/prototype.js" type="text/javascript"></script>
+	<script src="script/scriptaculous.js" type="text/javascript"></script>
+	<script src="script/prototip.js.php" type="text/javascript"></script>
 </head>
 <body onload="try {UpdateTimer();} catch (e) {}" style="margin: 0px; background-color: white;">
 	<IFRAME src="blank.html" id="blocker" style="DISPLAY: none; LEFT: 0px; POSITION: absolute; TOP: 0px" frameBorder="0" scrolling="no"></IFRAME>
