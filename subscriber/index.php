@@ -55,7 +55,7 @@ if (isset($_GET['deletelocale'])) {
 
 if ($SETTINGS['feature']['has_ssl']) {
 	if ($SETTINGS['feature']['force_ssl'] && !isset($_SERVER["HTTPS"])){
-		redirect("https://" . $_SERVER["SERVER_NAME"] . "/index.php");
+		redirect("https://" . $_SERVER["SERVER_NAME"] . "/$CUSTOMERURL/subscriber/index.php");
 	}
 }
 
