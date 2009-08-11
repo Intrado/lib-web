@@ -1,6 +1,6 @@
 <?
 
-$SETTINGS = parse_ini_file("subscribersettings.ini.php",true);
+$SETTINGS = parse_ini_file("../inc/settings.ini.php",true);
 $IS_COMMSUITE = $SETTINGS['feature']['is_commsuite'];
 
 //get the customer URL
