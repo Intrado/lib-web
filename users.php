@@ -36,21 +36,23 @@ function is_sm_user($id) {
 if (isset($_GET['resetpass'])) {
 	$maxreached = false;
 	$id = 0 + $_GET['enable'];
+	$usr = new User($id);
 	
 	/*CSDELETEMARKER_START*/
 	if (is_sm_user($id))
 		redirect();
 	
-	if(($maxusers != "unlimited") && $maxusers <= $usercount){
-		print '<script language="javascript">window.alert(\'You already have the maximum amount of users.\');window.location="users.php";</script>';
+	if(($maxusers != "unlimited") && $maxusers <= $usercount && !$usr->enabled) {
+		error('You already have the maximum amount of users');
 		$maxreached = true;
 	}
 	/*CSDELETEMARKER_END*/
 
 	if(!$maxreached){
-		QuickUpdate("update user set enabled = 1 where id = ?", false, array($id));
+		
+		$usr->enabled = 1;
+		$usr->update();
 
-		$usr = new User($id);
 		global $CUSTOMERURL;
 		forgotPassword($usr->login, $CUSTOMERURL);
 		redirect(); // TODO this takes a few seconds...
