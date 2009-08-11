@@ -74,8 +74,16 @@ class ValCallMeMessage extends Validator {
 	var $onlyserverside = true;
 	function validate ($value, $args) {
 		global $USER;
-		if (!QuickQuery("select count(*) from message where userid=? and id=?",false,array($USER->id, $value)))
-			return "$this->label ". _L("contains invalid message contents.");
+		if (!$USER->authorize("starteasy"))
+			return "$this->label "._L("is not allowed for this user account");
+		$values = json_decode($value);
+		if ($value == "{}")
+			return "$this->label "._L("has messages that are not recorded");
+		if (!$values->Default)
+			return "$this->label "._L("has messages that are not recorded");
+		$msg = new Message($values->Default +0);
+		if ($msg->userid !== $USER->id)
+			return "$this->label "._L("has invalid message values");
 		return true;
 	}
 }
@@ -94,7 +102,7 @@ $formdata = array(
 		"helpstep" => 1
 	),
 	"callme" => array(
-		"label" => _L('Phone Number'),
+		"label" => _L('Voice Recording'),
 		"value" => "",
 		"validators" => array(
 			array("ValCallMeMessage"),
@@ -135,7 +143,8 @@ if ($button = $form->getSubmit()) {
 	} else if (($errors = $form->validate()) === false) { //checks all of the items in this form
 		$postdata = $form->getData(); //gets assoc array of all values {name:value,...}
 		if ($postdata['messagename']) {
-			$message = new Message($postdata['callme'] + 0);
+			$value = json_decode($postdata['callme']);
+			$message = new Message($value->Default + 0);
 			$messagename = trim($postdata["messagename"])?trim($postdata["messagename"]):"Call Me" . " - " . date("M j, Y G:i:s");
 			if(QuickQuery("Select count(*) from message where userid=? and not deleted and name =?", false, array($USER->id, $messagename)))
 				$messagename = $messagename . " - " . date("M j, Y G:i:s");
