@@ -27,6 +27,10 @@ if (!$USER->authorize('manageaccount')) {
 $usercount = QuickQuery("select count(*) from user where enabled = 1 and login != 'schoolmessenger'");
 $maxusers = getSystemSetting("_maxusers","unlimited");
 
+$maxreached = $maxusers != "unlimited" && $usercount >= $maxusers;
+
+var_dump($maxreached);
+
 function is_sm_user($id) {
 	return QuickQuery("select count(*) from user where login='schoolmessenger' and id=?",false,array($id));
 }
@@ -34,29 +38,23 @@ function is_sm_user($id) {
 
 
 if (isset($_GET['resetpass'])) {
-	$maxreached = false;
-	$id = 0 + $_GET['enable'];
+	$id = 0 + $_GET['resetpass'];
 	$usr = new User($id);
 	
 	/*CSDELETEMARKER_START*/
 	if (is_sm_user($id))
 		redirect();
 	
-	if(($maxusers != "unlimited") && $maxusers <= $usercount && !$usr->enabled) {
-		error('You already have the maximum amount of users');
-		$maxreached = true;
+	if ($maxreached && !$usr->enabled) {		
+		redirect("?maxusers");
 	}
 	/*CSDELETEMARKER_END*/
 
-	if(!$maxreached){
-		
-		$usr->enabled = 1;
-		$usr->update();
+	$usr->enabled = 1;
+	$usr->update();
 
-		global $CUSTOMERURL;
-		forgotPassword($usr->login, $CUSTOMERURL);
-		redirect(); // TODO this takes a few seconds...
-	}
+	forgotPassword($usr->login, $CUSTOMERURL);
+	redirect();
 }
 
 if (isset($_GET['delete'])) {
@@ -78,29 +76,37 @@ if (isset($_GET['delete'])) {
 
 if (isset($_GET['disable'])) {
 	$id = 0 + $_GET['disable'];
+	$usr = new User($id);
+	
 	/*CSDELETEMARKER_START*/
 	if (is_sm_user($id))
 		redirect();
 	/*CSDELETEMARKER_END*/
-	QuickUpdate("update user set enabled = 0 where id = ?", false, array($id));
+		
+	$usr->enabled = 0;
+	$usr->update();
 	redirect();
 }
 
 if (isset($_GET['enable'])) {
-	$maxreached = false;
-
+	$id = 0 + $_GET['enable'];
+	$usr = new User($id);
+	
 	/*CSDELETEMARKER_START*/
-	if(($maxusers != "unlimited") && $maxusers <= $usercount){
-		print '<script language="javascript">window.alert(\'You already have the maximum amount of users.\');window.location="users.php";</script>';
-		$maxreached = true;
+	if (is_sm_user($id))
+		redirect();
+	if($maxreached && !$usr->enabled) {		
+		redirect("?maxusers");
 	}
 	/*CSDELETEMARKER_END*/
+	
+	$usr->enabled = 1;
+	$usr->update();
+	redirect();
+}
 
-	if(!$maxreached){
-		$id = 0 + $_GET['enable'];
-		QuickUpdate("update user set enabled = 1 where id = ?", false, array($id));
-		redirect();
-	}
+if (isset($_GET['maxusers'])) {
+	error("You already have the maximum number of allowed users");
 }
 
 
@@ -123,7 +129,7 @@ function fmt_actions_en ($obj,$name) {
 	$links = array();
 	$links[] = action_link($obj->importid > 0 ? _L("View") : _L("Edit"),"pencil","user.php?id=$obj->id");
 	$links[] = action_link(_L("Login as this user"),"key_go","./?login=$obj->login");
-	$links[] = action_link(_L("Reset Password"),"fugue/lock__pencil","", "if (window.confirm('"._L('Send an email reset reminder?')."')) window.location='?resetpass=1&enable=$obj->id'");
+	$links[] = action_link(_L("Reset Password"),"fugue/lock__pencil","", "if (window.confirm('"._L('Send an email reset reminder?')."')) window.location='?resetpass=$obj->id'");
 	if ($obj->id != $USER->id)
 		$links[] = action_link(_L("Disable"),"user_delete","?disable=$obj->id");
 	
@@ -140,7 +146,7 @@ function fmt_actions_dis ($obj,$name) {
 	$links[] = action_link($obj->importid > 0 ? _L("View") : _L("Edit"),"pencil","user.php?id=$obj->id");
 	$links[] = action_link(_L("Enable"),"user_add","?enable=$obj->id");
 	if(isset($newusers[$obj->id]))
-		$links[] = action_link(_L("Enable & Reset Password"),"fugue/lock__pencil","?enable=$obj->id&resetpass=1");
+		$links[] = action_link(_L("Enable & Reset Password"),"fugue/lock__pencil","?resetpass=$obj->id");
 	
 	$links[] = action_link(_L("Delete"),"cross","?delete=$obj->id","return confirmDelete()");
 	
