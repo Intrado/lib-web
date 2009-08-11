@@ -29,8 +29,6 @@ $maxusers = getSystemSetting("_maxusers","unlimited");
 
 $maxreached = $maxusers != "unlimited" && $usercount >= $maxusers;
 
-var_dump($maxreached);
-
 function is_sm_user($id) {
 	return QuickQuery("select count(*) from user where login='schoolmessenger' and id=?",false,array($id));
 }
