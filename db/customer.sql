@@ -1477,3 +1477,17 @@ $$$
 
 ALTER TABLE `reportcontact` CHANGE `resultdata` `resultdata` VARCHAR( 255 ) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL 
 $$$
+
+-- 7-0-x
+-- Set a permanent flag for messages/audiofiles that should never be deleted
+ALTER TABLE `message` ADD `permanent` TINYINT( 4 ) NOT NULL AFTER `deleted` 
+$$$
+ALTER TABLE `audiofile` ADD `permanent` TINYINT( 4 ) NOT NULL DEFAULT '0' AFTER `deleted`
+$$$
+
+-- create table for archived report name to content id mappings
+ CREATE TABLE `c_1`.`reportarchive` (
+`name` VARCHAR( 50 ) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL ,
+`contentid` BIGINT( 20 ) NOT NULL
+) ENGINE = InnoDB CHARACTER SET utf8 COLLATE utf8_general_ci
+$$$
