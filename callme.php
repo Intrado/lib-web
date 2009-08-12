@@ -97,7 +97,9 @@ $formdata = array(
 	"messagename" => array(
 		"label" => _L('Message Name'),
 		"value" => "",
-		"validators" => array(),
+		"validators" => array(
+			array("ValLength", "max" => 30)
+		),
 		"control" => array("TextField","size" => 30, "maxlength" => 30),
 		"helpstep" => 1
 	),
