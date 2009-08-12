@@ -8,11 +8,12 @@ class AudioFile extends DBMappedObject {
 	var $contentid;
 	var $recorddate;
 	var $deleted = 0;
+	var $permanent = 0;
 
 	function AudioFile ($id = NULL) {
 		$this->_allownulls = true;
 		$this->_tablename = "audiofile";
-		$this->_fieldlist = array("userid", "name", "description", "contentid", "recorddate", "deleted");
+		$this->_fieldlist = array("userid", "name", "description", "contentid", "recorddate", "deleted", "permanent");
 		DBMappedObject::DBMappedObject($id);
 	}
 

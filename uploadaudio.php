@@ -69,6 +69,7 @@ if(CheckFormSubmit($f,$s))
 			PopulateObject($f,$s,$audio,array("name", "description"));
 			$audio->userid = $USER->id;
 			$audio->deleted = 0;
+			$audio->permanent = (GetFormData($f, $s, 'permanent') == "transient")?1:0;
 
 			if(isset($_FILES['audio'])) {
 				if (!$_FILES['audio']['name']) {
@@ -135,9 +136,11 @@ if( $reloadform )
 	$audio = new AudioFile(getCurrentAudio());
 	$fields = array(
 			array("name","text",1,50,true),
-			array("description","text",1,50)
+			array("description","text",1,50),
+			array("permanent","radio")
 			);
 	PopulateForm($f,$s,$audio,$fields);
+	PutFormData($f, $s, 'permanent', ($audio->permanent)?"transient":"permanent");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -185,6 +188,15 @@ if(sel && <? print ($audio->id && $audio->name) ? 'true' : 'false'; ?>) {
 	<tr>
 		<th align="right" valign="top" class="windowRowHeader bottomBorder">Description:</th>
 		<td class="bottomBorder"><? NewFormItem($f, $s, 'description', 'text'); ?></td>
+	</tr>
+	<tr>
+		<th align="right" valign="top" class="windowRowHeader bottomBorder">Auto Expire:</th>
+		<td class="bottomBorder">
+			<ol style="border: 0px; padding: 0px; margin: 0px; list-style-type: none;">
+				<li><? NewFormItem($f, $s, 'permanent', 'radio', false, 'permanent'); ?>Yes (Keep for six months)</li>
+				<li><? NewFormItem($f, $s, 'permanent', 'radio', false, 'transient'); ?>No (Keep forever)</li>
+			</ol>
+		</td>
 	</tr>
 <? if($audio->contentid) { ?>
 	<tr>
