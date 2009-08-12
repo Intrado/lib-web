@@ -2029,14 +2029,6 @@ function submitTranslations(section) {
 	return false;
 }
 
-function setRetranslation (response, language) {
-	result = response.responseData;
-	if (response.responseStatus != 200){
-		return;
-	}
-	$(section + 'verify_' + language).update(result.translatedText);
-}
-
 function submitRetranslation(section,language) {
 	var text = new getObj(section + 'expand_' + language).obj.value;
 	if(text == "")
@@ -2047,15 +2039,20 @@ function submitRetranslation(section,language) {
 	}
 	var urllang = encodeURIComponent(language);
 	callbacksection = section;
-	new Ajax.Request('translate.php',
-		{ method:'post', postBody:"text=" + encodeURIComponent(text) + "&language=" + urllang, 
-			onSuccess: function(result) {
-				setRetranslation(result.responseJSON, urllang);
+	
+	var request = "translate.php?text=" + encodeURIComponent(text) + "&language=" + urllang;
+	cachedAjaxGet(
+			request,
+			function(result) {	
+					var data = result.responseJSON;
+					if(data.responseStatus != 200 || data.responseData.translatedText == undefined)
+						return;
+					$(section + 'verify_' + language).innerHTML = data.responseData.translatedText.escapeHTML();
 			}
-		}
 	);
 	return false;
 }
+
 function enablesection(section) {
 	try
 	{			
