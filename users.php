@@ -171,7 +171,9 @@ if (!isset($_SESSION['ajaxtablepagestart']) || !isset($_GET['ajax']))
 if (isset($_GET['containerID']) && isset($_GET['ajax'])) {		
 	if (isset($_GET['start']) && $_GET['ajax'] == 'page')
 		$_SESSION['ajaxtablepagestart'][$_GET['containerID']] = $_GET['start'] + 0;
-
+	if ($_GET['ajax'] == 'filter')
+		$_SESSION['ajaxtablepagestart'][$_GET['containerID']] = 0;
+		
 	header('Content-Type: application/json');
 		$ajaxdata = array('html' => show_user_table($_GET['containerID']));
 	exit(json_encode($ajaxdata));
@@ -235,6 +237,10 @@ function show_user_table($containerID) {
 	$numUsers = QuickQuery("select count(*) from user where $criteriaSQL $filterSQL", false, $args);
 	
 	$limitstart = isset($_SESSION['ajaxtablepagestart'][$containerID]) ? $_SESSION['ajaxtablepagestart'][$containerID] : 0;
+	if ($limitstart >= $numUsers)
+		$limitstart = $numUsers-$perpage;
+	if ($limitstart < 0)
+		$limitstart = 0;
 	$data = DBFindMany("User","from user where $criteriaSQL $filterSQL ORDER BY $orderbySQL LIMIT $limitstart,$perpage", false, $args);
 	foreach ($data as $i => $account) {
 		$data[$i] = (array)$account;
