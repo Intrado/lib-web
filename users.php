@@ -118,35 +118,39 @@ $newusers = QuickQueryList("select id,1 from user where not enabled and deleted=
 ////////////////////////////////////////////////////////////////////////////////
 // Display Functions
 ////////////////////////////////////////////////////////////////////////////////
-
-function fmt_actions_en ($obj,$name) {
+function fmt_actions_enabled_account ($account,$name) {
 	global $USER;
 
-	$activeuseranchor = (isset($_SESSION['userid']) && $_SESSION['userid'] == $obj->id) ? '<a name="viewrecent">' : '';
+	$id = $account['id'];
+	$importid = $account['importid'];
+	$login = $account['login'];
+	
+	$activeuseranchor = (isset($_SESSION['userid']) && $_SESSION['userid'] == $id) ? '<a name="viewrecent">' : '';
 
 	$links = array();
-	$links[] = action_link($obj->importid > 0 ? _L("View") : _L("Edit"),"pencil","user.php?id=$obj->id");
-	$links[] = action_link(_L("Login as this user"),"key_go","./?login=$obj->login");
-	$links[] = action_link(_L("Reset Password"),"fugue/lock__pencil","", "if (window.confirm('"._L('Send an email reset reminder?')."')) window.location='?resetpass=$obj->id'");
-	if ($obj->id != $USER->id)
-		$links[] = action_link(_L("Disable"),"user_delete","?disable=$obj->id");
+	$links[] = action_link($importid > 0 ? _L("View") : _L("Edit"),"pencil","user.php?id=$id");
+	$links[] = action_link(_L("Login as this user"),"key_go","./?login=$login");
+	$links[] = action_link(_L("Reset Password"),"fugue/lock__pencil","", "if (window.confirm('"._L('Send an email reset reminder?')."')) window.location='?resetpass=$id'");
+	if ($id != $USER->id)
+		$links[] = action_link(_L("Disable"),"user_delete","?disable=$id");
 	
 	return $activeuseranchor . action_links($links);
 }
 
-function fmt_actions_dis ($obj,$name) {
+function fmt_actions_disabled_account ($account,$name) {
 	global $newusers;
 	$editviewaction = "Edit";
-	if ($obj->importid > 0) $editviewaction = "View";
-
+	$importid = $account['importid'];
+	if ($importid > 0) $editviewaction = "View";
+	$id = $account['id'];
 
 	$links = array();
-	$links[] = action_link($obj->importid > 0 ? _L("View") : _L("Edit"),"pencil","user.php?id=$obj->id");
-	$links[] = action_link(_L("Enable"),"user_add","?enable=$obj->id");
-	if(isset($newusers[$obj->id]))
-		$links[] = action_link(_L("Enable & Reset Password"),"fugue/lock__pencil","?resetpass=$obj->id");
+	$links[] = action_link($importid > 0 ? _L("View") : _L("Edit"),"pencil","user.php?id=$id");
+	$links[] = action_link(_L("Enable"),"user_add","?enable=$id");
+	if(isset($newusers[$id]))
+		$links[] = action_link(_L("Enable & Reset Password"),"fugue/lock__pencil","?resetpass=$id");
 	
-	$links[] = action_link(_L("Delete"),"cross","?delete=$obj->id","return confirmDelete()");
+	$links[] = action_link(_L("Delete"),"cross","?delete=$id","return confirmDelete()");
 	
 	return action_links($links);
 }
@@ -154,9 +158,134 @@ function fmt_actions_dis ($obj,$name) {
 /*
 	Callback to format the access profile name for a user
 */
-function fmt_acc_profile ($obj,$name) {
+function fmt_profile_name ($account, $name) {
 	global $accessprofiles;
-	return escapehtml($accessprofiles[$obj->accessid]);
+	return escapehtml($accessprofiles[$account['accessid']]);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// AJAX
+////////////////////////////////////////////////////////////////////////////////
+if (!isset($_SESSION['ajaxtablepagestart']) || !isset($_GET['ajax']))
+	$_SESSION['ajaxtablepagestart'] = array();
+if (isset($_GET['containerID']) && isset($_GET['ajax'])) {		
+	if (isset($_GET['start']) && $_GET['ajax'] == 'page')
+		$_SESSION['ajaxtablepagestart'][$_GET['containerID']] = $_GET['start'] + 0;
+
+	header('Content-Type: application/json');
+		$ajaxdata = array('html' => show_user_table($_GET['containerID']));
+	exit(json_encode($ajaxdata));
+}
+
+function show_user_table($containerID) {
+	global $IS_COMMSUITE;
+	
+	$perpage = 20;
+	
+	$titles = array(
+		"firstname" => "First Name",
+		"lastname" => "Last Name",
+		"login" => "Username",
+		"description" => "Description",
+		"AccessProfile" => "Profile",
+		"lastlogin" => "Last Login",
+		"Actions" => "Actions"
+	);
+	$formatters = array(
+		'AccessProfile' => 'fmt_profile_name',
+		"lastlogin" => "fmt_date"
+	);
+	$sorting = array(
+		"firstname" => "firstname",
+		"lastname" => "lastname",
+		"login" => "login",
+		"lastlogin" => "lastlogin"
+	);
+	
+	if ($containerID == 'inactiveUsersContainer') {
+		$criteriaSQL = "not enabled and deleted=0";
+		$formatters["Actions"] = "fmt_actions_disabled_account";
+	} else {
+		if($IS_COMMSUITE)
+			$criteriaSQL = "enabled and deleted=0";
+/*CSDELETEMARKER_START*/
+		else
+			$criteriaSQL = "enabled and deleted=0 and login != 'schoolmessenger'";
+/*CSDELETEMARKER_END*/
+		$formatters["Actions"] = "fmt_actions_enabled_account";
+	}
+	
+	$orderbySQL = ajax_table_get_orderby($containerID, $sorting);
+	if (empty($orderbySQL))
+		$orderbySQL = "lastname, firstname";
+	
+	$filterSQL = get_filter_sql($containerID);
+	if (!empty($filterSQL)) {
+		$filterValue = $_SESSION["{$containerID}_filter"];
+		
+		// Append the same string 3 times, for [lastname, firstname, login].
+		for ($i = 0; $i < 3; $i++) {
+			$args[] = '%' . $_SESSION["{$containerID}_filter"] . '%';
+		}
+	} else {
+		$filterValue = '';
+		$args = false;
+	}
+	
+	$numUsers = QuickQuery("select count(*) from user where $criteriaSQL $filterSQL", false, $args);
+	
+	$limitstart = isset($_SESSION['ajaxtablepagestart'][$containerID]) ? $_SESSION['ajaxtablepagestart'][$containerID] : 0;
+	$data = DBFindMany("User","from user where $criteriaSQL $filterSQL ORDER BY $orderbySQL LIMIT $limitstart,$perpage", false, $args);
+	foreach ($data as $i => $account) {
+		$data[$i] = (array)$account;
+	}
+	
+	$tooltip = addslashes(_L("Search by First Name, Last Name, Username, or Access Profile. Press ENTER to apply the search word."));
+	$html = "<div style='float:right; padding:5px; padding-bottom:0; margin-right:5px;'><input id='{$containerID}_search' size=20 value='$filterValue'></div>";
+	$html .= ajax_table_show_menu($containerID, $numUsers, $limitstart, $perpage) . ajax_show_table($containerID, $data, $titles, $formatters, $sorting);
+	$html .= "
+		<script type='text/javascript'>
+			Event.observe('{$containerID}_search', 'keypress', function(event) {
+				if (Event.KEY_RETURN == event.keyCode)
+					ajax_table_update('$containerID', '?ajax=filter&filter=' + event.element().value);
+			});
+			
+			new Tip('{$containerID}_search', '$tooltip', {
+					style: 'protogrey',
+					stem: 'bottomRight',
+					hook: { target: 'topLeft', tip: 'bottomRight' },
+					offset: { x: 10, y: 0 },
+					fixed: true,
+					hideOthers: true
+			});
+		</script>
+	";
+	return $html;
+}
+
+function get_filter_sql($containerID) {
+	global $accessprofiles;
+	
+	if (!isset($_SESSION["{$containerID}_filter"]))
+		$_SESSION["{$containerID}_filter"] = '';
+	if (isset($_GET['ajax']) && $_GET['ajax'] == 'filter' && isset($_GET['filter']))
+		$_SESSION["{$containerID}_filter"] = $_GET['filter'];
+	
+	$filter = $_SESSION["{$containerID}_filter"];
+	
+	if (!empty($filter)) {
+		// PROFILE
+		$filteredProfiles = array();
+		foreach ($accessprofiles as $id => $name) {
+			if (strpos($name, $filter) !== false)
+				$filteredProfiles[] = $id;
+		}
+		$profileSQL = empty($filteredProfiles) ? "" : ('or accessid in (' . implode(',', $filteredProfiles) . ')');
+		
+		return "and (firstname like ? or lastname like ? or login like ? $profileSQL)";
+	} else {
+		return '';
+	}
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -174,39 +303,21 @@ if($maxusers != "unlimited")
 
 include_once("nav.inc.php");
 
-$titles = array(	"firstname" => "#First Name",
-					"lastname" => "#Last Name",
-					"login" => "#Username",
-					"description" => "#Description",
-					"AccessProfile" => "#Profile",
-					"lastlogin" => "Last Login",
-					"Actions" => "Actions"
-					);
-
-
-
 startWindow('Active Users ' . help('Users_ActiveUsersList'),null, true);
-
-button_bar(button('Add New User', NULL,"user.php?id=new") . help('Users_UserAdd'));
-
-
-if($IS_COMMSUITE)
-	$data = DBFindMany("User","from user where enabled and deleted=0 order by lastname, firstname");
-/*CSDELETEMARKER_START*/
-else
-	$data = DBFindMany("User","from user where enabled and deleted=0 and login != 'schoolmessenger' order by lastname, firstname");
-/*CSDELETEMARKER_END*/
-
-showObjects($data, $titles, array("Actions" => "fmt_actions_en", 'AccessProfile' => 'fmt_acc_profile', "lastlogin" => "fmt_obj_date"), false, true);
+	button_bar(button('Add New User', NULL,"user.php?id=new") . help('Users_UserAdd'));
+	
+	echo '<div id="activeUsersContainer">';
+		echo show_user_table('activeUsersContainer');
+	echo '</div>';
 endWindow();
 
 print '<br>';
 
 startWindow('Inactive Users ' . help('Users_InactiveUsersList'),null, true);
-$data = DBFindMany("User","from user where not enabled and deleted=0 order by lastname, firstname");
-showObjects($data, $titles, array('AccessProfile' => 'fmt_acc_profile', "Actions" => "fmt_actions_dis", "lastlogin" => "fmt_obj_date"), count($data) > 10, true);
+	echo '<div id="inactiveUsersContainer">';
+		echo show_user_table('inactiveUsersContainer');
+	echo '</div>';
 endWindow();
-
 
 include_once("navbottom.inc.php");
 ?>
