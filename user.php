@@ -476,6 +476,9 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 			if (isset($postdata['callerid']))
 				$edituser->setSetting("callerid",$postdata['callerid']);
 
+			if (!$edituser->getSetting("maxjobdays", false))
+				$edituser->setSetting("maxjobdays", 1);
+			
 			// Remove all existing user rules
 			$rules = $edituser->rules();
 			if (count($rules)) {
