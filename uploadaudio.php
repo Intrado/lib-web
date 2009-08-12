@@ -193,7 +193,7 @@ if(sel && <? print ($audio->id && $audio->name) ? 'true' : 'false'; ?>) {
 		<th align="right" valign="top" class="windowRowHeader bottomBorder">Auto Expire:</th>
 		<td class="bottomBorder">
 			<ol style="border: 0px; padding: 0px; margin: 0px; list-style-type: none;">
-				<li><? NewFormItem($f, $s, 'permanent', 'radio', false, 'permanent'); ?>Yes (Keep for six months)</li>
+				<li><? NewFormItem($f, $s, 'permanent', 'radio', false, 'permanent'); ?>Yes (Keep for <?=getSystemSetting('softdeletemonths', "6")?> months)</li>
 				<li><? NewFormItem($f, $s, 'permanent', 'radio', false, 'transient'); ?>No (Keep forever)</li>
 			</ol>
 		</td>

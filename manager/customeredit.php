@@ -351,6 +351,10 @@ if(CheckFormSubmit($f,"Save") || CheckFormSubmit($f, "Return")) {
 				}
 
 				setCustomerSystemSetting('_dmmethod', DBSafe(GetFormData($f, $s, "_dmmethod")), $custdb);
+				
+				setCustomerSystemSetting('softdeletemonths', DBSafe(GetFormData($f, $s, "softdeletemonths")), $custdb);
+				setCustomerSystemSetting('harddeletemonths', DBSafe(GetFormData($f, $s, "harddeletemonths")), $custdb);
+
 				if(CheckFormSubmit($f, "Return")){
 					redirect("customers.php");
 				} else {
@@ -443,6 +447,8 @@ if( $reloadform ) {
 	PutFormData($f, $s, "oemid", $custinfo[6], "text");
 	PutFormData($f, $s, "nsid", $custinfo[7], "text");
 
+	PutFormData($f, $s, "softdeletemonths", getCustomerSystemSetting('softdeletemonths', "6", false, $custdb));
+	PutFormData($f, $s, "harddeletemonths", getCustomerSystemSetting('harddeletemonths', "24", false, $custdb));
 }
 
 
@@ -633,6 +639,36 @@ foreach($languages as $index => $language){
 </tr>
 
 <tr>
+	<td>Auto Message Expire (soft delete)</td>
+	<td>
+<?
+	NewFormItem($f,$s,'softdeletemonths','selectstart');
+		NewFormItem($f,$s,'softdeletemonths','selectoption','6 Months','6');
+		NewFormItem($f,$s,'softdeletemonths','selectoption','12 Months','12');
+		NewFormItem($f,$s,'softdeletemonths','selectoption','18 Months','18');
+	NewFormItem($f,$s,'softdeletemonths','selectend');
+EndForm();
+?>
+	</td>
+</tr>
+
+<tr>
+	<td>Auto Report Expire (<font style="color: red">HARD</font> delete)</td>
+	<td>
+<?
+	NewFormItem($f,$s,'harddeletemonths','selectstart');
+		NewFormItem($f,$s,'harddeletemonths','selectoption','6 Months','6');
+		NewFormItem($f,$s,'harddeletemonths','selectoption','12 Months','12');
+		NewFormItem($f,$s,'harddeletemonths','selectoption','18 Months','18');
+		NewFormItem($f,$s,'harddeletemonths','selectoption','24 Months','24');
+		NewFormItem($f,$s,'harddeletemonths','selectoption','36 Months','36');
+		NewFormItem($f,$s,'harddeletemonths','selectoption','48 Months','48');
+	NewFormItem($f,$s,'harddeletemonths','selectend');
+?>
+	</td>
+</tr>
+
+<tr>
 	<td><? NewFormItem($f, "Save","Save", 'submit');?>
 	<? NewFormItem($f, "Return","Save and Return", 'submit');?></td>
 </tr>
@@ -640,8 +676,8 @@ foreach($languages as $index => $language){
 </table>
 
 <?
-EndForm();
 
+EndForm();
 include_once("navbottom.inc.php");
 
 ?>

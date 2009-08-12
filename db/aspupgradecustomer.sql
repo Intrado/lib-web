@@ -43,3 +43,9 @@ $$$
 `contentid` BIGINT( 20 ) NOT NULL
 ) ENGINE = InnoDB CHARACTER SET utf8 COLLATE utf8_general_ci
 $$$
+
+-- set soft and hard delete month values for customer
+INSERT INTO `setting` (`name`, `value`) VALUES
+('softdeletemonths', '6'),
+('harddeletemonths', '24')
+$$$
