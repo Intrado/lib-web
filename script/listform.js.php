@@ -249,15 +249,14 @@ function listform_refresh_liststats(listID, ignoreCache) {
 			}
 			
 			var data = stats[listID];
-				var data = stats[listID];
-				var hiddenTD = $('listsTableBody').down('input[value='+listID+']').up('td');
-				var nameTD = hiddenTD.next('td');
-				var statisticsTD = nameTD.next('td',0);
-				nameTD.update(data.name.escapeHTML());
-				statisticsTD.update(format_thousands_separator(data.total));
-				
-				listformVars.totals[listID] = data.total;
-				listform_update_grand_total();
+			var data = stats[listID];
+			var nameTD = $('listsTableBody').down('input[value='+listID+']').up('td');
+			var statisticsTD = nameTD.next('td',0);
+			nameTD.update(data.name.escapeHTML());
+			statisticsTD.update('<b>' + format_thousands_separator(data.total) + '</b>');
+			
+			listformVars.totals[listID] = data.total;
+			listform_update_grand_total();
 		}.bindAsEventListener(this, listID),
 		null,
 		doCache
@@ -269,6 +268,15 @@ function listform_update_grand_total() {
 	for (var id in listformVars.totals)
 		sum += listformVars.totals[id];
 	$('listGrandTotal').update(format_thousands_separator(sum));
+	
+	var rows = $('listsTableBody').rows;
+	var rowCount = rows.length;
+	for (var i = 0; i < rowCount; i++) {
+		var tr = $(rows[i]);
+		tr.removeClassName('listAlt');
+		if (i % 2 != 0)
+			tr.addClassName('listAlt');
+	}
 }
 
 // Inserts specified lists into the Lists Table
@@ -290,18 +298,16 @@ function listform_load_lists(listidsJSON) {
 			for (var listid in stats) {
 				var data = stats[listid];
 				listformVars.totals[listid] = data.total;
-				listform_update_grand_total();
 			
-				var hiddenTD = new Element('td', {'style':'width:0px'
-				}).update(new Element('input',{'type':'hidden','value':listid}));
-    			var commonStyle = 'padding: 3px;';
-			    var nameTD = new Element('td', {'class':'border List NameTD', 'width':'10%','style':'overflow: hidden; white-space: nowrap;' + commonStyle});
-			    nameTD.insert(data.name.escapeHTML());
-			    var actionTD = new Element('td', {'width':'25%','class':'border List ActionTD', 'colspan':100, 'style':commonStyle + ' ; text-align:center'});
+    			var commonStyle = 'padding: 3px; overflow: hidden; ';
+			    var nameTD = new Element('td', {'class':'NameTD', 'style':'overflow: hidden; white-space: nowrap;' + commonStyle});
+			    nameTD.insert(data.name.escapeHTML()).insert(new Element('input',{'type':'hidden','value':listid}));
+			    var actionTD = new Element('td', {'class':'ActionTD', 'style':commonStyle + '; text-align:center'});
 			    actionTD.insert('<img src="img/icons/diagona/10/101.gif" title="<?=addslashes(_L('Click to remove this list'))?>" />');
-			    var statisticsTD = new Element('td', {'class':'border List', 'style':commonStyle}).update(format_thousands_separator(data.total));
+			    var statisticsTD = new Element('td', {'style':commonStyle}).update('<b>' + format_thousands_separator(data.total) + '</b>');
 
-				$('listsTableBody').insert(new Element('tr').insert(hiddenTD).insert(nameTD).insert(statisticsTD).insert(actionTD));
+				var tbody = $('listsTableBody');
+				tbody.insert(new Element('tr').insert(nameTD).insert(statisticsTD).insert(actionTD));
 
 				if (!data.advancedlist) {
 					listform_refresh_preview(listid);
@@ -313,9 +319,10 @@ function listform_load_lists(listidsJSON) {
 						new Tip (tr, listformPreviewCache[listid], {
 				        	style: "protogrey",
 				        	hideOthers:true,
-				        	hook:{target:"bottomLeft",tip:"topRight"},
+				        	hook:{target:"leftMiddle",tip:"rightMiddle"},
 				        	offset:{x:0,y:0},
-				        	stem:"topRight",
+							delay: 0.4,
+				        	stem:"rightMiddle",
 				        	title: '<?=_L("List Name:")?> ' + this.innerHTML
 			          	});
 						tr.prototip.show();
@@ -335,6 +342,7 @@ function listform_load_lists(listidsJSON) {
 				}
 			}
 
+			listform_update_grand_total();
 			listform_reset_list_selectbox();
 			ruleWidget.refresh_guide(true);
 		}
@@ -398,8 +406,8 @@ function listform_hover_existing_list(nullableEvent, listid, tr) {
 			$('listchooseTotalRule').update(format_thousands_separator(data.totalrule));
 
 		var targetElement = (!tr) ? this.up('li') : tr;
-		var hookPreference = (!tr) ? {target:"topMiddle",tip:"bottomLeft"} : {target:"bottomLeft",tip:"topRight"};
-		var stemPreference = (!tr) ? "bottomLeft" : "topRight";
+		var hookPreference = (!tr) ? {target:"topLeft",tip:"bottomLeft"} : {target:"leftMiddle",tip:"rightMiddle"};
+		var stemPreference = (!tr) ? "bottomLeft" : "rightMiddle";
 		
 		Tips.hideAll();
 		new Tip (targetElement, $('listchooseTotalsContainer').innerHTML, {
@@ -407,6 +415,7 @@ function listform_hover_existing_list(nullableEvent, listid, tr) {
 			hideOthers: true,
 			hook: hookPreference,
 			offset:{x:0,y:0},
+			delay: 0.4,
 			stem: stemPreference,
 			title: '<?=_L("List Name:")?> ' + data.name.escapeHTML()
 		});
@@ -475,7 +484,8 @@ function listform_reset_list_selectbox() {
 
 	if (datas.length > 0) {
 		multicheckbox = new Element('div', {'style': 'border: solid 1px gray; background: white; overflow:hidden;'});
-		var ul = new Element('ul', {'style': 'clear:both; margin:0; padding:0; list-style:none; overflow:auto; height:200px; padding-right:4px'});
+		var heightCSS = (datas.length > 8) ? 'height:200px;' : '';
+		var ul = new Element('ul', {'style': 'clear:both; margin:0; padding:0; list-style:none; overflow:auto; '+heightCSS+'; padding-right:4px'});
 		var max = datas.length;
 		for (var i = 0; i < max; ++i) {
 			var data = datas[i];

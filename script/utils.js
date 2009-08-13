@@ -385,7 +385,7 @@ function isAllSameDigit(number){
 function ajax_table_update(containerID, uri) {
 	if (!$(containerID))
 		return;
-	$(containerID).update('<img src="img/progressbar.gif"/>');
+	$(containerID+'_tableprogressbar').update('<img src="img/ajax-loader.gif"/>');
 	if (!uri)
 		return;
 	cachedAjaxGet(uri + '&containerID=' + containerID, function(transport) {

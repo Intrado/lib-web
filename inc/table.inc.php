@@ -284,7 +284,7 @@ function ajax_show_table ($containerID, $data, $titles, $formatters = array(), $
 				$fieldsort = $existingsort[$field];
 				
 			if (!$maxMultisort) {
-				$style .= ' cursor:pointer; border-bottom: solid 2px darkblue; ';
+				$style .= ' cursor:pointer;';
 				
 				$orderby = urlencode(json_encode(array($field)));
 				$onclick = "ajax_table_update('$containerID', '?ajax=orderby&orderby=$orderby&" . ($fieldsort == 'ascend' ? 'descend&' : '') . "');";
@@ -303,9 +303,9 @@ function ajax_show_table ($containerID, $data, $titles, $formatters = array(), $
 		$headerHtml .= escapehtml($displaytitle);
 		if (!empty($fieldsort)) {
 			if ($fieldsort == 'ascend')
-				$headerHtml .= '<img src="img/icons/arrow_down.gif"/>';
+				$headerHtml .= '&nbsp;&nbsp;&uarr;';
 			else if ($fieldsort == 'descend')
-				$headerHtml .= '<img src="img/icons/arrow_up.gif"/>';
+				$headerHtml .= '&nbsp;&nbsp;&darr;';
 		}
 		$headerHtml .= "</th>";
 	}
@@ -405,6 +405,11 @@ function ajax_show_table ($containerID, $data, $titles, $formatters = array(), $
 }
 
 function ajax_table_show_menu ($containerID, $total, $start, $perpage) {
+	if ($start >= $total)
+		$start = $total-$perpage;
+	if ($start < 0)
+		$start = 0;
+	
 	$numpages = ceil($total/$perpage);
 	$curpage = ceil($start/$perpage) + 1;
 
@@ -412,7 +417,7 @@ function ajax_table_show_menu ($containerID, $total, $start, $perpage) {
 	$displaystart = ($total) ? $start +1 : 0;
 	
 	$onchange = "ajax_table_update('$containerID', '?ajax=page&start='+this.value);";
-	$info = "Showing $displaystart - $displayend of $total records<span class='noprint'> on $numpages pages</span>. ";
+	$info = "<div style='float:right'>Showing $displaystart - $displayend of $total records<span class='noprint'> on $numpages pages</span>.&nbsp;&nbsp;</div>";
 	$selectbox = "<div style='float:right;padding:0;margin:0'><select class='noprint' onchange=\"$onchange\">";
 	for ($x = 0; $x < $numpages; $x++) {
 		$offset = $x * $perpage;
@@ -421,6 +426,6 @@ function ajax_table_show_menu ($containerID, $total, $start, $perpage) {
 		$selectbox .= "<option value='$offset' $selected>Page $page</option>";
 	}
 	$selectbox .= "</select></div>";
-	return "<div class='pagenav' style='padding-top:5px'>" .  $selectbox . $info . "</div>";
+	return "<div class='pagenav' style='padding-top:5px; padding-right:5px; text-align:right'>" .  $selectbox . $info . "<div id='{$containerID}_tableprogressbar' style='float:right; width:16px; height:16px; margin-right: 5px'>&nbsp</div>" . "</div>";
 }
 ?>

@@ -1,9 +1,6 @@
 <?php
 /****** TODO *********************************************************************************************
-+ Remove unused pendingList; 1) when clicking done 2) when removing all rules from active pending list)
-+ Do not allow adding a blank rule (multisearch)
-+ Refactor unnecessary functions, better named IDs
-+ Benchmark DOM manipulation speed/memory usage in various browsers, particularly for Multisearch persondatavalues.
++ Add functionality for 'add myself', bug #
 *********************************************************************************************************/
 class ListForm extends Form {
 	function ListForm ($name) {
@@ -31,7 +28,7 @@ class ListForm extends Form {
 					
 		// HTML
 		$str = "
-			<table id='listFormWorkspace' width='100%' style='clear:both'>
+			<table id='listFormWorkspace' width='100%' style='clear:both; margin-bottom:40px'>
 				<tr>
 					<td colspan=100>
 						<h2 style=\"padding-left: 5px; background: repeat-x url('img/header_bg.gif')\">"._L('List')."</h2>
@@ -41,15 +38,15 @@ class ListForm extends Form {
 					<!-- MAIN CONTENT AREA -->
 					
 					<td valign=top style='padding:0;margin:0; '>
-							<div style='clear:both'>
+							<div style='clear:both;'>
 								".icon_button(_L('Build List Using Rules'),'application_form_edit', null, null, ' id="buildListButton" style="display:none;margin;0 "')."<span style='clear:both'></span>
-								<div id='buildListWindow' style='clear:both; padding:0;margin:0;display:none;'>
+								<div id='buildListWindow' style='clear:both; padding:0;margin:0;margin-bottom:30px; display:none;'>
 									<div id='ruleWidgetContainer' style='clear:both; white-space:nowrap;'>
 									</div>
-									<div></div>
 								</div>
+								<div style='clear:both'></div>
 								<hr style='clear:both; border: solid 2px rgb(200,200,200); display:none' id='divider' />
-								<div style='clear:both'>
+								<div style='clear:both; margin-top:5px'>
 									".icon_button(_L('Choose an Existing List'),'application_view_list', null, null, ' id="chooseListChoiceButton" style="display:none" ')."<span style='clear:both'></span>
 									<div id='chooseListWindow' style='display:none; clear:both'>
 										<table style=''><tr>
@@ -57,7 +54,6 @@ class ListForm extends Form {
 												<div id='listSelectboxContainer'></div>
 											</td>
 											<td valign=top>
-												
 													<div id='listchooseStatus'></div>
 													<div id='listchooseTotalsContainer' style='display:none'>
 													<table>
@@ -71,24 +67,29 @@ class ListForm extends Form {
 										</tr></table>
 									</div>
 								</div>
+								<div style='clear:both'></div>
 							</div>
 					</td>
-					<td valign=top>
-						<div id='allListsWindow' style='width:170px; overflow:hidden' >
-							<table width='100%' style='table-layout:fixed; font-size:90%; border-collapse: collapse'>
+					<td valign=top width='50%'>
+						<div id='allListsWindow' style='overflow:hidden;' >
+							<table width='100%' cellspacing='1' cellpadding='3' class='list' style='table-layout:fixed; font-size:90%;'>
 								<thead>
-									<tr>
-										<th style='width:0px'></th>
-										<th style='width:90px; overflow: hidden; white-space: nowrap; text-align:left'>Lists</th>
-										<th style='width:50px'></th>
-										<th colspan=100 style='width:16px'></th>
+									<tr class='listHeader'>
+										<th width='70%' style='overflow: hidden; overflow: hidden; white-space: nowrap; text-align:left'>"._L('List Name')."</th>
+										<th width='20%' style='overflow: hidden; text-align:left'>Count</th>
+										<th width='16'></th>
 									</tr>
-									<tr><td colspan=100 id='listsTableStatus'></td></tr>
 								</thead>
 								<tbody id='listsTableBody'>
 								</tbody>
+								<tfoot>
+									<tr>
+										<td colspan=3>
+											<b>"._L('Total')." <span id='listGrandTotal'>0</span></b><span style='vertical-align:middle' id='listsTableStatus'></span>
+										</td>
+									</tr>
+								</tfoot>
 							</table>
-							<div class='border' style='padding:3px; text-align:left;white-space: nowrap; '><b>"._L('Total')."</b> <span id='listGrandTotal'>0</span></div>
 						</div>
 						<div id='listRulesPreview'></div>
 					</td>
