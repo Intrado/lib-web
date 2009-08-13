@@ -63,11 +63,20 @@ if(CheckFormSubmit($f,$s))
 	{
 		MergeSectionFormData($f, $s);
 
+		$lableerror = false;
+		for($i = 0; $i < $max; $i++){
+			if(ereg("[#@]+", GetFormData($f, $s, $type . $i . "other"))) {
+				$lableerror = true;
+			}
+		}
+		
 		//do check
 		if( CheckFormSection($f, $s) )
 		{
 			error('There was a problem trying to save your changes', 'Please verify that all required field information has been entered properly');
-		} else {
+		}else if($lableerror) {
+			error('There was a problem trying to save your changes', 'Please do not use # or @ symbols in label');
+		}else {
 			$warning = false;
 			QuickUpdate("begin");
 			QuickUpdate("delete from destlabel where type = '" . DBSafe($type) . "'");
@@ -111,11 +120,11 @@ if($reloadform){
 	for($i=0; $i<$max; $i++){
 		$label = fetch_labels($type, $i, true);
 		if(in_array($label, $presetlabels)){
-			PutFormData($f, $s, $type . $i, $label, "alphanumeric");
-			PutFormData($f, $s, $type . $i . "other", "", "alphanumeric");
+			PutFormData($f, $s, $type . $i, $label, "text");
+			PutFormData($f, $s, $type . $i . "other", "", "text");
 		} else {
-			PutFormData($f, $s, $type . $i, "other", "alphanumeric");
-			PutFormData($f, $s, $type . $i . "other", $label, "alphanumeric");
+			PutFormData($f, $s, $type . $i, "other", "text");
+			PutFormData($f, $s, $type . $i . "other", $label, "text");
 		}
 		$notes = QuickQuery("select notes from destlabel where type = '" . $type . "' and sequence = " . $i);
 		PutFormData($f, $s, $type . $i . "notes", $notes, "text", 0, 255);
