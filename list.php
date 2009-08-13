@@ -241,6 +241,8 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 							$le->ruleid = $rule->id;
 							$le->create();
 						QuickUpdate('COMMIT');
+
+						notice(_L('The rule for %s has been added.', FieldMap::getName($data->fieldnum)));
 						$form->sendTo('list.php');
 						break;
 						
@@ -248,21 +250,29 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 						$fieldnum = $postdata['ruledelete'];
 						if ($USER->authorizeField($fieldnum))
 							QuickUpdate("DELETE le.*, r.* FROM listentry le, rule r WHERE le.ruleid=r.id AND le.listid=? AND r.fieldnum=?", false, array($list->id, $fieldnum));
+						
+						notice(_L('The rule for %s has been removed.', FieldMap::getName($fieldnum)));
 						$form->sendTo('list.php');
 						break;
 						
 					case 'clearrules':
 						QuickUpdate("DELETE le.*, r.* FROM listentry le, rule r WHERE le.ruleid=r.id AND le.listid=?", false, array($list->id));
+						
+						notice(_L('All rules have been removed.'));
 						$form->sendTo('list.php');
 						break;
 						
 					case 'clearadditions':
 						QuickUpdate("DELETE le.* FROM listentry le WHERE le.type='A' AND le.listid=?", false, array($list->id));
+						
+						notice(_L('All additions have been removed.'));
 						$form->sendTo('list.php');
 						break;
 						
 					case 'clearskips':
 						QuickUpdate("DELETE le.* FROM listentry le WHERE le.type='N' AND le.listid=?", false, array($list->id));
+						
+						notice(_L('All skips have been removed.'));
 						$form->sendTo('list.php');
 						break;
 						

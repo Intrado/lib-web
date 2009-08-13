@@ -155,14 +155,6 @@ function fmt_actions_disabled_account ($account,$name) {
 	return action_links($links);
 }
 
-/*
-	Callback to format the access profile name for a user
-*/
-function fmt_profile_name ($account, $name) {
-	global $accessprofiles;
-	return escapehtml($accessprofiles[$account['accessid']]);
-}
-
 ////////////////////////////////////////////////////////////////////////////////
 // AJAX
 ////////////////////////////////////////////////////////////////////////////////
@@ -189,21 +181,23 @@ function show_user_table($containerID) {
 		"lastname" => "Last Name",
 		"login" => "Username",
 		"description" => "Description",
-		"AccessProfile" => "Profile",
+		"profilename" => "Profile",
 		"lastlogin" => "Last Login",
 		"Actions" => "Actions"
 	);
 	$formatters = array(
-		'AccessProfile' => 'fmt_profile_name',
 		"lastlogin" => "fmt_date"
 	);
 	$sorting = array(
 		"firstname" => "firstname",
 		"lastname" => "lastname",
+		"description" => "description",
 		"login" => "login",
-		"lastlogin" => "lastlogin"
+		"lastlogin" => "lastlogin",
+		"profilename" => "profilename"
 	);
 	
+	// ACCOUNT ENABLED/DISABLED, COMMSUITE/NOT COMMSUITE
 	if ($containerID == 'inactiveUsersContainer') {
 		$criteriaSQL = "not enabled and deleted=0";
 		$formatters["Actions"] = "fmt_actions_disabled_account";
@@ -217,50 +211,55 @@ function show_user_table($containerID) {
 		$formatters["Actions"] = "fmt_actions_enabled_account";
 	}
 	
+	// ORDER BY
 	$orderbySQL = ajax_table_get_orderby($containerID, $sorting);
 	if (empty($orderbySQL))
 		$orderbySQL = "lastname, firstname";
-	
-	$filterSQL = get_filter_sql($containerID);
+
+	// FILTER
+	if (!isset($_SESSION["{$containerID}_filter"]))
+		$_SESSION["{$containerID}_filter"] = '';
+	if (isset($_GET['ajax']) && $_GET['ajax'] == 'filter' && isset($_GET['filter']))
+		$_SESSION["{$containerID}_filter"] = $_GET['filter'];
+
+	$filterSQL = !empty($_SESSION["{$containerID}_filter"]) ? "and (concat(upper(firstname),upper(lastname),upper(login),upper(a.name)) like ?)" : '';
 	if (!empty($filterSQL)) {
-		$filterValue = $_SESSION["{$containerID}_filter"];
-		
-		// Append the same string 3 times, for [lastname, firstname, login].
-		for ($i = 0; $i < 3; $i++) {
-			$args[] = '%' . $_SESSION["{$containerID}_filter"] . '%';
-		}
+		$filterValue = escapehtml($_SESSION["{$containerID}_filter"]);
+		$args[] = '%' . strtoupper($_SESSION["{$containerID}_filter"]) . '%';
 	} else {
 		$filterValue = '';
 		$args = false;
 	}
-	
-	$numUsers = QuickQuery("select count(*) from user where $criteriaSQL $filterSQL", false, $args);
-	
+
+	// PAGING
 	$limitstart = isset($_SESSION['ajaxtablepagestart'][$containerID]) ? $_SESSION['ajaxtablepagestart'][$containerID] : 0;
-	if ($limitstart >= $numUsers)
-		$limitstart = $numUsers-$perpage;
-	if ($limitstart < 0)
-		$limitstart = 0;
-	$data = DBFindMany("User","from user where $criteriaSQL $filterSQL ORDER BY $orderbySQL LIMIT $limitstart,$perpage", false, $args);
-	foreach ($data as $i => $account) {
-		$data[$i] = (array)$account;
-	}
+	
+	// RUN QUERY
+	$data = QuickQueryMultiRow("select SQL_CALC_FOUND_ROWS u.*,a.name as profilename from user u left join access a on (u.accessid = a.id) where $criteriaSQL $filterSQL order by $orderbySQL limit $limitstart,$perpage", true, false, $args);
+	$numUsers = QuickQuery("select FOUND_ROWS()");
 	
 	$tooltip = addslashes(_L("Search by First Name, Last Name, Username, or Access Profile. Press ENTER to apply the search word."));
-	$html = "<div style='float:right; padding:5px; padding-bottom:0; margin-right:5px;'><input id='{$containerID}_search' size=20 value='$filterValue'></div>";
+	$html = "<div style='float:left; padding-top:5px'><input id='{$containerID}_search' size=20 value=''></div>";
 	$html .= ajax_table_show_menu($containerID, $numUsers, $limitstart, $perpage) . ajax_show_table($containerID, $data, $titles, $formatters, $sorting);
 	$html .= "
 		<script type='text/javascript'>
-			Event.observe('{$containerID}_search', 'keypress', function(event) {
+			var searchLabel = '".addslashes(_L('Search'))."';
+			var searchBox = $('{$containerID}_search');
+			searchBox.value = '".addslashes($filterValue)."'.unescapeHTML();
+			blankFieldValue('{$containerID}_search', searchLabel);
+			searchBox.focus();
+			searchBox.blur();
+			
+			Event.observe(searchBox, 'keypress', function(event) {
 				if (Event.KEY_RETURN == event.keyCode)
-					ajax_table_update('$containerID', '?ajax=filter&filter=' + event.element().value);
+					ajax_table_update('$containerID', '?ajax=filter&filter=' + encodeURIComponent(event.element().value));
 			});
 			
-			new Tip('{$containerID}_search', '$tooltip', {
+			new Tip(searchBox, '$tooltip', {
 					style: 'protogrey',
-					stem: 'bottomRight',
-					hook: { target: 'topLeft', tip: 'bottomRight' },
-					offset: { x: 10, y: 0 },
+					stem: 'bottomLeft',
+					hook: { target: 'topLeft', tip: 'bottomLeft' },
+					offset: { x: 0, y: 0 },
 					fixed: true,
 					hideOthers: true
 			});
@@ -269,35 +268,9 @@ function show_user_table($containerID) {
 	return $html;
 }
 
-function get_filter_sql($containerID) {
-	global $accessprofiles;
-	
-	if (!isset($_SESSION["{$containerID}_filter"]))
-		$_SESSION["{$containerID}_filter"] = '';
-	if (isset($_GET['ajax']) && $_GET['ajax'] == 'filter' && isset($_GET['filter']))
-		$_SESSION["{$containerID}_filter"] = $_GET['filter'];
-	
-	$filter = $_SESSION["{$containerID}_filter"];
-	
-	if (!empty($filter)) {
-		// PROFILE
-		$filteredProfiles = array();
-		foreach ($accessprofiles as $id => $name) {
-			if (strpos($name, $filter) !== false)
-				$filteredProfiles[] = $id;
-		}
-		$profileSQL = empty($filteredProfiles) ? "" : ('or accessid in (' . implode(',', $filteredProfiles) . ')');
-		
-		return "and (firstname like ? or lastname like ? or login like ? $profileSQL)";
-	} else {
-		return '';
-	}
-}
-
 ////////////////////////////////////////////////////////////////////////////////
 // Display
 ////////////////////////////////////////////////////////////////////////////////
-
 $PAGE = "admin:users";
 $TITLE = "User List";
 

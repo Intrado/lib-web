@@ -292,7 +292,7 @@ function getEmailRegExp() {
     # This code is licensed under a Creative Commons Attribution-ShareAlike 2.5 License
     # http://creativecommons.org/licenses/by-sa/2.5/
     #
-    # $Revision: 1.89 $
+    # $Revision: 1.90 $
     # http://www.iamcal.com/publish/articles/php/parsing_email/
     ##################################################################################
 
@@ -680,6 +680,13 @@ function SmartTruncate ($txt, $max) {
 		return substr($txt,0,$max-3) . "...";
 	else
 		return $txt;
+}
+
+function notice ($message) {
+	if (!isset($_SESSION['confirmnotice']) || !is_array($_SESSION['confirmnotice']))
+		$_SESSION['confirmnotice'] = array();
+		
+	$_SESSION['confirmnotice'][] = $message;
 }
 
 ?>

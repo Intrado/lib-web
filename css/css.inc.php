@@ -479,6 +479,23 @@ div.scrollTableContainer {
 	border: 5px double red;
 }
 
+.confirmnoticecontainer {
+	margin: 5px;
+	margin-left: 25%;
+	width: 50%;
+	border: 3px solid <?=$theme1?>;
+}
+
+.confirmnoticecontent {
+	text-align: center;
+	margin: 0px;
+	border: 2px solid <?=$theme2?>;
+	background: <?=$topbg?>;
+}
+
+.confirmnoticecontent hr {
+	border: solid 1px <?=$theme2?>;
+}
 
 .sortheader {
 	color: white;
