@@ -149,8 +149,8 @@ NewForm($f);
 	<tr><td>Max Size:</td><td><? NewFormItem($f, $s, "filesizemax", "text", 10, 20, "id='maxsizeinput' onblur='togglefilesizecheck(true)' onfocus='togglefilesizecheck(false,true)' onkeyup='togglefilesizecheck(true)'")?> (bytes)</td></tr>
 	<tr><td colspan=6><i>The number of days from the last upload is used to determine when data is stale; for recurring uploads within a week, set a time window instead.</i></td></tr>
 	<tr>
-		<td><? NewFormItem($f, $s, "scheduled","radio", null, 0, "id='dostaledata' onclick=\"hide('scheduleddays');show('staledatamindays')\"");?>Stale Data</td>
-		<td><? NewFormItem($f, $s, "scheduled","radio", null, 1, "id='doscheduleddays' onclick=\"hide('staledatamindays');show('scheduleddays')\"");?>Weekly Schedule</td>
+		<td><? NewFormItem($f, $s, "scheduled","radio", null, 0, "id='dostaledata' onclick=\"$('scheduleddays').hide();$('staledatamindays').show()\"");?>Stale Data</td>
+		<td><? NewFormItem($f, $s, "scheduled","radio", null, 1, "id='doscheduleddays' onclick=\"$('staledatamindays').hide();$('scheduleddays').show()\"");?>Weekly Schedule</td>
 	</tr>
 </table>
 <table>
@@ -228,9 +228,9 @@ include_once("navbottom.inc.php");
 ?>
 <script>
 if(new getObj('dostaledata').obj.checked){
-	hide('scheduleddays');
+	$('scheduleddays').hide();
 } else {
-	hide('staledatamindays');
+	$('staledatamindays').hide();
 }
 
 <?php
@@ -292,19 +292,5 @@ function calculateminmax() {
 	maxinput.value = parseInt(<?=$import['filesize']?> * (1.0 + parseFloat(percent.value/100.0)));
 
 	togglefilesizecheck(true, true);
-}
-
-function show(name)
-{
-	var x = new getObj(name);
-	if (x.style)
-		x.style.display = "block";
-}
-
-function hide(name)
-{
-	var x = new getObj(name);
-	if (x.style)
-		x.style.display =  "none";
 }
 </script>
