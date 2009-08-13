@@ -222,7 +222,8 @@ foreach ($fieldmaps as $fieldmap) {
 				
 				} else {
 					$values = QuickQueryList("select value, value from persondatavalues where fieldnum=? and editlock=1", true, false, array($fieldnum));
-					if (count($values) > 0) {
+					// if 1 static value, set by fielddef or on account create, nothing to select here
+					if (count($values) > 1) {
 						$v = $person->$fieldnum;
 						if (count($values) == 1) {
 							$a = array_values($values);

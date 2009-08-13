@@ -43,7 +43,9 @@ if (isset($_GET['delete'])) {
 	$fieldmap->update();
 
 	// clear static subscriber values
-	QuickUpdate("delete from persondatavalues where fieldnum=? and editlock=1", false, array($fieldmap->fieldnum));
+	QuickUpdate("delete from persondatavalues where fieldnum=? and editlock=1 and refcount=0", false, array($fieldmap->fieldnum));
+	// clear static subscriber values, reset editlock
+	QuickUpdate("update persondatavalues set editlock=0 where fieldnum=?", false, array($fieldmap->fieldnum));
 	
 	QuickUpdate("commit");
 	redirect();

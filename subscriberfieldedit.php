@@ -26,6 +26,12 @@ if (!$USER->authorize('metadata') || !getSystemSetting("_hasselfsignup", false))
 	redirect('unauthorized.php');
 }
 
+// FUNCTIONS
+
+function trimStaticValue($value) {
+	return substr(trim($value), 0, 255);
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 // Data Handling
 ////////////////////////////////////////////////////////////////////////////////
@@ -97,24 +103,44 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
     } else if (($errors = $form->validate()) === false) { //checks all of the items in this form
         $postdata = $form->getData(); //gets assoc array of all values {name:value,...}
 
-			// if static text field
-			if ($fieldmap->isOptionEnabled('text')) {
-				$value = trim($postdata['values']);
-				QuickUpdate("update person set ".$fieldmap->fieldnum."=? where importid is null and type='system'", false, array($value));
-			}
+		// if static text field
+		if ($fieldmap->isOptionEnabled('text')) {
+			$value = trimStaticValue($postdata['values']);
+			QuickUpdate("update person set ".$fieldmap->fieldnum."=? where importid is null and type='system'", false, array($value));
+		}
+		$datavalues = explode("\n", $postdata['values']);
+		// if static list field, with single value
+		if ($fieldmap->isOptionEnabled('multisearch') && count($datavalues) == 1) {
+			$value = trimStaticValue($datavalues[0]);
+			QuickUpdate("update person set ".$fieldmap->fieldnum."=? where importid is null and type='system'", false, array($value));
+		}
 
-		QuickUpdate("delete from persondatavalues where fieldnum=? and editlock=1", false, array($fieldmap->fieldnum));
+		// NOTE subscriber static values and import person data values may share fields
+		// example, static values grade 8, 9, 10.  import values grade 10, 11, 12.  careful not to duplicate grade 10.
+		
+		// clear any non-imported, static values (will be recreated in next step)
+		QuickUpdate("delete from persondatavalues where fieldnum=? and refcount=0 and editlock=1", false, array($fieldmap->fieldnum));
+		
+		// clear any previous static values, will be recreated in next step
+		QuickUpdate("update persondatavalues set editlock=0 where fieldnum=?", false, array($fieldmap->fieldnum));
+		
+		// find remaining values
+		$importfieldvalues = QuickQueryList("select value from persondatavalues where fieldnum=?", false, false, array($fieldmap->fieldnum));
 
+		// create new static values (careful to update any duplicates from import data)
 		$insertstmt = "insert into persondatavalues (fieldnum, value, refcount, editlock) values ";
 		$insertvalues = array();
 	
-		$datavalues = explode("\n", $postdata['values']);
 		foreach ($datavalues as $value) {
-			$value = trim($value);
+			$value = trimStaticValue($value);
 			if (strlen($value) == 0) continue; // skip blank lines
-			$insertstmt .= "(?, ?, 0, 1),";
-			$insertvalues[] = $fieldmap->fieldnum;
-			$insertvalues[] = $value;
+			if (in_array($value, $importfieldvalues)) {
+				QuickUpdate("update persondatavalues set editlock=1 where fieldnum=? and value=?", false, array($fieldmap->fieldnum, $value));
+			} else {
+				$insertstmt .= "(?, ?, 0, 1),";
+				$insertvalues[] = $fieldmap->fieldnum;
+				$insertvalues[] = $value;
+			}
 		}
 		if (count($insertvalues)) {
 			$insertstmt = substr($insertstmt, 0, strlen($insertstmt)-1); // strip trailing comma
