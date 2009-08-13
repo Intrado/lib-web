@@ -84,8 +84,11 @@ class ListForm extends Form {
 								</tbody>
 								<tfoot>
 									<tr>
-										<td colspan=3>
-											<b>"._L('Total')." <span id='listGrandTotal'>0</span></b><span style='vertical-align:middle' id='listsTableStatus'></span>
+										<td class='border'>
+											<b>"._L('Total')."</b>
+										</td>
+										<td class='border' colspan=2>
+											<b><span id='listGrandTotal'>0</span></b><span style='vertical-align:middle' id='listsTableStatus'></span>
 										</td>
 									</tr>
 								</tfoot>
