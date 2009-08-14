@@ -186,7 +186,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 			exit("nope!"); //TODO
 		}
 		$errors = array();	
-		$parts = $message->parse($postdata["messagebody"],$errors);
+		$parts = $message->parse($postdata["messagebody"],$errors,$voiceid);
 
 		$message->name = trim($postdata["messagename"]);
 		$message->description = trim($postdata["description"]);
@@ -198,7 +198,8 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		//update the parts
 		QuickUpdate("delete from messagepart where messageid=$message->id");
 		foreach ($parts as $part) {
-			$part->voiceid = $voiceid;
+			if(!isset($part->voiceid))
+				$part->voiceid = $voiceid;
 			$part->messageid = $message->id;
 			$part->create();
 		}
