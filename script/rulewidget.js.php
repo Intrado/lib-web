@@ -105,6 +105,7 @@ var RuleWidget = Class.create({
 		
 		if (showRemoveAllButton) {
 			var td = new Element('td', {'colspan':100}).update(action_link('<?=addslashes(_L('Remove All Rules'))?>', 'diagona/16/101', '').observe('click', function(event) {
+				event.stop();
 				this.container.fire('RuleWidget:RemoveAllRules');
 			}.bindAsEventListener(this)).setStyle({'margin':'0'}));
 			td.down('img').remove(); // No icon necessary
