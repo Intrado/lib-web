@@ -446,6 +446,8 @@ function listform_remove_list(event, listid, doconfirm) {
 	var hiddenInput = $('listsTableBody').down('input[value='+listid+']');
 	if (hiddenInput) {
 		var tr = hiddenInput.up('tr');
+		if (tr.prototip)
+			tr.prototip.remove();
 		tr.remove();
 	}
 	var checkbox = $('listSelectboxContainer').down('input[value='+listid+']');
