@@ -110,7 +110,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		}
 		$datavalues = explode("\n", $postdata['values']);
 		// if static list field, with single value
-		if ($fieldmap->isOptionEnabled('multisearch') && count($datavalues) == 1) {
+		if ($fieldmap->isOptionEnabled('multisearch') && count($datavalues) == 1 && strpos($fieldmap->fieldnum, 'f') == 1) {
 			$value = trimStaticValue($datavalues[0]);
 			QuickUpdate("update person set ".$fieldmap->fieldnum."=? where importid is null and type='system'", false, array($value));
 		}
