@@ -1516,7 +1516,7 @@ class JobWiz_scheduleAdvanced extends WizStep {
 		$wizHasEmailMsg= wizHasEmail($postdata);
 		$helpstepnum = 1;
 		
-		$helpsteps = array(_L("Specify the number of days for which you would like your job to run before it stops."));
+		$helpsteps = array();
 		$maxjobdays = $USER->getSetting("maxjobdays", $ACCESS->getValue('maxjobdays'));
 		$maxdays = $ACCESS->getValue('maxjobdays', 7);
 		
@@ -1536,6 +1536,7 @@ class JobWiz_scheduleAdvanced extends WizStep {
 					"helpstep" => $helpstepnum++
 				);
 			}
+			$helpsteps[] = _L("Specify the number of days for which you would like your job to run before it stops.");
 			$formdata["maxjobdays"] = array(
 				"label" => _L("Days to Run"),
 				"fieldhelp" => ("Use this menu to set the default number of days your jobs should run."),
