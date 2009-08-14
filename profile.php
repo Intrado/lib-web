@@ -145,7 +145,7 @@ $blockednumberoptions = array (
 	"none" => _L("No Access"),
 	"viewonly" => _L("View Numbers Only"),
 	"addonly" => _L("Add/Delete Own Numbers"),
-	"editall" => _L("Add/Delete All Numbners")
+	"editall" => _L("Add/Delete All Numbers")
 );
 
 $formdata = array(
