@@ -547,17 +547,17 @@ class FinishJobWizard extends WizFinish {
 				$job->setSetting($option, $value);
 		}
 		
-		// set jobsetting 'callerid' blank for jobprocessor to lookup the current default at job start
-		if ($USER->authorize('setcallerid') && !getSystemSetting('_hascallback', false)) {
-			$callerid = '';
-			if (isset($postdata["/schedule/advanced"]['callerid'])) {
-				$callerid = Phone::parse($postdata["/schedule/advanced"]['callerid']);
-			}
+		// set jobsetting 'callerid'
+		if (getSystemSetting('_hascallback', false)) {
 			// blank callerid is fine, save this setting and default will be looked up by job processor when job starts
-			$job->setOptionValue("callerid",$callerid);
+			$callerid = '';
 		} else {
-			$job->setOptionValue("callerid", getDefaultCallerID());
+			if ($USER->authorize('setcallerid') && (isset($postdata["/schedule/advanced"]['callerid'])))
+				$callerid = Phone::parse($postdata["/schedule/advanced"]['callerid']);
+			else
+				$callerid = getDefaultCallerID();
 		}
+		$job->setSetting('callerid', $callerid);
 		
 		$job->update();
 		if ($schedule['date'])
