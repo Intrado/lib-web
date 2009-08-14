@@ -104,12 +104,10 @@ var RuleWidget = Class.create({
 			);
 		
 		if (showRemoveAllButton) {
-			var removeAllButtonHtml = '<div style="float:right">' + '<?=addslashes(icon_button(_L('Remove All Rules'),'diagona/16/101'))?>' + '</div><span style="clear:both"></span>';
-			var td = new Element('td', {'colspan':100}).update(removeAllButtonHtml);
-			var button = td.down('button');
-			button.observe('click', function(event) {
+			var td = new Element('td', {'colspan':100}).update(action_link('<?=addslashes(_L('Remove All Rules'))?>', 'diagona/16/101', '').observe('click', function(event) {
 				this.container.fire('RuleWidget:RemoveAllRules');
-			}.bindAsEventListener(this));
+			}.bindAsEventListener(this)).setStyle({'margin':'0'}));
+			td.down('img').remove(); // No icon necessary
 			this.rulesTableHead.insert(new Element('tr').insert(td));
 		}
 		

@@ -156,13 +156,13 @@ $formdata["newrule"] = array(
 
 $formdata["additions"] = array(
 	"label" => _L('Additions'),
-	"control" => array("FormHtml", 'html' => '<div id="removeAllAdditions" style="float:right; margin-left:10px;">' . submit_button(_L('Remove All Additions'),'clearadditions','diagona/16/101') .  "</div><div id='listAdditionsContainer' style='margin:0; margin-bottom:10px; padding:0'></div>"),
+	"control" => array("FormHtml", 'html' => '<div id="removeAllAdditions" style="float:left; margin:0;margin-top:3px;"></div><div id="listAdditionsContainer" style="margin:0; margin-bottom:10px; padding:0"></div>'),
 	"helpstep" => 2
 );
 
 $formdata["skips"] = array(
 	"label" => _L('Skips'),
-	"control" => array("FormHtml", 'html' => '<div id="removeAllSkips" style="float:right; margin-left:10px;">' . submit_button(_L('Remove All Skips'),'clearskips','diagona/16/101') . "</div><div id='listSkipsContainer' style='margin:0;padding:0'></div>"),
+	"control" => array("FormHtml", 'html' => '<div id="removeAllSkips" style="float:left; margin:0;margin-top:3px;"></div><div id="listSkipsContainer" style="margin:0;padding:0"></div>'),
 	"helpstep" => 2
 );
 
@@ -365,6 +365,15 @@ endWindow();
 		<?php } ?>
 		
 		$('listTotal').update(<?=$total?>);
+		
+		$('removeAllAdditions').insert(action_link('<?=addslashes(_L("Remove All Additions"))?>', 'diagona/16/101', 'removeAllAdditionsLink').observe('click', function(event) {
+			form_submit(event, 'clearadditions');
+		}).setStyle({'margin':'0'}));
+		$('removeAllAdditions').down('img').remove(); // no icon necessary
+		$('removeAllSkips').insert(action_link('<?=addslashes(_L("Remove All Skips"))?>', 'diagona/16/101', 'removeAllSkipsLink').observe('click', function(event) {
+			form_submit(event, 'clearskips');
+		}).setStyle({'margin':'0'}));
+		$('removeAllSkips').down('img').remove(); // no icon necessary
 	});
 
 	function list_add_rule(event) {
