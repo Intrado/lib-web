@@ -70,9 +70,7 @@ if ($id) {
 			if ($fieldmap->isOptionEnabled("multisearch")) {
 				$limit = DBFind('Rule', 'from rule inner join userrule on rule.id = userrule.ruleid where userid=? and fieldnum=?', false, array($USER->id, $fieldmap->fieldnum));
 				$limitsql = $limit ? $limit->toSQL(false, 'value', false, true) : '';
-				$fielddatavalues = QuickQueryList("select value from persondatavalues where fieldnum=? $limitsql order by value", false, false, array($fieldmap->fieldnum));
-				foreach ($fielddatavalues as $value)
-					$fielddata[$fieldmap->fieldnum][$value] = $value;
+				$fielddata[$fieldmap->fieldnum] = QuickQueryList("select value,value from persondatavalues where fieldnum=? $limitsql order by value", true, false, array($fieldmap->fieldnum));
 			}
 		}
 		// Get message parts so we can find the default values, if specified in the message
