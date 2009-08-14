@@ -70,7 +70,9 @@ if ($id) {
 			if ($fieldmap->isOptionEnabled("multisearch")) {
 				$limit = DBFind('Rule', 'from rule inner join userrule on rule.id = userrule.ruleid where userid=? and fieldnum=?', false, array($USER->id, $fieldmap->fieldnum));
 				$limitsql = $limit ? $limit->toSQL(false, 'value', false, true) : '';
-				$fielddata[$fieldmap->fieldnum] = QuickQueryList("select value from persondatavalues where fieldnum=? $limitsql order by value", false, false, array($fieldmap->fieldnum));
+				$fielddatavalues = QuickQueryList("select value from persondatavalues where fieldnum=? $limitsql order by value", false, false, array($fieldmap->fieldnum));
+				foreach ($fielddatavalues as $value)
+					$fielddata[$fieldmap->fieldnum][$value] = $value;
 			}
 		}
 		// Get message parts so we can find the default values, if specified in the message
@@ -126,7 +128,7 @@ if ($id && isset($fields) && count($fields) && $msgType == 'phone') {
 		} else if ($fieldmap->isOptionEnabled("reldate")) {
 			$formdata[$field] = array (
 				"label" => $fieldmap->name,
-				"value" => $fielddefaults[$field],
+				"value" => ($fielddefaults[$field])?$fielddefaults[$field]:date('m/d/Y'),
 				"validators" => array(),
 				"control" => array("TextDate", "size"=>12),
 				"helpstep" => 1
