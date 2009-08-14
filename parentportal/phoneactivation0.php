@@ -51,7 +51,7 @@ if( $reloadform )
 {
 	ClearFormData($f);
 
-	PutFormData($f, $s, "radioselect", "bycode");
+	PutFormData($f, $s, "radioselect", "byphone");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -72,12 +72,13 @@ startWindow(_L('Activation Method'));
 
 	<tr>
 		<td>
-			<? NewFormItem($f, $s, "radioselect", "radio", null, "bycode"); ?> <?=_L("I have an Activation Code to enter now.")?>
+			<? NewFormItem($f, $s, "radioselect", "radio", null, "byphone"); ?> <?=_L("I do not have an Activation Code and want to activate by phone.")?>
 		</td>
 	</tr>
+
 	<tr>
 		<td>
-			<? NewFormItem($f, $s, "radioselect", "radio", null, "byphone"); ?> <?=_L("I do not have an Activation Code and want to activate by phone.")?>
+			<? NewFormItem($f, $s, "radioselect", "radio", null, "bycode"); ?> <?=_L("I have an Activation Code to enter now.")?> <?=_L("(This code is provided by your school for each child; not required to activate by phone.)")?>
 		</td>
 	</tr>
 </table>
