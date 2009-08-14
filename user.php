@@ -26,14 +26,14 @@ if (!$USER->authorize('manageaccount')) {
 if (isset($_GET['id']))
 	$id = $_GET['id'] + 0;
 else
-	$id = "new";
+	$id = null;
 
 /*CSDELETEMARKER_START*/
 if (!$IS_COMMSUITE && $id !== "new")
 	if (QuickQuery("select count(*) from user where login = 'schoolmessenger' and id =?", false, array($id)))
 		redirect('unauthorized.php');
 
-if ($id === "new") {
+if (!$id) {
 	$usercount = QuickQuery("select count(*) from user where enabled = 1 and login != 'schoolmessenger'");
 	$maxusers = getSystemSetting("_maxusers", "unlimited");
 	if (($maxusers !== "unlimited") && $maxusers <= $usercount)
@@ -593,7 +593,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 // Display
 ////////////////////////////////////////////////////////////////////////////////
 $PAGE = "admin:users";
-$TITLE = _L('User Editor: ') . ($id == "new" ? _L("New User") : escapehtml($edituser->firstname) . ' ' . escapehtml($edituser->lastname));
+$TITLE = _L('User Editor: ') . (!$id ? _L("New User") : escapehtml($edituser->firstname) . ' ' . escapehtml($edituser->lastname));
 
 include_once("nav.inc.php");
 
