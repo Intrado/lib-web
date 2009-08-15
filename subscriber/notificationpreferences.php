@@ -53,10 +53,10 @@ $subscribeFields = FieldMap::getSubscribeMapNames();
 $subscribeFieldValues = array();
 foreach ($subscribeFields as $fieldnum => $name) {
 	if ('f' == substr($fieldnum, 0, 1)) {
-		$subscribeFieldValues[$fieldnum] = QuickQueryList("select value, value from persondatavalues where fieldnum=? and editlock=1", true, false, array($fieldnum));
+		$subscribeFieldValues[$fieldnum] = QuickQueryList("select value, value from persondatavalues where fieldnum=? and editlock=1 order by value", true, false, array($fieldnum));
 	} else {
 		$gfield = substr($fieldnum, 1, 3);
-		$subscribeFieldValues[$fieldnum] = QuickQueryList("select value, value from groupdata where fieldnum=? and personid=0 and importid=0", true, false, array($gfield));
+		$subscribeFieldValues[$fieldnum] = QuickQueryList("select value, value from groupdata where fieldnum=? and personid=0 and importid=0 order by value", true, false, array($gfield));
 	}
 }
 
@@ -221,7 +221,7 @@ foreach ($fieldmaps as $fieldmap) {
 					);
 				
 				} else {
-					$values = QuickQueryList("select value, value from persondatavalues where fieldnum=? and editlock=1", true, false, array($fieldnum));
+					$values = QuickQueryList("select value, value from persondatavalues where fieldnum=? and editlock=1 order by value", true, false, array($fieldnum));
 					// if 1 static value, set by fielddef or on account create, nothing to select here
 					if (count($values) > 1) {
 						$v = $person->$fieldnum;
@@ -265,7 +265,7 @@ foreach ($fieldmaps as $fieldmap) {
 			} else {
 				// dynamic multi, subscriber must select one (data from imports)
 			
-				$values = QuickQueryList("select value, value from persondatavalues where fieldnum=? and editlock=0", true, false, array($fieldnum));
+				$values = QuickQueryList("select value, value from persondatavalues where fieldnum=? and editlock=0 order by value", true, false, array($fieldnum));
 				if (count($values) > 0)
 					$formdata[$fieldnum] = array (
     	    			"label" => $fieldmap->name,
@@ -283,14 +283,14 @@ foreach ($fieldmaps as $fieldmap) {
 		if ($fieldmap->isOptionEnabled("static")) {
 				// static multi, subscriber must select one
 				
-				$values = QuickQueryList("select value, value from persondatavalues where fieldnum=? and editlock=1", true, false, array($fieldnum));
+				$values = QuickQueryList("select value, value from persondatavalues where fieldnum=? and editlock=1 order by value", true, false, array($fieldnum));
 		} else {
 				// dynamic multi, subscriber must select one (data from imports)
 			
-				$values = QuickQueryList("select value, value from persondatavalues where fieldnum=? and editlock=0", true, false, array($fieldnum));
+				$values = QuickQueryList("select value, value from persondatavalues where fieldnum=? and editlock=0 order by value", true, false, array($fieldnum));
 		}
 		$gfield = substr($fieldnum, 1, 3);
-		$arr = QuickQueryList("select value, value from groupdata where personid=? and fieldnum=?", false, false, array($person->id, $gfield));
+		$arr = QuickQueryList("select value, value from groupdata where personid=? and fieldnum=? order by value", false, false, array($person->id, $gfield));
 				if (count($values) > 0)
 					$formdata[$fieldnum] = array (
     	    			"label" => _L($fieldmap->name),
@@ -422,7 +422,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		// add all static text fields to this person
 		$staticList = QuickQueryList("select fieldnum from fieldmap where options like '%text%' and options like '%subscribe%' and options like '%static%'"); 
 		foreach ($staticList as $fieldnum) {
-			$value = QuickQuery("select value from persondatavalues where fieldnum=? and editlock=1", false, array($fieldnum));
+			$value = QuickQuery("select value from persondatavalues where fieldnum=? and editlock=1 order by value", false, array($fieldnum));
 			if ($value) {
 				$person->$fieldnum = $value;
 			}
