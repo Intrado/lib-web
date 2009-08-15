@@ -442,9 +442,9 @@ if( $reloadform ) {
 	PutFormData($f,"Save","Add", "");
 
 	//Color Scheme stuff
-	PutFormData($f, $s, "theme", getCustomerSystemSetting('_brandtheme', "3dblue", true, $custdb), "text", "nomin", "nomax", true);
-	PutFormData($f, $s, "_brandratio", getCustomerSystemSetting('_brandratio', ".3", true, $custdb), "text", true);
-	PutFormData($f, $s, "_brandprimary", getCustomerSystemSetting('_brandprimary', "26477D", true, $custdb), "text", true);
+	PutFormData($f, $s, "theme", getCustomerSystemSetting('_brandtheme', "Classroom", true, $custdb), "text", "nomin", "nomax", true);
+	PutFormData($f, $s, "_brandratio", getCustomerSystemSetting('_brandratio', ".2", true, $custdb), "text", true);
+	PutFormData($f, $s, "_brandprimary", getCustomerSystemSetting('_brandprimary', "3e693f", true, $custdb), "text", true);
 	PutFormData($f, $s, "_logoclickurl", getCustomerSystemSetting('_logoclickurl', "http://", true, $custdb), "text");
 
 	PutFormData($f, $s, "_supportemail", getCustomerSystemSetting('_supportemail', "", true, $custdb), "email", "nomin", "nomax", true);
