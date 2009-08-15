@@ -1486,7 +1486,7 @@ ALTER TABLE `audiofile` ADD `permanent` TINYINT( 4 ) NOT NULL DEFAULT '0' AFTER 
 $$$
 
 -- create table for archived report name to content id mappings
- CREATE TABLE `c_1`.`reportarchive` (
+ CREATE TABLE `reportarchive` (
 `name` VARCHAR( 50 ) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL ,
 `contentid` BIGINT( 20 ) NOT NULL
 ) ENGINE = InnoDB CHARACTER SET utf8 COLLATE utf8_general_ci

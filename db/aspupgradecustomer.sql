@@ -38,7 +38,7 @@ ALTER TABLE `messagepart` DROP INDEX `audiofileid`
 $$$
  
 -- create table for archived report name to content id mappings
- CREATE TABLE `c_1`.`reportarchive` (
+ CREATE TABLE `reportarchive` (
 `name` VARCHAR( 50 ) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL ,
 `contentid` BIGINT( 20 ) NOT NULL
 ) ENGINE = InnoDB CHARACTER SET utf8 COLLATE utf8_general_ci
@@ -48,4 +48,8 @@ $$$
 INSERT INTO `setting` (`name`, `value`) VALUES
 ('softdeletemonths', '6'),
 ('harddeletemonths', '24')
+$$$
+
+-- set modify date on all objects that have a null value. We need this so they can eventually be cleaned up.
+update message set modifydate = '2009-07-31 12:00:00' where modifydate is null and not deleted
 $$$
