@@ -26,6 +26,8 @@ if (!$USER->authorize('managesystem')) {
 ////////////////////////////////////////////////////////////////////////////////
 class IntroSelect extends FormItem {
 	function render ($value) {
+		static $renderscript = true;
+		
 		$n = $this->form->name."_".$this->name;
 		
 		$size = isset($this->args['size']) ? 'size="'.$this->args['size'].'"' : "";
@@ -41,7 +43,7 @@ class IntroSelect extends FormItem {
 			if($key == "user")
 				$str .= '<select  id="' . $n . $key .'" '.$size .' onchange="loaduser(\'' . $n .'user\',\'' . $n . 'message\');updatevalue(\''.$n.'\');">';
 			else if($key == "message")
-				$str .= '<select  id="' . $n . $key .'" '.$size .' onchange="updatevalue(\''.$n.'\');form_do_validation($(\'' . $this->form->name . '\'),$(\'' . $n . '\'));">';
+				$str .= '<select  id="' . $n . $key .'" '.$size .' onchange="updatemessage(\''.$n.'\');">';
 			else
 				$str .= '<select  id="' . $n . $key .'"  '.$size .' onchange="updatevalue(\''.$n.'\');">';
 			foreach ($selectbox as $selectvalue => $selectname) {
@@ -52,13 +54,29 @@ class IntroSelect extends FormItem {
 			$count++;
 		}	
 		$str .= '<td>';
-		$str .= icon_button(_L("Play"),"fugue/control","
+		$str .= '<div id="' . $n . 'play" style="' . ((isset($value["message"]) && $value["message"] != "")?"display:block;":"display:none;") . ' ">' 
+				. icon_button(_L("Play"),"fugue/control","
 				var content = $('" . $n . "message').getValue();
-					if(content.message != '')
-						popup('previewmessage.php?id=' + content, 400, 400);");
+					if(content != '')
+						popup('previewmessage.php?id=' + content, 400, 400);") . '</div>';
 		$str .= '</td></tr></table>';
 		$str .= '</div>';
-
+		
+		if($renderscript) {
+			$str .= '<script>
+					function updatemessage(item) {
+						updatevalue(item);form_do_validation($("' . $this->form->name . '"),$(item));
+						var sel = $(item + "message");							
+						if (sel.options[sel.selectedIndex].value > 0) { 
+							$(item + "play").show();
+						} else {
+							$(item + "play").hide();
+						}
+					}	
+			</script>';
+		}
+		
+		
 		return $str;
 	}
 }
@@ -99,7 +117,7 @@ $messages = DBFindMany("Message","from message where userid=" . $USER->id ." and
 
 $languages = QuickQueryList("select name from language where name != 'English'");
 
-$messageselect = array("" => "Select a Message");
+$messageselect = array("" => "System Default Intro");
 foreach($messages as $message)
 	$messageselect[$message->id] = $message->name;
 
@@ -130,6 +148,7 @@ if($defaultintro) {
 	$defaultmessages["message"][$defaultintro->id] = $defaultintro->name;
 }
 $emergencymessages = $messagevalues;
+$emergencymessages["message"][""] = "System Emergency Intro";
 if($emergencyintro) {
 	$emergencymessages["message"][$emergencyintro->id] = $emergencyintro->name;
 }
@@ -184,6 +203,7 @@ foreach($languages as $language) {
 	);
 	$emergencyintro = DBFind("Message","from message m, prompt p where p.type='emergencyintro' and language=? and p.messageid = m.id and m.type='phone'","m",array($language));
 	$emergencymessages = $messagevalues;
+	$emergencymessages["message"][""] = "System Emergency Intro";
 	$messageid = "";
 	if($emergencyintro) {
 		$emergencymessages["message"][$emergencyintro->id] = $emergencyintro->name;
