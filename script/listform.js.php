@@ -250,7 +250,7 @@ function listform_refresh_liststats(listID, ignoreCache) {
 			
 			var data = stats[listID];
 			var data = stats[listID];
-			var nameTD = $('listsTableBody').down('input[value='+listID+']').up('td');
+			var nameTD = $('listsTableBody').down('input[value='+listID+']').up('tr').down('td');
 			var statisticsTD = nameTD.next('td',0);
 			nameTD.update(data.name.escapeHTML());
 			statisticsTD.update('<b>' + format_thousands_separator(data.total) + '</b>');
@@ -301,10 +301,11 @@ function listform_load_lists(listidsJSON) {
 			
     			var commonStyle = 'padding: 3px; overflow: hidden; ';
 			    var nameTD = new Element('td', {'class':'NameTD', 'style':'overflow: hidden; white-space: nowrap;' + commonStyle});
-			    nameTD.insert(data.name.escapeHTML()).insert(new Element('input',{'type':'hidden','value':listid}));
+			    nameTD.insert(data.name.escapeHTML());
 			    var actionTD = new Element('td', {'class':'ActionTD', 'style':commonStyle + '; text-align:center'});
 			    actionTD.insert('<img src="img/icons/diagona/10/101.gif" title="<?=addslashes(_L('Click to remove this list'))?>" />');
-			    var statisticsTD = new Element('td', {'style':commonStyle}).update('<b>' + format_thousands_separator(data.total) + '</b>');
+			    actionTD.insert(new Element('input',{'type':'hidden','value':listid}));
+				var statisticsTD = new Element('td', {'style':commonStyle}).update('<b>' + format_thousands_separator(data.total) + '</b>');
 
 				var tbody = $('listsTableBody');
 				tbody.insert(new Element('tr').insert(nameTD).insert(statisticsTD).insert(actionTD));

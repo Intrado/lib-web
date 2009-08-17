@@ -10,8 +10,6 @@ class ListForm extends Form {
 			//'control' => array("HiddenField"),
 			'validators' => array( array("ValRequired"), array("ValLists") )
 		);
-
-		$this->ruleEditorGuideContents = 
 		
 		parent::Form($name, $formdata, null);
 	}
