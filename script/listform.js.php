@@ -70,8 +70,10 @@ function listform_load(listformID, formData, postURL) {
 		listform_set_rule_editor_status(false);
 		
 		$('listsTableStatus').update('<img src="img/ajax-loader.gif"/>');
+		var uri = new Hash();
+		uri.set('ruledata', event.memo.ruledata.toJSON());
 		new Ajax.Request('ajaxlistform.php?type=addrule&listid=' + listformVars.pendingList, {
-			postBody: 'ruledata='+event.memo.ruledata.toJSON(),
+			postBody: uri.toQueryString(),
 			onSuccess: function(transport) {
 				$('listsTableStatus').update();
 				var ruleid = transport.responseJSON;
