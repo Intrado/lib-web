@@ -1480,7 +1480,7 @@ $$$
 
 -- 7-0-x
 -- Set a permanent flag for messages/audiofiles that should never be deleted
-ALTER TABLE `message` ADD `permanent` TINYINT( 4 ) NOT NULL AFTER `deleted` 
+ALTER TABLE `message` ADD `permanent` TINYINT( 4 ) NOT NULL DEFAULT '0' AFTER `deleted` 
 $$$
 ALTER TABLE `audiofile` ADD `permanent` TINYINT( 4 ) NOT NULL DEFAULT '0' AFTER `deleted`
 $$$
