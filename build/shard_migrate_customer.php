@@ -14,6 +14,7 @@ $dbpass = "";
 
 /////////////
 // include
+include_once("../inc/db.inc.php");
 include_once("../manager/managerutils.inc.php");
 
 /////////////
@@ -49,6 +50,9 @@ $customerid = mysql_real_escape_string($customerid, $custdb);
 $customerdbname = "c_".$customerid;
 
 mysql_select_db($customerdbname);
+
+$pdo = DBConnect($shardhost, $dbuser, $dbpass, $customerdbname)
+	or die("Failed to connect to database using PDO");
 
 $confirm = "n";
 while($confirm != "y"){
@@ -124,7 +128,10 @@ $settings['_supportphone'] = "";
 $settings['emaildomain'] = "";
 
 foreach ($settings as $name => $value) {
-	$settings[$name] = QuickQuery("select value from setting where name='$name'", $custdb);
+	//$settings[$name] = QuickQuery("select value from setting where name='$name'", $custdb);
+	$res = mysql_query("select value from setting where name='$name'", $custdb);
+	$row = mysql_fetch_row($res);
+	$settings[$name] = $row[0];
 	echo "$name is $settings[$name] \n";
 }
 
@@ -140,12 +147,20 @@ $customertables = array(
 	"blockednumber",
 	"contactpref",
 	"content",
+	// custdm
+	// customercallstats
 	"destlabel",
+	// dmcalleridroute
+	// dmroute
+	// dmschedule
 	"email",
+	"enrollment",
 	"fieldmap",
+	"groupdata",
 	"import",
 	"importfield",
 	"importjob",
+	"importlogentry",
 	"job",
 	"joblanguage",
 	"jobsetting",
@@ -165,6 +180,7 @@ $customertables = array(
 	"portalperson",
 	"portalpersontoken",
 	"reportcontact",
+	"reportgroupdata",
 	"reportinstance",
 	"reportperson",
 	"reportsubscription",
@@ -173,10 +189,13 @@ $customertables = array(
 	"setting",
 	"sms",
 	"specialtask",
+	"subscriber",
+	"subscriberpending",
 	"surveyquestion",
 	"surveyquestionnaire",
 	"surveyresponse",
 	"surveyweb",
+	"systemmessages",
 	"systemstats",
 	"ttsvoice",
 	"user",
@@ -212,7 +231,7 @@ $query = "update user set login='schoolmessenger_old' where login='schoolmesseng
 mysql_query($query,$custdb);
 
 // create default customer data (was lost in truncation)
-createSMUserProfile($custdb);
+createSMUserProfile($pdo);
 
 // reset saved customer settings
 foreach ($settings as $name => $value) {
