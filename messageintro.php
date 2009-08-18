@@ -281,7 +281,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 			if(!$newmsg->deleted) {// if deleted the old value is still the intro
 				$newmsg->id = null;
 				$newmsg->deleted = 1;
-				$newmsg->name = $newmsg->name . " (Default Emergecny Intro Copy)";	
+				$newmsg->name = $newmsg->name . " (Default Emergency Intro Copy)";	
 				$newmsg->create();
 				// copy the parts
 				$parts = DBFindMany("MessagePart", "from messagepart where messageid=$msgid");
@@ -380,9 +380,9 @@ function setvalues(result,id) {
 		for (var i in response) {
 			output += '    <option value=\"' + i + '\">' + response[i] + '</option>\n'
 		}	
-		$(id).innerHTML = output;
+		$(id).update(output);
 	} else {
-		$(id).innerHTML = '<option value=\"\">Select a Message</option>';
+		$(id).update('<option value=\"\">Select a Message</option>');
 	}
 }
 function loaduser(sourceid,targetid) {
