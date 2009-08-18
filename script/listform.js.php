@@ -240,8 +240,7 @@ function listform_add_list(listid) {
 }
 
 function listform_refresh_liststats(listID, ignoreCache) {
-	doCache = ignoreCache ? false : true;
-	
+	var doCache = ignoreCache ? false : true;
 	cachedAjaxGet('ajax.php?type=liststats&listids='+[listID].toJSON(),
 		function(transport, listID) {
 			var stats = transport.responseJSON;
@@ -250,7 +249,6 @@ function listform_refresh_liststats(listID, ignoreCache) {
 				return;
 			}
 			
-			var data = stats[listID];
 			var data = stats[listID];
 			var nameTD = $('listsTableBody').down('input[value='+listID+']').up('tr').down('td');
 			var statisticsTD = nameTD.next('td',0);
@@ -288,8 +286,8 @@ function listform_load_lists(listidsJSON) {
 	if (!listids.join)
 		return;
 	$('listsTableStatus').update('<img src="img/ajax-loader.gif"/>');
-	cachedAjaxGet('ajax.php?type=liststats&listids='+listidsJSON,
-		function(transport) {
+	new Ajax.Request('ajax.php?type=liststats&listids='+listidsJSON, {
+		onSuccess: function(transport) {
 			$('listsTableStatus').update();
 			var stats = transport.responseJSON;
 			if (!stats) {
@@ -306,8 +304,8 @@ function listform_load_lists(listidsJSON) {
 			    nameTD.insert(data.name.escapeHTML());
 			    var actionTD = new Element('td', {'class':'ActionTD', 'style':commonStyle + '; text-align:center'});
 			    actionTD.insert('<img src="img/icons/diagona/10/101.gif" title="<?=addslashes(_L('Click to remove this list'))?>" />');
-			    actionTD.insert(new Element('input',{'type':'hidden','value':listid}));
-				var statisticsTD = new Element('td', {'style':commonStyle}).update('<b>' + format_thousands_separator(data.total) + '</b>');
+			  	actionTD.insert(new Element('input',{'type':'hidden','value':listid}));
+			    var statisticsTD = new Element('td', {'style':commonStyle}).update('<b>' + format_thousands_separator(data.total) + '</b>');
 
 				var tbody = $('listsTableBody');
 				tbody.insert(new Element('tr').insert(nameTD).insert(statisticsTD).insert(actionTD));
@@ -349,7 +347,7 @@ function listform_load_lists(listidsJSON) {
 			listform_reset_list_selectbox();
 			ruleWidget.refresh_guide(true);
 		}
-	);
+	});
 }
 
 var listformPreviewCache = {};
