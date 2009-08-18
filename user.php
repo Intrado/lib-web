@@ -23,23 +23,22 @@ if (!$USER->authorize('manageaccount')) {
 	redirect('unauthorized.php');
 }
 
-if (isset($_GET['id']))
-	$id = $_GET['id'] + 0;
+if (!empty($_GET['id']))
+	$id = !ctype_digit($_GET['id']) ? ("new") : ($_GET['id'] + 0);
 else
-	$id = null;
+	$id = "new";
 
-$maxreached = false;
 /*CSDELETEMARKER_START*/
 if (!$IS_COMMSUITE && $id !== "new")
 	if (QuickQuery("select count(*) from user where login = 'schoolmessenger' and id =?", false, array($id)))
 		redirect('unauthorized.php');
 
-if (!$id) {
+if (!$id || $id === "new") {
 	$usercount = QuickQuery("select count(*) from user where enabled = 1 and login != 'schoolmessenger'");
 	$maxusers = getSystemSetting("_maxusers", "unlimited");
 	if (($maxusers !== "unlimited") && $maxusers <= $usercount) {
 		print '<script language="javascript">window.alert(\''.addslashes(_L("You already have the maximum amount of users.")).'\');window.location="users.php";</script>';
-		$maxreached = true;
+		exit();
 	}
 }
 /*CSDELETEMARKER_END*/
@@ -427,7 +426,7 @@ $datachange = false;
 $errors = false;
 
 //check for form submission
-if (($button = $form->getSubmit()) && !$maxreached) { //checks for submit and merges in post data
+if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 	$ajax = $form->isAjaxSubmit(); //whether or not this requires an ajax response
 
 	if ($form->checkForDataChange()) {
@@ -439,7 +438,7 @@ if (($button = $form->getSubmit()) && !$maxreached) { //checks for submit and me
 			$form->modifyElement('accessprofilediv', '<script>alert("'._L("You have no Access Profiles defined! Go to the Admin->Profiles tab and create one.").'")</script>');
 		}
 		
-		if ($edituser->id == NULL) {
+		if ($edituser->id === "new") {
 			$edituser->enabled = 1;
 		}
 		
