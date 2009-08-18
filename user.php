@@ -23,17 +23,15 @@ if (!$USER->authorize('manageaccount')) {
 	redirect('unauthorized.php');
 }
 
-if (!empty($_GET['id']))
-	$id = !ctype_digit($_GET['id']) ? ("new") : ($_GET['id'] + 0);
-else
-	$id = "new";
-
+$id = isset($_GET['id']) ? ($_GET['id']+0) : 0;
+$makeNewUser = !$id;
+	
 /*CSDELETEMARKER_START*/
-if (!$IS_COMMSUITE && $id !== "new")
+if (!$IS_COMMSUITE && !$makeNewUser)
 	if (QuickQuery("select count(*) from user where login = 'schoolmessenger' and id =?", false, array($id)))
 		redirect('unauthorized.php');
 
-if (!$id || $id === "new") {
+if ($makeNewUser) {
 	$usercount = QuickQuery("select count(*) from user where enabled = 1 and login != 'schoolmessenger'");
 	$maxusers = getSystemSetting("_maxusers", "unlimited");
 	if (($maxusers !== "unlimited") && $maxusers <= $usercount) {
@@ -144,7 +142,7 @@ if($IS_LDAP){
 	);
 }
 
-$pass = ($edituser->id && $edituser->id !== "new") ? '00000000' : '';
+$pass = (!$makeNewUser) ? '00000000' : '';
 $passlength = getSystemSetting("passwordlength", 5);
 $formdata["password"] = array(
 	"label" => _L("Password"),
@@ -438,7 +436,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 			$form->modifyElement('accessprofilediv', '<script>alert("'._L("You have no Access Profiles defined! Go to the Admin->Profiles tab and create one.").'")</script>');
 		}
 		
-		if ($edituser->id === "new") {
+		if ($makeNewUser) {
 			$edituser->enabled = 1;
 		}
 		
@@ -470,7 +468,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 			
 			$edituser->accessid = $postdata['accessid'];
 			
-			if ($edituser->id == "new") // create or update the user
+			if ($makeNewUser) // create or update the user
 				$edituser->create();
 			else
 				$edituser->update(); 
@@ -595,7 +593,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 // Display
 ////////////////////////////////////////////////////////////////////////////////
 $PAGE = "admin:users";
-$TITLE = _L('User Editor: ') . (!$id ? _L("New User") : escapehtml($edituser->firstname) . ' ' . escapehtml($edituser->lastname));
+$TITLE = _L('User Editor: ') . ($makeNewUser ? _L("New User") : escapehtml($edituser->firstname) . ' ' . escapehtml($edituser->lastname));
 
 include_once("nav.inc.php");
 
