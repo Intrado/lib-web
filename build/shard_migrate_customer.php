@@ -238,8 +238,8 @@ foreach ($settings as $name => $value) {
 	$query = "delete from setting where name='$name'";
 	mysql_query($query)
 		or die("Failure to execute query $query ". mysql_error());
-	$name = DBSafe($name, $custdb);
-	$value = DBSafe($value, $custdb);
+	$name = DBSafe($name, $pdo);
+	$value = DBSafe($value, $pdo);
 	$query = "insert into setting (name, value) values ('$name', '$value')";
 	mysql_query($query)
 		or die("Failure to execute query $query ". mysql_error());
