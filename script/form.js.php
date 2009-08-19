@@ -200,25 +200,9 @@ function form_validation_display(element,style, msgtext) {
 	}
 }
 
-
-function form_load(name,scriptname,formdata, helpsteps, ajaxsubmit) {
-	var form = $(name);
-	//set up formvars to save data, avoid memleaks in IE by not attaching anything to dom elements
-	if (!document.formvars)
-		document.formvars = {};
+function form_make_validators(form, formvars) {
+	var formdata = formvars.formdata;
 	
-	var formvars = document.formvars[name] = {
-		formdata: formdata,
-		scriptname: scriptname, //used for any ajax calls for this form
-		helpsteps: helpsteps,
-		ajaxsubmit: ajaxsubmit,
-		helperdisabled: true,
-		currentstep: null,
-		validators: {},
-		jsgetvalue: {},
-		submitting: false
-	};
-		
 	//make appropriate validators for each field
 	for (fieldname in formdata) {		
 		var label = formdata[fieldname].label;
@@ -274,6 +258,27 @@ function form_load(name,scriptname,formdata, helpsteps, ajaxsubmit) {
 		formvars.validators[id] = validators;
 		formvars.jsgetvalue[id] = eval(formdata[fieldname].jsgetvalue);
 	}
+}
+
+function form_load(name,scriptname,formdata, helpsteps, ajaxsubmit) {
+	var form = $(name);
+	//set up formvars to save data, avoid memleaks in IE by not attaching anything to dom elements
+	if (!document.formvars)
+		document.formvars = {};
+	
+	var formvars = document.formvars[name] = {
+		formdata: formdata,
+		scriptname: scriptname, //used for any ajax calls for this form
+		helpsteps: helpsteps,
+		ajaxsubmit: ajaxsubmit,
+		helperdisabled: true,
+		currentstep: null,
+		validators: {},
+		jsgetvalue: {},
+		submitting: false
+	};
+		
+	form_make_validators(form, formvars);
 
 	//install helper focus handler
 	form.select("input","textarea","select").map(function(e) {
