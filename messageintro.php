@@ -41,7 +41,7 @@ class IntroSelect extends FormItem {
 		foreach ($this->args['values'] as $key => $selectbox) {
 			$str .= '<td>';
 			if($key == "user")
-				$str .= '<select  id="' . $n . $key .'" '.$size .' onchange="loaduser(\'' . $n .'user\',\'' . $n . 'message\');updatevalue(\''.$n.'\');">';
+				$str .= '<select  id="' . $n . $key .'" '.$size .' onchange="loaduser(\'' . $n . '\');updatevalue(\''.$n.'\');">';
 			else if($key == "message")
 				$str .= '<select  id="' . $n . $key .'" '.$size .' onchange="updatemessage(\''.$n.'\');">';
 			else
@@ -375,22 +375,28 @@ include_once("nav.inc.php");
 
 function setvalues(result,id) {
 	var response = result.responseJSON;
+
+	var defaulttext = $(id + 'message').options[0].text;
+	if(defaulttext == undefined)
+		defaulttext = "Select a Message";
+	
 	if (response) {	
-		var output = '<option value=\"\">Select a Message</option>';//'<select id=\"defaultintro\" name=\"loaduserselect\">n';
+		var output = '<option value=\"\">' + defaulttext + '</option>';//'<select id=\"defaultintro\" name=\"loaduserselect\">n';
 		for (var i in response) {
 			output += '    <option value=\"' + i + '\">' + response[i] + '</option>\n'
 		}	
-		$(id).update(output);
+		$(id + 'message').update(output);
 	} else {
-		$(id).update('<option value=\"\">Select a Message</option>');
+		$(id + 'message').update('<option value=\"\">' + defaulttext + '</option>');
 	}
+	$(id + 'play').hide();
 }
-function loaduser(sourceid,targetid) {
+function loaduser(id) {
 	var request = 'ajax.php?ajax&type=Messages&messagetype=phone';
 	
-	if($(sourceid).getValue() != '')
-		request += '&userid=' + $(sourceid).getValue();
-	cachedAjaxGet(request,setvalues,targetid);
+	if($(id + 'user').getValue() != '')
+		request += '&userid=' + $(id + 'user').getValue();
+	cachedAjaxGet(request,setvalues,id);
 }	
 
 function updatevalue(id) {
