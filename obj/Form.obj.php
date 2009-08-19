@@ -133,20 +133,9 @@ class Form {
 		return false;
 	}
 
-	function render () {
-		$theme = getBrandTheme();
+	function renderFormItems() {
 		$lasthelpstep = false;
-		
-		$posturl = $_SERVER['REQUEST_URI'];
-		$posturl .= mb_strpos($posturl,"?") !== false ? "&" : "?";
-		$posturl .= "form=". $this->name;
-		
-		$str = '
-		<div class="newform_container">
-		<form class="newform" id="'.$this->name.'" name="'.$this->name.'" method="POST" action="'.$posturl.'">
-		<input name="'.$this->name.'-formsnum" type="hidden" value="' . $this->serialnum . '">
-		<table summary="Form" width="100%" cellspacing="0" cellpadding="0" table-layout="fixed" ><tr><td valign="top"> <!-- FORM CONTENT -->';
-		
+		$str = '';
 		foreach ($this->formdata as $name => $itemdata) {
 			//check for section titles
 			if (is_string($itemdata)) {
@@ -255,6 +244,24 @@ class Form {
 		if ($lasthelpstep)
 			$str .= '
 			</table></fieldset>';
+			
+		return $str;
+	}
+	
+	function render () {
+		$theme = getBrandTheme();
+		
+		$posturl = $_SERVER['REQUEST_URI'];
+		$posturl .= mb_strpos($posturl,"?") !== false ? "&" : "?";
+		$posturl .= "form=". $this->name;
+		
+		$str = '
+		<div class="newform_container">
+		<form class="newform" id="'.$this->name.'" name="'.$this->name.'" method="POST" action="'.$posturl.'">
+		<input name="'.$this->name.'-formsnum" type="hidden" value="' . $this->serialnum . '">
+		<table summary="Form" width="100%" cellspacing="0" cellpadding="0" table-layout="fixed" ><tr><td valign="top"> <!-- FORM CONTENT -->';
+		
+		$str .= $this->renderFormItems();
 		
 		//submit buttons
 		foreach ($this->buttons as $code) {
