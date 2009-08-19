@@ -149,11 +149,11 @@ function listcontacts ($obj,$name) {
       			left join jobsetting js on (js.jobid = j.id and js.name = 'maxcallattempts')
             	where j.id=? group by j.id",true,false,array($obj->id));
 			$content = "";
-			if($result["has_phone"])
+			if($result["has_phone"] && $result["total_phone"] != 0)
 				$content .= $result["total_phone"] . " Phone" . ($result["total_phone"]!=1?"s":"") . " (" .  sprintf("%0.2f",(100*$result["remaining_phone"]/$result["total_phone"])) . "%	Remaining), ";
-			if($result["has_email"])
+			if($result["has_email"] && $result["total_email"] != 0)
 				$content .= $result["total_email"] . " Email" . ($result["total_email"]!=1?"s":"") . " (" .  sprintf("%0.2f",(100*$result["remaining_email"]/$result["total_email"])) . "%	Remaining), ";
-			if($result["has_sms"])
+			if($result["has_sms"]  && $result["total_sms"] != 0)
 				$content .= $result["total_sms"] . " SMS (" .  sprintf("%0.2f",(100*$result["remaining_sms"]/$result["total_sms"])) . "% Remaining)";		
 			return trim($content,", ");
 		} else if(in_array($obj->status,array("cancelled","complete"))) {	
