@@ -334,7 +334,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 					if(!$newmsg->deleted) {
 						$newmsg->id = null;
 						$newmsg->deleted = 1;
-						$newmsg->name = $newmsg->name . " ($language Emergecny Intro Copy)";													
+						$newmsg->name = $newmsg->name . " ($language Emergency Intro Copy)";													
 						$newmsg->create();
 						// copy the parts
 						$parts = DBFindMany("MessagePart", "from messagepart where messageid=$msgid");
