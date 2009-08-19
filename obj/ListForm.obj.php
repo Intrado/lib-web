@@ -4,11 +4,51 @@
 *********************************************************************************************************/
 class ListForm extends Form {
 	function ListForm ($name) {
+		global $USER;
+		
+		$formdata['addme'] = array(
+			'label' => _L('Add Myself'),
+			'value' => '',
+			'control' => array('CheckBox'),
+			'validators' => array(),
+			'helpstep' => 0
+		);
+		if ($USER->authorize('sendphone')) {
+			$formdata['addmePhone'] = array(
+				'label' => _L('My Phone'),
+				'value' => $USER->phone,
+				'control' => array('TextField', 'size'=>15),
+				'validators' => array(array("ValPhone")),
+				'requires' => array('addme'),
+				'helpstep' => 0
+			);
+		}
+		if ($USER->authorize('sendemail')) {
+			$formdata['addmeEmail'] = array(
+				'label' => _L('My Email'),
+				'value' => $USER->email,
+				'control' => array('TextField', 'size'=>35),
+				'validators' => array(array("ValEmail")),
+				'requires' => array('addme'),
+				'helpstep' => 0
+			);
+		}
+		if (getSystemSetting('_hassms', false) && $USER->authorize('sendsms')) {
+			$formdata['addmeSms'] = array(
+				'label' => _L('My Sms'),
+				'value' => '',
+				'control' => array('TextField','size'=>15),
+				'validators' => array(array("ValPhone")),
+				'requires' => array('addme'),
+				'helpstep' => 0
+			);
+		}
 		$formdata['listids'] = array(
 			'label' => 'A list',
 			'value' => '',
-			//'control' => array("HiddenField"),
-			'validators' => array( array("ValRequired"), array("ValLists") )
+			'control' => array("HiddenField"),
+			'validators' => array( array("ValRequired"), array("ValLists") ),
+			'helpstep' => 0
 		);
 		
 		parent::Form($name, $formdata, null);
@@ -21,12 +61,11 @@ class ListForm extends Form {
 		$posturl .= "form=". $this->name;
 		$listidsName = $this->name . '_listids';
 		
-		$formdataJSON = json_encode($this->formdata);
 		$posturlJSON = json_encode($posturl);
-					
+
 		// HTML
 		$str = "
-			<table id='listFormWorkspace' width='100%' style='clear:both; margin-bottom:40px'>
+			<table id='listFormWorkspace' width='100%' style='clear:both; margin-bottom:25px'>
 				<tr>
 					<td colspan=100>
 						<h2 style=\"padding-left: 5px; background: repeat-x url('img/header_bg.gif')\">"._L('List')."</h2>
@@ -98,19 +137,27 @@ class ListForm extends Form {
 			</table>
 			
 			<!-- FORM -->
-			<div class='newform_container' style='clear:both; margin-top: 10px'>
-				<!-- Validation Message -->
-				<div id='listChoose_listids_fieldarea'>
-					<img id='listChoose_listids_icon' src='img/pixel.gif'/>
-					<span id='listChoose_listids_msg'></span>
-				</div>
+			<div class='newform_container' style='clear:both'>
 				<form class='newform' id='{$this->name}' name='{$this->name}' method='POST' action='{$posturl}'>
-					".implode('', $this->buttons)."
+					<!-- Generic Form Items -->
+					<div>
+						<table class='border' style='clear:both;text-align:left; margin-left:10px'>
+							" . $this->renderFormItems() . "
+						</table>
+					</div>
+			
+					<!-- Validation Message -->
+					<div id='listChoose_listids_fieldarea' style='clear:both; margin-top: 20px; margin-left:10px'>
+						<img id='listChoose_listids_icon' src='img/pixel.gif'/>
+						<span id='listChoose_listids_msg'></span>
+					</div>
+						
+					<div style='clear:both; margin-top: 20px;'>
+						".implode('', $this->buttons)."
+					</div>
 					<input name='{$this->name}-formsnum' type='hidden' value='{$this->serialnum}'/>
-					<input id='{$listidsName}' name='{$listidsName}' type='hidden' value='{$this->formdata['listids']['value']}'/>
 				</form>
 			</div>
-			<br style='clear: both'/>
 		";
 		
 		// JAVASCRIPT
@@ -119,11 +166,14 @@ class ListForm extends Form {
 			<script type='text/javascript' src='script/rulewidget.js.php'></script>
 			<script type='text/javascript' src='script/listform.js.php'></script>
 			<script type='text/javascript'>
-					
 				document.observe('dom:loaded', function() {
 					// Initiatiate Page.
-					listform_load('{$this->name}', {$formdataJSON}, {$posturlJSON});
-					
+					listform_load('{$this->name}', " . json_encode($this->formdata) . ", {$posturlJSON});
+
+					// Show/Hide 'AddMe' textboxes, and register observers.
+					listform_refresh_addme();
+					$('{$this->name}_addme').observe('click', listform_refresh_addme);
+
 					ruleWidget.refresh_guide(true);
 					ruleWidget.startup();
 				});

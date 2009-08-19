@@ -315,8 +315,13 @@ class ValLists extends Validator {
 		$listids = json_decode($value);
 		if (empty($listids))
 			return _L("Please add a list");
+			
 		$allempty = true;
 		foreach ($listids as $listid) {
+			if ($listid === 'addme') {
+				$allempty = false;
+				continue;
+			}
 			if (!userOwns('list', $listid))
 				return _L('You have specified an invalid list');
 			$list = new PeopleList($listid + 0);
@@ -1621,8 +1626,10 @@ class JobWiz_submitConfirm extends WizStep {
 		)
 			redirect('unauthorized.php');
 		
+		// Built/Existing Lists
 		$lists = json_decode($postdata["/list"]["listids"]);
-		$calctotal = 0;
+		unset($lists['addme']);
+		$calctotal = $postdata["/list"]["addme"] ? 1 : 0;
 		foreach ($lists as $id) {
 			$list = new PeopleList($id+0);
 			$renderedlist = new RenderedList($list);

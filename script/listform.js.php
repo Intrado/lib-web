@@ -30,11 +30,10 @@ function listform_load(listformID, formData, postURL) {
 		// Make a global reference.
 		listformVars = document.formvars[listformID];
 	}
-	for (fieldname in listformVars.formdata) {
-		var id = form.id + '_'+fieldname;
-		listformVars.validators[id] = 'ajax';
-		listformVars.jsgetvalue[id] = form_default_get_value;
-	}
+	form_make_validators(form, listformVars);
+	listformVars.validators['listChoose_listids'] = 'ajax';
+	listformVars.jsgetvalue['listChoose_listids'] = form_default_get_value;
+	
 	//submit handler
 	form.observe('submit',form_handle_submit.curry(listformVars.id));
 	
@@ -235,7 +234,10 @@ function listform_add_list(listid) {
 	listids = listids.without(listid);
 	listids.push(listid);
 	listformVars.listidsElement.value = listids.toJSON();
-	listform_load_lists([listid].toJSON());
+	
+	if (listid.indexOf('addme') < 0)
+		listform_load_lists([listid].toJSON());
+		
 	return true;
 }
 
@@ -283,10 +285,11 @@ function listform_update_grand_total() {
 // @param listidsJSON, json-encoded array of listids
 function listform_load_lists(listidsJSON) {
 	var listids = listidsJSON.evalJSON();
-	if (!listids.join)
+	listids = listids.without('addme');
+	if (!listids.join || listids.length < 1)
 		return;
 	$('listsTableStatus').update('<img src="img/ajax-loader.gif"/>');
-	new Ajax.Request('ajax.php?type=liststats&listids='+listidsJSON, {
+	new Ajax.Request('ajax.php?type=liststats&listids='+listids.toJSON(), {
 		onSuccess: function(transport) {
 			$('listsTableStatus').update();
 			var stats = transport.responseJSON;
@@ -304,8 +307,8 @@ function listform_load_lists(listidsJSON) {
 			    nameTD.insert(data.name.escapeHTML());
 			    var actionTD = new Element('td', {'class':'ActionTD', 'style':commonStyle + '; text-align:center'});
 			    actionTD.insert('<img src="img/icons/diagona/10/101.gif" title="<?=addslashes(_L('Click to remove this list'))?>" />');
-			  	actionTD.insert(new Element('input',{'type':'hidden','value':listid}));
-			    var statisticsTD = new Element('td', {'style':commonStyle}).update('<b>' + format_thousands_separator(data.total) + '</b>');
+				actionTD.insert(new Element('input',{'type':'hidden','value':listid}));
+				var statisticsTD = new Element('td', {'style':commonStyle}).update('<b>' + format_thousands_separator(data.total) + '</b>');
 
 				var tbody = $('listsTableBody');
 				tbody.insert(new Element('tr').insert(nameTD).insert(statisticsTD).insert(actionTD));
@@ -438,32 +441,37 @@ function listform_onclick_existing_list(event, listid) {
 function listform_remove_list(event, listid, doconfirm) {
 	Tips.hideAll();
 
-	if (doconfirm) {
-		event.stop();
-		if (!confirm('<?=addslashes(_L("Are you sure you want to remove this list?"))?>'))
-			return;
+	var listaddme = listid.indexOf('addme') >= 0;
+	
+	if (!listaddme) {
+		if (doconfirm) {
+			event.stop();
+			if (!confirm('<?=addslashes(_L("Are you sure you want to remove this list?"))?>')) 
+				return;
+		}
+		
+		var hiddenInput = $('listsTableBody').down('input[value=' + listid + ']');
+		if (hiddenInput) {
+			var tr = hiddenInput.up('tr');
+			if (tr.prototip) 
+				tr.prototip.remove();
+			tr.remove();
+		}
+		var checkbox = $('listSelectboxContainer').down('input[value=' + listid + ']');
+		if (checkbox) {
+			checkbox.checked = false;
+		}
+		
+		if (listformVars.existingLists && listformVars.existingLists[listid]) {
+			listformVars.existingLists[listid].added = false;
+			listform_reset_list_selectbox();
+		}
+		if (event && listformVars.pendingList == listid) {
+			listform_hide_build_list_window();
+			listformVars.pendingList = null;
+		}
 	}
 	
-	var hiddenInput = $('listsTableBody').down('input[value='+listid+']');
-	if (hiddenInput) {
-		var tr = hiddenInput.up('tr');
-		if (tr.prototip)
-			tr.prototip.remove();
-		tr.remove();
-	}
-	var checkbox = $('listSelectboxContainer').down('input[value='+listid+']');
-	if (checkbox) {
-		checkbox.checked = false;
-	}
-
-	if (listformVars.existingLists && listformVars.existingLists[listid]) {
-		listformVars.existingLists[listid].added = false;
-		listform_reset_list_selectbox();
-	}
-	if (event && listformVars.pendingList == listid) {
-		listform_hide_build_list_window();
-		listformVars.pendingList = null;
-	}
 	var listids = listformVars.listidsElement.getValue() ? listformVars.listidsElement.getValue().evalJSON() : [];
 	if (listids.join) {
 		listids = listids.without(listid);
@@ -472,8 +480,11 @@ function listform_remove_list(event, listid, doconfirm) {
 		// Somehow listids is not an array, which should never happen.
 		listformVars.listidsElement.value = [].toJSON();
 	}
-	listformVars.totals[listid] = 0;
-	listform_update_grand_total();
+	
+	if (!listaddme) {
+		listformVars.totals[listid] = 0;
+		listform_update_grand_total();
+	}
 }
 
 function listform_reset_list_selectbox() {
@@ -526,4 +537,31 @@ function listform_set_rule_editor_status(addingRule) {
 function listform_hide_build_list_window() {
 	$('buildListWindow').hide();
 	$('buildListButton').show();
+}
+
+function listform_refresh_addme() {
+	var addme = $('listChoose_addme');
+	var addmePhone = $('listChoose_addmePhone');
+	var addmeEmail = $('listChoose_addmeEmail');
+	var addmeSms = $('listChoose_addmeSms');
+	
+	if (addme.checked) {
+		if (addmePhone)
+			addmePhone.up('tr').show();
+		if (addmeEmail)
+			addmeEmail.up('tr').show();
+		if (addmeSms)
+			addmeSms.up('tr').show();
+			
+		listform_add_list('addme');
+	} else {
+		if (addmePhone)
+			addmePhone.up('tr').hide();
+		if (addmeEmail)
+			addmeEmail.up('tr').hide();
+		if (addmeSms)
+			addmeSms.up('tr').hide();
+			
+		listform_remove_list(null, 'addme');
+	}
 }

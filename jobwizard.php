@@ -34,9 +34,13 @@ require_once("obj/Message.obj.php");
 require_once("obj/MessagePart.obj.php");
 require_once("obj/AudioFile.obj.php");
 require_once("obj/MessageAttachment.obj.php");
+require_once("obj/Person.obj.php");
+require_once("obj/Email.obj.php");
+require_once("obj/ListEntry.obj.php");
+require_once("obj/Sms.obj.php");
+
 // Job step form data
 require_once("jobwizard.inc.php");
-
 
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization
@@ -416,8 +420,76 @@ class FinishJobWizard extends WizFinish {
 			"emailmessagelink" => $emailmessagelink,
 			"smsmessagelink" => $smsmessagelink
 		);
+		unset($jobsettings['lists']['addme']);
 		
 		Query("BEGIN");
+		
+		if ($postdata["/list"]["addme"]) {
+			// NOTE: getUserJobTypes() automatically applies user jobType restrictions
+			$jobTypes = JobType::getUserJobTypes(false);
+			$addmelist = new PeopleList(null);
+			$addmelist->userid = $USER->id;
+			$addmelist->name = _L("Me");
+			$addmelist->description = _L("JobWizard, addme");
+			$addmelist->deleted = 1;
+			$addmelist->update();
+			if ($addmelist->id) {
+				// Constants
+				$langfield = FieldMap::getLanguageField();
+				$fnamefield = FieldMap::getFirstNameField();
+				$lnamefield = FieldMap::getLastNameField();
+				
+				// New Person
+				$person = new Person();
+				$person->userid = $USER->id;
+				$person->deleted = 0; // NOTE: This person must not be set as deleted, otherwise the list will not include him.
+				$person->type = "manualadd";
+				$person->$fnamefield = $USER->firstname;
+				$person->$lnamefield = $USER->lastname;
+				$person->$langfield = "English";
+				$person->update();
+				
+				// New Phone, Email, SMS
+				$deliveryTypes = array();
+				if (isset($postdata["/list"]["addmePhone"])) {
+					$deliveryTypes["phone"] = new Phone();
+					$deliveryTypes["phone"]->phone = Phone::parse($postdata["/list"]["addmePhone"]);
+				}
+				if (isset($postdata["/list"]["addmeEmail"])) {
+					$deliveryTypes["email"] = new Email();
+					$deliveryTypes["email"]->email = trim($postdata["/list"]["addmeEmail"]);
+				}
+				if ($wizHasSmsMsg && isset($postdata["/list"]["addmeSms"])) {
+					$deliveryTypes["sms"] = new Sms();
+					$deliveryTypes["sms"]->sms = Phone::parse($postdata["/list"]["addmeSms"]);
+				}
+				
+				// Delivery Types and Job Types
+				foreach ($deliveryTypes as $deliveryTypeName => $deliveryTypeObject) {
+					$deliveryTypeObject->personid = $person->id;
+					$deliveryTypeObject->sequence = 0;
+					$deliveryTypeObject->update();
+					
+					// For each job type, assume sequence = 0, enabled = 1
+					foreach ($jobTypes as $jobType) {
+						// NOTE: $person->id is assumed to be a new id, so no need to worry about duplicate keys
+						$query = "insert into contactpref (personid, jobTypeid, type, sequence, enabled) values (?, ?, ?, 0, 1)";
+						QuickUpdate($query, false, array($person->id, $jobType->id, $deliveryTypeName));
+					}
+				}
+				
+				// New List Entry
+				$le = new ListEntry();
+				$le->type = "A";
+				$le->listid = $addmelist->id;
+				$le->personid = $person->id;
+				$le->create();
+				
+				// Include this single-person list in the job.
+				$jobsettings["lists"][] = $addmelist->id;
+			}
+		}
+		
 		$job = Job::jobWithDefaults();
 
 		// Attach first list
