@@ -292,8 +292,6 @@ class RenderedList {
 		if (is_array($specificPeople) && empty($specificPeople))
 			return false;
 		
-		$listrulesSQL = $list->getListRuleSQL();
-		$userDataViewRestrictionsSQL = $USER->userSQL("p");
 		$commonfieldsSQL = $this->generateCommonFieldsSQL();
 		$addressJoinSQL = "LEFT JOIN address a ON (a.personid = p.id)";
 		$searchRulesSQL = $searchRules ? Rule::makeQuery($searchRules, "p") : "";
@@ -303,6 +301,8 @@ class RenderedList {
 		$limitSQL = $this->pagelimit >= 0 ? "limit $this->pageoffset,$this->pagelimit" : "";
 	
 		if (isset($_SESSION['listsearchpreview'])) {
+			$listRules = $this->list->getListRules();
+			$combinedRulesSQL = count($listRules) ? Rule::makeQuery(array_merge($USER->rules(), $listRules), "p") : 'and 0';
 			$leJoinSQL = "LEFT JOIN listentry le ON (le.listid=? AND p.id = le.personid)";
 			// Performs union between list rules and list additions.
 			return Query("
@@ -315,8 +315,7 @@ class RenderedList {
 						NOT p.deleted
 						AND p.userid IS NULL
 						AND le.type IS NULL
-						$userDataViewRestrictionsSQL
-						AND $listrulesSQL
+						$combinedRulesSQL
 						$searchRulesSQL
 						$peopleSQL)
 				UNION ALL
@@ -334,6 +333,8 @@ class RenderedList {
 				$limitSQL
 			", false, array($this->list->id, $this->list->id));
 		} else {
+			$listrulesSQL = $list->getListRuleSQL();
+			$userDataViewRestrictionsSQL = $USER->userSQL("p");
 			return Query("
 				SELECT SQL_CALC_FOUND_ROWS ($listrulesSQL) as isinlist,
 					$commonfieldsSQL
