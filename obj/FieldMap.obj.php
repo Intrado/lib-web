@@ -180,11 +180,15 @@ class FieldMap extends DBMappedObject {
 
 			$fieldnum = $this->fieldnum;
 
-			// TODO: Field values should be passed as parameters?
 			// editlock=1 are subscriber static values
 			$query = "delete from persondatavalues where fieldnum='$fieldnum' and editlock=0";
 			QuickUpdate($query);
 
+			$existingvalues = QuickQueryList("select value from persondatavalues where fieldnum=?", false, false, array($fieldnum));
+			if (count($existingvalues) > 0) {
+				$args = "?";
+				$args .= str_repeat(",?", count($existingvalues)-1);
+			}
 			switch ($fieldnum[0]) {
 				case "f" :
 				$query = "insert into persondatavalues (fieldnum,value,refcount) "
@@ -194,6 +198,22 @@ class FieldMap extends DBMappedObject {
 							. "from person p "
 							. "where not p.deleted and p.type = 'system' "
 							. "group by value";
+				if (count($existingvalues) > 0) {
+					$query = "insert into persondatavalues (fieldnum,value,refcount) "
+							. "select '$fieldnum' as fieldnum, "
+							. "p.$fieldnum as value, "
+							. "count(*) "
+							. "from person p "
+							. "where p.$fieldnum not in ($args) and not p.deleted and p.type = 'system' "
+							. "group by value";
+					
+					$upquery = "update persondatavalues pdv "
+							. "set refcount = (select count(*) from person p where p.$fieldnum = pdv.value "
+							. "and not p.deleted and p.type = 'system') "
+							. "where pdv.fieldnum='$fieldnum' "
+							. "and pdv.value in ($args)";
+					QuickUpdate($upquery, false, $existingvalues);
+				}
 				break;
 				case "g" :
 				$query = "insert into persondatavalues (fieldnum,value,refcount) "
@@ -203,12 +223,30 @@ class FieldMap extends DBMappedObject {
 							. "from groupdata gd "
 							. "where fieldnum=" . substr($fieldnum,1) . " "
 							. "group by value";
+				if (count($existingvalues) > 0) {
+					$query = "insert into persondatavalues (fieldnum,value,refcount) "
+							. "select '$fieldnum' as fieldnum, "
+							. "gd.value as value, "
+							. "count(*) "
+							. "from groupdata gd "
+							. "where fieldnum=" . substr($fieldnum,1)
+							. " and value not in ($args) "
+							. "group by value";
+							
+					$upquery = "update persondatavalues pdv "
+							. "set refcount = (select count(*) from groupdata gd where gd.fieldnum='" . substr($fieldnum,1) . "' and gd.value = pdv.value) "
+							. "where pdv.fieldnum='$fieldnum' and pdv.value in ($args)";
+					QuickUpdate($upquery, false, $existingvalues);
+				}
 				break;
 				case "c" :
 				// nothing, handled via enrollment import only
 				break;
 			}
-			$count = QuickUpdate($query);
+			if (count($existingvalues) > 0)
+				$count = QuickUpdate($query, false, $existingvalues);
+			else
+				$count = QuickUpdate($query);
 		}
 	}
 
