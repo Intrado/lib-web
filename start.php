@@ -208,6 +208,7 @@ function typestring($str) {
 }
 
 function activityfeed($mergeditems,$ajax = false) {
+	$actioncount = 0;
 	$activityfeed = $ajax===true?array():"";
 	$limit = 10;
 	$duplicatejob = array(); 
@@ -233,7 +234,6 @@ function activityfeed($mergeditems,$ajax = false) {
 										"tools" => "");
 		}	
 	} else {
-		$actioncount = 0;
 		while(!empty($mergeditems) && $limit > 0) {
 			$item = array_shift($mergeditems);
 			$time = date("M j, g:i a",strtotime($item["date"]));	
