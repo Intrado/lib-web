@@ -51,8 +51,8 @@ function list_remove_person($personid) {
 }
 
 function fmt_list_destination_sequence($row, $index){
-	if($row[$index] != "" || $row[$index] != false){
-		// index 8 is the type of destination: phone, email, or sms.
+	// index 8 is the type of destination: phone, email, or sms.
+	if($row[8] != "" || $row[8] != false){
 		return destination_label($row[8], $row[$index]);
 	} else {
 		return "";
