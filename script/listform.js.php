@@ -69,10 +69,11 @@ function listform_load(listformID, formData, postURL) {
 		listform_set_rule_editor_status(false);
 		
 		$('listsTableStatus').update('<img src="img/ajax-loader.gif"/>');
-		var uri = new Hash();
-		uri.set('ruledata', event.memo.ruledata.toJSON());
 		new Ajax.Request('ajaxlistform.php?type=addrule&listid=' + listformVars.pendingList, {
-			postBody: uri.toQueryString(),
+			parameters: {
+				'ruledata': event.memo.ruledata.toJSON()
+			},
+			method: 'post',
 			onSuccess: function(transport) {
 				$('listsTableStatus').update();
 				var ruleid = transport.responseJSON;
@@ -98,7 +99,10 @@ function listform_load(listformID, formData, postURL) {
 		
 		$('listsTableStatus').update('<img src="img/ajax-loader.gif"/>');
 		new Ajax.Request('ajaxlistform.php?type=deleterule&listid=' + listformVars.pendingList, {
-			postBody: 'fieldnum='+event.memo.fieldnum,
+			parameters: {
+				'fieldnum': event.memo.fieldnum
+			},
+			method: 'post',
 			onSuccess: function(transport) {
 				if (!transport.responseJSON) {
 					alert('<?=addslashes(_L("Sorry, there was an error when deleting this rule"))?>');
