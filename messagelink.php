@@ -31,11 +31,17 @@ function fadecolor($primary, $fade, $ratio){
 
 // find the message from authserver for this code
 $messageinfo = loginMessageLink($code);
-$customer = ($messageinfo)?getSystemSetting("displayname"):"Not Found";
-$job = new Job($messageinfo['jobid']+0);
-$jobname = $job->name;
-$jobdescription = $job->description;
-$jobstarttime = strtotime($job->starttime);
+$customer = "Not Found";
+
+$badcode = true;
+if ($messageinfo !== false) {
+	$badcode = false;
+	$customer = ($messageinfo)?getSystemSetting("displayname"):"Not Found";
+	$job = new Job($messageinfo['jobid']+0);
+	$jobname = $job->name;
+	$jobdescription = $job->description;
+	$jobstarttime = strtotime($job->starttime);
+}
 
 $TITLE = $customer;
 ?>
@@ -63,7 +69,7 @@ $TITLE = $customer;
 		<tr>
 			<td>
 				<div style="padding-left:10px; padding-bottom:10px">
-					<img src="logo.img.php?hash=<?=crc32("cid".getSystemSetting("_logocontentid"))?>" />
+					<img src="logo.img.php?hash=<?= $badcode ? "12345" : crc32("cid".getSystemSetting("_logocontentid"))?>" />
 				</div>
 			</td>
 			<td>
@@ -79,11 +85,11 @@ $TITLE = $customer;
 	<div style="margin: 15px">
 <?
 startWindow("Message Preview", false, false, false);
-if (!$messageinfo) {
+if ($badcode) {
 ?>
 	<div>
 		<h1>The requested information was not found.</h1>
-		<p>The message your looking for doesn't exist anymore or has expired.</p>
+		<p>The message you are looking for does not exist or has expired.</p>
 	</div>
 <?
 } else {
