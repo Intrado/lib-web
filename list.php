@@ -223,17 +223,26 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 			if ($ajax) {
 				switch ($button) {
 					case 'addrule':
+						$ruledata = json_decode($postdata['newrule']);
+						$data = $ruledata[0];
+						// CREATE rule.
+						if (!isset($data->fieldnum, $data->logical, $data->op, $data->val)) {
+							notice(_L('There was a problem adding the rule for %s.', FieldMap::getName($data->fieldnum)));
+							$form->sendTo('list.php');
+							break;
+						}
+						if (!$type = Rule::getType($data->fieldnum)) {
+							notice(_L('There was a problem adding the rule for %s.', FieldMap::getName($data->fieldnum)));
+							$form->sendTo('list.php');
+							break;
+						}
+						$data->val = prepareRuleVal($type, $data->op, $data->val);
+						if (!$rule = Rule::initFrom($data->fieldnum, $data->logical, $data->op, $data->val)) {
+							notice(_L('There was a problem adding the rule for %s.', FieldMap::getName($data->fieldnum)));
+							$form->sendTo('list.php');
+							break;
+						}
 						QuickUpdate('BEGIN');
-							$ruledata = json_decode($postdata['newrule']);
-							$data = $ruledata[0];
-							// CREATE rule.
-							if (!isset($data->fieldnum, $data->logical, $data->op, $data->val))
-								continue;
-							if (!$type = Rule::getType($data->fieldnum))
-								continue;
-							$data->val = prepareRuleVal($type, $data->op, $data->val);
-							if (!$rule = Rule::initFrom($data->fieldnum, $data->logical, $data->op, $data->val))
-								continue;
 							$rule->create();
 							$le = new ListEntry();
 							$le->listid = $list->id;
