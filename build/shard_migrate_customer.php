@@ -245,6 +245,17 @@ foreach ($settings as $name => $value) {
 		or die("Failure to execute query $query ". mysql_error());
 }
 
+// insert systemmessage
+$query = "INSERT INTO systemmessages (id, message, icon, modifydate) "
+			. "VALUES ('1', "
+			. "'<div style=\"color:#3e693f;font-size: 20px;font-weight: bold;\">New version 7.0!</div> "
+			. "<div style=\"font-size: 16px;margin: 25px;margin-bottom: 2px;\">See for yourself <b><a href=\"javascript: popup(''help/flash/Welcome.swf'',750,500);\"><img src=\"img/icons/control_play_blue.gif\" /> Play Video</a></b></div> <ul> "
+			. "<li>New users be sure to print the <a href=\"help/html/Quick_Start_for_New_Users.pdf\"><img src=\"img/icons/page_white_acrobat.gif\" /> Quick Start Guide</a> "
+			. "<li>Want more detail? See the step-by-step training guides for <a href=\"help/html/Getting_Started_with_v7.pdf\"><img src=\"img/icons/page_white_acrobat.gif\" /> New Users</a> and <a href=\"help/html/Advanced_Training_with_v7.pdf\"><img src=\"img/icons/page_white_acrobat.gif\" /> Advanced Users</a> </ul>', 'largeicons/news.jpg', "
+			. "NOW())";
+mysql_query($query)
+	or die("Failure to execute query $query ". mysql_error());
+
 
 //////////////////////////////////////
 // copy job/schedule/reportsubscription to shard
