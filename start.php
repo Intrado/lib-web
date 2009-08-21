@@ -208,7 +208,6 @@ function typestring($str) {
 }
 
 function activityfeed($mergeditems,$ajax = false) {
-	$actionids = array();
 	$activityfeed = $ajax===true?array():"";
 	$limit = 10;
 	$duplicatejob = array(); 
@@ -234,6 +233,7 @@ function activityfeed($mergeditems,$ajax = false) {
 										"tools" => "");
 		}	
 	} else {
+		$actioncount = 0;
 		while(!empty($mergeditems) && $limit > 0) {
 			$item = array_shift($mergeditems);
 			$time = date("M j, g:i a",strtotime($item["date"]));	
@@ -395,9 +395,9 @@ function activityfeed($mergeditems,$ajax = false) {
 										</td>
 										<td valign="middle" width="100px">';
 						if($tools) {
-								$activityfeed .= '  <div id="actionlink_'. $itemid .'" style="cursor:pointer" ><img src="img/largeicons/tiny20x20/tools.jpg" />&nbsp;Tools</div>
-													<div id="actions_'. $itemid .'" style="display:none;">' . $tools  . '</div>';
-								$actionids[] = "'$itemid'";
+								$activityfeed .= '  <div id="actionlink_'. $actioncount .'" style="cursor:pointer" ><img src="img/largeicons/tiny20x20/tools.jpg" />&nbsp;Tools</div>
+													<div id="actions_'. $actioncount .'" style="display:none;">' . $tools  . '</div>';
+								$actioncount++;
 						} else {
 								$activityfeed .= '&nbsp;';
 						}
@@ -409,12 +409,11 @@ function activityfeed($mergeditems,$ajax = false) {
 	if($ajax!==true) {
 		$activityfeed .= "
 				<script>
-				var actionids = Array(" . implode(",",$actionids) . ");
+				var actionids = $actioncount;
 				var jobfiltes = Array('none','jobs','savedjobs','scheduledjobs','activejobs','completedjobs','repeatingjobs','messages','phonemessages','emailmessages','smsmessages','lists','savedreports','systemmessages');
 				
 				function addfeedtools() {	
-					for(i=0;i<actionids.length;i++){
-						var id = actionids[i];
+					for(var id=0;id<actionids;id++){
 						$('actionlink_' + id).tip = new Tip('actionlink_' + id, $('actions_' + id).innerHTML, {
 							style: 'protogrey',
 							radius: 4,
@@ -429,8 +428,8 @@ function activityfeed($mergeditems,$ajax = false) {
 					}
 				}
 				function removefeedtools() {
-					for(i=0;i<actionids.length;i++){
-						Tips.remove('actionlink_' + actionids[i]);
+					for(var id=0;id<actionids;id++){
+						Tips.remove('actionlink_' + id);
 					}
 				}
 				function applyfilter(filter) {
@@ -443,15 +442,13 @@ function activityfeed($mergeditems,$ajax = false) {
 									var size = result.length;			
 									
 									removefeedtools();
-									actionids = Array();									
+									actionids = 0;									
 									for(i=0;i<size;i++){
 										var item = result[i];	
 										html += '<tr><td valign=\"top\" width=\"60px\"><a href=\"' + item.defaultlink + '\" ' + item.defaultonclick + '><img src=\"img/' + item.icon + '\" /></a></td><td ><div class=\"feedtitle\"><a href=\"' + item.defaultlink + '\" ' + item.defaultonclick + '>' + item.title + '</a></div><span>' + item.content + '</span></td>';
 										if(item.tools) {
-											html += '<td valign=\"middle\" width=\"100px\"><div id=\"actionlink_' + item.itemid + '\" style=\"cursor:pointer\" ><img src=\"img/largeicons/tiny20x20/tools.jpg\"/>&nbsp;Tools</div><div id=\"actions_' + item.itemid + '\" style=\"display:none;\">' + item.tools + '</div></td>';
-										}
-										if(item.tools != '') {
-											actionids.push(item.itemid);											
+											html += '<td valign=\"middle\" width=\"100px\"><div id=\"actionlink_' + actionids + '\" style=\"cursor:pointer\" ><img src=\"img/largeicons/tiny20x20/tools.jpg\"/>&nbsp;Tools</div><div id=\"actions_' + actionids + '\" style=\"display:none;\">' + item.tools + '</div></td>';
+											actionids++;
 										}
 										html += '</tr>';
 									}
