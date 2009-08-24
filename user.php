@@ -334,7 +334,7 @@ $formdata["datarules"] = array(
 );
 
 if ($hasstaffid) {
-	$formdata["staffpkey"]["control"] = array("FormHtml", "html" => '<div style="border: 1px solid gray; width: 20%">'.$edituser->staffpkey.'</div>');
+	if (isset($formdata["staffpkey"])) $formdata["staffpkey"]["control"] = array("FormHtml", "html" => '<div style="border: 1px solid gray; width: 20%">'.$edituser->staffpkey.'</div>');
 	$formdata["datarules"]["control"]["allowedFields"] = array('f', 'g');
 }
 
