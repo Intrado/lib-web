@@ -654,6 +654,7 @@ foreach($languages as $index => $language){
 	<td>
 <?
 	NewFormItem($f,$s,'softdeletemonths','selectstart');
+		NewFormItem($f,$s,'softdeletemonths','selectoption','Disabled','0');
 		NewFormItem($f,$s,'softdeletemonths','selectoption','6 Months','6');
 		NewFormItem($f,$s,'softdeletemonths','selectoption','12 Months','12');
 		NewFormItem($f,$s,'softdeletemonths','selectoption','18 Months','18');
@@ -668,6 +669,7 @@ EndForm();
 	<td>
 <?
 	NewFormItem($f,$s,'harddeletemonths','selectstart');
+		NewFormItem($f,$s,'harddeletemonths','selectoption','Disabled','0');
 		NewFormItem($f,$s,'harddeletemonths','selectoption','6 Months','6');
 		NewFormItem($f,$s,'harddeletemonths','selectoption','12 Months','12');
 		NewFormItem($f,$s,'harddeletemonths','selectoption','18 Months','18');
