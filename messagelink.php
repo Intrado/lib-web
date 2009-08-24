@@ -38,8 +38,8 @@ if ($messageinfo !== false) {
 	$badcode = false;
 	$customer = ($messageinfo)?getSystemSetting("displayname"):"Not Found";
 	$job = new Job($messageinfo['jobid']+0);
-	$jobname = $job->name;
-	$jobdescription = $job->description;
+	$jobname = escapehtml($job->name);
+	$jobdescription = escapehtml($job->description);
 	$jobstarttime = strtotime($job->starttime);
 }
 
