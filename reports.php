@@ -95,6 +95,10 @@ if(getSystemSetting('_hassurvey', true) && ($USER->authorize('viewsystemreports'
 	if(getSystemSetting('_hassms', false) && ($USER->authorize('viewsystemreports') || $USER->authorize("sendsms"))) {
 ?>
 					<tr><td><a href='reportjobdetailsearch.php?clear=1&type=sms'/>SMS Log</a></td></tr>
+<? } 
+	if ($USER->authorize('viewsystemreports')) {
+?>
+					<tr><td><a href='reportarchive.php'/>Systemwide Report Archive</a></td></tr>
 <? } ?>
 				</table>
 			</td>
