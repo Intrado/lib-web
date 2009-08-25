@@ -89,7 +89,23 @@ class ValAccesscode extends Validator {
 
 class ValPassword extends Validator {
 	var $onlyserverside = true;
+	function passwordcheck($password){
+		$tally = 0;
+		if(ereg("^0*$", $password)){
+			return true;
+		}
+		if(ereg("[0-9]", $password))
+			$tally++;
+		if(ereg("[a-zA-Z]", $password))
+			$tally++;
+		if(ereg("[\!\@\#\$\%\^\&\*]", $password))
+			$tally++;
 
+		if($tally >= 2)
+			return true;
+
+		return false;
+	}
 	function validate ($value, $args, $requiredvalues) {
 		if ($detail = validateNewPassword(
 				isset($requiredvalues['login'])? $requiredvalues['login']: $args['login'], 
@@ -98,7 +114,8 @@ class ValPassword extends Validator {
 				isset($requiredvalues['lastname'])? $requiredvalues['lastname']: $args['lastname']
 			))
 			return "$this->label ". _L("is invalid") ." ".$detail;
-
+		if (!$this->passwordcheck($value))
+			return "$this->label ". _L("is invalid.") ." " . _L("Must contain a letter and a number or symbol.");
 		$checkpassword = (getSystemSetting("checkpassword")==0) ? getSystemSetting("checkpassword") : 1;
 		if ($checkpassword && ($detail = isNotComplexPass($value)) && !ereg("^0*$", $value))
 			return "$this->label ". _L("is invalid") ." ".$detail;
