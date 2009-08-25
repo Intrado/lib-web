@@ -420,7 +420,9 @@ class FinishJobWizard extends WizFinish {
 			"emailmessagelink" => $emailmessagelink,
 			"smsmessagelink" => $smsmessagelink
 		);
-		unset($jobsettings['lists']['addme']);
+		// Remove temporary 'addme' token from listids.
+		if (($i = array_search('addme', $jobsettings['lists'])) !== false)
+			unset($jobsettings['lists'][$i]);
 		
 		Query("BEGIN");
 		
