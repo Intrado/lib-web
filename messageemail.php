@@ -57,14 +57,15 @@ if (isset($_GET['id'])) {
 // Form Data
 ////////////////////////////////////////////////////////////////////////////////
 $messagebody = '';
+$autoexpire = 1;
 
 $attachvalues = array();
 if(isset($_SESSION['messageid'])) {
 	$message = new Message($_SESSION['messageid']);
+	$autoexpire = $message->permanent;
 	$message->readHeaders();	
 	$parts = DBFindMany("MessagePart","from messagepart where messageid=$message->id order by sequence");
 	$messagebody = $message->format($parts);
-	
 	$attachments = DBFindMany("messageattachment","from messageattachment where not deleted and messageid=" . DBSafe($_SESSION['messageid']));
 	foreach ($attachments as $attachment) {
 		$attachvalues[$attachment->contentid] = array("size" => $attachment->size, "name" => $attachment->filename);
@@ -98,6 +99,14 @@ $formdata = array(
 		"value" => $message->description,
 		"validators" => array(),
 		"control" => array("TextField","size" => 30, "maxlength" => 51),
+		"helpstep" => 1
+	),
+	"autoexpire" => array(
+		"label" => _L('Auto Expire'),
+		"fieldhelp" => _L('Automatically erase this message if it is not associated with any job.'),
+		"value" => $autoexpire,
+		"validators" => array(),
+		"control" => array("RadioButton", "values" => array(1 => "Yes (Keep for ". getSystemSetting('softdeletemonths', "6") ." months)",0 => "No (Keep forever)")),
 		"helpstep" => 1
 	),
 	"&nbsp;",
@@ -190,6 +199,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 
 		$message->name = trim($postdata["messagename"]);
 		$message->description = trim($postdata["description"]);
+		$message->permanent = $postdata["autoexpire"]==0?0:1;
 		$message->modifydate = QuickQuery("select now()");
 		$message->subject = trim($postdata["subject"]);
 		$message->fromname = trim($postdata["fromname"]);
