@@ -66,12 +66,14 @@ $messagename = "";
 $messagedescription = "";
 $messagebody = "";
 $messagevoice = array("language" => "English","gender" => "Female");
+$autoexpire = 1;
 
 
 if(isset($_SESSION['messageid'])) {
 	$message = new Message($_SESSION['messageid']);
 	$messagename = $message->name;
 	$messagedescription = $message->description;
+	$autoexpire = $message->permanent;
 	$message->readHeaders();
 	$parts = DBFindMany("MessagePart","from messagepart where messageid=$message->id order by sequence");
 	$messagebody = $message->format($parts);
@@ -100,6 +102,14 @@ $formdata = array(
 		"value" => $messagedescription,
 		"validators" => array(),
 		"control" => array("TextField","size" => 30, "maxlength" => 51),
+		"helpstep" => 1
+	),	
+	"autoexpire" => array(
+		"label" => _L('Auto Expire'),
+		"fieldhelp" => _L('Automatically erase this message if it is not associated with any job.'),
+		"value" => $autoexpire,
+		"validators" => array(),
+		"control" => array("RadioButton", "values" => array(1 => "Yes (Keep for ". getSystemSetting('softdeletemonths', "6") ." months)",0 => "No (Keep forever)")),
 		"helpstep" => 1
 	),
 	"&nbsp;"
@@ -190,6 +200,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 
 		$message->name = trim($postdata["messagename"]);
 		$message->description = trim($postdata["description"]);
+		$message->permanent = $postdata["autoexpire"]==0?0:1;
 		$message->userid = $USER->id;
 		$message->modifydate = QuickQuery("select now()");
 		$message->stuffHeaders();

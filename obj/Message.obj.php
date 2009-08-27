@@ -9,7 +9,8 @@ class Message extends DBMappedObject {
 	var $modifydate;
 	var $lastused;
 	var $deleted = 0;
-
+	var $permanent = 0;
+	
 	//generated members
 	var $header1;
 	var $header2;
@@ -23,7 +24,7 @@ class Message extends DBMappedObject {
 	function Message ($id = NULL) {
 		$this->_allownulls = true;
 		$this->_tablename = "message";
-		$this->_fieldlist = array("userid", "name", "description", "type", "data", "deleted","modifydate", "lastused");
+		$this->_fieldlist = array("userid", "name", "description", "type", "data", "deleted","modifydate", "lastused", "permanent");
 		//call super's constructor
 		DBMappedObject::DBMappedObject($id);
 	}
@@ -62,7 +63,7 @@ class Message extends DBMappedObject {
 		$parts = array();
 		$partcount = 0;
 		$defaultvoice = new Voice($defaultvoiceid);
-		$currvoiceid = null;
+		$currvoiceid = $defaultvoiceid;
 		while (true) {
 			//get dist to next field and type of field
 			$pos_f = strpos($data,"<<");
@@ -173,7 +174,11 @@ class Message extends DBMappedObject {
 							$currvoiceid = QuickQuery("select id from ttsvoice where language = ? and gender = ?",
 								false, array(strtolower($token), $defaultvoice->gender));
 							if($currvoiceid == false){
-								$errors[] = "Can't find that language: " . $token . ". Only English and Spanish are available";
+								$currvoiceid = QuickQuery("select id from ttsvoice where language = ? and gender = ?",false, array(strtolower($token), 
+									($defaultvoice->gender=="female"?"male":"female")));
+							}
+							if($currvoiceid == false){
+								$errors[] = "Can't find that language: " . $token . ".";
 								$currvoiceid = null;
 							}
 						}
@@ -240,7 +245,9 @@ class Message extends DBMappedObject {
 
 	static function renderMessageParts($id, $fields) {
 		$parts = DBFindMany("MessagePart", "from messagepart where messageid=$id order by sequence");
-
+		return Message::renderParts($parts,$fields);
+	}
+	static function renderParts($parts, $fields) {
 		// -- digest the message --
 		$renderedparts = array();
 		$curpart = 0;
@@ -255,7 +262,7 @@ class Message extends DBMappedObject {
 				$renderedparts[++$curpart] = array("t",$part->txt,$part->voiceid);
 				break;
 			case "V":
-				if (!($value = $fields[$part->fieldnum])) {
+				if (!isset($fields[$part->fieldnum]) || !($value = $fields[$part->fieldnum])) {
 					$value = $part->defaultvalue;
 				}
 				$renderedparts[++$curpart] = array("t",$value,$part->voiceid);
@@ -265,10 +272,12 @@ class Message extends DBMappedObject {
 		return $renderedparts;
 	}
 
-	static function playAudio($id, $fields) {
-
-		$message = new Message($id);
+	static function playAudio($id, $fields,$audioformat = "wav",$intro = "") {
 		$renderedparts = Message::renderMessageParts($id, $fields);
+		Message::playParts($renderedparts,$audioformat,$intro);
+	}
+	static function playParts($renderedparts, $audioformat = "wav",$intro = "") {
+		
 		$voices = DBFindMany("Voice","from ttsvoice");
 
 		// -- get the wav files --
@@ -284,11 +293,14 @@ class Message extends DBMappedObject {
 				$wavfiles[] = writeWav($data);
 			}
 		}
-
+		$intro = $intro?('"' . $intro . '" "media/2secondsilence.wav" '):'';
 		//finally, merge the wav files
-		$outname = secure_tmpname("preview",".wav");
-		$cmd = 'sox "' . implode('" "',$wavfiles) . '" "' . $outname . '"';
-
+		$outname = secure_tmpname("preview",".$audioformat");
+		if($audioformat == "mp3") {
+			$cmd = 'sox -V1 ' . $intro. '"' . implode('" "',$wavfiles) . '" -t wav - | lame -S -V3 - "' . $outname . '"';
+		} else {
+			$cmd = 'sox ' . $intro. '"' . implode('" "',$wavfiles) . '" "' . $outname . '"';
+		} 
 		$result = exec($cmd, $res1, $res2);
 
 		foreach ($wavfiles as $file)
@@ -300,10 +312,12 @@ class Message extends DBMappedObject {
 			header("HTTP/1.0 200 OK");
 			if (isset($_GET['download']))
 				header('Content-type: application/x-octet-stream');
-			else
+			else if($audioformat == "mp3") {
+				header("Content-Type: audio/mpeg");
+			} else {
 				header("Content-Type: audio/wav");
-
-			header("Content-disposition: attachment; filename=message.wav");
+			} 
+			header("Content-disposition: attachment; filename=message.$audioformat");
 			header('Pragma: private');
 			header('Cache-control: private, must-revalidate');
 			header("Content-Length: " . strlen($data));
