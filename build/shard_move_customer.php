@@ -36,13 +36,13 @@ $authdb = DBConnect($authhost,$authuser,$authpass,"authserver");
 
 echo "connecting to source shard\n";
 $query = "select dbhost,dbusername,dbpassword from shard where id=$srcshard";
-list($srchost,$srcuser,$srcpass) = QuickQueryRow($query,false,$authdb) or die("Can't query shard info:" . mysql_error()); 
-$srcsharddb = DBConnect($srchost,$srcuser,$srcpass,"aspshard") or die("Can't connect to shard:" . mysql_error());
+list($srchost,$srcuser,$srcpass) = QuickQueryRow($query,false,$authdb) or die("Can't query shard info:" . errorinfo($authdb)); 
+$srcsharddb = DBConnect($srchost,$srcuser,$srcpass,"aspshard") or die("Can't connect to shard:" . $srchost);
 
 echo "connecting to dest shard\n";
 $query = "select dbhost,dbusername,dbpassword from shard where id=$destshard";
-list($desthost,$destuser,$destpass) = QuickQueryRow($query,false,$authdb) or die("Can't query shard info:" . mysql_error()); 
-$destsharddb = DBConnect($desthost,$destuser,$destpass,"aspshard") or die("Can't connect to shard:" . mysql_error());
+list($desthost,$destuser,$destpass) = QuickQueryRow($query,false,$authdb) or die("Can't query shard info:" . errorinfo($authdb)); 
+$destsharddb = DBConnect($desthost,$destuser,$destpass,"aspshard") or die("Can't connect to shard:" . $desthost);
 
 //sanity checks
 echo "doing sanity checks\n";
@@ -81,8 +81,9 @@ $newdbname = "c_$customerid";
 $newpass = genpassword();
 
 $query = "create database $newdbname DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci";
-QuickUpdate($query,$destsharddb) or die ("Failed to create new DB $newdbname : " . mysql_error($destsharddb));
-mysql_select_db($newdbname,$destsharddb) or die ("Failed select db $newdbname : " . mysql_error($destsharddb));
+QuickUpdate($query,$destsharddb) or die ("Failed to create new DB $newdbname : " . errorinfo($destsharddb));
+$destsharddb->query("use ".$newdbname) or die ("Failed select db $newdbname : " . errorinfo($destsharddb));
+
 
 QuickUpdate("drop user '$newdbname'", $destsharddb); //ensure mysql credentials match our records, which it won't if create user fails because the user already exists
 QuickUpdate("create user '$newdbname' identified by '$newpass'", $destsharddb);
@@ -98,8 +99,8 @@ if ($retval != 0)
 
 //verify the tables by doing a checksum
 
-mysql_select_db("c_$customerid",$srcsharddb);
-mysql_select_db("c_$customerid",$destsharddb);
+$srcsharddb->query("use c_$customerid");
+$destsharddb->query("use c_$customerid");
 
 $customertables = QuickQueryList("show tables",false,$srcsharddb);
 
@@ -117,8 +118,8 @@ foreach ($customertables as $t) {
 if ($anyerrors)
 	die("################## HASH MISMATCH DETECTED##################\n\n");
 
-mysql_select_db("aspshard",$srcsharddb);
-//mysql_select_db("aspshard",$destsharddb); leave this set to customer db for queries below
+$srcsharddb->query("use aspshard");
+//$destsharddb->query("use aspshard"); //leave this set to customer db for queries below
 
 //----------------------------------------------------------------------
 // copy job/schedule/reportsubscription to shard
@@ -130,31 +131,36 @@ $timezone = QuickQuery("select value from setting where name='timezone'",$destsh
 // reportsubscription
 echo ("Copy reportsubscriptions\n");
 $query = "INSERT INTO aspshard.qreportsubscription (id, customerid, userid, type, daysofweek, dayofmonth, time, timezone, nextrun, email) select id, ".$customerid.", userid, type, daysofweek, dayofmonth, time, '".$timezone."', nextrun, email from reportsubscription";
-mysql_query($query,$destsharddb)
-	or die ("Failed to execute statement \n$query\n\nfor c_$customerid : " . mysql_error($destsharddb));
+$rowcount = QuickUpdate($query,$destsharddb);
+if ($rowcount === false)
+	dieerror ("Failed to execute statement \n$query\n\nfor c_$customerid : ", $destsharddb);
 
 // jobsetting
 echo ("Copy repeating jobs and settings\n");
 $query = "INSERT INTO aspshard.qjobsetting (customerid, jobid, name, value) SELECT ".$customerid.", jobid, name, value FROM jobsetting WHERE jobid in (select id from job where status='repeating')";
-mysql_query($query,$destsharddb)
-	or die ("Failed to execute statement \n$query\n\nfor c_$customerid : " . mysql_error($destsharddb));
+$rowcount = QuickUpdate($query,$destsharddb);
+if ($rowcount === false)
+	dieerror ("Failed to execute statement \n$query\n\nfor c_$customerid : ", $destsharddb);
 
 // repeating job
 $query = "INSERT INTO aspshard.qjob (id, customerid, userid, scheduleid, listid, phonemessageid, emailmessageid, printmessageid, smsmessageid, questionnaireid, timezone, startdate, enddate, starttime, endtime, status, jobtypeid, thesql)" .
          " select id, ".$customerid.", userid, scheduleid, listid, phonemessageid, emailmessageid, printmessageid, smsmessageid, questionnaireid, '".$timezone."', startdate, enddate, starttime, endtime, 'repeating', jobtypeid, thesql from job where status='repeating'";
-mysql_query($query,$destsharddb)
-	or die ("Failed to execute statement \n$query\n\nfor c_$customerid : " . mysql_error($destsharddb));
+$rowcount = QuickUpdate($query,$destsharddb);
+if ($rowcount === false)
+	dieerror ("Failed to execute statement \n$query\n\nfor c_$customerid : ", $destsharddb);
 
 // schedule
 $query = "INSERT INTO aspshard.qschedule (id, customerid, daysofweek, time, nextrun, timezone) select id, ".$customerid.", daysofweek, time, nextrun, '".$timezone."' from schedule";
-mysql_query($query,$destsharddb)
-	or die ("Failed to execute statement \n$query\n\nfor c_$customerid : " . mysql_error($destsharddb));
+$rowcount = QuickUpdate($query,$destsharddb);
+if ($rowcount === false)
+	dieerror ("Failed to execute statement \n$query\n\nfor c_$customerid : ", $destsharddb);
 
 // future job
 $query = "INSERT INTO aspshard.qjob (id, customerid, userid, scheduleid, listid, phonemessageid, emailmessageid, printmessageid, smsmessageid, questionnaireid, timezone, startdate, enddate, starttime, endtime, status, jobtypeid, thesql)" .
          " select id, ".$customerid.", userid, scheduleid, listid, phonemessageid, emailmessageid, printmessageid, smsmessageid, questionnaireid, '".$timezone."', startdate, enddate, starttime, endtime, 'scheduled', jobtypeid, thesql from job where status='scheduled'";
-mysql_query($query,$destsharddb)
-	or die ("Failed to execute statement \n$query\n\nfor c_$customerid : " . mysql_error($destsharddb));
+$rowcount = QuickUpdate($query,$destsharddb);
+if ($rowcount === false)
+	dieerror ("Failed to execute statement \n$query\n\nfor c_$customerid : ", $destsharddb);
 
 
 // create triggers
@@ -163,8 +169,9 @@ $sqlqueries = explode("$$$",file_get_contents("../db/createtriggers.sql"));
 foreach ($sqlqueries as $query) {
 	if (trim($query)) {
 		$query = str_replace('_$CUSTOMERID_', $customerid, $query);
-		mysql_query($query,$destsharddb)
-			or die ("Failed to execute statement \n$query\n\nfor c_$customerid : " . mysql_error($destsharddb));
+		$rowcount = QuickUpdate($query,$destsharddb);
+		if ($rowcount === false)
+			dieerror ("Failed to execute statement \n$query\n\nfor c_$customerid : ", $destsharddb);
 	}
 }
 
@@ -172,13 +179,13 @@ foreach ($sqlqueries as $query) {
 
 echo "Transfer successful. setting authserver records and removing old database\n";
 
-mysql_select_db("aspshard",$srcsharddb); //ensure src shard connection is set to aspshard database
+$srcsharddb->query("use aspshard"); //ensure src shard connection is set to aspshard database
 
 //update authserver to point to new customer info
 //update shardid and password
 $query = "update customer set shardid=$destshard, dbpassword='" . DBSafe($newpass,$authdb) . "' where id=$customerid";
 if (QuickUpdate($query,$authdb) === false)
-	echo "Problem updating customer table:" . mysql_error($authdb) . "\n";
+	echo "Problem updating customer table:" . errorinfo($authdb) . "\n";
 
 //remove shard tables from old shard
 echo "deleting old shard records:";
@@ -186,8 +193,8 @@ $tablearray = array("importqueue", "jobstatdata", "qjobperson", "qjobtask", "spe
 foreach ($tablearray as $t) {
 	echo ".";
 	$query = "delete from ".$t." where customerid=$customerid";
-	if (!mysql_query($query, $srcsharddb)) {
-		echo "Failed to execute statement \n$query\n\n : " . mysql_error($srcsharddb) . "\n";
+	if (QuickUpdate($query, $srcsharddb) === false) {
+		echo "Failed to execute statement \n$query\n\n : " . errorinfo($srcsharddb) . "\n";
 	}
 }
 echo "\n";
@@ -196,12 +203,12 @@ echo "\n";
 //drop old customer user
 $query = "drop user c_$customerid";
 if (QuickUpdate($query,$srcsharddb) === false)
-	echo "Problem dropping old customer user:" . mysql_error($srcsharddb) . "\n";
+	echo "Problem dropping old customer user:" . errorinfo($srcsharddb) . "\n";
 //drop old customer db
 echo "Dropping old database\n";
 $query = "drop database c_$customerid";
 if (QuickUpdate($query,$srcsharddb) === false)
-	echo "Problem updating customer table:" . mysql_error($srcsharddb) . "\n";
+	echo "Problem updating customer table:" . errorinfo($srcsharddb) . "\n";
 
 echo "Done!\n";
 echo "/-------------------------------------------------------------\\\n";
@@ -229,9 +236,24 @@ function verify_table ($db1,$db2,$table) {
 	$hash2 = QuickQuery($query,$db2);
 	
 	if ($hash1 === false || $hash2 === false)
-		echo "Problem trying to hash tables:" . mysql_error();
+		echo "Problem trying to hash tables:" . $query;
 	
 	return $hash1 == $hash2;
+}
+
+function dieerror($str, $dbcon) {
+		echo $str . " : " . errorinfo($dbcon);
+		die();
+}
+
+function errorinfo($dbcon) {
+	$errInfo = $dbcon->errorInfo();
+	$err = $errInfo[0];
+	if (!isset($errInfo[2]))
+		$detail = "unknown";
+	else
+		$detail = $errInfo[2];
+	return $err . " : " . $detail;
 }
 
 ?>
