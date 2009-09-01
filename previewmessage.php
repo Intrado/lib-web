@@ -2,6 +2,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 // Includes
 ////////////////////////////////////////////////////////////////////////////////
+
 require_once("inc/common.inc.php");
 require_once("inc/securityhelper.inc.php");
 require_once("inc/table.inc.php");
@@ -12,6 +13,9 @@ require_once("obj/Form.obj.php");
 require_once("obj/FormItem.obj.php");
 require_once("inc/formatters.inc.php");
 require_once("obj/FieldMap.obj.php");
+require_once("obj/AudioFile.obj.php");
+require_once("obj/Voice.obj.php");
+require_once("obj/Message.obj.php");
 require_once("obj/MessagePart.obj.php");
 require_once("obj/AudioFile.obj.php");
 require_once("obj/FormSelectMessage.fi.php");
@@ -19,47 +23,46 @@ require_once("obj/FormSelectMessage.fi.php");
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization
 ////////////////////////////////////////////////////////////////////////////////
-if (!$USER->authorize("sendphone")) {
-	redirect("unauthorized.php");
-}
 
 ////////////////////////////////////////////////////////////////////////////////
 // Data Handling
 ////////////////////////////////////////////////////////////////////////////////
+
 if (isset($_GET['id'])) {
 	if (userOwns("message", $_GET['id'] + 0) || $USER->authorize('managesystem'))
 		$id = $_GET['id'] + 0;
 } else 
 	$id = false;
 
-if (isset($_GET['text'])) {
+if (isset($_POST['text'])) {
 	if(get_magic_quotes_gpc())
-		$ttstext = stripslashes($_GET['text']);
+		$_SESSION['ttstext'] = stripslashes($_POST['text']);
 	else
-		$ttstext = $_GET['text'];
+		$_SESSION['ttstext'] = $_POST['text'];
 } else
-	$ttstext = false;
+	$_SESSION['ttstext'] = false;
 
-if (isset($_GET['language'])) {
+if (isset($_POST['language'])) {
 	if(get_magic_quotes_gpc())
-		$ttslanguage = stripslashes($_GET['language']);
+		$_SESSION['ttslanguage'] = stripslashes($_POST['language']);
 	else
-		$ttslanguage = $_GET['language'];
+		$_SESSION['ttslanguage'] = $_POST['language'];
 } else 
-	$ttslanguage = "english";
+	$_SESSION['$ttslanguage'] = "english";
 
-if (isset($_GET['gender'])) {
+if (isset($_POST['gender'])) {
 	if(get_magic_quotes_gpc())
-		$ttsgender = stripslashes($_GET['gender']);
+		$_SESSION['ttsgender'] = stripslashes($_POST['gender']);
 	else
-		$ttsgender = $_GET['gender'];
+		$_SESSION['ttsgender'] = $_POST['gender'];
 } else
-	$ttsgender = "female";
+	$_SESSION['ttsgender'] = "female";
 
-if (!$id && !$ttstext)
+	
+if (!$id && !$_SESSION['ttstext']) {
 	redirect("unauthorized.php");
-
-if ($id) {
+}
+if ($id) {	
 	//find all unique fields and values used in this message
 	$messagefields = DBFindMany("FieldMap", "from fieldmap where fieldnum in (select distinct fieldnum from messagepart where messageid=?)", false, array($id));
 	if (count($messagefields) > 0) {
@@ -79,11 +82,43 @@ if ($id) {
 		foreach ($messageparts as $messagepart)
 			$fielddefaults[$messagepart->fieldnum] = $messagepart->defaultvalue;
 	}
+	$msgType = QuickQuery("select type from message where id=?", false, array($id));
+} else if($_SESSION['ttstext']) {
+	$voiceid = false;
+	if($_SESSION['ttsgender'] == "Female") {
+		$voiceid = QuickQuery("select id from ttsvoice where language=? and gender='Male'",false,array($language));
+	} else if($_SESSION['ttsgender'] == "Male") {
+		$voiceid = QuickQuery("select id from ttsvoice where language=? and gender='Female'",false,array($language));	
+	}
+	if($voiceid	=== false)
+		$voiceid = 2; // default to english	female
+	$message = new Message();
+	$parts = $message->parse($_SESSION['ttstext'],$errors,$voiceid);
+	$fieldnums = array();
+	$fielddefaults = array();
+	
+	foreach($parts as $part) {
+		if(isset($part->fieldnum)) {
+			$fieldnums[] = $part->fieldnum;
+			$fielddefaults[$part->fieldnum] = $part->defaultvalue;
+		}
+	}	
+	$messagefields = DBFindMany("FieldMap", "from fieldmap where fieldnum in (" . implode(",",$fieldnums) .  ")");
+	$fields = array();
+	$fielddata = array();
+	foreach ($messagefields as $fieldmap) {
+		$fields[$fieldmap->fieldnum] = $fieldmap;
+		if ($fieldmap->isOptionEnabled("multisearch")) {
+			$limit = DBFind('Rule', 'from rule inner join userrule on rule.id = userrule.ruleid where userid=? and fieldnum=?', false, array($USER->id, $fieldmap->fieldnum));
+			$limitsql = $limit ? $limit->toSQL(false, 'value', false, true) : '';
+			$fielddata[$fieldmap->fieldnum] = QuickQueryList("select value,value from persondatavalues where fieldnum=? $limitsql order by value", true, false, array($fieldmap->fieldnum));
+		}
+	}
+	$msgType = 'phone';	
 }
 
-$msgType = QuickQuery("select type from message where id=?", false, array($id));
 
-if (!$msgType)
+if (!isset($msgType) || !$msgType)
 	$msgType = 'phone';
 	
 class FormHtmlWithId extends FormItem {
@@ -126,7 +161,7 @@ if ($id && isset($fields) && count($fields) && $msgType == 'phone') {
 		} else if ($fieldmap->isOptionEnabled("reldate")) {
 			$formdata[$field] = array (
 				"label" => $fieldmap->name,
-				"value" => ($fielddefaults[$field])?$fielddefaults[$field]:date('m/d/Y'),
+				"value" => $fielddefaults[$field],
 				"validators" => array(),
 				"control" => array("TextDate", "size"=>12),
 				"helpstep" => 1
@@ -154,10 +189,8 @@ if ($msgType == 'email' || $msgType == 'sms')
 
 $buttons = array();
 if ($msgType == 'phone')
-	$buttons[] = submit_button(_L('Preview'),"submit","play");
+	$buttons[] = submit_button(_L('Refresh Field(s)'),"submit","fugue/arrow_circle_double_135");
 	
-$buttons[] = icon_button(_L('Close'),"cross","window.close()",null,null);
-
 // Only display and handle form elements if there are form elements.
 if (count($formdata)) {
 	$form = new Form("messagepreview",$formdata,array(),$buttons);
@@ -175,6 +208,7 @@ if (count($formdata)) {
 	$errors = false;
 	//check for form submission
 	if ($button = $form->getSubmit()) { //checks for submit and merges in post data
+		
 		if ($form->checkForDataChange()) {
 			$datachange = true;
 		} else if (($errors = $form->validate()) === false) { //checks all of the items in this form
@@ -184,18 +218,13 @@ if (count($formdata)) {
 				$previewdata .= "&$field=" . urlencode($value);
 			}
 			if ($msgType == 'phone') {
-				$form->modifyElement("messagepreviewdiv", '
-					<div align="center">
-						<OBJECT ID="MediaPlayer" WIDTH=320 HEIGHT=42
-						CLASSID="CLSID:22D6F312-B0F6-11D0-94AB-0080C74C7E95"
-						STANDBY="Loading Windows Media Player components..."
-						TYPE="application/x-oleobject">
-						<PARAM NAME="FileName" VALUE="preview.wav.php/mediaplayer_preview.wav?id='.$id.$previewdata.'">
-						<param name="controller" value="true">
-						<EMBED SRC="preview.wav.php/embed_preview.wav?id='.$id.$previewdata.'" AUTOSTART="TRUE"></EMBED>
-						</OBJECT>
-						<br><a href="preview.wav.php/download_preview.wav?id='.$id.$previewdata.'&download=true">'._L("Click here to download").'</a>
-					</div>'
+				$request = ($id)?"id=$id":(isset($_POST['text'])?"usetext=true":"blank=true");
+				$form->modifyElement("messageresultdiv", '
+						<script language="JavaScript" type="text/javascript">
+							embedPlayer("preview.wav.php/embed_preview.wav?' . $request . $previewdata. '","player",true);
+							$("download").update(\'<a href="_preview.wav.php/download_preview.wav?' . $request.$previewdata . '&download=true">' . _L("Click here to download") . '</a>\');
+						</script>
+						'
 				);
 			}
 			return;
@@ -206,32 +235,35 @@ if (count($formdata)) {
 ////////////////////////////////////////////////////////////////////////////////
 // Display
 ////////////////////////////////////////////////////////////////////////////////
+
 require_once("popup.inc.php");
 
 startWindow(_L("Message Preview"));
 if (count($formdata)) 
 	echo $form->render();
-	if ($msgType == 'phone') {
-		?><div id="messagepreviewdiv" name="messagepreviewdiv"><?
-		// If there is no formdata (no field inserts) then just play the message
-		if (!count($formdata)) {?>
-		<div style="float:left; margin: 5px">
-			<?=icon_button(_L('Close'),"cross","window.close()",null,null)?>
-		</div>
+if ($msgType == 'phone') {
+	$request = ($id)?"id=$id":(isset($_POST['text'])?"usetext=true":"blank=true");
+
+?>
+<script type="text/javascript" language="javascript" src="script/niftyplayer.js"></script>
+
+<div id="messagepreviewdiv" name="messagepreviewdiv"><?
+// If there is no formdata (no field inserts) then just play the message
+//if (!count($formdata)) {?>
 		<div align="center" style="clear:left">
-			<OBJECT ID="MediaPlayer" WIDTH=320 HEIGHT=42
-			CLASSID="CLSID:22D6F312-B0F6-11D0-94AB-0080C74C7E95"
-			STANDBY="Loading Windows Media Player components..."
-			TYPE="application/x-oleobject">
-			<PARAM NAME="FileName" VALUE="preview.wav.php/mediaplayer_preview.wav?<?=($id)?"id=$id":"text=".urlencode($ttstext)."&language=$ttslanguage&gender=$ttsgender"?>">
-			<param name="controller" value="true">
-			<EMBED SRC="preview.wav.php/embed_preview.wav?<?=($id)?"id=$id":"text=".urlencode($ttstext)."&language=$ttslanguage&gender=$ttsgender"?>" AUTOSTART="TRUE"></EMBED>
-			</OBJECT>
-			<br><a href="preview.wav.php/download_preview.wav?<?=($id)?"id=$id":"text=".urlencode($ttstext)."&language=$ttslanguage&gender=$ttsgender"?>&download=true"><?=_L("Click here to download")?></a>
+			<div id="player"></div>		
+			<script language="JavaScript" type="text/javascript">
+  				embedPlayer("preview.wav.php/embed_preview.wav?<?=$request?>","player",false); 
+			</script>
+			<div id='download'><a href="preview.wav.php/download_preview.wav?<?=$request?>&download=true"><?=_L("Click here to download")?></a></div>
 		</div>
-	<?}
+<?
+//}
+?></div>
+<div id="messageresultdiv" name="messageresultdiv">
+</div>
+<?
 }
-?></div><?
 endWindow();
 
 require_once("popupbottom.inc.php");
