@@ -189,7 +189,7 @@ if ($msgType == 'email' || $msgType == 'sms')
 
 $buttons = array();
 if ($msgType == 'phone')
-	$buttons[] = submit_button(_L('Refresh Field(s)'),"submit","fugue/arrow_circle_double_135");
+	$buttons[] = submit_button(_L('Play with Field(s)'),"submit","fugue/control");
 	
 // Only display and handle form elements if there are form elements.
 if (count($formdata)) {
@@ -244,22 +244,28 @@ if (count($formdata))
 if ($msgType == 'phone') {
 	$request = ($id)?"id=$id":(isset($_POST['text'])?"usetext=true":"blank=true");
 
+$hasdata = count($formdata);
+
 ?>
 <script type="text/javascript" language="javascript" src="script/niftyplayer.js"></script>
 
-<div id="messagepreviewdiv" name="messagepreviewdiv"><?
-// If there is no formdata (no field inserts) then just play the message
-//if (!count($formdata)) {?>
+<div id="messagepreviewdiv" name="messagepreviewdiv">
 		<div align="center" style="clear:left">
 			<div id="player"></div>		
+<? 
+// If there is no formdata (no field inserts) then just play the message
+ if (!$hasdata) {?>
 			<script language="JavaScript" type="text/javascript">
   				embedPlayer("preview.wav.php/embed_preview.wav?<?=$request?>","player",false); 
 			</script>
-			<div id='download'><a href="preview.wav.php/download_preview.wav?<?=$request?>&download=true"><?=_L("Click here to download")?></a></div>
+<?} ?>
+			<div id='download'>
+<? if (!$hasdata) {?>			
+			<a href="preview.wav.php/download_preview.wav?<?=$request?>&download=true"><?=_L("Click here to download")?></a>
+<?} ?>		
+			</div>
 		</div>
-<?
-//}
-?></div>
+</div>
 <div id="messageresultdiv" name="messageresultdiv">
 </div>
 <?
