@@ -297,7 +297,7 @@ class Message extends DBMappedObject {
 		//finally, merge the wav files
 		$outname = secure_tmpname("preview",".$audioformat");
 		if($audioformat == "mp3") {
-			$cmd = 'sox -V1 ' . $intro. '"' . implode('" "',$wavfiles) . '" -t wav - | lame -S -V3 - "' . $outname . '"';
+			$cmd = 'sox ' . $intro. '"' . implode('" "',$wavfiles) . '" -t wav - | lame -S -V3 - "' . $outname . '"';
 		} else {
 			$cmd = 'sox ' . $intro. '"' . implode('" "',$wavfiles) . '" "' . $outname . '"';
 		} 
