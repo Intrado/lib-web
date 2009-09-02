@@ -221,7 +221,7 @@ if (count($formdata)) {
 				$request = ($id)?"id=$id":(isset($_POST['text'])?"usetext=true":"blank=true");
 				$form->modifyElement("messageresultdiv", '
 						<script language="JavaScript" type="text/javascript">
-							embedPlayer("preview.wav.php/embed_preview.wav?' . $request . $previewdata. '","player",true);
+							embedPlayer("preview.wav.php/embed_preview.wav?' . $request . $previewdata. '","player");
 							$("download").update(\'<a href="_preview.wav.php/download_preview.wav?' . $request.$previewdata . '&download=true">' . _L("Click here to download") . '</a>\');
 						</script>
 						'
@@ -256,7 +256,7 @@ $hasdata = count($formdata);
 // If there is no formdata (no field inserts) then just play the message
  if (!$hasdata) {?>
 			<script language="JavaScript" type="text/javascript">
-  				embedPlayer("preview.wav.php/embed_preview.wav?<?=$request?>","player",false); 
+  				embedPlayer("preview.wav.php/embed_preview.wav?<?=$request?>","player"); 
 			</script>
 <?} ?>
 			<div id='download'>

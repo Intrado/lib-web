@@ -110,28 +110,29 @@ function hasFlashPlayer(){
 	return (FlashHelper.getMovie('niftyPlayer1') != undefined && FlashHelper.getMovie('niftyPlayer1').PercentLoaded != undefined);
 }
 
-function embedPlayer(url,target,reload) { 
-		if(!hasFlashPlayer()) {
-			$(target).update('<object classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000" codebase="http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=6,0,0,0" width="165" height="38" id="niftyPlayer1" align="">' + 
-			   '<param name=movie value="media/niftyplayer.swf">' + 
-			   '<param name=quality value=high>' + 
-			   '<param name=bgcolor value=#FFFFFF>' + 
-			   '<embed src="media/niftyplayer.swf" quality=high bgcolor=#FFFFFF width="165" height="38" name="niftyPlayer1" align="" type="application/x-shockwave-flash" pluginspage="http://www.macromedia.com/go/getflashplayer">' + 
-			   '</embed>' + 
-			   '</object>');
-		}	
-		if(hasFlashPlayer()) {
-			niftyplayer("niftyPlayer1").loadAndPlay(url);
-		} else {
-			   $(target).update("<object classid='clsid:22D6F312-B0F6-11D0-94AB-0080C74C7E95' width='280' height='45'>"+
-						"<param name='type' value='audio/mpeg'>"+
-						"<param name='src' value='" + url + "'>"+
-						"<param name='autostart' value='1'>"+
-						"<param name='showcontrols' value='1'>"+
-						"<param name='showstatusbar' value='0'>"+
-						"<embed src ='" + url + "' type='audio/mpeg' autoplay='true' autostart='1' width='280' height='45' controller='1' showstatusbar='0' bgcolor='#ffffff'></embed>"+ 
-						"</object>");
-		}
+function embedPlayer(url,target) { 
+	if(hasFlashPlayer()){
+		niftyplayer("niftyPlayer1").loadAndPlay(url);
+	} else {
+		$(target).update('<object classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000" codebase="http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=6,0,0,0" width="165" height="38" id="niftyPlayer1" align="">' + 
+		   '<param name=movie value="media/niftyplayer.swf?file=' + encodeURIComponent(url)  + '&as=1">' + 
+		   '<param name=quality value=high>' + 
+		   '<param name=bgcolor value=#FFFFFF>' + 
+		   '<embed src="media/niftyplayer.swf?file=' + encodeURIComponent(url) + '&as=1" quality=high bgcolor=#FFFFFF width="165" height="38" name="niftyPlayer1" align="" type="application/x-shockwave-flash" pluginspage="http://www.macromedia.com/go/getflashplayer">' + 
+		   '</embed>' + 
+		   '</object>');
+	} 
+	
+	if(!hasFlashPlayer()) {
+		   $(target).update("<object classid='clsid:22D6F312-B0F6-11D0-94AB-0080C74C7E95' width='280' height='45'>"+
+			"<param name='type' value='audio/mpeg'>"+
+			"<param name='src' value='" + url + "'>"+
+			"<param name='autostart' value='1'>"+
+			"<param name='showcontrols' value='1'>"+
+			"<param name='showstatusbar' value='0'>"+
+			"<embed src ='" + url + "' type='audio/mpeg' autoplay='true' autostart='1' width='280' height='45' controller='1' showstatusbar='0' bgcolor='#ffffff'></embed>"+ 
+			"</object>");
+   	}	   		
 }
 
 
