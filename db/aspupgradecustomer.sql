@@ -53,3 +53,8 @@ $$$
 -- set modify date on all objects that have a null value. We need this so they can eventually be cleaned up.
 update message set modifydate = '2009-07-31 12:00:00' where modifydate is null and not deleted
 $$$
+
+-- sms opt-in text
+INSERT INTO `setting` (`name`, `value`) VALUES
+('optintext', 'You may receive text messages from Your School')
+$$$

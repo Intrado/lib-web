@@ -130,6 +130,7 @@ if(CheckFormSubmit($f,"Save") || CheckFormSubmit($f, "Return")) {
 
 			$displayname = GetFormData($f,$s,"name");
 			$timezone = GetFormData($f, $s, "timezone");
+			$optintext = GetFormData($f, $s, "optintext");
 			$hostname = GetFormData($f, $s, "hostname");
 			$inboundnumber  = GetFormData($f, $s, "inboundnumber");
 			$maxphones = GetFormData($f, $s, "maxphones");
@@ -201,6 +202,8 @@ if(CheckFormSubmit($f,"Save") || CheckFormSubmit($f, "Return")) {
 				error("Customer cannot have both Contact Manager and Self-Signup features, please select only one");
 			} else if ($emaildomainerror !== true) {
 				error($emaildomainerror);
+			} else if (count($optintext) > 100) {
+				error('Opt-in Text cannot exceed 100 characters');
 			} else {
 
 				QuickUpdate("update customer set
@@ -236,7 +239,7 @@ if(CheckFormSubmit($f,"Save") || CheckFormSubmit($f, "Return")) {
 				setCustomerSystemSetting("displayname", $displayname, $custdb);
 				setCustomerSystemSetting("inboundnumber", $inboundnumber, $custdb);
 				setCustomerSystemSetting("timezone", $timezone, $custdb);
-
+				
 				update_jobtypeprefs(getCustomerSystemSetting('maxphones', 1, true, $custdb), $maxphones, "phone", $custdb);
 				setCustomerSystemSetting("maxphones", $maxphones, $custdb);
 
@@ -366,6 +369,8 @@ if(CheckFormSubmit($f,"Save") || CheckFormSubmit($f, "Return")) {
 				setCustomerSystemSetting('softdeletemonths', DBSafe(GetFormData($f, $s, "softdeletemonths")), $custdb);
 				setCustomerSystemSetting('harddeletemonths', DBSafe(GetFormData($f, $s, "harddeletemonths")), $custdb);
 
+				setCustomerSystemSetting('optintext', $optintext, $custdb);
+
 				if(CheckFormSubmit($f, "Return")){
 					redirect("customers.php");
 				} else {
@@ -460,6 +465,8 @@ if( $reloadform ) {
 
 	PutFormData($f, $s, "softdeletemonths", getCustomerSystemSetting('softdeletemonths', "6", false, $custdb));
 	PutFormData($f, $s, "harddeletemonths", getCustomerSystemSetting('harddeletemonths', "24", false, $custdb));
+
+	PutFormData($f, $s, "optintext", getCustomerSystemSetting('optintext', "You may receive text messages from Your School", false, $custdb));
 }
 
 
@@ -680,6 +687,8 @@ EndForm();
 ?>
 	</td>
 </tr>
+
+<tr><td>SMS Opt-in Text: </td><td><? NewFormitem($f, $s, 'optintext', 'textarea', 30) ?></td></tr>
 
 <tr>
 	<td><? NewFormItem($f, "Save","Save", 'submit');?>
