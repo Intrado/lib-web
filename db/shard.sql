@@ -285,5 +285,13 @@ INDEX (`createtime`),
 UNIQUE (`code` )
 ) ENGINE = InnoDB ;
 
+-- ----------------------------
+-- start here for release 7.1
+
+ALTER TABLE `smsblock` CHANGE `status` `status` ENUM( 'block', 'pendingoptin', 'optin', 'new' ) NOT NULL DEFAULT 'new' ;
+
+ALTER TABLE `smsblock` ADD `timezone` VARCHAR( 50 ) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL DEFAULT 'US/Pacific';
+
+ALTER TABLE `smsblock` ADD `customerid` INT NOT NULL DEFAULT '0' FIRST ;
 
 
