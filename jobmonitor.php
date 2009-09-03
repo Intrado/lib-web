@@ -9,7 +9,8 @@ require_once("inc/utils.inc.php");
 require_once("inc/securityhelper.inc.php");
 require_once("inc/formatters.inc.php");
 include_once("obj/Job.obj.php");
-
+require_once("inc/reportgeneratorutils.inc.php");
+require_once("inc/auth.inc.php");
 
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization
@@ -48,11 +49,25 @@ $TITLE = escapehtml($job->name);
 include_once("popup.inc.php");
 
 button_bar(button('Done', 'window.close()'),
-		button("Refresh","new getObj('realtime').obj.src = 'graph_job.png.php?jobid=$jobid&foo=' + new Date();"));
+		button("Refresh","UpdateTimer();"));
 
 //startWindow('Job Status', 'padding: 3px;');
+displayJobSummary($jobid,readonlyDBConnect());
 
-?><img id="realtime" src="graph_job.png.php?jobid=<?=$_GET['jobid']?>&junk=<?= rand() ?>" /><?
+?>
+
+<?startWindow(_L("Phone"));?>
+	<img id="realtimePhone" src="graph_job.png.php?type=phone&jobid=<?=$_GET['jobid']?>&junk=<?= rand() ?>" />
+<?endWindow();?>
+
+<?startWindow(_L("Email"));?>
+	<img id="realtimeEmail" src="graph_job.png.php?type=email&jobid=<?=$_GET['jobid']?>&junk=<?= rand() ?>" />
+<?endWindow();?>
+
+<?startWindow(_L("SMS"));?>
+	<img id="realtimeSMS" src="graph_job.png.php?type=sms&jobid=<?=$_GET['jobid']?>&junk=<?= rand() ?>" />
+<?endWindow();?>
+<?
 
 //endWindow();
 print('<br>');
@@ -60,10 +75,12 @@ print('<br>');
 include_once("popupbottom.inc.php");
 if (!$noupdate) {
 ?>
-<script language="JavaScript">
+<script type='text/javascript'>
 <!--
 function UpdateTimer() {
-	document.realtime.src = 'graph_job.png.php?jobid=<?=$_GET['jobid']?>&foo=' + new Date();
+	$('realtimePhone').src = 'graph_job.png.php?type=phone&jobid=<?=$_GET['jobid']?>&foo=' + new Date();
+	$('realtimeEmail').src = 'graph_job.png.php?type=email&jobid=<?=$_GET['jobid']?>&foo=' + new Date();
+	$('realtimeSMS').src = 'graph_job.png.php?type=sms&jobid=<?=$_GET['jobid']?>&foo=' + new Date();
 	setTimeout('UpdateTimer()', 15000);
 }
 -->
