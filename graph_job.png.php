@@ -55,36 +55,42 @@ switch ($type) {
 		break;
 	case 'email':
 		$coalesceSQL = "
+			if(rc.result not in ('sent', 'duplicate', 'declined') and rc.numattempts = 0 and j.status not in ('complete','cancelled'), 'inprogress', null),
 			rc.result
 		";
 		$cpcolors = array(
 			"sent" => "lightgreen",
 			"unsent" => "#1DC10",
 			"duplicate" => "lightgray",
-			"declined" => "yellow"
+			"declined" => "yellow",
+			"inprogress" => "blue"
 		);
 		$cpcodes = array(
 			"sent" => "Sent",
 			"unsent" => "Unsent",
 			"duplicate" => "Duplicate",
-			"declined" => "No Email Selected"
+			"declined" => "No Email Selected",
+			"inprogress" => "Queued"
 		);
 		break;
 	case 'sms':
 		$coalesceSQL = "
+			if(rc.result not in ('sent', 'duplicate', 'declined') and rc.numattempts = 0 and j.status not in ('complete','cancelled'), 'inprogress', null),
 			rc.result
 		";
 		$cpcolors = array(
 			"sent" => "lightgreen",
 			"unsent" => "#1DC10",
 			"duplicate" => "lightgray",
-			"declined" => "yellow"
+			"declined" => "yellow",
+			"inprogress" => "blue"
 		);
 		$cpcodes = array(
 			"sent" => "Sent",
 			"unsent" => "Unsent",
 			"duplicate" => "Duplicate",
-			"declined" => "No SMS Selected"
+			"declined" => "No SMS Selected",
+			"inprogress" => "Queued"
 		);
 		break;
 }
@@ -106,13 +112,14 @@ foreach ($data as $k => $v) {
 }
 $legend = $data;
 $colors = $data;
-
 if ($result = Query($query, false, array($type, $jobid))) {
 	while ($row = DBGetRow($result)) {
+		if($row[1] == "fail")
+			$row[1] = "F";
+
 		if(!isset($data[$row[1]])){
 			continue;
-		} else if($row[1] == "fail"){
-			$row[1] = "F";
+		} else if($row[1] == "F"){
 			$data[$row[1]] += $row[0];
 		}else
 			$data[$row[1]] = $row[0];
@@ -160,7 +167,13 @@ $graph = new PieGraph(400,300,"auto");
 $graph->SetFrame(false);
 $graph->SetAntiAliasing();
 
-$graph->title->Set("Call results - " . date("g:i:s a"));
+if ($type == 'phone')
+	$graph->title->Set("Phone results - " . date("g:i:s a"));
+else if ($type == 'email')
+	$graph->title->Set("Email results - " . date("g:i:s a"));
+else if ($type == 'sms')
+	$graph->title->Set("SMS results - " . date("g:i:s a"));
+
 $graph->title->SetFont(FF_FONT1,FS_BOLD);
 
 $p1 = new PiePlot3D(($data));
