@@ -38,6 +38,8 @@ require_once("obj/Person.obj.php");
 require_once("obj/Email.obj.php");
 require_once("obj/ListEntry.obj.php");
 require_once("obj/Sms.obj.php");
+require_once("inc/reportgeneratorutils.inc.php");
+require_once("inc/auth.inc.php");
 
 // Job step form data
 require_once("jobwizard.inc.php");
@@ -636,6 +638,8 @@ class FinishJobWizard extends WizFinish {
 		$job->update();
 		if ($schedule['date'])
 			$job->runNow();
+			
+		$_SESSION['wizard_job']['submitted_jobid'] = $job->id;
 		
 		Query("COMMIT");
 	}
@@ -649,8 +653,21 @@ class FinishJobWizard extends WizFinish {
 				</script>';
 				
 		$html = '<h1>Success! Your notification request has been submitted.</h1>';
+		$html .= '<div id="embedjobmonitor"></div>';
+		$html .= "
+			<script type='text/javascript'>
+				new Ajax.Updater('embedjobmonitor', 'jobmonitor.php', {
+					evalScripts: true,
+					method: 'get',
+					parameters: {
+						notpopup: true,
+						jobid: {$_SESSION['wizard_job']['submitted_jobid']}
+					}
+				});
+			</script>
+		";
 		//if ($postdata["/schedule/options"]["schedule"] == "template")
-			$html .= '<script>window.location="start.php";</script>';
+		//	$html .= '<script>window.location="start.php";</script>';
 		return $html;
 	}
 }
