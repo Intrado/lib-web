@@ -118,6 +118,25 @@ foreach ($customertables as $t) {
 if ($anyerrors)
 	die("################## HASH MISMATCH DETECTED##################\n\n");
 
+
+// create triggers
+// NOTE we need to create triggers before we copy all shard jobs in case one starts processing
+echo("Create triggers\n");
+$sqlqueries = explode("$$$",file_get_contents("../db/createtriggers.sql"));
+if (false === QuickUpdate("START TRANSACTION", $destsharddb))
+	die("cannot start transaction");
+foreach ($sqlqueries as $query) {
+	if (trim($query)) {
+		$query = str_replace('_$CUSTOMERID_', $customerid, $query);
+		$rowcount = QuickUpdate($query,$destsharddb);
+		if ($rowcount === false)
+			dieerror ("Failed to execute statement \n$query\n\nfor c_$customerid : ", $destsharddb);
+	}
+}
+if (false === QuickUpdate("COMMIT", $destsharddb))
+	die("failed to commit transaction");
+
+
 $srcsharddb->query("use aspshard");
 //$destsharddb->query("use aspshard"); //leave this set to customer db for queries below
 
@@ -130,11 +149,18 @@ $timezone = QuickQuery("select value from setting where name='timezone'",$destsh
 
 // reportsubscription
 echo ("Copy reportsubscriptions\n");
+if (false === QuickUpdate("START TRANSACTION", $destsharddb))
+	die("cannot start transaction");
 $query = "INSERT INTO aspshard.qreportsubscription (id, customerid, userid, type, daysofweek, dayofmonth, time, timezone, nextrun, email) select id, ".$customerid.", userid, type, daysofweek, dayofmonth, time, '".$timezone."', nextrun, email from reportsubscription";
 $rowcount = QuickUpdate($query,$destsharddb);
 if ($rowcount === false)
 	dieerror ("Failed to execute statement \n$query\n\nfor c_$customerid : ", $destsharddb);
+if (false === QuickUpdate("COMMIT", $destsharddb))
+	die("failed to commit transaction");
 
+if (false === QuickUpdate("START TRANSACTION", $destsharddb))
+	die("cannot start transaction");
+	
 // jobsetting
 echo ("Copy repeating jobs and settings\n");
 $query = "INSERT INTO aspshard.qjobsetting (customerid, jobid, name, value) SELECT ".$customerid.", jobid, name, value FROM jobsetting WHERE jobid in (select id from job where status='repeating')";
@@ -162,18 +188,9 @@ $rowcount = QuickUpdate($query,$destsharddb);
 if ($rowcount === false)
 	dieerror ("Failed to execute statement \n$query\n\nfor c_$customerid : ", $destsharddb);
 
+if (false === QuickUpdate("COMMIT", $destsharddb))
+	die("failed to commit transaction");
 
-// create triggers
-echo("Create triggers\n");
-$sqlqueries = explode("$$$",file_get_contents("../db/createtriggers.sql"));
-foreach ($sqlqueries as $query) {
-	if (trim($query)) {
-		$query = str_replace('_$CUSTOMERID_', $customerid, $query);
-		$rowcount = QuickUpdate($query,$destsharddb);
-		if ($rowcount === false)
-			dieerror ("Failed to execute statement \n$query\n\nfor c_$customerid : ", $destsharddb);
-	}
-}
 
 //----------------------------------------------------------------------
 

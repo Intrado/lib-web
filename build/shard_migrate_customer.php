@@ -87,6 +87,7 @@ if ($return_var) {
 // drop triggers
 echo("Drop triggers\n");
 $sqlqueries = explode("$$$",file_get_contents("../db/droptriggers.sql"));
+mysql_query("START TRANSACTION",$custdb);
 foreach ($sqlqueries as $query) {
 	if (trim($query)) {
 		$query = str_replace('_$CUSTOMERID_', $customerid, $query);
@@ -95,21 +96,31 @@ foreach ($sqlqueries as $query) {
 		// ignore failure caused by not exists
 	}
 }
-
+mysql_query("COMMIT",$custdb);
 
 ///////////////////////////////////////
 // remove any data from shard (customer may have been active for a bit in testing)
 echo "Removing shard bits\n";
 mysql_select_db("aspshard");
 $tablearray = array("importqueue", "jobstatdata", "qjobperson", "qjobtask", "specialtaskqueue", "qreportsubscription", "qjobsetting", "qschedule", "qjob");
+$rollback = false;
+mysql_query("START TRANSACTION",$custdb);
 foreach ($tablearray as $t) {
 	echo (".");
 	$query = "delete from ".$t." where customerid=$customerid";
 	if (!mysql_query($query,$custdb)) {
 		echo("Failed to execute statement \n$query\n\n : " . mysql_error($custdb));
+		$rollback = true;
+		break;
 	}
 }
 echo ("\n");
+if ($rollback) {
+	mysql_query("ROLLBACK",$custdb);
+	die("rollback and quit\n");
+}
+mysql_query("COMMIT",$custdb);
+
 
 //////////////////////////////////////
 // save some customer settings that we do not want to overwrite, will rewrite them after import
@@ -203,15 +214,25 @@ $customertables = array(
 	"userrule",
 	"usersetting",
 	"voicereply");
-
+	
+$rollback = false;
+mysql_query("START TRANSACTION",$custdb);
 foreach ($customertables as $t) {
 	echo (".");
 	$query = "truncate table $t";
 	if (!mysql_query($query,$custdb)) {
 		echo("Failed to execute statement \n$query\n\n : " . mysql_error($custdb));
+		$rollback = true;
+		break;
 	}
 }
 echo "\n";
+if ($rollback) {
+	mysql_query("ROLLBACK", $custdb);
+	die("rollback and quit\n");
+}
+mysql_query("COMMIT",$custdb);
+
 
 
 //////////////////////////////////////
@@ -236,12 +257,12 @@ createSMUserProfile($pdo);
 // reset saved customer settings
 foreach ($settings as $name => $value) {
 	$query = "delete from setting where name='$name'";
-	mysql_query($query)
+	mysql_query($query, $custdb)
 		or die("Failure to execute query $query ". mysql_error());
 	$name = DBSafe($name, $pdo);
 	$value = DBSafe($value, $pdo);
 	$query = "insert into setting (name, value) values ('$name', '$value')";
-	mysql_query($query)
+	mysql_query($query, $custdb)
 		or die("Failure to execute query $query ". mysql_error());
 }
 
@@ -258,6 +279,22 @@ mysql_query($query)
 
 
 //////////////////////////////////////
+// create triggers
+// NOTE: we need the triggers before any shard data is copied, in case redialer starts a report or job before this script finishes
+echo("Create triggers\n");
+$sqlqueries = explode("$$$",file_get_contents("../db/createtriggers.sql"));
+mysql_query("START TRANSACTION", $custdb);
+foreach ($sqlqueries as $query) {
+	if (trim($query)) {
+		$query = str_replace('_$CUSTOMERID_', $customerid, $query);
+		mysql_query($query,$custdb)
+			or die ("Failed to execute statement \n$query\n\nfor $customerdbname : " . mysql_error($custdb));
+	}
+}
+mysql_query("COMMIT", $custdb);
+
+
+//////////////////////////////////////
 // copy job/schedule/reportsubscription to shard
 
 $query = "select value from setting where name='timezone'";
@@ -268,12 +305,15 @@ $timezone = "'".mysql_result($res, 0)."'";
 // reportsubscription
 echo ("Copy reportsubscriptions\n");
 $query = "INSERT ignore INTO aspshard.qreportsubscription (id, customerid, userid, type, daysofweek, dayofmonth, time, timezone, nextrun, email) select id, ".$customerid.", userid, type, daysofweek, dayofmonth, time, ".$timezone.", nextrun, email from reportsubscription";
+mysql_query("START TRANSACTION", $custdb);
 mysql_query($query,$custdb)
 	or die ("Failed to execute statement \n$query\n\nfor $customerdbname : " . mysql_error($custdb));
+mysql_query("COMMIT", $custdb);
 
 // jobsetting
 echo ("Copy repeating jobs and settings\n");
 $query = "INSERT ignore INTO aspshard.qjobsetting (customerid, jobid, name, value) SELECT ".$customerid.", jobid, name, value FROM jobsetting WHERE jobid in (select id from job where status='repeating')";
+mysql_query("START TRANSACTION", $custdb);
 mysql_query($query,$custdb)
 	or die ("Failed to execute statement \n$query\n\nfor $customerdbname : " . mysql_error($custdb));
 
@@ -293,19 +333,7 @@ $query = "INSERT ignore INTO aspshard.qjob (id, customerid, userid, scheduleid, 
          " select id, ".$customerid.", userid, scheduleid, listid, phonemessageid, emailmessageid, printmessageid, smsmessageid, questionnaireid, ".$timezone.", startdate, enddate, starttime, endtime, 'scheduled', jobtypeid, thesql from job where status='scheduled'";
 mysql_query($query,$custdb)
 	or die ("Failed to execute statement \n$query\n\nfor $customerdbname : " . mysql_error($custdb));
-
-
-//////////////////////////////////////
-// create triggers
-echo("Create triggers\n");
-$sqlqueries = explode("$$$",file_get_contents("../db/createtriggers.sql"));
-foreach ($sqlqueries as $query) {
-	if (trim($query)) {
-		$query = str_replace('_$CUSTOMERID_', $customerid, $query);
-		mysql_query($query,$custdb)
-			or die ("Failed to execute statement \n$query\n\nfor $customerdbname : " . mysql_error($custdb));
-	}
-}
+mysql_query("COMMIT", $custdb);
 
 
 echo("!!!DONE!!!\n");
