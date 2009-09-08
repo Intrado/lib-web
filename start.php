@@ -44,8 +44,11 @@ $filter = "";
 if (isset($_GET['filter'])) {
 	$filter = $_GET['filter'];
 }
+
+$isajax = isset($_GET['ajax']);
+ 
 $mergeditems = array();
-if($ajax!==true) {
+if($isajax === true) {
 	switch ($filter) {
 		case "lists":
 			$mergeditems = array_merge($mergeditems,QuickQueryMultiRow("select 'list' as type,'Saved' as status, id, name, modifydate as date, lastused from list where userid=? and deleted = 0 and modifydate is not null order by modifydate desc limit 10",true,false,array($USER->id)));
@@ -462,7 +465,7 @@ function activityfeed($mergeditems,$ajax = false) {
 	return $activityfeed;
 }
 
-if (isset($_GET['ajax'])) {
+if ($isajax) {
 	header('Content-Type: application/json');
 	$data = activityfeed($mergeditems,true);
 	echo json_encode(!empty($data) ? $data : false);
