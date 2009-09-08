@@ -27,6 +27,7 @@ $SETTINGS = parse_ini_file("../inc/settings.ini.php",true);
 require_once("../inc/db.inc.php");
 require_once("../inc/DBMappedObject.php");
 require_once("../inc/DBRelationMap.php");
+require_once("../manager/managerutils.inc.php");
 
 //----------------------------------------------------------------------
 
@@ -79,13 +80,15 @@ if ($retval != 0)
 echo "creating destination DB\n";
 $newdbname = "c_$customerid";
 $newpass = genpassword();
+$limitedusername = "c_".$customerid."_limited";
+$limitedpassword = genpassword();
 
 $query = "create database $newdbname DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci";
 QuickUpdate($query,$destsharddb) or die ("Failed to create new DB $newdbname : " . errorinfo($destsharddb));
 $destsharddb->query("use ".$newdbname) or die ("Failed select db $newdbname : " . errorinfo($destsharddb));
 
-
 QuickUpdate("drop user '$newdbname'", $destsharddb); //ensure mysql credentials match our records, which it won't if create user fails because the user already exists
+QuickUpdate("drop user '$newlimitedname'", $destsharddb); //ensure mysql credentials match our records, which it won't if create user fails because the user already exists
 QuickUpdate("create user '$newdbname' identified by '$newpass'", $destsharddb);
 QuickUpdate("grant select, insert, update, delete, create temporary tables, execute on $newdbname . * to '$newdbname'", $destsharddb);
 
@@ -96,6 +99,8 @@ $result = exec($cmd,$output,$retval);
 if ($retval != 0)
 	die("Problem loading transfer data\n" . implode("\n",$output));
 
+// create the limited user
+createLimitedUser($limitedusername, $limitedpassword, $newdbname, $destsharddb);
 
 //verify the tables by doing a checksum
 
@@ -200,7 +205,7 @@ $srcsharddb->query("use aspshard"); //ensure src shard connection is set to asps
 
 //update authserver to point to new customer info
 //update shardid and password
-$query = "update customer set shardid=$destshard, dbpassword='" . DBSafe($newpass,$authdb) . "' where id=$customerid";
+$query = "update customer set dbusername='" . DBSafe($newuser,$authdb) . "', limitedusername='" . DBSafe($limitedusername, $authdb) . "', shardid=$destshard, dbpassword='" . DBSafe($newpass,$authdb) . "' where id=$customerid";
 if (QuickUpdate($query,$authdb) === false)
 	echo "Problem updating customer table:" . errorinfo($authdb) . "\n";
 
@@ -221,6 +226,10 @@ echo "\n";
 $query = "drop user c_$customerid";
 if (QuickUpdate($query,$srcsharddb) === false)
 	echo "Problem dropping old customer user:" . errorinfo($srcsharddb) . "\n";
+//drop old limited customer user
+$query = "drop user c_".$customerid."_limited";
+if (QuickUpdate($query,$srcsharddb) === false)
+	echo "Problem dropping old limited customer user:" . errorinfo($srcsharddb) . "\n";
 //drop old customer db
 echo "Dropping old database\n";
 $query = "drop database c_$customerid";
@@ -232,16 +241,6 @@ echo "/-------------------------------------------------------------\\\n";
 echo "| Dont forget to restart authserver, redialer, dispatchers    |\n";
 echo "| as they cache connection info                               |\n";
 echo "\\-------------------------------------------------------------/\n";
-
-
-function genpassword($digits = 15) {
-	$passwd = "";
-	$chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
-	while ($digits--) {
-		$passwd .= $chars[mt_rand(0,strlen($chars)-1)];
-	}
-	return $passwd;
-}
 
 
 function verify_table ($db1,$db2,$table) {
