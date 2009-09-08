@@ -8,10 +8,13 @@ if (!isset($_POST['message'])) {
 //	error_log("txtpostback OK for now, no message, this must be a postback status");
 	exit();
 }
-
 error_log("txtpostback recieved: ".http_build_query($_POST));
 
-$keywords_optout = array("end","stop","quit","cancel","unsubscribe");
+$optoutkeywords = array("end","stop","quit","cancel","unsubscribe");
+$optinkeywords = array("yes","subscribe","ok");
+
+require_once("XML/RPC.php");
+require_once("manager/authclient.inc.php");
 
 //----------------------------------------------------------------------
 
@@ -66,14 +69,41 @@ if ($splitmessage[0] === "help") {
 
 //check to see if this txt message has any of our keywords
 $hasoptout = false;
-foreach ($keywords_optout as $keyword) {
+foreach ($optoutkeywords as $keyword) {
 	if (stripos($splitmessage[0],$keyword) === 0) {
 		//echo "Keyword found. \n";// For testing
 		$hasoptout = true;
 	}
 }
+$hasoptin = false;
+foreach ($optinkeywords as $keyword) {
+	if (stripos($splitmessage[0],$keyword) === 0) {
+		//echo "Keyword found. \n";// For testing
+		$hasoptin = true;
+	}
+}
 
-if (!$hasoptout) {
+if ($hasoptout) {
+	// call authserver to update global blocked list
+	blocksms($sourceaddress, 'block', 'automated block due to keyword '.$splitmessage[0]);
+	
+	$body = "You have been unsubscribed from School Messenger Alerts and will no longer receive msgs. 4 info visit www.schoolmessenger.com/txtmsg. Text HELP for info.";
+	sendtxt($username, $password, $inboundshortcode, $sourceaddress, $body);
+	
+	// Send a email to support
+	//echo "Emailing. ";// For testing
+
+	$emaillist = "";
+	foreach ($emails as $email) {
+		$emaillist .= " ".$email;
+	}
+	simpleemail($subject ,http_build_query($_POST), $emaillist, "noreply@schoolmessenger.com:SMS Listener");
+	
+} else if ($hasoptin) {
+	// call authserver to update global blocked list
+	blocksms($sourceaddress, 'optin', 'automated optin due to keyword '.$splitmessage[0]);
+
+} else {
 	// Send a reply sms message if not in our keyword list, but only if we haven't already today
 
 	// Check file mod time
@@ -106,19 +136,6 @@ if (!$hasoptout) {
 
 	$body = "This is the SchoolMessenger automated notification system. For more information, reply HELP. Send STOP to opt out. Std rates/other chgs may apply.";
 	sendtxt($username, $password, $inboundshortcode, $sourceaddress, $body);
-	
-} else {
-	$body = "You have been unsubscribed from School Messenger Alerts and will no longer receive msgs. 4 info visit www.schoolmessenger.com/txtmsg. Text HELP for info.";
-	sendtxt($username, $password, $inboundshortcode, $sourceaddress, $body);
-	
-	// Send a email to support
-	//echo "Emailing. ";// For testing
-
-	$emaillist = "";
-	foreach ($emails as $email) {
-		$emaillist .= " ".$email;
-	}
-	simpleemail($subject ,http_build_query($_POST), $emaillist, "noreply@schoolmessenger.com:SMS Listener");
 }
 
 

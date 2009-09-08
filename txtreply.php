@@ -1,8 +1,11 @@
 <?
 /*CSDELETEMARKER_START*/
 
-$keywords = array("end","stop","quit","cancel","unsubscribe");
+$optoutkeywords = array("end","stop","quit","cancel","unsubscribe");
+$optinkeywords = array("yes","subscribe","ok");
 
+require_once("XML/RPC.php");
+require_once("manager/authclient.inc.php");
 
 //----------------------------------------------------------------------
 
@@ -59,15 +62,36 @@ $splitmessage[0] === "schooldemo") {
 }
 
 //check to see if this txt message has any of our keywords
-$haskeyword = false;
-foreach ($keywords as $keyword) {
+$hasoptout = false;
+foreach ($optoutkeywords as $keyword) {
 	if (stripos($splitmessage[0],$keyword) === 0) {
 		//echo "Keyword found. \n";// For testing
-		$haskeyword = true;
+		$hasoptout = true;
 	}
 }
 
-if (!$haskeyword) {
+$hasoptin = false;
+foreach ($optinkeywords as $keyword) {
+	if (stripos($splitmessage[0],$keyword) === 0) {
+		//echo "Keyword found. \n";// For testing
+		$hasoptin = true;
+	}
+}
+
+if ($hasoptout) {
+	// call authserver to update global blocked list
+	blocksms($sourceaddress, 'block', 'automated block due to keyword '.$splitmessage[0]);
+	
+	// Send a email to support
+	//echo "Emailing. ";// For testing
+	foreach ($emails as $email) {
+		simpleemail($subject,$body,$email,"noreply@schoolmessenger.com:SMS Listener");
+	}
+} else if ($hasoptin) {
+	// call authserver to update global blocked list
+	blocksms($sourceaddress, 'optin', 'automated optin due to keyword '.$splitmessage[0]);
+
+} else {
 	// Send a reply sms message if not in our keyword list, but only if we haven't already today
 
 	// Check file mod time
@@ -108,13 +132,6 @@ if (!$haskeyword) {
 		}
 	} else {
 		error_log("Error with Soap client: could not send reply SMS");
-	}
-} else {
-	// Send a email to support
-	//echo "Emailing. ";// For testing
-
-	foreach ($emails as $email) {
-		simpleemail($subject,$body,$email,"noreply@schoolmessenger.com:SMS Listener");
 	}
 }
 
