@@ -45,70 +45,70 @@ if (isset($_GET['filter'])) {
 	$filter = $_GET['filter'];
 }
 $mergeditems = array();
-
-switch ($filter) {
-	case "lists":
-		$mergeditems = array_merge($mergeditems,QuickQueryMultiRow("select 'list' as type,'Saved' as status, id, name, modifydate as date, lastused from list where userid=? and deleted = 0 and modifydate is not null order by modifydate desc limit 10",true,false,array($USER->id)));
-		break;
-	case "messages":
-		$mergeditems = array_merge($mergeditems,QuickQueryMultiRow("select 'message' as type,'Saved' as status,id, name, modifydate as date, type as messagetype, deleted from message where  userid=? and deleted = 0 and modifydate is not null order by modifydate desc limit 10",true,false,array($USER->id)));
-		break;
-	case "phonemessages":
-		$mergeditems = array_merge($mergeditems,QuickQueryMultiRow("select 'message' as type,'Saved' as status,id, name, modifydate as date, type as messagetype, deleted from message where  userid=? and deleted = 0 and modifydate is not null and type='phone' order by modifydate desc limit 10",true,false,array($USER->id)));
-		break;
-	case "emailmessages":
-		$mergeditems = array_merge($mergeditems,QuickQueryMultiRow("select 'message' as type,'Saved' as status,id, name, modifydate as date, type as messagetype, deleted from message where  userid=? and deleted = 0 and modifydate is not null and type='email' order by modifydate desc limit 10",true,false,array($USER->id)));
-		break;
-	case "smsmessages":
-		$mergeditems = array_merge($mergeditems,QuickQueryMultiRow("select 'message' as type,'Saved' as status,id, name, modifydate as date, type as messagetype, deleted from message where  userid=? and deleted = 0 and modifydate is not null and type='sms' order by modifydate desc limit 10",true,false,array($USER->id)));
-		break;
-	case "jobs":
-		$mergeditems = array_merge($mergeditems,QuickQueryMultiRow("select 'job' as type,status,id, name, modifydate as date,'modifydate' as datetype, type as jobtype, deleted from job where userid=? and deleted = 0 and (finishdate is null || status='repeating') and modifydate is not null order by modifydate desc limit 10",true,false,array($USER->id)));
-		$mergeditems = array_merge($mergeditems,QuickQueryMultiRow("select 'job' as type,status,id, name, finishdate as date,'finishdate' as datetype, type as jobtype, deleted from job where userid=? and deleted = 0 and status!='repeating' and finishdate is not null order by finishdate desc limit 10",true,false,array($USER->id)));
-		break;		
-	case "savedjobs":
-		$mergeditems = array_merge($mergeditems,QuickQueryMultiRow("select 'job' as type,status,id, name, modifydate as date,'modifydate' as datetype, type as jobtype, deleted from job where userid=? and deleted = 0 and finishdate is null and modifydate is not null and status = 'new' order by modifydate desc limit 10",true,false,array($USER->id)));
-		break;
-	case "repeatingjobs":
-		$mergeditems = array_merge($mergeditems,QuickQueryMultiRow("select 'job' as type,status,id, name, modifydate as date,'modifydate' as datetype,type as jobtype, deleted from job where userid=? and deleted = 0 and modifydate is not null and status='repeating' order by modifydate desc limit 10",true,false,array($USER->id)));
-		break;
-	case "scheduledjobs":
-		$mergeditems = array_merge($mergeditems,QuickQueryMultiRow("select 'job' as type,status,id, name, modifydate as date,'modifydate' as datetype, type as jobtype, deleted from job where userid=? and deleted = 0 and finishdate is null and modifydate is not null and status = 'scheduled' order by modifydate desc limit 10",true,false,array($USER->id)));
-		break;
-	case "activejobs":
-		$mergeditems = array_merge($mergeditems,QuickQueryMultiRow("select 'job' as type,status,id, name, modifydate as date,'modifydate' as datetype, type as jobtype,percentprocessed, deleted from job where userid=? and deleted = 0 and finishdate is null and modifydate is not null and status in ('processing','procactive','active') order by modifydate desc limit 10",true,false,array($USER->id)));
-		break;
-	case "cancelledjobs":
-		$mergeditems = array_merge($mergeditems,QuickQueryMultiRow("select 'job' as type,status,id, name, modifydate as date,'modifydate' as datetype, type as jobtype, deleted from job where userid=? and deleted = 0 and finishdate is null and modifydate is not null and status in ('cancelled','cancelling') order by modifydate desc limit 10",true,false,array($USER->id)));
-		$mergeditems = array_merge($mergeditems,QuickQueryMultiRow("select 'job' as type,status,id, name, finishdate as date,'finishdate' as datetype,type as jobtype, deleted from job where userid=? and deleted = 0 and finishdate is not null and status in ('cancelled','cancelling') order by finishdate desc limit 10",true,false,array($USER->id)));
-		break;
-	case "completedjobs":
-		$mergeditems = array_merge($mergeditems,QuickQueryMultiRow("select 'job' as type,status,id, name, finishdate as date,'finishdate' as datetype,type as jobtype, deleted from job where userid=? and deleted = 0 and finishdate is not null and status = 'complete' order by finishdate desc limit 10",true,false,array($USER->id)));
-		$mergeditems = array_merge($mergeditems,QuickQueryMultiRow("select 'job' as type,status,id, name, modifydate as date,'modifydate' as datetype , type as jobtype, deleted from job where userid=? and deleted = 0 and finishdate is null and modifydate is not null and status in ('cancelled','cancelling') order by modifydate desc limit 10",true,false,array($USER->id)));
-		$mergeditems = array_merge($mergeditems,QuickQueryMultiRow("select 'job' as type,status,id, name, finishdate as date,'finishdate' as datetype,type as jobtype, deleted from job where userid=? and deleted = 0 and finishdate is not null and status in ('cancelled','cancelling') order by finishdate desc limit 10",true,false,array($USER->id)));
-		break;	
-	case "savedreports":
-		$mergeditems = array_merge($mergeditems, QuickQueryMultiRow("select 'report' as type,'Saved' as status,id, name, modifydate as date from reportsubscription where userid=? and modifydate is not null order by modifydate desc limit 10",true,false,array($USER->id)));
-		break;
-	case "emailedreports":
-		$mergeditems = array_merge($mergeditems, QuickQueryMultiRow("select 'report' as type,'Emailed' as status,id, name, lastrun as date from reportsubscription where userid=? and lastrun is not null order by lastrun desc limit 10",true,false,array($USER->id)));
-		break;
-	case "systemmessages":
-		$mergeditems = array_merge($mergeditems, QuickQueryMultiRow("select 'systemmessage' as type,'' as status,id,icon, message, modifydate as date from systemmessages where modifydate is not null order by modifydate desc limit 10",true));
-		break;	
-	default:
-		$mergeditems = array_merge($mergeditems,QuickQueryMultiRow("select 'list' as type,'Saved' as status, id, name, modifydate as date, lastused from list where userid=? and deleted = 0  and modifydate is not null order by modifydate desc limit 10",true,false,array($USER->id)));
-		$mergeditems = array_merge($mergeditems,QuickQueryMultiRow("select 'message' as type,'Saved' as status,id, name, modifydate as date, type as messagetype, deleted from message where userid=? and deleted = 0  and modifydate is not null order by modifydate desc limit 10",true,false,array($USER->id)));
-		$mergeditems = array_merge($mergeditems,QuickQueryMultiRow("select 'job' as type,status,id, name, modifydate as date,'modifydate' as datetype, type as jobtype,percentprocessed, deleted from job where userid=? and deleted = 0  and (finishdate is null || status='repeating') and modifydate is not null order by modifydate desc limit 10",true,false,array($USER->id)));
-		$mergeditems = array_merge($mergeditems,QuickQueryMultiRow("select 'job' as type,status,id, name, finishdate as date,'finishdate' as datetype,type as jobtype,percentprocessed, deleted from job where userid=? and deleted = 0  and status!='repeating' and finishdate is not null order by finishdate desc limit 10",true,false,array($USER->id)));
-		$mergeditems = array_merge($mergeditems,QuickQueryMultiRow("select 'report' as type,'Saved' as status,id, name, modifydate as date from reportsubscription where userid=? and modifydate is not null order by modifydate desc limit 10",true,false,array($USER->id)));
-		$mergeditems = array_merge($mergeditems,QuickQueryMultiRow("select 'report' as type,'Emailed' as status,id, name, lastrun as date from reportsubscription where userid=? and lastrun is not null order by lastrun desc limit 10",true,false,array($USER->id)));
-		$mergeditems = array_merge($mergeditems, QuickQueryMultiRow("select 'systemmessage' as type,'' as status,id,icon, message, modifydate as date from systemmessages where modifydate is not null order by modifydate desc limit 10",true));
-		break;	
-} 
-
-uasort($mergeditems, 'itemcmp');
-
+if($ajax!==true) {
+	switch ($filter) {
+		case "lists":
+			$mergeditems = array_merge($mergeditems,QuickQueryMultiRow("select 'list' as type,'Saved' as status, id, name, modifydate as date, lastused from list where userid=? and deleted = 0 and modifydate is not null order by modifydate desc limit 10",true,false,array($USER->id)));
+			break;
+		case "messages":
+			$mergeditems = array_merge($mergeditems,QuickQueryMultiRow("select 'message' as type,'Saved' as status,id, name, modifydate as date, type as messagetype, deleted from message where  userid=? and deleted = 0 and modifydate is not null order by modifydate desc limit 10",true,false,array($USER->id)));
+			break;
+		case "phonemessages":
+			$mergeditems = array_merge($mergeditems,QuickQueryMultiRow("select 'message' as type,'Saved' as status,id, name, modifydate as date, type as messagetype, deleted from message where  userid=? and deleted = 0 and modifydate is not null and type='phone' order by modifydate desc limit 10",true,false,array($USER->id)));
+			break;
+		case "emailmessages":
+			$mergeditems = array_merge($mergeditems,QuickQueryMultiRow("select 'message' as type,'Saved' as status,id, name, modifydate as date, type as messagetype, deleted from message where  userid=? and deleted = 0 and modifydate is not null and type='email' order by modifydate desc limit 10",true,false,array($USER->id)));
+			break;
+		case "smsmessages":
+			$mergeditems = array_merge($mergeditems,QuickQueryMultiRow("select 'message' as type,'Saved' as status,id, name, modifydate as date, type as messagetype, deleted from message where  userid=? and deleted = 0 and modifydate is not null and type='sms' order by modifydate desc limit 10",true,false,array($USER->id)));
+			break;
+		case "jobs":
+			$mergeditems = array_merge($mergeditems,QuickQueryMultiRow("select 'job' as type,status,id, name, modifydate as date,'modifydate' as datetype, type as jobtype, deleted from job where userid=? and deleted = 0 and (finishdate is null || status='repeating') and modifydate is not null order by modifydate desc limit 10",true,false,array($USER->id)));
+			$mergeditems = array_merge($mergeditems,QuickQueryMultiRow("select 'job' as type,status,id, name, finishdate as date,'finishdate' as datetype, type as jobtype, deleted from job where userid=? and deleted = 0 and status!='repeating' and finishdate is not null order by finishdate desc limit 10",true,false,array($USER->id)));
+			break;		
+		case "savedjobs":
+			$mergeditems = array_merge($mergeditems,QuickQueryMultiRow("select 'job' as type,status,id, name, modifydate as date,'modifydate' as datetype, type as jobtype, deleted from job where userid=? and deleted = 0 and finishdate is null and modifydate is not null and status = 'new' order by modifydate desc limit 10",true,false,array($USER->id)));
+			break;
+		case "repeatingjobs":
+			$mergeditems = array_merge($mergeditems,QuickQueryMultiRow("select 'job' as type,status,id, name, modifydate as date,'modifydate' as datetype,type as jobtype, deleted from job where userid=? and deleted = 0 and modifydate is not null and status='repeating' order by modifydate desc limit 10",true,false,array($USER->id)));
+			break;
+		case "scheduledjobs":
+			$mergeditems = array_merge($mergeditems,QuickQueryMultiRow("select 'job' as type,status,id, name, modifydate as date,'modifydate' as datetype, type as jobtype, deleted from job where userid=? and deleted = 0 and finishdate is null and modifydate is not null and status = 'scheduled' order by modifydate desc limit 10",true,false,array($USER->id)));
+			break;
+		case "activejobs":
+			$mergeditems = array_merge($mergeditems,QuickQueryMultiRow("select 'job' as type,status,id, name, modifydate as date,'modifydate' as datetype, type as jobtype,percentprocessed, deleted from job where userid=? and deleted = 0 and finishdate is null and modifydate is not null and status in ('processing','procactive','active') order by modifydate desc limit 10",true,false,array($USER->id)));
+			break;
+		case "cancelledjobs":
+			$mergeditems = array_merge($mergeditems,QuickQueryMultiRow("select 'job' as type,status,id, name, modifydate as date,'modifydate' as datetype, type as jobtype, deleted from job where userid=? and deleted = 0 and finishdate is null and modifydate is not null and status in ('cancelled','cancelling') order by modifydate desc limit 10",true,false,array($USER->id)));
+			$mergeditems = array_merge($mergeditems,QuickQueryMultiRow("select 'job' as type,status,id, name, finishdate as date,'finishdate' as datetype,type as jobtype, deleted from job where userid=? and deleted = 0 and finishdate is not null and status in ('cancelled','cancelling') order by finishdate desc limit 10",true,false,array($USER->id)));
+			break;
+		case "completedjobs":
+			$mergeditems = array_merge($mergeditems,QuickQueryMultiRow("select 'job' as type,status,id, name, finishdate as date,'finishdate' as datetype,type as jobtype, deleted from job where userid=? and deleted = 0 and finishdate is not null and status = 'complete' order by finishdate desc limit 10",true,false,array($USER->id)));
+			$mergeditems = array_merge($mergeditems,QuickQueryMultiRow("select 'job' as type,status,id, name, modifydate as date,'modifydate' as datetype , type as jobtype, deleted from job where userid=? and deleted = 0 and finishdate is null and modifydate is not null and status in ('cancelled','cancelling') order by modifydate desc limit 10",true,false,array($USER->id)));
+			$mergeditems = array_merge($mergeditems,QuickQueryMultiRow("select 'job' as type,status,id, name, finishdate as date,'finishdate' as datetype,type as jobtype, deleted from job where userid=? and deleted = 0 and finishdate is not null and status in ('cancelled','cancelling') order by finishdate desc limit 10",true,false,array($USER->id)));
+			break;	
+		case "savedreports":
+			$mergeditems = array_merge($mergeditems, QuickQueryMultiRow("select 'report' as type,'Saved' as status,id, name, modifydate as date from reportsubscription where userid=? and modifydate is not null order by modifydate desc limit 10",true,false,array($USER->id)));
+			break;
+		case "emailedreports":
+			$mergeditems = array_merge($mergeditems, QuickQueryMultiRow("select 'report' as type,'Emailed' as status,id, name, lastrun as date from reportsubscription where userid=? and lastrun is not null order by lastrun desc limit 10",true,false,array($USER->id)));
+			break;
+		case "systemmessages":
+			$mergeditems = array_merge($mergeditems, QuickQueryMultiRow("select 'systemmessage' as type,'' as status,id,icon, message, modifydate as date from systemmessages where modifydate is not null order by modifydate desc limit 10",true));
+			break;	
+		default:
+			$mergeditems = array_merge($mergeditems,QuickQueryMultiRow("select 'list' as type,'Saved' as status, id, name, modifydate as date, lastused from list where userid=? and deleted = 0  and modifydate is not null order by modifydate desc limit 10",true,false,array($USER->id)));
+			$mergeditems = array_merge($mergeditems,QuickQueryMultiRow("select 'message' as type,'Saved' as status,id, name, modifydate as date, type as messagetype, deleted from message where userid=? and deleted = 0  and modifydate is not null order by modifydate desc limit 10",true,false,array($USER->id)));
+			$mergeditems = array_merge($mergeditems,QuickQueryMultiRow("select 'job' as type,status,id, name, modifydate as date,'modifydate' as datetype, type as jobtype,percentprocessed, deleted from job where userid=? and deleted = 0  and (finishdate is null || status='repeating') and modifydate is not null order by modifydate desc limit 10",true,false,array($USER->id)));
+			$mergeditems = array_merge($mergeditems,QuickQueryMultiRow("select 'job' as type,status,id, name, finishdate as date,'finishdate' as datetype,type as jobtype,percentprocessed, deleted from job where userid=? and deleted = 0  and status!='repeating' and finishdate is not null order by finishdate desc limit 10",true,false,array($USER->id)));
+			$mergeditems = array_merge($mergeditems,QuickQueryMultiRow("select 'report' as type,'Saved' as status,id, name, modifydate as date from reportsubscription where userid=? and modifydate is not null order by modifydate desc limit 10",true,false,array($USER->id)));
+			$mergeditems = array_merge($mergeditems,QuickQueryMultiRow("select 'report' as type,'Emailed' as status,id, name, lastrun as date from reportsubscription where userid=? and lastrun is not null order by lastrun desc limit 10",true,false,array($USER->id)));
+			$mergeditems = array_merge($mergeditems, QuickQueryMultiRow("select 'systemmessage' as type,'' as status,id,icon, message, modifydate as date from systemmessages where modifydate is not null order by modifydate desc limit 10",true));
+			break;	
+	} 
+	
+	uasort($mergeditems, 'itemcmp');
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 // Display Functions
@@ -213,203 +213,179 @@ function activityfeed($mergeditems,$ajax = false) {
 	$limit = 10;
 	$duplicatejob = array(); 
 	
-	if(empty($mergeditems)) {
-		if(!$ajax)
-			$activityfeed .= '		<tr>
-									<td valign="top" width="60px"><img src="img/largeicons/information.jpg" /></td>
+	if($ajax===true) {
+		if(empty($mergeditems)) {
+				$activityfeed[] = array("itemid" => "",
+											"defaultlink" => "",
+											"defaultonclick" => "",
+											"icon" => "largeicons/information.jpg",
+											"title" => _L("No Recent Items."),
+											"content" => "",
+											"tools" => "");
+		} else {
+			while(!empty($mergeditems) && $limit > 0) {
+				$item = array_shift($mergeditems);
+				$time = date("M j, g:i a",strtotime($item["date"]));	
+				$title = $item["status"];
+				$content = "";
+				$tools = "";
+				$itemid = $item["id"];
+				$icon = "";
+				$defaultlink = "";
+				$defaultonclick = "";
+				if($item["type"] == "job" ) {
+					if(array_search($itemid,$duplicatejob) !== false) {
+						continue;
+					} 
+					$status = $item["status"];
+					if($status == "completed" || $status == "cancelled") {
+						$duplicatejob[] = $itemid;
+					}
+					
+					$job = new Job();
+					$job->id = $itemid;
+					$job->status = $status;
+					$job->deleted = $item["deleted"];
+					$job->type = $item["jobtype"];
+					$tools = fmt_jobs_actions ($job,$item["name"]);
+					$tools = str_replace("&nbsp;|&nbsp;","<br />",$tools);
+					
+					$jobtype = $item["jobtype"] == "survey" ? _L("Survey") : _L("Job");
+					switch($status) {
+						case "new":
+							$title = _L('%1$s Saved',$jobtype);
+							$defaultlink = "job.php?id=$itemid";
+							$icon = 'largeicons/folderandfiles.jpg';
+							$jobcontent = typestring($item["jobtype"]) . "&nbsp;message&nbsp;with&nbsp;" . listcontacts($job,"job");						
+							break;
+						case "repeating":
+							if($item["datetype"]=="finishdate")
+								$title = _L("Running Repeating Job");
+							else
+								$title = _L('Repeating Job Saved');
+							$icon = 'largeicons/calendar.jpg';
+							$defaultlink = "jobrepeating.php?id=$itemid";
+							$jobcontent = typestring($item["jobtype"]) . "&nbsp;message&nbsp;with&nbsp;" . listcontacts($job,"job");
+							break;
+						case "complete":
+							$title = _L('%1$s Completed Successfully',$jobtype);
+							$icon = 'largeicons/' . ($item["jobtype"]=="survey"?"checklist.jpg":"checkedgreen.jpg") .  '"';
+							$defaultlink = $item["jobtype"] == "survey" ? "reportsurveysummary.php?jobid=$itemid" : "reportjobsummary.php?jobid=$itemid";									
+							$jobcontent = listcontacts($job,"job");
+							break;
+						case "cancelled":
+							$title = _L('%1$s Cancelled',$jobtype);
+							$icon = 'largeicons/checkedbluegreen.jpg';
+							$jobcontent = listcontacts($job,"job");	
+							$defaultlink = $item["jobtype"] == "survey" ? "reportsurveysummary.php?jobid=$itemid" : "reportjobsummary.php?jobid=$itemid";
+							break;
+						case "cancelling":
+							$title = _L('%1$s Cancelling',$jobtype);
+							$icon = 'largeicons/gear.jpg';
+							$jobcontent = listcontacts($job,"job");						
+							$defaultlink = $item["jobtype"] == "survey" ? "reportsurveysummary.php?jobid=$itemid" : "reportjobsummary.php?jobid=$itemid";
+							break;
+						case "active":
+							$title = _L('%1$s Submitted, Status: Active',$jobtype);
+							$icon = 'largeicons/ping.jpg';
+							$defaultlink = "#";
+							$jobcontent = listcontacts($job,"job");	
+							$defaultonclick = "onclick=\"popup('jobmonitor.php?jobid=$itemid', 500, 450);\"";
+							break;
+						case "scheduled":
+							$title = _L('%1$s Submitted, Status: Scheduled',$jobtype);
+							$icon = 'largeicons/clock.jpg';
+							$defaultlink = "job.php?id=$itemid";
+							$jobcontent = typestring($item["jobtype"]) . "&nbsp;message&nbsp;with&nbsp;" . listcontacts($job,"job");
+							break;
+						case "procactive" || "processing":		
+							$job->percentprocessed = $item["percentprocessed"];	
+							$title = _L('%1$s Submitted, Status: %2$s',$jobtype,escapehtml(fmt_status($job,$item["name"])));
+							$icon = 'largeicons/gear.jpg';
+							$defaultlink = "job.php?id=$itemid";
+							$jobcontent = typestring($item["jobtype"]) . "&nbsp;message&nbsp;with&nbsp;" . listcontacts($job,"job");	
+							break;								
+						default:
+							$title = _L('Job %1$s',escapehtml(fmt_status($job,$item["name"])));
+							break;
+					}
+					$content = '<a href="' . $defaultlink . '" ' . $defaultonclick . '>' .
+											$time .  '&nbsp;-&nbsp;<b>' .  escapehtml($item["name"]) . '</b>&nbsp;';
+					
+					$content .= '</a><div style="margin-right:10px;margin-top:10px;">
+								<a href="' . $defaultlink . '" ' . $defaultonclick . '>';
+					$content .= $jobcontent . '</a>';
+					$content .= job_responses($job,Null);
+					$content .= '</div>';
+				} else if($item["type"] == "list" ) {
+					$title = "Contact List " . escapehtml($title);
+					$defaultlink = "list.php?id=$itemid";
+					$content = '<a href="' . $defaultlink . '">' . $time .  ' - <b>' .   escapehtml($item["name"]) . "</b>";
+									
+					$content .= '&nbsp;-&nbsp;';
+					if(isset($item["lastused"]))
+						$content .= 'This list was last used: <i>' . date("M j, g:i a",strtotime($item["lastused"])) . "</i>";
+					else
+						$content .= 'This list has never been used ';
+					$content .= " and has " . listcontacts($itemid,"list") . '</a>';
+					$tools = action_links (action_link("Edit", "pencil", "list.php?id=$itemid"),action_link("Preview", "application_view_list", "showlist.php?id=$itemid"));
+					$tools = str_replace("&nbsp;|&nbsp;","<br />",$tools);
+					$icon = 'largeicons/addrbook.jpg';			
+				} else if($item["type"] == "message") {
+					$messagetype = $item["messagetype"];
+					$title = _L('%1$s message %2$s',($messagetype == "sms"?"SMS":(escapehtml(ucfirst($messagetype)))),escapehtml($title));
+					$tools = action_links (
+						action_link("Edit", "pencil", 'message' . $item["messagetype"] . '.php?id=' . $itemid),
+						action_link("Play","diagona/16/131",null,"popup('previewmessage.php?close=1&id=$itemid', 400, 500); return false;")
+						);	
+					$defaultlink = "message$messagetype.php?id=$itemid";
+					$content = '<a href="' . $defaultlink . '" ' . $defaultonclick . '>' . $time .  ' - <b>' .  escapehtml($item["name"]) . '</b>' . '</a>';
+					switch($messagetype) {
+						case "phone":
+							$icon = 'largeicons/phonehandset.jpg';
+							break;
+						case "email":
+							$icon = 'largeicons/email.jpg';
+							break;
+						case "sms":
+							$icon = 'largeicons/smschat.jpg';
+							break;
+					}
+				} else if($item["type"] == "report" ) {
+					$title = "Report " . escapehtml($title);				
+					$content = '<a href="' . $defaultlink . '" ' . $defaultonclick . '>' . 
+									$time .  ' - ' .  escapehtml($item["name"]) . '</a>';
+					$icon = 'largeicons/savedreport.jpg';
+					$defaultlink = "reportjobsummary.php?id=$itemid";
+				} else if($item["type"] == "systemmessage" ) {
+					$content = $item["message"];
+					$icon = 'largeicons/news.jpg';
+				}
+				$activityfeed[] = array("itemid" => $itemid,
+											"defaultlink" => $defaultlink,
+											"defaultonclick" => $defaultonclick,
+											"icon" => $icon,
+											"title" => $title,
+											"content" => $content,
+											"tools" => $tools);
+				
+				$limit--;
+			}
+		} 
+	} else {
+		$activityfeed .= '<tr>
+									<td valign="top" width="60px"><img src="img/ajax-loader.gif" /></td>
 									<td >
 											<div class="feedtitle">
 												<a href="">	
-												' . _L("No Recent Items.") . '</a>
+												' . _L("Loading Recent Activity") . '</a>
 											</div>											
 									</td>
 									</tr>';
-		else {
-			$activityfeed[] = array("itemid" => "",
-										"defaultlink" => "",
-										"defaultonclick" => "",
-										"icon" => "largeicons/information.jpg",
-										"title" => _L("No Recent Items."),
-										"content" => "",
-										"tools" => "");
-		}	
-	} else {
-		while(!empty($mergeditems) && $limit > 0) {
-			$item = array_shift($mergeditems);
-			$time = date("M j, g:i a",strtotime($item["date"]));	
-			$title = $item["status"];
-			$content = "";
-			$tools = "";
-			$itemid = $item["id"];
-			$icon = "";
-			$defaultlink = "";
-			$defaultonclick = "";
-			if($item["type"] == "job" ) {
-				if(array_search($itemid,$duplicatejob) !== false) {
-					continue;
-				} 
-				$status = $item["status"];
-				if($status == "completed" || $status == "cancelled") {
-					$duplicatejob[] = $itemid;
-				}
-				
-				$job = new Job();
-				$job->id = $itemid;
-				$job->status = $status;
-				$job->deleted = $item["deleted"];
-				$job->type = $item["jobtype"];
-				$tools = fmt_jobs_actions ($job,$item["name"]);
-				$tools = str_replace("&nbsp;|&nbsp;","<br />",$tools);
-				
-				$jobtype = $item["jobtype"] == "survey" ? _L("Survey") : _L("Job");
-				switch($status) {
-					case "new":
-						$title = _L('%1$s Saved',$jobtype);
-						$defaultlink = "job.php?id=$itemid";
-						$icon = 'largeicons/folderandfiles.jpg';
-						$jobcontent = typestring($item["jobtype"]) . "&nbsp;message&nbsp;with&nbsp;" . listcontacts($job,"job");						
-						break;
-					case "repeating":
-						if($item["datetype"]=="finishdate")
-							$title = _L("Running Repeating Job");
-						else
-							$title = _L('Repeating Job Saved');
-						$icon = 'largeicons/calendar.jpg';
-						$defaultlink = "jobrepeating.php?id=$itemid";
-						$jobcontent = typestring($item["jobtype"]) . "&nbsp;message&nbsp;with&nbsp;" . listcontacts($job,"job");
-						break;
-					case "complete":
-						$title = _L('%1$s Completed Successfully',$jobtype);
-						$icon = 'largeicons/' . ($item["jobtype"]=="survey"?"checklist.jpg":"checkedgreen.jpg") .  '"';
-						$defaultlink = $item["jobtype"] == "survey" ? "reportsurveysummary.php?jobid=$itemid" : "reportjobsummary.php?jobid=$itemid";									
-						$jobcontent = listcontacts($job,"job");
-						break;
-					case "cancelled":
-						$title = _L('%1$s Cancelled',$jobtype);
-						$icon = 'largeicons/checkedbluegreen.jpg';
-						$jobcontent = listcontacts($job,"job");	
-						$defaultlink = $item["jobtype"] == "survey" ? "reportsurveysummary.php?jobid=$itemid" : "reportjobsummary.php?jobid=$itemid";
-						break;
-					case "cancelling":
-						$title = _L('%1$s Cancelling',$jobtype);
-						$icon = 'largeicons/gear.jpg';
-						$jobcontent = listcontacts($job,"job");						
-						$defaultlink = $item["jobtype"] == "survey" ? "reportsurveysummary.php?jobid=$itemid" : "reportjobsummary.php?jobid=$itemid";
-						break;
-					case "active":
-						$title = _L('%1$s Submitted, Status: Active',$jobtype);
-						$icon = 'largeicons/ping.jpg';
-						$defaultlink = "#";
-						$jobcontent = listcontacts($job,"job");	
-						$defaultonclick = "onclick=\"popup('jobmonitor.php?jobid=$itemid', 500, 450);\"";
-						break;
-					case "scheduled":
-						$title = _L('%1$s Submitted, Status: Scheduled',$jobtype);
-						$icon = 'largeicons/clock.jpg';
-						$defaultlink = "job.php?id=$itemid";
-						$jobcontent = typestring($item["jobtype"]) . "&nbsp;message&nbsp;with&nbsp;" . listcontacts($job,"job");
-						break;
-					case "procactive" || "processing":		
-						$job->percentprocessed = $item["percentprocessed"];	
-						$title = _L('%1$s Submitted, Status: %2$s',$jobtype,escapehtml(fmt_status($job,$item["name"])));
-						$icon = 'largeicons/gear.jpg';
-						$defaultlink = "job.php?id=$itemid";
-						$jobcontent = typestring($item["jobtype"]) . "&nbsp;message&nbsp;with&nbsp;" . listcontacts($job,"job");	
-						break;								
-					default:
-						$title = _L('Job %1$s',escapehtml(fmt_status($job,$item["name"])));
-						break;
-				}
-				$content = '<a href="' . $defaultlink . '" ' . $defaultonclick . '>' .
-										$time .  '&nbsp;-&nbsp;<b>' .  escapehtml($item["name"]) . '</b>&nbsp;';
-				
-				$content .= '</a><div style="margin-right:10px;margin-top:10px;">
-							<a href="' . $defaultlink . '" ' . $defaultonclick . '>';
-				$content .= $jobcontent . '</a>';
-				$content .= job_responses($job,Null);
-				$content .= '</div>';
-			} else if($item["type"] == "list" ) {
-				$title = "Contact List " . escapehtml($title);
-				$defaultlink = "list.php?id=$itemid";
-				$content = '<a href="' . $defaultlink . '">' . $time .  ' - <b>' .   escapehtml($item["name"]) . "</b>";
-								
-				$content .= '&nbsp;-&nbsp;';
-				if(isset($item["lastused"]))
-					$content .= 'This list was last used: <i>' . date("M j, g:i a",strtotime($item["lastused"])) . "</i>";
-				else
-					$content .= 'This list has never been used ';
-				$content .= " and has " . listcontacts($itemid,"list") . '</a>';
-				$tools = action_links (action_link("Edit", "pencil", "list.php?id=$itemid"),action_link("Preview", "application_view_list", "showlist.php?id=$itemid"));
-				$tools = str_replace("&nbsp;|&nbsp;","<br />",$tools);
-				$icon = 'largeicons/addrbook.jpg';			
-			} else if($item["type"] == "message") {
-				$messagetype = $item["messagetype"];
-				$title = _L('%1$s message %2$s',($messagetype == "sms"?"SMS":(escapehtml(ucfirst($messagetype)))),escapehtml($title));
-				$tools = action_links (
-					action_link("Edit", "pencil", 'message' . $item["messagetype"] . '.php?id=' . $itemid),
-					action_link("Play","diagona/16/131",null,"popup('previewmessage.php?close=1&id=$itemid', 400, 500); return false;")
-					);	
-				$defaultlink = "message$messagetype.php?id=$itemid";
-				$content = '<a href="' . $defaultlink . '" ' . $defaultonclick . '>' . $time .  ' - <b>' .  escapehtml($item["name"]) . '</b>' . '</a>';
-				switch($messagetype) {
-					case "phone":
-						$icon = 'largeicons/phonehandset.jpg';
-						break;
-					case "email":
-						$icon = 'largeicons/email.jpg';
-						break;
-					case "sms":
-						$icon = 'largeicons/smschat.jpg';
-						break;
-				}
-			} else if($item["type"] == "report" ) {
-				$title = "Report " . escapehtml($title);				
-				$content = '<a href="' . $defaultlink . '" ' . $defaultonclick . '>' . 
-								$time .  ' - ' .  escapehtml($item["name"]) . '</a>';
-				$icon = 'largeicons/savedreport.jpg';
-				$defaultlink = "reportjobsummary.php?id=$itemid";
-			} else if($item["type"] == "systemmessage" ) {
-				$content = $item["message"];
-				$icon = 'largeicons/news.jpg';
-			}
-						
-			if($ajax===true) {
-				$activityfeed[] = array("itemid" => $itemid,
-										"defaultlink" => $defaultlink,
-										"defaultonclick" => $defaultonclick,
-										"icon" => $icon,
-										"title" => $title,
-										"content" => $content,
-										"tools" => $tools);
-			} else {	
-				
-				$activityfeed .= '<tr>	
-										<td valign="top" width="60px"><a href="' . $defaultlink . '" ' . $defaultonclick . '><img src="img/' . $icon . '" /></a></td>
-										<td >
-											<div class="feedtitle">
-												<a href="' . $defaultlink . '" ' . $defaultonclick . '>	
-												' . $title . '</a>
-											</div>
-											<span>' . $content . '</span>
-											
-										</td>
-										<td valign="middle" width="100px">';
-						if($tools) {
-								$activityfeed .= '  <div id="actionlink_'. $actioncount .'" style="cursor:pointer" ><img src="img/largeicons/tiny20x20/tools.jpg" />&nbsp;Tools</div>
-													<div id="actions_'. $actioncount .'" style="display:none;">' . $tools  . '</div>';
-								$actioncount++;
-						} else {
-								$activityfeed .= '&nbsp;';
-						}
-				$activityfeed .= 	'	</td>';
-			}
-			$limit--;
-		}
-	} 
-	if($ajax!==true) {
 		$activityfeed .= "
 				<script>
 				var actionids = $actioncount;
+				
 				var jobfiltes = Array('none','jobs','savedjobs','scheduledjobs','activejobs','completedjobs','repeatingjobs','messages','phonemessages','emailmessages','smsmessages','lists','savedreports','systemmessages');
 				
 				function addfeedtools() {	
@@ -477,8 +453,11 @@ function activityfeed($mergeditems,$ajax = false) {
 							}
 						});
 				}
-				addfeedtools();				
+				document.observe('dom:loaded', function() {
+					applyfilter('none'); 
+				});
 				</script>";
+				
 	}
 	return $activityfeed;
 }
