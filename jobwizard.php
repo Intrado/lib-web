@@ -156,7 +156,7 @@ class FinishJobWizard extends WizFinish {
 	function emailTextMessage($msgdata) {
 		return array("Default" => array(
 			"id" => "",
-			"fromname" => "",
+			"fromname" => $msgdata["fromname"],
 			"from" => $msgdata["from"],
 			"subject" => $msgdata["subject"],
 			"attachments" => json_decode($msgdata["attachments"]),
@@ -174,7 +174,7 @@ class FinishJobWizard extends WizFinish {
 				$retval[$lang] = array(
 					"id" => "",
 					"from" => $msgdata["from"],
-					"fromname" => "",
+					"fromname" => $msgdata["fromname"],
 					"subject" => $msgdata["subject"],
 					"attachments" => json_decode($msgdata["attachments"]),
 					"text" => $newmsgdata->text,

@@ -1092,9 +1092,22 @@ class JobWiz_messageEmailText extends WizStep {
 		$msgdata = isset($postdata['/message/phone/text']['message'])?json_decode($postdata['/message/phone/text']['message']):json_decode('{"text": ""}');
 		// Form Fields.
 		$formdata = array($this->title);
-		$helpsteps = array(_L("Enter the address where you would like to receive replies."));
+		
+		$helpsteps = array(_L("Enter the name for the email acount."));
+		$formdata["fromname"] = array(
+			"label" => _L('From Name'),
+			"fieldhelp" => _L('Recipients will see this name as the sender of the email.'),
+			"value" => $USER->firstname . " " . $USER->lastname,
+			"validators" => array(
+					array("ValRequired","ValLength","min" => 3,"max" => 50)
+					),
+			"control" => array("TextField","size" => 25, "maxlength" => 51),
+			"helpstep" => 1
+		);
+		
+		$helpsteps[] = array(_L("Enter the address where you would like to receive replies."));
 		$formdata["from"] = array(
-			"label" => _L("From"),
+			"label" => _L("From Email"),
 			"fieldhelp" => _L('This is the address the email is coming from. Recipients will also be able to reply to this address.'),
 			"value" => $USER->email,
 			"validators" => array(
@@ -1103,7 +1116,7 @@ class JobWiz_messageEmailText extends WizStep {
 				array("ValEmail")
 				),
 			"control" => array("TextField","max"=>255,"min"=>3,"size"=>35),
-			"helpstep" => 1
+			"helpstep" => 2
 		);
 		
 		$helpsteps[] = _L("Enter the subject of the email here.");
@@ -1116,7 +1129,7 @@ class JobWiz_messageEmailText extends WizStep {
 				array("ValLength","min" => 3,"max" => 255)
 			),
 			"control" => array("TextField","max"=>255,"min"=>3,"size"=>45),
-			"helpstep" => 2
+			"helpstep" => 3
 		);
 
 		$helpsteps[] = _L("You may attach up to three files that are up to 2MB each. For greater security, only certain types of files are accepted.<br><br><b>Note:</b> Some email accounts may not accept attachments above a certain size and may reject your message.");
@@ -1126,7 +1139,7 @@ class JobWiz_messageEmailText extends WizStep {
 			"value" => "",
 			"validators" => array(array("ValEmailAttach")),
 			"control" => array("EmailAttach","size" => 30, "maxlength" => 51),
-			"helpstep" => 3
+			"helpstep" => 4
 		);
 		
 		$helpsteps[] = _L("Email message body text goes here. Be sure to introduce yourself and give detailed information. For helpful message tips and ideas, click the Help link in the upper right corner of the screen.");
@@ -1139,7 +1152,7 @@ class JobWiz_messageEmailText extends WizStep {
 				array("ValLength","max" => 30000)
 			),
 			"control" => array("TextArea","rows"=>10,"cols"=>45),
-			"helpstep" => 4
+			"helpstep" => 5
 		);
 
 		if ($USER->authorize('sendmulti')) {
@@ -1150,7 +1163,7 @@ class JobWiz_messageEmailText extends WizStep {
 				"value" => ($postdata['/start']['package'] == "express")?true:false,
 				"validators" => array(),
 				"control" => array("CheckBox"),
-				"helpstep" => 5
+				"helpstep" => 6
 			);
 		}
 		
