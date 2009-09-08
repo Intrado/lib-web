@@ -37,17 +37,71 @@ class JobSummaryReport extends ReportGenerator{
 		}
 		$this->params['joblist'] = $joblist;
 		// Query for graph in pdf
-		$this->query = "select count(*) as cnt,
+		$this->query = JobSummaryReport::getDestinationResultQuery($joblistquery, "and rp.type = 'phone'");
+	}
+
+	// @param $joblistquery, sql of the form: "and ___", like "and rp.jobid = 123"
+	// @param $rptypequery, sql of the form: "and ___", like "and rp.type = 'phone'"
+	static function getDestinationResultQuery($joblistquery, $rptypequery) {
+		return "select count(*) as cnt,
 				coalesce(rc.result, rp.status) as currentstatus,
-				sum(rc.result not in ('A','M', 'blocked', 'duplicate') and rc.numattempts < js.value) as remaining
+				sum(rc.result not in ('A','M', 'sent', 'blocked', 'duplicate') and rc.numattempts < js.value) as remaining
 				from reportperson rp
 				left join reportcontact rc on (rp.jobid = rc.jobid and rp.type = rc.type and rp.personid = rc.personid)
 				left join jobsetting js on (js.jobid = rc.jobid and js.name = 'maxcallattempts')
-				where 1 "
-				. $joblistquery .
-				" and rp.type='phone'
+				where 1 $joblistquery $rptypequery
 				group by currentstatus";
+	}
 
+	// @param $joblist, a comma-separated string of job ids, assumed to be SQL-injection-safe
+	static function getPhoneInfo($joblist, $readonlyconn) {
+		$phonenumberquery = "select sum(rc.type='phone') as total,
+									sum(rp.status in ('success', 'fail', 'duplicate', 'blocked')) as done,
+									sum(rp.status not in ('success', 'fail', 'duplicate', 'blocked', 'nocontacts', 'declined') and rc.result not in ('A', 'M', 'duplicate', 'blocked')) as remaining,
+									sum(rc.result = 'blocked') as blocked,
+									sum(rc.result = 'duplicate') as duplicate,
+									sum(rp.status = 'nocontacts' and rc.result is null) as nocontacts,
+									sum(rc.numattempts) as totalattempts,
+									sum(rp.status = 'declined' and rc.result is null) as declined,
+									100 * sum(rp.numcontacts and rp.status='success') / (sum(rp.numcontacts and rp.status != 'duplicate') +0.00) as success_rate
+									from reportperson rp
+									left join reportcontact rc on (rp.jobid = rc.jobid and rp.type = rc.type and rp.personid = rc.personid)
+									inner join job j on (j.id = rp.jobid)
+									where rp.jobid in ('$joblist')
+									and rp.type='phone'";
+		return QuickQueryRow($phonenumberquery, false, $readonlyconn);
+	}
+
+	// @param $joblist, a comma-separated string of job ids, assumed to be SQL-injection-safe
+	static function getEmailInfo($joblist, $readonlyconn) {
+		$emailquery = "select sum(rc.type = 'email') as total,
+									sum(rp.status in ('success', 'duplicate', 'fail')) as done,
+									sum(rp.status not in ('success', 'fail', 'duplicate', 'nocontacts', 'declined') and rc.result not in ('sent', 'duplicate', 'blocked')) as remaining,
+									sum(rc.result = 'duplicate') as duplicate,
+									sum(rp.status = 'nocontacts' and rc.result is null) as nocontacts,
+									sum(rp.status = 'declined' and rc.result is null) as declined,
+									100 * sum(rp.numcontacts and rp.status='success') / (sum(rp.numcontacts and rp.status != 'duplicate') +0.00) as success_rate
+									from reportperson rp
+									left join reportcontact rc on (rp.jobid = rc.jobid and rp.type = rc.type and rp.personid = rc.personid)
+									where rp.jobid in ('$joblist')
+									and rp.type='email'";
+		return QuickQueryRow($emailquery, false, $readonlyconn);
+	}
+
+	static function getSmsInfo($joblist, $readonlyconn) {
+		$smsquery = "select sum(rc.type = 'sms') as total,
+									sum(rp.status in ('success', 'duplicate', 'fail')) as done,
+									sum(rp.status not in ('success', 'fail', 'duplicate', 'blocked', 'nocontacts', 'declined') and rc.result not in ('sent', 'duplicate', 'blocked')) as remaining,
+									sum(rc.result = 'blocked') as blocked,
+									sum(rc.result = 'duplicate') as duplicate,
+									sum(rp.status = 'nocontacts' and rc.result is null) as nocontacts,
+									sum(rp.status = 'declined' and rc.result is null) as declined,
+									100 * sum(rp.numcontacts and rp.status='success') / (sum(rp.numcontacts and rp.status != 'duplicate') +0.00) as success_rate
+									from reportperson rp
+									left join reportcontact rc on (rp.jobid = rc.jobid and rp.type = rc.type and rp.personid = rc.personid)
+									where rp.jobid in ('$joblist')
+									and rp.type='sms'";
+		return QuickQueryRow($smsquery, false, $readonlyconn);
 	}
 
 	function runHtml(){
@@ -82,49 +136,10 @@ class JobSummaryReport extends ReportGenerator{
 
 		$hasconfirmation = QuickQuery("select sum(value) from jobsetting where name = 'messageconfirmation' and jobid in ('" . $this->params['joblist'] . "')", $this->_readonlyDB);
 
-		//Gather Phone Information
-		$phonenumberquery = "select sum(rc.type='phone') as total,
-									sum(rp.status in ('success', 'fail', 'duplicate', 'blocked')) as done,
-									sum(rp.status not in ('success', 'fail', 'duplicate', 'blocked', 'nocontacts', 'declined') and rc.result not in ('A', 'M', 'duplicate', 'blocked')) as remaining,
-									sum(rc.result = 'blocked') as blocked,
-									sum(rc.result = 'duplicate') as duplicate,
-									sum(rp.status = 'nocontacts' and rc.result is null) as nocontacts,
-									sum(rc.numattempts) as totalattempts,
-									sum(rp.status = 'declined' and rc.result is null) as declined,
-									100 * sum(rp.numcontacts and rp.status='success') / (sum(rp.numcontacts and rp.status != 'duplicate') +0.00) as success_rate
-									from reportperson rp
-									left join reportcontact rc on (rp.jobid = rc.jobid and rp.type = rc.type and rp.personid = rc.personid)
-									inner join job j on (j.id = rp.jobid)
-									where rp.jobid in ('" . $this->params['joblist'] . "')
-									and rp.type='phone'";
-		$phonenumberinfo = QuickQueryRow($phonenumberquery, false, $this->_readonlyDB);
-
-		$emailquery = "select sum(rc.type = 'email') as total,
-									sum(rp.status in ('success', 'duplicate', 'fail')) as done,
-									sum(rp.status not in ('success', 'fail', 'duplicate', 'nocontacts', 'declined') and rc.result not in ('sent', 'duplicate', 'blocked')) as remaining,
-									sum(rc.result = 'duplicate') as duplicate,
-									sum(rp.status = 'nocontacts' and rc.result is null) as nocontacts,
-									sum(rp.status = 'declined' and rc.result is null) as declined,
-									100 * sum(rp.numcontacts and rp.status='success') / (sum(rp.numcontacts and rp.status != 'duplicate') +0.00) as success_rate
-									from reportperson rp
-									left join reportcontact rc on (rp.jobid = rc.jobid and rp.type = rc.type and rp.personid = rc.personid)
-									where rp.jobid in ('" . $this->params['joblist'] . "')
-									and rp.type='email'";
-		$emailinfo = QuickQueryRow($emailquery, false, $this->_readonlyDB);
-
-		$smsquery = "select sum(rc.type = 'sms') as total,
-									sum(rp.status in ('success', 'duplicate', 'fail')) as done,
-									sum(rp.status not in ('success', 'fail', 'duplicate', 'blocked', 'nocontacts', 'declined') and rc.result not in ('sent', 'duplicate', 'blocked')) as remaining,
-									sum(rc.result = 'blocked') as blocked,
-									sum(rc.result = 'duplicate') as duplicate,
-									sum(rp.status = 'nocontacts' and rc.result is null) as nocontacts,
-									sum(rp.status = 'declined' and rc.result is null) as declined,
-									100 * sum(rp.numcontacts and rp.status='success') / (sum(rp.numcontacts and rp.status != 'duplicate') +0.00) as success_rate
-									from reportperson rp
-									left join reportcontact rc on (rp.jobid = rc.jobid and rp.type = rc.type and rp.personid = rc.personid)
-									where rp.jobid in ('" . $this->params['joblist'] . "')
-									and rp.type='sms'";
-		$smsinfo = QuickQueryRow($smsquery, false, $this->_readonlyDB);
+		//Gather Detailed Destination Results
+		$phonenumberinfo = JobSummaryReport::getPhoneInfo($this->params['joblist'], $this->_readonlyDB);
+		$emailinfo = JobSummaryReport::getEmailInfo($this->params['joblist'], $this->_readonlyDB);
+		$smsinfo = JobSummaryReport::getSmsInfo($this->params['joblist'], $this->_readonlyDB);
 
 
 		if($hasconfirmation){
