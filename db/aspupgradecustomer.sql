@@ -55,6 +55,9 @@ update message set modifydate = '2009-07-31 12:00:00' where modifydate is null a
 $$$
 
 -- sms opt-in text
+-- do not enable sms opt-in for existing customers
 INSERT INTO `setting` (`name`, `value`) VALUES
-('optintext', 'You may receive text messages from Your School')
+('smsoptintext', 'You may receive text messages from Your School'),
+('enablesmsoptin', '0')
 $$$
+

@@ -130,7 +130,6 @@ if(CheckFormSubmit($f,"Save") || CheckFormSubmit($f, "Return")) {
 
 			$displayname = GetFormData($f,$s,"name");
 			$timezone = GetFormData($f, $s, "timezone");
-			$optintext = GetFormData($f, $s, "optintext");
 			$hostname = GetFormData($f, $s, "hostname");
 			$inboundnumber  = GetFormData($f, $s, "inboundnumber");
 			$maxphones = GetFormData($f, $s, "maxphones");
@@ -145,6 +144,8 @@ if(CheckFormSubmit($f,"Save") || CheckFormSubmit($f, "Return")) {
 			$maxusers = GetFormData($f, $s, 'maxusers');
 			$managernote = GetFormData($f, $s, 'managernote');
 			$hassms = GetFormData($f, $s, 'hassms');
+			$enablesmsoptin = GetFormData($f, $s, "enablesmsoptin");
+			$smsoptintext = GetFormData($f, $s, "smsoptintext");
 			$maxsms = GetFormData($f, $s, 'maxsms');
 			$hasportal = GetFormData($f, $s, 'hasportal');
 			$hasselfsignup = GetFormData($f, $s, 'hasselfsignup');
@@ -202,8 +203,8 @@ if(CheckFormSubmit($f,"Save") || CheckFormSubmit($f, "Return")) {
 				error("Customer cannot have both Contact Manager and Self-Signup features, please select only one");
 			} else if ($emaildomainerror !== true) {
 				error($emaildomainerror);
-			} else if (count($optintext) > 100) {
-				error('Opt-in Text cannot exceed 100 characters');
+			} else if (count($smsoptintext) > 100) {
+				error('SMS Opt-in Text cannot exceed 100 characters');
 			} else {
 
 				QuickUpdate("update customer set
@@ -267,6 +268,9 @@ if(CheckFormSubmit($f,"Save") || CheckFormSubmit($f, "Return")) {
 					$maxusers = "unlimited";
 				setCustomerSystemSetting('_maxusers', $maxusers, $custdb);
 				setCustomerSystemSetting('_hassms', $hassms, $custdb);
+				setCustomerSystemSetting('enablesmsoptin', $enablesmsoptin, $custdb);
+				setCustomerSystemSetting('smsoptintext', $smsoptintext, $custdb);
+				
 				setCustomerSystemSetting('_hasportal', $hasportal, $custdb);
 				setCustomerSystemSetting('_hassurvey', GetFormData($f, $s, 'hassurvey'), $custdb);
 				setCustomerSystemSetting('_hascallback', GetFormData($f, $s, 'hascallback'), $custdb);
@@ -369,8 +373,6 @@ if(CheckFormSubmit($f,"Save") || CheckFormSubmit($f, "Return")) {
 				setCustomerSystemSetting('softdeletemonths', DBSafe(GetFormData($f, $s, "softdeletemonths")), $custdb);
 				setCustomerSystemSetting('harddeletemonths', DBSafe(GetFormData($f, $s, "harddeletemonths")), $custdb);
 
-				setCustomerSystemSetting('optintext', $optintext, $custdb);
-
 				if(CheckFormSubmit($f, "Return")){
 					redirect("customers.php");
 				} else {
@@ -416,7 +418,12 @@ if( $reloadform ) {
 		$maxusers = "";
 	PutFormData($f,$s,"maxusers", $maxusers, "number", 0);
 	PutFormData($f,$s,"managernote", $custinfo[8], "text", 0, 255);
+	
+	// SMS
 	PutFormData($f,$s,"hassms", getCustomerSystemSetting('_hassms', false, true, $custdb), "bool", 0, 1);
+	PutFormData($f, $s, "enablesmsoptin", getCustomerSystemSetting('enablesmsoptin', true, true, $custdb), "bool", 0, 1);
+	PutFormData($f, $s, "smsoptintext", getCustomerSystemSetting('smsoptintext', "You may receive text messages from Your School", false, $custdb));
+
 	PutFormData($f,$s,"hassurvey", getCustomerSystemSetting('_hassurvey', true, true, $custdb), "bool", 0, 1);
 	PutFormData($f,$s,"hasportal", getCustomerSystemSetting('_hasportal', false, true, $custdb), "bool", 0, 1);
 	PutFormData($f,$s,"hasselfsignup", getCustomerSystemSetting('_hasselfsignup', false, true, $custdb), "bool", 0, 1);
@@ -465,8 +472,6 @@ if( $reloadform ) {
 
 	PutFormData($f, $s, "softdeletemonths", getCustomerSystemSetting('softdeletemonths', "6", false, $custdb));
 	PutFormData($f, $s, "harddeletemonths", getCustomerSystemSetting('harddeletemonths', "24", false, $custdb));
-
-	PutFormData($f, $s, "optintext", getCustomerSystemSetting('optintext', "You may receive text messages from Your School", false, $custdb));
 }
 
 
@@ -564,7 +569,11 @@ foreach($languages as $index => $language){
 		</select>
 		<? NewFormItem($f, "Save","Add", 'submit');?>
 </td></tr>
+
 <tr><td> Has SMS </td><td><? NewFormItem($f, $s, 'hassms', 'checkbox') ?> SMS</td></tr>
+<tr><td> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Enable SMS Opt-in </td><td><? NewFormItem($f, $s, 'enablesmsoptin', 'checkbox') ?> Opt-in</td></tr>
+<tr><td> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SMS Opt-in Text: </td><td><? NewFormitem($f, $s, 'smsoptintext', 'textarea', 30) ?></td></tr>
+
 <tr><td> Has Survey </td><td><? NewFormItem($f, $s, 'hassurvey', 'checkbox') ?> Survey</td></tr>
 <tr><td> Has Contact Manager </td><td><? NewFormItem($f, $s, 'hasportal', 'checkbox') ?> Contact Manager</td></tr>
 <tr><td> Has Self-Signup </td><td><? NewFormItem($f, $s, 'hasselfsignup', 'checkbox') ?> Self-Signup</td></tr>
@@ -687,8 +696,6 @@ EndForm();
 ?>
 	</td>
 </tr>
-
-<tr><td>SMS Opt-in Text: </td><td><? NewFormitem($f, $s, 'optintext', 'textarea', 30) ?></td></tr>
 
 <tr>
 	<td><? NewFormItem($f, "Save","Save", 'submit');?>

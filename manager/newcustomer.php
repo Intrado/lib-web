@@ -165,7 +165,8 @@ if (CheckFormSubmit($f,$s)){
 				QuickUpdate($query, $newdb) or dieWithError(" SQL:" . $query, $newdb);
 
 				$surveyurl = $SETTINGS['feature']['customer_url_prefix'] . "/" . $hostname . "/survey/";
-				$optintext = 'You may receive text messages from Your School';
+				$smsoptintext = 'You may receive text messages from Your School';
+				$enablesmsoptin = '1';
 				
 				$query = "INSERT INTO `setting` (`name`, `value`) VALUES
 							('urlcomponent', ?),
@@ -176,9 +177,10 @@ if (CheckFormSubmit($f,$s)){
 							('surveyurl', ?),
 							('displayname', ?),
 							('timezone', ?),
-							('optintext', ?)";
+							('smsoptintext', ?),
+							('enablesmsoptin', ?)";
 
-				QuickUpdate($query, $newdb, array($hostname, $surveyurl, $displayname, $timezone, $optintext)) or dieWithError(" SQL:" . $query, $newdb);
+				QuickUpdate($query, $newdb, array($hostname, $surveyurl, $displayname, $timezone, $smsoptintext, $enablesmsoptin)) or dieWithError(" SQL:" . $query, $newdb);
 
 				$query = "INSERT INTO `ttsvoice` (`language`, `gender`) VALUES
 							('english', 'male'),
