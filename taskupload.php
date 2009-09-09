@@ -49,6 +49,7 @@ if(isset($_FILES['taskcontents']) && $_FILES['taskcontents']['tmp_name']) {
 		error('Unable to complete file upload. Please try again');
 	} else {
 		$data = file_get_contents($newname);
+		unlink($newname);
 		if ($import->upload($data)) {
 			redirect("taskmap.php?id=$import->id");
 		} else {
