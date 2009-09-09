@@ -1738,7 +1738,7 @@ function previewlanguage(language,female,male) {
 		textstr = textstr.substr(0,4000);
 	}
 	var encodedtext=encodeURIComponent(textstr);
-	popup('previewmessage.php?text=' + encodedtext + '&language=' + language +'&gender=' + voice, 400, 400);
+	popup('previewmessage.php?parentfield=phonetextarea&language=' + language +'&gender=' + voice,400,500);
 }
 
 
