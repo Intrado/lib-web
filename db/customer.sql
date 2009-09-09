@@ -1479,6 +1479,13 @@ ALTER TABLE `reportcontact` CHANGE `resultdata` `resultdata` VARCHAR( 255 ) CHAR
 $$$
 
 -- 7-0-x
+
+INSERT INTO systemmessages (id, message, icon, modifydate)
+VALUES (
+'1', '<div style="color:#3e693f;font-size: 20px;font-weight: bold;">New version 7.0!</div> <div style="font-size: 16px;margin: 25px;margin-bottom: 2px;">See for yourself <b><a href="javascript: popup(''help/flash/Welcome.swf'',750,500);"><img src="img/icons/control_play_blue.gif" /> Play Video</a></b></div> <ul> <li>New users be sure to print the <a href="help/html/Quick_Start_for_New_Users.pdf"><img src="img/icons/page_white_acrobat.gif" /> Quick Start Guide</a> <li>Want more detail? See the step-by-step training guides for <a href="help/html/Getting_Started_with_v7.pdf"><img src="img/icons/page_white_acrobat.gif" /> New Users</a> and <a href="help/html/Advanced_Training_with_v7.pdf"><img src="img/icons/page_white_acrobat.gif" /> Advanced Users</a> </ul>', 'largeicons/news.jpg', NOW()
+)
+$$$
+
 -- Set a permanent flag for messages/audiofiles that should never be deleted
 ALTER TABLE `message` ADD `permanent` TINYINT( 4 ) NOT NULL DEFAULT '0' AFTER `deleted` 
 $$$
