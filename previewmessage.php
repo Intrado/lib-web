@@ -28,67 +28,67 @@ require_once("obj/FormSelectMessage.fi.php");
 // Data Handling
 ////////////////////////////////////////////////////////////////////////////////
 
+$id = false;
 if (isset($_GET['id'])) {
-	if (userOwns("message", $_GET['id'] + 0) || $USER->authorize('managesystem'))
+	$_SESSION['ttstext'] = false;
+	if(userOwns("message", $_GET['id'] + 0) || $USER->authorize('managesystem')) {
 		$id = $_GET['id'] + 0;
-} else 
-	$id = false;
+		//find all unique fields and values used in this message
+		$messagefields = DBFindMany("FieldMap", "from fieldmap where fieldnum in (select distinct fieldnum from messagepart where messageid=?)", false, array($id));
+		if (count($messagefields) > 0) {
+			$fields = array();
+			$fielddata = array();
+			foreach ($messagefields as $fieldmap) {
+				$fields[$fieldmap->fieldnum] = $fieldmap;
+				if ($fieldmap->isOptionEnabled("multisearch")) {
+					$limit = DBFind('Rule', 'from rule inner join userrule on rule.id = userrule.ruleid where userid=? and fieldnum=?', false, array($USER->id, $fieldmap->fieldnum));
+					$limitsql = $limit ? $limit->toSQL(false, 'value', false, true) : '';
+					$fielddata[$fieldmap->fieldnum] = QuickQueryList("select value,value from persondatavalues where fieldnum=? $limitsql order by value", true, false, array($fieldmap->fieldnum));
+				}
+			}
+			// Get message parts so we can find the default values, if specified in the message
+			$messageparts = DBFindMany("MessagePart", "from messagepart where messageid = ? and type = 'V'", false, array($id));
+			$fielddefaults = array();
+			foreach ($messageparts as $messagepart)
+				$fielddefaults[$messagepart->fieldnum] = $messagepart->defaultvalue;
+		}
+		$msgType = QuickQuery("select type from message where id=?", false, array($id));
+	}
+}
 
+// First Text Request - See Display section
+
+// Second Text Request - Set the session data parse text to find out fields and return and return the form  
 if (isset($_POST['text'])) {
+	if (isset($_POST['gender'])) {
+		if(get_magic_quotes_gpc())
+			$_SESSION['ttsgender'] = stripslashes($_POST['gender']);
+		else
+			$_SESSION['ttsgender'] = $_POST['gender'];
+	} else
+		$_SESSION['ttsgender'] = "female";
+	
+	if (isset($_POST['language'])) {
+		if(get_magic_quotes_gpc())
+			$_SESSION['ttslanguage'] = stripslashes($_POST['language']);
+		else
+			$_SESSION['ttslanguage'] = $_POST['language'];
+	} else 
+		$_SESSION['$ttslanguage'] = "english";
+			
 	if(get_magic_quotes_gpc())
 		$_SESSION['ttstext'] = stripslashes($_POST['text']);
 	else
-		$_SESSION['ttstext'] = $_POST['text'];
-} else
-	$_SESSION['ttstext'] = false;
+		$_SESSION['ttstext'] = $_POST['text'];	
+} 
 
-if (isset($_POST['language'])) {
-	if(get_magic_quotes_gpc())
-		$_SESSION['ttslanguage'] = stripslashes($_POST['language']);
-	else
-		$_SESSION['ttslanguage'] = $_POST['language'];
-} else 
-	$_SESSION['$ttslanguage'] = "english";
-
-if (isset($_POST['gender'])) {
-	if(get_magic_quotes_gpc())
-		$_SESSION['ttsgender'] = stripslashes($_POST['gender']);
-	else
-		$_SESSION['ttsgender'] = $_POST['gender'];
-} else
-	$_SESSION['ttsgender'] = "female";
-
-	
-if (!$id && !$_SESSION['ttstext']) {
-	redirect("unauthorized.php");
-}
-if ($id) {	
-	//find all unique fields and values used in this message
-	$messagefields = DBFindMany("FieldMap", "from fieldmap where fieldnum in (select distinct fieldnum from messagepart where messageid=?)", false, array($id));
-	if (count($messagefields) > 0) {
-		$fields = array();
-		$fielddata = array();
-		foreach ($messagefields as $fieldmap) {
-			$fields[$fieldmap->fieldnum] = $fieldmap;
-			if ($fieldmap->isOptionEnabled("multisearch")) {
-				$limit = DBFind('Rule', 'from rule inner join userrule on rule.id = userrule.ruleid where userid=? and fieldnum=?', false, array($USER->id, $fieldmap->fieldnum));
-				$limitsql = $limit ? $limit->toSQL(false, 'value', false, true) : '';
-				$fielddata[$fieldmap->fieldnum] = QuickQueryList("select value,value from persondatavalues where fieldnum=? $limitsql order by value", true, false, array($fieldmap->fieldnum));
-			}
-		}
-		// Get message parts so we can find the default values, if specified in the message
-		$messageparts = DBFindMany("MessagePart", "from messagepart where messageid = ? and type = 'V'", false, array($id));
-		$fielddefaults = array();
-		foreach ($messageparts as $messagepart)
-			$fielddefaults[$messagepart->fieldnum] = $messagepart->defaultvalue;
-	}
-	$msgType = QuickQuery("select type from message where id=?", false, array($id));
-} else if($_SESSION['ttstext']) {
+// Third Text Request - Session data is already set but nee to parse again. Set fields and return form again 
+if($_SESSION['ttstext']) {
 	$voiceid = false;
 	if($_SESSION['ttsgender'] == "Female") {
 		$voiceid = QuickQuery("select id from ttsvoice where language=? and gender='Male'",false,array($language));
 	} else if($_SESSION['ttsgender'] == "Male") {
-		$voiceid = QuickQuery("select id from ttsvoice where language=? and gender='Female'",false,array($language));	
+		$voiceid = QuickQuery("select id from ttsvoice where language=? and gender='Female'",false,array($language));
 	}
 	if($voiceid	=== false)
 		$voiceid = 2; // default to english	female
@@ -103,10 +103,13 @@ if ($id) {
 			$fielddefaults[$part->fieldnum] = $part->defaultvalue;
 		}
 	}	
-	$messagefields = DBFindMany("FieldMap", "from fieldmap where fieldnum in (" . implode(",",$fieldnums) .  ")");
+	
+	$messagefields = DBFindMany("FieldMap", "from fieldmap where fieldnum in ('" . implode("','",$fieldnums) .  "')");
+	
 	$fields = array();
 	$fielddata = array();
-	foreach ($messagefields as $fieldmap) {
+	
+	foreach ($messagefields as $fieldmap) {		
 		$fields[$fieldmap->fieldnum] = $fieldmap;
 		if ($fieldmap->isOptionEnabled("multisearch")) {
 			$limit = DBFind('Rule', 'from rule inner join userrule on rule.id = userrule.ruleid where userid=? and fieldnum=?', false, array($USER->id, $fieldmap->fieldnum));
@@ -117,14 +120,12 @@ if ($id) {
 	$msgType = 'phone';	
 }
 
-
 if (!isset($msgType) || !$msgType)
 	$msgType = 'phone';
 	
-class FormHtmlWithId extends FormItem {
-	function render ($value) {
-		return '<div id="'.$this->args['id'].'" name="'.$this->args['id'].'">'.$this->args['html'].'</div>';
-	}
+	
+if (!$id && !isset($_SESSION['ttstext']) && !isset($_GET['parentfield']) ) {
+	redirect("unauthorized.php");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -132,7 +133,7 @@ class FormHtmlWithId extends FormItem {
 ////////////////////////////////////////////////////////////////////////////////
 $formdata = array();
 
-if ($id && isset($fields) && count($fields) && $msgType == 'phone') {
+if (isset($fields) && count($fields) && $msgType == 'phone') {
 	foreach ($fields as $field => $fieldmap) {
 		if ($fieldmap->isOptionEnabled("firstname")) {
 			$formdata[$field] = array (
@@ -178,15 +179,6 @@ if ($id && isset($fields) && count($fields) && $msgType == 'phone') {
 	}
 }
 
-if ($msgType == 'email' || $msgType == 'sms')
-	$formdata['preview'] = array(
-		"label" => 'Preview',
-		"value" => $id,
-		"validators" => array(),
-		"control" => array("SelectMessage", "type"=>$msgType, "width"=>"100%", "readonly"=>true, "values"=>array($id => array("name" => ""))),
-		"helpstep" => 1
-	);
-
 $buttons = array();
 if ($msgType == 'phone')
 	$buttons[] = submit_button(_L('Play with Field(s)'),"submit","fugue/control");
@@ -194,7 +186,6 @@ if ($msgType == 'phone')
 // Only display and handle form elements if there are form elements.
 if (count($formdata)) {
 	$form = new Form("messagepreview",$formdata,array(),$buttons);
-
 
 	////////////////////////////////////////////////////////////////////////////////
 	// Data Handling
@@ -218,11 +209,11 @@ if (count($formdata)) {
 				$previewdata .= "&$field=" . urlencode($value);
 			}
 			if ($msgType == 'phone') {
-				$request = ($id)?"id=$id":(isset($_POST['text'])?"usetext=true":"blank=true");
+				$request = ($id)?"id=$id":(isset($_SESSION['ttstext'])?"usetext=true":"blank=true");	
 				$form->modifyElement("messageresultdiv", '
 						<script language="JavaScript" type="text/javascript">
 							embedPlayer("preview.wav.php/embed_preview.wav?' . $request . $previewdata. '","player");
-							$("download").update(\'<a href="_preview.wav.php/download_preview.wav?' . $request.$previewdata . '&download=true">' . _L("Click here to download") . '</a>\');
+							$("download").update(\'<a href="_preview.wav.php/download_preview.wav?'  . $request .  $previewdata . '&download=true">' . _L("Click here to download") . '</a>\');
 						</script>
 						'
 				);
@@ -236,41 +227,97 @@ if (count($formdata)) {
 // Display
 ////////////////////////////////////////////////////////////////////////////////
 
-require_once("popup.inc.php");
-
-startWindow(_L("Message Preview"));
-if (count($formdata)) 
-	echo $form->render();
-if ($msgType == 'phone') {
-	$request = ($id)?"id=$id":(isset($_POST['text'])?"usetext=true":"blank=true");
-
-$hasdata = count($formdata);
-
-?>
-<script type="text/javascript" language="javascript" src="script/niftyplayer.js"></script>
-
-<div id="messagepreviewdiv" name="messagepreviewdiv">
-		<div align="center" style="clear:left">
-			<div id="player"></div>		
-<? 
-// If there is no formdata (no field inserts) then just play the message
- if (!$hasdata) {?>
-			<script language="JavaScript" type="text/javascript">
-  				embedPlayer("preview.wav.php/embed_preview.wav?<?=$request?>","player"); 
-			</script>
-<?} ?>
-			<div id='download'>
-<? if (!$hasdata) {?>			
-			<a href="preview.wav.php/download_preview.wav?<?=$request?>&download=true"><?=_L("Click here to download")?></a>
-<?} ?>		
+// First Request - Initial request for text preview - grab parent window field text and execute a post request to set session data and get field form data
+if (isset($_GET['parentfield'])) {
+	$parentfield = $_GET['parentfield'];
+	if (isset($_GET['gender']) && $_GET['gender'] != "") {
+		$gender = $_GET['gender'];
+	} else {
+		$gender = "female";
+	}
+	if (isset($_GET['language']) && $_GET['language'] != "") {
+		$language = $_GET['language'];
+	} else {
+		$language = "english";
+	}
+	
+	require_once("popup.inc.php");
+	startWindow(_L("Message Preview"));?>
+	<div id="previewcontainer"></div>
+	<script type="text/javascript" language="javascript" src="script/niftyplayer.js"></script>
+	<script language="JavaScript" type="text/javascript">
+				var gender = "<?=$gender ?>";
+				var language = "<?=$language ?>";					
+				var parentfield = '<?= $parentfield?>';
+				
+				var textobj = null; // Can not get prototype element accross window opener 
+				if (window.opener.document.getElementById) {
+					textobj = window.opener.document.getElementById(parentfield);
+				} else if (window.opener.document.all) {
+					textobj = window.opener.document.all[parentfield];
+  				} else if (window.opener.document.layers) {
+  					textobj = window.opener.document.layers[parentfield];
+ 				} 
+ 				if(!textobj || !textobj.value) {
+ 					$('previewcontainer').update("Unable to playback. Please try again later."); 				
+ 				} else {
+					new Ajax.Request('previewmessage.php', {
+						method:'post',
+					    parameters: {text: textobj.value, gender: gender, language: language},
+						onSuccess: function (result) {							
+					    	$('previewcontainer').update(result.responseText);
+					    },
+					    onFailure: function(){
+					    	$('previewcontainer').update("Unable to playback. Please try again later.");
+						}
+					});			
+ 				}
+	</script>
+	<? 
+	endWindow();
+	require_once("popupbottom.inc.php");
+	exit();
+} else {
+	if($id) {
+		$request = "id=$id";
+		require_once("popup.inc.php");
+		?>
+		<script type="text/javascript" language="javascript" src="script/niftyplayer.js"></script>
+		<?
+		startWindow(_L("Message Preview"));	
+	} else {
+		$request = isset($_SESSION['ttstext'])?"usetext=true":"blank=true";		
+	}
+	
+	if (count($formdata)) 
+		echo $form->render();
+	
+	$hasdata = count($formdata);	
+	?>
+	<div id="messagepreviewdiv" name="messagepreviewdiv">
+			<div align="center" style="clear:left">
+				<div id="player"></div>		
+	<? 
+	// If there is no formdata (no field inserts) then just play the message
+	if (!$hasdata) {?>
+				<script language="JavaScript" type="text/javascript">
+	 				embedPlayer("preview.wav.php/embed_preview.wav?<?= $request ?>","player");
+				</script>
+<?	} ?>
+				<div id='download'>
+<?	if (!$hasdata) {?> 		
+				<a href="preview.wav.php/download_preview.wav?<?= $request ?>&download=true"><?=_L("Click here to download")?></a>
+<?	} ?>		
+				</div>
 			</div>
-		</div>
-</div>
-<div id="messageresultdiv" name="messageresultdiv">
-</div>
-<?
-}
-endWindow();
+	</div>
+	<div id="messageresultdiv" name="messageresultdiv"></div>
+<? 
+	if($id) {
+		endWindow();
+		require_once("popupbottom.inc.php");
+	} 
 
-require_once("popupbottom.inc.php");
+}
 ?>
+	

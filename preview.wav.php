@@ -48,16 +48,15 @@ if (isset($_GET['usetext'])) {
 				$part->voiceid = $voiceid;
 		}	
 	}
-	$renderedparts = Message::renderParts($parts,$fields,"mp3");
-
+	$renderedparts = Message::renderParts($parts,$fields);
+	
 	session_write_close();//WARNING: we don't keep a lock on the session file, any changes to session data are ignored past this point
-	Message::playParts($renderedparts,$fields);
+	Message::playParts($renderedparts,"mp3");
 
 } else if(isset($_GET['id'])) {
-
-	
 	//session_write_close();//WARNING: we don't keep a lock on the session file, any changes to session data are ignored past this point
 	$id = $_GET['id'] + 0;
+	
 	if (userOwns("message",$id) || $USER->authorize('managesystem')) {
 		$fields=array();
 		for($i=1; $i <= 20; $i++){
