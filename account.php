@@ -414,6 +414,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		$postdata = $form->getData(); //gets assoc array of all values {name:value,...}
 		
 		//save data here
+		Query('BEGIN');
 		
 		if (!$readonly) {
 			$USER->firstname = $postdata['firstname'];
@@ -480,6 +481,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 			$_SESSION['colorscheme']['_brandratio'] = getSystemSetting("_brandratio");
 		}
 		
+		Query('COMMIT');
 		
 		if ($ajax)
 			$form->sendTo("start.php");
