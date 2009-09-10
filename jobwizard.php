@@ -227,14 +227,19 @@ class FinishJobWizard extends WizFinish {
 					$emailMsg["Default"]["text"] .= "DO NOT REPLY: This is an automatically generated email. Please do not send a reply message.\nTo be removed from these alerts please contact ". $_SESSION['custname']. ".\n";
 				}
 				if ($wizHasSmsMsg) {
+					
+					$custname = $_SESSION['custname'];
+					if (strlen($custname) > 40)
+						$custname = substr($custname,0,40);
+					
 					$smsmessagelink = true;
 					$smsMsg = array("Default" => array(
 						"id" => false,
-						"text" => "Phone message from ". $_SESSION['custname']. "\n",
+						"text" => $custname . " sent you a msg. 4 info txt HELP. To listen ",
 						"language" => "english"
 					));
 					if (getSystemSetting("_hascallback"))
-						$smsMsg["Default"]["text"] .= "To listen dial ". Phone::format(getSystemSetting("inboundnumber")). "\n\n";
+						$smsMsg["Default"]["text"] .= "call ". Phone::format(getSystemSetting("inboundnumber")) . " ";
 				}
 				break;
 			//Express Text
