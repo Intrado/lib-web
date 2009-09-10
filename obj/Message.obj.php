@@ -295,36 +295,51 @@ class Message extends DBMappedObject {
 		}
 		$intro = $intro?('"' . $intro . '" "media/2secondsilence.wav" '):'';
 		//finally, merge the wav files
-		$outname = secure_tmpname("preview",".$audioformat");
-		if($audioformat == "mp3") {
-			$cmd = 'sox ' . $intro. '"' . implode('" "',$wavfiles) . '" -t wav - | lame -S -V3 - "' . $outname . '"';
-		} else {
-			$cmd = 'sox ' . $intro. '"' . implode('" "',$wavfiles) . '" "' . $outname . '"';
-		} 
+		$outname = secure_tmpname("preview",".wav");
+		$cmd = 'sox ' . $intro. '"' . implode('" "',$wavfiles) . '" "' . $outname . '"';
 		$result = exec($cmd, $res1, $res2);
 
 		foreach ($wavfiles as $file)
 			@unlink($file);
-
-		if (!$res2 && file_exists($outname)) {
-			$data = file_get_contents ($outname); //readfile seems to cause problems
-
-			header("HTTP/1.0 200 OK");
-			if (isset($_GET['download']))
-				header('Content-type: application/x-octet-stream');
-			else if($audioformat == "mp3") {
-				header("Content-Type: audio/mpeg");
-			} else {
-				header("Content-Type: audio/wav");
-			} 
-			header("Content-disposition: attachment; filename=message.$audioformat");
-			header('Pragma: private');
-			header('Cache-control: private, must-revalidate');
-			header("Content-Length: " . strlen($data));
-			header("Connection: close");
-
-			echo $data;
-
+	
+		if (!$res2 && file_exists($outname)) {	
+			if($audioformat == "mp3") {
+				$outnamemp3 = secure_tmpname("preview",".mp3");
+				$cmd = 'lame -S -V3 "' . $outname . '" "' . $outnamemp3 . '"';
+				$result = exec($cmd, $res1, $res2);
+				if (!$res2 && file_exists($outname)) {
+					$data = file_get_contents ($outnamemp3); //readfile seems to cause problems
+					header("HTTP/1.0 200 OK");
+					if (isset($_GET['download']))
+						header('Content-type: application/x-octet-stream');
+					else {
+						header("Content-Type: audio/mpeg");
+					} 
+					header("Content-disposition: attachment; filename=message.$audioformat");
+					header('Pragma: private');
+					header('Cache-control: private, must-revalidate');
+					header("Content-Length: " . strlen($data));
+					header("Connection: close");
+					echo $data;
+				} else {
+					echo _L("An error occurred trying to generate the preview file. Please try again.");
+				}
+				@unlink($outnamemp3);
+			} else {		
+				$data = file_get_contents ($outname); // readfile seems to cause problems
+				header("HTTP/1.0 200 OK");
+				if (isset($_GET['download']))
+					header('Content-type: application/x-octet-stream');
+				else {
+					header("Content-Type: audio/wav");
+				} 
+				header("Content-disposition: attachment; filename=message.$audioformat");
+				header('Pragma: private');
+				header('Cache-control: private, must-revalidate');
+				header("Content-Length: " . strlen($data));
+				header("Connection: close");
+				echo $data;
+			}
 		} else {
 			echo _L("An error occurred trying to generate the preview file. Please try again.");
 		}
