@@ -90,6 +90,97 @@ if ($job->sendsms) {
 }
 $_SESSION['jobstats'][$job->id] = $jobstats;
 
+$notice = "";
+switch ($job->status) {
+	case 'new':
+		$notice = _L("This job is not submitted, no data available");
+		break;
+	case 'scheduled':
+		$scheduledtime = strtotime($job->startdate . " " . $job->starttime);
+		$difftimestamp = $scheduledtime - time();
+		$notice = _L("This job is scheduled to run in ");
+		if ($difftimestamp >= 60) {
+			$diffdays = floor($difftimestamp / (60*60*24));
+			$diffhours = floor(($difftimestamp - ($diffdays*60*60*24)) / (60*60));
+			$diffminutes = floor(($difftimestamp - ($diffdays*60*60*24 + $diffhours*60*60)) / 60);
+			if ($diffdays > 0)
+				$notice .= "$diffdays days ";
+			if ($diffhours > 0)
+				$notice .= "$diffhours hours ";
+			if ($diffminutes > 0)
+				$notice .= "$diffminutes minutes ";
+		} else {
+			$notice = _L("This job will run shortly");
+		}
+		break;
+	case 'processing':
+		$notice = _L("Please wait while this job is processed: ") . $job->percentprocessed . "%";
+		break;
+	case 'procactive':
+		$notice = _L("Please wait while this job is processed, some contacts are running: ") . $job->percentprocessed . "%";
+		break;
+	case 'active':
+		$notice = _L("This job is active");
+		break;
+	case 'cancelling':
+		$notice = _L("Please wait while this job is cancelled");
+		break;
+	case 'cancelled':
+	case 'complete':
+		$notice = _L("This job finished on %s", fmt_job_enddate($job, null));
+		break;
+	default:
+		$notice = _L('RROR: Unknown job status');
+		break;
+}
+
+$destinationresults = array();
+if ($job->sendphone) {
+		$phoneinfo = JobSummaryReport::getPhoneInfo($job->id, $readonlyconn);
+		$destinationresults['phone'] = array(
+			'recipients' => $phoneinfo[0]+0,
+			'completed' => $phoneinfo[1]+0,
+			'remaining' => $phoneinfo[2]+0,
+			'attempts' => $phoneinfo[6]+0,
+			'percentcontacted' => sprintf("%0.2f", isset($phoneinfo[8]) ? $phoneinfo[8] : "") . '%'
+		);
+}
+if ($job->sendemail) {
+		$destinationresults['email'] = JobSummaryReport::getEmailInfo($job->id, $readonlyconn);
+		$destinationresults['email'] = array(
+			'recipients' => $destinationresults['email'][0]+0,
+			'completed' => $destinationresults['email'][1]+0,
+			'remaining' => $destinationresults['email'][2]+0,
+			'percentcontacted' => sprintf("%0.2f", isset($destinationresults['email'][6]) ? $destinationresults['email'][6] : "") . '%'
+		);
+}
+if ($job->sendsms) {
+		$destinationresults['sms'] = JobSummaryReport::getSmsInfo($job->id, $readonlyconn);
+		$destinationresults['sms'] = array(
+			'recipients' => $destinationresults['sms'][0]+0,
+			'completed' => $destinationresults['sms'][1]+0,
+			'remaining' => $destinationresults['sms'][2]+0,
+			'percentcontacted' => sprintf("%0.2f", isset($destinationresults['sms'][6]) ? $destinationresults['sms'][6] : "") . '%'
+		);
+}
+$windowtitle = _L("Monitoring job, %1s, last updated %2s", escapehtml($job->name), date("g:i:s a",$jobstats['validstamp']));
+$imageurl = "graph_detail_callprogress.png.php?jobid={$job->id}&valid={$jobstats['validstamp']}&scaley=0.75";
+
+////////////////////////////////////////////////////////////////////////////////
+// AJAX
+////////////////////////////////////////////////////////////////////////////////
+if (isset($_GET['ajax'])) {
+	header('Content-Type: application/json');
+	$data = array(
+		'jobstatus' => $job->status,
+		'windowtitle' => $windowtitle,
+		'imageurl' => $imageurl,
+		'destinationresults' => $destinationresults,
+		'notice' => $notice
+	);
+	exit(json_encode(!empty($data) ? $data : false));
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 // Display Functions
 ////////////////////////////////////////////////////////////////////////////////
@@ -98,8 +189,6 @@ $_SESSION['jobstats'][$job->id] = $jobstats;
 ////////////////////////////////////////////////////////////////////////////////
 // Display
 ////////////////////////////////////////////////////////////////////////////////
-
-
 if (!isset($_GET['notpopup'])) {
 	$TITLE = '';//escapehtml($job->name);
 	include_once("popup.inc.php");
@@ -112,76 +201,17 @@ if (!isset($_GET['notpopup'])) {
 if (!$noupdate)
 	print('<div id="jobmonitor">');
 
-$jobtype = new JobType($job->jobtypeid);
-$showdestinations = true;
-$notice = "";
-
-switch ($job->status) {
-	case 'new':
-		$notice = _L("This <b>%s</b> job is not submitted, no data available", $jobtype->name);
-		$showdestinations = false;
-		break;
-	case 'scheduled':
-		$scheduledtime = strtotime($job->startdate . " " . $job->starttime);
-		$difftimestamp = $scheduledtime - time();
-		$notice = _L("This <b>%s</b> job is scheduled to run in ", $jobtype->name);
-		if ($difftimestamp >= 60) {
-			$diffdays = floor($difftimestamp / (60*60*24));
-			$diffhours = floor(($difftimestamp - ($diffdays*60*60*24)) / (60*60));
-			$diffminutes = floor(($difftimestamp - ($diffdays*60*60*24 + $diffhours*60*60)) / 60);
-			if ($diffdays > 0)
-				$notice .= "$diffdays days ";
-			if ($diffhours > 0)
-				$notice .= "$diffhours hours ";
-			if ($diffminutes > 0)
-				$notice .= "$diffminutes minutes ";
-		} else {
-			$notice = _L("This <b>%s</b> job will run shortly", $jobtype->name);
-		}
-		$showdestinations = false;
-		break;
-	case 'processing':
-		$notice = _L("Please wait while this <b>%s</b> job is processed: ", $jobtype->name) . $job->percentprocessed . "%";
-		$showdestinations = false;
-		break;
-	case 'procactive':
-	case 'active':
-		$notice = _L("This <b>%s</b> job is active", $jobtype->name);
-		break;
-	case 'cancelling':
-		$notice = _L("Please wait while this <b>%s</b> job is cancelled", $jobtype->name);
-		$showdestinations = false;
-		break;
-	case 'cancelled':
-	case 'complete':
-		$notice = _L("This <b>%1s</b> job finished on %2s", $jobtype->name, fmt_job_enddate($job, null));
-		break;
-	default:
-		echo '<h1>ERROR: Unknown status</h1>';
-		break;
-}
-
-if ($showdestinations) {
-	if ($job->sendphone)
-		$phoneinfo = JobSummaryReport::getPhoneInfo($job->id, $readonlyconn);
-	if ($job->sendemail)
-		$emailinfo = JobSummaryReport::getEmailInfo($job->id, $readonlyconn);
-	if ($job->sendsms)
-		$smsinfo = JobSummaryReport::getSmsInfo($job->id, $readonlyconn);
-}
-
-$urloptions = "graph_detail_callprogress.png.php?jobid={$job->id}&valid={$jobstats['validstamp']}&scaley=0.5";
-startWindow(escapehtml($job->name));
+startWindow($windowtitle);
 ?>
 <table border="0" cellpadding="3" cellspacing="0" width="100%">
 	<tr>
-		<td class="bottomBorder" colspan=2>
+		<td colspan=2 id='notice'>
 			<?=$notice?>
 		</td>
 	</tr>
 <?
-if ($showdestinations && $job->sendphone) { ?>
-		<tr>
+if ($job->sendphone) { ?>
+		<tr class='destination'>
 			<th align="right" class="windowRowHeader bottomBorder">Phone:</th>
 			<td class="bottomBorder">
 					<table  border="0" cellpadding="2" cellspacing="1" class="list" width="100%">
@@ -193,19 +223,19 @@ if ($showdestinations && $job->sendphone) { ?>
 							<th>% Contacted</th>
 						</tr>
 						<tr>
-							<td><?=$phoneinfo[0]+0?></td>
-							<td><?=$phoneinfo[1]+0?></td>
-							<td><?=$phoneinfo[2]+0?></td>
-							<td><?=$phoneinfo[6]+0?></td>
-							<td><?=sprintf("%0.2f", isset($phoneinfo[8]) ? $phoneinfo[8] : "") . "%" ?></td>
+							<td id='recipientsphone'><?=$destinationresults['phone']['recipients']?></td>
+							<td id='completedphone'><?=$destinationresults['phone']['completed']?></td>
+							<td id='remainingphone'><?=$destinationresults['phone']['remaining']?></td>
+							<td id='attemptsphone'><?=$destinationresults['phone']['attempts']?></td>
+							<td id='percentcontactedphone'><?=$destinationresults['phone']['percentcontacted']?></td>
 						</tr>
 					</table>
-				<img src='<?=$urloptions?>&type=phone'/>
+				<img style='width:500px;height:300px' src='<?=$imageurl?>&type=phone' id='phonegraph'/>
 			</td>
 		</tr>
 <? }
-if ($showdestinations && $job->sendemail) { ?>
-		<tr>
+if ($job->sendemail) { ?>
+		<tr class='destination'>
 			<th align="right" class="windowRowHeader bottomBorder">Email:</th>
 			<td class="bottomBorder">
 				<table  border="0" cellpadding="2" cellspacing="1" class="list" width="100%">
@@ -216,18 +246,18 @@ if ($showdestinations && $job->sendemail) { ?>
 							<th>% Contacted</th>
 						</tr>
 						<tr>
-							<td><?=$emailinfo[0]+0?></td>
-							<td><?=$emailinfo[1]+0?></td>
-							<td><?=$emailinfo[2]+0?></td>
-							<td><?=sprintf("%0.2f", isset($emailinfo[6]) ? $emailinfo[6] : "") . "%" ?></td>
+							<td id='recipientsemail'><?=$destinationresults['email']['recipients']?></td>
+							<td id='completedemail'><?=$destinationresults['email']['completed']?></td>
+							<td id='remainingemail'><?=$destinationresults['email']['remaining']?></td>
+							<td id='percentcontactedemail'><?=$destinationresults['email']['percentcontacted']?></td>
 						</tr>
 				</table>
-				<img src='<?=$urloptions?>&type=email'/>
+				<img style='width:500px;height:300px' src='<?=$imageurl?>&type=email' id='emailgraph'/>
 			</td>
 		</tr>
 <? }
-if ($showdestinations && $job->sendsms) { ?>
-		<tr>
+if ($job->sendsms) { ?>
+		<tr class='destination'>
 			<th align="right" class="windowRowHeader bottomBorder">SMS:<th>
 			<td class="bottomBorder">
 				<table  border="0" cellpadding="2" cellspacing="1" class="list" width="100%">
@@ -238,49 +268,86 @@ if ($showdestinations && $job->sendsms) { ?>
 							<th>% Contacted</th>
 						</tr>
 						<tr>
-							<td><?=$smsinfo[0]+0?></td>
-							<td><?=$smsinfo[1]+0?></td>
-							<td><?=$smsinfo[2]+0?></td>
-							<td><?=sprintf("%0.2f", isset($smsinfo[7]) ? $smsinfo[7] : "") . "%" ?></td>
+							<td id='recipientssms'><?=$destinationresults['sms']['recipients']?></td>
+							<td id='completedsms'><?=$destinationresults['sms']['completed']?></td>
+							<td id='remainingsms'><?=$destinationresults['sms']['remaining']?></td>
+							<td id='percentcontactedsms'><?=$destinationresults['sms']['percentcompleted']?></td>
 						</tr>
 				</table>
-				<img src='<?=$urloptions?>&type=sms'/>
+				<img style='width:500px;height:300px' src='<?=$imageurl?>&type=sms' id='smsgraph'/>
 			</td>
 		</tr>
 <? }
 ?>
 </table>
+
+<script type='text/javascript'>
+displayDestinations = function(jobstatus) {
+	if (jobstatus == 'active' || jobstatus == 'procactive' || jobstatus == 'cancelled' || jobstatus == 'complete')
+		$$('tr.destination').invoke('show');
+	else
+		$$('tr.destination').invoke('hide');
+};
+displayDestinations('<?=$job->status?>');
+</script>
+
 <?
 endWindow();
-
-if (in_array($job->status, array("cancelled", "complete"))) {?>
-	<script type='text/javascript'>
-		jobmonitorstop = true;
-	</script>
-<? }
 
 if (!$noupdate) {
 	print('</div><br>'); ?>
 
 	<script type='text/javascript'>
-		jobmonitorupdater = new Ajax.PeriodicalUpdater('jobmonitor', 'jobmonitor.php', {
-			evalScripts: true,
-			method: 'get',
-			parameters: {
-				notpopup: true,
-				noupdate: true, // Ajax.PeriodicalUpdater will take care of updating from now on.
-				jobid: <?=$job->id?>
-			},
-			onSuccess: function() {
-				if (jobmonitorstop && jobmonitorupdater) {
-					jobmonitorupdater.stop();
+		refreshPage = function() {
+			new Ajax.Request('jobmonitor.php', {
+				evalScripts: false,
+				method: 'get',
+				parameters: {
+					ajax: true,
+					notpopup: true,
+					noupdate: true, // Ajax.PeriodicalUpdater will take care of updating from now on.
+					jobid: <?=$job->id?>
+				},
+				onSuccess: function(transport) {
+					var data = transport.responseJSON;
+					if (!data) {
+						return; // Silent error.
+					}
+
+					$('notice').update(data.notice);
+					$('jobmonitor').down('div.windowtitle').update(data.windowtitle);
+
+					displayDestinations(data.jobstatus);
+
+					if ($('phonegraph'))
+						updateDestination(data,'phone');
+					if ($('emailgraph'))
+						updateDestination(data,'email');
+					if ($('smsgraph'))
+						updateDestination(data,'sms');
+
+					if (data.jobstatus != 'complete' && data.jobstatus != 'cancelled')
+						setTimeout("refreshPage();", 10000); // Start the updater 5 seconds after the page loads.
 				}
-			},
-			frequency: 15,
-			decay: 1 // Decay value of 1 means no decay.
-		});
+			});
+		};
+
+		setTimeout("refreshPage();", 10000);
+
+		updateDestination = function(data, type) {
+			var img = new Element('img', {'src':data.imageurl+'&type='+type});
+			img.observe('load', function(event, type) {
+				$(type+'graph').src = this.src;
+			}.bindAsEventListener(img, type));
+
+			var results = data.destinationresults[type];
+			for (var result in results) {
+				$(result + type).update(results[result]);
+			}
+		};
 	</script>
 <? }
+
 
 if (!isset($_GET['notpopup'])) {
 	include_once("popupbottom.inc.php");
