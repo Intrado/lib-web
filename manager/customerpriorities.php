@@ -20,6 +20,16 @@ if (isset($_SESSION['currentid'])) {
 	}
 }
 
+if (isset($_GET['delete'])) {
+	QuickUpdate("update jobtype set deleted=1 where id=?",$custdb,array($_GET['delete']));
+	redirect();
+}
+
+if (isset($_GET['undelete'])) {
+	QuickUpdate("update jobtype set deleted=0 where id=?",$custdb,array($_GET['undelete']));
+	redirect();
+}
+
 
 //////////////////////////////////////////
 // Data Handling
@@ -27,7 +37,7 @@ if (isset($_SESSION['currentid'])) {
 
 $reload = 0;
 $refresh = 0;
-$result = Query("select id, name, systempriority, issurvey from jobtype where deleted = 0 order by systempriority, issurvey, name", $custdb);
+$result = Query("select id, name, systempriority, issurvey, deleted from jobtype order by systempriority, issurvey, name", $custdb);
 $jobtypes = array();
 while($row = DBGetRow($result, true)){
 	$jobtypes[] = $row;
@@ -41,7 +51,7 @@ if(CheckFormSubmit($f, 'new')) {
 	if(CheckFormInvalid($f))
 	{
 		error('Form was edited in another window, reloading data');
-		$reloadform = 1;
+		$reload = 1;
 	}
 	else
 	{
@@ -62,6 +72,12 @@ if(CheckFormSubmit($f, 'new')) {
 			} else {
 				error("You cannot add a job type that has a blank name");
 			}
+			
+			foreach ($jobtypes as $jobtype) {
+				QuickUpdate("update jobtype set name=? where id=?", $custdb, array(trim(GetFormData($f,$s,"name_". $jobtype["id"])),$jobtype["id"]));
+			}
+			
+			redirect();
 		}
 	}
 } else {
@@ -74,6 +90,12 @@ if($reload){
 	PutFormData($f, $s, 'newname', "", 'text');
 	PutFormData($f, 'new', 'add', '');
 	PutFormData($f,$s,'priority', 2, "number");
+	
+	foreach ($jobtypes as $jobtype) {
+		PutFormData($f,$s,"name_". $jobtype["id"],$jobtype["name"],"text",1,50,1);
+	}
+	
+	
 }
 
 //////////////////////////////////////////
@@ -102,15 +124,26 @@ NewForm($f);
 		<td>Name</td>
 		<td>System Priority</td>
 		<td>Is Survey?</td>
+		<td>Deleted?</td>
 		<td>Actions</td>
 	</tr>
 <?
 	foreach($jobtypes as $jobtype){
 		?><tr>
-			<td><?=$jobtype["name"]?></td>
+			<td><? NewFormItem($f, $s, "name_". $jobtype["id"], 'text', "20","50",$jobtype['deleted'] ? 'style="text-decoration: line-through;"' : ''); ?></td>
 			<td><?=getPriorityName($jobtype["systempriority"])?></td>
 			<td><?= $jobtype["issurvey"] ? "Yes" : "No" ?></td>
-			<td>&nbsp</td>
+			<td><?= $jobtype['deleted'] ? "Deleted" : "" ?></td>
+			<td>
+<?
+			if ($jobtype["deleted"]) {
+				echo '<a href="customerpriorities.php?undelete=' . $jobtype["id"] . '">Undelete</a>';			
+			} else {
+				echo '<a href="customerpriorities.php?delete=' . $jobtype["id"] . '">Delete</a>';							
+			}
+			
+?>
+			</td>
 		</tr><?
 	}
 ?>
@@ -125,11 +158,13 @@ NewForm($f);
 		?>
 		</td>
 		<td>No</td>
+		<td>&nbsp;</td>
 		<td><? NewFormItem($f, 'new', 'add', 'submit')?></td>
 
 	</tr>
 
 </table>
+<? NewFormItem($f, 'new', 'Save', 'submit')?>
 <div style="color:green">
 <p>If you want to add more general or survey types, please log into the customer and use the Job Type Management page.
 <p>If you are adding a High Priority Job Type, make sure it qualifies as a High Priority.  This would include things like "Attendance" or "Food Services".
