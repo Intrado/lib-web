@@ -26,6 +26,6 @@ if(isset($_GET['jobcode'])) {
 		where rp.jobid =?
 			and rp.personid =?
 			and rp.type = 'phone'", false, false, array($messageinfo['jobid'], $messageinfo['personid']));
-	Message::playAudio($messageinfo['messageid'], $historicdata);
+	Message::playAudio($messageinfo['messageid'], $historicdata,"mp3");
 }
 ?>

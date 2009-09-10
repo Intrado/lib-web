@@ -101,15 +101,12 @@ if ($badcode) {
 		<div style="font-size: 12px">&nbsp;&nbsp;<?=$jobdescription?></div>
 	</div>
 	<div style="margin:10px; clear:both;">
-		<OBJECT ID="MediaPlayer" WIDTH=320 HEIGHT=42
-		CLASSID="CLSID:22D6F312-B0F6-11D0-94AB-0080C74C7E95"
-		STANDBY="Loading Windows Media Player components..."
-		TYPE="application/x-oleobject">
-
-		<PARAM NAME="FileName" VALUE="messagelink_preview.wav.php/mediaplayer_preview.wav?jobcode=<?=$code?>">
-		<param name="controller" value="true">
-		<EMBED SRC="messagelink_preview.wav.php/embed_preview.wav?jobcode=<?=$code?>" AUTOSTART="TRUE"></EMBED>
-		</OBJECT>
+		<div id="player"></div>		
+		<script type="text/javascript" language="javascript" src="script/prototype.js"></script>	
+		<script type="text/javascript" language="javascript" src="script/niftyplayer.js"></script>
+		<script language="JavaScript" type="text/javascript">
+	 		embedPlayer("messagelink_preview.wav.php/embed_preview.wav?jobcode=<?=$code?>","player");
+		</script>
 		<br><a href="messagelink_preview.wav.php/message.wav?jobcode=<?=$code?>">Click Here</a>
 	</div>
 <?
