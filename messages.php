@@ -33,8 +33,12 @@ if (isset($_GET['delete'])) {
 	if (isset($_SESSION['messageid']) && ($_SESSION['messageid']== $deleteid))
 		$_SESSION['messageid'] = NULL;
 	if (userOwns("message",$deleteid)) {
+		$message = new Message($deleteid);
 		QuickUpdate("update message set deleted=1 where id='$deleteid'");
+		notice(_L("The message, %s, is now deleted", escapehtml($message->name)));
 		redirect();
+	} else {
+		notice(_L("You do not have permission to delete this message"));
 	}
 }
 
@@ -44,6 +48,9 @@ if (isset($_GET['deletetemplate'])) {
 		$questionnaire = new SurveyQuestionnaire($id);
 		$questionnaire->deleted = 1;
 		$questionnaire->update();
+		notice(_L("The survey template, %s, is now deleted", escapehtml($questionnaire->name)));
+	} else {
+		notice(_L("You do not have permission to delete this survey template"));
 	}
 	redirectToReferrer();
 }
