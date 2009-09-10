@@ -483,6 +483,8 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		
 		Query('COMMIT');
 		
+		// TODO, Release 7.2, add notice()
+		
 		if ($ajax)
 			$form->sendTo("start.php");
 		else
