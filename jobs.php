@@ -28,24 +28,30 @@ if (!$USER->authorize('sendphone') && !$USER->authorize('sendemail') && !$USER->
 
 ////////////////////////////////////////////////////////////////////////////////
 // Data Handling
+// NOTE: Job::update() makes many database updates for jobsettings, which makes it appropriate to use transactions around Job::update()
 ////////////////////////////////////////////////////////////////////////////////
-
 if (isset($_GET['cancel'])) {
 	$cancelid = DBSafe($_GET['cancel']);
 	if (userOwns("job",$cancelid) || $USER->authorize('managesystemjobs')) {
 		$job = new Job($cancelid);
 		$job->cancelleduserid = $USER->id;
 
-		if ($job->status == "active" || $job->status == "procactive" || $job->status == "processing" || $job->status == "scheduled") {
-			$job->status = "cancelling";
-		} else if ($job->status == "new") {
-			$job->status = "cancelled";
-			$job->finishdate = QuickQuery("select now()");
-			//skip running autoreports for this job since there is nothing to report on
-			QuickUpdate("update job set ranautoreport=1 where id='$cancelid'");
-		}
-		$job->update();
+		Query("BEGIN");
+			if ($job->status == "active" || $job->status == "procactive" || $job->status == "processing" || $job->status == "scheduled") {
+				$job->status = "cancelling";
+			} else if ($job->status == "new") {
+				$job->status = "cancelled";
+				$job->finishdate = QuickQuery("select now()");
+				//skip running autoreports for this job since there is nothing to report on
+				QuickUpdate("update job set ranautoreport=1 where id='$cancelid'");
+			}
+			$job->update();
+		Query("COMMIT");
+		notice(_L("The job, %s, is now cancelled", escapehtml($job->name)));
+	} else {
+		notice(_L("You do not have permission to cancel this job"));
 	}
+	
 	redirectToReferrer();
 }
 
@@ -54,21 +60,32 @@ if (isset($_GET['delete'])) {
 	if (userOwns("job",$deleteid) || $USER->authorize('managesystemjobs')) {
 		$job = new Job($deleteid);
 		if ($job->status == "cancelled" || $job->status == "cancelling" || $job->status == "complete") {
-			$job->deleted = 1;
-			$job->update();
+			Query('BEGIN');
+				$job->deleted = 1;
+				$job->update();
+			Query('COMMIT');
+			notice(_L("The job, %s, is now deleted", escapehtml($job->name)));
 		} else if ($job->status == "repeating") {
-			if ($job->scheduleid) {
-				$schedule = new Schedule($job->scheduleid);
-				$schedule->destroy();
-			}
-			$associatedimports = DBFindMany("ImportJob", "from importjob where jobid = '$deleteid'");
-			foreach($associatedimports as $importjob){
-				$importjob->destroy();
-			}
-			QuickUpdate("delete from joblanguage where jobid='$deleteid'");
-			$job->destroy();
+			Query('BEGIN');
+				if ($job->scheduleid) {
+					$schedule = new Schedule($job->scheduleid);
+					$schedule->destroy();
+				}
+				$associatedimports = DBFindMany("ImportJob", "from importjob where jobid = '$deleteid'");
+				foreach($associatedimports as $importjob){
+					$importjob->destroy();
+				}
+				QuickUpdate("delete from joblanguage where jobid='$deleteid'");
+				$job->destroy();
+			Query('COMMIT');
+			notice(_L("The job, %s, is now deleted", escapehtml($job->name)));
+		} else {
+			notice(_L("The job, %s, is not yet complete, please cancel it first", escapehtml($job->name)));
 		}
+	} else {
+		notice(_L("You do not have permission to delete this job"));
 	}
+	
 	redirectToReferrer();
 }
 
@@ -77,11 +94,19 @@ if (isset($_GET['archive'])) {
 	if (userOwns("job",$archiveid) || $USER->authorize('managesystemjobs')) {
 		$job = new Job($archiveid);
 		if ($job->status == "cancelled" || $job->status == "cancelling" || $job->status == "complete") {
-			$job->deleted = 2;
-			$job->modifydate = date("Y-m-d H:i:s", time());
-			$job->update();
+			Query('BEGIN');
+				$job->deleted = 2;
+				$job->modifydate = date("Y-m-d H:i:s", time());
+				$job->update();
+			Query('COMMIT');
+			notice(_L("The job, %s, is now archived", escapehtml($job->name)));
+		} else {
+			notice(_L("The job, %s, is not yet complete, please cancel it first", escapehtml($job->name)));
 		}
+	} else {
+		notice(_L("You do not have permission to archive this job"));
 	}
+	
 	redirectToReferrer();
 }
 
@@ -90,11 +115,18 @@ if (isset($_GET['unarchive'])) {
 	if (userOwns("job",$unarchiveid) || $USER->authorize('managesystemjobs')) {
 		$job = new Job($unarchiveid);
 		if ($job->status == "cancelled" || $job->status == "cancelling" || $job->status == "complete") {
-			$job->deleted = 0;
-			$job->modifydate = date("Y-m-d H:i:s", time());
-			$job->update();
+			Query('BEGIN');
+				$job->deleted = 0;
+				$job->modifydate = date("Y-m-d H:i:s", time());
+				$job->update();
+			Query('COMMIT');
+			
+			notice(_L("The job, %s, is now unarchived", escapehtml($job->name)));
 		}
+	} else {
+		notice(_L("You do not have permission to unarchive this job"));
 	}
+	
 	redirectToReferrer();
 }
 
@@ -102,8 +134,15 @@ if (isset($_GET['runrepeating'])) {
 	$runnow = $_GET['runrepeating'] + 0;
 	if (userOwns("job",$runnow) || $USER->authorize('managesystemjobs')) {
 		$job = new Job($runnow);
-		$job->runNow();
+		Query('BEGIN');
+			$job->runNow();
+		Query('COMMIT');
+		
+		notice(_L("The repeating job, %s, will now run", escapehtml($job->name)));
+	} else {
+		notice(_L("You do not have permission to run this repeating job"));
 	}
+	
 	redirectToReferrer();
 }
 
@@ -111,9 +150,16 @@ if (isset($_GET['copy'])) {
 	$copyid = DBSafe($_GET['copy']);
 	if (userOwns("job",$copyid) || $USER->authorize('managesystemjobs')) {
 		$job = new Job($copyid);
-		$newjob = $job->copyNew();
+		Query('BEGIN');
+			$newjob = $job->copyNew();
+		Query('COMMIT');
+		
+		notice(_L("A copy of the job, %s, is made", escapehtml($job->name)));
 		redirect('job.php?id='.$newjob->id);
+	} else {
+		notice(_L("You do not have permission to copy this job"));
 	}
+	
 	redirectToReferrer();
 }
 
