@@ -1169,7 +1169,7 @@ if ($JOBTYPE == "repeating" && getSystemSetting("disablerepeat") ) {
 					<table>
 						<tr>
 							<td><? NewFormItem($f,$s,"phonetextarea", "textarea", 50, 5,"id='phonetextarea' onkeyup=\"phonetranslationstate=false;\" " . ($submittedmode ? "DISABLED" : "")); ?></td>
-							<td valign="bottom"><?=	button('Play', "previewlanguage('english',true,true)");?></td>
+							<td valign="bottom"><?=	button('Play', "previewlanguage('phonetextarea','english',true,true)");?></td>
 						</tr>
 					</table>
 					Voice:
@@ -1194,7 +1194,7 @@ if ($JOBTYPE == "repeating" && getSystemSetting("disablerepeat") ) {
 <?
 						foreach($ttslanguages as $ttslanguage) {
 							$language = escapehtml(ucfirst($ttslanguage));
-							$playaction = "previewlanguage('$language'," . (isset($voicearray["female"][strtolower($language)])?"true":"false") . "," . (isset($voicearray["male"][strtolower($language)])?"true":"false") . ")"
+							$playaction = "previewlanguage('phoneexpand_$language','$language'," . (isset($voicearray["female"][strtolower($language)])?"true":"false") . "," . (isset($voicearray["male"][strtolower($language)])?"true":"false") . ")"
 ?>
 							<tr>
 								<td class="topBorder" valign="top" style="white-space:nowrap;"><? NewFormItem($f,$s,"phone_$language","checkbox",NULL, NULL,"id='phone_$language' " . ($submittedmode ? "DISABLED" : " onclick=\"translationlanguage('phone','$language')\"")); echo "&nbsp;" . $language . ": ";?>
@@ -1720,7 +1720,7 @@ function display_jobtype_info(value){
 ?>
 }
 
-function previewlanguage(language,female,male) {
+function previewlanguage(parentfield,language,female,male) {
 	var voice = 'default';
 	if(isCheckboxChecked('voiceradio_male') && male) {
 		voice = 'male';
@@ -1738,7 +1738,7 @@ function previewlanguage(language,female,male) {
 		textstr = textstr.substr(0,4000);
 	}
 	var encodedtext=encodeURIComponent(textstr);
-	popup('previewmessage.php?parentfield=phonetextarea&language=' + language +'&gender=' + voice,400,500);
+	popup('previewmessage.php?parentfield=' + parentfield + '&language=' + language +'&gender=' + voice,400,500);
 }
 
 
