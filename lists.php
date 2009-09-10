@@ -24,12 +24,13 @@ if (!$USER->authorize('createlist')) {
 ////////////////////////////////////////////////////////////////////////////////
 
 if (isset($_GET['delete'])) {
-	$deleteid = DBSafe($_GET['delete']);
+	$deleteid = $_GET['delete'] + 0;
 	if (isset($_SESSION['listid']) && $_SESSION['listid'] == $deleteid)
 		$_SESSION['listid'] = NULL;
 	if (userOwns("list",$deleteid)) {
+		$list = new PeopleList($deleteid);
 		//QuickUpdate("delete from listentry where listid='$deleteid'");
-		QuickUpdate("update list set deleted=1 where id='$deleteid'");
+		QuickUpdate("update list set deleted=1 where id=?", false, array($list->id));
 		notice(_L("The list, %s, is now deleted", escapehtml($list->name)));
 	} else {
 		notice(_L("You do not have permission to delete this list"));
