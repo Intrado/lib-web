@@ -18,6 +18,11 @@ if (!$USER->authorize('manageaccount')) {
 	redirect('unauthorized.php');
 }
 
+// Show javascript alerts as necessary, redirected from user.php
+if (isset($_GET['maxusers']))
+	error("You already have the maximum number of allowed users");
+if (isset($_GET['noprofiles']))
+	error("You have no Access Profiles defined! Go to the Admin->Profiles tab and create one");
 
 ////////////////////////////////////////////////////////////////////////////////
 // Data Handling
@@ -41,9 +46,9 @@ if (isset($_GET['resetpass'])) {
 	
 	/*CSDELETEMARKER_START*/
 	if (is_sm_user($id))
-		redirect();
+		redirect(); // NOTE: Deliberately not show a notice() about the hidden schoolmessenger user?
 	
-	if ($maxreached && !$usr->enabled) {		
+	if ($maxreached && !$usr->enabled) {
 		redirect("?maxusers");
 	}
 	/*CSDELETEMARKER_END*/
@@ -52,6 +57,7 @@ if (isset($_GET['resetpass'])) {
 	$usr->update();
 
 	forgotPassword($usr->login, $CUSTOMERURL);
+	notice(_L("An email has been sent to %s for resetting the password", $usr->login));
 	redirect();
 }
 
@@ -59,16 +65,21 @@ if (isset($_GET['delete'])) {
 	$deleteid = 0 + $_GET['delete'];
 	/*CSDELETEMARKER_START*/
 	if (is_sm_user($deleteid))
-		redirect();
+		redirect(); // NOTE: Deliberately not show a notice() about the hidden schoolmessenger user?
 	/*CSDELETEMARKER_END*/
 
 	if (isset($_SESSION['userid']) && $_SESSION['userid'] == $deleteid)
 		$_SESSION['userid'] = NULL;
 
-	QuickUpdate("update user set enabled=0, deleted=1 where id=?", false, array($deleteid));
-	QuickUpdate("delete from schedule where id in (select scheduleid from job where status='repeating' and userid=?)", false, array($deleteid));
-	QuickUpdate("delete from job where status='repeating' and userid=?", false, array($deleteid));
+	$usr = new User($deleteid);
+	
+	QuickQuery('BEGIN');
+		QuickUpdate("update user set enabled=0, deleted=1 where id=?", false, array($deleteid));
+		QuickUpdate("delete from schedule where id in (select scheduleid from job where status='repeating' and userid=?)", false, array($deleteid));
+		QuickUpdate("delete from job where status='repeating' and userid=?", false, array($deleteid));
+	QuickQuery('COMMIT');
 
+	notice(_L("%s is now deleted", $user->login));
 	redirect();
 }
 
@@ -78,11 +89,13 @@ if (isset($_GET['disable'])) {
 	
 	/*CSDELETEMARKER_START*/
 	if (is_sm_user($id))
-		redirect();
+		redirect(); // NOTE: Deliberately not show a notice() about the hidden schoolmessenger user?
 	/*CSDELETEMARKER_END*/
 		
 	$usr->enabled = 0;
 	$usr->update();
+	
+	notice(_L("%s is now disabled", $user->login));
 	redirect();
 }
 
@@ -92,21 +105,18 @@ if (isset($_GET['enable'])) {
 	
 	/*CSDELETEMARKER_START*/
 	if (is_sm_user($id))
-		redirect();
-	if($maxreached && !$usr->enabled) {		
+		redirect(); // NOTE: Deliberately not show a notice() about the hidden schoolmessenger user?
+	if($maxreached && !$usr->enabled) {
 		redirect("?maxusers");
 	}
 	/*CSDELETEMARKER_END*/
 	
 	$usr->enabled = 1;
 	$usr->update();
+	
+	notice(_L("%s is now enabled", $usr->login))
 	redirect();
 }
-
-if (isset($_GET['maxusers'])) {
-	error("You already have the maximum number of allowed users");
-}
-
 
 //preload names for all of the access profiles
 $accessprofiles = QuickQueryList("select id,name from access",true);
