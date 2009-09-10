@@ -607,70 +607,73 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
         $postdata = $form->getData(); //gets assoc array of all values {name:value,...}
 		
 		$obj = new Access($_SESSION['editaccessid']);
-		$obj->moduserid = $USER->id;
-		$obj->modified = date("Y-m-d g:i:s");
-		if(!$obj->id)
-			$obj->created = date("Y-m-d g:i:s");
-		
-		$obj->name = $postdata['name'];
-		$obj->description = $postdata['description'];
-		$obj->update();
-		
-		
-		$allowedfields = $postdata['datafields'];
-		$allowedfields = (isset($allowedfields) ? implode('|',$allowedfields) : "");
 
-		$obj->setPermission("loginweb", (bool)$postdata['loginweb']);
-		$obj->setPermission("loginphone", (bool)$postdata['loginphone']);
-		$obj->setPermission("startstats", (bool)$postdata['startstats']);
-		$obj->setPermission("startshort", (bool)$postdata['startshort']);
-		$obj->setPermission("starteasy", (bool)$postdata['starteasy']);
-		$obj->setPermission("sendphone",(bool)$postdata['sendphone']);
-		$obj->setPermission("callearly", $postdata['callearly']);
-		$obj->setPermission("calllate", $postdata['calllate']);
-		$obj->setPermission("callmax", $postdata['callmax']);
-		$obj->setPermission("sendemail", (bool)$postdata['sendemail']);
-		$obj->setPermission("sendmulti", (bool)$postdata['sendmulti']);
-		$obj->setPermission("createlist", (bool)$postdata['createlist']);
-		$obj->setPermission("listuploadids", (bool)$postdata['listuploadids']);
-		$obj->setPermission("listuploadcontacts", (bool)$postdata['listuploadcontacts']);
-		$obj->setPermission("datafields", $allowedfields);
-		$obj->setPermission("createrepeat", (bool)$postdata['createrepeat']);
-		$obj->setPermission("setcallerid", (bool)$postdata['setcallerid']);
-		$obj->setPermission("maxjobdays", $postdata['maxjobdays']);
-		$obj->setPermission("blocknumbers", $postdata['callblockingperms'] != "none");
-		$obj->setPermission("callblockingperms", $postdata['callblockingperms']);
-		$obj->setPermission("createreport", (bool)$postdata['createreport']);
-		$obj->setPermission("viewsystemreports", (bool)$postdata['viewsystemreports']);
-		$obj->setPermission("viewusagestats", (bool)$postdata['viewusagestats']);
-		$obj->setPermission("viewcalldistribution", (bool)$postdata['viewcalldistribution']);
-		$obj->setPermission("managesystemjobs", (bool)$postdata['managesystemjobs']);
-		$obj->setPermission("managemyaccount", (bool)$postdata['managemyaccount']);
-		$obj->setPermission("manageaccount", (bool)$postdata['manageaccount']);
-		$obj->setPermission("manageprofile", (bool)$postdata['manageprofile']);
-		$obj->setPermission("managesystem", (bool)$postdata['managesystem']);
-		$obj->setPermission("viewcontacts", (bool)$postdata['viewcontacts']);
-		$obj->setPermission("managecontactdetailsettings", (bool)$postdata['managecontactdetailsettings']);
-		$obj->setPermission("metadata", (bool)$postdata['metadata']);
-		$obj->setPermission("managetasks", (bool)$postdata['managetasks']);
-		$obj->setPermission("viewsystemactive", (bool)$postdata['viewsystemactive']);
-		$obj->setPermission("viewsystemrepeating", (bool)$postdata['viewsystemrepeating']);
-		$obj->setPermission("viewsystemcompleted", (bool)$postdata['viewsystemcompleted']);
-		$obj->setPermission("leavemessage", (bool)$postdata['leavemessage']);
-		$obj->setPermission("messageconfirmation", (bool)$postdata['messageconfirmation']);
-		
-		if(getSystemSetting("_hasportal", false)) {
-			$obj->setPermission("portalaccess", (bool)$postdata['portalaccess']);
-			$obj->setPermission("generatebulktokens", (bool)$postdata['generatebulktokens']);
-		}
+		Query("BEGIN");
+			$obj->moduserid = $USER->id;
+			$obj->modified = date("Y-m-d g:i:s");
+			if(!$obj->id)
+				$obj->created = date("Y-m-d g:i:s");
+			
+			$obj->name = $postdata['name'];
+			$obj->description = $postdata['description'];
+			$obj->update();
+			
+			
+			$allowedfields = $postdata['datafields'];
+			$allowedfields = (isset($allowedfields) ? implode('|',$allowedfields) : "");
 
-		if (getSystemSetting("_hassurvey", true)) {
-			$obj->setPermission("survey", (bool)$postdata['survey']);
-		}
+			$obj->setPermission("loginweb", (bool)$postdata['loginweb']);
+			$obj->setPermission("loginphone", (bool)$postdata['loginphone']);
+			$obj->setPermission("startstats", (bool)$postdata['startstats']);
+			$obj->setPermission("startshort", (bool)$postdata['startshort']);
+			$obj->setPermission("starteasy", (bool)$postdata['starteasy']);
+			$obj->setPermission("sendphone",(bool)$postdata['sendphone']);
+			$obj->setPermission("callearly", $postdata['callearly']);
+			$obj->setPermission("calllate", $postdata['calllate']);
+			$obj->setPermission("callmax", $postdata['callmax']);
+			$obj->setPermission("sendemail", (bool)$postdata['sendemail']);
+			$obj->setPermission("sendmulti", (bool)$postdata['sendmulti']);
+			$obj->setPermission("createlist", (bool)$postdata['createlist']);
+			$obj->setPermission("listuploadids", (bool)$postdata['listuploadids']);
+			$obj->setPermission("listuploadcontacts", (bool)$postdata['listuploadcontacts']);
+			$obj->setPermission("datafields", $allowedfields);
+			$obj->setPermission("createrepeat", (bool)$postdata['createrepeat']);
+			$obj->setPermission("setcallerid", (bool)$postdata['setcallerid']);
+			$obj->setPermission("maxjobdays", $postdata['maxjobdays']);
+			$obj->setPermission("blocknumbers", $postdata['callblockingperms'] != "none");
+			$obj->setPermission("callblockingperms", $postdata['callblockingperms']);
+			$obj->setPermission("createreport", (bool)$postdata['createreport']);
+			$obj->setPermission("viewsystemreports", (bool)$postdata['viewsystemreports']);
+			$obj->setPermission("viewusagestats", (bool)$postdata['viewusagestats']);
+			$obj->setPermission("viewcalldistribution", (bool)$postdata['viewcalldistribution']);
+			$obj->setPermission("managesystemjobs", (bool)$postdata['managesystemjobs']);
+			$obj->setPermission("managemyaccount", (bool)$postdata['managemyaccount']);
+			$obj->setPermission("manageaccount", (bool)$postdata['manageaccount']);
+			$obj->setPermission("manageprofile", (bool)$postdata['manageprofile']);
+			$obj->setPermission("managesystem", (bool)$postdata['managesystem']);
+			$obj->setPermission("viewcontacts", (bool)$postdata['viewcontacts']);
+			$obj->setPermission("managecontactdetailsettings", (bool)$postdata['managecontactdetailsettings']);
+			$obj->setPermission("metadata", (bool)$postdata['metadata']);
+			$obj->setPermission("managetasks", (bool)$postdata['managetasks']);
+			$obj->setPermission("viewsystemactive", (bool)$postdata['viewsystemactive']);
+			$obj->setPermission("viewsystemrepeating", (bool)$postdata['viewsystemrepeating']);
+			$obj->setPermission("viewsystemcompleted", (bool)$postdata['viewsystemcompleted']);
+			$obj->setPermission("leavemessage", (bool)$postdata['leavemessage']);
+			$obj->setPermission("messageconfirmation", (bool)$postdata['messageconfirmation']);
+			
+			if(getSystemSetting("_hasportal", false)) {
+				$obj->setPermission("portalaccess", (bool)$postdata['portalaccess']);
+				$obj->setPermission("generatebulktokens", (bool)$postdata['generatebulktokens']);
+			}
 
-		if (getSystemSetting("_hassms", false)) {
-			$obj->setPermission("sendsms", (bool)$postdata['sendsms']);
-		}
+			if (getSystemSetting("_hassurvey", true)) {
+				$obj->setPermission("survey", (bool)$postdata['survey']);
+			}
+
+			if (getSystemSetting("_hassms", false)) {
+				$obj->setPermission("sendsms", (bool)$postdata['sendsms']);
+			}
+		Query("COMMIT");
 
 		$_SESSION['editaccessid'] = $obj->id;
 				
