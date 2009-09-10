@@ -1,8 +1,4 @@
 <?
-// TODO
-//+ fix rulewidget.js.php, onchange for the fieldnum should clear the value column.
-//+ refactor ajaxlistform.php and list.php to use common functions for add a new list, rules, etc..
-
 ////////////////////////////////////////////////////////////////////////////////
 // Includes
 ////////////////////////////////////////////////////////////////////////////////
@@ -216,6 +212,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		$list->userid = $USER->id;
 		$list->deleted = 0;
 		$list->update();
+		
 		$_SESSION['listid'] = $list->id;
 		
 		// Save
@@ -227,18 +224,18 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 						$data = $ruledata[0];
 						// CREATE rule.
 						if (!isset($data->fieldnum, $data->logical, $data->op, $data->val)) {
-							notice(_L('There was a problem adding the rule for %s.', FieldMap::getName($data->fieldnum)));
+							notice(_L('There is a problem adding the rule for %s', FieldMap::getName($data->fieldnum)));
 							$form->sendTo('list.php');
 							break;
 						}
 						if (!$type = Rule::getType($data->fieldnum)) {
-							notice(_L('There was a problem adding the rule for %s.', FieldMap::getName($data->fieldnum)));
+							notice(_L('There is a problem adding the rule for %s', FieldMap::getName($data->fieldnum)));
 							$form->sendTo('list.php');
 							break;
 						}
 						$data->val = prepareRuleVal($type, $data->op, $data->val);
 						if (!$rule = Rule::initFrom($data->fieldnum, $data->logical, $data->op, $data->val)) {
-							notice(_L('There was a problem adding the rule for %s.', FieldMap::getName($data->fieldnum)));
+							notice(_L('There is a problem adding the rule for %s', FieldMap::getName($data->fieldnum)));
 							$form->sendTo('list.php');
 							break;
 						}
@@ -251,7 +248,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 							$le->create();
 						QuickUpdate('COMMIT');
 
-						notice(_L('The rule for %s has been added.', FieldMap::getName($data->fieldnum)));
+						notice(_L('The rule for %s is now added', FieldMap::getName($data->fieldnum)));
 						$form->sendTo('list.php');
 						break;
 						
@@ -260,28 +257,28 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 						if ($USER->authorizeField($fieldnum))
 							QuickUpdate("DELETE le.*, r.* FROM listentry le, rule r WHERE le.ruleid=r.id AND le.listid=? AND r.fieldnum=?", false, array($list->id, $fieldnum));
 						
-						notice(_L('The rule for %s has been removed.', FieldMap::getName($fieldnum)));
+						notice(_L('The rule for %s is now removed', FieldMap::getName($fieldnum)));
 						$form->sendTo('list.php');
 						break;
 						
 					case 'clearrules':
 						QuickUpdate("DELETE le.*, r.* FROM listentry le, rule r WHERE le.ruleid=r.id AND le.listid=?", false, array($list->id));
 						
-						notice(_L('All rules have been removed.'));
+						notice(_L('All rules are now removed'));
 						$form->sendTo('list.php');
 						break;
 						
 					case 'clearadditions':
 						QuickUpdate("DELETE le.* FROM listentry le WHERE le.type='A' AND le.listid=?", false, array($list->id));
 						
-						notice(_L('All additions have been removed.'));
+						notice(_L('All additions are now removed'));
 						$form->sendTo('list.php');
 						break;
 						
 					case 'clearskips':
 						QuickUpdate("DELETE le.* FROM listentry le WHERE le.type='N' AND le.listid=?", false, array($list->id));
 						
-						notice(_L('All skips have been removed.'));
+						notice(_L('All skips are now removed'));
 						$form->sendTo('list.php');
 						break;
 						
@@ -289,6 +286,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 					case 'done':
 						if (isset($_SESSION['origin']) && ($_SESSION['origin'] == 'start')) {
 							unset($_SESSION['origin']);
+							// TODO, Release 7.2, add notice()
 							$form->sendTo('start.php');
 						} else {
 							unset($_SESSION['origin']);
