@@ -68,6 +68,8 @@ if (isset($_GET['clear'])) {
 	if (ereg("^g[0-9]{2}$",$fieldnum)) {
 		QuickUpdate("delete from groupdata where fieldnum=".substr($fieldnum, 1));
 	}
+
+	notice(_L("Data for the field, %s, is now cleared", escapehtml(FieldMap::getName($fieldnum))));
 	redirect();
 }
 
