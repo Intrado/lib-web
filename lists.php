@@ -30,6 +30,9 @@ if (isset($_GET['delete'])) {
 	if (userOwns("list",$deleteid)) {
 		//QuickUpdate("delete from listentry where listid='$deleteid'");
 		QuickUpdate("update list set deleted=1 where id='$deleteid'");
+		notice(_L("The list, %s, is now deleted", escapehtml($list->name)));
+	} else {
+		notice(_L("You do not have permission to delete this list"));
 	}
 	redirect();
 }
