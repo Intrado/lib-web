@@ -61,6 +61,10 @@ else
 	$accessprofiles = QuickQueryList("select id, name from access where name != 'SchoolMessenger Admin'", true);
 /*CSDELETEMARKER_END*/
 
+if (!count($accessprofiles)) {
+	redirect("users.php?noprofiles");
+}
+		
 $userjobtypeids = QuickQueryList("select id from jobtype where id in (select jobtypeid from userjobtypes where userid=?) and not deleted and not issurvey order by systempriority, name asc", false, false, array($edituser->id));
 $jobtypes = QuickQueryList("select id, name from jobtype where not deleted and not issurvey order by systempriority, name asc", true);
 
@@ -273,10 +277,6 @@ $formdata["accessid"] = array(
 	"control" => array("SelectMenu", "values"=>$accessprofiles),
 	"helpstep" => 2
 );
-if (!count($accessprofiles)) {
-	$formdata["accessid"]["control"] = array("FormHtml","html" => "<div id='accessprofilediv'></div><div style='color: red'>"._L("You have no Access Profiles defined! Go to the Admin->Profiles tab and create one.")."</div>");
-	unset($formdata["accessid"]["validators"]);
-}
 
 $formdata["jobtypes"] = array(
 	"label" => _L("Job Type Restriction"),
@@ -430,10 +430,6 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		$datachange = true;
 	} else if (($errors = $form->validate()) === false) { //checks all of the items in this form
 		$postdata = $form->getData(); //gets assoc array of all values {name:value,...}
-		
-		if (!count($accessprofiles)) {
-			redirect("users.php?noprofiles");
-		}
 		
 		if ($makeNewUser) {
 			$edituser->enabled = 1;
