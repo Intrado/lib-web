@@ -67,14 +67,14 @@ if (isset($_POST['text'])) {
 			$_SESSION['ttsgender'] = $_POST['gender'];
 	} else
 		$_SESSION['ttsgender'] = "female";
-	
+		
 	if (isset($_POST['language'])) {
 		if(get_magic_quotes_gpc())
 			$_SESSION['ttslanguage'] = stripslashes($_POST['language']);
 		else
 			$_SESSION['ttslanguage'] = $_POST['language'];
 	} else 
-		$_SESSION['$ttslanguage'] = "english";
+		$_SESSION['ttslanguage'] = "english";
 			
 	if(get_magic_quotes_gpc())
 		$_SESSION['ttstext'] = stripslashes($_POST['text']);
@@ -82,18 +82,16 @@ if (isset($_POST['text'])) {
 		$_SESSION['ttstext'] = $_POST['text'];	
 } 
 
+if(isset($_GET['parentfield']) || $id) {
+	$_SESSION['ttstext'] = false;
+}
+
 // Third Text Request - Session data is already set but nee to parse again. Set fields and return form again 
-if($_SESSION['ttstext']) {
-	$voiceid = false;
-	if($_SESSION['ttsgender'] == "Female") {
-		$voiceid = QuickQuery("select id from ttsvoice where language=? and gender='Male'",false,array($language));
-	} else if($_SESSION['ttsgender'] == "Male") {
-		$voiceid = QuickQuery("select id from ttsvoice where language=? and gender='Female'",false,array($language));
-	}
-	if($voiceid	=== false)
-		$voiceid = 2; // default to english	female
+if($_SESSION['ttstext']) {	
+	
+	error_log(" Session " . $_SESSION['ttstext']);
 	$message = new Message();
-	$parts = $message->parse($_SESSION['ttstext'],$errors,$voiceid);
+	$parts = $message->parse($_SESSION['ttstext'],$errors,1);
 	$fieldnums = array();
 	$fielddefaults = array();
 	
@@ -118,7 +116,7 @@ if($_SESSION['ttstext']) {
 		}
 	}
 	$msgType = 'phone';	
-}
+} 
 
 if (!isset($msgType) || !$msgType)
 	$msgType = 'phone';
@@ -249,7 +247,6 @@ if (isset($_GET['parentfield'])) {
 				var gender = "<?=$gender ?>";
 				var language = "<?=$language ?>";					
 				var parentfield = '<?= $parentfield?>';
-				
 				var textobj = null; // Can not get prototype element accross window opener 
 				if (window.opener.document.getElementById) {
 					textobj = window.opener.document.getElementById(parentfield);

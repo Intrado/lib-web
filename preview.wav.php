@@ -12,8 +12,9 @@ include_once("obj/FieldMap.obj.php");
 
 if (isset($_GET['usetext'])) {
 	$text = $_SESSION['ttstext'];
-	$language = $_SESSION['ttslanguage'];
-	$gender = $_SESSION['ttsgender'];
+	$language = strtolower($_SESSION['ttslanguage']);
+	$gender = strtolower($_SESSION['ttsgender']);
+	
 	$fields=array();
 	for($i=1; $i <= 20; $i++){
 		$fieldnum = sprintf("f%02d", $i);
@@ -22,14 +23,21 @@ if (isset($_GET['usetext'])) {
 	}
 	
 	$voiceid = false;
-	if($gender == "Female") {
-		$voiceid = QuickQuery("select id from ttsvoice where language=? and gender='Male'",false,array($language));
-	} else if($gender == "Male") {
-		$voiceid = QuickQuery("select id from ttsvoice where language=? and gender='Female'",false,array($language));	
+	if($gender == "male") {
+		$voiceid = QuickQuery("select id from ttsvoice where language=? and gender='male'",false,array($language));	
+		if(!$voiceid) {
+			$voiceid = QuickQuery("select id from ttsvoice where language=? and gender='female'",false,array($language));
+		}
+	} else {
+		$voiceid = QuickQuery("select id from ttsvoice where language=? and gender='female'",false,array($language));
+		if(!$voiceid) {
+			$voiceid = QuickQuery("select id from ttsvoice where language=? and gender='male'",false,array($language));	
+		}
 	}
+			
 	if($voiceid	=== false)
 		$voiceid = 2; // default to english	female
-	
+				
 	$message = new Message();
 	$errors = array();	
 	$parts = $message->parse($text,$errors,$voiceid);
