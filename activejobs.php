@@ -2,15 +2,16 @@
 ////////////////////////////////////////////////////////////////////////////////
 // Includes
 ////////////////////////////////////////////////////////////////////////////////
-include_once("inc/common.inc.php");
-include_once("obj/Job.obj.php");
-include_once("obj/Schedule.obj.php");
-include_once("inc/form.inc.php");
-include_once("inc/html.inc.php");
+require_once("inc/common.inc.php");
+require_once("obj/Job.obj.php");
+require_once("obj/Schedule.obj.php");
+require_once("inc/form.inc.php");
+require_once("inc/html.inc.php");
 require_once("inc/table.inc.php");
 require_once("inc/utils.inc.php");
 require_once("inc/securityhelper.inc.php");
 require_once("inc/formatters.inc.php");
+require_once("obj/JobType.obj.php");
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -25,6 +26,9 @@ if (!$USER->authorize('viewsystemactive')) {
 ////////////////////////////////////////////////////////////////////////////////
 
 session_write_close();//WARNING: we don't keep a lock on the session file, any changes to session data are ignored past this point
+
+$jobtypes = DBFindMany("JobType","from jobtype");
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // Display
@@ -56,7 +60,7 @@ $result = Query(
             	sum(rc.result not in ('sent', 'duplicate', 'nocontacts') and rc.type='email' and rc.numattempts < 1) as remaining_email,
             	sum(rc.result not in ('sent', 'duplicate', 'nocontacts') and rc.type='print' and rc.numattempts < 1) as remaining_print,
             	sum(rc.result not in ('sent', 'duplicate', 'nocontacts', 'blocked') and rc.type='sms' and rc.numattempts < 1) as remaining_sms,
-            ADDTIME(j.startdate, j.starttime), j.id, j.status, j.deleted, jobowner.login, jobowner.id, j.type, j.percentprocessed, j.cancelleduserid
+            ADDTIME(j.startdate, j.starttime), j.id, j.status, j.deleted, jobowner.login, jobowner.id, j.type, j.percentprocessed, j.cancelleduserid, j.jobtypeid
             from job j
             left join reportcontact rc
             	on j.id = rc.jobid
@@ -72,10 +76,9 @@ while ($row = DBGetRow($result)) {
 
 
 function fmt_job_type ($row,$index) {
-	if ($row[21] == "survey")
-		return "Survey";
-	else
-		return "Notification";
+	global $jobtypes;
+	
+	return $jobtypes[$row[24]]->name . " " . ($row[21] == "survey" ? "Survey" : "Notification");
 }
 
 

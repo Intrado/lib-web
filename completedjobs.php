@@ -12,6 +12,7 @@ require_once("inc/table.inc.php");
 require_once("inc/utils.inc.php");
 require_once("inc/securityhelper.inc.php");
 require_once("inc/formatters.inc.php");
+require_once("obj/JobType.obj.php");
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -49,6 +50,8 @@ where j.userid=u.id and j.deleted = 0 and
             	(j.status = 'complete' or j.status = 'cancelled')
 order by finishdate desc limit $start, $limit
 ";
+
+$jobtypes = DBFindMany("JobType","from jobtype");
 
 $jobids = QuickQueryList($query);
 $query = "select FOUND_ROWS()";
@@ -122,16 +125,15 @@ function fmt_rate ($obj, $name) {
 	return $rate;
 }
 
-function fmt_jobtype ($obj,$name) {
-	if ($obj->type == "survey")
-		return "Survey";
-	else
-		return "Notification";
+function fmt_jobmode ($obj,$name) {
+	global $jobtypes;
+	
+	return $jobtypes[$obj->jobtypeid]->name . " " . ($obj->type == "survey" ? "Survey" : "Notification");	
 }
 
 $titles = array ("Owner" => "Submitted by",
 				"name" => 'Job Name',
-				"type" => "Mode",
+				"Mode" => "Mode",
 				"status" => 'Status',
 				"Total" => 'Total',
 				"Rate" => '% Contacted',
@@ -140,7 +142,7 @@ $titles = array ("Owner" => "Submitted by",
 				"responses" => "Responses",
 				"Actions" => 'Actions');
 $formatters = array(
-				"type" => "fmt_jobtype",
+				"Mode" => "fmt_jobmode",
 				"Owner" => 'fmt_job_owner',
 				"startdate" => 'fmt_job_startdate',
 				"status" => "fmt_ucfirst",
