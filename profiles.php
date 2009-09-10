@@ -28,8 +28,12 @@ if (isset($_GET['delete'])) {
 		$_SESSION['accessid'] = NULL;
 	$count = QuickQuery("select count(*) from user where accessid='$deleteid' and deleted=0");
 	if ($count == 0) {
-		QuickUpdate("delete from access where id='$deleteid'");
-		QuickUpdate("delete from permission where accessid='$deleteid'");
+		$access = new Access($deleteid);
+		Query("BEGIN");
+			QuickUpdate("delete from access where id='$deleteid'");
+			QuickUpdate("delete from permission where accessid='$deleteid'");
+		Query("COMMIT");
+		notice(_L("The access profile, %s, is now deleted", escapehtml($access->name)));
 	} else {
 		error("This access profile is being used by $count user account(s). Please reassign users to a different profile and try agian");
 	}
