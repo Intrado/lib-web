@@ -35,8 +35,7 @@ if ($makeNewUser) {
 	$usercount = QuickQuery("select count(*) from user where enabled = 1 and login != 'schoolmessenger'");
 	$maxusers = getSystemSetting("_maxusers", "unlimited");
 	if (($maxusers !== "unlimited") && $maxusers <= $usercount) {
-		print '<script language="javascript">window.alert(\''.addslashes(_L("You already have the maximum amount of users.")).'\');window.location="users.php";</script>';
-		exit();
+		redirect("users.php?maxusers");
 	}
 }
 /*CSDELETEMARKER_END*/
@@ -160,7 +159,7 @@ $formdata["password"] = array(
 
 $formdata["passwordconfirm"] = array(
 	"label" => _L("Confirm Password"),
-	"fieldhelp" => _L('This field is used used to confirm a new password.'),
+	"fieldhelp" => _L('This field is used to confirm a new password.'),
 	"value" => $pass,
 	"validators" => array(
 		array("ValRequired"),
@@ -433,7 +432,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		$postdata = $form->getData(); //gets assoc array of all values {name:value,...}
 		
 		if (!count($accessprofiles)) {
-			$form->modifyElement('accessprofilediv', '<script>alert("'._L("You have no Access Profiles defined! Go to the Admin->Profiles tab and create one.").'")</script>');
+			redirect("users.php?noprofiles");
 		}
 		
 		if ($makeNewUser) {
@@ -575,12 +574,20 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 			$edituser->setPincode($postdata['pin']);
 		
 		Query("COMMIT");
+		
 		if ($button == 'inpagesubmit') {
+			if ($hasstaffid)
+				notice(_L("Staff ID is now removed from Data View"));
+			else
+				notice(_L("Staff ID is now added to Data View"));
+			
 			if ($ajax)
 				$form->sendTo("user.php?id=".$edituser->id);
 			else
 				redirect("user.php?id=".$edituser->id);
 		} else {
+			// TODO, Release 7.2: notice(_L("Changes to %s's account is now saved", $edituser->login));
+			
 			if ($ajax)
 				$form->sendTo("users.php");
 			else
