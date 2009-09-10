@@ -29,7 +29,10 @@ if (!$USER->authorize('managetasks')) {
 if (isset($_GET['run'])) {
 	$run = $_GET['run'] + 0;
 	$import = new Import($run);
-	$import->runNow();
+	Query("BEGIN");
+		$import->runNow();
+	Query("COMMIT");
+	notice(_L("The import, %s, will now run", escapehtml($import->name)));
 	redirectToReferrer();
 }
 
@@ -109,46 +112,46 @@ if(CheckFormSubmit($form, $section) || CheckFormSubmit($form, 'mapfields'))
 					redirect();
 				}
 				// else editing existing import
+				Query("BEGIN");
+					$IMPORT->skipheaderlines = GetFormData($form, $section, 'skipheaderlines');
 
-				$IMPORT->skipheaderlines = GetFormData($form, $section, 'skipheaderlines');
+					$IMPORT->updatemethod = GetFormData($form, $section, 'updatemethod');
+					//$IMPORT->status = 'idle'; //don't update the status (new imports handled above)
+					$IMPORT->ownertype = 'system';
 
-				$IMPORT->updatemethod = GetFormData($form, $section, 'updatemethod');
-				//$IMPORT->status = 'idle'; //don't update the status (new imports handled above)
-				$IMPORT->ownertype = 'system';
+					$IMPORT->type = GetFormData($form, $section, 'automaticimport') ? 'automatic' : 'manual';
 
-				$IMPORT->type = GetFormData($form, $section, 'automaticimport') ? 'automatic' : 'manual';
+					$IMPORT->notes = GetFormData($form, $section, 'notes');
+					$IMPORT->update();
 
-				$IMPORT->notes = GetFormData($form, $section, 'notes');
-				$IMPORT->update();
-
-				$checked = GetFormData($form, $section, 'trigger_checkbox');
-				if ($checked) {
-					$associated = GetFormData($form, $section, 'associatedjobs');
-				} else {
-					$associated = array();
-				}
-				if(count($associated)==0) {
-					$query = "Delete from importjob where importid = '$IMPORT->id'";
-					QuickUpdate($query);
-				} else {
-					$query = "Delete from importjob where importid = '$IMPORT->id'
-								and jobid not in (". implode(',', $associated) . " )";
-					QuickUpdate($query);
-					$existingids = QuickQueryList("Select jobid from importjob where importid = '$IMPORT->id'
-													and jobid in (". implode(',', $associated) . " )" );
-					$newjobids = array_diff($associated, $existingids);
-					foreach($newjobids as $jobid) {
-						$newjob = new Job($jobid);
-						$schedule = new Schedule($newjob->scheduleid);
-						$schedule->nextrun = null;
-						$schedule->update();
-						$importjob = new ImportJob();
-						$importjob->jobid = $jobid;
-						$importjob->importid = $IMPORT->id;
-						$importjob->create();
+					$checked = GetFormData($form, $section, 'trigger_checkbox');
+					if ($checked) {
+						$associated = GetFormData($form, $section, 'associatedjobs');
+					} else {
+						$associated = array();
 					}
-				}
-
+					if(count($associated)==0) {
+						$query = "Delete from importjob where importid = '$IMPORT->id'";
+						QuickUpdate($query);
+					} else {
+						$query = "Delete from importjob where importid = '$IMPORT->id'
+									and jobid not in (". implode(',', $associated) . " )";
+						QuickUpdate($query);
+						$existingids = QuickQueryList("Select jobid from importjob where importid = '$IMPORT->id'
+														and jobid in (". implode(',', $associated) . " )" );
+						$newjobids = array_diff($associated, $existingids);
+						foreach($newjobids as $jobid) {
+							$newjob = new Job($jobid);
+							$schedule = new Schedule($newjob->scheduleid);
+							$schedule->nextrun = null;
+							$schedule->update();
+							$importjob = new ImportJob();
+							$importjob->jobid = $jobid;
+							$importjob->importid = $IMPORT->id;
+							$importjob->create();
+						}
+					}
+				QUERY("COMMIT");
 				$_SESSION['importid'] = $IMPORT->id; // Save import ID to the session
 
 				if (CheckFormSubmit($form,'mapfields')) {
