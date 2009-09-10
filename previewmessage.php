@@ -213,7 +213,7 @@ if (count($formdata)) {
 				$form->modifyElement("messageresultdiv", '
 						<script language="JavaScript" type="text/javascript">
 							embedPlayer("preview.wav.php/embed_preview.wav?' . $request . $previewdata. '","player");
-							$("download").update(\'<a href="_preview.wav.php/download_preview.wav?'  . $request .  $previewdata . '&download=true">' . _L("Click here to download") . '</a>\');
+							$("download").update(\'<a href="preview.wav.php/download_preview.wav?'  . $request .  $previewdata . '&download=true">' . _L("Click here to download") . '</a>\');
 						</script>
 						'
 				);
