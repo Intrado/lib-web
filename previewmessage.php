@@ -88,8 +88,6 @@ if(isset($_GET['parentfield']) || $id) {
 
 // Third Text Request - Session data is already set but nee to parse again. Set fields and return form again 
 if($_SESSION['ttstext']) {	
-	
-	error_log(" Session " . $_SESSION['ttstext']);
 	$message = new Message();
 	$parts = $message->parse($_SESSION['ttstext'],$errors,1);
 	$fieldnums = array();
