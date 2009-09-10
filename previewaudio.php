@@ -19,18 +19,11 @@ startWindow('Audio Preview', 'padding: 3px;');
 ?>
 
 <div align="center">
-
-<OBJECT ID="MediaPlayer" WIDTH=320 HEIGHT=42
-CLASSID="CLSID:22D6F312-B0F6-11D0-94AB-0080C74C7E95"
-STANDBY="Loading Windows Media Player components..."
-TYPE="application/x-oleobject">
-
-<PARAM NAME="FileName" VALUE="audio.wav.php/mediaplayer_preview.wav?id=<? print $_GET['id']; ?>">
-<param name="controller" value="true">
-<EMBED SRC="audio.wav.php/embed_preview.wav?id=<? print $_GET['id']; ?>" AUTOSTART="TRUE"></EMBED>
-</OBJECT>
-
-
+	<div id="player"></div>	
+	<script type="text/javascript" language="javascript" src="script/niftyplayer.js"></script>	
+	<script language="JavaScript" type="text/javascript">
+		embedPlayer("audio.wav.php/mediaplayer_preview.wav?id=<?= $_GET['id']; ?>","player");
+	</script>
 <br><a href="audio.wav.php/download_preview.wav?id=<? print $_GET['id']; ?>&download=true">Click here to download</a>
 </div>
 <?
