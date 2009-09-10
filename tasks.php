@@ -32,47 +32,51 @@ if (isset($_GET['delete'])) {
 	$id = $_GET['delete'] + 0;
 	$import = new Import($id);
 
-	switch ($import->datatype) {
-	case "person" :
-		// delete all groupdata with this importid
-		QuickUpdate("delete from groupdata where importid=$id");
-		//deactivate everyone with this importid
-		QuickUpdate("update person set deleted=1, lastimport=now() where importid=$id");
-		//TODO this doesnt seem to do anything since it doesn't check the deleted flag???
-		QuickUpdate("delete le from listentry le
-					left join person p on (p.id = le.personid)
-					where p.id is null and le.personid is not null");
+	Query("BEGIN");
+		switch ($import->datatype) {
+			case "person" :
+				// delete all groupdata with this importid
+				QuickUpdate("delete from groupdata where importid=$id");
+				//deactivate everyone with this importid
+				QuickUpdate("update person set deleted=1, lastimport=now() where importid=$id");
+				//TODO this doesnt seem to do anything since it doesn't check the deleted flag???
+				QuickUpdate("delete le from listentry le
+							left join person p on (p.id = le.personid)
+							where p.id is null and le.personid is not null");
 
-		//recalc pdvalues for all fields mapped
-		$fieldnums = QuickQueryList("select distinct mapto from importfield where (mapto like 'f%' or mapto like 'g%') and importid=$id");
-		if (count($fieldnums) > 0) {
-			$fields = DBFindMany("FieldMap", "from fieldmap where fieldnum in ('" . implode("','",$fieldnums) . "')");
-			foreach ($fields as $field)
-				$field->updatePersonDataValues();
+				//recalc pdvalues for all fields mapped
+				$fieldnums = QuickQueryList("select distinct mapto from importfield where (mapto like 'f%' or mapto like 'g%') and importid=$id");
+				if (count($fieldnums) > 0) {
+					$fields = DBFindMany("FieldMap", "from fieldmap where fieldnum in ('" . implode("','",$fieldnums) . "')");
+					foreach ($fields as $field)
+						$field->updatePersonDataValues();
+				}
+			break;
+			case "user" :
+				// disable all users with this importid and set importid to null
+				QuickUpdate("update user set enabled=0, lastimport=now(), importid=null where importid=$id");
+
+			break;
+			case "enrollment" :
+				// NOTE: do not remove userrules... do not inadvertently grant access to persons they should not see.
+				// Next enrollment import (assuming there is a new one set up) will recreate necessary rules at that time
+
+				// clear out data
+				QuickUpdate("truncate enrollment");
+
+				//remove pdvalues for all Cfields
+				QuickUpdate("delete from persondatavalues where fieldnum like 'c%'");
+			break;
 		}
-	break;
-	case "user" :
-		// disable all users with this importid and set importid to null
-		QuickUpdate("update user set enabled=0, lastimport=now(), importid=null where importid=$id");
 
-	break;
-	case "enrollment" :
-		// NOTE: do not remove userrules... do not inadvertently grant access to persons they should not see.
-		// Next enrollment import (assuming there is a new one set up) will recreate necessary rules at that time
+		//delete mappings
+		QuickUpdate("delete from importfield where importid=$id");
 
-		// clear out data
-		QuickUpdate("truncate enrollment");
+		//delete import
+		$import->destroy();
+	Query("COMMIT");
 
-		//remove pdvalues for all Cfields
-		QuickUpdate("delete from persondatavalues where fieldnum like 'c%'");
-	break;
-	}
-
-	//delete mappings
-	QuickUpdate("delete from importfield where importid=$id");
-
-	//delete import
-	$import->destroy();
+	notice(_L("The import, %s, is now deleted", escapehtml($import->name)));
 	redirect();
 }
 
@@ -135,7 +139,7 @@ function fmt_actions ($import,$dummy) {
 		$deletewarning = "This will delete all enrollment data!";
 	break;
 	}
-	
+
 	$associatedjobcount = QuickQuery("Select count(*) from importjob where importid = '$import->id'");
 	$confirm = "Are you sure you want to run this import now?";
 	if($associatedjobcount > 0){
@@ -143,23 +147,23 @@ function fmt_actions ($import,$dummy) {
 		$extra = 'W A R N I N G:\nThis import has ' . "$associatedjobcount" .' repeating job(s) linked to it that will automatically run if you click OK.\n';
 		$confirm = $extra. $confirm;
 	}
-	
+
 	$links = array();
-	
+
 	$links[] = action_link(_L("Upload"), "folder", "taskupload.php?id=$import->id");
-		
+
 	if ($import->datamodifiedtime != null) {
 		$links[] = action_link(_L("Download"), "disk", "taskdownload.php?id=$import->id");
-		$links[] = action_link(_L("Run Now"), "database_go", "task.php?run=$import->id","return confirm('$confirm');");		
+		$links[] = action_link(_L("Run Now"), "database_go", "task.php?run=$import->id","return confirm('$confirm');");
 	}
-	
+
 	if ($import->lastrun != null) {
 		$links[] = action_link(_L("Log"), "application_view_list", "tasklog.php?id=$import->id");
 	}
-	
+
 	$links[] = action_link(_L("Edit"), "pencil", "task.php?id=$import->id");
 	$links[] = action_link(_L("Delete"), "cross", "tasks.php?delete=$import->id", "return confirm('Are you sure you want to delete this import item?\\n$deletewarning');");
-	
+
 	return action_links($links);
 }
 
