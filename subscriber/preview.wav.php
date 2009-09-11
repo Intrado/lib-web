@@ -30,6 +30,6 @@ if (isset($_GET['jid'])) {
 			and rp.type = 'phone'";
 
 	$historicdata = QuickQueryRow($query, true, false, array($jid, $pid));
-	Message::playAudio($historicdata['messageid'], $historicdata);
+	Message::playAudio($historicdata['messageid'], $historicdata,"mp3");
 }
 ?>

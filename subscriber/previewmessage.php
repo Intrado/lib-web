@@ -172,18 +172,11 @@ if ($phone) {
 	?>
 
 		<div align="center">
-
-		<OBJECT ID="MediaPlayer" WIDTH=320 HEIGHT=42
-		CLASSID="CLSID:22D6F312-B0F6-11D0-94AB-0080C74C7E95"
-		STANDBY="<?=_L("Loading Windows Media Player components...")?>"
-		TYPE="application/x-oleobject">
-
-		<PARAM NAME="FileName" VALUE="preview.wav.php/mediaplayer_preview.wav?jid=<?= $jobid ?>&pid=<?= $personid ?>">
-		<param name="controller" value="true">
-		<EMBED SRC="preview.wav.php/embed_preview.wav?jid=<?= $jobid ?>&pid=<?= $personid ?>" AUTOSTART="TRUE"></EMBED>
-		</OBJECT>
-
-
+		<div id="player"></div>				
+		<script type="text/javascript" language="javascript" src="script/niftyplayer.js"></script>
+		<script language="JavaScript" type="text/javascript">
+	 				embedPlayer("preview.wav.php/embed_preview.wav?jid=<?= $jobid ?>&pid=<?= $personid ?>","player");
+		</script>
 		<br><a href="preview.wav.php/download_preview.wav?jid=<?= $jobid ?>&pid=<?= $personid ?>&download=true"><?=_L("Click here to download")?></a>
 		</div>
 	<?
