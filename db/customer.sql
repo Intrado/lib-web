@@ -1498,3 +1498,7 @@ $$$
 `contentid` BIGINT( 20 ) NOT NULL
 ) ENGINE = InnoDB CHARACTER SET utf8 COLLATE utf8_general_ci
 $$$
+
+-- surveyquestion index on questionnaireid
+ ALTER TABLE `surveyquestion` ADD INDEX ( `questionnaireid` )
+ $$$
