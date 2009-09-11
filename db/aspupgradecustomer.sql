@@ -61,3 +61,7 @@ INSERT INTO `setting` (`name`, `value`) VALUES
 ('enablesmsoptin', '0')
 $$$
 
+-- surveyquestion index on questionnaireid
+ ALTER TABLE `surveyquestion` ADD INDEX ( `questionnaireid` )
+ $$$
+
