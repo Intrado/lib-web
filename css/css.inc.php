@@ -7,7 +7,7 @@ if (!isset($_SESSION['colorscheme'])) {
 	$primary = "3e693f";
 	$theme1 = "3e693f";
 	$theme2 = "b47727";
-	$globalratio = ".2";	
+	$globalratio = ".2";
 } else {
 	$theme = $_SESSION['colorscheme']['_brandtheme'];
 	$primary = $_SESSION['colorscheme']['_brandprimary'];
@@ -164,12 +164,12 @@ a:hover {
 }
 
 .navband1 {
-	height: 6px; 
+	height: 6px;
 	background: <?=$primary?>;
 }
 
 .navband2 {
-	height: 2px; 
+	height: 2px;
 	background: <?=$theme2?>;
 	margin-bottom: 3px;
 }
@@ -327,11 +327,11 @@ a:hover {
 	height: 24px;
 
 	float: left;
-	background-color: transparent; 
-	border: 0px; 
-	width: auto; 
-	overflow: visible; 
-	vertical-align: middle; 
+	background-color: transparent;
+	border: 0px;
+	width: auto;
+	overflow: visible;
+	vertical-align: middle;
 	padding: 0 .25em 3px .25em;
 }
 
@@ -371,11 +371,11 @@ a:hover {
 .regbutton {
 	text-decoration: none;
 	float: left;
-	background-color: transparent; 
-	border: 0px; 
-	width: auto; 
-	overflow: visible; 
-	vertical-align: middle; 
+	background-color: transparent;
+	border: 0px;
+	width: auto;
+	overflow: visible;
+	vertical-align: middle;
 	padding: 1px;
 }
 
@@ -497,6 +497,45 @@ div.scrollTableContainer {
 	border: solid 1px <?=$theme2?>;
 }
 
+.accordionsectiondiv {
+	margin: 0;
+	overflow: hidden;
+	margin-top: -2px;
+}
+
+.accordionsectiondivexpanded .accordiontitlediv {
+	background-image: url('img/arrow_down.gif');
+}
+
+.accordionsectiondivcollapsed .accordiontitlediv {
+	background-image: url('img/arrow_right.gif');
+}
+
+.accordiontitlediv {
+	padding: 2px;
+	padding-left: 10px;
+	padding-top: 5px;
+	cursor: pointer;
+	color: <?=$primary?>;
+	letter-spacing: 1px;
+	background: <?=$topbg?> no-repeat;
+	background-position: 2px 6px;
+	border: solid 1px <?=$theme2?>;
+}
+
+.accordiontitleicon {
+	margin-left: 5px;
+	margin-right: 5px;
+	vertical-align: middle;
+}
+
+.accordioncontentdiv {
+	border: 1px solid <?=$theme2?>;
+	padding: 5px;
+	padding-bottom: 25px;
+	margin-bottom: 1px;
+}
+
 .sortheader {
 	color: white;
 	background-color: <?=$newfade2?>;
@@ -530,11 +569,11 @@ div.scrollTableContainer {
 
 
 .actionlink {
-	border: 0px; 
+	border: 0px;
 	white-space: nowrap;
 	text-decoration: none;
 	cursor: pointer;
-	
+
 	color: <?=$primary?>;;
 }
 
