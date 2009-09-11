@@ -258,7 +258,7 @@ if ($job->sendemail) { ?>
 <? }
 if ($job->sendsms) { ?>
 		<tr class='destination'>
-			<th align="right" class="windowRowHeader bottomBorder">SMS:<th>
+			<th align="right" class="windowRowHeader bottomBorder">SMS:</th>
 			<td class="bottomBorder">
 				<table  border="0" cellpadding="2" cellspacing="1" class="list" width="100%">
 						<tr class="listHeader" align="left" valign="bottom">
@@ -271,7 +271,7 @@ if ($job->sendsms) { ?>
 							<td id='recipientssms'><?=$destinationresults['sms']['recipients']?></td>
 							<td id='completedsms'><?=$destinationresults['sms']['completed']?></td>
 							<td id='remainingsms'><?=$destinationresults['sms']['remaining']?></td>
-							<td id='percentcontactedsms'><?=$destinationresults['sms']['percentcompleted']?></td>
+							<td id='percentcontactedsms'><?=$destinationresults['sms']['percentcontacted']?></td>
 						</tr>
 				</table>
 				<img style='width:500px;height:300px' src='<?=$imageurl?>&type=sms' id='smsgraph'/>
@@ -305,7 +305,7 @@ if (!$noupdate) {
 				parameters: {
 					ajax: true,
 					notpopup: true,
-					noupdate: true, // Ajax.PeriodicalUpdater will take care of updating from now on.
+					noupdate: true
 					jobid: <?=$job->id?>
 				},
 				onSuccess: function(transport) {
@@ -327,7 +327,7 @@ if (!$noupdate) {
 						updateDestination(data,'sms');
 
 					if (data.jobstatus != 'complete' && data.jobstatus != 'cancelled')
-						setTimeout("refreshPage();", 10000); // Start the updater 5 seconds after the page loads.
+						setTimeout("refreshPage();", 10000);
 				}
 			});
 		};
