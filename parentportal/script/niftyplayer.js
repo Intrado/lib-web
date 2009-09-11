@@ -106,8 +106,8 @@ function niftyplayer(name)
  * Embed the NiftyPlayer and load audio if flash player was embedded sucessfully. Otherwise use the native mp3 player.
  */
 
-function hasFlashPlayer(){		
-	return (FlashHelper.getMovie('niftyPlayer1') != undefined && FlashHelper.getMovie('niftyPlayer1').PercentLoaded != undefined);
+function hasFlashPlayer(){	
+	return (typeof(FlashHelper.getMovie('niftyPlayer1')) != 'undefined' && typeof(FlashHelper.getMovie('niftyPlayer1').PercentLoaded) != 'undefined');
 }
 
 function embedPlayer(url,target) { 
