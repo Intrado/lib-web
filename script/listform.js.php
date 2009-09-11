@@ -38,6 +38,15 @@ function listform_load(listformID, formData, postURL) {
 	//submit handler
 	form.observe('submit',form_handle_submit.curry(listformVars.id));
 
+	$('listChoose_listids_icon').observe('load', function() {
+		var icon = $('listChoose_listids_icon');
+		if (!icon.src.match(/exclamation/)) {
+			icon.hide();
+		} else {
+			icon.show();
+		}
+	});
+
 	// Accordion
 	accordion = new Accordion('accordionContainer');
 
