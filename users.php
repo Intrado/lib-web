@@ -27,6 +27,24 @@ if (isset($_GET['noprofiles']))
 ////////////////////////////////////////////////////////////////////////////////
 // Data Handling
 ////////////////////////////////////////////////////////////////////////////////
+if (isset($_GET['download'])) {
+	$userdetails = Query("select u.login, u.accesscode, u.firstname, u.lastname, u.description, u.phone, u.email, u.aremail, u.enabled, u.lastlogin, u.ldap, u.staffpkey, a.name, a.description profiledescription, r.fieldnum, r.op, r.val
+		from user u, rule r, userrule ur, access a
+		where a.id = u.accessid
+		and ur.userid = u.id and r.id = ur.ruleid and not u.deleted");
+
+	// set header
+	header("Pragma: private");
+	header("Cache-Control: private");
+	header("Content-disposition: attachment; filename=users.csv");
+	header("Content-type: application/vnd.ms-excel");
+	// echo out the data
+	echo '"login","accesscode","firstname","lastname","description","phone","email","aremail","enabled","lastlogin","ldap","staffpkey","profile name","profile description","fieldnum","op","val"' . "\n";
+	while ($row = $userdetails->fetch(PDO::FETCH_ASSOC))
+		echo '"' . implode('","', $row) . '"' . "\n";
+	exit;
+}
+
 
 /*CSDELETEMARKER_START*/
 $usercount = QuickQuery("select count(*) from user where enabled = 1 and login != 'schoolmessenger'");
@@ -43,11 +61,11 @@ function is_sm_user($id) {
 if (isset($_GET['resetpass'])) {
 	$id = 0 + $_GET['resetpass'];
 	$usr = new User($id);
-	
+
 	/*CSDELETEMARKER_START*/
 	if (is_sm_user($id))
 		redirect(); // NOTE: Deliberately not show a notice() about the hidden schoolmessenger user?
-	
+
 	if ($maxreached && !$usr->enabled) {
 		redirect("?maxusers");
 	}
@@ -72,7 +90,7 @@ if (isset($_GET['delete'])) {
 		$_SESSION['userid'] = NULL;
 
 	$usr = new User($deleteid);
-	
+
 	QuickQuery('BEGIN');
 		QuickUpdate("update user set enabled=0, deleted=1 where id=?", false, array($deleteid));
 		QuickUpdate("delete from schedule where id in (select scheduleid from job where status='repeating' and userid=?)", false, array($deleteid));
@@ -86,15 +104,15 @@ if (isset($_GET['delete'])) {
 if (isset($_GET['disable'])) {
 	$id = 0 + $_GET['disable'];
 	$usr = new User($id);
-	
+
 	/*CSDELETEMARKER_START*/
 	if (is_sm_user($id))
 		redirect(); // NOTE: Deliberately not show a notice() about the hidden schoolmessenger user?
 	/*CSDELETEMARKER_END*/
-		
+
 	$usr->enabled = 0;
 	$usr->update();
-	
+
 	notice(_L("%s is now disabled", escapehtml($usr->login)));
 	redirect();
 }
@@ -102,7 +120,7 @@ if (isset($_GET['disable'])) {
 if (isset($_GET['enable'])) {
 	$id = 0 + $_GET['enable'];
 	$usr = new User($id);
-	
+
 	/*CSDELETEMARKER_START*/
 	if (is_sm_user($id))
 		redirect(); // NOTE: Deliberately not show a notice() about the hidden schoolmessenger user?
@@ -110,10 +128,10 @@ if (isset($_GET['enable'])) {
 		redirect("?maxusers");
 	}
 	/*CSDELETEMARKER_END*/
-	
+
 	$usr->enabled = 1;
 	$usr->update();
-	
+
 	notice(_L("%s is now enabled", escapehtml($usr->login)));
 	redirect();
 }
@@ -134,7 +152,7 @@ function fmt_actions_enabled_account ($account,$name) {
 	$id = $account['id'];
 	$importid = $account['importid'];
 	$login = $account['login'];
-	
+
 	$activeuseranchor = (isset($_SESSION['userid']) && $_SESSION['userid'] == $id) ? '<a name="viewrecent">' : '';
 
 	$links = array();
@@ -143,7 +161,7 @@ function fmt_actions_enabled_account ($account,$name) {
 	$links[] = action_link(_L("Reset Password"),"fugue/lock__pencil","", "if (window.confirm('"._L('Send an email reset reminder?')."')) window.location='?resetpass=$id'");
 	if ($id != $USER->id)
 		$links[] = action_link(_L("Disable"),"user_delete","?disable=$id");
-	
+
 	return $activeuseranchor . action_links($links);
 }
 
@@ -159,9 +177,9 @@ function fmt_actions_disabled_account ($account,$name) {
 	$links[] = action_link(_L("Enable"),"user_add","?enable=$id");
 	if(isset($newusers[$id]))
 		$links[] = action_link(_L("Enable & Reset Password"),"fugue/lock__pencil","?resetpass=$id");
-	
+
 	$links[] = action_link(_L("Delete"),"cross","?delete=$id","return confirmDelete()");
-	
+
 	return action_links($links);
 }
 
@@ -170,12 +188,12 @@ function fmt_actions_disabled_account ($account,$name) {
 ////////////////////////////////////////////////////////////////////////////////
 if (!isset($_SESSION['ajaxtablepagestart']) || !isset($_GET['ajax']))
 	$_SESSION['ajaxtablepagestart'] = array();
-if (isset($_GET['containerID']) && isset($_GET['ajax'])) {		
+if (isset($_GET['containerID']) && isset($_GET['ajax'])) {
 	if (isset($_GET['start']) && $_GET['ajax'] == 'page')
 		$_SESSION['ajaxtablepagestart'][$_GET['containerID']] = $_GET['start'] + 0;
 	if ($_GET['ajax'] == 'filter')
 		$_SESSION['ajaxtablepagestart'][$_GET['containerID']] = 0;
-		
+
 	header('Content-Type: application/json');
 		$ajaxdata = array('html' => show_user_table($_GET['containerID']));
 	exit(json_encode($ajaxdata));
@@ -183,9 +201,9 @@ if (isset($_GET['containerID']) && isset($_GET['ajax'])) {
 
 function show_user_table($containerID) {
 	global $IS_COMMSUITE;
-	
+
 	$perpage = 20;
-	
+
 	$titles = array(
 		"firstname" => "First Name",
 		"lastname" => "Last Name",
@@ -206,7 +224,7 @@ function show_user_table($containerID) {
 		"lastlogin" => "lastlogin",
 		"profilename" => "profilename"
 	);
-	
+
 	// ACCOUNT ENABLED/DISABLED, COMMSUITE/NOT COMMSUITE
 	if ($containerID == 'inactiveUsersContainer') {
 		$criteriaSQL = "not enabled and deleted=0";
@@ -220,7 +238,7 @@ function show_user_table($containerID) {
 /*CSDELETEMARKER_END*/
 		$formatters["Actions"] = "fmt_actions_enabled_account";
 	}
-	
+
 	// ORDER BY
 	$orderbySQL = ajax_table_get_orderby($containerID, $sorting);
 	if (empty($orderbySQL))
@@ -243,11 +261,11 @@ function show_user_table($containerID) {
 
 	// PAGING
 	$limitstart = isset($_SESSION['ajaxtablepagestart'][$containerID]) ? $_SESSION['ajaxtablepagestart'][$containerID] : 0;
-	
+
 	// RUN QUERY
 	$data = QuickQueryMultiRow("select SQL_CALC_FOUND_ROWS u.*,a.name as profilename from user u left join access a on (u.accessid = a.id) where $criteriaSQL $filterSQL order by $orderbySQL limit $limitstart,$perpage", true, false, $args);
 	$numUsers = QuickQuery("select FOUND_ROWS()");
-	
+
 	$tooltip = addslashes(_L("Search by First Name, Last Name, Username, or Access Profile. Press ENTER to apply the search word."));
 	$html = "<div style='float:left; padding-top:5px'><input id='{$containerID}_search' size=20 value=''></div>";
 	$html .= ajax_table_show_menu($containerID, $numUsers, $limitstart, $perpage) . ajax_show_table($containerID, $data, $titles, $formatters, $sorting);
@@ -259,12 +277,12 @@ function show_user_table($containerID) {
 			blankFieldValue('{$containerID}_search', searchLabel);
 			searchBox.focus();
 			searchBox.blur();
-			
+
 			Event.observe(searchBox, 'keypress', function(event) {
 				if (Event.KEY_RETURN == event.keyCode)
 					ajax_table_update('$containerID', '?ajax=filter&filter=' + encodeURIComponent(event.element().value));
 			});
-			
+
 			new Tip(searchBox, '$tooltip', {
 					style: 'protogrey',
 					stem: 'bottomLeft',
@@ -289,12 +307,13 @@ $DESCRIPTION = "Active Users: $usercount";
 if($maxusers != "unlimited")
 	$DESCRIPTION .= ", Maximum Allowed: $maxusers";
 /*CSDELETEMARKER_END*/
+$DESCRIPTION .= ',&nbsp;&nbsp;<a href="users.php?download">download csv</a>';
 
 include_once("nav.inc.php");
 
 startWindow('Active Users ' . help('Users_ActiveUsersList'),null, true);
 	button_bar(button('Add New User', NULL,"user.php?id=new") . help('Users_UserAdd'));
-	
+
 	echo '<div id="activeUsersContainer">';
 		echo show_user_table('activeUsersContainer');
 	echo '</div>';
