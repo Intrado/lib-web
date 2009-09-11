@@ -61,40 +61,40 @@ function update_jobtypeprefs($min, $max, $type, $custdb){
 $f = "customer";
 $s = "edit";
 
-$googlangs = array(	"Arabic", 
-					"Bulgarian", 
-					"Catalan", 
-					"Chinese", 
-					"Croatian", 
-					"Czech", 
-					"Danish", 
+$googlangs = array(	"Arabic",
+					"Bulgarian",
+					"Catalan",
+					"Chinese",
+					"Croatian",
+					"Czech",
+					"Danish",
 					"Dutch",
-					"Filipino", 
-					"Finnish", 
-					"French", 
-					"German", 
-					"Greek", 
-					"Hebrew", 
-					"Hindi", 
-					"Indonesian", 
-					"Italian", 
-					"Japanese", 
-					"Korean", 
-					"Latvian", 
-					"Lithuanian", 
-					"Norwegian", 
-					"Polish", 
-					"Portuguese", 
-					"Romanian", 
-					"Russian", 
-					"Serbian", 
-					"Slovak", 
-					"Slovenian", 
-					"Spanish", 
-					"Swedish", 
-					"Ukrainian", 
+					"Filipino",
+					"Finnish",
+					"French",
+					"German",
+					"Greek",
+					"Hebrew",
+					"Hindi",
+					"Indonesian",
+					"Italian",
+					"Japanese",
+					"Korean",
+					"Latvian",
+					"Lithuanian",
+					"Norwegian",
+					"Polish",
+					"Portuguese",
+					"Romanian",
+					"Russian",
+					"Serbian",
+					"Slovak",
+					"Slovenian",
+					"Spanish",
+					"Swedish",
+					"Ukrainian",
 					"Vietnamese");
-					
+
 $timezones = array(	"US/Alaska",
 					"US/Aleutian",
 					"US/Arizona",
@@ -182,7 +182,7 @@ if(CheckFormSubmit($f,"Save") || CheckFormSubmit($f, "Return")) {
 					$fileerror = true;
 				}
 			}
-			
+
 			if (($inboundnumber != "") && QuickQuery("SELECT COUNT(*) FROM customer WHERE inboundnumber ='" . DBSafe($inboundnumber) . "' and id != '" . $currentid . "'")) {
 				error('Entered 800 Number Already being used', 'Please Enter Another');
 			} else if (QuickQuery("SELECT COUNT(*) FROM customer WHERE urlcomponent='" . DBSafe($hostname) ."' AND id != $currentid")) {
@@ -216,7 +216,7 @@ if(CheckFormSubmit($f,"Save") || CheckFormSubmit($f, "Return")) {
 						nsid='" . DBSafe(GetFormData($f, $s, "nsid")) . "',
 						notes='" . DBSafe($managernote) . "'
 						where id = '$currentid'");
-				
+
 				// notify authserver to refresh the customer cache
 				refreshCustomer($currentid);
 
@@ -240,7 +240,7 @@ if(CheckFormSubmit($f,"Save") || CheckFormSubmit($f, "Return")) {
 				setCustomerSystemSetting("displayname", $displayname, $custdb);
 				setCustomerSystemSetting("inboundnumber", $inboundnumber, $custdb);
 				setCustomerSystemSetting("timezone", $timezone, $custdb);
-				
+
 				update_jobtypeprefs(getCustomerSystemSetting('maxphones', 1, true, $custdb), $maxphones, "phone", $custdb);
 				setCustomerSystemSetting("maxphones", $maxphones, $custdb);
 
@@ -270,7 +270,7 @@ if(CheckFormSubmit($f,"Save") || CheckFormSubmit($f, "Return")) {
 				setCustomerSystemSetting('_hassms', $hassms, $custdb);
 				setCustomerSystemSetting('enablesmsoptin', $enablesmsoptin, $custdb);
 				setCustomerSystemSetting('smsoptintext', $smsoptintext, $custdb);
-				
+
 				setCustomerSystemSetting('_hasportal', $hasportal, $custdb);
 				setCustomerSystemSetting('_hassurvey', GetFormData($f, $s, 'hassurvey'), $custdb);
 				setCustomerSystemSetting('_hascallback', GetFormData($f, $s, 'hascallback'), $custdb);
@@ -369,7 +369,7 @@ if(CheckFormSubmit($f,"Save") || CheckFormSubmit($f, "Return")) {
 				}
 
 				setCustomerSystemSetting('_dmmethod', DBSafe(GetFormData($f, $s, "_dmmethod")), $custdb);
-				
+
 				setCustomerSystemSetting('softdeletemonths', DBSafe(GetFormData($f, $s, "softdeletemonths")), $custdb);
 				setCustomerSystemSetting('harddeletemonths', DBSafe(GetFormData($f, $s, "harddeletemonths")), $custdb);
 
@@ -418,7 +418,7 @@ if( $reloadform ) {
 		$maxusers = "";
 	PutFormData($f,$s,"maxusers", $maxusers, "number", 0);
 	PutFormData($f,$s,"managernote", $custinfo[8], "text", 0, 255);
-	
+
 	// SMS
 	PutFormData($f,$s,"hassms", getCustomerSystemSetting('_hassms', false, true, $custdb), "bool", 0, 1);
 	PutFormData($f, $s, "enablesmsoptin", getCustomerSystemSetting('enablesmsoptin', true, true, $custdb), "bool", 0, 1);
@@ -538,7 +538,7 @@ NewForm($f);
 foreach($languages as $index => $language){
 	$lang = "Language" . $index;
 	?><tr><td><?=$lang?></td><td><? NewFormItem($f, $s, $lang, 'text', 25, 50, "id='$lang' onkeyup=\"var s = new getObj('$lang"."_select'); s.obj.selectedIndex = 0;\" onchange=\"var sel = new getObj('$lang"."_select');	for (var i in sel.obj.options) if (this.value == sel.obj.options[i].value) sel.obj.selectedIndex = i;\"") ?>
-	<? 
+	<?
 	if ($index > 1) {?>
 		<select disabled id='<?="$lang"."_select"?>' onchange="if (this.selectedIndex != 0) {var o = new getObj('<?=$lang?>'); o.obj.value = this.options[this.selectedIndex].value;}">
 		<option value=0> -- No Translation Support -- </option>
@@ -675,7 +675,6 @@ foreach($languages as $index => $language){
 		NewFormItem($f,$s,'softdeletemonths','selectoption','12 Months','12');
 		NewFormItem($f,$s,'softdeletemonths','selectoption','18 Months','18');
 	NewFormItem($f,$s,'softdeletemonths','selectend');
-EndForm();
 ?>
 	</td>
 </tr>
