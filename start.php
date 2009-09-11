@@ -497,31 +497,38 @@ include_once("nav.inc.php");
 		<td>
 <?		
 			if ($USER->authorize('sendphone') || $USER->authorize('sendemail') || $USER->authorize('sendsms')) {  
+				$allowedjobtypes = QuickQueryRow("select sum(jt.systempriority = 1) as Emergency, sum(jt.systempriority != 1) as Other from jobtype jt",true);		
 				$jobtypes = QuickQueryList("select jt.systempriority from jobtype jt,userjobtypes ujt where ujt.jobtypeid = jt.id and ujt.userid=? and jt.deleted=0",false,false,array($USER->id));			
 				$jobtypescount = count($jobtypes);
 ?>
 			<div style="width:170px;top:0px;text-align:center;">
 			<? 
 				$hasnewjob = false;
-				if($jobtypescount === 0)
-					$hasnewjob = true;
-				else {
-					$hasnewjob = (in_array(2,$jobtypes) || in_array(3,$jobtypes));				
+				if($allowedjobtypes["Other"] > 0) {
+					if($jobtypescount === 0)
+						$hasnewjob = true;
+					else {
+						$hasnewjob = (in_array(2,$jobtypes) || in_array(3,$jobtypes));				
+					}
 				}
 				if($hasnewjob) {
-			?>
-					<img style="cursor:pointer;" src="img/newjob.jpg" align="middle" alt="Start a new job" title="Create a new notification job" 
-							onclick="window.location = 'jobwizard.php?new&jobtype=normal'"
-							onmouseover="this.src='img/newjob_over.jpg'"
-							onmouseout="this.src='img/newjob.jpg'" />
-			<? 
+?>
+						<img style="cursor:pointer;" src="img/newjob.jpg" align="middle" alt="Start a new job" title="Create a new notification job" 
+								onclick="window.location = 'jobwizard.php?new&jobtype=normal'"
+								onmouseover="this.src='img/newjob_over.jpg'"
+								onmouseout="this.src='img/newjob.jpg'" />
+<?
+				 
 				}
+
 				$hasemergency = false;
-				if($jobtypescount === 0)
-					$hasemergency = true;
-				else {
-					$hasemergency = in_array(1,$jobtypes);
-				}	
+				if($allowedjobtypes["Emergency"] > 0) {			
+					if($jobtypescount === 0)
+						$hasemergency = true;
+					else {
+						$hasemergency = in_array(1,$jobtypes);
+					}	
+				}
 				if($hasemergency) {
 			 ?>
 			<br />		
