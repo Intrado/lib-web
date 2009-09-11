@@ -11,6 +11,7 @@ header("Cache-Control: private");
 var listformVars = null;
 var ruleWidget = null;
 var ruleEditor = null;
+var accordion = null;
 
 // Modified form load.
 function listform_load(listformID, formData, postURL) {
@@ -33,18 +34,41 @@ function listform_load(listformID, formData, postURL) {
 	form_make_validators(form, listformVars);
 	listformVars.validators['listChoose_listids'] = 'ajax';
 	listformVars.jsgetvalue['listChoose_listids'] = form_default_get_value;
-	
+
 	//submit handler
 	form.observe('submit',form_handle_submit.curry(listformVars.id));
-	
+
+	// Accordion
+	accordion = new Accordion('accordionContainer');
+
+	accordion.add_section('buildlist', true);
+	accordion.add_section('chooselist', true);
+	accordion.add_section('addme');
+
+	accordion.update_section('buildlist', {
+		"title": "<?=addslashes(_L('Build List Using Rules'))?>",
+		"icon": "img/icons/application_form_edit.gif",
+		"content": $('buildListWindow').remove()
+	});
+	accordion.update_section('chooselist', {
+		"title": "<?=addslashes(_L('Choose an Existing List'))?>",
+		"icon": "img/icons/application_view_list.gif",
+		"content": $('chooseListWindow').remove()
+	});
+	accordion.update_section('addme', {
+		"title": "<?=addslashes(_L('Add Myself'))?>",
+		"icon": "img/icons/user.gif",
+		"content": $('addMeWindow').remove()
+	});
+
 	// RuleWidget
 	ruleWidget = new RuleWidget($('ruleWidgetContainer'));
 	ruleEditor = ruleWidget.ruleEditor;
-	
-	var buildListFieldset = new Element('fieldset',{'style':'border: 0; margin:0px; margin-top:5px; padding:0px;'});
+
+	var buildListFieldset = new Element('fieldset',{'style':'border: 0; margin:0px; margin-top:20px; padding:0px;'});
 	buildListFieldset.insert('<?=addslashes(icon_button(_L('Done Adding Rules To This List'),'accept',null,null, ' id="saveRulesButton" '))?>');
 	ruleWidget.container.insert(buildListFieldset);
-	
+
 	ruleWidget.container.observe('RuleWidget:ChangeField', function(event) {
 		if (event.memo.fieldnum)
 			listform_set_rule_editor_status(true);
@@ -55,19 +79,19 @@ function listform_load(listformID, formData, postURL) {
 	$('saveRulesButton').observe('focus', function() {
 		$('saveRulesButton').focus();
 	});
-	
+
 	ruleWidget.container.observe('RuleWidget:InColumn', function(event) {
 		if (ruleEditor.get_selected_fieldmap())
 			listform_set_rule_editor_status(true);
 		else
 			listform_set_rule_editor_status(false);
 	});
-					
+
 	ruleWidget.container.observe('RuleWidget:AddRule', function(event) {
 		$('saveRulesButton').focus();
-		
+
 		listform_set_rule_editor_status(false);
-		
+
 		$('listsTableStatus').update('<img src="img/ajax-loader.gif"/>');
 		new Ajax.Request('ajaxlistform.php?type=addrule&listid=' + listformVars.pendingList, {
 			parameters: {
@@ -81,11 +105,11 @@ function listform_load(listformID, formData, postURL) {
 					alert('<?=addslashes(_L("Sorry, cannot save this rule"))?>');
 					return;
 				}
-				
+
 				var listid = listformVars.pendingList;
-				
+
 				listform_refresh_preview(listid);
-				
+
 				if (!$('listsTableBody').down('input[value='+listid+']')) { // Add to the lists table if the pending list hasn't already been added.
 					listform_add_list(listid);
 				} else {
@@ -96,7 +120,7 @@ function listform_load(listformID, formData, postURL) {
 	});
 	ruleWidget.container.observe('RuleWidget:DeleteRule', function(event) {
 		listform_set_rule_editor_status(false);
-		
+
 		$('listsTableStatus').update('<img src="img/ajax-loader.gif"/>');
 		new Ajax.Request('ajaxlistform.php?type=deleterule&listid=' + listformVars.pendingList, {
 			parameters: {
@@ -108,9 +132,9 @@ function listform_load(listformID, formData, postURL) {
 					alert('<?=addslashes(_L("Sorry, there was an error when deleting this rule"))?>');
 					return;
 				}
-				
+
 				listform_refresh_preview(listformVars.pendingList);
-				
+
 				if ($H(ruleWidget.appliedRules).keys().length <= 0) {
 					listform_remove_list(null, listformVars.pendingList);
 				} else {
@@ -120,60 +144,70 @@ function listform_load(listformID, formData, postURL) {
 			}
 		});
 	});
-	
+
 	// allListsWindow: Grand Total
 	listformVars.totals = {};
-	
-	// allListsWindow: Build a List Using Rules Buttons
-	$('buildListButton').hide();
-	ruleWidget.container.observe('RuleWidget:Ready', function() { 
-			<?
-			if (!$USER->authorize('createlist')) {
-		 		echo "
-		 			$('chooseListChoiceButton').hide();
-					$('chooseListWindow').show();
+
+	accordion.container.observe('Accordion:ClickTitle', function(event) {
+		Tips.hideAll();
+
+		if (event.memo.section != 'buildlist') {
+			if (ruleEditor.get_selected_fieldmap()) {
+					listform_warn_add_rule();
+					event.stop();
 					return;
-				";
 			}
-			?>
-			
-		$('chooseListChoiceButton').show();
-		$('buildListButton').show();
-		$('divider').show();
-		
-		$('buildListButton').observe('click', function(event) {
-			Tips.hideAll();
-			
-			ruleWidget.refresh_guide(true);
-			
-			$('listchooseTotal').update();
-			$('listchooseTotalAdded').update();
-			$('listchooseTotalRemoved').update();
-			$('listchooseTotalRule').update();
-			
-			$('buildListWindow').show();
-			$('chooseListWindow').hide();
-			$('buildListButton').hide();
-			$('chooseListChoiceButton').show();
-			
-			
-			if (!listformVars.pendingList) {
-				ruleWidget.clear_rules();
-				new Ajax.Request('ajaxlistform.php?type=createlist', {
-					onSuccess: function(transport) {
-						$('listsTableStatus').update();
-						var listid = transport.responseJSON;
-						if (!listid) {
-							alert('<?=addslashes(_L('Sorry, you are not able to build lists'))?>');
-							return;
+		}
+
+		switch (event.memo.section) {
+			case 'buildlist':
+				ruleWidget.refresh_guide(true);
+
+				$('listchooseTotal').update();
+				$('listchooseTotalAdded').update();
+				$('listchooseTotalRemoved').update();
+				$('listchooseTotalRule').update();
+
+				if (!listformVars.pendingList) {
+					ruleWidget.clear_rules();
+					new Ajax.Request('ajaxlistform.php?type=createlist', {
+						onSuccess: function(transport) {
+							$('listsTableStatus').update();
+							var listid = transport.responseJSON;
+							if (!listid) {
+								alert('<?=addslashes(_L('Sorry, you are not able to build lists'))?>');
+								return;
+							}
+
+							listformVars.pendingList = listid;
 						}
-						
-						listformVars.pendingList = listid;
-					}
-				});
-			}
-		});
-		
+					});
+				}
+				break;
+
+			case 'chooselist':
+				listformVars.pendingList = null;
+				ruleWidget.refresh_guide();
+
+				break;
+			case 'addme':
+				break;
+		}
+	});
+	// allListsWindow: Build a List Using Rules Buttons
+	ruleWidget.container.observe('RuleWidget:Ready', function() {
+		<?
+		if (!$USER->authorize('createlist')) {
+			echo "
+				accordion.enable_section('chooselist');
+				return;
+			";
+		}
+		?>
+
+		accordion.enable_section('chooselist');
+		accordion.enable_section('buildlist');
+
 		// buildListWindow: Save Rules Button
 		$('saveRulesButton').observe('click', function(event) {
 			Tips.hideAll();
@@ -181,27 +215,13 @@ function listform_load(listformID, formData, postURL) {
 				listform_warn_add_rule();
 				return;
 			}
-			
+
 			listformVars.pendingList = null;
-			listform_hide_build_list_window();
+			accordion.collapse_all();
 			ruleWidget.refresh_guide();
 		});
 	});
-	
-	$('chooseListChoiceButton').observe('click', function(event) {
-		Tips.hideAll();
-		if (ruleEditor.get_selected_fieldmap()) {
-			listform_warn_add_rule();
-			return;
-		}
-			
-		$('chooseListChoiceButton').hide();
-		$('chooseListWindow').show();
-		listform_hide_build_list_window();
-		listformVars.pendingList = null;
-		ruleWidget.refresh_guide();
-	});
-	
+
 	// Load Existing Lists
 	cachedAjaxGet('ajax.php?type=lists',
 		function(transport) {
@@ -209,7 +229,7 @@ function listform_load(listformID, formData, postURL) {
 			if (!listformVars.existingLists)
 				listformVars.existingLists = {};
 			listform_reset_list_selectbox();
-			
+
 			// Load From Session Data.
 			var listids = listformVars.listidsElement.value ? listformVars.listidsElement.value.evalJSON() : [];
 			if (listids.join && listids.length > 0)
@@ -218,7 +238,7 @@ function listform_load(listformID, formData, postURL) {
 				ruleWidget.refresh_guide(true);
 			}
 		}
-	);	
+	);
 }
 
 function listform_warn_add_rule() {
@@ -231,17 +251,17 @@ function listform_add_list(listid) {
 		alert('<?=addslashes(_L('Please select a list'))?>');
 		return false;
 	}
-	
+
 	var listids = listformVars.listidsElement.value ? listformVars.listidsElement.value.evalJSON() : [];
 	if (!listids.join)
 		listids = [];
 	listids = listids.without(listid);
 	listids.push(listid);
 	listformVars.listidsElement.value = listids.toJSON();
-	
+
 	if (listid.indexOf('addme') < 0)
 		listform_load_lists([listid].toJSON());
-		
+
 	return true;
 }
 
@@ -254,13 +274,13 @@ function listform_refresh_liststats(listID, ignoreCache) {
 				alert('<?=addslashes(_L('No data available for this list, please check your internet connection and try again'))?>');
 				return;
 			}
-			
+
 			var data = stats[listID];
 			var nameTD = $('listsTableBody').down('input[value='+listID+']').up('tr').down('td');
 			var statisticsTD = nameTD.next('td',0);
 			nameTD.update(data.name.escapeHTML());
 			statisticsTD.update('<b>' + format_thousands_separator(data.total) + '</b>');
-			
+
 			listformVars.totals[listID] = data.total;
 			listform_update_grand_total();
 		}.bindAsEventListener(this, listID),
@@ -274,7 +294,7 @@ function listform_update_grand_total() {
 	for (var id in listformVars.totals)
 		sum += listformVars.totals[id];
 	$('listGrandTotal').update(format_thousands_separator(sum));
-	
+
 	var rows = $('listsTableBody').rows;
 	var rowCount = rows.length;
 	for (var i = 0; i < rowCount; i++) {
@@ -301,11 +321,11 @@ function listform_load_lists(listidsJSON) {
 				alert('<?=addslashes(_L('No data available for this list, please check your internet connection and try again'))?>');
 				return;
 			}
-			
+
 			for (var listid in stats) {
 				var data = stats[listid];
 				listformVars.totals[listid] = data.total;
-			
+
     			var commonStyle = 'padding: 3px; overflow: hidden; ';
 			    var nameTD = new Element('td', {'class':'NameTD', 'style':'overflow: hidden; white-space: nowrap;' + commonStyle});
 			    nameTD.insert(data.name.escapeHTML());
@@ -322,7 +342,7 @@ function listform_load_lists(listidsJSON) {
 					nameTD.observe('mouseover', function (event, listid) {
 						if (!listformPreviewCache[listid])
 							return;
-							
+
 						var tr = this.up('tr');
 						new Tip (tr, listformPreviewCache[listid], {
 				        	style: "protogrey",
@@ -340,10 +360,10 @@ function listform_load_lists(listidsJSON) {
 						listform_hover_existing_list(event, listid, this.up('tr'));
 					}.bindAsEventListener(nameTD,listid));
 				}
-				
+
 				var removeButton = actionTD.down('img');
 				removeButton.observe('click', listform_remove_list.bindAsEventListener(actionTD,listid,true));
-				
+
 				// Mark this list as 'added' so that the list selectbox no longer shows this list as an option.
 				if (listformVars.existingLists && listformVars.existingLists[listid]) {
 					listformVars.existingLists[listid].added = true;
@@ -367,7 +387,7 @@ function listform_refresh_preview (listid) {
 				Tips.hideAll();
 				return;
 			}
-			
+
 			var previewBox = new Element('div');
 			var tbody = new Element('tbody');
 			for (var i in listRules[listid]) {
@@ -377,7 +397,7 @@ function listform_refresh_preview (listid) {
 				var tr = new Element('tr');
 				ruleWidget.format_readable_rule(rule, tr);
 				tbody.insert(tr);
-				
+
 				if (listformVars.pendingList == listid) {
 					ruleWidget.refresh_rules_table(rule);
 				}
@@ -399,7 +419,7 @@ function listform_hover_existing_list(nullableEvent, listid, tr) {
 	$('listchooseTotalAdded').update();
 	$('listchooseTotalRemoved').update();
 	$('listchooseTotalRule').update();
-	
+
 	cachedAjaxGet('ajax.php?type=liststats&listids='+$H(listformVars.existingLists).keys().toJSON(), function(transport, listid, tr) {
 		var stats = transport.responseJSON;
 		if (!stats) {
@@ -416,7 +436,7 @@ function listform_hover_existing_list(nullableEvent, listid, tr) {
 		var targetElement = (!tr) ? this.up('li') : tr;
 		var hookPreference = (!tr) ? {target:"topLeft",tip:"bottomLeft"} : {target:"leftMiddle",tip:"rightMiddle"};
 		var stemPreference = (!tr) ? "bottomLeft" : "rightMiddle";
-		
+
 		Tips.hideAll();
 		new Tip (targetElement, $('listchooseTotalsContainer').innerHTML, {
 			style: "protogrey",
@@ -433,7 +453,7 @@ function listform_hover_existing_list(nullableEvent, listid, tr) {
 
 function listform_onclick_existing_list(event, listid) {
 	Tips.hideAll();
-	
+
 	if (this.checked) {
 		if (!listformVars.existingLists[listid].added && listform_add_list(listid))
 			ruleWidget.refresh_guide(true);
@@ -446,18 +466,18 @@ function listform_remove_list(event, listid, doconfirm) {
 	Tips.hideAll();
 
 	var listaddme = listid.indexOf('addme') >= 0;
-	
+
 	if (!listaddme) {
 		if (doconfirm) {
 			event.stop();
-			if (!confirm('<?=addslashes(_L("Are you sure you want to remove this list?"))?>')) 
+			if (!confirm('<?=addslashes(_L("Are you sure you want to remove this list?"))?>'))
 				return;
 		}
-		
+
 		var hiddenInput = $('listsTableBody').down('input[value=' + listid + ']');
 		if (hiddenInput) {
 			var tr = hiddenInput.up('tr');
-			if (tr.prototip) 
+			if (tr.prototip)
 				tr.prototip.remove();
 			tr.remove();
 		}
@@ -465,17 +485,17 @@ function listform_remove_list(event, listid, doconfirm) {
 		if (checkbox) {
 			checkbox.checked = false;
 		}
-		
+
 		if (listformVars.existingLists && listformVars.existingLists[listid]) {
 			listformVars.existingLists[listid].added = false;
 			listform_reset_list_selectbox();
 		}
 		if (event && listformVars.pendingList == listid) {
-			listform_hide_build_list_window();
+			accordion.collapse_all();
 			listformVars.pendingList = null;
 		}
 	}
-	
+
 	var listids = listformVars.listidsElement.getValue() ? listformVars.listidsElement.getValue().evalJSON() : [];
 	if (listids.join) {
 		listids = listids.without(listid);
@@ -484,7 +504,7 @@ function listform_remove_list(event, listid, doconfirm) {
 		// Somehow listids is not an array, which should never happen.
 		listformVars.listidsElement.value = [].toJSON();
 	}
-	
+
 	if (!listaddme) {
 		listformVars.totals[listid] = 0;
 		listform_update_grand_total();
@@ -538,17 +558,12 @@ function listform_set_rule_editor_status(addingRule) {
 	listformVars.listidsElement.setValue(listids.toJSON());
 }
 
-function listform_hide_build_list_window() {
-	$('buildListWindow').hide();
-	$('buildListButton').show();
-}
-
 function listform_refresh_addme() {
 	var addme = $('listChoose_addme');
 	var addmePhone = $('listChoose_addmePhone');
 	var addmeEmail = $('listChoose_addmeEmail');
 	var addmeSms = $('listChoose_addmeSms');
-	
+
 	if (addme.checked) {
 		if (addmePhone)
 			addmePhone.up('tr').show();
@@ -556,7 +571,7 @@ function listform_refresh_addme() {
 			addmeEmail.up('tr').show();
 		if (addmeSms)
 			addmeSms.up('tr').show();
-			
+
 		listform_add_list('addme');
 	} else {
 		if (addmePhone)
@@ -565,7 +580,7 @@ function listform_refresh_addme() {
 			addmeEmail.up('tr').hide();
 		if (addmeSms)
 			addmeSms.up('tr').hide();
-			
+
 		listform_remove_list(null, 'addme');
 	}
 }
