@@ -95,18 +95,11 @@ startWindow('Reply Info', 'padding: 3px;');
 </table>
 
 <div align="center">
-
-<OBJECT ID="MediaPlayer" WIDTH=320 HEIGHT=42
-CLASSID="CLSID:22D6F312-B0F6-11D0-94AB-0080C74C7E95"
-STANDBY="Loading Windows Media Player components..."
-TYPE="application/x-oleobject">
-
-<PARAM NAME="FileName" VALUE="repliesplay.wav.php/mediaplayer_preview.wav?id=<?=$id?>">
-<param name="controller" value="true">
-<EMBED SRC="repliesplay.wav.php/embed_preview.wav?id=<?=$id?>" AUTOSTART="TRUE"></EMBED>
-</OBJECT>
-
-
+	<div id="player"></div>	
+	<script type="text/javascript" language="javascript" src="script/niftyplayer.js"></script>	
+	<script language="JavaScript" type="text/javascript">
+		embedPlayer("repliesplay.wav.php/embed_preview.wav?id=<?=$id?>","player");
+	</script>
 <br><a href="repliesplay.wav.php?id=<?=$id?>&download=true">Click here to download</a>
 </div>
 <?
