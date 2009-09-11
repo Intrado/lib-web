@@ -553,9 +553,18 @@ function listform_set_rule_editor_status(addingRule) {
 	if (!listids.join)
 		listids = [];
 	listids = listids.without('pending');
-	if (addingRule)
+	if (addingRule) {
 		listids.push('pending');
+	} else {
+		listform_clear_validation_error();
+	}
 	listformVars.listidsElement.setValue(listids.toJSON());
+}
+
+function listform_clear_validation_error() {
+	$('listChoose_listids_icon').src = 'img/pixel.gif';
+	$('listChoose_listids_msg').update();
+	$('listChoose_listids_fieldarea').style.background = "rgb(255,255,255)";
 }
 
 function listform_refresh_addme() {
@@ -573,6 +582,7 @@ function listform_refresh_addme() {
 			addmeSms.up('tr').show();
 
 		listform_add_list('addme');
+		listform_clear_validation_error();
 	} else {
 		if (addmePhone)
 			addmePhone.up('tr').hide();

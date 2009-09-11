@@ -90,6 +90,7 @@ class ListForm extends Form {
 				</div>
 
 				<table style='border-collapse:collapse' id='addMeWindow'>
+					<tbody></tbody>
 				</table>
 			</div>
 
@@ -145,12 +146,12 @@ class ListForm extends Form {
 								" . $this->renderFormItems() . "
 							</table>
 						</div>
+					</div>
 
-						<!-- Validation Message -->
-						<div id='listChoose_listids_fieldarea' style='clear:both; margin-top: 20px; margin-left:10px'>
-							<img id='listChoose_listids_icon' src='img/pixel.gif'/>
-							<span id='listChoose_listids_msg'></span>
-						</div>
+					<!-- Validation Message -->
+					<div id='listChoose_listids_fieldarea' style='clear:both; margin-top: 20px; margin-left:10px'>
+						<img id='listChoose_listids_icon' src='img/pixel.gif'/>
+						<span id='listChoose_listids_msg'></span>
 					</div>
 
 					<!-- Buttons -->
@@ -178,14 +179,15 @@ class ListForm extends Form {
 					var addmePhone = $('listChoose_addmePhone');
 					var addmeEmail = $('listChoose_addmeEmail');
 					var addmeSms = $('listChoose_addmeSms');
+					var tbody = $('addMeWindow').down('tbody');
 					if (addme)
-						$('addMeWindow').insert(addme.up('tr').remove());
+						tbody.insert(addme.up('tr').remove());
 					if (addmePhone)
-						$('addMeWindow').insert(addmePhone.up('tr').remove());
+						tbody.insert(addmePhone.up('tr').remove());
 					if (addmeEmail)
-						$('addMeWindow').insert(addmeEmail.up('tr').remove());
+						tbody.insert(addmeEmail.up('tr').remove());
 					if (addmeSms)
-						$('addMeWindow').insert(addmeSms.up('tr').remove());
+						tbody.insert(addmeSms.up('tr').remove());
 					// Show/Hide 'AddMe' textboxes, and register observers.
 					listform_refresh_addme();
 					$('{$this->name}_addme').observe('click', listform_refresh_addme);
