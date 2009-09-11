@@ -72,7 +72,7 @@ startWindow("Select a Template"  . help('Reports_SelectATemplate'), 'padding: 3p
 <?
 if(getSystemSetting('_hassurvey', true) && ($USER->authorize('viewsystemreports') || $USER->authorize("survey"))){
 ?>
-			<th align="left" class="nosort">Survey</th>
+			<th align="left" class="nosort">Other</th>
 
 <?
 }
@@ -95,10 +95,9 @@ if(getSystemSetting('_hassurvey', true) && ($USER->authorize('viewsystemreports'
 	if(getSystemSetting('_hassms', false) && ($USER->authorize('viewsystemreports') || $USER->authorize("sendsms"))) {
 ?>
 					<tr><td><a href='reportjobdetailsearch.php?clear=1&type=sms'/>SMS Log</a></td></tr>
-<? } 
-	if ($USER->authorize('viewsystemreports')) {
-?>
-					<tr><td><a href='reportarchive.php'/>Systemwide Report Archive</a></td></tr>
+<?	} 
+	if(getSystemSetting('_hassurvey', true) && ($USER->authorize('viewsystemreports') || $USER->authorize("survey"))){ ?>
+					<tr><td><a href='reportsurvey.php?clear=1'/>Survey Results</a></td></tr>
 <? } ?>
 				</table>
 			</td>
@@ -107,10 +106,10 @@ if(getSystemSetting('_hassurvey', true) && ($USER->authorize('viewsystemreports'
 					<tr><td><a href='reportcallssearch.php?clear=1'/>Contact History</a></td></tr>
 				</table>
 			</td>
-<? if(getSystemSetting('_hassurvey', true) && ($USER->authorize('viewsystemreports') || $USER->authorize("survey"))){ ?>
+<? if ($USER->authorize('viewsystemreports')) { ?>
 			<td>
 				<table>
-					<tr><td><a href='reportsurvey.php?clear=1'/>Survey Results</a></td></tr>
+					<tr><td><a href='reportarchive.php'/>Systemwide Report Archive</a></td></tr>
 				</table>
 			</td>
 <? } ?>

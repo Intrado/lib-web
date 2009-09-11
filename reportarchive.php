@@ -21,8 +21,8 @@ if (!$USER->authorize('viewsystemreports')) {
 // Data Handling
 ////////////////////////////////////////////////////////////////////////////////
 
-$reports = QuickQueryList('select name, contentid from reportarchive', true);
-$archivedata = '<div style="margin-top: 5px">';
+$reports = QuickQueryList('select name, contentid from reportarchive order by name desc', true);
+$archivedata = '<div style="margin-top: 5px; padding: 4px; height: 150px; width: 150px; overflow: auto; border: 1px solid gray; scroll: auto;">';
 foreach ($reports as $name => $contentid) {
 	$archivedata .= '<div>
 		<a href="download_reportarchive.php/'. escapehtml($name). '.zip?id='. $contentid. '&name='.escapehtml($name).'">'. escapehtml($name). '</a>
