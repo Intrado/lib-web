@@ -305,7 +305,7 @@ if (!$noupdate) {
 				parameters: {
 					ajax: true,
 					notpopup: true,
-					noupdate: true
+					noupdate: true,
 					jobid: <?=$job->id?>
 				},
 				onSuccess: function(transport) {
