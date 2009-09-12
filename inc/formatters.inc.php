@@ -97,7 +97,7 @@ function fmt_checkbox_addrbook($row,$index) {
 		$result .= '<img src="img/checkbox-clear.png"';
 		$checked = false;
 	}
-	
+
 	$result .= " onclick=\"dolistbox(this,'add',";
 
 	$result .=  (($checked) ? "true":"false") . "," . $row[0] . ');" />';
@@ -110,7 +110,7 @@ function fmt_checkbox($row, $index) {
 	global $renderedlist;
 
 	$personid = $row[1];
-	
+
 	$checked = '';
 	if (in_array($row[0], array(1, 'A', 'R')) || in_array($personid, $renderedlist->pageaddids))
 		$checked = 'checked';
@@ -138,16 +138,16 @@ function fmt_idmagnify ($row,$index) {
 
 function fmt_persontip ($row, $index) {
 	global $USER;
-	
+
 	$person = new Person($row[1]);
 	if (!$person->id || $person->deleted)
 		return 'BAD PERSON!';
-		
+
 	$pkey = escapehtml($person->pkey);
-	
+
 	if ($person->userid)
 		return "<a href=\"addressedit.php?id=$person->id&origin=preview\">  <img src=\"img/icons/pencil.png\"></a> $pkey";
-	
+
 	$onmouseover = "";//"make_person_tip('$person->id', '');"; // TODO: Make a better persontip
 	$icon =  "<a href=\"viewcontact.php?id={$person->id}\">" . "<img id=\"persontip_$person->id\" style=\"cursor:pointer\" src=\"img/icons/diagona/16/049.gif\" onmouseover=\"$onmouseover\"/>" . "</a>" . " $pkey ";
 	return $icon;
@@ -159,12 +159,12 @@ function fmt_jobs_actions ($obj, $name) {
 
 function jobs_actionlinks ($obj) {
 	global $USER;
-	
+
 	$id = $obj->id;
 	$status = $obj->status;
 	$deleted = $obj->deleted;
 	$type = $obj->type;
-	
+
 	if ($type == "survey") {
 		$editbtn = action_link(_L("Edit"),"pencil","survey.php?id=$id");
 		$copybtn = ''; // no copy survey feature
@@ -198,10 +198,18 @@ function jobs_actionlinks ($obj) {
 		case "scheduled":
 		case "processing":
 		case "procactive":
-			if ($type == "survey") {
-				$buttons = array($editbtn, $cancelbtn);
+			if ($status != "new" && $USER->authorize('createreport')) {
+				if ($type == "survey") {
+					$buttons = array($editbtn, $monitorbtn, $cancelbtn);
+				} else {
+					$buttons = array($editbtn, $copybtn, $monitorbtn, $cancelbtn);
+				}
 			} else {
-				$buttons = array($editbtn, $copybtn, $cancelbtn);
+				if ($type == "survey") {
+					$buttons = array($editbtn, $cancelbtn);
+				} else {
+					$buttons = array($editbtn, $copybtn, $cancelbtn);
+				}
 			}
 			break;
 		case "active":
@@ -307,7 +315,7 @@ function fmt_status($obj, $name) {
 				case "active":
 					return _L("Active");
 				case "complete":
-					return _L("Complete");	
+					return _L("Complete");
 				case "cancelled":
 					return _L("Cancelled");
 				case "cancelling":
@@ -367,7 +375,7 @@ function fmt_jobs_actions_customer($row, $index) {
 		$copyLink= '';
 	}
 
-	if ($USER->authorize('viewsystemreports')) {		
+	if ($USER->authorize('viewsystemreports')) {
 		$reportLink = action_link(_L("Report"),"layout", $type == "survey" ? "reportsurveysummary.php?jobid=$id" : "reportjobsummary.php?jobid=$id");
 	} else {
 		$reportLink = '';
