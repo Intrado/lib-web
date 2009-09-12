@@ -1,9 +1,9 @@
-<? 
+<?
 
 function fmt_timeline_jobs_actions ($obj, $name) {
 	$array = jobs_actionlinks($obj);
 	$links = is_array($array) ? $array : func_get_args();
-	
+
 	foreach ($links as $key => $link)
 		if ($link == "")
 			unset($links[$key]);
@@ -13,7 +13,7 @@ function fmt_timeline_jobs_actions ($obj, $name) {
 // Settings
 $jobhight = 20;		// Pixel height of each job
 $jobspacing = 4;	// Pixel vertical spacing between jobs
-$minhight = 3;		// Height unit of the timeline bar (minheight is 3 jobs vertical) 
+$minhight = 3;		// Height unit of the timeline bar (minheight is 3 jobs vertical)
 $day = 0;
 
 $range = 1;
@@ -41,12 +41,12 @@ $rangeslice = 100 / $rangedays;
 
 $jobtypes = DBFindMany("JobType","from jobtype");
 $jobs = DBFindMany("Job","from job where
-	userid=? and 
+	userid=? and
 	status in ('scheduled','processing','procactive','active','complete','cancelling','cancelled')
-	and 
-	deleted = 0 and 
+	and
+	deleted = 0 and
 	(
-		DATE_SUB(CURDATE(),INTERVAL ? DAY) <= enddate and 
+		DATE_SUB(CURDATE(),INTERVAL ? DAY) <= enddate and
 		DATE_SUB(CURDATE(),INTERVAL ? DAY) >= startdate
 	) order by startdate",false,array($USER->id,($range - $day),(-$day - $range)));
 
@@ -78,12 +78,12 @@ foreach($jobs as $job) {
 	$endlocation += date("H", strtotime($job->endtime)) * 3600;
 	$endlocation += date("i", strtotime($job->endtime)) * 60;
 	$extracontent = "";
-	$leftborder = true; 
+	$leftborder = true;
 
 	if($startlocation < 0) {
 		$startday = 0;
 		$startlocation = -2;
-		$leftborder = false; 
+		$leftborder = false;
 		$width = ($endlocation / $rangewidth) + 2;
 	} else {
 		$startday = floor($startlocation/86400);
@@ -92,27 +92,27 @@ foreach($jobs as $job) {
 	}
 
 	$endday = floor($endlocation/86400);
-	
-	$j = 0;	
+
+	$j = 0;
 	while($j < $jobcount){
 		if(!isset($placment[$startday][$j])){
 			$placment[$startday][$j] = $i;
 			if($startday != $endday){
 				$d = $startday + 1;
 				while($d <= $rangedays && $d <= $endday) {
-					$placment[$d][$j] = $i;	
+					$placment[$d][$j] = $i;
 					$d++;
 				}
 				if($endday >= $rangedays) {
 					$width = 102 - $startlocation;
 				}
-			}		
-					
+			}
+
 			$jobids[$i] = "'$job->id'";
 			$jobstatus[$i] = "'" . ucfirst($job->status) . "'";
 			$statuscolor = (isset($jobcolor[$job->status])?$jobcolor[$job->status]:"#000");
-			
-			$content .= '<div id="__' . $i. '" class="jobcontainer" style="left: ' . $startlocation . '%;top: ' . (($j*$jobhight) + ($j*$jobspacing)) . 'px;height: ' . $jobhight . 'px;width: ' . $width . '%;">';				
+
+			$content .= '<div id="__' . $i. '" class="jobcontainer" style="left: ' . $startlocation . '%;top: ' . (($j*$jobhight) + ($j*$jobspacing)) . 'px;height: ' . $jobhight . 'px;width: ' . $width . '%;">';
 			$content .= '<div class="jobname">';
 			$content .= escapehtml($job->name);
 			$content .= '</div>
@@ -126,23 +126,23 @@ foreach($jobs as $job) {
 						</div>
 						<div class="jobbar" style="background-color: ' . $statuscolor . ';">&nbsp;</div>
 						</div>';
-			
+
 			$i++;
 			if($minhight <= $j )
 				$minhight = $j + 1;
-			
-			
-			break;	
-		}			
+
+
+			break;
+		}
 		$j++;
 	}
-	
+
 }
 
 $minhight = $minhight * $jobhight + $minhight*$jobspacing ;
 ?>
 	<div id="maincanvas"  style="height:<? echo $minhight + 58 ?>px;">
-	
+
 	<table>
 		<tr>
 			<td width="80px">
@@ -150,14 +150,14 @@ $minhight = $minhight * $jobhight + $minhight*$jobspacing ;
 				<img style"align: right;" src="img/timelinearrowleft.gif"  alt="Backward" border="0"/>
 			</a>
 			</td>
-			
+
 			<td width="100%">&nbsp;
-				
-		<div id="canvas" style="height:<? echo $minhight ?>px;"> 
+
+		<div id="canvas" style="height:<? echo $minhight ?>px;">
 			<img class="canvasleft" src="img/timelineleft.gif"  alt=""  width="2%" height="100%"/>
 			<img class="canvasright" src="img/timelineright.gif" alt="" width="2%" height="100%"/>
 			<div class="daylineend" style="left: 0%;"></div>
-			
+
 			<?
 				for($k=1;$k < $rangedays;$k++){
 					echo '<div class="dayline" style="left: ' . ($rangeslice * $k) . '%;"></div>';
@@ -166,24 +166,24 @@ $minhight = $minhight * $jobhight + $minhight*$jobspacing ;
 				}
 			 ?>
 			<div class="daylineend" style="left: 100%;"></div>
-		
-		<? 
+
+		<?
 		$labelstart = ($centerposition - $rangestart) + 43200;
 		$today = date("M jS");
 		for($k=0;$k < $rangedays;$k++){
 			$daylabel = date("M jS", $labelstart + 86400 * $k);
 			if($daylabel==$today) {
 				$daylabel = str_replace(" ","&nbsp;",$daylabel);
-				echo '<div class="daylabeltoday" style="left: ' . ($rangeslice * $k) . '%;width: ' . $rangeslice . '%;">Today<br />(' . $daylabel . ')</div>';	
+				echo '<div class="daylabeltoday" style="left: ' . ($rangeslice * $k) . '%;width: ' . $rangeslice . '%;">Today<br />(' . $daylabel . ')</div>';
 			} else
 				echo '<div class="daylabel" style="left: ' . ($rangeslice * $k) . '%;width: ' . $rangeslice . '%;">' . $daylabel . '</div>';
 		}
 		echo $content;
 		?>
-		
+
 		</div>
 			</td>
-			<td width="80px">	
+			<td width="80px">
 				<a id="_forward" href="start.php?timelineday=<?= ($day + ($range>0?$range*2:1)) ?>">
 					<img  src="img/timelinearrowright.gif"  alt="Forward" border="0"/>
 				</a>
@@ -195,27 +195,27 @@ $minhight = $minhight * $jobhight + $minhight*$jobspacing ;
 			<table width="100%" >
 				<tr>
 				<td style="width:33%;padding-left: 2%;">
-					<?=	icon_button(_L('Refresh'),"fugue/arrow_circle_double_135","window.location.reload()",null,'style="display:inline;"') ?>	
+					<?=	icon_button(_L('Refresh'),"fugue/arrow_circle_double_135","window.location.reload()",null,'style="display:inline;"') ?>
 				<td>
 				<td style="width:33%;text-align:center;white-space:nowrap;">
-					<? 
+					<?
 					if($range > 0 ) {
 						echo '<a href="start.php?timelinerange=' .  ($range-1) . '" style="text-decoration: none;"><img src="img/icons/fugue/magnifier_zoom.gif"> Zoom in</a> |';
 					}
 					?>
-					<a href="start.php?timelinerange=1&timelineday=0" style="text-decoration: none;"><img src="img/icons/fugue/arrow_circle_225.gif"> Reset</a>	
-					<? 
+					<a href="start.php?timelinerange=1&timelineday=0" style="text-decoration: none;"><img src="img/icons/fugue/arrow_circle_225.gif"> Reset</a>
+					<?
 					if($range < 5 ) {
 						echo '| <a href="start.php?timelinerange=' .  ($range+1) . '" style="text-decoration: none;"><img src="img/icons/fugue/magnifier_zoom_out.gif"> Zoom out</a>';
 					}
-					?>	
+					?>
 				</td>
 				<td style="text-align:right;padding-right: 2%;text-decoration:none;">
 					<div id="t_legend" style="cursor:pointer;display:inline;" ><img src="img/largeicons/tiny20x20/flag.jpg" />&nbsp;Legend</div>
 				</td>
 				</tr>
 			</table>
-			<div id="timelinelegend" style="display:none;width: 100px;">	
+			<div id="timelinelegend" style="display:none;width: 100px;">
 				<?
 				foreach($jobcolor as $name => $color) {
 					echo '<div class="jobcontainer" style="cursor:default;position:relative;margin:5px;height: ' . $jobhight . 'px;">
@@ -269,16 +269,16 @@ $minhight = $minhight * $jobhight + $minhight*$jobspacing ;
 			offset: { x: 0, y: -4 }
 		});
 
-		
+
 	});
 	function getcontent(id) {
 		var content = $("box_" + id).innerHTML;
 		if(jobstatus[id] == "Active" || jobstatus[id] == "Complete" || jobstatus[id] == "Cancelling" || jobstatus[id] == "Cancelled" ){
 			var jobid = jobids[id];
-			content += '<div id="boxmonitor_' + jobid + '" class="boxmonitor" onclick="popup(\'jobmonitor.php?jobid=' + jobid + '\', 500, 450);" ><img src="graph_job.png.php?jobid=' + jobid + '&junk=' + Math.random() + '"/><br />Click for larger view.</div>';		
+			content += '<div id="boxmonitor_' + jobid + '" class="boxmonitor" onclick="popup(\'jobmonitor.php?jobid=' + jobid + '\', 650, 450);" ><img src="graph_job.png.php?jobid=' + jobid + '&junk=' + Math.random() + '"/><br />Click for larger view.</div>';
 		}
 		return content;
 	}
 
-	
+
 </script>

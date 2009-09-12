@@ -179,9 +179,9 @@ function jobs_actionlinks ($obj) {
 
 	$reportbtn = action_link(_L("Report"),"layout", $type == "survey" ? "reportsurveysummary.php?jobid=$id" : "reportjobsummary.php?jobid=$id");
 
-	$monitorbtn = action_link(_L("Monitor"), "chart_pie", "#", "popup('jobmonitor.php?jobid=$id', 500, 450);");
+	$monitorbtn = action_link(_L("Monitor"), "chart_pie", "#", "popup('jobmonitor.php?jobid=$id', 650, 450);");
 
-	$graphbtn = action_link(_L("Graph"), "chart_pie", "#", "popup('jobmonitor.php?jobid=$id&noupdate', 500, 450);");
+	$graphbtn = action_link(_L("Graph"), "chart_pie", "#", "popup('jobmonitor.php?jobid=$id&noupdate', 650, 450);");
 
 	$deletebtn = action_link(_L("Delete"),"cross","jobs.php?delete=$id","return confirmDelete();");
 
