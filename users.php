@@ -28,10 +28,17 @@ if (isset($_GET['noprofiles']))
 // Data Handling
 ////////////////////////////////////////////////////////////////////////////////
 if (isset($_GET['download'])) {
-	$userdetails = Query("select u.login, u.accesscode, u.firstname, u.lastname, u.description, u.phone, u.email, u.aremail, u.enabled, u.lastlogin, u.ldap, u.staffpkey, a.name, a.description profiledescription, r.fieldnum, r.op, r.val
-		from user u, rule r, userrule ur, access a
-		where a.id = u.accessid
-		and ur.userid = u.id and r.id = ur.ruleid and not u.deleted");
+	$userdetails = Query("select u.login, u.accesscode, u.firstname, u.lastname, u.description, u.phone, us.value callerid, u.email, u.aremail, u.enabled, u.lastlogin, u.staffpkey, a.name, a.description profiledescription,
+		(select group_concat(jt.name separator ', ') from jobtype jt, userjobtypes ujt where ujt.jobtypeid = jt.id and ujt.userid = u.id ) as jobtype,
+		r.fieldnum, r.op, r.val
+		from user u
+			left join userrule ur on (ur.userid = u.id)
+			left join rule r on (r.id = ur.ruleid)
+			left join access a on (a.id = u.accessid)
+			left join usersetting us on (us.userid = u.id and us.name = 'callerid')
+			left join userjobtypes ujt on (ujt.userid = u.id)
+			left join jobtype jt on (jt.id = ujt.jobtypeid and not jt.deleted)
+		where not u.deleted and u.login != 'schoolmessenger'");
 
 	// set header
 	header("Pragma: private");
@@ -39,7 +46,7 @@ if (isset($_GET['download'])) {
 	header("Content-disposition: attachment; filename=users.csv");
 	header("Content-type: application/vnd.ms-excel");
 	// echo out the data
-	echo '"login","accesscode","firstname","lastname","description","phone","email","aremail","enabled","lastlogin","ldap","staffpkey","profile name","profile description","fieldnum","op","val"' . "\n";
+	echo '"login","accesscode","firstname","lastname","description","phone","callerid","email","aremail","enabled","lastlogin","staffpkey","profile name","profile description","jobtypes","fieldnum","op","val"' . "\n";
 	while ($row = $userdetails->fetch(PDO::FETCH_ASSOC))
 		echo '"' . implode('","', $row) . '"' . "\n";
 	exit;
