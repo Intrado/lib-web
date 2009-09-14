@@ -12,7 +12,7 @@ var listformVars = null;
 var ruleWidget = null;
 var ruleEditor = null;
 var accordion = null;
-var addmeOriginalValues = {}; // Used to restore to valid values when the addme checkbox is unchecked, so that addMeWindow validators do not complain.
+var addmeOriginalValues = {phone:false, email:false, sms:false}; // Used to restore to valid values when the addme checkbox is unchecked, so that addMeWindow validators do not complain.
 
 // Modified form load.
 function listform_load(listformID, formData, postURL) {
@@ -163,13 +163,7 @@ function listform_load(listformID, formData, postURL) {
 
 		// Warn if closing the AddMe section when there are validation errors.
 		if (accordion.currentSection == 'addme') {
-			// Force validator to check for errors.
-			if ($('listChoose_addmePhone'))
-				form_do_validation($(listformVars.id), $('listChoose_addmePhone'));
-			if ($('listChoose_addmeEmail'))
-				form_do_validation($(listformVars.id), $('listChoose_addmeEmail'));
-			if ($('listChoose_addmeSms'))
-				form_do_validation($(listformVars.id), $('listChoose_addmeSms'));
+			validate_addme_fields();
 
 			var validationIcons = $('addMeWindow').select('img');
 			var hasError = false;
@@ -619,17 +613,17 @@ function listform_refresh_addme() {
 
 	if (addme.checked) {
 		if (addmePhone) {
-			if (!addmeOriginalValues.phone)
+			if (addmeOriginalValues.phone === false)
 				addmeOriginalValues.phone = addmePhone.value;
 			addmePhone.up('tr').show();
 		}
 		if (addmeEmail) {
-			if (!addmeOriginalValues.email)
+			if (addmeOriginalValues.email === false)
 				addmeOriginalValues.email = addmeEmail.value;
 			addmeEmail.up('tr').show();
 		}
 		if (addmeSms) {
-			if (!addmeOriginalValues.sms)
+			if (addmeOriginalValues.sms === false)
 				addmeOriginalValues.sms = addmeSms.value;
 			addmeSms.up('tr').show();
 		}
@@ -638,17 +632,17 @@ function listform_refresh_addme() {
 		listform_clear_validation_error();
 	} else {
 		if (addmePhone) {
-			if (addmeOriginalValues.phone)
+			if (addmeOriginalValues.phone !== false)
 				addmePhone.value = addmeOriginalValues.phone;
 			addmePhone.up('tr').hide();
 		}
 		if (addmeEmail) {
-			if (addmeOriginalValues.email)
+			if (addmeOriginalValues.email !== false)
 				addmeEmail.value = addmeOriginalValues.email;
 			addmeEmail.up('tr').hide();
 		}
 		if (addmeSms) {
-			if (addmeOriginalValues.sms)
+			if (addmeOriginalValues.sms !== false)
 				addmeSms.value = addmeOriginalValues.sms;
 			addmeSms.up('tr').hide();
 		}
@@ -656,4 +650,15 @@ function listform_refresh_addme() {
 		listform_remove_list(null, 'addme');
 	}
 	listform_update_grand_total();
+	validate_addme_fields();
+}
+
+function validate_addme_fields() {
+	// Force validator to check for errors.
+	if ($('listChoose_addmePhone'))
+		form_do_validation($(listformVars.id), $('listChoose_addmePhone'));
+	if ($('listChoose_addmeEmail'))
+		form_do_validation($(listformVars.id), $('listChoose_addmeEmail'));
+	if ($('listChoose_addmeSms'))
+		form_do_validation($(listformVars.id), $('listChoose_addmeSms'));
 }
