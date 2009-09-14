@@ -63,9 +63,11 @@ var AccordionSection = Class.create({
 		this.accordion.container.insert(this.sectionDiv);
 
 		this.titleDiv.observe('click', function(event) {
-			if (this.accordion.currentSection != this.name) {
-				if (!this.accordion.container.fire("Accordion:ClickTitle", {section:this.name}).stopped)
+			if (!this.accordion.container.fire("Accordion:ClickTitle", {section:this.name}).stopped) {
+				if (this.accordion.currentSection != this.name)
 					this.accordion.show_section(this.name);
+				else
+					this.accordion.collapse_all();
 			}
 		}.bindAsEventListener(this));
 
