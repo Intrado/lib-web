@@ -40,6 +40,16 @@ class Person extends DBMappedObject {
 		DBMappedObject::DBMappedObject($id);
 	}
 
+	// $arg may be an either an instaceof Person, or just the personid.
+	static function getFullName($arg) {
+		$person = ($arg instanceof Person) ? $arg : new Person($arg);
+
+		$fnamefield = FieldMap::getFirstNameField();
+		$lnamefield = FieldMap::getLastNameField();
+
+		return $person->$fnamefield . ' ' . $person->$lnamefield;
+	}
+
 	static function findPerson($custid,$key) {
 		$query = "select id from person where pkey=? and not deleted";
 		$id = QuickQuery($query, false, array($key));
