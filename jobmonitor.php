@@ -93,7 +93,7 @@ $_SESSION['jobstats'][$job->id] = $jobstats;
 $notice = "";
 switch ($job->status) {
 	case 'new':
-		$notice = _L("This job is not submitted, no data available");
+		$notice = _L("This job is not submitted, no data available.");
 		break;
 	case 'scheduled':
 		$scheduledtime = strtotime($job->startdate . " " . $job->starttime);
@@ -109,8 +109,9 @@ switch ($job->status) {
 				$notice .= "$diffhours hours ";
 			if ($diffminutes > 0)
 				$notice .= "$diffminutes " . ($diffminutes == 1 ? 'minute' : 'minutes');
+			$notice .= ".";
 		} else {
-			$notice = _L("This job will run shortly");
+			$notice = _L("This job will run shortly.");
 		}
 		break;
 	case 'processing':
@@ -120,17 +121,17 @@ switch ($job->status) {
 		$notice = _L("Some data is available. This job is %s%%  processed.", $job->percentprocessed);
 		break;
 	case 'active':
-		$notice = _L("This job is active");
+		$notice = _L("This job is active.");
 		break;
 	case 'cancelling':
-		$notice = _L("Please wait while this job is cancelled");
+		$notice = _L("Please wait while this job is cancelled.");
 		break;
 	case 'cancelled':
 	case 'complete':
-		$notice = _L("This job finished on %s", fmt_job_enddate($job, null));
+		$notice = _L("This job finished on %s.", fmt_job_enddate($job, null));
 		break;
 	default:
-		$notice = _L('ERROR: Unknown job status');
+		$notice = _L('ERROR: Unknown job status.');
 		break;
 }
 
