@@ -3,12 +3,14 @@
 // Includes
 ////////////////////////////////////////////////////////////////////////////////
 require_once("inc/common.inc.php");
+require_once("obj/Phone.obj.php");
 require_once("inc/form.inc.php");
 require_once("inc/html.inc.php");
 require_once("inc/table.inc.php");
 require_once("inc/utils.inc.php");
 require_once("inc/securityhelper.inc.php");
 require_once("inc/formatters.inc.php");
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization
@@ -31,7 +33,7 @@ if (isset($_GET['delete'])) {
 	redirect();
 }
 
-$form = "blockedemail";
+$form = "blockednumbers";
 $section = "main";
 $reloadform = false;
 
@@ -51,19 +53,30 @@ if(CheckFormSubmit($form, $section))
 		if( CheckFormSection($form, $section) ) {
 			error('There was a problem trying to save your changes', 'Please verify that all required field information has been entered properly');
 		} else if ($ACCESS->getValue('callblockingperms') == 'editall' || $ACCESS->getValue('callblockingperms') == 'addonly') {
-			$email = TrimFormData($form, $section, 'email');
-			if (strlen($email) > 200) {
-				error('The email address cannot be more than 200 characters in length.');
+			$phone = Phone::parse(GetFormData($form, $section, 'number'));
+			if (strlen($phone) != 10) {
+				error('The phone number must be exactly 10 digits long (including area code)','You do not need to include a 1 for long distance');
 			} else {
 				QuickQuery("BEGIN");
-				$result = QuickUpdate("insert into blockeddestination(userid, description, destination, type, createdate)
-							values ($USER->id, '" .
-							DBSafe(GetFormData($form, $section, 'reason')) . "', '$email','email', now())");
+				$blocktype = GetFormData($form, $section, 'type');
+				if ($blocktype == 'both') {
+					$result = QuickUpdate("insert into blockeddestination(userid, description, destination, type, createdate)
+								values ($USER->id, '" .
+								DBSafe(GetFormData($form, $section, 'reason')) . "', '$phone','phone', now())");
+					$result = QuickUpdate("insert into blockeddestination(userid, description, destination, type, createdate)
+								values ($USER->id, '" .
+								DBSafe(GetFormData($form, $section, 'reason')) . "', '$phone','sms', now())");
+				} else {
+					$result = QuickUpdate("insert into blockeddestination(userid, description, destination, type, createdate)
+								values ($USER->id, '" .
+								DBSafe(GetFormData($form, $section, 'reason')) . "', '$phone','" .
+								DBSafe($blocktype) . "', now())");
+				}
 				QuickQuery("COMMIT");
 				if ($result) {
 					$reloadform = true;
 				} else {
-					error("An error occurred when saving the email address");
+					error("An error occurred when saving the phone number");
 				}
 			}
 		} else {
@@ -77,8 +90,9 @@ if(CheckFormSubmit($form, $section))
 if( $reloadform )
 {
 	ClearFormData($form);
-	PutFormData($form, $section,"email", "", "text", 1, 200, true);
+	PutFormData($form, $section,"number", "", "text", 1, 20, true);
 	PutFormData($form, $section,"reason", "", "text", 1, 100, true);
+	PutFormData($form, $section,"type", "both", "text");
 }
 
 
@@ -91,16 +105,17 @@ function fmt_blocking_actions($row, $index) {
 	// Only show the delete link in 'addonly' mode for blocked calls created by this user
 	if ($perm == 'editall' ||
 		($perm == 'addonly' && $USER->id == $ownerid)) {
-		return action_links(action_link(_L("Delete"),"cross","blockedemail.php?delete=$id","return confirmDelete();"));
+		return action_links(action_link(_L("Delete"),"cross","blockedphone.php?delete=$id","return confirmDelete();"));
 	} else {
 		return '';
 	}
 }
 
-function fmt_blockedby($row, $index) {
-	if ($row[$index])
-		return $row[$index];
-	return "System";
+function fmt_bntype ($row, $index) {
+	if ($row[$index] == "sms")
+		return "Text Messages";
+	else
+		return "Phone";
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -118,7 +133,22 @@ if ($ACCESS->getValue('callblockingperms') == 'addonly' || $ACCESS->getValue('ca
 ?>
 	<table style="margin-top: 5px;" border="0" cellpadding="0" cellspacing="0">
 		<tr>
-			<td>Email: <? NewFormItem($form, $section, 'email', 'text',20,200); ?>&nbsp;&nbsp;</td>
+			<td>Phone: <? NewFormItem($form, $section, 'number', 'text',20,20); ?>&nbsp;&nbsp;</td>
+			<td>
+<?
+				NewFormItem($form, $section,"type","selectstart");
+				if(getSystemSetting("_hassms", false)){
+					NewFormItem($form, $section,"type","selectoption","Block Calls and Text Messages","both");
+					NewFormItem($form, $section,"type","selectoption","Block Text Messages only","sms");
+					NewFormItem($form, $section,"type","selectoption","Block Calls only","phone");
+				} else {
+					NewFormItem($form, $section,"type","selectoption","Block Calls","both");
+				}
+				NewFormItem($form, $section,"type","selectend");
+
+?>
+			&nbsp;
+			</td>
 			<td>Reason: <? NewFormItem($form, $section, 'reason', 'text',30,100); ?>&nbsp;&nbsp;</td>
 			<td><?= submit($form, $section, 'Add'); ?></td>
 			<td><? print help('Blocked_Add', 'style="margin-left: 5px;"'); ?></td>
@@ -129,29 +159,31 @@ if ($ACCESS->getValue('callblockingperms') == 'addonly' || $ACCESS->getValue('ca
 
 if ($ACCESS->getValue('callblockingperms') == 'editall' || $ACCESS->getValue('callblockingperms') == 'addonly') {
 	$titles = array(
-				"0" => '#Email Address',
+				"0" => '#Phone Number',
+				"6" => "#Type",
 				"1" => '#Reason for Blocking',
 				"2" => '#Blocked by',
 				"7" => 'Blocked on',
 				"3" => 'Actions');
 } else {
 	$titles = array(
-				"0" => '#Email Address',
+				"0" => '#Phone Number',
+				"6" => "#Type",
 				"1" => '#Reason for Blocking',
 				"2" => '#Blocked by');
 }
 
 $formatters = array(
-				"0" => 'fmt_email',
-				"2" => 'fmt_blockedby',
+				"6" => "fmt_bntype",
+				"0" => 'fmt_phone',
 				"3" => 'fmt_blocking_actions');
 
 $result = Query(
 		"select b.destination, b.description, CONCAT(u.firstname, ' ', u.lastname) as fullname, b.id, b.userid, '" .
 			$ACCESS->getValue('callblockingperms') . "' as permission, b.type, b.createdate
-			from blockeddestination b
-			left join user u on (b.userid = u.id)
-			where b.type = 'email'
+			from blockeddestination b, user u
+			where b.userid = u.id
+			and b.type in ('phone', 'sms')
 			order by b.id desc");
 $data=array();
 while ($row = DBGetRow($result)) {
