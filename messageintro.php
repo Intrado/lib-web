@@ -99,7 +99,7 @@ class ValIntroSelect extends Validator {
 		
 				$ttswords = isset($audiodata["text"])?str_word_count($audiodata["text"]):0;					
 				if($audiodata["audiobytes"] < 100000 && $ttswords < 10 && ($audiodata["audiobytes"] < 50000 && $ttswords < 5)) { // Aproximately 5 seconds of audio
-					$errortext .= "Message is to short to be a intro message.";
+					$errortext .= "Message is too short to be a intro message.";
 				} 
 			}		
 		}				
