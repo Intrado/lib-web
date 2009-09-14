@@ -143,9 +143,9 @@ $datafields = $obj->getValue('datafields') ? explode('|',$obj->getValue('datafie
 
 $blockednumberoptions = array (
 	"none" => _L("No Access"),
-	"viewonly" => _L("View Phone/Email(s) Only"),
-	"addonly" => _L("Add/Delete Own Phone/Email(s)"),
-	"editall" => _L("Add/Delete All Phone/Email(s)")
+	"viewonly" => _L("View Only"),
+	"addonly" => _L("Add/Delete Own"),
+	"editall" => _L("Add/Delete All")
 );
 
 $formdata = array(
