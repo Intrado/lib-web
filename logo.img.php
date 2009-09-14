@@ -11,6 +11,10 @@ if ($IS_COMMSUITE) {
 	$CUSTOMERURL = strtolower(substr($CUSTOMERURL,0,strpos($CUSTOMERURL,"/")));
 } /*CSDELETEMARKER_END*/
 
+if (isset($_GET['urlcomponent'])) {
+	$CUSTOMERURL = $_GET['urlcomponent'];
+}
+
 require_once("XML/RPC.php");
 require_once("inc/auth.inc.php");
 

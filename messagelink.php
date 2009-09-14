@@ -34,9 +34,11 @@ $messageinfo = loginMessageLink($code);
 $customer = "Not Found";
 
 $badcode = true;
+$urlcomponent = 'm';
 if ($messageinfo !== false) {
 	$badcode = false;
 	$customer = ($messageinfo)?getSystemSetting("displayname"):"Not Found";
+	$urlcomponent = getSystemSetting('urlcomponent');
 	$job = new Job($messageinfo['jobid']+0);
 	$jobname = escapehtml($job->name);
 	$jobdescription = escapehtml($job->description);
@@ -69,7 +71,7 @@ $TITLE = $customer;
 		<tr>
 			<td>
 				<div style="padding-left:10px; padding-bottom:10px">
-					<img src="logo.img.php?hash=<?= $badcode ? "12345" : crc32("cid".getSystemSetting("_logocontentid"))?>" />
+					<img src="logo.img.php?urlcomponent=<?=$urlcomponent?>" />
 				</div>
 			</td>
 			<td>
