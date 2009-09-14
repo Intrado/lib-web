@@ -49,8 +49,10 @@ if ($jobid != NULL) {
 if (!$submittedmode && isset($_GET['deletejoblang'])) {
 	$joblangid = $_GET['deletejoblang'] + 0;
 	$joblang = new JobLanguage($joblangid);
-	if (userOwns("job",$joblang->jobid))
-	$joblang->destroy();
+	if (userOwns("job",$joblang->jobid)) {
+		$joblang->destroy();
+		notice(_L("The %1s message for %2s is now deleted.", escapehtml($joblang->type), escapehtml($joblang->language)));
+	}
 	redirect($JOBTYPE == "repeating" ? "jobrepeating.php" : "job.php");
 	exit();
 }
@@ -226,7 +228,7 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'phone') || CheckFormSubmit($f,'
 			error('Select both a language and a message');
 			$hasemaildetailerror = true;
 		} else if($sendsms && GetFormData($f, $s,"smsradio") == "create" && !ereg("^[a-zA-Z0-9\x20\x09\x0a\x0b\x0C\x0d\x2a\x5e\<\>\?\,\.\/\{\}\|\~\!\@\#\$\%\&\(\)\_\+\']*$", GetFormData($f, $s, "smstextarea"))) {
-			error('Invalid character(s) in SMS Message.');	
+			error('Invalid character(s) in SMS Message.');
 		} else {
 			//submit changes
 
@@ -337,7 +339,7 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'phone') || CheckFormSubmit($f,'
 
 			$job->printmessageid = NULL;
 			$job->sendprint = false;
-				
+
 			if ($cansendsms && $job->sendsms && $job->smsmessageid != 0) {
 				$jobtypes[] = "sms";
 			} else {
@@ -436,7 +438,7 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'phone') || CheckFormSubmit($f,'
 			if(!$submittedmode && !$completedmode) {
 				//now add any language options
 				foreach (array("phone","email") as $type){
-					if ($allowAutoTranslate && $job->getSetting("jobcreated" . $type) == "1") {						
+					if ($allowAutoTranslate && $job->getSetting("jobcreated" . $type) == "1") {
 						($type == "phone") ? $languages = &$ttslanguages : $languages = &$emaillanguages;
 						foreach($languages as $language) {
 							$language = ucfirst($language);
@@ -520,11 +522,12 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'phone') || CheckFormSubmit($f,'
 							$joblang->language = GetFormData($f,$type,"newlang" . $type);
 							$joblang->messageid = GetFormData($f,$type,"newmess" . $type);
 							$joblang->jobid = $job->id;
-							if ($joblang->language && $joblang->messageid)
-							$joblang->create();
+							if ($joblang->language && $joblang->messageid) {
+								$joblang->create();
+								notice(_L("The %1s message for %2s is now added.", escapehtml($type), escapehtml($joblang->language)));
+							}
 							$joblangs[$type] = DBFindMany('JobLanguage', "from joblanguage where type='$type' and jobid=" . $job->id); // Reaload the joblanguage array for the language to show up after add
 						}
-
 					}
 				}
 				/* Store multilists*/
@@ -1087,7 +1090,7 @@ if ($JOBTYPE == "repeating" && getSystemSetting("disablerepeat") ) {
 ?>
 			</tr>
 		</table>
-		
+
 		<div id="settingsdetails">
 		<table border="0" cellpadding="2" cellspacing="0" width="100%">
 		<? if ($JOBTYPE != "repeating") { ?>
@@ -1436,7 +1439,7 @@ if ($JOBTYPE == "repeating" && getSystemSetting("disablerepeat") ) {
 			</table>
 		</div>
 		</div>
-		
+
 		</td>
 	</tr>
 	<? } ?>
@@ -1501,7 +1504,7 @@ document.observe('dom:loaded', function() {
 		dateFilter:DatePickerUtils.noDatesBefore(0)
 	});
 <?  }
-	
+
 	foreach($infojobtypes as $infojobtype){
 		$info = escapehtml($infojobtype->info);
 		$info = str_replace(array("\r\n","\n","\r"),"<br>",$info);
@@ -1529,7 +1532,7 @@ document.observe('dom:loaded', function() {
 			$('displaysmsoptions').hide();
 		} else {
 			$('smsoptions').hide();
-		}	
+		}
 	<?
 	}
 	if($cansendphone) {
@@ -1544,7 +1547,7 @@ document.observe('dom:loaded', function() {
 			$('displayphoneoptions').hide();
 		} else {
 			$('phoneoptions').hide();
-		}	
+		}
 	<?
 	}
 	if($cansendemail) {
@@ -1950,7 +1953,7 @@ function setTranslations (response, langstring) {
 		}
 		return;
 	}
-	if(result instanceof Array) {	
+	if(result instanceof Array) {
 		for ( i = 0;i < result.length;i++) {
 			var language = trlanguages.shift();
 			if (result[i].responseStatus == 200){
@@ -2012,7 +2015,7 @@ function submitTranslations(section) {
 		var seriallang = serialized.join(";");
 		callbacksection = section;
 		new Ajax.Request('translate.php',
-			{ method:'post', postBody: "english=" + encodeURIComponent(text) + "&languages=" + seriallang, 
+			{ method:'post', postBody: "english=" + encodeURIComponent(text) + "&languages=" + seriallang,
 				onSuccess: function(result) {
 					setTranslations(result.responseJSON, seriallang);
 				}
@@ -2039,9 +2042,9 @@ function submitRetranslation(section,language) {
 	}
 	var urllang = encodeURIComponent(language);
 	callbacksection = section;
-	
+
 	new Ajax.Request('translate.php',
-			{ method:'post', postBody: "text=" + encodeURIComponent(text) + "&language=" + urllang, 
+			{ method:'post', postBody: "text=" + encodeURIComponent(text) + "&language=" + urllang,
 				onSuccess: function(result) {
 					var data = result.responseJSON;
 					if(data.responseStatus != 200 || data.responseData.translatedText == undefined)
@@ -2055,11 +2058,11 @@ function submitRetranslation(section,language) {
 
 function enablesection(section) {
 	try
-	{			
+	{
 		languages = phonelanguages;
 		if(section == 'email')
 			languages = emaillanguages;
-	
+
 		for (i = 0; i < languages.length; i++) {
 			var trexpand = new getObj(section + 'expand_' + languages[i]).obj;
 			trexpand.disabled = false;
@@ -2084,7 +2087,7 @@ function sendjobconfirm() {
 <?}?>
 	if(!phonesubmitstate && !emailsubmitstate) {
 		enablesection('email');
-		enablesection('phone');	
+		enablesection('phone');
 		submitForm('<? echo $f; ?>','send');
 	} else {
 		Element.show('translationstatus');
@@ -2094,7 +2097,7 @@ function sendjobconfirm() {
 }
 </script>
 
-<? } // End of Translation - This block will be removed if it is a repeating job or sendmulti is not enabled   
+<? } // End of Translation - This block will be removed if it is a repeating job or sendmulti is not enabled
 endWindow();
 buttons();
 EndForm();
