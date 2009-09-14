@@ -78,10 +78,10 @@ CREATE TABLE IF NOT EXISTS `blockeddestination` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8
 $$$
 
-insert into blockeddestination (userid, description, pattern, type) (select userid, description, pattern, 'phone' from blockednumber where type in ('call', 'both'))
+insert into blockeddestination (userid, description, destination, type) (select userid, description, pattern, 'phone' from blockednumber where type in ('call', 'both'))
 $$$
 
-insert into blockeddestination (userid, description, pattern, type) (select userid, description, pattern, 'sms' from blockednumber where type in ('sms', 'both'))
+insert into blockeddestination (userid, description, destination, type) (select userid, description, pattern, 'sms' from blockednumber where type in ('sms', 'both'))
 $$$
 
 -- drop old blocked number table
