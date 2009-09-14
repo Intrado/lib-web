@@ -2040,16 +2040,16 @@ function submitRetranslation(section,language) {
 	var urllang = encodeURIComponent(language);
 	callbacksection = section;
 	
-	var request = "translate.php?text=" + encodeURIComponent(text) + "&language=" + urllang;
-	cachedAjaxGet(
-			request,
-			function(result) {	
+	new Ajax.Request('translate.php',
+			{ method:'post', postBody: "text=" + encodeURIComponent(text) + "&language=" + urllang, 
+				onSuccess: function(result) {
 					var data = result.responseJSON;
 					if(data.responseStatus != 200 || data.responseData.translatedText == undefined)
 						return;
 					$(section + 'verify_' + language).innerHTML = data.responseData.translatedText.escapeHTML();
+				}
 			}
-	);
+		);
 	return false;
 }
 
