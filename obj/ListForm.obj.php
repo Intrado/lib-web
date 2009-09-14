@@ -32,7 +32,7 @@ class ListForm extends Form {
 		}
 		if (getSystemSetting('_hassms', false) && $USER->authorize('sendsms')) {
 			$formdata['addmeSms'] = array(
-				'label' => _L('My Sms'),
+				'label' => _L('My SMS'),
 				'value' => '',
 				'control' => array('TextField','size'=>15),
 				'validators' => array(array("ValPhone")),
@@ -121,6 +121,11 @@ class ListForm extends Form {
 										<tbody id='listsTableBody'>
 										</tbody>
 										<tfoot>
+											<tr id='listsTableMyself' stle='display:none'>
+												<td>"._L('Myself')."</td>
+												<td>1</td>
+												<td></td>
+											</tr>
 											<tr>
 												<td class='border'>
 													<b>"._L('Total')."</b>
