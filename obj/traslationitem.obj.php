@@ -90,19 +90,18 @@ class TranslationItem extends FormItem {
 						text = text.substring(0, 2000);
 						alert("' . _L('The message is too long. Only the first 2000 characters are submitted for translation.') . '");
 					}
-					var urllang = encodeURIComponent(language);
-					var request = "translate.php?text=" + encodeURIComponent(text) + "&language=" + urllang;
 					$(section + "retranslationtext").innerHTML = "<img src=\"img/icons/loading.gif\" />";
-					cachedAjaxGet(
-							request,
-							function(result) {	
+					new Ajax.Request("translate.php", {
+						method:"post",
+						parameters: {"text": text, "language": language},
+						onSuccess: function(result) {	
 									var data = result.responseJSON;
 									if(data.responseStatus != 200 || data.responseData.translatedText == undefined)
 										return;
 									var dstbox = section + "retranslationtext";
 									$(dstbox).innerHTML = data.responseData.translatedText.escapeHTML();
 							}
-					);
+					});
 					return false;
 				}
 				function getTranslation(section, language) {
