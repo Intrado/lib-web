@@ -66,18 +66,19 @@ $$$
  $$$
 
 -- add a table for blocked phone, email, sms
- CREATE TABLE blockeddestination` (
-`id` INT( 11 ) NOT NULL AUTO_INCREMENT PRIMARY KEY ,
-`userid` INT( 11 ) NOT NULL ,
-`description` VARCHAR( 255 ) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL ,
-`pattern` VARCHAR( 255 ) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL ,
-`type` ENUM( 'call', 'sms', 'email' ) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL ,
-`createdate` DATETIME NOT NULL DEFAULT '0000-00-00 00:00:00',
-INDEX ( `userid` , `type` )
-) ENGINE = InnoDB CHARACTER SET utf8 COLLATE utf8_general_ci
+CREATE TABLE IF NOT EXISTS `blockeddestination` (
+  `id` int(11) NOT NULL auto_increment,
+  `userid` int(11) default NULL,
+  `description` varchar(255) NOT NULL,
+  `destination` varchar(255) NOT NULL,
+  `type` enum('phone','sms','email') NOT NULL,
+  `createdate` datetime default NULL,
+  PRIMARY KEY  (`id`),
+  KEY `userid` (`userid`,`type`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1
 $$$
 
-insert into blockeddestination (userid, description, pattern, type) (select userid, description, pattern, 'call' from blockednumber where type in ('call', 'both'))
+insert into blockeddestination (userid, description, pattern, type) (select userid, description, pattern, 'phone' from blockednumber where type in ('call', 'both'))
 $$$
 
 insert into blockeddestination (userid, description, pattern, type) (select userid, description, pattern, 'sms' from blockednumber where type in ('sms', 'both'))
