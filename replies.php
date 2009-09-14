@@ -9,6 +9,7 @@ include_once("obj/Message.obj.php");
 include_once("obj/FieldMap.obj.php");
 include_once("obj/Content.obj.php");
 require_once("obj/Phone.obj.php");
+require_once("obj/Person.obj.php");
 include_once("inc/form.inc.php");
 include_once("inc/html.inc.php");
 require_once("inc/table.inc.php");
@@ -40,8 +41,15 @@ if(isset($_GET['delete'])){
 	if(userOwns("voicereply", $delete)){
 		$vr = new VoiceReply($delete);
 		$content = new Content($vr->contentid);
-		$content->destroy();
-		$vr->destroy();
+
+		Query("BEGIN");
+			$content->destroy();
+			$vr->destroy();
+		Query("COMMIT");
+
+		$job = new Job($vr->jobid);
+		notice(_L("The response from %1s for the job, %2s, is now deleted.", escapehtml(Person::getFullName($vr->personid)), escapehtml($job->name)));
+
 		$reload=1;
 	}
 }
@@ -89,12 +97,15 @@ if(isset($_GET['deleteplayed']) && $_GET['deleteplayed']){
 	$voicereplies = DBFindMany("VoiceReply", "from voicereply vr where vr.userid = '$USER->id'
 								$jobidquery
 								and listened = '1'");
+	Query("BEGIN");
+		foreach($voicereplies as $voicereply){
+			$content = new Content($voicereply->contentid);
+			$content->destroy();
+			$voicereply->destroy();
+		}
+	Query("COMMIT");
+	notice(_L("%s played responses are now deleted.", count($voicereplies)));
 
-	foreach($voicereplies as $voicereply){
-		$content = new Content($voicereply->contentid);
-		$content->destroy();
-		$voicereply->destroy();
-	}
 	if($jobidquery){
 		$count = QuickQuery("select count(*) from voicereply vr where vr.userid = '$USER->id'
 							$jobidquery");
