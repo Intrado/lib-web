@@ -25,8 +25,6 @@ if (!$USER->authorize('viewsystemactive')) {
 // Data Handling
 ////////////////////////////////////////////////////////////////////////////////
 
-session_write_close();//WARNING: we don't keep a lock on the session file, any changes to session data are ignored past this point
-
 $jobtypes = DBFindMany("JobType","from jobtype");
 
 
@@ -38,6 +36,8 @@ $PAGE = "system:activejobs";
 $TITLE = "Active & Pending Jobs";
 
 include_once("nav.inc.php");
+
+session_write_close();//WARNING: we don't keep a lock on the session file, any changes to session data are ignored past this point
 
 startWindow('Active & Pending Notification Jobs ' . help('System_ActiveJobs'),NULL);
 
@@ -77,7 +77,7 @@ while ($row = DBGetRow($result)) {
 
 function fmt_job_type ($row,$index) {
 	global $jobtypes;
-	
+
 	return $jobtypes[$row[24]]->name . " " . ($row[21] == "survey" ? "Survey" : "Notification");
 }
 

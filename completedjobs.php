@@ -26,8 +26,6 @@ if (!$USER->authorize('viewsystemcompleted')) {
 // Data Handling
 ////////////////////////////////////////////////////////////////////////////////
 
-session_write_close();//WARNING: we don't keep a lock on the session file, any changes to session data are ignored past this point
-
 $start = 0 + (isset($_GET['pagestart']) ? $_GET['pagestart'] : 0);
 $limit = 100;
 
@@ -40,6 +38,8 @@ $PAGE = "system:completedjobs";
 $TITLE = "Completed Jobs";
 
 include_once("nav.inc.php");
+
+session_write_close();//WARNING: we don't keep a lock on the session file, any changes to session data are ignored past this point
 
 startWindow('Completed Notification Jobs ' . help('System_CompletedJobs'), 'padding: 3px;');
 
@@ -127,8 +127,8 @@ function fmt_rate ($obj, $name) {
 
 function fmt_jobmode ($obj,$name) {
 	global $jobtypes;
-	
-	return $jobtypes[$obj->jobtypeid]->name . " " . ($obj->type == "survey" ? "Survey" : "Notification");	
+
+	return $jobtypes[$obj->jobtypeid]->name . " " . ($obj->type == "survey" ? "Survey" : "Notification");
 }
 
 $titles = array ("Owner" => "Submitted by",
