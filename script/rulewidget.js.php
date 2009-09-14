@@ -58,22 +58,22 @@ var RuleWidget = Class.create({
 			'numeric_num_le' => _L('Enter a value'),
 			'numeric_num_range' => _L('Enter a value')
 		))?>;
-		
+
 		// Guide/Focus
 		this.guideDisabled = false;
 		this.guideStepIndex = 0;
 		this.guideFieldset = null;
-	
+
 		if (!allowedFields)
 			this.allowedFields = ['f','g','c'];
 		else
 			this.allowedFields = allowedFields;
-			
+
 		if (!ignoredFields)
 			this.ignoredFields = [];
 		else
 			this.ignoredFields = ignoredFields;
-			
+
 		this.container = container;
 		this.warningDiv = new Element('div', {'style':'color:red; padding:2px'});
 		this.warningDiv.hide();
@@ -81,9 +81,9 @@ var RuleWidget = Class.create({
 		this.ruleHelperDiv = new Element('div', {'style':''});
 		this.ruleHelperContentDiv = new Element('div');
 		this.ruleHelperInfoDiv = new Element('div', {'style':'clear:both'});
-		
+
 		this.ruleHelperDiv.insert(this.ruleHelperContentDiv).insert(this.ruleHelperInfoDiv);
-														
+
 		this.rulesTableAboveEditor = new Element('tr'); // Right on top of rulesTableFootLastTR
 		this.rulesTableFootLastTR = new Element('tr'); // For rule editor
 		this.rulesTableHead = new Element('thead');
@@ -102,7 +102,7 @@ var RuleWidget = Class.create({
 					.insert(this.rulesTableFootLastTR)
 				)
 			);
-		
+
 		if (showRemoveAllButton) {
 			var td = new Element('td', {'colspan':100}).update(action_link('<?=addslashes(_L('Remove All Rules'))?>', 'diagona/16/101', '').observe('click', function(event) {
 				event.stop();
@@ -111,19 +111,19 @@ var RuleWidget = Class.create({
 			td.down('img').remove(); // No icon necessary
 			this.rulesTableHead.insert(new Element('tr').insert(td));
 		}
-		
+
 		if (!readonly)
 			this.ruleEditor = new RuleEditor(this, this.rulesTableFootLastTR);
 		this.clear_rules();
-		
+
 		this.delayActions = false;
-				
+
 		this.fieldmaps = null;
 		this.operators = null;
 		this.reldateOptions = null;
 		this.multisearchHTMLCache = {}; // Cache of multisearch DOM, indexed by fieldnum.
 	},
-	
+
 	// You must call startup() AFTER registering ruleWidget.container.observe('RuleWidget:Ready', ..);
 	// @param preloadedRules, optional array of rules to preload
 	startup: function(preloadedRules) {
@@ -149,7 +149,7 @@ var RuleWidget = Class.create({
 					// Test fieldnum name
 					if (this.ignoredFields.indexOf(fieldnum) >= 0)
 						continue;
-						
+
 					this.fieldmaps[fieldnum] = data['fieldmaps'][i];
 					for (var type in this.operators) {
 						if (this.fieldmaps[fieldnum].options.match(type))
@@ -161,7 +161,7 @@ var RuleWidget = Class.create({
 				this.operators['multisearch']['in'] = '<?=addslashes(_L('is'))?>';
 				if (this.ruleEditor)
 					this.ruleEditor.reset();
-				
+
 				// preloaded rules
 				var someUnused = false;
 				if (rules) {
@@ -185,14 +185,14 @@ var RuleWidget = Class.create({
 			}.bindAsEventListener(this, preloadedRules ? preloadedRules : null)
 		);
 	},
-		
+
 	clear_rules: function() {
 			this.appliedRules = {};
 			this.rulesTableBody.update();
 			if (this.ruleEditor)
 				this.ruleEditor.reset();
 	},
-	
+
 	// Updates contents of tr with human-readable fieldmapTD, criteriaTD, and valueTD.
 	// @param data, {fieldnum, type, logical, op, val}
 	// @param tr, table row DOM element.
@@ -218,18 +218,20 @@ var RuleWidget = Class.create({
 				criteria = '<?=addslashes(_L('is NOT'))?>';
 		}
 		criteriaTD.insert(criteria);
-		
+
 		// ValueTD
 		var value = this.format_readable_value(data);
-		var widthCSS = (addHiddenFieldnum) ? '  ' : '  ';
-		var heightCSS = (value.length > 400) ? ' overflow: auto; height: 300px; ' : '';
-		var valueDiv = new Element('div', {'style': 'width: 80px; overflow:hidden; white-space:normal; ' + widthCSS + heightCSS}).update(value);
+		var widthCSS = (addHiddenFieldnum) ? '  ' : ' width:80px; ';
+		var heightCSS = (value.length > 400) ? ' height: 200px; ' : '';
+		if (addHiddenFieldnum)
+			heightCSS += ' overflow: auto; ';
+		var valueDiv = new Element('div', {'style': 'overflow:hidden; white-space:normal; ' + widthCSS + heightCSS}).update(value);
 		var valueTD = new Element('td', {'class':'list',  'style':'overflow:hidden; white-space:normal; font-size:90%','valign':'top'}).update(valueDiv);
 		tr.insert(fieldmapTD).insert(criteriaTD).insert(valueTD);
-		
+
 		return true;
 	},
-	
+
 	format_readable_value: function(data) {
 		var value = '';
 		if (!data.val.join) {
@@ -245,14 +247,14 @@ var RuleWidget = Class.create({
 		} else {
 			value = data.val.join(' <?=addslashes(_L('and'))?> ');
 		}
-		return value.escapeHTML().replace(/,/g, ',<br/>') + ' ';
+		return value.escapeHTML().replace(/,/g, ', ') + ' ';
 	},
-	
+
 	refresh_guide: function (reset, specificFieldset) {
 		var sectionFieldsets = this.rulesTableFootLastTR.select('fieldset');
 		for (var i = 0; i < sectionFieldsets.length; i++) {
 			var fieldset = sectionFieldsets[i];
-			if (specificFieldset == fieldset) 
+			if (specificFieldset == fieldset)
 				this.guideStepIndex = i;
 			else {
 				fieldset.style.borderWidth = '0';
@@ -269,10 +271,10 @@ var RuleWidget = Class.create({
 		currentFieldset.style.borderWidth = '3px';
 		currentFieldset.down('div').style.margin = '0';
 		this.guideFieldset = currentFieldset;
-	
+
 		helpContent = null;
 		// Guide Content
-		
+
 		var ruleCount = $H(this.appliedRules).keys().length;
 		var data = this.ruleEditor.get_data();
 		if (data) {
@@ -300,11 +302,11 @@ var RuleWidget = Class.create({
 				helpContent = this.ruleEditorGuideContents[fieldmap.type];
 			}
 		}
-		
+
 		if (!helpContent) {
 				return;
 		}
-			
+
 		this.ruleHelperContentDiv.update(helpContent);
 		this.ruleHelperContentDiv.setStyle({'border':'solid 3px rgb(150,150,255)', 'padding':'2px'});
 	},
@@ -313,7 +315,7 @@ var RuleWidget = Class.create({
 		var rows = this.rulesTableBody.rows;
 		for (var i = 0; i < rows.length; i++) {
 			rows[i].cells[0].update('<?=addslashes(_L("Rule #"))?>' + (i+1));
-			
+
 			if (rows[i].cells.length == 5) {
 				var hiddenField = rows[i].cells[1].down('input');
 				if (hiddenField) {
@@ -328,7 +330,7 @@ var RuleWidget = Class.create({
 			}
 		}
 	},
-	
+
 	// @param data, {fieldnum, type, logical, op, val}
 	insert_rule: function(data, suppressFire) {
 		var needWarning = false;
@@ -355,7 +357,7 @@ var RuleWidget = Class.create({
 					tr.insert(actionTD);
 					deleteRuleButton.observe('click', function(event, tr, fieldnum) {
 							event.stop();
-							
+
 							if (!this.delayActions) {
 								tr.remove();
 								delete this.appliedRules[fieldnum];
@@ -396,7 +398,7 @@ var RuleEditor = Class.create({
 	// @param containerTR, the DOM container TR for this editor.
 	initialize: function(ruleWidget, containerTR) {
 	this.ruleWidget = ruleWidget;
-	
+
 	this.fieldTD = new Element('td',{'style':'', 'valign':'top'});
 		this.criteriaTD = new Element('td',{'style':'', 'valign':'top'});
 		this.valueTD = new Element('td',{'style':'', 'valign':'top'});
@@ -407,24 +409,24 @@ var RuleEditor = Class.create({
 			this.valueTD.update('<span style="cursor:help; font-style:italic; display:none; font-weight: bold;"><?=addslashes(_L('Value'))?></span>');
 			this.actionTD.update('<span style="cursor:help; font-style:italic; display:none; font-weight: bold;">&nbsp;</span>');
 		}
-		
+
 		var fieldsetCSS = 'padding:3px; margin:0px; border: solid 3px rgb(150,150,255)';
 		var fieldsetDivOptions = {'style':''};
 		this.fieldTD.insert(new Element('div', {'class':'RuleWidgetColumnDiv'})).insert(new Element('fieldset', {'id':'AddRuleFieldmap', style:fieldsetCSS}).insert(new Element('div', fieldsetDivOptions)));
 		this.criteriaTD.insert(new Element('div', {'class':'RuleWidgetColumnDiv'})).insert(new Element('fieldset', {'id':'AddRuleCriteria', style:fieldsetCSS}).insert(new Element('div', fieldsetDivOptions)));
 		this.valueTD.insert(new Element('div', {'class':'RuleWidgetColumnDiv'})).insert(new Element('fieldset', {'id':'AddRuleValue', style:fieldsetCSS}).insert(new Element('div', fieldsetDivOptions)));
 		this.actionTD.insert(new Element('div', {'class':'RuleWidgetColumnDiv'})).insert(new Element('fieldset', {'id':'AddRuleAction', style:fieldsetCSS}).insert(new Element('div', fieldsetDivOptions)));
-		
+
 		containerTR.insert(this.fieldTD).insert(this.criteriaTD).insert(this.valueTD).insert(this.actionTD);
 
 		this.fieldTD.down('span').observe('click', this.trigger_event_in_column.bindAsEventListener(this, this.fieldTD));
 	},
-	
+
 	trigger_event_in_column: function(nullableEvent, td) {
 		if (this.datepickers) {
 			this.datepickers.invoke('close');
 		}
-		
+
 		if (nullableEvent && nullableEvent.element().tagName.toUpperCase() == 'LABEL')
 			return;
 		var column = '';
@@ -438,7 +440,7 @@ var RuleEditor = Class.create({
 			column = 'action';
 		else
 			return;
-			
+
 		if (column != 'action')
 			this.ruleWidget.refresh_guide(false, td.down('fieldset'));
 		this.ruleWidget.container.fire('RuleWidget:InColumn', {'td':td, 'column':column});
@@ -448,14 +450,14 @@ var RuleEditor = Class.create({
 		if (!this.fieldTD.down('select'))
 			return false;
 		var fieldnum = this.fieldTD.down('select').getValue();
-		
+
 		if (!this.ruleWidget.fieldmaps[fieldnum])
 			return false;
 		var type = this.ruleWidget.fieldmaps[fieldnum].type;
-		
+
 		return {'fieldnum': fieldnum, 'type': type};
 	},
-	
+
 	// Returns data for the rule, {fieldnum, type, logical, op, val}
 	get_data: function() {
 		var fieldmap = this.get_selected_fieldmap();
@@ -470,7 +472,7 @@ var RuleEditor = Class.create({
 			logical = 'and not';
 			op = 'in';
 		}
-		
+
 		var val = [];
 		// MULTISEARCH
 		if (fieldmap.type == 'multisearch') {
@@ -515,25 +517,25 @@ var RuleEditor = Class.create({
 			'val':val
 		};
 	},
-	
+
 	//----------------------------- PRIVATE FUNCTIONS --------------------------
 
 	show_criteria_column: function(fieldnum) {
 		if (this.datepickers) {
 			this.datepickers.invoke('close');
 		}
-		
+
 		var section = this.criteriaTD.down('fieldset').down('div');
 		if (!fieldnum) {
 			section.update();
 			this.criteriaTD.down('span').stopObserving('click').hide();
 			return;
 		}
-		
+
 		var type = this.ruleWidget.fieldmaps[fieldnum].type;
 		var criteriaSelectbox = this.make_radioboxes(this.ruleWidget.operators[type]);
 		section.update(criteriaSelectbox);
-				
+
 		// Invoke onclick for each radiobox.
 		criteriaSelectbox.select('input').invoke('observe', 'click', function(event) {
 			var fieldmap = this.get_selected_fieldmap();
@@ -544,13 +546,13 @@ var RuleEditor = Class.create({
 		}.bindAsEventListener(this));
 		this.criteriaTD.down('span').show().observe('click', this.trigger_event_in_column.bindAsEventListener(this, this.criteriaTD));
 	},
-	
+
 	// Determines the appropriate input boxes to show, makes an ajax request for persondatavalues if necessary for multisearch.
 	show_value_column: function(fieldnum) {
 		if (this.datepickers) {
 			this.datepickers.invoke('close');
 		}
-		
+
 		var section = this.valueTD.down('fieldset').down('div');
 		if (!fieldnum) {
 			section.update();
@@ -558,15 +560,15 @@ var RuleEditor = Class.create({
 			this.valueTD.down('span').stopObserving('click').hide();
 			return false;
 		}
-		
+
 		var type = this.ruleWidget.fieldmaps[fieldnum].type;
 		var op = this.criteriaTD.down('input:checked');
 		if (!op)
 			return;
 		op = op.getValue();
-		
+
 		this.trigger_event_in_column.bindAsEventListener(this, this.valueTD);
-		
+
 		this.ruleWidget.container.style.width = '550px';
 		var container = new Element('div');
 		switch(type) {
@@ -584,7 +586,7 @@ var RuleEditor = Class.create({
 							if (!data) {
 								container.update('<?=addslashes(_L("No data found"))?>');
 							}
-							
+
 							var multicheckboxHTML = this.make_multicheckbox(data);
 							this.ruleWidget.multisearchHTMLCache[fieldnum] = multicheckboxHTML;
 							container = new Element('div').update(multicheckboxHTML);
@@ -593,7 +595,7 @@ var RuleEditor = Class.create({
 					});
 				}
 				break;
-				
+
 			case 'numeric':
 				container.update(this.make_textbox('',true));
 				if (op == 'num_range') {
@@ -601,7 +603,7 @@ var RuleEditor = Class.create({
 					container.insert(this.make_textbox('',true));
 				}
 				break;
-				
+
 			case 'reldate':
 				if (op == 'reldate') {
 					var selectbox = this.make_radioboxes(this.ruleWidget.reldateOptions);
@@ -620,28 +622,28 @@ var RuleEditor = Class.create({
 					}
 				}
 				break;
-				
+
 			case 'text':
 				container.update(this.make_textbox(''));
 				break;
 		}
-		
+
 		section.update(container);
 
 		this.valueTD.down('span').show().observe('click', this.trigger_event_in_column.bindAsEventListener(this, this.valueTD));
 		this.show_action_column();
 	},
-	
+
 	show_action_column: function(clear) {
 		if (clear) {
 			this.actionTD.down('fieldset').down('div').update();
 			this.actionTD.down('span').stopObserving('click').hide();
 			return;
 		}
-			
+
 		this.actionTD.down('fieldset').down('div').update('<?=addslashes(icon_button(_L('Add'), 'add'))?><span style="clear:both"></span>');
 		var addRuleButton = this.actionTD.down('button');
-		
+
 		// Events
 		addRuleButton.observe('click', function(event) {
 				this.ruleWidget.insert_rule(this.get_data());
@@ -649,7 +651,7 @@ var RuleEditor = Class.create({
 		addRuleButton.observe('focus', this.trigger_event_in_column.bindAsEventListener(this, this.actionTD));
 		this.actionTD.down('span').show().observe('click', this.trigger_event_in_column.bindAsEventListener(this, this.actionTD));
 	},
-		
+
 	reset: function() {
 		if (!this.ruleWidget.fieldmaps)
 			return;
@@ -658,18 +660,18 @@ var RuleEditor = Class.create({
 		}
 		this.datepickers = [];
 		var fieldSelectbox = new Element('select', {'style':'font-size:90%'});
-		
+
 		fieldSelectbox.update(new Element('option', {'value':''}).insert('--<?=addslashes(_L('Select a Field'))?>--'));
-		
+
 		var g = [];
 		var c = [];
 		for (var fieldnum in this.ruleWidget.fieldmaps) {
 			// Don't allow adding the same rule twice.
 			if (this.ruleWidget.appliedRules[fieldnum])
 				continue;
-				
+
 			var option = new Element('option', {'value':fieldnum}).update(this.ruleWidget.fieldmaps[fieldnum].name);
-			
+
 			if (fieldnum.charAt(0) == 'f')
 				fieldSelectbox.insert(option);
 			else if (fieldnum.charAt(0) == 'g')
@@ -691,7 +693,7 @@ var RuleEditor = Class.create({
 				fieldSelectbox.insert(option);
 			});
 		}
-			
+
 		fieldSelectbox.disabled = fieldSelectbox.options.length < 2;
 		fieldSelectbox.observe('change', function(event) {
 			if (this.datepickers) {
@@ -701,7 +703,7 @@ var RuleEditor = Class.create({
 			this.show_criteria_column(fieldnum);
 			this.show_value_column(null);
 			this.show_action_column(true);
-			if (fieldnum !== '') 
+			if (fieldnum !== '')
 				this.trigger_event_in_column(null, this.criteriaTD);
 			else {
 				this.ruleWidget.refresh_guide(true);
@@ -711,19 +713,19 @@ var RuleEditor = Class.create({
 			}
 			this.ruleWidget.container.style.width = '400px';
 		}.bindAsEventListener(this));
-		
+
 		this.fieldTD.down('fieldset').down('div').update(fieldSelectbox);
 		this.criteriaTD.down('fieldset').down('div').update();
 		this.valueTD.down('fieldset').down('div').update();
 		this.actionTD.down('fieldset').down('div').update();
 		this.ruleWidget.container.style.width = '400px';
-		
+
 		this.criteriaTD.down('span').stopObserving('click').hide();
 		this.valueTD.down('span').stopObserving('click').hide();
 		this.actionTD.down('span').stopObserving('click').hide();
 		this.trigger_event_in_column(null,this.fieldTD);
 	},
-	
+
 	// Adds a toolbar only if the number of checkboxes exceeds threshold
 	add_multicheckbox_toolbar: function(multicheckboxContainer, threshold) {
 		if (!threshold)
@@ -774,7 +776,7 @@ var RuleEditor = Class.create({
 			ul.insert(li);
 		}
 		multicheckbox.insert(ul);
-		
+
 		return new Element('div').update(multicheckbox).innerHTML;
 	},
 
@@ -787,7 +789,7 @@ var RuleEditor = Class.create({
 			selectbox.hide();
 		return selectbox;
 	},
-		
+
 	make_radioboxes: function(values, hidden) {
 		var radioboxDIV = new Element('div');
 		for (var i in values) {
@@ -799,7 +801,7 @@ var RuleEditor = Class.create({
 			radioboxDIV.hide();
 		return radioboxDIV;
 	},
-	
+
 	make_datebox: function(value, hidden) {
 		if (!value)
 			value = '';
@@ -807,7 +809,7 @@ var RuleEditor = Class.create({
 		datebox.observe('focus', function(event, ruleEditor) {
 			ruleEditor.datepickers.push(pickDate(this, true,true));
 		}.bindAsEventListener(datebox, this));
-		
+
 		if (hidden)
 			datebox.hide();
 		return datebox;
