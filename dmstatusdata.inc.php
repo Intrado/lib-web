@@ -38,7 +38,7 @@ $statusgroups["Resource Allocation"]["residleout"] = "Idle Outbound:";
 $statusgroups["Resource Allocation"]["resactin"] = "Active Inbound:";
 $statusgroups["Resource Allocation"]["residlein"] = "Idle Inbound:";
 $statusgroups["Resource Allocation"]["resthrotsched"] = "Throttled by Schedule:";
-$statusgroups["Resource Allocation"]["resthroterr"] = "Throttled by Error:";
+$statusgroups["Resource Allocation"]["resthroterr"] = "Throttled due to Congestion:";
 $statusgroups["Resource Allocation"]["restotal"] = "Total Resources:";
 
 $statusgroups['Call Results'] = array();
