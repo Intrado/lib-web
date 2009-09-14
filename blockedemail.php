@@ -167,6 +167,4 @@ EndForm();
 
 include_once("navbottom.inc.php");
 
-
-
 ?>

@@ -46,7 +46,7 @@ if (!$code || !$customer || !validEmail($email))
 	$badcode = true;
 
 if (!$badcode && $submit) {
-	// call authserver to block the email and get return value into $badcode variable.
+	$badcode = !emailUnsubscribe($CUSTOMERURL, $email);
 }
 
 $customer = escapehtml($customer);
