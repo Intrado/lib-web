@@ -35,10 +35,10 @@ if (isset($_GET['delete'])) {
 	if (userOwns("message",$deleteid)) {
 		$message = new Message($deleteid);
 		QuickUpdate("update message set deleted=1 where id='$deleteid'");
-		notice(_L("The message, %s, is now deleted", escapehtml($message->name)));
+		notice(_L("The message, %s, is now deleted.", escapehtml($message->name)));
 		redirect();
 	} else {
-		notice(_L("You do not have permission to delete this message"));
+		notice(_L("You do not have permission to delete this message."));
 	}
 }
 
@@ -48,9 +48,9 @@ if (isset($_GET['deletetemplate'])) {
 		$questionnaire = new SurveyQuestionnaire($id);
 		$questionnaire->deleted = 1;
 		$questionnaire->update();
-		notice(_L("The survey template, %s, is now deleted", escapehtml($questionnaire->name)));
+		notice(_L("The survey template, %s, is now deleted.", escapehtml($questionnaire->name)));
 	} else {
-		notice(_L("You do not have permission to delete this survey template"));
+		notice(_L("You do not have permission to delete this survey template."));
 	}
 	redirectToReferrer();
 }
@@ -86,12 +86,12 @@ function fmt_actions ($obj,$name) {
 		}
 	}
 */
-	
+
 	$advancedplaybtn = action_link("Play","diagona/16/131",null,"popup('previewmessage.php?close=1&id=$obj->id', 400, 500); return false;");
 	$editbtn = action_link("Edit", "pencil", 'message' . $obj->type . '.php?id=' . $obj->id);
 	$deletebtn = action_link("Delete", "cross", 'messages.php?delete=' . $obj->id, "return confirmDelete();");
 	$renamebtn = action_link("Rename", "textfield_rename", 'messagerename.php?id=' . $obj->id);
-	
+
 	if ($obj->type == "phone" && isset($SIMPLEPHONEMESSAGES[$obj->id])) {
 		return  action_links($advancedplaybtn,$renamebtn,$deletebtn);
 	} else {
@@ -101,7 +101,7 @@ function fmt_actions ($obj,$name) {
 			return action_links($editbtn,$renamebtn,$deletebtn);
 		}
 	}
-	
+
 }
 
 function fmt_phonetype ($obj,$name) {

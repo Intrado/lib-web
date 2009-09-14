@@ -101,7 +101,7 @@ $formdata = array(
 		"control" => array("FormHtml", "html" => hidden_submit_button('done')),
 		"helpstep" => 1
 	),
-	
+
 	"name" => array(
 		"label" => _L('List Name'),
 		"fieldhelp" => _L('This is the name of your list. The best names describe the list contents.'),
@@ -183,7 +183,7 @@ $helpsteps = array (
 
 $buttons = array(submit_button(_L('Refresh'),"refresh","arrow_refresh"),
 	submit_button(_L('Done'),"done","tick"));
-				
+
 $form = new Form("list",$formdata,$helpsteps,$buttons);
 $form->ajaxsubmit = true;
 
@@ -199,22 +199,22 @@ $datachange = false;
 $errors = false;
 //check for form submission
 if ($button = $form->getSubmit()) { //checks for submit and merges in post data
-	$ajax = $form->isAjaxSubmit(); //whether or not this requires an ajax response	
-	
+	$ajax = $form->isAjaxSubmit(); //whether or not this requires an ajax response
+
 	if ($form->checkForDataChange()) {
 		$datachange = true;
 	} else if (($errors = $form->validate()) === false) { //checks all of the items in this form
 		$postdata = $form->getData(); //gets assoc array of all values {name:value,...}
-		
+
 		$list->name = $postdata['name'];
 		$list->description = $postdata['description'];
 		$list->modifydate = QuickQuery("select now()");
 		$list->userid = $USER->id;
 		$list->deleted = 0;
 		$list->update();
-		
+
 		$_SESSION['listid'] = $list->id;
-		
+
 		// Save
 		if ($list->id) {
 			if ($ajax) {
@@ -224,18 +224,18 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 						$data = $ruledata[0];
 						// CREATE rule.
 						if (!isset($data->fieldnum, $data->logical, $data->op, $data->val)) {
-							notice(_L('There is a problem adding the rule for %s', FieldMap::getName($data->fieldnum)));
+							notice(_L('There is a problem adding the rule for %s.', escapehtml(FieldMap::getName($data->fieldnum))));
 							$form->sendTo('list.php');
 							break;
 						}
 						if (!$type = Rule::getType($data->fieldnum)) {
-							notice(_L('There is a problem adding the rule for %s', FieldMap::getName($data->fieldnum)));
+							notice(_L('There is a problem adding the rule for %s.', escapehtml(FieldMap::getName($data->fieldnum))));
 							$form->sendTo('list.php');
 							break;
 						}
 						$data->val = prepareRuleVal($type, $data->op, $data->val);
 						if (!$rule = Rule::initFrom($data->fieldnum, $data->logical, $data->op, $data->val)) {
-							notice(_L('There is a problem adding the rule for %s', FieldMap::getName($data->fieldnum)));
+							notice(_L('There is a problem adding the rule for %s.', escapehtml(FieldMap::getName($data->fieldnum))));
 							$form->sendTo('list.php');
 							break;
 						}
@@ -248,40 +248,40 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 							$le->create();
 						QuickUpdate('COMMIT');
 
-						notice(_L('The rule for %s is now added', FieldMap::getName($data->fieldnum)));
+						notice(_L('The rule for %s is now added.', escapehtml(FieldMap::getName($data->fieldnum))));
 						$form->sendTo('list.php');
 						break;
-						
+
 					case 'deleterule':
 						$fieldnum = $postdata['ruledelete'];
 						if ($USER->authorizeField($fieldnum))
 							QuickUpdate("DELETE le.*, r.* FROM listentry le, rule r WHERE le.ruleid=r.id AND le.listid=? AND r.fieldnum=?", false, array($list->id, $fieldnum));
-						
-						notice(_L('The rule for %s is now removed', FieldMap::getName($fieldnum)));
+
+						notice(_L('The rule for %s is now removed.', escapehtml(FieldMap::getName($fieldnum))));
 						$form->sendTo('list.php');
 						break;
-						
+
 					case 'clearrules':
 						QuickUpdate("DELETE le.*, r.* FROM listentry le, rule r WHERE le.ruleid=r.id AND le.listid=?", false, array($list->id));
-						
-						notice(_L('All rules are now removed'));
+
+						notice(_L('All rules are now removed.'));
 						$form->sendTo('list.php');
 						break;
-						
+
 					case 'clearadditions':
 						QuickUpdate("DELETE le.* FROM listentry le WHERE le.type='A' AND le.listid=?", false, array($list->id));
-						
-						notice(_L('All additions are now removed'));
+
+						notice(_L('All additions are now removed.'));
 						$form->sendTo('list.php');
 						break;
-						
+
 					case 'clearskips':
 						QuickUpdate("DELETE le.* FROM listentry le WHERE le.type='N' AND le.listid=?", false, array($list->id));
-						
-						notice(_L('All skips are now removed'));
+
+						notice(_L('All skips are now removed.'));
 						$form->sendTo('list.php');
 						break;
-						
+
 					case 'refresh': // handled same as case 'done'.
 					case 'done':
 						if (isset($_SESSION['origin']) && ($_SESSION['origin'] == 'start')) {
@@ -295,29 +295,29 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 							$form->sendTo('lists.php');
 						}
 						break;
-				
+
 					case 'preview':
 						$_SESSION['listsearchpreview'] = true;
 						$form->sendTo("showlist.php?id=" . $list->id);
 						break;
-						
+
 					case 'search':
 						unset($_SESSION['listsearchpreview']);
 						$form->sendTo("search.php");
 						break;
-						
+
 					case 'manualAdd':
 						$form->sendTo("addressedit.php?id=new&origin=manualadd");
 						break;
-						
+
 					case 'addressBookAdd':
 						$form->sendTo("addresses.php?origin=manualadd");
 						break;
-						
+
 					case 'uploadList':
 						$form->sendTo("uploadlist.php");
 						break;
-						
+
 					default:
 						$form->sendTo("lists.php");
 				}
@@ -353,26 +353,26 @@ endWindow();
 		ruleWidget.container.observe('RuleWidget:AddRule', list_add_rule);
 		ruleWidget.container.observe('RuleWidget:DeleteRule', list_delete_rule);
 		ruleWidget.container.observe('RuleWidget:RemoveAllRules', list_clear_rules);
-		
+
 		$('listAdditionsContainer').up('tr').hide();
 		$('listSkipsContainer').up('tr').hide();
-		
+
 		<?php if (isset($renderedlist) && $showAdditions) { ?>
 			if ($('listAdditionsContainer')) {
 				$('listAdditionsContainer').up('tr').show();
 				$('listAdditionsContainer').update('<?=addslashes(list_get_results_html('listAdditionsContainer', $renderedlist))?>');
 			}
 		<?php } ?>
-		
+
 		<?php if (isset($renderedlist) && $showSkips) { ?>
 			if ($('listSkipsContainer')) {
 				$('listSkipsContainer').up('tr').show();
 				$('listSkipsContainer').update('<?=addslashes(list_get_results_html('listSkipsContainer', $renderedlist))?>');
 			}
 		<?php } ?>
-		
+
 		$('listTotal').update(<?=$total?>);
-		
+
 		$('removeAllAdditions').insert(action_link('<?=addslashes(_L("Remove All Additions"))?>', 'diagona/16/101', 'removeAllAdditionsLink').observe('click', function(event) {
 			form_submit(event, 'clearadditions');
 		}).setStyle({'margin':'0'}));

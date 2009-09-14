@@ -80,7 +80,7 @@ if (isset($_GET['resetpass'])) {
 	$usr->update();
 
 	forgotPassword($usr->login, $CUSTOMERURL);
-	notice(_L("An email has been sent to %s for resetting the password", escapehtml($usr->login)));
+	notice(_L("An email has been sent to %s for resetting the password.", escapehtml($usr->login)));
 	redirect();
 }
 
@@ -102,7 +102,7 @@ if (isset($_GET['delete'])) {
 		QuickUpdate("delete from job where status='repeating' and userid=?", false, array($deleteid));
 	QuickQuery('COMMIT');
 
-	notice(_L("%s is now deleted", escapehtml($usr->login)));
+	notice(_L("%s is now deleted.", escapehtml($usr->login)));
 	redirect();
 }
 
@@ -118,7 +118,7 @@ if (isset($_GET['disable'])) {
 	$usr->enabled = 0;
 	$usr->update();
 
-	notice(_L("%s is now disabled", escapehtml($usr->login)));
+	notice(_L("%s is now disabled.", escapehtml($usr->login)));
 	redirect();
 }
 
@@ -137,7 +137,7 @@ if (isset($_GET['enable'])) {
 	$usr->enabled = 1;
 	$usr->update();
 
-	notice(_L("%s is now enabled", escapehtml($usr->login)));
+	notice(_L("%s is now enabled.", escapehtml($usr->login)));
 	redirect();
 }
 

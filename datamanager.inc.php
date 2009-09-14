@@ -69,7 +69,7 @@ if (isset($_GET['clear'])) {
 		QuickUpdate("delete from groupdata where fieldnum=".substr($fieldnum, 1));
 	}
 
-	notice(_L("Data for the field, %s, is now cleared", escapehtml(FieldMap::getName($fieldnum))));
+	notice(_L("Data for the field, %s, is now cleared.", escapehtml(FieldMap::getName($fieldnum))));
 	redirect();
 }
 
@@ -183,14 +183,14 @@ if (CheckFormSubmit($form, $section) || CheckFormSubmit($form, 'add')) {
 					if ($name !== null || $type !== null || $searchable !== null) {
 						$updatefield = DBFind("FieldMap", "from fieldmap where fieldnum = '$fieldnum'");
 						$updatefield->name = cleanedname($name);
-						
+
 						if ($fieldnum != FieldMap::getFirstNameField() &&
 							$fieldnum != FieldMap::getLastNameField() &&
 							$fieldnum != FieldMap::getLanguageField() &&
 							$fieldnum != FieldMap::getSchoolField() &&
 							$fieldnum != FieldMap::getGradeField() &&
 							$fieldnum != FieldMap::getStaffField() ) {
-						
+
 							// only update type for non-specialfield
 							if ($type !== null) $updatefield->updateFieldType($type);
 						}
@@ -198,7 +198,7 @@ if (CheckFormSubmit($form, $section) || CheckFormSubmit($form, 'add')) {
 							$fieldnum != FieldMap::getLastNameField() &&
 							$fieldnum != FieldMap::getLanguageField() &&
 							$fieldnum != FieldMap::getStaffField() ) {
-								
+
 							if ($searchable)
 								$updatefield->addOption('searchable');
 							else
@@ -321,7 +321,7 @@ switch ($DATATYPE) {
 case "person" :
 	$types = array("Text" => 'text',
 					"Date" => 'reldate',
-					"List" => 'multisearch', 
+					"List" => 'multisearch',
 					"Numeric" => 'numeric');
 
 		if(!FieldMap::getName(FieldMap::getFirstNameField()))

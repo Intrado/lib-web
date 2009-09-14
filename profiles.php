@@ -33,9 +33,9 @@ if (isset($_GET['delete'])) {
 			QuickUpdate("delete from access where id='$deleteid'");
 			QuickUpdate("delete from permission where accessid='$deleteid'");
 		Query("COMMIT");
-		notice(_L("The access profile, %s, is now deleted", escapehtml($access->name)));
+		notice(_L("The access profile, %s, is now deleted.", escapehtml($access->name)));
 	} else {
-		error("This access profile is being used by $count user account(s). Please reassign users to a different profile and try agian");
+		error("This access profile is being used by $count user account(s). Please reassign users to a different profile and try again");
 	}
 }
 
@@ -48,7 +48,7 @@ function fmt_actions ($obj,$name) {
 	return action_links(
 		action_link(_L("Edit"),"pencil","profile.php?id=$obj->id"),
 		action_link(_L("Delete"),"cross","?delete=$obj->id","return confirmDelete()")
-	);			
+	);
 }
 
 ////////////////////////////////////////////////////////////////////////////////

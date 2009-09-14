@@ -76,7 +76,7 @@ if (isset($_GET['delete'])) {
 		$import->destroy();
 	Query("COMMIT");
 
-	notice(_L("The import, %s, is now deleted", escapehtml($import->name)));
+	notice(_L("The import, %s, is now deleted.", escapehtml($import->name)));
 	redirect();
 }
 

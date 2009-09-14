@@ -32,7 +32,7 @@ if (isset($_GET['run'])) {
 	Query("BEGIN");
 		$import->runNow();
 	Query("COMMIT");
-	notice(_L("The import, %s, will now run", escapehtml($import->name)));
+	notice(_L("The import, %s, will now run.", escapehtml($import->name)));
 	redirectToReferrer();
 }
 

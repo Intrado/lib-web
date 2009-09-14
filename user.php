@@ -25,7 +25,7 @@ if (!$USER->authorize('manageaccount')) {
 
 $id = isset($_GET['id']) ? ($_GET['id']+0) : 0;
 $makeNewUser = !$id;
-	
+
 /*CSDELETEMARKER_START*/
 if (!$IS_COMMSUITE && !$makeNewUser)
 	if (QuickQuery("select count(*) from user where login = 'schoolmessenger' and id =?", false, array($id)))
@@ -49,9 +49,9 @@ $readonly = $edituser->importid != null;
 $ldapuser = $edituser->ldap;
 $profilename = QuickQuery("select name from access where id=?", false, array($edituser->accessid));
 
-$hasenrollment = QuickQuery("select count(id) from import where datatype = 'enrollment'")?true:false; 
+$hasenrollment = QuickQuery("select count(id) from import where datatype = 'enrollment'")?true:false;
 
-$hasstaffid = QuickQuery("select count(r.id) from userrule ur, rule r where ur.userid=? and ur.ruleid = r.id and r.fieldnum = 'c01'", false, array($edituser->id))?true:false; 
+$hasstaffid = QuickQuery("select count(r.id) from userrule ur, rule r where ur.userid=? and ur.ruleid = r.id and r.fieldnum = 'c01'", false, array($edituser->id))?true:false;
 
 if($IS_COMMSUITE) {
 	$accessprofiles = QuickQueryList("select id, name from access", true);
@@ -64,7 +64,7 @@ else
 if (!count($accessprofiles)) {
 	redirect("users.php?noprofiles");
 }
-		
+
 $userjobtypeids = QuickQueryList("select id from jobtype where id in (select jobtypeid from userjobtypes where userid=?) and not deleted and not issurvey order by systempriority, name asc", false, false, array($edituser->id));
 $jobtypes = QuickQueryList("select id, name from jobtype where not deleted and not issurvey order by systempriority, name asc", true);
 
@@ -430,11 +430,11 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		$datachange = true;
 	} else if (($errors = $form->validate()) === false) { //checks all of the items in this form
 		$postdata = $form->getData(); //gets assoc array of all values {name:value,...}
-		
+
 		if ($makeNewUser) {
 			$edituser->enabled = 1;
 		}
-		
+
 		Query("BEGIN");
 
 		if (!$readonly) {
@@ -444,36 +444,36 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 			$edituser->login = $postdata['login'];
 			$edituser->ldap = isset($postdata['ldap'])?$postdata['ldap']:false;
 			$edituser->accesscode = $postdata['accesscode'];
-			
+
 			$edituser->email = $postdata['email'];
 			$edituser->aremail = $postdata['aremail'];
-			
+
 			$userphone = Phone::parse($postdata['phone']);
 			$edituser->phone = $userphone;
-			
+
 			if (strlen($userphone) == 0 )
 				$userphone = false;
-			
+
 			if($IS_LDAP){
 				if(isset($postdata['ldap']) && $postdata['ldap'])
 					$edituser->ldap=1;
 				else
 					$edituser->ldap=0;
 			}
-			
+
 			$edituser->accessid = $postdata['accessid'];
-			
+
 			if ($makeNewUser) // create or update the user
 				$edituser->create();
 			else
-				$edituser->update(); 
-			
+				$edituser->update();
+
 			if (isset($postdata['callerid']))
 				$edituser->setSetting("callerid",$postdata['callerid']);
 
 			if (!$edituser->getSetting("maxjobdays", false))
 				$edituser->setSetting("maxjobdays", 1);
-			
+
 			// Remove all existing user rules
 			$rules = $edituser->rules();
 			if (count($rules)) {
@@ -504,7 +504,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 				// remove current staff id from user
 				$edituser->staffpkey = "";
 			}
-			
+
 			if (!$hasstaffid && isset($postdata['staffpkey']) && strlen($postdata['staffpkey'])) {
 				// remove existing c01 rule if exists
 				if ($existingstaffidrule) {
@@ -519,19 +519,19 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 				$rule->op = "in";
 				$rule->val =$postdata['staffpkey'];
 				$rule->create();
-				
+
 				Query("insert into userrule values (?, ?)", false, array($edituser->id, $rule->id));
-				
+
 				// set current staffid
 				$edituser->staffpkey = $postdata['staffpkey'];
-				
+
 				// remove any c fields from data rules
 				if (count($datarules))
 					foreach ($datarules as $index => $datarule)
 						if (substr($datarule->fieldnum, 0, 1) == "c")
 							unset($datarules[$index]);
 			}
-			
+
 			if (count($datarules)) {
 				foreach ($datarules as $datarule) {
 					$rule = new Rule();
@@ -541,16 +541,16 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 					$rule->op = $datarule->op;
 					$rule->val = is_array($datarule->val)?implode("|", $datarule->val):$datarule->val;
 					$rule->create();
-					
+
 					Query("insert into userrule values (?, ?)", false, array($edituser->id, $rule->id));
 				}
 			}
-			
+
 			// update again for staffid
 			$edituser->update();
-			
+
 			QuickUpdate("delete from userjobtypes where userid =?", false, array($edituser->id));
-			
+
 			if(count($postdata['jobtypes']))
 				foreach($postdata['jobtypes'] as $type)
 					QuickUpdate("insert into userjobtypes values (?, ?)", false, array($edituser->id, $type));
@@ -568,22 +568,22 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		// If the pincode is all 0 characters then it was a default form value, so ignore it
 		if (!ereg("^0*$", $postdata['pin']))
 			$edituser->setPincode($postdata['pin']);
-		
+
 		Query("COMMIT");
-		
+
 		if ($button == 'inpagesubmit') {
 			if ($hasstaffid)
-				notice(_L("Staff ID is now removed from Data View"));
+				notice(_L("Staff ID is now removed from Data View."));
 			else
-				notice(_L("Staff ID is now added to Data View"));
-			
+				notice(_L("Staff ID is now added to Data View."));
+
 			if ($ajax)
 				$form->sendTo("user.php?id=".$edituser->id);
 			else
 				redirect("user.php?id=".$edituser->id);
 		} else {
 			// TODO, Release 7.2: notice(_L("Changes to %s's account is now saved", $edituser->login));
-			
+
 			if ($ajax)
 				$form->sendTo("users.php");
 			else

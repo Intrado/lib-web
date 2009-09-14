@@ -47,11 +47,11 @@ if (isset($_GET['cancel'])) {
 			}
 			$job->update();
 		Query("COMMIT");
-		notice(_L("The job, %s, is now cancelled", escapehtml($job->name)));
+		notice(_L("The job, %s, is now cancelled.", escapehtml($job->name)));
 	} else {
-		notice(_L("You do not have permission to cancel this job"));
+		notice(_L("You do not have permission to cancel this job."));
 	}
-	
+
 	redirectToReferrer();
 }
 
@@ -64,7 +64,7 @@ if (isset($_GET['delete'])) {
 				$job->deleted = 1;
 				$job->update();
 			Query('COMMIT');
-			notice(_L("The job, %s, is now deleted", escapehtml($job->name)));
+			notice(_L("The job, %s, is now deleted.", escapehtml($job->name)));
 		} else if ($job->status == "repeating") {
 			Query('BEGIN');
 				if ($job->scheduleid) {
@@ -78,14 +78,14 @@ if (isset($_GET['delete'])) {
 				QuickUpdate("delete from joblanguage where jobid='$deleteid'");
 				$job->destroy();
 			Query('COMMIT');
-			notice(_L("The job, %s, is now deleted", escapehtml($job->name)));
+			notice(_L("The job, %s, is now deleted.", escapehtml($job->name)));
 		} else {
-			notice(_L("The job, %s, is not yet complete, please cancel it first", escapehtml($job->name)));
+			notice(_L("The job, %s, is still running. Please cancel it first.", escapehtml($job->name)));
 		}
 	} else {
-		notice(_L("You do not have permission to delete this job"));
+		notice(_L("You do not have permission to delete this job."));
 	}
-	
+
 	redirectToReferrer();
 }
 
@@ -99,14 +99,14 @@ if (isset($_GET['archive'])) {
 				$job->modifydate = date("Y-m-d H:i:s", time());
 				$job->update();
 			Query('COMMIT');
-			notice(_L("The job, %s, is now archived", escapehtml($job->name)));
+			notice(_L("The job, %s, is now archived.", escapehtml($job->name)));
 		} else {
-			notice(_L("The job, %s, is not yet complete, please cancel it first", escapehtml($job->name)));
+			notice(_L("The job, %s, is still running. Please cancel it first.", escapehtml($job->name)));
 		}
 	} else {
-		notice(_L("You do not have permission to archive this job"));
+		notice(_L("You do not have permission to archive this job."));
 	}
-	
+
 	redirectToReferrer();
 }
 
@@ -120,13 +120,13 @@ if (isset($_GET['unarchive'])) {
 				$job->modifydate = date("Y-m-d H:i:s", time());
 				$job->update();
 			Query('COMMIT');
-			
-			notice(_L("The job, %s, is now unarchived", escapehtml($job->name)));
+
+			notice(_L("The job, %s, is now unarchived.", escapehtml($job->name)));
 		}
 	} else {
-		notice(_L("You do not have permission to unarchive this job"));
+		notice(_L("You do not have permission to unarchive this job."));
 	}
-	
+
 	redirectToReferrer();
 }
 
@@ -137,12 +137,12 @@ if (isset($_GET['runrepeating'])) {
 		Query('BEGIN');
 			$job->runNow();
 		Query('COMMIT');
-		
-		notice(_L("The repeating job, %s, will now run", escapehtml($job->name)));
+
+		notice(_L("The repeating job, %s, will now run.", escapehtml($job->name)));
 	} else {
-		notice(_L("You do not have permission to run this repeating job"));
+		notice(_L("You do not have permission to run this repeating job."));
 	}
-	
+
 	redirectToReferrer();
 }
 
@@ -153,13 +153,13 @@ if (isset($_GET['copy'])) {
 		Query('BEGIN');
 			$newjob = $job->copyNew();
 		Query('COMMIT');
-		
-		notice(_L("A copy of the job, %s, is made", escapehtml($job->name)));
+
+		notice(_L("A copy of the job, %s, is made.", escapehtml($job->name)));
 		redirect('job.php?id='.$newjob->id);
 	} else {
-		notice(_L("You do not have permission to copy this job"));
+		notice(_L("You do not have permission to copy this job."));
 	}
-	
+
 	redirectToReferrer();
 }
 
