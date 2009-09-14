@@ -108,7 +108,7 @@ switch ($job->status) {
 			if ($diffhours > 0)
 				$notice .= "$diffhours hours ";
 			if ($diffminutes > 0)
-				$notice .= "$diffminutes minutes ";
+				$notice .= "$diffminutes " . ($diffminutes == 1 ? 'minute' : 'minutes');
 		} else {
 			$notice = _L("This job will run shortly");
 		}
@@ -130,7 +130,7 @@ switch ($job->status) {
 		$notice = _L("This job finished on %s", fmt_job_enddate($job, null));
 		break;
 	default:
-		$notice = _L('RROR: Unknown job status');
+		$notice = _L('ERROR: Unknown job status');
 		break;
 }
 
