@@ -24,17 +24,9 @@ $TITLE = "Blocked Lists";
 require_once("nav.inc.php");
 startWindow("Blocked Destination Types");
 	?>
-	<div style="padding-top: 8px">
-	<table border="1" width="100%" cellpadding="3" cellspacing="1" class="list">
-		<tr class="listHeader">
-			<th align="left" class="nosort">Phone Numbers</th>
-			<th align="left" class="nosort">Emails</th>
-		</tr>
-		<tr>
-			<td><a href="blockedphone.php">Phone Calls / Text Messages</a></td>
-			<td><a href="blockedemail.php">Email Addresses</a></td>
-		</tr>
-	</table>
+	<div style="padding: 8px">
+		<a href="blockedphone.php">Phone Calls / Text Messages</a><br>
+		<a href="blockedemail.php">Email Addresses</a>
 	</div>
 	<?
 endWindow();

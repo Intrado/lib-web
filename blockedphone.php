@@ -115,7 +115,7 @@ function fmt_bntype ($row, $index) {
 	if ($row[$index] == "sms")
 		return "Text Messages";
 	else
-		return "Phone";
+		return "Phone Calls";
 }
 
 ////////////////////////////////////////////////////////////////////////////////

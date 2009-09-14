@@ -100,7 +100,7 @@ function fmt_blocking_actions($row, $index) {
 function fmt_blockedby($row, $index) {
 	if ($row[$index])
 		return $row[$index];
-	return "System";
+	return "Recipient";
 }
 
 ////////////////////////////////////////////////////////////////////////////////
