@@ -117,7 +117,7 @@ switch ($job->status) {
 		$notice = _L("Please wait while this job is processed: ") . $job->percentprocessed . "%";
 		break;
 	case 'procactive':
-		$notice = _L("Please wait while this job is processed, some contacts are running: ") . $job->percentprocessed . "%";
+		$notice = _L("Some data is available. This job is %s%%  processed.", $job->percentprocessed);
 		break;
 	case 'active':
 		$notice = _L("This job is active");
