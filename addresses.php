@@ -28,9 +28,13 @@ if (isset($_GET['delete'])) {
 	$id = DBSafe($_GET['delete']);
 	if (userOwns("person",$id)) {
 		$person = new Person($id);
-		$person->deleted = 1;
-		$person->update();
-		QuickUpdate("delete from listentry where personid='$id'");
+
+		Query("BEGIN");
+			$person->deleted = 1;
+			$person->update();
+			QuickUpdate("delete from listentry where personid='$id'");
+		Query("COMMIT");
+		notice(_L("%s is now deleted from your address book.", escapehtml(Person::getFullName($person))));
 	}
 	redirect();
 }
