@@ -29,15 +29,13 @@ if (isset($_GET['noprofiles']))
 ////////////////////////////////////////////////////////////////////////////////
 if (isset($_GET['download'])) {
 	$userdetails = Query("select u.login, u.accesscode, u.firstname, u.lastname, u.description, u.phone, us.value callerid, u.email, u.aremail, u.enabled, u.lastlogin, u.staffpkey, a.name, a.description profiledescription,
-		(select group_concat(jt.name separator ', ') from jobtype jt, userjobtypes ujt where ujt.jobtypeid = jt.id and ujt.userid = u.id ) as jobtype,
+		(select group_concat(jt.name separator ', ') from jobtype jt, userjobtypes ujt where ujt.jobtypeid = jt.id and ujt.userid = u.id and not jt.deleted) as jobtype,
 		r.fieldnum, r.op, r.val
 		from user u
 			left join userrule ur on (ur.userid = u.id)
 			left join rule r on (r.id = ur.ruleid)
 			left join access a on (a.id = u.accessid)
 			left join usersetting us on (us.userid = u.id and us.name = 'callerid')
-			left join userjobtypes ujt on (ujt.userid = u.id)
-			left join jobtype jt on (jt.id = ujt.jobtypeid and not jt.deleted)
 		where not u.deleted and u.login != 'schoolmessenger'");
 
 	// set header
@@ -314,7 +312,7 @@ $DESCRIPTION = "Active Users: $usercount";
 if($maxusers != "unlimited")
 	$DESCRIPTION .= ", Maximum Allowed: $maxusers";
 /*CSDELETEMARKER_END*/
-$DESCRIPTION .= ',&nbsp;&nbsp;<a href="users.php?download">download csv</a>';
+$DESCRIPTION .= ',&nbsp;&nbsp;<a href="users.php?download">'._L("user details csv").'</a>';
 
 include_once("nav.inc.php");
 
