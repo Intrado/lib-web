@@ -82,34 +82,31 @@ class IntroSelect extends FormItem {
 }
 
 class ValIntroSelect extends Validator {
+	var $onlyserverside = true;
 	function validate ($value, $args) {
 		if(!is_array($value)) {
 			$value = json_decode($value,true);
-		}
+		}		
+		
 		$errortext = "";
-		if (!isset($value["message"]) || $value["message"] == "")	
-			$errortext .= " is required ";
-		else if ( 1 != QuickQuery('select count(*) from message where id=? and type=\'phone\'', false, array($value["message"]))) {
-			$errortext .= " message can not be found";
-		}
+		if (isset($value["message"]) && $value["message"] != "") {
+			if ( 1 != QuickQuery('select count(*) from message where id=? and type=\'phone\'', false, array($value["message"]))) {
+				$errortext .= "Message can not be found";
+			} else {
+				$audiodata = QuickQueryRow("select group_concat(mp.txt SEPARATOR ' ') as text, sum(length(c.data)) as audiobytes 
+					from message m left join messagepart mp on (mp.messageid=m.id) left join audiofile af on (af.id=mp.audiofileid) left join content c on (c.id=af.contentid) 
+					where m.id=? group by m.id",true,false, array($value["message"]));
+		
+				$ttswords = isset($audiodata["text"])?str_word_count($audiodata["text"]):0;					
+				if($audiodata["audiobytes"] < 100000 && $ttswords < 10 && ($audiodata["audiobytes"] < 50000 && $ttswords < 5)) { // Aproximately 5 seconds of audio
+					$errortext .= "Message is to short to be a intro message.";
+				} 
+			}		
+		}				
 		if ($errortext)
-			return $this->label . $errortext;
+			return $errortext;
 		else
 			return true;
-	}
-	
-	function getJSValidator () {
-		return 
-			'function (name, label, value, args) {			
-				vals = value.evalJSON();
-				var errortext = "";
-				if (vals.message == "")
-					errortext += " please pick a message";
-				if (errortext)
-					return errortext;
-					
-				return true;
-			}';
 	}
 }
 
@@ -159,7 +156,7 @@ $formdata = array(
 		"label" => _L("General"),
 		"fieldhelp" => _L('This is the introduction which plays before non-emergency messages. See the Guide for content suggestions.'),
 		"value" => array("message" => ($defaultintro === false?"":$defaultintro->id)),
-		"validators" => array(),
+		"validators" => array(array("ValIntroSelect")),
 		"control" => array("IntroSelect",
 			 "values"=>$defaultmessages
 		),
@@ -169,7 +166,7 @@ $formdata = array(
 		"label" => _L("Emergency"),
 		"fieldhelp" => _L('This is the introduction which plays before an emergency message. See the Guide for content suggestions.'),
 		"value" => array("message" => ($emergencyintro === false?"":$emergencyintro->id)),
-		"validators" => array(),
+		"validators" => array(array("ValIntroSelect")),
 		"control" => array("IntroSelect",
 			 "values"=>$emergencymessages
 		),
@@ -195,7 +192,7 @@ foreach($languages as $language) {
 		"label" => _L("General"),
 		"fieldhelp" => _L('This is the introduction which plays before non-emergency messages. See the Guide for content suggestions.'),
 		"value" => array("message" => $messageid),
-		"validators" => array(),
+		"validators" => array(array("ValIntroSelect")),
 		"control" => array("IntroSelect",
 			 "values"=>$defaultmessages
 		),
@@ -213,7 +210,7 @@ foreach($languages as $language) {
 		"label" => _L("Emergency"),
 		"fieldhelp" => _L('This is the introduction which plays before an emergency message. See the Guide for content suggestions.'),
 		"value" => array("message" => $messageid),
-		"validators" => array(),
+		"validators" => array(array("ValIntroSelect")),
 		"control" => array("IntroSelect",
 			 "values"=>$emergencymessages
 		),
@@ -254,6 +251,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		if(isset($messagevalues->message) && strlen($messagevalues->message) > 0) {
 			$msgid = $messagevalues->message + 0;
 			$newmsg = new Message($msgid);
+			
 			if(!$newmsg->deleted) {		// if deleted the old value is still the intro
 				$newmsg->id = null;
 				$newmsg->deleted = 1;
@@ -262,6 +260,9 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 				// copy the parts
 				$parts = DBFindMany("MessagePart", "from messagepart where messageid=$msgid");
 				foreach ($parts as $part) {
+					
+					
+					
 					$newpart = new MessagePart($part->id);
 					$newpart->id = null;
 					$newpart->messageid = $newmsg->id;
