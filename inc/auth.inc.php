@@ -351,6 +351,17 @@ function loginMessageLink($code) {
 	return false;
 }
 
+function emailUnsubscribe($urlcomponent, $email) {
+	$params = array(new XML_RPC_Value($urlcomponent, 'string'), new XML_RPC_Value($email, 'string'));
+	$method = "AuthServer.emailUnsubscribe";
+	$result = pearxmlrpc($method, $params);
+	if ($result !== false) {
+		// success
+		return true;
+	}
+	return false;
+}
+
 function readonlyDBConnect() {
 	$sessionid = session_id();
 	// if no session, return false
