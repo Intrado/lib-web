@@ -294,4 +294,9 @@ ALTER TABLE `smsblock` ADD `timezone` VARCHAR( 50 ) CHARACTER SET utf8 COLLATE u
 
 ALTER TABLE `smsblock` ADD `customerid` INT NOT NULL DEFAULT '0' FIRST ;
 
+CREATE TABLE `aspshard`.`replicationcheck` (
+`currenttime` DATETIME NOT NULL
+) ENGINE = InnoDB ;
+
+INSERT into `aspshard`.`replicationcheck` (`currenttime`) values (now()) ;
 
