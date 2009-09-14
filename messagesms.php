@@ -82,7 +82,7 @@ $formdata = array(
 	),
 	"autoexpire" => array(
 		"label" => _L('Auto Expire'),
-		"fieldhelp" => _L('Automatically erase this message if it is not associated with any job.'),
+		"fieldhelp" => _L('Automatically delete this message after %1$s months.', getSystemSetting('softdeletemonths', "6")),
 		"value" => $permanent,
 		"validators" => array(),
 		"control" => array("RadioButton", "values" => array(0 => "Yes (Keep for ". getSystemSetting('softdeletemonths', "6") ." months)",1 => "No (Keep forever)")),
