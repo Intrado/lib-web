@@ -75,7 +75,7 @@ CREATE TABLE IF NOT EXISTS `blockeddestination` (
   `createdate` datetime default NULL,
   PRIMARY KEY  (`id`),
   KEY `userid` (`userid`,`type`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1
+) ENGINE=InnoDB DEFAULT CHARSET=utf8
 $$$
 
 insert into blockeddestination (userid, description, pattern, type) (select userid, description, pattern, 'phone' from blockednumber where type in ('call', 'both'))
