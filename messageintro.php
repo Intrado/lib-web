@@ -257,7 +257,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 			if(!$newmsg->deleted) {		// if deleted the old value is still the intro
 				$newmsg->id = null;
 				$newmsg->deleted = 1;
-				$newmsg->name = $newmsg->name . " (Default General Intro Copy)";	
+				$newmsg->name = $newmsg->name . " (Copy)";	
 				$newmsg->create();
 				// copy the parts
 				$parts = DBFindMany("MessagePart", "from messagepart where messageid=$msgid");
@@ -281,7 +281,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 			if(!$newmsg->deleted) {// if deleted the old value is still the intro
 				$newmsg->id = null;
 				$newmsg->deleted = 1;
-				$newmsg->name = $newmsg->name . " (Default Emergency Intro Copy)";	
+				$newmsg->name = $newmsg->name . " (Copy)";	
 				$newmsg->create();
 				// copy the parts
 				$parts = DBFindMany("MessagePart", "from messagepart where messageid=$msgid");
@@ -308,7 +308,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 					if(!$newmsg->deleted) {
 						$newmsg->id = null;
 						$newmsg->deleted = 1;
-						$newmsg->name = $newmsg->name . " ($language General Intro Copy)";							
+						$newmsg->name = $newmsg->name . " (Copy)";							
 						$newmsg->create();
 						// copy the parts
 						$parts = DBFindMany("MessagePart", "from messagepart where messageid=$msgid");
@@ -334,7 +334,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 					if(!$newmsg->deleted) {
 						$newmsg->id = null;
 						$newmsg->deleted = 1;
-						$newmsg->name = $newmsg->name . " ($language Emergency Intro Copy)";													
+						$newmsg->name = $newmsg->name . " (Copy)";													
 						$newmsg->create();
 						// copy the parts
 						$parts = DBFindMany("MessagePart", "from messagepart where messageid=$msgid");
