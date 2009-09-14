@@ -78,12 +78,13 @@ $NAVTREE = array (
 		array("Call Distribution","reportsystemdistribution.php","viewcalldistribution",$SUBTAB=="distribution")
 		)),
 	array("System",NULL,array('viewsystemactive', 'viewsystemcompleted',
-						'viewsystemrepeating','viewcontacts','blocknumbers'),$MAINTAB=="system",array(
+						'viewsystemrepeating','viewcontacts','blocknumbers','blockedemail'),$MAINTAB=="system",array(
 		array("Active Jobs","activejobs.php","viewsystemactive",$SUBTAB=="activejobs"),
 		array("Completed Jobs","completedjobs.php","viewsystemcompleted",$SUBTAB=="completedjobs"),
 		array("Repeating Jobs","repeatingjobs.php","viewsystemrepeating",$SUBTAB=="repeatingjobs"),
 		array("Contacts","contacts.php?clear=1","viewcontacts",$SUBTAB=="contacts"),
-		array("Blocked Numbers","blocked.php","blocknumbers",$SUBTAB=="blockednumbers")
+		array("Blocked Phone","blocked.php","blocknumbers",$SUBTAB=="blockednumbers"),
+		array("Blocked Email","blockedemail.php","blocknumbers",$SUBTAB=="blockedemail")
 		)),
 	array("Admin",NULL,array('manageaccount', 'manageprofile', 'managesystem',
 							'metadata', 'managetasks'),$MAINTAB=="admin",array(
@@ -210,7 +211,7 @@ header('Content-type: text/html; charset=UTF-8') ;
 	<link href="css/datepicker.css.php" type="text/css" rel="stylesheet">
 	<link href="css/prototip.css.php" type="text/css" rel="stylesheet">
 	<link href="css/style_print.css" type="text/css" rel="stylesheet" media="print">
-	
+
 <!--[if lte IE 6]>
     <link href="css/ie6.css" type="text/css" rel="stylesheet"/>
 <![endif]-->
@@ -253,8 +254,8 @@ if($USER->authorize('managemyaccount')){
 							<a href="index.php?logout=1">Logout</a>
 						</div>
 					</td>
-					<td><img src="img/accountlinksbg_right.gif"></td>				
-				</tr>		
+					<td><img src="img/accountlinksbg_right.gif"></td>
+				</tr>
 			</table>
 		</td>
 	</tr>

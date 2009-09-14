@@ -45,12 +45,12 @@ if (isset($_GET['id'])) {
 class RestrictedFields extends FormItem {
 	function render ($value) {
 		$n = $this->form->name."_".$this->name;
-		
+
 		$restrictchecked = count($value) > 0 ? "checked" : "";
 		$str = '<input type="checkbox" id="'.$n.'-restrict" '.$restrictchecked .'>Restrict to these fields:';
-		
+
 		$str .= '<div id='.$n.' class="radiobox" style="margin-left: 1em;">';
-		
+
 		$hoverdata = array();
 		$counter = 1;
 		foreach ($this->args['values'] as $checkvalue => $checkname) {
@@ -69,7 +69,7 @@ class RestrictedFields extends FormItem {
 		if (isset($this->args['hover']))
 			$str .= '<script type="text/javascript">form_do_hover(' . json_encode($hoverdata) .');</script>
 			';
-		
+
 		$str .= '<script type="text/javascript">
 		//if we uncheck the restrict box, uncheck each field
 		var restrictcheckbox = $("'.$n.'-restrict");
@@ -81,7 +81,7 @@ class RestrictedFields extends FormItem {
 				});
 			}
 		});
-		
+
 		datafieldcheckboxes.each(function(checkbox) {
 			checkbox.observe("click",function(e) {
 				if (e.element().checked)
@@ -89,7 +89,7 @@ class RestrictedFields extends FormItem {
 			});
 		});
 		</script>';
-		
+
 		return $str;
 	}
 }
@@ -98,11 +98,11 @@ class RestrictedFields extends FormItem {
 
 class ValJobWindowTime extends Validator {
 	var $onlyserverside = true;
-	
+
 	function validate ($value, $args, $requiredvalues) {
 		$value = strtotime($value);
 		$value2 = strtotime($requiredvalues[$args['field']]);
-		
+
 		//only check if both times parse
 		if ($value != -1 && $value !== false && $value2 != -1 && $value2 !== false) {
 			if ($args['op'] == "later" && $value <= $value2)
@@ -110,20 +110,20 @@ class ValJobWindowTime extends Validator {
 			if ($args['op'] == "earlier" && $value >= $value2)
 				return _L('%1$s must be earlier than %2$s',$this->label, $args['fieldlabel']);
 		}
-		
+
 		return true;
 	}
 }
 
 class ValDupeProfileName extends Validator {
 	var $onlyserverside = true;
-	
+
 	function validate ($value, $args) {
 		$query = "select count(*) from access where name = ? and id != ?";
 		$res = QuickQuery($query,false,array($value,$args['accessid']+0));
 		if ($res)
 			return _L('An access profile with that name already exists. Please choose another');
-		
+
 		return true;
 	}
 }
@@ -143,9 +143,9 @@ $datafields = $obj->getValue('datafields') ? explode('|',$obj->getValue('datafie
 
 $blockednumberoptions = array (
 	"none" => _L("No Access"),
-	"viewonly" => _L("View Numbers Only"),
-	"addonly" => _L("Add/Delete Own Numbers"),
-	"editall" => _L("Add/Delete All Numbers")
+	"viewonly" => _L("View Phone/Email(s) Only"),
+	"addonly" => _L("Add/Delete Own Phone/Email(s)"),
+	"editall" => _L("Add/Delete All Phone/Email(s)")
 );
 
 $formdata = array(
@@ -201,7 +201,7 @@ _L('Login Options'),
 		"control" => array("CheckBox"),
 		"helpstep" => 2
 	),
-	
+
 _L('Start Page & Nav Options'),
 	"startstats" => array(
 		"label" => _L('View Job Statistics'),
@@ -218,7 +218,7 @@ _L('Start Page & Nav Options'),
 		"validators" => array(),
 		"control" => array("CheckBox"),
 		"helpstep" => 3
-	),	
+	),
 	"starteasy" => array(
 		"label" => _L('Outbound Recording'),
 		"fieldhelp" => _L('Allows users to call any phone number and record audio messages.'),
@@ -311,7 +311,7 @@ _L('Messaging Options'),
 		"control" => array("CheckBox"),
 		"helpstep" => 4
 	),
-	
+
 _L('Advanced Job Options'),
 	"createrepeat" => array(
 		"label" => _L('Create Repeating Jobs'),
@@ -351,7 +351,7 @@ _L('Advanced Job Options'),
 	//repeating
 	//survey
 	//callerid
-	//days to run	
+	//days to run
 
 _L('List Options'),
 	"createlist" => array(
@@ -378,7 +378,7 @@ _L('List Options'),
 		"control" => array("CheckBox"),
 		"helpstep" => 6
 	),
-	
+
 _L('Contact & Field Options'),
 	"datafields" => array(
 		"label" => _L('Field Restriction'),
@@ -397,7 +397,7 @@ _L('Contact & Field Options'),
 		"validators" => array(),
 		"control" => array("CheckBox"),
 		"helpstep" => 7
-	),	
+	),
 	"managecontactdetailsettings" => array(
 		"label" => _L('Edit Contact Details'),
 		"fieldhelp" => _L('Allows users to modify contact details such as phone numbers, email addresses, and contact preferences.'),
@@ -422,8 +422,8 @@ _L('Contact & Field Options'),
 		"control" => array("CheckBox"),
 		"helpstep" => 7
 	),
-	
-	
+
+
 _L('Report Options'),
 	"createreport" => array(
 		"label" => _L('Create Reports'),
@@ -484,8 +484,8 @@ _L('Systemwide View Options'),
 		"helpstep" => 9
 	),
 	"callblockingperms" => array(
-		"label" => _L('Blocked Numbers Access'),
-		"fieldhelp" => _L('Controls access to the systemwide blocked numbers list.'),
+		"label" => _L('Blocked Destination Access'),
+		"fieldhelp" => _L('Controls access to the systemwide blocked phone/email list.'),
 		"value" => $obj->id ? ($obj->getValue("blocknumbers") ? $obj->getValue("callblockingperms") : "none") : "viewonly",
 		"validators" => array(
 			array("ValInArray","values" => array_keys($blockednumberoptions))
@@ -599,13 +599,13 @@ $datachange = false;
 $errors = false;
 //check for form submission
 if ($button = $form->getSubmit()) { //checks for submit and merges in post data
-    $ajax = $form->isAjaxSubmit(); //whether or not this requires an ajax response    
-    
+    $ajax = $form->isAjaxSubmit(); //whether or not this requires an ajax response
+
     if ($form->checkForDataChange()) {
         $datachange = true;
     } else if (($errors = $form->validate()) === false) { //checks all of the items in this form
         $postdata = $form->getData(); //gets assoc array of all values {name:value,...}
-		
+
 		$obj = new Access($_SESSION['editaccessid']);
 
 		Query("BEGIN");
@@ -613,12 +613,12 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 			$obj->modified = date("Y-m-d g:i:s");
 			if(!$obj->id)
 				$obj->created = date("Y-m-d g:i:s");
-			
+
 			$obj->name = $postdata['name'];
 			$obj->description = $postdata['description'];
 			$obj->update();
-			
-			
+
+
 			$allowedfields = $postdata['datafields'];
 			$allowedfields = (isset($allowedfields) ? implode('|',$allowedfields) : "");
 
@@ -660,7 +660,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 			$obj->setPermission("viewsystemcompleted", (bool)$postdata['viewsystemcompleted']);
 			$obj->setPermission("leavemessage", (bool)$postdata['leavemessage']);
 			$obj->setPermission("messageconfirmation", (bool)$postdata['messageconfirmation']);
-			
+
 			if(getSystemSetting("_hasportal", false)) {
 				$obj->setPermission("portalaccess", (bool)$postdata['portalaccess']);
 				$obj->setPermission("generatebulktokens", (bool)$postdata['generatebulktokens']);
@@ -676,8 +676,8 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		Query("COMMIT");
 
 		$_SESSION['editaccessid'] = $obj->id;
-				
-        //save data here    
+
+        //save data here
         if ($ajax)
             $form->sendTo("profiles.php");
         else
@@ -722,17 +722,17 @@ endWindow();
 ?>
 <script>
 function checkAllCheckboxes(domanagement){
-	
+
 	var managementoptions = "manageaccount,manageprofile,managesystem,managesystemjobs,managetasks,metadata".split(",");
-	
+
 	var form = document.forms[0].elements;
 	for(var i = 0; i < form.length; i++){
 		if(form[i].type == "checkbox"){
-			
+
 			//skip datafields
 			if (form[i].name.indexOf("datafields") != -1)
 				continue;
-			
+
 			//see if it's a management checkbox
 			if (managementoptions.some(function(v) {return form[i].name.indexOf(v) != -1})) {
 				if (domanagement)

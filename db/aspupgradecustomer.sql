@@ -1,7 +1,7 @@
 -- Upgrade from release 7.0 to 7.1
 
 -- Set a permanent flag for messages and audiofiles that should never be deleted
-ALTER TABLE `message` ADD `permanent` TINYINT( 4 ) NOT NULL DEFAULT '0' AFTER `deleted` 
+ALTER TABLE `message` ADD `permanent` TINYINT( 4 ) NOT NULL DEFAULT '0' AFTER `deleted`
 $$$
 ALTER TABLE `audiofile` ADD `permanent` TINYINT( 4 ) NOT NULL DEFAULT '0' AFTER `deleted`
 $$$
@@ -36,7 +36,7 @@ $$$
 -- remove the index on audiofileid
 ALTER TABLE `messagepart` DROP INDEX `audiofileid`
 $$$
- 
+
 -- create table for archived report name to content id mappings
  CREATE TABLE `reportarchive` (
 `name` VARCHAR( 50 ) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL ,
@@ -65,3 +65,24 @@ $$$
  ALTER TABLE `surveyquestion` ADD INDEX ( `questionnaireid` )
  $$$
 
+-- add a table for blocked phone, email, sms
+ CREATE TABLE blockeddestination` (
+`id` INT( 11 ) NOT NULL AUTO_INCREMENT PRIMARY KEY ,
+`userid` INT( 11 ) NOT NULL ,
+`description` VARCHAR( 255 ) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL ,
+`pattern` VARCHAR( 255 ) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL ,
+`type` ENUM( 'call', 'sms', 'email' ) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL ,
+`createdate` DATETIME NOT NULL DEFAULT '0000-00-00 00:00:00',
+INDEX ( `userid` , `type` )
+) ENGINE = InnoDB CHARACTER SET utf8 COLLATE utf8_general_ci
+$$$
+
+insert into blockeddestination (userid, description, pattern, type) (select userid, description, pattern, 'call' from blockednumber where type in ('call', 'both'))
+$$$
+
+insert into blockeddestination (userid, description, pattern, type) (select userid, description, pattern, 'sms' from blockednumber where type in ('sms', 'both'))
+$$$
+
+-- drop old blocked number table
+DROP TABLE `blockednumber`
+$$$

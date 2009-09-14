@@ -1345,7 +1345,7 @@ $$$
 -- Post 6.2 below here.
 
 -- Add aditional import field types
-ALTER TABLE `importfield` CHANGE `action` `action` ENUM( 'copy', 'staticvalue', 'number', 'currency', 'date', 'lookup', 'curdate', 
+ALTER TABLE `importfield` CHANGE `action` `action` ENUM( 'copy', 'staticvalue', 'number', 'currency', 'date', 'lookup', 'curdate',
 	'numeric', 'currencyleadingzero' ) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT 'copy'
 $$$
 
@@ -1390,7 +1390,7 @@ CREATE TABLE IF NOT EXISTS `prompt` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8
 $$$
 
-ALTER TABLE `subscriber` ADD UNIQUE `username` ( `username` ) 
+ALTER TABLE `subscriber` ADD UNIQUE `username` ( `username` )
 $$$
 
 ALTER TABLE `subscriber` ADD `lastreminder` DATETIME NULL DEFAULT NULL AFTER `lastlogin`
@@ -1401,44 +1401,44 @@ $$$
 ALTER TABLE `permission` ADD INDEX ( `accessid` )
 $$$
 
-ALTER TABLE `surveyquestionnaire` ADD INDEX ( `userid` ) 
+ALTER TABLE `surveyquestionnaire` ADD INDEX ( `userid` )
 $$$
 
-ALTER TABLE `job` ADD INDEX `useraccess` ( `userid` , `status` , `deleted` ) 
+ALTER TABLE `job` ADD INDEX `useraccess` ( `userid` , `status` , `deleted` )
 $$$
 
-ALTER TABLE `systemstats` ADD INDEX `graphs` ( `date` , `attempt` ) 
+ALTER TABLE `systemstats` ADD INDEX `graphs` ( `date` , `attempt` )
 $$$
 
-ALTER TABLE `person` DROP INDEX `pkeysortb` 
+ALTER TABLE `person` DROP INDEX `pkeysortb`
 $$$
 
 ALTER TABLE `person` DROP INDEX `pkeysort` ,
-ADD INDEX `pkeysort` ( `pkey` , `type` , `deleted` ) 
+ADD INDEX `pkeysort` ( `pkey` , `type` , `deleted` )
 $$$
 
-ALTER TABLE `blockednumber` ADD INDEX ( `userid` ) 
+ALTER TABLE `blockednumber` ADD INDEX ( `userid` )
 $$$
 
-ALTER TABLE `person` DROP INDEX `namesort` 
+ALTER TABLE `person` DROP INDEX `namesort`
 $$$
 
-ALTER TABLE `person` DROP INDEX `getbykey` 
+ALTER TABLE `person` DROP INDEX `getbykey`
 $$$
 
-ALTER TABLE `person` DROP INDEX `general` 
+ALTER TABLE `person` DROP INDEX `general`
 $$$
 
-ALTER TABLE `person` ADD INDEX ( `f01` ) 
+ALTER TABLE `person` ADD INDEX ( `f01` )
 $$$
 
-ALTER TABLE `person` ADD INDEX ( `f02` ) 
+ALTER TABLE `person` ADD INDEX ( `f02` )
 $$$
 
 ALTER TABLE `listentry` ADD INDEX `listrule` ( `listid` , `type` , `personid` )
 $$$
 
-ALTER TABLE `setting` DROP INDEX `lookup` , ADD UNIQUE `name` ( `name` ) 
+ALTER TABLE `setting` DROP INDEX `lookup` , ADD UNIQUE `name` ( `name` )
 $$$
 
 ALTER TABLE `job` ADD `modifydate` datetime AFTER `createdate`
@@ -1475,7 +1475,7 @@ CREATE TABLE IF NOT EXISTS `systemmessages` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8
 $$$
 
-ALTER TABLE `reportcontact` CHANGE `resultdata` `resultdata` VARCHAR( 255 ) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL 
+ALTER TABLE `reportcontact` CHANGE `resultdata` `resultdata` VARCHAR( 255 ) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL
 $$$
 
 -- 7-0-x
@@ -1487,7 +1487,7 @@ VALUES (
 $$$
 
 -- Set a permanent flag for messages/audiofiles that should never be deleted
-ALTER TABLE `message` ADD `permanent` TINYINT( 4 ) NOT NULL DEFAULT '0' AFTER `deleted` 
+ALTER TABLE `message` ADD `permanent` TINYINT( 4 ) NOT NULL DEFAULT '0' AFTER `deleted`
 $$$
 ALTER TABLE `audiofile` ADD `permanent` TINYINT( 4 ) NOT NULL DEFAULT '0' AFTER `deleted`
 $$$
@@ -1501,4 +1501,20 @@ $$$
 
 -- surveyquestion index on questionnaireid
  ALTER TABLE `surveyquestion` ADD INDEX ( `questionnaireid` )
+ $$$
+
+-- create blocked destination table for blocked phone, sms, email
+ CREATE TABLE blockeddestination` (
+`id` INT( 11 ) NOT NULL AUTO_INCREMENT PRIMARY KEY ,
+`userid` INT( 11 ) NOT NULL ,
+`description` VARCHAR( 255 ) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL ,
+`pattern` VARCHAR( 255 ) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL ,
+`type` ENUM( 'call', 'sms', 'email' ) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL ,
+`createdate` DATETIME NOT NULL DEFAULT '0000-00-00 00:00:00',
+INDEX ( `userid` , `type` )
+) ENGINE = InnoDB CHARACTER SET utf8 COLLATE utf8_general_ci
+$$$
+
+-- drop old blocked number table
+ DROP TABLE `blockednumber`
  $$$
