@@ -86,6 +86,7 @@ if ($generateBulkTokens && isset($_GET['generate'])) {
 			$data[] = $row[1];
 		}
 		generatePersonTokens($data);
+		notice(_L("%s activation codes are generated.", number_format(count($data))));
 	}
 	redirect();
 }
@@ -168,11 +169,11 @@ $errors = false;
 
 //check for form submission
 if ($button = $form->getSubmit()) { //checks for submit and merges in post data
-	$ajax = $form->isAjaxSubmit(); //whether or not this requires an ajax response	
-	
+	$ajax = $form->isAjaxSubmit(); //whether or not this requires an ajax response
+
 	if (($errors = $form->validate()) === false) { //checks all of the items in this form
 		$postdata = $form->getData(); //gets assoc array of all values {name:value,...}
-				
+
 		if ($ajax) {
 			switch ($button) {
 				case 'addrule':
@@ -188,7 +189,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 					}
 					$form->sendTo("activationcodemanager.php");
 					break;
-					
+
 				case 'deleterule':
 					activationcodemanager_clear_search_session('activationcodemanager_rules');
 					if (!empty($_SESSION['activationcodemanager_rules'])) {
@@ -197,7 +198,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 					}
 					$form->sendTo("activationcodemanager.php");
 					break;
-					
+
 				case 'refresh':
 					$form->sendTo("activationcodemanager.php");
 					break;
@@ -219,10 +220,10 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 ////////////////////////////////////////////////////////////////////////////////
 function activationcodemanager_clear_search_session($keep = false) {
 	$_SESSION['saved_report'] = false;
-	
+
 	if ($keep != 'activationcodemanager_showall')
 		$_SESSION['activationcodemanager_showall'] = false;
-	
+
 	if ($keep != 'activationcodemanager_rules')
 		$_SESSION['activationcodemanager_rules'] = array();
 }
@@ -230,7 +231,7 @@ function activationcodemanager_clear_search_session($keep = false) {
 
 function activationcodemanager_make_report_options() {
 	global $fields;
-	
+
 	$options = array("reporttype" => "portal");
 
 	if (!empty($_SESSION['activationcodemanager_showall'])) {
@@ -238,7 +239,7 @@ function activationcodemanager_make_report_options() {
 	} else if (!empty($_SESSION['activationcodemanager_rules'])) {
 		$options['rules'] = $_SESSION['activationcodemanager_rules'];
 	}
-	
+
 	$activefields = array();
 	foreach ($fields as $field){
 		// used in pdf
@@ -247,10 +248,10 @@ function activationcodemanager_make_report_options() {
 		}
 	}
 	$options['activefields'] = implode(",",$activefields);
-	
+
 	$options['hideactivecodes'] = !empty($_SESSION['hideactivecodes']) ? true : false;
 	$options['hideassociated'] = !empty($_SESSION['hideassociated']) ? true : false;
-	
+
 	$options['pagestart'] = isset($_GET['pagestart']) ? $_GET['pagestart'] : 0;
 
 	return $options;
@@ -278,32 +279,32 @@ if ($reportgenerator->format == "csv") {
 
 	include_once("nav.inc.php");
 	startWindow("Contact Search", "padding: 3px;");
-	
+
 	echo "<div id='metadataTempDiv' style='display:none'>";
 		select_metadata("$('portalresults')", 5, $fields);
 	echo "</div>";
-	
+
 	?>
 		<script type="text/javascript">
 			<? Validator::load_validators(array("ValRules")); ?>
 		</script>
 	<?
-	
+
 	echo $form->render();
-	
+
 	if (isset($formdata['outputformat'])) {
 		$reportgenerator->generate();
 	}
-	
+
 	endWindow();
-	
+
 	?>
 		<script type="text/javascript">
 			document.observe('dom:loaded', function() {
 				ruleWidget.delayActions = true;
 				ruleWidget.container.observe('RuleWidget:AddRule', rulewidget_add_rule);
 				ruleWidget.container.observe('RuleWidget:DeleteRule', rulewidget_delete_rule);
-				
+
 				$('metadataDiv').update($('metadataTempDiv').innerHTML);
 			});
 
@@ -316,7 +317,7 @@ if ($reportgenerator->format == "csv") {
 				$('activationcodemanager_ruledata').value = event.memo.fieldnum;
 				form_submit(event, 'deleterule');
 			}
-			
+
 			function confirmGenerate () {
 			<?
 				if($reportgenerator->reporttotal > 0) {
@@ -333,7 +334,7 @@ if ($reportgenerator->format == "csv") {
 				}
 			?>
 			}
-			
+
 			function confirmGenerateActive () {
 			<?
 				$str = addslashes(_L("Some activation codes exist in this list.  Are you sure you want to overwrite them?"));
