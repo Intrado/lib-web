@@ -123,10 +123,10 @@ foreach($messages as $message)
 
 	
 if($IS_COMMSUITE)
-	$users = DBFindMany("User","from user where enabled and deleted=0 order by lastname, firstname");
+	$users = DBFindMany("User","from user where enabled and deleted=0 order by firstname, lastname");
 /*CSDELETEMARKER_START*/
 else
-	$users = DBFindMany("User","from user where enabled and deleted=0 and login != 'schoolmessenger' order by lastname, firstname");
+	$users = DBFindMany("User","from user where enabled and deleted=0 and login != 'schoolmessenger' order by firstname, lastname");
 /*CSDELETEMARKER_END*/
 	
 $userselect = array("" => "Select Messages From User (Optional)");
