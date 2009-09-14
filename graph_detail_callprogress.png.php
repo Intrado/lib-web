@@ -7,6 +7,8 @@ include_once("inc/reportutils.inc.php");
 include ("jpgraph/jpgraph.php");
 include ("jpgraph/jpgraph_bar.php");
 
+require_once('inc/graph.inc.php');
+
 session_write_close();//WARNING: we don't keep a lock on the session file, any changes to session data are ignored past this point
 
 if(isset($_GET['jobid'])){
@@ -29,7 +31,7 @@ if (!in_array($type, array('phone', 'email', 'sms')))
 	$type = 'phone'; // Default to phone
 
 if ($type == 'phone') {
-	$cpcolors = array(
+	$colors = array(
 		"A" => "lightgreen",
 		"M" => "#1DC10",
 		"B" => "orange",
@@ -37,7 +39,7 @@ if ($type == 'phone') {
 		"X" => "black",
 		"F" => "#8AA6B6"
 	);
-	$cpcodes = array(
+	$resultcodes = array(
 		"A" => "Answered",
 		"M" => "Machine",
 		"B" => "Busy",
@@ -46,17 +48,17 @@ if ($type == 'phone') {
 		"F" => "Unknown"
 	);
 } else if ($type == 'email' || $type == 'sms') {
-	$cpcolors = array(
+	$colors = array(
 		"sent" => "lightgreen",
 		"unsent" => "blue"
 	);
-	$cpcodes = array(
+	$resultcodes = array(
 		"sent" => "Sent",
 		"unsent" => "Unsent"
 	);
 }
 // Common code colors
-$cpcolors = array_merge($cpcolors, array(
+$colors = array_merge($colors, array(
 	"notattempted" => "blue",
 	"blocked" => "#CC00CC",
 	"duplicate" => "lightgray",
@@ -64,7 +66,7 @@ $cpcolors = array_merge($cpcolors, array(
 	"declined" => "yellow"
 ));
 // Common code titles
-$cpcodes = array_merge($cpcodes, array(
+$resultcodes = array_merge($resultcodes, array(
 	"notattempted" => "Not Attempted",
 	"blocked" => "Blocked",
 	"duplicate" => "Duplicate",
@@ -73,63 +75,33 @@ $cpcodes = array_merge($cpcodes, array(
 ));
 // Correct code titles depending on type, default phone.
 if ($type == 'email') {
-	$cpcodes['nocontacts'] = 'No Email';
-	$cpcodes['declined'] = 'No Email Selected';
+	$resultcodes['nocontacts'] = 'No Email';
+	$resultcodes['declined'] = 'No Email Selected';
 }
 else if ($type == 'sms') {
-	$cpcodes['nocontacts'] = 'No SMS';
-	$cpcodes['declined'] = 'No SMS Selected';
+	$resultcodes['nocontacts'] = 'No SMS';
+	$resultcodes['declined'] = 'No SMS Selected';
 }
 
-$data = array();
-$legend = array();
-$colors = array();
+$bars = array();
 $labels = array();
 $count=0;
-foreach($cpcodes as $index => $code){
-	$data = array_fill(0, count($cpcolors), 0);
+foreach($resultcodes as $index => $code) {
+	$data = array_fill(0, count($colors), 0);
 	$count++;
-	$color = $cpcolors[$index];
+	$color = $colors[$index];
 	$data[$count-1] = $jobstats[$type][$index];
-	$legend = $code;
 	$labels[] = $code;
 
-	$barname = "bar" . $count;
-	$$barname = new BarPlot($data);
-	$$barname->SetFillColor($color);
-	$$barname->SetAlign('center');
-	$$barname->value->Show();
-	$$barname->value->SetFormat('%d');
+	$bar = new BarPlot($data);
+	$bar->SetFillColor($color);
+	$bar->SetAlign('center');
+	$bar->value->Show();
+	$bar->value->SetFormat('%d');
+	$bars[] = $bar;
 }
 
-// New graph with a drop shadow
 $scalex = isset($_GET['scalex']) ? $_GET['scalex'] + 0 : 1;
 $scaley = isset($_GET['scaley']) ? $_GET['scaley'] + 0 : 1;
-$graph = new Graph(500*$scalex,400*$scaley,'auto');
-//$graph->SetShadow();
-$graph->img->SetMargin(100,60,20,130);
-
-for($i=1;$i<=$count;$i++){
-	$barname = "bar" . $i;
-	$graph->Add($$barname);
-}
-
-// Use a "text" X-scale
-$graph->SetScale("textlin");
-$graph->xaxis->SetTickLabels($labels);
-$graph->xaxis->SetPos("min");
-$graph->xaxis->SetLabelAngle(90);
-$graph->yaxis->SetTextLabelInterval(2);
-$graph->yaxis->HideFirstTickLabel();
-$graph->SetFrame(false);
-
-// Use built in font
-$graph->title->SetFont(FF_FONT1,FS_BOLD);
-
-$graph->title->SetFont(FF_FONT1,FS_BOLD);
-$graph->yaxis->title->SetFont(FF_FONT1,FS_BOLD);
-$graph->xaxis->title->SetFont(FF_FONT1,FS_BOLD);
-
-// Finally output the  image
-$graph->Stroke();
+output_bar_graph($bars, $labels, 500*$scalex,400*$scaley);
 ?>
