@@ -25,7 +25,7 @@ if (!$USER->authorize('createreport') && !$USER->authorize('viewsystemreports'))
 ////////////////////////////////////////////////////////////////////////////////
 
 function fmt_report_actions($obj){
-	
+
 	return action_links(
 		action_link(_L("Edit Schedule"),"calendar","reportedit.php?reportid=$obj->id"),
 		action_link(_L("Edit Options"),"pencil","reportsavedoptions.php?reportid=$obj->id"),
@@ -49,8 +49,11 @@ if(isset($_GET['delete'])){
 	if(userOwns("reportsubscription", $delete)){
 		$subscription = new ReportSubscription($delete);
 		$instance = new ReportInstance($subscription->reportinstanceid);
-		$instance->destroy();
-		$subscription->destroy();
+		Query("BEGIN");
+			$instance->destroy();
+			$subscription->destroy();
+		Query("COMMIT");
+		notice(_L("The report, %s, is now deleted.", escapehtml($subscription->name)));
 	}
 }
 
@@ -95,7 +98,7 @@ if(getSystemSetting('_hassurvey', true) && ($USER->authorize('viewsystemreports'
 	if(getSystemSetting('_hassms', false) && ($USER->authorize('viewsystemreports') || $USER->authorize("sendsms"))) {
 ?>
 					<tr><td><a href='reportjobdetailsearch.php?clear=1&type=sms'/>SMS Log</a></td></tr>
-<?	} 
+<?	}
 	if(getSystemSetting('_hassurvey', true) && ($USER->authorize('viewsystemreports') || $USER->authorize("survey"))){ ?>
 					<tr><td><a href='reportsurvey.php?clear=1'/>Survey Results</a></td></tr>
 <? } ?>
@@ -120,7 +123,7 @@ endWindow();
 
 ?><br><?
 
-$data = DBFindMany("ReportSubscription", "from reportsubscription where userid = '$USER->id'");
+$data = DBFindMany("ReportSubscription", "from reportsubscription where userid = ?", false, array($USER->id));
 
 $titles = array("name" => "Name",
 				"description" => "Description",
