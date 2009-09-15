@@ -103,7 +103,7 @@ $formdata = array(
 	),
 	"autoexpire" => array(
 		"label" => _L('Auto Expire'),
-		"fieldhelp" => _L('Automatically delete this message after %1$s months.', getSystemSetting('softdeletemonths', "6")),
+		"fieldhelp" => _L('Selecting Yes will allow the system to delete this message after %1$s months if it is not associated with any active jobs.', getSystemSetting('softdeletemonths', "6")),
 		"value" => $permanent,
 		"validators" => array(),
 		"control" => array("RadioButton", "values" => array(0 => "Yes (Keep for ". getSystemSetting('softdeletemonths', "6") ." months)",1 => "No (Keep forever)")),
@@ -157,12 +157,12 @@ $formdata = array(
 	)
 );
 
-$helpsteps = array (
-	_L('Enter a name for your message. The best names are descriptive and allow the message to be easily reused later. You can also optionally enter a description for your message.'),
-	_L('You can specify who the email is coming from in this section. Then enter the subject line for the email which recipients will see in their inboxes.'),
-	_L('You may attach files up to 2Mb in size. You should mention the attachment in the body of the email.'). "<br><br><b>". _L('Note'). ":</b>". _L('Some recipients may have size restrictions on incoming emails and may not receive emails with large attachments.'),
-	_L('Type your message in the Message Body field. Additional tips for successful messages can be found at the Help link in the upper right corner.'). "<br><br>". _L("If you would like to personalize your message with the recipient's data, set the cursor at the point in the message where the data should be inserted, choose the field you would like to use, and click enter. You should also enter a default value for any contacts who are missing data for the field you have selected.")
-);
+ $helpsteps = array (
+	_L('Enter a name for your message. The best names are descriptive and allow the message to be easily reused later. You can also optionally enter a description for your message. <br><br>If this message may be deleted after %1$s months of inactivity, select Yes in the Auto Expire section. If you need this message to be stored forever, select No.', getSystemSetting('softdeletemonths', "6")),
+ 	_L('You can specify who the email is coming from in this section. Then enter the subject line for the email which recipients will see in their inboxes.'),
+	_L('You may attach files up to 2Mb in size. You should mention the attachment in the body of the email.<br><br><b>Note:</b> Some recipients may have size restrictions on incoming emails and may not receive emails with large attachments.'),
+	_L('Type your message in the Message Body field. Additional tips for successful messages can be found at the Help link in the upper right corner.<br><br>If you would like to personalize your message with the recipient\'s data, set the cursor at the point in the message where the data should be inserted, choose the field you would like to use, and click enter. You should also enter a default value for any contacts who are missing data for the field you have selected.')
+ );
 
 $buttons = array(submit_button(_L('Save'),"submit","tick"),
 				icon_button(_L('Cancel'),"cross",null,"messages.php"));

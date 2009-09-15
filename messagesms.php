@@ -64,7 +64,7 @@ if(isset($_SESSION['messageid'])) {
 $formdata = array(
 	"messagename" => array(
 		"label" => _L('Message Name'),
-		"fieldhelp" => "",
+		"fieldhelp" => _L('The name of your message goes here. The best names describe the message content.'),
 		"value" => $message->name,
 		"validators" => array(
 			array("ValRequired","ValLength","min" => 3,"max" => 50),
@@ -75,6 +75,7 @@ $formdata = array(
 	),
 	"description" => array(
 		"label" => _L('Description'),
+		"fieldhelp" => _L('Enter an optional description.'),	
 		"value" => $message->description,
 		"validators" => array(),
 		"control" => array("TextField","size" => 30, "maxlength" => 51),
@@ -82,7 +83,7 @@ $formdata = array(
 	),
 	"autoexpire" => array(
 		"label" => _L('Auto Expire'),
-		"fieldhelp" => _L('Automatically delete this message after %1$s months.', getSystemSetting('softdeletemonths', "6")),
+		"fieldhelp" => _L('Selecting Yes will allow the system to delete this message after %1$s months if it is not associated with any active jobs.', getSystemSetting('softdeletemonths', "6")),
 		"value" => $permanent,
 		"validators" => array(),
 		"control" => array("RadioButton", "values" => array(0 => "Yes (Keep for ". getSystemSetting('softdeletemonths', "6") ." months)",1 => "No (Keep forever)")),
@@ -91,7 +92,7 @@ $formdata = array(
 	"message" => array(
 		"label" => _L("SMS Message"),
 		"value" => $messagebody,
-		"fieldhelp" => "Short text message that can be sent to mobile phones. Can not be longer than 160 characters.",
+		"fieldhelp" => "Short text message that can be sent to mobile phones. These messages cannot be longer than 160 characters.",
 		"validators" => array(
 			array("ValRequired"),
 			array("ValLength","max"=>160),
@@ -103,10 +104,9 @@ $formdata = array(
 );
 
 $helpsteps = array (
-	_L('Use a discriptive name to be able to easaly find your message later.'),
-	_L('Type your message') . '<ul><li>' . _L('Whom is it from.') . '<li>' . _L('Who is it for.') . '<li>' . _L('Keep it clear and simple') . '</ul>'
-	
-);
+	_L('Enter a name for your message. The best names are descriptive and allow the message to be easily reused later. You can also optionally enter a description for your message.<br><br>If this message may be deleted after %1$s months of inactivity, select Yes in the Auto Expire section. If you need this message to be stored forever, select No.', getSystemSetting('softdeletemonths', "6")),
+	_L('Enter your message here. Remember, an SMS message is limited to 160 characters. Try to keep your message clear and simple. Make sure to indicate who you are and who your intended audience is.') 	
+ );
 
 $buttons = array(submit_button(_L('Save'),"submit","tick"),
 				icon_button(_L('Cancel'),"cross",null,"messages.php"));
