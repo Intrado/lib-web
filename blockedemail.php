@@ -54,11 +54,12 @@ if(CheckFormSubmit($form, $section))
 			$email = TrimFormData($form, $section, 'email');
 			if (strlen($email) > 200) {
 				error('The email address cannot be more than 200 characters in length.');
+			} else if (!validEmail($email)) {
+				error('The email address is not valid.');
 			} else {
 				QuickQuery("BEGIN");
 				$result = QuickUpdate("insert into blockeddestination(userid, description, destination, type, createdate)
-							values ($USER->id, '" .
-							DBSafe(GetFormData($form, $section, 'reason')) . "', '$email','email', now())");
+							values (?, ?, ?, 'email', now())", false, array($USER->id, TrimFormData($form, $section, 'reason'), $email));
 				QuickQuery("COMMIT");
 				if ($result) {
 					$reloadform = true;
@@ -113,7 +114,7 @@ $TITLE = "Blocked List";
 include_once("nav.inc.php");
 
 NewForm($form);
-startWindow(_L('Systemwide Blocked Phone') . help('Blocked_SystemwideBlocked'), 'padding: 3px;', false, true);
+startWindow(_L('Systemwide Blocked Email') , 'padding: 3px;', false, true);
 if ($ACCESS->getValue('callblockingperms') == 'addonly' || $ACCESS->getValue('callblockingperms') == 'editall') {
 ?>
 	<table style="margin-top: 5px;" border="0" cellpadding="0" cellspacing="0">

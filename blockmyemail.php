@@ -59,6 +59,8 @@ $TITLE = $customer;
 <head>
 	<meta http-equiv="Content-type" value="text/html; charset=UTF-8" />
 	<link href="css.php?nocommoninc" type="text/css" rel="stylesheet" media="screen, print">
+	<script src="script/prototype.js" type="text/javascript"></script>
+	<script src="script/utils.js" type="text/javascript"></script>
 	<title><?=$TITLE?></title>
 </head>
 <body style='padding: 0; margin: 0px;font-family: "Lucida Grande", verdana, arial, helvetica, sans-serif;'>
@@ -70,11 +72,11 @@ $TITLE = $customer;
 				</div>
 			</td>
 			<td>
-				<div class="swooshbg">
+				<div class="navlogoarea">
 					<img src="img/shwoosh.gif" />
 				</div>
 			</td>
-			<td width="100%" class="swooshbg"></td>
+			<td width="100%" class="navlogoarea"></td>
 		</tr>
 	</table>
 	<div class="navband1"><img src="img/pixel.gif"></div>
@@ -112,5 +114,8 @@ if ($badcode) {
 }
 ?>
 	</div>
+	<script type="text/javascript">
+		function form_submit() {};
+	</script>
 </body>
 </html>

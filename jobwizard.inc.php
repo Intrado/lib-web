@@ -12,7 +12,7 @@ function wizHasPhone($postdata) {
 		(isset($postdata["/start"]["package"]) && $postdata["/start"]["package"] == "personalized" && isset($postdata["/message/phone/callme"]["message"]) && strlen($postdata["/message/phone/callme"]["message"]) > 2) ||
 		(isset($postdata["/start"]["package"]) && $postdata["/start"]["package"] == "custom" && isset($postdata["/message/pick"]["type"]) && in_array('phone', $postdata["/message/pick"]["type"]) && (
 			(isset($postdata["/message/select"]["phone"]) && $postdata["/message/select"]["phone"] == "record" && isset($postdata["/message/phone/callme"]["message"]) && strlen($postdata["/message/phone/callme"]["message"]) > 2) ||
-			(isset($postdata["/message/select"]["phone"]) && $postdata["/message/select"]["phone"] == "text" && isset($postdata["/message/phone/text"]["message"]) && strlen($postdata["/message/phone/text"]["message"]) > 2) || 
+			(isset($postdata["/message/select"]["phone"]) && $postdata["/message/select"]["phone"] == "text" && isset($postdata["/message/phone/text"]["message"]) && strlen($postdata["/message/phone/text"]["message"]) > 2) ||
 			(isset($postdata["/message/select"]["phone"]) && $postdata["/message/select"]["phone"] == "pick" && isset($postdata["/message/phone/pick"]["Default"]) && $postdata["/message/phone/pick"]["Default"])
 		))))
 		return true;
@@ -29,10 +29,10 @@ function wizHasEmail($postdata) {
 		(isset($postdata["/start"]["package"]) && $postdata["/start"]["package"] == "custom" && isset($postdata["/message/pick"]["type"]) && in_array('email', $postdata["/message/pick"]["type"]) && (
 			(isset($postdata["/message/select"]["email"]) && $postdata["/message/select"]["email"] == "record" && $USER->authorize("sendphone") && (
 				(isset($postdata["/message/select"]["phone"]) && $postdata["/message/select"]["phone"] == "record" && isset($postdata["/message/phone/callme"]["message"]) && strlen($postdata["/message/phone/callme"]["message"]) > 2) ||
-				(isset($postdata["/message/select"]["phone"]) && $postdata["/message/select"]["phone"] == "text" && isset($postdata["/message/phone/text"]["message"]) && strlen($postdata["/message/phone/text"]["message"]) > 2) || 
+				(isset($postdata["/message/select"]["phone"]) && $postdata["/message/select"]["phone"] == "text" && isset($postdata["/message/phone/text"]["message"]) && strlen($postdata["/message/phone/text"]["message"]) > 2) ||
 				(isset($postdata["/message/select"]["phone"]) && $postdata["/message/select"]["phone"] == "pick" && isset($postdata["/message/phone/pick"]["message"]) && $postdata["/message/phone/pick"]["message"])
 			)) ||
-			(isset($postdata["/message/select"]["email"]) && $postdata["/message/select"]["email"] == "text" && isset($postdata["/message/email/text"]["message"]) && $postdata["/message/email/text"]["message"]) || 
+			(isset($postdata["/message/select"]["email"]) && $postdata["/message/select"]["email"] == "text" && isset($postdata["/message/email/text"]["message"]) && $postdata["/message/email/text"]["message"]) ||
 			(isset($postdata["/message/select"]["email"]) && $postdata["/message/select"]["email"] == "pick" && isset($postdata["/message/email/pick"]["Default"]) && $postdata["/message/email/pick"]["Default"])
 		))))
 		return true;
@@ -49,10 +49,10 @@ function wizHasSms($postdata) {
 		(isset($postdata["/start"]["package"]) && $postdata["/start"]["package"] == "custom" && isset($postdata["/message/pick"]["type"]) && in_array('sms', $postdata["/message/pick"]["type"]) && (
 			(isset($postdata["/message/select"]["sms"]) && $postdata["/message/select"]["sms"] == "record" && $USER->authorize("sendphone") && (
 				(isset($postdata["/message/select"]["phone"]) && $postdata["/message/select"]["phone"] == "record" && isset($postdata["/message/phone/callme"]["message"]) && strlen($postdata["/message/phone/callme"]["message"]) > 2) ||
-				(isset($postdata["/message/select"]["phone"]) && $postdata["/message/select"]["phone"] == "text" && isset($postdata["/message/phone/text"]["message"]) && strlen($postdata["/message/phone/text"]["message"]) > 2) || 
+				(isset($postdata["/message/select"]["phone"]) && $postdata["/message/select"]["phone"] == "text" && isset($postdata["/message/phone/text"]["message"]) && strlen($postdata["/message/phone/text"]["message"]) > 2) ||
 				(isset($postdata["/message/select"]["phone"]) && $postdata["/message/select"]["phone"] == "pick" && isset($postdata["/message/phone/pick"]["message"]) && $postdata["/message/phone/pick"]["message"])
 			)) ||
-			(isset($postdata["/message/select"]["sms"]) && $postdata["/message/select"]["sms"] == "text" && isset($postdata["/message/sms/text"]["message"]) && $postdata["/message/sms/text"]["message"]) || 
+			(isset($postdata["/message/select"]["sms"]) && $postdata["/message/select"]["sms"] == "text" && isset($postdata["/message/sms/text"]["message"]) && $postdata["/message/sms/text"]["message"]) ||
 			(isset($postdata["/message/select"]["sms"]) && $postdata["/message/select"]["sms"] == "pick" && isset($postdata["/message/sms/pick"]["message"]) && $postdata["/message/sms/pick"]["message"])
 		))))
 		return true;
@@ -62,10 +62,10 @@ function wizHasSms($postdata) {
 function wizHasTranslation($postdata) {
 	if (((isset($postdata["/start"]["package"]) && $postdata["/start"]["package"] == 'express' && isset($postdata['/message/email/text']['translate']) && $postdata['/message/email/text']['translate']) ||
 		(isset($postdata["/start"]["package"]) && $postdata["/start"]["package"] == 'personalized' && isset($postdata['/message/email/text']['translate']) && $postdata['/message/email/text']['translate']) ||
-		(isset($postdata["/start"]["package"]) && $postdata["/start"]["package"] == 'custom' && isset($postdata['/message/pick']['type']) && in_array('email', $postdata['/message/pick']['type']) && 
+		(isset($postdata["/start"]["package"]) && $postdata["/start"]["package"] == 'custom' && isset($postdata['/message/pick']['type']) && in_array('email', $postdata['/message/pick']['type']) &&
 			isset($postdata["/message/select"]['email']) && $postdata["/message/select"]['email'] == 'text' && isset($postdata['/message/email/text']['translate']) && $postdata['/message/email/text']['translate'])
 		) || ((isset($postdata["/start"]["package"]) && $postdata["/start"]["package"] == 'express' && isset($postdata['/message/phone/text']['translate']) && $postdata['/message/phone/text']['translate']) ||
-		(isset($postdata["/start"]["package"]) && $postdata["/start"]["package"] == 'custom' && isset($postdata['/message/pick']['type']) && in_array('phone', $postdata['/message/pick']['type']) && 
+		(isset($postdata["/start"]["package"]) && $postdata["/start"]["package"] == 'custom' && isset($postdata['/message/pick']['type']) && in_array('phone', $postdata['/message/pick']['type']) &&
 			isset($postdata["/message/select"]['phone']) && $postdata["/message/select"]['phone'] == 'text' && isset($postdata['/message/phone/text']['translate']) && $postdata['/message/phone/text']['translate'])
 		)
 	)
@@ -137,7 +137,7 @@ class TextAreaPhone extends FormItem {
 						popup(\'previewmessage.php?parentfield='.$n.'-textarea&language='.urlencode($this->args['language']).'&gender=\'+ gender, 400, 400);
 					}
 				});
-				
+
 				$("'.$n.'-textarea").observe("change", textAreaPhone_storedata.curry("'.$n.'"));
 				$("'.$n.'-textarea").observe("blur", textAreaPhone_storedata.curry("'.$n.'"));
 				$("'.$n.'-textarea").observe("keyup", textAreaPhone_storedata.curry("'.$n.'"));
@@ -145,7 +145,7 @@ class TextAreaPhone extends FormItem {
 				$("'.$n.'-textarea").observe("click", textAreaPhone_storedata.curry("'.$n.'"));
 				$("'.$n.'-female").observe("click", textAreaPhone_storedata.curry("'.$n.'"));
 				$("'.$n.'-male").observe("click", textAreaPhone_storedata.curry("'.$n.'"));
-				
+
 				var textAreaPhone_keyupTimer = null;
 				function textAreaPhone_storedata(formitem, event) {
 					var form = event.findElement("form");
@@ -175,7 +175,7 @@ class CallMe extends FormItem {
 			$language = $this->args['language'];
 		else
 			$language = array();
-		
+
 		$nophone = _L("Phone Number");
 		$defaultphone = escapehtml((isset($this->args['phone']) && $this->args['phone'])?Phone::format($this->args['phone']):$nophone);
 		if (!$value)
@@ -190,7 +190,7 @@ class CallMe extends FormItem {
 			$str .= '
 				<div style="margin-bottom: 3px;">'._L("Add an alternate language?").'</div>
 				<select id="'.$n.'_select" ><option value="0">-- '._L("Select One").' --</option>';
-			foreach ($language as $langname) 
+			foreach ($language as $langname)
 				$str .= '<option id="'.$n.'_select_'.$langname.'" value="'.escapehtml($langname).'" >'.escapehtml($langname).'</option>';
 			$str .= '</select>';
 		}
@@ -203,6 +203,8 @@ class CallMe extends FormItem {
 		$str .= '<script type="text/javascript" src="script/easycall.js.php"></script>
 			<script type="text/javascript">
 				var msgs = '.$value.';
+				// remember phone number the user enters
+				var msgphone = null;
 				// Load default. it is a special case
 				new Easycall(
 					"'.$this->form->name.'",
@@ -240,7 +242,8 @@ class CallMe extends FormItem {
 							"'.((isset($this->args['min']) && $this->args['min'])?$this->args['min']:"10").'",
 							"'.((isset($this->args['max']) && $this->args['max'])?$this->args['max']:"10").'",
 							"'.$defaultphone.'",
-							"'.$nophone.'"
+							"'.$nophone.'",
+							"jobwizard"
 						).setupRecord();
 					});
 				}
@@ -254,7 +257,7 @@ class CallMe extends FormItem {
 ////////////////////////////////////////////////////////////////////////////////
 class ValJobName extends Validator {
 	var $onlyserverside = true;
-	
+
 	function validate ($value, $args) {
 		global $USER;
 		$jobcount = QuickQuery("select count(id) from job where not deleted and userid=? and name=? and status in ('new','scheduled','processing','procactive','active')", false, array($USER->id, $value));
@@ -266,7 +269,7 @@ class ValJobName extends Validator {
 
 class ValHasMessage extends Validator {
 	var $onlyserverside = true;
-	
+
 	function validate ($value, $args) {
 		global $USER;
 		if ($value == 'pick') {
@@ -299,18 +302,18 @@ class ValEasycall extends Validator {
 
 class ValLists extends Validator {
 	var $onlyserverside = true;
-	
+
 	function validate ($value, $args) {
 		global $USER;
-		
-		
+
+
 		if (strpos($value, 'pending') !== false)
 			return _L('Please finish adding this rule, or unselect the field');
-			
+
 		$listids = json_decode($value);
 		if (empty($listids))
 			return _L("Please add a list");
-			
+
 		$allempty = true;
 		foreach ($listids as $listid) {
 			if ($listid === 'addme') {
@@ -338,13 +341,13 @@ class ValTextAreaPhone extends Validator {
 		if (!$textlength)
 			return $this->label." "._L("cannot be blank.");
 		else if ($textlength > 4000) {
-			return $this->label." "._L("cannot be more than 4000 characters.");		
-		}		
+			return $this->label." "._L("cannot be more than 4000 characters.");
+		}
 		return true;
 	}
-	
+
 	function getJSValidator () {
-		return 
+		return
 			'function (name, label, value, args) {
 				var msgdata = value.evalJSON();
 				var textlength = msgdata.text.length;
@@ -383,7 +386,7 @@ class ValDate extends Validator {
 		if (isset($args['max']))
 			if (strtotime($value) > strtotime($args['max']))
 				return $this->label. " ". _L('cannot be a date later than %s', $args['max']);
-			
+
 		return true;
 	}
 }
@@ -395,7 +398,7 @@ class ValDate extends Validator {
 class JobWiz_start extends WizStep {
 	function getForm($postdata, $curstep) {
 		global $USER;
-		
+
 		$wizJobType = isset($_SESSION['wizard_job']['jobtype'])?$_SESSION['wizard_job']['jobtype']:"all";
 		$userjobtypes = JobType::getUserJobTypes();
 		$jobtypes = array();
@@ -416,7 +419,7 @@ class JobWiz_start extends WizStep {
 			}
 			$jobtips[$id] = escapehtml($jobtype->info);
 		}
-		
+
 		$deliverytypes = array();
 		foreach (array('sendphone', 'sendemail', 'sendsms') as $deliverytype) {
 			if ($USER->authorize($deliverytype))
@@ -427,7 +430,7 @@ class JobWiz_start extends WizStep {
 
 		if ($deliverytypes['sendsms'] && !getSystemSetting('_hassms'))
 			$deliverytypes['sendsms'] = false;
-		
+
 		$packageDetails = array(
 			"easycall" => array(
 				0 => _L('EasyCall'),
@@ -464,7 +467,7 @@ class JobWiz_start extends WizStep {
 			$packageDetails["express"][2] = "";
 			$packageDetails["personalized"][2] = "";
 		}
-		
+
 		// All delivery types allowed
 		if ($deliverytypes['sendphone'] && $deliverytypes['sendemail'] && $deliverytypes['sendsms']) {
 			$packageDetails["easycall"]["enabled"] = true;
@@ -521,7 +524,7 @@ class JobWiz_start extends WizStep {
 						</tr>
 					</table>';
 		}
-		
+
 		$formdata = array($this->title);
 		$formdata["name"] = array(
 			"label" => _L("Job Name"),
@@ -546,7 +549,7 @@ class JobWiz_start extends WizStep {
 			"control" => array("RadioButton", "values" => $jobtypes, "hover" => $jobtips),
 			"helpstep" => 2
 		);
-		
+
 		$formdata["package"] = array(
 			"label" => _L("Notification Method"),
 			"fieldhelp" => _L("Choose a notification method. <br><br><ul>
@@ -601,7 +604,7 @@ class JobWiz_messageType extends WizStep {
 
 		if (isset($values['sms']) && !getSystemSetting('_hassms'))
 			unset($values['sms']);
-		
+
 		$formdata[] = $this->title;
 		$helpsteps = array(_L("Select a method or methods for message delivery."));
 		$formdata["type"] = array(
@@ -616,10 +619,10 @@ class JobWiz_messageType extends WizStep {
 		);
 		return new Form("messageSelect",$formdata,$helpsteps);
 	}
-	
+
 	//returns true if this step is enabled
 	function isEnabled($postdata, $step) {
-		if (isset($postdata['/start']['package']) && 
+		if (isset($postdata['/start']['package']) &&
 			$postdata['/start']['package'] == "custom") {
 			return true;
 		} else {
@@ -655,10 +658,10 @@ class JobWiz_messageSelect extends WizStep {
 				"helpstep" => 1
 			);
 		}
-		
+
 		if (isset($values["record"]))
 			$values["record"] = _L("Automatic Email Alert");
-		
+
 		if ($USER->authorize("sendemail") && in_array('email',$postdata['/message/pick']['type'])) {
 			$formdata["email"] = array(
 				"label" => _L("Email Message"),
@@ -672,7 +675,7 @@ class JobWiz_messageSelect extends WizStep {
 				"helpstep" => 1
 			);
 		}
-		
+
 		if (isset($values["record"]))
 			$values["record"] = _L("Automatic SMS Text Alert");
 
@@ -689,13 +692,13 @@ class JobWiz_messageSelect extends WizStep {
 				"helpstep" => 1
 			);
 		}
-		
+
 		return new Form("messageSelect",$formdata,$helpsteps);
 	}
-	
+
 	//returns true if this step is enabled
 	function isEnabled($postdata, $step) {
-		if (isset($postdata['/start']['package']) && 
+		if (isset($postdata['/start']['package']) &&
 			$postdata['/start']['package'] == "custom") {
 			return true;
 		} else {
@@ -717,7 +720,7 @@ class JobWiz_messagePhoneChoose extends WizStep {
 				if ($syslangs[$langid]->name !== "English")
 					$langs[] = $syslangs[$langid]->name;
 		}
-		
+
 		$messagelist = DBFindMany("Message","from message where userid=" . $USER->id ." and deleted=0 and type='phone' order by name");
 		foreach ($messagelist as $id => $message) {
 			$phonemessage[$id]['name'] = $message->name;
@@ -752,10 +755,10 @@ class JobWiz_messagePhoneChoose extends WizStep {
 				"helpstep" => 2
 			);
 		}
-		
+
 		return new Form("messagePhoneChoose",$formdata,$helpsteps);
 	}
-	
+
 	//returns true if this step is enabled
 	function isEnabled($postdata, $step) {
 		global $USER;
@@ -790,7 +793,7 @@ class JobWiz_messagePhoneText extends WizStep {
 				"helpstep" => 1
 			)
 		);
-		
+
 		if ($USER->authorize('sendmulti')) {
 			$helpsteps[] = _L("Automatically translate into alternate languages powered by Google Translate.");
 			$formdata["translate"] = array(
@@ -802,10 +805,10 @@ class JobWiz_messagePhoneText extends WizStep {
 				"helpstep" => 2
 			);
 		}
-		
+
 		return new Form("messagePhoneText",$formdata,$helpsteps);
 	}
-	
+
 	//returns true if this step is enabled
 	function isEnabled($postdata, $step) {
 		global $USER;
@@ -843,7 +846,7 @@ class JobWiz_messagePhoneTranslate extends WizStep {
 			"helpstep" => 2
 		);
 	}
-	
+
 	function isTransient ($postdata, $language) {
 		if (isset($postdata["/message/phone/translate"][$language])) {
 			$postmsgdata = json_decode($postdata["/message/phone/translate"][$language]);
@@ -852,13 +855,13 @@ class JobWiz_messagePhoneTranslate extends WizStep {
 		}
 		return true;
 	}
-	
+
 	function getForm($postdata, $curstep) {
 		static $translations = false;
 		static $translationlanguages = false;
-		
+
 		$msgdata = isset($postdata['/message/phone/text']['message'])?json_decode($postdata['/message/phone/text']['message']):json_decode('{"gender": "female", "text": ""}');
-		
+
 		$warning = "";
 		if(mb_strlen($msgdata->text) > 4000) {
 			$warning = _L('Warning. Only the first 4000 characters are translated.');
@@ -869,26 +872,26 @@ class JobWiz_messagePhoneTranslate extends WizStep {
 		$englishkey = array_search('English', $translationlanguages);
 		if($englishkey !== false)
 			unset($translationlanguages[$englishkey]);
-			
+
 		$translations = translate_fromenglish($msgdata->text,$translationlanguages);
 		$voices = Voice::getTTSVoices();
 
 		// Form Fields.
 		$formdata = array($this->title);
-		
+
 		if ($warning)
 			$formdata["warning"] = array(
 				"label" => _L("Warning"),
 				"control" => array("FormHtml","html"=>'<div style="font-size: medium; color: red">'.escapehtml($warning).'</div><br>'),
 				"helpstep" => 1
 			);
-		
+
 		$formdata["englishtext"] = array(
 			"label" => _L("English"),
 			"control" => array("FormHtml","html"=>'<div style="font-size: medium;">'.escapehtml($msgdata->text).'</div><br>'),
 			"helpstep" => 1
 		);
-		
+
 		//$translations = false; // Debug output when no translation is available
 		if(!$translations) {
 			$formdata["Translationinfo"] = array(
@@ -924,25 +927,25 @@ class JobWiz_messagePhoneTranslate extends WizStep {
 				"helpstep" => 2
 			);
 		}
-		
+
 		$helpsteps = array(
 			_L("This is the message that all contacts will recieve if they do not have any other language message specified"),
 			_L("This is an automated translation powered by Google Translate. Please note that although machine translation is always improving, it is not perfect yet. You can try reverse translation for an idea of how well your message was translated.")
 		);
-		
-		
+
+
 		return new Form("messagePhoneTranslate",$formdata,$helpsteps);
 	}
-	
+
 	//returns true if this step is enabled
 	function isEnabled($postdata, $step) {
 		global $USER;
 		if (!$USER->authorize("sendphone" || !$USER->authorize("sendmulti")))
 			return false;
 		if ((isset($postdata["/start"]["package"]) && $postdata["/start"]["package"] == 'express' && isset($postdata['/message/phone/text']['translate']) && $postdata['/message/phone/text']['translate']) ||
-			(isset($postdata["/start"]["package"]) && $postdata["/start"]["package"] == 'custom' && isset($postdata['/message/pick']['type']) && in_array('phone', $postdata['/message/pick']['type']) && 
+			(isset($postdata["/start"]["package"]) && $postdata["/start"]["package"] == 'custom' && isset($postdata['/message/pick']['type']) && in_array('phone', $postdata['/message/pick']['type']) &&
 				isset($postdata["/message/select"]['phone']) && $postdata["/message/select"]['phone'] == 'text' && isset($postdata['/message/phone/text']['translate']) && $postdata['/message/phone/text']['translate'])
-		) 
+		)
 			return true;
 		else
 			return false;
@@ -997,7 +1000,7 @@ class JobWiz_messagePhoneCallMe extends WizStep {
 
 		return new Form("messagePhoneCallMe",$formdata,$helpsteps);
 	}
-	
+
 	//returns true if this step is enabled
 	function isEnabled($postdata, $step) {
 		global $USER;
@@ -1033,7 +1036,7 @@ class JobWiz_messageEmailChoose extends WizStep {
 			$messages[$id]['name'] = $message->name;
 			$values[] = $id;
 		}
-		
+
 		// Form Fields.
 		$formdata = array($this->title);
 		$helpsteps = array(_L("Select from list of existing messages. If you do not find an appropriate message, you may click the Message Source link from the navigation on the left and choose to create a new message."));
@@ -1066,7 +1069,7 @@ class JobWiz_messageEmailChoose extends WizStep {
 
 		return new Form("messageEmailChoose",$formdata,$helpsteps);
 	}
-	
+
 	//returns true if this step is enabled
 	function isEnabled($postdata, $step) {
 		global $USER;
@@ -1087,7 +1090,7 @@ class JobWiz_messageEmailText extends WizStep {
 		$msgdata = isset($postdata['/message/phone/text']['message'])?json_decode($postdata['/message/phone/text']['message']):json_decode('{"text": ""}');
 		// Form Fields.
 		$formdata = array($this->title);
-		
+
 		$helpsteps = array(_L("Enter the name for the email acount."));
 		$formdata["fromname"] = array(
 			"label" => _L('From Name'),
@@ -1099,7 +1102,7 @@ class JobWiz_messageEmailText extends WizStep {
 			"control" => array("TextField","size" => 25, "maxlength" => 51),
 			"helpstep" => 1
 		);
-		
+
 		$helpsteps[] = array(_L("Enter the address where you would like to receive replies."));
 		$formdata["from"] = array(
 			"label" => _L("From Email"),
@@ -1113,7 +1116,7 @@ class JobWiz_messageEmailText extends WizStep {
 			"control" => array("TextField","max"=>255,"min"=>3,"size"=>35),
 			"helpstep" => 2
 		);
-		
+
 		$helpsteps[] = _L("Enter the subject of the email here.");
 		$formdata["subject"] = array(
 			"label" => _L("Subject"),
@@ -1136,7 +1139,7 @@ class JobWiz_messageEmailText extends WizStep {
 			"control" => array("EmailAttach","size" => 30, "maxlength" => 51),
 			"helpstep" => 4
 		);
-		
+
 		$helpsteps[] = _L("Email message body text goes here. Be sure to introduce yourself and give detailed information. For helpful message tips and ideas, click the Help link in the upper right corner of the screen.");
 		$formdata["message"] = array(
 			"label" => _L("Email Message"),
@@ -1161,10 +1164,10 @@ class JobWiz_messageEmailText extends WizStep {
 				"helpstep" => 6
 			);
 		}
-		
+
 		return new Form("messageEmailText",$formdata,$helpsteps);
 	}
-	
+
 	//returns true if this step is enabled
 	function isEnabled($postdata, $step) {
 		global $USER;
@@ -1200,7 +1203,7 @@ class JobWiz_messageEmailTranslate extends WizStep {
 			"helpstep" => 2
 		);
 	}
-	
+
 	function isTransient ($postdata, $language) {
 		if (isset($postdata["/message/email/translate"][$language])) {
 			$postmsgdata = json_decode($postdata["/message/email/translate"][$language]);
@@ -1213,14 +1216,14 @@ class JobWiz_messageEmailTranslate extends WizStep {
 	function getForm($postdata, $curstep) {
 		static $translations = false;
 		static $translationlanguages = false;
-		
+
 		$englishtext = isset($postdata['/message/email/text']['message'])?$postdata['/message/email/text']['message']:"";
-		
+
 		$warning = "";
 		if(mb_strlen($englishtext) > 4000) {
 			$warning = _L('Warning. Only the first 4000 characters are translated.');
 		}
-			
+
 		if(!$translations) {
 			//Get available languages
 			$alllanguages = QuickQueryList("select name from language");
@@ -1229,7 +1232,7 @@ class JobWiz_messageEmailTranslate extends WizStep {
 		}
 		// Form Fields.
 		$formdata = array($this->title);
-		
+
 		if ($warning)
 			$formdata["warning"] = array(
 				"label" => _L("Warning"),
@@ -1242,7 +1245,7 @@ class JobWiz_messageEmailTranslate extends WizStep {
 			"control" => array("FormHtml","html"=>'<div style="font-size: medium;">'.escapehtml($englishtext).'</div><br>'),
 			"helpstep" => 1
 		);
-		
+
 		//$translations = false; // Debug output when no translation is available
 		if(!$translations) {
 			$formdata["Translationinfo"] = array(
@@ -1250,7 +1253,7 @@ class JobWiz_messageEmailTranslate extends WizStep {
 				"control" => array("FormHtml","html"=>'<div style="font-size: medium;">'._L('No Translations Available').'</div><br>'),
 				"helpstep" => 2
 			);
-		} else {			
+		} else {
 			$languagesinstance = array_values($translationlanguages);
 			if(is_array($translations)) {
 				foreach($translations as $obj){
@@ -1264,7 +1267,7 @@ class JobWiz_messageEmailTranslate extends WizStep {
 				$formdata[$language] = $this->getTranslationDataArray($language,$translations->translatedText, false, $transient, ($transient?"":$englishtext));
 			}
 		}
-		
+
 		if(!isset($formdata["Translationinfo"])) {
 			$formdata["Translationinfo"] = array(
 				"label" => " ",
@@ -1276,7 +1279,7 @@ class JobWiz_messageEmailTranslate extends WizStep {
 				"helpstep" => 2
 			);
 		}
-		
+
 		$helpsteps = array(
 			_L("This is the message that all contacts will recieve if they do not have any other language message specified"),
 			_L("This translation was automatically generated. Please note that automatic translation is always improving, but is not perfect yet. Try reverse translating your message for a preview of how well it translated.")
@@ -1284,7 +1287,7 @@ class JobWiz_messageEmailTranslate extends WizStep {
 
 		return new Form("messageEmailTranslate",$formdata,$helpsteps);
 	}
-	
+
 	//returns true if this step is enabled
 	function isEnabled($postdata, $step) {
 		global $USER;
@@ -1292,7 +1295,7 @@ class JobWiz_messageEmailTranslate extends WizStep {
 			return false;
 		if ((isset($postdata["/start"]["package"]) && $postdata["/start"]["package"] == 'express' && isset($postdata['/message/email/text']['translate']) && $postdata['/message/email/text']['translate']) ||
 			(isset($postdata["/start"]["package"]) && $postdata["/start"]["package"] == 'personalized' && isset($postdata['/message/email/text']['translate']) && $postdata['/message/email/text']['translate']) ||
-			(isset($postdata["/start"]["package"]) && $postdata["/start"]["package"] == 'custom' && isset($postdata['/message/pick']['type']) && in_array('email', $postdata['/message/pick']['type']) && 
+			(isset($postdata["/start"]["package"]) && $postdata["/start"]["package"] == 'custom' && isset($postdata['/message/pick']['type']) && in_array('email', $postdata['/message/pick']['type']) &&
 				isset($postdata["/message/select"]['email']) && $postdata["/message/select"]['email'] == 'text' && isset($postdata['/message/email/text']['translate']) && $postdata['/message/email/text']['translate'])
 		)
 			return true;
@@ -1308,7 +1311,7 @@ class JobWiz_messageSmsChoose extends WizStep {
 		$messages = array();
 		$values = array();
 		global $USER;
-		
+
 		$messagelist = DBFindMany("Message","from message where userid=" . $USER->id ." and deleted=0 and type='sms' order by name");
 		foreach ($messagelist as $id => $message) {
 			$messages[$id]['name'] = $message->name;
@@ -1330,7 +1333,7 @@ class JobWiz_messageSmsChoose extends WizStep {
 
 		return new Form("messageSmsChoose",$formdata,$helpsteps);
 	}
-	
+
 	//returns true if this step is enabled
 	function isEnabled($postdata, $step) {
 		global $USER;
@@ -1355,7 +1358,7 @@ class JobWiz_messageSmsText extends WizStep {
 		} else if (isset($postdata['/message/email/text'])) {
 			if (isset($postdata['/message/email/text']['message']))
 				$text = $postdata['/message/email/text']['message'];
-		} else 
+		} else
 			$text = "";
 
 		// Form Fields.
@@ -1375,7 +1378,7 @@ class JobWiz_messageSmsText extends WizStep {
 
 		return new Form("messageSmsText",$formdata,$helpsteps);
 	}
-	
+
 	//returns true if this step is enabled
 	function isEnabled($postdata, $step) {
 		global $USER;
@@ -1416,7 +1419,7 @@ class JobWiz_scheduleOptions extends WizStep {
 			$menu["now"] = _L("Now"). " ($callearly - $calllate)";
 		$menu["schedule"] = _L("Schedule and Send");
 		$menu["template"] = _L("Save for Later");
-		
+
 		$formdata = array($this->title);
 		$helpsteps = array(_L("Select when to send this message."));
 		$formdata["schedule"] = array(
@@ -1430,7 +1433,7 @@ class JobWiz_scheduleOptions extends WizStep {
 			"control" => array("RadioButton","values"=>$menu),
 			"helpstep" => 1
 		);
-		
+
 		if ($wizHasEmailMsg || $wizHasPhoneMsg) {
 			$helpsteps[] = _L("Set advanced options such as duplicate removal and number of days to run.");
 			$formdata["advanced"] = array(
@@ -1442,7 +1445,7 @@ class JobWiz_scheduleOptions extends WizStep {
 				"helpstep" => 2
 			);
 		}
-		
+
 		return new Form("scheduleOptions",$formdata,$helpsteps);
 	}
 }
@@ -1451,13 +1454,13 @@ class JobWiz_scheduleDate extends WizStep {
 	function getForm($postdata, $curstep) {
 		global $USER;
 		global $ACCESS;
-		
+
 		// Check to see if translation is used anywhere in the wizard. If it is, the job cannot be scheduled out more than 7 days.
 		$translated = wizHasTranslation($postdata);
-			
+
 		// Form Fields.
 		$formdata = array($this->title);
-		
+
 		$dayoffset = (strtotime("now") > strtotime(($ACCESS->getValue("calllate"))?$ACCESS->getValue("calllate"):"11:59 pm"))?1:0;
 		$helpsteps = array(_L("Choose a date for this notification to be delivered."));
 		$formdata["date"] = array(
@@ -1509,10 +1512,10 @@ class JobWiz_scheduleDate extends WizStep {
 
 		return new Form("scheduleDate",$formdata,$helpsteps);
 	}
-	
+
 	//returns true if this step is enabled
 	function isEnabled($postdata, $step) {
-		if (isset($postdata['/schedule/options']['schedule']) && 
+		if (isset($postdata['/schedule/options']['schedule']) &&
 			$postdata['/schedule/options']['schedule'] == "schedule"
 		) {
 			return true;
@@ -1528,11 +1531,11 @@ class JobWiz_scheduleAdvanced extends WizStep {
 		$wizHasPhoneMsg = wizHasPhone($postdata);
 		$wizHasEmailMsg= wizHasEmail($postdata);
 		$helpstepnum = 1;
-		
+
 		$helpsteps = array();
 		$maxjobdays = $USER->getSetting("maxjobdays", $ACCESS->getValue('maxjobdays'));
 		$maxdays = $ACCESS->getValue('maxjobdays', 7);
-		
+
 		$formdata = array($this->title);
 		if ($wizHasPhoneMsg) {
 			if ($ACCESS->getPermission('setcallerid') && !getSystemSetting('_hascallback')) {
@@ -1571,7 +1574,7 @@ class JobWiz_scheduleAdvanced extends WizStep {
 					"helpstep" => $helpstepnum++
 				);
 			}
-			
+
 			if ($ACCESS->getPermission('messageconfirmation')) {
 				$helpsteps[] = _L("This option allows recipients to respond to your phone message with a yes by pressing 1 or a no by pressing 2.");
 				$formdata["messageconfirmation"] = array(
@@ -1604,10 +1607,10 @@ class JobWiz_scheduleAdvanced extends WizStep {
 				"helpstep" => $helpstepnum++
 			);
 		}
-		
+
 		return new Form("scheduleAdvanced",$formdata,$helpsteps);
 	}
-	
+
 	//returns true if this step is enabled
 	function isEnabled($postdata, $step) {
 		$wizHasPhoneMsg = wizHasPhone($postdata);
@@ -1633,7 +1636,7 @@ class JobWiz_submitConfirm extends WizStep {
 			))
 		)
 			redirect('unauthorized.php');
-		
+
 		// Built/Existing Lists
 		$lists = json_decode($postdata["/list"]["listids"]);
 		unset($lists['addme']);
@@ -1644,7 +1647,7 @@ class JobWiz_submitConfirm extends WizStep {
 			$renderedlist->calcStats();
 			$calctotal = $calctotal + $renderedlist->total;
 		}
-		
+
 		$html = '<div style="font-size: medium">';
 		if ($postdata['/schedule/options']['schedule'] == 'template')
 			$html .= escapehtml(_L('You are about to save a notification to be used at a later date.')). "<br>". escapehtml(_L('Confirm and click Next to save this notification.'));

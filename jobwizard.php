@@ -108,7 +108,7 @@ class FinishJobWizard extends WizFinish {
 		}
 		return $retval;
 	}
-	
+
 	function phoneTextMessage($msgdata) {
 		return array("Default" => array(
 			"id" => "",
@@ -118,7 +118,7 @@ class FinishJobWizard extends WizFinish {
 			"override" => false
 		));
 	}
-	
+
 	function phoneTextTranslation($msgdata) {
 		$retval = array();
 		foreach ($msgdata as $lang => $data) {
@@ -134,7 +134,7 @@ class FinishJobWizard extends WizFinish {
 		}
 		return $retval;
 	}
-	
+
 	function emailSavedMessage($msgdata) {
 		$retval = array();
 		foreach ($msgdata as $lang => $data) {
@@ -184,16 +184,16 @@ class FinishJobWizard extends WizFinish {
 		}
 		return $retval;
 	}
-	
+
 	function finish ($postdata) {
 		// If the job has not ben confirmed, don't try to process the data.
 		if (!isset($postdata["/submit/confirm"]["jobconfirm"])  || !$postdata["/submit/confirm"]["jobconfirm"] )
 			return false;
-		
+
 		$wizHasPhoneMsg = wizHasPhone($postdata);
 		$wizHasEmailMsg= wizHasEmail($postdata);
 		$wizHasSmsMsg= wizHasSms($postdata);
-		
+
 		global $USER;
 		global $ACCESS;
 		$jobtype = DBFind("JobType", "from jobtype where id=?", false, array($postdata["/start"]["jobtype"]));
@@ -204,7 +204,7 @@ class FinishJobWizard extends WizFinish {
 		$smsMsg = array();
 		$emailmessagelink = false;
 		$smsmessagelink = false;
-		
+
 		switch ($postdata["/start"]["package"]) {
 			//If package is Easycall
 			case "easycall":
@@ -224,14 +224,14 @@ class FinishJobWizard extends WizFinish {
 					));
 					if (getSystemSetting("_hascallback"))
 						$emailMsg["Default"]["text"] .= "You may also listen to this message over the phone by dialing the automated notification system at: ". Phone::format(getSystemSetting("inboundnumber")). "\n\n";
-					$emailMsg["Default"]["text"] .= "DO NOT REPLY: This is an automatically generated email. Please do not send a reply message.\nTo be removed from these alerts please contact ". $_SESSION['custname']. ".\n";
+					$emailMsg["Default"]["text"] .= "DO NOT REPLY: This is an automatically generated email. Please do not send a reply message.";
 				}
 				if ($wizHasSmsMsg) {
-					
+
 					$custname = $_SESSION['custname'];
 					if (strlen($custname) > 40)
 						$custname = substr($custname,0,40);
-					
+
 					$smsmessagelink = true;
 					$smsMsg = array("Default" => array(
 						"id" => false,
@@ -316,7 +316,7 @@ class FinishJobWizard extends WizFinish {
 							));
 							if (getSystemSetting("_hascallback"))
 								$emailMsg["Default"]["text"] .= "You may also listen to this message over the phone by dialing the automated notification system at: ". Phone::format(getSystemSetting("inboundnumber")). "\n\n";
-							$emailMsg["Default"]["text"] .= "DO NOT REPLY: This is an automatically generated email. Please do not send a reply message.\nTo be removed from these alerts please contact ". $_SESSION['custname']. ".\n";
+							$emailMsg["Default"]["text"] .= "DO NOT REPLY: This is an automatically generated email. Please do not send a reply message.";
 							break;
 						case "text":
 							$emailMsg = $this->emailTextMessage($postdata["/message/email/text"]);
@@ -361,11 +361,11 @@ class FinishJobWizard extends WizFinish {
 					}
 				}
 				break;
-			
+
 			default:
 				error_log($postdata["/start"]["package"] . "is an unknown value for 'package'");
 		}
-		
+
 		$schedule = array();
 		switch ($postdata["/schedule/options"]["schedule"]) {
 			case "now":
@@ -381,7 +381,7 @@ class FinishJobWizard extends WizFinish {
 					$accessCalllate = "11:59 pm";
 				if (strtotime($calllate)  > strtotime($accessCalllate))
 					$calllate = $accessCalllate;
-				
+
 				$schedule = array(
 					"maxjobdays" => isset($postdata["/schedule/advanced"]["maxjobdays"])?$postdata["/schedule/advanced"]["maxjobdays"]:1,
 					"date" => date('m/d/Y'),
@@ -397,7 +397,7 @@ class FinishJobWizard extends WizFinish {
 					"calllate" => $postdata["/schedule/date"]["calllate"]
 				);
 				break;
-			case "template": 
+			case "template":
 				$schedule = array(
 					"maxjobdays" => isset($postdata["/schedule/advanced"]["maxjobdays"])?$postdata["/schedule/advanced"]["maxjobdays"]:1,
 					"date" => false,
@@ -408,14 +408,14 @@ class FinishJobWizard extends WizFinish {
 			default:
 				break;
 		}
-		
+
 		// for all the job settings on the "Advanced" step. set some advanced options that will get stuffed into the job
 		$advanced = array();
 		if (isset($postdata["/schedule/options"]["advanced"]) && $postdata["/schedule/options"]["advanced"])
 			foreach (array("skipduplicates", "skipemailduplicates", "leavemessage", "messageconfirmation") as $option)
 				if (isset($postdata["/schedule/advanced"][$option]))
 					$advanced[$option] = $postdata["/schedule/advanced"][$option];
-		
+
 		$jobsettings = array(
 			"jobtype" => $jobtype->id,
 			"jobname" => $jobname,
@@ -430,9 +430,9 @@ class FinishJobWizard extends WizFinish {
 		// Remove temporary 'addme' token from listids.
 		if (($i = array_search('addme', $jobsettings['lists'])) !== false)
 			unset($jobsettings['lists'][$i]);
-		
+
 		Query("BEGIN");
-		
+
 		if ($postdata["/list"]["addme"]) {
 			// NOTE: getUserJobTypes() automatically applies user jobType restrictions
 			$jobTypes = JobType::getUserJobTypes(false);
@@ -447,7 +447,7 @@ class FinishJobWizard extends WizFinish {
 				$langfield = FieldMap::getLanguageField();
 				$fnamefield = FieldMap::getFirstNameField();
 				$lnamefield = FieldMap::getLastNameField();
-				
+
 				// New Person
 				$person = new Person();
 				$person->userid = $USER->id;
@@ -457,7 +457,7 @@ class FinishJobWizard extends WizFinish {
 				$person->$lnamefield = $USER->lastname;
 				$person->$langfield = "English";
 				$person->update();
-				
+
 				// New Phone, Email, SMS
 				$deliveryTypes = array();
 				if (isset($postdata["/list"]["addmePhone"])) {
@@ -472,13 +472,13 @@ class FinishJobWizard extends WizFinish {
 					$deliveryTypes["sms"] = new Sms();
 					$deliveryTypes["sms"]->sms = Phone::parse($postdata["/list"]["addmeSms"]);
 				}
-				
+
 				// Delivery Types and Job Types
 				foreach ($deliveryTypes as $deliveryTypeName => $deliveryTypeObject) {
 					$deliveryTypeObject->personid = $person->id;
 					$deliveryTypeObject->sequence = 0;
 					$deliveryTypeObject->update();
-					
+
 					// For each job type, assume sequence = 0, enabled = 1
 					foreach ($jobTypes as $jobType) {
 						// NOTE: $person->id is assumed to be a new id, so no need to worry about duplicate keys
@@ -486,19 +486,19 @@ class FinishJobWizard extends WizFinish {
 						QuickUpdate($query, false, array($person->id, $jobType->id, $deliveryTypeName));
 					}
 				}
-				
+
 				// New List Entry
 				$le = new ListEntry();
 				$le->type = "A";
 				$le->listid = $addmelist->id;
 				$le->personid = $person->id;
 				$le->create();
-				
+
 				// Include this single-person list in the job.
 				$jobsettings["lists"][] = $addmelist->id;
 			}
 		}
-		
+
 		$job = Job::jobWithDefaults();
 
 		// Attach first list
@@ -509,12 +509,12 @@ class FinishJobWizard extends WizFinish {
 		$job->jobtypeid = $jobsettings['jobtype'];
 		$job->name = $jobsettings['jobname'];
 		$job->description = "";
-		
+
 		$jobtypes = array();
 		foreach (array("phone","email","sms","print") as $type)
 			if (isset($jobsettings[$type]) && $jobsettings[$type])
 				$jobtypes[] = $type;
-		
+
 		$job->type = implode(",",$jobtypes);
 		$job->modifydate = QuickQuery("select now()");
 		$job->createdate = QuickQuery("select now()");
@@ -529,8 +529,8 @@ class FinishJobWizard extends WizFinish {
 		$job->finishdate = null;
 		$job->status = "new";
 		$job->create();
-		
-		
+
+
 		foreach (array("phone","email","sms","print") as $type){
 			if ($jobsettings[$type]) {
 				// there is a message for this type
@@ -559,7 +559,7 @@ class FinishJobWizard extends WizFinish {
 						}
 						$newmessage->stuffHeaders();
 						$newmessage->create();
-						
+
 						/* This chunk parses the message contents and stuffs it in message parts. It is commented out and replaced by the next code that just stuffs all the text into one message part.
 						$parts = $newmessage->parse($message["text"]);
 						foreach ($parts as $part) {
@@ -574,7 +574,7 @@ class FinishJobWizard extends WizFinish {
 						$part->voiceid = $voiceid;
 						$part->sequence = 0;
 						$part->create();
-							
+
 						if (isset($message['attachments']) && $message['attachments']) {
 							foreach ($message['attachments'] as $cid => $details) {
 								$msgattachment = new MessageAttachment();
@@ -590,7 +590,7 @@ class FinishJobWizard extends WizFinish {
 					} else {
 						$messageid = $message['id'];
 					}
-					
+
 					$joblang = new JobLanguage();
 					$joblang->jobid = $job->id;
 					$joblang->messageid = $messageid;
@@ -598,7 +598,7 @@ class FinishJobWizard extends WizFinish {
 					$joblang->language = ucfirst($lang);
 					$joblang->translationeditlock = isset($message['override'])?$message['override']:0;
 					$joblang->create();
-					
+
 					// TODO: english is currently set to default everywhere. This needs to be a customer setting or something
 					$typemessageid = $type."messageid";
 					if ($message['language'] == 'english')
@@ -606,19 +606,19 @@ class FinishJobWizard extends WizFinish {
 				}
 			}
 		}
-		
+
 		// attach additional lists
 		if ($listids)
 			foreach ($listids as $listid)
 				QuickUpdate("insert into joblist (jobid,listid) values (?,?)", false, array($job->id, $listid));
-		
+
 		$job->setSetting('translationexpire', date("Y-m-d", strtotime("+15 days"))); // now plus 15 days
 		if ($jobsettings['emailmessagelink'])
 			$job->setSetting('emailmessagelink', "1");
-		
+
 		if ($jobsettings['smsmessagelink'])
 			$job->setSetting('smsmessagelink', "1");
-		
+
 		foreach ($advanced as $option => $value) {
 			if ($value == true)
 				$job->setSetting($option, 1);
@@ -627,7 +627,7 @@ class FinishJobWizard extends WizFinish {
 			else
 				$job->setSetting($option, $value);
 		}
-		
+
 		// set jobsetting 'callerid'
 		if (getSystemSetting('_hascallback', false)) {
 			// blank callerid is fine, save this setting and default will be looked up by job processor when job starts
@@ -639,16 +639,16 @@ class FinishJobWizard extends WizFinish {
 				$callerid = getDefaultCallerID();
 		}
 		$job->setSetting('callerid', $callerid);
-		
+
 		$job->update();
 		if ($schedule['date'])
 			$job->runNow();
-			
+
 		$_SESSION['wizard_job']['submitted_jobid'] = $job->id;
-		
+
 		Query("COMMIT");
 	}
-	
+
 	function getFinishPage ($postdata) {
 		// If the job has not ben confirmed, don't send any page data
 		if (!isset($postdata["/submit/confirm"]["jobconfirm"])  || !$postdata["/submit/confirm"]["jobconfirm"] )
@@ -656,7 +656,7 @@ class FinishJobWizard extends WizFinish {
 				<script>
 					window.location="unauthorized.php";
 				</script>';
-				
+
 		$html = '<h1>Success! Your notification request has been submitted.</h1>';
 		$html .= '<div id="embedjobmonitor"></div>';
 		$html .= "
@@ -697,7 +697,7 @@ $TITLE = false;
 require_once("nav.inc.php");
 
 ?>
-<script type="text/javascript">	
+<script type="text/javascript">
 <? Validator::load_validators(array("ValInArray", "ValJobName", "ValHasMessage", "ValTextAreaPhone","ValEasycall","ValLists","ValTranslation","ValEmailAttach", "ValTimeWindowCallLate", "ValTimeWindowCallEarly", "ValDate","ValRegExp"));// Included in jobwizard.inc.php ?>
 </script>
 <?
