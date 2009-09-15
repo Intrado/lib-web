@@ -3,7 +3,8 @@
 class SelectMessage extends FormItem {
 	function render ($value) {
 		$n = $this->form->name."_".$this->name;
-		$str = '<select id="'.$n.'" name="'.$n.'" onchange="'.$n.'messageselect.getMessage();" >
+		$varname = str_replace(" ", "_", $n);
+		$str = '<select id="'.$n.'" name="'.$n.'" onchange="'.$varname.'messageselect.getMessage();" >
 			<option value=""> --- '._L("Select One").' --- </option>
 		';
 		foreach ($this->args['values'] as $selectid => $selectvals) {
@@ -27,7 +28,7 @@ class SelectMessage extends FormItem {
 		<script type="text/javascript" src="script/messageselect.js"></script>
 			<script type="text/javascript">
 			'.((isset($this->args['readonly']) && $this->args['readonly'])?'$("'.$n.'").hide()':'').'
-			var '.$n.'messageselect = new MessageSelect("'.$n.'","'.$this->args['type'].'");
+			var '.$varname.'messageselect = new MessageSelect("'.$n.'","'.$this->args['type'].'");
 		</script>';
 		return $str;
 	}
