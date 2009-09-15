@@ -127,7 +127,7 @@ $buttons = array(
 );
 if (!isset($_SESSION['listsearchpreview']))
 	$buttons[] = icon_button(_L('Show All Contacts'),"tick",null,"search.php?showall");
-$buttons[] = icon_button(_L('Done'),"tick",null,"list.php");
+$buttons[] = icon_button(_L('Done'),"tick",null, isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : "list.php");
 
 $form = new Form('listsearch',$formdata,array(),$buttons);
 $form->ajaxsubmit = true;
