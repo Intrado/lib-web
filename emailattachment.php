@@ -8,6 +8,21 @@ if ($USER->authorize("sendemail") === false) {
 	redirect('./');
 }
 
+if(isset($_GET["name"]) && isset($_GET["id"])) {
+	if ($c = contentGet($_GET["id"] + 0)){
+		list($contenttype,$data) = $c;
+		if($data) {
+			header("HTTP/1.0 200 OK");
+			header('Content-type: application/x-octet-stream');
+			header("Content-disposition: attachment; filename=" . $_GET["name"]);
+			header("Content-Length: " . strlen($data));
+			header("Connection: close");
+			echo $data;
+		}
+	}
+	exit();
+}
+
 $filename = '';
 $contentid = '';
 $size = 0;
@@ -72,7 +87,7 @@ if (isset($_FILES['emailattachment']['error']) && $_FILES['emailattachment']['er
 		$errormessage .= _L('The file you uploaded does not have a file extension\nPlease make sure the file has the correct extension and try again');
 	} else {
 		$contentid = contentPut($newname,$mimetype);
-		@unlink($dest);
+		@unlink($newname);
 		if ($contentid) {
 			$uploaderror = false;
 		} else {

@@ -33,7 +33,7 @@ class EmailAttach extends FormItem {
 					var str = "";
 					for(var contentid in values) {
 						var onclick = "removeAttachment(" + contentid + ");";
-				 		str += values[contentid][\'name\'] + "&nbsp;(Size: " + Math.round(values[contentid][\'size\']/1024) + "k)&nbsp;<a href=\'#\' onclick=\'" + onclick + "return false;\'>Remove</a><br />";				
+				 		str += "<a href=\"emailattachment.php?name=" + encodeURIComponent(values[contentid][\'name\']) + "&id=" + contentid + "\">" + values[contentid][\'name\'] + "</a>&nbsp;(Size: " + Math.round(values[contentid][\'size\']/1024) + "k)&nbsp;<a href=\'#\' onclick=\'" + onclick + "return false;\'>Remove</a><br />";				
 					}
 				
 					$("' . $n . '").value = $H(values).toJSON();			
@@ -49,7 +49,7 @@ class EmailAttach extends FormItem {
 					Object.keys(values).each(function (contentid) {
 						if(contentid != id) {
 							var onclick = "removeAttachment(" + contentid + ");";
-				 			str += values[contentid][\'name\'] + "&nbsp;(Size: " + Math.round(values[contentid][\'size\']/1024) + "k)&nbsp;<a href=\'#\' onclick=\'" + onclick + "return false;\'>Remove</a><br />";									
+				 			str += "<a href=\"emailattachment.php?name=" + encodeURIComponent(values[contentid][\'name\']) + "&id=" + contentid + "\">" + values[contentid][\'name\'] + "</a>&nbsp;(Size: " + Math.round(values[contentid][\'size\']/1024) + "k)&nbsp;<a href=\'#\' onclick=\'" + onclick + "return false;\'>Remove</a><br />";									
 						} else
 							values[contentid] = undefined;
 					});
