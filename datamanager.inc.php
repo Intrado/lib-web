@@ -48,6 +48,7 @@ if (isset($_GET['delete'])) {
 		// do not destroy required fields
 
 		$fm->destroy();
+		notice(_L("The field, %s, is now deleted.", escapehtml($fm->name)));
 	}
 	redirect();
 }
@@ -151,62 +152,65 @@ if (CheckFormSubmit($form, $section) || CheckFormSubmit($form, 'add')) {
 
 			// if everything is valid, then save the changes
 			if ($isvalid) {
-				if ($isadd) {
-					$newfield = new FieldMap();
-					// Submit new item
-					$newfield->name = cleanedname(DBSafe(GetFormData($form, $section, "newfield_name")));
-					switch ($DATATYPE) {
-					case "person" :
-						$temp = "f";
-					break;
-					case "group" :
-						$temp = "g";
-					break;
-					case "schedule" :
-						$temp = "c";
-					break;
-					}
-					$newfield->fieldnum = $temp . GetFormData($form,$section,"newfield_fieldnum");
-					if (GetFormData($form, $section, "newfield_searchable"))
-						$newfield->addOption('searchable');
-					$newfield->addOption(GetFormData($form, $section, "newfield_type"));
-					$newfield->update();
-				}
-
-				// update each existing field
-				foreach($FIELDMAPS as $field) {
-					$fieldnum = $field->fieldnum;
-					$name = DBSafe(GetFormData($form, $section, "name_$fieldnum"));
-					$type = DBSafe(GetFormData($form, $section, "type_$fieldnum"));
-					$searchable = GetFormData($form, $section, "searchable_$fieldnum");
-
-					if ($name !== null || $type !== null || $searchable !== null) {
-						$updatefield = DBFind("FieldMap", "from fieldmap where fieldnum = '$fieldnum'");
-						$updatefield->name = cleanedname($name);
-
-						if ($fieldnum != FieldMap::getFirstNameField() &&
-							$fieldnum != FieldMap::getLastNameField() &&
-							$fieldnum != FieldMap::getLanguageField() &&
-							$fieldnum != FieldMap::getSchoolField() &&
-							$fieldnum != FieldMap::getGradeField() &&
-							$fieldnum != FieldMap::getStaffField() ) {
-
-							// only update type for non-specialfield
-							if ($type !== null) $updatefield->updateFieldType($type);
+				Query("BEGIN");
+					if ($isadd) {
+						$newfield = new FieldMap();
+						// Submit new item
+						$newfield->name = cleanedname(DBSafe(GetFormData($form, $section, "newfield_name")));
+						switch ($DATATYPE) {
+							case "person" :
+								$temp = "f";
+								break;
+							case "group" :
+								$temp = "g";
+								break;
+							case "schedule" :
+								$temp = "c";
+								break;
 						}
-						if ($fieldnum != FieldMap::getFirstNameField() &&
-							$fieldnum != FieldMap::getLastNameField() &&
-							$fieldnum != FieldMap::getLanguageField() &&
-							$fieldnum != FieldMap::getStaffField() ) {
-
-							if ($searchable)
-								$updatefield->addOption('searchable');
-							else
-								$updatefield->removeOption('searchable');
-						}
-						$updatefield->update();
+						$newfield->fieldnum = $temp . GetFormData($form,$section,"newfield_fieldnum");
+						if (GetFormData($form, $section, "newfield_searchable"))
+							$newfield->addOption('searchable');
+						$newfield->addOption(GetFormData($form, $section, "newfield_type"));
+						$newfield->update();
+						notice(_L("The field, %s, is now added.", escapehtml($newfield->name)));
 					}
-				}
+
+					// update each existing field
+					foreach($FIELDMAPS as $field) {
+						$fieldnum = $field->fieldnum;
+						$name = DBSafe(GetFormData($form, $section, "name_$fieldnum"));
+						$type = DBSafe(GetFormData($form, $section, "type_$fieldnum"));
+						$searchable = GetFormData($form, $section, "searchable_$fieldnum");
+
+						if ($name !== null || $type !== null || $searchable !== null) {
+							$updatefield = DBFind("FieldMap", "from fieldmap where fieldnum = '$fieldnum'");
+							$updatefield->name = cleanedname($name);
+
+							if ($fieldnum != FieldMap::getFirstNameField() &&
+								$fieldnum != FieldMap::getLastNameField() &&
+								$fieldnum != FieldMap::getLanguageField() &&
+								$fieldnum != FieldMap::getSchoolField() &&
+								$fieldnum != FieldMap::getGradeField() &&
+								$fieldnum != FieldMap::getStaffField() ) {
+
+								// only update type for non-specialfield
+								if ($type !== null) $updatefield->updateFieldType($type);
+							}
+							if ($fieldnum != FieldMap::getFirstNameField() &&
+								$fieldnum != FieldMap::getLastNameField() &&
+								$fieldnum != FieldMap::getLanguageField() &&
+								$fieldnum != FieldMap::getStaffField() ) {
+
+								if ($searchable)
+									$updatefield->addOption('searchable');
+								else
+									$updatefield->removeOption('searchable');
+							}
+							$updatefield->update();
+						}
+					}
+				Query("COMMIT");
 
 				// redraw or redirect
 				if ($isadd) {
