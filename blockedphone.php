@@ -25,10 +25,12 @@ if (!$USER->authorize('blocknumbers')) {
 
 if (isset($_GET['delete'])) {
 	$deleteid = DBSafe($_GET['delete']);
-	$ownerid = QuickQuery("select userid from blockeddestination where id = '$deleteid'");
+	$blockinfo = QuickQueryRow("select `userid`, `destination`, `type` from blockeddestination where id = ?", true, false, array($deleteid));
+	$ownerid = $blockinfo['userid'];
 	if ($ACCESS->getValue('callblockingperms') == 'editall' ||
 		($ACCESS->getValue('callblockingperms') == 'addonly' && $USER->id == $ownerid)) {
-		QuickUpdate("delete from blockeddestination where id='$deleteid'");
+		QuickUpdate("delete from blockeddestination where id=?", false, array($deleteid));
+		notice(_L("%1s for %2s are now unblocked.", $blockinfo['type'] == 'phone' ? escapehtml(_L('Phone calls')) : escapehtml(_L('Text messages')), escapehtml(Phone::format($blockinfo['destination']))));
 	}
 	redirect();
 }
@@ -73,8 +75,14 @@ if(CheckFormSubmit($form, $section))
 								DBSafe($blocktype) . "', now())");
 				}
 				QuickQuery("COMMIT");
+
 				if ($result) {
 					$reloadform = true;
+					if ($blocktype == 'both') {
+						notice(_L("Both phone calls and text messages for %s are now blocked.", escapehtml(Phone::format($phone))));
+					} else {
+						notice(_L("%1s for %2s are now blocked.", $blocktype == 'phone' ? escapehtml(_L('Phone calls')) : escapehtml(_L('Text messages')), escapehtml(Phone::format($phone))));
+					}
 				} else {
 					error("An error occurred when saving the phone number");
 				}
