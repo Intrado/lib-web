@@ -41,8 +41,7 @@ if ($messageinfo !== false) {
 	$urlcomponent = getSystemSetting('urlcomponent');
 	$job = new Job($messageinfo['jobid']+0);
 	$jobname = escapehtml($job->name);
-	$jobdescription = escapehtml($job->description);
-	$jobstarttime = strtotime($job->starttime);
+	$jobstarttime = strtotime($job->startdate . $job->starttime);
 }
 
 $TITLE = $customer;
