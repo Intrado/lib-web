@@ -111,10 +111,9 @@ $formdata = array(
 			array("ValRequired")
 		),
 		"control" => array(
-			"CallMe", 
-			"phone" => Phone::format($USER->phone), 
-			"origin" => $origin, 
-			"max" => getSystemSetting('easycallmax',10), 
+			"CallMe",
+			"phone" => Phone::format($USER->phone),
+			"max" => getSystemSetting('easycallmax',10),
 			"min" => getSystemSetting('easycallmin',10)
 		),
 		"helpstep" => 1
@@ -150,7 +149,7 @@ if ($button = $form->getSubmit()) {
 			$messagename = trim($postdata["messagename"])?trim($postdata["messagename"]):"Call Me" . " - " . date("M j, Y G:i:s");
 			if(QuickQuery("Select count(*) from message where userid=? and not deleted and name =?", false, array($USER->id, $messagename)))
 				$messagename = $messagename . " - " . date("M j, Y G:i:s");
-			
+
 			$message->name = $messagename;
 			$message->update();
 			$afid = QuickQuery("select audiofileid from messagepart where messageid=? limit 1", false, array($message->id));

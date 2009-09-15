@@ -27,11 +27,11 @@ var Easycall = Class.create({
 		this.origin = origin;
 		this.keytimer = null;
 	},
-	
+
 	// Load initial form values
 	load: function() {
 		var messages = $(this.formitemname).value.evalJSON();
-		
+
 		if (typeof(messages[this.language]) !== "undefined") {
 			this.messageid = messages[this.language];
 			this.setupRecord();
@@ -42,15 +42,19 @@ var Easycall = Class.create({
 			this.setupRecord();
 		}
 	},
-	
+
 	// Starts an easycall
 	record: function () {
 		// get value of phone
 		var phone = $(this.formitemname+"_"+this.language+"_phone").value;
 
+		// if there is a global variable for msgphone, set the current phone to it.
+		if (typeof(msgphone) !== "undefined")
+			msgphone = phone;
+
 		// remove input and button
 		$(this.formitemname+"_"+this.language+"_callcontrol").remove();
-		
+
 		// load up a call progress div with new controls
 		$(this.formitemname+"_"+this.language).insert(
 			new Element("div",{id: this.formitemname+"_"+this.language+"_progress"}).insert(
@@ -74,7 +78,7 @@ var Easycall = Class.create({
 		new Ajax.Request('ajaxeasycall.php', {
 			method:'post',
 			parameters: {
-				"phone": phone, 
+				"phone": phone,
 				"language": "Default",
 				"name": "Call Me",
 				"origin": this.origin
@@ -84,7 +88,7 @@ var Easycall = Class.create({
 			onFailure: this.handleEnd.bindAsEventListener(this)
 		});
 	},
-	
+
 	handleRecord: function(transport) {
 		// update progress
 		$(this.formitemname+"_"+this.language+"_progress_text").update("<?=escapehtml(_L('Call started... Your phone should ring shortly.'))?>");
@@ -98,7 +102,7 @@ var Easycall = Class.create({
 			this.handleEnd(response.error);
 		}
 	},
-	
+
 	// gets task status by getting the id
 	update: function () {
 		// start a periodical executor to check call status
@@ -112,7 +116,7 @@ var Easycall = Class.create({
 			});
 		}.bind(this), 2);
 	},
-	
+
 	handleUpdate: function(transport) {
 		var response = transport.responseJSON;
 		if (response && !response.error) {
@@ -129,7 +133,7 @@ var Easycall = Class.create({
 			this.handleEnd(response.error);
 		}
 	},
-	
+
 	// update page based on how the task ended
 	handleEnd: function(error) {
 		if (this.pe)
@@ -140,19 +144,19 @@ var Easycall = Class.create({
 				// create the play and re-record buttons
 				this.createFormItem();
 				return;
-			
+
 			case "callended":
 				$(this.formitemname+"_"+this.language+"_progress").update(icon_button("<?=addslashes(_L("Call ended early. Try again?"))?>", "exclamation", this.formitemname+"_retry")).insert(new Element("div", {style: "clear:both"}));
 				break;
-			
+
 			case "badphone":
 				$(this.formitemname+"_"+this.language+"_progress").update(icon_button("<?=addslashes(_L("Missing or invalid phone. Try again?"))?>", "exclamation", this.formitemname+"_retry")).insert(new Element("div", {style: "clear:both"}));
 				break;
-				
+
 			case "notask":
 				$(this.formitemname+"_"+this.language+"_progress").update(icon_button("<?=addslashes(_L("Status unavailable. Try again?"))?>", "exclamation", this.formitemname+"_retry")).insert(new Element("div", {style: "clear:both"}));
 				break;
-				
+
 			case "startupfail":
 				$(this.formitemname+"_"+this.language+"_progress").update(icon_button("<?=addslashes(_L("Session start failed. Try again?"))?>", "exclamation", this.formitemname+"_retry")).insert(new Element("div", {style: "clear:both"}));
 				break;
@@ -160,7 +164,7 @@ var Easycall = Class.create({
 			default:
 				$(this.formitemname+"_"+this.language+"_progress").update(icon_button("<?=addslashes(_L("There was an error! Try again?"))?>", "exclamation", this.formitemname+"_retry")).insert(new Element("div", {style: "clear:both"}));
 		}
-		
+
 		if ($(this.formitemname+"_"+this.language+"_progress")) {
 			if (easycallRecordings)
 				easycallRecordings--;
@@ -171,10 +175,12 @@ var Easycall = Class.create({
 			}
 		}
 	},
-	
+	// create the form items after the message is recorded
 	createFormItem: function () {
-		$(this.formitemname+"_"+this.language+"_lang").update(this.language);
-		
+		// if this is a CallMe then we don't display the language
+		if (this.origin != 'CallMe')
+			$(this.formitemname+"_"+this.language+"_lang").update(this.language);
+
 		if ($(this.formitemname+"_"+this.language+"_delete")) {
 			$(this.formitemname+"_"+this.language+"_delete").insert({ "before": icon_button("<?=_L('Play')?>", "fugue/control", this.formitemname+"_"+this.language+"_play").setStyle({float: "left"}) });
 			$(this.formitemname+"_"+this.language+"_delete").insert({ "before": icon_button("<?=_L('Re-record')?>", "diagona/16/118", this.formitemname+"_"+this.language+"_rerecord").setStyle({float: "left"}) });
@@ -182,7 +188,10 @@ var Easycall = Class.create({
 			$(this.formitemname+"_"+this.language+"_action").insert(icon_button("<?=_L('Play')?>", "fugue/control", this.formitemname+"_"+this.language+"_play").setStyle({float: "left"}));
 			$(this.formitemname+"_"+this.language+"_action").insert(icon_button("<?=_L('Re-record')?>", "diagona/16/118", this.formitemname+"_"+this.language+"_rerecord").setStyle({float: "left"}));
 		}
-		$(this.formitemname+"_"+this.language).insert(new Element("div", {style: "padding-top: 3px; margin-bottom: 5px; border-bottom: 1px solid gray; clear: both"}));
+
+		// CallMe doesn't need a bottom border
+		if (this.origin != 'CallMe')
+			$(this.formitemname+"_"+this.language).insert(new Element("div", {style: "padding-top: 3px; margin-bottom: 5px; border-bottom: 1px solid gray; clear: both"}));
 
 		$(this.formitemname+"_"+this.language+"_rerecord").observe("click", function (event) {
 			if (confirm("<?=_L('This will delete the current recording. Are you sure you want to do this?')?>"))
@@ -190,12 +199,12 @@ var Easycall = Class.create({
 		}.bind(this));
 		$(this.formitemname+"_"+this.language+"_play").observe('click', function (event) {
 			popup("previewmessage.php?close=1&id="+this.messageid, 400, 500);
-		}.bind(this)); 
-		
+		}.bind(this));
+
 		if (!$(this.formitemname+"langlock"))
 			$(this.formitemname+"_altlangs").show();
 	},
-	
+	// set up the form for a new recording session
 	setupRecord: function () {
 		if ($(this.formitemname+'_select_'+this.language)) {
 			if ($(this.formitemname+'_select_'+this.language)) {
@@ -205,15 +214,24 @@ var Easycall = Class.create({
 		}
 		if (!$(this.formitemname+"_"+this.language))
 			$(this.formitemname+"_messages").insert(new Element("div",{id: this.formitemname+"_"+this.language}));
-		
-		$(this.formitemname+"_"+this.language).update().insert(
-			new Element("div",{id: this.formitemname+"_"+this.language+"_lang", style: "font-size: large; float: left;"}).update(((easycallRecordings > 0)?this.language:''))
-		).insert(
-			new Element("div",{id: this.formitemname+"_"+this.language+"_action", style: "width: 80%; float: right; margin-bottom: 5px;"})
-		).insert(
-			new Element("div",{style: "clear: both;"})
-		);
-		
+
+		// if this is a CallMe then we don't display the language
+		if (this.origin == 'CallMe') {
+			$(this.formitemname+"_"+this.language).update().insert(
+				new Element("div",{id: this.formitemname+"_"+this.language+"_action", style: "margin-bottom: 5px;"})
+			).insert(
+				new Element("div",{style: "clear: both;"})
+			);
+		} else {
+			$(this.formitemname+"_"+this.language).update().insert(
+				new Element("div",{id: this.formitemname+"_"+this.language+"_lang", style: "font-size: large; float: left;"}).update(((easycallRecordings > 0)?this.language:''))
+			).insert(
+				new Element("div",{id: this.formitemname+"_"+this.language+"_action", style: "width: 80%; float: right; margin-bottom: 5px;"})
+			).insert(
+				new Element("div",{style: "clear: both;"})
+			);
+		}
+
 		if (this.language !== "Default") {
 			$(this.formitemname+"_"+this.language+"_action").insert(icon_button("<?=addslashes(_L("Remove"))?>", "cross", this.formitemname+"_"+this.language+"_delete").setStyle({float:"left"}));
 			$(this.formitemname+"_"+this.language+"_delete").observe("click", this.removeMessage.bind(this));
@@ -232,10 +250,13 @@ var Easycall = Class.create({
 				new Element("div", {"id": this.formitemname+"langlock"})
 			)
 		);
-		
+		// if we saved a custom phone number entered earlier then use it as the default
+		if (typeof(msgphone) !== "undefined" && msgphone !== null)
+			this.defaultphone = msgphone;
+
 		$(this.formitemname+"_"+this.language+"_phone").value = this.defaultphone;
 		blankFieldValue($(this.formitemname+"_"+this.language+"_phone"), this.nophone);
-		
+
 		$(this.formitemname+"_"+this.language+"_phone").observe("keydown", function (event) {
 			if (Event.KEY_RETURN == event.keyCode) {
 				Event.stop(event);
@@ -258,10 +279,10 @@ var Easycall = Class.create({
 			);
 		}.bind(this));
 		$(this.formitemname+"_"+this.language+"_callme").observe("click", this.record.bind(this));
-		
+
 		$(this.formitemname+"_altlangs").hide();
 	},
-	
+
 	removeMessage: function (event) {
 		var messages = $(this.formitemname).value.evalJSON();
 		if (typeof(messages[this.language]) !== "undefined") {
@@ -271,18 +292,18 @@ var Easycall = Class.create({
 			$(this.formitemname).value = Object.toJSON(messages);
 			easycallRecordings--;
 		}
-		
-		if ($(this.formitemname+'_select_'+this.language)) 
+
+		if ($(this.formitemname+'_select_'+this.language))
 			$(this.formitemname+'_select_'+this.language).show();
 		$(this.formitemname+"_"+this.language).remove();
 		if (this.pe)
 			this.pe.stop();
 		if (!$(this.formitemname+"langlock"))
 			$(this.formitemname+"_altlangs").show();
-			
+
 		form_do_validation(this.formname, this.formitemname);
 	},
-	
+
 	updateMessage: function () {
 		easycallRecordings++;
 		//Save message information in hidden form field
@@ -293,13 +314,13 @@ var Easycall = Class.create({
 			form_do_validation(this.formname, this.formitemname);
 		} catch (e) { alert(e); }
 	},
-	
+
 	valPhone: function (pnumber,minlength,maxlength) {
 		var phone = pnumber.replace(/[^0-9]/g,"");
 		if (minlength == maxlength && maxlength == 10 && phone.length == 10) {
 			var areacode = phone.substring(0, 3);
 			var prefix = phone.substring(3, 6);
-	
+
 			// based on North American Numbering Plan
 			// read more at en.wikipedia.org/wiki/List_of_NANP_area_codes
 
