@@ -83,7 +83,7 @@ $NAVTREE = array (
 		array("Completed Jobs","completedjobs.php","viewsystemcompleted",$SUBTAB=="completedjobs"),
 		array("Repeating Jobs","repeatingjobs.php","viewsystemrepeating",$SUBTAB=="repeatingjobs"),
 		array("Contacts","contacts.php?clear=1","viewcontacts",$SUBTAB=="contacts"),
-		array("Blocked Destinations","blocked.php","blocknumbers",$SUBTAB=="blockednumbers")
+		array("Blocked Lists","blocked.php","blocknumbers",$SUBTAB=="blockednumbers")
 		)),
 	array("Admin",NULL,array('manageaccount', 'manageprofile', 'managesystem',
 							'metadata', 'managetasks'),$MAINTAB=="admin",array(
