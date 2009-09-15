@@ -150,73 +150,84 @@ if($emergencyintro) {
 	$emergencymessages["message"][$emergencyintro->id] = $emergencyintro->name;
 }
 
-$formdata = array(
-	"Default Intro",
-	"defaultmessage" => array(
-		"label" => _L("General"),
-		"fieldhelp" => _L('This is the introduction which plays before non-emergency messages. See the Guide for content suggestions.'),
-		"value" => array("message" => ($defaultintro === false?"":$defaultintro->id)),
-		"validators" => array(array("ValIntroSelect")),
-		"control" => array("IntroSelect",
-			 "values"=>$defaultmessages
-		),
-		"helpstep" => 1
-	),
-	"emergencymessage" => array(
-		"label" => _L("Emergency"),
-		"fieldhelp" => _L('This is the introduction which plays before an emergency message. See the Guide for content suggestions.'),
-		"value" => array("message" => ($emergencyintro === false?"":$emergencyintro->id)),
-		"validators" => array(array("ValIntroSelect")),
-		"control" => array("IntroSelect",
-			 "values"=>$emergencymessages
-		),
-		"helpstep" => 1
-	)
-);
+$allowedjobtypes = QuickQueryRow("select sum(jt.systempriority = 1 && jt.deleted != 1) as Emergency, sum(jt.systempriority != 1  && jt.deleted != 1) as Other from jobtype jt",true);
 
+
+$formdata = array();
+
+
+$formdata[] = "Default Intro";
+if($allowedjobtypes["Other"] > 0) {
+	$formdata["defaultmessage"] = array(
+			"label" => _L("General"),
+			"fieldhelp" => _L('This is the introduction which plays before non-emergency messages. See the Guide for content suggestions.'),
+			"value" => array("message" => ($defaultintro === false?"":$defaultintro->id)),
+			"validators" => array(array("ValIntroSelect")),
+			"control" => array("IntroSelect",
+				 "values"=>$defaultmessages
+			),
+			"helpstep" => 1
+	);
+}
+if($allowedjobtypes["Emergency"] > 0) {
+	$formdata["emergencymessage"] = array(
+			"label" => _L("Emergency"),
+			"fieldhelp" => _L('This is the introduction which plays before an emergency message. See the Guide for content suggestions.'),
+			"value" => array("message" => ($emergencyintro === false?"":$emergencyintro->id)),
+			"validators" => array(array("ValIntroSelect")),
+			"control" => array("IntroSelect",
+				 "values"=>$emergencymessages
+			),
+			"helpstep" => 1
+	);
+}
 $helpsteplanguages = array();;
 $helpstepindex = 2;
 
 foreach($languages as $language) {	
-	$defaultintro = DBFind("Message","from message m, prompt p where p.type='intro' and language=? and p.messageid = m.id and m.type='phone'","m",array($language));
-	
-	// TODO Fix a better way of adding the set message rather than copying the array in a for loop like this. 
-	$defaultmessages = $messagevalues;
-	$messageid = "";
-	if($defaultintro) {
-		$defaultmessages["message"][$defaultintro->id] = $defaultintro->name;
-		$messageid = $defaultintro->id;
+	$formdata[] = $language . " " . _L("Intro"); // New section for each language	
+	if($allowedjobtypes["Other"] > 0) {
+		
+		$defaultintro = DBFind("Message","from message m, prompt p where p.type='intro' and language=? and p.messageid = m.id and m.type='phone'","m",array($language));
+		
+		// TODO Fix a better way of adding the set message rather than copying the array in a for loop like this. 
+		$defaultmessages = $messagevalues;
+		$messageid = "";
+		if($defaultintro) {
+			$defaultmessages["message"][$defaultintro->id] = $defaultintro->name;
+			$messageid = $defaultintro->id;
+		}
+		$formdata[$language . "default"] = array(
+			"label" => _L("General"),
+			"fieldhelp" => _L('This is the introduction which plays before non-emergency messages. See the Guide for content suggestions.'),
+			"value" => array("message" => $messageid),
+			"validators" => array(array("ValIntroSelect")),
+			"control" => array("IntroSelect",
+				 "values"=>$defaultmessages
+			),
+			"helpstep" => $helpstepindex
+		);
 	}
-	$formdata[] = $language . " " . _L("Intro"); // New section for each language
-	$formdata[$language . "default"] = array(
-		"label" => _L("General"),
-		"fieldhelp" => _L('This is the introduction which plays before non-emergency messages. See the Guide for content suggestions.'),
-		"value" => array("message" => $messageid),
-		"validators" => array(array("ValIntroSelect")),
-		"control" => array("IntroSelect",
-			 "values"=>$defaultmessages
-		),
-		"helpstep" => $helpstepindex
-	);
-	$emergencyintro = DBFind("Message","from message m, prompt p where p.type='emergencyintro' and language=? and p.messageid = m.id and m.type='phone'","m",array($language));
-	$emergencymessages = $messagevalues;
-	$emergencymessages["message"][""] = "System Emergency Intro";
-	$messageid = "";
-	if($emergencyintro) {
-		$emergencymessages["message"][$emergencyintro->id] = $emergencyintro->name;
-		$messageid = $emergencyintro->id;
+	if($allowedjobtypes["Emergency"] > 0) {
+		$emergencyintro = DBFind("Message","from message m, prompt p where p.type='emergencyintro' and language=? and p.messageid = m.id and m.type='phone'","m",array($language));
+		$emergencymessages = $messagevalues;
+		$emergencymessages["message"][""] = "System Emergency Intro";
+		$messageid = "";
+		if($emergencyintro) {
+			$emergencymessages["message"][$emergencyintro->id] = $emergencyintro->name;
+			$messageid = $emergencyintro->id;
+		}
+		$formdata[$language . "emergency"] = array(
+			"label" => _L("Emergency"),
+			"fieldhelp" => _L('This is the introduction which plays before an emergency message. See the Guide for content suggestions.'),
+			"value" => array("message" => $messageid),
+			"validators" => array(array("ValIntroSelect")),
+			"control" => array("IntroSelect",
+				 "values"=>$emergencymessages
+			),
+			"helpstep" => $helpstepindex
+		);
 	}
-	$formdata[$language . "emergency"] = array(
-		"label" => _L("Emergency"),
-		"fieldhelp" => _L('This is the introduction which plays before an emergency message. See the Guide for content suggestions.'),
-		"value" => array("message" => $messageid),
-		"validators" => array(array("ValIntroSelect")),
-		"control" => array("IntroSelect",
-			 "values"=>$emergencymessages
-		),
-		"helpstep" => $helpstepindex
-	);
-	
 	$helpsteptext[$helpstepindex] = $language;
 	$helpstepindex++;
 }
@@ -246,57 +257,59 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		$datachange = true;
 	} else if (($errors = $form->validate()) === false) { //checks all of the items in this form
 		$postdata = $form->getData(); //gets assoc array of all values {name:value,...}
-		
-		$messagevalues = json_decode($postdata['defaultmessage']);
-		if(isset($messagevalues->message) && strlen($messagevalues->message) > 0) {
-			$msgid = $messagevalues->message + 0;
-			$newmsg = new Message($msgid);
-			
-			if(!$newmsg->deleted) {		// if deleted the old value is still the intro
-				$newmsg->id = null;
-				$newmsg->deleted = 1;
-				$newmsg->name = $newmsg->name . " (Copy)";	
-				$newmsg->create();
-				// copy the parts
-				$parts = DBFindMany("MessagePart", "from messagepart where messageid=$msgid");
-				foreach ($parts as $part) {
-					
-					
-					
-					$newpart = new MessagePart($part->id);
-					$newpart->id = null;
-					$newpart->messageid = $newmsg->id;
-					$newpart->create();
-				}
-			} 
-			QuickUpdate("delete from prompt where type='intro' and language is null;");	
-			QuickUpdate("insert into prompt (type, messageid) values ('intro',?)",false,array($newmsg->id));			
-		} else {
-			QuickUpdate("delete from prompt where type='intro' and language is null;");			
-		}
-		
-		$emergencyvalues = json_decode($postdata['emergencymessage']);
-		if(isset($emergencyvalues->message) && strlen($emergencyvalues->message) > 0) {	
-			$msgid = $emergencyvalues->message + 0;
-			$newmsg = new Message($msgid);
-			if(!$newmsg->deleted) {// if deleted the old value is still the intro
-				$newmsg->id = null;
-				$newmsg->deleted = 1;
-				$newmsg->name = $newmsg->name . " (Copy)";	
-				$newmsg->create();
-				// copy the parts
-				$parts = DBFindMany("MessagePart", "from messagepart where messageid=$msgid");
-				foreach ($parts as $part) {
-					$newpart = new MessagePart($part->id);
-					$newpart->id = null;
-					$newpart->messageid = $newmsg->id;
-					$newpart->create();
-				}			
+		if(isset($postdata['defaultmessage'])) {	
+			$messagevalues = json_decode($postdata['defaultmessage']);
+			if(isset($messagevalues->message) && strlen($messagevalues->message) > 0) {
+				$msgid = $messagevalues->message + 0;
+				$newmsg = new Message($msgid);
+				
+				if(!$newmsg->deleted) {		// if deleted the old value is still the intro
+					$newmsg->id = null;
+					$newmsg->deleted = 1;
+					$newmsg->name = $newmsg->name . " (Copy)";	
+					$newmsg->create();
+					// copy the parts
+					$parts = DBFindMany("MessagePart", "from messagepart where messageid=$msgid");
+					foreach ($parts as $part) {
+						
+						
+						
+						$newpart = new MessagePart($part->id);
+						$newpart->id = null;
+						$newpart->messageid = $newmsg->id;
+						$newpart->create();
+					}
+				} 
+				QuickUpdate("delete from prompt where type='intro' and language is null;");	
+				QuickUpdate("insert into prompt (type, messageid) values ('intro',?)",false,array($newmsg->id));			
+			} else {
+				QuickUpdate("delete from prompt where type='intro' and language is null;");			
 			}
-			QuickUpdate("delete from prompt where type='emergencyintro' and language is null;");	
-			QuickUpdate("insert into prompt (type, messageid) values ('emergencyintro',?)",false,array($newmsg->id));
-		} else {
-			QuickUpdate("delete from prompt where type='emergencyintro' and language is null;");	
+		}
+		if(isset($postdata['emergencymessage'])) {
+			$emergencyvalues = json_decode($postdata['emergencymessage']);
+			if(isset($emergencyvalues->message) && strlen($emergencyvalues->message) > 0) {	
+				$msgid = $emergencyvalues->message + 0;
+				$newmsg = new Message($msgid);
+				if(!$newmsg->deleted) {// if deleted the old value is still the intro
+					$newmsg->id = null;
+					$newmsg->deleted = 1;
+					$newmsg->name = $newmsg->name . " (Copy)";	
+					$newmsg->create();
+					// copy the parts
+					$parts = DBFindMany("MessagePart", "from messagepart where messageid=$msgid");
+					foreach ($parts as $part) {
+						$newpart = new MessagePart($part->id);
+						$newpart->id = null;
+						$newpart->messageid = $newmsg->id;
+						$newpart->create();
+					}			
+				}
+				QuickUpdate("delete from prompt where type='emergencyintro' and language is null;");	
+				QuickUpdate("insert into prompt (type, messageid) values ('emergencyintro',?)",false,array($newmsg->id));
+			} else {
+				QuickUpdate("delete from prompt where type='emergencyintro' and language is null;");	
+			}
 		}
 		
 		foreach($languages as $language) {

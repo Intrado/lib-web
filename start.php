@@ -497,7 +497,7 @@ include_once("nav.inc.php");
 		<td>
 <?
 			if ($USER->authorize('sendphone') || $USER->authorize('sendemail') || $USER->authorize('sendsms')) {
-				$allowedjobtypes = QuickQueryRow("select sum(jt.systempriority = 1) as Emergency, sum(jt.systempriority != 1) as Other from jobtype jt",true);
+				$allowedjobtypes = QuickQueryRow("select sum(jt.systempriority = 1 && jt.deleted != 1) as Emergency, sum(jt.systempriority != 1 && jt.deleted != 1) as Other from jobtype jt",true);
 				$jobtypes = QuickQueryList("select jt.systempriority from jobtype jt,userjobtypes ujt where ujt.jobtypeid = jt.id and ujt.userid=? and jt.deleted=0",false,false,array($USER->id));
 				$jobtypescount = count($jobtypes);
 ?>
