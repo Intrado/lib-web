@@ -122,7 +122,6 @@ if ($ACCESS->getValue('callblockingperms') == 'addonly' || $ACCESS->getValue('ca
 			<td>Email: <? NewFormItem($form, $section, 'email', 'text',20,200); ?>&nbsp;&nbsp;</td>
 			<td>Reason: <? NewFormItem($form, $section, 'reason', 'text',30,100); ?>&nbsp;&nbsp;</td>
 			<td><?= submit($form, $section, 'Add'); ?></td>
-			<td><? print help('Blocked_Add', 'style="margin-left: 5px;"'); ?></td>
 		</tr>
 	</table>
 <?
