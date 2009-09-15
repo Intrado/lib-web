@@ -38,6 +38,7 @@ if (isset($_GET['id'])) {
 if(getSystemSetting("_hasportal", false) && $USER->authorize("portalaccess")){
 	if(isset($_GET['create']) && $_GET['create']){
 		if(generatePersonTokens(array($personid))){
+			notice(_L("An activation code is now created for %s.", escapehtml(Person::getFullName($personid))));
 			redirect();
 		} else {
 			error("There was an error generating a new token");
@@ -48,6 +49,7 @@ if(getSystemSetting("_hasportal", false) && $USER->authorize("portalaccess")){
 		$revokeid = $_GET['revoke'] + 0;
 		$count = revokePersonTokens(array($revokeid));
 		if($count){
+			notice(_L("The activation code for %s is now revoked.", escapehtml(Person::getFullName($revokeid))));
 			redirect();
 		} else {
 			error("There was an error revoking this person's token");
@@ -58,6 +60,9 @@ if(getSystemSetting("_hasportal", false) && $USER->authorize("portalaccess")){
 		$portaluserid = $_GET['disassociate'] + 0;
 		$count = QuickUpdate("delete from portalperson where personid = '" . $personid . "' and portaluserid = '" . $portaluserid . "'");
 		if($count){
+			$portaluser = getPortalUsers(array($portaluserid));
+			$portalusername = $portaluser[$portaluserid]['portaluser.username'];
+			notice(_L("%1s is now dissociated from user %2s.", escapehtml(Person::getFullName($personid)), escapehtml($portalusername)));
 			redirect();
 		} else {
 			error("An error occurred while disassociating the Portal User to this person");
@@ -306,7 +311,7 @@ if (!isset($_GET['ajax'])) {
 		buttons(submit($f, $s, "Done"));
 	} else {
 		buttons(button("Done", null, $_SESSION['contact_referer']),
-	
+
 			$USER->authorize('managecontactdetailsettings') ? button("Edit", "if(confirm('You are about to edit contact data that may impact other people\'s lists.  Are you sure you want to continue?')) window.location='editcontact.php'") : "");
 	}
 	startWindow('Contact');
