@@ -1,23 +1,23 @@
-<? 
+<?
 
 // Translation widget
 class TranslationItem extends FormItem {
 	function render ($value) {
 		static $renderscript = true;
-		
+
 		$n = $this->form->name."_".$this->name;
 		if($value == null)
 			$value == "";
-			
+
 		$msgdata = json_decode($value);
-		
+
 		$language = $this->args['language'];
 		$gender = isset($msgdata->gender)?$msgdata->gender:"female";
-		
+
 		$isphone = isset($this->args['phone']);
 
 		$str = "";
-		
+
 		$str .= '
 			<input id="'.$n.'" name="'.$n.'" type="hidden" value="' . escapehtml($value) . '"/>
 			<input id="'.$n.'englishText" name="'.$n.'englishText" type="hidden" value="' . escapehtml($this->args["englishText"]) . '"/>
@@ -26,7 +26,7 @@ class TranslationItem extends FormItem {
 			<table width="100%">
 				<tr>
 					<td valign="top" width="80px">
-						<input id="'.$n.'translatecheck" name="'.$n.'checkbox" type="checkbox" onclick="toggleTranslation(\''.$n.'\',\''.$language.'\');" '.(($msgdata->enabled)?"checked":"").' /> 
+						<input id="'.$n.'translatecheck" name="'.$n.'checkbox" type="checkbox" onclick="toggleTranslation(\''.$n.'\',\''.$language.'\');" '.(($msgdata->enabled)?"checked":"").' />
 						<b>'._L('Translate').'</b>
 					</td>
 					<td valign="top" align="right" width="18px">
@@ -50,7 +50,7 @@ class TranslationItem extends FormItem {
 								'. icon_button(_L("Show in English"), "fugue/magnifier", "toEnglishButton('$n','$language')", null, 'id="'. $n .'showenglish"').'
 								'. icon_button(_L("Hide English"), "fugue/magnifier__minus", "toEnglishButton('$n','$language')", null, 'id="'. $n .'hideenglish" style="display:none"').'
 								<input id="'.$n.'override" name="'.$n.'checkbox" type="checkbox" '.(($msgdata->override)?"checked":"").' onclick="overrideTranslation(\''.$n.'\',\''.$language.'\');"/>' . _L('Override Translation') . '
-								
+
 								<div id="'.$n.'retranslation" style="width: 100%; display: none;margin-top: 15px; clear:both">
 									'. icon_button(_L('Refresh %1$s to English Translation', $language),"fugue/arrow_circle_double_135","submitRetranslation('$n','$language')", null, 'style="margin-bottom: 12px"') . '
 									<div id="'.$n.'retranslationtext" name="'.$n.'retranslation" style="width: 100%; width: 99%; height: 50px; border: 1px solid gray; color: gray; overflow:auto; clear:both"></div>
@@ -65,7 +65,7 @@ class TranslationItem extends FormItem {
 					</td>
 				</tr>
 			</table>';
-			
+
 		if($renderscript) {
 			$str .= '
 			<script>
@@ -90,11 +90,11 @@ class TranslationItem extends FormItem {
 						text = text.substring(0, 2000);
 						alert("' . _L('The message is too long. Only the first 2000 characters are submitted for translation.') . '");
 					}
-					$(section + "retranslationtext").innerHTML = "<img src=\"img/icons/loading.gif\" />";
+					$(section + "retranslationtext").innerHTML = "<img src=\"img/ajax-loader.gif\" />";
 					new Ajax.Request("translate.php", {
 						method:"post",
 						parameters: {"text": text, "language": language},
-						onSuccess: function(result) {	
+						onSuccess: function(result) {
 									var data = result.responseJSON;
 									if(data.responseStatus != 200 || data.responseData.translatedText == undefined)
 										return;
@@ -112,7 +112,7 @@ class TranslationItem extends FormItem {
 						langtext.value = overridesave.value;
 						return;
 					}
-					$(section + "textdiv").innerHTML = "<img src=\"img/icons/loading.gif\" />";
+					$(section + "textdiv").innerHTML = "<img src=\"img/ajax-loader.gif\" />";
 					new Ajax.Request("translate.php", {
 						method:"post",
 						parameters: {"english": englishText.value, "languages": language},
@@ -135,9 +135,9 @@ class TranslationItem extends FormItem {
 						"override": (($(section + "translatecheck").checked)?$(section + "override").checked:false),
 						"gender": curVal.gender
 					});
-					form_do_validation($(\'' . $this->form->name . '\'), $(section)); 
-				} 
-				
+					form_do_validation($(\'' . $this->form->name . '\'), $(section));
+				}
+
 				function overrideTranslation(section,language) {
 					var langtext = $(section + "text");
 					var overridesave = $(section + "overridesave");
@@ -164,19 +164,19 @@ class TranslationItem extends FormItem {
 					if ($(section+"translatecheck").checked) {
 						if ($(section+"text").value == "")
 							getTranslation(section, language);
-						$(section +"icons").show(); 
+						$(section +"icons").show();
 						$(section +"textfields").show();
 						$(section +"disableinfo").hide();
 						$(section +"controls").show();
 					} else {
-						$(section +"icons").hide(); 
+						$(section +"icons").hide();
 						$(section +"textfields").hide();
 						$(section +"disableinfo").show();
 						$(section +"controls").hide();
 					}
 					setTranslationValue(section);
 				}
-				
+
 			</script>';
 			$renderscript = false;
 		}
@@ -198,8 +198,8 @@ class ValTranslation extends Validator {
 
 	}
 	function getJSValidator () {
-		return 
-			'function (name, label, value, args) {	
+		return
+			'function (name, label, value, args) {
 				if (value.strip() == "")
 					return label + " " + "' . _L('message can not be empty if translation checkbox is checked') . '";
 				checkval = value.evalJSON();
