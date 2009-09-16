@@ -292,7 +292,7 @@ ALTER TABLE `smsblock` CHANGE `status` `status` ENUM( 'block', 'pendingoptin', '
 
 ALTER TABLE `smsblock` ADD `timezone` VARCHAR( 50 ) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL DEFAULT 'US/Pacific';
 
-ALTER TABLE `smsblock` ADD `customerid` INT NOT NULL DEFAULT '0' FIRST ;
+ALTER TABLE `smsblock` ADD `customerid` INT DEFAULT NULL FIRST ;
 
 CREATE TABLE `aspshard`.`replicationcheck` (
 `currenttime` DATETIME NOT NULL
