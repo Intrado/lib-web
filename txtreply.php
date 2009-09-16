@@ -16,7 +16,7 @@ if (!$is3ci && !isset($_POST['message'])) {
 
 // keywords
 $optoutkeywords = array("end","stop","quit","cancel","unsubscribe");
-$optinkeywords = array("yes","subscribe","ok");
+$optinkeywords = array("optin","subscribe"); // special case "opt in" two words
 
 require_once("XML/RPC.php");
 require_once("manager/authclient.inc.php");
@@ -36,13 +36,33 @@ if ($is3ci) { // 3ci
 	$sourceaddress = trim($_GET['SourceAddr']);
 	$inboundshortcode = trim($_GET['DestAddr']);
 	$message = strtolower($_GET['MessageText']);
-error_log("3ci ".$inboundshortcode);
+//error_log("3ci ".$inboundshortcode);
 } else { // air2web
 	$sourceaddress = $_POST['device_address'];
 	$inboundshortcode = $_POST['inbound_address'];
 	$message = strtolower($_POST['message']);
-error_log("air2web ".$inboundshortcode);
+//error_log("air2web ".$inboundshortcode);
 }
+
+if ($inboundshortcode == "45305") {
+	// 3ci
+	$visitlink = "www.schoolmessenger.com/txt";
+} else if ($inboundshortcode == "68453") {
+	// air2web US
+	$visitlink = "www.schoolmessenger.com/txtmsg";
+} else {
+	// TODO air2web canada
+	// for now assume 3ci
+	$visitlink = "www.schoolmessenger.com/txt";
+	error_log("unexpected incoming shortcode ".$inboundshortcode);
+}
+
+$helptext = "Text Alert Service from SchoolMessenger. For additional info visit " . $visitlink . ". Send STOP to opt out. Std rates/other chgs may apply.";
+$infotext = $helptext;
+$optouttext = "You are now unsubscribed from this text alert service. Txt OPTIN to subscribe, HELP for help. Check out " . $visitlink . " for info.";
+$outintext = "You are now registered to receive text alerts. Txt STOP to quit, HELP for help. Check out " . $visitlink . " for info.";
+
+
 $message = str_replace("\n"," ",$message);
 $message = str_replace("\r"," ",$message);
 $message = trim($message);
@@ -51,9 +71,8 @@ $splitmessage = explode(" ", $message, 2);
 
 // Check if message starts with help
 if ($splitmessage[0] === "help") {
-	$body = "School Messenger Alerts approx 3msg/mo. Visit www.schoolmessenger.com/txtmsg or email support@schoolmessenger.com 4info. Txt STOP 2quit.  Std msg charges apply.";
 	if (!$is3ci) // 3ci sends for us
-		sendtxt($username, $password, $inboundshortcode, $sourceaddress, $body);
+		sendtxt($username, $password, $inboundshortcode, $sourceaddress, $helptext);
 	
 	logExit("HELP");
 }
@@ -71,6 +90,12 @@ foreach ($optinkeywords as $keyword) {
 		$hasoptin = true;
 	}
 }
+// special case 'opt in' two words
+if (isset($splitmessage[1]) &&
+	(stripos($splitmessage[0], 'opt') === 0) && 
+	(stripos($splitmessage[1], 'in') === 0)) {
+		$hasoptin = true;
+}
 
 if ($hasoptout) {
 	// call authserver to update global blocked list
@@ -78,9 +103,8 @@ if ($hasoptout) {
 	blocksms($phonenumber, 'block', 'automated block due to keyword '.$splitmessage[0]);
 	
 	// reply back with confirmation
-	$body = "You have been unsubscribed from School Messenger Alerts and will no longer receive msgs. 4 info visit www.schoolmessenger.com/txtmsg. Text HELP for info.";
 	if (!$is3ci) // 3ci sends for us
-		sendtxt($username, $password, $inboundshortcode, $sourceaddress, $body);
+		sendtxt($username, $password, $inboundshortcode, $sourceaddress, $optouttext);
 	
 	logExit("OPTOUT");
 } else if ($hasoptin) {
@@ -89,9 +113,8 @@ if ($hasoptout) {
 	blocksms($phonenumber, 'optin', 'automated optin due to keyword '.$splitmessage[0]);
 
 	// reply back with confirmation
-	$body = "You have subscribed to School Messenger Alerts and will receive msgs. 4 info visit www.schoolmessenger.com/txtmsg. Text HELP for info.";
 	if (!$is3ci) // 3ci not ready for optin keywords
-		sendtxt($username, $password, $inboundshortcode, $sourceaddress, $body);
+		sendtxt($username, $password, $inboundshortcode, $sourceaddress, $optintext);
 	
 	logExit("OPTIN");
 } else {
@@ -123,8 +146,7 @@ if ($hasoptout) {
 	fwrite($throttlefp,"$sourceaddress\n");
 	fclose($throttlefp);
 
-	$body = "This is the SchoolMessenger automated notification system. For more information, reply HELP. Send STOP to opt out. Std rates/other chgs may apply.";
-	sendtxt($username, $password, $inboundshortcode, $sourceaddress, $body);
+	sendtxt($username, $password, $inboundshortcode, $sourceaddress, $infotext);
 	logExit("INFO");
 }
 
