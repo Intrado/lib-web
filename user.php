@@ -286,7 +286,7 @@ $formdata["jobtypes"] = array(
 	"control" => array("MultiCheckBox", "values"=>$jobtypes),
 	"helpstep" => 2
 );
-if($usersurveytypes && getSystemSetting("_hassurvey", true)) {
+if (getSystemSetting("_hassurvey", true)) {
 	$formdata["surveytypes"] = array(
 		"label" => _L("Survey Type Restriction"),
 		"fieldhelp" => _L('If the user should only be able to send certain types of surveys, check the survey types here. Checking nothing will allow the user to send any survey type.'),
@@ -388,7 +388,7 @@ if ($readonly) {
 	$formdata["jobtypes"]["control"] = array("FormHtml", "html" => "<div style='border: 1px dotted;'>$displayjobtypes</div>");
 	unset($formdata["jobtypes"]["validators"]);
 	// Survey Types
-	if($usersurveytypes && getSystemSetting("_hassurvey", true)) {
+	if (getSystemSetting("_hassurvey", true)) {
 		$displaysurveytypes = "";
 		foreach ($surveytypes as $jobtypeid => $jobtypename) {
 			if (count($usersurveytypes)) {
@@ -558,7 +558,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 			if(count($postdata['jobtypes']))
 				foreach($postdata['jobtypes'] as $type)
 					QuickUpdate("insert into userjobtypes values (?, ?)", false, array($edituser->id, $type));					
-			if(getSystemSetting("_hassurvey", true) && count($postdata['surveytypes']))
+			if (getSystemSetting("_hassurvey", true) && isset($postdata['surveytypes']) && count($postdata['surveytypes']))
 				foreach($postdata['surveytypes'] as $type)
 					QuickUpdate("insert into userjobtypes values (?, ?)", false, array($edituser->id, $type));
 		}
