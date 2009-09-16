@@ -57,17 +57,23 @@ if(CheckFormSubmit($form, $section))
 			if (strlen($email) > 200) {
 				error('The email address cannot be more than 200 characters in length.');
 			} else if (!validEmail($email)) {
-				error('The email address is not valid.');
+				error(_L('The email address is not valid'));
 			} else {
 				QuickQuery("BEGIN");
-				$result = QuickUpdate("insert into blockeddestination(userid, description, destination, type, createdate)
-							values (?, ?, ?, 'email', now())", false, array($USER->id, TrimFormData($form, $section, 'reason'), $email));
-				QuickQuery("COMMIT");
-				if ($result) {
-					$reloadform = true;
-					notice(_L("Emails for %s are now blocked.", escapehtml($email)));
+				// Check to see if the email already exists
+				$exists = QuickQuery("select count(id) from blockeddestination where type = 'email' and destination = ?", false, array($email));
+				if ($exists) {
+					error(_L('That email is already blocked'));
 				} else {
-					error("An error occurred when saving the email address");
+					$result = QuickUpdate("insert into blockeddestination(userid, description, destination, type, createdate)
+								values (?, ?, ?, 'email', now())", false, array($USER->id, TrimFormData($form, $section, 'reason'), $email));
+					QuickQuery("COMMIT");
+					if ($result) {
+						$reloadform = true;
+						notice(_L("Emails for %s are now blocked.", escapehtml($email)));
+					} else {
+						error("An error occurred when saving the email address");
+					}
 				}
 			}
 		} else {

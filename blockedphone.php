@@ -59,32 +59,32 @@ if(CheckFormSubmit($form, $section))
 			if (strlen($phone) != 10) {
 				error('The phone number must be exactly 10 digits long (including area code)','You do not need to include a 1 for long distance');
 			} else {
-				QuickQuery("BEGIN");
 				$blocktype = GetFormData($form, $section, 'type');
-				if ($blocktype == 'both') {
-					$result = QuickUpdate("insert into blockeddestination(userid, description, destination, type, createdate)
-								values ($USER->id, '" .
-								DBSafe(GetFormData($form, $section, 'reason')) . "', '$phone','phone', now())");
-					$result = QuickUpdate("insert into blockeddestination(userid, description, destination, type, createdate)
-								values ($USER->id, '" .
-								DBSafe(GetFormData($form, $section, 'reason')) . "', '$phone','sms', now())");
+				// check to see if this number already exists
+				$exists = QuickQuery("select count(id) from blockeddestination where type in (" . (($blocktype == 'both')?"'phone', 'sms', ":"") . " ?) and destination = ?", false, array($blocktype, $phone));
+				if ($exists) {
+					error(_L('That combination of number and type are already blocked'));
 				} else {
-					$result = QuickUpdate("insert into blockeddestination(userid, description, destination, type, createdate)
-								values ($USER->id, '" .
-								DBSafe(GetFormData($form, $section, 'reason')) . "', '$phone','" .
-								DBSafe($blocktype) . "', now())");
-				}
-				QuickQuery("COMMIT");
+					QuickQuery("BEGIN");
+					if($blocktype == 'both' || $blocktype == 'phone')
+						$result = QuickUpdate("insert into blockeddestination (userid, description, destination, type, createdate)
+									values (?, ?, ?, 'phone', now())", false, array($USER->id, TrimFormData($form, $section, 'reason'), $phone));
+					if($blocktype == 'both' || $blocktype == 'sms')
+						$result = QuickUpdate("insert into blockeddestination (userid, description, destination, type, createdate)
+									values (?, ?, ?, 'sms', now())", false, array($USER->id, TrimFormData($form, $section, 'reason'), $phone));
 
-				if ($result) {
-					$reloadform = true;
-					if ($blocktype == 'both') {
-						notice(_L("Both phone calls and text messages for %s are now blocked.", escapehtml(Phone::format($phone))));
+					QuickQuery("COMMIT");
+
+					if ($result) {
+						$reloadform = true;
+						if ($blocktype == 'both') {
+							notice(_L("Both phone calls and text messages for %s are now blocked.", escapehtml(Phone::format($phone))));
+						} else {
+							notice(_L("%1s for %2s are now blocked.", $blocktype == 'phone' ? escapehtml(_L('Phone calls')) : escapehtml(_L('Text messages')), escapehtml(Phone::format($phone))));
+						}
 					} else {
-						notice(_L("%1s for %2s are now blocked.", $blocktype == 'phone' ? escapehtml(_L('Phone calls')) : escapehtml(_L('Text messages')), escapehtml(Phone::format($phone))));
+						error("An error occurred when saving the phone number");
 					}
-				} else {
-					error("An error occurred when saving the phone number");
 				}
 			}
 		} else {
