@@ -31,20 +31,22 @@ if (isset($_SESSION['currentid'])) {
 
 function update_jobtypeprefs($min, $max, $type, $custdb){
 	$runquery = false;
-	$emergencyjobtypeid = QuickQuery("select id from jobtype where systempriority = 1 and not deleted", $custdb);
-	$result = Query("select sequence from jobtypepref where jobtypeid = " . $emergencyjobtypeid . " and type = '" . $type . "'", $custdb);
-	$currentprefs = array();
-	while($row = DBGetRow($result)){
-		$currentprefs[$row[0]] = 1;
-	}
-
+	
+	$emergencyjobtypeids = QuickQueryList("select id from jobtype where systempriority = 1 and not deleted",false, $custdb);
+	if(!$emergencyjobtypeids) 
+		return;
+	
+	$currentprefs = QuickQueryList("select jobtypeid,max(sequence) from jobtypepref where jobtypeid in (" . implode($emergencyjobtypeids,",") . ") and type = '" . $type . "' group by jobtypeid",true, $custdb);
+		
 	$query = "insert into jobtypepref (jobtypeid,type, sequence,enabled)
 						values ";
 	$values = array();
 	for($i = $min-1; $i < $max; $i++){
-		if(!isset($currentprefs[$i])){
-			$values[] = "(" . $emergencyjobtypeid . ", '" . $type . "', " . $i . ", 1)";
-			$runquery = true;
+		foreach($emergencyjobtypeids as $emergencyjobtypeid) {
+			if(!isset($currentprefs["$emergencyjobtypeid"]) || $currentprefs["$emergencyjobtypeid"] < $i){
+				$values[] = "(" . $emergencyjobtypeid . ", '" . $type . "', " . $i . ", 1)";
+				$runquery = true;
+			}
 		}
 	}
 	if($runquery){
@@ -52,7 +54,6 @@ function update_jobtypeprefs($min, $max, $type, $custdb){
 		$query .= $values;
 		QuickUpdate($query, $custdb);
 	}
-
 }
 
 ////////////////////////////////////////////////////////////////////////////////
