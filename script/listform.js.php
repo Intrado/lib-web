@@ -397,9 +397,7 @@ function listform_load_lists(listidsJSON) {
 					tr.prototip.show();
 					}.bindAsEventListener(nameTD,listid));
 				} else {
-					nameTD.observe('mouseover', function (event, listid) {
-						listform_hover_existing_list(this, listid, this.up('tr'));
-					}.bindAsEventListener(nameTD,listid));
+					listform_delay_hover(nameTD, listid, nameTD.up('tr'));
 				}
 
 				var removeButton = actionTD.down('img');
@@ -463,9 +461,14 @@ function listform_hover_existing_list(label, listid, tr) {
 
 	Tips.hideAll();
 
+	if (hoverTimer === null)
+		return;
+
 	var listuri = chosenLists.indexOf(listid.toString()) >= 0 ? chosenLists.toJSON() : [listid].toJSON();
 	cachedAjaxGet('ajax.php?type=liststats&listids='+ listuri, function(transport, listid, tr) {
 		Tips.hideAll();
+		if (hoverTimer === null)
+			return;
 
 		var stats = transport.responseJSON;
 		if (!stats) {
@@ -490,6 +493,7 @@ function listform_hover_existing_list(label, listid, tr) {
 			offset:{x:0,y:0},
 			delay: 0.8,
 			stem: stemPreference,
+			hideOn: {element: 'target', event: 'mouseout'},
 			title: '<?=_L("List Name:")?> ' + data.name.escapeHTML()
 		});
 		targetElement.prototip.show();
@@ -583,12 +587,7 @@ function listform_reset_list_selectbox() {
 			}
 			checkbox.observe('click', listform_onclick_existing_list.bindAsEventListener(checkbox, value));
 			label.identify();
-			label.observe('mouseover', function (event, value) {
-				if (hoverTimer)
-					clearTimeout(hoverTimer);
-				Tips.hideAll();
-				hoverTimer = setTimeout('listform_hover_existing_list($("'+this.identify()+'"), '+value+');', 300);
-			}.bindAsEventListener(label, value));
+			listform_delay_hover(label, value);
 			ul.insert(li);
 		}
 		multicheckbox.insert(ul);
@@ -597,6 +596,24 @@ function listform_reset_list_selectbox() {
 	} else {
 		$('listSelectboxContainer').update('<?=addslashes(_L("There are no existing lists, you will need to build one."))?>');
 	}
+}
+
+function listform_delay_hover(element, listid, tr) {
+	element.observe('mouseover', function (event, listid, tr) {
+		if (hoverTimer)
+			clearTimeout(hoverTimer);
+		Tips.hideAll();
+		var params = '$("'+element.identify()+'"),'+listid;
+		if (tr)
+			params += ',$("'+tr.identify()+'")';
+		hoverTimer = setTimeout('listform_hover_existing_list(' + params + ');', 300);
+	}.bindAsEventListener(element, listid, tr));
+	element.observe('mouseout', function () {
+		if (hoverTimer)
+			clearTimeout(hoverTimer);
+		hoverTimer = null;
+		Tips.hideAll();
+	});
 }
 
 function listform_set_rule_editor_status(addingRule) {
