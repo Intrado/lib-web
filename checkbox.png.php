@@ -3,10 +3,13 @@ include_once("inc/common.inc.php");
 include_once("inc/securityhelper.inc.php");
 header ("Content-type: image/png");
 
-$id = DBSafe($_GET['id']);
+$id = $_GET['id'] + 0;
 if ($id && $USER->authorize('createlist') && userOwns("list",$_SESSION['listid'])) {
 	if ($_GET['type'] == "add") {
 		if ($_GET['toggle'] == "true") {
+			if (!userOwns('person', $id))
+				exit();
+
 			QuickUpdate("begin");
 			//insert into db
 			$usersql = $USER->userSQL("p");
@@ -34,6 +37,9 @@ if ($id && $USER->authorize('createlist') && userOwns("list",$_SESSION['listid']
 		}
 	} else if ($_GET['type'] == "remove") {
 		if ($_GET['toggle'] == "true") {
+			if (!userOwns('person', $id))
+				exit();
+
 			//insert into db
 			QuickUpdate("begin");
 			if(!QuickQuery("select count(*) from listentry where personid = " . $id . " and listid = " . $_SESSION['listid'])){

@@ -3,7 +3,7 @@
 function list_clear_search_session($keep = false) {
 	if ($keep != 'listsearchshowall')
 		$_SESSION['listsearchshowall'] = false;
-		
+
 	if ($keep != 'listsearchperson') {
 		$_SESSION['listsearchperson'] = false;
 		$_SESSION['listsearchpkey'] = false;
@@ -11,7 +11,7 @@ function list_clear_search_session($keep = false) {
 		$_SESSION['listsearchemail'] = false;
 		$_SESSION['listsearchsms'] = false;
 	}
-	
+
 	if ($keep != 'listsearchrules')
 		$_SESSION['listsearchrules'] = array();
 }
@@ -25,6 +25,8 @@ function listentry_delete($personid) {
 }
 
 function listentry_insert($personid, $type) {
+	if (!userOwns('person', $personid))
+		return;
 	QuickUpdate("INSERT INTO listentry (listid, type, personid) VALUES(?,?,?)", false, array($_SESSION['listid'], $type, $personid));
 }
 
@@ -58,15 +60,15 @@ function fmt_list_destination_sequence($row, $index){
 		return "";
 	}
 }
-		
+
 function list_handle_ajax_table($renderedlist, $validContainers) {
 	global $USER;
-	
+
 	if (!isset($_GET['ajax']))
 		return;
 	if (empty($_GET['addpersonid']) && empty($_GET['removepersonid']) && empty($_GET['containerID']) && empty($_GET['addtoggler']) && empty($_GET['removetoggler']))
 		return;
-	
+
 	header('Content-Type: application/json');
 		$ajaxdata = false;
 		QuickUpdate("BEGIN");
@@ -115,7 +117,7 @@ function list_prepare_ajax_table($containerID, $renderedlist) {
 		default:
 			return false;
 	}
-	
+
 	$allFieldmaps = FieldMap::getMapNames();
 	$titles = array(
 		0 => "In List",
@@ -137,25 +139,25 @@ function list_prepare_ajax_table($containerID, $renderedlist) {
 		$titles[5] = "Address";
 		$titles[6] = "Sequence";
 		$titles[7] = "Destination";
-		
+
 		$formatters[6] = "fmt_list_destination_sequence";
 		$formatters[7] = "fmt_destination";
-		
+
 		$sorting[5] = "address";
-		
+
 		$fieldmaps = FieldMap::getOptionalAuthorizedFieldMapsLike('f') + FieldMap::getOptionalAuthorizedFieldMapsLike('g');
 		// Reserve index 8, destination type, for formatter
 		$i = 9;
 		// NOTE: $row[8] indicates the destination's type, which is phone, email or sms.
 		foreach ($fieldmaps as $fieldmap) {
 			$titles[$i] = '@' . $fieldmap->name;
-			
+
 			// NOTE: Only allow sorting by f-fields.
 			if ($fieldmap->fieldnum[0] == 'f')
 				$sorting[$i] = $fieldmap->fieldnum;
 			$i++;
 		}
-		
+
 		// Sequence and Destination Columns are repeated.
 		$repeatedColumns = array(6,7);
 		// Group by Person ID, not PKEY
@@ -167,28 +169,28 @@ function list_prepare_ajax_table($containerID, $renderedlist) {
 			$sorting[5] = $renderedlist->language;
 		}
 	}
-	
+
 	$orderbySQL = ajax_table_get_orderby($containerID, $sorting);
 	if (!empty($orderbySQL))
 		$renderedlist->orderby = $orderbySQL;
 
 	$renderedlist->hasstats = false;
-	
+
 	if (!isset($_SESSION['ajaxtablepagestart']) || !isset($_GET['ajax']))
 		$_SESSION['ajaxtablepagestart'] = array();
 	if (isset($_GET['start']) && isset($_GET['containerID']))
 		$_SESSION['ajaxtablepagestart'][$_GET['containerID']] = $_GET['start'] + 0;
-	
+
 	$data = $renderedlist->getPage(isset($_SESSION['ajaxtablepagestart'][$containerID]) ? $_SESSION['ajaxtablepagestart'][$containerID] : 0, $renderedlist->pagelimit);
-	
+
 	if (empty($data)) {
 		if ($containerID == 'listSearchContainer')
 			return _L('Searched, but found no results');
 		else if ($containerID == 'listPreviewContainer')
 			return _L('Nobody in your list!');
 	}
-	
-	
+
+
 	return ajax_table_show_menu($containerID, $renderedlist->total, $renderedlist->pageoffset, $renderedlist->pagelimit) . ajax_show_table($containerID, $data, $titles, $formatters, $sorting, isset($repeatedColumns) ? $repeatedColumns : false, isset($groupBy) ? $groupBy : false, ($searchable ? 3 : 0), ($searchable ? true : false), ($searchable ? false : true));
 }
 
