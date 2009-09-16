@@ -301,7 +301,7 @@ var Easycall = Class.create({
 		if (!$(this.formitemname+"langlock"))
 			$(this.formitemname+"_altlangs").show();
 
-		form_do_validation(this.formname, this.formitemname);
+		form_do_validation($(this.formname), $(this.formitemname));
 	},
 
 	updateMessage: function () {
@@ -310,9 +310,7 @@ var Easycall = Class.create({
 		var messages = $(this.formitemname).value.evalJSON();
 		messages[this.language] = this.messageid;
 		$(this.formitemname).value = Object.toJSON(messages);
-		try {
-			form_do_validation(this.formname, this.formitemname);
-		} catch (e) { alert(e); }
+		form_do_validation($(this.formname), $(this.formitemname));
 	},
 
 	valPhone: function (pnumber,minlength,maxlength) {
