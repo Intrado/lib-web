@@ -37,9 +37,6 @@ if ($id && $USER->authorize('createlist') && userOwns("list",$_SESSION['listid']
 		}
 	} else if ($_GET['type'] == "remove") {
 		if ($_GET['toggle'] == "true") {
-			if (!userOwns('person', $id))
-				exit();
-
 			//insert into db
 			QuickUpdate("begin");
 			if(!QuickQuery("select count(*) from listentry where personid = " . $id . " and listid = " . $_SESSION['listid'])){
