@@ -13,6 +13,8 @@ var ruleWidget = null;
 var ruleEditor = null;
 var accordion = null;
 var addmeOriginalValues = {phone:false, email:false, sms:false}; // Used to restore to valid values when the addme checkbox is unchecked, so that addMeWindow validators do not complain.
+var hoverTimer = null;
+var chosenLists = {};
 
 // Modified form load.
 function listform_load(listformID, formData, postURL) {
@@ -261,9 +263,10 @@ function listform_load(listformID, formData, postURL) {
 
 			// Load From Session Data.
 			var listids = listformVars.listidsElement.value ? listformVars.listidsElement.value.evalJSON() : [];
-			if (listids.join && listids.length > 0)
-				listform_load_lists(listformVars.listidsElement.value);
-			else {
+			if (listids.join && listids.length > 0) {
+				chosenLists = listids;
+				listform_load_lists(listids.toJSON());
+			} else {
 				ruleWidget.refresh_guide(true);
 			}
 		}
@@ -363,12 +366,12 @@ function listform_load_lists(listidsJSON) {
 			for (var listid in stats) {
 				var data = stats[listid];
 				listformVars.totals[listid] = data.total;
-
-    			var commonStyle = 'padding: 3px; overflow: hidden; ';
-			    var nameTD = new Element('td', {'class':'NameTD', 'style':'overflow: hidden; white-space: nowrap;' + commonStyle});
-			    nameTD.insert(data.name.escapeHTML());
-			    var actionTD = new Element('td', {'class':'ActionTD', 'style':commonStyle + '; text-align:center'});
-			    actionTD.insert('<img src="img/icons/diagona/10/101.gif" title="<?=addslashes(_L('Click to remove this list'))?>" />');
+				
+				var commonStyle = 'padding: 3px; overflow: hidden; ';
+				var nameTD = new Element('td', {'class':'NameTD', 'style':'overflow: hidden; white-space: nowrap;' + commonStyle});
+				nameTD.insert(data.name.escapeHTML());
+				var actionTD = new Element('td', {'class':'ActionTD', 'style':commonStyle + '; text-align:center'});
+				actionTD.insert('<img src="img/icons/diagona/10/101.gif" title="<?=addslashes(_L('Click to remove this list'))?>" />');
 				actionTD.insert(new Element('input',{'type':'hidden','value':listid}));
 				var statisticsTD = new Element('td', {'style':commonStyle}).update('<b>' + format_thousands_separator(data.total) + '</b>');
 
@@ -391,11 +394,11 @@ function listform_load_lists(listidsJSON) {
 				        	stem:"rightMiddle",
 				        	title: '<?=_L("List Name:")?> ' + this.innerHTML
 			          	});
-						tr.prototip.show();
+					tr.prototip.show();
 					}.bindAsEventListener(nameTD,listid));
 				} else {
 					nameTD.observe('mouseover', function (event, listid) {
-						listform_hover_existing_list(event, listid, this.up('tr'));
+						listform_hover_existing_list(this, listid, this.up('tr'));
 					}.bindAsEventListener(nameTD,listid));
 				}
 
@@ -452,41 +455,45 @@ function listform_refresh_preview (listid) {
 	listid, false);
 }
 
-function listform_hover_existing_list(nullableEvent, listid, tr) {
+function listform_hover_existing_list(label, listid, tr) {
 	$('listchooseTotal').update();
 	$('listchooseTotalAdded').update();
 	$('listchooseTotalRemoved').update();
 	$('listchooseTotalRule').update();
 
-	cachedAjaxGet('ajax.php?type=liststats&listids='+$H(listformVars.existingLists).keys().toJSON(), function(transport, listid, tr) {
+	Tips.hideAll();
+
+	var listuri = chosenLists.indexOf(listid.toString()) >= 0 ? chosenLists.toJSON() : [listid].toJSON();
+	cachedAjaxGet('ajax.php?type=liststats&listids='+ listuri, function(transport, listid, tr) {
+		Tips.hideAll();
+
 		var stats = transport.responseJSON;
 		if (!stats) {
 			alert('<?=addslashes(_L('No data available for this list, please check your internet connection and try again'))?>');
-			Tips.hideAll();
 			return;
 		}
 		var data = stats[listid];
-			$('listchooseTotal').update(format_thousands_separator(data.total));
-			$('listchooseTotalAdded').update(format_thousands_separator(data.totaladded));
-			$('listchooseTotalRemoved').update(format_thousands_separator(data.totalremoved));
-			$('listchooseTotalRule').update(format_thousands_separator(data.totalrule));
+		$('listchooseTotal').update(format_thousands_separator(data.total));
+		$('listchooseTotalAdded').update(format_thousands_separator(data.totaladded));
+		$('listchooseTotalRemoved').update(format_thousands_separator(data.totalremoved));
+		$('listchooseTotalRule').update(format_thousands_separator(data.totalrule));
 
 		var targetElement = (!tr) ? this.up('li') : tr;
+		var tipMade = targetElement.prototip ? true : false;
 		var hookPreference = (!tr) ? {target:"topLeft",tip:"bottomLeft"} : {target:"leftMiddle",tip:"rightMiddle"};
 		var stemPreference = (!tr) ? "bottomLeft" : "rightMiddle";
 
-		Tips.hideAll();
 		new Tip (targetElement, $('listchooseTotalsContainer').innerHTML, {
 			style: "protogrey",
 			hideOthers: true,
 			hook: hookPreference,
 			offset:{x:0,y:0},
-			delay: 0.4,
+			delay: 0.8,
 			stem: stemPreference,
 			title: '<?=_L("List Name:")?> ' + data.name.escapeHTML()
 		});
 		targetElement.prototip.show();
-	}.bindAsEventListener(this, listid, tr));
+	}.bindAsEventListener(label, listid, tr));
 }
 
 function listform_onclick_existing_list(event, listid) {
@@ -575,7 +582,13 @@ function listform_reset_list_selectbox() {
 				checkbox.setAttribute('defaultChecked', true); // Workaround for Internet Explorer.
 			}
 			checkbox.observe('click', listform_onclick_existing_list.bindAsEventListener(checkbox, value));
-			label.observe('mouseover', listform_hover_existing_list.bindAsEventListener(label, value));
+			label.identify();
+			label.observe('mouseover', function (event, value) {
+				if (hoverTimer)
+					clearTimeout(hoverTimer);
+				Tips.hideAll();
+				hoverTimer = setTimeout('listform_hover_existing_list($("'+this.identify()+'"), '+value+');', 300);
+			}.bindAsEventListener(label, value));
 			ul.insert(li);
 		}
 		multicheckbox.insert(ul);
