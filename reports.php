@@ -72,15 +72,7 @@ startWindow("Select a Template"  . help('Reports_SelectATemplate'), 'padding: 3p
 		<tr class="listHeader">
 			<th align="left" class="nosort">Job and Date Range</th>
 			<th align="left" class="nosort">Individual</th>
-<?
-if(getSystemSetting('_hassurvey', true) && ($USER->authorize('viewsystemreports') || $USER->authorize("survey"))){
-?>
 			<th align="left" class="nosort">Other</th>
-
-<?
-}
-?>
-
 		</tr>
 		<tr align="left" valign="top">
 			<td>
