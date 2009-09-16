@@ -86,7 +86,7 @@ if ($generateBulkTokens && isset($_GET['generate'])) {
 			$data[] = $row[1];
 		}
 		generatePersonTokens($data);
-		notice(_L("%s activation codes are generated.", number_format(count($data))));
+		notice(_L("%s activation codes have been generated.", number_format(count($data))));
 	}
 	redirect();
 }
