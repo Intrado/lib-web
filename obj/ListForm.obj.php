@@ -121,7 +121,7 @@ class ListForm extends Form {
 										<tbody id='listsTableBody'>
 										</tbody>
 										<tfoot>
-											<tr id='listsTableMyself' stle='display:none'>
+											<tr id='listsTableMyself' style='display:none'>
 												<td>"._L('Myself')."</td>
 												<td>1</td>
 												<td></td>
