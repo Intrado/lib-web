@@ -286,14 +286,16 @@ $formdata["jobtypes"] = array(
 	"control" => array("MultiCheckBox", "values"=>$jobtypes),
 	"helpstep" => 2
 );
-$formdata["surveytypes"] = array(
-	"label" => _L("Survey Type Restriction"),
-	"fieldhelp" => _L('If the user should only be able to send certain types of surveys, check the survey types here. Checking nothing will allow the user to send any survey type.'),
-	"value" => $usersurveytypes,
-	"validators" => array(),
-	"control" => array("MultiCheckBox", "values"=>$surveytypes),
-	"helpstep" => 2
-);
+if($usersurveytypes && getSystemSetting("_hassurvey", true)) {
+	$formdata["surveytypes"] = array(
+		"label" => _L("Survey Type Restriction"),
+		"fieldhelp" => _L('If the user should only be able to send certain types of surveys, check the survey types here. Checking nothing will allow the user to send any survey type.'),
+		"value" => $usersurveytypes,
+		"validators" => array(),
+		"control" => array("MultiCheckBox", "values"=>$surveytypes),
+		"helpstep" => 2
+	);
+}
 
 $formdata[] = _L("Data View");
 
@@ -386,16 +388,18 @@ if ($readonly) {
 	$formdata["jobtypes"]["control"] = array("FormHtml", "html" => "<div style='border: 1px dotted;'>$displayjobtypes</div>");
 	unset($formdata["jobtypes"]["validators"]);
 	// Survey Types
-	$displaysurveytypes = "";
-	foreach ($surveytypes as $jobtypeid => $jobtypename) {
-		if (count($usersurveytypes)) {
-			if (in_array($jobtypeid, $usersurveytypes))
+	if($usersurveytypes && getSystemSetting("_hassurvey", true)) {
+		$displaysurveytypes = "";
+		foreach ($surveytypes as $jobtypeid => $jobtypename) {
+			if (count($usersurveytypes)) {
+				if (in_array($jobtypeid, $usersurveytypes))
+					$displaysurveytypes .= $jobtypename. "<br>";
+			} else
 				$displaysurveytypes .= $jobtypename. "<br>";
-		} else
-			$displaysurveytypes .= $jobtypename. "<br>";
+		}
+		$formdata["surveytypes"]["control"] = array("FormHtml", "html" => "<div style='border: 1px dotted;'>$displaysurveytypes</div>");
+		unset($formdata["surveytypes"]["validators"]);
 	}
-	$formdata["surveytypes"]["control"] = array("FormHtml", "html" => "<div style='border: 1px dotted;'>$displaysurveytypes</div>");
-	unset($formdata["surveytypes"]["validators"]);
 	// Staff Pkey value
 	if ($hasenrollment) {
 		unset($formdata["staffpkey"]);
@@ -553,8 +557,8 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 
 			if(count($postdata['jobtypes']))
 				foreach($postdata['jobtypes'] as $type)
-					QuickUpdate("insert into userjobtypes values (?, ?)", false, array($edituser->id, $type));
-			if(count($postdata['surveytypes']))
+					QuickUpdate("insert into userjobtypes values (?, ?)", false, array($edituser->id, $type));					
+			if(getSystemSetting("_hassurvey", true) && count($postdata['surveytypes']))
 				foreach($postdata['surveytypes'] as $type)
 					QuickUpdate("insert into userjobtypes values (?, ?)", false, array($edituser->id, $type));
 		}
