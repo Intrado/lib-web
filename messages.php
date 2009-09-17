@@ -87,7 +87,7 @@ function fmt_actions ($obj,$name) {
 	}
 */
 
-	$advancedplaybtn = action_link("Play","diagona/16/131",null,"popup('previewmessage.php?close=1&id=$obj->id', 400, 500); return false;");
+	$advancedplaybtn = action_link("Play","diagona/16/131",null,"popup('previewmessage.php?close=1&id=$obj->id', 400, 500,'preview'); return false;");
 	$editbtn = action_link("Edit", "pencil", 'message' . $obj->type . '.php?id=' . $obj->id);
 	$deletebtn = action_link("Delete", "cross", 'messages.php?delete=' . $obj->id, "return confirmDelete();");
 	$renamebtn = action_link("Rename", "textfield_rename", 'messagerename.php?id=' . $obj->id);

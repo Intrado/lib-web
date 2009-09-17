@@ -134,7 +134,7 @@ foreach($joblangs[$type] as $joblang) {
 				</td>
 				<td>
 <? if ($type == "phone") { ?>
-					<div style="float: right;"><?= button('Play', "popup('previewmessage.php?id=" . $message->id . "', 400, 400);"); ?></div>
+					<div style="float: right;"><?= button('Play', "popup('previewmessage.php?id=" . $message->id . "', 400, 400,'preview');"); ?></div>
 <? } ?>
 					<?= escapehtml($message->name) ?>
 				</td>
@@ -295,7 +295,7 @@ startWindow("Confirmation &amp; Submit");
 						$phonemessage = new Message($job->phonemessageid);
 						echo escapehtml($phonemessage->name);
 ?>
-							</td><td><?= button('Play', "popup('previewmessage.php?id=" . $job->phonemessageid . "', 400, 400);") ?>
+							</td><td><?= button('Play', "popup('previewmessage.php?id=" . $job->phonemessageid . "', 400, 400,'preview');") ?>
 								</td></tr></table>
 					</div></td>
 				</tr>

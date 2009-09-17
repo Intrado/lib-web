@@ -788,7 +788,7 @@ function message_select($type, $form, $section, $name, $extrahtml = "") {
 		NewFormItem($form,$section,$name, "selectend");
 		?></td>
 		<?	if ($type == "phone") { ?>
-		<td><?= button('Play', "var audio = new getObj('$name').obj; if(audio.selectedIndex >= 1) popup('previewmessage.php?id=' + audio.options[audio.selectedIndex].value, 400, 400);") ?>
+		<td><?= button('Play', "var audio = new getObj('$name').obj; if(audio.selectedIndex >= 1) popup('previewmessage.php?id=' + audio.options[audio.selectedIndex].value, 400, 400,'preview');") ?>
 		</td>
 		<?	} ?>
 	</tr>
@@ -840,7 +840,7 @@ function alternate($type) {
 		<tr valign="middle">
 			<td><?= escapehtml($joblang->language) ?></td>
 			<td><? if ($type == "phone") { ?>
-			<div style="float: right;"><?= button('Play', "popup('previewmessage.php?id=" . $joblang->messageid . "', 400, 400);"); ?></div>
+			<div style="float: right;"><?= button('Play', "popup('previewmessage.php?id=" . $joblang->messageid . "', 400, 400,'preview');"); ?></div>
 			<? } ?> <?= escapehtml($messages[$type][$joblang->messageid]->name) ?></td>
 			<td><? if (!$submittedmode) { ?> <a
 				href="<?= ($JOBTYPE == "repeating" ? "jobrepeating.php" : "job.php") ?>?deletejoblang=<?= $joblang->id ?>">Delete</a>
@@ -1741,7 +1741,7 @@ function previewlanguage(parentfield,language,female,male) {
 		textstr = textstr.substr(0,4000);
 	}
 	var encodedtext=encodeURIComponent(textstr);
-	popup('previewmessage.php?parentfield=' + parentfield + '&language=' + language +'&gender=' + voice,400,500);
+	popup('previewmessage.php?parentfield=' + parentfield + '&language=' + language +'&gender=' + voice,400,400,'preview');
 }
 
 

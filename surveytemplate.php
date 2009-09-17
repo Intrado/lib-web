@@ -334,7 +334,7 @@ function fmt_qphone($obj,$name) {
 ?>
 	</td><td>
 <?
-	echo button('Play', "var audio = new getObj('phonemessageid_" . $obj->questionnumber . "').obj; if(audio.selectedIndex >= 1) popup('previewmessage.php?id=' + audio.options[audio.selectedIndex].value, 400, 400);");
+	echo button('Play', "var audio = new getObj('phonemessageid_" . $obj->questionnumber . "').obj; if(audio.selectedIndex >= 1) popup('previewmessage.php?id=' + audio.options[audio.selectedIndex].value, 400, 400,'preview');");
 ?>
 
 	</tr></td></table>
@@ -412,7 +412,7 @@ startWindow('Survey Template Information',NULL,true, false);
 								<table border=0 cellpadding=3 cellspacing=0><tr><td>
 									<? message_select("phone",$f,$s,"machinemessageid",'dependson="phonesurvey"'); ?>
 								</td><td>
-									<? echo button('Play', "var audio = new getObj('machinemessageid').obj; if(audio.selectedIndex >= 1) popup('previewmessage.php?id=' + audio.options[audio.selectedIndex].value, 400, 400);");?>
+									<? echo button('Play', "var audio = new getObj('machinemessageid').obj; if(audio.selectedIndex >= 1) popup('previewmessage.php?id=' + audio.options[audio.selectedIndex].value, 400, 400,'preview');");?>
 								</td></tr></table>
 							</td>
 						</tr>
@@ -429,7 +429,7 @@ startWindow('Survey Template Information',NULL,true, false);
 								<table border=0 cellpadding=3 cellspacing=0><tr><td>
 									<? message_select("phone",$f,$s,"intromessageid",'dependson="phonesurvey"'); ?>
 								</td><td>
-									<? echo button('Play', "var audio = new getObj('intromessageid').obj; if(audio.selectedIndex >= 1) popup('previewmessage.php?id=' + audio.options[audio.selectedIndex].value, 400, 400);"); ?>
+									<? echo button('Play', "var audio = new getObj('intromessageid').obj; if(audio.selectedIndex >= 1) popup('previewmessage.php?id=' + audio.options[audio.selectedIndex].value, 400, 400,'preview');"); ?>
 								</td></tr></table>
 							</td>
 						</tr>
@@ -447,7 +447,7 @@ startWindow('Survey Template Information',NULL,true, false);
 								<table border=0 cellpadding=3 cellspacing=0><tr><td>
 									<? message_select("phone",$f,$s,"exitmessageid",'dependson="phonesurvey"'); ?>
 								</td><td>
-									<? echo button('Play', "var audio = new getObj('exitmessageid').obj; if(audio.selectedIndex >= 1) popup('previewmessage.php?id=' + audio.options[audio.selectedIndex].value, 400, 400);");?>
+									<? echo button('Play', "var audio = new getObj('exitmessageid').obj; if(audio.selectedIndex >= 1) popup('previewmessage.php?id=' + audio.options[audio.selectedIndex].value, 400, 400,'preview');");?>
 								</td></tr></table>
 							</td>
 						</tr>

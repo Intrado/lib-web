@@ -59,9 +59,9 @@ class IntroSelect extends FormItem {
 				. icon_button(_L("Play"),"fugue/control","
 				var content = $('" . $n . "message').getValue();
 					if(content != '')
-						popup('previewmessage.php?id=' + content, 400, 400);
+						popup('previewmessage.php?id=' + content, 400, 400,'preview');
 					else
-						popup('previewmessage.php?mediafile=" . urlencode($defaultrequest) . "', 400, 400);") . '</div>';
+						popup('previewmessage.php?mediafile=" . urlencode($defaultrequest) . "', 400, 400,'preview');") . '</div>';
 		$str .= '</td></tr></table>';
 		$str .= '</div>';
 		

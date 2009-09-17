@@ -60,7 +60,7 @@ class TranslationItem extends FormItem {
 					</td>
 					<td valign="top" width="100px">
 						<div id="'.$n.'controls" style="display: '.(($msgdata->enabled)?"block":"none").'">
-							'.($isphone?icon_button(_L("Play"),"fugue/control","var content = $('" . $n . "text').getValue(); if(content != '') popup('previewmessage.php?parentfield=".$n."text&language=$language&gender=$gender" . "', 400, 400);"):"").'
+							'.($isphone?icon_button(_L("Play"),"fugue/control","var content = $('" . $n . "text').getValue(); if(content != '') popup('previewmessage.php?parentfield=".$n."text&language=$language&gender=$gender" . "', 400, 400,'preview');"):"").'
 						</div>
 					</td>
 				</tr>
