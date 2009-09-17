@@ -17,6 +17,25 @@ if (!$MANAGERUSER->authorized("smsblock"))
 // Data Handling
 ////////////////////////////////////////////////////////////////////////////////
 
+if (isset($_GET['download'])) {
+	$shard = QuickQueryRow("select id, dbhost, dbusername, dbpassword from shard limit 1");
+	$sharddb = DBConnect($shard[1], $shard[2], $shard[3], "aspshard")
+		or die("Could not connect to shard database");
+	
+	header("Pragma: private");
+	header("Cache-Control: private");
+	header("Content-disposition: attachment; filename=smsblock.csv");
+	header("Content-type: application/vnd.ms-excel");
+	
+	echo "sms,status,notes,lastupdate\n";
+	$query = "select sms,status,notes,lastupdate from smsblock where status in ('optin','block')";
+	$res = Query($query,$sharddb);
+	while ($row = DBGetRow($res)) {
+		echo '"' . implode('","', $row) . '"' . "\n";
+	}
+	exit();
+}
+
 $number="";
 if(isset($_GET['sms'])){
 	$number = $_GET['sms']+0;
@@ -46,6 +65,8 @@ if(CheckFormSubmit($f, "search") || CheckFormSubmit($f, "operate"))
 			error('There was a problem trying to save your changes', 'Please verify that all required field information has been entered properly');
 			if(CheckFormSubmit($f, "operate"))
 				$number = CheckFormSubmit($f, "operate");
+		} else if (CheckFormSubmit($f, "operate") && GetFormData($f, $s, "operation") == "") {
+			error("Please select an action");
 		} else {
 			if(CheckFormSubmit($f, "operate")){
 				$number = ereg_replace("[^0-9]*","",CheckFormSubmit($f, "operate"));
@@ -152,6 +173,7 @@ if($number){
 <?
 				NewFormItem($f, $s, "operation", "selectstart");
 				NewFormItem($f, $s, "operation", "--Select an Operation--", "");
+				NewFormItem($f, $s, "operation", "selectoption", "-- Select an Action --", "");
 				//index 1 is status
 				if($data && $data[1] == 'block'){
 					NewFormItem($f, $s, "operation", "selectoption", "Opt-In", "optin");
@@ -181,6 +203,11 @@ if($number){
 <?
 }
 EndForm();
+?>
+
+<a href="smsblock.php?download">Download csv of blocked sms</a>
+
+<?
 include_once("navbottom.inc.php");
 
 ?>
