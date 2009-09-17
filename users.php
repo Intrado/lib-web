@@ -66,7 +66,11 @@ function is_sm_user($id) {
 if (isset($_GET['resetpass'])) {
 	$id = 0 + $_GET['resetpass'];
 	$usr = new User($id);
-
+	if (empty($usr->email)) {
+		notice(_L("Unable to reset the password for %s. This user does not have an email address.", escapehtml($usr->login)));
+		redirect();
+	}
+	
 	/*CSDELETEMARKER_START*/
 	if (is_sm_user($id))
 		redirect(); // NOTE: Deliberately not show a notice() about the hidden schoolmessenger user?
