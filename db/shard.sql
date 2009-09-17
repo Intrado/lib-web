@@ -295,8 +295,12 @@ ALTER TABLE `smsblock` ADD `timezone` VARCHAR( 50 ) CHARACTER SET utf8 COLLATE u
 ALTER TABLE `smsblock` ADD `customerid` INT DEFAULT NULL FIRST ;
 
 CREATE TABLE `aspshard`.`replicationcheck` (
-`currenttime` DATETIME NOT NULL
+`id` TINYINT NOT NULL AUTO_INCREMENT PRIMARY KEY ,
+`currenttime` BIGINT NOT NULL
 ) ENGINE = InnoDB ;
 
-INSERT into `aspshard`.`replicationcheck` (`currenttime`) values (now()) ;
+
+
+
+
 
