@@ -7,7 +7,14 @@ else
 
 <html>
 <head>
-<meta http-equiv="refresh" content="1800;url=index.php?logout=1&reason=timeout">
+<?
+if (isset($_GET['monitor'])) {
+	$time = $_GET['monitor'] ? $_GET['monitor'] : 15;
+	echo '<meta http-equiv="refresh" content="'.$time.'">';
+} else {
+	echo '<meta http-equiv="refresh" content="1800;url=index.php?logout=1&reason=timeout">';
+}
+?>
 <style media="print">
 .noprint {
 	display: none;
