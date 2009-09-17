@@ -24,7 +24,7 @@ if (!$USER->authorize('manageprofile')) {
 
 if (isset($_GET['delete'])) {
 	$deleteid = DBSafe($_GET['delete']);
-	if ($_SESSION['accessid'] == $deleteid)
+	if (isset($_SESSION['accessid']) && $_SESSION['accessid'] == $deleteid)
 		$_SESSION['accessid'] = NULL;
 	$count = QuickQuery("select count(*) from user where accessid='$deleteid' and deleted=0");
 	if ($count == 0) {
