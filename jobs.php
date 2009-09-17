@@ -149,13 +149,16 @@ if (isset($_GET['runrepeating'])) {
 if (isset($_GET['copy'])) {
 	$copyid = DBSafe($_GET['copy']);
 	if (userOwns("job",$copyid) || $USER->authorize('managesystemjobs')) {
-		$job = new Job($copyid);
-		Query('BEGIN');
-			$newjob = $job->copyNew();
-		Query('COMMIT');
+		if ($job->userid !== null) {
+			 Query('BEGIN');
+				$newjob = $job->copyNew();
+			Query('COMMIT');
 
-		notice(_L("A copy of the job, %s, is made.", escapehtml($job->name)));
-		redirect('job.php?id='.$newjob->id);
+			notice(_L("A copy of the job, %s, is made.", escapehtml($job->name)));
+			redirect('job.php?id='.$newjob->id);
+		} else {
+			notice(_L("You do not have permission to copy this job."));
+		}
 	} else {
 		notice(_L("You do not have permission to copy this job."));
 	}
