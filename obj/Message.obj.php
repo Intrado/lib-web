@@ -293,10 +293,15 @@ class Message extends DBMappedObject {
 				$wavfiles[] = writeWav($data);
 			}
 		}
-		$intro = $intro?('"' . $intro . '" "media/2secondsilence.wav" '):'';
+		if($intro && file_exists($intro)){
+			$intro = $intro?('"' . $intro . '" "media/2secondsilence.wav" '):'';
+		}
+		
 		//finally, merge the wav files
 		$outname = secure_tmpname("preview",".wav");
-		$cmd = 'sox ' . $intro. '"' . implode('" "',$wavfiles) . '" "' . $outname . '"';
+		
+		$messageparts = empty($wavfiles)?'':'"' . implode('" "',$wavfiles) . '" ';
+		$cmd = 'sox ' . $intro . $messageparts . '"' . $outname . '"';
 		$result = exec($cmd, $res1, $res2);
 
 		foreach ($wavfiles as $file)

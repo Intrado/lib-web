@@ -82,7 +82,7 @@ if (isset($_POST['text'])) {
 		$_SESSION['ttstext'] = $_POST['text'];	
 } 
 
-if(isset($_GET['parentfield']) || $id) {
+if(isset($_GET['parentfield']) || $id || isset($_GET['mediafile'])) {
 	$_SESSION['ttstext'] = false;
 }
 
@@ -120,7 +120,7 @@ if (!isset($msgType) || !$msgType)
 	$msgType = 'phone';
 	
 	
-if (!$id && !isset($_SESSION['ttstext']) && !isset($_GET['parentfield']) ) {
+if (!$id && !isset($_SESSION['ttstext']) && !isset($_GET['parentfield']) && !isset($_GET['mediafile']) ) {
 	redirect("unauthorized.php");
 }
 
@@ -273,17 +273,23 @@ if (isset($_GET['parentfield'])) {
 	require_once("popupbottom.inc.php");
 	exit();
 } else {
-	if($id) {
-		$request = "id=$id";
+	if($_SESSION['ttstext']) {
+		$request = "usetext=true";
+	} else {
+		if($id) {
+			$request = "id=$id";
+		} else if (isset($_GET['mediafile'])) {
+			$request = "mediafile=" . $_GET['mediafile'];
+		} else {
+			$request = "blank=true";
+		}
 		require_once("popup.inc.php");
 		?>
 		<script type="text/javascript" language="javascript" src="script/niftyplayer.js"></script>
 		<?
 		startWindow(_L("Message Preview"));	
-	} else {
-		$request = isset($_SESSION['ttstext'])?"usetext=true":"blank=true";		
 	}
-	
+
 	if (count($formdata)) 
 		echo $form->render();
 	
@@ -308,7 +314,7 @@ if (isset($_GET['parentfield'])) {
 	</div>
 	<div id="messageresultdiv" name="messageresultdiv"></div>
 <? 
-	if($id) {
+	if(!$_SESSION['ttstext']) {
 		endWindow();
 		require_once("popupbottom.inc.php");
 	} 

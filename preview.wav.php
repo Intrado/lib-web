@@ -60,7 +60,8 @@ if (isset($_GET['usetext'])) {
 	
 	session_write_close();//WARNING: we don't keep a lock on the session file, any changes to session data are ignored past this point
 	Message::playParts($renderedparts,"mp3");
-
+	exit();
+	
 } else if(isset($_GET['id'])) {
 	//session_write_close();//WARNING: we don't keep a lock on the session file, any changes to session data are ignored past this point
 	$id = $_GET['id'] + 0;
@@ -73,15 +74,34 @@ if (isset($_GET['usetext'])) {
 				$fields[$fieldnum] = $_REQUEST[$fieldnum];
 		}
 		Message::playAudio($id, $fields,"mp3");
+		exit();
 	}
-} else {
-		header("HTTP/1.0 200 OK");
-		header("Content-Type: audio/mp3");
-		header("Content-disposition: attachment; filename=message.mp3");
-		header('Pragma: private');
-		header('Cache-control: private, must-revalidate');
-		header("Content-Length: 0");
-		header("Connection: close");
-}
+} else if(isset($_GET['mediafile'])) {
+		$mediapath = "media/";
+		$mediafile = $_GET['mediafile'];
+		if (file_exists($mediapath . $mediafile)) {
+			Message::playParts(array(),"mp3",$mediapath . $mediafile);
+			exit();
+		} else {
+			$mediafile = strrchr($mediafile,'/');
+			if($mediafile !== false) {
+				$mediafile = substr($mediafile,1);
+				if (file_exists($mediapath . $mediafile)) {
+					Message::playParts(array(),"mp3",$mediapath . $mediafile);	
+					exit();
+				}
+			}
+		}
+
+} 
+
+header("HTTP/1.0 200 OK");
+header("Content-Type: audio/mp3");
+header("Content-disposition: attachment; filename=message.mp3");
+header('Pragma: private');
+header('Cache-control: private, must-revalidate');
+header("Content-Length: 0");
+header("Connection: close");
+
 
 ?>

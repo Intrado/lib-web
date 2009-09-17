@@ -54,11 +54,14 @@ class IntroSelect extends FormItem {
 			$count++;
 		}	
 		$str .= '<td>';
-		$str .= '<div id="' . $n . 'play" style="' . ((isset($value["message"]) && $value["message"] != "")?"display:block;":"display:none;") . ' ">' 
+		$defaultrequest = isset($this->args['defaultfile']) ? ''.$this->args['defaultfile'].'' : "";		
+		$str .= '<div id="' . $n . 'play">' 
 				. icon_button(_L("Play"),"fugue/control","
 				var content = $('" . $n . "message').getValue();
 					if(content != '')
-						popup('previewmessage.php?id=' + content, 400, 400);") . '</div>';
+						popup('previewmessage.php?id=' + content, 400, 400);
+					else
+						popup('previewmessage.php?mediafile=" . urlencode($defaultrequest) . "', 400, 400);") . '</div>';
 		$str .= '</td></tr></table>';
 		$str .= '</div>';
 		
@@ -66,12 +69,6 @@ class IntroSelect extends FormItem {
 			$str .= '<script>
 					function updatemessage(item) {
 						updatevalue(item);form_do_validation($("' . $this->form->name . '"),$(item));
-						var sel = $(item + "message");							
-						if (sel.options[sel.selectedIndex].value > 0) { 
-							$(item + "play").show();
-						} else {
-							$(item + "play").hide();
-						}
 					}	
 			</script>';
 		}
@@ -164,7 +161,8 @@ if($allowedjobtypes["Other"] > 0) {
 			"value" => array("message" => ($defaultintro === false?"":$defaultintro->id)),
 			"validators" => array(array("ValIntroSelect")),
 			"control" => array("IntroSelect",
-				 "values"=>$defaultmessages
+				"values"=>$defaultmessages,
+				"defaultfile" => "DefaultIntro.wav"
 			),
 			"helpstep" => 1
 	);
@@ -176,7 +174,8 @@ if($allowedjobtypes["Emergency"] > 0) {
 			"value" => array("message" => ($emergencyintro === false?"":$emergencyintro->id)),
 			"validators" => array(array("ValIntroSelect")),
 			"control" => array("IntroSelect",
-				 "values"=>$emergencymessages
+				"values"=>$emergencymessages,
+				"defaultfile" => "EmergencyIntro.wav"
 			),
 			"helpstep" => 1
 	);
@@ -203,7 +202,8 @@ foreach($languages as $language) {
 			"value" => array("message" => $messageid),
 			"validators" => array(array("ValIntroSelect")),
 			"control" => array("IntroSelect",
-				 "values"=>$defaultmessages
+				 "values"=>$defaultmessages,
+				 "defaultfile" => "$language/DefaultIntro.wav",
 			),
 			"helpstep" => $helpstepindex
 		);
@@ -223,7 +223,8 @@ foreach($languages as $language) {
 			"value" => array("message" => $messageid),
 			"validators" => array(array("ValIntroSelect")),
 			"control" => array("IntroSelect",
-				 "values"=>$emergencymessages
+				 "values"=>$emergencymessages,
+				 "defaultfile" => "$language/EmergencyIntro.wav",
 			),
 			"helpstep" => $helpstepindex
 		);
