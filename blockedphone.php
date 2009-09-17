@@ -63,7 +63,7 @@ if(CheckFormSubmit($form, $section))
 				// check to see if this number already exists
 				$exists = QuickQuery("select count(id) from blockeddestination where type in (" . (($blocktype == 'both')?"'phone', 'sms', ":"") . " ?) and destination = ?", false, array($blocktype, $phone));
 				if ($exists) {
-					error(_L('That combination of number and type are already blocked'));
+					error(_L('That combination of number and type is already blocked'));
 				} else {
 					QuickQuery("BEGIN");
 					if($blocktype == 'both' || $blocktype == 'phone')
