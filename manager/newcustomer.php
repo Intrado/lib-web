@@ -165,7 +165,8 @@ if (CheckFormSubmit($f,$s)){
 				QuickUpdate($query, $newdb) or dieWithError(" SQL:" . $query, $newdb);
 
 				$surveyurl = $SETTINGS['feature']['customer_url_prefix'] . "/" . $hostname . "/survey/";
-				$smsoptintext = 'You may receive text messages from Your School';
+				$smsoptintext = 'Please OPTIN to receive TXT alerts from ' . $displayname . '.';
+				$smsoptintext = substr(0, 65); // 65 chars for customer optin txt
 				$enablesmsoptin = '1';
 				
 				$query = "INSERT INTO `setting` (`name`, `value`) VALUES

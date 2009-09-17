@@ -146,7 +146,7 @@ if(CheckFormSubmit($f,"Save") || CheckFormSubmit($f, "Return")) {
 			$managernote = GetFormData($f, $s, 'managernote');
 			$hassms = GetFormData($f, $s, 'hassms');
 			$enablesmsoptin = GetFormData($f, $s, "enablesmsoptin");
-			$smsoptintext = GetFormData($f, $s, "smsoptintext");
+			$smsoptintext = trim(GetFormData($f, $s, "smsoptintext"));
 			$maxsms = GetFormData($f, $s, 'maxsms');
 			$hasportal = GetFormData($f, $s, 'hasportal');
 			$hasselfsignup = GetFormData($f, $s, 'hasselfsignup');
@@ -204,8 +204,8 @@ if(CheckFormSubmit($f,"Save") || CheckFormSubmit($f, "Return")) {
 				error("Customer cannot have both Contact Manager and Self-Signup features, please select only one");
 			} else if ($emaildomainerror !== true) {
 				error($emaildomainerror);
-			} else if (count($smsoptintext) > 100) {
-				error('SMS Opt-in Text cannot exceed 100 characters');
+			} else if (count($smsoptintext) > 65) {
+				error('SMS Opt-in Text cannot exceed 65 characters');
 			} else {
 
 				QuickUpdate("update customer set

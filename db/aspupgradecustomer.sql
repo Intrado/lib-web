@@ -55,10 +55,11 @@ update message set modifydate = '2009-07-31 12:00:00' where modifydate is null a
 $$$
 
 -- sms opt-in text
+INSERT INTO `setting` (`name`, `value`) select 'smsoptintext', (select concat('Please OPTIN to receive TXT alerts from ',(select value from setting where name='displayname'),'.'))
+$$$
+
 -- do not enable sms opt-in for existing customers
-INSERT INTO `setting` (`name`, `value`) VALUES
-('smsoptintext', 'You may receive text messages from Your School'),
-('enablesmsoptin', '0')
+INSERT INTO `setting` (`name`, `value`) VALUES ('enablesmsoptin', '0')
 $$$
 
 -- surveyquestion index on questionnaireid
