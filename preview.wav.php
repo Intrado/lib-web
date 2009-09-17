@@ -79,16 +79,23 @@ if (isset($_GET['usetext']) && isset($_SESSION['ttstext']) && isset($_SESSION['t
 } else if(isset($_GET['mediafile'])) {
 		$mediapath = "media/";
 		$mediafile = $_GET['mediafile'];
-		if (file_exists($mediapath . $mediafile)) {
-			Message::playParts(array(),"mp3",$mediapath . $mediafile);
-			exit();
-		} else {
-			$mediafile = strrchr($mediafile,'/');
-			if($mediafile !== false) {
-				$mediafile = substr($mediafile,1);
-				if (file_exists($mediapath . $mediafile)) {
-					Message::playParts(array(),"mp3",$mediapath . $mediafile);	
-					exit();
+		if(in_array($mediafile, array(
+				"DefaultIntro.wav",
+				"EmergencyIntro.wav",
+				"Spanish/DefaultIntro.wav",
+				"Spanish/EmergencyIntro.wav"
+			))) {
+			if (file_exists($mediapath . $mediafile)) {
+				Message::playParts(array(),"mp3",$mediapath . $mediafile);
+				exit();
+			} else {
+				$mediafile = strrchr($mediafile,'/');
+				if($mediafile !== false) {
+					$mediafile = substr($mediafile,1);
+					if (file_exists($mediapath . $mediafile)) {
+						Message::playParts(array(),"mp3",$mediapath . $mediafile);	
+						exit();
+					}
 				}
 			}
 		}
