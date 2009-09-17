@@ -77,17 +77,16 @@ if (isset($_FILES['emailattachment']['error']) && $_FILES['emailattachment']['er
 		$errormessage .= _L('Unable to complete file upload. Please try again');
 	} else if (!is_file($newname) || !is_readable($newname)) {
 		$errormessage .= _L('Unable to complete file upload. Please try again');
+	} else if ($extdotpos === false) {
+		$errormessage .= _L('The file you uploaded does not have a file extension\nPlease make sure the file has the correct extension and try again');
 	} else if (array_search(strtolower($ext),$unsafeext) !== false) {
 		$errormessage .= _L('The file you uploaded may pose a security risk and is not allowed. ').'\n'._L('Please check the help documentation for more information on safe and unsafe file types');
 	} else if ($_FILES['emailattachment']['size'] >= $maxattachmentsize) {
 		$errormessage .= _L('The file you uploaded exceeds the maximum email attachment limit of 2048K');
 	} else if ($_FILES['emailattachment']['size'] <= 0) {
 		$errormessage .= _L('The file you uploaded apears to be empty\nPlease check the file and try again');
-	} else if ($extdotpos === false) {
-		$errormessage .= _L('The file you uploaded does not have a file extension\nPlease make sure the file has the correct extension and try again');
 	} else {
 		$contentid = contentPut($newname,$mimetype);
-		@unlink($newname);
 		if ($contentid) {
 			$uploaderror = false;
 		} else {
@@ -95,6 +94,7 @@ if (isset($_FILES['emailattachment']['error']) && $_FILES['emailattachment']['er
 			$errormessage .= _L('Unable to complete file upload. Please try again');
 		}
 	}
+	@unlink($newname);	
 }
 
 ?>
