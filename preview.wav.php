@@ -10,7 +10,7 @@ include_once("obj/AudioFile.obj.php");
 include_once("obj/Voice.obj.php");
 include_once("obj/FieldMap.obj.php");
 
-if (isset($_GET['usetext'])) {
+if (isset($_GET['usetext']) && isset($_SESSION['ttstext']) && isset($_SESSION['ttslanguage']) && isset($_SESSION['ttsgender'])) {
 	$text = $_SESSION['ttstext'];
 	$language = strtolower($_SESSION['ttslanguage']);
 	$gender = strtolower($_SESSION['ttsgender']);

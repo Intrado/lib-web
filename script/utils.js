@@ -92,8 +92,11 @@ function setIFrame(div) {
 	}
 }
 
-function popup(url, width, height) {
-	window.open(url, '_blank', 'width=' + width + ',height=' + height + 'location=no,menubar=no,resizable=yes,scrollbars=yes,status=no,titlebar=no,toolbar=no');
+function popup(url, width, height, target) {
+	if(typeof(target) == 'undefined')
+		target = '_blank';
+	var targetwindow = window.open(url, target, 'width=' + width + ',height=' + height + 'location=no,menubar=no,resizable=yes,scrollbars=yes,status=no,titlebar=no,toolbar=no');
+	targetwindow.focus();
 }
 
 function getProperties(obj) {

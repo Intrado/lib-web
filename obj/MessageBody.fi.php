@@ -22,7 +22,7 @@ class MessageBody extends FormItem {
 																		voice = 'Male';
 																	}
 																	if(content != '')
-																		popup('previewmessage.php?parentfield=" . $n . "&language=' + encodeURIComponent(language) + '&gender=' + encodeURIComponent(voice), 400, 400);")
+																		popup('previewmessage.php?parentfield=" . $n . "&language=' + encodeURIComponent(language) + '&gender=' + encodeURIComponent(voice), 400, 400,'preview');")
 						. '</div>';
 	}
 	

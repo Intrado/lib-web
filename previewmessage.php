@@ -27,6 +27,12 @@ require_once("obj/FormSelectMessage.fi.php");
 ////////////////////////////////////////////////////////////////////////////////
 // Data Handling
 ////////////////////////////////////////////////////////////////////////////////
+if (isset($_GET['unloadsession'])) {
+	unset($_SESSION['ttstext']);
+	unset($_SESSION['ttsgender']);
+	unset($_SESSION['ttslanguage']);
+	exit();
+}
 
 $id = false;
 if (isset($_GET['id'])) {
@@ -209,7 +215,7 @@ if (count($formdata)) {
 				$form->modifyElement("messageresultdiv", '
 						<script language="JavaScript" type="text/javascript">
 							embedPlayer("preview.wav.php/embed_preview.wav?' . $request . $previewdata. '","player");
-							$("download").update(\'<a href="preview.wav.php/download_preview.wav?'  . $request .  $previewdata . '&download=true">' . _L("Click here to download") . '</a>\');
+							$("download").update(\'<a href="preview.wav.php/download_preview.wav?'  . $request .  $previewdata . '&download=true" onclick="sessiondata=false;">' . _L("Click here to download") . '</a>\');
 						</script>
 						'
 				);
@@ -239,9 +245,19 @@ if (isset($_GET['parentfield'])) {
 	
 	require_once("popup.inc.php");
 	startWindow(_L("Message Preview"));?>
+	<script language="JavaScript" type="text/javascript">
+		var sessiondata = true;
+	</script>
 	<div id="previewcontainer"></div>
 	<script type="text/javascript" language="javascript" src="script/niftyplayer.js"></script>
 	<script language="JavaScript" type="text/javascript">
+				function unloadsession(){
+					if(sessiondata == true){
+						window.location = 'previewmessage.php?unloadsession=true'; // sends a request to unload session. can not use ajax during unload
+					}
+					sessiondata = true;
+				}
+
 				var gender = "<?=$gender ?>";
 				var language = "<?=$language ?>";					
 				var parentfield = '<?= $parentfield?>';
@@ -285,6 +301,9 @@ if (isset($_GET['parentfield'])) {
 		}
 		require_once("popup.inc.php");
 		?>
+		<script language="JavaScript" type="text/javascript">
+			var sessiondata = true;
+		</script>
 		<script type="text/javascript" language="javascript" src="script/niftyplayer.js"></script>
 		<?
 		startWindow(_L("Message Preview"));	
@@ -307,7 +326,7 @@ if (isset($_GET['parentfield'])) {
 <?	} ?>
 				<div id='download'>
 <?	if (!$hasdata) {?> 		
-				<a href="preview.wav.php/download_preview.wav?<?= $request ?>&download=true"><?=_L("Click here to download")?></a>
+				<a href="preview.wav.php/download_preview.wav?<?= $request ?>&download=true" onclick="sessiondata=false;"><?=_L("Click here to download")?></a>
 <?	} ?>		
 				</div>
 			</div>
