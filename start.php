@@ -337,21 +337,24 @@ function activityfeed($mergeditems,$ajax = false) {
 				} else if($item["type"] == "message") {
 					$messagetype = $item["messagetype"];
 					$title = _L('%1$s message %2$s',($messagetype == "sms"?"SMS":(escapehtml(ucfirst($messagetype)))),escapehtml($title));
-					$tools = action_links (
-						action_link("Edit", "pencil", 'message' . $item["messagetype"] . '.php?id=' . $itemid),
-						action_link("Play","diagona/16/131",null,"popup('previewmessage.php?close=1&id=$itemid', 400, 500,'preview'); return false;")
-						);
+
 					$defaultlink = "message$messagetype.php?id=$itemid";
 					$content = '<a href="' . $defaultlink . '" ' . $defaultonclick . '>' . $time .  ' - <b>' .  escapehtml($item["name"]) . '</b>' . '</a>';
 					switch($messagetype) {
 						case "phone":
 							$icon = 'largeicons/phonehandset.jpg';
+							$tools = action_links (
+								action_link("Edit", "pencil", 'message' . $item["messagetype"] . '.php?id=' . $itemid),
+								action_link("Play","diagona/16/131",null,"popup('previewmessage.php?close=1&id=$itemid', 400, 500,'preview'); return false;")
+								);		
 							break;
 						case "email":
 							$icon = 'largeicons/email.jpg';
+							$tools = action_links (action_link("Edit", "pencil", 'message' . $item["messagetype"] . '.php?id=' . $itemid));	
 							break;
 						case "sms":
 							$icon = 'largeicons/smschat.jpg';
+							$tools = action_links (action_link("Edit", "pencil", 'message' . $item["messagetype"] . '.php?id=' . $itemid));	
 							break;
 					}
 				} else if($item["type"] == "report" ) {
