@@ -28,6 +28,7 @@ if(isset($_GET['resetDM']) || isset($_GET['update'])){
 <?
 	}
 	QuickUpdate("update dm set command = '" . $command ."' where id = " . $dmid);
+	redirect();
 }
 
 $queryextra = "";
@@ -116,11 +117,34 @@ function fmt_lastseen($row, $index){
 }
 
 
+function fmt_resources ($row,$index) {
+	//index 13 is poststatus
+	$data = json_decode($row[13]);
+	$data = $data[0];
+	
+	$restotal = $data->restotal;
+	$resactout = $data->restotal ? $data->resactout/$restotal * 100 : 0;
+	$resactin = $data->restotal ? $data->resactin/$restotal * 100 : 0;
+	
+	$used = $data->resactout + $data->resactin;
+	
+	$str = $used .'/'. $row[$index] . 
+		'<div style="float: right; width: 100px; height: 16px; border: 1px solid black;">
+			<div style="float: left; width: '.$resactout.'px; height: 16px; background: #00BBFF;"></div>
+			<div style="float: left; width: '.$resactin.'px; height: 16px; background: #FF00BB;"></div>
+		</div>';
+	
+	return $str;
+}
+
+
+
 $dms = array();
 $query = "select dm.id, dm.name, dm.authorizedip, dm.lastip,
 			dm.enablestate, dm.lastseen, dm.version, dm.dmuuid, dm.command, s_telco_calls_sec.value as telco_calls_sec, 
 			s_telco_type.value as telco_type, s_delmech_resource_count.value as delmech_resource_count,
-			s_telco_inboundtoken.value as telco_inboundtoken
+			s_telco_inboundtoken.value as telco_inboundtoken,
+			poststatus
 			from dm dm
 			left join dmsetting s_telco_calls_sec on 
 					(dm.id = s_telco_calls_sec.dmid 
@@ -157,7 +181,7 @@ $titles["status"] = "#Status";
 $titles[6] = "#Version";
 $titles[9] = "#Calls/Sec";
 $titles[10] = "@#Type";
-$titles[11] = "#Resources";
+$titles[11] = "Resources";
 $titles[12] = "@#Inbound";
 $titles[7] = "@#DM UUID";
 $titles[8] = "@#Cmd";
@@ -171,7 +195,8 @@ $filterTitles = array(4,"status",6);
 $formatters = array("actions" => "fmt_DMActions",
 					"status" => "fmt_dmstatus",
 					5 => "fmt_lastseen",
-					4 => "fmt_state");
+					4 => "fmt_state",
+					11 => "fmt_resources");
 
 $filterFormatters = array("status" => "fmt_dmstatus_nohtml",4 => "fmt_state");
 /////////////////////////////
@@ -181,7 +206,6 @@ $filterFormatters = array("status" => "fmt_dmstatus_nohtml",4 => "fmt_state");
 include_once("nav.inc.php");
 
 ?>
-
 <form method="POST" action="systemdms.php">
 <?
 // show the row data filters
@@ -204,7 +228,7 @@ if($showingDisabledDMs) {
 show_column_selector('customer_dm_table', $titles, $lockedTitles);
 
 ?>
-<table class="list sortable" id="customer_dm_table">
+<table class="list sortable" id="customer_dm_table" width="100%">
 <?
 	showTable($data, $titles, $formatters);
 ?>
@@ -222,5 +246,12 @@ if(file_exists("dmbuild.txt")){
 	<div>Latest Version: <?=file_get_contents("dmbuild.txt");?></div>
 <?
 }
+?>
+
+Resource legend:
+<span style="background: #00BBFF;">outbound</span>
+<span style="background: #FF00BB;">inbound</span>
+
+<?
 include_once("navbottom.inc.php");
 ?>
