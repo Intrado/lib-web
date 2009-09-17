@@ -175,7 +175,7 @@ foreach ($jobtypes as $jt) {
 
 // NOTE: what if email sequence0 is deleted? could have set up account, added email, changed account to use email1 then removed e0
 // OK because e0 is never deleted, it is only set to empty email field
-$values = QuickQueryList("select cp.jobtypeid from contactpref cp join jobtype jt on (cp.jobtypeid=jt.id) where cp.personid=? and cp.type='email' and cp.sequence=0 and cp.enabled=1 and jt.systempriority != 1", false, false, array($pid));
+$values = QuickQueryList("select cp.jobtypeid from contactpref cp join jobtype jt on (cp.jobtypeid=jt.id) where cp.personid=? and cp.type='email' and cp.sequence=0 and cp.enabled=1 and jt.systempriority != 1 and jt.deleted=0", false, false, array($pid));
 
 if(count($jobtypes) > 0) {
 	$formdata["jobtypes"] = array(
