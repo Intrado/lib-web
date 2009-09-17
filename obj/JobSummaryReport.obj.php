@@ -63,7 +63,7 @@ class JobSummaryReport extends ReportGenerator{
 									sum(rp.status = 'nocontacts' and rc.result is null) as nocontacts,
 									sum(rc.numattempts) as totalattempts,
 									sum(rp.status = 'declined' and rc.result is null) as declined,
-									100 * sum(rp.numcontacts and rp.status='success') / (sum(rp.numcontacts and rp.status != 'duplicate') +0.00) as success_rate
+									(select 100 * sum(rp2.status != 'duplicate' and rp2.iscontacted) / (sum(rp2.status != 'duplicate') + 0.00) as success_rate from reportperson rp2 where rp2.type='phone' and rp2.jobid=rp.jobid) as success_rate
 									from reportperson rp
 									left join reportcontact rc on (rp.jobid = rc.jobid and rp.type = rc.type and rp.personid = rc.personid)
 									inner join job j on (j.id = rp.jobid)
@@ -80,7 +80,7 @@ class JobSummaryReport extends ReportGenerator{
 									sum(rc.result = 'duplicate') as duplicate,
 									sum(rp.status = 'nocontacts' and rc.result is null) as nocontacts,
 									sum(rp.status = 'declined' and rc.result is null) as declined,
-									100 * sum(rp.numcontacts and rp.status='success') / (sum(rp.numcontacts and rp.status != 'duplicate') +0.00) as success_rate
+									(select 100 * sum(rp2.status != 'duplicate' and rp2.iscontacted) / (sum(rp2.status != 'duplicate') + 0.00) as success_rate from reportperson rp2 where rp2.type='email' and rp2.jobid=rp.jobid) as success_rate
 									from reportperson rp
 									left join reportcontact rc on (rp.jobid = rc.jobid and rp.type = rc.type and rp.personid = rc.personid)
 									where rp.jobid in ('$joblist')
@@ -96,7 +96,7 @@ class JobSummaryReport extends ReportGenerator{
 									sum(rc.result = 'duplicate') as duplicate,
 									sum(rp.status = 'nocontacts' and rc.result is null) as nocontacts,
 									sum(rp.status = 'declined' and rc.result is null) as declined,
-									100 * sum(rp.numcontacts and rp.status='success') / (sum(rp.numcontacts and rp.status != 'duplicate') +0.00) as success_rate
+									(select 100 * sum(rp2.status != 'duplicate' and rp2.iscontacted) / (sum(rp2.status != 'duplicate') + 0.00) as success_rate from reportperson rp2 where rp2.type='sms' and rp2.jobid=rp.jobid) as success_rate
 									from reportperson rp
 									left join reportcontact rc on (rp.jobid = rc.jobid and rp.type = rc.type and rp.personid = rc.personid)
 									where rp.jobid in ('$joblist')
