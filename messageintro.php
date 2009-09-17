@@ -147,7 +147,7 @@ if($emergencyintro) {
 	$emergencymessages["message"][$emergencyintro->id] = $emergencyintro->name;
 }
 
-$allowedjobtypes = QuickQueryRow("select sum(jt.systempriority = 1 && jt.deleted != 1) as Emergency, sum(jt.systempriority != 1  && jt.deleted != 1) as Other from jobtype jt",true);
+$allowedjobtypes = QuickQueryRow("select sum(jt.systempriority = 1) as Emergency, sum(jt.systempriority != 1) as Other from jobtype jt where jt.deleted = 0 and jt.issurvey = 0",true);
 
 
 $formdata = array();
