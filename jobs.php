@@ -149,6 +149,7 @@ if (isset($_GET['runrepeating'])) {
 if (isset($_GET['copy'])) {
 	$copyid = DBSafe($_GET['copy']);
 	if (userOwns("job",$copyid) || $USER->authorize('managesystemjobs')) {
+		$job = new Job($copyid);
 		if ($job->userid !== null) {
 			 Query('BEGIN');
 				$newjob = $job->copyNew();
