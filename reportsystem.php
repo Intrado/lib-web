@@ -111,7 +111,8 @@ if($reload){
 // Data Calculation
 ////////////////////////////////////////////////////////////////////////////////
 	$joblistquery = "";
-	$jobtypelist = QuickQueryList("select id, name from jobtype where not deleted", true);
+	$surveysql = getSystemSetting('_hassurvey', true) ? '' : 'and issurvey=0';
+	$jobtypelist = QuickQueryList("select id, name from jobtype where not deleted $surveysql", true);
 
 	$paramdata = array("lastxdays" =>  GetFormData($f, $s, "xdays"), "startdate" => $startdate, "enddate" => $enddate);
 
