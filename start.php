@@ -339,7 +339,7 @@ function activityfeed($mergeditems,$ajax = false) {
 					$title = _L('%1$s message %2$s',($messagetype == "sms"?"SMS":(escapehtml(ucfirst($messagetype)))),escapehtml($title));
 					$tools = action_links (
 						action_link("Edit", "pencil", 'message' . $item["messagetype"] . '.php?id=' . $itemid),
-						action_link("Play","diagona/16/131",null,"popup('previewmessage.php?close=1&id=$itemid', 400, 500); return false;")
+						action_link("Play","diagona/16/131",null,"popup('previewmessage.php?close=1&id=$itemid', 400, 500,'preview'); return false;")
 						);
 					$defaultlink = "message$messagetype.php?id=$itemid";
 					$content = '<a href="' . $defaultlink . '" ' . $defaultonclick . '>' . $time .  ' - <b>' .  escapehtml($item["name"]) . '</b>' . '</a>';
