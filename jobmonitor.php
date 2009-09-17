@@ -115,10 +115,10 @@ switch ($job->status) {
 		}
 		break;
 	case 'processing':
-		$notice = _L("Please wait while this job is processed: ") . $job->percentprocessed . "%";
+		$notice = _L("Please wait while this job is processed: <b>") . $job->percentprocessed . "%</b>";
 		break;
 	case 'procactive':
-		$notice = _L("Some data is available. This job is %s%%  processed.", $job->percentprocessed);
+		$notice = _L("Some data is available. This job is <b>%s%%</b>  processed.", $job->percentprocessed);
 		break;
 	case 'active':
 		$notice = _L("This job is active.");
@@ -165,6 +165,9 @@ if ($job->sendsms) {
 		);
 }
 $windowtitle = _L("Monitoring job, %1s, last updated %2s", escapehtml($job->name), date("g:i:s a",$jobstats['validstamp']));
+if (!in_array($job->status, array('complete', 'cancelled')))
+	$windowtitle .= " <img src='img/ajax-loader.gif'/>";
+
 $imageurl = "graph_detail_callprogress.png.php?jobid={$job->id}&valid={$jobstats['validstamp']}&scaley=0.75";
 
 ////////////////////////////////////////////////////////////////////////////////
