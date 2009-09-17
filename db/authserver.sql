@@ -337,3 +337,6 @@ ALTER TABLE `shard` ADD `readonlyhost` VARCHAR( 255 ) NOT NULL DEFAULT '' AFTER 
 ALTER TABLE `customer` ADD INDEX ( `shardid` ) ;
 
 ALTER TABLE `webactivation` ADD INDEX ( `creation` ) ;
+
+ ALTER TABLE `dm` CHANGE `poststatus` `poststatus` MEDIUMTEXT NOT NULL  ;
+ 
