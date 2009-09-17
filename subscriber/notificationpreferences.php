@@ -177,15 +177,17 @@ foreach ($jobtypes as $jt) {
 // OK because e0 is never deleted, it is only set to empty email field
 $values = QuickQueryList("select cp.jobtypeid from contactpref cp join jobtype jt on (cp.jobtypeid=jt.id) where cp.personid=? and cp.type='email' and cp.sequence=0 and cp.enabled=1 and jt.systempriority != 1", false, false, array($pid));
 
-$formdata["jobtypes"] = array(
-	"label" => "",
-	"value" => $values,
-	"validators" => array(
-		array("ValInArray", 'values'=>array_keys($jtvalues))
-	),
-	"control" => array("MultiCheckbox","values" => $jtvalues),
-	"helpstep" => 1
-);
+if($jtvalues !== false) {
+	$formdata["jobtypes"] = array(
+		"label" => "",
+		"value" => $values,
+		"validators" => array(
+			array("ValInArray", 'values'=>array_keys($jtvalues))
+		),
+		"control" => array("MultiCheckbox","values" => $jtvalues),
+		"helpstep" => 1
+	);
+}
 
 foreach ($fieldmaps as $fieldmap) {
 	$fieldnum = $fieldmap->fieldnum;
@@ -509,8 +511,8 @@ echo "<br>";
 
 // form data
 startWindow(_L('Interests'));
-
-echo '<table cellpadding="3"><tr><td>&nbsp;&nbsp;<img src="img/bug_lightbulb.gif" >&nbsp;&nbsp;' . _L("In addition to Emergency notifications, I would like to receive the following types of announcements:") . '</td></tr></table>';
+if($jtvalues === false)
+	echo '<table cellpadding="3"><tr><td>&nbsp;&nbsp;<img src="img/bug_lightbulb.gif" >&nbsp;&nbsp;' . _L("In addition to Emergency notifications, I would like to receive the following types of announcements:") . '</td></tr></table>';
 echo $form->render();
 
 endWindow();
