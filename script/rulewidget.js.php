@@ -818,7 +818,7 @@ var RuleEditor = Class.create({
 	make_textbox: function(value, small, hidden) {
 		if (!value)
 			value = '';
-		var textbox = new Element('input', {'type':'text', 'style':'font-size:90%', 'value':value.escapeHTML()});
+		var textbox = new Element('input', {'type':'text', 'style':'font-size:90%', 'value':value.escapeHTML(), 'maxlength':255});
 		textbox.size = small ? '8' : '12';
 		if (hidden)
 			textbox.hide();
