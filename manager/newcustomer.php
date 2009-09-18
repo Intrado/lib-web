@@ -166,7 +166,7 @@ if (CheckFormSubmit($f,$s)){
 
 				$surveyurl = $SETTINGS['feature']['customer_url_prefix'] . "/" . $hostname . "/survey/";
 				$smsoptintext = 'Please OPTIN to receive TXT alerts from ' . $displayname . '.';
-				$smsoptintext = substr(0, 65); // 65 chars for customer optin txt
+				$smsoptintext = substr($smsoptintext, 0, 65); // 65 chars for customer optin txt
 				$enablesmsoptin = '1';
 				
 				$query = "INSERT INTO `setting` (`name`, `value`) VALUES

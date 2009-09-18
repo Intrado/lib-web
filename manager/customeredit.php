@@ -204,7 +204,7 @@ if(CheckFormSubmit($f,"Save") || CheckFormSubmit($f, "Return")) {
 				error("Customer cannot have both Contact Manager and Self-Signup features, please select only one");
 			} else if ($emaildomainerror !== true) {
 				error($emaildomainerror);
-			} else if (count($smsoptintext) > 65) {
+			} else if (strlen($smsoptintext) > 65) {
 				error('SMS Opt-in Text cannot exceed 65 characters');
 			} else {
 
