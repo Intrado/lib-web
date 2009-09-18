@@ -23,6 +23,8 @@ if (!$USER->authorize('createlist')) {
 // Data Handling
 ////////////////////////////////////////////////////////////////////////////////
 
+$_SESSION['previewfrom'] = 'lists.php';
+
 if (isset($_GET['delete'])) {
 	$deleteid = $_GET['delete'] + 0;
 	if (isset($_SESSION['listid']) && $_SESSION['listid'] == $deleteid)

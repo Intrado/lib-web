@@ -43,6 +43,8 @@ if (!$USER->authorize('createlist')) {
 // Action/Request Processing
 ////////////////////////////////////////////////////////////////////////////////
 
+$_SESSION['previewfrom'] = 'list.php';
+
 unset($_SESSION['listsearchpreview']);
 list_clear_search_session();
 

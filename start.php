@@ -25,6 +25,8 @@ require_once("obj/RenderedList.obj.php");
 // Data Handling
 ////////////////////////////////////////////////////////////////////////////////
 
+$_SESSION['previewfrom'] = 'start.php';
+
 if ($USER->authorize("loginweb") === false) {
 	redirect('unauthorized');
 }
