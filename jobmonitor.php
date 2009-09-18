@@ -197,8 +197,7 @@ if (!isset($_GET['notpopup'])) {
 	$TITLE = '';//escapehtml($job->name);
 	include_once("popup.inc.php");
 
-	button_bar(button('Done', 'window.close()'),
-		button("Refresh","window.location='jobmonitor.php?jobid={$job->id}&noupdate={$noupdate}';"));
+	button_bar(button('Done', 'window.close()'));
 	echo '<br/>';
 }
 
