@@ -85,21 +85,19 @@ if (isset($_GET['usetext']) && isset($_SESSION['ttstext']) && isset($_SESSION['t
 				"Spanish/DefaultIntro.wav",
 				"Spanish/EmergencyIntro.wav"
 			))) {
-			if (file_exists($mediapath . $mediafile)) {
-				Message::playParts(array(),"mp3",$mediapath . $mediafile);
-				exit();
-			} else {
-				$mediafile = strrchr($mediafile,'/');
-				if($mediafile !== false) {
-					$mediafile = substr($mediafile,1);
-					if (file_exists($mediapath . $mediafile)) {
-						Message::playParts(array(),"mp3",$mediapath . $mediafile);	
-						exit();
-					}
+			Message::playParts(array(),"mp3",$mediapath . $mediafile);		
+			exit();
+			
+		} else {
+			$mediafile = strrchr($mediafile,'/');
+			if($mediafile !== false) {
+				$mediafile = substr($mediafile,1);
+				if($mediafile == "DefaultIntro.wav" || $mediafile == "EmergencyIntro.wav") {
+					Message::playParts(array(),"mp3",$mediapath . $mediafile);				
+					exit();
 				}
 			}
 		}
-
 } 
 
 header("HTTP/1.0 200 OK");
