@@ -249,7 +249,7 @@ $minhight = $minhight * $jobhight + $minhight*$jobspacing ;
 			$('__' + i).jobstatus = jobstatus[i];
 			$('__' + i).observe('prototip:shown', function() {
 				if((this.jobstatus=="Active" || this.jobstatus=="Cancelling" ) && $('boxmonitor_' + this.jobid) != undefined) {
-					$('boxmonitor_' + this.jobid).update('<img src="graph_job.png.php?jobid=' + this.jobid + '&junk=' + Math.random() + '"/><br />Click for larger view.');
+					$('boxmonitor_' + this.jobid).update('<img src="graph_job.png.php?jobid=' + this.jobid + '&junk=' + Math.random() + '"/><br />Click for more information.');
 				}
 			});
 			var w = $('__' + i).getWidth();
@@ -275,7 +275,7 @@ $minhight = $minhight * $jobhight + $minhight*$jobspacing ;
 		var content = $("box_" + id).innerHTML;
 		if(jobstatus[id] == "Active" || jobstatus[id] == "Complete" || jobstatus[id] == "Cancelling" || jobstatus[id] == "Cancelled" ){
 			var jobid = jobids[id];
-			content += '<div id="boxmonitor_' + jobid + '" class="boxmonitor" onclick="popup(\'jobmonitor.php?jobid=' + jobid + '\', 650, 450);" ><img src="graph_job.png.php?jobid=' + jobid + '&junk=' + Math.random() + '"/><br />Click for larger view.</div>';
+			content += '<div id="boxmonitor_' + jobid + '" class="boxmonitor" onclick="popup(\'jobmonitor.php?jobid=' + jobid + '\', 650, 450);" ><img src="graph_job.png.php?jobid=' + jobid + '&junk=' + Math.random() + '"/><br />Click for more information.</div>';
 		}
 		return content;
 	}
