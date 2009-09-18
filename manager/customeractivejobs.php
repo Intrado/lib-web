@@ -158,7 +158,7 @@ Task dispatch type:&nbsp;
 
 <?
 
-$prinames = array (1 => "Emergency", 2 => "Attendance", 3 => "General");
+$prinames = array (1 => "Emergency", 2 => "High", 3 => "General");
 $pricolors = array (1 => "#ff0000", 2 => "#ffff00", 3 => "#0000ff");
 
 
