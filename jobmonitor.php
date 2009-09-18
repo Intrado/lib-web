@@ -161,7 +161,7 @@ if ($job->sendsms) {
 			'recipients' => $destinationresults['sms'][0]+0,
 			'completed' => $destinationresults['sms'][1]+0,
 			'remaining' => $destinationresults['sms'][2]+0,
-			'percentcontacted' => sprintf("%0.2f", isset($destinationresults['sms'][6]) ? $destinationresults['sms'][6] : "") . '%'
+			'percentcontacted' => sprintf("%0.2f", isset($destinationresults['sms'][7]) ? $destinationresults['sms'][7] : "") . '%'
 		);
 }
 $windowtitle = _L("Monitoring job, %1s, last updated %2s", escapehtml($job->name), date("g:i:s a",$jobstats['validstamp']));
