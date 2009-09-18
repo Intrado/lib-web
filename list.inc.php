@@ -25,7 +25,8 @@ function listentry_delete($personid) {
 }
 
 function listentry_insert($personid, $type) {
-	if ($type == 'A' && !userOwns('person', $personid))
+	$person = new Person($personid);
+	if ($person->type != 'system' && $type == 'A' && !userOwns('person', $personid))
 		return;
 	QuickUpdate("INSERT INTO listentry (listid, type, personid) VALUES(?,?,?)", false, array($_SESSION['listid'], $type, $personid));
 }
