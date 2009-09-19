@@ -1482,7 +1482,8 @@ $$$
 
 INSERT INTO systemmessages (id, message, icon, modifydate)
 VALUES (
-'1', '<div style="color:#3e693f;font-size: 20px;font-weight: bold;">New version 7.0!</div> <div style="font-size: 16px;margin: 25px;margin-bottom: 2px;">See for yourself <b><a href="javascript: popup(''help/flash/Welcome.swf'',750,500);"><img src="img/icons/control_play_blue.gif" /> Play Video</a></b></div> <ul> <li>New users be sure to print the <a href="help/html/Quick_Start_for_New_Users.pdf"><img src="img/icons/page_white_acrobat.gif" /> Quick Start Guide</a> <li>Want more detail? See the step-by-step training guides for <a href="help/html/Getting_Started_with_v7.pdf"><img src="img/icons/page_white_acrobat.gif" /> New Users</a> and <a href="help/html/Advanced_Training_with_v7.pdf"><img src="img/icons/page_white_acrobat.gif" /> Advanced Users</a> </ul>', 'largeicons/news.jpg', NOW()
+'1', '<div style="color:#3e693f;font-size: 20px;font-weight: bold;">New version 7.0!</div> <div style="font-size: 16px;margin: 25px;margin-bottom: 2px;">See for yourself <b>
+<a href="javascript: popup(''help/flash/Welcome.swf'',750,500);"><img src="img/icons/control_play_blue.gif" /> Play Video</a></b></div> <ul> <li>New users be sure to print the <a href="help/html/Quick_Start_for_New_Users.pdf"><img src="img/icons/page_white_acrobat.gif" /> Quick Start Guide</a> <li>Want more detail? See the step-by-step training guides for <a href="help/html/Getting_Started_with_v7.pdf"><img src="img/icons/page_white_acrobat.gif" /> New Users</a> and <a href="help/html/Advanced_Training_with_v7.pdf"><img src="img/icons/page_white_acrobat.gif" /> Advanced Users</a> </ul>', 'largeicons/news.jpg', NOW()
 )
 $$$
 
@@ -1513,8 +1514,8 @@ CREATE TABLE IF NOT EXISTS `blockeddestination` (
   `createdate` datetime default NULL,
   PRIMARY KEY  (`id`),
   KEY `userid` (`userid`,`type`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8
 $$$
+) ENGINE=InnoDB DEFAULT CHARSET=utf8
 
 -- drop old blocked number table
  DROP TABLE `blockednumber`
@@ -1522,3 +1523,15 @@ $$$
 
  ALTER TABLE `custdm` CHANGE `poststatus` `poststatus` MEDIUMTEXT CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL 
  $$$
+
+INSERT INTO systemmessages (message, icon, modifydate)
+VALUES (
+'<div style="color:#3e693f;font-size: 20px;font-weight: bold;">New version 7.1!</div>
+  <ul>
+  <li>See what is new in version 7.1: <a href="help/html/New_in_Version_7_1.pdf"><img src="img/icons/page_white_acrobat.gif" /> New in Version 7.1</a> 
+  <li>Be sure to check out the new list building tutorial <a href="javascript: popup(''help/flash/listtutorial.swf'',750,500);"><img src="img/icons/control_play_blue.gif" /> Play Tutorial</a> great for new and advanced users!
+  </ul>', 'largeicons/news.jpg', NOW()
+)
+$$$
+
+

@@ -91,3 +91,14 @@ $$$
 
 ALTER TABLE `custdm` CHANGE `poststatus` `poststatus` MEDIUMTEXT CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL 
 $$$
+
+
+INSERT INTO systemmessages (message, icon, modifydate)
+VALUES (
+'<div style="color:#3e693f;font-size: 20px;font-weight: bold;">New version 7.1!</div>
+  <ul>
+  <li>See what is new in version 7.1: <a href="help/html/New_in_Version_7_1.pdf"><img src="img/icons/page_white_acrobat.gif" /> New in Version 7.1</a> 
+  <li>Be sure to check out the new list building tutorial <a href="javascript: popup(''help/flash/listtutorial.swf'',750,500);"><img src="img/icons/control_play_blue.gif" /> Play Tutorial</a> great for new and advanced users!
+  </ul>', 'largeicons/news.jpg', NOW()
+)
+$$$
