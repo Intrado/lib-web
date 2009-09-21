@@ -161,7 +161,7 @@ function sendtxt3ci($username, $password, $shortcode, $sourceaddress, $replybody
 	$client = new SoapClient(null,array("location" => "http://api.cmsmobilesuite.com:8080/axis2-1.3/services/NmApi", "uri" => "http://nmapi.cmsmobilesuite.com"));
 	if ($client) {
 		try {
-			$response = $client->SubmitSMS($username,$password,$shortcode,$sourceaddress,"This is the SchoolMessenger automated notification system. For more information, reply HELP. Send STOP to opt out. Std rates/other chgs may apply.");
+			$response = $client->SubmitSMS($username,$password,$shortcode,$sourceaddress,$replybody);
 		} catch (SoapFault $fault) {
 			error_log("txtreply SOAP Fault: (faultcode: {$fault->faultcode}, faultstring: {$fault->faultstring})");
 		}
