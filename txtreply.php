@@ -71,8 +71,7 @@ $splitmessage = explode(" ", $message, 2);
 
 // Check if message starts with help
 if ($splitmessage[0] === "help") {
-	if (!$is3ci) // 3ci sends for us
-		sendtxt($username, $password, $inboundshortcode, $sourceaddress, $helptext);
+	sendtxt($username, $password, $inboundshortcode, $sourceaddress, $helptext);
 	
 	logExit("HELP");
 }
@@ -103,8 +102,7 @@ if ($hasoptout) {
 	blocksms($phonenumber, 'block', 'automated block due to keyword '.$splitmessage[0]);
 	
 	// reply back with confirmation
-	if (!$is3ci) // 3ci sends for us
-		sendtxt($username, $password, $inboundshortcode, $sourceaddress, $optouttext);
+	sendtxt($username, $password, $inboundshortcode, $sourceaddress, $optouttext);
 	
 	logExit("OPTOUT");
 } else if ($hasoptin) {
@@ -113,8 +111,7 @@ if ($hasoptout) {
 	blocksms($phonenumber, 'optin', 'automated optin due to keyword '.$splitmessage[0]);
 
 	// reply back with confirmation
-	if (!$is3ci) // 3ci not ready for optin keywords
-		sendtxt($username, $password, $inboundshortcode, $sourceaddress, $optintext);
+	sendtxt($username, $password, $inboundshortcode, $sourceaddress, $optintext);
 	
 	logExit("OPTIN");
 } else {
