@@ -24,7 +24,7 @@ $systemprioritynames = array("1" => "Emergency",
 foreach($systemprioritynames as $index => $name){
 	$types[$index] = DBFindMany('JobType', "from jobtype where deleted=0 and systempriority = '" . $index . "' and not issurvey order by name");
 }
-$surveytypes = DBFindMany('JobType', "from jobtype where deleted=0 and systempriority = '3' and issurvey order by name");
+$surveytypes = getSystemSetting('_hassurvey', true) ? DBFindMany('JobType', "from jobtype where deleted=0 and systempriority = '3' and issurvey order by name") : array();
 $maxphones = getSystemSetting("maxphones", 3);
 $maxemails = getSystemSetting("maxemails", 2);
 $maxsms = getSystemSetting("maxsms", 2);
@@ -49,18 +49,18 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f, "add") || CheckFormSubmit($f, "
 	else
 	{
 		MergeSectionFormData($f, $s);
-		
-		foreach($systemprioritynames as $index => $name) 
+
+		foreach($systemprioritynames as $index => $name)
 			foreach($types[$index] as $type) {
 				TrimFormData($f, $s, "jobtypedesc" . $type->id);
 				TrimFormData($f, $s, "jobtypename" . $type->id);
-			}	
-		
+			}
+
 		foreach($surveytypes as $surveytype){
 			TrimFormData($f, $s, "jobtypedesc" . $surveytype->id);
 			TrimFormData($f, $s, "jobtypename" . $surveytype->id);
 		}
-		
+
 		//do check
 		if( CheckFormSection($f, $s) )
 		{
