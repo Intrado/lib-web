@@ -59,8 +59,8 @@ if ($inboundshortcode == "45305") {
 
 $helptext = "Text Alert Service from SchoolMessenger. For additional info visit " . $visitlink . ". Send STOP to opt out. Other chgs may apply.";
 $infotext = $helptext;
-$optouttext = "You are now unsubscribed from this text alert service. Txt OPTIN to subscribe, HELP for help. Check out " . $visitlink . " for info. Other chgs may apply.";
-$outintext = "You are now registered to receive text alerts. Txt STOP to quit, HELP for help. Check out " . $visitlink . " for info.";
+$optouttext = "You are now unsubscribed from the text alerts. Txt OPTIN to subscribe, HELP for help. Check out " . $visitlink . " for info. Other chgs may apply.";
+$optintext = "You are now registered to receive text alerts. Txt STOP to quit, HELP for help. Check out " . $visitlink . " for info.";
 
 
 $message = str_replace("\n"," ",$message);
