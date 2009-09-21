@@ -1514,8 +1514,8 @@ CREATE TABLE IF NOT EXISTS `blockeddestination` (
   `createdate` datetime default NULL,
   PRIMARY KEY  (`id`),
   KEY `userid` (`userid`,`type`)
-$$$
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8
+$$$
 
 -- drop old blocked number table
  DROP TABLE `blockednumber`
