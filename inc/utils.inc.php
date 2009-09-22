@@ -102,7 +102,9 @@ function getDefaultCallerID() {
 		return getSystemSetting($callbackdefault);
 	}
 	global $USER;
-	return $USER->getSetting('callerid', getSystemSetting('callerid'));
+	
+	// additional phone parse paranoia
+	return Phone::parse($USER->getSetting('callerid', getSystemSetting('callerid')));
 }
 
 function isvalidtimestamp ($time) {
@@ -292,7 +294,7 @@ function getEmailRegExp() {
     # This code is licensed under a Creative Commons Attribution-ShareAlike 2.5 License
     # http://creativecommons.org/licenses/by-sa/2.5/
     #
-    # $Revision: 1.90 $
+    # $Revision: 1.91 $
     # http://www.iamcal.com/publish/articles/php/parsing_email/
     ##################################################################################
 

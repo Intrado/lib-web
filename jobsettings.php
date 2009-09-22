@@ -117,7 +117,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		$postdata = $form->getData(); //gets assoc array of all values {name:value,...}
 
 		if (isset($postdata['callerid']))
-			setSystemSetting('callerid', $postdata['callerid']);
+			setSystemSetting('callerid', Phone::parse($postdata['callerid']));
 
 		setSystemSetting('autoreport_replyemail', $postdata['autoreportreplyemail']);
 		setSystemSetting('autoreport_replyname', $postdata['autoreportreplyname']);

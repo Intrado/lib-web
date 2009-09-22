@@ -473,7 +473,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 				$edituser->update();
 
 			if (isset($postdata['callerid']))
-				$edituser->setSetting("callerid",$postdata['callerid']);
+				$edituser->setSetting("callerid",Phone::parse($postdata['callerid']));
 
 			if (!$edituser->getSetting("maxjobdays", false))
 				$edituser->setSetting("maxjobdays", 1);

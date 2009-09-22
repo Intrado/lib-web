@@ -426,7 +426,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 			$USER->phone = $postdata['phone'];
 			$USER->update();
 			if ($USER->authorize('setcallerid') && isset($postdata['callerid'])) {
-				$USER->setSetting("callerid",$postdata['callerid']);
+				$USER->setSetting("callerid",Phone::parse($postdata['callerid']));
 			}
 		}
 
