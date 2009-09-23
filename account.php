@@ -423,7 +423,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 			$USER->accesscode = $postdata['accesscode'];
 			$USER->email = $postdata['email'];
 			$USER->aremail = $postdata['aremail'];
-			$USER->phone = $postdata['phone'];
+			$USER->phone = Phone::parse($postdata['phone']);
 			$USER->update();
 			if ($USER->authorize('setcallerid') && isset($postdata['callerid'])) {
 				$USER->setSetting("callerid",Phone::parse($postdata['callerid']));
