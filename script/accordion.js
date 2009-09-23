@@ -71,22 +71,14 @@ var AccordionSection = Class.create({
 			}
 		}.bindAsEventListener(this));
 
-		this.hideEffect = null;
-		this.showEffect = null;
-
 		this.hide(true);
 	},
 	hide: function(dontAnimate) {
-		if (this.showEffect) {
-			this.showEffect.cancel();
-			this.showEffect = null;
-		}
-
 		if (this.contentDiv.visible()) {
 			if (dontAnimate)
 				this.contentDiv.hide();
 			else
-				this.hideEffect = new Effect.BlindUp(this.contentDiv, {duration:this.accordion.settings.hideDuration});
+				new Effect.BlindUp(this.contentDiv, {queue: {limit: 2, position:'end', scope:'accordion'+this.accordion.container.identify()}, duration:this.accordion.settings.hideDuration});
 		}
 
 		this.sectionDiv.removeClassName('accordionsectiondivexpanded');
@@ -94,16 +86,11 @@ var AccordionSection = Class.create({
 		this.sectionDiv.addClassName('accordionsectiondivcollapsed');
 	},
 	show: function(dontAnimate) {
-		if (this.hideEffect) {
-			this.hideEffect.cancel();
-			this.hideEffect = null;
-		}
-
 		if (!this.contentDiv.visible()) {
 			if (dontAnimate)
 				this.contentDiv.show();
 			else
-				this.showEffect = new Effect.BlindDown(this.contentDiv, {duration:accordion.settings.showDuration});
+				new Effect.BlindDown(this.contentDiv, {queue: {limit: 2, position:'end', scope:'accordion'+this.accordion.container.identify()}, duration:accordion.settings.showDuration});
 		}
 
 		this.sectionDiv.removeClassName('accordionsectiondivexpanded');
