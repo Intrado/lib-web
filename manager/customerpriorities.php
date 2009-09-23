@@ -61,8 +61,8 @@ if(CheckFormSubmit($f, 'new')) {
 
 		if( CheckFormSection($f, $s) ) {
 			error('There was a problem trying to save your changes', 'Please verify that all required field information has been entered properly');
-		} else if ($priority !== 1 && $priority !== 2) {			
-			error('Priority must be between 0 and 2, 0 for Emergency and 2 for High Priority');		
+		} else if ($priority !== 1 && $priority !== 2) {
+			error('Priority must be between 0 and 2, 0 for Emergency and 2 for High Priority');
 		} else {
 			if(GetFormData($f, $s, 'newname') != ""){
 				$name = GetFormData($f, $s, 'newname');
@@ -72,11 +72,11 @@ if(CheckFormSubmit($f, 'new')) {
 			} else {
 				error("You cannot add a job type that has a blank name");
 			}
-			
+
 			foreach ($jobtypes as $jobtype) {
 				QuickUpdate("update jobtype set name=? where id=?", $custdb, array(trim(GetFormData($f,$s,"name_". $jobtype["id"])),$jobtype["id"]));
 			}
-			
+
 			redirect();
 		}
 	}
@@ -90,12 +90,12 @@ if($reload){
 	PutFormData($f, $s, 'newname', "", 'text');
 	PutFormData($f, 'new', 'add', '');
 	PutFormData($f,$s,'priority', 2, "number");
-	
+
 	foreach ($jobtypes as $jobtype) {
 		PutFormData($f,$s,"name_". $jobtype["id"],$jobtype["name"],"text",1,50,1);
 	}
-	
-	
+
+
 }
 
 //////////////////////////////////////////
@@ -137,11 +137,11 @@ NewForm($f);
 			<td>
 <?
 			if ($jobtype["deleted"]) {
-				echo '<a href="customerpriorities.php?undelete=' . $jobtype["id"] . '">Undelete</a>';			
+				echo '<a href="customerpriorities.php?undelete=' . $jobtype["id"] . '">Undelete</a>';
 			} else {
-				echo '<a href="customerpriorities.php?delete=' . $jobtype["id"] . '">Delete</a>';							
+				echo '<a href="customerpriorities.php?delete=' . $jobtype["id"] . '">Delete</a>';
 			}
-			
+
 ?>
 			</td>
 		</tr><?
@@ -166,7 +166,7 @@ NewForm($f);
 </table>
 <? NewFormItem($f, 'new', 'Save', 'submit')?>
 <div style="color:green">
-<p>If you want to add more general or survey types, please log into the customer and use the Job Type Management page.
+<p>If you want to add more general or survey types, please log into the customer and use the Job Type Management page. <b>You must have a minimum of one survey jobtype and one non-survey jobtype regardless of whether or not the customer has survey enabled.</b>
 <p>If you are adding a High Priority Job Type, make sure it qualifies as a High Priority.  This would include things like "Attendance" or "Food Services".
 <p>If it does not fall into that category, please make the Job Type a General.
 <p>Do not forget to configure the job type call preferences for any added job types on this page.
