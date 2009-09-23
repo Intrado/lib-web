@@ -52,7 +52,7 @@ function showTable ($data, $titles, $formatters = array(), $repeatedColumns = ar
 	$hiddencolumns = array();
 	echo '<tr class="listHeader">';
 	foreach ($titles as $index => $title) {
-		
+
 		echo '<th align="left" ';
 		// make column hidden
 		if(strpos($title,"@") !== false){
@@ -67,7 +67,7 @@ function showTable ($data, $titles, $formatters = array(), $repeatedColumns = ar
 		}
 
 		if (strpos($title,"@#") === 0){
-			$displaytitle = substr($title,2);		
+			$displaytitle = substr($title,2);
 		} else if (strpos($title,"@") === 0){
 			$displaytitle = substr($title,1);
 		} else if (strpos($title,"#") === 0){
@@ -126,7 +126,7 @@ function showTable ($data, $titles, $formatters = array(), $repeatedColumns = ar
 function startWindow($title, $style = "", $minimize = false, $usestate = true) {
 	static $id = 0;
 	$id++;
-	
+
 	$theme = getBrandTheme();
 
 	$visible = !$usestate || state("window_$id") != "closed";
@@ -158,7 +158,7 @@ function startWindow($title, $style = "", $minimize = false, $usestate = true) {
 function endWindow() {
 	$theme = getBrandTheme();
 
-?>		
+?>
 		</div></div></td>
 		<td background="img/themes/<?=$theme?>/win_r.gif"></td>
 	</tr>
@@ -195,14 +195,14 @@ function showPageMenu ($total,$start, $perpage, $link = NULL) {
 
 function ajax_table_handle_togglers($containerID) {
 	global $USER;
-	
+
 	if (!isset($_SESSION['ajaxtabletogglers']))
 		$_SESSION['ajaxtabletogglers'] = array();
 	if (!isset($_SESSION['ajaxtabletogglers'][$containerID]))
 		$_SESSION['ajaxtabletogglers'][$containerID] = array();
-		
+
 	$togglers = $_SESSION['ajaxtabletogglers'][$containerID];
-	
+
 	if (isset($_GET['addtoggler'])) {
 		$index = $_GET['addtoggler'];
 		$togglers[$index] = true;
@@ -210,16 +210,16 @@ function ajax_table_handle_togglers($containerID) {
 		$index = $_GET['removetoggler'];
 		$togglers[$index] = false;
 	}
-	
+
 	$_SESSION['ajaxtabletogglers'][$containerID] = $togglers;
-	
+
 	return true;
-}	
-	
+}
+
 function ajax_table_get_orderby($containerID, $validaliases) {
 	global $USER;
-	
-	$ajaxtablesort = json_decode($USER->getSetting('ajaxtablesort', false, true), true);
+
+	$ajaxtablesort = isset($_SESSION['ajaxtablesort']) ? $_SESSION['ajaxtablesort'] : array();
 	if (!is_array($ajaxtablesort))
 		$ajaxtablesort = array();
 	$validorderby = array();
@@ -234,58 +234,61 @@ function ajax_table_get_orderby($containerID, $validaliases) {
 	} else if (!empty($ajaxtablesort[$containerID])) {
 		$validorderby = $ajaxtablesort[$containerID];
 	}
+
+	// Bugfix 3188: The sorting information stored in $ajaxtablesort[$containerID], $validorderby, may be outdated. Make sure it is consistent with $validaliases.
+	$validorderby = array_intersect_key($validorderby, array_flip($validaliases));
+
 	if (!empty($validorderby)) {
 		$orderbySQL = implode(",", array_keys($validorderby));
-		// Checks if descend is set in user setting.
+		// Checks if descend is set already set.
 		if (in_array('descend', $validorderby))
 			$descend = true;
-		// $_GET['orderby'] has precedence over user setting.
+		// $_GET['orderby'] has precedence.
 		if (isset($_GET['orderby']))
 			$descend = isset($_GET['descend']) ? true : false;
 	}
 	if (!empty($descend))
 		$orderbySQL .= ' desc ';
 	$ajaxtablesort[$containerID] = $validorderby;
-	$USER->setSetting('ajaxtablesort', json_encode($ajaxtablesort));
+	$_SESSION['ajaxtablesort'] = $ajaxtablesort;
 	return isset($orderbySQL) ? $orderbySQL : null;
 }
 
 function ajax_show_table ($containerID, $data, $titles, $formatters = array(), $sorting = array(), $repeatedColumns = false, $groupBy = false, $maxMultisort = 0, $showColumnTogglers = false, $scroll = true) {
 	global $USER;
-	
-	$ajaxtablesort = json_decode($USER->getSetting('ajaxtablesort', false, true), true);
+
+	$ajaxtablesort = isset($_SESSION['ajaxtablesort']) ? $_SESSION['ajaxtablesort'] : array();
 	$existingsort = array();
 	if (is_array($ajaxtablesort) && isset($ajaxtablesort[$containerID]))
 		$existingsort = $ajaxtablesort[$containerID];
 	//use sparse array to use isset later
 	$hiddencolumns = array();
-	
+
 	$headerHtml = '<tr class="listHeader">';
-	
+
 	foreach ($titles as $index => $title) {
 		$headerHtml .= '<th align="left" ';
-		
+
 		$style = ' white-space: nowrap; ';
 		// make column hidden
 		if (strpos($title,"@") !== false) {
-		
+
 			if (!isset($_SESSION["ajaxtabletogglers"][$containerID]) || empty($_SESSION["ajaxtabletogglers"][$containerID][$index]))
 				$style .= ' display:none; ';
 			$hiddencolumns[$index] = true;
 		}
-		
-		
+
 		$fieldsort = false;
 		// make sortable
 		if (isset($sorting[$index])) {
 			$field = $sorting[$index];
-			
+
 			if (isset($existingsort[$field]))
 				$fieldsort = $existingsort[$field];
-				
+
 			if (!$maxMultisort) {
 				$style .= ' cursor:pointer;';
-				
+
 				$orderby = urlencode(json_encode(array($field)));
 				$onclick = "ajax_table_update('$containerID', '?ajax=orderby&orderby=$orderby&" . ($fieldsort == 'ascend' ? 'descend&' : '') . "');";
 				$headerHtml .= " onclick=\"$onclick\" ";
@@ -299,7 +302,7 @@ function ajax_show_table ($containerID, $data, $titles, $formatters = array(), $
 		else if (strpos($title,"@") === 0 || strpos($title,"#") === 0)
 			$displaytitle = substr($title,1);
 		$titles[$index] = $displaytitle;
-		
+
 		$headerHtml .= escapehtml($displaytitle);
 		if (!empty($fieldsort)) {
 			if ($fieldsort == 'ascend')
@@ -310,7 +313,7 @@ function ajax_show_table ($containerID, $data, $titles, $formatters = array(), $
 		$headerHtml .= "</th>";
 	}
 	$headerHtml .= "</tr>";
-	
+
 	$dataHtml = '';
 	if (!empty($data)) {
 		$alt = 0;
@@ -338,11 +341,11 @@ function ajax_show_table ($containerID, $data, $titles, $formatters = array(), $
 				if (isset($hiddencolumns[$index]) && (!isset($_SESSION["ajaxtabletogglers"][$containerID]) || empty($_SESSION["ajaxtabletogglers"][$containerID][$index])))
 					$dataTD .= ' style="display:none" ';
 				$dataTD .= ">";
-				
+
 				$render = true;
 				 if ($sameRecord  && !isset($repeatedColumns[$index]))
 					$render = false;
-				
+
 				if ($render) {
 					if (isset($formatters[$index]))
 						$dataTD .= $formatters[$index]($row,$index);
@@ -357,7 +360,7 @@ function ajax_show_table ($containerID, $data, $titles, $formatters = array(), $
 			$dataHtml .= $dataTR;
 		}
 	}
-	
+
 	$togglersHtml = "<div><table class='list' cellspacing=1>";
 	if ($showColumnTogglers) {
 		// NOTE: javascript does not know about the noncontinuous $index that we use in $titles, so we have to treat $titles as an indexed array.
@@ -382,7 +385,7 @@ function ajax_show_table ($containerID, $data, $titles, $formatters = array(), $
 		$togglersHtml .= "<tr>$togglerHeaderHtml</tr><tr>$togglerCheckboxesHtml</tr>";
 	}
 	$togglersHtml .= "</table></div>";
-	
+
 	$multisortHtml = '<div>';
 	if ($maxMultisort) {
 		$onchange = "var selectbox=$(this);  ajax_table_update('$containerID', '?ajax=orderby&orderby=' + json_input_values(selectbox.up('div').select('select')));";
@@ -397,7 +400,7 @@ function ajax_show_table ($containerID, $data, $titles, $formatters = array(), $
 		}
 	}
 	$multisortHtml .= "</div>";
-	
+
 	$scrollClass = (count($data) > 10 && $scroll) ? "class=\"scrollTableContainer\"" : "";
 	return "<div style='clear:both'>$togglersHtml $multisortHtml<div $scrollClass>"
 		. '<table width="99%"  cellpadding="3" cellspacing="1" class="list"><tbody>'
@@ -409,13 +412,13 @@ function ajax_table_show_menu ($containerID, $total, $start, $perpage) {
 		$start = $total-$perpage;
 	if ($start < 0)
 		$start = 0;
-	
+
 	$numpages = ceil($total/$perpage);
 	$curpage = ceil($start/$perpage) + 1;
 
 	$displayend = ($start + $perpage) > $total ? $total : ($start + $perpage);
 	$displaystart = ($total) ? $start +1 : 0;
-	
+
 	$onchange = "ajax_table_update('$containerID', '?ajax=page&start='+this.value);";
 	$info = "<div style='float:right'>Showing $displaystart - $displayend of $total records<span class='noprint'> on $numpages pages</span>.&nbsp;&nbsp;</div>";
 	$selectbox = "<div style='float:right;padding:0;margin:0'><select class='noprint' onchange=\"$onchange\">";
