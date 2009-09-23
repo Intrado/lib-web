@@ -124,11 +124,18 @@ function selectOrderBy($f, $s, $ordercount, $ordering){
 <?
 }
 
-function createPdfParams($filename){
-	global $_DBHOST, $_DBNAME, $_DBUSER, $_DBPASS;
-	$host = "jdbc:mysql://" . $_DBHOST . "/" . $_DBNAME . "?useServerPrepStmts=false&useUnicode=true&characterEncoding=UTF-8";
-	$user = $_DBUSER;
-	$pass = $_DBPASS;
+function createPdfParams($filename) {
+	$result = readonlyDBInfo();
+	if ($result !== false && $result['result'] == '') {
+		$host = "jdbc:mysql://" . $result['dbhost'] . "/" . $result['dbname'] . "?useServerPrepStmts=false&useUnicode=true&characterEncoding=UTF-8";
+		$user = $result['dbuser'];
+		$pass = $result['dbpass'];
+	} else {
+		global $_DBHOST, $_DBNAME, $_DBUSER, $_DBPASS;
+		$host = "jdbc:mysql://" . $_DBHOST . "/" . $_DBNAME . "?useServerPrepStmts=false&useUnicode=true&characterEncoding=UTF-8";
+		$user = $_DBUSER;
+		$pass = $_DBPASS;
+	}
 	$params = array("host" => $host,
 					"user" => $user,
 					"pass" => $pass,
