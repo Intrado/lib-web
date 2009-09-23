@@ -1,13 +1,19 @@
 <?
 
-function DBDebug($query) {
+function DBDebug($query, $dbcon) {
 	global $SETTINGS;
-	global $_dbcon;
 	static $initdblog = false;
 	static $logfp;
 
 	if (!$SETTINGS['feature']['log_db_queries'])
 		return;
+
+	$dbinfo = "";
+	if ($dbcon) {
+		// get the dbcon IP address
+		$dbinfo = $dbcon->getAttribute(constant("PDO::ATTR_CONNECTION_STATUS"));
+		if ($dbinfo == null) $dbinfo = "";
+	}
 
 	$cid = 0;
 	if (isset($_SESSION['_dbcid']))
@@ -19,7 +25,7 @@ function DBDebug($query) {
 		fwrite($logfp,"\n=== t:" . $cid . " ================ " . date("Y-m-d H:i:") . " ================ " . sprintf("%.3f",$usec + ($sec %60)) . ", ===================\n");
 		$initdblog = true;
 	}
-	fwrite($logfp,"--- t:" . $cid . " --------------------------\n$query\n");
+	fwrite($logfp,"--- t:" . $cid . " " . $dbinfo . " --------------------------\n$query\n");
 }
 
 //wrap mysql query, and optionally log query errors
@@ -84,18 +90,18 @@ function DBSafe ($string, $dbconnect=false) {
 }
 
 function Query ($query, $dbconnect=false, $args=false) {
-	DBDebug($query);
 	global $_dbcon;
 	$connection = $dbconnect ? $dbconnect : $_dbcon;
+	DBDebug($query, $connection);
 
 	return DBQueryWrapper($connection, $query, $args);
 }
 
 function QuickQuery ($query, $dbconnect=false, $args=false) {
-	DBDebug($query);
 	global $_dbcon;
 	$val = false;
 	$connection = $dbconnect ? $dbconnect : $_dbcon;
+	DBDebug($query, $connection);
 
 	if ($result = DBQueryWrapper($connection, $query, $args)) {
 		if ($row = $result->fetch(PDO::FETCH_NUM)) {
@@ -108,9 +114,9 @@ function QuickQuery ($query, $dbconnect=false, $args=false) {
 }
 
 function QuickUpdate ($query, $dbconnect=false, $args=false) {
-	DBDebug($query);
 	global $_dbcon;
 	$connection = $dbconnect ? $dbconnect : $_dbcon;
+	DBDebug($query, $connection);
 
 	if ($res = DBQueryWrapper($connection, $query, $args)) {
 		return $res->rowCount();
@@ -119,9 +125,9 @@ function QuickUpdate ($query, $dbconnect=false, $args=false) {
 }
 
 function QuickQueryRow ($query, $assoc=false, $dbconnect = false, $args=false) {
-	DBDebug($query);
 	global $_dbcon;
 	$connection = $dbconnect ? $dbconnect : $_dbcon;
+	DBDebug($query, $connection);
 
 	$row = false;
 	if ($result = DBQueryWrapper($connection, $query, $args))
@@ -131,9 +137,9 @@ function QuickQueryRow ($query, $assoc=false, $dbconnect = false, $args=false) {
 }
 
 function QuickQueryMultiRow ($query, $assoc = false, $dbconnect = false, $args = false) {
-	DBDebug($query);
 	global $_dbcon;
 	$connection = $dbconnect ? $dbconnect : $_dbcon;
+	DBDebug($query, $connection);
 
 	$list = array();
 	if ($result = DBQueryWrapper($connection, $query, $args)) {
@@ -145,11 +151,10 @@ function QuickQueryMultiRow ($query, $assoc = false, $dbconnect = false, $args =
 }
 
 function QuickQueryList ($query, $pair = false, $dbconnect = false, $args = false) {
-	DBDebug($query);
 	global $_dbcon;
 	$list = array();
-
 	$connection = $dbconnect ? $dbconnect : $_dbcon;
+	DBDebug($query, $connection);
 
 	if ($result = DBQueryWrapper($connection, $query, $args)) {
 		while ($row = $result->fetch(PDO::FETCH_NUM)) {
