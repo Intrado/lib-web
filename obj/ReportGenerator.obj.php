@@ -13,7 +13,7 @@ class ReportGenerator {
 	var $_readonlyDB;
 
 	function ReportGenerator() {
-		$_readonlyDB = readonlyDBConnect();	
+		$this->_readonlyDB = readonlyDBConnect();	
 	}
 	
 	function testSize(){
