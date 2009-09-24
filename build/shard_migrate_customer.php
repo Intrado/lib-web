@@ -6,8 +6,8 @@
 //////////////////////////////////////
 
 $customerid = ""; // asp customer id exists before we migrate the old commsuite data in
-$customerdatafile = ""; // file exported from old commsuite
-$shardhost = ""; // you want to run on the db machine for the 'mysqldump' to work
+$customerdatafile = "donotdelete_c_XXX_ASP_7-1.sql"; // file exported from old commsuite
+$shardhost = "localhost"; // you want to run on the db machine for the 'mysqldump' to work
 $dbuser = "";
 $dbpass = "";
 
@@ -155,7 +155,7 @@ $customertables = array(
 	"access",
 	"address",
 	"audiofile",
-	"blockednumber",
+	"blockeddestination",
 	"contactpref",
 	"content",
 	// custdm
@@ -190,6 +190,7 @@ $customertables = array(
 	"phone",
 	"portalperson",
 	"portalpersontoken",
+	"reportarchive",
 	"reportcontact",
 	"reportgroupdata",
 	"reportinstance",
@@ -265,18 +266,6 @@ foreach ($settings as $name => $value) {
 	mysql_query($query, $custdb)
 		or die("Failure to execute query $query ". mysql_error());
 }
-
-// insert systemmessage
-$query = "INSERT INTO systemmessages (id, message, icon, modifydate) "
-			. "VALUES ('1', "
-			. "'<div style=\"color:#3e693f;font-size: 20px;font-weight: bold;\">New version 7.0!</div> "
-			. "<div style=\"font-size: 16px;margin: 25px;margin-bottom: 2px;\">See for yourself <b><a href=\"javascript: popup(''help/flash/Welcome.swf'',750,500);\"><img src=\"img/icons/control_play_blue.gif\" /> Play Video</a></b></div> <ul> "
-			. "<li>New users be sure to print the <a href=\"help/html/Quick_Start_for_New_Users.pdf\"><img src=\"img/icons/page_white_acrobat.gif\" /> Quick Start Guide</a> "
-			. "<li>Want more detail? See the step-by-step training guides for <a href=\"help/html/Getting_Started_with_v7.pdf\"><img src=\"img/icons/page_white_acrobat.gif\" /> New Users</a> and <a href=\"help/html/Advanced_Training_with_v7.pdf\"><img src=\"img/icons/page_white_acrobat.gif\" /> Advanced Users</a> </ul>', 'largeicons/news.jpg', "
-			. "NOW())";
-mysql_query($query)
-	or die("Failure to execute query $query ". mysql_error());
-
 
 //////////////////////////////////////
 // create triggers
