@@ -502,10 +502,10 @@ var RuleEditor = Class.create({
 				// TEXT, NUMERIC, RELDATE_*
 				var inputs = this.valueTD.select('input');
 				if (inputs.length == 1) {
-					val = inputs[0].getValue();
+					val = inputs[0].getValue().strip();
 				} else if (inputs.length > 1) {
 					for (var i = 0; i < inputs.length; ++i)
-						val.push(inputs[i].getValue());
+						val.push(inputs[i].getValue().strip());
 				}
 			}
 		}
