@@ -22,6 +22,7 @@ require_once("../obj/Person.obj.php");
 require_once("../obj/Voice.obj.php");
 require_once("../obj/AudioFile.obj.php");
 require_once("../obj/VoiceReply.obj.php");
+require_once("../obj/Phone.obj.php");
 
 require_once("XmlToArray.obj.php");
 

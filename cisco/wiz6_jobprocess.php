@@ -1,6 +1,7 @@
 <?
 require_once("common.inc.php");
 require_once("../inc/securityhelper.inc.php");
+require_once("../obj/Phone.obj.php");
 require_once("../obj/Job.obj.php");
 require_once("../obj/JobType.obj.php");
 require_once("../obj/Access.obj.php");
