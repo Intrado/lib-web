@@ -75,7 +75,10 @@ $_SESSION['report']['options']['activefields'] = implode(",",$activefields);
 ////////////////////////////////////////////////////////////////////////////////
 // FORM DATA
 ////////////////////////////////////////////////////////////////////////////////
-$jobtypeobjs = DBFindMany("JobType", "from jobtype where deleted = '0'");
+if (getSystemSetting('_hassurvey', true))
+	$jobtypeobjs = DBFindMany("JobType", "from jobtype where deleted = '0'");
+else
+	$jobtypeobjs = DBFindMany("JobType", "from jobtype where not issurvey and deleted = '0'");
 $jobtypenames = array();
 foreach($jobtypeobjs as $jobtype){
 	$jobtypenames[$jobtype->id] = $jobtype->name;
