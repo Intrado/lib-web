@@ -11,7 +11,6 @@ require_once("../obj/JobType.obj.php");
 require_once("../obj/FieldMap.obj.php");
 require_once("parentportalutils.inc.php");
 
-
 ////////////////////////////////////////////////////////////////////////////////
 // Data Handling
 ////////////////////////////////////////////////////////////////////////////////
@@ -71,7 +70,10 @@ if(isset($_SESSION['currentpid'])){
 if($PERSONID){
 	$firstnamefield = FieldMap::getFirstNameField();
 	$lastnamefield = FieldMap::getLastNameField();
-	$jobtypes=DBFindMany("JobType", "from jobtype where not deleted order by systempriority, issurvey, name");
+	if (getSystemSetting('_hassurvey', true))
+		$jobtypes=DBFindMany("JobType", "from jobtype where not deleted order by systempriority, issurvey, name");
+	else
+		$jobtypes=DBFindMany("JobType", "from jobtype where not issurvey and not deleted order by systempriority, issurvey, name");
 	$maxphones = getSystemSetting("maxphones", 3);
 	$maxemails = getSystemSetting("maxemails", 2);
 	$maxsms = getSystemSetting("maxsms", 2);

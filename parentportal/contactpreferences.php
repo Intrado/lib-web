@@ -22,7 +22,10 @@ if(isset($_GET['clear'])){
 }
 
 if(isset($_SESSION['customerid']) && $_SESSION['customerid']){
-	$jobtypes=DBFindMany("JobType", "from jobtype where not deleted order by systempriority, issurvey, name");
+	if (getSystemSetting('_hassurvey', true))
+		$jobtypes=DBFindMany("JobType", "from jobtype where not deleted order by systempriority, issurvey, name");
+	else
+		$jobtypes=DBFindMany("JobType", "from jobtype where not issurvey and not deleted order by systempriority, issurvey, name");
 	$contactList = getContacts($_SESSION['portaluserid']);
 	$firstnamefield = FieldMap::getFirstNameField();
 	$lastnamefield = FieldMap::getLastNameField();
