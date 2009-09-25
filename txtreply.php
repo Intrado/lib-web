@@ -15,7 +15,8 @@ if (!$is3ci && !isset($_POST['message'])) {
 }
 
 // keywords
-$optoutkeywords = array("end","stop","quit","cancel","unsubscribe");
+$helpkeywords = array("help", "info", "aide");
+$optoutkeywords = array("end","stop","quit","cancel","unsubscribe","arret");
 $optinkeywords = array("optin","subscribe"); // special case "opt in" two words
 
 require_once("XML/RPC.php");
@@ -50,17 +51,28 @@ if ($inboundshortcode == "45305") {
 } else if ($inboundshortcode == "68453") {
 	// air2web US
 	$visitlink = "www.schoolmessenger.com/txtmsg";
+} else if ($inboundshortcode == "724665") {
+	// air2web Canada
+	$visitlink = "www.schoolmessenger.com/txtca";
 } else {
-	// TODO air2web canada
 	// for now assume 3ci
 	$visitlink = "www.schoolmessenger.com/txt";
 	error_log("unexpected incoming shortcode ".$inboundshortcode);
 }
 
-$helptext = "Text Alert Service from SchoolMessenger. For additional info visit " . $visitlink . ". Send STOP to opt out. Other chgs may apply.";
+// Text Message for US up to 160 chars
+$helptext = "Text Alert Service from SchoolMessenger. For additional info visit " . $visitlink . ". Send STOP to opt out. Msg&data rates may aply";
 $infotext = $helptext;
-$optouttext = "You are now unsubscribed from the text alerts. Txt OPTIN to subscribe, HELP for help. Check out " . $visitlink . " for info. Other chgs may apply.";
-$optintext = "You are now registered to receive text alerts. Txt STOP to quit, HELP for help. Check out " . $visitlink . " for info.";
+$optouttext = "You are now unsubscribed from the text alerts. Txt OPTIN to subscribe, HELP for help. Check out " . $visitlink . " 4 info. Msg&data rates may aply";
+$optintext = "You are now registered to receive text alerts. Txt STOP to quit, HELP for help. Check out " . $visitlink . " 4 info";
+
+// Text Message for Canada up to 132 chars
+if ($inboundshortcode == "724665") {
+	$helptext = "Text Alert Service from SchoolMessenger. Send STOP or ARRET to opt out. Msg&data rates may aply";
+	$infotext = $helptext;
+	$optouttext = "You are now unsubscribed from the text alerts. Txt OPTIN to subscribe, HELP for help. Msg&data rates may aply";
+	$optintext = "You are now registered to receive text alerts. Txt STOP to quit, HELP for help.";
+}
 
 
 $message = str_replace("\n"," ",$message);
@@ -69,14 +81,13 @@ $message = trim($message);
 
 $splitmessage = explode(" ", $message, 2);
 
-// Check if message starts with help
-if ($splitmessage[0] === "help") {
-	sendtxt($username, $password, $inboundshortcode, $sourceaddress, $helptext);
-	
-	logExit("HELP");
-}
-
 //check to see if this txt message has any of our keywords
+$hashelp = false;
+foreach ($helpkeywords as $keyword) {
+	if (stripos($splitmessage[0],$keyword) === 0) {
+		$hashelp = true;
+	}
+}
 $hasoptout = false;
 foreach ($optoutkeywords as $keyword) {
 	if (stripos($splitmessage[0],$keyword) === 0) {
@@ -96,7 +107,11 @@ if (isset($splitmessage[1]) &&
 		$hasoptin = true;
 }
 
-if ($hasoptout) {
+if ($hashelp) {
+	sendtxt($username, $password, $inboundshortcode, $sourceaddress, $helptext);
+	
+	logExit("HELP");
+} else if ($hasoptout) {
 	// call authserver to update global blocked list
 	$phonenumber = substr($sourceaddress, 1);
 	blocksms($phonenumber, 'block', 'automated block due to keyword '.$splitmessage[0]);
