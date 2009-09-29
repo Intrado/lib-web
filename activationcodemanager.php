@@ -82,11 +82,32 @@ if ($generateBulkTokens && isset($_GET['generate'])) {
 	if ($reportgenerator->query) {
 		$result = Query($reportgenerator->query);
 		$data = array();
-		while($row = DBGetRow($result)){
+		$totalgenerated = 0;
+		while ($row = DBGetRow($result)) {
 			$data[] = $row[1];
+			if (count($data) >= 10000) {
+				$count = generatePersonTokens($data);
+				if ($count)
+					$totalgenerated += $count;
+				else {
+					$count = 0; // failure
+					$data = array();
+					break; // exit loop
+				}
+				$data = array();
+			}
 		}
-		generatePersonTokens($data);
-		notice(_L("%s activation codes have been generated.", number_format(count($data))));
+		if (count($data) > 0) {
+			$count = generatePersonTokens($data);
+			if ($count)
+				$totalgenerated += $count;
+			else
+				$count = 0; // failure
+		}
+		if ($totalgenerated > 0)
+			notice(_L("%s activation codes have been generated.", number_format($totalgenerated)));
+		else
+			notice(_L("An unexpected error occurred.  Please try again."));
 	}
 	redirect();
 }
