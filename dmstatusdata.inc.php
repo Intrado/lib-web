@@ -97,7 +97,6 @@ function showStatusGroup($grouptitle, $data) {
 	echo '<b>' . $grouptitle . '</b>';
 	echo '<table width="100%">';
 	foreach ($data as $div => $label) {
-error_log($label."  ".$div);
 		echo '<tr><td width="20%">';
 		echo $label;
 		echo '</td><td><div id=\'' . $div . '\'></div></td></tr>';
