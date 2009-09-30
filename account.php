@@ -143,7 +143,7 @@ if (!$ldapuser) {
 			"helpstep" => 1
 		);
 	}
-	
+
 	$formdata["passwordconfirm"] = array(
 		"label" => _L("Confirm Password"),
 		"fieldhelp" => _L("Enter your password a second time to make sure it is correct."),
@@ -310,7 +310,7 @@ $formdata["callmax"] = array(
 	"fieldhelp" => ("This indicates the default number of times the system should try to call an individual number before considering the message undelivered."),
 	"value" => $usercallmax,
 	"validators" => array(
-		array("ValInArray", "values" => range(1,first($ACCESS->getValue('callmax'), 1)))
+		array("ValInArray", "values" => array_map('strval', range(1,first($ACCESS->getValue('callmax'), 1))))
 	),
 	"control" => array("SelectMenu", "values"=>array_combine(range(1,first($callmax, 1)),range(1,first($callmax, 1)))),
 	"helpstep" => 2
@@ -323,7 +323,7 @@ $formdata["maxjobdays"] = array(
 	"fieldhelp" => ("Use this menu to set the default number of days your jobs should run."),
 	"value" => $maxjobdays,
 	"validators" => array(
-		array("ValInArray", "values" => range(1,$maxdays))
+		array("ValInArray", "values" => array_map('strval',range(1,$maxdays)))
 	),
 	"control" => array("SelectMenu", "values"=>array_combine(range(1,$maxdays),range(1,$maxdays))),
 	"helpstep" => 2
@@ -381,8 +381,8 @@ $formdata["locale"] = array(
 $formdata["brandtheme"] = array(
 	"label" => _L("Customize Theme"),
 	"fieldhelp" => ("Use this to select a different theme for the user interface. Themes can be customized with alternate primary colors (in hex) and primary to background color ratio settings."),
-	"value" => json_encode(array("theme"=>$USER->getSetting('_brandtheme',getSystemSetting('_brandtheme')), 
-		"color"=>$USER->getSetting('_brandprimary',getSystemSetting('_brandprimary')), 
+	"value" => json_encode(array("theme"=>$USER->getSetting('_brandtheme',getSystemSetting('_brandtheme')),
+		"color"=>$USER->getSetting('_brandprimary',getSystemSetting('_brandprimary')),
 		"ratio"=>$USER->getSetting('_brandratio',getSystemSetting('_brandratio')),
 		"customize"=>($USER->getSetting('_brandtheme'))?true:false
 		)),
@@ -406,16 +406,16 @@ $errors = false;
 
 //check for form submission
 if ($button = $form->getSubmit()) { //checks for submit and merges in post data
-	$ajax = $form->isAjaxSubmit(); //whether or not this requires an ajax response    
+	$ajax = $form->isAjaxSubmit(); //whether or not this requires an ajax response
 
 	if ($form->checkForDataChange()) {
 		$datachange = true;
 	} else if (($errors = $form->validate()) === false) { //checks all of the items in this form
 		$postdata = $form->getData(); //gets assoc array of all values {name:value,...}
-		
+
 		//save data here
 		Query('BEGIN');
-		
+
 		if (!$readonly) {
 			$USER->firstname = $postdata['firstname'];
 			$USER->lastname = $postdata['lastname'];
@@ -441,18 +441,18 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		$newpin = $postdata['pin'];
 		if (!ereg("^0*$", $newpin))
 			$USER->setPincode($newpin);
-		
+
 		$USER->setSetting("callearly", $postdata['callearly']);
 		$USER->setSetting("calllate", $postdata['calllate']);
 		$USER->setSetting("callmax", $postdata['callmax']);
 		$USER->setSetting("maxjobdays", $postdata['maxjobdays']);
-		
+
 		$USER->setSetting("actionlinks", $postdata['actionlinks']);
 		//$USER->setSetting("_locale", $postdata['locale']);
 		//$_SESSION['_locale'] = $postdata['locale'];
 
 		$newTheme = json_decode($postdata['brandtheme']);
-		
+
 		if ($newTheme->customize) {
 
 			$USER->setSetting("_brandtheme", $newTheme->theme);
@@ -466,7 +466,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 			$_SESSION['colorscheme']['_brandratio'] = $newTheme->ratio;
 			$_SESSION['colorscheme']['_brandtheme1'] = $COLORSCHEMES[$newTheme->theme]["_brandtheme1"];
 			$_SESSION['colorscheme']['_brandtheme2'] = $COLORSCHEMES[$newTheme->theme]["_brandtheme2"];
-			
+
 		} else {
 			$USER->setSetting("_brandtheme", "");
 			$USER->setSetting("_brandtheme1", "");
@@ -480,11 +480,11 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 			$_SESSION['colorscheme']['_brandprimary'] = getSystemSetting("_brandprimary");
 			$_SESSION['colorscheme']['_brandratio'] = getSystemSetting("_brandratio");
 		}
-		
+
 		Query('COMMIT');
-		
+
 		// TODO, Release 7.2, add notice()
-		
+
 		if ($ajax)
 			$form->sendTo("start.php");
 		else
