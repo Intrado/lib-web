@@ -96,7 +96,7 @@ $formdata = array(
 		"validators" => array(
 			array("ValRequired"),
 			array("ValLength","max"=>160),
-			array("ValRegExp","pattern" => "^[a-zA-Z0-9\x20\x09\x0a\x0b\x0C\x0d\x2a\x5e\<\>\?\,\.\/\{\}\|\~\!\@\#\$\%\&\(\)\_\+\']*$")
+			array("ValRegExp","pattern" => "^[a-zA-Z0-9\x20\x09\x0a\x0b\x0C\x0d\x2a\<\>\?\,\.\/\{\}\|\!\@\#\$\%\&\(\)\_\+\'\"\:\-\=]*$")
 		),
 		"control" => array("TextArea","rows"=>10,"counter"=>160),
 		"helpstep" => 2
