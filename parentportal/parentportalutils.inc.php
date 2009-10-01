@@ -252,7 +252,7 @@ function getsetContactFormData($f, $s, $PERSONID, $phones, $emails, $smses, $job
 
 function checkPriorityPhone($f, $s, $phones){
 	$hasemergency = false;
-	$jobtypenames = QuickQueryList("select id, name from jobtype where systempriority in ('1', '2') and not deleted", true);
+	$jobtypenames = QuickQueryList("select id, name from jobtype where systempriority in ('1') and not deleted", true);
 	$jobtypelist = $jobtypenames;
 	$maxphones = getSystemSetting("maxphones", 3);
 	$lockedphones = array();
