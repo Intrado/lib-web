@@ -37,7 +37,9 @@ if (isset($_GET['deletelocale'])) {
 class CaptchaField extends FormItem {
 	function render ($value) {
 		$n = $this->form->name."_".$this->name;
-		return '<img src="captcha.png.php?'.mt_rand().'" /><br><input id="'.$n.'" name="'.$n.'" type="text" value="" maxlength="50" size="14"/>';
+		return '<table><tr><td><img src="captcha.png.php?'.mt_rand().'" /></td><td>' .
+				button('Try Another',null,'newsubscribersession.php') .
+				'</td></tr></table><input id="'.$n.'" name="'.$n.'" type="text" value="" maxlength="50" size="14"/>';
 	}
 }
 
@@ -60,7 +62,7 @@ class ValCaptcha extends Validator {
 	
 	function validate ($value, $args) {
 		if (strtolower($value) != strtolower($_SESSION['captcha']))
-			return _L('%1$s is not the correct value', $this->label);
+			return _L('%1$s is not the correct value.  Letters are not case sensitive.', $this->label);
 		
 		return true;
 	}
@@ -111,6 +113,31 @@ if ($authdomain == "1" && $emaildomain != "") {
 $tos = file_get_contents(isset($LOCALE)?"./locale/$LOCALE/terms.html":"./locale/en_US/terms.html");
 
 $formdata = array();
+$formdata["captcha"] = array(
+        "label" => _L("Captcha"),
+        "fieldhelp" => _L('Enter the characters in the captcha in the field below.  Letters are not case sensitive.'),
+        "value" => "",
+        "validators" => array(
+            array("ValRequired"),
+            array("ValCaptcha",)
+        ),
+        "control" => array("CaptchaField"),
+        "helpstep" => 3
+    );
+if ($authcode == "1" && $_SESSION['sitecode'] != "") {
+	$formdata["sitecode"] = array(
+        "label" => _L("Site Access Code"),
+        "fieldhelp" => _L('The site access code is a special code you should have received that will allow you to sign up for this service.'),
+        "value" => "",
+        "validators" => array(
+            array("ValRequired"),
+            array("ValLength","max" => 255),
+            array("ValSiteCode")
+        ),
+        "control" => array("TextField","maxlength" => 255),
+        "helpstep" => 3
+	);
+}
 $formdata["firstname"] = array(
         "label" => _L("First Name"),
         "fieldhelp" => _L('Enter your first name.'),
@@ -177,31 +204,6 @@ $formdata["confirmpassword"] = array(
         ),
         "requires" => array("password"),
         "control" => array("PasswordField","maxlength" => 50),
-        "helpstep" => 3
-    );
-if ($authcode == "1" && $_SESSION['sitecode'] != "") {
-	$formdata["sitecode"] = array(
-        "label" => _L("Site Access Code"),
-        "fieldhelp" => _L('The site access code is a special code you should have received that will allow you to sign up for this service.'),
-        "value" => "",
-        "validators" => array(
-            array("ValRequired"),
-            array("ValLength","max" => 255),
-            array("ValSiteCode")
-        ),
-        "control" => array("TextField","maxlength" => 255),
-        "helpstep" => 3
-	);
-}
-$formdata["captcha"] = array(
-        "label" => _L("Captcha"),
-        "fieldhelp" => _L('Enter the characters in the captcha in the field below.'),
-        "value" => "",
-        "validators" => array(
-            array("ValRequired"),
-            array("ValCaptcha",)
-        ),
-        "control" => array("CaptchaField"),
         "helpstep" => 3
     );
 $formdata["terms"] = array(
