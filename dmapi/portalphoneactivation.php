@@ -8,7 +8,7 @@ function promptCode($retry = false) {
 		<field name="code" type="dtmf" timeout="10000" max="20">
 			<prompt repeat="2">
 <?			if ($retry) { ?>
-				<tts gender="female" language="english">Sorry, the activation code is invalid or expired.</tts>
+				<tts gender="female" language="english">Sorry, the activation code is not valid or has expired.</tts>
 <?  		} ?>
 				<tts gender="female" language="english">Please enter your activation code, followed by the pound key.</tts>
 			</prompt>
@@ -71,7 +71,7 @@ function failGoodbye() {
 ?>
 <voice>
 	<message name="welcome">
-    	<tts gender="female" language="english">Sorry, the activation code is invalid or expired.  Goodbye.</tts>
+    	<tts gender="female" language="english">Sorry, the activation code is not valid or has expired.  Goodbye.</tts>
 		<hangup />
 	</message>
 </voice>
