@@ -33,12 +33,12 @@ class EmailAttach extends FormItem {
 					var str = "";
 					for(var contentid in values) {
 						var onclick = "removeAttachment(" + contentid + ");";
-				 		str += "<a href=\"emailattachment.php?name=" + encodeURIComponent(values[contentid][\'name\']) + "&id=" + contentid + "\">" + values[contentid][\'name\'] + "</a>&nbsp;(Size: " + Math.round(values[contentid][\'size\']/1024) + "k)&nbsp;<a href=\'#\' onclick=\'" + onclick + "return false;\'>Remove</a><br />";				
+				 		str += "<a href=\"emailattachment.php?id="  + contentid +  "&name=" + encodeURIComponent(encodeURIComponent(values[contentid][\'name\'])) + "\">" + values[contentid][\'name\'] + "</a>&nbsp;(Size: " + Math.round(values[contentid][\'size\']/1024) + "k)&nbsp;<a href=\'#\' onclick=\'" + onclick + "return false;\'>Remove</a><br />";								 		
 					}
 				
 					$("' . $n . '").value = $H(values).toJSON();			
-					$("uploadedfiles").innerHTML = str;	
-					$("uploaderror").innerHTML = errormessage;
+					$("uploadedfiles").update(str);	
+					$("uploaderror").update(errormessage);
 					form_do_validation($("' . $this->form->name . '"), $("' . $n . '"));
 					return true;
 				}
@@ -49,12 +49,12 @@ class EmailAttach extends FormItem {
 					Object.keys(values).each(function (contentid) {
 						if(contentid != id) {
 							var onclick = "removeAttachment(" + contentid + ");";
-				 			str += "<a href=\"emailattachment.php?name=" + encodeURIComponent(values[contentid][\'name\']) + "&id=" + contentid + "\">" + values[contentid][\'name\'] + "</a>&nbsp;(Size: " + Math.round(values[contentid][\'size\']/1024) + "k)&nbsp;<a href=\'#\' onclick=\'" + onclick + "return false;\'>Remove</a><br />";									
+				 			str += "<a href=\"emailattachment.php?id=" + contentid + "&name=" + encodeURIComponent(encodeURIComponent(values[contentid][\'name\'])) + "\">" + values[contentid][\'name\'] + "</a>&nbsp;(Size: " + Math.round(values[contentid][\'size\']/1024) + "k)&nbsp;<a href=\'#\' onclick=\'" + onclick + "return false;\'>Remove</a><br />";									
 						} else
 							values[contentid] = undefined;
 					});
 					$("' . $n . '").value = Object.toJSON(values);
-					$("uploadedfiles").innerHTML = str;			
+					$("uploadedfiles").update(str);			
 					form_do_validation($("' . $this->form->name . '"), $("' . $n . '"));
 				}
 			</script>';
