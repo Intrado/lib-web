@@ -111,7 +111,7 @@ if (isset($_FILES['emailattachment']['error']) && $_FILES['emailattachment']['er
 </form>
 <script src="script/prototype.js" type="text/javascript"></script>
 <script language="javascript" type="text/javascript">
-	window.top.window.stopUpload('<?= $contentid ?>','<?= $filename ?>','<?= $size ?>','<?= $errormessage ?>');
+	window.top.window.stopUpload('<?= $contentid ?>','<?= addslashes($filename) ?>','<?= $size ?>','<?= addslashes($errormessage) ?>');
 </script> 
 </body>
 </html>
