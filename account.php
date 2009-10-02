@@ -304,26 +304,32 @@ $formdata["calllate"] = array(
 );
 
 $callmax = $ACCESS->getValue('callmax');
+if (!$callmax)
+	$callmax = 10;
 $usercallmax = $USER->getSetting("callmax", 3);
 $formdata["callmax"] = array(
 	"label" => _L("Call Attempts"),
 	"fieldhelp" => ("This indicates the default number of times the system should try to call an individual number before considering the message undelivered."),
 	"value" => $usercallmax,
 	"validators" => array(
-		array("ValNumeric", "min" => 1, "max" => $callmax)
+		array("ValNumber", "min" => 1, "max" => $callmax),
+		array("ValNumeric")
 	),
 	"control" => array("SelectMenu", "values"=>array_combine(range(1,first($callmax, 1)),range(1,first($callmax, 1)))),
 	"helpstep" => 2
 );
 
 $maxjobdays = $USER->getSetting("maxjobdays", $ACCESS->getValue('maxjobdays'));
-$maxdays = $ACCESS->getValue('maxjobdays', 7);
+$maxdays = $ACCESS->getValue('maxjobdays');
+if (!$maxdays)
+	$maxdays = 7;
 $formdata["maxjobdays"] = array(
 	"label" => _L("Days to Run"),
 	"fieldhelp" => ("Use this menu to set the default number of days your jobs should run."),
 	"value" => $maxjobdays,
 	"validators" => array(
-		array("ValNumeric", "min" => 1, "max" => $maxdays)
+		array("ValNumber", "min" => 1, "max" => $maxdays),
+		array("ValNumeric")
 	),
 	"control" => array("SelectMenu", "values"=>array_combine(range(1,$maxdays),range(1,$maxdays))),
 	"helpstep" => 2
