@@ -157,7 +157,7 @@ class FinishDestWizard extends WizFinish {
 	        
 			if ($_SESSION['codegen'] == 'reset') {
 				$_SESSION['codegen'] = 'done';
-				if ($code = subscriberPrepareNewPhone($postdata['/collectdata']['newdata'], $options)) {
+				if ($code = subscriberPrepareNewPhone(Phone::parse($postdata['/collectdata']['newdata']), $options)) {
 					$good = true;
 				}
 			} else {
@@ -166,13 +166,13 @@ class FinishDestWizard extends WizFinish {
 				if ($postdata['/whattype']['whattype'] == 'sms')
 					$pendingtype = 'sms';
 				// grab the code from subscriberpending
-				$code = QuickQuery("select token from subscriberpending where type=? and value=?", false, array($pendingtype, $postdata['/collectdata']['newdata']));
+				$code = QuickQuery("select token from subscriberpending where type=? and value=?", false, array($pendingtype, Phone::parse($postdata['/collectdata']['newdata'])));
 				if ($code)
 					$good = true;
 			}
 			if ($good) {
 				//$formhtml = '<div style="height: 200px; overflow:auto;">Your activation code is: ' . $code . '</div>';
-				$formhtml = getPhoneReview($postdata['/collectdata']['newdata'], $code);
+				$formhtml = getPhoneReview(Phone::parse($postdata['/collectdata']['newdata']), $code);
 			}
 		}
 		return $formhtml;

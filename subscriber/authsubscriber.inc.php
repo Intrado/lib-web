@@ -181,6 +181,8 @@ function subscriberPrepareNewPhone($newphone, $options) {
 
 	$sessionid = session_id();
 	
+	$newphone = Phone::parse($newphone);
+	
 	$params = array(new XML_RPC_Value($sessionid, 'string'), new XML_RPC_Value($newphone, 'string'), new XML_RPC_Value($options, 'string'));
 	$method = "SubscriberServer.subscriber_createPhoneActivation";
 	$result = pearxmlrpc($method, $params);
