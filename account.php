@@ -310,7 +310,7 @@ $formdata["callmax"] = array(
 	"fieldhelp" => ("This indicates the default number of times the system should try to call an individual number before considering the message undelivered."),
 	"value" => $usercallmax,
 	"validators" => array(
-		array("ValInArray", "values" => array_map('strval', range(1,first($ACCESS->getValue('callmax'), 1))))
+		array("ValNumeric", "min" => 1, "max" => $callmax)
 	),
 	"control" => array("SelectMenu", "values"=>array_combine(range(1,first($callmax, 1)),range(1,first($callmax, 1)))),
 	"helpstep" => 2
@@ -323,7 +323,7 @@ $formdata["maxjobdays"] = array(
 	"fieldhelp" => ("Use this menu to set the default number of days your jobs should run."),
 	"value" => $maxjobdays,
 	"validators" => array(
-		array("ValInArray", "values" => array_map('strval',range(1,$maxdays)))
+		array("ValNumeric", "min" => 1, "max" => $maxdays)
 	),
 	"control" => array("SelectMenu", "values"=>array_combine(range(1,$maxdays),range(1,$maxdays))),
 	"helpstep" => 2
