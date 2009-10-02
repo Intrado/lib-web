@@ -1062,7 +1062,7 @@ class JobWiz_messageEmailChoose extends WizStep {
 				"validators" => array(
 					array("ValInArray","values"=>$values)
 				),
-				"control" => array("SelectMessage", "type"=>"phone", "width"=>"80%", "values"=>$messages),
+				"control" => array("SelectMessage", "type"=>"email", "width"=>"80%", "values"=>$messages),
 				"helpstep" => 2
 			);
 		}
