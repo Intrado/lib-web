@@ -104,6 +104,7 @@ function doajax()
 			$('F').update(status[0]['F']);
 			$('TB').update(status[0]['TB']);
 			$('failures').update(status[0]['failures']);
+			$('inboundcompletedcount').update(status[0]['inboundcompletedcount']);
 			var dialtime = parseFloat(status[0]['dialtime']);
 			$('dialtime').update(dialtime.toFixed(2));
 			var billtime = parseFloat(status[0]['billtime']);
