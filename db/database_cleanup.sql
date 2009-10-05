@@ -18,6 +18,17 @@ WHERE	not exists (
 		WHERE	j.id = jl.jobid)
 $$$
 
+-- Delete joblist
+-- remove joblist without a job
+
+DELETE	jl
+FROM 	joblist jl
+WHERE	not exists (
+		SELECT *
+		FROM	job j
+		WHERE	j.id = jl.jobid)
+$$$
+
 -- Delete jobsetting
 -- remove jobsetting without a job
 
@@ -231,8 +242,8 @@ FROM	list l
 WHERE	l.deleted
 and		not exists (
 		SELECT 	*
-		FROM 	job j
-		WHERE 	j.listid = l.id)
+		FROM 	joblist jl
+		WHERE 	jl.listid = l.id)
 
 $$$
 

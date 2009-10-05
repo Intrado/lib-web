@@ -1534,4 +1534,11 @@ VALUES (
 )
 $$$
 
+-- --------------------------
+-- start here for release 7.5
 
+ALTER TABLE `job` DROP `listid`, DROP `thesql`
+$$$
+
+ALTER TABLE `joblist` DROP `thesql`
+$$$

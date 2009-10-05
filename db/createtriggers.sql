@@ -10,14 +10,14 @@ DECLARE custid INTEGER DEFAULT _$CUSTOMERID_;
 IF NEW.status IN ('repeating') THEN
   SELECT value INTO tz FROM setting WHERE name='timezone';
 
-  INSERT INTO aspshard.qjob (id, customerid, userid, scheduleid, listid, phonemessageid, emailmessageid, printmessageid, smsmessageid, questionnaireid, timezone, startdate, enddate, starttime, endtime, status, jobtypeid, thesql)
-         VALUES(NEW.id, custid, NEW.userid, NEW.scheduleid, NEW.listid, NEW.phonemessageid, NEW.emailmessageid, NEW.printmessageid, NEW.smsmessageid, NEW.questionnaireid, tz, NEW.startdate, NEW.enddate, NEW.starttime, NEW.endtime, 'repeating', NEW.jobtypeid, NEW.thesql);
+  INSERT INTO aspshard.qjob (id, customerid, userid, scheduleid, phonemessageid, emailmessageid, printmessageid, smsmessageid, questionnaireid, timezone, startdate, enddate, starttime, endtime, status, jobtypeid)
+         VALUES(NEW.id, custid, NEW.userid, NEW.scheduleid, NEW.phonemessageid, NEW.emailmessageid, NEW.printmessageid, NEW.smsmessageid, NEW.questionnaireid, tz, NEW.startdate, NEW.enddate, NEW.starttime, NEW.endtime, 'repeating', NEW.jobtypeid);
 
   -- copy the jobsettings
   INSERT INTO aspshard.qjobsetting (customerid, jobid, name, value) SELECT custid, NEW.id, name, value FROM jobsetting WHERE jobid=NEW.id;
 
   -- copy the joblists
-  INSERT INTO aspshard.qjoblist (customerid, jobid, listid, thesql) SELECT custid, NEW.id, listid, thesql FROM joblist WHERE jobid=NEW.id;
+  INSERT INTO aspshard.qjoblist (customerid, jobid, listid) SELECT custid, NEW.id, listid FROM joblist WHERE jobid=NEW.id;
 
   -- do not copy schedule because it was inserted via the insert_schedule trigger
 
@@ -40,16 +40,16 @@ IF cc = 0 THEN
 -- we expect the status to be 'scheduled' when we insert the shard job
 -- status 'new' is for jobs that are not yet submitted
   IF NEW.status='scheduled' THEN
-    INSERT INTO aspshard.qjob (id, customerid, userid, scheduleid, listid, phonemessageid, emailmessageid, printmessageid, smsmessageid, questionnaireid, timezone, startdate, enddate, starttime, endtime, status, jobtypeid, thesql)
-           VALUES(NEW.id, custid, NEW.userid, NEW.scheduleid, NEW.listid, NEW.phonemessageid, NEW.emailmessageid, NEW.printmessageid, NEW.smsmessageid, NEW.questionnaireid, tz, NEW.startdate, NEW.enddate, NEW.starttime, NEW.endtime, NEW.status, NEW.jobtypeid, NEW.thesql);
+    INSERT INTO aspshard.qjob (id, customerid, userid, scheduleid, phonemessageid, emailmessageid, printmessageid, smsmessageid, questionnaireid, timezone, startdate, enddate, starttime, endtime, status, jobtypeid)
+           VALUES(NEW.id, custid, NEW.userid, NEW.scheduleid, NEW.phonemessageid, NEW.emailmessageid, NEW.printmessageid, NEW.smsmessageid, NEW.questionnaireid, tz, NEW.startdate, NEW.enddate, NEW.starttime, NEW.endtime, NEW.status, NEW.jobtypeid);
     -- copy the jobsettings
     INSERT INTO aspshard.qjobsetting (customerid, jobid, name, value) SELECT custid, NEW.id, name, value FROM jobsetting WHERE jobid=NEW.id;
     -- copy the joblists
-    INSERT INTO aspshard.qjoblist (customerid, jobid, listid, thesql) SELECT custid, NEW.id, listid, thesql FROM joblist WHERE jobid=NEW.id;
+    INSERT INTO aspshard.qjoblist (customerid, jobid, listid) SELECT custid, NEW.id, listid FROM joblist WHERE jobid=NEW.id;
   END IF;
 ELSE
 -- update job fields
-  UPDATE aspshard.qjob SET scheduleid=NEW.scheduleid, phonemessageid=NEW.phonemessageid, emailmessageid=NEW.emailmessageid, printmessageid=NEW.printmessageid, smsmessageid=NEW.smsmessageid, questionnaireid=NEW.questionnaireid, starttime=NEW.starttime, endtime=NEW.endtime, startdate=NEW.startdate, enddate=NEW.enddate, thesql=NEW.thesql WHERE customerid=custid AND id=NEW.id;
+  UPDATE aspshard.qjob SET scheduleid=NEW.scheduleid, phonemessageid=NEW.phonemessageid, emailmessageid=NEW.emailmessageid, printmessageid=NEW.printmessageid, smsmessageid=NEW.smsmessageid, questionnaireid=NEW.questionnaireid, starttime=NEW.starttime, endtime=NEW.endtime, startdate=NEW.startdate, enddate=NEW.enddate WHERE customerid=custid AND id=NEW.id;
   IF NEW.status IN ('processing', 'procactive', 'active', 'cancelling') THEN
     UPDATE aspshard.qjob SET status=NEW.status WHERE customerid=custid AND id=NEW.id;
   END IF;
@@ -108,16 +108,8 @@ DECLARE cc INTEGER;
 -- the job must be inserted before the lists
 SELECT COUNT(*) INTO cc FROM aspshard.qjob WHERE customerid=custid AND id=NEW.jobid;
 IF cc = 1 THEN
-    INSERT INTO aspshard.qjoblist (customerid, jobid, listid, thesql) VALUES (custid, NEW.jobid, NEW.listid, NEW.thesql);
+    INSERT INTO aspshard.qjoblist (customerid, jobid, listid) VALUES (custid, NEW.jobid, NEW.listid);
 END IF;
-END
-$$$
-
-CREATE TRIGGER update_joblist
-AFTER UPDATE ON joblist FOR EACH ROW
-BEGIN
-DECLARE custid INTEGER DEFAULT _$CUSTOMERID_;
-UPDATE aspshard.qjoblist SET thesql=NEW.thesql WHERE customerid=custid AND jobid=NEW.jobid AND listid=NEW.listid;
 END
 $$$
 

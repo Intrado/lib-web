@@ -299,8 +299,11 @@ CREATE TABLE `aspshard`.`replicationcheck` (
 `currenttime` BIGINT NOT NULL
 ) ENGINE = InnoDB ;
 
+-- ---------------------------
+-- start here for release 7.5
 
-
-
+-- NOTE you must not run this until after all customers are upgraded, copies job.listid to joblist table
+ALTER TABLE `qjob` DROP `listid`, DROP `thesql`;
+ALTER TABLE `qjoblist` DROP `thesql`;
 
 
