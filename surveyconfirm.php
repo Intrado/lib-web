@@ -44,7 +44,10 @@ if ($jobid != NULL) {
 
 
 $jobtype = new JobType($job->jobtypeid);
-$list = new PeopleList($job->listid);
+
+// assumes single list
+$listid = QuickQuery("select listid from joblist where jobid=?", false, $job->id);
+$list = new PeopleList($listid);
 $renderedlist = new RenderedList($list);
 $renderedlist->calcStats();
 $questionnaire = new SurveyQuestionnaire($job->questionnaireid);

@@ -9,8 +9,6 @@ $jobid = $_GET['jobid'] + 0;
 if (!userOwns("job",$jobid))
 	redirect('unauthorized.php');
 
-// gather job list rules to store with job.thesql for the trigger to shard db
-// job.thesql is used by the jobprocessor
 $job = new Job($jobid);
 
 $job->runNow();

@@ -501,10 +501,6 @@ class FinishJobWizard extends WizFinish {
 
 		$job = Job::jobWithDefaults();
 
-		// Attach first list
-		$listids = $jobsettings['lists'];
-		$job->listid = array_shift($listids);
-
 		$job->userid = $USER->id;
 		$job->jobtypeid = $jobsettings['jobtype'];
 		$job->name = $jobsettings['jobname'];
@@ -607,10 +603,10 @@ class FinishJobWizard extends WizFinish {
 			}
 		}
 
-		// attach additional lists
-		if ($listids)
-			foreach ($listids as $listid)
-				QuickUpdate("insert into joblist (jobid,listid) values (?,?)", false, array($job->id, $listid));
+		// store job lists
+		$listids = $jobsettings['lists'];
+		foreach ($listids as $listid)
+			QuickUpdate("insert into joblist (jobid,listid) values (?,?)", false, array($job->id, $listid));
 
 		$job->setSetting('translationexpire', date("Y-m-d", strtotime("+15 days"))); // now plus 15 days
 		if ($jobsettings['emailmessagelink'])

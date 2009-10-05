@@ -9,7 +9,6 @@ class Job extends DBMappedObject {
 	var $jobtypeid;
 	var $name;
 	var $description;
-	var $listid;
 	var $phonemessageid;
 	var $emailmessageid;
 	var $printmessageid;
@@ -26,7 +25,6 @@ class Job extends DBMappedObject {
 	var $status;
 	var $percentprocessed = 0;
 	var $deleted = 0;
-	var $thesql = "";
 
 	var $cancelleduserid;
 
@@ -41,31 +39,12 @@ class Job extends DBMappedObject {
 	function Job ($id = NULL) {
 		$this->_allownulls = true;
 		$this->_tablename = "job";
-		$this->_fieldlist = array("userid", "scheduleid", "jobtypeid", "name", "description", "listid",
+		$this->_fieldlist = array("userid", "scheduleid", "jobtypeid", "name", "description",
 				"phonemessageid", "emailmessageid", "printmessageid", "smsmessageid", "questionnaireid",
 				"type", "modifydate", "createdate", "startdate", "enddate", "starttime", "endtime", "finishdate",
-				"status", "percentprocessed", "deleted", "cancelleduserid", "thesql");
+				"status", "percentprocessed", "deleted", "cancelleduserid");
 		//call super's constructor
 		DBMappedObject::DBMappedObject($id);
-	}
-
-	// generate sql to store into 'thesql' field (used by jobprocessor to select person list)
-	function generateSql() {
-		// user rules
-		$user = new User($this->userid);
-
-		//get and compose list rules
-		$listrules = DBFindMany("Rule","from listentry le, rule r where le.type='R'
-				and le.ruleid=r.id and le.listid='" . $this->listid .  "'", "r");
-
-		if (count($listrules) > 0) {
-			$allrules = array_merge($user->rules(), $listrules);
-			$rulesql = "1 " . Rule::makeQuery($allrules, "p");
-		} else {
-			$rulesql = "0";
-		}
-
-		$this->thesql = $rulesql;
 	}
 
 	function copyMessage($msgid) {
@@ -191,8 +170,8 @@ class Job extends DBMappedObject {
 
 
 		//copy all the job lists
-		QuickUpdate("insert into joblist (jobid,listid,thesql)
-			select ?, listid, thesql
+		QuickUpdate("insert into joblist (jobid,listid)
+			select ?, listid
 			from joblist where jobid=?", false, array($newjob->id, $this->id));
 
 		// do not need to copy jobsetting, these are handled by the job object
@@ -239,17 +218,13 @@ class Job extends DBMappedObject {
 			if (!getSystemSetting("disablerepeat")) {
 				// check for empty message
 				if ($this->phonemessageid != null || $this->emailmessageid != null || $this->smsmessageid != null || $this->printmessageid || $this->questionnaireid != null) {
-					// check for empty list
-					$this->generateSql(); // update thesql
 
-					// with latest lists, be sure at least one person (otherwise, why bother copying this job that does nothing)
-					$hasPeople = $this->hasPeople($this->listid, $this->thesql);
-
-					// check additional lists
+					// check lists for people
+					$haspeople = false;
 					$joblists = DBFindMany('JobList', "from joblist where jobid=$this->id");
 					foreach ($joblists as $joblist) {
-						$joblist->generateSql($this->userid); // update thesql
-						$p = $this->hasPeople($joblist->listid, $joblist->thesql);
+						$thesql = $joblist->generateSql($this->userid); // update thesql
+						$p = $this->hasPeople($joblist->listid, $thesql);
 						if ($p) $hasPeople = true;
 					}
 
@@ -268,8 +243,7 @@ class Job extends DBMappedObject {
 			}
 		} else {
 			$status = QuickQuery("select status from job where id = '" . $this->id . "'");
-			if($status == "new"){
-				$this->generateSql();
+			if ($status == "new") {
 				$this->status = "scheduled"; // set state, schedulemanager will set it to 'processing' then jobprocessor will set it to 'active'
 				$this->update();
 			}

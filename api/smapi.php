@@ -759,7 +759,6 @@ class SMAPI{
 				$job->name = $name;
 				$job->description = $desc;
 				$job->jobtypeid = $jobtypeid;
-				$job->listid = $listid;
 				if($USER->authorize('sendphone') && $phonemsgid && userOwns("message", $phonemsgid) &&
 				QuickQuery("select type from message where id = " . $phonemsgid) == "phone"){
 					$job->sendphone = true;
@@ -821,7 +820,11 @@ class SMAPI{
 					return $result;
 				}
 
-				$job->create();
+				$job->create(); // create to generate the jobid
+				
+				// associate this jobid with the listid
+				QuickUpdate("insert into joblist (jobid, listid) values (?, ?)", false, array($job->id, $listid));
+				
 				$job->runNow();
 				$result["resultcode"] = "success";
 				$result["jobid"] = $job->id;

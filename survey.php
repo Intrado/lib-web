@@ -165,8 +165,7 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'send'))
 			} else {
 				$job->name = $name;
 				$job->description = trim(GetFormData($f,$s,"description"));
-				$fieldsarray = array("jobtypeid","listid",
-							"starttime", "endtime","startdate");
+				$fieldsarray = array("jobtypeid", "starttime", "endtime", "startdate");
 				PopulateObject($f,$s,$job,$fieldsarray);
 				if ($questionnaire->hasphone)
 					$job->setOption("maxcallattempts", GetFormData($f, $s, 'maxcallattempts'));
@@ -179,6 +178,10 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'send'))
 					else
 						$job->setOption("leavemessage", false);
 				}
+				
+				// single list
+				QuickUpdate("DELETE FROM joblist WHERE jobid=$job->id");
+				QuickUpdate("INSERT into joblist (jobid, listid) VALUES ($job->id, $listid)");
 			}
 
 			if(!$completedmode){

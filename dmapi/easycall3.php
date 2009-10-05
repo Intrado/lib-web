@@ -45,7 +45,6 @@ if($REQUEST_TYPE == "new"){
 		$job->name = $name;
 		$job->description = "EasyCall - " . date("M j, Y g:i a");
 		$type = $specialtask->getData('jobtypeid');
-		$job->listid = $specialtask->getData('listid');
 		$job->jobtypeid = $type;
 		$job->type = "phone";
 		$numdays = $specialtask->getData('jobdays');
@@ -71,6 +70,7 @@ if($REQUEST_TYPE == "new"){
 			}
 		}
 		if($job->id){
+			QuickUpdate("insert into joblist (jobid, listid) values (?,?)", false, array($job->id, $specialtask->getData('listid')));
 			$specialtask->setData('jobid', $job->id);
 			chdir("../");
 			$job->runNow();

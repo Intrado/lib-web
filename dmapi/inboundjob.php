@@ -337,7 +337,6 @@ function commitJob()
 	}
 
 
-	$job->listid = $_SESSION['listid'];
 	$job->phonemessageid = $_SESSION['messageid'];
 
 	$jobtype = new JobType($_SESSION['priority']);
@@ -362,6 +361,8 @@ function commitJob()
 			$joblang->create();
 			//error_log("created joblang");
 		}
+		// associate the list for this job
+		QuickUpdate("insert into joblist (jobid, listid) values (?,?)", false, array($job->id, $_SESSION['listid']));
 
 		// now we submit this job
 		//error_log("now submit the job to process ".$jobid);

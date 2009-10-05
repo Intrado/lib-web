@@ -3,16 +3,15 @@ class JobList extends DBMappedObject {
 
 	var $jobid;
 	var $listid;
-	var $thesql;
 
 	function JobList ($id = NULL) {
 		$this->_tablename = "joblist";
-		$this->_fieldlist = array("jobid", "listid", "thesql");
+		$this->_fieldlist = array("jobid", "listid");
 		//call super's constructor
 		DBMappedObject::DBMappedObject($id);
 	}
 
-	// generate sql to store into 'thesql' field (used by jobprocessor to select person list)
+	// generate thesql to search for people in this list (based on user rules, etc)
 	function generateSql($userid) {
 		// user rules
 		$user = new User($userid);
@@ -28,7 +27,7 @@ class JobList extends DBMappedObject {
 			$rulesql = "0";
 		}
 
-		$this->thesql = $rulesql;
+		return $rulesql;
 	}
 
 }

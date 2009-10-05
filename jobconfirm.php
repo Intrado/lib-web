@@ -51,21 +51,17 @@ if ($jobid != NULL) {
 	$job = new Job($_SESSION['jobid']);
 }
 
-
 $jobtype = new JobType($job->jobtypeid);
-$list = new PeopleList($job->listid);
-$renderedlist = new RenderedList($list);
-$renderedlist->calcStats();
-$totalpersons = $renderedlist->total;
 
+$totalpersons = 0;
 $ismultilist = false;
 $multilistids = QuickQueryList("select listid from joblist where jobid=".$job->id);
 if (count($multilistids) > 0) {
-	$ismultilist = true;
+	if (count($multilistids) > 1)
+		$ismultilist = true;
+		
 	$multilist = array();
 	$multirenderedlist = array();
-	$multilist[] = $list;
-	$multirenderedlist[] = $renderedlist;
 	foreach ($multilistids as $listid) {
 		$nextlist = new PeopleList($listid);
 		$nextrenderedlist = new RenderedList($nextlist);
@@ -73,11 +69,12 @@ if (count($multilistids) > 0) {
 		$multilist[] = $nextlist;
 		$multirenderedlist[] = $nextrenderedlist;
 		$totalpersons += $nextrenderedlist->total;
+		$list = $nextlist; // used by single list display
 	}
 }
 
 $blocksubmit = false;
-if ($totalpersons == 0){
+if ($totalpersons == 0) {
 	$blocksubmit = true;
 	error("The list you've selected does not have any people in it","Click 'Modify Job Settings' to return to the Job configuration page");
 }

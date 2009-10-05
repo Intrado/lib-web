@@ -42,7 +42,6 @@ $job->name = ($_SESSION['newjob']['name'] ? $_SESSION['newjob']['name'] : $defau
 $job->description = ($_SESSION['newjob']['desc'] ? $_SESSION['newjob']['desc'] : $defaultname);
 
 $job->jobtypeid = $_SESSION['newjob']['jobtypeid'];
-$job->listid = $_SESSION['newjob']['list'];
 $job->setOptionValue("retry",$_SESSION['newjob']['retries']);
 
 $job->enddate = date("Y-m-d", strtotime($job->startdate) + (($_SESSION['newjob']['numdays'] - 1) * 86400));
@@ -51,6 +50,8 @@ $job->type="phone";
 $job->phonemessageid = $_SESSION['newjob']['message'];
 
 $job->create();
+
+QuickUpdate("insert into joblist (jobid, listid) values (?,?)", false, array($job->id, $_SESSION['newjob']['list']));
 
 chdir("../");
 

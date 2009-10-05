@@ -94,14 +94,11 @@ if (isset($job->id)) {
 
 $selectedlists = array(); // ids
 $listradiostate = "single";
-if(isset($job->id)){
+if (isset($job->id)) {
 	$selectedlists = QuickQueryList("select listid from joblist where jobid=$job->id", false);
-	$listradiostate = empty($selectedlists)?"single":"multi";
-	if($job->listid) {
-		$selectedlists[] = $job->listid;
-	}
+	$listradiostate = count($selectedlists) == 1 ? "single" : "multi";
 }
-if(!empty($selectedlists)) {
+if (!empty($selectedlists)) {
 	$peoplelists = QuickQueryList("select id, name, (name +0) as foo from list where userid=$USER->id and (deleted=0 or id in (" . implode(",",array_values($selectedlists)) . ") ) order by foo,name", true);
 } else {
 	$peoplelists = QuickQueryList("select id, name, (name +0) as foo from list where userid=$USER->id and deleted=0 order by foo,name", true);
@@ -298,12 +295,6 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'phone') || CheckFormSubmit($f,'
 						}
 						$job->setSetting("jobcreated" . $type, 0);
 					}
-				}
-
-				if(GetFormData($f, $s, "listradio") == "single") {
-					$job->listid = GetFormData($f, $s, "listid");
-				} else {
-					$job->listid = array_shift(GetFormData($f,$s,'listids'));
 				}
 
 				$fieldsarray = array("jobtypeid","name","description", "phonemessageid",
@@ -530,22 +521,24 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'phone') || CheckFormSubmit($f,'
 						}
 					}
 				}
-				/* Store multilists*/
+				/* Store lists*/
 				QuickUpdate("DELETE FROM joblist WHERE jobid=$job->id");
-				if(GetFormData($f, $s, "listradio") == "multi") {
-					$batchvalues = array();
+				$listids = array();
+				if (GetFormData($f, $s, "listradio") == "multi") {
 					$listids = GetFormData($f,$s,'listids');
-
-					array_shift($listids);  // The first list has already been added to the job above
-					foreach($listids as $id) {
-						$values = "($job->id,". ($id+0) . ")";
-						$batchvalues[] = $values;
-					}
-					if(!empty($batchvalues)){
-						$sql = "INSERT INTO joblist (jobid,listid) VALUES ";
-						$sql .= implode(",",$batchvalues);
-						QuickUpdate($sql);
-					}
+				} else {
+					// single listid
+					$listids[] = GetFormData($f, $s, "listid");
+				}
+				$batchvalues = array();
+				foreach ($listids as $id) {
+					$values = "($job->id,". ($id+0) . ")"; // TODO prepstmt args
+					$batchvalues[] = $values;
+				}
+				if (!empty($batchvalues)) {
+					$sql = "INSERT INTO joblist (jobid,listid) VALUES ";
+					$sql .= implode(",",$batchvalues);
+					QuickUpdate($sql);
 				}
 			}
 
@@ -597,7 +590,6 @@ if( $reloadform )
 	array("name","text",1,$JOBTYPE == "repeating" ? 30: 50,true),
 	array("description","text",1,50,false),
 	array("jobtypeid","number","nomin","nomax", true),
-	array("listid","number","nomin","nomax",true),
 	array("phonemessageid","number","nomin","nomax"),
 	array("emailmessageid","number","nomin","nomax"),
 	array("smsmessageid","number","nomin","nomax"),
@@ -611,6 +603,8 @@ if( $reloadform )
 	PopulateForm($f,$s,$job,$fields);
 
 	PutFormData($f,$s,"listradio",$listradiostate);
+	$templistid = isset($selectedlists[0]) ? $selectedlists[0] : null;
+	PutFormData($f,$s,"listid", $templistid, "number","nomin","nomax",true);
 	PutFormData($f,$s,"listids",$selectedlists,"array",array_keys($peoplelists),"nomin","nomax");
 	SetRequired($f,$s,"listids", empty($selectedlists));// Since multiselect show required even when the ids are selected
 
@@ -1062,7 +1056,6 @@ if ($JOBTYPE == "repeating" && getSystemSetting("disablerepeat") ) {
 				foreach ($selectedlistnames as $listname) {
 						echo escapehtml($listname)."<br>";
 				}
-				echo escapehtml($peoplelists[$job->listid]);
 ?>
 				</td>
 

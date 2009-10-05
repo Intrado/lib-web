@@ -174,6 +174,7 @@ $customertables = array(
 	"importlogentry",
 	"job",
 	"joblanguage",
+	"joblist",
 	"jobsetting",
 	"jobstats",
 	"jobtype",
@@ -301,14 +302,20 @@ mysql_query("COMMIT", $custdb);
 
 // jobsetting
 echo ("Copy repeating jobs and settings\n");
-$query = "INSERT ignore INTO aspshard.qjobsetting (customerid, jobid, name, value) SELECT ".$customerid.", jobid, name, value FROM jobsetting WHERE jobid in (select id from job where status='repeating')";
+$query = "INSERT ignore INTO aspshard.qjobsetting (customerid, jobid, name, value) SELECT ".$customerid.", jobid, name, value FROM jobsetting WHERE jobid in (select id from job where status in ('repeating', 'scheduled'))";
+mysql_query("START TRANSACTION", $custdb);
+mysql_query($query,$custdb)
+	or die ("Failed to execute statement \n$query\n\nfor $customerdbname : " . mysql_error($custdb));
+
+// joblist
+$query = "INSERT ignore INTO aspshard.qjoblist (customerid, jobid, listid) SELECT ".$customerid.", jobid, listid FROM joblist WHERE jobid in (select id from job where status in ('repeating', 'scheduled'))";
 mysql_query("START TRANSACTION", $custdb);
 mysql_query($query,$custdb)
 	or die ("Failed to execute statement \n$query\n\nfor $customerdbname : " . mysql_error($custdb));
 
 // repeating job
-$query = "INSERT ignore INTO aspshard.qjob (id, customerid, userid, scheduleid, listid, phonemessageid, emailmessageid, printmessageid, smsmessageid, questionnaireid, timezone, startdate, enddate, starttime, endtime, status, jobtypeid, thesql)" .
-         " select id, ".$customerid.", userid, scheduleid, listid, phonemessageid, emailmessageid, printmessageid, smsmessageid, questionnaireid, ".$timezone.", startdate, enddate, starttime, endtime, 'repeating', jobtypeid, thesql from job where status='repeating'";
+$query = "INSERT ignore INTO aspshard.qjob (id, customerid, userid, scheduleid, phonemessageid, emailmessageid, printmessageid, smsmessageid, questionnaireid, timezone, startdate, enddate, starttime, endtime, status, jobtypeid)" .
+         " select id, ".$customerid.", userid, scheduleid, phonemessageid, emailmessageid, printmessageid, smsmessageid, questionnaireid, ".$timezone.", startdate, enddate, starttime, endtime, 'repeating', jobtypeid from job where status='repeating'";
 mysql_query($query,$custdb)
 	or die ("Failed to execute statement \n$query\n\nfor $customerdbname : " . mysql_error($custdb));
 
@@ -318,8 +325,8 @@ mysql_query($query,$custdb)
 	or die ("Failed to execute statement \n$query\n\nfor $customerdbname : " . mysql_error($custdb));
 
 // future job
-$query = "INSERT ignore INTO aspshard.qjob (id, customerid, userid, scheduleid, listid, phonemessageid, emailmessageid, printmessageid, smsmessageid, questionnaireid, timezone, startdate, enddate, starttime, endtime, status, jobtypeid, thesql)" .
-         " select id, ".$customerid.", userid, scheduleid, listid, phonemessageid, emailmessageid, printmessageid, smsmessageid, questionnaireid, ".$timezone.", startdate, enddate, starttime, endtime, 'scheduled', jobtypeid, thesql from job where status='scheduled'";
+$query = "INSERT ignore INTO aspshard.qjob (id, customerid, userid, scheduleid, phonemessageid, emailmessageid, printmessageid, smsmessageid, questionnaireid, timezone, startdate, enddate, starttime, endtime, status, jobtypeid)" .
+         " select id, ".$customerid.", userid, scheduleid, phonemessageid, emailmessageid, printmessageid, smsmessageid, questionnaireid, ".$timezone.", startdate, enddate, starttime, endtime, 'scheduled', jobtypeid from job where status='scheduled'";
 mysql_query($query,$custdb)
 	or die ("Failed to execute statement \n$query\n\nfor $customerdbname : " . mysql_error($custdb));
 mysql_query("COMMIT", $custdb);
