@@ -60,24 +60,17 @@ if($timezone){
 	QuickUpdate("set time_zone='" . $timezone . "'");
 }
 
+$thesql = array(); // key=listid, value=thesql
 
+// generate thesql for every list in this job
 $job = new Job($jobid);
-$job->generateSql();
-
-echo "new sql is: " . $job->thesql . "\n";
-
-// check additional lists
 $joblists = DBFindMany('JobList', "from joblist where jobid=$jobid");
 foreach ($joblists as $joblist) {
-	$joblist->generateSql($job->userid); // update thesql
-	echo "new sql for listid ".$joblist->listid." is : ".$joblist->thesql . "\n";
-	$joblist->update();
+	$thesql[$joblist->listid] = $joblist->generateSql($job->userid);
 }
 
 
-$job->update();
-
-echo "job updated, assume success \n";
+echo json_encode($thesql);
 
 exit(0); // success
 ?>
