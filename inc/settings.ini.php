@@ -34,19 +34,16 @@ disableAutoTranslate=false
 
 ;/*CSDELETEMARKER_START*/
 
-[txtpostback]
+[txtreply]
+; 3ci
 txt_username=
 txt_password=
-;txt_shortcode=
-txt_logfile="/usr/commsuite/logs/txtpostback.log"
-txt_throttlefile="/tmp/txtpostback_sourceday.dat"
-
-txt_javadir="/usr/commsuite/java/j2sdk/bin/java"
-txt_emailjar="/usr/commsuite/server/simpleemail/simpleemail.jar"
-
-;txt_email[]=bhencke@schoolmessenger.com
-;txt_email[]=hwood@schoolmessenger.com
-;txt_email[]=gbaumgartner@schoolmessenger.com
+; air2web
+txt_air2username=
+txt_air2password=
+; logs
+txt_logfile="/usr/commsuite/logs/txtreply.log"
+txt_throttlefile="/tmp/txtreply_sourceday.dat"
 
 ;/*CSDELETEMARKER_END*/
 
