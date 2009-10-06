@@ -25,9 +25,15 @@ require_once("manager/authclient.inc.php");
 //----------------------------------------------------------------------
 $SETTINGS = parse_ini_file("inc/settings.ini.php",true);
 
-$username = $SETTINGS['txtreply']['txt_username'];
-$password = $SETTINGS['txtreply']['txt_password'];
+// 3ci user/pass
+$username = isset($SETTINGS['txtreply']['txt_username']) ? $SETTINGS['txtreply']['txt_username'] : "";
+$password = isset($SETTINGS['txtreply']['txt_password']) ? $SETTINGS['txtreply']['txt_password'] : "";
 
+// air2web user/pass
+$air2username = isset($SETTINGS['txtreply']['txt_air2username']) ? $SETTINGS['txtreply']['txt_air2username'] : "";
+$air2password = isset($SETTINGS['txtreply']['txt_air2password']) ? $SETTINGS['txtreply']['txt_air2password'] : "";
+
+// log files
 $logfile = isset($SETTINGS['txtreply']['txt_logfile']) ? $SETTINGS['txtreply']['txt_logfile'] : "/usr/commsuite/logs/txtreply.log";
 $throttlefile = isset($SETTINGS['txtreply']['txt_throttlefile']) ? $SETTINGS['txtreply']['txt_throttlefile'] : "/tmp/txtreply_sourceday.dat";
 //----------------------------------------------------------------------
@@ -53,7 +59,7 @@ if ($inboundshortcode == "45305") {
 	$visitlink = "www.schoolmessenger.com/txtmsg";
 } else if ($inboundshortcode == "724665") {
 	// air2web Canada
-	$visitlink = "www.schoolmessenger.com/txtca";
+	$visitlink = "www.schoolmessenger.com/txtmsg";
 } else {
 	// for now assume 3ci
 	$visitlink = "www.schoolmessenger.com/txt";
@@ -61,16 +67,16 @@ if ($inboundshortcode == "45305") {
 }
 
 // Text Message for US up to 160 chars
-$helptext = "Text Alert Service from SchoolMessenger. For additional info visit " . $visitlink . ". Send STOP to opt out. Msg&data rates may aply";
+$helptext = "Text Alert Service from SchoolMessenger. For additional info visit " . $visitlink . ". Send STOP to opt out. Msg+data rates may aply";
 $infotext = $helptext;
-$optouttext = "You are now unsubscribed from the text alerts. Txt OPTIN to subscribe, HELP for help. Check out " . $visitlink . " 4 info. Msg&data rates may aply";
+$optouttext = "You are now unsubscribed from the text alerts. Txt OPTIN to subscribe, HELP for help. Check out " . $visitlink . " 4 info. Msg+data rates may aply";
 $optintext = "You are now registered to receive text alerts. Txt STOP to quit, HELP for help. Check out " . $visitlink . " 4 info";
 
 // Text Message for Canada up to 132 chars
 if ($inboundshortcode == "724665") {
-	$helptext = "Text Alert Service from SchoolMessenger. Send STOP or ARRET to opt out. Msg&data rates may aply";
+	$helptext = "Text Alert Service from SchoolMessenger. Send STOP or ARRET to opt out. Msg+data rates may aply";
 	$infotext = $helptext;
-	$optouttext = "You are now unsubscribed from the text alerts. Txt OPTIN to subscribe, HELP for help. Msg&data rates may aply";
+	$optouttext = "You are now unsubscribed from the text alerts. Txt OPTIN to subscribe, HELP for help. Msg+data rates may aply";
 	$optintext = "You are now registered to receive text alerts. Txt STOP to quit, HELP for help.";
 }
 
@@ -108,7 +114,7 @@ if (isset($splitmessage[1]) &&
 }
 
 if ($hashelp) {
-	sendtxt($username, $password, $inboundshortcode, $sourceaddress, $helptext);
+	sendtxt($inboundshortcode, $sourceaddress, $helptext);
 	
 	logExit("HELP");
 } else if ($hasoptout) {
@@ -117,7 +123,7 @@ if ($hashelp) {
 	blocksms($phonenumber, 'block', 'automated block due to keyword '.$splitmessage[0]);
 	
 	// reply back with confirmation
-	sendtxt($username, $password, $inboundshortcode, $sourceaddress, $optouttext);
+	sendtxt($inboundshortcode, $sourceaddress, $optouttext);
 	
 	logExit("OPTOUT");
 } else if ($hasoptin) {
@@ -126,7 +132,7 @@ if ($hashelp) {
 	blocksms($phonenumber, 'optin', 'automated optin due to keyword '.$splitmessage[0]);
 
 	// reply back with confirmation
-	sendtxt($username, $password, $inboundshortcode, $sourceaddress, $optintext);
+	sendtxt($inboundshortcode, $sourceaddress, $optintext);
 	
 	logExit("OPTIN");
 } else {
@@ -158,17 +164,18 @@ if ($hashelp) {
 	fwrite($throttlefp,"$sourceaddress\n");
 	fclose($throttlefp);
 
-	sendtxt($username, $password, $inboundshortcode, $sourceaddress, $infotext);
+	sendtxt($inboundshortcode, $sourceaddress, $infotext);
 	logExit("INFO");
 }
 
 
-function sendtxt($username, $password, $shortcode, $sourceaddress, $replybody) {
-	global $is3ci;
+function sendtxt($shortcode, $sourceaddress, $replybody) {
+	global $is3ci, $username, $password, $air2username, $air2password;
+	
 	if ($is3ci)
 		sendtxt3ci($username, $password, $shortcode, $sourceaddress, $replybody);
 	else
-		sendtxtAir2Web($username, $password, $shortcode, $sourceaddress, $replybody);
+		sendtxtAir2Web($air2username, $air2password, $shortcode, $sourceaddress, $replybody);
 }
 
 function sendtxt3ci($username, $password, $shortcode, $sourceaddress, $replybody) {
@@ -177,11 +184,20 @@ function sendtxt3ci($username, $password, $shortcode, $sourceaddress, $replybody
 	if ($client) {
 		try {
 			$response = $client->SubmitSMS($username,$password,$shortcode,$sourceaddress,$replybody);
+			if (!stripos($response, "code=\"2\"")) {
+				global $message;
+				error_log("txtreply bad response : $response : $sourceaddress $message");
+				exit();
+			}
 		} catch (SoapFault $fault) {
-			error_log("txtreply SOAP Fault: (faultcode: {$fault->faultcode}, faultstring: {$fault->faultstring})");
+			global $message;
+			error_log("txtreply SOAP Fault: (faultcode: {$fault->faultcode}, faultstring: {$fault->faultstring}) : $sourceaddress $message");
+			exit();
 		}
 	} else {
-		error_log("txtreply Error with Soap client: could not send reply SMS");
+		global $message;
+		error_log("txtreply Error with Soap client: could not send reply SMS : $sourceaddress $message");
+		exit();
 	}
 }
 
@@ -229,14 +245,25 @@ function sendtxtAir2Web($username, $password, $shortcode, $sourceaddress, $reply
 	$context = stream_context_create($context_options);
 	$fp = @fopen($url, 'r', false, $context);
 	if (!$fp) {
-		error_log("txtreply Unable to send to $url");
+		global $message;
+		error_log("txtreply Unable to send to $url : $sourceaddress $message");
 		exit();
 	}
 	$response = @stream_get_contents($fp);
 	if ($response === false) {
-		error_log("txtreply Unable to read from $url");
+		global $message;
+		error_log("txtreply Unable to read from $url : $sourceaddress $message");
 		exit();
 	}
+	
+	if (!stripos($response, "<code>100</code>")) {
+		global $message;
+		error_log("txtreply Failure to send : $response  : $sourceaddress $message");
+		exit();
+	}
+	
+	//error_log("request ".$sendrequest);
+	//error_log("response ".$response);
 }
 
 // log the post message, action, then exit script
