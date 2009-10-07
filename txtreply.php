@@ -67,16 +67,16 @@ if ($inboundshortcode == "45305") {
 }
 
 // Text Message for US up to 160 chars
-$helptext = "Text Alert Service from SchoolMessenger. For additional info visit " . $visitlink . ". Send STOP to opt out. Msg+data rates may aply";
+$helptext = "Text Alert Service from SchoolMessenger. For additional info visit " . $visitlink . ". Send STOP to opt out. Msg&data rates may aply";
 $infotext = $helptext;
-$optouttext = "You are now unsubscribed from the text alerts. Txt OPTIN to subscribe, HELP for help. Check out " . $visitlink . " 4 info. Msg+data rates may aply";
+$optouttext = "You are now unsubscribed from the text alerts. Txt OPTIN to subscribe, HELP for help. Check out " . $visitlink . " 4 info. Msg&data rates may aply";
 $optintext = "You are now registered to receive text alerts. Txt STOP to quit, HELP for help. Check out " . $visitlink . " 4 info";
 
 // Text Message for Canada up to 132 chars
 if ($inboundshortcode == "724665") {
-	$helptext = "Text Alert Service from SchoolMessenger. Send STOP or ARRET to opt out. Msg+data rates may aply";
+	$helptext = "Text Alert Service from SchoolMessenger. Send STOP or ARRET to opt out. Msg&data rates may aply";
 	$infotext = $helptext;
-	$optouttext = "You are now unsubscribed from the text alerts. Txt OPTIN to subscribe, HELP for help. Msg+data rates may aply";
+	$optouttext = "You are now unsubscribed from the text alerts. Txt OPTIN to subscribe, HELP for help. Msg&data rates may aply";
 	$optintext = "You are now registered to receive text alerts. Txt STOP to quit, HELP for help.";
 }
 
@@ -171,7 +171,10 @@ if ($hashelp) {
 
 function sendtxt($shortcode, $sourceaddress, $replybody) {
 	global $is3ci, $username, $password, $air2username, $air2password;
-	
+	//if ($sourceaddress == "18316006719") {
+	//	$is3ci = true;
+	//	$shortcode = "45305";
+	//}
 	if ($is3ci)
 		sendtxt3ci($username, $password, $shortcode, $sourceaddress, $replybody);
 	else
@@ -202,6 +205,9 @@ function sendtxt3ci($username, $password, $shortcode, $sourceaddress, $replybody
 }
 
 function sendtxtAir2Web($username, $password, $shortcode, $sourceaddress, $replybody) {
+	
+	// all ampersand must be treated for xml
+	$replybody = str_replace("&", "&amp;", $replybody);
 	
 	// build the xml
 	$sendrequest =
@@ -250,6 +256,10 @@ function sendtxtAir2Web($username, $password, $shortcode, $sourceaddress, $reply
 		exit();
 	}
 	$response = @stream_get_contents($fp);
+	
+	//error_log("request ".$sendrequest);
+	//error_log("response ".$response);
+
 	if ($response === false) {
 		global $message;
 		error_log("txtreply Unable to read from $url : $sourceaddress $message");
@@ -261,9 +271,6 @@ function sendtxtAir2Web($username, $password, $shortcode, $sourceaddress, $reply
 		error_log("txtreply Failure to send : $response  : $sourceaddress $message");
 		exit();
 	}
-	
-	//error_log("request ".$sendrequest);
-	//error_log("response ".$response);
 }
 
 // log the post message, action, then exit script
