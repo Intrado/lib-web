@@ -119,6 +119,9 @@ function fmt_lastseen($row, $index){
 
 function fmt_resources ($row,$index) {
 	//index 13 is poststatus
+	if (!isset($row[13]) || $row[13] == "")
+		return ""; // unauth dm has no poststatus
+		
 	$data = json_decode($row[13]);
 	$data = $data[0];
 	
