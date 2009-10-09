@@ -62,7 +62,7 @@ foreach ($data as $customer) {
 	$tablenames = array('setting', 'jobsetting', 'usersetting');
 	foreach ($tablenames as $tablename) {
 		echo ".";
-		$res = mysql_query("select id, value from $tablename where name='callerid'", $custdb);
+		$res = mysql_query("select id, value from $tablename where name='callerid' and length(value)>10", $custdb);
 		if (!$res) continue;
 		while ($row = mysql_fetch_row($res)) {
 			mysql_query("update $tablename set value='".Phone::parse($row[1])."' where id=".$row[0], $custdb);
