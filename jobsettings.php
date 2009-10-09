@@ -37,6 +37,7 @@ if (getSystemSetting('_hascallback', false)) {
 		"fieldhelp" => _L("This is the default Caller ID for all jobs."),
 		"value" => Phone::format(getSystemSetting('callerid')),
 		"validators" => array(
+			array("ValRequired"),
 			array("ValLength","min" => 2,"max" => 20),
 			array("ValPhone")),
 		"control" => array("TextField","maxlength" => 20),
