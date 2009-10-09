@@ -64,7 +64,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 // Display
 ////////////////////////////////////////////////////////////////////////////////
 
-$PAGE = "admin:settings";
+$PAGE = "reports:reports";
 $TITLE = _L('Systemwide Report Archive');
 
 require_once("nav.inc.php");
