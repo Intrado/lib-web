@@ -13,7 +13,9 @@ if(isset($_GET["name"]) && isset($_GET["id"])) {
 		list($contenttype,$data) = $c;
 		if($data) {
 			header("HTTP/1.0 200 OK");
-			header('Content-type: application/' . $contenttype);
+			header('Content-type: ' . $contenttype);
+			header("Pragma: private");
+			header("Cache-Control: private");
 			header("Content-disposition: attachment; filename=\"" . urldecode($_GET["name"]) . "\"");
 			header("Content-Length: " . strlen($data));
 			header("Connection: close");
