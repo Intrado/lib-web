@@ -220,7 +220,7 @@ class Job extends DBMappedObject {
 				if ($this->phonemessageid != null || $this->emailmessageid != null || $this->smsmessageid != null || $this->printmessageid || $this->questionnaireid != null) {
 
 					// check lists for people
-					$haspeople = false;
+					$hasPeople = false;
 					$joblists = DBFindMany('JobList', "from joblist where jobid=$this->id");
 					foreach ($joblists as $joblist) {
 						$thesql = $joblist->generateSql($this->userid); // update thesql

@@ -178,7 +178,7 @@ function listcontacts ($obj,$name) {
 			}
 			return trim($content,", ");
 		} else {
-			$lists[] = QuickQueryList("select listid from joblist where jobid = ?",false,false,array($obj->id));
+			$lists = QuickQueryList("select listid from joblist where jobid = ?",false,false,array($obj->id));
 
 		}
 	} else if($name == "list") {
