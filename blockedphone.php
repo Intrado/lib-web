@@ -61,9 +61,11 @@ if(CheckFormSubmit($form, $section))
 			} else {
 				$blocktype = GetFormData($form, $section, 'type');
 				// check to see if this number already exists
-				$exists = QuickQuery("select count(id) from blockeddestination where type in (" . (($blocktype == 'both')?"'phone', 'sms', ":"") . " ?) and destination = ?", false, array($blocktype, $phone));
-				if ($exists) {
-					error(_L('That combination of number and type is already blocked'));
+				$exists = QuickQueryList("select type from blockeddestination where  destination = ?", false, false, array($phone));
+				if ($exists && ($blocktype == 'both' || $blocktype == 'phone') && in_array('phone', $exists)) {
+					error(_L('That number is already blocked from receiving phone calls'));
+				} else if($exists && ($blocktype == 'both' || $blocktype == 'sms') && in_array('sms', $exists)) {
+					error(_L('That number is already blocked from receiving text messages'));
 				} else {
 					QuickQuery("BEGIN");
 					if($blocktype == 'both' || $blocktype == 'phone')
