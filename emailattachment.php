@@ -117,8 +117,3 @@ if (isset($_FILES['emailattachment']['error']) && $_FILES['emailattachment']['er
 </script> 
 </body>
 </html>
-
-
-
-
-	Content-disposition: attachment; filename=foo bar";
