@@ -178,8 +178,7 @@ function listcontacts ($obj,$name) {
 			}
 			return trim($content,", ");
 		} else {
-			$lists[] = QuickQuery("select listid from job where id=?",false, array($obj->id));
-			$lists = array_merge($lists, QuickQueryList("select listid from joblist where jobid = ?",false,false,array($obj->id)));
+			$lists[] = QuickQueryList("select listid from joblist where jobid = ?",false,false,array($obj->id));
 
 		}
 	} else if($name == "list") {
