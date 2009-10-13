@@ -1367,7 +1367,7 @@ $$$
 ALTER TABLE `persondatavalues` ADD `editlock` TINYINT NOT NULL DEFAULT '0'
 $$$
 
-ALTER TABLE `subscriber` ADD `preferences` TEXT NOT NULL DEFAULT ''
+ALTER TABLE `subscriber` ADD `preferences` TEXT NOT NULL
 $$$
 
 CREATE TABLE `subscriberpending` (
@@ -1521,7 +1521,7 @@ $$$
  DROP TABLE `blockednumber`
  $$$
 
- ALTER TABLE `custdm` CHANGE `poststatus` `poststatus` MEDIUMTEXT CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT ''
+ ALTER TABLE `custdm` CHANGE `poststatus` `poststatus` MEDIUMTEXT CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL
  $$$
 
 INSERT INTO systemmessages (message, icon, modifydate)
@@ -1541,4 +1541,10 @@ ALTER TABLE `job` DROP `listid`, DROP `thesql`
 $$$
 
 ALTER TABLE `joblist` DROP `thesql`
+$$$
+
+ALTER TABLE `custdm` CHANGE `poststatus` `poststatus` MEDIUMTEXT CHARACTER SET utf8 COLLATE utf8_general_ci
+$$$
+
+ALTER TABLE `subscriber` CHANGE `preferences` `preferences` TEXT
 $$$

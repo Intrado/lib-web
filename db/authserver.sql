@@ -338,8 +338,8 @@ ALTER TABLE `customer` ADD INDEX ( `shardid` ) ;
 
 ALTER TABLE `webactivation` ADD INDEX ( `creation` ) ;
 
- ALTER TABLE `dm` CHANGE `poststatus` `poststatus` MEDIUMTEXT NOT NULL  ;
+ALTER TABLE `dm` CHANGE `poststatus` `poststatus` MEDIUMTEXT NOT NULL ;
  
 -- start here for 7.5
 
-ALTER TABLE `dm` CHANGE `poststatus` `poststatus` MEDIUMTEXT NOT NULL DEFAULT ''  ;
+ALTER TABLE `dm` CHANGE `poststatus` `poststatus` MEDIUMTEXT ;

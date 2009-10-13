@@ -9,5 +9,8 @@ $$$
 ALTER TABLE `joblist` DROP `thesql`
 $$$
 
-ALTER TABLE `custdm` CHANGE `poststatus` `poststatus` MEDIUMTEXT CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT ''
+ALTER TABLE `custdm` CHANGE `poststatus` `poststatus` MEDIUMTEXT CHARACTER SET utf8 COLLATE utf8_general_ci
+$$$
+
+ALTER TABLE `subscriber` CHANGE `preferences` `preferences` TEXT
 $$$
