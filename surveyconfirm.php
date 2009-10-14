@@ -45,8 +45,10 @@ if ($jobid != NULL) {
 
 $jobtype = new JobType($job->jobtypeid);
 
-// assumes single list
-$listid = QuickQuery("select listid from joblist where jobid=?", false, $job->id);
+// assume one list for survey job, TODO support multilist
+$listids = QuickQueryList("select listid from joblist where jobid=?", false, false, array($jobid));
+if (isset($listids[0]))
+	$listid = $listids[0];
 $list = new PeopleList($listid);
 $renderedlist = new RenderedList($list);
 $renderedlist->calcStats();

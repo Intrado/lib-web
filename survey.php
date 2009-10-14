@@ -125,6 +125,10 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'send'))
 
 			$questionnaire = new SurveyQuestionnaire($questionnaireid);
 
+			$listid = GetFormData($f, $s, "listid") + 0;
+			if (!userOwns("list", $listid))
+				exit();
+				
 			//submit changes
 			$jobid = getCurrentSurvey();
 			if ($jobid == null) {
@@ -178,10 +182,6 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'send'))
 					else
 						$job->setOption("leavemessage", false);
 				}
-				
-				// single list
-				QuickUpdate("DELETE FROM joblist WHERE jobid=$job->id");
-				QuickUpdate("INSERT into joblist (jobid, listid) VALUES ($job->id, $listid)");
 			}
 
 			if(!$completedmode){
@@ -206,6 +206,14 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'send'))
 
 			setCurrentSurvey($job->id);
 
+			// save lists after job, need jobid for a new job
+			if (!$completedmode && !$submittedmode) {
+				// single list
+				QuickUpdate("DELETE FROM joblist WHERE jobid=$job->id");
+				QuickUpdate("INSERT into joblist (jobid, listid) VALUES ($job->id, $listid)");
+			}
+
+
 			ClearFormData($f);
 			if (CheckFormSubmit($f,'send')) {
 				redirect("surveyconfirm.php?id=" . $job->id);
@@ -223,11 +231,16 @@ if( $reloadform )
 	ClearFormData($f);
 
 	$jobid = getCurrentSurvey();
+	$listid = null;
 	if ($jobid == null) {
 		$job = Job::jobWithDefaults();
 		$job->questionnaireid = $_SESSION['scheduletemplate'];
 	} else {
 		$job = new Job($jobid);
+		// assume one list for survey job, TODO support multilist
+		$listids = QuickQueryList("select listid from joblist where jobid=?", false, false, array($jobid));
+		if (isset($listids[0]))
+			$listid = $listids[0];
 	}
 
 	//beautify the dates & times
@@ -242,12 +255,13 @@ if( $reloadform )
 		array("description","text",1,50,false),
 		array("jobtypeid","number","nomin","nomax", true),
 		array("questionnaireid","number","nomin","nomax",true),
-		array("listid","number","nomin","nomax",true),
 		array("starttime","text",1,50,true),
 		array("endtime","text",1,50,true),
 		array('startdate','text', 1, 50, true),
 	);
 
+	PutFormData($f, $s, "listid", $listid, "number", "nomin", "nomax", true);
+	
 	PutFormData($f,$s,"maxcallattempts",$job->getOptionValue("maxcallattempts"), "number",1,$ACCESS->getValue('callmax'),true);
 
 	PutFormData($f,$s,"callerid", Phone::format($job->getOptionValue("callerid")), "phone", 10, 10, false);
