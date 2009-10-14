@@ -386,6 +386,10 @@ function readonlyDBConnect() {
 		
 			$setcharset = "SET character_set_results = 'utf8', character_set_client = 'utf8', character_set_connection = 'utf8', character_set_database = 'utf8', character_set_server = 'utf8'";
 			$_readonlyDB->query($setcharset);
+			
+			if (isset($_SESSION['timezone'])) {
+				$_readonlyDB->query("set time_zone='" . $_SESSION['timezone'] . "'");
+			}
 			return $_readonlyDB;
 		} catch (PDOException $e) {
 			error_log("Problem connecting with readonly to MySQL server at " . $result['dbhost'] . " error:" . $e->getMessage() . " now retry primary db");
