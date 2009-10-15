@@ -1415,7 +1415,16 @@ class JobWiz_scheduleOptions extends WizStep {
 			$calllate = $accessCalllate;
 
 		$menu = array();
-		if (!((strtotime($callearly) >= strtotime($calllate)) || (strtotime($callearly) < strtotime($accessCallearly)) || (strtotime($calllate) > strtotime($accessCalllate))))
+		$callearlysec = strtotime($callearly) ;
+		$calllatesec = strtotime($calllate);
+		$accessCallearlysec = strtotime($accessCallearly);
+		$accessCalllatesec = strtotime($accessCalllate);
+
+		// Check that the NOW call early time is less than the NOW call late time
+		// and it's greater than or equal to the access profile call early time
+		// and the call late time is less than or equal to the access call late time
+		// and the proposed job window would be an hour or more
+		if (($callearlysec < $calllatesec) && ($callearlysec >= $accessCallearlysec) && ($calllatesec <= $accessCalllatesec) && (($calllatesec - $callearlysec) >= 3600))
 			$menu["now"] = _L("Now"). " ($callearly - $calllate)";
 		$menu["schedule"] = _L("Schedule and Send");
 		$menu["template"] = _L("Save for Later");
