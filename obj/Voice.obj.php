@@ -15,12 +15,7 @@ class Voice extends DBMappedObject {
 
 	// return array of Voice objects (indexed "language:gender") based on customer language table
 	static function getTTSVoices() {
-		if (getSystemSetting("_dmmethod", "asp") == "asp") {
-			$voices = DBFindMany("Voice","from ttsvoice t join language l where l.name = t.language order by t.id", "t");
-		} else {
-			// if flex customer, limit to English and Spanish
-			$voices = DBFindMany("Voice","from ttsvoice t join language l where l.name in ('English', 'Spanish') and l.name = t.language order by t.id", "t");
-		}
+		$voices = DBFindMany("Voice","from ttsvoice t join language l where l.name = t.language order by t.id", "t");
 		$retval = array();
 		foreach ($voices as $voice) {
 			$retval[$voice->language.":".$voice->gender] = $voice;
