@@ -1228,7 +1228,7 @@ if ($JOBTYPE == "repeating" && getSystemSetting("disablerepeat") ) {
 <?						} // End of languages ?>
 						</table>
 						<div id='branding'>
-						<div style="color: rgb(103, 103, 103);float: right;" class="gBranding"><span style="vertical-align: middle; font-family: arial,sans-serif; font-size: 11px;" class="gBrandingText">Translation powered by<img style="padding-left: 1px; vertical-align: middle;" alt="Google" src="http://www.google.com/uds/css/small-logo.png"></span></div>
+						<div style="color: rgb(103, 103, 103);float: right;" class="gBranding"><span style="vertical-align: middle; font-family: arial,sans-serif; font-size: 11px;" class="gBrandingText">Translation powered by<img style="padding-left: 1px; vertical-align: middle;" alt="Google" src="<?= isset($_SERVER['HTTPS'])?"https":"http" ?>://www.google.com/uds/css/small-logo.png"></span></div>
 						</div>
 					</div>
 <? 					} // End of automatic translations ?>
@@ -1403,7 +1403,7 @@ if ($JOBTYPE == "repeating" && getSystemSetting("disablerepeat") ) {
 							</tr>
 <?						} // End of languages ?>
 						</table>
-						<div style="color: rgb(103, 103, 103);float: right;" class="gBranding"><span style="vertical-align: middle; font-family: arial,sans-serif; font-size: 11px;" class="gBrandingText">Translation powered by<img style="padding-left: 1px; vertical-align: middle;" alt="Google" src="http://www.google.com/uds/css/small-logo.png"></span></div>
+						<div style="color: rgb(103, 103, 103);float: right;" class="gBranding"><span style="vertical-align: middle; font-family: arial,sans-serif; font-size: 11px;" class="gBrandingText">Translation powered by<img style="padding-left: 1px; vertical-align: middle;" alt="Google" src="<?= isset($_SERVER['HTTPS'])?"https":"http" ?>://www.google.com/uds/css/small-logo.png"></span></div>
 					</div>
 <? 					} // End of automatic translations ?>
 

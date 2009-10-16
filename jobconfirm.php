@@ -142,7 +142,7 @@ foreach($joblangs[$type] as $joblang) {
 	</table>
 <?		if (count($joblangs[$type]) != 0 && $job && $job->getSetting("jobcreated" . $type)) { ?>
 			<div id='branding'>
-				<div style="color: rgb(103, 103, 103);float: left;" class="gBranding"><span style="vertical-align: middle; font-family: arial,sans-serif; font-size: 11px;" class="gBrandingText">Translation powered by<img style="padding-left: 1px; vertical-align: middle;" alt="Google" src="http://www.google.com/uds/css/small-logo.png"></span></div>
+				<div style="color: rgb(103, 103, 103);float: left;" class="gBranding"><span style="vertical-align: middle; font-family: arial,sans-serif; font-size: 11px;" class="gBrandingText">Translation powered by<img style="padding-left: 1px; vertical-align: middle;" alt="Google" src="<?= isset($_SERVER['HTTPS'])?"https":"http" ?>://www.google.com/uds/css/small-logo.png"></span></div>
 			</div>
 <?
 		}
