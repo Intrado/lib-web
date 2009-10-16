@@ -111,7 +111,7 @@ $messages = DBFindMany("Message","from message where userid=" . $USER->id ." and
 
 $languages = QuickQueryList("select name from language where name != 'English'");
 
-$messageselect = array("" => "System Default Intro");
+$messageselect = array("" => "English - System General Intro");
 foreach($messages as $message)
 	$messageselect[$message->id] = $message->name;
 
@@ -142,7 +142,7 @@ if($defaultintro) {
 	$defaultmessages["message"][$defaultintro->id] = $defaultintro->name;
 }
 $emergencymessages = $messagevalues;
-$emergencymessages["message"][""] = "System Emergency Intro";
+$emergencymessages["message"][""] = "English - System Emergency Intro";
 if($emergencyintro) {
 	$emergencymessages["message"][$emergencyintro->id] = $emergencyintro->name;
 }
@@ -191,6 +191,11 @@ foreach($languages as $language) {
 		
 		// TODO Fix a better way of adding the set message rather than copying the array in a for loop like this. 
 		$defaultmessages = $messagevalues;
+		
+		if($language == "Spanish") {
+			$defaultmessages["message"][""] = "Spanish - System General Intro";
+		}
+		
 		$messageid = "";
 		if($defaultintro) {
 			$defaultmessages["message"][$defaultintro->id] = $defaultintro->name;
@@ -211,7 +216,13 @@ foreach($languages as $language) {
 	if($allowedjobtypes["Emergency"] > 0) {
 		$emergencyintro = DBFind("Message","from message m, prompt p where p.type='emergencyintro' and language=? and p.messageid = m.id and m.type='phone'","m",array($language));
 		$emergencymessages = $messagevalues;
-		$emergencymessages["message"][""] = "System Emergency Intro";
+		
+		if($language == "Spanish") {
+			$emergencymessages["message"][""] = "Spanish - System Emergency Intro";
+		} else {
+			$emergencymessages["message"][""] = "English - System Emergency Intro";
+		}
+		
 		$messageid = "";
 		if($emergencyintro) {
 			$emergencymessages["message"][$emergencyintro->id] = $emergencyintro->name;
