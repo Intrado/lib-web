@@ -18,7 +18,7 @@ class SelectMessage extends FormItem {
 		if ($this->args['type'] == 'email') {
 			$str .= '<tr><td class="msglabel">'._L("From").':</td><td><span id="'.$n.'from" class="msginfo">...</span></td></tr>
 			<tr><td class="msglabel">'._L("Subject").':</td><td><span id="'.$n.'subject" class="msginfo">...</span></td></tr>
-			<tr><td class="msglabel">'._L("Attachment").'t:</td><td><span id="'.$n.'attachment" class="msgattachment">...</span></td></tr>';
+			<tr><td class="msglabel">'._L("Attachment").':</td><td><span id="'.$n.'attachment" class="msgattachment">...</span></td></tr>';
 		}
 		if ($this->args['type'] == 'phone') {
 			$str .= '<tr><td class="msglabel">'._L("Preview").':</td><td>'.icon_button("Play","play",null,null,'id="'.$n.'play"').'</td></tr>';
