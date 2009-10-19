@@ -2,17 +2,21 @@
 ////////////////////////////////////////////////////////////////////////////////
 // Includes
 ////////////////////////////////////////////////////////////////////////////////
-include_once("inc/common.inc.php");
-include_once("inc/securityhelper.inc.php");
-include_once("inc/table.inc.php");
-include_once("inc/html.inc.php");
-include_once("inc/utils.inc.php");
+require_once("inc/common.inc.php");
+require_once("inc/securityhelper.inc.php");
+require_once("inc/table.inc.php");
+require_once("inc/html.inc.php");
+require_once("inc/utils.inc.php");
 require_once("obj/Validator.obj.php");
 require_once("obj/Form.obj.php");
 require_once("obj/FormItem.obj.php");
+require_once('inc/content.inc.php');
+require_once("obj/Content.obj.php");
 require_once("obj/Message.obj.php");
+require_once("obj/Voice.obj.php");
 require_once("obj/MessagePart.obj.php");
 require_once("obj/AudioFile.obj.php");
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization
@@ -89,15 +93,8 @@ class ValIntroSelect extends Validator {
 		if (isset($value["message"]) && $value["message"] != "") {
 			if ( 1 != QuickQuery('select count(*) from message where id=? and type=\'phone\'', false, array($value["message"]))) {
 				$errortext .= "Message can not be found";
-			} else {
-				$audiodata = QuickQueryRow("select group_concat(mp.txt SEPARATOR ' ') as text, sum(length(c.data)) as audiobytes 
-					from message m left join messagepart mp on (mp.messageid=m.id) left join audiofile af on (af.id=mp.audiofileid) left join content c on (c.id=af.contentid) 
-					where m.id=? group by m.id",true,false, array($value["message"]));
-		
-				$ttswords = isset($audiodata["text"])?str_word_count($audiodata["text"]):0;					
-				if($audiodata["audiobytes"] < 100000 && $ttswords < 10 && ($audiodata["audiobytes"] < 50000 && $ttswords < 5)) { // Aproximately 5 seconds of audio
-					$errortext .= "Message is too short to be a intro message.";
-				} 
+			} else if (Message::getAudioLength($value["message"],array()) < 70000) { // 70000 ~ 5 second audio
+				$errortext .= "Message must be more than 5 seconds long to be a intro message.";
 			}		
 		}				
 		if ($errortext)

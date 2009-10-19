@@ -352,6 +352,44 @@ class Message extends DBMappedObject {
 		@unlink($outname);
 	}
 
+	
+	// The only reliable way to check the message length is to render it. Return negative value on error. 
+	static function getAudioLength($id, $fields) {
+		$size = -1;
+		$renderedparts = Message::renderMessageParts($id, $fields);
+		$voices = DBFindMany("Voice","from ttsvoice");
+
+		// -- get the wav files --
+		$wavfiles = array();
+
+		foreach ($renderedparts as $part) {
+			if ($part[0] == "a") {
+				list($contenttype,$data) = contentGet($part[1]);
+				$wavfiles[] = writeWav($data);
+			} else if ($part[0] == "t") {
+				$voice = $voices[$part[2]];
+				list($contenttype,$data) = renderTts($part[1],$voice->language,$voice->gender);
+				$wavfiles[] = writeWav($data);
+			}
+		}
+		//finally, merge the wav files
+		$outname = secure_tmpname("preview",".wav");
+		
+		$messageparts = empty($wavfiles)?'':'"' . implode('" "',$wavfiles) . '" ';
+		$cmd = 'sox ' . $messageparts . '"' . $outname . '"';
+		$result = exec($cmd, $res1, $res2);
+
+		foreach ($wavfiles as $file)
+			@unlink($file);
+	
+		if (!$res2 && file_exists($outname)) {	
+			$data = file_get_contents ($outname); // readfile seems to cause problems	
+			$size = strlen($data);	
+		} 
+
+		@unlink($outname);	
+		return $size;
+	}
 }
 
 
