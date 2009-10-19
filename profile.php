@@ -266,7 +266,8 @@ _L('Messaging Options'),
 		"fieldhelp" => _L('Restricts the maximum number of call attempts a user may set for a job.'),
 		"value" => $obj->getValue("callmax") ? $obj->getValue("callmax") : 5,
 		"validators" => array(
-			array("ValInArray","values" => range(1,14))
+			array("ValNumber","min" => 1, "max" => 14),
+			array("ValNumeric")
 		),
 		"control" => array("SelectMenu", "values" => array_combine(range(1,14),range(1,14))),
 		"helpstep" => 4
@@ -342,7 +343,8 @@ _L('Advanced Job Options'),
 		"fieldhelp" => _L('Restricts the maximum number of days a user can schedule a job to run.'),
 		"value" => $obj->getValue("maxjobdays") ? $obj->getValue("maxjobdays") : 2,
 		"validators" => array(
-			array("ValInArray","values" => range(1,7))
+			array("ValNumber","min" => 1, "max" => 7),
+			array("ValNumeric")
 		),
 		"control" => array("SelectMenu", "values" => array_combine(range(1,7),range(1,7))),
 		"helpstep" => 5
