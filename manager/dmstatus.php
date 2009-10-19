@@ -82,7 +82,7 @@ echo "<div id='activeresources'></div>";
 //endWindow();
 
 //startWindow("Completed Resources");
-echo "<BR><b>COMPLTEED RESOURCES</b><BR><BR>";
+echo "<BR><b>COMPLETED RESOURCES</b><BR><BR>";
 echo "<div id='completedresources'></div>";
 //endWindow();
 ?>
