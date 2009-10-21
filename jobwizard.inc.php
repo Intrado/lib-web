@@ -1470,7 +1470,8 @@ class JobWiz_scheduleDate extends WizStep {
 		// Form Fields.
 		$formdata = array($this->title);
 
-		$dayoffset = (strtotime("now") > strtotime(($ACCESS->getValue("calllate"))?$ACCESS->getValue("calllate"):"11:59 pm"))?1:0;
+		// Make sure it's 30 minutes or more before the end of their allowed access call window
+		$dayoffset = (strtotime("now") > (strtotime(($ACCESS->getValue("calllate")?$ACCESS->getValue("calllate"):"11:59 pm")) - 1800))?1:0;
 		$helpsteps = array(_L("Choose a date for this notification to be delivered."));
 		$formdata["date"] = array(
 			"label" => _L("Start Date"),
