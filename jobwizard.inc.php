@@ -73,6 +73,54 @@ function wizHasTranslation($postdata) {
 	return false;
 }
 
+function getSchedule($postdata) {
+	global $ACCESS;
+	global $USER;
+	$schedule = array();
+	switch ($postdata["/schedule/options"]["schedule"]) {
+		case "now":
+			$callearly = date("g:i a");
+			$accessCallearly = $ACCESS->getValue("callearly");
+			if (!$accessCallearly)
+				$accessCallearly = "12:00 am";
+			$calllate = $USER->getCallLate();
+			if ((strtotime($callearly) + 3600) > strtotime($calllate))
+				$calllate = date("g:i a", strtotime($callearly) + 3600);
+			$accessCalllate = $ACCESS->getValue("calllate");
+			if (!$accessCalllate)
+				$accessCalllate = "11:59 pm";
+			if (strtotime($calllate)  > strtotime($accessCalllate))
+				$calllate = $accessCalllate;
+
+			$schedule = array(
+				"maxjobdays" => isset($postdata["/schedule/advanced"]["maxjobdays"])?$postdata["/schedule/advanced"]["maxjobdays"]:1,
+				"date" => date('m/d/Y'),
+				"callearly" => $callearly,
+				"calllate" => $calllate
+			);
+			break;
+		case "schedule":
+			$schedule = array(
+				"maxjobdays" => isset($postdata["/schedule/advanced"]["maxjobdays"])?$postdata["/schedule/advanced"]["maxjobdays"]:1,
+				"date" => date('m/d/Y', strtotime($postdata["/schedule/date"]["date"])),
+				"callearly" => $postdata["/schedule/date"]["callearly"],
+				"calllate" => $postdata["/schedule/date"]["calllate"]
+			);
+			break;
+		case "template":
+			$schedule = array(
+				"maxjobdays" => isset($postdata["/schedule/advanced"]["maxjobdays"])?$postdata["/schedule/advanced"]["maxjobdays"]:1,
+				"date" => false,
+				"callearly" => false,
+				"calllate" => false
+			);
+			break;
+		default:
+			break;
+	}
+	return $schedule;
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 // Custom Form Item Definitions
 ////////////////////////////////////////////////////////////////////////////////
@@ -363,7 +411,7 @@ class ValTextAreaPhone extends Validator {
 class ValTimeWindowCallEarly extends Validator {
 	var $onlyserverside = true;
 	function validate ($value, $args, $requiredvalues) {
-		if ((strtotime($value) + 1800) > strtotime($requiredvalues['calllate']))
+		if ((strtotime($value) + 3600) > strtotime($requiredvalues['calllate']))
 			return $this->label. " ". _L('There must be a minimum of one-half hour between start and end time');
 		return true;
 	}
@@ -372,7 +420,7 @@ class ValTimeWindowCallEarly extends Validator {
 class ValTimeWindowCallLate extends Validator {
 	var $onlyserverside = true;
 	function validate ($value, $args, $requiredvalues) {
-		if ((strtotime($value) - 1800) < strtotime($requiredvalues['callearly']))
+		if ((strtotime($value) - 3600) < strtotime($requiredvalues['callearly']))
 			return $this->label. " ". _L('There must be a minimum of one-half hour between start and end time');
 		return true;
 	}
@@ -1658,6 +1706,18 @@ class JobWiz_submitConfirm extends WizStep {
 			$calctotal = $calctotal + $renderedlist->total;
 		}
 
+		$formdata = array($this->title);
+
+		$schedule = getSchedule($postdata);
+		if ($schedule && $schedule['callearly'] && $schedule['calllate'] && ((strtotime($schedule['calllate']) - 3600) < strtotime($schedule['callearly']))) {
+			$html = '<div style="font-size: medium; color: red">' . escapehtml(_L('Your call window for this job appears to be less than one hour. It may not be able to retry all undelivered messages.'));
+			$formdata["warning"] = array(
+				"label" => '<div style="color: red;">'. _L("Warning"). '</div>',
+				"control" => array("FormHtml", "html" => $html),
+				"helpstep" => 1
+			);
+		}
+
 		$html = '<div style="font-size: medium">';
 		if ($postdata['/schedule/options']['schedule'] == 'template')
 			$html .= escapehtml(_L('You are about to save a notification to be used at a later date.')). "<br>". escapehtml(_L('Confirm and click Next to save this notification.'));
@@ -1668,7 +1728,6 @@ class JobWiz_submitConfirm extends WizStep {
 				$html = escapehtml(_L('Confirm and click Next to send this notification to the %1$s people you selected.', $calctotal, count($lists)));
 		}
 		$html .= '</div>';
-		$formdata = array($this->title);
 		$formdata["jobinfo"] = array(
 			"label" => _L("Job Info"),
 			"control" => array("FormHtml", "html" => $html),

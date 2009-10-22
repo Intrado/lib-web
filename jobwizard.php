@@ -366,48 +366,7 @@ class FinishJobWizard extends WizFinish {
 				error_log($postdata["/start"]["package"] . "is an unknown value for 'package'");
 		}
 
-		$schedule = array();
-		switch ($postdata["/schedule/options"]["schedule"]) {
-			case "now":
-				$callearly = date("g:i a");
-				$accessCallearly = $ACCESS->getValue("callearly");
-				if (!$accessCallearly)
-					$accessCallearly = "12:00 am";
-				$calllate = $USER->getCallLate();
-				if ((strtotime($callearly) + 3600) > strtotime($calllate))
-					$calllate = date("g:i a", strtotime($callearly) + 3600);
-				$accessCalllate = $ACCESS->getValue("calllate");
-				if (!$accessCalllate)
-					$accessCalllate = "11:59 pm";
-				if (strtotime($calllate)  > strtotime($accessCalllate))
-					$calllate = $accessCalllate;
-
-				$schedule = array(
-					"maxjobdays" => isset($postdata["/schedule/advanced"]["maxjobdays"])?$postdata["/schedule/advanced"]["maxjobdays"]:1,
-					"date" => date('m/d/Y'),
-					"callearly" => $callearly,
-					"calllate" => $calllate
-				);
-				break;
-			case "schedule":
-				$schedule = array(
-					"maxjobdays" => isset($postdata["/schedule/advanced"]["maxjobdays"])?$postdata["/schedule/advanced"]["maxjobdays"]:1,
-					"date" => date('m/d/Y', strtotime($postdata["/schedule/date"]["date"])),
-					"callearly" => $postdata["/schedule/date"]["callearly"],
-					"calllate" => $postdata["/schedule/date"]["calllate"]
-				);
-				break;
-			case "template":
-				$schedule = array(
-					"maxjobdays" => isset($postdata["/schedule/advanced"]["maxjobdays"])?$postdata["/schedule/advanced"]["maxjobdays"]:1,
-					"date" => false,
-					"callearly" => false,
-					"calllate" => false
-				);
-				break;
-			default:
-				break;
-		}
+		$schedule = getSchedule($postdata);
 
 		// for all the job settings on the "Advanced" step. set some advanced options that will get stuffed into the job
 		$advanced = array();
