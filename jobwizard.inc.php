@@ -422,6 +422,9 @@ class ValTimeWindowCallLate extends Validator {
 	function validate ($value, $args, $requiredvalues) {
 		if ((strtotime($value) - 3600) < strtotime($requiredvalues['callearly']))
 			return $this->label. " ". _L('There must be a minimum of one hour between start and end time');
+		$now = strtotime("now");
+		if ((date('m/d/Y', $now) == $requiredvalues['date']) && (strtotime($value) -1800 < $now))
+			return $this->label. " ". _L("There must be a minimum of one-half hour between now and end time to submit with today's date");
 		return true;
 	}
 }
@@ -434,11 +437,9 @@ class ValDate extends Validator {
 		if (isset($args['max']))
 			if (strtotime($value) > strtotime($args['max']))
 				return $this->label. " ". _L('cannot be a date later than %s', $args['max']);
-
 		return true;
 	}
 }
-
 
 ////////////////////////////////////////////////////////////////////////////////
 // Form Items
@@ -1563,7 +1564,7 @@ class JobWiz_scheduleDate extends WizStep {
 				array("ValTimeCheck", "min" => $ACCESS->getValue('callearly'), "max" => $ACCESS->getValue('calllate')),
 				array("ValTimeWindowCallLate")
 			),
-			"requires" => array("callearly"),
+			"requires" => array("callearly", "date"),
 			"control" => array("SelectMenu", "values"=>$endvalues),
 			"helpstep" => 2
 		);
@@ -1709,7 +1710,7 @@ class JobWiz_submitConfirm extends WizStep {
 		$formdata = array($this->title);
 
 		$schedule = getSchedule($postdata);
-		if ($schedule && $schedule['callearly'] && $schedule['calllate'] && ((strtotime($schedule['calllate']) - 3600) < strtotime($schedule['callearly']))) {
+		if ($schedule && $schedule['maxjobdays'] == 1 && $schedule['callearly'] && $schedule['calllate'] && ((strtotime($schedule['calllate']) - 3600) < strtotime($schedule['callearly']))) {
 			$html = '<div style="font-size: medium; color: red">' . escapehtml(_L('Your call window for this job appears to be less than one hour. It may not be able to retry all undelivered messages.'));
 			$formdata["warning"] = array(
 				"label" => '<div style="color: red;">'. _L("Warning"). '</div>',
