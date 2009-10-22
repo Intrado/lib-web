@@ -45,7 +45,7 @@ class IntroSelect extends FormItem {
 		foreach ($this->args['values'] as $key => $selectbox) {
 			$str .= '<td>';
 			if($key == "user")
-				$str .= '<select  id="' . $n . $key .'" '.$size .' onchange="loaduser(\'' . $n . '\');updatevalue(\''.$n.'\');">';
+				$str .= '<select  id="' . $n . $key .'" '.$size .' onchange="loaduser(\'' . $n . '\');updatemessage($(\''.$n.'\'));">';
 			else if($key == "message")
 				$str .= '<select  id="' . $n . $key .'" '.$size .' onchange="updatemessage(\''.$n.'\');">';
 			else
@@ -59,7 +59,7 @@ class IntroSelect extends FormItem {
 		}	
 		$str .= '<td>';
 		$defaultrequest = isset($this->args['defaultfile']) ? ''.$this->args['defaultfile'].'' : "";		
-		$str .= '<div id="' . $n . 'play">' 
+		$str .= '<div>' 
 				. icon_button(_L("Play"),"fugue/control","
 				var content = $('" . $n . "message').getValue();
 					if(content != '')
@@ -148,7 +148,15 @@ $allowedjobtypes = QuickQueryRow("select sum(jt.systempriority = 1) as Emergency
 
 
 $formdata = array();
-
+$formdata[] = array(
+			"label" => "",
+			"control" => array("FormHtml",
+				"html"=> _L("<h3>Important Information</h3>
+						<div>These intro messages will play before all phone messages. The best intro messages contain a brief greeting and instructs the user to press \"1\" to hear the message. You should also let recipients know that they can press pound to place the call on hold. 
+						</div>"),
+			),
+			"helpstep" => 1
+);
 
 $formdata[] = "Default Intro";
 if($allowedjobtypes["Other"] > 0) {
@@ -412,9 +420,9 @@ function setvalues(result,id) {
 	} else {
 		$(id + 'message').update('<option value=\"\">' + defaulttext + '</option>');
 	}
-	$(id + 'play').hide();
 }
 function loaduser(id) {
+	$(id).value = Object.toJSON({"message": ""});
 	var request = 'ajax.php?ajax&type=Messages&messagetype=phone';
 	
 	if($(id + 'user').getValue() != '')
@@ -423,14 +431,12 @@ function loaduser(id) {
 }	
 
 function updatevalue(id) {
-		var language = "";
-		if($(id+"language")!=null)
-			language = $(id+"language").value;
+	if($(id+"user") && $(id+"message")) {
 		$(id).value = Object.toJSON({
-				"language": language,
 				"user": $(id+"user").value,
 				"message": $(id+"message").value
 		});
+	}	
 }
 
 </script>
