@@ -1537,6 +1537,9 @@ $$$
 -- --------------------------
 -- start here for release 7.5
 
+INSERT into `joblist` (`jobid`, `listid`) SELECT `id`, `listid` from `job`
+$$$
+
 ALTER TABLE `job` DROP `listid`, DROP `thesql`
 $$$
 
