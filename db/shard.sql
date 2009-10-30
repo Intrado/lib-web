@@ -306,4 +306,16 @@ CREATE TABLE `aspshard`.`replicationcheck` (
 ALTER TABLE `qjob` DROP `listid`, DROP `thesql`;
 ALTER TABLE `qjoblist` DROP `thesql`;
 
+-- for looking up pending opt in messages based on timezone
+ALTER TABLE `smsblock` ADD INDEX ( `timezone` ) ;
+
+-- for sms dispatch to pull out older tasks for given status, timezone
+ALTER TABLE `smsblock` ADD INDEX `dispatch` ( `status` , `lastupdate` , `timezone` );
+
+-- dont need this anymore since dispatch key has status as prefix
+ALTER TABLE `smsblock` DROP INDEX `status` ;
+
+
+
+
 
