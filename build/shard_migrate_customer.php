@@ -6,7 +6,7 @@
 //////////////////////////////////////
 
 $customerid = ""; // asp customer id exists before we migrate the old commsuite data in
-$customerdatafile = "donotdelete_c_XXX_ASP_7-1.sql"; // file exported from old commsuite
+$customerdatafile = "donotdelete_c_XXX_ASP_7-1-2.sql"; // file exported from old commsuite
 $shardhost = "localhost"; // you want to run on the db machine for the 'mysqldump' to work
 $dbuser = "";
 $dbpass = "";
@@ -210,7 +210,7 @@ $customertables = array(
 	"surveyweb",
 	"systemmessages",
 	"systemstats",
-	"ttsvoice",
+	//"ttsvoice",
 	"user",
 	"userjobtypes",
 	"userrule",
