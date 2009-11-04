@@ -205,7 +205,7 @@ if(isset($options['jobtypes'])){
 $savedresults = array();
 if(isset($options['result'])) {
 	if ($options['result'] == "undelivered")
-		$savedresults = array("F", "B", "N", "X", "notattempted", "nocontacts", "blocked", "unsent");
+		$savedresults = array("F", "B", "N", "X", "notattempted", "declined", "blocked", "unsent");
 	else
 		$savedresults = explode("','", $options['result']);
 }

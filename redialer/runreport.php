@@ -77,6 +77,7 @@ if($type == "subscription"){
 		case 'emaildetail':
 		case 'phonedetail':
 		case 'smsdetail':
+		case 'notcontacted':
 			$generator = new JobDetailReport();
 			break;
 	}
