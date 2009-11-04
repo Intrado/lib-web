@@ -38,9 +38,6 @@ function fmt_dm_actions($row, $index){
 	$url = '<a href="dmstatus.php?dmid=' . $row[0] . '">Status</a>';
 	$url .= '&nbsp;|&nbsp;<a href="dmschedule.php?dmid=' . $row[0] . '">Resource&nbsp;Schedule</a>';
 	$url .= '&nbsp;|&nbsp;<a href="dmsettings.php?dmid=' . $row[0] . '">Route&nbsp;Plan</a>';
-	if($row[3] == "Jtapi"){
-		$url .= '&nbsp;|&nbsp;<a href="calleridroute.php?dmid=' . $row[0] . '">Caller&nbsp;ID&nbsp;Routes</a>';
-	}
 	$url .= '&nbsp;|&nbsp;<a href="dms.php?resetdm=' . $row[0] . '" onclick="return confirm(\'Are you sure you want to reset this Flex Appliance?\')">Reset</a>';
 	return $url;
 }

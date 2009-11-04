@@ -3,7 +3,7 @@
 	DM Settings Manager
 	List of settings:
 		// remote properties
-		 String dmType; // Test, Asterisk, Jtapi
+		 String dmType; // Test, Asterisk
 		 boolean dmEnabled;
 		 int resourceCount;
 		 int inboundCount;
@@ -12,13 +12,6 @@
 
 		// test voice
 		 boolean testDelay; // remote
-
-		// these are in jtapi.props, why are they here?
-		 String jtapi2cmIP; // (phase2) remote - write to jtapi config and restart
-		 String jtapi2cmUser; // remote - write to jtapi config and restart
-		 String jtapi2cmPass; // remote - write to jtapi config and restart
-
-
 
 */
 
@@ -50,7 +43,7 @@ if(isset($_GET['dmid'])){
 
 //Fetch dm settings from dmsettings table
 
-$telco_types = array("Test", "Asterisk", "Jtapi");
+$telco_types = array("Test", "Asterisk");
 $dm = QuickQueryRow("select name, lastip, lastseen, customerid, enablestate, type, authorizedip, lastip from dm where id = '" . DBSafe($dmid) . "'", true);
 
 
