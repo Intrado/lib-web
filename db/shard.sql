@@ -315,7 +315,8 @@ ALTER TABLE `smsblock` ADD INDEX `dispatch` ( `status` , `lastupdate` , `timezon
 -- dont need this anymore since dispatch key has status as prefix
 ALTER TABLE `smsblock` DROP INDEX `status` ;
 
-
+DROP TABLE `jobstatdata` ;
+ 
 
 
 
