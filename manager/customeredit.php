@@ -146,7 +146,7 @@ if(CheckFormSubmit($f,"Save") || CheckFormSubmit($f, "Return")) {
 			$managernote = GetFormData($f, $s, 'managernote');
 			$hassms = GetFormData($f, $s, 'hassms');
 			$enablesmsoptin = GetFormData($f, $s, "enablesmsoptin");
-			$smsoptintext = trim(GetFormData($f, $s, "smsoptintext"));
+			$smscustomername = trim(GetFormData($f, $s, "smscustomername"));
 			$maxsms = GetFormData($f, $s, 'maxsms');
 			$hasportal = GetFormData($f, $s, 'hasportal');
 			$hasselfsignup = GetFormData($f, $s, 'hasselfsignup');
@@ -204,8 +204,8 @@ if(CheckFormSubmit($f,"Save") || CheckFormSubmit($f, "Return")) {
 				error("Customer cannot have both Contact Manager and Self-Signup features, please select only one");
 			} else if ($emaildomainerror !== true) {
 				error($emaildomainerror);
-			} else if (strlen($smsoptintext) > 65) {
-				error('SMS Opt-in Text cannot exceed 65 characters');
+			} else if (strlen($smscustomername) > 50) {
+				error('SMS Customer Name cannot exceed 50 characters');
 			} else {
 
 				QuickUpdate("update customer set
@@ -270,7 +270,7 @@ if(CheckFormSubmit($f,"Save") || CheckFormSubmit($f, "Return")) {
 				setCustomerSystemSetting('_maxusers', $maxusers, $custdb);
 				setCustomerSystemSetting('_hassms', $hassms, $custdb);
 				setCustomerSystemSetting('enablesmsoptin', $enablesmsoptin, $custdb);
-				setCustomerSystemSetting('smsoptintext', $smsoptintext, $custdb);
+				setCustomerSystemSetting('smscustomername', $smscustomername, $custdb);
 
 				setCustomerSystemSetting('_hasportal', $hasportal, $custdb);
 				setCustomerSystemSetting('_hassurvey', GetFormData($f, $s, 'hassurvey'), $custdb);
@@ -423,7 +423,7 @@ if( $reloadform ) {
 	// SMS
 	PutFormData($f,$s,"hassms", getCustomerSystemSetting('_hassms', false, true, $custdb), "bool", 0, 1);
 	PutFormData($f, $s, "enablesmsoptin", getCustomerSystemSetting('enablesmsoptin', true, true, $custdb), "bool", 0, 1);
-	PutFormData($f, $s, "smsoptintext", getCustomerSystemSetting('smsoptintext', "You may receive text messages from Your School", false, $custdb));
+	PutFormData($f, $s, "smscustomername", getCustomerSystemSetting('smscustomername', "SchoolMessenger", false, $custdb));
 
 	PutFormData($f,$s,"hassurvey", getCustomerSystemSetting('_hassurvey', true, true, $custdb), "bool", 0, 1);
 	PutFormData($f,$s,"hasportal", getCustomerSystemSetting('_hasportal', false, true, $custdb), "bool", 0, 1);
@@ -573,7 +573,7 @@ foreach($languages as $index => $language){
 
 <tr><td> Has SMS </td><td><? NewFormItem($f, $s, 'hassms', 'checkbox') ?> SMS</td></tr>
 <tr><td> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Enable SMS Opt-in </td><td><? NewFormItem($f, $s, 'enablesmsoptin', 'checkbox') ?> Opt-in</td></tr>
-<tr><td> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SMS Opt-in Text: </td><td><? NewFormitem($f, $s, 'smsoptintext', 'textarea', 30) ?></td></tr>
+<tr><td> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SMS Customer Name: </td><td><? NewFormitem($f, $s, 'smscustomername', 'text', 25, 50) ?></td></tr>
 
 <tr><td> Has Survey </td><td><? NewFormItem($f, $s, 'hassurvey', 'checkbox') ?> Survey</td></tr>
 <tr><td> Has Contact Manager </td><td><? NewFormItem($f, $s, 'hasportal', 'checkbox') ?> Contact Manager</td></tr>
