@@ -176,7 +176,7 @@ if (CheckFormSubmit($f,$s)){
 							('surveyurl', ?),
 							('displayname', ?),
 							('timezone', ?),
-							('smsoptintext', ?),
+							('smscustomername', ?),
 							('enablesmsoptin', ?)";
 
 				QuickUpdate($query, $newdb, array($hostname, $surveyurl, $displayname, $timezone, $displayname, $enablesmsoptin)) or dieWithError(" SQL:" . $query, $newdb);
