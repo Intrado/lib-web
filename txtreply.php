@@ -17,7 +17,7 @@ if (!$is3ci && !isset($_POST['message'])) {
 // keywords
 $helpkeywords = array("help", "info", "aide");
 $optoutkeywords = array("end","stop","quit","cancel","unsubscribe","arret");
-$optinkeywords = array("optin","subscribe"); // special case "opt in" two words
+$optinkeywords = array("y","yes","optin","subscribe"); // special case "opt in" two words
 
 require_once("XML/RPC.php");
 require_once("manager/authclient.inc.php");
@@ -53,33 +53,34 @@ if ($is3ci) { // 3ci
 
 if ($inboundshortcode == "45305") {
 	// 3ci
-	$visitlink = "www.schoolmessenger.com/txt";
+	$visitlink = "schoolmessenger.com/txt";
 } else if ($inboundshortcode == "68453") {
 	// air2web US
-	$visitlink = "www.schoolmessenger.com/txtmsg";
+	$visitlink = "schoolmessenger.com/tm";
 } else if ($inboundshortcode == "724665") {
 	// air2web Canada
-	$visitlink = "www.schoolmessenger.com/txtmsg";
+	$visitlink = "schoolmessenger.com/tm";
 } else {
-	// for now assume 3ci
-	$visitlink = "www.schoolmessenger.com/txt";
+	// for now assume air2web
+	$visitlink = "schoolmessenger.com/tm";
 	error_log("unexpected incoming shortcode ".$inboundshortcode);
 }
 
 // Text Message for US up to 160 chars
-$helptext = "Text Alert Service from SchoolMessenger. For additional info visit " . $visitlink . ". Send STOP to opt out. Msg&data rates may aply";
-$infotext = $helptext;
-$optouttext = "You are now unsubscribed from the text alerts. Txt OPTIN to subscribe, HELP for help. Check out " . $visitlink . " 4 info. Msg&data rates may aply";
-$optintext = "You are now registered to receive text alerts. Txt STOP to quit, HELP for help. Check out " . $visitlink . " 4 info";
+$helptext = "Text alerts by SchoolMessenger. Reply Y for aprox 5 msgs/mo. Text STOP to quit. Msg&data rates may apply. " . $visitlink;
+$infotext = "Unknown response. Reply Y to subscribe for aprox 5 msgs/mo. Text STOP to quit. For more information reply HELP.";
+$optouttext = "You are now unsubscribed. Reply Y to re-subscribe for aprox 5 msgs/mo. HELP for help. Msg&data rates may apply. " . $visitlink;
+$optintext = "You are now registered to receive aprox 5 msgs/mo. Txt STOP to quit, HELP for help. Msg&data rates may apply. " . $visitlink;
 
-// Text Message for Canada up to 132 chars
+// Text Message for Canada up to 136 chars
+/*
 if ($inboundshortcode == "724665") {
 	$helptext = "Text Alert Service from SchoolMessenger. Send STOP or ARRET to opt out. Msg&data rates may aply";
 	$infotext = $helptext;
 	$optouttext = "You are now unsubscribed from the text alerts. Txt OPTIN to subscribe, HELP for help. Msg&data rates may aply";
 	$optintext = "You are now registered to receive text alerts. Txt STOP to quit, HELP for help.";
 }
-
+*/
 
 $message = str_replace("\n"," ",$message);
 $message = str_replace("\r"," ",$message);
