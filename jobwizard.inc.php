@@ -1419,7 +1419,7 @@ class JobWiz_messageSmsText extends WizStep {
 			"validators" => array(
 				array("ValRequired"),
 				array("ValLength","max"=>160),
-				array("ValRegExp","pattern" => "^[a-zA-Z0-9\x20\x09\x0a\x0b\x0C\x0d\x2a\<\>\?\,\.\/\{\}\|\!\@\#\$\%\&\(\)\_\+\'\"\:\;\=\-]*$")
+				array("ValRegExp","pattern" => getSmsRegExp())
 			),
 			"control" => array("TextArea","rows"=>5,"cols"=>35,"counter"=>160),
 			"helpstep" => 1

@@ -256,6 +256,9 @@ function base64url_decode($string) {
     return base64_decode($data);
 }
 
+function getSmsRegExp() {
+	return "^[a-zA-Z0-9\x20\x09\x0a\x0b\x0C\x0d\x2a\<\>\?\,\.\/\{\}\|\!\@\#\$\%\&\(\)\_\+\'\"\:\;\=\-]*$";
+}
 
 function getDomainRegExp() {
     ##################################################################################
@@ -294,7 +297,7 @@ function getEmailRegExp() {
     # This code is licensed under a Creative Commons Attribution-ShareAlike 2.5 License
     # http://creativecommons.org/licenses/by-sa/2.5/
     #
-    # $Revision: 1.91 $
+    # $Revision: 1.92 $
     # http://www.iamcal.com/publish/articles/php/parsing_email/
     ##################################################################################
 

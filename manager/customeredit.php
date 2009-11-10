@@ -204,8 +204,12 @@ if(CheckFormSubmit($f,"Save") || CheckFormSubmit($f, "Return")) {
 				error("Customer cannot have both Contact Manager and Self-Signup features, please select only one");
 			} else if ($emaildomainerror !== true) {
 				error($emaildomainerror);
+			} else if ($smscustomername == "") {
+				error('SMS Customer Name cannot be blank');
 			} else if (strlen($smscustomername) > 50) {
 				error('SMS Customer Name cannot exceed 50 characters');
+			} else if (!ereg(getSmsRegExp(),$smscustomername)) {
+				error('SMS Customer Name has invalid characters');
 			} else {
 
 				QuickUpdate("update customer set
