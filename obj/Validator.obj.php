@@ -6,20 +6,20 @@ abstract class Validator {
 	var $onlyserverside = false; //set this if you don't have a JS validator
 	var $requiredfields = array();
 
-	/* 
-	 * spits out javascript required to install a validator in the form 
+	/*
+	 * spits out javascript required to install a validator in the form
 	 * Takes a list of class names
 	 */
 	static function load_validators ($validators) {
-		
+
 		echo "if (!document.validators) document.validators = {};\n";
-		
+
 		foreach ($validators as $validator) {
 			$obj = new $validator();
 ?>
 		//constructor for <?=$validator?>
-		
-		document.validators["<?=$validator?>"] = 
+
+		document.validators["<?=$validator?>"] =
 			function (name, label, args) {
 				this.validator = "<?=$validator?>";
 				this.onlyserverside = <?= $obj->onlyserverside ? "true" : "false" ?>;
@@ -29,26 +29,26 @@ abstract class Validator {
 				this.validate = <?= $obj->getJSValidator() ?>;
 		};
 <?
-			
+
 		}
 	}
-	
-	/* 
-	 * works pre-merge 
+
+	/*
+	 * works pre-merge
 	 */
 	static function validate_item ($formdata,$name,$value,$requiredvalues = array()) {
 		$validators = $formdata[$name]['validators'];
-		
+
 		foreach ($validators as $validatordata) {
 			$validator = $validatordata[0];
 			//only validate non empty values (unless its the ValRequired validator)
-			if ($validator == "ValRequired" || ((is_array($value) && count($value)) || (!is_array($value) && mb_strlen($value) > 0))) {		
+			if ($validator == "ValRequired" || ((is_array($value) && count($value)) || (!is_array($value) && mb_strlen($value) > 0))) {
 				$obj = new $validator();
 				$obj->label = $formdata[$name]['label'];
 				$obj->name = $name;
-				
+
 				$res = $obj->validate($value, $validatordata,$requiredvalues);
-				
+
 				if ($res !== true)
 					return array($validator,$res);
 			}
@@ -61,7 +61,7 @@ abstract class Validator {
 	function validate($value, $args) {
 		return "Unimplemented";
 	}
-	
+
 	/* abstract */
 	function getJSValidator () {
 		return '
@@ -71,18 +71,18 @@ abstract class Validator {
 			}
 		';
 	}
-	
+
 }
 
 class ValRequired extends Validator {
 	function validate ($value, $args) {
 		if ((is_array($value) && !count($value)) || (!is_array($value) && mb_strlen($value) == 0))
-			return "$this->label is required";		
+			return "$this->label is required";
 		return true;
 	}
-	
+
 	function getJSValidator () {
-		return 
+		return
 			'function (name, label, value, args) {
 				if (value.length == 0)
 					return label + " is required";
@@ -92,7 +92,7 @@ class ValRequired extends Validator {
 }
 
 class ValLength extends Validator {
-	
+
 	function validate ($value, $args) {
 		$hasmin = isset($args['min']) && $args['min'] !== false;
 		if ($hasmin)
@@ -100,17 +100,17 @@ class ValLength extends Validator {
 		$hasmax = isset($args['max']) && $args['max'] !== false;
 		if ($hasmax)
 			$max = $args['max']+0;
-		
+
 		if ($hasmin && mb_strlen($value) < $min)
 			return "$this->label must be at least $min characters long";
 		if ($hasmax && mb_strlen($value) > $max)
 			return "$this->label cannot be more than $max characters long";
-		
+
 		return true;
 	}
-	
+
 	function getJSValidator () {
-		return 
+		return
 			'function (name, label, value, args) {
 				if (args.min && value.length < args.min)
 					return label + " must be at least " + args.min + " characters long";
@@ -122,7 +122,7 @@ class ValLength extends Validator {
 }
 
 class ValNumber extends Validator {
-	
+
 	function validate ($value, $args) {
 		$hasmin = isset($args['min']) && $args['min'] !== false;
 		if ($hasmin)
@@ -130,32 +130,32 @@ class ValNumber extends Validator {
 		$hasmax = isset($args['max']) && $args['max'] !== false;
 		if ($hasmax)
 			$max = $args['max']+0;
-		
+
 		if (!ereg("^-?[0-9]*\.?[0-9]+$",$value))
 			return "$this->label must be a number";
-		
+
 		if ($hasmin && $value < $min)
 			return "$this->label cannot be less than $min";
 		if ($hasmax && $value > $max)
 			return "$this->label cannot be greater than $max";
-		
+
 		return true;
 	}
-	
+
 	function getJSValidator () {
-		return 
+		return
 			'function (name, label, value, args) {
 				var re = /^-?[0-9]*\.?[0-9]+$/;
-				
+
 				if (!re.test(value))
 					return label + " must be a number";
-				
+
 				var f = parseFloat(value);
 				if (args.min && f < args.min)
 					return label + " cannot be less than " + args.min;
 				if (args.max && f > args.max)
 					return label + " cannot be greater than " + args.max;
-				
+
 				return true;
 			}';
 	}
@@ -163,7 +163,7 @@ class ValNumber extends Validator {
 
 
 class ValNumeric extends Validator {
-	
+
 	function validate ($value, $args) {
 		$hasmin = isset($args['min']) && $args['min'] !== false;
 		if ($hasmin)
@@ -171,48 +171,52 @@ class ValNumeric extends Validator {
 		$hasmax = isset($args['max']) && $args['max'] !== false;
 		if ($hasmax)
 			$max = $args['max']+0;
-		
+
 		if (!ereg("^[0-9]*$",$value))
 			return "$this->label must be numeric";
-		
+
 		if ($hasmin && mb_strlen($value) < $min)
 			return "$this->label must be at least $min digits long";
 		if ($hasmax && mb_strlen($value) > $max)
 			return "$this->label cannot be more than $max digits long";
-		
+
 		return true;
 	}
-	
+
 	function getJSValidator () {
-		return 
+		return
 			'function (name, label, value, args) {
 				var re = /^[0-9]*$/;
-				
+
 				if (!re.test(value))
 					return label + " must be numeric";
-				
+
 				if (args.min && value.length < args.min)
 					return label + " must be at least " + args.min + " digits long";
 				if (args.max && value.length > args.max)
 					return label + " cannot be more than " + args.max + " digits long";
-				
+
 				return true;
 			}';
 	}
 }
 
-//
-// requires inc/utils.inc.php validEmail() and checkEmailDomain()
-//
-// optional args.domain to validate the address matches this domain
-// optional args.subdomain (default false) to allow subdomains
-//
+/**
+ * Requires inc/utils.inc.php validEmail() and checkEmailDomain()
+ * @var String $args['domain'] If set, used to validate the address matches this domain
+ * @var String $args['subdomain'] If set (default false), used to allow subdomains
+ * @var String $args['field'] If set, only continue to validate if $requiredvalues[$args['field']] == $args['requirefieldvalue']; assumes $args['requirefieldvalue'] is also set.
+ * @var String $args['requirefieldvalue'] If set, only continue to validate if $requiredvalues[$args['field']] == $args['requirefieldvalue']; assumes $args['field'] is also set.
+ */
 class ValEmail extends Validator {
-	
-	function validate ($value, $args) {
+
+	function validate ($value, $args, $requiredvalues) {
+		if (!empty($args['requirefieldvalue']) && $requiredvalues[$args['field']] != $args['requirefieldvalue'])
+			return true;
+
 		if (!validEmail($value))
 			return "$this->label is not a valid email format";
-			
+
 		if (isset($args['domain'])) {
 			$subdomain = false;
 			if (isset($args['subdomain']))
@@ -224,19 +228,22 @@ class ValEmail extends Validator {
 		}
 		return true;
 	}
-	
+
 	function getJSValidator () {
 		$addr_spec = addslashes(getEmailRegExp());
-		
-		return 
-			'function (name, label, value, args) {
+
+		return
+			'function (name, label, value, args, requiredvalues) {
+				if (args["requirefieldvalue"] && requiredvalues[args["field"]] != args["requirefieldvalue"])
+					return true;
+
 				var emailregexp = "^' . $addr_spec . '$";
 				var reg = new RegExp(emailregexp);
 				var r = reg.exec(value);
 				// r is null, or [0] is match, [1] is username, [2] is @, [3] is domain
 				if (r == null)
 					return label + " is an invalid email format";
-				
+
 				if (args.domain) {
 					var matched = false;
 					var lowdomainvalue = r[3].toLowerCase();
@@ -263,9 +270,9 @@ class ValEmail extends Validator {
 // requires inc/utils.inc.php checkemails()
 //
 class ValEmailList extends Validator {
-	
+
 	function validate ($value, $args) {
-		
+
 		if ($bademaillist = checkemails($value)) {
 			$errmsg = "$this->label has invalid emails.  Each email must be separated by a semi-colon. Invalid emails found are: ";
 			foreach ($bademaillist as $bademail) {
@@ -277,11 +284,11 @@ class ValEmailList extends Validator {
 
 		return true;
 	}
-	
+
 	function getJSValidator () {
 		$addr_spec = getEmailRegExp();
 
-		return 
+		return
 			'function (name, label, value, args) {
 				var isbad = false;
 				var badnames = "";
@@ -305,20 +312,20 @@ class ValEmailList extends Validator {
 }
 
 class ValDomain extends Validator {
-	
+
 	function validate ($value, $args) {
 		$domainregexp = getDomainRegExp();
-		
+
 		if (!preg_match("!^$domainregexp$!", $value))
 			return "$this->label is not a valid domain format";
-			
+
 		return true;
 	}
-	
+
 	function getJSValidator () {
 		$domainregexp = addslashes(getDomainRegExp());
-		
-		return 
+
+		return
 			'function (name, label, value, args) {
 				var domainregexp = "^' . $domainregexp . '$";
 				var reg = new RegExp(domainregexp);
@@ -331,18 +338,18 @@ class ValDomain extends Validator {
 }
 
 class ValDomainList extends Validator {
-	
+
 	function validate ($value, $args) {
 		$errmsg = validateDomainList($value);
 		if ($errmsg !== true)
 			return "$this->label has invalid domains.  ".$errmsg;
 		return true;
 	}
-	
+
 	function getJSValidator () {
 		$domainregexp = addslashes(getDomainRegExp());
-		
-		return 
+
+		return
 			'function (name, label, value, args) {
 				var domainregexp = "^' . $domainregexp . '$";
 				var reg = new RegExp(domainregexp);
@@ -365,12 +372,16 @@ class ValDomainList extends Validator {
 	}
 }
 
-//
-// requires obj/Phone.obj.php validate()
-//
+/**
+ * Requires obj/Phone.obj.php validate()
+ * @var String $args['field'] If set, only continue to validate if $requiredvalues[$args['field']] == $args['requirefieldvalue']; assumes $args['requirefieldvalue'] is also set.
+ * @var String $args['requirefieldvalue'] If set, only continue to validate if $requiredvalues[$args['field']] == $args['requirefieldvalue']; assumes $args['field'] is also set.
+ */
 class ValPhone extends Validator {
-	
-	function validate ($value, $args) {
+	function validate ($value, $args, $requiredvalues) {
+		if (!empty($args['requirefieldvalue']) && $requiredvalues[$args['field']] != $args['requirefieldvalue'])
+			return true;
+
 		if ($err = Phone::validate($value)) {
 			$errmsg = "$this->label is invalid.  ";
 			foreach ($err as $e) {
@@ -381,15 +392,18 @@ class ValPhone extends Validator {
 
 		return true;
 	}
-	
+
 	function getJSValidator () {
-		return 
-			'function (name, label, value, args) {
+		return
+			'function (name, label, value, args, requiredvalues) {
+				if (args["requirefieldvalue"] && requiredvalues[args["field"]] != args["requirefieldvalue"])
+					return true;
+
 				var phone = value.replace(/[^0-9]/g,"");
 				if (phone.length == 10) {
 					var areacode = phone.substring(0, 3);
 					var prefix = phone.substring(3, 6);
-			
+
 					// based on North American Numbering Plan
 					// read more at en.wikipedia.org/wiki/List_of_NANP_area_codes
 
@@ -424,7 +438,7 @@ class ValPhone extends Validator {
 							)) {
 							return true; // OK special case
 						}
-				
+
 						return label + " seems to be invalid.";
 					}
 					return true;
@@ -439,14 +453,14 @@ class ValPhone extends Validator {
 /*
  * must set args[field] to the same as the formdata['requires'] field
  */
-class ValFieldConfirmation extends Validator {	
-	function validate ($value, $args, $requiredvalues) {	
+class ValFieldConfirmation extends Validator {
+	function validate ($value, $args, $requiredvalues) {
 		if ($requiredvalues[$args['field']] != $value)
-			return "$this->label does not match!";	
+			return "$this->label does not match!";
 		return true;
 	}
 	function getJSValidator () {
-		return 
+		return
 			'function (name, label, value, args, requiredvalues) {
 				if (requiredvalues[args["field"]] != value)
 					return this.label +" does not match!";
@@ -466,12 +480,12 @@ class ValInArray extends Validator {
 			return "$this->label must be an item from the list of available choices.";
 		return true;
 	}
-	
+
 	function getJSValidator () {
-		return 
+		return
 			'function (name, label, value, args) {
 				var values = args.values;
-								
+
 				if (Object.isArray(value)) {
 					//find every value
 					for (var i = 0; i < value.length; i++) {
@@ -480,7 +494,7 @@ class ValInArray extends Validator {
 						for (var j = 0; j < values.length; j++) {
 							if (item == values[j])
 								found = true;
-						}	
+						}
 						if (!found)
 							return label + " must be items from the list of available choices.";
 					}
@@ -489,7 +503,7 @@ class ValInArray extends Validator {
 					for (var j = 0; j < values.length; j++) {
 						if (value == values[j])
 							found = true;
-					}				
+					}
 					if (!found)
 						return label + " must be an item from the list of available choices.";
 				}
@@ -500,19 +514,19 @@ class ValInArray extends Validator {
 
 class ValTimeCheck extends Validator {
 	var $onlyserverside = true;
-	
+
 	function validate ($value, $args, $requiredvalues) {
 		$value = strtotime($value);
-		
+
 		$hasmin = isset($args['min']) && $args['min'] !== false;
 		if ($hasmin)
 			$min = strtotime($args['min']);
 		$hasmax = isset($args['max']) && $args['max'] !== false;
 		if ($hasmax)
 			$max = strtotime($args['max']);
-		
+
 		if ($value == -1 || $value === false)
-			return _L("%$1s is not a valid time format",$this->label);		
+			return _L("%$1s is not a valid time format",$this->label);
 		if ($hasmin && $value < $min)
 			return _L("%$1s cannot be earlier than %$2s", $this->label, $args['min']);
 		if ($hasmax && $value > $max)
@@ -522,15 +536,38 @@ class ValTimeCheck extends Validator {
 	}
 }
 
+/**
+ * @var Boolean $args["rangedonly"] If true, only allow 'xdays' and 'daterange'
+ */
 class ValReldate extends Validator {
 	var $onlyserverside = true;
-	
+
 	// @param $valueJSON = ['reldate':'', 'xdays':'', 'startdate':'', 'enddate':'']
 	function validate ($valueJSON, $args, $requiredvalues) {
 		$data = json_decode($valueJSON, true);
-		if (!is_array($data) || empty($data) || empty($data['reldate']))
+		if (!is_array($data) || empty($data))
 			return true; // Don't complain if there is no data.
-		
+
+		$errBadOption = _L("You must specify a valid date option");
+		if (empty($data['reldate'])) {
+			return $errBadOption;
+		} else if (!empty($args["rangedonly"]) && !in_array($data['reldate'], array(
+			'xdays',
+			'daterange'
+		))) {
+			return $errBadOption;
+		} else if (!in_array($data['reldate'], array(
+			'today',
+			'yesterday',
+			'lastweekday',
+			'weektodate',
+			'monthtodate',
+			'xdays',
+			'daterange'
+		))) {
+			return $errBadOption;
+		}
+
 		if ($data['reldate'] == 'daterange') {
 			if (empty($data['startdate']) || empty($data['enddate']))
 				return _L("You must specify both start and end dates");
@@ -543,20 +580,20 @@ class ValReldate extends Validator {
 		} else if ($data['reldate'] == 'xdays' && (!isset($data['xdays']) || !is_numeric($data['xdays']))) {
 			return _L("You must enter a number for X days");
 		}
-		
+
 		return true;
 	}
 }
 
 class ValRegExp extends Validator {
-	function validate ($value, $args) {		
+	function validate ($value, $args) {
 		if (!ereg($args["pattern"], $value))
-			return _L("Invalid character in ")." ".$this->label;	
+			return _L("Invalid character in ")." ".$this->label;
 		return true;
 	}
-	
+
 	function getJSValidator () {
-		return 
+		return
 			'function (name, label, value, args) {
 				var reg = new RegExp(args["pattern"]);
 				if (reg.exec(value) == null)

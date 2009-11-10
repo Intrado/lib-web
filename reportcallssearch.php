@@ -96,8 +96,22 @@ $possibleresults = array("A" => "Answered",
 	"sent" => "Sent",
 	"unsent" => "Unsent",
 	"declined" => "No Destination Selected");
-	
+
 $options = $_SESSION['report']['options'];
+
+if (!empty($options['personid'])) {
+	$searchmethod = 'personid';
+	$searchvalue = $options['personid'];
+} else if (!empty($options['phone'])) {
+	$searchmethod = 'phone';
+	$searchvalue = $options['phone'];
+} else if (!empty($options['email'])) {
+	$searchmethod = 'email';
+	$searchvalue = $options['email'];
+} else {
+	$searchmethod = 'personid';
+	$searchvalue = '';
+}
 
 $rulesjson = '';
 if (!empty($options['rules'])) {
@@ -116,29 +130,37 @@ if(isset($options['results'])){
 	$savedresults = explode("','", $options['results']);
 }
 
+
 $formdata = array();
 
-$formdata["personid"] = array(
-	"label" => _L("Person ID"),
-	"value" => isset($options['personid']) ? $options['personid'] : '',
-	"control" => array("TextField"),
-	"validators" => array(),
+$formdata["searchmethod"] = array(
+	"label" => _L("Search By"),
+	"value" => $searchmethod,
+	"control" => array("RadioButton", "values" => array(
+			"personid" => _L("Person ID"), // pkey
+			"phone" => _L("Phone"),
+			"email" => _L("Email")
+		)
+	),
+	"validators" => array(array("ValRequired"), array("ValInArray", "values" => array(
+			"personid", // pkey
+			"phone",
+			"email"
+		)
+	)),
 	"helpstep" => 1
 );
 
-$formdata["phone"] = array(
-	"label" => _L("Phone"),
-	"value" => isset($options['phone']) ? Phone::format($options['phone']) : '',
+$formdata["searchvalue"] = array(
+	"label" => _L("Search Value"),
+	"value" => $searchvalue,
 	"control" => array("TextField"),
-	"validators" => array(array("ValPhone")),
-	"helpstep" => 1
-);
-
-$formdata["email"] = array(
-	"label" => _L("Email"),
-	"value" => isset($options['email']) ? $options['email'] : '',
-	"control" => array("TextField"),
-	"validators" => array(array("ValEmail")),
+	"validators" => array(
+		array("ValRequired"),
+		array("ValPhone", "field" => "searchmethod", "requirefieldvalue" => "phone"),
+		array("ValEmail", "field" => "searchmethod", "requirefieldvalue" => "email")
+	),
+	"requires" => array("searchmethod"),
 	"helpstep" => 1
 );
 
@@ -154,13 +176,13 @@ $formdata["ruledata"] = array(
 $formdata["dateoptions"] = array(
 	"label" => _L("Date Options"),
 	"value" => json_encode(array(
-		"reldate" => isset($options['reldate']) ? $options['reldate'] : '',
-		"xdays" => isset($options['lastxdays']) ? $options['lastxdays'] : '',
+		"reldate" => isset($options['reldate']) ? $options['reldate'] : 'xdays',
+		"xdays" => isset($options['lastxdays']) ? $options['lastxdays'] : '7',
 		"startdate" => isset($options['startdate']) ? $options['startdate'] : '',
 		"enddate" => isset($options['enddate']) ? $options['enddate'] : ''
 	)),
-	"control" => array("ReldateOptions"),
-	"validators" => array(array("ValReldate")),
+	"control" => array("ReldateOptions", "rangedonly" => true),
+	"validators" => array(array("ValRequired"), array("ValReldate", "rangedonly" => true, "defaultxdays" => 7)),
 	"helpstep" => 1
 );
 
@@ -220,11 +242,11 @@ $errors = false;
 
 //check for form submission
 if ($button = $form->getSubmit()) { //checks for submit and merges in post data
-	$ajax = $form->isAjaxSubmit(); //whether or not this requires an ajax response	
-	
+	$ajax = $form->isAjaxSubmit(); //whether or not this requires an ajax response
+
 	if (($errors = $form->validate()) === false) { //checks all of the items in this form
 		$postdata = $form->getData(); //gets assoc array of all values {name:value,...}
-				
+
 		if ($ajax) {
 			if (in_array($button,array('addrule','deleterule','view'))) {
 				if (isset($_SESSION['report']['options']['rules']))
@@ -233,20 +255,18 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 					'reporttype' => 'contacthistory',
 					'rules' => isset($rules) ? $rules : array()
 				);
-				
-				$phone = Phone::parse($postdata['phone']);
-				
-				if (!empty($postdata['personid']))
-					$_SESSION['report']['options']['personid'] = $postdata['personid'];
-				if (!empty($postdata['phone']))
-					$_SESSION['report']['options']['phone'] = $phone;
-				if (!empty($postdata['email']))
-					$_SESSION['report']['options']['email'] = $postdata['email'];
-				
+
+				if ($postdata['searchmethod'] == 'personid')
+					$_SESSION['report']['options']['personid'] = $postdata['searchvalue'];
+				if ($postdata['searchmethod'] == 'phone')
+					$_SESSION['report']['options']['phone'] = Phone::parse($postdata['searchvalue']);
+				if ($postdata['searchmethod'] == 'email')
+					$_SESSION['report']['options']['email'] = $postdata['searchvalue'];
+
 				$dateOptions = json_decode($postdata['dateoptions'], true);
 				if (!empty($dateOptions['reldate'])) {
 					$_SESSION['report']['options']['reldate'] = $dateOptions['reldate'];
-					
+
 					if ($dateOptions['reldate'] == 'xdays' && !empty($dateOptions['xdays'])) {
 						$_SESSION['report']['options']['lastxdays'] = $dateOptions['xdays'];
 					} else if ($dateOptions['reldate'] == 'daterange') {
@@ -256,7 +276,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 							$_SESSION['report']['options']['enddate'] = $dateOptions['enddate'];
 					}
 				}
-				
+
 				if (!empty($postdata['jobtypes'])) {
 					$temp = array();
 					foreach($postdata['jobtypes'] as $savedjobtype) {
@@ -270,7 +290,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 						$temp[] = DBSafe($savedresult);
 					$_SESSION['report']['options']['results'] = implode("','", $temp);
 				}
-				
+
 				switch ($button) {
 					case 'addrule':
 						$data = json_decode($postdata['ruledata']);
@@ -284,7 +304,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 						}
 						$form->sendTo("reportcallssearch.php");
 						break;
-						
+
 					case 'deleterule':
 						if (!empty($_SESSION['report']['options']['rules'])) {
 							$fieldnum = $postdata['ruledata'];
@@ -292,7 +312,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 						}
 						$form->sendTo("reportcallssearch.php");
 						break;
-						
+
 					case 'view':
 						$form->sendTo("reportcallsresult.php");
 						break;
@@ -322,7 +342,7 @@ startWindow(_L("Person Notification Search"), "padding: 3px;");
 	echo "<div id='metadataTempDiv' style='display:none'>";
 		select_metadata(null, null, $fields);
 	echo "</div>";
-	
+
 	?>
 		<script type="text/javascript">
 			<? Validator::load_validators(array("ValRules", "ValReldate")); ?>
@@ -336,7 +356,7 @@ endWindow();
 			ruleWidget.delayActions = true;
 			ruleWidget.container.observe('RuleWidget:AddRule', rulewidget_add_rule);
 			ruleWidget.container.observe('RuleWidget:DeleteRule', rulewidget_delete_rule);
-			
+
 			var jobtypesCheckboxes = $('<?=$form->name?>_jobtypes').select('input');
 			$('<?=$form->name?>_jobtype').observe('click', function(event, jobtypesCheckboxes) {
 				if (!this.checked) {
@@ -348,7 +368,7 @@ endWindow();
 			jobtypesCheckboxes.invoke('observe', 'click', function(event) {
 				$('<?=$form->name?>_jobtype').checked = true;
 			});
-			
+
 			var resultsCheckboxes = $('<?=$form->name?>_results').select('input');
 			$('<?=$form->name?>_result').observe('click', function(event, resultsCheckboxes) {
 				if (!this.checked) {
@@ -360,7 +380,7 @@ endWindow();
 			resultsCheckboxes.invoke('observe', 'click', function(event) {
 				$('<?=$form->name?>_result').checked = true;
 			});
-			
+
 			$('metadataDiv').update($('metadataTempDiv').innerHTML);
 		});
 

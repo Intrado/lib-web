@@ -67,7 +67,7 @@ if (isset($_GET['reportid'])) {
 	if (!userOwns("reportsubscription", $_GET['reportid']+0)) {
 		redirect('unauthorized.php');
 	}
-	
+
 	$_SESSION['reportid'] = $_GET['reportid']+0;
 
 	$subscription = new ReportSubscription($_SESSION['reportid']);
@@ -155,7 +155,7 @@ switch($_SESSION['report']['type']){
 			"unsent" => "Unsent",
 			"declined" => "No Destination Selected");
 		break;
-		
+
 	case "email":
 		$possibleresults = array("sent" => "Sent",
 			"unsent" => "Unsent",
@@ -163,14 +163,14 @@ switch($_SESSION['report']['type']){
 			"declined" => "No Email Selected");
 
 		break;
-	
+
 	case "sms":
 		$possibleresults = array("sent" => "Sent",
 			"unsent" => "Unsent",
 			"duplicate" => "Duplicate",
 			"declined" => "No SMS Selected");
 		break;
-	
+
 	default:
 		$possibleresults = array("A" => "Answered",
 			"M" => "Machine",
@@ -187,7 +187,7 @@ switch($_SESSION['report']['type']){
 			"declined" => "No Destination Selected");
 		break;
 }
-	
+
 $options = $_SESSION['report']['options'];
 
 $rulesjson = '';
@@ -209,7 +209,7 @@ if(isset($options['result'])) {
 	else
 		$savedresults = explode("','", $options['result']);
 }
-	
+
 $jobid = isset($options['jobid']) ? $options['jobid']: '';
 $jobtypefilter = "";
 if (isset($_SESSION['report']['type'])) {
@@ -237,7 +237,7 @@ $jobsarchived = DBFindMany("Job","from job j where deleted = 2 and status!='repe
 foreach ($jobsarchived as $job) {
 	$jobidsarchived[$job->id] = $job->name;
 }
-	
+
 $formdata = array();
 $formdata["radioselect"] = array(
 	"label" => _L("Search on job or date"),
@@ -274,7 +274,7 @@ $formdata["checkarchived"] = array(
 $formdata["dateoptions"] = array(
 	"label" => _L("Date Options"),
 	"value" => json_encode(array(
-		"reldate" => isset($options['reldate']) ? $options['reldate'] : '',
+		"reldate" => isset($options['reldate']) ? $options['reldate'] : 'today',
 		"xdays" => isset($options['lastxdays']) ? $options['lastxdays'] : '',
 		"startdate" => isset($options['startdate']) ? $options['startdate'] : '',
 		"enddate" => isset($options['enddate']) ? $options['enddate'] : ''
@@ -363,13 +363,13 @@ $errors = false;
 
 //check for form submission
 if ($button = $form->getSubmit()) { //checks for submit and merges in post data
-	$ajax = $form->isAjaxSubmit(); //whether or not this requires an ajax response	
-	
+	$ajax = $form->isAjaxSubmit(); //whether or not this requires an ajax response
+
 	if ($form->checkForDataChange()) {
 		$datachange = true;
 	} else if (($errors = $form->validate()) === false) { //checks all of the items in this form
 		$postdata = $form->getData(); //gets assoc array of all values {name:value,...}
-		
+
 		if ($ajax) {
 			if (in_array($button,array('addrule','deleterule','view', 'save'))) {
 				if (isset($_SESSION['report']['options']['rules']))
@@ -379,7 +379,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 					'rules' => isset($rules) ? $rules : array()
 				);
 				set_session_options_reporttype();
-				
+
 				switch($postdata['radioselect']){
 					case "job":
 						if ($postdata['checkarchived'])
@@ -392,7 +392,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 						$dateOptions = json_decode($postdata['dateoptions'], true);
 						if (!empty($dateOptions['reldate'])) {
 							$_SESSION['report']['options']['reldate'] = $dateOptions['reldate'];
-							
+
 							if ($dateOptions['reldate'] == 'xdays' && !empty($dateOptions['xdays'])) {
 								$_SESSION['report']['options']['lastxdays'] = $dateOptions['xdays'];
 							} else if ($dateOptions['reldate'] == 'daterange') {
@@ -404,7 +404,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 						}
 						break;
 				}
-				
+
 				if (isset($postdata['multipleorderby'])) {
 					$multipleorderby = $postdata['multipleorderby'];
 					if (is_array($multipleorderby)) {
@@ -417,7 +417,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 						set_session_options_orderby();
 					}
 				}
-					
+
 				if (!empty($postdata['jobtypes'])) {
 					$temp = array();
 					foreach($postdata['jobtypes'] as $savedjobtype) {
@@ -431,7 +431,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 						$temp[] = DBSafe($savedresult);
 					$_SESSION['report']['options']['result'] = implode("','", $temp);
 				}
-				
+
 				switch ($button) {
 					case 'addrule':
 						$data = json_decode($postdata['ruledata']);
@@ -445,7 +445,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 						}
 						$form->sendTo("reportjobdetailsearch.php");
 						break;
-						
+
 					case 'deleterule':
 						if (!empty($_SESSION['report']['options']['rules'])) {
 							$fieldnum = $postdata['ruledata'];
@@ -453,11 +453,11 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 						}
 						$form->sendTo("reportjobdetailsearch.php");
 						break;
-						
+
 					case 'view':
 						$form->sendTo("reportjobdetails.php");
 						break;
-						
+
 					case 'save':
 						set_session_options_activefields();
 						$form->sendTo("reportedit.php");
@@ -489,7 +489,7 @@ function set_session_options_reporttype() {
 
 function set_session_options_activefields() {
 	global $fields;
-	
+
 	$activefields = array();
 	foreach($fields as $field){
 		if(isset($_SESSION['report']['fields'][$field->fieldnum]) && $_SESSION['report']['fields'][$field->fieldnum]){
@@ -535,7 +535,7 @@ startWindow(_L("Select"), "padding: 3px;");
 	echo "<div id='metadataTempDiv' style='display:none'>";
 		select_metadata(null, null, $fields);
 	echo "</div>";
-	
+
 	?>
 		<script type="text/javascript">
 			<? Validator::load_validators(array("ValRules", "ValReldate")); ?>
@@ -549,13 +549,13 @@ endWindow();
 			ruleWidget.delayActions = true;
 			ruleWidget.container.observe('RuleWidget:AddRule', rulewidget_add_rule);
 			ruleWidget.container.observe('RuleWidget:DeleteRule', rulewidget_delete_rule);
-			
+
 			$('<?=$form->name?>_radioselect').select('input').invoke('observe', 'click', function(event) {
 				var radio = event.element();
 				if (radio.value == 'job') {
 					$('<?=$form->name?>_dateoptions').up('tr').hide();
 					$('<?=$form->name?>_checkarchived').up('tr').show();
-					
+
 					if ($('<?=$form->name?>_checkarchived').checked) {
 						$('<?=$form->name?>_jobid').up('tr').hide();
 						$('<?=$form->name?>_jobidarchived').up('tr').show();
@@ -570,7 +570,7 @@ endWindow();
 					$('<?=$form->name?>_checkarchived').up('tr').hide();
 				}
 			});
-			
+
 			$('<?=$form->name?>_checkarchived').observe('click', function(event) {
 				if (event.element().checked) {
 					$('<?=$form->name?>_jobid').up('tr').hide();
@@ -580,7 +580,7 @@ endWindow();
 					$('<?=$form->name?>_jobidarchived').up('tr').hide();
 				}
 			});
-			
+
 			var jobtypesCheckboxes = $('<?=$form->name?>_jobtypes').select('input');
 			$('<?=$form->name?>_jobtype').observe('click', function(event, jobtypesCheckboxes) {
 				if (!this.checked) {
@@ -592,7 +592,7 @@ endWindow();
 			jobtypesCheckboxes.invoke('observe', 'click', function(event) {
 				$('<?=$form->name?>_jobtype').checked = true;
 			});
-			
+
 			var resultsCheckboxes = $('<?=$form->name?>_results').select('input');
 			$('<?=$form->name?>_result').observe('click', function(event, resultsCheckboxes) {
 				if (!this.checked) {
@@ -604,12 +604,12 @@ endWindow();
 			resultsCheckboxes.invoke('observe', 'click', function(event) {
 				$('<?=$form->name?>_result').checked = true;
 			});
-			
+
 			var radioselectchoice = $('<?=$form->name?>_radioselect').down('input:checked');
 			if (radioselectchoice.value == 'job') {
 				$('<?=$form->name?>_dateoptions').up('tr').hide();
 				$('<?=$form->name?>_checkarchived').up('tr').show();
-				
+
 				if ($('<?=$form->name?>_checkarchived').checked) {
 					$('<?=$form->name?>_jobid').up('tr').hide();
 					$('<?=$form->name?>_jobidarchived').up('tr').show();
@@ -624,7 +624,7 @@ endWindow();
 				$('<?=$form->name?>_jobidarchived').up('tr').hide();
 				$('<?=$form->name?>_checkarchived').up('tr').hide();
 			}
-				
+
 			$('metadataDiv').update($('metadataTempDiv').innerHTML);
 		});
 
