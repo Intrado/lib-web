@@ -246,23 +246,27 @@ class MultipleOrderBy extends FormItem {
 /** Replaces dateOptions() in reportutils.inc.php
  * @var Boolean $args['infinite'] If true shows 'Select Date Range'
  * @var Boolean $args['rangedonly'] If true, only allow 'xdays' and 'daterange'
+ * @var Integer $args['defaultxdays']
  */
 class ReldateOptions extends FormItem {
 	// @param $valueJSON = ['reldate':'', 'xdays':'', 'startdate':'', 'enddate':'']
 	function render ($valueJSON) {
 		global $LOCALE;
 
+		$defaultxdays = !isset($this->args['defaultxdays']) ? '' : $this->args['defaultxdays'];
+
 		$n = $this->form->name."_".$this->name;
 
 		$hiddenField = "<input id='$n' name='$n' type='hidden' value='".escapehtml($valueJSON)."' />";
 
 		$data = json_decode($valueJSON, true);
-		if (!is_array($data) || empty($data))
-			$data = array('reldate' => '', 'xdays' => '', 'startdate' => '', 'enddate' => '');
+		if (!is_array($data) || empty($data)) {
+			$data = array('reldate' => '', 'xdays' => $defaultxdays, 'startdate' => '', 'enddate' => '');
+		}
 
 		$onchange = "if (this.value != \"xdays\") { $(\"{$n}_xdaysContainer\").hide(); } else { $(\"{$n}_xdaysContainer\").show(); } if (this.value != \"daterange\") { $(\"{$n}_dateContainer\").hide(); } else { $(\"{$n}_dateContainer\").show(); } ";
 		$onchange .= " $(\"$n\").value = \$H({\"reldate\":this.value}).toJSON(); ";
-		$onchange .= " $(\"{$n}_xdays\").value = \"\"; $(\"{$n}_startdate\").value = \"\"; $(\"{$n}_enddate\").value = \"\";";
+		$onchange .= " $(\"{$n}_xdays\").value = \"$defaultxdays\"; $(\"{$n}_startdate\").value = \"\"; $(\"{$n}_enddate\").value = \"\";";
 		$selectbox = "<select id='{$n}_reldate' onchange='$onchange'>";
 			if (!empty($this->args['infinite']))
 				$selectbox .= "<option value=''>" . _L("-- Select Date Range --") . "</option>";
@@ -290,9 +294,9 @@ class ReldateOptions extends FormItem {
 			}
 		$selectbox .= "</select>";
 
-		$xdaysValue = !empty($data['xdays']) ? $data['xdays'] : '';
+		$xdaysValue = isset($data['xdays']) ? $data['xdays'] : $defaultxdays;
 		$xdaysChange = "$(\"$n\").value = \$H({\"reldate\":$(\"{$n}_reldate\").value, \"xdays\":this.value}).toJSON();";
-		$xdays = _L("Days: ") . "<input type='text' size='3' id='{$n}_xdays' value='$xdaysValue' onchange='$xdaysChange'/>";
+		$xdays = _L("Days: ") . "<input type='text' size='3' id='{$n}_xdays' value='$xdaysValue' onfocus='$xdaysChange' onblur='$xdaysChange' onchange='$xdaysChange'/>";
 
 		$dateChange = " $(\"$n\").value = \$H({\"reldate\":$(\"{$n}_reldate\").value, \"startdate\":$(\"{$n}_startdate\").value, \"enddate\":$(\"{$n}_enddate\").value}).toJSON(); ";
 		$dateFocus = " this.select(); $dateChange; ";

@@ -393,8 +393,8 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 						if (!empty($dateOptions['reldate'])) {
 							$_SESSION['report']['options']['reldate'] = $dateOptions['reldate'];
 
-							if ($dateOptions['reldate'] == 'xdays' && !empty($dateOptions['xdays'])) {
-								$_SESSION['report']['options']['lastxdays'] = $dateOptions['xdays'];
+							if ($dateOptions['reldate'] == 'xdays' && isset($dateOptions['xdays'])) {
+								$_SESSION['report']['options']['lastxdays'] = $dateOptions['xdays'] + 0;
 							} else if ($dateOptions['reldate'] == 'daterange') {
 								if (!empty($dateOptions['startdate']))
 									$_SESSION['report']['options']['startdate'] = $dateOptions['startdate'];
@@ -641,3 +641,4 @@ endWindow();
 <?
 	require_once("navbottom.inc.php");
 ?>
+
