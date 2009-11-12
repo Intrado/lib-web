@@ -170,8 +170,9 @@ var RuleWidget = Class.create({
 							break; // Bad data.
 
 						if (rules[i].fieldnum && !this.fieldmaps[rules[i].fieldnum]) {
-							if (this.ruleEditor)
+							if (this.ruleEditor) {
 								someUnused = true;
+							}
 							continue;
 						}
 						this.insert_rule(rules[i], true);

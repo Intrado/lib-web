@@ -14,10 +14,10 @@ class FormRuleWidget extends FormItem {
 			$ignoredFields = json_encode($this->args["ignoredFields"]);
 		else
 			$ignoredFields = json_encode(array());
-			
+
 		$readonly = (!empty($this->args["readonly"])) ? json_encode(true) : json_encode(false);
 		$showRemoveAllButton = !empty($this->args["showRemoveAllButton"]) ? json_encode(true) : json_encode(false);
-		
+
 		$inputname = $this->form->name."_".$this->name;
 		if (!$rulesJSON || !is_array(json_decode($rulesJSON)))
 			$rulesJSON = '[]';//'[{fieldnum:"f01", type:"text", logical:"and", op:"eq", val:"Kee-Yip"}, {fieldnum:"f02", type:"text", logical:"and", op:"eq", val:"Chan"}]';
@@ -34,12 +34,12 @@ class FormRuleWidget extends FormItem {
 				if (!document.formvars) {
 					return;
 				}
-				
+
 				if (!deleterule)
 					$('$inputname').value = ruleWidget.toJSON();
 				if (pending)
 					$('$inputname').value = 'pending';
-				
+
 				rulewidget_do_validation();
 			}
 			function rulewidget_do_validation() {
@@ -50,6 +50,10 @@ class FormRuleWidget extends FormItem {
 			ruleWidget.container.observe('RuleWidget:AddRule', rulewidget_update_value.bindAsEventListener(ruleWidget,false));
 			ruleWidget.container.observe('RuleWidget:ChangeField', rulewidget_update_value.bindAsEventListener(ruleWidget));
 			ruleWidget.container.observe('RuleWidget:DeleteRule', rulewidget_update_value.bindAsEventListener(ruleWidget, false, true));
+			ruleWidget.container.observe('RuleWidget:RemoveAllRules', function() {
+				this.clear_rules();
+				rulewidget_update_value(null,false,true).bind(this);
+			}.bindAsEventListener(ruleWidget));
 			ruleWidget.startup($rulesJSON);
 			</script>";
 		return $html;
@@ -63,10 +67,10 @@ class ValRules extends Validator {
 		$msgIncompleteRule = addslashes(_L("Incomplete rule data"));
 		$msgRuleAlreadyExists = addslashes(_L("Rule already exists"));
 		$msgUnauthorizedFieldmap = addslashes(_L("Unauthorized fieldmap"));
-	
+
 		if ($valueJSON == 'pending')
 			return $msgPleaseFinish;
-		
+
 		$ruledata = json_decode($valueJSON);
 		if (!is_array($ruledata) || empty($ruledata)) // Do not complain if no rules are specified
 			return true;
@@ -85,22 +89,22 @@ class ValRules extends Validator {
 		}
 		return true;
 	}
-	
+
 	function getJSValidator () {
 		$msgPleaseFinish = addslashes(_L("Please finish adding your rule"));
 		$msgIncompleteRule = addslashes(_L("Incomplete rule data"));
 		$msgRuleAlreadyExists = addslashes(_L("Rule already exists"));
 		$msgUnauthorizedFieldmap = addslashes(_L("Unauthorized fieldmap"));
-	
+
 		return "
 			function (name, label, value, args) {
 				if (value == 'pending')
 					return '$msgPleaseFinish';
-					
+
 				var ruledata = value.evalJSON();
 				if (!ruledata || !ruledata.join)
 					return true; // Do not complain if no rules are specified
-					
+
 				for (var i = 0; i < ruledata.length; ++i) {
 					if (!ruledata[i].fieldnum || !ruledata[i].type || !ruledata[i].logical || !ruledata[i].op)
 						return '$msgIncompleteRule';

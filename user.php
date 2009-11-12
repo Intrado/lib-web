@@ -322,7 +322,8 @@ $fields = QuickQueryMultiRow("select fieldnum from fieldmap where options not li
 $ignoredFields = array();
 foreach ($fields as $fieldnum)
 	$ignoredFields[] = $fieldnum[0];
-if (!in_array('c01', $ignoredFields)) $ignoredFields[] = 'c01';
+if (!in_array('c01', $ignoredFields))
+	$ignoredFields[] = 'c01';
 $formdata["datarules"] = array(
 	"label" => _L("Data Restriction"),
 	"fieldhelp" => _L('If the user should only be able to access certain data, you may create restriction rules here.'),
@@ -330,7 +331,7 @@ $formdata["datarules"] = array(
 	"validators" => array(
 		array("ValRules")
 	),
-	"control" => array("FormRuleWidget", "ignoredFields" => $ignoredFields),
+	"control" => array("FormRuleWidget", "ignoredFields" => $ignoredFields, "showRemoveAllButton" => true),
 	"helpstep" => 1
 );
 
@@ -557,7 +558,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 
 			if(count($postdata['jobtypes']))
 				foreach($postdata['jobtypes'] as $type)
-					QuickUpdate("insert into userjobtypes values (?, ?)", false, array($edituser->id, $type));					
+					QuickUpdate("insert into userjobtypes values (?, ?)", false, array($edituser->id, $type));
 			if (getSystemSetting("_hassurvey", true) && isset($postdata['surveytypes']) && count($postdata['surveytypes']))
 				foreach($postdata['surveytypes'] as $type)
 					QuickUpdate("insert into userjobtypes values (?, ?)", false, array($edituser->id, $type));
