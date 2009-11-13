@@ -16,8 +16,8 @@ if (!$is3ci && !isset($_POST['message'])) {
 
 // keywords
 $helpkeywords = array("help", "info", "aide");
-$optoutkeywords = array("end","stop","quit","cancel","unsubscribe","arret");
-$optinkeywords = array("y","yes","optin","subscribe"); // special case "opt in" two words
+$optoutkeywords = array("end","stop","quit","cancel","unsubscribe","arret","delete","remove"); // special case "wrong XXX" two words anywhere
+$optinkeywords = array("y","yes","optin","subscribe","yea","yeah","ok","okay","register"); // special case "opt in" two words
 
 require_once("XML/RPC.php");
 require_once("manager/authclient.inc.php");
@@ -86,31 +86,49 @@ $message = str_replace("\n"," ",$message);
 $message = str_replace("\r"," ",$message);
 $message = trim($message);
 
-$splitmessage = explode(" ", $message, 2);
+//split on any non alpha character, do not return empty elements
+$words = preg_split("/[^a-zA-Z]+/",$message,-1,PREG_SPLIT_NO_EMPTY);
+
+//remove all ignored words from the beginning of the message
+$ignorewords = array("re","reply","please","plz","hi","hello");
+while (count($words) && in_array($words[0],$ignorewords))
+        array_shift($words); //remove first element
+
+$splitmessage = $words;
 
 //check to see if this txt message has any of our keywords
 $hashelp = false;
 foreach ($helpkeywords as $keyword) {
-	if (stripos($splitmessage[0],$keyword) === 0) {
+	if ($splitmessage[0] == $keyword) {
 		$hashelp = true;
 	}
 }
 $hasoptout = false;
 foreach ($optoutkeywords as $keyword) {
-	if (stripos($splitmessage[0],$keyword) === 0) {
+	if ($splitmessage[0] == $keyword) {
 		$hasoptout = true;
+	}
+}
+// special case 'wrong' phrases
+$wrongindex = array_search('wrong', $splitmessage);
+if ($wrongindex !== false && isset($splitmessage[$wrongindex+1])) {
+	$secondwords = array("number","no","num","phone","person","contact");
+	foreach ($secondwords as $keyword) {
+		if ($splitmessage[$wrongindex+1] == $keyword) {
+			$hasoptout = true;
+		}
 	}
 }
 $hasoptin = false;
 foreach ($optinkeywords as $keyword) {
-	if (stripos($splitmessage[0],$keyword) === 0) {
+	if ($splitmessage[0] == $keyword) {
 		$hasoptin = true;
 	}
 }
 // special case 'opt in' two words
 if (isset($splitmessage[1]) &&
-	(stripos($splitmessage[0], 'opt') === 0) && 
-	(stripos($splitmessage[1], 'in') === 0)) {
+	($splitmessage[0] == 'opt') && 
+	($splitmessage[1] == 'in')) {
 		$hasoptin = true;
 }
 
@@ -137,7 +155,7 @@ if ($hashelp) {
 	
 	logExit("OPTIN");
 } else {
-	// Send a reply sms message if not in our keyword list, but only if we haven't already today
+	// Send a reply sms message if not in our keyword list, after 5 times today, skip to prevent auto-spamming
 
 	// Check file mod time
 	if (file_exists($throttlefile) && date('y m d', filemtime($throttlefile)) === date('y m d')) {
@@ -153,10 +171,14 @@ if ($hashelp) {
 	}
 	//do we need to check for this number?
 	if (!$newfile) {
+		$infotoday = 0; // count how many responses they sent today, reply up to 5 times (prevent auto-spamming)
 		while (!feof($throttlefp)) {
 			if (trim(fgets($throttlefp)) === $sourceaddress) {
-				fclose($throttlefp);
-				logExit("NONE");
+				$infotoday++;
+				if ($infotoday >= 5) {
+					fclose($throttlefp);
+					logExit("NONE");
+				}
 			}
 		}
 	}
@@ -172,14 +194,12 @@ if ($hashelp) {
 
 function sendtxt($shortcode, $sourceaddress, $replybody) {
 	global $is3ci, $username, $password, $air2username, $air2password;
-	//if ($sourceaddress == "18316006719") {
-	//	$is3ci = true;
-	//	$shortcode = "45305";
-	//}
+	
 	if ($is3ci)
 		sendtxt3ci($username, $password, $shortcode, $sourceaddress, $replybody);
 	else
 		sendtxtAir2Web($air2username, $air2password, $shortcode, $sourceaddress, $replybody);
+	
 }
 
 function sendtxt3ci($username, $password, $shortcode, $sourceaddress, $replybody) {
