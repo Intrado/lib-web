@@ -94,15 +94,16 @@ if ($badcode) {
 	startWindow("Email Blocked");
 	?>
 		<h1>Your request has been processed</h1>
-		<p>Your email (<?=$email?>) will no longer receive messages from <?=$customer?>.</p>
+		<p>Your email (<?=$email?>) will no longer receive <b>ANY</b> messages from <?=$customer?>.</p>
 		<p>To re-subscribe, contact <?=$customer?>.</p>
 	<?
 	endWindow();} else {
 	startWindow("Block My Email Address", false, false, false);
 	?>
 		<div>
-			<h1>Confirm your email address below</h1>
-			<p>Once blocked, you will no longer receive messages from <?=$customer?> to the following address.</p>
+			<h1>To unsubscribe from <b>ALL</b> messages, confirm your email address below</h1>
+			<p>Once blocked, you will no longer receive any emails from <?=$customer?> to the following address.</p>
+			<p><big style="color: #cc0000;">This may include emergency broadcasts and other important announcements.</big></p>
 			<div><div style="float:left; margin-right: 5px">Email:</div><div style="padding-left: 3px; padding-right: 3px; width: auto; float: left"><?=$email?></div></div>
 			<div style="clear: both; margin-bottom: 10px"><img src="img/pixel.gif" /></div>
 			<form method="POST" action="blockmyemail.php">
