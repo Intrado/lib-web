@@ -296,7 +296,7 @@ class ReldateOptions extends FormItem {
 
 		$xdaysValue = isset($data['xdays']) ? $data['xdays'] : $defaultxdays;
 		$xdaysChange = "$(\"$n\").value = \$H({\"reldate\":$(\"{$n}_reldate\").value, \"xdays\":this.value}).toJSON();";
-		$xdays = _L("Days: ") . "<input type='text' size='3' id='{$n}_xdays' value='$xdaysValue' onfocus='$xdaysChange' onblur='$xdaysChange' onchange='$xdaysChange'/>";
+		$xdays = _L("Days: ") . "<input type='text' size='3' id='{$n}_xdays' value='$xdaysValue' onclick='$xdaysChange' onfocus='$xdaysChange' onblur='$xdaysChange' onchange='$xdaysChange'/>";
 
 		$dateChange = " $(\"$n\").value = \$H({\"reldate\":$(\"{$n}_reldate\").value, \"startdate\":$(\"{$n}_startdate\").value, \"enddate\":$(\"{$n}_enddate\").value}).toJSON(); ";
 		$dateFocus = " this.select(); $dateChange; ";
