@@ -201,19 +201,12 @@ class ValNumeric extends Validator {
 	}
 }
 
-/**
- * Requires inc/utils.inc.php validEmail() and checkEmailDomain()
- * @var String $args['domain'] If set, used to validate the address matches this domain
- * @var String $args['subdomain'] If set (default false), used to allow subdomains
- * @var String $args['field'] If set, only continue to validate if $requiredvalues[$args['field']] == $args['requirefieldvalue']; assumes $args['requirefieldvalue'] is also set.
- * @var String $args['requirefieldvalue'] If set, only continue to validate if $requiredvalues[$args['field']] == $args['requirefieldvalue']; assumes $args['field'] is also set.
- */
+// Requires inc/utils.inc.php validEmail() and checkEmailDomain()
+// $args['domain'] If set, used to validate the address matches this domain
+// $args['subdomain'] If set (default false), used to allow subdomains
 class ValEmail extends Validator {
 
-	function validate ($value, $args, $requiredvalues) {
-		if (!empty($args['requirefieldvalue']) && $requiredvalues[$args['field']] != $args['requirefieldvalue'])
-			return true;
-
+	function validate ($value, $args) {
 		if (!validEmail($value))
 			return "$this->label is not a valid email format";
 
@@ -233,10 +226,7 @@ class ValEmail extends Validator {
 		$addr_spec = addslashes(getEmailRegExp());
 
 		return
-			'function (name, label, value, args, requiredvalues) {
-				if (args["requirefieldvalue"] && requiredvalues[args["field"]] != args["requirefieldvalue"])
-					return true;
-
+			'function (name, label, value, args) {
 				var emailregexp = "^' . $addr_spec . '$";
 				var reg = new RegExp(emailregexp);
 				var r = reg.exec(value);
@@ -372,16 +362,9 @@ class ValDomainList extends Validator {
 	}
 }
 
-/**
- * Requires obj/Phone.obj.php validate()
- * @var String $args['field'] If set, only continue to validate if $requiredvalues[$args['field']] == $args['requirefieldvalue']; assumes $args['requirefieldvalue'] is also set.
- * @var String $args['requirefieldvalue'] If set, only continue to validate if $requiredvalues[$args['field']] == $args['requirefieldvalue']; assumes $args['field'] is also set.
- */
+// Requires obj/Phone.obj.php validate()
 class ValPhone extends Validator {
-	function validate ($value, $args, $requiredvalues) {
-		if (!empty($args['requirefieldvalue']) && $requiredvalues[$args['field']] != $args['requirefieldvalue'])
-			return true;
-
+	function validate ($value, $args) {
 		if ($err = Phone::validate($value)) {
 			$errmsg = "$this->label is invalid.  ";
 			foreach ($err as $e) {
@@ -395,10 +378,7 @@ class ValPhone extends Validator {
 
 	function getJSValidator () {
 		return
-			'function (name, label, value, args, requiredvalues) {
-				if (args["requirefieldvalue"] && requiredvalues[args["field"]] != args["requirefieldvalue"])
-					return true;
-
+			'function (name, label, value, args) {
 				var phone = value.replace(/[^0-9]/g,"");
 				if (phone.length == 10) {
 					var areacode = phone.substring(0, 3);
@@ -536,9 +516,7 @@ class ValTimeCheck extends Validator {
 	}
 }
 
-/**
- * @var Boolean $args["rangedonly"] If true, only allow 'xdays' and 'daterange'
- */
+// $args["rangedonly"] If true, only allow 'xdays' and 'daterange'
 class ValReldate extends Validator {
 	var $onlyserverside = true;
 

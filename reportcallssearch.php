@@ -73,6 +73,57 @@ foreach ($fields as $field) {
 $_SESSION['report']['options']['activefields'] = implode(",",$activefields);
 
 ////////////////////////////////////////////////////////////////////////////////
+// Custom Validators
+////////////////////////////////////////////////////////////////////////////////
+class ValContactHistorySearch extends Validator {
+	function validate ($value, $args, $requiredvalues) {
+		global $formdata;
+
+		switch ($requiredvalues[$args['field']]) {
+			case 'phone':
+				$validator = new ValPhone();
+				$validator->label = $formdata["searchvalue"]["label"];
+				$validator->name = "ValPhone";
+
+				return $validator->validate($value, $args);
+
+			case 'email':
+				$validator = new ValEmail();
+				$validator->label = $formdata["searchvalue"]["label"];
+				$validator->name = "ValEmail";
+				return $validator->validate($value, $args);
+
+			case 'personid':
+				return true;
+
+			default:
+				return $this->label . _L(" is not valid");
+		}
+	}
+
+	function getJSValidator () {
+		return
+			'function (name, label, value, args, requiredvalues) {
+				switch (requiredvalues[args["field"]]) {
+					case "phone":
+						var validator = new document.validators["ValPhone"](name,label,args);
+						return validator.validate(name, label, value, args);
+
+					case "email":
+						var validator = new document.validators["ValEmail"](name,label,args);
+						return validator.validate(name, label, value, args);
+
+					case "personid":
+						return true;
+
+					default:
+						return label + " is not valid";
+				}
+			}';
+	}
+}
+
+////////////////////////////////////////////////////////////////////////////////
 // FORM DATA
 ////////////////////////////////////////////////////////////////////////////////
 if (getSystemSetting('_hassurvey', true))
@@ -133,21 +184,16 @@ if(isset($options['results'])){
 
 $formdata = array();
 
+$validsearchmethods = array(
+	"personid" => _L("ID Number"), // pkey
+	"phone" => _L("Phone"),
+	"email" => _L("Email")
+);
 $formdata["searchmethod"] = array(
 	"label" => _L("Search By"),
 	"value" => $searchmethod,
-	"control" => array("RadioButton", "values" => array(
-			"personid" => _L("Person ID"), // pkey
-			"phone" => _L("Phone"),
-			"email" => _L("Email")
-		)
-	),
-	"validators" => array(array("ValRequired"), array("ValInArray", "values" => array(
-			"personid", // pkey
-			"phone",
-			"email"
-		)
-	)),
+	"control" => array("RadioButton", "values" => $validsearchmethods),
+	"validators" => array(array("ValRequired"), array("ValInArray", "values" => array_keys($validsearchmethods))),
 	"helpstep" => 1
 );
 
@@ -157,8 +203,7 @@ $formdata["searchvalue"] = array(
 	"control" => array("TextField"),
 	"validators" => array(
 		array("ValRequired"),
-		array("ValPhone", "field" => "searchmethod", "requirefieldvalue" => "phone"),
-		array("ValEmail", "field" => "searchmethod", "requirefieldvalue" => "email")
+		array("ValContactHistorySearch", "field" => "searchmethod")
 	),
 	"requires" => array("searchmethod"),
 	"helpstep" => 1
@@ -177,7 +222,7 @@ $formdata["dateoptions"] = array(
 	"label" => _L("Date Options"),
 	"value" => json_encode(array(
 		"reldate" => isset($options['reldate']) ? $options['reldate'] : 'xdays',
-		"xdays" => isset($options['lastxdays']) ? $options['lastxdays'] : '7',
+		"xdays" => isset($options['lastxdays']) ? $options['lastxdays'] : '30',
 		"startdate" => isset($options['startdate']) ? $options['startdate'] : '',
 		"enddate" => isset($options['enddate']) ? $options['enddate'] : ''
 	)),
@@ -345,7 +390,7 @@ startWindow(_L("Person Notification Search"), "padding: 3px;");
 
 	?>
 		<script type="text/javascript">
-			<? Validator::load_validators(array("ValRules", "ValReldate")); ?>
+			<? Validator::load_validators(array("ValRules", "ValReldate", "ValContactHistorySearch")); ?>
 		</script>
 	<?
 	echo $form->render();
