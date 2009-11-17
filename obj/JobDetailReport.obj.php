@@ -43,7 +43,8 @@ class JobDetailReport extends ReportGenerator{
 		$this->params['joblist'] = $joblist;
 		$resultquery = "";
 		if(isset($this->params['result']) && $this->params['result']){
-			if($this->params['result'] == "undelivered"){
+			
+			if($this->params['result'] == "undelivered" || $_SESSION['report']['type'] == "notcontacted"){
 
 				$undeliveredpersons = QuickQueryList("select rp.personid, sum(rp.iscontacted) as cnt, sum(rp2.iscontacted) as cnt2 from reportperson rp
 											left join reportperson rp2 on (rp2.personid = rp.duplicateid and rp2.jobid = rp.jobid and rp2.type = rp.type)
