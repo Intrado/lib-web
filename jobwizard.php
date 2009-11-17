@@ -93,6 +93,11 @@ $wizdata = array(
 	))
 );
 
+function getSmsMessageLinkText() {
+	// Redialer will append the URL with link code, and if has callback the inbound number, HELP 4 info.
+	return getSystemSetting("smscustomername", "SchoolMessenger") . " sent a msg. ";
+}
+
 class FinishJobWizard extends WizFinish {
 	function phoneRecordedMessage($msgdata) {
 		$retval = array();
@@ -228,18 +233,12 @@ class FinishJobWizard extends WizFinish {
 				}
 				if ($wizHasSmsMsg) {
 
-					$custname = $_SESSION['custname'];
-					if (strlen($custname) > 40)
-						$custname = substr($custname,0,40);
-
 					$smsmessagelink = true;
 					$smsMsg = array("Default" => array(
 						"id" => false,
-						"text" => $custname . " sent you a msg. 4 info txt HELP. To listen ",
+						"text" => getSmsMessageLinkText(),
 						"language" => "english"
 					));
-					if (getSystemSetting("_hascallback"))
-						$smsMsg["Default"]["text"] .= "call ". Phone::format(getSystemSetting("inboundnumber")) . " ";
 				}
 				break;
 			//Express Text
@@ -336,11 +335,9 @@ class FinishJobWizard extends WizFinish {
 							$smsmessagelink = true;
 							$smsMsg = array("Default" => array(
 								"id" => false,
-								"text" => "Phone message from ". $_SESSION['custname']. "\n",
+								"text" => getSmsMessageLinkText(),
 								"language" => "english"
 							));
-							if (getSystemSetting("_hascallback"))
-								$smsMsg["Default"]["text"] .= "To listen dial ". Phone::format(getSystemSetting("inboundnumber")). "\n\n";
 							break;
 						case "text":
 							$smsMsg = array("Default" => array(
