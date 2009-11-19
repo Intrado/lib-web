@@ -21,3 +21,8 @@ $$$
 insert into setting (name, value) select 'smscustomername', value from setting where name = 'displayname' on duplicate key update name='smscustomername'
 $$$
 
+ALTER TABLE `blockeddestination` ADD `failattempts` TINYINT( 4 ) NULL ;
+$$$
+
+ALTER TABLE `blockeddestination` ADD UNIQUE `typedestination` ( `type` , `destination` )
+$$$
