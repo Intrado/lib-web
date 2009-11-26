@@ -47,9 +47,9 @@ $destsharddb = DBConnect($desthost,$destuser,$destpass,"aspshard") or die("Can't
 
 //sanity checks
 echo "doing sanity checks\n";
-//customer has active jobs
 
-$query = "select count(*) from qjob where status in ('processing', 'procactive', 'active')";
+//customer has active jobs
+$query = "select count(*) from qjob where customerid=$customerid and status in ('processing', 'procactive', 'active', 'cancelling')";
 if (QuickQuery($query,$srcsharddb))
 	die("There are active jobs!");
 
@@ -88,7 +88,7 @@ QuickUpdate($query,$destsharddb) or die ("Failed to create new DB $newdbname : "
 $destsharddb->query("use ".$newdbname) or die ("Failed select db $newdbname : " . errorinfo($destsharddb));
 
 QuickUpdate("drop user '$newdbname'", $destsharddb); //ensure mysql credentials match our records, which it won't if create user fails because the user already exists
-QuickUpdate("drop user '$newlimitedname'", $destsharddb); //ensure mysql credentials match our records, which it won't if create user fails because the user already exists
+QuickUpdate("drop user '$limitedusername'", $destsharddb); //ensure mysql credentials match our records, which it won't if create user fails because the user already exists
 QuickUpdate("create user '$newdbname' identified by '$newpass'", $destsharddb);
 QuickUpdate("grant select, insert, update, delete, create temporary tables, execute on $newdbname . * to '$newdbname'", $destsharddb);
 
@@ -174,14 +174,14 @@ if ($rowcount === false)
 	dieerror ("Failed to execute statement \n$query\n\nfor c_$customerid : ", $destsharddb);
 
 // joblist
-$query = "INSERT ignore INTO aspshard.qjoblist (customerid, jobid, listid) SELECT ".$customerid.", jobid, listid FROM joblist WHERE jobid in (select id from job where status in ('repeating', 'scheduled'))";
-mysql_query("START TRANSACTION", $custdb);
-mysql_query($query,$custdb)
-	or die ("Failed to execute statement \n$query\n\nfor $customerdbname : " . mysql_error($custdb));
+$query = "INSERT INTO aspshard.qjoblist (customerid, jobid, listid) SELECT ".$customerid.", jobid, listid FROM joblist WHERE jobid in (select id from job where status in ('repeating', 'scheduled'))";
+$rowcount = QuickUpdate($query,$destsharddb);
+if ($rowcount === false)
+	dieerror ("Failed to execute statement \n$query\n\nfor c_$customerid : ", $destsharddb);
 
 // repeating job
-$query = "INSERT INTO aspshard.qjob (id, customerid, userid, scheduleid, listid, phonemessageid, emailmessageid, printmessageid, smsmessageid, questionnaireid, timezone, startdate, enddate, starttime, endtime, status, jobtypeid)" .
-         " select id, ".$customerid.", userid, scheduleid, listid, phonemessageid, emailmessageid, printmessageid, smsmessageid, questionnaireid, '".$timezone."', startdate, enddate, starttime, endtime, 'repeating', jobtypeid from job where status='repeating'";
+$query = "INSERT INTO aspshard.qjob (id, customerid, userid, scheduleid, phonemessageid, emailmessageid, printmessageid, smsmessageid, questionnaireid, timezone, startdate, enddate, starttime, endtime, status, jobtypeid)" .
+         " select id, ".$customerid.", userid, scheduleid, phonemessageid, emailmessageid, printmessageid, smsmessageid, questionnaireid, '".$timezone."', startdate, enddate, starttime, endtime, 'repeating', jobtypeid from job where status='repeating'";
 $rowcount = QuickUpdate($query,$destsharddb);
 if ($rowcount === false)
 	dieerror ("Failed to execute statement \n$query\n\nfor c_$customerid : ", $destsharddb);
@@ -193,8 +193,8 @@ if ($rowcount === false)
 	dieerror ("Failed to execute statement \n$query\n\nfor c_$customerid : ", $destsharddb);
 
 // future job
-$query = "INSERT INTO aspshard.qjob (id, customerid, userid, scheduleid, listid, phonemessageid, emailmessageid, printmessageid, smsmessageid, questionnaireid, timezone, startdate, enddate, starttime, endtime, status, jobtypeid)" .
-         " select id, ".$customerid.", userid, scheduleid, listid, phonemessageid, emailmessageid, printmessageid, smsmessageid, questionnaireid, '".$timezone."', startdate, enddate, starttime, endtime, 'scheduled', jobtypeid from job where status='scheduled'";
+$query = "INSERT INTO aspshard.qjob (id, customerid, userid, scheduleid, phonemessageid, emailmessageid, printmessageid, smsmessageid, questionnaireid, timezone, startdate, enddate, starttime, endtime, status, jobtypeid)" .
+         " select id, ".$customerid.", userid, scheduleid, phonemessageid, emailmessageid, printmessageid, smsmessageid, questionnaireid, '".$timezone."', startdate, enddate, starttime, endtime, 'scheduled', jobtypeid from job where status='scheduled'";
 $rowcount = QuickUpdate($query,$destsharddb);
 if ($rowcount === false)
 	dieerror ("Failed to execute statement \n$query\n\nfor c_$customerid : ", $destsharddb);
@@ -211,13 +211,13 @@ $srcsharddb->query("use aspshard"); //ensure src shard connection is set to asps
 
 //update authserver to point to new customer info
 //update shardid and password
-$query = "update customer set dbusername='" . DBSafe($newuser,$authdb) . "', limitedusername='" . DBSafe($limitedusername, $authdb) . "', shardid=$destshard, dbpassword='" . DBSafe($newpass,$authdb) . "' where id=$customerid";
+$query = "update customer set dbusername='" . DBSafe($newdbname,$authdb) . "', limitedusername='" . DBSafe($limitedusername, $authdb) . "', shardid=$destshard, dbpassword='" . DBSafe($newpass,$authdb) . "' where id=$customerid";
 if (QuickUpdate($query,$authdb) === false)
 	echo "Problem updating customer table:" . errorinfo($authdb) . "\n";
 
 //remove shard tables from old shard
 echo "deleting old shard records:";
-$tablearray = array("importqueue", "jobstatdata", "qjobperson", "qjobtask", "specialtaskqueue", "qreportsubscription", "qjobsetting", "qschedule", "qjob");
+$tablearray = array("importqueue", "qjobperson", "qjobtask", "specialtaskqueue", "qreportsubscription", "qjobsetting", "qschedule", "qjob");
 foreach ($tablearray as $t) {
 	echo ".";
 	$query = "delete from ".$t." where customerid=$customerid";
