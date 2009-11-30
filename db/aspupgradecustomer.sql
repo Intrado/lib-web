@@ -26,3 +26,6 @@ $$$
 
 ALTER TABLE `blockeddestination` ADD UNIQUE `typedestination` ( `type` , `destination` )
 $$$
+
+ALTER TABLE `blockeddestination` ADD `blockmethod` ENUM( 'manual', 'pending', 'autoblock' ) NOT NULL ;
+$$$
