@@ -102,7 +102,7 @@ mysql_query("COMMIT",$custdb);
 // remove any data from shard (customer may have been active for a bit in testing)
 echo "Removing shard bits\n";
 mysql_select_db("aspshard");
-$tablearray = array("importqueue", "jobstatdata", "qjobperson", "qjobtask", "specialtaskqueue", "qreportsubscription", "qjobsetting", "qschedule", "qjob");
+$tablearray = array("importqueue", "qjobperson", "qjobtask", "specialtaskqueue", "qreportsubscription", "qjobsetting", "qschedule", "qjob");
 $rollback = false;
 mysql_query("START TRANSACTION",$custdb);
 foreach ($tablearray as $t) {
