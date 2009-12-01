@@ -1552,11 +1552,11 @@ $$$
 ALTER TABLE `subscriber` CHANGE `preferences` `preferences` TEXT
 $$$
 
-ALTER TABLE `blockeddestination` ADD `failattempts` TINYINT( 4 ) NULL ;
+ALTER TABLE `blockeddestination` ADD `failattempts` TINYINT( 4 ) NULL
 $$$
 
 ALTER TABLE `blockeddestination` ADD UNIQUE `typedestination` ( `type` , `destination` )
 $$$
 
-ALTER TABLE `blockeddestination` ADD `blockmethod` ENUM( 'manual', 'pending', 'autoblock' ) NOT NULL ;
+ALTER TABLE `blockeddestination` ADD `blockmethod` ENUM( 'manual', 'pending', 'autoblock' ) NOT NULL
 $$$
