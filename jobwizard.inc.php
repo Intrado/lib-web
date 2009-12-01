@@ -30,7 +30,7 @@ function wizHasEmail($postdata) {
 			(isset($postdata["/message/select"]["email"]) && $postdata["/message/select"]["email"] == "record" && $USER->authorize("sendphone") && (
 				(isset($postdata["/message/select"]["phone"]) && $postdata["/message/select"]["phone"] == "record" && isset($postdata["/message/phone/callme"]["message"]) && strlen($postdata["/message/phone/callme"]["message"]) > 2) ||
 				(isset($postdata["/message/select"]["phone"]) && $postdata["/message/select"]["phone"] == "text" && isset($postdata["/message/phone/text"]["message"]) && strlen($postdata["/message/phone/text"]["message"]) > 2) ||
-				(isset($postdata["/message/select"]["phone"]) && $postdata["/message/select"]["phone"] == "pick" && isset($postdata["/message/phone/pick"]["message"]) && $postdata["/message/phone/pick"]["message"])
+				(isset($postdata["/message/select"]["phone"]) && $postdata["/message/select"]["phone"] == "pick" && isset($postdata["/message/phone/pick"]["Default"]) && $postdata["/message/phone/pick"]["Default"])
 			)) ||
 			(isset($postdata["/message/select"]["email"]) && $postdata["/message/select"]["email"] == "text" && isset($postdata["/message/email/text"]["message"]) && $postdata["/message/email/text"]["message"]) ||
 			(isset($postdata["/message/select"]["email"]) && $postdata["/message/select"]["email"] == "pick" && isset($postdata["/message/email/pick"]["Default"]) && $postdata["/message/email/pick"]["Default"])
@@ -50,7 +50,7 @@ function wizHasSms($postdata) {
 			(isset($postdata["/message/select"]["sms"]) && $postdata["/message/select"]["sms"] == "record" && $USER->authorize("sendphone") && (
 				(isset($postdata["/message/select"]["phone"]) && $postdata["/message/select"]["phone"] == "record" && isset($postdata["/message/phone/callme"]["message"]) && strlen($postdata["/message/phone/callme"]["message"]) > 2) ||
 				(isset($postdata["/message/select"]["phone"]) && $postdata["/message/select"]["phone"] == "text" && isset($postdata["/message/phone/text"]["message"]) && strlen($postdata["/message/phone/text"]["message"]) > 2) ||
-				(isset($postdata["/message/select"]["phone"]) && $postdata["/message/select"]["phone"] == "pick" && isset($postdata["/message/phone/pick"]["message"]) && $postdata["/message/phone/pick"]["message"])
+				(isset($postdata["/message/select"]["phone"]) && $postdata["/message/select"]["phone"] == "pick" && isset($postdata["/message/phone/pick"]["Default"]) && $postdata["/message/phone/pick"]["Default"])
 			)) ||
 			(isset($postdata["/message/select"]["sms"]) && $postdata["/message/select"]["sms"] == "text" && isset($postdata["/message/sms/text"]["message"]) && $postdata["/message/sms/text"]["message"]) ||
 			(isset($postdata["/message/select"]["sms"]) && $postdata["/message/select"]["sms"] == "pick" && isset($postdata["/message/sms/pick"]["message"]) && $postdata["/message/sms/pick"]["message"])
