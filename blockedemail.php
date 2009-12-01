@@ -61,12 +61,14 @@ if(CheckFormSubmit($form, $section))
 			} else {
 				QuickQuery("BEGIN");
 				// Check to see if the email already exists
-				$exists = QuickQuery("select count(id) from blockeddestination where type = 'email' and destination = ?", false, array($email));
+				$exists = QuickQuery("select count(id) from blockeddestination where type = 'email' and blockmethod = 'manual' and destination = ?", false, array($email));
 				if ($exists) {
 					error(_L('That email is already blocked'));
 				} else {
-					$result = QuickUpdate("insert into blockeddestination(userid, description, destination, type, createdate)
-								values (?, ?, ?, 'email', now())", false, array($USER->id, TrimFormData($form, $section, 'reason'), $email));
+					$description = TrimFormData($form, $section, 'reason');
+					$result = QuickUpdate("insert into blockeddestination(userid, description, destination, type, createdate, blockmethod)
+								values (?, ?, ?, 'email', now(), 'manual') on duplicate key update userid = ?, description = ?, createdate = now(), failattempts = null, blockmethod = 'manual'",
+								false, array($USER->id, $description, $email, $USER->id, $description));
 					QuickQuery("COMMIT");
 					if ($result) {
 						$reloadform = true;
@@ -110,6 +112,8 @@ function fmt_blocking_actions($row, $index) {
 function fmt_blockedby($row, $index) {
 	if ($row[$index])
 		return $row[$index];
+	else if ($row[9] == "autoblock")
+		return "Auto-Blocked";
 	return "Recipient";
 }
 
@@ -157,10 +161,11 @@ $formatters = array(
 
 $result = Query(
 		"select b.destination, b.description, CONCAT(u.firstname, ' ', u.lastname) as fullname, b.id, b.userid, '" .
-			$ACCESS->getValue('callblockingperms') . "' as permission, b.type, b.createdate
+			$ACCESS->getValue('callblockingperms') . "' as permission, b.type, b.createdate, b.failattempts, b.blockmethod
 			from blockeddestination b
 			left join user u on (b.userid = u.id)
 			where b.type = 'email'
+			and b.blockmethod in ('autoblock', 'manual')
 			order by b.id desc");
 $data=array();
 while ($row = DBGetRow($result)) {
