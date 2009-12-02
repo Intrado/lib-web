@@ -177,7 +177,7 @@ if($phone){
 		<div align="center">
 
 		<div id="player"></div>		
-		<script type="text/javascript" language="javascript" src="script/niftyplayer.js"></script>
+		<script type="text/javascript" language="javascript" src="script/niftyplayer.js.php"></script>
 		<script language="JavaScript" type="text/javascript">
 	 				embedPlayer("preview.wav.php/embed_preview.wav?jid=<?= $jobid ?>&pid=<?= $personid ?>","player");
 		</script>

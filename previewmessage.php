@@ -249,7 +249,7 @@ if (isset($_GET['parentfield'])) {
 		var sessiondata = true;
 	</script>
 	<div id="previewcontainer"></div>
-	<script type="text/javascript" language="javascript" src="script/niftyplayer.js"></script>
+	<script type="text/javascript" language="javascript" src="script/niftyplayer.js.php"></script>
 	<script language="JavaScript" type="text/javascript">
 				function unloadsession(){
 					if(sessiondata == true){
@@ -304,7 +304,7 @@ if (isset($_GET['parentfield'])) {
 		<script language="JavaScript" type="text/javascript">
 			var sessiondata = true;
 		</script>
-		<script type="text/javascript" language="javascript" src="script/niftyplayer.js"></script>
+		<script type="text/javascript" language="javascript" src="script/niftyplayer.js.php"></script>
 		<?
 		startWindow(_L("Message Preview"));	
 	}

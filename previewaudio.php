@@ -20,7 +20,7 @@ startWindow('Audio Preview', 'padding: 3px;');
 
 <div align="center">
 	<div id="player"></div>	
-	<script type="text/javascript" language="javascript" src="script/niftyplayer.js"></script>	
+	<script type="text/javascript" language="javascript" src="script/niftyplayer.js.php"></script>
 	<script language="JavaScript" type="text/javascript">
 		embedPlayer("audio.wav.php/mediaplayer_preview.wav?id=<?= $_GET['id']; ?>","player");
 	</script>

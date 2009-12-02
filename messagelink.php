@@ -105,7 +105,7 @@ if ($badcode) {
 	<div style="margin:10px; clear:both;">
 		<div id="player"></div>		
 		<script type="text/javascript" language="javascript" src="script/prototype.js"></script>	
-		<script type="text/javascript" language="javascript" src="script/niftyplayer.js"></script>
+		<script type="text/javascript" language="javascript" src="script/niftyplayer.js.php"></script>
 		<script language="JavaScript" type="text/javascript">
 	 		embedPlayer("messagelink_preview.wav.php/embed_preview.wav?jobcode=<?=$code?>","player");
 		</script>

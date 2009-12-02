@@ -96,7 +96,7 @@ startWindow('Reply Info', 'padding: 3px;');
 
 <div align="center">
 	<div id="player"></div>	
-	<script type="text/javascript" language="javascript" src="script/niftyplayer.js"></script>	
+	<script type="text/javascript" language="javascript" src="script/niftyplayer.js.php"></script>
 	<script language="JavaScript" type="text/javascript">
 		embedPlayer("repliesplay.wav.php/embed_preview.wav?id=<?=$id?>","player");
 	</script>
