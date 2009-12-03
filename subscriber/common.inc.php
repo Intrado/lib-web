@@ -13,6 +13,8 @@ if ($IS_COMMSUITE) {
 	$BASEURL = "/$CUSTOMERURL";
 } /*CSDELETEMARKER_END*/
 
+apache_note("CS_CUST",urlencode($CUSTOMERURL)); //for logging
+
 require_once("XML/RPC.php");
 require_once("authsubscriber.inc.php");
 require_once("subscribersessionhandler.inc.php");
@@ -33,13 +35,19 @@ if (!isset($isNotLoggedIn)) {
 		//index page will redirect to ssl
 		redirect("index.php?logout=1");
 	}
-
+	
 	doStartSession();
 	
 	if (!isset($_SESSION['subscriberid'])) {
 		$_SESSION['lasturi'] = $_SERVER['REQUEST_URI'];
 		redirect("./?logout=1");
     }
+	
+	if (!isset($_SESSION['subscriberusername']))
+		$_SESSION['subscriberusername'] = QuickQuery("select username from subscriber where id=?", false, array($_SESSION['subscriberid']));
+	
+	apache_note("CS_USER",urlencode($_SESSION['subscriberusername'])); //for logging
+	
 } // else we are not logged in
 
 

@@ -3,6 +3,8 @@
 $SETTINGS = parse_ini_file("managersettings.ini.php",true);
 $IS_COMMSUITE = false;
 
+apache_note("CS_CUST","_Manager_"); //for logging
+
 $dsn = 'mysql:dbname='.$SETTINGS['db']['db'].';host='.$SETTINGS['db']['host'];
 
 global $_dbcon;
@@ -36,6 +38,8 @@ if(!isset($isasplogin)){
 		redirect("./?logout=1&reason=timeout");
 		
 	$MANAGERUSER = new AspAdminUser($_SESSION['aspadminuserid']);
+	
+	apache_note("CS_USER",urlencode($MANAGERUSER->login)); //for logging
 
 	//check to make sure the url component is the username
 	$expectedusername = substr($_SERVER["SCRIPT_NAME"],1);

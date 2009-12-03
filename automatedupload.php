@@ -10,6 +10,8 @@ if ($IS_COMMSUITE) {
 	$CUSTOMERURL = strtolower(substr($CUSTOMERURL,0,strpos($CUSTOMERURL,"/")));
 } /*CSDELETEMARKER_END*/
 
+apache_note("CS_CUST",urlencode($CUSTOMERURL)); //for logging
+
 require_once("inc/db.inc.php");
 require_once("inc/DBMappedObject.php");
 require_once("inc/DBRelationMap.php");

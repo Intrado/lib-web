@@ -13,6 +13,8 @@
 $CUSTOMERURL = substr($_SERVER["SCRIPT_NAME"],1);
 $CUSTOMERURL = strtolower(substr($CUSTOMERURL,0,strpos($CUSTOMERURL,"/")));
 
+apache_note("CS_CUST",urlencode($CUSTOMERURL)); //for logging
+
 if(isset($_GET['wsdl'])){
 
 	$wsdl = file_get_contents("smapi.wsdl");
@@ -1183,6 +1185,8 @@ function APISession($sessionid){
 		$USER = &$_SESSION['user'];
 		$USER->refresh();
 		$USER->optionsarray = false; /* will be reconstructed if needed */
+		
+		apache_note("CS_USER",urlencode($USER->login)); //for logging
 
 		$ACCESS = &$_SESSION['access'];
 		$ACCESS->loadPermissions(true);

@@ -45,6 +45,9 @@ if ($messageinfo !== false) {
 	$jobstarttime = strtotime($job->startdate . $job->starttime);
 }
 
+apache_note("CS_CUST",urlencode($urlcomponent)); //for logging
+
+
 $TITLE = $customer;
 ?>
 <html>

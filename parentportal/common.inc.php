@@ -33,12 +33,15 @@ if(!isset($ppNotLoggedIn)){
     	$result = portalGetPortalUser();
     	if($result['result'] == ""){
 	    	$_SESSION['portaluser'] = $result['portaluser'];
+			apache_note("CS_USER",urlencode($_SESSION['portaluser']['portaluser.username'])); //for logging
     	} else {
     		redirect("./".$logout);
     	}
     }
 
-	if (isset($_SESSION['customerid'])) {
+	if (isset($_SESSION['customerid'])) {		
+		apache_note("CS_CUST",urlencode($_SESSION['customerid'])); //for logging
+
 		// store the customer's toll free inbound number
 		$n = QuickQuery("select value from setting where name='inboundnumber'");
 

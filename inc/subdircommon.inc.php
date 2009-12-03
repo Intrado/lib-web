@@ -16,6 +16,8 @@ if ($IS_COMMSUITE) {
 	$BASEURL = "/$CUSTOMERURL";
 } /*CSDELETEMARKER_END*/
 
+apache_note("CS_CUST",urlencode($CUSTOMERURL)); //for logging
+
 require_once("../inc/db.inc.php");
 require_once("../inc/DBMappedObject.php");
 require_once("../inc/DBRelationMap.php");
@@ -43,6 +45,8 @@ if (!isset($isindexpage) || !$isindexpage) {
 		$USER = &$_SESSION['user'];
 		$USER->refresh();
 		$USER->optionsarray = false; /* will be reconstructed if needed */
+		
+		apache_note("CS_USER",urlencode($USER->login)); //for logging
 
 		$ACCESS = &$_SESSION['access'];
 		$ACCESS->loadPermissions(true);

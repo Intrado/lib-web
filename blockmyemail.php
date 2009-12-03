@@ -38,6 +38,8 @@ if ($IS_COMMSUITE) {
 	$CUSTOMERURL = strtolower(substr($CUSTOMERURL,0,strpos($CUSTOMERURL,"/")));
 } /*CSDELETEMARKER_END*/
 
+apache_note("CS_CUST",urlencode($CUSTOMERURL)); //for logging
+
 $customer = getCustomerName($CUSTOMERURL);
 $email = base64url_decode($code);
 
@@ -48,6 +50,8 @@ if (!$code || !$customer || !validEmail($email))
 if (!$badcode && $submit) {
 	$badcode = !emailUnsubscribe($CUSTOMERURL, $email);
 }
+
+apache_note("CS_USER",urlencode($email)); //for logging
 
 $customer = escapehtml($customer);
 $email = escapehtml($email);
