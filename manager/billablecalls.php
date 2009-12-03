@@ -8,6 +8,7 @@ require_once("../inc/themes.inc.php");
 require_once("../inc/table.inc.php");
 require_once("../inc/formatters.inc.php");
 
+session_write_close();//WARNING: we don't keep a lock on the session file, any changes to session data are ignored past this point
 
 if (!$MANAGERUSER->authorized("billablecalls"))
 	exit("Not Authorized");

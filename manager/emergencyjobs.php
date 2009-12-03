@@ -8,6 +8,7 @@ require_once("../inc/themes.inc.php");
 require_once("../inc/table.inc.php");
 require_once("../inc/formatters.inc.php");
 
+session_write_close();//WARNING: we don't keep a lock on the session file, any changes to session data are ignored past this point
 
 if (!$MANAGERUSER->authorized("emergencyjobs"))
 	exit("Not Authorized");
@@ -43,6 +44,7 @@ include_once("nav.inc.php");
 
 <form method=post>
 <label>Priority:<select name="type">
+<option value=0 selected>All types</option>
 <option value=1 selected>Emergency</option>
 <option value=2 >Attendance</option>
 <option value=3 >General</option>
@@ -71,9 +73,13 @@ if (!isset($_POST['startdate'])) {
 		$custdb = getPooledCustomerConnection($cid,true);
 		
 		//do stuff here
-		//get list of jobtypes for systempriority=1
-		$query = "select id from jobtype where systempriority=?";
-		$jtids = QuickQueryList($query,false,$custdb,array($_POST['type']));
+		//get list of jobtypes for systempriority
+		$jtsql = "";
+		if ($_POST['type'] != "0") {
+			$query = "select id from jobtype where systempriority=?";
+			$jtids = QuickQueryList($query,false,$custdb,array($_POST['type']));
+			$jtsql = "and j.jobtypeid in (".implode(",",$jtids).")";
+		}
 		
 		$query = "select j.name, j.description, m.name, u.login, count(*) as calls,
 				(select count(*) from custdm) as hasflex, j.id
@@ -83,7 +89,7 @@ if (!isset($_POST['startdate'])) {
 				inner join user u on (u.id = j.userid)
 				inner join message m on (m.id = j.phonemessageid)
 				where j.finishdate between ? and ? + interval 1 day
-				and j.jobtypeid in (".implode(",",$jtids).")
+				$jtsql
 				group by j.id";
 		$costs = QuickQueryMultiRow($query,false,$custdb,array($_POST['startdate'],$_POST['enddate']));
 		foreach ($costs as $row) {
@@ -132,6 +138,7 @@ if (!isset($_POST['startdate'])) {
 	);
 	
 	switch ($_POST['type']) {
+		case "0": $type = "All"; break;
 		case "1": $type = "Emergency"; break;
 		case "2": $type = "Attendance"; break;
 		case "3": $type = "General"; break;

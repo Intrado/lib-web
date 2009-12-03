@@ -15,6 +15,8 @@ if (isset($_GET['urlcomponent'])) {
 	$CUSTOMERURL = $_GET['urlcomponent'];
 }
 
+apache_note("CS_CUST",urlencode($CUSTOMERURL)); //for logging
+
 require_once("XML/RPC.php");
 require_once("inc/auth.inc.php");
 
@@ -39,6 +41,7 @@ if (count($row) > 0) {
 	$ext = ".gif";
 }
 
+session_write_close();//WARNING: we don't keep a lock on the session file, any changes to session data are ignored past this point
 
 //header("Content-disposition: filename=logo." . $ext);
 //header("Cache-Control: private");

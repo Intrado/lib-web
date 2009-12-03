@@ -51,6 +51,9 @@ $isajax = isset($_GET['ajax']);
 
 $mergeditems = array();
 if($isajax === true) {
+	
+	session_write_close();//WARNING: we don't keep a lock on the session file, any changes to session data are ignored past this point
+	
 	switch ($filter) {
 		case "lists":
 			$mergeditems = array_merge($mergeditems,QuickQueryMultiRow("select 'list' as type,'Saved' as status, id, name, modifydate as date, lastused from list where userid=? and deleted = 0 and modifydate is not null order by modifydate desc limit 10",true,false,array($USER->id)));
@@ -113,6 +116,11 @@ if($isajax === true) {
 	}
 
 	uasort($mergeditems, 'itemcmp');
+	
+	header('Content-Type: application/json');
+	$data = activityfeed($mergeditems,true);
+	echo json_encode(!empty($data) ? $data : false);
+	exit();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -467,13 +475,6 @@ function activityfeed($mergeditems,$ajax = false) {
 
 	}
 	return $activityfeed;
-}
-
-if ($isajax) {
-	header('Content-Type: application/json');
-	$data = activityfeed($mergeditems,true);
-	echo json_encode(!empty($data) ? $data : false);
-	exit();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
