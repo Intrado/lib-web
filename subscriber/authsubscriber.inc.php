@@ -272,9 +272,10 @@ function doStartSession() {
 	session_name($CUSTOMERURL . "_subscriber");
 	session_start();
 
-	if (isset($_SESSION['timezone'])) {
-		@date_default_timezone_set($_SESSION['timezone']);
-		QuickUpdate("set time_zone='" . $_SESSION['timezone'] . "'");
+	$tz = getSystemSetting("timezone");
+	if (isset($tz)) {
+		@date_default_timezone_set($tz);
+		QuickUpdate("set time_zone='" . $tz . "'");
 	}
 }
 
