@@ -497,20 +497,6 @@ div.scrollTableContainer {
 	border: solid 1px <?=$theme2?>;
 }
 
-.accordionsectiondiv {
-	margin: 0;
-	overflow: hidden;
-	margin-top: -2px;
-}
-
-.accordionsectiondivexpanded .accordiontitlediv {
-	background-image: url('img/arrow_down.gif');
-}
-
-.accordionsectiondivcollapsed .accordiontitlediv {
-	background-image: url('img/arrow_right.gif');
-}
-
 .accordiontitlediv {
 	padding: 2px;
 	padding-left: 10px;
@@ -522,18 +508,107 @@ div.scrollTableContainer {
 	background-position: 2px 6px;
 	border: solid 1px <?=$theme2?>;
 }
-
+.accordiontitledivexpanded {
+	background-image: url('img/arrow_down.gif');
+}
+.accordiontitledivcollapsed {
+	background-image: url('img/arrow_right.gif');
+}
+.accordiontitledivlocked {
+	color: rgb(180,180,180);
+}
 .accordiontitleicon {
 	margin-left: 5px;
 	margin-right: 5px;
 	vertical-align: middle;
 }
-
 .accordioncontentdiv {
 	border: 1px solid <?=$theme2?>;
 	padding: 5px;
 	padding-bottom: 25px;
 	margin-bottom: 1px;
+}
+.horizontaltabstitlediv {
+	font-size: 12px;
+	padding: 2px;
+	padding-top: 5px;
+	cursor: pointer;
+	color: rgb(30,30,30);
+	background: #f8f1e9 no-repeat;
+	background-position: 2px 6px;
+	border: solid 1px #b47727;
+	-moz-border-radius: 10px 10px 0 0;
+	display: inline;
+	white-space: nowrap;
+}
+.horizontaltabstitledivexpanded {
+	border-bottom: solid 2px rgb(250,250,250);
+}
+.horizontaltabstitledivcollapsed {
+	background: rgb(200,200,200);
+}
+.horizontaltabstitledivlocked {
+	color: rgb(130,130,130);
+}
+.horizontaltabstitleicon {
+	margin-left: 5px;
+	margin-right: 5px;
+	vertical-align: middle;
+}
+.horizontaltabscontentdiv {
+}
+.horizontaltabspanelspane {
+	border: 1px solid #b47727;
+	padding: 5px;
+	padding-bottom: 25px;
+	margin-bottom: 1px;
+	background: rgb(250,250,250);
+}
+.verticaltabstitlediv {
+	font-size: 12px;
+	padding: 2px;
+	padding-top: 5px;
+	cursor: pointer;
+	color: rgb(30,30,30);
+	background: #f8f1e9 no-repeat;
+	background-position: 2px 6px;
+	border: solid 1px #b47727;
+	-moz-border-radius: 0 10px 10px 0;
+}
+.verticaltabstitledivexpanded {
+	border-left: rgb(250,250,250);
+	margin-left: -1px;
+}
+.verticaltabstitledivcollapsed {
+	background: rgb(200,200,200);
+}
+.verticaltabstitledivlocked {
+	color: rgb(130,130,130);
+}
+.verticaltabstitleicon {
+	margin-left: 5px;
+	margin-right: 5px;
+	vertical-align: middle;
+}
+.verticaltabscontentdiv {
+}
+.verticaltabstabspane {
+	width: 200px;
+}
+.verticaltabspanelspane {
+	border: 1px solid #b47727;
+	padding: 5px;
+	padding-bottom: 25px;
+	margin-bottom: 1px;
+	background: rgb(250,250,250);
+}
+table.SplitPane {
+	border-collapse: collapse;
+	width: 100%;
+}
+td.SplitPane {
+	margin: 0;
+	padding: 0;
 }
 
 .sortheader {
