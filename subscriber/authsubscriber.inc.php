@@ -268,14 +268,16 @@ function doDBConnect($result) {
 
 
 function doStartSession() {
-	global $CUSTOMERURL;
+	global $CUSTOMERURL, $_dbcon;
 	session_name($CUSTOMERURL . "_subscriber");
 	session_start();
 
-	$tz = getSystemSetting("timezone");
-	if (isset($tz)) {
-		@date_default_timezone_set($tz);
-		QuickUpdate("set time_zone='" . $tz . "'");
+	if (isset($_dbcon)) {
+		$tz = getSystemSetting("timezone");
+		if (isset($tz)) {
+			@date_default_timezone_set($tz);
+			QuickUpdate("set time_zone='" . $tz . "'");
+		}
 	}
 }
 
