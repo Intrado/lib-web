@@ -82,6 +82,12 @@ if ($inboundshortcode == "724665") {
 }
 */
 
+// strip leading +1 or leading 1 from source address (use phonenumber for authserver block list)
+// result should be a valid 10 digit phone number
+$phonenumber = ereg_replace("[^0-9]*","",$sourceaddress); // strip non-numeric
+$phonenumber = substr($phonenumber, -10); // save last 10 digits
+
+// parse the message
 $message = str_replace("\n"," ",$message);
 $message = str_replace("\r"," ",$message);
 $message = trim($message);
@@ -138,7 +144,6 @@ if ($hashelp) {
 	logExit("HELP");
 } else if ($hasoptout) {
 	// call authserver to update global blocked list
-	$phonenumber = substr($sourceaddress, 1);
 	blocksms($phonenumber, 'block', 'automated block due to keyword '.$splitmessage[0]);
 	
 	// reply back with confirmation
@@ -147,7 +152,6 @@ if ($hashelp) {
 	logExit("OPTOUT");
 } else if ($hasoptin) {
 	// call authserver to update global blocked list
-	$phonenumber = substr($sourceaddress, 1);
 	blocksms($phonenumber, 'optin', 'automated optin due to keyword '.$splitmessage[0]);
 
 	// reply back with confirmation
