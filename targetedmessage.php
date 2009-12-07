@@ -29,7 +29,7 @@ $classpeople = array();
 for($i=0;$i<=3;$i++) {
 	$period = $i + 1;
 	$classes[$i] = "History Class -- Period " . $period;
-	$classpeople[$i] = array(0 => "Ben Hencke - ". $period , 1 => "Howard Wood - ". $period,2 => "Gretel Baumgartner - ". $period, 3 => "Kee-Yip Chan - ". $period, 4 => "Nickolas Heckman - ". $period);
+	$classpeople[$i] = array(0 => "Ben Hencke", 1 => "Howard Wood",2 => "Gretel Baumgartner", 3 => "Kee-Yip Chan", 4 => "Nickolas Heckman");
 }
 
 $categories = "{Positive: 'img/icons/award_star_gold_2.gif',Corrective: 'img/icons/lightning.gif',Informational: 'img/icons/information.gif'}";
@@ -72,7 +72,6 @@ if (isset($_GET['classid'])) {
 ////////////////////////////////////////////////////////////////////////////////
 
 
-
 function classselect($values) {
 	$n = 'classselect';
 	$value = 3;
@@ -84,8 +83,6 @@ function classselect($values) {
 	$str .= '</select>';
 	return $str;
 }
-
-
 
 function fmt_template ($obj, $field) {
 	return $obj->$field;
@@ -112,8 +109,6 @@ startWindow(_L('Classroom Message'));
 			<hr />
 			<a id="checkall" href="#" style="float:left; white-space: nowrap;">Check All</a><br />
 			<ul id="contactbox" style="list-style-type:none;width:100%;text-decoration:none;"><li>
-					<img src="img/icons/fugue/arrow.png" style="vertical-align:middle;" alt="" />Hello
-				<li>Hello</li>
 				</li></ul>
 			<hr />
 			<img src="img/icons/fugue/light_bulb.gif" alt="" />Press shift key to multiselect
@@ -166,9 +161,11 @@ endWindow();
 	var highlightedcontacts = new Hash();	// List of Contacts that are currently highlighted
 	var lastmessagehover = "none";
 
-
 	var revealmessages = true;			// Boolean to reveal messages on first click
 
+	var tabs;
+	
+	var categories = new Array('<?= implode(array_keys($library),"','")?>');
 
 
 	function getstatesrc(state) {
@@ -185,30 +182,36 @@ endWindow();
 
 
 	function clearcache() {
-		checkedcache = new Hash();
+		categories.each(function(category) {
+			category.value = new Hash();
+		});
 	}
 	function setlink(contact,message,state) {
-		if(checkedcache.get(contact) == undefined)
-			checkedcache.set(contact,new Hash());
+		var sectioncache = checkedcache.get(tabs.currentSection);
+		if(sectioncache.get(contact) == undefined)
+			sectioncache.set(contact,new Hash());
+		var contact = sectioncache.get(contact);
 		if(state)
-			checkedcache.get(contact).set(message,true);
+			contact.set(message,true);
 		else
-			checkedcache.get(contact).unset(message);
+			contact.unset(message);
 	}
+
+	// has link in this section only
 	function haslink(contact,message) {
-		if(checkedcache.get(contact) == undefined || checkedcache.get(contact).get(message) == undefined)
+		if(checkedcache.get(tabs.currentSection).get(contact) == undefined || checkedcache.get(tabs.currentSection).get(contact).get(message) == undefined)
 			return false;
 		return true;
 	}
 
-	function updatemessages() {
+	function updatemessages(section) {
 		var contactsize = checkedcontacts.size();
 		var selectedmessages = new Hash();
 
 		// Get all contact-message links from cache
 		checkedcontacts.each(function(contact) {
-			if(checkedcache.get(contact.key) != undefined) {
-				checkedcache.get(contact.key).each(function(msg) {
+			if(checkedcache.get(section).get(contact.key) != undefined) {
+				checkedcache.get(section).get(contact.key).each(function(msg) {
 					var count = selectedmessages.get(msg.key) | 0;
 					count++;
 					selectedmessages.set(msg.key,count);
@@ -293,39 +296,34 @@ endWindow();
 							// First click reveals the message board
 							if(revealmessages) {
 								revealmessages = false;
-
 								$('theinstructions').hide();
 								$('tabsContainer').show();
-								//revealmessages = 1;
-								//new Effect.Opacity('themessages', {from: 0.0,to: 1.0,duration: 1.0});
-								//$('themessages').appear();
-								//$('themessages').appear({ duration: 1.0 });
-								//$('theinstructions').hide();
-								//setTimeout("$('theinstructions').hide();$('themessages').show();", 1000);
 							}
 
 							// ==================================
-							updatemessages();
+							updatemessages(tabs.currentSection);
 					});
 
 					$(id).observe('mouseover', function(event) {
 						event.stop();
 						this.style.background = c_hover;
+						var msgid = this.id;
 
-						if(checkedcache.get(this.id) == undefined) {
-							return;
-						} else {
-							checkedcache.get(this.id).each(function(message) {
-								//console.info("set" + message.key);
+						if(checkedcache.get(tabs.currentSection).get(msgid) != undefined) {
+							checkedcache.get(tabs.currentSection).get(msgid).each(function(message) {
 								$(message.key).style.background = c_hover;
-								highlightedmessages.set(message.key,true)
+								highlightedmessages.set(message.key,true);
 							});
 						}
+						categories.each(function (category) {
+							if(tabs.currentSection != category + '-library' && checkedcache.get(category + '-library').get(msgid) != undefined) {
+									tabs.sections[category + '-library'].titleDiv.pulsate({pulses:2, duration: 1.5});
+							}
+						});
 					});
 					$(id).observe('mouseout', function(event) {
 						event.stop();
 						highlightedmessages.each(function(message) {
-							//console.info("unset" + message.key);
 							$(message.key).style.background = c_none;
 							highlightedmessages.unset(message.key);
 						});
@@ -373,11 +371,9 @@ document.observe("dom:loaded", function() {
 			$('theinstructions').hide();
 			revealmessages = false
 			$('tabsContainer').show();
-			//new Effect.Opacity('themessages', {from: 0.0,to: 1.0,duration: 1.0});
-			//$('themessages').appear();
 		}
+		updatemessages(tabs.currentSection);
 
-		updatemessages();
 	}.bindAsEventListener($('contactbox')));
 
 	$('classselect').observe('change', function(event) {
@@ -385,7 +381,6 @@ document.observe("dom:loaded", function() {
 		getclass(event.element().getValue());
 	});
 
-	var categories = new Array('<?= implode(array_keys($library),"','")?>');
 
 
 	categories.each(function(category) {
@@ -414,7 +409,7 @@ document.observe("dom:loaded", function() {
 				event.stop();
 				msgid = this.id;
 				$(msgid).style.background = c_hover;
-				checkedcache.each(function(contact) {
+				checkedcache.get(tabs.currentSection).each(function(contact) {
 					if(contact.value.get(msgid) === true) {
 						$(contact.key).previous('img').src = h_image;
 						highlightedcontacts.set(contact.key,true);
@@ -438,14 +433,11 @@ document.observe("dom:loaded", function() {
 	tabs = new Tabs('tabsContainer',{});
 
 
-
-
-
 	var categoriesimages = new Hash(<?= $categories ?>);
 
 
 	categories.each(function(category) {
-
+		checkedcache.set(category + '-library',new Hash());
 		var image = "img/icons/bug.gif";
 		if(categoriesimages.get(category))
 			image = categoriesimages.get(category);
@@ -458,7 +450,9 @@ document.observe("dom:loaded", function() {
 	});
 
 	tabs.show_section(categories.first() + '-library');
-
+	tabs.container.observe('Tabs:ClickTitle', function(event) {
+		updatemessages(event.memo.section);
+	});
 });
 
 
