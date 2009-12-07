@@ -43,8 +43,6 @@ if (count($row) > 0) {
 
 session_write_close();//WARNING: we don't keep a lock on the session file, any changes to session data are ignored past this point
 
-//header("Content-disposition: filename=logo." . $ext);
-//header("Cache-Control: private");
 header("Content-type: " . $contenttype);
 header("Pragma: ");
 header("Cache-Control: private");
