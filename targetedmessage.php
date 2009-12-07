@@ -73,24 +73,6 @@ if (isset($_GET['classid'])) {
 
 
 
-
-function contactbox($values) {
-	$height = "450px";
-	$style = isset($height) ? ('style="height: ' . $height . '; overflow: auto;"') : '';
-	$n = "contactbox";
-	$str = '<a id="checkall" href="#" style="float:left; white-space: nowrap;">Check All</a><br />';
-	$str .= '<div id='.$n.' class="radiobox" '.$style.'>';
-	$counter = 1;
-	foreach ($values as $checkvalue => $checkname) {
-		$id = $n.'-'.$counter;
-		$str .= '<input id="'.$id.'" name="'.$n.'[]" type="checkbox" value="'.escapehtml($checkvalue).'" style="display:none;" /><label id="'.$id.'-label" for="'.$id.'">'.escapehtml($checkname).'</label><label></label><img src="img/icons/fugue/tick.gif" style="display:none" alt=""></img><br />
-				';
-		$counter++;
-	}
-	$str .= '</div>';
-	return $str;
-}
-
 function classselect($values) {
 	$n = 'classselect';
 	$value = 3;
@@ -128,7 +110,11 @@ startWindow(_L('Classroom Message'));
 		<td style="top:0px;width:250px;vertical-align:top;border-right:1px solid black;padding-right:10px;">
 			<?= classselect($classes); ?>
 			<hr />
-			<?= contactbox($classpeople[1]); ?>
+			<a id="checkall" href="#" style="float:left; white-space: nowrap;">Check All</a><br />
+			<ul id="contactbox" style="list-style-type:none;width:100%;text-decoration:none;"><li>
+					<img src="img/icons/fugue/arrow.png" style="vertical-align:middle;" alt="" />Hello
+				<li>Hello</li>
+				</li></ul>
 			<hr />
 			<img src="img/icons/fugue/light_bulb.gif" alt="" />Press shift key to multiselect
 			<hr />
@@ -137,7 +123,7 @@ startWindow(_L('Classroom Message'));
 		<td style="vertical-align:top;">
 			<div id="theinstructions" style="font-size:2em;padding:100px;"><img src="img/icons/fugue/arrow_180.png" alt="" style="vertical-align:middle;"/>&nbsp;Click on a Contact to Start</div>
 
-			<div id='tabsContainer' style=' margin:10px; margin-right:0px;display:none;vertical-align:middle'></div>
+			<div id='tabsContainer' style=' margin:10px; margin-right:0px;display:none;vertical-align:middle;'></div>
 			<? foreach($library as $title => $messages) {
 					// add library to id since user may change the title of the category
 					echo "<div id='" . $title . "-library' style='display:block;'>
@@ -146,7 +132,7 @@ startWindow(_L('Classroom Message'));
 					$nn = 'mm_';
 					$count = 0;
 					foreach($messages as $id => $message) {
-						echo '<div id="'.$nn.$id.$title.'" class="targetmessage" style="border:dashed 1px silver;background-color:#FFF;width:300px;float:left;margin:10px;")"><img src="img/checkbox-clear.png" alt="" style="vertical-align:middle;"/>&nbsp;<label id="'.$n.$id.$title.'-label">' . $message .  ' </label><div style="display:none;">Comment </div></div>';
+						echo '<div id="'.$nn.$id.$title.'" class="targetmessage" style="border:dashed 1px silver;background-color:#FFF;width:300px;float:left;margin:10px;")"><img src="img/checkbox-clear.png" alt="" style="vertical-align:middle;"/>&nbsp;<label id="'.$n.$id.$title.'">' . $message .  ' </label><div style="display:none;">Comment </div></div>';
 					}
 
 					echo '<div style="clear:both;"></div></div>';
@@ -169,7 +155,7 @@ endWindow();
 	var c_hover = "#bbcccc";
 	var c_selected = "#ffcccc";
 	var c_none = "#ffffff";
-
+	var h_image = "img/icons/fugue/arrow.gif";
 
 
 	var checkedcache = new Hash();			// History of Contact to Message links
@@ -259,6 +245,7 @@ endWindow();
 			onSuccess: function(transport){
 				var response = transport.responseJSON || "Class not available";
 				$('contactbox').update("");
+
 				$('theinstructions').show();
 				$('tabsContainer').hide();
 
@@ -271,16 +258,14 @@ endWindow();
 				response.each(function(person) {
 					var id = 'contactbox-' + counter;
 					counter++;
-					$('contactbox').insert('<input id="' + id + '" name="contactbox[]" type="checkbox" value="' + person + '" style="display:none;" /><label id="' + id + '-label" for="' + id + '">' + person +'</label><label></label><img src="img/icons/fugue/tick.gif" style="display:none" alt=""></img><br />');
+					$('contactbox').insert('<li><img src="img/pixel.gif" style="width:10px;height:10px;vertical-align:middle;" alt="" / ><a href="#" id="' + id + '" style="text-decoration:none;">' + person +'</a><img src="img/icons/fugue/tick.gif" style="display:none" alt="" / ></li>');
 
 					/*
 					 * Observe Contact Click. Select one contact at a time or multiple contacts with
 					 * alt key pressed.
 					 */
-					$(id + '-label').observe('click', function(event) {
+					$(id).observe('click', function(event) {
 							event.stop();
-							//$(this).focus();
-
 
 							if(!event.shiftKey) {
 								checkedcontacts.each(function(contact) {
@@ -323,7 +308,7 @@ endWindow();
 							updatemessages();
 					});
 
-					$(id + '-label').observe('mouseover', function(event) {
+					$(id).observe('mouseover', function(event) {
 						event.stop();
 						this.style.background = c_hover;
 
@@ -337,14 +322,14 @@ endWindow();
 							});
 						}
 					});
-					$(id + '-label').observe('mouseout', function(event) {
+					$(id).observe('mouseout', function(event) {
 						event.stop();
 						highlightedmessages.each(function(message) {
 							//console.info("unset" + message.key);
 							$(message.key).style.background = c_none;
 							highlightedmessages.unset(message.key);
 						});
-						if(this.previous('input').checked)
+						if(checkedcontacts.get(this.id))
 							this.style.background = c_selected;
 						else
 							this.style.background = c_none;
@@ -376,24 +361,21 @@ document.observe("dom:loaded", function() {
 	 */
 	$('checkall').observe('click', function(event) {
 		event.stop();
-		var checkboxes = this.select('input');
-		var count = checkboxes.length;
+		var contacts = $('contactbox').select('a');
+		var count = contacts.length;
 		for (var i = 0; i < count; ++i) {
-			checkboxes[i].checked = true;
-			var label = checkboxes[i].next('label');
-			label.style.background = "#ffcccc";
-			checkedcontacts.set(label.id,true);
+			//checkboxes[i].checked = true;
+			//var label = checkboxes[i].next('li');
+			contacts[i].style.background = "#ffcccc";
+			checkedcontacts.set(contacts[i].id,true);
 		}
 		if(revealmessages) {
 			$('theinstructions').hide();
 			revealmessages = false
 			$('tabsContainer').show();
-
-
 			//new Effect.Opacity('themessages', {from: 0.0,to: 1.0,duration: 1.0});
 			//$('themessages').appear();
 		}
-
 
 		updatemessages();
 	}.bindAsEventListener($('contactbox')));
@@ -417,6 +399,14 @@ document.observe("dom:loaded", function() {
 				checkedmessages.set(msgid,state);                  // Set Message to appropriate state
 				// Set each selected contact to
 				checkedcontacts.each(function(contact) {
+					if(state == 2) {
+						highlightedcontacts.set(contact.key,true);
+						$(contact.key).previous('img').src = h_image;
+					} else {
+						highlightedcontacts.unset(contact.key);
+						$(contact.key).previous('img').src = "img/pixel.gif";
+					}
+
 					setlink(contact.key,msgid,(state == 2));
 				});
 			});
@@ -426,7 +416,7 @@ document.observe("dom:loaded", function() {
 				$(msgid).style.background = c_hover;
 				checkedcache.each(function(contact) {
 					if(contact.value.get(msgid) === true) {
-						$(contact.key).style.background = c_hover;
+						$(contact.key).previous('img').src = h_image;
 						highlightedcontacts.set(contact.key,true);
 					}
 				});
@@ -435,10 +425,7 @@ document.observe("dom:loaded", function() {
 				event.stop();
 				$(this.id).style.background = c_none;
 				highlightedcontacts.each(function(contact) {
-					if(checkedcontacts.get(contact.key) === true)
-						$(contact.key).style.background = c_selected;
-					else
-						$(contact.key).style.background = c_none;
+					$(contact.key).previous('img').src = "img/pixel.gif";
 					highlightedcontacts.unset(contact.key);
 				});
 			});
