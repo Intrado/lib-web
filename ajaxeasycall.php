@@ -16,7 +16,7 @@ global $USER;
 if (!$USER->authorize("starteasy"))
 	exit();
 
-function taskNew($phone,$language,$name,$origin) {
+function taskNew($phone,$language,$name,$origin,$type) {
 	if (!$phone)
 		return array("error"=>"badphone");
 	if (!$language)
@@ -24,7 +24,7 @@ function taskNew($phone,$language,$name,$origin) {
 	global $USER;
 	$task = new SpecialTask("new");
 	$task->status = 'new';
-	$task->type = 'EasyCall';
+	$task->type = $type;
 	$task->setData('phonenumber', $phone);
 	$task->lastcheckin = date("Y-m-d H:i:s");
 	$task->setData('progress', _L("Creating Call"));
@@ -57,7 +57,7 @@ function taskStatus($id) {
 	$langdata = array();
 	for($x=0; $x<$task->getData('totalamount'); $x++)
 		if ($task->getData("message$x"))
-			$langdata[$task->getData("language$x")] = $task->getData("message$x");	
+			$langdata[$task->getData("language$x")] = $task->getData("message$x");
 	return array(
 		"id"=>$task->id,
 		"status"=>$task->status,
@@ -79,8 +79,9 @@ $id = false;
 
 if (isset($_POST['phone']) && isset($_POST['language'])) {
 	$id = "new";
-	$language = $_POST['language']; 
+	$language = $_POST['language'];
 	$phone = Phone::parse($_POST['phone']);
+	$type = $_POST['type'];
 }
 
 if (isset($_POST['name']))
@@ -104,7 +105,7 @@ if (isset($_GET['id'])) {
 
 header("Content-Type: application/json");
 if ($id === "new")
-	echo json_encode(taskNew($phone,$language,$name,$origin));
+	echo json_encode(taskNew($phone,$language,$name,$origin,$type));
 else
 	echo json_encode(taskStatus($id));
 exit();

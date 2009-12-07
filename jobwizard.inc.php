@@ -262,7 +262,8 @@ class CallMe extends FormItem {
 					"'.((isset($this->args['max']) && $this->args['max'])?$this->args['max']:"10").'",
 					"'.$defaultphone.'",
 					"'.$nophone.'",
-					"jobwizard"
+					"jobwizard",
+					"easycall"
 				).load();
 				easycallRecordings++;
 				Object.keys(msgs).each(function(lang) {
@@ -274,7 +275,8 @@ class CallMe extends FormItem {
 						"'.((isset($this->args['max']) && $this->args['max'])?$this->args['max']:"10").'",
 						"'.$defaultphone.'",
 						"'.$nophone.'",
-						"jobwizard"
+						"jobwizard",
+						"easycall"
 					).load();
 					easycallRecordings++;
 				});
@@ -291,7 +293,8 @@ class CallMe extends FormItem {
 							"'.((isset($this->args['max']) && $this->args['max'])?$this->args['max']:"10").'",
 							"'.$defaultphone.'",
 							"'.$nophone.'",
-							"jobwizard"
+							"jobwizard",
+							"easycall"
 						).setupRecord();
 					});
 				}

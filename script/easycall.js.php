@@ -13,7 +13,7 @@ var easycallRecordings = 0;
 var Easycall = Class.create({
 
 	// Initialize with empty specialtask id
-	initialize: function(formname, formitemname, language, minlength, maxlength, defaultphoneval, nophoneval, origin) {
+	initialize: function(formname, formitemname, language, minlength, maxlength, defaultphoneval, nophoneval, origin, type) {
 		this.formname = formname;
 		this.formitemname = formitemname;
 		this.language = language;
@@ -25,6 +25,10 @@ var Easycall = Class.create({
 		this.nophone = nophoneval;
 		this.num = 0;
 		this.origin = origin;
+		if (type)
+			this.type = type;
+		else
+			this.type = "easycall";
 		this.keytimer = null;
 	},
 
@@ -81,7 +85,8 @@ var Easycall = Class.create({
 				"phone": phone,
 				"language": "Default",
 				"name": "Call Me",
-				"origin": this.origin
+				"origin": this.origin,
+				"type": this.type
 			},
 			// hand result off to handleRecord
 			onSuccess: this.handleRecord.bindAsEventListener(this),
@@ -177,8 +182,8 @@ var Easycall = Class.create({
 	},
 	// create the form items after the message is recorded
 	createFormItem: function () {
-		// if this is a CallMe then we don't display the language
-		if (this.origin != 'CallMe')
+		// if this is a JobWizard callme session, display the language
+		if (this.origin == 'jobwizard')
 			$(this.formitemname+"_"+this.language+"_lang").update(this.language);
 
 		if ($(this.formitemname+"_"+this.language+"_delete")) {
@@ -189,8 +194,8 @@ var Easycall = Class.create({
 			$(this.formitemname+"_"+this.language+"_action").insert(icon_button("<?=_L('Re-record')?>", "diagona/16/118", this.formitemname+"_"+this.language+"_rerecord").setStyle({float: "left"}));
 		}
 
-		// CallMe doesn't need a bottom border
-		if (this.origin != 'CallMe')
+		// JobWizard call me gets a bottom border
+		if (this.origin == 'jobwizard')
 			$(this.formitemname+"_"+this.language).insert(new Element("div", {style: "padding-top: 3px; margin-bottom: 5px; border-bottom: 1px solid gray; clear: both"}));
 
 		$(this.formitemname+"_"+this.language+"_rerecord").observe("click", function (event) {
@@ -215,18 +220,18 @@ var Easycall = Class.create({
 		if (!$(this.formitemname+"_"+this.language))
 			$(this.formitemname+"_messages").insert(new Element("div",{id: this.formitemname+"_"+this.language}));
 
-		// if this is a CallMe then we don't display the language
-		if (this.origin == 'CallMe') {
+		// if this is a JobWizard callme session, display the language
+		if (this.origin == 'jobwizard') {
 			$(this.formitemname+"_"+this.language).update().insert(
-				new Element("div",{id: this.formitemname+"_"+this.language+"_action", style: "margin-bottom: 5px;"})
+				new Element("div",{id: this.formitemname+"_"+this.language+"_lang", style: "font-size: large; float: left;"}).update(((easycallRecordings > 0)?this.language:''))
+			).insert(
+				new Element("div",{id: this.formitemname+"_"+this.language+"_action", style: "width: 80%; float: right; margin-bottom: 5px;"})
 			).insert(
 				new Element("div",{style: "clear: both;"})
 			);
 		} else {
 			$(this.formitemname+"_"+this.language).update().insert(
-				new Element("div",{id: this.formitemname+"_"+this.language+"_lang", style: "font-size: large; float: left;"}).update(((easycallRecordings > 0)?this.language:''))
-			).insert(
-				new Element("div",{id: this.formitemname+"_"+this.language+"_action", style: "width: 80%; float: right; margin-bottom: 5px;"})
+				new Element("div",{id: this.formitemname+"_"+this.language+"_action", style: "margin-bottom: 5px;"})
 			).insert(
 				new Element("div",{style: "clear: both;"})
 			);

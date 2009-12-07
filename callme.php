@@ -60,7 +60,8 @@ class CallMe extends FormItem {
 					"'.((isset($this->args['max']) && $this->args['max'])?$this->args['max']:"10").'",
 					"'.$defaultphone.'",
 					"'.$nophone.'",
-					"CallMe"
+					"CallMe",
+					"easycall"
 				).load();
 			</script>';
 		return $str;
