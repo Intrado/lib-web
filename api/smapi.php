@@ -304,7 +304,7 @@ class SMAPI{
 			}
 
 			//delete temp file that secure_tmpname generated so we can check if sox generated a file later
-			@unlink($cleanedtempfile);
+			unlink($cleanedtempfile);
 
 			if(!file_put_contents($origtempfile, base64_decode($audio))){
 				$result['resultdescription'] = "Failed to generate audio file";
@@ -315,8 +315,8 @@ class SMAPI{
 			$content = null;
 			if($res2 || !file_exists($cleanedtempfile)) {
 				$result["resultdescription"]= 'There was an error reading your audio file. Please try another file. Supported formats include: .wav';
-				@unlink($origtempfile);
-				@unlink($cleanedtempfile);
+				unlink($origtempfile);
+				unlink($cleanedtempfile);
 				return $result;
 			} else {
 				$content = new Content();
@@ -324,8 +324,8 @@ class SMAPI{
 				$content->data = base64_encode(file_get_contents($cleanedtempfile));
 				$content->create();
 
-				@unlink($origtempfile);
-				@unlink($cleanedtempfile);
+				unlink($origtempfile);
+				unlink($cleanedtempfile);
 			}
 			if($content == null || !$content->id){
 

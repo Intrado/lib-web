@@ -96,7 +96,7 @@ if (isset($_FILES['emailattachment']['error']) && $_FILES['emailattachment']['er
 			$errormessage .= _L('Unable to complete file upload. Please try again');
 		}
 	}
-	@unlink($newname);	
+	unlink($newname);	
 }
 
 ?>

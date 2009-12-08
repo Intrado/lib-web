@@ -23,7 +23,7 @@ if(isset($_GET['id'])) {
 			$outname = secure_tmpname("previewaudio",".mp3");
 			$cmd = 'lame -S -V3 "' . $wavfile . '" "' . $outname . '"';
 			$result = exec($cmd, $res1, $res2);
-			@unlink($wavfile);
+			unlink($wavfile);
 			
 			if (!$res2 && file_exists($outname)) {
 				$data = file_get_contents ($outname); //readfile seems to cause problems
@@ -42,7 +42,7 @@ if(isset($_GET['id'])) {
 			} else {
 				echo _L("An error occurred trying to generate the audio file. Please try again.");
 			}
-			@unlink($outname);
+			unlink($outname);
 		}
 	}
 }

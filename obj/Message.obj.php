@@ -305,7 +305,7 @@ class Message extends DBMappedObject {
 		$result = exec($cmd, $res1, $res2);
 
 		foreach ($wavfiles as $file)
-			@unlink($file);
+			unlink($file);
 	
 		if (!$res2 && file_exists($outname)) {	
 			if($audioformat == "mp3") {
@@ -329,7 +329,7 @@ class Message extends DBMappedObject {
 				} else {
 					echo _L("An error occurred trying to generate the preview file. Please try again.");
 				}
-				@unlink($outnamemp3);
+				unlink($outnamemp3);
 			} else {		
 				$data = file_get_contents ($outname); // readfile seems to cause problems
 				header("HTTP/1.0 200 OK");
@@ -349,7 +349,7 @@ class Message extends DBMappedObject {
 			echo _L("An error occurred trying to generate the preview file. Please try again.");
 		}
 
-		@unlink($outname);
+		unlink($outname);
 	}
 
 	
@@ -380,14 +380,14 @@ class Message extends DBMappedObject {
 		$result = exec($cmd, $res1, $res2);
 
 		foreach ($wavfiles as $file)
-			@unlink($file);
+			unlink($file);
 	
 		if (!$res2 && file_exists($outname)) {	
 			$data = file_get_contents ($outname); // readfile seems to cause problems	
 			$size = strlen($data);	
 		} 
 
-		@unlink($outname);	
+		unlink($outname);	
 		return $size;
 	}
 }

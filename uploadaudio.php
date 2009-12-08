@@ -87,8 +87,8 @@ if(CheckFormSubmit($f,$s))
 					$dest = $SETTINGS['feature']['tmp_dir'] . DIRECTORY_SEPARATOR . basename($_FILES['audio']['tmp_name']) . '.wav';
 					if(!move_uploaded_file($_FILES['audio']['tmp_name'],$source)) {
 						error('There was an error reading your audio file','Please try another file');
-						@unlink($source);
-						@unlink($dest);
+						unlink($source);
+						unlink($dest);
 					} else {
 	
 						$cmd = "sox \"$source\" -r 8000 -c 1 -s -w \"$dest\" ";
@@ -97,13 +97,13 @@ if(CheckFormSubmit($f,$s))
 						if($res2 || !file_exists($dest)) {
 							error('There was an error reading your audio file','Please try another file',
 							'Supported formats include: .wav, .aiff, and .au');
-							@unlink($source);
-							@unlink($dest);
+							unlink($source);
+							unlink($dest);
 						} else {
 							$contentid = contentPut($dest,"audio/wav");
 	
-							@unlink($source);
-							@unlink($dest);
+							unlink($source);
+							unlink($dest);
 	
 							if ($contentid) {
 								$audio->contentid = $contentid;

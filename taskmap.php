@@ -255,7 +255,7 @@ if ($fp && filesize($importfile) > 0 ) {
 	$noimportdata = true;
 }
 
-@unlink($importfile);
+unlink($importfile);
 
 
 $mapfromcols = range(0,$colcount-1);

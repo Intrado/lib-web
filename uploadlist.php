@@ -31,7 +31,7 @@ if (!$USER->authorize('createlist') || !($USER->authorize('listuploadids') || $U
 $list = new PeopleList(getCurrentList());
 
 if (isset($_SESSION['listuploadfiles'][$list->id])) {
-	@unlink($_SESSION['listuploadfiles'][$list->id]);
+	unlink($_SESSION['listuploadfiles'][$list->id]);
 	unset($_SESSION['listuploadfiles'][$list->id]);
 }
 

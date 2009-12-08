@@ -251,7 +251,7 @@ if (CheckFormSubmit($f,'save') && !$errormsg) {
 
 	//clean up the file and reset the session var
 
-	@unlink($curfilename);
+	unlink($curfilename);
 	unset($_SESSION['listuploadfiles'][$list->id]);
 
 	redirect("list.php");
