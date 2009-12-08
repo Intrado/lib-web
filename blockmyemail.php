@@ -105,7 +105,8 @@ if ($badcode) {
 		<p>Your email (<?=$email?>) will no longer receive <b>ANY</b> messages from <?=$customer?>.</p>
 		<p>To re-subscribe, contact <?=$customer?>.</p>
 	<?
-	endWindow();} else {
+	endWindow();
+} else {
 	startWindow("Block My Email Address", false, false, false);
 	?>
 		<div>
