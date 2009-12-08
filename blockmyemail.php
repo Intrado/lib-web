@@ -23,9 +23,13 @@ require_once("obj/Job.obj.php");
 $code = '';
 $submit = false;
 
-if (isset($_GET['s'])) {
+if (isset($_GET['s']))
 	$code = $_GET['s'];
-} else if (isset($_POST['submit'])) {
+
+if (isset($_GET['auto']))
+	$submit = true;
+	
+if (isset($_POST['submit'])) {
 	$code = $_POST['code'];
 	$submit = true;
 }
