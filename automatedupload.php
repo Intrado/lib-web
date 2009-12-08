@@ -176,12 +176,11 @@ if (isset($_GET['authCode']) && isset($_GET['sessionId'])) {
 		//do the upload
 		$import = new Import($_SESSION['importid']);
 		$data = file_get_contents($_SESSION['filename']);
+		unlink($_SESSION['filename']);
 		if (!$data  || !$import->upload($data))
 			return array ("resumeLength" => "0",
 						"errorMsg" => "There was an error uploading the file",
 						"errorCode" => "UPLOAD_ERROR");
-
-		@unlink($_SESSION['filename']);
 
 		//should we kick off the import?
 		if ($import->type == "automatic") {
@@ -211,7 +210,7 @@ if (isset($_GET['authCode']) && isset($_GET['sessionId'])) {
 
 		//delete any remaining files still hanging around
 		if (isset($sess['filename']))
-			@unlink($sess['filename']);
+			unlink($sess['filename']);
 		//delete the session
 		$_SESSION = array();
 
