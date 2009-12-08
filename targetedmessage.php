@@ -166,6 +166,7 @@ endWindow();
 	var tabs;
 	
 	var categories = new Array('<?= implode(array_keys($library),"','")?>');
+	var categoriesimages = new Hash(<?= $categories ?>);
 
 
 	function getstatesrc(state) {
@@ -190,11 +191,29 @@ endWindow();
 		var sectioncache = checkedcache.get(tabs.currentSection);
 		if(sectioncache.get(contact) == undefined)
 			sectioncache.set(contact,new Hash());
-		var contact = sectioncache.get(contact);
-		if(state)
-			contact.set(message,true);
-		else
-			contact.unset(message);
+		var contactlink = sectioncache.get(contact);
+		if(state) {
+			//tabs.currentSection
+			var img = $(contact).next('img');
+			while(img.name != undefined && img.name != tabs.currentSection) {
+				img = img.next('img');
+			}
+			if(img.name != undefined) {
+				img.show();
+			}
+			contactlink.set(message,true);
+		} else {
+			contactlink.unset(message);
+			if(contactlink.size() == 0) {
+				var img = $(contact).next('img');
+				while(img.name != undefined && img.name != tabs.currentSection) {
+					img = img.next('img');
+				}
+				if(img.name != undefined) {
+					img.hide();
+				}
+			}
+		}
 	}
 
 	// has link in this section only
@@ -252,6 +271,16 @@ endWindow();
 				$('theinstructions').show();
 				$('tabsContainer').hide();
 
+				var icons = "";
+				categories.each(function(category) {
+					var image = "img/icons/bug.gif";
+					if(categoriesimages.get(category))
+						image = categoriesimages.get(category);
+
+					icons += '<img src="' + image + '" name="' + category + '-library" class="' + category + '-library"style="display:none;" alt="" />';
+				});
+
+
 				//$('themessages').fade({ duration: 0.5 });
 				//setTimeout("$('theinstructions').show()",1000);
 				revealmessages = true;
@@ -261,7 +290,7 @@ endWindow();
 				response.each(function(person) {
 					var id = 'contactbox-' + counter;
 					counter++;
-					$('contactbox').insert('<li><img src="img/pixel.gif" style="width:10px;height:10px;vertical-align:middle;" alt="" / ><a href="#" id="' + id + '" style="text-decoration:none;">' + person +'</a><img src="img/icons/fugue/tick.gif" style="display:none" alt="" / ></li>');
+					$('contactbox').insert('<li><img src="img/pixel.gif" style="width:10px;height:10px;vertical-align:middle;" alt="" / ><a href="#" id="' + id + '" style="text-decoration:none;">' + person +'</a>' + icons + '</li>');
 
 					/*
 					 * Observe Contact Click. Select one contact at a time or multiple contacts with
@@ -285,7 +314,6 @@ endWindow();
 								checkedcontacts.unset(this.id);
 								$(this.id).style.background = c_none;
 								this.previous().checked = false;
-								
 							} else {
 								this.style.background = c_selected;
 								checkedcontacts.set(this.id,true);
@@ -317,7 +345,9 @@ endWindow();
 						}
 						categories.each(function (category) {
 							if(tabs.currentSection != category + '-library' && checkedcache.get(category + '-library').get(msgid) != undefined) {
-									tabs.sections[category + '-library'].titleDiv.pulsate({pulses:2, duration: 1.5});
+								tabs.sections[category + '-library'].titleDiv.style.background = c_hover;
+
+								//tabs.sections[category + '-library'].titleDiv.pulsate({pulses:2, duration: 1.5});
 							}
 						});
 					});
@@ -331,6 +361,11 @@ endWindow();
 							this.style.background = c_selected;
 						else
 							this.style.background = c_none;
+
+
+						categories.each(function (category) {
+							tabs.sections[category + '-library'].titleDiv.style.background = '';
+						});
 					});
 				});
 
@@ -340,7 +375,6 @@ endWindow();
 		});
 		clearcache();
 	}
-
 
 document.observe("dom:loaded", function() {
 	$('classselect').setValue(0);
@@ -352,7 +386,6 @@ document.observe("dom:loaded", function() {
 	$('picker').observe("mousedown", function(event) {			  // disable select in FF
 		event.stop();
 	});
-
 
 	/*
 	 * Static observers
@@ -369,7 +402,7 @@ document.observe("dom:loaded", function() {
 		}
 		if(revealmessages) {
 			$('theinstructions').hide();
-			revealmessages = false
+			revealmessages = false; 
 			$('tabsContainer').show();
 		}
 		updatemessages(tabs.currentSection);
@@ -401,7 +434,6 @@ document.observe("dom:loaded", function() {
 						highlightedcontacts.unset(contact.key);
 						$(contact.key).previous('img').src = "img/pixel.gif";
 					}
-
 					setlink(contact.key,msgid,(state == 2));
 				});
 			});
@@ -431,10 +463,6 @@ document.observe("dom:loaded", function() {
 
 
 	tabs = new Tabs('tabsContainer',{});
-
-
-	var categoriesimages = new Hash(<?= $categories ?>);
-
 
 	categories.each(function(category) {
 		checkedcache.set(category + '-library',new Hash());
