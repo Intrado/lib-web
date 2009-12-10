@@ -237,7 +237,7 @@ buttons();
 EndForm();
 ?>
 <div style="margin: 5px;">
-	<img src="img/bug_lightbulb.gif" > Please reset the Flex Appliance after you save any changes.
+	<img src="img/bug_lightbulb.gif" > Please reset the SmartCall Appliance after you save any changes.
 </div>
 <?
 include_once("navbottom.inc.php");

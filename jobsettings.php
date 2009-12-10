@@ -71,10 +71,10 @@ $formdata["autoreportreplyname"] = array(
 
 if($IS_COMMSUITE || getSystemSetting('_dmmethod', 'asp') != 'asp'){
 
-	$helpsteps[$helpstepnum++] = _L("If you use a Flex appliance or have a licensed solution, enter the minimum and maximum length of extensions on your local network. For example, to have the system call  four digit extensions on your local network, set these values to 4.");
+	$helpsteps[$helpstepnum++] = _L("If you use a SmartCall appliance or have a licensed solution, enter the minimum and maximum length of extensions on your local network. For example, to have the system call  four digit extensions on your local network, set these values to 4.");
 	$formdata["easycallmin"] = array(
 		"label" => _L("Minimum Extensions Length"),
-		"fieldhelp" => _L("This is the minimum length of an extension on your local network which your Flex appliance or licensed solution may call."),
+		"fieldhelp" => _L("This is the minimum length of an extension on your local network which your SmartCall appliance or licensed solution may call."),
 		"value" => getSystemSetting('easycallmin',10),
 		"validators" => array(
 			array("ValRequired"),
@@ -82,12 +82,12 @@ if($IS_COMMSUITE || getSystemSetting('_dmmethod', 'asp') != 'asp'){
 		"control" => array("SelectMenu","values"=>array_combine(range(1,10),range(1,10))),
 		"helpstep" => $helpstepnum
 	);
-	
+
 	$formdata["easycallmax"] = array(
 		"label" => _L("Maximum Extensions Length"),
-		"fieldhelp" => _L("This is the maximum length of an extension on your local network which your Flex appliance or licensed solution may call."),
+		"fieldhelp" => _L("This is the maximum length of an extension on your local network which your SmartCall appliance or licensed solution may call."),
 		"value" => getSystemSetting('easycallmax',10),
-		"fieldhelp" => _L("This is the maximum length of an extension on your local network which your Flex appliance or licensed solution may call."),
+		"fieldhelp" => _L("This is the maximum length of an extension on your local network which your SmartCall appliance or licensed solution may call."),
 		"validators" => array(
 			array("ValRequired"),
 			array("ValNumber","min" => 1,"max" => 10)),
@@ -110,7 +110,7 @@ $datachange = false;
 $errors = false;
 
 if ($button = $form->getSubmit()) { //checks for submit and merges in post data
-	$ajax = $form->isAjaxSubmit(); //whether or not this requires an ajax response    
+	$ajax = $form->isAjaxSubmit(); //whether or not this requires an ajax response
 
 	if ($form->checkForDataChange()) {
 		$datachange = true;
@@ -126,8 +126,8 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		if($IS_COMMSUITE || getSystemSetting('_dmmethod', 'asp') != 'asp'){
 			setSystemSetting('easycallmin', $postdata['easycallmin']);
 			setSystemSetting('easycallmax', $postdata['easycallmax']);
-		}		
-		
+		}
+
 		if ($ajax)
 			$form->sendTo("settings.php");
 		else

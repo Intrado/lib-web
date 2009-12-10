@@ -15,12 +15,12 @@ if(isset($_GET['resetdm'])){
 		QuickUpdate("update custdm set routechange = null where dmid = " . $resetid);
 ?>
 <script>
-		window.alert('Reset command initiated for Flex Appliance: <?=$dmname?>');
+		window.alert('Reset command initiated for SmartCall Appliance: <?=$dmname?>');
 		window.location="dms.php";
 </script>
 <?
 	} else {
-		error("An error occured when trying to reset a Flex Appliance", "Please try again later");
+		error("An error occured when trying to reset a SmartCall Appliance", "Please try again later");
 	}
 }
 
@@ -38,7 +38,7 @@ function fmt_dm_actions($row, $index){
 	$url = '<a href="dmstatus.php?dmid=' . $row[0] . '">Status</a>';
 	$url .= '&nbsp;|&nbsp;<a href="dmschedule.php?dmid=' . $row[0] . '">Resource&nbsp;Schedule</a>';
 	$url .= '&nbsp;|&nbsp;<a href="dmsettings.php?dmid=' . $row[0] . '">Route&nbsp;Plan</a>';
-	$url .= '&nbsp;|&nbsp;<a href="dms.php?resetdm=' . $row[0] . '" onclick="return confirm(\'Are you sure you want to reset this Flex Appliance?\')">Reset</a>';
+	$url .= '&nbsp;|&nbsp;<a href="dms.php?resetdm=' . $row[0] . '" onclick="return confirm(\'Are you sure you want to reset this SmartCall Appliance?\')">Reset</a>';
 	return $url;
 }
 
@@ -58,7 +58,7 @@ $formatters = array("actions" => "fmt_dm_actions",
 					2 => "fmt_dm_comment");
 
 $PAGE="admin:settings";
-$TITLE="Flex Appliance Manager";
+$TITLE="SmartCall Appliance Manager";
 include_once("nav.inc.php");
 buttons(button("Back", null, "settings.php"));
 startWindow("Authorized Appliances" . help('Settings_DMs'));

@@ -41,7 +41,7 @@ startWindow("Options", 'padding: 3px;');
 				<th align="left" class="nosort">Destination Labels</th>
 <?
 			}
-			// features - if contact manager, or self-signup, or flex appliance
+			// features - if contact manager, or self-signup, or smartcall appliance
 			if ((getSystemSetting('_hasportal', false) && $USER->authorize('portalaccess')) ||
 				(getSystemSetting('_hasselfsignup', false) && $USER->authorize('metadata')) ||
 				($USER->authorize('managesystem') && getSystemSetting('_dmmethod', "")!='asp')) {
@@ -91,7 +91,7 @@ startWindow("Options", 'padding: 3px;');
 					<tr><td><a href='disablerepeatingjobs.php'>Enable/Disable Repeating Jobs</a></td></tr>
 					<tr><td><a href='jobsettings.php'>Job Settings</a></td></tr>
 					<tr><td><a href='jobtypemanagement.php'>Job Types</a></td></tr>
-					<tr><td><a href='messageintro.php'>Message Intro</a></td></tr>		
+					<tr><td><a href='messageintro.php'>Message Intro</a></td></tr>
 				</table>
 			</td>
 			<td>
@@ -105,7 +105,7 @@ startWindow("Options", 'padding: 3px;');
 			</td>
 <?
 		}
-		// features - if contact manager, or self-signup, or flex appliance
+		// features - if contact manager, or self-signup, or smartcall appliance
 		if ((getSystemSetting('_hasportal', false) && $USER->authorize('portalaccess')) ||
 			(getSystemSetting('_hasselfsignup', false) && ($USER->authorize('metadata') || $USER->authorize('managesystem'))) ||
 			($USER->authorize('managesystem') && getSystemSetting('_dmmethod', "")!='asp')) {
@@ -114,26 +114,26 @@ startWindow("Options", 'padding: 3px;');
 				<table>
 <?
 					if (getSystemSetting('_hasportal', false) && $USER->authorize('portalaccess')) {
-?>				
+?>
 						<tr><td><a href='contactmanagersettings.php'>Contact Manager Settings</a></td></tr>
 <?
-					}					
+					}
 					if (getSystemSetting('_hasselfsignup', false)) {
 						if ($USER->authorize('managesystem')) {
-?>				
+?>
 							<tr><td><a href='subscribersettings.php'>Self-Signup Settings</a></td></tr>
 <?						}
 						if ($USER->authorize('metadata')) {
 ?>
 							<tr><td><a href='subscriberfields.php'>Self-Signup Fields</a></td></tr>
 <?						}
-					}					
+					}
 					if ($USER->authorize('managesystem') && getSystemSetting('_dmmethod', "")!='asp') {
 ?>
-						<tr><td><a href='dms.php'><?=($IS_COMMSUITE)?_L("Telephony Settings"):_L("Flex Appliance")?></a></td></tr>
+						<tr><td><a href='dms.php'><?=($IS_COMMSUITE)?_L("Telephony Settings"):_L("SmartCall Appliance")?></a></td></tr>
 <?
 					}
-?>					
+?>
 				</table>
 			</td>
 <?

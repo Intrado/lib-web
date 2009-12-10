@@ -43,7 +43,7 @@ include_once("dmstatusdata.inc.php");
 ////////////////////////////////////////////////////////////////////////////////
 
 $PAGE="admin:settings";
-$TITLE="Flex Appliance: ".escapehtml($dmname);
+$TITLE="SmartCall Appliance: ".escapehtml($dmname);
 
 include_once("nav.inc.php");
 buttons(icon_button("Back","fugue/arrow_180",null,"dms.php"));

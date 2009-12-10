@@ -68,7 +68,7 @@ if(CheckFormSubmit($f,$s) || $checkformdelete || CheckFormSubmit($f, "add") || C
 			TrimFormData($f, $s, "dm_" . $route->id ."_prefix");
 			TrimFormData($f, $s, "dm_" . $route->id ."_suffix");
 		}
-		
+
 		//do check
 
 		if( CheckFormSection($f, $s) ) {
@@ -259,7 +259,7 @@ buttons();
 EndForm();
 ?>
 <div style="margin: 5px;">
-	<img src="img/bug_lightbulb.gif" > Please reset the Flex Appliance after you save any changes.
+	<img src="img/bug_lightbulb.gif" > Please reset the SmartCall Appliance after you save any changes.
 </div>
 <?
 include_once("navbottom.inc.php");
