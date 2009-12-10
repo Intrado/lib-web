@@ -35,20 +35,16 @@ if(CheckFormSubmit($f,$s))
 				}
 
 				if(!isset($_SESSION['customerid'])){
-					$associationresult = portalGetCustomerAssociations();
-					if($associationresult['result'] == ""){
-						$customerlist = $associationresult['custmap'];
-						$customeridlist = array_keys($customerlist);
-					} else {
-						$customeridlist = array();
-					}
+					
+					// set the customerid to the one just associated with this person
 					$_SESSION['customerid'] = $result['customerid'];
-
-					$_SESSION['custname'] = $customerlist[$customeridlist[0]];
-					$accessresult = portalAccessCustomer($customeridlist[0]);
+					// get customer db access
+					$accessresult = portalAccessCustomer($_SESSION['customerid']);
 					if($accessresult['result'] != ""){
 						error(_L("There was an unknown problem connecting to that customer"));
 					}
+					$_SESSION['custname'] = getSystemSetting("displayname");
+				
 					//make sure timezone gets updated to the current customer's tz
 					$timezone = getSystemSetting("timezone");
 					$_SESSION['timezone'] = $timezone;
