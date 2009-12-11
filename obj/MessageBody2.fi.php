@@ -1,0 +1,195 @@
+<?
+
+// TODO: Rename this file to MessageBody.fi.php, replacing the old implementation.
+
+// Todo: set a default language variable instead of checking against 'english' or 'en'
+
+// Translation widget
+class MessageBody extends FormItem {
+	function render ($value) {
+		static $renderscript = true;
+
+		$n = $this->form->name."_".$this->name;
+		if($value == null)
+			$value == "";
+
+		$msgdata = json_decode($value);
+
+		$language = $this->args['language'];
+
+		if ($language == 'english' || empty($this->args['multilingual'])) {
+			$multilingual = false;
+		} else {
+			$multilingual = true;
+		}
+
+		$gender = isset($msgdata->gender)?$msgdata->gender:"female";
+
+		$isphone = !empty($this->args['phone']);
+
+		$cssShowIfMultilingual = "; display:" . ($multilingual ? "block" : "none") . "; ";
+
+		$str = "";
+
+		$str .= '
+			<input id="'.$n.'" name="'.$n.'" type="hidden" value="' . escapehtml($value) . '"/>
+			<input id="'.$n.'overridesave" type="hidden" value=""></div>
+
+			<div class="TranslationSettingDiv" style="'.$cssShowIfMultilingual.'">
+				<input id="'.$n.'translatecheck" class="EnableTranslationCheckbox" name="'.$n.'checkbox" type="checkbox" onclick="toggleTranslation(\''.$n.'\',\''.$language.'\');" '.(($msgdata->enabled && $multilingual)?"checked":"").' />
+				<b>'._L('Enable Translation').'</b>
+			</div>
+
+			<div id="'.$n.'controls" style="">
+				<div style="float:left">'.($isphone?icon_button(_L("Play"),"fugue/control","var content = $('" . $n . "text').getValue(); if(content != '') popup('previewmessage.php?parentfield=".$n."text&language=$language&gender=$gender" . "', 400, 400,'preview');"):"").'</div>
+				<div style="float:right">'. icon_button(_L("Clear"), "fugue/control") .'</div>
+				<div style="clear:both"></div>
+			</div>
+
+			<div id="'.$n.'textfields" style="padding-right:3px; padding-left: 3px;">
+				<div class="Translation">
+					<textarea id="'.$n.'sourceText" name="'.$n.'sourceText" style="width:98%; '.$cssShowIfMultilingual.'">' . escapehtml($this->args["sourceText"]) . '</textarea>
+
+					<div style="margin-top: 15px; '.$cssShowIfMultilingual.'">
+						<div id="'.$n.'icons" style="float:left; display: '.(($msgdata->enabled)?"block":"none").'">
+							<img id="'.$n.'editlock" style="'.((!$msgdata->override)?"display:none;":"").'" src="img/padlock.gif">
+						</div>
+						<center>' . icon_button(_L("Refresh Translation"), "fugue/magnifier", "getTranslation('$n','$language')", null, 'style="float:none;" id="'. $n .'refreshTranslationButton"') . '</center>
+						<div style="clear:both"></div>
+					</div>
+				</div>
+
+				<div class="Translation">
+					<div id="'.$n.'textdiv" name="'.$n.'textdiv" style="display: '.((!$msgdata->override && $multilingual)?"block":"none").'; height: 50px; border: 1px solid gray; color: gray; overflow:auto">'.escapehtml($msgdata->text).'</div>
+				</div>
+
+				<textarea id="'.$n.'text" name="'.$n.'text" style="width:98%;  display: '.(($msgdata->override || !$multilingual)?"block":"none").'; " rows="3" onChange="setTranslationValue(\''.$n.'\');" />'.escapehtml($msgdata->text).'</textarea>
+
+				<div class="Translation">
+					<div id="'. $n .'retranslationcontrols" style="clear:both; '.$cssShowIfMultilingual.'">
+						<input id="'.$n.'override" name="'.$n.'checkbox" type="checkbox" '.(($msgdata->override)?"checked":"").' onclick="overrideTranslation(\''.$n.'\',\''.$language.'\');"/>' . _L('Override Translation') . '
+
+						<div id="'.$n.'retranslation" style="margin-top: 15px; clear:both">
+							<center>'. icon_button(_L('English Retranslation', $language),"fugue/arrow_circle_double_135","submitRetranslation('$n','$language')", null, 'style="float:none"') . '</center>
+							<div id="'.$n.'retranslationtext" name="'.$n.'retranslation" style="height: 50px; border: 1px solid gray; color: gray; overflow:auto; clear:both"></div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+
+		';
+
+		if($renderscript) {
+			$str .= '
+			<script>
+				function submitRetranslation(section,language) {
+					var srcbox = section + "text";
+					var text = $(srcbox).getValue();
+					if(text == "")
+						return;
+					if(text != text.substring(0, 2000)){
+						text = text.substring(0, 2000);
+						alert("' . _L('The message is too long. Only the first 2000 characters are submitted for translation.') . '");
+					}
+					$(section + "retranslationtext").innerHTML = "<img src=\"img/ajax-loader.gif\" />";
+					new Ajax.Request("translate.php", {
+						method:"post",
+						parameters: {"text": text, "language": language},
+						onSuccess: function(result) {
+									var data = result.responseJSON;
+									if(data.responseStatus != 200 || data.responseData.translatedText == undefined)
+										return;
+									var dstbox = section + "retranslationtext";
+									$(dstbox).innerHTML = data.responseData.translatedText.escapeHTML();
+							}
+					});
+					return false;
+				}
+				function getTranslation(section, language) {
+					var sourceText = $(section+"sourceText");
+					var langtext = $(section + "text");
+					var overridesave = $(section + "overridesave");
+					if (!sourceText.value) {
+						langtext.value = overridesave.value;
+						return;
+					}
+					$(section + "textdiv").innerHTML = "<img src=\"img/ajax-loader.gif\" />";
+					new Ajax.Request("translate.php", {
+						method:"post",
+						parameters: {"english": sourceText.value, "languages": language},
+						onSuccess: function(transport) {
+							var data = transport.responseJSON;
+							if(data.responseStatus != 200 || data.responseData.translatedText == undefined)
+								return;
+							$(section+"textdiv").innerHTML = data.responseData.translatedText.escapeHTML();
+							$(section+"text").value = data.responseData.translatedText.escapeHTML();
+							setTranslationValue(section);
+						}
+					});
+				}
+				function setTranslationValue(section) {
+					var curVal = $(section).value.evalJSON();
+					$(section).value = Object.toJSON({
+						"enabled": $(section + "translatecheck").checked,
+						"text": (($(section + "translatecheck").checked)?$(section + "text").value.toString():""),
+						"override": (($(section + "translatecheck").checked)?$(section + "override").checked:false),
+						"gender": curVal.gender
+					});
+					form_do_validation($(\'' . $this->form->name . '\'), $(section));
+				}
+
+				function overrideTranslation(section,language) {
+					var langtext = $(section + "text");
+					var overridesave = $(section + "overridesave");
+					if ($(section+"override").checked) {
+						if (!overridesave.value)
+							overridesave.value = langtext.value;
+						langtext.show();
+						$(section + "editlock").show();
+						$(section + "textdiv").hide();
+					} else {
+						if(langtext.value != overridesave.value && !confirm(\'' . _L('The edited text will be removed and set back to the previous translation.') . '\')) {
+							$(section + "override").checked = true;
+							return;
+						}
+						getTranslation(section,language);
+						overridesave.value = "";
+						langtext.hide();
+						$(section + "editlock").hide();
+						$(section + "textdiv").show();
+					}
+					setTranslationValue(section);
+				}
+				function toggleTranslation(section,language) {
+					var translatecheck = $(section+"translatecheck");
+					var settingDiv = translatecheck ? translatecheck.up("div.TranslationSettingDiv") : null;
+
+					if (translatecheck.checked) {
+						if ($(section+"text").value == "" && language)
+							getTranslation(section, language);
+
+						// TODO: Show appropriate things.
+						$(section +"textfields").select(".Translation").invoke("show");
+						if (!$(section+"override").checked) {
+							$(section +"text").hide();
+						}
+					} else {
+						// TODO: Show appropriate things.
+						$(section +"textfields").select(".Translation").invoke("hide");
+						$(section +"text").show();
+					}
+					setTranslationValue(section);
+
+					if (language)
+						settingDiv.fire("MessageBody:TranslationSettingChanged");
+				}
+
+			</script>';
+			$renderscript = false;
+		}
+		return $str;
+	}
+}
+
+?>
