@@ -538,7 +538,7 @@ div.scrollTableContainer {
 	background-position: 2px 6px;
 	border: solid 1px #b47727;
 	-moz-border-radius: 10px 10px 0 0;
-	display: inline;
+	float: left;
 	white-space: nowrap;
 }
 .horizontaltabstitledivexpanded {
@@ -556,6 +556,7 @@ div.scrollTableContainer {
 	vertical-align: middle;
 }
 .horizontaltabscontentdiv {
+	clear: both;
 }
 .horizontaltabspanelspane {
 	border: 1px solid #b47727;
@@ -570,14 +571,15 @@ div.scrollTableContainer {
 	padding-top: 5px;
 	cursor: pointer;
 	color: rgb(30,30,30);
-	background: #f8f1e9 no-repeat;
-	background-position: 2px 6px;
+	background: white no-repeat;
 	border: solid 1px #b47727;
 	-moz-border-radius: 0 10px 10px 0;
+	border-left: 0;
 }
 .verticaltabstitledivexpanded {
-	border-left: rgb(250,250,250);
-	margin-left: -1px;
+	border: solid 2px #b47727;
+	border-left: 0;
+	margin-left: -2px;
 }
 .verticaltabstitledivcollapsed {
 	background: rgb(200,200,200);
@@ -593,14 +595,13 @@ div.scrollTableContainer {
 .verticaltabscontentdiv {
 }
 .verticaltabstabspane {
-	width: 200px;
 }
 .verticaltabspanelspane {
-	border: 1px solid #b47727;
+	border: 2px solid #b47727;
 	padding: 5px;
 	padding-bottom: 25px;
 	margin-bottom: 1px;
-	background: rgb(250,250,250);
+	background: white;
 }
 table.SplitPane {
 	border-collapse: collapse;
@@ -609,6 +610,37 @@ table.SplitPane {
 td.SplitPane {
 	margin: 0;
 	padding: 0;
+	vertical-align: top;
+}
+.MessageContentHeader {
+	font-weight: bold;
+	letter-spacing: 1px;
+	font-size: 120%;
+	display: block;
+	margin: 2px;
+	margin-left: 5px;
+}
+#summaryContainer table {
+}
+#summaryContainer th {
+	font-weight: bold;
+	vertical-align: top;
+	padding: 5px;
+}
+#summaryContainer th.Destination {
+	border-left: solid 1px rgb(210,210,210);
+	text-align: middle;
+}
+#summaryContainer th.Language {
+	border-top: solid 1px rgb(210,210,210);
+	text-align: left;
+}
+#summaryContainer td.StatusIcon {
+	vertical-align: top;
+	text-align: center;
+	border-top: solid 1px rgb(210,210,210);
+	border-left: solid 1px rgb(210,210,210);
+	padding: 5px;
 }
 
 .sortheader {
