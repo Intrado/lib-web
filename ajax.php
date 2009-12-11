@@ -23,12 +23,21 @@ function handleRequest() {
 	global $RULE_OPERATORS;
 	global $RELDATE_OPTIONS;
 	$type = isset($_GET['type'])?$_GET['type']:$_POST['type'];
-	
+
 	switch($type) {
 		//--------------------------- SIMPLE OBJECTS, should mirror objects in obj/*.obj.php (simplified to _fieldlist) -------------------------------
 		case 'lists':
 			return cleanObjects(DBFindMany('PeopleList', ', (name+0) as lettersfirst from list where userid=? and not deleted order by lettersfirst,name', false, array($USER->id)));
-			
+
+		// Return an AudioFile object specified by its ID.
+		case 'AudioFile':
+			if (!isset($_GET['id']))
+				return false;
+			$audioFile = new AudioFile($_GET['id'] + 0);
+			if ($audioFile->userid !== $USER->id)
+				return false;
+			return cleanObjects($audioFile);
+
 		// Return a message object specified by it's ID
 		case 'Message':
 			if (!isset($_GET['id']))
@@ -37,20 +46,20 @@ function handleRequest() {
 			if ($message->userid !== $USER->id)
 				return false;
 			return cleanObjects($message);
-		
+
 		// Return a specific message part by it's ID
 		case "MessagePart":
 			if (!isset($_GET['id']))
 				return false;
 			$mp =  new MessagePart($_GET['id'] + 0);
 			// if the message part doesn't belong to any message, return false
-			if (!$mp->messageid) 
+			if (!$mp->messageid)
 				return false;
 			// if the message part doesn't belog to the current user, return false
 			if (!userOwns("message", $mp->messageid))
 				return false;
 			return cleanObjects($mp);
-		
+
 		//--------------------------- COMPLEX OBJECTS -------------------------------
 		// Return message parts belonging to a specific messageid
 		case "MessageParts":
@@ -59,7 +68,7 @@ function handleRequest() {
 			if (!userOwns("message", $_GET['id']))
 				return false;
 			return cleanObjects(DBFindMany("MessagePart","from messagepart where messageid=? order by sequence", false, array($_GET['id'])));
-		
+
 		// Return messages for the current user, if userid is specified return that user's messages
 		case "Messages":
 			if(!isset($_GET['messagetype'])){
@@ -73,7 +82,7 @@ function handleRequest() {
 					return false;
 			}
 			return QuickQueryList('select id,name from message where not deleted and userid=? and type=? order by id', true, false, array($userid, $_GET['messagetype']));
-			
+
 		//--------------------------- RPC -------------------------------
 		case 'hasmessage':
 			if (!isset($_GET['messagetype']) && !isset($_GET['messageid']))
@@ -82,7 +91,7 @@ function handleRequest() {
 				return QuickQuery("select count(id) from message where userid=? and not deleted and type=?", false, array($USER->id, $_GET['messagetype']))?true:false;
 			if (isset($_GET['messageid']))
 				return QuickQuery("select count(id) from message where userid=? and not deleted and id=?", false, array($USER->id, $_GET['messageid']))?true:false;
-			
+
 		case 'listrules':
 			// $_GET['listids'] should be json-encoded array.
 			if (!isset($_GET['listids']))
@@ -103,7 +112,7 @@ function handleRequest() {
 				}
 			}
 			return cleanObjects($listrules);
-			
+
 		case 'liststats':
 			// $_GET['listids'] should be json-encoded array.
 			if (!isset($_GET['listids']))
@@ -127,20 +136,20 @@ function handleRequest() {
 					'total' => $renderedlist->total);
 			}
 			return $stats;
-			
+
 		case 'persondatavalues':
 			if (!isset($_GET['fieldnum']) || !$USER->authorizeField($_GET['fieldnum']))
 				return false;
 			$limit = DBFind('Rule', 'from rule inner join userrule on rule.id = userrule.ruleid where userid=? and fieldnum=?', false, array($USER->id, $_GET['fieldnum']));
 			$limitsql = $limit ? $limit->toSQL(false, 'value', false, true) : '';
 			return QuickQueryList("select value from persondatavalues where fieldnum=? $limitsql order by value", false, false, array($_GET['fieldnum']));
-			
+
 		case 'rulewidgetsettings':
 			return array(
 				'operators' => $RULE_OPERATORS,
 				'reldateOptions' => $RELDATE_OPTIONS,
 				'fieldmaps' => cleanObjects(FieldMap::getAllAuthorizedFieldMaps()));
-		
+
 		// Return a whole message including it's message parts formatted into body text and any attachments.
 		case 'previewmessage':
 			if (!isset($_GET['id']))
@@ -155,7 +164,7 @@ function handleRequest() {
 			if (count($parts) == 1)
 				foreach ($parts as $id => $part)
 					if ($part->type == "A") $simple = true;
-			
+
 			return array(
 				"lastused"=>$message->lastused,
 				"description"=>$message->description,
@@ -167,7 +176,7 @@ function handleRequest() {
 				"attachment"=>count($attachments)?cleanObjects($attachments):false,
 				"body"=>count($parts)?$message->format($parts):""
 			);
-			
+
 		default:
 			error_log("No AJAX API for type=$type");
 			return false;
