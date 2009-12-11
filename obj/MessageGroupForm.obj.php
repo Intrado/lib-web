@@ -1,8 +1,10 @@
 <?php
 
+// next task: revise renderFormItems(), refactor so that it's less work for javascript DOM manipulation.
 // next task: summary page.
 // next task: summary page -- onclick event handlers for each cell.
 // next task: status images for each destination.
+// next task: restructure tabs to new structure: destination->subtype->languages instead of destination->languages->subtype.
 // next task: correctly find out the current editor for use with data field inserts and call me to record.
 // next task: write a function to cause all languages for a certain destination type to be form_validated. (for use in autotranslate and when loading the form).
 // next task: replace the subtype icons with the actual form validation icon.
@@ -519,9 +521,9 @@ class MessageGroupForm extends Form {
 			
 			<script type='text/javascript' src='script/datepicker.js'></script> <!-- Needed for data-field-insert Date fields. -->
 			<script type='text/javascript' src='script/accordion.js'></script>
+			<script type='text/javascript' src='script/messagegroupform.js.php'></script>
 			<script type='text/javascript'>
 				document.observe('dom:loaded', function() {
-
 					var formName = '{$this->name}';
 					form_load(formName,
 						'". $this->get_post_url() ."',
@@ -532,354 +534,11 @@ class MessageGroupForm extends Form {
 
 					var allowedDestinations = " . json_encode($this->allowedDestinations) . ";
 
-					var AutoTranslate = Class.create({
-						initialize: function(container, messageGroupForm, type, subtype) {
-							
-							
-
-							this.container = container;
-							this.messageGroupForm = messageGroupForm;
-							this.type = type;
-							this.subtype = subtype;
-							this.destination = messageGroupForm.allowedDestinations[type];
-
-							
-							
-
-							this.languages = this.destination.languages;
-							this.fieldareas = this.destination.fieldareas;
-
-							
-							
-
-							this.translationDivs = {};
-							this.retranslationDivs = {};
-							this.languageCheckboxes = {};
-
-							if (!messageGroupForm.autotranslates)
-								messageGroupForm.autotranslates = {};
-							messageGroupForm.autotranslates[type + subtype] = this;
-
-							
-							
-
-							// Create the ui.
-							this.sourceTextarea = new Element('textarea', {'style':'width:99%; height:100px'});
-							var clearButton = new Element('button', {'type':'button'}).update('Clear');
-							var translateButton = new Element('button', {'type':'button'}).update('Refresh Translations');
-
-							this.container.insert(new Element('div', {'class':'MessageContentHeader'}).update('Auto-Translate'));
-							this.container.insert(new Element('div', {'style':'text-align:right'}).insert(clearButton));
-							this.container.insert(new Element('div').insert(this.sourceTextarea));
-							this.container.insert(new Element('div', {'style':'text-align:left;'}).insert(translateButton));
-
-							clearButton.observe('click', this.on_click_clear.bindAsEventListener(this));
-							translateButton.observe('click', this.on_click_translate.bindAsEventListener(this));
-
-							for (var languageCode in this.languages) {
-								if (languageCode == 'en') // TODO: only autotranslate valid languages defined in translate.php
-									continue;
-
-								
-								
-
-								var playButton = new Element('button', {'type':'button'}).update('Play');
-								var retranslateButton = new Element('button', {'type':'button'}).update('English Retranslation');
-								this.translationDivs[languageCode] = new Element('div', {'style':'padding:2px; height:100px; border: dashed 1px rgb(220,220,220)'});
-								this.retranslationDivs[languageCode] = new Element('div', {'style':'padding:2px; border: dashed 1px rgb(220,220,220)'});
-								this.languageCheckboxes[languageCode] = new Element('input', {'type':'checkbox', 'style':'margin-right:10px', 'checked':true});
-
-								
-								
-
-								var translationContainer = new Element('div', {'style':'margin-top: 15px; border: solid 1px rgb(210,210,210); padding: 5px'});
-								var headerDiv = new Element('div', {'style':'font-size:125%'});
-								
-								
-								var label = new Element('label', {'style':'margin-right: 10px;'}).insert(this.languages[languageCode]);
-								
-								
-								translationContainer.insert(headerDiv.insert(this.languageCheckboxes[languageCode]).insert(label).insert(playButton));
-								translationContainer.insert(this.translationDivs[languageCode]);
-								
-								
-								translationContainer.insert(new Element('div', {'style':'margin-top:10px'}).insert(retranslateButton));
-								
-								
-								translationContainer.insert(this.retranslationDivs[languageCode]);
-								this.container.insert(translationContainer);
-
-								
-								
-
-								playButton.observe('click', this.on_click_play.bindAsEventListener(this));
-								
-								
-								retranslateButton.observe('click', this.on_click_retranslate.bindAsEventListener(this, languageCode));
-								
-								
-								this.languageCheckboxes[languageCode].observe('click', this.on_toggle_language.bindAsEventListener(this));
-								
-								
-							}
-
-							
-						},
-
-						get_message_prefix: function(languageCode) {
-							return this.messageGroupForm.formName + '_' + this.type + this.subtype + languageCode;
-						},
-
-						get_message_element: function(languageCode, suffix) {
-							
-							
-							
-							
-							return $(this.get_message_prefix(languageCode) + suffix);
-						},
-
-						on_click_translate: function() {
-							var willOverwrite = true;
-
-							if (!willOverwrite || confirm('Are you sure?')) {
-								var sourceText = this.sourceTextarea.value;
-
-
-							
-
-
-								var translateLanguages = {};
-								
-								for (var languageCode in this.languageCheckboxes) {
-									if (this.languageCheckboxes[languageCode].checked) {
-										translateLanguages[languageCode] = this.languages[languageCode];
-
-										this.translationDivs[languageCode].update('<img src=\"img/ajax-loader.gif\" />');
-
-										// Clear english retranslations.
-										this.retranslationDivs[languageCode].update();
-
-										
-										this.get_message_element(languageCode, 'sourceText').update(sourceText);
-										
-										if (this.get_message_element(languageCode, 'translatecheck'))
-											this.get_message_element(languageCode, 'translatecheck').checked = true;
-										toggleTranslation(this.get_message_prefix(languageCode), null);
-									}
-								}
-
-								
-								
-
-								new Ajax.Request('translate.php', {
-									method:'post',
-									parameters: {'english': sourceText, 'languages': \$H(translateLanguages).values().join(';')},
-									onSuccess: function(transport, translateLanguages) {
-										
-										var languageCodes = \$H(translateLanguages).keys();
-										
-										// TODO: ajax; and onsuccess, update the Languages/Messages in languageTabs.
-
-										var data = transport.responseJSON;
-										
-
-										if (!data || !data.responseData || !data.responseStatus || data.responseStatus != 200)
-											return;
-										if (languageCodes.length == 1 && data.responseData.length < 1)
-											return;
-
-										var responses = data.responseData;
-										
-										
-
-										
-										for (var i = 0; i < languageCodes.length; i++) {
-											var languageCode = languageCodes[i];
-
-											var response = languageCodes.length > 1 ? responses[i] : responses;
-
-											var translatedText;
-											if (languageCodes.length > 1) {
-												if (response.responseStatus != 200 || !response.responseData)
-													continue;
-												translatedText = response.responseData.translatedText;
-											} else {
-												translatedText = response.translatedText;
-											}
-
-											
-											// TODO: escape HTML.
-											this.translationDivs[languageCode].update(translatedText);
-
-											// TODO: escape HTML.
-											
-											this.get_message_element(languageCode, 'text').update(translatedText);
-											this.get_message_element(languageCode, 'textdiv').update(translatedText);
-										}
-
-										
-										//if(data.responseStatus != 200 || data.responseData.translatedText == undefined)
-										//	return;
-										//$(section+'textdiv').innerHTML = data.responseData.translatedText.escapeHTML();
-										//$(section+'text').value = data.responseData.translatedText.escapeHTML();
-										//setTranslationValue(section);
-									}.bindAsEventListener(this, translateLanguages)
-								});
-							}
-						},
-
-						on_click_play: function(event, languageCode) {
-						},
-
-						on_click_retranslate: function(event, languageCode) {
-							
-							
-							var retranslationDiv = this.retranslationDivs[languageCode].update('<img src=\"img/ajax-loader.gif\" />');
-
-							new Ajax.Request('translate.php', {
-								method:'post',
-								parameters: {'text': this.translationDivs[languageCode].innerHTML, 'language': this.languages[languageCode]},
-								onSuccess: function(result, retranslationDiv) {
-									var data = result.responseJSON;
-									if(data.responseStatus != 200 || data.responseData.translatedText == undefined)
-										return;
-									retranslationDiv.update(data.responseData.translatedText.escapeHTML());
-								}.bindAsEventListener(this, retranslationDiv)
-							});
-						},
-
-						on_click_clear: function() {
-							//if (confirm('Are you sure?')) {
-								// TODO: Does this clear each selected language's translation?
-							//}
-						},
-						on_toggle_language: function(event, languageCode) {
-							// Does unchecking the checkbox clear this language's translation?
-						}
-					});
-
-					var MessageGroupForm = Class.create({
-						initialize: function(formName, destinationTabs, allowedDestinations, toolsAccordion) {
-							this.formName = formName;
-							this.destinationTabs = destinationTabs;
-							this.allowedDestinations = allowedDestinations;
-							this.toolsAccordion = toolsAccordion;
-						},
-
-						get_message_element: function(type, subtype, languageCode, suffix) {
-							return $(this.formName + '_' + type + subtype + languageCode + suffix);
-						},
-
-						get_current_message_info: function(type, destination) {
-							var info = {'type': type};
-
-							var languageTabs = destination.languageTabs;
-							info.languageCode = languageTabs ? languageTabs.currentSection : 'en';
-
-							var subtypeTabs = destination.subtypeTabs[info.languageCode];
-							
-							if (subtypeTabs)
-								info.subtype = subtypeTabs.currentSection;
-							else if (type == 'phone')
-								info.subtype = 'voice';
-							else if (type == 'sms')
-								info.subtype = 'plain';
-							
-
-							
-
-							info.control = $(this.formName + '_' + info.type + info.subtype + info.languageCode);
-							
-
-							return info;
-						},
-
-						get_current_editor: function() {
-							var type = this.destinationTabs.currentSection;
-							if (type != 'phone' && type != 'email' && type != 'sms')
-								return null;
-							var destination =  this.allowedDestinations[type];
-
-							var info = this.get_current_message_info(type, destination);
-
-							// TODO: Depending on the state of info.control, set destination.currentEditor accordingly.
-							destination.currentEditor = $(info.control.identify() + 'text');
-
-							return destination.currentEditor;
-						},
-
-						refresh_accordion: function(type, verticalSection, subtypeSection) {
-							this.toolsAccordion.enable_section('callMe');
-							this.toolsAccordion.enable_section('audioLibrary');
-							this.toolsAccordion.enable_section('dataField');
-							this.toolsAccordion.enable_section('attachment');
-							this.toolsAccordion.enable_section('translation');
-							this.toolsAccordion.unlock_section('callMe');
-							this.toolsAccordion.unlock_section('audioLibrary');
-
-							if (type != 'phone') {
-								this.toolsAccordion.disable_section('callMe');
-								this.toolsAccordion.disable_section('audioLibrary');
-							}
-							if (type != 'email') {
-								this.toolsAccordion.disable_section('attachment');
-							}
-							if (type == 'sms') {
-								this.toolsAccordion.disable_section('dataField');
-							}
-
-							var destination = this.allowedDestinations[type];
-							var languageTabs = destination.languageTabs;
-							if (languageTabs) {
-								var languageCode = verticalSection || languageTabs.currentSection;
-								
-
-								languageTabs.sections[languageCode].contentDiv.down('.ForAccordion').insert(this.toolsAccordion.container);
-
-								if (languageCode == 'en') {
-									this.toolsAccordion.disable_section('translation');
-								} else if (languageCode == 'autotranslate') {
-									
-								} else {
-									var subtypeTabs = destination.subtypeTabs[languageCode];
-									var subtype;
-									if (subtypeTabs)
-										subtype = subtypeSection || subtypeTabs.currentSection;
-									else
-										subtype = 'voice';
-									if (destination.translationSettingDivs) {
-										var settingDiv = destination.translationSettingDivs[subtype+languageCode];
-										var checkbox = settingDiv.down('input.EnableTranslationCheckbox');
-
-										if (checkbox.checked) {
-											this.toolsAccordion.lock_section('callMe');
-											this.toolsAccordion.lock_section('audioLibrary');
-										}
-
-										var translationSection = $('translationSection');
-										
-										translationSection.select('.TranslationSettingDiv').invoke('hide');
-										translationSection.insert(settingDiv.show());
-									} else {
-										this.toolsAccordion.disable_section('translation');
-									}
-								}
-							} else {
-								this.toolsAccordion.disable_section('translation');
-								$(type + 'Container').down('.ForAccordion').insert(this.toolsAccordion.container);
-							}
-						}
-					});
-
 					var destinationTabs = new Tabs($('destinationTabsContainer'), {'showDuration':0, 'hideDuration':0});
 					var toolsAccordion = new Accordion('toolsAccordionContainer');
 					toolsAccordion.container.setStyle({'paddingLeft':'10px'});
 
 					var messageGroupForm = new MessageGroupForm (formName, destinationTabs, allowedDestinations, toolsAccordion);
-
-					
-
-
 
 					// Move type-specific form items.
 					$('emailContainer').down('tbody').insert($('messagegroupform_subject_fieldarea')).insert($('messagegroupform_fromname_fieldarea')).insert($('messagegroupform_fromemail_fieldarea'));
@@ -993,16 +652,6 @@ class MessageGroupForm extends Form {
 								fieldarea.down('.formtableheader').hide();
 								var formItem = $(messageGroupForm.formName + '_' + type + subtype + languageCode);
 								formItem.observe('Form:ValidationDisplayed', function(event, type, subtype, languageCode) {
-									
-									
-									
-									
-									
-									
-									
-									
-									
-									
 									
 									var destination = this.allowedDestinations[type];
 									var subtypes = destination.subtypes;
