@@ -14,6 +14,7 @@ function make_split_pane(vertical) {
 		splitContainer.insert(new Element('div', {'class':'SplitPane'}));
 	}
 
+	splitContainer.identify();
 	return splitContainer;
 }
 
@@ -50,6 +51,7 @@ var Accordion = Class.create({
 	},
 	lock_section: function(name) {
 		this.sections[name].lock();
+		this.sections[name].hide_content(true);
 	},
 	unlock_section: function(name) {
 		this.sections[name].unlock();
@@ -88,12 +90,16 @@ var Accordion = Class.create({
 // settings.collapseCurrentSection is ignored, always false.
 var Tabs = Class.create(Accordion, {
 	initialize: function($super, container, settings) {
+		settings = settings || {};
+		if (settings.hideDuration === undefined)
+			settings.hideDuration = 0.1;
+		if (settings.showDuration === undefined)
+			settings.showDuration = 0.1;
+		if (settings.vertical === undefined)
+			settings.vertical = false;
 		settings.collapseCurrentSection = false;
-		settings.hideDuration = 0.1;
-		settings.showDuration = 0.1;
 		$super(container, settings);
-		if (this.settings.vertical === undefined)
-			this.settings.vertical = false;
+
 		if (this.settings.vertical)
 			this.classPrefix = 'verticaltabs';
 		else
@@ -108,13 +114,15 @@ var Tabs = Class.create(Accordion, {
 			this.panelsPane = this.splitContainer.down('.SplitPane', 1);
 		}
 		this.tabsPane.addClassName(this.classPrefix+'tabspane');
+		this.tabsStopper = new Element('div', {'style':'clear:both'});
+		this.tabsPane.insert(this.tabsStopper);
 		this.panelsPane.addClassName(this.classPrefix+'panelspane');
 		this.container.insert(this.splitContainer);
 	},
 
 	add_section: function($super, name, disabled) {
 		var section = new AccordionSection(name, disabled, this);
-		this.tabsPane.insert(section.titleDiv);
+		this.tabsStopper.insert({'before':section.titleDiv});
 		this.panelsPane.insert(section.contentDiv);
 		this.sections[name] = section;
 	}
@@ -169,11 +177,15 @@ var AccordionSection = Class.create({
 		this.titleDiv.removeClassName(this.widget.classPrefix+'titledivlocked');
 	},
 	hide_content: function(dontAnimate) {
+		var hideDuration = this.widget.settings.hideDuration;
+		if (!hideDuration)
+			dontAnimate = true;
+
 		if (this.contentDiv.visible()) {
 			if (dontAnimate)
 				this.contentDiv.hide();
 			else
-				new Effect.BlindUp(this.contentDiv, {queue: {limit: 2, position:'end', scope:this.widget.classPrefix+this.widget.container.identify()}, duration:this.widget.settings.hideDuration});
+				new Effect.BlindUp(this.contentDiv, {queue: {limit: 2, position:'end', scope:this.widget.classPrefix+this.widget.container.identify()}, duration:hideDuration});
 		}
 
 		this.titleDiv.removeClassName(this.widget.classPrefix+'titledivexpanded');
@@ -181,11 +193,15 @@ var AccordionSection = Class.create({
 		this.titleDiv.addClassName(this.widget.classPrefix+'titledivcollapsed');
 	},
 	show_content: function(dontAnimate) {
+		var showDuration = this.widget.settings.showDuration;
+		if (!showDuration)
+			dontAnimate = true;
+
 		if (!this.contentDiv.visible()) {
 			if (dontAnimate)
 				this.contentDiv.show();
 			else
-				new Effect.BlindDown(this.contentDiv, {queue: {limit: 2, position:'end', scope:this.widget.classPrefix+this.widget.container.identify()}, duration:this.widget.settings.showDuration});
+				new Effect.BlindDown(this.contentDiv, {queue: {limit: 2, position:'end', scope:this.widget.classPrefix+this.widget.container.identify()}, duration:showDuration});
 		}
 
 		this.titleDiv.removeClassName(this.widget.classPrefix+'titledivexpanded');
