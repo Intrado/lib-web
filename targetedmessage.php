@@ -22,7 +22,7 @@ if (!$USER->authorize('managesystem')) {
 // Action/Request Processing
 ////////////////////////////////////////////////////////////////////////////////
 
-// data
+// data Generating test date
 $classes = array();
 $classpeople = array();
 for($i=0;$i<=3;$i++) {
@@ -40,6 +40,7 @@ foreach($library as $title => $messages) {
 	}
 }
 
+//Handle ajax request. when swithcing sections
 if (isset($_POST['classid'])) {
 	header('Content-Type: application/json');
 	$id = $_POST['classid'] + 0;
@@ -94,9 +95,6 @@ function classselect($values) {
 	return $str;
 }
 
-function fmt_template ($obj, $field) {
-	return $obj->$field;
-}
 
 ////////////////////////////////////////////////////////////////////////////////
 // Display
@@ -128,8 +126,6 @@ startWindow(_L('Classroom Message'));
 			<div id="theinstructions" style="font-size:2em;padding:100px;"><img src="img/icons/fugue/arrow_180.png" alt="" style="vertical-align:middle;"/>&nbsp;Click on a Contact to Start</div>
 
 			<div id='tabsContainer' style=' margin:10px; margin-right:0px;display:none;vertical-align:middle;'></div>
-
-			
 			<?
 				$libraryids = array();
 				$messageids = array();
@@ -140,7 +136,7 @@ startWindow(_L('Classroom Message'));
 					$messagecount = 0;
 					foreach($messages as $id => $message) {
 						echo '<div id="lib-' . $librarycount.$messagecount.'" class="targetmessage" style="border:solid 1px silver;background-color:#FFF;width:300px;float:left;margin:10px;")"><img src="img/checkbox-clear.png" alt="" style="position:relative;top:10px;left:3px;"/>&nbsp;<div style="position:relative;top:-10px;left:20px;width:270px;border:1px dashed silver;">' . $message .  ' </div><a href="#" class="commentlink" style="displayblock;float:right;">Comment </a>
-							<textarea class="targetcomment"  style="display:none;position:relative;clear:both;width:94%;left:2%;height:60px;border:1px solid red;background:white;"></textarea>
+							<textarea class="targetcomment" style="display:none;position:relative;clear:both;width:94%;left:2%;height:60px;border:1px solid red;background:white;"></textarea>
 						</div>';
 
 						$messageids[] = "'lib-$librarycount$messagecount':$id";
@@ -168,12 +164,6 @@ endWindow();
 	var c_none = "#ffffff";
 	var h_image = "img/icons/fugue/arrow.gif";
 
-
-
-
-
-	var checkedcache = new Hash();			// History of Contact to Message links
-
 	/*
 	 Checked cache contains
 	 Checkedcache -> Category -> Contact -> Message
@@ -182,6 +172,9 @@ endWindow();
 
 	 Checkedcache has an extra level Category to easaly determine if a contact has one or more messages checked in under one category
 	*/
+	var checkedcache = new Hash();			// History of Contact to Message links
+
+
 	var contactmap = new Hash(); // Link html ids to contact ids
 
 	// Link html ids to contact ids
@@ -227,26 +220,28 @@ endWindow();
 	 *
 	 * The HTML ids for the are concatinated with 'contactbox-' for a contact and something else for message
 	 */
-	function setlink(contact,message,state,comment) {
-		var currenttab = librarymap.get(tabs.currentSection);
-		var sectioncache = checkedcache.get(currenttab);
-		if(sectioncache.get(contact) == undefined)
-			sectioncache.set(contact,new Hash());
-		var contactlink = sectioncache.get(contact);
-		if(state) {
-			var img = $('contactbox-' + contact).next('img');
-			while(img != undefined && img.name != librarymap.get(tabs.currentSection)) {
+
+	// TODO Change to setEvent
+	function setlink(contactid,messageid,isChecked,comment) {
+		var category = librarymap.get(tabs.currentSection);
+		var people = checkedcache.get(category);
+		if(people.get(contactid) == undefined)
+			people.set(contactid,new Hash());
+		var contactlink = people.get(contactid);
+		if(isChecked) {
+			var img = $('contactbox-' + contactid).next('img');
+			while(img != undefined && img.name != category) {
 				img = img.next('img');
 			}
 			if(img != undefined) {
 				img.show();
 			}
-			contactlink.set(message,comment);
+			contactlink.set(messageid,comment);
 		} else {
-			contactlink.unset(message);
+			contactlink.unset(messageid);
 			if(contactlink.size() == 0) {
-				var img = $('contactbox-' + contact).next('img');
-				while(img.name != undefined && img.name != librarymap.get(tabs.currentSection)) {
+				var img = $('contactbox-' + contactid).next('img');
+				while(img.name != undefined && img.name != category) {
 					img = img.next('img');
 				}
 				if(img.name != undefined) {
@@ -263,36 +258,39 @@ endWindow();
 		return true;
 	}
 
-	function updatemessages(section) {
+	function updatemessages(category) {
 		var contactsize = checkedcontacts.size();
-		var selectedmessages = new Hash();
-		var currenttab = librarymap.get(section);
-
-
+		var selectedmessages = new Array();
+		var currenttab = librarymap.get(category);
+		
 		// Get all contact-message links from cache
 		checkedcontacts.each(function(contact) {
-			if(checkedcache.get(currenttab).get(contact.key) != undefined) {
-				checkedcache.get(currenttab).get(contact.key).each(function(msg) {
-					var count = selectedmessages.get(msg.key) | 0;
-					count++;
-					selectedmessages.set(msg.key,count);
+			var messages = checkedcache.get(currenttab).get(contact.key)
+			if(messages != undefined) {
+				messages.each(function(msg) {
+					selectedmessages.push(msg.key);
 				});
 			}
 		});
 
 		// Reset all previous message selections
 		checkedmessages.each(function(message) {
-			$(tabs.currentSection + message.key).down('img').src = getstatesrc(0);
+			console.info(tabs.currentSection + message.key);
+			var target = $(tabs.currentSection + message.key).down('img');
+			target.src = getstatesrc(0);
+			target.next('textarea').value = "";
+			target.next('textarea').hide();
+			target.next('a').update('Comment');
 			checkedmessages.unset(message.key);
 		});
 
 		// Set all contact-message link boxes
 		selectedmessages.each(function(message) {
 			if(message.value == contactsize) {
-				$(tabs.currentSection + message.key).down('img').src = getstatesrc(2);
+				$(tabs.currentSection + message).down('img').src = getstatesrc(2);
 				checkedmessages.set(message.key,2);
 			} else {
-				$(tabs.currentSection + message.key).down('img').src = getstatesrc(1);
+				$(tabs.currentSection + message).down('img').src = getstatesrc(1);
 				checkedmessages.set(message.key,1);
 			}
 		});
@@ -341,7 +339,6 @@ endWindow();
 					 * alt key pressed.
 					 */
 					$(id).observe('click', function(event) {
-							event.stop();
 							if(!event.shiftKey) {
 								checkedcontacts.each(function(contact) {
 									$('contactbox-' + contact.key).style.background = c_none;
@@ -370,11 +367,9 @@ endWindow();
 					});
 
 					$(id).observe('mouseover', function(event) {
-						event.stop();
 						this.style.background = c_hover;
 						var contactid = contactmap.get(this.id);
 						var currenttab = librarymap.get(tabs.currentSection);
-
 
 						if(checkedcache.get(currenttab).get(contactid) != undefined) {
 							checkedcache.get(currenttab).get(contactid).each(function(message) {
@@ -383,15 +378,13 @@ endWindow();
 							});
 						}
 						librarymap.each(function (category) {
-							if(currenttab != category.value  && checkedcache.get(currenttab).get(contactid) != undefined) {
+							if(currenttab != category.value  && checkedcache.get(category.value).get(contactid) != undefined) {
 								tabs.sections[category.key].titleDiv.style.background = c_hover;
-
 								//tabs.sections[category.key].titleDiv.pulsate({pulses:2, duration: 1.5});
 							}
 						});
 					});
 					$(id).observe('mouseout', function(event) {
-						event.stop();
 						highlightedmessages.each(function(message) {
 							$(message.key).style.background = c_none;
 							highlightedmessages.unset(message.key);
@@ -407,14 +400,9 @@ endWindow();
 						});
 					});
 				}
-
 			},
 			onFailure: function(){ alert('Could not get class') }
 		});
-
-
-
-
 	}
 
 document.observe("dom:loaded", function() {
