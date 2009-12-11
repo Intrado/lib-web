@@ -114,7 +114,8 @@ if($REQUEST_TYPE == "new") {
 					<choice digits="1">
 						<uploadaudio name="recordaudio" />
 						<audio cmid="file://prompts/Saved.wav" />
-						<goto message="continue" />
+						<audio cmid="file://prompts/GoodBye.wav" />
+						<hangup />
 					</choice>
 
 					<choice digits="2">
@@ -133,18 +134,6 @@ if($REQUEST_TYPE == "new") {
 						<hangup />
 					</timeout>
 				</field>
-			</message>
-
-			<message name="continue">
-				<field name="recordnext" type="menu" timeout="5000" sticky="true">
-					<prompt repeat="1">
-						<audio cmid="file://prompts/AnotherRecording.wav" />
-					</prompt>
-				</field>
-				<timeout>
-					<audio cmid="file://prompts/GoodBye.wav" />
-					<hangup />
-				</timeout>
 			</message>
 		</voice>
 	<?
