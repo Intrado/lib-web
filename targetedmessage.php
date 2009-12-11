@@ -31,12 +31,20 @@ for($i=0;$i<=3;$i++) {
 	$classpeople[$i] = array("p_0001" => "Ben Hencke", "p_0002" => "Howard Wood","p_0003" => "Gretel Baumgartner", "p_0004" => "Kee-Yip Chan", "p_0005" => "Nickolas Heckman");
 }
 
-$categories = "{Positive: 'img/icons/award_star_gold_2.gif',Corrective: 'img/icons/lightning.gif',Informational: 'img/icons/information.gif'}";
 
-$library = array("Positive" => array(),"Corrective" => array(),"Informational" => array());
+
+$categoriesjson = "{1: {name:'Positive',img:'img/icons/award_star_gold_2.gif'},2: {name: 'Corrective',img: 'img/icons/lightning.gif'},3: {name:'Informational',img: 'img/icons/information.gif'}}";
+$categoriesimg = "{1: 'img/icons/award_star_gold_2.gif',2: 'img/icons/lightning.gif',3: 'img/icons/information.gif'}";
+
+$categories = array(1 => "Positive",2 => "Corrective",3 => "Informational");
+
+// category id => personid => messageid;
+$library = array(1 => array(),2 => array(),3 => array());
+$msgcount = 0;
 foreach($library as $title => $messages) {
 	for($i=0;$i<30;$i++) {
-		$library[$title][$i] = $title . ' Generic targeted student message ' . $i . ' 012346789 01234567890 1234567890 123456789';
+		$library[$title][$msgcount] = $title . ' Generic targeted student message ' . $i . ' 012346789 01234567890 1234567890 123456789';
+		$msgcount++;
 	}
 }
 
@@ -115,8 +123,10 @@ startWindow(_L('Classroom Message'));
 			<?= classselect($classes); ?>
 			<hr />
 			<a id="checkall" href="#" style="float:left; white-space: nowrap;">Check All</a><br />
-			<ul id="contactbox" style="list-style-type:none;width:100%;text-decoration:none;"><li>
-				</li></ul>
+
+			<div id="contactwrapper">
+				<div id="contactbox" style="width:100%;text-decoration:none;"></div>
+			</div>
 			<hr />
 			<img src="img/icons/fugue/light_bulb.gif" alt="" />Press shift key to multiselect
 			<hr />
@@ -126,27 +136,27 @@ startWindow(_L('Classroom Message'));
 			<div id="theinstructions" style="font-size:2em;padding:100px;"><img src="img/icons/fugue/arrow_180.png" alt="" style="vertical-align:middle;"/>&nbsp;Click on a Contact to Start</div>
 
 			<div id='tabsContainer' style=' margin:10px; margin-right:0px;display:none;vertical-align:middle;'></div>
+
+			<div id="libraryContent">
 			<?
 				$libraryids = array();
 				$messageids = array();
-				$librarycount = 0;
-				foreach($library as $title => $messages) {
+				foreach($library as $categoryid => $messages) {
 					// add library to id since user may change the title of the category
-					echo "<div id='lib-$librarycount' style='display:block;'>";
-					$messagecount = 0;
-					foreach($messages as $id => $message) {
-						echo '<div id="lib-' . $librarycount.$messagecount.'" class="targetmessage" style="border:solid 1px silver;background-color:#FFF;width:300px;float:left;margin:10px;")"><img src="img/checkbox-clear.png" alt="" style="position:relative;top:10px;left:3px;"/>&nbsp;<div style="position:relative;top:-10px;left:20px;width:270px;border:1px dashed silver;">' . $message .  ' </div><a href="#" class="commentlink" style="displayblock;float:right;">Comment </a>
+					echo "<div id='lib-$categoryid' style='display:block;'>";
+					foreach($messages as $messageid => $message) {
+						echo '<div id="msg-' . $messageid.'" class="targetmessage" style="border:solid 1px silver;background-color:#FFF;width:300px;float:left;margin:10px;")"><img src="img/checkbox-clear.png" alt="" style="position:relative;top:10px;left:3px;"/>&nbsp;<div style="position:relative;top:-10px;left:20px;width:270px;border:1px dashed silver;">' . $message .  ' </div><a href="#" class="commentlink" style="displayblock;float:right;">Comment </a>
 							<textarea class="targetcomment" style="display:none;position:relative;clear:both;width:94%;left:2%;height:60px;border:1px solid red;background:white;"></textarea>
 						</div>';
 
-						$messageids[] = "'lib-$librarycount$messagecount':$id";
-						$messagecount++;
+						//$messageids[] = "'lib-$librarycount$messagecount':$id";
+						//$messagecount++;
 					}
-					$libraryids[] = "'lib-$librarycount':'$title'";
-					$librarycount++;
+					//$libraryids[] = "'lib-$librarycount':'$title'";
 					echo '<div style="clear:both;"></div></div>';
 				}
 			?>
+			</div>
 		</td>
 	</tr>
 </table>
@@ -175,24 +185,18 @@ endWindow();
 	var checkedcache = new Hash();			// History of Contact to Message links
 
 
-	var contactmap = new Hash(); // Link html ids to contact ids
-
-	// Link html ids to contact ids
-	var messagemap = new Hash({<?= implode($messageids,",")?>});
-	var librarymap = new Hash({<?= implode($libraryids,",")?>});
-
+	var categoryinfo = $H(<?= $categoriesjson ?>);
 
 	var checkedcontacts = new Hash();		// List of the Contacts that are currently checked
 	var checkedmessages = new Hash();		// List of Messages that are currently checked
 	var highlightedmessages = new Hash();	// List of Messages that are currently highlighted
 	var highlightedcontacts = new Hash();	// List of Contacts that are currently highlighted
-	var lastmessagehover = "none";
 
 	var revealmessages = true;			// Boolean to reveal messages on first click
 
 	var tabs;
 	
-	var categoriesimages = new Hash(<?= $categories ?>);
+	var categoriesimages = new Hash(<?= $categoriesimg ?>);
 
 
 	function getstatesrc(state) {
@@ -208,22 +212,20 @@ endWindow();
 	}
 
 	function clearcache() {
-		librarymap.each(function(category) {
+		checkedcache.each(function(category) {
 			checkedcache.set(category.value,new Hash());
-			//category.value = new Hash(); // TODO look into JavaScript garbage collection.
 		});
 	}
 	/*
-	 * setlink
+	 * setEvent
 	 * Takes a contact by its pid.
 	 * Takes a message by its mid.
 	 *
 	 * The HTML ids for the are concatinated with 'contactbox-' for a contact and something else for message
 	 */
 
-	// TODO Change to setEvent
-	function setlink(contactid,messageid,isChecked,comment) {
-		var category = librarymap.get(tabs.currentSection);
+	function setEvent(contactid,messageid,isChecked,comment) {
+		var category = tabs.currentSection.substr(4); // strip 'lib-'
 		var people = checkedcache.get(category);
 		if(people.get(contactid) == undefined)
 			people.set(contactid,new Hash());
@@ -258,25 +260,26 @@ endWindow();
 		return true;
 	}
 
-	function updatemessages(category) {
+	function updatemessages(currenttab) {
 		var contactsize = checkedcontacts.size();
-		var selectedmessages = new Array();
-		var currenttab = librarymap.get(category);
-		
+		var selectedmessages = new Hash();
+		var category = currenttab.substr(4);
 		// Get all contact-message links from cache
 		checkedcontacts.each(function(contact) {
-			var messages = checkedcache.get(currenttab).get(contact.key)
+			var messages = checkedcache.get(category).get(contact.key)
 			if(messages != undefined) {
 				messages.each(function(msg) {
-					selectedmessages.push(msg.key);
+					var count = selectedmessages.get(msg.key) | 0;
+					count++;
+					selectedmessages.set(msg.key,count);
 				});
 			}
 		});
 
+
 		// Reset all previous message selections
 		checkedmessages.each(function(message) {
-			console.info(tabs.currentSection + message.key);
-			var target = $(tabs.currentSection + message.key).down('img');
+			var target = $('msg-' + message.key).down('img');
 			target.src = getstatesrc(0);
 			target.next('textarea').value = "";
 			target.next('textarea').hide();
@@ -287,10 +290,10 @@ endWindow();
 		// Set all contact-message link boxes
 		selectedmessages.each(function(message) {
 			if(message.value == contactsize) {
-				$(tabs.currentSection + message).down('img').src = getstatesrc(2);
+				$('msg-' + message.key).down('img').src = getstatesrc(2);
 				checkedmessages.set(message.key,2);
 			} else {
-				$(tabs.currentSection + message).down('img').src = getstatesrc(1);
+				$('msg-' + message.key).down('img').src = getstatesrc(1);
 				checkedmessages.set(message.key,1);
 			}
 		});
@@ -312,33 +315,32 @@ endWindow();
 				$('tabsContainer').hide();
 				clearcache();
 
-				var icons = "";
+			/*	var icons = "";
 				librarymap.each(function(category) {
 					var image = "img/icons/bug.gif";
 					if(categoriesimages.get(category.value))
 						image = categoriesimages.get(category.value);
-
 					icons += '<img src="' + image + '" name="' + category.value + '" class="' + category.value + '-library"style="width:10px;display:none;" alt="" />';
 				});
-
+				*/
 				//$('themessages').fade({ duration: 0.5 });
 				//setTimeout("$('theinstructions').show()",1000);
 				revealmessages = true;
 				checkedcontacts = new Hash();
-				contactmap = new Hash();
 
-				var counter = 0;
 				for(var person in response){
 					var id = 'contactbox-' + person;
-					counter++;
-					contactmap.set(id,person);
-					$('contactbox').insert('<li><img src="img/pixel.gif" style="width:10px;height:10px;vertical-align:middle;" alt="" / ><a href="#" id="' + id + '" title="' + person + '" style="text-decoration:none;">' + response[person] +'</a>' + icons + '</li>');
+
+					var dom = $('contactbox').remove();
+					dom.insert('<img src="img/pixel.gif" style="width:10px;height:10px;vertical-align:middle;" alt="" / ><a href="#" id="' + id + '" title="' + person + '" style="text-decoration:none;">' + response[person] +'</a><br/>');
+					$('contactwrapper').insert(dom);
 
 					/*
 					 * Observe Contact Click. Select one contact at a time or multiple contacts with
 					 * alt key pressed.
 					 */
 					$(id).observe('click', function(event) {
+							event.stop(); // Some browsers may open another winbdow on shift click
 							if(!event.shiftKey) {
 								checkedcontacts.each(function(contact) {
 									$('contactbox-' + contact.key).style.background = c_none;
@@ -348,13 +350,12 @@ endWindow();
 
 							// Select or deselect the itme depending on alt click. Unable to deselect if only one item is selected
 							if (event.shiftKey && this.previous().checked == true && checkedcontacts.size() > 1) {
-								checkedcontacts.unset(contactmap.get(this.id));
+								checkedcontacts.unset(this.id.substr(11));
 								$(this.id).style.background = c_none;
 							} else {
 								this.style.background = c_selected;
-								checkedcontacts.set(contactmap.get(this.id),true);
+								checkedcontacts.set(this.id.substr(11),true);
 							}
-
 							// First click reveals the message board
 							if(revealmessages) {
 								revealmessages = false;
@@ -368,25 +369,25 @@ endWindow();
 
 					$(id).observe('mouseover', function(event) {
 						this.style.background = c_hover;
-						var contactid = contactmap.get(this.id);
-						var currenttab = librarymap.get(tabs.currentSection);
+						var contactid = this.id.substr(11);
+						var currenttab = tabs.currentSection.substr(4);;
 
 						if(checkedcache.get(currenttab).get(contactid) != undefined) {
 							checkedcache.get(currenttab).get(contactid).each(function(message) {
-								$(tabs.currentSection + message.key).style.background = c_hover;
-								highlightedmessages.set(tabs.currentSection + message.key,true);
+								$('msg-' + message.key).style.background = c_hover;
+								highlightedmessages.set(message.key,true);
 							});
 						}
-						librarymap.each(function (category) {
-							if(currenttab != category.value  && checkedcache.get(category.value).get(contactid) != undefined) {
-								tabs.sections[category.key].titleDiv.style.background = c_hover;
-								//tabs.sections[category.key].titleDiv.pulsate({pulses:2, duration: 1.5});
+						checkedcache.each(function (category) {
+							if(currenttab != category.key && category.value.get(contactid) != undefined) {
+								tabs.sections['lib-' + category.key].titleDiv.style.background = c_hover;
+								tabs.sections['lib-' + category.key].titleDiv.down('img').pulsate({pulses:2, duration: 1.5});
 							}
 						});
 					});
 					$(id).observe('mouseout', function(event) {
 						highlightedmessages.each(function(message) {
-							$(message.key).style.background = c_none;
+							$('msg-' + message.key).style.background = c_none;
 							highlightedmessages.unset(message.key);
 						});
 						if(checkedcontacts.get(this.title))
@@ -395,8 +396,8 @@ endWindow();
 							this.style.background = c_none;
 
 
-						librarymap.each(function (category) {
-							tabs.sections[category.key].titleDiv.style.background = '';
+						categoryinfo.each(function (category) {
+							tabs.sections['lib-' + category.key].titleDiv.style.background = '';
 						});
 					});
 				}
@@ -423,10 +424,10 @@ document.observe("dom:loaded", function() {
 	 */
 	$('checkall').observe('click', function(event) {
 		event.stop();
-		contactmap.each(function(contact) {
-			$(contact.key).style.background = "#ffcccc";
-			checkedcontacts.set(contact.value,true);
-		})
+		$$('#contactbox a').each(function(contact) {
+			contact.style.background = "#ffcccc";
+			checkedcontacts.set(contact.id.substr(11),true);
+		});
 		if(revealmessages) {
 			$('theinstructions').hide();
 			revealmessages = false; 
@@ -440,12 +441,12 @@ document.observe("dom:loaded", function() {
 		getclass(event.element().getValue());
 	});
 
-	messagemap.each(function(message) {
-		$(message.key).observe('click', function(event) {
+	$$('#libraryContent .targetmessage').each(function(message) {
+		message.observe('click', function(event) {
 			event.stop();
 
 			var htmlid = this.id;  // html id: message-category-mid
-			var msgid = messagemap.get(this.id);  // message id as in db:  mid
+			var msgid = this.id.substr(4);  // strip 'msg-'
 
 			var state = checkedmessages.get(msgid) || 0;
 			if(event.target.hasClassName('commentlink')) {
@@ -459,7 +460,7 @@ document.observe("dom:loaded", function() {
 						if (keyunicode == 13) {
 							var target = e.element();
 							checkedcontacts.each(function(contact) {
-								setlink(contact.key,messagemap.get(target.up().id),true,target.getValue());
+								setEvent(contact.key,target.up().id.substr(4),true,target.getValue());
 							});
 							e.stop();
 						}
@@ -486,19 +487,18 @@ document.observe("dom:loaded", function() {
 						$(htmlid).down('textarea').hide();
 						$(htmlid).down('a').update("Comment");
 					}
-					setlink(contact.key,msgid,(state == 2),"");
+					setEvent(contact.key,msgid,(state == 2),"");
 				});
 			}
 		});
 
-		$(message.key).observe('mouseover', function(event) {
+		message.observe('mouseover', function(event) {
 			event.stop();
 			var htmlid = this.id;
-			var msgid = messagemap.get(this.id);;
-			var currenttab = librarymap.get(tabs.currentSection);
+			var msgid = this.id.substr(4);  // strip 'msg-'
 
 			$(htmlid).style.background = c_hover;
-			checkedcache.get(currenttab).each(function(contact) {
+			checkedcache.get(tabs.currentSection.substr(4)).each(function(contact) {
 				if(contact.value.get(msgid) != undefined) {
 					$('contactbox-' + contact.key).previous('img').src = h_image;
 					highlightedcontacts.set('contactbox-' + contact.key,true);
@@ -506,7 +506,7 @@ document.observe("dom:loaded", function() {
 			});
 		});
 
-		$(message.key).observe('mouseout', function(event) {
+		message.observe('mouseout', function(event) {
 			event.stop();
 			$(this.id).style.background = c_none;
 			highlightedcontacts.each(function(contact) {
@@ -520,19 +520,18 @@ document.observe("dom:loaded", function() {
 	// Load tabs
 	tabs = new Tabs('tabsContainer',{});
 
-	librarymap.each(function(category) {
-		checkedcache.set(category.value,new Hash());
-		var image = "img/icons/bug.gif";
-		if(categoriesimages.get(category.value))
-			image = categoriesimages.get(category.value);
-		tabs.add_section(category.key);
-		tabs.update_section(category.key, {
-			"title": category.value,
-			"icon": image,
-			"content": $(category.key).remove()
+	categoryinfo.each(function(category) {
+		checkedcache.set(category.key,new Hash());
+		var conentid = "lib-" + category.key;
+
+		tabs.add_section(conentid);
+		tabs.update_section(conentid, {
+			"title": category.value.name,
+			"icon": category.value.img,
+			"content": $(conentid).remove()
 		});
 	});
-	tabs.show_section(librarymap.keys().first());
+	tabs.show_section('lib-' + categoryinfo.keys().first());
 
 	tabs.container.observe('Tabs:ClickTitle', function(event) {
 		updatemessages(event.memo.section);
