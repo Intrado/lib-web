@@ -145,9 +145,16 @@ var Easycall = Class.create({
 			this.pe.stop();
 		switch(error) {
 			case "done":
-				$(this.formitemname+"_"+this.language+"_progress").remove();
-				// create the play and re-record buttons
-				this.createFormItem();
+				if (this.type == 'easycall') {
+					$(this.formitemname+"_"+this.language+"_progress").remove();
+					// create the play and re-record buttons
+					this.createFormItem();
+				} else {
+					this.setupRecord();
+					// Fire an event to signify that the recording is saved.
+					$(this.formitemname).fire('Easycall:RecordingDone', $(this.formitemname).value.evalJSON());
+				}
+
 				return;
 
 			case "callended":
