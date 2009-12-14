@@ -11,8 +11,7 @@
 // next task: when saving the form, delete all existing messages?
 // next task: when clicking on override translation, disable the sourceTextarea.
 
-/* // QUESTION: it may help usability to use an exclamation point for languageTabIcons if there are errors. likewise for the destination tabs.
- * // test case: test in Internet Explorer.
+/* // test case: test in Internet Explorer.
  *
  * // TODO: if there are languages that are not part of the valid set defined in translate.php, do not translate. But, do not assume that the language is valid, explicitly check against an array before sending to translate.php.
  * // test caes: the langugae tab icon for an email should be accept.gif if either html or plain is a valid message. It does not need both subtypes to be valid.
@@ -25,7 +24,7 @@
  * // current task: When you click 'refresh translation' in autotranslate, update the sourceText and translationText for each affected Language.
  * // TODO: no need to confirm() when clicking 'refrehs translation' in autotranslate if you are not actually overwriting any messages.
  * // TODO: take out error_log
- * // TODO: take out 
+ * // TODO: take out
  * // TODO: for auto-translate, alert if text is longer than 2000 when clicking on Translate or Retranslate.
  * // TODO: don't translate if text is blank.
  * // Todo: set a default language variable instead of checking against 'english' or 'en'
@@ -135,7 +134,7 @@ class ValCallMeMessage extends Validator {
 		if (!$USER->authorize("starteasy"))
 			return "$this->label "._L("is not allowed for this user account");
 
-		
+
 		$values = json_decode($value, true);
 		if (isset($values['Default'])) {
 			$audioFile = new AudioFile($values['Default'] +0);
@@ -149,7 +148,7 @@ class ValCallMeMessage extends Validator {
 class MessageGroupForm extends Form {
 	//////////////////////////////
 	// Gather Fields.
-	// $messages = array( $type . $subtype . $language . $autotranslate => new Message() );
+	// $messages = array( $type . $subtype . $language . $autotranslate => new Message2() );
 	var $messages;
 	var $allowedDestinations;
 
@@ -207,6 +206,14 @@ class MessageGroupForm extends Form {
 		 *** Each TranslationItem can be used as a manually typed message; just set overridden=true.
 		 *** TODO: If TranslationItem does not meet requirements, make a subclass.
 		 */
+		$this->emailItems = array();
+		$this->attachmentItems = array();
+		$this->messageItems = array();
+		$this->translationSettingItems = array();
+		$this->advancedItems = array();
+		$this->callMeItems = array();
+		$this->audioLibraryItems = array();
+
 		$formdata = array();
 
 		foreach ($this->allowedDestinations as $type => $destination) {
@@ -221,7 +228,7 @@ class MessageGroupForm extends Form {
 					$sourceText = '';
 					$autotranslate = 'none';
 
-					$message = new Message();
+					$message = new Message2();
 					$message->type = $type;
 					$message->subtype = $subtype;
 					$message->languagecode = $languageCode;
@@ -237,7 +244,7 @@ class MessageGroupForm extends Form {
 							"gender" => 'female'
 						)),
 						"validators" => array(array("ValTranslation")),
-						"control" => array("MessageBody",
+						"control" => array("MessageBody2",
 							"phone" => $type == 'phone',
 							"language" => strtolower($languageName),
 							"sourceText" => $sourceText,
@@ -246,6 +253,7 @@ class MessageGroupForm extends Form {
 						"transient" => false,
 						"helpstep" => 2
 					);
+					$this->messageItems[] = $messageKey;
 					$this->allowedDestinations[$type]['fieldareas'][$subtype . $languageCode] = "{$name}_{$messageKey}_fieldarea";
 				}
 			}
@@ -280,6 +288,8 @@ class MessageGroupForm extends Form {
 			"helpstep" => 1
 		);
 
+		$this->advancedItems[] = 'autoexpire';
+
 		/////////////////////////////////////
 		// Phone Message Settings
 		/////////////////////////////////////
@@ -290,6 +300,7 @@ class MessageGroupForm extends Form {
 			"control" => array("RadioButton","values" => array ("Female" => "Female","Male" => "Male")),
 			"helpstep" => 2
 		);
+		$this->advancedItems[] = 'preferredVoice';
 
 		$formdata["callme"] = array(
 			"label" => _L('Voice Recording'),
@@ -305,6 +316,7 @@ class MessageGroupForm extends Form {
 			),
 			"helpstep" => 1
 		);
+		$this->callMeItems[] = 'callme';
 
 		/////////////////////////////////////
 		// Phone Message Settings
@@ -318,6 +330,7 @@ class MessageGroupForm extends Form {
 			"control" => array("TextField","size" => 30, "maxlength" => 51),
 			"helpstep" => 1
 		);
+		$this->emailItems[] = 'subject';
 
 		$formdata['fromname'] = array(
 			"label" => _L('From Name'),
@@ -328,6 +341,7 @@ class MessageGroupForm extends Form {
 			"control" => array("TextField","size" => 30, "maxlength" => 51),
 			"helpstep" => 1
 		);
+		$this->emailItems[] = 'fromname';
 
 		$formdata['fromemail'] = array(
 			"label" => _L('From Email'),
@@ -338,6 +352,7 @@ class MessageGroupForm extends Form {
 			"control" => array("TextField","size" => 30, "maxlength" => 51),
 			"helpstep" => 1
 		);
+		$this->emailItems[] = 'fromemail';
 
 		$attachvalues = array();
 		$formdata["attachments"] = array(
@@ -347,6 +362,7 @@ class MessageGroupForm extends Form {
 			"control" => array("EmailAttach","size" => 30, "maxlength" => 51),
 			"helpstep" => 3
 		);
+		$this->attachmentItems[] = 'attachments';
 
 		// Extend MessageBody.
 		// TODO: Is MessageBody formitem used anywhere other than the advanced message editor?
@@ -396,28 +412,36 @@ class MessageGroupForm extends Form {
 			$summaryLanguageRows .= "</tr>";
 		}
 
+		$bareboneItems = array_merge($this->attachmentItems, $this->messageItems, $this->translationSettingItems, $this->advancedItems, $this->callMeItems, $this->audioLibraryItems);
+
 		$str = "
 			<!-- FORM -->
 			<div class='newform_container' style='clear:both'>
 
 				<form class='newform' id='{$this->name}' name='{$this->name}' method='POST' action='" . $this->get_post_url() . "'>
 
-					<!-- Initially Offscreen Form Items -->
-					<div id='renderedFormItems' style='display:none'>
-							" . $this->renderFormItems() . "
+					<div id='renderedFormItems'>
+							" . $this->renderFormItems($bareboneItems) . "
 					</div>
+
+					<!-- Initially Offscreen Form Items -->
+					<table style='display:none'>
+						<tbody>
+							" . $this->renderFormItemsControl($this->messageItems) . "
+						</tbody>
+					</table>
 
 					<!-- Initially Offscreen Premade Accordion Content -->
 					<div style='display:none'>
 						<div id='toolsAccordionContainer'></div>
 
 						<table id='attachmentSection' style='width:100%; border-collapse:collapse'>
-							<tbody></tbody>
+							<tbody>".$this->renderFormItemsControl($this->attachmentItems)."</tbody>
 						</table>
 
 						<div id='callMeSection' style='width:100%'>
 							<table style='width:100%; border-collapse:collapse'><tbody class='AudioFiles'></tbody></table>
-							<table style='width:100%; border-collapse:collapse'><tbody class='EasycallFormItem'></tbody></table>
+							<table style='width:100%; border-collapse:collapse'><tbody class='EasycallFormItem'>".$this->renderFormItemsControl($this->callMeItems)."</tbody></table>
 						</div>
 
 						<div id='audioLibrarySection'>
@@ -471,10 +495,12 @@ class MessageGroupForm extends Form {
 							</table>
 						</div>
 
-						<div id='translationSection'></div>
+						<div id='translationSection'>
+							<table style='width:100%; border-collapse:collapse'><tbody>".$this->renderFormItemsControl($this->translationSettingItems)."</tbody></table>
+						</div>
 
 						<div id='advancedSection'>
-							<table style='width:100%; border-collapse:collapse'><tbody></tbody></table>
+							<table style='width:100%; border-collapse:collapse'><tbody>".$this->renderFormItemsControl($this->advancedItems)."</tbody></table>
 						</div>
 					</div>
 
@@ -518,7 +544,7 @@ class MessageGroupForm extends Form {
 
 		// JAVASCRIPT
 		$str .= "
-			
+
 			<script type='text/javascript' src='script/datepicker.js'></script> <!-- Needed for data-field-insert Date fields. -->
 			<script type='text/javascript' src='script/accordion.js'></script>
 			<script type='text/javascript' src='script/messagegroupform.js.php'></script>
@@ -531,44 +557,31 @@ class MessageGroupForm extends Form {
 						".json_encode($this->helpsteps).",
 						".($this->ajaxsubmit ? "true" : "false")."
 					);
-
 					var allowedDestinations = " . json_encode($this->allowedDestinations) . ";
 
 					var destinationTabs = new Tabs($('destinationTabsContainer'), {'showDuration':0, 'hideDuration':0});
 					var toolsAccordion = new Accordion('toolsAccordionContainer');
-					toolsAccordion.container.setStyle({'paddingLeft':'10px'});
-
 					var messageGroupForm = new MessageGroupForm (formName, destinationTabs, allowedDestinations, toolsAccordion);
 
-					// Move type-specific form items.
-					$('emailContainer').down('tbody').insert($('messagegroupform_subject_fieldarea')).insert($('messagegroupform_fromname_fieldarea')).insert($('messagegroupform_fromemail_fieldarea'));
 
 					// Accordion.
-
+					toolsAccordion.container.setStyle({'paddingLeft':'10px'});
 					toolsAccordion.add_section('attachment');
 					toolsAccordion.add_section('callMe');
 					toolsAccordion.add_section('audioLibrary');
 					toolsAccordion.add_section('dataField');
 					toolsAccordion.add_section('translation');
 					toolsAccordion.add_section('advanced');
-
 					toolsAccordion.update_section('attachment', {
 						'title': 'Attachments',
 						'icon': 'img/icons/accept.gif',
 						'content': $('attachmentSection')
 					});
-					$('attachmentSection').down('tbody').insert($('messagegroupform_attachments_fieldarea'));
-					$('messagegroupform_attachments_fieldarea').down('.formtableheader').hide();
-					$('messagegroupform_attachments_fieldarea').down('.formtableicon').hide();
-
 					toolsAccordion.update_section('callMe', {
 						'title': 'Call Me to Record',
 						'icon': 'img/icons/accept.gif',
 						'content': $('callMeSection')
 					});
-					$('callMeSection').down('tbody.EasycallFormItem').insert($('messagegroupform_callme_fieldarea'));
-					$('messagegroupform_callme_fieldarea').down('.formtableheader').hide();
-
 					toolsAccordion.update_section('audioLibrary', {
 						'title': 'Audio Library',
 						'icon': 'img/icons/accept.gif',
@@ -579,23 +592,22 @@ class MessageGroupForm extends Form {
 						'icon': 'img/icons/accept.gif',
 						'content': $('dataFieldSection')
 					});
-
 					toolsAccordion.update_section('translation', {
 						'title': 'Translation',
 						'icon': 'img/icons/accept.gif',
 						'content': $('translationSection')
 					});
-
 					toolsAccordion.update_section('advanced', {
 						'title': 'Advanced Options',
 						'icon': 'img/icons/accept.gif',
 						'content': $('advancedSection')
 					});
-					$('advancedSection').down('tbody').insert($('messagegroupform_autoexpire_fieldarea')).insert($('messagegroupform_preferredVoice_fieldarea'));
 
 					// Vertical Tabs.
 					for (var type in allowedDestinations) {
+
 						var destination = allowedDestinations[type];
+
 						var subtypes = destination['subtypes'];
 						var languages = destination['languages'];
 						var fieldareas = destination['fieldareas'];
@@ -604,6 +616,8 @@ class MessageGroupForm extends Form {
 						destination.hasValidMessages = {};
 
 						var languageTabs =  (\$H(languages).size() > 1) ? new Tabs($(type + 'Container'), {'vertical':true, 'showDuration':0, 'hideDuration':0}) : null;
+
+
 
 						if (languageTabs) {
 							if (type == 'email')
@@ -621,6 +635,7 @@ class MessageGroupForm extends Form {
 								'icon': 'img/icons/transmit.gif',
 								'content': splitPane
 							});
+
 							languageTabs.sections['autotranslate'].titleDiv.setStyle({'paddingTop':'10px'});
 							languageTabs.sections['autotranslate'].titleDiv.setStyle({'paddingBottom':'10px'});
 							languageTabs.sections['autotranslate'].titleDiv.setStyle({'marginBottom':'10px'});
@@ -648,11 +663,12 @@ class MessageGroupForm extends Form {
 								var tbody = new Element('tbody');
 
 								var fieldarea = $(fieldareas[subtype + languageCode]);
-								fieldarea.down('.formtableicon').hide();
-								fieldarea.down('.formtableheader').hide();
+
+
 								var formItem = $(messageGroupForm.formName + '_' + type + subtype + languageCode);
+
 								formItem.observe('Form:ValidationDisplayed', function(event, type, subtype, languageCode) {
-									
+
 									var destination = this.allowedDestinations[type];
 									var subtypes = destination.subtypes;
 									var hasValidMessages = destination.hasValidMessages;
@@ -691,32 +707,14 @@ class MessageGroupForm extends Form {
 								}.bindAsEventListener(messageGroupForm, type, subtype, languageCode));
 
 								var formtablecontrol = fieldarea.down('.formtablecontrol');
-								var label = fieldarea.down('.formtableheader').down('label');
-								formtablecontrol.insert({'top':label.addClassName('MessageContentHeader')});
 								if (subtype == 'html')
 									formtablecontrol.insert(new Element('div', {'class':'ForCK'}).update('forck'));
 
 								var settingDiv = fieldarea.down('.TranslationSettingDiv');
 
+
+
 								settingDiv.observe('MessageBody:TranslationSettingChanged', function(event, type, languageCode, subtype) {
-									
-									
-									
-									
-									
-									
-									
-									
-									
-									
-									
-									
-									
-									
-									
-									
-									
-									
 									this.refresh_accordion(type, languageCode, subtype);
 								}.bindAsEventListener(messageGroupForm, type, languageCode, subtype));
 
@@ -727,7 +725,7 @@ class MessageGroupForm extends Form {
 								var content = new Element('table', {'style':'width:100%; border-collapse:collapse'}).insert(tbody);
 
 								if (subtypeTabs) {
-									
+
 									subtypeTabs.update_section(subtype, {
 										'title': subtype,
 										'icon': 'img/icons/accept.gif',
@@ -736,24 +734,25 @@ class MessageGroupForm extends Form {
 								} else {
 									contentDiv.insert(content);
 								}
+
 							}
 
 							if (subtypeTabs) {
 								subtypeTabs.show_section(subtypes[0]);
-								
-								
+
+
 								destination.subtypeTabs[languageCode] = subtypeTabs;
-								
-								
-								
+
+
+
 								subtypeTabs.container.observe('Tabs:ClickTitle', function(event, type, languageCode) {
 									if (event.memo.section != 'html' && event.memo.section != 'plain')
 										return;
 									this.refresh_accordion(type, languageCode, event.memo.section);
 								}.bindAsEventListener(messageGroupForm, type, languageCode));
-								
+
 							} else if (type == 'email') {
-								
+
 							}
 
 							var splitPane = make_split_pane(true);
@@ -767,7 +766,7 @@ class MessageGroupForm extends Form {
 									'icon': 'img/icons/diagona/16/160.gif',
 									'content': splitPane
 								});
-								
+
 							} else {
 								$(type + 'Container').insert(splitPane);
 							}
@@ -814,6 +813,8 @@ class MessageGroupForm extends Form {
 						'icon': 'img/icons/telephone.gif',
 						'content': $('phoneContainer')
 					});
+
+					$('emailContainer').down('tbody').insert($('messagegroupform_subject_fieldarea')).insert($('messagegroupform_fromname_fieldarea')).insert($('messagegroupform_fromemail_fieldarea'));
 					destinationTabs.update_section('email', {
 						'title': 'Email',
 						'icon': 'img/icons/email.gif',
@@ -833,7 +834,7 @@ class MessageGroupForm extends Form {
 
 					destinationTabs.container.observe('Tabs:ClickTitle', function(event) {
 						var section = event.memo.section;
-						
+
 						if (section == 'summary') {
 							// Update Summary.
 							for (var type in this.allowedDestinations) {
@@ -846,9 +847,9 @@ class MessageGroupForm extends Form {
 									for (var i = 0, count = subtypes.length; i < count; i++) {
 										var subtype = subtypes[i];
 
-										
+
 										var td = $('summary_' + type + subtype + languageCode);
-										
+
 										td.update();
 										if (hasValidMessages[subtype + languageCode]) {
 											td.update(new Element('img', {'src':'img/icons/accept.gif'}));
@@ -873,7 +874,7 @@ class MessageGroupForm extends Form {
 
 					$('insertDataField').observe('click', function(event) {
 						var currentEditor = this.get_current_editor();
-						
+
 
 						var select = $('dataFieldSelect');
 						if (select.getValue()) {
@@ -887,7 +888,7 @@ class MessageGroupForm extends Form {
 
 					$('insertAudio').observe('click', function(event) {
 						var currentEditor = this.get_current_editor();
-						
+
 
 						var select = $('audioLibrarySelect');
 						if (select.getValue()) {
@@ -900,47 +901,46 @@ class MessageGroupForm extends Form {
 						cachedAjaxGet('ajax.php?type=AudioFile&id=' + event.memo.Default, function(result, audioFileID) {
 							var audioFile = result.responseJSON;
 
-							
+
 
 							if (!audioFile.name)
 								return;
 
 							var playButton = new Element('button', {'type':'button'}).update('Play');
-							
+
 
 							playButton.observe('click', function(event, audioFileID) {
-								
+
 							}.bindAsEventListener(playButton, audioFileID));
 
-							
+
 
 							var insertButton = new Element('button', {'type':'button'}).update('Insert');
-							
+
 							insertButton.observe('click', function(event, audioFileID, audioFile) {
 								var currentEditor = this.get_current_editor();
 								textInsert('{{' + audioFile.name + '}}', currentEditor);
 							}.bindAsEventListener(this, audioFileID, audioFile));
 
-							
+
 
 							var tr = new Element('tr');
 							tr.insert(new Element('td').insert(audioFile.name.escapeHTML()));
 							tr.insert(new Element('td').insert(playButton));
 							tr.insert(new Element('td').insert(insertButton));
 
-							
 
-							
+
+
 
 							$('callMeSection').down('tbody.AudioFiles').insert(tr);
 
-							
+
 
 							// TODO: Insert the audio file name into the current message body.
 						}.bindAsEventListener(this), event.memo.Default);
 					}.bindAsEventListener(messageGroupForm));
 
-					$('renderedFormItems').show();
 				});
 			</script>";
 		return $str;
