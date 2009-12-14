@@ -27,6 +27,20 @@ class Voice extends DBMappedObject {
 	static function getTTSLanguages() {
 		return QuickQueryList("select distinct l.name from ttsvoice t join language l where l.name = t.language order by t.id");
 	}
+
+	static function getPreferredVoice($languagecode, $gender) {
+		$voiceid = QuickQuery("select t.id from language l join ttsvoice t on l.ttsvoiceid = t.id where l.code=? and t.gender=?",false,array($languagecode,$gender));
+
+		if($voiceid === false ) {
+			if($gender == "Female") {
+				$voiceid = QuickQuery("select t.id from language l join ttsvoice t on l.ttsvoiceid = t.id where l.code=? and t.gender='Male'",false,array($languagecode));
+			} else if($gender == "Male") {
+				$voiceid = QuickQuery("select t.id from language l join ttsvoice t on l.ttsvoiceid = t.id where l.code=? and t.gender='Female'",false,array($languagecode));
+			}
+		}
+		if($voiceid	=== false)
+			$voiceid = 1; // default to english
+	}
 }
 
 ?>
