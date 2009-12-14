@@ -96,7 +96,9 @@ function form_do_validation (form, element) {
 
 		//set progress animation
 		//if radio button, get the id of the container div
-		$((element.up(".radiobox") || element).id + "_icon").src = "img/ajax-loader.gif";;
+		var statusindicator = $((element.up(".radiobox") || element).id + "_icon");
+		if (statusindicator)
+			statusindicator.src = "img/ajax-loader.gif";;
 
 		//see if we need additional fields for validation
 		var requiredvalues = {};
@@ -166,16 +168,22 @@ function form_validation_display(element,style, msgtext) {
 
 	if (style == "error") {
 		css = 'background: rgb(255,200,200);';
-		icon.src = "img/icons/exclamation.gif";
-		icon.alt = icon.title = "Validation Error";
+		if (icon) {
+			icon.src = "img/icons/exclamation.gif";
+			icon.alt = icon.title = "Validation Error";
+		}
 	} else if (style == "valid") {
 		css = 'background: rgb(255,255,255);'; //rgb(225,255,225)
-		icon.src = "img/icons/accept.gif";
-		icon.alt = icon.title = "Valid";
+		if (icon) {
+			icon.src = "img/icons/accept.gif";
+			icon.alt = icon.title = "Valid";
+		}
 	} else if (style == "blank") {
 		css = 'background: rgb(255,255,255); display: none';
-		icon.src = "img/pixel.gif";
-		icon.alt = icon.title = "";
+		if (icon) {
+			icon.src = "img/pixel.gif";
+			icon.alt = icon.title = "";
+		}
 	}
 
 	//set up the validation transition effects

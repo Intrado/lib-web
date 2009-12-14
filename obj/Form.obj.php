@@ -15,37 +15,37 @@ class Form {
 	var $serialnum = "";
 	var $validationresults = null;
 	var $ajaxsubmit = true;
-	
+
 	function Form ($name, $formdata, $helpsteps = null, $buttons = null) {
 		$this->name = $name;
 		$this->formdata = $formdata;
 		$this->helpsteps = $helpsteps;
-		
+
 		if (isset($buttons))
 			$this->buttons = $buttons;
-		
+
 		//only use value data in hash, ignore labels, options, etc, etc
 		$values = array();
 		foreach ($formdata as $k => $v) {
 			if (isset($v['value']))
 				$values[$k] = $v['value'];
 		}
-		
+
 		$this->serialnum = md5(serialize($values));
 	}
-	
+
 	function handleRequest($dontexit = false) {
 		if (!isset($_REQUEST['form']) || $_REQUEST['form'] != $this->name)
 			return false; //nothing to do
-		
+
 		if (isset($_REQUEST['ajaxvalidator'])) {
-						
+
 			$jsondata = json_decode($_REQUEST['json'],true);
-			
+
 			$result = array();
-		
+
 			list($form,$item) = explode("_",$_REQUEST['formitem']);
-			
+
 			$itemresult = Validator::validate_item($this->formdata,$item,$jsondata['value'],$jsondata['requiredvalues']);
 			if ($itemresult === true) {
 				$result['vres'] = true;
@@ -58,34 +58,34 @@ class Form {
 
 			if ($dontexit) {
 				return $result;
-			} else {			
+			} else {
 				header("Content-Type: application/json");
 				echo json_encode($result);
 				exit();
 			}
 		}
-		
+
 		//ajax post form - merge in data, check validation, etc
 		if (isset($_POST['submit'])) {
-			
+
 			//check the form snum vs loaded formdata
 			if (isset($_REQUEST['ajax']) && $this->checkForDataChange()) {
 				$result = array("status" => "fail", "datachange" => true);
 				if ($dontexit) {
 					return $result;
-				} else {	
+				} else {
 					header("Content-Type: application/json");
 					echo json_encode($result);
 					exit();
 				}
 			}
-			
-			//we need to set all checkboxes to false because if they are unchecked we won't see any 
+
+			//we need to set all checkboxes to false because if they are unchecked we won't see any
 			//POST data for them if they are checked, the POST data will reset them to true
 			foreach ($this->formdata as $name => $data) {
 				if (is_string($data))
 					continue;
-				
+
 				if (isset($data['control'])) {
 					$controltype = strtolower($data['control'][0]);
 					if ($controltype == "checkbox")
@@ -96,7 +96,7 @@ class Form {
 						$this->formdata[$name]['value'] = array();
 				}
 			}
-			
+
 			foreach ($_POST as $name => $value) {
 				if ($name == "submit")
 					continue;
@@ -114,9 +114,9 @@ class Form {
 					}
 				}
 			}
-			
+
 			$errors = $this->validate();
-						
+
 			//if this is an ajax request, validate now and return json results for the form
 			if (isset($_REQUEST['ajax']) && $errors !== false) {
 				$result = array("status" => "fail", "validationerrors" => $errors);
@@ -129,37 +129,41 @@ class Form {
 				}
 			}
 		}
-		
+
 		return false;
 	}
 
-	function renderFormItems() {
+	// $ignoredItems is an array of $this->formdata keys to ignore.
+	function renderFormItems($ignoredItems = null) {
 		$lasthelpstep = false;
 		$str = '';
 		foreach ($this->formdata as $name => $itemdata) {
+			if (is_array($ignoredItems) && in_array($name, $ignoredItems))
+				continue;
+
 			//check for section titles
 			if (is_string($itemdata)) {
 				if ($lasthelpstep) {
 					$str .= '</table></fieldset>';
 					$lasthelpstep = false;
 				}
-				
+
 				$str .= '
 					<h2>'.$itemdata.'</h2>';
 				unset($this->formdata[$name]); //hide these from showing up in data sent to form_load
 				continue;
 			}
-			
+
 			if (isset($itemdata['control'])) {
 				$control = $itemdata['control'];
 			} else {
 				//set a hidden field
 				$control = array("HiddenField");
 			}
-			
+
 			$formclass = $control[0];
 			$item = new $formclass($this,$name, $control);
-			
+
 			//inject which function to use for getting the value from this control
 			$this->formdata[$name]['jsgetvalue'] = $item->jsGetValue();
 
@@ -173,12 +177,12 @@ class Form {
 				$str .= '
 			</table></fieldset>';
 			}
-			
+
 			if ($lasthelpstep != $itemdata['helpstep']) {
 				$lasthelpstep = $itemdata['helpstep'];
 				$str .= '<fieldset id="'. $this->name . '_helpsection_'.$lasthelpstep.'"><table summary="" width="100%" cellspacing="0" table-layout="fixed" class="formcontenttable">';
 			}
-			
+
 			$n = $this->name."_".$item->name;
 			$l = $itemdata['label'];
 
@@ -195,7 +199,7 @@ class Form {
 				$alt = "";
 				$style = "";
 				$msg = false;
-			
+
 				//see if valrequired is any of the validators
 				$isrequired = false;
 				foreach ($itemdata['validators'] as $v) {
@@ -204,9 +208,9 @@ class Form {
 						break;
 					}
 				}
-				
+
 				$isblank = (is_array($value) && !count($value)) || (!is_array($value) && mb_strlen($value) == 0);
-				
+
 				if ($this->getSubmit() || !$isblank) {
 					//validate and show normally
 					$valresult = Validator::validate_item($this->formdata,$name,$value,$requiredfields);
@@ -227,7 +231,7 @@ class Form {
 					$alt = "Required Field";
 					$style = 'style="background: rgb(255,255,220);"' ;
 				}
-				
+
 				$str.= '
 				<tr id="'.$n.'_fieldarea" '.$style.'>
 					<th class="formtableheader"><label class="formlabel" for="'.$n.'" tabindex="'.$t.'" >'.$l.'</label></th>
@@ -240,34 +244,97 @@ class Form {
 				';
 			}
 		} //foreach
-		
+
 		if ($lasthelpstep)
 			$str .= '
 			</table></fieldset>';
-			
+
 		return $str;
 	}
-	
+
+	// This function only renders the form item's control and validation message; no icon nor label.
+	// Assumes isset($itemdata['control']) for every form item to be rendered.
+	// Also assumes the control is not HiddenField nor FormHtml.
+	function renderFormItemsControl($specificItems) {
+		$str = '';
+		foreach ($this->formdata as $name => $itemdata) {
+			if (!in_array($name, $specificItems))
+				continue;
+
+			$control = $itemdata['control'];
+
+			$formclass = $control[0];
+			$item = new $formclass($this,$name, $control);
+
+			//inject which function to use for getting the value from this control
+			$this->formdata[$name]['jsgetvalue'] = $item->jsGetValue();
+
+			$n = $this->name."_".$item->name;
+
+			$value = $itemdata['value'];
+			$requiredfields = isset($itemdata['requires']) ? $this->getFieldValues($itemdata['requires']) : array();
+			$style = "";
+			$msg = false;
+
+			//see if valrequired is any of the validators
+			$isrequired = false;
+			foreach ($itemdata['validators'] as $v) {
+				if ($v[0] == "ValRequired") {
+					$isrequired = true;
+					break;
+				}
+			}
+
+			$isblank = (is_array($value) && !count($value)) || (!is_array($value) && mb_strlen($value) == 0);
+
+			if ($this->getSubmit() || !$isblank) {
+				//validate and show normally
+				$valresult = Validator::validate_item($this->formdata,$name,$value,$requiredfields);
+				if ($valresult === true) {
+					$style = 'style="background: rgb(255,255,255);"' ; //rgb(225,255,225)
+					$msg = false;
+				} else {
+					list($validator,$msg) =  $valresult;
+					$style = 'style="background: rgb(255,200,200);"' ;
+				}
+			} else if (!$this->getSubmit() && $isblank && $isrequired) {
+				//show required highlight
+				$style = 'style="background: rgb(255,255,220);"' ;
+			}
+
+			$str.= '
+			<tr id="'.$n.'_fieldarea" '.$style.'>
+				<td class="formtablecontrol">
+					'.$item->render($value).'
+					<div id="'.$n.'_msg" class="underneathmsg">'.($msg ? $msg : "").'</div>
+				</td>
+			</tr>
+			';
+		} //foreach
+
+		return $str;
+	}
+
 	function render () {
 		$theme = getBrandTheme();
-		
+
 		$posturl = $_SERVER['REQUEST_URI'];
 		$posturl .= mb_strpos($posturl,"?") !== false ? "&" : "?";
 		$posturl .= "form=". $this->name;
-		
+
 		$str = '
 		<div class="newform_container">
 		<form class="newform" id="'.$this->name.'" name="'.$this->name.'" method="POST" action="'.$posturl.'">
 		<input name="'.$this->name.'-formsnum" type="hidden" value="' . $this->serialnum . '">
 		<table summary="Form" width="100%" cellspacing="0" cellpadding="0" table-layout="fixed" ><tr><td valign="top"> <!-- FORM CONTENT -->';
-		
+
 		$str .= $this->renderFormItems();
-		
+
 		//submit buttons
 		foreach ($this->buttons as $code) {
 			$str .= $code;
 		}
-		
+
 		$str .= '
 				<!-- END FORM CONTENT -->
 				</td>
@@ -288,14 +355,14 @@ class Form {
 			</tr>
 		</table>
 		</form>
-		
-		
-		
+
+
+
 		</div>
 		<div style="clear: both;"></div>
 
-		<script type="text/javascript">	
-	
+		<script type="text/javascript">
+
 		form_load("'.$this->name.'",
 			"'.$posturl.'",
 			'.json_encode($this->formdata).',
@@ -306,7 +373,7 @@ class Form {
 		';
 		return $str;
 	}
-	
+
 	function checkForDataChange() {
 		return $this->serialnum != $_POST[$this->name.'-formsnum'];
 	}
@@ -314,9 +381,9 @@ class Form {
 	function validate () {
 		if ($this->validationresults !== null)
 			return $this->validationresults;
-		
+
 		$this->validationresults= array();
-		
+
 		$anyerrors = false;
 		foreach ($this->formdata as $name => $data) {
 			if (is_string($data))
@@ -333,7 +400,7 @@ class Form {
 				$this->validationresults[] = array("name" => $name,"vres" => false,"vmsg" => $msg, "v" => $validator);
 			}
 		}
-		
+
 		if ($anyerrors) {
 			return $this->validationresults;
 		} else {
@@ -341,7 +408,7 @@ class Form {
 			return false;
 		}
 	}
-	
+
 	function getData () {
 		$res = array();
 		foreach ($this->formdata as $name => $data) {
@@ -352,7 +419,7 @@ class Form {
 		}
 		return $res;
 	}
-	
+
 	//gets assoc array for just provided field names
 	function getFieldValues ($names) {
 		$res = array();
@@ -362,17 +429,17 @@ class Form {
 		}
 		return $res;
 	}
-	
+
 	function isAjaxSubmit() {
 		return isset($_GET['ajax']) && isset($_POST['submit']);
 	}
-	
+
 	function getSubmit() {
 		if (!isset($_POST['submit']) || $_REQUEST['form'] != $this->name)
 			return false;
 		return $_POST['submit'];
 	}
-	
+
 	//sends repsonse to an ajax call that will redirect the browser to a url
 	function sendTo ($url) {
 		$result = array("status" => "success", "nexturl" => $url);
@@ -380,7 +447,7 @@ class Form {
 		echo json_encode($result);
 		exit();
 	}
-	
+
 	//Send an element outside the form some new content
 	function modifyElement ($elementname, $htmlcontent) {
 		$result = array("status" => "modify", "name" => $elementname, "content" => $htmlcontent);
