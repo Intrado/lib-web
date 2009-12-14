@@ -23,8 +23,7 @@
  * // test case: when you click refresh translation in autotranslate, reproduce by translating once, then disabling a language's translation, then translate again. notice that the message's text did not get set to the new translation.
  * // current task: When you click 'refresh translation' in autotranslate, update the sourceText and translationText for each affected Language.
  * // TODO: no need to confirm() when clicking 'refrehs translation' in autotranslate if you are not actually overwriting any messages.
- * // TODO: take out error_log
- * // TODO: take out
+ * // TODO: take out debugging
  * // TODO: for auto-translate, alert if text is longer than 2000 when clicking on Translate or Retranslate.
  * // TODO: don't translate if text is blank.
  * // Todo: set a default language variable instead of checking against 'english' or 'en'
@@ -104,6 +103,7 @@ class CallMe extends FormItem {
 		$str .= '<script type="text/javascript" src="script/easycall.js.php"></script>
 			<script type="text/javascript">
 			document.observe("dom:loaded", function() {
+				//return;
 				var msgs = '.$value.';
 				// Load default. it is a special case
 				new Easycall(
@@ -150,7 +150,7 @@ class MessageGroupForm extends Form {
 	// Gather Fields.
 	// $messages = array( $type . $subtype . $language . $autotranslate => new Message2() );
 	var $messages;
-	var $allowedDestinations;
+	var $destinationInfos;
 
 	// $settings['readonly'] = boolean.
 	// $settings['disablephone'] = boolean.
@@ -168,32 +168,32 @@ class MessageGroupForm extends Form {
 		// Data Gathering
 		/////////////////////////////////////////////
 		$this->messageGroup = $messageGroup;
-		$this->allowedDestinations = array();
+		$this->destinationInfos = array();
 		$this->messages = array();
 		$this->audiofiles = DBFindMany('AudioFile', "from audiofile where userid = $USER->id and deleted != 1 order by name");
 		$this->dataFields = FieldMap::getAuthorizedMapNames();
 
 		if (empty($settings['disablePhone'])) {
-			$this->allowedDestinations['phone'] = array();
-			$this->allowedDestinations['phone']['subtypes'] = array('voice');
+			$this->destinationInfos['phone'] = array();
+			$this->destinationInfos['phone']['subtypes'] = array('voice');
 
 			// Todo: check for multilingual privilege.
-			$this->allowedDestinations['phone']['languages'] = array('en' => 'English', 'vt' => 'Chinese', 'vt' => 'Chinese', 'es' => 'Spanish');
+			$this->destinationInfos['phone']['languages'] = array('en' => 'English', 'vt' => 'Chinese', 'vt' => 'Chinese', 'es' => 'Spanish');
 			$preferredVoice = "female";
 		}
 
 		if (empty($settings['disableEmail'])) {
-			$this->allowedDestinations['email'] = array();
-			$this->allowedDestinations['email']['subtypes'] = array('html', 'plain');
+			$this->destinationInfos['email'] = array();
+			$this->destinationInfos['email']['subtypes'] = array('html', 'plain');
 
 			// Todo: check for multilingual privilege.
-			$this->allowedDestinations['email']['languages'] = array('en' => 'English', 'vt' => 'Chinese', 'vt' => 'Chinese', 'es' => 'Spanish');
+			$this->destinationInfos['email']['languages'] = array('en' => 'English', 'vt' => 'Chinese', 'vt' => 'Chinese', 'es' => 'Spanish');
 		}
 
 		if (empty($settings['disableSMS'])) {
-			$this->allowedDestinations['sms'] = array();
-			$this->allowedDestinations['sms']['subtypes'] = array('plain');
-			$this->allowedDestinations['sms']['languages'] = array('en' => 'English');
+			$this->destinationInfos['sms'] = array();
+			$this->destinationInfos['sms']['subtypes'] = array('plain');
+			$this->destinationInfos['sms']['languages'] = array('en' => 'English');
 		}
 
 		/////////////////////////////////////////////
@@ -216,9 +216,9 @@ class MessageGroupForm extends Form {
 
 		$formdata = array();
 
-		foreach ($this->allowedDestinations as $type => $destination) {
+		foreach ($this->destinationInfos as $type => $destination) {
 			// Store the fieldareas for easy DOM manipulation into $destinationTabs.
-			$this->allowedDestinations[$type]['fieldareas'] = array();
+			$this->destinationInfos[$type]['fieldareas'] = array();
 
 			foreach ($destination['subtypes'] as $subtype) {
 				foreach ($destination['languages'] as $languageCode => $languageName) {
@@ -254,7 +254,7 @@ class MessageGroupForm extends Form {
 						"helpstep" => 2
 					);
 					$this->messageItems[] = $messageKey;
-					$this->allowedDestinations[$type]['fieldareas'][$subtype . $languageCode] = "{$name}_{$messageKey}_fieldarea";
+					$this->destinationInfos[$type]['fieldareas'][$subtype . $languageCode] = "{$name}_{$messageKey}_fieldarea";
 				}
 			}
 		}
@@ -394,7 +394,7 @@ class MessageGroupForm extends Form {
 		$summaryLanguageRows = "";
 		$languageNames = array();
 		//var td = $('summary_' + type + subtype + languageCode);
-		foreach ($this->allowedDestinations as $type => $destination) {
+		foreach ($this->destinationInfos as $type => $destination) {
 			foreach ($destination['subtypes'] as $subtype) {
 				$subtypeHtml = count($destination['subtypes']) > 1 ? (" (" . ucfirst($subtype) . ") ") : "";
 				$summaryHeaders .= "<th class='Destination'>" . ucfirst($type) . $subtypeHtml . "</th>";
@@ -404,7 +404,7 @@ class MessageGroupForm extends Form {
 		}
 		foreach ($languageNames as $languageCode => $languageName) {
 			$summaryLanguageRows .= "<tr><th class='Language'>" . ucfirst($languageNames[$languageCode]) . "</th>";
-			foreach ($this->allowedDestinations as $type => $destination) {
+			foreach ($this->destinationInfos as $type => $destination) {
 				foreach ($destination['subtypes'] as $subtype) {
 					$summaryLanguageRows .= "<td class='StatusIcon' id='summary_{$type}{$subtype}{$languageCode}'></td>";
 				}
@@ -532,7 +532,6 @@ class MessageGroupForm extends Form {
 
 					" . $this->render_hidden_serialnum() . "
 
-
 				</form>
 			</div>
 			<div id='ckarea' style='clear:both; display:none'>
@@ -557,12 +556,11 @@ class MessageGroupForm extends Form {
 						".json_encode($this->helpsteps).",
 						".($this->ajaxsubmit ? "true" : "false")."
 					);
-					var allowedDestinations = " . json_encode($this->allowedDestinations) . ";
+					var destinationInfos = " . json_encode($this->destinationInfos) . ";
 
 					var destinationTabs = new Tabs($('destinationTabsContainer'), {'showDuration':0, 'hideDuration':0});
 					var toolsAccordion = new Accordion('toolsAccordionContainer');
-					var messageGroupForm = new MessageGroupForm (formName, destinationTabs, allowedDestinations, toolsAccordion);
-
+					var messageGroupForm = new MessageGroupForm (formName, destinationTabs, destinationInfos, toolsAccordion);
 
 					// Accordion.
 					toolsAccordion.container.setStyle({'paddingLeft':'10px'});
@@ -604,9 +602,9 @@ class MessageGroupForm extends Form {
 					});
 
 					// Vertical Tabs.
-					for (var type in allowedDestinations) {
+					for (var type in destinationInfos) {
 
-						var destination = allowedDestinations[type];
+						var destination = destinationInfos[type];
 
 						var subtypes = destination['subtypes'];
 						var languages = destination['languages'];
@@ -668,8 +666,7 @@ class MessageGroupForm extends Form {
 								var formItem = $(messageGroupForm.formName + '_' + type + subtype + languageCode);
 
 								formItem.observe('Form:ValidationDisplayed', function(event, type, subtype, languageCode) {
-
-									var destination = this.allowedDestinations[type];
+									var destination = this.destinationInfos[type];
 									var subtypes = destination.subtypes;
 									var hasValidMessages = destination.hasValidMessages;
 									var languageTabs = destination.languageTabs;
@@ -837,8 +834,8 @@ class MessageGroupForm extends Form {
 
 						if (section == 'summary') {
 							// Update Summary.
-							for (var type in this.allowedDestinations) {
-								var destination = this.allowedDestinations[type];
+							for (var type in this.destinationInfos) {
+								var destination = this.destinationInfos[type];
 								var hasValidMessages = destination.hasValidMessages;
 								var languages = destination.languages;
 								var subtypes = destination.subtypes;
