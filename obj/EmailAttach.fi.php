@@ -21,7 +21,12 @@ class EmailAttach extends FormItem {
 					$(\'upload_process\').show();	
 					return true;
 				}
-				function stopUpload(id,name,size,errormessage){
+				function stopUpload(id,name,size,errormessage) {
+					// stopUpload() is called automatically when the iframe is loaded, which may be before document.formvars is initialized by form_load().
+					// In that case, just return.
+					if (!document.formvars)
+						return;
+						
 					setTimeout ("$(\'upload_process\').hide();", 500 );
 					var values = {};
 					var field = $("' . $n . '").value;
