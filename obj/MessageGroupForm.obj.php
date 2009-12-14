@@ -1,8 +1,6 @@
 <?php
 
-// next task: revise renderFormItems(), refactor so that it's less work for javascript DOM manipulation.
-// next task: summary page.
-// next task: summary page -- onclick event handlers for each cell.
+
 // next task: status images for each destination.
 // next task: restructure tabs to new structure: destination->subtype->languages instead of destination->languages->subtype.
 // next task: correctly find out the current editor for use with data field inserts and call me to record.
@@ -10,9 +8,14 @@
 // next task: replace the subtype icons with the actual form validation icon.
 // next task: when saving the form, delete all existing messages?
 // next task: when clicking on override translation, disable the sourceTextarea.
+// delayed TODO: revise renderFormItems(), refactor so that it's less work for javascript DOM manipulation. (speedup load time in Internet Explorer by utilizing lazy DOM manipulation for messagebody only when the user clicks on a destination or language tab)
+// delayed TODO: summary page layout -- no gridlines for SMS, no icons for SMS except for English.
+
+// done: summary page -- onclick event handlers for each cell.
+
 
 /* // test case: test in Internet Explorer.
- *
+ * // test case: summary page -- click on a multilingual TD for SMS. Verify that there are no javascript errors; verify that you are not taken to any tab.
  * // TODO: if there are languages that are not part of the valid set defined in translate.php, do not translate. But, do not assume that the language is valid, explicitly check against an array before sending to translate.php.
  * // test caes: the langugae tab icon for an email should be accept.gif if either html or plain is a valid message. It does not need both subtypes to be valid.
  * // test case: if the english source for a language has been cleared but the translation is not overidden, make sure the translation is also blank.
@@ -393,7 +396,6 @@ class MessageGroupForm extends Form {
 		$summaryHeaders = "";
 		$summaryLanguageRows = "";
 		$languageNames = array();
-		//var td = $('summary_' + type + subtype + languageCode);
 		foreach ($this->destinationInfos as $type => $destination) {
 			foreach ($destination['subtypes'] as $subtype) {
 				$subtypeHtml = count($destination['subtypes']) > 1 ? (" (" . ucfirst($subtype) . ") ") : "";
@@ -406,7 +408,8 @@ class MessageGroupForm extends Form {
 			$summaryLanguageRows .= "<tr><th class='Language'>" . ucfirst($languageNames[$languageCode]) . "</th>";
 			foreach ($this->destinationInfos as $type => $destination) {
 				foreach ($destination['subtypes'] as $subtype) {
-					$summaryLanguageRows .= "<td class='StatusIcon' id='summary_{$type}{$subtype}{$languageCode}'></td>";
+					$icon = 'img/icons/diagona/16/160.gif';
+					$summaryLanguageRows .= "<td class='StatusIcon'><img class='StatusIcon' id='summary_{$type}_{$subtype}_{$languageCode}' src='$icon'/></td>";
 				}
 			}
 			$summaryLanguageRows .= "</tr>";
@@ -844,12 +847,12 @@ class MessageGroupForm extends Form {
 									for (var i = 0, count = subtypes.length; i < count; i++) {
 										var subtype = subtypes[i];
 
+										var image = $('summary_' + type + '_' + subtype + '_' + languageCode);
 
-										var td = $('summary_' + type + subtype + languageCode);
-
-										td.update();
 										if (hasValidMessages[subtype + languageCode]) {
-											td.update(new Element('img', {'src':'img/icons/accept.gif'}));
+											image.src = 'img/icons/accept.gif';
+										} else {
+											image.src = 'img/icons/diagona/16/160.gif';
 										}
 									}
 								}
@@ -859,6 +862,25 @@ class MessageGroupForm extends Form {
 							return;
 						}
 						this.refresh_accordion(section);
+					}.bindAsEventListener(messageGroupForm));
+					$('summaryContainer').observe('click', function(event) {
+						var element = event.element();
+						if (!element.match('img.StatusIcon'))
+							return;
+						var idSplit = element.identify().split('_');
+						var type = idSplit[1];
+						var subtype = idSplit[2];
+						var languageCode = idSplit[3];
+						this.destinationTabs.show_section(type);
+						var languageTabs = this.destinationInfos[type].languageTabs;
+						if (languageTabs)
+							languageTabs.show_section(languageCode);
+						var subtypeTabs = this.destinationInfos[type].subtypeTabs;
+						if (subtypeTabs) {
+							var subtypeTabsForLanguage = subtypeTabs[languageCode];
+							if (subtypeTabsForLanguage)
+								subtypeTabsForLanguage.show_section(subtype);
+						}
 					}.bindAsEventListener(messageGroupForm));
 
 					destinationTabs.show_section('phone'); // TODO: Show the first, depending on allowMultilingual, allow phone, etc..
