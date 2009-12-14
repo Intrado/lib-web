@@ -642,6 +642,9 @@ td.SplitPane {
 	border-left: solid 1px rgb(210,210,210);
 	padding: 5px;
 }
+#summaryContainer img.StatusIcon {
+	cursor: pointer;
+}
 
 .sortheader {
 	color: white;
