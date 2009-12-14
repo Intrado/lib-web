@@ -10,6 +10,7 @@ header("Cache-Control: private");
 
 // todo: whenever using _L(), must also strip tags.
 
+
 var AutoTranslate = Class.create({
 
 	// done: Make onclick handlers for each language checkbox, adding or removing from this.translationLanguages
@@ -149,7 +150,7 @@ var AutoTranslate = Class.create({
 					return;
 				}
 
-				var dataResponseData = data.responseData;
+				var dataResponseData = data.responseData;	
 			
 				var i = 0;
 				for (var languageCode in this.translationLanguages) {
@@ -210,9 +211,9 @@ var MessageGroupForm = Class.create({
 	// todo: when in email and sms, hide the preferred voice advanced option.
 	// todo: disable certain accordion sections for autotranslate.
 	
-	initialize: function (formName, destinationInfoTabs, destinationInfos, toolsAccordion) {
+	initialize: function (formName, destinationTabs, destinationInfos, toolsAccordion) {
 		this.formName = formName;
-		this.destinationInfoTabs = destinationInfoTabs;
+		this.destinationTabs = destinationTabs;
 		this.destinationInfos = destinationInfos;
 		this.toolsAccordion = toolsAccordion;
 	},
@@ -242,7 +243,7 @@ var MessageGroupForm = Class.create({
 	},
 
 	get_current_editor: function() {
-		var type = this.destinationInfoTabs.currentSection;
+		var type = this.destinationTabs.currentSection;
 		if (type != 'phone' && type != 'email' && type != 'sms')
 			return null;
 		var destinationInfo =  this.destinationInfos[type];
@@ -318,3 +319,4 @@ var MessageGroupForm = Class.create({
 		}
 	}
 });
+
