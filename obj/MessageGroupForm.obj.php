@@ -1,7 +1,6 @@
 <?php
 
-// current TODO: does callme to record ui correctly display errors?
-// next TODO: integrate CKEDITOR, then correctly find out the current editor.
+// current TODO: integrate CKEDITOR, then correctly find out the current editor.
 // next TODO: integrate CKEDITOR with translations.
 // next TODO: integrate CKEDITOR with call me and audio library.
 // next TODO: integrate CKEDITOR with data fields.
@@ -21,7 +20,9 @@
 // done: summary page -- onclick event handlers for each cell.
 
 // test case: in autotranslate, uncheck lanaguage that has translation. Then go to that language tab and verify that this does not automatically disable translation for the language.
-						
+
+// delayed TODO: does callme to record ui correctly display errors?
+
 /* // test case: test in Internet Explorer.
  * // test case: summary page -- click on a multilingual TD for SMS. Verify that there are no javascript errors; verify that you are not taken to any tab.
  * // next TODO: if there are languages that are not part of the valid set defined in translate.php, do not translate. But, do not assume that the language is valid, explicitly check against an array before sending to translate.php.
@@ -545,16 +546,16 @@ class MessageGroupForm extends Form {
 
 				</form>
 			</div>
-			<div id='ckarea' style='clear:both; display:none'>
+			<div id='ckarea' style='clear:both;'>
 				<div>
-					<textarea id='forck'> hello </textarea>
+					<textarea id='htmlEditor'> hello </textarea>
 				</div>
 			</div>
 		";
 
 		// JAVASCRIPT
 		$str .= "
-
+			<script type='text/javascript' src='script/ckeditor/ckeditor_basic.js'></script>
 			<script type='text/javascript' src='script/datepicker.js'></script> <!-- Needed for data-field-insert Date fields. -->
 			<script type='text/javascript' src='script/accordion.js'></script>
 			<script type='text/javascript' src='script/messagegroupform.js.php'></script>
@@ -573,6 +574,16 @@ class MessageGroupForm extends Form {
 					var toolsAccordion = new Accordion('toolsAccordionContainer');
 					var messageGroupForm = new MessageGroupForm (formName, destinationTabs, destinationInfos, toolsAccordion);
 
+					// CKEDITOR
+					var htmlEditor = CKEDITOR.replace('htmlEditor', {
+						'toolbar': [
+							['Styles', 'Format'],
+							['Bold', 'Italic', '-', 'NumberedList', 'BulletedList', '-', 'Link', '-']
+						],
+						'resize_enabled': false,
+						'width': '100%'
+					});
+					
 					// Accordion.
 					toolsAccordion.container.setStyle({'paddingLeft':'10px'});
 					toolsAccordion.add_section('attachment');
@@ -745,7 +756,7 @@ class MessageGroupForm extends Form {
 
 								var formtablecontrol = fieldarea.down('.formtablecontrol');
 								if (subtype == 'html')
-									formtablecontrol.insert(new Element('div', {'class':'ForCK'}).update('forck'));
+									formtablecontrol.insert(new Element('div', {'class':'htmlEditor'}).update('htmlEditor'));
 
 								var settingDiv = fieldarea.down('.TranslationSettingDiv');
 
