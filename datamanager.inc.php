@@ -63,11 +63,13 @@ if (isset($_GET['clear'])) {
 		redirect();
 	}
 
+	// DO NOT CLEAR SUBSCRIBER values (F or G)
+	
 	if (ereg("^f[0-9]{2}$",$fieldnum)) {
-		QuickUpdate("update person p use index (ownership) set `$fieldnum`=NULL ");
+		QuickUpdate("update person p use index (ownership) set `$fieldnum`=NULL where importid is not null");
 	}
 	if (ereg("^g[0-9]{2}$",$fieldnum)) {
-		QuickUpdate("delete from groupdata where fieldnum=".substr($fieldnum, 1));
+		QuickUpdate("delete from groupdata where fieldnum=".substr($fieldnum, 1) . " and importid != 0");
 	}
 
 	notice(_L("Data for the field, %s, is now cleared.", escapehtml(FieldMap::getName($fieldnum))));
