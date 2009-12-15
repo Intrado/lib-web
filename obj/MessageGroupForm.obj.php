@@ -1,22 +1,30 @@
 <?php
 
-
-// next task: status images for each destination.
-// next task: restructure tabs to new structure: destination->subtype->languages instead of destination->languages->subtype.
-// next task: correctly find out the current editor for use with data field inserts and call me to record.
-// next task: write a function to cause all languages for a certain destination type to be form_validated. (for use in autotranslate and when loading the form).
-// next task: replace the subtype icons with the actual form validation icon.
-// next task: when saving the form, delete all existing messages?
-// next task: when clicking on override translation, disable the sourceTextarea.
+// current TODO: does callme to record ui correctly display errors?
+// next TODO: integrate CKEDITOR, then correctly find out the current editor.
+// next TODO: integrate CKEDITOR with translations.
+// next TODO: integrate CKEDITOR with call me and audio library.
+// next TODO: integrate CKEDITOR with data fields.
+// next TODO: save on tabbing and window close.
+// next TODO: implement new formitem's getJSCode() and getJSDependencies()
+// next TODO: strong validation.
+// next TODO: translation with field inserts.
+// next TODO: when clicking on override translation, disable the sourceTextarea.
+// next TODO: restructure tabs to new structure: destination->subtype->languages instead of destination->languages->subtype.
+// next TODO: write a function to cause all languages for a certain destination type to be form_validated. (when loading the form).
+// next TODO: when saving the form, delete all existing messages?
 // delayed TODO: revise renderFormItems(), refactor so that it's less work for javascript DOM manipulation. (speedup load time in Internet Explorer by utilizing lazy DOM manipulation for messagebody only when the user clicks on a destination or language tab)
 // delayed TODO: summary page layout -- no gridlines for SMS, no icons for SMS except for English.
 
+// done: status images for subtypes.
+// done: status images for each destination.
 // done: summary page -- onclick event handlers for each cell.
 
-
+// test case: in autotranslate, uncheck lanaguage that has translation. Then go to that language tab and verify that this does not automatically disable translation for the language.
+						
 /* // test case: test in Internet Explorer.
  * // test case: summary page -- click on a multilingual TD for SMS. Verify that there are no javascript errors; verify that you are not taken to any tab.
- * // TODO: if there are languages that are not part of the valid set defined in translate.php, do not translate. But, do not assume that the language is valid, explicitly check against an array before sending to translate.php.
+ * // next TODO: if there are languages that are not part of the valid set defined in translate.php, do not translate. But, do not assume that the language is valid, explicitly check against an array before sending to translate.php.
  * // test caes: the langugae tab icon for an email should be accept.gif if either html or plain is a valid message. It does not need both subtypes to be valid.
  * // test case: if the english source for a language has been cleared but the translation is not overidden, make sure the translation is also blank.
  * // current task: status images for each language.
@@ -25,14 +33,14 @@
  * // current task: When you click 'refresh translation' in autotranslate, check the Translation Option's 'Enable Translation' checkbox, and call the formitem's toggleTranslation function.
  * // test case: when you click refresh translation in autotranslate, reproduce by translating once, then disabling a language's translation, then translate again. notice that the message's text did not get set to the new translation.
  * // current task: When you click 'refresh translation' in autotranslate, update the sourceText and translationText for each affected Language.
- * // TODO: no need to confirm() when clicking 'refrehs translation' in autotranslate if you are not actually overwriting any messages.
- * // TODO: take out debugging
+ * // done: no need to confirm() when clicking 'refrehs translation' in autotranslate if you are not actually overwriting any messages.
+ * // done: take out debugging
  * // TODO: for auto-translate, alert if text is longer than 2000 when clicking on Translate or Retranslate.
  * // TODO: don't translate if text is blank.
- * // Todo: set a default language variable instead of checking against 'english' or 'en'
- * // TODO: set the first destination tab, subtype tab, etc.. depending on permissions and settings.
+ * // next TODO: set a default language variable instead of checking against 'english' or 'en'
+ * // next TODO: set the first destination tab, subtype tab, etc.. depending on permissions and settings.
  * // TODO: do not translate default language. (autotranslate tab, and in any google translations).
- * // TODO: does callme to record ui correctly display errors?
+
  * // TODO: if clear, set greyed-out instructions.
  * // TODO: update get_current_editor for use in autotranslate tab due to data field inserts for phone.
  * // TODO: disable callme, translation, and audiolibrary (accordion sections) for autotranslate phone.
@@ -615,6 +623,7 @@ class MessageGroupForm extends Form {
 						destination.translationSettingDivs = {};
 						destination.subtypeTabs = {};
 						destination.hasValidMessages = {};
+						destination.languageHasValidMessages = {};
 
 						var languageTabs =  (\$H(languages).size() > 1) ? new Tabs($(type + 'Container'), {'vertical':true, 'showDuration':0, 'hideDuration':0}) : null;
 
@@ -670,20 +679,33 @@ class MessageGroupForm extends Form {
 
 								formItem.observe('Form:ValidationDisplayed', function(event, type, subtype, languageCode) {
 									var destination = this.destinationInfos[type];
+									var destinationTabs = this.destinationTabs;
 									var subtypes = destination.subtypes;
+									var subtypeTabs = destination.subtypeTabs[languageCode];
+									var languages = destination.languages;
 									var hasValidMessages = destination.hasValidMessages;
 									var languageTabs = destination.languageTabs;
+									var languageHasValidMessages = destination.languageHasValidMessages;
 
 									// Store the updated status.
 									var messageValid = (event.memo.style == 'valid') && (this.get_message_element(type, subtype, languageCode, 'text').value.strip() != '');
 									hasValidMessages[subtype + languageCode] = messageValid;
 
-									// If the status of any subtype for this language is specified==true.
+									if (messageValid) {
+										if (subtypeTabs)
+											subtypeTabs.sections[subtype].titleIcon.src = 'img/icons/accept.gif';
+									}
+									
+									// If the status of any subtype message for this language is valid, then indicate that the language is also.
 									var languageHasValidMessage = messageValid;
 									if (!messageValid) {
+										if (subtypeTabs)
+										subtypeTabs.sections[subtype].titleIcon.src = 'img/icons/diagona/16/160.gif';
+										
 										for (var i = 0, count = subtypes.length; i < count; i++) {
 											if (hasValidMessages[subtypes[i] + languageCode]) {
 												languageHasValidMessage = true;
+												languageHasValidMessages[languageCode] = true;
 												break;
 											}
 										}
@@ -694,14 +716,29 @@ class MessageGroupForm extends Form {
 											languageTabs.sections[languageCode].titleIcon.src = 'img/icons/accept.gif';
 										}
 
-										// TODO: Update the Phone,Email,SMS mainTab icons.
+										destinationTabs.sections[type].titleIcon.src = 'img/icons/accept.gif';
 
 									} else {
+										languageHasValidMessages[languageCode] = false;
+										
 										if (languageTabs) {
 											languageTabs.sections[languageCode].titleIcon.src = 'img/icons/diagona/16/160.gif';
 										}
 
-										// TODO: Update the Phone,Email,SMS mainTab icons. If any language has a valid message.
+										var destinationHasValidMessage = false;
+										// If the status of any language for this destination type is valid, then the indicate that destination type is also valid.
+										for (var languageCode in languages) {
+											if (languageHasValidMessages[languageCode]) {
+												destinationHasValidMessage = true;
+												break;
+											}
+										}
+										
+										if (destinationHasValidMessage) {
+											destinationTabs.sections[type].titleIcon.src = 'img/icons/accept.gif';
+										} else {
+											destinationTabs.sections[type].titleIcon.src = 'img/icons/diagona/16/160.gif';
+										}
 									}
 
 								}.bindAsEventListener(messageGroupForm, type, subtype, languageCode));
@@ -725,10 +762,9 @@ class MessageGroupForm extends Form {
 								var content = new Element('table', {'style':'width:100%; border-collapse:collapse'}).insert(tbody);
 
 								if (subtypeTabs) {
-
 									subtypeTabs.update_section(subtype, {
 										'title': subtype,
-										'icon': 'img/icons/accept.gif',
+										'icon': 'img/icons/diagona/16/160.gif', // TODO: Show accept.gif if valid.
 										'content': content
 									});
 								} else {
@@ -788,7 +824,7 @@ class MessageGroupForm extends Form {
 									autotranslateSubtypeTabs.add_section(subtype);
 									autotranslateSubtypeTabs.update_section(subtype, {
 										'title': subtype,
-										'icon': 'img/icons/accept.gif',
+										'icon': 'img/pixel.gif',
 										'content': contentDiv
 									});
 								}
@@ -810,20 +846,20 @@ class MessageGroupForm extends Form {
 					destinationTabs.add_section('summary');
 					destinationTabs.update_section('phone', {
 						'title': 'Phone',
-						'icon': 'img/icons/telephone.gif',
+						'icon': 'img/icons/diagona/16/160.gif', // TODO: Show accept.gif if valid.
 						'content': $('phoneContainer')
 					});
 
 					$('emailContainer').down('tbody').insert($('messagegroupform_subject_fieldarea')).insert($('messagegroupform_fromname_fieldarea')).insert($('messagegroupform_fromemail_fieldarea'));
 					destinationTabs.update_section('email', {
 						'title': 'Email',
-						'icon': 'img/icons/email.gif',
+						'icon': 'img/icons/diagona/16/160.gif', // TODO: Show accept.gif if valid.
 						'content': $('emailContainer')
 					});
 
 					destinationTabs.update_section('sms', {
 						'title': 'SMS',
-						'icon': 'img/icons/box.gif',
+						'icon': 'img/icons/diagona/16/160.gif', // TODO: Show accept.gif if valid.
 						'content': $('smsContainer')
 					});
 					destinationTabs.update_section('summary', {

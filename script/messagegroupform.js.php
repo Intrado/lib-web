@@ -7,9 +7,9 @@ header("Expires: " . gmdate('D, d M Y H:i:s', time() + 60*60) . " GMT"); //exire
 header("Content-Type: text/javascript");
 header("Cache-Control: private");
 ?>
+// delayed TODO: whenever using _L(), must also strip tags.
 
-// todo: whenever using _L(), must also strip tags.
-
+// done: Intenret explorer, chekcbox setting to true might be problematic, need to see how to do it in the dom.
 
 var AutoTranslate = Class.create({
 
@@ -59,8 +59,9 @@ var AutoTranslate = Class.create({
 			this.translationDivs[languageCode] = new Element('div', {'style':'padding:2px; height:100px; border: dashed 1px rgb(220,220,220)'});
 			this.retranslationDivs[languageCode] = new Element('div', {'style':'padding:2px; border: dashed 1px rgb(220,220,220)'});
 			this.languageCheckboxes[languageCode] = new Element('input', {'type':'checkbox', 'style':'margin-right:10px', 'checked':true});
-			
-			this.languageCheckboxes[languageCode].observe('click', function (event, languageCode) {
+			var languageCheckbox = this.languageCheckboxes[languageCode];
+			languageCheckbox.setAttribute('defaultChecked', true); // Workaround for Internet Explorer.
+			languageCheckbox.observe('click', function (event, languageCode) {
 				var checkbox = event.element();
 				if (checkbox.checked) {
 					this.translationLanguages[languageCode] = this.languages[languageCode];
@@ -99,33 +100,15 @@ var AutoTranslate = Class.create({
 	},
 
 	on_click_translate: function() {
-		var sourceText = this.sourceTextarea.value;
-		
-		// Loop over list of languages to translate (languages that the user has checked),
-		// updating the DOM and adding to the translationLanguageNames array.
+		// Loop over list of languages to translate (languages that the user has checked), adding to the translationLanguageNames array.
 		var translationLanguageNames = []; // List of language names to be sent via ajax to translate.php.
 		var willOverwrite = false; // Indicates if any messages will get overwritten.
 		for (var languageCode in this.translationLanguages) {
 			translationLanguageNames.push(this.languages[languageCode]);
 			
-			// Show swirly ajax loader.
-			this.translationDivs[languageCode].update('<img src=\"img/ajax-loader.gif\" />');
-
-			// Clear retranslations.
-			this.retranslationDivs[languageCode].update();
-
 			// Indicate if any message will get overwritten.
-			if (this.get_message_element(languageCode, 'text').getValue().trim())
+			if (this.get_message_element(languageCode, 'text').getValue().strip())
 				willOverwrite = true;
-				
-			// In the message's tab: update sourceText.
-			this.get_message_element(languageCode, 'sourceText').update(sourceText);
-			
-			// In the message's tab: enable translations for this message (checkbox).
-			this.get_message_element(languageCode, 'translatecheck').checked = true; // TODO: This may be buggy in Internet Explorer.
-			
-			// In the message's tab: show translation-related DOM elements.
-			toggleTranslation(this.get_message_prefix(languageCode), null);
 		}
 		
 		// USER HAS NOT SELECTED ANY LANGUAGES TO TRANSLATE
@@ -137,6 +120,22 @@ var AutoTranslate = Class.create({
 		// WARN THE USER
 		if (willOverwrite && !confirm('<?= _L("Are you sure?") ?>')) { // TODO: Better confirm message.
 			return;
+		}
+		
+		var sourceText = this.sourceTextarea.value;
+		// Loop over list of languages to translate (languages that the user has checked), updating the DOM.
+		for (var languageCode in this.translationLanguages) {
+			// Show swirly ajax loader.
+			this.translationDivs[languageCode].update('<img src=\"img/ajax-loader.gif\" />');
+
+			// Clear retranslations.
+			this.retranslationDivs[languageCode].update();
+				
+			// In the message's tab: update sourceText.
+			this.get_message_element(languageCode, 'sourceText').update(sourceText);
+			
+			// In the message's tab: enable translations for this message (checkbox).
+			this.get_message_element(languageCode, 'translatecheck').checked = true; // TODO: This may be buggy in Internet Explorer.
 		}
 		
 		new Ajax.Request('translate.php', {
@@ -178,7 +177,8 @@ var AutoTranslate = Class.create({
 		this.get_message_element(languageCode, 'text').update(translatedText);
 		this.get_message_element(languageCode, 'textdiv').update(translatedText);
 		
-		// TODO: force validation.
+		// In the message's tab: show translation-related DOM elements.
+		toggleTranslation(this.get_message_prefix(languageCode), null);
 	},
 	
 	on_click_play: function(event, languageCode) {
@@ -217,7 +217,7 @@ var MessageGroupForm = Class.create({
 		this.destinationInfos = destinationInfos;
 		this.toolsAccordion = toolsAccordion;
 	},
-
+	
 	get_message_element: function(type, subtype, languageCode, suffix) {
 		return $(this.formName + '_' + type + subtype + languageCode + suffix);
 	},
