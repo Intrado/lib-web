@@ -122,6 +122,7 @@ if(isset($this->args['audiofiles'])) {
 // Todo: set a default language variable instead of checking against 'english' or 'en'
 
 // Translation widget
+// $args['subtype']
 class MessageBody2 extends FormItem {
 	function render ($value) {
 		static $renderscript = true;
@@ -132,9 +133,9 @@ class MessageBody2 extends FormItem {
 
 		$msgdata = json_decode($value);
 
-		$language = $this->args['language'];
+		$languageName = $this->args['language'];
 
-		if ($language == 'english' || empty($this->args['multilingual'])) {
+		if ($languageName == 'english' || empty($this->args['multilingual'])) {
 			$multilingual = false;
 		} else {
 			$multilingual = true;
@@ -145,6 +146,8 @@ class MessageBody2 extends FormItem {
 		$isphone = !empty($this->args['phone']);
 
 		$cssShowIfMultilingual = "; display:" . ($multilingual ? "block" : "none") . "; ";
+		
+		$divHtmlEditorContainerIfNeeded = $this->args['subtype'] == 'html' ? '<div class="HtmlEditorContainer"></div>' : '';
 
 		$str = "";
 
@@ -153,25 +156,27 @@ class MessageBody2 extends FormItem {
 			<input id="'.$n.'overridesave" type="hidden" value=""></div>
 
 			<div class="TranslationSettingDiv" style="'.$cssShowIfMultilingual.'">
-				<input id="'.$n.'translatecheck" class="EnableTranslationCheckbox" name="'.$n.'checkbox" type="checkbox" onclick="toggleTranslation(\''.$n.'\',\''.$language.'\');" '.(($msgdata->enabled && $multilingual)?"checked":"").' />
+				<input id="'.$n.'translatecheck" class="EnableTranslationCheckbox" name="'.$n.'checkbox" type="checkbox" onclick="toggleTranslation(\''.$n.'\',\''.$languageName.'\');" '.(($msgdata->enabled && $multilingual)?"checked":"").' />
 				<b>'._L('Enable Translation').'</b>
 			</div>
 
 			<div id="'.$n.'controls" style="">
-				<div style="float:left">'.($isphone?icon_button(_L("Play"),"fugue/control","var content = $('" . $n . "text').getValue(); if(content != '') popup('previewmessage.php?parentfield=".$n."text&language=$language&gender=$gender" . "', 400, 400,'preview');"):"").'</div>
+				<div style="float:left">'.($isphone?icon_button(_L("Play"),"fugue/control","var content = $('" . $n . "text').getValue(); if(content != '') popup('previewmessage.php?parentfield=".$n."text&language=$languageName&gender=$gender" . "', 400, 400,'preview');"):"").'</div>
 				<div style="float:right">'. icon_button(_L("Clear"), "fugue/control") .'</div>
 				<div style="clear:both"></div>
 			</div>
 
 			<div id="'.$n.'textfields" style="padding-right:3px; padding-left: 3px;">
+				
 				<div class="Translation">
 					<textarea id="'.$n.'sourceText" name="'.$n.'sourceText" style="width:98%; '.$cssShowIfMultilingual.'">' . escapehtml($this->args["sourceText"]) . '</textarea>
+					'.$divHtmlEditorContainerIfNeeded.'
 
 					<div style="margin-top: 15px; '.$cssShowIfMultilingual.'">
 						<div id="'.$n.'icons" style="float:left; display: '.(($msgdata->enabled)?"block":"none").'">
 							<img id="'.$n.'editlock" style="'.((!$msgdata->override)?"display:none;":"").'" src="img/padlock.gif">
 						</div>
-						<center>' . icon_button(_L("Refresh Translation"), "fugue/magnifier", "getTranslation('$n','$language')", null, 'style="float:none;" id="'. $n .'refreshTranslationButton"') . '</center>
+						<center>' . icon_button(_L("Refresh Translation"), "fugue/magnifier", "getTranslation('$n','$languageName')", null, 'style="float:none;" id="'. $n .'refreshTranslationButton"') . '</center>
 						<div style="clear:both"></div>
 					</div>
 				</div>
@@ -181,13 +186,14 @@ class MessageBody2 extends FormItem {
 				</div>
 
 				<textarea id="'.$n.'text" name="'.$n.'text" style="width:98%;  display: '.(($msgdata->override || !$multilingual)?"block":"none").'; " rows="3" onChange="setTranslationValue(\''.$n.'\');" />'.escapehtml($msgdata->text).'</textarea>
+				'.$divHtmlEditorContainerIfNeeded.'
 
 				<div class="Translation">
 					<div id="'. $n .'retranslationcontrols" style="clear:both; '.$cssShowIfMultilingual.'">
-						<input id="'.$n.'override" name="'.$n.'checkbox" type="checkbox" '.(($msgdata->override)?"checked":"").' onclick="overrideTranslation(\''.$n.'\',\''.$language.'\');"/>' . _L('Override Translation') . '
+						<input id="'.$n.'override" name="'.$n.'checkbox" type="checkbox" '.(($msgdata->override)?"checked":"").' onclick="overrideTranslation(\''.$n.'\',\''.$languageName.'\');"/>' . _L('Override Translation') . '
 
 						<div id="'.$n.'retranslation" style="margin-top: 15px; clear:both">
-							<center>'. icon_button(_L('English Retranslation', $language),"fugue/arrow_circle_double_135","submitRetranslation('$n','$language')", null, 'style="float:none"') . '</center>
+							<center>'. icon_button(_L('English Retranslation', $languageName),"fugue/arrow_circle_double_135","submitRetranslation('$n','$languageName')", null, 'style="float:none"') . '</center>
 							<div id="'.$n.'retranslationtext" name="'.$n.'retranslation" style="height: 50px; border: 1px solid gray; color: gray; overflow:auto; clear:both"></div>
 						</div>
 					</div>

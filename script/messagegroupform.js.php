@@ -216,39 +216,64 @@ var MessageGroupForm = Class.create({
 		this.destinationTabs = destinationTabs;
 		this.destinationInfos = destinationInfos;
 		this.toolsAccordion = toolsAccordion;
+		
+		// Load CKEditor; use this.htmlEditorWrapper to easily move the html editor around without fiddling with the actual html editor's DOM structure.
+		// NOTE: CKEditor throws javascript errors if it is inserted inside of the form.
+		// NOTE: CKEditor throws javascript errors if the textarea that it is trying to replace is not already in-page.
+		this.htmlEditorWrapper = new Element('div', {'style':'clear:both'}).hide();
+		this.htmlEditorTextarea = new Element('textarea');
+		this.htmlEditorWrapper.insert(this.htmlEditorTextarea);
+		$(this.formName).insert({after:this.htmlEditorWrapper});
+		this.htmlEditor = CKEDITOR.replace(this.htmlEditorTextarea, {
+			'toolbar': [
+				['Styles', 'Format'],
+				['Bold', 'Italic', '-', 'NumberedList', 'BulletedList', '-', 'Link', '-']
+			],
+			'resize_enabled': false,
+			'width': '100%'
+		});
 	},
 	
 	get_message_element: function(type, subtype, languageCode, suffix) {
 		return $(this.formName + '_' + type + subtype + languageCode + suffix);
 	},
 
-	get_current_message_info: function(type, destinationInfo) {
+	get_current_message_info: function(type, subtype, languageCode, destinationInfo) {
 		var info = {'type': type};
 
-		var languageTabs = destinationInfo.languageTabs;
-		info.languageCode = languageTabs ? languageTabs.currentSection : 'en';
+		if (languageCode) {
+			info.languageCode = languageCode;
+		} else {
+			var languageTabs = destinationInfo.languageTabs;
+			info.languageCode = languageTabs ? languageTabs.currentSection : 'en';
+		}
 
-		var subtypeTabs = destinationInfo.subtypeTabs[info.languageCode];
+		if (subtype) {
+			info.subtype = subtype;
+		} else {
+			var subtypeTabs = destinationInfo.subtypeTabs[info.languageCode];
+				
+			if (subtypeTabs)
+				info.subtype = subtypeTabs.currentSection;
+			else if (type == 'phone')
+				info.subtype = 'voice';
+			else if (type == 'sms')
+				info.subtype = 'plain';
+		}
 		
-		if (subtypeTabs)
-			info.subtype = subtypeTabs.currentSection;
-		else if (type == 'phone')
-			info.subtype = 'voice';
-		else if (type == 'sms')
-			info.subtype = 'plain';
-		
+		// TODO: Get the correct control.
 		info.control = $(this.formName + '_' + info.type + info.subtype + info.languageCode);
 		
 		return info;
 	},
 
-	get_current_editor: function() {
-		var type = this.destinationTabs.currentSection;
+	get_current_editor: function(typeSection, subtypeSection, languageCodeSection) {
+		var type = typeSection || this.destinationTabs.currentSection;
 		if (type != 'phone' && type != 'email' && type != 'sms')
 			return null;
 		var destinationInfo =  this.destinationInfos[type];
 
-		var info = this.get_current_message_info(type, destinationInfo);
+		var info = this.get_current_message_info(type, subtypeSection, languageCodeSection, destinationInfo);
 
 		// TODO: Depending on the state of info.control, set destinationInfo.currentEditor accordingly.
 		destinationInfo.currentEditor = $(info.control.identify() + 'text');
@@ -256,6 +281,18 @@ var MessageGroupForm = Class.create({
 		return destinationInfo.currentEditor;
 	},
 
+	refresh_html_editor: function(textarea) {
+		var container = textarea.next('.HtmlEditorContainer');
+		if (!container)
+			return;
+
+		// TODO: May need to parse the value for data field insert tags, etc..
+		textarea.hide();
+		this.htmlEditor.setData(textarea.getValue());
+		container.insert(this.htmlEditorWrapper.show());
+	},
+	
+	// TODO: Rename to refresh_display() because this also refresh the ckeditor.
 	refresh_accordion: function(type, verticalSection, subtypeSection) {
 		this.toolsAccordion.enable_section('callMe');
 		this.toolsAccordion.enable_section('audioLibrary');
@@ -264,6 +301,9 @@ var MessageGroupForm = Class.create({
 		this.toolsAccordion.enable_section('translation');
 		this.toolsAccordion.unlock_section('callMe');
 		this.toolsAccordion.unlock_section('audioLibrary');
+
+		var subtype;
+		var languageCode;
 
 		if (type != 'phone') {
 			this.toolsAccordion.disable_section('callMe');
@@ -279,7 +319,7 @@ var MessageGroupForm = Class.create({
 		var destinationInfo = this.destinationInfos[type];
 		var languageTabs = destinationInfo.languageTabs;
 		if (languageTabs) {
-			var languageCode = verticalSection || languageTabs.currentSection;
+			languageCode = verticalSection || languageTabs.currentSection;
 			
 			languageTabs.sections[languageCode].contentDiv.down('.ForAccordion').insert(this.toolsAccordion.container);
 
@@ -291,7 +331,6 @@ var MessageGroupForm = Class.create({
 				this.toolsAccordion.disable_section('translation');
 			} else {
 				var subtypeTabs = destinationInfo.subtypeTabs[languageCode];
-				var subtype;
 				if (subtypeTabs)
 					subtype = subtypeSection || subtypeTabs.currentSection;
 				else
@@ -317,6 +356,10 @@ var MessageGroupForm = Class.create({
 			this.toolsAccordion.disable_section('translation');
 			$(type + 'Container').down('.ForAccordion').insert(this.toolsAccordion.container);
 		}
+
+		var currentEditor = this.get_current_editor(type, subtype, languageCode);
+		if (currentEditor)
+			this.refresh_html_editor(currentEditor);
 	}
 });
 

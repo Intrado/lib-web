@@ -12,6 +12,8 @@
 // next TODO: restructure tabs to new structure: destination->subtype->languages instead of destination->languages->subtype.
 // next TODO: write a function to cause all languages for a certain destination type to be form_validated. (when loading the form).
 // next TODO: when saving the form, delete all existing messages?
+// next TODO: combine callme, audio upload, and audio library into a single "Audio" accordion section.
+// next TODO: wordsmith Data Field Insert accordion section to "Data Fields"
 // delayed TODO: revise renderFormItems(), refactor so that it's less work for javascript DOM manipulation. (speedup load time in Internet Explorer by utilizing lazy DOM manipulation for messagebody only when the user clicks on a destination or language tab)
 // delayed TODO: summary page layout -- no gridlines for SMS, no icons for SMS except for English.
 
@@ -260,7 +262,8 @@ class MessageGroupForm extends Form {
 							"phone" => $type == 'phone',
 							"language" => strtolower($languageName),
 							"sourceText" => $sourceText,
-							"multilingual" => $type != 'sms'
+							"multilingual" => $type != 'sms',
+							"subtype" => $subtype
 						),
 						"transient" => false,
 						"helpstep" => 2
@@ -543,13 +546,7 @@ class MessageGroupForm extends Form {
 					</div>
 
 					" . $this->render_hidden_serialnum() . "
-
 				</form>
-			</div>
-			<div id='ckarea' style='clear:both;'>
-				<div>
-					<textarea id='htmlEditor'> hello </textarea>
-				</div>
 			</div>
 		";
 
@@ -573,16 +570,6 @@ class MessageGroupForm extends Form {
 					var destinationTabs = new Tabs($('destinationTabsContainer'), {'showDuration':0, 'hideDuration':0});
 					var toolsAccordion = new Accordion('toolsAccordionContainer');
 					var messageGroupForm = new MessageGroupForm (formName, destinationTabs, destinationInfos, toolsAccordion);
-
-					// CKEDITOR
-					var htmlEditor = CKEDITOR.replace('htmlEditor', {
-						'toolbar': [
-							['Styles', 'Format'],
-							['Bold', 'Italic', '-', 'NumberedList', 'BulletedList', '-', 'Link', '-']
-						],
-						'resize_enabled': false,
-						'width': '100%'
-					});
 					
 					// Accordion.
 					toolsAccordion.container.setStyle({'paddingLeft':'10px'});
@@ -753,10 +740,6 @@ class MessageGroupForm extends Form {
 									}
 
 								}.bindAsEventListener(messageGroupForm, type, subtype, languageCode));
-
-								var formtablecontrol = fieldarea.down('.formtablecontrol');
-								if (subtype == 'html')
-									formtablecontrol.insert(new Element('div', {'class':'htmlEditor'}).update('htmlEditor'));
 
 								var settingDiv = fieldarea.down('.TranslationSettingDiv');
 
@@ -967,19 +950,14 @@ class MessageGroupForm extends Form {
 						cachedAjaxGet('ajax.php?type=AudioFile&id=' + event.memo.Default, function(result, audioFileID) {
 							var audioFile = result.responseJSON;
 
-
-
 							if (!audioFile.name)
 								return;
 
 							var playButton = new Element('button', {'type':'button'}).update('Play');
 
-
 							playButton.observe('click', function(event, audioFileID) {
 
 							}.bindAsEventListener(playButton, audioFileID));
-
-
 
 							var insertButton = new Element('button', {'type':'button'}).update('Insert');
 
@@ -988,20 +966,12 @@ class MessageGroupForm extends Form {
 								textInsert('{{' + audioFile.name + '}}', currentEditor);
 							}.bindAsEventListener(this, audioFileID, audioFile));
 
-
-
 							var tr = new Element('tr');
 							tr.insert(new Element('td').insert(audioFile.name.escapeHTML()));
 							tr.insert(new Element('td').insert(playButton));
 							tr.insert(new Element('td').insert(insertButton));
 
-
-
-
-
 							$('callMeSection').down('tbody.AudioFiles').insert(tr);
-
-
 
 							// TODO: Insert the audio file name into the current message body.
 						}.bindAsEventListener(this), event.memo.Default);
