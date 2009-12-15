@@ -168,21 +168,20 @@ class MessageBody2 extends FormItem {
 
 			<div id="'.$n.'textfields" style="padding-right:3px; padding-left: 3px;">
 				
-				<div class="Translation">
-					<textarea id="'.$n.'sourceText" name="'.$n.'sourceText" style="width:98%; '.$cssShowIfMultilingual.'">' . escapehtml($this->args["sourceText"]) . '</textarea>
-					'.$divHtmlEditorContainerIfNeeded.'
+				<div id="'.$n.'sourceTextContainer">
+					<div class="Translation">
+						<textarea id="'.$n.'sourceText" name="'.$n.'sourceText" style="width:98%; '.$cssShowIfMultilingual.'">' . escapehtml($this->args["sourceText"]) . '</textarea>
+						'.$divHtmlEditorContainerIfNeeded.'
 
-					<div style="margin-top: 15px; '.$cssShowIfMultilingual.'">
-						<div id="'.$n.'icons" style="float:left; display: '.(($msgdata->enabled)?"block":"none").'">
-							<img id="'.$n.'editlock" style="'.((!$msgdata->override)?"display:none;":"").'" src="img/padlock.gif">
+						<div style="margin-top: 15px; '.$cssShowIfMultilingual.'">
+							<center>' . icon_button(_L("Refresh Translation"), "fugue/magnifier", "getTranslation('$n','$languageName')", null, 'style="float:none;" id="'. $n .'refreshTranslationButton"') . '</center>
+							<div style="clear:both"></div>
 						</div>
-						<center>' . icon_button(_L("Refresh Translation"), "fugue/magnifier", "getTranslation('$n','$languageName')", null, 'style="float:none;" id="'. $n .'refreshTranslationButton"') . '</center>
-						<div style="clear:both"></div>
 					</div>
-				</div>
 
-				<div class="Translation">
-					<div id="'.$n.'textdiv" name="'.$n.'textdiv" style="display: '.((!$msgdata->override && $multilingual)?"block":"none").'; height: 50px; border: 1px solid gray; color: gray; overflow:auto">'.escapehtml($msgdata->text).'</div>
+					<div class="Translation">
+						<div id="'.$n.'textdiv" name="'.$n.'textdiv" style="display: '.((!$msgdata->override && $multilingual)?"block":"none").'; height: 50px; border: 1px solid gray; color: gray; overflow:auto">'.escapehtml($msgdata->text).'</div>
+					</div>
 				</div>
 
 				<textarea id="'.$n.'text" name="'.$n.'text" style="width:98%;  display: '.(($msgdata->override || !$multilingual)?"block":"none").'; " rows="3" onChange="setTranslationValue(\''.$n.'\');" />'.escapehtml($msgdata->text).'</textarea>
@@ -190,7 +189,7 @@ class MessageBody2 extends FormItem {
 
 				<div class="Translation">
 					<div id="'. $n .'retranslationcontrols" style="clear:both; '.$cssShowIfMultilingual.'">
-						<input id="'.$n.'override" name="'.$n.'checkbox" type="checkbox" '.(($msgdata->override)?"checked":"").' onclick="overrideTranslation(\''.$n.'\',\''.$languageName.'\');"/>' . _L('Override Translation') . '
+						<input id="'.$n.'override" name="'.$n.'checkbox" type="checkbox" '.(($msgdata->override)?"checked":"").' onclick="overrideTranslation(\''.$n.'\',\''.$languageName.'\'); $(\''.$n.'\').fire(\'MessageBody:OverrideChanged\');"/>' . _L('Override Translation') . '
 
 						<div id="'.$n.'retranslation" style="margin-top: 15px; clear:both">
 							<center>'. icon_button(_L('English Retranslation', $languageName),"fugue/arrow_circle_double_135","submitRetranslation('$n','$languageName')", null, 'style="float:none"') . '</center>
@@ -199,8 +198,6 @@ class MessageBody2 extends FormItem {
 					</div>
 				</div>
 			</div>
-
-
 		';
 
 		if($renderscript) {
@@ -269,8 +266,7 @@ class MessageBody2 extends FormItem {
 						if (!overridesave.value)
 							overridesave.value = langtext.value;
 						langtext.show();
-						$(section + "editlock").show();
-						$(section + "textdiv").hide();
+						$(section + "sourceTextContainer").hide();
 					} else {
 						if(langtext.value != overridesave.value && !confirm(\'' . _L('The edited text will be removed and set back to the previous translation.') . '\')) {
 							$(section + "override").checked = true;
@@ -279,8 +275,7 @@ class MessageBody2 extends FormItem {
 						getTranslation(section,language);
 						overridesave.value = "";
 						langtext.hide();
-						$(section + "editlock").hide();
-						$(section + "textdiv").show();
+						$(section + "sourceTextContainer").show();
 					}
 					setTranslationValue(section);
 				}
@@ -305,7 +300,7 @@ class MessageBody2 extends FormItem {
 					setTranslationValue(section);
 
 					if (language)
-						settingDiv.fire("MessageBody:TranslationSettingChanged");
+						$(section).fire("MessageBody:TranslationSettingChanged");
 				}
 
 			</script>';

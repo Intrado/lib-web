@@ -1,6 +1,8 @@
 <?php
 
 // current TODO: integrate CKEDITOR, then correctly find out the current editor.
+// next TODO: get rid of translation lock icon in MessageBody.
+// next TODO: hide sourceText and refresh translation in MessageBody if overriding.
 // next TODO: integrate CKEDITOR with translations.
 // next TODO: integrate CKEDITOR with call me and audio library.
 // next TODO: integrate CKEDITOR with data fields.
@@ -674,6 +676,11 @@ class MessageGroupForm extends Form {
 
 
 								var formItem = $(messageGroupForm.formName + '_' + type + subtype + languageCode);
+								formItem.observe('MessageBody:OverrideChanged', function(event, type, subtype, languageCode) {
+									var currentEditor = this.get_current_editor(type, subtype, languageCode);
+									if (currentEditor)
+										this.refresh_html_editor(currentEditor);
+								}.bindAsEventListener(messageGroupForm, type, subtype, languageCode));
 
 								formItem.observe('Form:ValidationDisplayed', function(event, type, subtype, languageCode) {
 									var destination = this.destinationInfos[type];
@@ -741,14 +748,12 @@ class MessageGroupForm extends Form {
 
 								}.bindAsEventListener(messageGroupForm, type, subtype, languageCode));
 
-								var settingDiv = fieldarea.down('.TranslationSettingDiv');
 
-
-
-								settingDiv.observe('MessageBody:TranslationSettingChanged', function(event, type, languageCode, subtype) {
+								formItem.observe('MessageBody:TranslationSettingChanged', function(event, type, languageCode, subtype) {
 									this.refresh_accordion(type, languageCode, subtype);
 								}.bindAsEventListener(messageGroupForm, type, languageCode, subtype));
 
+								var settingDiv = fieldarea.down('.TranslationSettingDiv');
 								destination.translationSettingDivs[subtype + languageCode] = settingDiv;
 
 								tbody.insert(fieldarea);

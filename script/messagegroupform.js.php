@@ -271,12 +271,25 @@ var MessageGroupForm = Class.create({
 		var type = typeSection || this.destinationTabs.currentSection;
 		if (type != 'phone' && type != 'email' && type != 'sms')
 			return null;
+
 		var destinationInfo =  this.destinationInfos[type];
 
 		var info = this.get_current_message_info(type, subtypeSection, languageCodeSection, destinationInfo);
 
-		// TODO: Depending on the state of info.control, set destinationInfo.currentEditor accordingly.
-		destinationInfo.currentEditor = $(info.control.identify() + 'text');
+		// Depending on the state of info.control, set destinationInfo.currentEditor accordingly.
+		var controlTextElement = $(info.control.identify() + 'text');
+		var controlSourceTextElement = $(info.control.identify() + 'sourceText');
+		var translationCheckbox = $(info.control.identify() + 'translatecheck');
+		var overrideCheckbox = $(info.control.identify() + 'override');
+		if (translationCheckbox.checked) {
+			if (info.languageCode != 'en' && !overrideCheckbox.checked) { // TODO: use defaultLanguageCode instead of 'en'
+				destinationInfo.currentEditor = controlSourceTextElement;
+			} else {
+				destinationInfo.currentEditor = controlTextElement;
+			}
+		} else {
+			destinationInfo.currentEditor = controlTextElement;
+		}
 
 		return destinationInfo.currentEditor;
 	},
