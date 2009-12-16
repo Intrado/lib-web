@@ -47,6 +47,10 @@ var AutoTranslate = Class.create({
 		this.container.insert(new Element('div').insert(this.sourceTextarea));
 		this.container.insert(new Element('div', {'style':'text-align:left;'}).insert(translateButton));
 
+		if (this.subtype == 'html') {
+			this.sourceTextarea.insert({'after': '<div class="HtmlEditorContainer"></div>'});
+		}
+
 		clearButton.observe('click', this.on_click_clear.bindAsEventListener(this));
 		translateButton.observe('click', this.on_click_translate.bindAsEventListener(this));
 
@@ -122,7 +126,7 @@ var AutoTranslate = Class.create({
 			return;
 		}
 		
-		var sourceText = this.sourceTextarea.value;
+		var sourceText = this.sourceTextarea.getValue();
 		// Loop over list of languages to translate (languages that the user has checked), updating the DOM.
 		for (var languageCode in this.translationLanguages) {
 			// Show swirly ajax loader.
@@ -132,7 +136,7 @@ var AutoTranslate = Class.create({
 			this.retranslationDivs[languageCode].update();
 				
 			// In the message's tab: update sourceText.
-			this.get_message_element(languageCode, 'sourceText').update(sourceText);
+			this.get_message_element(languageCode, 'sourceText').value = sourceText;
 			
 			// In the message's tab: enable translations for this message (checkbox).
 			this.get_message_element(languageCode, 'translatecheck').checked = true; // TODO: This may be buggy in Internet Explorer.
@@ -216,6 +220,7 @@ var MessageGroupForm = Class.create({
 		this.destinationTabs = destinationTabs;
 		this.destinationInfos = destinationInfos;
 		this.toolsAccordion = toolsAccordion;
+		this.autotranslateSubtypeTabs = {};
 		
 		// Load CKEditor; use this.htmlEditorWrapper to easily move the html editor around without fiddling with the actual html editor's DOM structure.
 		// NOTE: CKEditor throws javascript errors if it is inserted inside of the form.
@@ -251,7 +256,7 @@ var MessageGroupForm = Class.create({
 		if (subtype) {
 			info.subtype = subtype;
 		} else {
-			var subtypeTabs = destinationInfo.subtypeTabs[info.languageCode];
+			var subtypeTabs = (info.languageCode == 'autotranslate') ? this.autotranslateSubtypeTabs[type] : destinationInfo.subtypeTabs[info.languageCode];
 				
 			if (subtypeTabs)
 				info.subtype = subtypeTabs.currentSection;
@@ -261,7 +266,6 @@ var MessageGroupForm = Class.create({
 				info.subtype = 'plain';
 		}
 		
-		// TODO: Get the correct control.
 		info.control = $(this.formName + '_' + info.type + info.subtype + info.languageCode);
 		
 		return info;
@@ -272,26 +276,55 @@ var MessageGroupForm = Class.create({
 		if (type != 'phone' && type != 'email' && type != 'sms')
 			return null;
 
-		var destinationInfo =  this.destinationInfos[type];
+		var currentEditor;
 
-		var info = this.get_current_message_info(type, subtypeSection, languageCodeSection, destinationInfo);
+		var info = this.get_current_message_info(type, subtypeSection, languageCodeSection, this.destinationInfos[type]);
 
-		// Depending on the state of info.control, set destinationInfo.currentEditor accordingly.
+		if (info.languageCode == 'autotranslate') {
+			var autotranslate = this.autotranslates[info.type + info.subtype];
+			return autotranslate.sourceTextarea;
+		}
+
+		// Depending on the state of info.control, set currentEditor accordingly.
 		var controlTextElement = $(info.control.identify() + 'text');
 		var controlSourceTextElement = $(info.control.identify() + 'sourceText');
 		var translationCheckbox = $(info.control.identify() + 'translatecheck');
 		var overrideCheckbox = $(info.control.identify() + 'override');
 		if (translationCheckbox.checked) {
 			if (info.languageCode != 'en' && !overrideCheckbox.checked) { // TODO: use defaultLanguageCode instead of 'en'
-				destinationInfo.currentEditor = controlSourceTextElement;
+				currentEditor = controlSourceTextElement;
 			} else {
-				destinationInfo.currentEditor = controlTextElement;
+				currentEditor = controlTextElement;
 			}
 		} else {
-			destinationInfo.currentEditor = controlTextElement;
+			currentEditor = controlTextElement;
 		}
 
-		return destinationInfo.currentEditor;
+		return currentEditor;
+	},
+
+	// Inserts text to the current editor.
+	textInsert: function(text) {
+		var currentEditor = this.get_current_editor();
+		if (!currentEditor)
+			return;
+
+		if (currentEditor.next('.HtmlEditorContainer')) {
+			this.htmlEditor.insertText(text);
+		} else {
+			textInsert(text, currentEditor);
+		}
+	},
+
+	// Updates value of which textarea the htmlEditor is editing.
+	cache_html_editor: function() {
+		if (!this.currentEditorForHtml)
+			return;
+
+		// Update the textarea.
+		// TODO: May need to do some text processing because ckeditor escapes angle brackets, etc..
+		// TODO: There may be a bug in ckeditor where getData() does not return the most updated data if you change the data within the same execution scope; may need to wait a few milliseconds?
+		this.currentEditorForHtml.value = this.htmlEditor.getData();
 	},
 
 	refresh_html_editor: function(textarea) {
@@ -299,9 +332,12 @@ var MessageGroupForm = Class.create({
 		if (!container)
 			return;
 
+		this.currentEditorForHtml = textarea;
+
 		// TODO: May need to parse the value for data field insert tags, etc..
 		textarea.hide();
-		this.htmlEditor.setData(textarea.getValue());
+		var cleanText = textarea.getValue().replace(/<</g, '&lt;&lt;').replace(/>>/g, '&gt;&gt;');
+		this.htmlEditor.setData(cleanText);
 		container.insert(this.htmlEditorWrapper.show());
 	},
 	
@@ -342,14 +378,18 @@ var MessageGroupForm = Class.create({
 				this.toolsAccordion.disable_section('callMe');
 				this.toolsAccordion.disable_section('audioLibrary');
 				this.toolsAccordion.disable_section('translation');
-			} else {
-				var subtypeTabs = destinationInfo.subtypeTabs[languageCode];
-				if (subtypeTabs)
-					subtype = subtypeSection || subtypeTabs.currentSection;
-				else
-					subtype = 'voice';
-				if (destinationInfo.translationSettingDivs) {
-					var settingDiv = destinationInfo.translationSettingDivs[subtype+languageCode];
+			}
+
+			var subtypeTabs = (languageCode == 'autotranslate') ? this.autotranslateSubtypeTabs[type] : destinationInfo.subtypeTabs[languageCode];
+			if (subtypeTabs)
+				subtype = subtypeSection || subtypeTabs.currentSection;
+			else
+				subtype = 'voice';
+
+
+			if (destinationInfo.translationSettingDivs) {
+				var settingDiv = destinationInfo.translationSettingDivs[subtype+languageCode];
+				if (settingDiv) {
 					var checkbox = settingDiv.down('input.EnableTranslationCheckbox');
 
 					if (checkbox.checked) {
@@ -361,15 +401,18 @@ var MessageGroupForm = Class.create({
 					
 					translationSection.select('.TranslationSettingDiv').invoke('hide');
 					translationSection.insert(settingDiv.show());
-				} else {
-					this.toolsAccordion.disable_section('translation');
 				}
+			} else {
+				this.toolsAccordion.disable_section('translation');
 			}
 		} else {
 			this.toolsAccordion.disable_section('translation');
 			$(type + 'Container').down('.ForAccordion').insert(this.toolsAccordion.container);
 		}
 
+		this.cache_html_editor();
+
+		this.currentEditorForHtml = null;
 		var currentEditor = this.get_current_editor(type, subtype, languageCode);
 		if (currentEditor)
 			this.refresh_html_editor(currentEditor);

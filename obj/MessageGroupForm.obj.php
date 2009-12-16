@@ -1,68 +1,54 @@
 <?php
 
-// current TODO: integrate CKEDITOR, then correctly find out the current editor.
-// next TODO: get rid of translation lock icon in MessageBody.
-// next TODO: hide sourceText and refresh translation in MessageBody if overriding.
-// next TODO: integrate CKEDITOR with translations.
-// next TODO: integrate CKEDITOR with call me and audio library.
-// next TODO: integrate CKEDITOR with data fields.
+// current TODO: combine callme, audio upload, and audio library into a single "Audio" accordion section.
+// current TODO: audio upload
+// next TODO: translation with field inserts.
+// next TODO: revise renderFormItems(), refactor so that it's less work for javascript DOM manipulation. (speedup load time in Internet Explorer by utilizing lazy DOM manipulation for messagebody only when the user clicks on a destination or language tab)
+// next TODO: alter appearance of data fields in CKEditor to prevent user from interleaving markup in the fieldname, which causes validation errors, but we still want to allow the user to stylize the data field.
+// next TODO: auto translation auto creates plain text version if it's not already set, but it does not update the message until the user clicks Refresh Translations in the plain subtab.
+// next TODO: if clear button clicked, set greyed-out instructions.
+// next TODO: email auto creates plain text version if not already set.
 // next TODO: save on tabbing and window close.
 // next TODO: implement new formitem's getJSCode() and getJSDependencies()
+// next TODO: CKEditor image uploads
 // next TODO: strong validation.
-// next TODO: translation with field inserts.
-// next TODO: when clicking on override translation, disable the sourceTextarea.
 // next TODO: restructure tabs to new structure: destination->subtype->languages instead of destination->languages->subtype.
 // next TODO: write a function to cause all languages for a certain destination type to be form_validated. (when loading the form).
 // next TODO: when saving the form, delete all existing messages?
-// next TODO: combine callme, audio upload, and audio library into a single "Audio" accordion section.
-// next TODO: wordsmith Data Field Insert accordion section to "Data Fields"
-// delayed TODO: revise renderFormItems(), refactor so that it's less work for javascript DOM manipulation. (speedup load time in Internet Explorer by utilizing lazy DOM manipulation for messagebody only when the user clicks on a destination or language tab)
+// next TODO: set a default language variable instead of checking against 'english' or 'en'
+// next TODO: set the first destination tab, subtype tab, etc.. depending on permissions and settings.
+// delayed TODO: tweak tabs/accordion/splitpane to not wiggle around so much.
+// delayed TODO: if there are languages that are not part of the valid set defined in translate.php, do not translate. But, do not assume that the language is valid, explicitly check against an array before sending to translate.php.
 // delayed TODO: summary page layout -- no gridlines for SMS, no icons for SMS except for English.
+// delayed TODO: for auto-translate, alert if text is longer than 2000 when clicking on Translate or Retranslate.
+// delayed TODO: CKEditor custom toolbar
+// delayed TODO: don't translate if text is blank.
+// delayed TODO: (This should already be done in javascript, but just in case) When saving, make sure if no plain text version is created, auto create one.
+// delayed TODO: make sure allowed languages is in translate.php's $supportedlanguages
+// delayed TODO: wordsmith Data Field Insert accordion section to "Data Fields"
+// delayed TODO: make crossplatform rounded corners for tabs.
 
-// done: status images for subtypes.
-// done: status images for each destination.
-// done: summary page -- onclick event handlers for each cell.
-
-// test case: in autotranslate, uncheck lanaguage that has translation. Then go to that language tab and verify that this does not automatically disable translation for the language.
-
-// delayed TODO: does callme to record ui correctly display errors?
-
-/* // test case: test in Internet Explorer.
- * // test case: summary page -- click on a multilingual TD for SMS. Verify that there are no javascript errors; verify that you are not taken to any tab.
- * // next TODO: if there are languages that are not part of the valid set defined in translate.php, do not translate. But, do not assume that the language is valid, explicitly check against an array before sending to translate.php.
- * // test caes: the langugae tab icon for an email should be accept.gif if either html or plain is a valid message. It does not need both subtypes to be valid.
- * // test case: if the english source for a language has been cleared but the translation is not overidden, make sure the translation is also blank.
- * // current task: status images for each language.
- * // test case: a previously overridden message should no longer keep state/save for overridden once you choose to disable translation alltogether.
- * // test case (phone): first go to Chinese with translation on, then go to SPanish with translation off. In spanish, open the Audio Library accordion section, then go to Chinese. Verify that Chinese's audio library does not open and is disabled.
- * // current task: When you click 'refresh translation' in autotranslate, check the Translation Option's 'Enable Translation' checkbox, and call the formitem's toggleTranslation function.
- * // test case: when you click refresh translation in autotranslate, reproduce by translating once, then disabling a language's translation, then translate again. notice that the message's text did not get set to the new translation.
- * // current task: When you click 'refresh translation' in autotranslate, update the sourceText and translationText for each affected Language.
- * // done: no need to confirm() when clicking 'refrehs translation' in autotranslate if you are not actually overwriting any messages.
- * // done: take out debugging
- * // TODO: for auto-translate, alert if text is longer than 2000 when clicking on Translate or Retranslate.
- * // TODO: don't translate if text is blank.
- * // next TODO: set a default language variable instead of checking against 'english' or 'en'
- * // next TODO: set the first destination tab, subtype tab, etc.. depending on permissions and settings.
- * // TODO: do not translate default language. (autotranslate tab, and in any google translations).
-
- * // TODO: if clear, set greyed-out instructions.
- * // TODO: update get_current_editor for use in autotranslate tab due to data field inserts for phone.
- * // TODO: disable callme, translation, and audiolibrary (accordion sections) for autotranslate phone.
- * // TODO: disable translation (accordion section0 for autotranslate email.
- * // TODO: auto translation auto creates plain text version if it's not already set.
- * // TODO: email auto creates plain text version if not already set.
- * // TODO: Accordion needs to correctly get the current editor for translation messages.
- * // TODO: make sure allowed languages is in translate.php's $supportedlanguages
+/*
+ * test case: translations with {{audio}}
+ * test case: translations with ckeditor images
+ * test case: summary page -- click on a multilingual TD for SMS. Verify that there are no javascript errors; verify that you are not taken to any tab.
+ * test case: the langugae tab icon for an email should be accept.gif if either html or plain is a valid message. It does not need both subtypes to be valid.
+ * test case: in autotranslate, uncheck lanaguage that has translation. Then go to that language tab and verify that this does not automatically disable translation for the language.
+ * test case: if callme to record fials, ui should let the user retry
+ * test case: if the english source for a language has been cleared but the translation is not overidden, make sure the translation is also blank.
+ * test case: a previously overridden message should no longer keep state/save for overridden once you choose to disable translation alltogether.
+ * test case (phone): first go to Chinese with translation on, then go to SPanish with translation off. In spanish, open the Audio Library accordion section, then go to Chinese. Verify that Chinese's audio library does not open and is disabled.
+ * test case: when you click refresh translation in autotranslate, reproduce by translating once, then disabling a language's translation, then translate again. notice that the message's text did not get set to the new translation.
  *
-/// TEST CASE:
-* For spanish phone message, do a callme and also insert from audio library. Then, enable translations. The UI should prevent you from including an audio file in a translation message, perhaps using a validator and making sure there are no message parts of type='A'.
-* UTF8 on translations, message body, etc..
-* HTML on translations, message body, etc..
-*
-*
-*
- * TODO:
+
+GENERAL TEST CASES:
+* test case: For spanish phone message, do a callme and also insert from audio library. Then, enable translations. The UI should prevent you from including an audio file in a translation message, perhaps using a validator and making sure there are no message parts of type='A'.
+* test case: UTF8 on translations, message body, etc..
+* test case: HTML on translations, message body, etc..
+* test case: test in Internet Explorer.
+* test case: test in Safari, especially CKEDITOR.
+
+FEATURES SUMMARY:
  *
  *  *-- Translation
 	* display and buttons.
@@ -834,6 +820,7 @@ class MessageGroupForm extends Form {
 
 							if (autotranslateSubtypeTabs) {
 								autotranslateSubtypeTabs.show_section(subtypes[0]);
+								messageGroupForm.autotranslateSubtypeTabs[type] = autotranslateSubtypeTabs;
 							}
 						}
 					}
@@ -927,26 +914,20 @@ class MessageGroupForm extends Form {
 
 
 					$('insertDataField').observe('click', function(event) {
-						var currentEditor = this.get_current_editor();
-
-
 						var select = $('dataFieldSelect');
 						if (select.getValue()) {
 							var defaultValue = $('dataFieldDefault').getValue().strip();
 							var defaultString = defaultValue != '' ? ':' + defaultValue : '';
 
-							textInsert('<<' + select.options[select.selectedIndex].text + defaultString + '>>', currentEditor);
+							this.textInsert('<<' + select.options[select.selectedIndex].text + defaultString + '>>');
 							// todo: update ckeditor.
 						}
 					}.bindAsEventListener(messageGroupForm));
 
 					$('insertAudio').observe('click', function(event) {
-						var currentEditor = this.get_current_editor();
-
-
 						var select = $('audioLibrarySelect');
 						if (select.getValue()) {
-							textInsert('{{' + select.options[select.selectedIndex].text + '}}', currentEditor);
+							this.textInsert('{{' + select.options[select.selectedIndex].text + '}}');
 							// todo: update ckeditor.
 						}
 					}.bindAsEventListener(messageGroupForm));
@@ -967,8 +948,7 @@ class MessageGroupForm extends Form {
 							var insertButton = new Element('button', {'type':'button'}).update('Insert');
 
 							insertButton.observe('click', function(event, audioFileID, audioFile) {
-								var currentEditor = this.get_current_editor();
-								textInsert('{{' + audioFile.name + '}}', currentEditor);
+								this.textInsert('{{' + audioFile.name + '}}');
 							}.bindAsEventListener(this, audioFileID, audioFile));
 
 							var tr = new Element('tr');
