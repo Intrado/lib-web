@@ -27,8 +27,8 @@ if (isset($_GET['download'])) {
 	header("Content-disposition: attachment; filename=smsblock.csv");
 	header("Content-type: application/vnd.ms-excel");
 	
-	echo "sms,status,notes,lastupdate\n";
-	$query = "select sms,status,notes,lastupdate from smsblock where status in ('optin','block')";
+	echo "sms,status,customerid,notes,lastupdate\n";
+	$query = "select sms,status,customerid,notes,lastupdate from smsblock where status in ('pendingoptin','optin','block')";
 	$res = Query($query,$sharddb);
 	while ($row = DBGetRow($res)) {
 		echo '"' . implode('","', $row) . '"' . "\n";
@@ -105,7 +105,7 @@ if ($number && !$error) {
 
 	$sharddb = DBConnect($shard[1], $shard[2], $shard[3], "aspshard")
 		or die("Could not connect to shard database");
-	$data = QuickQueryRow("select sms, status, lastupdate, notes from smsblock where sms like '" . DBSafe($number) . "%'", false, $sharddb);
+	$data = QuickQueryRow("select sms, status, customerid, lastupdate, notes from smsblock where sms like '" . DBSafe($number) . "%'", false, $sharddb);
 }
 
 // Customer phone formatter function because we can't use phone.obj.php
@@ -156,14 +156,16 @@ if($number){
 		<tr>
 			<th class="listheader">SMS</th>
 			<th class="listheader">Status</th>
+			<th class="listheader">Customer ID</th>
 			<th class="listheader">Last Modified</th>
 			<th class="listheader">Notes</th>
 		</tr>
 		<tr>
 			<td><?= $data ? fmt_phone_number($data[0]) : fmt_phone_number($number) ?></td>
 			<td><?= $data ? fmt_block_status($data[1]) : "No Record" ?></td>
-			<td><?= $data ? fmt_date($data, 2) : "" ?></td>
-			<td><?= $data ? $data[3] : ""?></td>
+			<td><?= $data ? $data[2] : "" ?></td>
+			<td><?= $data ? fmt_date($data, 3) : "" ?></td>
+			<td><?= $data ? $data[4] : ""?></td>
 		</tr>
 	</table>
 	<table>
