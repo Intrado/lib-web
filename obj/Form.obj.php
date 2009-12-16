@@ -133,14 +133,10 @@ class Form {
 		return false;
 	}
 
-	// $ignoredItems is an array of $this->formdata keys to ignore.
-	function renderFormItems($ignoredItems = null) {
+	function renderFormItems() {
 		$lasthelpstep = false;
 		$str = '';
 		foreach ($this->formdata as $name => $itemdata) {
-			if (is_array($ignoredItems) && in_array($name, $ignoredItems))
-				continue;
-
 			//check for section titles
 			if (is_string($itemdata)) {
 				if ($lasthelpstep) {
@@ -248,69 +244,6 @@ class Form {
 		if ($lasthelpstep)
 			$str .= '
 			</table></fieldset>';
-
-		return $str;
-	}
-
-	// This function only renders the form item's control and validation message; no icon nor label.
-	// Assumes isset($itemdata['control']) for every form item to be rendered.
-	// Also assumes the control is not HiddenField nor FormHtml.
-	function renderFormItemsControl($specificItems) {
-		$str = '';
-		foreach ($this->formdata as $name => $itemdata) {
-			if (!in_array($name, $specificItems))
-				continue;
-
-			$control = $itemdata['control'];
-
-			$formclass = $control[0];
-			$item = new $formclass($this,$name, $control);
-
-			//inject which function to use for getting the value from this control
-			$this->formdata[$name]['jsgetvalue'] = $item->jsGetValue();
-
-			$n = $this->name."_".$item->name;
-
-			$value = $itemdata['value'];
-			$requiredfields = isset($itemdata['requires']) ? $this->getFieldValues($itemdata['requires']) : array();
-			$style = "";
-			$msg = false;
-
-			//see if valrequired is any of the validators
-			$isrequired = false;
-			foreach ($itemdata['validators'] as $v) {
-				if ($v[0] == "ValRequired") {
-					$isrequired = true;
-					break;
-				}
-			}
-
-			$isblank = (is_array($value) && !count($value)) || (!is_array($value) && mb_strlen($value) == 0);
-
-			if ($this->getSubmit() || !$isblank) {
-				//validate and show normally
-				$valresult = Validator::validate_item($this->formdata,$name,$value,$requiredfields);
-				if ($valresult === true) {
-					$style = 'style="background: rgb(255,255,255);"' ; //rgb(225,255,225)
-					$msg = false;
-				} else {
-					list($validator,$msg) =  $valresult;
-					$style = 'style="background: rgb(255,200,200);"' ;
-				}
-			} else if (!$this->getSubmit() && $isblank && $isrequired) {
-				//show required highlight
-				$style = 'style="background: rgb(255,255,220);"' ;
-			}
-
-			$str.= '
-			<tr id="'.$n.'_fieldarea" '.$style.'>
-				<td class="formtablecontrol">
-					'.$item->render($value).'
-					<div id="'.$n.'_msg" class="underneathmsg">'.($msg ? $msg : "").'</div>
-				</td>
-			</tr>
-			';
-		} //foreach
 
 		return $str;
 	}
