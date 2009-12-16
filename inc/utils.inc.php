@@ -297,7 +297,7 @@ function getEmailRegExp() {
     # This code is licensed under a Creative Commons Attribution-ShareAlike 2.5 License
     # http://creativecommons.org/licenses/by-sa/2.5/
     #
-    # $Revision: 1.92 $
+    # $Revision: 1.93 $
     # http://www.iamcal.com/publish/articles/php/parsing_email/
     ##################################################################################
 
@@ -692,6 +692,10 @@ function notice ($message) {
 		$_SESSION['confirmnotice'] = array();
 		
 	$_SESSION['confirmnotice'][] = $message;
+}
+
+function repeatWithSeparator($str, $sep, $count) {
+	return implode($sep, array_fill(0, $count, $str));
 }
 
 ?>
