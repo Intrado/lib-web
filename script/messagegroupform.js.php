@@ -343,20 +343,17 @@ var MessageGroupForm = Class.create({
 	
 	// TODO: Rename to refresh_display() because this also refresh the ckeditor.
 	refresh_accordion: function(type, verticalSection, subtypeSection) {
-		this.toolsAccordion.enable_section('callMe');
-		this.toolsAccordion.enable_section('audioLibrary');
+		this.toolsAccordion.enable_section('audio');
 		this.toolsAccordion.enable_section('dataField');
 		this.toolsAccordion.enable_section('attachment');
 		this.toolsAccordion.enable_section('translation');
-		this.toolsAccordion.unlock_section('callMe');
-		this.toolsAccordion.unlock_section('audioLibrary');
+		this.toolsAccordion.unlock_section('audio');
 
 		var subtype;
 		var languageCode;
 
 		if (type != 'phone') {
-			this.toolsAccordion.disable_section('callMe');
-			this.toolsAccordion.disable_section('audioLibrary');
+			this.toolsAccordion.disable_section('audio');
 		}
 		if (type != 'email') {
 			this.toolsAccordion.disable_section('attachment');
@@ -375,8 +372,7 @@ var MessageGroupForm = Class.create({
 			if (languageCode == 'en') {
 				this.toolsAccordion.disable_section('translation');
 			} else if (languageCode == 'autotranslate') {
-				this.toolsAccordion.disable_section('callMe');
-				this.toolsAccordion.disable_section('audioLibrary');
+				this.toolsAccordion.disable_section('audio');
 				this.toolsAccordion.disable_section('translation');
 			}
 
@@ -393,8 +389,7 @@ var MessageGroupForm = Class.create({
 					var checkbox = settingDiv.down('input.EnableTranslationCheckbox');
 
 					if (checkbox.checked) {
-						this.toolsAccordion.lock_section('callMe');
-						this.toolsAccordion.lock_section('audioLibrary');
+						this.toolsAccordion.lock_section('audio');
 					}
 
 					var translationSection = $('translationSection');

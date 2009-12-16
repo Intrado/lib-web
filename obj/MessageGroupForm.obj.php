@@ -213,8 +213,7 @@ class MessageGroupForm extends Form {
 		$this->messageItems = array();
 		$this->translationSettingItems = array();
 		$this->advancedItems = array();
-		$this->callMeItems = array();
-		$this->audioLibraryItems = array();
+		$this->audioItems = array();
 
 		$formdata = array();
 
@@ -319,7 +318,7 @@ class MessageGroupForm extends Form {
 			),
 			"helpstep" => 1
 		);
-		$this->callMeItems[] = 'callme';
+		$this->audioItems[] = 'callme';
 
 		/////////////////////////////////////
 		// Phone Message Settings
@@ -415,7 +414,7 @@ class MessageGroupForm extends Form {
 			$summaryLanguageRows .= "</tr>";
 		}
 
-		$bareboneItems = array_merge($this->attachmentItems, $this->messageItems, $this->translationSettingItems, $this->advancedItems, $this->callMeItems, $this->audioLibraryItems);
+		$bareboneItems = array_merge($this->attachmentItems, $this->messageItems, $this->translationSettingItems, $this->advancedItems, $this->audioItems);
 
 		$str = "
 			<!-- FORM -->
@@ -442,29 +441,30 @@ class MessageGroupForm extends Form {
 							<tbody>".$this->renderFormItemsControl($this->attachmentItems)."</tbody>
 						</table>
 
-						<div id='callMeSection' style='width:100%'>
+						<div id='audioSection' style='width:100%'>
 							<table style='width:100%; border-collapse:collapse'><tbody class='AudioFiles'></tbody></table>
-							<table style='width:100%; border-collapse:collapse'><tbody class='EasycallFormItem'>".$this->renderFormItemsControl($this->callMeItems)."</tbody></table>
-						</div>
+							<table style='width:100%; border-collapse:collapse'><tbody class='AudioFormItem'>".$this->renderFormItemsControl($this->audioItems)."</tbody></table>
 
-						<div id='audioLibrarySection'>
-							<table style='width:100%; border-collapse:collapse'>
-								<tr>
-									<td valign='top' colspan='2'>
-										<b>Insert Audio Recording:</b>
-									</td>
-								</tr>
-								<tr>
-									<td valign='top' class='bottomBorder'>
-										<select id='audioLibrarySelect'>
-											<option value=''>-- Select an Audio File --</option>
-											" . implode('', $audioFileOptions) . "
-										</select>
-										" . icon_button(_L('Insert'),'fugue/arrow_turn_180', null, null, "id='insertAudio'") . "
-										" . icon_button(_L('Play'),'fugue/control', null, null, "id='playAudio'") ."
-									</td>
-								</tr>
-							</table>
+							<!-- TODO, Get rid of this section, replace with ajax audio files. -->
+							<div id='audioLibrarySection' style='border:solid 4px red'> 
+								<table style='width:100%; border-collapse:collapse'>
+									<tr>
+										<td valign='top' colspan='2'>
+											<b>Insert Audio Recording:</b>
+										</td>
+									</tr>
+									<tr>
+										<td valign='top' class='bottomBorder'>
+											<select id='audioLibrarySelect'>
+												<option value=''>-- Select an Audio File --</option>
+												" . implode('', $audioFileOptions) . "
+											</select>
+											" . icon_button(_L('Insert'),'fugue/arrow_turn_180', null, null, "id='insertAudio'") . "
+											" . icon_button(_L('Play'),'fugue/control', null, null, "id='playAudio'") ."
+										</td>
+									</tr>
+								</table>
+							</div>
 						</div>
 
 						<div id='dataFieldSection'>
@@ -562,8 +562,7 @@ class MessageGroupForm extends Form {
 					// Accordion.
 					toolsAccordion.container.setStyle({'paddingLeft':'10px'});
 					toolsAccordion.add_section('attachment');
-					toolsAccordion.add_section('callMe');
-					toolsAccordion.add_section('audioLibrary');
+					toolsAccordion.add_section('audio');
 					toolsAccordion.add_section('dataField');
 					toolsAccordion.add_section('translation');
 					toolsAccordion.add_section('advanced');
@@ -572,18 +571,13 @@ class MessageGroupForm extends Form {
 						'icon': 'img/icons/accept.gif',
 						'content': $('attachmentSection')
 					});
-					toolsAccordion.update_section('callMe', {
-						'title': 'Call Me to Record',
+					toolsAccordion.update_section('audio', {
+						'title': 'Audio',
 						'icon': 'img/icons/accept.gif',
-						'content': $('callMeSection')
-					});
-					toolsAccordion.update_section('audioLibrary', {
-						'title': 'Audio Library',
-						'icon': 'img/icons/accept.gif',
-						'content': $('audioLibrarySection')
+						'content': $('audioSection')
 					});
 					toolsAccordion.update_section('dataField', {
-						'title': 'Insert Data Fields',
+						'title': 'Data Fields',
 						'icon': 'img/icons/accept.gif',
 						'content': $('dataFieldSection')
 					});
@@ -924,6 +918,7 @@ class MessageGroupForm extends Form {
 						}
 					}.bindAsEventListener(messageGroupForm));
 
+					// TODO: Get rid of this, replace with Ajax and clicking on the filename.
 					$('insertAudio').observe('click', function(event) {
 						var select = $('audioLibrarySelect');
 						if (select.getValue()) {
@@ -956,7 +951,7 @@ class MessageGroupForm extends Form {
 							tr.insert(new Element('td').insert(playButton));
 							tr.insert(new Element('td').insert(insertButton));
 
-							$('callMeSection').down('tbody.AudioFiles').insert(tr);
+							$('audioSection').down('tbody.AudioFiles').insert(tr);
 
 							// TODO: Insert the audio file name into the current message body.
 						}.bindAsEventListener(this), event.memo.Default);
