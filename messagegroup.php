@@ -1,101 +1,138 @@
 <?php
-require_once("inc/common.inc.php");
-require_once("inc/securityhelper.inc.php");
-require_once("inc/table.inc.php");
-require_once("inc/html.inc.php");
-require_once("inc/utils.inc.php");
-require_once("obj/Validator.obj.php");
-require_once("obj/Form.obj.php");
-require_once("obj/FormItem.obj.php");
-require_once("obj/AudioFile.obj.php");
-require_once("obj/Voice.obj.php");
-require_once("obj/Message.obj.php");
-require_once("obj/MessagePart.obj.php");
-require_once("obj/FieldMap.obj.php");
-require_once("obj/Phone.obj.php");
-require_once("obj/MessageBody.fi.php");
-require_once("obj/ValMessageBody.val.php");
-require_once("obj/ValDuplicateNameCheck.val.php");
-require_once('obj/MessageGroup.obj.php');
-require_once('obj/MessageGroupForm.obj.php');
-require_once('obj/traslationitem.obj.php');
-require_once('obj/MessageAttachment.obj.php');
-require_once("obj/EmailAttach.fi.php");
-require_once("obj/EmailAttach.val.php");
+// This is a simple test page for the formswitcher.
 
-// CONSTANTS.
-$formSettings = array();
+require_once('obj/FormSwitcher.obj.php');
 
-// REQUEST PROCESSING.
-$isNew = true;
-$isReadOnly = false;
+$messagegroupbasicsformdata = array();
+$messagegroupbasicsformdata['emailsubject'] = array(
+	'control' => array('TextField'),
+	'validators' => array('ValRequired'),
+	'renderoptions' => array()
+);
+$messagegroupbasicsform = new Form('messagegroupbasicsform', $messagegroupbasicsformdata);
 
-if ($isNew)
-	$messageGroup = new MessageGroup();
+$emailformdata = array();
+$emailformdata['emailsubject'] = array(
+	'control' => array('TextField'),
+	'validators' => array('ValRequired'),
+	'renderoptions' => array()
+);
+$emailform = new Form('emailform', $emailformdata);
 
-// FORM INTIIALIZATION.
-$buttons = array(
-	submit_button(_L('Cancel'),"cancel","arrow_refresh"),
-	submit_button(_L('Save'),"save","tick")
+$formstructure = array(
+	'messagegroupbasics' => $messagegroupbasicsform,
+	'layers' => array(
+		'_layout' => 'horizontaltabs',
+		'phone' => array(
+			'_title' => 'Phone',
+			'languages' => array(
+				'_layout' => 'verticaltabs',
+				'en' => array(
+					'_title' => 'English',
+					'_layout' => 'verticalsplit',
+					'tools' => array(
+						'_layout' => 'accordion',
+						'audio' => array(),
+						'datafields' => array()
+					)
+				),
+				'es' => array(
+					'_title'=> 'Spanish',
+					'_layout' => 'verticalsplit',
+					'tools' => array(
+						'_layout' => 'accordion',
+						'audio' => array(),
+						'datafields' => array(),
+						'translation' => array()
+					)
+				)
+			)
+		),
+		'email' => array(
+			'_title' => 'Email',
+			'emailheaders' => $emailform,
+			'subtypes' => array(
+				'_layout' => 'horizontaltabs',
+				'html' => array(
+					'_title' => 'Html',
+					'languages' => array(
+						'_layout' => 'verticaltabs',
+						'en' => array(
+							'_title' => 'English',
+							'_layout' => 'verticalsplit',
+							'tools' => array(
+								'layout' => 'accordion',
+								'attachments' => array(),
+								'datafields' => array(),
+							)
+						),
+						'es' => array(
+							'_layout' => 'verticalsplit',
+							'_title'=> 'Spanish',
+							'tools' => array(
+								'layout' => 'accordion',
+								'attachments' => array(),
+								'datafields' => array(),
+								'translation' => array()
+							)
+						)
+					)
+				),
+				'plain' => array(
+					'_title' => 'Plain',
+					'languages' => array(
+						'_layout' => 'verticaltabs',
+						'en' => array(
+							'_title' => 'English',
+							'_layout' => 'verticalsplit',
+							'tools' => array(
+								'layout' => 'accordion',
+								'attachments' => array(),
+								'datafields' => array(),
+							)
+						),
+						'es' => array(
+							'_title'=> 'Spanish',
+							'_layout' => 'verticalsplit',
+							'tools' => array(
+								'layout' => 'accordion',
+								'attachments' => array(),
+								'datafields' => array(),
+								'translation' => array()
+							)
+						)
+					)
+				)
+			)
+		),
+		'sms' => array(
+		),
+		'summary' => array(
+		)
+	)
 );
 
-$form = new MessageGroupForm('messagegroupform', null, $buttons, $messageGroup, $formSettings);
+$formswitcher = new FormSwitcher('messagegroup', $formstructure);
 
-// FORM VALIDATION HANDLING.
-$form->handleRequest();
-
-// FORM SUBMISSION HANDLING.
-if (!$isReadOnly && $button = $form->getSubmit()) {
-	// $ajax indicates whether or not this request requires an ajax response.
-	$ajax = $form->isAjaxSubmit();
-
-	if (!$form->checkForDataChange() && !$form->validate()) {
-
-		if ($button == 'save') {
-			/////////////////////////////////////////////////
-			// SAVE.
-			/////////////////////////////////////////////////
-
-			Query('BEGIN');
-				$form->save();
-			Query('COMMIT');
-
-			// Let the User Know What Happened.
-			if ($ajax)
-				$form->sendTo('messagegroup.php');
-			else
-				redirect('messagegroup.php');
-		} else if ($button == 'cancel') {
-			/////////////////////////////////////////////////
-			// CANCEL.
-			/////////////////////////////////////////////////
-
-			if ($ajax)
-				$form->sendTo('messagegroup.php');
-			else
-				redirect('messagegroup.php');
-		}
-	}
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// Display
-////////////////////////////////////////////////////////////////////////////////
-$PAGE = _L("notifications").":"._L("messages");
-$TITLE = _L('Message Group Builder: ') . (!$isNew ? escapehtml($messageGroup->name) : _L("New Message Group") );
-$ICON = "email.gif";
-
-include_once("nav.inc.php");
+$formswitcher->handleRequest();
 
 ?>
-<script type="text/javascript">
-<? Validator::load_validators(array("ValMessageBody","ValDuplicateNameCheck","ValCallMeMessage", "ValEmailAttach", "ValTranslation")); ?>
-</script>
-<?
 
-startWindow(_L('Message Group'));
-echo $form->render();
-endWindow();
-include_once("navbottom.inc.php");
+<html>
+<head>
+	<link href="css.php" type="text/css" rel="stylesheet" media="screen, print">
+	<script src="script/prototype.js" type="text/javascript"></script>
+	<script src="script/scriptaculous.js" type="text/javascript"></script>
+	<script src="script/accordion.js" type="text/javascript"></script>
+</head>
+
+<body>
+
+<?php
+
+	echo $formswitcher->render();
 
 ?>
+
+</body>
+</html>
