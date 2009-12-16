@@ -165,7 +165,7 @@ if($number){
 			<td><?= $data ? fmt_block_status($data[1]) : "No Record" ?></td>
 			<td><?= $data ? $data[2] : "" ?></td>
 			<td><?= $data ? fmt_date($data, 3) : "" ?></td>
-			<td><?= $data ? $data[4] : ""?></td>
+			<td><?= $data ? escapehtml($data[4]) : "" ?></td>
 		</tr>
 	</table>
 	<table>
