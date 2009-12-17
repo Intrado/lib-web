@@ -1,17 +1,5 @@
 <?php
 
-class Form {
-	var $name;
-
-	function Form($name, $data) {
-		$this->name = $name;
-	}
-
-	function render() {
-		return "<form id='{$this->name}' style='margin:0; padding: 10px; border: solid 2px blue'></form>";
-	}
-}
-
 class FormSwitcher {
 	var $name;
 	var $formstructure;
@@ -33,9 +21,9 @@ class FormSwitcher {
 
 		if (!empty($formstructure['_layout'])) {
 			$layout = $formstructure['_layout'];
-			$html .= "<div id='$fullkey' class='$layout Structure' style='border: solid 1px rgb(130,230,255); padding: 20px'>$fullkey<br/>";
+			$html .= "<div id='$fullkey' class='$layout Structure' style='padding:4px'>";
 		} else {
-			$html .= "<div id='$fullkey' class='Structure' style='border: solid 1px rgb(230,230,230); padding: 20px'>$fullkey<br/>";
+			$html .= "<div id='$fullkey' class='Structure' style='padding:4px'>";
 		}
 
 		if (!empty($formstructure['_title'])) {
@@ -70,7 +58,7 @@ class FormSwitcher {
 				var make_tabs = function(formswitcherID, vertical) {
 					$$('#'+formswitcherID + (vertical ? ' .verticaltabs' : ' .horizontaltabs')).each(function(container, vertical) {
 						var kids = container.childElements();
-						var tabs = new Tabs(container, {'vertical':vertical});
+						var tabs = new Tabs(container, {'vertical':vertical, 'showDuration':0, 'hideDuration':0});
 						kids.each(function (kid) {
 							if (!kid.match('.Structure'))
 								return;
