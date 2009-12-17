@@ -47,7 +47,7 @@ function fmt_alert_timestamp($row, $index) {
 		if ($timestamp + ($staledataleewayhours * SECONDSPERHOUR) < strtotime($row[10]))
 			return "<div style='background-color: #ff0000'>" . fmt_import_date($row, $index) . "</div>";
 	}
-	
+
 	return fmt_import_date($row, $index);
 }
 
@@ -209,7 +209,7 @@ $queryextra = "";
 $querytypes = "";
 $alerttxt = "";
 $custtxt = "";
-	
+
 if (CheckFormSubmit($f, $s)) {
 	//check to see if formdata is valid
 	if (CheckFormInvalid($f)) {
@@ -250,14 +250,14 @@ if (isset($_GET['cid'])) {
 		$queryextra = " AND id in (";
 		foreach (explode(",", $_GET['cid']) as $cid)
 			$queryextra .= "'". DBSafe($cid) . "',";
-			
+
 		$queryextra = substr($queryextra, 0, -1) . ") ";
 	}
 } else if (!empty($favcustomers) && !isset($_GET['showall']) && !isset($_POST['showmatch'])) {
 	$queryextra = " AND id in (";
 	foreach ($favcustomers as $cid => $junk)
 		$queryextra .= "'". DBSafe($cid) . "',";
-		
+
 	$queryextra = substr($queryextra, 0, -1) . ") ";
 }
 
@@ -301,11 +301,11 @@ foreach ($customers as $cust) {
 		$currhost = $cust[1];
 	}
 	Query("use c_" . $cust[0], $custdb);
-	
+
 	if ($custdb) {
 		$query = "SELECT id, name, status, type, updatemethod, lastrun, datamodifiedtime, length(data), description, notes, alertoptions, datatype
 					FROM import
-					where type in ('automatic', 'manual')
+					where type in ('automatic', 'manual') and ownertype = 'system'
 					$querytypes
 					order by id";
 		$list = Query($query, $custdb);
@@ -337,7 +337,7 @@ $titles = array("0" => "#ID",
 		"11" => "#File Size in Bytes",
 		"14" => "@#Alert Email",
 		"actions" => "Actions");
-		
+
 $formatters = array("0" => "fmt_custid",
 					"url" => "fmt_custurl",
 					"11" => "fmt_filesize",
@@ -349,14 +349,14 @@ $formatters = array("0" => "fmt_custid",
 					"daysold" => "fmt_daysold",
 					"8" => "fmt_updatemethod",
 					"alert" => "fmt_alert");
-					
+
 // Do not provide a checkbox to hide these columns.
 $lockedTitles = array(0, "actions", "url", 5);
 
 // only format these fields when filtering
 $filterFormatters = array("8" => "fmt_updatemethod",
 					"alert" => "fmt_alert");
-					
+
 // allow these fields for filtering
 $filterTitles = array("alert", 6, 7, 15, 8, 2);
 
@@ -398,7 +398,7 @@ include("nav.inc.php");
 							</tr>
 							<tr>
 								<td colspan="2">
-									<input type="submit" name="showmatch" id="showmatch" value="Search" />   
+									<input type="submit" name="showmatch" id="showmatch" value="Search" />
 								</td>
 							</tr>
 						</table>
@@ -410,7 +410,7 @@ include("nav.inc.php");
 			<?
 			// show the row data filters
 			show_row_filter('customer_imports_table', $data, $titles, $filterTitles, $filterFormatters);
-			
+
 			?>
 		</td>
 	</tr>
@@ -452,7 +452,7 @@ showTable($data, $titles, $formatters);
 		<th align="left" class="listheader">Last Run</th>
 		<th align="left" class="listheader">File Date</th>
 		<th align="left" class="listheader">File Size</th>
-		<th align="left" class="listheader">Days Old</th>		
+		<th align="left" class="listheader">Days Old</th>
 	</tr>
 	<tr>
 		<th class="listheader">No Alert</th>
