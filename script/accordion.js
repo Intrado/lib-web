@@ -1,17 +1,22 @@
-function make_split_pane(vertical) {
+function make_split_pane(vertical, count) {
 	var splitContainer = null;
+
+	if (count === undefined)
+		count = 2;
 
 	if (vertical) {
 		splitContainer = new Element('table', {'class':'SplitPane'});
 		var tbody = new Element('tbody');
 		var tr = new Element('tr');
-		tr.insert(new Element('td', {'class':'SplitPane'}));
-		tr.insert(new Element('td', {'class':'SplitPane'}));
+		for (var i = 0; i < count; i++) {
+			tr.insert(new Element('td', {'class':'SplitPane'}));
+		}
 		splitContainer.insert(tbody.insert(tr));
 	} else {
 		splitContainer = new Element('div');
-		splitContainer.insert(new Element('div', {'class':'SplitPane'}));
-		splitContainer.insert(new Element('div', {'class':'SplitPane'}));
+		for (var i = 0; i < count; i++) {
+			splitContainer.insert(new Element('div', {'class':'SplitPane'}));
+		}
 	}
 
 	splitContainer.identify();

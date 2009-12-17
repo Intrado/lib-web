@@ -93,7 +93,7 @@ class ValCallMeMessage extends Validator {
 ////////////////////////////////////////////////////////////////////////////////
 // Form Data
 ////////////////////////////////////////////////////////////////////////////////
-$callmeformdata = array(
+$audioformdata = array(
 	"callme" => array(
 		"label" => _L('Voice Recording'),
 		"value" => "",
@@ -113,8 +113,8 @@ $callmeformdata = array(
 $callmehelpsteps = array ();
 $callmehelpsteps[0] = _L('Enter a message name and a phone number. Then click the Call Me To Record button. You will be prompted to record a new audio message over the phone. Once you complete this process, click the Save button');
 $callmebuttons = array(submit_button(_L("Save"),"submit","tick"),icon_button(_L('Cancel'),"cross",null,"$origin.php"));
-$callmeform = new Form("callme",$callmeformdata,$callmehelpsteps,$callmebuttons);
-$callmeform->ajaxsubmit = true;
+$audioform = new Form("callme",$audioformdata,$callmehelpsteps,$callmebuttons);
+$audioform->ajaxsubmit = true;
 
 
 
@@ -148,10 +148,16 @@ $formstructure = array(
 				'en' => array(
 					'_title' => 'English',
 					'_layout' => 'verticalsplit',
+					'messagebody' => 'TESTESTES',
 					'tools' => array(
 						'_layout' => 'accordion',
-						'audio' => $callmeform,
-						'datafields' => array()
+						'audio' => array(
+							'_title' => 'Audio',
+							'audio' => $audioform
+						),
+						'datafields' => array(
+							'_title' => 'Data Fields'
+						)
 					)
 				),
 				'es' => array(
@@ -178,8 +184,9 @@ $formstructure = array(
 						'en' => array(
 							'_title' => 'English',
 							'_layout' => 'verticalsplit',
+							'messagebody' => '',
 							'tools' => array(
-								'layout' => 'accordion',
+								'_layout' => 'accordion',
 								'attachments' => array(),
 								'datafields' => array(),
 							)

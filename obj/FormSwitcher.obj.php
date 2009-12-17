@@ -43,6 +43,10 @@ class FormSwitcher {
 
 				$html .= $value->render();
 
+			} else { // Arbitrary HTML.
+
+				$html .= "<div id='{$fullkey}{$key}' class='Structure' style='padding:4px'>$value</div>";
+
 			}
 		}
 
@@ -53,32 +57,57 @@ class FormSwitcher {
 		$html = "<div id='{$this->name}'>" . $this->_render($this->formstructure, null, '') . "</div>";
 		$html .= "<script type='text/javascript'>
 			(function() {
-				var formswitcherID = '{$this->name}';
+				var formswitcherid = '{$this->name}';
 
-				var make_tabs = function(formswitcherID, vertical) {
-					$$('#'+formswitcherID + (vertical ? ' .verticaltabs' : ' .horizontaltabs')).each(function(container, vertical) {
+				var load_layout = function(formswitcherid, classname) {
+					$$('#' + formswitcherid + ' .' + classname).each(function(container, classname) {
 						var kids = container.childElements();
-						var tabs = new Tabs(container, {'vertical':vertical, 'showDuration':0, 'hideDuration':0});
-						kids.each(function (kid) {
-							if (!kid.match('.Structure'))
-								return;
 
-							this.add_section(kid.identify());
-							this.update_section(kid.identify(), {
-								'title': kid.down('span.Title'),
-								'icon': 'img/icons/diagona/16/160.gif',
-								'content': kid
-							});
+						var structures = kids.findAll(function(kid) {
+							return kid.match('.Structure');
+						});
 
-							if (!this.firstSection)
-								this.firstSection = kid.identify();
-						}.bindAsEventListener(tabs, vertical));
-						tabs.show_section(tabs.firstSection);
-					}.bindAsEventListener(this, vertical));
+						var layout;
+						if (classname == 'horizontaltabs' || classname == 'verticaltabs' || classname == 'accordion') {
+							if (classname == 'horizontaltabs')
+								layout = new Tabs(container, {'vertical':false, 'showDuration':0, 'hideDuration':0});
+							else if (classname == 'verticaltabs')
+								layout = new Tabs(container, {'vertical':true, 'showDuration':0, 'hideDuration':0});
+							else if (classname == 'accordion')
+								layout = new Accordion(container);
+
+							structures.each(function (structure) {
+								this.add_section(structure.identify());
+								this.update_section(structure.identify(), {
+									'title': structure.down('span.Title'),
+									'icon': 'img/icons/diagona/16/160.gif',
+									'content': structure
+								});
+
+								if (!this.firstSection)
+									this.firstSection = structure.identify();
+
+							}.bindAsEventListener(layout));
+
+							layout.show_section(layout.firstSection);
+
+						} else if (classname == 'verticalsplit') {
+							var split = make_split_pane(true, structures.length);
+
+							for (var i = 0; i < structures.length; i++) {
+								split.down('.SplitPane', i).insert(structures[i]);
+							}
+
+							container.insert(split);
+						}
+
+					}.bindAsEventListener(this, classname));
 				};
 
-				make_tabs(formswitcherID, false);
-				make_tabs(formswitcherID, true);
+				load_layout(formswitcherid, 'horizontaltabs');
+				load_layout(formswitcherid, 'verticaltabs');
+				load_layout(formswitcherid, 'accordion');
+				load_layout(formswitcherid, 'verticalsplit');
 			})();
 		</script>";
 
