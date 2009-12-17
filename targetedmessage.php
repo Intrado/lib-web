@@ -16,7 +16,7 @@ require_once("obj/Alert.obj.php");
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization
 ////////////////////////////////////////////////////////////////////////////////
-if (!$USER->authorize('managesystem')) {
+if (!$USER->authorize('targetedmessage')) {
 	redirect('unauthorized.php');
 }
 
@@ -25,16 +25,12 @@ if (!$USER->authorize('managesystem')) {
 // Action/Request Processing
 ////////////////////////////////////////////////////////////////////////////////
 
-function repeatWithSeparator($str, $sep, $count) {
-	return implode($sep,array_fill(0,$count,$str)); // TODO improve
-}
-
 if (isset($_POST['eventContacts']) && isset($_POST['eventMessage']) && isset($_POST['isChecked'])) {
 	$contacts = json_decode($_POST['eventContacts']);
 	$message = $_POST['eventMessage'];
 	$comment = isset($_POST['eventComments'])?$_POST['eventComments']:"";
-
 	error_log("Comment " . $comment);
+	
 	$ischecked = $_POST['isChecked'];
 	if($ischecked == "false") {
 		$args = array($USER->id,$message);
@@ -43,21 +39,19 @@ if (isset($_POST['eventContacts']) && isset($_POST['eventMessage']) && isset($_P
 		}
 		$eventids = QuickQueryList("select e.id from personassociation pa left join event e on (pa.eventid = e.id) where e.userid = ? and e.targetedmessageid = ? and Date(e.occurence) = CURDATE() and pa.personid in (" . repeatWithSeparator("?",",",count($contacts)) . ")",
 						false,false,$args);
-
-		$idstr = implode(",",$eventids);
-		QuickQuery("BEGIN");
-		QuickQuery("delete from alert where eventid in (" . $idstr . ")");
-		QuickQuery("delete from personassociation where eventid in (" . $idstr . ")");
-		QuickQuery("delete from event where id in (" . $idstr . ")");
-		QuickQuery("COMMIT");
+		if (count($eventids) > 0) {
+			$idstr = implode(",",$eventids);
+			QuickQuery("BEGIN");
+			QuickQuery("delete from alert where eventid in (" . $idstr . ")");
+			QuickQuery("delete from personassociation where eventid in (" . $idstr . ")");
+			QuickQuery("delete from event where id in (" . $idstr . ")");
+			QuickQuery("COMMIT");
+		}
 		exit();
   	}
 
-
 	foreach($contacts as $contact) {
 		QuickQuery("BEGIN");
-
-
 		// Query to see if the event is recorded
 		$eventid = QuickQuery("select e.id from personassociation pa left join event e on (pa.eventid = e.id) where pa.personid = ? and e.userid = ? and e.targetedmessageid = ? and Date(e.occurence) = CURDATE()",
 						false,array($contact,$USER->id,$message));
@@ -72,7 +66,10 @@ if (isset($_POST['eventContacts']) && isset($_POST['eventMessage']) && isset($_P
 		$event->sectionid = 1;  //TODO implement section stuff
 		$event->targetedmessageid = $message;
 		$event->name = "placeholder: TODO"; // TODO get name from targetedmessage
-		$event->notes = $comment;
+		if(isset($_POST['eventComments']))
+			$event->notes = $USER->authorize('targetedmessage')?$_POST['eventComments']:"";
+		else if(!$event->notes)
+			$event->notes = "";
 		$event->occurence = date("Y-m-d H:i:s");
 		$event->update();
 
@@ -117,7 +114,7 @@ $categories = array(0 => "Positive",1 => "Corrective",2 => "Informational");
 
 
 // If no targeted messages exist fill the targeted message library with phony test data
-if(QuickQuery("select count(id) from targetedmessage") === 0) {
+if(QuickQuery("select count(*) from targetedmessage") == "0") {
 	error_log("Generating Test Data: Creating Targeted Messages");
 	$batchvalues = array();
 	// three categories
@@ -143,8 +140,6 @@ if (isset($_POST['classid'])) {
 	header('Content-Type: application/json');
 	$id = $_POST['classid'] + 0;
 
-
-
 	if(isset($classpeople[$id])){
 		$contactids = array_keys($classpeople[$id]);
 
@@ -156,23 +151,9 @@ if (isset($_POST['classid'])) {
 					 where e.targetedmessageid is not null and e.userid = ? and Date(e.occurence) = CURDATE() and pa.personid in (" . implode(",",$contactids) . ")";
 			$contactmessages = QuickQueryMultiRow($query,false,false,array($USER->id));
 		}
-
 		$response->people = $classpeople[$id];
 		$response->cache = $contactmessages;
 		echo json_encode($response);
-	}
-
-	if(isset($_POST['cache'])) {
-		error_log($_POST['cache']);
-		$cache = json_decode($_POST['cache'],true);
-		foreach($cache as $category => $contacts) {
-			foreach($contacts as $contact => $messages) {
-				error_log($contact);
-				foreach($messages as $message => $comment) {
-					error_log("    $message -- Comment: $comment");
-				}
-			}
-		}
 	}
 
 	exit(0);
@@ -221,8 +202,6 @@ include_once("nav.inc.php");
 startWindow(_L('Classroom Message'));
 ?>
 
-
-
 <table width="100%" id="picker">
 	<tr>
 		<td style="top:0px;width:250px;vertical-align:top;border-right:1px solid black;padding-right:10px;">
@@ -251,10 +230,10 @@ startWindow(_L('Classroom Message'));
 					// add library to id since user may change the title of the category
 					echo "<div id='lib-$categoryid' style='display:block;'>";
 					foreach($messages as $messageid => $message) {
-						echo '<div id="msg-' . $messageid.'" class="targetmessage" style="position:relative;border:solid 1px silver;background-color:#FFF;width:300px;float:left;margin:4px;padding:0px;"><img src="img/checkbox-clear.png" alt="" style="position:absolute;top:10px;left:3px;"/><div style="position:relative;top:5px;left:25px;width:270px">' . $message .  ' </div><a href="#" class="commentlink" style="position:relative;float:right;">Comment </a>
-							<span class="targetcomment" style="display:none;">
+						echo '<div id="msg-' . $messageid.'" class="targetmessage" style="position:relative;border:solid 1px silver;background-color:#FFF;width:300px;float:left;margin:4px;padding:0px;"><img src="img/checkbox-clear.png" alt="" style="position:absolute;top:10px;left:3px;"/><div style="position:relative;top:5px;left:25px;width:270px">' . $message .  ' </div>' . ($USER->authorize('targetedcomment')?'<a href="#" class="commentlink" style="position:relative;float:right;">Comment</a>':'&nbsp;')
+						. '<span class="targetcomment" style="display:none;">
 								<textarea class="targetcomment" style="position:relative;clear:both;width:94%;left:2%;height:60px;"></textarea>
-								<a class="targetcomment" href="#" onclick="saveComment(\''. $messageid.'\');false;">Save</a>
+								<a class="targetcomment" href="#" onclick="saveComment(\''. $messageid.'\');false;">Save</a><span style="display:none"><br />Notice: Some of the Contacts have a comment for this message. Saving a new comment will overwrite the comment</span>
 							</span>
 						</div>';
 					}
@@ -278,6 +257,7 @@ endWindow();
 	var c_selected = "#ffcccc";
 	var c_none = "#ffffff";
 	var h_image = "img/icons/fugue/arrow.gif";
+	var hascomments = <?= $USER->authorize('targetedcomment')?"true":"false" ?>;
 
 	/*
 	 Checked cache contains
@@ -348,8 +328,9 @@ endWindow();
 	function setEvent(contactid,messageid,isChecked,comment) {
 		var category = tabs.currentSection.substr(4); // strip 'lib-'
 		var people = checkedcache.get(category);
-		if(people.get(contactid) == undefined)
+		if(people.get(contactid) == undefined){
 			people.set(contactid,new Hash());
+		}
 		var contactlink = people.get(contactid);
 		if(isChecked) {
 
@@ -371,7 +352,6 @@ endWindow();
 
 	}
 	 function saveComment(id) {
-
 		var text = $('msg-' + id).down('textarea').getValue();
 		// Save event to database
 		new Ajax.Request('targetedmessage.php',
@@ -389,8 +369,6 @@ endWindow();
 		});
 	 }
 
-
-
 	// has link in this section only
 	function haslink(contact,message) {
 		if(checkedcache.get(tabs.currentSection).get(contact) == undefined || checkedcache.get(tabs.currentSection).get(contact).get(message) == undefined)
@@ -400,7 +378,8 @@ endWindow();
 
 	function updatemessages(currenttab) {
 		var contactsize = checkedcontacts.size();
-		var selectedmessages = new Hash();
+
+
 		var category = currenttab.substr(4);
 		// Get all contact-message links from cache
 
@@ -408,10 +387,16 @@ endWindow();
 		checkedmessages.each(function(message) {
 			var target = $('msg-' + message.key).down('img');
 			target.src = getstatesrc(0);
-			var comment = target.next('span');
-			comment.hide();
-			comment.down('textarea').value = "";
-			target.next('a').update('Comment');
+			if(hascomments) {
+				target = target.next('a');
+				target.update('Comment');
+			}
+			target = target.next('span');
+			target.hide();
+			target = target.down('textarea');
+			target.value = "";
+			target = target.next('span');
+			target.hide();
 			checkedmessages.unset(message.key);
 		});
 
@@ -420,22 +405,45 @@ endWindow();
 				var messages = checkedcache.get(category).get(contact.key)
 				if(messages != undefined) {
 					messages.each(function(msg) {
-						$('msg-' + msg.key).down('img').src = getstatesrc(2);
-						$('msg-' + msg.key).down('textarea').value = msg.value;
+						var target = $('msg-' + msg.key).down('img');
+						target.src = getstatesrc(2);
+						if(hascomments && msg.value != "") {
+							target = target.next('a');
+							target.update('Close');
+							target = target.next('span');
+							target.show();
+							target.down('textarea').value = msg.value;
+						}
 						checkedmessages.set(msg.key,2);
 					});
 				}
 			});
 			return;
 		}
+
+
+		var selectedmessages = new Hash();
+		var selectedcomments = new Hash();
+		var newcontct = false;
 		checkedcontacts.each(function(contact) {
 			var messages = checkedcache.get(category).get(contact.key)
 			if(messages != undefined) {
 				messages.each(function(msg) {
-					var count = selectedmessages.get(msg.key) | 0;
+					var count = selectedmessages.get(msg.key) || 0;
 					count++;
 					selectedmessages.set(msg.key,count);
+
+					var comment = selectedcomments.get(msg.key) || false;
+					
+					if((msg.value != "" && msg.value === comment) || (comment === false && count == 1)) {
+						selectedcomments.set(msg.key,msg.value);
+					} else if((comment !== false && msg.value !== comment) || (comment === false && count > 1)) {
+						selectedcomments.set(msg.key,true);
+					}
+					console.info(msg.value + "-" + comment + ":"+ selectedcomments.get(msg.key));
 				});
+			} else {
+				newcontct = true;
 			}
 		});
 
@@ -448,6 +456,22 @@ endWindow();
 				$('msg-' + message.key).down('img').src = getstatesrc(1);
 				checkedmessages.set(message.key,1);
 			}
+			if(hascomments) {
+				var comment = selectedcomments.get(message.key) || false;
+				var textarea = $('msg-' + message.key).down('textarea');
+				if(comment === false) {
+					textarea.value = "";
+				} else if(comment === true || newcontct == true ) {
+					textarea.value = "";
+					textarea.next('span').show();
+				} else {
+					textarea.value = comment;
+					var target = $('msg-' + message.key).down('a')
+					target.update('Close');
+					console.info("show");
+					target.next('span').show();
+				}
+			}
 		});
 	}
 	
@@ -458,11 +482,8 @@ endWindow();
 		new Ajax.Request('targetedmessage.php',
 		{
 			method:'post',
-			parameters: {classid: selected,cache: checkedcache.toJSON()},
+			parameters: {classid: selected},
 			onSuccess: function(transport){
-
-
-
 				var response = transport.responseJSON || "Class not available";
 				$('contactbox').update("");
 
@@ -483,7 +504,6 @@ endWindow();
 					categoryinfo.each(function(category) {
 						dom.insert('<img id="' + id + "-" + category.key + '"src="' + category.value.img + '" title="' + category.value.name + '" style="width:10px;display:none;" alt="" />');
 					});
-				//	dom.insert('<img id="i-' + id + '" src="' + h_image + '" style="display:none;width:10px;height:10px;vertical-align:middle;float:right" alt="" / ><br />')
 					dom.insert('<br />')
 
 					$('contactwrapper').insert(dom);
@@ -496,7 +516,6 @@ endWindow();
 							event.stop(); // Some browsers may open another winbdow on shift click
 							if(!event.shiftKey) {
 								checkedcontacts.each(function(contact) {
-									//$('c-' + contact.key).style.background = c_none;
 									$('c-' + contact.key).setStyle('font-weight:normal;');
 									$('i-c-' + contact.key).src = 'img/pixel.gif';
 									checkedcontacts.unset(contact.key);
@@ -504,16 +523,15 @@ endWindow();
 							}
 
 							// Select or deselect the itme depending on alt click. Unable to deselect if only one item is selected
-							if (event.shiftKey && this.previous().checked == true && checkedcontacts.size() > 1) {
-								checkedcontacts.unset(this.id.substr(2));
+							if (event.shiftKey && checkedcontacts.get(this.id.substr(2)) != undefined && checkedcontacts.size() > 1) {
+								this.setStyle('font-weight:normal;');
 								$('i-' + this.id).src = 'img/pixel.gif';
+								checkedcontacts.unset(this.id.substr(2));
 							} else {
-								//this.style.background = c_selected;
+								this.setStyle('font-weight:bold');
 								$('i-' + this.id).src = h_image;
-
 								checkedcontacts.set(this.id.substr(2),true);
 							}
-							$(this.id).setStyle('font-weight:bold');
 							// First click reveals the message board
 							if(revealmessages) {
 								revealmessages = false;
@@ -561,7 +579,8 @@ endWindow();
 				});
 				setcache(response.cache);
 			},
-			onFailure: function(){ alert('Could not get class') }
+			onFailure: function(){ alert('Could not get class') },
+			onException: function(){ alert('Could not get class') }
 		});
 	}
 
@@ -608,24 +627,12 @@ document.observe("dom:loaded", function() {
 
 			var htmlid = this.id;  // html id: message-category-mid
 			var msgid = this.id.substr(4);  // strip 'msg-'
-
 			var state = checkedmessages.get(msgid) || 0;
 			if(event.target.hasClassName('commentlink')) {
 				if(event.target.next('span').visible()){
 					event.target.update("Comment");
-					//event.target.next('textarea').stopObserving('keyup');
 				} else {
 					event.target.update("Close");
-					/*event.target.next('textarea').observe('keydown',function(e){
-						var keyunicode=e.charCode || e.keyCode;
-						if (keyunicode == 13) {
-							var target = e.element();
-							checkedcontacts.each(function(contact) {
-								setEvent(contact.key,target.up().id.substr(4),true,target.getValue());
-							});
-							e.stop();
-						}
-					});*/
 				}
 				event.target.next('span').toggle();
 				if(state == 2) {
@@ -635,17 +642,18 @@ document.observe("dom:loaded", function() {
 			// Don't modify anything if writing a comment'
 			if(!event.target.hasClassName('targetcomment')) {
 				state = (state == 2)? 0 : 2;
-				var text = ""; //event.target.down('textarea').getValue();
+				//var text = ""; //event.target.down('textarea').getValue();
 				// Save event to database
 				new Ajax.Request('targetedmessage.php',
 				{
 					method:'post',
 					parameters: {eventContacts: checkedcontacts.keys().toJSON(),
 								eventMessage: msgid,
-								isChecked:(state == 2),
-								eventComments:text},
+								isChecked:(state == 2)},
+					onFailure: function(){ alert('Unable to Set Message') },
+					onException: function(){ alert('Unable to Set Message') },
 					onSuccess: function(transport){
-						//console.info("updated contacts");
+						console.info("updated contacts " + transport);
 						$(htmlid).down('img').src = getstatesrc(state);
 						checkedmessages.set(msgid,state);                  // Set Message to appropriate state
 						// Set each selected contact to
@@ -662,7 +670,6 @@ document.observe("dom:loaded", function() {
 								$(htmlid).down('span').hide();
 								$(htmlid).down('a').update("Comment");
 							}
-
 							setEvent(contact.key,msgid,(state == 2),"");
 						});
 					}
