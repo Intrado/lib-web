@@ -108,12 +108,39 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 			$value = trimStaticValue($postdata['values']);
 			QuickUpdate("update person set ".$fieldmap->fieldnum."=? where importid is null and type='system'", false, array($value));
 		}
+		// get values and trim
 		$datavalues = explode("\n", $postdata['values']);
-		// if static list field, with single value
-		if ($fieldmap->isOptionEnabled('multisearch') && count($datavalues) === 1 && strpos($fieldmap->fieldnum, 'f') === 0) {
-			$value = trimStaticValue($datavalues[0]);
-			QuickUpdate("update person set ".$fieldmap->fieldnum."=? where importid is null and type='system'", false, array($value));
+		for ($i=0; $i<count($datavalues); $i++) {
+			$datavalues[$i] = trimStaticValue($datavalues[$i]);
 		}
+		$numvalues = count($datavalues);
+		// if static list Ffield
+		if ($fieldmap->isOptionEnabled('multisearch') && strpos($fieldmap->fieldnum, 'f') === 0) {
+			// single value, update all person subscribers with new value
+			if ($numvalues == 1) {
+				QuickUpdate("update person set ".$fieldmap->fieldnum."=? where importid is null and type='system'", false, array($datavalues[0]));
+			}
+			// no values, update all person subscribers with NULL
+			if ($numvalues == 0) {
+				QuickUpdate("update person set ".$fieldmap->fieldnum."=NULL where importid is null and type='system'");
+			}
+			// new values, update all person subscribers with invalid value to NULL
+			if ($numvalues > 1) {
+				$args = repeatWithSeparator("?", ",", $numvalues);
+				QuickUpdate("update person set ".$fieldmap->fieldnum."=NULL where importid is null and type='system' and ".$fieldmap->fieldnum." not in (".$args.")", false, $datavalues);
+			}
+		}
+		// Gfield, cleanup old values
+		if (strpos($fieldmap->fieldnum, 'g') === 0) {
+			$fn = substr($fieldmap->fieldnum, 1);
+			if ($numvalues == 0) {
+				QuickUpdate("delete from groupdata where fieldnum=? and importid=0", false, array($fn));
+			} else {
+				$args = repeatWithSeparator("?", ",", $numvalues);
+				QuickUpdate("delete from groupdata where fieldnum=".$fn." and importid=0 and value not in (".$args.")", false, $datavalues);
+			}
+		}
+
 
 		// NOTE subscriber static values and import person data values may share fields
 		// example, static values grade 8, 9, 10.  import values grade 10, 11, 12.  careful not to duplicate grade 10.
@@ -132,7 +159,6 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		$insertvalues = array();
 	
 		foreach ($datavalues as $value) {
-			$value = trimStaticValue($value);
 			if (strlen($value) == 0) continue; // skip blank lines
 			if (in_array($value, $importfieldvalues)) {
 				QuickUpdate("update persondatavalues set editlock=1 where fieldnum=? and value=?", false, array($fieldmap->fieldnum, $value));
