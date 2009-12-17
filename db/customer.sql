@@ -1563,3 +1563,43 @@ $$$
 
 ALTER TABLE `blockeddestination` ADD INDEX `methoddate` ( `blockmethod` , `createdate` )
 $$$
+
+CREATE TABLE `event` (
+	`id` INT NOT NULL AUTO_INCREMENT PRIMARY KEY ,
+	`userid` INT NOT NULL ,
+	`organizationid` INT NOT NULL ,
+	`sectionid` INT NULL ,
+	`targetedmessageid` INT NULL ,
+	`name` VARCHAR( 50 ) NOT NULL ,
+	`notes` TEXT NOT NULL ,
+	`occurence` DATETIME NOT NULL
+) ENGINE = InnoDB
+$$$
+
+ CREATE TABLE `alert` (
+	`id` INT NOT NULL AUTO_INCREMENT PRIMARY KEY ,
+	`eventid` INT NOT NULL ,
+	`personid` INT NOT NULL ,
+	`date` DATE NOT NULL ,
+	`time` TIME NOT NULL
+) ENGINE = InnoDB
+$$$
+
+CREATE TABLE IF NOT EXISTS `targetedmessage` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `messagekey` varchar(255) NOT NULL,
+  `targetedmessagecategoryid` int(11) NOT NULL,
+  `overridemessagegroupid` int(11) DEFAULT NULL,
+  PRIMARY KEY  (`id`)
+) ENGINE=InnoDB
+$$$
+
+CREATE TABLE IF NOT EXISTS `personassociation` (
+  `personid` int(11) NOT NULL,
+  `type` enum('organization','section','event') NOT NULL,
+  `organizationid` int(11) DEFAULT NULL,
+  `sectionid` int(11) DEFAULT NULL,
+  `eventid` int(11) DEFAULT NULL,
+  KEY `personid` (`personid`)
+) ENGINE=InnoDB
+$$$
