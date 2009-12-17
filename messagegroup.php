@@ -91,30 +91,48 @@ class ValCallMeMessage extends Validator {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-// Form Data
+// Custom Forms
 ////////////////////////////////////////////////////////////////////////////////
-$audioformdata = array(
-	"callme" => array(
-		"label" => _L('Voice Recording'),
-		"value" => "",
-		"validators" => array(
-			array("ValCallMeMessage"),
-			array("ValRequired")
-		),
-		"control" => array(
-			"CallMe",
-			"phone" => Phone::format($USER->phone),
-			"max" => getSystemSetting('easycallmax',10),
-			"min" => getSystemSetting('easycallmin',10)
-		),
-		"helpstep" => 1
-	)
-);
-$callmehelpsteps = array ();
-$callmehelpsteps[0] = _L('Enter a message name and a phone number. Then click the Call Me To Record button. You will be prompted to record a new audio message over the phone. Once you complete this process, click the Save button');
-$callmebuttons = array(submit_button(_L("Save"),"submit","tick"),icon_button(_L('Cancel'),"cross",null,"$origin.php"));
-$audioform = new Form("callme",$audioformdata,$callmehelpsteps,$callmebuttons);
-$audioform->ajaxsubmit = true;
+class AudioForm extends SwitchableForm {
+	function AudioForm() {
+		global $USER;
+		global $origin;
+
+		$audioformdata = array(
+			"callme" => array(
+				"label" => _L('Voice Recording'),
+				"value" => "",
+				"validators" => array(
+					array("ValCallMeMessage"),
+					array("ValRequired")
+				),
+				"control" => array(
+					"CallMe",
+					"phone" => Phone::format($USER->phone),
+					"max" => getSystemSetting('easycallmax',10),
+					"min" => getSystemSetting('easycallmin',10)
+				),
+				"helpstep" => 1
+			)
+		);
+		$callmehelpsteps = array ();
+		$callmehelpsteps[0] = _L('Enter a message name and a phone number. Then click the Call Me To Record button. You will be prompted to record a new audio message over the phone. Once you complete this process, click the Save button');
+		$callmebuttons = array(submit_button(_L("Save"),"submit","tick"),icon_button(_L('Cancel'),"cross",null,"$origin.php"));
+
+		parent::Form("audio",$audioformdata,$callmehelpsteps,$callmebuttons);
+		$this->ajaxsubmit = true;
+	}
+
+	// TODO: Make the correct authorization checks.
+	function authorized() {
+		global $USER;
+
+		return $USER->authorize("starteasy");
+	}
+
+	function save() {
+	}
+}
 
 
 
@@ -153,7 +171,7 @@ $formstructure = array(
 						'_layout' => 'accordion',
 						'audio' => array(
 							'_title' => 'Audio',
-							'audio' => $audioform
+							'_form' => new AudioForm()
 						),
 						'datafields' => array(
 							'_title' => 'Data Fields'
