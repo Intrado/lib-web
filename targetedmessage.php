@@ -26,37 +26,15 @@ if (!$USER->authorize('managesystem')) {
 ////////////////////////////////////////////////////////////////////////////////
 
 function repeatWithSeparator($str, $sep, $count) {
-	return implode(",",array_fill(0,$count,$str)); // TODO improve
-}
-
-// data Generating test date
-$classes = array();
-$classpeople = array();
-for($i=0;$i<=3;$i++) {
-	$period = $i + 1;
-	$classes[$i] = "History Class -- Period " . $period;
-	$classpeople[$i] = array(1 => "Ben Hencke", 2 => "Howard Wood",3 => "Gretel Baumgartner", 4 => "Kee-Yip Chan", 5 => "Nickolas Heckman");
-}
-
-$categoriesjson = "{1: {name:'Positive',img:'img/icons/award_star_gold_2.gif'},2: {name: 'Corrective',img: 'img/icons/lightning.gif'},3: {name:'Informational',img: 'img/icons/information.gif'}}";
-$categoriesimg = "{1: 'img/icons/award_star_gold_2.gif',2: 'img/icons/lightning.gif',3: 'img/icons/information.gif'}";
-
-$categories = array(1 => "Positive",2 => "Corrective",3 => "Informational");
-
-// category id => personid => messageid;
-$library = array(1 => array(),2 => array(),3 => array());
-$msgcount = 0;
-foreach($library as $title => $messages) {
-	for($i=0;$i<30;$i++) {
-		$library[$title][$msgcount] = $title . ' Generic targeted student message ' . $i . ' 012346789 01234567890 1234567890 123456789';
-		$msgcount++;
-	}
+	return implode($sep,array_fill(0,$count,$str)); // TODO improve
 }
 
 if (isset($_POST['eventContacts']) && isset($_POST['eventMessage']) && isset($_POST['isChecked'])) {
 	$contacts = json_decode($_POST['eventContacts']);
 	$message = $_POST['eventMessage'];
 	$comment = isset($_POST['eventComments'])?$_POST['eventComments']:"";
+
+	error_log("Comment " . $comment);
 	$ischecked = $_POST['isChecked'];
 	if($ischecked == "false") {
 		$args = array($USER->id,$message);
@@ -115,12 +93,73 @@ if (isset($_POST['eventContacts']) && isset($_POST['eventMessage']) && isset($_P
 	exit(0);
 }
 
+
+// data Generating test date
+$classes = array();
+$classpeople = array();
+$studentid = 1;
+
+for($i=0;$i<=3;$i++) {
+	$period = $i + 1;
+	$classes[$i] = "History Class -- Period " . $period;
+	$classpeople[$i] = array();
+	for($j=0;$j<30;$j++) {
+		$classpeople[$i][$studentid] = "Student $studentid";
+		$studentid++;
+	}
+	//$classpeople[$i] = array(1 => "Ben Hencke", 2 => "Howard Wood",3 => "Gretel Baumgartner", 4 => "Kee-Yip Chan", 5 => "Nickolas Heckman");
+}
+
+$categoriesjson = "{0: {name:'Positive',img:'img/icons/award_star_gold_2.gif'},1: {name: 'Corrective',img: 'img/icons/lightning.gif'},2: {name:'Informational',img: 'img/icons/information.gif'}}";
+$categoriesimg = "{0: 'img/icons/award_star_gold_2.gif',1: 'img/icons/lightning.gif',2: 'img/icons/information.gif'}";
+
+$categories = array(0 => "Positive",1 => "Corrective",2 => "Informational");
+
+
+// If no targeted messages exist fill the targeted message library with phony test data
+if(QuickQuery("select count(id) from targetedmessage") === 0) {
+	error_log("Generating Test Data: Creating Targeted Messages");
+	$batchvalues = array();
+	// three categories
+	for($i=0;$i<3;$i++) {
+		// 30 messages per category
+		for($j=0;$j<30;$j++) {
+			$batchvalues[] = "('$i Generic targeted student message $j 012346789 01234567890 1234567890 123456789',$i)";
+		}
+	}
+	$sql = "INSERT INTO targetedmessage (messagekey,targetedmessagecategoryid) VALUES ";
+	$sql .= implode(",",$batchvalues);
+	QuickUpdate($sql);
+}
+
+// category id => personid => messageid;
+$library = array();
+foreach($categories as $id => $name) {
+	$library[$id] = QuickQueryList("select id,messagekey from targetedmessage where targetedmessagecategoryid = ?",true,false,array($id));
+}
+
 //Handle ajax request. when swithcing sections
 if (isset($_POST['classid'])) {
 	header('Content-Type: application/json');
 	$id = $_POST['classid'] + 0;
+
+
+
 	if(isset($classpeople[$id])){
-		echo json_encode($classpeople[$id]);
+		$contactids = array_keys($classpeople[$id]);
+
+		$contactmessages = false;
+		if(count($contactids) > 0) {
+			$query = "select tm.targetedmessagecategoryid, pa.personid, e.targetedmessageid, e.notes from
+					 personassociation pa left join event e on (pa.eventid = e.id)
+					 left join targetedmessage tm on (e.targetedmessageid = tm.id)
+					 where e.targetedmessageid is not null and e.userid = ? and Date(e.occurence) = CURDATE() and pa.personid in (" . implode(",",$contactids) . ")";
+			$contactmessages = QuickQueryMultiRow($query,false,false,array($USER->id));
+		}
+
+		$response->people = $classpeople[$id];
+		$response->cache = $contactmessages;
+		echo json_encode($response);
 	}
 
 	if(isset($_POST['cache'])) {
@@ -213,7 +252,10 @@ startWindow(_L('Classroom Message'));
 					echo "<div id='lib-$categoryid' style='display:block;'>";
 					foreach($messages as $messageid => $message) {
 						echo '<div id="msg-' . $messageid.'" class="targetmessage" style="position:relative;border:solid 1px silver;background-color:#FFF;width:300px;float:left;margin:4px;padding:0px;"><img src="img/checkbox-clear.png" alt="" style="position:absolute;top:10px;left:3px;"/><div style="position:relative;top:5px;left:25px;width:270px">' . $message .  ' </div><a href="#" class="commentlink" style="position:relative;float:right;">Comment </a>
-							<textarea class="targetcomment" style="display:none;position:relative;clear:both;width:94%;left:2%;height:60px;border:1px solid red;background:white;"></textarea>
+							<span class="targetcomment" style="display:none;">
+								<textarea class="targetcomment" style="position:relative;clear:both;width:94%;left:2%;height:60px;"></textarea>
+								<a class="targetcomment" href="#" onclick="saveComment(\''. $messageid.'\');false;">Save</a>
+							</span>
 						</div>';
 					}
 					echo '<div style="clear:both;"></div></div>';
@@ -273,7 +315,26 @@ endWindow();
 
 	function clearcache() {
 		checkedcache.each(function(category) {
-			checkedcache.set(category.value,new Hash());
+			checkedcache.set(category.key,new Hash());
+		});
+		checkedcontacts = new Hash();
+	}
+
+	function setcache(cache) {
+		cache.each(function(event) {
+			var people = checkedcache.get(event[0]);
+			var contactid = event[1];
+
+			if(people.get(contactid) == undefined)
+				people.set(contactid,new Hash());
+			var contactlink = people.get(contactid);
+
+			var img = $('c-' + contactid + '-' + event[0]);
+			if(img != undefined) {
+
+				img.show();
+			}
+			contactlink.set(event[2],event[3]);
 		});
 	}
 	/*
@@ -292,7 +353,7 @@ endWindow();
 		var contactlink = people.get(contactid);
 		if(isChecked) {
 
-			var img = $('c-' + contactid + category);
+			var img = $('c-' + contactid + '-' + category);
 			if(img != undefined) {
 				img.show();
 			}
@@ -300,13 +361,35 @@ endWindow();
 		} else {
 			contactlink.unset(messageid);
 			if(contactlink.size() == 0) {
-				var img = $('c-' + contactid + category);
+				var img = $('c-' + contactid + '-' + category);
 				if(img != undefined) {
 					img.hide();
 				}
+				people.unset(contactid);
 			}
 		}
+
 	}
+	 function saveComment(id) {
+
+		var text = $('msg-' + id).down('textarea').getValue();
+		// Save event to database
+		new Ajax.Request('targetedmessage.php',
+		{
+			method:'post',
+			parameters: {eventContacts: checkedcontacts.keys().toJSON(),
+						eventMessage: id,
+						isChecked: true,
+						eventComments:text},
+			onSuccess: function(transport){
+				checkedcontacts.each(function(contact) {
+					setEvent(contact.key,id,true,text);
+				});
+			}
+		});
+	 }
+
+
 
 	// has link in this section only
 	function haslink(contact,message) {
@@ -320,6 +403,31 @@ endWindow();
 		var selectedmessages = new Hash();
 		var category = currenttab.substr(4);
 		// Get all contact-message links from cache
+
+		// Reset all previous message selections
+		checkedmessages.each(function(message) {
+			var target = $('msg-' + message.key).down('img');
+			target.src = getstatesrc(0);
+			var comment = target.next('span');
+			comment.hide();
+			comment.down('textarea').value = "";
+			target.next('a').update('Comment');
+			checkedmessages.unset(message.key);
+		});
+
+		if(contactsize == 1) {
+			checkedcontacts.each(function(contact) {
+				var messages = checkedcache.get(category).get(contact.key)
+				if(messages != undefined) {
+					messages.each(function(msg) {
+						$('msg-' + msg.key).down('img').src = getstatesrc(2);
+						$('msg-' + msg.key).down('textarea').value = msg.value;
+						checkedmessages.set(msg.key,2);
+					});
+				}
+			});
+			return;
+		}
 		checkedcontacts.each(function(contact) {
 			var messages = checkedcache.get(category).get(contact.key)
 			if(messages != undefined) {
@@ -329,17 +437,6 @@ endWindow();
 					selectedmessages.set(msg.key,count);
 				});
 			}
-		});
-
-
-		// Reset all previous message selections
-		checkedmessages.each(function(message) {
-			var target = $('msg-' + message.key).down('img');
-			target.src = getstatesrc(0);
-			target.next('textarea').value = "";
-			target.next('textarea').hide();
-			target.next('a').update('Comment');
-			checkedmessages.unset(message.key);
 		});
 
 		// Set all contact-message link boxes
@@ -363,6 +460,9 @@ endWindow();
 			method:'post',
 			parameters: {classid: selected,cache: checkedcache.toJSON()},
 			onSuccess: function(transport){
+
+
+
 				var response = transport.responseJSON || "Class not available";
 				$('contactbox').update("");
 
@@ -370,18 +470,18 @@ endWindow();
 				$('tabsContainer').hide();
 				clearcache();
 
-				revealmessages = true;
-				checkedcontacts = new Hash();
 
-				for(var person in response){
-					var id = 'c-' + person;
+				revealmessages = true;
+
+				$H(response.people).each(function(person) {
+					var id = 'c-' + person.key;
 
 					var dom = $('contactbox').remove();
 
 					dom.insert('<img id="i-' + id + '" src="img/pixel.gif" style="width:10px;;height:10px;vertical-align:middle;" alt="" / >')
-					dom.insert('<a href="#" id="' + id + '" title="' + person + '" style="text-decoration:none;">' + response[person] +'</a>');
+					dom.insert('<a href="#" id="' + id + '" title="' +  person.key + '" style="text-decoration:none;">' + person.value +'</a>');
 					categoryinfo.each(function(category) {
-						dom.insert('<img id="' + id + category.key + '"src="' + category.value.img + '" title="' + category.value.name + '" style="width:10px;display:none;" alt="" />');
+						dom.insert('<img id="' + id + "-" + category.key + '"src="' + category.value.img + '" title="' + category.value.name + '" style="width:10px;display:none;" alt="" />');
 					});
 				//	dom.insert('<img id="i-' + id + '" src="' + h_image + '" style="display:none;width:10px;height:10px;vertical-align:middle;float:right" alt="" / ><br />')
 					dom.insert('<br />')
@@ -458,7 +558,8 @@ endWindow();
 							tabs.sections['lib-' + category.key].titleDiv.style.background = '';
 						});
 					});
-				}
+				});
+				setcache(response.cache);
 			},
 			onFailure: function(){ alert('Could not get class') }
 		});
@@ -483,7 +584,9 @@ document.observe("dom:loaded", function() {
 	$('checkall').observe('click', function(event) {
 		event.stop();
 		$$('#contactbox a').each(function(contact) {
-			contact.style.background = "#ffcccc";
+			//contact.style.background = "#ffcccc";
+			contact.setStyle('font-weight:bold');
+			$('i-' + contact.id).src = h_image;
 			checkedcontacts.set(contact.id.substr(2),true);
 		});
 		if(revealmessages) {
@@ -508,12 +611,12 @@ document.observe("dom:loaded", function() {
 
 			var state = checkedmessages.get(msgid) || 0;
 			if(event.target.hasClassName('commentlink')) {
-				if(event.target.next('textarea').visible()){
+				if(event.target.next('span').visible()){
 					event.target.update("Comment");
-					event.target.next('textarea').stopObserving('keyup');
+					//event.target.next('textarea').stopObserving('keyup');
 				} else {
 					event.target.update("Close");
-					event.target.next('textarea').observe('keydown',function(e){
+					/*event.target.next('textarea').observe('keydown',function(e){
 						var keyunicode=e.charCode || e.keyCode;
 						if (keyunicode == 13) {
 							var target = e.element();
@@ -522,9 +625,9 @@ document.observe("dom:loaded", function() {
 							});
 							e.stop();
 						}
-					});
+					});*/
 				}
-				event.target.next('textarea').toggle();
+				event.target.next('span').toggle();
 				if(state == 2) {
 					return;
 				}
@@ -532,35 +635,36 @@ document.observe("dom:loaded", function() {
 			// Don't modify anything if writing a comment'
 			if(!event.target.hasClassName('targetcomment')) {
 				state = (state == 2)? 0 : 2;
-				$(htmlid).down('img').src = getstatesrc(state);
-				checkedmessages.set(msgid,state);                  // Set Message to appropriate state
-				// Set each selected contact to
-				checkedcontacts.each(function(contact) {
-					if(state == 2) {
-						highlightedcontacts.set('c-' + contact.key,true);
-						//$('i-c-' + contact.key).src = h_image;
-						$('c-' + contact.key).style.background =  c_hover;
-					} else {
-						highlightedcontacts.unset('c-' + contact.key);
-						//$('i-c-' + contact.key).src = 'img/pixel.gif';
-						$('c-' + contact.key).style.background =  c_none;
-
-						$(htmlid).down('textarea').hide();
-						$(htmlid).down('a').update("Comment");
-					}
-
-					setEvent(contact.key,msgid,(state == 2),"");
-				});
-
-
-
+				var text = ""; //event.target.down('textarea').getValue();
 				// Save event to database
 				new Ajax.Request('targetedmessage.php',
 				{
 					method:'post',
-					parameters: {eventContacts: checkedcontacts.keys().toJSON(),eventMessage: msgid,isChecked:(state == 2)},
+					parameters: {eventContacts: checkedcontacts.keys().toJSON(),
+								eventMessage: msgid,
+								isChecked:(state == 2),
+								eventComments:text},
 					onSuccess: function(transport){
 						//console.info("updated contacts");
+						$(htmlid).down('img').src = getstatesrc(state);
+						checkedmessages.set(msgid,state);                  // Set Message to appropriate state
+						// Set each selected contact to
+						checkedcontacts.each(function(contact) {
+							if(state == 2) {
+								highlightedcontacts.set('c-' + contact.key,true);
+								//$('i-c-' + contact.key).src = h_image;
+								$('c-' + contact.key).style.background =  c_hover;
+							} else {
+								highlightedcontacts.unset('c-' + contact.key);
+								//$('i-c-' + contact.key).src = 'img/pixel.gif';
+								$('c-' + contact.key).style.background =  c_none;
+
+								$(htmlid).down('span').hide();
+								$(htmlid).down('a').update("Comment");
+							}
+
+							setEvent(contact.key,msgid,(state == 2),"");
+						});
 					}
 				});
 			}
@@ -579,6 +683,7 @@ document.observe("dom:loaded", function() {
 					highlightedcontacts.set('c-' + contact.key,true);
 				}
 			});
+
 		});
 
 		message.observe('mouseout', function(event) {
