@@ -137,6 +137,10 @@ class Form {
 		$lasthelpstep = false;
 		$str = '';
 		foreach ($this->formdata as $name => $itemdata) {
+			$showicon = (isset($itemdata['renderoptions']) && isset($itemdata['renderoptions']['icon'])) ? $itemdata['renderoptions']['icon'] : true;
+			$showlabel = (isset($itemdata['renderoptions']) && isset($itemdata['renderoptions']['label'])) ? $itemdata['renderoptions']['label'] : true;
+			$showerrormessage = (isset($itemdata['renderoptions']) && isset($itemdata['renderoptions']['errormessage'])) ? $itemdata['renderoptions']['errormessage'] : true;
+
 			//check for section titles
 			if (is_string($itemdata)) {
 				if ($lasthelpstep) {
@@ -184,7 +188,11 @@ class Form {
 
 			if ($formclass == "FormHtml") {
 				$str.= '
-				<tr><th class="formtableheader"><label class="formlabel" for="'.$n.'" >'.$l.'</label></th><td class="formtableicon"></td><td class="formtablecontrol">'.$item->render('').'</td></tr>
+				<tr>
+					' . ($showlabel ? '<th class="formtableheader"><label class="formlabel" for="'.$n.'" >'.$l.'</label></th>' : '') . '
+					' . ($showicon ? '<td class="formtableicon"></td>' : '') . '
+					<td class="formtablecontrol">'.$item->render('').'</td>
+				</tr>
 				';
 				unset($this->formdata[$name]); //hide these from showing up in data sent to form_load
 			} else {
@@ -230,11 +238,11 @@ class Form {
 
 				$str.= '
 				<tr id="'.$n.'_fieldarea" '.$style.'>
-					<th class="formtableheader"><label class="formlabel" for="'.$n.'" tabindex="'.$t.'" >'.$l.'</label></th>
-					<td class="formtableicon"><img alt="'.$alt.'" title="'.$alt.'" id="'.$n.'_icon" src="'.$i.'" /></td>
+					'.($showlabel ? '<th class="formtableheader"><label class="formlabel" for="'.$n.'" tabindex="'.$t.'" >'.$l.'</label></th>' : '').'
+					'.($showicon ? '<td class="formtableicon"><img alt="'.$alt.'" title="'.$alt.'" id="'.$n.'_icon" src="'.$i.'" /></td>' : '').'
 					<td class="formtablecontrol">
 						'.$item->render($value).'
-						<div id="'.$n.'_msg" class="underneathmsg">'.($msg ? $msg : "").'</div>
+						'.($showerrormessage ? '<div id="'.$n.'_msg" class="underneathmsg">'.($msg ? $msg : "").'</div>' : '').'
 					</td>
 				</tr>
 				';
