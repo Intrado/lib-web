@@ -35,15 +35,7 @@ disableAutoTranslate=false
 ;/*CSDELETEMARKER_START*/
 
 [txtreply]
-; 3ci
-txt_username=
-txt_password=
-; air2web
-txt_air2username=
-txt_air2password=
-; logs
-txt_logfile="/usr/commsuite/logs/txtreply.log"
-txt_throttlefile="/tmp/txtreply_sourceday.dat"
+txt_datfile="/usr/commsuite/cache/txtreply.dat"
 
 ;/*CSDELETEMARKER_END*/
 
