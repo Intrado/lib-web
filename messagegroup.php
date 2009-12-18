@@ -15,6 +15,7 @@ require_once("obj/Message.obj.php");
 require_once("obj/AudioFile.obj.php");
 require_once("obj/ValDuplicateNameCheck.val.php");
 require_once("obj/FormSwitcher.obj.php");
+require_once("obj/MessageGroup.obj.php");
 
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization
@@ -94,17 +95,17 @@ class ValCallMeMessage extends Validator {
 // Custom Forms
 ////////////////////////////////////////////////////////////////////////////////
 class AudioForm extends SwitchableForm {
-	function AudioForm() {
+	function AudioForm($formname, $messageGroup) {
 		global $USER;
-		global $origin;
 
-		$audioformdata = array(
+		$this->messageGroup = $messageGroup;
+
+		$formdata = array(
 			"callme" => array(
 				"label" => _L('Voice Recording'),
 				"value" => "",
 				"validators" => array(
-					array("ValCallMeMessage"),
-					array("ValRequired")
+					array("ValCallMeMessage")
 				),
 				"control" => array(
 					"CallMe",
@@ -112,15 +113,15 @@ class AudioForm extends SwitchableForm {
 					"max" => getSystemSetting('easycallmax',10),
 					"min" => getSystemSetting('easycallmin',10)
 				),
+				"renderoptions" => array(
+					"icon" => false,
+					"label" => false,
+					"errormessage" => true
+				),
 				"helpstep" => 1
 			)
 		);
-		$callmehelpsteps = array ();
-		$callmehelpsteps[0] = _L('Enter a message name and a phone number. Then click the Call Me To Record button. You will be prompted to record a new audio message over the phone. Once you complete this process, click the Save button');
-		$callmebuttons = array(submit_button(_L("Save"),"submit","tick"),icon_button(_L('Cancel'),"cross",null,"$origin.php"));
-
-		parent::Form("audio",$audioformdata,$callmehelpsteps,$callmebuttons);
-		$this->ajaxsubmit = true;
+		parent::SwitchableForm($formname,$formdata);
 	}
 
 	// TODO: Make the correct authorization checks.
@@ -134,30 +135,49 @@ class AudioForm extends SwitchableForm {
 	}
 }
 
+class MessageGroupBasicsForm extends SwitchableForm {
+	var $messageGroup;
 
+	function MessageGroupBasicsForm($formname, $messageGroup) {
+		$this->messageGroup = $messageGroup;
 
+		$formdata = array();
 
-/*
-$messagegroupbasicsformdata = array();
-$messagegroupbasicsformdata['emailsubject'] = array(
-	'control' => array('TextField'),
-	'validators' => array('ValRequired'),
-	'renderoptions' => array()
-);
-$messagegroupbasicsform = new Form('messagegroupbasicsform', $messagegroupbasicsformdata);
+		$formdata['name'] = array(
+			"label" => _L('Message Group Name'),
+			"value" => $this->messageGroup->name,
+			"validators" => array(
+				array("ValRequired","ValLength","min" => 3,"max" => 50)
+			),
+			"control" => array("TextField","size" => 30, "maxlength" => 51),
+			"helpstep" => 1
+		);
 
-$emailformdata = array();
-$emailformdata['emailsubject'] = array(
-	'control' => array('TextField'),
-	'validators' => array('ValRequired'),
-	'renderoptions' => array()
-);
-$emailform = new Form('emailform', $emailformdata);
-*/
+		$formdata['description'] = array(
+			"label" => _L('Message Group Description'),
+			"value" => $this->messageGroup->description,
+			"validators" => array(),
+			"control" => array("TextField","size" => 30, "maxlength" => 51),
+			"helpstep" => 1
+		);
+
+		parent::SwitchableForm($formname,$formdata);
+	}
+
+	// TODO: Make the correct authorization checks.
+	function authorized() {
+		global $USER;
+	}
+
+	function save() {
+	}
+}
+
+$messageGroup = new MessageGroup();
 
 $formstructure = array(
-	'messagegroupbasics' => '',
-	'layers' => array(
+	'_form' => new MessageGroupBasicsForm('messagegroupbasics', $messageGroup),
+	'destinations' => array(
 		'_layout' => 'horizontaltabs',
 		'phone' => array(
 			'_title' => 'Phone',
@@ -165,13 +185,15 @@ $formstructure = array(
 				'_layout' => 'verticaltabs',
 				'en' => array(
 					'_title' => 'English',
+					'_icon' => 'img/icons/diagona/16/160.gif',
 					'_layout' => 'verticalsplit',
 					'messagebody' => 'TESTESTES',
 					'tools' => array(
 						'_layout' => 'accordion',
 						'audio' => array(
 							'_title' => 'Audio',
-							'_form' => new AudioForm()
+							'_form' => new AudioForm('phoneenvoiceaudio', $messageGroup),
+							'_parentformname' => 'messagegroupbasics'
 						),
 						'datafields' => array(
 							'_title' => 'Data Fields'

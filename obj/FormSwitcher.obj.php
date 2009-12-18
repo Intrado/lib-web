@@ -1,6 +1,12 @@
 <?php
 
 abstract class SwitchableForm extends Form {
+	function SwitchableForm($formname, $formdata) {
+		// TODO: QUESTION, can buttons and help be null?
+		parent::Form($formname, $formdata, null, array());
+		$this->ajaxsubmit = true;
+	}
+
 	// Returns boolean; true if the user has the correct privileges.
 	abstract function authorized();
 
@@ -57,6 +63,12 @@ class FormSwitcher {
 	}
 
 	function handleRequest() {
+		if (!empty($_POST)) {
+			header('Content-Type: application/json');
+
+			exit(); // TODO: implement saving in here?
+			//exit(json_encode($this->save()));
+		}
 	}
 
 	function validate() {
@@ -67,7 +79,11 @@ class FormSwitcher {
 	// This function recurses along $currentform's treebranch, starting with the current form, working its way up to the top-most parent form.
 	// Each form's validate() method is invoked.
 	function _validate($currentform) {
-		$errorsmap = array($currentform->name => $currentform->validate());
+		$errorsmap = array();
+
+		$formerrors = $currentform->validate();
+		if ($errorsmap)
+			$errorsmap = array($currentform->name => $formerrors);
 
 		if ($this->getParentForm($currentform->name))
 			$errorsmap = array_merge($errorsmap, $this->_validate($this->getParentForm($currentform->name)));
@@ -75,8 +91,25 @@ class FormSwitcher {
 		return $errorsmap;
 	}
 
+	// Returns an error indicating success or fail, understandable by the ajax handler in form.js.php's form_handle_submit().
 	function save() {
-		$this->_save($this->currentform);
+		$result = array();
+
+		$errorsmap = $this->validate();
+
+		// Must make sure all validators are successful before even trying to save data.
+		if (!empty($errorsmap)) {
+			$result['status'] = 'fail';
+			$result['validationerrors'] = $errorsmap;
+		} else {
+			$result['status'] = $this->_save($this->currentform) ? 'success' : 'fail';
+
+			if ($result['status'] == 'fail') {
+				// TODO: add more detail to the result.
+			}
+		}
+
+		return $result;
 	}
 
 	// This function recurses along $currentform's treebranch, starting with the top-most parent, working its way back down to $currentform.
@@ -88,11 +121,7 @@ class FormSwitcher {
 			return false;
 
 		// FAILURE.
-		} else if (($errors = $currentform->validate()) || !$currentform->save()) {
-
-			if ($errors) {
-				// TODO: handle error messages.
-			}
+		} else if (!$currentform->save()) {
 
 			return false;
 
@@ -108,10 +137,10 @@ class FormSwitcher {
 		$html = "<div id='{$this->name}'>" . $this->renderFormStructure($this->formstructure, null, '') . "</div>";
 		$html .= "<script type='text/javascript'>
 			(function() {
-				var formswitcherid = '{$this->name}';
+				var formswitchercontainer = $('{$this->name}');
 
-				var load_layout = function(formswitcherid, classname) {
-					$$('#' + formswitcherid + ' .' + classname).each(function(container, classname) {
+				var load_layout = function(formswitchercontainer, classname) {
+					formswitchercontainer.select('.' + classname).each(function(container, classname) {
 						var kids = container.childElements();
 
 						var layoutsections = kids.findAll(function(kid) {
@@ -128,15 +157,23 @@ class FormSwitcher {
 								layout = new Accordion(container);
 
 							layoutsections.each(function (layoutsection) {
-								this.add_section(layoutsection.identify());
-								this.update_section(layoutsection.identify(), {
-									'title': layoutsection.down('span.FormSwitcherLayoutSectionTitle'),
-									'icon': 'img/icons/diagona/16/160.gif',
+								var kids = layoutsection.childElements();
+								//var newformcontainer = kids.find(function (el) { return el.match('.newform_container'); });
+								//var sectionname =  newformcontainer ? newformcontainer.down('form').identify() : layoutsection.identify();
+								var form = layoutsection.down('form'); // Finds the first descendent form.
+								var sectionname =  form ? form.identify() : layoutsection.identify();
+								var titlespan = kids.find(function (el) { return el.match('.FormSwitcherLayoutSectionTitle'); });
+								var iconimg = kids.find(function (el) { return el.match('.FormSwitcherLayoutSectionIcon'); });
+
+								this.add_section(sectionname);
+								this.update_section(sectionname, {
+									'title': titlespan,
+									'icon': iconimg ? iconimg.src : '',
 									'content': layoutsection
 								});
 
 								if (!this.firstSection)
-									this.firstSection = layoutsection.identify();
+									this.firstSection = sectionname;
 
 							}.bindAsEventListener(layout));
 
@@ -155,10 +192,43 @@ class FormSwitcher {
 					}.bindAsEventListener(this, classname));
 				};
 
-				load_layout(formswitcherid, 'horizontaltabs');
-				load_layout(formswitcherid, 'verticaltabs');
-				load_layout(formswitcherid, 'accordion');
-				load_layout(formswitcherid, 'verticalsplit');
+				load_layout(formswitchercontainer, 'horizontaltabs');
+				load_layout(formswitchercontainer, 'verticaltabs');
+				load_layout(formswitchercontainer, 'accordion');
+				load_layout(formswitchercontainer, 'verticalsplit');
+
+				var on_click_tab = function(event) {
+					var save_form = function(event, target) {
+						if (!target || !target.match('form'))
+							return;
+
+
+						event.stop();
+
+						target.stopObserving('AjaxForm:SubmitSuccess');
+
+						target.observe('AjaxForm:SubmitSuccess', function(formevent, widgetevent) {
+							if (widgetevent.memo.action == 'collapse')
+								this.collapse_all();
+							else
+								this.show_section(widgetevent.memo.section);
+						}.bindAsEventListener(event.memo.widget, event));
+
+						prepare_form_submit(target, 'submit');
+						form_handle_submit(target, null);
+					};
+
+					var load_form = function(event, target) {
+						if (!target || !target.match('form'))
+							return;
+
+					};
+
+					save_form(event, $(event.memo.currentSection));
+					load_form(event, $(event.memo.section));
+				};
+				formswitchercontainer.observe('Accordion:ClickTitle', on_click_tab);
+				formswitchercontainer.observe('Tabs:ClickTitle', on_click_tab);
 			})();
 		</script>";
 
@@ -170,14 +240,17 @@ class FormSwitcher {
 
 		if (!empty($formstructure['_layout'])) {
 			$layout = $formstructure['_layout'];
-			$html .= "<div id='$fullkey' class='$layout FormSwitcherLayoutSection' style='padding:4px'>";
+			$html .= "<div class='$layout FormSwitcherLayoutSection' style='padding:4px'>";
 		} else {
-			$html .= "<div id='$fullkey' class='FormSwitcherLayoutSection' style='padding:4px'>";
+			$html .= "<div class='FormSwitcherLayoutSection' style='padding:4px'>";
 		}
 
 		if (!empty($formstructure['_title'])) {
-			$title = $formstructure['_title'];
-			$html .= "<span class='FormSwitcherLayoutSectionTitle'>$title</span>";
+			$html .= "<span class='FormSwitcherLayoutSectionTitle'>{$formstructure['_title']}</span>";
+		}
+
+		if (!empty($formstructure['_icon'])) {
+			$html .= "<img class='FormSwitcherLayoutSectionIcon' style='display:none' src='{$formstructure['_icon']}'/>";
 		}
 
 		foreach ($formstructure as $key => $value) {
@@ -193,7 +266,7 @@ class FormSwitcher {
 				continue;
 			} else { // Arbitrary HTML.
 
-				$html .= "<div id='{$fullkey}{$key}' class='FormSwitcherLayoutSection' style='padding:4px'>$value</div>";
+				$html .= "<div class='FormSwitcherLayoutSection' style='padding:4px'>$value</div>";
 
 			}
 		}
@@ -201,5 +274,4 @@ class FormSwitcher {
 		return $html . "</div>";
 	}
 }
-
 ?>
