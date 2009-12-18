@@ -18,8 +18,7 @@ if (!$is3ci && !isset($_POST['message'])) {
 $SETTINGS = parse_ini_file("inc/settings.ini.php",true);
 
 // log files
-$tmpdir = isset($SETTINGS['feature']['tmp_dir']) ? $SETTINGS['feature']['tmp_dir'] : "/tmp";
-$tmplogfile = $tmpdir . "/txtreply.log";
+$tmplogfile = isset($SETTINGS['txtreply']['txt_datfile']) ? $SETTINGS['txtreply']['txt_datfile'] : "/usr/commsuite/cache/txtreply.dat";
 //----------------------------------------------------------------------
 
 
