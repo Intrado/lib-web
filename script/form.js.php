@@ -488,24 +488,27 @@ function form_submit (event, value) {
 	var formvars = document.formvars[form.name];
 	var e = event.element();
 
+	prepare_form_submit(form, value || e.value);
+	form_handle_submit(form,event);
+}
+
+// For documentation, see form_submit().
+function prepare_form_submit (form, value) {
 	var submit = document.createElement('input');
 	submit.setAttribute('name','submit');
-	submit.value = value || e.value;
+	submit.value = value;
 	submit.setAttribute('type','hidden');
 	form.appendChild(submit);
-
-	form_handle_submit(form,event);
 }
 
 function form_handle_submit(form,event) {
 	form = $(form);
 	var formvars = document.formvars[form.name];
-
 	//only continue here if we are going to override the default submit behavior
 	if (!formvars.ajaxsubmit)
 		return;
-
-	Event.stop(event); //we'll take it from here with ajax
+	if (event)
+		Event.stop(event); //we'll take it from here with ajax
 
 	//don't allow more than one submit at a time
 	if (formvars.submitting)
@@ -564,6 +567,7 @@ function form_handle_submit(form,event) {
 					window.location=formvars.scriptname;
 				}
 			} else if ("success" == res.status) {
+				form.fire('AjaxForm:SubmitSuccess');
 				if (res.nexturl)
 					window.location=res.nexturl;
 			} else if ("modify" == res.status) {
