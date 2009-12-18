@@ -481,29 +481,27 @@ function form_disable_helper(event) {
 //used for submit buttons onclick, because we override default submit behavior, we need to
 //insert something to mark which submit button was pressed.
 //ie is retarded, and will actually put the button's html contents as the value, so we need another arg for that
-function form_submit (event, value) {
-	event = Event.extend(event);
-
-	var form = event.findElement("form");
+//NOTICE: there are 2 param usage patterns, either specify the event and value, or value and form.
+function form_submit (event, value, form) {
+	if (!form) {
+		event = Event.extend(event);
+		form = event.findElement("form");
+	}
 	var formvars = document.formvars[form.name];
-	var e = event.element();
 
-	prepare_form_submit(form, value || e.value);
-	form_handle_submit(form,event);
-}
-
-// For documentation, see form_submit().
-function prepare_form_submit (form, value) {
 	var submit = document.createElement('input');
 	submit.setAttribute('name','submit');
 	submit.value = value;
 	submit.setAttribute('type','hidden');
 	form.appendChild(submit);
+
+	form_handle_submit(form,event);
 }
 
 function form_handle_submit(form,event) {
 	form = $(form);
 	var formvars = document.formvars[form.name];
+
 	//only continue here if we are going to override the default submit behavior
 	if (!formvars.ajaxsubmit)
 		return;
