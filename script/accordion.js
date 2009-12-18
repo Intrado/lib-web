@@ -27,7 +27,7 @@ function make_split_pane(vertical, count) {
  * @author Kee-Yip Chan
  */
 // Custom Events:
-// container.fire("Accordion:ClickTitle", {section}), if the event is not stopped then show the chosen section.
+// container.fire("Accordion:ClickTitle", {section, currentSection}), if the event is not stopped then show the chosen section.
 var Accordion = Class.create({
 	// @param settings {hideDuration:0.3, showDuration:0.3}
 	initialize: function(container, settings) {
@@ -81,6 +81,9 @@ var Accordion = Class.create({
 		this.currentSection = name;
 	},
 	fire_event: function(action, data) {
+		data.currentSection = this.currentSection;
+		data.widget = this;
+
 		var handledEvent = this.container.fire(this.firePrefix+action, data);
 		if (action == 'ClickTitle' && !this.settings.collapseCurrentSection && data.section == this.currentSection) {
 			handledEvent.stop();
@@ -217,7 +220,7 @@ var AccordionSection = Class.create({
 		if (this.locked)
 			return;
 
-		if (this.widget.fire_event('ClickTitle', {section:this.name}).stopped)
+		if (this.widget.fire_event('ClickTitle', {section:this.name, action: (this.contentDiv.visible() && this.widget.settings.collapseCurrentSection) ? 'collapse' : 'expand'}).stopped)
 			return;
 
 		if (this.widget.currentSection != this.name)
