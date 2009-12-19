@@ -112,7 +112,7 @@ if ($badcode) {
 		<script language="JavaScript" type="text/javascript">
 	 		embedPlayer("messagelink_preview.wav.php/embed_preview.wav?jobcode=<?=$code?>","player");
 		</script>
-		<br><a href="messagelink_preview.wav.php/message.wav?jobcode=<?=$code?>">Click Here</a>
+		<br><a href="messagelink_preview.wav.php/message.wav?jobcode=<?=$code?>">Click here to download</a>
 	</div>
 <?
 }
