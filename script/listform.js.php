@@ -157,8 +157,6 @@ function listform_load(listformID, formData, postURL) {
 		});
 	});
 
-	// allListsWindow: Grand Total
-	listformVars.totals = {};
 
 	accordion.container.observe('Accordion:ClickTitle', function(event) {
 		Tips.hideAll();
@@ -253,6 +251,13 @@ function listform_load(listformID, formData, postURL) {
 		});
 	});
 
+	listform_load_cached_list();
+}
+
+function listform_load_cached_list() {
+	// allListsWindow: Grand Total
+	listformVars.totals = {};
+
 	// Load Existing Lists
 	cachedAjaxGet('ajax.php?type=lists',
 		function(transport) {
@@ -326,7 +331,7 @@ function listform_refresh_liststats(listID, ignoreCache) {
 }
 
 function listform_update_grand_total() {
-	var sum = $('listChoose_addme').checked ? 1 : 0;
+	var sum = $('listChoose_addme') ? ($('listChoose_addme').checked ? 1 : 0) : 0;
 	for (var id in listformVars.totals) {
 		sum += listformVars.totals[id];
 	}
@@ -517,7 +522,7 @@ function listform_onclick_existing_list(event, listid) {
 	Tips.hideAll();
 
 	if (this.checked) {
-		if (!listformVars.existingLists[listid].added && listform_add_list(listid))
+		if (!listformVars.existingLists[listid].added && listform_add_list(listid) && ruleWidget)
 			ruleWidget.refresh_guide(true);
 	} else {
 		listform_remove_list(event, listid);
