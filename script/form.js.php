@@ -565,7 +565,7 @@ function form_handle_submit(form,event) {
 					window.location=formvars.scriptname;
 				}
 			} else if ("success" == res.status) {
-				form.fire('AjaxForm:SubmitSuccess');
+				form.fire('AjaxForm:SubmitSuccess', res);
 				if (res.nexturl)
 					window.location=res.nexturl;
 			} else if ("modify" == res.status) {
