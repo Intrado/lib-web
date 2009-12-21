@@ -15,7 +15,7 @@ $$$
 ALTER TABLE `message` ADD `messagegroupid` INT( 11 ) NOT NULL AFTER `id` 
 $$$
 
-ALTER TABLE `audiofile` ADD `messagegroupid` INT( 11 ) NOT NULL AFTER `id` 
+ALTER TABLE `audiofile` ADD `messagegroupid` INT( 11 ) DEFAULT NULL AFTER `id` 
 $$$
 
 ALTER TABLE `job` ADD `messagegroupid` INT( 11 ) NOT NULL AFTER `id` 
