@@ -15,6 +15,7 @@ var accordion = null;
 var addmeOriginalValues = {phone:false, email:false, sms:false}; // Used to restore to valid values when the addme checkbox is unchecked, so that addMeWindow validators do not complain.
 var hoverTimer = null;
 var chosenLists = [];
+var forcevalidator = null;
 
 // Modified form load.
 function listform_load(listformID, formData, postURL) {
@@ -527,6 +528,9 @@ function listform_onclick_existing_list(event, listid) {
 	} else {
 		listform_remove_list(event, listid);
 	}
+	if(forcevalidator) {
+		forcevalidator();
+	}
 }
 
 function listform_remove_list(event, listid, doconfirm) {
@@ -574,6 +578,10 @@ function listform_remove_list(event, listid, doconfirm) {
 	if (!listaddme) {
 		listformVars.totals[listid] = 0;
 		listform_update_grand_total();
+	}
+
+	if(forcevalidator) {
+		forcevalidator();
 	}
 }
 
