@@ -4,8 +4,6 @@ $authhost = "127.0.0.1";
 $authuser = "root";
 $authpass = "reliance202";
 
-$targetversion = "7.5";
-
 /*
  * Starting in 7.5, we will use a customer setting "_dbversion" to indicate what version
  * that customer DB is running. This script will evolve to upgrade databases 
@@ -30,12 +28,18 @@ $targetversion = "7.5";
  */
 
 //list supported versons here in order of upgrade
+//format is major.minor.point/revision
+//rev is mainly for internal dev where we may have already deployed that version, but made some changes
 $versions = array (
-	"7.5"
+	"7.1.5/0",
+	"7.5/2"
 	//7.5.1
 	//7.6
 	//etc
 );
+
+$targetversion = $versions[count($versions)-1];
+list($targetversion, $targetrev) = explode("/",$targetversion);
 
 $usage = "
 Description:
@@ -129,8 +133,11 @@ foreach ($customers as  $customerid => $customer) {
 
 	$version = QuickQuery("select value from setting where name='_dbversion' for update",$db);
 	if ($version == null)
-		$version = "7.1.5"; //assume last known version with no _dbversion support
-	if ($version === $targetversion) {
+		$version = "7.1.5/0"; //assume last known version with no _dbversion support
+	
+	list($version, $rev) = explode("/",$version);
+	
+	if ($version === $targetversion && $rev == $targetrev) {
 		Query("commit",$db);
 		echo "alread up to date, skipping\n";
 		continue;
@@ -147,18 +154,19 @@ foreach ($customers as  $customerid => $customer) {
 		Query("begin",$db);		
 	}
 	
-	
-	echo "upgrading: ";
-
 	/*******************************************************/
 	
 	//TODO find index of current version in $versions array, run upgrade for version of index +1, repeat until index == $targetversion index
+	//for now, just run 7.5
 	
 	require("upgrades/db_7-5.php");
-	if (upgrade_7_5($customer['shardid'], $customerid, $db))
-		QuickUpdate("insert into setting (name,value) values ('_dbversion','7.5') on duplicate key update value=values(value)", $db);
-	else
+	$rev = $version == "7.5" ? $rev : 0; //reset revision to 0 each time we go to a new release, unless we're doing the same release.
+	echo "upgrading from $version/$rev to $targetversion/$targetrev\n";
+	if (upgrade_7_5($rev, $customer['shardid'], $customerid, $db)) {
+		QuickUpdate("insert into setting (name,value) values ('_dbversion','$targetversion/$targetrev') on duplicate key update value=values(value)", $db);
+	} else {
 		exit("Error upgrading DB");
+	}
 	
 	/*******************************************************/
 	
@@ -167,16 +175,42 @@ foreach ($customers as  $customerid => $customer) {
 	echo "\n";
 }
 
-function apply_sql ($filename, $customerid, $custdb) {
-	$sqlqueries = explode("$$$",file_get_contents($filename));
-	foreach ($sqlqueries as $sqlquery) {
-		echo ".";
-		if (trim($sqlquery)){
-			$sqlquery = str_replace('_$CUSTOMERID_', $customerid, $sqlquery);
-			Query($sqlquery,$custdb)
-				or die ("Failed to execute sql:\n$sqlquery\n" . mysql_error($custdb));
+function apply_sql ($filename, $customerid, $custdb, $skiprev) {
+	
+	$allsql = file_get_contents($filename);
+	
+	//check revisions
+	$revs = preg_split("/-- \\\$rev ([0-9]+)/",$allsql,-1, PREG_SPLIT_DELIM_CAPTURE);
+	
+	$currev = 1;
+	foreach ($revs as $revsql) {
+		
+		//if we got just numbers, must be revision version
+		if (preg_match("/^[0-9]+\$/",$revsql)) {
+			$currev = $revsql + 0;
+			if (!($skiprev && $currev <= $skiprev))
+				echo "$currev";
+			continue;
+		}
+		
+		//skip blanks, older revs
+		if (trim($revsql) == "" || $skiprev && $currev <= $skiprev) {
+			continue;
+		}
+		
+		$sqlqueries = explode("$$$",$revsql);
+		foreach ($sqlqueries as $sqlquery) {
+			if (trim($sqlquery)){
+				echo ".";
+				$sqlquery = str_replace('_$CUSTOMERID_', $customerid, $sqlquery);
+				$res = Query($sqlquery,$custdb);
+				if (!$res) {
+					exit("Error running query, check dberrors.txt for info");
+				}
+			}
 		}
 	}
+		
 	Query("commit",$custdb);	
 	Query("begin",$custdb);	
 }
