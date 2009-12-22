@@ -44,19 +44,21 @@ class User extends DBMappedObject {
 		QuickUpdate($query, false, array($password, $this->id));
 	}
 
+	// Example: authorize('sendemail', 'sendphone') returns true only if user has both permissions.
+	// Example: authorize(array('sendemail', 'sendphone')) returns true if user has either permission.
 	function authorize () {
 		$features = func_get_args();
 		if(isset($_SESSION['access'])) {
 			foreach($features as $feature) {
 				if(is_array($feature)) {
-					$all = false;
+					$any = false;
 					foreach($feature as $or) {
 						if($_SESSION['access']->getValue($or)) {
-							$all = true;
+							$any = true;
 							break;
 						}
 					}
-					if(!$all)
+					if(!$any)
 						return false;
 				}
 				elseif(!$_SESSION['access']->getValue($feature)) {
