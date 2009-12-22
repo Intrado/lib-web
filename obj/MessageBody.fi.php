@@ -170,7 +170,7 @@ class MessageBody2 extends FormItem {
 				
 				<div id="'.$n.'sourceTextContainer">
 					<div class="Translation">
-						<textarea id="'.$n.'sourceText" name="'.$n.'sourceText" style="width:98%; '.$cssShowIfMultilingual.'">' . escapehtml($this->args["sourceText"]) . '</textarea>
+						<textarea id="'.$n.'sourceText" name="'.$n.'sourceText" style="width:98%; '.$cssShowIfMultilingual.'">' . escapehtml($this->args["sourcetext"]) . '</textarea>
 						'.$divHtmlEditorContainerIfNeeded.'
 
 						<div style="margin-top: 15px; '.$cssShowIfMultilingual.'">
