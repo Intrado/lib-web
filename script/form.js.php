@@ -608,3 +608,152 @@ function form_count_field_characters(count,target,event) {
 	else
 		$(target).innerHTML="Characters remaining:&nbsp;" + remaining;
 }
+
+function form_submit_all (tabevent, value) {
+	// TODO: Refactor for better naming.
+	
+	var forms = $$('form');
+	// Map used to store the results of the form submissions.
+	var results = {};
+	
+	for (var i = 0; i < forms.length; i++) {
+		var form = forms[i];
+		
+		results[form.name] = {};
+		
+		form.stopObserving('AjaxForm:SubmitSuccess');
+		form.observe('AjaxForm:SubmitSuccess', function(ajaxevent, tabevent, results) {
+			results[this.name] = ajaxevent.memo;
+			
+			for (var name in results) {
+				var result = results[name];
+				if (!result.status || result.status == 'error') {
+					return;
+				}
+			}
+			
+			// At this point, all forms have been submitted successfully.
+			if (!tabevent) {
+				// TODO: window.location = nexturl;
+			} else {
+				var nexttab = tabevent.memo.section;
+				if (nexttab == tabevent.memo.currentSection)
+					return;
+					
+				console.info(tabevent.memo.currentSection);
+				
+				tabevent.memo.widget.update_section(tabevent.memo.section, {
+					'icon': 'img/ajax-loader.gif'
+				});
+				
+				var formvars = document.formvars[this.name];
+				var posturl = formvars.scriptname + (formvars.scriptname.include('?') ? '&' : '?') + "ajax=true";
+				new Ajax.Request(posturl, {
+					method: 'post',
+					parameters: {loadtab: nexttab},
+					onSuccess: function (response) {
+						var data = response.responseJSON;
+						
+						if (!data || !data.element) {
+							alert('problem!');
+						}
+						
+						tabevent.memo.widget.update_section(data.element, {
+							'icon': 'img/icons/diagona/16/160.gif', // TODO: detect the correct icon..
+							'content': data.content
+						});
+						
+						var container = $(data.element).up();
+						form_load_layout(container, null);
+						tabevent.memo.widget.show_section(nexttab);
+						
+						// NOTE: To prevent flickering, clear the contents of the previous tab after the next tab shown.
+						tabevent.memo.widget.update_section(tabevent.memo.currentSection, {
+							'icon': 'img/icons/accept.gif', // TODO: detect the correct icon..
+							'content': new Element('div')
+						});
+					}
+				});
+			}
+		}.bindAsEventListener(form, tabevent, results));
+		
+		form_submit(null, value, form);
+	}
+	//console.info(results);
+}
+
+function form_load_layout (formswitchercontainer, classname) {
+	// If only the container is specified, go ahead and load all the various layouts.
+	if (!classname) {
+		form_load_layout(formswitchercontainer, 'horizontaltabs');
+		form_load_layout(formswitchercontainer, 'verticaltabs');
+		form_load_layout(formswitchercontainer, 'accordion');
+		form_load_layout(formswitchercontainer, 'verticalsplit');
+		return;
+	}
+	
+	formswitchercontainer.select('.' + classname).each(function(container, classname) {
+		var kids = container.childElements();
+
+		var layoutsections = kids.findAll(function(kid) {
+			return kid.match('.FormSwitcherLayoutSection');
+		});
+
+		var layout;
+		if (classname == 'horizontaltabs' || classname == 'verticaltabs' || classname == 'accordion') {
+			if (classname == 'horizontaltabs')
+				layout = new Tabs(container, {'vertical':false, 'showDuration':0, 'hideDuration':0});
+			else if (classname == 'verticaltabs')
+				layout = new Tabs(container, {'vertical':true, 'showDuration':0, 'hideDuration':0});
+			else if (classname == 'accordion')
+				layout = new Accordion(container);
+
+			layoutsections.each(function (layoutsection) {
+				var kids = layoutsection.childElements();
+				var sectionname =  layoutsection.identify();
+				var titlespan = kids.find(function (el) { return el.match('.FormSwitcherLayoutSectionTitle'); });
+				var iconimg = kids.find(function (el) { return el.match('.FormSwitcherLayoutSectionIcon'); });
+
+				this.add_section(sectionname);
+				this.update_section(sectionname, {
+					'title': titlespan,
+					'icon': iconimg ? iconimg.src : 'img/icons/diagona/16/160.gif',
+					'content': layoutsection
+				});
+
+				if (!this.firstSection)
+					this.firstSection = sectionname;
+
+			}.bindAsEventListener(layout));
+
+			console.info(layout);
+			layout.show_section(layout.firstSection);
+
+		} else if (classname == 'verticalsplit') {
+			var split = make_split_pane(true, layoutsections.length);
+
+			for (var i = 0; i < layoutsections.length; i++) {
+				split.down('.SplitPane', i).insert(layoutsections[i]);
+			}
+
+			container.insert(split);
+		}
+
+	}.bindAsEventListener(this, classname));
+}
+
+function form_init_splitter(formswitchercontainer) {
+	var formswitchercontainer = $(formswitchercontainer);
+	
+	form_load_layout(formswitchercontainer, null);
+
+	var onTabsClickTitle = function(event) {
+		event.stop();
+		form_submit_all(event, 'tab');
+	};
+	var onAccordionClickTitle = function(event) {
+		// TODO: form_validate().
+	};
+	formswitchercontainer.observe('Accordion:ClickTitle', onAccordionClickTitle);
+	formswitchercontainer.observe('Tabs:ClickTitle', onTabsClickTitle);
+}
