@@ -16,6 +16,8 @@ require_once("inc/utils.inc.php");
 require_once("inc/date.inc.php");
 require_once("inc/translate.inc.php");
 require_once("obj/Form.obj.php");
+require_once("obj/FormTabber.obj.php");
+require_once("obj/FormSplitter.obj.php");
 require_once("obj/FormItem.obj.php");
 require_once("obj/Phone.obj.php");
 require_once("obj/Message.obj.php");
