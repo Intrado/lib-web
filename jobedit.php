@@ -13,6 +13,10 @@ require_once("obj/FormItem.obj.php");
 require_once("obj/Job.obj.php");
 require_once("obj/JobType.obj.php");
 require_once("obj/Phone.obj.php"); // Required by job
+require_once("obj/PeopleList.obj.php");
+require_once("obj/RenderedList.obj.php");
+require_once("obj/FieldMap.obj.php");
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization
@@ -50,96 +54,10 @@ $JOBTYPE = "normal";
 // Optional Form Items And Validators
 ////////////////////////////////////////////////////////////////////////////////
 
-// Example of a custom form FormItem
-class DeliveryWindowItem extends FormItem {
-	function render ($value) {
-		$n = $this->form->name."_".$this->name;
-		$size = isset($this->args['size']) ? 'size="'.$this->args['size'].'"' : "";
-
-		$starthour = isset($this->args['starthour'])?$this->args['starthour']: 0;
-		$startminute = isset($this->args['startminute'])?$this->args['startminute']: 0;
-		$stophour = isset($this->args['stophour'])?$this->args['stophour']: 23;
-		$stopminute = isset($this->args['stopminute'])?$this->args['stopminute']: 55;
-		$stopminute += 5; 
-
-		$str = '<input id="'.$n.'" name="'.$n.'" type="hidden" value=""/>';
-		$str .= '<div id="wrapstart'.$n.'"><select id="start'.$n.'" name="start'.$n.'" '.$size .' ></select></div>';
-		$str .= '<div id="wrapend'.$n.'"><select id="end'.$n.'" name="end'.$n.'" '.$size .' ></select></div>';
-		$str .= '<script type="text/javascript" language="javascript">
-					document.observe("dom:loaded", function() {
-						var id = "'.$n.'";
-						var startelement = $(\'start'.$n.'\');
-						var stopelement = $(\'end'.$n.'\');
-						var starthour = '.$starthour .';
-						var startminute = '.$startminute.';
-						var stophour = ' . $stophour . ';
-						var stopminute = '.$stopminute.';
-						for(var i=starthour; i <= stophour; i++) {
-							var smin = (i == starthour)?startminute:0;
-							var emin = (i == stophour)?stopminute:60;
-							var hour = (i > 12)?(i - 12):i;
-							if(hour == 0)
-								hour = 12;
-							var suffix = (i > 11)?" pm":" am";
-							for(var j=smin; j < emin; j=j+5) {
-								var value = hour + ":" + (j<10?("0"+j):j) + suffix;
-								startelement.insert(\'<option value="\' + value + \'">\' + value + \'</option>\');
-								stopelement.insert(\'<option value="\' + value + \'">\' + value + \'</option>\');
-							}
-						}
-						//$("wrap" + startid).insert(start);
-
-						startelement.setValue("9:00 am");
-						stopelement.setValue("9:00 pm");
-						$(id).value = \'{start:"\' + $("start" + id).getValue()  + \'",stop:"\'+ $("end" + id).getValue() + \'"}\';
-
-						startelement.observe("change",function(e) {
-							var id = "'.$n.'";
-
-
-							$(id).value = \'{start:"\' + $("start" + id).getValue()  + \'",stop:"\'+ $("end" + id).getValue() + \'"}\';
-						});
-						stopelement.observe("change",function(e) {
-							var id = "'.$n.'";
-							$(id).value = \'{start:"\' + $("start" + id).getValue()  + \'",stop:"\'+ $("end" + id).getValue() + \'"}\';
-						});
-					});
-				</script>';
-		return $str;
-	}
-}
-
-
-// Example of a custom form Validator
-class ValDeliveryWindowItem extends Validator {
-	function validate ($value, $args) {
-		if(!is_array($value)) {
-			$value = json_decode($value,true);
-		}
-		$starttime = strtotime($value["start"]);
-		$stoptime = strtotime($value["stop"]);
-
-		if($starttime === -1 || $starttime === false)
-			return "The start time is invalid";
-		if($stoptime === -1 || $stoptime === false)
-			return "The stop time is invalid";
-		if($starttime <= $stoptime)
-			return 'The end time cannot be before or the same as the start time';
-		if($stoptime-(30*60) <= $starttime)
-			return 'The end time must be at least 30 minutes after the start time';
-		if ($value["start"] < $args["start"] || $value["stop"] > $args["stop"])
-			return "One item is required for " . $this->label;
-		else
-			return true;
-
-	}
-}
-
-
 class JobListItem extends FormItem {
 	function render ($value) {
 		$n = $this->form->name."_".$this->name;
-		return "<input id='" .$n."' name='".$n."' type='hidden' value=''/>
+		return "<input id='" .$n."' name='".$n."' type='hidden' value='". json_encode($value) ."'/>
 				<div>
 				<div id='listSelectboxContainer' style='float:left;width:40%;'></div>
 				<div id='listchooseTotalsContainer' style='display:none'>
@@ -183,6 +101,9 @@ class JobListItem extends FormItem {
 					document.observe('dom:loaded', function() {
 						listformVars = {listidsElement: $('" .$n."')};
 						listform_load_cached_list();
+						forcevalidator = function() {
+							form_do_validation($('" . $this->form->name . "'), $('" . $n . "'));
+						};
 					});
 				</script>
 
@@ -240,6 +161,40 @@ class ValDate extends Validator {
 	}
 }
 
+class ValLists extends Validator {
+	var $onlyserverside = true;
+
+	function validate ($value, $args) {
+		global $USER;
+
+
+		if (strpos($value, 'pending') !== false)
+			return _L('Please finish adding this rule, or unselect the field');
+
+		$listids = json_decode($value);
+		if (empty($listids))
+			return _L("Please add a list");
+
+		$allempty = true;
+		foreach ($listids as $listid) {
+			if ($listid === 'addme') {
+				$allempty = false;
+				continue;
+			}
+			if (!userOwns('list', $listid))
+				return _L('You have specified an invalid list');
+			$list = new PeopleList($listid + 0);
+			$renderedlist = new RenderedList($list);
+			$renderedlist->calcStats();
+			if ($renderedlist->total >= 1)
+				$allempty = false;
+		}
+		if ($allempty)
+			return _L('All of these lists are empty');
+		return true;
+	}
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 // Form Data
 ////////////////////////////////////////////////////////////////////////////////
@@ -254,14 +209,10 @@ foreach ($userjobtypes as $id => $jobtype) {
 }
 
 // Prepare List data
+
 $selectedlists = array();
 if (isset($job->id)) {
-	$selectedlists = QuickQueryList("select listid from joblist where jobid=$job->id", false);
-}
-if (!empty($selectedlists)) {
-	$peoplelists = QuickQueryList("select id, name, (name +0) as foo from list where userid=$USER->id and (deleted=0 or id in (" . implode(",",array_values($selectedlists)) . ") ) order by foo,name", true);
-} else {
-	$peoplelists = QuickQueryList("select id, name, (name +0) as foo from list where userid=$USER->id and deleted=0 order by foo,name", true);
+	$selectedlists = QuickQueryList("select listid from joblist where jobid=?", false,false,array($job->id));
 }
 
 // Prepare Scheduling data
@@ -274,6 +225,8 @@ $numdays = array();
 $maxdays = $ACCESS->getValue('maxjobdays');
 if ($maxdays == null) {$maxdays = 7;}
 for ($i = 1; $i <= 7; $i++) {$numdays[$i] = $i;}
+
+$messages = array_merge(array("" => "-- Select a Message --"),QuickQueryList("select id, name, (name +0) as digitsfirst from messagegroup where userid=? and deleted=0 order by digitsfirst,name", true,false,array($USER->id)));
 
 $formdata = array(
 	_L('Job Settings'),
@@ -320,7 +273,7 @@ $formdata = array(
 		"helpstep" => 2
 	),
 	"days" => array(
-		"label" => _L("Days to run"),
+		"label" => _L("Days to Run"),
 		"fieldhelp" => _L(""),
 		"value" => (86400 + strtotime($job->enddate) - strtotime($job->startdate) ) / 86400,
 		"validators" => array(
@@ -358,22 +311,12 @@ $formdata = array(
 		"helpstep" => 2
 	),
 	_L('Job Lists'),
-	/*"lists" => array(
+	"lists" => array(
 		"label" => _L('Lists'),
 		"value" => $selectedlists,
 		"validators" => array(
 			array("ValRequired"),
-			array("ValInArray", "values" => array_keys($peoplelists))
-		),
-		"control" => array("MultiCheckBox", "values" => $peoplelists, "height" => "200px;width:200px"),
-		"helpstep" => 3
-	),*/
-	"lists" => array(
-		"label" => _L('Lists'),
-		"value" => "",
-		"validators" => array(
-			array("ValRequired"),
-			array("ValInArray", "values" => array_keys($peoplelists))
+			array("ValLists")
 		),
 		"control" => array("JobListItem"),
 		"helpstep" => 3
@@ -388,9 +331,9 @@ $formdata = array(
 	_L('Job Message'),
 	"message" => array(
 		"label" => _L('Message'),
-		"value" => "",
+		"value" => isset($job->id)?$job->messagegroupid:"",
 		"validators" => array(array("ValRequired")),
-		"control" => array("SelectMenu", "values" => array("" => "-- Select a Message --", 1 => "First Message", 2 => "Second Message")),
+		"control" => array("SelectMenu", "values" => $messages),
 		"helpstep" => 4
 	),
 	_L('Advanced Options '),
@@ -482,7 +425,7 @@ include_once("nav.inc.php");
 ?>
 <script type="text/javascript" src="script/listform.js.php"></script>
 <script type="text/javascript">
-<? Validator::load_validators(array("ValJobName","ValTimeWindowCallEarly","ValTimeWindowCallLate","ValDate")); ?>
+<? Validator::load_validators(array("ValJobName","ValTimeWindowCallEarly","ValTimeWindowCallLate","ValDate","ValLists")); ?>
 </script>
 <?
 
