@@ -23,9 +23,12 @@ class Voice extends DBMappedObject {
 		return $retval;
 	}
 
-	// return array of language names (indexed by language code) that are supported languages for tts, based on customer language table
-	static function getTTSLanguages() {
-		return QuickQueryList("select distinct l.code, l.name from ttsvoice t join language l where l.name = t.language order by t.id", true);
+	// return array of language names (indexed by language code if $paired) that are supported languages for tts, based on customer language table
+	static function getTTSLanguages($paired = false) {
+		if ($paired)
+			return QuickQueryList("select distinct l.code, l.name from ttsvoice t join language l where l.name = t.language order by t.id", true);
+		else
+			return QuickQueryList("select distinct l.name from ttsvoice t join language l where l.name = t.language order by t.id");
 	}
 	
 	static function getPreferredVoice($languagecode, $gender) {
