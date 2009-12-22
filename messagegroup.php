@@ -1,5 +1,4 @@
 <?php
-// TODO, FormJS BUG: With url set to ?messagegroupid=new, whenever the form tabs away, a new messagegroup is created because the form's posturl keeps the GET variables intact.
 // TODO, FormJS BUG: enter a validation error in callme, switch to email tab, then switch back to phone tab, notice there is a javascript error about 'variable msg is null'
 // TODO, Usability BUG: If the session is timed out, the page will show alert() messages for each form that is submitted, making it annoying..
 // TODO, Usability BUG: If multiple forms have validation errors, submitting the page will cause multiple alerts() to appear, making it annoying..
@@ -94,7 +93,7 @@ class ValCallMeMessage extends Validator {
 $cansendphone = $USER->authorize('sendphone');
 $cansendemail = $USER->authorize('sendemail');
 $cansendsms = getSystemSetting('_hassms', false) && $USER->authorize('sendsms');
-$cansendmultilingual = false;//$USER->authorize('sendmulti');
+$cansendmultilingual = $USER->authorize('sendmulti');
 
 if (!$cansendphone && !$cansendemail && !$cansendsms) {
 	unset($_SESSION['messagegroupid']);
@@ -121,21 +120,6 @@ if (isset($_GET['messagegroupid'])) {
 
 if (isset($_SESSION['messagegroupid'])) {
 	$messagegroup = new MessageGroup($_SESSION['messagegroupid']);
-} else {
-	$messagegroup = new MessageGroup();
-	$messagegroup->userid = $USER->id;
-	$messagegroup->name = 'new messagegroup';
-	$messagegroup->description = 'new messagegroup';
-	$messagegroup->modified =  makeDateTime(time());
-	$messagegroup->deleted = 1; // Set to deleted in case the user does not submit the form.
-	$messagegroup->permanent = 0; // Set to non-permanent in case the user does not submit the form.
-	
-	// TODO: Disabled for now, due to FormJS bug with posturl keeping GET variables intact.
-	//if ($messagegroup->create()) {
-	//	$_SESSION['messagegroupid'] = $messagegroup->id;
-	//} else {
-	//	redirect('unauthorized.php'); // TODO: Something went wrong.. redirect somewhere?
-	//}
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -150,7 +134,7 @@ $datafields = FieldMap::getAuthorizedMapNames();
 
 // Get both global audiofiles and ones assigned to this messagegroup.
 // Global audiofiles are not assigned to any messagegroup.
-$audiofiles = DBFindMany('AudioFile2', "from audiofile where userid = $USER->id and (messagegroupid = ? or not messagegroupid) and deleted != 1 order by name", false, array($_SESSION['messagegroupid']));
+$audiofiles = DBFindMany('AudioFile2', "from audiofile where userid = $USER->id and (messagegroupid = ? or not messagegroupid) and deleted != 1 order by name", false, array(isset($messagegroup) ? $messagegroup->id : 0));
 
 $customerlanguages = $cansendmultilingual ? QuickQueryList("select code, name from language", true) : QuickQueryList("select code, name from language where code=?", true, false, array($defaultlanguagecode));
 $ttslanguages = $cansendmultilingual ? Voice::getTTSLanguages() : array();
@@ -415,6 +399,22 @@ $messagegroupsplitter->handleRequest();
 ///////////////////////////////////////////////////////////////////////////////
 // Submit
 ///////////////////////////////////////////////////////////////////////////////
+if (!isset($messagegroup)) {
+	$messagegroup = new MessageGroup();
+	$messagegroup->userid = $USER->id;
+	$messagegroup->name = 'new messagegroup';
+	$messagegroup->description = 'new messagegroup';
+	$messagegroup->modified =  makeDateTime(time());
+	$messagegroup->deleted = 1; // Set to deleted in case the user does not submit the form.
+	$messagegroup->permanent = 0; // Set to non-permanent in case the user does not submit the form.
+	
+	if ($messagegroup->create()) {
+		$_SESSION['messagegroupid'] = $messagegroup->id;
+	} else {
+		redirect('unauthorized.php'); // TODO: Something went wrong.. redirect somewhere?
+	}
+}
+	
 if (($button = $messagegroupsplitter->getSubmit()) && !$readonly) {
 	$form = $messagegroupsplitter->getSubmittedForm();
 	
@@ -441,7 +441,7 @@ if (($button = $messagegroupsplitter->getSubmit()) && !$readonly) {
 			} break;
 		}
 	} else {
-		error_log("------ NO FORM!!!!");
+		;// TODO: handle this?
 	}
 }
 
