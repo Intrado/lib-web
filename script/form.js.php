@@ -639,8 +639,6 @@ function form_submit_all (tabevent, value) {
 				var nexttab = tabevent.memo.section;
 				if (nexttab == tabevent.memo.currentSection)
 					return;
-					
-				console.info(tabevent.memo.currentSection);
 				
 				tabevent.memo.widget.update_section(tabevent.memo.section, {
 					'icon': 'img/ajax-loader.gif'
@@ -679,7 +677,6 @@ function form_submit_all (tabevent, value) {
 		
 		form_submit(null, value, form);
 	}
-	//console.info(results);
 }
 
 function form_load_layout (formswitchercontainer, classname) {
@@ -726,7 +723,6 @@ function form_load_layout (formswitchercontainer, classname) {
 
 			}.bindAsEventListener(layout));
 
-			console.info(layout);
 			layout.show_section(layout.firstSection);
 
 		} else if (classname == 'verticalsplit') {
