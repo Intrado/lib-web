@@ -1,31 +1,5 @@
 <?
 ////////////////////////////////////////////////////////////////////////////////
-// Includes
-////////////////////////////////////////////////////////////////////////////////
-require_once("inc/common.inc.php");
-require_once("inc/securityhelper.inc.php");
-require_once("inc/table.inc.php");
-require_once("inc/html.inc.php");
-require_once("inc/utils.inc.php");
-require_once("obj/Validator.obj.php");
-require_once("obj/Form.obj.php");
-require_once("obj/FormItem.obj.php");
-require_once("obj/Job.obj.php");
-require_once("obj/JobType.obj.php");
-require_once("obj/Phone.obj.php"); // Required by job
-require_once("obj/PeopleList.obj.php");
-require_once("obj/RenderedList.obj.php");
-require_once("obj/FieldMap.obj.php");
-
-
-////////////////////////////////////////////////////////////////////////////////
-// Authorization
-////////////////////////////////////////////////////////////////////////////////
-if (!$USER->authorize('sendphone') && !$USER->authorize('sendemail') && !$USER->authorize('sendprint') && !$USER->authorize('sendsms')) {
-	redirect('unauthorized.php');
-}
-
-////////////////////////////////////////////////////////////////////////////////
 // Action/Request Processing
 ////////////////////////////////////////////////////////////////////////////////
 $job = null;
@@ -48,8 +22,6 @@ if ($_SESSION['jobid'] == NULL) {
 	$job = new Job($_SESSION['jobid']);
 }
 
-$JOBTYPE = "normal";
-
 ////////////////////////////////////////////////////////////////////////////////
 // Optional Form Items And Validators
 ////////////////////////////////////////////////////////////////////////////////
@@ -57,7 +29,7 @@ $JOBTYPE = "normal";
 class JobListItem extends FormItem {
 	function render ($value) {
 		$n = $this->form->name."_".$this->name;
-		return "<input id='" .$n."' name='".$n."' type='hidden' value='". json_encode($value) ."'/>
+		return "<input id='" .$n."' name='".$n."' type='hidden' value='". escapehtml($value) ."'/>
 				<div>
 				<div id='listSelectboxContainer' style='float:left;width:40%;'></div>
 				<div id='listchooseTotalsContainer' style='display:none'>
@@ -111,6 +83,89 @@ class JobListItem extends FormItem {
 	}
 }
 
+class WeekRepeatItem extends FormItem {
+	function render ($value) {
+		$n = $this->form->name."_".$this->name;
+		$str = '
+				<input id="'.$n.'" name="'.$n.'" type="hidden" value="' . escapehtml(json_encode($value)) . '"/>
+				<table border="0" cellpadding="2" cellspacing="1" class="list">
+					<tr class="listHeader" align="left" valign="bottom">
+						<th>Su</th>
+						<th>M</th>
+						<th>Tu</th>
+						<th>W</th>
+						<th>Th</th>
+						<th>F</th>
+						<th>Sa</th>
+						<th>Time</th>
+					</tr>
+					<tr>
+						<td><input id="itm0_'.$n.'" type="checkbox" '. ($value[0] ? 'checked' : '').' /></td>
+						<td><input id="itm1_'.$n.'" type="checkbox" '. ($value[1] ? 'checked' : '').' /></td>
+						<td><input id="itm2_'.$n.'" type="checkbox" '. ($value[2] ? 'checked' : '').' /></td>
+						<td><input id="itm3_'.$n.'" type="checkbox" '. ($value[3] ? 'checked' : '').' /></td>
+						<td><input id="itm4_'.$n.'" type="checkbox" '. ($value[4] ? 'checked' : '').' /></td>
+						<td><input id="itm5_'.$n.'" type="checkbox" '. ($value[5] ? 'checked' : '').' /></td>
+						<td><input id="itm6_'.$n.'" type="checkbox" '. ($value[6] ? 'checked' : '').' /></td>
+					<td>';
+
+		$str .= '<select id="itm7_'.$n.'">';
+		foreach ($this->args['timevalues'] as $selectvalue => $selectname) {
+			$checked = $value[7] == $selectvalue;
+			$str .= '<option value="'.escapehtml($selectvalue).'" '.($checked ? 'selected' : '').' >'.escapehtml($selectname).'</option>
+				';
+		}
+		$str .= '</select>';
+
+		$str .=		'</td>
+					</tr>
+				</table>
+				<script type="text/javascript" language="javascript">
+					function makerepeat(e) {
+						var n = "' .$n. '";
+						var values = Array();
+						for(var i=0;i < 7;i++) {
+							values.push($("itm" + i + "_" +  n).checked);
+						}
+						values.push($("itm7_" +  n).getValue());
+						$(n).value = values.toJSON();
+						form_do_validation($("' . $this->form->name . '"), $("' . $n . '"));
+					}
+					document.observe("dom:loaded", function() {
+						var n = "' .$n. '";
+						for(var i=0;i < 8;i++) {
+							$("itm" + i + "_"+ n).observe("change",makerepeat);
+						}
+					});
+				</script>
+		';
+		return $str;
+	}
+}
+
+class ValWeekRepeatItem extends Validator {
+	var $onlyserverside = true;
+	function validate ($value, $args) {
+		global $USER;
+
+		if(!is_array($value)) {
+			$value = json_decode($value);
+		}
+
+		if(count($value) != 8 )
+			return _L('An error occurred, try reloading the page'); // decoding problem or anything else
+		$time = strtotime($value[7]);
+		if($time < strtotime($USER->getCallEarly()))
+			return _L('Time is can not be before %1$s',$USER->getCallEarly());
+		else if($time > strtotime($USER->getCallLate()))
+			return _L('Time is can not be after %1$s',$USER->getCallLate());
+		for($i = 0;$i < 7;$i++){
+			if(!is_bool($value[$i]))
+				return _L('Invalid Input');
+		}
+		return true;
+	}
+}
 
 /* TODO these validators are copied from the wizard
 	Make sure they are moved to avoid duplicate implementation
@@ -220,19 +275,19 @@ $dayoffset = (strtotime("now") > (strtotime(($ACCESS->getValue("calllate")?$ACCE
 $startvalues = newform_time_select(NULL, $ACCESS->getValue('callearly'), $ACCESS->getValue('calllate'), $USER->getCallEarly());
 $endvalues = newform_time_select(NULL, $ACCESS->getValue('callearly'), $ACCESS->getValue('calllate'), $USER->getCallLate());
 
-// Prepare the the "Number of Days to run" data
-$numdays = array();
-$maxdays = $ACCESS->getValue('maxjobdays');
-if ($maxdays == null) {$maxdays = 7;}
-for ($i = 1; $i <= 7; $i++) {$numdays[$i] = $i;}
+$messages = array_merge(array("" => _L("-- Select a Message --")),QuickQueryList("select id, name, (name +0) as digitsfirst from messagegroup where userid=? and deleted=0 order by digitsfirst,name", true,false,array($USER->id)));
 
-$messages = array_merge(array("" => "-- Select a Message --"),QuickQueryList("select id, name, (name +0) as digitsfirst from messagegroup where userid=? and deleted=0 order by digitsfirst,name", true,false,array($USER->id)));
+
+
+$cansendphone = $USER->authorize('sendphone');
+$cansendemail = $USER->authorize('sendemail');
+$cansendsms = getSystemSetting('_hassms', false) && $USER->authorize('sendsms');
 
 $formdata = array(
 	_L('Job Settings'),
 	"name" => array(
 		"label" => _L('Job Name'),
-		"value" => "",
+		"value" => isset($job->name)?$job->name:"",
 		"validators" => array(
 			array("ValRequired"),
 			array("ValJobName"),
@@ -253,25 +308,75 @@ $formdata = array(
 	"jobtype" => array(
 		"label" => _L("Type/Category"),
 		"fieldhelp" => _L("Select the option that best describes the type of notification you are sending."),
-		"value" => "",
+		"value" => isset($job->jobtypeid)?$job->jobtypeid:"",
 		"validators" => array(
 			array("ValRequired"),
 			array("ValInArray", "values" => array_keys($jobtypes))
 		),
 		"control" => array("RadioButton", "values" => $jobtypes, "hover" => $jobtips),
 		"helpstep" => 2
-	),
-	"date" => array(
-		"label" => _L("Start Date"),
-		"fieldhelp" => _L("Notification will begin on the selected date."),
-		"value" => "now + $dayoffset days",
-		"validators" => array(
+	));
+
+	$callearlyvalidators = array(
 			array("ValRequired"),
-			array("ValDate", "min" => date("m/d/Y", strtotime("now + $dayoffset days")))
-		),
-		"control" => array("TextDate", "size"=>12, "nodatesbefore" => $dayoffset),
-		"helpstep" => 2
-	),
+			array("ValTimeCheck", "min" => $ACCESS->getValue('callearly'), "max" => $ACCESS->getValue('calllate'))
+	);
+	$calllatevalidators = $callearlyvalidators;
+	
+	if ($JOBTYPE == "repeating") {
+		$schedule = new Schedule($job->scheduleid);
+
+		$scheduledows = array();
+		if ($schedule->id == NULL) {
+			$schedule->time = $USER->getCallEarly();
+		} else {
+			$data = explode(",", $schedule->daysofweek);
+			for ($x = 0; $x < 7; $x++)
+			$scheduledows[$x] = in_array($x,$data);
+		}
+		$repeatvalues = array();
+		for ($x = 0; $x < 7; $x++) {
+			$repeatvalues[] = isset($scheduledows[$x]);
+		}
+		$repeatvalues[] =$schedule->time;
+		$formdata["repeat"] = array(
+			"label" => _L("Repeat"),
+			"fieldhelp" => _L(""),
+			"value" => $repeatvalues,
+			"validators" => array(
+				array("ValRequired"),
+				array("ValWeekRepeatItem")
+			),
+			"control" => array("WeekRepeatItem","timevalues" => newform_time_select(NULL, $ACCESS->getValue('callearly'), $ACCESS->getValue('calllate'), $USER->getCallLate())),
+			"helpstep" => 2
+		);
+	} else {
+		$callearlyvalidators[] = array("ValTimeWindowCallEarly");
+		$calllatevalidators[] = array("ValTimeWindowCallLate");
+		$formdata["date"] = array(
+			"label" => _L("Start Date"),
+			"fieldhelp" => _L("Notification will begin on the selected date."),
+			"value" => "now + $dayoffset days",
+			"validators" => array(
+				array("ValRequired"),
+				array("ValDate", "min" => date("m/d/Y", strtotime("now + $dayoffset days")))
+			),
+			"control" => array("TextDate", "size"=>12, "nodatesbefore" => $dayoffset),
+			"helpstep" => 2
+		);
+	}
+
+	// Prepare the the "Number of Days to run" data
+	$numdays = array();
+	$maxdays = first($ACCESS->getValue('maxjobdays'), 7);
+	for ($i = 1; $i <= $maxdays; $i++) {$numdays[$i] = $i;}
+
+	// Prepare attempt data
+	$attempts = array();
+	$maxattempts = first($ACCESS->getValue('callmax'), 1);
+	for ($i = 1; $i <= $maxattempts; $i++) {$attempts[$i] = $i;}
+
+	$formdata = array_merge($formdata,array(
 	"days" => array(
 		"label" => _L("Days to Run"),
 		"fieldhelp" => _L(""),
@@ -288,12 +393,8 @@ $formdata = array(
 		"label" => _L("Start Time"),
 		"fieldhelp" => ("This is the earliest time to send calls. This is also determined by your security profile."),
 		"value" => $USER->getCallEarly(),
-		"validators" => array(
-			array("ValRequired"),
-			array("ValTimeCheck", "min" => $ACCESS->getValue('callearly'), "max" => $ACCESS->getValue('calllate')),
-			array("ValTimeWindowCallEarly")
-		),
-		"requires" => array("calllate"),
+		"validators" => $callearlyvalidators,
+		"requires" => array("calllate"),// is only required for non repeating jobs
 		"control" => array("SelectMenu", "values"=>$startvalues),
 		"helpstep" => 2
 	),
@@ -301,19 +402,15 @@ $formdata = array(
 		"label" => _L("End Time"),
 		"fieldhelp" => ("This is the latest time to send calls. This is also determined by your security profile."),
 		"value" => $USER->getCallLate(),
-		"validators" => array(
-			array("ValRequired"),
-			array("ValTimeCheck", "min" => $ACCESS->getValue('callearly'), "max" => $ACCESS->getValue('calllate')),
-			array("ValTimeWindowCallLate")
-		),
-		"requires" => array("callearly", "date"),
+		"validators" => $calllatevalidators,
+		"requires" => array("callearly", "date"), // is only required for non repeating jobs
 		"control" => array("SelectMenu", "values"=>$endvalues),
 		"helpstep" => 2
 	),
 	_L('Job Lists'),
 	"lists" => array(
 		"label" => _L('Lists'),
-		"value" => $selectedlists,
+		"value" => json_encode($selectedlists),
 		"validators" => array(
 			array("ValRequired"),
 			array("ValLists")
@@ -321,9 +418,9 @@ $formdata = array(
 		"control" => array("JobListItem"),
 		"helpstep" => 3
 	),
-	"skipduplicats" => array(
+	"skipduplicates" => array(
 		"label" => _L('Skip Duplicates'),
-		"value" => false,
+		"value" => $job->isOption("skipduplicates") || $job->isOption("skipemailduplicates"),
 		"validators" => array(),
 		"control" => array("CheckBox"),
 		"helpstep" => 3
@@ -339,26 +436,48 @@ $formdata = array(
 	_L('Advanced Options '),
 	"report" => array(
 		"label" => _L('Completion Report'),
-		"value" => false,
+		"value" => $job->isOption("sendreport"),
 		"validators" => array(),
 		"control" => array("CheckBox"),
+		"helpstep" => 5
+	)));
+
+	if ($USER->authorize('setcallerid') && !getSystemSetting('_hascallback', false)) {
+		$formdata["callerid"] = array(
+			"label" => _L("Personal Caller ID"),
+			"fieldhelp" => (""),
+			"value" => Phone::format($USER->getSetting("callerid",getDefaultCallerID())),
+			"validators" => array(
+				array("ValLength","min" => 3,"max" => 20),
+				array("ValPhone")
+			),
+			"control" => array("TextField","maxlength" => 20, "size" => 15),
+			"helpstep" => 5
+		);
+	}
+	$formdata = array_merge($formdata,array(
+	"attempts" => array(
+		"label" => _L('Max Attempts'),
+		"value" => $job->getOptionValue("maxcallattempts"),
+		"validators" => array(array("ValRequired")),
+		"control" => array("SelectMenu", "values" => $attempts),
 		"helpstep" => 5
 	),
 	"replyoption" => array(
 		"label" => _L('Allow Reply'),
-		"value" => false,
+		"value" => $job->isOption("leavemessage"),
 		"validators" => array(),
 		"control" => array("CheckBox"),
 		"helpstep" => 5
 	),
 	"confirmoption" => array(
 		"label" => _L('Allow Confirmation'),
-		"value" => false,
+		"value" => $job->isOption("messageconfirmation"),
 		"validators" => array(),
 		"control" => array("CheckBox"),
 		"helpstep" => 5
 	),
-);
+));
 //				$helpsteps[] = _L("The Delivery Window designates the earliest call time and the latest call time allowed for notification delivery.");
 
 
@@ -395,7 +514,111 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		Query("BEGIN");
 
 		//save data here
+		$job->name = $postdata['name'];
+		$job->description = "";
+		$job->jobtypeid = $postdata['jobtype'];
 
+		if ($JOBTYPE == "repeating") {
+			$repeatdata = json_decode($postdata['repeat'],true);
+
+			$schedule = new Schedule($job->scheduleid);
+			$schedule->time = date("H:i", strtotime($repeatdata[7]));
+			$schedule->triggertype = "job";
+			$schedule->type = "R";
+			$schedule->userid = $USER->id;
+
+			$dow = array();
+			for ($x = 0; $x < 7; $x++) {
+				if($repeatdata[$x] === true) {
+					$dow[$x] = $x+1;
+				}
+			}
+			$schedule->daysofweek = implode(",",$dow);
+			$schedule->nextrun = $schedule->calcNextRun();
+
+			$schedule->update();
+			$job->scheduleid = $schedule->id;
+			$numdays = $postdata['days'];
+			// 86,400 seconds in a day - precaution b/c windows doesn't
+			//	like dates before 1970, and using 0 makes windows think it's 12/31/69
+			$job->startdate = date("Y-m-d", 86400);
+			$job->enddate = date("Y-m-d", ($numdays * 86400));
+		} else if ($JOBTYPE == 'normal') {
+			$numdays = $postdata['days'];
+			$job->startdate = date("Y-m-d", strtotime($postdata['date']));
+			$job->enddate = date("Y-m-d", strtotime($job->startdate) + (($numdays - 1) * 86400));
+		}
+
+
+
+		$job->starttime = date("H:i", strtotime($postdata['callearly']));
+		$job->endtime = date("H:i", strtotime($postdata['calllate']));
+		$job->userid = $USER->id;
+		$job->modifydate = date("Y-m-d H:i:s", time());
+
+
+
+		// TODO remove type in job
+		$jobtypes = array();
+		if ($cansendphone) {
+			$jobtypes[] = "phone";
+		}
+		if ($cansendemail) {
+			$jobtypes[] = "email";
+		}
+		if ($cansendsms) {
+			$jobtypes[] = "sms";
+		}
+		$job->type=implode(",",$jobtypes);
+		//
+
+		$job->setOption("skipduplicates",$postdata['skipduplicates']);
+
+
+		$job->messagegroupid = $postdata['message'];
+
+
+		// set jobsetting 'callerid' blank for jobprocessor to lookup the current default at job start
+		if ($USER->authorize('setcallerid') && !getSystemSetting('_hascallback', false)) {
+				// blank callerid is fine, save this setting and default will be looked up by job processor when job starts
+				$job->setOptionValue("callerid",Phone::parse($postdata['callerid']));
+		} else {
+			$job->setOptionValue("callerid", getDefaultCallerID());
+		}
+
+		if ($USER->authorize("leavemessage"))
+			$job->setOption("leavemessage", $postdata['replyoption']);
+
+		if ($USER->authorize("messageconfirmation"))
+			$job->setOption("messageconfirmation", $postdata['confirmoption']);
+
+
+		$job->setOption("sendreport",$postdata['report']);
+		$job->setOptionValue("maxcallattempts", $postdata['attempts']);
+
+		if ($job->id) {
+			$job->update();
+		} else {
+			$job->status = ($JOBTYPE == "normal")?"new":"repeating";
+			$job->createdate = date("Y-m-d H:i:s", time());
+			$job->create();
+		}
+
+		if($job->id) {
+			/* Store lists*/
+			QuickUpdate("DELETE FROM joblist WHERE jobid=$job->id");
+			$listids = json_decode($postdata['lists']);
+			$batchvalues = array();
+			foreach ($listids as $id) {
+				$values = "($job->id,". ($id+0) . ")"; // TODO prepstmt args
+				$batchvalues[] = $values;
+			}
+			if (!empty($batchvalues)) {
+				$sql = "INSERT INTO joblist (jobid,listid) VALUES ";
+				$sql .= implode(",",$batchvalues);
+				QuickUpdate($sql);
+			}
+		}
 
 		Query("COMMIT");
 		if ($ajax)
@@ -425,7 +648,7 @@ include_once("nav.inc.php");
 ?>
 <script type="text/javascript" src="script/listform.js.php"></script>
 <script type="text/javascript">
-<? Validator::load_validators(array("ValJobName","ValTimeWindowCallEarly","ValTimeWindowCallLate","ValDate","ValLists")); ?>
+<? Validator::load_validators(array("ValJobName","ValWeekRepeatItem","ValTimeWindowCallEarly","ValTimeWindowCallLate","ValDate","ValLists")); ?>
 </script>
 <?
 
