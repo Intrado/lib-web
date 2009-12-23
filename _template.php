@@ -136,7 +136,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		$datachange = true;
 	} else if (($errors = $form->validate()) === false) { //checks all of the items in this form
 		$postdata = $form->getData(); //gets assoc array of all values {name:value,...}
-		Query("BEGIN")
+		Query("BEGIN");
 		
 		//save data here	
 		
