@@ -5,6 +5,7 @@ class Job extends DBMappedObject {
 
 
 	var $userid;
+	var $messagegroupid;
 	var $scheduleid;
 	var $jobtypeid;
 	var $name;
@@ -39,7 +40,7 @@ class Job extends DBMappedObject {
 	function Job ($id = NULL) {
 		$this->_allownulls = true;
 		$this->_tablename = "job";
-		$this->_fieldlist = array("userid", "scheduleid", "jobtypeid", "name", "description",
+		$this->_fieldlist = array("userid","messagegroupid", "scheduleid", "jobtypeid", "name", "description",
 				"phonemessageid", "emailmessageid", "printmessageid", "smsmessageid", "questionnaireid",
 				"type", "modifydate", "createdate", "startdate", "enddate", "starttime", "endtime", "finishdate",
 				"status", "percentprocessed", "deleted", "cancelleduserid");
