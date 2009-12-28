@@ -2,27 +2,23 @@
 ////////////////////////////////////////////////////////////////////////////////
 // Includes
 ////////////////////////////////////////////////////////////////////////////////
-include_once("inc/common.inc.php");
-include_once("inc/securityhelper.inc.php");
-include_once("inc/html.inc.php");
-include_once("inc/utils.inc.php");
-include_once("inc/table.inc.php");
-include_once("inc/form.inc.php");
-include_once("obj/Job.obj.php");
-include_once("obj/JobLanguage.obj.php");
-include_once("obj/JobType.obj.php");
-include_once("obj/PeopleList.obj.php");
-include_once("obj/Message.obj.php");
-include_once("obj/MessagePart.obj.php");
-include_once("obj/AudioFile.obj.php");
-include_once("obj/FieldMap.obj.php");
-include_once("obj/Language.obj.php");
-include_once("obj/Schedule.obj.php");
-include_once("inc/formatters.inc.php");
-include_once("obj/Phone.obj.php");
-include_once("obj/Sms.obj.php");
-include_once("obj/Voice.obj.php");
 
+require_once("inc/common.inc.php");
+require_once("inc/securityhelper.inc.php");
+require_once("inc/table.inc.php");
+require_once("inc/html.inc.php");
+require_once("inc/utils.inc.php");
+require_once("obj/Validator.obj.php");
+require_once("obj/Form.obj.php");
+require_once("obj/FormItem.obj.php");
+require_once("obj/Job.obj.php");
+require_once("obj/JobType.obj.php");
+require_once("obj/Phone.obj.php"); // Required by job
+require_once("obj/PeopleList.obj.php");
+require_once("obj/RenderedList.obj.php");
+require_once("obj/FieldMap.obj.php");
+include_once("obj/Schedule.obj.php");
+require_once("obj/ValDuplicateNameCheck.val.php");
 
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization
@@ -31,7 +27,7 @@ if (!$USER->authorize('createrepeat')) {
 	redirect('unauthorized.php');
 }
 
-
 $JOBTYPE = "repeating";
 
-include("jobedit.inc.php");
+include("jobedit.php");
+

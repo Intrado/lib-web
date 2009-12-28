@@ -171,18 +171,6 @@ class ValWeekRepeatItem extends Validator {
 	Make sure they are moved to avoid duplicate implementation
 */
 
-class ValJobName extends Validator {
-	var $onlyserverside = true;
-
-	function validate ($value, $args) {
-		global $USER;
-		$jobcount = QuickQuery("select count(id) from job where not deleted and userid=? and name=? and status in ('new','scheduled','processing','procactive','active')", false, array($USER->id, $value));
-		if ($jobcount)
-			return "$this->label: ". _L('There is already an active notification with this name. Please choose another.');
-		return true;
-	}
-}
-
 class ValTimeWindowCallEarly extends Validator {
 	var $onlyserverside = true;
 	function validate ($value, $args, $requiredvalues) {
@@ -290,7 +278,7 @@ $formdata = array(
 		"value" => isset($job->name)?$job->name:"",
 		"validators" => array(
 			array("ValRequired"),
-			array("ValJobName"),
+			array("ValDuplicateNameCheck","type" => "job"),
 			array("ValLength","max" => 30)
 		),
 		"control" => array("TextField","size" => 30, "maxlength" => 51),
@@ -331,14 +319,16 @@ $formdata = array(
 			$schedule->time = $USER->getCallEarly();
 		} else {
 			$data = explode(",", $schedule->daysofweek);
-			for ($x = 0; $x < 7; $x++)
-			$scheduledows[$x] = in_array($x,$data);
+			for ($x = 1; $x < 8; $x++){
+				if(in_array($x,$data))
+					$scheduledows[$x-1] = true;
+			}
 		}
 		$repeatvalues = array();
 		for ($x = 0; $x < 7; $x++) {
 			$repeatvalues[] = isset($scheduledows[$x]);
 		}
-		$repeatvalues[] =$schedule->time;
+		$repeatvalues[] = date("g:i a", strtotime($schedule->time));
 		$formdata["repeat"] = array(
 			"label" => _L("Repeat"),
 			"fieldhelp" => _L(""),
@@ -410,7 +400,7 @@ $formdata = array(
 	_L('Job Lists'),
 	"lists" => array(
 		"label" => _L('Lists'),
-		"value" => json_encode($selectedlists),
+		"value" => empty($selectedlists)?"":json_encode($selectedlists),
 		"validators" => array(
 			array("ValRequired"),
 			array("ValLists")
@@ -428,7 +418,7 @@ $formdata = array(
 	_L('Job Message'),
 	"message" => array(
 		"label" => _L('Message'),
-		"value" => isset($job->id)?$job->messagegroupid:"",
+		"value" => (isset($job->id)?$job->messagegroupid:""),
 		"validators" => array(array("ValRequired")),
 		"control" => array("SelectMenu", "values" => $messages),
 		"helpstep" => 4
@@ -446,7 +436,7 @@ $formdata = array(
 		$formdata["callerid"] = array(
 			"label" => _L("Personal Caller ID"),
 			"fieldhelp" => (""),
-			"value" => Phone::format($USER->getSetting("callerid",getDefaultCallerID())),
+			"value" => Phone::format($job->getSetting("callerid",getDefaultCallerID())),
 			"validators" => array(
 				array("ValLength","min" => 3,"max" => 20),
 				array("ValPhone")
@@ -455,6 +445,7 @@ $formdata = array(
 			"helpstep" => 5
 		);
 	}
+	
 	$formdata = array_merge($formdata,array(
 	"attempts" => array(
 		"label" => _L('Max Attempts'),
@@ -648,7 +639,7 @@ include_once("nav.inc.php");
 ?>
 <script type="text/javascript" src="script/listform.js.php"></script>
 <script type="text/javascript">
-<? Validator::load_validators(array("ValJobName","ValWeekRepeatItem","ValTimeWindowCallEarly","ValTimeWindowCallLate","ValDate","ValLists")); ?>
+<? Validator::load_validators(array("ValDuplicateNameCheck","ValWeekRepeatItem","ValTimeWindowCallEarly","ValTimeWindowCallLate","ValDate","ValLists")); ?>
 </script>
 <?
 
