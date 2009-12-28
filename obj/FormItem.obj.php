@@ -101,7 +101,7 @@ class SelectMenu extends FormItem {
 		$size = isset($this->args['size']) ? 'size="'.$this->args['size'].'"' : "";
 		$str = '<select id='.$n.' name="'.$n.'" '.$size .' >';
 		foreach ($this->args['values'] as $selectvalue => $selectname) {
-			$checked = $value === $selectvalue;
+			$checked = $value == $selectvalue;
 			$str .= '<option value="'.escapehtml($selectvalue).'" '.($checked ? 'selected' : '').' >'.escapehtml($selectname).'</option>
 				';
 		}
@@ -117,7 +117,7 @@ class MultiSelect extends FormItem {
 		$size = isset($this->args['size']) ? 'size="'.$this->args['size'].'"' : "";
 		$str = '<select multiple id='.$n.' name="'.$n.'[]" '.$size .' >';
 		foreach ($this->args['values'] as $selectvalue => $selectname) {
-			$checked = $value === $selectvalue || (is_array($value) && in_array($selectvalue, $value));
+			$checked = $value == $selectvalue || (is_array($value) && in_array($selectvalue, $value));
 			$str .= '<option value="'.escapehtml($selectvalue).'" '.($checked ? 'selected' : '').' >'.escapehtml($selectname).'</option>
 			';
 		}
