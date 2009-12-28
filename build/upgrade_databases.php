@@ -2,7 +2,7 @@
 
 $authhost = "127.0.0.1";
 $authuser = "root";
-$authpass = "reliance202";
+$authpass = "";
 
 /*
  * Starting in 7.5, we will use a customer setting "_dbversion" to indicate what version
@@ -139,7 +139,7 @@ foreach ($customers as  $customerid => $customer) {
 	
 	if ($version === $targetversion && $rev == $targetrev) {
 		Query("commit",$db);
-		echo "alread up to date, skipping\n";
+		echo "already up to date, skipping\n";
 		continue;
 	}
 	
@@ -159,7 +159,7 @@ foreach ($customers as  $customerid => $customer) {
 	//TODO find index of current version in $versions array, run upgrade for version of index +1, repeat until index == $targetversion index
 	//for now, just run 7.5
 	
-	require("upgrades/db_7-5.php");
+	require_once("upgrades/db_7-5.php");
 	$rev = $version == "7.5" ? $rev : 0; //reset revision to 0 each time we go to a new release, unless we're doing the same release.
 	echo "upgrading from $version/$rev to $targetversion/$targetrev\n";
 	if (upgrade_7_5($rev, $customer['shardid'], $customerid, $db)) {
