@@ -42,18 +42,6 @@ if (isset($_GET['delete'])) {
 	}
 }
 
-if (isset($_GET['deletetemplate'])) {
-	$id = $_GET['deletetemplate'] + 0;
-	if (userOwns("surveyquestionnaire",$id)) {
-		$questionnaire = new SurveyQuestionnaire($id);
-		$questionnaire->deleted = 1;
-		$questionnaire->update();
-		notice(_L("The survey template, %s, is now deleted.", escapehtml($questionnaire->name)));
-	} else {
-		notice(_L("You do not have permission to delete this survey template."));
-	}
-	redirectToReferrer();
-}
 
 //preload audiofile information to determine simple/advanced phone messages
 //save messageid => audiofileid
@@ -121,19 +109,13 @@ function fmt_creator ($obj,$name) {
 }
 
 
-function fmt_surveyactions ($obj,$name) {
-
-	return '<a href="surveytemplate.php?id=' . $obj->id . '">Edit</a>&nbsp;|&nbsp;'
-			. '<a href="survey.php?scheduletemplate=' . $obj->id . '">Schedule</a>&nbsp;|&nbsp;'
-			. '<a href="messages.php?deletetemplate=' . $obj->id . '">Delete</a>';
-}
 
 ////////////////////////////////////////////////////////////////////////////////
 // Display
 ////////////////////////////////////////////////////////////////////////////////
 
 $PAGE = "notifications:messages";
-$TITLE = "Message " . ((getSystemSetting('_hassurvey', true) && $USER->authorize("survey")) ? "& Survey Template " : "") . "Builder";
+$TITLE = "Message Builder";
 
 include_once("nav.inc.php");
 
@@ -208,40 +190,6 @@ if(getSystemSetting('_hassms', false) && $USER->authorize('sendsms')) {
 	echo '<br>';
 }
 
-if($USER->authorize('sendprint')) {
-	$data = DBFindMany("Message",", (name + 0) as foo from message where type='print' and userid=$USER->id and deleted=0 order by foo, name");
-	$scroll = false;
-	if (count($data) > $scrollThreshold) {
-		$scroll = true;
-	}
-	startWindow('My Print Messages ' . help('Messages_MyPrintMessages'), 'padding: 3px;', true, true);
-	button_bar(button('Create Print Message', NULL,'messageprint.php?id=new') . help('Messages_AddprintMessage'));
-	showObjects($data, $titles, array("Actions" => "fmt_actions", "userid" => "fmt_creator"), $scroll, true);
-	endWindow();
-	echo '<br>';
-}
-
-
-if (getSystemSetting('_hassurvey', true) && $USER->authorize('survey')) {
-
-	startWindow('My Survey Templates '. help('Surveys_MySurveyTemplates'),'padding: 3px;', true, true);
-	button_bar(button('Create New Survey Template', null,"surveytemplate.php?id=new") . help('Surveys_CreateNewTemplateButton') );
-
-	$questionnaires = DBFindMany("SurveyQuestionnaire", "from surveyquestionnaire where userid=$USER->id and deleted = 0 order by name");
-
-	$titles = array("name" => "#Name",
-					"description" => "#Description",
-					"Type" => "#Type",
-					"Questions" => "#Questions",
-					"Actions" => "Actions");
-	$formatters = array("Type" => "fmt_questionnairetype",
-					"Questions" => "fmt_numquestions",
-					"Actions" => "fmt_surveyactions");
-
-	showObjects($questionnaires,$titles,$formatters, count($questionnaires) > 8,true);
-
-	endWindow();
-}
 
 include_once("navbottom.inc.php");
 ?>

@@ -23,13 +23,29 @@ if (!getSystemSetting('_hassurvey', true) || !$USER->authorize('survey')) {
 ////////////////////////////////////////////////////////////////////////////////
 // Data Handling
 ////////////////////////////////////////////////////////////////////////////////
-
-
+if (isset($_GET['deletetemplate'])) {
+	$id = $_GET['deletetemplate'] + 0;
+	if (userOwns("surveyquestionnaire",$id)) {
+		$questionnaire = new SurveyQuestionnaire($id);
+		$questionnaire->deleted = 1;
+		$questionnaire->update();
+		notice(_L("The survey template, %s, is now deleted.", escapehtml($questionnaire->name)));
+	} else {
+		notice(_L("You do not have permission to delete this survey template."));
+	}
+	redirectToReferrer();
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 // Display Functions
 ////////////////////////////////////////////////////////////////////////////////
 
+function fmt_surveyactions ($obj,$name) {
+
+	return '<a href="surveytemplate.php?id=' . $obj->id . '">Edit</a>&nbsp;|&nbsp;'
+			. '<a href="survey.php?scheduletemplate=' . $obj->id . '">Schedule</a>&nbsp;|&nbsp;'
+			. '<a href="surveys.php?deletetemplate=' . $obj->id . '">Delete</a>';
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 // Display
@@ -38,6 +54,26 @@ $PAGE = "notifications:survey";
 $TITLE = "Survey Builder";
 
 include_once("nav.inc.php");
+
+
+startWindow('My Survey Templates '. help('Surveys_MySurveyTemplates'),'padding: 3px;', true, true);
+button_bar(button('Create New Survey Template', null,"surveytemplate.php?id=new") . help('Surveys_CreateNewTemplateButton') );
+
+$questionnaires = DBFindMany("SurveyQuestionnaire", "from surveyquestionnaire where userid=$USER->id and deleted = 0 order by name");
+
+$titles = array("name" => "#Name",
+				"description" => "#Description",
+				"Type" => "#Type",
+				"Questions" => "#Questions",
+				"Actions" => "Actions");
+$formatters = array("Type" => "fmt_questionnairetype",
+				"Questions" => "fmt_numquestions",
+				"Actions" => "fmt_surveyactions");
+
+showObjects($questionnaires,$titles,$formatters, count($questionnaires) > 8,true);
+
+endWindow();
+
 
 
 startWindow('My Surveys ' . help('SurveyBuilder_MyActiveAndPending'),'padding: 3px;',true, true);
