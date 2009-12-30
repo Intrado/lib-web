@@ -20,7 +20,6 @@ if (!$USER->authorize('targetedmessage')) {
 	redirect('unauthorized.php');
 }
 
-
 ////////////////////////////////////////////////////////////////////////////////
 // Action/Request Processing
 ////////////////////////////////////////////////////////////////////////////////
@@ -29,7 +28,6 @@ if (isset($_POST['eventContacts']) && isset($_POST['eventMessage']) && isset($_P
 	$contacts = json_decode($_POST['eventContacts']);
 	$message = $_POST['eventMessage'];
 	$comment = isset($_POST['eventComments'])?$_POST['eventComments']:"";
-	error_log("Comment " . $comment);
 	
 	$ischecked = $_POST['isChecked'];
 	if($ischecked == "false") {
@@ -440,7 +438,6 @@ endWindow();
 					} else if((comment !== false && msg.value !== comment) || (comment === false && count > 1)) {
 						selectedcomments.set(msg.key,true);
 					}
-					console.info(msg.value + "-" + comment + ":"+ selectedcomments.get(msg.key));
 				});
 			} else {
 				newcontct = true;
@@ -468,7 +465,6 @@ endWindow();
 					textarea.value = comment;
 					var target = $('msg-' + message.key).down('a')
 					target.update('Close');
-					console.info("show");
 					target.next('span').show();
 				}
 			}
@@ -653,7 +649,6 @@ document.observe("dom:loaded", function() {
 					onFailure: function(){ alert('Unable to Set Message') },
 					onException: function(){ alert('Unable to Set Message') },
 					onSuccess: function(transport){
-						console.info("updated contacts " + transport);
 						$(htmlid).down('img').src = getstatesrc(state);
 						checkedmessages.set(msgid,state);                  // Set Message to appropriate state
 						// Set each selected contact to
