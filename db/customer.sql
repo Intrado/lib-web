@@ -1616,6 +1616,6 @@ CREATE TABLE IF NOT EXISTS `messagegroup` (
   `deleted` tinyint NOT NULL DEFAULT 0, 
   PRIMARY KEY  (`id`),
   KEY `userid` (`userid`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8
 $$$
 
