@@ -62,7 +62,9 @@ function createSMUserProfile($newdb) {
 						. "($accessid, 'generatebulktokens', '1'),"
 						. "($accessid, 'managetasks', '1'), "
 						. "($accessid, 'managecontactdetailsettings', '1'),"
-						. "($accessid, 'messageconfirmation', '1')";
+						. "($accessid, 'messageconfirmation', '1'),"
+						. "($accessid, 'targetedmessage', '1'),"
+						. "($accessid, 'targetedcomment', '1')";
 				QuickUpdate($query, $newdb);
 
 				$query = "INSERT INTO `user` (`accessid`, `login`,

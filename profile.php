@@ -312,7 +312,23 @@ _L('Messaging Options'),
 		"control" => array("CheckBox"),
 		"helpstep" => 4
 	),
-
+_L('Classroom Messaging Options'),
+	"targetedmessage" => array(
+		"label" => _L('Send Classroom Messages'),
+		"fieldhelp" => _L('Allows users to select and send from a library of classroom messages'),
+		"value" => $obj->getValue("targetedmessage"),
+		"validators" => array(),
+		"control" => array("CheckBox"),
+		"helpstep" => 4
+	),
+	"targetedcomment" => array(
+		"label" => _L('Add Comment Classroom Message'),
+		"fieldhelp" => _L('Allows users to add a comment to the predefined classroom message'),
+		"value" => $obj->getValue("targetedcomment"),
+		"validators" => array(),
+		"control" => array("CheckBox"),
+		"helpstep" => 4
+	),
 _L('Advanced Job Options'),
 	"createrepeat" => array(
 		"label" => _L('Create Repeating Jobs'),
@@ -635,6 +651,8 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 			$obj->setPermission("callmax", $postdata['callmax']);
 			$obj->setPermission("sendemail", (bool)$postdata['sendemail']);
 			$obj->setPermission("sendmulti", (bool)$postdata['sendmulti']);
+			$obj->setPermission("targetedmessage", (bool)$postdata['targetedmessage']);
+			$obj->setPermission("targetedcomment", (bool)$postdata['targetedcomment']);
 			$obj->setPermission("createlist", (bool)$postdata['createlist']);
 			$obj->setPermission("listuploadids", (bool)$postdata['listuploadids']);
 			$obj->setPermission("listuploadcontacts", (bool)$postdata['listuploadcontacts']);

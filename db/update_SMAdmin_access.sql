@@ -43,6 +43,8 @@ INSERT INTO `permission` (accessid,name,value) VALUES
 						 (@smaccessid, 'generatebulktokens', '1'),
 						 (@smaccessid, 'managetasks', '1'),
 						 (@smaccessid, 'managecontactdetailsettings', '1'),
-						 (@smaccessid, 'messageconfirmation', '1');
+						 (@smaccessid, 'messageconfirmation', '1'),
+						 (@smaccessid, 'targetedmessage', '1'),
+						 (@smaccessid, 'targetedcomment', '1');
 $$$
 						
