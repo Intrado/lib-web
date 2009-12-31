@@ -144,6 +144,7 @@ if(CheckFormSubmit($f,"Save") || CheckFormSubmit($f, "Return")) {
 			$surveyurl = GetFormData($f, $s, 'surveyurl');
 			$maxusers = GetFormData($f, $s, 'maxusers');
 			$managernote = GetFormData($f, $s, 'managernote');
+			$hasldap = GetFormData($f, $s, 'hasldap');
 			$hassms = GetFormData($f, $s, 'hassms');
 			$enablesmsoptin = GetFormData($f, $s, "enablesmsoptin");
 			$smscustomername = trim(GetFormData($f, $s, "smscustomername"));
@@ -272,6 +273,7 @@ if(CheckFormSubmit($f,"Save") || CheckFormSubmit($f, "Return")) {
 				if($maxusers == "")
 					$maxusers = "unlimited";
 				setCustomerSystemSetting('_maxusers', $maxusers, $custdb);
+				setCustomerSystemSetting('hasldap', $hasldap, $custdb);
 				setCustomerSystemSetting('_hassms', $hassms, $custdb);
 				setCustomerSystemSetting('enablesmsoptin', $enablesmsoptin, $custdb);
 				setCustomerSystemSetting('smscustomername', $smscustomername, $custdb);
@@ -424,6 +426,10 @@ if( $reloadform ) {
 	PutFormData($f,$s,"maxusers", $maxusers, "number", 0);
 	PutFormData($f,$s,"managernote", $custinfo[8], "text", 0, 255);
 
+	// LDAP
+	PutFormData($f,$s,"hasldap", getCustomerSystemSetting('hasldap', false, true, $custdb), "bool", 0, 1);
+	// TODO pick a disk agent, store in 'authdiskuuid'
+	
 	// SMS
 	PutFormData($f,$s,"hassms", getCustomerSystemSetting('_hassms', false, true, $custdb), "bool", 0, 1);
 	PutFormData($f, $s, "enablesmsoptin", getCustomerSystemSetting('enablesmsoptin', true, true, $custdb), "bool", 0, 1);
@@ -574,6 +580,8 @@ foreach($languages as $index => $language){
 		</select>
 		<? NewFormItem($f, "Save","Add", 'submit');?>
 </td></tr>
+
+<tr><td> Has LDAP </td><td><? NewFormItem($f, $s, 'hasldap', 'checkbox') ?> LDAP</td></tr>
 
 <tr><td> Has SMS </td><td><? NewFormItem($f, $s, 'hassms', 'checkbox') ?> SMS</td></tr>
 <tr><td> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Enable SMS Opt-in </td><td><? NewFormItem($f, $s, 'enablesmsoptin', 'checkbox') ?> Opt-in</td></tr>
