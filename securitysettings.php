@@ -125,6 +125,76 @@ if (getSystemSetting('_hascallback', '0') && !getSystemSetting('_hasselfsignup',
 	);
 }
 
+if (getSystemSetting('hasldap', '0')) {
+	$helpsteps[$helpstepnum++] = array(_L("Enter the hostname or IP address of your LDAP server."));
+	$formdata["ldaphost"] = array(
+		"label" => _L("LDAP Host"),
+		"fieldhelp" => _L("LDAP Server hostname"),
+		"value" => getSystemSetting('ldaphost', ''),
+		"validators" => array(
+			array("ValRequired"),
+			array("ValLength","min" => 1,"max" => 50)
+		),
+		"control" => array("TextField","maxlength" => 50),
+		"helpstep" => $helpstepnum
+	);
+
+	$helpsteps[$helpstepnum++] = array(_L("Enter the port number that your LDAP server listens on."));
+	$formdata["ldapport"] = array(
+		"label" => _L("LDAP Port"),
+		"fieldhelp" => _L("LDAP Server port, default is 389"),
+		"value" => getSystemSetting('ldapport', '389'),
+		"validators" => array(
+			array("ValRequired"),
+			array("ValNumeric"),
+			array("ValLength","min" => 1,"max" => 50)
+		),
+		"control" => array("TextField","maxlength" => 50),
+		"helpstep" => $helpstepnum
+	);
+	
+	$helpsteps[$helpstepnum++] = array(_L("Enter a binding username for lookups to your LDAP server."));
+	$formdata["ldapuser"] = array(
+		"label" => _L("LDAP Username"),
+		"fieldhelp" => _L("LDAP binding username"),
+		"value" => getSystemSetting('ldapuser', ''),
+		"validators" => array(
+			array("ValRequired"),
+			array("ValLength","min" => 1,"max" => 50)
+		),
+		"control" => array("TextField","maxlength" => 50),
+		"helpstep" => $helpstepnum
+	);
+
+	$helpsteps[$helpstepnum++] = array(_L("Enter the password for the binding user to your LDAP server."));
+	$formdata["ldappass"] = array(
+		"label" => _L("LDAP Password"),
+		"fieldhelp" => _L("LDAP binding user's password"),
+		"value" => getSystemSetting('ldappass', ''),
+		"validators" => array(
+			array("ValRequired"),
+			array("ValLength","min" => 1,"max" => 50)
+		),
+		"control" => array("PasswordField","maxlength" => 50),
+		"helpstep" => $helpstepnum
+	);
+
+	$helpsteps[$helpstepnum++] = array(_L("Enter the domain used by your LDAP server."));
+	$formdata["ldapdomain"] = array(
+		"label" => _L("LDAP Domain"),
+		"fieldhelp" => _L("LDAP domain"),
+		"value" => getSystemSetting('ldapdomain', ''),
+		"validators" => array(
+			array("ValRequired"),
+			array("ValDomain"),
+			array("ValLength","min" => 1,"max" => 50)
+		),
+		"control" => array("TextField","maxlength" => 50),
+		"helpstep" => $helpstepnum
+	);
+
+}
+
 $buttons = array(submit_button(_L("Done"),"submit","accept"),
 				icon_button(_L("Cancel"),"cross",null,"settings.php"));
 
@@ -156,6 +226,14 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 			$postdata['msgcallbackrequireid'] ? setSystemSetting('msgcallbackrequireid', '1') : setSystemSetting('msgcallbackrequireid', '0');
 		} else {
 			setSystemSetting('msgcallbackrequireid', '0');
+		}
+		
+		if (getSystemSetting('hasldap', '0')) {
+			setSystemSetting('ldaphost', $postdata['ldaphost']);
+			setSystemSetting('ldapport', $postdata['ldapport']);
+			setSystemSetting('ldapuser', $postdata['ldapuser']);
+			setSystemSetting('ldappass', $postdata['ldappass']);
+			setSystemSetting('ldapdomain', $postdata['ldapdomain']);
 		}
 		
 		if ($ajax)
