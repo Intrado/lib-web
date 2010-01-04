@@ -160,8 +160,15 @@ var AccordionSection = Class.create({
 	update: function(options) {
 		if (options.title)
 			this.titleSpan.update(options.title);
-		if (options.icon)
-			this.titleIcon.src = options.icon;
+		if (options.icon) {
+			if (options.icon.tagName) {
+				this.titleIcon.replace(options.icon);
+				this.titleIcon = options.icon;
+				this.titleIcon.addClassName(this.widget.classPrefix+'titleicon');
+			} else {
+				this.titleIcon.src = options.icon;
+			}
+		}
 		if (options.content)
 			this.contentDiv.update(options.content);
 	},
