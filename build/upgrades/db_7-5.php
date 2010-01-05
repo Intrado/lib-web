@@ -202,7 +202,7 @@ function upgrade_7_5 ($rev, $shardid, $customerid, $db) {
 				if ($schoolfieldnum[0] == "g")
 					$query = "select distinct value from groupdata where fieldnum=$num";
 				else
-					$query = "select distinct $schoolfieldnum from from person";
+					$query = "select distinct $schoolfieldnum from person";
 				QuickUpdate("insert ignore into organization (orgkey) $query");
 
 				//create person associations
