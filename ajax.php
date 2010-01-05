@@ -196,13 +196,14 @@ function handleRequest() {
 				$result->headers[] = "Email";
 			if($cansendsms)
 				$result->headers[] = "SMS";
-			$query = "select languagecode
+			$query = "select l.name as language
 						" . ($cansendphone?",sum(type='phone') as Phone":"") . "
 						" . ($cansendemail?",sum(type='email') as Email":"") . "
 						" . ($cansendsms?",sum(type='sms') as SMS":"") . "
-						from message where messagegroupid = ?
-						" . ($cansendmultilingual?"":"and languagecode = '$defaultlanguagecode'") . "
-						group by languagecode order by languagecode";
+						from message m, language l where m.messagegroupid = ?
+						" . ($cansendmultilingual?"":"and m.languagecode = '$defaultlanguagecode'") . "
+						and m.languagecode = l.code
+						group by language order by language";
 			$result->data = QuickQueryMultiRow($query,true,false,array($_GET['id']));
 			return $result;
 		default:

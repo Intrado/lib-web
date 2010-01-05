@@ -189,9 +189,9 @@ class ValTranslationExpirationDate extends Validator {
 		}
 		if($modifydate != false) {
 			if(strtotime("today") - strtotime($modifydate) > (7*86400))
-				return "Message Translations Expired";
+				return $this->label. " ". _L('The selected message below contains auto-translated content older than 7 days. Regenerate translations to schedule a start date');
 			if(strtotime($value) - strtotime($modifydate) > (7*86400))
-				return "Can not schedule the job for more than 7 days of when the message was saved";
+				return _L("Can not schedule the job with a message containing auto-translated content older than 7 days from the Start Date");
 		}
 		return true;
 	}
@@ -207,9 +207,9 @@ class ValTranslationExpirationMessage extends Validator {
 		$modifydate = QuickQuery("select min(modifydate) from message where messagegroupid = ? and autotranslate = 'translated'", false, array($value));
 		if($modifydate != false) {
 			if(strtotime("today") - strtotime($modifydate) > (7*86400))
-				return "Message Translations Expired";
+				return _L('The selected message contains auto-translated content older than 7 days. Regenerate translations to schedule a start date');
 			if(strtotime($requiredvalues['date']) - strtotime($modifydate) > (7*86400))
-				return "Can not schedule the job for more than 7 days of when the message was saved";
+				return _L("Can not schedule the job with a message containing auto-translated content older than 7 days from the Start Date");
 		}
 		return true;
 	}
@@ -516,7 +516,7 @@ $helpsteps[] = _L("The name of your job. The best names are brief and discriptiv
 							response.data.each(function(item) {
 								str += '<tr>';
 								//console.info(item.languagecode +item.Phone + item.Email);
-									str += '<td>' + item.languagecode + '</td>';
+									str += '<td>' + item.language + '</td>';
 								if(response.headers[item.Phone])
 									str += '<td>' + (item.Phone!=0?'<img src=\'img/icons/accept.gif\' />':'') + '</td>';
 								if(response.headers[item.Email])
