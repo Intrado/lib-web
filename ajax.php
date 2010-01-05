@@ -177,6 +177,33 @@ function handleRequest() {
 				"body"=>count($parts)?$message->format($parts):""
 			);
 
+		case 'messagegrid':
+			if (!isset($_GET['id']))
+				return false;
+			$cansendphone = $USER->authorize('sendphone');
+			$cansendemail = $USER->authorize('sendemail');
+			$cansendsms = getSystemSetting('_hassms', false) && $USER->authorize('sendsms');
+			$cansendmultilingual = $USER->authorize('sendmulti');
+			$cansendmultilingual = false;
+			$defaultlanguagecode = 'en';
+
+			$result->headers = array();
+			$result->headers[] = "Language";
+			if($cansendphone)
+				$result->headers[] = "Phone";
+			if($cansendemail)
+				$result->headers[] = "Email";
+			if($cansendsms)
+				$result->headers[] = "SMS";
+			$query = "select languagecode
+						" . ($cansendphone?",sum(type='phone') as Phone":"") . "
+						" . ($cansendemail?",sum(type='email') as Email":"") . "
+						" . ($cansendsms?",sum(type='sms') as SMS":"") . "
+						from message where messagegroupid = ?
+						" . ($cansendmultilingual?"":"and languagecode = '$defaultlanguagecode'") . "
+						group by languagecode order by languagecode";
+			$result->data = QuickQueryMultiRow($query,true,false,array($_GET['id']));
+			return $result;
 		default:
 			error_log("No AJAX API for type=$type");
 			return false;
