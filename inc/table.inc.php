@@ -142,7 +142,7 @@ function startWindow($title, $style = "", $minimize = false, $usestate = true) {
 		<td background="img/themes/<?=$theme?>/win_t.gif" width="100%">
 			<div class="windowbar">
 <?	if ($minimize) { ?>
-				<div class="menucollapse" onclick="windowHide(<?=$id?>);" ><img id="window_colapseimg_<?= $id ?>" src="img/arrow_<?=  $visible ? "down" : "right" ?>.gif"></div>
+				<div class="menucollapse" onclick="windowHide(<?=$id?>);" ><img alt="expand or colapse window" id="window_colapseimg_<?= $id ?>" src="img/arrow_<?=  $visible ? "down" : "right" ?>.gif"></div>
 <? } ?>
 				<div class="windowtitle"><?= $title ?></div>
 			</div>

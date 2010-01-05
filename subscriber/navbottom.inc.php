@@ -3,7 +3,7 @@
 
 <div id="termsinfo">
 <? /*CSDELETEMARKER_START*/ if (!$IS_COMMSUITE) { ?>
-<?=_L('Use of this system is subject to the %1$s and %2$s', '<a href="locale/' . $LOCALE . '/privacy.html" target="_blank">' . _L("Privacy Policy") . "</a>", '<a href="locale/' . $LOCALE . '/terms.html" target="_blank">' . _L("Terms of Service") . "</a>")?>
+<?=_L('Use of this system is subject to the %1$s and %2$s', '<a href="locale/' . $LOCALE . '/privacy.html" target="_blank" title="'. _L("Privacy Policy") .'">' . _L("Privacy Policy") . "</a>", '<a href="locale/' . $LOCALE . '/terms.html" target="_blank" title="'. _L("Terms of Service") .'">' . _L("Terms of Service") . "</a>")?>
 <br>
 <? } /*CSDELETEMARKER_END*/ ?>
 &copy; 1999-2009 Reliance Communications, Inc. <?=_L("All Rights Reserved.")?>
@@ -20,7 +20,7 @@ if(isset($ERRORS) && is_array($ERRORS)) {
 	print '<script language="javascript">window.alert(\'' . implode('.\n', $ERRORS) . '.\');</script>';
 }
 ?>
-<img id="state" src="img/spacer.gif" width="1" height="1">
+<img id="state" alt="" src="img/spacer.gif" width="1" height="1">
 <? if (isset($_GET['timer'])) printf("<!-- %0.2f -->", microtime(true) - $PAGETIME) ?>
 </body>
 </html>

@@ -22,22 +22,22 @@ if (isset($_GET['timer']) || isset($_SESSION['timer'])) {
 //[[title,default link,access,selected,[[sub title,sub link,sub access,sub selected],...],...]
 
 $NAVTREE = array (
-	array(_L("Messages"),"start.php",NULL,$MAINTAB=="messages",array()),
-	array(_L("Contact Info"), "notificationpreferences.php", NULL, $MAINTAB=="contacts", array()),
-	array(_L("My Account"), "account.php", NULL, $MAINTAB=="account", array())
+	array(_L("Messages"), _L("Messages"), "M", "start.php",NULL,$MAINTAB=="messages",array()),
+	array(_L("Contact Info"), _L("Contact Info"), "C", "notificationpreferences.php", NULL, $MAINTAB=="contacts", array()),
+	array(_L("My Account"), _L("My Account"), "A", "account.php", NULL, $MAINTAB=="account", array())
 );
 
 ////////////////////////////////////////////////////////////////////////////////
 // Display Functions
 ////////////////////////////////////////////////////////////////////////////////
 
-function navMainTab ($title, $link, $isselected) {
+function navMainTab ($display, $hint, $accesskey, $link, $isselected) {
 	$theme = getBrandTheme();
-	return '<div class="navtab"><a onfocus="blur()" href="' . $link . '"><img src="img/themes/' . $theme . '/main_nav_tab' . ($isselected ? "_active" : "") . '.gif"><span>' . $title . '</span></a></div>';
+	return '<div class="navtab"><a accesskey="'.$accesskey.'" onfocus="blur()" href="' . $link . '" title="'.$hint.'"><img alt="" src="img/themes/' . $theme . '/main_nav_tab' . ($isselected ? "_active" : "") . '.gif"><span>' . $display . '</span></a></div>';
 }
 
 function navSubTab ($title, $link, $isselected) {
-	return '<a onfocus="blur()" class="subnavtab ' . ($isselected ? "active" : "") . '" href="' . $link . '"><div>' . $title . '</div></a>';
+	return '<a onfocus="blur()" class="subnavtab ' . ($isselected ? "active" : "") . '" href="' . $link . '" title="'.$title.'"><div>' . $title . '</div></a>';
 }
 
 function doNavTabs ($navtree) {
@@ -48,21 +48,21 @@ function doNavTabs ($navtree) {
 	foreach ($navtree as $maintab) {
 			//do the subtabs first, if there are any
 			$maintablink = false;
-			foreach ($maintab[4] as $subtab) {
+			foreach ($maintab[6] as $subtab) {
 					//set the maintablink to the first enabled subtab's link
 					if ($maintablink === false)
 						$maintablink = $subtab[1];
 					//build subtab html if this maintab is selected
-					if ($maintab[3]) {
+					if ($maintab[5]) {
 						$FIRSTACTIVETABLINK = $maintablink;
 						$ACTIVEMAINTABTITLE = $maintab[0];
 						$SUBTABS .= navSubTab($subtab[0],$subtab[1],$subtab[3]);
 					}
 			}
 			//if we didnt get a link, then use the default
-			$maintablink = $maintablink === false ? $maintab[1] : $maintablink;
+			$maintablink = $maintablink === false ? $maintab[3] : $maintablink;
 
-			$MAINTABS .= navMainTab($maintab[0],$maintablink,$maintab[3]);
+			$MAINTABS .= navMainTab($maintab[0],$maintab[1],$maintab[2],$maintablink,$maintab[5]);
 	}
 }
 
@@ -70,9 +70,9 @@ function doLogo () {
 	$logohash = crc32("cid".getSystemSetting("_logocontentid"));
 	$clickurl = getSystemSetting("_logoclickurl");
 	if($clickurl != "" && $clickurl != "http://")
-		echo '<a href="' . $clickurl . '" target="_blank"><img src="logo.img.php?hash=' . $logohash .'></a>';
+		echo '<a href="' . $clickurl . '" target="_blank" title="Logo"><img src="logo.img.php?hash=' . $logohash .'></a>';
 	else
-		echo '<img src="logo.img.php?hash=' . $logohash .'">';
+		echo '<img src="logo.img.php?hash=' . $logohash .'" alt="Logo">';
 }
 
 doNavTabs($NAVTREE);
@@ -128,20 +128,20 @@ header('Content-type: text/html; charset=UTF-8') ;
 			<div class="custname"><?= escapehtml($_SESSION['custname']); ?></div>
 			<table border=0 cellspacing=0 cellpadding=0 class="noprint">
 				<tr>
-					<td><img src="img/accountlinksbg_left.gif"></td>
+					<td><img src="img/accountlinksbg_left.gif" alt=""></td>
 					<td background="img/accountlinksbg_mid.gif">
 						<div class="applinks hoverlinks">
-							<a href="index.php?logout=1"><?=_L("Logout")?></a>
+							<a href="index.php?logout=1" title="<?=_L("Logout")?>"><?=_L("Logout")?></a>
 						</div>
 					</td>
-					<td><img src="img/accountlinksbg_right.gif"></td>				
+					<td><img src="img/accountlinksbg_right.gif" alt=""></td>				
 				</tr>		
 			</table>
 		</td>
 	</tr>
 </table>
-<div class="navband1"><img src="img/pixel.gif"></div>
-<div class="navband2"><img src="img/pixel.gif"></div>
+<div class="navband1"><img src="img/pixel.gif" alt=""></div>
+<div class="navband2"><img src="img/pixel.gif" alt=""></div>
 
 <!-- =================================================== -->
 <div class="navmenuspacer">
@@ -155,7 +155,7 @@ header('Content-type: text/html; charset=UTF-8') ;
 	<?= $SUBTABS ?>
 </div>
 
-	<div class="pagetitle"><? if(isset($ICON)) print '<img src="img/themes/' .getBrandTheme() . '/icon_' . $ICON . '" align="absmiddle">'; ?> <?= $TITLE ?></div>
+	<div class="pagetitle"><? if(isset($ICON)) print '<img alt="" src="img/themes/' .getBrandTheme() . '/icon_' . $ICON . '" align="absmiddle">'; ?> <?= $TITLE ?></div>
 	<div class="pagetitlesubtext"><?= (isset($DESCRIPTION) ? $DESCRIPTION : "") ?></div>
 
 	<div class="maincontent">

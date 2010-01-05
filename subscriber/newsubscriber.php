@@ -37,7 +37,7 @@ if (isset($_GET['deletelocale'])) {
 class CaptchaField extends FormItem {
 	function render ($value) {
 		$n = $this->form->name."_".$this->name;
-		return '<table><tr><td><img src="captcha.png.php?'.mt_rand().'" /></td><td>' .
+		return '<table><tr><td><img alt="captcha" src="captcha.png.php?'.mt_rand().'" /></td><td>' .
 				button('Try Another',null,'newsubscribersession.php') .
 				'</td></tr></table><input id="'.$n.'" name="'.$n.'" type="text" value="" maxlength="50" size="14"/>';
 	}

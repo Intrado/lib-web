@@ -41,7 +41,7 @@ if((isset($_COOKIE['embeddedpage']) && $_COOKIE['embeddedpage']) || isset($_GET[
 			<td colspan="3" align="right">
 				<table>
 					<tr>
-						<td><img src="img/sm_white.gif" /></td>
+						<td><img src="img/sm_white.gif" alt="" /></td>
 						<td>
 						<? /*CSDELETEMARKER_START*/ if (!$IS_COMMSUITE && isset($_SERVER["HTTPS"])) { ?>
 									<div style="float:right">
@@ -73,7 +73,7 @@ if((isset($_COOKIE['embeddedpage']) && $_COOKIE['embeddedpage']) || isset($_GET[
 <body style='font-family: "Lucida Grande", verdana, arial, helvetica, sans-serif; margin: 0px; background-color: #<?=$primary?>;'>
 	<table border=0 cellpadding=0 cellspacing=0 width="100%">
 	<tr style="background-color: #FFFFFF;">
-		<td><div style="padding-left:5px; padding-bottom:5px;"><img src="logo.img.php" /></div></td>
+		<td><div style="padding-left:5px; padding-bottom:5px;"><img src="logo.img.php" alt="Logo" /></div></td>
 		<td>
 			<br>
 		</td>
@@ -82,7 +82,7 @@ if((isset($_COOKIE['embeddedpage']) && $_COOKIE['embeddedpage']) || isset($_GET[
 		<td colspan="2">&nbsp;</td>
 	</tr>
 	<tr>
-		<td width="320" valign="top" style="background-color: #D4DDE2; color: #365F8D;"><img src="loginpicture.img.php"></td>
+		<td width="320" valign="top" style="background-color: #D4DDE2; color: #365F8D;"><img src="loginpicture.img.php" alt="picture of student in library"></td>
 		<td style="background-color: #D4DDE2; color: #<?=$primary?>;">
 			<table>
 				<tr>
