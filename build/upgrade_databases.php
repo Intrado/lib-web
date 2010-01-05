@@ -2,7 +2,7 @@
 
 $authhost = "127.0.0.1";
 $authuser = "root";
-$authpass = "";
+$authpass = "reliance202";
 
 /*
  * Starting in 7.5, we will use a customer setting "_dbversion" to indicate what version
@@ -32,7 +32,7 @@ $authpass = "";
 //rev is mainly for internal dev where we may have already deployed that version, but made some changes
 $versions = array (
 	"7.1.5/0",
-	"7.5/2"
+	"7.5/3"
 	//7.5.1
 	//7.6
 	//etc
@@ -175,7 +175,7 @@ foreach ($customers as  $customerid => $customer) {
 	echo "\n";
 }
 
-function apply_sql ($filename, $customerid, $custdb, $skiprev) {
+function apply_sql ($filename, $customerid, $custdb, $specificrev = false) {
 	
 	$allsql = file_get_contents($filename);
 	
@@ -188,13 +188,11 @@ function apply_sql ($filename, $customerid, $custdb, $skiprev) {
 		//if we got just numbers, must be revision version
 		if (preg_match("/^[0-9]+\$/",$revsql)) {
 			$currev = $revsql + 0;
-			if (!($skiprev && $currev <= $skiprev))
-				echo "$currev";
 			continue;
 		}
 		
 		//skip blanks, older revs
-		if (trim($revsql) == "" || $skiprev && $currev <= $skiprev) {
+		if (trim($revsql) == "" || $specificrev && $currev != $specificrev) {
 			continue;
 		}
 		
