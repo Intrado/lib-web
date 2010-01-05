@@ -173,19 +173,48 @@ class ValWeekRepeatItem extends Validator {
 		return true;
 	}
 }
-/*
-class ValTranslationExperation extends Validator {
+
+class ValTranslationExpirationDate extends Validator {
 	var $onlyserverside = true;
-	function validate ($value, $args) {
-		global $USER;
-
-		if($time < strtotime($USER->getCallEarly()))
-			return _L('Time is can not be before %1$s',$USER->getCallEarly());
-
+	function validate ($value, $args,$requiredvalues) {
+		global $USER;	
+		global $submittedmode;
+		if($submittedmode) {
+			global $job;
+			$modifydate = QuickQuery("select min(modifydate) from message where messagegroupid = ? and autotranslate = 'translated'", false, array($job->messagegroupid));
+		} else {
+			if($requiredvalues['message'] == "")
+				return true;
+			$modifydate = QuickQuery("select min(modifydate) from message where messagegroupid = ? and autotranslate = 'translated'", false, array($requiredvalues['message']));
+		}
+		if($modifydate != false) {
+			if(strtotime("today") - strtotime($modifydate) > (7*86400))
+				return "Message Translations Expired";
+			if(strtotime($value) - strtotime($modifydate) > (7*86400))
+				return "Can not schedule the job for more than 7 days of when the message was saved";
+		}
 		return true;
 	}
 }
-*/
+
+class ValTranslationExpirationMessage extends Validator {
+	var $onlyserverside = true;
+	function validate ($value, $args,$requiredvalues) {
+		global $USER;
+
+		if($requiredvalues['date'] == "")
+			return true;
+		$modifydate = QuickQuery("select min(modifydate) from message where messagegroupid = ? and autotranslate = 'translated'", false, array($value));
+		if($modifydate != false) {
+			if(strtotime("today") - strtotime($modifydate) > (7*86400))
+				return "Message Translations Expired";
+			if(strtotime($requiredvalues['date']) - strtotime($modifydate) > (7*86400))
+				return "Can not schedule the job for more than 7 days of when the message was saved";
+		}
+		return true;
+	}
+}
+
 
 /* TODO these validators are copied from the wizard
 	Make sure they are moved to avoid duplicate implementation
@@ -399,10 +428,13 @@ $helpsteps[] = _L("The name of your job. The best names are brief and discriptiv
 				"validators" => array(
 					array("ValRequired"),
 					array("ValDate", "min" => date("m/d/Y", strtotime("now + $dayoffset days")))
+					,array("ValTranslationExpirationDate")
 				),
 				"control" => array("TextDate", "size"=>12, "nodatesbefore" => $dayoffset),
 				"helpstep" => 3
 			);
+			if(!$submittedmode)
+				$formdata["date"]["requires"] = array("message");
 		}
 	}
 	if($completedmode) {
@@ -518,6 +550,7 @@ $helpsteps[] = _L("The name of your job. The best names are brief and discriptiv
 		$formdata["message"] = array(
 			"label" => _L('Message'),
 			"control" => array("FormHtml","html" => $messages[$job->messagegroupid]),
+			"requires" => array("date"),
 			"helpstep" => 5
 		);
 		$formdata["messagegrid"] = array(
@@ -583,8 +616,10 @@ $helpsteps[] = _L("The name of your job. The best names are brief and discriptiv
 			"label" => _L('Message'),
 			"value" => (((isset($job->messagegroupid) && $job->messagegroupid))?$job->messagegroupid:""),
 			"validators" => array(
-				array("ValRequired")),
+				array("ValRequired"),
+				array("ValTranslationExpirationMessage")),
 			"control" => array("SelectMenu", "values" => $messages),
+			"requires" => array("date"),
 			"helpstep" => 5
 		);
 
@@ -818,7 +853,7 @@ include_once("nav.inc.php");
 ?>
 <script type="text/javascript" src="script/listform.js.php"></script>
 <script type="text/javascript">
-<? Validator::load_validators(array("ValDuplicateNameCheck","ValWeekRepeatItem","ValTimeWindowCallEarly","ValTimeWindowCallLate","ValDate","ValLists")); ?>
+<? Validator::load_validators(array("ValDuplicateNameCheck","ValTranslationExpirationDate","ValTranslationExpirationMessage","ValWeekRepeatItem","ValTimeWindowCallEarly","ValTimeWindowCallLate","ValDate","ValLists")); ?>
 </script>
 <?
 
