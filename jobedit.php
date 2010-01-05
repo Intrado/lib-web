@@ -15,12 +15,19 @@ if (isset($_GET['origin'])) {
 	$_SESSION['origin'] = trim($_GET['origin']);
 }
 
+
+$completedmode = false; // Flag indicating that a job is complete or cancelled so only allow editing of name and description.
+$submittedmode = false; // Flag indicating that a job has been submitted, allowing editing of date/time, name/desc, and a few selected options.
+
 $jobid = $_SESSION['jobid'];
 if ($_SESSION['jobid'] == NULL) {
 	$job = Job::jobWithDefaults();
 } else {
 	$job = new Job($_SESSION['jobid']);
+	$completedmode = in_array($job->status, array('complete','cancelled','cancelling'));
+	$submittedmode = ($completedmode || in_array($job->status,array('active','procactive','processing','scheduled')));
 }
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // Optional Form Items And Validators
@@ -166,6 +173,19 @@ class ValWeekRepeatItem extends Validator {
 		return true;
 	}
 }
+/*
+class ValTranslationExperation extends Validator {
+	var $onlyserverside = true;
+	function validate ($value, $args) {
+		global $USER;
+
+		if($time < strtotime($USER->getCallEarly()))
+			return _L('Time is can not be before %1$s',$USER->getCallEarly());
+
+		return true;
+	}
+}
+*/
 
 /* TODO these validators are copied from the wizard
 	Make sure they are moved to avoid duplicate implementation
@@ -263,17 +283,21 @@ $dayoffset = (strtotime("now") > (strtotime(($ACCESS->getValue("calllate")?$ACCE
 $startvalues = newform_time_select(NULL, $ACCESS->getValue('callearly'), $ACCESS->getValue('calllate'), $USER->getCallEarly());
 $endvalues = newform_time_select(NULL, $ACCESS->getValue('callearly'), $ACCESS->getValue('calllate'), $USER->getCallLate());
 
-$messages = array_merge(array("" => _L("-- Select a Message --")),QuickQueryList("select id, name, (name +0) as digitsfirst from messagegroup where userid=? and deleted=0 order by digitsfirst,name", true,false,array($USER->id)));
-
-
+$messages = array("" =>_L("-- Select a Message --")) + QuickQueryList("select id, name, (name +0) as digitsfirst from messagegroup where userid=? and deleted=0 order by digitsfirst,name", true,false,array($USER->id));
 
 $cansendphone = $USER->authorize('sendphone');
 $cansendemail = $USER->authorize('sendemail');
 $cansendsms = getSystemSetting('_hassms', false) && $USER->authorize('sendsms');
+$cansendmultilingual = $USER->authorize('sendmulti');
 
-$formdata = array(
-	_L('Job Settings'),
-	"name" => array(
+$helpsteps = array();
+$formdata = array();
+
+$formdata[] = _L('Job Settings');
+
+$helpsteps[] = _L("The name of your job. The best names are brief and discriptive of the message content.");
+
+	$formdata["name"] = array(
 		"label" => _L('Job Name'),
 		"value" => isset($job->name)?$job->name:"",
 		"validators" => array(
@@ -283,27 +307,39 @@ $formdata = array(
 		),
 		"control" => array("TextField","size" => 30, "maxlength" => 51),
 		"helpstep" => 1
-	),
-	/*"description" => array(
+	);
+	$formdata["description"] = array(
 		"label" => _L('Description'),
-		"value" => "",
+		"value" => isset($job->description)?$job->description:"",
 		"validators" => array(
 			array("ValLength","min" => 3,"max" => 50)
 		),
 		"control" => array("TextField","size" => 30, "maxlength" => 51),
 		"helpstep" => 1
-	),*/
-	"jobtype" => array(
-		"label" => _L("Type/Category"),
-		"fieldhelp" => _L("Select the option that best describes the type of notification you are sending."),
-		"value" => isset($job->jobtypeid)?$job->jobtypeid:"",
-		"validators" => array(
-			array("ValRequired"),
-			array("ValInArray", "values" => array_keys($jobtypes))
-		),
-		"control" => array("RadioButton", "values" => $jobtypes, "hover" => $jobtips),
-		"helpstep" => 2
-	));
+	);
+
+	if($submittedmode || $completedmode) {
+		$helpsteps[] = _L("The option that best describes the type of notification you are sending.");
+		$formdata["jobtype"] = array(
+			"label" => _L("Type/Category"),
+			"fieldhelp" => _L("The option that best describes the type of notification you are sending."),
+			"control" => array("FormHtml","html" => $jobtypes[$job->jobtypeid]),
+			"helpstep" => 2
+		);
+	} else {
+		$helpsteps[] = _L("Select the option that best describes the type of notification you are sending.");
+		$formdata["jobtype"] = array(
+			"label" => _L("Type/Category"),
+			"fieldhelp" => _L("Select the option that best describes the type of notification you are sending."),
+			"value" => isset($job->jobtypeid)?$job->jobtypeid:"",
+			"validators" => array(
+				array("ValRequired"),
+				array("ValInArray", "values" => array_keys($jobtypes))
+			),
+			"control" => array("RadioButton", "values" => $jobtypes, "hover" => $jobtips),
+			"helpstep" => 2
+		);
+	}
 
 	$callearlyvalidators = array(
 			array("ValRequired"),
@@ -329,6 +365,8 @@ $formdata = array(
 			$repeatvalues[] = isset($scheduledows[$x]);
 		}
 		$repeatvalues[] = date("g:i a", strtotime($schedule->time));
+
+		$helpsteps[] = _L("");  // Guide for the whole scheduling section
 		$formdata["repeat"] = array(
 			"label" => _L("Repeat"),
 			"fieldhelp" => _L(""),
@@ -338,150 +376,283 @@ $formdata = array(
 				array("ValWeekRepeatItem")
 			),
 			"control" => array("WeekRepeatItem","timevalues" => newform_time_select(NULL, $ACCESS->getValue('callearly'), $ACCESS->getValue('calllate'), $USER->getCallLate())),
-			"helpstep" => 2
+			"helpstep" => 3
 		);
 	} else {
 		$callearlyvalidators[] = array("ValTimeWindowCallEarly");
 		$calllatevalidators[] = array("ValTimeWindowCallLate");
-		$formdata["date"] = array(
-			"label" => _L("Start Date"),
-			"fieldhelp" => _L("Notification will begin on the selected date."),
-			"value" => "now + $dayoffset days",
+		if($completedmode) {
+
+			$helpsteps[] = _L("The Delivery Window designates the earliest call time and the latest call time allowed for notification delivery.");  // Guide for the whole scheduling section
+			$formdata["date"] = array(
+				"label" => _L("Start Date"),
+				"fieldhelp" => _L("Notification will begin on the selected date."),
+				"control" => array("FormHtml","html" => date("m/d/Y", strtotime($job->startdate))),
+				"helpstep" => 3
+			);
+		} else {
+			$helpsteps[] = _L("The Delivery Window designates the earliest call time and the latest call time allowed for notification delivery.");  // Guide for the whole scheduling section
+			$formdata["date"] = array(
+				"label" => _L("Start Date"),
+				"fieldhelp" => _L("Notification will begin on the selected date."),
+				"value" => isset($job->startdate)?$job->startdate:"now + $dayoffset days",
+				"validators" => array(
+					array("ValRequired"),
+					array("ValDate", "min" => date("m/d/Y", strtotime("now + $dayoffset days")))
+				),
+				"control" => array("TextDate", "size"=>12, "nodatesbefore" => $dayoffset),
+				"helpstep" => 3
+			);
+		}
+	}
+	if($completedmode) {
+		$formdata["days"] = array(
+			"label" => _L("Days to Run"),
+			"fieldhelp" => _L(""),
+			"control" => array("FormHtml","html" => (86400 + strtotime($job->enddate) - strtotime($job->startdate) ) / 86400),
+			"helpstep" => 3
+		);
+		$formdata["callearly"] = array(
+			"label" => _L("Start Time"),
+			"fieldhelp" => ("This is the earliest time to send calls. This is also determined by your security profile."),
+			"control" => array("FormHtml","html" => $USER->getCallEarly()),
+			"helpstep" => 3
+		);
+		$formdata["calllate"] = array(
+			"label" => _L("End Time"),
+			"fieldhelp" => ("This is the latest time to send calls. This is also determined by your security profile."),
+			"control" => array("FormHtml","html" => $USER->getCallLate()),
+			"helpstep" => 3
+		);
+	} else {
+		// Prepare the the "Number of Days to run" data
+		$maxdays = first($ACCESS->getValue('maxjobdays'), 7);
+		$numdays = array_combine(range(1,$maxdays),range(1,$maxdays));
+		//error_log((86400 + strtotime($job->enddate) - strtotime($job->startdate) ) / 86400);
+		$formdata["days"] = array(
+			"label" => _L("Days to Run"),
+			"fieldhelp" => _L(""),
+			"value" => (86400 + strtotime($job->enddate) - strtotime($job->startdate) ) / 86400,
 			"validators" => array(
 				array("ValRequired"),
-				array("ValDate", "min" => date("m/d/Y", strtotime("now + $dayoffset days")))
+				array("ValDate", "min" => 1, "max" => ($ACCESS->getValue('maxjobdays') != null ? $ACCESS->getValue('maxjobdays') : "7"))
 			),
-			"control" => array("TextDate", "size"=>12, "nodatesbefore" => $dayoffset),
-			"helpstep" => 2
+			"control" => array("SelectMenu", "values" => $numdays),
+			"helpstep" => 3
+		);
+		$formdata["callearly"] = array(
+			"label" => _L("Start Time"),
+			"fieldhelp" => ("This is the earliest time to send calls. This is also determined by your security profile."),
+			"value" => $USER->getCallEarly(),
+			"validators" => $callearlyvalidators,
+			"requires" => array("calllate"),// is only required for non repeating jobs
+			"control" => array("SelectMenu", "values"=>$startvalues),
+			"helpstep" => 3
+		);
+		$formdata["calllate"] = array(
+			"label" => _L("End Time"),
+			"fieldhelp" => ("This is the latest time to send calls. This is also determined by your security profile."),
+			"value" => $USER->getCallLate(),
+			"validators" => $calllatevalidators,
+			"requires" => array("callearly", "date"), // is only required for non repeating jobs
+			"control" => array("SelectMenu", "values"=>$endvalues),
+			"helpstep" => 3
 		);
 	}
 
-	// Prepare the the "Number of Days to run" data
-	$numdays = array();
-	$maxdays = first($ACCESS->getValue('maxjobdays'), 7);
-	for ($i = 1; $i <= $maxdays; $i++) {$numdays[$i] = $i;}
+	$helpsteps[] = _L("List");
+	$helpsteps[] = _L("Message");
+	$helpsteps[] = _L("Advanced");
 
-	// Prepare attempt data
-	$attempts = array();
-	$maxattempts = first($ACCESS->getValue('callmax'), 1);
-	for ($i = 1; $i <= $maxattempts; $i++) {$attempts[$i] = $i;}
 
-	$formdata = array_merge($formdata,array(
-	"days" => array(
-		"label" => _L("Days to Run"),
-		"fieldhelp" => _L(""),
-		"value" => (86400 + strtotime($job->enddate) - strtotime($job->startdate) ) / 86400,
-		"validators" => array(
-			array("ValRequired"),
-			array("ValDate", "min" => 1, "max" => ($ACCESS->getValue('maxjobdays') != null ? $ACCESS->getValue('maxjobdays') : "7"))
-		),
-		"control" => array("SelectMenu", "values" => $numdays),
-		"helpstep" => 2
-	),
+	$messageinfogrid = "
+				<div id='jobedit_messagegrid'></div>
+				<script type=\"text/javascript\">
+					document.observe('dom:loaded', function() {
+						" . ($submittedmode || $completedmode?"":"$('jobedit_message').observe('change', load_messageinfo);") . "
+						load_messageinfo();
+					});
+					function load_messageinfo() {
+						var request = 'ajax.php?ajax&type=messagegrid&id=' + " . ($submittedmode || $completedmode?"$job->messagegroupid":"$('jobedit_message').value;") . "
+						cachedAjaxGet(request,function(result) {
+							var response = result.responseJSON;
 
-	"callearly" => array(
-		"label" => _L("Start Time"),
-		"fieldhelp" => ("This is the earliest time to send calls. This is also determined by your security profile."),
-		"value" => $USER->getCallEarly(),
-		"validators" => $callearlyvalidators,
-		"requires" => array("calllate"),// is only required for non repeating jobs
-		"control" => array("SelectMenu", "values"=>$startvalues),
-		"helpstep" => 2
-	),
-	"calllate" => array(
-		"label" => _L("End Time"),
-		"fieldhelp" => ("This is the latest time to send calls. This is also determined by your security profile."),
-		"value" => $USER->getCallLate(),
-		"validators" => $calllatevalidators,
-		"requires" => array("callearly", "date"), // is only required for non repeating jobs
-		"control" => array("SelectMenu", "values"=>$endvalues),
-		"helpstep" => 2
-	),
-	_L('Job Lists'),
-	"lists" => array(
-		"label" => _L('Lists'),
-		"value" => empty($selectedlists)?"":json_encode($selectedlists),
-		"validators" => array(
-			array("ValRequired"),
-			array("ValLists")
-		),
-		"control" => array("JobListItem"),
-		"helpstep" => 3
-	),
-	"skipduplicates" => array(
-		"label" => _L('Skip Duplicates'),
-		"value" => $job->isOption("skipduplicates") || $job->isOption("skipemailduplicates"),
-		"validators" => array(),
-		"control" => array("CheckBox"),
-		"helpstep" => 3
-	),
-	_L('Job Message'),
-	"message" => array(
-		"label" => _L('Message'),
-		"value" => (isset($job->id)?$job->messagegroupid:""),
-		"validators" => array(array("ValRequired")),
-		"control" => array("SelectMenu", "values" => $messages),
-		"helpstep" => 4
-	),
-	_L('Advanced Options '),
-	"report" => array(
-		"label" => _L('Completion Report'),
-		"value" => $job->isOption("sendreport"),
-		"validators" => array(),
-		"control" => array("CheckBox"),
-		"helpstep" => 5
-	)));
+							var str = '<table style=\'border-width:1px;\'>';
+							response.headers.each(function(title) {
+								str += '<th>' + title + '</th>';
+							});
+							response.data.each(function(item) {
+								str += '<tr>';
+								//console.info(item.languagecode +item.Phone + item.Email);
+									str += '<td>' + item.languagecode + '</td>';
+								if(response.headers[item.Phone])
+									str += '<td>' + (item.Phone!=0?'<img src=\'img/icons/accept.gif\' />':'') + '</td>';
+								if(response.headers[item.Email])
+									str += '<td>' + (item.Email!=0?'<img src=\'img/icons/accept.gif\' />':'') + '</td>';
+								if(response.headers[item.SMS])
+									str += '<td>' + (item.SMS!=0?'<img src=\'img/icons/accept.gif\' />':'') + '</td>';
+								str += '</tr>';
+							});
+							str += '</table>';
+							$('jobedit_messagegrid').update(str);
+						});
+					}
+				</script>";
 
-	if ($USER->authorize('setcallerid') && !getSystemSetting('_hascallback', false)) {
-		$formdata["callerid"] = array(
-			"label" => _L("Personal Caller ID"),
-			"fieldhelp" => (""),
-			"value" => Phone::format($job->getSetting("callerid",getDefaultCallerID())),
-			"validators" => array(
-				array("ValLength","min" => 3,"max" => 20),
-				array("ValPhone")
-			),
-			"control" => array("TextField","maxlength" => 20, "size" => 15),
+
+
+	if($submittedmode || $completedmode) {
+		$formdata[] = _L('Job Lists');
+
+		$formdata["lists"] = array(
+			"label" => _L('Lists'),
+			"control" => array("FormHtml","html" => implode("<br/>",QuickQueryList("select name from list where id in (" . repeatWithSeparator("?", ",", count($selectedlists)) . ")", false,false,$selectedlists))),
+			"helpstep" => 4
+		);
+		$formdata["skipduplicates"] = array(
+			"label" => _L('Skip Duplicates'),
+			"control" => array("FormHtml","html" => ($job->isOption("skipduplicates") || $job->isOption("skipemailduplicates"))?"<input type='checkbox' checked disabled/>":"<input type='checkbox' disabled/>"),
+			"helpstep" => 4
+		);
+		$formdata[] = _L('Job Message');
+		$formdata["message"] = array(
+			"label" => _L('Message'),
+			"control" => array("FormHtml","html" => $messages[$job->messagegroupid]),
 			"helpstep" => 5
 		);
+		$formdata["messagegrid"] = array(
+			"label" => _L('Message Info'),
+			"control" => array("FormHtml","html" => $messageinfogrid),
+			"helpstep" => 5
+		);
+		$formdata[] = _L('Advanced Options ');
+		$formdata["report"] = array(
+			"label" => _L('Completion Report'),
+			"control" => array("FormHtml","html" => $job->isOption("sendreport")?"<input type='checkbox' checked disabled/>":"<input type='checkbox' disabled/>"),
+			"helpstep" => 6
+		);
+
+		if ($USER->authorize('setcallerid') && !getSystemSetting('_hascallback', false)) {
+			$formdata["callerid"] = array(
+				"label" => _L("Personal Caller ID"),
+				"control" => array("FormHtml","html" => Phone::format($job->getSetting("callerid",getDefaultCallerID()))),
+				"helpstep" => 6
+			);
+		}
+
+		// Prepare attempt data
+		$maxattempts = first($ACCESS->getValue('callmax'), 1);
+		$attempts = array_combine(range(1,$maxattempts),range(1,$maxattempts));
+
+		$formdata["attempts"] = array(
+			"label" => _L('Max Attempts'),
+			"control" => array("FormHtml","html" => $job->getOptionValue("maxcallattempts")),
+			"helpstep" => 6
+		);
+		$formdata["replyoption"] = array(
+			"label" => _L('Allow Reply'),
+			"control" => array("FormHtml","html" => $job->isOption("leavemessage")?"<input type='checkbox' checked disabled/>":"<input type='checkbox' disabled/>"),
+			"helpstep" => 6
+		);
+		$formdata["confirmoption"] = array(
+			"label" => _L('Allow Confirmation'),
+			"control" => array("FormHtml","html" => $job->isOption("messageconfirmation")?"<input type='checkbox' checked disabled/>":"<input type='checkbox' disabled/>"),
+			"helpstep" => 6
+		);
+	} else {
+		$formdata[] = _L('Job Lists');
+		$formdata["lists"] = array(
+			"label" => _L('Lists'),
+			"value" => empty($selectedlists)?"":json_encode($selectedlists),
+			"validators" => array(
+				array("ValRequired"),
+				array("ValLists")
+			),
+			"control" => array("JobListItem"),
+			"helpstep" => 4
+		);
+		$formdata["skipduplicates"] = array(
+			"label" => _L('Skip Duplicates'),
+			"value" => $job->isOption("skipduplicates") || $job->isOption("skipemailduplicates"),
+			"validators" => array(),
+			"control" => array("CheckBox"),
+			"helpstep" => 4
+		);
+		$formdata[] = _L('Job Message');
+		$formdata["message"] = array(
+			"label" => _L('Message'),
+			"value" => (((isset($job->messagegroupid) && $job->messagegroupid))?$job->messagegroupid:""),
+			"validators" => array(
+				array("ValRequired")),
+			"control" => array("SelectMenu", "values" => $messages),
+			"helpstep" => 5
+		);
+
+		$formdata["messagegrid"] = array(
+			"label" => _L('Message Info'),
+			"control" => array("FormHtml","html" => $messageinfogrid),
+			"helpstep" => 5
+		);
+
+		$formdata[] = _L('Advanced Options ');
+		$formdata["report"] = array(
+			"label" => _L('Completion Report'),
+			"value" => $job->isOption("sendreport"),
+			"validators" => array(),
+			"control" => array("CheckBox"),
+			"helpstep" => 6
+		);
+
+		if ($USER->authorize('setcallerid') && !getSystemSetting('_hascallback', false)) {
+			$formdata["callerid"] = array(
+				"label" => _L("Personal Caller ID"),
+				"fieldhelp" => (""),
+				"value" => Phone::format($job->getSetting("callerid",getDefaultCallerID())),
+				"validators" => array(
+					array("ValLength","min" => 3,"max" => 20),
+					array("ValPhone")
+				),
+				"control" => array("TextField","maxlength" => 20, "size" => 15),
+				"helpstep" => 6
+			);
+		}
+
+		// Prepare attempt data
+		$maxattempts = first($ACCESS->getValue('callmax'), 1);
+		$attempts = array_combine(range(1,$maxattempts),range(1,$maxattempts));
+
+		$formdata["attempts"] = array(
+			"label" => _L('Max Attempts'),
+			"value" => $job->getOptionValue("maxcallattempts"),
+			"validators" => array(array("ValRequired")),
+			"control" => array("SelectMenu", "values" => $attempts),
+			"helpstep" => 6
+		);
+		$formdata["replyoption"] = array(
+			"label" => _L('Allow Reply'),
+			"value" => $job->isOption("leavemessage"),
+			"validators" => array(),
+			"control" => array("CheckBox"),
+			"helpstep" => 6
+		);
+		$formdata["confirmoption"] = array(
+			"label" => _L('Allow Confirmation'),
+			"value" => $job->isOption("messageconfirmation"),
+			"validators" => array(),
+			"control" => array("CheckBox"),
+			"helpstep" => 6
+		);
 	}
-	
-	$formdata = array_merge($formdata,array(
-	"attempts" => array(
-		"label" => _L('Max Attempts'),
-		"value" => $job->getOptionValue("maxcallattempts"),
-		"validators" => array(array("ValRequired")),
-		"control" => array("SelectMenu", "values" => $attempts),
-		"helpstep" => 5
-	),
-	"replyoption" => array(
-		"label" => _L('Allow Reply'),
-		"value" => $job->isOption("leavemessage"),
-		"validators" => array(),
-		"control" => array("CheckBox"),
-		"helpstep" => 5
-	),
-	"confirmoption" => array(
-		"label" => _L('Allow Confirmation'),
-		"value" => $job->isOption("messageconfirmation"),
-		"validators" => array(),
-		"control" => array("CheckBox"),
-		"helpstep" => 5
-	),
-));
-//				$helpsteps[] = _L("The Delivery Window designates the earliest call time and the latest call time allowed for notification delivery.");
 
 
-$helpsteps = array (
-	_L("The name of your job. The best names are brief and discriptive of the message content."),
-	_L("Select the option that best describes the type of notification you are sending."),
-	_L("Select a list"),
-	_L("Select a message"),
-	_L("Optionally choose advanced options")
-);
 
-$buttons = array(submit_button(_L('Save'),"submit","tick"),
-				icon_button(_L('Cancel'),"cross",null,"start.php"));
+$buttons = array(submit_button(_L('Save'),"submit","tick"));
+if ($JOBTYPE == "normal" && !$submittedmode) {
+	$buttons[] = submit_button(_L('Proceed To Confirmation'),"send","arrow_right");
+} 
+$buttons[] = icon_button(_L('Cancel'),"cross",null,"start.php");
+
+
 $form = new Form("jobedit",$formdata,$helpsteps,$buttons);
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -502,120 +673,128 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		$datachange = true;
 	} else if (($errors = $form->validate()) === false) { //checks all of the items in this form
 		$postdata = $form->getData(); //gets assoc array of all values {name:value,...}
-		Query("BEGIN");
 
+		Query("BEGIN");
 		//save data here
 		$job->name = $postdata['name'];
-		$job->description = "";
-		$job->jobtypeid = $postdata['jobtype'];
-
-		if ($JOBTYPE == "repeating") {
-			$repeatdata = json_decode($postdata['repeat'],true);
-
-			$schedule = new Schedule($job->scheduleid);
-			$schedule->time = date("H:i", strtotime($repeatdata[7]));
-			$schedule->triggertype = "job";
-			$schedule->type = "R";
-			$schedule->userid = $USER->id;
-
-			$dow = array();
-			for ($x = 0; $x < 7; $x++) {
-				if($repeatdata[$x] === true) {
-					$dow[$x] = $x+1;
-				}
-			}
-			$schedule->daysofweek = implode(",",$dow);
-			$schedule->nextrun = $schedule->calcNextRun();
-
-			$schedule->update();
-			$job->scheduleid = $schedule->id;
-			$numdays = $postdata['days'];
-			// 86,400 seconds in a day - precaution b/c windows doesn't
-			//	like dates before 1970, and using 0 makes windows think it's 12/31/69
-			$job->startdate = date("Y-m-d", 86400);
-			$job->enddate = date("Y-m-d", ($numdays * 86400));
-		} else if ($JOBTYPE == 'normal') {
-			$numdays = $postdata['days'];
-			$job->startdate = date("Y-m-d", strtotime($postdata['date']));
-			$job->enddate = date("Y-m-d", strtotime($job->startdate) + (($numdays - 1) * 86400));
-		}
-
-
-
-		$job->starttime = date("H:i", strtotime($postdata['callearly']));
-		$job->endtime = date("H:i", strtotime($postdata['calllate']));
-		$job->userid = $USER->id;
+		$job->description = $postdata['description'];
 		$job->modifydate = date("Y-m-d H:i:s", time());
 
-
-
-		// TODO remove type in job
-		$jobtypes = array();
-		if ($cansendphone) {
-			$jobtypes[] = "phone";
-		}
-		if ($cansendemail) {
-			$jobtypes[] = "email";
-		}
-		if ($cansendsms) {
-			$jobtypes[] = "sms";
-		}
-		$job->type=implode(",",$jobtypes);
-		//
-
-		$job->setOption("skipduplicates",$postdata['skipduplicates']);
-
-
-		$job->messagegroupid = $postdata['message'];
-
-
-		// set jobsetting 'callerid' blank for jobprocessor to lookup the current default at job start
-		if ($USER->authorize('setcallerid') && !getSystemSetting('_hascallback', false)) {
-				// blank callerid is fine, save this setting and default will be looked up by job processor when job starts
-				$job->setOptionValue("callerid",Phone::parse($postdata['callerid']));
-		} else {
-			$job->setOptionValue("callerid", getDefaultCallerID());
-		}
-
-		if ($USER->authorize("leavemessage"))
-			$job->setOption("leavemessage", $postdata['replyoption']);
-
-		if ($USER->authorize("messageconfirmation"))
-			$job->setOption("messageconfirmation", $postdata['confirmoption']);
-
-
-		$job->setOption("sendreport",$postdata['report']);
-		$job->setOptionValue("maxcallattempts", $postdata['attempts']);
-
-		if ($job->id) {
+		if($completedmode) {
 			$job->update();
 		} else {
-			$job->status = ($JOBTYPE == "normal")?"new":"repeating";
-			$job->createdate = date("Y-m-d H:i:s", time());
-			$job->create();
-		}
+			if ($JOBTYPE == "repeating") {
+				$repeatdata = json_decode($postdata['repeat'],true);
 
-		if($job->id) {
-			/* Store lists*/
-			QuickUpdate("DELETE FROM joblist WHERE jobid=$job->id");
-			$listids = json_decode($postdata['lists']);
-			$batchvalues = array();
-			foreach ($listids as $id) {
-				$values = "($job->id,". ($id+0) . ")"; // TODO prepstmt args
-				$batchvalues[] = $values;
+				$schedule = new Schedule($job->scheduleid);
+				$schedule->time = date("H:i", strtotime($repeatdata[7]));
+				$schedule->triggertype = "job";
+				$schedule->type = "R";
+				$schedule->userid = $USER->id;
+
+				$dow = array();
+				for ($x = 0; $x < 7; $x++) {
+					if($repeatdata[$x] === true) {
+						$dow[$x] = $x+1;
+					}
+				}
+				$schedule->daysofweek = implode(",",$dow);
+				$schedule->nextrun = $schedule->calcNextRun();
+
+				$schedule->update();
+				$job->scheduleid = $schedule->id;
+				$numdays = $postdata['days'];
+				// 86,400 seconds in a day - precaution b/c windows doesn't
+				//	like dates before 1970, and using 0 makes windows think it's 12/31/69
+				$job->startdate = date("Y-m-d", 86400);
+				$job->enddate = date("Y-m-d", ($numdays * 86400));
+			} else if ($JOBTYPE == 'normal') {
+				$numdays = $postdata['days'];
+				$job->startdate = date("Y-m-d", strtotime($postdata['date']));
+				
+				$job->enddate = date("Y-m-d", strtotime($job->startdate) + (($numdays - 1) * 86400));
 			}
-			if (!empty($batchvalues)) {
-				$sql = "INSERT INTO joblist (jobid,listid) VALUES ";
-				$sql .= implode(",",$batchvalues);
-				QuickUpdate($sql);
+
+			$job->starttime = date("H:i", strtotime($postdata['callearly']));
+			$job->endtime = date("H:i", strtotime($postdata['calllate']));
+
+			if($submittedmode) {
+				$job->update();
+			} else {
+				$job->jobtypeid = $postdata['jobtype'];
+				$job->userid = $USER->id;
+
+				// TODO remove type in job
+				$jobtypes = array();
+				if ($cansendphone) {
+					$jobtypes[] = "phone";
+				}
+				if ($cansendemail) {
+					$jobtypes[] = "email";
+				}
+				if ($cansendsms) {
+					$jobtypes[] = "sms";
+				}
+				$job->type=implode(",",$jobtypes);
+				//
+
+				//error_log($postdata['skipduplicates']);
+				$job->setOption("skipduplicates",$postdata['skipduplicates']?1:0);
+				$job->setOption("skipemailduplicates",$postdata['skipduplicates']?1:0);
+
+
+				$job->messagegroupid = $postdata['message'];
+
+
+				// set jobsetting 'callerid' blank for jobprocessor to lookup the current default at job start
+				if ($USER->authorize('setcallerid') && !getSystemSetting('_hascallback', false)) {
+						// blank callerid is fine, save this setting and default will be looked up by job processor when job starts
+						$job->setOptionValue("callerid",Phone::parse($postdata['callerid']));
+				} else {
+					$job->setOptionValue("callerid", getDefaultCallerID());
+				}
+
+				if ($USER->authorize("leavemessage"))
+					$job->setOption("leavemessage", $postdata['replyoption']?1:0);
+
+				if ($USER->authorize("messageconfirmation"))
+					$job->setOption("messageconfirmation", $postdata['confirmoption']?1:0);
+
+
+				$job->setOption("sendreport",$postdata['report']?1:0);
+				$job->setOptionValue("maxcallattempts", $postdata['attempts']);
+
+				if ($job->id) {
+					$job->update();
+				} else {
+					$job->status = ($JOBTYPE == "normal")?"new":"repeating";
+					$job->createdate = date("Y-m-d H:i:s", time());
+					$job->create();
+				}
+				if($job->id) {
+					/* Store lists*/
+					QuickUpdate("DELETE FROM joblist WHERE jobid=$job->id");
+					$listids = json_decode($postdata['lists']);
+					$batchvalues = array();
+					foreach ($listids as $id) {
+						$values = "($job->id,". ($id+0) . ")"; // TODO prepstmt args
+						$batchvalues[] = $values;
+					}
+					if (!empty($batchvalues)) {
+						$sql = "INSERT INTO joblist (jobid,listid) VALUES ";
+						$sql .= implode(",",$batchvalues);
+						QuickUpdate($sql);
+					}
+				}
 			}
 		}
-
 		Query("COMMIT");
+
+		$sendto = $button=="send"?"jobconfirm.php":"start.php";
 		if ($ajax)
-			$form->sendTo("start.php");
+			$form->sendTo($sendto);
 		else
-			redirect("start.php");
+			redirect($sendto);
 	}
 }
 
