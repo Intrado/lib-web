@@ -21,17 +21,26 @@ $SETTINGS = parse_ini_file("inc/settings.ini.php",true);
 $tmplogfile = isset($SETTINGS['txtreply']['txt_datfile']) ? $SETTINGS['txtreply']['txt_datfile'] : "/usr/commsuite/cache/txtreply.dat";
 //----------------------------------------------------------------------
 
+// additional params sent from air2web
+$carrier = "";
+$channel = "";
+$router = "";
+$message_id = "none";
+$message_orig = "";
 
 if ($is3ci) { // 3ci
 	$sourceaddress = trim($_GET['SourceAddr']);
 	$inboundshortcode = trim($_GET['DestAddr']);
 	$message = strtolower($_GET['MessageText']);
-	$message_id = "none";
 } else { // air2web
 	$sourceaddress = $_POST['device_address'];
 	$inboundshortcode = $_POST['inbound_address'];
 	$message = strtolower($_POST['message']);
 	$message_id = $_POST['message_id'];
+	$message_orig = $_POST['message_orig'];
+	$carrier = $_POST['carrier'];
+	$channel = $_POST['channel'];
+	$router = $_POST['router'];
 }
 
 if ($inboundshortcode != "45305" && // 3ci
@@ -52,6 +61,10 @@ $data['shortcode'] = $inboundshortcode;
 $data['smsnumber'] = $sourceaddress;
 $data['message_id'] = $message_id;
 $data['message'] = $message;
+$data['message_orig'] = $message_orig;
+$data['carrier'] = $carrier;
+$data['channel'] = $channel;
+$data['router'] = $router;
 
 $httpdata = http_build_query($data);
 
