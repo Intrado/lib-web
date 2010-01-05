@@ -178,13 +178,14 @@ function handleRequest() {
 			);
 
 		case 'messagegrid':
+			// TODO lookup default language code
+			// TODO lookup display names for all language messages to display
 			if (!isset($_GET['id']))
 				return false;
 			$cansendphone = $USER->authorize('sendphone');
 			$cansendemail = $USER->authorize('sendemail');
 			$cansendsms = getSystemSetting('_hassms', false) && $USER->authorize('sendsms');
 			$cansendmultilingual = $USER->authorize('sendmulti');
-			$cansendmultilingual = false;
 			$defaultlanguagecode = 'en';
 
 			$result->headers = array();
