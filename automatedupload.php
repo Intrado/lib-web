@@ -30,7 +30,6 @@ require_once("obj/Permission.obj.php");
 require_once("inc/utils.inc.php");
 require_once("inc/date.inc.php");
 require_once("obj/User.obj.php");
-require_once("obj/Customer.obj.php");
 require_once("obj/Import.obj.php");
 
 

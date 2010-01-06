@@ -1,7 +1,6 @@
 <?
 require_once("common.inc.php");
 require_once("../obj/Phone.obj.php");
-require_once("../obj/Customer.obj.php");
 require_once("../inc/table.inc.php");
 require_once("../inc/form.inc.php");
 require_once("../inc/formatters.inc.php");
