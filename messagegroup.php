@@ -26,7 +26,8 @@ require_once("obj/ValDuplicateNameCheck.val.php");
 require_once("obj/MessageGroup.obj.php");
 require_once("obj/MessageAttachment.obj.php");
 require_once("obj/traslationitem.obj.php");
-require_once("obj/FileUpload.fi.php");
+require_once("obj/AudioUpload.fi.php");
+require_once("obj/EmailAttach.fi.php");
 require_once("obj/EmailAttach.val.php");
 require_once('messagegroup.inc.php');
 

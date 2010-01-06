@@ -84,7 +84,7 @@ function makeAccordionSplitter($type, $subtype, $languagecode, $permanent, $pref
 					"fieldhelp" => "You may attach up to three files that are up to 2048kB each. Note: Some recipients may have different size restrictions on incoming mail which can cause them to not receive your message if you have attached large files.",
 					"value" => $emailattachments ? $emailattachments : '',
 					"validators" => array(array("ValEmailAttach")),
-					"control" => array("FileUpload","size" => 30, "maxlength" => 51),
+					"control" => array("EmailAttach","size" => 30, "maxlength" => 51),
 					"renderoptions" => array("icon" => false, "label" => false, "errormessage" => true),
 					"helpstep" => 3
 				)
@@ -119,7 +119,7 @@ function makeAccordionSplitter($type, $subtype, $languagecode, $permanent, $pref
 						"fieldhelp" => "You may attach up to three files that are up to 2048kB each. Note: Some recipients may have different size restrictions on incoming mail which can cause them to not receive your message if you have attached large files.",
 						"value" => '',
 						"validators" => array(),
-						"control" => array("FileUpload","showhistory" => false, "type" => "audio", "size" => 30, "maxlength" => 51),
+						"control" => array("AudioUpload", "size" => 30, "maxlength" => 51),
 						"renderoptions" => array("icon" => false, "label" => false, "errormessage" => true),
 						"helpstep" => 3
 					),
