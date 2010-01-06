@@ -37,7 +37,7 @@ function form_event_handler (event) {
 
 function form_get_value (form,targetname) {
 	var formvars = document.formvars[form.name];
-
+	
 	return formvars.jsgetvalue[targetname](form,targetname);
 }
 
@@ -219,9 +219,11 @@ function form_make_validators(form, formvars) {
 	for (fieldname in formdata) {
 		var label = formdata[fieldname].label;
 		var id = form.id+"_"+fieldname;
+		
 		var e = $(id);
-		if (!e)
+		if (!e) {
 			continue;
+		}
 
 		if (e.tagName.toLowerCase() == 'div' && e.hasClassName('radiobox')) {
 			//attach event listeners to each of the radio boxes
@@ -275,11 +277,12 @@ function form_make_validators(form, formvars) {
 function form_load(name,scriptname,formdata, helpsteps, ajaxsubmit) {
 	var form = $(name);
 	//set up formvars to save data, avoid memleaks in IE by not attaching anything to dom elements
-	if (!document.formvars)
+	if (!document.formvars) {
 		document.formvars = {};
+	}
 
 	var formvars = document.formvars[name] = {
-		formdata: formdata,
+		formdata: formdata.length === 0 ? {} : formdata, // If this form has no formdata (such as one containing only formhtml), php's json_encode will have made it into an array instead of an object.
 		scriptname: scriptname, //used for any ajax calls for this form
 		helpsteps: helpsteps,
 		ajaxsubmit: ajaxsubmit,
@@ -289,7 +292,7 @@ function form_load(name,scriptname,formdata, helpsteps, ajaxsubmit) {
 		jsgetvalue: {},
 		submitting: false
 	};
-
+	
 	form_make_validators(form, formvars);
 
 	//install helper focus handler
@@ -313,7 +316,7 @@ function form_load(name,scriptname,formdata, helpsteps, ajaxsubmit) {
 			}
 		}
 	});
-
+	
 	//submit handler
 	form.observe("submit",form_handle_submit.curry(name));
 }
@@ -520,6 +523,7 @@ function form_handle_submit(form,event) {
 	//update each element's msg area, and throw up an alert box explaining there are unresolved issues.
 
 	//add an ajax marker
+	
 	var posturl = formvars.scriptname + (formvars.scriptname.include('?') ? '&' : '?') + "ajax=true";
 	new Ajax.Request(posturl, {
 		method:'post',
@@ -561,12 +565,12 @@ function form_handle_submit(form,event) {
 				}
 
 				if (res.datachange) {
+					// TODO: Fire an event so that form_submit_all() can cancel alerts etc..
 					alert("The data on this form has changed.\nYour changes cannot be saved.");
 					window.location=formvars.scriptname;
 				}
 			} else if ("success" == res.status) {
-				form.fire('AjaxForm:SubmitSuccess', res);
-				if (res.nexturl)
+				if (!form.fire('AjaxForm:SubmitSuccess', res).stopped && res.nexturl)
 					window.location=res.nexturl;
 			} else if ("modify" == res.status) {
 				$(res.name).update(res.content);
@@ -575,6 +579,7 @@ function form_handle_submit(form,event) {
 			formvars.submitting = false;
 		},
 		onFailure: function(){
+			// TODO: Fire an event so that form_submit_all() can cancel alerts etc...
 			alert('There was a problem submitting the form. Please try again.'); //TODO better error handling
 			formvars.submitting = false;
 		}
@@ -609,81 +614,166 @@ function form_count_field_characters(count,target,event) {
 		$(target).innerHTML="Characters remaining:&nbsp;" + remaining;
 }
 
-function form_submit_all (tabevent, value) {
-	// TODO: Refactor for better naming.
+function form_submit_all (tabevent, value, formsplittercontainer) {
+	saveHtmlEditorContent();
 	
 	var forms = $$('form');
-	// Map used to store the results of the form submissions.
-	var results = {};
+	if (forms.length < 1)
+		return;
 	
+	var beforesubmitallcontainer = tabevent ? tabevent.memo.widget.container : formsplittercontainer;
+	if (beforesubmitallcontainer) {
+		if (beforesubmitallcontainer.fire('FormSplitter:BeforeSubmitAll', {'forms':forms, 'value':value}).stopped)
+			return;
+	}
+	
+	// Map used to store the results of the form submissions.
+	var submissions = {};
+
 	for (var i = 0; i < forms.length; i++) {
 		var form = forms[i];
 		
-		results[form.name] = {};
+		var submission = submissions[form.name] = {'submitted':false, 'form':form, 'value':value};
 		
+		// Clear existing observers.
 		form.stopObserving('AjaxForm:SubmitSuccess');
-		form.observe('AjaxForm:SubmitSuccess', function(ajaxevent, tabevent, results) {
-			results[this.name] = ajaxevent.memo;
+		form.stopObserving('AjaxForm:DataChanged');
+		
+		form.observe('AjaxForm:DataChanged', function(ajaxevent, tabevent, submissions) {
 			
-			for (var name in results) {
-				var result = results[name];
-				if (!result.status || result.status == 'error') {
+		}.bindAsEventListener(form, tabevent, submissions));
+		
+		form.observe('AjaxForm:SubmitSuccess', function(ajaxevent, tabevent, submissions) {
+			ajaxevent.stop();
+			
+			var thissubmission = submissions[this.name];
+			thissubmission.response = ajaxevent.memo;
+			
+			var formvars = document.formvars[this.name];
+			var posturl = formvars.scriptname + (formvars.scriptname.include('?') ? '&' : '?') + "ajax=true";
+			
+			// Update this form's serial number only if this form will not get reloaded in the next tab.
+			var nexttab = tabevent ? tabevent.memo.section : null;
+			if (tabevent && (nexttab == tabevent.memo.currentSection || !tabevent.memo.widget.sections[nexttab].contentDiv.down('form#' + this.name))) {
+				new Ajax.Request(posturl, {
+					method: 'post',
+					parameters: {'formsnum': this.name},
+					onSuccess: function (response) {
+						var data = response.responseJSON;
+						
+						if (!data || !data.formsnum) {
+							alert('problem updating serialnumber');
+						}
+						
+						var formsnumfield = this.down('input[name="' + this.name + '-formsnum' + '"]');
+						if (formsnumfield) {
+							formsnumfield.value = data.formsnum;
+						}
+					}.bindAsEventListener(this)
+				});
+			}
+			
+			for (var formname in submissions) {
+				var submission = submissions[formname];
+				if (!submission.submitted) {
+					// Submit the next form; other forms will be submitted sequentially upon the next AjaxForm:SubmitSuccess.
+					submission.submitted = true;
+					form_submit(null, submission.value, submission.form);
+					return;
+				}
+				
+				// If any form has an error, abort.
+				// NOTE: Will need to cause all forms to validate.
+				if (!submission.response || !submission.response.status || submission.response.status == 'error') {
 					return;
 				}
 			}
 			
 			// At this point, all forms have been submitted successfully.
-			if (!tabevent) {
-				// TODO: window.location = nexturl;
-			} else {
-				var nexttab = tabevent.memo.section;
-				if (nexttab == tabevent.memo.currentSection)
-					return;
+			if (tabevent && nexttab != tabevent.memo.currentSection) {
+				// If the tab getting replaced contains the html editor, move the editor down to the bottom of the document body and hide it for later use.
+				if (tabevent.memo.widget.container.down('#cke_reusableckeditor')) {
+					hideHtmlEditor();
+				}
 				
-				tabevent.memo.widget.update_section(tabevent.memo.section, {
+				tabevent.memo.widget.update_section(nexttab, {
 					'icon': 'img/ajax-loader.gif'
 				});
 				
-				var formvars = document.formvars[this.name];
-				var posturl = formvars.scriptname + (formvars.scriptname.include('?') ? '&' : '?') + "ajax=true";
-				new Ajax.Request(posturl, {
-					method: 'post',
-					parameters: {loadtab: nexttab},
-					onSuccess: function (response) {
-						var data = response.responseJSON;
-						
-						if (!data || !data.element) {
-							alert('problem!');
-						}
-						
-						tabevent.memo.widget.update_section(data.element, {
-							'icon': 'img/icons/diagona/16/160.gif', // TODO: detect the correct icon..
-							'content': data.content
-						});
-						
-						var container = $(data.element).up();
-						form_load_layout(container, null);
-						tabevent.memo.widget.show_section(nexttab);
-						
-						// NOTE: To prevent flickering, clear the contents of the previous tab after the next tab shown.
-						tabevent.memo.widget.update_section(tabevent.memo.currentSection, {
-							'icon': 'img/icons/accept.gif', // TODO: detect the correct icon..
-							'content': new Element('div')
-						});
-					}
-				});
+				var handledbeforetabloadevent = tabevent.memo.widget.container.fire('FormSplitter:BeforeTabLoad', {'tabevent': tabevent, 'nexttab': nexttab, 'currenttab': tabevent.memo.currentSection});
+
+				form_load_tab(this, tabevent.memo.widget, nexttab, handledbeforetabloadevent.memo.specificsections);
+			} else if (!tabevent) {
+				if (ajaxevent.memo.nexturl)
+					window.location = ajaxevent.memo.nexturl;
 			}
-		}.bindAsEventListener(form, tabevent, results));
+		}.bindAsEventListener(form, tabevent, submissions));
 		
-		form_submit(null, value, form);
+		if (i == 0) {
+			// Submit the first form; other forms will be submitted sequentially upon AjaxForm:SubmitSuccess.
+			submission.submitted = true;
+			form_submit(null, value, form);
+		}
 	}
 }
 
-function form_load_layout (formswitchercontainer, classname) {
+function form_load_tab (form, widget, nexttab, specificsections, suppressfire) {
+	var formvars = document.formvars[form.name];
+	var posturl = formvars.scriptname + (formvars.scriptname.include('?') ? '&' : '?') + "ajax=true";
+	
+	if (!document.tabvars)
+		document.tabvars = {};
+		
+	if (document.tabvars.loading)
+		return;
+		
+	document.tabvars.loading = true;
+	
+	new Ajax.Request(posturl, {
+		method: 'post',
+		parameters: {'loadtab': nexttab, 'specificsections': specificsections ? specificsections.toJSON() : ''},
+		onSuccess: function (response, widget, nexttab, specificsections) {
+			document.tabvars.loading = false;
+			
+			var data = response.responseJSON;
+			
+			if (!data || !data.element) {
+				alert('problem!');
+			}
+			
+			widget.update_section(data.element, {
+				'icon': 'img/icons/diagona/16/160.gif',
+				'content': data.content
+			});
+			
+			var formcontainer = $(data.element);
+			var container = formcontainer.match('form.FormSplitterParentForm') ? formcontainer.up('.FormSplitterParentFormContainer') : formcontainer.up();
+			form_load_layout(container, null, specificsections);
+			var previoustab = widget.currentSection;
+			widget.show_section(nexttab);
+			
+			// NOTE: To prevent flickering, clear the contents of the previous tab after the next tab is shown.
+			if (previoustab != nexttab) {
+				widget.update_section(previoustab, {
+					'content': new Element('div')
+				});
+			}
+			
+			if (!suppressfire)
+				widget.container.fire('FormSplitter:TabLoaded', {'form': this, 'data': data, 'tabloaded': nexttab, 'previoustab': previoustab, 'widget':widget});
+		}.bindAsEventListener(form, widget, nexttab, specificsections, suppressfire),
+		
+		onFailure: function() {
+			document.tabvars.loading = false;
+		}
+	});
+}
+
+function form_load_layout (formswitchercontainer, classname, specificsections) {
 	// If only the container is specified, go ahead and load all the various layouts.
 	if (!classname) {
-		form_load_layout(formswitchercontainer, 'horizontaltabs');
-		form_load_layout(formswitchercontainer, 'verticaltabs');
+		form_load_layout(formswitchercontainer, 'horizontaltabs', specificsections);
+		form_load_layout(formswitchercontainer, 'verticaltabs', specificsections);
 		form_load_layout(formswitchercontainer, 'accordion');
 		form_load_layout(formswitchercontainer, 'verticalsplit');
 		return;
@@ -705,25 +795,34 @@ function form_load_layout (formswitchercontainer, classname) {
 			else if (classname == 'accordion')
 				layout = new Accordion(container);
 
-			layoutsections.each(function (layoutsection) {
+			layoutsections.each(function (layoutsection, specificsections) {
 				var kids = layoutsection.childElements();
-				var sectionname =  layoutsection.identify();
+				var sectionname =  layoutsection.match('.FormSplitterParentFormContainer') ? layoutsection.down('form.FormSplitterParentForm').identify() : layoutsection.identify();
 				var titlespan = kids.find(function (el) { return el.match('.FormSwitcherLayoutSectionTitle'); });
 				var iconimg = kids.find(function (el) { return el.match('.FormSwitcherLayoutSectionIcon'); });
 
 				this.add_section(sectionname);
 				this.update_section(sectionname, {
 					'title': titlespan,
-					'icon': iconimg ? iconimg.src : 'img/icons/diagona/16/160.gif',
+					'icon': iconimg ? iconimg : 'img/icons/diagona/16/160.gif',
 					'content': layoutsection
 				});
 
 				if (!this.firstSection)
 					this.firstSection = sectionname;
+			}.bindAsEventListener(layout, specificsections));
 
-			}.bindAsEventListener(layout));
-
-			layout.show_section(layout.firstSection);
+			if (classname != 'accordion' && specificsections) {
+				for (var i = 0; i < specificsections.length; i++) {
+					var specificsection = specificsections[i];
+					if (layout.sections[specificsection]) {
+						layout.show_section(specificsection);
+						break;
+					}
+				}
+			} else if (classname != 'accordion') {
+				layout.show_section(layout.firstSection);
+			}
 
 		} else if (classname == 'verticalsplit') {
 			var split = make_split_pane(true, layoutsections.length);
@@ -738,18 +837,17 @@ function form_load_layout (formswitchercontainer, classname) {
 	}.bindAsEventListener(this, classname));
 }
 
-function form_init_splitter(formswitchercontainer) {
+function form_init_splitter(formswitchercontainer, specificsections) {
 	var formswitchercontainer = $(formswitchercontainer);
 	
-	form_load_layout(formswitchercontainer, null);
+	form_load_layout(formswitchercontainer, null, specificsections);
 
 	var onTabsClickTitle = function(event) {
 		event.stop();
-		form_submit_all(event, 'tab');
+		if (!this.fire('FormSplitter:BeforeSubmit', event.memo).stopped)
+			form_submit_all(event, 'tab');
 	};
-	var onAccordionClickTitle = function(event) {
-		// TODO: form_validate().
-	};
-	formswitchercontainer.observe('Accordion:ClickTitle', onAccordionClickTitle);
-	formswitchercontainer.observe('Tabs:ClickTitle', onTabsClickTitle);
+	formswitchercontainer.observe('Tabs:ClickTitle', onTabsClickTitle.bindAsEventListener(formswitchercontainer));
+	
+	// TODO: window.onbeforeunload.
 }
