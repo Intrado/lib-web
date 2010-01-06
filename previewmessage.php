@@ -13,6 +13,7 @@ require_once("obj/Form.obj.php");
 require_once("obj/FormItem.obj.php");
 require_once("inc/formatters.inc.php");
 require_once("obj/FieldMap.obj.php");
+require_once("obj/Content.obj.php");
 require_once("obj/AudioFile.obj.php");
 require_once("obj/Voice.obj.php");
 require_once("obj/Message.obj.php");
