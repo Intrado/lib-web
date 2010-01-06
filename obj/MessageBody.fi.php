@@ -6,7 +6,7 @@ class MessageBody extends FormItem {
 	
 		$str = '
 			<div class="MessageBodyContainer" style="'.(!empty($this->args['hidden']) ? 'display:none' : '').'">
-			<table>
+			<table style="width:100%">
 				<tr>
 					<td valign="top" rowspan="5">
 						<textarea id="'.$n.'" name="'.$n.'" rows="12" cols="50" />'.escapehtml($value).'</textarea>	';
