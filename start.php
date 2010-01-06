@@ -59,16 +59,11 @@ if($isajax === true) {
 			$mergeditems = array_merge($mergeditems,QuickQueryMultiRow("select 'list' as type,'Saved' as status, id, name, modifydate as date, lastused from list where userid=? and deleted = 0 and modifydate is not null order by modifydate desc limit 10",true,false,array($USER->id)));
 			break;
 		case "messages":
-			$mergeditems = array_merge($mergeditems,QuickQueryMultiRow("select 'message' as type,'Saved' as status,id, name, modifydate as date, type as messagetype, deleted from message where  userid=? and deleted = 0 and modifydate is not null order by modifydate desc limit 10",true,false,array($USER->id)));
-			break;
-		case "phonemessages":
-			$mergeditems = array_merge($mergeditems,QuickQueryMultiRow("select 'message' as type,'Saved' as status,id, name, modifydate as date, type as messagetype, deleted from message where  userid=? and deleted = 0 and modifydate is not null and type='phone' order by modifydate desc limit 10",true,false,array($USER->id)));
-			break;
-		case "emailmessages":
-			$mergeditems = array_merge($mergeditems,QuickQueryMultiRow("select 'message' as type,'Saved' as status,id, name, modifydate as date, type as messagetype, deleted from message where  userid=? and deleted = 0 and modifydate is not null and type='email' order by modifydate desc limit 10",true,false,array($USER->id)));
-			break;
-		case "smsmessages":
-			$mergeditems = array_merge($mergeditems,QuickQueryMultiRow("select 'message' as type,'Saved' as status,id, name, modifydate as date, type as messagetype, deleted from message where  userid=? and deleted = 0 and modifydate is not null and type='sms' order by modifydate desc limit 10",true,false,array($USER->id)));
+			$mergeditems = array_merge($mergeditems,QuickQueryMultiRow("
+			select 'message' as type,'Saved' as status,g.id as id, g.name as name, g.modified as date, g.deleted as deleted,
+			 sum(type='phone') as phone, sum(type='email') as email,sum(type='sms') as sms
+			from messagegroup g, message m where g.userid=? and g.deleted = 0 and g.modified is not null and m.messagegroupid = g.id
+			group by m.languagecode order by g.modified desc limit 10 ",true,false,array($USER->id)));
 			break;
 		case "jobs":
 			$mergeditems = array_merge($mergeditems,QuickQueryMultiRow("select 'job' as type,status,id, name, modifydate as date,'modifydate' as datetype, type as jobtype, deleted from job where userid=? and deleted = 0 and (finishdate is null || status='repeating') and modifydate is not null order by modifydate desc limit 10",true,false,array($USER->id)));
@@ -106,7 +101,12 @@ if($isajax === true) {
 			break;
 		default:
 			$mergeditems = array_merge($mergeditems,QuickQueryMultiRow("select 'list' as type,'Saved' as status, id, name, modifydate as date, lastused from list where userid=? and deleted = 0  and modifydate is not null order by modifydate desc limit 10",true,false,array($USER->id)));
-			$mergeditems = array_merge($mergeditems,QuickQueryMultiRow("select 'message' as type,'Saved' as status,id, name, modifydate as date, type as messagetype, deleted from message where userid=? and deleted = 0  and modifydate is not null order by modifydate desc limit 10",true,false,array($USER->id)));
+			$mergeditems = array_merge($mergeditems,QuickQueryMultiRow("
+			select 'message' as type,'Saved' as status,g.id as id, g.name as name, g.modified as date, g.deleted as deleted,
+			 sum(type='phone') as phone, sum(type='email') as email,sum(type='sms') as sms
+			from messagegroup g, message m where g.userid=? and g.deleted = 0 and g.modified is not null and m.messagegroupid = g.id
+			group by m.languagecode order by g.modified desc limit 10 ",true,false,array($USER->id)));
+
 			$mergeditems = array_merge($mergeditems,QuickQueryMultiRow("select 'job' as type,status,id, name, modifydate as date,'modifydate' as datetype, type as jobtype,percentprocessed, deleted from job where userid=? and deleted = 0  and (finishdate is null || status='repeating') and modifydate is not null order by modifydate desc limit 10",true,false,array($USER->id)));
 			$mergeditems = array_merge($mergeditems,QuickQueryMultiRow("select 'job' as type,status,id, name, finishdate as date,'finishdate' as datetype,type as jobtype,percentprocessed, deleted from job where userid=? and deleted = 0  and status!='repeating' and finishdate is not null order by finishdate desc limit 10",true,false,array($USER->id)));
 			$mergeditems = array_merge($mergeditems,QuickQueryMultiRow("select 'report' as type,'Saved' as status,id, name, modifydate as date from reportsubscription where userid=? and modifydate is not null order by modifydate desc limit 10",true,false,array($USER->id)));
@@ -344,28 +344,17 @@ function activityfeed($mergeditems,$ajax = false) {
 					$tools = str_replace("&nbsp;|&nbsp;","<br />",$tools);
 					$icon = 'largeicons/addrbook.jpg';
 				} else if($item["type"] == "message") {
-					$messagetype = $item["messagetype"];
-					$title = _L('%1$s message %2$s',($messagetype == "sms"?"SMS":(escapehtml(ucfirst($messagetype)))),escapehtml($title));
+					$types = $item["phone"] > 0?"," . _L("phone"):"";
+					$types .= $item["email"] > 0?"," . _L("email"):"";
+					$types .= $item["sms"] > 0?"," . _L("sms"):"";
 
-					$defaultlink = "message$messagetype.php?id=$itemid";
+					$title = _L('Message %1$s with %2$s Content',escapehtml($title),typestring(substr($types,1)));
+
+					$defaultlink = "messagegroup.php?id=$itemid";
 					$content = '<a href="' . $defaultlink . '" ' . $defaultonclick . '>' . $time .  ' - <b>' .  escapehtml($item["name"]) . '</b>' . '</a>';
-					switch($messagetype) {
-						case "phone":
-							$icon = 'largeicons/phonehandset.jpg';
-							$tools = action_links (
-								action_link("Edit", "pencil", 'message' . $item["messagetype"] . '.php?id=' . $itemid),
-								action_link("Play","diagona/16/131",null,"popup('previewmessage.php?close=1&id=$itemid', 400, 500,'preview'); return false;")
-								);		
-							break;
-						case "email":
-							$icon = 'largeicons/email.jpg';
-							$tools = action_links (action_link("Edit", "pencil", 'message' . $item["messagetype"] . '.php?id=' . $itemid));	
-							break;
-						case "sms":
-							$icon = 'largeicons/smschat.jpg';
-							$tools = action_links (action_link("Edit", "pencil", 'message' . $item["messagetype"] . '.php?id=' . $itemid));	
-							break;
-					}
+
+					$icon = 'largeicons/letter.jpg';
+					$tools = action_links (action_link("Edit", "pencil", 'messagegroup.php?id=' . $itemid));
 				} else if($item["type"] == "report" ) {
 					$title = "Report " . escapehtml($title);
 					$content = '<a href="' . $defaultlink . '" ' . $defaultonclick . '>' .
@@ -452,8 +441,6 @@ function activityfeed($mergeditems,$ajax = false) {
 
 									if(filter.substring(filter.length-4) != 'jobs')
 										$('jobsubfilters').hide();
-									if(filter.substring(filter.length-8) != 'messages' && filter != 'systemmessages')
-										$('messagessubfilters').hide();
 									size = jobfiltes.length;
 									for(i=0;i<size;i++){
 										$(jobfiltes[i] + 'filter').setStyle({color: filtercolor, fontWeight: 'normal'});
@@ -578,12 +565,7 @@ $activityfeed = '
 								<a id="completedjobsfilter" href="start.php?filter=completedjobs" onclick="applyfilter(\'completedjobs\'); return false;"><img src="img/largeicons/tiny20x20/checkedgreen.jpg">Completed</a><br />
 								<a id="repeatingjobsfilter" href="start.php?filter=repeatingjobs" onclick="applyfilter(\'repeatingjobs\'); return false;"><img src="img/largeicons/tiny20x20/calendar.jpg">Repeating</a><br />
 							</div>
-							<a id="messagesfilter" href="start.php?filter=messages" onclick="applyfilter(\'messages\');  $(\'messagessubfilters\').toggle(); return false;"><img src="img/largeicons/tiny20x20/letter.jpg">Messages</a><br />
-							<div id="messagessubfilters" style="' . (in_array($filter,array("phonemessages","emailmessages","smsmessages"))?"display:block":"display:none") . ';padding-left:20px;">
-								<a id="phonemessagesfilter" href="start.php?filter=phonemessages" onclick="applyfilter(\'phonemessages\'); return false;"><img src="img/largeicons/tiny20x20/phonehandset.jpg">Phone</a><br />
-								<a id="emailmessagesfilter" href="start.php?filter=emailmessages" onclick="applyfilter(\'emailmessages\'); return false;"><img src="img/largeicons/tiny20x20/email.jpg">Email</a><br />
-								<a id="smsmessagesfilter" href="start.php?filter=smsmessages" onclick="applyfilter(\'smsmessages\'); return false;"><img src="img/largeicons/tiny20x20/smschat.jpg">SMS</a><br />
-							</div>
+							<a id="messagesfilter" href="start.php?filter=messages" onclick="applyfilter(\'messages\'); return false;"><img src="img/largeicons/tiny20x20/letter.jpg">Messages</a><br />
 							<a id="listsfilter" href="start.php?filter=lists" onclick="applyfilter(\'lists\'); return false;"><img src="img/largeicons/tiny20x20/addrbook.jpg">Lists</a><br />
 							<a id="savedreportsfilter" href="start.php?filter=savedreports" onclick="applyfilter(\'savedreports\'); return false;"><img src="img/largeicons/tiny20x20/savedreport.jpg">Reports</a><br />
 							<a id="systemmessagesfilter" href="start.php?filter=systemmessages" onclick="applyfilter(\'systemmessages\'); return false;"><img src="img/largeicons/tiny20x20/news.jpg">System&nbsp;Messages</a><br />
