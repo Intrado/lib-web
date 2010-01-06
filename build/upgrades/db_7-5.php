@@ -105,7 +105,7 @@ function upgrade_7_5 ($rev, $shardid, $customerid, $db) {
 
 				//name = default message name in order: phone, email,sms
 				$defaultmessageid = first($job->phonemessageid,$job->emailmessageid,$job->smsmessageid);
-				$msg = new Message($defaultmessageid);
+				$msg = new Message_7_5_r2($defaultmessageid);
 						
 				$mg = new MessageGroup();
 				$mg->name = $msg->name;
@@ -164,7 +164,7 @@ function upgrade_7_5 ($rev, $shardid, $customerid, $db) {
 			if (!Query("insert ignore into surveymessages select phonemessageid from surveyquestion", $db))
 				return false;
 			
-			$orphanedmessages = DBFindMany("Message","from message m where m.messagegroupid is null and not exists (select * from surveymessages sm where sm.messageid=m.id)");
+			$orphanedmessages = DBFindMany("Message_7_5_r2","from message m where m.messagegroupid is null and not exists (select * from surveymessages sm where sm.messageid=m.id)");
 			$count = 0;
 			foreach ($orphanedmessages as $msg) {
 				$mg = new MessageGroup();
@@ -213,7 +213,7 @@ function upgrade_7_5 ($rev, $shardid, $customerid, $db) {
 				} else {
 					$query = "insert into personassociation (personid,type,organizationid)
 					select p.id,'organization',o.id from person p inner join organization o on (o.orgkey=p.$schoolfieldnum)
-					group by p.personid, o.id";
+					group by p.id, o.id";
 				}
 				QuickUpdate($query);
 				
@@ -282,7 +282,13 @@ function upgrade_7_5 ($rev, $shardid, $customerid, $db) {
 			
 			
 			apply_sql("upgrades/db_7-5_post.sql",$customerid,$db, 3);
-
+		case 3:
+			// upgrade from rev 3 to rev 4
+			echo "|";
+			apply_sql("upgrades/db_7-5_pre.sql",$customerid,$db, 4);
+			
+			$fieldmaps = FieldMap::retrieveFieldMaps();
+			$fieldmaps["f03"]->updatePersonDataValues();
 	}
 	
 	

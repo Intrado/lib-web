@@ -290,3 +290,57 @@ $$$
 alter table message add originalid int(11) null
 $$$
 
+
+-- $rev 4
+
+
+ALTER TABLE `listentry` 
+	ADD `organizationid` INT NULL ,
+	ADD `sectionid` INT NULL
+$$$
+
+-- switch person language field to codes
+update person p
+	inner join language l on (l.name = p.f03)
+	set p.f03 = l.code
+$$$
+
+ALTER TABLE `job` 
+	DROP `type`,
+	DROP `phonemessageid`,
+	DROP `emailmessageid`,
+	DROP `printmessageid`,
+	DROP `smsmessageid`	
+$$$
+
+ALTER TABLE `job` ADD `type` ENUM( 'notification', 'survey', 'event' ) NOT NULL DEFAULT 'notification' AFTER `questionnaireid`
+$$$
+
+update job set type='survey' where questionnaireid is not null
+$$$
+
+CREATE TABLE IF NOT EXISTS `section` (
+  `id` int(11) NOT NULL auto_increment,
+  `skey` varchar(255) NOT NULL,
+  `organizationid` int(11) NOT NULL,
+  `c01` varchar(255) NOT NULL,
+  `c02` varchar(255) NOT NULL,
+  `c03` varchar(255) NOT NULL,
+  `c04` varchar(255) NOT NULL,
+  `c05` varchar(255) NOT NULL,
+  `c06` varchar(255) NOT NULL,
+  `c07` varchar(255) NOT NULL,
+  `c08` varchar(255) NOT NULL,
+  `c09` varchar(255) NOT NULL,
+  `c10` varchar(255) NOT NULL,
+  PRIMARY KEY  (`id`),
+  UNIQUE `skey` (`skey`),
+  KEY `organizationid` (`organizationid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8
+$$$
+
+ALTER TABLE `messagepart` CHANGE `type` `type` ENUM( 'A', 'T', 'V', 'I' ) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT 'A' 
+$$$
+
+ALTER TABLE `messagepart` ADD `imagecontentid` BIGINT NULL AFTER `audiofileid`
+$$$

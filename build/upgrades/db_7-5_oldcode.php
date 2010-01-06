@@ -50,9 +50,9 @@ class Job_7_5_r2 extends DBMappedObject {
 		$newmsg->create();
 
 		// copy the parts
-		$parts = DBFindMany("MessagePart", "from messagepart where messageid=$msgid");
+		$parts = DBFindMany("MessagePart_7_5_r2", "from messagepart where messageid=$msgid");
 		foreach ($parts as $part) {
-			$newpart = new MessagePart($part->id);
+			$newpart = new MessagePart_7_5_r2($part->id);
 			$newpart->id = null;
 			$newpart->messageid = $newmsg->id;
 			$newpart->create();
@@ -66,4 +66,56 @@ class Job_7_5_r2 extends DBMappedObject {
 		return $newmsg;
 	}
 }
+
+
+class Message_7_5_r2 extends DBMappedObject {
+
+	var $userid;
+	var $name;
+	var $description;
+	var $data = ""; //for headers
+	var $type;
+	var $modifydate;
+	var $lastused;
+	var $deleted = 0;
+	var $permanent = 0;
+
+
+	function Message_7_5_r2 ($id = NULL) {
+		$this->_allownulls = true;
+		$this->_tablename = "message";
+		$this->_fieldlist = array("userid", "name", "description", "type", "data", "deleted","modifydate", "lastused", "permanent");
+		//call super's constructor
+		DBMappedObject::DBMappedObject($id);
+	}
+}
+
+
+class MessagePart_7_5_r2 extends DBMappedObject {
+
+	var $messageid;
+	var $type;
+	var $audiofileid;
+	var $txt;
+	var $fieldnum;
+	var $defaultvalue;
+	var $voiceid;
+	var $sequence;
+	var $maxlen;
+	var $imagecontentid;
+
+	var $audiofile;
+
+	function MessagePart_7_5_r2 ($id = NULL) {
+		$this->_allownulls = true;
+		$this->_tablename = "messagepart";
+		$this->_fieldlist = array("messageid", "type", "audiofileid", "txt", "fieldnum", "defaultvalue", "voiceid", "sequence", "maxlen");
+
+		//call super's constructor
+		DBMappedObject::DBMappedObject($id);
+	}
+
+}
+
+
 ?>
