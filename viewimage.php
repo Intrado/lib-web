@@ -6,9 +6,9 @@ include_once("obj/Content.obj.php");
 
 if (!isset($_GET['id']))
 	exit();
-	
+
+// TODO: Check against $_SESSION['usercontentids'] for security.
 $contentid = $_GET['id'] + 0;
-//$filename = "blah.jpg"; // TODO: figure out the correct filename.
 
 if ($content = contentGet($contentid)){
 	list($contenttype,$data) = $content;
@@ -26,6 +26,8 @@ if ($content = contentGet($contentid)){
 		echo $data;
 	}
 }
-exit();
 
+
+// Keeping a session array of contentids = true, for the messageparts that you are
+// editing or viewing.
 ?>
