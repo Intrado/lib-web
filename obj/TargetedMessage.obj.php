@@ -5,7 +5,7 @@ class TargetedMessage extends DBMappedObject {
 	var $overridemessagegroupid;
 
 	function TargetedMessage ($id = NULL) {
-		$this->_allownulls = false;
+		$this->_allownulls = true;
 		$this->_tablename = "targetedmessage";
 		$this->_fieldlist = array(
 			"messagekey",
