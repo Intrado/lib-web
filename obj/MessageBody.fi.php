@@ -3,7 +3,9 @@
 class MessageBody extends FormItem {
 	function render ($value) {
 		$n = $this->form->name."_".$this->name;	
-	
+		$formnamepieces = explode('-', $this->form->name);
+		if (count($formnamepieces) == 3)
+			$languagecode = $formnamepieces[2];
 		$str = '
 			<div class="MessageBodyContainer" style="'.(!empty($this->args['hidden']) ? 'display:none' : '').'">
 			<table style="width:100%">
@@ -17,11 +19,21 @@ class MessageBody extends FormItem {
 																			alert('The preview will only render audio from the first 4000 characters.');
 																			content = content.substr(0,4000);
 																		}
-																		var language = $('" . $this->form->name . "_language').getValue();
-																		var voice = 'Female';
-																		if($('" . $this->form->name . "_voice-2').checked) {
-																			voice = 'Male';
+																		var languageselection = $('" . $this->form->name . "_language');
+																		var language;
+																		if (languageselection) {
+																			language = $('" . $this->form->name . "_language').getValue();
+																		} else {
+																			language = '$languagecode';
 																		}
+																		var voice = 'Female';
+																		var voiceselection = $('" . $this->form->name . "_voice-2');
+																		if (voiceselection) {
+																			if(voiceselection.checked) {
+																				voice = 'Male';
+																			}
+																		}
+																		
 																		if(content != '')
 																			popup('previewmessage.php?parentfield=" . $n . "&language=' + encodeURIComponent(language) + '&gender=' + encodeURIComponent(voice), 400, 400,'preview');")
 							. '</div>';
