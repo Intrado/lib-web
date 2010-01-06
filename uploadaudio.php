@@ -100,7 +100,7 @@ if (!empty($_POST) && empty($_FILES['audio'])) {
 	<input id="audio" name="audio" type="file" onChange="window.top.window.startUpload();this.form.submit();"/>	
 </form>
 <script language="javascript" type="text/javascript">
-	window.top.window.stopUpload('<?=$contentid?>','<?= addslashes($filename) ?>','<?= $size ?>','<?= addslashes($errormessage) ?>', '<?=$_GET['formname']?>', '<?=$_GET['itemname']?>');
+	window.top.window.stopAudioUpload('<?=$contentid?>','<?= addslashes($filename) ?>','<?= $size ?>','<?= addslashes($errormessage) ?>', '<?=$_GET['formname']?>', '<?=$_GET['itemname']?>');
 </script> 
 </body>
 </html>
