@@ -9,12 +9,14 @@ class TranslationItem extends FormItem {
 		if($value == null)
 			$value == "";
 
+		$usehtmleditor = !empty($this->args['usehtmleditor']) ? 'true' : 'false';
+		
 		$msgdata = json_decode($value);
 
 		$language = $this->args['language'];
 		$gender = isset($msgdata->gender)?$msgdata->gender:"female";
 
-		$isphone = isset($this->args['phone']);
+		$isphone = !empty($this->args['phone']);
 
 		$str = "";
 
@@ -22,21 +24,21 @@ class TranslationItem extends FormItem {
 			<input id="'.$n.'" name="'.$n.'" type="hidden" value="' . escapehtml($value) . '"/>
 			<input id="'.$n.'englishText" name="'.$n.'englishText" type="hidden" value="' . escapehtml($this->args["englishText"]) . '"/>
 			<input id="'.$n.'overridesave" type="hidden" value=""></div>
-			<hr>
+			' . (!empty($this->args['showhr']) ? '<hr>' : '') . '
 			<table width="100%">
 				<tr>
-					<td valign="top" width="80px">
-						<input id="'.$n.'translatecheck" name="'.$n.'checkbox" type="checkbox" onclick="toggleTranslation(\''.$n.'\',\''.$language.'\');" '.(($msgdata->enabled)?"checked":"").' />
+					<td valign="top" width="80px" class="TranslationItemCheckboxTD" style="'.(!empty($this->args['hidetranslationcheckbox']) ? 'display:none' : '').'">
+						<input id="'.$n.'translatecheck" name="'.$n.'checkbox" type="checkbox" onclick="toggleTranslation(\''.$n.'\',\''.$language.'\', '.$usehtmleditor.');" '.(($msgdata->enabled)?"checked":"").' />
 						<b>'._L('Translate').'</b>
 					</td>
-					<td valign="top" align="right" width="18px">
+					<td valign="top" align="right" width="18px" style="'.(!empty($this->args['hidetranslationlock']) ? 'display:none' : '').'">
 						<div id="'.$n.'icons" style="display: '.(($msgdata->enabled)?"block":"none").'">
 							<img id="'.$n.'editlock" style="display: '.(($msgdata->override)?"block":"none").';" src="img/padlock.gif">
 						</div>
 					</td>
 					<td valign="top" width="70%">
 						<div id="'.$n.'disableinfo" style="display: '.(($msgdata->enabled)?"none":"block").'; width: 100%;">
-							<ul><li> '  . _L('%1$s recipients will now receive the default English message.',ucfirst($language)) . '</li></ul>
+							'  . (isset($this->args['disabledinfo']) ? $this->args['disabledinfo'] : ('<ul><li> ' . _L('%1$s recipients will now receive the default English message.',ucfirst($language)) . '</li></ul>')) . '
 						</div>
 						<div id="'.$n.'textfields" style="width: 100%; display: '.(($msgdata->enabled)?"block":"none").'">
 							<fieldset>
@@ -49,7 +51,7 @@ class TranslationItem extends FormItem {
 							<div id="'. $n .'retranslationcontrols" style="width: 100%">
 								'. icon_button(_L("Show in English"), "fugue/magnifier", "toEnglishButton('$n','$language')", null, 'id="'. $n .'showenglish"').'
 								'. icon_button(_L("Hide English"), "fugue/magnifier__minus", "toEnglishButton('$n','$language')", null, 'id="'. $n .'hideenglish" style="display:none"').'
-								<input id="'.$n.'override" name="'.$n.'checkbox" type="checkbox" '.(($msgdata->override)?"checked":"").' onclick="overrideTranslation(\''.$n.'\',\''.$language.'\');"/>' . _L('Override Translation') . '
+								<span style="'.(empty($this->args['allowoverride']) ? 'display:none' : '').'"><input id="'.$n.'override" name="'.$n.'checkbox" type="checkbox" '.(($msgdata->override)?"checked":"").' onclick="overrideTranslation(\''.$n.'\',\''.$language.'\', '.$usehtmleditor.');"/>' . _L('Override Translation') . '</span>
 
 								<div id="'.$n.'retranslation" style="width: 100%; display: none;margin-top: 15px; clear:both">
 									'. icon_button(_L('Refresh %1$s to English Translation', $language),"fugue/arrow_circle_double_135","submitRetranslation('$n','$language')", null, 'style="margin-bottom: 12px"') . '
@@ -58,7 +60,7 @@ class TranslationItem extends FormItem {
 							</div>
 						</div>
 					</td>
-					<td valign="top" width="100px">
+					<td valign="top" width="100px" style="'.(!$isphone ? 'display:none' : '').'">
 						<div id="'.$n.'controls" style="display: '.(($msgdata->enabled)?"block":"none").'">
 							'.($isphone?icon_button(_L("Play"),"fugue/control","var content = $('" . $n . "text').getValue(); if(content != '') popup('previewmessage.php?parentfield=".$n."text&language=$language&gender=$gender" . "', 400, 400,'preview');"):"").'
 						</div>
@@ -66,9 +68,50 @@ class TranslationItem extends FormItem {
 				</tr>
 			</table>';
 
-		if($renderscript) {
+		if (isset($this->args['fields'])) {
+			// Data Fields.
 			$str .= '
-			<script>
+				<table border="0" cellpadding="1" cellspacing="0" style="display:none; font-size: 9px; margin-top: 5px;" class="DataFieldsTable" id="'.$n.'datafieldstable">
+					<tr>
+						<td>
+							<span style="font-size: 9px;">Default&nbsp;Value:</span><br />
+							<input id="'.$n.'datadefault" name="'.$n.'datavalue" type="text" size="10" value=""/>
+						</td>
+						<td>
+							<span style="font-size: 9px;">Data&nbsp;Field:</span><br />
+							<select id="'.$n.'datafield" name="'.$n.'language">
+								<option value="">-- Select a Field --</option>';								
+			foreach($this->args['fields'] as $field)
+			{
+				$str .= '		<option value="' . $field . '">' . $field . '</option>';
+			}
+			$str .=	'		</select>
+						</td>
+					</tr>
+					<tr>
+						<td colspan=2>
+							'. icon_button(_L("Insert"),"fugue/arrow_turn_180","
+										sel = $('" . $n . "datafield');
+										if (sel.options[sel.selectedIndex].value != '') {
+											 def = $('" . $n . "datadefault').value;
+											 textInsert('<<' + sel.options[sel.selectedIndex].text + (def ? ':' : '') + def + '>>', $('{$n}text'));
+										}")
+							. '					
+						</td>
+					</tr>
+				</table>';
+		}
+			
+			
+		if($renderscript || isset($this->args['reload'])) {
+			$renderscript = false;
+		}
+		return $str;
+	}
+	
+	function renderJavascriptLibraries() {
+		$str = '
+			<script type="text/javascript">
 				function toEnglishButton(section,language) {
 					if ($(section+"showenglish").visible()) {
 						$(section+"retranslation").show();
@@ -135,32 +178,46 @@ class TranslationItem extends FormItem {
 						"override": (($(section + "translatecheck").checked)?$(section + "override").checked:false),
 						"gender": curVal.gender
 					});
-					form_do_validation($(\'' . $this->form->name . '\'), $(section));
+					form_do_validation($(section).up("form"), $(section));
 				}
 
-				function overrideTranslation(section,language) {
+				function overrideTranslation(section,language, usehtmleditor, nowarning) {
 					var langtext = $(section + "text");
 					var overridesave = $(section + "overridesave");
+					
+					saveHtmlEditorContent();
+					
 					if ($(section+"override").checked) {
+						$(section).fire("TranslationItem:OverrideToggled", {"override": $(section+"override").checked});
+						
 						if (!overridesave.value)
 							overridesave.value = langtext.value;
 						langtext.show();
 						$(section + "editlock").show();
-						$(section + "textdiv").hide()
+						$(section + "textdiv").hide();
+						
+						if (usehtmleditor)
+							applyHtmlEditor(langtext);
 					} else {
-						if(langtext.value != overridesave.value && !confirm(\'' . _L('The edited text will be removed and set back to the previous translation.') . '\')) {
+						if(!nowarning && langtext.value != overridesave.value && !confirm(\'' . _L('The edited text will be removed and set back to the previous translation.') . '\')) {
 							$(section + "override").checked = true;
 							return;
 						}
+						
+						$(section).fire("TranslationItem:OverrideToggled", {"override": $(section+"override").checked});
+						
 						getTranslation(section,language);
 						overridesave.value = "";
 						langtext.hide();
 						$(section + "editlock").hide();
-						$(section + "textdiv").show()
+						$(section + "textdiv").show();
 					}
 					setTranslationValue(section);
 				}
-				function toggleTranslation(section,language) {
+				
+				function toggleTranslation(section,language, usehtmleditor) {
+					$(section).fire("TranslationItem:TranslationToggled", {"enabled": $(section+"translatecheck").checked});
+					
 					if ($(section+"translatecheck").checked) {
 						if ($(section+"text").value == "")
 							getTranslation(section, language);
@@ -168,6 +225,9 @@ class TranslationItem extends FormItem {
 						$(section +"textfields").show();
 						$(section +"disableinfo").hide();
 						$(section +"controls").show();
+						
+						if ($(section+"override").checked && usehtmleditor)
+							applyHtmlEditor(section+"text");
 					} else {
 						$(section +"icons").hide();
 						$(section +"textfields").hide();
@@ -175,11 +235,26 @@ class TranslationItem extends FormItem {
 						$(section +"controls").hide();
 					}
 					setTranslationValue(section);
+					
 				}
-
 			</script>';
-			$renderscript = false;
-		}
+			return $str;
+	}
+	
+	function renderJavascript() {
+		$n = $this->form->name."_".$this->name;
+		$usehtmleditor = !empty($this->args['usehtmleditor']) ? 'true' : 'false';
+		
+		$str = "
+			(function() {
+				if ($usehtmleditor) {
+					var textarea = $('{$n}text');
+					if (textarea.visible())
+						applyHtmlEditor(textarea);
+				}
+			})();
+		";
+		
 		return $str;
 	}
 }
