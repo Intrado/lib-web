@@ -68,6 +68,14 @@ function fmt_destination ($row,$index) {
 	return "&nbsp;";
 }
 
+function fmt_languagecode ($row,$index) {
+	return escapehtml(Language::getName($row[$index]));
+}
+
+function fmt_obj_languagecode ($obj,$name) {
+	return escapehtml(Language::getName($obj->$name));	
+}
+
 function fmt_limit_25 ($row,$index) {
 	$txt = fmt_null($row,$index);
 	$max = 25;
