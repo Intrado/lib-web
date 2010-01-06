@@ -584,7 +584,6 @@ function saveHtmlEditorContent() {
 			}
 		}
 		html = tempdiv.innerHTML.replace(/&lt;&lt;/g, '<<').replace(/&gt;&gt;/g, '>>');
-		console.info(html);
 		textarea.value = html;
 	}
 	
@@ -609,7 +608,10 @@ function applyHtmlEditor(textarea) {
 		textarea.disabled = true;
 		
 		var reusableckeditor = new Element('div', {'id':'reusableckeditor'});
-		document.body.insert(new Element('div', {'id':'reusableckeditorhider'}).hide().insert(reusableckeditor));
+		document.observe('dom:loaded', function() {
+			document.body.insert(new Element('div', {'id':'reusableckeditorhider'}).hide().insert(reusableckeditor));
+		});
+		
 		CKEDITOR.replace(reusableckeditor, {
 			'toolbar': [
 				['Styles', 'Format'],
@@ -630,7 +632,6 @@ function applyHtmlEditor(textarea) {
 	}
 	
 	var html = textarea.value.replace(/\(\((\d+)\)\)/g, "<img src='viewimage.php?id=$1'/>");
-	console.info(html);
 	editorobject.instance.setData(html);
 	
 	textarea.hide().addClassName('HtmlEditor').insert({'after':editorobject.container});
