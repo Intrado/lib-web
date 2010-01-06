@@ -33,6 +33,7 @@ class Voice extends DBMappedObject {
 		foreach (Voice::GetTTSVoices() as $voice) {
 			$codes[] = $voice->languagecode;
 		}
+		return $codes;
 	}
 	
 	static function getPreferredVoice($languagecode, $gender) {
