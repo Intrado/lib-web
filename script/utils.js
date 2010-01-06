@@ -49,7 +49,9 @@ function setVisibleIfChecked (checkbox, name) {
 }
 
 function textInsert(text, dest) {
-	if (document.selection) {
+	if ($('reusableckeditorhider') && !$('reusableckeditorhider').down('#cke_reusableckeditor')) {
+		CKEDITOR.instances['reusableckeditor'].insertText(text);
+	} else if (document.selection) {
 		dest.focus();
 		dest.sel.text = text;
 		dest.sel.select();
@@ -553,4 +555,69 @@ function pickDate (textbox, allowPast, allowFuture, closeOnBlur) {
 		relativePosition: true,
 		dateFilter: filter
 	});
+}
+
+// Updates the textarea that the html editor replaces with the latest content.
+// Returns null if the html editor is not loaded.
+// Returns an object containing the html editor instance and also the html editor's container.
+function saveHtmlEditorContent() {
+	if (!CKEDITOR) {
+		return null;
+	}
+	
+	var instance;
+	if (!CKEDITOR.instances || !(instance = CKEDITOR.instances['reusableckeditor']))
+		return null;
+		
+	var container = $('cke_reusableckeditor');
+	
+	var textarea = container.previous();
+	var textareauseshtmleditor = textarea && textarea.match('textarea.HtmlEditor');
+	if (textareauseshtmleditor)
+		textarea.value = instance.getData();
+	
+	return {'instance': instance, 'container': container, 'previoustextarea': textareauseshtmleditor ? textarea : null};
+}
+
+function hideHtmlEditor() {
+	if ($('cke_reusableckeditor'))
+		$('reusableckeditorhider').insert($('cke_reusableckeditor'));
+}
+
+// Loads the html editor if necessary.
+// NOTE: It is assumed that there be only a single html editor on the page; CKEditor is buggy with multiple instances.
+function applyHtmlEditor(textarea) {
+	var editorobject = saveHtmlEditorContent();
+	if (!editorobject) {
+		if ($('reusableckeditor'))
+			return; // The editor instance is still loading.
+		
+		textarea.insert({'before': '<img class="AjaxLoader" src="img/ajax-loader.gif"/>'});
+		textarea.hide();
+		textarea.disabled = true;
+		
+		var reusableckeditor = new Element('div', {'id':'reusableckeditor'});
+		document.body.insert(new Element('div', {'id':'reusableckeditorhider'}).hide().insert(reusableckeditor));
+		CKEDITOR.replace(reusableckeditor, {
+			'toolbar': [
+				['Styles', 'Format'],
+				['Bold', 'Italic', '-', 'NumberedList', 'BulletedList', '-', 'Link', '-', 'Image']
+			],
+			'resize_enabled': false,
+			'width': '100%',
+			'filebrowserImageUploadUrl' : 'uploadimage.php',
+			'on': {
+				'instanceReady': function(event) {
+					this.previous('img.AjaxLoader').remove();
+					applyHtmlEditor(this);
+				}.bindAsEventListener(textarea)
+			}
+		});
+		
+		return;
+	}
+	
+	editorobject.instance.setData(textarea.value);
+	
+	textarea.hide().addClassName('HtmlEditor').insert({'after':editorobject.container});
 }
