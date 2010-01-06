@@ -11,10 +11,9 @@ class AudioUpload extends FormItem {
 		
 		$str = '
 			<input id="' . $n . '" name="' . $n . '" type="hidden" value="' . escapehtml($value) . '"/>
-			<div id="uploadedfiles"></div>
-			<div id="upload_process" style="display: none;"><img src="img/ajax-loader.gif" /></div>
+			<div id="'.$n.'upload_process" style="display: none;"><img src="img/ajax-loader.gif" /></div>
 			<iframe id="'.$n.'my_attach" src="uploadaudio.php?formname='.$this->form->name.'&itemname='.$n.'" style="border:0;"></iframe>
-			<div id="uploaderror"></div>
+			<div id="'.$n.'uploaderror"></div>
 			';
 		return $str;
 	}
@@ -23,12 +22,13 @@ class AudioUpload extends FormItem {
 		$isaudio = isset($this->args['type']) && $this->args['type'] == 'audio' ? 'true' : 'false';
 		
 		$str = '<script>
-			function startAudioUpload(){
-				$(\'upload_process\').show();	
+			function startAudioUpload(itemname) {
+				$(itemname + "uploaderror").update();
+				$(itemname + \'upload_process\').show();	
 				return true;
 			}
 			
-			function stopAudioUpload(id,name,size,errormessage, formname, itemname) {
+			function stopAudioUpload(audioid,audioname,errormessage, formname, itemname) {
 				if (!formname || !itemname) {
 					return;
 				}
@@ -37,26 +37,24 @@ class AudioUpload extends FormItem {
 				if (!document.formvars || !document.formvars[formname])
 					return;
 					
-				setTimeout ("var uploadprocess = $(\'upload_process\'); if (uploadprocess) uploadprocess.hide();", 500 );
+				setTimeout ("var uploadprocess = $(\'"+itemname+ "upload_process\'); if (uploadprocess) uploadprocess.hide();", 500 );
 				
 				var values = {};
 				var fieldelement = $(itemname);
 				if (!fieldelement)
 					return;
 				var field = fieldelement.value;
-				if(field != "") 
+				if(field != "")
 					values = field.evalJSON();
-				if(id && name && size && !errormessage) {
-					values[id] = {"size":size,"name":name};
+				if (audioid && audioname && !errormessage) {
+					var newaudio = {"id":audioid, "name":audioname};
+					values[audioid] = newaudio;
+					fieldelement.fire("AudioUpload:AudioUploaded", newaudio);
 				}
-				
-				
-				var str = "";
-				var uploadedfiles = $("uploadedfiles").update();
 				
 				fieldelement.value = $H(values).toJSON();
 				
-				$("uploaderror").update(errormessage);
+				$(itemname + "uploaderror").update(errormessage);
 				form_do_validation($(formname), fieldelement);
 				return true;
 			}
