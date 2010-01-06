@@ -29,6 +29,11 @@ function handleRequest() {
 		case 'lists':
 			return cleanObjects(DBFindMany('PeopleList', ', (name+0) as lettersfirst from list where userid=? and not deleted order by lettersfirst,name', false, array($USER->id)));
 
+		// Returns a map of audiofiles belonging to the current user; a messagegroupid may be specified, but the results will still include global audio files (where messagegroupid is null). Results are sorted by recorddate.
+		case 'AudioFiles':
+			$messagegroupid = !empty($_GET['messagegroupid']) ? $_GET['messagegroupid'] + 0 : 0;
+			return cleanObjects(DBFindMany('AudioFile2', 'from audiofile where userid=? and (messagegroupid=? or messagegroupid is null) and not deleted order by recorddate', false, array($USER->id, $messagegroupid)));
+
 		// Return an AudioFile object specified by its ID.
 		case 'AudioFile':
 			if (!isset($_GET['id']))
@@ -37,7 +42,7 @@ function handleRequest() {
 			if ($audioFile->userid !== $USER->id)
 				return false;
 			return cleanObjects($audioFile);
-
+			
 		// Return a message object specified by it's ID
 		case 'Message':
 			if (!isset($_GET['id']))
@@ -84,6 +89,11 @@ function handleRequest() {
 			return QuickQueryList('select id,name from message where not deleted and userid=? and type=? order by id', true, false, array($userid, $_GET['messagetype']));
 
 		//--------------------------- RPC -------------------------------
+		case 'messagegroupsummary':
+			if (!isset($_GET['messagegroupid']))
+				return false;
+			return QuickQueryMultiRow("select distinct type,subtype,languagecode from message where userid=? and messagegroupid=? and not deleted order by type,subtype,languagecode", true, false, array($USER->id, $_GET['messagegroupid']));
+			
 		case 'hasmessage':
 			if (!isset($_GET['messagetype']) && !isset($_GET['messageid']))
 				return false;
@@ -176,7 +186,7 @@ function handleRequest() {
 				"attachment"=>count($attachments)?cleanObjects($attachments):false,
 				"body"=>count($parts)?$message->format($parts):""
 			);
-
+			
 		case 'messagegrid':
 			// TODO lookup default language code
 			// TODO lookup display names for all language messages to display
