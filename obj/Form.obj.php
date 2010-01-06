@@ -30,7 +30,7 @@ class Form {
 			if (isset($v['value']))
 				$values[$k] = $v['value'];
 		}
-
+		
 		$this->serialnum = md5(serialize($values));
 	}
 
@@ -67,7 +67,6 @@ class Form {
 
 		//ajax post form - merge in data, check validation, etc
 		if (isset($_POST['submit'])) {
-
 			//check the form snum vs loaded formdata
 			if (isset($_REQUEST['ajax']) && $this->checkForDataChange()) {
 				$result = array("status" => "fail", "datachange" => true);
@@ -133,6 +132,56 @@ class Form {
 		return false;
 	}
 
+	function renderJavascript() {
+		$str = '';
+
+		foreach ($this->formdata as $name => $itemdata) {
+			if (is_string($itemdata))
+				continue;
+				
+			if (isset($itemdata['control'])) {
+				$control = $itemdata['control'];
+			} else {
+				//set a hidden field
+				$control = array("HiddenField");
+			}
+
+			$formclass = $control[0];
+			$item = new $formclass($this,$name, $control);
+			
+			if ($formclass != "FormHtml") {
+				$value = $itemdata['value'];
+				$str .= $item->renderJavascript($value);
+			}
+		} //foreach
+
+		return '<script type="text/javascript">' . $str . '</script>';
+	}
+	
+	function renderJavascriptLibraries() {
+		$str = '';
+
+		foreach ($this->formdata as $name => $itemdata) {
+			if (is_string($itemdata))
+				continue;
+				
+			if (isset($itemdata['control'])) {
+				$control = $itemdata['control'];
+			} else {
+				//set a hidden field
+				$control = array("HiddenField");
+			}
+
+			$formclass = $control[0];
+			$item = new $formclass($this,$name, $control);
+			
+			$js = $item->renderJavascriptLibraries();
+			$str .= $js;
+		} //foreach
+
+		return $str;
+	}
+	
 	function renderFormItems() {
 		$lasthelpstep = false;
 		$str = '';
@@ -256,14 +305,19 @@ class Form {
 		return $str;
 	}
 
-	function render () {
+	function render ($ignorelibraries = false) {
 		$theme = getBrandTheme();
 
 		$posturl = $_SERVER['REQUEST_URI'];
 		$posturl .= mb_strpos($posturl,"?") !== false ? "&" : "?";
 		$posturl .= "form=". $this->name;
 		
-		$str = '
+		$str = '';
+		
+		if (!$ignorelibraries)
+			$str .= $this->renderJavascriptLibraries();
+		
+		$str .= '
 		<div class="newform_container">
 		' . (empty($this->parentform) ? '<form class="newform" id="'.$this->name.'" name="'.$this->name.'" method="POST" action="'.$posturl.'">
 		<input name="'.$this->name.'-formsnum" type="hidden" value="' . $this->serialnum . '">' : '') . '
@@ -314,6 +368,9 @@ class Form {
 		);
 		</script>
 		' : '');
+		
+		$str .= $this->renderJavascript();
+		
 		return $str;
 	}
 
