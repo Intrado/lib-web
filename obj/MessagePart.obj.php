@@ -11,16 +11,14 @@ class MessagePart extends DBMappedObject {
 	var $voiceid;
 	var $sequence;
 	var $maxlen;
-	var $contentid;
+	var $imagecontentid;
 
 	var $audiofile;
 
 	function MessagePart ($id = NULL) {
 		$this->_allownulls = true;
 		$this->_tablename = "messagepart";
-		$this->_fieldlist = array("messageid", "type", "audiofileid", "contentid", "txt", "fieldnum", "defaultvalue", "voiceid", "sequence", "maxlen");
-		$this->_childobjects = array("audiofile", "content");
-		$this->_childclasses = array("AudioFile", "Content");
+		$this->_fieldlist = array("messageid", "type", "audiofileid", "imagecontentid", "txt", "fieldnum", "defaultvalue", "voiceid", "sequence", "maxlen");
 
 		//call super's constructor
 		DBMappedObject::DBMappedObject($id);
