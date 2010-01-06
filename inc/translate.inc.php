@@ -1,5 +1,7 @@
 <?
 
+// TODO: Fix translate.inc.php to always index by language code; different languages can potentially have the same name, although it would be bad for usability.
+
 function getTranslationLanguages($indexbyname = false) {
 	$languages = array("arabic"=>"ar", "bulgarian"=>"bg", "catalan"=>"ca", "chinese"=>"zh", "croatian"=>"hr", "czech"=>"cs", "danish"=>"da", "dutch"=>"nl", "english"=>"en", "filipino" => "tl","finnish"=>"fi", "french"=>"fr", "german"=>"de", "greek"=>"el", "hebrew"=>"iw", "hindi"=>"hi", "indonesian"=>"id", "italian"=>"it", "japanese"=>"ja", "korean"=>"ko", "latvian"=>"lv", "lithuanian"=>"lt", "norwegian"=>"no", "polish"=>"pl", "portuguese"=>"pt-PT", "romanian"=>"ro", "russian"=>"ru", "serbian"=>"sr", "slovak"=>"sk", "slovenian"=>"sl", "spanish"=>"es", "swedish"=>"sv", "ukrainian"=>"uk", "vietnamese"=>"vi");
 	
@@ -45,10 +47,10 @@ function googletranslate($text, $lang_pairs) {
 		if($decoded->responseStatus == 200) {
 			if(is_array($decoded->responseData)){
 				foreach($decoded->responseData as $obj){
-					$obj->responseData->translatedText = html_entity_decode($obj->responseData->translatedText,ENT_QUOTES,"UTF-8");
+					$obj->responseData->translatedText = preg_replace('/<input value="(.+?)"\\/>/', '$1', html_entity_decode($obj->responseData->translatedText,ENT_QUOTES,"UTF-8"));
 				}
 			} else {
-				$decoded->responseData->translatedText = html_entity_decode($decoded->responseData->translatedText,ENT_QUOTES,"UTF-8");
+				$decoded->responseData->translatedText = preg_replace('/<input value="(.+?)"\\/>/', '$1', html_entity_decode($decoded->responseData->translatedText,ENT_QUOTES,"UTF-8"));
 			}
 			return $decoded->responseData;
 		} else {
@@ -60,12 +62,13 @@ function googletranslate($text, $lang_pairs) {
 	}
 }
 
+// $indexbycode indicates that $languagearray is indexed by the language code; if false, it indicates that $languagearray is indexed by the language name.
 function translate_fromenglish($englishtext,$languagearray) {
-		
+	
 	if(!isset($englishtext) || !isset($languagearray)) {
 		return false;
 	}
-
+		
 	$supportedlanguages = getTranslationLanguages(true);
 
 	$src_text = $englishtext;
@@ -92,8 +95,6 @@ function translate_fromenglish($englishtext,$languagearray) {
 	}
 	$text = "&q=".urlencode($src_text);
 
-	//error_log($text . $lang_pairs );
-	
 	return googletranslate($text, $lang_pairs);
 }
 
