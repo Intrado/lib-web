@@ -151,6 +151,9 @@ function list_prepare_ajax_table($containerID, $renderedlist) {
 		$i = 9;
 		// NOTE: $row[8] indicates the destination's type, which is phone, email or sms.
 		foreach ($fieldmaps as $fieldmap) {
+			if (FieldMap::getLanguageField() == $fieldmap->fieldnum)
+				$formatters[$i] = "fmt_languagecode";
+			
 			$titles[$i] = '@' . $fieldmap->name;
 
 			// NOTE: Only allow sorting by f-fields.

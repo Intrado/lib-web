@@ -144,6 +144,7 @@ if ($_SESSION['addressesorigin'] == "manualadd" && $_SESSION['listid'] != null) 
 					3 => "Last Name",
 					4 => "Language");
 	$formatters = array(1 => "fmt_checkbox_addrbook",
+						4 => "fmt_languagecode",
 						5 => "fmt_phone",
 						6 => "fmt_email",
 						7 => "fmt_phone",

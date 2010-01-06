@@ -208,6 +208,10 @@ class ContactsReport extends ReportGenerator {
 		$formatters = array("0" => "fmt_idmagnify",
 							"5" => "fmt_destination_sequence",
 							"6" => "fmt_editlocked_destination");
+		
+		//I think this is safe since it starts appending f03 right after other fields
+		if (in_array(FieldMap::getLanguageField(),$activefields))
+			$formatters[9] = "fmt_languagecode";
 
 		startWindow("Search Results", "padding: 3px;");
 		showPageMenu($total,$pagestart,$max);

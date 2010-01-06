@@ -339,7 +339,7 @@ if (!isset($_GET['ajax'])) {
 	<tr>
 		<th align="right" class="windowRowHeader bottomBorder">Language Preference:</th>
 		<td  class="bottomBorder">
-			<? $languagefield=FieldMap::getLanguageField(); displayValue($data->$languagefield); ?>
+			<? $languagefield=FieldMap::getLanguageField(); displayValue(Language::getName($data->$languagefield)); ?>
 		</td>
 	</tr>
 <?

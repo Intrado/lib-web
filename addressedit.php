@@ -56,7 +56,7 @@ if (isset($_GET['id'])) {
 ////////////////////////////////////////////////////////////////////////////////
 
 $personid = $_SESSION['addresseditid'];
-$languages = QuickQueryList("select name from language order by name");
+$languages = Language::getLanguageMap();
 
 $langfield = FieldMap::getLanguageField();
 $fnamefield = FieldMap::getFirstNameField();
@@ -65,7 +65,7 @@ $lnamefield = FieldMap::getLastNameField();
 if ($personid == NULL) {
 	// create a new person with empty data
 	$person = new Person();
-	$person->$langfield = "English"; // default language, so that first in alphabet is not selected (example, Chinese)
+	$person->$langfield = "en"; // default language, so that first in alphabet is not selected (example, Chinese)
 	$address = new Address();
 } else {
 	// editing existing person
@@ -135,12 +135,12 @@ $formdata = array(
 	"language" => array(
 		"label" => _L('Language Preference'),
 		"fieldhelp" => _L('When available, messages will be sent in the person\'s language preference.'), 
-		"value" => $person->$langfield ? $person->$langfield : "English",
+		"value" => $person->$langfield ? $person->$langfield : "en",
 		"validators" => array(
 			array("ValRequired"),
-			array("ValInArray","values" => $languages)
+			array("ValInArray","values" => array_keys($languages))
 		),
-		"control" => array("SelectMenu","values" => array_combine($languages,$languages)),
+		"control" => array("SelectMenu","values" => $languages),
 		"helpstep" => $helpstep
 	),
 	"addr1" => array(

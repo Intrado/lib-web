@@ -411,7 +411,7 @@ class FinishJobWizard extends WizFinish {
 				$person->type = "manualadd";
 				$person->$fnamefield = $USER->firstname;
 				$person->$lnamefield = $USER->lastname;
-				$person->$langfield = "English";
+				$person->$langfield = "en";
 				$person->update();
 
 				// New Phone, Email, SMS

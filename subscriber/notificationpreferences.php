@@ -208,7 +208,7 @@ foreach ($fieldmaps as $fieldmap) {
 				
 					// map locale to customer language
 					$value = "en_US";
-					if ($person->$fieldnum == "Spanish")
+					if ($person->$fieldnum == "es")
 						$value = "es_US";
 				
 					$formdata['locale'] = array (
@@ -466,9 +466,9 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		QuickUpdate("update subscriber set preferences=? where id=?", false, array($prefs, $_SESSION['subscriberid']));
 		$_SESSION['_locale'] = $postdata['locale'];        
 
-		$person->$languageField = "English";
+		$person->$languageField = "en";
 		if ($postdata['locale'] == "es_US")
-			$person->$languageField = "Spanish";
+			$person->$languageField = "es";
         
         $person->update();
         $_SESSION['subscriber.firstname'] = $person->$firstnameField;
