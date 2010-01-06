@@ -27,10 +27,8 @@ class EmailAttach extends FormItem {
 			
 			function stopUpload(id,name,size,errormessage, formname, itemname) {
 				if (!formname || !itemname) {
-					console.info("NOT GOOD: " + formname + " or no " + itemname);
 					return;
 				}
-				console.info("######stopping " + formname + " ... " + itemname);
 				// stopUpload() is called automatically when the iframe is loaded, which may be before document.formvars is initialized by form_load().
 				// In that case, just return.
 				if (!document.formvars || !document.formvars[formname])
@@ -78,7 +76,6 @@ class EmailAttach extends FormItem {
 				
 				$("uploaderror").update(errormessage);
 				form_do_validation($(formname), fieldelement);
-				console.info("returnt rue");
 				return true;
 			}
 			
