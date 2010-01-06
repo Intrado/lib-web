@@ -93,6 +93,7 @@ if (isset($_SESSION['messagegroupid'])) {
 	$newmessagegroup = new MessageGroup();
 	$newmessagegroup->userid = $USER->id;
 	$newmessagegroup->name = $defaultmessagegroupname;
+	$newmessagegroup->description = '';
 	$newmessagegroup->modified =  makeDateTime(time());
 	$newmessagegroup->deleted = 1; // Set to deleted in case the user does not submit the form.
 	$newmessagegroup->permanent = $defaultpermanent;
