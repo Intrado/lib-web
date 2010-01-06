@@ -4,7 +4,7 @@ header('Content-Type: application/json');
 require_once("inc/common.inc.php");
 require_once("inc/translate.inc.php");
 
-	$supportedlanguages = getTranslationLanguages(true);
+	$supportedlanguages = getTranslationLanguages(false);
 	$url = "http://ajax.googleapis.com/ajax/services/language/translate?v=1.0";
 	$url .= (isset($SETTINGS['translation']['apikey']) && $SETTINGS['translation']['apikey'])?"&key=" . $SETTINGS['translation']['apikey']:"";
 	$text = "";
@@ -37,7 +37,7 @@ require_once("inc/translate.inc.php");
 		foreach ($destinationlanguages as $destlang){
 			$lang = strtolower($destlang);
 			if(array_key_exists($lang,$supportedlanguages)) {
-				$lang_pairs .= "&langpair=" . urlencode("en|" . $supportedlanguages[$lang]);
+				$lang_pairs .= "&langpair=" . urlencode("en|" . $lang);
 			}
 		}
 		$text = "&q=".urlencode($src_text);
@@ -56,7 +56,7 @@ require_once("inc/translate.inc.php");
     	$language = strtolower($language);
     	if(array_key_exists($language,$supportedlanguages)) {
     		$text = "&q=" . urlencode($text);
-    		$lang_pairs = "&langpair=" . urlencode($supportedlanguages[$language] . "|en");
+    		$lang_pairs = "&langpair=" . urlencode($language . "|en");
 		}
     }
      elseif(isset($_GET['text']) && isset($_GET['language'])){
@@ -71,7 +71,7 @@ require_once("inc/translate.inc.php");
     	$language = strtolower($language);
     	if(array_key_exists($language,$supportedlanguages)) {
     		$text = "&q=" . urlencode($text);
-    		$lang_pairs = "&langpair=" . urlencode($supportedlanguages[$language] . "|en");
+    		$lang_pairs = "&langpair=" . urlencode($language . "|en");
 		}
     }
     if($text != "" && $lang_pairs != "") {
