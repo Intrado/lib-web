@@ -159,6 +159,8 @@ class Form {
 	}
 	
 	function renderJavascriptLibraries() {
+		static $renderedformclasses = array(); // Used to determine if a formitem's javascript libraries have already been loaded.
+		
 		$str = '';
 
 		foreach ($this->formdata as $name => $itemdata) {
@@ -173,6 +175,11 @@ class Form {
 			}
 
 			$formclass = $control[0];
+			if (in_array($formclass, $renderedformclasses))
+				continue;
+				
+			$renderedformclasses[] = $formclass;
+			
 			$item = new $formclass($this,$name, $control);
 			
 			$js = $item->renderJavascriptLibraries();
@@ -333,7 +340,7 @@ class Form {
 		$str .= '
 				<!-- END FORM CONTENT -->
 				</td>
-				<td id="'.$this->name.'_helpercell" valign="top" width="100px">
+				<td id="'.$this->name.'_helpercell" valign="top" width="'.($this->helpsteps ? '100px' : '0px').'">
 				<!-- HELPER -->
 				<div id="'.$this->name.'_startguide" style="float: right; padding-top: 3px;">'.($this->helpsteps ? icon_button("Guide","information","return form_enable_helper(event);") : "").'</div>
 				<div id="'.$this->name.'_helper" class="helper">
