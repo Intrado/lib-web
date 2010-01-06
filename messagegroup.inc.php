@@ -128,12 +128,16 @@ function makeAccordionSplitter($type, $subtype, $languagecode, $permanent, $pref
 						<script type='text/javascript'>
 							(function () {
 								var audiolibrarywidget = new AudioLibraryWidget('audiolibrarycontainer', $existingmessagegroupid);
-								// TODO: Handle upload event.
-								//$('audioupload').onload = function(event) {
-									// TODO: use textInsert()
-									//textInsert('{{' + audiofile.name + '}}', $('{$type}-{$subtype}-{$languagecode}_messagebody'));
-								//	this.reload();
-								//}.bindAsEventListener(audiolibrarywidget);
+								
+								var audiouploadformitem = $('{$type}-{$subtype}-{$languagecode}_audioupload');
+								audiouploadformitem.observe('AudioUpload:AudioUploaded', function(event) {
+									hideHtmlEditor();
+									console.info('audio uploaded');
+									var audiofile = event.memo;
+									console.info(audiofile);
+									textInsert('{{' + audiofile.name + '}}', $('{$type}-{$subtype}-{$languagecode}_messagebody'));
+									this.reload();
+								}.bindAsEventListener(audiolibrarywidget));
 								
 								audiolibrarywidget.container.observe('AudioLibraryWidget:ClickName', function(event) {
 									hideHtmlEditor();
@@ -142,12 +146,11 @@ function makeAccordionSplitter($type, $subtype, $languagecode, $permanent, $pref
 								}.bindAsEventListener(audiolibrarywidget));
 								
 								var callmeformitem = $('{$type}-{$subtype}-{$languagecode}_callme');
-								callmeformitem.observe('Easycall:RecordingDone', function(event, audiolibrarywidget) {
+								callmeformitem.observe('Easycall:RecordingDone', function(event) {
 									hideHtmlEditor();
-									// TODO: use textInsert()
 									//textInsert('{{' + audiofile.name + '}}', $('{$type}-{$subtype}-{$languagecode}_messagebody'));
-									audiolibrarywidget.reload();
-								}.bindAsEventListener(callmeformitem, audiolibrarywidget));
+									this.reload();
+								}.bindAsEventListener(audiolibrarywidget));
 							})();
 						</script>
 					")
