@@ -337,7 +337,7 @@ function commitJob()
 	}
 
 
-	$job->phonemessageid = $_SESSION['messageid'];
+	$job->messagegroupid = $_SESSION['messagegroupid'];
 
 	$jobtype = new JobType($_SESSION['priority']);
 
@@ -350,17 +350,6 @@ function commitJob()
 	$job->create();
 	$jobid = $job->id;
 	if ($jobid) {
-		// now create any additional language messages for this job
-		if (isset($_SESSION['msglangmap'])) foreach($_SESSION['msglangmap'] as $lang => $msgid) {
-			//error_log($lang.$msgid);
-			$joblang = new JobLanguage();
-			$joblang->jobid = $jobid;
-			$joblang->messageid = $msgid;
-			$joblang->type = "phone";
-			$joblang->language = $lang;
-			$joblang->create();
-			//error_log("created joblang");
-		}
 		// associate the list for this job
 		QuickUpdate("insert into joblist (jobid, listid) values (?,?)", false, array($job->id, $_SESSION['listid']));
 
