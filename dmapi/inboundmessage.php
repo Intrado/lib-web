@@ -4,7 +4,9 @@
 include_once("../obj/User.obj.php");
 include_once("../obj/Access.obj.php");
 include_once("../obj/Permission.obj.php");
+include_once("../obj/Content.obj.php");
 include_once("../obj/AudioFile.obj.php");
+include_once("../obj/MessageGroup.obj.php");
 include_once("../obj/Message.obj.php");
 include_once("../obj/MessagePart.obj.php");
 include_once("inboundutils.inc.php");
@@ -121,11 +123,11 @@ function promptMultiLang()
 
 <?
 			$listindex = 1;
-			foreach ($languages as $lang)
+			foreach ($languages as $code => $name)
 			{
 ?>
 				<audio cmid="file://prompts/inbound/Press<?= $listindex ?>For.wav" />
-				<tts gender="female"><?= escapehtml($lang) ?></tts>
+				<tts gender="female"><?= escapehtml($name) ?></tts>
 <?
 				$listindex++;
 			}
@@ -134,7 +136,7 @@ function promptMultiLang()
 
 <?
 			$listindex = 1;
-			foreach ($languages as $lang)
+			foreach ($languages as $code => $name)
 			{
 ?>
 				<choice digits="<?= $listindex ?>" />
@@ -170,88 +172,103 @@ function buildLanguageList()
 
 	$user = new User($_SESSION['userid']);
 
-	$query = "select value from persondatavalues where fieldnum='f03' ".
-				"and value != '' and value is not null order by refcount desc limit 9";
+	// F03 contains the languagecode, must lookup name from language table
+	$query = "select l.code, l.name from persondatavalues p inner join language l on (l.code = p.value) " .
+			 "where p.fieldnum='f03' and p.value != '' and p.value is not null order by p.refcount desc limit 9";
 
-	$languages = QuickQueryList($query);
+	$languages = QuickQueryList($query, true);
 
 	// its a rare case that a customer does not have any persondata (they must import something)
 	// but if so, take the customers languages from the language table
 	if ($languages == NULL || count($languages) == 0) {
-		$languages = QuickQueryList("select name from language order by name");
+		error_log("grab from language table");
+		$languages = QuickQueryList("select code, name from language order by name", true);
 	}
 
 	// "English" is always the default, so remove english from the list
-	foreach ($languages as $index => $value) {
-		if (strcasecmp($value ,"english") == 0) {
-			unset($languages[$index]);
+	foreach ($languages as $code => $name) {
+		if (strcasecmp($name ,"english") == 0) {
+			unset($languages[$code]);
 			break;
 		}
 	}
 
 	//add default to the list as the first option (it will get removed when the user records their first/default message
-	$languages = array_values($languages);
-	array_unshift($languages,"default");
-
+	$defaultarray = array();
+	$defaultarray['en'] = "English";
+	$languages = array_merge($defaultarray, $languages);
 
 	$_SESSION['languageList'] = $languages;
-
-	$_SESSION['langindex'] = 0; // default
-
+	$_SESSION['langindex'] = 'en'; // default English
 }
 
 function commitMessage($contentid)
 {
-
 	$languages = $_SESSION['languageList'];
-	$langi = $_SESSION['langindex'];
-	$language = $languages[$langi];
+	$languagecode = $_SESSION['langindex'];
+	$language = $languages[$languagecode];
 
 	loadTimezone();
 	$name = "Call In (".$language.") - ".date("M j, Y G:i:s");
 
-	$audioFile = new AudioFile();
-	$audioFile->userid = $_SESSION['userid'];
-	$audioFile->name = $name;
-	$audioFile->description = "";
-	$audioFile->contentid = $contentid; //$BFXML_VARS['recordaudio'];
-	$audioFile->recordDate = date("Y-m-d G:i:s");
-
-	$message = new Message();
-	$message->userid = $_SESSION['userid'];
-	$message->type = "phone";
-	$message->name = $name;
-	$message->description = "";
-
-	$messagePart = new MessagePart();
-	$messagePart->type = "A";
-
-	// now commit to database
-	$audioFile->create();
-	$audiofileid = $audioFile->id;
-	//error_log("audiofileid: ".$audiofileid);
-	if ($audiofileid) {
-		$message->create();
-		$messageid = $message->id;
-		//error_log("messageid: ".$messageid);
-		if ($messageid) {
-			$messagePart->messageid = $messageid;
-			$messagePart->audiofileid = $audiofileid;
-			$messagePart->sequence = 0;
-			$messagePart->create();
-
-			// if default language then set session msgid, else add to map of msgid-lang to add into joblanguage
-			// ok to assume English is their default language, customer has no options for this (yet)
-			if ($language =="default") {
-				$_SESSION['messageid'] = $messageid;
-			} else {
-				if (!isset($_SESSION['msglangmap'])) $_SESSION['msglangmap'] = array();
-
-				$_SESSION['msglangmap'][$languages[$langi]] = $messageid;
-			}
-			return true;
-		}
+	if (isset($_SESSION['messagegroupid'])) {
+		$messagegroupid = $_SESSION['messagegroupid'];
+	} else {
+		$groupname = "Call In - ".date("M j, Y G:i:s");
+		$messagegroup = new MessageGroup();
+		$messagegroup->userid = $_SESSION['userid'];
+		$messagegroup->name = $groupname;
+		$messagegroup->description = "";
+		$messagegroup->modified = date("Y-m-d G:i:s");
+		$messagegroup->create();
+		$messagegroupid = $messagegroup->id;
+		$_SESSION['messagegroupid'] = $messagegroupid;
 	}
+
+	if ($messagegroupid) {
+		$audioFile = new AudioFile();
+		$audioFile->userid = $_SESSION['userid'];
+		$audioFile->name = $name;
+		$audioFile->description = "";
+		$audioFile->contentid = $contentid; //$BFXML_VARS['recordaudio'];
+		$audioFile->recordDate = date("Y-m-d G:i:s");
+		$audioFile->messagegroupid = $messagegroupid;
+
+		$message = new Message();
+		$message->messagegroupid = $messagegroupid;
+		$message->userid = $_SESSION['userid'];
+		$message->type = "phone";
+		$message->subtype = "voice";
+		$message->autotranslate = "none";
+		$message->languagecode = $languagecode;
+		$message->name = $name;
+		$message->description = "";
+
+		$messagePart = new MessagePart();
+		$messagePart->type = "A";
+
+		// now commit to database
+		$audioFile->create();
+		$audiofileid = $audioFile->id;
+		//error_log("audiofileid: ".$audiofileid);
+		if ($audiofileid) {
+			$message->create();
+			$messageid = $message->id;
+			//error_log("messageid: ".$messageid);
+			if ($messageid) {
+				$messagePart->messageid = $messageid;
+				$messagePart->audiofileid = $audiofileid;
+				$messagePart->sequence = 0;
+				$messagePart->create();
+				
+				$messagegroup = new MessageGroup($messagegroupid);
+				$messagegroup->modified = date("Y-m-d G:i:s");
+				$messagegroup->update();
+
+				return true;
+			} // end message
+		} // end audiofile
+	} // end messagegroupid
 
 	return false; // some kind of error
 }
@@ -265,10 +282,8 @@ if($REQUEST_TYPE == "new"){
 	<hangup />
 	<?
 } else if($REQUEST_TYPE == "continue") {
-
 	// if they recorded a message, and asked to save
 	if (isset($BFXML_VARS['saveaudio'])) {
-
 		buildLanguageList();
 		$languages = $_SESSION['languageList'];
 		$langi = $_SESSION['langindex'];
@@ -294,7 +309,6 @@ if($REQUEST_TYPE == "new"){
 		}
 	// if they choose to record additional languages
 	} else if (isset($BFXML_VARS['domultilang'])) {
-
 		$selectedLang = 0;
 		if (isset($BFXML_VARS['langtorecord'])) {
 			$selectedLang = $BFXML_VARS['langtorecord'] +0;
@@ -304,7 +318,16 @@ if($REQUEST_TYPE == "new"){
 		if ($BFXML_VARS['domultilang'] == 2 &&
 			$selectedLang != 0 && $selectedLang <= count($languages))
 		{
-			$_SESSION['langindex'] = $selectedLang-1;
+			$langindex = '';
+			$i = 0;
+			foreach ($languages as $code => $name) {
+				$i++;
+				if ($i == $selectedLang) {
+					$langindex = $code;
+					break;
+				}
+			}
+			$_SESSION['langindex'] = $langindex;
 			promptRecordMessage(true);
 		}
 		else
