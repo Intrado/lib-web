@@ -573,8 +573,20 @@ function saveHtmlEditorContent() {
 	
 	var textarea = container.previous();
 	var textareauseshtmleditor = textarea && textarea.match('textarea.HtmlEditor');
-	if (textareauseshtmleditor)
-		textarea.value = instance.getData();
+	if (textareauseshtmleditor) {
+		var tempdiv = new Element('div').insert(instance.getData());
+		var images = tempdiv.select('img');
+		for (var i = 0, count = images.length; i < count; i++) {
+			var image = images[i];
+			var matches = image.src.match(/viewimage\.php\?id=(\d+)/);
+			if (matches.length == 2) {
+				image.replace('((' + matches[1] + '))');
+			}
+		}
+		html = tempdiv.innerHTML.replace(/&lt;&lt;/g, '<<').replace(/&gt;&gt;/g, '>>');
+		console.info(html);
+		textarea.value = html;
+	}
 	
 	return {'instance': instance, 'container': container, 'previoustextarea': textareauseshtmleditor ? textarea : null};
 }
@@ -617,7 +629,9 @@ function applyHtmlEditor(textarea) {
 		return;
 	}
 	
-	editorobject.instance.setData(textarea.value);
+	var html = textarea.value.replace(/\(\((\d+)\)\)/g, "<img src='viewimage.php?id=$1'/>");
+	console.info(html);
+	editorobject.instance.setData(html);
 	
 	textarea.hide().addClassName('HtmlEditor').insert({'after':editorobject.container});
 }
