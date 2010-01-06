@@ -20,8 +20,10 @@ class Language extends DBMappedObject {
 		return $languages;
 	}
 	
+	//prefered way to translate a language code to name
 	static function getName ($code) {
-		return Language::getLanguageMap()[$code];
+		$languages = Language::getLanguageMap();
+		return isset($languages[$code]) ? $languages[$code] : $code;
 	}
 }
 
