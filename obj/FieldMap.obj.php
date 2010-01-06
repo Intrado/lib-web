@@ -153,10 +153,7 @@ class FieldMap extends DBMappedObject {
 	}
 
 	static function getName ($fieldnum) {
-		global $USER;
-		$query = "select name from fieldmap where "
-				." fieldnum = '$fieldnum'";
-		return QuickQuery($query);
+		return FieldMap::retrieveFieldMaps()[$fieldnum]->name;
 	}
 
 	// Returns an associative array, indexed by fieldnum.
