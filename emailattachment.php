@@ -45,6 +45,8 @@ $errormessage = is_string($result) ? $result : '';
 <html>
 <head>
 	<meta http-equiv="Content-type" value="text/html; charset=UTF-8" />
+	<link href="css.php?hash=<?=crc32(serialize($_SESSION['colorscheme']))?>" type="text/css" rel="stylesheet" media="screen, print">
+	<link href="css/form.css.php" type="text/css" rel="stylesheet">
 </head>
 
 <body style="margin-left: 0px; margin-top: 1px; margin-bottom: 0px">
@@ -52,7 +54,6 @@ $errormessage = is_string($result) ? $result : '';
 	<input type="hidden" name="MAX_FILE_SIZE" value="<?= $maxattachmentsize ?>">
 	<input id="emailattachment" name="emailattachment" type="file" onChange="window.top.window.startUpload();this.form.submit();"/>	
 </form>
-<script src="script/prototype.js" type="text/javascript"></script>
 <script language="javascript" type="text/javascript">
 	window.top.window.stopUpload('<?=$contentid?>','<?= addslashes($filename) ?>','<?= $size ?>','<?= addslashes($errormessage) ?>', '<?=$_GET['formname']?>', '<?=$_GET['itemname']?>');
 </script> 
