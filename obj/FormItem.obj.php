@@ -12,6 +12,18 @@ abstract class FormItem {
 	}
 
 	abstract function render ($value) ;
+	
+	// Return a string containing any javascript dependencies.
+	// NOTE: The returned string should contain script tags.
+	function renderJavascriptLibraries() {
+		return '';
+	}
+	
+	// Return a string containing any javascript to be executed.
+	// NOTE: The returned string should NOT contain script tags.
+	function renderJavascript($value) {
+		return '';
+	}
 
 	function jsGetValue () {
 		return "form_default_get_value"; //must evaluate to an existing function. anonymous functions dont seem to work, and inline function definitions not suggested.
