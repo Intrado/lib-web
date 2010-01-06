@@ -19,6 +19,9 @@ class User extends DBMappedObject {
 	var $staffpkey;
 	var $importid;
 	var $lastimport;
+	
+	
+	var $rules = false; //local cache of rules
 
 	//new constructor
 	function User ($id = NULL) {
@@ -80,23 +83,16 @@ class User extends DBMappedObject {
 		return ($this->firstname ? substr($this->firstname, 0, 1) . '. ' : NULL) . $this->lastname;
 	}
 
-	function rules()
-	{
-		return DBFindMany("Rule","from rule inner join userrule on rule.id = userrule.ruleid where userid =?", false, array($this->id));
+	function rules() {
+		if ($this->rules === false)
+			$this->rules = DBFindMany("Rule","from rule inner join userassociation ua on rule.id = ua.ruleid where userid =?", false, array($this->id));
+		return $this->rules;
 	}
 	
 	function userSQL ($alias = false) {
 		$r = Rule::makeQuery($this->rules(), $alias);
-//echo "USERRULE ".$r;
+		//TODO add org/section/etc
 		return $r;
-	}
-
-	function getCustomer () {
-		static $customer = null;
-		if ($customer == null)
-			$customer = new Customer($this->customerid);
-
-		return $customer;
 	}
 
 	//see if the login is used
