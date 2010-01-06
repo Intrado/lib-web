@@ -25,7 +25,6 @@ var AudioLibraryWidget = Class.create({
 		for (var audiofileid in audiofiles) {
 			var audiofile = audiofiles[audiofileid];
 			audiofile.id = audiofileid;
-			console.info(audiofile);
 			var namelink = new Element('a', {'href': '#'});
 			namelink.update(audiofile.name);
 			namelink.observe('click', this.onClickName.bindAsEventListener(this, audiofile));
