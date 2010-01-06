@@ -18,12 +18,11 @@ if(isset($_GET["name"]) && isset($_GET["id"])) {
 	exit();
 }
 
-$audio = new AudioFile('new');
+$audio = new AudioFile();
 
 $errormessage = "";
-$contentid = "";
-$filename = "";
-$size = "";
+$audioid = "";
+$audioname = "";
 
 if (!empty($_POST) && empty($_FILES['audio'])) {
 	$errormessage = ('Please select an audio file to upload');
@@ -31,14 +30,14 @@ if (!empty($_POST) && empty($_FILES['audio'])) {
 	$messagegroup = new MessageGroup($_SESSION['messagegroupid']);
 	
 	//submit changes
-	$audio->name = _L('Audio Upload - ') . date("F jS, Y h:i a");
+	$audioname = $audio->name = _L('Audio Upload - ') . date("F jS, Y h:i a");
 	$audio->userid = $USER->id;
 	$audio->deleted = 0;
 	$audio->permanent = $messagegroup->permanent;
 	$audio->messagegroupid = $messagegroup->id;
 	
 	if (!$_FILES['audio']['name']) {
-		$errormessage = ('There was an error reading your audio file'."\n".'Please try another file');
+		$errormessage = _L("There was an error reading your audio file.\nPlease try another file");
 	} else {
 		$filename = $_FILES['audio']['name'];
 		$path_parts = pathinfo($filename);
@@ -52,17 +51,15 @@ if (!empty($_POST) && empty($_FILES['audio'])) {
 		$source = $SETTINGS['feature']['tmp_dir'] . DIRECTORY_SEPARATOR . basename($_FILES['audio']['tmp_name']) . 'orig.' . $ext;
 		$dest = $SETTINGS['feature']['tmp_dir'] . DIRECTORY_SEPARATOR . basename($_FILES['audio']['tmp_name']) . '.wav';
 		if(!move_uploaded_file($_FILES['audio']['tmp_name'],$source)) {
-			$errormessage = ('There was an error reading your audio file'."\n".'Please try another file');
+			$errormessage = _L("There was an error reading your audio file.\nPlease try another file");
 			unlink($source);
 			unlink($dest);
 		} else {
-
 			$cmd = "sox \"$source\" -r 8000 -c 1 -s -w \"$dest\" ";
 			$result = exec($cmd, $res1,$res2);
 
 			if($res2 || !file_exists($dest)) {
-				$errormessage = ('There was an error reading your audio file'."\n".'Please try another file'."\n".
-				'Supported formats include: .wav, .aiff, and .au');
+				$errormessage = _L("There was an error reading your audio file.\nPlease try another file.\nSupported formats include: .wav, .aiff, and .au");
 				unlink($source);
 				unlink($dest);
 			} else {
@@ -74,9 +71,9 @@ if (!empty($_POST) && empty($_FILES['audio'])) {
 				if ($contentid) {
 					$audio->contentid = $contentid;
 					$audio->update();
+					$audioid = $audio->id;
 				} else {
-					$errormessage = ('There was an error uploading your audio file'."\n".'Please try again'."\n".
-					'Supported formats include: .wav, .aiff, and .au');
+					$errormessage = _L("There was an error uploading your audio file.\nPlease try again.\nSupported formats include: .wav, .aiff, and .au");
 				}
 			}
 		}
@@ -97,10 +94,10 @@ if (!empty($_POST) && empty($_FILES['audio'])) {
 	<?=_L('Upload an audio file')?>
 	<br/>
 	<!-- TODO: Might need maximum size -->
-	<input id="audio" name="audio" type="file" onChange="window.top.window.startUpload();this.form.submit();"/>	
+	<input id="audio" name="audio" type="file" onChange="window.top.window.startAudioUpload('<?=$_GET['itemname']?>');this.form.submit();"/>	
 </form>
 <script language="javascript" type="text/javascript">
-	window.top.window.stopAudioUpload('<?=$contentid?>','<?= addslashes($filename) ?>','<?= $size ?>','<?= addslashes($errormessage) ?>', '<?=$_GET['formname']?>', '<?=$_GET['itemname']?>');
+	window.top.window.stopAudioUpload('<?=$audioid?>','<?= addslashes($audioname) ?>',<?=json_encode($errormessage)?>, '<?=$_GET['formname']?>', '<?=$_GET['itemname']?>');
 </script> 
 </body>
 </html>
