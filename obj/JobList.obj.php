@@ -17,7 +17,7 @@ class JobList extends DBMappedObject {
 		$user = new User($userid);
 
 		//get and compose list rules
-		$listrules = DBFindMany("Rule","from listentry le, rule r where le.type='R'
+		$listrules = DBFindMany("Rule","from listentry le, rule r where le.type='rule'
 				and le.ruleid=r.id and le.listid='" . $this->listid .  "'", "r");
 
 		if (count($listrules) > 0) {

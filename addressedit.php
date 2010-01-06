@@ -469,7 +469,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 			if (!QuickQuery("select count(*) from listentry where listid = ? and personid = ?", null, array($_SESSION['listid'], $personid))) {
 				$le = new ListEntry();
 				$le->listid = $_SESSION['listid'];
-				$le->type = "A";
+				$le->type = "add";
 				$le->sequence = 0;
 				$le->personid = $person->id;
 				$le->create();

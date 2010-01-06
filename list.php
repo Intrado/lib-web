@@ -271,14 +271,14 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 						break;
 
 					case 'clearadditions':
-						QuickUpdate("DELETE le.* FROM listentry le WHERE le.type='A' AND le.listid=?", false, array($list->id));
+						QuickUpdate("DELETE le.* FROM listentry le WHERE le.type='add' AND le.listid=?", false, array($list->id));
 
 						notice(_L('All additions are now removed.'));
 						$form->sendTo('list.php');
 						break;
 
 					case 'clearskips':
-						QuickUpdate("DELETE le.* FROM listentry le WHERE le.type='N' AND le.listid=?", false, array($list->id));
+						QuickUpdate("DELETE le.* FROM listentry le WHERE le.type='negate' AND le.listid=?", false, array($list->id));
 
 						notice(_L('All skips are now removed.'));
 						$form->sendTo('list.php');

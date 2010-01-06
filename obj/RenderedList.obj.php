@@ -119,9 +119,9 @@ class RenderedList {
 			$this->data[] = $row;
 			$this->pageids[] = $row[1];
 			
-			if ($row[0] == "R")
+			if ($row[0] == 'rule')
 				$this->pageruleids[] = $row[1];
-			else if ($row[0] == 'A')
+			else if ($row[0] == 'add')
 				$this->pageaddids[] = $row[1];
 			else {
 				$this->pageruleids[] = $row[1];
@@ -135,8 +135,8 @@ class RenderedList {
 		if (in_array($this->mode, array("rules","people")) && count($this->pageids) > 0) {
 			if (!isset($_SESSION['listsearchpreview'])) {
 				$peopleSQL = " AND personid IN (" . implode(',', $this->pageids) . ")";
-				$additionsSQL = "SELECT personid FROM listentry WHERE listid=? AND type='A' $peopleSQL";
-				$skipsSQL = "SELECT personid FROM listentry WHERE listid=? AND type='N' $peopleSQL";
+				$additionsSQL = "SELECT personid FROM listentry WHERE listid=? AND type='add' $peopleSQL";
+				$skipsSQL = "SELECT personid FROM listentry WHERE listid=? AND type='negate' $peopleSQL";
 				$this->pageaddids = QuickQueryList($additionsSQL, false, false, array($this->list->id));
 				$this->pageremoveids = QuickQueryList($skipsSQL, false, false, array($this->list->id));
 			}
@@ -271,7 +271,7 @@ class RenderedList {
 		global $USER;
 		$orderSQL = $this->orderby ? "order by " . $this->orderby : "";
 		$limitSQL = $this->pagelimit >= 0 ? "limit $this->pageoffset,$this->pagelimit" : "";
-		$leTypeSQL = $this->mode == "add" ? "AND le.type='A'" : "AND le.type='N'";
+		$leTypeSQL = $this->mode == "add" ? "AND le.type='add'" : "AND le.type='negate'";
 
 		return Query("SELECT (le.type) AS entrytype,
 				p.id, pkey, $this->firstname, $this->lastname, $this->language
@@ -326,7 +326,7 @@ class RenderedList {
 						$addressJoinSQL
 					WHERE
 						NOT p.deleted
-						AND le.type='A'
+						AND le.type='add'
 						$searchRulesSQL
 						$peopleSQL)
 				$orderSQL
@@ -383,12 +383,12 @@ class RenderedList {
 	}
 	
 	function countRemoved () {
-		$query = "select count(*) from listentry le inner join person p on (p.id = le.personid) where le.type='N' and le.listid = ?";
+		$query = "select count(*) from listentry le inner join person p on (p.id = le.personid) where le.type='negate' and le.listid = ?";
 		return QuickQuery($query, false, array($this->list->id));
 	}
 
 	function countAdded () {
-		$query = "select count(*) from listentry le inner join person p on (p.id = le.personid and not p.deleted) where  le.type='A' and le.listid = ?";
+		$query = "select count(*) from listentry le inner join person p on (p.id = le.personid and not p.deleted) where  le.type='add' and le.listid = ?";
 		return QuickQuery($query, false, array($this->list->id));
 	}
 }

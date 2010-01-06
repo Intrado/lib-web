@@ -445,7 +445,7 @@ class FinishJobWizard extends WizFinish {
 
 				// New List Entry
 				$le = new ListEntry();
-				$le->type = "A";
+				$le->type = "add";
 				$le->listid = $addmelist->id;
 				$le->personid = $person->id;
 				$le->create();

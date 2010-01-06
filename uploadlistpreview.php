@@ -234,14 +234,14 @@ if (CheckFormSubmit($f,'save') && !$errormsg) {
 			//flip associative array
 			$personids = array_keys($temppersonids);
 
-			$oldids = QuickQueryList("select p.id from person p, listentry le where p.id=le.personid and le.type='A' and p.userid is null and le.listid=$list->id");
+			$oldids = QuickQueryList("select p.id from person p, listentry le where p.id=le.personid and le.type='add' and p.userid is null and le.listid=$list->id");
 			$deleteids = array_diff($oldids, $personids);
 			$addids = array_diff($personids, $oldids);
 
 			$query = "delete from listentry where personid in ('" . implode("','",$deleteids) . "') and listid = " . $list->id;
 			QuickUpdate($query);
 			if (count($addids) > 0) {
-				$query = "insert into listentry (listid, type, personid) values ($list->id,'A','" . implode("'),($list->id,'A','",$addids) . "')";
+				$query = "insert into listentry (listid, type, personid) values ($list->id,'add','" . implode("'),($list->id,'add','",$addids) . "')";
 				QuickUpdate($query);
 			}
 		} else {

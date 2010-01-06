@@ -204,7 +204,7 @@ class Job extends DBMappedObject {
 		$query = "select p.id " .
 			"from listentry le " .
 			"straight_join person p on (p.id=le.personid and not p.deleted) " .
-			"where le.listid=".$listid." and le.type='A' " .
+			"where le.listid=".$listid." and le.type='add' " .
 			"limit 1";
 		$p = QuickQuery($query);
 		if ($p) $hasPeople = true;

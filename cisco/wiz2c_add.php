@@ -66,7 +66,7 @@ if (isset($_GET['firstname']) || isset($_GET['lasttname']) || isset($_GET['phone
 
 		$le = new ListEntry();
 		$le->listid = $list->id;
-		$le->type = "A";
+		$le->type = "add";
 		$le->personid = $person->id;
 		$le->create();
 

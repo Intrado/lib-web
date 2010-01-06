@@ -79,7 +79,7 @@ function handleRequest() {
 				$rule->create();
 				$le = new ListEntry();
 				$le->listid = $_GET['listid']+0;
-				$le->type = "R";
+				$le->type = "rule";
 				$le->ruleid = $rule->id;
 				$le->create();
 				summarizeListName($_GET['listid']);

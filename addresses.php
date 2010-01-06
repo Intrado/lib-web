@@ -133,7 +133,7 @@ if ($_SESSION['addressesorigin'] == "manualadd" && $_SESSION['listid'] != null) 
 		$query = "
 		select le.personid
 		from listentry le
-		where le.listid = $listid and le.type='A'
+		where le.listid = $listid and le.type='add'
 		and (le.personid = " . implode(" or le.personid =", $onpageids) . ")
 		";
 		$inlistids = QuickQueryList($query);

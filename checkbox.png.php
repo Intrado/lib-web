@@ -24,7 +24,7 @@ if ($id && $USER->authorize('createlist') && userOwns("list",$_SESSION['listid']
 				//make sure the person doesn't already exist in the list
 				if(!QuickQuery("select count(*) from listentry where personid = " . $id . " and listid = " . $_SESSION['listid'])){
 					QuickUpdate("insert into listentry (listid,type,personid)"
-								. "values ('" . $_SESSION['listid'] . "','A','$id')");
+								. "values ('" . $_SESSION['listid'] . "','add','$id')");
 				}
 				//if the person already exists in the list, keep displaying the checkbox
 				readfile("img/checkbox-add.png");
@@ -42,7 +42,7 @@ if ($id && $USER->authorize('createlist') && userOwns("list",$_SESSION['listid']
 			if(!QuickQuery("select count(*) from listentry where personid = " . $id . " and listid = " . $_SESSION['listid'])){
 				QuickUpdate("insert into listentry (listid,type,personid)"
 							. "values ('" . $_SESSION['listid']
-							. "','N','$id')");
+							. "','negate','$id')");
 			}
 			QuickUpdate("commit");
 			readfile("img/checkbox-remove.png");

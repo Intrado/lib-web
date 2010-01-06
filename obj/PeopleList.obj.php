@@ -18,7 +18,7 @@ class PeopleList extends DBMappedObject {
 	}
 
 	function getListRules() {
-		return DBFindMany("Rule","from listentry le, rule r where le.type='R'
+		return DBFindMany("Rule","from listentry le, rule r where le.type='rule'
 				and le.ruleid=r.id and le.listid='" . $this->id .  "'", "r");
 	}
 

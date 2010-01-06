@@ -33,23 +33,23 @@ function listentry_insert($personid, $type) {
 
 function list_add_person($personid) {
 	if ($type = listentry_get_type($personid)) {
-		if ($type == 'A') // Already in the additions section.
+		if ($type == 'add') // Already in the additions section.
 			return;
-		else if ($type == 'N') // Already in the skips section.
+		else if ($type == 'negate') // Already in the skips section.
 			listentry_delete($personid);
 	} else {
-		listentry_insert($personid, 'A');
+		listentry_insert($personid, 'add');
 	}
 }
 
 function list_remove_person($personid) {
 	if ($type = listentry_get_type($personid)) {
-		if ($type == 'N') // Already in the skips section.
+		if ($type == 'negate') // Already in the skips section.
 			return;
-		else if ($type == 'A') // Already in the additions section.
+		else if ($type == 'add') // Already in the additions section.
 			listentry_delete($personid);
 	} else {
-		listentry_insert($personid, 'N');
+		listentry_insert($personid, 'negate');
 	}
 }
 
