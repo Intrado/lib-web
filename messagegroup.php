@@ -826,7 +826,7 @@ echo '<div id="formswitchercontainer">' . $messagegroupsplitter->render($default
 		};
 		
 		formswitchercontainer.observe('FormSplitter:BeforeSubmitAll', function(event, state) {
-			if (!confirmAutotranslator(null, event, state))
+			if ($('autotranslatorrefreshtranslationbutton') && !confirmAutotranslator(null, event, state))
 				event.stop();
 		}.bindAsEventListener(formswitchercontainer, state));
 		
