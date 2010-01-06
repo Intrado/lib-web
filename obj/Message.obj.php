@@ -126,7 +126,7 @@ class Message extends DBMappedObject {
 		else
 			$this->update();
 			
-		$voiceid = Voice::getPreferredVoice($this->languagecode, $preferredgender);
+		$voiceid = $preferredgender ? Voice::getPreferredVoice($this->languagecode, $preferredgender) : null;
 		
 		if (is_string($body)) {
 			if ($this->type == 'sms') {
@@ -150,12 +150,6 @@ class Message extends DBMappedObject {
 		}
 	}
 	
-	function firstVoiceID() {
-		return QuickQuery("select voiceid from messagepart where messageid = $this->id order by sequence limit 1");
-	}
-
-	// TODO: Embedded images.
-	// TODO: Put back comment about not setting messageid.
 	static function parse ($data, &$errors = NULL, $defaultvoiceid=null) {
 		global $USER;
 
@@ -172,6 +166,7 @@ class Message extends DBMappedObject {
 			$pos_f = strpos($data,"<<");
 			$pos_a = strpos($data,"{{");
 			$pos_l = strpos($data,"[[");
+			$pos_e = strpos($data,"((");
 
 			$poses = array();
 			if($pos_f !== false)
@@ -180,6 +175,8 @@ class Message extends DBMappedObject {
 				$poses[] = $pos_a;
 			if($pos_l !== false)
 				$poses[] = $pos_l;
+			if($pos_e !== false)
+				$poses[] = $pos_e;
 
 			if(!count($poses))
 				break;
@@ -192,6 +189,8 @@ class Message extends DBMappedObject {
 					$type = "A";
 				if($pos === $pos_l)
 					$type = "newlang";
+				if($pos === $pos_e)
+					$type = "E";
 			}
 
 			//make a text part up to the pos of the field
@@ -219,6 +218,8 @@ class Message extends DBMappedObject {
 				case "newlang":
 					$endtoken = "]]";
 					break;
+				case "E":
+					$endtoken = "))";
 			}
 			//$endtoken = ($type == "A") ? "}}" : ">>";
 			$length = @strpos($data,$endtoken,$pos+1); // assume at least one char for audio/field name
@@ -286,6 +287,18 @@ class Message extends DBMappedObject {
 							}
 						}
 						break;
+					case "E":
+						$part->sequence = $partcount++;
+						$query = "select id from content where id=?";
+
+						$contentid = QuickQuery($query, false, array($token));
+						if ($contentid !== false) {
+							$part->contentid = $contentid;
+							$parts[] = $part;
+						} else {
+							$errors[] = "Can't find content with id '$token'";
+						}
+						break;
 				}
 			}
 			//skip the end if we found it
@@ -313,7 +326,7 @@ class Message extends DBMappedObject {
 		return $parts;
 	}
 
-	function format ($parts) {
+	static function format ($parts, $translatable = false) {
 
 		$map = FieldMap::getMapNames();
 		$data = "";
@@ -322,37 +335,38 @@ class Message extends DBMappedObject {
 		foreach ($parts as $part) {
 			if($currvoiceid == null){
 				$currvoiceid = $part->voiceid;
-			} else if($part->voiceid != $currvoiceid){
-				$data .= "[[" . ucfirst($voices[$part->voiceid]->language) . "]]";
+			} else if($part->voiceid && $part->voiceid != $currvoiceid){
+				$voicestr = "[[" . ucfirst($voices[$part->voiceid]->language) . "]]";
+				$data .= $translatable ? ('<input value="' . escapehtml($voicestr) . '"/>') : $voicestr;
 				$currvoiceid = $part->voiceid;
 			}
+			
+			$partstr = '';
 			switch ($part->type) {
 			case 'A':
 				$part->audiofile = new AudioFile($part->audiofileid);
-				$data .= "{{" . $part->audiofile->name . "}}";
+				$partstr .= "{{" . $part->audiofile->name . "}}";
 				break;
 			case 'T':
-				$data .= $part->txt;
+				$partstr .= $part->txt;
 				break;
 			case 'V':
-				$data .= "<<" . $map[$part->fieldnum];
+				$partstr .= "<<" . $map[$part->fieldnum];
 
 				if ($part->defaultvalue !== null && strlen($part->defaultvalue) > 0)
-					$data .= ":" . $part->defaultvalue;
-				$data .= ">>";
+					$partstr .= ":" . $part->defaultvalue;
+				$partstr .= ">>";
+				break;
+			case 'E':
+				$partstr .= "((" . $part->contentid . "))";
 				break;
 			}
+			
+			if ($partstr != '')
+				$data .= ($translatable && $part->type != 'T') ? ('<input value="' . escapehtml($partstr) . '"/>') : $partstr;
 		}
 
 		return $data;
-	}
-
-	static function getPhoneLanguages() {
-		return array();
-	}
-
-	static function getEmailLanguages() {
-		return array();
 	}
 
 	static function renderMessageParts($id, $fields) {
@@ -463,7 +477,6 @@ class Message extends DBMappedObject {
 
 		@unlink($outname);
 	}
-
 
 	// The only reliable way to check the message length is to render it. Return negative value on error.
 	static function getAudioLength($id, $fields) {
