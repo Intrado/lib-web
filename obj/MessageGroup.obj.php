@@ -44,7 +44,7 @@ class MessageGroup extends DBMappedObject {
 	}
 	
 	function getOneEnabledMessage($type) {
-		return DBFind('Message2', 'from message where not deleted and type=? and messagegroupid=?', false, array($type, $this->id));
+		return DBFind('Message', 'from message where not deleted and type=? and messagegroupid=?', false, array($type, $this->id));
 	}
 
 	function getGlobalPreferredGender($default) {
@@ -72,7 +72,7 @@ class MessageGroup extends DBMappedObject {
 	}
 	
 	function getMessageText($type, $subtype, $languagecode, $autotranslate) {
-		if (!$message = DBFind('Message2', 'from message where not deleted and type=? and subtype=? and languagecode=? and messagegroupid=? and autotranslate=?', false, array($type, $subtype, $languagecode, $this->id, $autotranslate)))
+		if (!$message = DBFind('Message', 'from message where not deleted and type=? and subtype=? and languagecode=? and messagegroupid=? and autotranslate=?', false, array($type, $subtype, $languagecode, $this->id, $autotranslate)))
 			return '';
 		
 		$parts = DBFindMany('MessagePart', 'from messagepart where messageid=?', false, array($message->id));
