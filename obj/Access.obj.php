@@ -5,10 +5,9 @@ class Access extends DBMappedObject {
 	var $name;
 	var $description;
 
-	var $permissions;
+	var $permissions = false;
 
 	function Access ($id = NULL) {
-		$this->permissions = false;
 		$this->_allownulls = true;
 		$this->_tablename = "access";
 		$this->_fieldlist = array("name","description");
