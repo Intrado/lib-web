@@ -80,7 +80,7 @@ if (isset($_POST['text'])) {
 		else
 			$_SESSION['ttslanguage'] = $_POST['language'];
 	} else 
-		$_SESSION['ttslanguage'] = "english";
+		$_SESSION['ttslanguage'] = "en";
 			
 	if(get_magic_quotes_gpc())
 		$_SESSION['ttstext'] = stripslashes($_POST['text']);
@@ -240,7 +240,7 @@ if (isset($_GET['parentfield'])) {
 	if (isset($_GET['language']) && $_GET['language'] != "") {
 		$language = $_GET['language'];
 	} else {
-		$language = "english";
+		$language = "en";
 	}
 	
 	require_once("popup.inc.php");
