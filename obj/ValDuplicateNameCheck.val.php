@@ -6,7 +6,12 @@ class ValDuplicateNameCheck extends Validator {
 		global $USER;
 		$type = $args["type"];
 
-		if(in_array($type, array("phone","email","sms"))) {
+		if ($type == 'messagegroup') {
+			$existsid = QuickQuery("select id from messagegroup where name=? and userid=? and deleted=0",false,array($value,$USER->id));
+			if($existsid && $existsid != $_SESSION['messagegroupid']) {
+				return "$this->label: ". _L('There is already a message group with this name. Please choose another.');
+			}
+		} else if(in_array($type, array("phone","email","sms"))) {
 			$existsid = QuickQuery("select id from message where name=? and type=? and userid=? and deleted=0",false,array($value,$args["type"],$USER->id));
 			if($existsid && $existsid != $_SESSION['messageid']) {
 				return "$this->label: ". _L('There is already a message with this name. Please choose another.');
