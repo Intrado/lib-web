@@ -27,11 +27,11 @@ class Voice extends DBMappedObject {
 		return $voices;
 	}
 
-	// return array of language codes that are supported languages for tts, based on what's enabled in customer language table
-	static function getTTSLanguageCodes() {
+	// return array of language codes and language names, $codes[$voice->languagecode] = $voice->language, that are supported languages for tts, based on what's enabled in customer language table.
+	static function getTTSLanguageMap() {
 		$codes = array();
 		foreach (Voice::GetTTSVoices() as $voice) {
-			$codes[] = $voice->languagecode;
+			$codes[$voice->languagecode] = $voice->language;
 		}
 		return $codes;
 	}
