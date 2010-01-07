@@ -314,6 +314,13 @@ $endvalues = newform_time_select(NULL, $ACCESS->getValue('callearly'), $ACCESS->
 
 $messages = array("" =>_L("-- Select a Message --")) + QuickQueryList("select id, name, (name +0) as digitsfirst from messagegroup where userid=? and deleted=0 order by digitsfirst,name", true,false,array($USER->id));
 
+if($job->messagegroupid != null) {
+	$deletedmessage = QuickQueryRow("select id, name from messagegroup where id = ? and deleted = 1", false, false,array($job->messagegroupid));
+	if($deletedmessage != false)
+		$messages += array($deletedmessage[0] => $deletedmessage[1]);
+}
+
+
 $cansendphone = $USER->authorize('sendphone');
 $cansendemail = $USER->authorize('sendemail');
 $cansendsms = getSystemSetting('_hassms', false) && $USER->authorize('sendsms');
