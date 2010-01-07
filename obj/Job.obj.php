@@ -23,9 +23,9 @@ class Job extends DBMappedObject {
 
 	var $cancelleduserid;
 
+	var $sendinfo = false; // if $sendphone, $sendemail, $sendsms is correct. Refreash, Update and Create will reset this to false
 	var $sendphone;
 	var $sendemail;
-	var $sendprint;
 	var $sendsms;
 
 	var $optionsarray = null; //options to update
@@ -262,17 +262,11 @@ class Job extends DBMappedObject {
 	function refresh($specificfields = NULL, $refreshchildren = false) {
 		parent::refresh($specificfields, $refreshchildren);
 		$this->loadSettings();
-		$this->sendphone = true;
-		$this->sendemail = true;
-		$this->sendprint = false;
-		$this->sendsms = true;
+		$this->sendinfo = false;
 	}
 
 	function update($specificfields = NULL, $updatechildren = false) {
-		$this->sendphone = true;
-		$this->sendemail = true;
-		$this->sendprint = false;
-		$this->sendsms = true;
+		$this->sendinfo = false;
 
 		parent::update($specificfields,$updatechildren);
 
@@ -289,10 +283,8 @@ class Job extends DBMappedObject {
 	}
 
 	function create($specificfields = NULL, $createchildren = false) {
-		$this->sendphone = true;
-		$this->sendemail = true;
-		$this->sendprint = false;
-		$this->sendsms = true;
+		$this->sendinfo = false;
+
 
 		$id = parent::create($specificfields, $createchildren);
 
@@ -344,6 +336,40 @@ class Job extends DBMappedObject {
 	}
 	function setOptionValue ($option,$value) {
 		$this->setSetting($option, $value);
+	}
+
+
+	// Update the send info if necessary, After a Refrash, Update and Create the cache is flushed this may be optimized.
+	function updatesendinfo() {
+		if(!$this->sendinfo) {
+			if($this->messagegroupid != null) {
+				$value = QuickQueryRow("select sum(type='phone') as phone, sum(type='email') as email, sum(type='sms') as sms from message where messagegroupid = ? group by messagegroupid",false,false,array($this->messagegroupid));
+				if($value !== false) {
+					$this->sendphone = ($value[0] > 0);
+					$this->sendemail = ($value[1] > 0);
+					$this->sendsms = ($value[2] > 0);
+					$this->sendinfo = true;
+				}
+			}
+		}
+	}
+
+	// Update cache if necessary and return if this job has a message with phone type
+	function hasPhone() {
+		$this->updatesendinfo();
+		return $this->sendinfo && $this->sendphone;
+	}
+
+	// Update cache if necessary and return if this job has a message with email type
+	function hasEmail() {
+		$this->updatesendinfo();
+		return $this->sendinfo && $this->sendemail;
+	}
+
+	// Update cache if necessary and return if this job has a message with sms type
+	function hasSMS() {
+		$this->updatesendinfo();
+		return $this->sendinfo && $this->sendsms;
 	}
 
 }
