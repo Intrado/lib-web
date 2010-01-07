@@ -759,19 +759,6 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 				$job->jobtypeid = $postdata['jobtype'];
 				$job->userid = $USER->id;
 
-				// TODO remove type in job
-				$jobtypes = array();
-				if ($cansendphone) {
-					$jobtypes[] = "phone";
-				}
-				if ($cansendemail) {
-					$jobtypes[] = "email";
-				}
-				if ($cansendsms) {
-					$jobtypes[] = "sms";
-				}
-				$job->type=implode(",",$jobtypes);
-				//
 
 				//error_log($postdata['skipduplicates']);
 				$job->setOption("skipduplicates",$postdata['skipduplicates']?1:0);
