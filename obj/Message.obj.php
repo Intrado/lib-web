@@ -91,7 +91,7 @@ class Message extends DBMappedObject {
 			$msgattachment->size = $attachment['size'];
 			
 			$msgattachment->create();
-				
+			
 			$messageattachments[] = $msgattachment;
 		}
 		
@@ -166,7 +166,7 @@ class Message extends DBMappedObject {
 			$pos_f = strpos($data,"<<");
 			$pos_a = strpos($data,"{{");
 			$pos_l = strpos($data,"[[");
-			$pos_e = strpos($data,"((");
+			$pos_i = strpos($data,'((');
 
 			$poses = array();
 			if($pos_f !== false)
@@ -175,8 +175,8 @@ class Message extends DBMappedObject {
 				$poses[] = $pos_a;
 			if($pos_l !== false)
 				$poses[] = $pos_l;
-			if($pos_e !== false)
-				$poses[] = $pos_e;
+			if($pos_i !== false)
+				$poses[] = $pos_i;
 
 			if(!count($poses))
 				break;
@@ -189,8 +189,8 @@ class Message extends DBMappedObject {
 					$type = "A";
 				if($pos === $pos_l)
 					$type = "newlang";
-				if($pos === $pos_e)
-					$type = "E";
+				if($pos === $pos_i)
+					$type = "I";
 			}
 
 			//make a text part up to the pos of the field
@@ -218,7 +218,7 @@ class Message extends DBMappedObject {
 				case "newlang":
 					$endtoken = "]]";
 					break;
-				case "E":
+				case "I":
 					$endtoken = "))";
 			}
 			//$endtoken = ($type == "A") ? "}}" : ">>";
@@ -287,13 +287,13 @@ class Message extends DBMappedObject {
 							}
 						}
 						break;
-					case "E":
+					case "I":
 						$part->sequence = $partcount++;
 						$query = "select id from content where id=?";
 
 						$contentid = QuickQuery($query, false, array($token));
 						if ($contentid !== false) {
-							$part->contentid = $contentid;
+							$part->imagecontentid = $contentid;
 							$parts[] = $part;
 						} else {
 							$errors[] = "Can't find content with id '$token'";
