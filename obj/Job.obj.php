@@ -2,18 +2,12 @@
 
 
 class Job extends DBMappedObject {
-
-
 	var $userid;
 	var $messagegroupid;
 	var $scheduleid;
 	var $jobtypeid;
 	var $name;
 	var $description;
-	var $phonemessageid;
-	var $emailmessageid;
-	var $printmessageid;
-	var $smsmessageid;
 	var $questionnaireid;
 	var $type;
 	var $modifydate;
@@ -41,8 +35,7 @@ class Job extends DBMappedObject {
 		$this->_allownulls = true;
 		$this->_tablename = "job";
 		$this->_fieldlist = array("userid","messagegroupid", "scheduleid", "jobtypeid", "name", "description",
-				"phonemessageid", "emailmessageid", "printmessageid", "smsmessageid", "questionnaireid",
-				"type", "modifydate", "createdate", "startdate", "enddate", "starttime", "endtime", "finishdate",
+				"questionnaireid", "type", "modifydate", "createdate", "startdate", "enddate", "starttime", "endtime", "finishdate",
 				"status", "percentprocessed", "deleted", "cancelleduserid");
 		//call super's constructor
 		DBMappedObject::DBMappedObject($id);
@@ -116,60 +109,6 @@ class Job extends DBMappedObject {
 
 		$newjob->create();
 
-		// copy the messages
-		// if message is not deleted, then we can point to it directly
-		// but if message is deleted, it's either already a copy from a previous run (uneditable)
-		// or it's a translation message and we need to make another copy of these
-		if (!$isrepeatingrunnow && $newjob->isOption('jobcreatedphone')) {
-			$msg = new Message($newjob->phonemessageid);
-			if ($msg->deleted) {
-				$newmsg = Job::copyMessage($msg->id);
-				$newjob->phonemessageid = $newmsg->id;
-				$newjob->update();
-			}
-			$joblangs = DBFindMany("JobLanguage", "from joblanguage where jobid=? and type='phone'", false, array($this->id));
-			foreach ($joblangs as $jl) {
-				$newmsg = Job::copyMessage($jl->messageid);
-
-				$newjl = new JobLanguage($jl->id);
-				$newjl->id = null;
-				$newjl->messageid = $newmsg->id;
-				$newjl->jobid = $newjob->id;
-				$newjl->create();
-			}
-		} else {
-			//copy all the job language settings
-			QuickUpdate("insert into joblanguage (jobid, messageid, type, language)
-				select ?, messageid, 'phone', language
-				from joblanguage where jobid=? and type='phone'", false, array($newjob->id, $this->id));
-		}
-		// email messages
-		if (!$isrepeatingrunnow && $newjob->isOption('jobcreatedemail')) {
-			$msg = new Message($newjob->emailmessageid);
-			if ($msg->deleted) {
-				$newmsg = Job::copyMessage($msg->id);
-				$newjob->emailmessageid = $newmsg->id;
-				$newjob->update();
-			}
-			$joblangs = DBFindMany("JobLanguage", "from joblanguage where jobid=? and type='email'", false, array($this->id));
-			foreach ($joblangs as $jl) {
-				$newmsg = Job::copyMessage($jl->messageid);
-
-				$newjl = new JobLanguage($jl->id);
-				$newjl->id = null;
-				$newjl->messageid = $newmsg->id;
-				$newjl->jobid = $newjob->id;
-				$newjl->create();
-			}
-		} else {
-			//copy all the job language settings
-			QuickUpdate("insert into joblanguage (jobid, messageid, type, language)
-				select ?, messageid, 'email', language
-				from joblanguage where jobid=? and type='email'", false, array($newjob->id, $this->id));
-		}
-		// sms has no translation or joblanguage, no need to copy
-
-
 		//copy all the job lists
 		QuickUpdate("insert into joblist (jobid,listid)
 			select ?, listid
@@ -218,7 +157,7 @@ class Job extends DBMappedObject {
 			// check for system disablerepeat
 			if (!getSystemSetting("disablerepeat")) {
 				// check for empty message
-				if ($this->phonemessageid != null || $this->emailmessageid != null || $this->smsmessageid != null || $this->printmessageid || $this->questionnaireid != null) {
+				if ($this->messagegroupid != null || $this->questionnaireid != null) {
 
 					// check lists for people
 					$hasPeople = false;
@@ -319,25 +258,22 @@ class Job extends DBMappedObject {
 	}
 
 
-
+	// TODO Check where  sendphone,sendemail and sendsms is used and see if we eliminate them
 	function refresh($specificfields = NULL, $refreshchildren = false) {
 		parent::refresh($specificfields, $refreshchildren);
 		$this->loadSettings();
-		$this->sendphone = (bool)$this->phonemessageid;
-		$this->sendemail = (bool)$this->emailmessageid;
-		$this->sendprint = (bool)$this->printmessageid;
-		$this->sendsms = (bool)$this->smsmessageid;
+		$this->sendphone = true;
+		$this->sendemail = true;
+		$this->sendprint = false;
+		$this->sendsms = true;
 	}
 
 	function update($specificfields = NULL, $updatechildren = false) {
-		$this->sendphone = (bool)$this->phonemessageid;
-		$this->sendemail = (bool)$this->emailmessageid;
-		$this->sendprint = (bool)$this->printmessageid;
-		$this->sendsms = (bool)$this->smsmessageid;
-		if(!$this->sendphone) $this->phonemessageid = NULL;
-		if(!$this->sendemail) $this->emailmessageid = NULL;
-		if(!$this->sendprint) $this->printmessageid = NULL;
-		if(!$this->sendsms) $this->smsmessageid = NULL;
+		$this->sendphone = true;
+		$this->sendemail = true;
+		$this->sendprint = false;
+		$this->sendsms = true;
+
 		parent::update($specificfields,$updatechildren);
 
 		if($this->id){
@@ -353,14 +289,11 @@ class Job extends DBMappedObject {
 	}
 
 	function create($specificfields = NULL, $createchildren = false) {
-		$this->sendphone = (bool)$this->phonemessageid;
-		$this->sendemail = (bool)$this->emailmessageid;
-		$this->sendprint = (bool)$this->printmessageid;
-		$this->sendsms = (bool)$this->smsmessageid;
-		if(!$this->sendphone) $this->phonemessageid = NULL;
-		if(!$this->sendemail) $this->emailmessageid = NULL;
-		if(!$this->sendprint) $this->printmessageid = NULL;
-		if(!$this->sendsms) $this->smsmessageid = NULL;
+		$this->sendphone = true;
+		$this->sendemail = true;
+		$this->sendprint = false;
+		$this->sendsms = true;
+
 		$id = parent::create($specificfields, $createchildren);
 
 		if($id){
