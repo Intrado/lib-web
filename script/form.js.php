@@ -560,7 +560,8 @@ function form_handle_submit(form,event) {
 							window.location=res.dontsaveurl;
 						}
 					} else {
-						alert("There are some errors on this form.\nPlease correct them before trying again.");
+						if (!form.fire('AjaxForm:SubmitSuccess', {'errormessage':"There are some errors on this form.\nDo you want to continue anyway without saving changes?"}).stopped)
+							alert("There are some errors on this form.\nPlease correct them before trying again.");
 					}
 				}
 
@@ -579,7 +580,6 @@ function form_handle_submit(form,event) {
 			formvars.submitting = false;
 		},
 		onFailure: function(){
-			// TODO: Fire an event so that form_submit_all() can cancel alerts etc...
 			alert('There was a problem submitting the form. Please try again.'); //TODO better error handling
 			formvars.submitting = false;
 		}
@@ -644,8 +644,8 @@ function form_submit_all (tabevent, value, formsplittercontainer) {
 		}.bindAsEventListener(form, tabevent, submissions));
 		
 		form.observe('AjaxForm:SubmitSuccess', function(ajaxevent, tabevent, submissions) {
-			ajaxevent.stop();
-			
+			if (!ajaxevent.memo.errormessage)
+				ajaxevent.stop();
 			var thissubmission = submissions[this.name];
 			thissubmission.response = ajaxevent.memo;
 			
@@ -654,55 +654,68 @@ function form_submit_all (tabevent, value, formsplittercontainer) {
 			
 			// Update this form's serial number only if this form will not get reloaded in the next tab.
 			var nexttab = tabevent ? tabevent.memo.section : null;
-			if (tabevent && (nexttab == tabevent.memo.currentSection || !tabevent.memo.widget.sections[nexttab].contentDiv.down('form#' + this.name))) {
-				new Ajax.Request(posturl, {
-					method: 'post',
-					parameters: {'formsnum': this.name},
-					onSuccess: function (response) {
-						var data = response.responseJSON;
-						
-						if (!data || !data.formsnum) {
-							alert('problem updating serialnumber');
-						}
-						
-						var formsnumfield = this.down('input[name="' + this.name + '-formsnum' + '"]');
-						if (formsnumfield) {
-							formsnumfield.value = data.formsnum;
-						}
-					}.bindAsEventListener(this)
-				});
-			}
-			
-			for (var formname in submissions) {
-				var submission = submissions[formname];
-				if (!submission.submitted) {
-					// Submit the next form; other forms will be submitted sequentially upon the next AjaxForm:SubmitSuccess.
-					submission.submitted = true;
-					form_submit(null, submission.value, submission.form);
-					return;
+			if (!ajaxevent.memo.errormessage) {
+				if (tabevent && (nexttab == tabevent.memo.currentSection || !tabevent.memo.widget.sections[nexttab].contentDiv.down('form#' + this.name))) {
+					new Ajax.Request(posturl, {
+						method: 'post',
+						parameters: {'formsnum': this.name},
+						onSuccess: function (response) {
+							var data = response.responseJSON;
+							
+							if (!data || !data.formsnum) {
+								alert('problem updating serialnumber');
+							}
+							
+							var formsnumfield = this.down('input[name="' + this.name + '-formsnum' + '"]');
+							if (formsnumfield) {
+								formsnumfield.value = data.formsnum;
+							}
+						}.bindAsEventListener(this)
+					});
 				}
 				
-				// If any form has an error, abort.
-				// NOTE: Will need to cause all forms to validate.
-				if (!submission.response || !submission.response.status || submission.response.status == 'error') {
-					return;
+				for (var formname in submissions) {
+					var submission = submissions[formname];
+					if (!submission.submitted) {
+						// Submit the next form; other forms will be submitted sequentially upon the next AjaxForm:SubmitSuccess.
+						submission.submitted = true;
+						form_submit(null, submission.value, submission.form);
+						return;
+					}
+					
+					// If any form has an error, abort.
+					// NOTE: Will need to cause all forms to validate.
+					if (!submission.response || !submission.response.status || submission.response.status == 'error') {
+						return;
+					}
 				}
 			}
 			
-			// At this point, all forms have been submitted successfully.
+			// At this point, either an error occurred or all forms have been submitted successfully.
 			if (tabevent && nexttab != tabevent.memo.currentSection) {
-				// If the tab getting replaced contains the html editor, move the editor down to the bottom of the document body and hide it for later use.
-				if (tabevent.memo.widget.container.down('#cke_reusableckeditor')) {
-					hideHtmlEditor();
+				var gotonexttab = true;
+				
+				if (ajaxevent.memo.errormessage) {
+					ajaxevent.stop();
+					
+					if (!confirm(ajaxevent.memo.errormessage))
+						gotonexttab = false;
 				}
 				
-				tabevent.memo.widget.update_section(nexttab, {
-					'icon': 'img/ajax-loader.gif'
-				});
-				
-				var handledbeforetabloadevent = tabevent.memo.widget.container.fire('FormSplitter:BeforeTabLoad', {'tabevent': tabevent, 'nexttab': nexttab, 'currenttab': tabevent.memo.currentSection});
+				if (gotonexttab) {
+					// If the tab getting replaced contains the html editor, move the editor down to the bottom of the document body and hide it for later use.
+					if (tabevent.memo.widget.container.down('#cke_reusableckeditor')) {
+						hideHtmlEditor();
+					}
+					
+					tabevent.memo.widget.update_section(nexttab, {
+						'icon': 'img/ajax-loader.gif'
+					});
+					
+					var handledbeforetabloadevent = tabevent.memo.widget.container.fire('FormSplitter:BeforeTabLoad', {'tabevent': tabevent, 'nexttab': nexttab, 'currenttab': tabevent.memo.currentSection});
 
-				form_load_tab(this, tabevent.memo.widget, nexttab, handledbeforetabloadevent.memo.specificsections);
+					form_load_tab(this, tabevent.memo.widget, nexttab, handledbeforetabloadevent.memo.specificsections);
+				}
 			} else if (!tabevent) {
 				if (ajaxevent.memo.nexturl)
 					window.location = ajaxevent.memo.nexturl;
