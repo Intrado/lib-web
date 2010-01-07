@@ -16,7 +16,7 @@ var Easycall = Class.create({
 	// variables used:
 	//	formname: name of the parent form
 	//	formitemname: name of the parent form item
-	//	langcode: language code to store content id reference as
+	//	langcode: language code to store audiofiles id reference as
 	//	minlength: minimum phone number length
 	//	maxlength: maximum phone number length
 	//	defaultphoneval: default phone number
@@ -27,7 +27,7 @@ var Easycall = Class.create({
 		this.formitemname = formitemname;
 		this.langcode = langcode;
 		this.specialtask = null;
-		this.contentid = null;
+		this.audiofileid = null;
 		this.defaultphone = defaultphoneval;
 		this.nophone = nophoneval;
 		this.num = 0;
@@ -38,11 +38,11 @@ var Easycall = Class.create({
 
 	// Load initial form values
 	load: function() {
-		var content = $(this.formitemname).value.evalJSON();
+		var audiofiles = $(this.formitemname).value.evalJSON();
 
-		if (typeof(content[this.langcode]) !== "undefined") {
+		if (typeof(audiofiles[this.langcode]) !== "undefined") {
 			easycallRecordings++;
-			this.contentid = content[this.langcode];
+			this.audiofileid = audiofiles[this.langcode];
 			this.setupRecord();
 			// remove input and button
 			$(this.formitemname+"_"+this.langcode+"_callcontrol").remove();
@@ -133,12 +133,39 @@ var Easycall = Class.create({
 			// update progress
 			$(this.formitemname+"_"+this.langcode+"_progress_text").update(response.progress);
 			if (response.status == "done") {
-				// if special task completes. Store the message
-				this.contentid = response.contentid;
-				this.updateMessage();
-				// hand off to handleStatus
-				this.handleStatus("done", "");
+				// get the audiofile
+				this.getAudioFile();
 			}
+		} else {
+			this.handleStatus(response.error, "");
+		}
+	},
+
+	// get an audiofile of the recording so we can store it
+	getAudioFile: function() {
+		$(this.formitemname+"_"+this.langcode+"_progress_text").update("<?=escapehtml(_L('Saving audio'))?>");
+		new Ajax.Request('ajaxeasycall.php', {
+			method:'post',
+			parameters: {
+				"id": this.specialtask,
+				"action": "getaudiofile"
+			},
+			onSuccess: this.handleGetAudioFile.bindAsEventListener(this),
+			onFailure: function() {
+				this.handleStatus("saveerror", "");
+			}
+		});
+	},
+
+	// audiofileid should be returned
+	handleGetAudioFile: function(transport) {
+		var response = transport.responseJSON;
+		if (response && !response.error) {
+			// get the audiofileid and store the form data
+			this.audiofileid = response.audiofileid;
+			this.updateMessage();
+			// all done! hand off to handleStatus
+			this.handleStatus("done", "");
 		} else {
 			this.handleStatus(response.error, "");
 		}
@@ -155,6 +182,11 @@ var Easycall = Class.create({
 				$(this.formitemname+"_"+this.langcode+"_progress").remove();
 				// create the play and re-record buttons
 				this.createFormItem();
+				break;
+
+			case "notask":
+				retrybuttontext = "<?=escapehtml(_L('Clear and try again'))?>";
+				form_validation_display(this.formitemname, "error", "<?=escapehtml(_L('No valid request was found'))?>");
 				break;
 
 			case "callended":
@@ -213,7 +245,7 @@ var Easycall = Class.create({
 				this.setupRecord();
 		}.bind(this));
 		$(this.formitemname+"_"+this.langcode+"_play").observe('click', function (event) {
-			popup("previewmessage.php?close=1&id="+this.contentid, 400, 500);
+			popup("previewmessage.php?close=1&id="+this.audiofileid, 400, 500);
 		}.bind(this));
 
 		if (!$(this.formitemname+"langlock"))
@@ -300,12 +332,12 @@ var Easycall = Class.create({
 	},
 
 	removeMessage: function (event) {
-		var content = $(this.formitemname).value.evalJSON();
-		if (typeof(content[this.langcode]) !== "undefined") {
+		var audiofiles = $(this.formitemname).value.evalJSON();
+		if (typeof(audiofiles[this.langcode]) !== "undefined") {
 			if (!confirm("<?=_L('This will delete the current recording. Are you sure you want to do this?')?>"))
 				return false;
-			delete content[this.langcode];
-			$(this.formitemname).value = Object.toJSON(content);
+			delete audiofiles[this.langcode];
+			$(this.formitemname).value = Object.toJSON(audiofiles);
 			easycallRecordings--;
 		}
 
@@ -323,9 +355,9 @@ var Easycall = Class.create({
 	updateMessage: function () {
 		easycallRecordings++;
 		//Save message information in hidden form field
-		var content = $(this.formitemname).value.evalJSON();
-		content[this.langcode] = this.contentid;
-		$(this.formitemname).value = Object.toJSON(content);
+		var audiofiles = $(this.formitemname).value.evalJSON();
+		audiofiles[this.langcode] = this.audiofileid;
+		$(this.formitemname).value = Object.toJSON(audiofiles);
 		form_do_validation($(this.formname), $(this.formitemname));
 	},
 

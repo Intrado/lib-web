@@ -340,10 +340,10 @@ class ValEasycall extends Validator {
 		$values = json_decode($value);
 		if ($value == "{}")
 			return "$this->label "._L("has messages that are not recorded");
-		foreach ($values as $langcode => $cid)
-			$content = DBFind("Content", "from content where id = ?", false, array($cid));
-			if (!$content)
-				return "$this->label "._L("has messages that are not recorded");
+		foreach ($values as $langcode => $afid)
+			$audiofile = DBFind("AudioFile", "from audiofile where id = ?", false, array($afid));
+			if (!$audiofile)
+				return "$this->label "._L("has invalid or missing messages");
 		return true;
 	}
 }

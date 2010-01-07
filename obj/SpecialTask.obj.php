@@ -2,14 +2,16 @@
 
 class SpecialTask extends DBMappedObject {
 
+	var $userid;
 	var $status;
+	var $type;
 	var $data = "";
 	var $lastcheckin;
 
 	function SpecialTask ($id = NULL) {
 		$this->_allownulls = true;
 		$this->_tablename = "specialtask";
-		$this->_fieldlist = array("status","data","lastcheckin");
+		$this->_fieldlist = array("userid","status","type","data","lastcheckin");
 		//call super's constructor
 		DBMappedObject::DBMappedObject($id);
 	}

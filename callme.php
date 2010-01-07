@@ -77,16 +77,24 @@ class ValCallMeMessage extends Validator {
 	var $onlyserverside = true;
 	function validate ($value, $args) {
 		global $USER;
+
+		// if the user isn't authorized to do easycalls
 		if (!$USER->authorize("starteasy"))
 			return "$this->label "._L("is not allowed for this user account");
 		$values = json_decode($value);
+
+		// if there isn't any data
 		if ($value == "{}")
 			return "$this->label "._L("has messages that are not recorded");
+
+		// value of the audiofileid should be stored as Default
 		if (!$values->Default)
 			return "$this->label "._L("has messages that are not recorded");
-		$content = DBFind("Content", "from content where id = ?", false, array($values->Default + 0));
-		if (!$content)
-			return "$this->label "._L("has invalid message values");
+		$audiofile = DBFind("AudioFile", "from audiofile where id = ?", false, array($values->Default + 0));
+
+		// if there is no audiofile object of this id or it isn't owned by this user it's an error
+		if (!$audiofile || $audiofile->userid !== $USER->id)
+			return "$this->label "._L("has an invalid message value");
 		return true;
 	}
 }
@@ -179,17 +187,14 @@ if ($button = $form->getSubmit()) {
 		$message->deleted = 0;
 		$message->create();
 
-		// create an audiofile object
-		$audiofile = new AudioFile();
-		$audiofile->userid = $USER->id;
+		// update the audiofile object and undelete it
+		$audiofile = new AudioFile($value->Default + 0);
 		$audiofile->name = $messagename;
 		$audiofile->description = $description;
-		$audiofile->contentid = ($value->Default + 0);
-		$audiofile->recorddate = date('Y-m-d H:i:s');
 		$audiofile->deleted = 0;
 		$audiofile->permanent = 0;
 		$audiofile->messagegroupid = $messagegroup->id;
-		$audiofile->create();
+		$audiofile->update();
 
 		// create a message part object
 		$messagepart = new MessagePart();
