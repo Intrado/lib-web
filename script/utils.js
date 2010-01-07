@@ -648,8 +648,12 @@ function applyHtmlEditor(textarea) {
 		return;
 	}
 	
-	var html = textarea.value;//.replace(/\(\((\d+)\)\)/g, "<img src='viewimage.php?id=$1'/>");
+	var html = textarea.value.replace("<<", "&lt;&lt;").replace(">>", "&gt;&gt;");//.replace(/\(\((\d+)\)\)/g, "<img src='viewimage.php?id=$1'/>");
 	editorobject.instance.setData(html);
 	
 	textarea.hide().addClassName('HtmlEditor').insert({'after':editorobject.container});
+}
+
+function makeTranslatableString(str) {
+	return str.replace(/(<<.*?>>)/, '<input value="$1"/>').replace(/({{.*?}})/, '<input value="$1"/>').replace(/(\[\[.*?\]\])/, '<input value="$1"/>');
 }
