@@ -52,9 +52,9 @@ if (!$cansendphone && !$cansendemail && !$cansendsms) {
 // Only unset the session variable if navigating to messagegroup.php via a link, which we can detect when there is only ?messagegroupid and no postdata.
 // A form's ajax call keeps the url components intact so that ?messagegroupid=new will remain even after we've created a messagegroup.
 // If we do not make this strict check, the session variable will get unset and a new messagegroup would be created each time a form makes an ajax call.
-if (isset($_GET['messagegroupid']) && empty($_POST) && count($_GET) == 1) {
+if (isset($_GET['id']) && empty($_POST) && count($_GET) == 1) {
 	unset($_SESSION['messagegroupid']);
-	if ($existingmessagegroupid = $_GET['messagegroupid'] + 0) {
+	if ($existingmessagegroupid = $_GET['id'] + 0) {
 		if (userOwns('messagegroup', $existingmessagegroupid))
 			$_SESSION['messagegroupid'] = $existingmessagegroupid;
 		else
@@ -188,7 +188,7 @@ foreach ($destinations as $type => $destination) {
 				$_SESSION['autotranslatesourcetext'] = isset($existingmessagegroup) ? $existingmessagegroup->getMessageText($type,$subtype,$defaultlanguagecode, 'none') : '';
 			
 			if ($type == 'phone' || $type == 'email') {
-				$autotranslatorformdata["header"] = makeFormHtml("<div class='MessageBodyHeader' style='display:none'>" . _L("Autotranslate") . "</div");
+				$autotranslatorformdata["header"] = makeFormHtml("<div class='MessageBodyHeader'>" . _L("Autotranslate") . "</div");
 				$autotranslatorformdata["sourcemessagebody"] = makeMessageBody($type, 'autotranslator', $_SESSION['autotranslatesourcetext'], $datafields, $subtype == 'html', true);
 				$autotranslatorformdata["refreshtranslations"] = makeFormHtml(icon_button(_L("Refresh Translations"),"tick", null, null, 'id="autotranslatorrefreshtranslationbutton"') . "<div style='margin-top:35px;clear:both'></div>");
 				
@@ -198,7 +198,7 @@ foreach ($destinations as $type => $destination) {
 					else if ($type == 'email' && !isset($customeremailtranslationlanguages[$languagecode]))
 						continue;
 						
-					$autotranslatorformdata["{$languagecode}-translationitem"] = makeTranslationItem($type, $subtype, $languagecode, $languagename, $_SESSION['autotranslatesourcetext'], "", ucfirst($languagename), false, false, false);
+					$autotranslatorformdata["{$languagecode}-translationitem"] = makeTranslationItem($type, $subtype, $languagecode, $languagename, $_SESSION['autotranslatesourcetext'], "", ucfirst($languagename), false, false, false, !(isset($existingmessagegroup) && $existingmessagegroup->hasMessage($type, $subtype, $languagecode)), '', null, true);
 				}
 			}
 			
@@ -471,7 +471,7 @@ $messagegroupname = isset($existingmessagegroup) ? $existingmessagegroup->name :
 $messagegroupsplitter = new FormSplitter("messagegroupbasics", "", null, "horizontalsplit", $buttons, array(
 	array("title" => "", "formdata" => array(
 		'name' => array(
-			"label" => _L('Message Group Name'),
+			"label" => _L('Message Name'),
 			// If the user hasn't changed the message group's default name, then just show blank so that the user is forced to make a better one.
 			"value" => $messagegroupname == $defaultmessagegroupname ? '' : $messagegroupname,
 			"validators" => array(
@@ -706,7 +706,7 @@ if (($button = $messagegroupsplitter->getSubmit()) && !$readonly) {
 // Display
 ////////////////////////////////////////////////////////////////////////////////
 $PAGE = "notifications:messages";
-$TITLE = _L('Message Group Editor');
+$TITLE = _L('Message Editor');
 
 include_once('nav.inc.php');
 ?>
@@ -729,7 +729,7 @@ td.MessageGroupAudioFile {
 }
 td.GlobalAudioFile {
 }
-#phone-voice iframe {
+iframe.UploadIFrame {
 	overflow: hidden;
 	width: 100%;
 	margin: 0;
@@ -756,7 +756,7 @@ div.MessageBodyHeader, div.SourceMessageBodyHeader {
 </script>
 
 <?php
-startWindow(_L('Message Group Editor'));
+startWindow(_L('Message Editor'));
 
 $firstdestinationtype = array_shift(array_keys($destinations));
 $firstdestinationsubtype = array_shift($destinations[$firstdestinationtype]['subtypes']);
@@ -860,8 +860,8 @@ echo '<div id="formswitchercontainer">' . $messagegroupsplitter->render($default
 		};
 		var updateTranslationItem = function(form, languagecode, translatedtext) {
 			var formitemname = form.name + '_' + languagecode + '-translationitem';
-			$(formitemname+'text').update(translatedtext);
-			$(formitemname+'textdiv').update(translatedtext);
+			$(formitemname+'text').value = translatedtext;
+			$(formitemname+'textdiv').update(translatedtext.replace(/<</, "&lt;&lt;").replace(/>>/, "&gt;&gt;"));
 		};
 		
 		formswitchercontainer.observe('FormSplitter:BeforeSubmitAll', function(event, state) {
@@ -897,6 +897,8 @@ echo '<div id="formswitchercontainer">' . $messagegroupsplitter->render($default
 				state.currentlanguagecode = tabloadedpieces[2];
 			} else if (tabloadedpieces.length == 1 || (tabloadedpieces.length == 2 && tabloadedpieces[0] == 'phone')) {
 				state.currentdestinationtype = tabloadedpieces[0] != 'summary' ? tabloadedpieces[0] : '';
+				if (state.currentdestinationtype == 'emailheaders')
+					state.currentdestinationtype = 'email';
 				state.currentsubtype = tabloadedpieces.length == 2 ? tabloadedpieces[1] : '';
 				state.currentlanguagecode = '<?=$defaultlanguagecode?>';
 			}
@@ -905,7 +907,7 @@ echo '<div id="formswitchercontainer">' . $messagegroupsplitter->render($default
 			if (memo.tabloaded == 'summary') {
 				memo.widget.container.observe('click', function(event, widget, state) {
 					var element = event.element();
-					if (element.match('img.StatusIcon')) {
+					if (element.match('.StatusIcon')) {
 						var pieces = element.identify().split('-');
 						var specificsections = [
 							pieces[0] + '-' + pieces[1] + '-' + pieces[2]
@@ -949,12 +951,12 @@ echo '<div id="formswitchercontainer">' . $messagegroupsplitter->render($default
 						
 						new Ajax.Request('translate.php', {
 							method:'post',
-							parameters: {'english': sourcetext, 'languages': translationlanguagecodes.join(';')},
+							parameters: {'english': makeTranslatableString(sourcetext), 'languages': translationlanguagecodes.join(';')},
 							onSuccess: function(transport, translationlanguagecodes) {
 								var data = transport.responseJSON;
 
 								if (!data || !data.responseData || !data.responseStatus || data.responseStatus != 200 || (translationlanguagecodes.length > 1 && translationlanguagecodes.length != data.responseData.length)) {
-									alert('<?= _L('Sorry') ?>'); // TODO: Better error message.
+									alert('<?= _L('Sorry an error occurred during translation. Please try again.') ?>'); // TODO: Better error message.
 									return;
 								}
 								
@@ -990,6 +992,7 @@ echo '<div id="formswitchercontainer">' . $messagegroupsplitter->render($default
 						var formname = this.name;
 						var idpieces = formname.split('-');
 						if (idpieces.length == 3) {
+							$(formname + '_translationitem' + 'englishText').value = $(formname + '_sourcemessagebody').value;
 							getTranslation(formname + '_translationitem', idpieces[2]);
 						}
 					}.bindAsEventListener(refreshtranslationbutton.up('form'), state));
