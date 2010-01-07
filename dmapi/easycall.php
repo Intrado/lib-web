@@ -1,11 +1,6 @@
 <?
-include_once("../inc/utils.inc.php");
-include_once("../obj/Job.obj.php");
-include_once("../obj/User.obj.php");
-include_once("../obj/SpecialTask.obj.php");
-include_once("../obj/Message.obj.php");
-include_once("../obj/MessagePart.obj.php");
-include_once("../obj/AudioFile.obj.php");
+require_once("../inc/utils.inc.php");
+require_once("../obj/SpecialTask.obj.php");
 
 $specialtask = new specialtask($_SESSION['specialtaskid']);
 $phone = $specialtask->getData('phonenumber');
@@ -41,6 +36,7 @@ if($REQUEST_TYPE == "new") {
 	<?
 	$_SESSION = array();
 } else {
+	$BFXML_VARS['continue'] = true;
 	forwardToPage("easycall2.php");
 	return;
 }

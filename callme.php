@@ -13,6 +13,9 @@ require_once("obj/FormItem.obj.php");
 require_once("obj/Phone.obj.php");
 require_once("obj/Message.obj.php");
 require_once("obj/AudioFile.obj.php");
+require_once("obj/Content.obj.php");
+require_once("obj/MessagePart.obj.php");
+require_once("obj/MessageGroup.obj.php");
 require_once("obj/ValDuplicateNameCheck.val.php");
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -43,7 +46,7 @@ class CallMe extends FormItem {
 		// Hidden input item to store values in
 		$str = '<input id="'.$n.'" name="'.$n.'" type="hidden" value="'.escapehtml($value).'" />
 		<div>
-			<div id="'.$n.'_messages" style="padding: 6px; white-space:nowrap"></div>
+			<div id="'.$n.'_content" style="padding: 6px; white-space:nowrap"></div>
 			<div id="'.$n.'_altlangs" style="clear: both; padding: 5px; display: none"></div>
 		</div>
 		';
@@ -60,8 +63,7 @@ class CallMe extends FormItem {
 					"'.((isset($this->args['max']) && $this->args['max'])?$this->args['max']:"10").'",
 					"'.$defaultphone.'",
 					"'.$nophone.'",
-					"CallMe",
-					"easycall"
+					false
 				).load();
 			</script>';
 		return $str;
@@ -82,8 +84,8 @@ class ValCallMeMessage extends Validator {
 			return "$this->label "._L("has messages that are not recorded");
 		if (!$values->Default)
 			return "$this->label "._L("has messages that are not recorded");
-		$msg = new Message($values->Default +0);
-		if ($msg->userid !== $USER->id)
+		$content = DBFind("Content", "from content where id = ?", false, array($values->Default + 0));
+		if (!$content)
 			return "$this->label "._L("has invalid message values");
 		return true;
 	}
@@ -144,20 +146,61 @@ if ($button = $form->getSubmit()) {
 		$datachange = true;
 	} else if (($errors = $form->validate()) === false) { //checks all of the items in this form
 		$postdata = $form->getData(); //gets assoc array of all values {name:value,...}
-		if ($postdata['messagename']) {
-			$value = json_decode($postdata['callme']);
-			$message = new Message($value->Default + 0);
-			$messagename = trim($postdata["messagename"])?trim($postdata["messagename"]):"Call Me" . " - " . date("M j, Y G:i:s");
-			if(QuickQuery("Select count(*) from message where userid=? and not deleted and name =?", false, array($USER->id, $messagename)))
-				$messagename = $messagename . " - " . date("M j, Y G:i:s");
 
-			$message->name = $messagename;
-			$message->update();
-			$afid = QuickQuery("select audiofileid from messagepart where messageid=? limit 1", false, array($message->id));
-			$audiofile = new AudioFile($afid);
-			$audiofile->name = $messagename;
-			$audiofile->update();
-		}
+		$value = json_decode($postdata['callme']);
+
+		// get a unique message name
+		$messagename = trim($postdata["messagename"])?trim($postdata["messagename"]):"Call Me" . " - " . date("M j, Y G:i:s");
+		if(QuickQuery("Select count(*) from message where userid=? and not deleted and name =?", false, array($USER->id, $messagename)))
+			$messagename = $messagename . " - " . date("M j, Y G:i:s");
+		$description = "Call Me - " . date("M j, Y G:i:s");
+
+		Query("BEGIN");
+
+		// create a message group for this message
+		$messagegroup = new MessageGroup();
+		$messagegroup->userid = $USER->id;
+		$messagegroup->name = $messagename;
+		$messagegroup->description = $description;
+		$messagegroup->modified = date('Y-m-d H:i:s');
+		$messagegroup->permanent = 0;
+		$messagegroup->deleted = 0;
+		$messagegroup->create();
+
+		// create a message object
+		$message = new Message();
+		$message->userid = $USER->id;
+		$message->name = $messagename;
+		$message->description = $description;
+		$message->type = "phone";
+		$message->subtype = "voice";
+		$message->autotranslate = "none";
+		$message->modifydate = date('Y-m-d H:i:s');
+		$message->deleted = 0;
+		$message->create();
+
+		// create an audiofile object
+		$audiofile = new AudioFile();
+		$audiofile->userid = $USER->id;
+		$audiofile->name = $messagename;
+		$audiofile->description = $description;
+		$audiofile->contentid = ($value->Default + 0);
+		$audiofile->recorddate = date('Y-m-d H:i:s');
+		$audiofile->deleted = 0;
+		$audiofile->permanent = 0;
+		$audiofile->messagegroupid = $messagegroup->id;
+		$audiofile->create();
+
+		// create a message part object
+		$messagepart = new MessagePart();
+		$messagepart->messageid = $message->id;
+		$messagepart->type = "A"; // this is an audio file
+		$messagepart->audofileid = $audiofile->id;
+		$messagepart->sequence = 0;
+		$messagepart->create();
+
+		Query("COMMIT");
+
 		if ($ajax)
 			$form->sendTo("$origin.php");
 		else

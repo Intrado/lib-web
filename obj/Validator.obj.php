@@ -379,8 +379,11 @@ class ValPhone extends Validator {
 	function getJSValidator () {
 		return
 			'function (name, label, value, args) {
+				// read min and max length args for easycall and callme
+				var minlength = (args.min)?args.min:10;
+				var maxlength = (args.max)?args.max:10;
 				var phone = value.replace(/[^0-9]/g,"");
-				if (phone.length == 10) {
+				if (minlength == maxlength && maxlength == 10 && phone.length == 10) {
 					var areacode = phone.substring(0, 3);
 					var prefix = phone.substring(3, 6);
 
@@ -422,6 +425,11 @@ class ValPhone extends Validator {
 						return label + " seems to be invalid.";
 					}
 					return true;
+				} else if (minlength != 10 || maxlength != 10) {
+					if (phone.length < minlength)
+						return label + " is invalid. The phone number or extension must be at least " + minlength + " digits long.\nYou do not need to include a 1 for long distance.";
+					if (phone.length > maxlength)
+						return label + " is invalid. The phone number or extension must be no more than " + maxlength + " digits long.\nYou do not need to include a 1 for long distance.";
 				} else {
 					return label + " is invalid. The phone number must be exactly 10 digits long (including area code).\nYou do not need to include a 1 for long distance.";
 				}

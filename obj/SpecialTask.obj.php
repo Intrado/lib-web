@@ -3,14 +3,13 @@
 class SpecialTask extends DBMappedObject {
 
 	var $status;
-	var $type;
 	var $data = "";
 	var $lastcheckin;
 
 	function SpecialTask ($id = NULL) {
 		$this->_allownulls = true;
 		$this->_tablename = "specialtask";
-		$this->_fieldlist = array("status","type", "data","lastcheckin");
+		$this->_fieldlist = array("status","data","lastcheckin");
 		//call super's constructor
 		DBMappedObject::DBMappedObject($id);
 	}
@@ -32,7 +31,7 @@ class SpecialTask extends DBMappedObject {
 		}
 		$this->data = implode('&',$pairs);
 	}
-	
+
 	function delData($field) {
 		$cleanarray = sane_parsestr($this->data);
 

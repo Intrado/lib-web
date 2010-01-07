@@ -38,6 +38,7 @@ require_once("obj/Person.obj.php");
 require_once("obj/Email.obj.php");
 require_once("obj/ListEntry.obj.php");
 require_once("obj/Sms.obj.php");
+require_once("obj/Content.obj.php");
 require_once("inc/reportgeneratorutils.inc.php");
 require_once("inc/auth.inc.php");
 
@@ -71,7 +72,7 @@ $wizdata = array(
 			"pick" => new JobWiz_messagePhoneChoose(_L("Phone: Message")),
 			"text" => new JobWiz_messagePhoneText(_L("Text-to-speech")),
 			"translate" => new JobWiz_messagePhoneTranslate(_L("Translations")),
-			"callme" => new JobWiz_messagePhoneCallMe(_L("Record"))
+			"callme" => new JobWiz_messagePhoneEasyCall(_L("Record"))
 		)),
 		"email"	=> new WizSection ("Email",array(
 			"pick" => new JobWiz_messageEmailChoose(_L("Email: Message")),
@@ -650,7 +651,7 @@ require_once("nav.inc.php");
 
 ?>
 <script type="text/javascript">
-<? Validator::load_validators(array("ValInArray", "ValJobName", "ValHasMessage", "ValTextAreaPhone","ValEasycall","ValLists","ValTranslation","ValEmailAttach", "ValTimeWindowCallLate", "ValTimeWindowCallEarly", "ValDate","ValRegExp"));// Included in jobwizard.inc.php ?>
+<? Validator::load_validators(array("ValInArray", "ValJobName", "ValHasMessage", "ValTextAreaPhone","ValEasycall","ValLists","ValTranslation","ValEmailAttach", "ValTimeWindowCallLate", "ValTimeWindowCallEarly", "ValDate","ValRegExp", "valPhone"));// Included in jobwizard.inc.php ?>
 </script>
 <?
 

@@ -3,10 +3,6 @@
 // Includes
 ////////////////////////////////////////////////////////////////////////////////
 require_once("inc/common.inc.php");
-require_once("obj/Message.obj.php");
-require_once("obj/MessagePart.obj.php");
-require_once("obj/AudioFile.obj.php");
-require_once("obj/FieldMap.obj.php");
 require_once("obj/SpecialTask.obj.php");
 require_once("obj/Phone.obj.php");
 
@@ -16,97 +12,71 @@ global $USER;
 if (!$USER->authorize("starteasy"))
 	exit();
 
-function taskNew($phone,$language,$name,$origin,$type) {
+// set the header for the return data
+header("Content-Type: application/json");
+
+
+function taskNew($phone) {
+	// Parse the phone to remove invalid junk and validate that it's a phone number
+	$phone = Phone::parse($phone);
 	if (!$phone)
 		return array("error"=>"badphone");
-	if (!$language)
-		return array("error"=>"badlanguage");
-	global $USER;
-	$task = new SpecialTask("new");
+
+	// create a new special task
+	$task = new SpecialTask();
 	$task->status = 'new';
-	$task->type = $type;
-	$task->setData('phonenumber', $phone);
 	$task->lastcheckin = date("Y-m-d H:i:s");
+
+	$task->setData('phonenumber', $phone);
 	$task->setData('progress', _L("Creating Call"));
 	$task->setData('callerid', getSystemSetting('callerid'));
-	if (!$name)
-		$name = "Easy Call - " . date("M j, Y g:i a");
-	$task->setData('name', $name);
-	$task->setData('origin', $origin);
-	$task->setData('userid', $USER->id);
-	$task->setData('listid', 0);
-	$task->setData('jobtypeid', 0);
-	$task->setData('count', 0);
-	$task->setData('totalamount', 1);
-	$task->setData('currlang', $language);
-	$task->setData("language0", $language);
-	$task->setData('progress', _L("Creating Call"));
+
+	// change status to queued so it gets picked up
 	$task->status = 'queued';
 	$task->create();
 	QuickUpdate("call start_specialtask(" . $task->id . ")");
+
+	// return the task id that was created
 	return array("id"=>$task->id);
 }
 
 function taskStatus($id) {
 	if (!$id)
 		return false;
+
+	// get the task data, if its an empty task (no status) return an error
 	$task = new SpecialTask($id);
 	if (!$task->status)
 		return array("error"=>"notask");
-	// Parse the task data
-	$langdata = array();
-	for($x=0; $x<$task->getData('totalamount'); $x++)
-		if ($task->getData("message$x"))
-			$langdata[$task->getData("language$x")] = $task->getData("message$x");
+
+	// Parse and return the task data
 	return array(
 		"id"=>$task->id,
 		"status"=>$task->status,
-		"language"=>$langdata?$langdata:false,
+		"contentid"=>$task->getData('contentid'),
 		"progress"=>$task->getData('progress'),
-		"currlang"=>$task->getData('currlang'),
-		"error"=>$task->getData('error'),
-		"count"=>$task->getData('count'),
-		"totalamount"=>$task->getData('totalamount')
+		"error"=>$task->getData('error')
 		);
 }
 
 //////////////////////////////////////////////////////////
-// POST data is a request to start a new special task
-// GET data is request for task status
+// request should include an ACTION with the desired
+// behavior.
 //////////////////////////////////////////////////////////
 
-$id = false;
+switch ($_REQUEST['action']) {
+	// create a new call me request, returns new task id
+	case "new":
+		$phone = $_REQUEST['phone'];
+		echo json_encode(taskNew($phone));
+		break;
 
-if (isset($_POST['phone']) && isset($_POST['language'])) {
-	$id = "new";
-	$language = $_POST['language'];
-	$phone = Phone::parse($_POST['phone']);
-	$type = $_POST['type'];
+	// return task status by id
+	case "status":
+		$id = $_REQUEST['id']+0;
+		echo json_encode(taskStatus($id));
+		break;
 }
 
-if (isset($_POST['name']))
-	$name = $_POST['name'];
-else
-	$name = "";
-
-if (isset($_POST['origin']))
-	$origin = $_POST['origin'];
-else
-	$origin = "ajaxeasycall";
-
-if (isset($_GET['id'])) {
-	$id = $_GET['id']+0;
-}
-
-/////////////////////////////////////////////////////////
-// If it is a "new" task ID then create a new one
-// Otherwise, return the status of the task id
-/////////////////////////////////////////////////////////
-
-header("Content-Type: application/json");
-if ($id === "new")
-	echo json_encode(taskNew($phone,$language,$name,$origin,$type));
-else
-	echo json_encode(taskStatus($id));
 exit();
 ?>

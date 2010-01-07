@@ -43,13 +43,8 @@ function specialtask($msg){
 	$_SESSION['specialtaskid'] = $task->id;
 
 	ob_start();
-	if(strtolower($task->type) == "easycall"){
-		forwardToPage("easycall.php");
-	} else if(strtolower($task->type) == "callme"){
-		forwardToPage("callme.php");
-	} else {
-		$ERROR = "Unknown Special Task Type";
-	}
+	forwardToPage("easycall.php");
+
 	$output = ob_get_contents();
 	ob_end_clean();
 
@@ -98,7 +93,7 @@ function completetask($msg){
 	$SESSIONID = $msg->getParam(0);
 	session_id($SESSIONID->scalarval());
 	doStartSession();
-	
+
 	$REQUEST_TYPE = "result";
 
 	$BFXML_VARS = XML_RPC_decode($msg->getParam(1));
@@ -127,7 +122,7 @@ function continuetask($msg){
 	$SESSIONID = $msg->getParam(0);
 	session_id($SESSIONID->scalarval());
 	doStartSession();
-	
+
 	$REQUEST_TYPE = "continue";
 
 	$BFXML_VARS = XML_RPC_decode($msg->getParam(1));
@@ -153,12 +148,12 @@ function response($ERROR, $output){
 	if($ERROR){
 		$resultcode = "failure";
 	}
-            
+
 	$result = new XML_RPC_Value(array(
-		"taskxml" => new XML_RPC_Value($output, "string"), 
-		"resultcode" => new XML_RPC_Value($resultcode, "string"), 
+		"taskxml" => new XML_RPC_Value($output, "string"),
+		"resultcode" => new XML_RPC_Value($resultcode, "string"),
 		"resultdescription" => new XML_RPC_Value($ERROR, "string")), "struct");
-	
+
 	return new XML_RPC_Response($result);
 }
 
@@ -190,7 +185,7 @@ $xmlrpc_server = new XML_RPC_Server($functionMap);
 $output = ob_get_contents();
 ob_end_clean();
 echo $output;
-	
+
 if ($SETTINGS['feature']['log_dmapi']) {
 	$logfilename = $SETTINGS['feature']['log_dir'] . "output.txt";
 

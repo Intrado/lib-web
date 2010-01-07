@@ -7,12 +7,11 @@ include_once("../obj/SpecialTask.obj.php");
 include_once("../obj/Message.obj.php");
 include_once("../obj/MessagePart.obj.php");
 include_once("../obj/AudioFile.obj.php");
-include_once("../obj/JobType.obj.php");
-include_once("../obj/Access.obj.php");
-include_once("../obj/Permission.obj.php");
-include_once("../obj/JobLanguage.obj.php");
-include_once("../obj/Rule.obj.php");
-
+require_once("../obj/JobType.obj.php");
+require_once("../obj/Access.obj.php");
+require_once("../obj/Permission.obj.php");
+require_once("../obj/JobLanguage.obj.php");
+require_once("../obj/Rule.obj.php");
 
 global $USER, $ACCESS;
 $specialtask = new specialtask($_SESSION['specialtaskid']);
@@ -87,9 +86,10 @@ if($REQUEST_TYPE == "new"){
 			<message>
 				<?
 					if($specialtask->getData('origin') == "cisco"){
-						?><audio cmid="file://prompts/inbound/Goodbye.wav" /> <?
+						?><audio cmid="file://prompts/inbound/Goodbye.wav" /><?
 					} else {
-						?><audio cmid="file://prompts/GoodBye.wav" /> <?
+						?><audio cmid="file://prompts/inbound/Saved.wav" />
+						<audio cmid="file://prompts/GoodBye.wav" /><?
 					}
 				?>
 				<hangup />

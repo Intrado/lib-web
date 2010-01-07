@@ -216,13 +216,16 @@ class TextAreaPhone extends FormItem {
 	}
 }
 
-class CallMe extends FormItem {
+class EasyCall extends FormItem {
 	function render ($value) {
 		$n = $this->form->name."_".$this->name;
-		if (isset($this->args['language']) && $this->args['language'])
-			$language = $this->args['language'];
+		if (isset($this->args['languages']) && $this->args['languages'])
+			$languages = $this->args['languages'];
 		else
-			$language = array();
+			$languages = array();
+
+		$min = (isset($this->args['min']) && $this->args['min'])?$this->args['min']:"10";
+		$max = (isset($this->args['max']) && $this->args['min'])?$this->args['max']:"10";
 
 		$nophone = _L("Phone Number");
 		$defaultphone = escapehtml((isset($this->args['phone']) && $this->args['phone'])?Phone::format($this->args['phone']):$nophone);
@@ -231,15 +234,15 @@ class CallMe extends FormItem {
 		// Hidden input item to store values in
 		$str = '<input id="'.$n.'" name="'.$n.'" type="hidden" value="'.escapehtml($value).'" />
 		<div>
-			<div id="'.$n.'_messages" style="padding: 6px; white-space:nowrap">
+			<div id="'.$n.'_content" style="padding: 6px; white-space:nowrap">
 			</div>
 			<div id="'.$n.'_altlangs" style="clear: both; padding: 5px; display: none">';
-		if (count($language)) {
+		if (count($languages)) {
 			$str .= '
 				<div style="margin-bottom: 3px;">'._L("Add an alternate language?").'</div>
 				<select id="'.$n.'_select" ><option value="0">-- '._L("Select One").' --</option>';
-			foreach ($language as $langname)
-				$str .= '<option id="'.$n.'_select_'.$langname.'" value="'.escapehtml($langname).'" >'.escapehtml($langname).'</option>';
+			foreach ($languages as $langcode => $langname)
+				$str .= '<option id="'.$n.'_select_'.$langcode.'" value="'.$langcode.'" >'.escapehtml($langname).'</option>';
 			$str .= '</select>';
 		}
 		$str .= '
@@ -251,6 +254,7 @@ class CallMe extends FormItem {
 		$str .= '<script type="text/javascript" src="script/easycall.js.php"></script>
 			<script type="text/javascript">
 				var msgs = '.$value.';
+				var languages = '.json_encode($languages).';
 				// remember phone number the user enters
 				var msgphone = null;
 				// Load default. it is a special case
@@ -258,27 +262,23 @@ class CallMe extends FormItem {
 					"'.$this->form->name.'",
 					"'.$n.'",
 					"Default",
-					"'.((isset($this->args['min']) && $this->args['min'])?$this->args['min']:"10").'",
-					"'.((isset($this->args['max']) && $this->args['max'])?$this->args['max']:"10").'",
+					"'.$min.'",
+					"'.$max.'",
 					"'.$defaultphone.'",
 					"'.$nophone.'",
-					"jobwizard",
-					"easycall"
+					true
 				).load();
-				easycallRecordings++;
-				Object.keys(msgs).each(function(lang) {
+				Object.keys(msgs).each(function(langcode) {
 					new Easycall(
 						"'.$this->form->name.'",
 						"'.$n.'",
-						lang,
-						"'.((isset($this->args['min']) && $this->args['min'])?$this->args['min']:"10").'",
-						"'.((isset($this->args['max']) && $this->args['max'])?$this->args['max']:"10").'",
+						langcode,
+						"'.$min.'",
+						"'.$max.'",
 						"'.$defaultphone.'",
 						"'.$nophone.'",
-						"jobwizard",
-						"easycall"
+						true
 					).load();
-					easycallRecordings++;
 				});
 				if ($("'.$n.'_select")) {
 					$("'.$n.'_select").observe("change", function (event) {
@@ -289,12 +289,11 @@ class CallMe extends FormItem {
 							"'.$this->form->name.'",
 							"'.$n.'",
 							$("'.$n.'_select").value,
-							"'.((isset($this->args['min']) && $this->args['min'])?$this->args['min']:"10").'",
-							"'.((isset($this->args['max']) && $this->args['max'])?$this->args['max']:"10").'",
+							"'.$min.'",
+							"'.$max.'",
 							"'.$defaultphone.'",
 							"'.$nophone.'",
-							"jobwizard",
-							"easycall"
+							true
 						).setupRecord();
 					});
 				}
@@ -341,11 +340,9 @@ class ValEasycall extends Validator {
 		$values = json_decode($value);
 		if ($value == "{}")
 			return "$this->label "._L("has messages that are not recorded");
-		foreach ($values as $lang => $message)
-			$msg = new Message($message+0);
-			if ($msg->userid !== $USER->id)
-				return "$this->label "._L("has invalid message values");
-			if (!$message)
+		foreach ($values as $langcode => $cid)
+			$content = DBFind("Content", "from content where id = ?", false, array($cid));
+			if (!$content)
 				return "$this->label "._L("has messages that are not recorded");
 		return true;
 	}
@@ -1005,16 +1002,16 @@ class JobWiz_messagePhoneTranslate extends WizStep {
 }
 
 //Call me to Record
-class JobWiz_messagePhoneCallMe extends WizStep {
+class JobWiz_messagePhoneEasyCall extends WizStep {
 	function getForm($postdata, $curstep) {
 		// Form Fields.
 		global $USER;
 		$langs = array();
 		if ($USER->authorize("sendmulti")) {
-			$syslangs = DBFindMany("Language","from language order by name");
-			foreach ($syslangs as $langid => $language)
-				if ($syslangs[$langid]->name !== "English")
-					$langs[] = $syslangs[$langid]->name;
+			$syslangs = Language::getLanguageMap();
+			foreach ($syslangs as $langid => $langname)
+				if (strtolower($langname) !== "english")
+					$langs[$langid] = $langname;
 		}
 		$formdata = array($this->title);
 		$formdata['tips'] = array(
@@ -1038,9 +1035,9 @@ class JobWiz_messagePhoneCallMe extends WizStep {
 				array("ValEasycall")
 			),
 			"control" => array(
-				"CallMe",
+				"EasyCall",
 				"phone"=>$USER->phone,
-				"language"=>$langs,
+				"languages"=>$langs,
 				"max" => getSystemSetting('easycallmax',10),
 				"min" => getSystemSetting('easycallmin',10)
 			),
@@ -1050,7 +1047,7 @@ class JobWiz_messagePhoneCallMe extends WizStep {
 		Choose which language you will be recording in and enter the phone number where the system can reach you. Then click \"Call Me to Record\" to get started. Listen carefully to the prompts when you receive the call. You may record as many different langauges as you need.
 		");
 
-		return new Form("messagePhoneCallMe",$formdata,$helpsteps);
+		return new Form("messagePhoneEasyCall",$formdata,$helpsteps);
 	}
 
 	//returns true if this step is enabled
