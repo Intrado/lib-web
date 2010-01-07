@@ -258,7 +258,6 @@ function activityfeed($mergeditems,$ajax = false) {
 					$job->id = $itemid;
 					$job->status = $status;
 					$job->deleted = $item["deleted"];
-					$job->type = $item["jobtype"];
 					$tools = fmt_jobs_actions ($job,$item["name"]);
 					$tools = str_replace("&nbsp;|&nbsp;","<br />",$tools);
 
