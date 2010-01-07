@@ -133,7 +133,12 @@ if (isset($existingmessagegroup)) {
 	foreach ($attachments as $attachment) {
 		$emailattachments[$attachment->contentid] = array("size" => $attachment->size, "name" => $attachment->filename);
 	}
+	if (empty($emailattachments)) {
+		if (isset($_SESSION['emailattachments']))
+			$emailattachments = $_SESSION['emailattachments'];
+	}
 } else {
+	unset($_SESSION['emailattachments']);
 	$emailattachments = array();
 }
 
@@ -510,9 +515,10 @@ if (($button = $messagegroupsplitter->getSubmit()) && !$readonly) {
 				if (isset($postdata["attachments"])) {
 					if (!is_array($emailattachments = json_decode($postdata["attachments"],true)))
 						$emailattachments = array();
+					$_SESSION['emailattachments'] = $emailattachments;
 					
 					// First delete all message attachments for this messagegroup, then create new ones.
-					QuickUpdate("delete from messageattachment where messagegroupid=?",false,array($messagegroup->id));
+					QuickUpdate("delete a from messageattachment a join message m on a.messageid = m.id where m.messagegroupid=?",false,array($messagegroup->id));
 					$emailmessages = DBFindMany('Message', 'from message where not deleted and type="email" and messagegroupid=?', false, array($messagegroup->id));
 					foreach ($emailmessages as $emailmessage) {
 						$emailmessage->createMessageAttachments($emailattachments);
@@ -555,7 +561,6 @@ if (($button = $messagegroupsplitter->getSubmit()) && !$readonly) {
 								
 								if (!empty($autotranslatorlanguages) && !empty($postdata['sourcemessagebody'])) {
 									// Batch translation.
-									
 									$sourcemessageparts = Message::parse($postdata['sourcemessagebody']);
 									if ($autotranslatortranslations = translate_fromenglish(Message::format($sourcemessageparts, true), $autotranslatorlanguages)) {
 										// Increment an index because translate_fromenglish() does not return an associative array.

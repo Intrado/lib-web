@@ -93,7 +93,7 @@ class EmailAttach extends FormItem {
 				});
 				$(itemname).value = Object.toJSON(values);
 				$("uploadedfiles").update(str);			
-				form_do_validation($(formname), $(name));
+				form_do_validation($(formname), $(itemname));
 			}
 		</script>';
 		return $str;
