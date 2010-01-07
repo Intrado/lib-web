@@ -357,7 +357,7 @@ class Message extends DBMappedObject {
 					$partstr .= ":" . $part->defaultvalue;
 				$partstr .= ">>";
 				break;
-			case 'E':
+			case 'I':
 				$partstr .= "((" . $part->contentid . "))";
 				break;
 			}
