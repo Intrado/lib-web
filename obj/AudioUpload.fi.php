@@ -12,7 +12,7 @@ class AudioUpload extends FormItem {
 		$str = '
 			<input id="' . $n . '" name="' . $n . '" type="hidden" value="' . escapehtml($value) . '"/>
 			<div id="'.$n.'upload_process" style="display: none;"><img src="img/ajax-loader.gif" /></div>
-			<iframe id="'.$n.'my_attach" src="uploadaudio.php?formname='.$this->form->name.'&itemname='.$n.'" style="border:0;"></iframe>
+			<iframe id="'.$n.'my_attach" class="UploadIFrame" src="uploadaudio.php?formname='.$this->form->name.'&itemname='.$n.'" style="border:0;"></iframe>
 			<div id="'.$n.'uploaderror"></div>
 			';
 		return $str;
