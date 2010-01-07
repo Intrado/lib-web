@@ -13,6 +13,7 @@ include_once("obj/Job.obj.php");
 include_once("obj/JobLanguage.obj.php");
 include_once("obj/JobType.obj.php");
 include_once("obj/PeopleList.obj.php");
+include_once("obj/MessageGroup.obj.php");
 include_once("obj/Message.obj.php");
 include_once("obj/MessagePart.obj.php");
 include_once("obj/AudioFile.obj.php");
@@ -100,56 +101,7 @@ if($jobtype->systempriority == 1){
 
 ////////////////////////////////////////////////////////////////////////////////
 // Display
-
-$joblangs = array();
-$joblangs['phone'] = DBFindMany('JobLanguage', "from joblanguage where joblanguage.type = 'phone' and jobid = " . $job->id);
-$joblangs['email'] = DBFindMany('JobLanguage', "from joblanguage where joblanguage.type = 'email' and jobid = " . $job->id);
-$joblangs['sms'] = DBFindMany('JobLanguage', "from joblanguage where joblanguage.type = 'sms' and jobid = " . $job->id);
-
-
-function alternate($type) {
-	global $USER, $f, $job, $messages, $joblangs, $submittedmode;
-	if($USER->authorize('sendmulti')) {
-?>
-	<table border="0" cellpadding="2" cellspacing="1" class="list">
-		<tr class="listHeader" align="left" valign="bottom">
-			<th>Language Preference</th>
-			<th>Message to Send</th>
-		</tr>
-<?
-$id = $type . 'messageid';
-//just show the selected options? allowing to edit could cause the page to become slow
-//with many languages/messages
-if (count($joblangs[$type]) == 0)
-	echo "<tr><td colspan='2'>No alternate language and message combinations defined</td></tr>";
-else
-foreach($joblangs[$type] as $joblang) {
-		$message = new Message($joblang->messageid);
-?>
-			<tr valign="middle">
-				<td><?= $joblang->language ?>
-				</td>
-				<td>
-<? if ($type == "phone") { ?>
-					<div style="float: right;"><?= button('Play', "popup('previewmessage.php?id=" . $message->id . "', 400, 400,'preview');"); ?></div>
-<? } ?>
-					<?= escapehtml($message->name) ?>
-				</td>
-			</tr>
-<?
-}
-?>
-	</table>
-<?		if (count($joblangs[$type]) != 0 && $job && $job->getSetting("jobcreated" . $type)) { ?>
-			<div id='branding'>
-				<div style="color: rgb(103, 103, 103);float: left;" class="gBranding"><span style="vertical-align: middle; font-family: arial,sans-serif; font-size: 11px;" class="gBrandingText">Translation powered by<img style="padding-left: 1px; vertical-align: middle;" alt="Google" src="<?= isset($_SERVER['HTTPS'])?"https":"http" ?>://www.google.com/uds/css/small-logo.png"></span></div>
-			</div>
-<?
-		}
-	} else {
-		echo "&nbsp;";
-	}
-}
+////////////////////////////////////////////////////////////////////////////////
 
 
 function displayMultilist() {
@@ -278,55 +230,68 @@ startWindow("Confirmation &amp; Submit");
 			</table>
 		</td>
 	</tr>
-<? if(strpos($job->type,"phone") !== false) { ?>
 	<tr valign="top">
-		<th align="right" class="windowRowHeader bottomBorder">Phone:</th>
+		<th align="right" class="windowRowHeader bottomBorder">Message:</th>
 		<td class="bottomBorder">
 			<table border="0" cellpadding="2" cellspacing="0" width=100%>
 				<tr>
-					<td class="bottomBorder"  width="30%" >Default message</td>
-					<td class="bottomBorder" >
-						<table border=0 cellpadding=3 cellspacing=0><tr>
-							<td>
+					<td width="30%" >
 <?
-						$phonemessage = new Message($job->phonemessageid);
-						echo escapehtml($phonemessage->name);
+						$message = new MessageGroup($job->messagegroupid);
+						echo escapehtml($message->name);
 ?>
-							</td><td><?= button('Play', "popup('previewmessage.php?id=" . $job->phonemessageid . "', 400, 400,'preview');") ?>
-								</td></tr></table>
-					</div></td>
-				</tr>
-<? if($USER->authorize('sendmulti')) { ?>
+					</td>
+					<td>
+						<table border=0 cellpadding=3 cellspacing=0>
+							<tr>
+							<td>
+							<div id='jobedit_messagegrid'></div>
+				<script type="text/javascript">
+					document.observe('dom:loaded', function() {
+						load_messageinfo();
+					});
+					function load_messageinfo() {
+						var request = 'ajax.php?ajax&type=messagegrid&id=<?=$job->messagegroupid?>';
+						cachedAjaxGet(request,function(result) {
+							var response = result.responseJSON;
 
-				<tr>
-					<td class="bottomBorder" >Multilingual message options</td>
-					<td class="bottomBorder" ><? alternate('phone'); ?></td>
+							var str = '<table style=\'border-width:1px;\'>';
+							response.headers.each(function(title) {
+								str += '<th>' + title + '</th>';
+							});
+							response.data.each(function(item) {
+								str += '<tr>';
+									str += '<td>' + item.language + '</td>';
+								if(response.headers[item.Phone])
+									str += '<td>' + (item.Phone!=0?'<img src=\'img/icons/accept.gif\' />':'') + '</td>';
+								if(response.headers[item.Email])
+									str += '<td>' + (item.Email!=0?'<img src=\'img/icons/accept.gif\' />':'') + '</td>';
+								if(response.headers[item.SMS])
+									str += '<td>' + (item.SMS!=0?'<img src=\'img/icons/accept.gif\' />':'') + '</td>';
+								str += '</tr>';
+							});
+							str += '</table>';
+							$('jobedit_messagegrid').update(str);
+						});
+					}
+				</script>
+							</td>
+							</tr>
+						</table>
+					</td>
 				</tr>
-<? } ?>
-				<tr>
-					<td class="bottomBorder" >Maximum attempts</td>
-					<td class="bottomBorder" ><?= escapehtml($job->getOptionValue('maxcallattempts')); ?></td>
-				</tr>
-				<? if ($USER->authorize('setcallerid')  && !getSystemSetting('_hascallback', false)) {
-					$callerid = $job->getOptionValue('callerid');
-					if (!isset($callerid) || $callerid === "")
-						$callerid = getSystemSetting('callerid');
-				?>
-					<tr>
-						<td class="bottomBorder" >Caller&nbsp;ID</td>
-						<td class="bottomBorder" ><?= Phone::format($callerid) ?>&nbsp;</td>
-					</tr>
-				<? } ?>
+			</table>
+		</td>
+	</tr>
 
-				<tr>
-					<td class="bottomBorder" >Skip duplicate phone numbers</td>
-					<td class="bottomBorder" ><input type="checkbox" disabled <?= $job->isOption("skipduplicates") ? "checked":"" ?>>Skip Duplicates</td>
-				</tr>
-
+	<tr valign="top">
+		<th align="right" class="windowRowHeader bottomBorder">Message:</th>
+		<td class="bottomBorder">
+			<table border="0" cellpadding="2" cellspacing="0" width=100%>
 <? if($USER->authorize('leavemessage')) { ?>
 
 					<tr>
-						<td class="bottomBorder" > Allow call recipients to leave a message</td>
+						<td class="bottomBorder" width="30%" > Allow call recipients to leave a message</td>
 						<td class="bottomBorder" ><input type="checkbox" disabled <?= $job->isOption("leavemessage") ? "checked":"" ?>>Accept Voice Responses</td>
 					</tr>
 <?
@@ -334,7 +299,7 @@ startWindow("Confirmation &amp; Submit");
 if ($USER->authorize("messageconfirmation")){
 ?>
 					<tr>
-						<td>Allow message confirmation by recipients</td>
+						<td width="30%"> Allow message confirmation by recipients</td>
 						<td><input type="checkbox" disabled <?= $job->isOption("messageconfirmation") ? "checked":"" ?>>Request Message Confirmation</td>
 					</tr>
 <?
@@ -343,63 +308,12 @@ if ($USER->authorize("messageconfirmation")){
 			</table>
 		</td>
 	</tr>
-<? } ?>
-<? if(strpos($job->type,"email") !== false) { ?>
-	<tr valign="top">
-		<th align="right" class="windowRowHeader bottomBorder">Email:</th>
-		<td class="bottomBorder">
-			<table border="0" cellpadding="2" cellspacing="0" width=100%>
-				<tr>
-					<td class="bottomBorder"  width="30%" >Default message</td>
-					<td class="bottomBorder" >
-<?
-$emailmessage = new Message($job->emailmessageid);
-echo escapehtml($emailmessage->name);
-?>
-					</td>
-				</tr>
-<? if($USER->authorize('sendmulti')) { ?>
-
-				<tr>
-					<td class="bottomBorder" >Multilingual message options</td>
-					<td class="bottomBorder" ><? alternate('email'); ?></td>
-				</tr>
-<? } ?>
-				<tr>
-					<td>Skip duplicate email addresses</td>
-					<td><input type="checkbox" disabled <?= $job->isOption("skipemailduplicates") ? "checked":"" ?>>Skip Duplicates</td>
-				</tr>
-			</table>
-		</td>
-	</tr>
-
-<? } ?>
-<? if(strpos($job->type,"sms") !== false) { ?>
-	<tr valign="top">
-		<th align="right" class="windowRowHeader bottomBorder">SMS:</th>
-		<td class="bottomBorder">
-			<table border="0" cellpadding="2" cellspacing="0" width=100%>
-				<tr>
-					<td width="30%" >Default message</td>
-					<td>
-<?
-$smsmessage = new Message($job->smsmessageid);
-echo escapehtml($smsmessage->name);
-?>
-					</td>
-				</tr>
-			</table>
-		</td>
-	</tr>
-
-<? } ?>
 </table>
 
 <?
 endWindow();
 buttons();
 
-
-
 include_once("navbottom.inc.php");
+
 ?>
