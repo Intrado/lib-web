@@ -75,7 +75,7 @@ class MessageBody extends FormItem {
 	
 		// Data Fields.
 		$str .= '
-			<table border="0" cellpadding="1" cellspacing="0" style="font-size: 9px; margin-top: 5px;" class="DataFieldsTable" id="'.$n.'datafieldstable">
+			<table border="0" cellpadding="1" cellspacing="0" style="' . (!empty($this->args['hidedatafieldsonload']) ? '' : '') . '; font-size: 9px; margin-top: 5px;" class="DataFieldsTable" id="'.$n.'datafieldstable">
 				<tr>
 					<td>
 						<span style="font-size: 9px;">Default&nbsp;Value:</span><br />
