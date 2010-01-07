@@ -1,13 +1,5 @@
 <?
 
-/*
-key = person.key
-f01-20 persondata.f01-20
-e1-2 = email sequence 1-2
-a1-6 = address parts
-p1-4 = phone sequence 1-5
-*/
-
 class FieldMap extends DBMappedObject {
 
 	var $fieldnum;
