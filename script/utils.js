@@ -575,15 +575,27 @@ function saveHtmlEditorContent() {
 	var textareauseshtmleditor = textarea && textarea.match('textarea.HtmlEditor');
 	if (textareauseshtmleditor) {
 		var tempdiv = new Element('div').insert(instance.getData());
+		
+		// Unstyle any image elements having src="viewimage.php?id=.."
 		var images = tempdiv.select('img');
 		for (var i = 0, count = images.length; i < count; i++) {
 			var image = images[i];
 			var matches = image.src.match(/viewimage\.php\?id=(\d+)/);
 			if (matches.length == 2) {
-				image.replace('((' + matches[1] + '))');
+				image.replace('<img src="viewimage.php?id=' + matches[1] + '"/>');
+				//image.replace('((' + matches[1] + '))');
 			}
 		}
+		
 		html = tempdiv.innerHTML.replace(/&lt;&lt;/g, '<<').replace(/&gt;&gt;/g, '>>');
+		
+		if (images.length < 1) {
+			// CKEditor inserts blank tags even if the user has deleted everything.
+			if (tempdiv.innerHTML.stripTags().strip() == '')
+				html = '';
+		}
+		
+		
 		textarea.value = html;
 	}
 	
@@ -598,6 +610,8 @@ function hideHtmlEditor() {
 // Loads the html editor if necessary.
 // NOTE: It is assumed that there be only a single html editor on the page; CKEditor is buggy with multiple instances.
 function applyHtmlEditor(textarea) {
+	textarea = $(textarea);
+	
 	var editorobject = saveHtmlEditorContent();
 	if (!editorobject) {
 		if ($('reusableckeditor'))
@@ -608,30 +622,33 @@ function applyHtmlEditor(textarea) {
 		textarea.disabled = true;
 		
 		var reusableckeditor = new Element('div', {'id':'reusableckeditor'});
-		document.observe('dom:loaded', function() {
+		if (document.body) {
 			document.body.insert(new Element('div', {'id':'reusableckeditorhider'}).hide().insert(reusableckeditor));
-		});
-		
-		CKEDITOR.replace(reusableckeditor, {
-			'toolbar': [
-				['Styles', 'Format'],
-				['Bold', 'Italic', '-', 'NumberedList', 'BulletedList', '-', 'Link', '-', 'Image']
-			],
-			'resize_enabled': false,
-			'width': '100%',
-			'filebrowserImageUploadUrl' : 'uploadimage.php',
-			'on': {
-				'instanceReady': function(event) {
-					this.previous('img.AjaxLoader').remove();
-					applyHtmlEditor(this);
-				}.bindAsEventListener(textarea)
-			}
-		});
+			CKEDITOR.replace(reusableckeditor, {
+				'toolbar': [
+					['Styles', 'Format'],
+					['Bold', 'Italic', '-', 'NumberedList', 'BulletedList', '-', 'Link', '-', 'Image']
+				],
+				'resize_enabled': false,
+				'width': '100%',
+				'filebrowserImageUploadUrl' : 'uploadimage.php',
+				'on': {
+					'instanceReady': function(event) {
+						this.previous('img.AjaxLoader').remove();
+						applyHtmlEditor(this);
+					}.bindAsEventListener(textarea)
+				}
+			});
+		} else {
+			document.observe('dom:loaded', function(event) {
+				applyHtmlEditor(this);
+			}.bindAseventListener(textaera));
+		}
 		
 		return;
 	}
 	
-	var html = textarea.value.replace(/\(\((\d+)\)\)/g, "<img src='viewimage.php?id=$1'/>");
+	var html = textarea.value;//.replace(/\(\((\d+)\)\)/g, "<img src='viewimage.php?id=$1'/>");
 	editorobject.instance.setData(html);
 	
 	textarea.hide().addClassName('HtmlEditor').insert({'after':editorobject.container});
