@@ -131,6 +131,7 @@ class TranslationItem extends FormItem {
 				}
 				function submitRetranslation(section,language) {
 					var srcbox = section + "text";
+					
 					var text = $(srcbox).getValue();
 					if(text == "")
 						return;
@@ -141,13 +142,13 @@ class TranslationItem extends FormItem {
 					$(section + "retranslationtext").innerHTML = "<img src=\"img/ajax-loader.gif\" />";
 					new Ajax.Request("translate.php", {
 						method:"post",
-						parameters: {"text": text, "language": language},
+						parameters: {"text": makeTranslatableString(text), "language": language},
 						onSuccess: function(result) {
 									var data = result.responseJSON;
 									if(data.responseStatus != 200 || data.responseData.translatedText == undefined)
 										return;
 									var dstbox = section + "retranslationtext";
-									$(dstbox).innerHTML = data.responseData.translatedText.escapeHTML();
+									$(dstbox).innerHTML = data.responseData.translatedText.replace(/<</, "&lt;&lt;").replace(/>>/, "&gt;&gt;");//.escapeHTML();
 							}
 					});
 					return false;
@@ -163,13 +164,13 @@ class TranslationItem extends FormItem {
 					$(section + "textdiv").innerHTML = "<img src=\"img/ajax-loader.gif\" />";
 					new Ajax.Request("translate.php", {
 						method:"post",
-						parameters: {"english": englishText.value, "languages": language},
+						parameters: {"english": makeTranslatableString(englishText.value), "languages": language},
 						onSuccess: function(transport) {
 							var data = transport.responseJSON;
 							if(data.responseStatus != 200 || data.responseData.translatedText == undefined)
 								return;
-							$(section+"textdiv").innerHTML = data.responseData.translatedText.escapeHTML();
-							$(section+"text").value = data.responseData.translatedText.escapeHTML();
+							$(section+"textdiv").innerHTML = data.responseData.translatedText.replace(/<</, "&lt;&lt;").replace(/>>/, "&gt;&gt;");//.escapeHTML();
+							$(section+"text").value = data.responseData.translatedText;//.escapeHTML();
 							englishText.value = "";
 							setTranslationValue(section);
 						}
