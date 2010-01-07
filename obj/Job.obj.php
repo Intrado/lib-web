@@ -41,27 +41,37 @@ class Job extends DBMappedObject {
 		DBMappedObject::DBMappedObject($id);
 	}
 
-	function copyMessage($msgid) {
-		// copy the message
-		$newmsg = new Message($msgid);
-		$newmsg->id = null;
-		$newmsg->create();
+	function copyMessage($messagegroupid) {
+	
+		// copy the message group
+		$newmessagegroup = new MessageGroup($messagegroupid);
+		$newmessagegroup->id = null;
+		$newmessagegroup->create();
 
-		// copy the parts
-		$parts = DBFindMany("MessagePart", "from messagepart where messageid=$msgid");
-		foreach ($parts as $part) {
-			$newpart = new MessagePart($part->id);
-			$newpart->id = null;
-			$newpart->messageid = $newmsg->id;
-			$newpart->create();
+		$messages = DBFindMany("Message", "from message where messagegroupid=$messagegroupid");
+		foreach ($messages as $message) {
+
+			//copy the messages
+			$newmessage = new Message($message->id);
+			$newmessage->id = null;
+			$newmessage->messagegroupid = $newmessagegroup->id;
+			$newmessage->create();
+
+			// copy the parts
+			$parts = DBFindMany("MessagePart", "from messagepart where messageid=$message->id");
+			foreach ($parts as $part) {
+				$newpart = new MessagePart($part->id);
+				$newpart->id = null;
+				$newpart->messageid = $newmessage->id;
+				$newpart->create();
+			}
+			// copy the attachments
+			QuickUpdate("insert into messageattachment (messageid,contentid,filename,size,deleted) " .
+			"select $newmessage->id, ma.contentid, ma.filename, ma.size, 1 as deleted " .
+			"from messageattachment ma where ma.messageid=$message->id and not deleted");
 		}
 
-		// copy the attachments
-		QuickUpdate("insert into messageattachment (messageid,contentid,filename,size,deleted) " .
-			"select $newmsg->id, ma.contentid, ma.filename, ma.size, 1 as deleted " .
-			"from messageattachment ma where ma.messageid=$msgid and not deleted");
-
-		return $newmsg;
+		return $newmessagegroup;
 	}
 
 	function copyNew($isrepeatingrunnow = false) {
@@ -108,6 +118,20 @@ class Job extends DBMappedObject {
 		$newjob->enddate = date("Y-m-d", time() + $daydiff);
 
 		$newjob->create();
+
+		// copy the messages
+		// if message is not deleted, then we can point to it directly
+		// but if message is deleted, it's either already a copy from a previous run (uneditable)
+		// or it's a translation message and we need to make another copy of these
+		if (!$isrepeatingrunnow) {
+			$msg = new MessageGroup($newjob->messagegroupid);
+			if ($msg->deleted) {
+				$newmsg = Job::copyMessage($msg->id);
+				$newjob->messagegroupid = $newmsg->id;
+				$newjob->update();
+			}			 
+		}
+
 
 		//copy all the job lists
 		QuickUpdate("insert into joblist (jobid,listid)

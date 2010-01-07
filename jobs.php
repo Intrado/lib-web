@@ -18,6 +18,7 @@ require_once("inc/date.inc.php");
 require_once("inc/securityhelper.inc.php");
 require_once("inc/formatters.inc.php");
 require_once("obj/ImportJob.obj.php");
+require_once("obj/MessageGroup.obj.php");
 
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization
