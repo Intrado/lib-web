@@ -2,7 +2,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 // Custom Utility Functions
 ////////////////////////////////////////////////////////////////////////////////
-function makeTranslationItem($type, $subtype, $languagecode, $languagename, $sourcetext, $messagetext, $translationcheckboxlabel, $override, $allowoverride = true, $hidetranslationcheckbox = false, $enabled = true, $disabledinfo = "", $datafields = null) {
+function makeTranslationItem($type, $subtype, $languagecode, $languagename, $sourcetext, $messagetext, $translationcheckboxlabel, $override, $allowoverride = true, $hidetranslationcheckbox = false, $enabled = true, $disabledinfo = "", $datafields = null, $inautotranslator = false) {
 	$control = array("TranslationItem",
 		"phone" => $type == 'phone',
 		"language" => $languagecode,
@@ -12,7 +12,7 @@ function makeTranslationItem($type, $subtype, $languagecode, $languagename, $sou
 		"reload" => true,
 		"allowoverride" => $allowoverride,
 		"usehtmleditor" => $subtype == 'html',
-		"hidetranslationcheckbox" => true,
+		"hidetranslationcheckbox" => $hidetranslationcheckbox,
 		"hidetranslationlock" => true,
 		"disabledinfo" => $disabledinfo,
 		"translationcheckboxlabel" => $translationcheckboxlabel,
@@ -23,6 +23,15 @@ function makeTranslationItem($type, $subtype, $languagecode, $languagename, $sou
 	if (is_array($datafields))
 		$control["fields"] = $datafields;
 	
+	$validators = array(array("ValMessageBody"));
+	
+	if ($type == 'phone') {
+		$validators[] = array("ValLength","max" => 4000);
+	}
+	if ($type == 'email' && !$inautotranslator) {
+		$validators[] = array("ValEmailMessageBody");
+	}
+	
 	return array(
 		"label" => ucfirst($languagename),
 		"value" => json_encode(array(
@@ -31,7 +40,7 @@ function makeTranslationItem($type, $subtype, $languagecode, $languagename, $sou
 			"override" => $override,
 			"gender" => 'female' // TODO: This needs to take preferredvoice.
 		)),
-		"validators" => array(),
+		"validators" => $validators,
 		"control" => $control,
 		"renderoptions" => array("icon" => false, "label" => false, "errormessage" => true),
 		"transient" => false,
@@ -142,9 +151,7 @@ function makeAccordionSplitter($type, $subtype, $languagecode, $permanent, $pref
 								var audiouploadformitem = $('{$type}-{$subtype}-{$languagecode}_audioupload');
 								audiouploadformitem.observe('AudioUpload:AudioUploaded', function(event) {
 									hideHtmlEditor();
-									console.info('audio uploaded');
 									var audiofile = event.memo;
-									console.info(audiofile);
 									textInsert('{{' + audiofile.name + '}}', $('{$type}-{$subtype}-{$languagecode}_messagebody'));
 									this.reload();
 								}.bindAsEventListener(audiolibrarywidget));
@@ -183,8 +190,10 @@ function makeAccordionSplitter($type, $subtype, $languagecode, $permanent, $pref
 						(function() {
 							var container = $('accordiondatafieldscontainer');
 							var datafieldstable = $$('.DataFieldsTable');
-							for (var i = 0; i < datafieldstable.length; i++) {
+							for (var i = 0, count = datafieldstable.length; i < count; i++) {
 								container.insert(datafieldstable[i]);
+								if (count == 1)
+									datafieldstable[i].show();
 							}
 						})();
 					</script>
@@ -285,6 +294,7 @@ class CallMe extends FormItem {
 			(function () {
 				var msgs = '.$value.';
 				// Load default. it is a special case
+				/* TODO: Easycall not working
 				new Easycall(
 					"'.$this->form->name.'",
 					"'.$n.'",
@@ -295,6 +305,7 @@ class CallMe extends FormItem {
 					"'.$nophone.'",
 					false
 				).load();
+				*/
 			})();
 		';
 	}
