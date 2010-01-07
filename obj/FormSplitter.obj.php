@@ -181,7 +181,7 @@ class FormSplitter extends Form {
 				$html .= $this->renderJavascriptLibraries();
 			}
 		
-			$html .= '<div style="padding:4px;" class="FormSwitcherLayoutSection FormSplitterParentFormContainer">';
+			$html .= '<div style="padding:2px;" class="FormSwitcherLayoutSection FormSplitterParentFormContainer">';
 			if ($showtitle) {
 				$html .= '<span class="FormSwitcherLayoutSectionTitle">'.$this->title.'</span>';
 				if ($this->icon)
@@ -190,7 +190,7 @@ class FormSplitter extends Form {
 			$html .= '<form id="'.$this->name.'" class="newform FormSplitterParentForm '.$classname.' FormSwitcherLayoutSection" name="'.$this->name.'" method="POST" action="'.$posturl.'">';
 			$html .= '<input name="'.$this->name.'-formsnum" type="hidden" value="' . $this->serialnum . '">';
 		} else {
-			$html .= '<div style="padding:4px; ; " class="'.$classname.' FormSwitcherLayoutSection">';
+			$html .= '<div style="padding:2px; ; " class="'.$classname.' FormSwitcherLayoutSection">';
 			$html .= '<span class="FormSwitcherLayoutSectionTitle">'.$this->title.'</span>';
 			if ($this->icon)
 					$html .= '<img class="FormSwitcherLayoutSectionIcon" src="'.$this->icon.'"/>';
@@ -200,7 +200,7 @@ class FormSplitter extends Form {
 		$subformIndex = 0;
 		foreach ($this->children as $child) {
 			if (is_array($child)) {
-				$html .= '<div style="margin: 4px; padding-bottom: 50px;" class="FormSwitcherLayoutSection">';
+				$html .= '<div style="margin: 2px; padding-bottom: 20px;" class="FormSwitcherLayoutSection">';
 				$html .= '<span class="FormSwitcherLayoutSectionTitle">'.$this->subforms[$subformIndex]->title.'</span>';
 				if ($this->subforms[$subformIndex]->icon)
 					$html .= '<img class="FormSwitcherLayoutSectionIcon" src="'.$this->subforms[$subformIndex]->icon.'"/>';
@@ -210,7 +210,7 @@ class FormSplitter extends Form {
 			} else if ($child instanceof FormSplitter) {
 				$html .= $child->render($specificsections, true, true);
 			} else if (is_string($child)) {
-				$html .= '<div style="padding:4px; ; " class="FormSwitcherLayoutSection">'.$child.'</div>';
+				$html .= '<div style="padding:2px; ; " class="FormSwitcherLayoutSection">'.$child.'</div>';
 			}
 		}
 		
