@@ -17,10 +17,10 @@ function makeTranslationItem($type, $subtype, $languagecode, $languagename, $sou
 		"disabledinfo" => $disabledinfo,
 		"showhr" => false
 	);
-	
+
 	if (is_array($datafields))
 		$control["fields"] = $datafields;
-	
+
 	return array(
 		"label" => ucfirst($languagename),
 		"value" => json_encode(array(
@@ -54,10 +54,10 @@ function makeMessageBody($type, $label, $messagetext, $datafields = null, $useht
 		"usehtmleditor" => $usehtmleditor,
 		"hidden" => $hidden
 	);
-	
+
 	if (is_array($datafields))
 		$control["fields"] = $datafields;
-	
+
 	return array(
 		"label" => $label,
 		"value" => $messagetext,
@@ -68,13 +68,13 @@ function makeMessageBody($type, $label, $messagetext, $datafields = null, $useht
 		"helpstep" => 2
 	);
 }
-			
+
 function makeAccordionSplitter($type, $subtype, $languagecode, $permanent, $preferredgender, $inautotranslator = false, $emailattachments = null, $allowtranslation = false, $existingmessagegroupid = 0) {
 	global $USER;
-	
+
 	$existingmessagegroupid = !empty($existingmessagegroupid) ? $existingmessagegroupid + 0 : 0;
 	$accordionsplitterchildren = array();
-	
+
 	if ($type == 'email') {
 		$accordionsplitterchildren[] = array(
 			"title" => _L("Attachments"),
@@ -128,7 +128,7 @@ function makeAccordionSplitter($type, $subtype, $languagecode, $permanent, $pref
 						<script type='text/javascript'>
 							(function () {
 								var audiolibrarywidget = new AudioLibraryWidget('audiolibrarycontainer', $existingmessagegroupid);
-								
+
 								var audiouploadformitem = $('{$type}-{$subtype}-{$languagecode}_audioupload');
 								audiouploadformitem.observe('AudioUpload:AudioUploaded', function(event) {
 									hideHtmlEditor();
@@ -138,13 +138,13 @@ function makeAccordionSplitter($type, $subtype, $languagecode, $permanent, $pref
 									textInsert('{{' + audiofile.name + '}}', $('{$type}-{$subtype}-{$languagecode}_messagebody'));
 									this.reload();
 								}.bindAsEventListener(audiolibrarywidget));
-								
+
 								audiolibrarywidget.container.observe('AudioLibraryWidget:ClickName', function(event) {
 									hideHtmlEditor();
 									var audiofile = event.memo.audiofile;
 									textInsert('{{' + audiofile.name + '}}', $('{$type}-{$subtype}-{$languagecode}_messagebody'));
 								}.bindAsEventListener(audiolibrarywidget));
-								
+
 								var callmeformitem = $('{$type}-{$subtype}-{$languagecode}_callme');
 								callmeformitem.observe('Easycall:RecordingDone', function(event) {
 									hideHtmlEditor();
@@ -158,11 +158,11 @@ function makeAccordionSplitter($type, $subtype, $languagecode, $permanent, $pref
 			);
 		}
 	} else if ($type == 'sms') {
-			
+
 	} else {
 		return null;
 	}
-	
+
 	if ($type == 'email' || $type == 'phone') {
 		$accordionsplitterchildren[] = array(
 			"title" => _L("Data Fields"),
@@ -181,7 +181,7 @@ function makeAccordionSplitter($type, $subtype, $languagecode, $permanent, $pref
 				")
 			)
 		);
-		
+
 		if ($allowtranslation && !$inautotranslator) {
 			$accordionsplitterchildren[] = array(
 				"title" => _L("Translation"),
@@ -202,7 +202,7 @@ function makeAccordionSplitter($type, $subtype, $languagecode, $permanent, $pref
 			);
 		}
 	}
-	
+
 	$advancedoptionsformdata = array(
 		"autoexpire" => array(
 			"label" => _L('Auto Expire'),
@@ -214,7 +214,7 @@ function makeAccordionSplitter($type, $subtype, $languagecode, $permanent, $pref
 			"helpstep" => 1
 		)
 	);
-	
+
 	if ($type == 'phone') {
 		$advancedoptionsformdata['preferredgender'] = array(
 			"label" => _L('Preferred Voice'),
@@ -225,10 +225,10 @@ function makeAccordionSplitter($type, $subtype, $languagecode, $permanent, $pref
 			"helpstep" => 2
 		);
 	}
-	
+
 	$accordionsplitterchildren[] = array("title" => _L("Advanced Options"), "formdata" => $advancedoptionsformdata);
 	$accordionsplitter = new FormSplitter("", "", null, "accordion", array(), $accordionsplitterchildren);
-	
+
 	return $accordionsplitter;
 }
 
@@ -245,28 +245,28 @@ class CallMe extends FormItem {
 		// Hidden input item to store values in
 		$str = '<input id="'.$n.'" name="'.$n.'" type="hidden" value="'.escapehtml($value).'" />
 		<div>
-			<div id="'.$n.'_messages" style="padding: 6px; white-space:nowrap"></div>
+			<div id="'.$n.'_content" style="padding: 6px; white-space:nowrap"></div>
 			<div id="'.$n.'_altlangs" style="clear: both; padding: 5px; display: none"></div>
 		</div>
 		';
-		
+
 		return $str;
 	}
-	
+
 	function renderJavascriptLibraries() {
 		// include the easycall javascript object and setup to record
 		$str = '<script type="text/javascript" src="script/easycall.js.php"></script>';
 		return $str;
 	}
-	
+
 	function renderJavascript($value) {
 		$n = $this->form->name."_".$this->name;
-		
+
 		$nophone = _L("Phone Number");
 		$defaultphone = escapehtml((isset($this->args['phone']) && $this->args['phone'])?Phone::format($this->args['phone']):$nophone);
 		if (!$value)
 			$value = '{}';
-			
+
 		return '
 			(function () {
 				var msgs = '.$value.';
@@ -279,8 +279,7 @@ class CallMe extends FormItem {
 					"'.((isset($this->args['max']) && $this->args['max'])?$this->args['max']:"10").'",
 					"'.$defaultphone.'",
 					"'.$nophone.'",
-					"CallMe",
-					"easycall"
+					false
 				).load();
 			})();
 		';
