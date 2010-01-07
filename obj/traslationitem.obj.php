@@ -18,6 +18,8 @@ class TranslationItem extends FormItem {
 
 		$isphone = !empty($this->args['phone']);
 
+		$translationcheckboxlabel = isset($this->args['translationcheckboxlabel']) ? $this->args['translationcheckboxlabel'] : _L("Translate");
+		
 		$str = "";
 
 		$str .= '
@@ -27,10 +29,13 @@ class TranslationItem extends FormItem {
 			' . (!empty($this->args['showhr']) ? '<hr>' : '') . '
 			<table width="100%">
 				<tr>
-					<td valign="top" width="80px" class="TranslationItemCheckboxTD" style="'.(!empty($this->args['hidetranslationcheckbox']) ? 'display:none' : '').'">
+					<td '.(!empty($this->args['translationcheckboxnewline']) ? 'colspan=2' : '').' valign="top" width="80px" class="TranslationItemCheckboxTD" style="'.(!empty($this->args['hidetranslationcheckbox']) ? 'display:none' : '').'">
 						<input id="'.$n.'translatecheck" name="'.$n.'checkbox" type="checkbox" onclick="toggleTranslation(\''.$n.'\',\''.$language.'\', '.$usehtmleditor.');" '.(($msgdata->enabled)?"checked":"").' />
-						<b>'._L('Translate').'</b>
+						<label for="'.$n.'translatecheck"><b>'.$translationcheckboxlabel.'</b></label>
 					</td>
+					
+				'.(!empty($this->args['translationcheckboxnewline']) ? '<tr>' : '').'
+				
 					<td valign="top" align="right" width="18px" style="'.(!empty($this->args['hidetranslationlock']) ? 'display:none' : '').'">
 						<div id="'.$n.'icons" style="display: '.(($msgdata->enabled)?"block":"none").'">
 							<img id="'.$n.'editlock" style="display: '.(($msgdata->override)?"block":"none").';" src="img/padlock.gif">
