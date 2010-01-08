@@ -202,7 +202,7 @@ foreach ($destinations as $type => $destination) {
 				}
 			}
 			
-			$accordionsplitter = makeAccordionSplitter($type, $subtype, $languagecode, $permanent, $preferredgender, true, $type == 'email' ? $emailattachments : null, false, isset($existingmessagegroup) ? $existingmessagegroup->id : 0);
+			$accordionsplitter = makeAccordionSplitter($type, $subtype, $languagecode, $permanent, $preferredgender, true, $type == 'email' ? $emailattachments : null, false);
 			
 			$messageformsplitters[] = new FormSplitter("{$type}-{$subtype}-autotranslator", _L("Autotranslate"), null, "verticalsplit", array(), array(
 			array("title" => "", "formdata" => $autotranslatorformdata), // TODO: Change the wording for this title.
@@ -362,7 +362,7 @@ foreach ($destinations as $type => $destination) {
 				}
 			}
 			
-			$accordionsplitter = makeAccordionSplitter($type, $subtype, $languagecode, $permanent, $preferredgender, false, $type == 'email' ? $emailattachments : null, isset($formdata['translationitem']) ? true : false, isset($existingmessagegroup) ? $existingmessagegroup->id : 0);
+			$accordionsplitter = makeAccordionSplitter($type, $subtype, $languagecode, $permanent, $preferredgender, false, $type == 'email' ? $emailattachments : null, isset($formdata['translationitem']) ? true : false);
 			
 			$messageformsplitters[] = new FormSplitter($messageformname, $languagename, isset($existingmessagegroup) && $existingmessagegroup->hasMessage($type, $subtype, $languagecode) ? "img/icons/accept.gif" : "img/icons/diagona/16/160.gif", "verticalsplit", array(), array(
 			array("title" => "", "formdata" => $formdata), // TODO: Change the wording for this title.

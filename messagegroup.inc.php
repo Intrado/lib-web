@@ -88,10 +88,9 @@ function makeMessageBody($type, $label, $messagetext, $datafields = null, $useht
 	);
 }
 
-function makeAccordionSplitter($type, $subtype, $languagecode, $permanent, $preferredgender, $inautotranslator = false, $emailattachments = null, $allowtranslation = false, $existingmessagegroupid = 0) {
+function makeAccordionSplitter($type, $subtype, $languagecode, $permanent, $preferredgender, $inautotranslator = false, $emailattachments = null, $allowtranslation = false) {
 	global $USER;
 	
-	$existingmessagegroupid = !empty($existingmessagegroupid) ? $existingmessagegroupid + 0 : 0;
 	$accordionsplitterchildren = array();
 	
 	if ($type == 'email') {
@@ -146,7 +145,7 @@ function makeAccordionSplitter($type, $subtype, $languagecode, $permanent, $pref
 						<div id='audiolibrarycontainer'></div>
 						<script type='text/javascript'>
 							(function () {
-								var audiolibrarywidget = new AudioLibraryWidget('audiolibrarycontainer', $existingmessagegroupid);
+								var audiolibrarywidget = new AudioLibraryWidget('audiolibrarycontainer', {$_SESSION['messagegroupid']});
 								
 								var audiouploadformitem = $('{$type}-{$subtype}-{$languagecode}_audioupload');
 								audiouploadformitem.observe('AudioUpload:AudioUploaded', function(event) {
@@ -165,8 +164,25 @@ function makeAccordionSplitter($type, $subtype, $languagecode, $permanent, $pref
 								var callmeformitem = $('{$type}-{$subtype}-{$languagecode}_callme');
 								callmeformitem.observe('Easycall:RecordingDone', function(event) {
 									hideHtmlEditor();
-									//textInsert('{{' + audiofile.name + '}}', $('{$type}-{$subtype}-{$languagecode}_messagebody'));
-									this.reload();
+									event.stop();
+									new Ajax.Request('ajaxmessagegroup.php', {
+										'method': 'post',
+										'parameters': {
+											'action': 'enableaudiofile',
+											'messagegroupid': {$_SESSION['messagegroupid']},
+											'audiofileid': event.memo.audiofileid
+										},
+										'onSuccess': function(transport) {
+											var audiofile = transport.responseJSON;
+											
+											if (!audiofile) {
+												return; // TODO: Error message.
+											}
+											
+											textInsert('{{' + audiofile.name + '}}', $('{$type}-{$subtype}-{$languagecode}_messagebody'));
+											this.reload();
+										}.bindAsEventListener(this)
+									});
 								}.bindAsEventListener(audiolibrarywidget));
 							})();
 						</script>
@@ -268,7 +284,7 @@ class CallMe extends FormItem {
 		// Hidden input item to store values in
 		$str = '<input id="'.$n.'" name="'.$n.'" type="hidden" value="'.escapehtml($value).'" />
 		<div>
-			<div id="'.$n.'_messages" style="padding: 6px; white-space:nowrap"></div>
+			<div id="'.$n.'_content" style="padding: 6px; white-space:nowrap"></div>
 			<div id="'.$n.'_altlangs" style="clear: both; padding: 5px; display: none"></div>
 		</div>
 		';
@@ -294,7 +310,6 @@ class CallMe extends FormItem {
 			(function () {
 				var msgs = '.$value.';
 				// Load default. it is a special case
-				/* TODO: Easycall not working
 				new Easycall(
 					"'.$this->form->name.'",
 					"'.$n.'",
@@ -305,7 +320,6 @@ class CallMe extends FormItem {
 					"'.$nophone.'",
 					false
 				).load();
-				*/
 			})();
 		';
 	}

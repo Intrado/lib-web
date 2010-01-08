@@ -180,8 +180,13 @@ var Easycall = Class.create({
 			case "done":
 				// remove the progress div
 				$(this.formitemname+"_"+this.langcode+"_progress").remove();
-				// create the play and re-record buttons
-				this.createFormItem();
+				if (!$(this.formitemname).fire('Easycall:RecordingDone', {'audiofileid':this.audiofileid}).stopped) {
+					// create the play and re-record buttons
+					this.createFormItem();
+				} else {
+					// If the event is stopped, then just setup another recording.
+					this.setupRecord();
+				}
 				break;
 
 			case "notask":
