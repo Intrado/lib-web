@@ -52,6 +52,8 @@ $isajax = isset($_GET['ajax']);
 $mergeditems = array();
 if($isajax === true) {
 
+	$start = 0 + (isset($_GET['pagestart']) ? $_GET['pagestart'] : 0);
+	$limit = 20;
 	session_write_close();//WARNING: we don't keep a lock on the session file, any changes to session data are ignored past this point
 	switch ($filter) {
 		case "date":
@@ -61,9 +63,10 @@ if($isajax === true) {
 			$mergeditems = QuickQueryMultiRow("select 'list' as type,'Saved' as status, id, name, modifydate as date, lastused, (name +0) as digitsfirst from list where userid=? and deleted = 0  and modifydate is not null order by digitsfirst",true,false,array($USER->id));
 			break;
 		default:
-			$mergeditems = QuickQueryMultiRow("select 'list' as type,'Saved' as status, id, name, modifydate as date, lastused from list where userid=? and deleted = 0  and modifydate is not null order by modifydate desc",true,false,array($USER->id));
+			$mergeditems = QuickQueryMultiRow("select 'list' as type,'Saved' as status, id, name, modifydate as date, lastused from list where userid=? and deleted = 0  and modifydate is not null order by modifydate desc limit $start, $limit",true,false,array($USER->id));
 		break;
 	}
+	$total = QuickQuery("select FOUND_ROWS()");
 
 	header('Content-Type: application/json');
 	$data = activityfeed($mergeditems,true);
@@ -82,7 +85,6 @@ function activityfeed($mergeditems,$ajax = false) {
 	$actioncount = 0;
 	$activityfeed = $ajax===true?array():"";
 	$limit = 10;
-	$duplicatejob = array();
 
 	if($ajax===true) {
 		if(empty($mergeditems)) {
@@ -98,31 +100,26 @@ function activityfeed($mergeditems,$ajax = false) {
 				$item = array_shift($mergeditems);
 				$time = date("M j, g:i a",strtotime($item["date"]));
 				$title = $item["status"];
-				$content = "";
-				$tools = "";
 				$itemid = $item["id"];
-				$icon = "";
 				$defaultlink = "";
 				$defaultonclick = "";
-				if($item["type"] == "list" ) {
-					$title = escapehtml($item["name"]);
-					$defaultlink = "list.php?id=$itemid";
-					$content = '<a href="' . $defaultlink . '">' . $time;
+				$title = escapehtml($item["name"]);
+				$defaultlink = "list.php?id=$itemid";
+				$content = '<a href="' . $defaultlink . '">' . $time;
 
-					$content .= '&nbsp;-&nbsp;';
-					if(isset($item["lastused"]))
-						$content .= 'This list was last used: <i>' . date("M j, g:i a",strtotime($item["lastused"])) . "</i>";
-					else
-						$content .= 'This list has never been used ';
-					$content .= " and has " . listcontacts($itemid,"list") . '</a>';
-					$tools = action_links (
-						action_link("Edit", "pencil", "list.php?id=$itemid"),
-						action_link("Preview", "application_view_list", "showlist.php?id=$itemid"),
-						action_link("Delete", "cross", "lists.php?delete=$itemid", "return confirmDelete();")
-						);
-					//$tools = str_replace("&nbsp;|&nbsp;","<br />",$tools);
-					$icon = 'largeicons/addrbook.jpg';
-				}
+				$content .= '&nbsp;-&nbsp;';
+				if(isset($item["lastused"]))
+					$content .= 'This list was last used: <i>' . date("M j, g:i a",strtotime($item["lastused"])) . "</i>";
+				else
+					$content .= 'This list has never been used ';
+				$content .= " and has " . listcontacts($itemid,"list") . '</a>';
+				$tools = action_links (
+					action_link("Edit", "pencil", "list.php?id=$itemid"),
+					action_link("Preview", "application_view_list", "showlist.php?id=$itemid"),
+					action_link("Delete", "cross", "lists.php?delete=$itemid", "return confirmDelete();")
+					);
+				//$tools = str_replace("&nbsp;|&nbsp;","<br />",$tools);
+				$icon = 'largeicons/addrbook.jpg';
 
 				$activityfeed[] = array("itemid" => $itemid,
 											"defaultlink" => $defaultlink,
@@ -151,26 +148,6 @@ function activityfeed($mergeditems,$ajax = false) {
 
 				var jobfiltes = Array('none','date','name');
 
-				function addfeedtools() {
-					for(var id=0;id<actionids;id++){
-						$('actionlink_' + id).tip = new Tip('actionlink_' + id, $('actions_' + id).innerHTML, {
-							style: 'protogrey',
-							radius: 4,
-							border: 4,
-							hideOn: false,
-							hideAfter: 0.5,
-							stem: 'rightTop',
-							hook: {  target: 'leftMiddle', tip: 'topRight'  },
-							width: 'auto',
-							offset: { x: 0, y: 0 }
-						});
-					}
-				}
-				function removefeedtools() {
-					for(var id=0;id<actionids;id++){
-						Tips.remove('actionlink_' + id);
-					}
-				}
 				function applyfilter(filter) {
 						new Ajax.Request('lists.php?ajax=true&filter=' + filter, {
 							method:'get',
@@ -180,7 +157,6 @@ function activityfeed($mergeditems,$ajax = false) {
 									var html = '';
 									var size = result.length;
 
-									//removefeedtools();
 									actionids = 0;
 									for(i=0;i<size;i++){
 										var item = result[i];
@@ -192,7 +168,6 @@ function activityfeed($mergeditems,$ajax = false) {
 										html += '</tr>';
 									}
 									$('feeditems').update(html);
-									//addfeedtools();
 
 									var filtercolor = $('filterby').getStyle('color');
 									if(!filtercolor)
@@ -305,9 +280,9 @@ $activityfeed = '
 				<table width="100%" name="recentactivity" style="padding-top: 7px;">
 				<tr>
 					<td class="feed" style="width: 180px;vertical-align: top;font-size: 12px;" >
-						<div style="">
+						<div>
 						' .
-						icon_button(_L('Create New List'),"add","list.php?id=new",null,'style="display:inline;"')
+						icon_button(_L('Create New List'),"add","location.href='list.php?id=new'")
 						 .' <div style="clear:both;"></div>
 						</div>
 						<br />
