@@ -19,7 +19,7 @@ var EasyCall = Class.create({
 	//	minlength: minimum phone number length
 	//	maxlength: maximum phone number length
 	//	defaultphoneval: default phone number
-	//	nophoneval: text to display when no phone number
+	//	name: text to use as audiofile name
 	initialize: function(formname, formitemname, container, minlength, maxlength, defaultphoneval, name) {
 		this.formname = formname;
 		this.formitemname = formitemname;
@@ -39,7 +39,7 @@ var EasyCall = Class.create({
 	// Starts an easycall
 	record: function () {
 		// get value of phone
-		var phone = $(this.formitemname+"_phone").value;
+		var phone = $(this.container+"_phone").value;
 
 		// validate the phone, if it's invalid change the status and bail out on recording
 		var val = this.easycallPhoneValidate(phone);
@@ -49,23 +49,21 @@ var EasyCall = Class.create({
 		}
 
 		// remove input and button
-		$(this.formitemname+"_callcontrol").remove();
+		$(this.container+"_callcontrol").remove();
 
 		// load up a call progress div with new controls
-		$(this.formitemname+"_main").insert(
-			new Element("div",{id: this.formitemname+"_progress"}).insert(
-				new Element("img",{id: this.formitemname+"_progress_img", src: "img/ajax-loader.gif", style: "float:left"})
+		$(this.container).insert(
+			new Element("div",{id: this.container+"_progress"}).insert(
+				new Element("img",{id: this.container+"_progress_img", src: "img/ajax-loader.gif", style: "float:left"})
 			).insert(
-				new Element("div",{id: this.formitemname+"_progress_text"})
-			).insert(
-				new Element("div", {id: this.formitemname+"langlock"})
+				new Element("div",{id: this.container+"_progress_text"})
 			).insert(
 				new Element("div", {style: "padding-top: 3px; margin-bottom: 5px; border-bottom: 1px solid gray; clear: both"})
 			)
 		);
 
 		// set the progress text so the user knows something is happening in the background
-		$(this.formitemname+"_progress_text").update("<?=escapehtml(_L('Starting up call... Please wait.'))?>");
+		$(this.container+"_progress_text").update("<?=escapehtml(_L('Starting up call... Please wait.'))?>");
 
 		// do ajax to start the specialtask
 		new Ajax.Request('ajaxeasycall.php', {
@@ -86,7 +84,7 @@ var EasyCall = Class.create({
 	// handles successful return of recording ajax call
 	handleRecord: function(transport) {
 		// update progress
-		$(this.formitemname+"_progress_text").update("<?=escapehtml(_L('Call started... Your phone should ring shortly.'))?>");
+		$(this.container+"_progress_text").update("<?=escapehtml(_L('Call started... Your phone should ring shortly.'))?>");
 		var response = transport.responseJSON;
 		if (response && !response.error) {
 			// if successful start, hand off to update
@@ -120,7 +118,7 @@ var EasyCall = Class.create({
 		var response = transport.responseJSON;
 		if (response && !response.error) {
 			// update progress
-			$(this.formitemname+"_progress_text").update(response.progress);
+			$(this.container+"_progress_text").update(response.progress);
 			// if the result indicates that the task is complete
 			if (response.status == "done") {
 				// stop the periodical executor and get the audiofile
@@ -136,7 +134,7 @@ var EasyCall = Class.create({
 
 	// get an audiofile of the recording so we can store it
 	getAudioFile: function() {
-		$(this.formitemname+"_progress_text").update("<?=escapehtml(_L('Saving audio'))?>");
+		$(this.container+"_progress_text").update("<?=escapehtml(_L('Saving audio'))?>");
 		new Ajax.Request('ajaxeasycall.php', {
 			method:'post',
 			parameters: {
@@ -172,8 +170,8 @@ var EasyCall = Class.create({
 
 		switch(type) {
 			case "done":
-				// fire an event that tells the parent it's got an audiofile
-				$(this.container).fire("EasyCall:update", {"audiofileid": this.audiofileid, "audiofilename": this.name});
+				// complete the session
+				this.completeSession();
 				return;
 
 			// clears form validation
@@ -210,9 +208,9 @@ var EasyCall = Class.create({
 		}
 		// if we need a retry button
 		if (needsretry) {
-			$(this.formitemname+"_main").update(icon_button("<?=escapehtml(_L('Clear and try again'))?>", "exclamation", this.formitemname+"_retry")).insert(new Element("div", {style: "clear:both"}));
+			$(this.container).update(icon_button("<?=escapehtml(_L('Clear and try again'))?>", "exclamation", this.container+"_retry")).insert(new Element("div", {style: "clear:both"}));
 			// listen for clicks on the re-record button
-			$(this.formitemname+"_retry").observe(
+			$(this.container+"_retry").observe(
 				"click", this.setupRecord.bind(this)
 			).observe(
 				"click", function() {
@@ -225,41 +223,32 @@ var EasyCall = Class.create({
 	// set up the form for a new recording session
 	setupRecord: function () {
 
-		if (!$(this.formitemname+"_main"))
-			$(this.container).insert(new Element("div",{id: this.formitemname+"_main"}));
-
-		$(this.formitemname+"_main").update().insert(
-			new Element("div",{id: this.formitemname+"_action", style: "margin-bottom: 5px;"})
-		).insert(
-			new Element("div",{style: "clear: both;"})
-		);
-
-		$(this.formitemname+"_main").insert(
-			new Element("div", {"id": this.formitemname+"_callcontrol"}).insert(
-				new Element("input", {"id": this.formitemname+"_phone", autocomplete:"off", type: "text", style: "margin-bottom: 5px; border: 1px solid gray; "+((this.defaultphone == this.nophone)?"color: gray;":"")})
+		$(this.container).update().insert(
+			new Element("div", {"id": this.container+"_callcontrol"}).insert(
+				new Element("input", {"id": this.container+"_phone", autocomplete:"off", type: "text", style: "margin-bottom: 5px; border: 1px solid gray; "+((this.defaultphone == this.nophone)?"color: gray;":"")})
 			).insert(
 				new Element("div", {style: "clear:both"})
 			).insert(
-				icon_button("<?=_L("Call Me to Record")?>", "/diagona/16/151", this.formitemname+"_callme").setStyle({float: "left"})
+				icon_button("<?=_L("Call Me to Record")?>", "/diagona/16/151", this.container+"_callme").setStyle({float: "left"})
 			).insert(
 				new Element("div", {style: "clear:both"})
 			)
 		);
 
-		$(this.formitemname+"_phone").value = this.defaultphone;
-		blankFieldValue($(this.formitemname+"_phone"), this.nophone);
+		$(this.container+"_phone").value = this.defaultphone;
+		blankFieldValue($(this.container+"_phone"), this.nophone);
 
-		$(this.formitemname+"_phone").observe("keydown", function (event) {
+		$(this.container+"_phone").observe("keydown", function (event) {
 			if (Event.KEY_RETURN == event.keyCode) {
 				// clear any form validation errors and stop keytimer
 				this.handleStatus("noerror")
 				window.clearTimeout(this.keytimer);
 				// intercept and stop the event so we don't submit the form
 				Event.stop(event);
-				$(this.formitemname+"_callme").click();
+				$(this.container+"_callme").click();
 			}
 		}.bind(this));
-		$(this.formitemname+"_phone").observe("keyup", function (event) {
+		$(this.container+"_phone").observe("keyup", function (event) {
 			// Set a timer to do phone number validation
 			if (this.keytimer)
 				window.clearTimeout(this.keytimer);
@@ -277,7 +266,12 @@ var EasyCall = Class.create({
 		}.bind(this));
 
 		// call me button starts the recording process
-		$(this.formitemname+"_callme").observe("click", this.record.bind(this));
+		$(this.container+"_callme").observe("click", this.record.bind(this));
+	},
+
+	// fire the event that signifies the session is complete
+	completeSession: function () {
+		$(this.container).fire("EasyCall:update", {"audiofileid": this.audiofileid, "audiofilename": this.name});
 	},
 
 	easycallPhoneValidate: function (phone) {
