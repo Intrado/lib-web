@@ -153,7 +153,7 @@ function insertAndSelectItem (select,name,value) {
 	}
 }
 
-/** 
+/**
 	Function to ensure that at least one item is selected in the select box named
 	by the id in the "id" parameter. The enclosingBlock param is the id of any enclosing block that
 	may control the visibility of the select box.
@@ -161,12 +161,12 @@ function insertAndSelectItem (select,name,value) {
 */
 function isSelected(id, enclosingBlock) {
 	var sel = new getObj(id);
-	
+
 	if (enclosingBlock) {
 		var block = new getObj(enclosingBlock);
 		return (block.style.display != 'none' && sel.obj.selectedIndex > 0);
 	} else {
-		return sel.obj.selectedIndex > 0;	
+		return sel.obj.selectedIndex > 0;
 	}
 }
 
@@ -179,7 +179,7 @@ function isCheckboxChecked(id) {
 	return false;
 }
 
-/* Function to enable or disable the target checkbox if none 
+/* Function to enable or disable the target checkbox if none
 	of the source checkboxes are checked.
 	@param sources An array of the source (i.e., master checkboxed)
 	@param targets An array of the target (i.e., slave checkboxes)
@@ -187,18 +187,18 @@ function isCheckboxChecked(id) {
 function syncCheckboxState(sources, targets) {
 	var chkObj = null;
 	var anyChecked = false;
-	
+
 	for (i = 0; i < sources.length; i++) {
-		source = new getObj(sources[i]).obj;	
+		source = new getObj(sources[i]).obj;
 		if (source.checked) {
-			anyChecked = true;	
+			anyChecked = true;
 		}
 	}
-	
+
 	if (anyChecked) {
 		for (i = 0; i < targets.length; i++) {
 			target = new getObj(targets[i]).obj;
-			target.disabled = false;	
+			target.disabled = false;
 		}
 	} else {
 		for (i = 0; i < targets.length; i++) {
@@ -214,7 +214,7 @@ function confirmDelete () {
 }
 
 
-/* traverses the DOM looking for 
+/* traverses the DOM looking for
 parent = the parent element
 marker = which value to look for in the "dependson" attribute.
 visability = true|false
@@ -269,14 +269,14 @@ function parse_theme_from_url (url) {
 function btn_roll(obj,over) {
 	obj = $(obj);
 	over = over ? "_over" : "";
-	
+
 	var leftimg = obj.down('.left');
 	var rightimg = obj.down('.right');
 	var midtb = obj.down('.middle');
-	
+
 	//parse one of the button images for the theme
-	var theme = parse_theme_from_url(leftimg.src); 
-	
+	var theme = parse_theme_from_url(leftimg.src);
+
 	leftimg.src='img/themes/' + theme + '/button_left' + over + '.gif';
 	rightimg.src='img/themes/' + theme + '/button_right' + over + '.gif';
 	midtb.style.background = "url('img/themes/" + theme + "/button_mid" + over + ".gif') repeat-x";
@@ -293,9 +293,9 @@ function btn_rollout(obj) {
 function windowHide(windowid) {
 	var windowbody = new getObj('window_' + windowid);
 	var collapseicon = new getObj('window_colapseimg_' + windowid);
-	
+
 	var vis = windowbody.style.display != "none";
-	
+
 	if (vis) {
 		windowbody.style.display =  "none" ;
 		collapseicon.obj.src = "img/arrow_right.gif";
@@ -303,7 +303,7 @@ function windowHide(windowid) {
 		windowbody.style.display =  "block" ;
 		collapseicon.obj.src = "img/arrow_down.gif";
 	}
-	
+
 	setState('window_' + windowid, vis ? "closed" : "open");
 }
 
@@ -409,7 +409,7 @@ function ajax_table_update(containerID, uri) {
 
 function do_ajax_listbox(checkbox, personid) {
 	// NOTE: No need to manually toggle the checkbox because the browser will do that automatically.
-	
+
 	if (checkbox.checked) {
 		// Add.
 		cachedAjaxGet('?ajax&addpersonid='+personid, function(transport) {
@@ -440,7 +440,7 @@ var personTips = [];
 function make_person_tip(personid, tiptitle){
 	if (personTips[personid])
 		return;
-		
+
 	personTips[personid] = new Tip('persontip_'+personid,
 		{
 			ajax: {
@@ -450,7 +450,7 @@ function make_person_tip(personid, tiptitle){
 					}
 				}
 			},
-			
+
 			title : tiptitle,
 			style: "protogrey",
 			stem: "leftMiddle",
@@ -490,28 +490,28 @@ function format_thousands_separator(num) {
 function icon_button(name,icon,id) {
 	var newbutton = new Element("button",{"class": "button", type: "button"});
 	newbutton.id = id;
-	
+
 	var buttonface = new Element("td",{"class": "middle"}).insert(new Element("img",{src: "img/icons/"+icon+".gif"})).insert(name);
-	
+
 	var buttonrecord = new Element("tr", {}).insert(new Element("td",{}).insert(new Element("img",{"class": "left", src: "img/themes/"+_brandtheme+"/button_left.gif"}))).insert(buttonface).insert(new Element("td",{}).insert(new Element("img",{"class": "right", src: "img/themes/"+_brandtheme+"/button_right.gif"})));
-	
+
 	var buttonbody = new Element("table",{}).insert(new Element("tbody",{}).insert(buttonrecord));
-	
+
 	newbutton.insert(buttonbody);
-	
+
 	newbutton.observe("mouseover", btn_rollover.bind(this,newbutton));
 	newbutton.observe("mouseout", btn_rollout.bind(this,newbutton));
-	
+
 	return newbutton;
 }
 
 function action_link(name,icon,id) {
 	var newaction = new Element("a", {href: "#", "class": "actionlink", title: name, style: "margin-left: 3px;"});
 	newaction.id = id;
-	
+
 	// TODO: actionlinkmode needs to be checked to display icons and/or titles
 	newaction.insert(new Element("img", {src: "img/icons/"+icon+".gif"})).insert(name);
-	
+
 	return newaction;
 }
 
@@ -529,7 +529,7 @@ function setDefaultFieldValue(value, event) {
 			color: "black"
 		});
 	}
-	
+
 	if (event.type == "blur" && element.value == "") {
 		element.value = value;
 		element.setStyle({
@@ -541,7 +541,7 @@ function setDefaultFieldValue(value, event) {
 // @param textbox, can also be an ID.
 function pickDate (textbox, allowPast, allowFuture, closeOnBlur) {
 	var element = $(textbox);
-	
+
 	var filter = new DatePickerFilter();
 	if (!allowPast)
 		filter.append(DatePickerUtils.noDatesBefore(0));
@@ -564,18 +564,18 @@ function saveHtmlEditorContent() {
 	if (!CKEDITOR) {
 		return null;
 	}
-	
+
 	var instance;
 	if (!CKEDITOR.instances || !(instance = CKEDITOR.instances['reusableckeditor']))
 		return null;
-		
+
 	var container = $('cke_reusableckeditor');
-	
+
 	var textarea = container.previous();
 	var textareauseshtmleditor = textarea && textarea.match('textarea.HtmlEditor');
 	if (textareauseshtmleditor) {
 		var tempdiv = new Element('div').insert(instance.getData());
-		
+
 		// Unstyle any image elements having src="viewimage.php?id=.."
 		var images = tempdiv.select('img');
 		for (var i = 0, count = images.length; i < count; i++) {
@@ -586,19 +586,19 @@ function saveHtmlEditorContent() {
 				//image.replace('((' + matches[1] + '))');
 			}
 		}
-		
+
 		html = tempdiv.innerHTML.replace(/&lt;&lt;/g, '<<').replace(/&gt;&gt;/g, '>>');
-		
+
 		if (images.length < 1) {
 			// CKEditor inserts blank tags even if the user has deleted everything.
 			if (tempdiv.innerHTML.stripTags().strip() == '')
 				html = '';
 		}
-		
-		
+
+
 		textarea.value = html;
 	}
-	
+
 	return {'instance': instance, 'container': container, 'previoustextarea': textareauseshtmleditor ? textarea : null};
 }
 
@@ -611,16 +611,16 @@ function hideHtmlEditor() {
 // NOTE: It is assumed that there be only a single html editor on the page; CKEditor is buggy with multiple instances.
 function applyHtmlEditor(textarea) {
 	textarea = $(textarea);
-	
+
 	var editorobject = saveHtmlEditorContent();
 	if (!editorobject) {
 		if ($('reusableckeditor'))
 			return; // The editor instance is still loading.
-		
+
 		textarea.insert({'before': '<img class="AjaxLoader" src="img/ajax-loader.gif"/>'});
 		textarea.hide();
 		textarea.disabled = true;
-		
+
 		var reusableckeditor = new Element('div', {'id':'reusableckeditor'});
 		if (document.body) {
 			document.body.insert(new Element('div', {'id':'reusableckeditorhider'}).hide().insert(reusableckeditor));
@@ -644,16 +644,49 @@ function applyHtmlEditor(textarea) {
 				applyHtmlEditor(this);
 			}.bindAseventListener(textaera));
 		}
-		
+
 		return;
 	}
-	
+
 	var html = textarea.value.replace("<<", "&lt;&lt;").replace(">>", "&gt;&gt;");//.replace(/\(\((\d+)\)\)/g, "<img src='viewimage.php?id=$1'/>");
 	editorobject.instance.setData(html);
-	
+
 	textarea.hide().addClassName('HtmlEditor').insert({'after':editorobject.container});
 }
 
 function makeTranslatableString(str) {
 	return str.replace(/(<<.*?>>)/, '<input value="$1"/>').replace(/({{.*?}})/, '<input value="$1"/>').replace(/(\[\[.*?\]\])/, '<input value="$1"/>');
+}
+
+// TODO: Make a less annoying version
+// returns a string of the current date in
+function curDate() {
+   var months = new Array(13);
+   months[0]  = "Jan";
+   months[1]  = "Feb";
+   months[2]  = "Mar";
+   months[3]  = "Apr";
+   months[4]  = "May";
+   months[5]  = "Jun";
+   months[6]  = "Jul";
+   months[7]  = "Aug";
+   months[8]  = "Sep";
+   months[9]  = "Oct";
+   months[10] = "Nov";
+   months[11] = "Dec";
+   var now         = new Date();
+   var monthnumber = now.getMonth();
+   var monthname   = months[monthnumber];
+   var monthday    = now.getDate();
+   var year        = now.getFullYear();
+   var hour   = now.getHours();
+   var minute = now.getMinutes();
+   var second = now.getSeconds();
+   var ap = "am";
+   if (hour   > 11) { ap = "pm";             }
+   if (hour   > 12) { hour = hour - 12;      }
+   if (hour   == 0) { hour = 12;             }
+   if (minute < 10) { minute = "0" + minute; }
+   if (second < 10) { second = "0" + second; }
+   return monthname + ' ' + monthday + ', ' + year + " " + hour + ':' + minute + ':' + second + " " + ap;
 }
