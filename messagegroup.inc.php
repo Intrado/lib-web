@@ -2,7 +2,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 // Custom Utility Functions
 ////////////////////////////////////////////////////////////////////////////////
-function makeTranslationItem($type, $subtype, $languagecode, $languagename, $sourcetext, $messagetext, $translationcheckboxlabel, $override, $allowoverride = true, $hidetranslationcheckbox = false, $enabled = true, $disabledinfo = "", $datafields = null, $inautotranslator = false) {
+function makeTranslationItem($required, $type, $subtype, $languagecode, $languagename, $sourcetext, $messagetext, $translationcheckboxlabel, $override, $allowoverride = true, $hidetranslationcheckbox = false, $enabled = true, $disabledinfo = "", $datafields = null, $inautotranslator = false) {
 	$control = array("TranslationItem",
 		"phone" => $type == 'phone',
 		"language" => $languagecode,
@@ -23,7 +23,7 @@ function makeTranslationItem($type, $subtype, $languagecode, $languagename, $sou
 	if (is_array($datafields))
 		$control["fields"] = $datafields;
 
-	$validators = array(array("ValMessageBody"));
+	$validators = array(array("ValMessageBody", "type" => $type, "subtype" => $subtype, "languagecode" => $languagecode));
 
 	if ($type == 'phone') {
 		$validators[] = array("ValLength","max" => 4000);
@@ -31,6 +31,9 @@ function makeTranslationItem($type, $subtype, $languagecode, $languagename, $sou
 	if ($type == 'email' && !$inautotranslator) {
 		$validators[] = array("ValEmailMessageBody");
 	}
+	
+	if ($required)
+		$validators[] = array("ValRequired");
 
 	return array(
 		"label" => ucfirst($languagename),
@@ -57,7 +60,7 @@ function makeFormHtml($html) {
 	);
 }
 
-function makeMessageBody($type, $label, $messagetext, $datafields = null, $usehtmleditor = false, $hideplaybutton = false, $hidden = false) {
+function makeMessageBody($required, $type, $subtype, $languagecode, $label, $messagetext, $datafields = null, $usehtmleditor = false, $hideplaybutton = false, $hidden = false) {
 	$control = array("MessageBody",
 		"playbutton" => $type == 'phone' && !$hideplaybutton,
 		"usehtmleditor" => $usehtmleditor,
@@ -68,7 +71,7 @@ function makeMessageBody($type, $label, $messagetext, $datafields = null, $useht
 	if (is_array($datafields))
 		$control["fields"] = $datafields;
 
-	$validators = array(array("ValMessageBody"));
+	$validators = array(array("ValMessageBody", "type" => $type, "subtype" => $subtype, "languagecode" => $languagecode));
 
 	if ($type == 'phone') {
 		$validators[] = array("ValLength","max" => 4000);
@@ -76,6 +79,9 @@ function makeMessageBody($type, $label, $messagetext, $datafields = null, $useht
 	if ($type == 'email') {
 		$validators[] = array("ValEmailMessageBody");
 	}
+	
+	if ($required)
+		$validators[] = array("ValRequired");
 
 	return array(
 		"label" => $label,
