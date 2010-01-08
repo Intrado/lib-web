@@ -323,7 +323,7 @@ class ValHasMessage extends Validator {
 	function validate ($value, $args) {
 		global $USER;
 		if ($value == 'pick') {
-			$msgcount = (QuickQuery("select count(id) from message where userid=? and not deleted and type=?", false, array($USER->id, $args['type'])));
+			$msgcount = (QuickQuery("select count(*) from message where userid=? and not deleted and type=?", false, array($USER->id, $args['type'])));
 			if (!$msgcount)
 				return "$this->label: ". _L('There are no saved messages of this type.');
 		}
