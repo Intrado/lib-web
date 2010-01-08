@@ -54,7 +54,7 @@ $isajax = isset($_GET['ajax']);
 $mergeditems = array();
 if($isajax === true) {
 	$start = 0 + (isset($_GET['pagestart']) ? $_GET['pagestart'] : 0);
-	$limit = 20;
+	$limit = 5;
 	$orderby = "modified";
 	session_write_close();//WARNING: we don't keep a lock on the session file, any changes to session data are ignored past this point
 
@@ -67,7 +67,7 @@ if($isajax === true) {
 			select 'message' as type,'Saved' as status,g.id as id, g.name as name, g.modified as date, g.deleted as deleted,
 			 sum(type='phone') as phone, sum(type='email') as email,sum(type='sms') as sms
 			from messagegroup g, message m where g.userid=? and g.deleted = 0 and g.modified is not null and m.messagegroupid = g.id
-			group by m.languagecode order by g.modified desc limit 10 ",true,false,array($USER->id));
+			group by g.id,m.languagecode order by g.modified desc limit $start, $limit",true,false,array($USER->id));
 
 
 	$total = QuickQuery("select FOUND_ROWS()");
@@ -180,7 +180,7 @@ function activityfeed($mergeditems,$ajax = false) {
 											"defaultlink" => "",
 											"defaultonclick" => "",
 											"icon" => "largeicons/information.jpg",
-											"title" => _L("No Lists."),
+											"title" => _L("No Messages."),
 											"content" => "",
 											"tools" => "");
 		} else {
@@ -337,7 +337,6 @@ $activityfeed = '
 				</tr>
 			</table>';
 			echo $activityfeed;
-
 endWindow();
 
 /*
