@@ -339,7 +339,7 @@ $helpsteps[] = _L("The name of your job. The best names are brief and discriptiv
 		"validators" => array(
 			array("ValRequired"),
 			array("ValDuplicateNameCheck","type" => "job"),
-			array("ValLength","max" => 30)
+			array("ValLength","max" => ($JOBTYPE == "repeating")?30:50)
 		),
 		"control" => array("TextField","size" => 30, "maxlength" => 51),
 		"helpstep" => 1
@@ -721,7 +721,8 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		$job->name = $postdata['name'];
 		$job->description = $postdata['description'];
 		$job->modifydate = date("Y-m-d H:i:s", time());
-
+		$job->type = 'notification';
+		
 		if($completedmode) {
 			$job->update();
 		} else {
