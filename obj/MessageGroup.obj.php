@@ -1,6 +1,7 @@
 <?php
 class MessageGroup extends DBMappedObject {
 	var $userid;
+	var $defaultlanguagecode;
 	var $name;
 	var $description;
 	var $modified;
@@ -13,6 +14,7 @@ class MessageGroup extends DBMappedObject {
 		$this->_tablename = "messagegroup";
 		$this->_fieldlist = array(
 			"userid",
+			"defaultlanguagecode",
 			"name",
 			"description",
 			"modified",
@@ -25,11 +27,15 @@ class MessageGroup extends DBMappedObject {
 		DBMappedObject::DBMappedObject($id);
 	}
 	
+	// Returns true/false; true if the user has a message with its defaultlanguagecode.
+	function hasDefaultMessage($type, $subtype) {
+		$query = 'select count(id) from message where not deleted and messagegroupid=? and type=? and subtype=? and languagecode=?';
+		return QuickQuery($query, false, array($this->id, $type, $subtype, $this->defaultlanguagecode)) ? true : false;
+	}
+	
 	function hasMessage($type, $subtype = null, $languagecode = null) {
-		global $USER;
-		
-		$query = 'select count(id) from message where userid=? and messagegroupid=? and not deleted and type=? ';
-		$args = array($USER->id, $this->id, $type);
+		$query = 'select count(id) from message where not deleted and messagegroupid=? and type=? ';
+		$args = array($this->id, $type);
 		
 		if (is_string($subtype)) {
 			$query .= ' and subtype=? ';
