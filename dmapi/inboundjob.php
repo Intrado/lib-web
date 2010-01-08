@@ -324,7 +324,7 @@ function commitJob()
 	$job= Job::jobWithDefaults();
 
 	$job->name = "Call In - " . date("M j, Y g:i a");
-	$job->type = "phone";
+	$job->type = "notification";
 
 	$job->createdate = date("Y-m-d");
 	$job->startdate = date("Y-m-d");
