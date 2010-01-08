@@ -316,7 +316,20 @@ ALTER TABLE `smsblock` ADD INDEX `dispatch` ( `status` , `lastupdate` , `timezon
 ALTER TABLE `smsblock` DROP INDEX `status` ;
 
 DROP TABLE `jobstatdata` ;
+
+-- now use customer.joblist 
+DROP TABLE `qjoblist`;
+
+-- now use customer.jobsetting
+DROP TABLE `qjobsetting`;
+
+-- now use customer.job for these fields
+ALTER TABLE `qjob`
+  DROP `phonemessageid`,
+  DROP `emailmessageid`,
+  DROP `printmessageid`,
+  DROP `smsmessageid`,
+  DROP `jobtypeid`;
  
-
-
+ALTER TABLE `qjob` ADD `messagegroupid` INT default NULL AFTER `scheduleid` ;
 
