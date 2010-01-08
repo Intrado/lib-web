@@ -54,8 +54,8 @@ $isajax = isset($_GET['ajax']);
 $mergeditems = array();
 if($isajax === true) {
 	$start = 0 + (isset($_GET['pagestart']) ? $_GET['pagestart'] : 0);
-	$limit = 5;
-	$orderby = "modified";
+	$limit = 20;
+	$orderby = "modified desc";
 	session_write_close();//WARNING: we don't keep a lock on the session file, any changes to session data are ignored past this point
 
 	switch ($filter) {
@@ -64,14 +64,13 @@ if($isajax === true) {
 			break;
 	}
 	$mergeditems = QuickQueryMultiRow("
-			select 'message' as type,'Saved' as status,g.id as id, g.name as name, g.modified as date, g.deleted as deleted,
+			select SQL_CALC_FOUND_ROWS 'message' as type,'Saved' as status,g.id as id, g.name as name, g.modified as date, g.deleted as deleted,
 			 sum(type='phone') as phone, sum(type='email') as email,sum(type='sms') as sms
 			from messagegroup g, message m where g.userid=? and g.deleted = 0 and g.modified is not null and m.messagegroupid = g.id
-			group by g.id,m.languagecode order by g.modified desc limit $start, $limit",true,false,array($USER->id));
+			group by g.id,m.languagecode order by g.$orderby limit $start,$limit",true,false,array($USER->id));
 
 
 	$total = QuickQuery("select FOUND_ROWS()");
-	
 	$numpages = ceil($total/$limit);
 	$curpage = ceil($start/$limit) + 1;
 	$displayend = ($start + $limit) > $total ? $total : ($start + $limit);
@@ -229,10 +228,11 @@ function activityfeed($mergeditems,$ajax = false) {
 				<script>
 				var actionids = $actioncount;
 
-				var jobfiltes = Array('none','date','name');
+				var filtes = Array('date','name');
+				var activepage = 0;
 
 				function applyfilter(filter) {
-						new Ajax.Request('messages.php?ajax=true&filter=' + filter, {
+						new Ajax.Request('messages.php?ajax=true&filter=' + filter + '&pagestart=' + activepage, {
 							method:'get',
 							onSuccess: function (response) {
 								var result = response.responseJSON;
@@ -251,30 +251,36 @@ function activityfeed($mergeditems,$ajax = false) {
 										html += '</tr>';
 									}
 									$('feeditems').update(html);
+									var pagetop = new Element('div',{style: 'float:right;'});
+									var pagebottom = new Element('div',{style: 'float:right;'});
 
-									var pageselect = $('pageselector').remove();
-
-									pageselect.update(result.pageinfo[3]);
-									var select = new Element('select', {onchange: 'alert(\'Not implemented yet\')'});
+									pagetop.update(result.pageinfo[3]);
+									pagebottom.update(result.pageinfo[3]);
+									var selecttop = new Element('select', {onchange: 'activepage = this.value;applyfilter(\'' + filter + '\');'});
+									var selectbottom = new Element('select', {onchange: 'activepage = this.value;applyfilter(\'' + filter + '\');'});
 									for (var x = 0; x < result.pageinfo[0]; x++) {
 										var offset = x * result.pageinfo[1];
-										var selected = (result.pageinfo[2] == x+1) ? 'selected' : '';
-										var opt = new Element('option', {value: 'offset'});
-										opt.update('Page ' + (x+1));
-										select.insert(opt);
+										var opttop = new Element('option', {value: offset});
+										var optbottom = new Element('option', {value: offset});
+										optbottom.selected = opttop.selected = (result.pageinfo[2] == x+1) ? 'selected' : '';
+										opttop.update('Page ' + (x+1));
+										optbottom.update('Page ' + (x+1));
+										selecttop.insert(opttop);
+										selectbottom.insert(optbottom);
 									}
-
-									pageselect.insert(select);
-
-									$('pagewrapper').insert(pageselect);
+									pagetop.insert(selecttop);
+									pagebottom.insert(selectbottom);
+									$('pagewrappertop').update(pagetop);
+									$('pagewrapperbottom').update(pagebottom);
 
 									var filtercolor = $('filterby').getStyle('color');
 									if(!filtercolor)
 										filtercolor = '#000';
 
-									size = jobfiltes.length;
+									size = filtes.length;
 									for(i=0;i<size;i++){
-										$(jobfiltes[i] + 'filter').setStyle({color: filtercolor, fontWeight: 'normal'});
+										//console.info($(jobfiltes[i] + 'filter'));
+										$(filtes[i] + 'filter').setStyle({color: filtercolor, fontWeight: 'normal'});
 									}
 									$(filter + 'filter').setStyle({
 	 									 color: '#000000',
@@ -287,7 +293,7 @@ function activityfeed($mergeditems,$ajax = false) {
 						});
 				}
 				document.observe('dom:loaded', function() {
-					applyfilter('none');
+					applyfilter('date');
 				});
 				</script>";
 
@@ -320,96 +326,26 @@ $activityfeed = '
 						<br />
 						<h1 id="filterby">Sort By:</h1>
 						<div id="allfilters" class="feedfilter">
-							<a id="listsfilter" href="lists.php?filter=date" onclick="applyfilter(\'date\'); return false;"><img src="img/largeicons/tiny20x20/clock.jpg">Modify Date</a><br />
-							<a id="listsfilter" href="lists.php?filter=name" onclick="applyfilter(\'name\'); return false;"><img src="img/largeicons/tiny20x20/pencil.jpg">Name</a><br />
+							<a id="datefilter" href="lists.php?filter=date" onclick="applyfilter(\'date\'); return false;"><img src="img/largeicons/tiny20x20/clock.jpg">Modify Date</a><br />
+							<a id="namefilter" href="lists.php?filter=name" onclick="applyfilter(\'name\'); return false;"><img src="img/largeicons/tiny20x20/pencil.jpg">Name</a><br />
 						</div>
 					</td>
 					<td width="10px" style="border-left: 1px dotted gray;" >&nbsp;</td>
 					<td class="feed" valign="top" >
+						<div id="pagewrappertop"></div>
+
 						<table id="feeditems">
 				';
 
 				$activityfeed .= activityfeed($mergeditems,false);
 				$activityfeed .= '</table>
 						<br />
-						<div id="pagewrapper"><div id="pageselector"></div></div>
+						<div id="pagewrapperbottom"></div>
 					</td>
 				</tr>
 			</table>';
 			echo $activityfeed;
 endWindow();
-
-/*
-
-$scrollThreshold = 8;
-
-if($USER->authorize('sendphone')) {
-	$data = DBFindMany("Message",", (name + 0) as foo from message where type='phone' and userid=$USER->id and deleted=0 order by foo, name");
-	$scroll = false;
-	if (count($data) > $scrollThreshold) {
-		$scroll = true;
-	}
-	startWindow('My Phone Messages ' . help('Messages_MyPhoneMessages'), 'padding: 3px;', true, true);
-
-	if ($USER->authorize('starteasy')) {
-		button_bar(button('Call Me To Record', "document.location='callme.php?origin=messages'") . help('AudioFileEditor_CallMeToRecord'),
-			button('Create Advanced Message', "document.location='messagephone.php?id=new'") . help('Messages_AddPhoneMessage'),
-			button('Audio Library', "popup('audio.php',500,400);") . help('Messages_AudioFileEditor'));
-	} else {
-		button_bar(button('Create Advanced Message', "document.location='messagephone.php?id=new'") . help('Messages_AddPhoneMessage'),
-			button('Audio Library', "popup('audio.php',500,400);") . help('Messages_AudioFileEditor'));
-	}
-
-
-
-	$phonetitles = array(	"name" => "#Name",
-						"description" => "#Description",
-						"Type" => "#Type",
-						"Actions" => "Actions"
-					);
-
-	showObjects($data, $phonetitles, array("Type" => "fmt_phonetype", "Actions" => "fmt_actions", "userid" => "fmt_creator"), $scroll, true);
-	endWindow();
-	echo '<br>';
-}
-
-
-$titles = array(	"name" => "#Name",
-					"description" => "#Description",
-					"Actions" => "Actions"
-					);
-
-
-if($USER->authorize('sendemail')) {
-	$data = DBFindMany("Message",", (name + 0) as foo from message where type='email' and userid=$USER->id and deleted=0 order by foo, name");
-	$scroll = false;
-	if (count($data) > $scrollThreshold) {
-		$scroll = true;
-	}
-	startWindow('My Email Messages ' . help('Messages_MyEmailMessages'), 'padding: 3px;', true, true);
-
-	button_bar(button('Create Email Message', NULL,'messageemail.php?id=new') . help('Messages_AddEmailMessage'));
-
-	showObjects($data, $titles, array("Actions" => "fmt_actions", "userid" => "fmt_creator"), $scroll, true);
-	endWindow();
-	echo '<br>';
-}
-
-if(getSystemSetting('_hassms', false) && $USER->authorize('sendsms')) {
-	$data = DBFindMany("Message",", (name + 0) as foo from message where type='sms' and userid=$USER->id and deleted=0 order by foo, name");
-	$scroll = false;
-	if (count($data) > $scrollThreshold) {
-		$scroll = true;
-	}
-	startWindow('My SMS Messages ' . help('Messages_MySmsMessages'), 'padding: 3px;', true, true);
-
-	button_bar(button('Create SMS Message', NULL,'messagesms.php?id=new') . help('Messages_AddSmsMessage'));
-
-	showObjects($data, $titles, array("Actions" => "fmt_actions", "userid" => "fmt_creator"), $scroll, true);
-	endWindow();
-	echo '<br>';
-}
-*/
 
 include_once("navbottom.inc.php");
 ?>

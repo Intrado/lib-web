@@ -54,22 +54,24 @@ if($isajax === true) {
 
 	$start = 0 + (isset($_GET['pagestart']) ? $_GET['pagestart'] : 0);
 	$limit = 20;
+	$orderby = "modifydate desc";
 	session_write_close();//WARNING: we don't keep a lock on the session file, any changes to session data are ignored past this point
 	switch ($filter) {
-		case "date":
-			$mergeditems = QuickQueryMultiRow("select 'list' as type,'Saved' as status, id, name, modifydate as date, lastused from list where userid=? and deleted = 0  and modifydate is not null order by modifydate desc",true,false,array($USER->id));
-			break;
 		case "name":
-			$mergeditems = QuickQueryMultiRow("select 'list' as type,'Saved' as status, id, name, modifydate as date, lastused, (name +0) as digitsfirst from list where userid=? and deleted = 0  and modifydate is not null order by digitsfirst",true,false,array($USER->id));
+			$orderby = "name";
 			break;
-		default:
-			$mergeditems = QuickQueryMultiRow("select 'list' as type,'Saved' as status, id, name, modifydate as date, lastused from list where userid=? and deleted = 0  and modifydate is not null order by modifydate desc limit $start, $limit",true,false,array($USER->id));
-		break;
 	}
+	$mergeditems = QuickQueryMultiRow("select  SQL_CALC_FOUND_ROWS 'list' as type,'Saved' as status, id, name, modifydate as date, lastused from list where userid=? and deleted = 0  and modifydate is not null order by $orderby limit $start, $limit",true,false,array($USER->id));
+
 	$total = QuickQuery("select FOUND_ROWS()");
+	$numpages = ceil($total/$limit);
+	$curpage = ceil($start/$limit) + 1;
+	$displayend = ($start + $limit) > $total ? $total : ($start + $limit);
+	$displaystart = ($total) ? $start +1 : 0;
 
 	header('Content-Type: application/json');
-	$data = activityfeed($mergeditems,true);
+	$data->list = activityfeed($mergeditems,true);
+	$data->pageinfo = array($numpages,$limit,$curpage, "Showing $displaystart - $displayend of $total records on $numpages pages ");
 	echo json_encode(!empty($data) ? $data : false);
 	exit();
 }
@@ -146,7 +148,7 @@ function activityfeed($mergeditems,$ajax = false) {
 				<script>
 				var actionids = $actioncount;
 
-				var jobfiltes = Array('none','date','name');
+				var filtes = Array('date','name');
 
 				function applyfilter(filter) {
 						new Ajax.Request('lists.php?ajax=true&filter=' + filter, {
@@ -155,11 +157,11 @@ function activityfeed($mergeditems,$ajax = false) {
 								var result = response.responseJSON;
 								if(result) {
 									var html = '';
-									var size = result.length;
+									var size = result.list.length;
 
 									actionids = 0;
 									for(i=0;i<size;i++){
-										var item = result[i];
+										var item = result.list[i];
 										html += '<tr><td valign=\"top\" width=\"60px\"><a href=\"' + item.defaultlink + '\" ' + item.defaultonclick + '><img src=\"img/' + item.icon + '\" /></a></td><td ><div class=\"feedtitle\"><a href=\"' + item.defaultlink + '\" ' + item.defaultonclick + '>' + item.title + '</a></div><span>' + item.content + '</span></td>';
 										if(item.tools) {
 											html += '<td valign=\"middle\" width=\"100px\"><div>' + item.tools + '</div></td>';
@@ -168,14 +170,35 @@ function activityfeed($mergeditems,$ajax = false) {
 										html += '</tr>';
 									}
 									$('feeditems').update(html);
+									var pagetop = new Element('div',{style: 'float:right;'});
+									var pagebottom = new Element('div',{style: 'float:right;'});
+
+									pagetop.update(result.pageinfo[3]);
+									pagebottom.update(result.pageinfo[3]);
+									var selecttop = new Element('select', {onchange: 'activepage = this.value;applyfilter(\'' + filter + '\');'});
+									var selectbottom = new Element('select', {onchange: 'activepage = this.value;applyfilter(\'' + filter + '\');'});
+									for (var x = 0; x < result.pageinfo[0]; x++) {
+										var offset = x * result.pageinfo[1];
+										var opttop = new Element('option', {value: offset});
+										var optbottom = new Element('option', {value: offset});
+										optbottom.selected = opttop.selected = (result.pageinfo[2] == x+1) ? 'selected' : '';
+										opttop.update('Page ' + (x+1));
+										optbottom.update('Page ' + (x+1));
+										selecttop.insert(opttop);
+										selectbottom.insert(optbottom);
+									}
+									pagetop.insert(selecttop);
+									pagebottom.insert(selectbottom);
+									$('pagewrappertop').update(pagetop);
+									$('pagewrapperbottom').update(pagebottom);
 
 									var filtercolor = $('filterby').getStyle('color');
 									if(!filtercolor)
 										filtercolor = '#000';
 
-									size = jobfiltes.length;
+									size = filtes.length;
 									for(i=0;i<size;i++){
-										$(jobfiltes[i] + 'filter').setStyle({color: filtercolor, fontWeight: 'normal'});
+										$(filtes[i] + 'filter').setStyle({color: filtercolor, fontWeight: 'normal'});
 									}
 									$(filter + 'filter').setStyle({
 	 									 color: '#000000',
@@ -188,7 +211,7 @@ function activityfeed($mergeditems,$ajax = false) {
 						});
 				}
 				document.observe('dom:loaded', function() {
-					applyfilter('none');
+					applyfilter('date');
 				});
 				</script>";
 
@@ -288,17 +311,19 @@ $activityfeed = '
 						<br />
 						<h1 id="filterby">Sort By:</h1>
 						<div id="allfilters" class="feedfilter">
-							<a id="listsfilter" href="lists.php?filter=date" onclick="applyfilter(\'date\'); return false;"><img src="img/largeicons/tiny20x20/clock.jpg">Modify Date</a><br />
-							<a id="listsfilter" href="lists.php?filter=name" onclick="applyfilter(\'name\'); return false;"><img src="img/largeicons/tiny20x20/pencil.jpg">Name</a><br />
+							<a id="datefilter" href="lists.php?filter=date" onclick="applyfilter(\'date\'); return false;"><img src="img/largeicons/tiny20x20/clock.jpg">Modify Date</a><br />
+							<a id="namefilter" href="lists.php?filter=name" onclick="applyfilter(\'name\'); return false;"><img src="img/largeicons/tiny20x20/pencil.jpg">Name</a><br />
 						</div>
 					</td>
 					<td width="10px" style="border-left: 1px dotted gray;" >&nbsp;</td>
 					<td class="feed" valign="top" >
+						<div id="pagewrappertop"></div>
 						<table id="feeditems">
 				';
 
 				$activityfeed .= activityfeed($mergeditems,false);
 				$activityfeed .= '</table>
+						<div id="pagewrapperbottom"></div>
 					</td>
 				</tr>
 			</table>';
