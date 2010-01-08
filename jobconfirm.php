@@ -285,7 +285,7 @@ startWindow("Confirmation &amp; Submit");
 	</tr>
 
 	<tr valign="top">
-		<th align="right" class="windowRowHeader bottomBorder">Message:</th>
+		<th align="right" class="windowRowHeader bottomBorder">Advanced Options:</th>
 		<td class="bottomBorder">
 			<table border="0" cellpadding="2" cellspacing="0" width=100%>
 <? if($USER->authorize('leavemessage')) { ?>
