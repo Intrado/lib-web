@@ -425,13 +425,16 @@ class ValPhone extends Validator {
 						return label + " seems to be invalid.";
 					}
 					return true;
-				} else if (minlength != 10 || maxlength != 10) {
-					if (phone.length < minlength)
-						return label + " is invalid. The phone number or extension must be at least " + minlength + " digits long.\nYou do not need to include a 1 for long distance.";
-					if (phone.length > maxlength)
-						return label + " is invalid. The phone number or extension must be no more than " + maxlength + " digits long.\nYou do not need to include a 1 for long distance.";
 				} else {
-					return label + " is invalid. The phone number must be exactly 10 digits long (including area code).\nYou do not need to include a 1 for long distance.";
+					if (minlength != 10 || maxlength != 10) {
+						if (phone.length < minlength)
+							return label + " is invalid. The phone number or extension must be at least " + minlength + " digits long.\nYou do not need to include a 1 for long distance.";
+						if (phone.length > maxlength)
+							return label + " is invalid. The phone number or extension must be no more than " + maxlength + " digits long.\nYou do not need to include a 1 for long distance.";
+					} else {
+						return label + " is invalid. The phone number must be exactly 10 digits long (including area code).\nYou do not need to include a 1 for long distance.";
+					}
+					return true;
 				}
 			}';
 	}
