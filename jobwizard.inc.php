@@ -224,18 +224,13 @@ class EasyCall extends FormItem {
 		else
 			$languages = array();
 
-		$min = (isset($this->args['min']) && $this->args['min'])?$this->args['min']:"10";
-		$max = (isset($this->args['max']) && $this->args['min'])?$this->args['max']:"10";
-
-		$nophone = _L("Phone Number");
-		$defaultphone = escapehtml((isset($this->args['phone']) && $this->args['phone'])?Phone::format($this->args['phone']):$nophone);
+		$defaultphone = escapehtml((isset($this->args['phone']) && $this->args['phone'])?Phone::format($this->args['phone']):addslashes(_L("Phone Number")));
 		if (!$value)
 			$value = '{}';
 		// Hidden input item to store values in
 		$str = '<input id="'.$n.'" name="'.$n.'" type="hidden" value="'.escapehtml($value).'" />
-		<div>
-			<div id="'.$n.'_content" style="padding: 6px; white-space:nowrap">
-			</div>
+		<div style="padding-bottom: 6px">
+			<div id="'.$n.'_content" style="padding-bottom: 6px; padding-left: 6px; padding-top: 0px; margin: 0px; white-space:nowrap"></div>
 			<div id="'.$n.'_altlangs" style="clear: both; padding: 5px; display: none">';
 		if (count($languages)) {
 			$str .= '
@@ -250,53 +245,39 @@ class EasyCall extends FormItem {
 		</div>
 		';
 
-		// include the easycall javascript object. then load existing values.
+		// include the easycall javascript object, extend it's functionality, then load existing values.
 		$str .= '<script type="text/javascript" src="script/easycall.js.php"></script>
+			<script type="text/javascript" src="script/wizeasycall.js.php"></script>
 			<script type="text/javascript">
+				// get the current audiofiles from the form data
 				var msgs = '.$value.';
+
+				// store the language code to name map in a json object, we need this in WizEasyCall
 				var languages = '.json_encode($languages).';
-				// remember phone number the user enters
-				var msgphone = null;
-				// Load default. it is a special case
-				new Easycall(
-					"'.$this->form->name.'",
-					"'.$n.'",
-					"Default",
-					"'.$min.'",
-					"'.$max.'",
-					"'.$defaultphone.'",
-					"'.$nophone.'",
-					true
-				).load();
+
+				// save default phone into msgphone, this variable tracks changes the user makes to desired call me number
+				msgphone = "'.$defaultphone.'";
+
+				// load up all the audiofiles from form data
 				Object.keys(msgs).each(function(langcode) {
-					new Easycall(
-						"'.$this->form->name.'",
-						"'.$n.'",
-						langcode,
-						"'.$min.'",
-						"'.$max.'",
-						"'.$defaultphone.'",
-						"'.$nophone.'",
-						true
-					).load();
+
+					// create a new wizard easycall
+					insertNewWizEasyCall( "'.$this->form->name.'", "'.$n.'", "'.$n.'_content", "'.$n.'_select", langcode );
 				});
-				if ($("'.$n.'_select")) {
-					$("'.$n.'_select").observe("change", function (event) {
-						e = event.element();
-						if (e.value == 0)
-							return;
-						new Easycall(
-							"'.$this->form->name.'",
-							"'.$n.'",
-							$("'.$n.'_select").value,
-							"'.$min.'",
-							"'.$max.'",
-							"'.$defaultphone.'",
-							"'.$nophone.'",
-							true
-						).setupRecord();
-					});
-				}
+
+				// listen for selections from the _select element
+				$("'.$n.'_select").observe("change", function (event) {
+					e = event.element();
+					if (e.value == 0)
+						return;
+
+					var langcode = $("'.$n.'_select").value;
+
+					// create a new wizard easycall
+					insertNewWizEasyCall( "'.$this->form->name.'", "'.$n.'", "'.$n.'_content", "'.$n.'_select", langcode );
+
+				});
+
 			</script>';
 		return $str;
 	}
@@ -1037,9 +1018,7 @@ class JobWiz_messagePhoneEasyCall extends WizStep {
 			"control" => array(
 				"EasyCall",
 				"phone"=>$USER->phone,
-				"languages"=>$langs,
-				"max" => getSystemSetting('easycallmax',10),
-				"min" => getSystemSetting('easycallmin',10)
+				"languages"=>$langs
 			),
 			"helpstep" => 1
 		);
@@ -1146,9 +1125,10 @@ class JobWiz_messageEmailText extends WizStep {
 			"fieldhelp" => _L('Recipients will see this name as the sender of the email.'),
 			"value" => $USER->firstname . " " . $USER->lastname,
 			"validators" => array(
-					array("ValRequired","ValLength","min" => 3,"max" => 50)
+					array("ValRequired"),
+					array("ValLength","max" => 50)
 					),
-			"control" => array("TextField","size" => 25, "maxlength" => 51),
+			"control" => array("TextField","size" => 25, "maxlength" => 50),
 			"helpstep" => 1
 		);
 
@@ -1159,7 +1139,7 @@ class JobWiz_messageEmailText extends WizStep {
 			"value" => $USER->email,
 			"validators" => array(
 				array("ValRequired"),
-				array("ValLength","min" => 3,"max" => 255),
+				array("ValLength","max" => 255),
 				array("ValEmail")
 				),
 			"control" => array("TextField","max"=>255,"min"=>3,"size"=>35),
@@ -1173,7 +1153,7 @@ class JobWiz_messageEmailText extends WizStep {
 			"value" => $postdata['/start']['name'],
 			"validators" => array(
 				array("ValRequired"),
-				array("ValLength","min" => 3,"max" => 255)
+				array("ValLength","max" => 255)
 			),
 			"control" => array("TextField","max"=>255,"min"=>3,"size"=>45),
 			"helpstep" => 3
@@ -1604,7 +1584,6 @@ class JobWiz_scheduleAdvanced extends WizStep {
 					"fieldhelp" => _L('This option will set the Caller ID when the person is called.'),
 					"value" => Phone::format($USER->getSetting("callerid", getSystemSetting("callerid"))),
 					"validators" => array(
-						array("ValLength","min" => 3,"max" => 20),
 						array("ValPhone")
 					),
 					"control" => array("TextField","maxlength" => 20, "size" => 15),
