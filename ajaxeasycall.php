@@ -21,10 +21,23 @@ header("Content-Type: application/json");
 function taskNew($phone) {
 	global $USER;
 
-	// Parse the phone to remove invalid junk and validate that it's a phone number
+	// get min and max extension length
+	$min = getSystemSetting('easycallmin',10);
+	$max = getSystemSetting('easycallmin',10);
+
 	$phone = Phone::parse($phone);
-	if (!$phone)
-		return array("error"=>"badphone");
+
+	// if this should be a 10 digit number, call phone validate on it
+	if ($min == $max && $min == 10) {
+		// phone validate returns an array of strings when validation fails
+		if (Phone::validate($phone))
+			return array("error"=>"badphone");
+	} else {
+		// check that phone length is in the allowable range if less than 10-digits is allowed
+		$pl = length($phone);
+		if ($pl < $min || $pl > $max)
+			return array("error"=>"badphone");
+	}
 
 	// create a new special task
 	$task = new SpecialTask();
@@ -81,11 +94,6 @@ function createaudiofile($id, $name = "") {
 	$contentid = $task->getData('contentid');
 	$content = DBFind("Content", "from content where id = ?", false, array($contentid));
 	if (!$content)
-		return array("error"=>"saveerror");
-
-	// check that the requested audiofile name doesn't already exist for this user
-	$audiofilecheck = DBFind("AudioFile", "from audiofile where not deleted and userid = ? and name = ?", false, array($USER->id, $name));
-	if ($audiofilecheck)
 		return array("error"=>"saveerror");
 
 	// create an audio file belonging to this user and return it's id
