@@ -1,7 +1,6 @@
 <?
-require_once("../inc/utils.inc.php");
+require_once("../inc/subdircommon.inc.php");
 require_once("../inc/html.inc.php");
-require_once("../inc/locale.inc.php");
 
 //set expire time to + 1 hour so browsers cache this file
 header("Expires: " . gmdate('D, d M Y H:i:s', time() + 60*60) . " GMT"); //exire in 1 hour, but if theme changes so will hash pointing to this file
@@ -16,20 +15,21 @@ var EasyCall = Class.create({
 	//	formname: name of the parent form
 	//	formitemname: name of the parent form item
 	//	container: parent form container
-	//	minlength: minimum phone number length
-	//	maxlength: maximum phone number length
 	//	defaultphoneval: default phone number
 	//	name: text to use as audiofile name
-	initialize: function(formname, formitemname, container, minlength, maxlength, defaultphoneval, name) {
+	initialize: function(formname, formitemname, container, defaultphoneval, name) {
 		this.formname = formname;
 		this.formitemname = formitemname;
 		this.container = container;
-		this.validatorargs = {"min": this.minlength, "max": this.maxlength};
+		this.validatorargs = {
+			"min": "<?=getSystemSetting('easycallmin',10)?>",
+			"max": "<?=getSystemSetting('easycallmax',10)?>"
+		};
 		this.defaultphone = defaultphoneval;
 		this.name = name;
 		this.specialtaskid = null;
 		this.audiofileid = null;
-		this.nophone = "<?=escapehtml(_L('Phone Number'))?>";
+		this.nophone = "<?=addslashes(_L('Phone Number'))?>";
 		this.keytimer = null;
 
 		// setup up the record controls
@@ -63,7 +63,7 @@ var EasyCall = Class.create({
 		);
 
 		// set the progress text so the user knows something is happening in the background
-		$(this.container+"_progress_text").update("<?=escapehtml(_L('Starting up call... Please wait.'))?>");
+		$(this.container+"_progress_text").update("<?=addslashes(_L('Starting up call... Please wait.'))?>");
 
 		// do ajax to start the specialtask
 		new Ajax.Request('ajaxeasycall.php', {
@@ -84,7 +84,7 @@ var EasyCall = Class.create({
 	// handles successful return of recording ajax call
 	handleRecord: function(transport) {
 		// update progress
-		$(this.container+"_progress_text").update("<?=escapehtml(_L('Call started... Your phone should ring shortly.'))?>");
+		$(this.container+"_progress_text").update("<?=addslashes(_L('Call started... Your phone should ring shortly.'))?>");
 		var response = transport.responseJSON;
 		if (response && !response.error) {
 			// if successful start, hand off to update
@@ -134,7 +134,7 @@ var EasyCall = Class.create({
 
 	// get an audiofile of the recording so we can store it
 	getAudioFile: function() {
-		$(this.container+"_progress_text").update("<?=escapehtml(_L('Saving audio'))?>");
+		$(this.container+"_progress_text").update("<?=addslashes(_L('Saving audio'))?>");
 		new Ajax.Request('ajaxeasycall.php', {
 			method:'post',
 			parameters: {
@@ -181,22 +181,22 @@ var EasyCall = Class.create({
 
 			case "notask":
 				needsretry = true;
-				form_validation_display(this.formitemname, "error", "<?=escapehtml(_L('No valid request was found'))?>");
+				form_validation_display(this.formitemname, "error", "<?=addslashes(_L('No valid request was found'))?>");
 				break;
 
 			case "callended":
 				needsretry = true;
-				form_validation_display(this.formitemname, "error", "<?=escapehtml(_L('Call ended early'))?>");
+				form_validation_display(this.formitemname, "error", "<?=addslashes(_L('Call ended early'))?>");
 				break;
 
 			case "starterror":
 				needsretry = true;
-				form_validation_display(this.formitemname, "error", "<?=escapehtml(_L('Couldn\'t initiate request'))?>");
+				form_validation_display(this.formitemname, "error", "<?=addslashes(_L('Couldn\'t initiate request'))?>");
 				break;
 
 			case "saveerror":
 				needsretry = true;
-				form_validation_display(this.formitemname, "error", "<?=escapehtml(_L('There was a problem saving your audio'))?>");
+				form_validation_display(this.formitemname, "error", "<?=addslashes(_L('There was a problem saving your audio'))?>");
 				break;
 
 			case "badphone":
@@ -208,7 +208,7 @@ var EasyCall = Class.create({
 		}
 		// if we need a retry button
 		if (needsretry) {
-			$(this.container).update(icon_button("<?=escapehtml(_L('Clear and try again'))?>", "exclamation", this.container+"_retry")).insert(new Element("div", {style: "clear:both"}));
+			$(this.container).update(icon_button("<?=addslashes(_L('Clear and try again'))?>", "exclamation", this.container+"_retry")).insert(new Element("div", {style: "clear:both"}));
 			// listen for clicks on the re-record button
 			$(this.container+"_retry").observe(
 				"click", this.setupRecord.bind(this)
@@ -229,7 +229,7 @@ var EasyCall = Class.create({
 			).insert(
 				new Element("div", {style: "clear:both"})
 			).insert(
-				icon_button("<?=_L("Call Me to Record")?>", "/diagona/16/151", this.container+"_callme").setStyle({float: "left"})
+				icon_button("<?=addslashes(_L("Call Me to Record"))?>", "/diagona/16/151", this.container+"_callme").setStyle({float: "left"})
 			).insert(
 				new Element("div", {style: "clear:both"})
 			)
@@ -245,7 +245,7 @@ var EasyCall = Class.create({
 				window.clearTimeout(this.keytimer);
 				// intercept and stop the event so we don't submit the form
 				Event.stop(event);
-				$(this.container+"_callme").click();
+				this.record();
 			}
 		}.bind(this));
 		$(this.container+"_phone").observe("keyup", function (event) {
