@@ -149,9 +149,10 @@ function activityfeed($mergeditems,$ajax = false) {
 				var actionids = $actioncount;
 
 				var filtes = Array('date','name');
+				var activepage = 0;
 
 				function applyfilter(filter) {
-						new Ajax.Request('lists.php?ajax=true&filter=' + filter, {
+						new Ajax.Request('lists.php?ajax=true&filter=' + filter + '&pagestart=' + activepage, {
 							method:'get',
 							onSuccess: function (response) {
 								var result = response.responseJSON;
@@ -323,6 +324,7 @@ $activityfeed = '
 
 				$activityfeed .= activityfeed($mergeditems,false);
 				$activityfeed .= '</table>
+						<br />
 						<div id="pagewrapperbottom"></div>
 					</td>
 				</tr>
