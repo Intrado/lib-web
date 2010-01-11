@@ -582,12 +582,11 @@ function saveHtmlEditorContent() {
 			var image = images[i];
 			var matches = image.src.match(/viewimage\.php\?id=(\d+)/);
 			if (matches.length == 2) {
-				image.replace('<img src="viewimage.php?id=' + matches[1] + '"/>');
-				//image.replace('((' + matches[1] + '))');
+				image.replace('<img src="viewimage.php?id=' + matches[1] + '">');
 			}
 		}
 
-		html = tempdiv.innerHTML.replace(/&lt;&lt;/g, '<<').replace(/&gt;&gt;/g, '>>');
+		var html = tempdiv.innerHTML.replace(/&lt;&lt;/g, '<<').replace(/&gt;&gt;/g, '>>');
 
 		if (images.length < 1) {
 			// CKEditor inserts blank tags even if the user has deleted everything.
@@ -595,10 +594,9 @@ function saveHtmlEditorContent() {
 				html = '';
 		}
 
-
 		textarea.value = html;
 	}
-
+	
 	return {'instance': instance, 'container': container, 'previoustextarea': textareauseshtmleditor ? textarea : null};
 }
 
@@ -619,7 +617,6 @@ function applyHtmlEditor(textarea) {
 
 		textarea.insert({'before': '<img class="AjaxLoader" src="img/ajax-loader.gif"/>'});
 		textarea.hide();
-		textarea.disabled = true;
 
 		var reusableckeditor = new Element('div', {'id':'reusableckeditor'});
 		if (document.body) {
@@ -648,7 +645,7 @@ function applyHtmlEditor(textarea) {
 		return;
 	}
 
-	var html = textarea.value.replace("<<", "&lt;&lt;").replace(">>", "&gt;&gt;");//.replace(/\(\((\d+)\)\)/g, "<img src='viewimage.php?id=$1'/>");
+	var html = textarea.value.replace("<<", "&lt;&lt;").replace(">>", "&gt;&gt;");
 	editorobject.instance.setData(html);
 
 	textarea.hide().addClassName('HtmlEditor').insert({'after':editorobject.container});
