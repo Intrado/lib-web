@@ -166,7 +166,7 @@ class Message extends DBMappedObject {
 			$pos_f = strpos($data,"<<");
 			$pos_a = strpos($data,"{{");
 			$pos_l = strpos($data,"[[");
-			$pos_i = strpos($data,'((');
+			$pos_i = strpos($data,'<img src="viewimage.php?id=');
 
 			$poses = array();
 			if($pos_f !== false)
@@ -206,7 +206,10 @@ class Message extends DBMappedObject {
 				$parts[] = $part;
 			}
 
-			$pos += 2; // pass over the begintoken
+			if ($type == 'I')
+				$pos += strlen('<img src="viewimage.php?id=');
+			else
+				$pos += 2; // pass over the begintoken
 
 			switch($type){
 				case "A":
@@ -219,7 +222,7 @@ class Message extends DBMappedObject {
 					$endtoken = "]]";
 					break;
 				case "I":
-					$endtoken = "))";
+					$endtoken = '">';
 			}
 			//$endtoken = ($type == "A") ? "}}" : ">>";
 			$length = @strpos($data,$endtoken,$pos+1); // assume at least one char for audio/field name
@@ -303,7 +306,7 @@ class Message extends DBMappedObject {
 			}
 			//skip the end if we found it
 			if ($length)
-				$skip = $pos + $length +2;
+				$skip = $pos + $length + strlen($endtoken);
 			else
 				$skip = $pos + $length ;
 
@@ -358,12 +361,13 @@ class Message extends DBMappedObject {
 				$partstr .= ">>";
 				break;
 			case 'I':
-				$partstr .= "((" . $part->contentid . "))";
+				$partstr .= '<img src="viewimage.php?id=' . $part->imagecontentid . '">';
+				permitContent($part->imagecontentid);
 				break;
 			}
 			
 			if ($partstr != '')
-				$data .= ($translatable && $part->type != 'T') ? ('<input value="' . escapehtml($partstr) . '"/>') : $partstr;
+				$data .= ($translatable && !in_array($part->type, array('T','I'))) ? ('<input value="' . escapehtml($partstr) . '"/>') : $partstr;
 		}
 
 		return $data;
@@ -393,6 +397,7 @@ class Message extends DBMappedObject {
 				}
 				$renderedparts[++$curpart] = array("t",$value,$part->voiceid);
 				break;
+			// NOTE: Case 'I' is skipped because images cannot be played through audio.
 			}
 		}
 		return $renderedparts;
