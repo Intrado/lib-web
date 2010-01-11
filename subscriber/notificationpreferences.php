@@ -62,6 +62,15 @@ foreach ($subscribeFields as $fieldnum => $name) {
 
 $fieldmaps = DBFindMany("FieldMap", "from fieldmap where options like '%subscribe%' order by fieldnum");
 
+$hasorganizations = strcmp("none", getSystemSetting("subscribersetorganization", "none")) != 0;
+$organizations = array();
+if ($hasorganizations) {
+	$organizations = QuickQueryList("select id, orgkey from organization", true);
+	if (count($organizations) == 0) {
+		$hasorganizations = 0;
+	}
+}
+
 $subscriberid = $_SESSION['subscriberid'];
 $pendingList = DBFindMany("SubscriberPending", "from subscriberpending where subscriberid=?", false, array($subscriberid));
 
@@ -185,6 +194,19 @@ if(count($jobtypes) > 0) {
 			array("ValInArray", 'values'=>array_keys($jtvalues))
 		),
 		"control" => array("MultiCheckbox","values" => $jtvalues),
+		"helpstep" => 1
+	);
+}
+
+if ($hasorganizations) {
+	$currentorganizations = QuickQueryList("select organizationid from personassociation where personid=? and type='organization'", false, false, array($pid));
+	$formdata["organizations"] = array(
+		"label" => _L("Organization"),
+		"value" => $currentorganizations,
+		"validators" => array(
+			array("ValInArray", 'values'=>array_keys($organizations))
+		),
+		"control" => array("MultiCheckbox","values" => $organizations),
 		"helpstep" => 1
 	);
 }
@@ -456,6 +478,24 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 					$query = substr($query, 0, strlen($query)-2); // remove trailing comma and space
 					QuickUpdate($query, false, $args);
 				}
+			}
+		}
+		
+		if ($hasorganizations) {
+			// delete all person association with organizations, rebuild after
+			$query = "delete from personassociation where personid=? and type='organization'";
+			QuickUpdate($query, false, array($pid));
+			// if selected any, add them
+			if (count($postdata['organizations']) > 0) {
+				$query = "insert into personassociation (personid, type, organizationid) values ";
+				$args = array();
+				foreach ($postdata['organizations'] as $orgid) {
+					$args[] = $pid;
+					$args[] = $orgid;
+					$query .= "(?, 'organization', ?), ";
+				}
+				$query = substr($query, 0, strlen($query)-2); // remove trailing comma and space
+				QuickUpdate($query, false, $args);
 			}
 		}
 
