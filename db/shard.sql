@@ -333,3 +333,6 @@ ALTER TABLE `qjob`
  
 ALTER TABLE `qjob` ADD `messagegroupid` INT default NULL AFTER `scheduleid` ;
 
+ALTER TABLE `qjob` DROP `messagegroupid`,
+	DROP `questionnaireid`;
+	
