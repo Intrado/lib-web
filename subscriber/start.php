@@ -7,6 +7,7 @@ require_once("../obj/FieldMap.obj.php");
 require_once("../obj/Person.obj.php");
 require_once("../inc/formatters.inc.php");
 require_once("../obj/Message.obj.php");
+require_once("../obj/MessageGroup.obj.php");
 require_once("../obj/Phone.obj.php");
 
 
@@ -30,7 +31,7 @@ if (isset($_SESSION['firstlogin'])) {
 	$contactCount[$pid] = 1;
 	$allData[$pid] = array();
 
-	$result = Query("select j.id, j.startdate, j.name, j.type, u.firstname, u.lastname, rp.personid, j.emailmessageid
+	$result = Query("select j.id, j.startdate, j.name, j.type, u.firstname, u.lastname, rp.personid, j.messagegroupid
 		from job j
 		left join jobsetting js on (js.jobid=j.id and js.name='translationexpire')
 		left join reportperson rp on (rp.jobid = j.id)
@@ -72,15 +73,17 @@ if (isset($_SESSION['firstlogin'])) {
 function message_action($row, $index){
 	//index 1 is job id
 	//index 7 is person id
-	//index 4 is type
-	$types = explode(",",$row[4]);
-	if(in_array("phone", $types)){
+	//index 8 is messagegroup id
+	
+	$messagegroup = new MessageGroup($row[8]);
+	
+	if($messagegroup->hasMessage('phone')){
 		$buttons[] = button(_L("Play"), "popup('previewmessage.php?jobid=" . $row[1] . "&personid=" . $row[7] . "&type=phone', 400, 500,'preview');",null);
 	}
-	if(in_array("email", $types)){
+	if($messagegroup->hasMessage('email')){
 		$buttons[] = button(_L("Read Email"), "popup('previewmessage.php?jobid=" . $row[1] . "&personid=" . $row[7] . "&type=email', 400, 500,'preview');",null);
 	}
-	if(in_array("sms", $types)){
+	if($messagegroup->hasMessage('sms')){
 		$buttons[] = button(_L("Read SMS"), "popup('previewmessage.php?jobid=" . $row[1] . "&personid=" . $row[7] . "&type=sms', 400, 500,'preview');",null);
 	}
 	return "<table><tr><td>" . implode("</td><td>", $buttons) . "</td></tr></table>";
@@ -94,12 +97,13 @@ function sender($row, $index){
 	//index 5 is first name
 	//index 6 is last name
 	//index 4 is type
-	//index 8 is email message id
+	//index 8 is messagegroupid
 	//fetch associated email message if it exists and find email return address
 
-	$types = explode(",",$row[4]);
-	if(in_array("email", $types)){
-		$message = DBFind("Message", "from message m where m.id = '" . DBSafe($row[8]) . "'");
+	$messagegroup = new MessageGroup($row[8]);
+
+	if($messagegroup->hasMessage('email')){
+		$message = DBFind("Message", "from message m where messagegroupid=? and type='email' limit 1", false, array($row[8]));
 		$messagedata = sane_parsestr($message->data);
 		return "<a href='mailto:" . $messagedata['fromemail'] . "'>" . escapehtml($messagedata['fromname']) . "</a>";
 	} else {
