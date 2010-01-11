@@ -45,6 +45,16 @@ var Accordion = Class.create({
 		this.classPrefix = 'accordion';
 		this.firePrefix = 'Accordion:';
 	},
+	get_section_containing: function(element) {
+		element = $(element);
+		for (var name in this.sections) {
+			var section = this.sections[name];
+			if (section.contentDiv.down('#' + element.identify()))
+				return name;
+		}
+		return null;
+	},
+	
 	add_section: function(name, disabled) {
 		var section = new AccordionSection(name, disabled, this);
 		this.container.insert(section.titleDiv).insert(section.contentDiv);
