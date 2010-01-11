@@ -616,7 +616,6 @@ function form_count_field_characters(count,target,event) {
 
 function form_submit_all (tabevent, value, formsplittercontainer) {
 	saveHtmlEditorContent();
-	
 	var forms = $$('form');
 	if (forms.length < 1)
 		return;
@@ -711,7 +710,6 @@ function form_submit_all (tabevent, value, formsplittercontainer) {
 					tabevent.memo.widget.update_section(nexttab, {
 						'icon': 'img/ajax-loader.gif'
 					});
-					
 					var handledbeforetabloadevent = tabevent.memo.widget.container.fire('FormSplitter:BeforeTabLoad', {'tabevent': tabevent, 'nexttab': nexttab, 'currenttab': tabevent.memo.currentSection});
 
 					form_load_tab(this, tabevent.memo.widget, nexttab, handledbeforetabloadevent.memo.specificsections);
@@ -737,9 +735,10 @@ function form_load_tab (form, widget, nexttab, specificsections, suppressfire) {
 	if (!document.tabvars)
 		document.tabvars = {};
 		
-	if (document.tabvars.loading)
+	if (document.tabvars.loading) {
 		return;
-		
+	}
+	
 	document.tabvars.loading = true;
 	
 	new Ajax.Request(posturl, {
@@ -764,7 +763,6 @@ function form_load_tab (form, widget, nexttab, specificsections, suppressfire) {
 			form_load_layout(container, null, specificsections);
 			var previoustab = widget.currentSection;
 			widget.show_section(nexttab);
-			
 			// NOTE: To prevent flickering, clear the contents of the previous tab after the next tab is shown.
 			if (previoustab != nexttab) {
 				widget.update_section(previoustab, {
@@ -805,9 +803,10 @@ function form_load_layout (formswitchercontainer, classname, specificsections) {
 				layout = new Tabs(container, {'vertical':false, 'showDuration':0, 'hideDuration':0});
 			else if (classname == 'verticaltabs')
 				layout = new Tabs(container, {'vertical':true, 'showDuration':0, 'hideDuration':0});
-			else if (classname == 'accordion')
+			else if (classname == 'accordion') {
 				layout = new Accordion(container);
-
+			}
+			
 			layoutsections.each(function (layoutsection, specificsections) {
 				var kids = layoutsection.childElements();
 				var sectionname =  layoutsection.match('.FormSplitterParentFormContainer') ? layoutsection.down('form.FormSplitterParentForm').identify() : layoutsection.identify();
@@ -835,6 +834,15 @@ function form_load_layout (formswitchercontainer, classname, specificsections) {
 				}
 			} else if (classname != 'accordion') {
 				layout.show_section(layout.firstSection);
+			} else {
+				var form = container.up('form');
+				if (form) {
+					var formvars = document.formvars[form.name];
+					if (!formvars)
+						formvars = document.formvars[form.name] = {};
+					formvars.accordion = layout;
+					form.fire('FormSplitter:AccordionLoaded');
+				}
 			}
 
 		} else if (classname == 'verticalsplit') {
@@ -861,6 +869,4 @@ function form_init_splitter(formswitchercontainer, specificsections) {
 			form_submit_all(event, 'tab');
 	};
 	formswitchercontainer.observe('Tabs:ClickTitle', onTabsClickTitle.bindAsEventListener(formswitchercontainer));
-	
-	// TODO: window.onbeforeunload.
 }
