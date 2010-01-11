@@ -692,7 +692,7 @@ td.SplitPane {
 }
 #summaryContainer th.Destination {
 	border-left: solid 1px rgb(210,210,210);
-	text-align: middle;
+	text-align: center;
 }
 #summaryContainer th.Language {
 	border-top: solid 1px rgb(210,210,210);
