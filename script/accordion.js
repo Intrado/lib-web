@@ -146,7 +146,19 @@ var AccordionSection = Class.create({
 		this.titleDiv = new Element('div', {'class':this.widget.classPrefix+'titlediv'});
 		this.titleIcon = new Element('img', {'class':this.widget.classPrefix+'titleicon'});
 		this.titleSpan = new Element('span', {'class':this.widget.classPrefix+'titlespan'});
-		this.titleDiv.insert(this.titleIcon).insert(this.titleSpan);
+		this.titleDiv.insert(
+			new Element('table', {'style':'margin:0;border:0;border-collapse:collapse; width:100%; border-spacing:0'}).insert(
+				new Element('tbody').insert(
+					new Element('tr').insert(
+						new Element('td', {'class':'left'})
+					).insert(
+						new Element('td', {'class':'middle'}).insert(this.titleIcon).insert(this.titleSpan)
+					).insert(
+						new Element('td', {'class':'right'})
+					)
+				)
+			)
+		);
 		this.contentDiv = new Element('div', {'class':this.widget.classPrefix+'contentdiv'});
 
 		// Register DOM events.
