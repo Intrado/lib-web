@@ -10,8 +10,8 @@ DECLARE custid INTEGER DEFAULT _$CUSTOMERID_;
 IF NEW.status IN ('repeating') THEN
   SELECT value INTO tz FROM setting WHERE name='timezone';
 
-  INSERT INTO aspshard.qjob (id, customerid, userid, scheduleid, messagegroupid, questionnaireid, timezone, startdate, enddate, starttime, endtime, status)
-         VALUES(NEW.id, custid, NEW.userid, NEW.scheduleid, NEW.messagegroupid, NEW.questionnaireid, tz, NEW.startdate, NEW.enddate, NEW.starttime, NEW.endtime, 'repeating');
+  INSERT INTO aspshard.qjob (id, customerid, userid, scheduleid, timezone, startdate, enddate, starttime, endtime, status)
+         VALUES(NEW.id, custid, NEW.userid, NEW.scheduleid, tz, NEW.startdate, NEW.enddate, NEW.starttime, NEW.endtime, 'repeating');
 
   -- do not copy schedule because it was inserted via the insert_schedule trigger
 
@@ -34,12 +34,12 @@ IF cc = 0 THEN
 -- we expect the status to be 'scheduled' when we insert the shard job
 -- status 'new' is for jobs that are not yet submitted
   IF NEW.status='scheduled' THEN
-    INSERT INTO aspshard.qjob (id, customerid, userid, scheduleid, messagegroupid, questionnaireid, timezone, startdate, enddate, starttime, endtime, status)
-           VALUES(NEW.id, custid, NEW.userid, NEW.scheduleid, NEW.messagegroupid, NEW.questionnaireid, tz, NEW.startdate, NEW.enddate, NEW.starttime, NEW.endtime, NEW.status);
+    INSERT INTO aspshard.qjob (id, customerid, userid, scheduleid, timezone, startdate, enddate, starttime, endtime, status)
+           VALUES(NEW.id, custid, NEW.userid, NEW.scheduleid, tz, NEW.startdate, NEW.enddate, NEW.starttime, NEW.endtime, NEW.status);
   END IF;
 ELSE
 -- update job fields
-  UPDATE aspshard.qjob SET scheduleid=NEW.scheduleid, messagegroupid=NEW.messagegroupid, questionnaireid=NEW.questionnaireid, starttime=NEW.starttime, endtime=NEW.endtime, startdate=NEW.startdate, enddate=NEW.enddate WHERE customerid=custid AND id=NEW.id;
+  UPDATE aspshard.qjob SET scheduleid=NEW.scheduleid, starttime=NEW.starttime, endtime=NEW.endtime, startdate=NEW.startdate, enddate=NEW.enddate WHERE customerid=custid AND id=NEW.id;
   IF NEW.status IN ('processing', 'procactive', 'active', 'cancelling') THEN
     UPDATE aspshard.qjob SET status=NEW.status WHERE customerid=custid AND id=NEW.id;
   END IF;
