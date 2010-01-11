@@ -20,13 +20,28 @@ class TranslationItem extends FormItem {
 
 		$translationcheckboxlabel = isset($this->args['translationcheckboxlabel']) ? $this->args['translationcheckboxlabel'] : _L("Translate");
 		
+		if (isset($this->args['allowoverride']))
+			$allowoverride = $this->args['allowoverride'];
+		else
+			$allowoverride = true;
+		
 		$str = "";
 
 		$str .= '
+			<div class="TranslationItemContainer">
+			
 			<input id="'.$n.'" name="'.$n.'" type="hidden" value="' . escapehtml($value) . '"/>
-			<input id="'.$n.'englishText" name="'.$n.'englishText" type="hidden" value="' . escapehtml($this->args["englishText"]) . '"/>
-			<input id="'.$n.'overridesave" type="hidden" value=""></div>
+			<input id="'.$n.'overridesave" type="hidden" value=""/>
 			' . (!empty($this->args['showhr']) ? '<hr>' : '') . '
+			
+			<div style="'.(!empty($this->args['editenglishtext']) ? '' : 'display:none').'">
+				<div class="MessageBodyContainer">
+					<textarea '. (!empty($this->args['editenglishtext']) ? (' onChange="setTranslationValue(\''.$n.'\');" style="display:block; width:99%" ') : ' style="display:none" ') . '  rows="10" class="SourceTextarea" id="'.$n.'englishText">' . escapehtml($this->args["englishText"]) . '</textarea>
+					' . icon_button(_L("Refresh Translation"),"tick", "getTranslation('$n','$language',$usehtmleditor);", null, 'id="refreshtranslationbutton"') . '
+					<div style="margin-top:20px;clear:both"></div>
+				</div>
+			</div>
+			
 			<table width="100%">
 				<tr>
 					<td '.(!empty($this->args['translationcheckboxnewline']) ? 'colspan=2' : '').' valign="top" width="80px" class="TranslationItemCheckboxTD" style="'.(!empty($this->args['hidetranslationcheckbox']) ? 'display:none' : '').'">
@@ -46,22 +61,24 @@ class TranslationItem extends FormItem {
 							'  . (isset($this->args['disabledinfo']) ? $this->args['disabledinfo'] : ('<ul><li> ' . _L('%1$s recipients will now receive the default English message.',ucfirst($language)) . '</li></ul>')) . '
 						</div>
 						<div id="'.$n.'textfields" style="width: 100%; display: '.(($msgdata->enabled)?"block":"none").'">
-							<fieldset>
-								<div style="width: 100%;">
-									<div id="'.$n.'textdiv" name="'.$n.'textdiv" style="display: '.((!$msgdata->override)?"block":"none").'; width: 99%; height: 50px; border: 1px solid gray; color: gray; overflow:auto">'.escapehtml($msgdata->text).'</div>
-									<textarea id="'.$n.'text" name="'.$n.'text" style="display: '.(($msgdata->override)?"block":"none").'; width: 99%;" rows="3" onChange="setTranslationValue(\''.$n.'\');" />'.escapehtml($msgdata->text).'</textarea>
-									<br>
-								</div>
-							</fieldset>
-							<div id="'. $n .'retranslationcontrols" style="width: 100%">
-								'. icon_button(_L("Show in English"), "fugue/magnifier", "toEnglishButton('$n','$language')", null, 'id="'. $n .'showenglish"').'
-								'. icon_button(_L("Hide English"), "fugue/magnifier__minus", "toEnglishButton('$n','$language')", null, 'id="'. $n .'hideenglish" style="display:none"').'
-								<span style="'.(empty($this->args['allowoverride']) ? 'display:none' : '').'"><input id="'.$n.'override" name="'.$n.'checkbox" type="checkbox" '.(($msgdata->override)?"checked":"").' onclick="overrideTranslation(\''.$n.'\',\''.$language.'\', '.$usehtmleditor.');"/>' . _L('Override Translation') . '</span>
+							<div id="'.$n.'textdiv" name="'.$n.'textdiv" style="display: '.((!$msgdata->override)?"block":"none").'; width: 99%; height: 50px; border: 1px solid gray; color: gray; overflow:auto">'.(!empty($this->args['usehtmleditor']) ? $msgdata->text : escapehtml($msgdata->text)).'</div>
+						</div>
+						
+						<div class="MessageBodyContainer" style="display: '.(($msgdata->override || !$msgdata->enabled)?"block":"none").'">
+							<div style="'.(!$allowoverride ? 'display:none' : '').'">
+								<textarea class="MessageTextarea" id="'.$n.'text" name="'.$n.'text" style="width: 99%;" rows="10" onChange="setTranslationValue(\''.$n.'\');" />'.escapehtml($msgdata->text).'</textarea>
+							</div>
+						</div>
+						
+						<div id="'. $n .'retranslationcontrols" style="width: 100%; display: '.(($msgdata->enabled)?"block":"none").'">
+							
+							'. icon_button(_L("Show in English"), "fugue/magnifier", "toEnglishButton('$n','$language',$usehtmleditor)", null, 'id="'. $n .'showenglish"').'
+							'. icon_button(_L("Hide English"), "fugue/magnifier__minus", "toEnglishButton('$n','$language',$usehtmleditor)", null, 'id="'. $n .'hideenglish" style="display:none"').'
+							<span style="'.(!$allowoverride ? 'display:none' : '').'"><input id="'.$n.'override" name="'.$n.'checkbox" type="checkbox" '.(($msgdata->override)?"checked":"").' onclick="overrideTranslation(\''.$n.'\',\''.$language.'\', '.$usehtmleditor.');"/>' . _L('Override Translation') . '</span>
 
-								<div id="'.$n.'retranslation" style="width: 100%; display: none;margin-top: 15px; clear:both">
-									'. icon_button(_L('Refresh %1$s to English Translation', $language),"fugue/arrow_circle_double_135","submitRetranslation('$n','$language')", null, 'style="margin-bottom: 12px"') . '
-									<div id="'.$n.'retranslationtext" name="'.$n.'retranslation" style="width: 100%; width: 99%; height: 50px; border: 1px solid gray; color: gray; overflow:auto; clear:both"></div>
-								</div>
+							<div id="'.$n.'retranslation" style="width: 100%; display: none;margin-top: 15px; clear:both">
+								'. icon_button(_L('Refresh %1$s to English Translation', $language),"fugue/arrow_circle_double_135","submitRetranslation('$n','$language', $usehtmleditor)", null, 'style="margin-bottom: 12px"') . '
+								<div id="'.$n.'retranslationtext" name="'.$n.'retranslation" style="width: 100%; width: 99%; height: 50px; border: 1px solid gray; color: gray; overflow:auto; clear:both"></div>
 							</div>
 						</div>
 					</td>
@@ -73,18 +90,18 @@ class TranslationItem extends FormItem {
 				</tr>
 			</table>';
 
-		if (isset($this->args['fields'])) {
+		if (!empty($this->args['fields'])) {
 			// Data Fields.
 			$str .= '
-				<table border="0" cellpadding="1" cellspacing="0" style="display:none; font-size: 9px; margin-top: 5px;" class="DataFieldsTable" id="'.$n.'datafieldstable">
+				<table border="0" cellpadding="1" cellspacing="0" style="display:block; font-size: 9px; margin-top: 5px;" class="DataFieldsTable" id="'.$n.'datafieldstable">
 					<tr>
 						<td>
 							<span style="font-size: 9px;">Default&nbsp;Value:</span><br />
-							<input id="'.$n.'datadefault" name="'.$n.'datavalue" type="text" size="10" value=""/>
+							<input class="DataFieldDefaultValue" type="text" size="10" value=""/>
 						</td>
 						<td>
 							<span style="font-size: 9px;">Data&nbsp;Field:</span><br />
-							<select id="'.$n.'datafield" name="'.$n.'language">
+							<select class="DataFieldSelect">
 								<option value="">-- Select a Field --</option>';								
 			foreach($this->args['fields'] as $field)
 			{
@@ -95,41 +112,41 @@ class TranslationItem extends FormItem {
 					</tr>
 					<tr>
 						<td colspan=2>
-							'. icon_button(_L("Insert"),"fugue/arrow_turn_180","
-										sel = $('" . $n . "datafield');
-										if (sel.options[sel.selectedIndex].value != '') {
-											 def = $('" . $n . "datadefault').value;
-											 textInsert('<<' + sel.options[sel.selectedIndex].text + (def ? ':' : '') + def + '>>', $('{$n}text'));
-										}")
-							. '					
+							'. icon_button(_L("Insert"),"fugue/arrow_turn_180")
+							. '
 						</td>
 					</tr>
 				</table>';
 		}
 			
-			
+		
+		$str .= '</div>';
+		
 		if($renderscript || isset($this->args['reload'])) {
 			$renderscript = false;
 		}
+		
+		
 		return $str;
 	}
 	
 	function renderJavascriptLibraries() {
+		
 		$str = '
 			<script type="text/javascript">
-				function toEnglishButton(section,language) {
+				function toEnglishButton(section,language,usehtmleditor) {
 					if ($(section+"showenglish").visible()) {
 						$(section+"retranslation").show();
 						$(section+"showenglish").hide();
 						$(section+"hideenglish").show();
-						submitRetranslation(section,language);
+						submitRetranslation(section,language,usehtmleditor);
 					} else {
 						$(section+"retranslation").hide();
 						$(section+"hideenglish").hide();
 						$(section+"showenglish").show();
 					}
 				}
-				function submitRetranslation(section,language) {
+				function submitRetranslation(section,language,usehtmleditor) {
 					var srcbox = section + "text";
 					
 					var text = $(srcbox).getValue();
@@ -148,12 +165,20 @@ class TranslationItem extends FormItem {
 									if(data.responseStatus != 200 || data.responseData.translatedText == undefined)
 										return;
 									var dstbox = section + "retranslationtext";
-									$(dstbox).innerHTML = data.responseData.translatedText.replace(/<</, "&lt;&lt;").replace(/>>/, "&gt;&gt;");//.escapeHTML();
+									var translatedtext = data.responseData.translatedText;
+									if (usehtmleditor) {
+										translatedtext = translatedtext.replace(/<</, "&lt;&lt;").replace(/>>/, "&gt;&gt;");
+									} else {
+										console.info("escapinghtml");
+										translatedtext = translatedtext.escapeHTML();
+									}
+									$(dstbox).innerHTML = translatedtext;
 							}
 					});
 					return false;
 				}
-				function getTranslation(section, language) {
+				function getTranslation(section, language, usehtmleditor) {
+					saveHtmlEditorContent();
 					var englishText = $(section+"englishText");
 					var langtext = $(section + "text");
 					var overridesave = $(section + "overridesave");
@@ -169,21 +194,31 @@ class TranslationItem extends FormItem {
 							var data = transport.responseJSON;
 							if(data.responseStatus != 200 || data.responseData.translatedText == undefined)
 								return;
-							$(section+"textdiv").innerHTML = data.responseData.translatedText.replace(/<</, "&lt;&lt;").replace(/>>/, "&gt;&gt;");//.escapeHTML();
-							$(section+"text").value = data.responseData.translatedText;//.escapeHTML();
-							englishText.value = "";
+								
+							var translatedtext = data.responseData.translatedText;
+							if (usehtmleditor) {
+								translatedtext = translatedtext.replace(/<</, "&lt;&lt;").replace(/>>/, "&gt;&gt;");
+							} else {
+								console.info("escapinghtml");
+								translatedtext = translatedtext.escapeHTML();
+							}
+							$(section+"textdiv").innerHTML = translatedtext;
+							$(section+"text").value = data.responseData.translatedText;
 							setTranslationValue(section);
 						}
 					});
 				}
 				function setTranslationValue(section) {
 					var curVal = $(section).value.evalJSON();
-					$(section).value = Object.toJSON({
+					var newState = {
 						"enabled": $(section + "translatecheck").checked,
-						"text": (($(section + "translatecheck").checked)?$(section + "text").value.toString():""),
+						"englishText": $(section + "englishText").value,
 						"override": (($(section + "translatecheck").checked)?$(section + "override").checked:false),
+						"text": $(section + "text").value,
 						"gender": curVal.gender
-					});
+					};
+					
+					$(section).value = Object.toJSON(newState);
 					form_do_validation($(section).up("form"), $(section));
 				}
 
@@ -198,12 +233,14 @@ class TranslationItem extends FormItem {
 						
 						if (!overridesave.value)
 							overridesave.value = langtext.value;
-						langtext.show();
+						langtext.up(".MessageBodyContainer").show();
 						$(section + "editlock").show();
 						$(section + "textdiv").hide();
 						
 						if (usehtmleditor)
 							applyHtmlEditor(langtext);
+							
+						$(section + "englishText").up(".MessageBodyContainer").hide();
 					} else {
 						if(!nowarning && langtext.value != overridesave.value && !confirm(\'' . _L('The edited text will be removed and set back to the previous translation.') . '\')) {
 							$(section + "override").checked = true;
@@ -212,11 +249,15 @@ class TranslationItem extends FormItem {
 						
 						$(section).fire("TranslationItem:OverrideToggled", {"override": $(section+"override").checked});
 						
-						getTranslation(section,language);
+						$(section + "englishText").up(".MessageBodyContainer").show();
+						
+						getTranslation(section,language,usehtmleditor);
 						overridesave.value = "";
-						langtext.hide();
+						langtext.up(".MessageBodyContainer").hide();
 						$(section + "editlock").hide();
 						$(section + "textdiv").show();
+						if (usehtmleditor)
+							applyHtmlEditor($(section+"englishText"));
 					}
 					setTranslationValue(section);
 				}
@@ -226,23 +267,42 @@ class TranslationItem extends FormItem {
 					
 					if ($(section+"translatecheck").checked) {
 						if ($(section+"text").value == "")
-							getTranslation(section, language);
+							getTranslation(section, language,usehtmleditor);
 						$(section +"icons").show();
 						$(section +"textfields").show();
+						$(section +"retranslationcontrols").show();
 						$(section +"disableinfo").hide();
 						$(section +"controls").show();
 						
-						if ($(section+"override").checked && usehtmleditor)
-							applyHtmlEditor(section+"text");
+						$(section+"englishText").up(".MessageBodyContainer").show();
+						
+						if ($(section+"override").checked) {
+							if (usehtmleditor)
+								applyHtmlEditor(section+"text");
+							else
+								$(section+"text").up(".MessageBodyContainer").show();
+						} else {
+							$(section+"text").up(".MessageBodyContainer").hide();
+							if (usehtmleditor)
+								applyHtmlEditor($(section+"englishText"));
+						}
 					} else {
 						$(section +"icons").hide();
 						$(section +"textfields").hide();
+						$(section +"retranslationcontrols").hide();
 						$(section +"disableinfo").show();
 						$(section +"controls").hide();
+						
+						$(section+"englishText").up(".MessageBodyContainer").hide();
+						
+						if (usehtmleditor)
+							applyHtmlEditor(section+"text");
+						else
+							$(section+"text").up(".MessageBodyContainer").show();
 					}
 					setTranslationValue(section);
-					
 				}
+				
 			</script>';
 			return $str;
 	}
@@ -250,13 +310,33 @@ class TranslationItem extends FormItem {
 	function renderJavascript() {
 		$n = $this->form->name."_".$this->name;
 		$usehtmleditor = !empty($this->args['usehtmleditor']) ? 'true' : 'false';
-		
+		$allowdatafieldinsert = !empty($this->args['fields']) ? 'true' : 'false';
 		$str = "
 			(function() {
+				var formitemelement = $('$n');
+				var formitemcontainer = formitemelement.up('.TranslationItemContainer');
+				
 				if ($usehtmleditor) {
-					var textarea = $('{$n}text');
-					if (textarea.visible())
-						applyHtmlEditor(textarea);
+					var curVal = formitemelement.value.evalJSON();
+					var textarea = (curVal.enabled && !curVal.override) ? formitemcontainer.down('.SourceTextarea') : formitemcontainer.down('.MessageTextarea');
+					
+					applyHtmlEditor(textarea);
+				}
+				
+				if ($allowdatafieldinsert) {
+					var datafieldstable = $('{$n}datafieldstable');
+					var datafieldinsertbutton = datafieldstable.down('button');
+					datafieldinsertbutton.stopObserving('click');
+					datafieldinsertbutton.observe('click', function(event, formitemcontainer, formitemelement, datafieldstable) {
+						var curVal = formitemelement.value.evalJSON();
+						var textarea = (curVal.enabled && !curVal.override) ? formitemcontainer.down('.SourceTextarea') : formitemcontainer.down('.MessageTextarea');
+						
+						var sel = datafieldstable.down('.DataFieldSelect');
+						if (sel.options[sel.selectedIndex].value != '') {
+							 def = datafieldstable.down('.DataFieldDefaultValue').value;
+							 textInsert('<<' + sel.options[sel.selectedIndex].text + (def ? ':' : '') + def + '>>', textarea);
+						}
+					}.bindAsEventListener(datafieldinsertbutton, formitemcontainer, formitemelement, datafieldstable));
 				}
 			})();
 		";
