@@ -2,7 +2,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 // Custom Utility Functions
 ////////////////////////////////////////////////////////////////////////////////
-function makeTranslationItem($required, $type, $subtype, $languagecode, $languagename, $sourcetext, $messagetext, $translationcheckboxlabel, $override, $allowoverride = true, $hidetranslationcheckbox = false, $enabled = true, $disabledinfo = "", $datafields = null, $inautotranslator = false) {
+function makeTranslationItem($required, $type, $subtype, $languagecode, $languagename, $sourcetext, $messagetext, $translationcheckboxlabel, $override, $allowoverride = true, $hidetranslationcheckbox = false, $enabled = true, $disabledinfo = "", $datafields = null, $inautotranslator = false, $maximages = 3) {
 	$control = array("TranslationItem",
 		"phone" => $type == 'phone',
 		"language" => $languagecode,
@@ -17,13 +17,14 @@ function makeTranslationItem($required, $type, $subtype, $languagecode, $languag
 		"disabledinfo" => $disabledinfo,
 		"translationcheckboxlabel" => $translationcheckboxlabel,
 		"translationcheckboxnewline" => true,
+		"editenglishtext" => !$inautotranslator,
 		"showhr" => false
 	);
 
 	if (is_array($datafields))
 		$control["fields"] = $datafields;
 
-	$validators = array(array("ValMessageBody", "type" => $type, "subtype" => $subtype, "languagecode" => $languagecode));
+	$validators = array();
 
 	if ($type == 'phone') {
 		$validators[] = array("ValLength","max" => 4000);
@@ -31,6 +32,8 @@ function makeTranslationItem($required, $type, $subtype, $languagecode, $languag
 	if ($type == 'email' && !$inautotranslator) {
 		$validators[] = array("ValEmailMessageBody");
 	}
+	
+	$validators[] = array("ValMessageBody", "type" => $type, "subtype" => $subtype, "languagecode" => $languagecode, "maximages" => $maximages);
 	
 	if ($required)
 		$validators[] = array("ValRequired");
@@ -40,6 +43,7 @@ function makeTranslationItem($required, $type, $subtype, $languagecode, $languag
 		"value" => json_encode(array(
 			"enabled" => $enabled,
 			"text" => $messagetext,
+			"englishText" => $sourcetext,
 			"override" => $override,
 			"gender" => 'female' // TODO: This needs to take preferredvoice.
 		)),
@@ -60,7 +64,7 @@ function makeFormHtml($html) {
 	);
 }
 
-function makeMessageBody($required, $type, $subtype, $languagecode, $label, $messagetext, $datafields = null, $usehtmleditor = false, $hideplaybutton = false, $hidden = false) {
+function makeMessageBody($required, $type, $subtype, $languagecode, $label, $messagetext, $datafields = null, $usehtmleditor = false, $hideplaybutton = false, $hidden = false, $maximages = 3) {
 	$control = array("MessageBody",
 		"playbutton" => $type == 'phone' && !$hideplaybutton,
 		"usehtmleditor" => $usehtmleditor,
@@ -71,7 +75,7 @@ function makeMessageBody($required, $type, $subtype, $languagecode, $label, $mes
 	if (is_array($datafields))
 		$control["fields"] = $datafields;
 
-	$validators = array(array("ValMessageBody", "type" => $type, "subtype" => $subtype, "languagecode" => $languagecode));
+	$validators = array(array("ValMessageBody", "type" => $type, "subtype" => $subtype, "languagecode" => $languagecode, "maximages" => $maximages));
 
 	if ($type == 'phone') {
 		$validators[] = array("ValLength","max" => 4000);
@@ -116,29 +120,30 @@ function makeAccordionSplitter($type, $subtype, $languagecode, $permanent, $pref
 		);
 	} else if ($type == 'phone') {
 		if (!$inautotranslator) {
+			$callmeformdata = !$USER->authorize('starteasy') ? array() : array(
+				"callme" => array(
+					"label" => _L('Voice Recording'),
+					"value" => "",
+					"validators" => array(
+						array('ValCallMeMessage')
+					),
+					"control" => array(
+						"CallMe",
+						"phone" => Phone::format($USER->phone),
+						"langcode" => $languagecode
+					),
+					"renderoptions" => array(
+						"icon" => false,
+						"label" => false,
+						"errormessage" => true
+					),
+					"helpstep" => 1
+				)
+			);
+			
 			$accordionsplitterchildren[] = array(
 				"title" => _L("Audio"),
-				"formdata" =>  array(
-					"callme" => array(
-						"label" => _L('Voice Recording'),
-						"value" => "",
-						"validators" => array(
-							array('ValCallMeMessage')
-						),
-						"control" => array(
-							"CallMe",
-							"phone" => Phone::format($USER->phone),
-							"max" => getSystemSetting('easycallmax',10),
-							"min" => getSystemSetting('easycallmin',10),
-							"langcode" => $languagecode
-						),
-						"renderoptions" => array(
-							"icon" => false,
-							"label" => false,
-							"errormessage" => true
-						),
-						"helpstep" => 1
-					),
+				"formdata" =>  array_merge($callmeformdata, array(
 					"audioupload" => array(
 						"label" => _L('Audio Upload'),
 						"fieldhelp" => "You may attach up to three files that are up to 2048kB each. Note: Some recipients may have different size restrictions on incoming mail which can cause them to not receive your message if you have attached large files.",
@@ -153,23 +158,24 @@ function makeAccordionSplitter($type, $subtype, $languagecode, $permanent, $pref
 						<script type='text/javascript'>
 							(function () {
 								var audiolibrarywidget = new AudioLibraryWidget('audiolibrarycontainer', {$_SESSION['messagegroupid']});
+								var audiotextarea = '" . ($allowtranslation ? "{$type}-{$subtype}-{$languagecode}_translationitemtext" : "{$type}-{$subtype}-{$languagecode}_nonemessagebody") . "';
 
 								var audiouploadformitem = $('{$type}-{$subtype}-{$languagecode}_audioupload');
 								audiouploadformitem.observe('AudioUpload:AudioUploaded', function(event) {
 									hideHtmlEditor();
 									var audiofile = event.memo;
-									textInsert('{{' + audiofile.name + '}}', $('{$type}-{$subtype}-{$languagecode}_messagebody'));
+									textInsert('{{' + audiofile.name + '}}', $(audiotextarea));
 									this.reload();
-								}.bindAsEventListener(audiolibrarywidget));
+								}.bindAsEventListener(audiolibrarywidget, audiotextarea));
 
 								audiolibrarywidget.container.observe('AudioLibraryWidget:ClickName', function(event) {
 									hideHtmlEditor();
 									var audiofile = event.memo.audiofile;
-									textInsert('{{' + audiofile.name + '}}', $('{$type}-{$subtype}-{$languagecode}_messagebody'));
-								}.bindAsEventListener(audiolibrarywidget));
+									textInsert('{{' + audiofile.name + '}}', $(audiotextarea));
+								}.bindAsEventListener(audiolibrarywidget, audiotextarea));
 
 								// observe the callme container element for EasyCall events
-								$('{$type}-{$subtype}-{$languagecode}_callme_content').observe('EasyCall:update', function(event) {
+								$('{$type}-{$subtype}-{$languagecode}_callme_content').observe('EasyCall:update', function(event, audiotextarea) {
 									new Ajax.Request('ajaxmessagegroup.php', {
 										'method': 'post',
 										'parameters': {
@@ -177,10 +183,10 @@ function makeAccordionSplitter($type, $subtype, $languagecode, $permanent, $pref
 											'messagegroupid': {$_SESSION['messagegroupid']},
 											'audiofileid': event.memo.audiofileid
 										},
-										'onSuccess': function(transport, audiofilename) {
+										'onSuccess': function(transport, audiofilename, audiotextarea) {
 											// if success
 											if (transport.responseJSON) {
-												textInsert('{{' + audiofilename + '}}', $('{$type}-{$subtype}-{$languagecode}_messagebody'));
+												textInsert('{{' + audiofilename + '}}', $(audiotextarea));
 												this.reload();
 
 											// if failed the action but success on the ajax request
@@ -191,18 +197,18 @@ function makeAccordionSplitter($type, $subtype, $languagecode, $permanent, $pref
 											// create a new EasyCall to record another audio file if desired
 											newEasyCall();
 
-										}.bindAsEventListener(this, event.memo.audiofilename),
+										}.bindAsEventListener(this, event.memo.audiofilename, audiotextarea),
 										'onFailure': function() {
 											alert('" . escapehtml(_L('An error occured while trying to save your audio.\nPlease try again.')) . "');
 											newEasyCall();
 										}.bindAsEventListener(this)
 									});
-								}.bindAsEventListener(audiolibrarywidget));
+								}.bindAsEventListener(audiolibrarywidget, audiotextarea));
 
 							})();
 						</script>
 					")
-				)
+				))
 			);
 		}
 	} else if ($type == 'sms') {
@@ -329,8 +335,6 @@ class CallMe extends FormItem {
 					"'.$this->form->name.'",
 					"'.$n.'",
 					"'.$n.'_content'.'",
-					"'.((isset($this->args['min']) && $this->args['min'])?$this->args['min']:"10").'",
-					"'.((isset($this->args['max']) && $this->args['max'])?$this->args['max']:"10").'",
 					"'.$defaultphone.'",
 					"'.Language::getName($this->args['langcode']).' - " + curDate()
 				);
