@@ -11,7 +11,7 @@ class ValMessageBody extends Validator {
 		
 		$message = new Message();
 		$errors = array();	
-		$message->parse($value,$errors);  // Fill in with voice id later
+		$parts = $message->parse($value,$errors);  // Fill in with voice id later
 		if (count($errors) > 0)	{
 			$str = "There was an error parsing the message: ";
 			foreach($errors as $error)
@@ -20,9 +20,19 @@ class ValMessageBody extends Validator {
 			}
 			
 			return $str;
-		} else {
-			return true;
 		}
+		
+		if (isset($args['maximages'])) {
+			$imagecount = 0;
+			foreach ($parts as $part) {
+				if ($part->type == 'I')
+					$imagecount++;
+				if ($imagecount > $args['maximages'])
+					return _L('You may only include %s images.', $args['maximages']);
+			}
+		}
+		
+		return true;
 	}
 }
 ?>
