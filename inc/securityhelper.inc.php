@@ -27,6 +27,16 @@ function userOwns ($type,$id) {
 	}
 }
 
+function permitContent($id) {
+	if (!isset($_SESSION['usercontentids']))
+		$_SESSION['usercontentids'] = array();
+	$_SESSION['usercontentids'][$id] = true;
+}
+
+function contentAllowed($id) {
+	return isset($_SESSION['usercontentids']) && isset($_SESSION['usercontentids'][$id]);
+}
+
 function setIfOwnsOrNew ($id,$name, $type, $checkcustomer = false) {
 	if ($id === "new") {
 		$_SESSION[$name] = NULL;

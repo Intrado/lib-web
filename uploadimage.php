@@ -20,6 +20,7 @@ if ($USER->authorize("sendemail") && isset($_FILES['upload'])) {
 	$result = handleFileUpload($formitemname, $maxfilesize, null, $allowedext, false);
 
 	if (is_array($result)) {
+		permitContent($result['contentid']);
 		$imgsrc = "viewimage.php?id=" . $result['contentid'];
 	} else if (is_string($result)) {
 		$errormessage = $result;
