@@ -115,7 +115,33 @@ function makeAccordionSplitter($type, $subtype, $languagecode, $permanent, $pref
 					"control" => array("EmailAttach","size" => 30, "maxlength" => 51),
 					"renderoptions" => array("icon" => false, "label" => false, "errormessage" => true),
 					"helpstep" => 3
-				)
+				),
+				"attachmentsjavascript" => makeFormHtml("
+					<script type='text/javascript'>
+						(function () {
+							var attachmentsformitem = $('{$type}-{$subtype}-{$languagecode}_attachments');
+							var form = attachmentsformitem.up('form');
+							
+							attachmentsformitem.observe('Form:ValidationDisplayed', function(event) {
+								var formvars = document.formvars[this.identify()];
+								
+								if (event.memo.style == 'error')
+									formvars.preventAccordionClosing = true;
+								else
+									formvars.preventAccordionClosing = false;
+							}.bindAsEventListener(form));
+							
+							form.observe('Accordion:ClickTitle', function(event, attachmentsformitem) {
+								var formvars = document.formvars[this.identify()];
+								var currentSection = event.memo.currentSection;
+								if (event.memo.widget.sections[currentSection].contentDiv.down('#' + attachmentsformitem.identify())) {
+									if (formvars.preventAccordionClosing && !confirm('".addslashes(_L('There are errors on this form, are you sure you want to continue?'))."'))
+										event.stop();
+								}
+							}.bindAsEventListener(form, attachmentsformitem));
+						})();
+					</script>
+				")
 			)
 		);
 	} else if ($type == 'phone') {
@@ -158,24 +184,72 @@ function makeAccordionSplitter($type, $subtype, $languagecode, $permanent, $pref
 						<script type='text/javascript'>
 							(function () {
 								var audiolibrarywidget = new AudioLibraryWidget('audiolibrarycontainer', {$_SESSION['messagegroupid']});
-								var audiotextarea = '" . ($allowtranslation ? "{$type}-{$subtype}-{$languagecode}_translationitemtext" : "{$type}-{$subtype}-{$languagecode}_nonemessagebody") . "';
-
+								
 								var audiouploadformitem = $('{$type}-{$subtype}-{$languagecode}_audioupload');
+								
+								var getAudioTextarea = function () {
+									var audiotextareaid = '" . ($allowtranslation ? "{$type}-{$subtype}-{$languagecode}_translationitem" : "{$type}-{$subtype}-{$languagecode}_nonemessagebody") . "';
+									
+									var sourcetextarea = $(audiotextareaid + 'englishText');
+									if (sourcetextarea) {
+										if (sourcetextarea.up('.MessageBodyContainer').visible())
+											return sourcetextarea;
+										else
+											return $(audiotextareaid + 'text');
+									} else {
+										return $(audiotextareaid);
+									}
+								};
+								
+								var translationcheckbox = $('{$type}-{$subtype}-{$languagecode}_translationitem' + 'translatecheck');
+								if (translationcheckbox) {
+									var observetranslationaccordion = function(accordion, translationcheckbox) {
+										var audiosection = accordion.get_section_containing('audiolibrarycontainer');
+										if (audiosection) {
+											translationcheckbox.observe('click', function(event, accordion, audiosection) {
+												if (event.element().checked)
+													accordion.lock_section(audiosection);
+												else
+													accordion.unlock_section(audiosection);
+											}.bindAsEventListener(translationcheckbox, accordion, audiosection));
+											
+											if (translationcheckbox.checked)
+												accordion.lock_section(audiosection);
+										}
+									};
+									
+									var form = audiouploadformitem.up('form');
+									
+									form.observe('FormSplitter:AccordionLoaded', function(event, translationcheckbox) {
+										var formvars = document.formvars[this.name];
+										
+										observetranslationaccordion(formvars.accordion, translationcheckbox);
+									}.bindAsEventListener(form, translationcheckbox));
+									
+									if (document.formvars && document.formvars[form.name] && document.formvars[form.name].accordion) {
+										var formvars = document.formvars[form.name];
+										observetranslationaccordion(formvars.accordion, translationcheckbox);
+									}
+								}
+								
 								audiouploadformitem.observe('AudioUpload:AudioUploaded', function(event) {
 									hideHtmlEditor();
 									var audiofile = event.memo;
-									textInsert('{{' + audiofile.name + '}}', $(audiotextarea));
+									
+									textInsert('{{' + audiofile.name + '}}', getAudioTextarea());
 									this.reload();
-								}.bindAsEventListener(audiolibrarywidget, audiotextarea));
+								}.bindAsEventListener(audiolibrarywidget));
 
 								audiolibrarywidget.container.observe('AudioLibraryWidget:ClickName', function(event) {
 									hideHtmlEditor();
 									var audiofile = event.memo.audiofile;
-									textInsert('{{' + audiofile.name + '}}', $(audiotextarea));
-								}.bindAsEventListener(audiolibrarywidget, audiotextarea));
+									
+									textInsert('{{' + audiofile.name + '}}', getAudioTextarea());
+								}.bindAsEventListener(audiolibrarywidget));
 
 								// observe the callme container element for EasyCall events
-								$('{$type}-{$subtype}-{$languagecode}_callme_content').observe('EasyCall:update', function(event, audiotextarea) {
+								$('{$type}-{$subtype}-{$languagecode}_callme_content').observe('EasyCall:update', function(event) {
+										
 									new Ajax.Request('ajaxmessagegroup.php', {
 										'method': 'post',
 										'parameters': {
@@ -183,10 +257,10 @@ function makeAccordionSplitter($type, $subtype, $languagecode, $permanent, $pref
 											'messagegroupid': {$_SESSION['messagegroupid']},
 											'audiofileid': event.memo.audiofileid
 										},
-										'onSuccess': function(transport, audiofilename, audiotextarea) {
+										'onSuccess': function(transport, audiofilename) {
 											// if success
 											if (transport.responseJSON) {
-												textInsert('{{' + audiofilename + '}}', $(audiotextarea));
+												textInsert('{{' + audiofilename + '}}', getAudioTextarea());
 												this.reload();
 
 											// if failed the action but success on the ajax request
@@ -197,13 +271,13 @@ function makeAccordionSplitter($type, $subtype, $languagecode, $permanent, $pref
 											// create a new EasyCall to record another audio file if desired
 											newEasyCall();
 
-										}.bindAsEventListener(this, event.memo.audiofilename, audiotextarea),
+										}.bindAsEventListener(this, event.memo.audiofilename),
 										'onFailure': function() {
 											alert('" . escapehtml(_L('An error occured while trying to save your audio.\nPlease try again.')) . "');
 											newEasyCall();
 										}.bindAsEventListener(this)
 									});
-								}.bindAsEventListener(audiolibrarywidget, audiotextarea));
+								}.bindAsEventListener(audiolibrarywidget));
 
 							})();
 						</script>
