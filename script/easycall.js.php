@@ -16,8 +16,8 @@ var EasyCall = Class.create({
 	//	formitemname: name of the parent form item
 	//	container: parent form container
 	//	defaultphoneval: default phone number
-	//	name: text to use as audiofile name
-	initialize: function(formname, formitemname, container, defaultphoneval, name) {
+	//	audiofilename: text to use as audiofile name
+	initialize: function(formname, formitemname, container, defaultphoneval, audiofilename) {
 		this.formname = formname;
 		this.formitemname = formitemname;
 		this.container = container;
@@ -26,7 +26,7 @@ var EasyCall = Class.create({
 			"max": "<?=getSystemSetting('easycallmax',10)?>"
 		};
 		this.defaultphone = defaultphoneval;
-		this.name = name;
+		this.audiofilename = audiofilename;
 		this.specialtaskid = null;
 		this.audiofileid = null;
 		this.nophone = "<?=addslashes(_L('Phone Number'))?>";
@@ -139,7 +139,7 @@ var EasyCall = Class.create({
 			method:'post',
 			parameters: {
 				"id": this.specialtaskid,
-				"name": this.name,
+				"name": this.audiofilename,
 				"action": "getaudiofile"
 			},
 			onSuccess: this.handleGetAudioFile.bindAsEventListener(this),
@@ -271,7 +271,7 @@ var EasyCall = Class.create({
 
 	// fire the event that signifies the session is complete
 	completeSession: function () {
-		$(this.container).fire("EasyCall:update", {"audiofileid": this.audiofileid, "audiofilename": this.name});
+		$(this.container).fire("EasyCall:update", {"audiofileid": this.audiofileid, "audiofilename": this.audiofilename});
 	},
 
 	easycallPhoneValidate: function (phone) {
