@@ -232,7 +232,13 @@ foreach ($destinations as $type => $destination) {
 				$translationenabled = empty($messagetexts['none']);
 				
 				// Translation formitem.
-				$messagetext = !empty($messagetexts['overridden']) ? $messagetexts['overridden'] : $messagetexts['translated'];
+				if (!empty($messagetexts['overridden'])) {
+					$messagetext = $messagetexts['overridden'];
+				} else if (!empty($messagetexts['translated'])) {
+					$messagetext = $messagetexts['translated'];
+				} else {
+					$messagetext = $messagetexts['none'];
+				}
 				$formdata["translationitem"] = makeTranslationItem($required, $type, $subtype, $languagecode, $languagename, $messagetexts['source'], $messagetext, _L("Enable Translation"), !empty($messagetexts['overridden']), true, false, $translationenabled, "", $datafields);
 
 				// Javascript to detect when user enables/disables translation.
@@ -244,60 +250,6 @@ foreach ($destinations as $type => $destination) {
 				$overriddenstr = !empty($messagetexts['overridden']) ? 'true' : 'false';
 				$formdata["toggletranslation"] = makeFormHtml("
 					<script type='text/javascript'>
-						$('$translationitemid').observe('TranslationItem:TranslationToggled', function(event) {
-							if (event.memo.enabled) {
-								return;
-								$('$sourcemessagebodyid').up('.MessageBodyContainer').show();
-								$('$messagebodyid').up('.MessageBodyContainer').hide();
-
-								$$('.MessageBodyHeader').invoke('hide');
-								$$('.SourceMessageBodyHeader').invoke('show');
-
-								$('refreshtranslationbutton').show();
-
-								if ($usehtmleditor)
-									applyHtmlEditor($('$sourcemessagebodyid'));
-							} else {
-								return;
-								// Turn off override if translation is disabled.
-								$('{$translationitemid}override').checked = false; // TODO: May need to do something special for Internet Explorer.
-								overrideTranslation('$translationitemid', '{$translationlanguages[$languagecode]}', $usehtmleditor, true);
-
-								$('$sourcemessagebodyid').up('.MessageBodyContainer').hide();
-								$('$messagebodyid').up('.MessageBodyContainer').show();
-
-								$$('.MessageBodyHeader').invoke('show');
-								$$('.SourceMessageBodyHeader').invoke('hide');
-
-								$('refreshtranslationbutton').hide();
-
-								if ($usehtmleditor)
-									applyHtmlEditor($('$messagebodyid'));
-							}
-						});
-						$('$translationitemid').observe('TranslationItem:OverrideToggled', function(event) {
-							if (!event.memo.override) {
-								return;
-								$('$sourcemessagebodyid').up('.MessageBodyContainer').show();
-
-								$$('.MessageBodyHeader').invoke('hide');
-								$$('.SourceMessageBodyHeader').invoke('show');
-
-								$('refreshtranslationbutton').show();
-
-								if ($usehtmleditor)
-									applyHtmlEditor($('$sourcemessagebodyid'));
-							} else {
-								return;
-								$('$sourcemessagebodyid').up('.MessageBodyContainer').hide();
-
-								$$('.MessageBodyHeader').invoke('show');
-								$$('.SourceMessageBodyHeader').invoke('hide');
-
-								$('refreshtranslationbutton').hide();
-							}
-						});
-
 						if ($translationenabledstr) {
 							if ($overriddenstr) {
 								$$('.MessageBodyHeader').invoke('show');

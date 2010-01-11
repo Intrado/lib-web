@@ -557,10 +557,8 @@ function pickDate (textbox, allowPast, allowFuture, closeOnBlur) {
 	});
 }
 
-// Updates the textarea that the html editor replaces with the latest content.
-// Returns null if the html editor is not loaded.
-// Returns an object containing the html editor instance and also the html editor's container.
-function saveHtmlEditorContent() {
+// Returns the textarea that the html editor is currently replacing.
+function getHtmlEditorObject() {
 	if (!CKEDITOR) {
 		return null;
 	}
@@ -573,8 +571,22 @@ function saveHtmlEditorContent() {
 
 	var textarea = container.previous();
 	var textareauseshtmleditor = textarea && textarea.match('textarea.HtmlEditor');
-	if (textareauseshtmleditor) {
-		var tempdiv = new Element('div').insert(instance.getData());
+	
+	return {'instance': instance, 'container': container, 'currenttextarea': textareauseshtmleditor ? textarea : null};
+}
+
+// Updates the textarea that the html editor replaces with the latest content.
+// Returns null if the html editor is not loaded.
+// Returns an object containing the html editor instance and also the html editor's container.
+function saveHtmlEditorContent(existinghtmleditorobject) {
+	var htmleditorobject = existinghtmleditorobject || getHtmlEditorObject();
+	if (!htmleditorobject) {
+		return null;
+	}
+	
+	var textarea = htmleditorobject.currenttextarea;
+	if (textarea) {
+		var tempdiv = new Element('div').insert(htmleditorobject.instance.getData());
 
 		// Unstyle any image elements having src="viewimage.php?id=.."
 		var images = tempdiv.select('img');
@@ -590,14 +602,15 @@ function saveHtmlEditorContent() {
 
 		if (images.length < 1) {
 			// CKEditor inserts blank tags even if the user has deleted everything.
-			if (tempdiv.innerHTML.stripTags().strip() == '')
+			if (html.stripTags().strip() == '')
 				html = '';
 		}
 
 		textarea.value = html;
+		textarea.fire('HtmlEditor:SavedContent');
 	}
 	
-	return {'instance': instance, 'container': container, 'previoustextarea': textareauseshtmleditor ? textarea : null};
+	return htmleditorobject;
 }
 
 function hideHtmlEditor() {
@@ -610,7 +623,7 @@ function hideHtmlEditor() {
 function applyHtmlEditor(textarea) {
 	textarea = $(textarea);
 
-	var editorobject = saveHtmlEditorContent();
+	var editorobject = getHtmlEditorObject();
 	if (!editorobject) {
 		if ($('reusableckeditor'))
 			return; // The editor instance is still loading.
@@ -644,10 +657,14 @@ function applyHtmlEditor(textarea) {
 
 		return;
 	}
+	
+	if (!editorobject.currenttextarea || editorobject.currenttextarea.identify() != textarea.identify()) {
+		saveHtmlEditorContent(editorobject);
+	}
 
 	var html = textarea.value.replace("<<", "&lt;&lt;").replace(">>", "&gt;&gt;");
 	editorobject.instance.setData(html);
-
+	
 	textarea.hide().addClassName('HtmlEditor').insert({'after':editorobject.container});
 }
 

@@ -35,7 +35,7 @@ class TranslationItem extends FormItem {
 			' . (!empty($this->args['showhr']) ? '<hr>' : '') . '
 			
 			<div style="'.(!empty($this->args['editenglishtext']) ? '' : 'display:none').'">
-				<div class="MessageBodyContainer">
+				<div class="MessageBodyContainer" style="'.((!$msgdata->enabled || $msgdata->override) ? 'display:none' : '').'">
 					<textarea '. (!empty($this->args['editenglishtext']) ? (' onChange="setTranslationValue(\''.$n.'\');" style="display:block; width:99%" ') : ' style="display:none" ') . '  rows="10" class="SourceTextarea" id="'.$n.'englishText">' . escapehtml($this->args["englishText"]) . '</textarea>
 					' . icon_button(_L("Refresh Translation"),"tick", "getTranslation('$n','$language',$usehtmleditor);", null, 'id="refreshtranslationbutton"') . '
 					<div style="margin-top:20px;clear:both"></div>
@@ -66,7 +66,7 @@ class TranslationItem extends FormItem {
 						
 						<div class="MessageBodyContainer" style="display: '.(($msgdata->override || !$msgdata->enabled)?"block":"none").'">
 							<div style="'.(!$allowoverride ? 'display:none' : '').'">
-								<textarea class="MessageTextarea" id="'.$n.'text" name="'.$n.'text" style="width: 99%;" rows="10" onChange="setTranslationValue(\''.$n.'\');" />'.escapehtml($msgdata->text).'</textarea>
+								<textarea class="MessageTextarea" id="'.$n.'text" name="'.$n.'text" style="width: 99%;" rows="10" onChange="setTranslationValue(\''.$n.'\');">'.escapehtml($msgdata->text).'</textarea>
 							</div>
 						</div>
 						
@@ -135,6 +135,8 @@ class TranslationItem extends FormItem {
 		$str = '
 			<script type="text/javascript">
 				function toEnglishButton(section,language,usehtmleditor) {
+					saveHtmlEditorContent();
+					
 					if ($(section+"showenglish").visible()) {
 						$(section+"retranslation").show();
 						$(section+"showenglish").hide();
@@ -147,6 +149,8 @@ class TranslationItem extends FormItem {
 					}
 				}
 				function submitRetranslation(section,language,usehtmleditor) {
+					saveHtmlEditorContent();
+					
 					var srcbox = section + "text";
 					
 					var text = $(srcbox).getValue();
@@ -169,7 +173,6 @@ class TranslationItem extends FormItem {
 									if (usehtmleditor) {
 										translatedtext = translatedtext.replace(/<</, "&lt;&lt;").replace(/>>/, "&gt;&gt;");
 									} else {
-										console.info("escapinghtml");
 										translatedtext = translatedtext.escapeHTML();
 									}
 									$(dstbox).innerHTML = translatedtext;
@@ -199,7 +202,6 @@ class TranslationItem extends FormItem {
 							if (usehtmleditor) {
 								translatedtext = translatedtext.replace(/<</, "&lt;&lt;").replace(/>>/, "&gt;&gt;");
 							} else {
-								console.info("escapinghtml");
 								translatedtext = translatedtext.escapeHTML();
 							}
 							$(section+"textdiv").innerHTML = translatedtext;
@@ -263,6 +265,8 @@ class TranslationItem extends FormItem {
 				}
 				
 				function toggleTranslation(section,language, usehtmleditor) {
+					saveHtmlEditorContent();
+					
 					$(section).fire("TranslationItem:TranslationToggled", {"enabled": $(section+"translatecheck").checked});
 					
 					if ($(section+"translatecheck").checked) {
@@ -295,10 +299,10 @@ class TranslationItem extends FormItem {
 						
 						$(section+"englishText").up(".MessageBodyContainer").hide();
 						
+						$(section+"text").up(".MessageBodyContainer").show();
+						
 						if (usehtmleditor)
-							applyHtmlEditor(section+"text");
-						else
-							$(section+"text").up(".MessageBodyContainer").show();
+							applyHtmlEditor($(section+"text"));
 					}
 					setTranslationValue(section);
 				}
@@ -338,6 +342,10 @@ class TranslationItem extends FormItem {
 						}
 					}.bindAsEventListener(datafieldinsertbutton, formitemcontainer, formitemelement, datafieldstable));
 				}
+				
+				formitemcontainer.observe('HtmlEditor:SavedContent', function(event) {
+					setTranslationValue(this.identify());
+				}.bindAsEventListener(formitemelement));
 			})();
 		";
 		
