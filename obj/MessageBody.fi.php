@@ -11,7 +11,7 @@ class MessageBody extends FormItem {
 			<table style="width:100%">
 				<tr>
 					<td valign="top" rowspan="5">
-						<textarea id="'.$n.'" name="'.$n.'" rows="12" cols="50" />'.escapehtml($value).'</textarea>	';
+						<textarea id="'.$n.'" name="'.$n.'" rows="12" cols="50">'.escapehtml($value).'</textarea>	';
 						
 		if(!isset($this->args['playbutton']) || $this->args['playbutton'] === true) {
 			$str .= 		'<div>' . icon_button(_L("Play"),"fugue/control","var content = $('" . $n . "').getValue();
@@ -79,11 +79,11 @@ class MessageBody extends FormItem {
 				<tr>
 					<td>
 						<span style="font-size: 9px;">Default&nbsp;Value:</span><br />
-						<input id="'.$n.'datadefault" name="'.$n.'datavalue" type="text" size="10" value=""/>
+						<input id="'.$n.'datadefault" type="text" size="10" value=""/>
 					</td>
 					<td>
 						<span style="font-size: 9px;">Data&nbsp;Field:</span><br />
-						<select id="'.$n.'datafield" name="'.$n.'language">
+						<select id="'.$n.'datafield">
 							<option value="">-- Select a Field --</option>';								
 		foreach($this->args['fields'] as $field)
 		{
