@@ -54,7 +54,7 @@ var WizEasyCall = Class.create(EasyCall,{
 
 		// check if form data for this langcode already exists.
 		var audiofiles = $(this.formitemname).value.evalJSON();
-		if (typeof(audiofiles[this.langcode]) !== "undefined") {
+		if (typeof(audiofiles[this.langcode]) !== "undefined" && audiofiles[this.langcode] !== null) {
 			this.audiofileid = audiofiles[this.langcode];
 			this.createPlayReRecordRemoveButtons();
 		}
@@ -81,28 +81,8 @@ var WizEasyCall = Class.create(EasyCall,{
 		}
 
 		// if this is not en (Default), allow a delete button
-		if (this.langcode != "en") {
-			$(this.container+"_action").insert(icon_button("<?=escapehtml(_L("Remove"))?>", "cross", this.container+"_delete").setStyle({float:"left"}));
-
-			// listen for clicks on the remove button
-			$(this.container+"_delete").observe("click", function (event) {
-				// remove the audiofile if it exists in form data
-				this.removeAudioFile.bind(this);
-
-				// decrement the total audiofiles
-				totalaudiofiles--;
-
-				// remove the container
-				$(this.container).remove();
-
-				// unhide the alt language selector
-				$(this.formitemname+"_altlangs").show();
-
-				// unhide the langcode from the selector
-				if ($(this.formitemname+"_select_"+this.langcode))
-					$(this.formitemname+"_select_"+this.langcode).show();
-			}.bind(this));
-		}
+		if (this.langcode != "en")
+			$(this.container+"_action").insert(this.getRemoveButton());
 
 		$(this.container+"_action").insert({ "after":
 			new Element("div",{style: "clear: both;"})
@@ -145,28 +125,8 @@ var WizEasyCall = Class.create(EasyCall,{
 			);
 
 		// if this is not en (Default), allow a delete button
-		if (this.langcode != "en") {
-			$(this.container+"_action").insert(icon_button("<?=escapehtml(_L("Remove"))?>", "cross", this.container+"_delete").setStyle({float:"left"}));
-
-			// listen for clicks on the remove button
-			$(this.container+"_delete").observe("click", function (event) {
-				// remove the audiofile if it exists in form data
-				this.removeAudioFile();
-
-				// decrement the total audiofiles
-				totalaudiofiles--;
-
-				// remove the container
-				$(this.container).remove();
-
-				// unhide the alt language selector
-				$(this.formitemname+"_altlangs").show();
-
-				// unhide the langcode from the selector
-				if ($(this.formitemname+"_select_"+this.langcode))
-					$(this.formitemname+"_select_"+this.langcode).show();
-			}.bind(this));
-		}
+		if (this.langcode != "en")
+			$(this.container+"_action").insert(this.getRemoveButton());
 
 		// JobWizard EasyCall gets a bottom border
 		$(this.container).insert(new Element("div", {style: "padding-top: 3px; margin-bottom: 5px; border-bottom: 1px solid gray; clear: both"}));
@@ -190,6 +150,32 @@ var WizEasyCall = Class.create(EasyCall,{
 
 		// show the language select element
 		$(this.formitemname+"_altlangs").show();
+	},
+
+	// returns a remove button element
+	getRemoveButton: function() {
+		rembutton = icon_button("<?=escapehtml(_L("Remove"))?>", "cross", this.container+"_delete").setStyle({float:"left"});
+
+		// listen for clicks on the remove button
+		rembutton.observe("click", function (event) {
+			// remove the audiofile if it exists in form data
+			this.removeAudioFile();
+
+			// decrement the total audiofiles
+			totalaudiofiles--;
+
+			// remove the container
+			$(this.container).remove();
+
+			// unhide the alt language selector
+			$(this.formitemname+"_altlangs").show();
+
+			// unhide the langcode from the selector
+			if ($(this.formitemname+"_select_"+this.langcode))
+				$(this.formitemname+"_select_"+this.langcode).show();
+		}.bind(this));
+
+		return rembutton;
 	},
 
 	// remove the audiofile (if it exists) from the form data.
