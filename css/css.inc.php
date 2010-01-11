@@ -508,6 +508,12 @@ div.scrollTableContainer {
 	background-position: 2px 6px;
 	border: solid 1px <?=$theme2?>;
 }
+.accordiontitlediv td.middle {
+	text-align: left;
+}
+.accordiontitlediv td.left, .accordiontitlediv td.right {
+	display: none;
+}
 .accordiontitledivexpanded {
 	background-image: url('img/arrow_down.gif');
 }
@@ -528,24 +534,57 @@ div.scrollTableContainer {
 	padding-bottom: 25px;
 	margin-bottom: 1px;
 }
+.horizontaltabstabspane {
+	margin: 0;
+	border: 0;
+	padding: 0;
+	border-bottom: solid 1px <?=$theme2?>;
+}
 .horizontaltabstitlediv {
 	font-size: 12px;
-	padding: 2px;
-	padding-top: 5px;
+	padding:0;
 	cursor: pointer;
-	color: rgb(30,30,30);
-	background: #f8f1e9 no-repeat;
-	background-position: 2px 6px;
-	border: solid 1px #b47727;
-	-moz-border-radius: 10px 10px 0 0;
+	color: <?=$primary?>;
 	float: left;
 	white-space: nowrap;
+	margin:0;
 }
+.horizontaltabstitlediv td, img {
+	padding: 0;
+	margin: 0;
+	text-align: left;
+}
+
+.horizontaltabstitlediv td.middle {
+	padding-right: 3px;
+	padding-left: 0;
+	background: <?=$theme1?> url('img/horizontaltab_middle.gif') repeat-x;
+}
+.horizontaltabstitlediv td.right {
+	background: <?=$theme1?> url('img/horizontaltab_right.gif') no-repeat;
+	width: 14px;
+	height: 26px;
+}
+.horizontaltabstitlediv td.left {
+	background: <?=$theme1?> url('img/horizontaltab_left.gif') no-repeat;
+	width: 14px;
+	height: 26px;
+}
+
 .horizontaltabstitledivexpanded {
-	border-bottom: solid 2px rgb(250,250,250);
+	font-weight: bold;
+}
+
+.horizontaltabstitledivexpanded td.middle {
+	background: <?=$theme2?> url('img/horizontaltab_middle.gif') repeat-x;
+}
+.horizontaltabstitledivexpanded td.left {
+	background: <?=$theme2?> url('img/horizontaltab_left.gif') repeat-x;
+}
+.horizontaltabstitledivexpanded td.right {
+	background: <?=$theme2?> url('img/horizontaltab_right.gif') repeat-x;
 }
 .horizontaltabstitledivcollapsed {
-	background: rgb(200,200,200);
 }
 .horizontaltabstitledivlocked {
 	color: rgb(130,130,130);
@@ -559,30 +598,52 @@ div.scrollTableContainer {
 	clear: both;
 }
 .horizontaltabspanelspane {
-	border: 1px solid #b47727;
+	border: 1px solid <?=$theme2?>;
+	border-top: 0;
+	margin:0;
 	padding: 5px;
 	padding-bottom: 25px;
 	margin-bottom: 1px;
-	background: rgb(250,250,250);
+	background: white;
 }
 .verticaltabstitlediv {
 	font-size: 12px;
-	padding: 2px;
-	padding-top: 5px;
 	cursor: pointer;
-	color: rgb(30,30,30);
-	background: white no-repeat;
-	border: solid 1px #b47727;
-	-moz-border-radius: 0 10px 10px 0;
-	border-left: 0;
+	color: <?=$primary?>;
+	margin: 0;
+	padding: 0;
+	margin-top: 5px;
+}
+.verticaltabstitlediv td, img {
+	padding: 0;
+	margin: 0;
+}
+
+.verticaltabstitlediv td.left {
+	display:none;
+}
+.verticaltabstitlediv td.middle {
+	padding-right: 3px;
+	background: <?=$theme1?> url('img/verticaltab_middle.gif') repeat-x;
+}
+.verticaltabstitlediv td.right {
+	background: <?=$theme1?> url('img/verticaltab_right.gif') no-repeat;
+	width: 14px;
+	height: 26px;
 }
 .verticaltabstitledivexpanded {
-	border: solid 2px #b47727;
 	border-left: 0;
-	margin-left: -2px;
+	font-weight: bold;
 }
+.verticaltabstitledivexpanded td.middle {
+	background: <?=$theme2?> url('img/verticaltab_middle.gif') repeat-x;
+}
+.verticaltabstitledivexpanded td.right {
+	background: <?=$theme2?> url('img/verticaltab_right.gif') no-repeat;
+}
+
 .verticaltabstitledivcollapsed {
-	background: rgb(200,200,200);
+	font-weight: normal;
 }
 .verticaltabstitledivlocked {
 	color: rgb(130,130,130);
@@ -595,9 +656,10 @@ div.scrollTableContainer {
 .verticaltabscontentdiv {
 }
 .verticaltabstabspane {
+	border-left: 1px solid <?=$theme2?>;
+	padding: 0;
 }
 .verticaltabspanelspane {
-	border: 2px solid #b47727;
 	padding: 5px;
 	padding-bottom: 25px;
 	margin-bottom: 1px;
@@ -606,6 +668,7 @@ div.scrollTableContainer {
 table.SplitPane {
 	border-collapse: collapse;
 	width: 100%;
+	margin: 0;
 }
 td.SplitPane {
 	margin: 0;
