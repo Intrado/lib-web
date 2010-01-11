@@ -669,7 +669,7 @@ form {
 	width: 150px;
 }
 td.verticaltabstabspane {
-	width: 10%;
+	width: 15%;
 	white-space: nowrap;
 }
 td.MessageGroupAudioFile {
@@ -737,7 +737,7 @@ echo '<div id="formswitchercontainer">' . $messagegroupsplitter->render($default
 				if (div.match('.FormSwitcherLayoutSection')) {
 					var td = div.up('td.SplitPane');
 					if (td) {
-						td.style.width = '30%';
+						td.style.width = '45%';
 					}
 
 					var formtableheaders = div.select('.formtableheader');
@@ -937,20 +937,6 @@ echo '<div id="formswitchercontainer">' . $messagegroupsplitter->render($default
 						});
 					}.bindAsEventListener(autotranslator.up('form'), state));
 				}
-			} else if (tabloadedpieces.length == 3) {
-				// Individual message translation.
-				/*var refreshtranslationbutton = $('refreshtranslationbutton');
-				if (refreshtranslationbutton) {
-					refreshtranslationbutton.observe('click', function(event, state) {
-						saveHtmlEditorContent();
-
-						var formname = this.name;
-						var idpieces = formname.split('-');
-						if (idpieces.length == 3) {
-							getTranslation(formname + '_translationitem', idpieces[2], idpieces[1] == 'html');
-						}
-					}.bindAsEventListener(refreshtranslationbutton.up('form'), state));
-				}*/
 			}
 
 			// Update the status icons on tabs.
