@@ -250,7 +250,11 @@ class EasyCall extends FormItem {
 			<script type="text/javascript" src="script/wizeasycall.js.php"></script>
 			<script type="text/javascript">
 				// get the current audiofiles from the form data
-				var msgs = '.$value.';
+				var audiofiles = '.$value.';
+
+				// if en (Default) is not set, set it so it must be recorded
+				if (typeof(audiofiles["en"]) == "undefined")
+					audiofiles["en"] = null;
 
 				// store the language code to name map in a json object, we need this in WizEasyCall
 				var languages = '.json_encode($languages).';
@@ -259,7 +263,7 @@ class EasyCall extends FormItem {
 				msgphone = "'.$defaultphone.'";
 
 				// load up all the audiofiles from form data
-				Object.keys(msgs).each(function(langcode) {
+				Object.keys(audiofiles).each(function(langcode) {
 
 					// create a new wizard easycall
 					insertNewWizEasyCall( "'.$this->form->name.'", "'.$n.'", "'.$n.'_content", "'.$n.'_select", langcode );
