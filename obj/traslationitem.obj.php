@@ -278,14 +278,13 @@ class TranslationItem extends FormItem {
 						$(section +"disableinfo").hide();
 						$(section +"controls").show();
 						
-						$(section+"englishText").up(".MessageBodyContainer").show();
-						
 						if ($(section+"override").checked) {
 							if (usehtmleditor)
 								applyHtmlEditor(section+"text");
 							else
 								$(section+"text").up(".MessageBodyContainer").show();
 						} else {
+							$(section+"englishText").up(".MessageBodyContainer").show();
 							$(section+"text").up(".MessageBodyContainer").hide();
 							if (usehtmleditor)
 								applyHtmlEditor($(section+"englishText"));
