@@ -22,6 +22,14 @@ class FieldMap extends DBMappedObject {
 		$fieldmap->options = "searchable,multisearch,disabled";
 		return $fieldmap;
 	}
+	
+	static function getSubscriberOrganizationFieldMap() {
+		$fieldmap = new FieldMap();
+		$fieldmap->fieldnum = "oid";
+		$fieldmap->name = _L("Organization");
+		$fieldmap->options = "searchable,multisearch,subscribe,static";
+		return $fieldmap;
+	}
 
 	static function getFirstNameField() {
 		return FieldMap::getFieldnumWithOption('firstname', 'f01');
