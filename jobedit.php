@@ -312,7 +312,13 @@ $dayoffset = (strtotime("now") > (strtotime(($ACCESS->getValue("calllate")?$ACCE
 $startvalues = newform_time_select(NULL, $ACCESS->getValue('callearly'), $ACCESS->getValue('calllate'), $USER->getCallEarly());
 $endvalues = newform_time_select(NULL, $ACCESS->getValue('callearly'), $ACCESS->getValue('calllate'), $USER->getCallLate());
 
-$messages = array("" =>_L("-- Select a Message --")) + QuickQueryList("select id, name, (name +0) as digitsfirst from messagegroup where userid=? and deleted=0 order by digitsfirst,name", true,false,array($USER->id));
+
+$messages = QuickQueryList("select id, name, (name +0) as digitsfirst from messagegroup where userid=? and deleted=0 order by digitsfirst,name", true,false,array($USER->id));
+if($messages === false) {
+	$messages = array("" =>_L("-- Select a Message --"));
+} else {
+	$messages = array("" =>_L("-- Select a Message --")) + $messages;
+}
 
 if($job->messagegroupid != null) {
 	$deletedmessage = QuickQueryRow("select id, name from messagegroup where id = ? and deleted = 1", false, false,array($job->messagegroupid));
