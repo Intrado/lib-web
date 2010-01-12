@@ -62,7 +62,9 @@ class IntroSelect extends FormItem {
 		$str .= '<div>' 
 				. icon_button(_L("Play"),"fugue/control","
 				var content = $('" . $n . "message').getValue();
-					if(content != '')
+					if(content.substring(0,5) == 'intro') {
+						popup('previewmessage.php?id=' + content.substring(5), 400, 400,'preview');
+					} else if(content != '')
 						popup('previewmessage.php?id=' + content, 400, 400,'preview');
 					else
 						popup('previewmessage.php?mediafile=" . urlencode($defaultrequest) . "', 400, 400,'preview');") . '</div>';
@@ -87,11 +89,10 @@ class ValIntroSelect extends Validator {
 	function validate ($value, $args) {
 		if(!is_array($value)) {
 			$value = json_decode($value,true);
-		}		
-		
+		}
 		$errortext = "";
-		if (isset($value["message"]) && $value["message"] != "") {
-			if ( 1 != QuickQuery('select count(*) from message where id=? and type=\'phone\'', false, array($value["message"]))) {
+		if (isset($value["message"]) && $value["message"] != "" && substr($value["message"],0,5) != "intro") {
+			if ( 1 != QuickQuery('select count(*) from message where id=? and type=\'phone\' and languagecode=?', false, array($value["message"],$args["languagecode"]))) {
 				$errortext .= "Message can not be found";
 			} else if (Message::getAudioLength($value["message"],array()) < 70000) { // 70000 ~ 5 second audio
 				$errortext .= "Message must be more than 5 seconds long to be a intro message.";
@@ -104,140 +105,149 @@ class ValIntroSelect extends Validator {
 	}
 }
 
-$messages = DBFindMany("Message","from message where userid=" . $USER->id ." and deleted=0 and type='phone' order by name");
 
-$languages = QuickQueryList("select name from language where name != 'English'");
+// Note that id is the message id and name is the mssage group id
+$messages = QuickQueryList("select m.id as id, g.name as name,(g.name + 0) as digitsfirst
+							from messagegroup g, message m where g.userid=? and g.deleted = 0 and m.messagegroupid = g.id and m.type = 'phone'
+							and m.autotranslate != 'translated' and m.languagecode = 'en' order by digitsfirst",true,false,array($USER->id));
 
-$messageselect = array("" => "English - System General Intro");
-foreach($messages as $message)
-	$messageselect[$message->id] = $message->name;
+if($messages == false) {
+	$messages = array("" => "English - System General Intro");
+} else {
+	$messages = array("" => "English - System General Intro") + $messages;
+}
 
-	
+$languages = QuickQueryList("select name, code from language where name != 'English'",true);
+
 if($IS_COMMSUITE)
-	$users = DBFindMany("User","from user where enabled and deleted=0 order by firstname, lastname");
+$users = DBFindMany("User","from user where enabled and deleted=0 order by firstname, lastname");
 /*CSDELETEMARKER_START*/
 else
-	$users = DBFindMany("User","from user where enabled and deleted=0 and login != 'schoolmessenger' order by firstname, lastname");
+$users = DBFindMany("User","from user where enabled and deleted=0 and login != 'schoolmessenger' order by firstname, lastname");
 /*CSDELETEMARKER_END*/
-	
+
 $userselect = array("" => "Select Messages From User (Optional)");
 foreach($users as $user) {
 	$userselect[$user->id] = $user->firstname ." " . $user->lastname;
-}	
+}
 
-$messagevalues = array("user" => $userselect, "message" => $messageselect);
-//$languagevalues = array("language" => $languageselect,"user" => $userselect, "message" => $messageselect);
+$messagevalues = array("user" => $userselect, "message" => $messages);
 
-
-$defaultintro = DBFind("Message","from message m, prompt p where p.type='intro' and language is null and p.messageid = m.id and m.type='phone'","m");
-$emergencyintro = DBFind("Message","from message m, prompt p where p.type='emergencyintro' and language is null and p.messageid = m.id and m.type='phone'","m");
-
-
+$generalintro = QuickQueryRow("select m.id , m.name from message m, prompt p where p.type='intro' and language is null and p.messageid = m.id and m.type='phone'");
+$emergencyintro = QuickQueryRow("select m.id , m.name from message m, prompt p where p.type='emergencyintro' and language is null and p.messageid = m.id and m.type='phone'");
 
 $defaultmessages = $messagevalues;
-if($defaultintro) {
-	$defaultmessages["message"][$defaultintro->id] = $defaultintro->name;
-}
+if($generalintro)
+	$defaultmessages["message"]['intro' . $generalintro[0]] = $generalintro[1];
 $emergencymessages = $messagevalues;
 $emergencymessages["message"][""] = "English - System Emergency Intro";
-if($emergencyintro) {
-	$emergencymessages["message"][$emergencyintro->id] = $emergencyintro->name;
-}
+if($emergencyintro) 
+	$emergencymessages["message"]['intro' . $emergencyintro[0]] = $emergencyintro[1];
 
 $allowedjobtypes = QuickQueryRow("select sum(jt.systempriority = 1) as Emergency, sum(jt.systempriority != 1) as Other from jobtype jt where jt.deleted = 0 and jt.issurvey = 0",true);
 
-
 $formdata = array();
 $formdata[] = array(
-			"label" => "",
-			"control" => array("FormHtml",
-				"html"=> _L("<h3>Important Information</h3>
-						<div>These intro messages will play before all phone messages. The best intro messages contain a brief greeting and instructs the user to press \"1\" to hear the message. You should also let recipients know that they can press pound to place the call on hold. 
-						</div>"),
-			),
-			"helpstep" => 1
+	"label" => "",
+	"control" => array("FormHtml",
+		"html"=> _L("<h3>Important Information</h3>
+				<div>These intro messages will play before all phone messages. The best intro messages contain a brief greeting and instructs the user to press \"1\" to hear the message. You should also let recipients know that they can press pound to place the call on hold.
+				</div>"),
+	),
+	"helpstep" => 1
 );
 
 $formdata[] = "Default Intro";
 if($allowedjobtypes["Other"] > 0) {
-	$formdata["defaultmessage"] = array(
-			"label" => _L("General"),
-			"fieldhelp" => _L('This is the introduction which plays before non-emergency messages. See the Guide for content suggestions.'),
-			"value" => array("message" => ($defaultintro === false?"":$defaultintro->id)),
-			"validators" => array(array("ValIntroSelect")),
-			"control" => array("IntroSelect",
-				"values"=>$defaultmessages,
-				"defaultfile" => "DefaultIntro.wav"
-			),
-			"helpstep" => 1
+	$formdata["intro"] = array(
+		"label" => _L("General"),
+		"fieldhelp" => _L('This is the introduction which plays before non-emergency messages. See the Guide for content suggestions.'),
+		"value" => array("message" => ($generalintro === false?"":'intro' . $generalintro[0])),
+		"validators" => array(array("ValIntroSelect","languagecode" => "en")),
+		"control" => array("IntroSelect",
+			"values"=>$defaultmessages,
+			"defaultfile" => "DefaultIntro.wav"
+		),
+		"helpstep" => 1
 	);
 }
 if($allowedjobtypes["Emergency"] > 0) {
-	$formdata["emergencymessage"] = array(
-			"label" => _L("Emergency"),
-			"fieldhelp" => _L('This is the introduction which plays before an emergency message. See the Guide for content suggestions.'),
-			"value" => array("message" => ($emergencyintro === false?"":$emergencyintro->id)),
-			"validators" => array(array("ValIntroSelect")),
-			"control" => array("IntroSelect",
-				"values"=>$emergencymessages,
-				"defaultfile" => "EmergencyIntro.wav"
-			),
-			"helpstep" => 1
+	$formdata["emergencyintro"] = array(
+		"label" => _L("Emergency"),
+		"fieldhelp" => _L('This is the introduction which plays before an emergency message. See the Guide for content suggestions.'),
+		"value" => array("message" => ($emergencyintro === false?"":'intro' . $emergencyintro[0])),
+		"validators" => array(array("ValIntroSelect", "languagecode" => "en")),
+		"control" => array("IntroSelect",
+			"values"=>$emergencymessages,
+			"defaultfile" => "EmergencyIntro.wav"
+		),
+		"helpstep" => 1
 	);
 }
 $helpsteplanguages = array();;
 $helpstepindex = 2;
 
-foreach($languages as $language) {	
-	$formdata[] = $language . " " . _L("Intro"); // New section for each language	
+foreach($languages as $language => $code) {
+	$formdata[] = $language . " " . _L("Intro"); // New section for each language
+
+	// Note that id is the message id and name is the mssage group id
+	$messages = QuickQueryList("select m.id as id, g.name as name,(g.name + 0) as digitsfirst
+						from messagegroup g, message m where g.userid=? and g.deleted = 0 and m.messagegroupid = g.id and m.type = 'phone'
+						and m.autotranslate != 'translated' and m.languagecode = ? order by digitsfirst",true,false,array($USER->id,$code));
+	if($messages == false) {
+		$messagevalues["message"] = array("" => "English - System General Intro");
+	} else {
+		$messagevalues["message"] = array("" => "English - System General Intro") + $messages;
+	}
+
 	if($allowedjobtypes["Other"] > 0) {
-		
-		$defaultintro = DBFind("Message","from message m, prompt p where p.type='intro' and language=? and p.messageid = m.id and m.type='phone'","m",array($language));
-		
-		// TODO Fix a better way of adding the set message rather than copying the array in a for loop like this. 
-		$defaultmessages = $messagevalues;
-		
+		$generalintro = QuickQueryRow("select m.id , m.name from message m, prompt p where p.type='intro' and language=? and p.messageid = m.id and m.type='phone'",false,false,array($language));
+
+		// TODO Fix a better way of adding the set message rather than copying the array in a for loop like this.
+		$generalmessages = $messagevalues;
+
 		if($language == "Spanish") {
-			$defaultmessages["message"][""] = "Spanish - System General Intro";
+			$generalmessages["message"][""] = "Spanish - System General Intro";
 		}
-		
+
 		$messageid = "";
-		if($defaultintro) {
-			$defaultmessages["message"][$defaultintro->id] = $defaultintro->name;
-			$messageid = $defaultintro->id;
+		if($generalintro) {
+			$generalmessages["message"]['intro' . $generalintro[0]] = $generalintro[1];
+			$messageid = 'intro' . $generalintro[0];
 		}
-		$formdata[$language . "default"] = array(
+		$formdata[$code . "intro"] = array(
 			"label" => _L("General"),
 			"fieldhelp" => _L('This is the introduction which plays before non-emergency messages. See the Guide for content suggestions.'),
 			"value" => array("message" => $messageid),
-			"validators" => array(array("ValIntroSelect")),
+			"validators" => array(array("ValIntroSelect", "languagecode" => $code)),
 			"control" => array("IntroSelect",
-				 "values"=>$defaultmessages,
+				 "values"=>$generalmessages,
 				 "defaultfile" => "$language/DefaultIntro.wav",
 			),
 			"helpstep" => $helpstepindex
 		);
 	}
 	if($allowedjobtypes["Emergency"] > 0) {
-		$emergencyintro = DBFind("Message","from message m, prompt p where p.type='emergencyintro' and language=? and p.messageid = m.id and m.type='phone'","m",array($language));
+		$emergencyintro = QuickQueryRow("select m.id , m.name from message m, prompt p where p.type='emergencyintro' and language=? and p.messageid = m.id and m.type='phone'",false,false,array($language));
+
 		$emergencymessages = $messagevalues;
-		
+
 		if($language == "Spanish") {
 			$emergencymessages["message"][""] = "Spanish - System Emergency Intro";
 		} else {
 			$emergencymessages["message"][""] = "English - System Emergency Intro";
 		}
-		
+
 		$messageid = "";
 		if($emergencyintro) {
-			$emergencymessages["message"][$emergencyintro->id] = $emergencyintro->name;
-			$messageid = $emergencyintro->id;
+			$emergencymessages["message"]['intro' . $emergencyintro[0]] = $emergencyintro[1];
+			$messageid = 'intro' . $emergencyintro[0];
 		}
-		$formdata[$language . "emergency"] = array(
+		$formdata[$code . "emergencyintro"] = array(
 			"label" => _L("Emergency"),
 			"fieldhelp" => _L('This is the introduction which plays before an emergency message. See the Guide for content suggestions.'),
 			"value" => array("message" => $messageid),
-			"validators" => array(array("ValIntroSelect")),
+			"validators" => array(array("ValIntroSelect", "languagecode" => $code)),
 			"control" => array("IntroSelect",
 				 "values"=>$emergencymessages,
 				 "defaultfile" => "$language/EmergencyIntro.wav",
@@ -250,11 +260,11 @@ foreach($languages as $language) {
 }
 
 $helpsteps = array (
-	_L('These intro messages will play before all phone messages. The best intro messages contain a brief greeting and instructs the user to press "1" to hear the message. You should also let recipients know that they can press pound to place the call on hold. For example, <p>"<em>This is an important message from Springfield Independent School District. To hear this message now press 1. To place this call on hold press the pound key</em>".</p> Additionally, the Emergency intro message should state that the message is an emergency rather than simply "important."')
+_L('These intro messages will play before all phone messages. The best intro messages contain a brief greeting and instructs the user to press "1" to hear the message. You should also let recipients know that they can press pound to place the call on hold. For example, <p>"<em>This is an important message from Springfield Independent School District. To hear this message now press 1. To place this call on hold press the pound key</em>".</p> Additionally, the Emergency intro message should state that the message is an emergency rather than simply "important."')
 );
 
 $buttons = array(submit_button(_L("Done"),"submit","tick"),
-		icon_button(_L("Cancel"),"cross",null,"settings.php"));
+icon_button(_L("Cancel"),"cross",null,"settings.php"));
 
 $form = new Form("introform", $formdata, $helpsteps, $buttons);
 
@@ -268,124 +278,84 @@ $errors = false;
 
 //check for form submission
 if ($button = $form->getSubmit()) { //checks for submit and merges in post data
-	$ajax = $form->isAjaxSubmit(); //whether or not this requires an ajax response    
+	$ajax = $form->isAjaxSubmit(); //whether or not this requires an ajax response
 
 	if ($form->checkForDataChange()) {
 		$datachange = true;
 	} else if (($errors = $form->validate()) === false) { //checks all of the items in this form
 		$postdata = $form->getData(); //gets assoc array of all values {name:value,...}
-		if(isset($postdata['defaultmessage'])) {	
-			$messagevalues = json_decode($postdata['defaultmessage']);
-			if(isset($messagevalues->message) && strlen($messagevalues->message) > 0) {
-				$msgid = $messagevalues->message + 0;
-				$newmsg = new Message($msgid);
-				
-				if(!$newmsg->deleted) {		// if deleted the old value is still the intro
-					$newmsg->id = null;
-					$newmsg->deleted = 1;
-					$newmsg->name = $newmsg->name . " (Copy)";	
-					$newmsg->create();
-					// copy the parts
-					$parts = DBFindMany("MessagePart", "from messagepart where messageid=$msgid");
-					foreach ($parts as $part) {
-						
-						
-						
-						$newpart = new MessagePart($part->id);
-						$newpart->id = null;
-						$newpart->messageid = $newmsg->id;
-						$newpart->create();
+		$introtypes = array('intro','emergencyintro');
+		foreach($introtypes as $introtype) {
+			if(isset($postdata[$introtype])) {
+				$messagevalues = json_decode($postdata[$introtype]);
+				if(substr($messagevalues->message,0,5) != "intro") {
+					if(isset($messagevalues->message) && strlen($messagevalues->message) > 0) {
+						$msgid = $messagevalues->message + 0;
+						$newmsg = new Message($msgid);
+						$msggroupname = QuickQuery("select name from messagegroup where id = ?", false,array($newmsg->messagegroupid));
+
+						if(!$newmsg->deleted) {		// if deleted the old value is still the intro
+							$newmsg->id = null;
+							$newmsg->userid = $USER->id;
+							$newmsg->deleted = 1;
+							$newmsg->name = ($msggroupname != false?$msggroupname:$newmsg->name) . " (Copy)";
+							$newmsg->messagegroupid = null;
+							$newmsg->create();
+							// copy the parts
+							$parts = DBFindMany("MessagePart", "from messagepart where messageid=$msgid");
+							foreach ($parts as $part) {
+								$newpart = new MessagePart($part->id);
+								$newpart->id = null;
+								$newpart->messageid = $newmsg->id;
+								$newpart->create();
+							}
+						}
+						QuickUpdate("delete from prompt where type=? and language is null;",false,array($introtype));
+						QuickUpdate("insert into prompt (type, messageid) values (?,?)",false,array($introtype,$newmsg->id));
+					} else {
+						QuickUpdate("delete from prompt where type=? and language is null;",false,array($introtype));
 					}
-				} 
-				QuickUpdate("delete from prompt where type='intro' and language is null;");	
-				QuickUpdate("insert into prompt (type, messageid) values ('intro',?)",false,array($newmsg->id));			
-			} else {
-				QuickUpdate("delete from prompt where type='intro' and language is null;");			
+				}
 			}
 		}
-		if(isset($postdata['emergencymessage'])) {
-			$emergencyvalues = json_decode($postdata['emergencymessage']);
-			if(isset($emergencyvalues->message) && strlen($emergencyvalues->message) > 0) {	
-				$msgid = $emergencyvalues->message + 0;
-				$newmsg = new Message($msgid);
-				if(!$newmsg->deleted) {// if deleted the old value is still the intro
-					$newmsg->id = null;
-					$newmsg->deleted = 1;
-					$newmsg->name = $newmsg->name . " (Copy)";	
-					$newmsg->create();
-					// copy the parts
-					$parts = DBFindMany("MessagePart", "from messagepart where messageid=$msgid");
-					foreach ($parts as $part) {
-						$newpart = new MessagePart($part->id);
-						$newpart->id = null;
-						$newpart->messageid = $newmsg->id;
-						$newpart->create();
-					}			
+		foreach($languages as $language => $code) {
+			foreach($introtypes as $introtype) {
+				if(isset($postdata[$code . $introtype])) {
+					$languagevalues = json_decode($postdata[$code . $introtype]);
+					if(substr($languagevalues->message,0,5) != "intro") {
+						if(isset($languagevalues->message) && strlen($languagevalues->message) > 0) {
+							$msgid = $languagevalues->message + 0;
+							$newmsg = new Message($msgid);
+							$msggroupname = QuickQuery("select name from messagegroup where id = ?", false,array($newmsg->messagegroupid));
+
+							if(!$newmsg->deleted) {		// if deleted the old value is still the intro
+								$newmsg->id = null;
+								$newmsg->userid = $USER->id;
+								$newmsg->deleted = 1;
+								$newmsg->name = ($msggroupname != false?$msggroupname:$newmsg->name) . " (Copy)";
+								$newmsg->messagegroupid = null;
+								$newmsg->create();
+								// copy the parts
+								$parts = DBFindMany("MessagePart", "from messagepart where messageid=$msgid");
+								foreach ($parts as $part) {
+									$newpart = new MessagePart($part->id);
+									$newpart->id = null;
+									$newpart->messageid = $newmsg->id;
+									$newpart->create();
+								}
+							}
+							QuickUpdate("delete from prompt where type=? and language=?;",false,array($introtype,$language));
+							QuickUpdate("insert into prompt (type, messageid,language) values (?,?,?)",false,array($introtype,$newmsg->id,$language));
+						} else {
+							QuickUpdate("delete from prompt where type=? and language=?;",false,array($introtype,$language));
+						}
+					}
 				}
-				QuickUpdate("delete from prompt where type='emergencyintro' and language is null;");	
-				QuickUpdate("insert into prompt (type, messageid) values ('emergencyintro',?)",false,array($newmsg->id));
-			} else {
-				QuickUpdate("delete from prompt where type='emergencyintro' and language is null;");	
 			}
-		}
-		
-		foreach($languages as $language) {
-			$insertquery = "";
-			if(isset($postdata[$language . 'default'])) {				
-				$languagevalues = json_decode($postdata[$language . 'default']);
-				if(isset($languagevalues->message) && strlen($languagevalues->message) > 0) {
-					$msgid = $languagevalues->message + 0;
-					$newmsg = new Message($msgid);
-					if(!$newmsg->deleted) {
-						$newmsg->id = null;
-						$newmsg->deleted = 1;
-						$newmsg->name = $newmsg->name . " (Copy)";							
-						$newmsg->create();
-						// copy the parts
-						$parts = DBFindMany("MessagePart", "from messagepart where messageid=$msgid");
-						foreach ($parts as $part) {
-							$newpart = new MessagePart($part->id);
-							$newpart->id = null;
-							$newpart->messageid = $newmsg->id;
-							$newpart->create();
-						}
-					}
-					QuickUpdate("delete from prompt where type='intro' and language=?;",false,array($language));
-					QuickUpdate("insert into prompt (type, messageid,language) values ('intro',?,?)",false,array($newmsg->id,$language));
-				} else {
-					QuickUpdate("delete from prompt where type='intro' and language=?;",false,array($language));			
-				}
-			}	
-						
-			if(isset($postdata[$language . 'emergency'])) {				
-				$languagevalues = json_decode($postdata[$language . 'emergency']);
-				if(isset($languagevalues->message) && strlen($languagevalues->message) > 0) {
-					$msgid = $languagevalues->message + 0;
-					$newmsg = new Message($msgid);
-					if(!$newmsg->deleted) {
-						$newmsg->id = null;
-						$newmsg->deleted = 1;
-						$newmsg->name = $newmsg->name . " (Copy)";													
-						$newmsg->create();
-						// copy the parts
-						$parts = DBFindMany("MessagePart", "from messagepart where messageid=$msgid");
-						foreach ($parts as $part) {
-							$newpart = new MessagePart($part->id);
-							$newpart->id = null;
-							$newpart->messageid = $newmsg->id;
-							$newpart->create();
-						}
-					}
-					QuickUpdate("delete from prompt where type='emergencyintro' and language=?;",false,array($language));								
-					QuickUpdate("insert into prompt (type, messageid,language) values ('emergencyintro',?,?)",false,array($newmsg->id,$language));
-				} else {
-					QuickUpdate("delete from prompt where type='emergencyintro' and language=?;",false,array($language));							
-				}
-			}	
 		}
 
 		if ($ajax)
-			$form->sendTo("settings.php");	
+			$form->sendTo("settings.php");
 		else
 			redirect("settings.php");
 	}
@@ -405,38 +375,38 @@ include_once("nav.inc.php");
 <? Validator::load_validators(array("ValIntroSelect")); ?>
 
 function setvalues(result,id) {
-	var response = result.responseJSON;
+var response = result.responseJSON;
 
-	var defaulttext = $(id + 'message').options[0].text;
-	if(defaulttext == undefined)
-		defaulttext = "Select a Message";
-	
-	if (response) {	
-		var output = '<option value=\"\">' + defaulttext + '</option>';//'<select id=\"defaultintro\" name=\"loaduserselect\">n';
-		for (var i in response) {
-			output += '    <option value=\"' + i + '\">' + response[i] + '</option>\n'
-		}	
-		$(id + 'message').update(output);
-	} else {
-		$(id + 'message').update('<option value=\"\">' + defaulttext + '</option>');
-	}
+var defaulttext = $(id + 'message').options[0].text;
+if(defaulttext == undefined)
+defaulttext = "Select a Message";
+
+if (response) {
+var output = '<option value=\"\">' + defaulttext + '</option>';//'<select id=\"defaultintro\" name=\"loaduserselect\">n';
+for (var i in response) {
+	output += '    <option value=\"' + i + '\">' + response[i] + '</option>\n'
+}
+$(id + 'message').update(output);
+} else {
+$(id + 'message').update('<option value=\"\">' + defaulttext + '</option>');
+}
 }
 function loaduser(id) {
-	$(id).value = Object.toJSON({"message": ""});
-	var request = 'ajax.php?ajax&type=Messages&messagetype=phone';
-	
-	if($(id + 'user').getValue() != '')
-		request += '&userid=' + $(id + 'user').getValue();
-	cachedAjaxGet(request,setvalues,id);
-}	
+$(id).value = Object.toJSON({"message": ""});
+var request = 'ajax.php?ajax&type=Messages&messagetype=phone';
+
+if($(id + 'user').getValue() != '')
+request += '&userid=' + $(id + 'user').getValue();
+cachedAjaxGet(request,setvalues,id);
+}
 
 function updatevalue(id) {
-	if($(id+"user") && $(id+"message")) {
-		$(id).value = Object.toJSON({
-				"user": $(id+"user").value,
-				"message": $(id+"message").value
-		});
-	}	
+if($(id+"user") && $(id+"message")) {
+$(id).value = Object.toJSON({
+		"user": $(id+"user").value,
+		"message": $(id+"message").value
+});
+}
 }
 
 </script>
