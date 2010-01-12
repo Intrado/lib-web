@@ -61,15 +61,7 @@ foreach ($subscribeFields as $fieldnum => $name) {
 }
 
 $fieldmaps = DBFindMany("FieldMap", "from fieldmap where options like '%subscribe%' order by fieldnum");
-
-$hasorganizations = strcmp("none", getSystemSetting("subscribersetorganization", "none")) != 0;
-$organizations = array();
-if ($hasorganizations) {
-	$organizations = QuickQueryList("select id, orgkey from organization", true);
-	if (count($organizations) == 0) {
-		$hasorganizations = 0;
-	}
-}
+$organizations = QuickQueryList("select o.id, o.orgkey from organization o join persondatavalues pdv on (o.id = pdv.value) where pdv.fieldnum='oid' and not o.deleted", true);
 
 $subscriberid = $_SESSION['subscriberid'];
 $pendingList = DBFindMany("SubscriberPending", "from subscriberpending where subscriberid=?", false, array($subscriberid));
@@ -198,12 +190,14 @@ if(count($jobtypes) > 0) {
 	);
 }
 
-if ($hasorganizations) {
+// do not display if only one value, else display multiple and MUST select at least one
+if (count($organizations) > 1) {
 	$currentorganizations = QuickQueryList("select organizationid from personassociation where personid=? and type='organization'", false, false, array($pid));
 	$formdata["organizations"] = array(
 		"label" => _L("Organization"),
 		"value" => $currentorganizations,
 		"validators" => array(
+			array("ValRequired"),
 			array("ValInArray", 'values'=>array_keys($organizations))
 		),
 		"control" => array("MultiCheckbox","values" => $organizations),
@@ -481,22 +475,15 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 			}
 		}
 		
-		if ($hasorganizations) {
+		// if set, there must always be at least one selected
+		if (isset($postdata['organizations'])) {
 			// delete all person association with organizations, rebuild after
 			$query = "delete from personassociation where personid=? and type='organization'";
 			QuickUpdate($query, false, array($pid));
-			// if selected any, add them
-			if (count($postdata['organizations']) > 0) {
-				$query = "insert into personassociation (personid, type, organizationid) values ";
-				$args = array();
-				foreach ($postdata['organizations'] as $orgid) {
-					$args[] = $pid;
-					$args[] = $orgid;
-					$query .= "(?, 'organization', ?), ";
-				}
-				$query = substr($query, 0, strlen($query)-2); // remove trailing comma and space
-				QuickUpdate($query, false, $args);
-			}
+
+			// insert new selections
+			$query = "insert into personassociation (personid, type, organizationid) values " . repeatWithSeparator("(".$pid.", 'organization', ?)", ",", count($postdata['organizations']));
+			QuickUpdate($query, false, $postdata['organizations']);
 		}
 
         $preferences = array();
