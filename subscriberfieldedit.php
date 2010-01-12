@@ -41,8 +41,12 @@ $formdata = array();
 	
 if (isset($_GET['id'])) { // edit mode
 	$id = 0 + $_GET['id'];
-	$fieldmap = new FieldMap($id);
-			
+	
+	if ("oid" == $_GET['id']) {
+		$fieldmap = FieldMap::getSubscriberOrganizationFieldMap();
+	} else {
+		$fieldmap = new FieldMap($id);
+	}
    	$formhtml = "<div>".$fieldmap->name."</div>";
    	$formdata["formhtml"] = array(
    		"label" => _L("Field Name"),
@@ -57,6 +61,22 @@ if (isset($_GET['id'])) { // edit mode
 $staticvalues = QuickQueryList("select value from persondatavalues where fieldnum=? and editlock=1", false, false, array($fieldmap->fieldnum));
 $value = implode("\n", $staticvalues);
 
+// if organization
+if ("oid" == $fieldmap->fieldnum) {
+	$organizations = QuickQueryList("select id, orgkey from organization where not deleted", true);
+	$formdata["values"] = array(
+   		"label" => _L("Field Value(s)"),
+   		"fieldhelp" => _L('Select the organizations that subscribers may belong.'),
+   		"value" => $staticvalues,
+   		"validators" => array(
+			array("ValRequired"),
+            array("ValInArray", 'values'=>array_keys($organizations))
+      		),
+      	"control" => array("MultiCheckbox","values" => $organizations),
+      	"helpstep" => 1
+	);
+
+} else {
 // text or multitext
 if ($fieldmap->isOptionEnabled("multisearch")) {
 	// text area
@@ -81,7 +101,7 @@ if ($fieldmap->isOptionEnabled("multisearch")) {
    		"helpstep" => 1
 	);
 }
-
+}
 $buttons = array(submit_button("Done","submit","accept"),
                 icon_button("Cancel","cross",null,"subscriberfields.php"));
                 
@@ -103,6 +123,40 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
     } else if (($errors = $form->validate()) === false) { //checks all of the items in this form
         $postdata = $form->getData(); //gets assoc array of all values {name:value,...}
 
+		// special case, organization field
+		if ("oid" == $fieldmap->fieldnum) {
+			// always clear old values, rebuild if 'static'
+			$query = "delete from persondatavalues where fieldnum='oid'";
+			QuickUpdate($query);
+
+			$datavalues = $postdata['values'];
+			$numvalues = count($datavalues);
+			if ($numvalues > 0) {
+				$query = "insert into persondatavalues (fieldnum, value, editlock) values " . repeatWithSeparator("('oid', ?, 1)", ",", $numvalues);
+				QuickUpdate($query, false, $datavalues);
+
+				// find all subscriber persons
+				$query = "select id from person where importid is null and type='system'";
+				$pids = QuickQueryList($query);
+				
+				// remove any obsolete values from personassocation
+				$query = "delete from personassociation where personid in (". repeatWithSeparator("?", ",", count($pids)) .") and type='organization' and organizationid not in (". repeatWithSeparator("?", ",", $numvalues) .")";
+				QuickUpdate($query, false, array_merge($pids, $datavalues));
+				
+				// if single value, update all subscriber's personassociation to the one organization
+				if ($numvalues == 1) {
+					// remove any associations they may have had
+					$query = "delete from personassociation where personid in (". repeatWithSeparator("?", ",", count($pids)) .") and type='organization'";
+					QuickUpdate($query, false, array_merge($pids, $pids));
+					
+					// insert the single association
+					$oid = $datavalues[0];
+					$query = "insert into personassociation (personid, type, organizationid) values " . repeatWithSeparator("(?, 'organization', ".$oid.")", ",", count($pids));
+					QuickUpdate($query, false, $pids);
+				}
+			}
+			
+		} else {
 		// if static text field
 		if ($fieldmap->isOptionEnabled('text')) {
 			$value = trimStaticValue($postdata['values']);
@@ -172,7 +226,8 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 			$insertstmt = substr($insertstmt, 0, strlen($insertstmt)-1); // strip trailing comma
 			QuickUpdate($insertstmt, false, $insertvalues);
 		} 
-				
+		}
+			
         if ($ajax)
             $form->sendTo("subscriberfields.php");
         else

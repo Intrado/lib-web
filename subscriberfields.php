@@ -32,7 +32,7 @@ if (!$USER->authorize('metadata') || !getSystemSetting("_hasselfsignup", false))
 
 if (isset($_GET['delete'])) {
 	$id = 0 + $_GET['delete'];
-	
+
 	QuickUpdate("begin");
 	
 	// get fieldmap obj to remove options
@@ -46,7 +46,7 @@ if (isset($_GET['delete'])) {
 	QuickUpdate("delete from persondatavalues where fieldnum=? and editlock=1 and refcount=0", false, array($fieldmap->fieldnum));
 	// clear static subscriber values, reset editlock
 	QuickUpdate("update persondatavalues set editlock=0 where fieldnum=?", false, array($fieldmap->fieldnum));
-	
+
 	QuickUpdate("commit");
 	redirect();
 }
@@ -55,16 +55,21 @@ $firstnameField = FieldMap::getFirstNameField();
 $lastnameField = FieldMap::getLastNameField();
 $languageField = FieldMap::getLanguageField();
 
+// all subscriber fields already added
 $data = DBFindMany("FieldMap","from fieldmap where options like '%subscribe%'");
+// add the special case Organization field, required
+$dummyorganizationfieldmap = FieldMap::getSubscriberOrganizationFieldMap();
+$data = array_merge($data, array($dummyorganizationfieldmap));
+
+// all fields available to add
+$addfields = QuickQueryList("select id, name from fieldmap where options not like '%subscribe%' and options not like '%language%' and options not like '%staff%' and (options like '%text%' or options like '%multisearch%') order by fieldnum", true);
+
 
 $titles = array(	"name" => "Field",
 					"valtype" => "Value Type",
 					"values" => "Values",
 					"Actions" => "Actions"
 					);
-
-$addfields = QuickQueryList("select id, name from fieldmap where options not like '%subscribe%' and options not like '%language%' and options not like '%staff%' and (options like '%text%' or options like '%multisearch%') order by fieldnum", true);
-
 
 ////////////////////////////////////////////////////////////////////////////////
 // Display Functions
@@ -78,11 +83,14 @@ function fmt_actions ($obj, $name) {
 		$obj->fieldnum == $lastnameField ||
 		$obj->fieldnum == $languageField)
 			return '';
-			
-	$action_links = action_link("Delete", "cross", "subscriberfields.php?delete=$obj->id", "return confirmDelete();");
-	if ($obj->isOptionEnabled('static'))
-		$action_links .= '&nbsp|&nbsp' . action_link("Edit Values", "pencil", "subscriberfieldedit.php?id=$obj->id");
-
+	
+	if ("oid" == $obj->fieldnum) {
+			$action_links = action_link("Edit Values", "pencil", "subscriberfieldedit.php?id='oid'");
+	} else {		
+		$action_links = action_link("Delete", "cross", "subscriberfields.php?delete=$obj->id", "return confirmDelete();");
+		if ($obj->isOptionEnabled('static'))
+			$action_links .= '&nbsp|&nbsp' . action_link("Edit Values", "pencil", "subscriberfieldedit.php?id=$obj->id");
+	}
 	return $action_links;
 }
 
@@ -101,7 +109,12 @@ function fmt_values ($obj, $name) {
 		if ($obj->fieldnum == $languageField) {
 			return "English,Spanish"; // TODO
 		} else {
-			$values = QuickQueryList("select value from persondatavalues where fieldnum=? and editlock=1", false, false, array($obj->fieldnum));
+			// if organization, must lookup display names (persondatavalues.value stores the id)
+			if ($obj->fieldnum == "oid") {
+				$values = QuickQueryList("select o.orgkey from persondatavalues pdv join organization o on (pdv.value = o.id) where pdv.fieldnum='oid' and pdv.editlock=1");
+			} else {
+				$values = QuickQueryList("select value from persondatavalues where fieldnum=? and editlock=1", false, false, array($obj->fieldnum));
+			}
 			if (count($values) == 0)
 				return "";
 			$valcsv = implode(",", $values);
