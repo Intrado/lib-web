@@ -41,8 +41,7 @@ $formdata = array();
 	
 if (isset($_GET['id'])) { // edit mode
 	$id = 0 + $_GET['id'];
-	
-	if ("oid" == $_GET['id']) {
+	if ($id == 0) {
 		$fieldmap = FieldMap::getSubscriberOrganizationFieldMap();
 	} else {
 		$fieldmap = new FieldMap($id);
