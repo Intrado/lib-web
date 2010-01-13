@@ -861,9 +861,9 @@ class JobWiz_messagePhoneText extends WizStep {
 
 //Displays the different message translations.
 class JobWiz_messagePhoneTranslate extends WizStep {
-	function getTranslationDataArray($language, $text, $gender = "female", $transient = true, $englishText = false) {
+	function getTranslationDataArray($label, $languagecode, $text, $gender = "female", $transient = true, $englishText = false) {
 		return array(
-			"label" => ucfirst($language),
+			"label" => ucfirst($label),
 			"value" => json_encode(array(
 				"enabled" => true,
 				"text" => $text,
@@ -873,7 +873,7 @@ class JobWiz_messagePhoneTranslate extends WizStep {
 			"validators" => array(array("ValTranslation")),
 			"control" => array("TranslationItem",
 				"phone" => true,
-				"language" => strtolower($language),
+				"language" => $languagecode,
 				"englishText" => $englishText
 			),
 			"transient" => $transient,
@@ -902,12 +902,10 @@ class JobWiz_messagePhoneTranslate extends WizStep {
 		}
 
 		//Get available languages
-		$translationlanguages = Voice::getTTSLanguages();
-		$englishkey = array_search('English', $translationlanguages);
-		if($englishkey !== false)
-			unset($translationlanguages[$englishkey]);
-
-		$translations = translate_fromenglish($msgdata->text,$translationlanguages);
+		$translationlanguages = Voice::getTTSLanguageMap();
+		unset($translationlanguages['en']);
+		$translationlanguagecodes = array_keys($translationlanguages);
+		$translations = translate_fromenglish($msgdata->text,$translationlanguagecodes);
 		$voices = Voice::getTTSVoices();
 
 		// Form Fields.
@@ -934,20 +932,22 @@ class JobWiz_messagePhoneTranslate extends WizStep {
 				"helpstep" => 2
 			);
 		} else {
-			$i = 1;
 			if(is_array($translations)){
 				foreach($translations as $obj){
-					if(!isset($voices[strtolower($translationlanguages[$i]).":".$msgdata->gender]))
+					$languagecode = array_shift($translationlanguagecodes);
+					
+					if(!isset($voices[$languagecode.":".$msgdata->gender]))
 						$gender = ($msgdata->gender == "male")?"female":"male";
 					else
 						$gender = $msgdata->gender;
-					$transient = $this->isTransient($postdata, $translationlanguages[$i]);
-					$formdata[$translationlanguages[$i]] = $this->getTranslationDataArray($translationlanguages[$i], $obj->responseData->translatedText, $gender, $transient, ($transient?"":$msgdata->text));
-					$i++;
+					$transient = $this->isTransient($postdata, $languagecode);
+					
+					$formdata[$languagecode] = $this->getTranslationDataArray($translationlanguages[$languagecode], $languagecode, $obj->responseData->translatedText, $gender, $transient, ($transient?"":$msgdata->text));
 				}
 			} else {
-				$transient = $this->isTransient($postdata, $translationlanguages[$i]);
-				$formdata[$translationlanguages[$i]] = $this->getTranslationDataArray($translationlanguages[$i], $translations->translatedText, $msgdata->gender, $transient, ($transient?"":$msgdata->text));
+				$languagecode = array_shift($translationlanguagecodes);
+				$transient = $this->isTransient($postdata, $languagecode);
+				$formdata[$languagecode] = $this->getTranslationDataArray($translationlanguages[$languagecode], $languagecode, $translations->translatedText, $msgdata->gender, $transient, ($transient?"":$msgdata->text));
 			}
 		}
 		if(!isset($formdata["Translationinfo"])) {
@@ -1217,9 +1217,9 @@ class JobWiz_messageEmailText extends WizStep {
 }
 
 class JobWiz_messageEmailTranslate extends WizStep {
-	function getTranslationDataArray($language, $text, $gender = "female", $transient = true, $englishText = false) {
+	function getTranslationDataArray($label, $languagecode, $text, $gender = "female", $transient = true, $englishText = false) {
 		return array(
-			"label" => ucfirst($language),
+			"label" => ucfirst($label),
 			"value" => json_encode(array(
 				"enabled" => true,
 				"text" => $text,
@@ -1229,7 +1229,7 @@ class JobWiz_messageEmailTranslate extends WizStep {
 			"validators" => array(array("ValTranslation")),
 			"control" => array("TranslationItem",
 				"email" => true,
-				"language" => strtolower($language),
+				"language" => $languagecode,
 				"englishText" => $englishText
 			),
 			"transient" => $transient,
@@ -1259,9 +1259,11 @@ class JobWiz_messageEmailTranslate extends WizStep {
 
 		if(!$translations) {
 			//Get available languages
-			$alllanguages = QuickQueryList("select name from language");
-			$translationlanguages = array_intersect($alllanguages,array("Arabic", "Bulgarian", "Catalan", "Chinese", "Croatian", "Czech", "Danish", "Dutch","Filipino","Finnish", "French", "German", "Greek", "Hebrew", "Hindi", "Indonesian", "Italian", "Japanese", "Korean", "Latvian", "Lithuanian", "Norwegian", "Polish", "Portuguese", "Romanian", "Russian", "Serbian", "Slovak", "Slovenian", "Spanish", "Swedish", "Ukrainian", "Vietnamese"));
-			$translations = translate_fromenglish($englishtext,$translationlanguages);
+			$alllanguages = QuickQueryList("select code, name from language", true);
+			$translationlanguages = array_intersect_key($alllanguages, getTranslationLanguages());
+			unset($translationlanguages['en']);
+			$translationlanguagecodes = array_keys($translationlanguages);
+			$translations = translate_fromenglish($englishtext,$translationlanguagecodes);
 		}
 		// Form Fields.
 		$formdata = array($this->title);
@@ -1287,17 +1289,16 @@ class JobWiz_messageEmailTranslate extends WizStep {
 				"helpstep" => 2
 			);
 		} else {
-			$languagesinstance = array_values($translationlanguages);
 			if(is_array($translations)) {
 				foreach($translations as $obj){
-					$language = array_shift($languagesinstance);
-					$transient = $this->isTransient($postdata,$language);
-					$formdata[$language] = $this->getTranslationDataArray($language,$obj->responseData->translatedText, false, $transient, ($transient?"":$englishtext));
+					$languagecode = array_shift($translationlanguagecodes);
+					$transient = $this->isTransient($postdata,$languagecode);
+					$formdata[$languagecode] = $this->getTranslationDataArray($translationlanguages[$languagecode], $languagecode,$obj->responseData->translatedText, false, $transient, ($transient?"":$englishtext));
 				}
 			} else {
-				$language = array_shift($languagesinstance);
-				$transient = $this->isTransient($postdata, $language);
-				$formdata[$language] = $this->getTranslationDataArray($language,$translations->translatedText, false, $transient, ($transient?"":$englishtext));
+				$languagecode = array_shift($translationlanguagecodes);
+				$transient = $this->isTransient($postdata, $languagecode);
+				$formdata[$languagecode] = $this->getTranslationDataArray($translationlanguages[$languagecode], $languagecode,$translations->translatedText, false, $transient, ($transient?"":$englishtext));
 			}
 		}
 
