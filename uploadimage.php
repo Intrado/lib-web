@@ -14,7 +14,7 @@ $errormessage = '';
 // User must be able to send email because this is only used for email messages.
 $formitemname = 'upload'; // NOTE: CKEditor is hard coded to use 'upload' as the form item's name.
 if ($USER->authorize("sendemail") && isset($_FILES['upload'])) {
-	$maxfilesize = 2 * 1024 * 1024; // 2 megabytes.
+	$maxfilesize = 1024 * 750; // 750kb.
 	$allowedext = array('.jpeg', '.jpg', '.png', '.gif', '.bmp');
 	
 	$result = handleFileUpload($formitemname, $maxfilesize, null, $allowedext, false);
