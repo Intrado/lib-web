@@ -56,7 +56,7 @@ class MessageGroup extends DBMappedObject {
 	function getGlobalPreferredGender($default) {
 		if (!$phonemessage = $this->getOneEnabledMessage('phone'))
 			return $default;
-		return QuickQuery('select v.gender from messagepart mp join ttsvoice v on mp.voiceid=v.id where mp.messageid=? limit 1', false, array($phonemessage->id));
+		return QuickQuery('select v.gender from messagepart mp join ttsvoice v on mp.voiceid=v.id where mp.messageid=? and mp.voiceid is not null order by sequence limit 1', false, array($phonemessage->id));
 	}
 
 	function getGlobalEmailAttachments() {
