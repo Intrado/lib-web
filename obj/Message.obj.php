@@ -109,13 +109,13 @@ class Message extends DBMappedObject {
 		return implode('&', $data);
 	}
 
+	// Updates the first message part with a voiceid, keeping the language the same, only changing the gender.
 	function updatePreferredVoice($preferredgender) {
-		if ($this->type != 'phone')
+		if ($this->type != 'phone' || !$voicemessagepart = DBFind('MessagePart', 'from messagepart where voiceid is not null and messageid=? order by sequence', false, array($this->id)))
 			return;
-		// TODO: Must use the correct language; it is not necessarily the message's languagecode.
-		$voiceid = Voice::getPreferredVoice($this->languagecode, $preferredgender);
-		// TODO: This is incorrect, should only set the first voiceid, and should only set the gender; it needs to use the same language as it currently is in.
-		QuickUpdate('update messagepart set voiceid=? where messageid=?', false, array($voiceid, $this->id));
+		$languagecode = QuickQuery('select languagecode from ttsvoice where id=?', false, array($voicemessagepart->voiceid));
+		$voicemessagepart->voiceid = Voice::getPreferredVoice($languagecode, $preferredgender);
+		$voicemessagepart->update();
 	}
 	
 	// This will delete any existing message parts and recreate new ones.
