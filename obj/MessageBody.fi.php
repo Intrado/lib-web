@@ -3,9 +3,14 @@
 class MessageBody extends FormItem {
 	function render ($value) {
 		$n = $this->form->name."_".$this->name;	
-		$formnamepieces = explode('-', $this->form->name);
-		if (count($formnamepieces) == 3)
-			$languagecode = $formnamepieces[2];
+		
+		if (isset($this->args['preferredgenderformitem']))
+			$preferredgenderformitem = $this->args['preferredgenderformitem'];
+		else
+			$preferredgenderformitem = $this->form->name . "_voice";
+		
+		if (isset($this->args['language']))
+			$language = $this->args['language'];
 		$str = '
 			<div class="MessageBodyContainer" style="'.(!empty($this->args['hidden']) ? 'display:none' : '').'">
 			<table style="width:100%">
@@ -24,18 +29,23 @@ class MessageBody extends FormItem {
 																		if (languageselection) {
 																			language = $('" . $this->form->name . "_language').getValue();
 																		} else {
-																			language = '$languagecode';
+																			language = '$language';
 																		}
-																		var voice = 'Female';
-																		var voiceselection = $('" . $this->form->name . "_voice-2');
-																		if (voiceselection) {
-																			if(voiceselection.checked) {
-																				voice = 'Male';
-																			}
+																		
+																		var gender;
+																		var preferredgenderformitem = $('$preferredgenderformitem');
+																		if (preferredgenderformitem) {
+																			var value = preferredgenderformitem.getValue();
+																			if (value == 'male' || value == 'Male')
+																				gender = 'male';
+																			else
+																				gender = 'female';
+																		} else {
+																			gender = 'female';
 																		}
 																		
 																		if(content != '')
-																			popup('previewmessage.php?parentfield=" . $n . "&language=' + encodeURIComponent(language) + '&gender=' + encodeURIComponent(voice), 400, 400,'preview');")
+																			popup('previewmessage.php?parentfield=" . $n . "&language=' + encodeURIComponent(language) + '&gender=' + encodeURIComponent(gender), 400, 400,'preview');")
 							. '</div>';
 		}
 			
@@ -117,14 +127,15 @@ class MessageBody extends FormItem {
 		$str = "
 			(function() {
 				var setselection = function () {
-					if(document.selection) this.sel = document.selection.createRange();
+					if(document.selection)
+						this.sel = document.selection.createRange();
 				};
-				$('$n').focus();
-				$('$n').observe('keyup',setselection);
-				$('$n').observe('mouseup',setselection);
+
+				var textarea = $('$n');
+				textarea.observe('keyup',setselection.bindAsEventListener(textarea));
+				textarea.observe('mouseup',setselection.bindAsEventListener(textarea));
 				
 				if ($usehtmleditor && !$hidden) {
-					var textarea = $('$n');
 					if (textarea.visible())
 						applyHtmlEditor(textarea);
 				}
