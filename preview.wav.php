@@ -24,14 +24,14 @@ if (isset($_GET['usetext']) && isset($_SESSION['ttstext']) && isset($_SESSION['t
 	
 	$voiceid = false;
 	if($gender == "male") {
-		$voiceid = QuickQuery("select id from ttsvoice where language=? and gender='male'",false,array($language));	
+		$voiceid = QuickQuery("select id from ttsvoice where languagecode=? and gender='male'",false,array($language));	
 		if(!$voiceid) {
-			$voiceid = QuickQuery("select id from ttsvoice where language=? and gender='female'",false,array($language));
+			$voiceid = QuickQuery("select id from ttsvoice where languagecode=? and gender='female'",false,array($language));
 		}
 	} else {
-		$voiceid = QuickQuery("select id from ttsvoice where language=? and gender='female'",false,array($language));
+		$voiceid = QuickQuery("select id from ttsvoice where languagecode=? and gender='female'",false,array($language));
 		if(!$voiceid) {
-			$voiceid = QuickQuery("select id from ttsvoice where language=? and gender='male'",false,array($language));	
+			$voiceid = QuickQuery("select id from ttsvoice where languagecode=? and gender='male'",false,array($language));	
 		}
 	}
 			
