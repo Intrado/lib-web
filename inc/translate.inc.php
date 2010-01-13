@@ -69,7 +69,7 @@ function translate_fromenglish($englishtext,$languagearray) {
 		return false;
 	}
 		
-	$supportedlanguages = getTranslationLanguages(true);
+	$supportedlanguages = getTranslationLanguages(false);
 
 	$src_text = $englishtext;
 
@@ -87,7 +87,7 @@ function translate_fromenglish($englishtext,$languagearray) {
 	foreach ($destinationlanguages as $destlang){
 		$lang = strtolower($destlang);
 		if(array_key_exists($lang,$supportedlanguages)) {
-			$lang_pairs .= "&langpair=" . urlencode("en|" . $supportedlanguages[$lang]);
+			$lang_pairs .= "&langpair=" . urlencode("en|" . $lang);
 		} else {
 			$lang_pairs .= "&langpair=" . urlencode("en|en"); //  If translation to a non suported language google has to return a value for that to not interfere with the ordering
 		}
