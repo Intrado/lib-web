@@ -1,4 +1,5 @@
 <?
+require_once("../inc/subdircommon.inc.php");
 require_once("../inc/utils.inc.php");
 require_once("../obj/Validator.obj.php");
 
@@ -707,12 +708,16 @@ function form_submit_all (tabevent, value, formsplittercontainer) {
 						hideHtmlEditor();
 					}
 					
-					tabevent.memo.widget.update_section(nexttab, {
-						'icon': 'img/ajax-loader.gif'
-					});
+					
 					var handledbeforetabloadevent = tabevent.memo.widget.container.fire('FormSplitter:BeforeTabLoad', {'tabevent': tabevent, 'nexttab': nexttab, 'currenttab': tabevent.memo.currentSection});
 
-					form_load_tab(this, tabevent.memo.widget, nexttab, handledbeforetabloadevent.memo.specificsections);
+					if (!handledbeforetabloadevent.stopped) {
+						tabevent.memo.widget.update_section(nexttab, {
+							'icon': 'img/ajax-loader.gif'
+						});
+						
+						form_load_tab(this, tabevent.memo.widget, nexttab, handledbeforetabloadevent.memo.specificsections);
+					}
 				}
 			} else if (!tabevent) {
 				if (ajaxevent.memo.nexturl)
@@ -750,11 +755,11 @@ function form_load_tab (form, widget, nexttab, specificsections, suppressfire) {
 			var data = response.responseJSON;
 			
 			if (!data || !data.element) {
-				alert('problem!');
+				alert('<?=addslashes(_L("Sorry, there is an error loading this tab."))?>');
 			}
 			
 			widget.update_section(data.element, {
-				'icon': 'img/icons/diagona/16/160.gif',
+				'icon': 'img/pixel.gif',
 				'content': data.content
 			});
 			
@@ -776,6 +781,7 @@ function form_load_tab (form, widget, nexttab, specificsections, suppressfire) {
 		
 		onFailure: function() {
 			document.tabvars.loading = false;
+			alert('<?=addslashes(_L("Sorry, there is an error loading this tab."))?>');
 		}
 	});
 }
@@ -816,7 +822,7 @@ function form_load_layout (formswitchercontainer, classname, specificsections) {
 				this.add_section(sectionname);
 				this.update_section(sectionname, {
 					'title': titlespan,
-					'icon': iconimg ? iconimg : 'img/icons/diagona/16/160.gif',
+					'icon': iconimg ? iconimg : 'img/pixel.gif',
 					'content': layoutsection
 				});
 
