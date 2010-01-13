@@ -546,13 +546,19 @@ div.scrollTableContainer {
 	cursor: pointer;
 	color: <?=$primary?>;
 	float: left;
-	white-space: nowrap;
+	width: 15%;
 	margin:0;
 }
-.horizontaltabstitlediv td, img {
+.horizontaltabstitlediv table {
+	table-layout: fixed;
+	width: 100%;
+}
+.horizontaltabstitlediv td {
 	padding: 0;
 	margin: 0;
 	text-align: left;
+	white-space: nowrap;
+	overflow: hidden;
 }
 
 .horizontaltabstitlediv td.middle {
@@ -614,9 +620,15 @@ div.scrollTableContainer {
 	padding: 0;
 	margin-top: 5px;
 }
-.verticaltabstitlediv td, img {
+.verticaltabstitlediv table {
+	table-layout: fixed;
+	width: 100%;
+}
+.verticaltabstitlediv td {
 	padding: 0;
 	margin: 0;
+	overflow: hidden;
+	white-space: nowrap;
 }
 
 .verticaltabstitlediv td.left {
