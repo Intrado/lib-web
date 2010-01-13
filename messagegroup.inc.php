@@ -2,7 +2,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 // Custom Utility Functions
 ////////////////////////////////////////////////////////////////////////////////
-function makeTranslationItem($required, $type, $subtype, $languagecode, $languagename, $sourcetext, $messagetext, $translationcheckboxlabel, $override, $allowoverride = true, $hidetranslationcheckbox = false, $enabled = true, $disabledinfo = "", $datafields = null, $inautotranslator = false, $maximages = 3) {
+function makeTranslationItem($required, $type, $subtype, $languagecode, $languagename, $preferredgender, $sourcetext, $messagetext, $translationcheckboxlabel, $override, $allowoverride = true, $hidetranslationcheckbox = false, $enabled = true, $disabledinfo = "", $datafields = null, $inautotranslator = false, $maximages = 10) {
 	$control = array("TranslationItem",
 		"phone" => $type == 'phone',
 		"language" => $languagecode,
@@ -11,13 +11,15 @@ function makeTranslationItem($required, $type, $subtype, $languagecode, $languag
 		"subtype" => $subtype,
 		"reload" => true,
 		"allowoverride" => $allowoverride,
-		"usehtmleditor" => $subtype == 'html',
+		"usehtmleditor" => !$inautotranslator && $subtype == 'html',
+		"escapehtml" => $subtype != 'html',
 		"hidetranslationcheckbox" => $hidetranslationcheckbox,
 		"hidetranslationlock" => true,
 		"disabledinfo" => $disabledinfo,
 		"translationcheckboxlabel" => $translationcheckboxlabel,
 		"translationcheckboxnewline" => true,
 		"editenglishtext" => !$inautotranslator,
+		"editwhendisabled" => !$inautotranslator,
 		"showhr" => false
 	);
 
@@ -33,19 +35,22 @@ function makeTranslationItem($required, $type, $subtype, $languagecode, $languag
 		$validators[] = array("ValEmailMessageBody");
 	}
 	
-	$validators[] = array("ValMessageBody", "type" => $type, "subtype" => $subtype, "languagecode" => $languagecode, "maximages" => $maximages);
+	if (!$inautotranslator)
+		$validators[] = array("ValMessageBody", "translationitem" => true, "type" => $type, "subtype" => $subtype, "languagecode" => $languagecode, "maximages" => $maximages);
+	$validators[] = array("ValTranslationItem", "required" => $required);
 	
 	if ($required)
 		$validators[] = array("ValRequired");
 
 	return array(
-		"label" => ucfirst($languagename),
+		"label" => _L('%s Message', ucfirst($languagename)),
 		"value" => json_encode(array(
 			"enabled" => $enabled,
 			"text" => $messagetext,
 			"englishText" => $sourcetext,
 			"override" => $override,
-			"gender" => 'female' // TODO: This needs to take preferredvoice.
+			"gender" => $preferredgender,
+			"language" => $languagecode
 		)),
 		"validators" => $validators,
 		"control" => $control,
@@ -64,12 +69,14 @@ function makeFormHtml($html) {
 	);
 }
 
-function makeMessageBody($required, $type, $subtype, $languagecode, $label, $messagetext, $datafields = null, $usehtmleditor = false, $hideplaybutton = false, $hidden = false, $maximages = 3) {
+function makeMessageBody($required, $type, $subtype, $languagecode, $label, $messagetext, $datafields = null, $usehtmleditor = false, $hideplaybutton = false, $hidden = false, $maximages = 10) {
 	$control = array("MessageBody",
 		"playbutton" => $type == 'phone' && !$hideplaybutton,
 		"usehtmleditor" => $usehtmleditor,
 		"hidden" => $hidden,
-		"hidedatafieldsonload" => true
+		"hidedatafieldsonload" => true,
+		"language" => $languagecode,
+		"preferredgenderformitem" => "{$type}-{$subtype}-{$languagecode}_preferredgender"
 	);
 
 	if (is_array($datafields))
@@ -102,7 +109,7 @@ function makeAccordionSplitter($type, $subtype, $languagecode, $permanent, $pref
 	global $USER;
 
 	$accordionsplitterchildren = array();
-
+	
 	if ($type == 'email') {
 		$accordionsplitterchildren[] = array(
 			"title" => _L("Attachments"),
@@ -347,11 +354,11 @@ function makeAccordionSplitter($type, $subtype, $languagecode, $permanent, $pref
 	);
 
 	if ($type == 'phone') {
-		$gendervalues = array ("Female" => "Female","Male" => "Male");
+		$gendervalues = array ("female" => "Female","male" => "Male");
 		$advancedoptionsformdata['preferredgender'] = array(
 			"label" => _L('Preferred Voice'),
 			"fieldhelp" => _L('Choose the gender of the text-to-speech voice.'),
-			"value" => ucfirst($preferredgender),
+			"value" => $preferredgender,
 			"validators" => array(
 				array("ValInArray", "values" => array_keys($gendervalues))
 			),
@@ -443,6 +450,56 @@ class ValEmailMessageBody extends Validator {
 			if (empty($headervalue))
 				return _L('Email headers are incomplete. Please fill in the Subject, From Name, and From Email.');
 		}
+		return true;
+	}
+}
+
+class ValTranslationItem extends Validator {
+	var $onlyserverside = true;
+	function validate ($value, $args) {
+		$msgdata = json_decode($value);
+		
+		if (!empty($args['required'])) {
+			if (($msgdata->enabled && !$msgdata->override && empty($msgdata->englishText)) || ((!$msgdata->enabled || $msgdata->override) && empty($msgdata->text))) {
+				return _L('%s is required.', $this->label);
+			}
+		}
+		return true;
+	}
+}
+
+class ValDefaultLanguageCode extends Validator {
+	var $onlyserverside = true;
+	function validate ($requestedlanguagecode, $args) {
+		$messagegroup = new MessageGroup($_SESSION['messagegroupid']);
+		$messages = DBFindMany('Message', 'from message where not deleted and type != "sms" and messagegroupid=?', false, array($messagegroup->id));
+		
+		if (!empty($messages)) {
+			$foundrequestedlanguage = false;
+			$existinglanguagecodes = array(); // example: ["{$message->type}-{$message->subtype}"] = array('en', 'es')
+			foreach ($messages as $message) {
+				if ($message->languagecode == $requestedlanguagecode)
+					$foundrequestedlanguage = true;
+				$key = "{$message->type}-{$message->subtype}";
+				if (!isset($existinglanguagecodes[$key]))
+					$existinglanguagecodes[$key] = array();
+				$existinglanguagecodes[$key][] = $message->languagecode;
+			}
+			
+			if (!$foundrequestedlanguage)
+				return _L("Please first create a %s message.", Language::getName($requestedlanguagecode));
+			
+			foreach ($existinglanguagecodes as $key => $languagecodes) {
+				if (!in_array($requestedlanguagecode, $languagecodes)) {
+					list($type, $subtype) = explode('-', $key);
+					if ($type == 'email')
+						return _L('Please first create a %1$s message for %2$s in %3$s.', Language::getName($requestedlanguagecode), ucfirst($type), $subtype == 'html' ? 'HTML' : ucfirst($subtype));
+					else
+						return _L('Please first create a %1$s message for %2$.', Language::getName($requestedlanguagecode), $type == 'sms' ? 'SMS' : ucfirst($type));
+				}
+			}
+		}
+		
 		return true;
 	}
 }
