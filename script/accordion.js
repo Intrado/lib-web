@@ -180,8 +180,12 @@ var AccordionSection = Class.create({
 		this.hide_content(true);
 	},
 	update: function(options) {
-		if (options.title)
+		if (options.title) {
 			this.titleSpan.update(options.title);
+			var title = this.titleSpan.innerHTML.stripTags();
+			this.titleSpan.title = title;
+		}
+		
 		if (options.icon) {
 			if (options.icon.tagName) {
 				this.titleIcon.replace(options.icon);
