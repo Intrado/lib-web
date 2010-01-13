@@ -51,7 +51,7 @@ function setVisibleIfChecked (checkbox, name) {
 function textInsert(text, dest) {
 	if ($('reusableckeditorhider') && !$('reusableckeditorhider').down('#cke_reusableckeditor')) {
 		CKEDITOR.instances['reusableckeditor'].insertText(text);
-	} else if (document.selection) {
+	} else if (document.selection && dest.sel) {
 		dest.focus();
 		dest.sel.text = text;
 		dest.sel.select();
@@ -559,12 +559,12 @@ function pickDate (textbox, allowPast, allowFuture, closeOnBlur) {
 
 // Returns the textarea that the html editor is currently replacing.
 function getHtmlEditorObject() {
-	if (!CKEDITOR) {
+	if ((typeof CKEDITOR == 'undefined') || !CKEDITOR) {
 		return null;
 	}
 
 	var instance;
-	if (!CKEDITOR.instances || !(instance = CKEDITOR.instances['reusableckeditor']))
+	if ((typeof CKEDITOR.instances == 'undefined') || !CKEDITOR.instances || !(instance = CKEDITOR.instances['reusableckeditor']))
 		return null;
 
 	var container = $('cke_reusableckeditor');
@@ -628,7 +628,7 @@ function applyHtmlEditor(textarea) {
 		if ($('reusableckeditor'))
 			return; // The editor instance is still loading.
 
-		textarea.insert({'before': '<img class="AjaxLoader" src="img/ajax-loader.gif"/>'});
+		textarea.insert({'before': '<span class="HTMLEditorAjaxLoader"><img src="img/ajax-loader.gif"/> Please wait while the HTML editor loads. </span>'});
 		textarea.hide();
 
 		var reusableckeditor = new Element('div', {'id':'reusableckeditor'});
@@ -644,7 +644,7 @@ function applyHtmlEditor(textarea) {
 				'filebrowserImageUploadUrl' : 'uploadimage.php',
 				'on': {
 					'instanceReady': function(event) {
-						this.previous('img.AjaxLoader').remove();
+						this.previous('.HTMLEditorAjaxLoader').remove();
 						applyHtmlEditor(this);
 					}.bindAsEventListener(textarea)
 				}
