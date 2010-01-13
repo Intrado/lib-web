@@ -57,16 +57,14 @@ var AudioLibraryWidget = Class.create({
 			
 			'onSuccess': function(transport) {
 				var audiofiles = transport.responseJSON;
-				if (!audiofiles) {
-					alert('<?=_L("Unable to get audio file")?>'); // TODO: better error message... Or don't bother to show an alert.
-					return;
-				}
+				if (!audiofiles)
+					return; // Do not show an error, this just means that there are no audiofiles found.
 				
 				this.showAudioFiles(audiofiles);
 			}.bindAsEventListener(this),
 			
 			'onFailure': function() {
-				alert('<?=_L("Failure, could not contact server??")?>'); // TODO: better error message... Or don't bother to show an alert.
+				alert('<?=_L("Sorry, there was a problem retrieving audio files.")?>');
 			}
 		});
 	},
