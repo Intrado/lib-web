@@ -243,7 +243,9 @@ class FormSplitter extends Form {
 			';
 		}
 		
-		$html .= parent::renderJavascript();
+		if (!$this->parentform && $this->name) {
+			$html .= parent::renderJavascript();
+		}
 		
 		return $html;
 	}

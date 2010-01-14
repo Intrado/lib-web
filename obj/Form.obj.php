@@ -376,7 +376,9 @@ class Form {
 		</script>
 		' : '');
 		
-		$str .= $this->renderJavascript();
+		if (empty($this->parentform)) {
+			$str .= $this->renderJavascript();
+		}
 		
 		return $str;
 	}
