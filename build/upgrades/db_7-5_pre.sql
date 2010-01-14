@@ -50,7 +50,7 @@ CREATE TABLE `event` (
 	`name` VARCHAR( 50 ) NOT NULL ,
 	`notes` TEXT NOT NULL ,
 	`occurence` DATETIME NOT NULL
-) ENGINE = InnoDB
+) ENGINE = InnoDB DEFAULT CHARSET=utf8
 $$$
 
  CREATE TABLE `alert` (
@@ -59,7 +59,7 @@ $$$
 	`personid` INT NOT NULL ,
 	`date` DATE NOT NULL ,
 	`time` TIME NOT NULL
-) ENGINE = InnoDB
+) ENGINE = InnoDB DEFAULT CHARSET=utf8
 $$$
 
 CREATE TABLE `targetedmessage` (
@@ -68,7 +68,7 @@ CREATE TABLE `targetedmessage` (
   `targetedmessagecategoryid` int(11) NOT NULL,
   `overridemessagegroupid` int(11) DEFAULT NULL,
   PRIMARY KEY  (`id`)
-) ENGINE=InnoDB
+) ENGINE=InnoDB DEFAULT CHARSET=utf8
 $$$
 
 CREATE TABLE `personassociation` (
@@ -78,7 +78,7 @@ CREATE TABLE `personassociation` (
   `sectionid` int(11) DEFAULT NULL,
   `eventid` int(11) DEFAULT NULL,
   KEY `personid` (`personid`)
-) ENGINE=InnoDB
+) ENGINE=InnoDB DEFAULT CHARSET=utf8
 $$$
 
 CREATE TABLE `messagegroup` (
@@ -108,7 +108,7 @@ CREATE TABLE `organization` (
 	`orgkey` VARCHAR( 255 ) NOT NULL ,
 	`deleted` TINYINT NOT NULL DEFAULT 0,
 	UNIQUE orgkey (orgkey)
-) ENGINE = InnoDB
+) ENGINE = InnoDB DEFAULT CHARSET=utf8
 $$$
 
 RENAME TABLE `userrule`  TO `userassociation`
@@ -344,3 +344,119 @@ $$$
 
 ALTER TABLE `messagepart` ADD `imagecontentid` BIGINT NULL AFTER `audiofileid`
 $$$
+
+-- $rev 5
+
+ALTER TABLE `specialtask` ADD `userid` INT( 11 ) NOT NULL AFTER `id`
+$$$
+
+GRANT SELECT ON `messagegroup` TO 'c__$CUSTOMERID__limited'@'%'
+$$$
+GRANT SELECT ON `organization` TO 'c__$CUSTOMERID__limited'@'%'
+$$$
+GRANT SELECT , INSERT , UPDATE, DELETE ON `personassociation` TO 'c__$CUSTOMERID__limited'@'%'
+$$$
+
+CREATE TABLE targetedmessagecategory (
+	`id` INT( 11 ) NOT NULL auto_increment,
+	`name` VARCHAR( 50 ) NOT NULL,
+	PRIMARY KEY (`id`)
+) ENGINE = InnoDB DEFAULT CHARSET=utf8
+$$$
+
+
+drop trigger if exists insert_repeating_job
+$$$
+drop trigger if exists update_job
+$$$
+drop trigger if exists delete_job
+$$$
+drop trigger if exists insert_jobsetting
+$$$
+drop trigger if exists update_jobsetting
+$$$
+drop trigger if exists delete_jobsetting
+$$$
+drop trigger if exists insert_joblist
+$$$
+drop trigger if exists update_joblist
+$$$
+drop trigger if exists delete_joblist
+$$$
+
+
+CREATE TRIGGER insert_repeating_job
+AFTER INSERT ON job FOR EACH ROW
+BEGIN
+DECLARE cc INTEGER;
+DECLARE tz VARCHAR(50);
+DECLARE custid INTEGER DEFAULT _$CUSTOMERID_;
+
+IF NEW.status IN ('repeating') THEN
+  SELECT value INTO tz FROM setting WHERE name='timezone';
+
+  INSERT INTO aspshard.qjob (id, customerid, userid, scheduleid, timezone, startdate, enddate, starttime, endtime, status)
+         VALUES(NEW.id, custid, NEW.userid, NEW.scheduleid, tz, NEW.startdate, NEW.enddate, NEW.starttime, NEW.endtime, 'repeating');
+
+  -- do not copy schedule because it was inserted via the insert_schedule trigger
+
+END IF;
+END
+$$$
+
+
+CREATE TRIGGER update_job
+AFTER UPDATE ON job FOR EACH ROW
+BEGIN
+DECLARE cc INTEGER;
+DECLARE tz VARCHAR(50);
+DECLARE custid INTEGER DEFAULT _$CUSTOMERID_;
+
+SELECT value INTO tz FROM setting WHERE name='timezone';
+
+SELECT COUNT(*) INTO cc FROM aspshard.qjob WHERE customerid=custid AND id=NEW.id;
+IF cc = 0 THEN
+-- we expect the status to be 'scheduled' when we insert the shard job
+-- status 'new' is for jobs that are not yet submitted
+  IF NEW.status='scheduled' THEN
+    INSERT INTO aspshard.qjob (id, customerid, userid, scheduleid, timezone, startdate, enddate, starttime, endtime, status)
+           VALUES(NEW.id, custid, NEW.userid, NEW.scheduleid, tz, NEW.startdate, NEW.enddate, NEW.starttime, NEW.endtime, NEW.status);
+  END IF;
+ELSE
+-- update job fields
+  UPDATE aspshard.qjob SET scheduleid=NEW.scheduleid, starttime=NEW.starttime, endtime=NEW.endtime, startdate=NEW.startdate, enddate=NEW.enddate WHERE customerid=custid AND id=NEW.id;
+  IF NEW.status IN ('processing', 'procactive', 'active', 'cancelling') THEN
+    UPDATE aspshard.qjob SET status=NEW.status WHERE customerid=custid AND id=NEW.id;
+  END IF;
+END IF;
+END
+$$$
+
+
+CREATE TRIGGER delete_job
+AFTER DELETE ON job FOR EACH ROW
+BEGIN
+DECLARE custid INTEGER DEFAULT _$CUSTOMERID_;
+-- only repeating jobs ever get deleted
+DELETE FROM aspshard.qjob WHERE customerid=custid AND id=OLD.id;
+END
+$$$
+
+
+ALTER TABLE messagegroup ADD `languagecode` VARCHAR( 3 ) CHARACTER SET ascii COLLATE ascii_general_ci NOT NULL DEFAULT 'en' AFTER `description`
+$$$
+
+
+ALTER TABLE `prompt` ADD `languagecode` VARCHAR( 3 ) CHARACTER SET ascii COLLATE ascii_general_ci NOT NULL default ''
+$$$
+
+update prompt p
+inner join language l on (l.name = p.language)
+set p.languagecode = l.code
+$$$
+
+
+ALTER TABLE `messagegroup` ADD `defaultlanguagecode` VARCHAR( 3 ) CHARACTER SET ascii COLLATE ascii_general_ci NOT NULL default 'en'
+$$$
+
+

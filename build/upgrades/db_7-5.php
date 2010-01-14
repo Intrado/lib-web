@@ -15,9 +15,9 @@
  * would also help in dev since there are lots of small changes in between major versions
  */
 
-require_once("../obj/MessageGroup.obj.php");
-require_once("../obj/Message.obj.php");
-require_once("../obj/MessagePart.obj.php");
+//require_once("../obj/MessageGroup.obj.php");
+//require_once("../obj/Message.obj.php");
+//require_once("../obj/MessagePart.obj.php");
 require_once("../obj/AudioFile.obj.php");
 require_once("../obj/FieldMap.obj.php");
 require_once("../obj/Rule.obj.php");
@@ -107,7 +107,7 @@ function upgrade_7_5 ($rev, $shardid, $customerid, $db) {
 				$defaultmessageid = first($job->phonemessageid,$job->emailmessageid,$job->smsmessageid);
 				$msg = new Message_7_5_r2($defaultmessageid);
 						
-				$mg = new MessageGroup();
+				$mg = new MessageGroup_7_5_r2();
 				$mg->name = $msg->name;
 				$mg->description = SmartTruncate("Created from $job->name", 50);
 				$mg->userid = $job->userid;
@@ -164,10 +164,10 @@ function upgrade_7_5 ($rev, $shardid, $customerid, $db) {
 			if (!Query("insert ignore into surveymessages select phonemessageid from surveyquestion", $db))
 				return false;
 			
-			$orphanedmessages = DBFindMany("Message_7_5_r2","from message m where m.messagegroupid is null and not exists (select * from surveymessages sm where sm.messageid=m.id)");
+			$orphanedmessages = DBFindMany("Message_7_5_r2","from message m where m.messagegroupid is null and not exists (select * from surveymessages sm where sm.messageid=m.id)",false,false,$db);
 			$count = 0;
 			foreach ($orphanedmessages as $msg) {
-				$mg = new MessageGroup();
+				$mg = new MessageGroup_7_5_r2();
 				$mg->name = $msg->name;
 				$mg->description = $msg->description;
 				$mg->userid = $msg->userid;
@@ -225,7 +225,7 @@ function upgrade_7_5 ($rev, $shardid, $customerid, $db) {
 				}
 				QuickUpdate($query);
 				
-				QuickUpdate("update fieldmap set fieldnum='o01' where fieldnum='$schoolfieldnum'");
+				QuickUpdate("update fieldmap set fieldnum='o01' where fieldnum='$schoolfieldnum'"); //TODO delete this fieldmap instead?
 				
 				
 				//create orgs for rules, in case rules are set up for nonexisting schools
@@ -289,6 +289,15 @@ function upgrade_7_5 ($rev, $shardid, $customerid, $db) {
 			
 			$fieldmaps = FieldMap::retrieveFieldMaps();
 			$fieldmaps["f03"]->updatePersonDataValues();
+		case 4:
+			// upgrade from rev 4 to rev 5
+			echo "|";
+			apply_sql("upgrades/db_7-5_pre.sql",$customerid,$db, 5);
+			
+			
+			
+		
+		
 	}
 	
 	

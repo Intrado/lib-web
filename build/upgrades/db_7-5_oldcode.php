@@ -45,7 +45,7 @@ class Job_7_5_r2 extends DBMappedObject {
 
 	function copyMessage($msgid) {
 		// copy the message
-		$newmsg = new Message($msgid);
+		$newmsg = new Message_7_5_r2($msgid);
 		$newmsg->id = null;
 		$newmsg->create();
 
@@ -115,6 +115,33 @@ class MessagePart_7_5_r2 extends DBMappedObject {
 		DBMappedObject::DBMappedObject($id);
 	}
 
+}
+
+class MessageGroup_7_5_r2 extends DBMappedObject {
+	var $userid;
+	var $name;
+	var $description;
+	var $modified;
+	var $lastused;
+	var $permanent = 0;
+	var $deleted = 0;
+
+	function MessageGroup_7_5_r2 ($id = NULL) {
+		$this->_allownulls = true;
+		$this->_tablename = "messagegroup";
+		$this->_fieldlist = array(
+			"userid",
+			"name",
+			"description",
+			"modified",
+			"lastused",
+			"permanent",
+			"deleted"
+		);
+
+		//call super's constructor
+		DBMappedObject::DBMappedObject($id);
+	}
 }
 
 
