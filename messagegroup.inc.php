@@ -6,7 +6,6 @@ function makeTranslationItem($required, $type, $subtype, $languagecode, $languag
 	$control = array("TranslationItem",
 		"phone" => $type == 'phone',
 		"language" => $languagecode,
-		"englishText" => $sourcetext,
 		"multilingual" => $type != 'sms',
 		"subtype" => $subtype,
 		"reload" => true,
