@@ -32,16 +32,15 @@ class MessageBody extends FormItem {
 																			language = '$language';
 																		}
 																		
-																		var gender;
-																		var preferredgenderformitem = $('$preferredgenderformitem');
-																		if (preferredgenderformitem) {
-																			var value = preferredgenderformitem.getValue();
-																			if (value == 'male' || value == 'Male')
-																				gender = 'male';
-																			else
-																				gender = 'female';
-																		} else {
-																			gender = 'female';
+																		var gender = 'female'; // Default female.
+																		var preferredgenderdiv = $('$preferredgenderformitem');
+																		if (preferredgenderdiv) {
+																			var selectedradio = preferredgenderdiv.down('input:checked');
+																			if (selectedradio) {
+																				var value = selectedradio.getValue();
+																				if (value == 'male' || value == 'Male')
+																					gender = 'male';
+																			}
 																		}
 																		
 																		if(content != '')
