@@ -636,11 +636,6 @@ function form_submit_all (tabevent, value, formsplittercontainer) {
 		
 		// Clear existing observers.
 		form.stopObserving('AjaxForm:SubmitSuccess');
-		form.stopObserving('AjaxForm:DataChanged');
-		
-		form.observe('AjaxForm:DataChanged', function(ajaxevent, tabevent, submissions) {
-			
-		}.bindAsEventListener(form, tabevent, submissions));
 		
 		form.observe('AjaxForm:SubmitSuccess', function(ajaxevent, tabevent, submissions) {
 			if (!ajaxevent.memo.errormessage)
@@ -649,21 +644,21 @@ function form_submit_all (tabevent, value, formsplittercontainer) {
 			thissubmission.response = ajaxevent.memo;
 			
 			var formvars = document.formvars[this.name];
-			var posturl = formvars.scriptname + (formvars.scriptname.include('?') ? '&' : '?') + "ajax=true";
+			// Prepare a clean url without any GET parameters.
+			var indexofquestionmark = formvars.scriptname.indexOf('?');
+			var cleanurl = (indexofquestionmark >= 0) ? formvars.scriptname.substring(0, indexofquestionmark) : formvars.scriptname;
+			var posturl = cleanurl + "?ajax=true";
 			
 			// Update this form's serial number only if this form will not get reloaded in the next tab.
 			var nexttab = tabevent ? tabevent.memo.section : null;
 			if (!ajaxevent.memo.errormessage) {
 				if (tabevent && (nexttab == tabevent.memo.currentSection || !tabevent.memo.widget.sections[nexttab].contentDiv.down('form#' + this.name))) {
-					// Prepare a clean url so that if the ajax call fails we will reload the page without any GET parameters.
-					var indexofquestionmark = formvars.scriptname.indexOf('?');
-					var cleanurl = (indexofquestionmark >= 0) ? formvars.scriptname.substring(0, indexofquestionmark) : formvars.scriptname;
 					var errortext = '<?=addslashes(_L("Sorry, an erorr occurred. This page will now reload"))?>';
 					
 					new Ajax.Request(posturl, {
 						method: 'post',
 						parameters: {'formsnum': this.name},
-						onSuccess: function (response, errortext, cleanurl) {
+						onSuccess: function (response) {
 							var data = response.responseJSON;
 							
 							if (!data || !data.formsnum) {
@@ -676,11 +671,11 @@ function form_submit_all (tabevent, value, formsplittercontainer) {
 							if (formsnumfield) {
 								formsnumfield.value = data.formsnum;
 							}
-						}.bindAsEventListener(this, errortext, cleanurl),
-						onFailure: function(response, errortext, cleanurl) {
+						}.bindAsEventListener(this),
+						onFailure: function(response) {
 							alert(errortext);
 							window.location = cleanurl;
-						}.bindAsEventListener(this, errortext, cleanurl)
+						}.bindAsEventListener(this)
 					});
 				}
 				
@@ -745,7 +740,6 @@ function form_submit_all (tabevent, value, formsplittercontainer) {
 
 function form_load_tab (form, widget, nexttab, specificsections) {
 	var formvars = document.formvars[form.name];
-	var posturl = formvars.scriptname + (formvars.scriptname.include('?') ? '&' : '?') + "ajax=true";
 	
 	if (!document.tabvars)
 		document.tabvars = {};
@@ -755,6 +749,11 @@ function form_load_tab (form, widget, nexttab, specificsections) {
 	}
 	
 	document.tabvars.loading = true;
+	
+	// Prepare a clean url without any GET parameters.
+	var indexofquestionmark = formvars.scriptname.indexOf('?');
+	var cleanurl = (indexofquestionmark >= 0) ? formvars.scriptname.substring(0, indexofquestionmark) : formvars.scriptname;
+	var posturl = cleanurl + "?ajax=true";
 	
 	new Ajax.Request(posturl, {
 		method: 'post',
