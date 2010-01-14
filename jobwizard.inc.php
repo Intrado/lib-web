@@ -1264,7 +1264,10 @@ class JobWiz_messageEmailTranslate extends WizStep {
 			unset($translationlanguages['en']);
 			$translationlanguagecodes = array_keys($translationlanguages);
 			$translations = translate_fromenglish($englishtext,$translationlanguagecodes);
+		} else {
+			$translationlanguagecodes = array_keys($translationlanguages);
 		}
+		
 		// Form Fields.
 		$formdata = array($this->title);
 
