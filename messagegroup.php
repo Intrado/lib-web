@@ -192,14 +192,35 @@ foreach ($destinations as $type => $destination) {
 				$autotranslatorformdata["extrajavascript"] = makeFormHtml("
 					<script type='text/javascript'>
 						(function() {
-							registerHtmlEditorSaveListener(null);
-							
 							var itemname = '{$type}-{$subtype}-autotranslator_sourcemessagebody';
 							if (!$(itemname))
 								return;
 								
+							var form = $(itemname).up('form');
 							var clearmessagebutton = $('clearmessagebutton');
-							
+							var keytimer = null;
+							var validateHtmlEditor = function(event, checknow) {
+								var formelement;
+								var htmleditorobject;
+								
+								window.clearTimeout(keytimer);
+								if (!checknow) {
+									keytimer = window.setTimeout(function() {
+										validateHtmlEditor(null, true);
+									}, 500);
+									return;
+								}
+								
+								formelement = $(itemname);
+								htmleditorobject = getHtmlEditorObject();
+								if (htmleditorobject) {
+									saveHtmlEditorContent(htmleditorobject);
+									if (htmleditorobject.currenttextarea.id.include(itemname)) {
+										form_do_validation(form, formelement);
+									}
+								}
+							};
+								
 							// Clear any existing click-observers on this element, then make a new one.
 							clearmessagebutton.stopObserving('click').observe('click', function() {
 								if (!confirm('".addslashes($clearmessageconfirmtext)."')) {
@@ -211,6 +232,8 @@ foreach ($destinations as $type => $destination) {
 								
 								clearHtmlEditorContent();
 							});
+							
+							registerHtmlEditorKeyListener(validateHtmlEditor);
 						})();
 					</script>
 				");
@@ -275,10 +298,7 @@ foreach ($destinations as $type => $destination) {
 				$formdata["extrajavascript"] = makeFormHtml("
 					<script type='text/javascript'>
 						(function() {
-							registerHtmlEditorSaveListener(null);
-							
 							var itemname = '{$type}-{$subtype}-{$languagecode}_translationitem';
-							
 							if (!$(itemname))
 								return;
 								
@@ -286,9 +306,29 @@ foreach ($destinations as $type => $destination) {
 							var clearmessagebutton = $('clearmessagebutton');
 							var messageemptyspan = $('messageemptyspan');
 							
-							var warnIfMessageTextEmpty = function() {
+							var keytimer = null;
+							var warnIfMessageTextEmpty = function(event, checknow) {
 								var translationvalueobject;
 								var messagetext;
+								var formelement;
+								var htmleditorobject;
+								
+								window.clearTimeout(keytimer);
+								if (!checknow) {
+									keytimer = window.setTimeout(function() {
+										warnIfMessageTextEmpty(null, true);
+									}, 500);
+									return;
+								}
+								
+								formelement = $(itemname);
+								htmleditorobject = getHtmlEditorObject();
+								if (htmleditorobject) {
+									saveHtmlEditorContent(htmleditorobject);
+									if (htmleditorobject.currenttextarea.id.include(itemname)) {
+										form_do_validation(form, formelement);
+									}
+								}
 								
 								translationvalueobject = setTranslationValue(itemname);
 								
@@ -330,7 +370,7 @@ foreach ($destinations as $type => $destination) {
 							// Clear any existing keyup-observers for this element, then make a new one which will call warnIfMessageTextEmpty().
 							form.stopObserving('keyup').observe('keyup', warnIfMessageTextEmpty);
 							
-							registerHtmlEditorSaveListener(warnIfMessageTextEmpty);
+							registerHtmlEditorKeyListener(warnIfMessageTextEmpty);
 						})();
 					</script>
 				");
@@ -354,8 +394,6 @@ foreach ($destinations as $type => $destination) {
 					$formdata["extrajavascript"] = makeFormHtml("
 						<script type='text/javascript'>
 							(function() {
-								registerHtmlEditorSaveListener(null);
-							
 								var itemname = '{$type}-{$subtype}-{$languagecode}_nonemessagebody';
 								if (!$(itemname))
 									return;
@@ -380,8 +418,6 @@ foreach ($destinations as $type => $destination) {
 					$formdata["extrajavascript"] = makeFormHtml("
 						<script type='text/javascript'>
 							(function() {
-								registerHtmlEditorSaveListener(null);
-							
 								var itemname = '{$type}-{$subtype}-{$languagecode}_nonemessagebody';
 								if (!$(itemname))
 									return;
@@ -390,10 +426,30 @@ foreach ($destinations as $type => $destination) {
 								var clearmessagebutton = $('clearmessagebutton');
 								var messageemptyspan = $('messageemptyspan');
 								
-								var warnIfMessageTextEmpty = function() {
+								var keytimer = null;
+								var warnIfMessageTextEmpty = function(event, checknow) {
 									var messagetext;
+									var formelement;
+									var htmleditorobject;
 									
-									messagetext = $(itemname).value;
+									window.clearTimeout(keytimer);
+									if (!checknow) {
+										keytimer = window.setTimeout(function() {
+											warnIfMessageTextEmpty(null, true);
+										}, 500);
+										return;
+									}
+									
+									formelement = $(itemname);
+									htmleditorobject = getHtmlEditorObject();
+									if (htmleditorobject) {
+										saveHtmlEditorContent(htmleditorobject);
+										if (htmleditorobject.currenttextarea.id.include(itemname)) {
+											form_do_validation(form, formelement);
+										}
+									}
+									
+									messagetext = formelement.value;
 									
 									messageemptyspan.style.visibility = (messagetext.strip() == '') ? 'visible' : 'hidden';
 								};
@@ -416,7 +472,7 @@ foreach ($destinations as $type => $destination) {
 								// Clear any existing keyup-observers for this element, then make a new one which will call warnIfMessageTextEmpty().
 								form.stopObserving('keyup').observe('keyup', warnIfMessageTextEmpty);
 								
-								registerHtmlEditorSaveListener(warnIfMessageTextEmpty);
+								registerHtmlEditorKeyListener(warnIfMessageTextEmpty);
 							})();
 						</script>
 					");
@@ -523,12 +579,7 @@ $destinationlayoutforms[] = array(
 			"control" => array("FormHtml","html" => "<table>{$summaryheaders}{$summarylanguagerows}</table>"),
 			"renderoptions" => array("icon" => false, "label" => false, "errormessage" => false),
 			"helpstep" => 1
-		),
-		'extrajavascript' => makeFormHtml("
-			<script type='text/javascript'>
-				registerHtmlEditorSaveListener(null);
-			</script>
-		")
+		)
 	)
 );
 
@@ -855,6 +906,7 @@ div.MessageBodyHeader {
 	display: block;
 	clear: both;
 	color: rgb(130,130,130);
+	visibility: hidden;
 }
 </style>
 
