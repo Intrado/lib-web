@@ -70,7 +70,7 @@ if (isset($_GET['id']) && empty($_POST) && count($_GET) == 1) {
 ///////////////////////////////////////////////////////////////////////////////
 $readonly = false;
 
-$defaultpreferredgender = 'female'; // TODO: Maybe this should be lowercase..
+$defaultpreferredgender = 'female';
 $defaultautotranslate = 'none';
 $systemdefaultlanguagecode = 'en';
 $defaultpermanent = 0;
@@ -186,7 +186,7 @@ foreach ($destinations as $type => $destination) {
 				$_SESSION["autotranslatesourcetext{$type}{$subtype}"] = isset($existingmessagegroup) ? $existingmessagegroup->getMessageText($type,$subtype,$systemdefaultlanguagecode, 'none') : '';
 
 			if ($type == 'phone' || $type == 'email') {
-				$autotranslatorformdata["header"] = makeFormHtml("<div class='MessageBodyHeader'>" . _L("Automatic Translation") . "</div" . icon_button(_L("Clear"),"delete", null, null, 'id="clearmessagebutton"') . "<span id='messageemptyspan'></span>");
+				$autotranslatorformdata["header"] = makeFormHtml("<div class='MessageBodyHeader'>" . _L("Automatic Translation") . "</div>" . icon_button(_L("Clear"),"delete", null, null, 'id="clearmessagebutton"') . "<span id='messageemptyspan'></span>");
 				
 				$autotranslatorformdata["sourcemessagebody"] = makeMessageBody(false, $type, $subtype, 'autotranslator', _L('Automatic Translation'), $_SESSION["autotranslatesourcetext{$type}{$subtype}"], $datafields, $subtype == 'html', true);
 				$autotranslatorformdata["extrajavascript"] = makeFormHtml("
@@ -290,7 +290,7 @@ foreach ($destinations as $type => $destination) {
 				} else {
 					$messagetext = $messagetexts['none'];
 				}
-				$formdata["header"] = makeFormHtml("<div class='MessageBodyHeader'>" . escapehtml(_L("%s Message", ucfirst($languagename))) . "</div" . icon_button(_L("Clear"),"delete", null, null, 'id="clearmessagebutton"') . "
+				$formdata["header"] = makeFormHtml("<div class='MessageBodyHeader'>" . escapehtml(_L("%s Message", ucfirst($languagename))) . "</div>" . icon_button(_L("Clear"),"delete", null, null, 'id="clearmessagebutton"') . "
 					<span id='messageemptyspan'>".escapehtml($blankmessagewarning)."</span>
 				");
 				$formdata["translationitem"] = makeTranslationItem($required, $type, $subtype, $languagecode, $languagename, $preferredgender, $messagetexts['source'], $messagetext, _L("Enable Translation"), !empty($messagetexts['overridden']), true, false, $translationenabled, "", $datafields);
@@ -378,7 +378,7 @@ foreach ($destinations as $type => $destination) {
 				$formdata["branding"] = makeBrandingFormHtml();
 			} else {
 				if ($type == 'sms') {
-					$formdata["header"] = makeFormHtml("<div class='MessageBodyHeader'>" . _L("SMS Message") . "</div" . icon_button(_L("Clear"),"delete", null, null, 'id="clearmessagebutton"') . "<span id='messageemptyspan'></span>");
+					$formdata["header"] = makeFormHtml("<div class='MessageBodyHeader'>" . _L("SMS Message") . "</div>" . icon_button(_L("Clear"),"delete", null, null, 'id="clearmessagebutton"') . "<span id='messageemptyspan'></span>");
 					$formdata['nonemessagebody'] = array(
 						"label" => _L("SMS Message"),
 						"value" => $messagetexts['none'],
@@ -411,7 +411,7 @@ foreach ($destinations as $type => $destination) {
 						</script>
 					");
 				} else {
-					$formdata["header"] = makeFormHtml("<div class='MessageBodyHeader'>" . _L("%s Message", ucfirst($languagename)) . "</div" . icon_button(_L("Clear"),"delete", null, null, 'id="clearmessagebutton"') . "
+					$formdata["header"] = makeFormHtml("<div class='MessageBodyHeader'>" . _L("%s Message", ucfirst($languagename)) . "</div>" . icon_button(_L("Clear"),"delete", null, null, 'id="clearmessagebutton"') . "
 						<span id='messageemptyspan'>".escapehtml($blankmessagewarning)."</span>
 					");
 					$formdata['nonemessagebody'] = makeMessageBody($required, $type, $subtype, $languagecode, _L("%s Message", ucfirst($languagename)), $messagetexts['none'], $datafields, $subtype == 'html');
