@@ -823,7 +823,7 @@ class JobWiz_messagePhoneText extends WizStep {
 					array("ValRequired"),
 					array("ValTextAreaPhone")
 				),
-				"control" => array("TextAreaPhone","width"=>"80%","rows"=>10,"language"=>"english","voice"=>"female"),
+				"control" => array("TextAreaPhone","width"=>"80%","rows"=>10,"language"=>"en","voice"=>"female"),
 				"helpstep" => 1
 			)
 		);
