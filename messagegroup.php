@@ -169,27 +169,53 @@ if ($cansendsms) {
 
 ///////////////////////////////////////////////////////////////////////////////
 // Formdata
-// TODO: If $readonly, don't use actual formitems, just use FormHtml.
 ///////////////////////////////////////////////////////////////////////////////
 $destinationlayoutforms = array();
+$clearmessageconfirmtext = _L("Are you sure you want to clear this message?");
 foreach ($destinations as $type => $destination) {
-
+	$countlanguages = count($destination['languages']);
 	$subtypelayoutforms = array();
 	foreach ($destination['subtypes'] as $subtype) {
-
 		$messageformsplitters = array();
 
 		// Autotranslator.
-		if (!$readonly && count($destination['languages']) > 1) {
+		if (!$readonly && $countlanguages > 1) {
 			$autotranslatorformdata = array();
 
 			if (empty($_SESSION["autotranslatesourcetext{$type}{$subtype}"]))
 				$_SESSION["autotranslatesourcetext{$type}{$subtype}"] = isset($existingmessagegroup) ? $existingmessagegroup->getMessageText($type,$subtype,$systemdefaultlanguagecode, 'none') : '';
 
 			if ($type == 'phone' || $type == 'email') {
-				$autotranslatorformdata["header"] = makeFormHtml("<div class='MessageBodyHeader'>" . _L("Autotranslate Message") . "</div");
-				$autotranslatorformdata["sourcemessagebody"] = makeMessageBody(false, $type, $subtype, 'autotranslator', _L('Autotranslate Message'), $_SESSION["autotranslatesourcetext{$type}{$subtype}"], $datafields, $subtype == 'html', true);
-				$autotranslatorformdata["refreshtranslations"] = makeFormHtml(icon_button(_L("Refresh Translations"),"tick", null, null, 'id="autotranslatorrefreshtranslationbutton"') . "<div style='margin-top:35px;clear:both'></div>");
+				$autotranslatorformdata["header"] = makeFormHtml("<div class='MessageBodyHeader'>" . _L("Automatic Translation") . "</div" . icon_button(_L("Clear"),"delete", null, null, 'id="clearmessagebutton"') . "<span id='messageemptyspan'></span>");
+				
+				$autotranslatorformdata["sourcemessagebody"] = makeMessageBody(false, $type, $subtype, 'autotranslator', _L('Automatic Translation'), $_SESSION["autotranslatesourcetext{$type}{$subtype}"], $datafields, $subtype == 'html', true);
+				$autotranslatorformdata["extrajavascript"] = makeFormHtml("
+					<script type='text/javascript'>
+						(function() {
+							registerHtmlEditorSaveListener(null);
+							
+							var itemname = '{$type}-{$subtype}-autotranslator_sourcemessagebody';
+							if (!$(itemname))
+								return;
+								
+							var clearmessagebutton = $('clearmessagebutton');
+							
+							// Clear any existing click-observers on this element, then make a new one.
+							clearmessagebutton.stopObserving('click').observe('click', function() {
+								if (!confirm('".addslashes($clearmessageconfirmtext)."')) {
+									saveHtmlEditorContent();
+									return;
+								}
+								
+								$(itemname).value = '';
+								
+								clearHtmlEditorContent();
+							});
+						})();
+					</script>
+				");
+					
+				$autotranslatorformdata["refreshtranslations"] = makeFormHtml(icon_button(_L("Refresh Translations"),"fugue/arrow_circle_double_135", null, null, 'id="autotranslatorrefreshtranslationbutton"') . "<div style='margin-top:35px;clear:both'></div>");
 
 				$translationitems = array();
 				foreach ($destination['languages'] as $languagecode => $languagename) {
@@ -203,17 +229,18 @@ foreach ($destinations as $type => $destination) {
 				}
 				
 				$autotranslatorformdata["sourcemessagebody"]["requires"] = $translationitems;
+				
+				$autotranslatorformdata["branding"] = makeBrandingFormHtml();
 			}
 
 			$accordionsplitter = makeAccordionSplitter($type, $subtype, 'autotranslator', $permanent, $preferredgender, true, $type == 'email' ? $emailattachments : null, false);
 
-			$messageformsplitters[] = new FormSplitter("{$type}-{$subtype}-autotranslator", _L("Autotranslate"), null, "verticalsplit", array(), array(
-			array("title" => "", "formdata" => $autotranslatorformdata), // TODO: Change the wording for this title.
-			$accordionsplitter));
+			$messageformsplitters[] = new FormSplitter("{$type}-{$subtype}-autotranslator", _L("Automatic Translation"), "img/icons/world.gif", "verticalsplit", array(), array(array("title" => "", "formdata" => $autotranslatorformdata), $accordionsplitter));
 		}
 
 		// Individual Message (type-subtype-language).
 		foreach ($destination['languages'] as $languagecode => $languagename) {
+			$blankmessagewarning = $countlanguages > 1 ? _L("If the %s message is blank, these contacts will receive messages in the default language.", ucfirst($languagename)) : '';
 			$messageformname = "{$type}-{$subtype}-{$languagecode}";
 
 			$messagetexts = array(
@@ -240,40 +267,78 @@ foreach ($destinations as $type => $destination) {
 				} else {
 					$messagetext = $messagetexts['none'];
 				}
-				$formdata["header"] = makeFormHtml("<div class='MessageBodyHeader'>" . _L("%s Message", ucfirst($languagename)) . "</div");
+				$formdata["header"] = makeFormHtml("<div class='MessageBodyHeader'>" . escapehtml(_L("%s Message", ucfirst($languagename))) . "</div" . icon_button(_L("Clear"),"delete", null, null, 'id="clearmessagebutton"') . "
+					<span id='messageemptyspan'>".escapehtml($blankmessagewarning)."</span>
+				");
 				$formdata["translationitem"] = makeTranslationItem($required, $type, $subtype, $languagecode, $languagename, $preferredgender, $messagetexts['source'], $messagetext, _L("Enable Translation"), !empty($messagetexts['overridden']), true, false, $translationenabled, "", $datafields);
-
-				// Javascript to detect when user enables/disables translation.
-				$usehtmleditor = $subtype == 'html' ? 'true' : 'false';
-				$translationitemid = $messageformname . '_translationitem';
-				$sourcemessagebodyid = $translationitemid . 'englishText';
-				$messagebodyid = $translationitemid . 'text';
-				$translationenabledstr = $translationenabled ? 'true' : 'false';
-				$overriddenstr = !empty($messagetexts['overridden']) ? 'true' : 'false';
-				$formdata["toggletranslation"] = makeFormHtml("
+				
+				$formdata["extrajavascript"] = makeFormHtml("
 					<script type='text/javascript'>
-						if ($translationenabledstr) {
-							if ($overriddenstr) {
-								$$('.MessageBodyHeader').invoke('show');
-								$$('.SourceMessageBodyHeader').invoke('hide');
-
-								$('refreshtranslationbutton').hide();
-							} else {
-								$$('.MessageBodyHeader').invoke('show');
-								$$('.SourceMessageBodyHeader').invoke('hide');
-							}
-						} else {
-
-							$$('.MessageBodyHeader').invoke('show');
-							$$('.SourceMessageBodyHeader').invoke('hide');
-
-							$('refreshtranslationbutton').hide();
-						}
+						(function() {
+							registerHtmlEditorSaveListener(null);
+							
+							var itemname = '{$type}-{$subtype}-{$languagecode}_translationitem';
+							
+							if (!$(itemname))
+								return;
+								
+							var form = $(itemname).up('form');
+							var clearmessagebutton = $('clearmessagebutton');
+							var messageemptyspan = $('messageemptyspan');
+							
+							var warnIfMessageTextEmpty = function() {
+								var translationvalueobject;
+								var messagetext;
+								
+								translationvalueobject = setTranslationValue(itemname);
+								
+								if (translationvalueobject.enabled)
+									messagetext = translationvalueobject.override ? translationvalueobject.text : translationvalueobject.englishText;
+								else
+									messagetext = translationvalueobject.text;
+								
+								messageemptyspan.style.visibility = (messagetext.strip() == '') ? 'visible' : 'hidden';
+							};
+							
+							// Clear any existing click-observers on this element, then make a new one which will call warnIfMessageTextEmpty().
+							clearmessagebutton.stopObserving('click').observe('click', function() {
+								var translationvalueobject;
+								
+								if (!confirm('".addslashes($clearmessageconfirmtext)."')) {
+									saveHtmlEditorContent();
+									return;
+								}
+								
+								translationvalueobject = setTranslationValue(itemname);
+								
+								if (translationvalueobject.enabled) {
+									if (translationvalueobject.override) {
+										$(itemname+'text').value = '';
+									} else {
+										$(itemname+'englishText').value = '';
+									}
+								} else {
+									$(itemname+'text').value = '';
+								}
+								
+								warnIfMessageTextEmpty();
+								clearHtmlEditorContent();
+							});
+							
+							warnIfMessageTextEmpty();
+							
+							// Clear any existing keyup-observers for this element, then make a new one which will call warnIfMessageTextEmpty().
+							form.stopObserving('keyup').observe('keyup', warnIfMessageTextEmpty);
+							
+							registerHtmlEditorSaveListener(warnIfMessageTextEmpty);
+						})();
 					</script>
 				");
+				
+				$formdata["branding"] = makeBrandingFormHtml();
 			} else {
 				if ($type == 'sms') {
-					$formdata["header"] = makeFormHtml("<div class='MessageBodyHeader'>" . _L("SMS Message") . "</div");
+					$formdata["header"] = makeFormHtml("<div class='MessageBodyHeader'>" . _L("SMS Message") . "</div" . icon_button(_L("Clear"),"delete", null, null, 'id="clearmessagebutton"') . "<span id='messageemptyspan'></span>");
 					$formdata['nonemessagebody'] = array(
 						"label" => _L("SMS Message"),
 						"value" => $messagetexts['none'],
@@ -282,13 +347,79 @@ foreach ($destinations as $type => $destination) {
 							array("ValLength","max"=>160),
 							array("ValRegExp","pattern" => getSmsRegExp())
 						),
-						"control" => array("TextArea","rows"=>10,"counter"=>160),
+						"control" => array("TextArea","cols" => 50, "rows"=>10,"counter"=>160),
 						"renderoptions" => array("label" => false, "icon" => false, "error" => true),
 						"helpstep" => 2
 					);
+					$formdata["extrajavascript"] = makeFormHtml("
+						<script type='text/javascript'>
+							(function() {
+								registerHtmlEditorSaveListener(null);
+							
+								var itemname = '{$type}-{$subtype}-{$languagecode}_nonemessagebody';
+								if (!$(itemname))
+									return;
+								
+								var clearmessagebutton = $('clearmessagebutton');
+								
+								// Clear any existing click-observers on this element, then make a new one.
+								clearmessagebutton.stopObserving('click').observe('click', function() {
+									if (!confirm('".addslashes($clearmessageconfirmtext)."'))
+										return;
+									
+									$(itemname).value = '';
+								});
+							})();
+						</script>
+					");
 				} else {
-					$formdata["header"] = makeFormHtml("<div class='MessageBodyHeader'>" . _L("%s Message", ucfirst($languagename)) . "</div");
+					$formdata["header"] = makeFormHtml("<div class='MessageBodyHeader'>" . _L("%s Message", ucfirst($languagename)) . "</div" . icon_button(_L("Clear"),"delete", null, null, 'id="clearmessagebutton"') . "
+						<span id='messageemptyspan'>".escapehtml($blankmessagewarning)."</span>
+					");
 					$formdata['nonemessagebody'] = makeMessageBody($required, $type, $subtype, $languagecode, _L("%s Message", ucfirst($languagename)), $messagetexts['none'], $datafields, $subtype == 'html');
+					$formdata["extrajavascript"] = makeFormHtml("
+						<script type='text/javascript'>
+							(function() {
+								registerHtmlEditorSaveListener(null);
+							
+								var itemname = '{$type}-{$subtype}-{$languagecode}_nonemessagebody';
+								if (!$(itemname))
+									return;
+									
+								var form = $(itemname).up('form');
+								var clearmessagebutton = $('clearmessagebutton');
+								var messageemptyspan = $('messageemptyspan');
+								
+								var warnIfMessageTextEmpty = function() {
+									var messagetext;
+									
+									messagetext = $(itemname).value;
+									
+									messageemptyspan.style.visibility = (messagetext.strip() == '') ? 'visible' : 'hidden';
+								};
+								
+								// Clear any existing click-observers on this element, then make a new one which will call warnIfMessageTextEmpty().
+								clearmessagebutton.stopObserving('click').observe('click', function() {
+									if (!confirm('".addslashes($clearmessageconfirmtext)."')) {
+										saveHtmlEditorContent();
+										return;
+									}
+									
+									$(itemname).value = '';
+									
+									warnIfMessageTextEmpty();
+									clearHtmlEditorContent();
+								});
+								
+								warnIfMessageTextEmpty();
+								
+								// Clear any existing keyup-observers for this element, then make a new one which will call warnIfMessageTextEmpty().
+								form.stopObserving('keyup').observe('keyup', warnIfMessageTextEmpty);
+								
+								registerHtmlEditorSaveListener(warnIfMessageTextEmpty);
+							})();
+						</script>
+					");
 				}
 			}
 
@@ -299,9 +430,9 @@ foreach ($destinations as $type => $destination) {
 			$accordionsplitter));
 		}
 
-		if (count($destination['languages']) > 1) {
+		if ($countlanguages > 1) {
 			$subtypelayoutforms[] = new FormTabber("{$type}-{$subtype}", $subtype == 'html' ? 'HTML' : ucfirst($subtype), isset($existingmessagegroup) && $existingmessagegroup->hasMessage($type, $subtype) ? "img/icons/accept.gif" : "img/icons/diagona/16/160.gif", "verticaltabs", $messageformsplitters);
-		} else if (count($destination['languages']) == 1) {
+		} else if ($countlanguages == 1) {
 			$messageformsplitters[0]->title = ucfirst($subtype);
 			$subtypelayoutforms[] = $messageformsplitters[0];
 		}
@@ -316,27 +447,28 @@ foreach ($destinations as $type => $destination) {
 				"label" => _L('Subject'),
 				"value" => $_SESSION['emailheaders']['subject'],
 				"validators" => array_merge($additionalvalidators, array(
-					array("ValLength","min" => 3,"max" => 50)
+					array("ValLength","max" => 50)
 				)),
-				"control" => array("TextField","size" => 30, "maxlength" => 51),
+				"control" => array("TextField","size" => 30, "maxlength" => 50),
 				"helpstep" => 1
 			);
 			$emailheadersformdata['fromname'] = array(
 				"label" => _L('From Name'),
 				"value" => $_SESSION['emailheaders']['fromname'],
 				"validators" => array_merge($additionalvalidators, array(
-					array("ValLength","min" => 3,"max" => 50)
+					array("ValLength","max" => 50)
 				)),
-				"control" => array("TextField","size" => 30, "maxlength" => 51),
+				"control" => array("TextField","size" => 30, "maxlength" => 50),
 				"helpstep" => 1
 			);
 			$emailheadersformdata['fromemail'] = array(
 				"label" => _L('From Email'),
 				"value" => $_SESSION['emailheaders']['fromemail'],
 				"validators" => array_merge($additionalvalidators, array(
+					array("ValLength","max" => 255),
 					array("ValEmail")
 				)),
-				"control" => array("TextField","size" => 30, "maxlength" => 51),
+				"control" => array("TextField","size" => 30, "maxlength" => 255),
 				"helpstep" => 1
 			);
 
@@ -359,7 +491,7 @@ $summaryheaders = '<th></th>';
 $summarylanguagerows = "";
 foreach ($destinations as $type => $destination) {
 	foreach ($destination['subtypes'] as $subtype) {
-		$summaryheaders .= "<th class='Destination'>" . ucfirst($type) . (count($destination['subtypes']) > 1 ? (" (" . ucfirst($subtype) . ") ") : "") . "</th>";
+		$summaryheaders .= "<th class='Destination'>" . ($type == 'sms' ? "SMS" : ucfirst($type)) . (count($destination['subtypes']) > 1 ? (" (" . ($subtype == 'html' ? "HTML" : ucfirst($subtype)) . ") ") : "") . "</th>";
 	}
 }
 foreach ($customerlanguages as $languagecode => $languagename) {
@@ -369,8 +501,11 @@ foreach ($customerlanguages as $languagecode => $languagename) {
 			if ($type == 'sms' && $languagecode != $systemdefaultlanguagecode) {
 				$summarylanguagerows .= "<td></td>";
 			} else {
-				$icon = (isset($existingmessagegroup) && $existingmessagegroup->hasMessage($type, $subtype, $languagecode)) ? 'img/icons/accept.gif' : 'img/icons/diagona/16/160.gif';
-				$summarylanguagerows .= "<td class='StatusIcon'><img class='StatusIcon' id='{$type}-{$subtype}-{$languagecode}-summaryicon' src='$icon'/></td>";
+				$hasmessage = isset($existingmessagegroup) && $existingmessagegroup->hasMessage($type, $subtype, $languagecode);
+				$icon = $hasmessage ? 'img/icons/accept.gif' : 'img/icons/diagona/16/160.gif';
+				$alt = $hasmessage ? escapehtml(_L("Message found.")) : escapehtml(_L("Message not found."));
+				$title = _L("Click to jump to this message");
+				$summarylanguagerows .= "<td class='StatusIcon'><img class='StatusIcon' id='{$type}-{$subtype}-{$languagecode}-summaryicon' title='$title' alt='$alt' src='$icon'/></td>";
 			}
 		}
 	}
@@ -379,6 +514,7 @@ foreach ($customerlanguages as $languagecode => $languagename) {
 $destinationlayoutforms[] = array(
 	"name" => "summary",
 	"title" => "Summary",
+	"icon" => "img/icons/application_view_columns.gif",
 	"formdata" => array(
 		'summary' => array(
 			"label" => _L('Summary!'),
@@ -387,7 +523,12 @@ $destinationlayoutforms[] = array(
 			"control" => array("FormHtml","html" => "<table>{$summaryheaders}{$summarylanguagerows}</table>"),
 			"renderoptions" => array("icon" => false, "label" => false, "errormessage" => false),
 			"helpstep" => 1
-		)
+		),
+		'extrajavascript' => makeFormHtml("
+			<script type='text/javascript'>
+				registerHtmlEditorSaveListener(null);
+			</script>
+		")
 	)
 );
 
@@ -409,7 +550,8 @@ $messagegroupsplitter = new FormSplitter("messagegroupbasics", "", null, "horizo
 			"value" => $messagegroupname == $defaultmessagegroupname ? '' : $messagegroupname,
 			"validators" => array(
 				array("ValDuplicateNameCheck", "type" => "messagegroup"),
-				array("ValRequired","ValLength","min" => 3,"max" => 50)
+				array("ValRequired"),
+				array("ValLength","max" => 50)
 			),
 			"control" => array("TextField","size" => 30, "maxlength" => 50),
 			"helpstep" => 1
@@ -696,9 +838,23 @@ iframe.UploadIFrame {
 	margin: 0;
 	padding: 0;
 }
-div.MessageBodyHeader, div.SourceMessageBodyHeader {
+div.MessageBodyHeader {
 	font-weight: bold;
 	margin-left: 2px;
+	float: left;
+	padding-top: 4px;
+}
+.accordioncontentdiv {
+	padding: 2px;
+}
+.accordioncontentdiv .radiobox {
+	margin-right: 0;
+}
+#messageemptyspan {
+	padding-top: 6px;
+	display: block;
+	clear: both;
+	color: rgb(130,130,130);
 }
 </style>
 
@@ -765,7 +921,7 @@ echo '<div id="formswitchercontainer">' . $messagegroupsplitter->render($default
 			var sourcetext = sourcetextarea.value;
 			if (sourcetext.strip() == '') {
 				if (clickevent) {
-					alert('<?= _L("You have not typed a translation message.") ?>');
+					alert('<?= addslashes(_L("Please enter a message to translate.")) ?>');
 					return null;
 				} else {
 					return {};
@@ -799,7 +955,7 @@ echo '<div id="formswitchercontainer">' . $messagegroupsplitter->render($default
 
 			if (translationlanguagecodes.length < 1) {
 				if (clickevent) {
-					alert('<?= _L("You have not selected any languages to translate.") ?>'); // WORDSMITH: Better message.
+					alert('<?=addslashes(_L("Please select a language to translate.")) ?>');
 					return null;
 				} else {
 					return {};
@@ -825,7 +981,7 @@ echo '<div id="formswitchercontainer">' . $messagegroupsplitter->render($default
 
 		formswitchercontainer.observe('FormSplitter:BeforeTabLoad', function(event, state) {
 			if ($$('.HTMLEditorAjaxLoader').length > 0) {
-				alert('<?=_L("Please wait until the HTML Editor has loaded.")?>');
+				alert('<?=addslashes(_L("Please wait until the HTML Editor has loaded."))?>');
 				event.stop();
 			}
 			
@@ -845,7 +1001,12 @@ echo '<div id="formswitchercontainer">' . $messagegroupsplitter->render($default
 		formswitchercontainer.observe('FormSplitter:TabLoaded', function(event, state, styleLayouts) {
 			// NOTE: Message tab icons are the only ones with an ID attribute.
 			var messagetabicon = event.memo.widget.sections[event.memo.tabloaded].titleDiv.down('img');
-			if (messagetabicon.id)
+			
+			if (messagetabicon.id == 'summaryicon')
+				messagetabicon.src = 'img/icons/application_view_columns.gif';
+			else if (messagetabicon.id.include('autotranslatoricon'))
+				messagetabicon.src = 'img/icons/world.gif';
+			else if (messagetabicon.id)
 				messagetabicon.src = 'img/icons/diagona/16/160.gif';
 			
 			styleLayouts();
@@ -876,7 +1037,9 @@ echo '<div id="formswitchercontainer">' . $messagegroupsplitter->render($default
 			if (memo.tabloaded == 'summary') {
 				memo.widget.container.observe('click', function(event, widget, state) {
 					var element = event.element();
-					if (element.match('.StatusIcon')) {
+					if (element.match('img.StatusIcon')) {
+						event.stop();
+						
 						var pieces = element.identify().split('-');
 						var specificsections = [
 							pieces[0] + '-' + pieces[1] + '-' + pieces[2]
@@ -894,7 +1057,7 @@ echo '<div id="formswitchercontainer">' . $messagegroupsplitter->render($default
 							nexttab = pieces[0] == 'email' ? 'emailheaders' : (pieces[0] + '-' + pieces[1]);
 						}
 
-						form_load_tab(this, widget, nexttab, specificsections, true);
+						form_load_tab(this, widget, nexttab, specificsections);
 					}
 				}.bindAsEventListener(memo.form, memo.widget, state));
 			} else if ((tabloadedpieces.length == 2 && tabloadedpieces[0] == 'email' && state.currentlanguagecode == 'autotranslator' ) || (tabloadedpieces.length == 3 && tabloadedpieces[2] == 'autotranslator')) {
@@ -918,7 +1081,7 @@ echo '<div id="formswitchercontainer">' . $messagegroupsplitter->render($default
 							$(formitemname + 'retranslationtext').update();
 						}
 
-						var errortext = '<?=addslashes(_L('Sorry an error occurred during translation. Please try again.'))?>';
+						var errortext = '<?=addslashes(_L('Sorry, an error occurred during translation. Please try again.'))?>';
 						new Ajax.Request('translate.php', {
 							'method':'post',
 							'parameters': {'english': makeTranslatableString(sourcetext), 'languages': translationlanguagecodes.join(';')},
