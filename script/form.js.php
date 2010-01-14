@@ -567,7 +567,6 @@ function form_handle_submit(form,event) {
 				}
 
 				if (res.datachange) {
-					// TODO: Fire an event so that form_submit_all() can cancel alerts etc..
 					alert("The data on this form has changed.\nYour changes cannot be saved.");
 					window.location=formvars.scriptname;
 				}
@@ -656,21 +655,32 @@ function form_submit_all (tabevent, value, formsplittercontainer) {
 			var nexttab = tabevent ? tabevent.memo.section : null;
 			if (!ajaxevent.memo.errormessage) {
 				if (tabevent && (nexttab == tabevent.memo.currentSection || !tabevent.memo.widget.sections[nexttab].contentDiv.down('form#' + this.name))) {
+					// Prepare a clean url so that if the ajax call fails we will reload the page without any GET parameters.
+					var indexofquestionmark = formvars.scriptname.indexOf('?');
+					var cleanurl = (indexofquestionmark >= 0) ? formvars.scriptname.substring(0, indexofquestionmark) : formvars.scriptname;
+					var errortext = '<?=addslashes(_L("Sorry, an erorr occurred. This page will now reload"))?>';
+					
 					new Ajax.Request(posturl, {
 						method: 'post',
 						parameters: {'formsnum': this.name},
-						onSuccess: function (response) {
+						onSuccess: function (response, errortext, cleanurl) {
 							var data = response.responseJSON;
 							
 							if (!data || !data.formsnum) {
-								alert('problem updating serialnumber');
+								alert(errortext);
+								window.location = cleanurl;
+								return;
 							}
 							
 							var formsnumfield = this.down('input[name="' + this.name + '-formsnum' + '"]');
 							if (formsnumfield) {
 								formsnumfield.value = data.formsnum;
 							}
-						}.bindAsEventListener(this)
+						}.bindAsEventListener(this, errortext, cleanurl),
+						onFailure: function(response, errortext, cleanurl) {
+							alert(errortext);
+							window.location = cleanurl;
+						}.bindAsEventListener(this, errortext, cleanurl)
 					});
 				}
 				
@@ -733,7 +743,7 @@ function form_submit_all (tabevent, value, formsplittercontainer) {
 	}
 }
 
-function form_load_tab (form, widget, nexttab, specificsections, suppressfire) {
+function form_load_tab (form, widget, nexttab, specificsections) {
 	var formvars = document.formvars[form.name];
 	var posturl = formvars.scriptname + (formvars.scriptname.include('?') ? '&' : '?') + "ajax=true";
 	
@@ -756,6 +766,7 @@ function form_load_tab (form, widget, nexttab, specificsections, suppressfire) {
 			
 			if (!data || !data.element) {
 				alert('<?=addslashes(_L("Sorry, there is an error loading this tab."))?>');
+				return;
 			}
 			
 			widget.update_section(data.element, {
@@ -775,9 +786,8 @@ function form_load_tab (form, widget, nexttab, specificsections, suppressfire) {
 				});
 			}
 			
-			if (!suppressfire)
-				widget.container.fire('FormSplitter:TabLoaded', {'form': this, 'data': data, 'tabloaded': nexttab, 'previoustab': previoustab, 'widget':widget});
-		}.bindAsEventListener(form, widget, nexttab, specificsections, suppressfire),
+			widget.container.fire('FormSplitter:TabLoaded', {'form': this, 'data': data, 'tabloaded': nexttab, 'previoustab': previoustab, 'widget':widget});
+		}.bindAsEventListener(form, widget, nexttab, specificsections),
 		
 		onFailure: function() {
 			document.tabvars.loading = false;
