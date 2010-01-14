@@ -61,7 +61,7 @@ class EmailAttach extends FormItem {
 					
 					var sizeinfo = "&nbsp;(Size: " + Math.round(content.size/1024) + "k)&nbsp;";
 					
-					var removelink = new Element("a", {"href":""});
+					var removelink = new Element("a", {"href":"#"});
 					
 					removelink.update("Remove");
 					
@@ -83,16 +83,29 @@ class EmailAttach extends FormItem {
 				if (!formname || !itemname)
 					return;
 				var values = $(itemname).value.evalJSON();
-				var str = "";
+				var uploadedfiles = $("uploadedfiles").update();
 				Object.keys(values).each(function (contentid) {
 					if(contentid != id) {
-						var onclick = "removeAttachment(" + contentid + ", \\\'" + formname + "\\\', \\\'" + itemname + "\\\');";
-						str += "<a href=\"emailattachment.php?id=" + contentid + "&name=" + encodeURIComponent(encodeURIComponent(values[contentid][\'name\'])) + "\">" + values[contentid][\'name\'] + "</a>&nbsp;(Size: " + Math.round(values[contentid][\'size\']/1024) + "k)&nbsp;<a href=\'#\' onclick=\'" + onclick + "return false;\'>Remove</a><br />";									
-					} else
+						var content = values[contentid];
+						var contentname = content.name;
+						
+						uploadedfiles.insert(
+							new Element("a", {"href": "emailattachment.php?id=" + contentid + "&name=" + encodeURIComponent(encodeURIComponent(contentname))}).insert(contentname)
+						).insert(
+							"&nbsp;(Size: " + Math.round(content.size / 1024) + "k)&nbsp;"
+						).insert(
+							new Element("a", {"href": "#"}).insert("'.addslashes(_L("Remove")).'").observe("click", function(event, contentid, formname, itemname) {
+								event.stop();
+								removeAttachment(contentid, formname, itemname);
+							}.bindAsEventListener(uploadedfiles, contentid, formname, itemname))
+						).insert(
+							"<br/>"
+						);
+					} else {
 						values[contentid] = undefined;
+					}
 				});
 				$(itemname).value = Object.toJSON(values);
-				$("uploadedfiles").update(str);			
 				form_do_validation($(formname), $(itemname));
 			}
 		</script>';
