@@ -665,10 +665,19 @@ function applyHtmlEditor(textarea) {
 		if (document.body) {
 			document.body.insert(new Element('div', {'id':'reusableckeditorhider'}).hide().insert(reusableckeditor));
 			CKEDITOR.replace(reusableckeditor, {
+				'customConfig': '', // Prevent ckeditor from trying to load an external configuration file, should improve startup time.
+				'removePlugins': 'wsc,scayt,smiley,showblocks,flash',
 				'toolbar': [
-					['Styles', 'Format'],
-					['Bold', 'Italic', '-', 'NumberedList', 'BulletedList', '-', 'Link', '-', 'Image']
+					['Preview','Print'],
+					['Undo','Redo','-','SelectAll','Cut','Copy','Paste','PasteText','PasteFromWord','Find','Replace'],
+					'/',
+					['Styles','Format'],
+					['NumberedList','BulletedList','JustifyLeft','JustifyCenter','JustifyRight','JustifyBlock','Outdent','Indent'],
+					'/',
+					['Font','FontSize','Bold', 'Italic', 'Underline','Strike','Subscript','Superscript',  'TextColor','BGColor', 'RemoveFormat'],
+					['SpecialChar','Blockquote','Link', 'Image','Table','HorizontalRule','PageBreak']
 				],
+				'disableObjectResizing': true,
 				'resize_enabled': false,
 				'width': '100%',
 				'filebrowserImageUploadUrl' : 'uploadimage.php',
