@@ -20,6 +20,7 @@ function makeTranslationItem($required, $type, $subtype, $languagecode, $languag
 		"translationcheckboxnewline" => true,
 		"editenglishtext" => !$inautotranslator,
 		"editwhendisabled" => !$inautotranslator,
+		"preferredgenderformitem" => "{$type}-{$subtype}-{$languagecode}_preferredgender",
 		"showhr" => false
 	);
 
@@ -69,6 +70,14 @@ function makeFormHtml($html) {
 	);
 }
 
+function makeBrandingFormHtml() {
+	return makeFormHtml('
+		<div id="branding" style="margin-top:20px">
+			<div style="color: rgb(103, 103, 103);" class="gBranding"><span style="vertical-align: middle; font-family: arial,sans-serif; font-size: 11px;" class="gBrandingText">Translation powered by<img style="padding-left: 1px; vertical-align: middle;" alt="Google" src="' . (isset($_SERVER['HTTPS'])?"https":"http") . '://www.google.com/uds/css/small-logo.png"></span></div>
+		</div>
+	');
+}
+
 function makeMessageBody($required, $type, $subtype, $languagecode, $label, $messagetext, $datafields = null, $usehtmleditor = false, $hideplaybutton = false, $hidden = false, $maximages = 10) {
 	$control = array("MessageBody",
 		"playbutton" => $type == 'phone' && !$hideplaybutton,
@@ -113,13 +122,14 @@ function makeAccordionSplitter($type, $subtype, $languagecode, $permanent, $pref
 	if ($type == 'email') {
 		$accordionsplitterchildren[] = array(
 			"title" => _L("Attachments"),
+			"icon" => "img/icons/diagona/16/190.gif",
 			"formdata" =>  array(
 				"attachments" => array(
 					"label" => _L('Attachments'),
 					"fieldhelp" => "You may attach up to three files that are up to 2048kB each. Note: Some recipients may have different size restrictions on incoming mail which can cause them to not receive your message if you have attached large files.",
 					"value" => $emailattachments ? $emailattachments : '',
 					"validators" => array(array("ValEmailAttach")),
-					"control" => array("EmailAttach","size" => 30, "maxlength" => 51),
+					"control" => array("EmailAttach"),
 					"renderoptions" => array("icon" => false, "label" => false, "errormessage" => true),
 					"helpstep" => 3
 				),
@@ -176,13 +186,14 @@ function makeAccordionSplitter($type, $subtype, $languagecode, $permanent, $pref
 			
 			$accordionsplitterchildren[] = array(
 				"title" => _L("Audio"),
+				"icon" => 'img/icons/fugue/microphone.gif',
 				"formdata" =>  array_merge($callmeformdata, array(
 					"audioupload" => array(
 						"label" => _L('Audio Upload'),
 						"fieldhelp" => "You may attach up to three files that are up to 2048kB each. Note: Some recipients may have different size restrictions on incoming mail which can cause them to not receive your message if you have attached large files.",
 						"value" => '',
-						"validators" => array(),
-						"control" => array("AudioUpload", "size" => 30, "maxlength" => 51),
+						"validators" => array(), // uploadaudio.php does custom validation, and messagepart will validate audio inserts.
+						"control" => array("AudioUpload"),
 						"renderoptions" => array("icon" => false, "label" => false, "errormessage" => true),
 						"helpstep" => 3
 					),
@@ -272,7 +283,7 @@ function makeAccordionSplitter($type, $subtype, $languagecode, $permanent, $pref
 
 											// if failed the action but success on the ajax request
 											} else {
-												alert('" . escapehtml(_L('An error occured while trying to save your audio.\nPlease try again.')) . "');
+												alert('" . addslashes(_L('An error occured while trying to save your audio.\nPlease try again.')) . "');
 											}
 
 											// create a new EasyCall to record another audio file if desired
@@ -280,7 +291,7 @@ function makeAccordionSplitter($type, $subtype, $languagecode, $permanent, $pref
 
 										}.bindAsEventListener(this, event.memo.audiofilename),
 										'onFailure': function() {
-											alert('" . escapehtml(_L('An error occured while trying to save your audio.\nPlease try again.')) . "');
+											alert('" . addslashes(_L('An error occured while trying to save your audio.\nPlease try again.')) . "');
 											newEasyCall();
 										}.bindAsEventListener(this)
 									});
@@ -301,6 +312,7 @@ function makeAccordionSplitter($type, $subtype, $languagecode, $permanent, $pref
 	if ($type == 'email' || $type == 'phone') {
 		$accordionsplitterchildren[] = array(
 			"title" => _L("Data Fields"),
+			"icon" => 'img/icons/fugue/arrow_turn_180.gif',
 			"formdata" =>  array(
 				"datafields" => makeFormHtml("
 					<div id='accordiondatafieldscontainer'></div>
@@ -322,6 +334,7 @@ function makeAccordionSplitter($type, $subtype, $languagecode, $permanent, $pref
 		if ($allowtranslation && !$inautotranslator) {
 			$accordionsplitterchildren[] = array(
 				"title" => _L("Translation"),
+				"icon" => "img/icons/world.gif",
 				"formdata" =>  array(
 					"translation" => makeFormHtml("
 						<table style='width:100%'><tbody><tr id='accordiontranslationtr'></tr></tbody></table>
@@ -342,6 +355,7 @@ function makeAccordionSplitter($type, $subtype, $languagecode, $permanent, $pref
 
 	$autoexpirevalues = array(0 => "Yes (Keep for ". getSystemSetting('softdeletemonths', "6") ." months)",1 => "No (Keep forever)");
 	$advancedoptionsformdata = array(
+		"autoexpireheader" => makeFormHtml(_L('Auto Expire')),
 		"autoexpire" => array(
 			"label" => _L('Auto Expire'),
 			"value" => $permanent,
@@ -349,12 +363,14 @@ function makeAccordionSplitter($type, $subtype, $languagecode, $permanent, $pref
 				array("ValInArray", "values" => array_keys($autoexpirevalues))
 			),
 			"control" => array("RadioButton", "values" => $autoexpirevalues),
+			"renderoptions" => array("label" => false, "icon" => false, "errormessage" => true),
 			"helpstep" => 1
 		)
 	);
 
 	if ($type == 'phone') {
 		$gendervalues = array ("female" => "Female","male" => "Male");
+		$advancedoptionsformdata['preferredgenderheader'] = makeFormHtml('<br/>' . _L('Preferred Voice'));
 		$advancedoptionsformdata['preferredgender'] = array(
 			"label" => _L('Preferred Voice'),
 			"fieldhelp" => _L('Choose the gender of the text-to-speech voice.'),
@@ -363,11 +379,12 @@ function makeAccordionSplitter($type, $subtype, $languagecode, $permanent, $pref
 				array("ValInArray", "values" => array_keys($gendervalues))
 			),
 			"control" => array("RadioButton","values" => $gendervalues),
+			"renderoptions" => array("label" => false, "icon" => false, "errormessage" => true),
 			"helpstep" => 2
 		);
 	}
 
-	$accordionsplitterchildren[] = array("title" => _L("Advanced Options"), "formdata" => $advancedoptionsformdata);
+	$accordionsplitterchildren[] = array("title" => _L("Advanced Options"), "icon" => "img/icons/diagona/16/181.gif", "formdata" => $advancedoptionsformdata);
 	$accordionsplitter = new FormSplitter("", "", null, "accordion", array(), $accordionsplitterchildren);
 
 	return $accordionsplitter;
@@ -379,12 +396,9 @@ function makeAccordionSplitter($type, $subtype, $languagecode, $permanent, $pref
 class CallMe extends FormItem {
 	function render ($value) {
 		$n = $this->form->name."_".$this->name;
-		$nophone = _L("Phone Number");
-		$defaultphone = escapehtml((isset($this->args['phone']) && $this->args['phone'])?Phone::format($this->args['phone']):$nophone);
-		if (!$value)
-			$value = '{}';
+		
 		// Hidden input item to store values in
-		$str = '<input id="'.$n.'" name="'.$n.'" type="hidden" value="'.escapehtml($value).'" />
+		$str = '<input id="'.$n.'" name="'.$n.'" type="hidden" value="{}" />
 		<div>
 			<div id="'.$n.'_content" style="padding: 6px; white-space:nowrap"></div>
 		</div>
@@ -404,8 +418,6 @@ class CallMe extends FormItem {
 
 		$nophone = _L("Phone Number");
 		$defaultphone = escapehtml((isset($this->args['phone']) && $this->args['phone'])?Phone::format($this->args['phone']):$nophone);
-		if (!$value)
-			$value = '{}';
 
 		return '
 			function newEasyCall() {
@@ -487,15 +499,15 @@ class ValDefaultLanguageCode extends Validator {
 			}
 			
 			if (!$foundrequestedlanguage)
-				return _L("Please first create a %s message.", Language::getName($requestedlanguagecode));
+				return _L("Please first create the %s message.", Language::getName($requestedlanguagecode));
 			
 			foreach ($existinglanguagecodes as $key => $languagecodes) {
 				if (!in_array($requestedlanguagecode, $languagecodes)) {
 					list($type, $subtype) = explode('-', $key);
 					if ($type == 'email')
-						return _L('Please first create a %1$s message for %2$s in %3$s.', Language::getName($requestedlanguagecode), ucfirst($type), $subtype == 'html' ? 'HTML' : ucfirst($subtype));
+						return _L('Please first create the %1$s message for %2$s in %3$s.', Language::getName($requestedlanguagecode), ucfirst($type), $subtype == 'html' ? 'HTML' : ucfirst($subtype));
 					else
-						return _L('Please first create a %1$s message for %2$.', Language::getName($requestedlanguagecode), $type == 'sms' ? 'SMS' : ucfirst($type));
+						return _L('Please first create the %1$s message for %2$.', Language::getName($requestedlanguagecode), $type == 'sms' ? 'SMS' : ucfirst($type));
 				}
 			}
 		}
