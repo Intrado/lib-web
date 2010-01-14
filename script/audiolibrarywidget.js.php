@@ -64,7 +64,7 @@ var AudioLibraryWidget = Class.create({
 			}.bindAsEventListener(this),
 			
 			'onFailure': function() {
-				alert('<?=_L("Sorry, there was a problem retrieving audio files.")?>');
+				alert('<?=addslashes(_L("Sorry, there was a problem retrieving audio files."))?>');
 			}
 		});
 	},
