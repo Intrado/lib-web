@@ -568,6 +568,9 @@ function getHtmlEditorObject() {
 		return null;
 
 	var container = $('cke_reusableckeditor');
+	
+	if (!container)
+		return null;
 
 	var textarea = container.previous();
 	var textareauseshtmleditor = textarea && textarea.match('textarea.HtmlEditor');
@@ -575,9 +578,23 @@ function getHtmlEditorObject() {
 	return {'instance': instance, 'container': container, 'currenttextarea': textareauseshtmleditor ? textarea : null};
 }
 
-var currenthtmleditorsavelistener = null; // global variable used to keep track of the key listener so that it can be unregistered when registerHtmlEditorSaveListener() is called with a new listener.
-function registerHtmlEditorSaveListener(listener) {
-	currenthtmleditorsavelistener = listener;
+var currenthtmleditorkeylistener = null; // Global variable used to keep track of the key listener so that it can be unregistered when registerHtmlEditorKeyListener() is called with a new listener.
+var pendinghtmleditorkeylistener = null; // Will register this listener when the instance is ready, 
+function registerHtmlEditorKeyListener(listener) {
+	var htmleditorobject = getHtmlEditorObject();
+	if (!htmleditorobject) {
+		currenthtmleditorkeylistener = null;
+		pendinghtmleditorkeylistener = listener; // Will register this listener when the instance is ready, called in applyHtmlEditor().
+		
+		return;
+	}
+	
+	if (currenthtmleditorkeylistener)
+		htmleditorobject.instance.removeListener('key', currenthtmleditorkeylistener);
+	if (listener)
+		htmleditorobject.instance.on('key', listener);
+	
+	currenthtmleditorkeylistener = listener;
 }
 
 // Updates the textarea that the html editor replaces with the latest content.
@@ -613,10 +630,6 @@ function saveHtmlEditorContent(existinghtmleditorobject) {
 
 		textarea.value = html;
 		textarea.fire('HtmlEditor:SavedContent');
-	}
-	
-	if (currenthtmleditorsavelistener) {
-		currenthtmleditorsavelistener();
 	}
 	
 	return htmleditorobject;
@@ -663,6 +676,8 @@ function applyHtmlEditor(textarea) {
 					'instanceReady': function(event) {
 						this.previous('.HTMLEditorAjaxLoader').remove();
 						applyHtmlEditor(this);
+						registerHtmlEditorKeyListener(pendinghtmleditorkeylistener);
+						pendinghtmleditorkeylistener = null;
 					}.bindAsEventListener(textarea)
 				}
 			});
