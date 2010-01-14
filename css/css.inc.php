@@ -538,7 +538,6 @@ div.scrollTableContainer {
 	margin: 0;
 	border: 0;
 	padding: 0;
-	border-bottom: solid 1px <?=$theme2?>;
 }
 .horizontaltabstitlediv {
 	font-size: 12px;
@@ -579,6 +578,9 @@ div.scrollTableContainer {
 
 .horizontaltabstitledivexpanded {
 	font-weight: bold;
+	color: <?=$theme2?>;
+	margin-bottom: -1px;
+	border-bottom: solid 1px white;
 }
 
 .horizontaltabstitledivexpanded td.middle {
@@ -591,9 +593,7 @@ div.scrollTableContainer {
 	background: <?=$theme2?> url('img/horizontaltab_right.gif') repeat-x;
 }
 .horizontaltabstitledivcollapsed {
-}
-.horizontaltabstitledivlocked {
-	color: rgb(130,130,130);
+	color: <?=$theme1?>;
 }
 .horizontaltabstitleicon {
 	margin-left: 5px;
@@ -605,8 +605,8 @@ div.scrollTableContainer {
 }
 .horizontaltabspanelspane {
 	border: 1px solid <?=$theme2?>;
-	border-top: 0;
-	margin:0;
+	margin:2px;
+	margin-top: 0;
 	padding: 5px;
 	padding-bottom: 25px;
 	margin-bottom: 1px;
@@ -618,7 +618,7 @@ div.scrollTableContainer {
 	color: <?=$primary?>;
 	margin: 0;
 	padding: 0;
-	margin-top: 5px;
+	margin-top: 2px;
 }
 .verticaltabstitlediv table {
 	table-layout: fixed;
@@ -644,8 +644,10 @@ div.scrollTableContainer {
 	height: 26px;
 }
 .verticaltabstitledivexpanded {
-	border-left: 0;
 	font-weight: bold;
+	color: <?=$theme2?>;
+	margin-left: -1px;
+	background: white;
 }
 .verticaltabstitledivexpanded td.middle {
 	background: <?=$theme2?> url('img/verticaltab_middle.gif') repeat-x;
@@ -656,9 +658,7 @@ div.scrollTableContainer {
 
 .verticaltabstitledivcollapsed {
 	font-weight: normal;
-}
-.verticaltabstitledivlocked {
-	color: rgb(130,130,130);
+	color: <?=$theme1?>;
 }
 .verticaltabstitleicon {
 	margin-left: 5px;
@@ -666,14 +666,18 @@ div.scrollTableContainer {
 	vertical-align: middle;
 }
 .verticaltabscontentdiv {
+	border-right: 1px solid <?=$theme2?>;
+	padding: 0;
+	margin: 2px;
+	margin-right: 0;
+	padding-bottom: 25px;
+	padding-right: 10px;
 }
 .verticaltabstabspane {
-	border-left: 1px solid <?=$theme2?>;
 	padding: 0;
 }
 .verticaltabspanelspane {
-	padding: 5px;
-	padding-bottom: 25px;
+	padding; 0;
 	margin-bottom: 1px;
 	background: white;
 }
@@ -695,29 +699,29 @@ td.SplitPane {
 	margin: 2px;
 	margin-left: 5px;
 }
-#summaryContainer table {
+
+#summary table {
+	border-collapse: collapse;
 }
-#summaryContainer th {
+#summary th {
 	font-weight: bold;
 	vertical-align: top;
-	padding: 5px;
+	padding: 2px;
+	padding-right: 10px;
 }
-#summaryContainer th.Destination {
-	border-left: solid 1px rgb(210,210,210);
-	text-align: center;
-}
-#summaryContainer th.Language {
-	border-top: solid 1px rgb(210,210,210);
+#summary th.Destination {
 	text-align: left;
 }
-#summaryContainer td.StatusIcon {
-	vertical-align: top;
-	text-align: center;
-	border-top: solid 1px rgb(210,210,210);
-	border-left: solid 1px rgb(210,210,210);
-	padding: 5px;
+#summary th.Language {
+	text-align: right;
 }
-#summaryContainer img.StatusIcon {
+#summary td.StatusIcon {
+	vertical-align: top;
+	text-align: left;
+	padding: 2px;
+}
+
+#summary img.StatusIcon {
 	cursor: pointer;
 }
 
