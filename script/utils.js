@@ -575,6 +575,11 @@ function getHtmlEditorObject() {
 	return {'instance': instance, 'container': container, 'currenttextarea': textareauseshtmleditor ? textarea : null};
 }
 
+var currenthtmleditorsavelistener = null; // global variable used to keep track of the key listener so that it can be unregistered when registerHtmlEditorSaveListener() is called with a new listener.
+function registerHtmlEditorSaveListener(listener) {
+	currenthtmleditorsavelistener = listener;
+}
+
 // Updates the textarea that the html editor replaces with the latest content.
 // Returns null if the html editor is not loaded.
 // Returns an object containing the html editor instance and also the html editor's container.
@@ -610,12 +615,24 @@ function saveHtmlEditorContent(existinghtmleditorobject) {
 		textarea.fire('HtmlEditor:SavedContent');
 	}
 	
+	if (currenthtmleditorsavelistener) {
+		currenthtmleditorsavelistener();
+	}
+	
 	return htmleditorobject;
 }
 
 function hideHtmlEditor() {
 	if ($('cke_reusableckeditor'))
 		$('reusableckeditorhider').insert($('cke_reusableckeditor'));
+}
+
+function clearHtmlEditorContent() {
+	var htmleditorobject = getHtmlEditorObject();
+	if (!htmleditorobject)
+		return;
+	
+	htmleditorobject.instance.setData('');
 }
 
 // Loads the html editor if necessary.
