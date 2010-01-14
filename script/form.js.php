@@ -769,6 +769,9 @@ function form_load_tab (form, widget, nexttab, specificsections) {
 				return;
 			}
 			
+			// Clear any html editor listeners.
+			registerHtmlEditorKeyListener(null);
+			
 			widget.update_section(data.element, {
 				'icon': 'img/pixel.gif',
 				'content': data.content
