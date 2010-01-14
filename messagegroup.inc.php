@@ -136,7 +136,8 @@ function makeAccordionSplitter($type, $subtype, $languagecode, $permanent, $pref
 				"attachmentsjavascript" => makeFormHtml("
 					<script type='text/javascript'>
 						(function () {
-							var attachmentsformitem = $('{$type}-{$subtype}-{$languagecode}_attachments');
+							var attachmentsformitemname = '{$type}-{$subtype}-{$languagecode}_attachments';
+							var attachmentsformitem = $(attachmentsformitemname);
 							var form = attachmentsformitem.up('form');
 							
 							attachmentsformitem.observe('Form:ValidationDisplayed', function(event) {
@@ -148,14 +149,18 @@ function makeAccordionSplitter($type, $subtype, $languagecode, $permanent, $pref
 									formvars.preventAccordionClosing = false;
 							}.bindAsEventListener(form));
 							
-							form.observe('Accordion:ClickTitle', function(event, attachmentsformitem) {
+							form.observe('Accordion:ClickTitle', function(event) {
 								var formvars = document.formvars[this.identify()];
 								var currentSection = event.memo.currentSection;
-								if (event.memo.widget.sections[currentSection].contentDiv.down('#' + attachmentsformitem.identify())) {
+								var sectionobject = event.memo.widget.sections[currentSection];
+								if (!sectionobject)
+									return;
+								var contentDiv = sectionobject.contentDiv;
+								if (contentDiv && contentDiv.down('#' + attachmentsformitemname)) {
 									if (formvars.preventAccordionClosing && !confirm('".addslashes(_L('There are errors on this form, are you sure you want to continue?'))."'))
 										event.stop();
 								}
-							}.bindAsEventListener(form, attachmentsformitem));
+							}.bindAsEventListener(form));
 						})();
 					</script>
 				")

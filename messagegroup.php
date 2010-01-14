@@ -215,7 +215,7 @@ foreach ($destinations as $type => $destination) {
 								htmleditorobject = getHtmlEditorObject();
 								if (htmleditorobject) {
 									saveHtmlEditorContent(htmleditorobject);
-									if (htmleditorobject.currenttextarea.id.include(itemname)) {
+									if (htmleditorobject.currenttextarea && htmleditorobject.currenttextarea.id.include(itemname)) {
 										form_do_validation(form, formelement);
 									}
 								}
@@ -325,7 +325,7 @@ foreach ($destinations as $type => $destination) {
 								htmleditorobject = getHtmlEditorObject();
 								if (htmleditorobject) {
 									saveHtmlEditorContent(htmleditorobject);
-									if (htmleditorobject.currenttextarea.id.include(itemname)) {
+									if (htmleditorobject.currenttextarea && htmleditorobject.currenttextarea.id.include(itemname)) {
 										form_do_validation(form, formelement);
 									}
 								}
@@ -444,7 +444,7 @@ foreach ($destinations as $type => $destination) {
 									htmleditorobject = getHtmlEditorObject();
 									if (htmleditorobject) {
 										saveHtmlEditorContent(htmleditorobject);
-										if (htmleditorobject.currenttextarea.id.include(itemname)) {
+										if (htmleditorobject.currenttextarea && htmleditorobject.currenttextarea.id.include(itemname)) {
 											form_do_validation(form, formelement);
 										}
 									}
