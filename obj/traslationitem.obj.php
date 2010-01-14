@@ -54,7 +54,7 @@ class TranslationItem extends FormItem {
 			<div style="'.(!empty($this->args['editenglishtext']) ? '' : 'display:none').'">
 				<div class="MessageBodyContainer" style="'.((!$msgdata->enabled || $msgdata->override) ? 'display:none' : '').'">
 					<textarea '. (!empty($this->args['editenglishtext']) ? (' onChange="setTranslationValue(\''.$n.'\');" style="display:block; width:99%" ') : ' style="display:none" ') . '  rows="10" class="SourceTextarea" id="'.$n.'englishText">' . escapehtml($this->args["englishText"]) . '</textarea>
-					' . icon_button(_L("Refresh Translation"),"tick", "getTranslation('$n','$language',$usehtmleditor, $escapehtml);", null, 'id="refreshtranslationbutton"') . '
+					' . icon_button(_L("Refresh Translation"),"fugue/arrow_circle_double_135", "getTranslation('$n','$language',$usehtmleditor, $escapehtml);", null, 'id="refreshtranslationbutton"') . '
 					<div style="margin-top:20px;clear:both"></div>
 				</div>
 			</div>
@@ -104,16 +104,15 @@ class TranslationItem extends FormItem {
 							'.($isphone ? icon_button(_L("Play"),"fugue/control","
 									var content = $('" . $n . "text').getValue();
 									if (content != '') {
-										var gender;
-										var preferredgenderformitem = $('$preferredgenderformitem');
-										if (preferredgenderformitem) {
-											var value = preferredgenderformitem.getValue();
-											if (value == 'male' || value == 'Male')
-												gender = 'male';
-											else
-												gender = 'female';
-										} else {
-											gender = 'female';
+										var gender = 'female'; // Default female.
+										var preferredgenderdiv = $('$preferredgenderformitem');
+										if (preferredgenderdiv) {
+											var selectedradio = preferredgenderdiv.down('input:checked');
+											if (selectedradio) {
+												var value = selectedradio.getValue();
+												if (value == 'male' || value == 'Male')
+													gender = 'male';
+											}
 										}
 																
 										popup('previewmessage.php?parentfield={$n}text&language=$language&gender='+gender, 400, 400,'preview');
@@ -246,6 +245,7 @@ class TranslationItem extends FormItem {
 						}
 					});
 				}
+				// Returns the revised state object.
 				function setTranslationValue(section) {
 					var state = $(section).value.evalJSON();
 					
@@ -257,6 +257,8 @@ class TranslationItem extends FormItem {
 					
 					$(section).value = Object.toJSON(state);
 					form_do_validation($(section).up("form"), $(section));
+					
+					return state;
 				}
 
 				function overrideTranslation(section,language, usehtmleditor, escapehtml, nowarning) {
