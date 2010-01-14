@@ -53,7 +53,7 @@ class TranslationItem extends FormItem {
 			
 			<div style="'.(!empty($this->args['editenglishtext']) ? '' : 'display:none').'">
 				<div class="MessageBodyContainer" style="'.((!$msgdata->enabled || $msgdata->override) ? 'display:none' : '').'">
-					<textarea '. (!empty($this->args['editenglishtext']) ? (' onChange="setTranslationValue(\''.$n.'\');" style="display:block; width:99%" ') : ' style="display:none" ') . '  rows="10" class="SourceTextarea" id="'.$n.'englishText">' . escapehtml($this->args["englishText"]) . '</textarea>
+					<textarea '. (!empty($this->args['editenglishtext']) ? (' onChange="setTranslationValue(\''.$n.'\');" style="display:block; width:99%" ') : ' style="display:none" ') . '  rows="10" class="SourceTextarea" id="'.$n.'englishText">' . escapehtml($msgdata->englishText) . '</textarea>
 					' . icon_button(_L("Refresh Translation"),"fugue/arrow_circle_double_135", "getTranslation('$n','$language',$usehtmleditor, $escapehtml);", null, 'id="refreshtranslationbutton"') . '
 					<div style="margin-top:20px;clear:both"></div>
 				</div>
@@ -78,7 +78,7 @@ class TranslationItem extends FormItem {
 							'  . (isset($this->args['disabledinfo']) ? $this->args['disabledinfo'] : ('<ul><li> ' . _L('%1$s recipients will now receive the default English message.',ucfirst($language)) . '</li></ul>')) . '
 						</div>
 						<div id="'.$n.'textfields" style="width: 100%; display: '.(($msgdata->enabled)?"block":"none").'">
-							<div id="'.$n.'textdiv" name="'.$n.'textdiv" style="display: '.((!$msgdata->override)?"block":"none").'; width: 99%; height: 50px; border: 1px solid gray; color: gray; overflow:auto">'.(!empty($this->args['usehtmleditor']) ? $msgdata->text : escapehtml($msgdata->text)).'</div>
+							<div id="'.$n.'textdiv" name="'.$n.'textdiv" style="display: '.((!$msgdata->override)?"block":"none").'; width: 99%; '.(!empty($this->args['usehtmleditor']) ? "" : "height: 50px;").' border: 1px solid gray; color: gray; overflow:auto">'.(!empty($this->args['usehtmleditor']) ? $msgdata->text : escapehtml($msgdata->text)).'</div>
 						</div>
 						
 						<div class="MessageBodyContainer" style="display: '.(($msgdata->override || !$msgdata->enabled)?"block":"none").'">
@@ -94,8 +94,8 @@ class TranslationItem extends FormItem {
 							<span style="'.(!$allowoverride ? 'display:none' : '').'"><input id="'.$n.'override" name="'.$n.'checkbox" type="checkbox" '.(($msgdata->override)?"checked":"").' onclick="overrideTranslation(\''.$n.'\',\''.$language.'\', '.$usehtmleditor.', '.$escapehtml.');"/>' . _L('Override Translation') . '</span>
 
 							<div id="'.$n.'retranslation" style="width: 100%; display: none;margin-top: 15px; clear:both">
-								'. icon_button(_L('Refresh %1$s to English Translation', $language),"fugue/arrow_circle_double_135","submitRetranslation('$n','$language', $usehtmleditor, $escapehtml)", null, 'style="margin-bottom: 12px"') . '
-								<div id="'.$n.'retranslationtext" name="'.$n.'retranslation" style="width: 100%; width: 99%; height: 50px; border: 1px solid gray; color: gray; overflow:auto; clear:both"></div>
+								'. icon_button(_L('Refresh %s to English Translation', Language::getName($language)),"fugue/arrow_circle_double_135","submitRetranslation('$n','$language', $usehtmleditor, $escapehtml)", null, 'style="margin-bottom: 12px"') . '
+								<div id="'.$n.'retranslationtext" name="'.$n.'retranslation" style="width: 100%; width: 99%; '.(!empty($this->args['usehtmleditor']) ? "" : "height: 50px;").' border: 1px solid gray; color: gray; overflow:auto; clear:both"></div>
 							</div>
 						</div>
 					</td>
