@@ -30,7 +30,6 @@ if (!empty($_POST) && empty($_FILES['audio'])) {
 	$messagegroup = new MessageGroup($_SESSION['messagegroupid']);
 	
 	//submit changes
-	$audioname = $audio->name = _L('Audio Upload - ') . date("F jS, Y h:i a");
 	$audio->userid = $USER->id;
 	$audio->deleted = 0;
 	$audio->permanent = $messagegroup->permanent;
@@ -69,6 +68,7 @@ if (!empty($_POST) && empty($_FILES['audio'])) {
 				unlink($dest);
 
 				if ($contentid) {
+					$audioname = $audio->name = $filename . ' - ' . date("F jS, Y h:i a");
 					$audio->contentid = $contentid;
 					$audio->update();
 					$audioid = $audio->id;
