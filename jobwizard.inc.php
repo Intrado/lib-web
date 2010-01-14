@@ -868,13 +868,13 @@ class JobWiz_messagePhoneTranslate extends WizStep {
 				"enabled" => true,
 				"text" => $text,
 				"override" => false,
-				"gender" => $gender
+				"gender" => $gender,
+				"englishText" => $englishText
 			)),
 			"validators" => array(array("ValTranslation")),
 			"control" => array("TranslationItem",
 				"phone" => true,
-				"language" => $languagecode,
-				"englishText" => $englishText
+				"language" => $languagecode
 			),
 			"transient" => $transient,
 			"helpstep" => 2
@@ -1224,13 +1224,13 @@ class JobWiz_messageEmailTranslate extends WizStep {
 				"enabled" => true,
 				"text" => $text,
 				"override" => false,
-				"gender" => false
+				"gender" => false,
+				"englishText" => $englishText
 			)),
 			"validators" => array(array("ValTranslation")),
 			"control" => array("TranslationItem",
 				"email" => true,
-				"language" => $languagecode,
-				"englishText" => $englishText
+				"language" => $languagecode
 			),
 			"transient" => $transient,
 			"helpstep" => 2
