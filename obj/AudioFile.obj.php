@@ -9,7 +9,7 @@ class AudioFile extends DBMappedObject {
 	var $recorddate;
 	var $deleted = 0;
 	var $permanent = 0;
-	var $messagegroupid = 0;
+	var $messagegroupid = NULL;
 
 	function AudioFile ($id = NULL) {
 		$this->_allownulls = true;
