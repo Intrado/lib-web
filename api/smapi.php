@@ -171,7 +171,7 @@ class SMAPI{
 				$result["resultdescription"] = "Invalid user";
 				return $result;
 			}
-			$queryresult = Query("select id, name, description, type from message where userid = " . $USER->id . " and type= '" . DBSafe(strtolower($type)) . "' and not deleted order by name");
+			$queryresult = Query("select id, name, description, type from message where userid = ? and type= ? and autotranslate != 'source' and not deleted order by name", false, array($USER->id, strtolower($type)));
 			$messages = array();
 			while($row = DBGetRow($queryresult)){
 				$message = new API_Message();
@@ -235,7 +235,7 @@ class SMAPI{
 				}
 			}
 			$parts = Message::parse($messagetext);
-			$voiceid = QuickQuery("select id from ttsvoice where language = 'english' and gender = 'female'");
+			$voiceid = QuickQuery("select id from ttsvoice where languagecode = 'en' and gender = 'female'");
 			QuickUpdate("delete from messagepart where messageid=$message->id");
 			foreach ($parts as $part) {
 				$part->voiceid = $voiceid;
@@ -537,18 +537,19 @@ class SMAPI{
 			}
 
 			$queryresult = Query("select id, name, description, phonemessageid, emailmessageid, smsmessageid
-									from job where status = 'repeating' and userid = " . $USER->id . " order by finishdate asc");
+									from job where status = 'repeating' and userid = ? order by finishdate asc", false, array($USER->id));
 
 			//fetch all messages
-			$messages['phone'] = DBFindMany("Message", "from message where type='phone' and not deleted and userid = " . $USER->id);
-			$messages['email'] = DBFindMany("Message", "from message where type='email' and not deleted and userid = " . $USER->id);
-			$messages['sms'] = DBFindMany("Message", "from message where type='sms' and not deleted and userid = " . $USER->id);
+			$messages['phone'] = DBFindMany("Message", "from message where type='phone' and autotranslate != 'source' and not deleted and userid = ?", false, array($USER->id));
+			$messages['email'] = DBFindMany("Message", "from message where type='email' and autotranslate != 'source' and not deleted and userid = ?", false, array($USER->id));
+			// NOTE: SMS will only have autotranslate='none' so we do not need to check for it explicitly.
+			$messages['sms'] = DBFindMany("Message", "from message where type='sms' and not deleted and userid = ?", false, array($USER->id));
 
 			$jobs = array();
 			while($row = DBGetRow($queryresult)){
-				$joblangs['phone'] = DBFindMany('JobLanguage', "from joblanguage where joblanguage.type = 'phone' and jobid = " . $row[0]);
-				$joblangs['email'] = DBFindMany('JobLanguage', "from joblanguage where joblanguage.type = 'email' and jobid = " . $row[0]);
-				$joblangs['sms'] = DBFindMany('JobLanguage', "from joblanguage where joblanguage.type = 'sms' and jobid = " . $row[0]);
+				$joblangs['phone'] = DBFindMany('JobLanguage', "from joblanguage where joblanguage.type = 'phone' and jobid = ?", false, array($row[0]));
+				$joblangs['email'] = DBFindMany('JobLanguage', "from joblanguage where joblanguage.type = 'email' and jobid = ?", false, array($row[0]));
+				$joblangs['sms'] = DBFindMany('JobLanguage', "from joblanguage where joblanguage.type = 'sms' and jobid = ?", false, array($row[0]));
 
 				$job = new API_Job();
 				$job->id = $row[0];
@@ -761,45 +762,60 @@ class SMAPI{
 				$job->name = $name;
 				$job->description = $desc;
 				$job->jobtypeid = $jobtypeid;
-				if($USER->authorize('sendphone') && $phonemsgid && userOwns("message", $phonemsgid) &&
-				QuickQuery("select type from message where id = " . $phonemsgid) == "phone"){
-					$job->sendphone = true;
-					$job->phonemessageid = $phonemsgid;
-				} else {
-					$job->sendphone = false;
+				
+				// Create a deleted non-permanent messagegroup that contains duplicates of the client-supplied messages.
+				$messagegroup = new MessageGroup();
+				$messagegroup->userid = $USER->id;
+				$messagegroup->defaultlanguagecode = 'en'; // NOTE: Default language is assumed to be English.
+				$messagegroup->name = $job->name;
+				$messagegroup->description = $job->description;
+				$messagegroup->modified = makeDateTime(time());
+				$messagegroup->deleted = 1; // NOTE: We don't want this messagegroup to show in the UI.
+				$messagegroup->permanent = 0; // NOTE: This is a hidden messagegroup anyway, so why keep it? The original messages remain intact.
+				$messagegroup->create();
+				$job->messagegroupid = $messagegroup->id;
+				$job->sendphone = false;
+				$job->sendemail = false;
+				$job->sendsms = false;
+				if ($USER->authorize('sendphone') && $phonemsgid) {
+					$phonemessage = new Message($phonemsgid);
+					if ($phonemessage->userid == $USER->id && $phonemessage->type == 'phone') {
+						// NOTE: $phonemessage->copy() already calls $duplicatephonemessage->create();
+						$duplicatephonemessage = $phonemessage->copy($messagegroup->id);
+						$job->sendphone = true;
+					}
 				}
-				if($USER->authorize('sendemail') && $emailmsgid && userOwns("message", $emailmsgid) &&
-				QuickQuery("select type from message where id = " . $emailmsgid) == "email"){
-					$job->sendemail = true;
-					$job->emailmessageid = $emailmsgid;
-				} else {
-					$job->sendemail = false;
+				if ($USER->authorize('sendemail') && $emailmsgid) {
+					$emailmessage = new Message($emailmsgid);
+					if ($emailmessage->userid == $USER->id && $emailmessage->type == 'email') {
+						// NOTE: $emailmessage->copy() already calls $duplicateemailmessage->create();
+						$duplicateemailmessage = $emailmessage->copy($messagegroup->id);
+						$job->sendemail = true;
+					}
 				}
-				if(getSystemSetting('_hassms') && $USER->authorize('sendsms') && $smsmsgid && userOwns("message", $smsmsgid) &&
-				QuickQuery("select type from message where id = " . $smsmsgid) == "sms"){
-					$job->sendsms = true;
-					$job->smsmessageid = $smsmsgid;
-				} else {
-					$job->sendsms = false;
+				if (getSystemSetting('_hassms') && $USER->authorize('sendsms') && $smsmsgid) {
+					$smsmessage = new Message($smsmsgid);
+					if ($smsmessage->userid == $USER->id && $smsmessage->type == 'sms') {
+						// NOTE: $smsmessage->copy() already calls $duplicatesmsmessage->create();
+						$duplicatesmsmessage = $smsmessage->copy($messagegroup->id);
+						$job->sendsms = true;
+					}
 				}
 
 				$jobtypes = array();
-				if ($job->sendphone && $job->phonemessageid != 0) {
+				if ($job->sendphone && $duplicatephonemessage->id != 0) {
 					$jobtypes[] = "phone";
 				} else {
-					$job->phonemessageid = NULL;
 					$job->sendphone = false;
 				}
-				if ($job->sendemail && $job->emailmessageid != 0) {
+				if ($job->sendemail && $duplicateemailmessage->id != 0) {
 					$jobtypes[] = "email";
 				} else {
-					$job->emailmessageid = NULL;
 					$job->sendemail = false;
 				}
-				if (getSystemSetting('_hassms') && $job->sendsms && $job->smsmessageid != 0) {
+				if (getSystemSetting('_hassms') && $job->sendsms && $duplicatesmsmessage->id != 0) {
 					$jobtypes[] = "sms";
 				} else {
-					$job->smsmessageid = NULL;
 					$job->sendsms = false;
 				}
 				$job->type=implode(",",$jobtypes);
@@ -827,7 +843,7 @@ class SMAPI{
 				// associate this jobid with the listid
 				QuickUpdate("insert into joblist (jobid, listid) values (?, ?)", false, array($job->id, $listid));
 				
-				$job->runNow();
+				$job->runNow(false, true);
 				$result["resultcode"] = "success";
 				$result["jobid"] = $job->id;
 				return $result;
