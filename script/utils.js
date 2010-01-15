@@ -489,7 +489,8 @@ function format_thousands_separator(num) {
 
 function icon_button(name,icon,id) {
 	var newbutton = new Element("button",{"class": "button", type: "button"});
-	newbutton.id = id;
+	if (id)
+		newbutton.id = id;
 
 	var buttonface = new Element("td",{"class": "middle"}).insert(new Element("img",{src: "img/icons/"+icon+".gif"})).insert(name);
 
