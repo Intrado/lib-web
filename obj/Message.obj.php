@@ -51,6 +51,30 @@ class Message extends DBMappedObject {
 			$this->data = 'header1=' . urlencode($this->header1) . '&header2=' .  urlencode($this->header2) . '&header3=' . urlencode($this->header3) . '&fromaddress=' . urlencode($this->fromaddress);
 		}
 	}
+	
+	function copy($messagegroupid = null) {
+		//copy the messages
+		$newmessage = new Message($this->id);
+		$newmessage->id = null;
+		if (!is_null($messagegroupid))
+			$newmessage->messagegroupid = $messagegroupid;
+		$newmessage->create();
+
+		// copy the parts
+		$parts = DBFindMany("MessagePart", "from messagepart where messageid=$this->id");
+		foreach ($parts as $part) {
+			$newpart = new MessagePart($part->id);
+			$newpart->id = null;
+			$newpart->messageid = $newmessage->id;
+			$newpart->create();
+		}
+		// copy the attachments
+		QuickUpdate("insert into messageattachment (messageid,contentid,filename,size,deleted) " .
+		"select $newmessage->id, ma.contentid, ma.filename, ma.size, 1 as deleted " .
+		"from messageattachment ma where ma.messageid=$this->id and not deleted");
+		
+		return $newmessage;
+	}
 
 	function updateMessageForCurrentUser($messagegroupid, $name, $description, $type, $subtype, $languagecode, $autotranslate, $headers) {
 		global $USER;

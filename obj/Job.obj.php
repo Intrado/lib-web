@@ -50,25 +50,8 @@ class Job extends DBMappedObject {
 
 		$messages = DBFindMany("Message", "from message where messagegroupid=$messagegroupid");
 		foreach ($messages as $message) {
-
-			//copy the messages
-			$newmessage = new Message($message->id);
-			$newmessage->id = null;
-			$newmessage->messagegroupid = $newmessagegroup->id;
-			$newmessage->create();
-
-			// copy the parts
-			$parts = DBFindMany("MessagePart", "from messagepart where messageid=$message->id");
-			foreach ($parts as $part) {
-				$newpart = new MessagePart($part->id);
-				$newpart->id = null;
-				$newpart->messageid = $newmessage->id;
-				$newpart->create();
-			}
-			// copy the attachments
-			QuickUpdate("insert into messageattachment (messageid,contentid,filename,size,deleted) " .
-			"select $newmessage->id, ma.contentid, ma.filename, ma.size, 1 as deleted " .
-			"from messageattachment ma where ma.messageid=$message->id and not deleted");
+			// NOTE: $message-copy() already calls $newmessage->create().
+			$newmessage = $message->copy();
 		}
 
 		return $newmessagegroup;
