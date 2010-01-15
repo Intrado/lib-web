@@ -536,81 +536,45 @@ class SMAPI{
 				return $result;
 			}
 
-			$queryresult = Query("select id, name, description, phonemessageid, emailmessageid, smsmessageid
+			$queryresult = Query("select id, name, description, messagegroupid
 									from job where status = 'repeating' and userid = ? order by finishdate asc", false, array($USER->id));
-
-			//fetch all messages
-			$messages['phone'] = DBFindMany("Message", "from message where type='phone' and autotranslate != 'source' and not deleted and userid = ?", false, array($USER->id));
-			$messages['email'] = DBFindMany("Message", "from message where type='email' and autotranslate != 'source' and not deleted and userid = ?", false, array($USER->id));
-			// NOTE: SMS will only have autotranslate='none' so we do not need to check for it explicitly.
-			$messages['sms'] = DBFindMany("Message", "from message where type='sms' and not deleted and userid = ?", false, array($USER->id));
-
+			
+			$hassms = getSystemSetting('_hassms');
+			$multilingual = $USER->authorize('sendmulti');
 			$jobs = array();
 			while($row = DBGetRow($queryresult)){
-				$joblangs['phone'] = DBFindMany('JobLanguage', "from joblanguage where joblanguage.type = 'phone' and jobid = ?", false, array($row[0]));
-				$joblangs['email'] = DBFindMany('JobLanguage', "from joblanguage where joblanguage.type = 'email' and jobid = ?", false, array($row[0]));
-				$joblangs['sms'] = DBFindMany('JobLanguage', "from joblanguage where joblanguage.type = 'sms' and jobid = ?", false, array($row[0]));
-
+				// NOTE: We don't want to return the autotranslate='source' messages because the autotranslate='translate' message would be included anyway.
+				$defaultlanguagecode = QuickQuery('select defaultlanguagecode from messagegroup where id = ?', false, array($row[3]));
+				$messages = DBFindMany('Message', 'from message where not deleted and not autotranslate="source" and messagegroupid = ? ', false, array($row[3]));
+				
 				$job = new API_Job();
 				$job->id = $row[0];
 				$job->name = $row[1];
 				$job->description = $row[2];
 
-				$phonemessages = array();
-				$emailmessages = array();
-				$smsmessages = array();
-				//only set message array if exists
-				//do not return alternative job langs if defaults are not set(this should never happen)
-				$types = array();
-				if($row[3]){
-					$phonemessage = new API_Message();
-					$phonemessage->id = $row[3];
-					$phonemessage->name = $messages['phone'][$row[3]]->name;
-					$phonemessage->type = 'phone';
-					$phonemessage->language = 'default';
-					$phonemessages[] = $phonemessage;
-					$types[] = "phone";
-				}
-				if($row[4]){
-					$emailmessage = new API_Message();
-					$emailmessage->id = $row[4];
-					$emailmessage->name = $messages['email'][$row[4]]->name;
-					$emailmessage->type = 'email';
-					$emailmessage->language = 'default';
-					$emailmessages[] = $emailmessage;
-					$types[] = "email";
-				}
-				if(getSystemSetting('_hassms') && $row[5]){
-					$smsmessage = new API_Message();
-					$smsmessage->id = $row[5];
-					$smsmessage->name = $messages['sms'][$row[5]]->name;
-					$smsmessage->type = 'sms';
-					$smsmessage->language = 'default';
-					$smsmessages[] = $smsmessage;
-					$types[] = "sms";
-				}
-				if($USER->authorize('sendmulti')){
-					foreach($types as $type){
-						$arrayname = $type . "messages";
-						foreach($joblangs[$type] as $joblang){
-							$joblangmessage = new API_Message();
-							$joblangmessage->id = $joblang->messageid;
-							$joblangmessage->name = $messages[$type][$joblang->messageid]->name;
-							$joblangmessage->type = $type;
-							$joblangmessage->language = $joblang->language;
-							if($type == 'phone')
-							$phonemessages[] = $joblangmessage;
-							else if($type == 'email')
-							$emailmessages[] = $joblangmessage;
-							else if($type == 'sms')
-							$smsmessages[] = $joblangmessage;
-						}
-					}
+				$apimessages = array(); // Example: $apimessages[$message->type] = array(new API_Message(), new API_Message());
+				foreach ($messages as $message) {
+					if (!$hassms && $message->type == 'sms')
+						continue;
+					if (!$multilingual && $message->languagecode != $defaultlanguagecode)
+						continue;
+					
+					$apimessage = new API_Message();
+					$apimessage->id = $message->id;
+					$apimessage->name = $message->name;
+					$apimessage->type = $message->type;
+					// NOTE: We just want to return the language name; the rest of the smapi does not accept language code nor language name as input.
+					$apimessage->language = ($message->languagecode == $defaultlanguagecode) ? 'default' : Language::getName($message->languagecode);
+					
+					if (!isset($apimessages[$message->type]))
+						$apimessages[$message->type] = array();
+						
+					$apimessages[$message->type][] = $apimessage;
 				}
 
-				$job->phonemessages = $phonemessages;
-				$job->emailmessages = $emailmessages;
-				$job->smsmessages = $smsmessages;
+				$job->phonemessages = isset($apimessages['phone']) ? $apimessages['phone'] : array();
+				$job->emailmessages = isset($apimessages['email']) ? $apimessages['email'] : array();
+				$job->smsmessages = isset($apimessages['sms']) ? $apimessages['sms'] : array();
 				$jobs[] = $job;
 			}
 
@@ -762,6 +726,7 @@ class SMAPI{
 				$job->name = $name;
 				$job->description = $desc;
 				$job->jobtypeid = $jobtypeid;
+				$job->type = 'notification';
 				
 				// Create a deleted non-permanent messagegroup that contains duplicates of the client-supplied messages.
 				$messagegroup = new MessageGroup();
@@ -774,51 +739,36 @@ class SMAPI{
 				$messagegroup->permanent = 0; // NOTE: This is a hidden messagegroup anyway, so why keep it? The original messages remain intact.
 				$messagegroup->create();
 				$job->messagegroupid = $messagegroup->id;
-				$job->sendphone = false;
-				$job->sendemail = false;
-				$job->sendsms = false;
+				$job->sendphone = false; // Default value.
+				$job->sendemail = false; // Default value.
+				$job->sendsms = false; // Default value.
 				if ($USER->authorize('sendphone') && $phonemsgid) {
 					$phonemessage = new Message($phonemsgid);
 					if ($phonemessage->userid == $USER->id && $phonemessage->type == 'phone') {
 						// NOTE: $phonemessage->copy() already calls $duplicatephonemessage->create();
-						$duplicatephonemessage = $phonemessage->copy($messagegroup->id);
-						$job->sendphone = true;
+						$duplicatephonemessage = $phonemessage->copy($messagegroup->id, true);
+						if ($duplicatephonemessage->id)
+							$job->sendphone = true;
 					}
 				}
 				if ($USER->authorize('sendemail') && $emailmsgid) {
 					$emailmessage = new Message($emailmsgid);
 					if ($emailmessage->userid == $USER->id && $emailmessage->type == 'email') {
 						// NOTE: $emailmessage->copy() already calls $duplicateemailmessage->create();
-						$duplicateemailmessage = $emailmessage->copy($messagegroup->id);
-						$job->sendemail = true;
+						$duplicateemailmessage = $emailmessage->copy($messagegroup->id, true);
+						if ($duplicateemailmessage->id)
+							$job->sendemail = true;
 					}
 				}
 				if (getSystemSetting('_hassms') && $USER->authorize('sendsms') && $smsmsgid) {
 					$smsmessage = new Message($smsmsgid);
 					if ($smsmessage->userid == $USER->id && $smsmessage->type == 'sms') {
 						// NOTE: $smsmessage->copy() already calls $duplicatesmsmessage->create();
-						$duplicatesmsmessage = $smsmessage->copy($messagegroup->id);
-						$job->sendsms = true;
+						$duplicatesmsmessage = $smsmessage->copy($messagegroup->id, true);
+						if ($duplicatesmsmessage->id)
+							$job->sendsms = true;
 					}
 				}
-
-				$jobtypes = array();
-				if ($job->sendphone && $duplicatephonemessage->id != 0) {
-					$jobtypes[] = "phone";
-				} else {
-					$job->sendphone = false;
-				}
-				if ($job->sendemail && $duplicateemailmessage->id != 0) {
-					$jobtypes[] = "email";
-				} else {
-					$job->sendemail = false;
-				}
-				if (getSystemSetting('_hassms') && $job->sendsms && $duplicatesmsmessage->id != 0) {
-					$jobtypes[] = "sms";
-				} else {
-					$job->sendsms = false;
-				}
-				$job->type=implode(",",$jobtypes);
 
 				$job->startdate = date("Y-m-d", strtotime($startdate));
 				if($ACCESS->getValue('maxjobdays') && $daystorun > $ACCESS->getValue('maxjobdays')){
@@ -843,7 +793,7 @@ class SMAPI{
 				// associate this jobid with the listid
 				QuickUpdate("insert into joblist (jobid, listid) values (?, ?)", false, array($job->id, $listid));
 				
-				$job->runNow(false, true);
+				$job->runNow();
 				$result["resultcode"] = "success";
 				$result["jobid"] = $job->id;
 				return $result;
@@ -1271,7 +1221,8 @@ function getJobData($jobid=0){
 		$jobs[] = $job;
 	}
 	if($jobid){
-		return $jobs[0];
+		return array_shift($jobs);
+		//return $jobs[0];
 	} else {
 		return $jobs;
 	}
@@ -1300,6 +1251,7 @@ require_once("../inc/date.inc.php");
 require_once("../inc/securityhelper.inc.php");
 
 // OBJECTS
+require_once("../obj/MessageGroup.obj.php");
 require_once("../obj/Message.obj.php");
 require_once("../obj/MessagePart.obj.php");
 require_once("../obj/AudioFile.obj.php");
@@ -1308,7 +1260,7 @@ require_once("../obj/JobType.obj.php");
 require_once("../obj/Job.obj.php");
 require_once("../obj/JobList.obj.php");
 require_once("../obj/Voice.obj.php");
-require_once("../obj/JobLanguage.obj.php");
+require_once("../obj/Language.obj.php");
 require_once("../obj/Phone.obj.php");
 require_once("../obj/Email.obj.php");
 require_once("../obj/Sms.obj.php");
