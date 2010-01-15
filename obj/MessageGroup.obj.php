@@ -1,7 +1,7 @@
 <?php
 class MessageGroup extends DBMappedObject {
 	var $userid;
-	var $defaultlanguagecode;
+	var $defaultlanguagecode = 'en';
 	var $name;
 	var $description;
 	var $modified;
