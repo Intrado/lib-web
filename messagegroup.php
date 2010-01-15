@@ -911,6 +911,7 @@ div.MessageBodyHeader {
 </style>
 
 <script src="script/ckeditor/ckeditor_basic.js" type="text/javascript"></script>
+<script src="script/htmleditor.js" type="text/javascript"></script>
 <script src="script/accordion.js" type="text/javascript"></script>
 <script src="script/audiolibrarywidget.js.php" type="text/javascript"></script>
 <script type="text/javascript">
