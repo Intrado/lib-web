@@ -52,12 +52,15 @@ class Message extends DBMappedObject {
 		}
 	}
 	
-	function copy($messagegroupid = null) {
+	// If $forcedeleted is true, sets $newmessage->deleted = 1; otherwise, does not explicitly set $newmessage->deleted.
+	function copy($messagegroupid = null, $forcedeleted = false) {
 		//copy the messages
 		$newmessage = new Message($this->id);
 		$newmessage->id = null;
 		if (!is_null($messagegroupid))
 			$newmessage->messagegroupid = $messagegroupid;
+		if ($forcedeleted)
+			$newmessage->deleted = 1;
 		$newmessage->create();
 
 		// copy the parts
