@@ -1,5 +1,4 @@
 <?
-require_once("../inc/subdircommon.inc.php");
 require_once("../inc/utils.inc.php");
 require_once("../obj/Validator.obj.php");
 
@@ -653,7 +652,7 @@ function form_submit_all (tabevent, value, formsplittercontainer) {
 			var nexttab = tabevent ? tabevent.memo.section : null;
 			if (!ajaxevent.memo.errormessage) {
 				if (tabevent && (nexttab == tabevent.memo.currentSection || !tabevent.memo.widget.sections[nexttab].contentDiv.down('form#' + this.name))) {
-					var errortext = '<?=addslashes(_L("Sorry, an erorr occurred. This page will now reload"))?>';
+					var errortext = 'Sorry, an erorr occurred. This page will now reload';
 					
 					new Ajax.Request(posturl, {
 						method: 'post',
@@ -764,7 +763,7 @@ function form_load_tab (form, widget, nexttab, specificsections) {
 			var data = response.responseJSON;
 			
 			if (!data || !data.element) {
-				alert('<?=addslashes(_L("Sorry, there is an error loading this tab."))?>');
+				alert('Sorry, there is an error loading this tab.');
 				return;
 			}
 			
@@ -793,7 +792,7 @@ function form_load_tab (form, widget, nexttab, specificsections) {
 		
 		onFailure: function() {
 			document.tabvars.loading = false;
-			alert('<?=addslashes(_L("Sorry, there is an error loading this tab."))?>');
+			alert('Sorry, there is an error loading this tab.');
 		}
 	});
 }
