@@ -628,7 +628,7 @@ function form_submit_all (tabevent, value, formsplittercontainer) {
 	// Map used to store the results of the form submissions.
 	var submissions = {};
 
-	for (var i = 0; i < forms.length; i++) {
+	for (var i = 0, count = forms.length; i < count; i++) {
 		var form = forms[i];
 		
 		var submission = submissions[form.name] = {'submitted':false, 'form':form, 'value':value};
