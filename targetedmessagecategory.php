@@ -26,23 +26,23 @@ if (!$USER->authorize('managesystem')) {
 ////////////////////////////////////////////////////////////////////////////////
 
 $validimages = array(
-	"award_star_gold_2",
-	"lightning",
-	"information",
-	"diagona/16/151",
-	"diagona/16/152",
-	"diagona/16/153",
-	"diagona/16/154",
-	"diagona/16/155",
-	"diagona/16/156",
-	"diagona/16/157",
-	"diagona/16/158",
-	"diagona/16/159",
+	"gold star" => "award_star_gold_2",
+	"lightning" => "lightning",
+	"information" => "information",
+	"red dot" => "diagona/16/151",
+	"green dot" => "diagona/16/152",
+	"blue dot" => "diagona/16/153",
+	"yellow dot" => "diagona/16/154",
+	"pink dot" => "diagona/16/155",
+	"orange dot" => "diagona/16/156",
+	"purple dot" => "diagona/16/157",
+	"black dot" => "diagona/16/158",
+	"gray dot" => "diagona/16/159",
 );
 
 $formradiovalues = array();
-foreach($validimages as $validimage) {
-	$formradiovalues[$validimage] = "<img src='img/icons/$validimage.gif' style='border:0px' />";
+foreach($validimages as $key => $image) {
+	$formradiovalues[$key] = "<img src='img/icons/$image.gif' style='border:0px' />";
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -56,7 +56,7 @@ class ImgRadioButton extends FormItem {
 		foreach ($this->args['values'] as $radiovalue => $radiohtml) {
 			$id = $n.'-'.$counter;
 			$str .= '<div style="float:left;margin:10px;"><input id="'.$id.'" name="'.$n.'" type="radio" style="float:left" value="'.escapehtml($radiovalue).'" '.($value == $radiovalue ? 'checked' : '').' /><label for="'.$id.'"><button type="button" class="regbutton" style="border: 0px; background-color: white; color: black; margin-left: 0px;" onclick="$(\''.$id.'\').click();">'.($radiohtml).'</button></label>
-				</div>';
+				</div><div style="clear:both;"></div>';
 			$counter++;
 		}
 

@@ -26,9 +26,43 @@ if (!$USER->authorize('managesystem')) {
 if (isset($_GET['enable']) && isset($_GET['id'])) {
 	session_write_close();//WARNING: we don't keep a lock on the session file, any changes to session data are ignored past this point
 	header('Content-Type: application/json');
-	$return = QuickUpdate("update targetedmessage set enabled=? where id=?",false,array(($_GET['enable']=="false"?0:1),$_GET['id']));
-	echo json_encode($return!==false);
+	$result = QuickUpdate("update targetedmessage set enabled=? where id=?",false,array(($_GET['enable']=="false"?0:1),$_GET['id']));
+	echo json_encode($result!==false);
 	exit();
+} else if(isset($_GET['deletecategoryid'])) {
+	session_write_close();//WARNING: we don't keep a lock on the session file, any changes to session data are ignored past this point
+	header('Content-Type: application/json');
+	$items = QuickQuery("select count(*) from targetedmessage where targetedmessagecategoryid = ? and deleted = 0",false,array($_GET['deletecategoryid']));
+	echo json_encode($items === "0" && QuickUpdate("delete from targetedmessagecategory where id=?",false,array($_GET['deletecategoryid'])));
+	exit();
+}
+
+$categories = QuickQueryMultiRow("select id, name, image from targetedmessagecategory where 1",true);
+$categoriesjson = array();
+$validimages = array(  // TODO his is duplicated from targeted messagecategory, please fix me.
+	"gold star" => "award_star_gold_2",
+	"lightning" => "lightning",
+	"information" => "information",
+	"red dot" => "diagona/16/151",
+	"green dot" => "diagona/16/152",
+	"blue dot" => "diagona/16/153",
+	"yellow dot" => "diagona/16/154",
+	"pink dot" => "diagona/16/155",
+	"orange dot" => "diagona/16/156",
+	"purple dot" => "diagona/16/157",
+	"black dot" => "diagona/16/158",
+	"gray dot" => "diagona/16/159",
+);
+
+
+foreach($categories as $category) {
+	$obj = null;
+	$obj->name = $category["name"];
+	if(isset($category["image"]) && isset($validimages[$category["image"]]))
+		$obj->img = "img/icons/" . $validimages[$category["image"]]  . ".gif";
+	else
+		$obj->img = "img/pixel.gif";
+	$categoriesjson[$category["id"]] = $obj;
 }
 
 $ajax = isset($_GET['ajax']);
@@ -42,12 +76,20 @@ if($ajax === true) {
 		echo json_encode(false);
 		exit();
 	}
+
+	if (isset($_GET['moveid']) && isset($_GET['movetoid'])) {
+		if(in_array($_GET['movetoid'], array_keys($categoriesjson)))
+			QuickUpdate("update targetedmessage set targetedmessagecategoryid=? where id=?", false, array($_GET['movetoid'],$_GET['moveid']));
+	} else if(isset($_GET['deletemessageid'])) {
+		QuickUpdate("update targetedmessage set deleted=1 where id=?",false,array($_GET['deletemessageid']));
+	}
+
 	$getcategory = $_GET['category'];
 
 	$start = 0 + (isset($_GET['pagestart']) ? $_GET['pagestart'] : 0);
 	$limit = 100;
 
-	$items = QuickQueryMultiRow("select SQL_CALC_FOUND_ROWS id, messagekey, targetedmessagecategoryid, overridemessagegroupid, enabled from targetedmessage where targetedmessagecategoryid = ? order by id limit $start, $limit",true,false,array($getcategory));
+	$items = QuickQueryMultiRow("select SQL_CALC_FOUND_ROWS id, messagekey, targetedmessagecategoryid, overridemessagegroupid, enabled from targetedmessage where targetedmessagecategoryid = ? and deleted = 0 order by id limit $start, $limit",true,false,array($getcategory));
 
 	$total = QuickQuery("select FOUND_ROWS()");
 	$numpages = ceil($total/$limit);
@@ -60,24 +102,20 @@ if($ajax === true) {
 	while(!empty($items)) {
 		$item = array_shift($items);
 		$data->list[] = array(
-								"id" => $item["id"],
-								"enabled" => ($item["enabled"]==1),
-								"title" => $item["messagekey"],
-								"actions" => action_links (action_link("Edit", "pencil", ""))
+			"id" => $item["id"],
+			"enabled" => ($item["enabled"]==1),
+			"title" => $item["messagekey"],
+			"actions" => action_links (action_link("Edit", "pencil", ""))
 		);
+
 	}
+
+
 	echo json_encode(!empty($data) ? $data : false);
 	exit();
 }
 
-$categoriesjson = array();
-$categories = QuickQueryMultiRow("select id, name, image from targetedmessagecategory where 1",true);
-foreach($categories as $category) {
-	$obj = null;
-	$obj->name = $category["name"];
-	$obj->img = isset($category["image"])?"img/icons/" . $category["image"] . ".gif":"img/pixel.gif";
-	$categoriesjson[$category["id"]] = $obj;
-}
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // Display Functions
@@ -100,18 +138,20 @@ echo icon_button(_L('Create Category'),"add",null,"targetedmessagecategory.php?i
 
 ?>
 <div style="clear:both;"></div>
-<div id='tabsContainer' style='margin:10px; margin-right:0px;vertical-align:middle;'></div>
+
+
+<div id='tabsContainer' style='vertical-align:middle;'></div>
 
 <div id="libraryContent">
 
 <?
+
 foreach($categories as $category) {
 	echo "<div id='lib-" . $category["id"] . "'>
-			<h3>Edit Category</h3>
 			" .
 			action_links (
-				action_link("Rename", "textfield_rename", "targetedmessagecategory.php?id=" . $category["id"]),
-				action_link("Delete", "cross", "")
+				action_link("Edit", "pencil", "targetedmessagecategory.php?id=" . $category["id"]),
+				action_link("Delete", "cross", null,"deletecategory('". $category["id"] . "');return false;")
 			)
 			. "
 			<h3>Massages</h3>
@@ -120,9 +160,9 @@ foreach($categories as $category) {
 			. "
 			<div id='pagewrappertop-" . $category["id"] . "'></div>
 			<div style='clear:both;'></div>
-			<div id='items-" . $category["id"] . "'>";
-	echo "
-			</div>
+			<table id='items-" . $category["id"] . "'>
+				<tr><td></td></tr>
+			</table>
 			<div id='pagewrapperbottom-" . $category["id"] . "'></div>
 		</div>";
 }
@@ -161,35 +201,96 @@ function updateenabled(input) {
 	});
 }
 
-function updatecategory(category) {
-	new Ajax.Request('targetedmessageedit.php?ajax=true&category=' + category + '&pagestart=' + activepage, {
+function move(current, item) {
+	var value = item.getValue();
+	if(value == "") {
+		var options = '<option value="">-- Move To --</option>';
+		categoryinfo.each(function(category) {
+			if(category.key != current)
+				options += '<option value="' + category.key + '">' + category.value.name + '</option>';
+		});
+		item.update(options);
+	} else {
+		value = {action:"move",messageid:item.id.substring(5),tocategory:value};
+		updatecategory(current,value);
+	}
+}
+
+
+function deletemessage(current, item) {
+	var confirm = confirmDelete();
+	if(confirm){
+		console.info("delete" + item.id.substring(7));
+		var value = {action:"deletemessage",deletemessageid:item.id.substring(7)};
+		updatecategory(current,value);
+	}
+}
+function deletecategory(id) {
+	var confirm = confirmDelete();
+	if(confirm){
+		new Ajax.Request('targetedmessageedit.php', {
 		method:'get',
+		parameters: {deletecategoryid:id},
+		onSuccess: function (response) {
+			var result = response.responseJSON;
+			if(!result)
+				alert("Unable to delete category, All messages contained withing the category must be moved or deleted.");
+			else
+				window.location = 'targetedmessageedit.php';
+		}
+	});
+	}
+}
+
+function updatecategory(category, actioninfo) {
+
+	var sendvars = {
+		ajax:"true",
+		category:category,
+		pagestart:activepage
+	};
+	if(actioninfo != undefined) {
+		if(actioninfo.action == "move") {
+			sendvars.moveid = actioninfo.messageid;
+			sendvars.movetoid = actioninfo.tocategory;
+		} else if(actioninfo.action == "deletemessage") {
+			sendvars.deletemessageid = actioninfo.deletemessageid;
+		}
+	}
+
+	new Ajax.Request('targetedmessageedit.php', {
+		method:'get',
+		parameters: sendvars,
 		onSuccess: function (response) {
 			var result = response.responseJSON;
 			if(result) {
 				var size = result.list.length;
 
-				var items = new Element('table',{width:'100%'});
+				var items = new Element('tbody',{width:'100%'});
+
 				var header = new Element('tr').addClassName("listHeader");
 
 				header.insert(new Element('th').update('Enabled'));
 				header.insert(new Element('th',{width:'100%',align:'left'}).update('Message'));
-				header.insert(new Element('th').update('Actions'));
+				header.insert(new Element('th',{align:'left'}).update('Actions'));
+
 
 				items.insert(header);
-				for(i=0;i<size;i++){
+				
+				 for(i=0;i<size;i++){
 					var item = result.list[i];
 					var row = new Element('tr');
 					if(i%2)
 						row.addClassName("listAlt");
 					row.insert(new Element('td',{align:"right"}).update(new Element('input',{id:'enable-' + item.id,type:'checkbox',checked:item.enabled,onclick:'updateenabled(this);return false;'})));
 					row.insert(new Element('td').update(item.title));
-					row.insert(new Element('td').update(item.actions));
-
+					row.insert(new Element('td',{style:"white-space: nowrap;"}).update(
+					'<a href="#"  class="actionlink" title="Edit" ><img src="img/icons/pencil.gif" alt="Edit">Edit</a>&nbsp;|&nbsp;<a id="delete-' + item.id + '" href="#"  class="actionlink" title="delete" onclick="deletemessage(' + category + ',this); return false;" ><img src="img/icons/cross.gif" alt="delete">Delete</a>&nbsp;|&nbsp;<select id="move-' + item.id + '" onclick="move(' + category + ',this)"/><option value="">-- Move To --</option></select>'
+					));
 					items.insert(row);
 				}
 
-				$('items-' + category).update(items);
+				$('items-' + category).update(items);		
 
 				var pagetop = new Element('div',{style: 'float:right;'}).update(result.pageinfo[3]);
 				var pagebottom = new Element('div',{style: 'float:right;'}).update(result.pageinfo[3]);
@@ -205,7 +306,6 @@ function updatecategory(category) {
 				pagebottom.insert(selectbottom);
 				$('pagewrappertop-' + category).update(pagetop);
 				$('pagewrapperbottom-' + category).update(pagebottom);
-				
 			}
 		}
 	});
