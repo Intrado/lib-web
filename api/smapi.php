@@ -229,11 +229,22 @@ class SMAPI{
 				return $result;
 			}
 
+			// NOTE: Assumes tts message is English
+			// because messageparts are recreated with the English female voice.
+			// However, if an audiofile is uploaded, the messagepart's voiceid doesn't matter so
+			// it's still possible for the $message->languagecode to not be 'en',
+			// which is why we don't check explicitly for $message->languagecode == 'en'.
+			if ($message->autotranslate == 'translated' || $message->autotranslate == 'source') {
+				$result["resultdescription"] = "Translation message cannot be edited.";
+				return $result;
+			}
+			
 			if($message->type == "sms"){
 				if(strlen($messagetext) > 160){
 					$messagetext = substr($messagetext, 0, 160);
 				}
 			}
+			
 			$parts = Message::parse($messagetext);
 			$voiceid = QuickQuery("select id from ttsvoice where languagecode = 'en' and gender = 'female'");
 			QuickUpdate("delete from messagepart where messageid=$message->id");
@@ -747,8 +758,18 @@ class SMAPI{
 					if ($phonemessage->userid == $USER->id && $phonemessage->type == 'phone') {
 						// NOTE: $phonemessage->copy() already calls $duplicatephonemessage->create();
 						$duplicatephonemessage = $phonemessage->copy($messagegroup->id, true);
-						if ($duplicatephonemessage->id)
-							$job->sendphone = true;
+						if ($duplicatephonemessage->id) {
+							// If the message is auto-translated, then copy its source message also, in case we need to refresh the translation.
+							if ($phonemessage->autotranslate == 'translated') {
+								$sourcephonemessage = DBFind('Message', 'from message where not deleted and messagegroupid=? and type="phone" and subtype=? and languagecode=? and autotranslate="source"', false, array($phonemessage->messagegroupid, $phonemessage->subtype, $phonemessage->languagecode));
+								$duplicatesourcephonemessage = $sourcephonemessage->copy($messagegroup->id, true);
+								
+								if ($duplicatesourcephonemessage->id)
+									$job->sendphone = true;
+							} else {
+								$job->sendphone = true;
+							}
+						}
 					}
 				}
 				if ($USER->authorize('sendemail') && $emailmsgid) {
@@ -756,8 +777,18 @@ class SMAPI{
 					if ($emailmessage->userid == $USER->id && $emailmessage->type == 'email') {
 						// NOTE: $emailmessage->copy() already calls $duplicateemailmessage->create();
 						$duplicateemailmessage = $emailmessage->copy($messagegroup->id, true);
-						if ($duplicateemailmessage->id)
-							$job->sendemail = true;
+						if ($duplicateemailmessage->id) {
+							// If the message is auto-translated, then copy its source message also, in case we need to refresh the translation.
+							if ($emailmessage->autotranslate == 'translated') {
+								$sourceemailmessage = DBFind('Message', 'from message where not deleted and messagegroupid=? and type="email" and subtype=? and languagecode=? and autotranslate="source"', false, array($emailmessage->messagegroupid, $emailmessage->subtype, $emailmessage->languagecode));
+								$duplicatesourceemailmessage = $sourceemailmessage->copy($messagegroup->id, true);
+								
+								if ($duplicatesourceemailmessage->id)
+									$job->sendemail = true;
+							} else {
+								$job->sendemail = true;
+							}
+						}
 					}
 				}
 				if (getSystemSetting('_hassms') && $USER->authorize('sendsms') && $smsmsgid) {
