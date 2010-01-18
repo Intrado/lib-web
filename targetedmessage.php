@@ -105,8 +105,32 @@ for($i=0;$i<=3;$i++) {
 	//$classpeople[$i] = array(1 => "Ben Hencke", 2 => "Howard Wood",3 => "Gretel Baumgartner", 4 => "Kee-Yip Chan", 5 => "Nickolas Heckman");
 }
 
-$categoriesjson = "{0: {name:'Positive',img:'img/icons/award_star_gold_2.gif'},1: {name: 'Corrective',img: 'img/icons/lightning.gif'},2: {name:'Informational',img: 'img/icons/information.gif'}}";
-$categoriesimg = "{0: 'img/icons/award_star_gold_2.gif',1: 'img/icons/lightning.gif',2: 'img/icons/information.gif'}";
+$validimages = array(
+	"gold star" => "award_star_gold_2",
+	"lightning" => "lightning",
+	"information" => "information",
+	"red dot" => "diagona/16/151",
+	"green dot" => "diagona/16/152",
+	"blue dot" => "diagona/16/153",
+	"yellow dot" => "diagona/16/154",
+	"pink dot" => "diagona/16/155",
+	"orange dot" => "diagona/16/156",
+	"purple dot" => "diagona/16/157",
+	"black dot" => "diagona/16/158",
+	"gray dot" => "diagona/16/159",
+);
+
+$categories = QuickQueryMultiRow("select id, name, image from targetedmessagecategory where 1",true);
+$categoriesjson = array();
+foreach($categories as $category) {
+	$obj = null;
+	$obj->name = $category["name"];
+	if(isset($category["image"]) && isset($validimages[$category["image"]]))
+		$obj->img = "img/icons/" . $validimages[$category["image"]]  . ".gif";
+	else
+		$obj->img = "img/pixel.gif";
+	$categoriesjson[$category["id"]] = $obj;
+}
 
 $categories = array(0 => "Positive",1 => "Corrective",2 => "Informational");
 
@@ -129,7 +153,7 @@ if(QuickQuery("select count(*) from targetedmessage") == "0") {
 
 // category id => personid => messageid;
 $library = array();
-foreach($categories as $id => $name) {
+foreach($categoriesjson as $id => $obj) {
 	$library[$id] = QuickQueryList("select id,messagekey from targetedmessage where targetedmessagecategoryid = ?",true,false,array($id));
 }
 
@@ -268,7 +292,7 @@ endWindow();
 	var checkedcache = new Hash();			// History of Contact to Message links
 
 
-	var categoryinfo = $H(<?= $categoriesjson ?>);
+	var categoryinfo = $H(<?= json_encode($categoriesjson) ?>);
 
 	var checkedcontacts = new Hash();		// List of the Contacts that are currently checked
 	var checkedmessages = new Hash();		// List of Messages that are currently checked
