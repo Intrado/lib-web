@@ -388,7 +388,7 @@ function makeAccordionSplitter($type, $subtype, $languagecode, $permanent, $pref
 		);
 	}
 
-	$accordionsplitterchildren[] = array("title" => _L("Advanced Options"), "icon" => "img/icons/diagona/16/181.gif", "formdata" => $advancedoptionsformdata);
+	$accordionsplitterchildren[] = array("title" => _L("Advanced Options"), "icon" => "img/icons/diagona/16/041.gif", "formdata" => $advancedoptionsformdata);
 	$accordionsplitter = new FormSplitter("", "", null, "accordion", array(), $accordionsplitterchildren);
 
 	return $accordionsplitter;
