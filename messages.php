@@ -4,8 +4,9 @@
 ////////////////////////////////////////////////////////////////////////////////
 require_once("inc/common.inc.php");
 require_once("inc/securityhelper.inc.php");
-require_once("obj/Message.obj.php");
-require_once("obj/MessagePart.obj.php");
+require_once("obj/MessageGroup.obj.php");
+//require_once("obj/Message.obj.php");
+//require_once("obj/MessagePart.obj.php");
 require_once("obj/AudioFile.obj.php");
 require_once("obj/FieldMap.obj.php");
 require_once("obj/SurveyQuestionnaire.obj.php");
@@ -29,12 +30,15 @@ if (!$USER->authorize(array('sendmessage', 'sendemail', 'sendphone', 'sendsms'))
 ////////////////////////////////////////////////////////////////////////////////
 
 if (isset($_GET['delete'])) {
-	$deleteid = DBSafe($_GET['delete']);
-	if (isset($_SESSION['messageid']) && ($_SESSION['messageid']== $deleteid))
-		$_SESSION['messageid'] = NULL;
-	if (userOwns("message",$deleteid)) {
-		$message = new Message($deleteid);
-		QuickUpdate("update message set deleted=1 where id='$deleteid'");
+	$deleteid = $_GET['delete'];
+	if (isset($_SESSION['messagegroupid']) && ($_SESSION['messagegroupid']== $deleteid))
+		$_SESSION['messagegroupid'] = NULL;
+	if (userOwns("messagegroup",$deleteid)) {
+		$message = new MessageGroup($deleteid);
+		Query("BEGIN");
+		QuickUpdate("update messagegroup set deleted=1 where id=?",false,array($deleteid));
+		QuickUpdate("update message set deleted=1 where messagegroupid=?",false,array($deleteid));
+		Query("COMMIT");
 		notice(_L("The message, %s, is now deleted.", escapehtml($message->name)));
 		redirect();
 	} else {
@@ -76,7 +80,6 @@ if($isajax === true) {
 	if(empty($mergeditems)) {
 			$data->list[] = array("itemid" => "",
 										"defaultlink" => "",
-										"defaultonclick" => "",
 										"icon" => "largeicons/information.jpg",
 										"title" => _L("No Messages."),
 										"content" => "",
@@ -164,8 +167,8 @@ startWindow(_L('My Messages'), 'padding: 3px;', true, true);
 		<br />
 		<h1 id="filterby">Sort By:</h1>
 		<div id="allfilters" class="feedfilter">
-			<a id="datefilter" href="lists.php?filter=date" onclick="applyfilter('date'); return false;"><img src="img/largeicons/tiny20x20/clock.jpg" />Modify Date</a><br />
-			<a id="namefilter" href="lists.php?filter=name" onclick="applyfilter('name'); return false;"><img src="img/largeicons/tiny20x20/pencil.jpg" />Name</a><br />
+			<a id="datefilter" href="#" onclick="applyfilter('date'); return false;"><img src="img/largeicons/tiny20x20/clock.jpg" />Modify Date</a><br />
+			<a id="namefilter" href="#" onclick="applyfilter('name'); return false;"><img src="img/largeicons/tiny20x20/pencil.jpg" />Name</a><br />
 		</div>
 	</td>
 	<td width="10px" style="border-left: 1px dotted gray;" >&nbsp;</td>
@@ -178,7 +181,7 @@ startWindow(_L('My Messages'), 'padding: 3px;', true, true);
 				<td >
 						<div class='feedtitle'>
 							<a href=''>
-							<?= _L("Loading Lists") ?></a>
+							<?= _L("Loading Messages") ?></a>
 						</div>
 				</td>
 			</tr>
@@ -195,56 +198,55 @@ var filtes = Array('date','name');
 var activepage = 0;
 
 function applyfilter(filter) {
-		new Ajax.Request('messages.php?ajax=true&filter=' + filter + '&pagestart=' + activepage, {
-			method:'get',
-			onSuccess: function (response) {
-				var result = response.responseJSON;
-				if(result) {
-					var html = '';
-					var size = result.list.length;
+	new Ajax.Request('messages.php', {
+		method:'get',
+		parameters:{ajax:true,filter:filter,pagestart:activepage},
+		onSuccess: function (response) {
+			var result = response.responseJSON;
+			if(result) {
+				var html = '';
+				var size = result.list.length;
 
-					for(i=0;i<size;i++){
-						var item = result.list[i];
-						html += '<tr><td valign=\"top\" width=\"60px\"><a href=\"' + item.defaultlink + '\"><img src=\"img/' + item.icon + '\" /></a></td><td ><div class=\"feedtitle\"><a href=\"' + item.defaultlink + '\">' + item.title + '</a></div><span>' + item.content + '</span></td>';
-						if(item.tools) {
-							html += '<td valign=\"middle\" width=\"100px\"><div>' + item.tools + '</div></td>';
-						}
-						html += '</tr>';
+				for(i=0;i<size;i++){
+					var item = result.list[i];
+					html += '<tr><td valign=\"top\" width=\"60px\"><a href=\"' + item.defaultlink + '\"><img src=\"img/' + item.icon + '\" /></a></td><td ><div class=\"feedtitle\"><a href=\"' + item.defaultlink + '\">' + item.title + '</a></div><span>' + item.content + '</span></td>';
+					if(item.tools) {
+						html += '<td valign=\"middle\" width=\"100px\"><div>' + item.tools + '</div></td>';
 					}
-					$('feeditems').update(html);
-					var pagetop = new Element('div',{style: 'float:right;'}).update(result.pageinfo[3]);
-					var pagebottom = new Element('div',{style: 'float:right;'}).update(result.pageinfo[3]);
-
-					var selecttop = new Element('select', {onchange: 'activepage = this.value;applyfilter(\'' + filter + '\');'});
-					var selectbottom = new Element('select', {onchange: 'activepage = this.value;applyfilter(\'' + filter + '\');'});
-					for (var x = 0; x < result.pageinfo[0]; x++) {
-						var offset = x * result.pageinfo[1];
-						var selected = (result.pageinfo[2] == x+1);
-						selecttop.insert(new Element('option', {value: offset,selected:selected}).update('Page ' + (x+1)));
-						selectbottom.insert(new Element('option', {value: offset,selected:selected}).update('Page ' + (x+1)));
-					}
-					pagetop.insert(selecttop);
-					pagebottom.insert(selectbottom);
-					$('pagewrappertop').update(pagetop);
-					$('pagewrapperbottom').update(pagebottom);
-
-					var filtercolor = $('filterby').getStyle('color');
-					if(!filtercolor)
-						filtercolor = '#000';
-
-					size = filtes.length;
-					for(i=0;i<size;i++){
-						$(filtes[i] + 'filter').setStyle({color: filtercolor, fontWeight: 'normal'});
-					}
-					$(filter + 'filter').setStyle({
-						 color: '#000000',
-						 fontWeight: 'bold'
-					});
-
+					html += '</tr>';
 				}
+				$('feeditems').update(html);
+				var pagetop = new Element('div',{style: 'float:right;'}).update(result.pageinfo[3]);
+				var pagebottom = new Element('div',{style: 'float:right;'}).update(result.pageinfo[3]);
 
+				var selecttop = new Element('select', {onchange: 'activepage = this.value;applyfilter(\'' + filter + '\');'});
+				var selectbottom = new Element('select', {onchange: 'activepage = this.value;applyfilter(\'' + filter + '\');'});
+				for (var x = 0; x < result.pageinfo[0]; x++) {
+					var offset = x * result.pageinfo[1];
+					var selected = (result.pageinfo[2] == x+1);
+					selecttop.insert(new Element('option', {value: offset,selected:selected}).update('Page ' + (x+1)));
+					selectbottom.insert(new Element('option', {value: offset,selected:selected}).update('Page ' + (x+1)));
+				}
+				pagetop.insert(selecttop);
+				pagebottom.insert(selectbottom);
+				$('pagewrappertop').update(pagetop);
+				$('pagewrapperbottom').update(pagebottom);
+
+				var filtercolor = $('filterby').getStyle('color');
+				if(!filtercolor)
+					filtercolor = '#000';
+
+				size = filtes.length;
+				for(i=0;i<size;i++){
+					$(filtes[i] + 'filter').setStyle({color: filtercolor, fontWeight: 'normal'});
+				}
+				$(filter + 'filter').setStyle({
+					 color: '#000000',
+					 fontWeight: 'bold'
+				});
 			}
-		});
+		}
+	});
 }
 document.observe('dom:loaded', function() {
 	applyfilter('date');
