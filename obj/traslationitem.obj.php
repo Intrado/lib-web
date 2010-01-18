@@ -170,7 +170,8 @@ class TranslationItem extends FormItem {
 		$str = '
 			<script type="text/javascript">
 				function toEnglishButton(section,language,usehtmleditor, escapehtml) {
-					saveHtmlEditorContent();
+					if (usehtmleditor)
+						saveHtmlEditorContent();
 					
 					if ($(section+"showenglish").visible()) {
 						$(section+"retranslation").show();
@@ -184,7 +185,8 @@ class TranslationItem extends FormItem {
 					}
 				}
 				function submitRetranslation(section,language,usehtmleditor, escapehtml) {
-					saveHtmlEditorContent();
+					if (usehtmleditor)
+						saveHtmlEditorContent();
 					
 					var srcbox = section + "text";
 					
@@ -216,7 +218,8 @@ class TranslationItem extends FormItem {
 					return false;
 				}
 				function getTranslation(section, language, usehtmleditor, escapehtml) {
-					saveHtmlEditorContent();
+					if (usehtmleditor)
+						saveHtmlEditorContent();
 					var englishText = $(section+"englishText");
 					var langtext = $(section + "text");
 					var overridesave = $(section + "overridesave");
@@ -265,7 +268,8 @@ class TranslationItem extends FormItem {
 					var langtext = $(section + "text");
 					var overridesave = $(section + "overridesave");
 					
-					saveHtmlEditorContent();
+					if (usehtmleditor)
+						saveHtmlEditorContent();
 					
 					if ($(section+"override").checked) {
 						$(section).fire("TranslationItem:OverrideToggled", {"override": $(section+"override").checked});
@@ -302,7 +306,8 @@ class TranslationItem extends FormItem {
 				}
 				
 				function toggleTranslation(section,language, usehtmleditor, escapehtml) {
-					saveHtmlEditorContent();
+					if (usehtmleditor)
+						saveHtmlEditorContent();
 					
 					$(section).fire("TranslationItem:TranslationToggled", {"enabled": $(section+"translatecheck").checked});
 					
