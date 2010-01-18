@@ -55,6 +55,7 @@ if (!$cansendphone && !$cansendemail && !$cansendsms) {
 // If we do not make this strict check, the session variable will get unset and a new messagegroup would be created each time a form makes an ajax call.
 if (isset($_GET['id']) && empty($_POST) && count($_GET) == 1) {
 	unset($_SESSION['messagegroupid']);
+	unset($_SESSION['emailheaders']);
 	if ($existingmessagegroupid = $_GET['id'] + 0) {
 		if (userOwns('messagegroup', $existingmessagegroupid))
 			$_SESSION['messagegroupid'] = $existingmessagegroupid;
@@ -68,8 +69,6 @@ if (isset($_GET['id']) && empty($_POST) && count($_GET) == 1) {
 ///////////////////////////////////////////////////////////////////////////////
 // Defaults.
 ///////////////////////////////////////////////////////////////////////////////
-$readonly = false;
-
 $defaultpreferredgender = 'female';
 $defaultautotranslate = 'none';
 $systemdefaultlanguagecode = 'en';
@@ -99,12 +98,10 @@ if (isset($_SESSION['messagegroupid'])) {
 	$newmessagegroup->deleted = 1; // Set to deleted in case the user does not submit the form.
 	$newmessagegroup->permanent = $defaultpermanent;
 
-	if (!$readonly) {
-		if ($newmessagegroup->create()) {
-			$_SESSION['messagegroupid'] = $newmessagegroup->id;
-		} else {
-			redirect('unauthorized.php'); // TODO: Something went wrong.. redirect somewhere?
-		}
+	if ($newmessagegroup->create()) {
+		$_SESSION['messagegroupid'] = $newmessagegroup->id;
+	} else {
+		redirect('unauthorized.php'); // TODO: Something went wrong.. redirect somewhere?
 	}
 }
 $customerlanguages = $cansendmultilingual ? QuickQueryList("select code, name from language", true) : QuickQueryList("select code, name from language where code=?", true, false, array($systemdefaultlanguagecode));
@@ -179,7 +176,7 @@ foreach ($destinations as $type => $destination) {
 		$messageformsplitters = array();
 
 		// Autotranslator.
-		if (!$readonly && $countlanguages > 1) {
+		if ($countlanguages > 1) {
 			$autotranslatorformdata = array();
 
 			if (empty($_SESSION["autotranslatesourcetext{$type}{$subtype}"]))
@@ -586,11 +583,7 @@ $destinationlayoutforms[] = array(
 //////////////////////////////////////////////////////////
 // Finalize the formsplitter.
 //////////////////////////////////////////////////////////
-if (!$readonly) {
-	$buttons = array(icon_button(_L("Done"),"tick", "form_submit_all(null, 'done', $('formswitchercontainer'));", null), icon_button(_L("Cancel"),"cross",null,"start.php"));
-} else {
-	$buttons = array(); // TODO: Maybe readonly needs a done button?
-}
+$buttons = array(icon_button(_L("Done"),"tick", "form_submit_all(null, 'done', $('formswitchercontainer'));", null), icon_button(_L("Cancel"),"cross",null,"messages.php"));
 
 $messagegroupname = isset($existingmessagegroup) ? $existingmessagegroup->name : $newmessagegroup->name;
 $messagegroupsplitter = new FormSplitter("messagegroupbasics", "", null, "horizontalsplit", $buttons, array(
@@ -631,7 +624,7 @@ $messagegroupsplitter->handleRequest();
 ///////////////////////////////////////////////////////////////////////////////
 // Submit
 ///////////////////////////////////////////////////////////////////////////////
-if (($button = $messagegroupsplitter->getSubmit()) && !$readonly) {
+if ($button = $messagegroupsplitter->getSubmit()) {
 	$form = $messagegroupsplitter->getSubmittedForm();
 
 	$messagegroup = isset($existingmessagegroup) ? $existingmessagegroup : $newmessagegroup;
@@ -837,7 +830,7 @@ if (($button = $messagegroupsplitter->getSubmit()) && !$readonly) {
 				QuickQuery('COMMIT');
 
 				if ($ajax && $button == 'done')
-					$form->sendTo('start.php');
+					$form->sendTo('messages.php');
 				else if ($ajax && $button == 'tab')
 					$form->sendTo('');
 			} break;
