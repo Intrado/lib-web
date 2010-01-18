@@ -519,7 +519,7 @@ foreach ($destinations as $type => $destination) {
 				"value" => $_SESSION['emailheaders']['fromemail'],
 				"validators" => array_merge($additionalvalidators, array(
 					array("ValLength","max" => 255),
-					array("ValEmail")
+					array("ValEmail", "domain" => getSystemSetting('emaildomain'))
 				)),
 				"control" => array("TextField","size" => 30, "maxlength" => 255),
 				"helpstep" => 1
@@ -569,14 +569,7 @@ $destinationlayoutforms[] = array(
 	"title" => "Summary",
 	"icon" => "img/icons/application_view_columns.gif",
 	"formdata" => array(
-		'summary' => array(
-			"label" => _L('Summary!'),
-			"value" => "wassup",
-			"validators" => array(),
-			"control" => array("FormHtml","html" => "<table>{$summaryheaders}{$summarylanguagerows}</table>"),
-			"renderoptions" => array("icon" => false, "label" => false, "errormessage" => false),
-			"helpstep" => 1
-		)
+		'summary' => makeFormHtml("<table>{$summaryheaders}{$summarylanguagerows}</table>")
 	)
 );
 
