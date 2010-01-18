@@ -133,8 +133,8 @@ foreach($users as $user) {
 
 $messagevalues = array("user" => $userselect, "message" => $messages);
 
-$generalintro = QuickQueryRow("select m.id , m.name from message m, prompt p where p.type='intro' and language is null and p.messageid = m.id and m.type='phone'");
-$emergencyintro = QuickQueryRow("select m.id , m.name from message m, prompt p where p.type='emergencyintro' and language is null and p.messageid = m.id and m.type='phone'");
+$generalintro = QuickQueryRow("select m.id , m.name from message m, prompt p where p.type='intro' and p.languagecode is null and p.messageid = m.id and m.type='phone'");
+$emergencyintro = QuickQueryRow("select m.id , m.name from message m, prompt p where p.type='emergencyintro' and p.languagecode is null and p.messageid = m.id and m.type='phone'");
 
 $defaultmessages = $messagevalues;
 if($generalintro)
@@ -201,7 +201,7 @@ foreach($languages as $language => $code) {
 	}
 
 	if($allowedjobtypes["Other"] > 0) {
-		$generalintro = QuickQueryRow("select m.id , m.name from message m, prompt p where p.type='intro' and language=? and p.messageid = m.id and m.type='phone'",false,false,array($language));
+		$generalintro = QuickQueryRow("select m.id , m.name from message m, prompt p where p.type='intro' and p.languagecode=? and p.messageid = m.id and m.type='phone'",false,false,array($code));
 
 		// TODO Fix a better way of adding the set message rather than copying the array in a for loop like this.
 		$generalmessages = $messagevalues;
@@ -228,7 +228,7 @@ foreach($languages as $language => $code) {
 		);
 	}
 	if($allowedjobtypes["Emergency"] > 0) {
-		$emergencyintro = QuickQueryRow("select m.id , m.name from message m, prompt p where p.type='emergencyintro' and language=? and p.messageid = m.id and m.type='phone'",false,false,array($language));
+		$emergencyintro = QuickQueryRow("select m.id , m.name from message m, prompt p where p.type='emergencyintro' and p.languagecode=? and p.messageid = m.id and m.type='phone'",false,false,array($code));
 
 		$emergencymessages = $messagevalues;
 
