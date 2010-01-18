@@ -201,8 +201,7 @@ class ValTranslationExpirationMessage extends Validator {
 	var $onlyserverside = true;
 	function validate ($value, $args,$requiredvalues) {
 		global $USER;
-
-		if($requiredvalues['date'] == "")
+		if(!isset($requiredvalues['date']))
 			return true;
 		$modifydate = QuickQuery("select min(modifydate) from message where messagegroupid = ? and autotranslate = 'translated'", false, array($value));
 		if($modifydate != false) {
@@ -234,9 +233,11 @@ class ValTimeWindowCallLate extends Validator {
 	function validate ($value, $args, $requiredvalues) {
 		if ((strtotime($value) - 3600) < strtotime($requiredvalues['callearly']))
 			return $this->label. " ". _L('There must be a minimum of one hour between start and end time');
-		$now = strtotime("now");
-		if ((date('m/d/Y', $now) == $requiredvalues['date']) && (strtotime($value) -1800 < $now))
-			return $this->label. " ". _L("There must be a minimum of one-half hour between now and end time to submit with today's date");
+		if(isset($requiredvalues['date'])) {
+			$now = strtotime("now");
+			if ((date('m/d/Y', $now) == $requiredvalues['date']) && (strtotime($value) -1800 < $now))
+				return $this->label. " ". _L("There must be a minimum of one-half hour between now and end time to submit with today's date");
+		}
 		return true;
 	}
 }
@@ -382,12 +383,6 @@ $helpsteps[] = _L("The name of your job. The best names are brief and discriptiv
 			"helpstep" => 2
 		);
 	}
-
-	$callearlyvalidators = array(
-			array("ValRequired"),
-			array("ValTimeCheck", "min" => $ACCESS->getValue('callearly'), "max" => $ACCESS->getValue('calllate'))
-	);
-	$calllatevalidators = $callearlyvalidators;
 	
 	if ($JOBTYPE == "repeating") {
 		$schedule = new Schedule($job->scheduleid);
@@ -421,8 +416,6 @@ $helpsteps[] = _L("The name of your job. The best names are brief and discriptiv
 			"helpstep" => 3
 		);
 	} else {
-		$callearlyvalidators[] = array("ValTimeWindowCallEarly");
-		$calllatevalidators[] = array("ValTimeWindowCallLate");
 		if($completedmode) {
 
 			$helpsteps[] = _L("The Delivery Window designates the earliest call time and the latest call time allowed for notification delivery.");  // Guide for the whole scheduling section
@@ -473,7 +466,6 @@ $helpsteps[] = _L("The name of your job. The best names are brief and discriptiv
 		// Prepare the the "Number of Days to run" data
 		$maxdays = first($ACCESS->getValue('maxjobdays'), 7);
 		$numdays = array_combine(range(1,$maxdays),range(1,$maxdays));
-		//error_log((86400 + strtotime($job->enddate) - strtotime($job->startdate) ) / 86400);
 		$formdata["days"] = array(
 			"label" => _L("Days to Run"),
 			"fieldhelp" => _L(""),
@@ -485,24 +477,38 @@ $helpsteps[] = _L("The name of your job. The best names are brief and discriptiv
 			"control" => array("SelectMenu", "values" => $numdays),
 			"helpstep" => 3
 		);
+
 		$formdata["callearly"] = array(
 			"label" => _L("Start Time"),
 			"fieldhelp" => ("This is the earliest time to send calls. This is also determined by your security profile."),
-			"value" => $USER->getCallEarly(),
-			"validators" => $callearlyvalidators,
+			"value" => date("g:i a", strtotime($job->starttime)),
+			"validators" => array(
+						array("ValRequired"),
+						array("ValTimeCheck", "min" => $ACCESS->getValue('callearly'), "max" => $ACCESS->getValue('calllate')),
+						array("ValTimeWindowCallEarly")
+			),
 			"requires" => array("calllate"),// is only required for non repeating jobs
 			"control" => array("SelectMenu", "values"=>$startvalues),
 			"helpstep" => 3
 		);
+
 		$formdata["calllate"] = array(
 			"label" => _L("End Time"),
 			"fieldhelp" => ("This is the latest time to send calls. This is also determined by your security profile."),
-			"value" => $USER->getCallLate(),
-			"validators" => $calllatevalidators,
-			"requires" => array("callearly", "date"), // is only required for non repeating jobs
+			"value" => date("g:i a", strtotime($job->endtime)),
+			"validators" => array(
+						array("ValRequired"),
+						array("ValTimeCheck", "min" => $ACCESS->getValue('callearly'), "max" => $ACCESS->getValue('calllate')),
+						array("ValTimeWindowCallLate")
+			),
+			"requires" => array("callearly"), // is only required for non repeating jobs
 			"control" => array("SelectMenu", "values"=>$endvalues),
 			"helpstep" => 3
 		);
+
+		if($JOBTYPE != "repeating") {// is only required for non repeating jobs
+			$formdata["calllate"]["requires"][] = "date";
+		}
 	}
 
 	$helpsteps[] = _L("List");
@@ -632,9 +638,12 @@ $helpsteps[] = _L("The name of your job. The best names are brief and discriptiv
 				array("ValRequired"),
 				array("ValTranslationExpirationMessage")),
 			"control" => array("SelectMenu", "values" => $messages),
-			"requires" => array("date"),
 			"helpstep" => 5
 		);
+
+		if ($JOBTYPE != "repeating") {
+			$formdata["message"]["requires"] = array("date");
+		}
 
 		$formdata["messagegrid"] = array(
 			"label" => _L('Message Info'),
@@ -763,7 +772,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 				
 				$job->enddate = date("Y-m-d", strtotime($job->startdate) + (($numdays - 1) * 86400));
 			}
-
+			
 			$job->starttime = date("H:i", strtotime($postdata['callearly']));
 			$job->endtime = date("H:i", strtotime($postdata['calllate']));
 
@@ -773,8 +782,6 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 				$job->jobtypeid = $postdata['jobtype'];
 				$job->userid = $USER->id;
 
-
-				//error_log($postdata['skipduplicates']);
 				$job->setOption("skipduplicates",$postdata['skipduplicates']?1:0);
 				$job->setOption("skipemailduplicates",$postdata['skipduplicates']?1:0);
 
