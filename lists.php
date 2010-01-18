@@ -42,20 +42,19 @@ if (isset($_GET['delete'])) {
 	redirect();
 }
 
-$filter = "";
-if (isset($_GET['filter'])) {
-	$filter = $_GET['filter'];
-}
+
 
 $isajax = isset($_GET['ajax']);
 
-$mergeditems = array();
 if($isajax === true) {
-
+	session_write_close();//WARNING: we don't keep a lock on the session file, any changes to session data are ignored past this point
 	$start = 0 + (isset($_GET['pagestart']) ? $_GET['pagestart'] : 0);
 	$limit = 20;
 	$orderby = "modifydate desc";
-	session_write_close();//WARNING: we don't keep a lock on the session file, any changes to session data are ignored past this point
+	$filter = "";
+	if (isset($_GET['filter'])) {
+		$filter = $_GET['filter'];
+	}
 	switch ($filter) {
 		case "name":
 			$orderby = "name";
@@ -69,9 +68,50 @@ if($isajax === true) {
 	$displayend = ($start + $limit) > $total ? $total : ($start + $limit);
 	$displaystart = ($total) ? $start +1 : 0;
 
-	header('Content-Type: application/json');
-	$data->list = activityfeed($mergeditems,true);
+	if(empty($mergeditems)) {
+			$data->list[] = array("itemid" => "",
+										"defaultlink" => "",
+										"icon" => "largeicons/information.jpg",
+										"title" => _L("No Lists."),
+										"content" => "",
+										"tools" => "");
+	} else {
+		while(!empty($mergeditems) && $limit > 0) {
+			$item = array_shift($mergeditems);
+			$time = date("M j, g:i a",strtotime($item["date"]));
+			$title = $item["status"];
+			$itemid = $item["id"];
+			$defaultlink = "";
+			$title = escapehtml($item["name"]);
+			$defaultlink = "list.php?id=$itemid";
+			$content = '<a href="' . $defaultlink . '">' . $time;
+
+			$content .= '&nbsp;-&nbsp;';
+			if(isset($item["lastused"]))
+				$content .= 'This list was last used: <i>' . date("M j, g:i a",strtotime($item["lastused"])) . "</i>";
+			else
+				$content .= 'This list has never been used ';
+			$content .= " and has " . listcontacts($itemid,"list") . '</a>';
+			$tools = action_links (
+				action_link("Edit", "pencil", "list.php?id=$itemid"),
+				action_link("Preview", "application_view_list", "showlist.php?id=$itemid"),
+				action_link("Delete", "cross", "lists.php?delete=$itemid", "return confirmDelete();")
+				);
+			//$tools = str_replace("&nbsp;|&nbsp;","<br />",$tools);
+			$icon = 'largeicons/addrbook.jpg';
+
+			$data->list[] = array("itemid" => $itemid,
+										"defaultlink" => $defaultlink,
+										"icon" => $icon,
+										"title" => $title,
+										"content" => $content,
+										"tools" => $tools);
+
+		}
+	}
 	$data->pageinfo = array($numpages,$limit,$curpage, "Showing $displaystart - $displayend of $total records on $numpages pages ");
+
+	header('Content-Type: application/json');
 	echo json_encode(!empty($data) ? $data : false);
 	exit();
 }
@@ -80,145 +120,6 @@ if($isajax === true) {
 ////////////////////////////////////////////////////////////////////////////////
 // Display Functions
 ////////////////////////////////////////////////////////////////////////////////
-
-
-
-function activityfeed($mergeditems,$ajax = false) {
-	$actioncount = 0;
-	$activityfeed = $ajax===true?array():"";
-	$limit = 10;
-
-	if($ajax===true) {
-		if(empty($mergeditems)) {
-				$activityfeed[] = array("itemid" => "",
-											"defaultlink" => "",
-											"defaultonclick" => "",
-											"icon" => "largeicons/information.jpg",
-											"title" => _L("No Lists."),
-											"content" => "",
-											"tools" => "");
-		} else {
-			while(!empty($mergeditems) && $limit > 0) {
-				$item = array_shift($mergeditems);
-				$time = date("M j, g:i a",strtotime($item["date"]));
-				$title = $item["status"];
-				$itemid = $item["id"];
-				$defaultlink = "";
-				$defaultonclick = "";
-				$title = escapehtml($item["name"]);
-				$defaultlink = "list.php?id=$itemid";
-				$content = '<a href="' . $defaultlink . '">' . $time;
-
-				$content .= '&nbsp;-&nbsp;';
-				if(isset($item["lastused"]))
-					$content .= 'This list was last used: <i>' . date("M j, g:i a",strtotime($item["lastused"])) . "</i>";
-				else
-					$content .= 'This list has never been used ';
-				$content .= " and has " . listcontacts($itemid,"list") . '</a>';
-				$tools = action_links (
-					action_link("Edit", "pencil", "list.php?id=$itemid"),
-					action_link("Preview", "application_view_list", "showlist.php?id=$itemid"),
-					action_link("Delete", "cross", "lists.php?delete=$itemid", "return confirmDelete();")
-					);
-				//$tools = str_replace("&nbsp;|&nbsp;","<br />",$tools);
-				$icon = 'largeicons/addrbook.jpg';
-
-				$activityfeed[] = array("itemid" => $itemid,
-											"defaultlink" => $defaultlink,
-											"defaultonclick" => $defaultonclick,
-											"icon" => $icon,
-											"title" => $title,
-											"content" => $content,
-											"tools" => $tools);
-
-				$limit--;
-			}
-		}
-	} else {
-		$activityfeed .= '<tr>
-									<td valign="top" width="60px"><img src="img/ajax-loader.gif" /></td>
-									<td >
-											<div class="feedtitle">
-												<a href="">
-												' . _L("Loading Lists") . '</a>
-											</div>
-									</td>
-									</tr>';
-		$activityfeed .= "
-				<script>
-				var actionids = $actioncount;
-
-				var filtes = Array('date','name');
-				var activepage = 0;
-
-				function applyfilter(filter) {
-						new Ajax.Request('lists.php?ajax=true&filter=' + filter + '&pagestart=' + activepage, {
-							method:'get',
-							onSuccess: function (response) {
-								var result = response.responseJSON;
-								if(result) {
-									var html = '';
-									var size = result.list.length;
-
-									actionids = 0;
-									for(i=0;i<size;i++){
-										var item = result.list[i];
-										html += '<tr><td valign=\"top\" width=\"60px\"><a href=\"' + item.defaultlink + '\" ' + item.defaultonclick + '><img src=\"img/' + item.icon + '\" /></a></td><td ><div class=\"feedtitle\"><a href=\"' + item.defaultlink + '\" ' + item.defaultonclick + '>' + item.title + '</a></div><span>' + item.content + '</span></td>';
-										if(item.tools) {
-											html += '<td valign=\"middle\" width=\"100px\"><div>' + item.tools + '</div></td>';
-											actionids++;
-										}
-										html += '</tr>';
-									}
-									$('feeditems').update(html);
-									var pagetop = new Element('div',{style: 'float:right;'});
-									var pagebottom = new Element('div',{style: 'float:right;'});
-
-									pagetop.update(result.pageinfo[3]);
-									pagebottom.update(result.pageinfo[3]);
-									var selecttop = new Element('select', {onchange: 'activepage = this.value;applyfilter(\'' + filter + '\');'});
-									var selectbottom = new Element('select', {onchange: 'activepage = this.value;applyfilter(\'' + filter + '\');'});
-									for (var x = 0; x < result.pageinfo[0]; x++) {
-										var offset = x * result.pageinfo[1];
-										var opttop = new Element('option', {value: offset});
-										var optbottom = new Element('option', {value: offset});
-										optbottom.selected = opttop.selected = (result.pageinfo[2] == x+1) ? 'selected' : '';
-										opttop.update('Page ' + (x+1));
-										optbottom.update('Page ' + (x+1));
-										selecttop.insert(opttop);
-										selectbottom.insert(optbottom);
-									}
-									pagetop.insert(selecttop);
-									pagebottom.insert(selectbottom);
-									$('pagewrappertop').update(pagetop);
-									$('pagewrapperbottom').update(pagebottom);
-
-									var filtercolor = $('filterby').getStyle('color');
-									if(!filtercolor)
-										filtercolor = '#000';
-
-									size = filtes.length;
-									for(i=0;i<size;i++){
-										$(filtes[i] + 'filter').setStyle({color: filtercolor, fontWeight: 'normal'});
-									}
-									$(filter + 'filter').setStyle({
-	 									 color: '#000000',
-										 fontWeight: 'bold'
-									});
-
-								}
-
-							}
-						});
-				}
-				document.observe('dom:loaded', function() {
-					applyfilter('date');
-				});
-				</script>";
-
-	}
-	return $activityfeed;
-}
 
 function listcontacts ($obj,$name) {
 	$lists = array();
@@ -291,48 +192,106 @@ $TITLE = "List Builder";
 
 include_once("nav.inc.php");
 
-$data = DBFindMany("PeopleList",", (name +0) as foo from list where userid=$USER->id and deleted=0 order by foo,name");
-$titles = array(	"name" => "#List Name",
-					"description" => "#Description",
-					"lastused" => "Last Used",
-					"Actions" => "Actions"
-					);
-
 startWindow('My Lists&nbsp;' . help('Lists_MyLists'));
 
-$activityfeed = '
-				<table width="100%" name="recentactivity" style="padding-top: 7px;">
-				<tr>
-					<td class="feed" style="width: 180px;vertical-align: top;font-size: 12px;" >
-						<div>
-						' .
-						icon_button(_L('Create New List'),"add","location.href='list.php?id=new'")
-						 .' <div style="clear:both;"></div>
-						</div>
-						<br />
-						<h1 id="filterby">Sort By:</h1>
-						<div id="allfilters" class="feedfilter">
-							<a id="datefilter" href="lists.php?filter=date" onclick="applyfilter(\'date\'); return false;"><img src="img/largeicons/tiny20x20/clock.jpg">Modify Date</a><br />
-							<a id="namefilter" href="lists.php?filter=name" onclick="applyfilter(\'name\'); return false;"><img src="img/largeicons/tiny20x20/pencil.jpg">Name</a><br />
-						</div>
-					</td>
-					<td width="10px" style="border-left: 1px dotted gray;" >&nbsp;</td>
-					<td class="feed" valign="top" >
-						<div id="pagewrappertop"></div>
-						<table id="feeditems">
-				';
+?>
+<table width="100%" style="padding-top: 7px;">
+<tr>
+	<td class="feed" style="width: 180px;vertical-align: top;font-size: 12px;" >
+		<div>
+		<?= icon_button(_L('Create New List'),"add","location.href='list.php?id=new'") ?>
+		<div style="clear:both;"></div>
+		</div>
+		<br />
+		<h1 id="filterby">Sort By:</h1>
+		<div id="allfilters" class="feedfilter">
+			<a id="datefilter" href="#" onclick="applyfilter('date'); return false;"><img src="img/largeicons/tiny20x20/clock.jpg" />Modify Date</a><br />
+			<a id="namefilter" href="#" onclick="applyfilter('name'); return false;"><img src="img/largeicons/tiny20x20/pencil.jpg" />Name</a><br />
+		</div>
+	</td>
+	<td width="10px" style="border-left: 1px dotted gray;" >&nbsp;</td>
+	<td class="feed" valign="top" >
+		<div id="pagewrappertop"></div>
 
-				$activityfeed .= activityfeed($mergeditems,false);
-				$activityfeed .= '</table>
-						<br />
-						<div id="pagewrapperbottom"></div>
-					</td>
-				</tr>
-			</table>';
-			echo $activityfeed;
+		<table id="feeditems">
+			<tr>
+				<td valign='top' width='60px'><img src='img/ajax-loader.gif' /></td>
+				<td >
+					<div class='feedtitle'>
+						<a href=''>
+						<?= _L("Loading Lists") ?></a>
+					</div>
+				</td>
+			</tr>
+		</table>
+		<br />
+		<div id="pagewrapperbottom"></div>
+	</td>
+</tr>
+</table>
 
 
+<script type="text/javascript" language="javascript">
+var filtes = Array('date','name');
+var activepage = 0;
 
+function applyfilter(filter) {
+		new Ajax.Request('lists.php', {
+			method:'get',
+			parameters:{ajax:true,filter:filter,pagestart:activepage},
+			onSuccess: function (response) {
+				var result = response.responseJSON;
+				if(result) {
+					var html = '';
+					var size = result.list.length;
+
+					for(i=0;i<size;i++){
+						var item = result.list[i];
+						html += '<tr><td valign=\"top\" width=\"60px\"><a href=\"' + item.defaultlink + '\"><img src=\"img/' + item.icon + '\" /></a></td><td ><div class=\"feedtitle\"><a href=\"' + item.defaultlink + '\">' + item.title + '</a></div><span>' + item.content + '</span></td>';
+						if(item.tools) {
+							html += '<td valign=\"middle\" width=\"100px\"><div>' + item.tools + '</div></td>';
+						}
+						html += '</tr>';
+					}
+					$('feeditems').update(html);
+					var pagetop = new Element('div',{style: 'float:right;'}).update(result.pageinfo[3]);
+					var pagebottom = new Element('div',{style: 'float:right;'}).update(result.pageinfo[3]);
+
+					var selecttop = new Element('select', {onchange: 'activepage = this.value;applyfilter(\'' + filter + '\');'});
+					var selectbottom = new Element('select', {onchange: 'activepage = this.value;applyfilter(\'' + filter + '\');'});
+					for (var x = 0; x < result.pageinfo[0]; x++) {
+						var offset = x * result.pageinfo[1];
+						var selected = (result.pageinfo[2] == x+1);
+						selecttop.insert(new Element('option', {value: offset,selected:selected}).update('Page ' + (x+1)));
+						selectbottom.insert(new Element('option', {value: offset,selected:selected}).update('Page ' + (x+1)));
+					}
+					pagetop.insert(selecttop);
+					pagebottom.insert(selectbottom);
+					$('pagewrappertop').update(pagetop);
+					$('pagewrapperbottom').update(pagebottom);
+
+					var filtercolor = $('filterby').getStyle('color');
+					if(!filtercolor)
+						filtercolor = '#000';
+
+					size = filtes.length;
+					for(i=0;i<size;i++){
+						$(filtes[i] + 'filter').setStyle({color: filtercolor, fontWeight: 'normal'});
+					}
+					$(filter + 'filter').setStyle({
+						 color: '#000000',
+						 fontWeight: 'bold'
+					});
+
+				}
+			}
+		});
+}
+document.observe('dom:loaded', function() {
+	applyfilter('date');
+});
+</script>
+<?
 
 endWindow();
 
