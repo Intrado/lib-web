@@ -982,7 +982,6 @@ echo '<div id="formswitchercontainer">' . $messagegroupsplitter->render($default
 			}
 
 			var translationcheckboxes = $$('.TranslationItemCheckboxTD');
-
 			// Loop over list of languages to translate (languages that the user has checked), adding to the translationlanguagecodes array.
 			var translationlanguagecodes = []; // List of language names to be sent via ajax to translate.php.
 
@@ -996,8 +995,8 @@ echo '<div id="formswitchercontainer">' . $messagegroupsplitter->render($default
 					translationlanguagecodes.push(languagecode);
 
 					// Detect if any message will get overwritten.
-					for (var i = 0; i < messagegroupsummary.length; i++) {
-						var messageinfo = messagegroupsummary[i];
+					for (var j = 0, jcount = messagegroupsummary.length; j < jcount; j++) {
+						var messageinfo = messagegroupsummary[j];
 						if (messageinfo.type == state.currentdestinationtype && messageinfo.subtype == state.currentsubtype && messageinfo.languagecode == languagecode) {
 							willoverwrite = true;
 							break;
