@@ -1,4 +1,9 @@
 function messagegroupHandleBeforeTabLoad (event, state, systemdefaultlanguagecode) {
+	if ($$('.HTMLEditorAjaxLoader').length > 0) {
+		alert('Please wait until the HTML Editor has loaded.');
+		event.stop();
+	}
+	
 	var nexttab = event.memo.nexttab;
 	var nexttabpieces = nexttab.split('-');
 	if (nexttabpieces.length == 2 && nexttabpieces[0] == 'email') {
@@ -11,7 +16,7 @@ function messagegroupHandleBeforeTabLoad (event, state, systemdefaultlanguagecod
 	}
 }
 
-function messagegroupHandleTabLoaded (event, state, existingmessagegroupid, systemdefaultlanguagecode, readonly) {
+function messagegroupHandleTabLoaded (event, state, existingmessagegroupid, systemdefaultlanguagecode, autotranslatorUpdator, readonly) {
 	// NOTE: Message tab icons are the only ones with an ID attribute.
 	var messagetabicon = event.memo.widget.sections[event.memo.tabloaded].titleDiv.down('img');
 	
@@ -46,7 +51,7 @@ function messagegroupHandleTabLoaded (event, state, existingmessagegroupid, syst
 		state.currentsubtype = tabloadedpieces[1];
 	}
 
-	// Event Handlers for specific tabs like summary, individual languages.
+	// Event Handlers for specific tabs like summary, autotranslator, individual languages.
 	if (memo.tabloaded == 'summary') {
 		memo.widget.container.observe('click', function(event, widget, state) {
 			var element = event.element();
@@ -70,9 +75,15 @@ function messagegroupHandleTabLoaded (event, state, existingmessagegroupid, syst
 					nexttab = pieces[0] == 'email' ? 'emailheaders' : (pieces[0] + '-' + pieces[1]);
 				}
 
-				form_load_tab(this, widget, nexttab, specificsections, true);
+				form_load_tab(this, widget, nexttab, specificsections, readonly);
 			}
 		}.bindAsEventListener(memo.form, memo.widget, state));
+	} else if (autotranslatorUpdator) {
+		if ((tabloadedpieces.length == 2 && tabloadedpieces[0] == 'email' && state.currentlanguagecode == 'autotranslator' ) || (tabloadedpieces.length == 3 && tabloadedpieces[2] == 'autotranslator')) {
+			var autotranslatorbutton =  $('autotranslatorrefreshtranslationbutton');
+			if (autotranslatorbutton)
+				autotranslatorUpdator(autotranslatorbutton, state);
+		}
 	}
 	
 	// Update the status icons on tabs.
