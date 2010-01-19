@@ -666,7 +666,6 @@ div.scrollTableContainer {
 	vertical-align: middle;
 }
 .verticaltabscontentdiv {
-	border-right: 1px solid <?=$theme2?>;
 	padding: 0;
 	margin: 2px;
 	margin-right: 0;
@@ -677,6 +676,7 @@ div.scrollTableContainer {
 	padding: 0;
 }
 .verticaltabspanelspane {
+	border-right: 1px solid <?=$theme2?>;
 	padding; 0;
 	margin-bottom: 1px;
 	background: white;
@@ -691,7 +691,15 @@ td.SplitPane {
 	padding: 0;
 	vertical-align: top;
 }
-.MessageContentHeader {
+
+
+#cke_reusableckeditor {
+	border: 0;
+	margin: 0;
+	padding: 0;
+}
+
+#messagegroupformcontainer .MessageContentHeader {
 	font-weight: bold;
 	letter-spacing: 1px;
 	font-size: 120%;
@@ -700,29 +708,69 @@ td.SplitPane {
 	margin-left: 5px;
 }
 
-#summary table {
+#messagegroupformcontainer #summary table {
 	border-collapse: collapse;
 }
-#summary th {
+#messagegroupformcontainer #summary th {
 	font-weight: bold;
 	vertical-align: top;
 	padding: 2px;
 	padding-right: 10px;
 }
-#summary th.Destination {
+#messagegroupformcontainer #summary th.Destination {
 	text-align: left;
 }
-#summary th.Language {
+#messagegroupformcontainer #summary th.Language {
 	text-align: right;
 }
-#summary td.StatusIcon {
+#messagegroupformcontainer #summary td.StatusIcon {
 	vertical-align: top;
 	text-align: left;
 	padding: 2px;
 }
 
-#summary img.StatusIcon {
+#messagegroupformcontainer #summary img.StatusIcon {
 	cursor: pointer;
+}
+
+#messagegroupformcontainer form {
+	margin: 0;
+	padding: 0;
+}
+
+#messagegroupformcontainer iframe.UploadIFrame {
+	overflow: hidden;
+	width: 100%;
+	margin: 0;
+	margin-top: 10px;
+	padding: 0;
+	height: 60px;
+}
+
+#messagegroupformcontainer div.MessageTextReadonly {
+	padding: 2px;
+	margin-top: 5px;
+	border: solid 1px <?=$newfade1?>;
+}
+
+#messagegroupformcontainer #messagegroupbasics_name_fieldarea .formtableheader {
+	width: 150px;
+}
+#messagegroupformcontainer td.verticaltabstabspane {
+	width: 15%;
+	white-space: nowrap;
+}
+#messagegroupformcontainer div.MessageBodyHeader {
+	font-weight: bold;
+	margin-left: 2px;
+	float: left;
+	padding-top: 4px;
+}
+#messagegroupformcontainer .accordioncontentdiv {
+	padding: 2px;
+}
+#messagegroupformcontainer .accordioncontentdiv .radiobox {
+	margin-right: 0;
 }
 
 .sortheader {
