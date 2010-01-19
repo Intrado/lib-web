@@ -110,7 +110,7 @@ require_once("inc/translate.inc.php");
        	if($decoded->responseStatus == 200) {
 			if(is_array($decoded->responseData)){
 				foreach($decoded->responseData as $obj){
-					$obj->responseData->translatedText = reg_replace('/<input value="(.+?)"\\/>/', '$1', html_entity_decode($obj->responseData->translatedText,ENT_QUOTES,"UTF-8"));
+					$obj->responseData->translatedText = preg_replace('/<input value="(.+?)"\\/>/', '$1', html_entity_decode($obj->responseData->translatedText,ENT_QUOTES,"UTF-8"));
 				}
 			} else {
 				$decoded->responseData->translatedText = preg_replace('/<input value="(.+?)"\\/>/', '$1', html_entity_decode($decoded->responseData->translatedText,ENT_QUOTES,"UTF-8"));
