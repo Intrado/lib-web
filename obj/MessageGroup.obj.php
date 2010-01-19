@@ -82,12 +82,30 @@ class MessageGroup extends DBMappedObject {
 	}
 	
 	function getMessageText($type, $subtype, $languagecode, $autotranslate) {
-		if (!$message = DBFind('Message', 'from message where not deleted and type=? and subtype=? and languagecode=? and messagegroupid=? and autotranslate=?', false, array($type, $subtype, $languagecode, $this->id, $autotranslate)))
+		$message = $this->getMessage($type, $subtype, $languagecode, $autotranslate);
+		if (!$message)
 			return '';
 		
 		$parts = DBFindMany('MessagePart', 'from messagepart where messageid=?', false, array($message->id));
 		
 		return $message->format($parts);
+	}
+	
+	function getMessage($type, $subtype, $languagecode, $autotranslate) {
+		static $messagecache = array();
+		
+		$key = $type . $subtype . $languagecode . $autotranslate;
+		
+		if (!isset($messagecache[$key])) {
+			if (!$message = DBFind('Message', 'from message where not deleted and type=? and subtype=? and languagecode=? and messagegroupid=? and autotranslate=?', false, array($type, $subtype, $languagecode, $this->id, $autotranslate)))
+				return null;
+			
+			$messagecache[$key] = $message;
+		} else {
+			$message = $messagecache[$key];
+		}
+	
+		return $message;
 	}
 }
 
