@@ -539,39 +539,7 @@ foreach ($destinations as $type => $destination) {
 	}
 }
 
-// Summary Tab.
-$summaryheaders = '<th></th>';
-$summarylanguagerows = "";
-foreach ($destinations as $type => $destination) {
-	foreach ($destination['subtypes'] as $subtype) {
-		$summaryheaders .= "<th class='Destination'>" . ($type == 'sms' ? "SMS" : ucfirst($type)) . (count($destination['subtypes']) > 1 ? (" (" . ($subtype == 'html' ? "HTML" : ucfirst($subtype)) . ") ") : "") . "</th>";
-	}
-}
-foreach ($customerlanguages as $languagecode => $languagename) {
-	$summarylanguagerows .= "<tr><th class='Language'>" . ucfirst($languagename) . "</th>";
-	foreach ($destinations as $type => $destination) {
-		foreach ($destination['subtypes'] as $subtype) {
-			if ($type == 'sms' && $languagecode != $systemdefaultlanguagecode) {
-				$summarylanguagerows .= "<td></td>";
-			} else {
-				$hasmessage = isset($existingmessagegroup) && $existingmessagegroup->hasMessage($type, $subtype, $languagecode);
-				$icon = $hasmessage ? 'img/icons/accept.gif' : 'img/icons/diagona/16/160.gif';
-				$alt = $hasmessage ? escapehtml(_L("Message found.")) : escapehtml(_L("Message not found."));
-				$title = _L("Click to jump to this message");
-				$summarylanguagerows .= "<td class='StatusIcon'><img class='StatusIcon' id='{$type}-{$subtype}-{$languagecode}-summaryicon' title='$title' alt='$alt' src='$icon'/></td>";
-			}
-		}
-	}
-	$summarylanguagerows .= "</tr>";
-}
-$destinationlayoutforms[] = array(
-	"name" => "summary",
-	"title" => "Summary",
-	"icon" => "img/icons/application_view_columns.gif",
-	"formdata" => array(
-		'summary' => makeFormHtml("<table>{$summaryheaders}{$summarylanguagerows}</table>")
-	)
-);
+$destinationlayoutforms[] = makeSummaryTab($destinations, $customerlanguages, $systemdefaultlanguagecode, isset($existingmessagegroup) ? $existingmessagegroup : null);
 
 //////////////////////////////////////////////////////////
 // Finalize the formsplitter.
@@ -844,49 +812,14 @@ $TITLE = _L('Message Editor');
 include_once('nav.inc.php');
 ?>
 
-
+<script src="script/ckeditor/ckeditor_basic.js" type="text/javascript"></script>
+<script src="script/htmleditor.js" type="text/javascript"></script>
+<script src="script/accordion.js" type="text/javascript"></script>
+<script src="script/audiolibrarywidget.js.php" type="text/javascript"></script>
+<script type="text/javascript">
+	<?php Validator::load_validators(array("ValDefaultLanguageCode", "ValTranslationItem", "ValDuplicateNameCheck", "ValCallMeMessage", "ValMessageBody", "ValEmailMessageBody", "ValLength", "ValRegExp", "ValEmailAttach")); ?>
+</script>
 <style type='text/css'>
-form {
-	margin: 0;
-	padding: 0;
-}
-#messagegroupbasics_name_fieldarea .formtableheader {
-	width: 150px;
-}
-td.verticaltabstabspane {
-	width: 15%;
-	white-space: nowrap;
-}
-td.MessageGroupAudioFile {
-
-}
-td.GlobalAudioFile {
-}
-iframe.UploadIFrame {
-	overflow: hidden;
-	width: 100%;
-	margin: 0;
-	margin-top: 10px;
-	padding: 0;
-	height: 60px;
-}
-#cke_reusableckeditor {
-	border: 0;
-	margin: 0;
-	padding: 0;
-}
-div.MessageBodyHeader {
-	font-weight: bold;
-	margin-left: 2px;
-	float: left;
-	padding-top: 4px;
-}
-.accordioncontentdiv {
-	padding: 2px;
-}
-.accordioncontentdiv .radiobox {
-	margin-right: 0;
-}
 #messageemptyspan {
 	padding-top: 6px;
 	display: block;
@@ -895,15 +828,6 @@ div.MessageBodyHeader {
 	visibility: hidden;
 }
 </style>
-
-<script src="script/ckeditor/ckeditor_basic.js" type="text/javascript"></script>
-<script src="script/htmleditor.js" type="text/javascript"></script>
-<script src="script/accordion.js" type="text/javascript"></script>
-<script src="script/audiolibrarywidget.js.php" type="text/javascript"></script>
-<script type="text/javascript">
-	<?php Validator::load_validators(array("ValDefaultLanguageCode", "ValTranslationItem", "ValDuplicateNameCheck", "ValCallMeMessage", "ValMessageBody", "ValEmailMessageBody", "ValLength", "ValRegExp", "ValEmailAttach")); ?>
-</script>
-
 <?php
 startWindow(_L('Message Editor'));
 
@@ -912,7 +836,7 @@ $firstdestinationsubtype = array_shift($destinations[$firstdestinationtype]['sub
 $defaultsections = array("{$firstdestinationtype}-{$firstdestinationsubtype}", "{$firstdestinationtype}-{$firstdestinationsubtype}-{$systemdefaultlanguagecode}");
 if ($firstdestinationtype == 'email')
 	$defaultsections[] = "emailheaders";
-echo '<div id="formswitchercontainer">' . $messagegroupsplitter->render($defaultsections) . '</div>';
+echo '<div id="messagegroupformcontainer">' . $messagegroupsplitter->render($defaultsections) . '</div>';
 
 ?>
 
@@ -930,7 +854,7 @@ echo '<div id="formswitchercontainer">' . $messagegroupsplitter->render($default
 			'messagegroupsummary': <?=json_encode(QuickQueryMultiRow("select distinct type,subtype,languagecode from message where userid=? and messagegroupid=? and not deleted order by type,subtype,languagecode", true, false, array($USER->id, $_SESSION['messagegroupid'])))?>
 		};
 
-		var formswitchercontainer = $('formswitchercontainer');
+		var formswitchercontainer = $('messagegroupformcontainer');
 		form_init_splitter(formswitchercontainer, <?=json_encode($defaultsections)?>);
 
 		var styleLayouts = function() {
