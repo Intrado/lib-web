@@ -65,7 +65,13 @@ if ($cansendmultilingual)
 else
 	$allowtranslation = false;
 
-$emailheaders = $existingmessagegroup->getGlobalEmailHeaders(array());
+$emailheaders = $existingmessagegroup->getGlobalEmailHeaders(
+	array(
+		'subject' => '',
+		'fromname' => '',
+		'fromemail' => ''
+	)
+);
 $emailattachments = $existingmessagegroup->getGlobalEmailAttachments();
 
 // $destinations is a tree that is populated according to the user's permissions; it contains destination types, subtypes, and languages.
@@ -140,7 +146,8 @@ foreach ($destinations as $type => $destination) {
 			
 			if ($type == 'sms') {
 				$messageformdata["header"] = makeFormHtml("<div class='MessageBodyHeader'>" . _L("SMS Message") . "</div>");
-				$messageformdata["message"] = makeFormHtml("<div class='MessageTextReadonly'>$messagetext</div>");
+				if (!empty($messagetext))
+					$messageformdata["message"] = makeFormHtml("<div class='MessageTextReadonly'>$messagetext</div>");
 			} else {
 				$messageformdata["header"] = makeFormHtml("<div class='MessageBodyHeader'>" . _L("%s Message", ucfirst($languagename)) . "</div>");
 				
@@ -316,7 +323,7 @@ echo '<div id="messagegroupformcontainer">' . $messagegroupsplitter->render($def
 
 		// When a tab is loaded, update the status icon of the previous tab.
 		formswitchercontainer.observe('FormSplitter:TabLoaded',
-			messagegroupHandleTabLoaded.bindAsEventListener(formswitchercontainer, state, '<?=$existingmessagegroup->id?>', '<?=$systemdefaultlanguagecode?>', true)
+			messagegroupHandleTabLoaded.bindAsEventListener(formswitchercontainer, state, '<?=$existingmessagegroup->id?>', '<?=$systemdefaultlanguagecode?>', null, true)
 		);
 		
 		form_init_splitter(formswitchercontainer, <?=json_encode($defaultsections)?>, true);
