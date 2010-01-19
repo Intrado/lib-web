@@ -799,7 +799,6 @@ if ($button = $messagegroupsplitter->getSubmit()) {
 			case 'cancel': {
 			} break;
 		}
-	} else {
 	}
 }
 
@@ -815,6 +814,7 @@ include_once('nav.inc.php');
 <script src="script/ckeditor/ckeditor_basic.js" type="text/javascript"></script>
 <script src="script/htmleditor.js" type="text/javascript"></script>
 <script src="script/accordion.js" type="text/javascript"></script>
+<script src="script/messagegroup.js.php" type="text/javascript"></script>
 <script src="script/audiolibrarywidget.js.php" type="text/javascript"></script>
 <script type="text/javascript">
 	<?php Validator::load_validators(array("ValDefaultLanguageCode", "ValTranslationItem", "ValDuplicateNameCheck", "ValCallMeMessage", "ValMessageBody", "ValEmailMessageBody", "ValLength", "ValRegExp", "ValEmailAttach")); ?>
@@ -840,10 +840,6 @@ echo '<div id="messagegroupformcontainer">' . $messagegroupsplitter->render($def
 
 ?>
 
-<div style='display:none'>
-	<textarea id='preloadhtmleditor'></textarea>
-</div>
-
 <script type="text/javascript">
 	(function() {
 		// Use an object to store state information.
@@ -856,26 +852,6 @@ echo '<div id="messagegroupformcontainer">' . $messagegroupsplitter->render($def
 
 		var formswitchercontainer = $('messagegroupformcontainer');
 		form_init_splitter(formswitchercontainer, <?=json_encode($defaultsections)?>);
-
-		var styleLayouts = function() {
-			$$('div.accordion').each(function(div) {
-				if (div.match('.FormSwitcherLayoutSection')) {
-					var td = div.up('td.SplitPane');
-					if (td) {
-						td.style.width = '45%';
-					}
-
-					var formtableheaders = div.select('.formtableheader');
-					formtableheaders.each(function(th) {
-						th.style.width = '100px';
-					});
-				}
-			});
-
-			var verticaltabs = $$('div.verticaltabstitlediv');
-			if (verticaltabs.length > 0)
-				verticaltabs[0].setStyle({'marginBottom':'20px'});
-		};
 
 		var confirmAutotranslator = function(clickevent, tabevent, state) {
 			saveHtmlEditorContent(); // If this is email html, the autotranslator also uses the html editor for its source message body.
@@ -941,191 +917,75 @@ echo '<div id="messagegroupformcontainer">' . $messagegroupsplitter->render($def
 				event.stop();
 		}.bindAsEventListener(formswitchercontainer, state));
 
-		formswitchercontainer.observe('FormSplitter:BeforeTabLoad', function(event, state) {
-			if ($$('.HTMLEditorAjaxLoader').length > 0) {
-				alert('<?=addslashes(_L("Please wait until the HTML Editor has loaded."))?>');
-				event.stop();
-			}
-			
-			var nexttab = event.memo.nexttab;
-			var nexttabpieces = nexttab.split('-');
-			if (nexttabpieces.length == 2 && nexttabpieces[0] == 'email') {
-				// If the user is tabbing between subtypes, make sure the language stays consistent.
-				event.memo.specificsections = [event.memo.nexttab + '-' + state.currentlanguagecode];
-			} else if (nexttab == 'emailheaders') {
-				event.memo.specificsections = ['emailheaders', 'email-html', 'email-html-<?=$systemdefaultlanguagecode?>'];
-			} else if (nexttab == 'phone-voice') {
-				event.memo.specificsections = ['phone-voice', 'phone-voice-<?=$systemdefaultlanguagecode?>'];
-			}
-		}.bindAsEventListener(formswitchercontainer, state));
+		formswitchercontainer.observe('FormSplitter:BeforeTabLoad',
+			messagegroupHandleBeforeTabLoad.bindAsEventListener(formswitchercontainer, state, '<?=$systemdefaultlanguagecode?>')
+		);
 
-		// When a tab is loaded, update the status icon of the previous tab.
-		formswitchercontainer.observe('FormSplitter:TabLoaded', function(event, state, styleLayouts) {
-			// NOTE: Message tab icons are the only ones with an ID attribute.
-			var messagetabicon = event.memo.widget.sections[event.memo.tabloaded].titleDiv.down('img');
-			
-			if (messagetabicon.id == 'summaryicon')
-				messagetabicon.src = 'img/icons/application_view_columns.gif';
-			else if (messagetabicon.id.include('autotranslatoricon'))
-				messagetabicon.src = 'img/icons/world.gif';
-			else if (messagetabicon.id)
-				messagetabicon.src = 'img/icons/diagona/16/160.gif';
-			
-			styleLayouts();
+		var autotranslatorupdator = function (autotranslatorbutton, state) {
+			autotranslatorbutton.stopObserving('click');
+			autotranslatorbutton.observe('click', function(event, state) {
+				var autotranslateobject = confirmAutotranslator(event, null, state);
+				if (!autotranslateobject)
+					return;
 
-			var memo = event.memo;
-			var previoustabpieces = memo.previoustab.split('-');
-			var tabloadedpieces = memo.tabloaded.split('-');
+				var sourcetext = autotranslateobject.sourcetext;
+				var translationlanguagecodes = autotranslateobject.translationlanguagecodes;
 
-			// Keep track of the current destination type, subtype, and languagecode.
-			if (tabloadedpieces.length == 3) {
-				state.curerntdestinationtype = tabloadedpieces[0];
-				state.currentsubtype = tabloadedpieces[1];
-				state.currentlanguagecode = tabloadedpieces[2];
-			} else if (tabloadedpieces.length == 1 || (tabloadedpieces.length == 2 && tabloadedpieces[0] == 'phone')) {
-				state.currentdestinationtype = tabloadedpieces[0] != 'summary' ? tabloadedpieces[0] : '';
-				state.currentsubtype = tabloadedpieces.length == 2 ? tabloadedpieces[1] : '';
-				if (state.currentdestinationtype == 'emailheaders') {
-					state.currentdestinationtype = 'email';
-					state.currentsubtype = 'html';
+				// Show ajax loaders for the translating languages, and clear the retranslation text.
+				for (var i = 0, count = translationlanguagecodes.length; i < count; i++) {
+					var formitemname = this.name + '_' + translationlanguagecodes[i] + '-translationitem';
+
+					$(formitemname + 'textdiv').update('<img src=\"img/ajax-loader.gif\" />');
+					$(formitemname + 'retranslationtext').update();
 				}
-				state.currentlanguagecode = '<?=$systemdefaultlanguagecode?>';
-			} else if (tabloadedpieces.length == 2 && tabloadedpieces[0] == 'email') {
-				state.currentdestinationtype = 'email';
-				state.currentsubtype = tabloadedpieces[1];
-			}
 
-			// Event Handlers for specific tabs like summary, autotranslator, individual languages.
-			if (memo.tabloaded == 'summary') {
-				memo.widget.container.observe('click', function(event, widget, state) {
-					var element = event.element();
-					if (element.match('img.StatusIcon')) {
-						event.stop();
-						
-						var pieces = element.identify().split('-');
-						var specificsections = [
-							pieces[0] + '-' + pieces[1] + '-' + pieces[2]
-						];
-						if (pieces[0] != 'sms')
-							specificsections.push(pieces[0] + '-' + pieces[1]);
-						if (pieces[0] == 'email') {
-							specificsections.push('emailheaders');
-						}
+				var errortext = '<?=addslashes(_L('Sorry, an error occurred during translation. Please try again.'))?>';
+				new Ajax.Request('translate.php', {
+					'method':'post',
+					'parameters': {'english': makeTranslatableString(sourcetext), 'languages': translationlanguagecodes.join(';')},
+					'onSuccess': function(transport, translationlanguagecodes, errortext) {
+						var data = transport.responseJSON;
 
-						var nexttab;
-						if (pieces[0] == 'sms') {
-							nexttab = pieces[0] + '-' + pieces[1] + '-' + pieces[2];
-						} else {
-							nexttab = pieces[0] == 'email' ? 'emailheaders' : (pieces[0] + '-' + pieces[1]);
-						}
-
-						form_load_tab(this, widget, nexttab, specificsections);
-					}
-				}.bindAsEventListener(memo.form, memo.widget, state));
-			} else if ((tabloadedpieces.length == 2 && tabloadedpieces[0] == 'email' && state.currentlanguagecode == 'autotranslator' ) || (tabloadedpieces.length == 3 && tabloadedpieces[2] == 'autotranslator')) {
-				var autotranslator =  $('autotranslatorrefreshtranslationbutton');
-				if (autotranslator) {
-					autotranslator.stopObserving('click');
-					autotranslator.observe('click', function(event, state) {
-						var autotranslateobject = confirmAutotranslator(event, null, state);
-						if (!autotranslateobject)
+						if (!data || !data.responseData || !data.responseStatus || data.responseStatus != 200 || (translationlanguagecodes.length > 1 && translationlanguagecodes.length != data.responseData.length)) {
+							alert(errortext);
 							return;
+						}
 
-						var sourcetext = autotranslateobject.sourcetext;
-						var translationlanguagecodes = autotranslateobject.translationlanguagecodes;
+						var dataResponseData = data.responseData;
 
-
-						// Show ajax loaders for the translating languages, and clear the retranslation text.
 						for (var i = 0, count = translationlanguagecodes.length; i < count; i++) {
-							var formitemname = this.name + '_' + translationlanguagecodes[i] + '-translationitem';
-
-							$(formitemname + 'textdiv').update('<img src=\"img/ajax-loader.gif\" />');
-							$(formitemname + 'retranslationtext').update();
-						}
-
-						var errortext = '<?=addslashes(_L('Sorry, an error occurred during translation. Please try again.'))?>';
-						new Ajax.Request('translate.php', {
-							'method':'post',
-							'parameters': {'english': makeTranslatableString(sourcetext), 'languages': translationlanguagecodes.join(';')},
-							'onSuccess': function(transport, translationlanguagecodes, errortext) {
-								var data = transport.responseJSON;
-
-								if (!data || !data.responseData || !data.responseStatus || data.responseStatus != 200 || (translationlanguagecodes.length > 1 && translationlanguagecodes.length != data.responseData.length)) {
-									alert(errortext);
-									return;
-								}
-
-								var dataResponseData = data.responseData;
-
-								for (var i = 0, count = translationlanguagecodes.length; i < count; i++) {
-									var languagecode = translationlanguagecodes[i];
-									if (count == 1) {
-										updateTranslationItem(this, languagecode, dataResponseData.translatedText);
-										break;
-									}
-
-									var response = dataResponseData[i];
-									var responseData = response.responseData;
-									i++;
-
-									if (response.responseStatus != 200 || !responseData) {
-										alert(errortext);
-										continue;
-									}
-
-									updateTranslationItem(this, languagecode, responseData.translatedText);
-								}
-							}.bindAsEventListener(this, translationlanguagecodes, errortext),
-							
-							'onFailure': function(transport, errortext) {
-								alert(errortext);
-							}.bindAsEventListener(this, errortext)
-						});
-					}.bindAsEventListener(autotranslator.up('form'), state));
-				}
-			}
-			
-			// Update the status icons on tabs.
-			new Ajax.Request('ajax.php', {
-				'method': 'get',
-				'parameters': {
-					'type': 'messagegroupsummary',
-					'messagegroupid': <?=$_SESSION['messagegroupid']?>
-				},
-				'onSuccess': function(transport, memo, state) {
-					var previoustabpieces = memo.previoustab.split('-');
-					var tabloadedpieces = memo.tabloaded.split('-');
-
-					var results = transport.responseJSON;
-					state.messagegroupsummary = results || [];
-					if (results) {
-						for (var i = 0; i < results.length; i++) {
-							var result = results[i];
-
-							var updateprevioustab = (result.type == 'email' && memo.previoustab == 'emailheaders') || result.type == previoustabpieces[0];
-							var updatetabloaded = (result.type == 'email' && memo.tabloaded == 'emailheaders') || result.type == tabloadedpieces[0];
-							if (updateprevioustab || updatetabloaded) {
-								if (result.type == 'email' && $('emailheadersicon')) {
-									$('emailheadersicon').src = "img/icons/accept.gif";
-								}
-
-								if ($(result.type + '-' + result.subtype + 'icon')) {
-									$(result.type + '-' + result.subtype + 'icon').src = "img/icons/accept.gif";
-								}
-
-								if ($(result.type + '-' + result.subtype + '-' + result.languagecode + 'icon')) {
-									$(result.type + '-' + result.subtype + '-' + result.languagecode + 'icon').src = "img/icons/accept.gif";
-								}
+							var languagecode = translationlanguagecodes[i];
+							if (count == 1) {
+								updateTranslationItem(this, languagecode, dataResponseData.translatedText);
+								break;
 							}
-						}
-					}
-				}.bindAsEventListener(this, memo, state)
-				
-				// NOTE: No need to alert on failure because this ajax request is only to update the status icons.
-			});
-		}.bindAsEventListener(formswitchercontainer, state, styleLayouts));
 
-		styleLayouts();
+							var response = dataResponseData[i];
+							var responseData = response.responseData;
+							i++;
+
+							if (response.responseStatus != 200 || !responseData) {
+								alert(errortext);
+								continue;
+							}
+
+							updateTranslationItem(this, languagecode, responseData.translatedText);
+						}
+					}.bindAsEventListener(this, translationlanguagecodes, errortext),
+					
+					'onFailure': function(transport, errortext) {
+						alert(errortext);
+					}.bindAsEventListener(this, errortext)
+				});
+			}.bindAsEventListener(autotranslatorbutton.up('form'), state));
+		};
+		
+		// When a tab is loaded, update the status icon of the previous tab.
+		formswitchercontainer.observe('FormSplitter:TabLoaded',
+			messagegroupHandleTabLoaded.bindAsEventListener(formswitchercontainer, state, '<?=$_SESSION['messagegroupid']?>', '<?=$systemdefaultlanguagecode?>', autotranslatorupdator, false)
+		);
+
+		messagegroupStyleLayouts();
 	})();
 
 </script>
