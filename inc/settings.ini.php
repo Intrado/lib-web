@@ -7,7 +7,6 @@ path="/xmlrpc"
 
 [feature]
 is_commsuite=false
-is_ldap=false
 has_ssl=true
 force_ssl=true
 log_dir="/usr/commsuite/logs/"
