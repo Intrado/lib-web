@@ -71,6 +71,8 @@ $jobtypes = QuickQueryList("select id, name from jobtype where not deleted and n
 $usersurveytypes = QuickQueryList("select id from jobtype where id in (select jobtypeid from userjobtypes where userid=?) and not deleted and issurvey order by systempriority, name asc", false, false, array($edituser->id));
 $surveytypes = QuickQueryList("select id, name from jobtype where not deleted and issurvey order by systempriority, name asc", true);
 
+$IS_LDAP = getSystemSetting('hasldap', '0');
+
 ////////////////////////////////////////////////////////////////////////////////
 // Custom form items
 ////////////////////////////////////////////////////////////////////////////////
