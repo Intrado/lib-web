@@ -614,7 +614,8 @@ function form_count_field_characters(count,target,event) {
 }
 
 function form_submit_all (tabevent, value, formsplittercontainer) {
-	saveHtmlEditorContent();
+	if (typeof saveHtmlEditorContent == 'function')
+		saveHtmlEditorContent();
 	var forms = $$('form');
 	if (forms.length < 1)
 		return;
@@ -728,16 +729,21 @@ function form_submit_all (tabevent, value, formsplittercontainer) {
 					window.location = ajaxevent.memo.nexturl;
 			}
 		}.bindAsEventListener(form, tabevent, submissions));
-		
-		if (i == 0) {
-			// Submit the first form; other forms will be submitted sequentially upon AjaxForm:SubmitSuccess.
-			submission.submitted = true;
-			form_submit(null, value, form);
-		}
 	}
+	
+	// Submit the first form; other forms will be submitted sequentially upon AjaxForm:SubmitSuccess.
+	var firstform = forms[0];
+	submissions[firstform.name].submitted = true;
+	form_submit(null, value, firstform);
 }
 
-function form_load_tab (form, widget, nexttab, specificsections) {
+function form_load_tab (form, widget, nexttab, specificsections, cacheajax) {
+	if (!form) {
+		var forms = $$('form');
+		if (forms.length < 1)
+			return;
+		form = forms[0];
+	}
 	var formvars = document.formvars[form.name];
 	
 	if (!document.tabvars)
@@ -754,47 +760,57 @@ function form_load_tab (form, widget, nexttab, specificsections) {
 	var cleanurl = (indexofquestionmark >= 0) ? formvars.scriptname.substring(0, indexofquestionmark) : formvars.scriptname;
 	var posturl = cleanurl + "?ajax=true";
 	
-	new Ajax.Request(posturl, {
-		method: 'post',
-		parameters: {'loadtab': nexttab, 'specificsections': specificsections ? specificsections.toJSON() : ''},
-		onSuccess: function (response, widget, nexttab, specificsections) {
-			document.tabvars.loading = false;
-			
-			var data = response.responseJSON;
-			
-			if (!data || !data.element) {
-				alert('Sorry, there is an error loading this tab.');
-				return;
-			}
-			
-			// Clear any html editor listeners.
-			registerHtmlEditorKeyListener(null);
-			
-			widget.update_section(data.element, {
-				'icon': 'img/pixel.gif',
-				'content': data.content
-			});
-			
-			var formcontainer = $(data.element);
-			var container = formcontainer.match('form.FormSplitterParentForm') ? formcontainer.up('.FormSplitterParentFormContainer') : formcontainer.up();
-			form_load_layout(container, null, specificsections);
-			var previoustab = widget.currentSection;
-			widget.show_section(nexttab);
-			// NOTE: To prevent flickering, clear the contents of the previous tab after the next tab is shown.
-			if (previoustab != nexttab) {
-				widget.update_section(previoustab, {
-					'content': new Element('div')
-				});
-			}
-			
-			widget.container.fire('FormSplitter:TabLoaded', {'form': this, 'data': data, 'tabloaded': nexttab, 'previoustab': previoustab, 'widget':widget});
-		}.bindAsEventListener(form, widget, nexttab, specificsections),
+	var loadtabhandler = function (response, widget, nexttab, specificsections) {
+		document.tabvars.loading = false;
 		
-		onFailure: function() {
-			document.tabvars.loading = false;
+		var data = response.responseJSON;
+		
+		if (!data || !data.element) {
 			alert('Sorry, there is an error loading this tab.');
+			return;
 		}
-	});
+		
+		// Clear any html editor listeners.
+		if (typeof registerHtmlEditorKeyListener == 'function')
+			registerHtmlEditorKeyListener(null);
+		
+		widget.update_section(data.element, {
+			'icon': 'img/pixel.gif',
+			'content': data.content
+		});
+		
+		var formcontainer = $(data.element);
+		var container = formcontainer.match('form.FormSplitterParentForm') ? formcontainer.up('.FormSplitterParentFormContainer') : formcontainer.up();
+		form_load_layout(container, null, specificsections);
+		var previoustab = widget.currentSection;
+		widget.show_section(nexttab);
+		// NOTE: To prevent flickering, clear the contents of the previous tab after the next tab is shown.
+		if (previoustab != nexttab) {
+			widget.update_section(previoustab, {
+				'content': new Element('div')
+			});
+		}
+		
+		widget.container.fire('FormSplitter:TabLoaded', {'form': this, 'data': data, 'tabloaded': nexttab, 'previoustab': previoustab, 'widget':widget});
+	};
+	
+	if (cacheajax) {
+		cachedAjaxGet(posturl + '&loadtab='+nexttab+'&specificsections='+(specificsections ? specificsections.toJSON() : ''),
+			loadtabhandler.bindAsEventListener(form, widget, nexttab, specificsections)
+		);
+	} else {
+		new Ajax.Request(posturl, {
+			'method': 'post',
+			'parameters': {
+				'loadtab': nexttab,
+				'specificsections': specificsections ? specificsections.toJSON() : ''
+			},
+			'onSuccess': loadtabhandler.bindAsEventListener(form, widget, nexttab, specificsections),
+			'onFailure': function() {
+				alert('Sorry, there is an error loading this tab.');
+			}
+		});
+	}
 }
 
 function form_load_layout (formswitchercontainer, classname, specificsections) {
@@ -875,15 +891,33 @@ function form_load_layout (formswitchercontainer, classname, specificsections) {
 	}.bindAsEventListener(this, classname));
 }
 
-function form_init_splitter(formswitchercontainer, specificsections) {
+function form_init_splitter(formswitchercontainer, specificsections, dontsubmit) {
 	var formswitchercontainer = $(formswitchercontainer);
 	
 	form_load_layout(formswitchercontainer, null, specificsections);
 
 	var onTabsClickTitle = function(event) {
 		event.stop();
-		if (!this.fire('FormSplitter:BeforeSubmit', event.memo).stopped)
-			form_submit_all(event, 'tab');
+		
+		if (dontsubmit) {
+			var memo = event.memo;
+			var nexttab = memo.section;
+			var widget = memo.widget;
+			
+			var handledbeforetabloadevent = widget.container.fire('FormSplitter:BeforeTabLoad', {'tabevent': event, 'nexttab': nexttab, 'currenttab': memo.currentSection});
+			
+			if (!handledbeforetabloadevent.stopped) {
+				widget.update_section(nexttab, {
+					'icon': 'img/ajax-loader.gif'
+				});
+				
+				// NOTE: Call form_load_tab() with ajax caching.
+				form_load_tab(null, widget, nexttab, handledbeforetabloadevent.memo.specificsections, true);
+			}
+		} else {
+			if (!this.fire('FormSplitter:BeforeSubmit', event.memo).stopped)
+				form_submit_all(event, 'tab');
+		}
 	};
 	formswitchercontainer.observe('Tabs:ClickTitle', onTabsClickTitle.bindAsEventListener(formswitchercontainer));
 }
