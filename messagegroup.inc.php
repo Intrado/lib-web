@@ -2,6 +2,48 @@
 ////////////////////////////////////////////////////////////////////////////////
 // Custom Utility Functions
 ////////////////////////////////////////////////////////////////////////////////
+
+// Returns an array structure accepted by FormSplitter's constructor for a child form.
+function makeSummaryTab($destinations, $customerlanguages, $systemdefaultlanguagecode, $existingmessagegroup = null) {
+	// Table Headers
+	$summaryheaders = '<th></th>';
+	$summarylanguagerows = "";
+	foreach ($destinations as $type => $destination) {
+		foreach ($destination['subtypes'] as $subtype) {
+			$summaryheaders .= "<th class='Destination'>" . ($type == 'sms' ? "SMS" : ucfirst($type)) . (count($destination['subtypes']) > 1 ? (" (" . ($subtype == 'html' ? "HTML" : ucfirst($subtype)) . ") ") : "") . "</th>";
+		}
+	}
+	
+	// Table Rows
+	foreach ($customerlanguages as $languagecode => $languagename) {
+		$summarylanguagerows .= "<tr><th class='Language'>" . ucfirst($languagename) . "</th>";
+		foreach ($destinations as $type => $destination) {
+			foreach ($destination['subtypes'] as $subtype) {
+				if ($type == 'sms' && $languagecode != $systemdefaultlanguagecode) {
+					$summarylanguagerows .= "<td></td>";
+				} else {
+					$hasmessage = !is_null($existingmessagegroup) && $existingmessagegroup->hasMessage($type, $subtype, $languagecode);
+					$icon = $hasmessage ? 'img/icons/accept.gif' : 'img/icons/diagona/16/160.gif';
+					$alt = $hasmessage ? escapehtml(_L("Message found.")) : escapehtml(_L("Message not found."));
+					$title = _L("Click to jump to this message");
+					$summarylanguagerows .= "<td class='StatusIcon'><img class='StatusIcon' id='{$type}-{$subtype}-{$languagecode}-summaryicon' title='$title' alt='$alt' src='$icon'/></td>";
+				}
+			}
+		}
+		$summarylanguagerows .= "</tr>";
+	}
+	
+	// Returns an array structure accepted by FormSplitter's constructor for a child form.
+	return array(
+		"name" => "summary",
+		"title" => "Summary",
+		"icon" => "img/icons/application_view_columns.gif",
+		"formdata" => array(
+			'summary' => makeFormHtml("<table>{$summaryheaders}{$summarylanguagerows}</table>")
+		)
+	);
+}
+
 function makeTranslationItem($required, $type, $subtype, $languagecode, $languagename, $preferredgender, $sourcetext, $messagetext, $translationcheckboxlabel, $override, $allowoverride = true, $hidetranslationcheckbox = false, $enabled = true, $disabledinfo = "", $datafields = null, $inautotranslator = false, $maximages = 10) {
 	$control = array("TranslationItem",
 		"phone" => $type == 'phone',
