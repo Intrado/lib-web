@@ -108,6 +108,13 @@ function getCurrentAudio() {
 	return $_SESSION['audiofileid'];
 }
 
+function setCurrentMessageGroup ($newid) {
+	return setIfOwnsOrNew($newid, "messagegroupid", "messagegroup");
+}
+
+function getCurrentMessageGroup() {
+	return $_SESSION['messagegroupid'];
+}
 
 function setCurrentAccess ($newid) {
 	return setIfOwnsOrNew($newid, "accessid", "access", true);
