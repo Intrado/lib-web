@@ -76,12 +76,11 @@ class MessageGroup extends DBMappedObject {
 
 	function getGlobalPreferredGender() {
 		if (!$phonemessage = $this->getFirstMessageOfType('phone'))
-			return $default;
+			return 'female';
+			
 		$gender = QuickQuery('select v.gender from messagepart mp join ttsvoice v on mp.voiceid=v.id where mp.messageid=? and mp.voiceid is not null order by sequence limit 1', false, array($phonemessage->id));
-		if ($gender)
-			return $gender;
-		else
-			return $default;
+		
+		return $gender ? $gender : 'female';
 	}
 
 	function getGlobalEmailAttachments() {
@@ -93,6 +92,7 @@ class MessageGroup extends DBMappedObject {
 	function getGlobalEmailHeaders($default) {
 		if (!$emailmessage = $this->getFirstMessageOfType('email'))
 			return $default;
+			
 		$emailmessage->readHeaders();
 		
 		return array(
@@ -103,8 +103,7 @@ class MessageGroup extends DBMappedObject {
 	}
 	
 	function getMessageText($type, $subtype, $languagecode, $autotranslate) {
-		$message = $this->getMessage($type, $subtype, $languagecode, $autotranslate);
-		if (!$message)
+		if (!$message = $this->getMessage($type, $subtype, $languagecode, $autotranslate))
 			return '';
 		
 		$parts = DBFindMany('MessagePart', 'from messagepart where messageid=?', false, array($message->id));
@@ -113,20 +112,26 @@ class MessageGroup extends DBMappedObject {
 	}
 	
 	function getMessage($type, $subtype, $languagecode, $autotranslate) {
-		static $messagecache = array();
-		
-		$key = $type . $subtype . $languagecode . $autotranslate;
-		
-		if (!isset($messagecache[$key])) {
-			if (!$message = DBFind('Message', 'from message where not deleted and type=? and subtype=? and languagecode=? and messagegroupid=? and autotranslate=?', false, array($type, $subtype, $languagecode, $this->id, $autotranslate)))
-				return null;
-			
-			$messagecache[$key] = $message;
-		} else {
-			$message = $messagecache[$key];
+		foreach ($this->getMessages() as $message) {
+			if ($message->type == $type &&
+				$message->subtype == $subtype &&
+				$message->languagecode == $languagecode &&
+				$message->autotranslate == $autotranslate)
+				return $message;
 		}
+		
+		return null;
+	}
 	
-		return $message;
+	static function getSummary($messagegroupid) {
+		global $USER;
+		
+		static $summaries = array();
+		
+		if (!isset($summaries[$messagegroupid]))
+			$summaries[$messagegroupid] = QuickQueryMultiRow("select distinct type,subtype,languagecode from message where userid=? and messagegroupid=? and not deleted order by type,subtype,languagecode", true, false, array($USER->id, $messagegroupid));
+		
+		return $summaries[$messagegroupid];
 	}
 }
 
