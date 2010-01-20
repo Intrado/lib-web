@@ -140,11 +140,13 @@ $formdata["login"] = array(
 if($IS_LDAP){
 	$formdata["ldap"] = array(
 		"label" => _L("Use LDAP Auth"),
+		"fieldhelp" => _L('Authenticate with an onsite LDAP server.  You do not need to set a password for your username here.'),
 		"value" => $ldapuser,
 		"validators" => array(),
 		"control" => array("CheckBox"),
 		"helpstep" => 1
 	);
+	// TODO how to determine if password is required or not, based on ldap checkbox
 }
 
 $pass = (!$makeNewUser) ? '00000000' : '';
