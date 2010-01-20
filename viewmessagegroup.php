@@ -23,7 +23,7 @@ require_once("obj/Validator.obj.php");
 require_once("obj/MessageGroup.obj.php");
 require_once("obj/MessageAttachment.obj.php");
 require_once("obj/Language.obj.php");
-require_once('messagegroup.inc.php');
+require_once("messagegroup.inc.php");
 
 ///////////////////////////////////////////////////////////////////////////////
 // Authorization:
@@ -35,7 +35,7 @@ $cansendmultilingual = $USER->authorize('sendmulti');
 
 // Only kick the user out if he does not have permission to create any message at all (neither phone, email, nor sms).
 if (!$cansendphone && !$cansendemail && !$cansendsms) {
-	unset($_SESSION['messagegroupid']);
+	unset($_SESSION['viewmessagegroupid']);
 	redirect('unauthorized.php');
 }
 
@@ -45,7 +45,7 @@ if (!$cansendphone && !$cansendemail && !$cansendsms) {
 
 if (isset($_GET['id'])) {
 	$id = $_GET['id'] + 0;
-	if (userOwns('messagegroup',$id)
+	if (userOwns('messagegroup',$id))
 		$_SESSION['viewmessagegroupid'] = $id;
 	redirect('viewmessagegroup.php');
 }
@@ -61,15 +61,12 @@ $existingmessagegroup = new MessageGroup($_SESSION['viewmessagegroupid']);
 // Data Gathering:
 ///////////////////////////////////////////////////////////////////////////////
 
-//if the user can send multi-lingual notifications use all languages, otherwise make an array of just the default.
-if ($cansendmultilingual) {
-	$customerlanguages = Language::getLanguageMap();
-	$allowtranslation = !(isset($SETTINGS['translation']['disableAutoTranslate']) && $SETTINGS['translation']['disableAutoTranslate']);
-} else {
-	$deflanguagecode = Language::getDefaultLanguageCode();
-	$customerlanguages = array($deflanguagecode => Language::getName($deflanguagecode));
-	$allowtranslation = false;
-}
+// Make an array of just the default language, for use in SMS and when the user cannot send multilingual messages.
+$deflanguagecode = Language::getDefaultLanguageCode();
+$deflanguage = array($deflanguagecode => Language::getName($deflanguagecode));
+
+//if the user can send multi-lingual notifications use all languages, otherwise use an array of just the default.
+$customerlanguages = $cansendmultilingual ? Language::getLanguageMap() : $deflanguage;
 
 $emailheaders = $existingmessagegroup->getGlobalEmailHeaders(
 	array(
@@ -78,6 +75,7 @@ $emailheaders = $existingmessagegroup->getGlobalEmailHeaders(
 		'fromemail' => ''
 	)
 );
+
 $emailattachments = $existingmessagegroup->getGlobalEmailAttachments();
 
 // $destinations is a tree that is populated according to the user's permissions; it contains destination types, subtypes, and languages.
@@ -97,7 +95,7 @@ if ($cansendemail) {
 if ($cansendsms) {
 	$destinations['sms'] = array(
 		'subtypes' => array('plain'),
-		'languages' => array(Language::getDefaultLanguageCode() => $customerlanguages[Language::getDefaultLanguageCode()])
+		'languages' => $deflanguage
 	);
 }
 
@@ -112,34 +110,89 @@ foreach ($destinations as $type => $destination) {
 		$messageformsplitters = array();
 
 		// Individual Message (type-subtype-language).
-		foreach ($destination['languages'] as $languagecode => $languagename) {
-			$blankmessagewarning = $countlanguages > 1 ? '<span id="messageemptyspan">' . _L("The %s message is blank, so these contacts will receive messages in the default language.", ucfirst($languagename)) . '</span>' : '';
-			$messageformname = "{$type}-{$subtype}-{$languagecode}";
-
-			$messagetexts = array(
-				'source' => $existingmessagegroup->getMessageText($type,$subtype,$languagecode, 'source'),
-				'translated' => $existingmessagegroup->getMessageText($type,$subtype,$languagecode, 'translated'),
-				'overridden' => $existingmessagegroup->getMessageText($type,$subtype,$languagecode, 'overridden'),
-				'none' => $existingmessagegroup->getMessageText($type,$subtype,$languagecode, 'none')
-			);
+		foreach ($destination['languages'] as $languagecode => $languagename) {	
+			$messageformdata = array();
 			
-			if (!empty($messagetexts['overridden'])) {
-				$messagetext = $messagetexts['overridden'];
-				$message = $existingmessagegroup->getMessage($type,$subtype,$languagecode, 'overridden');
-			} else if (!empty($messagetexts['translated'])) {
-				$messagetext = $messagetexts['translated'];
-				$message = $existingmessagegroup->getMessage($type,$subtype,$languagecode, 'translated');
-			} else {
-				$messagetext = $messagetexts['none'];
-				$message = $existingmessagegroup->getMessage($type,$subtype,$languagecode, 'none');
+			if (!$message = $existingmessagegroup->getMessage($type,$subtype,$languagecode, 'overridden')) {
+				if (!$message = $existingmessagegroup->getMessage($type,$subtype,$languagecode, 'translated'))
+					$message = $existingmessagegroup->getMessage($type,$subtype,$languagecode, 'none');
 			}
 			
-			if ($subtype != 'html')
-				$messagetext = escapehtml($messagetext);
-
-			$messageformdata = array();
+			if ($message) {
+				$parts = DBFindMany('MessagePart', 'from messagepart where messageid=?', false, array($message->id));
+				$messagetext = $subtype != 'html' ? escapehtml($message->format($parts)) : $message->format($parts);
+			}
+			
+			if ($type == 'sms') {
+				$messageformdata["header"] = makeFormHtml("<div class='MessageBodyHeader'>" . _L("SMS Message") . "</div>");
+				if ($message)
+					$messageformdata["message"] = makeFormHtml("<div class='MessageTextReadonly'>$messagetext</div>");
+				// Don't show a blank-message warning for SMS.
+			} else {
+				$messageformdata["header"] = makeFormHtml("<div class='MessageBodyHeader'>" . _L("%s Message", $languagename) . "</div>");
+				
+				if ($message) {
+					$messagehtml = "<div class='MessageTextReadonly'>$messagetext</div>";
+					
+					if ($type == 'phone') {
+						$messagehtml .= icon_button(_L("Play"), "fugue/control",
+								"popup('previewmessage.php?id={$message->id}', 400, 400,'preview');"
+							) .
+							"<div style='clear:both'></div>";
+					}
+				// Don't show a blank-message warning if either subtype has a message.
+				} else if ($subtype == 'html' && $existingmessagegroup->hasMessage($type, 'plain', $languagecode)) {
+					$messagehtml = '';
+				} else if ($subtype == 'plain' && $existingmessagegroup->hasMessage($type, 'html', $languagecode)) {
+					$messagehtml = '';
+				} else if ($countlanguages > 1) {
+					$messagehtml = '<span id="messageemptyspan">' .
+						_L("The %s message is blank, so these contacts will receive messages in the default language.", $languagename) .
+						'</span>';
+				} else {
+					$messagehtml = '';
+				}
+				
+				$messageformdata["message"] = makeFormHtml($messagehtml);
+				
+				if ($message && $message->type == 'translated')
+					$messageformdata["branding"] = makeBrandingFormHtml();
+			}
+			
+			/////////////////////////////////
+			// Accordion Sections
+			/////////////////////////////////
 			$accordionsplitterchildren = array();
 			$advancedoptionsformdata = array();
+			
+			// Accordion sections for phone and email.
+			if ($type == 'phone') {
+				$gendervalues = array ("female" => "Female","male" => "Male");
+				$advancedoptionsformdata['preferredgender'] = array(
+					"label" => _L('Preferred Voice'),
+					"control" => array("FormHtml", "html" => $gendervalues[$existingmessagegroup->getGlobalPreferredGender()]),
+					"helpstep" => 1
+				);
+			} else if ($type == 'email') {
+				$attachmentshtml = "";
+				
+				foreach ($emailattachments as $emailattachment) {
+					$urifilename = urlencode($emailattachment->filename);
+					$filename = escapehtml($emailattachment->filename);
+					$filesize = (int)($emailattachment->size / 1024);
+					$attachmentshtml .= "<a href='emailattachment.php?id={$emailattachment->contentid}&name={$urifilename}'>$filename</a>";
+					$attachmentshtml .= "&nbsp;(Size: {$filesize}k)&nbsp;";
+				}
+				
+				$accordionsplitterchildren[] = array("title" => _L("Attachments"),
+					"icon" => "img/icons/diagona/16/190.gif",
+					"formdata" => array(makeFormHtml(
+						$attachmentshtml != "" ? $attachmentshtml : _L("There are no attachments.")
+					))
+				);
+			}
+			
+			// Accordion sections common to all destination types.	
 			$autoexpirevalues = array(
 				"Yes (Keep for ". getSystemSetting('softdeletemonths', "6") ." months)",
 				"No (Keep forever)"
@@ -150,56 +203,8 @@ foreach ($destinations as $type => $destination) {
 				"helpstep" => 1
 			);
 			
-			if ($type == 'sms') {
-				$messageformdata["header"] = makeFormHtml("<div class='MessageBodyHeader'>" . _L("SMS Message") . "</div>");
-				if (!empty($messagetext))
-					$messageformdata["message"] = makeFormHtml("<div class='MessageTextReadonly'>$messagetext</div>");
-			} else {
-				$messageformdata["header"] = makeFormHtml("<div class='MessageBodyHeader'>" . _L("%s Message", ucfirst($languagename)) . "</div>");
-				
-				if (!empty($messagetext)) {
-					$messagehtml = "<div class='MessageTextReadonly'>$messagetext</div>";
-					
-					if ($type == 'phone') {
-						$playbutton = icon_button(_L("Play"),"fugue/control",
-							"popup('previewmessage.php?id={$message->id}', 400, 400,'preview');"
-						);
-						$messagehtml .= "$playbutton<div style='clear:both'></div>";
-					}
-				} else {
-					$messagehtml = $blankmessagewarning;
-				}
-				
-				$messageformdata["message"] = makeFormHtml($messagehtml);
-				if (!empty($messagetexts['translated']))
-					$messageformdata["branding"] = makeBrandingFormHtml();
-					
-				if ($type == 'phone') {
-					$gendervalues = array ("female" => "Female","male" => "Male");
-					$advancedoptionsformdata['preferredgender'] = array(
-						"label" => _L('Preferred Voice'),
-						"control" => array("FormHtml", "html" => $gendervalues[$existingmessagegroup->getGlobalPreferredGender('female')]),
-						"helpstep" => 1
-					);
-				} else if ($type == 'email') {
-					$attachmentshtml = "";
-					
-					foreach ($emailattachments as $emailattachment) {
-						$urifilename = urlencode($emailattachment->filename);
-						$filename = escapehtml($emailattachment->filename);
-						$filesize = (int)($emailattachment->size / 1024);
-						$attachmentshtml .= "<a href='emailattachment.php?id={$emailattachment->contentid}&name={$urifilename}'>$filename</a>";
-						$attachmentshtml .= "&nbsp;(Size: {$filesize}k)&nbsp;";
-					}
-					
-					if ($attachmentshtml == "")
-						$attachmentshtml = _L("There are no attachments.");
-					$accordionsplitterchildren[] = array("title" => _L("Attachments"), "icon" => "img/icons/diagona/16/190.gif", "formdata" => array(makeFormHtml($attachmentshtml)));
-				}
-			}
-			
 			$accordionsplitterchildren[] = array("title" => _L("Advanced Options"), "icon" => "img/icons/diagona/16/041.gif", "formdata" => $advancedoptionsformdata);
-			$messageformsplitters[] = new FormSplitter($messageformname, $languagename,
+			$messageformsplitters[] = new FormSplitter("{$type}-{$subtype}-{$languagecode}", $languagename,
 				$existingmessagegroup->hasMessage($type, $subtype, $languagecode) ? "img/icons/accept.gif" : "img/icons/diagona/16/160.gif",
 				"verticalsplit",
 				array(),
@@ -220,33 +225,44 @@ foreach ($destinations as $type => $destination) {
 
 	if (count($destination['subtypes']) > 1) {
 		if ($type == 'email') {
-			$emailheadersformdata = array();
-			$emailheadersformdata['subject'] = array(
-				"label" => _L('Subject'),
-				"control" => array("FormHtml","html" => $emailheaders['subject']),
-				"helpstep" => 1
-			);
-			$emailheadersformdata['fromname'] = array(
-				"label" => _L('From Name'),
-				"control" => array("FormHtml","html" => $emailheaders['fromname']),
-				"helpstep" => 1
-			);
-			$emailheadersformdata['fromemail'] = array(
-				"label" => _L('From Email'),
-				"control" => array("FormHtml","html" => $emailheaders['fromemail']),
-				"helpstep" => 1
+			$emailheadersformdata = array(
+				'subject' => array(
+					"label" => _L('Subject'),
+					"control" => array("FormHtml","html" => $emailheaders['subject']),
+					"helpstep" => 1
+				),
+				'fromname' => array(
+					"label" => _L('From Name'),
+					"control" => array("FormHtml","html" => $emailheaders['fromname']),
+					"helpstep" => 1
+				),
+				'fromemail' => array(
+					"label" => _L('From Email'),
+					"control" => array("FormHtml","html" => $emailheaders['fromemail']),
+					"helpstep" => 1
+				)
 			);
 
-			$destinationlayoutforms[] = new FormSplitter("emailheaders", ucfirst($type), $existingmessagegroup->hasMessage($type) ? "img/icons/accept.gif" : "img/icons/diagona/16/160.gif", "horizontalsplit", array(), array(
-				array("title" => "", "formdata" => $emailheadersformdata),
-				new FormTabber("", "", null, "horizontaltabs", $subtypelayoutforms)
-			));
+			$destinationlayoutforms[] = new FormSplitter("emailheaders", ucfirst($type),
+				// Icon.
+				$existingmessagegroup->hasMessage($type) ? "img/icons/accept.gif" : "img/icons/diagona/16/160.gif",
+				// Layout-type.
+				"horizontalsplit",
+				// Buttons.
+				array(),
+				// Children.
+				array(
+					array("title" => "", "formdata" => $emailheadersformdata),
+					new FormTabber("", "", null, "horizontaltabs", $subtypelayoutforms)
+				)
+			);
 		}
 	} else if (count($subtypelayoutforms) == 1) { // Phone, Sms.
 		if ($type == 'sms')
 			$subtypelayoutforms[0]->title = 'SMS';
 		else
 			$subtypelayoutforms[0]->title = ucfirst($type);
+		
 		$destinationlayoutforms[] = $subtypelayoutforms[0];
 	}
 }
@@ -302,9 +318,9 @@ include_once('nav.inc.php');
 <?php
 startWindow(_L('Message Viewer'));
 
-$firstdestinationtype = array_shift(array_keys($destinations));
-$firstdestinationsubtype = array_shift($destinations[$firstdestinationtype]['subtypes']);
-$defaultsections = array("{$firstdestinationtype}-{$firstdestinationsubtype}", "{$firstdestinationtype}-{$firstdestinationsubtype}-{Language::getDefaultLanguageCode()}");
+$firstdestinationtype = reset(array_keys($destinations));
+$firstdestinationsubtype = reset($destinations[$firstdestinationtype]['subtypes']);
+$defaultsections = array("{$firstdestinationtype}-{$firstdestinationsubtype}", "{$firstdestinationtype}-{$firstdestinationsubtype}-" . Language::getDefaultLanguageCode());
 if ($firstdestinationtype == 'email')
 	$defaultsections[] = "emailheaders";
 echo '<div id="messagegroupformcontainer">' . $messagegroupsplitter->render($defaultsections) . '</div>';
@@ -318,9 +334,9 @@ echo '<div id="messagegroupformcontainer">' . $messagegroupsplitter->render($def
 			'currentdestinationtype': '<?=$firstdestinationtype?>',
 			'currentsubtype': '<?=$firstdestinationsubtype?>',
 			'currentlanguagecode': '<?=Language::getDefaultLanguageCode()?>',
-			'messagegroupsummary': <?=json_encode(QuickQueryMultiRow("select distinct type,subtype,languagecode from message where userid=? and messagegroupid=? and not deleted order by type,subtype,languagecode", true, false, array($USER->id, $existingmessagegroup->id)))?>
+			'messagegroupsummary': <?=json_encode(MessageGroup::getSummary($existingmessagegroup->id))?>
 		};
-
+		
 		var formswitchercontainer = $('messagegroupformcontainer');
 
 		formswitchercontainer.observe('FormSplitter:BeforeTabLoad',
