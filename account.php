@@ -425,7 +425,9 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		if (!$readonly) {
 			$USER->firstname = $postdata['firstname'];
 			$USER->lastname = $postdata['lastname'];
-			$USER->login = $postdata['login'];
+			if (!$USER->ldap) {
+				$USER->login = $postdata['login'];
+			}
 			$USER->accesscode = $postdata['accesscode'];
 			$USER->email = $postdata['email'];
 			$USER->aremail = $postdata['aremail'];
