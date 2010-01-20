@@ -35,27 +35,16 @@ $cansendmultilingual = $USER->authorize('sendmulti');
 
 // Only kick the user out if he does not have permission to create any message at all (neither phone, email, nor sms).
 if (!$cansendphone && !$cansendemail && !$cansendsms) {
-	unset($_SESSION['viewmessagegroupid']);
 	redirect('unauthorized.php');
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 // Request processing:
 ///////////////////////////////////////////////////////////////////////////////
-
-if (isset($_GET['id'])) {
-	$id = $_GET['id'] + 0;
-	if (userOwns('messagegroup',$id))
-		$_SESSION['viewmessagegroupid'] = $id;
-	redirect('viewmessagegroup.php');
-}
-
-if (!isset($_SESSION['viewmessagegroupid'])) {
+if (!isset($_GET['id']) || !userOwns('messagegroup',$_GET['id'] + 0))
 	redirect('unauthorized.php');
-}
 
-$existingmessagegroup = new MessageGroup($_SESSION['viewmessagegroupid']);
-
+$messagegroup = new MessageGroup($_GET['id'] + 0);
 
 ///////////////////////////////////////////////////////////////////////////////
 // Data Gathering:
@@ -68,7 +57,7 @@ $deflanguage = array($deflanguagecode => Language::getName($deflanguagecode));
 //if the user can send multi-lingual notifications use all languages, otherwise use an array of just the default.
 $customerlanguages = $cansendmultilingual ? Language::getLanguageMap() : $deflanguage;
 
-$emailheaders = $existingmessagegroup->getGlobalEmailHeaders(
+$emailheaders = $messagegroup->getGlobalEmailHeaders(
 	array(
 		'subject' => '',
 		'fromname' => '',
@@ -76,7 +65,7 @@ $emailheaders = $existingmessagegroup->getGlobalEmailHeaders(
 	)
 );
 
-$emailattachments = $existingmessagegroup->getGlobalEmailAttachments();
+$emailattachments = $messagegroup->getGlobalEmailAttachments();
 
 // $destinations is a tree that is populated according to the user's permissions; it contains destination types, subtypes, and languages.
 $destinations = array();
@@ -113,9 +102,9 @@ foreach ($destinations as $type => $destination) {
 		foreach ($destination['languages'] as $languagecode => $languagename) {	
 			$messageformdata = array();
 			
-			if (!$message = $existingmessagegroup->getMessage($type,$subtype,$languagecode, 'overridden')) {
-				if (!$message = $existingmessagegroup->getMessage($type,$subtype,$languagecode, 'translated'))
-					$message = $existingmessagegroup->getMessage($type,$subtype,$languagecode, 'none');
+			if (!$message = $messagegroup->getMessage($type,$subtype,$languagecode, 'overridden')) {
+				if (!$message = $messagegroup->getMessage($type,$subtype,$languagecode, 'translated'))
+					$message = $messagegroup->getMessage($type,$subtype,$languagecode, 'none');
 			}
 			
 			if ($message) {
@@ -141,9 +130,9 @@ foreach ($destinations as $type => $destination) {
 							"<div style='clear:both'></div>";
 					}
 				// Don't show a blank-message warning if either subtype has a message.
-				} else if ($subtype == 'html' && $existingmessagegroup->hasMessage($type, 'plain', $languagecode)) {
+				} else if ($subtype == 'html' && $messagegroup->hasMessage($type, 'plain', $languagecode)) {
 					$messagehtml = '';
-				} else if ($subtype == 'plain' && $existingmessagegroup->hasMessage($type, 'html', $languagecode)) {
+				} else if ($subtype == 'plain' && $messagegroup->hasMessage($type, 'html', $languagecode)) {
 					$messagehtml = '';
 				} else if ($countlanguages > 1) {
 					$messagehtml = '<span id="messageemptyspan">' .
@@ -170,7 +159,7 @@ foreach ($destinations as $type => $destination) {
 				$gendervalues = array ("female" => "Female","male" => "Male");
 				$advancedoptionsformdata['preferredgender'] = array(
 					"label" => _L('Preferred Voice'),
-					"control" => array("FormHtml", "html" => $gendervalues[$existingmessagegroup->getGlobalPreferredGender()]),
+					"control" => array("FormHtml", "html" => $gendervalues[$messagegroup->getGlobalPreferredGender()]),
 					"helpstep" => 1
 				);
 			} else if ($type == 'email') {
@@ -199,13 +188,13 @@ foreach ($destinations as $type => $destination) {
 			);
 			$advancedoptionsformdata['autoexpire'] = array(
 				"label" => _L('Auto Expire'),
-				"control" => array("FormHtml","html" => $autoexpirevalues[$existingmessagegroup->permanent]),
+				"control" => array("FormHtml","html" => $autoexpirevalues[$messagegroup->permanent]),
 				"helpstep" => 1
 			);
 			
 			$accordionsplitterchildren[] = array("title" => _L("Advanced Options"), "icon" => "img/icons/diagona/16/041.gif", "formdata" => $advancedoptionsformdata);
 			$messageformsplitters[] = new FormSplitter("{$type}-{$subtype}-{$languagecode}", $languagename,
-				$existingmessagegroup->hasMessage($type, $subtype, $languagecode) ? "img/icons/accept.gif" : "img/icons/diagona/16/160.gif",
+				$messagegroup->hasMessage($type, $subtype, $languagecode) ? "img/icons/accept.gif" : "img/icons/diagona/16/160.gif",
 				"verticalsplit",
 				array(),
 				array(
@@ -216,7 +205,7 @@ foreach ($destinations as $type => $destination) {
 		}
 
 		if ($countlanguages > 1) {
-			$subtypelayoutforms[] = new FormTabber("{$type}-{$subtype}", $subtype == 'html' ? 'HTML' : ucfirst($subtype), $existingmessagegroup->hasMessage($type, $subtype) ? "img/icons/accept.gif" : "img/icons/diagona/16/160.gif", "verticaltabs", $messageformsplitters);
+			$subtypelayoutforms[] = new FormTabber("{$type}-{$subtype}", $subtype == 'html' ? 'HTML' : ucfirst($subtype), $messagegroup->hasMessage($type, $subtype) ? "img/icons/accept.gif" : "img/icons/diagona/16/160.gif", "verticaltabs", $messageformsplitters);
 		} else if ($countlanguages == 1) {
 			$messageformsplitters[0]->title = ucfirst($subtype);
 			$subtypelayoutforms[] = $messageformsplitters[0];
@@ -245,7 +234,7 @@ foreach ($destinations as $type => $destination) {
 
 			$destinationlayoutforms[] = new FormSplitter("emailheaders", ucfirst($type),
 				// Icon.
-				$existingmessagegroup->hasMessage($type) ? "img/icons/accept.gif" : "img/icons/diagona/16/160.gif",
+				$messagegroup->hasMessage($type) ? "img/icons/accept.gif" : "img/icons/diagona/16/160.gif",
 				// Layout-type.
 				"horizontalsplit",
 				// Buttons.
@@ -267,7 +256,7 @@ foreach ($destinations as $type => $destination) {
 	}
 }
 
-$destinationlayoutforms[] = makeSummaryTab($destinations, $customerlanguages, Language::getDefaultLanguageCode(), $existingmessagegroup);
+$destinationlayoutforms[] = makeSummaryTab($destinations, $customerlanguages, Language::getDefaultLanguageCode(), $messagegroup);
 
 //////////////////////////////////////////////////////////
 // Finalize the formsplitter.
@@ -278,13 +267,13 @@ $messagegroupsplitter = new FormSplitter("messagegroupbasics", "", null, "horizo
 	array("title" => "", "formdata" => array(
 		'name' => array(
 			"label" => _L('Message Name'),
-			"control" => array("FormHtml","html" => $existingmessagegroup->name),
+			"control" => array("FormHtml","html" => $messagegroup->name),
 			"helpstep" => 1
 		),
 		'defaultlanguagecode' => array(
 			"label" => _L('Default Language'),
 			// NOTE: It is not necessary to capitalize the language names in $customerlanguages because it should already be so in the database.
-			"control" => array("FormHtml","html" => $customerlanguages[$existingmessagegroup->defaultlanguagecode]),
+			"control" => array("FormHtml","html" => $customerlanguages[$messagegroup->defaultlanguagecode]),
 			"helpstep" => 1
 		)
 	)),
@@ -334,7 +323,7 @@ echo '<div id="messagegroupformcontainer">' . $messagegroupsplitter->render($def
 			'currentdestinationtype': '<?=$firstdestinationtype?>',
 			'currentsubtype': '<?=$firstdestinationsubtype?>',
 			'currentlanguagecode': '<?=Language::getDefaultLanguageCode()?>',
-			'messagegroupsummary': <?=json_encode(MessageGroup::getSummary($existingmessagegroup->id))?>
+			'messagegroupsummary': <?=json_encode(MessageGroup::getSummary($messagegroup->id))?>
 		};
 		
 		var formswitchercontainer = $('messagegroupformcontainer');
@@ -345,7 +334,7 @@ echo '<div id="messagegroupformcontainer">' . $messagegroupsplitter->render($def
 
 		// When a tab is loaded, update the status icon of the previous tab.
 		formswitchercontainer.observe('FormSplitter:TabLoaded',
-			messagegroupHandleTabLoaded.bindAsEventListener(formswitchercontainer, state, '<?=$existingmessagegroup->id?>', '<?=Language::getDefaultLanguageCode()?>', null, true)
+			messagegroupHandleTabLoaded.bindAsEventListener(formswitchercontainer, state, '<?=$messagegroup->id?>', '<?=Language::getDefaultLanguageCode()?>', null, true)
 		);
 		
 		form_init_splitter(formswitchercontainer, <?=json_encode($defaultsections)?>, true);
