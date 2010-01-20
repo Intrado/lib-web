@@ -4,6 +4,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 require_once("inc/common.inc.php");
 require_once("obj/Message.obj.php");
+require_once("obj/MessageGroup.obj.php");
 require_once("obj/MessagePart.obj.php");
 require_once("obj/MessageAttachment.obj.php");
 require_once("obj/AudioFile.obj.php");
@@ -92,7 +93,7 @@ function handleRequest() {
 		case 'messagegroupsummary':
 			if (!isset($_GET['messagegroupid']))
 				return false;
-			return QuickQueryMultiRow("select distinct type,subtype,languagecode from message where userid=? and messagegroupid=? and not deleted order by type,subtype,languagecode", true, false, array($USER->id, $_GET['messagegroupid']));
+			return MessageGroup::getSummary($_GET['messagegroupid']);
 			
 		case 'hasmessage':
 			if (!isset($_GET['messagetype']) && !isset($_GET['messageid']))
