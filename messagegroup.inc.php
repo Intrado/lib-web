@@ -550,10 +550,11 @@ class ValDefaultLanguageCode extends Validator {
 			foreach ($existinglanguagecodes as $key => $languagecodes) {
 				if (!in_array($requestedlanguagecode, $languagecodes)) {
 					list($type, $subtype) = explode('-', $key);
+
 					if ($type == 'email')
 						return _L('Please first create the %1$s message for %2$s in %3$s.', Language::getName($requestedlanguagecode), ucfirst($type), $subtype == 'html' ? 'HTML' : ucfirst($subtype));
 					else
-						return _L('Please first create the %1$s message for %2$.', Language::getName($requestedlanguagecode), $type == 'sms' ? 'SMS' : ucfirst($type));
+						return _L('Please first create the %1$s message for %2$s.', Language::getName($requestedlanguagecode), $type == 'sms' ? 'SMS' : ucfirst($type));
 				}
 			}
 		}
