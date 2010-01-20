@@ -25,6 +25,10 @@ class Language extends DBMappedObject {
 		$languages = Language::getLanguageMap();
 		return isset($languages[$code]) ? $languages[$code] : $code;
 	}
+	
+	static function getDefaultLanguageCode() {
+		return 'en';
+	}
 }
 
 ?>
