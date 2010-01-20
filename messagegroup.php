@@ -43,33 +43,12 @@ $cansendmultilingual = $USER->authorize('sendmulti');
 
 // Only kick the user out if he does not have permission to create any message at all (neither phone, email, nor sms).
 if (!$cansendphone && !$cansendemail && !$cansendsms) {
-	unset($_SESSION['messagegroupid']);
 	redirect('unauthorized.php');
-}
-
-///////////////////////////////////////////////////////////////////////////////
-// Request processing:
-///////////////////////////////////////////////////////////////////////////////
-// Only unset the session variable if navigating to messagegroup.php via a link, which we can detect when there is only ?messagegroupid and no postdata.
-// A form's ajax call keeps the url components intact so that ?messagegroupid=new will remain even after we've created a messagegroup.
-// If we do not make this strict check, the session variable will get unset and a new messagegroup would be created each time a form makes an ajax call.
-if (isset($_GET['id']) && empty($_POST) && count($_GET) == 1) {
-	unset($_SESSION['messagegroupid']);
-	unset($_SESSION['emailheaders']);
-	if ($existingmessagegroupid = $_GET['id'] + 0) {
-		if (userOwns('messagegroup', $existingmessagegroupid))
-			$_SESSION['messagegroupid'] = $existingmessagegroupid;
-		else
-			redirect('unauthorized.php');
-	} else { // URL: ?messagegroupid=new
-		// Continue below, where a new messagegroup is created because the session variable is not set.
-	}
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 // Defaults.
 ///////////////////////////////////////////////////////////////////////////////
-$defaultpreferredgender = 'female';
 $defaultautotranslate = 'none';
 $defaultpermanent = 0;
 $defaultmessagegroupname = 'Please enter a name';
@@ -80,29 +59,38 @@ $defaultemailheaders = array(
 );
 
 ///////////////////////////////////////////////////////////////////////////////
-// Instantiate Message Group
+// Request processing:
 ///////////////////////////////////////////////////////////////////////////////
-if (isset($_SESSION['messagegroupid'])) {
-	$existingmessagegroup = new MessageGroup($_SESSION['messagegroupid']);
-} else {
-	// For a new messagegroup, it is first created in the database as deleted
-	// in case the user does not submit the form. Once the form is submitted, the
-	// messagegroup is set as not deleted; the permanent flag is toggled by the user.
-	$newmessagegroup = new MessageGroup();
-	$newmessagegroup->userid = $USER->id;
-	$newmessagegroup->name = $defaultmessagegroupname;
-	$newmessagegroup->defaultlanguagecode = Language::getDefaultLanguageCode();
-	$newmessagegroup->description = '';
-	$newmessagegroup->modified =  makeDateTime(time());
-	$newmessagegroup->deleted = 1; // Set to deleted in case the user does not submit the form.
-	$newmessagegroup->permanent = $defaultpermanent;
+if (isset($_GET['id'])) {
+	unset($_SESSION['emailheaders']);
+	unset($_SESSION['emailattachments']);
+	setCurrentMessageGroup($_GET['id']);
 
-	if ($newmessagegroup->create()) {
-		$_SESSION['messagegroupid'] = $newmessagegroup->id;
-	} else {
-		redirect('unauthorized.php');
+	if ($_GET['id'] === 'new') {
+		// For a new messagegroup, it is first created in the database as deleted
+		// in case the user does not submit the form. Once the form is submitted, the
+		// messagegroup is set as not deleted; the permanent flag is toggled by the user.
+		$newmessagegroup = new MessageGroup();
+		$newmessagegroup->userid = $USER->id;
+		$newmessagegroup->name = $defaultmessagegroupname;
+		$newmessagegroup->defaultlanguagecode = Language::getDefaultLanguageCode();
+		$newmessagegroup->description = '';
+		$newmessagegroup->modified =  makeDateTime(time());
+		$newmessagegroup->deleted = 1; // Set to deleted in case the user does not submit the form.
+		$newmessagegroup->permanent = $defaultpermanent;
+
+		if ($newmessagegroup->create())
+			$_SESSION['messagegroupid'] = $newmessagegroup->id;
+			
+		redirect();
 	}
 }
+
+if (!isset($_SESSION['messagegroupid'])) {
+	redirect('unauthorized.php');
+}
+
+$messagegroup = new MessageGroup(getCurrentMessageGroup());
 
 ///////////////////////////////////////////////////////////////////////////////
 // Data Gathering:
@@ -128,31 +116,21 @@ $customerphonetranslationlanguages = array_intersect_key($ttslanguages, $transla
 
 $datafields = FieldMap::getAuthorizedMapNames();
 
-$preferredgender = isset($existingmessagegroup) ? $existingmessagegroup->getGlobalPreferredGender($defaultpreferredgender) : $defaultpreferredgender;
+$preferredgender = $messagegroup->getGlobalPreferredGender();
 
-$permanent = isset($existingmessagegroup) ? $existingmessagegroup->permanent : $defaultpermanent;
+$permanent = $messagegroup->permanent;
 
-if (!isset($existingmessagegroup))
-	unset($_SESSION['emailheaders']);
 if (!isset($_SESSION['emailheaders'])) {
-	$_SESSION['emailheaders'] = isset($existingmessagegroup) ? $existingmessagegroup->getGlobalEmailHeaders($defaultemailheaders) : $defaultemailheaders;
+	$_SESSION['emailheaders'] = $messagegroup->getGlobalEmailHeaders($defaultemailheaders);
 }
 
-// $emailattachments is a map indexed by contentid, containing size and name of each attachment.
-if (isset($existingmessagegroup)) {
-	$emailattachments = array();
-	
-	$attachments = $existingmessagegroup->getGlobalEmailAttachments();
-	foreach ($attachments as $attachment) {
-		$emailattachments[$attachment->contentid] = array("size" => $attachment->size, "name" => $attachment->filename);
-	}
-	
-	if (empty($emailattachments) && isset($_SESSION['emailattachments']))
-		$emailattachments = $_SESSION['emailattachments'];
-} else {
-	unset($_SESSION['emailattachments']);
-	$emailattachments = array();
+// $emailattachments is a map indexed by contentid, containing size and name of each attachment, passed as data to the EmailAttach formitem.
+$emailattachments = array();
+foreach ($messagegroup->getGlobalEmailAttachments() as $attachment) {
+	$emailattachments[$attachment->contentid] = array("size" => $attachment->size, "name" => $attachment->filename);
 }
+if (empty($emailattachments) && isset($_SESSION['emailattachments']))
+	$emailattachments = $_SESSION['emailattachments'];
 
 // $destinations is a tree that is populated according to the user's permissions; it contains destination types, subtypes, and languages.
 $destinations = array();
@@ -191,7 +169,7 @@ foreach ($destinations as $type => $destination) {
 			$autotranslatorformdata = array();
 
 			if (empty($_SESSION["autotranslatesourcetext{$type}{$subtype}"]))
-				$_SESSION["autotranslatesourcetext{$type}{$subtype}"] = isset($existingmessagegroup) ? $existingmessagegroup->getMessageText($type,$subtype,Language::getDefaultLanguageCode(), 'none') : '';
+				$_SESSION["autotranslatesourcetext{$type}{$subtype}"] = $messagegroup->getMessageText($type,$subtype,Language::getDefaultLanguageCode(), 'none');
 
 			if ($type == 'phone' || $type == 'email') {
 				$autotranslatorformdata["header"] = makeFormHtml("<div class='MessageBodyHeader'>" . _L("Automatic Translation") . "</div>" . icon_button(_L("Clear"),"delete", null, null, 'id="clearmessagebutton"') . "<span id='messageemptyspan'></span>");
@@ -256,7 +234,7 @@ foreach ($destinations as $type => $destination) {
 						continue;
 
 					$translationitems[] = "{$languagecode}-translationitem";
-					$autotranslatorformdata["{$languagecode}-translationitem"] = makeTranslationItem(false, $type, $subtype, $languagecode, $languagename, $preferredgender, $_SESSION["autotranslatesourcetext{$type}{$subtype}"], "", $languagename, false, false, false, !(isset($existingmessagegroup) && $existingmessagegroup->hasMessage($type, $subtype, $languagecode)), '', null, true);
+					$autotranslatorformdata["{$languagecode}-translationitem"] = makeTranslationItem(false, $type, $subtype, $languagecode, $languagename, $preferredgender, $_SESSION["autotranslatesourcetext{$type}{$subtype}"], "", $languagename, false, false, false, !$messagegroup->hasMessage($type, $subtype, $languagecode), '', null, true);
 				}
 				
 				$autotranslatorformdata["sourcemessagebody"]["requires"] = $translationitems;
@@ -275,18 +253,16 @@ foreach ($destinations as $type => $destination) {
 			$messageformname = "{$type}-{$subtype}-{$languagecode}";
 
 			$messagetexts = array(
-				'source' => isset($existingmessagegroup) ? $existingmessagegroup->getMessageText($type,$subtype,$languagecode, 'source') : '',
-				'translated' => isset($existingmessagegroup) ? $existingmessagegroup->getMessageText($type,$subtype,$languagecode, 'translated') : '',
-				'overridden' => isset($existingmessagegroup) ? $existingmessagegroup->getMessageText($type,$subtype,$languagecode, 'overridden') : '',
-				'none' => isset($existingmessagegroup) ? $existingmessagegroup->getMessageText($type,$subtype,$languagecode, 'none') : ''
+				'source' => $messagegroup->getMessageText($type,$subtype,$languagecode, 'source'),
+				'translated' => $messagegroup->getMessageText($type,$subtype,$languagecode, 'translated'),
+				'overridden' => $messagegroup->getMessageText($type,$subtype,$languagecode, 'overridden'),
+				'none' => $messagegroup->getMessageText($type,$subtype,$languagecode, 'none')
 			);
 
 			$formdata = array();
-			if (isset($existingmessagegroup)) {
-				$required = $existingmessagegroup->defaultlanguagecode == $languagecode;
-			} else {
-				$required = $languagecode == Language::getDefaultLanguageCode();
-			}
+			
+			$required = $messagegroup->defaultlanguagecode == $languagecode;
+			
 			if (($type == 'phone' && isset($customerphonetranslationlanguages[$languagecode])) || ($type == 'email' && isset($customeremailtranslationlanguages[$languagecode]))) {
 				$translationenabled = empty($messagetexts['none']);
 				
@@ -489,13 +465,13 @@ foreach ($destinations as $type => $destination) {
 
 			$accordionsplitter = makeAccordionSplitter($type, $subtype, $languagecode, $permanent, $preferredgender, false, $type == 'email' ? $emailattachments : null, isset($formdata['translationitem']) ? true : false);
 
-			$messageformsplitters[] = new FormSplitter($messageformname, $languagename, isset($existingmessagegroup) && $existingmessagegroup->hasMessage($type, $subtype, $languagecode) ? "img/icons/accept.gif" : "img/icons/diagona/16/160.gif", "verticalsplit", array(), array(
+			$messageformsplitters[] = new FormSplitter($messageformname, $languagename, $messagegroup->hasMessage($type, $subtype, $languagecode) ? "img/icons/accept.gif" : "img/icons/diagona/16/160.gif", "verticalsplit", array(), array(
 			array("title" => "", "formdata" => $formdata),
 			$accordionsplitter));
 		}
 
 		if ($countlanguages > 1) {
-			$subtypelayoutforms[] = new FormTabber("{$type}-{$subtype}", $subtype == 'html' ? 'HTML' : ucfirst($subtype), isset($existingmessagegroup) && $existingmessagegroup->hasMessage($type, $subtype) ? "img/icons/accept.gif" : "img/icons/diagona/16/160.gif", "verticaltabs", $messageformsplitters);
+			$subtypelayoutforms[] = new FormTabber("{$type}-{$subtype}", $subtype == 'html' ? 'HTML' : ucfirst($subtype), $messagegroup->hasMessage($type, $subtype) ? "img/icons/accept.gif" : "img/icons/diagona/16/160.gif", "verticaltabs", $messageformsplitters);
 		} else if ($countlanguages == 1) {
 			$messageformsplitters[0]->title = ucfirst($subtype);
 			$subtypelayoutforms[] = $messageformsplitters[0];
@@ -504,7 +480,7 @@ foreach ($destinations as $type => $destination) {
 
 	if (count($destination['subtypes']) > 1) {
 		if ($type == 'email') {
-			$additionalvalidators = isset($existingmessagegroup) && $existingmessagegroup->getFirstMessageOfType('email') ? array(array("ValRequired")) : array();
+			$additionalvalidators = $messagegroup->getFirstMessageOfType('email') ? array(array("ValRequired")) : array();
 
 			$emailheadersformdata = array();
 			$emailheadersformdata['subject'] = array(
@@ -536,7 +512,7 @@ foreach ($destinations as $type => $destination) {
 				"helpstep" => 1
 			);
 
-			$destinationlayoutforms[] = new FormSplitter("emailheaders", ucfirst($type), isset($existingmessagegroup) && $existingmessagegroup->hasMessage($type) ? "img/icons/accept.gif" : "img/icons/diagona/16/160.gif", "horizontalsplit", array(), array(
+			$destinationlayoutforms[] = new FormSplitter("emailheaders", ucfirst($type), $messagegroup->hasMessage($type) ? "img/icons/accept.gif" : "img/icons/diagona/16/160.gif", "horizontalsplit", array(), array(
 				array("title" => "", "formdata" => $emailheadersformdata),
 				new FormTabber("", "", null, "horizontaltabs", $subtypelayoutforms)
 			));
@@ -550,20 +526,19 @@ foreach ($destinations as $type => $destination) {
 	}
 }
 
-$destinationlayoutforms[] = makeSummaryTab($destinations, $customerlanguages, Language::getDefaultLanguageCode(), isset($existingmessagegroup) ? $existingmessagegroup : null);
+$destinationlayoutforms[] = makeSummaryTab($destinations, $customerlanguages, Language::getDefaultLanguageCode(), $messagegroup);
 
 //////////////////////////////////////////////////////////
 // Finalize the formsplitter.
 //////////////////////////////////////////////////////////
 $buttons = array(icon_button(_L("Done"),"tick", "form_submit_all(null, 'done', $('formswitchercontainer'));", null), icon_button(_L("Cancel"),"cross",null,"messages.php"));
 
-$messagegroupname = isset($existingmessagegroup) ? $existingmessagegroup->name : $newmessagegroup->name;
 $messagegroupsplitter = new FormSplitter("messagegroupbasics", "", null, "horizontalsplit", $buttons, array(
 	array("title" => "", "formdata" => array(
 		'name' => array(
 			"label" => _L('Message Name'),
 			// If the user hasn't changed the message group's default name, then just show blank so that the user is forced to make a better one.
-			"value" => $messagegroupname == $defaultmessagegroupname ? '' : $messagegroupname,
+			"value" => $messagegroup->name == $defaultmessagegroupname ? '' : $messagegroup->name,
 			"validators" => array(
 				array("ValDuplicateNameCheck", "type" => "messagegroup"),
 				array("ValRequired"),
@@ -574,7 +549,7 @@ $messagegroupsplitter = new FormSplitter("messagegroupbasics", "", null, "horizo
 		),
 		'defaultlanguagecode' => array(
 			"label" => _L('Default Language'),
-			"value" => isset($existingmessagegroup) ? $existingmessagegroup->defaultlanguagecode : Language::getDefaultLanguageCode(),
+			"value" => $messagegroup->defaultlanguagecode,
 			"validators" => array(
 				array("ValRequired"),
 				array("ValInArray","values" => array_keys($customerlanguages)),
@@ -598,8 +573,6 @@ $messagegroupsplitter->handleRequest();
 ///////////////////////////////////////////////////////////////////////////////
 if ($button = $messagegroupsplitter->getSubmit()) {
 	$form = $messagegroupsplitter->getSubmittedForm();
-
-	$messagegroup = isset($existingmessagegroup) ? $existingmessagegroup : $newmessagegroup;
 
 	if ($form) {
 		$ajax = $form->isAjaxSubmit();
