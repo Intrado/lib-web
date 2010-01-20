@@ -164,7 +164,6 @@ form.newform {
 	vertical-align: top;
 }
 
-// HtmlRadioButtonBigCheck
 .newform .htmlradiobuttonbigcheck {
 	border: 0px;
 	padding: 0px;
