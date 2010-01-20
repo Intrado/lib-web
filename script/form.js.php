@@ -15,6 +15,21 @@ header("Cache-Control: private");
 
 // TODO: Need to localize text
 
+// Rebuild the url with the GET parameters that we want to add.
+// If any of the GET parameters that we want to add is already in the url, overwrite the value.
+function form_make_url(scriptname, getparameters) {
+	var params = scriptname.toQueryParams();
+	
+	for (var key in getparameters) {
+		params[key] = getparameters[key];
+	}
+	
+	var indexofquestionmark = scriptname.indexOf('?');
+	var cleanurl = (indexofquestionmark >= 0) ? scriptname.substring(0, indexofquestionmark) : scriptname;
+
+	return cleanurl + '?' + Object.toQueryString(params);
+}
+
 function form_event_handler (event) {
 	var form = event.findElement("form");
 	var formvars = document.formvars[form.name];
@@ -112,7 +127,11 @@ function form_do_validation (form, element) {
 		//special case, if we are doing ajax call, then validators isn't an array, just call ajax for the result
 		if (validators == "ajax") {
 			//tack on some stuff to GET query (see in logs which POSTs are just validation) and hide the value (dont need to see that in logs)
-			var posturl = formvars.scriptname + (formvars.scriptname.include('?') ? '&' : '?') + "ajaxvalidator=true&formitem=" + targetname;
+			var posturl = form_make_url(formvars.scriptname, {
+				'ajaxvalidator': 'true',
+				'formitem': targetname
+			});
+			
 			var postData = {
 				value: value,
 				requiredvalues: requiredvalues
@@ -523,8 +542,10 @@ function form_handle_submit(form,event) {
 	//update each element's msg area, and throw up an alert box explaining there are unresolved issues.
 
 	//add an ajax marker
+	var posturl = form_make_url(formvars.scriptname, {
+		'ajax': 'true'
+	});
 	
-	var posturl = formvars.scriptname + (formvars.scriptname.include('?') ? '&' : '?') + "ajax=true";
 	new Ajax.Request(posturl, {
 		method:'post',
 		parameters: form.serialize(true),
@@ -644,17 +665,15 @@ function form_submit_all (tabevent, value, formsplittercontainer) {
 			thissubmission.response = ajaxevent.memo;
 			
 			var formvars = document.formvars[this.name];
-			// Prepare a clean url without any GET parameters.
-			var indexofquestionmark = formvars.scriptname.indexOf('?');
-			var cleanurl = (indexofquestionmark >= 0) ? formvars.scriptname.substring(0, indexofquestionmark) : formvars.scriptname;
-			var posturl = cleanurl + "?ajax=true";
+			
+			var posturl = form_make_url(formvars.scriptname, {
+				'ajax': 'true'
+			});
 			
 			// Update this form's serial number only if this form will not get reloaded in the next tab.
 			var nexttab = tabevent ? tabevent.memo.section : null;
 			if (!ajaxevent.memo.errormessage) {
 				if (tabevent && (nexttab == tabevent.memo.currentSection || !tabevent.memo.widget.sections[nexttab].contentDiv.down('form#' + this.name))) {
-					var errortext = 'Sorry, an erorr occurred. This page will now reload';
-					
 					new Ajax.Request(posturl, {
 						method: 'post',
 						parameters: {'formsnum': this.name},
@@ -662,8 +681,7 @@ function form_submit_all (tabevent, value, formsplittercontainer) {
 							var data = response.responseJSON;
 							
 							if (!data || !data.formsnum) {
-								alert(errortext);
-								window.location = cleanurl;
+								// No need to alert because the next time they try to submit, a datachanged error will pop up.
 								return;
 							}
 							
@@ -671,11 +689,8 @@ function form_submit_all (tabevent, value, formsplittercontainer) {
 							if (formsnumfield) {
 								formsnumfield.value = data.formsnum;
 							}
-						}.bindAsEventListener(this),
-						onFailure: function(response) {
-							alert(errortext);
-							window.location = cleanurl;
 						}.bindAsEventListener(this)
+						// No need to alert for onFailure because the next time they try to submit, a datachanged error will pop up.
 					});
 				}
 				
@@ -755,11 +770,6 @@ function form_load_tab (form, widget, nexttab, specificsections, cacheajax) {
 	
 	document.tabvars.loading = true;
 	
-	// Prepare a clean url without any GET parameters.
-	var indexofquestionmark = formvars.scriptname.indexOf('?');
-	var cleanurl = (indexofquestionmark >= 0) ? formvars.scriptname.substring(0, indexofquestionmark) : formvars.scriptname;
-	var posturl = cleanurl + "?ajax=true";
-	
 	var loadtabhandler = function (response, widget, nexttab, specificsections) {
 		document.tabvars.loading = false;
 		
@@ -794,8 +804,17 @@ function form_load_tab (form, widget, nexttab, specificsections, cacheajax) {
 		widget.container.fire('FormSplitter:TabLoaded', {'form': this, 'data': data, 'tabloaded': nexttab, 'previoustab': previoustab, 'widget':widget});
 	};
 	
+	var posturl = form_make_url(formvars.scriptname, {
+		'ajax': 'true'
+	});
+	
 	if (cacheajax) {
-		cachedAjaxGet(posturl + '&loadtab='+nexttab+'&specificsections='+(specificsections ? specificsections.toJSON() : ''),
+		var geturl = form_make_url(posturl, {
+			'loadtab': nexttab,
+			'specificsections': specificsections ? specificsections.toJSON() : ''
+		});
+
+		cachedAjaxGet(geturl,
 			loadtabhandler.bindAsEventListener(form, widget, nexttab, specificsections)
 		);
 	} else {
