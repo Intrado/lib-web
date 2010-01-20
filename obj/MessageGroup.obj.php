@@ -8,6 +8,8 @@ class MessageGroup extends DBMappedObject {
 	var $lastused;
 	var $permanent = 0;
 	var $deleted = 0;
+	
+	var $messages = false;
 
 	function MessageGroup ($id = NULL) {
 		$this->_allownulls = true;
@@ -27,34 +29,53 @@ class MessageGroup extends DBMappedObject {
 		DBMappedObject::DBMappedObject($id);
 	}
 	
+	function getMessages() {
+		if (!$this->id)
+			return array();
+		
+		if ($this->messages === false)  {
+			$this->messages = DBFindMany("Message", "from message where not deleted and messagegroupid=? order by id", false, array($this->id));
+		}
+		
+		return $this->messages;
+	}
+	
 	// Returns true/false; true if the user has a message with its defaultlanguagecode.
 	function hasDefaultMessage($type, $subtype) {
-		$query = 'select count(id) from message where not deleted and messagegroupid=? and type=? and subtype=? and languagecode=?';
-		return QuickQuery($query, false, array($this->id, $type, $subtype, $this->defaultlanguagecode)) ? true : false;
+		foreach ($this->getMessages() as $message) {
+			if ($message->type == $type && 
+				$message->subtype == $subtype && 
+				$message->languagecode == $this->defaultlanguagecode)
+				return true;
+		}
+		
+		return false;
 	}
 	
 	function hasMessage($type, $subtype = null, $languagecode = null) {
-		$query = 'select count(id) from message where not deleted and messagegroupid=? and type=? ';
-		$args = array($this->id, $type);
-		
-		if (is_string($subtype)) {
-			$query .= ' and subtype=? ';
-			$args[] = $subtype;
-		}
-		if (is_string($languagecode)) {
-			$query .= ' and languagecode=? ';
-			$args[] = $languagecode;
+		foreach ($this->getMessages() as $message) {
+			if ($message->type != $type)
+				continue;
+			if($subtype != null && $message->subtype != $subtype)
+				continue;
+			if($languagecode != null && $message->languagecode != $languagecode)
+				continue;
+			return true;
 		}
 		
-		return QuickQuery($query, false, $args) ? true : false;
+		return false;
 	}
 	
-	function getOneEnabledMessage($type) {
-		return DBFind('Message', 'from message where not deleted and type=? and messagegroupid=?', false, array($type, $this->id));
+	function getFirstMessageOfType($type) {
+		foreach ($this->getMessages() as $message) {
+			if ($message->type == $type)
+				return $message;
+		}
+		return null;
 	}
 
-	function getGlobalPreferredGender($default) {
-		if (!$phonemessage = $this->getOneEnabledMessage('phone'))
+	function getGlobalPreferredGender() {
+		if (!$phonemessage = $this->getFirstMessageOfType('phone'))
 			return $default;
 		$gender = QuickQuery('select v.gender from messagepart mp join ttsvoice v on mp.voiceid=v.id where mp.messageid=? and mp.voiceid is not null order by sequence limit 1', false, array($phonemessage->id));
 		if ($gender)
@@ -64,13 +85,13 @@ class MessageGroup extends DBMappedObject {
 	}
 
 	function getGlobalEmailAttachments() {
-		if (!$emailmessage = $this->getOneEnabledMessage('email'))
+		if (!$emailmessage = $this->getFirstMessageOfType('email'))
 			return array();
 		return DBFindMany('MessageAttachment', 'from messageattachment where not deleted and messageid=?', false, array($emailmessage->id));
 	}
 	
 	function getGlobalEmailHeaders($default) {
-		if (!$emailmessage = $this->getOneEnabledMessage('email'))
+		if (!$emailmessage = $this->getFirstMessageOfType('email'))
 			return $default;
 		$emailmessage->readHeaders();
 		

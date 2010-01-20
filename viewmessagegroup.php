@@ -42,28 +42,34 @@ if (!$cansendphone && !$cansendemail && !$cansendsms) {
 ///////////////////////////////////////////////////////////////////////////////
 // Request processing:
 ///////////////////////////////////////////////////////////////////////////////
-if (isset($_GET['id']) || isset($_SESSION['messagegroupid'])) {
-	$existingmessagegroupid = isset($_GET['id']) ? $_GET['id'] + 0 : $_SESSION['messagegroupid'] + 0;
-	if (userOwns('messagegroup', $existingmessagegroupid)) {
-		$_SESSION['messagegroupid'] = $existingmessagegroupid;
-		$existingmessagegroup = new MessageGroup($existingmessagegroupid);
-	} else {
-		unset($_SESSION['messagegroupid']);
-		redirect('unauthorized.php');
-	}
-} else {
-	redirect('messages.php');
+
+if (isset($_GET['id'])) {
+	$id = $_GET['id'] + 0;
+	if (userOwns('messagegroup',$id)
+		$_SESSION['viewmessagegroupid'] = $id;
+	redirect('viewmessagegroup.php');
 }
+
+if (!isset($_SESSION['viewmessagegroupid'])) {
+	redirect('unauthorized.php');
+}
+
+$existingmessagegroup = new MessageGroup($_SESSION['viewmessagegroupid']);
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // Data Gathering:
 ///////////////////////////////////////////////////////////////////////////////
-$systemdefaultlanguagecode = 'en';
-$customerlanguages = $cansendmultilingual ? QuickQueryList("select code, name from language", true) : QuickQueryList("select code, name from language where code=?", true, false, array($systemdefaultlanguagecode));
-if ($cansendmultilingual)
-	$allowtranslation = isset($SETTINGS['translation']['disableAutoTranslate']) ? (!$SETTINGS['translation']['disableAutoTranslate']) : true;
-else
+
+//if the user can send multi-lingual notifications use all languages, otherwise make an array of just the default.
+if ($cansendmultilingual) {
+	$customerlanguages = Language::getLanguageMap();
+	$allowtranslation = !(isset($SETTINGS['translation']['disableAutoTranslate']) && $SETTINGS['translation']['disableAutoTranslate']);
+} else {
+	$deflanguagecode = Language::getDefaultLanguageCode();
+	$customerlanguages = array($deflanguagecode => Language::getName($deflanguagecode));
 	$allowtranslation = false;
+}
 
 $emailheaders = $existingmessagegroup->getGlobalEmailHeaders(
 	array(
@@ -91,7 +97,7 @@ if ($cansendemail) {
 if ($cansendsms) {
 	$destinations['sms'] = array(
 		'subtypes' => array('plain'),
-		'languages' => array($systemdefaultlanguagecode => $customerlanguages[$systemdefaultlanguagecode])
+		'languages' => array(Language::getDefaultLanguageCode() => $customerlanguages[Language::getDefaultLanguageCode()])
 	);
 }
 
@@ -245,7 +251,7 @@ foreach ($destinations as $type => $destination) {
 	}
 }
 
-$destinationlayoutforms[] = makeSummaryTab($destinations, $customerlanguages, $systemdefaultlanguagecode, $existingmessagegroup);
+$destinationlayoutforms[] = makeSummaryTab($destinations, $customerlanguages, Language::getDefaultLanguageCode(), $existingmessagegroup);
 
 //////////////////////////////////////////////////////////
 // Finalize the formsplitter.
@@ -298,7 +304,7 @@ startWindow(_L('Message Viewer'));
 
 $firstdestinationtype = array_shift(array_keys($destinations));
 $firstdestinationsubtype = array_shift($destinations[$firstdestinationtype]['subtypes']);
-$defaultsections = array("{$firstdestinationtype}-{$firstdestinationsubtype}", "{$firstdestinationtype}-{$firstdestinationsubtype}-{$systemdefaultlanguagecode}");
+$defaultsections = array("{$firstdestinationtype}-{$firstdestinationsubtype}", "{$firstdestinationtype}-{$firstdestinationsubtype}-{Language::getDefaultLanguageCode()}");
 if ($firstdestinationtype == 'email')
 	$defaultsections[] = "emailheaders";
 echo '<div id="messagegroupformcontainer">' . $messagegroupsplitter->render($defaultsections) . '</div>';
@@ -311,19 +317,19 @@ echo '<div id="messagegroupformcontainer">' . $messagegroupsplitter->render($def
 		var state = {
 			'currentdestinationtype': '<?=$firstdestinationtype?>',
 			'currentsubtype': '<?=$firstdestinationsubtype?>',
-			'currentlanguagecode': '<?=$systemdefaultlanguagecode?>',
+			'currentlanguagecode': '<?=Language::getDefaultLanguageCode()?>',
 			'messagegroupsummary': <?=json_encode(QuickQueryMultiRow("select distinct type,subtype,languagecode from message where userid=? and messagegroupid=? and not deleted order by type,subtype,languagecode", true, false, array($USER->id, $existingmessagegroup->id)))?>
 		};
 
 		var formswitchercontainer = $('messagegroupformcontainer');
 
 		formswitchercontainer.observe('FormSplitter:BeforeTabLoad',
-			messagegroupHandleBeforeTabLoad.bindAsEventListener(formswitchercontainer, state, '<?=$systemdefaultlanguagecode?>')
+			messagegroupHandleBeforeTabLoad.bindAsEventListener(formswitchercontainer, state, '<?=Language::getDefaultLanguageCode()?>')
 		);
 
 		// When a tab is loaded, update the status icon of the previous tab.
 		formswitchercontainer.observe('FormSplitter:TabLoaded',
-			messagegroupHandleTabLoaded.bindAsEventListener(formswitchercontainer, state, '<?=$existingmessagegroup->id?>', '<?=$systemdefaultlanguagecode?>', null, true)
+			messagegroupHandleTabLoaded.bindAsEventListener(formswitchercontainer, state, '<?=$existingmessagegroup->id?>', '<?=Language::getDefaultLanguageCode()?>', null, true)
 		);
 		
 		form_init_splitter(formswitchercontainer, <?=json_encode($defaultsections)?>, true);
