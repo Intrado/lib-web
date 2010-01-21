@@ -79,31 +79,6 @@ class Message extends DBMappedObject {
 		return $newmessage;
 	}
 
-	function updateMessageForCurrentUser($messagegroupid, $name, $description, $type, $subtype, $languagecode, $autotranslate, $headers) {
-		global $USER;
-		
-		$this->userid = $USER->id;
-		$this->messagegroupid = $messagegroupid;
-		
-		$this->name = $name;
-		$this->description = $description;
-		
-		$this->type = $type;
-		$this->subtype = $subtype;
-		$this->languagecode = $languagecode;
-		$this->autotranslate = $autotranslate;
-		
-		$this->modifydate = makeDateTime(time());
-		$this->deleted = 0;
-		
-		if (is_string($headers))
-			$this->data = $headers;
-		else if (is_array($headers))
-			$this->data = Message::makeHeaderDataString($headers);
-			
-		$this->update();
-	}
-
 	function createMessageAttachments($emailattachments) {
 		if ($this->type != 'email')
 			return null;

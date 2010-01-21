@@ -672,7 +672,23 @@ if ($button = $messagegroupsplitter->getSubmit()) {
 											QuickUpdate('update message set deleted=1 where autotranslate not in ("source", "translated") and messagegroupid=? and type=? and subtype=? and languagecode=?', false, array($messagegroup->id, $formdestinationtype, $formdestinationsubtype, $languagecode));
 											if (!($sourcemessage = DBFind('Message', 'from message where not deleted and autotranslate="source" and messagegroupid=? and type=? and subtype=? and languagecode=?', false, array($messagegroup->id, $formdestinationtype, $formdestinationsubtype, $languagecode)))) {
 												$sourcemessage = new Message();
-												$sourcemessage->updateMessageForCurrentUser($messagegroup->id, "Message for {$formdestinationtype} {$formdestinationsubtype} {$languagecode}", "", $formdestinationtype, $formdestinationsubtype, $languagecode, 'source', $formdestinationtype == 'email' ? $emailheaderdatastring : '');
+												$sourcemessage->userid = $USER->id;
+												$sourcemessage->messagegroupid = $messagegroup->id;
+												$sourcemessage->name = $messagegroup->name;
+												$sourcemessage->type = $formdestinationtype;
+												$sourcemessage->subtype = $formdestinationsubtype;
+												$sourcemessage->languagecode = $languagecode;
+												$sourcemessage->autotranslate = 'source';
+												$sourcemessage->modifydate = makeDateTime(time());
+												$sourcemessage->deleted = 0;
+												if ($formdestinationtype == 'email') {
+													$sourcemessage->data = $emailheaderdatastring;
+													$sourcemessage->description = SmartTruncate(($formdestinationsubtype == 'html' ? 'HTML' : ucfirst($formdestinationsubtype)) . ' ' . Language::getName($languagecode), 50);
+												} else {
+													$sourcemessage->description = SmartTruncate(Language::getName($languagecode), 50);
+												}
+												$sourcemessage->update();
+												
 												if ($formdestinationtype == 'email')
 													$sourcemessage->createMessageAttachments($emailattachments);
 											}
@@ -682,7 +698,23 @@ if ($button = $messagegroupsplitter->getSubmit()) {
 
 											if (!($translatedmessage = DBFind('Message', 'from message where not deleted and autotranslate="translated" and messagegroupid=? and type=? and subtype=? and languagecode=?', false, array($messagegroup->id, $formdestinationtype, $formdestinationsubtype, $languagecode)))) {
 												$translatedmessage = new Message();
-												$translatedmessage->updateMessageForCurrentUser($messagegroup->id, "Message for {$formdestinationtype} {$formdestinationsubtype} {$languagecode}", "", $formdestinationtype, $formdestinationsubtype, $languagecode, 'translated', $formdestinationtype == 'email' ? $emailheaderdatastring : '');
+												$translatedmessage->userid = $USER->id;
+												$translatedmessage->messagegroupid = $messagegroup->id;
+												$translatedmessage->name = $messagegroup->name;
+												$translatedmessage->type = $formdestinationtype;
+												$translatedmessage->subtype = $formdestinationsubtype;
+												$translatedmessage->languagecode = $languagecode;
+												$translatedmessage->autotranslate = 'translated';
+												$translatedmessage->modifydate = makeDateTime(time());
+												$translatedmessage->deleted = 0;
+												if ($formdestinationtype == 'email') {
+													$translatedmessage->data = $emailheaderdatastring;
+													$translatedmessage->description = SmartTruncate(($formdestinationsubtype == 'html' ? 'HTML' : ucfirst($formdestinationsubtype)) . ' ' . Language::getName($languagecode), 50);
+												} else {
+													$translatedmessage->description = SmartTruncate(Language::getName($languagecode), 50);
+												}
+												$translatedmessage->update();
+												
 												if ($formdestinationtype == 'email')
 													$translatedmessage->createMessageAttachments($emailattachments);
 											}
@@ -755,8 +787,24 @@ if ($button = $messagegroupsplitter->getSubmit()) {
 									continue;
 
 								$newmessage = new Message();
-								$newmessage->updateMessageForCurrentUser($messagegroup->id, "Message for {$formdestinationtype} {$formdestinationsubtype} {$formdestinationlanguagecode}", "", $formdestinationtype, $formdestinationsubtype, $formdestinationlanguagecode, $autotranslate, $formdestinationtype == 'email' ? $emailheaderdatastring : '');
-
+								$newmessage->userid = $USER->id;
+								$newmessage->messagegroupid = $messagegroup->id;
+								$newmessage->name = $messagegroup->name;
+								$newmessage->type = $formdestinationtype;
+								$newmessage->subtype = $formdestinationsubtype;
+								$newmessage->languagecode = $languagecode;
+								$newmessage->autotranslate = $autotranslate;
+								$newmessage->modifydate = makeDateTime(time());
+								$newmessage->deleted = 0;
+								// Email.
+								if ($formdestinationtype == 'email') {
+									$newmessage->data = $emailheaderdatastring;
+									$newmessage->description = SmartTruncate(($formdestinationsubtype == 'html' ? 'HTML' : ucfirst($formdestinationsubtype)) . ' ' . Language::getName($languagecode), 50);
+								} else if ($formdestinationtype != 'sms') {
+									$newmessage->description = SmartTruncate(Language::getName($languagecode), 50);
+								}
+								$newmessage->update();
+								
 								if ($formdestinationtype == 'email')
 									$newmessage->createMessageAttachments($emailattachments);
 
