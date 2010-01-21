@@ -30,12 +30,13 @@ function messagegroupHandleTabLoaded (event, state, existingmessagegroupid, syst
 	messagegroupStyleLayouts(readonly);
 	
 	var memo = event.memo;
+	var languagesectionpieces = memo.specificsections ? memo.specificsections[0].split('-') : null;
 	var previoustabpieces = memo.previoustab.split('-');
 	var tabloadedpieces = memo.tabloaded.split('-');
 
 	// Keep track of the current destination type, subtype, and languagecode.
 	if (tabloadedpieces.length == 3) {
-		state.curerntdestinationtype = tabloadedpieces[0];
+		state.currentdestinationtype = tabloadedpieces[0];
 		state.currentsubtype = tabloadedpieces[1];
 		state.currentlanguagecode = tabloadedpieces[2];
 	} else if (tabloadedpieces.length == 1 || (tabloadedpieces.length == 2 && tabloadedpieces[0] == 'phone')) {
@@ -45,7 +46,11 @@ function messagegroupHandleTabLoaded (event, state, existingmessagegroupid, syst
 			state.currentdestinationtype = 'email';
 			state.currentsubtype = 'html';
 		}
-		state.currentlanguagecode = systemdefaultlanguagecode;
+
+		if (languagesectionpieces && languagesectionpieces.length == 3)
+			state.currentlanguagecode = languagesectionpieces[2];
+		else
+			state.currentlanguagecode = systemdefaultlanguagecode;
 	} else if (tabloadedpieces.length == 2 && tabloadedpieces[0] == 'email') {
 		state.currentdestinationtype = 'email';
 		state.currentsubtype = tabloadedpieces[1];
