@@ -2,303 +2,927 @@
 ////////////////////////////////////////////////////////////////////////////////
 // Includes
 ////////////////////////////////////////////////////////////////////////////////
-include_once("inc/common.inc.php");
-include_once("inc/securityhelper.inc.php");
-include_once("inc/table.inc.php");
-include_once("inc/html.inc.php");
-include_once("inc/utils.inc.php");
-include_once("inc/form.inc.php");
-include_once("obj/Setting.obj.php");
-include_once("obj/Phone.obj.php");
-include_once("obj/FieldMap.obj.php");
-
+require_once("inc/common.inc.php");
+require_once("inc/securityhelper.inc.php");
+require_once("inc/table.inc.php");
+require_once("inc/html.inc.php");
+require_once("inc/utils.inc.php");
+require_once("inc/form.inc.php");
+require_once("obj/Setting.obj.php");
+require_once("obj/Phone.obj.php");
+require_once("obj/FieldMap.obj.php");
 require_once("obj/Wizard.obj.php");
-
 require_once("obj/Form.obj.php");
 require_once("obj/FormItem.obj.php");
 require_once("obj/Validator.obj.php");
-
+require_once("obj/Language.obj.php");
+require_once("obj/Message.obj.php");
+require_once("obj/MessagePart.obj.php");
+require_once("obj/AudioFile.obj.php");
+require_once("obj/Voice.obj.php");
+require_once("obj/FieldMap.obj.php");
+require_once("obj/SurveyQuestion.obj.php");
+require_once("obj/SurveyQuestionnaire.obj.php");
 
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization
 ////////////////////////////////////////////////////////////////////////////////
-if (!getSystemSetting('_hassurvey', true) || !$USER->authorize('survey')) {
+if (!getSystemSetting('_hassurvey', true) || !$USER->authorize('survey') || !$USER->authorize('sendphone','sendemail')) {
 	redirect('unauthorized.php');
+}
+
+if (isset($_GET['id'])) {
+	setCurrentQuestionnaire($_GET['id']);
+	Wizard::clear("surveytemplatewiz");
+	redirect();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Optional Form Items And Validators
 ////////////////////////////////////////////////////////////////////////////////
 
-class SurveyType extends FormItem {
+//fills in "add" when this button is clicked, and submits the form.
+class AddQuestionButton extends FormItem {
 	function render ($value) {
 		$n = $this->form->name."_".$this->name;
-		if($value == null || $value == "") // Handle empty value to combind this validator with ValRequired
-			$value = array("phone" => "false","web" => "false");
-			
-		// edit input type from "hidden" to "text" to debug the form value
-		$str = '<input id="'.$n.'" name="'.$n.'" type="text" value="'.escapehtml(json_encode($value)).'"/>';
-		$str .= '<input id="'.$n.'phone" name="'.$n.'left" type="checkbox" onchange="setValue_'.$n.'()" value="" '. ($value["phone"] == "true" ? 'checked' : '').' />&nbsp;Phone';
-		$str .= '<input id="'.$n.'web" name="'.$n.'right" type="checkbox" onchange="setValue_'.$n.'()" value="" '. ($value["web"] == "true" ? 'checked' : '').' />&nbsp;Web';
-		$str .= '<script>function setValue_'.$n.'(){
-								$("'.$n.'").value = Object.toJSON({
-									"phone": $("'.$n.'phone").checked.toString(),
-									"web": $("'.$n.'web").checked.toString()
-							});
-							form_do_validation($("' . $this->form->name . '"), $("' . $n . '"));
-						 }
-				</script>';
+		$str = '<input id="'.$n.'" name="'.$n.'" type="hidden" value="" />'; //always blank out value
+		$str .= icon_button( _L('Add Another Question'),"add", "$('$n').value='add'; form_submit(event,'samestep');");
+		
 		return $str;
 	}
 }
 
-class ValSurveyType extends Validator {
-	function validate ($value, $args) {
-		if(!is_array($value)) {
-			$value = json_decode($value,true);
+//sets question fields to something to skip validation
+//adds "1" to field value to mark question as deleted
+class RemoveQuestionButton extends FormItem {
+	function render ($value) {
+		$n = $this->form->name."_".$this->name;
+		$str = '<input id="'.$n.'" name="'.$n.'" type="hidden" value="" />'; //always blank out value
+		$str .= icon_button($this->args['name'],"delete", "$('$n').value='1'; doRemoveQuestion('".$this->form->name."',".$this->args['qnum']."); form_submit(event,'samestep');");
+		
+		return $str;
+	}
+	
+	function renderJavascriptLibraries() {
+		return '
+		<script type="text/javascript">
+		function doRemoveQuestion(formname,qnum) {
+			$(formname+"_question"+qnum+"-reportlabel").value="-Deleting-";
+			$(formname+"_question"+qnum+"-webtext").value="-Deleting-";
+			$(formname+"_question"+qnum+"-phonemessage").value="{\"delete\":true}";
+			$(formname+"_question"+qnum+"-phonemessage_content").update("Deleting");
 		}
-		if (!($value["phone"] == "true" || $value["web"] == "true"))
-			return "Phone or Web survey is required for " . $this->label;
-		else
+		</script>
+		';
+	}
+}
+
+class PhoneMessageRecorder extends FormItem {
+
+	function render ($value) {
+		$n = $this->form->name."_".$this->name;
+		if (!$value)
+			$value = '{}';
+		// Hidden input item to store values in
+		$str = '<input id="'.$n.'" name="'.$n.'" type="hidden" value="'.escapehtml($value).'" />
+		<div>
+			<div id="'.$n.'_content" style="padding: 6px; white-space:nowrap"></div>
+		</div>
+		<script type="text/javascript">
+		setupMessageRecorderButtons("'.$n.'");
+		</script>
+		';
+
+		return $str;
+	}
+
+	function renderJavascriptLibraries() {
+		global $USER;
+		// include the easycall javascript object and setup to record
+		$str = '<script type="text/javascript" src="script/easycall.js.php"></script>';
+		$str .= '
+		<script type="text/javascript">
+		
+		function setupMessageRecorderButtons(e) {
+			e = $(e);
+			var value = e.value.evalJSON();
+			var formname = e.up("form").name;
+			var content = $(e.id+"_content");
+			
+			if (value.m || value.af) {
+				var playbtn = icon_button("'.escapehtml(_L('Play')).'", "fugue/control");
+				var rerecordbtn = icon_button("'.escapehtml(_L('Re-record')).'", "diagona/16/118");
+				
+				playbtn.observe("click", function () {
+					var value = e.value.evalJSON();
+					if (value.m)
+						popup("previewmessage.php?id=" + value.m, 400, 400);
+					else if (value.af)
+						popup("previewaudio.php?close=1&id="+value.af, 400, 500);
+				});
+				
+				function curry (fn,obj) {
+					return new function() {
+						fn(obj);
+					}
+				}
+				
+				rerecordbtn.observe("click", function () {
+					setupMessageRecorderEasyCall(e);
+				});
+				
+				content.update();
+				content.insert(playbtn);
+				content.insert(rerecordbtn);
+			} else {
+				setupMessageRecorderEasyCall(e);
+			}
+		}
+		
+		function setupMessageRecorderEasyCall (e) {
+			e = $(e);
+			var formname = e.up("form").name;
+			var content = $(e.id+"_content");
+			
+			new EasyCall(formname, e.id, content, "'.Phone::format($USER->phone).'", "Survey Message");
+			
+			content.observe("EasyCall:update", function(event) {
+				e.value = "{\"af\":" + event.memo.audiofileid + "}";
+				setupMessageRecorderButtons(e);
+				Event.stopObserving(content,"EasyCall:update");
+			});
+		}
+		</script>
+		';
+		
+		return $str;
+	}
+}
+
+
+class PhoneMessageRecorderValidator extends Validator {
+	var $onlyserverside = true;
+	function validate ($value, $args) {
+		global $USER;
+		
+		
+		if (!$USER->authorize("starteasy"))
+			return _L('%1$s is not allowed for this user account',$this->label);
+		$values = json_decode($value);
+	
+		if ($values == null || (!isset($values->m) && !isset($values->af) && !isset($values->delete)))
+			return _L('%1$s does not have a message recorded', $this->label);
+
+		//special allow for delete
+		if (isset($values->delete))
 			return true;
 
-	}
-	function getJSValidator () {
-		return
-			'function (name, label, value, args) {
-				checkval = value.evalJSON();
-				if (!(checkval.phone == "true" || checkval.web == "true"))
-					return "Phone or Web survey is required for " + label;
-				return true;
-			}';
-	}
-}
+		if (isset($values->m)) {
+			if (!QuickQuery("select count(*) from message where id=? and userid=?",false,array($values->m,$USER->id)))
+				return _L('%1$s has an invalid or missing message', $this->label);
+		}
 
+		if (isset($values->af)) {
+			if (!QuickQuery("select count(*) from audiofile where id=? and userid=?",false,array($values->af,$USER->id)))
+				return _L('%1$s has an invalid or missing message', $this->label);
+		}
 
-class SurveyQuestion extends FormItem {
-	function render ($value) {
-		$n = $this->form->name."_".$this->name;
-		if($value == null || $value == "") // Handle empty value to combind this validator with ValRequired
-			$value = array("phone" => "false","web" => "false");
-
-		// edit input type from "hidden" to "text" to debug the form value
-		$str = '<input id="'.$n.'" name="'.$n.'" type="text" value="'.escapehtml(json_encode($value)).'"/>';
-		$str .= '<input id="'.$n.'phone" name="'.$n.'left" type="checkbox" onchange="setValue_'.$n.'()" value="" '. ($value["phone"] == "true" ? 'checked' : '').' />&nbsp;Phone';
-		$str .= '<input id="'.$n.'web" name="'.$n.'right" type="checkbox" onchange="setValue_'.$n.'()" value="" '. ($value["web"] == "true" ? 'checked' : '').' />&nbsp;Web';
-		$str .= '<script>function setValue_'.$n.'(){
-								$("'.$n.'").value = Object.toJSON({
-									"phone": $("'.$n.'phone").checked.toString(),
-									"web": $("'.$n.'web").checked.toString()
-							});
-							form_do_validation($("' . $this->form->name . '"), $("' . $n . '"));
-						 }
-				</script>';
-		return $str;
+		return true;
 	}
 }
-
 ////////////////////////////////////////////////////////////////////////////////
 // Data Handling
 ////////////////////////////////////////////////////////////////////////////////
 
+
+$questionnaire = new SurveyQuestionnaire(getCurrentQuestionnaire());
+if ($questionnaire->id) {
+	$questions = array_values(DBFindMany("SurveyQuestion","from surveyquestion where questionnaireid=? order by questionnumber", false, array($questionnaire->id)));	
+} else {
+	$questions = array();
+}
+
+if ($questionnaire->emailmessageid) {
+	$emailmessage = new Message($questionnaire->emailmessageid);
+	$emailmessage->readHeaders(); 
+	
+	$emailparts = DBFindMany("MessagePart","from messagepart where messageid=? order by sequence",false,array($emailmessage->id));
+	$emailbody = Message::format($emailparts);
+} else{
+	$emailmessage = false;
+}
+
+
+/**************************** settings ****************************/
 class SurveyTempleteWiz_settings extends WizStep {
 	function getForm($postdata, $curstep) {
+		global $USER, $questionnaire, $questions;
 
 		$formdata = array();
 		$formdata["name"] = array(
 			"label" => _L('Name'),
-			"value" => "",
+			"fieldhelp" => _L('TODO'),
+			"value" => $questionnaire->name,
 			"validators" => array(
 				array("ValRequired"),
-				array("ValLength","max" => 30)
+				array("ValLength","max" => 50)
 			),
-			"control" => array("TextField","size" => 30, "maxlength" => 51),
+			"control" => array("TextField","size" => 30, "maxlength" => 50),
 			"helpstep" => 1
 		);
 		$formdata["description"] = array(
 			"label" => _L('Description'),
-			"value" => "",
+			"fieldhelp" => _L('TODO'),
+			"value" => $questionnaire->description,
 			"validators" => array(
-				array("ValLength","min" => 3,"max" => 50)
+				array("ValLength","max" => 50)
 			),
-			"control" => array("TextField","size" => 30, "maxlength" => 51),
+			"control" => array("TextField","size" => 30, "maxlength" => 50),
 			"helpstep" => 1
 		);
-/*
-		$formdata["surveytype"] = array(
-			"label" => _L('Survey Type'),
-			"fieldhelp" => _L(''),
-			"value" => "",//array("left" => "true","right" => "false"),
-			"validators" => array(array("ValRequired"),array("ValSurveyType")),
-			"control" => array("SurveyType"),
-			"helpstep" => 2
-		);
-*/
-		$formdata["phonesurvey"] = array(
-			"label" => _L('Phone Survey'),
-			"fieldhelp" => _L(''),
-			"value" => "",
-			"validators" => array(),
-			"control" => array("CheckBox"),
-			"helpstep" => 2
-		);
-
-		$formdata["websurvey"] = array(
-			"label" => _L('Web Survey'),
-			"fieldhelp" => _L(''),
-			"value" => "",
+		
+		//only present option for phone/web if they have a choice between the two
+		if ($questionnaire->hasweb && $questionnaire->hasphone)
+			$type = "both";
+		else if ($questionnaire->hasweb)
+			$type = "web";
+		else
+			$type = "phone";
+		if ($USER->authorize('sendphone') && $USER->authorize('sendemail')) {
+			$surveytypes = array("phone" => "Phone","web" => "Web", "both" => "Phone and Web");
+			
+			$formdata["surveytype"] = array(
+				"label" => _L('Survey Method'),
+				"fieldhelp" => _L('TODO'),
+				"value" => $type,
+				"validators" => array(
+					array("ValRequired"),
+					array("ValInArray","values" => array_keys($surveytypes))
+				),
+				"control" => array("RadioButton", "values" => $surveytypes),
+				"helpstep" => 2
+			);
+		}
+		
+		$formdata["randomizeorder"] = array(
+			"label" => _L('Randomize Question Order'),
+			"fieldhelp" => _L('TODO'),
+			"value" => (bool)$questionnaire->dorandomizeorder,
 			"validators" => array(),
 			"control" => array("CheckBox"),
 			"helpstep" => 3
 		);
-
-		$formdata["numberofquestions"] = array(
-       		"label" => _L("Number of Questions"),
-       		"fieldhelp" => _L(''),
-       		"value" => "",
-       		"validators" => array(
-            	array("ValRequired")
-       		),
-       		"control" => array("SelectMenu","values" => array("" => "-- Select a Number --") + array_combine(range(1,99),range(1,99))),
-       		"helpstep" => 4
-   		);
-		return new Form("settings", $formdata, null);
+		
+		$helpsteps = array(
+			_("Enter a name and description for your survey. Names are used in reports and the web page for the survey"),
+			_("Select a survey method. Phone will call contacts on your list and present them with a set of interactive prompts. Web will send an email with a link to a form"),
+			_("In order to remove potential statistical bias, you may select to randomize question order. Each person will be presented with the questions in a different order. This improves statistical validity of the responses received. Unselect this if some of your questions are based on previous questions.")
+		);
+		
+		
+		return new Form("settings", $formdata, $helpsteps);
 	}
 }
 
-class SurveyTemplateWiz_phone extends WizStep {
+/**************************** phone features ****************************/
+class SurveyTemplateWiz_phonefeatures extends WizStep {
 	function getForm($postdata, $curstep) {
+		global $USER, $questionnaire, $questions;
 
 		$formdata = array();
+		$helpsteps = array();
+		$helpstepnum = 1;
 
+		$formdata[] = "Phone Survey Features";
+
+		$machineoptions = array("message" => _('Leave a message for answering machines'),"hangup" => _('Hang up and try again later'));
 		$formdata["amsweringmachine"] = array(
-			"label" => _L('Answering Machine Message'),
-			"fieldhelp" => _L('Leave message on answering machines'),
-			"value" => "",
-			"validators" => array(),
-			"control" => array("CheckBox"),
-			"helpstep" => 1
+			"label" => _L('Answering Machine'),
+			"fieldhelp" => _L('Select an option for what to do when the system calls and reaches an answering machine'),
+			"value" => $questionnaire->machinemessageid ? "message" : "hangup",
+			"validators" => array(
+				array("ValInArray","values" => array_keys($machineoptions))
+			),
+			"control" => array("RadioButton","values" => $machineoptions),
+			"helpstep" => $helpstepnum++
 		);
+		$helpsteps[] = _('If a survey phone call reaches an answering machine, it can either leave a message letting the person know why they received a call, or hang up and try again later. It is generally better to leave a message, however, hanging up and trying again may result in more surveys responses.');
+	
+		$introopts = array("message" => _('Play an intro message'),"skip" => _('Skip right to asking questions'));
 		$formdata["intromessage"] = array(
-			"label" => _L('Play introductory message'),
-			"fieldhelp" => _L('Play introductory message'),
-			"value" => "",
-			"validators" => array(),
-			"control" => array("CheckBox"),
-			"helpstep" => 1
+			"label" => _L('Introduction'),
+			"fieldhelp" => _L("If you'd like to play an introduction message, you can opt to here."),
+			"value" => $questionnaire->intromessageid ? "message" : "skip",
+			"validators" => array(
+				array("ValInArray","values" => array_keys($introopts))
+			),
+			"control" => array("RadioButton","values" => $introopts),
+			"helpstep" => $helpstepnum++
 		);
+		$helpsteps[] = _('It is reccomended to record an introduction message describing the survey process. People are more likely to participate in the survey if they know what it is about, and why their repsonse is important.');
+	
+		$byeopts = array("message" => _('Play a goodbye message'),"reply" => _('Play a goodbye message and allow reply'), "skip" => _('Hangup after the last question'));
 		$formdata["goodbyemessage"] = array(
-			"label" => _L('Play goodbye message'),
-			"fieldhelp" => _L('Play goodbye message'),
-			"value" => "",
-			"validators" => array(),
-			"control" => array("CheckBox"),
-			"helpstep" => 1
+			"label" => _L('Goodbye message'),
+			"fieldhelp" => _L('If you\'d like to play a message after they survey, you can opt to here. You may also allow call recipients to leave a reply message'),
+			"value" => $questionnaire->leavemessage ? "reply" : ($questionnaire->exitmessageid ? "message" : "skip"),
+			"validators" => array(
+				array("ValInArray","values" => array_keys($byeopts))
+			),
+			"control" => array("RadioButton","values" => $byeopts),
+			"helpstep" => $helpstepnum++
 		);
-		$formdata["replymessage"] = array(
-			"label" => _L('Allow call recipients to leave a message'),
-			"fieldhelp" => _L('Allow call recipients to leave a message'),
-			"value" => "",
-			"validators" => array(),
-			"control" => array("CheckBox"),
-			"helpstep" => 1
-		);
-
-		return new Form("phonesurvey", $formdata, null);
+		$helpsteps[] = _('It is reccomended to record a goodbye message thanking the person for their time and responses. People are more likely to participate in future surveys if they have been thanked for their time.<br><br>Reply messages can used to collect additional information from the person that is not otherwise covered in the survey questions, or to provide feedback about the survey. These messages will show up in the Responses tab. If you select this, you should record a goodbye message that lets the person know that this is available to them by pressing the zero key.');
+	
+		
+		return new Form("phonefeatures", $formdata, $helpsteps);
 	}
-
-		//returns true if this step is enabled
+	
+	//returns true if this step is enabled
 	function isEnabled($postdata, $step) {
-		if (isset($postdata['/settings']))
-			return ($postdata['/settings']['phonesurvey'] == "true");
-		return true;
+		global $USER;
+		$surveytype = @$postdata['/settings']['surveytype'] ;
+		//true if we can send phone, and type is not email only
+		return $USER->authorize('sendphone') && $surveytype != "web"; 
 	}
+
 }
-class SurveyTemplateWiz_web extends WizStep {
+
+/**************************** phone messages ****************************/
+class SurveyTemplateWiz_phonemessages extends WizStep {
 	function getForm($postdata, $curstep) {
+		global $USER, $questionnaire, $questions;
 
 		$formdata = array();
+		$helpsteps = array();
+		$helpstepnum = 1;
 
-		$formdata["emailmessage"] = array(
-			"label" => _L('Email Message'),
-			"value" => "",
-			"validators" => array(
-				array("ValRequired")
-			),
-			"control" => array("TextField","size" => 30, "maxlength" => 51),
-			"helpstep" => 1
-		);
 
-		$formdata["webtitle"] = array(
-			"label" => _L('Web Page Title'),
-			"value" => "",
-			"validators" => array(),
-			"control" => array("TextField","size" => 30, "maxlength" => 51),
-			"helpstep" => 1
-		);
+		//answering machine message
+		if ($postdata['/phonefeatures']['amsweringmachine'] == "message") {
+			$formdata[] = "Answering Machine Message";
+			$formdata["machinetext"] = array(
+				"label" => "",
+				"control" => array("FormHtml", "html" => _L('Record a message for answering machines. This will be played if the person is unavailable and the call reaches an answering machine.')),
+				"helpstep" => $helpstepnum++
+			);
+			
+			$formdata["amsweringmachine"] = array(
+				"label" => _L('Answering Machine Message'),
+				"fieldhelp" => _L('TODO'),
+				"value" => $questionnaire->machinemessageid ? '{"m":' . $questionnaire->machinemessageid . '}' : "",
+				"validators" => array(
+					array("ValRequired"),
+					array("PhoneMessageRecorderValidator")
+				),
+				"control" => array("PhoneMessageRecorder"),
+				"helpstep" => $helpstepnum++
+			);
+			$helpsteps[] = _L('TODO');
+		}		
 
-		$formdata["webmessage"] = array(
-			"label" => _L('Web Thank You Message'),
-			"value" => "",
-			"validators" => array(),
-			"control" => array("TextField","size" => 30, "maxlength" => 51),
-			"helpstep" => 1
-		);
+		//intro message
+		if ($postdata['/phonefeatures']['intromessage'] == "message") {
+			$formdata[] = "Intro Message";
+			$formdata["introtext"] = array(
+				"label" => "",
+				"control" => array("FormHtml", "html" => _L('Record an introduction message. This will be played when the person answers the phone. Be sure to introduce yourself and explain the phone survey process.')),
+				"helpstep" => $helpstepnum++
+			);
 
-		$formdata["htmlinsurvey"] = array(
-			"label" => _L('Use HTML in Web Survey'),
-			"fieldhelp" => _L('Use HTML in Web Survey'),
-			"value" => "",
-			"validators" => array(),
-			"control" => array("CheckBox"),
-			"helpstep" => 1
-		);
+			$formdata["intromessage"] = array(
+				"label" => _L('Intro Message'),
+				"fieldhelp" => _L('TODO'),
+				"value" => $questionnaire->intromessageid ? '{"m":' . $questionnaire->intromessageid . '}' : "",
+				"validators" => array(
+					array("ValRequired"),
+					array("PhoneMessageRecorderValidator")
+				),
+				"control" => array("PhoneMessageRecorder"),
+				"helpstep" => $helpstepnum++
+			);
+			$helpsteps[] = _L('TODO');
+		}		
 
-		return new Form("phonesurvey", $formdata, null);
+		//goodbye message
+		if ($postdata['/phonefeatures']['goodbyemessage'] == "message" || 
+			$postdata['/phonefeatures']['goodbyemessage'] == "reply") {
+				
+			$formdata[] = "Goodbye Message";
+			$formdata["goodbyetext"] = array(
+				"label" => "",
+				"control" => array("FormHtml", "html" => _L('Record a goodbye / thank you message.')),
+				"helpstep" => $helpstepnum++
+			);
+
+			$formdata["goodbyemessage"] = array(
+				"label" => _L('Goodbye Message'),
+				"fieldhelp" => _L('TODO'),
+				"value" => $questionnaire->exitmessageid ? '{"m":' . $questionnaire->exitmessageid . '}' : "",
+				"validators" => array(
+					array("ValRequired"),
+					array("PhoneMessageRecorderValidator")
+				),
+				"control" => array("PhoneMessageRecorder"),
+				"helpstep" => $helpstepnum++
+			);
+			$helpsteps[] = _L('TODO');
+		}
+
+		return new Form("phonemessages", $formdata, $helpsteps);
 	}
 
 	//returns true if this step is enabled
 	function isEnabled($postdata, $step) {
-		if (isset($postdata['/settings']))
-			return ($postdata['/settings']['websurvey'] == "true");
-		return true;
+		global $USER;
+		$surveytype = @$postdata['/settings']['surveytype'] ;
+		$hasphone = $USER->authorize('sendphone') && $surveytype != "web"; //true if we can send phone, and type is not email only
+		
+		if (!$hasphone)
+			return false;
+		if (@$postdata['/phonefeatures']['amsweringmachine'] == "message" ||
+			@$postdata['/phonefeatures']['intromessage'] == "message" ||
+			@$postdata['/phonefeatures']['goodbyemessage'] == "goodbyemessage" || 
+			@$postdata['/phonefeatures']['goodbyemessage'] == "reply")
+			return true;
+		return false;
 	}
+
 }
 
-class SurveyTemplateWiz_questions extends WizStep {
+/**************************** web features ****************************/
+class SurveyTemplateWiz_webfeatures extends WizStep {
 	function getForm($postdata, $curstep) {
+		global $USER, $questionnaire, $questions, $emailmessage, $emailbody;
+		
+		//if we are editing a survey email, load name from there, otherwise use defaults
+		if ($emailmessage) {
+			$fromname = $emailmessage->fromname;
+			$fromemail =  $emailmessage->fromemail;
+			$subject = $emailmessage->subject;
+			$body = $emailbody;
+		} else {
+			$fromname = $USER->firstname . " " . $USER->lastname;
+			$fromemail =  $USER->email;
+			$subject = "Web Survey for " . getCustomerSystemSetting("displayname");
+			$body = "This is a web survey from " . getCustomerSystemSetting("displayname") . ".\n\nYour responses are important to us. Please follow the link at the end of this email to participate in this survey.\n\nThank you,\n" . getCustomerSystemSetting("displayname");
+		}
 
 		$formdata = array();
-
-		$formdata["placeholder"] = array(
-			"label" => _L('Placeholder'),
-			"fieldhelp" => _L(''),
-			"value" => "",
+		$helpsteps = array();
+		$helpstepnum = 1;
+		
+		$formdata[] = "Web Survey Features";
+		
+		$formdata["webpagetitle"] = array(
+			"label" => _L('Web Page Title'),
+			"fieldhelp" => _L('The Web Page Title will show up in large text on the web survey form.'),
+			"value" => $questionnaire->webpagetitle,
+			"validators" => array(
+				array("ValLength","max"=> 50)
+			),
+			"control" => array("TextField", "size" => 30, "maxlength" => 50),
+			"helpstep" => $helpstepnum++
+		);
+		$helpsteps[] = _('You may enter a title here. This will show up in large text on the web survey form.');
+		
+		$formdata["webexitmessage"] = array(
+			"label" => _L('Web Thank You'),
+			"fieldhelp" => _L('This is displayed when the person completes a web survey.'),
+			"value" => $questionnaire->webexitmessage,
+			"validators" => array(
+				array("ValLength","max"=> 32000)
+			),
+			"control" => array("TextArea", "rows" => 7, "cols" => 30),
+			"helpstep" => $helpstepnum++
+		);
+		$helpsteps[] = _('It is reccomended to enter a goodbye message thanking the person for their time and responses. People are more likely to participate in future surveys if they have been thanked for their time.');
+		
+		$formdata["usehtml"] = array(
+			"label" => _L('Use HTML'),
+			"fieldhelp" => _L('Allows HTML in title, thank you, and question text'),
+			"value" => $questionnaire->usehtml,
 			"validators" => array(),
 			"control" => array("CheckBox"),
-			"helpstep" => 1
+			"helpstep" => $helpstepnum++
 		);
+		$helpsteps[] = _('By enabling this feature, the title, thank you, and question text may be HTML. You can use this to insert images or links, or to style the questions.');
+		
+		
+		$formdata[] = _('Email Link');
+		
+		$formdata["fromname"] = array(
+			"label" => _L('From Name'),
+			"fieldhelp" => _L('Recipients will see this name as the sender of the email.'),
+			"value" => $fromname,
+			"validators" => array(
+					array("ValRequired"),
+					array("ValLength","max" => 50)
+					),
+			"control" => array("TextField","size" => 25, "maxlength" => 50),
+			"helpstep" => $helpstepnum++
+		);
+		$helpsteps[] = _L('Enter the name for the email acount.');
 
-		return new Form("phonesurvey", $formdata, null);
+
+		$formdata["from"] = array(
+			"label" => _L('From Email'),
+			"fieldhelp" => _L('This is the address the email is coming from. Recipients will also be able to reply to this address.'),
+			"value" => $fromemail,
+			"validators" => array(
+				array("ValRequired"),
+				array("ValLength","max" => 255),
+				array("ValEmail")
+				),
+			"control" => array("TextField","size" => 35, "maxlength" => 255),
+			"helpstep" => $helpstepnum++
+		);
+		$helpsteps[] = array(_L('Enter the address where you would like to receive replies.'));
+
+		
+		$formdata["subject"] = array(
+			"label" => _L('Subject'),
+			"fieldhelp" => _L('The Subject will appear as the subject line of the email.'),
+			"value" => $subject,
+			"validators" => array(
+				array("ValRequired"),
+				array("ValLength","min" => 3,"max" => 255)
+			),
+			"control" => array("TextField","size" => 45, "maxlength"=>255),
+			"helpstep" => $helpstepnum++
+		);
+		$helpsteps[] = _L('Enter the subject of the email here.');
+
+		$formdata["message"] = array(
+			"label" => _L('Email Message'),
+			"fieldhelp" => _L('Enter the message you would like to send. A link to the survey will be appended to the end of this message.'),
+			"value" => $body,
+			"validators" => array(
+				array("ValRequired"),
+				array("ValLength","max" => 30000)
+			),
+			"control" => array("TextArea","rows"=>10,"cols"=>45),
+			"helpstep" =>  $helpstepnum++
+		);
+		$helpsteps[] = _L('The email message body text goes here. Be sure to introduce yourself and give some information about the survey and why their response is important.<br><br>A link to the survey will be appended to the end of this message.');
+		
+		
+		return new Form("webfeatures", $formdata, $helpsteps);
+	}
+
+	//returns true if this step is enabled
+	function isEnabled($postdata, $step) {
+		global $USER;
+		$surveytype = @$postdata['/settings']['surveytype'] ;
+		
+		return $USER->authorize('sendemail') && $surveytype != "phone"; 
 	}
 }
 
+/**************************** questions ****************************/
+class SurveyTemplateWiz_questions extends WizStep {
+	function getForm($postdata, $curstep) {
+		global $USER, $questionnaire, $questions;
+		
+		$formdata = array();
+		$helpsteps = array();
+		$helpstepnum = 1;
+		
+		$surveytype = @$postdata['/settings']['surveytype'] ;
+		$hasphone = $USER->authorize('sendphone') && $surveytype != "web"; //true if we can send phone, and type is not email only
+		$hasweb = $USER->authorize('sendemail') && $surveytype != "phone"; //true if we can send emails, and type is not phone only
+		$responseoptions = array(
+			"2" => "1-2",
+			"3" => "1-3",
+			"4" => "1-4",
+			"5" => "1-5",
+			"6" => "1-6",
+			"7" => "1-7",
+			"8" => "1-8",
+			"9" => "1-9"
+		);
+		//get list of questions, and their data from $postdata
+		$questiondata = array();
+		if (isset($postdata["/questions"])) {
+			//see if we should use data from existing form posts
+			$qnum = 1;
+			$srcnum = 1;
+			//reorder deleted questions for display (any repost will result in correct order)
+			while (isset($postdata["/questions"]["question$srcnum-reportlabel"])) {
+				//check for a delete marker
+				if (@$postdata["/questions"]["question$srcnum-delete"]) {
+					//error_log("delete q src:$srcnum qnum:$qnum");
+					//skip to next question, don't increment new question number
+					$srcnum++;
+					continue;
+				}
+				//error_log("adding question src:$srcnum qnum:$qnum");
+				
+				$questiondata[$qnum]["reportlabel"] = $postdata["/questions"]["question$srcnum-reportlabel"];
+				$questiondata[$qnum]["validresponse"] = $postdata["/questions"]["question$srcnum-validresponse"];
+				if ($hasphone)
+					$questiondata[$qnum]["phonemessage"] = $postdata["/questions"]["question$srcnum-phonemessage"];
+				if ($hasweb)
+					$questiondata[$qnum]["webtext"] = $postdata["/questions"]["question$srcnum-webtext"];
+				$srcnum++;
+				$qnum++;
+			}
+		} else if ($questionnaire->id) {
+			//otherwise see if we're editing something
+			foreach ($questions as $index => $question) {
+				$qnum = $index + 1;
+				$questiondata[$qnum]["reportlabel"] = $question->reportlabel;
+				$questiondata[$qnum]["validresponse"] = $question->validresponse;
+				if ($hasphone)
+					$questiondata[$qnum]["phonemessage"] = $question->phonemessageid ? '{"m": ' . $question->phonemessageid . '}' : "";
+				if ($hasweb)
+					$questiondata[$qnum]["webtext"] = $question->webmessage;
+			}
+		}
+		
+		//add new question section
+		if (@$postdata['/questions']['newquestionaction'] == "add" || count($questiondata) == 0) {
+			$qnum = count($questiondata) + 1;
+			$questiondata[$qnum]["reportlabel"] = "";
+			$questiondata[$qnum]["validresponse"] = $qnum > 1 ? $questiondata[$qnum-1]["validresponse"] : 5;
+			if ($hasphone)
+				$questiondata[$qnum]["phonemessage"] = "";
+			if ($hasweb)
+				$questiondata[$qnum]["webtext"] = "";
+		}
+		
+		
+		
+		//do formdata for existing questions
+		foreach ($questiondata as $qnum => $question) {
+			$formdata[] = "Question $qnum";
+			
+			$formdata["question$qnum-reportlabel"] = array(
+				"label" => _L('Report Label'),
+				"fieldhelp" => _L('TODO'),
+				"value" => $questiondata[$qnum]["reportlabel"],
+				"transient" => true,
+				"validators" => array(
+					array("ValRequired"),
+					array("ValLength","max" => 50)
+				),
+				"control" => array("TextField","size" => 30, "maxlength" => 50),
+				"helpstep" => $helpstepnum++
+			);
+			$helpsteps[] = _L('TODO');
+			
+			
+			$formdata["question$qnum-validresponse"] = array(
+				"label" => _L('Valid Response'),
+				"fieldhelp" => _L('TODO'),
+				"value" => $questiondata[$qnum]["validresponse"],
+				"transient" => true,
+				"validators" => array(
+					array("ValRequired"),
+					array("ValNumber","min" => 2, "max" => 9)
+				),
+				"control" => array("SelectMenu","values" => $responseoptions),
+				"helpstep" => $helpstepnum++
+			);
+			$helpsteps[] = _L('TODO');
+			
+			if ($hasphone) {
+				$formdata["question$qnum-phonemessage"] = array(
+					"label" => _L('Phone Question'),
+					"fieldhelp" => _L('TODO'),
+					"value" => $questiondata[$qnum]["phonemessage"],
+					"transient" => true,
+					"validators" => array(
+						array("ValRequired"),
+						array("PhoneMessageRecorderValidator")
+					),
+					"control" => array("PhoneMessageRecorder"),
+					"helpstep" => $helpstepnum++
+				);
+				$helpsteps[] = _L('TODO');
+				
+			}
+			
+			if ($hasweb) {
+				$formdata["question$qnum-webtext"] = array(
+				"label" => _L('Web Question Text'),
+				"fieldhelp" => _L('TODO'),
+				"value" => $questiondata[$qnum]["webtext"],
+				"transient" => true,
+				"validators" => array(
+					array("ValRequired"),
+					array("ValLength","max" => 32000)
+				),
+				"control" => array("TextArea","rows"=>5,"cols"=>45),
+				"helpstep" => $helpstepnum++
+			);
+			$helpsteps[] = _L('TODO');
+			}
+			
+			
+			$formdata["question$qnum-delete"] = array(
+				"label" => _L('Tools'),
+				"fieldhelp" => _L('TODO'),
+				"fieldhelp" => _L('To remove this question from your survey, click this button.'),
+				"value" => "",
+				"transient" => true,
+				"validators" => array(),
+				"control" => array("RemoveQuestionButton","name" => _L('Remove Question %1$s', $qnum),"qnum" => $qnum),
+				"helpstep" => $helpstepnum++
+			);
+			$helpsteps[] = _L('TODO');
+			
+		}
+		
+		$formdata["newquestionaction"] = array(
+			"label" => _L('Add Question'),
+			"fieldhelp" => _L('TODO'),
+			"fieldhelp" => _L('If you\'d like to add an additional question to your survey, click this button.'),
+			"value" => "",
+			"transient" => true,
+			"validators" => array(),
+			"control" => array("AddQuestionButton"),
+			"helpstep" => $helpstepnum++
+		);
+		$helpsteps[] = _L('TODO');
+		
+		return new Form("phonesurvey", $formdata, $helpsteps);
+	}
+}
 
+function getMessageIdForPhoneRecorder($value) {
+	global $USER;
+	
+	$values = json_decode($value);
+	
+	if (isset($values->m))
+		return $values->m;
+	
+	if (isset($values->af)) {
+		//make a message for this audiofile and return the messageid
+		$m = new Message();
+		$m->userid = $USER->id;
+		$m->name = "Survey Question";
+		$m->description = "";
+		$m->type = "phone";
+		$m->subtype = "voice";
+		$m->autotranslate = "none";
+		$m->modifydate = date("Y-m-d H:i:s");
+		$m->languagecode = Language::getDefaultLanguageCode();
+		$m->deleted = 0;
+		$m->create();
+		
+		$mp = new MessagePart();
+		$mp->messageid = $m->id;
+		$mp->type = "A";
+		$mp->audiofileid = $values->af;
+		$mp->sequence = 0;
+		$mp->create();
+		
+		return $m->id;
+	}
+	
+	return null;
+}
+
+/**************************** finisher ****************************/
 class FinishSurveyTemplateWizard extends WizFinish {
 	
 	function finish ($postdata) {
+		global $USER, $questionnaire, $questions, $emailmessage;
+		
+		Query("BEGIN");
+		
+		$surveytype = @$postdata['/settings']['surveytype'] ;
+		$hasphone = $USER->authorize('sendphone') && $surveytype != "web"; //true if we can send phone, and type is not email only
+		$hasweb = $USER->authorize('sendemail') && $surveytype != "phone"; //true if we can send emails, and type is not phone only
+		
+		//settings
+		$questionnaire->userid = $USER->id;
+		$questionnaire->name = $postdata['/settings']['name'];
+		$questionnaire->description = $postdata['/settings']['description'];	
+		$questionnaire->hasphone = $hasphone ? 1 : 0;
+		$questionnaire->hasweb = $hasweb ? 1 : 0;
+		$questionnaire->dorandomizeorder = $postdata['/settings']['randomizeorder'] ? 1 : 0;
+		
+		
+		//phone features/messages
+		if ($hasphone && $postdata['/phonefeatures']['amsweringmachine'] == "message") {
+			$questionnaire->machinemessageid = getMessageIdForPhoneRecorder($postdata['/phonemessages']['amsweringmachine']);
+		} else {
+			$questionnaire->machinemessageid = null;
+		}
+		
+		if ($hasphone && $postdata['/phonefeatures']['intromessage'] == "message") {
+			$questionnaire->intromessageid = getMessageIdForPhoneRecorder($postdata['/phonemessages']['intromessage']);
+		} else {
+			$questionnaire->intromessageid = null;
+		}
+		
+		if ($hasphone && ($postdata['/phonefeatures']['goodbyemessage'] == "message" ||
+						$postdata['/phonefeatures']['goodbyemessage'] == "reply")) {
+			$questionnaire->exitmessageid = getMessageIdForPhoneRecorder($postdata['/phonemessages']['goodbyemessage']);
+			$questionnaire->leavemessage = $postdata['/phonefeatures']['goodbyemessage'] == "reply" ? 1 : 0;
+		} else {
+			$questionnaire->exitmessageid = null;
+			$questionnaire->leavemessage = 0;
+		}
+		
+		//web features
+		if ($hasweb ) {
+			$questionnaire->webpagetitle = $postdata['/webfeatures']['webpagetitle'];
+			$questionnaire->webexitmessage = $postdata['/webfeatures']['webexitmessage'];
+			$questionnaire->usehtml = $postdata['/webfeatures']['usehtml'] == "true" ? 1 : 0;
+			
+			//emailmessage
+			if (!$emailmessage) {
+				$emailmessage = new Message();
+				$emailmessage->userid = $USER->id;
+				$emailmessage->name = "Survey Email";
+				$emailmessage->description = "";
+				$emailmessage->type = "email";
+				$emailmessage->subtype = "plain";
+				$emailmessage->autotranslate = "none";
+				$emailmessage->languagecode = Language::getDefaultLanguageCode();
+				$emailmessage->deleted = 0;
+			}
+			
+			$emailmessage->subject = $postdata['/webfeatures']['subject'];
+			$emailmessage->fromemail = $postdata['/webfeatures']['from'];
+			$emailmessage->fromname = $postdata['/webfeatures']['fromname'];
+			$emailmessage->stuffHeaders();
+			$emailmessage->modifydate = date("Y-m-d H:i:s");
+			$emailmessage->update();
+			
+			QuickUpdate("delete from messagepart where messageid=?", false, array($emailmessage->id));
+			
+			$mp = new MessagePart();
+			$mp->messageid = $emailmessage->id;
+			$mp->type = "T";
+			$mp->txt = $postdata['/webfeatures']['message'];
+			$mp->sequence = 0;
+			$mp->create();
+			
+			$questionnaire->emailmessageid = $emailmessage->id;
+			
+		} else {
+			$questionnaire->webpagetitle = null;
+			$questionnaire->webexitmessage = null;
+			$questionnaire->usehtml = 0;
+		}
+		
+		$questionnaire->update();
+		
+		//do questions
+		$qnum = 1;
+		$srcnum = 1;
+		while (isset($postdata["/questions"]["question$srcnum-reportlabel"])) {
+			//check for a delete marker
+			if (@$postdata["/questions"]["question$srcnum-delete"]) {
+				$srcnum++;
+				continue;
+			}
+			
+			if (isset($questions[$qnum-1]))
+				$question = $questions[$qnum-1];
+			else
+				$question = new SurveyQuestion();
+			
+			$question->questionnumber = $qnum-1;
+			$question->questionnaireid = $questionnaire->id;
+			$question->reportlabel = $postdata["/questions"]["question$srcnum-reportlabel"];
+			$question->validresponse = $postdata["/questions"]["question$srcnum-validresponse"];
+			$question->phonemessageid = $hasphone ? getMessageIdForPhoneRecorder($postdata["/questions"]["question$srcnum-phonemessage"]) : null;
+			$question->webmessage = $hasweb ? $postdata["/questions"]["question$srcnum-webtext"] : null;
+			
+			$question->update();
+
+			$srcnum++;
+			$qnum++;
+		}
+		
+		//remove any questions greater or equal the next questionnumber, in case user deleted some from existing survey
+		QuickUpdate("delete from surveyquestion where questionnaireid=? and questionnumber >= ?", false, array($questionnaire->id, $qnum-1));
+		
+		Query("COMMIT");
 	}
 	
 	function getFinishPage ($postdata) {
-		return "<h1>Survey Template Created</h1>";
+		global $USER, $questionnaire, $questions, $emailmessage;
+		
+		if ($questionnaire->id)
+			return "<h1>Survey Template Modified</h1>";
+		else
+			return "<h1>Survey Template Created</h1>";
 	}
 }
 
-
+/**************************** wizard setup ****************************/
 $wizdata = array(
-	"settings" => new SurveyTempleteWiz_settings(_L("Settings")),
-	"phonesurvey" => new SurveyTemplateWiz_phone(_L("Phone Features")),
-	"websurvey" => new SurveyTemplateWiz_web(_L("Web Features")),
+	"settings" => new SurveyTempleteWiz_settings(_L("Start")),
+	"phonefeatures" => new SurveyTemplateWiz_phonefeatures(_L("Phone Features")),
+	"phonemessages" => new SurveyTemplateWiz_phonemessages(_L("Phone Messages")),
+	"webfeatures" => new SurveyTemplateWiz_webfeatures(_L("Web Features")),
 	"questions" => new SurveyTemplateWiz_questions(_L("Questions"))
 	);
 
@@ -313,12 +937,14 @@ $wizard->handleRequest();
 $PAGE = "notifications:survey";
 $TITLE = "Survey Template Editor";
 
-include_once("nav.inc.php");
+require_once("nav.inc.php");
 
 // Load Custom Form Validators
 ?>
 <script type="text/javascript">
-<? Validator::load_validators(array("ValSurveyType")); ?>
+<? 
+Validator::load_validators(array("PhoneMessageRecorderValidator")); 
+?>
 </script>
 <?
 
@@ -329,5 +955,14 @@ echo $wizard->render();
 
 endWindow();
 
-include_once("navbottom.inc.php");
+if (false) {
+	startWindow("Wizard Data");
+	echo "<pre>";
+	var_dump($_SESSION['surveytemplatewiz']);
+	//var_dump($_SERVER);
+	echo "</pre>";
+	endWindow();
+}
+
+require_once("navbottom.inc.php");
 ?>

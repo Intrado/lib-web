@@ -31,6 +31,10 @@ class Wizard {
 		}
 	}
 	
+	static function clear($name) {
+		unset($_SESSION[$name]);
+	}
+	
 	function getStepData ($curstep = null) {
 		if ($curstep == null)
 			$curstep = $this->curstep;
@@ -304,6 +308,8 @@ class Wizard {
 						} else if ($button == "prev") {
 							if ($next = $this->getPrevStep())
 								$form->sendTo($_SERVER['SCRIPT_NAME']."?step=$next");
+						} else if ($button == "samestep") {
+							$form->sendTo($_SERVER['SCRIPT_NAME']."?step=$step");
 						}
 					}
 				}

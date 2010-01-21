@@ -42,7 +42,7 @@ if (isset($_GET['deletetemplate'])) {
 
 function fmt_surveyactions ($obj,$name) {
 
-	return '<a href="surveytemplate.php?id=' . $obj->id . '">Edit</a>&nbsp;|&nbsp;'
+	return '<a href="surveytemplatewiz.php?id=' . $obj->id . '">Edit</a>&nbsp;|&nbsp;'
 			. '<a href="survey.php?scheduletemplate=' . $obj->id . '">Schedule</a>&nbsp;|&nbsp;'
 			. '<a href="surveys.php?deletetemplate=' . $obj->id . '">Delete</a>';
 }
@@ -57,7 +57,7 @@ include_once("nav.inc.php");
 
 
 startWindow('My Survey Templates '. help('Surveys_MySurveyTemplates'),'padding: 3px;', true, true);
-button_bar(button('Create New Survey Template', null,"surveytemplate.php?id=new") . help('Surveys_CreateNewTemplateButton') );
+button_bar(button('Create New Survey Template', null,"surveytemplatewiz.php?id=new") . help('Surveys_CreateNewTemplateButton') );
 
 $questionnaires = DBFindMany("SurveyQuestionnaire", "from surveyquestionnaire where userid=$USER->id and deleted = 0 order by name");
 
