@@ -21,7 +21,7 @@ class Message extends DBMappedObject {
 	// For 'email' header data.
 	var $subject;
 	var $fromname;
-	var $fromaddress;
+	var $fromaddress; //???
 	var $fromemail;
 
 	function Message ($id = NULL) {
