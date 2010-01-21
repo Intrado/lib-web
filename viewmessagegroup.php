@@ -93,8 +93,60 @@ if ($cansendsms) {
 ///////////////////////////////////////////////////////////////////////////////
 $destinationlayoutforms = array();
 foreach ($destinations as $type => $destination) {
+	/////////////////////////////////
+	// Accordion Sections
+	// The accordion sections for viewmessagegroup.php do not need javascript interaction with any formitems,
+	// so we can define the entire accordion at the destination-type level.
+	/////////////////////////////////
+	$accordionsplitterchildren = array();
+	$advancedoptionsformdata = array();
+	
+	// Accordion sections for phone and email.
+	if ($type == 'phone') {
+		$gendervalues = array ("female" => "Female","male" => "Male");
+		$advancedoptionsformdata['preferredgender'] = array(
+			"label" => _L('Preferred Voice'),
+			"control" => array("FormHtml", "html" => $gendervalues[$messagegroup->getGlobalPreferredGender()]),
+			"helpstep" => 1
+		);
+	} else if ($type == 'email') {
+		$attachmentshtml = "";
+		
+		foreach ($emailattachments as $emailattachment) {
+			$urifilename = urlencode($emailattachment->filename);
+			$filename = escapehtml($emailattachment->filename);
+			$filesize = (int)($emailattachment->size / 1024);
+			$attachmentshtml .= "<a href='emailattachment.php?id={$emailattachment->contentid}&name={$urifilename}'>$filename</a>";
+			$attachmentshtml .= "&nbsp;(Size: {$filesize}k)&nbsp;";
+		}
+		
+		$accordionsplitterchildren[] = array("title" => _L("Attachments"),
+			"icon" => "img/icons/diagona/16/190.gif",
+			"formdata" => array(makeFormHtml(
+				$attachmentshtml != "" ? $attachmentshtml : _L("There are no attachments.")
+			))
+		);
+	}
+	
+	// Accordion sections common to all destination types.	
+	$autoexpirevalues = array(
+		"Yes (Keep for ". getSystemSetting('softdeletemonths', "6") ." months)",
+		"No (Keep forever)"
+	);
+	$advancedoptionsformdata['autoexpire'] = array(
+		"label" => _L('Auto Expire'),
+		"control" => array("FormHtml","html" => $autoexpirevalues[$messagegroup->permanent]),
+		"helpstep" => 1
+	);
+	
+	$accordionsplitterchildren[] = array("title" => _L("Advanced Options"), "icon" => "img/icons/diagona/16/041.gif", "formdata" => $advancedoptionsformdata);
+
+	//////////////////////
+	// Subtypes
+	//////////////////////
 	$countlanguages = count($destination['languages']);
 	$subtypelayoutforms = array();
+
 	foreach ($destination['subtypes'] as $subtype) {
 		$messageformsplitters = array();
 
@@ -147,58 +199,15 @@ foreach ($destinations as $type => $destination) {
 				if ($message && $message->type == 'translated')
 					$messageformdata["branding"] = makeBrandingFormHtml();
 			}
-			
-			/////////////////////////////////
-			// Accordion Sections
-			/////////////////////////////////
-			$accordionsplitterchildren = array();
-			$advancedoptionsformdata = array();
-			
-			// Accordion sections for phone and email.
-			if ($type == 'phone') {
-				$gendervalues = array ("female" => "Female","male" => "Male");
-				$advancedoptionsformdata['preferredgender'] = array(
-					"label" => _L('Preferred Voice'),
-					"control" => array("FormHtml", "html" => $gendervalues[$messagegroup->getGlobalPreferredGender()]),
-					"helpstep" => 1
-				);
-			} else if ($type == 'email') {
-				$attachmentshtml = "";
-				
-				foreach ($emailattachments as $emailattachment) {
-					$urifilename = urlencode($emailattachment->filename);
-					$filename = escapehtml($emailattachment->filename);
-					$filesize = (int)($emailattachment->size / 1024);
-					$attachmentshtml .= "<a href='emailattachment.php?id={$emailattachment->contentid}&name={$urifilename}'>$filename</a>";
-					$attachmentshtml .= "&nbsp;(Size: {$filesize}k)&nbsp;";
-				}
-				
-				$accordionsplitterchildren[] = array("title" => _L("Attachments"),
-					"icon" => "img/icons/diagona/16/190.gif",
-					"formdata" => array(makeFormHtml(
-						$attachmentshtml != "" ? $attachmentshtml : _L("There are no attachments.")
-					))
-				);
-			}
-			
-			// Accordion sections common to all destination types.	
-			$autoexpirevalues = array(
-				"Yes (Keep for ". getSystemSetting('softdeletemonths', "6") ." months)",
-				"No (Keep forever)"
-			);
-			$advancedoptionsformdata['autoexpire'] = array(
-				"label" => _L('Auto Expire'),
-				"control" => array("FormHtml","html" => $autoexpirevalues[$messagegroup->permanent]),
-				"helpstep" => 1
-			);
-			
-			$accordionsplitterchildren[] = array("title" => _L("Advanced Options"), "icon" => "img/icons/diagona/16/041.gif", "formdata" => $advancedoptionsformdata);
+
 			$messageformsplitters[] = new FormSplitter("{$type}-{$subtype}-{$languagecode}", $languagename,
 				$messagegroup->hasMessage($type, $subtype, $languagecode) ? "img/icons/accept.gif" : "img/icons/diagona/16/160.gif",
 				"verticalsplit",
 				array(),
 				array(
 					array("title" => "", "formdata" => $messageformdata),
+					// Add the accordion for each language tab.
+					// NOTE: We want a new instance of FormSplitter per language tab.
 					new FormSplitter("", "", null, "accordion", array(), $accordionsplitterchildren)
 				)
 			);
