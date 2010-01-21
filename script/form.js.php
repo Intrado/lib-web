@@ -801,7 +801,7 @@ function form_load_tab (form, widget, nexttab, specificsections, cacheajax) {
 			});
 		}
 		
-		widget.container.fire('FormSplitter:TabLoaded', {'form': this, 'data': data, 'tabloaded': nexttab, 'previoustab': previoustab, 'widget':widget});
+		widget.container.fire('FormSplitter:TabLoaded', {'form': this, 'data': data, 'tabloaded': nexttab, 'previoustab': previoustab, 'widget':widget, 'specificsections': specificsections});
 	};
 	
 	var posturl = form_make_url(formvars.scriptname, {
