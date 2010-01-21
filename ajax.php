@@ -43,7 +43,7 @@ function handleRequest() {
 			if ($audioFile->userid !== $USER->id)
 				return false;
 			return cleanObjects($audioFile);
-			
+
 		// Return a message object specified by it's ID
 		case 'Message':
 			if (!isset($_GET['id']))
@@ -94,7 +94,7 @@ function handleRequest() {
 			if (!isset($_GET['messagegroupid']))
 				return false;
 			return MessageGroup::getSummary($_GET['messagegroupid']);
-			
+
 		case 'hasmessage':
 			if (!isset($_GET['messagetype']) && !isset($_GET['messageid']))
 				return false;
@@ -148,18 +148,78 @@ function handleRequest() {
 			}
 			return $stats;
 
-		case 'persondatavalues':
-			if (!isset($_GET['fieldnum']) || !$USER->authorizeField($_GET['fieldnum']))
+		case 'getdatavalues':
+			// if no fieldnum requested then return false
+			if (!isset($_GET['fieldnum']))
 				return false;
-			$limit = DBFind('Rule', 'from rule inner join userrule on rule.id = userrule.ruleid where userid=? and fieldnum=?', false, array($USER->id, $_GET['fieldnum']));
-			$limitsql = $limit ? $limit->toSQL(false, 'value', false, true) : '';
-			return QuickQueryList("select value from persondatavalues where fieldnum=? $limitsql order by value", false, false, array($_GET['fieldnum']));
+
+			$fieldnum = $_GET['fieldnum'];
+
+			// if an f,g or c field was requested
+			if (in_array(substr($fieldnum, 0, 1), array('f','g','c'))) {
+				//  if the user is not authorized to it
+				if (!$USER->authorizeField($fieldnum))
+					return false;
+
+				// query the field data values
+				$limit = DBFind('Rule', 'from rule inner join userassociation on rule.id = userassociation.ruleid where userassociation.type = "rule" and userid=? and fieldnum=?', false, array($USER->id, $_GET['fieldnum']));
+				$limitsql = $limit ? $limit->toSQL(false, 'value', false, true) : '';
+				return QuickQueryList("select value from persondatavalues where fieldnum=? $limitsql order by value", false, false, array($_GET['fieldnum']));
+
+			// if it's an organization field
+			} else if ($fieldnum == 'organization') {
+
+				// find organization ids that the user is limited to see
+				$limit = QuickQueryList("select organizationid from userassociation where userid = ? and type = 'organization' and organizationid not NULL", false, false, array($USER->id));
+
+				// if there are assigned org ids, build a limit
+				$orgids = array();
+				if ($limit)
+					foreach ($limit as $l)
+						$orgids[] .= '?';
+
+				$limitsql = ($orgids)? " and id in (" . implode(",", $orgids) . ") " : "";
+
+				// select all organization values the user is authorized to see
+				return QuickQueryList("select orgkey from organization where 1 " . $limitsql, false, false, $limit);
+
+			// if it's a section field
+			} else if ($fieldnum == 'section') {
+
+				// find sections ids that the user is limited to see
+				// TODO: Do sections need to be restricted by organization associations here or is that handled when the user associations are created?
+				$limit = QuickQueryList("select sectionid from userassociation where userid = ? and type = 'section' and sectionid not NULL", false, false, array($USER->id));
+
+				// if there are assigned section ids, build a limit
+				$secids = array();
+				if ($limit)
+					foreach ($limit as $l)
+						$secids[] .= '?';
+
+				$limitsql = ($secids)? " and id in (" . implode(",", $secids) . ") " : "";
+
+				// select all organization values the user is authorized to see
+				return QuickQueryList("select skey from organization where 1 " . $limitsql, false, false, $limit);
+
+			// unknown fieldnum?
+			} else {
+				return false;
+			}
 
 		case 'rulewidgetsettings':
+			// check userassociations for org and section to see if we should show organization/section selection
+			$userhasorg = (QuickQuery('select count(id) from userassociation where type = "organization" and organizationid not null and userid = ?', false, array($USER->id)) > 0);
+			$userhassection = (QuickQuery('select count(id) from userassociation where type = "section" and sectionid not null and userid = ?', false, array($USER->id)) > 0);
+
+			$custhasorg = (QuickQuery('select count(id) from organization where not deleted') > 0);
+			$custhassection = (QuickQuery('select count(id) from section') > 0);
+
 			return array(
 				'operators' => $RULE_OPERATORS,
 				'reldateOptions' => $RELDATE_OPTIONS,
-				'fieldmaps' => cleanObjects(FieldMap::getAllAuthorizedFieldMaps()));
+				'fieldmaps' => cleanObjects(FieldMap::getAllAuthorizedFieldMaps()),
+				'hasorg' => $hasorg,
+				'hassection' => $hassection);
 
 		// Return a whole message including it's message parts formatted into body text and any attachments.
 		case 'previewmessage':
@@ -187,7 +247,7 @@ function handleRequest() {
 				"attachment"=>count($attachments)?cleanObjects($attachments):false,
 				"body"=>count($parts)?$message->format($parts):""
 			);
-			
+
 		case 'messagegrid':
 			// TODO lookup default language code
 			// TODO lookup display names for all language messages to display

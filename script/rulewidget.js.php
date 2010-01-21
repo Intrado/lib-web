@@ -156,6 +156,25 @@ var RuleWidget = Class.create({
 							this.fieldmaps[fieldnum].type = type;
 					}
 				}
+
+				// The customer has organizations so show a selector for it
+				if (data.hasorg) {
+					this.fieldmaps['organization'] = {};
+					this.fieldmaps['organization'].type = 'equalsonly';
+					this.fieldmaps['organization'].name = '<?=addslashes(_L("Organization"))?>';
+				}
+
+				// The customer has sections so show a selector for it
+				if (data.hassection) {
+					this.fieldmaps['section'] = {};
+					this.fieldmaps['section'].type = 'equalsonly';
+					this.fieldmaps['section'].name = '<?=addslashes(_L("Section"))?>';
+				}
+
+				// Add "in" to the equalsonly type
+				this.operators['equalsonly'] = {};
+				this.operators['equalsonly']['in'] = '<?=addslashes(_L('is'))?>';
+
 				// Add "is not" to the multisearch operators.
 				this.operators['multisearch']['not'] = '<?=addslashes(_L('is NOT'))?>';
 				this.operators['multisearch']['in'] = '<?=addslashes(_L('is'))?>';
@@ -236,14 +255,14 @@ var RuleWidget = Class.create({
 	format_readable_value: function(data) {
 		var value = '';
 		if (!data.val.join) {
-			if (data.type == 'multisearch') {
+			if (data.type == 'multisearch' || data.type == "equalsonly") {
 				value = data.val.replace(/\|/g, ',');
 			} else if (data.op == 'reldate') {
 				value = this.reldateOptions[data.val];
 			} else {
 				value = data.val.replace(/\|/g, ' <?=addslashes(_L('and'))?> ');
 			}
-		} else if (data.type == 'multisearch') {
+		} else if (data.type == 'multisearch' || data.type == "equalsonly") {
 			value = data.val.join(',');
 		} else {
 			value = data.val.join(' <?=addslashes(_L('and'))?> ');
@@ -475,8 +494,8 @@ var RuleEditor = Class.create({
 		}
 
 		var val = [];
-		// MULTISEARCH
-		if (fieldmap.type == 'multisearch') {
+		// MULTISEARCH or EQUALSONLY
+		if (fieldmap.type == 'multisearch' || fieldmap.type == 'equalsonly') {
 			var multisearchValues = [];
 			if (this.valueTD.down('input')) {
 				var checkboxes = this.valueTD.select('input:checked');
@@ -537,14 +556,25 @@ var RuleEditor = Class.create({
 		var criteriaSelectbox = this.make_radioboxes(this.ruleWidget.operators[type]);
 		section.update(criteriaSelectbox);
 
-		// Invoke onclick for each radiobox.
-		criteriaSelectbox.select('input').invoke('observe', 'click', function(event) {
-			var fieldmap = this.get_selected_fieldmap();
-			if (fieldmap.type != 'multisearch' || (!this.valueTD.down('input') && !this.valueTD.down('select'))) {
-				this.show_value_column(fieldmap.fieldnum);
-			}
-			this.trigger_event_in_column(null, this.valueTD);
-		}.bindAsEventListener(this));
+		// radio buttons
+		var radiobuttons = criteriaSelectbox.select('input');
+
+		// if this has only one possible criteria, there is no radiobutton. just load values
+		if (radiobuttons.length == 0){
+			this.show_value_column(this.get_selected_fieldmap().fieldnum);
+		} else {
+
+			// Invoke onclick for each radiobox.
+			radiobuttons.invoke('observe', 'click', function(event) {
+				var fieldmap = this.get_selected_fieldmap();
+				if (fieldmap.type != 'multisearch' || (!this.valueTD.down('input') && !this.valueTD.down('select'))) {
+					this.show_value_column(fieldmap.fieldnum);
+				}
+				this.trigger_event_in_column(null, this.valueTD);
+			}.bindAsEventListener(this));
+		}
+
+		// fire event in criteria column if user clicks on the label
 		this.criteriaTD.down('span').show().observe('click', this.trigger_event_in_column.bindAsEventListener(this, this.criteriaTD));
 	},
 
@@ -563,16 +593,28 @@ var RuleEditor = Class.create({
 		}
 
 		var type = this.ruleWidget.fieldmaps[fieldnum].type;
-		var op = this.criteriaTD.down('input:checked');
-		if (!op)
-			return;
-		op = op.getValue();
+		// get the available operators for this type
+		var operators = $H(this.ruleWidget.operators[type]).values();
+		var op = null;
+
+		// if it could be more than one, check which is selected
+		if (operators.size() > 1) {
+			op = this.criteriaTD.down('input:checked');
+			if (!op)
+				return;
+			op = op.getValue();
+		// otherwise just grab the first value. (there is only one)
+		} else {
+			op = operators[0];
+		}
 
 		this.trigger_event_in_column.bindAsEventListener(this, this.valueTD);
 
 		this.ruleWidget.container.style.width = '550px';
 		var container = new Element('div');
 		switch(type) {
+			case 'equalsonly':
+				// fall through, shares cache and ajax call with multisearch
 			case 'multisearch':
 				container.update('<img src="img/ajax-loader.gif"/>');
 				if (this.ruleWidget.multisearchHTMLCache[fieldnum]) {
@@ -580,7 +622,7 @@ var RuleEditor = Class.create({
 					container.update(multicheckboxHTML);
 					this.add_multicheckbox_toolbar(container);
 				} else {
-					new Ajax.Request('ajax.php?type=persondatavalues&fieldnum=' + fieldnum, {
+					new Ajax.Request('ajax.php?type=getdatavalues&fieldnum=' + fieldnum, {
 						onSuccess: function(transport, fieldnum) {
 							var section = this.valueTD.down('fieldset').down('div');
 							var data = transport.responseJSON;
@@ -675,7 +717,7 @@ var RuleEditor = Class.create({
 
 			if (fieldnum.charAt(0) == 'f')
 				fieldSelectbox.insert(option);
-			else if (fieldnum.charAt(0) == 'g')
+			else if (fieldnum.charAt(0) == 'g' || fieldnum == 'organization' || fieldnum == 'section')
 				g.push(option);
 			else if (fieldnum.charAt(0) == 'c')
 				c.push(option);
@@ -701,9 +743,8 @@ var RuleEditor = Class.create({
 				this.datepickers.invoke('close');
 			}
 			var fieldnum = this.fieldTD.down('select').getValue();
-			this.show_criteria_column(fieldnum);
 			this.show_value_column(null);
-			this.show_action_column(true);
+			this.show_criteria_column(fieldnum);
 			if (fieldnum !== '')
 				this.trigger_event_in_column(null, this.criteriaTD);
 			else {
@@ -793,11 +834,24 @@ var RuleEditor = Class.create({
 
 	make_radioboxes: function(values, hidden) {
 		var radioboxDIV = new Element('div');
+		// get the number of possible values
+		var numvals = $H(values).size();
+
+		// for each value, insert a div with control and label
 		for (var i in values) {
-			var radio = new Element('input', {'type':'radio', 'name':radioboxDIV.identify(), 'value':i.escapeHTML()});
-			var label = new Element('label', {'style':'font-size:90%', 'for':radio.identify()}).update(values[i].escapeHTML());
-			radioboxDIV.insert(new Element('div', {'style':'white-space:nowrap'}).insert(radio).insert(label));
+			// don't insert a control if there is only one possible value
+			if (numvals > 1) {
+				// create the control with a label
+				var radio = new Element('input', {'type':'radio', 'name':radioboxDIV.identify(), 'value':i.escapeHTML()});
+				var label = new Element('label', {'style':'font-size:90%', 'for':radio.identify()}).update(values[i].escapeHTML());
+				radioboxDIV.insert(
+					new Element('div', {'style':'white-space:nowrap'}).insert(radio).insert(label));
+			// otherwise, just stick the text into the div
+			} else {
+				radioboxDIV.update(values[i].escapeHTML());
+			}
 		}
+
 		if (hidden)
 			radioboxDIV.hide();
 		return radioboxDIV;
