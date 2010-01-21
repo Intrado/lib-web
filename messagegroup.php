@@ -583,64 +583,52 @@ if ($button = $messagegroupsplitter->getSubmit()) {
 			case 'done': {
 				QuickQuery('BEGIN');
 
-				/////////////////////////////
-				// Global Settings.
-				/////////////////////////////
-
-				// Preferred Gender:
-				// $preferredgender is previously defined, but it can be overwritten by $postdata.
-				if (isset($postdata['preferredgender']))
-					$preferredgender = $postdata['preferredgender'];
-				$phonemessages = DBFindMany('Message', 'from message where not deleted and type="phone" and messagegroupid=?', false, array($messagegroup->id));
-				
-				foreach ($phonemessages as $phonemessage) {
-					$phonemessage->updatePreferredVoice($preferredgender);
-				}
-
-				// Email Headers:
-				if (isset($postdata['subject']))
-					$_SESSION['emailheaders']['subject'] = trim($postdata['subject']);
-				if (isset($postdata['fromname']))
-					$_SESSION['emailheaders']['fromname'] = trim($postdata['fromname']);
-				if (isset($postdata['fromemail']))
-					$_SESSION['emailheaders']['fromemail'] = trim($postdata['fromemail']);
-				// Use a single query to update all email message headers in this message group.
-				$emailheaderdatastring = Message::makeHeaderDataString($_SESSION['emailheaders']);
-				QuickUpdate('update message set data=? where not deleted and type="email" and messagegroupid=?', false, array($emailheaderdatastring, $messagegroup->id));
-
-				// Email Attachments:
-				// $emailattachments is previously defined, but it can be overwritten by $postdata.
-				if (isset($postdata["attachments"])) {
-					if (!is_array($emailattachments = json_decode($postdata["attachments"],true)))
-						$emailattachments = array();
-					$_SESSION['emailattachments'] = $emailattachments;
-
-					// First delete all message attachments for this messagegroup, then create new ones.
-					QuickUpdate("delete a from messageattachment a join message m on a.messageid = m.id where m.messagegroupid=?",false,array($messagegroup->id));
-					$emailmessages = DBFindMany('Message', 'from message where not deleted and type="email" and messagegroupid=?', false, array($messagegroup->id));
-					foreach ($emailmessages as $emailmessage) {
-						$emailmessage->createMessageAttachments($emailattachments);
-					}
-				}
-
-				/////////////////////////////
-				// Specific Forms
-				/////////////////////////////
-
 				if ($form->name == 'messagegroupbasics') {
 					$messagegroup->name = trim($postdata['name']);
 					$messagegroup->defaultlanguagecode = $postdata['defaultlanguagecode'];
 				} else if ($form->name == 'emailheaders') {
-					// Email headers are updated further down, where global settings are applied.
-				} else if ($form->name == 'summary') {
-				} else {
+					$_SESSION['emailheaders']['subject'] = trim($postdata['subject']);
+					$_SESSION['emailheaders']['fromname'] = trim($postdata['fromname']);
+					$_SESSION['emailheaders']['fromemail'] = trim($postdata['fromemail']);
+
+					// Use a single query to update all email message headers in this message group.
+					QuickUpdate('update message set data=? where not deleted and type="email" and messagegroupid=?', false, array(Message::makeHeaderDataString($_SESSION['emailheaders']), $messagegroup->id));
+				} else if ($form->name != 'summary') {
 					list($formdestinationtype, $formdestinationsubtype, $formdestinationlanguagecode) = explode('-', $form->name);
 
 					$destination = isset($destinations[$formdestinationtype]) ? $destinations[$formdestinationtype] : null;
 
 					if (in_array($formdestinationsubtype, $destination['subtypes']) && ($formdestinationlanguagecode == 'autotranslator' || isset($destination['languages'][$formdestinationlanguagecode]))) {
 						$messagegroup->permanent = $postdata['autoexpire'] + 0;
+						$messagegroup->deleted = 0;
+						$messagegroup->modified = makeDateTime(time());
+
+						// Update audio files' permanent flag; the user does not have to be editing a phone message to change the permanent flag.
 						QuickUpdate('update audiofile set permanent=? where messagegroupid=?', false, array($messagegroup->permanent, $messagegroup->id));
+
+						if ($formdestinationtype == 'phone') {
+							$preferredgender = $postdata['preferredgender'];
+							$phonemessages = DBFindMany('Message', 'from message where not deleted and type="phone" and messagegroupid=?', false, array($messagegroup->id));
+			
+							foreach ($phonemessages as $phonemessage) {
+								$phonemessage->updatePreferredVoice($preferredgender);
+							}
+						} else if ($formdestinationtype == 'email') {
+							// Email Attachments.
+							if (!is_array($emailattachments = json_decode($postdata["attachments"],true)))
+								$emailattachments = array();
+							$_SESSION['emailattachments'] = $emailattachments;
+
+							// First delete all message attachments for this messagegroup, then create new ones.
+							QuickUpdate("delete a from messageattachment a join message m on a.messageid = m.id where m.messagegroupid=?",false,array($messagegroup->id));
+							$emailmessages = DBFindMany('Message', 'from message where not deleted and type="email" and messagegroupid=?', false, array($messagegroup->id));
+							foreach ($emailmessages as $emailmessage) {
+								$emailmessage->createMessageAttachments($emailattachments);
+							}
+
+							// Email Headers.
+							$emailheaderdatastring = Message::makeHeaderDataString($_SESSION['emailheaders']);
+						}
 
 						if ($formdestinationlanguagecode == 'autotranslator') {
 							$autotranslatorlanguages = array(); // [$languagecode] = $translationlanguagename
@@ -731,7 +719,10 @@ if ($button = $messagegroupsplitter->getSubmit()) {
 						} else {
 							// Either update existing messages or soft-delete them, depending on the user inputs for the sourcemessagebody/translationitem/messagebody.
 
-							if (count($destination['languages']) > 1 && (($formdestinationtype == 'phone' && isset($customerphonetranslationlanguages[$formdestinationlanguagecode])) || ($formdestinationtype == 'email' && isset($customeremailtranslationlanguages[$formdestinationlanguagecode])))) {
+							if (count($destination['languages']) > 1 &&
+								(($formdestinationtype == 'phone' && isset($customerphonetranslationlanguages[$formdestinationlanguagecode])) ||
+									($formdestinationtype == 'email' && isset($customeremailtranslationlanguages[$formdestinationlanguagecode])))
+							) {
 								if (isset($postdata['translationitem'])) {
 									$translationitemdata = json_decode($postdata['translationitem']);
 								}
@@ -782,6 +773,7 @@ if ($button = $messagegroupsplitter->getSubmit()) {
 
 								$existingmessage->recreateParts($messagebodies[$existingmessage->autotranslate], null, $formdestinationtype == 'phone' ? $preferredgender : null);
 							}
+
 							foreach ($newmessagesneeded as $autotranslate => $needed) {
 								if (!$needed || $messagebodies[$autotranslate] == "")
 									continue;
@@ -792,16 +784,17 @@ if ($button = $messagegroupsplitter->getSubmit()) {
 								$newmessage->name = $messagegroup->name;
 								$newmessage->type = $formdestinationtype;
 								$newmessage->subtype = $formdestinationsubtype;
-								$newmessage->languagecode = $languagecode;
+								$newmessage->languagecode = $formdestinationlanguagecode;
 								$newmessage->autotranslate = $autotranslate;
 								$newmessage->modifydate = makeDateTime(time());
 								$newmessage->deleted = 0;
-								// Email.
 								if ($formdestinationtype == 'email') {
 									$newmessage->data = $emailheaderdatastring;
-									$newmessage->description = SmartTruncate(($formdestinationsubtype == 'html' ? 'HTML' : ucfirst($formdestinationsubtype)) . ' ' . Language::getName($languagecode), 50);
+									$newmessage->description = SmartTruncate(($formdestinationsubtype == 'html' ? 'HTML' : ucfirst($formdestinationsubtype)) . ' ' . Language::getName($formdestinationlanguagecode), 50);
 								} else if ($formdestinationtype != 'sms') {
-									$newmessage->description = SmartTruncate(Language::getName($languagecode), 50);
+									$newmessage->description = SmartTruncate(Language::getName($formdestinationlanguagecode), 50);
+								} else {
+									$newmessage->description = '';
 								}
 								$newmessage->update();
 								
@@ -811,13 +804,9 @@ if ($button = $messagegroupsplitter->getSubmit()) {
 								$newmessage->recreateParts($messagebodies[$autotranslate], null, $formdestinationtype == 'phone' ? $preferredgender : null);
 							}
 						}
-					} else {
-						break;
 					}
 				}
 
-				$messagegroup->deleted = 0;
-				$messagegroup->modified = makeDateTime(time());
 				$messagegroup->update();
 
 				QuickQuery('COMMIT');
@@ -978,31 +967,44 @@ echo '<div id="messagegroupformcontainer">' . $messagegroupsplitter->render($def
 					'onSuccess': function(transport, translationlanguagecodes, errortext) {
 						var data = transport.responseJSON;
 
-						if (!data || !data.responseData || !data.responseStatus || data.responseStatus != 200 || (translationlanguagecodes.length > 1 && translationlanguagecodes.length != data.responseData.length)) {
+						if (!data || !data.responseData || !data.responseStatus || data.responseStatus != 200 ||
+							(translationlanguagecodes.length > 1 && translationlanguagecodes.length != data.responseData.length)) {
 							alert(errortext);
 							return;
 						}
 
 						var dataResponseData = data.responseData;
+						
+						var count = translationlanguagecodes.length;
 
-						for (var i = 0, count = translationlanguagecodes.length; i < count; i++) {
+						// If there is a single language, the response is not an array.
+						if (count == 1) {
+							updateTranslationItem(this, languagecode, dataResponseData.translatedText);
+							return;
+						}
+
+						// Use a flag to indicate if any language has an error;
+						// we want to wait until after the for-loop to show an alert() otherwise the user could get multiple alerts.
+						var haserror = false;
+
+						for (var i = 0; i < count; i++) {
 							var languagecode = translationlanguagecodes[i];
-							if (count == 1) {
-								updateTranslationItem(this, languagecode, dataResponseData.translatedText);
-								break;
-							}
 
 							var response = dataResponseData[i];
 							var responseData = response.responseData;
-							i++;
 
+							// If there is an error for a particular language, clear its contents, and flag haserror.
 							if (response.responseStatus != 200 || !responseData) {
-								alert(errortext);
+								updateTranslationItem(this, languagecode, '');
+								haserror = true;
 								continue;
+							} else {
+								updateTranslationItem(this, languagecode, responseData.translatedText);
 							}
-
-							updateTranslationItem(this, languagecode, responseData.translatedText);
 						}
+
+						if (haserror)
+							alert(errortext);
 					}.bindAsEventListener(this, translationlanguagecodes, errortext),
 					
 					'onFailure': function(transport, errortext) {
@@ -1016,7 +1018,7 @@ echo '<div id="messagegroupformcontainer">' . $messagegroupsplitter->render($def
 		formswitchercontainer.observe('FormSplitter:TabLoaded',
 			messagegroupHandleTabLoaded.bindAsEventListener(formswitchercontainer, state, '<?=$_SESSION['messagegroupid']?>', '<?=Language::getDefaultLanguageCode()?>', autotranslatorupdator, false)
 		);
-
+		
 		messagegroupStyleLayouts();
 	})();
 
