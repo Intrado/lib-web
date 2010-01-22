@@ -21,7 +21,6 @@ if ($USER->authorize(array('starteasy','sendmessage', 'sendemail', 'sendphone', 
 	$SHORTCUTS['-- Jobs & Messages --'] = "false;";
 	if ($USER->authorize("starteasy")) {
 		$SHORTCUTS['EasyStart'] = "jobwizard.php?new";
-		$SHORTCUTS['Call Me to Record'] = "callme.php";
 	}
 	if ($USER->authorize(array('sendmessage', 'sendemail', 'sendphone', 'sendsms'))) {
 		$SHORTCUTS['My Messages'] = "messages.php";
