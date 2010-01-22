@@ -95,7 +95,7 @@ class ValIntroSelect extends Validator {
 			if ( 1 != QuickQuery('select count(*) from message where id=? and type=\'phone\' and languagecode=?', false, array($value["message"],$args["languagecode"]))) {
 				$errortext .= "Message can not be found";
 			} else if (Message::getAudioLength($value["message"],array()) < 70000) { // 70000 ~ 5 second audio
-				$errortext .= "Message must be more than 5 seconds long to be a intro message.";
+				$errortext .= "Message must be more than 5 seconds long to be an intro message.";
 			}		
 		}				
 		if ($errortext)
@@ -310,10 +310,10 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 								$newpart->create();
 							}
 						}
-						QuickUpdate("delete from prompt where type=? and language is null;",false,array($introtype));
-						QuickUpdate("insert into prompt (type, messageid) values (?,?)",false,array($introtype,$newmsg->id));
+						QuickUpdate("delete from prompt where type=? and languagecode = 'en'",false,array($introtype));
+						QuickUpdate("insert into prompt (type, messageid,languagecode) values (?,?,'en')",false,array($introtype,$newmsg->id));
 					} else {
-						QuickUpdate("delete from prompt where type=? and language is null;",false,array($introtype));
+						QuickUpdate("delete from prompt where type=? and languagecode = 'en'",false,array($introtype));
 					}
 				}
 			}
@@ -344,10 +344,10 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 									$newpart->create();
 								}
 							}
-							QuickUpdate("delete from prompt where type=? and language=?;",false,array($introtype,$language));
-							QuickUpdate("insert into prompt (type, messageid,language) values (?,?,?)",false,array($introtype,$newmsg->id,$language));
+							QuickUpdate("delete from prompt where type=? and languagecode=?",false,array($introtype,$code));
+							QuickUpdate("insert into prompt (type, messageid,languagecode) values (?,?,?)",false,array($introtype,$newmsg->id,$code));
 						} else {
-							QuickUpdate("delete from prompt where type=? and language=?;",false,array($introtype,$language));
+							QuickUpdate("delete from prompt where type=? and languagecode=?",false,array($introtype,$code));
 						}
 					}
 				}
