@@ -133,8 +133,8 @@ foreach($users as $user) {
 
 $messagevalues = array("user" => $userselect, "message" => $messages);
 
-$generalintro = QuickQueryRow("select m.id , m.name from message m, prompt p where p.type='intro' and p.languagecode is null and p.messageid = m.id and m.type='phone'");
-$emergencyintro = QuickQueryRow("select m.id , m.name from message m, prompt p where p.type='emergencyintro' and p.languagecode is null and p.messageid = m.id and m.type='phone'");
+$generalintro = QuickQueryRow("select m.id , m.name from message m, prompt p where p.type='intro' and p.languagecode is 'en' and p.messageid = m.id and m.type='phone'");
+$emergencyintro = QuickQueryRow("select m.id , m.name from message m, prompt p where p.type='emergencyintro' and p.languagecode is 'en' and p.messageid = m.id and m.type='phone'");
 
 $defaultmessages = $messagevalues;
 if($generalintro)
@@ -222,7 +222,7 @@ foreach($languages as $language => $code) {
 			"validators" => array(array("ValIntroSelect", "languagecode" => $code)),
 			"control" => array("IntroSelect",
 				 "values"=>$generalmessages,
-				 "defaultfile" => "$language/DefaultIntro.wav",
+				 "defaultfile" => "$code/DefaultIntro.wav",
 			),
 			"helpstep" => $helpstepindex
 		);
@@ -250,7 +250,7 @@ foreach($languages as $language => $code) {
 			"validators" => array(array("ValIntroSelect", "languagecode" => $code)),
 			"control" => array("IntroSelect",
 				 "values"=>$emergencymessages,
-				 "defaultfile" => "$language/EmergencyIntro.wav",
+				 "defaultfile" => "$code/EmergencyIntro.wav",
 			),
 			"helpstep" => $helpstepindex
 		);
