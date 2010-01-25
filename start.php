@@ -256,6 +256,7 @@ function activityfeed($mergeditems,$ajax = false) {
 
 					$job = new Job();
 					$job->id = $itemid;
+					$job->type = $item["jobtype"];
 					$job->status = $status;
 					$job->deleted = $item["deleted"];
 					$tools = fmt_jobs_actions ($job,$item["name"]);
