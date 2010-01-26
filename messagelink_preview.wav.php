@@ -7,6 +7,7 @@ require_once("inc/db.inc.php");
 require_once("inc/auth.inc.php");
 require_once('inc/securityhelper.inc.php');
 require_once('inc/content.inc.php');
+require_once("inc/locale.inc.php");
 require_once("obj/Content.obj.php");
 require_once("obj/Message.obj.php");
 require_once("obj/MessagePart.obj.php");
