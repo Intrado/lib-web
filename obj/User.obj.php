@@ -20,9 +20,9 @@ class User extends DBMappedObject {
 	var $importid;
 	var $lastimport;
 	
-	
 	var $rules = false; //local cache of rules
-
+	var $organizations = false; // local cache of authorized organizations.
+	
 	//new constructor
 	function User ($id = NULL) {
 		$this->_allownulls = true;
@@ -73,6 +73,14 @@ class User extends DBMappedObject {
 		return false;
 	}
 
+	// Returns true if the user is associated with this organization or is unrestricted.
+	// The user is unrestricted if he has no organization associations.
+	function authorizeOrganization($id) {
+		$organizations = $this->organizations();
+		
+		return isset($organizations[$id]);
+	}
+	
 	function authorizeField($field) {
 		$fields = $_SESSION['access']->getValue('datafields');
 		return !$fields || in_array($field, explode('|', $_SESSION['access']->getValue('datafields')));
@@ -85,10 +93,27 @@ class User extends DBMappedObject {
 
 	function rules() {
 		if ($this->rules === false)
-			$this->rules = DBFindMany("Rule","from rule inner join userassociation ua on rule.id = ua.ruleid where userid =?", false, array($this->id));
+			$this->rules = DBFindMany("Rule","from rule r inner join userassociation ua on r.id = ua.ruleid where userid =?", 'r', array($this->id));
 		return $this->rules;
 	}
-	
+
+	// Returns associated organizations or all organizations if unrestricted.
+	// The user is unrestricted if he has no organization associations.
+	function organizations() {
+		if ($this->organizations === false) {
+			$associatedorganizations = DBFindMany('Organization', 'from organization o left join userassociation ua on o.id = ua.organizationid where userid = ?', 'o', array($this->id));
+
+			// If the user has specific organization associations, return those organizations.
+			// Otherwise he can see all organizations.
+			if (count($associatedorganizations) > 0)
+				$this->organizations = $associatedorganizations;
+			else
+				$this->organizations = DBFindMany('Organization', 'from organization where not deleted');
+		}
+		
+		return $this->organizations;
+	}
+
 	function userSQL ($alias = false) {
 		$r = Rule::makeQuery($this->rules(), $alias);
 		//TODO add org/section/etc
