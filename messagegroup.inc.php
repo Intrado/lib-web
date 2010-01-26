@@ -76,11 +76,11 @@ function makeTranslationItem($required, $type, $subtype, $languagecode, $languag
 	if ($type == 'email' && !$inautotranslator) {
 		$validators[] = array("ValEmailMessageBody");
 	}
-	
+
 	if (!$inautotranslator)
 		$validators[] = array("ValMessageBody", "translationitem" => true, "type" => $type, "subtype" => $subtype, "languagecode" => $languagecode, "maximages" => $maximages);
 	$validators[] = array("ValTranslationItem", "required" => $required);
-	
+
 	if ($required)
 		$validators[] = array("ValRequired");
 
@@ -140,7 +140,7 @@ function makeMessageBody($required, $type, $subtype, $languagecode, $label, $mes
 	if ($type == 'email') {
 		$validators[] = array("ValEmailMessageBody");
 	}
-	
+
 	if ($required)
 		$validators[] = array("ValRequired");
 
@@ -159,7 +159,7 @@ function makeAccordionSplitter($type, $subtype, $languagecode, $permanent, $pref
 	global $USER;
 
 	$accordionsplitterchildren = array();
-	
+
 	if ($type == 'email') {
 		$accordionsplitterchildren[] = array(
 			"title" => _L("Attachments"),
@@ -180,16 +180,16 @@ function makeAccordionSplitter($type, $subtype, $languagecode, $permanent, $pref
 							var attachmentsformitemname = '{$type}-{$subtype}-{$languagecode}_attachments';
 							var attachmentsformitem = $(attachmentsformitemname);
 							var form = attachmentsformitem.up('form');
-							
+
 							attachmentsformitem.observe('Form:ValidationDisplayed', function(event) {
 								var formvars = document.formvars[this.identify()];
-								
+
 								if (event.memo.style == 'error')
 									formvars.preventAccordionClosing = true;
 								else
 									formvars.preventAccordionClosing = false;
 							}.bindAsEventListener(form));
-							
+
 							form.observe('Accordion:ClickTitle', function(event) {
 								var formvars = document.formvars[this.identify()];
 								var currentSection = event.memo.currentSection;
@@ -229,7 +229,7 @@ function makeAccordionSplitter($type, $subtype, $languagecode, $permanent, $pref
 					"helpstep" => 1
 				)
 			);
-			
+
 			$accordionsplitterchildren[] = array(
 				"title" => _L("Audio"),
 				"icon" => 'img/icons/fugue/microphone.gif',
@@ -248,12 +248,12 @@ function makeAccordionSplitter($type, $subtype, $languagecode, $permanent, $pref
 						<script type='text/javascript'>
 							(function () {
 								var audiolibrarywidget = new AudioLibraryWidget('audiolibrarycontainer', {$_SESSION['messagegroupid']});
-								
+
 								var audiouploadformitem = $('{$type}-{$subtype}-{$languagecode}_audioupload');
-								
+
 								var getAudioTextarea = function () {
 									var audiotextareaid = '" . ($allowtranslation ? "{$type}-{$subtype}-{$languagecode}_translationitem" : "{$type}-{$subtype}-{$languagecode}_nonemessagebody") . "';
-									
+
 									var sourcetextarea = $(audiotextareaid + 'englishText');
 									if (sourcetextarea) {
 										if (sourcetextarea.up('.MessageBodyContainer').visible())
@@ -264,7 +264,7 @@ function makeAccordionSplitter($type, $subtype, $languagecode, $permanent, $pref
 										return $(audiotextareaid);
 									}
 								};
-								
+
 								var translationcheckbox = $('{$type}-{$subtype}-{$languagecode}_translationitem' + 'translatecheck');
 								if (translationcheckbox) {
 									var observetranslationaccordion = function(accordion, translationcheckbox) {
@@ -276,30 +276,30 @@ function makeAccordionSplitter($type, $subtype, $languagecode, $permanent, $pref
 												else
 													accordion.unlock_section(audiosection);
 											}.bindAsEventListener(translationcheckbox, accordion, audiosection));
-											
+
 											if (translationcheckbox.checked)
 												accordion.lock_section(audiosection);
 										}
 									};
-									
+
 									var form = audiouploadformitem.up('form');
-									
+
 									form.observe('FormSplitter:AccordionLoaded', function(event, translationcheckbox) {
 										var formvars = document.formvars[this.name];
-										
+
 										observetranslationaccordion(formvars.accordion, translationcheckbox);
 									}.bindAsEventListener(form, translationcheckbox));
-									
+
 									if (document.formvars && document.formvars[form.name] && document.formvars[form.name].accordion) {
 										var formvars = document.formvars[form.name];
 										observetranslationaccordion(formvars.accordion, translationcheckbox);
 									}
 								}
-								
+
 								audiouploadformitem.observe('AudioUpload:AudioUploaded', function(event) {
 									hideHtmlEditor();
 									var audiofile = event.memo;
-									
+
 									textInsert('{{' + audiofile.name + '}}', getAudioTextarea());
 									this.reload();
 								}.bindAsEventListener(audiolibrarywidget));
@@ -307,13 +307,13 @@ function makeAccordionSplitter($type, $subtype, $languagecode, $permanent, $pref
 								audiolibrarywidget.container.observe('AudioLibraryWidget:ClickName', function(event) {
 									hideHtmlEditor();
 									var audiofile = event.memo.audiofile;
-									
+
 									textInsert('{{' + audiofile.name + '}}', getAudioTextarea());
 								}.bindAsEventListener(audiolibrarywidget));
 
 								// observe the callme container element for EasyCall events
 								$('{$type}-{$subtype}-{$languagecode}_callme_content').observe('EasyCall:update', function(event) {
-										
+
 									new Ajax.Request('ajaxmessagegroup.php', {
 										'method': 'post',
 										'parameters': {
@@ -442,7 +442,7 @@ function makeAccordionSplitter($type, $subtype, $languagecode, $permanent, $pref
 class CallMe extends FormItem {
 	function render ($value) {
 		$n = $this->form->name."_".$this->name;
-		
+
 		// Hidden input item to store values in
 		$str = '<input id="'.$n.'" name="'.$n.'" type="hidden" value="{}" />
 		<div>
@@ -471,7 +471,6 @@ class CallMe extends FormItem {
 				$("'.$n.'_content").update();
 				// Create an EasyCall!
 				new EasyCall(
-					"'.$this->form->name.'",
 					"'.$n.'",
 					"'.$n.'_content'.'",
 					"'.$defaultphone.'",
@@ -516,7 +515,7 @@ class ValTranslationItem extends Validator {
 	var $onlyserverside = true;
 	function validate ($value, $args) {
 		$msgdata = json_decode($value);
-		
+
 		if (!empty($args['required'])) {
 			if (($msgdata->enabled && !$msgdata->override && empty($msgdata->englishText)) || ((!$msgdata->enabled || $msgdata->override) && empty($msgdata->text))) {
 				return _L('%s is required.', $this->label);
@@ -531,7 +530,7 @@ class ValDefaultLanguageCode extends Validator {
 	function validate ($requestedlanguagecode, $args) {
 		$messagegroup = new MessageGroup($_SESSION['messagegroupid']);
 		$messages = DBFindMany('Message', 'from message where not deleted and type != "sms" and messagegroupid=?', false, array($messagegroup->id));
-		
+
 		if (!empty($messages)) {
 			$foundrequestedlanguage = false;
 			$existinglanguagecodes = array(); // example: ["{$message->type}-{$message->subtype}"] = array('en', 'es')
@@ -543,10 +542,10 @@ class ValDefaultLanguageCode extends Validator {
 					$existinglanguagecodes[$key] = array();
 				$existinglanguagecodes[$key][] = $message->languagecode;
 			}
-			
+
 			if (!$foundrequestedlanguage)
 				return _L("Please first create the %s message.", Language::getName($requestedlanguagecode));
-			
+
 			foreach ($existinglanguagecodes as $key => $languagecodes) {
 				if (!in_array($requestedlanguagecode, $languagecodes)) {
 					list($type, $subtype) = explode('-', $key);
@@ -558,7 +557,7 @@ class ValDefaultLanguageCode extends Validator {
 				}
 			}
 		}
-		
+
 		return true;
 	}
 }

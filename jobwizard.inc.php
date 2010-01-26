@@ -224,7 +224,7 @@ class EasyCall extends FormItem {
 		else
 			$languages = array();
 
-		$defaultphone = escapehtml((isset($this->args['phone']) && $this->args['phone'])?Phone::format($this->args['phone']):addslashes(_L("Phone Number")));
+		$defaultphone = escapehtml(Phone::format($this->args['phone']));
 		if (!$value)
 			$value = '{}';
 		// Hidden input item to store values in
@@ -257,7 +257,7 @@ class EasyCall extends FormItem {
 					audiofiles["en"] = null;
 
 				// store the language code to name map in a json object, we need this in WizEasyCall
-				var languages = '.json_encode($languages).';
+				languages = '.json_encode($languages).';
 
 				// save default phone into msgphone, this variable tracks changes the user makes to desired call me number
 				msgphone = "'.$defaultphone.'";
@@ -266,7 +266,7 @@ class EasyCall extends FormItem {
 				Object.keys(audiofiles).each(function(langcode) {
 
 					// create a new wizard easycall
-					insertNewWizEasyCall( "'.$this->form->name.'", "'.$n.'", "'.$n.'_content", "'.$n.'_select", langcode );
+					insertNewWizEasyCall( "'.$n.'", "'.$n.'_content", "'.$n.'_select", langcode );
 				});
 
 				// listen for selections from the _select element
@@ -278,7 +278,7 @@ class EasyCall extends FormItem {
 					var langcode = $("'.$n.'_select").value;
 
 					// create a new wizard easycall
-					insertNewWizEasyCall( "'.$this->form->name.'", "'.$n.'", "'.$n.'_content", "'.$n.'_select", langcode );
+					insertNewWizEasyCall( "'.$n.'", "'.$n.'_content", "'.$n.'_select", langcode );
 
 				});
 
@@ -325,10 +325,11 @@ class ValEasycall extends Validator {
 		$values = json_decode($value);
 		if ($value == "{}")
 			return "$this->label "._L("has messages that are not recorded");
-		foreach ($values as $langcode => $afid)
-			$audiofile = DBFind("AudioFile", "from audiofile where id = ?", false, array($afid));
+		foreach ($values as $langcode => $afid) {
+			$audiofile = DBFind("AudioFile", "from audiofile where id = ? and userid = ?", false, array($afid, $USER->id));
 			if (!$audiofile)
 				return "$this->label "._L("has invalid or missing messages");
+		}
 		return true;
 	}
 }
@@ -935,13 +936,13 @@ class JobWiz_messagePhoneTranslate extends WizStep {
 			if(is_array($translations)){
 				foreach($translations as $obj){
 					$languagecode = array_shift($translationlanguagecodes);
-					
+
 					if(!isset($voices[$languagecode.":".$msgdata->gender]))
 						$gender = ($msgdata->gender == "male")?"female":"male";
 					else
 						$gender = $msgdata->gender;
 					$transient = $this->isTransient($postdata, $languagecode);
-					
+
 					$formdata[$languagecode] = $this->getTranslationDataArray($translationlanguages[$languagecode], $languagecode, $obj->responseData->translatedText, $gender, $transient, ($transient?"":$msgdata->text));
 				}
 			} else {
@@ -1267,7 +1268,7 @@ class JobWiz_messageEmailTranslate extends WizStep {
 		} else {
 			$translationlanguagecodes = array_keys($translationlanguages);
 		}
-		
+
 		// Form Fields.
 		$formdata = array($this->title);
 
