@@ -29,7 +29,7 @@ require_once("obj/FormRuleWidget.fi.php");
 require_once("inc/rulesutils.inc.php");
 require_once("inc/formatters.inc.php");
 require_once("obj/JobType.obj.php");
-require_once('list.inc.php');
+require_once("list.inc.php");
 
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization
@@ -84,13 +84,28 @@ class ValListName extends Validator {
 // Form Data
 ////////////////////////////////////////////////////////////////////////////////
 
-$rulesjson = '';
+$rulewidgetvaluejson = '';
 if ($list->id) {
+	$rulewidgetdata = array();
+	
 	$rules = $list->getListRules();
-	if (is_array($rules))
-		$rulesjson = json_encode(cleanObjects(array_values($rules)));
-	else
-		unset($rules);
+	if (count($rules) > 0)
+		$rulewidgetdata = cleanObjects(array_values($rules));
+	
+	$organizations = $list->getOrganizations();
+	if (count($organizations) > 0) {
+		$orgkeys = array(); // An array of value=>title pairs.
+		foreach ($organizations as $organization) {
+			$orgkeys[$organization->id] = $organization->orgkey;
+		}
+		$rulewidgetdata[] = array(
+			'fieldnum' => 'organization',
+			'val' => $orgkeys
+		);
+	}
+	
+	if (count($rulewidgetdata) > 0)
+		$rulewidgetvaluejson = json_encode($rulewidgetdata);
 }
 
 $total = isset($renderedlist) ? $renderedlist->total : '0';
@@ -143,14 +158,13 @@ $formdata["ruledelete"] = array(
 $formdata["newrule"] = array(
 	"label" => _L('List Rules'),
 	"fieldhelp" => _L('Use rules to select groups of contacts from the data available to your account.'),
-	"value" => $rulesjson,
+	"value" => $rulewidgetvaluejson,
 	"validators" => array(
 		array("ValRules")
 	),
-	"control" => array("FormRuleWidget", "showRemoveAllButton" => !empty($rules)),
+	"control" => array("FormRuleWidget", "showRemoveAllButton" => $rulewidgetvaluejson != ''),
 	"helpstep" => 2
 );
-
 
 $formdata["additions"] = array(
 	"label" => _L('Additions'),
@@ -222,6 +236,8 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 			if ($ajax) {
 				switch ($button) {
 					case 'addrule':
+						error_log('Adding rule');
+						
 						$ruledata = json_decode($postdata['newrule']);
 						$data = $ruledata[0];
 						// CREATE rule.
@@ -230,41 +246,69 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 							$form->sendTo('list.php');
 							break;
 						}
-						if (!$type = Rule::getType($data->fieldnum)) {
-							notice(_L('There is a problem adding the rule for %s.', escapehtml(FieldMap::getName($data->fieldnum))));
-							$form->sendTo('list.php');
-							break;
+						
+						if ($data->fieldnum == 'organization') {
+							QuickUpdate('BEGIN');
+								
+								foreach ($data->val as $id) {
+									$le = new ListEntry();
+									$le->listid = $list->id;
+									$le->type = "organization";
+									$le->organizationid = $id + 0;
+									$le->create();
+								}
+								
+							QuickUpdate('COMMIT');
+							
+							notice(_L('The rule for organization is now added.'));
+						} else {
+							if (!$type = Rule::getType($data->fieldnum)) {
+								notice(_L('There is a problem adding the rule for %s.', escapehtml(FieldMap::getName($data->fieldnum))));
+								$form->sendTo('list.php');
+								break;
+							}
+							
+							$data->val = prepareRuleVal($type, $data->op, $data->val);
+							
+							if (!$rule = Rule::initFrom($data->fieldnum, $data->logical, $data->op, $data->val)) {
+								notice(_L('There is a problem adding the rule for %s.', escapehtml(FieldMap::getName($data->fieldnum))));
+								$form->sendTo('list.php');
+								break;
+							}
+							
+							QuickUpdate('BEGIN');
+								$rule->create();
+								$le = new ListEntry();
+								$le->listid = $list->id;
+								$le->type = "rule";
+								$le->ruleid = $rule->id;
+								$le->create();
+							QuickUpdate('COMMIT');
+							
+							notice(_L('The rule for %s is now added.', escapehtml(FieldMap::getName($data->fieldnum))));
 						}
-						$data->val = prepareRuleVal($type, $data->op, $data->val);
-						if (!$rule = Rule::initFrom($data->fieldnum, $data->logical, $data->op, $data->val)) {
-							notice(_L('There is a problem adding the rule for %s.', escapehtml(FieldMap::getName($data->fieldnum))));
-							$form->sendTo('list.php');
-							break;
-						}
-						QuickUpdate('BEGIN');
-							$rule->create();
-							$le = new ListEntry();
-							$le->listid = $list->id;
-							$le->type = "R";
-							$le->ruleid = $rule->id;
-							$le->create();
-						QuickUpdate('COMMIT');
-
-						notice(_L('The rule for %s is now added.', escapehtml(FieldMap::getName($data->fieldnum))));
+						
 						$form->sendTo('list.php');
 						break;
 
 					case 'deleterule':
 						$fieldnum = $postdata['ruledelete'];
-						if ($USER->authorizeField($fieldnum))
+						if ($fieldnum == 'organization') {
+							QuickUpdate("DELETE FROM listentry WHERE listid=? AND type='organization'", false, array($list->id));
+							
+							notice(_L('The rule for organization is now removed.'));
+						} else if ($USER->authorizeField($fieldnum)) {
 							QuickUpdate("DELETE le.*, r.* FROM listentry le, rule r WHERE le.ruleid=r.id AND le.listid=? AND r.fieldnum=?", false, array($list->id, $fieldnum));
+							
+							notice(_L('The rule for %s is now removed.', escapehtml(FieldMap::getName($fieldnum))));
+						}
 
-						notice(_L('The rule for %s is now removed.', escapehtml(FieldMap::getName($fieldnum))));
 						$form->sendTo('list.php');
 						break;
 
 					case 'clearrules':
 						QuickUpdate("DELETE le.*, r.* FROM listentry le, rule r WHERE le.ruleid=r.id AND le.listid=?", false, array($list->id));
+						QuickUpdate("DELETE FROM listentry WHERE le.listid=? AND type='organization'", false, array($list->id));
 
 						notice(_L('All rules are now removed.'));
 						$form->sendTo('list.php');
