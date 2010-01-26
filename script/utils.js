@@ -520,6 +520,10 @@ function blankFieldValue(element, value) {
 	element = $(element);
 	element.observe("focus", setDefaultFieldValue.curry(value));
 	element.observe("blur", setDefaultFieldValue.curry(value));
+	if (element.value == "") {
+		element.value = value;
+		element.setStyle({ color: "gray" });
+	}
 }
 
 function setDefaultFieldValue(value, event) {
