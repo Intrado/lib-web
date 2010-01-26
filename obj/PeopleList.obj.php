@@ -21,6 +21,13 @@ class PeopleList extends DBMappedObject {
 		return DBFindMany("Rule","from listentry le, rule r where le.type='rule'
 				and le.ruleid=r.id and le.listid='" . $this->id .  "'", "r");
 	}
+	
+	function getOrganizations() {
+		return DBFindMany("Organization",
+			"from organization o inner join listentry le on (o.id = le.organizationid) where le.listid = ?",
+			"o",
+			array($this->id));
+	}
 
 	function getListRuleSQL () {
 		//get and compose list rules
@@ -30,7 +37,7 @@ class PeopleList extends DBMappedObject {
 			$listsql = "1" . Rule::makeQuery($listrules, "p");
 		else
 			$listsql = "0";//dont assume anyone is in the list if there are no rules
-//echo (" LISTSQL ".$listsql);
+			
 		return $listsql;
 	}
 }
