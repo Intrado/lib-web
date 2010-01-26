@@ -168,58 +168,28 @@ function handleRequest() {
 
 			// if it's an organization field
 			} else if ($fieldnum == 'organization') {
-
-				// find organization ids that the user is limited to see
-				$limit = QuickQueryList("select organizationid from userassociation where userid = ? and type = 'organization' and organizationid not NULL", false, false, array($USER->id));
-
-				// if there are assigned org ids, build a limit
-				$orgids = array();
-				if ($limit)
-					foreach ($limit as $l)
-						$orgids[] .= '?';
-
-				$limitsql = ($orgids)? " and id in (" . implode(",", $orgids) . ") " : "";
-
-				// select all organization values the user is authorized to see
-				return QuickQueryList("select orgkey from organization where 1 " . $limitsql, false, false, $limit);
-
-			// if it's a section field
-			} else if ($fieldnum == 'section') {
-
-				// find sections ids that the user is limited to see
-				// TODO: Do sections need to be restricted by organization associations here or is that handled when the user associations are created?
-				$limit = QuickQueryList("select sectionid from userassociation where userid = ? and type = 'section' and sectionid not NULL", false, false, array($USER->id));
-
-				// if there are assigned section ids, build a limit
-				$secids = array();
-				if ($limit)
-					foreach ($limit as $l)
-						$secids[] .= '?';
-
-				$limitsql = ($secids)? " and id in (" . implode(",", $secids) . ") " : "";
-
-				// select all organization values the user is authorized to see
-				return QuickQueryList("select skey from organization where 1 " . $limitsql, false, false, $limit);
-
+				// $orgkeys is an array of value=>title pairs.
+				$orgkeys = array();
+				
+				foreach ($USER->organizations() as $organization) {
+					$orgkeys[$organization->id] = $organization->orgkey;
+				}
+				
+				return $orgkeys;
 			// unknown fieldnum?
 			} else {
 				return false;
 			}
 
 		case 'rulewidgetsettings':
-			// check userassociations for org and section to see if we should show organization/section selection
-			$userhasorg = (QuickQuery('select count(id) from userassociation where type = "organization" and organizationid not null and userid = ?', false, array($USER->id)) > 0);
-			$userhassection = (QuickQuery('select count(id) from userassociation where type = "section" and sectionid not null and userid = ?', false, array($USER->id)) > 0);
-
-			$custhasorg = (QuickQuery('select count(id) from organization where not deleted') > 0);
-			$custhassection = (QuickQuery('select count(id) from section') > 0);
+			// check userassociations for org to see if we should show organization selection
 
 			return array(
 				'operators' => $RULE_OPERATORS,
 				'reldateOptions' => $RELDATE_OPTIONS,
 				'fieldmaps' => cleanObjects(FieldMap::getAllAuthorizedFieldMaps()),
-				'hasorg' => $hasorg,
-				'hassection' => $hassection);
+				'hasorg' => count($USER->organizations()) > 0,
+			);
 
 		// Return a whole message including it's message parts formatted into body text and any attachments.
 		case 'previewmessage':
