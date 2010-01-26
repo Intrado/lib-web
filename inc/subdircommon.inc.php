@@ -29,6 +29,7 @@ require_once("../obj/User.obj.php");
 require_once("../obj/Access.obj.php");
 require_once("../obj/Permission.obj.php");
 require_once("../obj/Rule.obj.php"); //for search and sec profile rules
+require_once("../obj/Organization.obj.php"); //for search and sec profile rules
 
 if (!isset($isindexpage) || !$isindexpage) {
 	doStartSession();
