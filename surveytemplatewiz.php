@@ -47,7 +47,7 @@ class AddQuestionButton extends FormItem {
 		$n = $this->form->name."_".$this->name;
 		$str = '<input id="'.$n.'" name="'.$n.'" type="hidden" value="" />'; //always blank out value
 		$str .= icon_button( _L('Add Another Question'),"add", "$('$n').value='add'; form_submit(event,'samestep');");
-		
+
 		return $str;
 	}
 }
@@ -59,10 +59,10 @@ class RemoveQuestionButton extends FormItem {
 		$n = $this->form->name."_".$this->name;
 		$str = '<input id="'.$n.'" name="'.$n.'" type="hidden" value="" />'; //always blank out value
 		$str .= icon_button($this->args['name'],"delete", "$('$n').value='1'; doRemoveQuestion('".$this->form->name."',".$this->args['qnum']."); form_submit(event,'samestep');");
-		
+
 		return $str;
 	}
-	
+
 	function renderJavascriptLibraries() {
 		return '
 		<script type="text/javascript">
@@ -102,17 +102,17 @@ class PhoneMessageRecorder extends FormItem {
 		$str = '<script type="text/javascript" src="script/easycall.js.php"></script>';
 		$str .= '
 		<script type="text/javascript">
-		
+
 		function setupMessageRecorderButtons(e) {
 			e = $(e);
 			var value = e.value.evalJSON();
 			var formname = e.up("form").name;
 			var content = $(e.id+"_content");
-			
+
 			if (value.m || value.af) {
 				var playbtn = icon_button("'.escapehtml(_L('Play')).'", "fugue/control");
 				var rerecordbtn = icon_button("'.escapehtml(_L('Re-record')).'", "diagona/16/118");
-				
+
 				playbtn.observe("click", function () {
 					var value = e.value.evalJSON();
 					if (value.m)
@@ -120,17 +120,17 @@ class PhoneMessageRecorder extends FormItem {
 					else if (value.af)
 						popup("previewaudio.php?close=1&id="+value.af, 400, 500);
 				});
-				
+
 				function curry (fn,obj) {
 					return new function() {
 						fn(obj);
 					}
 				}
-				
+
 				rerecordbtn.observe("click", function () {
 					setupMessageRecorderEasyCall(e);
 				});
-				
+
 				content.update();
 				content.insert(playbtn);
 				content.insert(rerecordbtn);
@@ -138,14 +138,13 @@ class PhoneMessageRecorder extends FormItem {
 				setupMessageRecorderEasyCall(e);
 			}
 		}
-		
+
 		function setupMessageRecorderEasyCall (e) {
 			e = $(e);
-			var formname = e.up("form").name;
 			var content = $(e.id+"_content");
-			
-			new EasyCall(formname, e.id, content, "'.Phone::format($USER->phone).'", "Survey Message");
-			
+
+			new EasyCall(e.id, content, "'.Phone::format($USER->phone).'", "Survey Message");
+
 			content.observe("EasyCall:update", function(event) {
 				e.value = "{\"af\":" + event.memo.audiofileid + "}";
 				setupMessageRecorderButtons(e);
@@ -154,7 +153,7 @@ class PhoneMessageRecorder extends FormItem {
 		}
 		</script>
 		';
-		
+
 		return $str;
 	}
 }
@@ -164,12 +163,12 @@ class PhoneMessageRecorderValidator extends Validator {
 	var $onlyserverside = true;
 	function validate ($value, $args) {
 		global $USER;
-		
-		
+
+
 		if (!$USER->authorize("starteasy"))
 			return _L('%1$s is not allowed for this user account',$this->label);
 		$values = json_decode($value);
-	
+
 		if ($values == null || (!isset($values->m) && !isset($values->af) && !isset($values->delete)))
 			return _L('%1$s does not have a message recorded', $this->label);
 
@@ -197,15 +196,15 @@ class PhoneMessageRecorderValidator extends Validator {
 
 $questionnaire = new SurveyQuestionnaire(getCurrentQuestionnaire());
 if ($questionnaire->id) {
-	$questions = array_values(DBFindMany("SurveyQuestion","from surveyquestion where questionnaireid=? order by questionnumber", false, array($questionnaire->id)));	
+	$questions = array_values(DBFindMany("SurveyQuestion","from surveyquestion where questionnaireid=? order by questionnumber", false, array($questionnaire->id)));
 } else {
 	$questions = array();
 }
 
 if ($questionnaire->emailmessageid) {
 	$emailmessage = new Message($questionnaire->emailmessageid);
-	$emailmessage->readHeaders(); 
-	
+	$emailmessage->readHeaders();
+
 	$emailparts = DBFindMany("MessagePart","from messagepart where messageid=? order by sequence",false,array($emailmessage->id));
 	$emailbody = Message::format($emailparts);
 } else{
@@ -240,7 +239,7 @@ class SurveyTempleteWiz_settings extends WizStep {
 			"control" => array("TextField","size" => 30, "maxlength" => 50),
 			"helpstep" => 1
 		);
-		
+
 		//only present option for phone/web if they have a choice between the two
 		if ($questionnaire->hasweb && $questionnaire->hasphone)
 			$type = "both";
@@ -250,7 +249,7 @@ class SurveyTempleteWiz_settings extends WizStep {
 			$type = "phone";
 		if ($USER->authorize('sendphone') && $USER->authorize('sendemail')) {
 			$surveytypes = array("phone" => "Phone","web" => "Web", "both" => "Phone and Web");
-			
+
 			$formdata["surveytype"] = array(
 				"label" => _L('Survey Method'),
 				"fieldhelp" => _L('TODO'),
@@ -263,7 +262,7 @@ class SurveyTempleteWiz_settings extends WizStep {
 				"helpstep" => 2
 			);
 		}
-		
+
 		$formdata["randomizeorder"] = array(
 			"label" => _L('Randomize Question Order'),
 			"fieldhelp" => _L('TODO'),
@@ -272,14 +271,14 @@ class SurveyTempleteWiz_settings extends WizStep {
 			"control" => array("CheckBox"),
 			"helpstep" => 3
 		);
-		
+
 		$helpsteps = array(
 			_("Enter a name and description for your survey. Names are used in reports and the web page for the survey"),
 			_("Select a survey method. Phone will call contacts on your list and present them with a set of interactive prompts. Web will send an email with a link to a form"),
 			_("In order to remove potential statistical bias, you may select to randomize question order. Each person will be presented with the questions in a different order. This improves statistical validity of the responses received. Unselect this if some of your questions are based on previous questions.")
 		);
-		
-		
+
+
 		return new Form("settings", $formdata, $helpsteps);
 	}
 }
@@ -307,7 +306,7 @@ class SurveyTemplateWiz_phonefeatures extends WizStep {
 			"helpstep" => $helpstepnum++
 		);
 		$helpsteps[] = _('If a survey phone call reaches an answering machine, it can either leave a message letting the person know why they received a call, or hang up and try again later. It is generally better to leave a message, however, hanging up and trying again may result in more surveys responses.');
-	
+
 		$introopts = array("message" => _('Play an intro message'),"skip" => _('Skip right to asking questions'));
 		$formdata["intromessage"] = array(
 			"label" => _L('Introduction'),
@@ -320,7 +319,7 @@ class SurveyTemplateWiz_phonefeatures extends WizStep {
 			"helpstep" => $helpstepnum++
 		);
 		$helpsteps[] = _('It is reccomended to record an introduction message describing the survey process. People are more likely to participate in the survey if they know what it is about, and why their repsonse is important.');
-	
+
 		$byeopts = array("message" => _('Play a goodbye message'),"reply" => _('Play a goodbye message and allow reply'), "skip" => _('Hangup after the last question'));
 		$formdata["goodbyemessage"] = array(
 			"label" => _L('Goodbye message'),
@@ -333,17 +332,17 @@ class SurveyTemplateWiz_phonefeatures extends WizStep {
 			"helpstep" => $helpstepnum++
 		);
 		$helpsteps[] = _('It is reccomended to record a goodbye message thanking the person for their time and responses. People are more likely to participate in future surveys if they have been thanked for their time.<br><br>Reply messages can used to collect additional information from the person that is not otherwise covered in the survey questions, or to provide feedback about the survey. These messages will show up in the Responses tab. If you select this, you should record a goodbye message that lets the person know that this is available to them by pressing the zero key.');
-	
-		
+
+
 		return new Form("phonefeatures", $formdata, $helpsteps);
 	}
-	
+
 	//returns true if this step is enabled
 	function isEnabled($postdata, $step) {
 		global $USER;
 		$surveytype = @$postdata['/settings']['surveytype'] ;
 		//true if we can send phone, and type is not email only
-		return $USER->authorize('sendphone') && $surveytype != "web"; 
+		return $USER->authorize('sendphone') && $surveytype != "web";
 	}
 
 }
@@ -366,7 +365,7 @@ class SurveyTemplateWiz_phonemessages extends WizStep {
 				"control" => array("FormHtml", "html" => _L('Record a message for answering machines. This will be played if the person is unavailable and the call reaches an answering machine.')),
 				"helpstep" => $helpstepnum++
 			);
-			
+
 			$formdata["amsweringmachine"] = array(
 				"label" => _L('Answering Machine Message'),
 				"fieldhelp" => _L('TODO'),
@@ -379,7 +378,7 @@ class SurveyTemplateWiz_phonemessages extends WizStep {
 				"helpstep" => $helpstepnum++
 			);
 			$helpsteps[] = _L('TODO');
-		}		
+		}
 
 		//intro message
 		if ($postdata['/phonefeatures']['intromessage'] == "message") {
@@ -402,12 +401,12 @@ class SurveyTemplateWiz_phonemessages extends WizStep {
 				"helpstep" => $helpstepnum++
 			);
 			$helpsteps[] = _L('TODO');
-		}		
+		}
 
 		//goodbye message
-		if ($postdata['/phonefeatures']['goodbyemessage'] == "message" || 
+		if ($postdata['/phonefeatures']['goodbyemessage'] == "message" ||
 			$postdata['/phonefeatures']['goodbyemessage'] == "reply") {
-				
+
 			$formdata[] = "Goodbye Message";
 			$formdata["goodbyetext"] = array(
 				"label" => "",
@@ -437,12 +436,12 @@ class SurveyTemplateWiz_phonemessages extends WizStep {
 		global $USER;
 		$surveytype = @$postdata['/settings']['surveytype'] ;
 		$hasphone = $USER->authorize('sendphone') && $surveytype != "web"; //true if we can send phone, and type is not email only
-		
+
 		if (!$hasphone)
 			return false;
 		if (@$postdata['/phonefeatures']['amsweringmachine'] == "message" ||
 			@$postdata['/phonefeatures']['intromessage'] == "message" ||
-			@$postdata['/phonefeatures']['goodbyemessage'] == "goodbyemessage" || 
+			@$postdata['/phonefeatures']['goodbyemessage'] == "goodbyemessage" ||
 			@$postdata['/phonefeatures']['goodbyemessage'] == "reply")
 			return true;
 		return false;
@@ -454,7 +453,7 @@ class SurveyTemplateWiz_phonemessages extends WizStep {
 class SurveyTemplateWiz_webfeatures extends WizStep {
 	function getForm($postdata, $curstep) {
 		global $USER, $questionnaire, $questions, $emailmessage, $emailbody;
-		
+
 		//if we are editing a survey email, load name from there, otherwise use defaults
 		if ($emailmessage) {
 			$fromname = $emailmessage->fromname;
@@ -471,9 +470,9 @@ class SurveyTemplateWiz_webfeatures extends WizStep {
 		$formdata = array();
 		$helpsteps = array();
 		$helpstepnum = 1;
-		
+
 		$formdata[] = "Web Survey Features";
-		
+
 		$formdata["webpagetitle"] = array(
 			"label" => _L('Web Page Title'),
 			"fieldhelp" => _L('The Web Page Title will show up in large text on the web survey form.'),
@@ -485,7 +484,7 @@ class SurveyTemplateWiz_webfeatures extends WizStep {
 			"helpstep" => $helpstepnum++
 		);
 		$helpsteps[] = _('You may enter a title here. This will show up in large text on the web survey form.');
-		
+
 		$formdata["webexitmessage"] = array(
 			"label" => _L('Web Thank You'),
 			"fieldhelp" => _L('This is displayed when the person completes a web survey.'),
@@ -497,7 +496,7 @@ class SurveyTemplateWiz_webfeatures extends WizStep {
 			"helpstep" => $helpstepnum++
 		);
 		$helpsteps[] = _('It is reccomended to enter a goodbye message thanking the person for their time and responses. People are more likely to participate in future surveys if they have been thanked for their time.');
-		
+
 		$formdata["usehtml"] = array(
 			"label" => _L('Use HTML'),
 			"fieldhelp" => _L('Allows HTML in title, thank you, and question text'),
@@ -507,10 +506,10 @@ class SurveyTemplateWiz_webfeatures extends WizStep {
 			"helpstep" => $helpstepnum++
 		);
 		$helpsteps[] = _('By enabling this feature, the title, thank you, and question text may be HTML. You can use this to insert images or links, or to style the questions.');
-		
-		
+
+
 		$formdata[] = _('Email Link');
-		
+
 		$formdata["fromname"] = array(
 			"label" => _L('From Name'),
 			"fieldhelp" => _L('Recipients will see this name as the sender of the email.'),
@@ -539,7 +538,7 @@ class SurveyTemplateWiz_webfeatures extends WizStep {
 		);
 		$helpsteps[] = array(_L('Enter the address where you would like to receive replies.'));
 
-		
+
 		$formdata["subject"] = array(
 			"label" => _L('Subject'),
 			"fieldhelp" => _L('The Subject will appear as the subject line of the email.'),
@@ -565,8 +564,8 @@ class SurveyTemplateWiz_webfeatures extends WizStep {
 			"helpstep" =>  $helpstepnum++
 		);
 		$helpsteps[] = _L('The email message body text goes here. Be sure to introduce yourself and give some information about the survey and why their response is important.<br><br>A link to the survey will be appended to the end of this message.');
-		
-		
+
+
 		return new Form("webfeatures", $formdata, $helpsteps);
 	}
 
@@ -574,8 +573,8 @@ class SurveyTemplateWiz_webfeatures extends WizStep {
 	function isEnabled($postdata, $step) {
 		global $USER;
 		$surveytype = @$postdata['/settings']['surveytype'] ;
-		
-		return $USER->authorize('sendemail') && $surveytype != "phone"; 
+
+		return $USER->authorize('sendemail') && $surveytype != "phone";
 	}
 }
 
@@ -583,11 +582,11 @@ class SurveyTemplateWiz_webfeatures extends WizStep {
 class SurveyTemplateWiz_questions extends WizStep {
 	function getForm($postdata, $curstep) {
 		global $USER, $questionnaire, $questions;
-		
+
 		$formdata = array();
 		$helpsteps = array();
 		$helpstepnum = 1;
-		
+
 		$surveytype = @$postdata['/settings']['surveytype'] ;
 		$hasphone = $USER->authorize('sendphone') && $surveytype != "web"; //true if we can send phone, and type is not email only
 		$hasweb = $USER->authorize('sendemail') && $surveytype != "phone"; //true if we can send emails, and type is not phone only
@@ -617,7 +616,7 @@ class SurveyTemplateWiz_questions extends WizStep {
 					continue;
 				}
 				//error_log("adding question src:$srcnum qnum:$qnum");
-				
+
 				$questiondata[$qnum]["reportlabel"] = $postdata["/questions"]["question$srcnum-reportlabel"];
 				$questiondata[$qnum]["validresponse"] = $postdata["/questions"]["question$srcnum-validresponse"];
 				if ($hasphone)
@@ -639,7 +638,7 @@ class SurveyTemplateWiz_questions extends WizStep {
 					$questiondata[$qnum]["webtext"] = $question->webmessage;
 			}
 		}
-		
+
 		//add new question section
 		if (@$postdata['/questions']['newquestionaction'] == "add" || count($questiondata) == 0) {
 			$qnum = count($questiondata) + 1;
@@ -650,13 +649,13 @@ class SurveyTemplateWiz_questions extends WizStep {
 			if ($hasweb)
 				$questiondata[$qnum]["webtext"] = "";
 		}
-		
-		
-		
+
+
+
 		//do formdata for existing questions
 		foreach ($questiondata as $qnum => $question) {
 			$formdata[] = "Question $qnum";
-			
+
 			$formdata["question$qnum-reportlabel"] = array(
 				"label" => _L('Report Label'),
 				"fieldhelp" => _L('TODO'),
@@ -670,8 +669,8 @@ class SurveyTemplateWiz_questions extends WizStep {
 				"helpstep" => $helpstepnum++
 			);
 			$helpsteps[] = _L('TODO');
-			
-			
+
+
 			$formdata["question$qnum-validresponse"] = array(
 				"label" => _L('Valid Response'),
 				"fieldhelp" => _L('TODO'),
@@ -685,7 +684,7 @@ class SurveyTemplateWiz_questions extends WizStep {
 				"helpstep" => $helpstepnum++
 			);
 			$helpsteps[] = _L('TODO');
-			
+
 			if ($hasphone) {
 				$formdata["question$qnum-phonemessage"] = array(
 					"label" => _L('Phone Question'),
@@ -700,9 +699,9 @@ class SurveyTemplateWiz_questions extends WizStep {
 					"helpstep" => $helpstepnum++
 				);
 				$helpsteps[] = _L('TODO');
-				
+
 			}
-			
+
 			if ($hasweb) {
 				$formdata["question$qnum-webtext"] = array(
 				"label" => _L('Web Question Text'),
@@ -718,8 +717,8 @@ class SurveyTemplateWiz_questions extends WizStep {
 			);
 			$helpsteps[] = _L('TODO');
 			}
-			
-			
+
+
 			$formdata["question$qnum-delete"] = array(
 				"label" => _L('Tools'),
 				"fieldhelp" => _L('TODO'),
@@ -731,9 +730,9 @@ class SurveyTemplateWiz_questions extends WizStep {
 				"helpstep" => $helpstepnum++
 			);
 			$helpsteps[] = _L('TODO');
-			
+
 		}
-		
+
 		$formdata["newquestionaction"] = array(
 			"label" => _L('Add Question'),
 			"fieldhelp" => _L('TODO'),
@@ -745,19 +744,19 @@ class SurveyTemplateWiz_questions extends WizStep {
 			"helpstep" => $helpstepnum++
 		);
 		$helpsteps[] = _L('TODO');
-		
+
 		return new Form("phonesurvey", $formdata, $helpsteps);
 	}
 }
 
 function getMessageIdForPhoneRecorder($value) {
 	global $USER;
-	
+
 	$values = json_decode($value);
-	
+
 	if (isset($values->m))
 		return $values->m;
-	
+
 	if (isset($values->af)) {
 		//make a message for this audiofile and return the messageid
 		$m = new Message();
@@ -771,54 +770,54 @@ function getMessageIdForPhoneRecorder($value) {
 		$m->languagecode = Language::getDefaultLanguageCode();
 		$m->deleted = 0;
 		$m->create();
-		
+
 		$mp = new MessagePart();
 		$mp->messageid = $m->id;
 		$mp->type = "A";
 		$mp->audiofileid = $values->af;
 		$mp->sequence = 0;
 		$mp->create();
-		
+
 		return $m->id;
 	}
-	
+
 	return null;
 }
 
 /**************************** finisher ****************************/
 class FinishSurveyTemplateWizard extends WizFinish {
-	
+
 	function finish ($postdata) {
 		global $USER, $questionnaire, $questions, $emailmessage;
-		
+
 		Query("BEGIN");
-		
+
 		$surveytype = @$postdata['/settings']['surveytype'] ;
 		$hasphone = $USER->authorize('sendphone') && $surveytype != "web"; //true if we can send phone, and type is not email only
 		$hasweb = $USER->authorize('sendemail') && $surveytype != "phone"; //true if we can send emails, and type is not phone only
-		
+
 		//settings
 		$questionnaire->userid = $USER->id;
 		$questionnaire->name = $postdata['/settings']['name'];
-		$questionnaire->description = $postdata['/settings']['description'];	
+		$questionnaire->description = $postdata['/settings']['description'];
 		$questionnaire->hasphone = $hasphone ? 1 : 0;
 		$questionnaire->hasweb = $hasweb ? 1 : 0;
 		$questionnaire->dorandomizeorder = $postdata['/settings']['randomizeorder'] ? 1 : 0;
-		
-		
+
+
 		//phone features/messages
 		if ($hasphone && $postdata['/phonefeatures']['amsweringmachine'] == "message") {
 			$questionnaire->machinemessageid = getMessageIdForPhoneRecorder($postdata['/phonemessages']['amsweringmachine']);
 		} else {
 			$questionnaire->machinemessageid = null;
 		}
-		
+
 		if ($hasphone && $postdata['/phonefeatures']['intromessage'] == "message") {
 			$questionnaire->intromessageid = getMessageIdForPhoneRecorder($postdata['/phonemessages']['intromessage']);
 		} else {
 			$questionnaire->intromessageid = null;
 		}
-		
+
 		if ($hasphone && ($postdata['/phonefeatures']['goodbyemessage'] == "message" ||
 						$postdata['/phonefeatures']['goodbyemessage'] == "reply")) {
 			$questionnaire->exitmessageid = getMessageIdForPhoneRecorder($postdata['/phonemessages']['goodbyemessage']);
@@ -827,13 +826,13 @@ class FinishSurveyTemplateWizard extends WizFinish {
 			$questionnaire->exitmessageid = null;
 			$questionnaire->leavemessage = 0;
 		}
-		
+
 		//web features
 		if ($hasweb ) {
 			$questionnaire->webpagetitle = $postdata['/webfeatures']['webpagetitle'];
 			$questionnaire->webexitmessage = $postdata['/webfeatures']['webexitmessage'];
 			$questionnaire->usehtml = $postdata['/webfeatures']['usehtml'] == "true" ? 1 : 0;
-			
+
 			//emailmessage
 			if (!$emailmessage) {
 				$emailmessage = new Message();
@@ -846,33 +845,33 @@ class FinishSurveyTemplateWizard extends WizFinish {
 				$emailmessage->languagecode = Language::getDefaultLanguageCode();
 				$emailmessage->deleted = 0;
 			}
-			
+
 			$emailmessage->subject = $postdata['/webfeatures']['subject'];
 			$emailmessage->fromemail = $postdata['/webfeatures']['from'];
 			$emailmessage->fromname = $postdata['/webfeatures']['fromname'];
 			$emailmessage->stuffHeaders();
 			$emailmessage->modifydate = date("Y-m-d H:i:s");
 			$emailmessage->update();
-			
+
 			QuickUpdate("delete from messagepart where messageid=?", false, array($emailmessage->id));
-			
+
 			$mp = new MessagePart();
 			$mp->messageid = $emailmessage->id;
 			$mp->type = "T";
 			$mp->txt = $postdata['/webfeatures']['message'];
 			$mp->sequence = 0;
 			$mp->create();
-			
+
 			$questionnaire->emailmessageid = $emailmessage->id;
-			
+
 		} else {
 			$questionnaire->webpagetitle = null;
 			$questionnaire->webexitmessage = null;
 			$questionnaire->usehtml = 0;
 		}
-		
+
 		$questionnaire->update();
-		
+
 		//do questions
 		$qnum = 1;
 		$srcnum = 1;
@@ -882,34 +881,34 @@ class FinishSurveyTemplateWizard extends WizFinish {
 				$srcnum++;
 				continue;
 			}
-			
+
 			if (isset($questions[$qnum-1]))
 				$question = $questions[$qnum-1];
 			else
 				$question = new SurveyQuestion();
-			
+
 			$question->questionnumber = $qnum-1;
 			$question->questionnaireid = $questionnaire->id;
 			$question->reportlabel = $postdata["/questions"]["question$srcnum-reportlabel"];
 			$question->validresponse = $postdata["/questions"]["question$srcnum-validresponse"];
 			$question->phonemessageid = $hasphone ? getMessageIdForPhoneRecorder($postdata["/questions"]["question$srcnum-phonemessage"]) : null;
 			$question->webmessage = $hasweb ? $postdata["/questions"]["question$srcnum-webtext"] : null;
-			
+
 			$question->update();
 
 			$srcnum++;
 			$qnum++;
 		}
-		
+
 		//remove any questions greater or equal the next questionnumber, in case user deleted some from existing survey
 		QuickUpdate("delete from surveyquestion where questionnaireid=? and questionnumber >= ?", false, array($questionnaire->id, $qnum-1));
-		
+
 		Query("COMMIT");
 	}
-	
+
 	function getFinishPage ($postdata) {
 		global $USER, $questionnaire, $questions, $emailmessage;
-		
+
 		if ($questionnaire->id)
 			return "<h1>Survey Template Modified</h1>";
 		else
@@ -942,8 +941,8 @@ require_once("nav.inc.php");
 // Load Custom Form Validators
 ?>
 <script type="text/javascript">
-<? 
-Validator::load_validators(array("PhoneMessageRecorderValidator")); 
+<?
+Validator::load_validators(array("PhoneMessageRecorderValidator"));
 ?>
 </script>
 <?
