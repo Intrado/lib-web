@@ -63,10 +63,13 @@ class FormRuleWidget extends FormItem {
 // @param optional $args["allowedFields"], example: array('f','g','c')
 class ValRules extends Validator {
 	function validate ($valueJSON, $args) {
+		global $USER;
+		
 		$msgPleaseFinish = addslashes(_L("Please finish adding your rule"));
 		$msgIncompleteRule = addslashes(_L("Incomplete rule data"));
 		$msgRuleAlreadyExists = addslashes(_L("Rule already exists"));
 		$msgUnauthorizedFieldmap = addslashes(_L("Unauthorized fieldmap"));
+		$msgUnauthorizedOrganization = addslashes(_L("Unauthorized organization"));
 
 		if ($valueJSON == 'pending')
 			return $msgPleaseFinish;
@@ -77,14 +80,23 @@ class ValRules extends Validator {
 
 		$rulesfor = array();
 		foreach ($ruledata as $data) {
-			if (!isset($data->fieldnum, $data->logical, $data->op, $data->val))
+			if (!isset($data->fieldnum, $data->logical, $data->op, $data->val)) {
 				return $msgIncompleteRule;
-			if (isset($rulesfor[$data->fieldnum])) // Do not allow more than one rule per fieldnum
+			} else if (isset($rulesfor[$data->fieldnum])) { // Do not allow more than one rule per fieldnum
 				return $msgRuleAlreadyExists;
-			if (isset($args['allowedFields']) && !in_array($data->fieldnum[0], $args['allowedFields']))
+			} else if (isset($args['allowedFields']) && !in_array($data->fieldnum[0], $args['allowedFields'])) {
 				return $msgUnauthorizedFieldmap;
-			if (!Rule::initFrom($data->fieldnum, $data->logical, $data->op, $data->val))
-				return $msgUnauthorizedFieldmap;
+			} else if ($data->fieldnum == 'organization') {
+				foreach ($data->val as $id) {
+					if (!$USER->authorizeOrganization($id))
+						return $msgUnauthorizedOrganization;
+				}
+			} else {
+				if (!Rule::initFrom($data->fieldnum, $data->logical, $data->op, $data->val)) {
+					return $msgUnauthorizedFieldmap;
+				}
+			}
+			
 			$rulesfor[$data->fieldnum] = true;
 		}
 		return true;
