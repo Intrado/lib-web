@@ -13,7 +13,7 @@ function makeSummaryTab($destinations, $customerlanguages, $systemdefaultlanguag
 			$summaryheaders .= "<th class='Destination'>" . ($type == 'sms' ? "SMS" : ucfirst($type)) . (count($destination['subtypes']) > 1 ? (" (" . ($subtype == 'html' ? "HTML" : ucfirst($subtype)) . ") ") : "") . "</th>";
 		}
 	}
-	
+
 	// Table Rows
 	foreach ($customerlanguages as $languagecode => $languagename) {
 		$summarylanguagerows .= "<tr><th class='Language'>" . ucfirst($languagename) . "</th>";
@@ -32,7 +32,7 @@ function makeSummaryTab($destinations, $customerlanguages, $systemdefaultlanguag
 		}
 		$summarylanguagerows .= "</tr>";
 	}
-	
+
 	// Returns an array structure accepted by FormSplitter's constructor for a child form.
 	return array(
 		"name" => "summary",
@@ -444,9 +444,36 @@ class CallMe extends FormItem {
 		$n = $this->form->name."_".$this->name;
 
 		// Hidden input item to store values in
-		$str = '<input id="'.$n.'" name="'.$n.'" type="hidden" value="{}" />
+		$str = '<input id="'.$n.'" name="'.$n.'" type="hidden" value="{}" />';
+
+		// set up easycall stylesheet
+		$str .= '
+		<style type="text/css">
+		.easycallcallprogress {
+			float:left;
+		}
+		.easycallunderline {
+			padding-top: 3px;
+			margin-bottom: 5px;
+			border-bottom:
+			1px solid gray;
+			clear: both;
+		}
+		.easycallphoneinput {
+			margin-bottom: 5px;
+			border: 1px solid gray;
+		}
+
+		//messagegroup styles
+		.messagegroupcontent {
+			padding: 6px;
+			white-space:nowrap
+		}
+		</style>';
+
+		$str .= '
 		<div>
-			<div id="'.$n.'_content" style="padding: 6px; white-space:nowrap"></div>
+			<div id="'.$n.'_content" class="messagegroupcontent"></div>
 		</div>
 		';
 
@@ -462,8 +489,7 @@ class CallMe extends FormItem {
 	function renderJavascript($value) {
 		$n = $this->form->name."_".$this->name;
 
-		$nophone = _L("Phone Number");
-		$defaultphone = escapehtml((isset($this->args['phone']) && $this->args['phone'])?Phone::format($this->args['phone']):$nophone);
+		$defaultphone = escapehtml(Phone::format($this->args['phone']));
 
 		return '
 			function newEasyCall() {

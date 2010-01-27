@@ -84,9 +84,36 @@ class PhoneMessageRecorder extends FormItem {
 		if (!$value)
 			$value = '{}';
 		// Hidden input item to store values in
-		$str = '<input id="'.$n.'" name="'.$n.'" type="hidden" value="'.escapehtml($value).'" />
+		$str = '<input id="'.$n.'" name="'.$n.'" type="hidden" value="'.escapehtml($value).'" />';
+
+		// set up easycall stylesheet
+		$str .= '
+		<style type="text/css">
+		.easycallcallprogress {
+			float:left;
+		}
+		.easycallunderline {
+			padding-top: 3px;
+			margin-bottom: 5px;
+			border-bottom:
+			1px solid gray;
+			clear: both;
+		}
+		.easycallphoneinput {
+			margin-bottom: 5px;
+			border: 1px solid gray;
+		}
+
+		// surveytemplate styles
+		.surveytemplatecontent {
+			padding: 6px;
+			white-space:nowrap
+		}
+		</style>';
+
+		$str .= '
 		<div>
-			<div id="'.$n.'_content" style="padding: 6px; white-space:nowrap"></div>
+			<div id="'.$n.'_content" class="surveytemplatecontent"></div>
 		</div>
 		<script type="text/javascript">
 		setupMessageRecorderButtons("'.$n.'");

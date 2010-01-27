@@ -228,10 +228,64 @@ class EasyCall extends FormItem {
 		if (!$value)
 			$value = '{}';
 		// Hidden input item to store values in
-		$str = '<input id="'.$n.'" name="'.$n.'" type="hidden" value="'.escapehtml($value).'" />
-		<div style="padding-bottom: 6px">
-			<div id="'.$n.'_content" style="padding-bottom: 6px; padding-left: 6px; padding-top: 0px; margin: 0px; white-space:nowrap"></div>
-			<div id="'.$n.'_altlangs" style="clear: both; padding: 5px; display: none">';
+		$str = '<input id="'.$n.'" name="'.$n.'" type="hidden" value="'.escapehtml($value).'" />';
+
+		// set up easycall stylesheet
+		$str .= '
+		<style type="text/css">
+		.easycallcallprogress {
+			float:left;
+		}
+		.easycallunderline {
+			padding-top: 3px;
+			margin-bottom: 5px;
+			border-bottom:
+			1px solid gray;
+			clear: both;
+		}
+		.easycallphoneinput {
+			margin-bottom: 5px;
+			border: 1px solid gray;
+		}
+
+		// wiz easycall styles
+		.wizeasycallcontainer {
+			padding: 0px;
+			margin: 0px;
+			white-space:nowrap;
+		}
+		.wizeasycallaction {
+			width: 80%;
+			float: right;
+			margin-bottom: 5px;
+		}
+		.wizeasycalllanguage {
+			font-size: large;
+			float: left;
+		}
+		.wizeasycallbutton {
+			float: left;
+		}
+		.wizeasycallmaincontainer {
+			padding-bottom: 6px;
+		}
+		.wizeasycallcontent {
+			padding-bottom: 6px;
+			padding-left: 6px;
+			padding-top: 0px;
+			margin: 0px;
+			white-space:nowrap;
+		}
+		.wizeasycallaltlangs {
+			clear: both;
+			padding: 5px;
+		}
+		</style>';
+
+		$str .='
+		<div class="wizeasycallmaincontainer">
+			<div id="'.$n.'_content" class="wizeasycallcontent"></div>
+			<div id="'.$n.'_altlangs" class="wizeasycallaltlangs" style="display: none">';
 		if (count($languages)) {
 			$str .= '
 				<div style="margin-bottom: 3px;">'._L("Add an alternate language?").'</div>

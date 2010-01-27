@@ -53,16 +53,15 @@ var EasyCall = Class.create({
 		// load up a call progress div with new controls
 		$(this.containerid).insert(
 			new Element("div",{id: this.containerid+"_progress"}).insert(
-				new Element("img",{src: "img/ajax-loader.gif", style: "float:left"})
+				new Element("img",{src: "img/ajax-loader.gif", class: "easycallcallprogress"})
 			).insert(
-				new Element("div",{id: this.containerid+"_progress_text"})
+				new Element("div",{id: this.containerid+"_progress_text"}).update(
+					"<?=addslashes(_L('Starting up call... Please wait.'))?>"
+				)
 			).insert(
-				new Element("div", {style: "padding-top: 3px; margin-bottom: 5px; border-bottom: 1px solid gray; clear: both"})
+				new Element("div", {class: "easycallunderline"})
 			)
 		);
-
-		// set the progress text so the user knows something is happening in the background
-		$(this.containerid+"_progress_text").update("<?=addslashes(_L('Starting up call... Please wait.'))?>");
 
 		// do ajax to start the specialtask
 		new Ajax.Request('ajaxeasycall.php', {
@@ -216,18 +215,18 @@ var EasyCall = Class.create({
 			new Element("div", {"id": this.containerid+"_callcontrol"}).insert(
 				this.getPhoneInput()
 			).insert(
-				new Element("div", {style: "clear:both"})
+				new Element("div", { style: "clear: both;" })
 			).insert(
 				this.getCallMeButton()
 			).insert(
-				new Element("div", {style: "clear:both"})
+				new Element("div", { style: "clear: both;" })
 			)
 		);
 	},
 
 	// return phone input
 	getPhoneInput: function() {
-		var phoneinput = new Element("input", {autocomplete:"off", type: "text", style: "margin-bottom: 5px; border: 1px solid gray; "});
+		var phoneinput = new Element("input", {autocomplete:"off", type: "text", class: "easycallphoneinput"});
 
 		// set the initial value
 		phoneinput.value = this.defaultphone;

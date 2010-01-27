@@ -21,7 +21,7 @@ function insertNewWizEasyCall(formitemname, maincontainerid, langselect, langcod
 
 	// insert a new container for the language at the end of the content element
 	$(maincontainerid).insert({ "bottom":
-		new Element("div",{ id: maincontainerid+"_"+langcode, style: "padding: 0px; margin: 0px; white-space:nowrap" })
+		new Element("div",{ id: maincontainerid+"_"+langcode, class: "wizeasycallcontainer" })
 	});
 
 	// set the selector to index 0
@@ -70,13 +70,13 @@ var WizEasyCall = Class.create(EasyCall,{
 
 		// add the language name and an action element
 		$(this.containerid+"_callcontrol").insert({ "before":
-			new Element("div",{id: this.containerid+"_action", style: "width: 80%; float: right; margin-bottom: 5px;"})
+			new Element("div",{id: this.containerid+"_action", class: "wizeasycallaction"})
 		});
 
 		// if there is more than 1 audofile, display the title
 		if (totalaudiofiles > 1) {
 			$(this.containerid+"_action").insert({ "before":
-				new Element("div", { style: "font-size: large; float: left; margin-bottom: 3px"}).update(
+				new Element("div", { class: "wizeasycalllanguage"}).update(
 					(this.langcode == "en")?"Default":languages[this.langcode]
 				)
 			});
@@ -114,11 +114,11 @@ var WizEasyCall = Class.create(EasyCall,{
 		// display the language and add an action div
 		$(this.containerid).update();
 		$(this.containerid).insert(
-				new Element("div", { style: "font-size: large; float: left;"}).update(
+				new Element("div", { class: "wizeasycalllanguage"}).update(
 					(this.langcode == "en")?"Default":languages[this.langcode]
 				)
 			).insert(
-				new Element("div", {id: this.containerid+"_action", style: "width: 80%; float: right; margin-bottom: 5px;"}).insert(
+				new Element("div", {id: this.containerid+"_action", class: "wizeasycallaction"}).insert(
 					this.getPlayButton()
 				).insert(
 					this.getReRecordButton()
@@ -130,7 +130,7 @@ var WizEasyCall = Class.create(EasyCall,{
 			$(this.containerid+"_action").insert(this.getRemoveButton());
 
 		// JobWizard EasyCall gets a bottom border
-		$(this.containerid).insert(new Element("div", {style: "padding-top: 3px; margin-bottom: 5px; border-bottom: 1px solid gray; clear: both"}));
+		$(this.containerid).insert(new Element("div", {class: "easycallunderline"}));
 
 		// show the language select element
 		$(this.formitemname+"_altlangs").show();
@@ -138,7 +138,7 @@ var WizEasyCall = Class.create(EasyCall,{
 
 	// returns a re-record button
 	getReRecordButton: function() {
-		var rerecordbutton = icon_button("<?=escapehtml(_L('Re-record'))?>", "diagona/16/118", this.containerid+"_rerecord").setStyle({float: "left"});
+		var rerecordbutton = icon_button("<?=escapehtml(_L('Re-record'))?>", "diagona/16/118", this.containerid+"_rerecord").addClassName("wizeasycallbutton");
 
 		// listen for clicks on the re-record button
 		rerecordbutton.observe("click", function (event) {
@@ -157,7 +157,7 @@ var WizEasyCall = Class.create(EasyCall,{
 
 	// returns a play button
 	getPlayButton: function() {
-		var playbutton = icon_button("<?=escapehtml(_L("Play"))?>", "fugue/control", this.containerid+"_play").setStyle({float: "left"});
+		var playbutton = icon_button("<?=escapehtml(_L("Play"))?>", "fugue/control", this.containerid+"_play").addClassName("wizeasycallbutton");
 
 		// listen for clicks on the play button
 		playbutton.observe("click", function (event) {
@@ -169,7 +169,7 @@ var WizEasyCall = Class.create(EasyCall,{
 
 	// returns a remove button element
 	getRemoveButton: function() {
-		rembutton = icon_button("<?=escapehtml(_L("Remove"))?>", "cross", this.containerid+"_delete").setStyle({float:"left"});
+		rembutton = icon_button("<?=escapehtml(_L("Remove"))?>", "cross", this.containerid+"_delete").addClassName("wizeasycallbutton");
 
 		// listen for clicks on the remove button
 		rembutton.observe("click", function (event) {
