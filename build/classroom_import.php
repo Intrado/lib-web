@@ -8,6 +8,7 @@ Usage:
 -l languagecode ie 'en', 'es' etc.
 -i input csv file
 -o output root path
+-s optional echo out sql to insert message keys into db
 
 classroom_import.php will create a subfoalder named as the languagecode if it does not already exist.
 In the language folder the import will create data.php
@@ -30,6 +31,10 @@ foreach ($argv as $arg) {
 					break;
 				case "o":
 					$flag = "o";
+					break;
+				case "s":
+					$values["s"] = true;
+					$flag = false;
 					break;
 				default:
 					echo "Unknown option " . $arg[$x] . "\n";
@@ -54,7 +59,9 @@ if (!isset($values["i"]))
 if (!isset($values["o"]))
 	exit("No output file specified\n$usage");
 
+
 $input = fopen($values["i"], 'r') or die("Can't open input file \"" . $values["i"] . "\"\n");
+
 
 if(!file_exists($values["o"])) {
 	exit("Output path does not exist\n$usage");
@@ -70,20 +77,37 @@ $count = 0;
 
 fwrite($output, "<? \n\$messagedatacache[\"" . $values["l"] . "\"] = array(\n");
 
-while($line = fgets($input)) {
-	$linevalues = explode(",",$line);
-	if(!$linevalues)
-		exit("Unable to read line: \n$line\n");
-	if(!isset($linevalues[0]) || !isset($linevalues[1]))
-		exit("Unable to read the first two values in line: \n$line\n");
+$checkarray = array();
+while (($data = fgetcsv($input)) !== FALSE) {
+	if(!isset($data[0]) || !isset($data[1]))
+		exit("Unable to read the first two values in line\n");
 	echo ".";
-	$count++;
-	fwrite($output, '"' . (addslashes(trim(trim($linevalues[0]),'"')) . '"=>"' . addslashes(trim(trim($linevalues[1]),'"')) . "\",\n"));
+	$key = addslashes(strtolower(trim($data[0])));
+	//$value = addslashes($data[1]);                 // Add slashed do not work double quotation also get slashed
+	$value = preg_replace('/\'/', "\\'",$data[1]);
+	if(!isset($checkarray[$key])) {
+		fwrite($output, "'$key'=>'$value',\n");
+		$checkarray[$key] = $value;
+		$count++;
+	} else {
+		echo "\nWarning " . ($checkarray[$key]==$value?"Two identical key/value pairs ($key => $value)":"Two messages with the same key ($key)") . " - skipping\n";
+	}
 }
 fwrite($output,");\n ?>");
 
 echo "\nImported $count records\n";
+
+if(isset($values["s"])) {
+	$values = array();
+	foreach($checkarray as $key => $value) {
+		$values[] = "('$key',1)";
+	}
+	if (!empty($values)) {
+		echo "INSERT INTO targetedmessage (messagekey,targetedmessagecategoryid) VALUES \n		";
+		echo implode(",\n		",$values);
+		echo "\n";
+	}
+}
 fclose($input);
 fclose($output);
-
 ?>
