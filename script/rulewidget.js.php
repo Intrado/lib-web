@@ -266,6 +266,7 @@ var RuleWidget = Class.create({
 		if (typeof(data.val.join) == 'undefined') { // Called from RuleWidget::startup().
 			if (data.type == 'association') {
 				// data.val for 'association' is an object of value:title pairs.
+				// We only want to display the titles.
 				value = $H(data.val).values().join(',');
 			} else if (data.type == 'multisearch') {
 				value = data.val.replace(/\|/g, ',');
@@ -426,8 +427,21 @@ var RuleWidget = Class.create({
 			}
 			
 			this.rulesTableBody.insert(tr);
-			this.appliedRules[data.fieldnum] = data;
-
+			
+			// If this is an association, we want to convert data.val into an array of IDs if it is currently an object of value:title pairs.
+			// This is so the validator does not need to worry about whether data.val is an array or an object of value:title pairs.
+			if (data.type == 'association') {
+				if (typeof(data.join) == "undefined") {
+					var ids = [];
+					for (var value in data.val) {
+						ids.push(data.val[value]);
+					}
+					data.val = ids;
+				}
+			} else {
+				this.appliedRules[data.fieldnum] = data;
+			}
+			
 			this.refresh_rules_table();
 			if (this.ruleEditor)
 				this.ruleEditor.reset();
