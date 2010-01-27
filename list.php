@@ -307,7 +307,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 
 					case 'clearrules':
 						QuickUpdate("DELETE le.*, r.* FROM listentry le, rule r WHERE le.ruleid=r.id AND le.listid=?", false, array($list->id));
-						QuickUpdate("DELETE FROM listentry WHERE le.listid=? AND type='organization'", false, array($list->id));
+						QuickUpdate("DELETE FROM listentry WHERE listid=? AND type='organization'", false, array($list->id));
 
 						notice(_L('All rules are now removed.'));
 						$form->sendTo('list.php');
