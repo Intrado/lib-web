@@ -83,8 +83,7 @@ while (($data = fgetcsv($input)) !== FALSE) {
 		exit("Unable to read the first two values in line\n");
 	echo ".";
 	$key = addslashes(strtolower(trim($data[0])));
-	//$value = addslashes($data[1]);                 // Add slashed do not work double quotation also get slashed
-	$value = preg_replace('/\'/', "\\'",$data[1]);
+	$value = addcslashes($data[1],"'");
 	if(!isset($checkarray[$key])) {
 		fwrite($output, "'$key'=>'$value',\n");
 		$checkarray[$key] = $value;
