@@ -10,7 +10,8 @@ require_once("inc/utils.inc.php");
 include_once("inc/form.inc.php");
 include_once("inc/html.inc.php");
 include_once("inc/formatters.inc.php");
-require_once("inc/classroom.inc.php");
+require_once("obj/TargetedMessageCategory.obj.php");
+
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -112,7 +113,7 @@ if($ajax === true) {
 				$title = $messagedatacache["en"][$item["messagekey"]];
 		} else {
 			$title = ""; // Could not find message for this message key.
-		}		
+		}
 		$data->list[] = array(
 			"id" => $item["id"],
 			"enabled" => ($item["enabled"]==1),

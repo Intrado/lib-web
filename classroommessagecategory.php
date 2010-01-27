@@ -11,7 +11,7 @@ require_once("obj/Validator.obj.php");
 require_once("obj/Form.obj.php");
 require_once("obj/FormItem.obj.php");
 require_once("obj/ValDuplicateNameCheck.val.php");
-require_once("inc/classroom.inc.php");
+require_once("obj/TargetedMessageCategory.obj.php");
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -75,25 +75,12 @@ if (isset($_GET['deleteid'])) {
 ////////////////////////////////////////////////////////////////////////////////
 $row = false;
 
-if($id != null) {
-	$row = QuickQueryRow("select name, image from targetedmessagecategory where id = ?", true,false, array($id));
-}
-
-
-
-if($row != false) {
-	$name = $row["name"];
-	$image = isset($row["image"])?$row["image"]:"";
-} else {
-	$name = "";
-	$image = "";
-}
-
+$category = new TargetedMessageCategory($id);
 
 $formdata = array(
 	"name" => array(
 		"label" => _L('Name'),
-		"value" => $name,
+		"value" => $category->name,
 		"validators" => array(
 			array("ValRequired"),
 			array("ValLength","min" => 3,"max" => 50),
@@ -104,7 +91,7 @@ $formdata = array(
 	),
 	"image" => array(
 		"label" => _L('Image'),
-		"value" => $image,
+		"value" => $category->image,
 		"validators" => array(
 			array("ValRequired"),
 			array("ValInArray", "values" => array_keys($formradiovalues)),
@@ -141,11 +128,11 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		$datachange = true;
 	} else if (($errors = $form->validate()) === false) { //checks all of the items in this form
 		$postdata = $form->getData(); //gets assoc array of all values {name:value,...}
-		if($id != null) {
-			QuickUpdate("update targetedmessagecategory set name=?, image=? where id=?", false, array($postdata["name"],$postdata["image"],$id));
-		} else {
-			QuickUpdate("insert into targetedmessagecategory (name,image) values (?,?)",false,array($postdata["name"],$postdata["image"]));
-		}
+
+		$category->name = $postdata["name"];
+		$category->image = $postdata["image"];
+		$category->update();
+
 		if ($ajax)
 			$form->sendTo("classroommessagemanager.php");
 		else
