@@ -22,7 +22,7 @@ class ValDuplicateNameCheck extends Validator {
 				return "$this->label: ". _L('There is already an active notification with this name. Please choose another.');
 			}
 		} else if($type == "targetedmessagecategory") {
-			$existsid = QuickQuery("select id from targetedmessagecategory where name=?",false,array($value));
+			$existsid = QuickQuery("select id from targetedmessagecategory where name=? and deleted = 0",false,array($value));
 			if($existsid && $existsid != $_SESSION["targetedmessagecategoryid"]) {
 				return "$this->label: ". _L('There is already a category with this name. Please choose another.');
 			}
