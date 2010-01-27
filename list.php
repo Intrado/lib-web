@@ -113,6 +113,7 @@ $showAdditions = isset($renderedlist) && $renderedlist->totaladded > 0;
 $showSkips = isset($renderedlist) && $renderedlist->totalremoved > 0;
 
 $formdata = array(
+	// A hidden submit button is needed because otherwise pressing ENTER would take you to the Preview page.
 	"hiddendone" => array(
 		"label" => _L(''),
 		"control" => array("FormHtml", "html" => hidden_submit_button('done')),
@@ -144,7 +145,7 @@ $formdata = array(
 	"preview" => array(
 		"label" => 'Total',
 		"fieldhelp" => _L('This number indicates how many people are currently in your list. Click the preview button to view contact information.'),
-		"control" => array("FormHtml", 'html' => '<div id="listTotal" style="float:left; padding:5px; margin-right: 10px;">0</div>' . submit_button(_L('Preview'), 'preview', 'tick')),
+		"control" => array("FormHtml", 'html' => '<div id="listTotal" style="float:left; padding:5px; margin-right: 10px;">'.$total.'</div>' . submit_button(_L('Preview'), 'preview', 'tick')),
 		"helpstep" => 1
 	)
 );
@@ -236,8 +237,6 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 			if ($ajax) {
 				switch ($button) {
 					case 'addrule':
-						error_log('Adding rule');
-						
 						$ruledata = json_decode($postdata['newrule']);
 						$data = $ruledata[0];
 						// CREATE rule.
@@ -260,7 +259,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 								
 							QuickUpdate('COMMIT');
 							
-							notice(_L('The rule for organization is now added.'));
+							notice(_L('The rule for Organization is now added.'));
 						} else {
 							if (!$type = Rule::getType($data->fieldnum)) {
 								notice(_L('There is a problem adding the rule for %s.', escapehtml(FieldMap::getName($data->fieldnum))));
@@ -296,7 +295,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 						if ($fieldnum == 'organization') {
 							QuickUpdate("DELETE FROM listentry WHERE listid=? AND type='organization'", false, array($list->id));
 							
-							notice(_L('The rule for organization is now removed.'));
+							notice(_L('The rule for Organization is now removed.'));
 						} else if ($USER->authorizeField($fieldnum)) {
 							QuickUpdate("DELETE le.*, r.* FROM listentry le, rule r WHERE le.ruleid=r.id AND le.listid=? AND r.fieldnum=?", false, array($list->id, $fieldnum));
 							
@@ -416,8 +415,6 @@ endWindow();
 				$('listSkipsContainer').update('<?=addslashes(list_get_results_html('listSkipsContainer', $renderedlist))?>');
 			}
 		<?php } ?>
-
-		$('listTotal').update(<?=$total?>);
 
 		$('removeAllAdditions').insert(action_link('<?=addslashes(_L("Remove All Additions"))?>', 'diagona/16/101', 'removeAllAdditionsLink').observe('click', function(event) {
 			form_submit(event, 'clearadditions');
