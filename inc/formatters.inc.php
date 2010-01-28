@@ -120,7 +120,7 @@ function fmt_checkbox($row, $index) {
 	$personid = $row[1];
 
 	$checked = '';
-	if (in_array($row[0], array(1, 'A', 'R')) || in_array($personid, $renderedlist->pageaddids))
+	if (in_array($row[0], array(1, 'add', 'rule', 'organization', 'section')) || in_array($personid, $renderedlist->pageaddids))
 		$checked = 'checked';
 	if (in_array($personid, $renderedlist->pageremoveids))
 		$checked = '';
@@ -149,7 +149,7 @@ function fmt_persontip ($row, $index) {
 
 	$person = new Person($row[1]);
 	if (!$person->id || $person->deleted)
-		return 'BAD PERSON!';
+		return _L('This person cannot be found.');
 
 	$pkey = escapehtml($person->pkey);
 
