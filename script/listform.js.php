@@ -113,8 +113,8 @@ function listform_load(listformID, formData, postURL) {
 			method: 'post',
 			onSuccess: function(transport) {
 				$('listsTableStatus').update();
-				var ruleid = transport.responseJSON;
-				if (!ruleid) {
+				
+				if (!transport.responseJSON) {
 					alert('<?=addslashes(_L("Sorry, cannot save this rule"))?>');
 					return;
 				}
