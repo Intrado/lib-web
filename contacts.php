@@ -61,6 +61,7 @@ if (isset($_GET['showall'])) {
 	systemcontact_clear_search_session();
 	$_SESSION['systemcontact_showall'] = true;
 } else if (!empty($_SESSION['systemcontact_rules'])) {
+	// NOTE: $_SESSION['systemcontact_rules'] may also contain array("fieldnum" => "organization", "val" => $organizationids)
 	$rules = $_SESSION['systemcontact_rules'];
 	if (is_array($rules))
 		$rulesjson = json_encode(cleanObjects(array_values($rules)));
@@ -175,12 +176,30 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 				case 'addrule':
 					systemcontact_clear_search_session('systemcontact_rules');
 					$data = json_decode($postdata['ruledata']);
-					if (isset($data->fieldnum, $data->logical, $data->op, $data->val) && $type = Rule::getType($data->fieldnum)) {
-						$data->val = prepareRuleVal($type, $data->op, $data->val);
-						if ($rule = Rule::initFrom($data->fieldnum, $data->logical, $data->op, $data->val)) {
+					if (isset($data->fieldnum, $data->logical, $data->op, $data->val)) {
+						if ($data->fieldnum == 'organization') {
+							$orgkeys = array();
+							
+							$organizations = $USER->organizations();
+							foreach ($data->val as $id) {
+								$id = $id + 0;
+								$orgkeys[$id] = $organizations[$id]->orgkey;
+							}
+							
 							if (!isset($_SESSION['systemcontact_rules']))
 								$_SESSION['systemcontact_rules'] = array();
-							$_SESSION['systemcontact_rules'][$data->fieldnum] = $rule;
+							
+							$_SESSION['systemcontact_rules']["organization"] = array(
+								"fieldnum" => "organization",
+								"val" => $orgkeys
+							);
+						} else if ($type = Rule::getType($data->fieldnum)) {
+							$data->val = prepareRuleVal($type, $data->op, $data->val);
+							if ($rule = Rule::initFrom($data->fieldnum, $data->logical, $data->op, $data->val)) {
+								if (!isset($_SESSION['systemcontact_rules']))
+									$_SESSION['systemcontact_rules'] = array();
+								$_SESSION['systemcontact_rules'][$data->fieldnum] = $rule;
+							}
 						}
 					}
 					$form->sendTo("contacts.php");
@@ -256,7 +275,12 @@ function systemcontact_make_report_options() {
 		if (!empty($_SESSION['systemcontact_email']))
 			$options['email'] = $_SESSION['systemcontact_email'];
 	} else if (!empty($_SESSION['systemcontact_rules'])) {
-		$options['rules'] = $_SESSION['systemcontact_rules'];
+		$rules = $_SESSION['systemcontact_rules'];
+		$organizationids = isset($rules['organization']) ? array_keys($rules['organization']['val']) : false;
+		unset($rules['organization']);
+		
+		$options['rules'] = $rules;
+		$options['organizationids'] = $organizationids;
 	}
 	
 	if (!empty($_SESSION['systemcontact_orderby'])) {

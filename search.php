@@ -25,7 +25,7 @@ include_once("ruleeditform.inc.php");
 require_once("inc/rulesutils.inc.php");
 require_once("obj/FormRuleWidget.fi.php");
 require_once("inc/reportutils.inc.php");
-require_once('list.inc.php');
+require_once("list.inc.php");
 
 include_once("obj/Address.obj.php");
 include_once("obj/Language.obj.php");
@@ -55,15 +55,22 @@ if (!$renderedlist = new RenderedList($list)) {
 	redirect('list.php');
 }
 
-$rulesjson = '';
+$rulewidgetvaluejson = '';
 
 if (isset($_GET['showall'])) {
 	list_clear_search_session();
 	$_SESSION['listsearchshowall'] = true;
-} else if (!empty($_SESSION['listsearchrules'])) {
-	$rules = $_SESSION['listsearchrules'];
-	if (is_array($rules))
-		$rulesjson = json_encode(cleanObjects(array_values($rules)));
+} else {
+	// NOTE: $_SESSION['listsearchrules'] may also contain array("fieldnum" => "organization", "val" =>  $organizationids)
+	$rulewidgetdata = array();
+	
+	if (isset($_SESSION['listsearchrules']) && count($_SESSION['listsearchrules']) > 0) {
+		$rules = $_SESSION['listsearchrules'];
+		$rulewidgetdata = cleanObjects(array_values($rules));
+	}
+	
+	if (count($rulewidgetdata) > 0)
+		$rulewidgetvaluejson = json_encode($rulewidgetdata);
 }
 
 list_handle_ajax_table($renderedlist, array($containerID));
@@ -86,7 +93,7 @@ if (!isset($_SESSION['listsearchpreview'])) {
 	
 	$formdata["ruledata"] = array(
 		"label" => _L('Rules'),
-		"value" => $rulesjson,
+		"value" => $rulewidgetvaluejson,
 		"control" => array("FormRuleWidget"),
 		"validators" => array(array('ValRules')),
 		"helpstep" => 2
@@ -151,12 +158,31 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 				case 'addrule':
 					list_clear_search_session('listsearchrules');
 					$data = json_decode($postdata['ruledata']);
-					if (isset($data->fieldnum, $data->logical, $data->op, $data->val) && $type = Rule::getType($data->fieldnum)) {
-						$data->val = prepareRuleVal($type, $data->op, $data->val);
-						if ($rule = Rule::initFrom($data->fieldnum, $data->logical, $data->op, $data->val)) {
+					if (isset($data->fieldnum, $data->logical, $data->op, $data->val)) {
+						if ($data->fieldnum == 'organization') {
+							$orgkeys = array();
+							
+							$organizations = $USER->organizations();
+							foreach ($data->val as $id) {
+								$id = $id + 0;
+								$orgkeys[$id] = $organizations[$id]->orgkey;
+							}
+							
 							if (!isset($_SESSION['listsearchrules']))
 								$_SESSION['listsearchrules'] = array();
-							$_SESSION['listsearchrules'][$data->fieldnum] = $rule;
+							
+							$_SESSION['listsearchrules']['organization'] = array(
+								"fieldnum" => "organization",
+								"val" => $orgkeys
+							);
+						} else if ($type = Rule::getType($data->fieldnum)) {
+							$data->val = prepareRuleVal($type, $data->op, $data->val);
+							
+							if ($rule = Rule::initFrom($data->fieldnum, $data->logical, $data->op, $data->val)) {
+								if (!isset($_SESSION['listsearchrules']))
+									$_SESSION['listsearchrules'] = array();
+								$_SESSION['listsearchrules'][$data->fieldnum] = $rule;
+							}
 						}
 					}
 					$form->sendTo("search.php");

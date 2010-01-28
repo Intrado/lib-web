@@ -89,15 +89,19 @@ if ($list->id) {
 	$rulewidgetdata = array();
 	
 	$rules = $list->getListRules();
+	
 	if (count($rules) > 0)
 		$rulewidgetdata = cleanObjects(array_values($rules));
 	
 	$organizations = $list->getOrganizations();
+	
 	if (count($organizations) > 0) {
 		$orgkeys = array(); // An array of value=>title pairs.
+		
 		foreach ($organizations as $organization) {
 			$orgkeys[$organization->id] = $organization->orgkey;
 		}
+		
 		$rulewidgetdata[] = array(
 			'fieldnum' => 'organization',
 			'val' => $orgkeys

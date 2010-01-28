@@ -9,6 +9,7 @@ class RenderedList {
 	var $language;
 
 	var $searchrules = array();
+	var $searchorganizationids = array();
 	var $searchpeople;
 
 	var $mode = "rules"; // possible modes: add,remove,rules,people
@@ -42,7 +43,8 @@ class RenderedList {
 		$this->pagelimit = $pagelimit;
 	}
 	// $rules, an array of rules; can be set to false to retrieve all contacts
-	function prepareRulesMode ($pagelimit, $rules) {
+	function prepareRulesMode ($pagelimit, $rules, $organizations = false) {
+		$this->searchorganizations = $organizations;
 		$this->searchrules = $rules;
 		$this->mode = "rules";
 		$this->pagelimit = $pagelimit;
@@ -81,7 +83,7 @@ class RenderedList {
 		}
 		
 		if ($this->mode == "rules") {
-			$result = $this->renderSearch(false, $this->searchrules);
+			$result = $this->renderSearch(false, $this->searchrules, $this->searchorganizations, false);
 			if (!empty($result) && !$this->hasstats)
 				$this->total = QuickQuery("SELECT FOUND_ROWS()");
 		} else if ($this->mode == "people") {
@@ -285,9 +287,8 @@ class RenderedList {
 		", false, array($this->list->id));
 	}
 
-	function renderSearch($specificPeople = false, $searchRules = false) {
+	function renderSearch($specificPeople = false, $searchRules = false, $searchorganizationids = false, $searchsectionids = false) {
 		global $USER;
-		global $list;
 		
 		if (is_array($specificPeople) && empty($specificPeople))
 			return false;
@@ -302,13 +303,23 @@ class RenderedList {
 	
 		if (isset($_SESSION['listsearchpreview'])) {
 			$listRules = $this->list->getListRules();
-			$combinedRulesSQL = count($listRules) ? Rule::makeQuery(array_merge($USER->rules(), $listRules), "p") : 'and 0';
 			$leJoinSQL = "LEFT JOIN listentry le ON (le.listid=? AND p.id = le.personid)";
+			
+			if (count($listRules)) {
+				$combinedRulesSQL = Rule::makeQuery(array_merge($USER->rules(), $listRules), "p");
+			} else if (count($this->list->getOrganizations()) == 0 && count($this->list->getSections()) == 0) {
+				$combinedRulesSQL = "and 0";
+			} else {
+				$combinedRulesSQL = "";
+			}
+			
+			// TODO: Take into account the user's organization/section restrictions.
+			
 			// Performs union between list rules and list additions.
 			return Query("
-					(SELECT SQL_CALC_FOUND_ROWS IFNULL(le.type,'R') AS entrytype,
+					(SELECT SQL_CALC_FOUND_ROWS IFNULL(le.type,'rule') AS entrytype,
 						$commonfieldsSQL
-					FROM person p
+					FROM " . $this->list->getPersonSubquerySQL() . " p
 						$leJoinSQL
 						$addressJoinSQL
 					WHERE
@@ -316,7 +327,6 @@ class RenderedList {
 						AND p.userid IS NULL
 						AND le.type IS NULL
 						$combinedRulesSQL
-						$searchRulesSQL
 						$peopleSQL)
 				UNION ALL
 					(SELECT (le.type) as entrytype,
@@ -327,18 +337,24 @@ class RenderedList {
 					WHERE
 						NOT p.deleted
 						AND le.type='add'
-						$searchRulesSQL
 						$peopleSQL)
 				$orderSQL
 				$limitSQL
 			", false, array($this->list->id, $this->list->id));
 		} else {
-			$listrulesSQL = $list->getListRuleSQL();
+			// TODO: Need to take into account organization/section listentries for determine isinlist.
+			$listrulesSQL = $this->list->getListRuleSQL();
+			
 			$userDataViewRestrictionsSQL = $USER->userSQL("p");
+			
 			return Query("
-				SELECT SQL_CALC_FOUND_ROWS ($listrulesSQL) as isinlist,
+				SELECT
+					SQL_CALC_FOUND_ROWS ($listrulesSQL) as isinlist,
 					$commonfieldsSQL
-				FROM person p
+				FROM " . PeopleList::makePersonSubquery(
+							$searchorganizationids ? $searchorganizationids : array(),
+							$searchsectionids ? $searchsectionids : array()
+						) . " p
 					$addressJoinSQL
 				WHERE
 					p.userid IS null
@@ -359,8 +375,10 @@ class RenderedList {
 		if (count($this->list->getListRules()) > 0) {
 			$allrules = array_merge($USER->rules(), $this->list->getListRules());
 			$rulesql = Rule::makeQuery($allrules, "p");
+		} else if (count($this->list->getOrganizations()) == 0 && count($this->list->getSections()) == 0) {
+			$rulesql = "and 0"; // if there are no restrictions at all, then return 0 results.
 		} else {
-			$rulesql = "and 0"; // no list rules, no persons to render
+			$rulesql = "";
 		}
 
 		$this->totalremoved = $this->countRemoved();
@@ -368,7 +386,7 @@ class RenderedList {
 
 		$this->total = $this->countEffectiveRule($rulesql) + $this->totaladded;
 		if ($this->mode == "add") {
-			$this->total = $this->totaladded;;
+			$this->total = $this->totaladded;
 		}
 		if ($this->mode == "remove") {
 			$this->total = $this->totalremoved;
@@ -378,7 +396,12 @@ class RenderedList {
 	}
 	
 	function countEffectiveRule ($rulesql) {
-		$query = "select count(*) from person p left join listentry le on (le.personid=p.id and le.listid=?) where le.type is null and p.userid is null and not p.deleted $rulesql";
+		$query = "
+			select count(*)
+				from " . $this->list->getPersonSubquerySQL() . " p
+					left join listentry le on (le.personid=p.id and le.listid=?)
+				where le.type is null and p.userid is null and not p.deleted $rulesql";
+
 		return QuickQuery($query, false, array($this->list->id));
 	}
 	

@@ -12,8 +12,9 @@ function list_clear_search_session($keep = false) {
 		$_SESSION['listsearchsms'] = false;
 	}
 
-	if ($keep != 'listsearchrules')
+	if ($keep != 'listsearchrules') {
 		$_SESSION['listsearchrules'] = array();
+	}
 }
 
 function listentry_get_type($personid) {
@@ -75,7 +76,7 @@ function list_handle_ajax_table($renderedlist, $validContainers) {
 		QuickUpdate("BEGIN");
 			if (!empty($_GET['addpersonid'])) {
 				$restrictUserSQL = $USER->userSQL("P");
-				if ($validPerson = QuickQuery("SELECT P.id FROM person P WHERE P.id=? AND (P.userid=0 OR P.userid=? OR (1 $restrictUserSQL))", false, array($_GET['addpersonid'], $USER->id))) {
+				if ($validPerson = QuickQuery("SELECT P.id FROM " . PeopleList::makePersonSubquery() . " P WHERE P.id=? AND (P.userid=0 OR P.userid=? OR (1 $restrictUserSQL))", false, array($_GET['addpersonid'], $USER->id))) {
 					$ajaxdata = true;
 					list_add_person($validPerson);
 				}
@@ -102,13 +103,17 @@ function list_prepare_ajax_table($containerID, $renderedlist) {
 			break;
 		case 'listPreviewContainer':
 		case 'listSearchContainer':
-			if (!empty($_SESSION['listsearchshowall']))
+			if (!empty($_SESSION['listsearchshowall'])) {
 				$renderedlist->prepareRulesMode(100, false);
-			else if (!empty($_SESSION['listsearchperson']))
+			} else if (!empty($_SESSION['listsearchperson'])) {
 				$renderedlist->preparePeopleMode(100, $_SESSION['listsearchpkey'], $_SESSION['listsearchphone'], $_SESSION['listsearchemail']);
-			else if (!empty($_SESSION['listsearchrules']))
-				$renderedlist->prepareRulesMode(100, $_SESSION['listsearchrules']);
-			else {
+			} else if (!empty($_SESSION['listsearchrules'])) {
+				$rules = $_SESSION['listsearchrules'];
+				$organizationids = isset($rules['organization']) ? $rules['organization']['val'] : false;
+				unset($rules['organization']);
+				
+				$renderedlist->prepareRulesMode(100, $rules, $organizationids);
+			} else {
 				if ($containerID == 'listPreviewContainer')
 					$renderedlist->prepareRulesMode(100, false);
 				else
@@ -193,7 +198,6 @@ function list_prepare_ajax_table($containerID, $renderedlist) {
 		else if ($containerID == 'listPreviewContainer')
 			return _L('Nobody in your list!');
 	}
-
 
 	return ajax_table_show_menu($containerID, $renderedlist->total, $renderedlist->pageoffset, $renderedlist->pagelimit) . ajax_show_table($containerID, $data, $titles, $formatters, $sorting, isset($repeatedColumns) ? $repeatedColumns : false, isset($groupBy) ? $groupBy : false, ($searchable ? 3 : 0), ($searchable ? true : false), ($searchable ? false : true));
 }
