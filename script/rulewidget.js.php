@@ -223,8 +223,14 @@ var RuleWidget = Class.create({
 	// @param tr, table row DOM element.
 	// @param addHiddenFieldnum, optional boolean specifying to add a hidden input with value=fieldnum
 	format_readable_rule: function(data, tr, addHiddenFieldnum) {
-		if (!data.fieldnum || !data.op || !data.logical)
-			return false;
+		if (!data.fieldnum || !data.op || !data.logical) {
+			if (data.fieldnum == "organization") {
+				data.op = "in";
+				data.logical = "and";
+			} else {
+				return false;
+			}
+		}
 		if (!this.fieldmaps[data.fieldnum])
 			return false;
 		if (!data.type)
@@ -279,9 +285,12 @@ var RuleWidget = Class.create({
 			// data.val is an array of IDs, but we want to show the titles instead.
 			// Example: for organization, data.val would be an array of organization IDs, but we want to display the orgkeys instead.
 			var titles = [];
+			var associationTitles = this.associationTitles[data.fieldnum];
+			
 			for (var i = 0, count = data.val.length; i < count; i++) {
-				titles.push(this.associationTitles[data.val[i]]);
+				titles.push(associationTitles[data.val[i]]);
 			}
+			
 			value = titles.join(',');
 		} else if (data.type == 'multisearch') { // Called from "Add" button.
 			value = data.val.join(',');
@@ -430,7 +439,7 @@ var RuleWidget = Class.create({
 			
 			// If this is an association, we want to convert data.val into an array of IDs if it is currently an object of value:title pairs.
 			// This is so the validator does not need to worry about whether data.val is an array or an object of value:title pairs.
-			if (data.type == 'association' && typeof(data.join) == "undefined") {
+			if (data.type == 'association' && typeof(data.val.join) == "undefined") {
 				var ids = [];
 				
 				for (var id in data.val) {
