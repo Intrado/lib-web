@@ -161,11 +161,48 @@ function handleRequest() {
 				if (!$USER->authorizeField($fieldnum))
 					return false;
 
-				// query the field data values
-				$limit = DBFind('Rule', 'from rule inner join userassociation on rule.id = userassociation.ruleid where userassociation.type = "rule" and userid=? and fieldnum=?', false, array($USER->id, $_GET['fieldnum']));
+				// The user may be restricted to specific values.
+				$limit = DBFind('Rule', 'from rule inner join userassociation on rule.id = userassociation.ruleid where userassociation.type = "rule" and userid=? and fieldnum=?', false, array($USER->id, $fieldnum));
 				$limitsql = $limit ? $limit->toSQL(false, 'value', false, true) : '';
-				return QuickQueryList("select value from persondatavalues where fieldnum=? $limitsql order by value", false, false, array($_GET['fieldnum']));
-
+				
+				// Get 'c' field values from the 'section' table, taking into account user section/organization restrictions.
+				if ($fieldnum[0] == 'c') {
+					// Make sure fieldnum is 'c01' through 'c10', to safeguard against SQL injection.
+					$number = substr($fieldnum, 1) + 0;
+					if ($number < 1 ||
+						$number > 10 ||
+						$fieldnum != 'c' . str_pad($number, 2, '0', STR_PAD_LEFT))
+						return false;
+					
+					// If the user has any section associations, only get values from those sections;
+					// Or if the user only has organization associations, then get the values from sections in those organizations.
+					// Otherwise, get values from all sections.
+					if (QuickQuery('select count(*) from userassociation where userid = ? and type = "section" limit 1', false, array($USER->id)) > 0) {
+						return QuickQueryList("
+							select distinct $fieldnum as value
+							from section
+								inner join userassociation
+									on (userassociation.sectionid = section.id)
+							where userid=? $limitsql
+						", false, false, array($USER->id));
+					} else if (QuickQuery('select count(*) from userassociation where userid = ? and type = "organization" limit 1', false, array($USER->id)) > 0) {
+						return QuickQueryList("
+							select distinct $fieldnum as value
+							from section
+								inner join userassociation
+									on (userassociation.organizationid = section.organizationid)
+							where userid=? $limitsql
+						", false, false, array($USER->id));
+					} else {
+						return QuickQueryList("
+							select distinct $fieldnum as value
+							from section
+								where 1 $limitsql
+						", false);
+					}
+				} else {
+					return QuickQueryList("select value from persondatavalues where fieldnum=? $limitsql order by value", false, false, array($_GET['fieldnum']));
+				}
 			// if it's an organization field
 			} else if ($fieldnum == 'organization') {
 				// $orgkeys is an array of value=>title pairs.
