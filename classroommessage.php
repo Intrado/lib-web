@@ -13,6 +13,7 @@ require_once("obj/FormItem.obj.php");
 require_once("obj/Event.obj.php");
 require_once("obj/Alert.obj.php");
 require_once("obj/TargetedMessageCategory.obj.php");
+require_once("obj/TargetedMessage.obj.php");
 
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization
@@ -106,44 +107,6 @@ for($i=0;$i<=3;$i++) {
 	//$classpeople[$i] = array(1 => "Ben Hencke", 2 => "Howard Wood",3 => "Gretel Baumgartner", 4 => "Kee-Yip Chan", 5 => "Nickolas Heckman");
 }
 
-
-$categories = QuickQueryMultiRow("select id, name, image from targetedmessagecategory where deleted = 0",true);
-$categoriesjson = array();
-foreach($categories as $category) {
-	$obj = null;
-	$obj->name = $category["name"];
-	if(isset($category["image"]) && isset($classroomcategoryicons[$category["image"]]))
-		$obj->img = "img/icons/" . $classroomcategoryicons[$category["image"]]  . ".gif";
-	else
-		$obj->img = "img/pixel.gif";
-	$categoriesjson[$category["id"]] = $obj;
-}
-
-$categories = array(0 => "Positive",1 => "Corrective",2 => "Informational");
-
-
-// If no targeted messages exist fill the targeted message library with phony test data
-if(QuickQuery("select count(*) from targetedmessage") == "0") {
-	error_log("Generating Test Data: Creating Targeted Messages");
-	$batchvalues = array();
-	// three categories
-	for($i=0;$i<3;$i++) {
-		// 30 messages per category
-		for($j=0;$j<30;$j++) {
-			$batchvalues[] = "('$i Generic targeted student message $j 012346789 01234567890 1234567890 123456789',$i)";
-		}
-	}
-	$sql = "INSERT INTO targetedmessage (messagekey,targetedmessagecategoryid) VALUES ";
-	$sql .= implode(",",$batchvalues);
-	QuickUpdate($sql);
-}
-
-// category id => personid => messageid;
-$library = array();
-foreach($categoriesjson as $id => $obj) {
-	$library[$id] = QuickQueryList("select id,messagekey from targetedmessage where targetedmessagecategoryid = ?",true,false,array($id));
-}
-
 //Handle ajax request. when swithcing sections
 if (isset($_POST['classid'])) {
 	header('Content-Type: application/json');
@@ -167,6 +130,34 @@ if (isset($_POST['classid'])) {
 
 	exit(0);
 }
+
+
+$categories = QuickQueryMultiRow("select id, name, image from targetedmessagecategory where deleted = 0",true);
+$categoriesjson = array();
+foreach($categories as $category) {
+	$obj = null;
+	$obj->name = $category["name"];
+	if(isset($category["image"]) && isset($classroomcategoryicons[$category["image"]]))
+		$obj->img = "img/icons/" . $classroomcategoryicons[$category["image"]]  . ".gif";
+	else
+		$obj->img = "img/pixel.gif";
+	$categoriesjson[$category["id"]] = $obj;
+}
+
+$categories = array(0 => "Positive",1 => "Corrective",2 => "Informational");
+
+$library = array();
+$customtxt = array();
+foreach($categoriesjson as $id => $obj) {
+	$library[$id] = DBFindMany("TargetedMessage","from targetedmessage where enabled = 1 and targetedmessagecategoryid = ?",false,array($id));
+	$customtxt[$id] = QuickQueryList("select t.id, p.txt from targetedmessage t, message m, messagepart p
+										where t.targetedmessagecategoryid = ? and t.deleted = 0 and
+											t.overridemessagegroupid = m.messagegroupid and
+											m.languagecode = 'en' and
+											p.messageid = m.id and p.sequence = 0",true,false,array($id));
+}
+
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // Optional Form Items And Validators
@@ -237,14 +228,26 @@ startWindow(_L('Classroom Message'));
 			<?
 				$libraryids = array();
 				$messageids = array();
+				$filename = "messagedata/en/data.php";
+				if(file_exists($filename))
+					include_once($filename);
 				foreach($library as $categoryid => $messages) {
 					// add library to id since user may change the title of the category
 					echo "<div id='lib-$categoryid' style='display:block;'>";
-					foreach($messages as $messageid => $message) {
-						echo '<div id="msg-' . $messageid.'" class="targetmessage" style="position:relative;border:solid 1px silver;background-color:#FFF;width:300px;float:left;margin:4px;padding:0px;"><img src="img/checkbox-clear.png" alt="" style="position:absolute;top:10px;left:3px;"/><div style="position:relative;top:5px;left:25px;width:270px">' . $message .  ' </div>' . ($USER->authorize('targetedcomment')?'<a href="#" class="commentlink" style="position:relative;float:right;">Comment</a>':'&nbsp;')
+					foreach($messages as $message) {
+		
+						if(isset($message->overridemessagegroupid) && isset($customtxt[$categoryid][$message->id])) {
+							$title = $customtxt[$categoryid][$message->id];
+						} else if(isset($messagedatacache["en"]) && isset($messagedatacache["en"][$message->messagekey])) {
+							$title = $messagedatacache["en"][$message->messagekey];
+						} else {
+							$title = ""; // Could not find message for this message key.
+						}
+
+						echo '<div id="msg-' . $message->id .'" class="targetmessage" style="position:relative;border:solid 1px silver;background-color:#FFF;width:300px;float:left;margin:4px;padding:0px;"><img src="img/checkbox-clear.png" alt="" style="position:absolute;top:10px;left:3px;"/><div style="position:relative;top:5px;left:25px;width:270px">' . $title .  ' </div>' . ($USER->authorize('targetedcomment')?'<a href="#" class="commentlink" style="position:relative;float:right;">Comment</a>':'&nbsp;')
 						. '<span class="targetcomment" style="display:none;">
 								<textarea class="targetcomment" style="position:relative;clear:both;width:94%;left:2%;height:60px;"></textarea>
-								<a class="targetcomment" href="#" onclick="saveComment(\''. $messageid.'\');false;">Save</a><span style="display:none"><br />Notice: Some of the Contacts have a comment for this message. Saving a new comment will overwrite the comment</span>
+								<a class="targetcomment" href="#" onclick="saveComment(\''. $message->id .'\');false;">Save</a><span style="display:none"><br />Notice: Some of the Contacts have a comment for this message. Saving a new comment will overwrite the comment</span>
 							</span>
 						</div>';
 					}
@@ -259,6 +262,9 @@ startWindow(_L('Classroom Message'));
 
 <?
 endWindow();
+
+
+// TODO --- Once development is done script should move to its own file for caching purposes 
 ?>
 <script type="text/javascript" src="script/accordion.js"></script>
 <script type="text/javascript" language="javascript">
@@ -591,9 +597,7 @@ endWindow();
 					});
 				});
 				setcache(response.cache);
-			},
-			onFailure: function(){ alert('Could not get class') },
-			onException: function(){ alert('Could not get class') }
+			}
 		});
 	}
 
