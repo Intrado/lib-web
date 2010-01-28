@@ -430,17 +430,17 @@ var RuleWidget = Class.create({
 			
 			// If this is an association, we want to convert data.val into an array of IDs if it is currently an object of value:title pairs.
 			// This is so the validator does not need to worry about whether data.val is an array or an object of value:title pairs.
-			if (data.type == 'association') {
-				if (typeof(data.join) == "undefined") {
-					var ids = [];
-					for (var value in data.val) {
-						ids.push(data.val[value]);
-					}
-					data.val = ids;
+			if (data.type == 'association' && typeof(data.join) == "undefined") {
+				var ids = [];
+				
+				for (var id in data.val) {
+					ids.push(id);
 				}
-			} else {
-				this.appliedRules[data.fieldnum] = data;
+				
+				data.val = ids;
 			}
+			
+			this.appliedRules[data.fieldnum] = data;
 			
 			this.refresh_rules_table();
 			if (this.ruleEditor)
