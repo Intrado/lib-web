@@ -9,23 +9,16 @@ require_once("inc/html.inc.php");
 require_once("inc/formatters.inc.php");
 require_once("inc/date.inc.php");
 require_once("obj/Person.obj.php");
-require_once("obj/PeopleList.obj.php");
-require_once("obj/ListEntry.obj.php");
-require_once("obj/RenderedList.obj.php");
 require_once("obj/Validator.obj.php");
 require_once("obj/Form.obj.php");
-require_once("obj/Rule.obj.php");
 require_once("obj/FieldMap.obj.php");
 require_once("obj/FormItem.obj.php");
 require_once("obj/Phone.obj.php");
 require_once("obj/Email.obj.php");
 require_once("obj/Sms.obj.php");
 require_once("inc/securityhelper.inc.php");
-require_once("inc/rulesutils.inc.php");
-require_once("obj/FormRuleWidget.fi.php");
 require_once("obj/Job.obj.php");
 require_once("inc/reportutils.inc.php");
-require_once('list.inc.php');
 
 require_once("obj/Address.obj.php");
 require_once("obj/Language.obj.php");
@@ -37,9 +30,7 @@ require_once("obj/CallsReport.obj.php");
 require_once("obj/ReportInstance.obj.php");
 require_once("obj/ReportSubscription.obj.php");
 require_once("obj/UserSetting.obj.php");
-require_once("inc/rulesutils.inc.php");
 require_once("obj/PortalReport.obj.php");
-
 
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization
@@ -164,13 +155,6 @@ if (!empty($options['personid'])) {
 	$searchvalue = '';
 }
 
-$rulesjson = '';
-if (!empty($options['rules'])) {
-	$rules = $options['rules'];
-	if (is_array($rules))
-		$rulesjson = json_encode(cleanObjects(array_values($rules)));
-}
-
 $savedjobtypes = array();
 if(isset($options['jobtypes'])){
 	$savedjobtypes = explode("','", $options['jobtypes']);
@@ -210,13 +194,6 @@ $formdata["searchvalue"] = array(
 );
 
 $formdata[] = _L("Filter By");
-$formdata["ruledata"] = array(
-	"label" => _L('Criteria'),
-	"value" => $rulesjson,
-	"control" => array("FormRuleWidget", "allowedFields" => array('f','g')),
-	"validators" => array(array('ValRules', "allowedFields" => array('f','g'))),
-	"helpstep" => 1
-);
 
 $formdata["dateoptions"] = array(
 	"label" => _L("Date Options"),
@@ -293,12 +270,9 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		$postdata = $form->getData(); //gets assoc array of all values {name:value,...}
 
 		if ($ajax) {
-			if (in_array($button,array('addrule','deleterule','view'))) {
-				if (isset($_SESSION['report']['options']['rules']))
-					$rules = $_SESSION['report']['options']['rules'];
+			if ($button == 'view') {
 				$_SESSION['report']['options'] = array(
-					'reporttype' => 'contacthistory',
-					'rules' => isset($rules) ? $rules : array()
+					'reporttype' => 'contacthistory'
 				);
 
 				if ($postdata['searchmethod'] == 'personid')
@@ -336,32 +310,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 					$_SESSION['report']['options']['results'] = implode("','", $temp);
 				}
 
-				switch ($button) {
-					case 'addrule':
-						$data = json_decode($postdata['ruledata']);
-						if (isset($data->fieldnum, $data->logical, $data->op, $data->val) && $type = Rule::getType($data->fieldnum)) {
-							$data->val = prepareRuleVal($type, $data->op, $data->val);
-							if ($rule = Rule::initFrom($data->fieldnum, $data->logical, $data->op, $data->val)) {
-								if (!isset($_SESSION['report']['options']['rules']))
-									$_SESSION['report']['options']['rules'] = array();
-								$_SESSION['report']['options']['rules'][$data->fieldnum] = $rule;
-							}
-						}
-						$form->sendTo("reportcallssearch.php");
-						break;
-
-					case 'deleterule':
-						if (!empty($_SESSION['report']['options']['rules'])) {
-							$fieldnum = $postdata['ruledata'];
-							unset($_SESSION['report']['options']['rules'][$fieldnum]);
-						}
-						$form->sendTo("reportcallssearch.php");
-						break;
-
-					case 'view':
-						$form->sendTo("reportcallsresult.php");
-						break;
-				}
+				$form->sendTo("reportcallsresult.php");
 			}
 		} else {
 			redirect("reportcallssearch.php");
@@ -390,7 +339,7 @@ startWindow(_L("Person Notification Search"), "padding: 3px;");
 
 	?>
 		<script type="text/javascript">
-			<? Validator::load_validators(array("ValRules", "ValReldate", "ValContactHistorySearch")); ?>
+			<? Validator::load_validators(array("ValReldate", "ValContactHistorySearch")); ?>
 		</script>
 	<?
 	echo $form->render();
@@ -398,10 +347,6 @@ endWindow();
 ?>
 	<script type="text/javascript">
 		document.observe('dom:loaded', function() {
-			ruleWidget.delayActions = true;
-			ruleWidget.container.observe('RuleWidget:AddRule', rulewidget_add_rule);
-			ruleWidget.container.observe('RuleWidget:DeleteRule', rulewidget_delete_rule);
-
 			var jobtypesCheckboxes = $('<?=$form->name?>_jobtypes').select('input');
 			$('<?=$form->name?>_jobtype').observe('click', function(event, jobtypesCheckboxes) {
 				if (!this.checked) {
@@ -428,16 +373,6 @@ endWindow();
 
 			$('metadataDiv').update($('metadataTempDiv').innerHTML);
 		});
-
-		function rulewidget_add_rule(event) {
-			$('<?=$form->name?>_ruledata').value = event.memo.ruledata.toJSON();
-			form_submit(event, 'addrule');
-		}
-
-		function rulewidget_delete_rule(event) {
-			$('<?=$form->name?>_ruledata').value = event.memo.fieldnum;
-			form_submit(event, 'deleterule');
-		}
 	</script>
 <?
 	require_once("navbottom.inc.php");
