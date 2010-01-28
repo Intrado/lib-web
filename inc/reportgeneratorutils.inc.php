@@ -17,6 +17,10 @@ function getOrderSql($params){
 
 }
 
+function getPersonSubquerySql($params) {
+	return PeopleList::makePersonSubQuery(isset($params['organizationids']) ? $params['organizationids'] : false);
+}
+
 function getRuleSql($params, $alias, $isjobreport=true){
 	$rulesql = "";
 	if(isset($params['rules'])){
