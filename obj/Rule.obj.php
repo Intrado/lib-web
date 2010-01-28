@@ -205,7 +205,13 @@ class Rule extends DBMappedObject {
 					$gquery .=  $rule->toSql($alias, $fieldoverride, $isreport);
 				}
 				if (strpos($rule->fieldnum, "c") === 0) {
-					if ($cquery == "") $cquery = " and exists (select null from enrollment a where ".$alias.".id=a.personid ";
+					if ($cquery == "") {
+						$cquery = " and exists (
+							select null
+							from section a inner join personassociation pa on (a.id = pa.sectionid)
+							where {$alias}.id = pa.personid ";
+					}
+					
 					$cquery .= $rule->toSql("a");
 				}
 			}
