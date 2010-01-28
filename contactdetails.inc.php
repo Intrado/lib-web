@@ -497,9 +497,15 @@ foreach ($fieldmaps as $map) {
 		<td class="bottomBorder">
 		<table cellpadding="3" cellspacing="1" class="list sortable" id="enrollmenttable">
 <?
-		$assocdata = QuickQueryMultiRow("select c01, c02, c03, c04, c05, c06, c07, c08, c09, c10 from enrollment where personid=".$personid, true);
-		//var_dump($assocdata);
-
+		$assocdata = QuickQueryMultiRow("
+			select c01, c02, c03, c04, c05, c06, c07, c08, c09, c10
+			from section
+				inner join personassociation pa
+					on (section.id = pa.sectionid)
+			where personid=$personid",
+			true
+		);
+		
 		$fieldmaps = FieldMap::getAuthorizedFieldMapsLike('c');
 ?>
 		<tr class="listHeader">
