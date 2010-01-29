@@ -68,9 +68,14 @@ class RemoveQuestionButton extends FormItem {
 		<script type="text/javascript">
 		function doRemoveQuestion(formname,qnum) {
 			$(formname+"_question"+qnum+"-reportlabel").value="-Deleting-";
-			$(formname+"_question"+qnum+"-webtext").value="-Deleting-";
-			$(formname+"_question"+qnum+"-phonemessage").value="{\"delete\":true}";
-			$(formname+"_question"+qnum+"-phonemessage_content").update("Deleting");
+			var webtext = $(formname+"_question"+qnum+"-webtext")
+			if (webtext)
+				webtext.value="-Deleting-";
+			var phonemessage = $(formname+"_question"+qnum+"-phonemessage")
+			if (phonemessage) {
+				phonemessage.value="{\"delete\":true}";
+				$(formname+"_question"+qnum+"-phonemessage_content").update("Deleting");
+			}
 		}
 		</script>
 		';
@@ -104,7 +109,6 @@ class PhoneMessageRecorder extends FormItem {
 			border: 1px solid gray;
 		}
 
-		// surveytemplate styles
 		.surveytemplatecontent {
 			padding: 6px;
 			white-space:nowrap
