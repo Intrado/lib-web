@@ -61,7 +61,7 @@ if($isajax === true) {
 			$orderby = "name";
 			break;
 	}
-	$mergeditems = QuickQueryMultiRow("select  SQL_CALC_FOUND_ROWS 'list' as type,'Saved' as status, id, name, modifydate as date, lastused from list where userid=? and deleted = 0  and modifydate is not null order by $orderby limit $start, $limit",true,false,array($USER->id));
+	$mergeditems = QuickQueryMultiRow("select  SQL_CALC_FOUND_ROWS 'list' as type,'Saved' as status, id, name, modifydate as date, lastused from list where userid=? and deleted = 0 order by $orderby limit $start, $limit",true,false,array($USER->id));
 
 	$total = QuickQuery("select FOUND_ROWS()");
 	$numpages = ceil($total/$limit);
