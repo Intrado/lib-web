@@ -85,9 +85,7 @@ if($isajax === true) {
 			$defaultlink = "";
 			$title = escapehtml($item["name"]);
 			$defaultlink = "list.php?id=$itemid";
-			$content = '<a href="' . $defaultlink . '">' . $time;
-
-			$content .= '&nbsp;-&nbsp;';
+			$content = '<a href="' . $defaultlink . '">' . ($item["date"]!== null?$time . '&nbsp;-&nbsp;':"");
 			if(isset($item["lastused"]))
 				$content .= 'This list was last used: <i>' . date("M j, g:i a",strtotime($item["lastused"])) . "</i>";
 			else
@@ -107,7 +105,6 @@ if($isajax === true) {
 										"title" => $title,
 										"content" => $content,
 										"tools" => $tools);
-
 		}
 	}
 	$data->pageinfo = array($numpages,$limit,$curpage, "Showing $displaystart - $displayend of $total records on $numpages pages ");
