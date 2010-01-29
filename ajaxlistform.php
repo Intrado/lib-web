@@ -55,7 +55,7 @@ function summarizeListName($listid) {
 				$orgkeys[] = $organization->orgkey;
 			}
 			
-			$summary[] = 'organization is ' . implode(', ', $orgkeys);
+			$summary[] = 'Organization is ' . implode(', ', $orgkeys);
 		}
 	}
 	
