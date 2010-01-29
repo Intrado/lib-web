@@ -1,6 +1,8 @@
 <?
 // phone inbound, prompt to select list (page into sets of 9), then save listid
 
+include_once("../obj/Organization.obj.php");
+include_once("../obj/Section.obj.php");
 include_once("../obj/User.obj.php");
 include_once("../obj/Rule.obj.php");
 include_once("../obj/Access.obj.php");
