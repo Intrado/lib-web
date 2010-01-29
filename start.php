@@ -63,7 +63,7 @@ if($isajax === true) {
 			select 'message' as type,'Saved' as status,g.id as id, g.name as name, g.modified as date, g.deleted as deleted,
 			 sum(type='phone') as phone, sum(type='email') as email,sum(type='sms') as sms
 			from messagegroup g, message m where g.userid=? and g.deleted = 0 and g.modified is not null and m.messagegroupid = g.id
-			group by g.id,m.languagecode order by g.modified desc limit 10 ",true,false,array($USER->id)));
+			group by g.id order by g.modified desc limit 10 ",true,false,array($USER->id)));
 			break;
 		case "jobs":
 			$mergeditems = array_merge($mergeditems,QuickQueryMultiRow("select 'job' as type,status,id, name, modifydate as date,'modifydate' as datetype, type as jobtype, deleted from job where userid=? and deleted = 0 and (finishdate is null || status='repeating') and modifydate is not null order by modifydate desc limit 10",true,false,array($USER->id)));
@@ -105,7 +105,7 @@ if($isajax === true) {
 			select 'message' as type,'Saved' as status,g.id as id, g.name as name, g.modified as date, g.deleted as deleted,
 			 sum(type='phone') as phone, sum(type='email') as email,sum(type='sms') as sms
 			from messagegroup g, message m where g.userid=? and g.deleted = 0 and g.modified is not null and m.messagegroupid = g.id
-			group by g.id,m.languagecode order by g.modified desc limit 10 ",true,false,array($USER->id)));
+			group by g.id order by g.modified desc limit 10 ",true,false,array($USER->id)));
 
 			$mergeditems = array_merge($mergeditems,QuickQueryMultiRow("select 'job' as type,status,id, name, modifydate as date,'modifydate' as datetype, type as jobtype,percentprocessed, deleted from job where userid=? and deleted = 0  and (finishdate is null || status='repeating') and modifydate is not null order by modifydate desc limit 10",true,false,array($USER->id)));
 			$mergeditems = array_merge($mergeditems,QuickQueryMultiRow("select 'job' as type,status,id, name, finishdate as date,'finishdate' as datetype,type as jobtype,percentprocessed, deleted from job where userid=? and deleted = 0  and status!='repeating' and finishdate is not null order by finishdate desc limit 10",true,false,array($USER->id)));
