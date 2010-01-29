@@ -174,7 +174,7 @@ class PhoneMessageRecorder extends FormItem {
 			e = $(e);
 			var content = $(e.id+"_content");
 
-			new EasyCall(e.id, content.id, "'.Phone::format($USER->phone).'", "Survey Message");
+			new EasyCall(e, content, "'.Phone::format($USER->phone).'", "Survey Message");
 
 			content.observe("EasyCall:update", function(event) {
 				e.value = "{\"af\":" + event.memo.audiofileid + "}";
