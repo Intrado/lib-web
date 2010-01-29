@@ -25,7 +25,10 @@ class PortalReport extends ReportGenerator{
 		if(isset($this->params['hideassociated']) && $this->params['hideassociated']){
 			$hideassociated = " and not exists(select count(*) from portalperson pp2 where pp2.personid = p.id group by pp2.personid) ";
 		}
-		if($rulesql || $pkeysql || $showall){
+		if((isset($this->params['organizationids']) && count($this->params['organizationids']) > 0) ||
+			$rulesql ||
+			$pkeysql ||
+			$showall){
 			$this->query = "select SQL_CALC_FOUND_ROWS
 						p.pkey as pkey,
 						p.id as pid,
@@ -34,7 +37,7 @@ class PortalReport extends ReportGenerator{
 						ppt.token,
 						ppt.expirationdate"
 						. generateFields("p")
-						. "	from person p
+						. "	from " . getPersonSubquerySql($this->params) . " p
 						left join portalpersontoken ppt on (ppt.personid = p.id)
 						where not p.deleted
 						and p.type='system' "
@@ -45,7 +48,7 @@ class PortalReport extends ReportGenerator{
 						. $usersql;
 			//test query used to confirm no active codes are in the list
 			$this->testquery = "select count(ppt.token)
-						from person p
+						from " . getPersonSubquerySql($this->params) . " p
 						left join portalpersontoken ppt on (ppt.personid = p.id)
 						where not p.deleted
 						and p.type='system'
