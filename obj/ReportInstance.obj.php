@@ -56,7 +56,7 @@ class ReportInstance extends DBMappedObject {
 		if(isset($paramarray['rules'])){
 			$paramarray['rules'] = $this->ruleArraytoString($paramarray['rules']);	
 		}
-		if(isset($paramarray['organizationids']) && is_array($paramarray['organizationids'])) {
+		if(isset($paramarray['organizationids']) && count($paramarray['organizationids']) > 0) {
 			$paramarray['organizationids'] = implode(';', $paramarray['organizationids']);
 		} else {
 			unset($paramarray['organizationids']);

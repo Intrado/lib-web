@@ -276,7 +276,7 @@ function systemcontact_make_report_options() {
 			$options['email'] = $_SESSION['systemcontact_email'];
 	} else if (!empty($_SESSION['systemcontact_rules'])) {
 		$rules = $_SESSION['systemcontact_rules'];
-		$organizationids = isset($rules['organization']) ? array_keys($rules['organization']['val']) : false;
+		$organizationids = isset($rules['organization']) ? array_keys($rules['organization']['val']) : array();
 		unset($rules['organization']);
 		
 		$options['rules'] = $rules;

@@ -278,7 +278,7 @@ function activationcodemanager_make_report_options() {
 		$options['showall'] = true;
 	} else if (!empty($_SESSION['activationcodemanager_rules'])) {
 		$rules = $_SESSION['activationcodemanager_rules'];
-		$organizationids = isset($rules['organization']) ? array_keys($rules['organization']['val']) : false;
+		$organizationids = isset($rules['organization']) ? array_keys($rules['organization']['val']) : array();
 		unset($rules['organization']);
 		$options['rules'] = $rules;
 		$options['organizationids'] = $organizationids;

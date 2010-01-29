@@ -9,9 +9,6 @@ require_once("inc/html.inc.php");
 require_once("inc/formatters.inc.php");
 require_once("inc/date.inc.php");
 require_once("obj/Person.obj.php");
-require_once("obj/PeopleList.obj.php");
-require_once("obj/ListEntry.obj.php");
-require_once("obj/RenderedList.obj.php");
 require_once("obj/Validator.obj.php");
 require_once("obj/Form.obj.php");
 require_once("obj/Rule.obj.php");
@@ -25,7 +22,6 @@ require_once("inc/rulesutils.inc.php");
 require_once("obj/FormRuleWidget.fi.php");
 require_once("obj/Job.obj.php");
 require_once("inc/reportutils.inc.php");
-require_once('list.inc.php');
 
 require_once("obj/Address.obj.php");
 require_once("obj/Language.obj.php");
@@ -38,7 +34,6 @@ require_once("obj/ReportInstance.obj.php");
 require_once("obj/ReportSubscription.obj.php");
 require_once("obj/JobDetailReport.obj.php");
 require_once("obj/UserSetting.obj.php");
-require_once("inc/rulesutils.inc.php");
 require_once("obj/PortalReport.obj.php");
 
 
@@ -190,12 +185,32 @@ switch($_SESSION['report']['type']){
 
 $options = $_SESSION['report']['options'];
 
-$rulesjson = '';
-if (!empty($options['rules'])) {
-	$rules = $options['rules'];
-	if (is_array($rules))
-		$rulesjson = json_encode(cleanObjects(array_values($rules)));
+$rulewidgetvaluejson = '';
+$rulewidgetdata = array();
+if (isset($options['rules']) && count($options['rules']) > 0) {
+	$rulewidgetdata = cleanObjects(array_values($options['rules']));
 }
+if (isset($options['organizationids']) && count($options['organizationids']) > 0) {
+	$organizations = $USER->organizations();
+	
+	if (count($organizations) > 0) {
+		$orgkeys = array(); // An array of value=>title pairs.
+		
+		foreach ($options['organizationids'] as $id) {
+			if (isset($organizations[$id]))
+				$orgkeys[$id] = $organizations[$id]->orgkey;
+		}
+		
+		if (count($orgkeys) > 0) {
+			$rulewidgetdata[] = array(
+				'fieldnum' => 'organization',
+				'val' => $orgkeys
+			);
+		}
+	}
+}
+if (count($rulewidgetdata) > 0)
+	$rulewidgetvaluejson = json_encode($rulewidgetdata);
 
 $savedjobtypes = array();
 if(isset($options['jobtypes'])){
@@ -213,14 +228,11 @@ if(isset($options['result'])) {
 $jobid = isset($options['jobid']) ? $options['jobid']: '';
 $jobtypefilter = "";
 if (isset($_SESSION['report']['type'])) {
-	if ($_SESSION['report']['type'] == "phone") {
-		$jobtypefilter = " and phonemessageid is not null ";
-	} else if ($_SESSION['report']['type'] == "email") {
-		$jobtypefilter = " and emailmessageid is not null ";
-	} else if ($_SESSION['report']['type'] == "sms") {
-		$jobtypefilter = " and smsmessageid is not null ";
-	}
+	$type = $_SESSION['report']['type'];
+	if (in_array($type, array('phone', 'email', 'sms')))
+		$jobtypefilter = " and exists (select * from message m where m.type='$type' and m.messagegroupid=j.messagegroupid) ";
 }
+
 //if this user can see systemwide reports, then lock them to the customerid
 //otherwise lock them to jobs that they own
 $userJoin = "";
@@ -285,11 +297,12 @@ $formdata["dateoptions"] = array(
 );
 
 $formdata[] = _L("Filter By");
+$allowedFields = array('f','g');
 $formdata["ruledata"] = array(
 	"label" => _L('Criteria'),
-	"value" => $rulesjson,
-	"control" => array("FormRuleWidget", "allowedFields" => array('f','g')),
-	"validators" => array(array('ValRules', "allowedFields" => array('f','g'))),
+	"value" => $rulewidgetvaluejson,
+	"control" => array("FormRuleWidget", "allowedFields" => $allowedFields),
+	"validators" => array(array('ValRules', "allowedFields" => $allowedFields)),
 	"helpstep" => 1
 );
 
@@ -348,10 +361,6 @@ $buttons = array(
 	submit_button(_L("Save/Schedule"),"save","arrow_refresh")
 );
 
-$helpsteps = array(
-	_L("TEST")
-);
-
 $form = new Form('reportcallssearch',$formdata,array(),$buttons);
 $form->ajaxsubmit = true;
 ///////////////////////////////////////////////////////////
@@ -372,12 +381,18 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 
 		if ($ajax) {
 			if (in_array($button,array('addrule','deleterule','view', 'save'))) {
+				// Clear report options except for rules and organizations.
 				if (isset($_SESSION['report']['options']['rules']))
 					$rules = $_SESSION['report']['options']['rules'];
+				if (isset($_SESSION['report']['options']['organizationids']))
+					$organizationids = $_SESSION['report']['options']['organizationids'];
+				
 				$_SESSION['report']['options'] = array(
 					'reporttype' => 'phonedetail',
-					'rules' => isset($rules) ? $rules : array()
+					'rules' => isset($rules) ? $rules : array(),
+					'organizationids' => isset($organizationids) ? $organizationids : array()
 				);
+				
 				set_session_options_reporttype();
 
 				switch($postdata['radioselect']){
@@ -435,22 +450,30 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 				switch ($button) {
 					case 'addrule':
 						$data = json_decode($postdata['ruledata']);
-						if (isset($data->fieldnum, $data->logical, $data->op, $data->val) && $type = Rule::getType($data->fieldnum)) {
-							$data->val = prepareRuleVal($type, $data->op, $data->val);
-							if ($rule = Rule::initFrom($data->fieldnum, $data->logical, $data->op, $data->val)) {
-								if (!isset($_SESSION['report']['options']['rules']))
-									$_SESSION['report']['options']['rules'] = array();
-								$_SESSION['report']['options']['rules'][$data->fieldnum] = $rule;
+						if (isset($data->fieldnum, $data->logical, $data->op, $data->val)) {
+							if ($data->fieldnum == 'organization') {
+								$_SESSION['report']['options']['organizationids'] = $data->val;
+							} else if ($type = Rule::getType($data->fieldnum)) {
+								$data->val = prepareRuleVal($type, $data->op, $data->val);
+								if ($rule = Rule::initFrom($data->fieldnum, $data->logical, $data->op, $data->val)) {
+									if (!isset($_SESSION['report']['options']['rules']))
+										$_SESSION['report']['options']['rules'] = array();
+									$_SESSION['report']['options']['rules'][$data->fieldnum] = $rule;
+								}
 							}
 						}
 						$form->sendTo("reportjobdetailsearch.php");
 						break;
 
 					case 'deleterule':
-						if (!empty($_SESSION['report']['options']['rules'])) {
-							$fieldnum = $postdata['ruledata'];
+						$fieldnum = $postdata['ruledata'];
+						
+						if ($fieldnum == 'organization') {
+							unset($_SESSION['report']['options']['organizationids']);
+						} else if (!empty($_SESSION['report']['options']['rules'])) {
 							unset($_SESSION['report']['options']['rules'][$fieldnum]);
 						}
+						
 						$form->sendTo("reportjobdetailsearch.php");
 						break;
 
@@ -641,4 +664,3 @@ endWindow();
 <?
 	require_once("navbottom.inc.php");
 ?>
-
