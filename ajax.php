@@ -121,6 +121,21 @@ function handleRequest() {
 					if (!$USER->authorizeField($rule->fieldnum))
 						unset($listrules[$id][$ruleid]);
 				}
+				
+				$organizations = $list->getOrganizations();
+				
+				if (count($organizations) > 0) {
+					$orgkeys = array();
+					
+					foreach ($organizations as $organization) {
+						$orgkeys[$organization->id] = $organization->orgkey;
+					}
+					
+					$listrules[$id]['organization'] = array(
+						'fieldnum' => 'organization',
+						'val' => $orgkeys
+					);
+				}
 			}
 			return cleanObjects($listrules);
 
