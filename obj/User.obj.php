@@ -116,7 +116,6 @@ class User extends DBMappedObject {
 
 	function userSQL ($alias = false) {
 		$r = Rule::makeQuery($this->rules(), $alias);
-		//TODO add org/section/etc
 		return $r;
 	}
 
