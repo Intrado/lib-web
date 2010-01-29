@@ -10,6 +10,7 @@ require_once("inc/utils.inc.php");
 require_once("inc/securityhelper.inc.php");
 require_once("inc/formatters.inc.php");
 include_once("obj/Person.obj.php");
+include_once("obj/Language.obj.php");
 include_once("obj/Address.obj.php");
 include_once("obj/Phone.obj.php");
 include_once("obj/Email.obj.php");
