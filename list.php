@@ -252,6 +252,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 						
 						if ($data->fieldnum == 'organization') {
 							QuickUpdate('BEGIN');
+								QuickUpdate("DELETE FROM listentry WHERE listid=? AND type='organization'", false, array($list->id));
 								
 								foreach ($data->val as $id) {
 									$le = new ListEntry();
