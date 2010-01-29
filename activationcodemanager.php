@@ -25,7 +25,7 @@ include_once("ruleeditform.inc.php");
 require_once("inc/rulesutils.inc.php");
 require_once("obj/FormRuleWidget.fi.php");
 require_once("inc/reportutils.inc.php");
-require_once('list.inc.php');
+require_once("list.inc.php");
 
 include_once("obj/Address.obj.php");
 include_once("obj/Language.obj.php");
@@ -68,6 +68,7 @@ if (isset($_GET['showall'])) {
 	activationcodemanager_clear_search_session();
 	$_SESSION['activationcodemanager_showall'] = true;
 } else if (!empty($_SESSION['activationcodemanager_rules'])) {
+	// NOTE: $_SESSION['activationcodemanager_rules'] may also contain array("fieldnum" => "organization", "val" => $organizationids)
 	$rules = $_SESSION['activationcodemanager_rules'];
 	if (is_array($rules))
 		$rulesjson = json_encode(cleanObjects(array_values($rules)));
@@ -200,12 +201,30 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 				case 'addrule':
 					activationcodemanager_clear_search_session('activationcodemanager_rules');
 					$data = json_decode($postdata['ruledata']);
-					if (isset($data->fieldnum, $data->logical, $data->op, $data->val) && $type = Rule::getType($data->fieldnum)) {
-						$data->val = prepareRuleVal($type, $data->op, $data->val);
-						if ($rule = Rule::initFrom($data->fieldnum, $data->logical, $data->op, $data->val)) {
+					if (isset($data->fieldnum, $data->logical, $data->op, $data->val)) {
+						if ($data->fieldnum == 'organization') {
+							$orgkeys = array();
+							
+							$organizations = $USER->organizations();
+							foreach ($data->val as $id) {
+								$id = $id + 0;
+								$orgkeys[$id] = $organizations[$id]->orgkey;
+							}
+							
 							if (!isset($_SESSION['activationcodemanager_rules']))
 								$_SESSION['activationcodemanager_rules'] = array();
-							$_SESSION['activationcodemanager_rules'][$data->fieldnum] = $rule;
+							
+							$_SESSION['activationcodemanager_rules']["organization"] = array(
+								"fieldnum" => "organization",
+								"val" => $orgkeys
+							);
+						} else if ($type = Rule::getType($data->fieldnum)) {
+							$data->val = prepareRuleVal($type, $data->op, $data->val);
+							if ($rule = Rule::initFrom($data->fieldnum, $data->logical, $data->op, $data->val)) {
+								if (!isset($_SESSION['activationcodemanager_rules']))
+									$_SESSION['activationcodemanager_rules'] = array();
+								$_SESSION['activationcodemanager_rules'][$data->fieldnum] = $rule;
+							}
 						}
 					}
 					$form->sendTo("activationcodemanager.php");
@@ -258,7 +277,11 @@ function activationcodemanager_make_report_options() {
 	if (!empty($_SESSION['activationcodemanager_showall'])) {
 		$options['showall'] = true;
 	} else if (!empty($_SESSION['activationcodemanager_rules'])) {
-		$options['rules'] = $_SESSION['activationcodemanager_rules'];
+		$rules = $_SESSION['activationcodemanager_rules'];
+		$organizationids = isset($rules['organization']) ? array_keys($rules['organization']['val']) : false;
+		unset($rules['organization']);
+		$options['rules'] = $rules;
+		$options['organizationids'] = $organizationids;
 	}
 
 	$activefields = array();
