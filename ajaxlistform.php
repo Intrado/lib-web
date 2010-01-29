@@ -12,28 +12,59 @@ require_once("inc/rulesutils.inc.php");
 // @param $listid, assumed to be a valid list id.
 function summarizeListName($listid) {
 	global $RULE_OPERATORS;
+	
 	$list = new PeopleList($listid+0);
-	$rules = DBFindMany('Rule', 'FROM rule r, listentry le WHERE le.ruleid=r.id AND le.listid=?', 'r', array($list->id));
-	$fieldmaps = FieldMap::getAllAuthorizedFieldMaps();
+	
 	$summary = array();
-	foreach ($rules as $rule) {
-		if (!$type = Rule::getType($rule->fieldnum))
-			continue;
-		$op = $RULE_OPERATORS[$type][$rule->op];
-		if ($type == 'multisearch')
-			$op = 'is';
-		if ($rule->logical == 'and not')
-			$op = 'is NOT';
-		$val = $rule->val;
-		if ($type == 'multisearch')
-			$val = str_replace('|', ', ', $val);
-		else if ($type == 'reldate')
-			$val = str_replace(',', ' and ', $val);
-		$summary[] = $fieldmaps[$rule->fieldnum]->name . ' ' . $op . ' ' . $val;
+	
+	$sections = $list->getSections();
+	
+	if (count($sections) > 0) {
+		$skeys = array();
+		
+		foreach ($sections as $section) {
+			$skeys[] = $section->skey;
+		}
+		
+		$summary[] = 'section is ' . implode(', ', $skeys);
+	} else {
+		$rules = DBFindMany('Rule', 'FROM rule r, listentry le WHERE le.ruleid=r.id AND le.listid=?', 'r', array($list->id));
+		$fieldmaps = FieldMap::getAllAuthorizedFieldMaps();
+		foreach ($rules as $rule) {
+			if (!$type = Rule::getType($rule->fieldnum))
+				continue;
+			$op = $RULE_OPERATORS[$type][$rule->op];
+			if ($type == 'multisearch')
+				$op = 'is';
+			if ($rule->logical == 'and not')
+				$op = 'is NOT';
+			$val = $rule->val;
+			if ($type == 'multisearch')
+				$val = str_replace('|', ', ', $val);
+			else if ($type == 'reldate')
+				$val = str_replace(',', ' and ', $val);
+			$summary[] = $fieldmaps[$rule->fieldnum]->name . ' ' . $op . ' ' . $val;
+		}
+		
+		$organizations = $list->getOrganizations();
+		
+		if (count($organizations) > 0) {
+			$orgkeys = array();
+			
+			foreach ($organizations as $organization) {
+				$orgkeys[] = $organization->orgkey;
+			}
+			
+			$summary[] = 'organization is ' . implode(', ', $orgkeys);
+		}
 	}
-	$list->name = SmartTruncate(implode('; ', $summary),50);
-	if (empty($rules))
+	
+	if (count($summary) > 0) {
+		$list->name = SmartTruncate(implode('; ', $summary),50);
+	} else {
 		$list->name = _L('Please Add Rules to This List');
+	}
+	
 	$list->update();
 }
 
@@ -61,38 +92,73 @@ function handleRequest() {
 		case 'addrule':
 			if (!$USER->authorize('createlist') || !isset($_POST['ruledata']) || !isset($_GET['listid']))
 				return false;
+			
+			$listid = $_GET['listid']+0;
+			
 			$data = json_decode($_POST['ruledata']);
-			if (empty($data) || !userOwns('list', $_GET['listid']))
+			if (empty($data) || !userOwns('list', $listid))
 				return false;
 			if (!isset($data->fieldnum, $data->logical, $data->op, $data->val))
 				return false;
-			if (!$type = Rule::getType($data->fieldnum))
-				return false;
-
-			$data->val = prepareRuleVal($type, $data->op, $data->val);
-
-			if (!$rule = Rule::initFrom($data->fieldnum, $data->logical, $data->op, $data->val))
-				return false;
 			
-			// CREATE rule.
-			QuickUpdate('BEGIN');
-				$rule->create();
-				$le = new ListEntry();
-				$le->listid = $_GET['listid']+0;
-				$le->type = "rule";
-				$le->ruleid = $rule->id;
-				$le->create();
-				summarizeListName($_GET['listid']);
-			QuickUpdate('COMMIT');
-			return $rule->id;
+			if ($data->fieldnum == 'organization') {
+				QuickUpdate('BEGIN');
+					QuickUpdate("DELETE FROM listentry WHERE type='organization' AND listid=?", false, array($listid));
+					
+					foreach ($data->val as $id) {
+						$id = $id + 0;
+						
+						if ($USER->authorizeOrganization($id)) {
+							$le = new ListEntry();
+							$le->listid = $listid;
+							$le->type = "organization";
+							$le->organizationid = $id;
+							$le->create();
+						}
+					}
+					
+					summarizeListName($listid);
+				QuickUpdate('COMMIT');
+			} else {
+				if (!$type = Rule::getType($data->fieldnum))
+					return false;
+
+				$data->val = prepareRuleVal($type, $data->op, $data->val);
+
+				if (!$rule = Rule::initFrom($data->fieldnum, $data->logical, $data->op, $data->val))
+					return false;
+				
+				// CREATE rule.
+				QuickUpdate('BEGIN');
+					$rule->create();
+					$le = new ListEntry();
+					$le->listid = $listid;
+					$le->type = "rule";
+					$le->ruleid = $rule->id;
+					$le->create();
+					summarizeListName($listid);
+				QuickUpdate('COMMIT');
+			}
+			
+			return true;
 		
 		case 'deleterule':
 			if (!$USER->authorize('createlist') || !isset($_POST['fieldnum']) || !isset($_GET['listid']))
 				return false;
-			if (empty($_POST['fieldnum']) || !userOwns('list', $_GET['listid']))
+				
+			$listid = $_GET['listid'] + 0;
+			$fieldnum = $_POST['fieldnum'];
+			
+			if ($fieldnum == "" || !userOwns('list', $listid))
 				return false;
-			QuickUpdate("DELETE le.*, r.* FROM listentry le, rule r WHERE le.ruleid=r.id AND le.listid=? AND r.fieldnum=?", false, array($_GET['listid'], $_POST['fieldnum']));
-			summarizeListName($_GET['listid']);
+				
+			if ($fieldnum == 'organization') {
+				QuickUpdate("DELETE FROM listentry WHERE type='organization' AND listid=?", false, array($listid));
+			} else {
+				QuickUpdate("DELETE le.*, r.* FROM listentry le, rule r WHERE le.ruleid=r.id AND le.listid=? AND r.fieldnum=?", false, array($listid, $fieldnum));
+			}
+			
+			summarizeListName($listid);
 			return true;
 			
 		default:
