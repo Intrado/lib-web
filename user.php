@@ -51,7 +51,7 @@ $profilename = QuickQuery("select name from access where id=?", false, array($ed
 
 $hasenrollment = QuickQuery("select count(id) from import where datatype = 'enrollment'")?true:false;
 
-$hasstaffid = QuickQuery("select count(r.id) from userrule ur, rule r where ur.userid=? and ur.ruleid = r.id and r.fieldnum = 'c01'", false, array($edituser->id))?true:false;
+$hasstaffid = QuickQuery("select count(r.id) from userassociation ur, rule r where ur.userid=? and ur.ruleid = r.id and r.fieldnum = 'c01'", false, array($edituser->id))?true:false;
 
 if($IS_COMMSUITE) {
 	$accessprofiles = QuickQueryList("select id, name from access", true);
@@ -491,16 +491,16 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 					if ($hasstaffid) {
 						if (substr($rule->fieldnum, 0, 1) !== "c") {
 							Query("delete from rule where id=?", false, array($rule->id));
-							Query("delete from userrule where userid=? and ruleid=?", false, array($edituser->id, $rule->id));
+							Query("delete from userassociation where userid=? and ruleid=?", false, array($edituser->id, $rule->id));
 						}
 					 } else {
 						Query("delete from rule where id=?", false, array($rule->id));
-						Query("delete from userrule where userid=? and ruleid=?", false, array($edituser->id, $rule->id));
+						Query("delete from userassociation where userid=? and ruleid=?", false, array($edituser->id, $rule->id));
 					}
 				}
 			}
 
-			$existingstaffidrule = QuickQuery("select r.id from userrule ur, rule r where ur.userid=? and ur.ruleid = r.id and r.fieldnum = 'c01'", false, array($edituser->id));
+			$existingstaffidrule = QuickQuery("select r.id from userassociation ur, rule r where ur.userid=? and ur.ruleid = r.id and r.fieldnum = 'c01'", false, array($edituser->id));
 			if (isset($postdata['datarules']))
 				$datarules = json_decode($postdata['datarules']);
 
@@ -508,7 +508,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 				// remove existing c01 rule if exists
 				if ($existingstaffidrule) {
 					Query("delete from rule where id=?", false, array($existingstaffidrule));
-					Query("delete from userrule where userid=? and ruleid=?", false, array($edituser->id, $existingstaffidrule));
+					Query("delete from userassociation where userid=? and ruleid=?", false, array($edituser->id, $existingstaffidrule));
 				}
 				// remove current staff id from user
 				$edituser->staffpkey = "";
@@ -518,7 +518,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 				// remove existing c01 rule if exists
 				if ($existingstaffidrule) {
 					Query("delete from rule where id=?", false, array($existingstaffidrule));
-					Query("delete from userrule where userid=? and ruleid=?", false, array($edituser->id, $existingstaffidrule));
+					Query("delete from userassociation where userid=? and ruleid=?", false, array($edituser->id, $existingstaffidrule));
 				}
 				// create the c01 rule based on current staffid
 				$rule = new Rule();
@@ -529,7 +529,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 				$rule->val =$postdata['staffpkey'];
 				$rule->create();
 
-				Query("insert into userrule values (?, ?)", false, array($edituser->id, $rule->id));
+				Query("insert into userassociation (userid, type, ruleid) values (?, 'rule', ?)", false, array($edituser->id, $rule->id));
 
 				// set current staffid
 				$edituser->staffpkey = $postdata['staffpkey'];
@@ -551,7 +551,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 					$rule->val = is_array($datarule->val)?implode("|", $datarule->val):$datarule->val;
 					$rule->create();
 
-					Query("insert into userrule values (?, ?)", false, array($edituser->id, $rule->id));
+					Query("insert into userassociation (userid, type, ruleid) values (?, 'rule', ?)", false, array($edituser->id, $rule->id));
 				}
 			}
 
