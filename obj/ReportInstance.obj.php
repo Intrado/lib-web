@@ -56,8 +56,10 @@ class ReportInstance extends DBMappedObject {
 		if(isset($paramarray['rules'])){
 			$paramarray['rules'] = $this->ruleArraytoString($paramarray['rules']);	
 		}
-		if(isset($paramarray['organizationids'])) {
+		if(isset($paramarray['organizationids']) && is_array($paramarray['organizationids'])) {
 			$paramarray['organizationids'] = implode(';', $paramarray['organizationids']);
+		} else {
+			unset($paramarray['organizationids']);
 		}
 		$paramstring = http_build_query($paramarray, false, "&");
 		$this->setParameterString($paramstring);			
