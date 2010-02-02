@@ -464,7 +464,6 @@ class CallMe extends FormItem {
 			border: 1px solid gray;
 		}
 
-		//messagegroup styles
 		.messagegroupcontent {
 			padding: 6px;
 			white-space:nowrap
