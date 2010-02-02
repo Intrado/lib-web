@@ -247,8 +247,7 @@ class EasyCall extends FormItem {
 			margin-bottom: 5px;
 			border: 1px solid gray;
 		}
-
-		// wiz easycall styles
+		
 		.wizeasycallcontainer {
 			padding: 0px;
 			margin: 0px;
