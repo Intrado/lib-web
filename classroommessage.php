@@ -90,47 +90,46 @@ if (isset($_POST['eventContacts']) && isset($_POST['eventMessage']) && isset($_P
 	exit(0);
 }
 
-
-// data Generating test date
-$classes = array();
-$classpeople = array();
-$studentid = 1;
-
-for($i=0;$i<=3;$i++) {
-	$period = $i + 1;
-	$classes[$i] = "History Class -- Period " . $period;
-	$classpeople[$i] = array();
-	for($j=0;$j<30;$j++) {
-		$classpeople[$i][$studentid] = "Student $studentid";
-		$studentid++;
-	}
-	//$classpeople[$i] = array(1 => "Ben Hencke", 2 => "Howard Wood",3 => "Gretel Baumgartner", 4 => "Kee-Yip Chan", 5 => "Nickolas Heckman");
-}
-
 //Handle ajax request. when swithcing sections
-if (isset($_POST['classid'])) {
+if (isset($_GET['sectionid'])) {
 	header('Content-Type: application/json');
-	$id = $_POST['classid'] + 0;
+	$id = $_GET['sectionid'];
+	$response = false;
 
-	if(isset($classpeople[$id])){
-		$contactids = array_keys($classpeople[$id]);
+	$usersection = QuickQuery("select count(*) from userassociation ua where sectionid = ? and userid = ?",
+							false,array($id,$USER->id));
+	if($usersection > 0) {
+		// User can access this section
 
-		$contactmessages = false;
-		if(count($contactids) > 0) {
+		$res = Query("select p.id, p.pkey,concat(p.f01,'&nbsp;', p.f02) name
+											from person p join personassociation pa on (p.id = pa.personid)
+											where pa.type = 'section' and sectionid = ?",false,array($id));
+		while($row = DBGetRow($res)){
+			$obj = null;
+			$obj->pkey = $row[1];
+			$obj->name = $row[2];
+			$response->people[$row[0]] = $obj;
+		}
+		if(count($response->people) > 0) {
+			$contactids = array_keys($response->people);
 			$query = "select tm.targetedmessagecategoryid, pa.personid, e.targetedmessageid, e.notes from
 					 personassociation pa left join event e on (pa.eventid = e.id)
 					 left join targetedmessage tm on (e.targetedmessageid = tm.id)
 					 where e.targetedmessageid is not null and e.userid = ? and Date(e.occurence) = CURDATE() and pa.personid in (" . implode(",",$contactids) . ")";
-			$contactmessages = QuickQueryMultiRow($query,false,false,array($USER->id));
+			$response->cache = QuickQueryMultiRow($query,false,false,array($USER->id));
+		} else {
+			$response = false;
 		}
-		$response->people = $classpeople[$id];
-		$response->cache = $contactmessages;
-		echo json_encode($response);
+
 	}
 
+
+	error_log(json_encode($response));
+	echo json_encode($response);
 	exit(0);
 }
 
+$sections = DBFindMany("Section", "from section s join userassociation ua on (ua.sectionid = s.id) where ua.userid = ?","s",array($USER->id));
 
 $categories = QuickQueryMultiRow("select id, name, image from targetedmessagecategory where deleted = 0",true);
 $categoriesjson = array();
@@ -157,58 +156,34 @@ foreach($categoriesjson as $id => $obj) {
 											p.messageid = m.id and p.sequence = 0",true,false,array($id));
 }
 
-
-
-////////////////////////////////////////////////////////////////////////////////
-// Optional Form Items And Validators
-////////////////////////////////////////////////////////////////////////////////
-
-
-////////////////////////////////////////////////////////////////////////////////
-// Form Data
-////////////////////////////////////////////////////////////////////////////////
-
-
-////////////////////////////////////////////////////////////////////////////////
-// Form Data Handling
-////////////////////////////////////////////////////////////////////////////////
-
-
 ////////////////////////////////////////////////////////////////////////////////
 // Display Functions
 ////////////////////////////////////////////////////////////////////////////////
-
-function classselect($values) {
-	$n = 'classselect';
-	$value = 3;
-	$str = '<select id='.$n.' name="'.$n.'">';
-	foreach ($values as $selectvalue => $selectname) {
-		$checked = $value == $selectvalue;
-		$str .= '<option value="'.escapehtml($selectvalue).'" '.($checked ? 'selected' : '').' >'.escapehtml($selectname).'</option>';
-	}
-	$str .= '</select>';
-	return $str;
-}
 
 
 ////////////////////////////////////////////////////////////////////////////////
 // Display
 ////////////////////////////////////////////////////////////////////////////////
 $PAGE = "notifications:classroom";
-$TITLE = _L('Classroom Message');
+$TITLE = _L('Classroom Comments');
 
 include_once("nav.inc.php");
 
-startWindow(_L('Classroom Message'));
+
+echo '<select id="classselect" name="classselect" style="margin:5px">';
+foreach($sections as $section) {
+	echo '<option value="'.$section->id.'">'.escapehtml($section->skey).'</option>';
+}
+echo "</select>";
+
+startWindow(_L('Classroom Comments'));
+
 ?>
 
 <table width="100%" id="picker">
 	<tr>
 		<td style="top:0px;width:250px;vertical-align:top;border-right:1px solid black;padding-right:10px;">
-			<?= classselect($classes); ?>
-			<hr />
-			<a id="checkall" href="#" style="float:left; white-space: nowrap;">Check All</a><br />
-
+			<a id="checkall" href="#" style="float:left; white-space: nowrap;">Select All</a><br />
 			<div id="contactwrapper">
 				<div id="contactbox" style="width:100%;text-decoration:none;"></div>
 			</div>
@@ -220,11 +195,11 @@ startWindow(_L('Classroom Message'));
 		<td style="vertical-align:top;">
 			<div id="theinstructions" style="font-size:2em;padding:100px;"><img src="img/icons/fugue/arrow_180.png" alt="" style="vertical-align:middle;"/>&nbsp;Click on a Contact to Start</div>
 
-			<div id="searchContainer" style="margin:10px;display:none;"><input id="searchbox" type="text" value="" size="50" style="float:left"/><?= icon_button("Search", "magnifier", null, null)  . icon_button("Go to Overview", "arrow_right", null, null,'style="float:right;"') ?></div>
+		<div id="searchContainer" style="margin:10px;display:none;"><input id="searchbox" type="text" value="" size="50" style="float:left"/><?= icon_button("Search", "magnifier", null, null)  . icon_button("Done Picking Comments", "tick", null, "classroommessageoverview.php",'style="float:right;"') ?></div>
 			<div style="clear:both;"></div>
 			<div id='tabsContainer' style=' margin:10px; margin-right:0px;display:none;vertical-align:middle;'></div>
 
-			<div id="libraryContent">
+			<div id="libraryContent" style="display:none;">
 			<?
 				$libraryids = array();
 				$messageids = array();
@@ -243,13 +218,22 @@ startWindow(_L('Classroom Message'));
 						} else {
 							$title = ""; // Could not find message for this message key.
 						}
+						// TODO make proper css
+						echo '<div id="msg-' . $message->id .'" class="targetmessage" style="position:relative;border:solid 1px silver;background-color:#FFF;width:300px;height:50px;float:left;margin:4px;padding:0px;">
+								<img src="img/checkbox-clear.png" alt="" style="float:left;margin:2px"/>
+								<div id="msgtxt-' . $message->id .'" style="float:left;overflow:auto;height:35px;width:260px">'
+								. $title .
+								' </div>
+								<img src="img/icons/fugue/marker.gif" alt="" style="float:right;margin:2px"/>
 
-						echo '<div id="msg-' . $message->id .'" class="targetmessage" style="position:relative;border:solid 1px silver;background-color:#FFF;width:300px;float:left;margin:4px;padding:0px;"><img src="img/checkbox-clear.png" alt="" style="position:absolute;top:10px;left:3px;"/><div style="position:relative;top:5px;left:25px;width:270px">' . $title .  ' </div>' . ($USER->authorize('targetedcomment')?'<a href="#" class="commentlink" style="position:relative;float:right;">Comment</a>':'&nbsp;')
-						. '<span class="targetcomment" style="display:none;">
-								<textarea class="targetcomment" style="position:relative;clear:both;width:94%;left:2%;height:60px;"></textarea>
-								<a class="targetcomment" href="#" onclick="saveComment(\''. $message->id .'\');false;">Save</a><span style="display:none"><br />Notice: Some of the Contacts have a comment for this message. Saving a new comment will overwrite the comment</span>
-							</span>
-						</div>';
+								<div style="clear:both;"></div>' .
+								($USER->authorize('targetedcomment')?'<a href="#" class="commentlink" style="float:right">Remark</a>':'&nbsp;') .
+								'
+								<span id="com-' . $message->id .'" class="targetcomment" style="width:280px;border:0px solid black;padding:10px;height:100px;bottom:0px;display:none;">
+									<textarea class="targetcomment" style="height:70px;width:265px;"></textarea>
+									<a class="targetcomment" href="#" style="" onclick="saveComment(\''. $message->id .'\');false;">Done</a><span style="display:none"></span>
+								</span>
+								</div>';
 					}
 					echo '<div style="clear:both;"></div></div>';
 				}
@@ -366,7 +350,6 @@ endWindow();
 				people.unset(contactid);
 			}
 		}
-
 	}
 	 function saveComment(id) {
 		var text = $('msg-' + id).down('textarea').getValue();
@@ -382,6 +365,11 @@ endWindow();
 				checkedcontacts.each(function(contact) {
 					setEvent(contact.key,id,true,text);
 				});
+				$('com-' + id).hide();
+				$('msg-' + id).down('a').show();
+				$('msg-' + id).setStyle("height:50px;")
+				$('msgtxt-' + id).setStyle("height:35px;")
+
 			}
 		});
 	 }
@@ -402,15 +390,21 @@ endWindow();
 
 		// Reset all previous message selections
 		checkedmessages.each(function(message) {
+			$('msg-' + message.key).setStyle("height:50px;");
 			var target = $('msg-' + message.key).down('img');
 			target.src = getstatesrc(0);
 			if(hascomments) {
 				target = target.next('a');
-				target.update('Comment');
+				target.show();
+				//console.info(target);
+				target.update('Remark');
 			}
-			target = target.next('span');
-			target.hide();
+			target =  $('com-' + message.key);
+			//target.hide();
 			target = target.down('textarea');
+			target.stopObserving();
+			target.setStyle({color: "black"});
+			$('com-' + message.key).hide();
 			target.value = "";
 			target = target.next('span');
 			target.hide();
@@ -425,11 +419,10 @@ endWindow();
 						var target = $('msg-' + msg.key).down('img');
 						target.src = getstatesrc(2);
 						if(hascomments && msg.value != "") {
-							target = target.next('a');
-							target.update('Close');
-							target = target.next('span');
-							target.show();
+							target = $('com-' + msg.key);
 							target.down('textarea').value = msg.value;
+						} else {
+							$('msg-' + msg.key).setStyle('height:50px;');
 						}
 						checkedmessages.set(msg.key,2);
 					});
@@ -474,19 +467,20 @@ endWindow();
 			}
 			if(hascomments) {
 				var comment = selectedcomments.get(message.key) || false;
-				var textarea = $('msg-' + message.key).down('textarea');
+				var textarea = $('com-' + message.key).down('textarea');
 				if(comment === false) {
 					textarea.value = "";
 				} else if(comment === true || newcontct == true ) {
 					textarea.value = "";
-					textarea.next('span').show();
+					// Add multiple remark notice
+					blankFieldValue(textarea, "Multiple Remarks. Typing a new remark here will overwrite.");
+					//textarea.next('span').show();
 				} else {
 					textarea.value = comment;
-					var target = $('msg-' + message.key).down('a')
-					target.update('Close');
-					target.next('span').show();
+					//$('com-' + message.key).show();
 				}
 			}
+			//$('com-' + message.key).hide();
 		});
 	}
 	
@@ -496,8 +490,8 @@ endWindow();
 	function getclass(selected) {
 		new Ajax.Request('classroommessage.php',
 		{
-			method:'post',
-			parameters: {classid: selected},
+			method:'get',
+			parameters: {sectionid: selected},
 			onSuccess: function(transport){
 				var response = transport.responseJSON || "Class not available";
 				$('contactbox').update("");
@@ -506,22 +500,28 @@ endWindow();
 				$('tabsContainer').hide();
 				$('searchContainer').hide();
 
-
 				clearcache();
-
 
 				revealmessages = true;
 
+				var dom = $('contactbox').remove();
+				var tbody = new Element('tbody');
+
 				$H(response.people).each(function(person) {
 					var id = 'c-' + person.key;
-
-					var dom = $('contactbox').remove();
-
-					dom.insert('<img id="i-' + id + '" src="img/pixel.gif" style="width:10px;;height:10px;vertical-align:middle;" alt="" / >')
-					dom.insert('<a href="#" id="' + id + '" title="' +  person.key + '" style="text-decoration:none;">' + person.value +'</a>');
+					var tr = new Element('tr');
+					tr.insert('<td><a href="#" id="' + id + '" title="Student id: ' +  person.value.pkey + '" style="text-decoration:none;">' + person.value.name +'</a></td>');
 					categoryinfo.each(function(category) {
-						dom.insert('<img id="' + id + "-" + category.key + '"src="' + category.value.img + '" title="' + category.value.name + '" style="width:10px;display:none;" alt="" />');
+						tr.insert('<td><img id="' + id + "-" + category.key + '"src="' + category.value.img + '" title="' + category.value.name + '" style="width:10px;display:none;" alt="" /></td>');
 					});
+					tbody.insert(tr);
+				});
+				dom.insert(new Element('table').insert(tbody));
+				$('contactwrapper').insert(dom);
+
+
+				$H(response.people).each(function(person) {
+					var id = 'c-' + person.key;
 					dom.insert('<br />')
 
 					$('contactwrapper').insert(dom);
@@ -535,7 +535,7 @@ endWindow();
 							if(!event.shiftKey) {
 								checkedcontacts.each(function(contact) {
 									$('c-' + contact.key).setStyle('font-weight:normal;');
-									$('i-c-' + contact.key).src = 'img/pixel.gif';
+									//$('i-c-' + contact.key).src = 'img/pixel.gif';
 									checkedcontacts.unset(contact.key);
 								});
 							}
@@ -543,11 +543,11 @@ endWindow();
 							// Select or deselect the itme depending on alt click. Unable to deselect if only one item is selected
 							if (event.shiftKey && checkedcontacts.get(this.id.substr(2)) != undefined && checkedcontacts.size() > 1) {
 								this.setStyle('font-weight:normal;');
-								$('i-' + this.id).src = 'img/pixel.gif';
+								//$('i-' + this.id).src = 'img/pixel.gif';
 								checkedcontacts.unset(this.id.substr(2));
 							} else {
 								this.setStyle('font-weight:bold');
-								$('i-' + this.id).src = h_image;
+								//$('i-' + this.id).src = h_image;
 								checkedcontacts.set(this.id.substr(2),true);
 							}
 							// First click reveals the message board
@@ -556,6 +556,9 @@ endWindow();
 								$('theinstructions').hide();
 								$('tabsContainer').show();
 								$('searchContainer').show();
+								var searchBox = $('searchbox');
+								searchBox.focus();
+								searchBox.blur();
 							}
 
 							// ==================================
@@ -602,8 +605,8 @@ endWindow();
 	}
 
 document.observe("dom:loaded", function() {
-	$('classselect').setValue(0);
-	getclass(0);
+	
+	getclass($('classselect').getValue());
 
 	$('picker').observe("selectstart", function(event) {          // disable select in IE
 		if(!(event.target.hasClassName('targetcomment') || event.target.id == "searchbox"))
@@ -650,19 +653,35 @@ document.observe("dom:loaded", function() {
 			var msgid = this.id.substr(4);  // strip 'msg-'
 			var state = checkedmessages.get(msgid) || 0;
 			if(event.target.hasClassName('commentlink')) {
-				if(event.target.next('span').visible()){
-					event.target.update("Comment");
-				} else {
-					event.target.update("Close");
-				}
-				event.target.next('span').toggle();
+				$('msgtxt-' + msgid).setStyle('height:auto');
+				event.target.hide();
+				$(htmlid).setStyle('height:auto');	
+				var target = $('com-' + msgid);
+				target.toggle();
+				target = target.down('textarea');
+				target.focus();
+				target.blur();
 				if(state == 2) {
 					return;
 				}
 			}
 			// Don't modify anything if writing a comment'
 			if(!event.target.hasClassName('targetcomment')) {
+				
 				state = (state == 2)? 0 : 2;
+
+				var textarea = $('com-' + msgid).down('textarea');
+				if((state == 0) && hascomments && textarea.getValue() != "") {
+					if(!confirm('The custom remark will be removed if unselecting.'))
+						return;
+					else {
+						textarea.value = "";
+						textarea.stopObserving();
+					}
+				}
+
+
+
 				//var text = ""; //event.target.down('textarea').getValue();
 				// Save event to database
 				new Ajax.Request('classroommessage.php',
@@ -686,9 +705,11 @@ document.observe("dom:loaded", function() {
 								highlightedcontacts.unset('c-' + contact.key);
 								//$('i-c-' + contact.key).src = 'img/pixel.gif';
 								$('c-' + contact.key).style.background =  c_none;
+								$(htmlid).setStyle('height:50px');
+								$('msgtxt-' + msgid).setStyle('height:35px');
 
 								$(htmlid).down('span').hide();
-								$(htmlid).down('a').update("Comment");
+								$(htmlid).down('a').show();
 							}
 							setEvent(contact.key,msgid,(state == 2),"");
 						});
@@ -745,9 +766,7 @@ document.observe("dom:loaded", function() {
 		updatemessages(event.memo.section);
 	});
 	var searchBox = $('searchbox');
-	blankFieldValue(searchBox, "Search Messages in All Categories");
-	searchBox.focus();
-	searchBox.blur();
+	blankFieldValue(searchBox, "Search Comments");
 });
 
 
