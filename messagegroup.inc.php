@@ -20,7 +20,7 @@ function makeSummaryTab($destinations, $customerlanguages, $systemdefaultlanguag
 		foreach ($destinations as $type => $destination) {
 			foreach ($destination['subtypes'] as $subtype) {
 				if ($type == 'sms' && $languagecode != $systemdefaultlanguagecode) {
-					$summarylanguagerows .= "<td></td>";
+					$summarylanguagerows .= "<td>" . _L("N/A") . "</td>";
 				} else {
 					$hasmessage = !is_null($existingmessagegroup) && $existingmessagegroup->hasMessage($type, $subtype, $languagecode);
 					$icon = $hasmessage ? 'img/icons/accept.gif' : 'img/icons/diagona/16/160.gif';
@@ -155,11 +155,13 @@ function makeMessageBody($required, $type, $subtype, $languagecode, $label, $mes
 	);
 }
 
-function makeAccordionSplitter($type, $subtype, $languagecode, $permanent, $preferredgender, $inautotranslator = false, $emailattachments = null, $allowtranslation = false) {
+function makeAccordionSplitter($type, $subtype, $languagecode, $permanent, $preferredgender, $inautotranslator = false, $emailattachments = null, $allowtranslation = false, $messagegroup = null, $multilingual = false) {
 	global $USER;
 
+	$formname = "{$type}-{$subtype}-{$languagecode}";
+	
 	$accordionsplitterchildren = array();
-
+	
 	if ($type == 'email') {
 		$accordionsplitterchildren[] = array(
 			"title" => _L("Attachments"),
@@ -209,17 +211,34 @@ function makeAccordionSplitter($type, $subtype, $languagecode, $permanent, $pref
 		);
 	} else if ($type == 'phone') {
 		if (!$inautotranslator) {
+			if ($messagegroup && !$messagegroup->deleted) {
+				$preferredaudiofilename = $messagegroup->name;
+			} else {
+				$preferredaudiofilename = 'Call Me to Record';
+			}
+			
+			// If there are multiple languages for this destination type, append the language name.					
+			if ($multilingual) {					
+				$preferredaudiofilename .= ' - ' . Language::getName($languagecode);				
+			}					
+			
+			$callmelabeltext = _L('Voice Recording');
+			
 			$callmeformdata = !$USER->authorize('starteasy') ? array() : array(
+				"callmelabel" => makeFormHtml('
+					<label class="formlabel" for="' . "{$type}-{$subtype}-{$languagecode}_callme" . '">' . $callmelabeltext . '</label>
+				'),
 				"callme" => array(
-					"label" => _L('Voice Recording'),
+					"label" => $callmelabeltext,
 					"value" => "",
+					"fieldhelp" => _L("Enter your phone number and press Call Me to Record. The recorded audio file will appear in the Audio Library below."),
 					"validators" => array(
 						array('ValCallMeMessage')
 					),
 					"control" => array(
 						"CallMe",
 						"phone" => Phone::format($USER->phone),
-						"langcode" => $languagecode
+						"preferredaudiofilename" => $preferredaudiofilename
 					),
 					"renderoptions" => array(
 						"icon" => false,
@@ -229,22 +248,30 @@ function makeAccordionSplitter($type, $subtype, $languagecode, $permanent, $pref
 					"helpstep" => 1
 				)
 			);
-
+			
+			$audiouploadlabeltext = _L('Audio Upload');
+			
 			$accordionsplitterchildren[] = array(
 				"title" => _L("Audio"),
 				"icon" => 'img/icons/fugue/microphone.gif',
 				"formdata" =>  array_merge($callmeformdata, array(
+					"audiouploadlabel" => makeFormHtml('
+						<label style="margin-top:15px; display:block" class="formlabel" for="' . "{$type}-{$subtype}-{$languagecode}_audioupload" . '">' . $audiouploadlabeltext . '</label>
+					'),
 					"audioupload" => array(
-						"label" => _L('Audio Upload'),
-						"fieldhelp" => "You may attach up to three files that are up to 2048kB each. Note: Some recipients may have different size restrictions on incoming mail which can cause them to not receive your message if you have attached large files.",
+						"label" => $audiouploadlabeltext,
+						'fieldhelp' => _L('Upload an audio file. It will appear in the Audio Library below.'),
 						"value" => '',
 						"validators" => array(), // uploadaudio.php does custom validation, and messagepart will validate audio inserts.
 						"control" => array("AudioUpload"),
 						"renderoptions" => array("icon" => false, "label" => false, "errormessage" => true),
 						"helpstep" => 3
 					),
+					"audiolibrarylabel" => makeFormHtml('
+						<label style="margin-top:15px; display:block" class="formlabel" for="' . "{$type}-{$subtype}-{$languagecode}_audiolibrary" . '">' . _L('Audio Library') . '</label>
+					'),
 					"audiolibrary" => makeFormHtml("
-						<div id='audiolibrarycontainer'></div>
+						<div id=\"audiolibrarycontainer\" style=\"border:1px dotted gray; padding-bottom: 10px\"></div>
 						<script type='text/javascript'>
 							(function () {
 								var audiolibrarywidget = new AudioLibraryWidget('audiolibrarycontainer', {$_SESSION['messagegroupid']});
@@ -253,7 +280,7 @@ function makeAccordionSplitter($type, $subtype, $languagecode, $permanent, $pref
 
 								var getAudioTextarea = function () {
 									var audiotextareaid = '" . ($allowtranslation ? "{$type}-{$subtype}-{$languagecode}_translationitem" : "{$type}-{$subtype}-{$languagecode}_nonemessagebody") . "';
-
+									
 									var sourcetextarea = $(audiotextareaid + 'englishText');
 									if (sourcetextarea) {
 										if (sourcetextarea.up('.MessageBodyContainer').visible())
@@ -266,10 +293,11 @@ function makeAccordionSplitter($type, $subtype, $languagecode, $permanent, $pref
 								};
 
 								var translationcheckbox = $('{$type}-{$subtype}-{$languagecode}_translationitem' + 'translatecheck');
-								if (translationcheckbox) {
-									var observetranslationaccordion = function(accordion, translationcheckbox) {
-										var audiosection = accordion.get_section_containing('audiolibrarycontainer');
-										if (audiosection) {
+								
+								var observetranslationaccordion = function(accordion, translationcheckbox) {
+									var audiosection = accordion.get_section_containing('audiolibrarycontainer');
+									if (audiosection) {
+										if (translationcheckbox) {
 											translationcheckbox.observe('click', function(event, accordion, audiosection) {
 												if (event.element().checked)
 													accordion.lock_section(audiosection);
@@ -279,23 +307,28 @@ function makeAccordionSplitter($type, $subtype, $languagecode, $permanent, $pref
 
 											if (translationcheckbox.checked)
 												accordion.lock_section(audiosection);
+											else
+												accordion.show_section(audiosection, true);
+										} else {
+											accordion.show_section(audiosection, true);
 										}
-									};
-
-									var form = audiouploadformitem.up('form');
-
-									form.observe('FormSplitter:AccordionLoaded', function(event, translationcheckbox) {
-										var formvars = document.formvars[this.name];
-
-										observetranslationaccordion(formvars.accordion, translationcheckbox);
-									}.bindAsEventListener(form, translationcheckbox));
-
-									if (document.formvars && document.formvars[form.name] && document.formvars[form.name].accordion) {
-										var formvars = document.formvars[form.name];
-										observetranslationaccordion(formvars.accordion, translationcheckbox);
 									}
-								}
+								};
 
+								var form = audiouploadformitem.up('form');
+
+								form.observe('FormSplitter:AccordionLoaded', function(event, translationcheckbox) {
+									var formvars = document.formvars[this.name];
+
+									observetranslationaccordion(formvars.accordion, translationcheckbox);
+								}.bindAsEventListener(form, translationcheckbox));
+
+								// If the accordion was loaded before the form got a chance to observe, then go ahead and do the same thing as what the FormSplitter:AccordionLoaded handler would've done.
+								if (document.formvars && document.formvars[form.name] && document.formvars[form.name].accordion) {
+									var formvars = document.formvars[form.name];
+									observetranslationaccordion(formvars.accordion, translationcheckbox);
+								}
+								
 								audiouploadformitem.observe('AudioUpload:AudioUploaded', function(event) {
 									hideHtmlEditor();
 									var audiofile = event.memo;
@@ -304,7 +337,7 @@ function makeAccordionSplitter($type, $subtype, $languagecode, $permanent, $pref
 									this.reload();
 								}.bindAsEventListener(audiolibrarywidget));
 
-								audiolibrarywidget.container.observe('AudioLibraryWidget:ClickName', function(event) {
+								audiolibrarywidget.container.observe('AudioLibraryWidget:ClickInsert', function(event) {
 									hideHtmlEditor();
 									var audiofile = event.memo.audiofile;
 
@@ -313,7 +346,6 @@ function makeAccordionSplitter($type, $subtype, $languagecode, $permanent, $pref
 
 								// observe the callme container element for EasyCall events
 								$('{$type}-{$subtype}-{$languagecode}_callme_content').observe('EasyCall:update', function(event) {
-
 									new Ajax.Request('ajaxmessagegroup.php', {
 										'method': 'post',
 										'parameters': {
@@ -321,21 +353,22 @@ function makeAccordionSplitter($type, $subtype, $languagecode, $permanent, $pref
 											'messagegroupid': {$_SESSION['messagegroupid']},
 											'audiofileid': event.memo.audiofileid
 										},
-										'onSuccess': function(transport, audiofilename) {
+										'onSuccess': function(transport) {
+											var audiofilename = transport.responseJSON;
+											
 											// if success
-											if (transport.responseJSON) {
+											if (audiofilename) {
 												textInsert('{{' + audiofilename + '}}', getAudioTextarea());
 												this.reload();
-
+												
 											// if failed the action but success on the ajax request
 											} else {
 												alert('" . addslashes(_L('An error occured while trying to save your audio.\nPlease try again.')) . "');
 											}
-
+											
 											// create a new EasyCall to record another audio file if desired
 											newEasyCall();
-
-										}.bindAsEventListener(this, event.memo.audiofilename),
+										}.bindAsEventListener(this),
 										'onFailure': function() {
 											alert('" . addslashes(_L('An error occured while trying to save your audio.\nPlease try again.')) . "');
 											newEasyCall();
@@ -349,12 +382,10 @@ function makeAccordionSplitter($type, $subtype, $languagecode, $permanent, $pref
 				))
 			);
 		}
-	} else if ($type == 'sms') {
-
-	} else {
+	} else if ($type != 'sms') {
 		return null;
 	}
-
+	
 	if ($type == 'email' || $type == 'phone') {
 		$accordionsplitterchildren[] = array(
 			"title" => _L("Data Fields"),
@@ -400,14 +431,19 @@ function makeAccordionSplitter($type, $subtype, $languagecode, $permanent, $pref
 	}
 
 	$autoexpirevalues = array(0 => "Yes (Keep for ". getSystemSetting('softdeletemonths', "6") ." months)",1 => "No (Keep forever)");
+	
+	$autoexpirelabeltext = _L('Auto Expire');
 	$advancedoptionsformdata = array(
-		"autoexpireheader" => makeFormHtml(_L('Auto Expire')),
+		"autoexpirelabel" => makeFormHtml('
+			<label class="formlabel" for="' . "{$type}-{$subtype}-{$languagecode}_autoexpire" . '">' . $autoexpirelabeltext . '</label>
+		'),
 		"autoexpire" => array(
-			"label" => _L('Auto Expire'),
+			"label" => $autoexpirelabeltext,
 			"value" => $permanent,
 			"validators" => array(
 				array("ValInArray", "values" => array_keys($autoexpirevalues))
 			),
+			"fieldhelp" => _L('Selecting Yes will allow the system to delete this message after %1$s months if it is not associated with any active jobs.', getSystemSetting('softdeletemonths', "6")),
 			"control" => array("RadioButton", "values" => $autoexpirevalues),
 			"renderoptions" => array("label" => false, "icon" => false, "errormessage" => true),
 			"helpstep" => 1
@@ -416,9 +452,12 @@ function makeAccordionSplitter($type, $subtype, $languagecode, $permanent, $pref
 
 	if ($type == 'phone') {
 		$gendervalues = array ("female" => "Female","male" => "Male");
-		$advancedoptionsformdata['preferredgenderheader'] = makeFormHtml('<br/>' . _L('Preferred Voice'));
+		$preferredgenderlabeltext = _L('Preferred Voice');
+		$advancedoptionsformdata['preferredgenderlabel'] = makeFormHtml('
+			<label style="margin-top: 10px; display:block;" class="formlabel" for="' . "{$type}-{$subtype}-{$languagecode}_preferredgender" . '">' . $preferredgenderlabeltext . '</label>
+		');
 		$advancedoptionsformdata['preferredgender'] = array(
-			"label" => _L('Preferred Voice'),
+			"label" => $preferredgenderlabeltext,
 			"fieldhelp" => _L('Choose the gender of the text-to-speech voice.'),
 			"value" => $preferredgender,
 			"validators" => array(
@@ -431,7 +470,90 @@ function makeAccordionSplitter($type, $subtype, $languagecode, $permanent, $pref
 	}
 
 	$accordionsplitterchildren[] = array("title" => _L("Advanced Options"), "icon" => "img/icons/diagona/16/041.gif", "formdata" => $advancedoptionsformdata);
-	$accordionsplitter = new FormSplitter("", "", null, "accordion", array(), $accordionsplitterchildren);
+	$accordionsplitter = new FormSplitter("", "", null, "vertical", array(),
+		array(
+			array(
+				'title' => '',
+				'formdata' => array(makeFormHtml('
+					<div style="float:right">'
+					. icon_button(_L('Show Tools'), 'tick', NULL, NULL, ' id="showaccordioncontainer" style="display:none" ')
+					. icon_button(_L('Hide Tools'), 'tick', NULL, NULL, ' id="hideaccordioncontainer" ')
+					. '<div style="clear:both"></div>
+					</div>
+					
+					<div style="clear:both"></div>
+					
+					<script type="text/javascript">
+						(function () {
+							var formname = "'.$formname.'";
+							var form = $(formname);
+							
+							// Helper function for getting the accordion container.
+							function getAccordionContainer() {
+								var formvars = document.formvars && document.formvars[formname];
+								
+								var accordion;
+								
+								if (formvars) {
+									accordion = formvars.accordion;
+								}
+								
+								return accordion ? accordion.container : null;
+							}
+							
+							function showAccordionContainer() {
+								var accordioncontainer = getAccordionContainer();
+								
+								if (accordioncontainer) {
+									accordioncontainer.show();
+								}
+								
+								var accordionsplitpane = form.down("td.SplitPane", 1);
+								
+								if (accordionsplitpane) {
+									accordionsplitpane.style.width = "45%";
+								}
+								
+								document.stopObserving("FormSplitter:AllLayoutLoaded");
+							}
+							
+							// Observe each button for a click; when a button is clicked, hide itself and show the other button. Then set the visibility of the accordion container appropriately.
+							
+							$("hideaccordioncontainer").observe("click", function(event) {
+								event.element().hide();
+								$("showaccordioncontainer").show();
+								
+								var accordioncontainer = getAccordionContainer();
+								if (accordioncontainer) {
+									accordioncontainer.hide();
+								}
+								
+								var accordionsplitpane = form.down("td.SplitPane", 1);
+								
+								if (accordionsplitpane) {
+									accordionsplitpane.style.width = "auto";
+								}
+							});
+							
+							$("showaccordioncontainer").observe("click", function(event) {
+								event.element().hide();
+								$("hideaccordioncontainer").show();
+								
+								showAccordionContainer();
+							});
+							
+							// In case "FormSplitter:AllLayoutLoaded" had already fired.
+							showAccordionContainer();
+							
+							// In case "FormSplitter:AllLayoutLoaded" has yet to fire.
+							document.observe("FormSplitter:AllLayoutLoaded", showAccordionContainer);
+						})();
+					</script>
+				'))
+			),
+			new FormSplitter("", "", null, "accordion", array(), $accordionsplitterchildren)
+		)
+	);
 
 	return $accordionsplitter;
 }
@@ -489,7 +611,7 @@ class CallMe extends FormItem {
 		$n = $this->form->name."_".$this->name;
 
 		$defaultphone = escapehtml(Phone::format($this->args['phone']));
-
+		
 		return '
 			function newEasyCall() {
 				// remove any existing content
@@ -499,7 +621,7 @@ class CallMe extends FormItem {
 					"'.$n.'",
 					"'.$n.'_content'.'",
 					"'.$defaultphone.'",
-					"'.Language::getName($this->args['langcode']).' - " + curDate()
+					"'.addslashes($this->args['preferredaudiofilename']).'"
 				);
 			};
 			newEasyCall();
