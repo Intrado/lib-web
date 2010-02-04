@@ -127,20 +127,6 @@ function messagegroupHandleTabLoaded (event, state, existingmessagegroupid, syst
 }
 
 function messagegroupStyleLayouts(readonly) {
-	$$('div.accordion').each(function(div) {
-		if (div.match('.FormSwitcherLayoutSection')) {
-			var td = div.up('td.SplitPane');
-			if (td) {
-				td.style.width = '45%';
-			}
-
-			var formtableheaders = div.select('.formtableheader');
-			formtableheaders.each(function(th) {
-				th.style.width = '100px';
-			});
-		}
-	});
-
 	if (!readonly) {
 		var verticaltabs = $$('div.verticaltabstitlediv');
 		if (verticaltabs.length > 0)
