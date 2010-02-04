@@ -17,6 +17,7 @@ require_once("obj/FieldMap.obj.php");
 require_once("obj/SurveyQuestionnaire.obj.php");
 require_once("inc/formatters.inc.php");
 require_once("obj/PeopleList.obj.php");
+require_once("obj/Person.obj.php");
 require_once("obj/RenderedList.obj.php");
 
 

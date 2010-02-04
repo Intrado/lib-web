@@ -76,7 +76,7 @@ function list_handle_ajax_table($renderedlist, $validContainers) {
 		QuickUpdate("BEGIN");
 			if (!empty($_GET['addpersonid'])) {
 				$restrictUserSQL = $USER->userSQL("P");
-				if ($validPerson = QuickQuery("SELECT P.id FROM " . PeopleList::makePersonSubquery() . " P WHERE P.id=? AND (P.userid=0 OR P.userid=? OR (1 $restrictUserSQL))", false, array($_GET['addpersonid'], $USER->id))) {
+				if ($validPerson = QuickQuery("SELECT P.id FROM " . Person::makePersonSubquery() . " P WHERE P.id=? AND (P.userid=0 OR P.userid=? OR (1 $restrictUserSQL))", false, array($_GET['addpersonid'], $USER->id))) {
 					$ajaxdata = true;
 					list_add_person($validPerson);
 				}
