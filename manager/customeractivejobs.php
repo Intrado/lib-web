@@ -121,7 +121,7 @@ foreach ($shards as $shardid => $sharddb) {
 	QuickUpdate("set time_zone='GMT'",$sharddb);
 
 	$query = "select j.systempriority, j.customerid, j.id, j.startdate, j.starttime, j.timezone,
-			timediff(addtime(j.startdate,j.starttime), convert_tz(now(),'GMT',j.timezone)) as timetostart, j.jobtypeid
+			timediff(addtime(j.startdate,j.starttime), convert_tz(now(),'GMT',j.timezone)) as timetostart
 			from qjob j where j.status='scheduled'
 			order by hour(timetostart), minute(timetostart), second(timetostart), j.systempriority, j.customerid, j.id
 			";
@@ -132,13 +132,12 @@ foreach ($shards as $shardid => $sharddb) {
 		if($hours < 0)
 			$days = 0 - $days;
 		$hours = $hours%24;
-		// row 7 is the job type id.
-		// TODO: Use the systempriority once the trigger has been corrected to set this properly.
-		if ($row[7] > 3)
-			$row[7] = 3;
+		// row 1 is the system priority (jobtypeid removed from qjob in 7.5)
+		if ($row[1] > 3)
+			$row[1] = 3;
 			
 		$timetorun = implode(":",array($hours,$minutes,$seconds)) . ($days ? " + $days Days" : "");
-		$schedjobs[$row[7]][($days*24*60*60)+($hours*60*60)+($minutes*60)+$seconds][] = array ($row[1], $customers[$row[1]], $row[2], $row[3], $row[4], $row[5], $timetorun);
+		$schedjobs[$row[1]][($days*24*60*60)+($hours*60*60)+($minutes*60)+$seconds][] = array ($row[1], $customers[$row[1]], $row[2], $row[3], $row[4], $row[5], $timetorun);
 
 	}
 }
