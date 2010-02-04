@@ -13,6 +13,7 @@ include_once("obj/Job.obj.php");
 include_once("obj/JobLanguage.obj.php");
 include_once("obj/JobType.obj.php");
 include_once("obj/PeopleList.obj.php");
+include_once("obj/Person.obj.php");
 include_once("obj/MessageGroup.obj.php");
 include_once("obj/Message.obj.php");
 include_once("obj/MessagePart.obj.php");

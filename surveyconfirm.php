@@ -12,6 +12,7 @@ include_once("obj/FieldMap.obj.php");
 include_once("obj/Job.obj.php");
 include_once("obj/JobType.obj.php");
 include_once("obj/PeopleList.obj.php");
+include_once("obj/Person.obj.php");
 include_once("obj/Phone.obj.php");
 include_once("obj/SurveyQuestionnaire.obj.php");
 include_once("obj/SurveyQuestion.obj.php");

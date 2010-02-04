@@ -14,6 +14,7 @@ require_once("obj/Import.obj.php");
 require_once("obj/ImportField.obj.php");
 require_once("obj/Schedule.obj.php");
 include_once("obj/PeopleList.obj.php");
+include_once("obj/Person.obj.php");
 
 
 ////////////////////////////////////////////////////////////////////////////////
