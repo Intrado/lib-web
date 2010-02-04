@@ -14,11 +14,14 @@ function getOrderSql($params){
 		$orderquery = "order by " . implode(", ", $orderfields);
 	}
 	return $orderquery;
-
 }
 
-function getPersonSubquerySql($params) {
-	return PeopleList::makePersonSubQuery(isset($params['organizationids']) ? $params['organizationids'] : false);
+function getReportPersonSubquerySql($params, $isjobreport = false) {
+	return Person::makePersonSubQuery(
+		isset($params['organizationids']) ? $params['organizationids'] : false,
+		isset($params['sectionids']) ? $params['sectionids'] : false,
+		$isjobreport
+	);
 }
 
 function getRuleSql($params, $alias, $isjobreport=true){
