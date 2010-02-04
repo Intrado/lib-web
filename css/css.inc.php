@@ -742,9 +742,8 @@ td.SplitPane {
 	overflow: hidden;
 	width: 100%;
 	margin: 0;
-	margin-top: 10px;
 	padding: 0;
-	height: 60px;
+	height: 2em;
 }
 
 #messagegroupformcontainer div.MessageTextReadonly {
