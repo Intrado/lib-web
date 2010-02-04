@@ -33,7 +33,7 @@ function handleRequest() {
 		// Returns a map of audiofiles belonging to the current user; a messagegroupid may be specified, but the results will still include global audio files (where messagegroupid is null). Results are sorted by recorddate.
 		case 'AudioFiles':
 			$messagegroupid = !empty($_GET['messagegroupid']) ? $_GET['messagegroupid'] + 0 : 0;
-			return cleanObjects(DBFindMany('AudioFile', 'from audiofile where userid=? and (messagegroupid=? or messagegroupid is null) and not deleted order by messagegroupid desc, recorddate desc', false, array($USER->id, $messagegroupid)));
+			return cleanObjects(DBFindMany('AudioFile', 'from audiofile where userid=? and messagegroupid=? and not deleted order by messagegroupid desc, recorddate desc', false, array($USER->id, $messagegroupid)));
 
 		// Return an AudioFile object specified by its ID.
 		case 'AudioFile':
