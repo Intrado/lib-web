@@ -31,7 +31,7 @@ require_once("obj/AudioUpload.fi.php");
 require_once("obj/EmailAttach.fi.php");
 require_once("obj/EmailAttach.val.php");
 require_once("obj/Language.obj.php");
-require_once('messagegroup.inc.php');
+require_once("messagegroup.inc.php");
 
 ///////////////////////////////////////////////////////////////////////////////
 // Authorization:
@@ -64,6 +64,7 @@ $defaultemailheaders = array(
 if (isset($_GET['id'])) {
 	unset($_SESSION['emailheaders']);
 	unset($_SESSION['emailattachments']);
+	unset($_SESSION["autotranslatesourcetext"]);
 	setCurrentMessageGroup($_GET['id']);
 
 	if ($_GET['id'] === 'new') {
@@ -89,6 +90,9 @@ if (isset($_GET['id'])) {
 if (!isset($_SESSION['messagegroupid'])) {
 	redirect('unauthorized.php');
 }
+
+if (!isset($_SESSION["autotranslatesourcetext"]))
+	$_SESSION["autotranslatesourcetext"] = array();
 
 $messagegroup = new MessageGroup(getCurrentMessageGroup());
 
@@ -168,13 +172,13 @@ foreach ($destinations as $type => $destination) {
 		if ($countlanguages > 1) {
 			$autotranslatorformdata = array();
 
-			if (empty($_SESSION["autotranslatesourcetext{$type}{$subtype}"]))
-				$_SESSION["autotranslatesourcetext{$type}{$subtype}"] = $messagegroup->getMessageText($type,$subtype,Language::getDefaultLanguageCode(), 'none');
+			if (empty($_SESSION["autotranslatesourcetext"]["{$type}{$subtype}"]))
+				$_SESSION["autotranslatesourcetext"]["{$type}{$subtype}"] = $messagegroup->getMessageText($type,$subtype,Language::getDefaultLanguageCode(), 'none');
 
 			if ($type == 'phone' || $type == 'email') {
 				$autotranslatorformdata["header"] = makeFormHtml("<div class='MessageBodyHeader'>" . _L("Automatic Translation") . "</div>" . icon_button(_L("Clear"),"delete", null, null, 'id="clearmessagebutton"') . "<span id='messageemptyspan'></span>");
 				
-				$autotranslatorformdata["sourcemessagebody"] = makeMessageBody(false, $type, $subtype, 'autotranslator', _L('Automatic Translation'), $_SESSION["autotranslatesourcetext{$type}{$subtype}"], $datafields, $subtype == 'html', true);
+				$autotranslatorformdata["sourcemessagebody"] = makeMessageBody(false, $type, $subtype, 'autotranslator', _L('Automatic Translation'), $_SESSION["autotranslatesourcetext"]["{$type}{$subtype}"], $datafields, $subtype == 'html', true);
 				$autotranslatorformdata["extrajavascript"] = makeFormHtml("
 					<script type='text/javascript'>
 						(function() {
@@ -234,7 +238,7 @@ foreach ($destinations as $type => $destination) {
 						continue;
 
 					$translationitems[] = "{$languagecode}-translationitem";
-					$autotranslatorformdata["{$languagecode}-translationitem"] = makeTranslationItem(false, $type, $subtype, $languagecode, $languagename, $preferredgender, $_SESSION["autotranslatesourcetext{$type}{$subtype}"], "", $languagename, false, false, false, !$messagegroup->hasMessage($type, $subtype, $languagecode), '', null, true);
+					$autotranslatorformdata["{$languagecode}-translationitem"] = makeTranslationItem(false, $type, $subtype, $languagecode, $languagename, $preferredgender, $_SESSION["autotranslatesourcetext"]["{$type}{$subtype}"], "", $languagename, false, false, false, !$messagegroup->hasMessage($type, $subtype, $languagecode), '', null, true);
 				}
 				
 				$autotranslatorformdata["sourcemessagebody"]["requires"] = $translationitems;
@@ -463,7 +467,7 @@ foreach ($destinations as $type => $destination) {
 				}
 			}
 
-			$accordionsplitter = makeAccordionSplitter($type, $subtype, $languagecode, $permanent, $preferredgender, false, $type == 'email' ? $emailattachments : null, isset($formdata['translationitem']) ? true : false);
+			$accordionsplitter = makeAccordionSplitter($type, $subtype, $languagecode, $permanent, $preferredgender, false, $type == 'email' ? $emailattachments : null, isset($formdata['translationitem']) ? true : false, $messagegroup, $countlanguages > 1);
 
 			$messageformsplitters[] = new FormSplitter($messageformname, $languagename, $messagegroup->hasMessage($type, $subtype, $languagecode) ? "img/icons/accept.gif" : "img/icons/diagona/16/160.gif", "verticalsplit", array(), array(
 			array("title" => "", "formdata" => $formdata),
@@ -634,7 +638,7 @@ if ($button = $messagegroupsplitter->getSubmit()) {
 							$autotranslatorlanguages = array(); // [$languagecode] = $translationlanguagename
 							$trimmedautotranslatorsourcetext = trim($postdata['sourcemessagebody']);
 							if (!empty($trimmedautotranslatorsourcetext)) {
-								$_SESSION["autotranslatesourcetext{$formdestinationtype}{$formdestinationsubtype}"] = $trimmedautotranslatorsourcetext;
+								$_SESSION["autotranslatesourcetext"]["{$formdestinationtype}{$formdestinationsubtype}"] = $trimmedautotranslatorsourcetext;
 								// Determine the set of languages to autotranslate so that we can make a batch translation call.
 								foreach ($destination['languages'] as $languagecode => $languagename) {
 									if (($formdestinationtype == 'phone' && !isset($customerphonetranslationlanguages[$languagecode])) || ($formdestinationtype == 'email' && !isset($customeremailtranslationlanguages[$languagecode])))
@@ -651,7 +655,7 @@ if ($button = $messagegroupsplitter->getSubmit()) {
 
 								if (!empty($autotranslatorlanguages)) {
 									// Batch translation.
-									$sourcemessageparts = Message::parse($_SESSION["autotranslatesourcetext{$formdestinationtype}{$formdestinationsubtype}"]);
+									$sourcemessageparts = Message::parse($_SESSION["autotranslatesourcetext"]["{$formdestinationtype}{$formdestinationsubtype}"]);
 									if ($autotranslatortranslations = translate_fromenglish(Message::format($sourcemessageparts, true), array_keys($autotranslatorlanguages))) {
 										// Increment an index because translate_fromenglish() does not return an associative array.
 										$autotranslationlanguageindex = 0;
