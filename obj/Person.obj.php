@@ -59,6 +59,68 @@ class Person extends DBMappedObject {
 		else
 			return false;
 	}
+	
+	// Returns a subquery on the 'person' or 'reportperson' table depending on $isjobreport.
+	// Takes into consideration the provided organizations/sections and user organization/section restrictions.
+	// If $sectionids is specified, then $organizationids is ignored because the section is more restrictive.
+	// If $isjobreport is true, then use the 'reportperson' table, otherwise use the 'person' table.
+	static function makePersonSubquery($organizationids = false, $sectionids = false, $isjobreport = false) {
+		global $USER;
+		
+		static $associatedorganizationids = false;
+		static $associatedsectionids = false;
+		
+		if ($associatedorganizationids === false) {
+			// TODO: Need to make sure organization is not deleted?
+			$associatedorganizationids = QuickQueryList("select organizationid from userassociation where type='organization' and userid = ?", false, false, array($USER->id));
+		}
+		
+		if ($associatedsectionids === false) {
+			$associatedsectionids = QuickQueryList("select sectionid from userassociation where type='section' and userid = ?", false, false, array($USER->id));
+		}
+		
+		$findorganizations = count($associatedorganizationids) > 0 || ($organizationids && count($organizationids) > 0);
+		$findsections = count($associatedsectionids) > 0 || ($sectionids && count($sectionids) > 0);
+		
+		$persontablename = $isjobreport ? 'reportperson' : 'person';
+		$personidfield = $isjobreport ? 'personid' : 'id';
+		
+		if ($findorganizations || $findsections) {
+			$sql = "(
+				select {$persontablename}.*
+				from {$persontablename}
+					inner join personassociation pa on ({$persontablename}.{$personidfield} = pa.personid)
+				where " . ($isjobreport ? "" : "not {$persontablename}.deleted and ");
+				
+			if ($findsections) {
+				if ($sectionids)
+					$combinedsectionids = count($associatedsectionids) > 0 ? array_intersect($sectionids, $associatedsectionids) : $sectionids;
+				else
+					$combinedsectionids = $associatedsectionids;
+				
+				if (count($combinedsectionids) > 0)
+					$sql .= "pa.sectionid in (" . implode(",", $combinedsectionids) . ")";
+				else
+					$sql .= "0";
+			} else {
+				if ($organizationids)
+					$combinedorganizationids = count($associatedorganizationids) > 0 ? array_intersect($organizationids, $associatedorganizationids) : $organizationids;
+				else
+					$combinedorganizationids = $associatedorganizationids;
+				
+				if (count($combinedorganizationids) > 0)
+					$sql .= "pa.organizationid in (" . implode(",", $combinedorganizationids) . ")";
+				else
+					$sql .= "0";
+			}
+			
+			$sql .= ")"; // Closing parenthesis for the subquery.
+		} else {
+			$sql = "{$persontablename}";
+		}
+		
+		return $sql;
+	}
 
 	function getAddress () {
 		return DBFind("Address", "from address where personid = '" . $this->id . "'");

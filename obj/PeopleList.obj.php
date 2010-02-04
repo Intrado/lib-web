@@ -57,60 +57,7 @@ class PeopleList extends DBMappedObject {
 	// Returns a subquery on the person table, taking into account organization/section listentries.
 	// Also takes into account user organization/section restrictions.
 	function getPersonSubquerySQL() {
-		return PeopleList::makePersonSubquery(array_keys($this->getOrganizations()), array_keys($this->getSections()));
-	}
-	
-	// Returns a subquery on the person table, taking into account the provided organizations/sections.
-	// Also takes into account user organization/section restrictions.
-	// If $sectionids is specified, then $organizationids is ignored because the section is more restrictive.
-	static function makePersonSubquery($organizationids = false, $sectionids = false) {
-		global $USER;
-		
-		static $associatedorganizationids = false;
-		static $associatedsectionids = false;
-		
-		if ($associatedorganizationids === false) {
-			// TODO: Need to make sure organization is not deleted?
-			$associatedorganizationids = QuickQueryList("select organizationid from userassociation where type='organization' and userid = ?", false, false, array($USER->id));
-		}
-		
-		if ($associatedsectionids === false) {
-			$associatedsectionids = QuickQueryList("select sectionid from userassociation where type='section' and userid = ?", false, false, array($USER->id));
-		}
-		
-		$findorganizations = count($associatedorganizationids) > 0 || ($organizationids && count($organizationids) > 0);
-		$findsections = count($associatedsectionids) > 0 || ($sectionids && count($sectionids) > 0);
-		
-		if ($findorganizations || $findsections) {
-			$sql = "(
-				select person.*
-				from person
-					inner join personassociation pa on (person.id = pa.personid)
-				where not person.deleted
-					and ";
-				
-			if ($findsections) {
-				$combinedsectionids = $sectionids ? array_intersect($sectionids, $associatedsectionids) : $associatedsectionids;
-		
-				if (count($combinedsectionids) > 0)
-					$sql .= "pa.sectionid in (" . implode(",", $combinedsectionids) . ")";
-				else
-					$sql .= "0";
-			} else {
-				$combinedorganizationids = $organizationids ? array_intersect($organizationids, $associatedorganizationids) : $associatedorganizationids;
-		
-				if (count($combinedorganizationids) > 0)
-					$sql .= "pa.organizationid in (" . implode(",", $combinedorganizationids) . ")";
-				else
-					$sql .= "0";
-			}
-			
-			$sql .= ")"; // Closing parenthesis for the subquery.
-		} else {
-			$sql = "person";
-		}
-		
-		return $sql;
+		return Person::makePersonSubquery(array_keys($this->getOrganizations()), array_keys($this->getSections()));
 	}
 	
 	function getListRuleSQL () {
