@@ -84,13 +84,13 @@ class ValRules extends Validator {
 				return $msgIncompleteRule;
 			} else if (isset($rulesfor[$data->fieldnum])) { // Do not allow more than one rule per fieldnum
 				return $msgRuleAlreadyExists;
-			} else if (isset($args['allowedFields']) && !in_array($data->fieldnum[0], $args['allowedFields'])) {
-				return $msgUnauthorizedFieldmap;
 			} else if ($data->fieldnum == 'organization') {
 				foreach ($data->val as $id) {
 					if (!$USER->authorizeOrganization($id))
 						return $msgUnauthorizedOrganization;
 				}
+			} else if (isset($args['allowedFields']) && !in_array($data->fieldnum[0], $args['allowedFields'])) {
+				return $msgUnauthorizedFieldmap;
 			} else {
 				if (!Rule::initFrom($data->fieldnum, $data->logical, $data->op, $data->val)) {
 					return $msgUnauthorizedFieldmap;
@@ -105,8 +105,6 @@ class ValRules extends Validator {
 	function getJSValidator () {
 		$msgPleaseFinish = addslashes(_L("Please finish adding your rule"));
 		$msgIncompleteRule = addslashes(_L("Incomplete rule data"));
-		$msgRuleAlreadyExists = addslashes(_L("Rule already exists"));
-		$msgUnauthorizedFieldmap = addslashes(_L("Unauthorized fieldmap"));
 
 		return "
 			function (name, label, value, args) {
