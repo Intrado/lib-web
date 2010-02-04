@@ -12,7 +12,6 @@ include_once("inc/form.inc.php");
 include_once("inc/html.inc.php");
 include_once("inc/formatters.inc.php");
 require_once("obj/FieldMap.obj.php");
-require_once("obj/PeopleList.obj.php");
 require_once("obj/RenderedList.obj.php");
 require_once("obj/Person.obj.php");
 
