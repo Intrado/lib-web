@@ -91,8 +91,6 @@ if (!empty($_POST) && empty($_FILES['audio'])) {
 <body style="margin-left: 0px; margin-top: 1px; margin-bottom: 0px">
 
 <form id="uploadform" style='margin:0;padding:0'action="uploadaudio.php?formname=<?=$_GET['formname']?>&itemname=<?=$_GET['itemname']?>" method="post" enctype="multipart/form-data" onsubmit="" >
-	<?=_L('Upload an audio file')?>
-	<br/>
 	<!-- TODO: Might need maximum size -->
 	<input id="audio" name="audio" type="file" onChange="window.top.window.startAudioUpload('<?=$_GET['itemname']?>');this.form.submit();"/>	
 </form>
