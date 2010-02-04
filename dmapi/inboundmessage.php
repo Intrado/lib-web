@@ -181,7 +181,6 @@ function buildLanguageList()
 	// its a rare case that a customer does not have any persondata (they must import something)
 	// but if so, take the customers languages from the language table
 	if ($languages == NULL || count($languages) == 0) {
-		error_log("grab from language table");
 		$languages = QuickQueryList("select code, name from language order by name", true);
 	}
 
@@ -197,7 +196,7 @@ function buildLanguageList()
 	$defaultarray = array();
 	$defaultarray['en'] = "English";
 	$languages = array_merge($defaultarray, $languages);
-
+	
 	$_SESSION['languageList'] = $languages;
 	$_SESSION['langindex'] = 'en'; // default English
 }
@@ -294,7 +293,6 @@ if($REQUEST_TYPE == "new"){
 
 			// remove language from the list
 			unset($languages[$langi]);
-			$languages = array_values($languages);
 			$_SESSION['languageList'] = $languages;
 			//error_log("langc : ".count($languages));
 
@@ -323,6 +321,7 @@ if($REQUEST_TYPE == "new"){
 			foreach ($languages as $code => $name) {
 				$i++;
 				if ($i == $selectedLang) {
+					error_log("found it");
 					$langindex = $code;
 					break;
 				}
