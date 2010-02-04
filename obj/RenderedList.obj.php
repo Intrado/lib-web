@@ -351,7 +351,7 @@ class RenderedList {
 				SELECT
 					SQL_CALC_FOUND_ROWS ($listrulesSQL) as isinlist,
 					$commonfieldsSQL
-				FROM " . PeopleList::makePersonSubquery(
+				FROM " . Person::makePersonSubquery(
 							$searchorganizationids ? $searchorganizationids : array(),
 							$searchsectionids ? $searchsectionids : array()
 						) . " p
