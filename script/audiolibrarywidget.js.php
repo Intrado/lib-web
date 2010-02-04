@@ -14,7 +14,7 @@ var AudioLibraryWidget = Class.create({
 		this.container = $(container);
 		this.messagegroupid = messagegroupid;
 		
-		this.container.insert(new Element('table',{'style':'border-collapse:collapse; margin-top: 10px; width:100%'}).insert(new Element('tbody')));
+		this.container.insert(new Element('table',{'style':'border-collapse:collapse; width:100%'}).insert(new Element('tbody')));
 		
 		this.reload();
 	},
@@ -24,17 +24,33 @@ var AudioLibraryWidget = Class.create({
 		
 		for (var audiofileid in audiofiles) {
 			var audiofile = audiofiles[audiofileid];
+			
+			// We need to set the id property because the audiofile objects in the ajax response do not have it.
 			audiofile.id = audiofileid;
+			
 			var namelink = new Element('a', {'href': '#'});
-			namelink.update(audiofile.name);
+			namelink.update(audiofile.name.escapeHTML());
 			namelink.observe('click', this.onClickName.bindAsEventListener(this, audiofile));
+			
 			var playbutton = icon_button('<?=_L("Play")?>','fugue/control', null);
 			playbutton.observe('click', this.onClickPlay.bindAsEventListener(this, audiofile));
 			
-			var namediv = new Element('div', {'style': 'float:left'});
-			namediv.insert(namelink);
+			var insertbutton = icon_button('<?=_L("Insert")?>','fugue/arrow_turn_180', null);
+			insertbutton.observe('click', this.onClickInsert.bindAsEventListener(this, audiofile));
 			
-			var tr = new Element('tr').insert(new Element('td').insert(namediv)).insert(new Element('td').insert(playbutton).insert('<div style="clear:both"></div>'));
+			var deletebutton = icon_button('<?=_L("Delete")?>','cross', null);
+			deletebutton.observe('click', this.onClickDelete.bindAsEventListener(this, audiofile));
+			
+			var tr = new Element('tr')
+				.insert(
+					new Element('td').insert(namelink)
+				).insert(
+					new Element('td')
+						.insert(playbutton)
+						.insert(insertbutton)
+						.insert(deletebutton)
+						.insert('<div style="clear:both"></div>')
+				);
 			
 			if (audiofile.messagegroupid)
 				tr.addClassName('MessageGroupAudioFile');
@@ -69,12 +85,114 @@ var AudioLibraryWidget = Class.create({
 		});
 	},
 	
+	alertConnectionProblem: function() {
+		alert('Sorry, there was a connection problem.');
+	},
+	
 	onClickName: function(event, audiofile) {
+		var audiofilelink = event.element();
+		
+		if (!audiofilelink.match('a'))
+			return;
+		
+		var audiofilelinktablecell = audiofilelink.up('td');
+		
 		event.stop(); // Don't follow through with the link's href.
-		this.container.fire('AudioLibraryWidget:ClickName', {'audiofile': audiofile});
+		
+		// Hide the link, then show an input whose value is the audiofile's current name.
+		audiofilelink.hide();
+		
+		var renametextbox = new Element('input', {'style': 'display:block; float:left', 'type': 'text', 'value': audiofile.name});
+		
+		var renamedonebutton = icon_button('<?=_L("Done")?>','tick', null);
+		renamedonebutton.observe('click', this.onClickRenameDone.bindAsEventListener(this, audiofilelink, renametextbox, audiofile));
+		
+		audiofilelinktablecell.insert(
+			renametextbox
+		).insert(
+			renamedonebutton
+		).insert(
+			'<div style="clear:both"></div>'
+		);
+	},
+	
+	onClickRenameDone: function(event, audiofilelink, renametextbox, audiofile) {
+		var newname = renametextbox.value.strip();
+		
+		if (newname == '') {
+			alert('The audio file name cannot be blank.');
+			return;
+		}
+		
+		// Resets the contents of the table cell that contains this audio file's link so that
+		// only the audio file link is in it.
+		// Also updates the cached audio file's name.
+		var resetAudioFile = function(newname) {
+			var audiofilelinktablecell = audiofilelink.up('td');
+			
+			// Reset the table cell, keeping only the audio file link.
+			audiofilelinktablecell.update(
+				audiofilelink.update(newname.escapeHTML()).show()
+			);
+			
+			// Update the cached audio file's name.
+			audiofile.name = newname;
+		};
+		
+		new Ajax.Request('ajaxaudiolibrary.php?action=renameaudiofile', {
+			'method': 'post',
+			'parameters': {
+				'id': audiofile.id,
+				'newname': newname
+			},
+			'onSuccess': function(transport) {
+				var data = transport.responseJSON;
+				
+				if (!data) {
+					alert('Sorry, there was a problem renaming this audio file.');
+					return;
+				} else if (data.error) {
+					alert(data.error);
+					return;
+				}
+				
+				resetAudioFile(newname);
+			},
+			'onFailure': this.alertConnectionProblem
+		});
 	},
 	
 	onClickPlay: function(event, audiofile) {
 		popup('previewaudio.php?close=1&id=' + audiofile.id, 400, 400);
+	},
+	
+	onClickInsert: function(event, audiofile) {
+		this.container.fire('AudioLibraryWidget:ClickInsert', {'audiofile': audiofile});
+	},
+	
+	onClickDelete: function(event, audiofile) {
+		var deletebutton = event.element();
+		
+		if (!deletebutton.match('button'))
+			return;
+		
+		new Ajax.Request('ajaxaudiolibrary.php?action=deleteaudiofile', {
+			'method': 'post',
+			'parameters': {
+				'id': audiofile.id
+			},
+			'onSuccess': function(transport) {
+				var data = transport.responseJSON;
+				
+				if (!data) {
+					alert('Sorry, there was a problem deleting this audio file.');
+					return;
+				}
+				
+				// Remove the table row for this audio file.
+				deletebutton.up('tr').remove();
+			},
+			'onFailure': this.alertConnectionProblem
+		});
 	}
 });
