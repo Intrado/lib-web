@@ -26,6 +26,7 @@ require_once("obj/Validator.obj.php");
 require_once("obj/Form.obj.php");
 require_once("obj/FormItem.obj.php");
 require_once("obj/FormRuleWidget.fi.php");
+require_once("obj/SectionWidget.fi.php");
 require_once("inc/rulesutils.inc.php");
 require_once("inc/formatters.inc.php");
 require_once("obj/JobType.obj.php");
@@ -168,6 +169,15 @@ $formdata["newrule"] = array(
 		array("ValRules")
 	),
 	"control" => array("FormRuleWidget", "showRemoveAllButton" => $rulewidgetvaluejson != ''),
+	"helpstep" => 2
+);
+
+$formdata["sectionids"] = array(
+	"label" => _L('Sections'),
+	"fieldhelp" => _L('Select sections from an organization.'),
+	"value" => "{}",
+	"validators" => array(),
+	"control" => array("SectionWidget"),
 	"helpstep" => 2
 );
 
