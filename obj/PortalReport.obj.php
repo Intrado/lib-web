@@ -37,7 +37,7 @@ class PortalReport extends ReportGenerator{
 						ppt.token,
 						ppt.expirationdate"
 						. generateFields("p")
-						. "	from " . getPersonSubquerySql($this->params) . " p
+						. "	from " . getReportPersonSubquerySql($this->params) . " p
 						left join portalpersontoken ppt on (ppt.personid = p.id)
 						where not p.deleted
 						and p.type='system' "
@@ -48,7 +48,7 @@ class PortalReport extends ReportGenerator{
 						. $usersql;
 			//test query used to confirm no active codes are in the list
 			$this->testquery = "select count(ppt.token)
-						from " . getPersonSubquerySql($this->params) . " p
+						from " . getReportPersonSubquerySql($this->params) . " p
 						left join portalpersontoken ppt on (ppt.personid = p.id)
 						where not p.deleted
 						and p.type='system'
