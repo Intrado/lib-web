@@ -46,7 +46,7 @@ class JobDetailReport extends ReportGenerator{
 			
 			if($this->params['result'] == "undelivered" || (isset($_SESSION['report']['type']) && $_SESSION['report']['type'] == "notcontacted")){
 
-				$undeliveredpersons = QuickQueryList("select rp.personid, sum(rp.iscontacted) as cnt, sum(rp2.iscontacted) as cnt2 from reportperson rp
+				$undeliveredpersons = QuickQueryList("select rp.personid, sum(rp.iscontacted) as cnt, sum(rp2.iscontacted) as cnt2 from " . getReportPersonSubQuerySql($this->params, true) . " rp
 											left join reportperson rp2 on (rp2.personid = rp.duplicateid and rp2.jobid = rp.jobid and rp2.type = rp.type)
 											where rp.jobid in ('" . $joblist . "') group by rp.jobid, rp.personid having cnt = 0 and (cnt2 = 0 or cnt2 is null)", true, $this->_readonlyDB);
 				$undeliveredpersons = array_keys($undeliveredpersons);
@@ -135,7 +135,7 @@ class JobDetailReport extends ReportGenerator{
 			$fieldquery
 			$gfieldquery
 			, dl.label as label
-			from reportperson rp
+			from " . getReportPersonSubQuerySql($this->params, true) . " rp
 			inner join job j on (rp.jobid = j.id)
 			inner join user u on (u.id = j.userid)
 			left join	reportcontact rc on (rc.jobid = rp.jobid and rc.type = rp.type and rc.personid = rp.personid)
@@ -153,7 +153,7 @@ class JobDetailReport extends ReportGenerator{
 		//query to test resulting dataset
 		$this->testquery =
 			"select count(*)
-				from reportperson rp
+				from " . getReportPersonSubQuerySql($this->params, true) . " rp
 				inner join job j on (rp.jobid = j.id)
 				inner join user u on (u.id = j.userid)
 				left join	reportcontact rc on (rc.jobid = rp.jobid and rc.type = rp.type and rc.personid = rp.personid)
@@ -462,7 +462,7 @@ class JobDetailReport extends ReportGenerator{
 		if($this->params['joblist'] != "")
 			$joblist=explode("','", $this->params['joblist']);
 
-		$sms = QuickQuery("select count(smsmessageid) from job where id in ('" . $this->params['joblist'] . "')", $this->_readonlyDB) ? "1" : "0";
+		$sms = QuickQuery("select * from job j inner join message m on (m.messagegroupid=j.messagegroupid) where m.type='sms' and j.id in ('" . $this->params['joblist'] . "') limit 1", $this->_readonlyDB) ? "1" : "0";
 
 		$params = array("jobId" => $this->params['joblist'],
 						"jobcount" => count($joblist),
