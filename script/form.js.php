@@ -338,6 +338,8 @@ function form_load(name,scriptname,formdata, helpsteps, ajaxsubmit) {
 	
 	//submit handler
 	form.observe("submit",form_handle_submit.curry(name));
+	
+	form.fire('Form:Loaded', {'formvars': formvars});
 }
 
 function form_fieldset_event_handler (event) {
@@ -833,12 +835,19 @@ function form_load_tab (form, widget, nexttab, specificsections, cacheajax) {
 }
 
 function form_load_layout (formswitchercontainer, classname, specificsections) {
+	if (!document.tabvars)
+		document.tabvars = {};
+	
+	document.tabvars.alllayoutloaded = false;
 	// If only the container is specified, go ahead and load all the various layouts.
 	if (!classname) {
 		form_load_layout(formswitchercontainer, 'horizontaltabs', specificsections);
 		form_load_layout(formswitchercontainer, 'verticaltabs', specificsections);
 		form_load_layout(formswitchercontainer, 'accordion');
 		form_load_layout(formswitchercontainer, 'verticalsplit');
+		
+		formswitchercontainer.fire('FormSplitter:AllLayoutLoaded');
+		document.tabvars.alllayoutloaded = true;
 		return;
 	}
 	
@@ -888,12 +897,23 @@ function form_load_layout (formswitchercontainer, classname, specificsections) {
 				layout.show_section(layout.firstSection);
 			} else {
 				var form = container.up('form');
+				
 				if (form) {
 					var formvars = document.formvars[form.name];
-					if (!formvars)
-						formvars = document.formvars[form.name] = {};
-					formvars.accordion = layout;
-					form.fire('FormSplitter:AccordionLoaded');
+					
+					function setFormvarsAccordion (event) {
+						if (event)
+							formvars = event.memo.formvars;
+						
+						formvars.accordion = layout;
+						form.fire('FormSplitter:AccordionLoaded');
+					}
+					
+					if (formvars) {
+						setFormvarsAccordion();
+					} else {
+						form.observe('Form:Loaded', setFormvarsAccordion);
+					}
 				}
 			}
 
