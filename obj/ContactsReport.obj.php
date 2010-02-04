@@ -55,7 +55,7 @@ class ContactsReport extends ReportGenerator {
 						) as address
 					$fieldquery
 					$gfieldquery
-					from " . getPersonSubquerySql($this->params) . " p
+					from " . getReportPersonSubquerySql($this->params) . " p
 					left join address a on (a.personid = p.id)
 					where not p.deleted
 					and p.type='system'
