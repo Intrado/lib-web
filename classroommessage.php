@@ -23,6 +23,15 @@ if (!$USER->authorize('targetedmessage')) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+// Settings
+////////////////////////////////////////////////////////////////////////////////
+
+$contentfile = "messagedata/en/data.php";
+$requesturl = "classroommessage.php";
+$commentname = "Comment";
+$remarkname = "Remark";
+
+////////////////////////////////////////////////////////////////////////////////
 // Action/Request Processing
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -120,14 +129,64 @@ if (isset($_GET['sectionid'])) {
 		} else {
 			$response = false;
 		}
-
 	}
 
-
-	error_log(json_encode($response));
 	echo json_encode($response);
 	exit(0);
 }
+
+
+$customtxt = QuickQueryList("select t.id, p.txt from targetedmessage t, message m, messagepart p
+										where t.deleted = 0 and
+											t.overridemessagegroupid = m.messagegroupid and
+											m.languagecode = 'en' and
+											p.messageid = m.id and p.sequence = 0",true);
+
+if (isset($_GET['search'])) {
+	header('Content-Type: application/json');
+
+
+	$searchwords = explode(' ',$_GET['search']);
+	$searchcount = count($searchwords);
+
+	error_log($searchcount);
+
+	$messages = DBFindMany("TargetedMessage","from targetedmessage where enabled = 1");
+
+	if(file_exists($contentfile))
+		include_once($contentfile);
+
+	$response = array();
+
+
+	foreach($messages as $message) {
+		if(isset($message->overridemessagegroupid) && isset($customtxt[$message->id])) {
+			$title = $customtxt[$message->id];
+		} else if(isset($messagedatacache["en"]) && isset($messagedatacache["en"][$message->messagekey])) {
+			$title = $messagedatacache["en"][$message->messagekey];
+		} else {
+			$title = ""; // Could not find message for this message key.
+		}
+//		$i = 0;
+
+//		while($i < $searchcount && stripos($title,$searchwords[$i]) !== false) {$i++;}
+
+		for($i = 0;$i < $searchcount && (trim($searchwords[$i]) == "" || stripos($title,trim($searchwords[$i])) !== false);$i++);
+		if($i == $searchcount)
+			$response[$message->id] = $title;
+
+//		if(stripos($title,$_GET['search']) !== false) {
+//			$response[$message->id] = $title;
+//		}
+	}
+	//error_log(json_encode(empty($response)?false:$response));
+	echo json_encode(empty($response)?false:$response);
+	exit(0);
+}
+
+
+
+
 
 $sections = DBFindMany("Section", "from section s join userassociation ua on (ua.sectionid = s.id) where ua.userid = ?","s",array($USER->id));
 
@@ -146,14 +205,9 @@ foreach($categories as $category) {
 $categories = array(0 => "Positive",1 => "Corrective",2 => "Informational");
 
 $library = array();
-$customtxt = array();
+
 foreach($categoriesjson as $id => $obj) {
 	$library[$id] = DBFindMany("TargetedMessage","from targetedmessage where enabled = 1 and targetedmessagecategoryid = ?",false,array($id));
-	$customtxt[$id] = QuickQueryList("select t.id, p.txt from targetedmessage t, message m, messagepart p
-										where t.targetedmessagecategoryid = ? and t.deleted = 0 and
-											t.overridemessagegroupid = m.messagegroupid and
-											m.languagecode = 'en' and
-											p.messageid = m.id and p.sequence = 0",true,false,array($id));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -168,22 +222,23 @@ $PAGE = "notifications:classroom";
 $TITLE = _L('Classroom Comments');
 
 include_once("nav.inc.php");
+?>
+<link href='css/classroom.css' type='text/css' rel='stylesheet' media='screen'>
+<?
 
-
+startWindow(_L('Classroom Comments'));
 echo '<select id="classselect" name="classselect" style="margin:5px">';
 foreach($sections as $section) {
 	echo '<option value="'.$section->id.'">'.escapehtml($section->skey).'</option>';
 }
-echo "</select>";
-
-startWindow(_L('Classroom Comments'));
-
+echo "</select>" . icon_button("Done Picking Comments", "tick", null, "classroommessageoverview.php",'style="float:right;"');
 ?>
+
 
 <table width="100%" id="picker">
 	<tr>
-		<td style="top:0px;width:250px;vertical-align:top;border-right:1px solid black;padding-right:10px;">
-			<a id="checkall" href="#" style="float:left; white-space: nowrap;">Select All</a><br />
+		<td style="top:0px;vertical-align:top;border-right:1px solid black;padding-right:10px;">
+			<a id="checkall" href="#" style="float:left;white-space: nowrap;">Select All</a><br />
 			<div id="contactwrapper">
 				<div id="contactbox" style="width:100%;text-decoration:none;"></div>
 			</div>
@@ -192,52 +247,56 @@ startWindow(_L('Classroom Comments'));
 			<hr />
 		</td>
 
-		<td style="vertical-align:top;">
+		<td style="vertical-align:top;width:100%">
 			<div id="theinstructions" style="font-size:2em;padding:100px;"><img src="img/icons/fugue/arrow_180.png" alt="" style="vertical-align:middle;"/>&nbsp;Click on a Contact to Start</div>
 
-		<div id="searchContainer" style="margin:10px;display:none;"><input id="searchbox" type="text" value="" size="50" style="float:left"/><?= icon_button("Search", "magnifier", null, null)  . icon_button("Done Picking Comments", "tick", null, "classroommessageoverview.php",'style="float:right;"') ?></div>
-			<div style="clear:both;"></div>
-			<div id='tabsContainer' style=' margin:10px; margin-right:0px;display:none;vertical-align:middle;'></div>
 
+			<div id='tabsContainer' style=' margin:10px; margin-right:0px;display:none;vertical-align:middle;'></div>
 			<div id="libraryContent" style="display:none;">
 			<?
 				$libraryids = array();
 				$messageids = array();
-				$filename = "messagedata/en/data.php";
-				if(file_exists($filename))
-					include_once($filename);
+				if(file_exists($contentfile))
+					include_once($contentfile);
 				foreach($library as $categoryid => $messages) {
 					// add library to id since user may change the title of the category
-					echo "<div id='lib-$categoryid' style='display:block;'>";
+					echo '<div id="lib-' . $categoryid . '" style="display:block;">
+						  <span id="nowedit-' . $categoryid . '" style="float:left;color:graytext;font-weight:lighter;font-style:italic;"></span>
+						  <div style="clear:both"></div>';
 					foreach($messages as $message) {
 		
-						if(isset($message->overridemessagegroupid) && isset($customtxt[$categoryid][$message->id])) {
-							$title = $customtxt[$categoryid][$message->id];
+						if(isset($message->overridemessagegroupid) && isset($customtxt[$message->id])) {
+							$title = $customtxt[$message->id];
 						} else if(isset($messagedatacache["en"]) && isset($messagedatacache["en"][$message->messagekey])) {
 							$title = $messagedatacache["en"][$message->messagekey];
 						} else {
 							$title = ""; // Could not find message for this message key.
 						}
 						// TODO make proper css
-						echo '<div id="msg-' . $message->id .'" class="targetmessage" style="position:relative;border:solid 1px silver;background-color:#FFF;width:300px;height:50px;float:left;margin:4px;padding:0px;">
-								<img src="img/checkbox-clear.png" alt="" style="float:left;margin:2px"/>
-								<div id="msgtxt-' . $message->id .'" style="float:left;overflow:auto;height:35px;width:260px">'
+						echo '<div id="msg-' . $message->id .'" class="classroomcomment">
+								<img id="msgchk-' . $message->id .'" class="msgchk" src="img/checkbox-clear.png" alt=""/>
+								<div id="msgtxt-' . $message->id .'" class="msgtxt" >'
 								. $title .
 								' </div>
-								<img src="img/icons/fugue/marker.gif" alt="" style="float:right;margin:2px"/>
-
-								<div style="clear:both;"></div>' .
-								($USER->authorize('targetedcomment')?'<a href="#" class="commentlink" style="float:right">Remark</a>':'&nbsp;') .
-								'
-								<span id="com-' . $message->id .'" class="targetcomment" style="width:280px;border:0px solid black;padding:10px;height:100px;bottom:0px;display:none;">
-									<textarea class="targetcomment" style="height:70px;width:265px;"></textarea>
-									<a class="targetcomment" href="#" style="" onclick="saveComment(\''. $message->id .'\');false;">Done</a><span style="display:none"></span>
+								<img src="img/icons/fugue/marker.gif" alt="Mark" title="Mark this Comment" style="float:right;margin:2px" onclick="markcomment(\'' . $message->id .'\')" />
+								<div style="clear:both;">' .
+									($USER->authorize('targetedcomment')?'<div id="remprev-' . $message->id .'" class="remarklink"></div><a href="#" class="remarklink">Remark</a>':'&nbsp;') .
+								'</div>
+								<span id="com-' . $message->id .'" class="remark" style="display:none;">
+									<textarea class="remark"></textarea>
+									<a class="remark" href="#" onclick="saveComment(\''. $message->id .'\');false;">Done</a>
 								</span>
 								</div>';
 					}
 					echo '<div style="clear:both;"></div></div>';
 				}
 			?>
+
+				<div id="lib-search">
+					<div id="searchContainer" style="margin:10px;display:none;"><input id="searchbox" type="text" value="" size="50" style="float:left"/><?= icon_button("Search", "magnifier", 'dosearch(); return false;', null) ?></div>
+					<div id="searchResult" style="clear:both;"></div>
+				</div>
+
 			</div>
 		</td>
 	</tr>
@@ -278,6 +337,11 @@ endWindow();
 	var highlightedmessages = new Hash();	// List of Messages that are currently highlighted
 	var highlightedcontacts = new Hash();	// List of Contacts that are currently highlighted
 
+
+	var markedcontacts = new Hash();
+
+	var markedcomment = false;
+
 	var revealmessages = true;			// Boolean to reveal messages on first click
 
 	var tabs;
@@ -287,7 +351,7 @@ endWindow();
 			case 0:
 				return "img/checkbox-clear.png";
 			case 1:
-				return "img/checkbox-add.png";
+				return "img/checkbox-dash.png";
 			case 2:
 				return "img/checkbox-check.png";
 		}
@@ -310,10 +374,11 @@ endWindow();
 				people.set(contactid,new Hash());
 			var contactlink = people.get(contactid);
 
+			// set category icon
 			var img = $('c-' + contactid + '-' + event[0]);
 			if(img != undefined) {
-
-				img.show();
+				img.src = categoryinfo.get(event[0]).img;
+				//img.show();
 			}
 			contactlink.set(event[2],event[3]);
 		});
@@ -337,7 +402,8 @@ endWindow();
 
 			var img = $('c-' + contactid + '-' + category);
 			if(img != undefined) {
-				img.show();
+				img.src = categoryinfo.get(category).img;
+				//img.show();
 			}
 			contactlink.set(messageid,comment);
 		} else {
@@ -345,16 +411,18 @@ endWindow();
 			if(contactlink.size() == 0) {
 				var img = $('c-' + contactid + '-' + category);
 				if(img != undefined) {
-					img.hide();
+					//img.hide();
+					img.src = 'img/pixel.gif';
+
 				}
 				people.unset(contactid);
 			}
 		}
 	}
 	 function saveComment(id) {
-		var text = $('msg-' + id).down('textarea').getValue();
+		var text = $('com-' + id).down('textarea').getValue();
 		// Save event to database
-		new Ajax.Request('classroommessage.php',
+		new Ajax.Request('<?= $requesturl ?>',
 		{
 			method:'post',
 			parameters: {eventContacts: checkedcontacts.keys().toJSON(),
@@ -367,9 +435,10 @@ endWindow();
 				});
 				$('com-' + id).hide();
 				$('msg-' + id).down('a').show();
-				$('msg-' + id).setStyle("height:50px;")
-				$('msgtxt-' + id).setStyle("height:35px;")
 
+				remarkpreview(id,text);
+				$('msg-' + id).setStyle("height:4.5em;")
+				$('msgtxt-' + id).setStyle("height:3em;")
 			}
 		});
 	 }
@@ -381,49 +450,121 @@ endWindow();
 		return true;
 	}
 
-	function updatemessages(currenttab) {
-		var contactsize = checkedcontacts.size();
 
+	function markcomment(id) {
+		//var border = $('msg-' + id).getStyle('border-color');
+		if(markedcomment == id) {
+			$('msg-' + id).setStyle('border-color:silver');
+			markedcomment = false;
+		} else {
+			if(markedcomment)
+				$('msg-' + markedcomment).setStyle('border-color:silver');
+			$('msg-' + id).setStyle('border-color:red');
+			markedcomment = id;
+		}
+		markedcontacts.each(function(contact) {
+			$('c-' + contact.key).setStyle('border:0px');
+		});
+
+		if(markedcomment) {
+			checkedcache.get(tabs.currentSection.substr(4)).each(function(contact) {
+				if(contact.value.get(markedcomment) != undefined) {
+					$('c-' + contact.key).setStyle('border:1px solid red;');
+					markedcontacts.set(contact.key,true);
+				}
+			});
+		}		
+	}
+	function remarkpreview(id,remark) {
+		if(remark.length > 20)
+			remark = remark.substring(0, 20) + '...';
+		$('remprev-' + id).update(remark);
+	}
+
+	function dosearch() {
+			new Ajax.Request('<?= $requesturl ?>',
+				{
+					method:'get',
+					parameters: {search: $('searchbox').getValue()},
+					onSuccess: function(transport){
+						var response = transport.responseJSON || false;
+						if(response) {
+							var container = new Element('div');
+							$H(response).each(function(itm) {
+								//all += itm.key + " " + itm.value + '\n';
+								container.insert(
+									'<div id="msg-' + itm.key  + '" class="classroomcomment">' +
+									'<img id="msgchk-' + itm.key  + '" class="msgchk" src="img/checkbox-clear.png" alt=""/>' +
+									'<div id="msgtxt-' + itm.key  + '" class="msgtxt" >' + itm.value +
+									' </div>' +
+									'<img src="img/icons/fugue/marker.gif" alt="Mark" title="Mark this Comment" style="float:right;margin:2px" onclick="markcomment(\'' + itm.key + '\')" />' +
+									'<div style="clear:both;">' +
+									'</div>' +
+									'</div>'
+								);
+							});
+							container.insert('<div style="clear:both;"></div>');
+							$('searchResult').update(container);
+						} else {
+							$('searchResult').update('Not Found');
+						}
+					}
+				});
+	}
+
+
+	function updatemessages(currenttab) {
+		if(currenttab == 'lib-search')
+			return
 
 		var category = currenttab.substr(4);
+		var contactsize = checkedcontacts.size();
+
 		// Get all contact-message links from cache
 
 		// Reset all previous message selections
-		checkedmessages.each(function(message) {
-			$('msg-' + message.key).setStyle("height:50px;");
-			var target = $('msg-' + message.key).down('img');
+		checkedmessages.each(function(msg) {
+			var target = $('msg-' + msg.key);
+			target.setStyle("height:4.5em;background:" + c_none);
+			$('msgtxt-' + msg.key).setStyle('height:3em;');
+
+			var target = target.down('img');
 			target.src = getstatesrc(0);
 			if(hascomments) {
+				target = $('remprev-' + msg.key);
+				target.update('')
 				target = target.next('a');
 				target.show();
-				//console.info(target);
 				target.update('Remark');
 			}
-			target =  $('com-' + message.key);
-			//target.hide();
+			target =  $('com-' + msg.key);
+			target.hide();
 			target = target.down('textarea');
 			target.stopObserving();
 			target.setStyle({color: "black"});
-			$('com-' + message.key).hide();
 			target.value = "";
-			target = target.next('span');
-			target.hide();
-			checkedmessages.unset(message.key);
+
+
+			checkedmessages.unset(msg.key);
 		});
 
 		if(contactsize == 1) {
 			checkedcontacts.each(function(contact) {
+				$('nowedit-' + category).update('Now Editing: ' +  $('c-' + contact.key).innerHTML);
 				var messages = checkedcache.get(category).get(contact.key)
 				if(messages != undefined) {
 					messages.each(function(msg) {
-						var target = $('msg-' + msg.key).down('img');
+						var target = $('msg-' + msg.key);
+						target.style.background = c_selected;
+						var target = target.down('img');
 						target.src = getstatesrc(2);
 						if(hascomments && msg.value != "") {
 							target = $('com-' + msg.key);
 							target.down('textarea').value = msg.value;
-						} else {
-							$('msg-' + msg.key).setStyle('height:50px;');
-						}
+							remarkpreview(msg.key,msg.value);
+						} //else {
+						//	$('msg-' + msg.key).setStyle('height4.5em;');
+						//}
 						checkedmessages.set(msg.key,2);
 					});
 				}
@@ -435,8 +576,10 @@ endWindow();
 		var selectedmessages = new Hash();
 		var selectedcomments = new Hash();
 		var newcontct = false;
+		var nowedit = "";
 		checkedcontacts.each(function(contact) {
 			var messages = checkedcache.get(category).get(contact.key)
+			nowedit += ', ' + $('c-' + contact.key).innerHTML;
 			if(messages != undefined) {
 				messages.each(function(msg) {
 					var count = selectedmessages.get(msg.key) || 0;
@@ -444,7 +587,6 @@ endWindow();
 					selectedmessages.set(msg.key,count);
 
 					var comment = selectedcomments.get(msg.key) || false;
-					
 					if((msg.value != "" && msg.value === comment) || (comment === false && count == 1)) {
 						selectedcomments.set(msg.key,msg.value);
 					} else if((comment !== false && msg.value !== comment) || (comment === false && count > 1)) {
@@ -456,31 +598,39 @@ endWindow();
 			}
 		});
 
+		$('nowedit-' + category).update('Now Editing:' +  nowedit.substr(1));
+
 		// Set all contact-message link boxes
-		selectedmessages.each(function(message) {
-			if(message.value == contactsize) {
-				$('msg-' + message.key).down('img').src = getstatesrc(2);
-				checkedmessages.set(message.key,2);
+		selectedmessages.each(function(msg) {
+			var target = $('msg-' + msg.key);
+			target.style.background = c_selected;
+			target = target.down('img');
+			if(msg.value == contactsize) {
+				target.src = getstatesrc(2);
+				checkedmessages.set(msg.key,2);
 			} else {
-				$('msg-' + message.key).down('img').src = getstatesrc(1);
-				checkedmessages.set(message.key,1);
+				target.src = getstatesrc(1);
+				checkedmessages.set(msg.key,1);
 			}
 			if(hascomments) {
-				var comment = selectedcomments.get(message.key) || false;
-				var textarea = $('com-' + message.key).down('textarea');
+				var comment = selectedcomments.get(msg.key) || false;
+				var textarea = $('com-' + msg.key).down('textarea');
 				if(comment === false) {
 					textarea.value = "";
+					remarkpreview(msg.key,"");
 				} else if(comment === true || newcontct == true ) {
 					textarea.value = "";
 					// Add multiple remark notice
-					blankFieldValue(textarea, "Multiple Remarks. Typing a new remark here will overwrite.");
+					remarkpreview(msg.key,'  * Multiple Remarks')
+					blankFieldValue(textarea, "* Multiple Remarks. \nTyping a new remark here will overwrite.");
 					//textarea.next('span').show();
 				} else {
 					textarea.value = comment;
-					//$('com-' + message.key).show();
+					remarkpreview(msg.key,comment);
+					//$('com-' + msg.key).show();
 				}
 			}
-			//$('com-' + message.key).hide();
+			//$('com-' + msg.key).hide();
 		});
 	}
 	
@@ -488,7 +638,7 @@ endWindow();
 	 * Get the class contacts and set observers
 	 */
 	function getclass(selected) {
-		new Ajax.Request('classroommessage.php',
+		new Ajax.Request('<?= $requesturl ?>',
 		{
 			method:'get',
 			parameters: {sectionid: selected},
@@ -510,10 +660,12 @@ endWindow();
 				$H(response.people).each(function(person) {
 					var id = 'c-' + person.key;
 					var tr = new Element('tr');
-					tr.insert('<td><a href="#" id="' + id + '" title="Student id: ' +  person.value.pkey + '" style="text-decoration:none;">' + person.value.name +'</a></td>');
+					tr.insert('<td width="100%"><a href="#" id="' + id + '" title="Student id: ' +  person.value.pkey + '" style="text-decoration:none;cursor:pointer;">' + person.value.name +'</a></td>');
+					var td = new Element('td', {style:'white-space:nowrap'});//{white-space:'nowrap'}
 					categoryinfo.each(function(category) {
-						tr.insert('<td><img id="' + id + "-" + category.key + '"src="' + category.value.img + '" title="' + category.value.name + '" style="width:10px;display:none;" alt="" /></td>');
+						td.insert('<img id="' + id + '-' + category.key + '"src="img/pixel.gif" title="' + category.value.name + '" style="width:10px;display:inline;" alt="" />');
 					});
+					tr.insert(td);
 					tbody.insert(tr);
 				});
 				dom.insert(new Element('table').insert(tbody));
@@ -534,7 +686,8 @@ endWindow();
 							event.stop(); // Some browsers may open another winbdow on shift click
 							if(!event.shiftKey) {
 								checkedcontacts.each(function(contact) {
-									$('c-' + contact.key).setStyle('font-weight:normal;');
+									//$('c-' + contact.key).setStyle('font-weight:normal;');
+									$('c-' + contact.key).style.background = c_none;
 									//$('i-c-' + contact.key).src = 'img/pixel.gif';
 									checkedcontacts.unset(contact.key);
 								});
@@ -542,11 +695,15 @@ endWindow();
 
 							// Select or deselect the itme depending on alt click. Unable to deselect if only one item is selected
 							if (event.shiftKey && checkedcontacts.get(this.id.substr(2)) != undefined && checkedcontacts.size() > 1) {
-								this.setStyle('font-weight:normal;');
+								//this.setStyle('font-weight:normal;');
+								this.style.background = c_none;
+
 								//$('i-' + this.id).src = 'img/pixel.gif';
 								checkedcontacts.unset(this.id.substr(2));
 							} else {
-								this.setStyle('font-weight:bold');
+								//this.setStyle('font-weight:bold');
+								this.style.background = c_selected;
+
 								//$('i-' + this.id).src = h_image;
 								checkedcontacts.set(this.id.substr(2),true);
 							}
@@ -565,10 +722,16 @@ endWindow();
 							updatemessages(tabs.currentSection);
 					});
 
+
+
+/*
 					$(id).observe('mouseover', function(event) {
 						this.style.background = c_hover;
 						var contactid = this.id.substr(2);
-						var currenttab = tabs.currentSection.substr(4);;
+						var currenttab = tabs.currentSection;
+						if(currenttab == 'lib-search')
+							return;
+						currenttab = currenttab.substr(4);
 
 						if(checkedcache.get(currenttab).get(contactid) != undefined) {
 							checkedcache.get(currenttab).get(contactid).each(function(message) {
@@ -576,12 +739,13 @@ endWindow();
 								highlightedmessages.set(message.key,true);
 							});
 						}
-						checkedcache.each(function (category) {
-							if(currenttab != category.key && category.value.get(contactid) != undefined) {
-								tabs.sections['lib-' + category.key].titleDiv.style.background = c_hover;
-								tabs.sections['lib-' + category.key].titleDiv.down('img').pulsate({pulses:2, duration: 1.5});
-							}
-						});
+//						checkedcache.each(function (category) {
+//							if(currenttab != category.key && category.value.get(contactid) != undefined) {
+//								tabs.sections['lib-' + category.key].titleDiv.style.background = c_hover;
+//								tabs.sections['lib-' + category.key].titleDiv.down('img').pulsate({pulses:2, duration: 1.5});
+//							}
+//						});
+						
 					});
 					$(id).observe('mouseout', function(event) {
 						highlightedmessages.each(function(message) {
@@ -598,6 +762,7 @@ endWindow();
 							tabs.sections['lib-' + category.key].titleDiv.style.background = '';
 						});
 					});
+*/
 				});
 				setcache(response.cache);
 			}
@@ -609,12 +774,12 @@ document.observe("dom:loaded", function() {
 	getclass($('classselect').getValue());
 
 	$('picker').observe("selectstart", function(event) {          // disable select in IE
-		if(!(event.target.hasClassName('targetcomment') || event.target.id == "searchbox"))
+		if(!(event.target.hasClassName('remark') || event.target.id == "searchbox"))
 			event.stop();
 		$('searchbox').blur();
 	});
 	$('picker').observe("mousedown", function(event) {			  // disable select in FF
-		if(!(event.target.hasClassName('targetcomment') || event.target.id == "searchbox"))
+		if(!(event.target.hasClassName('remark') || event.target.id == "searchbox"))
 			event.stop();
 		$('searchbox').blur();
 	});
@@ -627,7 +792,6 @@ document.observe("dom:loaded", function() {
 		$$('#contactbox a').each(function(contact) {
 			//contact.style.background = "#ffcccc";
 			contact.setStyle('font-weight:bold');
-			$('i-' + contact.id).src = h_image;
 			checkedcontacts.set(contact.id.substr(2),true);
 		});
 		if(revealmessages) {
@@ -645,19 +809,21 @@ document.observe("dom:loaded", function() {
 		getclass(event.element().getValue());
 	});
 
-	$$('#libraryContent .targetmessage').each(function(message) {
+	$$('#libraryContent .classroomcomment').each(function(message) {
 		message.observe('click', function(event) {
 			event.stop();
 
 			var htmlid = this.id;  // html id: message-category-mid
 			var msgid = this.id.substr(4);  // strip 'msg-'
 			var state = checkedmessages.get(msgid) || 0;
-			if(event.target.hasClassName('commentlink')) {
+			if(event.target.hasClassName('remarklink')) {
+
 				$('msgtxt-' + msgid).setStyle('height:auto');
 				event.target.hide();
 				$(htmlid).setStyle('height:auto');	
 				var target = $('com-' + msgid);
-				target.toggle();
+				target.show();
+				$('remprev-' + msgid).update('');
 				target = target.down('textarea');
 				target.focus();
 				target.blur();
@@ -666,8 +832,9 @@ document.observe("dom:loaded", function() {
 				}
 			}
 			// Don't modify anything if writing a comment'
-			if(!event.target.hasClassName('targetcomment')) {
-				
+		//	if(!event.target.hasClassName('remark')) {
+			if(event.target.hasClassName('msgtxt') || event.target.hasClassName('msgchk') || event.target.hasClassName('remarklink')) {
+
 				state = (state == 2)? 0 : 2;
 
 				var textarea = $('com-' + msgid).down('textarea');
@@ -676,15 +843,13 @@ document.observe("dom:loaded", function() {
 						return;
 					else {
 						textarea.value = "";
+						$('remprev-' + msgid).update("");
 						textarea.stopObserving();
 					}
 				}
 
-
-
-				//var text = ""; //event.target.down('textarea').getValue();
 				// Save event to database
-				new Ajax.Request('classroommessage.php',
+				new Ajax.Request('<?= $requesturl ?>',
 				{
 					method:'post',
 					parameters: {eventContacts: checkedcontacts.keys().toJSON(),
@@ -696,20 +861,36 @@ document.observe("dom:loaded", function() {
 						$(htmlid).down('img').src = getstatesrc(state);
 						checkedmessages.set(msgid,state);                  // Set Message to appropriate state
 						// Set each selected contact to
+
+						if(state == 2) {
+							$(htmlid).style.background = c_selected;
+						} else {
+							$(htmlid).setStyle('height:4.5em;background:' + c_none);
+							$('msgtxt-' + msgid).setStyle('height:3em;');
+							$(htmlid).down('span').hide();
+							$(htmlid).down('a').show();
+						}
+
+
+
 						checkedcontacts.each(function(contact) {
 							if(state == 2) {
 								highlightedcontacts.set('c-' + contact.key,true);
-								//$('i-c-' + contact.key).src = h_image;
-								$('c-' + contact.key).style.background =  c_hover;
-							} else {
-								highlightedcontacts.unset('c-' + contact.key);
-								//$('i-c-' + contact.key).src = 'img/pixel.gif';
-								$('c-' + contact.key).style.background =  c_none;
-								$(htmlid).setStyle('height:50px');
-								$('msgtxt-' + msgid).setStyle('height:35px');
+								if(markedcomment == msgid) {
+									markedcontacts.set(contact.key,true);
+									$('c-' + contact.key).setStyle('border:1px solid red;');
+								}
 
-								$(htmlid).down('span').hide();
-								$(htmlid).down('a').show();
+								//$('c-' + contact.key).style.background =  c_hover;
+							} else {
+								if(markedcomment == msgid) {
+									markedcontacts.unset(contact.key);
+									$('c-' + contact.key).setStyle('border:0px;');
+								}
+
+								highlightedcontacts.unset('c-' + contact.key);
+								//$('c-' + contact.key).style.background =  c_none;
+
 							}
 							setEvent(contact.key,msgid,(state == 2),"");
 						});
@@ -718,6 +899,62 @@ document.observe("dom:loaded", function() {
 			}
 		});
 
+
+		message.observe('mouseover', function(event) {
+			event.stop();
+			var htmlid = this.id;
+			var msgid = this.id.substr(4);  // strip 'msg-'
+			var category = tabs.currentSection;
+			if(category == 'lib-search')
+				return
+			var category = category.substr(4);
+
+			//$(htmlid).style.background = c_hover;
+			checkedcache.get(tabs.currentSection.substr(4)).each(function(contact) {
+				if(contact.value.get(msgid) != undefined) {
+					//$('i-c-' + contact.key).src = h_image;
+					//$('c-' + contact.key).style.background =  c_hover;
+					//$('c-' + contact.key + '-' + category).pulsate({pulses:2, from:0.5, duration: 1.5});
+					var img = $('c-' + contact.key + '-' + category);
+
+
+					Effect.Queues.get(img.id).each(function(effect) { effect.cancel(); });
+
+					new Effect.Pulsate(img,{pulses:2, from:0.5, duration: 1.5, queue: { position: 'end', scope: img.id }});
+
+//					new Effect.Opacity(img,{duration: 0.25, from:1, to:0.5, queue: { position: 'end', scope: img.id }});
+//					new Effect.Opacity(img,{duration: 0.25, from:0.5, to:1, queue: { position: 'end', scope: img.id }});
+
+
+					highlightedcontacts.set('c-' + contact.key,true);
+				}
+			});
+
+		});
+
+		message.observe('mouseout', function(event) {
+			event.stop();
+			var category = tabs.currentSection;
+			if(category == 'lib-search')
+				return
+			var category = category.substr(4);
+
+			//$(this.id).style.background = c_none;
+			highlightedcontacts.each(function(contact) {
+				//$('i-' + contact.key).src = 'img/pixel.gif';
+				//$(contact.key).style.background =  c_none;
+				var img = $(contact.key + '-' + category);
+
+				Effect.Queues.get(img.id).each(function(effect) { effect.cancel();});
+				img.style.opacity = 1.0;
+				//$(contact.key + '-' + category).setStyle('opacity:1.0');
+				highlightedcontacts.unset(contact.key);
+			});
+		});
+
+
+
+/*
 		message.observe('mouseover', function(event) {
 			event.stop();
 			var htmlid = this.id;
@@ -743,6 +980,8 @@ document.observe("dom:loaded", function() {
 				highlightedcontacts.unset(contact.key);
 			});
 		});
+
+*/
 	});
 
 
@@ -760,6 +999,14 @@ document.observe("dom:loaded", function() {
 			"content": $(conentid).remove()
 		});
 	});
+	tabs.add_section('lib-search');
+	tabs.update_section('lib-search', {
+		"title": 'Search',
+		"icon": 'img/magnify.gif',
+		"content": $('lib-search').remove()
+	});
+	//tabs.sections['lib-search'].titleDiv.setStyle('float:right');
+
 	tabs.show_section('lib-' + categoryinfo.keys().first());
 
 	tabs.container.observe('Tabs:ClickTitle', function(event) {
