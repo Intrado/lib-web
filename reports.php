@@ -107,6 +107,7 @@ startWindow("Select a Template"  . help('Reports_SelectATemplate'), 'padding: 3p
 			<td>
 				<table>
 					<tr><td><a href='reportarchive.php'/>Systemwide Report Archive</a></td></tr>
+					<tr><td><a href='reportcontactchange.php'/>Contact Destinations Changed</a></td></tr>
 				</table>
 			</td>
 <? } ?>
