@@ -5,6 +5,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 include_once("inc/common.inc.php");
 include_once("inc/utils.inc.php");
+include_once("inc/date.inc.php");
 include_once("inc/securityhelper.inc.php");
 include_once("inc/form.inc.php");
 include_once("inc/html.inc.php");
