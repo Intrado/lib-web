@@ -39,6 +39,11 @@ require_once("../obj/SurveyReport.obj.php");
 require_once("../obj/JobSummaryReport.obj.php");
 require_once("../obj/JobDetailReport.obj.php");
 require_once("../obj/CallsReport.obj.php");
+require_once("../obj/ContactChangeReport.obj.php");
+require_once("../obj/Person.obj.php");
+require_once("../obj/Phone.obj.php");
+require_once("../obj/Email.obj.php");
+require_once("../obj/Sms.obj.php");
 require_once("../obj/User.obj.php");
 require_once("../obj/Rule.obj.php");
 require_once("../obj/FieldMap.obj.php");
@@ -65,6 +70,9 @@ if($type == "subscription"){
 
 	switch($options['reporttype']){
 
+		case 'contactchangereport':
+			$generator = new ContactChangeReport();
+			break;
 		case 'contacthistory':
 			$generator = new CallsReport();
 			break;
@@ -127,9 +135,19 @@ if($options['reporttype'] == 'phonedetail' || $options['reporttype'] == 'emailde
 if($result == ""){
 	$generator->generateQuery(true); // hackPDF to set g01-g10 as f21-f30
 	echo "finished generating query\n";
-	$generator->setReportFile();
-	echo "finished setting report file to use\n";
-	$result = $generator->runPDF($params);
+	
+	// special case contact change report, CSV only (all others PDF)
+	if ($options['reporttype'] == 'contactchangereport') {
+		$generator->format = "csv";
+		$result = $generator->runCSV($params);
+		if ($result) {
+			$result = "success";
+		}
+	} else {
+		$generator->setReportFile();
+		echo "finished setting report file to use\n";
+		$result = $generator->runPDF($params);
+	}
 }
 echo $result;
 
