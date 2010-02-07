@@ -6,6 +6,8 @@ class ContactChangeReport extends ReportGenerator {
 
 	function generateQuery(){
 		global $USER;
+		$hassms = getSystemSetting("_hassms", false);
+
 		$this->params = $this->reportinstance->getParameters();
 		$this->reporttype = $this->params['reporttype'];
 
@@ -15,39 +17,32 @@ class ContactChangeReport extends ReportGenerator {
 		$userJoin = " and p.userid = '$USER->id' ";
 
 		$usersql = $USER->userSQL("p");
-		$phonequery="";
-		$emailquery="";
-		$personquery="";
-		$peoplequery = "";
-		/*
-		if(isset($this->params['phone']) && $this->params['phone'] != ""){
-			$peoplephonelist = QuickQueryList("select personid from phone ph where 1 and ph.phone like '%" . DBSafe($this->params['phone']) . "%' group by personid");
+
+		$reldate = "today";
+		if(isset($this->params['reldate']))
+			$reldate = $this->params['reldate'];
+		list($startdate, $enddate) = getStartEndDate($reldate, $this->params);
+
+		$peoplephonelist = QuickQueryList("select personid from phone where editlockdate >= ?", false, false, array(makeDateTime($startdate)));
+		$peopleemaillist = QuickQueryList("select personid from email where editlockdate >= ?", false, false, array(makeDateTime($startdate)));
+		if ($hassms) {
+			$peoplesmslist = QuickQueryList("select personid from sms where editlockdate >= ?", false, false, array(makeDateTime($startdate)));
+		} else {
+			$peoplesmslist = array();
 		}
-		if(isset($this->params['email']) && $this->params['email'] != ""){
-			$peopleemaillist = QuickQueryList("select personid from email e where 1 and e.email = '" . DBSafe($this->params['email']) . "'  group by personid");
+		$peoplelist = array_merge($peoplephonelist, $peopleemaillist, $peoplesmslist);
+		$peoplelist = array_unique($peoplelist);
+
+		if (count($peoplelist) > 0) {
+			$peoplelist = implode("','", $peoplelist);
+			$peoplequery = " and p.id in ('" . $peoplelist . "') ";
+		} else {
+			$peoplequery = " and false ";
 		}
-		if(isset($this->params['personid'])){
-			$personquery = $this->params['personid'] ? " and p.pkey = '" . DBSafe($this->params['personid']) . "'" : "";
-		}
-		*/
-		$options = $_SESSION['report']['options'];
-		
-		
+
+		$personquery = "";
 		$fieldquery = generateFields("p");
 		$gfieldquery = generateGFieldQuery("p.id");
-
-		if(isset($peoplephonelist) && isset($peopleemaillist))
-			$peoplelist = implode("','", array_intersect($peoplephonelist, $peopleemaillist));
-		else if(isset($peoplephonelist))
-			$peoplelist = implode("','", $peoplephonelist);
-		else if(isset($peopleemaillist))
-			$peoplelist = implode("','", $peopleemaillist);
-
-		if(isset($peoplelist))
-			$peoplequery = " and p.id in ('" . $peoplelist . "') ";
-
-		// TODO remove
-		$peoplequery = " and p.id in (3, 4, 5, 6, 7) ";
 		
 		$this->query = "select SQL_CALC_FOUND_ROWS
 					p.pkey as pkey,
@@ -68,7 +63,6 @@ class ContactChangeReport extends ReportGenerator {
 					where not p.deleted
 					and p.type='system'
 					$peoplequery
-					$personquery
 					$usersql
 					$rulesql
 					$orderquery
@@ -251,7 +245,7 @@ class ContactChangeReport extends ReportGenerator {
 		endWindow();
 	}
 
-	function runCSV(){
+	function runCSV($options = false){
 
 		$fields = FieldMap::getOptionalAuthorizedFieldMaps();
 		$fieldlist = array();
@@ -265,13 +259,19 @@ class ContactChangeReport extends ReportGenerator {
 		$maxsms = getSystemSetting('maxsms', '1');
 		$hassms = getSystemSetting('_hassms', false);
 		
-		header("Pragma: private");
-		header("Cache-Control: private");
-		header("Content-disposition: attachment; filename=report.csv");
-		header("Content-type: application/vnd.ms-excel");
+		if ($options) {
+			$fp = fopen($options['filename'], "w");
+			if (!$fp)
+				return false;
+		} else {
+			header("Pragma: private");
+			header("Cache-Control: private");
+			header("Content-disposition: attachment; filename=report.csv");
+			header("Content-type: application/vnd.ms-excel");
+		}
 
 		session_write_close();//WARNING: we don't keep a lock on the session file, any changes to session data are ignored past this point
-
+		
 		//generate the CSV header
 		$header = '"ID#", "First Name", "Last Name", "Address"';
 
@@ -293,8 +293,15 @@ class ContactChangeReport extends ReportGenerator {
 			}
 		}
 		
-		echo $header;
-		echo "\r\n";
+		if ($options) {
+			$ok = fwrite($fp, $header . "\r\n");
+			if (!$ok)
+				return false;
+				
+		} else {
+			echo $header;
+			echo "\r\n";
+		}
 
 		$result = Query($this->query, $this->_readonlyDB);
 
@@ -309,26 +316,35 @@ class ContactChangeReport extends ReportGenerator {
 				}
 				$count++;
 			}
-			$phonelist = DBFindMany("Phone", "from phone where personid = '$row[1]'", false, false, $this->_readonlyDB);
+			$phonelist = DBFindMany("Phone", "from phone where personid = '$row[1]' order by sequence", false, false, $this->_readonlyDB);
 			foreach($phonelist as $phone){
 				$reportarray[] = Phone::format($phone->phone);
 				$reportarray[] = $phone->editlockdate;
 			}
-			$emaillist = DBFindMany("Email", "from email where personid = '$row[1]'", false, false, $this->_readonlyDB);
+			$emaillist = DBFindMany("Email", "from email where personid = '$row[1]' order by sequence", false, false, $this->_readonlyDB);
 			foreach($emaillist as $email){
 				$reportarray[] = $email->email;
-				$reportarray[] = ""; // TODO
+				$reportarray[] = $email->editlockdate;
 			}
 			if ($hassms) {
-				$smslist = DBFindMany("Sms", "from sms where personid = '$row[1]'", false, false, $this->_readonlyDB);
+				$smslist = DBFindMany("Sms", "from sms where personid = '$row[1]' order by sequence", false, false, $this->_readonlyDB);
 				foreach($smslist as $sms){
 					$reportarray[] = $sms->sms;
-					$reportarray[] = ""; // TODO
+					$reportarray[] = $sms->editlockdate;
 				}
 			}
 			
-			echo '"' . implode('","', $reportarray) . '"' . "\r\n";
+			if ($options) {
+				$ok = fwrite($fp, '"' . implode('","', $reportarray) . '"' . "\r\n");
+				if (!$ok)
+					return false;
+			} else {
+				echo '"' . implode('","', $reportarray) . '"' . "\r\n";
+			}
 
+		}
+		if ($options) {
+			return fclose($fp);
 		}
 	}
 
