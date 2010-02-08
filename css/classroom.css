@@ -1,0 +1,46 @@
+
+.classroomcomment {
+	position:relative;
+	border:solid 1px silver;
+	background-color:#FFF;
+	width:300px;
+	height:4.5em;
+	float:left;
+	margin:4px;
+	padding:0px;
+}
+
+.msgchk {
+	float:left;
+	margin:2px;
+	cursor:pointer;
+}
+
+.msgtxt {
+	float:left;
+	overflow:auto;
+	height:3em;
+	width:260px;
+	cursor:pointer;
+}
+
+span.remark  {
+	width:280px;border:0px solid black;padding:10px;height:100px;bottom:0px;
+}
+
+textarea.remark  {
+	height:70px;margin-top:10px;width:265px;
+}
+
+a.remark  {
+
+}
+
+div.remarklink {
+	float:left;color:graytext;overflow:hidden;padding-left:20px;width:200px;
+}
+
+a.remarklink{
+	float:right;
+}
+
