@@ -3,6 +3,8 @@ class TargetedMessage extends DBMappedObject {
 	var $messagekey;
 	var $targetedmessagecategoryid;
 	var $overridemessagegroupid;
+	var $enabled;
+	var $deleted = 0;
 
 	function TargetedMessage ($id = NULL) {
 		$this->_allownulls = true;
