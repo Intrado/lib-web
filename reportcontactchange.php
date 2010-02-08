@@ -140,7 +140,7 @@ if($reload){
 
 $PAGE = "reports:reports";
 
-$TITLE = "Contact Destinations Changed";
+$TITLE = "Contact Information Changes";
 if(isset($_SESSION['reportid'])){
 	$subscription = new ReportSubscription($_SESSION['reportid']);
 	$TITLE .= " - " . escapehtml($subscription->name);

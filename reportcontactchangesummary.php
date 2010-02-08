@@ -297,7 +297,7 @@ if($error || $reportgenerator->format == "html"){
 	$reportgenerator->format = "html";
 	$reportgenerator->generateQuery();
 	$PAGE = "reports:reports";
-	$TITLE = "Contact Destination Changes";
+	$TITLE = "Contact Information Changes";
 	if(isset($_SESSION['reportid'])){
 		$subscription = new ReportSubscription($_SESSION['reportid']);
 		$TITLE .= " - " . escapehtml($subscription->name);
