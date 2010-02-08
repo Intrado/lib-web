@@ -278,22 +278,23 @@ echo "</select>" . icon_button("Done Picking Comments", "tick", null, "classroom
 								<div id="msgtxt-' . $message->id .'" class="msgtxt" >'
 								. $title .
 								' </div>
-								<img src="img/icons/fugue/marker.gif" alt="Mark" title="Mark this Comment" style="float:right;margin:2px" onclick="markcomment(\'' . $message->id .'\')" />
+								<img src="img/icons/fugue/marker.gif" alt="Mark" title="Mark this Comment" style="float:right;margin:2px" onclick="markcomment(\'msg-\',\'' . $message->id .'\')" />
 								<div style="clear:both;">' .
-									($USER->authorize('targetedcomment')?'<div id="remprev-' . $message->id .'" class="remarklink"></div><a href="#" class="remarklink">Remark</a>':'&nbsp;') .
+									($USER->authorize('targetedcomment')?'<div id="msgprem' . $message->id .'" class="remarklink"></div><a href="#" class="remarklink">Remark</a>':'&nbsp;') .
 								'</div>
-								<span id="com-' . $message->id .'" class="remark" style="display:none;">
+								<span id="msgrem' . $message->id .'" class="remark" style="display:none;">
 									<textarea class="remark"></textarea>
 									<a class="remark" href="#" onclick="saveComment(\''. $message->id .'\');false;">Done</a>
 								</span>
-								</div>';
+							  </div>';
 					}
 					echo '<div style="clear:both;"></div></div>';
 				}
 			?>
 
 				<div id="lib-search">
-					<div id="searchContainer" style="margin:10px;display:none;"><input id="searchbox" type="text" value="" size="50" style="float:left"/><?= icon_button("Search", "magnifier", 'dosearch(); return false;', null) ?></div>
+					<span id="nowedit-search" style="float:left;color:graytext;font-weight:lighter;font-style:italic;"></span>
+					<div id="searchContainer" style="clear:both;margin:10px;padding-top:10px;display:none;"><input id="searchbox" type="text" value="" size="50" style="float:left"/><?= icon_button("Search", "magnifier", 'dosearch(); return false;', null) ?></div>
 					<div id="searchResult" style="clear:both;"></div>
 				</div>
 
@@ -359,15 +360,21 @@ endWindow();
 	}
 
 	function clearcache() {
-		checkedcache.each(function(category) {
-			checkedcache.set(category.key,new Hash());
-		});
+		//checkedcache.each(function(category) {
+			//checkedcache.set(category.key,new Hash());
+		checkedcache = new Hash()
+
+		//});
 		checkedcontacts = new Hash();
+	}
+
+	function clearchecked() {
+		checkedmessages = new Hash();
 	}
 
 	function setcache(cache) {
 		cache.each(function(event) {
-			var people = checkedcache.get(event[0]);
+			var people = checkedcache;//.get(event[0]);
 			var contactid = event[1];
 
 			if(people.get(contactid) == undefined)
@@ -393,7 +400,7 @@ endWindow();
 
 	function setEvent(contactid,messageid,isChecked,comment) {
 		var category = tabs.currentSection.substr(4); // strip 'lib-'
-		var people = checkedcache.get(category);
+		var people = checkedcache;//.get(category);
 		if(people.get(contactid) == undefined){
 			people.set(contactid,new Hash());
 		}
@@ -420,7 +427,7 @@ endWindow();
 		}
 	}
 	 function saveComment(id) {
-		var text = $('com-' + id).down('textarea').getValue();
+		var text = $('msgrem' + id).down('textarea').getValue();
 		// Save event to database
 		new Ajax.Request('<?= $requesturl ?>',
 		{
@@ -433,7 +440,7 @@ endWindow();
 				checkedcontacts.each(function(contact) {
 					setEvent(contact.key,id,true,text);
 				});
-				$('com-' + id).hide();
+				$('msgrem' + id).hide();
 				$('msg-' + id).down('a').show();
 
 				remarkpreview(id,text);
@@ -445,29 +452,36 @@ endWindow();
 
 	// has link in this section only
 	function haslink(contact,message) {
-		if(checkedcache.get(tabs.currentSection).get(contact) == undefined || checkedcache.get(tabs.currentSection).get(contact).get(message) == undefined)
+		if(checkedcache.get(contact) == undefined || checkedcache.get(contact).get(message) == undefined)
 			return false;
 		return true;
 	}
 
 
-	function markcomment(id) {
+	function markcomment(prefix,id) {
+		var previous;
 		//var border = $('msg-' + id).getStyle('border-color');
 		if(markedcomment == id) {
-			$('msg-' + id).setStyle('border-color:silver');
+
+			previous = $(prefix + id);
+			$(prefix + id).setStyle('border-color:silver');
 			markedcomment = false;
 		} else {
 			if(markedcomment)
-				$('msg-' + markedcomment).setStyle('border-color:silver');
-			$('msg-' + id).setStyle('border-color:red');
+				previous = $(prefix + id);
+			$(prefix + id).setStyle('border-color:red');
 			markedcomment = id;
 		}
+		if(previous != undefined) {
+			previous.setStyle('border-color:silver');
+		}
+
 		markedcontacts.each(function(contact) {
 			$('c-' + contact.key).setStyle('border:0px');
 		});
 
 		if(markedcomment) {
-			checkedcache.get(tabs.currentSection.substr(4)).each(function(contact) {
+			checkedcache.each(function(contact) {
 				if(contact.value.get(markedcomment) != undefined) {
 					$('c-' + contact.key).setStyle('border:1px solid red;');
 					markedcontacts.set(contact.key,true);
@@ -478,99 +492,96 @@ endWindow();
 	function remarkpreview(id,remark) {
 		if(remark.length > 20)
 			remark = remark.substring(0, 20) + '...';
-		$('remprev-' + id).update(remark);
+		$('msgprem' + id).update(remark);
 	}
 
 	function dosearch() {
-			new Ajax.Request('<?= $requesturl ?>',
-				{
-					method:'get',
-					parameters: {search: $('searchbox').getValue()},
-					onSuccess: function(transport){
-						var response = transport.responseJSON || false;
-						if(response) {
-							var container = new Element('div');
-							$H(response).each(function(itm) {
-								//all += itm.key + " " + itm.value + '\n';
-								container.insert(
-									'<div id="msg-' + itm.key  + '" class="classroomcomment">' +
-									'<img id="msgchk-' + itm.key  + '" class="msgchk" src="img/checkbox-clear.png" alt=""/>' +
-									'<div id="msgtxt-' + itm.key  + '" class="msgtxt" >' + itm.value +
-									' </div>' +
-									'<img src="img/icons/fugue/marker.gif" alt="Mark" title="Mark this Comment" style="float:right;margin:2px" onclick="markcomment(\'' + itm.key + '\')" />' +
-									'<div style="clear:both;">' +
-									'</div>' +
-									'</div>'
-								);
-							});
-							container.insert('<div style="clear:both;"></div>');
-							$('searchResult').update(container);
-						} else {
-							$('searchResult').update('Not Found');
-						}
+		new Ajax.Request('<?= $requesturl ?>',
+			{
+				method:'get',
+				parameters: {search: $('searchbox').getValue()},
+				onSuccess: function(transport){
+					var response = transport.responseJSON || false;
+					if(response) {
+						var container = new Element('div');
+						var messages = $H(response);
+
+						messages.each(function(itm) {
+							//all += itm.key + " " + itm.value + '\n';
+							container.insert(
+								'<div id="smsg-' + itm.key  + '" class="classroomcomment">' +
+								'<img id="smsgchk-' + itm.key  + '" class="msgchk" src="img/checkbox-clear.png" alt=""/>' +
+								'<div id="smsgtxt-' + itm.key  + '" class="msgtxt" >' + itm.value +
+								' </div>' +
+								'<img src="img/icons/fugue/marker.gif" alt="Mark" title="Mark this Comment" style="float:right;margin:2px" onclick="markcomment(\'smsg-\',\'' + itm.key + '\')" />' +
+								'<div style="clear:both;">' +
+									(hascomments?'<div id="smsgprem' + itm.key + '" class="remarklink"></div><a href="#" class="remarklink">Remark</a>':'&nbsp;') +
+								'</div>' +
+								'<span id="smsgrem' + itm.key + '" class="remark" style="display:none;">' +
+									'<textarea class="remark"></textarea>' +
+									'<a class="remark" href="#" onclick="saveComment(\'' + itm.key + '\');false;">Done</a>' +
+								'</span>' +
+								'</div>'
+							);
+						});
+
+						container.insert('<div style="clear:both;"></div>');
+						$('searchResult').update(container);
+						
+						messages.each(function(itm) {
+							$('smsg-' + itm.key).observe('click',messageclick);
+						});
+
+						updatemessages('lib-search','lib-search');
+					} else {
+						$('searchResult').update('Not Found');
 					}
-				});
+				}
+			});
 	}
 
 
-	function updatemessages(currenttab) {
-		if(currenttab == 'lib-search')
-			return
+	function updatemessages(currenttab,nexttab) {
+		var c_prefix = currenttab == 'lib-search'?'smsg':'msg';
+		var n_prefix = nexttab == 'lib-search'?'smsg':'msg';
 
-		var category = currenttab.substr(4);
+		var category = nexttab.substr(4);
 		var contactsize = checkedcontacts.size();
 
 		// Get all contact-message links from cache
 
 		// Reset all previous message selections
 		checkedmessages.each(function(msg) {
-			var target = $('msg-' + msg.key);
-			target.setStyle("height:4.5em;background:" + c_none);
-			$('msgtxt-' + msg.key).setStyle('height:3em;');
 
-			var target = target.down('img');
-			target.src = getstatesrc(0);
-			if(hascomments) {
-				target = $('remprev-' + msg.key);
-				target.update('')
-				target = target.next('a');
-				target.show();
-				target.update('Remark');
+			var target = $(c_prefix + '-' + msg.key);
+			if(target != undefined) {
+				target.setStyle("height:4.5em;background:" + c_none);
+				$(c_prefix + 'txt-' + msg.key).setStyle('height:3em;');
+
+				var target = target.down('img');
+				target.src = getstatesrc(0);
+				if(hascomments) {
+					target = $(c_prefix + 'prem' + msg.key);
+					target.update('');
+					target = target.next('a');
+					target.show();
+					target.update('Remark');
+				}
+				target =  $(c_prefix + 'rem' + msg.key);
+				target.hide();
+				target = target.down('textarea');
+				target.stopObserving();
+				target.setStyle({color: "black"});
+				target.value = "";
+
+				//checkedmessages.unset(msg.key);
+
 			}
-			target =  $('com-' + msg.key);
-			target.hide();
-			target = target.down('textarea');
-			target.stopObserving();
-			target.setStyle({color: "black"});
-			target.value = "";
-
-
-			checkedmessages.unset(msg.key);
 		});
 
-		if(contactsize == 1) {
-			checkedcontacts.each(function(contact) {
-				$('nowedit-' + category).update('Now Editing: ' +  $('c-' + contact.key).innerHTML);
-				var messages = checkedcache.get(category).get(contact.key)
-				if(messages != undefined) {
-					messages.each(function(msg) {
-						var target = $('msg-' + msg.key);
-						target.style.background = c_selected;
-						var target = target.down('img');
-						target.src = getstatesrc(2);
-						if(hascomments && msg.value != "") {
-							target = $('com-' + msg.key);
-							target.down('textarea').value = msg.value;
-							remarkpreview(msg.key,msg.value);
-						} //else {
-						//	$('msg-' + msg.key).setStyle('height4.5em;');
-						//}
-						checkedmessages.set(msg.key,2);
-					});
-				}
-			});
-			return;
-		}
+		clearchecked();
+
+
 
 
 		var selectedmessages = new Hash();
@@ -578,19 +589,21 @@ endWindow();
 		var newcontct = false;
 		var nowedit = "";
 		checkedcontacts.each(function(contact) {
-			var messages = checkedcache.get(category).get(contact.key)
+			var messages = checkedcache.get(contact.key)
 			nowedit += ', ' + $('c-' + contact.key).innerHTML;
 			if(messages != undefined) {
 				messages.each(function(msg) {
-					var count = selectedmessages.get(msg.key) || 0;
-					count++;
-					selectedmessages.set(msg.key,count);
+					if($(n_prefix + '-' + msg.key) != undefined) { // if searchtab is selected this may be undefined
+						var count = selectedmessages.get(msg.key) || 0;
+						count++;
+						selectedmessages.set(msg.key,count);
 
-					var comment = selectedcomments.get(msg.key) || false;
-					if((msg.value != "" && msg.value === comment) || (comment === false && count == 1)) {
-						selectedcomments.set(msg.key,msg.value);
-					} else if((comment !== false && msg.value !== comment) || (comment === false && count > 1)) {
-						selectedcomments.set(msg.key,true);
+						var comment = selectedcomments.get(msg.key) || false;
+						if((msg.value != "" && msg.value === comment) || (comment === false && count == 1)) {
+							selectedcomments.set(msg.key,msg.value);
+						} else if((comment !== false && msg.value !== comment) || (comment === false && count > 1)) {
+							selectedcomments.set(msg.key,true);
+						}
 					}
 				});
 			} else {
@@ -602,7 +615,7 @@ endWindow();
 
 		// Set all contact-message link boxes
 		selectedmessages.each(function(msg) {
-			var target = $('msg-' + msg.key);
+			var target = $(n_prefix + '-' + msg.key);
 			target.style.background = c_selected;
 			target = target.down('img');
 			if(msg.value == contactsize) {
@@ -614,7 +627,7 @@ endWindow();
 			}
 			if(hascomments) {
 				var comment = selectedcomments.get(msg.key) || false;
-				var textarea = $('com-' + msg.key).down('textarea');
+				var textarea = $(n_prefix + 'rem' + msg.key).down('textarea');
 				if(comment === false) {
 					textarea.value = "";
 					remarkpreview(msg.key,"");
@@ -627,10 +640,10 @@ endWindow();
 				} else {
 					textarea.value = comment;
 					remarkpreview(msg.key,comment);
-					//$('com-' + msg.key).show();
+					//$('msgrem' + msg.key).show();
 				}
 			}
-			//$('com-' + msg.key).hide();
+			//$('msgrem' + msg.key).hide();
 		});
 	}
 	
@@ -717,9 +730,8 @@ endWindow();
 								searchBox.focus();
 								searchBox.blur();
 							}
-
 							// ==================================
-							updatemessages(tabs.currentSection);
+							updatemessages(tabs.currentSection,tabs.currentSection);
 					});
 
 
@@ -769,188 +781,194 @@ endWindow();
 		});
 	}
 
-document.observe("dom:loaded", function() {
-	
-	getclass($('classselect').getValue());
-
-	$('picker').observe("selectstart", function(event) {          // disable select in IE
-		if(!(event.target.hasClassName('remark') || event.target.id == "searchbox"))
-			event.stop();
-		$('searchbox').blur();
-	});
-	$('picker').observe("mousedown", function(event) {			  // disable select in FF
-		if(!(event.target.hasClassName('remark') || event.target.id == "searchbox"))
-			event.stop();
-		$('searchbox').blur();
-	});
-	
-	/*
-	 * Static observers
-	 */
-	$('checkall').observe('click', function(event) {
+	function messageclick(event) {
 		event.stop();
-		$$('#contactbox a').each(function(contact) {
-			//contact.style.background = "#ffcccc";
-			contact.setStyle('font-weight:bold');
-			checkedcontacts.set(contact.id.substr(2),true);
-		});
-		if(revealmessages) {
-			$('theinstructions').hide();
-			revealmessages = false; 
-			$('tabsContainer').show();
-			$('searchContainer').show();
+		var htmlid = this.id;  // html id: message-category-mid
+		var c_prefix = this.id.substr(0,4) == "smsg"?"smsg":"msg";
+		var msgid = this.id.substr(c_prefix == "smsg"?5:4);
 
+		var state = checkedmessages.get(msgid) || 0;
+		if(event.target.hasClassName('remarklink')) {
+
+			$(c_prefix + 'txt-' + msgid).setStyle('height:auto');
+			event.target.hide();
+			$(htmlid).setStyle('height:auto');
+			var target = $(c_prefix + 'rem' + msgid);
+			target.show();
+			$(c_prefix + 'prem' + msgid).update('');
+			target = target.down('textarea');
+			target.focus();
+			target.blur();
+			if(state == 2) {
+				return;
+			}
 		}
-		updatemessages(tabs.currentSection);
-	}.bindAsEventListener($('contactbox')));
+		// Don't modify anything if writing a comment'
+	//	if(!event.target.hasClassName('remark')) {
+		if(event.target.hasClassName('msgtxt') || event.target.hasClassName('msgchk') || event.target.hasClassName('remarklink')) {
 
-	$('classselect').observe('change', function(event) {
-		event.stop();
-		getclass(event.element().getValue());
-	});
-
-	$$('#libraryContent .classroomcomment').each(function(message) {
-		message.observe('click', function(event) {
-			event.stop();
-
-			var htmlid = this.id;  // html id: message-category-mid
-			var msgid = this.id.substr(4);  // strip 'msg-'
-			var state = checkedmessages.get(msgid) || 0;
-			if(event.target.hasClassName('remarklink')) {
-
-				$('msgtxt-' + msgid).setStyle('height:auto');
-				event.target.hide();
-				$(htmlid).setStyle('height:auto');	
-				var target = $('com-' + msgid);
-				target.show();
-				$('remprev-' + msgid).update('');
-				target = target.down('textarea');
-				target.focus();
-				target.blur();
-				if(state == 2) {
+			state = (state == 2)? 0 : 2;
+			var textarea = $(c_prefix + 'rem' + msgid).down('textarea');
+			if((state == 0) && hascomments && textarea.getValue() != "") {
+				if(!confirm('The custom remark will be removed if unselecting.'))
 					return;
+				else {
+					textarea.value = "";
+					$(c_prefix + 'prem' + msgid).update("");
+					textarea.stopObserving();
 				}
 			}
-			// Don't modify anything if writing a comment'
-		//	if(!event.target.hasClassName('remark')) {
-			if(event.target.hasClassName('msgtxt') || event.target.hasClassName('msgchk') || event.target.hasClassName('remarklink')) {
 
-				state = (state == 2)? 0 : 2;
+			// Save event to database
+			new Ajax.Request('<?= $requesturl ?>',
+			{
+				method:'post',
+				parameters: {eventContacts: checkedcontacts.keys().toJSON(),
+							eventMessage: msgid,
+							isChecked:(state == 2)},
+				onFailure: function(){ alert('Unable to Set Message') },
+				onException: function(){ alert('Unable to Set Message') },
+				onSuccess: function(transport){
+					$(htmlid).down('img').src = getstatesrc(state);
+					checkedmessages.set(msgid,state);                  // Set Message to appropriate state
+					// Set each selected contact to
 
-				var textarea = $('com-' + msgid).down('textarea');
-				if((state == 0) && hascomments && textarea.getValue() != "") {
-					if(!confirm('The custom remark will be removed if unselecting.'))
-						return;
-					else {
-						textarea.value = "";
-						$('remprev-' + msgid).update("");
-						textarea.stopObserving();
+					if(state == 2) {
+						$(htmlid).style.background = c_selected;
+					} else {
+						$(htmlid).setStyle('height:4.5em;background:' + c_none);
+						$(c_prefix + 'txt-' + msgid).setStyle('height:3em;');
+						$(htmlid).down('span').hide();
+						$(htmlid).down('a').show();
 					}
-				}
 
-				// Save event to database
-				new Ajax.Request('<?= $requesturl ?>',
-				{
-					method:'post',
-					parameters: {eventContacts: checkedcontacts.keys().toJSON(),
-								eventMessage: msgid,
-								isChecked:(state == 2)},
-					onFailure: function(){ alert('Unable to Set Message') },
-					onException: function(){ alert('Unable to Set Message') },
-					onSuccess: function(transport){
-						$(htmlid).down('img').src = getstatesrc(state);
-						checkedmessages.set(msgid,state);                  // Set Message to appropriate state
-						// Set each selected contact to
 
+
+					checkedcontacts.each(function(contact) {
 						if(state == 2) {
-							$(htmlid).style.background = c_selected;
-						} else {
-							$(htmlid).setStyle('height:4.5em;background:' + c_none);
-							$('msgtxt-' + msgid).setStyle('height:3em;');
-							$(htmlid).down('span').hide();
-							$(htmlid).down('a').show();
-						}
-
-
-
-						checkedcontacts.each(function(contact) {
-							if(state == 2) {
-								highlightedcontacts.set('c-' + contact.key,true);
-								if(markedcomment == msgid) {
-									markedcontacts.set(contact.key,true);
-									$('c-' + contact.key).setStyle('border:1px solid red;');
-								}
-
-								//$('c-' + contact.key).style.background =  c_hover;
-							} else {
-								if(markedcomment == msgid) {
-									markedcontacts.unset(contact.key);
-									$('c-' + contact.key).setStyle('border:0px;');
-								}
-
-								highlightedcontacts.unset('c-' + contact.key);
-								//$('c-' + contact.key).style.background =  c_none;
-
+							highlightedcontacts.set('c-' + contact.key,true);
+							if(markedcomment == msgid) {
+								markedcontacts.set(contact.key,true);
+								$('c-' + contact.key).setStyle('border:1px solid red;');
 							}
-							setEvent(contact.key,msgid,(state == 2),"");
-						});
+
+							//$('c-' + contact.key).style.background =  c_hover;
+						} else {
+							if(markedcomment == msgid) {
+								markedcontacts.unset(contact.key);
+								$('c-' + contact.key).setStyle('border:0px;');
+							}
+
+							highlightedcontacts.unset('c-' + contact.key);
+							//$('c-' + contact.key).style.background =  c_none;
+
+						}
+						setEvent(contact.key,msgid,(state == 2),"");
+					});
+				}
+			});
+		}
+	};
+
+
+
+
+
+
+
+	document.observe("dom:loaded", function() {
+
+		getclass($('classselect').getValue());
+
+		$('picker').observe("selectstart", function(event) {          // disable select in IE
+			if(!(event.target.hasClassName('remark') || event.target.id == "searchbox"))
+				event.stop();
+			$('searchbox').blur();
+		});
+		$('picker').observe("mousedown", function(event) {			  // disable select in FF
+			if(!(event.target.hasClassName('remark') || event.target.id == "searchbox"))
+				event.stop();
+			$('searchbox').blur();
+		});
+
+		/*
+		 * Static observers
+		 */
+		$('checkall').observe('click', function(event) {
+			event.stop();
+			$$('#contactbox a').each(function(contact) {
+				//contact.style.background = "#ffcccc";
+				contact.setStyle('font-weight:bold');
+				checkedcontacts.set(contact.id.substr(2),true);
+			});
+			if(revealmessages) {
+				$('theinstructions').hide();
+				revealmessages = false;
+				$('tabsContainer').show();
+				$('searchContainer').show();
+
+			}
+			updatemessages(tabs.currentSection,tabs.currentSection);
+		}.bindAsEventListener($('contactbox')));
+
+		$('classselect').observe('change', function(event) {
+			event.stop();
+			getclass(event.element().getValue());
+		});
+
+		$$('#libraryContent .classroomcomment').each(function(message) {
+			message.observe('click', messageclick);
+
+			message.observe('mouseover', function(event) {
+				event.stop();
+				var htmlid = this.id;
+				var msgid = this.id.substr(4);  // strip 'msg-'
+				var category = tabs.currentSection;
+				if(category == 'lib-search')
+					return
+				var category = category.substr(4);
+
+				//$(htmlid).style.background = c_hover;
+				checkedcache.each(function(contact) {
+					if(contact.value.get(msgid) != undefined) {
+						//$('i-c-' + contact.key).src = h_image;
+						//$('c-' + contact.key).style.background =  c_hover;
+						//$('c-' + contact.key + '-' + category).pulsate({pulses:2, from:0.5, duration: 1.5});
+						var img = $('c-' + contact.key + '-' + category);
+
+
+						Effect.Queues.get(img.id).each(function(effect) { effect.cancel(); });
+
+						new Effect.Pulsate(img,{pulses:2, from:0.5, duration: 1.5, queue: { position: 'end', scope: img.id }});
+
+	//					new Effect.Opacity(img,{duration: 0.25, from:1, to:0.5, queue: { position: 'end', scope: img.id }});
+	//					new Effect.Opacity(img,{duration: 0.25, from:0.5, to:1, queue: { position: 'end', scope: img.id }});
+
+
+						highlightedcontacts.set('c-' + contact.key,true);
 					}
 				});
-			}
-		});
-
-
-		message.observe('mouseover', function(event) {
-			event.stop();
-			var htmlid = this.id;
-			var msgid = this.id.substr(4);  // strip 'msg-'
-			var category = tabs.currentSection;
-			if(category == 'lib-search')
-				return
-			var category = category.substr(4);
-
-			//$(htmlid).style.background = c_hover;
-			checkedcache.get(tabs.currentSection.substr(4)).each(function(contact) {
-				if(contact.value.get(msgid) != undefined) {
-					//$('i-c-' + contact.key).src = h_image;
-					//$('c-' + contact.key).style.background =  c_hover;
-					//$('c-' + contact.key + '-' + category).pulsate({pulses:2, from:0.5, duration: 1.5});
-					var img = $('c-' + contact.key + '-' + category);
-
-
-					Effect.Queues.get(img.id).each(function(effect) { effect.cancel(); });
-
-					new Effect.Pulsate(img,{pulses:2, from:0.5, duration: 1.5, queue: { position: 'end', scope: img.id }});
-
-//					new Effect.Opacity(img,{duration: 0.25, from:1, to:0.5, queue: { position: 'end', scope: img.id }});
-//					new Effect.Opacity(img,{duration: 0.25, from:0.5, to:1, queue: { position: 'end', scope: img.id }});
-
-
-					highlightedcontacts.set('c-' + contact.key,true);
-				}
 			});
 
-		});
+			message.observe('mouseout', function(event) {
+				event.stop();
+				var category = tabs.currentSection;
+				if(category == 'lib-search')
+					return
+				var category = category.substr(4);
 
-		message.observe('mouseout', function(event) {
-			event.stop();
-			var category = tabs.currentSection;
-			if(category == 'lib-search')
-				return
-			var category = category.substr(4);
+				//$(this.id).style.background = c_none;
+				highlightedcontacts.each(function(contact) {
+					//$('i-' + contact.key).src = 'img/pixel.gif';
+					//$(contact.key).style.background =  c_none;
+					var img = $(contact.key + '-' + category);
 
-			//$(this.id).style.background = c_none;
-			highlightedcontacts.each(function(contact) {
-				//$('i-' + contact.key).src = 'img/pixel.gif';
-				//$(contact.key).style.background =  c_none;
-				var img = $(contact.key + '-' + category);
-
-				Effect.Queues.get(img.id).each(function(effect) { effect.cancel();});
-				img.style.opacity = 1.0;
-				//$(contact.key + '-' + category).setStyle('opacity:1.0');
-				highlightedcontacts.unset(contact.key);
+					Effect.Queues.get(img.id).each(function(effect) { effect.cancel();});
+					img.style.opacity = 1.0;
+					//$(contact.key + '-' + category).setStyle('opacity:1.0');
+					highlightedcontacts.unset(contact.key);
+				});
 			});
-		});
 
 
 
@@ -1010,7 +1028,11 @@ document.observe("dom:loaded", function() {
 	tabs.show_section('lib-' + categoryinfo.keys().first());
 
 	tabs.container.observe('Tabs:ClickTitle', function(event) {
-		updatemessages(event.memo.section);
+		if(event.memo.currentSection == 'lib-search' || event.memo.section == 'lib-search')
+			updatemessages(event.memo.currentSection,event.memo.section);
+		else{
+			$('nowedit-' + event.memo.section.substr(4)).update($('nowedit-' + event.memo.currentSection.substr(4)).innerHTML);
+		}
 	});
 	var searchBox = $('searchbox');
 	blankFieldValue(searchBox, "Search Comments");
