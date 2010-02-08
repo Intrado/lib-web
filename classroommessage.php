@@ -151,7 +151,7 @@ if (isset($_GET['search'])) {
 
 	error_log($searchcount);
 
-	$messages = DBFindMany("TargetedMessage","from targetedmessage where enabled = 1");
+	$messages = DBFindMany("TargetedMessage","from targetedmessage where enabled = 1 order by targetedmessagecategoryid");
 
 	if(file_exists($contentfile))
 		include_once($contentfile);
@@ -172,9 +172,13 @@ if (isset($_GET['search'])) {
 //		while($i < $searchcount && stripos($title,$searchwords[$i]) !== false) {$i++;}
 
 		for($i = 0;$i < $searchcount && (trim($searchwords[$i]) == "" || stripos($title,trim($searchwords[$i])) !== false);$i++);
-		if($i == $searchcount)
-			$response[$message->id] = $title;
+		if($i == $searchcount) {
+			$obj = null;
+			$obj->title = $title;
+			$obj->categoryid = $message->targetedmessagecategoryid;
 
+			$response[$message->id] = $obj;
+		}
 //		if(stripos($title,$_GET['search']) !== false) {
 //			$response[$message->id] = $title;
 //		}
@@ -272,7 +276,6 @@ echo "</select>" . icon_button("Done Picking Comments", "tick", null, "classroom
 						} else {
 							$title = ""; // Could not find message for this message key.
 						}
-						// TODO make proper css
 						echo '<div id="msg-' . $message->id .'" class="classroomcomment">
 								<img id="msgchk-' . $message->id .'" class="msgchk" src="img/checkbox-clear.png" alt=""/>
 								<div id="msgtxt-' . $message->id .'" class="msgtxt" >'
@@ -427,7 +430,8 @@ endWindow();
 		}
 	}
 	 function saveComment(id) {
-		var text = $('msgrem' + id).down('textarea').getValue();
+		var prefix = tabs.currentSection == 'lib-search'?'smsg':'msg';
+		var text = $(prefix+ 'rem' + id).down('textarea').getValue();
 		// Save event to database
 		new Ajax.Request('<?= $requesturl ?>',
 		{
@@ -440,12 +444,12 @@ endWindow();
 				checkedcontacts.each(function(contact) {
 					setEvent(contact.key,id,true,text);
 				});
-				$('msgrem' + id).hide();
-				$('msg-' + id).down('a').show();
+				$(prefix + 'rem' + id).hide();
+				$(prefix + '-' + id).down('a').show();
+				$(prefix + '-' + id).setStyle("height:4.5em;")
+				$(prefix + 'txt-' + id).setStyle("height:3em;")
+				remarkpreview(prefix,id,text);
 
-				remarkpreview(id,text);
-				$('msg-' + id).setStyle("height:4.5em;")
-				$('msgtxt-' + id).setStyle("height:3em;")
 			}
 		});
 	 }
@@ -460,22 +464,20 @@ endWindow();
 
 	function markcomment(prefix,id) {
 		var previous;
-		//var border = $('msg-' + id).getStyle('border-color');
 		if(markedcomment == id) {
-
 			previous = $(prefix + id);
 			$(prefix + id).setStyle('border-color:silver');
 			markedcomment = false;
 		} else {
 			if(markedcomment)
-				previous = $(prefix + id);
+				previous = $(prefix + markedcomment);
 			$(prefix + id).setStyle('border-color:red');
 			markedcomment = id;
 		}
+
 		if(previous != undefined) {
 			previous.setStyle('border-color:silver');
 		}
-
 		markedcontacts.each(function(contact) {
 			$('c-' + contact.key).setStyle('border:0px');
 		});
@@ -489,10 +491,10 @@ endWindow();
 			});
 		}		
 	}
-	function remarkpreview(id,remark) {
+	function remarkpreview(prefix,id,remark) {
 		if(remark.length > 20)
 			remark = remark.substring(0, 20) + '...';
-		$('msgprem' + id).update(remark);
+		$(prefix + 'prem' + id).update(remark);
 	}
 
 	function dosearch() {
@@ -505,13 +507,22 @@ endWindow();
 					if(response) {
 						var container = new Element('div');
 						var messages = $H(response);
+						var prevcategory = false;
 
 						messages.each(function(itm) {
 							//all += itm.key + " " + itm.value + '\n';
+							if(itm.value.categoryid != prevcategory) {
+								var cat = categoryinfo.get(itm.value.categoryid);
+								container.insert('<div style="clear:both;padding-top:5px"><h3><img src="' + cat.img + '"/>&nbsp;'+ cat.name +'</h3></div>');
+								prevcategory = itm.value.categoryid;
+							}
+
+
+
 							container.insert(
 								'<div id="smsg-' + itm.key  + '" class="classroomcomment">' +
 								'<img id="smsgchk-' + itm.key  + '" class="msgchk" src="img/checkbox-clear.png" alt=""/>' +
-								'<div id="smsgtxt-' + itm.key  + '" class="msgtxt" >' + itm.value +
+								'<div id="smsgtxt-' + itm.key  + '" class="msgtxt" >' + itm.value.title +
 								' </div>' +
 								'<img src="img/icons/fugue/marker.gif" alt="Mark" title="Mark this Comment" style="float:right;margin:2px" onclick="markcomment(\'smsg-\',\'' + itm.key + '\')" />' +
 								'<div style="clear:both;">' +
@@ -630,16 +641,16 @@ endWindow();
 				var textarea = $(n_prefix + 'rem' + msg.key).down('textarea');
 				if(comment === false) {
 					textarea.value = "";
-					remarkpreview(msg.key,"");
+					remarkpreview(n_prefix,msg.key,"");
 				} else if(comment === true || newcontct == true ) {
 					textarea.value = "";
 					// Add multiple remark notice
-					remarkpreview(msg.key,'  * Multiple Remarks')
-					blankFieldValue(textarea, "* Multiple Remarks. \nTyping a new remark here will overwrite.");
+					remarkpreview(n_prefix,msg.key,'  * Multiple Remarks')
+					//blankFieldValue(textarea, "* Multiple Remarks. \nTyping a new remark here will overwrite.");
 					//textarea.next('span').show();
 				} else {
 					textarea.value = comment;
-					remarkpreview(msg.key,comment);
+					remarkpreview(n_prefix,msg.key,comment);
 					//$('msgrem' + msg.key).show();
 				}
 			}
@@ -1035,10 +1046,14 @@ endWindow();
 		}
 	});
 	var searchBox = $('searchbox');
+
+	searchBox.observe('keypress', function(event) {
+		if (Event.KEY_RETURN == event.keyCode)
+			dosearch();
+	});
+
 	blankFieldValue(searchBox, "Search Comments");
 });
-
-
 
 </script>
 <?
