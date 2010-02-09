@@ -686,6 +686,7 @@ var RuleEditor = Class.create({
 			case 'association':
 				// fall through, shares cache and ajax call with multisearch
 			case 'multisearch':
+				container.setStyle({'border': 'solid 1px gray', 'background': 'white'});
 				container.update('<img src="img/ajax-loader.gif"/>');
 				if (this.ruleWidget.multisearchDomCache[fieldnum]) {
 					var multicheckboxDom = this.ruleWidget.multisearchDomCache[fieldnum];
@@ -706,6 +707,7 @@ var RuleEditor = Class.create({
 							var data = transport.responseJSON;
 							if (!data) {
 								container.update('<?=addslashes(_L("No data found"))?>');
+								return;
 							}
 							
 							if (type == 'association')
@@ -713,7 +715,7 @@ var RuleEditor = Class.create({
 							
 							var multicheckboxDom = this.make_multicheckbox(data);
 							this.ruleWidget.multisearchDomCache[fieldnum] = multicheckboxDom;
-							container = new Element('div').update(multicheckboxDom);
+							container.update(multicheckboxDom);
 							section.update(this.add_multicheckbox_toolbar(container));
 						}.bindAsEventListener(this, fieldnum, type)
 					});
@@ -873,8 +875,8 @@ var RuleEditor = Class.create({
 					checkboxes[i].checked = false;
 				}
 			}.bindAsEventListener(multicheckboxContainer));
-			multicheckboxContainer.down('div').insert({top:new Element('div').insert(checkAll).insert(clear).insert('<div style="width:130px;height:1px;clear:both"></div>')});
 			multicheckboxContainer.down('.MultiCheckbox').style.height = '300px';
+			multicheckboxContainer.insert({top:new Element('div').insert(checkAll).insert(clear).insert('<div style="width:130px;height:1px;clear:both"></div>')});
 		}
 		
 		return multicheckboxContainer;
@@ -884,7 +886,7 @@ var RuleEditor = Class.create({
 	// Returns a div element containing the values as checkboxes, or returns a select element with a single option if there's just one value.
 	make_multicheckbox: function(values) {
 		multicheckbox = new Element('div', {
-			'style': 'border: solid 1px gray; background: white; overflow:hidden;',
+			'style': 'overflow:auto',
 			'class': 'MultiCheckbox'
 		});
 		
