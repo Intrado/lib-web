@@ -273,7 +273,7 @@ if(CheckFormSubmit($f,"Save") || CheckFormSubmit($f, "Return")) {
 				if($maxusers == "")
 					$maxusers = "unlimited";
 				setCustomerSystemSetting('_maxusers', $maxusers, $custdb);
-				setCustomerSystemSetting('hasldap', $hasldap, $custdb);
+				setCustomerSystemSetting('_hasldap', $hasldap, $custdb);
 				setCustomerSystemSetting('_hassms', $hassms, $custdb);
 				setCustomerSystemSetting('enablesmsoptin', $enablesmsoptin, $custdb);
 				setCustomerSystemSetting('smscustomername', $smscustomername, $custdb);
@@ -428,7 +428,7 @@ if( $reloadform ) {
 	PutFormData($f,$s,"managernote", $custinfo[8], "text", 0, 255);
 
 	// LDAP
-	PutFormData($f,$s,"hasldap", getCustomerSystemSetting('hasldap', false, true, $custdb), "bool", 0, 1);
+	PutFormData($f,$s,"hasldap", getCustomerSystemSetting('_hasldap', false, true, $custdb), "bool", 0, 1);
 	// TODO pick a disk agent, store in 'authdiskuuid'
 	
 	// SMS

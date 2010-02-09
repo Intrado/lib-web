@@ -212,7 +212,7 @@ foreach ($customers as $cust) {
 
 		if (getCustomerSystemSetting('_hasportal', false, true, $custdb))
 			$customerfeatures[] = "ContactMgr";
-		if (getCustomerSystemSetting('hasldap', false, true, $custdb))
+		if (getCustomerSystemSetting('_hasldap', false, true, $custdb))
 			$customerfeatures[] = "LDAP";
 		if (getCustomerSystemSetting('_hassms', false, true, $custdb))
 			$customerfeatures[] = "SMS";

@@ -125,7 +125,7 @@ if (getSystemSetting('_hascallback', '0') && !getSystemSetting('_hasselfsignup',
 	);
 }
 
-if (getSystemSetting('hasldap', '0')) {
+if (getSystemSetting('_hasldap', '0')) {
 	$helpsteps[$helpstepnum++] = array(_L("Enter the hostname or IP address of your LDAP server."));
 	$formdata["ldaphost"] = array(
 		"label" => _L("LDAP Host"),
@@ -228,7 +228,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 			setSystemSetting('msgcallbackrequireid', '0');
 		}
 		
-		if (getSystemSetting('hasldap', '0')) {
+		if (getSystemSetting('_hasldap', '0')) {
 			setSystemSetting('ldaphost', $postdata['ldaphost']);
 			setSystemSetting('ldapport', $postdata['ldapport']);
 			setSystemSetting('ldapuser', $postdata['ldapuser']);
