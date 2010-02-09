@@ -136,8 +136,8 @@ if($result == ""){
 	$generator->generateQuery(true); // hackPDF to set g01-g10 as f21-f30
 	echo "finished generating query\n";
 	
-	// special case contact change report, CSV only (all others PDF)
-	if ($options['reporttype'] == 'contactchangereport') {
+	// is output CSV or PDF
+	if (isset($options['outputtype']) && ($options['outputtype'] == 'csv')) {
 		$generator->format = "csv";
 		$result = $generator->runCSV($params);
 		if ($result) {
