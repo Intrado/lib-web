@@ -91,9 +91,12 @@ function createLimitedUser($limitedusername, $limitedpassword, $custdbname, $sha
 	$tables['jobtype'] 		= "select";
 	$tables['message'] 		= "select";
 	$tables['messageattachment'] = "select";
+	$tables['messagegroup'] = "select";
 	$tables['messagepart'] 	= "select";
+	$tables['organization'] = "select";
 	$tables['persondatavalues'] = "select";
 	$tables['person'] 		= "select, update";
+	$tables['personassociation'] = "select, insert, update, delete";
 	$tables['phone'] 		= "select, update";
 	$tables['reportperson'] = "select";
 	$tables['setting'] 		= "select";
