@@ -1,5 +1,6 @@
 <?
 require_once("common.inc.php");
+require_once("../obj/Person.obj.php");
 require_once("../obj/PeopleList.obj.php");
 require_once("../obj/Message.obj.php");
 require_once("../obj/JobType.obj.php");
@@ -8,6 +9,8 @@ include_once("../obj/ListEntry.obj.php");
 include_once("../obj/RenderedList.obj.php");
 include_once("../obj/FieldMap.obj.php");
 include_once("../obj/Language.obj.php");
+require_once("../obj/Organization.obj.php");
+require_once("../obj/Section.obj.php");
 
 if (!$USER->authorize('sendphone')) {
 	header("Location: $URL/index.php");

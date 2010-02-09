@@ -46,8 +46,8 @@ $job->setOptionValue("retry",$_SESSION['newjob']['retries']);
 
 $job->enddate = date("Y-m-d", strtotime($job->startdate) + (($_SESSION['newjob']['numdays'] - 1) * 86400));
 
-$job->type="phone";
-$job->phonemessageid = $_SESSION['newjob']['message'];
+$job->type="notification";
+$job->messagegroupid = $_SESSION['newjob']['message'];
 
 $job->create();
 

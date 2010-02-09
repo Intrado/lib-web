@@ -5,6 +5,9 @@ include_once("../inc/utils.inc.php");
 include_once("../obj/SpecialTask.obj.php");
 require_once("../obj/Phone.obj.php");
 include_once("../obj/Language.obj.php");
+require_once("../obj/Organization.obj.php");
+require_once("../obj/Section.obj.php");
+
 
 if (!$USER->authorize('sendphone')) {
 	header("Location: $URL/index.php");
@@ -26,8 +29,8 @@ if (isset($_GET['dn'])) {
 	$_SESSION['newjob']['retries'] = max($_SESSION['newjob']['retries'],$ACCESS->getValue('callmax'));
 
 	//put in the special task
-
 	$task = new SpecialTask();
+	$task->userid = $USER->id;
 	$task->type = 'EasyCall';
 
 	$task->setData('phonenumber', $_SESSION['dn']);
@@ -36,6 +39,7 @@ if (isset($_GET['dn'])) {
 
 	$task->setData('origin', "cisco");
 	$task->setData('userid', $USER->id);
+
 	$task->setData('listid', $_SESSION['newjob']['list']);
 	$task->setData('jobtypeid', $_SESSION['newjob']['jobtypeid']);
 

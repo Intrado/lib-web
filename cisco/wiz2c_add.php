@@ -2,6 +2,7 @@
 require_once("common.inc.php");
 require_once("../obj/Person.obj.php");
 require_once("../obj/Phone.obj.php");
+require_once("../obj/Person.obj.php");
 require_once("../obj/PeopleList.obj.php");
 include_once("../obj/Rule.obj.php");
 include_once("../obj/ListEntry.obj.php");

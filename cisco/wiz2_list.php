@@ -1,5 +1,6 @@
 <?
 require_once("common.inc.php");
+require_once("../obj/Person.obj.php");
 require_once("../obj/PeopleList.obj.php");
 
 if (!$USER->authorize('sendphone')) {
