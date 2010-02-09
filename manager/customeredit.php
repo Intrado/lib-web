@@ -282,7 +282,7 @@ if(CheckFormSubmit($f,"Save") || CheckFormSubmit($f, "Return")) {
 				setCustomerSystemSetting('_hassurvey', GetFormData($f, $s, 'hassurvey'), $custdb);
 				setCustomerSystemSetting('_hascallback', GetFormData($f, $s, 'hascallback'), $custdb);
 				setCustomerSystemSetting('callbackdefault', GetFormData($f, $s, 'callbackdefault'), $custdb);
-				setCustomerSystemSetting('hastargetedmessage', GetFormData($f, $s, 'hastargetedmessage'), $custdb);
+				setCustomerSystemSetting('_hastargetedmessage', GetFormData($f, $s, 'hastargetedmessage'), $custdb);
 				setCustomerSystemSetting('_hasselfsignup', $hasselfsignup, $custdb);
 				setCustomerSystemSetting('_timeslice', GetFormData($f, $s, 'timeslice'), $custdb);
 
@@ -441,7 +441,7 @@ if( $reloadform ) {
 	PutFormData($f,$s,"hasselfsignup", getCustomerSystemSetting('_hasselfsignup', false, true, $custdb), "bool", 0, 1);
 	PutFormData($f,$s,"hascallback", getCustomerSystemSetting('_hascallback', false, true, $custdb), "bool", 0, 1);
 	PutFormData($f,$s,'callbackdefault', getCustomerSystemSetting('callbackdefault', 'inboundnumber', true, $custdb), null, null, null);
-	PutFormData($f,$s,"hastargetedmessage", getCustomerSystemSetting('hastargetedmessage', false, true, $custdb), "bool", 0, 1);
+	PutFormData($f,$s,"hastargetedmessage", getCustomerSystemSetting('_hastargetedmessage', false, true, $custdb), "bool", 0, 1);
 	PutFormData($f,$s,"timeslice", getCustomerSystemSetting('_timeslice', 450, true, $custdb), "number", 60, 1800);
 	PutFormData($f, $s, "loginlockoutattempts", getCustomerSystemSetting('loginlockoutattempts', 5, true, $custdb), "number", 0);
 	PutFormData($f, $s, "logindisableattempts", getCustomerSystemSetting('logindisableattempts', 0, true, $custdb), "number", 0);

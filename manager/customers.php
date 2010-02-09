@@ -222,6 +222,8 @@ foreach ($customers as $cust) {
 			$customerfeatures[] = "Callback";
 		if (getCustomerSystemSetting('_hasselfsignup', false, true, $custdb))
 			$customerfeatures[] = "Self-Signup";
+		if (getCustomerSystemSetting('_hastargetedmessage', false, true, $custdb))
+			$customerfeatures[] = "Classroom";
 
 		$row[10] = implode(", ", $customerfeatures);
 		$row[11] = getCustomerSystemSetting('_dmmethod', "", true, $custdb);
