@@ -527,7 +527,7 @@ function report_name($string){
 		case 'smsdetail':
 			return "SMS Log";
 		case 'contactchangereport':
-			return "Contact Information Changes"
+			return "Contact Information Changes";
 		default:
 			return $string;
 	}
