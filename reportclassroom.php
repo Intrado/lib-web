@@ -33,7 +33,6 @@ if(isset($_GET['pid'])){
 	redirect();
 }
 
-$pid = $_SESSION['report']['options']['pid'];
 ////////////////////////////////////////////////////////////////////////////////
 // Data Handling
 ////////////////////////////////////////////////////////////////////////////////
@@ -50,15 +49,21 @@ $titles = array();
 $formatters = array();
 $customxt = array();
 
+// ====== Note: Same date SQL is used for person and org report below ================
+if(isset($options['reldate']) && $options['reldate'] != ""){
+	list($startdate, $enddate) = getStartEndDate($options['reldate'], $options);
+	$startdate = date("Y-m-d", $startdate);
+	$enddate = date("Y-m-d", $enddate);
+	$datesql = " AND (a.date >= '$startdate' and a.date < date_add('$enddate',interval 1 day) )";
+} else {
+	$datesql = " AND Date(a.occurence) = CURDATE()";
+}
+// ===================================================================================
+
 if($options['classroomreporttype'] == 'person') {
-	if(isset($options['reldate']) && $options['reldate'] != ""){
-		list($startdate, $enddate) = getStartEndDate($options['reldate'], $options);
-		$startdate = date("Y-m-d", $startdate);
-		$enddate = date("Y-m-d", $enddate);
-		$datesql = " AND (a.date >= '$startdate' and a.date < date_add('$enddate',interval 1 day) )";
-	} else {
-		$datesql = " AND Date(a.occurence) = CURDATE()";
-	}
+	$pid = $_SESSION['report']['options']['pid'];
+	$TITLE = _L('Classroom Comment Report: %s',Person::getFullName($pid));
+
 
 	$result = Query("SELECT tm.id,tm.messagekey,e.notes,a.date,a.time,CONCAT(u.firstname,' ',u.lastname),s.skey,tm.overridemessagegroupid
 					FROM person p
@@ -98,13 +103,19 @@ if($options['classroomreporttype'] == 'person') {
 					"5" => "fmt_null",
 					"6" => "fmt_null");
 } else if($options['classroomreporttype'] == 'organization') {
-
-	$titles = array("1" => _L("Organization"),
-					"3" => _L("Comments Sent"));
-
-
-	$formatters = array("1" => "frm_classroommessage",
-					"3" => "fmt_null");
+	$TITLE = _L('Classroom Comment Report:');
+	$data = QuickQueryMultiRow("SELECT o.orgkey, count(a.id)
+					FROM alert a
+					LEFT JOIN event e ON ( a.eventid = e.id )
+					LEFT JOIN organization o ON ( e.organizationid = o.id )
+					WHERE 1
+					$datesql
+					group by o.id
+					");
+	$titles = array("0" => _L("Organization"),
+					"1" => _L("Comments Sent"));
+	$formatters = array("0" => "fmt_null",
+					"1" => "fmt_null");
 }
 
 
@@ -130,7 +141,7 @@ function frm_classroommessage($row, $index) {
 // Display
 ////////////////////////////////////////////////////////////////////////////////
 $PAGE = "reports:reports";
-$TITLE = _L('Classroom Comment Report: %s',Person::getFullName($pid));
+//$TITLE = _L('Classroom Comment Report);  // This is set above
 
 include_once("nav.inc.php");
 $fallbackUrl = "reportclassroomsearch.php";
@@ -145,7 +156,6 @@ startWindow("Search Results");
 ?>
 	<br />
 <?= buttons($back,$donebutton);?>
-	
 	<table class="list" cellpadding="3" cellspacing="1" >
 		<?= showTable($data, $titles, $formatters); ?>
 	</table>

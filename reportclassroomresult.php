@@ -30,6 +30,7 @@ if (!getSystemSetting('_hastargetedmessage', false) && !$USER->authorize('viewsy
 
 $options = $_SESSION['report']['options'];
 $personsql = "";
+$emailtable = "";
 $emailsql = "";
 $datesql = "";
 
@@ -37,7 +38,8 @@ if(isset($options['personid']) && $options['personid'] != "")
 	$personsql = " AND p.pkey = '" . DBSafe($options['personid']) . "'";
 
 if(isset($options['email']) && $options['email'] != "")
-	$emailsql = " AND p.email = '" . DBSafe($options['email']) . "'";
+	$emailtable = " LEFT JOIN email e ON ( e.personid = p.id )";
+	$emailsql = "AND e.email = '" . DBSafe($options['email']) . "'";
 
 if(isset($options['reldate']) && $options['reldate'] != ""){
 	list($startdate, $enddate) = getStartEndDate($options['reldate'], $options);
@@ -55,6 +57,7 @@ $query = "SELECT p.pkey,
 				FROM person p
 				LEFT JOIN personassociation pa ON ( p.id = pa.personid )
 				LEFT JOIN alert a ON ( a.eventid = pa.eventid )
+				$emailtable
 				where 1
 				$personsql
 				$emailsql

@@ -212,10 +212,11 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 							$_SESSION['report']['options']['enddate'] = $dateOptions['enddate'];
 					}
 				}
-				$form->sendTo("reportclassroomresult.php");
+				// if requestion the person report there might be multiple match result, redirect to reportclassroomresult.php
+				$form->sendTo($options['classroomreporttype'] == 'person'?"reportclassroomresult.php":"reportclassroom.php");
 			}
 		} else {
-			redirect("reportclassroomresult.php");
+			redirect("reports.php");
 		}
 	}
 }
