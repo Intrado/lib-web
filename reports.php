@@ -95,12 +95,19 @@ startWindow("Select a Template"  . help('Reports_SelectATemplate'), 'padding: 3p
 <?	}
 	if(getSystemSetting('_hassurvey', true) && ($USER->authorize('viewsystemreports') || $USER->authorize("survey"))){ ?>
 					<tr><td><a href='reportsurvey.php?clear=1'/>Survey Results</a></td></tr>
+<?	}
+	if(getSystemSetting('_hastargetedmessage', false) && ($USER->authorize('viewsystemreports') || $USER->authorize("targetedmessage"))){ ?>
+					<tr><td><a href='reportclassroomsearch.php?clear=1&type=organization'/>Classroom Report</a></td></tr>
 <? } ?>
 				</table>
 			</td>
 			<td>
 				<table>
 					<tr><td><a href='reportcallssearch.php?clear=1'/>Contact History</a></td></tr>
+<?	
+	if(getSystemSetting('_hastargetedmessage', false) && ($USER->authorize('viewsystemreports') || $USER->authorize("targetedmessage"))){ ?>
+					<tr><td><a href='reportclassroomsearch.php?clear=1&type=person'/>Classroom Contact History</a></td></tr>
+<?  } ?>
 				</table>
 			</td>
 <? if ($USER->authorize('viewsystemreports')) { ?>
