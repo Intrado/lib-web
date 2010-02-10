@@ -294,7 +294,10 @@ function upgrade_7_5 ($rev, $shardid, $customerid, $db) {
 			echo "|";
 			apply_sql("upgrades/db_7-5_pre.sql",$customerid,$db, 5);
 			
-			
+		case 5:
+			// upgrade from rev 5 to rev 6
+			echo "|";
+			apply_sql("upgrades/db_7-5_pre.sql",$customerid,$db, 6);
 			
 		
 		

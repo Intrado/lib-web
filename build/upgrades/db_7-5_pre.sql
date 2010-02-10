@@ -460,3 +460,68 @@ ALTER TABLE `messagegroup` ADD `defaultlanguagecode` VARCHAR( 3 ) CHARACTER SET 
 $$$
 
 
+-- $rev 6
+
+ALTER TABLE messagegroup DROP `languagecode`
+$$$
+
+ALTER TABLE `targetedmessage` ADD `deleted` tinyint NOT NULL DEFAULT 0
+$$$
+
+ALTER TABLE `targetedmessagecategory` ADD `deleted` TINYINT NOT NULL DEFAULT 0
+$$$
+
+ALTER TABLE `messagegroup` ADD `data` TEXT NOT NULL DEFAULT '' AFTER `defaultlanguagecode`
+$$$
+
+update messagegroup mg
+	set data=concat('preferredgender=',
+		(select v.gender from ttsvoice v inner join messagepart mp on (v.id=mp.voiceid)
+			where mp.messageid=(
+				select m.id from message m where not m.deleted and m.type='phone' and m.messagegroupid=mg.id and m.languagecode=mg.defaultlanguagecode
+				order by m.autotranslate limit 1
+			)
+			order by sequence limit 1
+		)
+	) where not mg.deleted
+$$$
+
+update message set subtype='plain' where type='email' and subtype=''
+$$$
+update message set subtype='voice' where type='phone' and subtype=''
+$$$
+update message set subtype='plain' where type='sms' and subtype=''
+$$$
+
+
+-- set messagegroupid on audiofile
+
+ALTER TABLE `phone` ADD `editlockdate` DATETIME NULL
+$$$
+UPDATE `phone` set `editlockdate`=now() where `editlock`=1
+$$$
+ALTER TABLE `phone` ADD INDEX ( `editlockdate` )
+$$$
+ALTER TABLE `email` ADD `editlockdate` DATETIME NULL
+$$$
+UPDATE `email` set `editlockdate`=now() where `editlock`=1
+$$$
+ALTER TABLE `email` ADD INDEX ( `editlockdate` )
+$$$
+ALTER TABLE `sms` ADD `editlockdate` DATETIME NULL
+$$$
+UPDATE `sms` set `editlockdate`=now() where `editlock`=1
+$$$
+ALTER TABLE `sms` ADD INDEX ( `editlockdate` )
+$$$
+
+
+ALTER TABLE `prompt` DROP `language`
+$$$
+
+ALTER TABLE `targetedmessage` ADD `enabled` tinyint NOT NULL DEFAULT 1
+$$$
+
+ALTER TABLE `targetedmessagecategory` ADD `image` VARCHAR( 50 ) NULL
+$$$
+
