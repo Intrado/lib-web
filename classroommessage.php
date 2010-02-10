@@ -28,12 +28,31 @@ if (!$USER->authorize('targetedmessage')) {
 
 $contentfile = "messagedata/en/data.php";
 $requesturl = "classroommessage.php";
+$redirect = "classroommessageoverview.php";
 $commentname = "Comment";
 $remarkname = "Remark";
+$cutoff = "22:00";
 
 ////////////////////////////////////////////////////////////////////////////////
 // Action/Request Processing
 ////////////////////////////////////////////////////////////////////////////////
+
+if(isset($_GET['clock'])) {
+	header('Content-Type: application/json');
+	$time = strtotime($cutoff) -  time();
+	$response = false;
+	if($time) {
+		$response->active = true;
+		$response->hours = floor($time/3600);
+		$response->minutes = floor($time%3600/60);
+	} else {
+		$response->active = false;
+	}
+	echo json_encode($response);
+	exit(0);
+}
+
+
 
 if (isset($_POST['eventContacts']) && isset($_POST['eventMessage']) && isset($_POST['isChecked'])) {
 	$contacts = json_decode($_POST['eventContacts']);
@@ -119,7 +138,7 @@ if (isset($_GET['sectionid'])) {
 			$obj->name = $row[2];
 			$response->people[$row[0]] = $obj;
 		}
-		if(count($response->people) > 0) {
+		if(isset($response->people) && count($response->people) > 0) {
 			$contactids = array_keys($response->people);
 			$query = "select tm.targetedmessagecategoryid, pa.personid, e.targetedmessageid, e.notes from
 					 personassociation pa left join event e on (pa.eventid = e.id)
@@ -144,12 +163,8 @@ $customtxt = QuickQueryList("select t.id, p.txt from targetedmessage t, message 
 
 if (isset($_GET['search'])) {
 	header('Content-Type: application/json');
-
-
 	$searchwords = explode(' ',$_GET['search']);
 	$searchcount = count($searchwords);
-
-	error_log($searchcount);
 
 	$messages = DBFindMany("TargetedMessage","from targetedmessage where enabled = 1 order by targetedmessagecategoryid");
 
@@ -157,8 +172,6 @@ if (isset($_GET['search'])) {
 		include_once($contentfile);
 
 	$response = array();
-
-
 	foreach($messages as $message) {
 		if(isset($message->overridemessagegroupid) && isset($customtxt[$message->id])) {
 			$title = $customtxt[$message->id];
@@ -167,29 +180,17 @@ if (isset($_GET['search'])) {
 		} else {
 			$title = ""; // Could not find message for this message key.
 		}
-//		$i = 0;
-
-//		while($i < $searchcount && stripos($title,$searchwords[$i]) !== false) {$i++;}
-
 		for($i = 0;$i < $searchcount && (trim($searchwords[$i]) == "" || stripos($title,trim($searchwords[$i])) !== false);$i++);
 		if($i == $searchcount) {
 			$obj = null;
 			$obj->title = $title;
 			$obj->categoryid = $message->targetedmessagecategoryid;
-
 			$response[$message->id] = $obj;
 		}
-//		if(stripos($title,$_GET['search']) !== false) {
-//			$response[$message->id] = $title;
-//		}
 	}
-	//error_log(json_encode(empty($response)?false:$response));
 	echo json_encode(empty($response)?false:$response);
 	exit(0);
 }
-
-
-
 
 
 $sections = DBFindMany("Section", "from section s join userassociation ua on (ua.sectionid = s.id) where ua.userid = ?","s",array($USER->id));
@@ -229,17 +230,16 @@ include_once("nav.inc.php");
 ?>
 <link href='css/classroom.css' type='text/css' rel='stylesheet' media='screen'>
 <?
-
 startWindow(_L('Classroom Comments'));
-echo '<select id="classselect" name="classselect" style="margin:5px">';
+echo '<select id="classselect" name="classselect" class="classselect">';
 foreach($sections as $section) {
 	echo '<option value="'.$section->id.'">'.escapehtml($section->skey).'</option>';
 }
-echo "</select>" . icon_button("Done Picking Comments", "tick", null, "classroommessageoverview.php",'style="float:right;"');
+echo '</select><div id="clock" class="clock"></div>' . icon_button("Done Picking Comments", "tick", null, $redirect,'style="padding-top:0px;float:right"');
 ?>
 
 
-<table width="100%" id="picker">
+<table width="100%" id="picker" style="clear:both">
 	<tr>
 		<td style="top:0px;vertical-align:top;border-right:1px solid black;padding-right:10px;">
 			<a id="checkall" href="#" style="float:left;white-space: nowrap;">Select All</a><br />
@@ -255,7 +255,7 @@ echo "</select>" . icon_button("Done Picking Comments", "tick", null, "classroom
 			<div id="theinstructions" style="font-size:2em;padding:100px;"><img src="img/icons/fugue/arrow_180.png" alt="" style="vertical-align:middle;"/>&nbsp;Click on a Contact to Start</div>
 
 
-			<div id='tabsContainer' style=' margin:10px; margin-right:0px;display:none;vertical-align:middle;'></div>
+			<div id='tabsContainer' style='margin-right:0px;display:none;vertical-align:middle;'></div>
 			<div id="libraryContent" style="display:none;">
 			<?
 				$libraryids = array();
@@ -297,7 +297,7 @@ echo "</select>" . icon_button("Done Picking Comments", "tick", null, "classroom
 
 				<div id="lib-search">
 					<span id="nowedit-search" style="float:left;color:graytext;font-weight:lighter;font-style:italic;"></span>
-					<div id="searchContainer" style="clear:both;margin:10px;padding-top:10px;display:none;"><input id="searchbox" type="text" value="" size="50" style="float:left"/><?= icon_button("Search", "magnifier", 'dosearch(); return false;', null) ?></div>
+					<div id="searchContainer" style="clear:both;margin:10px;padding-top:10px;display:none;"><input id="searchbox" class="searchbox" type="text" value="" size="50" style="float:left"/><?= icon_button("Search", "magnifier", 'dosearch(); return false;', null) ?></div>
 					<div id="searchResult" style="clear:both;"></div>
 				</div>
 
@@ -349,6 +349,7 @@ endWindow();
 	var revealmessages = true;			// Boolean to reveal messages on first click
 
 	var tabs;
+	var clock;
 
 	function getstatesrc(state) {
 		switch(state){
@@ -363,11 +364,7 @@ endWindow();
 	}
 
 	function clearcache() {
-		//checkedcache.each(function(category) {
-			//checkedcache.set(category.key,new Hash());
 		checkedcache = new Hash()
-
-		//});
 		checkedcontacts = new Hash();
 	}
 
@@ -441,6 +438,12 @@ endWindow();
 						isChecked: true,
 						eventComments:text},
 			onSuccess: function(transport){
+
+
+
+
+
+
 				checkedcontacts.each(function(contact) {
 					setEvent(contact.key,id,true,text);
 				});
@@ -517,8 +520,6 @@ endWindow();
 								prevcategory = itm.value.categoryid;
 							}
 
-
-
 							container.insert(
 								'<div id="smsg-' + itm.key  + '" class="classroomcomment">' +
 								'<img id="smsgchk-' + itm.key  + '" class="msgchk" src="img/checkbox-clear.png" alt=""/>' +
@@ -549,6 +550,24 @@ endWindow();
 					}
 				}
 			});
+	}
+
+
+	function updateclock() {
+		var timetocutoff = new Date(<?= (strtotime($cutoff) - 3600) . '000' ?>).getTime() / 1000;
+		var now = new Date().getTime() / 1000;
+
+		var diff = timetocutoff - now;
+
+		if(diff > 0) {
+			var hours = Math.floor(diff / 3600);
+			var minutes = Math.floor(diff % 3600 / 60);
+			$('clock').update((hours>0?hours + ' Hour' + (hours==1?' ':'s '):'') + minutes + ' Minute' + (minutes==1?' ':'s ') + ' left until cutoff');
+		} else {
+			clock.stop();
+			alert('The cutoff time for this page has passed ' + diff + " " + timetocutoff + " " + now);
+			window.location = '<?= $redirect ?>';
+		}
 	}
 
 
@@ -584,9 +603,6 @@ endWindow();
 				target.stopObserving();
 				target.setStyle({color: "black"});
 				target.value = "";
-
-				//checkedmessages.unset(msg.key);
-
 			}
 		});
 
@@ -710,25 +726,17 @@ endWindow();
 							event.stop(); // Some browsers may open another winbdow on shift click
 							if(!event.shiftKey) {
 								checkedcontacts.each(function(contact) {
-									//$('c-' + contact.key).setStyle('font-weight:normal;');
 									$('c-' + contact.key).style.background = c_none;
-									//$('i-c-' + contact.key).src = 'img/pixel.gif';
 									checkedcontacts.unset(contact.key);
 								});
 							}
 
 							// Select or deselect the itme depending on alt click. Unable to deselect if only one item is selected
 							if (event.shiftKey && checkedcontacts.get(this.id.substr(2)) != undefined && checkedcontacts.size() > 1) {
-								//this.setStyle('font-weight:normal;');
 								this.style.background = c_none;
-
-								//$('i-' + this.id).src = 'img/pixel.gif';
 								checkedcontacts.unset(this.id.substr(2));
 							} else {
-								//this.setStyle('font-weight:bold');
 								this.style.background = c_selected;
-
-								//$('i-' + this.id).src = h_image;
 								checkedcontacts.set(this.id.substr(2),true);
 							}
 							// First click reveals the message board
@@ -737,55 +745,9 @@ endWindow();
 								$('theinstructions').hide();
 								$('tabsContainer').show();
 								$('searchContainer').show();
-								var searchBox = $('searchbox');
-								searchBox.focus();
-								searchBox.blur();
 							}
-							// ==================================
 							updatemessages(tabs.currentSection,tabs.currentSection);
 					});
-
-
-
-/*
-					$(id).observe('mouseover', function(event) {
-						this.style.background = c_hover;
-						var contactid = this.id.substr(2);
-						var currenttab = tabs.currentSection;
-						if(currenttab == 'lib-search')
-							return;
-						currenttab = currenttab.substr(4);
-
-						if(checkedcache.get(currenttab).get(contactid) != undefined) {
-							checkedcache.get(currenttab).get(contactid).each(function(message) {
-								$('msg-' + message.key).style.background = c_hover;
-								highlightedmessages.set(message.key,true);
-							});
-						}
-//						checkedcache.each(function (category) {
-//							if(currenttab != category.key && category.value.get(contactid) != undefined) {
-//								tabs.sections['lib-' + category.key].titleDiv.style.background = c_hover;
-//								tabs.sections['lib-' + category.key].titleDiv.down('img').pulsate({pulses:2, duration: 1.5});
-//							}
-//						});
-						
-					});
-					$(id).observe('mouseout', function(event) {
-						highlightedmessages.each(function(message) {
-							$('msg-' + message.key).style.background = c_none;
-							highlightedmessages.unset(message.key);
-						});
-						//if(checkedcontacts.get(this.title)){
-							//this.style.background = c_selected;
-						//} else
-							this.style.background = c_none;
-
-
-						categoryinfo.each(function (category) {
-							tabs.sections['lib-' + category.key].titleDiv.style.background = '';
-						});
-					});
-*/
 				});
 				setcache(response.cache);
 			}
@@ -799,7 +761,11 @@ endWindow();
 		var msgid = this.id.substr(c_prefix == "smsg"?5:4);
 
 		var state = checkedmessages.get(msgid) || 0;
-		if(event.target.hasClassName('remarklink')) {
+		if(event.target.hasClassName && event.target.hasClassName('remarklink')) {
+			if($(c_prefix + 'rem' + msgid).down('textarea').getValue() == '' && $(c_prefix + 'prem' + msgid).innerHTML != '') {
+				if(!confirm('Multiple Remarks. Edeting will replace all previous remarks.'))
+					return;
+			}
 
 			$(c_prefix + 'txt-' + msgid).setStyle('height:auto');
 			event.target.hide();
@@ -816,8 +782,7 @@ endWindow();
 		}
 		// Don't modify anything if writing a comment'
 	//	if(!event.target.hasClassName('remark')) {
-		if(event.target.hasClassName('msgtxt') || event.target.hasClassName('msgchk') || event.target.hasClassName('remarklink')) {
-
+		if(event.target.hasClassName && (event.target.hasClassName('msgtxt') || event.target.hasClassName('msgchk') || event.target.hasClassName('remarklink'))) {
 			state = (state == 2)? 0 : 2;
 			var textarea = $(c_prefix + 'rem' + msgid).down('textarea');
 			if((state == 0) && hascomments && textarea.getValue() != "") {
@@ -839,7 +804,12 @@ endWindow();
 							isChecked:(state == 2)},
 				onFailure: function(){ alert('Unable to Set Message') },
 				onException: function(){ alert('Unable to Set Message') },
-				onSuccess: function(transport){
+				onSuccess: function(response){
+					if (response.responseText.indexOf(" Login</title>") != -1) {
+						alert('Your changes cannot be saved because your session has expired or logged out.');
+						window.location="index.php?logout=1";
+					}
+
 					$(htmlid).down('img').src = getstatesrc(state);
 					checkedmessages.set(msgid,state);                  // Set Message to appropriate state
 					// Set each selected contact to
@@ -862,17 +832,12 @@ endWindow();
 								markedcontacts.set(contact.key,true);
 								$('c-' + contact.key).setStyle('border:1px solid red;');
 							}
-
-							//$('c-' + contact.key).style.background =  c_hover;
 						} else {
 							if(markedcomment == msgid) {
 								markedcontacts.unset(contact.key);
 								$('c-' + contact.key).setStyle('border:0px;');
 							}
-
 							highlightedcontacts.unset('c-' + contact.key);
-							//$('c-' + contact.key).style.background =  c_none;
-
 						}
 						setEvent(contact.key,msgid,(state == 2),"");
 					});
@@ -881,25 +846,17 @@ endWindow();
 		}
 	};
 
-
-
-
-
-
-
 	document.observe("dom:loaded", function() {
 
 		getclass($('classselect').getValue());
 
 		$('picker').observe("selectstart", function(event) {          // disable select in IE
-			if(!(event.target.hasClassName('remark') || event.target.id == "searchbox"))
+			if(!(event.target.hasClassName('remark') || event.target.hasClassName('searchbox')))
 				event.stop();
-			$('searchbox').blur();
 		});
 		$('picker').observe("mousedown", function(event) {			  // disable select in FF
-			if(!(event.target.hasClassName('remark') || event.target.id == "searchbox"))
+			if(event.target.hasClassName && !(event.target.hasClassName('remark') || event.target.hasClassName('searchbox')))
 				event.stop();
-			$('searchbox').blur();
 		});
 
 		/*
@@ -942,20 +899,9 @@ endWindow();
 				//$(htmlid).style.background = c_hover;
 				checkedcache.each(function(contact) {
 					if(contact.value.get(msgid) != undefined) {
-						//$('i-c-' + contact.key).src = h_image;
-						//$('c-' + contact.key).style.background =  c_hover;
-						//$('c-' + contact.key + '-' + category).pulsate({pulses:2, from:0.5, duration: 1.5});
 						var img = $('c-' + contact.key + '-' + category);
-
-
 						Effect.Queues.get(img.id).each(function(effect) { effect.cancel(); });
-
 						new Effect.Pulsate(img,{pulses:2, from:0.5, duration: 1.5, queue: { position: 'end', scope: img.id }});
-
-	//					new Effect.Opacity(img,{duration: 0.25, from:1, to:0.5, queue: { position: 'end', scope: img.id }});
-	//					new Effect.Opacity(img,{duration: 0.25, from:0.5, to:1, queue: { position: 'end', scope: img.id }});
-
-
 						highlightedcontacts.set('c-' + contact.key,true);
 					}
 				});
@@ -967,50 +913,13 @@ endWindow();
 				if(category == 'lib-search')
 					return
 				var category = category.substr(4);
-
-				//$(this.id).style.background = c_none;
 				highlightedcontacts.each(function(contact) {
-					//$('i-' + contact.key).src = 'img/pixel.gif';
-					//$(contact.key).style.background =  c_none;
 					var img = $(contact.key + '-' + category);
-
 					Effect.Queues.get(img.id).each(function(effect) { effect.cancel();});
 					img.style.opacity = 1.0;
-					//$(contact.key + '-' + category).setStyle('opacity:1.0');
 					highlightedcontacts.unset(contact.key);
 				});
 			});
-
-
-
-/*
-		message.observe('mouseover', function(event) {
-			event.stop();
-			var htmlid = this.id;
-			var msgid = this.id.substr(4);  // strip 'msg-'
-
-			$(htmlid).style.background = c_hover;
-			checkedcache.get(tabs.currentSection.substr(4)).each(function(contact) {
-				if(contact.value.get(msgid) != undefined) {
-					//$('i-c-' + contact.key).src = h_image;
-					$('c-' + contact.key).style.background =  c_hover;
-					highlightedcontacts.set('c-' + contact.key,true);
-				}
-			});
-
-		});
-
-		message.observe('mouseout', function(event) {
-			event.stop();
-			$(this.id).style.background = c_none;
-			highlightedcontacts.each(function(contact) {
-				//$('i-' + contact.key).src = 'img/pixel.gif';
-				$(contact.key).style.background =  c_none;
-				highlightedcontacts.unset(contact.key);
-			});
-		});
-
-*/
 	});
 
 
@@ -1034,14 +943,16 @@ endWindow();
 		"icon": 'img/magnify.gif',
 		"content": $('lib-search').remove()
 	});
-	//tabs.sections['lib-search'].titleDiv.setStyle('float:right');
 
 	tabs.show_section('lib-' + categoryinfo.keys().first());
 
 	tabs.container.observe('Tabs:ClickTitle', function(event) {
-		if(event.memo.currentSection == 'lib-search' || event.memo.section == 'lib-search')
+		if(event.memo.currentSection == 'lib-search' || event.memo.section == 'lib-search'){
 			updatemessages(event.memo.currentSection,event.memo.section);
-		else{
+			var searchBox = $('searchbox');
+			//searchBox.focus();
+			searchBox.blur();
+		} else{
 			$('nowedit-' + event.memo.section.substr(4)).update($('nowedit-' + event.memo.currentSection.substr(4)).innerHTML);
 		}
 	});
@@ -1051,8 +962,10 @@ endWindow();
 		if (Event.KEY_RETURN == event.keyCode)
 			dosearch();
 	});
-
 	blankFieldValue(searchBox, "Search Comments");
+
+	clock = new PeriodicalExecuter(updateclock,5);
+	updateclock();
 });
 
 </script>
