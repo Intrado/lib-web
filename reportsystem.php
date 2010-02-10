@@ -15,7 +15,7 @@ require_once("inc/formatters.inc.php");
 require_once("obj/FieldMap.obj.php");
 require_once("inc/date.inc.php");
 require_once("inc/reportgeneratorutils.inc.php");
-
+require_once("obj/Language.obj.php");
 
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization
@@ -110,6 +110,7 @@ if($reload){
 ////////////////////////////////////////////////////////////////////////////////
 // Data Calculation
 ////////////////////////////////////////////////////////////////////////////////
+	$languageField = FieldMap::getLanguageField();
 	$joblistquery = "";
 	$surveysql = getSystemSetting('_hassurvey', true) ? '' : 'and issurvey=0';
 	$jobtypelist = QuickQueryList("select id, name from jobtype where not deleted $surveysql", true);
@@ -124,17 +125,30 @@ if($reload){
 	$groupbyquery = "";
 	$groupbyorder = "";
 	$rgroupdata = "";
-	if($groupby != ""){
+	
+//error_log("groupby ".$groupby);
+	if ($groupby == "") {
+		// --System--
+		$groupbyquery = "''";
+		$groupbyorder = "";
+	} else if ($groupby == "org") {
+		// Organization
+		// TODO people not associated with any organization are not being selected, need help with this query to include them 'not assigned'
+		// TODO people in two organizations get counted twice
+		$groupbyquery = "oz.orgkey";
+		$groupbyorder = $groupbyquery . ", ";
+		$rgroupdata = "join personassociation pa on (pa.personid = rp.personid and pa.type='organization') join organization oz on (oz.id = pa.organizationid)";
+	} else {
+		// F or G field
 		if (strpos($groupby, "g") === 0) {
+			// Gfield
 			$groupbyquery = "rgd.value"; // reportgroupdata
 			$rgroupdata = "join reportgroupdata rgd on (rgd.personid=rp.personid and rgd.jobid=rp.jobid and rgd.fieldnum=".substr($groupby,1).")";
 		} else {
+			// Ffield
 			$groupbyquery = "rp." . $groupby; // reportperson
 		}
 		$groupbyorder = $groupbyquery . ", ";
-	} else {
-		$groupbyquery = "''";
-		$groupbyorder = "";
 	}
 
 	$userlist = array();
@@ -151,9 +165,10 @@ if($reload){
 				$rgroupdata
 				where rp.status in ('fail', 'success')
 				$joblistquery
-				and type = '" . DBSafe($type) . "'
+				and rp.type = '" . DBSafe($type) . "'
 				group by $groupbyorder rp.jobid, rp.userid";
-//echo $query;
+//error_log($query);
+
 	$result = Query($query);
 	$data = array();
 	$userlistarray = array();
@@ -239,6 +254,7 @@ if(getSystemSetting('_hassms', false)){
 				<?
 					NewFormItem($f, $s, "groupby", "selectstart");
 					NewFormItem($f, $s, "groupby", "selectoption", " -- System -- ", "");
+					NewFormItem($f, $s, "groupby", "selectoption", "Organization", "org");
 					foreach($fields as $field){
 						NewFormItem($f, $s, "groupby", "selectoption", $field->name, $field->fieldnum);
 					}
@@ -285,14 +301,25 @@ startWindow("Total Messages Delivered", "padding: 3px;");
 		foreach($groupbyarray as $index => $groupbyfield){
 
 			echo ++$alt % 2 ? '<tr>' : '<tr class="listAlt">';
-			$name = FieldMap::getName($groupby);
+
+			// index contains the person data value (could be empty, 'not assigned')
 			$display = $index;
-			if($display == "")
+			if ($index == "")
 				$display = escapehtml("<Not Assigned>");
-			if(!$name)
+				
+			if ($groupby == "")
 				$name = "System";
-			else
-				$name .= ": " . $display;
+			else if ($groupby == "org")
+				$name = "Organization: " . $display;
+			else if ($groupby == $languageField) {
+				// display language name, instead of code
+				$display = Language::getName($index);
+				if ($index == "")
+					$display = escapehtml("<Not Assigned>");
+
+				$name = FieldMap::getName($groupby) . ": " . $display;
+			} else
+				$name = FieldMap::getName($groupby) . ": " . $display;
 ?>
 			<td><u><?=$name?><u></td>
 <?
