@@ -74,7 +74,7 @@ CKEDITOR.dialog.add( 'image', function( editor )
 					{
 						id: 'uploadbutton',
 						filebrowser: 'tab1:viewimageurl',
-						for: ['tab1', 'upload'],
+						'for': ['tab1', 'upload'],
 						type: 'fileButton',
 						label: 'Upload',
 						onLoad: function () {
