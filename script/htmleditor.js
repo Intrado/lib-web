@@ -145,7 +145,7 @@ function applyHtmlEditor(textarea) {
 		saveHtmlEditorContent(editorobject);
 	}
 
-	var html = textarea.value.replace("<<", "&lt;&lt;").replace(">>", "&gt;&gt;");
+	var html = textarea.value.replace(/<</g, "&lt;&lt;").replace(/>>/g, "&gt;&gt;");
 	editorobject.instance.setData(html);
 	
 	textarea.hide().addClassName('HtmlEditor').insert({'after':editorobject.container});
