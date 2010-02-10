@@ -1,4 +1,8 @@
 
+.classselect {
+	float:left;
+}
+
 .classroomcomment {
 	position:relative;
 	border:solid 1px silver;
@@ -25,7 +29,7 @@
 }
 
 span.remark  {
-	width:280px;border:0px solid black;padding:10px;height:100px;bottom:0px;
+	width:280px;padding-left:10px;height:100px;bottom:0px;
 }
 
 textarea.remark  {
@@ -44,3 +48,8 @@ a.remarklink{
 	float:right;
 }
 
+.clock {
+	float:left;
+	padding-left: 20px;
+	padding-top: 5px;
+}
