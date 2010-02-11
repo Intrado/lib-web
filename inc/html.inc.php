@@ -256,6 +256,9 @@ function audio($name) {
 	<?
 }
 
+// Returns a plain text version of the provided $html text.
+// NOTE: This function may be enhanced in the future to better represent the contents of the $html text,
+// such as replacing HR tags with dashes, or formatting tables as fixed width, etc..
 function html_to_plain($html) {
 	return strip_tags($html);
 }
