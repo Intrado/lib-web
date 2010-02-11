@@ -101,7 +101,7 @@ if($ajax === true) {
 	$data->pageinfo = array($numpages,$limit,$curpage, "Showing $displaystart - $displayend of $total records on $numpages pages ");
 	$data->list = array();
 
-	$filename = "messagedata/en/data.php";
+	$filename = "messagedata/en/targetedmessage.php";
 	if(file_exists($filename))
 		include_once($filename);
 
@@ -164,7 +164,7 @@ foreach($categories as $category) {
 				action_link("Delete", "cross", null,"deletecategory('". $category["id"] . "');return false;")
 			)
 			. "
-			<h3>Massages</h3>
+			<h3>Messages</h3>
 			" .
 			icon_button(_L('Create Message'),"add",null,"classroommessageedit.php?id=new")
 			. "
