@@ -247,7 +247,7 @@ class Form {
 				<tr>
 					' . ($showlabel ? '<th class="formtableheader"><label class="formlabel" for="'.$n.'" >'.$l.'</label></th>' : '') . '
 					' . ($showicon ? '<td class="formtableicon"></td>' : '') . '
-					<td class="formtablecontrol">'.$item->render('').'</td>
+					<td class="formtablecontrol"'.((!$showlabel || !$showicon) ? ' colspan="3"' : '').'>'.$item->render('').'</td>
 				</tr>
 				';
 				unset($this->formdata[$name]); //hide these from showing up in data sent to form_load
