@@ -4,6 +4,8 @@ function generateFields($tablealias){
 	$fieldstring = "";
 	$first = FieldMap::GetFirstNameField();
 	$last = FieldMap::GetLastNameField();
+	$lang = FieldMap::GetLanguageField();
+	
 	for($i=1; $i<=20; $i++){
 
 		if($i<10){
@@ -13,7 +15,9 @@ function generateFields($tablealias){
 		}
 		if($num == $first || $num == $last){
 			continue;
-		} else{
+		//} else if ($num == $lang) {
+			//$fieldstring .= ", ifnull(l.name, " . $tablealias . "." . $num . ") as " . $num;
+		} else {
 			$fieldstring .= "," . $tablealias . "." . $num;
 		}
 	}
@@ -39,6 +43,10 @@ function generateGFieldQuery($personidalias, $isreporthistory = false, $hackPDF 
 		$fieldstring .= ", (select group_concat(value separator ', ') from $gdtable where fieldnum=$i and personid=$personidalias $jidstr) as $num\n";
 	}
 	return $fieldstring;
+}
+
+function generateOrganizationFieldQuery($personidalias) {
+	return ", (select group_concat(oz.orgkey separator ',') from organization oz join personassociation pa on (oz.id = pa.organizationid) where pa.personid=$personidalias and not oz.deleted) as org \n";
 }
 
 function select_metadata($tablename=null, $start=null, $fields){
@@ -158,11 +166,11 @@ function getJobList($startdate, $enddate, $jobtypes = "", $surveyonly = "", $del
 	$deliveryquery = " ";
 	$surveydeliveryquery = "";
 	if("phone" == $deliverymethod){
-		$deliveryquery = " and (j.phonemessageid is not null OR sq.hasphone != '0' )";
+		$deliveryquery = " and (m.type='phone' OR sq.hasphone != '0' )";
 	} else if("email" == $deliverymethod) {
-		$deliveryquery = " and (j.emailmessageid is not null OR sq.hasweb != '0' )";
+		$deliveryquery = " and (m.type='email' OR sq.hasweb != '0' )";
 	} else if("sms" == $deliverymethod) {
-		$deliveryquery = " and (j.smsmessageid is not null)";
+		$deliveryquery = " and (m.type='sms' )";
 	}
 	$surveyfilter = "";
 	if($surveyonly == "true"){
@@ -178,6 +186,7 @@ function getJobList($startdate, $enddate, $jobtypes = "", $surveyonly = "", $del
 	}
 	$joblist = QuickQueryList("select j.id from job j
 							left join surveyquestionnaire sq on (sq.id = j.questionnaireid)
+							left join message m on (m.messagegroupid = j.messagegroupid)
 							where ( (j.startdate >= '$startdate' and j.startdate < date_add('$enddate',interval 1 day) )
 							or j.starttime = null) and ifnull(j.finishdate, j.enddate) >= '$startdate' and j.startdate <= date_add('$enddate',interval 1 day)
 							and j.status in ('active', 'complete', 'cancelled')
@@ -226,20 +235,29 @@ function dateOptions($f, $s, $tablename = "", $infinite = false){
 <?
 }
 
-
-function appendFieldTitles($titles, $startindex, $fieldlist, $activefields){
+function getFieldIndexList($fieldalias) {
 	// get field list same way query did
 	// leave first item even though it is a blank, this will allow the count offset to begin at 1
 	// find field alias if it exists and strip string starting from 1 after that position
 	// flip the array so the field number is now the index and the index is a count offset
-	$fieldindex = explode(",",generateFields("p"));
+	$fieldindex = explode(",",generateFields($fieldalias));
 	foreach($fieldindex as $index => $fieldnumber){
+		// language field is 'as f03' to lookup languagecode name from language table (see generateFields())
+		if (strpos($fieldnumber, " as ")) {
+			$fieldnumber = substr($fieldnumber, strpos($fieldnumber, " as ")+4);
+			$fieldindex[$index] = $fieldnumber;
+		}
 		$aliaspos = strpos($fieldnumber, ".");
 		if($aliaspos !== false){
 			$fieldindex[$index] = substr($fieldnumber, $aliaspos+1);
 		}
 	}
 	$fieldindex = array_flip($fieldindex);
+	return $fieldindex;
+}
+
+function appendFieldTitles($titles, $startindex, $fieldlist, $activefields){
+	$fieldindex = getFieldIndexList("p");
 
 	foreach($fieldlist as $fieldnum => $fieldname){
 		if (strpos($fieldnum, "g") === 0) {
