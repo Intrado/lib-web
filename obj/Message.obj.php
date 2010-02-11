@@ -17,12 +17,13 @@ class Message extends DBMappedObject {
 	var $header1;
 	var $header2;
 	var $header3;
-
+	var $fromaddress; //???
+	
 	// For 'email' header data.
 	var $subject;
 	var $fromname;
-	var $fromaddress; //???
 	var $fromemail;
+	var $overrideplaintext = 0; // When type === 'email' and subtype === 'plain', indicates message is custom.
 
 	function Message ($id = NULL) {
 		$this->_allownulls = true;
@@ -37,17 +38,22 @@ class Message extends DBMappedObject {
 		$data = sane_parsestr($this->data);
 		foreach($data as $key => $value)
 		{
+			if ($key == 'overrideplaintext')
+				$value = $value + 0;
+				
 			$this->$key = $value;
 		}
 	}
 
 	function stuffHeaders () {
-		if($this->type == 'email')
-		{
-			$this->data = 'subject=' . urlencode($this->subject) . '&fromname=' .  urlencode($this->fromname) . '&fromemail=' . urlencode($this->fromemail);
-		}
-		elseif($this->type == 'print')
-		{
+		if($this->type == 'email') {
+			$this->data = 'subject=' . urlencode($this->subject) .
+				'&fromname=' .  urlencode($this->fromname) .
+				'&fromemail=' . urlencode($this->fromemail);
+				
+			if ($this->subtype == 'plain')
+				$this->data .= '&overrideplaintext=' . urlencode($this->overrideplaintext);
+		} elseif ($this->type == 'print') {
 			$this->data = 'header1=' . urlencode($this->header1) . '&header2=' .  urlencode($this->header2) . '&header3=' . urlencode($this->header3) . '&fromaddress=' . urlencode($this->fromaddress);
 		}
 	}
@@ -110,7 +116,7 @@ class Message extends DBMappedObject {
 		
 		return implode('&', $data);
 	}
-
+	
 	// Updates the first message part with a voiceid, keeping the language the same, only changing the gender.
 	function updatePreferredVoice($preferredgender) {
 		if ($this->type != 'phone' || !$voicemessagepart = DBFind('MessagePart', 'from messagepart where voiceid is not null and messageid=? order by sequence', false, array($this->id)))
@@ -152,7 +158,17 @@ class Message extends DBMappedObject {
 		}
 	}
 	
-	static function parse ($data, &$errors = NULL, $defaultvoiceid=null) {
+	// Wrapper for Message::parseText.
+	function parse ($data, &$errors = NULL, $defaultvoiceid=null) {
+		return Message::parseText($this->messagegroupid, $data, $errors, $defaultvoiceid);
+	}
+	
+	// Wrapper for Message::formatText.
+	function format ($parts, $translatable = false) {
+		return Message::formatText($parts, $translatable);
+	}
+	
+	static function parseText ($messagegroupid, $data, &$errors = NULL, $defaultvoiceid=null) {
 		global $USER;
 
 		if ($errors == NULL)
@@ -244,9 +260,9 @@ class Message extends DBMappedObject {
 				switch ($type) {
 					case "A":
 						$part->sequence = $partcount++;
-						$query = "select id from audiofile where userid=? and name=? and deleted = 0";
-
-						$audioid = QuickQuery($query, false, array($USER->id, $token));
+						$query = "select id from audiofile where userid=? and messagegroupid=? and name=? and deleted = 0";
+						
+						$audioid = QuickQuery($query, false, array($USER->id, $messagegroupid, $token));
 						if ($audioid !== false) {
 							//find an audiofile with this name
 							$part->audiofileid = $audioid;
@@ -331,7 +347,7 @@ class Message extends DBMappedObject {
 		return $parts;
 	}
 
-	static function format ($parts, $translatable = false) {
+	static function formatText ($parts, $translatable = false) {
 
 		$map = FieldMap::getMapNames();
 		$data = "";

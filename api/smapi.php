@@ -245,7 +245,7 @@ class SMAPI{
 				}
 			}
 			
-			$parts = Message::parse($messagetext);
+			$parts = $message->parse($messagetext);
 			$voiceid = QuickQuery("select id from ttsvoice where languagecode = 'en' and gender = 'female'");
 			QuickUpdate("delete from messagepart where messageid=$message->id");
 			foreach ($parts as $part) {
