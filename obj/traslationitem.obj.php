@@ -18,10 +18,21 @@ class TranslationItem extends FormItem {
 			$escapehtml = 'true';
 		}
 		
-		$msgdata = json_decode($value);
-
 		$language = $this->args['language'];
 		$gender = isset($msgdata->gender)?$msgdata->gender:"female";
+		
+		if (trim($value) == "") {
+			$msgdata = (object)array(
+				"enabled" => true,
+				"text" => isset($this->args['plaintextmessage']) ? $this->args['plaintextmessage'] : "",
+				"englishText" => "",
+				"override" => false,
+				"gender" => $gender,
+				"language" => $language
+			);
+		} else {
+			$msgdata = json_decode($value);
+		}
 
 		$isphone = !empty($this->args['phone']);
 
@@ -41,13 +52,31 @@ class TranslationItem extends FormItem {
 			$preferredgenderformitem = $this->args['preferredgenderformitem'];
 		else
 			$preferredgenderformitem = $this->form->name . "_voice";
-			
+		
 		$str = "";
-
+		
+		$hidden = false;
+		if (isset($this->args['overrideplaintext'])) {
+			$str .= '
+				<div id="'.$n.'plaintextpreview" style="display:'.($this->args['overrideplaintext'] ? 'none' : 'block').';">
+					<pre style="color:gray; border: solid 1px gray;">' .
+					(isset($this->args['plaintextmessage']) && $this->args['plaintextmessage'] != '' ?
+						escapehtml($this->args['plaintextmessage']) :
+						"<em>" . escapehtml(_L("A plain-text message will be generated from the HTML message.")) . "</em>"
+					) .
+					'</pre>
+				</div>
+			';
+			
+			if (!$this->args['overrideplaintext'])
+				$hidden = true;
+		}
+		
 		$str .= '
-			<div class="TranslationItemContainer">
+			<div class="TranslationItemContainer" style="'.($hidden ? 'display:none' : '').'">
 			
 			<input id="'.$n.'" name="'.$n.'" type="hidden" value="' . escapehtml($value) . '"/>
+			<input id="'.$n.'state" type="hidden" value="' . escapehtml(json_encode($msgdata)) . '"/>
 			<input id="'.$n.'overridesave" type="hidden" value=""/>
 			' . (!empty($this->args['showhr']) ? '<hr>' : '') . '
 			
@@ -210,7 +239,7 @@ class TranslationItem extends FormItem {
 									if (escapehtml)
 										translatedtext = translatedtext.escapeHTML();
 									else
-										translatedtext = translatedtext.replace(/<</, "&lt;&lt;").replace(/>>/, "&gt;&gt;");
+										translatedtext = translatedtext.replace(/<</g, "&lt;&lt;").replace(/>>/g, "&gt;&gt;");
 										
 									$(dstbox).innerHTML = translatedtext;
 							}
@@ -250,20 +279,43 @@ class TranslationItem extends FormItem {
 				}
 				// Returns the revised state object.
 				function setTranslationValue(section) {
-					var state = $(section).value.evalJSON();
+					var state = {};
+					var formitemelement = $(section);
+					if (formitemelement.value.strip() != "") {
+						state = formitemelement.value.evalJSON();
+					}
+					
+					var mainTextarea = $(section+"text");
 					
 					// NOTE: Edit the existing value instead of overwriting it completely because there may be some properties that we want to keep, like state.language.
+					state.editWhenDisabled = 
 					state.enabled = $(section + "translatecheck").checked;
 					state.englishText = $(section + "englishText").value;
 					state.override = (($(section + "translatecheck").checked)?$(section + "override").checked:false);
-					state.text = $(section + "text").value;
+					state.text = mainTextarea.value;
 					
-					$(section).value = Object.toJSON(state);
-					form_do_validation($(section).up("form"), $(section));
+					var statejson = Object.toJSON(state);
+						
+					if ((mainTextarea.hasClassName("EditWhenDisabled") &&
+							state.enabled &&
+							!state.override &&
+							state.englishText.strip() == "") ||
+						((!state.enabled || state.override) &&
+							state.text.strip() == "")
+					) {
+						formitemelement.value = "";
+					} else {
+						formitemelement.value = statejson;
+					}
+					
+					// Keep the json value in $(section + "state") so that we can keep track of override/enabled states in case formitemelement.value is blank.
+					$(section + "state").value = statejson;
+					
+					form_do_validation(formitemelement.up("form"), formitemelement);
 					
 					return state;
 				}
-
+				
 				function overrideTranslation(section,language, usehtmleditor, escapehtml, nowarning) {
 					var langtext = $(section + "text");
 					var overridesave = $(section + "overridesave");
@@ -358,41 +410,64 @@ class TranslationItem extends FormItem {
 	
 	function renderJavascript() {
 		$n = $this->form->name."_".$this->name;
-		$usehtmleditor = !empty($this->args['usehtmleditor']) ? 'true' : 'false';
-		$allowdatafieldinsert = !empty($this->args['fields']) ? 'true' : 'false';
-		
+
 		$str = "
 			(function() {
 				var formitemelement = $('$n');
+				var stateelement = $('{$n}state');
 				var formitemcontainer = formitemelement.up('.TranslationItemContainer');
-				
-				if ($usehtmleditor) {
-					var curVal = formitemelement.value.evalJSON();
-					var textarea = (curVal.enabled && !curVal.override) ? formitemcontainer.down('.SourceTextarea') : formitemcontainer.down('.MessageTextarea');
-					
-					applyHtmlEditor(textarea);
-				}
-				
-				if ($allowdatafieldinsert) {
-					var datafieldstable = $('{$n}datafieldstable');
-					var datafieldinsertbutton = datafieldstable.down('button');
-					datafieldinsertbutton.stopObserving('click');
-					datafieldinsertbutton.observe('click', function(event, formitemcontainer, formitemelement, datafieldstable) {
-						var curVal = formitemelement.value.evalJSON();
-						var textarea = (curVal.enabled && !curVal.override) ? formitemcontainer.down('.SourceTextarea') : formitemcontainer.down('.MessageTextarea');
-						
-						var sel = datafieldstable.down('.DataFieldSelect');
-						if (sel.options[sel.selectedIndex].value != '') {
-							 def = datafieldstable.down('.DataFieldDefaultValue').value;
-							 textInsert('<<' + sel.options[sel.selectedIndex].text + (def ? ':' : '') + def + '>>', textarea);
-						}
-					}.bindAsEventListener(datafieldinsertbutton, formitemcontainer, formitemelement, datafieldstable));
-				}
+				var curVal = stateelement.value.evalJSON();
+				var textarea = ((curVal.enabled && !curVal.override)) ? formitemcontainer.down('.SourceTextarea') : formitemcontainer.down('.MessageTextarea');
+		";
+		
+		if (isset($this->args['usehtmleditor']) && $this->args['usehtmleditor']) {
+			$str .= "
+				applyHtmlEditor(textarea);
 				
 				formitemcontainer.observe('HtmlEditor:SavedContent', function(event) {
 					setTranslationValue(this.identify());
 				}.bindAsEventListener(formitemelement));
-				
+			";
+		}
+		
+		if (isset($this->args['fields']) && $this->args['fields']) {
+			$str .= "
+				var datafieldstable = $('{$n}datafieldstable');
+				var datafieldinsertbutton = datafieldstable.down('button');
+				datafieldinsertbutton.stopObserving('click');
+				datafieldinsertbutton.observe('click', function(event) {
+					var curVal = stateelement.value.evalJSON();
+					var textarea = (curVal.enabled && !curVal.override) ? formitemcontainer.down('.SourceTextarea') : formitemcontainer.down('.MessageTextarea');
+					
+					var sel = datafieldstable.down('.DataFieldSelect');
+					if (sel.options[sel.selectedIndex].value != '') {
+						 def = datafieldstable.down('.DataFieldDefaultValue').value;
+						 textInsert('<<' + sel.options[sel.selectedIndex].text + (def ? ':' : '') + def + '>>', textarea);
+					}
+				}.bindAsEventListener(datafieldinsertbutton));
+			";
+		}
+		
+		if (isset($this->args['overrideplaintext'])) {
+			$str .= "
+					var form = $('{$this->form->name}');
+					var plaintextpreview = $('{$n}plaintextpreview');
+					form.observe('PlainEmailCheckbox:OverridePlainText', function(event) {
+						if (event.memo.override) {
+							formitemcontainer.show();
+							plaintextpreview.hide();
+							if (formitemelement.value.strip() == '') {
+								formitemelement.value = '';
+							}
+						} else {
+							formitemcontainer.hide();
+							plaintextpreview.show();
+						}
+					});
+			";
+		}
+		
+		$str .= "
 				// Set the textareas' selection for use with textInsert().
 				var setselection = function () {
 					if(document.selection)
