@@ -153,6 +153,7 @@ $donebutton = icon_button(_L('Done'), 'tick', null, 'reports.php');
 
 startWindow("Search Results");
 
+if(count($data) > 0){
 ?>
 	<br />
 <?= buttons($back,$donebutton);?>
@@ -160,9 +161,16 @@ startWindow("Search Results");
 		<?= showTable($data, $titles, $formatters); ?>
 	</table>
 <?
-buttons($back,$donebutton);
-
+	buttons($back,$donebutton);
+} else {
+?>
+	<div>Your search did not find any matching results. Click the back button and try modifying your search settings.<div>
+<?
+	buttons($back,$donebutton);
+}
 endWindow();
+
+
 
 include_once("navbottom.inc.php");
 ?>

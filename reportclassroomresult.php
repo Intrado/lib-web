@@ -37,9 +37,10 @@ $datesql = "";
 if(isset($options['personid']) && $options['personid'] != "")
 	$personsql = " AND p.pkey = '" . DBSafe($options['personid']) . "'";
 
-if(isset($options['email']) && $options['email'] != "")
+if(isset($options['email']) && $options['email'] != "") {
 	$emailtable = " LEFT JOIN email e ON ( e.personid = p.id )";
 	$emailsql = "AND e.email = '" . DBSafe($options['email']) . "'";
+}
 
 if(isset($options['reldate']) && $options['reldate'] != ""){
 	list($startdate, $enddate) = getStartEndDate($options['reldate'], $options);
@@ -130,12 +131,8 @@ if(count($data) > 0){
 	<div>Your search did not find any matching results. Click the back button and try modifying your search settings.<div>
 <?
 }
-$fallbackUrl = "reportclassroomsearch.php";
-if(isset($_SESSION['report']['singleperson']))
-	$back = icon_button(_L('Back'), 'fugue/arrow_180', null, 'reportclassroomsearch.php');
-else
-	$back = icon_button(_L('Back'), 'fugue/arrow_180', "location.href='" . (isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : $fallbackUrl) . "'");
-buttons($back);
+buttons(icon_button(_L('Modify Search'), 'fugue/arrow_180', null, 'reportclassroomsearch.php'),
+					icon_button(_L('Done'), 'tick', null, 'reports.php'));
 
 endWindow();
 
