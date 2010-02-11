@@ -106,17 +106,6 @@ class Message extends DBMappedObject {
 		return $messageattachments;
 	}
 	
-	// Returns a url-encoded string containing each header's name and value as a parameter.
-	static function makeHeaderDataString($headers) {
-		$data = array();
-		
-		foreach ($headers as $name => $value) {
-			$data[] = "$name=" . urlencode($value);
-		}
-		
-		return implode('&', $data);
-	}
-	
 	// Updates the first message part with a voiceid, keeping the language the same, only changing the gender.
 	function updatePreferredVoice($preferredgender) {
 		if ($this->type != 'phone' || !$voicemessagepart = DBFind('MessagePart', 'from messagepart where voiceid is not null and messageid=? order by sequence', false, array($this->id)))
@@ -158,17 +147,7 @@ class Message extends DBMappedObject {
 		}
 	}
 	
-	// Wrapper for Message::parseText.
-	function parse ($data, &$errors = NULL, $defaultvoiceid=null) {
-		return Message::parseText($this->messagegroupid, $data, $errors, $defaultvoiceid);
-	}
-	
-	// Wrapper for Message::formatParts.
-	function format ($parts, $translatable = false) {
-		return Message::formatParts($parts, $translatable);
-	}
-	
-	static function parseText ($messagegroupid, $data, &$errors = NULL, $defaultvoiceid=null) {
+	function parse ($data, &$errors = NULL, $defaultvoiceid=null, $audiofileids = null) {
 		global $USER;
 
 		if ($errors == NULL)
@@ -260,9 +239,15 @@ class Message extends DBMappedObject {
 				switch ($type) {
 					case "A":
 						$part->sequence = $partcount++;
-						$query = "select id from audiofile where userid=? and messagegroupid=? and name=? and deleted = 0";
+						if (is_array($audiofileids)) {
+							$params = implode(',', array_fill(0, count($audiofileids), '?'));
+							$query = "select id from audiofile where userid=? and name=? and deleted = 0 and id in ($params)";
+							$audioid = QuickQuery($query, false, array($USER->id) + $audiofileids + array($token));
+						} else {
+							$query = "select id from audiofile where userid=? and name=? and deleted = 0";
+							$audioid = QuickQuery($query, false, array($USER->id, $token));
+						}
 						
-						$audioid = QuickQuery($query, false, array($USER->id, $messagegroupid, $token));
 						if ($audioid !== false) {
 							//find an audiofile with this name
 							$part->audiofileid = $audioid;
@@ -346,9 +331,8 @@ class Message extends DBMappedObject {
 
 		return $parts;
 	}
-
-	static function formatParts ($parts, $translatable = false) {
-
+	
+	function format ($parts, $translatable = false) {
 		$map = FieldMap::getMapNames();
 		$data = "";
 		$voices = DBFindMany("Voice", "from ttsvoice");
