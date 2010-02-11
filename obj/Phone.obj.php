@@ -6,12 +6,33 @@ class Phone extends DBMappedObject {
 	var $phone;
 	var $sequence;
 	var $editlock;
-
+	var $editlockdate;
+	
 	function Phone ($id = NULL) {
 		$this->_tablename = "phone";
-		$this->_fieldlist = array("personid", "phone", "sequence","editlock");
+		$this->_allownulls = true;
+		$this->_fieldlist = array("personid", "phone", "sequence","editlock","editlockdate");
 		//call super's constructor
 		DBMappedObject::DBMappedObject($id);
+	}
+	
+	function update ($specificfields = NULL, $updatechildren = false) {
+		if (isset($this->id)) {
+			$originalObject = new Phone($this->id);
+			if (($originalObject->phone != $this->phone) ||
+				($originalObject->editlock != $this->editlock)) {
+					if ($this->editlock)
+						$this->editlockdate = date("Y-m-d H:i:s", time());
+					else
+						$this->editlockdate = null;
+			}
+		} else {
+					if ($this->editlock)
+						$this->editlockdate = date("Y-m-d H:i:s", time());
+					else
+						$this->editlockdate = null;
+		}
+		DBMappedObject::update($specificfields, $updatechildren);
 	}
 
 	static function format ($phone) {
