@@ -13,6 +13,8 @@ require_once("inc/utils.inc.php");
 require_once("inc/securityhelper.inc.php");
 require_once("inc/formatters.inc.php");
 require_once("obj/JobType.obj.php");
+require_once("obj/MessageGroup.obj.php");
+require_once("obj/Message.obj.php");
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -92,8 +94,12 @@ function getJobTypes($job) {
 			if ($questionnaire->hasweb)
 				$types[] = "email";
 		} else {
-			if ($job->type)
-				$types = explode(",",$job->type);
+			$mg = new MessageGroup($job->messagegroupid);
+			
+			$types = array();
+			foreach (array("phone","email","sms") as $type)
+				if ($mg->hasMessage($type))
+					$types[] = $type;
 	}
 	return $types;
 }
