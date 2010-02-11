@@ -52,20 +52,23 @@ if(isset($_GET['clock'])) {
 	exit(0);
 }
 
-
-
-if (isset($_POST['eventContacts']) && isset($_POST['eventMessage']) && isset($_POST['isChecked'])) {
+if (isset($_POST['eventContacts']) && isset($_POST['eventMessage']) && isset($_POST['isChecked']) && isset($_POST['sectionid'])) {
+	header('Content-Type: application/json');
 	$contacts = json_decode($_POST['eventContacts']);
-	$message = $_POST['eventMessage'];
-	$comment = isset($_POST['eventComments'])?$_POST['eventComments']:"";
-	
-	$ischecked = $_POST['isChecked'];
+	$message = DBSafe($_POST['eventMessage']);
+	$sectionid = DBSafe($_POST['sectionid']);
+	$ischecked = DBSafe($_POST['isChecked']);
+
+
+	$args = array();
+	foreach($contacts as $contact) {
+		$args[] = $contact + 0; // DB Safe! Make sure its an integer
+	}
+	$args[] = $USER->id;
+	$args[] = $message;
+	$args[] = $sectionid;
 	if($ischecked == "false") {
-		$args = array($USER->id,$message);
-		foreach($contacts as $contact) {
-			$args[] = $contact;
-		}
-		$eventids = QuickQueryList("select e.id from personassociation pa left join event e on (pa.eventid = e.id) where e.userid = ? and e.targetedmessageid = ? and Date(e.occurence) = CURDATE() and pa.personid in (" . repeatWithSeparator("?",",",count($contacts)) . ")",
+		$eventids = QuickQueryList("select e.id from personassociation pa left join event e on (pa.eventid = e.id) where pa.personid in (" . repeatWithSeparator("?",",",count($contacts)) . ") and e.userid = ? and e.targetedmessageid = ? and e.sectionid = ? and Date(e.occurence) = CURDATE()",
 						false,false,$args);
 		if (count($eventids) > 0) {
 			$idstr = implode(",",$eventids);
@@ -74,48 +77,60 @@ if (isset($_POST['eventContacts']) && isset($_POST['eventMessage']) && isset($_P
 			QuickQuery("delete from personassociation where eventid in (" . $idstr . ")");
 			QuickQuery("delete from event where id in (" . $idstr . ")");
 			QuickQuery("COMMIT");
-		}
-		exit();
-  	}
-
-	foreach($contacts as $contact) {
-		QuickQuery("BEGIN");
-		// Query to see if the event is recorded
-		$eventid = QuickQuery("select e.id from personassociation pa left join event e on (pa.eventid = e.id) where pa.personid = ? and e.userid = ? and e.targetedmessageid = ? and Date(e.occurence) = CURDATE()",
-						false,array($contact,$USER->id,$message));
-		$event = null;
-		if($eventid === false) {
-			$event = new Event();
 		} else {
+			echo json_encode(false);
+			exit(0);
+		}
+  	} else {
+		$section = DBFind("Section","from section where id = ?",false,array($sectionid));
+
+		if(!$section) {
+			echo json_encode(false);
+			exit(0);
+		}
+
+		$events = QuickQueryList("select pa.personid,e.id from personassociation pa
+											left join event e on (pa.eventid = e.id)
+											where pa.personid in (" . repeatWithSeparator("?",",",count($contacts)) . ")
+											and e.userid = ? and e.targetedmessageid = ? and e.sectionid = ? and Date(e.occurence) = CURDATE()",
+											true,false,$args);
+
+
+
+		foreach($contacts as $contact) {
+			$eventid = isset($events[$contact])?$events[$contact]:null;
+			QuickQuery("BEGIN");
 			$event = new Event($eventid);
+			$event->userid = $USER->id;
+			$event->organizationid = $section->organizationid;
+			$event->sectionid = $section->id;
+			$event->targetedmessageid = $message;
+			$event->name = "Teacher Comment";
+			if(isset($_POST['eventComments'])) {
+				$event->notes = $USER->authorize('targetedmessage')?$_POST['eventComments']:"";
+			}
+			else if(!$event->notes){
+				$event->notes = "";
+			}
+			$event->occurence = date("Y-m-d H:i:s");
+			$event->update();
+
+			// Get the alert since this is a targeted message there should only be one alert
+			$alert = ($eventid)?new Alert(QuickQuery("select id from alert where eventid = ?",false,array($event->id))):new Alert();
+			$alert->eventid = $event->id;
+			$alert->personid = $contact;
+			$alert->date = date("Y-m-d");
+			$alert->time = date("H:i:s");
+			$alert->update();
+
+			if(!$eventid) {
+				QuickQuery("insert into personassociation values (?,?,?,?,?)",false,array($contact,'event',NULL,NULL,$event->id));
+			}
+			QuickQuery("COMMIT");
 		}
-		$event->userid = $USER->id;
-		$event->organizationid = 1; //TODO implement organization stuff
-		$event->sectionid = 1;  //TODO implement section stuff
-		$event->targetedmessageid = $message;
-		$event->name = "placeholder: TODO"; // TODO get name from targetedmessage
-		if(isset($_POST['eventComments']))
-			$event->notes = $USER->authorize('targetedmessage')?$_POST['eventComments']:"";
-		else if(!$event->notes)
-			$event->notes = "";
-		$event->occurence = date("Y-m-d H:i:s");
-		$event->update();
-
-		// Get the alert since this is a targeted message there should only be one alert
-		$alert = ($eventid !== false)?new Alert(QuickQuery("select id from alert where eventid = ?",false,array($event->id))):new Alert();		
-		$alert->eventid = $event->id;
-		$alert->personid = $contact;
-		$alert->date = date("Y-m-d");
-		$alert->time = date("H:i:s");
-		$alert->update();
-
-		if($eventid === false) {
-			QuickQuery("insert into personassociation values (?,?,?,?,?)",false,array($contact,'event',NULL,NULL,$event->id));
-		}
-		QuickQuery("COMMIT");
-
 	}
-	exit(0);
+	echo json_encode(true);
+	exit();
 }
 
 //Handle ajax request. when swithcing sections
@@ -142,7 +157,7 @@ if (isset($_GET['sectionid'])) {
 			$contactids = array_keys($response->people);
 			$query = "select tm.targetedmessagecategoryid, pa.personid, e.targetedmessageid, e.notes from
 					 personassociation pa left join event e on (pa.eventid = e.id)
-					 left join targetedmessage tm on (e.targetedmessageid = tm.id)
+						left join targetedmessage tm on (e.targetedmessageid = tm.id)
 					 where e.targetedmessageid is not null and e.userid = ? and Date(e.occurence) = CURDATE() and pa.personid in (" . implode(",",$contactids) . ")";
 			$response->cache = QuickQueryMultiRow($query,false,false,array($USER->id));
 		} else {
@@ -400,32 +415,32 @@ endWindow();
 
 	function setEvent(contactid,messageid,isChecked,comment) {
 		var category = tabs.currentSection.substr(4); // strip 'lib-'
-		var people = checkedcache;//.get(category);
-		if(people.get(contactid) == undefined){
-			people.set(contactid,new Hash());
+		if(checkedcache.get(contactid) == undefined){
+			checkedcache.set(contactid,new Hash());
 		}
-		var contactlink = people.get(contactid);
+		var contactlink = checkedcache.get(contactid);
 		if(isChecked) {
-
-			var img = $('c-' + contactid + '-' + category);
-			if(img != undefined) {
-				img.src = categoryinfo.get(category).img;
-				//img.show();
+			if(contactlink.get(messageid) == undefined || comment !== false) {
+				var img = $('c-' + contactid + '-' + category);
+				if(img != undefined) {
+					img.src = categoryinfo.get(category).img;
+				}
+				contactlink.set(messageid,comment);
 			}
-			contactlink.set(messageid,comment);
 		} else {
 			contactlink.unset(messageid);
 			if(contactlink.size() == 0) {
 				var img = $('c-' + contactid + '-' + category);
 				if(img != undefined) {
-					//img.hide();
 					img.src = 'img/pixel.gif';
 
 				}
-				people.unset(contactid);
+				checkedcache.unset(contactid);
 			}
 		}
 	}
+
+
 	 function saveComment(id) {
 		var prefix = tabs.currentSection == 'lib-search'?'smsg':'msg';
 		var text = $(prefix+ 'rem' + id).down('textarea').getValue();
@@ -436,23 +451,26 @@ endWindow();
 			parameters: {eventContacts: checkedcontacts.keys().toJSON(),
 						eventMessage: id,
 						isChecked: true,
-						eventComments:text},
-			onSuccess: function(transport){
-
-
-
-
-
-
-				checkedcontacts.each(function(contact) {
-					setEvent(contact.key,id,true,text);
-				});
-				$(prefix + 'rem' + id).hide();
-				$(prefix + '-' + id).down('a').show();
-				$(prefix + '-' + id).setStyle("height:4.5em;")
-				$(prefix + 'txt-' + id).setStyle("height:3em;")
-				remarkpreview(prefix,id,text);
-
+						eventComments:text,
+						sectionid:$('classselect').getValue()},
+			onSuccess: function(response){
+				if (response.responseText.indexOf(" Login</title>") != -1) {
+					alert('Your changes cannot be saved because your session has expired or logged out.');
+					window.location="index.php?logout=1";
+				}
+				if(response.responseJSON == false) {
+					alert('Unable to save remark');
+				}
+				else {
+					checkedcontacts.each(function(contact) {
+						setEvent(contact.key,id,true,text);
+					});
+					$(prefix + 'rem' + id).hide();
+					$(prefix + '-' + id).down('a').show();
+					$(prefix + '-' + id).setStyle("height:4.5em;")
+					$(prefix + 'txt-' + id).setStyle("height:3em;")
+					remarkpreview(prefix,id,text);
+				} 
 			}
 		});
 	 }
@@ -785,7 +803,7 @@ endWindow();
 		if(event.target.hasClassName && (event.target.hasClassName('msgtxt') || event.target.hasClassName('msgchk') || event.target.hasClassName('remarklink'))) {
 			state = (state == 2)? 0 : 2;
 			var textarea = $(c_prefix + 'rem' + msgid).down('textarea');
-			if((state == 0) && hascomments && textarea.getValue() != "") {
+			if((state == 0) && (hascomments && textarea.getValue() != '' || $(c_prefix + 'prem' + msgid).innerHTML != '')) {
 				if(!confirm('The custom remark will be removed if unselecting.'))
 					return;
 				else {
@@ -801,7 +819,8 @@ endWindow();
 				method:'post',
 				parameters: {eventContacts: checkedcontacts.keys().toJSON(),
 							eventMessage: msgid,
-							isChecked:(state == 2)},
+							isChecked:(state == 2),
+							sectionid:$('classselect').getValue()},
 				onFailure: function(){ alert('Unable to Set Message') },
 				onException: function(){ alert('Unable to Set Message') },
 				onSuccess: function(response){
@@ -823,8 +842,6 @@ endWindow();
 						$(htmlid).down('a').show();
 					}
 
-
-
 					checkedcontacts.each(function(contact) {
 						if(state == 2) {
 							highlightedcontacts.set('c-' + contact.key,true);
@@ -839,7 +856,7 @@ endWindow();
 							}
 							highlightedcontacts.unset('c-' + contact.key);
 						}
-						setEvent(contact.key,msgid,(state == 2),"");
+						setEvent(contact.key,msgid,(state == 2),false);
 					});
 				}
 			});
@@ -865,8 +882,8 @@ endWindow();
 		$('checkall').observe('click', function(event) {
 			event.stop();
 			$$('#contactbox a').each(function(contact) {
-				//contact.style.background = "#ffcccc";
-				contact.setStyle('font-weight:bold');
+				contact.style.background = c_selected;
+				//contact.setStyle('font-weight:bold');
 				checkedcontacts.set(contact.id.substr(2),true);
 			});
 			if(revealmessages) {
