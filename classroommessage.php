@@ -26,7 +26,7 @@ if (!$USER->authorize('targetedmessage')) {
 // Settings
 ////////////////////////////////////////////////////////////////////////////////
 
-$contentfile = "messagedata/en/data.php";
+$contentfile = "messagedata/en/targetedmessage.php";
 $requesturl = "classroommessage.php";
 $redirect = "classroommessageoverview.php";
 $commentname = "Comment";
