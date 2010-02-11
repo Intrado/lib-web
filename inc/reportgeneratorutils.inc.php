@@ -70,8 +70,8 @@ function displayJobSummary($joblist, $readonlyDB = false){
 		$jobinfo = getJobSummary($joblist, $readonlyDB);
 
 		//Check for any sms messages
-		$smscheck = QuickQuery("select count(smsmessageid) from job where id in ('" . $joblist . "')", $readonlyDB);
-
+		//$smscheck = QuickQuery("select count(smsmessageid) from job where id in ('" . $joblist . "')", $readonlyDB);
+		$smscheck = getSystemSetting('_hassms', '0'); // TODO
 
 		startWindow("Summary ". help("ReportGeneratorUtils_Summary"), 'padding: 3px;');
 		?>
