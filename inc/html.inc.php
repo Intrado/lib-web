@@ -255,4 +255,9 @@ function audio($name) {
 	</select>
 	<?
 }
+
+function html_to_plain($html) {
+	return strip_tags($html);
+}
+
 ?>
