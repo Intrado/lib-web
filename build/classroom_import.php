@@ -70,7 +70,7 @@ $path = $values["o"] . "/" . $values["l"];
 if(!file_exists($path)) {
 	mkdir($path, 0755);
 }
-$output = fopen($path . "/data.php", 'w') or die("Can't open output file \"" . $values["o"] . "\"\n");
+$output = fopen($path . "/targetedmessage.php", 'w') or die("Can't open output file \"" . $values["o"] . "\"\n");
 
 echo "Processing";
 $count = 0;
@@ -78,12 +78,26 @@ $count = 0;
 fwrite($output, "<? \n\$messagedatacache[\"" . $values["l"] . "\"] = array(\n");
 
 $checkarray = array();
+
+//setlocale(LC_ALL, 'en_US.UTF8');
+
+fgetcsv($input); // Skip the header line
 while (($data = fgetcsv($input)) !== FALSE) {
-	if(!isset($data[0]) || !isset($data[1]))
-		exit("Unable to read the first two values in line\n");
+	if(!isset($data[0]))
+		exit("Unable to read the first column on line " . ($count + 1) ."\n");
+	if(!isset($data[1]))
+		exit("Unable to read the second column on line " . ($count + 1) ."\n");
+	if(!isset($data[2]))
+		exit("Unable to read the third column on line " . ($count + 1) ."\n");
+
 	echo ".";
+
+	// First value => message key
+	// Second value => english
+	// third value => translation
+
 	$key = addslashes(strtolower(trim($data[0])));
-	$value = addcslashes($data[1],"'");
+	$value = addcslashes($data[2],"'");
 	if(!isset($checkarray[$key])) {
 		fwrite($output, "'$key'=>'$value',\n");
 		$checkarray[$key] = $value;
