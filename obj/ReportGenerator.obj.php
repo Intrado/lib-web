@@ -29,7 +29,7 @@ class ReportGenerator {
 	}
 
 	function generate($options = null){
-		$result = "";
+		$result = "success";
 		$hackPDF = false; // used for Gfields display
 		if ($this->format == "pdf") $hackPDF = true;
 		$this->generateQuery($hackPDF);
@@ -39,7 +39,7 @@ class ReportGenerator {
 				$this->runHtml();
 				break;
 			case 'csv':
-				$this->runCSV();
+				$this->runCSV($options);
 				break;
 			case 'pdf':
 				$this->setReportFile();
