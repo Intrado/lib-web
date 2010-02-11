@@ -167,7 +167,7 @@ foreach($fields as $field){
 	}
 }
 $options['activefields'] = implode(",",$activefields);
-$options['outputtype'] = 'csv'; // default outputtype (most reports use PDF by default)
+$options['format'] = 'csv'; // (most reports use PDF by default), this one does not support it, only CSV
 $instance = new ReportInstance();
 
 if(isset($_SESSION['reportid'])){
