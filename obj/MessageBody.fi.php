@@ -11,8 +11,28 @@ class MessageBody extends FormItem {
 		
 		if (isset($this->args['language']))
 			$language = $this->args['language'];
-		$str = '
-			<div class="MessageBodyContainer" style="'.(!empty($this->args['hidden']) ? 'display:none' : '').'">
+			
+		$str = '';
+		
+		$hidden = isset($this->args['hidden']) ? $this->args['hidden'] : false;
+		
+		if (isset($this->args['overrideplaintext'])) {
+			$str .= '
+				<div id="'.$n.'plaintextpreview" style="display:'.($this->args['overrideplaintext'] ? 'none' : 'block').';">
+					<pre style="color:gray; border: solid 1px gray;">' .
+					(isset($this->args['plaintextmessage']) && $this->args['plaintextmessage'] != '' ?
+						escapehtml($this->args['plaintextmessage']) :
+						"<em>" . escapehtml(_L("A plain-text message will be generated from the HTML message.")) . "</em>"
+					) .
+					'</pre>
+				</div>
+			';
+			
+			if (!$this->args['overrideplaintext'])
+				$hidden = true;
+		}
+		
+		$str .= '<div id="'.$n.'messagebodycontainer" class="MessageBodyContainer" style="'.($hidden ? 'display:none' : '').'">
 			<table style="width:100%">
 				<tr>
 					<td valign="top" rowspan="5">
@@ -114,15 +134,14 @@ class MessageBody extends FormItem {
 				</tr>
 			</table>';
 			
-		$str .= '</div>';
+		$str .= '</div>'; // MessageBodyContainer
 	
 		return $str;
 	}
 	
 	function renderJavascript() {
 		$n = $this->form->name."_".$this->name;
-		$usehtmleditor = !empty($this->args['usehtmleditor']) ? 'true' : 'false';
-		$hidden = !empty($this->args['hidden']) ? 'true' : 'false';
+		
 		$str = "
 			(function() {
 				var setselection = function () {
@@ -134,10 +153,37 @@ class MessageBody extends FormItem {
 				textarea.observe('keyup',setselection.bindAsEventListener(textarea));
 				textarea.observe('mouseup',setselection.bindAsEventListener(textarea));
 				
-				if ($usehtmleditor && !$hidden) {
+		";
+		
+		if ((isset($this->args['usehtmleditor']) && $this->args['usehtmleditor']) &&
+			(!isset($this->args['hidden']) || !$this->args['hidden'])) {
+			$str .= "
 					if (textarea.visible())
 						applyHtmlEditor(textarea);
-				}
+			";
+		}
+		
+		if (isset($this->args['overrideplaintext'])) {
+			$str .= "
+					var form = $('{$this->form->name}');
+					var messagebodycontainer = $('{$n}messagebodycontainer');
+					var plaintextpreview = $('{$n}plaintextpreview');
+					form.observe('PlainEmailCheckbox:OverridePlainText', function(event) {
+						if (event.memo.override) {
+							messagebodycontainer.show();
+							plaintextpreview.hide();
+							if (textarea.value.strip() == '') {
+								textarea.value = '';
+							}
+						} else {
+							messagebodycontainer.hide();
+							plaintextpreview.show();
+						}
+					});
+			";
+		}
+		
+		$str .= "
 			})();
 		";
 		
