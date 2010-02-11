@@ -163,9 +163,9 @@ class Message extends DBMappedObject {
 		return Message::parseText($this->messagegroupid, $data, $errors, $defaultvoiceid);
 	}
 	
-	// Wrapper for Message::formatText.
+	// Wrapper for Message::formatParts.
 	function format ($parts, $translatable = false) {
-		return Message::formatText($parts, $translatable);
+		return Message::formatParts($parts, $translatable);
 	}
 	
 	static function parseText ($messagegroupid, $data, &$errors = NULL, $defaultvoiceid=null) {
@@ -347,7 +347,7 @@ class Message extends DBMappedObject {
 		return $parts;
 	}
 
-	static function formatText ($parts, $translatable = false) {
+	static function formatParts ($parts, $translatable = false) {
 
 		$map = FieldMap::getMapNames();
 		$data = "";

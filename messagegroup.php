@@ -787,7 +787,7 @@ if ($button = $messagegroupsplitter->getSubmit()) {
 									if (!empty($autotranslatorlanguages)) {
 										// Batch translation.
 										$sourcemessageparts = Message::parseText($messagegroup->id, $_SESSION['autotranslatesourcetext']["{$formdestinationtype}{$formdestinationsubtype}"]);
-										$sourcemessagetext = Message::formatText($sourcemessageparts, true);
+										$sourcemessagetext = Message::formatParts($sourcemessageparts, true);
 										if ($formdestinationtype == 'email' && $formdestinationsubtype == 'html') {
 											$plainsourcemessageparts = Message::parseText($messagegroup->id, html_to_plain($sourcemessagetext));
 										}
@@ -970,7 +970,7 @@ if ($button = $messagegroupsplitter->getSubmit()) {
 								
 								$trimmedsourcetext = isset($translationitemdata->englishText) ? trim($translationitemdata->englishText) : '';
 								if (!empty($messagesneeded['translated']) && !empty($trimmedsourcetext)) {
-									if (!$translation = translate_fromenglish(Message::formatText(Message::parseText($messagegroup->id, $trimmedsourcetext),true), array($formdestinationlanguagecode))) {
+									if (!$translation = translate_fromenglish(Message::formatParts(Message::parseText($messagegroup->id, $trimmedsourcetext),true), array($formdestinationlanguagecode))) {
 										unset($translation);
 									}
 								}
