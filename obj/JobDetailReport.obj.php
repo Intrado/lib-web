@@ -100,6 +100,7 @@ class JobDetailReport extends ReportGenerator{
 
 		$searchquery = " and rp.jobid in ('" . $joblist. "')";
 		$searchquery .= $resultquery . $typequery;
+		$orgfieldquery = generateOrganizationFieldQuery("rp.personid");
 		$fieldquery = generateFields("rp");
 		$gfieldquery = generateGFieldQuery("rp.personid", true, $hackPDF);
 		$this->query =
@@ -132,6 +133,7 @@ class JobDetailReport extends ReportGenerator{
 			rc.sequence as sequence,
 			rc.voicereplyid as voicereplyid,
 			vr.id as vrid
+			$orgfieldquery
 			$fieldquery
 			$gfieldquery
 			, dl.label as label
@@ -145,6 +147,7 @@ class JobDetailReport extends ReportGenerator{
 			left join surveyweb sw on (sw.personid = rp.personid and sw.jobid = rp.jobid)
 			left join destlabel dl on (rc.type = dl.type and rc.sequence = dl.sequence)
 			left join voicereply vr on (vr.jobid = rp.jobid and vr.personid = rp.personid and vr.sequence = rc.sequence and vr.userid = " . $USER->id . " and rc.type='phone')
+			left join language l on (l.code = rp." . FieldMap::GetLanguageField() . ")
 			where 1
 			$searchquery
 			$rulesql
@@ -202,6 +205,10 @@ class JobDetailReport extends ReportGenerator{
 				default;
 					return ucfirst($status);
 			}
+		}
+
+		function fmt_organization($row, $index) {
+			return $row[18];
 		}
 
 		$typequery = "";
@@ -302,14 +309,17 @@ class JobDetailReport extends ReportGenerator{
 						11 => "Attempts",
 						8 => "Last Attempt",
 						9 => "Last Result",
-						14 => "Response");
-		$titles = appendFieldTitles($titles, 17, $fieldlist, $activefields);
+						14 => "Response",
+						17 => "Organization");
+		$titles = appendFieldTitles($titles, 18, $fieldlist, $activefields);
 
 		$formatters = array(7 => "fmt_destination",
 							8 => "fmt_date",
 							9 => "fmt_jobdetail_result",
 							14 => "fmt_detailedresponse",
-							15 => "fmt_dst_src");
+							15 => "fmt_dst_src",
+							17 => "fmt_organization"
+							);
 		showTable($data,$titles,$formatters);
 		echo "</table>";
 		showPageMenu($total,$pagestart,500);
@@ -370,20 +380,10 @@ class JobDetailReport extends ReportGenerator{
 			}
 		}
 
-		// find the f-fields the same way as the query did
-		// strip off the f, use the field number as the index and
-		// it's position as the offset
-		$fieldindex = explode(",",generateFields("p"));
-		foreach($fieldindex as $index => $fieldnumber){
-			$aliaspos = strpos($fieldnumber, ".");
-			if($aliaspos !== false){
-				$fieldindex[$index] = substr($fieldnumber, $aliaspos+1);
-			}
-		}
-		$fieldindex = array_flip($fieldindex);
+		$fieldindex = getFieldIndexList("p");
 		$activefields = array_flip($activefields);
 		//generate the CSV header
-		$header = '"Job Name","Submitted by","ID","First Name","Last Name","Message","Dst. Src.","Destination","Attempts","Last Attempt","Last Result","Response"';
+		$header = '"Job Name","Submitted by","ID","First Name","Last Name","Message","Dst. Src.","Destination","Attempts","Last Attempt","Last Result","Response","Organization"';
 		foreach($fieldlist as $fieldnum => $fieldname){
 			if(isset($activefields[$fieldnum])){
 				$header .= ',"' . $fieldname . '"';
@@ -416,8 +416,8 @@ class JobDetailReport extends ReportGenerator{
 			}
 			$row[9] = html_entity_decode(fmt_jobdetail_result($row,9));
 
-			$reportarray = array($row[0], $row[1], $row[2],$row[3],$row[4],$row[6],fmt_dst_src($row, 15),$row[7],$row[11],$row[8],$row[9],fmt_confirmation($row, 14));
-			//index 15 is the last position of a non-ffield
+			$reportarray = array($row[0], $row[1], $row[2],$row[3],$row[4],$row[6],fmt_dst_src($row, 15),$row[7],$row[11],$row[8],$row[9],fmt_confirmation($row, 14), $row[18]);
+			//index 18 is the last position of a non-ffield
 			foreach($fieldlist as $fieldnum => $fieldname){
 				if(isset($activefields[$fieldnum])){
 					if (strpos($fieldnum, "g") === 0) {
@@ -425,7 +425,7 @@ class JobDetailReport extends ReportGenerator{
 					} else {
 						$num = $fieldindex[$fieldnum]; // ffield
 					}
-					$reportarray[] = $row[17+$num]; // 15 is last index, plus 2 for first/lastname, $num starts at 1 for f03
+					$reportarray[] = $row[18+$num]; // 18 is last index, $num starts at 1 for f03
 				}
 			}
 			if ($issurvey) {
@@ -485,7 +485,7 @@ class JobDetailReport extends ReportGenerator{
 		$ordering["Last Attempt"]="lastattempt";
 		$ordering["Last Result"]="result";
 		$ordering["Response"]="confirmed DESC, voicereplyid DESC";
-
+		$ordering["Organization"]="org";
 
 		foreach($fields as $field){
 			$ordering[$field->name]= "rp." . $field->fieldnum;
