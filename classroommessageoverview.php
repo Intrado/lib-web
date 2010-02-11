@@ -79,6 +79,8 @@ if($isajax === true) {
 		$sqlargs[] = $_GET['category'];
 		$extrasql .= " and tm.targetedmessagecategoryid = ? ";
 		$getcategory = true;
+	} else {
+		$getcategory = false;
 	}
 
 	if(isset($_GET['sortby'])) {
