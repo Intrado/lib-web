@@ -44,11 +44,11 @@ function makeSummaryTab($destinations, $customerlanguages, $systemdefaultlanguag
 	);
 }
 
-function makeTranslationItem($required, $type, $subtype, $languagecode, $languagename, $preferredgender, $sourcetext, $messagetext, $translationcheckboxlabel, $override, $allowoverride = true, $hidetranslationcheckbox = false, $enabled = true, $disabledinfo = "", $datafields = null, $inautotranslator = false, $maximages = 10) {
+function makeTranslationItem($required, $type, $subtype, $languagecode, $languagename, $preferredgender, $sourcetext, $messagetext, $overrideplaintext, $translationcheckboxlabel, $override, $allowoverride = true, $hidetranslationcheckbox = false, $enabled = true, $disabledinfo = "", $datafields = null, $inautotranslator = false, $maximages = 10) {
+	
 	$control = array("TranslationItem",
 		"phone" => $type == 'phone',
 		"language" => $languagecode,
-		"multilingual" => $type != 'sms',
 		"subtype" => $subtype,
 		"reload" => true,
 		"allowoverride" => $allowoverride,
@@ -75,25 +75,46 @@ function makeTranslationItem($required, $type, $subtype, $languagecode, $languag
 	}
 	if ($type == 'email' && !$inautotranslator) {
 		$validators[] = array("ValEmailMessageBody");
+		
+		if ($subtype == 'plain') {
+			$control["overrideplaintext"] = $overrideplaintext;
+			$control["plaintextmessage"] = $messagetext;
+		}
 	}
-
-	if (!$inautotranslator)
-		$validators[] = array("ValMessageBody", "translationitem" => true, "type" => $type, "subtype" => $subtype, "languagecode" => $languagecode, "maximages" => $maximages);
+	
+	if (!$inautotranslator) {
+		$validators[] = array("ValMessageBody",
+			"translationitem" => true,
+			"type" => $type,
+			"subtype" => $subtype,
+			"languagecode" => $languagecode,
+			"maximages" => $maximages
+		);
+	}
 	$validators[] = array("ValTranslationItem", "required" => $required);
 
 	if ($required)
 		$validators[] = array("ValRequired");
 
-	return array(
-		"label" => _L('%s Message', ucfirst($languagename)),
-		"value" => json_encode(array(
+	if (!$inautotranslator &&
+		(($enabled && !$override && empty($sourcetext)) ||
+			((!$enabled || $override) && empty($messagetext)))
+	) {
+		$value = "";
+	} else {
+		$value = json_encode(array(
 			"enabled" => $enabled,
 			"text" => $messagetext,
 			"englishText" => $sourcetext,
 			"override" => $override,
 			"gender" => $preferredgender,
 			"language" => $languagecode
-		)),
+		));
+	}
+	
+	return array(
+		"label" => _L('%s Message', ucfirst($languagename)),
+		"value" => (!$inautotranslator && $type == 'email' && $subtype == 'plain' && !$overrideplaintext) ? "" : $value,
 		"validators" => $validators,
 		"control" => $control,
 		"renderoptions" => array("icon" => false, "label" => false, "errormessage" => true),
@@ -119,7 +140,7 @@ function makeBrandingFormHtml() {
 	');
 }
 
-function makeMessageBody($required, $type, $subtype, $languagecode, $label, $messagetext, $datafields = null, $usehtmleditor = false, $hideplaybutton = false, $hidden = false, $maximages = 10) {
+function makeMessageBody($required, $type, $subtype, $languagecode, $label, $messagetext, $datafields = null, $usehtmleditor = false, $overrideplaintext = 0, $hideplaybutton = false, $hidden = false, $maximages = 10) {
 	$control = array("MessageBody",
 		"playbutton" => $type == 'phone' && !$hideplaybutton,
 		"usehtmleditor" => $usehtmleditor,
@@ -139,14 +160,19 @@ function makeMessageBody($required, $type, $subtype, $languagecode, $label, $mes
 	}
 	if ($type == 'email') {
 		$validators[] = array("ValEmailMessageBody");
+		
+		if ($subtype == 'plain') {
+			$control["overrideplaintext"] = $overrideplaintext;
+			$control["plaintextmessage"] = $messagetext;
+		}
 	}
-
+	
 	if ($required)
 		$validators[] = array("ValRequired");
 
 	return array(
 		"label" => $label,
-		"value" => $messagetext,
+		"value" => ($type == 'email' && $subtype == 'plain' && !$overrideplaintext) ? "" : $messagetext,
 		"validators" => $validators,
 		"control" => $control,
 		"transient" => false,
@@ -651,6 +677,7 @@ class ValEmailMessageBody extends Validator {
 		// It is an error if any of the headers are blank.
 		foreach ($_SESSION['emailheaders'] as $headervalue) {
 			$headervalue = trim($headervalue);
+			
 			if (empty($headervalue))
 				return _L('Email headers are incomplete. Please fill in the Subject, From Name, and From Email.');
 		}
@@ -669,6 +696,36 @@ class ValTranslationItem extends Validator {
 			}
 		}
 		return true;
+	}
+}
+
+class ValOverridePlainText extends Validator {
+	var $onlyserverside = false;
+	
+	function validate ($value, $args, $requiredvalues) {
+		if ($value === "true" &&
+			(!isset($requiredvalues[$args['field']]) ||
+				trim($requiredvalues[$args['field']]) == "")
+		) {
+			return _L('When overriding plain-text, the message body is required.');
+		}
+		
+		return true;
+	}
+	
+	function getJSValidator () {
+		return '
+			function (name, label, value, args, requiredvalues) {
+				if (value &&
+					(!requiredvalues[args["field"]] ||
+						requiredvalues[args["field"]].strip() == "")
+				) {
+					return "' . _L('When overriding plain-text, the message body is required.') . '";
+				}
+				
+				return true;
+			}
+		';
 	}
 }
 
@@ -696,7 +753,7 @@ class ValDefaultLanguageCode extends Validator {
 			foreach ($existinglanguagecodes as $key => $languagecodes) {
 				if (!in_array($requestedlanguagecode, $languagecodes)) {
 					list($type, $subtype) = explode('-', $key);
-
+					
 					if ($type == 'email')
 						return _L('Please first create the %1$s message for %2$s in %3$s.', Language::getName($requestedlanguagecode), ucfirst($type), $subtype == 'html' ? 'HTML' : ucfirst($subtype));
 					else
