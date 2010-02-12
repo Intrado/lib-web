@@ -33,9 +33,10 @@ if(isset($_GET['clear'])){
 	redirect();
 }
 
-$groupby = isset($_SESSION['usagestats']['groupby']) ? $_SESSION['usagestats']['groupby'] : FieldMap::getSchoolField(); //defaults to school field
-if(!$groupby)
-	$groupby = ""; //but if school is not used, default to blank
+// default to 'Organization' only if they have any organizations in their database
+$defaultgroupby = (QuickQuery("select count(*) from organization") > 0) ? "org" : "";
+$groupby = isset($_SESSION['usagestats']['groupby']) ? $_SESSION['usagestats']['groupby'] : $defaultgroupby;
+
 $fields = DBFindMany("FieldMap", "from fieldmap where options like '%multisearch%' and (fieldnum like 'f%' or fieldnum like 'g%') order by fieldnum");
 
 $showusers = isset($_SESSION['usagestats']['showusers']) ? $_SESSION['usagestats']['showusers'] : "0";
