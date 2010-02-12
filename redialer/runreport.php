@@ -124,7 +124,7 @@ $_SESSION['access'] = new Access($USER->accessid);
 if(!isset($generator)){
 	exit("Bad report type, corresponding generator not found\n");
 }
-$generator->format = "pdf";
+
 $generator->reportinstance = $instance;
 echo "finished configuring generator\n";
 $result = "";
