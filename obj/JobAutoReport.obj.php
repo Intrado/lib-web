@@ -93,11 +93,10 @@ class JobAutoReport extends ReportGenerator{
 	}
 
 	function getReportSpecificParams(){
-		//$sms = QuickQuery("select count(smsmessageid) from job where id in ('" . $this->params['joblist'] . "')", $this->_readonlyDB) ? "1" : "0";
-		$sms = getSystemSetting('_hassms', '0'); // TODO
+		$hassms = QuickQuery("select exists (select * from message m where m.type='sms' and m.messagegroupid = j.messagegroupid) from job j where id in ('" . $this->params['joblist'] . "')", $this->_readonlyDB);
 		$params = array("jobId" => $this->params['jobid'],
 						"jobcount" => "1",
-						"hassms" => $sms);
+						"hassms" => $hassms);
 		return $params;
 	}
 }

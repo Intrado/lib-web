@@ -430,13 +430,14 @@ class JobSummaryReport extends ReportGenerator{
 		if($this->params['joblist'] != "")
 			$joblist=explode("','", $this->params['joblist']);
 
-		$sms = QuickQuery("select count(smsmessageid) from job where id in ('" . $this->params['joblist'] . "')", $this->_readonlyDB) ? "1" : "0";
+		$hassms = QuickQuery("select exists (select * from message m where m.type='sms' and m.messagegroupid = j.messagegroupid) from job j where id in ('" . $this->params['joblist'] . "')", $this->_readonlyDB);
+		
 		$messageconfirmation = QuickQuery("select sum(value) from jobsetting where name = 'messageconfirmation' and jobid in ('" . $this->params['joblist'] . "')", $this->_readonlyDB) ? "1" : "0";
 
 		$params = array("jobId" => $this->params['joblist'],
 						"jobcount" => count($joblist),
 						"daterange" => $daterange,
-						"hassms" => $sms,
+						"hassms" => $hassms,
 						"messageconfirmation" => $messageconfirmation);
 		return $params;
 	}

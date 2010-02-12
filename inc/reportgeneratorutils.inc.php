@@ -70,8 +70,7 @@ function displayJobSummary($joblist, $readonlyDB = false){
 		$jobinfo = getJobSummary($joblist, $readonlyDB);
 
 		//Check for any sms messages
-		//$smscheck = QuickQuery("select count(smsmessageid) from job where id in ('" . $joblist . "')", $readonlyDB);
-		$smscheck = getSystemSetting('_hassms', '0'); // TODO
+		$hassms = QuickQuery("select exists (select * from message m where m.type='sms' and m.messagegroupid = j.messagegroupid) from job j where id in ('" . $this->params['joblist'] . "')", $this->_readonlyDB);
 
 		startWindow("Summary ". help("ReportGeneratorUtils_Summary"), 'padding: 3px;');
 		?>
@@ -90,7 +89,7 @@ function displayJobSummary($joblist, $readonlyDB = false){
 								<th>Recipients</th>
 								<th># of Phones</th>
 								<th># of Emails</th>
-<? if($smscheck) { ?>
+<? if($hassms) { ?>
 								<th># of SMS</th>
 <? } ?>
 							</tr>
@@ -109,7 +108,7 @@ function displayJobSummary($joblist, $readonlyDB = false){
 									<td><?=$job[8]?></td>
 									<td><?=$job[9]?></td>
 									<td><?=$job[10]?></td>
-<? if($smscheck) { ?>
+<? if($hassms) { ?>
 									<td><?=$job[11]?></td>
 <? } ?>
 								</tr>
