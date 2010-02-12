@@ -68,6 +68,10 @@ function fmt_dst_src($row, $index){
 		return "";
 }
 
+function fmt_organization($row, $index) {
+	return $row[9];
+}
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // Data Handling
