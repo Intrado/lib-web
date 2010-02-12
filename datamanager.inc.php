@@ -192,7 +192,6 @@ if (CheckFormSubmit($form, $section) || CheckFormSubmit($form, 'add')) {
 							if ($fieldnum != FieldMap::getFirstNameField() &&
 								$fieldnum != FieldMap::getLastNameField() &&
 								$fieldnum != FieldMap::getLanguageField() &&
-								$fieldnum != FieldMap::getSchoolField() &&
 								$fieldnum != FieldMap::getGradeField() &&
 								$fieldnum != FieldMap::getStaffField() ) {
 
@@ -338,14 +337,9 @@ case "person" :
 			$types["Language"] = 'multisearch,language';
 		if(!FieldMap::getGradeField())
 			$types["Grade"] = 'multisearch,grade';
-		if(!FieldMap::getSchoolField())
-			$types["School"] = 'multisearch,school';
 break;
 case "group" :
 		$types = array("List" => 'multisearch');
-
-		if(!FieldMap::getSchoolField())
-			$types["School"] = 'multisearch,school';
 break;
 case "schedule" :
 		$types = array("List" => 'multisearch');
@@ -381,12 +375,11 @@ case "schedule" :
 break;
 }
 
-			// These 5 items are special cases
+			// These items are special cases
 			if ($fieldnum != $field->getFirstNameField() &&
 				$fieldnum != $field->getLastNameField() &&
 				$fieldnum != $field->getLanguageField() &&
 				$fieldnum != $field->getGradeField() &&
-				$fieldnum != $field->getSchoolField() &&
 				$fieldnum != $field->getStaffField() ) {
 ?>
 				<td><? NewFormItem($form, $section, "name_$fieldnum", 'text', '20'); ?></td>

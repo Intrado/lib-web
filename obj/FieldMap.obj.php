@@ -47,11 +47,6 @@ class FieldMap extends DBMappedObject {
 		return FieldMap::getFieldnumWithOption('grade');
 	}
 
-	// NOTE 'school' moved from Ffield to Gfield in release 6.1
-	static function getSchoolField(){
-		return FieldMap::getFieldnumWithOption('school');
-	}
-
 	static function getStaffField(){
 		return FieldMap::getFieldnumWithOption('staff', 'c01');
 	}
