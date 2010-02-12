@@ -20,6 +20,8 @@ require_once("obj/Sms.obj.php");
 require_once("inc/securityhelper.inc.php");
 require_once("inc/rulesutils.inc.php");
 require_once("obj/FormRuleWidget.fi.php");
+require_once("obj/SectionWidget.fi.php");
+require_once("obj/ValSections.val.php");
 require_once("obj/Job.obj.php");
 require_once("inc/reportutils.inc.php");
 
@@ -306,6 +308,20 @@ $formdata["ruledata"] = array(
 	"helpstep" => 1
 );
 
+$formdata["sectionids"] = array(
+	"label" => _L('Sections'),
+	"fieldhelp" => _L('Select sections from an organization.'),
+	"value" => "",
+	"validators" => array(
+		array("ValSections")
+	),
+	"control" => array("SectionWidget",
+		"sectionids" => isset($options['sectionids']) && count($options['sectionids']) > 0 ?
+			$options['sectionids'] :
+			array()
+	),
+	"helpstep" => 2
+);
 
 $formdata["jobtype"] = array(
 	"label" => _L("Filter by job type"),
@@ -390,7 +406,8 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 				$_SESSION['report']['options'] = array(
 					'reporttype' => 'phonedetail',
 					'rules' => isset($rules) ? $rules : array(),
-					'organizationids' => isset($organizationids) ? $organizationids : array()
+					'organizationids' => isset($organizationids) ? $organizationids : array(),
+					'sectionids' => isset($postdata['sectionids']) ? $postdata['sectionids'] : array()
 				);
 				
 				set_session_options_reporttype();
@@ -561,7 +578,7 @@ startWindow(_L("Select"), "padding: 3px;");
 
 	?>
 		<script type="text/javascript">
-			<? Validator::load_validators(array("ValRules", "ValReldate")); ?>
+			<? Validator::load_validators(array("ValSections", "ValRules", "ValReldate")); ?>
 		</script>
 	<?
 	echo $form->render();
