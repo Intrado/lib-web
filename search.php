@@ -24,6 +24,8 @@ require_once("inc/securityhelper.inc.php");
 include_once("ruleeditform.inc.php");
 require_once("inc/rulesutils.inc.php");
 require_once("obj/FormRuleWidget.fi.php");
+require_once("obj/SectionWidget.fi.php");
+require_once("obj/ValSections.val.php");
 require_once("inc/reportutils.inc.php");
 require_once("list.inc.php");
 
@@ -85,8 +87,11 @@ if (!isset($_SESSION['listsearchpreview'])) {
 	$formdata["toggles"] = array(
 		"label" => _L('Search Options'),
 		"control" => array("FormHtml", 'html' => "
-			<input name='listsearch_searchOption' id='searchByRules' type='radio' onclick=\"choose_search_by_rules();\"><label for='searchByRules'> Search by Rules </label>
-			<input name='listsearch_searchOption' id='searchByPerson' type='radio' onclick=\"choose_search_by_person();\"><label for='searchByPerson'> Search for Person </label>
+			<input id='searchByRules' type='radio' onclick=\"choose_search_by_rules();\"><label for='searchByRules'> Search by Rules </label>
+			
+			<input id='searchBySections' type='radio' onclick=\"choose_search_by_sections();\"><label for='searchBySections'> Search by Sections </label>
+			
+			<input id='searchByPerson' type='radio' onclick=\"choose_search_by_person();\"><label for='searchByPerson'> Search for Person </label>
 		"),
 		"helpstep" => 2
 	);
@@ -96,6 +101,23 @@ if (!isset($_SESSION['listsearchpreview'])) {
 		"value" => $rulewidgetvaluejson,
 		"control" => array("FormRuleWidget"),
 		"validators" => array(array('ValRules')),
+		"helpstep" => 2
+	);
+	
+	$formdata["sectionids"] = array(
+		"label" => _L('Sections'),
+		"fieldhelp" => _L('Select sections from an organization.'),
+		"value" => "",
+		"validators" => array(
+			array("ValSections")
+		),
+		"control" => array("SectionWidget", "sectionids" => isset($_SESSION['listsearchsectionids']) ? $_SESSION['listsearchsectionids'] : array()),
+		"helpstep" => 2
+	);
+	
+	$formdata["sectionsearchbutton"] = array(
+		"label" => _L(''),
+		"control" => array("FormHtml", "html" => "<div id='sectionsearchButtonContainer'>" . submit_button(_L('Search'),'sectionsearch',"magnifier") . "</div>"),
 		"helpstep" => 2
 	);
 
@@ -122,9 +144,9 @@ if (!isset($_SESSION['listsearchpreview'])) {
 		"helpstep" => 2
 	);
 
-	$formdata["searchbutton"] = array(
+	$formdata["personsearchbutton"] = array(
 		"label" => _L(''),
-		"control" => array("FormHtml", "html" => "<div id='searchButtonContainer'>" . submit_button(_L('Search'),"search","magnifier") . "</div>"),
+		"control" => array("FormHtml", "html" => "<div id='personsearchButtonContainer'>" . submit_button(_L('Search'),'personsearch',"magnifier") . "</div>"),
 		"helpstep" => 2
 	);
 }
@@ -197,7 +219,13 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 					$form->sendTo("search.php");
 					break;
 					
-				case 'search':
+				case 'sectionsearch':
+					list_clear_search_session('listsearchsectionids');
+					$_SESSION['listsearchsectionids'] = $postdata['sectionids'];
+					$form->sendTo("search.php");
+					break;
+					
+				case 'personsearch':
 					list_clear_search_session();
 					$_SESSION['listsearchperson'] = true;
 					$_SESSION['listsearchpkey'] = isset($postdata['pkey']) ? $postdata['pkey'] : false;
@@ -229,45 +257,46 @@ include_once("nav.inc.php");
 	var notpreview = <?= !isset($_SESSION['listsearchpreview']) ? "true;" : "false;" ?>
 
 	<? if (!isset($_SESSION['listsearchpreview'])) {
-		Validator::load_validators(array("ValRules"));
+		Validator::load_validators(array("ValSections", "ValRules"));
 	} ?>
-
-
-	document.observe('dom:loaded', function() {
-		if (notpreview) {
-			ruleWidget.delayActions = true;
-			ruleWidget.container.observe('RuleWidget:AddRule', rulewidget_add_rule);
-			ruleWidget.container.observe('RuleWidget:DeleteRule', rulewidget_delete_rule);
-			
-			<?
-				if (!empty($_SESSION['listsearchrules']) || empty($_SESSION['listsearchperson']))
-					echo 'choose_search_by_rules();';
-				else
-					echo 'choose_search_by_person();';
-			?>
-		}
-		
-		$('<?=$containerID?>').update('<?=addslashes(list_get_results_html($containerID, $renderedlist))?>');
-	});
 
 	function choose_search_by_rules() {
 		$('searchByRules').checked = true;
+		$('searchBySections').checked = false;
 		$('searchByPerson').checked = false;
 		$('ruleWidgetContainer').up('tr').show();
+		$('<?=$form->name?>_sectionids_fieldarea').hide();
+		$('sectionsearchButtonContainer').up('tr').hide();
 		$('<?=$form->name?>_pkey').up('tr').hide();
 		$('<?=$form->name?>_phone').up('tr').hide();
 		$('<?=$form->name?>_email').up('tr').hide();
-		$('searchButtonContainer').up('tr').hide();
+		$('personsearchButtonContainer').up('tr').hide();
+	}
+	
+	function choose_search_by_sections() {
+		$('searchByRules').checked = false;
+		$('searchBySections').checked = true;
+		$('searchByPerson').checked = false;
+		$('ruleWidgetContainer').up('tr').hide();
+		$('<?=$form->name?>_sectionids_fieldarea').show();
+		$('sectionsearchButtonContainer').up('tr').show();
+		$('<?=$form->name?>_pkey').up('tr').hide();
+		$('<?=$form->name?>_phone').up('tr').hide();
+		$('<?=$form->name?>_email').up('tr').hide();
+		$('personsearchButtonContainer').up('tr').hide();
 	}
 
 	function choose_search_by_person() {
 		$('searchByRules').checked = false;
+		$('searchBySections').checked = false;
 		$('searchByPerson').checked = true;
 		$('ruleWidgetContainer').up('tr').hide();
+		$('<?=$form->name?>_sectionids_fieldarea').hide();
+		$('sectionsearchButtonContainer').up('tr').hide();
 		$('<?=$form->name?>_pkey').up('tr').show();
 		$('<?=$form->name?>_phone').up('tr').show();
 		$('<?=$form->name?>_email').up('tr').show();
-		$('searchButtonContainer').up('tr').show();
+		$('personsearchButtonContainer').up('tr').show();
 	}
 
 	function list_clear_person() {
@@ -293,6 +322,25 @@ include_once("nav.inc.php");
 			form_submit(event, 'deleterule');
 		}
 	}
+	
+	document.observe('dom:loaded', function() {
+		if (notpreview) {
+			ruleWidget.delayActions = true;
+			ruleWidget.container.observe('RuleWidget:AddRule', rulewidget_add_rule);
+			ruleWidget.container.observe('RuleWidget:DeleteRule', rulewidget_delete_rule);
+			
+			<?
+				if (!empty($_SESSION['listsearchrules']) || (empty($_SESSION['listsearchperson']) && empty($_SESSION['listsearchsectionids'])))
+					echo 'choose_search_by_rules();';
+				else if (!empty($_SESSION['listsearchsectionids']))
+					echo 'choose_search_by_sections();';
+				else
+					echo 'choose_search_by_person();';
+			?>
+		}
+		
+		$('<?=$containerID?>').update('<?=addslashes(list_get_results_html($containerID, $renderedlist))?>');
+	});
 </script>
 <?
 if (!isset($_SESSION['listsearchpreview']))
