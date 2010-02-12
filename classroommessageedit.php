@@ -99,7 +99,7 @@ foreach($languages as $language) {
 	} else {
 		//error_log("default" . $code);
 		// Populate with default data
-		$filename = "messagedata/" . $code . "/data.php";
+		$filename = "messagedata/" . $code . "/targetedmessage.php";
 		if(file_exists($filename))
 			include_once($filename);
 

@@ -70,7 +70,7 @@ if($isajax === true) {
 
 
 
-	$messagedatapath = "messagedata/en/data.php";
+	$messagedatapath = "messagedata/en/targetedmessage.php";
 	$orderby = "name";
 
 	$sqlargs = array($USER->id);
