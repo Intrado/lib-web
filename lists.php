@@ -197,8 +197,13 @@ startWindow('My Lists&nbsp;' . help('Lists_MyLists'));
 <tr>
 	<td class="feed" style="width: 180px;vertical-align: top;font-size: 12px;" >
 		<div>
-		<?= icon_button(_L('Create New List'),"add","location.href='list.php?id=new'") ?>
-		<div style="clear:both;"></div>
+			<?
+				// TODO: If the user has only 1 section, or if the system has only 1 section, don't bother showing two buttons?
+			?>
+			<?= icon_button(_L('Create New List with Rules'),"add","location.href='editlistrules.php?id=new'") ?>
+			<div style="clear:both;"></div>
+			<?= icon_button(_L('Create New List with Sections'),"add","location.href='editlistsections.php?id=new'") ?>
+			<div style="clear:both;"></div>
 		</div>
 		<br />
 		<h1 id="filterby">Sort By:</h1>

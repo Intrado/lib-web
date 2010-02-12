@@ -45,8 +45,9 @@ if (!$USER->authorize('createlist')) {
 // Action/Request Processing
 ////////////////////////////////////////////////////////////////////////////////
 
-$_SESSION['previewfrom'] = 'list.php';
+$_SESSION['previewfrom'] = 'editlistrules.php';
 
-// NOTE: editlist.inc.php will figure out which method to use.
+$method = 'rules';
+
 include('editlist.inc.php');
 ?>
