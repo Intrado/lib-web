@@ -22,6 +22,8 @@ if (!$USER->authorize('targetedmessage')) {
 	redirect('unauthorized.php');
 }
 
+//TODO add redirect if we are past time window
+
 ////////////////////////////////////////////////////////////////////////////////
 // Settings
 ////////////////////////////////////////////////////////////////////////////////
@@ -249,16 +251,17 @@ startWindow(_L('Classroom Comments'));
 echo button_bar(icon_button("Done Picking Comments", "tick", null, $redirect), '<div id="clock" class="clock"></div>');
 ?>
 
+<label>Section: <select id="classselect" name="classselect">
+<?
+foreach($sections as $section)
+	echo '<option value="'.$section->id.'">'.escapehtml($section->skey).'</option>';
+?>
+</select></label><br />
 
 <table width="100%" id="picker" style="clear:both; margin-top: 3px;">
 	<tr>
-		<td style="top:0px;vertical-align:top;border-right:1px solid black;padding-right:10px;">
-			<label>Section: <select id="classselect" name="classselect">
-<?
-			foreach($sections as $section)
-				echo '<option value="'.$section->id.'">'.escapehtml($section->skey).'</option>';
-?>
-			</select></label><br />
+		<td style="top: 0px; vertical-align: top; padding-right: 10px;">
+
 			<a id="checkall" href="#" style="float:left;white-space: nowrap;">Select All</a><br />
 			<div id="contactwrapper" >
 				<div id="contactbox" style="width:100%;text-decoration:none;"></div>
