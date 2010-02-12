@@ -211,6 +211,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		$list->modifydate = QuickQuery("select now()");
 		$list->userid = $USER->id;
 		$list->deleted = 0;
+		// TODO: Set $list->type = $method;
 		$list->update();
 		
 		if ($method == 'sections') {
