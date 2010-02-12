@@ -31,7 +31,7 @@ function handleRequest() {
 		case 'lists':
 			return cleanObjects(DBFindMany('PeopleList', ', (name+0) as lettersfirst from list where userid=? and not deleted order by lettersfirst,name', false, array($USER->id)));
 
-		// Returns a map of audiofiles belonging to the current user; a messagegroupid may be specified, but the results will still include global audio files (where messagegroupid is null). Results are sorted by recorddate.
+		// Returns a map of audiofiles belonging to a particular messagegroup. Results are sorted by recorddate.
 		case 'AudioFiles':
 			$messagegroupid = !empty($_GET['messagegroupid']) ? $_GET['messagegroupid'] + 0 : 0;
 			return cleanObjects(DBFindMany('AudioFile', 'from audiofile where userid=? and messagegroupid=? and not deleted order by messagegroupid desc, recorddate desc', false, array($USER->id, $messagegroupid)));
@@ -221,7 +221,7 @@ function handleRequest() {
 				}
 			// if it's an organization field
 			} else if ($fieldnum == 'organization') {
-				// $orgkeys is an array of value=>title pairs.
+				// $orgkeys is an array of id=>orgkey pairs.
 				$orgkeys = array();
 				
 				foreach ($USER->organizations() as $organization) {
@@ -233,10 +233,39 @@ function handleRequest() {
 			} else {
 				return false;
 			}
+			
+		case 'getsections':
+			if (!isset($_GET['organizationid']))
+				return false;
+			$organizationid = $_GET['organizationid'] + 0;
+			if (!$USER->authorizeOrganization($organizationid))
+				return false;
+			
+			// If the user has section associations, only retrieve those sections that also belong to this organization.
+			// Otherwise retrieve all sections from this organization.
+			if (QuickQuery('select count(*) from userassociation where userid = ? and type = "section" limit 1', false, array($USER->id)) > 0) {
+				// Return an array of id=>skey pairs.
+				return QuickQueryList("
+					select section.id, section.skey
+					from section
+						inner join userassociation
+							on (userassociation.sectionid = section.id)
+					where userid=? and organizationid = ?",
+					true, false, array($USER->id, $organizationid)
+				);
+			} else {
+				// Return an array of id=>skey pairs.
+				return QuickQueryList("
+					select id, skey
+					from section
+					where organizationid = ?",
+					true, false, array($organizationid)
+				);
+			}
 
 		case 'rulewidgetsettings':
 			// check userassociations for org to see if we should show organization selection
-
+			
 			return array(
 				'operators' => $RULE_OPERATORS,
 				'reldateOptions' => $RELDATE_OPTIONS,
