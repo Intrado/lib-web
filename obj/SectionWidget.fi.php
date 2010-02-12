@@ -9,7 +9,7 @@ class SectionWidget extends FormItem {
 		
 		$n = $this->form->name . '_' . $this->name;
 		
-		if (isset($this->args['sectionids']) && count($this->args['sectionids']) > 0) {
+		if (isset($this->args['sectionids']) && is_array($this->args['sectionids']) && count($this->args['sectionids']) > 0) {
 			$organizationid = QuickQuery('select organizationid from section where id=?', false, array(reset($this->args['sectionids'])));
 		}
 		
@@ -49,7 +49,7 @@ class SectionWidget extends FormItem {
 	function renderJavascript() {
 		$n = $this->form->name . '_' . $this->name;
 		
-		if (isset($this->args['sectionids']) && count($this->args['sectionids']) > 0) {
+		if (isset($this->args['sectionids']) && is_array($this->args['sectionids']) && count($this->args['sectionids']) > 0) {
 			// The javascript SectionWidget expects an object literal of sectionid => true pairs.
 			$sectionids = array_fill_keys($this->args['sectionids'], true);
 		} else {
