@@ -31,6 +31,7 @@ class JobAutoReport extends ReportGenerator{
 
 		$searchquery = " and rp.jobid in ('". $this->params['joblist'] ."')";
 		$searchquery .= $resultquery;
+		$orgfieldquery = generateOrganizationFieldQuery("rp.personid");
 		$fieldquery = generateFields("rp");
 
 		$this->query =
@@ -65,6 +66,7 @@ class JobAutoReport extends ReportGenerator{
 			rc.sequence as sequence,
 			rc.voicereplyid as voicereplyid,
 			vr.id as vrid
+			$orgfieldquery
 			$fieldquery
 			, dl.label as label
 			from reportperson rp
@@ -91,7 +93,8 @@ class JobAutoReport extends ReportGenerator{
 	}
 
 	function getReportSpecificParams(){
-		$sms = QuickQuery("select count(smsmessageid) from job where id in ('" . $this->params['joblist'] . "')", $this->_readonlyDB) ? "1" : "0";
+		//$sms = QuickQuery("select count(smsmessageid) from job where id in ('" . $this->params['joblist'] . "')", $this->_readonlyDB) ? "1" : "0";
+		$sms = getSystemSetting('_hassms', '0'); // TODO
 		$params = array("jobId" => $this->params['jobid'],
 						"jobcount" => "1",
 						"hassms" => $sms);
