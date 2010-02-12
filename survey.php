@@ -143,11 +143,8 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'send'))
 			//set unchangable fields
 			$job->type="survey";
 			$job->sendphone = false;
-			$job->phonemessageid = NULL;
+			$job->messagegroupid = NULL;
 			$job->sendemail = false;
-			$job->emailmessageid = NULL;
-			$job->sendprint = false;
-			$job->printmessageid = NULL;
 			$job->modifydate = date("Y-m-d H:i:s", time());
 
 			//always skip dupes
