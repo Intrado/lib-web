@@ -303,7 +303,6 @@ class JobDetailReport extends ReportGenerator{
 						2 => "ID#",
 						3 => "First Name",
 						4 => "Last Name",
-						6 => "Message",
 						15 => "Sequence",
 						7 => "Destination",
 						11 => "Attempts",
@@ -383,7 +382,7 @@ class JobDetailReport extends ReportGenerator{
 		$fieldindex = getFieldIndexList("p");
 		$activefields = array_flip($activefields);
 		//generate the CSV header
-		$header = '"Job Name","Submitted by","ID","First Name","Last Name","Message","Dst. Src.","Destination","Attempts","Last Attempt","Last Result","Response","Organization"';
+		$header = '"Job Name","Submitted by","ID","First Name","Last Name","Dst. Src.","Destination","Attempts","Last Attempt","Last Result","Response","Organization"';
 		foreach($fieldlist as $fieldnum => $fieldname){
 			if(isset($activefields[$fieldnum])){
 				$header .= ',"' . $fieldname . '"';
@@ -416,7 +415,7 @@ class JobDetailReport extends ReportGenerator{
 			}
 			$row[9] = html_entity_decode(fmt_jobdetail_result($row,9));
 
-			$reportarray = array($row[0], $row[1], $row[2],$row[3],$row[4],$row[6],fmt_dst_src($row, 15),$row[7],$row[11],$row[8],$row[9],fmt_confirmation($row, 14), $row[18]);
+			$reportarray = array($row[0], $row[1], $row[2],$row[3],$row[4],fmt_dst_src($row, 15),$row[7],$row[11],$row[8],$row[9],fmt_confirmation($row, 14), $row[18]);
 			//index 18 is the last position of a non-ffield
 			foreach($fieldlist as $fieldnum => $fieldname){
 				if(isset($activefields[$fieldnum])){
