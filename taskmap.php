@@ -125,7 +125,6 @@ if ($datatype == "person") {
 	$maptofields["u9"] = "Caller ID";
 	$maptofields["u11"] = "Access Profile";
 	$maptofields["u12"] = "Restricted Job Types";
-	$maptofields["u10"] = "Staff ID";
 	$maptofields["okey"] = "Organization";
 	$maptofields["sep"] = "--------------";
 
