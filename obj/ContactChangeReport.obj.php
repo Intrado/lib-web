@@ -300,7 +300,7 @@ class ContactChangeReport extends ReportGenerator {
 		
 		if ($hassms) {
 			for ($i=0; $i<$maxsms; $i++) {
-				$header .= ',"Email '.($i +1).'","Modified"';
+				$header .= ',"SMS '.($i +1).'","Modified"';
 			}
 		}
 		
