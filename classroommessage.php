@@ -246,19 +246,21 @@ include_once("nav.inc.php");
 <link href='css/classroom.css' type='text/css' rel='stylesheet' media='screen'>
 <?
 startWindow(_L('Classroom Comments'));
-echo '<select id="classselect" name="classselect" class="classselect">';
-foreach($sections as $section) {
-	echo '<option value="'.$section->id.'">'.escapehtml($section->skey).'</option>';
-}
-echo '</select><div id="clock" class="clock"></div>' . icon_button("Done Picking Comments", "tick", null, $redirect,'style="padding-top:0px;float:right"');
+echo button_bar(icon_button("Done Picking Comments", "tick", null, $redirect), '<div id="clock" class="clock"></div>');
 ?>
 
 
-<table width="100%" id="picker" style="clear:both">
+<table width="100%" id="picker" style="clear:both; margin-top: 3px;">
 	<tr>
 		<td style="top:0px;vertical-align:top;border-right:1px solid black;padding-right:10px;">
+			<label>Section: <select id="classselect" name="classselect">
+<?
+			foreach($sections as $section)
+				echo '<option value="'.$section->id.'">'.escapehtml($section->skey).'</option>';
+?>
+			</select></label><br />
 			<a id="checkall" href="#" style="float:left;white-space: nowrap;">Select All</a><br />
-			<div id="contactwrapper">
+			<div id="contactwrapper" >
 				<div id="contactbox" style="width:100%;text-decoration:none;"></div>
 			</div>
 			<hr />
