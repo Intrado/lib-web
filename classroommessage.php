@@ -599,7 +599,7 @@ endWindow();
 			$('clock').update((hours>0?hours + ' Hour' + (hours==1?' ':'s '):'') + minutes + ' Minute' + (minutes==1?' ':'s ') + ' left until cutoff');
 		} else {
 			clock.stop();
-			alert('The cutoff time for this page has passed ' + diff + " " + timetocutoff + " " + now);
+			alert('The cutoff time for this page has passed');
 			window.location = '<?= $redirect ?>';
 		}
 	}
