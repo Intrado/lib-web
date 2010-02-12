@@ -4,7 +4,7 @@ class MessageGroup extends DBMappedObject {
 	var $defaultlanguagecode = 'en';
 	var $name;
 	var $description;
-	var $data;
+	var $data = '';
 	var $modified;
 	var $lastused;
 	var $permanent = 0;
