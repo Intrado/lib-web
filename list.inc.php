@@ -11,6 +11,10 @@ function list_clear_search_session($keep = false) {
 		$_SESSION['listsearchemail'] = false;
 		$_SESSION['listsearchsms'] = false;
 	}
+	
+	if ($keep != 'listsearchsectionids') {
+		$_SESSION['listsearchsectionids'] = array();
+	}
 
 	if ($keep != 'listsearchrules') {
 		$_SESSION['listsearchrules'] = array();
