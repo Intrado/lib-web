@@ -125,6 +125,12 @@ if(!isset($generator)){
 	exit("Bad report type, corresponding generator not found\n");
 }
 
+$instanceparams = $instance->getParameters();
+if (isset($instanceparams['format']))
+	$generator->format = $instanceparams['format'];
+else
+	$generator->format = 'pdf'; // default
+
 $generator->reportinstance = $instance;
 echo "finished configuring generator\n";
 $result = "";
@@ -137,7 +143,7 @@ if($result == ""){
 	echo "finished generating query\n";
 	$result = $generator->generate($params);
 }
-echo $result;
+echo $result . "\n";
 
 // if success, and subscription, then update the lastrun field
 if("success" == $result) {
