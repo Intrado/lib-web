@@ -79,6 +79,7 @@ if ($datatype == "person") {
 	$maptofields = array();
 	$maptofields[""] = "- Unmapped -";
 	$maptofields["key"] = "Unique ID";
+	$maptofields["okey"] = "Organization";
 	//F fields
 	foreach ($fieldmaps as $fieldmap)
 		$maptofields[$fieldmap->fieldnum] = $fieldmap->name;
@@ -125,6 +126,7 @@ if ($datatype == "person") {
 	$maptofields["u11"] = "Access Profile";
 	$maptofields["u12"] = "Restricted Job Types";
 	$maptofields["u10"] = "Staff ID";
+	$maptofields["okey"] = "Organization";
 	$maptofields["sep"] = "--------------";
 
 	//F fields, limit to multisearch
@@ -153,6 +155,8 @@ if ($datatype == "person") {
 	$maptofields = array();
 	$maptofields[""] = "- Unmapped -";
 	$maptofields["pkey"] = "Person ID";
+	$maptofields["okey"] = "Organization";
+	$maptofields["skey"] = "Section";
 
 	$fieldmaps = DBFindMany("FieldMap","from fieldmap where fieldnum like 'c%' order by fieldnum");
 	//C fields
