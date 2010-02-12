@@ -118,7 +118,7 @@ class ContactChangeReport extends ReportGenerator {
 				'2' as ordering,
 				'email' as type,
 				editlock,
-				'todo' as editlockdate
+				editlockdate
 				from email
 				where
 				personid in ('" . implode("','",$personidlist) . "')
@@ -130,7 +130,7 @@ class ContactChangeReport extends ReportGenerator {
 				'3' as ordering,
 				'sms' as type,
 				editlock,
-				'todo' as editlockdate
+				editlockdate
 				from sms
 				where
 				personid in ('" . implode("','",$personidlist) . "')
