@@ -837,7 +837,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 			$_SESSION['jobid'] = $job->id;
 			$sendto = "jobconfirm.php";
 		} else {
-			$sendto = "start.php";
+			$sendto = "jobs.php";
 		}
 		if ($ajax)
 			$form->sendTo($sendto);
