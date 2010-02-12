@@ -260,19 +260,19 @@ foreach($sections as $section)
 
 <table width="100%" id="picker" style="clear:both; margin-top: 3px;">
 	<tr>
-		<td style="top: 0px; vertical-align: top; padding-right: 10px;">
+		<td style="top: 0px; vertical-align: top; padding-right: 10px;white-space: nowrap;">
 
 			<a id="checkall" href="#" style="float:left;white-space: nowrap;">Select All</a><br />
 			<div id="contactwrapper" >
 				<div id="contactbox" style="width:100%;text-decoration:none;"></div>
 			</div>
 			<hr />
-			<img src="img/icons/fugue/light_bulb.gif" alt="" />Press shift key to multiselect
+			<img src="img/icons/fugue/light_bulb.gif" alt="" />Press shift key to <br />&nbsp;&nbsp;&nbsp;&nbsp;multiselect
 			<hr />
 		</td>
 
 		<td style="vertical-align:top;width:100%">
-			<div id="theinstructions" style="font-size:2em;padding:100px;"><img src="img/icons/fugue/arrow_180.png" alt="" style="vertical-align:middle;"/>&nbsp;Click on a Contact to Start</div>
+			<div id="theinstructions"><img src="img/icons/fugue/arrow_180.png" alt="" style="vertical-align:middle;"/> Click on a Contact to Start</div>
 
 
 			<div id='tabsContainer' style='margin-right:0px;display:none;vertical-align:middle;'></div>
@@ -338,7 +338,7 @@ endWindow();
 
 	// Color variables
 	var c_hover = "#bbcccc";
-	var c_selected = "#ffcccc";
+	var c_selected = "#C4CCC4";//"#ffcccc";
 	var c_none = "#ffffff";
 	var h_image = "img/icons/fugue/arrow.gif";
 	var hascomments = <?= $USER->authorize('targetedcomment')?"true":"false" ?>;
@@ -523,6 +523,17 @@ endWindow();
 		$(prefix + 'prem' + id).update(remark);
 	}
 
+	function highlight(obj) {
+		//obj.addClassName('listAlt');
+		obj.style.background = c_selected;
+	}
+
+	function clearhighlight(obj) {
+		obj.style.background = c_none;
+
+		//obj.removeClassName('listAlt');
+	}
+
 	function dosearch() {
 		new Ajax.Request('<?= $requesturl ?>',
 			{
@@ -608,7 +619,8 @@ endWindow();
 
 			var target = $(c_prefix + '-' + msg.key);
 			if(target != undefined) {
-				target.setStyle("height:4.5em;background:" + c_none);
+				clearhighlight(target);
+				target.setStyle('height:4.5em;');
 				$(c_prefix + 'txt-' + msg.key).setStyle('height:3em;');
 
 				var target = target.down('img');
@@ -666,7 +678,7 @@ endWindow();
 		// Set all contact-message link boxes
 		selectedmessages.each(function(msg) {
 			var target = $(n_prefix + '-' + msg.key);
-			target.style.background = c_selected;
+			highlight(target);
 			target = target.down('img');
 			if(msg.value == contactsize) {
 				target.src = getstatesrc(2);
@@ -685,15 +697,11 @@ endWindow();
 					textarea.value = "";
 					// Add multiple remark notice
 					remarkpreview(n_prefix,msg.key,'  * Multiple Remarks')
-					//blankFieldValue(textarea, "* Multiple Remarks. \nTyping a new remark here will overwrite.");
-					//textarea.next('span').show();
 				} else {
 					textarea.value = comment;
 					remarkpreview(n_prefix,msg.key,comment);
-					//$('msgrem' + msg.key).show();
 				}
 			}
-			//$('msgrem' + msg.key).hide();
 		});
 	}
 	
@@ -707,6 +715,8 @@ endWindow();
 			parameters: {sectionid: selected},
 			onSuccess: function(transport){
 				var response = transport.responseJSON || "Class not available";
+				var contacts = $H(response.people);
+				var size = 0;
 				$('contactbox').update("");
 
 				$('theinstructions').show();
@@ -720,7 +730,7 @@ endWindow();
 				var dom = $('contactbox').remove();
 				var tbody = new Element('tbody');
 
-				$H(response.people).each(function(person) {
+				contacts.each(function(person) {
 					var id = 'c-' + person.key;
 					var tr = new Element('tr');
 					tr.insert('<td width="100%"><a href="#" id="' + id + '" title="Student id: ' +  person.value.pkey + '" style="text-decoration:none;cursor:pointer;">' + person.value.name +'</a></td>');
@@ -730,12 +740,13 @@ endWindow();
 					});
 					tr.insert(td);
 					tbody.insert(tr);
+					size++;
 				});
 				dom.insert(new Element('table').insert(tbody));
 				$('contactwrapper').insert(dom);
 
 
-				$H(response.people).each(function(person) {
+				contacts.each(function(person) {
 					var id = 'c-' + person.key;
 					dom.insert('<br />')
 
@@ -749,17 +760,17 @@ endWindow();
 							event.stop(); // Some browsers may open another winbdow on shift click
 							if(!event.shiftKey) {
 								checkedcontacts.each(function(contact) {
-									$('c-' + contact.key).style.background = c_none;
+									clearhighlight($('c-' + contact.key));
 									checkedcontacts.unset(contact.key);
 								});
 							}
 
 							// Select or deselect the itme depending on alt click. Unable to deselect if only one item is selected
 							if (event.shiftKey && checkedcontacts.get(this.id.substr(2)) != undefined && checkedcontacts.size() > 1) {
-								this.style.background = c_none;
+								clearhighlight(this);
 								checkedcontacts.unset(this.id.substr(2));
 							} else {
-								this.style.background = c_selected;
+								highlight(this);
 								checkedcontacts.set(this.id.substr(2),true);
 							}
 							// First click reveals the message board
@@ -772,7 +783,14 @@ endWindow();
 							updatemessages(tabs.currentSection,tabs.currentSection);
 					});
 				});
-				setcache(response.cache);
+				if(size > 0) {
+					setcache(response.cache);
+					$('picker').show();
+				} else {
+					$('picker').hide();
+				}
+
+
 			}
 		});
 	}
@@ -839,12 +857,14 @@ endWindow();
 					// Set each selected contact to
 
 					if(state == 2) {
-						$(htmlid).style.background = c_selected;
+						highlight($(htmlid));
 					} else {
-						$(htmlid).setStyle('height:4.5em;background:' + c_none);
+						var target = $(htmlid);
+						clearhighlight(target);
+						target.setStyle('height:4.5em;');//background:' + c_none);
 						$(c_prefix + 'txt-' + msgid).setStyle('height:3em;');
-						$(htmlid).down('span').hide();
-						$(htmlid).down('a').show();
+						target.down('span').hide();
+						target.down('a').show();
 					}
 
 					checkedcontacts.each(function(contact) {
@@ -887,8 +907,7 @@ endWindow();
 		$('checkall').observe('click', function(event) {
 			event.stop();
 			$$('#contactbox a').each(function(contact) {
-				contact.style.background = c_selected;
-				//contact.setStyle('font-weight:bold');
+				highlight(contact);
 				checkedcontacts.set(contact.id.substr(2),true);
 			});
 			if(revealmessages) {
@@ -917,8 +936,6 @@ endWindow();
 				if(category == 'lib-search')
 					return
 				var category = category.substr(4);
-
-				//$(htmlid).style.background = c_hover;
 				checkedcache.each(function(contact) {
 					if(contact.value.get(msgid) != undefined) {
 						var img = $('c-' + contact.key + '-' + category);

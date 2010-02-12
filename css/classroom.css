@@ -7,6 +7,12 @@
 	padding-top: 5px;
 }
 
+#theinstructions {
+	font-size:2em;
+	padding:100px;
+	white-space: nowrap;
+}
+
 .classroomcomment {
 	position:relative;
 	border:solid 1px silver;
