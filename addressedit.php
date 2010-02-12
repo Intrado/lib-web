@@ -431,6 +431,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 				$phone->personid = $person->id;
 				$phone->sequence = $x;
 				$phone->phone = Phone::parse($postdata["phone$x"]);
+				$phone->editlock = 0;
 				$phone->update();
 				$x++;
 			}
@@ -443,6 +444,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 				$email->personid = $person->id;
 				$email->sequence = $x;
 				$email->email = trim($postdata["email$x"]);
+				$email->editlock = 0;
 				$email->update();
 				$x++;
 			}
@@ -454,6 +456,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 				$sms->personid = $person->id;
 				$sms->sequence = $x;
 				$sms->sms = Phone::parse($postdata["sms$x"]);
+				$sms->editlock = 0;
 				$sms->update();
 				$x++;
 			}
