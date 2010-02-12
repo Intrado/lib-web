@@ -62,7 +62,7 @@ $dummyorganizationfieldmap = FieldMap::getSubscriberOrganizationFieldMap();
 $data = array_merge($data, array($dummyorganizationfieldmap));
 
 // all fields available to add
-$addfields = QuickQueryList("select id, name from fieldmap where options not like '%subscribe%' and options not like '%language%' and options not like '%staff%' and (options like '%text%' or options like '%multisearch%') order by fieldnum", true);
+$addfields = QuickQueryList("select id, name from fieldmap where options not like '%subscribe%' and options not like '%language%' and (options like '%text%' or options like '%multisearch%') order by fieldnum", true);
 
 
 $titles = array(	"name" => "Field",

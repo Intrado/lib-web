@@ -43,8 +43,7 @@ if (isset($_GET['delete'])) {
 	$fm = new FieldMap($id);
 	if (!$fm->isOptionEnabled('firstname') &&
 		!$fm->isOptionEnabled('lastname') &&
-		!$fm->isOptionEnabled('language') &&
-		!$fm->isOptionEnabled('staff')) {
+		!$fm->isOptionEnabled('language')) {
 		// do not destroy required fields
 
 		$fm->destroy();
@@ -57,8 +56,8 @@ if (isset($_GET['clear'])) {
 	$fieldnum = DBSafe($_GET['clear']);
 	if ($fieldnum === FieldMap::getFirstNameField() ||
 		$fieldnum === FieldMap::getLastNameField() ||
-		$fieldnum === FieldMap::getLanguageField() ||
-		$fieldnum === FieldMap::getStaffField()) {
+		$fieldnum === FieldMap::getLanguageField()
+		) {
 		// do not clear data of required fields
 		redirect();
 	}
@@ -80,18 +79,17 @@ if (isset($_GET['clear'])) {
 switch ($DATATYPE) {
 case "person" :
 	$VALID_TYPES = array('text', 'reldate', 'multisearch', 'numeric', 'multisearch,language', 'multisearch,grade',
-						 'text,firstname', 'text,lastname', 'grade', 'firstname', 'lastname', 'language',
-						 'multisearch,school', 'school');
+						 'text,firstname', 'text,lastname', 'grade', 'firstname', 'lastname', 'language');
 	$numfields = 20;
 	$dt = "f%";
 break;
 case "group" :
-	$VALID_TYPES = array('multisearch', 'multisearch,school', 'school');
+	$VALID_TYPES = array('multisearch');
 	$numfields = 10;
 	$dt = "g%";
 break;
 case "schedule" :
-	$VALID_TYPES = array('multisearch', 'numeric', 'multisearch,staff', 'staff');
+	$VALID_TYPES = array('multisearch', 'numeric');
 	$numfields = 10;
 	$dt = "c%";
 break;
@@ -192,16 +190,16 @@ if (CheckFormSubmit($form, $section) || CheckFormSubmit($form, 'add')) {
 							if ($fieldnum != FieldMap::getFirstNameField() &&
 								$fieldnum != FieldMap::getLastNameField() &&
 								$fieldnum != FieldMap::getLanguageField() &&
-								$fieldnum != FieldMap::getGradeField() &&
-								$fieldnum != FieldMap::getStaffField() ) {
+								$fieldnum != FieldMap::getGradeField()
+								) {
 
 								// only update type for non-specialfield
 								if ($type !== null) $updatefield->updateFieldType($type);
 							}
 							if ($fieldnum != FieldMap::getFirstNameField() &&
 								$fieldnum != FieldMap::getLastNameField() &&
-								$fieldnum != FieldMap::getLanguageField() &&
-								$fieldnum != FieldMap::getStaffField() ) {
+								$fieldnum != FieldMap::getLanguageField()
+								) {
 
 								if ($searchable)
 									$updatefield->addOption('searchable');
@@ -242,12 +240,8 @@ if( $reloadform )
 
 		if ($field->isOptionEnabled('language')) {
 			$type = 'language';
-		} else if ($field->isOptionEnabled('school')) {
-			$type = 'school';
 		} else if ($field->isOptionEnabled('grade')) {
 			$type = 'grade';
-		} else if ($field->isOptionEnabled('staff')) {
-			$type = 'staff';
 		} else if ($field->isOptionEnabled('firstname')) {
 			$type = 'firstname';
 		} else if ($field->isOptionEnabled('lastname')) {
@@ -343,9 +337,6 @@ case "group" :
 break;
 case "schedule" :
 		$types = array("List" => 'multisearch');
-
-		if(!FieldMap::getStaffField())
-			$types["Staff ID"] = 'multisearch,staff';
 break;
 }
 
@@ -379,8 +370,8 @@ break;
 			if ($fieldnum != $field->getFirstNameField() &&
 				$fieldnum != $field->getLastNameField() &&
 				$fieldnum != $field->getLanguageField() &&
-				$fieldnum != $field->getGradeField() &&
-				$fieldnum != $field->getStaffField() ) {
+				$fieldnum != $field->getGradeField()
+				) {
 ?>
 				<td><? NewFormItem($form, $section, "name_$fieldnum", 'text', '20'); ?></td>
 				<td>
@@ -463,7 +454,7 @@ break;
 <?
 				break;
 				case "schedule" :
-					// staffID field is unremovable
+					// no special cases
 				break;
 				}
 			}

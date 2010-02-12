@@ -43,7 +43,7 @@ class SubscriberWiz_choosefield extends WizStep {
 		$formdata = array();
 	
 		$addfields = array("" => "-- Choose a Field --");
-		$tmp = QuickQueryList("select id, name from fieldmap where fieldnum not like '%c%' and options not like '%subscribe%' and options not like '%language%' and options not like '%staff%' and (options like '%text%' or options like '%multisearch%') order by fieldnum", true);
+		$tmp = QuickQueryList("select id, name from fieldmap where fieldnum not like '%c%' and options not like '%subscribe%' and options not like '%language%' and (options like '%text%' or options like '%multisearch%') order by fieldnum", true);
 		foreach ($tmp as $k => $v)
 			$addfields[$k] = $v;
 	

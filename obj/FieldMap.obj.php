@@ -47,10 +47,6 @@ class FieldMap extends DBMappedObject {
 		return FieldMap::getFieldnumWithOption('grade');
 	}
 
-	static function getStaffField(){
-		return FieldMap::getFieldnumWithOption('staff', 'c01');
-	}
-
 	static function getFieldnumWithOption($option, $default = null) {
 		$results = FieldMap::retrieveFieldMaps();
 
