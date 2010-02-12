@@ -121,8 +121,7 @@ $customeremailtranslationlanguages = array_intersect_key($customerlanguages, $tr
 $customerphonetranslationlanguages = array_intersect_key($ttslanguages, $translationlanguages); // NOTE: $ttslanguages is already an a subset of $customerlanguages.
 
 $datafields = FieldMap::getAuthorizedMapNames();
-
-$preferredgender = $messagegroup->getGlobalPreferredGender();
+$messagegroup->readHeaders();
 
 $permanent = $messagegroup->permanent;
 
@@ -241,14 +240,14 @@ foreach ($destinations as $type => $destination) {
 						continue;
 
 					$translationitems[] = "{$languagecode}-translationitem";
-					$autotranslatorformdata["{$languagecode}-translationitem"] = makeTranslationItem(false, $type, $subtype, $languagecode, $languagename, $preferredgender, $_SESSION['autotranslatesourcetext']["{$type}{$subtype}"], "", 0, $languagename, false, false, false, !$messagegroup->hasMessage($type, $subtype, $languagecode), '', null, true);
+					$autotranslatorformdata["{$languagecode}-translationitem"] = makeTranslationItem(false, $type, $subtype, $languagecode, $languagename, $messagegroup->preferredgender, $_SESSION['autotranslatesourcetext']["{$type}{$subtype}"], "", 0, $languagename, false, false, false, !$messagegroup->hasMessage($type, $subtype, $languagecode), '', null, true);
 				}
 				$autotranslatorformdata["sourcemessagebody"]["requires"] = $translationitems;
 				
 				$autotranslatorformdata["branding"] = makeBrandingFormHtml();
 			}
 
-			$accordionsplitter = makeAccordionSplitter($type, $subtype, 'autotranslator', $permanent, $preferredgender, true, $type == 'email' ? $emailattachments : null, false);
+			$accordionsplitter = makeAccordionSplitter($type, $subtype, 'autotranslator', $permanent, $messagegroup->preferredgender, true, $type == 'email' ? $emailattachments : null, false);
 
 			$messageformsplitters[] = new FormSplitter("{$type}-{$subtype}-autotranslator", _L("Automatic Translation"), "img/icons/world.gif", "verticalsplit", array(), array(array("title" => "", "formdata" => $autotranslatorformdata), $accordionsplitter));
 		}
@@ -320,7 +319,7 @@ foreach ($destinations as $type => $destination) {
 				
 				$overridingplaintext = isset($plainmessage) && $plainmessage && $plainmessage->overrideplaintext;
 				
-				$formdata["translationitem"] = makeTranslationItem($required, $type, $subtype, $languagecode, $languagename, $preferredgender, $messagetexts['source'], $messagetext,  $overridingplaintext ? 1 : 0, _L("Enable Translation"), !empty($messagetexts['overridden']), true, false, $translationenabled, "", $datafields);
+				$formdata["translationitem"] = makeTranslationItem($required, $type, $subtype, $languagecode, $languagename, $messagegroup->preferredgender, $messagetexts['source'], $messagetext,  $overridingplaintext ? 1 : 0, _L("Enable Translation"), !empty($messagetexts['overridden']), true, false, $translationenabled, "", $datafields);
 				
 				if ($emailplain) {
 					$formdata["overrideplaintext"] = array(
@@ -577,7 +576,7 @@ foreach ($destinations as $type => $destination) {
 				}
 			}
 			
-			$accordionsplitter = makeAccordionSplitter($type, $subtype, $languagecode, $permanent, $preferredgender, false, $type == 'email' ? $emailattachments : null, isset($formdata['translationitem']) ? true : false, $messagegroup, $countlanguages > 1);
+			$accordionsplitter = makeAccordionSplitter($type, $subtype, $languagecode, $permanent, $messagegroup->preferredgender, false, $type == 'email' ? $emailattachments : null, isset($formdata['translationitem']) ? true : false, $messagegroup, $countlanguages > 1);
 
 			$messageformsplitters[] = new FormSplitter($messageformname, $languagename, $messagegroup->hasMessage($type, $subtype, $languagecode) ? "img/icons/accept.gif" : "img/icons/diagona/16/160.gif", "verticalsplit", array(), array(
 			array("title" => "", "formdata" => $formdata),
@@ -731,10 +730,11 @@ if ($button = $messagegroupsplitter->getSubmit()) {
 							QuickUpdate('update audiofile set permanent=? where messagegroupid=?', false, array($messagegroup->permanent, $messagegroup->id));
 
 							if ($formdestinationtype == 'phone') {
-								$preferredgender = $postdata['preferredgender'];
+								$messagegroup->preferredgender = $postdata['preferredgender'];
+								$messagegroup->stuffHeaders();
 								foreach ($messagegroup->getMessages() as $message) {
 									if ($message->type == 'phone') {
-										$message->updatePreferredVoice($preferredgender);
+										$message->updatePreferredVoice($messagegroup->preferredgender);
 									}
 								}
 							} else if ($formdestinationtype == 'email') {
@@ -856,7 +856,7 @@ if ($button = $messagegroupsplitter->getSubmit()) {
 												if ($sourcemessageparts === false)
 													$sourcemessageparts = $sourcemessage->parse($sourcemessagetext);
 												
-												$sourcemessage->recreateParts(null, $sourcemessageparts, $formdestinationtype == 'phone' ? $preferredgender : null);
+												$sourcemessage->recreateParts(null, $sourcemessageparts, $formdestinationtype == 'phone' ? $messagegroup->preferredgender : null);
 												
 												if (isset($plaintextoverriden) && !$plaintextoverriden) {
 													if ($plainsourcemessage = $messagegroup->getMessage($formdestinationtype, 'plain', $languagecode, 'source')) {
@@ -918,7 +918,7 @@ if ($button = $messagegroupsplitter->getSubmit()) {
 													$translatedmessage->update();
 												}
 												
-												$translatedmessage->recreateParts($translationtext, null, $formdestinationtype == 'phone' ? $preferredgender : null);
+												$translatedmessage->recreateParts($translationtext, null, $formdestinationtype == 'phone' ? $messagegroup->preferredgender : null);
 												
 												if (isset($plaintextoverriden) && !$plaintextoverriden) {
 													if ($plaintranslatedmessage = $messagegroup->getMessage('email', 'plain', $languagecode, 'translated')) {
@@ -1049,7 +1049,7 @@ if ($button = $messagegroupsplitter->getSubmit()) {
 											$existingmessage->update();
 										}
 										
-										$existingmessage->recreateParts($messagebodies[$existingmessage->autotranslate], null, $formdestinationtype == 'phone' ? $preferredgender : null);
+										$existingmessage->recreateParts($messagebodies[$existingmessage->autotranslate], null, $formdestinationtype == 'phone' ? $messagegroup->preferredgender : null);
 									}
 								}
 								
@@ -1130,7 +1130,7 @@ if ($button = $messagegroupsplitter->getSubmit()) {
 									if ($formdestinationtype == 'email')
 										$newmessage->createMessageAttachments($emailattachments);
 
-									$newmessage->recreateParts($messagebodies[$autotranslate], null, $formdestinationtype == 'phone' ? $preferredgender : null);
+									$newmessage->recreateParts($messagebodies[$autotranslate], null, $formdestinationtype == 'phone' ? $messagegroup->preferredgender : null);
 								}
 								
 								// Previously overridden plain-text messages have been deleted, so we need to generate new ones from any existing html messages. This time, we do not want to override plain-text.

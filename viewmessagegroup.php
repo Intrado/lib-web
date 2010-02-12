@@ -106,7 +106,7 @@ foreach ($destinations as $type => $destination) {
 		$gendervalues = array ("female" => "Female","male" => "Male");
 		$advancedoptionsformdata['preferredgender'] = array(
 			"label" => _L('Preferred Voice'),
-			"control" => array("FormHtml", "html" => $gendervalues[$messagegroup->getGlobalPreferredGender()]),
+			"control" => array("FormHtml", "html" => $gendervalues[$messagegroup->preferredgender]),
 			"helpstep" => 1
 		);
 	} else if ($type == 'email') {
