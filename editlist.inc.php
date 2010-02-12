@@ -392,10 +392,6 @@ endWindow();
 	document.observe('dom:loaded', function() {
 		if (typeof ruleWidget !== "undefined") {
 			ruleWidget.delayActions = true;
-			ruleWidget.container.observe('RuleWidget:AddRule', list_add_rule);
-			ruleWidget.container.observe('RuleWidget:DeleteRule', list_delete_rule);
-			ruleWidget.container.observe('RuleWidget:RemoveAllRules', list_clear_rules);
-			
 			function list_add_rule(event) {
 				$('list_newrule').value = [event.memo.ruledata].toJSON();
 				form_submit(event, 'addrule');
@@ -407,6 +403,9 @@ endWindow();
 			function list_clear_rules(event) {
 				form_submit(event, 'clearrules');
 			}
+			ruleWidget.container.observe('RuleWidget:AddRule', list_add_rule);
+			ruleWidget.container.observe('RuleWidget:DeleteRule', list_delete_rule);
+			ruleWidget.container.observe('RuleWidget:RemoveAllRules', list_clear_rules);
 		}
 		
 		$('listAdditionsContainer').up('tr').hide();
