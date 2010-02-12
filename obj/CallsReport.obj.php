@@ -163,7 +163,6 @@ class CallsReport extends ReportGenerator{
 		$titles = array("0" => "Job Name",
 						"1" => "Submitted by",
 						"2" => "Job Type",
-						"4" => "Message",
 						"8" => "Sequence",
 						"5" => "Destination",
 						"6" => "Date/Time",
@@ -279,7 +278,7 @@ class CallsReport extends ReportGenerator{
 			$count=1;
 			foreach($fieldlist as $index => $field){
 				?>
-				setColVisability(searchresultstable, 8+<?=$count?>, new getObj("hiddenfield".concat('<?=$index?>')).obj.checked);
+				setColVisability(searchresultstable, 7+<?=$count?>, new getObj("hiddenfield".concat('<?=$index?>')).obj.checked);
 				<?
 				$count++;
 			}
