@@ -63,42 +63,57 @@ class FormRuleWidget extends FormItem {
 // @param optional $args["allowedFields"], example: array('f','g','c')
 class ValRules extends Validator {
 	function validate ($valueJSON, $args) {
-		global $USER;
-		
 		$msgPleaseFinish = addslashes(_L("Please finish adding your rule"));
-		$msgIncompleteRule = addslashes(_L("Incomplete rule data"));
 		$msgRuleAlreadyExists = addslashes(_L("Rule already exists"));
-		$msgUnauthorizedFieldmap = addslashes(_L("Unauthorized fieldmap"));
-		$msgUnauthorizedOrganization = addslashes(_L("Unauthorized organization"));
-
+		
 		if ($valueJSON == 'pending')
 			return $msgPleaseFinish;
 
 		$ruledata = json_decode($valueJSON);
-		if (!is_array($ruledata) || empty($ruledata)) // Do not complain if no rules are specified
+		
+		if ((!isset($ruledata->fieldnum) && !is_array($ruledata)) || empty($ruledata)) // Do not complain if no rules are specified
 			return true;
-
-		$rulesfor = array();
-		foreach ($ruledata as $data) {
-			if (!isset($data->fieldnum, $data->logical, $data->op, $data->val)) {
-				return $msgIncompleteRule;
-			} else if (isset($rulesfor[$data->fieldnum])) { // Do not allow more than one rule per fieldnum
-				return $msgRuleAlreadyExists;
-			} else if ($data->fieldnum == 'organization') {
-				foreach ($data->val as $id) {
-					if (!$USER->authorizeOrganization($id))
-						return $msgUnauthorizedOrganization;
+		
+		if (is_array($ruledata)) {
+			$rulesfor = array();
+			foreach ($ruledata as $data) {
+				if (isset($data->fieldnum) && isset($rulesfor[$data->fieldnum])) { // Do not allow more than one rule per fieldnum
+					return $msgRuleAlreadyExists;
+				} else {
+					$error = $this->validateOneRule($data);
+					if ($error !== true)
+						return $error;
 				}
-			} else if (isset($args['allowedFields']) && !in_array($data->fieldnum[0], $args['allowedFields'])) {
-				return $msgUnauthorizedFieldmap;
-			} else {
-				if (!Rule::initFrom($data->fieldnum, $data->logical, $data->op, $data->val)) {
-					return $msgUnauthorizedFieldmap;
-				}
+				
+				$rulesfor[$data->fieldnum] = true;
 			}
-			
-			$rulesfor[$data->fieldnum] = true;
+		} else {
+			return $this->validateOneRule($ruledata);
 		}
+		
+		return true;
+	}
+	
+	function validateOneRule($data) {
+		global $USER;
+		
+		$msgIncompleteRule = addslashes(_L("Incomplete rule data"));
+		$msgUnauthorizedFieldmap = addslashes(_L("Unauthorized fieldmap"));
+		$msgUnauthorizedOrganization = addslashes(_L("Unauthorized organization"));
+		
+		if (!isset($data->fieldnum, $data->logical, $data->op, $data->val)) {
+			return $msgIncompleteRule;
+		} else if ($data->fieldnum == 'organization') {
+			foreach ($data->val as $id) {
+				if (!ctype_digit($id) || !$USER->authorizeOrganization($id))
+					return $msgUnauthorizedOrganization;
+			}
+		} else if (isset($args['allowedFields']) && !in_array($data->fieldnum[0], $args['allowedFields'])) {
+			return $msgUnauthorizedFieldmap;
+		} else if (!Rule::initFrom($data->fieldnum, $data->logical, $data->op, $data->val)) {
+			return $msgUnauthorizedFieldmap;
+		}
+		
 		return true;
 	}
 
