@@ -50,6 +50,7 @@ class CallsReport extends ReportGenerator{
 
 		$search = $personquery . $phonequery . $emailquery . $jobtypesquery . $resultquery  . $jobquery;
 
+		$orgfieldquery = generateOrganizationFieldQuery("rp.personid");
 		$fieldquery = generateFields("rp");
 		$gfieldquery = generateGFieldQuery("rp.personid", true);
 
@@ -72,7 +73,9 @@ class CallsReport extends ReportGenerator{
 					rc.attemptdata as attemptdata,
 					coalesce(rc.result, rp.status) as status,
 					rc.sequence as sequence
-					$fieldquery $gfieldquery
+					$orgfieldquery
+					$fieldquery
+					$gfieldquery
 					from reportperson rp
 					left join reportcontact rc on (rp.jobid = rc.jobid and rp.personid = rc.personid and rp.type = rc.type)
 					inner join job j on (rp.jobid= j.id)
@@ -130,10 +133,11 @@ class CallsReport extends ReportGenerator{
 				$line[] = $time;
 				$line[] = $res;
 				$line[] = $row[8];
+				$line[] = $row[9];
 				//generatefields returns a string beginning with a comma so the count of generatefields is 1 plus the count of f-fields
 				// TODO hardcode 27 ffields+gfields ugh...
 				for($i=0; $i<=27; $i++){
-					$line[] = $row[9+$i];
+					$line[] = $row[10+$i];
 				}
 				$data[] = $line;
 			}
@@ -163,14 +167,17 @@ class CallsReport extends ReportGenerator{
 						"8" => "Sequence",
 						"5" => "Destination",
 						"6" => "Date/Time",
-						"7" => "Result");
-		$titles = appendFieldTitles($titles, 8, $fieldlist, $activefields);
+						"7" => "Result",
+						"9" => "Organization");
+		$titles = appendFieldTitles($titles, 9, $fieldlist, $activefields);
 
 		$formatters = array("3" => "fmt_delivery_type_list",
 							"5" => "fmt_destination",
 							"6" => "fmt_ms_timestamp",
 							"7" => "fmt_contacthistory_result",
-							"8" => "fmt_dst_src");
+							"8" => "fmt_dst_src",
+							"9" => "fmt_organization"
+							);
 
 		$searchrules = array();
 		if(isset($this->params['rules']) && $this->params['rules']){
@@ -272,7 +279,7 @@ class CallsReport extends ReportGenerator{
 			$count=1;
 			foreach($fieldlist as $index => $field){
 				?>
-				setColVisability(searchresultstable, 7+<?=$count?>, new getObj("hiddenfield".concat('<?=$index?>')).obj.checked);
+				setColVisability(searchresultstable, 8+<?=$count?>, new getObj("hiddenfield".concat('<?=$index?>')).obj.checked);
 				<?
 				$count++;
 			}
@@ -282,6 +289,7 @@ class CallsReport extends ReportGenerator{
 
 	}
 
+	// NOTE seems this is not an option in the GUI (Contact History)
 	function runCSV(){
 		$results = isset($this->params['result']) ? $this->params['result'] : "";
 		$resultquery = "";
@@ -393,6 +401,7 @@ class CallsReport extends ReportGenerator{
 		$ordering["Destination"] = "destination";
 		$ordering["Date/Time"] = "date";
 		$ordering["result"] = "result";
+		$ordering["Organization"] = "org";
 		foreach($fields as $field){
 			$ordering[$field->name]= "rp." . $field->fieldnum;
 		}

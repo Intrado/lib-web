@@ -23,10 +23,10 @@ class ContactChangeReport extends ReportGenerator {
 			$reldate = $this->params['reldate'];
 		list($startdate, $enddate) = getStartEndDate($reldate, $this->params);
 
-		$peoplephonelist = QuickQueryList("select personid from phone where editlockdate >= ?", false, false, array(makeDateTime($startdate)));
-		$peopleemaillist = QuickQueryList("select personid from email where editlockdate >= ?", false, false, array(makeDateTime($startdate)));
+		$peoplephonelist = QuickQueryList("select personid from phone where editlockdate >= ? and editlock=1", false, false, array(makeDateTime($startdate)));
+		$peopleemaillist = QuickQueryList("select personid from email where editlockdate >= ? and editlock=1", false, false, array(makeDateTime($startdate)));
 		if ($hassms) {
-			$peoplesmslist = QuickQueryList("select personid from sms where editlockdate >= ?", false, false, array(makeDateTime($startdate)));
+			$peoplesmslist = QuickQueryList("select personid from sms where editlockdate >= ? and editlock=1", false, false, array(makeDateTime($startdate)));
 		} else {
 			$peoplesmslist = array();
 		}
@@ -41,6 +41,7 @@ class ContactChangeReport extends ReportGenerator {
 		}
 
 		$personquery = "";
+		$orgfieldquery = generateOrganizationFieldQuery("p.id");
 		$fieldquery = generateFields("p");
 		$gfieldquery = generateGFieldQuery("p.id");
 		
@@ -56,10 +57,12 @@ class ContactChangeReport extends ReportGenerator {
 							coalesce(a.state,''), ' ',
 							coalesce(a.zip,'')
 						) as address
+					$orgfieldquery
 					$fieldquery
 					$gfieldquery
 					from " . getReportPersonSubquerySql($this->params) . " p
 					left join address a on (a.personid = p.id)
+					left join language l on (l.code = p." . FieldMap::GetLanguageField() . ")
 					where not p.deleted
 					and p.type='system'
 					$peoplequery
@@ -204,6 +207,11 @@ class ContactChangeReport extends ReportGenerator {
 		function fmt_editlock_date($row, $index) {
 			return $row[9];
 		}
+		
+		// index 10 is organization
+		function fmt_organization($row, $index) {
+			return $row[10];
+		}
 
 		$titles = array("0" => "ID#",
 						"2" => "First Name",
@@ -211,21 +219,24 @@ class ContactChangeReport extends ReportGenerator {
 						"4" => "Address",
 						"5" => "Sequence",
 						"6" => "Destination",
-						"9" => "Modified Date");
+						"9" => "Modified Date",
+						"10" => "Organization");
 		// index 7 is a flag to tell what type of destination
 		// index 8 editlock
 		// so set the title of starting f-field at appropriate place
 		// append begins after index specified
-		$titles = appendFieldTitles($titles, 9, $fieldlist, $activefields);
+		$titles = appendFieldTitles($titles, 10, $fieldlist, $activefields);
 
 		$formatters = array("0" => "fmt_idmagnify",
 							"5" => "fmt_destination_sequence",
 							"6" => "fmt_editlocked_destination",
-							"9" => "fmt_editlock_date");
+							"9" => "fmt_editlock_date",
+							"10" => "fmt_organization");
 		
+		// TODO we should not lookup language name in database for every row! why doesn't the genfields work???
 		//I think this is safe since it starts appending f03 right after other fields
-		if (in_array(FieldMap::getLanguageField(),$activefields))
-			$formatters[10] = "fmt_languagecode";
+		//if (in_array(FieldMap::getLanguageField(),$activefields))
+			//$formatters[11] = "fmt_languagecode";
 
 		startWindow("Search Results", "padding: 3px;");
 		showPageMenu($total,$pagestart,$max);
@@ -273,7 +284,7 @@ class ContactChangeReport extends ReportGenerator {
 		session_write_close();//WARNING: we don't keep a lock on the session file, any changes to session data are ignored past this point
 		
 		//generate the CSV header
-		$header = '"ID#", "First Name", "Last Name", "Address"';
+		$header = 'ID#, First Name, Last Name, Address, Organization';
 
 		foreach($activefields as $active){
 			if(!$active) continue;
@@ -307,12 +318,12 @@ class ContactChangeReport extends ReportGenerator {
 
 		while ($row = DBGetRow($result)) {
 
-			$reportarray = array($row[0], $row[2], $row[3], $row[4]);
+			$reportarray = array($row[0], $row[2], $row[3], $row[4], $row[5]);
 
 			$count=0;
 			foreach($fieldlist as $index => $field){
 				if(in_array($index, $activefields)){
-					$reportarray[] = $row[5+$count];
+					$reportarray[] = $row[6+$count];
 				}
 				$count++;
 			}
