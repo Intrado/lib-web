@@ -4,13 +4,16 @@ class MessageGroup extends DBMappedObject {
 	var $defaultlanguagecode = 'en';
 	var $name;
 	var $description;
+	var $data;
 	var $modified;
 	var $lastused;
 	var $permanent = 0;
 	var $deleted = 0;
 	
-	var $messages = false;
-
+	var $preferredgender = 'female'; // Part of the $data string.
+	
+	var $messages = false; // Local cache of messages.
+	
 	function MessageGroup ($id = NULL) {
 		$this->_allownulls = true;
 		$this->_tablename = "messagegroup";
@@ -19,6 +22,7 @@ class MessageGroup extends DBMappedObject {
 			"defaultlanguagecode",
 			"name",
 			"description",
+			"data",
 			"modified",
 			"lastused",
 			"permanent",
@@ -27,6 +31,17 @@ class MessageGroup extends DBMappedObject {
 
 		//call super's constructor
 		DBMappedObject::DBMappedObject($id);
+	}
+	
+	function readHeaders () {
+		$data = sane_parsestr($this->data);
+		foreach($data as $key => $value) {
+			$this->$key = $value;
+		}
+	}
+
+	function stuffHeaders () {
+		$this->data = "preferredgender=" . urlencode($this->preferredgender);
 	}
 	
 	function getMessages() {
