@@ -325,7 +325,7 @@ foreach ($destinations as $type => $destination) {
 				if ($emailplain) {
 					$formdata["overrideplaintext"] = array(
 						"label" => _L("Override Plain Text"),
-						"value" => $overridingplaintext ? "true" : "false",
+						"value" => $overridingplaintext,
 						"fieldhelp" => _L("A plain-text message will be generated from the html message, however you may type a custom plain-text message by overriding it."),
 						"control" => array("CheckBox"),
 						"validators" => array(
@@ -492,7 +492,7 @@ foreach ($destinations as $type => $destination) {
 					if ($emailplain) {
 						$formdata["overrideplaintext"] = array(
 							"label" => _L("Override Plain Text"),
-							"value" => $overridingplaintext ? "true" : "false",
+							"value" => $overridingplaintext,
 							"fieldhelp" => _L("A plain-text message will be generated from the html message, however you may type a custom plain-text message by overriding it."),
 							"control" => array("CheckBox"),
 							"validators" => array(
@@ -713,7 +713,7 @@ if ($button = $messagegroupsplitter->getSubmit()) {
 									$message->readHeaders();
 									$emaildata['overrideplaintext'] = $message->overrideplaintext;
 								}
-								$message->data = Message::makeHeaderDataString($emaildata);
+								$message->data = makeUrlDataString($emaildata);
 								$message->update();
 							}
 						}
@@ -762,7 +762,7 @@ if ($button = $messagegroupsplitter->getSubmit()) {
 									}
 								}
 								
-								$emaildatastring = Message::makeHeaderDataString($emaildata);
+								$emaildatastring = makeUrlDataString($emaildata);
 							}
 
 							if ($formdestinationlanguagecode == 'autotranslator') {
@@ -786,14 +786,17 @@ if ($button = $messagegroupsplitter->getSubmit()) {
 									
 									if (!empty($autotranslatorlanguages)) {
 										// Batch translation.
-										$sourcemessageparts = Message::parseText($messagegroup->id, $_SESSION['autotranslatesourcetext']["{$formdestinationtype}{$formdestinationsubtype}"]);
-										$sourcemessagetext = Message::formatParts($sourcemessageparts, true);
-										if ($formdestinationtype == 'email' && $formdestinationsubtype == 'html') {
-											$plainsourcemessageparts = Message::parseText($messagegroup->id, html_to_plain($sourcemessagetext));
-										}
+										$sourcemessagetext = $_SESSION['autotranslatesourcetext']["{$formdestinationtype}{$formdestinationsubtype}"];
+										
 										if ($autotranslatortranslations = translate_fromenglish($sourcemessagetext, array_keys($autotranslatorlanguages))) {
+											// NOTE: Reuse the same set of message parts for each language's source message; Message::recreateParts() calls DBMappedObject::create(), which will result in the message parts getting new IDs.
+											$sourcemessageparts = false;
+											if ($formdestinationtype == 'email' && $formdestinationsubtype == 'html')
+												$plainsourcemessageparts = false;
+											
 											// Increment an index because translate_fromenglish() does not return an associative array.
 											$autotranslationlanguageindex = 0;
+											
 											foreach ($autotranslatorlanguages as $languagecode => $translationlanguagename) {
 												// Delete any existing messages of the same type-subtype-languagecode that are not relevent for autotranslate.
 												QuickUpdate('update message set deleted=1 where autotranslate not in ("source", "translated") and messagegroupid=? and type=? and subtype=? and languagecode=?', false, array($messagegroup->id, $formdestinationtype, $formdestinationsubtype, $languagecode));
@@ -850,7 +853,9 @@ if ($button = $messagegroupsplitter->getSubmit()) {
 													$sourcemessage->update();
 												}
 
-												// NOTE: Reuse the same set of message parts for each language's source message; Message::recreateParts() calls DBMappedObject::create(), which will result in the message parts getting new IDs.
+												if ($sourcemessageparts === false)
+													$sourcemessageparts = $sourcemessage->parse($sourcemessagetext);
+												
 												$sourcemessage->recreateParts(null, $sourcemessageparts, $formdestinationtype == 'phone' ? $preferredgender : null);
 												
 												if (isset($plaintextoverriden) && !$plaintextoverriden) {
@@ -873,6 +878,9 @@ if ($button = $messagegroupsplitter->getSubmit()) {
 														$plainsourcemessage->createMessageAttachments($emailattachments);
 													}
 													if (!$plainsourcemessage->overrideplaintext) {
+														if ($plainsourcemessageparts === false)
+															$plainsourcemessageparts = $plainsourcemessage->parse(html_to_plain($sourcemessagetext));
+														
 														$plainsourcemessage->recreateParts(null, $plainsourcemessageparts, null);
 													}
 												}
@@ -970,7 +978,7 @@ if ($button = $messagegroupsplitter->getSubmit()) {
 								
 								$trimmedsourcetext = isset($translationitemdata->englishText) ? trim($translationitemdata->englishText) : '';
 								if (!empty($messagesneeded['translated']) && !empty($trimmedsourcetext)) {
-									if (!$translation = translate_fromenglish(Message::formatParts(Message::parseText($messagegroup->id, $trimmedsourcetext),true), array($formdestinationlanguagecode))) {
+									if (!$translation = translate_fromenglish($trimmedsourcetext, array($formdestinationlanguagecode))) {
 										unset($translation);
 									}
 								}
@@ -1031,7 +1039,8 @@ if ($button = $messagegroupsplitter->getSubmit()) {
 										continue;
 									}
 									
-									if ($formdestinationsubtype == 'html' && $existingmessage->subtype == 'plain') {
+									if ($formdestinationtype == 'email' && $formdestinationsubtype == 'html' && $existingmessage->subtype == 'plain') {
+										// Update existing plain messages that are not overridden.
 										$existingmessage->recreateParts(html_to_plain($messagebodies[$existingmessage->autotranslate]), null, null);
 									} else {
 										if ($formdestinationtype == 'email' && $formdestinationsubtype == 'plain') {
@@ -1054,7 +1063,7 @@ if ($button = $messagegroupsplitter->getSubmit()) {
 											continue;
 										}
 										
-										if (!$messagegroup->getMessage('html', 'plain', $formdestinationlanguagecode, $autotranslate)) {
+										if (!$messagegroup->getMessage('email', 'plain', $formdestinationlanguagecode, $autotranslate)) {
 											$newplainmessage = new Message();
 											$newplainmessage->userid = $USER->id;
 											$newplainmessage->messagegroupid = $messagegroup->id;
@@ -1091,7 +1100,10 @@ if ($button = $messagegroupsplitter->getSubmit()) {
 										$newmessage->data = $emaildatastring;
 										$newmessage->description = SmartTruncate(($formdestinationsubtype == 'html' ? 'HTML' : ucfirst($formdestinationsubtype)) . ' ' . Language::getName($formdestinationlanguagecode), 50);
 										
-										if (!$plaintextoverriden && $formdestinationsubtype == 'html') {
+										// Create any new plain messages that are needed for these new html messages.
+										if ((!$plaintextoverriden && $formdestinationsubtype == 'html') &&
+											!$messagegroup->hasMessage('email', 'plain', $formdestinationlanguagecode, $autotranslate)
+										) {
 											$newplainmessage = new Message();
 											$newplainmessage->userid = $USER->id;
 											$newplainmessage->messagegroupid = $messagegroup->id;

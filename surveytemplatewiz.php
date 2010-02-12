@@ -237,7 +237,7 @@ if ($questionnaire->emailmessageid) {
 	$emailmessage->readHeaders();
 
 	$emailparts = DBFindMany("MessagePart","from messagepart where messageid=? order by sequence",false,array($emailmessage->id));
-	$emailbody = Message::formatParts($emailparts);
+	$emailbody = $emailmessage->format($emailparts);
 } else{
 	$emailmessage = false;
 }
