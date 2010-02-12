@@ -502,8 +502,8 @@ function makeAccordionSplitter($type, $subtype, $languagecode, $permanent, $pref
 				'title' => '',
 				'formdata' => array(makeFormHtml('
 					<div style="float:right">'
-					. icon_button(_L('Show Tools'), 'tick', NULL, NULL, ' id="showaccordioncontainer" style="display:none" ')
-					. icon_button(_L('Hide Tools'), 'tick', NULL, NULL, ' id="hideaccordioncontainer" ')
+					. icon_button(_L('Show Tools'), 'tick', NULL, NULL, ' id="showaccordiontools" style="display:none" ')
+					. icon_button(_L('Hide Tools'), 'tick', NULL, NULL, ' id="hideaccordiontools" ')
 					. '<div style="clear:both"></div>
 					</div>
 					
@@ -545,9 +545,9 @@ function makeAccordionSplitter($type, $subtype, $languagecode, $permanent, $pref
 							
 							// Observe each button for a click; when a button is clicked, hide itself and show the other button. Then set the visibility of the accordion container appropriately.
 							
-							$("hideaccordioncontainer").observe("click", function(event) {
+							$("hideaccordiontools").observe("click", function(event) {
 								event.element().hide();
-								$("showaccordioncontainer").show();
+								$("showaccordiontools").show();
 								
 								var accordioncontainer = getAccordionContainer();
 								if (accordioncontainer) {
@@ -557,13 +557,13 @@ function makeAccordionSplitter($type, $subtype, $languagecode, $permanent, $pref
 								var accordionsplitpane = form.down("td.SplitPane", 1);
 								
 								if (accordionsplitpane) {
-									accordionsplitpane.style.width = "auto";
+									accordionsplitpane.style.width = "110px";
 								}
 							});
 							
-							$("showaccordioncontainer").observe("click", function(event) {
+							$("showaccordiontools").observe("click", function(event) {
 								event.element().hide();
-								$("hideaccordioncontainer").show();
+								$("hideaccordiontools").show();
 								
 								showAccordionContainer();
 							});
