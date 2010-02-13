@@ -23,6 +23,8 @@ require_once("inc/securityhelper.inc.php");
 include_once("ruleeditform.inc.php");
 require_once("inc/rulesutils.inc.php");
 require_once("obj/FormRuleWidget.fi.php");
+require_once("obj/SectionWidget.fi.php");
+require_once("obj/ValSections.val.php");
 require_once("inc/reportutils.inc.php");
 include_once("obj/Address.obj.php");
 include_once("obj/Language.obj.php");
@@ -81,6 +83,7 @@ $formdata["toggles"] = array(
 	"label" => _L('Search Options'),
 	"control" => array("FormHtml", 'html' => "
 		<input name='systemcontact_searchOption' id='searchByRules' type='radio' onclick=\"choose_search_by_rules();\"><label for='searchByRules'> Search by Rules </label>
+		<input name='systemcontact_searchOption' id='searchBySections' type='radio' onclick=\"choose_search_by_sections();\"><label for='searchBySections'> Search by Sections </label>
 		<input name='systemcontact_searchOption' id='searchByPerson' type='radio' onclick=\"choose_search_by_person();\"><label for='searchByPerson'> Search for Person </label>
 	"),
 	"helpstep" => 2
@@ -94,6 +97,23 @@ $formdata["ruledata"] = array(
 	"helpstep" => 2
 );
 
+$formdata["sectionids"] = array(
+	"label" => _L('Sections'),
+	"fieldhelp" => _L('Select sections from an organization.'),
+	"value" => "",
+	"validators" => array(
+		array("ValSections")
+	),
+	"control" => array("SectionWidget", "sectionids" => isset($_SESSION['systemcontact_sectionids']) ? $_SESSION['systemcontact_sectionids'] : array()),
+	"helpstep" => 2
+);
+
+$formdata["sectionsearchbutton"] = array(
+	"label" => _L(''),
+	"control" => array("FormHtml", "html" => "<div id='sectionsearchButtonContainer'>" . submit_button(_L('Search'),'sectionsearch',"magnifier") . "</div>"),
+	"helpstep" => 2
+);
+	
 $formdata["pkey"] = array(
 	"label" => _L('Person ID'),
 	"value" => !empty($_SESSION['systemcontact_pkey']) ? $_SESSION['systemcontact_pkey'] : '',
@@ -116,9 +136,9 @@ $formdata["email"] = array(
 	"helpstep" => 3
 );
 
-$formdata["searchbutton"] = array(
+$formdata["personsearchbutton"] = array(
 	"label" => _L(''),
-	"control" => array("FormHtml", "html" => "<div id='searchButtonContainer'>" . submit_button(_L('Search'),"search","magnifier") . "</div>"),
+	"control" => array("FormHtml", "html" => "<div id='personsearchButtonContainer'>" . submit_button(_L('Search'),'personsearch',"magnifier") . "</div>"),
 	"helpstep" => 3
 );
 
@@ -214,7 +234,13 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 					$form->sendTo("contacts.php");
 					break;
 					
-				case 'search':
+				case 'sectionsearch':
+					systemcontact_clear_search_session('systemcontact_sectionids');
+					$_SESSION['systemcontact_sectionids'] = $postdata['sectionids'];
+					$form->sendTo("contacts.php");
+					break;
+					
+				case 'personsearch':
 					systemcontact_clear_search_session();
 					$_SESSION['systemcontact_person'] = true;
 					$_SESSION['systemcontact_pkey'] = isset($postdata['pkey']) ? $postdata['pkey'] : false;
@@ -248,7 +274,11 @@ function systemcontact_clear_search_session($keep = false) {
 		
 	if ($keep != 'systemcontact_showall')
 		$_SESSION['systemcontact_showall'] = false;
-		
+	
+	if ($keep != 'systemcontact_sectionid') {
+		$_SESSION['systemcontact_sectionids'] = array();
+	}
+	
 	if ($keep != 'systemcontact_person') {
 		$_SESSION['systemcontact_person'] = false;
 		$_SESSION['systemcontact_pkey'] = false;
@@ -281,6 +311,8 @@ function systemcontact_make_report_options() {
 		
 		$options['rules'] = $rules;
 		$options['organizationids'] = $organizationids;
+	} else if (!empty($_SESSION['systemcontact_sectionid'])) {
+		$options['sectionids'] = $_SESSION['systemcontact_sectionid'];
 	}
 	
 	if (!empty($_SESSION['systemcontact_orderby'])) {
@@ -328,8 +360,10 @@ include_once("nav.inc.php");
 			$('metadataDiv').up('tr').hide();
 			
 		<?
-			if (!empty($_SESSION['systemcontact_rules']) || empty($_SESSION['systemcontact_person']))
+			if (!empty($_SESSION['systemcontact_rules']) || (empty($_SESSION['systemcontact_sectionids']) && empty($_SESSION['systemcontact_person'])))
 				echo 'choose_search_by_rules();';
+			else if (!empty($_SESSION['systemcontact_sectionids']))
+				echo 'choose_search_by_sections();';
 			else
 				echo 'choose_search_by_person();';
 		?>
@@ -337,22 +371,41 @@ include_once("nav.inc.php");
 
 	function choose_search_by_rules() {
 		$('searchByRules').checked = true;
+		$('searchBySections').checked = false;
 		$('searchByPerson').checked = false;
 		$('ruleWidgetContainer').up('tr').show();
+		$('<?=$form->name?>_sectionids_fieldarea').hide();
+		$('sectionsearchButtonContainer').up('tr').hide();
 		$('<?=$form->name?>_pkey').up('tr').hide();
 		$('<?=$form->name?>_phone').up('tr').hide();
 		$('<?=$form->name?>_email').up('tr').hide();
-		$('searchButtonContainer').up('tr').hide();
+		$('personsearchButtonContainer').up('tr').hide();
 	}
 
+	function choose_search_by_sections() {
+		$('searchByRules').checked = false;
+		$('searchBySections').checked = true;
+		$('searchByPerson').checked = false;
+		$('ruleWidgetContainer').up('tr').hide();
+		$('<?=$form->name?>_sectionids_fieldarea').show();
+		$('sectionsearchButtonContainer').up('tr').show();
+		$('<?=$form->name?>_pkey').up('tr').hide();
+		$('<?=$form->name?>_phone').up('tr').hide();
+		$('<?=$form->name?>_email').up('tr').hide();
+		$('personsearchButtonContainer').up('tr').hide();
+	}
+	
 	function choose_search_by_person() {
 		$('searchByRules').checked = false;
+		$('searchBySections').checked = false;
 		$('searchByPerson').checked = true;
 		$('ruleWidgetContainer').up('tr').hide();
+		$('<?=$form->name?>_sectionids_fieldarea').hide();
+		$('sectionsearchButtonContainer').up('tr').hide();
 		$('<?=$form->name?>_pkey').up('tr').show();
 		$('<?=$form->name?>_phone').up('tr').show();
 		$('<?=$form->name?>_email').up('tr').show();
-		$('searchButtonContainer').up('tr').show();
+		$('personsearchButtonContainer').up('tr').show();
 	}
 	
 	function systemcontact_clear_person() {
@@ -378,7 +431,7 @@ startWindow("Options");
 	echo $form->render();
 endWindow();
 
-if (!empty($_SESSION['systemcontact_showall']) || !empty($_SESSION['systemcontact_person']) || !empty($_SESSION['systemcontact_rules'])) {
+if (!empty($_SESSION['systemcontact_showall']) || !empty($_SESSION['systemcontact_sectionids']) || !empty($_SESSION['systemcontact_person']) || !empty($_SESSION['systemcontact_rules'])) {
 	echo "<div id='metadataTempDiv' style='display:none'>";
 		select_metadata("$('searchresults')", 5, $fields);
 	echo "</div>";
