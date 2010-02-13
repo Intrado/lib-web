@@ -18,7 +18,7 @@ require_once("obj/TargetedMessage.obj.php");
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization
 ////////////////////////////////////////////////////////////////////////////////
-if (!$USER->authorize('targetedmessage')) {
+if (!getSystemSetting('_hastargetedmessage', false) || !$USER->authorize('targetedmessage')) {
 	redirect('unauthorized.php');
 }
 
@@ -185,9 +185,7 @@ if (isset($_GET['search'])) {
 
 	$messages = DBFindMany("TargetedMessage","from targetedmessage where enabled = 1 order by targetedmessagecategoryid");
 
-	if(file_exists($contentfile))
-		include_once($contentfile);
-
+	require_once($contentfile);
 	$response = array();
 	foreach($messages as $message) {
 		if(isset($message->overridemessagegroupid) && isset($customtxt[$message->id])) {
@@ -280,8 +278,7 @@ foreach($sections as $section)
 			<?
 				$libraryids = array();
 				$messageids = array();
-				if(file_exists($contentfile))
-					include_once($contentfile);
+				require_once($contentfile);
 				foreach($library as $categoryid => $messages) {
 					// add library to id since user may change the title of the category
 					echo '<div id="lib-' . $categoryid . '" style="display:block;">

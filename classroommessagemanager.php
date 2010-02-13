@@ -2,15 +2,15 @@
 ////////////////////////////////////////////////////////////////////////////////
 // Includes
 ////////////////////////////////////////////////////////////////////////////////
-include_once("inc/common.inc.php");
-include_once("inc/securityhelper.inc.php");
-include_once("obj/PeopleList.obj.php");
-include_once("obj/Person.obj.php");
+require_once("inc/common.inc.php");
+require_once("inc/securityhelper.inc.php");
+require_once("obj/PeopleList.obj.php");
+require_once("obj/Person.obj.php");
 require_once("inc/table.inc.php");
 require_once("inc/utils.inc.php");
-include_once("inc/form.inc.php");
-include_once("inc/html.inc.php");
-include_once("inc/formatters.inc.php");
+require_once("inc/form.inc.php");
+require_once("inc/html.inc.php");
+require_once("inc/formatters.inc.php");
 require_once("obj/TargetedMessageCategory.obj.php");
 
 
@@ -18,7 +18,7 @@ require_once("obj/TargetedMessageCategory.obj.php");
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization
 ////////////////////////////////////////////////////////////////////////////////
-if (!$USER->authorize('managesystem')) {
+if (!getSystemSetting('_hastargetedmessage', false) || !$USER->authorize('managesystem')) {
 	redirect('unauthorized.php');
 }
 
@@ -102,8 +102,7 @@ if($ajax === true) {
 	$data->list = array();
 
 	$filename = "messagedata/en/targetedmessage.php";
-	if(file_exists($filename))
-		include_once($filename);
+	require_once($filename);
 
 	while(!empty($items)) {
 		$item = array_shift($items);
