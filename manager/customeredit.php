@@ -7,6 +7,7 @@ require_once("../obj/Phone.obj.php");
 require_once("../inc/themes.inc.php");
 require_once("XML/RPC.php");
 require_once("authclient.inc.php");
+require_once("../obj/Language.obj.php");
 
 
 if (!$MANAGERUSER->authorized("editcustomer"))
@@ -62,39 +63,39 @@ function update_jobtypeprefs($min, $max, $type, $custdb){
 $f = "customer";
 $s = "edit";
 
-$googlangs = array(	"Arabic",
-					"Bulgarian",
-					"Catalan",
-					"Chinese",
-					"Croatian",
-					"Czech",
-					"Danish",
-					"Dutch",
-					"Filipino",
-					"Finnish",
-					"French",
-					"German",
-					"Greek",
-					"Hebrew",
-					"Hindi",
-					"Indonesian",
-					"Italian",
-					"Japanese",
-					"Korean",
-					"Latvian",
-					"Lithuanian",
-					"Norwegian",
-					"Polish",
-					"Portuguese",
-					"Romanian",
-					"Russian",
-					"Serbian",
-					"Slovak",
-					"Slovenian",
-					"Spanish",
-					"Swedish",
-					"Ukrainian",
-					"Vietnamese");
+$googlangs = array(	"ar" => "Arabic",
+					"bg" => "Bulgarian",
+					"ca" => "Catalan",
+					"zh" => "Chinese",
+					"hr" => "Croatian",
+					"cs" => "Czech",
+					"da" => "Danish",
+					"nl" => "Dutch",
+					"fil" => "Filipino",
+					"fi" => "Finnish",
+					"fr" => "French",
+					"de" => "German",
+					"el" => "Greek",
+					"he" => "Hebrew",   //or iw
+					"hi" => "Hindi",
+					"id" => "Indonesian", // or in
+					"it" => "Italian",
+					"ja" => "Japanese",
+					"ko" => "Korean",
+					"lv" => "Latvian",
+					"lt" => "Lithuanian",
+					"no" => "Norwegian",
+					"pl" => "Polish",
+					"pt" => "Portuguese",
+					"ro" => "Romanian",
+					"ru" => "Russian",
+					"sr" => "Serbian",
+					"sk" => "Slovak",
+					"sl" => "Slovenian",
+					"es" => "Spanish",
+					"sv" => "Swedish",
+					"uk" => "Ukrainian",
+					"vi" => "Vietnamese");
 
 $timezones = array(	"US/Alaska",
 					"US/Aleutian",
@@ -111,7 +112,7 @@ $timezones = array(	"US/Alaska",
 $reloadform = 0;
 
 $refresh = 0;
-$languages = QuickQueryList("select id, name from language order by id", true, $custdb);
+$languages = DBFindMany("Language","from language order by id", false,false, $custdb);
 $ttslangs = QuickQueryList("select id, language from ttsvoice", true, $custdb);
 $ttslangs = array_flip($ttslangs);
 
@@ -317,8 +318,8 @@ if(CheckFormSubmit($f,"Save") || CheckFormSubmit($f, "Return")) {
 					}
 				}
 
-				if(GetFormData($f,$s, "newlang")!=""){
-					QuickUpdate("insert into language(name) values ('" . GetFormData($f, $s, "newlang") . "')", $custdb);
+				if(GetFormData($f,$s, "newlang")!="" && GetFormData($f,$s, "newlangcode")!=""){
+					QuickUpdate("insert into language(name,code) values ('" . GetFormData($f, $s, "newlang") . "','" . GetFormData($f, $s, "newlangcode") . "')", $custdb);
 				}
 
 				//Logo
@@ -397,7 +398,7 @@ if( $reloadform ) {
 
 	ClearFormData($f);
 	if($refresh){
-		$languages = QuickQueryList("select id, name from language order by id", true, $custdb);
+		$languages = DBFindMany("Language","from language order by id", false,false, $custdb);
 	}
 	PutFormData($f,$s,'name',getCustomerSystemSetting('displayname', "", true, $custdb),"text",1,50,true);
 	PutFormData($f,$s,'hostname',$custinfo[3],"text",1,255,true);
@@ -448,12 +449,13 @@ if( $reloadform ) {
 	PutFormData($f, $s, "loginlockouttime", getCustomerSystemSetting('loginlockouttime', 5, true, $custdb), "number", 0);
 
 	$oldlanguages = array();
-	foreach($languages as $index => $language){
-		$oldlanguages[] = $index;
-		$lang = "Language" . $index;
-		PutFormData($f, $s, $lang, $language, "text");
+	foreach($languages as $language){
+		$oldlanguages[] = $language->id;
+		$lang = "Language" . $language->id;
+		PutFormData($f, $s, $lang, $language->name, "text");
 	}
 	PutFormData($f, $s, "oldlanguages", $oldlanguages);
+	PutFormData($f, $s, "newlangcode", "", "text");
 	PutFormData($f, $s, "newlang", "", "text");
 
 	PutFormData($f,$s,"enabled",$custinfo[4], "bool",0,1);
@@ -548,19 +550,20 @@ NewForm($f);
 <tr><td>Number of minutes for login lockout:</td><td><? NewFormItem($f,$s,'loginlockouttime','text', 2) ?> 1 - 60 minutes</td></tr>
 <td></td><th align="left">Language:/ Google and TTS Support:</th>
 <?
-foreach($languages as $index => $language){
-	$lang = "Language" . $index;
-	?><tr><td><?=$lang?></td><td><? NewFormItem($f, $s, $lang, 'text', 25, 50, "id='$lang' onkeyup=\"var s = new getObj('$lang"."_select'); s.obj.selectedIndex = 0;\" onchange=\"var sel = new getObj('$lang"."_select');	for (var i in sel.obj.options) if (this.value == sel.obj.options[i].value) sel.obj.selectedIndex = i;\"") ?>
+foreach($languages as $language){
+	$lang = "Language" . $language->id;
+	?><tr><td><?=$lang?></td><td><div style="display:inline"><?=str_pad($language->code,3)?></div><?
+	NewFormItem($f, $s, $lang, 'text', 25, 50, "id='$lang' onkeyup=\"var s = new getObj('$lang"."_select'); s.obj.selectedIndex = 0;\" onchange=\"var sel = new getObj('$lang"."_select');	for (var i in sel.obj.options) if (this.value == sel.obj.options[i].value) sel.obj.selectedIndex = i;\"") ?>
 	<?
-	if ($index > 1) {?>
+	if ($language->id > 1) {?>
 		<select disabled id='<?="$lang"."_select"?>' onchange="if (this.selectedIndex != 0) {var o = new getObj('<?=$lang?>'); o.obj.value = this.options[this.selectedIndex].value;}">
 		<option value=0> -- No Translation Support -- </option>
-		<?foreach ($googlangs as $googlang) {
+		<?foreach ($googlangs as $code => $googlang) {
 			$ttsLangSup = '';
 			if (isset($ttslangs[strtolower($googlang)]))
 				$ttsLangSup .= " (TTS Support)";
 			?>
-			<option value="<?=$googlang?>" <?=($googlang == $language)?"selected":""?>><?=$googlang . $ttsLangSup?></option>
+			<option value="<?= str_pad($code,3) . " " . $googlang?>" <?=($code == $language->code)?"selected":""?>><?=$googlang . $ttsLangSup?></option>
 		<?}?>
 		</select>
 	<?} else {?>
@@ -569,18 +572,24 @@ foreach($languages as $index => $language){
 	</td></tr><?
 }
 ?>
-<tr><td>New Language: </td><td><? NewFormItem($f, $s, 'newlang', 'text', 25, 50, "id='newlanginput' onkeyup=\"var s = new getObj('newlanginputselect'); s.obj.selectedIndex = 0;\"")?>
-		<select id='newlanginputselect' onchange="var o = new getObj('newlanginput'); if (this.selectedIndex !== 0) o.obj.value = this.options[this.selectedIndex].value;">
+<tr><td>New Language: </td><td><div style="display:inline" id="newlangcodedisp"></div><?
+		NewFormItem($f, $s, 'newlangcode', 'hidden', 25, 50, "id='newlangcode'");
+		NewFormItem($f, $s, 'newlang', 'text', 25, 50, "id='newlanginput' onkeyup=\"var s = new getObj('newlanginputselect'); s.obj.selectedIndex = 0;\"")?>
+		<select id='newlanginputselect' onchange="var o = new getObj('newlanginput');var h = new getObj('newlangcode');if (this.selectedIndex !== 0) { var value = this.options[this.selectedIndex].value; o.obj.value = value.substring(4); h.obj.value = value.substring(0,3); $('newlangcodedisp').update(value.substring(0,3));}">
 		<option value=0> -- No Translation Support -- </option>
-		<?foreach ($googlangs as $googlang) {
+		<?foreach ($googlangs as $code => $googlang) {
 			$ttsLangSup = '';
 			if (isset($ttslangs[strtolower($googlang)]))
 				$ttsLangSup .= " (TTS Support)";
 			?>
-			<option value="<?=$googlang?>" ><?=$googlang . $ttsLangSup?></option>
+
+			<option value="<?= str_pad($code,3) . " " . $googlang?>" ><?=$googlang . $ttsLangSup?></option>
 		<?}?>
 		</select>
-		<? NewFormItem($f, "Save","Add", 'submit');?>
+		<div style="display:inline;">
+		Search Languages: <input id="searchbox" type="text" size="30" />
+		</div><? NewFormItem($f, "Save","Add", 'submit');?>
+		<table id="searchresult" style=""><tr><td></td></tr></table>
 </td></tr>
 
 <tr><td> Has LDAP </td><td><? NewFormItem($f, $s, 'hasldap', 'checkbox') ?> LDAP</td></tr>
@@ -745,4 +754,61 @@ include_once("navbottom.inc.php");
 		new getObj('brandratio').obj.value = colorscheme[value]['_brandratio'];
 	}
 
+
+function addlang(code,name) {
+	$('newlangcode').value = code;
+	$('newlanginput').value = name;
+	var s = new getObj('newlanginputselect'); s.obj.selectedIndex = 0;
+	$('searchresult').update('');
+	$('newlangcodedisp').update(code);
+}
+
+function search(event) {
+	if (Event.KEY_RETURN == event.keyCode) {
+		event.stop();
+		var searchtxt = event.target.getValue();
+
+		console.info('enter '  + searchtxt);
+		new Ajax.Request('languagesearch.php',
+		{
+			method:'get',
+			parameters: {searchtxt: searchtxt},
+			onSuccess: function(response){
+				var result = response.responseJSON;
+				var items = new Element('tbody',{width:'100%'});
+				var header = new Element('tr').addClassName("listHeader");
+
+				if(result) {
+					header.insert(new Element('th').update('Code'));
+					header.insert(new Element('th',{align:'left'}).update('Language'));
+
+					items.insert(header);
+					var i = 0;
+					$H(result).each(function(itm) {
+						var row = new Element('tr');
+						if(i%2)
+							row.addClassName("listAlt");
+						row.insert(new Element('td',{align:"right"}).update(itm.key));
+						row.insert(new Element('td').update('<a href="#" onclick="addlang(\'' + itm.key + '\',\'' + itm.value + '\');return false;">' + itm.value + '</a>'));
+						items.insert(row);
+						i++;
+						console.info(itm.key + ' '  + itm.value);
+					});
+				} else {
+					header.insert(new Element('th').update('No Language Found containing the search sting "' + searchtxt + '"'));
+					items.insert(header);
+
+				}
+				$('searchresult').update(items);
+
+			}
+		});
+	}
+}
+
+
+document.observe("dom:loaded", function() {
+	var searchBox = $('searchbox');
+	searchBox.observe('keypress', search);
+});
 </script>
