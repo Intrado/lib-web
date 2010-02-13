@@ -92,7 +92,6 @@ startWindow("Options", 'padding: 3px;');
 					<tr><td><a href='jobsettings.php'>Job Settings</a></td></tr>
 					<tr><td><a href='jobtypemanagement.php'>Job Types</a></td></tr>
 					<tr><td><a href='messageintro.php'>Message Intro</a></td></tr>
-					<tr><td><a href='classroommessagemanager.php'>Classroom Message Manager</a></td></tr>
 				</table>
 			</td>
 			<td>
@@ -132,6 +131,11 @@ startWindow("Options", 'padding: 3px;');
 					if ($USER->authorize('managesystem') && getSystemSetting('_dmmethod', "")!='asp') {
 ?>
 						<tr><td><a href='dms.php'><?=($IS_COMMSUITE)?_L("Telephony Settings"):_L("SmartCall Appliance")?></a></td></tr>
+<?
+					}
+					if (getSystemSetting('_hastargetedmessage', false) && $USER->authorize('managesystem')) {
+?>
+							<tr><td><a href='classroommessagemanager.php'>Classroom Message Manager</a></td></tr>
 <?
 					}
 ?>
