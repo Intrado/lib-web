@@ -194,7 +194,7 @@ function upgrade_7_5 ($rev, $shardid, $customerid, $db) {
 			
 			
 			
-			$schoolfieldnum = FieldMap::getSchoolField();
+			$schoolfieldnum = FieldMap::getFieldnumWithOption('school');
 			if ($schoolfieldnum) {
 				$num = substr($schoolfieldnum,1) + 0;
 				
