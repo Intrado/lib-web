@@ -234,37 +234,6 @@ class Job extends DBMappedObject {
 		return $job;
 	}
 
-	// return array of fields with values other than their defaults
-	// NOTE only 'advanced' options (for now), used by jobedit page
-	function compareWithDefaults() {
-		$defaultjob = $this->jobWithDefaults();
-		$fielddiffs = array();
-
-		// advanced settings
-		if (strtotime($this->startdate) != strtotime($defaultjob->startdate)) $fielddiffs['startdate'] = 1;
-		if (strtotime($this->enddate) != strtotime($defaultjob->enddate)) $fielddiffs['enddate'] = 1;
-		if (strtotime($this->starttime) != strtotime($defaultjob->starttime)) $fielddiffs['starttime'] = 1;
-		if (strtotime($this->endtime) != strtotime($defaultjob->endtime)) $fielddiffs['endtime'] = 1;
-		if ($this->isOption("sendreport") != $defaultjob->isOption("sendreport")) $fielddiffs['sendreport'] = 1;
-
-		// advanced phone options
-		$phonelang = DBFindMany('JobLanguage', "from joblanguage where joblanguage.type = 'phone' and jobid = " . $this->id);
-		if ($phonelang) $fielddiffs['phonelang'] = 1;
-		if ($this->getOptionValue("maxcallattempts") != $defaultjob->getOptionValue("maxcallattempts")) $fielddiffs['maxcallattempts'] = 1;
-		if ($this->getOptionValue("callerid") != $defaultjob->getOptionValue("callerid")) $fielddiffs['callerid'] = 1;
-		if ($this->isOption("skipduplicates") != $defaultjob->isOption("skipduplicates")) $fielddiffs['skipduplicates'] = 1;
-		if ($this->isOption("leavemessage") != $defaultjob->isOption("leavemessage")) $fielddiffs['leavemessage'] = 1;
-		if ($this->isOption("messageconfirmation") != $defaultjob->isOption("messageconfirmation")) $fielddiffs['messageconfirmation'] = 1;
-
-		// advanced email options
-		$emaillang = DBFindMany('JobLanguage', "from joblanguage where joblanguage.type = 'email' and jobid = " . $this->id);
-		if ($emaillang) $fielddiffs['emaillang'] = 1;
-		if ($this->isOption("skipemailduplicates") != $defaultjob->isOption("skipemailduplicates")) $fielddiffs['skipemailduplicates'] = 1;
-
-		return $fielddiffs;
-	}
-
-
 	// TODO Check where  sendphone,sendemail and sendsms is used and see if we eliminate them
 	function refresh($specificfields = NULL, $refreshchildren = false) {
 		parent::refresh($specificfields, $refreshchildren);
