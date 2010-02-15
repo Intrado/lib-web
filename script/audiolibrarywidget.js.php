@@ -38,9 +38,6 @@ var AudioLibraryWidget = Class.create({
 			var insertbutton = icon_button('<?=_L("Insert")?>','fugue/arrow_turn_180', null);
 			insertbutton.observe('click', this.onClickInsert.bindAsEventListener(this, audiofile));
 			
-			var deletebutton = icon_button('<?=_L("Delete")?>','cross', null);
-			deletebutton.observe('click', this.onClickDelete.bindAsEventListener(this, audiofile));
-			
 			var tr = new Element('tr')
 				.insert(
 					new Element('td').insert(namelink)
@@ -48,7 +45,6 @@ var AudioLibraryWidget = Class.create({
 					new Element('td')
 						.insert(playbutton)
 						.insert(insertbutton)
-						.insert(deletebutton)
 						.insert('<div style="clear:both"></div>')
 				);
 			
@@ -104,19 +100,26 @@ var AudioLibraryWidget = Class.create({
 		
 		var renametextbox = new Element('input', {'style': 'display:block; float:left', 'type': 'text', 'value': audiofile.name});
 		
-		var renamedonebutton = icon_button('<?=_L("Done")?>','tick', null);
-		renamedonebutton.observe('click', this.onClickRenameDone.bindAsEventListener(this, audiofilelink, renametextbox, audiofile));
+		var renamebutton = icon_button('<?=_L("Rename")?>','tick', null);
+		renamebutton.observe('click', this.onClickRename.bindAsEventListener(this, audiofilelink, renametextbox, audiofile));
+		
+		var deletebutton = icon_button('<?=_L("Delete")?>','cross', null);
+		deletebutton.observe('click', this.onClickDelete.bindAsEventListener(this, audiofile));
 		
 		audiofilelinktablecell.insert(
 			renametextbox
 		).insert(
-			renamedonebutton
+			'<div style="clear:both"></div>'
+		).insert(
+			renamebutton
+		).insert(
+			deletebutton
 		).insert(
 			'<div style="clear:both"></div>'
 		);
 	},
 	
-	onClickRenameDone: function(event, audiofilelink, renametextbox, audiofile) {
+	onClickRename: function(event, audiofilelink, renametextbox, audiofile) {
 		var newname = renametextbox.value.strip();
 		
 		if (newname == '') {
@@ -176,6 +179,9 @@ var AudioLibraryWidget = Class.create({
 		if (!deletebutton.match('button'))
 			return;
 		
+		if (!confirm("Are you sure you want to delete this audio file?"))
+			return;
+			
 		new Ajax.Request('ajaxaudiolibrary.php?action=deleteaudiofile', {
 			'method': 'post',
 			'parameters': {
