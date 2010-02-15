@@ -61,7 +61,7 @@ if($isajax === true) {
 		case "messages":
 			$mergeditems = array_merge($mergeditems,QuickQueryMultiRow("
 			select 'message' as type,'Saved' as status,g.id as id, g.name as name, g.modified as date, g.deleted as deleted,
-			 sum(type='phone') as phone, sum(type='email') as email,sum(type='sms') as sms
+			 sum(m.type='phone') as phone, sum(m.type='email') as email,sum(m.type='sms') as sms
 			from messagegroup g, message m where g.userid=? and g.deleted = 0 and g.modified is not null and m.messagegroupid = g.id
 			group by g.id order by g.modified desc limit 10 ",true,false,array($USER->id)));
 			break;
@@ -103,7 +103,7 @@ if($isajax === true) {
 			$mergeditems = array_merge($mergeditems,QuickQueryMultiRow("select 'list' as type,'Saved' as status, id, name, modifydate as date, lastused from list where userid=? and deleted = 0  and modifydate is not null order by modifydate desc limit 10",true,false,array($USER->id)));
 			$mergeditems = array_merge($mergeditems,QuickQueryMultiRow("
 			select 'message' as type,'Saved' as status,g.id as id, g.name as name, g.modified as date, g.deleted as deleted,
-			 sum(type='phone') as phone, sum(type='email') as email,sum(type='sms') as sms
+			 sum(m.type='phone') as phone, sum(m.type='email') as email,sum(m.type='sms') as sms
 			from messagegroup g, message m where g.userid=? and g.deleted = 0 and g.modified is not null and m.messagegroupid = g.id
 			group by g.id order by g.modified desc limit 10 ",true,false,array($USER->id)));
 
