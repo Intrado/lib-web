@@ -2,8 +2,8 @@
 class ValMessageBody extends Validator {
 	var $onlyserverside = true;
 	function validate ($value, $args, $requiredvalues) {
-		if (isset($_SESSION['messagegroupid'])) {
-			$messagegroup = new MessageGroup($_SESSION['messagegroupid']);
+		if (isset($args['messagegroup']) && $args['messagegroup']) {
+			$messagegroup = $args['messagegroup'];
 			$errormessagecreatefirst = _L("Please first create the %s message.", Language::getName($messagegroup->defaultlanguagecode));
 			// Unless the user is editing the default message, show an error if the messagegroup has no default message.
 			if (!$messagegroup->hasDefaultMessage($args['type'], $args['subtype'])) {
@@ -34,11 +34,11 @@ class ValMessageBody extends Validator {
 		}
 		
 		if (!empty($args['translationitem'])) {
-			$msgdata = json_decode($value);
-			if ($msgdata->override || !$msgdata->enabled)
-				$text = $msgdata->text;
-			else if ($msgdata->enabled && !$msgdata->override)
-				$text = $msgdata->englishText;
+			$translationdata = json_decode($value);
+			if ($translationdata->override || !$translationdata->enabled)
+				$text = $translationdata->text;
+			else if ($translationdata->enabled && !$translationdata->override)
+				$text = $translationdata->englishText;
 		} else {
 			$text = $value;
 		}
@@ -56,7 +56,14 @@ class ValMessageBody extends Validator {
 			return $str;
 		}
 		
-		if (isset($args['maximages'])) {
+		if (isset($args['type']) && $args['type'] == 'phone') {
+			if ((isset($translationdata) && $translationdata->enabled) || (isset($args['languagecode']) && $args['languagecode'] == 'autotranslator')) {
+				foreach ($parts as $part) {
+					if ($part->type == 'A')
+						return _L('Translation messages may not have audio parts.');
+				}
+			}
+		} else if (isset($args['maximages'])) {
 			$imagecount = 0;
 			foreach ($parts as $part) {
 				if ($part->type == 'I')

@@ -88,7 +88,8 @@ function makeTranslationItem($required, $type, $subtype, $languagecode, $languag
 			"type" => $type,
 			"subtype" => $subtype,
 			"languagecode" => $languagecode,
-			"maximages" => $maximages
+			"maximages" => $maximages,
+			"messagegroup" => isset($_SESSION['messagegroupid']) ? new MessageGroup($_SESSION['messagegroupid']) : null
 		);
 	}
 	$validators[] = array("ValTranslationItem", "required" => $required);
@@ -153,7 +154,17 @@ function makeMessageBody($required, $type, $subtype, $languagecode, $label, $mes
 	if (is_array($datafields))
 		$control["fields"] = $datafields;
 
-	$validators = array(array("ValMessageBody", "type" => $type, "subtype" => $subtype, "languagecode" => $languagecode, "maximages" => $maximages));
+	$validators = array(
+		array("ValMessageBody",
+			"type" => $type,
+			"subtype" => $subtype,
+			"languagecode" => $languagecode,
+			"messagegroup" => isset($_SESSION['messagegroupid']) ?
+				new MessageGroup($_SESSION['messagegroupid']) :
+				null,
+			"maximages" => $maximages
+		)
+	);
 
 	if ($type == 'phone') {
 		$validators[] = array("ValLength","max" => 4000);
