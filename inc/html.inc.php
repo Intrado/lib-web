@@ -260,7 +260,17 @@ function audio($name) {
 // NOTE: This function may be enhanced in the future to better represent the contents of the $html text,
 // such as replacing HR tags with dashes, or formatting tables as fixed width, etc..
 function html_to_plain($html) {
-	return strip_tags($html);
+	// Escape data-field-insert tags.
+	$html = str_replace('<<', '&lt;&lt;', $html);
+	$html = str_replace('>>', '&gt;&gt;', $html);
+	
+	$plain = strip_tags($html);
+	
+	// Unescape data-field-insert tags.
+	$plain = str_replace('&lt;&lt;', '<<', $plain);
+	$plain = str_replace('&gt;&gt;', '>>', $plain);
+	
+	return $plain;
 }
 
 ?>
