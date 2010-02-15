@@ -181,7 +181,7 @@ include_once("nav.inc.php");
 $data = DBFindMany("Job","from job where userid=$USER->id and (status='new' or status='scheduled' or status='procactive' or status='processing' or status='active' or status='cancelling') and type != 'survey' and deleted=0 order by id desc");
 $titles = array(	"name" => "#Job Name",
 					"description" => "#Description",
-					"type" => "#Deliver by",
+					"type" => "#Type",
 					"startdate" => "Start date",
 					"Status" => "#Status",
 					"responses" => "Responses (Unplayed/Total)",
@@ -217,7 +217,7 @@ if ($USER->authorize('createrepeat')) {
 	$data = DBFindMany("Job",", name + 0 as foo from job where userid=$USER->id and status = 'repeating' and type != 'survey' order by foo,name ");
 	$titles = array(	"name" => "#Job Name",
 						"description" => "#Description",
-						"type" => "#Deliver by",
+						"type" => "#Type",
 						"startdate" => "Next Scheduled Run",
 						"finishdate" => "Last Run",
 						"Actions" => "Actions"
@@ -246,7 +246,7 @@ if ($USER->authorize('createrepeat')) {
 $data = DBFindMany("Job","from job where userid=$USER->id and (status='complete' or status='cancelled') and type != 'survey' and deleted = 0 order by finishdate desc");
 $titles = array(	"name" => "#Job Name",
 					"description" => "#Description",
-					"type" => "#Deliver by",
+					"type" => "#Type",
 					"startdate" => "Start Date",
 					"Status" => "#Status",
 					"enddate" => "End Date",

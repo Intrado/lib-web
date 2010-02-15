@@ -41,7 +41,7 @@ print '<br>';
 $data = DBFindMany("Job","from job where userid=$USER->id and deleted = 2 order by id desc");
 $titles = array(	"name" => "Name",
 					"description" => "Description",
-					"type" => "#Deliver by",
+					"type" => "#Type",
 					"startdate" => "Start Date",
 					"Status" => "Status",
 					"enddate" => "End Date",
