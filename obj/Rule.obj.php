@@ -55,6 +55,15 @@ class Rule extends DBMappedObject {
 	}
 	
 	function toSql ($alias = false, $fieldoverride = false, $isjobreport = false, $ignoreGfield = false) {
+		
+		//special case alert rule
+		if ($this->fieldnum == "alrt") {
+			$aliasid = ($alias ? $alias . ".id" : "id");
+			//TODO support all kinds of nice stuff like reldate, etc
+			//also prob want to restrict to one org's alerts (join event, to org?)
+			return " and exists (select * from alert al where al.personid=$aliasid and al.date=curdate()) ";
+		}
+		
 		$val = DBSafe($this->val);
 		$f = ($alias ? "$alias.":"") . ($fieldoverride ? $fieldoverride : $this->fieldnum);
 
@@ -199,6 +208,9 @@ class Rule extends DBMappedObject {
 			foreach ($rulesarray as $rule) {
 				if (strpos($rule->fieldnum, "f") === 0) {
 					$fquery .= $rule->toSql($alias, $fieldoverride);
+				}
+				if ($rule->fieldnum == "alrt") {
+					$fquery .= $rule->toSql($alias);
 				}
 				if (strpos($rule->fieldnum, "g") === 0) {
 					//field override not used, but we still need to pass any alaias we're using for person record
