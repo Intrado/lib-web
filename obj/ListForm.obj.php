@@ -3,6 +3,15 @@ class ListForm extends Form {
 	function ListForm ($name) {
 		global $USER;
 
+		$formdata['sectionwidget'] = array(
+			'label' => _L('Choose Sections'),
+			'value' => '',
+			'control' => array('SectionWidget'),
+			'validators' => array(),
+			'renderoptions' => array('label' => false, 'icon' => false, 'errormessage' => true),
+			'helpstep' => 0
+		);
+		
 		$formdata['addme'] = array(
 			'label' => _L('Add Myself'),
 			'value' => '',
@@ -60,14 +69,20 @@ class ListForm extends Form {
 
 		$posturlJSON = json_encode($posturl);
 
+		$str = $this->renderJavascriptLibraries();
+		
 		// HTML
-		$str = "
+		$str .= "
 			<!-- Offscreen Premade Accordion Content -->
 			<div style='display:none'>
 				<div id='buildListWindow'>
 					<div id='ruleWidgetContainer' style='clear:both; white-space:nowrap;'></div>
 				</div>
-
+				
+				<table style='border-collapse:collapse' id='chooseSectionsWindow'>
+					<tbody></tbody>
+				</table>
+				
 				<div id='chooseListWindow'>
 					<table>
 						<tr>
@@ -169,6 +184,7 @@ class ListForm extends Form {
 		";
 
 		// JAVASCRIPT
+		$str .= $this->renderJavascript();
 		$str .= "
 			<script type='text/javascript' src='script/datepicker.js'></script>
 			<script type='text/javascript' src='script/accordion.js'></script>
@@ -179,6 +195,14 @@ class ListForm extends Form {
 					// Initiatiate Page.
 					listform_load('{$this->name}', " . json_encode($this->formdata) . ", {$posturlJSON});
 
+					// Move SectionWidget things into chooseSectionsWindow.
+					(function() {
+						var tbody = $('chooseSectionsWindow').down('tbody');
+						if (tbody) {
+							tbody.insert($('listChoose_sectionwidget_fieldarea'));
+						}
+					})();
+					
 					// Move AddMe things into addMeWindow.
 					var addme = $('listChoose_addme');
 					var addmePhone = $('listChoose_addmePhone');
