@@ -9,6 +9,8 @@ require_once("obj/RenderedList.obj.php");
 require_once("inc/date.inc.php");
 require_once("inc/securityhelper.inc.php");
 require_once("inc/rulesutils.inc.php");
+require_once("obj/Validator.obj.php");
+require_once("obj/ValSections.val.php");
 
 // @param $listid, assumed to be a valid list id.
 function summarizeListName($listid) {
@@ -27,7 +29,7 @@ function summarizeListName($listid) {
 			$skeys[] = $section->skey;
 		}
 		
-		$summary[] = 'section is ' . implode(', ', $skeys);
+		$summary[] = 'Section is ' . implode(', ', $skeys);
 	} else {
 		$rules = DBFindMany('Rule', 'FROM rule r, listentry le WHERE le.ruleid=r.id AND le.listid=?', 'r', array($list->id));
 		$fieldmaps = FieldMap::getAllAuthorizedFieldMaps();
@@ -79,15 +81,36 @@ function handleRequest() {
 		case 'createlist': // returns $list->id
 			if (!$USER->authorize('createlist'))
 				return false;
+			
+			if (isset($_POST['sectionids'])) {
+				if (!is_array($_POST['sectionids']) || count($_POST['sectionids']) <= 0)
+					return false;
+					
+				$valsection = new ValSections();
+				$valsection->label = _L('Section');
+				$errormessage = $valsection->validate($_POST['sectionids']);
+				if ($errormessage !== true)
+					return array('error' => $errormessage);
+			}
+			
 			// CREATE list
 			$list = new PeopleList(null);
 			$list->description = 'JobWizard List ' . date('Y M d, H:i:s', time());
 			$list->userid = $USER->id;
 			$list->name = _L('Please Add Rules to This List');
 			$list->deleted = 1;
+			$list->type = isset($_POST['sectionids']) ? 'section' : 'person';
 			$list->update();
 			if (!$list->id)
 				return false;
+				
+			if (isset($_POST['sectionids'])) {
+				foreach ($_POST['sectionids'] as $sectionid) {
+					QuickUpdate('insert into listentry set type="section", listid=?, sectionid=?', false, array($list->id, $sectionid));
+				}
+				summarizeListName($list->id);
+			}
+			
 			return $list->id;
 			
 		case 'addrule':
