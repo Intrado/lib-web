@@ -14,8 +14,7 @@ if (isset($_GET['id'])) {
 
 $list = new PeopleList(isset($_SESSION['listid']) ? $_SESSION['listid'] : null);
 if ($list->id) {
-	// If this list has section listentries, then set method to 'sections', otherwise default to 'rules'.
-	$method = count($list->getSections()) > 0 ? 'sections' : 'rules';
+	$method = ($list->type === 'section') ? 'sections' : 'rules';
 	
 	$renderedlist = new RenderedList($list);
 	$renderedlist->calcStats();
@@ -137,7 +136,7 @@ if ($method == 'rules') {
 	);
 }
 
-if ($method == 'sections') {
+if ($method === 'sections') {
 	$formdata["sectionids"] = array(
 		"label" => _L('Sections'),
 		"fieldhelp" => _L('Select sections from an organization.'),
@@ -211,7 +210,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		$list->modifydate = QuickQuery("select now()");
 		$list->userid = $USER->id;
 		$list->deleted = 0;
-		// TODO: Set $list->type = $method;
+		$list->type = ($method === 'sections') ? 'section' : 'person';
 		$list->update();
 		
 		if ($method == 'sections') {
