@@ -28,6 +28,7 @@ class ContactsReport extends ReportGenerator {
 		if(isset($this->params['personid'])){
 			$personquery = $this->params['personid'] ? " and p.pkey = '" . DBSafe($this->params['personid']) . "'" : "";
 		}
+		$orgfieldquery = generateOrganizationFieldQuery("p.id");
 		$fieldquery = generateFields("p");
 		$gfieldquery = generateGFieldQuery("p.id");
 
@@ -53,6 +54,7 @@ class ContactsReport extends ReportGenerator {
 							coalesce(a.state,''), ' ',
 							coalesce(a.zip,'')
 						) as address
+					$orgfieldquery
 					$fieldquery
 					$gfieldquery
 					from " . getReportPersonSubquerySql($this->params) . " p
@@ -143,10 +145,9 @@ class ContactsReport extends ReportGenerator {
 			}
 			$destinationdata[$row[0]][] = $row;
 		}
-
-
+		
 		// personrow index 4 is address
-		// personrow index 5 is the start of f-fields
+		// personrow index 5 is the start of organization and f-fields
 		// personrow insert all destinations before f-fields
 		// array_splice inserts data after 2nd argument's array index
 		// destination index 1 is phone/email/sms
@@ -193,17 +194,18 @@ class ContactsReport extends ReportGenerator {
 			}
 			return $output;
 		}
-
+		
 		$titles = array("0" => "ID#",
 						"2" => "First Name",
 						"3" => "Last Name",
 						"4" => "Address",
 						"5" => "Sequence",
-						"6" => "Destination");
+						"6" => "Destination",
+						"9" => "Organization");
 		// index 7 is a flag to tell what type of destination
 		// so set the title of starting f-field at appropriate place
 		// append begins after index specified
-		$titles = appendFieldTitles($titles, 8, $fieldlist, $activefields);
+		$titles = appendFieldTitles($titles, 9, $fieldlist, $activefields);
 
 		$formatters = array("0" => "fmt_idmagnify",
 							"5" => "fmt_destination_sequence",
@@ -211,7 +213,7 @@ class ContactsReport extends ReportGenerator {
 		
 		//I think this is safe since it starts appending f03 right after other fields
 		if (in_array(FieldMap::getLanguageField(),$activefields))
-			$formatters[9] = "fmt_languagecode";
+			$formatters["10"] = "fmt_languagecode"; // Put it right after organization column.
 
 		startWindow("Search Results", "padding: 3px;");
 		showPageMenu($total,$pagestart,$max);
@@ -248,7 +250,7 @@ class ContactsReport extends ReportGenerator {
 		session_write_close();//WARNING: we don't keep a lock on the session file, any changes to session data are ignored past this point
 
 		//generate the CSV header
-		$header = '"ID#", "First Name", "Last Name", "Address"';
+		$header = '"ID#", "First Name", "Last Name", "Address", "Organization"';
 
 		foreach($activefields as $active){
 			if(!$active) continue;
@@ -302,6 +304,7 @@ class ContactsReport extends ReportGenerator {
 			$ordering[$field->name]= "p." . $field->fieldnum;
 		}
 		$ordering["Address"] = "address";
+		$ordering["Organization"]="org";
 		return $ordering;
 	}
 }

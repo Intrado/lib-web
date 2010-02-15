@@ -25,6 +25,7 @@ class ReportGenerator {
 		if($count > 33000){
 			$result = "Report exceeds max page limit";
 		}
+		
 		return $result;
 	}
 
@@ -46,6 +47,7 @@ class ReportGenerator {
 				$result = $this->runPDF($options);
 				break;
 		}
+		
 		return $result;
 	}
 

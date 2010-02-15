@@ -41,7 +41,7 @@ class ReportInstance extends DBMappedObject {
 	function setParameterString ($paramstring) {
 		$params = explode("&", $paramstring);
 		sort($params);
-		$this->parameters = implode("&", $params);
+		$this->parameters = implode("&", $params);	
 		//$this->rehash();
 	}
 	
@@ -56,13 +56,23 @@ class ReportInstance extends DBMappedObject {
 		if(isset($paramarray['rules'])){
 			$paramarray['rules'] = $this->ruleArraytoString($paramarray['rules']);	
 		}
-		if(isset($paramarray['organizationids']) && count($paramarray['organizationids']) > 0) {
+		
+		if(isset($paramarray['sectionids']) && is_array($paramarray['sectionids']) && count($paramarray['sectionids']) > 0) {
+			$paramarray['sectionids'] = implode(';', $paramarray['sectionids']);
+			unset($paramarray['organizationids']);
+		} else {
+			unset($paramarray['sectionids']);
+		}
+		
+		if(isset($paramarray['organizationids']) && is_array($paramarray['organizationids']) && count($paramarray['organizationids']) > 0) {
 			$paramarray['organizationids'] = implode(';', $paramarray['organizationids']);
 		} else {
 			unset($paramarray['organizationids']);
 		}
+		
 		$paramstring = http_build_query($paramarray, false, "&");
-		$this->setParameterString($paramstring);			
+		$this->setParameterString($paramstring);
+			
 	}
 	
 	function setString ($paramstring) {
@@ -77,8 +87,13 @@ class ReportInstance extends DBMappedObject {
 		$paramarray = sane_parsestr($this->parameters);
 		if(isset($paramarray['rules']))
 			$paramarray['rules'] = $this->ruleStringtoArray($paramarray['rules']);
+			
+		if(isset($paramarray['sectionids']))
+			$paramarray['sectionids'] = explode(';', $paramarray['sectionids']);
+			
 		if(isset($paramarray['organizationids']))
 			$paramarray['organizationids'] = explode(';', $paramarray['organizationids']);
+			
 		return $paramarray;
 	}
 	

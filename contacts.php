@@ -275,7 +275,7 @@ function systemcontact_clear_search_session($keep = false) {
 	if ($keep != 'systemcontact_showall')
 		$_SESSION['systemcontact_showall'] = false;
 	
-	if ($keep != 'systemcontact_sectionid') {
+	if ($keep != 'systemcontact_sectionids') {
 		$_SESSION['systemcontact_sectionids'] = array();
 	}
 	
@@ -311,8 +311,8 @@ function systemcontact_make_report_options() {
 		
 		$options['rules'] = $rules;
 		$options['organizationids'] = $organizationids;
-	} else if (!empty($_SESSION['systemcontact_sectionid'])) {
-		$options['sectionids'] = $_SESSION['systemcontact_sectionid'];
+	} else if (!empty($_SESSION['systemcontact_sectionids'])) {
+		$options['sectionids'] = $_SESSION['systemcontact_sectionids'];
 	}
 	
 	if (!empty($_SESSION['systemcontact_orderby'])) {
@@ -347,7 +347,7 @@ include_once("nav.inc.php");
 ?>
 
 <script type="text/javascript">
-	<? Validator::load_validators(array("ValRules")); ?>
+	<? Validator::load_validators(array("ValSections", "ValRules")); ?>
 
 	document.observe('dom:loaded', function() {
 		ruleWidget.delayActions = true;
@@ -433,7 +433,7 @@ endWindow();
 
 if (!empty($_SESSION['systemcontact_showall']) || !empty($_SESSION['systemcontact_sectionids']) || !empty($_SESSION['systemcontact_person']) || !empty($_SESSION['systemcontact_rules'])) {
 	echo "<div id='metadataTempDiv' style='display:none'>";
-		select_metadata("$('searchresults')", 5, $fields);
+		select_metadata("$('searchresults')", 6, $fields);
 	echo "</div>";
 	$reportinstance = new ReportInstance();
 	$reportinstance->setParameters(systemcontact_make_report_options());

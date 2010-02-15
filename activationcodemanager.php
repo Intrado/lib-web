@@ -24,6 +24,8 @@ require_once("inc/securityhelper.inc.php");
 include_once("ruleeditform.inc.php");
 require_once("inc/rulesutils.inc.php");
 require_once("obj/FormRuleWidget.fi.php");
+require_once("obj/SectionWidget.fi.php");
+require_once("obj/ValSections.val.php");
 require_once("inc/reportutils.inc.php");
 require_once("list.inc.php");
 
@@ -141,12 +143,40 @@ $checkHideActiveCodes = (!empty($_SESSION['hideactivecodes'])) ? 'checked' : '';
 $checkHideAssociated = (!empty($_SESSION['hideassociated'])) ? 'checked' : '';
 
 $formdata = array();
+
+$formdata["toggles"] = array(
+	"label" => _L('Search Options'),
+	"control" => array("FormHtml", 'html' => "
+		<input name='activationcodemanager_searchOption' id='searchByRules' type='radio' onclick=\"choose_search_by_rules();\"><label for='searchByRules'> Search by Rules </label>
+		<input name='activationcodemanager_searchOption' id='searchBySections' type='radio' onclick=\"choose_search_by_sections();\"><label for='searchBySections'> Search by Sections </label>
+	"),
+	"helpstep" => 2
+);
+
 $formdata["ruledata"] = array(
 	"label" => _L('Search'),
 	"value" => $rulesjson,
 	"control" => array("FormRuleWidget"),
 	"validators" => array(array('ValRules')),
 	"helpstep" => 1
+);
+
+$formdata["sectionids"] = array(
+	"label" => _L('Sections'),
+	"fieldhelp" => _L('Select sections from an organization.'),
+	"value" => "",
+	"validators" => array(
+		array("ValSections")
+	),
+	"control" => array("SectionWidget", "sectionids" => isset($_SESSION['activationcodemanager_sectionids']) ? $_SESSION['activationcodemanager_sectionids'] : array()),
+	"helpstep" => 2
+);
+
+
+$formdata["sectionsearchbutton"] = array(
+	"label" => _L(''),
+	"control" => array("FormHtml", "html" => "<div id='sectionsearchButtonContainer'>" . submit_button(_L('Search'),'sectionsearch',"magnifier") . "</div>"),
+	"helpstep" => 2
 );
 
 $formdata["displayoptions"] = array(
@@ -164,7 +194,7 @@ $formdata["filter"] = array(
 	"helpstep" => 1
 );
 
-if (!empty($_SESSION['activationcodemanager_rules']) || !empty($_SESSION['activationcodemanager_showall'])) {
+if (!empty($_SESSION['activationcodemanager_rules']) || !empty($_SESSION['activationcodemanager_sectionids']) || !empty($_SESSION['activationcodemanager_showall'])) {
 	$formdata["outputformat"] = array(
 		"label" => _L("Output Format"),
 		"control" => array("FormHtml", "html" => "<a href='activationcodemanager.php/report.csv?csv=true'>CSV</a>"),
@@ -239,6 +269,12 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 					$form->sendTo("activationcodemanager.php");
 					break;
 
+				case 'sectionsearch':
+					activationcodemanager_clear_search_session('activationcodemanager_sectionids');
+					$_SESSION['activationcodemanager_sectionids'] = $postdata['sectionids'];
+					$form->sendTo("activationcodemanager.php");
+					break;
+					
 				case 'refresh':
 					$form->sendTo("activationcodemanager.php");
 					break;
@@ -266,6 +302,9 @@ function activationcodemanager_clear_search_session($keep = false) {
 
 	if ($keep != 'activationcodemanager_rules')
 		$_SESSION['activationcodemanager_rules'] = array();
+		
+	if ($keep != 'activationcodemanager_sectionids')
+		$_SESSION['activationcodemanager_sectionids'] = array();
 }
 
 
@@ -282,6 +321,8 @@ function activationcodemanager_make_report_options() {
 		unset($rules['organization']);
 		$options['rules'] = $rules;
 		$options['organizationids'] = $organizationids;
+	} else if (!empty($_SESSION['activationcodemanager_sectionids'])) {
+		$options['sectionids'] = $_SESSION['activationcodemanager_sectionids'];
 	}
 
 	$activefields = array();
@@ -297,7 +338,6 @@ function activationcodemanager_make_report_options() {
 	$options['hideassociated'] = !empty($_SESSION['hideassociated']) ? true : false;
 
 	$options['pagestart'] = isset($_GET['pagestart']) ? $_GET['pagestart'] : 0;
-
 	return $options;
 }
 
@@ -330,7 +370,7 @@ if ($reportgenerator->format == "csv") {
 
 	?>
 		<script type="text/javascript">
-			<? Validator::load_validators(array("ValRules")); ?>
+			<? Validator::load_validators(array("ValSections", "ValRules")); ?>
 		</script>
 	<?
 
@@ -350,6 +390,13 @@ if ($reportgenerator->format == "csv") {
 				ruleWidget.container.observe('RuleWidget:DeleteRule', rulewidget_delete_rule);
 
 				$('metadataDiv').update($('metadataTempDiv').innerHTML);
+				
+				<?
+					if (!empty($_SESSION['activationcodemanager_rules']) || empty($_SESSION['activationcodemanager_sectionids']))
+						echo 'choose_search_by_rules();';
+					else if (!empty($_SESSION['activationcodemanager_sectionids']))
+						echo 'choose_search_by_sections();';
+				?>
 			});
 
 			function rulewidget_add_rule(event) {
@@ -386,6 +433,22 @@ if ($reportgenerator->format == "csv") {
 					return confirm('$str');
 				";
 			?>
+			}
+			
+			function choose_search_by_rules() {
+				$('searchByRules').checked = true;
+				$('searchBySections').checked = false;
+				$('ruleWidgetContainer').up('tr').show();
+				$('<?=$form->name?>_sectionids_fieldarea').hide();
+				$('sectionsearchButtonContainer').up('tr').hide();
+			}
+
+			function choose_search_by_sections() {
+				$('searchByRules').checked = false;
+				$('searchBySections').checked = true;
+				$('ruleWidgetContainer').up('tr').hide();
+				$('<?=$form->name?>_sectionids_fieldarea').show();
+				$('sectionsearchButtonContainer').up('tr').show();
 			}
 		</script>
 	<?

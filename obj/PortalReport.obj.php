@@ -6,6 +6,7 @@ class PortalReport extends ReportGenerator{
 
 	function generateQuery(){
 		global $USER;
+		
 		$this->params = $this->reportinstance->getParameters();
 		$rulesql = getRuleSql($this->params, "p", false);
 		$usersql = $USER->userSQL("p");
@@ -26,9 +27,11 @@ class PortalReport extends ReportGenerator{
 			$hideassociated = " and not exists(select count(*) from portalperson pp2 where pp2.personid = p.id group by pp2.personid) ";
 		}
 		if((isset($this->params['organizationids']) && count($this->params['organizationids']) > 0) ||
+			(isset($this->params['sectionids']) && count($this->params['sectionids']) > 0) ||
 			$rulesql ||
 			$pkeysql ||
-			$showall){
+			$showall
+		){
 			$this->query = "select SQL_CALC_FOUND_ROWS
 						p.pkey as pkey,
 						p.id as pid,
@@ -36,6 +39,7 @@ class PortalReport extends ReportGenerator{
 						p." . FieldMap::GetLastNameField() . " as lastname,
 						ppt.token,
 						ppt.expirationdate"
+						. generateOrganizationFieldQuery("p.id")
 						. generateFields("p")
 						. "	from " . getReportPersonSubquerySql($this->params) . " p
 						left join portalpersontoken ppt on (ppt.personid = p.id)
@@ -118,9 +122,10 @@ class PortalReport extends ReportGenerator{
 						3 => "Last Name",
 						4 => "Activation Code",
 						5 => "Expiration Date",
-						6 => "Contact Manager Account(s)");
+						6 => "Contact Manager Account(s)",
+						7 => "Organization");
 
-		$titles = appendFieldTitles($titles, 6, $fieldlist, $activefields);
+		$titles = appendFieldTitles($titles, 7, $fieldlist, $activefields);
 
 		$repeatedColumns = array(6);
 
@@ -158,7 +163,8 @@ class PortalReport extends ReportGenerator{
 						2 => "First Name",
 						3 => "Last Name",
 						4 => "Token",
-						5 => "Expiration Date");
+						5 => "Expiration Date",
+						6 => "Organization");
 
 		// find the f-fields the same way as the query did
 		// strip off the f, use the field number as the index and
@@ -201,13 +207,13 @@ class PortalReport extends ReportGenerator{
 			if($row[5]){
 				$row[5] = date("m/d/Y", strtotime($row[5]));
 			}
-			$array = array($row[0], $row[2], $row[3], $row[4],$row[5]);
+			$array = array($row[0], $row[2], $row[3], $row[4],$row[5],$row[6]);
 
-			//index 13 is the last position of a non-ffield
+			//index 14 is the last position of a non-ffield
 			foreach($fieldlist as $fieldnum => $fieldname){
 				if(isset($activefields[$fieldnum])){
 					$num = $fieldindex[$fieldnum];
-					$array[] = $row[5+$num];
+					$array[] = $row[6+$num];
 				}
 			}
 
