@@ -269,7 +269,7 @@ foreach ($destinations as $type => $destination) {
 
 			$formdata = array();
 			
-			$required = $messagegroup->defaultlanguagecode == $languagecode;
+			$required = ($messagegroup->defaultlanguagecode == $languagecode) && $messagegroup->hasMessage($type);
 			
 			if (($type == 'phone' && isset($customerphonetranslationlanguages[$languagecode])) ||
 				($type == 'email' && isset($customeremailtranslationlanguages[$languagecode]))
