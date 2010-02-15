@@ -299,9 +299,15 @@ function upgrade_7_5 ($rev, $shardid, $customerid, $db) {
 			echo "|";
 			apply_sql("upgrades/db_7-5_pre.sql",$customerid,$db, 6);
 			
-		
-		
+		case 6:
+			// upgrade from rev 6 to rev 7
+			echo "|";
+			apply_sql("upgrades/db_7-5_pre.sql",$customerid,$db, 7);
 	}
+	
+	//do these always
+	//apply_sql("../db/targetedmessages.sql",$customerid,$db);
+	apply_sql("../db/update_SMAdmin_access.sql",$customerid,$db);
 	
 	
 	return true;

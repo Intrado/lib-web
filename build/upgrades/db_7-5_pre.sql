@@ -525,3 +525,54 @@ $$$
 ALTER TABLE `targetedmessagecategory` ADD `image` VARCHAR( 50 ) NULL
 $$$
 
+
+-- $rev 7
+
+alter table list add `type` enum ('person','section','alert') not null default 'person' after userid;
+$$$
+
+alter table alert add sent tinyint (4) not null default 0 after time;
+$$$
+
+ALTER TABLE `alert` ADD INDEX `alertjob` ( `personid` , `date` )  
+$$$
+
+ALTER TABLE `job` CHANGE `type` `type` ENUM( 'notification', 'survey', 'alert' ) NOT NULL DEFAULT 'notification' 
+$$$
+
+ALTER TABLE `personassociation` ADD `importid` INT AFTER `personid`
+$$$
+
+ALTER TABLE `personassociation` ADD INDEX ( `importid` )
+$$$
+
+delete from fieldmap where fieldnum='o01'
+$$$
+
+alter table messagegroup add `type` enum('notification','targetedmessage','classroomtemplate') not null default 'notification' after userid;
+$$$
+
+update messagegroup mg set mg.`type`='targetedmessage' where exists (select * from targetedmessage tm where tm.overridemessagegroupid = mg.id)
+$$$
+
+ALTER TABLE `personassociation` ADD `importstatus` ENUM( 'none', 'checking', 'new' ) CHARACTER SET latin1 COLLATE latin1_general_ci NOT NULL DEFAULT 'none' AFTER `importid`
+$$$
+
+ALTER TABLE `personassociation` DROP INDEX `importid` ,
+ADD INDEX `importid` ( `importid` , `importstatus` ) 
+$$$
+
+
+ALTER TABLE `userassociation` ADD `importid` INT NULL AFTER `userid` ,
+ADD `importstatus` ENUM( 'none', 'checking', 'new' ) CHARACTER SET latin1 COLLATE latin1_general_ci NOT NULL DEFAULT 'none' AFTER `importid`
+$$$
+
+ALTER TABLE `userassociation` ADD INDEX ( `importid` , `importstatus` ) 
+$$$
+
+ALTER TABLE `section` ADD `importid` INT NULL ,
+ADD `importstatus` ENUM( 'none', 'checking', 'new' ) CHARACTER SET latin1 COLLATE latin1_general_ci NOT NULL DEFAULT 'none'
+$$$
+
+ALTER TABLE `section` ADD INDEX ( `importid` , `importstatus` )  
+$$$
