@@ -886,7 +886,7 @@ var RuleEditor = Class.create({
 	// Returns a div element containing the values as checkboxes, or returns a select element with a single option if there's just one value.
 	make_multicheckbox: function(values) {
 		multicheckbox = new Element('div', {
-			'style': 'overflow:auto',
+			'style': 'overflow:auto; padding-right: 2em; padding-bottom: 1em',
 			'class': 'MultiCheckbox'
 		});
 		
