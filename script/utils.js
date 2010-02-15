@@ -563,7 +563,7 @@ function pickDate (textbox, allowPast, allowFuture, closeOnBlur) {
 }
 
 function makeTranslatableString(str) {
-	return str.replace(/(<<.*?>>)/, '<input value="$1"/>').replace(/({{.*?}})/, '<input value="$1"/>').replace(/(\[\[.*?\]\])/, '<input value="$1"/>');
+	return str.replace(/(<<.*?>>)/g, '<input value="$1"/>').replace(/({{.*?}})/g, '<input value="$1"/>').replace(/(\[\[.*?\]\])/g, '<input value="$1"/>');
 }
 
 // TODO: Make a less annoying version

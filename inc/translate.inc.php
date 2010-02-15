@@ -121,7 +121,11 @@ function translate_toenglish($anytext,$anylanguage) {
 	return googletranslate($text, $lang_pairs);
 }
 
-
-
+function makeTranslatableString($str) {
+	$str = preg_replace('/(<<.*?>>)/', '<input value="$1"/>', $str);
+	$str = preg_replace('/({{.*?}})/', '<input value="$1"/>', $str);
+	$str = preg_replace('/(\\[\\[.*?\\]\\])/', '<input value="$1"/>', $str);
+	return $str;
+}
 
 ?>

@@ -788,7 +788,7 @@ if ($button = $messagegroupsplitter->getSubmit()) {
 										// Batch translation.
 										$sourcemessagetext = $_SESSION['autotranslatesourcetext']["{$formdestinationtype}{$formdestinationsubtype}"];
 										
-										if ($autotranslatortranslations = translate_fromenglish($sourcemessagetext, array_keys($autotranslatorlanguages))) {
+										if ($autotranslatortranslations = translate_fromenglish(makeTranslatableString($sourcemessagetext), array_keys($autotranslatorlanguages))) {
 											// NOTE: Reuse the same set of message parts for each language's source message; Message::recreateParts() calls DBMappedObject::create(), which will result in the message parts getting new IDs.
 											$sourcemessageparts = false;
 											if ($formdestinationtype == 'email' && $formdestinationsubtype == 'html')
@@ -978,7 +978,7 @@ if ($button = $messagegroupsplitter->getSubmit()) {
 								
 								$trimmedsourcetext = isset($translationitemdata->englishText) ? trim($translationitemdata->englishText) : '';
 								if (!empty($messagesneeded['translated']) && !empty($trimmedsourcetext)) {
-									if (!$translation = translate_fromenglish($trimmedsourcetext, array($formdestinationlanguagecode))) {
+									if (!$translation = translate_fromenglish(makeTranslatableString($trimmedsourcetext), array($formdestinationlanguagecode))) {
 										unset($translation);
 									}
 								}

@@ -10,7 +10,7 @@ class TranslationItem extends FormItem {
 			$value == "";
 
 		$usehtmleditor = !empty($this->args['usehtmleditor']) ? 'true' : 'false';
-		if ($usehtmleditor) {
+		if ($usehtmleditor === 'true') {
 			$escapehtml = 'false';
 		} else if (isset($this->args['escapehtml'])) {
 			$escapehtml = $this->args['escapehtml'] ? 'true' : 'false';
@@ -34,6 +34,11 @@ class TranslationItem extends FormItem {
 			$msgdata = json_decode($value);
 		}
 
+		if ($usehtmleditor === 'true') {
+			$msgdata->text = str_replace('<<', '&lt;&lt;', $msgdata->text);
+			$msgdata->text = str_replace('>>', '&gt;&gt;', $msgdata->text);
+		}
+		
 		$isphone = !empty($this->args['phone']);
 
 		$translationcheckboxlabel = isset($this->args['translationcheckboxlabel']) ? $this->args['translationcheckboxlabel'] : _L("Translate");
@@ -269,7 +274,7 @@ class TranslationItem extends FormItem {
 							if (escapehtml)
 								translatedtext = translatedtext.escapeHTML();
 							else
-								translatedtext = translatedtext.replace(/<</, "&lt;&lt;").replace(/>>/, "&gt;&gt;");
+								translatedtext = translatedtext.replace(/<</g, "&lt;&lt;").replace(/>>/g, "&gt;&gt;");
 							
 							$(section+"textdiv").innerHTML = translatedtext;
 							$(section+"text").value = data.responseData.translatedText;
