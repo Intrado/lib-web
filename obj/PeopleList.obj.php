@@ -1,8 +1,8 @@
 <?
 
 class PeopleList extends DBMappedObject {
-
 	var $userid;
+	var $type = "person"; // enum ('person','section','alert')
 	var $name;
 	var $description;
 	var $modifydate;
@@ -16,7 +16,7 @@ class PeopleList extends DBMappedObject {
 	function PeopleList ($id = NULL) {
 		$this->_allownulls = true;
 		$this->_tablename = "list";
-		$this->_fieldlist = array("userid", "name", "description","modifydate","lastused", "deleted");
+		$this->_fieldlist = array("userid", "type", "name", "description","modifydate","lastused", "deleted");
 		//call super's constructor
 		DBMappedObject::DBMappedObject($id);
 	}
@@ -70,7 +70,7 @@ class PeopleList extends DBMappedObject {
 			$listsql = "0"; //dont assume anyone is in the list if there are no restrictions on rules, organizations, or sections.
 		else {
 			// TODO: Need to restrict by list's organization and section sql
-			$listsql = "2";
+			$listsql = "1";
 		}
 		
 		return $listsql;
