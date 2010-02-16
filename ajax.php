@@ -250,7 +250,7 @@ function handleRequest() {
 					from section
 						inner join userassociation
 							on (userassociation.sectionid = section.id)
-					where userid=? and organizationid = ?",
+					where userid=? and section.organizationid = ?",
 					true, false, array($USER->id, $organizationid)
 				);
 			} else {
