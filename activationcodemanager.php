@@ -144,14 +144,16 @@ $checkHideAssociated = (!empty($_SESSION['hideassociated'])) ? 'checked' : '';
 
 $formdata = array();
 
-$formdata["toggles"] = array(
-	"label" => _L('Search Options'),
-	"control" => array("FormHtml", 'html' => "
-		<input name='activationcodemanager_searchOption' id='searchByRules' type='radio' onclick=\"choose_search_by_rules();\"><label for='searchByRules'> Search by Rules </label>
-		<input name='activationcodemanager_searchOption' id='searchBySections' type='radio' onclick=\"choose_search_by_sections();\"><label for='searchBySections'> Search by Sections </label>
-	"),
-	"helpstep" => 2
-);
+if ($USER->hasSections()) {
+	$formdata["toggles"] = array(
+		"label" => _L('Search Options'),
+		"control" => array("FormHtml", 'html' => "
+			<input name='activationcodemanager_searchOption' id='searchByRules' type='radio' onclick=\"choose_search_by_rules();\"><label for='searchByRules'> Search by Rules </label>
+			<input name='activationcodemanager_searchOption' id='searchBySections' type='radio' onclick=\"choose_search_by_sections();\"><label for='searchBySections'> Search by Sections </label>
+		"),
+		"helpstep" => 2
+	);
+}
 
 $formdata["ruledata"] = array(
 	"label" => _L('Search'),
@@ -161,23 +163,25 @@ $formdata["ruledata"] = array(
 	"helpstep" => 1
 );
 
-$formdata["sectionids"] = array(
-	"label" => _L('Sections'),
-	"fieldhelp" => _L('Select sections from an organization.'),
-	"value" => "",
-	"validators" => array(
-		array("ValSections")
-	),
-	"control" => array("SectionWidget", "sectionids" => isset($_SESSION['activationcodemanager_sectionids']) ? $_SESSION['activationcodemanager_sectionids'] : array()),
-	"helpstep" => 2
-);
+if ($USER->hasSections()) {
+	$formdata["sectionids"] = array(
+		"label" => _L('Sections'),
+		"fieldhelp" => _L('Select sections from an organization.'),
+		"value" => "",
+		"validators" => array(
+			array("ValSections")
+		),
+		"control" => array("SectionWidget", "sectionids" => isset($_SESSION['activationcodemanager_sectionids']) ? $_SESSION['activationcodemanager_sectionids'] : array()),
+		"helpstep" => 2
+	);
 
 
-$formdata["sectionsearchbutton"] = array(
-	"label" => _L(''),
-	"control" => array("FormHtml", "html" => "<div id='sectionsearchButtonContainer'>" . submit_button(_L('Search'),'sectionsearch',"magnifier") . "</div>"),
-	"helpstep" => 2
-);
+	$formdata["sectionsearchbutton"] = array(
+		"label" => _L(''),
+		"control" => array("FormHtml", "html" => "<div id='sectionsearchButtonContainer'>" . submit_button(_L('Search'),'sectionsearch',"magnifier") . "</div>"),
+		"helpstep" => 2
+	);
+}
 
 $formdata["displayoptions"] = array(
 	"label" => _L("Display Options"),
@@ -270,8 +274,11 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 					break;
 
 				case 'sectionsearch':
-					activationcodemanager_clear_search_session('activationcodemanager_sectionids');
-					$_SESSION['activationcodemanager_sectionids'] = $postdata['sectionids'];
+					if ($USER->hasSections()) {
+						activationcodemanager_clear_search_session('activationcodemanager_sectionids');
+						$_SESSION['activationcodemanager_sectionids'] = $postdata['sectionids'];
+					}
+					
 					$form->sendTo("activationcodemanager.php");
 					break;
 					
@@ -437,18 +444,22 @@ if ($reportgenerator->format == "csv") {
 			
 			function choose_search_by_rules() {
 				$('searchByRules').checked = true;
-				$('searchBySections').checked = false;
 				$('ruleWidgetContainer').up('tr').show();
+			<? if ($USER->hasSections()) { ?>
+				$('searchBySections').checked = false;
 				$('<?=$form->name?>_sectionids_fieldarea').hide();
 				$('sectionsearchButtonContainer').up('tr').hide();
+			<? } ?>
 			}
 
 			function choose_search_by_sections() {
 				$('searchByRules').checked = false;
-				$('searchBySections').checked = true;
 				$('ruleWidgetContainer').up('tr').hide();
+			<? if ($USER->hasSections()) { ?>
+				$('searchBySections').checked = true;
 				$('<?=$form->name?>_sectionids_fieldarea').show();
 				$('sectionsearchButtonContainer').up('tr').show();
+			<? } ?>
 			}
 		</script>
 	<?

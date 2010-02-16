@@ -55,7 +55,11 @@ function listform_load(listformID, formData, postURL) {
 	accordion = new Accordion('accordionContainer');
 
 	accordion.add_section('buildlist', true);
-	accordion.add_section('choosesections', true);
+	
+	var sectionsWindow = $('chooseSectionsWindow');
+	if (sectionsWindow) {
+		accordion.add_section('choosesections', true);
+	}
 	accordion.add_section('chooselist', true);
 	accordion.add_section('addme');
 
@@ -64,11 +68,13 @@ function listform_load(listformID, formData, postURL) {
 		"icon": "img/icons/application_form_edit.gif",
 		"content": $('buildListWindow').remove()
 	});
-	accordion.update_section('choosesections', {
-		"title": "<?=addslashes(_L('Build List Using Sections'))?>",
-		"icon": "img/icons/application_form_edit.gif",
-		"content": $('chooseSectionsWindow').remove()
-	});
+	if (sectionsWindow) {
+		accordion.update_section('choosesections', {
+			"title": "<?=addslashes(_L('Build List Using Sections'))?>",
+			"icon": "img/icons/application_form_edit.gif",
+			"content":sectionsWindow.remove()
+		});
+	}
 	accordion.update_section('chooselist', {
 		"title": "<?=addslashes(_L('Choose an Existing List'))?>",
 		"icon": "img/icons/application_view_list.gif",
@@ -81,48 +87,48 @@ function listform_load(listformID, formData, postURL) {
 	});
 
 	// SectionWidget
-	$('chooseSectionsWindow').insert(
-		icon_button('Create This List','tick').observe('click', function() {
-			var selectedcheckboxes = $('listChoose_sectionwidget_fieldarea').select('input:checked');
+	if (sectionsWindow) {
+		sectionsWindow.insert(
+			icon_button('Create This List','tick').observe('click', function() {
+				var selectedcheckboxes = $('listChoose_sectionwidget_fieldarea').select('input:checked');
 			
-			if (selectedcheckboxes.length < 1) {
-				alert('Please choose a section.');
-				return;
-			}
-			
-			var sectionids = [];
-			for (var i = 0, count = selectedcheckboxes.length; i < count; i++)
-				sectionids.push(selectedcheckboxes[i].value);
-			
-			console.info(sectionids);
-			new Ajax.Request('ajaxlistform.php?type=createlist', {
-				'method': 'post',
-				'parameters': {
-					'sectionids[]': sectionids
-				},
-				'onSuccess': function(transport) {
-					$('listsTableStatus').update();
-					var listid = transport.responseJSON;
-					if (!listid) {
-						alert('<?=addslashes(_L('Sorry, you are not able to create lists'))?>');
-						return;
-					} else if (typeof listid.error === 'string') {
-						alert(listid.error);
-						return;
-					}
-					listformVars.pendingList = null;
-					listform_add_list(listid);
-					accordion.collapse_all();
-					console.info($('listChoose_sectionwidgetorganizationselector'));
-					$('listChoose_sectionwidgetorganizationselector').selectedIndex = 0;
-					$('listChoose_sectionwidget').update();
-				},
-				'onFailure': function() {
-					alert('There is a connection problem.');
+				if (selectedcheckboxes.length < 1) {
+					alert('Please choose a section.');
+					return;
 				}
-			});
-		})
-	);
+			
+				var sectionids = [];
+				for (var i = 0, count = selectedcheckboxes.length; i < count; i++)
+					sectionids.push(selectedcheckboxes[i].value);
+			
+				new Ajax.Request('ajaxlistform.php?type=createlist', {
+					'method': 'post',
+					'parameters': {
+						'sectionids[]': sectionids
+					},
+					'onSuccess': function(transport) {
+						$('listsTableStatus').update();
+						var listid = transport.responseJSON;
+						if (!listid) {
+							alert('<?=addslashes(_L('Sorry, you are not able to create lists'))?>');
+							return;
+						} else if (typeof listid.error === 'string') {
+							alert(listid.error);
+							return;
+						}
+						listformVars.pendingList = null;
+						listform_add_list(listid);
+						accordion.collapse_all();
+						$('listChoose_sectionwidgetorganizationselector').selectedIndex = 0;
+						$('listChoose_sectionwidget').update();
+					},
+					'onFailure': function() {
+						alert('There is a connection problem.');
+					}
+				});
+			})
+		);
+	}
 	
 	// RuleWidget
 	ruleWidget = new RuleWidget($('ruleWidgetContainer'));
@@ -295,7 +301,9 @@ function listform_load(listformID, formData, postURL) {
 
 		accordion.enable_section('chooselist');
 		accordion.enable_section('buildlist');
-		accordion.enable_section('choosesections');
+		if (sectionsWindow) {
+			accordion.enable_section('choosesections');
+		}
 
 		// buildListWindow: Save Rules Button
 		$('saveRulesButton').observe('click', function(event) {

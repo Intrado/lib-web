@@ -308,20 +308,22 @@ $formdata["ruledata"] = array(
 	"helpstep" => 1
 );
 
-$formdata["sectionids"] = array(
-	"label" => _L('Sections'),
-	"fieldhelp" => _L('Select sections from an organization.'),
-	"value" => "",
-	"validators" => array(
-		array("ValSections")
-	),
-	"control" => array("SectionWidget",
-		"sectionids" => isset($options['sectionids']) && count($options['sectionids']) > 0 ?
-			$options['sectionids'] :
-			array()
-	),
-	"helpstep" => 2
-);
+if ($USER->hasSections()) {
+	$formdata["sectionids"] = array(
+		"label" => _L('Sections'),
+		"fieldhelp" => _L('Select sections from an organization.'),
+		"value" => "",
+		"validators" => array(
+			array("ValSections")
+		),
+		"control" => array("SectionWidget",
+			"sectionids" => isset($options['sectionids']) && count($options['sectionids']) > 0 ?
+				$options['sectionids'] :
+				array()
+		),
+		"helpstep" => 2
+	);
+}
 
 $formdata["jobtype"] = array(
 	"label" => _L("Filter by job type"),
@@ -406,9 +408,12 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 				$_SESSION['report']['options'] = array(
 					'reporttype' => 'phonedetail',
 					'rules' => isset($rules) ? $rules : array(),
-					'organizationids' => isset($organizationids) ? $organizationids : array(),
-					'sectionids' => isset($postdata['sectionids']) ? $postdata['sectionids'] : array()
+					'organizationids' => isset($organizationids) ? $organizationids : array()
 				);
+				
+				if ($USER->hasSections()) {
+					$_SESSION['report']['options']['sectionids'] = isset($postdata['sectionids']) ? $postdata['sectionids'] : array();
+				}
 				
 				set_session_options_reporttype();
 

@@ -45,7 +45,7 @@ class ValListName extends Validator {
 // Form Data
 ////////////////////////////////////////////////////////////////////////////////
 
-if ($method == 'rules') {
+if ($method === 'rules') {
 	$rulewidgetvaluejson = '';
 	if ($list->id) {
 		$rulewidgetdata = array();
@@ -119,7 +119,7 @@ $formdata = array(
 
 $formdata[] = _L('List Content');
 
-if ($method == 'rules') {
+if ($method === 'rules') {
 	$formdata["ruledelete"] = array(
 		"value" => "",
 		"control" => array("HiddenField")
@@ -232,80 +232,86 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 			if ($ajax) {
 				switch ($button) {
 					case 'addrule':
-						$ruledata = json_decode($postdata['newrule']);
-						$data = $ruledata[0];
-						// CREATE rule.
-						if (!isset($data->fieldnum, $data->logical, $data->op, $data->val)) {
-							notice(_L('There is a problem adding the rule for %s.', escapehtml(FieldMap::getName($data->fieldnum))));
-							$form->sendTo($methodlink);
-							break;
-						}
+						if ($method === 'rules') {
+							$ruledata = json_decode($postdata['newrule']);
+							$data = $ruledata[0];
+							// CREATE rule.
+							if (!isset($data->fieldnum, $data->logical, $data->op, $data->val)) {
+								notice(_L('There is a problem adding the rule for %s.', escapehtml(FieldMap::getName($data->fieldnum))));
+								$form->sendTo($methodlink);
+								break;
+							}
 						
-						if ($data->fieldnum == 'organization') {
-							QuickUpdate('BEGIN');
-								QuickUpdate("DELETE FROM listentry WHERE listid=? AND type='organization'", false, array($list->id));
+							if ($data->fieldnum == 'organization') {
+								QuickUpdate('BEGIN');
+									QuickUpdate("DELETE FROM listentry WHERE listid=? AND type='organization'", false, array($list->id));
 								
-								foreach ($data->val as $id) {
+									foreach ($data->val as $id) {
+										$le = new ListEntry();
+										$le->listid = $list->id;
+										$le->type = "organization";
+										$le->organizationid = $id + 0;
+										$le->create();
+									}
+								
+								QuickUpdate('COMMIT');
+							
+								notice(_L('The rule for Organization is now added.'));
+							} else {
+								if (!$type = Rule::getType($data->fieldnum)) {
+									notice(_L('There is a problem adding the rule for %s.', escapehtml(FieldMap::getName($data->fieldnum))));
+									$form->sendTo($methodlink);
+									break;
+								}
+							
+								$data->val = prepareRuleVal($type, $data->op, $data->val);
+							
+								if (!$rule = Rule::initFrom($data->fieldnum, $data->logical, $data->op, $data->val)) {
+									notice(_L('There is a problem adding the rule for %s.', escapehtml(FieldMap::getName($data->fieldnum))));
+									$form->sendTo($methodlink);
+									break;
+								}
+							
+								QuickUpdate('BEGIN');
+									$rule->create();
 									$le = new ListEntry();
 									$le->listid = $list->id;
-									$le->type = "organization";
-									$le->organizationid = $id + 0;
+									$le->type = "rule";
+									$le->ruleid = $rule->id;
 									$le->create();
-								}
-								
-							QuickUpdate('COMMIT');
+								QuickUpdate('COMMIT');
 							
-							notice(_L('The rule for Organization is now added.'));
-						} else {
-							if (!$type = Rule::getType($data->fieldnum)) {
-								notice(_L('There is a problem adding the rule for %s.', escapehtml(FieldMap::getName($data->fieldnum))));
-								$form->sendTo($methodlink);
-								break;
+								notice(_L('The rule for %s is now added.', escapehtml(FieldMap::getName($data->fieldnum))));
 							}
-							
-							$data->val = prepareRuleVal($type, $data->op, $data->val);
-							
-							if (!$rule = Rule::initFrom($data->fieldnum, $data->logical, $data->op, $data->val)) {
-								notice(_L('There is a problem adding the rule for %s.', escapehtml(FieldMap::getName($data->fieldnum))));
-								$form->sendTo($methodlink);
-								break;
-							}
-							
-							QuickUpdate('BEGIN');
-								$rule->create();
-								$le = new ListEntry();
-								$le->listid = $list->id;
-								$le->type = "rule";
-								$le->ruleid = $rule->id;
-								$le->create();
-							QuickUpdate('COMMIT');
-							
-							notice(_L('The rule for %s is now added.', escapehtml(FieldMap::getName($data->fieldnum))));
 						}
 						
 						$form->sendTo($methodlink);
 						break;
 
 					case 'deleterule':
-						$fieldnum = $postdata['ruledelete'];
-						if ($fieldnum == 'organization') {
-							QuickUpdate("DELETE FROM listentry WHERE listid=? AND type='organization'", false, array($list->id));
+						if ($method === 'rules') {
+							$fieldnum = $postdata['ruledelete'];
+							if ($fieldnum == 'organization') {
+								QuickUpdate("DELETE FROM listentry WHERE listid=? AND type='organization'", false, array($list->id));
 							
-							notice(_L('The rule for Organization is now removed.'));
-						} else if ($USER->authorizeField($fieldnum)) {
-							QuickUpdate("DELETE le.*, r.* FROM listentry le, rule r WHERE le.ruleid=r.id AND le.listid=? AND r.fieldnum=?", false, array($list->id, $fieldnum));
+								notice(_L('The rule for Organization is now removed.'));
+							} else if ($USER->authorizeField($fieldnum)) {
+								QuickUpdate("DELETE le.*, r.* FROM listentry le, rule r WHERE le.ruleid=r.id AND le.listid=? AND r.fieldnum=?", false, array($list->id, $fieldnum));
 							
-							notice(_L('The rule for %s is now removed.', escapehtml(FieldMap::getName($fieldnum))));
+								notice(_L('The rule for %s is now removed.', escapehtml(FieldMap::getName($fieldnum))));
+							}
 						}
 
 						$form->sendTo($methodlink);
 						break;
 
 					case 'clearrules':
-						QuickUpdate("DELETE le.*, r.* FROM listentry le, rule r WHERE le.ruleid=r.id AND le.listid=?", false, array($list->id));
-						QuickUpdate("DELETE FROM listentry WHERE listid=? AND type='organization'", false, array($list->id));
-
-						notice(_L('All rules are now removed.'));
+						if ($method === 'rules') {
+							QuickUpdate("DELETE le.*, r.* FROM listentry le, rule r WHERE le.ruleid=r.id AND le.listid=?", false, array($list->id));
+							QuickUpdate("DELETE FROM listentry WHERE listid=? AND type='organization'", false, array($list->id));
+						
+							notice(_L('All rules are now removed.'));
+						}
 						$form->sendTo($methodlink);
 						break;
 

@@ -197,12 +197,13 @@ startWindow('My Lists&nbsp;' . help('Lists_MyLists'));
 <tr>
 	<td class="feed" style="width: 180px;vertical-align: top;font-size: 12px;" >
 		<div>
-			<?
-				// TODO: If the user has only 1 section, or if the system has only 1 section, don't bother showing two buttons?
-			?>
 			<?= icon_button(_L('Create New List with Rules'),"add","location.href='editlistrules.php?id=new'") ?>
 			<div style="clear:both;"></div>
-			<?= icon_button(_L('Create New List with Sections'),"add","location.href='editlistsections.php?id=new'") ?>
+			<?
+				if ($USER->hasSections()) {
+					echo icon_button(_L('Create New List with Sections'),"add","location.href='editlistsections.php?id=new'");
+				}
+			?>
 			<div style="clear:both;"></div>
 		</div>
 		<br />
@@ -247,7 +248,7 @@ function applyfilter(filter) {
 				if(result) {
 					var html = '';
 					var size = result.list.length;
-
+					
 					for(i=0;i<size;i++){
 						var item = result.list[i];
 						html += '<tr><td valign=\"top\" width=\"60px\"><a href=\"' + item.defaultlink + '\"><img src=\"img/' + item.icon + '\" /></a></td><td ><div class=\"feedtitle\"><a href=\"' + item.defaultlink + '\">' + item.title + '</a></div><span>' + item.content + '</span></td>';

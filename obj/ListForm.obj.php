@@ -3,14 +3,16 @@ class ListForm extends Form {
 	function ListForm ($name) {
 		global $USER;
 
-		$formdata['sectionwidget'] = array(
-			'label' => _L('Choose Sections'),
-			'value' => '',
-			'control' => array('SectionWidget'),
-			'validators' => array(),
-			'renderoptions' => array('label' => false, 'icon' => false, 'errormessage' => true),
-			'helpstep' => 0
-		);
+		if ($USER->hasSections()) {
+			$formdata['sectionwidget'] = array(
+				'label' => _L('Choose Sections'),
+				'value' => '',
+				'control' => array('SectionWidget'),
+				'validators' => array(),
+				'renderoptions' => array('label' => false, 'icon' => false, 'errormessage' => true),
+				'helpstep' => 0
+			);
+		}
 		
 		$formdata['addme'] = array(
 			'label' => _L('Add Myself'),
@@ -78,11 +80,17 @@ class ListForm extends Form {
 				<div id='buildListWindow'>
 					<div id='ruleWidgetContainer' style='clear:both; white-space:nowrap;'></div>
 				</div>
-				
+		";
+		
+		if ($USER->hasSections()) {
+			$str .= "
 				<table style='border-collapse:collapse' id='chooseSectionsWindow'>
 					<tbody></tbody>
 				</table>
-				
+			";
+		}
+		
+		$str .= "
 				<div id='chooseListWindow'>
 					<table>
 						<tr>
@@ -194,7 +202,10 @@ class ListForm extends Form {
 				document.observe('dom:loaded', function() {
 					// Initiatiate Page.
 					listform_load('{$this->name}', " . json_encode($this->formdata) . ", {$posturlJSON});
-
+		";
+		
+		if ($USER->hasSections()) {
+			$str .= "
 					// Move SectionWidget things into chooseSectionsWindow.
 					(function() {
 						var tbody = $('chooseSectionsWindow').down('tbody');
@@ -202,7 +213,10 @@ class ListForm extends Form {
 							tbody.insert($('listChoose_sectionwidget_fieldarea'));
 						}
 					})();
-					
+			";
+		}
+		
+		$str .= "
 					// Move AddMe things into addMeWindow.
 					var addme = $('listChoose_addme');
 					var addmePhone = $('listChoose_addmePhone');

@@ -22,6 +22,7 @@ class User extends DBMappedObject {
 	
 	var $rules = false; //local cache of rules
 	var $organizations = false; // local cache of authorized organizations.
+	var $hassections = null; // local cache of boolean indicating that there are sections that the user can see.
 	
 	//new constructor
 	function User ($id = NULL) {
@@ -81,6 +82,26 @@ class User extends DBMappedObject {
 		return isset($organizations[$id]);
 	}
 	
+	// Returns true if there are sections that the user is permitted to see.
+	function hasSections() {
+		if ($this->hassections === null) {
+			// If the user cannot see any organizations then he cannot see any sections either.
+			if (count($this->organizations()) < 1) {
+				$this->hassections = false;
+			// If the user has section associations, then he can obviously see those sections.
+			} else if (QuickQuery('select sectionid from userassociation where type="section" and userid = ? limit 1', false, array($this->id))) {
+				$this->hassections = true;
+			// If the user does not have section associations, then find out if any of the organizations that he can see has a section.
+			} else if (QuickQuery('select id from section where organizationid in ('.implode(',', array_keys($this->organizations())).') limit 1')) {
+				$this->hassections = true;
+			} else {
+				$this->hassections = false;
+			}
+		}
+		
+		return $this->hassections;
+	}
+	
 	function authorizeField($field) {
 		$fields = $_SESSION['access']->getValue('datafields');
 		return !$fields || in_array($field, explode('|', $_SESSION['access']->getValue('datafields')));
@@ -101,7 +122,7 @@ class User extends DBMappedObject {
 	// The user is unrestricted if he has no organization associations.
 	function organizations() {
 		if ($this->organizations === false) {
-			$associatedorganizations = DBFindMany('Organization', 'from organization o left join userassociation ua on o.id = ua.organizationid where userid = ?', 'o', array($this->id));
+			$associatedorganizations = DBFindMany('Organization', 'from organization o inner join userassociation ua on o.id = ua.organizationid where userid = ?', 'o', array($this->id));
 
 			// If the user has specific organization associations, return those organizations.
 			// Otherwise he can see all organizations.
