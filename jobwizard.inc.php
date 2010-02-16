@@ -975,74 +975,7 @@ class JobWiz_messageSelect extends WizStep {
 		}
 	}
 }
-/*
-//This is for selecting a saved phone message.
-class JobWiz_messagePhoneChoose extends WizStep {
-	function getForm($postdata, $curstep) {
-		global $USER;
-		$phonemessage = array();
-		$values = array();
-		$langs = array();
-		if ($USER->authorize("sendmulti")) {
-			$syslangs = DBFindMany("Language","from language order by name");
-			foreach ($syslangs as $langid => $language)
-				if ($syslangs[$langid]->name !== "English")
-					$langs[] = $syslangs[$langid]->name;
-		}
 
-		$messagelist = DBFindMany("Message","from message where userid=" . $USER->id ." and deleted=0 and type='phone' order by name");
-		foreach ($messagelist as $id => $message) {
-			$phonemessage[$id]['name'] = $message->name;
-			$values[] = $id;
-		}
-		$formdata = array();
-
-		$formdata[] = $this->title;
-		$helpsteps = array(_L("Select from list of existing messages. If you do not find an appropriate message, you may click the Message Source link from the navigation on the left and choose to create a new message."));
-		$formdata["Default"] = array(
-			"label" => _L("Select a Message"),
-			"value" => "",
-			"validators" => array(
-				array("ValRequired"),
-				array("ValInArray","values"=>$values)
-			),
-			"control" => array("SelectMessage", "type"=>"phone", "width"=>"80%", "values"=>$phonemessage),
-			"helpstep" => 1
-		);
-		if (count($langs)) {
-			$formdata[] = _L("Optional additional languages");
-			$helpsteps[] = _L("Select from list of existing messages. If you do not find an appropriate message, you may click the Message Source link from the navigation on the left and choose to create a new message.");
-		}
-		foreach ($langs as $lang) {
-			$formdata[$lang] = array(
-				"label" => $lang,
-				"value" => "",
-				"validators" => array(
-					array("ValInArray","values"=>$values)
-				),
-				"control" => array("SelectMessage", "type"=>"phone", "width"=>"80%", "values"=>$phonemessage),
-				"helpstep" => 2
-			);
-		}
-
-		return new Form("messagePhoneChoose",$formdata,$helpsteps);
-	}
-
-	//returns true if this step is enabled
-	function isEnabled($postdata, $step) {
-		global $USER;
-		if (!$USER->authorize("sendphone"))
-			return false;
-		if (isset($postdata['/start']['package']) && $postdata['/start']['package'] == "custom" &&
-			isset($postdata['/message/select']['phone']) && $postdata['/message/select']['phone'] == "pick") {
-			return true;
-		} else {
-			return false;
-		}
-	}
-}
- *
- */
 
 //This is for typing in a phone message.
 class JobWiz_messagePhoneText extends WizStep {
@@ -1292,73 +1225,6 @@ class JobWiz_messagePhoneEasyCall extends WizStep {
 	}
 }
 
-/*
-class JobWiz_messageEmailChoose extends WizStep {
-	function getForm($postdata, $curstep) {
-		$messages = array();
-		$values = array();
-		global $USER;
-		$langs = array();
-		if ($USER->authorize("sendmulti")) {
-			$syslangs = DBFindMany("Language","from language order by name");
-			foreach ($syslangs as $langid => $language)
-				if ($syslangs[$langid]->name !== "English")
-					$langs[] = $syslangs[$langid]->name;
-		}
-		$messagelist = DBFindMany("Message","from message where userid=" . $USER->id ." and deleted=0 and type='email' order by name");
-		foreach ($messagelist as $id => $message) {
-			$messages[$id]['name'] = $message->name;
-			$values[] = $id;
-		}
-
-		// Form Fields.
-		$formdata = array($this->title);
-		$helpsteps = array(_L("Select from list of existing messages. If you do not find an appropriate message, you may click the Message Source link from the navigation on the left and choose to create a new message."));
-		$formdata["Default"] = array(
-			"label" => _L("Select a Message"),
-			"validators" => array(
-				array("ValRequired"),
-				array("ValInArray", "values"=>$values)
-			),
-			"value" => "",
-			"control" => array("SelectMessage","type"=>"email", "width"=>"80%", "values"=>$messages),
-			"helpstep" => 1
-		);
-
-		if (count($langs)) {
-			$formdata[] = _L("Optional additional languages");
-			$helpsteps[] = _L("Select from list of existing messages. If you do not find an appropriate message, you may click the Message Source link from the navigation on the left and choose to create a new message.");
-		}
-		foreach ($langs as $lang) {
-			$formdata[$lang] = array(
-				"label" => $lang,
-				"value" => "",
-				"validators" => array(
-					array("ValInArray","values"=>$values)
-				),
-				"control" => array("SelectMessage", "type"=>"email", "width"=>"80%", "values"=>$messages),
-				"helpstep" => 2
-			);
-		}
-
-		return new Form("messageEmailChoose",$formdata,$helpsteps);
-	}
-
-	//returns true if this step is enabled
-	function isEnabled($postdata, $step) {
-		global $USER;
-		if (!$USER->authorize("sendemail"))
-			return false;
-		if (isset($postdata['/start']['package']) && $postdata['/start']['package'] == "custom" &&
-			isset($postdata['/message/select']['email']) && $postdata['/message/select']['email'] == "pick") {
-			return true;
-		} else {
-			return false;
-		}
-	}
-}
-
-*/
 
 class JobWiz_messageEmailText extends WizStep {
 	function getForm($postdata, $curstep) {
@@ -1448,7 +1314,6 @@ class JobWiz_messageEmailText extends WizStep {
 	//returns true if this step is enabled
 	function isEnabled($postdata, $step) {
 		global $USER;
-		//error_log(json_encode($postdata['/message/pick']['type']));
 		if (!$USER->authorize("sendemail"))
 			return false;
 		if ((isset($postdata['/start']['package']) && ($postdata['/start']['package'] == "express" || $postdata['/start']['package'] == "personalized")) ||
@@ -1594,51 +1459,6 @@ class JobWiz_messageEmailTranslate extends WizStep {
 	}
 }
 
-/*
-class JobWiz_messageSmsChoose extends WizStep {
-	function getForm($postdata, $curstep) {
-		// Form Fields.
-		$formdata = array();
-		$messages = array();
-		$values = array();
-		global $USER;
-
-		$messagelist = DBFindMany("Message","from message where userid=" . $USER->id ." and deleted=0 and type='sms' order by name");
-		foreach ($messagelist as $id => $message) {
-			$messages[$id]['name'] = $message->name;
-			$values[] = $id;
-		}
-
-		$formdata[] = $this->title;
-		$formdata["message"] = array(
-			"label" => "Select a Message",
-			"validators" => array(
-				array("ValRequired"),
-				array("ValInArray", "values"=>$values)
-			),
-			"value" => "",
-			"control" => array("SelectMessage", "type"=>"sms", "width"=>"80%", "values"=>$messages),
-			"helpstep" => 1
-		);
-		$helpsteps = array(_L("Select from list of existing messages. If you do not find an appropriate message, you may click the Message Source link from the navigation on the left and choose to create a new message."));
-
-		return new Form("messageSmsChoose",$formdata,$helpsteps);
-	}
-
-	//returns true if this step is enabled
-	function isEnabled($postdata, $step) {
-		global $USER;
-		if (!$USER->authorize("sendsms") || !getSystemSetting("_hassms"))
-			return false;
-		if (isset($postdata['/start']['package']) && $postdata['/start']['package'] == "custom" &&
-			isset($postdata['/message/select']['sms']) && $postdata['/message/select']['sms'] == "pick") {
-			return true;
-		} else {
-			return false;
-		}
-	}
-}
-*/
 
 class JobWiz_messageSmsText extends WizStep {
 	function getForm($postdata, $curstep) {
