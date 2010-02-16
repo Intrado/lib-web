@@ -118,6 +118,8 @@ class Message extends DBMappedObject {
 	// This will delete any existing message parts and recreate new ones.
 	// There are 2 usage patterns: either $body is null, or $parts is null.
 	function recreateParts($body, $parts, $preferredgender) {
+		global $USER;
+		
 		if (!is_null($this->id))
 			QuickUpdate("delete from messagepart where messageid=?", false, array($this->id));
 		else
@@ -132,10 +134,11 @@ class Message extends DBMappedObject {
 				$part->txt = $body;
 				$part->type = "T";
 				$part->sequence = 0;
-				$part->update();
+				$part->create();
 			} else {
 				$errors = array();
-				$parts = $this->parse($body, $errors, $voiceid);
+				$audiofileids = QuickQueryList("select id from audiofile where userid=? and deleted = 0 and messagegroupid=?", false, false, array($USER->id, $this->messagegroupid));
+				$parts = $this->parse($body, $errors, $voiceid, $audiofileids);
 			}
 		}
 		
@@ -145,6 +148,8 @@ class Message extends DBMappedObject {
 				$part->create();
 			}
 		}
+		
+		return $parts;
 	}
 	
 	function parse ($data, &$errors = NULL, $defaultvoiceid=null, $audiofileids = null) {
@@ -240,9 +245,12 @@ class Message extends DBMappedObject {
 					case "A":
 						$part->sequence = $partcount++;
 						if (is_array($audiofileids)) {
-							$params = implode(',', array_fill(0, count($audiofileids), '?'));
-							$query = "select id from audiofile where userid=? and name=? and deleted = 0 and id in ($params)";
-							$audioid = QuickQuery($query, false, array($USER->id) + $audiofileids + array($token));
+							if (count($audiofileids) > 0) {
+								$query = "select id from audiofile where userid=? and name=? and deleted = 0 and id in (".implode(",", $audiofileids).")";
+								$audioid = QuickQuery($query, false, array($USER->id,$token));
+							} else {
+								$audioid = false;
+							}
 						} else {
 							$query = "select id from audiofile where userid=? and name=? and deleted = 0";
 							$audioid = QuickQuery($query, false, array($USER->id, $token));

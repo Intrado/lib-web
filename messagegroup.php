@@ -854,9 +854,9 @@ if ($button = $messagegroupsplitter->getSubmit()) {
 												}
 
 												if ($sourcemessageparts === false)
-													$sourcemessageparts = $sourcemessage->parse($sourcemessagetext);
-												
-												$sourcemessage->recreateParts(null, $sourcemessageparts, $formdestinationtype == 'phone' ? $messagegroup->preferredgender : null);
+													$sourcemessageparts = $sourcemessage->recreateParts($sourcemessagetext, null, $formdestinationtype == 'phone' ? $messagegroup->preferredgender : null);
+												else
+													$sourcemessage->recreateParts(null, $sourcemessageparts, $formdestinationtype == 'phone' ? $messagegroup->preferredgender : null);
 												
 												if (isset($plaintextoverriden) && !$plaintextoverriden) {
 													if ($plainsourcemessage = $messagegroup->getMessage($formdestinationtype, 'plain', $languagecode, 'source')) {
@@ -879,9 +879,9 @@ if ($button = $messagegroupsplitter->getSubmit()) {
 													}
 													if (!$plainsourcemessage->overrideplaintext) {
 														if ($plainsourcemessageparts === false)
-															$plainsourcemessageparts = $plainsourcemessage->parse(html_to_plain($sourcemessagetext));
-														
-														$plainsourcemessage->recreateParts(null, $plainsourcemessageparts, null);
+															$plainsourcemessageparts = $plainsourcemessage->recreateParts(html_to_plain($sourcemessagetext));
+														else
+															$plainsourcemessage->recreateParts(null, $plainsourcemessageparts, null);
 													}
 												}
 												
