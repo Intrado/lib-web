@@ -79,12 +79,10 @@ $wizdata = array(
 			"callme" => new JobWiz_messagePhoneEasyCall(_L("Record"))
 		)),
 		"email"	=> new WizSection ("Email",array(
-			//"pick" => new JobWiz_messageEmailChoose(_L("Email: Message")),
 			"text" => new JobWiz_messageEmailText(_L("Compose Email")),
 			"translate" => new JobWiz_messageEmailTranslate(_L("Translations"))
 		)),
 		"sms" => new WizSection ("SMS",array(
-			//"pick" => new JobWiz_messageSmsChoose(_L("SMS: SMS Text")),
 			"text" => new JobWiz_messageSmsText(_L("SMS Text"))
 		))
 	)),
@@ -171,7 +169,7 @@ class FinishJobWizard extends WizFinish {
 			"subject" => $msgdata["subject"],
 			"attachments" => json_decode($msgdata["attachments"]),
 			"text" => $msgdata["message"],
-			"language" => "english",
+			"language" => "en",
 			"override" => false
 		));
 	}
@@ -229,7 +227,7 @@ class FinishJobWizard extends WizFinish {
 						"subject" => "Message from ". $_SESSION['custname'],
 						"attachments" => array(),
 						"text" => "An important telephone notification was sent to you by ". $_SESSION['custname']. ". Click the link below or copy and paste the link into your web browser to hear the message.\n\n",
-						"language" => "english",
+						"language" => "en",
 						"override" => false
 					));
 					if (getSystemSetting("_hascallback"))
@@ -242,7 +240,7 @@ class FinishJobWizard extends WizFinish {
 					$smsMsg = array("Default" => array(
 						"id" => false,
 						"text" => getSmsMessageLinkText(),
-						"language" => "english"
+						"language" => "en"
 					));
 				}
 				break;
@@ -262,7 +260,7 @@ class FinishJobWizard extends WizFinish {
 					$smsMsg = array("Default" => array(
 						"id" => false,
 						"text" => $postdata["/message/sms/text"]["message"],
-						"language" => "english"
+						"language" => "en"
 					));
 				}
 				break;
@@ -279,7 +277,7 @@ class FinishJobWizard extends WizFinish {
 					$smsMsg = array("Default" => array(
 						"id" => false,
 						"text" => $postdata["/message/sms/text"]["message"],
-						"language" => "english"
+						"language" => "en"
 					));
 				}
 				break;
@@ -320,7 +318,7 @@ class FinishJobWizard extends WizFinish {
 									"subject" => "Message from ". $_SESSION['custname'],
 									"attachments" => array(),
 									"text" => "An important telephone notification was sent to you by ". $_SESSION['custname']. ". Click the link below or copy and paste the link into your web browser to hear the message.\n\n",
-									"language" => "english",
+									"language" => "en",
 									"override" => false
 								));
 								if (getSystemSetting("_hascallback"))
@@ -451,12 +449,14 @@ class FinishJobWizard extends WizFinish {
 				if ($wizHasSmsMsg && isset($postdata["/list"]["addmeSms"])) {
 					$deliveryTypes["sms"] = new Sms();
 					$deliveryTypes["sms"]->sms = Phone::parse($postdata["/list"]["addmeSms"]);
+
 				}
 
 				// Delivery Types and Job Types
 				foreach ($deliveryTypes as $deliveryTypeName => $deliveryTypeObject) {
 					$deliveryTypeObject->personid = $person->id;
 					$deliveryTypeObject->sequence = 0;
+					$deliveryTypeObject->editlock = 0;
 					$deliveryTypeObject->update();
 
 					// For each job type, assume sequence = 0, enabled = 1
@@ -487,8 +487,7 @@ class FinishJobWizard extends WizFinish {
 		$job->description = "";
 
 		$job->type = 'notification';
-		$job->modifydate = QuickQuery("select now()");
-		$job->createdate = QuickQuery("select now()");
+		$job->modifydate = $job->createdate = date("Y-m-d H:i:s", time());
 		$job->scheduleid = null;
 		if ($schedule['date'])
 			$job->startdate = date("Y-m-d", strtotime($schedule['date']));
@@ -509,7 +508,7 @@ class FinishJobWizard extends WizFinish {
 			$messagegroup->userid = $USER->id;
 			$messagegroup->name = $jobsettings["jobname"];
 			$messagegroup->description = "";
-			$messagegroup->modified = date("Y-m-d H:i:s", time());
+			$messagegroup->modified = $job->modifydate;
 			$messagegroup->deleted = 1;
 			$messagegroup->create();
 			$messagegroupid = $messagegroup->id;
@@ -518,12 +517,12 @@ class FinishJobWizard extends WizFinish {
 					// there is a message for this type
 					$messages = $jobsettings[$type]; // There may be many messages for each type
 					foreach ($messages as $title => $message) {
-						$lang = isset($message['language'])?$message['language']:"english";
+						$lang = isset($message['language'])?$message['language']:"en";
 						if (!$message['id']) {
 							// create a new message
 							$voiceid = null;
 							if ($type == 'phone') {
-								$voiceid = QuickQuery("select id from ttsvoice where language=? and gender=?",false,array($lang,$message["gender"]));
+								$voiceid = QuickQuery("select id from ttsvoice where languagecode=? and gender=?",false,array($lang,$message["gender"]));
 								if($voiceid === false)
 									$voiceid = 1; // default to english
 							}
@@ -548,7 +547,7 @@ class FinishJobWizard extends WizFinish {
 							$newmessage->description = "";
 							$newmessage->userid = $USER->id;
 							$newmessage->modifydate = $messagegroup->modified;//QuickQuery("select now()");
-							$newmessage->languagecode = "en";
+							$newmessage->languagecode = $lang;
 							$newmessage->deleted = 1;
 							if ($type == 'email') {
 								$newmessage->subject = $message["subject"];
