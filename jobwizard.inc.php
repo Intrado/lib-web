@@ -6,77 +6,163 @@
 // Check the whole of the wizard post data and include user authorization to figure out if this wizard has an assigned valid phone message
 function wizHasMessageGroup($postdata) {
 	global $USER;
-
-	if(($USER->authorize("sendphone") || $USER->authorize("sendemail") || ($USER->authorize("sendsms") && getSystemSetting("_hassms"))) &&
-		(isset($postdata["/start"]["package"]) && $postdata["/start"]["package"] == "custom" &&
-		 isset($postdata["/message/options"]["options"]) && $postdata["/message/options"]["options"] == "pick" && isset($postdata["/message/pickmessage"]["messagegroup"])
-		))
+	if((isset($postdata["/start"]["package"]) && $postdata["/start"]["package"] == "custom" &&
+		isset($postdata["/message/options"]["options"]) && $postdata["/message/options"]["options"] == "pick" &&
+		isset($postdata["/message/pickmessage"]["messagegroup"])) &&
+		($USER->authorize("sendphone") || $USER->authorize("sendemail") || ($USER->authorize("sendsms") && getSystemSetting("_hassms")))) {
 		return true;
+	}
 	return false;
 }
 
 // Check the whole of the wizard post data and include user authorization to figure out if this wizard has an assigned valid phone message
 function wizHasPhone($postdata) {
 	global $USER;
-	if ($USER->authorize("sendphone") && (
-		(isset($postdata["/start"]["package"]) && $postdata["/start"]["package"] == "easycall" && isset($postdata["/message/phone/callme"]["message"]) && strlen($postdata["/message/phone/callme"]["message"]) > 2) ||
-		(isset($postdata["/start"]["package"]) && $postdata["/start"]["package"] == "express" && isset($postdata["/message/phone/text"]["message"]) && strlen($postdata["/message/phone/text"]["message"]) > 2) ||
-		(isset($postdata["/start"]["package"]) && $postdata["/start"]["package"] == "personalized" && isset($postdata["/message/phone/callme"]["message"]) && strlen($postdata["/message/phone/callme"]["message"]) > 2) ||
-		(isset($postdata["/start"]["package"]) && $postdata["/start"]["package"] == "custom" && isset($postdata["/message/pick"]["type"]) && in_array('phone', $postdata["/message/pick"]["type"]) && (
-			(isset($postdata["/message/select"]["phone"]) && $postdata["/message/select"]["phone"] == "record" && isset($postdata["/message/phone/callme"]["message"]) && strlen($postdata["/message/phone/callme"]["message"]) > 2) ||
-			(isset($postdata["/message/select"]["phone"]) && $postdata["/message/select"]["phone"] == "text" && isset($postdata["/message/phone/text"]["message"]) && strlen($postdata["/message/phone/text"]["message"]) > 2)
-		))))
-		return true;
-	return false;
+	if (isset($postdata["/start"]["package"]) && $USER->authorize("sendemail")) {
+		$package = $postdata["/start"]["package"];
+		// Test Common Packges Phone
+		if(($package == "easycall" && isset($postdata["/message/phone/callme"]["message"]) && strlen($postdata["/message/phone/callme"]["message"]) > 2) ||
+		   ($package == "express" && isset($postdata["/message/phone/text"]["message"]) && strlen($postdata["/message/phone/text"]["message"]) > 2) ||
+		   ($package == "personalized" && isset($postdata["/message/phone/callme"]["message"]) && strlen($postdata["/message/phone/callme"]["message"]) > 2)
+		) {
+			return true;
+		}
+
+		// Test Custom For Phone
+		if($package == "custom" &&
+			isset($postdata["/message/options"]["options"])  &&
+			$postdata["/message/options"]["options"] == "create" && // Need to take create Path
+			isset($postdata["/message/pick"]["type"]) &&
+			in_array('phone', $postdata["/message/pick"]["type"]) &&  // Select Phone
+			isset($postdata["/message/select"]["phone"]) &&
+				(
+				($postdata["/message/select"]["phone"] == "record" && isset($postdata["/message/phone/callme"]["message"]) && strlen($postdata["/message/phone/callme"]["message"]) > 2)
+				||
+				($postdata["/message/select"]["phone"] == "text" && isset($postdata["/message/phone/text"]["message"]) && strlen($postdata["/message/phone/text"]["message"]) > 2)
+				)
+			)
+		{
+			return true;
+		}
+		return false;
+	}
 }
 
 // Check the whole of the wizard post data and include user authorization to figure out if this wizard has an assigned valid email message
 function wizHasEmail($postdata) {
 	global $USER;
-	if ($USER->authorize("sendemail") && (
-		(isset($postdata["/start"]["package"]) && $postdata["/start"]["package"] == "easycall" && isset($postdata["/message/phone/callme"]["message"]) && strlen($postdata["/message/phone/callme"]["message"]) > 2 && $USER->authorize("sendphone")) ||
-		(isset($postdata["/start"]["package"]) && $postdata["/start"]["package"] == "express" && isset($postdata["/message/email/text"]["message"]) && $postdata["/message/email/text"]["message"]) ||
-		(isset($postdata["/start"]["package"]) && $postdata["/start"]["package"] == "personalized" &&isset($postdata["/message/email/text"]["message"]) && $postdata["/message/email/text"]["message"]) ||
-		(isset($postdata["/start"]["package"]) && $postdata["/start"]["package"] == "custom" && isset($postdata["/message/pick"]["type"]) && in_array('email', $postdata["/message/pick"]["type"]) && (
-			(isset($postdata["/message/select"]["email"]) && $postdata["/message/select"]["email"] == "record" && $USER->authorize("sendphone") && (
-				(isset($postdata["/message/select"]["phone"]) && $postdata["/message/select"]["phone"] == "record" && isset($postdata["/message/phone/callme"]["message"]) && strlen($postdata["/message/phone/callme"]["message"]) > 2) ||
-				(isset($postdata["/message/select"]["phone"]) && $postdata["/message/select"]["phone"] == "text" && isset($postdata["/message/phone/text"]["message"]) && strlen($postdata["/message/phone/text"]["message"]) > 2)
-			)) ||
-			(isset($postdata["/message/select"]["email"]) && $postdata["/message/select"]["email"] == "text" && isset($postdata["/message/email/text"]["message"]) && $postdata["/message/email/text"]["message"])
-		))))
-		return true;
+	if (isset($postdata["/start"]["package"]) && $USER->authorize("sendemail")) {
+		$package = $postdata["/start"]["package"];
+		// Test Common Packges Email
+		if(($package == "easycall" && isset($postdata["/message/phone/callme"]["message"]) && strlen($postdata["/message/phone/callme"]["message"]) > 2 && $USER->authorize("sendphone")) ||
+		   (($package == "express" || $package == "personalized") && isset($postdata["/message/email/text"]["message"]) && $postdata["/message/email/text"]["message"])) {
+			return true;
+		}
+		// Test Custom For Email
+		if($package == "custom" &&
+			isset($postdata["/message/options"]["options"])  && 
+			$postdata["/message/options"]["options"] == "create" && // Need to take create Path
+			isset($postdata["/message/pick"]["type"]) &&
+			in_array('email', $postdata["/message/pick"]["type"]))  // Select Email
+		{
+			if(isset($postdata["/message/email/text"]["message"]) && $postdata["/message/email/text"]["message"]) {
+				return true;
+			}
+
+			// If phone is selected together with email; Check that select page has values; Optimized order of issets
+			if(isset($postdata["/message/select"]) &&
+			   isset($postdata["/message/select"]["email"]) && // Need to check if set since it is not checked above
+			   $postdata["/message/select"]["email"] == "record" &&
+			   isset($postdata["/message/select"]["phone"]) &&
+				// message/pick type is set because of if statement above
+			   in_array('phone', $postdata["/message/pick"]["type"]) &&
+			   $USER->authorize("sendphone") &&
+			   (
+				 $postdata["/message/select"]["phone"] == "record" && isset($postdata["/message/phone/callme"]["message"]) && strlen($postdata["/message/phone/callme"]["message"]) > 2
+				 ||
+				 $postdata["/message/select"]["phone"] == "text" && isset($postdata["/message/phone/text"]["message"]) && strlen($postdata["/message/phone/text"]["message"]) > 2
+			   ))
+			{
+				return true;
+			}
+		}
+	}
 	return false;
 }
 
 // Check the whole of the wizard post data and include user authorization to figure out if this wizard has an assigned valid sms message
 function wizHasSms($postdata) {
 	global $USER;
-	if ($USER->authorize("sendsms") && getSystemSetting("_hassms") && (
-		(isset($postdata["/start"]["package"]) && $postdata["/start"]["package"] == "easycall" && isset($postdata["/message/phone/callme"]["message"]) && strlen($postdata["/message/phone/callme"]["message"]) > 2 && $USER->authorize("sendphone")) ||
-		(isset($postdata["/start"]["package"]) && $postdata["/start"]["package"] == "express" && isset($postdata["/message/sms/text"]["message"]) && $postdata["/message/sms/text"]["message"]) ||
-		(isset($postdata["/start"]["package"]) && $postdata["/start"]["package"] == "personalized" &&isset($postdata["/message/sms/text"]["message"]) && $postdata["/message/sms/text"]["message"]) ||
-		(isset($postdata["/start"]["package"]) && $postdata["/start"]["package"] == "custom" && isset($postdata["/message/pick"]["type"]) && in_array('sms', $postdata["/message/pick"]["type"]) && (
-			(isset($postdata["/message/select"]["sms"]) && $postdata["/message/select"]["sms"] == "record" && $USER->authorize("sendphone") && (
-				(isset($postdata["/message/select"]["phone"]) && $postdata["/message/select"]["phone"] == "record" && isset($postdata["/message/phone/callme"]["message"]) && strlen($postdata["/message/phone/callme"]["message"]) > 2) ||
-				(isset($postdata["/message/select"]["phone"]) && $postdata["/message/select"]["phone"] == "text" && isset($postdata["/message/phone/text"]["message"]) && strlen($postdata["/message/phone/text"]["message"]) > 2)
-			)) ||
-			(isset($postdata["/message/select"]["sms"]) && $postdata["/message/select"]["sms"] == "text" && isset($postdata["/message/sms/text"]["message"]) && $postdata["/message/sms/text"]["message"])
-		))))
-		return true;
+	if (isset($postdata["/start"]["package"]) && $USER->authorize("sendsms") && getSystemSetting("_hassms")) {
+		$package = $postdata["/start"]["package"];
+		// Test Common Packges SMS
+		if(($package == "easycall" && isset($postdata["/message/phone/callme"]["message"]) && strlen($postdata["/message/phone/callme"]["message"]) > 2 && $USER->authorize("sendphone")) ||
+		   (($package == "express" || $package == "personalized") && isset($postdata["/message/sms/text"]["message"]) && $postdata["/message/sms/text"]["message"])) {
+			return true;
+		}
+
+		// Test Custom For SMS
+		if($package == "custom" &&
+			isset($postdata["/message/options"]["options"])  &&
+			$postdata["/message/options"]["options"] == "create" && // Need to take create Path
+			isset($postdata["/message/pick"]["type"]) &&
+			in_array('sms', $postdata["/message/pick"]["type"]))  // Select SMS
+		{
+			if(isset($postdata["/message/sms/text"]["message"]) && $postdata["/message/sms/text"]["message"]) {
+				return true;
+			}
+
+			// If phone is selected together with email; Check that select page has values; Optimized order of issets
+			if(isset($postdata["/message/select"]) &&
+			   isset($postdata["/message/select"]["sms"]) && // Need to check if set since it is not checked above
+			   $postdata["/message/select"]["sms"] == "record" &&
+			   isset($postdata["/message/select"]["phone"]) &&
+				// message/pick type is set because of if statement above
+			   in_array('phone', $postdata["/message/pick"]["type"]) &&
+			   $USER->authorize("sendphone") &&
+			   (
+				 $postdata["/message/select"]["phone"] == "record" && isset($postdata["/message/phone/callme"]["message"]) && strlen($postdata["/message/phone/callme"]["message"]) > 2
+				 ||
+				 $postdata["/message/select"]["phone"] == "text" && isset($postdata["/message/phone/text"]["message"]) && strlen($postdata["/message/phone/text"]["message"]) > 2
+			   ))
+			{
+				return true;
+			}
+		}
+	}
 	return false;
 }
 
 function wizHasTranslation($postdata) {
-	if (((isset($postdata["/start"]["package"]) && $postdata["/start"]["package"] == 'express' && isset($postdata['/message/email/text']['translate']) && $postdata['/message/email/text']['translate']) ||
-		(isset($postdata["/start"]["package"]) && $postdata["/start"]["package"] == 'personalized' && isset($postdata['/message/email/text']['translate']) && $postdata['/message/email/text']['translate']) ||
-		(isset($postdata["/start"]["package"]) && $postdata["/start"]["package"] == 'custom' && isset($postdata['/message/pick']['type']) && in_array('email', $postdata['/message/pick']['type']) &&
-			isset($postdata["/message/select"]['email']) && $postdata["/message/select"]['email'] == 'text' && isset($postdata['/message/email/text']['translate']) && $postdata['/message/email/text']['translate'])
-		) || ((isset($postdata["/start"]["package"]) && $postdata["/start"]["package"] == 'express' && isset($postdata['/message/phone/text']['translate']) && $postdata['/message/phone/text']['translate']) ||
-		(isset($postdata["/start"]["package"]) && $postdata["/start"]["package"] == 'custom' && isset($postdata['/message/pick']['type']) && in_array('phone', $postdata['/message/pick']['type']) &&
-			isset($postdata["/message/select"]['phone']) && $postdata["/message/select"]['phone'] == 'text' && isset($postdata['/message/phone/text']['translate']) && $postdata['/message/phone/text']['translate'])
-		)
-	)
-		return true;
+	if (isset($postdata["/start"]["package"])) {
+		$package = $postdata["/start"]["package"];
+		if(isset($postdata['/message/email/text']['translate']) && $postdata['/message/email/text']['translate']) {
+			if($package == 'express' || $package == 'personalized') {
+				return true;
+			}
+			if($package == 'custom' &&
+			   isset($postdata["/message/options"]["options"])  &&
+			   $postdata["/message/options"]["options"] == "create" && // Need to take create Path
+			   isset($postdata['/message/pick']['type']) && 
+			   in_array('email', $postdata['/message/pick']['type'])
+			   ) {
+				return true;
+			}
+		}
+		if(isset($postdata['/message/phone/text']['translate']) && $postdata['/message/phone/text']['translate']) {
+			if($package == 'express' || $package == 'personalized') {
+				return true;
+			}
+			if($package == 'custom' &&
+			   isset($postdata["/message/options"]["options"])  &&
+			   $postdata["/message/options"]["options"] == "create" && // Need to take create Path
+			   isset($postdata['/message/pick']['type']) &&
+			   in_array('phone', $postdata['/message/pick']['type'])
+			   ) {
+				return true;
+			}
+		}
+	}
 	return false;
 }
 
