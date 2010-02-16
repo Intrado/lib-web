@@ -286,80 +286,98 @@ class FinishJobWizard extends WizFinish {
 			//Custom
 			case "custom":
 				if ($wizHasPhoneMsg) {
-					switch ($postdata["/message/select"]["phone"]) {
-						case "record":
-							$phoneMsg = $this->phoneRecordedMessage(json_decode($postdata["/message/phone/callme"]["message"]));
-							break;
-						case "text":
-							if ($postdata["/message/select"]["phone"] == "text") {
+					if(isset($postdata["/message/select"])) {
+						switch ($postdata["/message/select"]["phone"]) {
+							case "record":
+								$phoneMsg = $this->phoneRecordedMessage(json_decode($postdata["/message/phone/callme"]["message"]));
+								break;
+							case "text":
 								$phoneMsg = $this->phoneTextMessage(json_decode($postdata["/message/phone/text"]["message"]));
 								if (isset($postdata["/message/phone/text"]["translate"]) && $postdata["/message/phone/text"]["translate"])
 									$phoneMsg = array_merge($phoneMsg, $this->phoneTextTranslation($postdata["/message/phone/translate"]));
-							}
-							break;
-						//case "pick":
-						//	$phoneMsg = $this->phoneRecordedMessage($postdata["/message/phone/pick"]);
-						//	break;
-						default:
-							error_log($postdata["/message/select"]["phone"] . " is an unknown value for ['/message/select']['phone']");
+								break;
+							//case "pick":
+							//	$phoneMsg = $this->phoneRecordedMessage($postdata["/message/phone/pick"]);
+							//	break;
+							default:
+								error_log($postdata["/message/select"]["phone"] . " is an unknown value for ['/message/select']['phone']");
+						}
+					} else {
+						$phoneMsg = $this->phoneTextMessage(json_decode($postdata["/message/phone/text"]["message"]));
+						if (isset($postdata["/message/phone/text"]["translate"]) && $postdata["/message/phone/text"]["translate"])
+							$phoneMsg = array_merge($phoneMsg, $this->phoneTextTranslation($postdata["/message/phone/translate"]));
 					}
 				}
 				if ($wizHasEmailMsg) {
-					switch ($postdata["/message/select"]["email"]) {
-						case "record":
-							$emailmessagelink = true;
-							$emailMsg = array("Default" => array(
-								"id" => "",
-								"from" => "contactme@schoolmessenger.com",
-								"fromname" => "SchoolMessenger",
-								"subject" => "Message from ". $_SESSION['custname'],
-								"attachments" => array(),
-								"text" => "An important telephone notification was sent to you by ". $_SESSION['custname']. ". Click the link below or copy and paste the link into your web browser to hear the message.\n\n",
-								"language" => "english",
-								"override" => false
-							));
-							if (getSystemSetting("_hascallback"))
-								$emailMsg["Default"]["text"] .= "You may also listen to this message over the phone by dialing the automated notification system at: ". Phone::format(getSystemSetting("inboundnumber")). "\n\n";
-							$emailMsg["Default"]["text"] .= "DO NOT REPLY: This is an automatically generated email. Please do not send a reply message.";
-							break;
-						case "text":
-							$emailMsg = $this->emailTextMessage($postdata["/message/email/text"]);
-							if (isset($postdata["/message/email/text"]["translate"]) && $postdata["/message/email/text"]["translate"])
-								$emailMsg = array_merge($emailMsg, $this->emailTextTranslation($postdata["/message/email/text"], $postdata["/message/email/translate"]));
-							break;
-						//case "pick":
-						//	$emailMsg = $this->emailSavedMessage($postdata["/message/email/pick"]);
-						//	break;
-						default:
-							error_log($postdata["/message/select"]["email"] . " is an unknown value for ['/message/select']['email']");
+					if(isset($postdata["/message/select"])) {
+						switch ($postdata["/message/select"]["email"]) {
+							case "record":
+								$emailmessagelink = true;
+								$emailMsg = array("Default" => array(
+									"id" => "",
+									"from" => "contactme@schoolmessenger.com",
+									"fromname" => "SchoolMessenger",
+									"subject" => "Message from ". $_SESSION['custname'],
+									"attachments" => array(),
+									"text" => "An important telephone notification was sent to you by ". $_SESSION['custname']. ". Click the link below or copy and paste the link into your web browser to hear the message.\n\n",
+									"language" => "english",
+									"override" => false
+								));
+								if (getSystemSetting("_hascallback"))
+									$emailMsg["Default"]["text"] .= "You may also listen to this message over the phone by dialing the automated notification system at: ". Phone::format(getSystemSetting("inboundnumber")). "\n\n";
+								$emailMsg["Default"]["text"] .= "DO NOT REPLY: This is an automatically generated email. Please do not send a reply message.";
+								break;
+							case "text":
+								$emailMsg = $this->emailTextMessage($postdata["/message/email/text"]);
+								if (isset($postdata["/message/email/text"]["translate"]) && $postdata["/message/email/text"]["translate"])
+									$emailMsg = array_merge($emailMsg, $this->emailTextTranslation($postdata["/message/email/text"], $postdata["/message/email/translate"]));
+								break;
+							//case "pick":
+							//	$emailMsg = $this->emailSavedMessage($postdata["/message/email/pick"]);
+							//	break;
+							default:
+								error_log($postdata["/message/select"]["email"] . " is an unknown value for ['/message/select']['email']");
+						}
+					} else {
+						$emailMsg = $this->emailTextMessage($postdata["/message/email/text"]);
+						if (isset($postdata["/message/email/text"]["translate"]) && $postdata["/message/email/text"]["translate"])
+							$emailMsg = array_merge($emailMsg, $this->emailTextTranslation($postdata["/message/email/text"], $postdata["/message/email/translate"]));
 					}
 				}
 				if ($wizHasSmsMsg) {
-					switch ($postdata["/message/select"]["sms"]) {
-						case "record":
-							$smsmessagelink = true;
-							$smsMsg = array("Default" => array(
-								"id" => false,
-								"text" => getSmsMessageLinkText(),
-								"language" => "english"
-							));
-							break;
-						case "text":
-							$smsMsg = array("Default" => array(
-								"id" => false,
-								"text" => $postdata["/message/sms/text"]["message"],
-								"language" => "english"
-							));
-							break;
-						//case "pick":
-						//	$smsMsg = array("Default" => array(
-						//		"id" => $postdata["/message/sms/pick"]["message"],
-						//		"text" => false,
-						//		"language" => "english"
-						//	));
-						//	break;
-						default:
-							error_log($postdata["/message/select"]["sms"] . " is an unknown value for ['/message/select']['sms']");
+					if(isset($postdata["/message/select"])) {
+						switch ($postdata["/message/select"]["sms"]) {
+							case "record":
+								$smsmessagelink = true;
+								$smsMsg = array("Default" => array(
+									"id" => false,
+									"text" => getSmsMessageLinkText(),
+									"language" => "english"
+								));
+								break;
+							case "text":
+								$smsMsg = array("Default" => array(
+									"id" => false,
+									"text" => $postdata["/message/sms/text"]["message"],
+									"language" => "english"
+								));
+								break;
+							//case "pick":
+							//	$smsMsg = array("Default" => array(
+							//		"id" => $postdata["/message/sms/pick"]["message"],
+							//		"text" => false,
+							//		"language" => "english"
+							//	));
+							//	break;
+							default:
+								error_log($postdata["/message/select"]["sms"] . " is an unknown value for ['/message/select']['sms']");
+						}
+					} else {
+						$smsMsg = array("Default" => array(
+							"id" => false,
+							"text" => $postdata["/message/sms/text"]["message"],
+							"language" => "english"
+						));
 					}
 				}
 				break;
@@ -530,6 +548,7 @@ class FinishJobWizard extends WizFinish {
 							$newmessage->description = "";
 							$newmessage->userid = $USER->id;
 							$newmessage->modifydate = $messagegroup->modified;//QuickQuery("select now()");
+							$newmessage->languagecode = "en";
 							$newmessage->deleted = 1;
 							if ($type == 'email') {
 								$newmessage->subject = $message["subject"];
