@@ -332,7 +332,7 @@ class Message extends DBMappedObject {
 		return $parts;
 	}
 	
-	function format ($parts, $translatable = false) {
+	function format ($parts) {
 		$map = FieldMap::getMapNames();
 		$data = "";
 		$voices = DBFindMany("Voice", "from ttsvoice");
@@ -342,7 +342,7 @@ class Message extends DBMappedObject {
 				$currvoiceid = $part->voiceid;
 			} else if($part->voiceid && $part->voiceid != $currvoiceid){
 				$voicestr = "[[" . ucfirst($voices[$part->voiceid]->language) . "]]";
-				$data .= $translatable ? ('<input value="' . escapehtml($voicestr) . '"/>') : $voicestr;
+				$data .= $voicestr;
 				$currvoiceid = $part->voiceid;
 			}
 			
@@ -369,7 +369,7 @@ class Message extends DBMappedObject {
 			}
 			
 			if ($partstr != '')
-				$data .= ($translatable && !in_array($part->type, array('T','I'))) ? ('<input value="' . escapehtml($partstr) . '"/>') : $partstr;
+				$data .= $partstr;
 		}
 
 		return $data;
