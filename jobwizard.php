@@ -42,6 +42,7 @@ require_once("obj/Sms.obj.php");
 require_once("obj/Content.obj.php");
 require_once("inc/reportgeneratorutils.inc.php");
 require_once("inc/auth.inc.php");
+require_once("obj/MessageGroup.obj.php");
 
 // Job step form data
 require_once("jobwizard.inc.php");
@@ -67,21 +68,23 @@ $wizdata = array(
 	"start" => new JobWiz_start(_L("Job Type")),
 	"list" => new JobWiz_listChoose(_L("List")),
 	"message" => new WizSection("Message",array(
+		"options" => new JobWiz_messageOptions(_L("Message Options")),
 		"pick" => new JobWiz_messageType(_L("Delivery Methods")),
 		"select" => new JobWiz_messageSelect(_L("Message Source")),
+		"pickmessage" => new JobWiz_messageGroupChoose(_L("Message")),
 		"phone" => new WizSection ("Phone",array(
-			"pick" => new JobWiz_messagePhoneChoose(_L("Phone: Message")),
+			//"pick" => new JobWiz_messagePhoneChoose(_L("Phone: Message")),
 			"text" => new JobWiz_messagePhoneText(_L("Text-to-speech")),
 			"translate" => new JobWiz_messagePhoneTranslate(_L("Translations")),
 			"callme" => new JobWiz_messagePhoneEasyCall(_L("Record"))
 		)),
 		"email"	=> new WizSection ("Email",array(
-			"pick" => new JobWiz_messageEmailChoose(_L("Email: Message")),
+			//"pick" => new JobWiz_messageEmailChoose(_L("Email: Message")),
 			"text" => new JobWiz_messageEmailText(_L("Compose Email")),
 			"translate" => new JobWiz_messageEmailTranslate(_L("Translations"))
 		)),
 		"sms" => new WizSection ("SMS",array(
-			"pick" => new JobWiz_messageSmsChoose(_L("SMS: SMS Text")),
+			//"pick" => new JobWiz_messageSmsChoose(_L("SMS: SMS Text")),
 			"text" => new JobWiz_messageSmsText(_L("SMS Text"))
 		))
 	)),
@@ -294,9 +297,9 @@ class FinishJobWizard extends WizFinish {
 									$phoneMsg = array_merge($phoneMsg, $this->phoneTextTranslation($postdata["/message/phone/translate"]));
 							}
 							break;
-						case "pick":
-							$phoneMsg = $this->phoneRecordedMessage($postdata["/message/phone/pick"]);
-							break;
+						//case "pick":
+						//	$phoneMsg = $this->phoneRecordedMessage($postdata["/message/phone/pick"]);
+						//	break;
 						default:
 							error_log($postdata["/message/select"]["phone"] . " is an unknown value for ['/message/select']['phone']");
 					}
@@ -324,9 +327,9 @@ class FinishJobWizard extends WizFinish {
 							if (isset($postdata["/message/email/text"]["translate"]) && $postdata["/message/email/text"]["translate"])
 								$emailMsg = array_merge($emailMsg, $this->emailTextTranslation($postdata["/message/email/text"], $postdata["/message/email/translate"]));
 							break;
-						case "pick":
-							$emailMsg = $this->emailSavedMessage($postdata["/message/email/pick"]);
-							break;
+						//case "pick":
+						//	$emailMsg = $this->emailSavedMessage($postdata["/message/email/pick"]);
+						//	break;
 						default:
 							error_log($postdata["/message/select"]["email"] . " is an unknown value for ['/message/select']['email']");
 					}
@@ -348,13 +351,13 @@ class FinishJobWizard extends WizFinish {
 								"language" => "english"
 							));
 							break;
-						case "pick":
-							$smsMsg = array("Default" => array(
-								"id" => $postdata["/message/sms/pick"]["message"],
-								"text" => false,
-								"language" => "english"
-							));
-							break;
+						//case "pick":
+						//	$smsMsg = array("Default" => array(
+						//		"id" => $postdata["/message/sms/pick"]["message"],
+						//		"text" => false,
+						//		"language" => "english"
+						//	));
+						//	break;
 						default:
 							error_log($postdata["/message/select"]["sms"] . " is an unknown value for ['/message/select']['sms']");
 					}
@@ -378,6 +381,7 @@ class FinishJobWizard extends WizFinish {
 			"jobtype" => $jobtype->id,
 			"jobname" => $jobname,
 			"lists" => json_decode($postdata["/list"]["listids"]),
+			"Messagegroup" => "",          // Add this 
 			"phone" => $phoneMsg,
 			"email" => $emailMsg,
 			"sms" => $smsMsg,
@@ -464,12 +468,7 @@ class FinishJobWizard extends WizFinish {
 		$job->name = $jobsettings['jobname'];
 		$job->description = "";
 
-		$jobtypes = array();
-		foreach (array("phone","email","sms","print") as $type)
-			if (isset($jobsettings[$type]) && $jobsettings[$type])
-				$jobtypes[] = $type;
-
-		$job->type = implode(",",$jobtypes);
+		$job->type = 'notification';
 		$job->modifydate = QuickQuery("select now()");
 		$job->createdate = QuickQuery("select now()");
 		$job->scheduleid = null;
@@ -484,82 +483,102 @@ class FinishJobWizard extends WizFinish {
 		$job->status = "new";
 		$job->create();
 
-
-		foreach (array("phone","email","sms","print") as $type){
-			if ($jobsettings[$type]) {
-				// there is a message for this type
-				$messages = $jobsettings[$type];
-				foreach ($messages as $title => $message) {
-					$lang = isset($message['language'])?$message['language']:"english";
-					if (!$message['id']) {
-						// create a new message
-						$voiceid = null;
-						if ($type == 'phone') {
-							$voiceid = QuickQuery("select id from ttsvoice where language=? and gender=?",false,array($lang,$message["gender"]));
-							if($voiceid === false)
-								$voiceid = 1; // default to english
-						}
-						$newmessage = new Message();
-						$newmessage->type = $type;
-						$newmessage->name = ($jobsettings["jobname"]);
-						$newmessage->description = "";
-						$newmessage->userid = $USER->id;
-						$newmessage->modifydate = QuickQuery("select now()");
-						$newmessage->deleted = 1;
-						if ($type == 'email') {
-							$newmessage->subject = $message["subject"];
-							$newmessage->fromname = ($message["fromname"])?$message["fromname"]:$USER->firstname." ".$USER->lastname;
-							$newmessage->fromemail = ($message["from"]);
-						}
-						$newmessage->stuffHeaders();
-						$newmessage->create();
-
-						/* This chunk parses the message contents and stuffs it in message parts. It is commented out and replaced by the next code that just stuffs all the text into one message part.
-						$parts = $newmessage->parse($message["text"]);
-						foreach ($parts as $part) {
-							$part->voiceid = $voiceid;
-							$part->messageid = $newmessage->id;
-							$part->create();
-						}*/
-						$part = new MessagePart();
-						$part->messageid = $newmessage->id;
-						$part->type = "T";
-						$part->txt = $message["text"];
-						$part->voiceid = $voiceid;
-						$part->sequence = 0;
-						$part->create();
-
-						if (isset($message['attachments']) && $message['attachments']) {
-							foreach ($message['attachments'] as $cid => $details) {
-								$msgattachment = new MessageAttachment();
-								$msgattachment->messageid = $newmessage->id;
-								$msgattachment->contentid = $cid;
-								$msgattachment->filename = $details->name;
-								$msgattachment->size = $details->size;
-								$msgattachment->deleted = 1;
-								$msgattachment->create();
+		$messagegroupid = null;
+		if (wizHasMessageGroup($postdata)) {
+			$messagegroupid = $postdata["/message/pickmessage"]["messagegroup"];
+		} else {
+			$messagegroup = new MessageGroup();
+			$messagegroup->userid = $USER->id;
+			$messagegroup->name = $jobsettings["jobname"];
+			$messagegroup->description = "";
+			$messagegroup->modified = date("Y-m-d H:i:s", time());
+			$messagegroup->deleted = 1;
+			$messagegroup->create();
+			$messagegroupid = $messagegroup->id;
+			foreach (array("phone","email","sms") as $type){
+				if ($jobsettings[$type]) {
+					// there is a message for this type
+					$messages = $jobsettings[$type]; // There may be many messages for each type
+					foreach ($messages as $title => $message) {
+						$lang = isset($message['language'])?$message['language']:"english";
+						if (!$message['id']) {
+							// create a new message
+							$voiceid = null;
+							if ($type == 'phone') {
+								$voiceid = QuickQuery("select id from ttsvoice where language=? and gender=?",false,array($lang,$message["gender"]));
+								if($voiceid === false)
+									$voiceid = 1; // default to english
 							}
+							$newmessage = new Message();
+							$newmessage->messagegroupid = $messagegroup->id;
+							$newmessage->type = $type;
+							switch($type) {
+								case 'phone':
+									$newmessage->subtype = 'voice';
+									break;
+								case 'email':
+									$newmessage->subtype = 'plain';  // TODO: Add HTML support to wizard
+									break;
+								default:
+									$newmessage->subtype = 'plain';
+									break;
+							}
+
+							$newmessage->autotranslate = 'none';
+
+							$newmessage->name = ($jobsettings["jobname"]);
+							$newmessage->description = "";
+							$newmessage->userid = $USER->id;
+							$newmessage->modifydate = $messagegroup->modified;//QuickQuery("select now()");
+							$newmessage->deleted = 1;
+							if ($type == 'email') {
+								$newmessage->subject = $message["subject"];
+								$newmessage->fromname = ($message["fromname"])?$message["fromname"]:$USER->firstname." ".$USER->lastname;
+								$newmessage->fromemail = ($message["from"]);
+							}
+							$newmessage->stuffHeaders();
+							$newmessage->create();
+
+							/* This chunk parses the message contents and stuffs it in message parts. It is commented out and replaced by the next code that just stuffs all the text into one message part.
+							$parts = $newmessage->parse($message["text"]);
+							foreach ($parts as $part) {
+								$part->voiceid = $voiceid;
+								$part->messageid = $newmessage->id;
+								$part->create();
+							}*/
+							$part = new MessagePart();
+							$part->messageid = $newmessage->id;
+							$part->type = "T";
+							$part->txt = $message["text"];
+							$part->voiceid = $voiceid;
+							$part->sequence = 0;
+							$part->create();
+
+							if (isset($message['attachments']) && $message['attachments']) {
+								foreach ($message['attachments'] as $cid => $details) {
+									$msgattachment = new MessageAttachment();
+									$msgattachment->messageid = $newmessage->id;
+									$msgattachment->contentid = $cid;
+									$msgattachment->filename = $details->name;
+									$msgattachment->size = $details->size;
+									$msgattachment->deleted = 1;
+									$msgattachment->create();
+								}
+							}
+							//$messageid = $newmessage->id;
+						} else {
+							//$messageid = $message['id'];
 						}
-						$messageid = $newmessage->id;
-					} else {
-						$messageid = $message['id'];
 					}
-
-					$joblang = new JobLanguage();
-					$joblang->jobid = $job->id;
-					$joblang->messageid = $messageid;
-					$joblang->type = $type;
-					$joblang->language = ucfirst($lang);
-					$joblang->translationeditlock = isset($message['override'])?$message['override']:0;
-					$joblang->create();
-
-					// TODO: english is currently set to default everywhere. This needs to be a customer setting or something
-					$typemessageid = $type."messageid";
-					if ($message['language'] == 'english')
-						$job->$typemessageid = $messageid;
 				}
 			}
+
+
 		}
+		$job->messagegroupid = $messagegroupid;//$messageid;
+		//TODO
+		//When the user picks an existing message the messageid is a message group
+		//but when the content is created on the fly.....
 
 		// store job lists
 		$listids = $jobsettings['lists'];
