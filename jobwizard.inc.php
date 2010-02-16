@@ -1147,13 +1147,17 @@ class JobWiz_messagePhoneTranslate extends WizStep {
 		global $USER;
 		if (!$USER->authorize("sendphone" || !$USER->authorize("sendmulti")))
 			return false;
-		if ((isset($postdata["/start"]["package"]) && $postdata["/start"]["package"] == 'express' && isset($postdata['/message/phone/text']['translate']) && $postdata['/message/phone/text']['translate']) ||
-			(isset($postdata["/start"]["package"]) && $postdata["/start"]["package"] == 'custom' && isset($postdata['/message/pick']['type']) && in_array('phone', $postdata['/message/pick']['type']) &&
-				isset($postdata["/message/select"]['phone']) && $postdata["/message/select"]['phone'] == 'text' && isset($postdata['/message/phone/text']['translate']) && $postdata['/message/phone/text']['translate'])
-		)
-			return true;
-		else
-			return false;
+		if(isset($postdata['/start']['package']) && isset($postdata['/message/phone/text']['translate']) && $postdata['/message/phone/text']['translate']) {
+			$package = $postdata['/start']['package'];
+			if($package == "express" || $package == "personalized") {
+				return true;
+			}
+			if($package == "custom" && isset($postdata['/message/pick']['type']) && in_array('phone',$postdata['/message/pick']['type']) &&
+			   isset($postdata['/message/select']['phone']) && $postdata['/message/select']['phone'] == "text") {
+					return true;
+			}
+		}
+		return false;
 	}
 }
 
@@ -1446,16 +1450,21 @@ class JobWiz_messageEmailTranslate extends WizStep {
 	//returns true if this step is enabled
 	function isEnabled($postdata, $step) {
 		global $USER;
-		if (!$USER->authorize("sendmulti") || !$USER->authorize("sendemail"))
-			return false;
-		if ((isset($postdata["/start"]["package"]) && $postdata["/start"]["package"] == 'express' && isset($postdata['/message/email/text']['translate']) && $postdata['/message/email/text']['translate']) ||
-			(isset($postdata["/start"]["package"]) && $postdata["/start"]["package"] == 'personalized' && isset($postdata['/message/email/text']['translate']) && $postdata['/message/email/text']['translate']) ||
-			(isset($postdata["/start"]["package"]) && $postdata["/start"]["package"] == 'custom' && isset($postdata['/message/pick']['type']) && in_array('email', $postdata['/message/pick']['type']) &&
-				isset($postdata["/message/select"]['email']) && $postdata["/message/select"]['email'] == 'text' && isset($postdata['/message/email/text']['translate']) && $postdata['/message/email/text']['translate'])
-		)
-			return true;
-		else
-			return false;
+		if(isset($postdata['/start']['package']) && isset($postdata['/message/email/text']['translate']) && $postdata['/message/email/text']['translate']) {
+			$package = $postdata['/start']['package'];
+			if($package == "express" || $package == "personalized") {
+				return true;
+			}
+			if($package == "custom" && isset($postdata['/message/pick']['type']) && in_array('email',$postdata['/message/pick']['type'])) {
+				$hasphone = in_array('phone',$postdata['/message/pick']['type']);
+				if(!$hasphone      // Need to check Select page too if Phone whas selected
+					||
+				   ($hasphone && isset($postdata['/message/select']['email']) && $postdata['/message/select']['email'] == "text")) {
+					return true;
+				}
+			}
+		}
+		return false;
 	}
 }
 
