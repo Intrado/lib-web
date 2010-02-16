@@ -53,7 +53,6 @@ function handleRequest() {
 			
 			$audiofile->update();
 			
-			error_log($audiofile->name);
 			return $audiofile->name;
 			
 		// set the delete flag on an audio file
