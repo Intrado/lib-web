@@ -86,6 +86,10 @@ if (isset($_GET['id'])) {
 			$_SESSION['messagegroupid'] = $newmessagegroup->id;
 			
 		redirect();
+	} else {
+		$messagegroup = new MessageGroup(getCurrentMessageGroup());
+		if ($messagegroup->deleted)
+			redirect('messagegroupview.php?id=' . $_GET['id']);
 	}
 }
 
@@ -96,7 +100,8 @@ if (!isset($_SESSION['messagegroupid'])) {
 if (!isset($_SESSION['autotranslatesourcetext']))
 	$_SESSION['autotranslatesourcetext'] = array();
 
-$messagegroup = new MessageGroup(getCurrentMessageGroup());
+if (!isset($messagegroup))
+	$messagegroup = new MessageGroup(getCurrentMessageGroup());
 
 ///////////////////////////////////////////////////////////////////////////////
 // Data Gathering:
@@ -819,6 +824,7 @@ if ($button = $messagegroupsplitter->getSubmit()) {
 																break;
 															} else {
 																$message->deleted = 1;
+																$message->messagegroupid = null;
 																$message->update();
 															}
 														}
@@ -1033,6 +1039,7 @@ if ($button = $messagegroupsplitter->getSubmit()) {
 										}
 										
 										$existingmessage->deleted = 1;
+										$existingmessage->messagegroupid = null;
 										$existingmessage->update();
 										
 										// NOTE: Don't bother updating parts and attachments for deleted messages.
