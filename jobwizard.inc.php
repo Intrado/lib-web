@@ -813,7 +813,7 @@ class JobWiz_messageOptions extends WizStep {
 class JobWiz_messageGroupChoose extends WizStep {
 	function getForm($postdata, $curstep) {
 		global $USER;
-		$messages = QuickQueryList("select id, name, (name +0) as digitsfirst from messagegroup where userid=? and deleted=0 order by digitsfirst,name", true,false,array($USER->id));
+		$messages = QuickQueryList("select g.id, g.name, (g.name +0) as digitsfirst from messagegroup g, message m where g.userid=? and g.deleted=0 and m.messagegroupid = g.id order by digitsfirst,g.name", true,false,array($USER->id));
 		$messages = ($messages === false)?array("" =>_L("-- Select a Message --")):(array("" =>_L("-- Select a Message --")) + $messages);
 
 		$formdata = array();
