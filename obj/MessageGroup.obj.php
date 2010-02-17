@@ -51,7 +51,7 @@ class MessageGroup extends DBMappedObject {
 			return array();
 		
 		if ($this->messages === false)  {
-			$this->messages = DBFindMany("Message", "from message where not deleted and messagegroupid=? order by id", false, array($this->id));
+			$this->messages = DBFindMany("Message", "from message where messagegroupid=? order by id", false, array($this->id));
 		}
 		
 		return $this->messages;
@@ -137,7 +137,7 @@ class MessageGroup extends DBMappedObject {
 		static $summaries = array();
 		
 		if (!isset($summaries[$messagegroupid]))
-			$summaries[$messagegroupid] = QuickQueryMultiRow("select distinct type,subtype,languagecode from message where userid=? and messagegroupid=? and not deleted order by type,subtype,languagecode", true, false, array($USER->id, $messagegroupid));
+			$summaries[$messagegroupid] = QuickQueryMultiRow("select distinct type,subtype,languagecode from message where userid=? and messagegroupid=? order by type,subtype,languagecode", true, false, array($USER->id, $messagegroupid));
 		
 		return $summaries[$messagegroupid];
 	}
