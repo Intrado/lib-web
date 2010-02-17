@@ -31,7 +31,7 @@ require_once("obj/Language.obj.php");
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization
 ////////////////////////////////////////////////////////////////////////////////
-if (!$USER->authorize('createreport') && !$USER->authorize('viewsystemreports')) {
+if (!($USER->authorize('createreport') || $USER->authorize('viewsystemreports'))) {
 	redirect('unauthorized.php');
 }
 
