@@ -1105,7 +1105,7 @@ class JobWiz_messagePhoneTranslate extends WizStep {
 		} else {
 			if(is_array($translations)){
 				foreach($translations as $obj){
-					$languagecode = array_shift($translationlanguagecodes);
+					$languagecode = reset($translationlanguagecodes);
 
 					if(!isset($voices[$languagecode.":".$msgdata->gender]))
 						$gender = ($msgdata->gender == "male")?"female":"male";
@@ -1116,7 +1116,7 @@ class JobWiz_messagePhoneTranslate extends WizStep {
 					$formdata[$languagecode] = $this->getTranslationDataArray($translationlanguages[$languagecode], $languagecode, $obj->responseData->translatedText, $gender, $transient, ($transient?"":$msgdata->text));
 				}
 			} else {
-				$languagecode = array_shift($translationlanguagecodes);
+				$languagecode = reset($translationlanguagecodes);
 				$transient = $this->isTransient($postdata, $languagecode);
 				$formdata[$languagecode] = $this->getTranslationDataArray($translationlanguages[$languagecode], $languagecode, $translations->translatedText, $msgdata->gender, $transient, ($transient?"":$msgdata->text));
 			}
@@ -1416,12 +1416,12 @@ class JobWiz_messageEmailTranslate extends WizStep {
 		} else {
 			if(is_array($translations)) {
 				foreach($translations as $obj){
-					$languagecode = array_shift($translationlanguagecodes);
+					$languagecode = reset($translationlanguagecodes);
 					$transient = $this->isTransient($postdata,$languagecode);
 					$formdata[$languagecode] = $this->getTranslationDataArray($translationlanguages[$languagecode], $languagecode,$obj->responseData->translatedText, false, $transient, ($transient?"":$englishtext));
 				}
 			} else {
-				$languagecode = array_shift($translationlanguagecodes);
+				$languagecode = reset($translationlanguagecodes);
 				$transient = $this->isTransient($postdata, $languagecode);
 				$formdata[$languagecode] = $this->getTranslationDataArray($translationlanguages[$languagecode], $languagecode,$translations->translatedText, false, $transient, ($transient?"":$englishtext));
 			}
