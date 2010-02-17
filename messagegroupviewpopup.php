@@ -26,5 +26,5 @@ require_once("obj/Language.obj.php");
 require_once("messagegroup.inc.php");
 
 
-$popup = false;
+$popup = true;
 include_once('messagegroupview.inc.php');
