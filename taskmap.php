@@ -126,6 +126,7 @@ if ($datatype == "person") {
 	$maptofields["u11"] = "Access Profile";
 	$maptofields["u12"] = "Restricted Job Types";
 	$maptofields["okey"] = "Organization";
+	$maptofields["u10"] = "Staff ID";
 	$maptofields["sep"] = "--------------";
 
 	//F fields, limit to multisearch
@@ -151,11 +152,20 @@ if ($datatype == "person") {
 	}
 
 } else if ($datatype == "enrollment") {
+	
 	$maptofields = array();
 	$maptofields[""] = "- Unmapped -";
 	$maptofields["pkey"] = "Person ID";
-	$maptofields["okey"] = "Organization";
 	$maptofields["skey"] = "Section";
+	$maptofields["okey"] = "Organization";
+	
+} else if ($datatype == "section") {
+	
+	$maptofields = array();
+	$maptofields[""] = "- Unmapped -";
+	$maptofields["skey"] = "Section";
+	$maptofields["okey"] = "Organization";
+	$maptofields["u10"] = "Staff ID"; // 'u10' is used in user import, and keys of $maptofields must be 4 chars or less, so cannot use 'staffpkey' or something nicer
 
 	$fieldmaps = DBFindMany("FieldMap","from fieldmap where fieldnum like 'c%' order by fieldnum");
 	//C fields
