@@ -576,3 +576,40 @@ $$$
 
 ALTER TABLE `section` ADD INDEX ( `importid` , `importstatus` )  
 $$$
+
+
+
+-- $rev 8
+
+ALTER TABLE `import` CHANGE `datatype` `datatype` ENUM( 'person', 'user', 'enrollment', 'section' ) NOT NULL DEFAULT 'person'
+$$$
+
+
+ALTER TABLE `userassociation` ADD `id` INT NOT NULL AUTO_INCREMENT PRIMARY KEY FIRST
+$$$
+
+ALTER TABLE `personassociation` ADD `id` INT NOT NULL AUTO_INCREMENT PRIMARY KEY FIRST
+$$$
+
+ALTER TABLE `section` DROP INDEX organizationid
+$$$
+
+ALTER TABLE `section` DROP INDEX `skey` ,
+ADD UNIQUE `skey` ( `organizationid` , `skey` ( 10 ) )
+$$$
+
+delete from persondatavalues where fieldnum like 'c%'
+$$$
+
+CREATE TABLE publish (
+  id int(11) NOT NULL auto_increment,
+  userid int(11) NOT NULL,
+  `action` enum('publish','subscribe') NOT NULL,
+  `type` enum('messagegroup') NOT NULL,
+  messagegroupid int(11) default NULL,
+  PRIMARY KEY  (id),
+  KEY userid (userid),
+  KEY messagegroupid (messagegroupid)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
+
+
