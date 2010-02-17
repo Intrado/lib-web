@@ -18,10 +18,10 @@
 //require_once("../obj/MessageGroup.obj.php");
 //require_once("../obj/Message.obj.php");
 //require_once("../obj/MessagePart.obj.php");
-require_once("../obj/AudioFile.obj.php");
+//require_once("../obj/AudioFile.obj.php");
 require_once("../obj/FieldMap.obj.php");
-require_once("../obj/Rule.obj.php");
-require_once("../obj/ListEntry.obj.php");
+//require_once("../obj/Rule.obj.php");
+//require_once("../obj/ListEntry.obj.php");
 
 //some old or transitional objects used here
 require_once("upgrades/db_7-5_oldcode.php");
@@ -193,8 +193,7 @@ function upgrade_7_5 ($rev, $shardid, $customerid, $db) {
 			}
 			
 			
-			
-			$schoolfieldnum = FieldMap::getFieldnumWithOption('school');
+			$schoolfieldnum = QuickQuery("select fieldnum from fieldmap where options like '%school%'");
 			if ($schoolfieldnum) {
 				$num = substr($schoolfieldnum,1) + 0;
 				
@@ -287,8 +286,8 @@ function upgrade_7_5 ($rev, $shardid, $customerid, $db) {
 			echo "|";
 			apply_sql("upgrades/db_7-5_pre.sql",$customerid,$db, 4);
 			
-			$fieldmaps = FieldMap::retrieveFieldMaps();
-			$fieldmaps["f03"]->updatePersonDataValues();
+			$f03 = DBFind("FieldMap","from fieldmap where fieldnum='f03'",false,false,$db);
+			$f03->updatePersonDataValues();
 		case 4:
 			// upgrade from rev 4 to rev 5
 			echo "|";
