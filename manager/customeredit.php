@@ -319,7 +319,7 @@ if(CheckFormSubmit($f,"Save") || CheckFormSubmit($f, "Return")) {
 				}
 
 				if(GetFormData($f,$s, "newlang")!="" && GetFormData($f,$s, "newlangcode")!=""){
-					QuickUpdate("insert into language(name,code) values ('" . GetFormData($f, $s, "newlang") . "','" . GetFormData($f, $s, "newlangcode") . "')", $custdb);
+					QuickUpdate("insert into language(name,code) values ('" . trim(GetFormData($f, $s, "newlang")) . "','" . trim(GetFormData($f, $s, "newlangcode")) . "')", $custdb);
 				}
 
 				//Logo
