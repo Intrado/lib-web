@@ -813,18 +813,8 @@ class JobWiz_messageOptions extends WizStep {
 class JobWiz_messageGroupChoose extends WizStep {
 	function getForm($postdata, $curstep) {
 		global $USER;
-		$values = array();
-
 		$messages = QuickQueryList("select id, name, (name +0) as digitsfirst from messagegroup where userid=? and deleted=0 order by digitsfirst,name", true,false,array($USER->id));
 		$messages = ($messages === false)?array("" =>_L("-- Select a Message --")):(array("" =>_L("-- Select a Message --")) + $messages);
-
-		//$messagelist = DBFindMany("MessageGroup","from messagegroup where userid=" . $USER->id ." and deleted=0 order by name");
-//		foreach ($messagelist as $id => $message) {
-//			$phonemessage[$id]['name'] = $message->name;
-//			$values[] = $id;
-//		}
-
-
 
 		$formdata = array();
 
@@ -838,6 +828,13 @@ class JobWiz_messageGroupChoose extends WizStep {
 				array("ValInArray","values"=>array_keys($messages))
 			),
 			"control" => array("SelectMenu","width"=>"80%", "values"=>$messages),
+			"helpstep" => 1
+		);
+
+		require_once("inc/MessageGroupSummery.inc.php");
+		$formdata["messagegrid"] = array(
+			"label" => _L('Message Info'),
+			"control" => array("FormHtml","html" => makeMessageGroupSummaryTable('messageGroupChoose','messagegroup')),
 			"helpstep" => 1
 		);
 		return new Form("messageGroupChoose",$formdata,$helpsteps);

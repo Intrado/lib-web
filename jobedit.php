@@ -515,43 +515,6 @@ $helpsteps[] = _L("The name of your job. The best names are brief and discriptiv
 	$helpsteps[] = _L("Message");
 	$helpsteps[] = _L("Advanced");
 
-
-	$messageinfogrid = "
-				<div id='jobedit_messagegrid'></div>
-				<script type=\"text/javascript\">
-					document.observe('dom:loaded', function() {
-						" . ($submittedmode || $completedmode?"":"$('jobedit_message').observe('change', load_messageinfo);") . "
-						load_messageinfo();
-					});
-					function load_messageinfo() {
-						var request = 'ajax.php?ajax&type=messagegrid&id=' + " . ($submittedmode || $completedmode?"$job->messagegroupid":"$('jobedit_message').value;") . "
-						cachedAjaxGet(request,function(result) {
-							var response = result.responseJSON;
-
-							var str = '<table style=\'border-width:1px;\'>';
-							response.headers.each(function(title) {
-								str += '<th>' + title + '</th>';
-							});
-							response.data.each(function(item) {
-								str += '<tr>';
-								//console.info(item.languagecode +item.Phone + item.Email);
-									str += '<td>' + item.language + '</td>';
-								if(response.headers[item.Phone])
-									str += '<td>' + (item.Phone!=0?'<img src=\'img/icons/accept.gif\' />':'') + '</td>';
-								if(response.headers[item.Email])
-									str += '<td>' + (item.Email!=0?'<img src=\'img/icons/accept.gif\' />':'') + '</td>';
-								if(response.headers[item.SMS])
-									str += '<td>' + (item.SMS!=0?'<img src=\'img/icons/accept.gif\' />':'') + '</td>';
-								str += '</tr>';
-							});
-							str += '</table>';
-							$('jobedit_messagegrid').update(str);
-						});
-					}
-				</script>";
-
-
-
 	if($submittedmode || $completedmode) {
 		$formdata[] = _L('Job Lists');
 
@@ -574,7 +537,7 @@ $helpsteps[] = _L("The name of your job. The best names are brief and discriptiv
 		);
 		$formdata["messagegrid"] = array(
 			"label" => _L('Message Info'),
-			"control" => array("FormHtml","html" => $messageinfogrid),
+			"control" => array("FormHtml","html" => makeMessageGroupSummaryTable('jobedit','message',true,$job->messagegroupid)),
 			"helpstep" => 5
 		);
 		$formdata[] = _L('Advanced Options ');
@@ -647,7 +610,7 @@ $helpsteps[] = _L("The name of your job. The best names are brief and discriptiv
 
 		$formdata["messagegrid"] = array(
 			"label" => _L('Message Info'),
-			"control" => array("FormHtml","html" => $messageinfogrid),
+			"control" => array("FormHtml","html" => makeMessageGroupSummaryTable('jobedit','message')),
 			"helpstep" => 5
 		);
 

@@ -20,6 +20,7 @@ require_once("obj/RenderedList.obj.php");
 require_once("obj/FieldMap.obj.php");
 require_once("obj/Schedule.obj.php");
 require_once("obj/ValDuplicateNameCheck.val.php");
+require_once("inc/MessageGroupSummery.inc.php");
 
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization
