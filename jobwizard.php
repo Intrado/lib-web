@@ -110,7 +110,7 @@ class FinishJobWizard extends WizFinish {
 					"id" => $data,
 					"text" => "",
 					"gender" => "",
-					"language" => ($lang == "Default")?"english":strtolower($lang),
+					"language" => ($lang == "Default")?"en":strtolower($lang),
 					"override" => false
 				);
 		}
@@ -122,7 +122,7 @@ class FinishJobWizard extends WizFinish {
 			"id" => "",
 			"text" => $msgdata->text,
 			"gender" => $msgdata->gender,
-			"language" => 'english',
+			"language" => 'en',
 			"override" => false
 		));
 	}
@@ -154,7 +154,7 @@ class FinishJobWizard extends WizFinish {
 					"subject" => "",
 					"attachments" => "",
 					"text" => "",
-					"language" => ($lang == "Default")?"english":strtolower($lang),
+					"language" => ($lang == "Default")?"en":strtolower($lang),
 					"override" => false
 				);
 		}
@@ -350,14 +350,14 @@ class FinishJobWizard extends WizFinish {
 								$smsMsg = array("Default" => array(
 									"id" => false,
 									"text" => getSmsMessageLinkText(),
-									"language" => "english"
+									"language" => "en"
 								));
 								break;
 							case "text":
 								$smsMsg = array("Default" => array(
 									"id" => false,
 									"text" => $postdata["/message/sms/text"]["message"],
-									"language" => "english"
+									"language" => "en"
 								));
 								break;
 							//case "pick":
