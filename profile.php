@@ -312,6 +312,22 @@ _L('Messaging Options'),
 		"control" => array("CheckBox"),
 		"helpstep" => 4
 	),
+	"publishmessagegroup" => array(
+		"label" => _L('Publish Message Groups'),
+		"fieldhelp" => _L('Allows users to publish message groups. These message groups can be used by any user with the "Subscribe to Message Groups" privilege.'),
+		"value" => $obj->getValue("publishmessagegroup"),
+		"validators" => array(),
+		"control" => array("CheckBox"),
+		"helpstep" => 9
+	),
+	"subscribemessagegroup" => array(
+		"label" => _L('Subscribe to Message Groups'),
+		"fieldhelp" => _L('Allows users to view and subscribe to published message groups.'),
+		"value" => $obj->getValue("subscribemessagegroup"),
+		"validators" => array(),
+		"control" => array("CheckBox"),
+		"helpstep" => 9
+	),
 _L('Classroom Messaging Options'),
 	"targetedmessage" => array(
 		"label" => _L('Send Classroom Messages'),
@@ -680,6 +696,8 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 			$obj->setPermission("viewsystemcompleted", (bool)$postdata['viewsystemcompleted']);
 			$obj->setPermission("leavemessage", (bool)$postdata['leavemessage']);
 			$obj->setPermission("messageconfirmation", (bool)$postdata['messageconfirmation']);
+			$obj->setPermission("publishmessagegroup", (bool)$postdata['publishmessagegroup']);
+			$obj->setPermission("subscribemessagegroup", (bool)$postdata['subscribemessagegroup']);
 
 			if(getSystemSetting("_hasportal", false)) {
 				$obj->setPermission("portalaccess", (bool)$postdata['portalaccess']);

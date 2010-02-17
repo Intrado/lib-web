@@ -5,12 +5,11 @@
 require_once("inc/common.inc.php");
 require_once("inc/securityhelper.inc.php");
 require_once("obj/MessageGroup.obj.php");
-//require_once("obj/Message.obj.php");
-//require_once("obj/MessagePart.obj.php");
 require_once("obj/AudioFile.obj.php");
 require_once("obj/FieldMap.obj.php");
 require_once("obj/SurveyQuestionnaire.obj.php");
 require_once("obj/SurveyQuestion.obj.php");
+require_once("obj/Publish.obj.php");
 require_once("inc/html.inc.php");
 require_once("inc/form.inc.php");
 require_once("inc/table.inc.php");
@@ -23,6 +22,53 @@ require_once("inc/formatters.inc.php");
 ////////////////////////////////////////////////////////////////////////////////
 if (!$USER->authorize(array('sendmessage', 'sendemail', 'sendphone', 'sendsms'))) {
 	redirect('unauthorized.php');
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// Request processing:
+///////////////////////////////////////////////////////////////////////////////
+// requests to publish a messagegroupid
+if (isset($_GET['messagegroupid']) && isset($_GET['publish'])) {
+	// check this is a vaild messagegroup id and it's owned by this user
+	$msgGroup = DBFind("MessageGroup", "from messagegroup where id = ? and userid = ?", false, array($_GET['messagegroupid'], $USER->id));
+	if ($msgGroup) {
+		// create a new publish dbmo
+		$publish = new Publish();
+		$publish->userid = $USER->id;
+		$publish->action = 'publish';
+		$publish->type = 'messagegroup';
+		$publish->messagegroupid = $msgGroup->id;
+		$publish->create();
+		
+		notice(_L("The message, %s, is now published.", escapehtml($msgGroup->name)));
+	}
+	
+	redirect();
+}
+
+// requests to remove a publishid
+if (isset($_GET['publishid']) && isset($_GET['remove'])) {
+	// check that this is a vaid publish id
+	$publish = DBFind("Publish", "from publish where id = ? and userid = ? and type = 'messagegroup'", false, array($_GET['publishid'], $USER->id));
+	if ($publish) {
+		// get the message group for this published item
+		$msgGroup = DBFind("MessageGroup", "from messagegroup where id = ?", false, array($publish->messagegroupid));
+		// is it published or subscription
+		$ispublished = ($publish->action == 'publish');
+		$issubscribed = ($publish->action == 'subscribe');
+		// if the message group is valid  and user can publish message groups and it is published, remove it and all subscriptions
+		if ($msgGroup->userid == $USER->id && $USER->authorize('publishmessagegroup') && $ispublished) {
+			QuickQuery("delete from publish where type = 'messagegroup' and messagegroupid = ?", false, array($msgGroup->id));
+			notice(_L("The message, %s, is no longer published. All subscribers to this message have been removed.", escapehtml($msgGroup->name)));
+		}
+		// if the user can subscribe and it is a subscription, remove the subscription
+		if ($USER->authorize('subscribemessagegroup') && $issubscribed) {
+			$publish->destroy();
+			notice(_L("You are no longer subscribed to message, %s.", escapehtml($msgGroup->name)));
+		}
+	}
+	
+	redirect();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -65,10 +111,23 @@ if($isajax === true) {
 			break;
 	}
 	$mergeditems = QuickQueryMultiRow("
-			select SQL_CALC_FOUND_ROWS 'message' as type,'Saved' as status,g.id as id, g.name as name, g.modified as date, g.deleted as deleted,
-			 sum(m.type='phone') as phone, sum(m.type='email') as email,sum(m.type='sms') as sms
-			from messagegroup g, message m where g.userid=? and g.deleted = 0 and m.messagegroupid = g.id
-			group by g.id order by g.$orderby limit $start,$limit",true,false,array($USER->id));
+		select SQL_CALC_FOUND_ROWS 'message' as type,'Saved' as status, 
+			g.id as id, g.name as name, g.modified as date, g.deleted as deleted, 
+			sum(m.type='phone') as phone, sum(m.type='email') as email,
+			sum(m.type='sms') as sms, p.action as publishaction, p.id as publishid, u.login as owner
+		from messagegroup g
+			join message m on
+				(m.messagegroupid = g.id)
+			join user u on
+				(g.userid = u.id)
+			left join publish p on
+				(p.userid=? and p.messagegroupid = m.messagegroupid)
+		where not g.deleted and
+			(g.userid=? or g.id in (select messagegroupid from publish where userid=? and type = 'messagegroup'))
+		group by g.id
+		order by g.$orderby 
+		limit $start,$limit",
+		true,false,array($USER->id,$USER->id,$USER->id));
 
 
 	$total = QuickQuery("select FOUND_ROWS()");
@@ -95,13 +154,44 @@ if($isajax === true) {
 			$title = escapehtml($item["name"]);
 			$defaultlink = "messagegroup.php?id=$itemid";
 			$content = '<a href="' . $defaultlink . '" >' . $time .  ' - <b>' .  _L('%1$s Content',typestring(substr($types,1))). '</b>' . '</a>';
+			$publishaction = $item['publishaction'];
+			$publishid = $item['publishid'];
+			
+			$icon = 'img/largeicons/letter.jpg';
+			
+			// give the user some text
+			$publishmessage = '';
+			if ($publishaction == 'publish')
+				$publishmessage = _L('Changes to this message are published.');
+			if ($publishaction == 'subscribe')
+				$publishmessage = _L('You are subscribed to this message. Owner: (%s)', $item['owner']);
 
-			$icon = 'largeicons/letter.jpg';
-
-			$tools = action_links (
-				action_link("Edit", "pencil", 'messagegroup.php?id=' . $itemid),
-				action_link("Delete", "cross", 'messages.php?delete=' . $itemid, "return confirmDelete();"),
-				action_link("Rename", "textfield_rename", 'messagerename.php?id=' . $itemid));
+			// Users with published messages or subscribed messages will get a special action item
+			$publishactionlink = "";
+			if ($USER->authorize("publishmessagegroup")) {
+				// this message is published, else allow it to be
+				if ($publishaction == 'publish')
+					$publishactionlink = action_link("Un-Publish", "fugue/star__minus", "messages.php?publishid=$publishid&remove");
+				else
+					$publishactionlink = action_link("Publish", "fugue/star__plus", "messages.php?messagegroupid=$itemid&publish");
+			}
+			if ($USER->authorize("subscribemessagegroup")) {
+				// this message is subscribed to
+				if ($publishaction == 'subscribe')
+					$publishactionlink = action_link("Un-Subscribe", "fugue/star__minus", "messages.php?publishid=$publishid&remove");
+			}
+			
+			// if the user is only subscribed to this message group, they can't edit, delete, rename
+			if ($publishaction == 'subscribe')
+				$tools = action_links (
+					action_link("Preview", "fugue/control", 'messagegroupview.php?id=' . $itemid),
+					$publishactionlink);
+			else
+				$tools = action_links (
+					action_link("Edit", "pencil", 'messagegroup.php?id=' . $itemid),
+					$publishactionlink,
+					action_link("Delete", "cross", 'messages.php?delete=' . $itemid, "return confirmDelete();"),
+					action_link("Rename", "textfield_rename", 'messagerename.php?id=' . $itemid));
 
 
 			$data->list[] = array("itemid" => $itemid,
@@ -109,11 +199,11 @@ if($isajax === true) {
 										"icon" => $icon,
 										"title" => $title,
 										"content" => $content,
-										"tools" => $tools);
+										"tools" => $tools,
+										"publishmessage" => $publishmessage);
 
 		}
 	}
-
 
 	$data->pageinfo = array($numpages,$limit,$curpage, "Showing $displaystart - $displayend of $total records on $numpages pages ");
 
@@ -161,8 +251,9 @@ startWindow(_L('My Messages'), 'padding: 3px;', true, true);
 <tr>
 	<td class="feed" style="width: 180px;vertical-align: top;font-size: 12px;" >
 		<div>
-		<?= icon_button(_L('Create New Message'),"add","location.href='messagegroup.php?id=new'") ?>
-		<div style="clear:both;"></div>
+			<?= icon_button(_L('Create New Message'),"add","location.href='messagegroup.php?id=new'") ?>
+			<?= icon_button(_L('Subscribe to Message'),"add", "popup('messagegroupsubscribepopup.php', 400, 500)") ?>
+			<div style="clear:both;"></div>
 		</div>
 		<br />
 		<h1 id="filterby">Sort By:</h1>
@@ -204,18 +295,62 @@ function applyfilter(filter) {
 		onSuccess: function (response) {
 			var result = response.responseJSON;
 			if(result) {
-				var html = '';
+				$('feeditems').update();
 				var size = result.list.length;
 
-				for(i=0;i<size;i++){
+				for(var i=0;i<size;i++){
 					var item = result.list[i];
-					html += '<tr><td valign=\"top\" width=\"60px\"><a href=\"' + item.defaultlink + '\"><img src=\"img/' + item.icon + '\" /></a></td><td ><div class=\"feedtitle\"><a href=\"' + item.defaultlink + '\">' + item.title + '</a></div><span>' + item.content + '</span></td>';
-					if(item.tools) {
-						html += '<td valign=\"middle\" width=\"100px\"><div>' + item.tools + '</div></td>';
+					var msg = new Element('tr');
+
+					// insert icon
+					msg.insert(
+							new Element('td', {valign: 'top', width: '60px'}).insert(
+								new Element('a', {href: item.defaultlink}).insert(
+									new Element('img', {src: item.icon})
+								)
+							)
+						);
+					// insert title and content details
+					msg.insert(
+							new Element('td').insert(
+								new Element('div', {class: 'feedtitle'}).insert(
+									new Element('a', {href: item.defaultlink}).insert(
+										item.title
+									)
+								)
+							).insert(
+								((item.publishmessage)?
+									new Element('div', {class: 'feedsubtitle'}).insert(
+										new Element('a', {href: item.defaultlink}).insert(
+											new Element('img', {src: 'img/icons/diagona/10/031.gif'})
+										).insert(
+											item.publishmessage
+										)
+									):
+									''
+								)
+							).insert(
+								new Element('div', {style: "clear: both"})
+							).insert(
+								new Element('div').insert(
+									item.content
+								)
+							)
+						);
+					// insert tools (if there are any)
+					if (item.tools) {
+						msg.insert(
+							new Element('td', {valign: 'middle', width: '100px'}).insert(
+								new Element('div').insert(
+									item.tools
+								)
+							)
+						);
 					}
-					html += '</tr>';
+					
+					$('feeditems').insert({"bottom": msg});
 				}
-				$('feeditems').update(html);
+				//$('feeditems').update(html);
 				var pagetop = new Element('div',{style: 'float:right;'}).update(result.pageinfo[3]);
 				var pagebottom = new Element('div',{style: 'float:right;'}).update(result.pageinfo[3]);
 
