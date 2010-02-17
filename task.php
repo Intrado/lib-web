@@ -56,9 +56,6 @@ foreach($associatedjobs as $importjob){
 	$associatedjobids[$importjob->jobid] = $importjob->jobid;
 }
 
-$enrollmentdataexists = false;
-if (QuickQuery("select count(*) from import where datatype='enrollment'")) $enrollmentdataexists = true;
-
 
 /****************** main message section ******************/
 $form = "taskeditor";
@@ -230,8 +227,8 @@ startWindow('Import Information ');
 							NewFormItem($form, $section, 'datatype', 'selectstart');
 							NewFormItem($form, $section, 'datatype', 'selectoption', "Person", 'person');
 							NewFormItem($form, $section, 'datatype', 'selectoption', "User", 'user');
-							if (!$enrollmentdataexists)
-								NewFormItem($form, $section, 'datatype', 'selectoption', "Enrollment", 'enrollment');
+							NewFormItem($form, $section, 'datatype', 'selectoption', "Section", 'section');
+							NewFormItem($form, $section, 'datatype', 'selectoption', "Enrollment", 'enrollment');
 							NewFormItem($form, $section, 'datatype', 'selectend');
 						} else {
 							echo ucfirst($IMPORT->datatype);
@@ -276,7 +273,7 @@ startWindow('Import Information ');
 							} else if ($IMPORT->datatype == "user") {
 								NewFormItem($form, $section, 'updatemethod', 'selectoption', "Create only", 'createonly');
 								NewFormItem($form, $section, 'updatemethod', 'selectoption', "Full Synchronization", 'full');
-							} // else enrollment is always 'full' and not displayed
+							} // else enrollment and section always 'full' and not displayed
 							NewFormItem($form, $section, 'updatemethod', 'selectend');
 						?>
 					</td>
