@@ -126,7 +126,7 @@ if (isset($_POST['eventContacts']) && isset($_POST['eventMessage']) && isset($_P
 			$alert->update();
 
 			if(!$eventid) {
-				QuickQuery("insert into personassociation values (?,?,?,?,?)",false,array($contact,'event',NULL,NULL,$event->id));
+				QuickQuery("insert into personassociation (personid,type,eventid) values (?,?,?)",false,array($contact,'event',$event->id));
 			}
 			QuickQuery("COMMIT");
 		}
