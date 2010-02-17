@@ -111,7 +111,7 @@ if($isajax === true) {
 			break;
 	}
 	$mergeditems = QuickQueryMultiRow("
-		select SQL_CALC_FOUND_ROWS 'message' as type,'Saved' as status, 
+		select SQL_CALC_FOUND_ROWS 
 			g.id as id, g.name as name, g.modified as date, g.deleted as deleted, 
 			sum(m.type='phone') as phone, sum(m.type='email') as email,
 			sum(m.type='sms') as sms, p.action as publishaction, p.id as publishid, u.login as owner
