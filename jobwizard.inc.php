@@ -831,7 +831,7 @@ class JobWiz_messageGroupChoose extends WizStep {
 			"helpstep" => 1
 		);
 
-		require_once("inc/MessageGroupSummery.inc.php");
+		require_once("inc/MessageGroupSummary.inc.php");
 		$formdata["messagegrid"] = array(
 			"label" => _L('Message Info'),
 			"control" => array("FormHtml","html" => makeMessageGroupSummaryTable('messageGroupChoose','messagegroup')),

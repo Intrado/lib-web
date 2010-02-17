@@ -314,7 +314,7 @@ $startvalues = newform_time_select(NULL, $ACCESS->getValue('callearly'), $ACCESS
 $endvalues = newform_time_select(NULL, $ACCESS->getValue('callearly'), $ACCESS->getValue('calllate'), $USER->getCallLate());
 
 
-$messages = QuickQueryList("select id, name, (name +0) as digitsfirst from messagegroup where userid=? and deleted=0 order by digitsfirst,name", true,false,array($USER->id));
+$messages = QuickQueryList("select g.id, g.name, (g.name +0) as digitsfirst from messagegroup g, message m where g.userid=? and g.deleted=0 and m.messagegroupid = g.id order by digitsfirst,g.name", true,false,array($USER->id));
 if($messages === false) {
 	$messages = array("" =>_L("-- Select a Message --"));
 } else {

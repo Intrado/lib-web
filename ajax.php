@@ -312,21 +312,24 @@ function handleRequest() {
 			$defaultlanguagecode = 'en';
 
 			$result->headers = array();
-			$result->headers[] = "Language";
+			$result->headers['language'] = "&nbsp;";
 			if($cansendphone)
-				$result->headers[] = "Phone";
-			if($cansendemail)
-				$result->headers[] = "Email";
+				$result->headers['phone'] = "Phone";
+			if($cansendemail) {
+				$result->headers['htmlemail'] = "Email (HTML)";
+				$result->headers['plainemail'] = "Email (Plain)";
+			}
 			if($cansendsms)
-				$result->headers[] = "SMS";
-			$query = "select l.name as language
-						" . ($cansendphone?",sum(type='phone') as Phone":"") . "
-						" . ($cansendemail?",sum(type='email') as Email":"") . "
-						" . ($cansendsms?",sum(type='sms') as SMS":"") . "
+				$result->headers['sms'] = "SMS";
+			$query = "select l.name as languagename, l.code as languagecode
+						" . ($cansendphone?",sum(type='phone') as phone":"") . "
+						" . ($cansendemail?",sum(type='email' and subtype='html') as htmlemail":"") . "
+						" . ($cansendemail?",sum(type='email' and subtype='plain') as plainemail":"") . "
+						" . ($cansendsms?",sum(type='sms') as sms":"") . "
 						from message m, language l where m.messagegroupid = ?
 						" . ($cansendmultilingual?"":"and m.languagecode = '$defaultlanguagecode'") . "
 						and m.languagecode = l.code
-						group by language order by language";
+						group by l.name order by l.name";
 			$result->data = QuickQueryMultiRow($query,true,false,array($_GET['id']));
 			return $result;
 		default:
