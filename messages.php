@@ -99,7 +99,7 @@ if($isajax === true) {
 
 	$start = 0 + (isset($_GET['pagestart']) ? $_GET['pagestart'] : 0);
 	$limit = 100;
-	$orderby = "modified desc";
+	$orderby = "g.modified,g.id desc";
 
 	$filter = "";
 	if (isset($_GET['filter'])) {
@@ -107,7 +107,7 @@ if($isajax === true) {
 	}
 	switch ($filter) {
 		case "name":
-			$orderby = "name";
+			$orderby = "g.name,g.id";
 			break;
 	}
 	$mergeditems = QuickQueryMultiRow("
@@ -125,7 +125,7 @@ if($isajax === true) {
 		where not g.deleted and
 			(g.userid=? or g.id in (select messagegroupid from publish where userid=? and type = 'messagegroup'))
 		group by g.id
-		order by g.$orderby 
+		order by $orderby 
 		limit $start,$limit",
 		true,false,array($USER->id,$USER->id,$USER->id));
 
