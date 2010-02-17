@@ -93,23 +93,19 @@ if ($cansendsms) {
 ///////////////////////////////////////////////////////////////////////////////
 $destinationlayoutforms = array();
 foreach ($destinations as $type => $destination) {
+	if (!$messagegroup->hasMessage($type)) {
+		unset($destinations[$type]);
+		continue;
+	}
+		
 	/////////////////////////////////
 	// Accordion Sections
 	// The accordion sections for viewmessagegroup.php do not need javascript interaction with any formitems,
 	// so we can define the entire accordion at the destination-type level.
 	/////////////////////////////////
 	$accordionsplitterchildren = array();
-	$advancedoptionsformdata = array();
-	
-	// Accordion sections for phone and email.
-	if ($type == 'phone') {
-		$gendervalues = array ("female" => "Female","male" => "Male");
-		$advancedoptionsformdata['preferredgender'] = array(
-			"label" => _L('Preferred Voice'),
-			"control" => array("FormHtml", "html" => $gendervalues[$messagegroup->preferredgender]),
-			"helpstep" => 1
-		);
-	} else if ($type == 'email') {
+
+	if ($type == 'email' && count($emailattachments) > 0) {
 		$attachmentshtml = "";
 		
 		foreach ($emailattachments as $emailattachment) {
@@ -128,94 +124,83 @@ foreach ($destinations as $type => $destination) {
 		);
 	}
 	
-	// Accordion sections common to all destination types.	
-	$autoexpirevalues = array(
-		"Yes (Keep for ". getSystemSetting('softdeletemonths', "6") ." months)",
-		"No (Keep forever)"
-	);
-	$advancedoptionsformdata['autoexpire'] = array(
-		"label" => _L('Auto Expire'),
-		"control" => array("FormHtml","html" => $autoexpirevalues[$messagegroup->permanent]),
-		"helpstep" => 1
-	);
-	
-	$accordionsplitterchildren[] = array("title" => _L("Advanced Options"), "icon" => "img/icons/diagona/16/041.gif", "formdata" => $advancedoptionsformdata);
-
 	//////////////////////
 	// Subtypes
 	//////////////////////
-	$countlanguages = count($destination['languages']);
 	$subtypelayoutforms = array();
 
 	foreach ($destination['subtypes'] as $subtype) {
+		if (!$messagegroup->hasMessage($type, $subtype)) {
+			continue;
+		}
+		
 		$messageformsplitters = array();
 
 		// Individual Message (type-subtype-language).
 		foreach ($destination['languages'] as $languagecode => $languagename) {	
-			$messageformdata = array();
-			
 			if (!$message = $messagegroup->getMessage($type,$subtype,$languagecode, 'overridden')) {
-				if (!$message = $messagegroup->getMessage($type,$subtype,$languagecode, 'translated'))
-					$message = $messagegroup->getMessage($type,$subtype,$languagecode, 'none');
+				if (!$message = $messagegroup->getMessage($type,$subtype,$languagecode, 'translated')) {
+					if (!$message = $messagegroup->getMessage($type,$subtype,$languagecode, 'none')) {
+						// NOTE: We want to use the original array $destinations because
+						// when loading a specific tab, we only want to jump to a language
+						// that has a tab.
+						unset($destinations[$type]['languages'][$languagecode]);
+						continue;
+					}
+				}
 			}
 			
-			if ($message) {
-				$parts = DBFindMany('MessagePart', 'from messagepart where messageid=?', false, array($message->id));
-				$messagetext = $subtype != 'html' ? escapehtml($message->format($parts)) : $message->format($parts);
+			$messageformdata = array();
+			
+			$parts = DBFindMany('MessagePart', 'from messagepart where messageid=?', false, array($message->id));
+			if ($subtype == 'html') {
+				$messagetext = str_replace('<<', '&lt;&lt;', $message->format($parts));
+				$messagetext = str_replace('>>', '&gt;&gt;', $messagetext);
+			} else {
+				$messagetext = escapehtml($message->format($parts));
 			}
 			
 			if ($type == 'sms') {
 				$messageformdata["header"] = makeFormHtml("<div class='MessageBodyHeader'>" . _L("SMS Message") . "</div>");
-				if ($message)
-					$messageformdata["message"] = makeFormHtml("<div class='MessageTextReadonly'>$messagetext</div>");
-				// Don't show a blank-message warning for SMS.
+				$messageformdata["message"] = makeFormHtml("<div class='MessageTextReadonly'>$messagetext</div>");
 			} else {
 				$messageformdata["header"] = makeFormHtml("<div class='MessageBodyHeader'>" . _L("%s Message", $languagename) . "</div>");
-				
-				if ($message) {
-					$messagehtml = "<div class='MessageTextReadonly'>$messagetext</div>";
+				$messagehtml = "<div class='MessageTextReadonly'>$messagetext</div>";
 					
-					if ($type == 'phone') {
-						$messagehtml .= icon_button(_L("Play"), "fugue/control",
-								"popup('previewmessage.php?id={$message->id}', 400, 400,'preview');"
-							) .
-							"<div style='clear:both'></div>";
-					}
-				// Don't show a blank-message warning if either subtype has a message.
-				} else if ($subtype == 'html' && $messagegroup->hasMessage($type, 'plain', $languagecode)) {
-					$messagehtml = '';
-				} else if ($subtype == 'plain' && $messagegroup->hasMessage($type, 'html', $languagecode)) {
-					$messagehtml = '';
-				} else if ($countlanguages > 1) {
-					$messagehtml = '<span id="messageemptyspan">' .
-						_L("The %s message is blank, so these contacts will receive messages in the default language.", $languagename) .
-						'</span>';
-				} else {
-					$messagehtml = '';
+				if ($type == 'phone') {
+					$messagehtml .= icon_button(_L("Play"), "fugue/control",
+							"popup('previewmessage.php?id={$message->id}', 400, 400,'preview');"
+						) .
+						"<div style='clear:both'></div>";
 				}
 				
 				$messageformdata["message"] = makeFormHtml($messagehtml);
 				
-				if ($message && $message->type == 'translated')
+				if ($message->type == 'translated')
 					$messageformdata["branding"] = makeBrandingFormHtml();
 			}
-
+			
+			$formsplitterchildren = array(
+				array("title" => "", "formdata" => $messageformdata)
+			);
+			
+			if (count($accordionsplitterchildren) > 0) {
+				$formsplitterchildren[] = new FormSplitter("", "", null, "accordion", array(), $accordionsplitterchildren);
+			}
+			
 			$messageformsplitters[] = new FormSplitter("{$type}-{$subtype}-{$languagecode}", $languagename,
 				$messagegroup->hasMessage($type, $subtype, $languagecode) ? "img/icons/accept.gif" : "img/icons/diagona/16/160.gif",
 				"verticalsplit",
 				array(),
-				array(
-					array("title" => "", "formdata" => $messageformdata),
-					// Add the accordion for each language tab.
-					// NOTE: We want a new instance of FormSplitter per language tab.
-					new FormSplitter("", "", null, "accordion", array(), $accordionsplitterchildren)
-				)
+				$formsplitterchildren
 			);
 		}
 
-		if ($countlanguages > 1) {
+		// NOTE: We want to use the original array $destinations because
+		// the count of languages may have changed due to unset($destinations[$type]['languages'][$languagecode]).
+		if (count($destinations[$type]['languages']) > 1) {
 			$subtypelayoutforms[] = new FormTabber("{$type}-{$subtype}", $subtype == 'html' ? 'HTML' : ucfirst($subtype), $messagegroup->hasMessage($type, $subtype) ? "img/icons/accept.gif" : "img/icons/diagona/16/160.gif", "verticaltabs", $messageformsplitters);
-		} else if ($countlanguages == 1) {
+		} else {
 			$messageformsplitters[0]->title = ucfirst($subtype);
 			$subtypelayoutforms[] = $messageformsplitters[0];
 		}
@@ -316,12 +301,19 @@ include_once('nav.inc.php');
 <?php
 startWindow(_L('Message Viewer'));
 
-$firstdestinationtype = reset(array_keys($destinations));
-$firstdestinationsubtype = reset($destinations[$firstdestinationtype]['subtypes']);
-$defaultsections = array("{$firstdestinationtype}-{$firstdestinationsubtype}", "{$firstdestinationtype}-{$firstdestinationsubtype}-" . Language::getDefaultLanguageCode());
-if ($firstdestinationtype == 'email')
-	$defaultsections[] = "emailheaders";
-echo '<div id="messagegroupformcontainer">' . $messagegroupsplitter->render($defaultsections) . '</div>';
+$preferreddestinationtype = isset($_GET['type']) && isset($destinations[$_GET['type']]) ? $_GET['type'] : reset(array_keys($destinations));
+$preferreddestinationsubtype = isset($_GET['subtype']) && in_array($_GET['subtype'], $destinations[$preferreddestinationtype]['subtypes']) ? $_GET['subtype'] : reset($destinations[$preferreddestinationtype]['subtypes']);
+if (isset($_GET['languagecode']) && isset($destinations[$preferreddestinationtype]['languages'][$_GET['languagecode']])) {
+	$preferredlanguagecode = $_GET['languagecode'];
+} else if ($destinations[$preferreddestinationtype]['languages'][Language::getDefaultLanguageCode()]) {
+	$preferredlanguagecode = Language::getDefaultLanguageCode();
+} else {
+	$preferredlanguagecode = reset($destinations[$preferreddestinationtype]['languages']);
+}
+$preferredtabs = array("{$preferreddestinationtype}-{$preferreddestinationsubtype}", "{$preferreddestinationtype}-{$preferreddestinationsubtype}-{$preferredlanguagecode}");
+if ($preferreddestinationtype == 'email')
+	$preferredtabs[] = "emailheaders";
+echo '<div id="messagegroupformcontainer">' . $messagegroupsplitter->render($preferredtabs) . '</div>';
 
 ?>
 
@@ -329,24 +321,24 @@ echo '<div id="messagegroupformcontainer">' . $messagegroupsplitter->render($def
 	(function() {
 		// Use an object to store state information.
 		var state = {
-			'currentdestinationtype': '<?=$firstdestinationtype?>',
-			'currentsubtype': '<?=$firstdestinationsubtype?>',
-			'currentlanguagecode': '<?=Language::getDefaultLanguageCode()?>',
+			'currentdestinationtype': '<?=$preferreddestinationtype?>',
+			'currentsubtype': '<?=$preferreddestinationsubtype?>',
+			'currentlanguagecode': '<?=$preferredlanguagecode?>',
 			'messagegroupsummary': <?=json_encode(MessageGroup::getSummary($messagegroup->id))?>
 		};
 		
 		var formswitchercontainer = $('messagegroupformcontainer');
 
 		formswitchercontainer.observe('FormSplitter:BeforeTabLoad',
-			messagegroupHandleBeforeTabLoad.bindAsEventListener(formswitchercontainer, state, '<?=Language::getDefaultLanguageCode()?>')
+			messagegroupHandleBeforeTabLoad.bindAsEventListener(formswitchercontainer, state, '<?=$preferredlanguagecode?>')
 		);
 
 		// When a tab is loaded, update the status icon of the previous tab.
 		formswitchercontainer.observe('FormSplitter:TabLoaded',
-			messagegroupHandleTabLoaded.bindAsEventListener(formswitchercontainer, state, '<?=$messagegroup->id?>', '<?=Language::getDefaultLanguageCode()?>', null, true)
+			messagegroupHandleTabLoaded.bindAsEventListener(formswitchercontainer, state, '<?=$messagegroup->id?>', '<?=$preferredlanguagecode?>', null, true)
 		);
 		
-		form_init_splitter(formswitchercontainer, <?=json_encode($defaultsections)?>, true);
+		form_init_splitter(formswitchercontainer, <?=json_encode($preferredtabs)?>, true);
 		
 		messagegroupStyleLayouts(true);
 	})();
