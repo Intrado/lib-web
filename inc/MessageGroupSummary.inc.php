@@ -12,7 +12,9 @@ function makeMessageGroupSummaryTable($formname,$formitem,$isstatic = false, $me
 					load_messageinfo();
 				});
 				function load_messageinfo() {
-					var request = 'ajax.php?ajax&type=messagegrid&id=' + " . ($isstatic?"$messagegroupid":"$('$msgselect').value;") . "
+
+					var id = " . ($isstatic?"$messagegroupid":"$('$msgselect').value;") . ";
+					var request = 'ajax.php?ajax&type=messagegrid&id=' + id;
 					cachedAjaxGet(request,function(result) {
 						var response = result.responseJSON;
 						if(response.data.length > 0) {
@@ -27,14 +29,14 @@ function makeMessageGroupSummaryTable($formname,$formitem,$isstatic = false, $me
 								str += '<tr>';
 									str += '<th class=\'Language\'>' + item.languagename + '</th>';
 								if(response.headers['phone'])
-									str += '<td><img src=\'img/icons/' + (item.phone!=0?'accept.gif\'':'diagona/16/160.gif') + '\' /></td>';
+									str += '<td>' + (item.phone>0?'<a href=\"#\" onclick=\"popup(\'previewmessage.php?id=' + item.id + '\', 500, 500); return false;\"><img src=\'img/icons/accept.gif\' /></a>':'<img src=\'img/icons/diagona/16/160.gif\' />') + '</td>';
 								if(response.headers['htmlemail'])
-									str += '<td><img src=\'img/icons/' + (item.htmlemail!=0?'accept.gif\'':'diagona/16/160.gif') + '\' /></td>';
+									str += '<td>' + (item.htmlemail>0?'<a href=\"#\" onclick=\"popup(\'previewmessage.php?id=' + item.id + '\', 500, 500); return false;\"><img src=\'img/icons/accept.gif\' /></a>':'<img src=\'img/icons/diagona/16/160.gif\' />') + '</td>';
 								if(response.headers['plainemail'])
-									str += '<td><img src=\'img/icons/' + (item.plainemail!=0?'accept.gif\'':'diagona/16/160.gif') + '\' /></td>';
+									str += '<td>' + (item.plainemail>0?'<a href=\"#\" onclick=\"popup(\'previewmessage.php?id=' + item.id + '\', 500, 500); return false;\"><img src=\'img/icons/accept.gif\' /></a>':'<img src=\'img/icons/diagona/16/160.gif\' />') + '</td>';
 								if(response.headers['sms']) {
 									if(item.languagecode == 'en')
-										str += '<td><img src=\'img/icons/' + (item.sms!=0?'accept.gif\'':'diagona/16/160.gif') + '\' /></td>';
+										str += '<td>' + (item.sms>0?'<a href=\"#\" onclick=\"popup(\'previewmessage.php?id=' + item.id + '\', 500, 500); return false;\"><img src=\'img/icons/accept.gif\' /></a>':'<img src=\'img/icons/diagona/16/160.gif\' />') + '</td>';
 									else
 										str += '<td>" . _L("N/A") . "</td>';
 								}

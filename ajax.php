@@ -309,7 +309,7 @@ function handleRequest() {
 			$cansendemail = $USER->authorize('sendemail');
 			$cansendsms = getSystemSetting('_hassms', false) && $USER->authorize('sendsms');
 			$cansendmultilingual = $USER->authorize('sendmulti');
-			$defaultlanguagecode = 'en';
+			$deflanguagecode = 'en';//Language::getDefaultLanguageCode();
 
 			$result->headers = array();
 			$result->headers['language'] = "&nbsp;";
@@ -321,15 +321,22 @@ function handleRequest() {
 			}
 			if($cansendsms)
 				$result->headers['sms'] = "SMS";
-			$query = "select l.name as languagename, l.code as languagecode
+			$query = "select mt.id as id, ll.code as languagecode,ll.name as languagename
+						" . ($cansendphone?",mt.phone as phone":"") . "
+						" . ($cansendemail?",mt.htmlemail as htmlemail":"") . "
+						" . ($cansendemail?",mt.plainemail as plainemail":"") . "
+						" . ($cansendsms?",mt.sms as sms":"") . "
+						from language ll left join (
+						select m.id as id,l.code as code
 						" . ($cansendphone?",sum(type='phone') as phone":"") . "
 						" . ($cansendemail?",sum(type='email' and subtype='html') as htmlemail":"") . "
 						" . ($cansendemail?",sum(type='email' and subtype='plain') as plainemail":"") . "
 						" . ($cansendsms?",sum(type='sms') as sms":"") . "
-						from message m, language l where m.messagegroupid = ?
-						" . ($cansendmultilingual?"":"and m.languagecode = '$defaultlanguagecode'") . "
-						and m.languagecode = l.code
-						group by l.name order by l.name";
+						from message m left join language l on (m.languagecode = l.code)
+						 where m.messagegroupid = ?
+						" . ($cansendmultilingual?"":"and m.languagecode = '$deflanguagecode'") . "
+						group by l.name order by l.name) mt on ll.code = mt.code where 1
+						" . ($cansendmultilingual?"":"and ll.code = '$deflanguagecode'");
 			$result->data = QuickQueryMultiRow($query,true,false,array($_GET['id']));
 			return $result;
 		default:
