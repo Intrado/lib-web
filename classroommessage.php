@@ -285,7 +285,7 @@ foreach($sections as $section)
 						  <span id="nowedit-' . $categoryid . '" style="float:left;color:graytext;font-weight:lighter;font-style:italic;"></span>
 						  <div style="clear:both"></div>';
 					foreach($messages as $message) {
-		
+
 						if(isset($message->overridemessagegroupid) && isset($customtxt[$message->id])) {
 							$title = $customtxt[$message->id];
 						} else if(isset($messagedatacache["en"]) && isset($messagedatacache["en"][$message->messagekey])) {
@@ -627,7 +627,6 @@ endWindow();
 					target.update('');
 					target = target.next('a');
 					target.show();
-					target.update('Remark');
 				}
 				target =  $(c_prefix + 'rem' + msg.key);
 				target.hide();
@@ -874,7 +873,7 @@ endWindow();
 						} else {
 							if(markedcomment == msgid) {
 								markedcontacts.unset(contact.key);
-								$('c-' + contact.key).setStyle('border:0px;');
+								$('c-' + contact.key).setStyle('border:1px; solid white');
 							}
 							highlightedcontacts.unset('c-' + contact.key);
 						}
@@ -890,7 +889,7 @@ endWindow();
 		getclass($('classselect').getValue());
 
 		$('picker').observe("selectstart", function(event) {          // disable select in IE
-			if(!(event.target.hasClassName('remark') || event.target.hasClassName('searchbox')))
+			if(event.target.hasClassName && !(event.target.hasClassName('remark') || event.target.hasClassName('searchbox')))
 				event.stop();
 		});
 		$('picker').observe("mousedown", function(event) {			  // disable select in FF
