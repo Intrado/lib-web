@@ -134,9 +134,9 @@ if (CheckFormSubmit($f,$s)){
 							('f03', 'Language', 'searchable,multisearch,language,subscribe,static')";
 				QuickUpdate($query, $newdb) or dieWithError("SQL:" . $query, $newdb);
 
-				$query = "INSERT INTO `language` (`name`) VALUES
-							('English'),
-							('Spanish')";
+				$query = "INSERT INTO `language` (`name`,`code`) VALUES
+							('English',`en`),
+							('Spanish',`es`)";
 				QuickUpdate($query, $newdb) or dieWithError("SQL:" . $query, $newdb);
 
 				$query = "INSERT INTO `jobtype` (`name`, `systempriority`, `info`, `issurvey`, `deleted`) VALUES
@@ -180,31 +180,31 @@ if (CheckFormSubmit($f,$s)){
 
 				QuickUpdate($query, $newdb, array($hostname, $surveyurl, $displayname, $timezone, $displayname, $enablesmsoptin)) or dieWithError(" SQL:" . $query, $newdb);
 
-				$query = "INSERT INTO `ttsvoice` (`language`, `gender`) VALUES
-							('english', 'male'),
-							('english', 'female'),
-							('spanish', 'male'),
-							('spanish', 'female'),
-							('catalan', 'female'),
-							('catalan', 'male'),
-							('chinese', 'female'),
-							('dutch', 'female'),
-							('dutch', 'male'),
-							('finnish', 'female'),
-							('french', 'female'),
-							('french', 'male'),
-							('german', 'female'),
-							('german', 'male'),
-							('greek', 'female'),
-							('italian', 'female'),
-							('italian', 'male'),
-							('polish', 'female'),
-							('polish', 'male'),
-							('portuguese', 'female'),
-							('portuguese', 'male'),
-							('russian', 'female'),
-							('swedish', 'female'),
-							('swedish', 'male')
+				$query = "INSERT INTO `ttsvoice` (`languagecode`, `language`, `gender`) VALUES
+							('en', 'english', 'male'),
+							('en', 'english', 'female'),
+							('es', 'spanish', 'male'),
+							('es', 'spanish', 'female'),
+							('ca', 'catalan', 'female'),
+							('ca', 'catalan', 'male'),
+							('zh', 'chinese', 'female'),
+							('nl', 'dutch', 'female'),
+							('nl', 'dutch', 'male'),
+							('fi', 'finnish', 'female'),
+							('fr', 'french', 'female'),
+							('fr', 'french', 'male'),
+							('de', 'german', 'female'),
+							('de', 'german', 'male'),
+							('el', 'greek', 'female'),
+							('it', 'italian', 'female'),
+							('it', 'italian', 'male'),
+							('pl', 'polish', 'female'),
+							('pl', 'polish', 'male'),
+							('pt', 'portuguese', 'female'),
+							('pt', 'portuguese', 'male'),
+							('ru', 'russian', 'female'),
+							('sv', 'swedish', 'female'),
+							('sv', 'swedish', 'male')
 							";
 
 				QuickUpdate($query, $newdb) or dieWithError(" SQL: " . $query, $newdb);
