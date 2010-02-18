@@ -885,7 +885,7 @@ var RuleEditor = Class.create({
 	// NOTE: If you want add a toolbar, do add_multicheckbox_toolbar(new Element('div').update(make_multicheckbox()));
 	// Returns a div element containing the values as checkboxes, or returns a select element with a single option if there's just one value.
 	make_multicheckbox: function(values) {
-		multicheckbox = new Element('div', {
+		var multicheckbox = new Element('div', {
 			'style': 'overflow:auto; padding-right: 2em; padding-bottom: 1em',
 			'class': 'MultiCheckbox'
 		});
@@ -914,7 +914,7 @@ var RuleEditor = Class.create({
 				
 				var label = new Element('label', {
 					'for': checkbox.identify(),
-					'style': labelstyle,
+					'style': labelstyle
 				}).update(value.escapeHTML());
 				
 				multicheckbox.insert(
@@ -937,7 +937,7 @@ var RuleEditor = Class.create({
 				
 				var label = new Element('label', {
 					'for': checkbox.identify(),
-					'style': labelstyle,
+					'style': labelstyle
 				}).update(title.escapeHTML());
 				
 				multicheckbox.insert(
