@@ -21,7 +21,6 @@ class User extends DBMappedObject {
 	var $lastimport;
 	
 	var $rules = false; //local cache of rules
-	var $organizations = false; // local cache of authorized organizations.
 	var $hassections = null; // local cache of boolean indicating that there are sections that the user can see.
 	
 	//new constructor
@@ -121,18 +120,26 @@ class User extends DBMappedObject {
 	// Returns associated organizations or all organizations if unrestricted.
 	// The user is unrestricted if he has no organization associations.
 	function organizations() {
-		if ($this->organizations === false) {
+		// Global cache of users' organizations; we do not keep a local cache because
+		// it would serialize upon each request.
+		// This array is indexed by userid.
+		global $USERSORGANIZATIONS;
+		
+		if (!isset($USERSORGANIZATIONS))
+			$USERSORGANIZATIONS = array();
+			
+		if (!isset($USERSORGANIZATIONS[$this->id]) || $USERSORGANIZATIONS[$this->id] === false) {
 			$associatedorganizations = DBFindMany('Organization', 'from organization o inner join userassociation ua on o.id = ua.organizationid where userid = ?', 'o', array($this->id));
 
 			// If the user has specific organization associations, return those organizations.
 			// Otherwise he can see all organizations.
 			if (count($associatedorganizations) > 0)
-				$this->organizations = $associatedorganizations;
+				$USERSORGANIZATIONS[$this->id] = $associatedorganizations;
 			else
-				$this->organizations = DBFindMany('Organization', 'from organization where not deleted');
+				$USERSORGANIZATIONS[$this->id] = DBFindMany('Organization', 'from organization where not deleted');
 		}
 		
-		return $this->organizations;
+		return $USERSORGANIZATIONS[$this->id];
 	}
 
 	function userSQL ($alias = false) {
