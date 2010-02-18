@@ -99,7 +99,7 @@ if($isajax === true) {
 
 	$start = 0 + (isset($_GET['pagestart']) ? $_GET['pagestart'] : 0);
 	$limit = 100;
-	$orderby = "g.modified,g.id desc";
+	$orderby = "modified desc";
 
 	$filter = "";
 	if (isset($_GET['filter'])) {
@@ -107,30 +107,49 @@ if($isajax === true) {
 	}
 	switch ($filter) {
 		case "name":
-			$orderby = "g.name,g.id";
+			$orderby = "name";
 			break;
 	}
-	$mergeditems = QuickQueryMultiRow("
-		select SQL_CALC_FOUND_ROWS 
-			g.id as id, g.name as name, g.modified as date, g.deleted as deleted, 
+	
+	// get all the message group ids for this page
+	$msgGroupIds = QuickQueryList(
+		"(select SQL_CALC_FOUND_ROWS mg.id as id, mg.modified as modified, mg.name as name
+		from messagegroup mg
+		where mg.userid = ? 
+			and not mg.deleted)
+		UNION ALL
+		(select mg.id as id, mg.modified as modified, mg.name as name
+		from publish p
+		join messagegroup mg on
+			(p.messagegroupid = mg.id)
+		where p.userid = ?
+			and p.action = 'subscribe'
+			and p.type = 'messagegroup'
+			and not mg.deleted)
+		order by $orderby, id
+		limit $start, $limit", false, false, array($USER->id, $USER->id));
+	
+	// total rows
+	$total = QuickQuery("select FOUND_ROWS()");
+	
+	// get all the message group display data needed for this page
+	$mergeditems = QuickQueryMultiRow(
+		"select 'message' as type,'Saved' as status, 
+			mg.id as id, mg.name as name, mg.modified as date, mg.deleted as deleted, 
 			sum(m.type='phone') as phone, sum(m.type='email') as email,
 			sum(m.type='sms') as sms, p.action as publishaction, p.id as publishid, u.login as owner
-		from messagegroup g
-			join message m on
-				(m.messagegroupid = g.id)
-			join user u on
-				(g.userid = u.id)
-			left join publish p on
-				(p.userid=? and p.messagegroupid = m.messagegroupid)
-		where not g.deleted and
-			(g.userid=? or g.id in (select messagegroupid from publish where userid=? and type = 'messagegroup'))
-		group by g.id
-		order by $orderby 
-		limit $start,$limit",
-		true,false,array($USER->id,$USER->id,$USER->id));
+		from messagegroup mg
+		join message m on
+			(m.messagegroupid = mg.id)
+		join user u on
+			(mg.userid = u.id)
+		left join publish p on
+			(p.userid = ? and p.messagegroupid = m.messagegroupid)
+		where mg.id in (". implode(",", $msgGroupIds) .")
+		group by mg.id
+		order by mg.$orderby, mg.id",
+		true, false, array($USER->id));
 
-
-	$total = QuickQuery("select FOUND_ROWS()");
 	$numpages = ceil($total/$limit);
 	$curpage = ceil($start/$limit) + 1;
 	$displayend = ($start + $limit) > $total ? $total : ($start + $limit);
@@ -139,7 +158,7 @@ if($isajax === true) {
 	if(empty($mergeditems)) {
 			$data->list[] = array("itemid" => "",
 										"defaultlink" => "",
-										"icon" => "largeicons/information.jpg",
+										"icon" => "img/largeicons/information.jpg",
 										"title" => _L("No Messages."),
 										"content" => "",
 										"tools" => "");
@@ -252,7 +271,7 @@ startWindow(_L('My Messages'), 'padding: 3px;', true, true);
 	<td class="feed" style="width: 180px;vertical-align: top;font-size: 12px;" >
 		<div>
 			<?= icon_button(_L('Create New Message'),"add","location.href='messagegroup.php?id=new'") ?>
-			<?= icon_button(_L('Subscribe to Message'),"add", "popup('messagegroupsubscribepopup.php', 400, 500)") ?>
+			<?=(($USER->authorize('subscribemessagegroup'))?icon_button(_L('Subscribe to Message'),"add", "popup('messagegroupsubscribepopup.php', 600, 500)"):'') ?>
 			<div style="clear:both;"></div>
 		</div>
 		<br />
