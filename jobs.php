@@ -7,7 +7,6 @@ require_once("obj/Job.obj.php");
 require_once("obj/Message.obj.php");
 require_once("obj/MessagePart.obj.php");
 require_once("obj/AudioFile.obj.php");
-require_once("obj/JobLanguage.obj.php");
 require_once("obj/JobList.obj.php");
 require_once("obj/Schedule.obj.php");
 require_once("inc/form.inc.php");
@@ -76,7 +75,6 @@ if (isset($_GET['delete'])) {
 				foreach($associatedimports as $importjob){
 					$importjob->destroy();
 				}
-				QuickUpdate("delete from joblanguage where jobid='$deleteid'");
 				$job->destroy();
 			Query('COMMIT');
 			notice(_L("The job, %s, is now deleted.", escapehtml($job->name)));

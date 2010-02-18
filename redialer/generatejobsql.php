@@ -13,7 +13,6 @@ require_once("../obj/Access.obj.php");
 require_once("../obj/Permission.obj.php");
 require_once("../obj/Job.obj.php");
 require_once("../obj/JobList.obj.php");
-require_once("../obj/JobLanguage.obj.php");
 require_once("../obj/JobType.obj.php");
 require_once("../obj/Rule.obj.php");
 require_once("../obj/FieldMap.obj.php");

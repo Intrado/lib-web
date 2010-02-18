@@ -28,7 +28,6 @@ require_once("obj/FieldMap.obj.php");
 require_once("obj/FormSelectMessage.fi.php");
 require_once("obj/SectionWidget.fi.php");
 require_once("obj/Job.obj.php");
-require_once("obj/JobLanguage.obj.php");
 require_once("obj/Schedule.obj.php");
 require_once("obj/Job.obj.php");
 require_once("obj/Message.obj.php");

@@ -9,7 +9,6 @@ include_once("../obj/User.obj.php");
 include_once("../obj/Rule.obj.php");
 include_once("../obj/Access.obj.php");
 include_once("../obj/Job.obj.php");
-include_once("../obj/JobLanguage.obj.php");
 include_once("../obj/JobType.obj.php");
 include_once("../obj/Permission.obj.php");
 include_once("../obj/PeopleList.obj.php");
