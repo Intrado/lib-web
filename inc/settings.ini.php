@@ -31,11 +31,7 @@ referer="http://asp.schoolmessenger.com"
 disableAutoTranslate=false
 
 
-;/*CSDELETEMARKER_START*/
-
 [txtreply]
 txt_datfile="/usr/commsuite/cache/txtreply.dat"
-
-;/*CSDELETEMARKER_END*/
 
 ;*/?>
