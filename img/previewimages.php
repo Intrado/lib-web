@@ -45,6 +45,8 @@ for ($x = 255; $x >= 0; $x -= 8) {
 
 
 $folders = array(
+	"largeicons",
+	"largeicons/tiny20x20",
 	"icons",
 	"icons/fugue",
 	"icons/diagona/16",
