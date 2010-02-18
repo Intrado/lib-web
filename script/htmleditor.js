@@ -62,7 +62,7 @@ function saveHtmlEditorContent(existinghtmleditorobject) {
 			}
 		}
 
-		var html = tempdiv.innerHTML.replace(/&lt;&lt;/g, '<<').replace(/&gt;&gt;/g, '>>');
+		var html = cleanFieldInserts(tempdiv.innerHTML).replace(/&lt;&lt;/g, '<<').replace(/&gt;&gt;/g, '>>');
 
 		if (images.length < 1) {
 			// CKEditor inserts blank tags even if the user has deleted everything.
@@ -75,6 +75,35 @@ function saveHtmlEditorContent(existinghtmleditorobject) {
 	}
 	
 	return htmleditorobject;
+}
+
+// Corrects any html tags that may be inside a data-field insert.
+// Example: &lt;&lt;First <b>Name</b>&gt;&gt; becomes <b>&lt;&lt;First Name&gt;&gt;
+// NOTE: It is assumed that the tokens are &lt;&lt; and &gt;&gt; instead of << and >>.
+function cleanFieldInserts(html) {
+	var regex = /&lt;(<.*?>)*?&lt;(.+)?&gt;(<.*?>)?&gt;/g;
+	var matches = html.match(regex);
+
+	for (var i = 0, count = matches.length; i < count; i++) {
+		var cleaner = matches[i].replace(regex, '$1&lt;&lt;$2&gt;&gt;$3');
+		var beforeinsert = cleaner.match(/^(.*)?&lt;&lt;/)[1] || '';
+		var afterinsert = cleaner.match(/&gt;&gt;(.*)?$/)[1] || '';
+	
+		var field = cleaner.match(/&lt;&lt;(.+)?&gt;&gt;/)[1] || '';
+		
+		var opentags = field.match(/<[^\/]*?>/g);
+		if (opentags)
+			beforeinsert += opentags.join('');
+		
+		var closedtags = field.match(/<\/.*?>/g);
+		if (closedtags)
+			afterinsert = closedtags.join('') + afterinsert;
+		
+		var field = field.stripTags().strip();
+		html = html.replace(matches[i],
+			beforeinsert + '&lt;&lt;' + field + '&gt;&gt;' + afterinsert);
+	}
+	return html;
 }
 
 function hideHtmlEditor() {
