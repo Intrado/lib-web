@@ -16,14 +16,6 @@ function getOrderSql($params){
 	return $orderquery;
 }
 
-function getReportPersonSubquerySql($params, $isjobreport = false) {
-	return Person::makePersonSubQuery(
-		isset($params['organizationids']) ? $params['organizationids'] : false,
-		isset($params['sectionids']) ? $params['sectionids'] : false,
-		$isjobreport
-	);
-}
-
 function getRuleSql($params, $alias, $isjobreport=true){
 	$rulesql = "";
 	if(isset($params['rules'])){

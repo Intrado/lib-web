@@ -55,9 +55,9 @@ class ContactsReport extends ReportGenerator {
 							coalesce(a.zip,'')
 						) as address
 					$orgfieldquery
-					$fieldquery
+					$fieldqueryC
 					$gfieldquery
-					from " . getReportPersonSubquerySql($this->params) . " p
+					from person p
 					left join address a on (a.personid = p.id)
 					where not p.deleted
 					and p.type='system'

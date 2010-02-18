@@ -60,7 +60,7 @@ class ContactChangeReport extends ReportGenerator {
 					$orgfieldquery
 					$fieldquery
 					$gfieldquery
-					from " . getReportPersonSubquerySql($this->params) . " p
+					from person p
 					left join address a on (a.personid = p.id)
 					left join language l on (l.code = p." . FieldMap::GetLanguageField() . ")
 					where not p.deleted

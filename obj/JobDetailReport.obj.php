@@ -46,7 +46,7 @@ class JobDetailReport extends ReportGenerator{
 			
 			if($this->params['result'] == "undelivered" || (isset($_SESSION['report']['type']) && $_SESSION['report']['type'] == "notcontacted")){
 
-				$undeliveredpersons = QuickQueryList("select rp.personid, sum(rp.iscontacted) as cnt, sum(rp2.iscontacted) as cnt2 from " . getReportPersonSubQuerySql($this->params, true) . " rp
+				$undeliveredpersons = QuickQueryList("select rp.personid, sum(rp.iscontacted) as cnt, sum(rp2.iscontacted) as cnt2 from reportperson rp
 											left join reportperson rp2 on (rp2.personid = rp.duplicateid and rp2.jobid = rp.jobid and rp2.type = rp.type)
 											where rp.jobid in ('" . $joblist . "') group by rp.jobid, rp.personid having cnt = 0 and (cnt2 = 0 or cnt2 is null)", true, $this->_readonlyDB);
 				$undeliveredpersons = array_keys($undeliveredpersons);
@@ -137,7 +137,7 @@ class JobDetailReport extends ReportGenerator{
 			$fieldquery
 			$gfieldquery
 			, dl.label as label
-			from " . getReportPersonSubQuerySql($this->params, true) . " rp
+			from reportperson rp
 			inner join job j on (rp.jobid = j.id)
 			inner join user u on (u.id = j.userid)
 			left join	reportcontact rc on (rc.jobid = rp.jobid and rc.type = rp.type and rc.personid = rp.personid)
@@ -156,7 +156,7 @@ class JobDetailReport extends ReportGenerator{
 		//query to test resulting dataset
 		$this->testquery =
 			"select count(*)
-				from " . getReportPersonSubQuerySql($this->params, true) . " rp
+				from reportperson rp
 				inner join job j on (rp.jobid = j.id)
 				inner join user u on (u.id = j.userid)
 				left join	reportcontact rc on (rc.jobid = rp.jobid and rc.type = rp.type and rc.personid = rp.personid)

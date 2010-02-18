@@ -319,7 +319,7 @@ class RenderedList {
 			return Query("
 					(SELECT SQL_CALC_FOUND_ROWS IFNULL(le.type,'rule') AS entrytype,
 						$commonfieldsSQL
-					FROM " . $this->list->getPersonSubquerySQL() . " p
+					FROM person p
 						$leJoinSQL
 						$addressJoinSQL
 					WHERE
@@ -351,10 +351,7 @@ class RenderedList {
 				SELECT
 					SQL_CALC_FOUND_ROWS ($listrulesSQL) as isinlist,
 					$commonfieldsSQL
-				FROM " . Person::makePersonSubquery(
-							$searchorganizationids ? $searchorganizationids : array(),
-							$searchsectionids ? $searchsectionids : array()
-						) . " p
+				FROM person p
 					$addressJoinSQL
 				WHERE
 					p.userid IS null
@@ -398,7 +395,7 @@ class RenderedList {
 	function countEffectiveRule ($rulesql) {
 		$query = "
 			select count(*)
-				from " . $this->list->getPersonSubquerySQL() . " p
+				from person p
 					left join listentry le on (le.personid=p.id and le.listid=?)
 				where le.type is null and p.userid is null and not p.deleted $rulesql";
 

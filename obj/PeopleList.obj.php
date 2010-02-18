@@ -54,12 +54,6 @@ class PeopleList extends DBMappedObject {
 		return $this->sections;
 	}
 	
-	// Returns a subquery on the person table, taking into account organization/section listentries.
-	// Also takes into account user organization/section restrictions.
-	function getPersonSubquerySQL() {
-		return Person::makePersonSubquery(array_keys($this->getOrganizations()), array_keys($this->getSections()));
-	}
-	
 	function getListRuleSQL () {
 		//get and compose list rules
 		$listrules = $this->getListRules();
