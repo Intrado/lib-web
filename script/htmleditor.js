@@ -83,6 +83,9 @@ function saveHtmlEditorContent(existinghtmleditorobject) {
 function cleanFieldInserts(html) {
 	var regex = /&lt;(<.*?>)*?&lt;(.+)?&gt;(<.*?>)?&gt;/g;
 	var matches = html.match(regex);
+	
+	if (!matches)
+		return html;
 
 	for (var i = 0, count = matches.length; i < count; i++) {
 		var cleaner = matches[i].replace(regex, '$1&lt;&lt;$2&gt;&gt;$3');
