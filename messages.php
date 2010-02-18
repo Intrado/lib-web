@@ -314,7 +314,7 @@ function applyfilter(filter) {
 		onSuccess: function (response) {
 			var result = response.responseJSON;
 			if(result) {
-				$('feeditems').update();
+				$('feeditems').update(new Element('tbody'));
 				var size = result.list.length;
 
 				for(var i=0;i<size;i++){
@@ -323,25 +323,25 @@ function applyfilter(filter) {
 
 					// insert icon
 					msg.insert(
-							new Element('td', {valign: 'top', width: '60px'}).insert(
-								new Element('a', {href: item.defaultlink}).insert(
-									new Element('img', {src: item.icon})
+							new Element('td', {'valign': 'top', width: '60px'}).insert(
+								new Element('a', {'href': item.defaultlink}).insert(
+									new Element('img', {'src': item.icon})
 								)
 							)
 						);
 					// insert title and content details
 					msg.insert(
 							new Element('td').insert(
-								new Element('div', {class: 'feedtitle'}).insert(
-									new Element('a', {href: item.defaultlink}).insert(
+								new Element('div', {'class': 'feedtitle'}).insert(
+									new Element('a', {'href': item.defaultlink}).insert(
 										item.title
 									)
 								)
 							).insert(
 								((item.publishmessage)?
-									new Element('div', {class: 'feedsubtitle'}).insert(
-										new Element('a', {href: item.defaultlink}).insert(
-											new Element('img', {src: 'img/icons/diagona/10/031.gif'})
+									new Element('div', {'class': 'feedsubtitle'}).insert(
+										new Element('a', {'href': item.defaultlink}).insert(
+											new Element('img', {'src': 'img/icons/diagona/10/031.gif'})
 										).insert(
 											item.publishmessage
 										)
@@ -349,7 +349,7 @@ function applyfilter(filter) {
 									''
 								)
 							).insert(
-								new Element('div', {style: "clear: both"})
+								new Element('div', {'style': 'clear: both'})
 							).insert(
 								new Element('div').insert(
 									item.content
@@ -359,7 +359,7 @@ function applyfilter(filter) {
 					// insert tools (if there are any)
 					if (item.tools) {
 						msg.insert(
-							new Element('td', {valign: 'middle', width: '100px'}).insert(
+							new Element('td', {'valign': 'middle', 'width': '100px'}).insert(
 								new Element('div').insert(
 									item.tools
 								)
@@ -367,9 +367,9 @@ function applyfilter(filter) {
 						);
 					}
 					
-					$('feeditems').insert({"bottom": msg});
+					$('feeditems').down('tbody').insert(msg);
 				}
-				//$('feeditems').update(html);
+				
 				var pagetop = new Element('div',{style: 'float:right;'}).update(result.pageinfo[3]);
 				var pagebottom = new Element('div',{style: 'float:right;'}).update(result.pageinfo[3]);
 
