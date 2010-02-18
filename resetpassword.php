@@ -113,7 +113,7 @@ if($form){
 			</tr>
 			<tr>
 				<td>&nbsp;</td>
-				<td><div><input type="submit" name="submit" value="Continue"</div></td>
+				<td><div><input type="submit" name="submit" value="Continue"></div></td>
 			</tr>
 			<tr>
 				<td>&nbsp;</td>

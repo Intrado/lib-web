@@ -66,7 +66,7 @@ NewForm($f);
 startWindow(_L('Activation Method'));
 ?>
 <table>
-	<tr><td><?=_L("Start by choosing the method you'll use to add people to your account.")?></td</tr>
+	<tr><td><?=_L("Start by choosing the method you'll use to add people to your account.")?></td></tr>
 
 	<tr><td class="bottomBorder">&nbsp;</td></tr>
 
