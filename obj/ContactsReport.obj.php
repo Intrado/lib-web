@@ -55,7 +55,7 @@ class ContactsReport extends ReportGenerator {
 							coalesce(a.zip,'')
 						) as address
 					$orgfieldquery
-					$fieldqueryC
+					$fieldquery
 					$gfieldquery
 					from person p
 					left join address a on (a.personid = p.id)
