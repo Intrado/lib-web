@@ -744,7 +744,7 @@ class ValDefaultLanguageCode extends Validator {
 	var $onlyserverside = true;
 	function validate ($requestedlanguagecode, $args) {
 		$messagegroup = new MessageGroup($_SESSION['messagegroupid']);
-		$messages = DBFindMany('Message', 'from message where not deleted and type != "sms" and messagegroupid=?', false, array($messagegroup->id));
+		$messages = DBFindMany('Message', 'from message where type != "sms" and messagegroupid=?', false, array($messagegroup->id));
 
 		if (!empty($messages)) {
 			$foundrequestedlanguage = false;
