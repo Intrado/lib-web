@@ -846,6 +846,16 @@ td.SplitPane {
 	font-weight: bold;
 	color: <?=$primary?>;
 }
+.feedsubtitle {
+	padding-top: 2px;
+	padding-left: 4px;
+	font-size: 10px;
+	font-style: italic;
+	color: <?=$primary?>;
+}
+.feedsubtitle img {
+	padding-right: 4px;
+}
 .feedfilter {
 	margin-left: 20px;
 }
