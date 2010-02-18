@@ -21,7 +21,7 @@ class JobList extends DBMappedObject {
 				and le.ruleid=r.id and le.listid='" . $this->listid .  "'", "r");
 
 		if (count($listrules) > 0) {
-			$allrules = array_merge($user->rules(), $listrules);
+			$allrules = array_merge($user->getRules(), $listrules);
 			$rulesql = "1 " . Rule::makeQuery($allrules, "p");
 		} else {
 			$rulesql = "0";

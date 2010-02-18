@@ -112,7 +112,7 @@ class User extends DBMappedObject {
 		return ($this->firstname ? substr($this->firstname, 0, 1) . '. ' : NULL) . $this->lastname;
 	}
 
-	function rules() {
+	function getRules() {
 		if ($this->rules === false)
 			$this->rules = DBFindMany("Rule","from rule r inner join userassociation ua on r.id = ua.ruleid where userid =?", 'r', array($this->id));
 		return $this->rules;
@@ -136,7 +136,7 @@ class User extends DBMappedObject {
 	}
 
 	function userSQL ($alias = false) {
-		$r = Rule::makeQuery($this->rules(), $alias);
+		$r = Rule::makeQuery($this->getRules(), $alias);
 		return $r;
 	}
 

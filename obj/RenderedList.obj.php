@@ -306,7 +306,7 @@ class RenderedList {
 			$leJoinSQL = "LEFT JOIN listentry le ON (le.listid=? AND p.id = le.personid)";
 			
 			if (count($listRules)) {
-				$combinedRulesSQL = Rule::makeQuery(array_merge($USER->rules(), $listRules), "p");
+				$combinedRulesSQL = Rule::makeQuery(array_merge($USER->getRules(), $listRules), "p");
 			} else if (count($this->list->getOrganizations()) == 0 && count($this->list->getSections()) == 0) {
 				$combinedRulesSQL = "and 0";
 			} else {
@@ -373,7 +373,7 @@ class RenderedList {
 
 		// if there are list rules, combine with the user rules for enrollment data integration
 		if (count($this->list->getListRules()) > 0) {
-			$allrules = array_merge($USER->rules(), $this->list->getListRules());
+			$allrules = array_merge($USER->getRules(), $this->list->getListRules());
 			$rulesql = Rule::makeQuery($allrules, "p");
 		} else if (count($this->list->getOrganizations()) == 0 && count($this->list->getSections()) == 0) {
 			$rulesql = "and 0"; // if there are no restrictions at all, then return 0 results.

@@ -321,7 +321,7 @@ if ($hasenrollment) {
 	);
 }
 
-$rules = cleanObjects($edituser->rules());
+$rules = cleanObjects($edituser->getRules());
 $fields = QuickQueryMultiRow("select fieldnum from fieldmap where options not like '%multisearch%'");
 $ignoredFields = array();
 foreach ($fields as $fieldnum)
@@ -484,7 +484,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 				$edituser->setSetting("maxjobdays", 1);
 
 			// Remove all existing user rules
-			$rules = $edituser->rules();
+			$rules = $edituser->getRules();
 			if (count($rules)) {
 				foreach ($rules as $rule) {
 					// don't remove c field rules if they are using a staff id
