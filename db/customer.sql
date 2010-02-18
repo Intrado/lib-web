@@ -1,8 +1,4 @@
---
--- Database: some customer `c_0`
---
-
--- --------------------------------------------------------
+-- schema for some customer c_X
 
 --
 -- Table structure for table `access`
@@ -14,10 +10,8 @@ CREATE TABLE `access` (
   `description` varchar(50) NOT NULL default '',
   PRIMARY KEY  (`id`),
   KEY `id` (`id`)
-) ENGINE = innodb DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 
 $$$
-
--- --------------------------------------------------------
 
 --
 -- Table structure for table `address`
@@ -35,10 +29,24 @@ CREATE TABLE `address` (
   `editlock` tinyint(4) NOT NULL default '0',
   PRIMARY KEY  (`id`),
   KEY `personid` (`personid`)
-) ENGINE = innodb DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 
 $$$
 
--- --------------------------------------------------------
+--
+-- Table structure for table `alert`
+--
+
+CREATE TABLE `alert` (
+  `id` int(11) NOT NULL auto_increment,
+  `eventid` int(11) NOT NULL,
+  `personid` int(11) NOT NULL,
+  `date` date NOT NULL,
+  `time` time NOT NULL,
+  `sent` tinyint(4) NOT NULL default '0',
+  PRIMARY KEY  (`id`),
+  KEY `alertjob` (`personid`,`date`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 
+$$$
 
 --
 -- Table structure for table `audiofile`
@@ -46,34 +54,52 @@ $$$
 
 CREATE TABLE `audiofile` (
   `id` int(11) NOT NULL auto_increment,
+  `messagegroupid` int(11) default NULL,
   `userid` int(11) NOT NULL default '0',
   `name` varchar(50) NOT NULL default '',
   `description` varchar(50) NOT NULL default '',
   `contentid` bigint(20) NOT NULL default '0',
   `recorddate` datetime default NULL,
   `deleted` tinyint(4) NOT NULL default '0',
+  `permanent` tinyint(4) NOT NULL default '0',
   PRIMARY KEY  (`id`),
   KEY `list` (`userid`,`deleted`)
-) ENGINE = innodb DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 
 $$$
 
--- --------------------------------------------------------
-
 --
--- Table structure for table `blockednumber`
+-- Table structure for table `blockeddestination`
 --
 
-CREATE TABLE `blockednumber` (
+CREATE TABLE `blockeddestination` (
   `id` int(11) NOT NULL auto_increment,
-  `userid` int(11) NOT NULL default '0',
-  `description` varchar(100) NOT NULL,
-  `pattern` varchar(10) NOT NULL default '',
-  `type` enum('call','sms','both') NOT NULL default 'both',
-  PRIMARY KEY  (`id`)
-) ENGINE = innodb DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci
+  `userid` int(11) default NULL,
+  `description` varchar(255) NOT NULL,
+  `destination` varchar(255) NOT NULL,
+  `type` enum('phone','sms','email') NOT NULL,
+  `createdate` datetime default NULL,
+  `failattempts` tinyint(4) default NULL,
+  `blockmethod` enum('manual','pending','autoblock') NOT NULL,
+  PRIMARY KEY  (`id`),
+  UNIQUE KEY `typedestination` (`type`,`destination`),
+  KEY `userid` (`userid`,`type`),
+  KEY `methoddate` (`blockmethod`,`createdate`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 
 $$$
 
--- --------------------------------------------------------
+--
+-- Table structure for table `contactpref`
+--
+
+CREATE TABLE `contactpref` (
+  `personid` int(11) NOT NULL,
+  `jobtypeid` int(11) NOT NULL,
+  `type` enum('phone','email','print','sms') NOT NULL,
+  `sequence` tinyint(4) NOT NULL,
+  `enabled` tinyint(4) NOT NULL default '0',
+  PRIMARY KEY  (`personid`,`jobtypeid`,`type`,`sequence`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 
+$$$
 
 --
 -- Table structure for table `content`
@@ -84,10 +110,94 @@ CREATE TABLE `content` (
   `contenttype` varchar(255) NOT NULL default '',
   `data` mediumtext NOT NULL,
   PRIMARY KEY  (`id`)
-) ENGINE = innodb DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 
 $$$
 
--- --------------------------------------------------------
+--
+-- Table structure for table `custdm`
+--
+
+CREATE TABLE `custdm` (
+  `dmid` int(11) NOT NULL,
+  `name` varchar(255) NOT NULL,
+  `enablestate` enum('new','active','disabled') NOT NULL,
+  `telco_type` enum('Test','Asterisk','Jtapi') NOT NULL default 'Test',
+  `routechange` tinyint(4) default NULL,
+  `poststatus` mediumtext,
+  PRIMARY KEY  (`dmid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 
+$$$
+
+--
+-- Table structure for table `customercallstats`
+--
+
+CREATE TABLE `customercallstats` (
+  `jobid` int(11) NOT NULL,
+  `userid` int(11) NOT NULL,
+  `finishdate` datetime default NULL,
+  `attempted` int(11) default NULL,
+  PRIMARY KEY  (`jobid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 
+$$$
+
+--
+-- Table structure for table `destlabel`
+--
+
+CREATE TABLE `destlabel` (
+  `type` enum('phone','email','sms') NOT NULL,
+  `sequence` tinyint(4) NOT NULL,
+  `label` varchar(20) NOT NULL,
+  `notes` varchar(255) default NULL,
+  PRIMARY KEY  (`type`,`sequence`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 
+$$$
+
+--
+-- Table structure for table `dmcalleridroute`
+--
+
+CREATE TABLE `dmcalleridroute` (
+  `id` int(11) NOT NULL auto_increment,
+  `dmid` int(11) NOT NULL,
+  `callerid` varchar(20) NOT NULL,
+  `prefix` varchar(20) NOT NULL,
+  PRIMARY KEY  (`id`),
+  UNIQUE KEY `dmid` (`dmid`,`callerid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 
+$$$
+
+--
+-- Table structure for table `dmroute`
+--
+
+CREATE TABLE `dmroute` (
+  `id` int(11) NOT NULL auto_increment,
+  `dmid` int(11) NOT NULL,
+  `match` varchar(20) NOT NULL,
+  `strip` int(11) NOT NULL,
+  `prefix` varchar(20) NOT NULL,
+  `suffix` varchar(20) NOT NULL,
+  PRIMARY KEY  (`id`),
+  UNIQUE KEY `dmid` (`dmid`,`match`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 
+$$$
+
+--
+-- Table structure for table `dmschedule`
+--
+
+CREATE TABLE `dmschedule` (
+  `id` int(11) NOT NULL auto_increment,
+  `dmid` int(11) NOT NULL,
+  `daysofweek` varchar(20) NOT NULL,
+  `starttime` time NOT NULL,
+  `endtime` time NOT NULL,
+  `resourcepercentage` float NOT NULL default '1',
+  PRIMARY KEY  (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 
+$$$
 
 --
 -- Table structure for table `email`
@@ -99,12 +209,52 @@ CREATE TABLE `email` (
   `email` varchar(100) NOT NULL default '',
   `sequence` tinyint(4) NOT NULL default '0',
   `editlock` tinyint(4) NOT NULL default '0',
+  `editlockdate` datetime default NULL,
   PRIMARY KEY  (`id`),
-  KEY `personid` (`personid`,`sequence`)
-) ENGINE = innodb DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci
+  KEY `personid` (`personid`,`sequence`),
+  KEY `editlockdate` (`editlockdate`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 
 $$$
 
--- --------------------------------------------------------
+--
+-- Table structure for table `enrollment`
+--
+
+CREATE TABLE `enrollment` (
+  `id` int(11) NOT NULL auto_increment,
+  `personid` int(11) NOT NULL,
+  `c01` varchar(255) NOT NULL,
+  `c02` varchar(255) NOT NULL,
+  `c03` varchar(255) NOT NULL,
+  `c04` varchar(255) NOT NULL,
+  `c05` varchar(255) NOT NULL,
+  `c06` varchar(255) NOT NULL,
+  `c07` varchar(255) NOT NULL,
+  `c08` varchar(255) NOT NULL,
+  `c09` varchar(255) NOT NULL,
+  `c10` varchar(255) NOT NULL,
+  PRIMARY KEY  (`id`),
+  KEY `staffid` (`c01`),
+  KEY `personid` (`personid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 
+$$$
+
+--
+-- Table structure for table `event`
+--
+
+CREATE TABLE `event` (
+  `id` int(11) NOT NULL auto_increment,
+  `userid` int(11) NOT NULL,
+  `organizationid` int(11) NOT NULL,
+  `sectionid` int(11) default NULL,
+  `targetedmessageid` int(11) default NULL,
+  `name` varchar(50) NOT NULL,
+  `notes` text NOT NULL,
+  `occurence` datetime NOT NULL,
+  PRIMARY KEY  (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 
+$$$
 
 --
 -- Table structure for table `fieldmap`
@@ -117,10 +267,24 @@ CREATE TABLE `fieldmap` (
   `options` text NOT NULL,
   PRIMARY KEY  (`id`),
   KEY `getfieldname` (`fieldnum`)
-) ENGINE = innodb DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 
 $$$
 
--- --------------------------------------------------------
+--
+-- Table structure for table `groupdata`
+--
+
+CREATE TABLE `groupdata` (
+  `id` bigint(11) NOT NULL auto_increment,
+  `personid` int(11) NOT NULL,
+  `fieldnum` tinyint(4) NOT NULL,
+  `value` varchar(255) NOT NULL,
+  `importid` int(11) NOT NULL,
+  PRIMARY KEY  (`id`),
+  KEY `personfield` (`personid`,`fieldnum`),
+  KEY `importid` (`importid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 
+$$$
 
 --
 -- Table structure for table `import`
@@ -134,20 +298,22 @@ CREATE TABLE `import` (
   `listid` int(11) default NULL,
   `name` varchar(50) NOT NULL default '',
   `description` varchar(50) NOT NULL default '',
+  `notes` text,
   `status` enum('idle','queued','running','error') NOT NULL default 'idle',
   `type` enum('manual','automatic','list','addressbook') NOT NULL default 'manual',
+  `datatype` enum('person','user','enrollment','section') NOT NULL default 'person',
   `ownertype` enum('system','user') NOT NULL default 'system',
-  `updatemethod` enum('updateonly','update','full') NOT NULL default 'full',
+  `updatemethod` enum('updateonly','update','full','createonly') NOT NULL default 'full',
   `lastrun` datetime default NULL,
   `data` longblob,
   `datamodifiedtime` datetime default NULL,
+  `skipheaderlines` tinyint(4) NOT NULL default '0',
+  `alertoptions` text,
   PRIMARY KEY  (`id`),
   UNIQUE KEY `uploadkey` (`uploadkey`),
   KEY `scheduleid` (`scheduleid`)
-) ENGINE = innodb DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 
 $$$
-
--- --------------------------------------------------------
 
 --
 -- Table structure for table `importfield`
@@ -157,12 +323,12 @@ CREATE TABLE `importfield` (
   `id` int(11) NOT NULL auto_increment,
   `importid` int(11) NOT NULL default '0',
   `mapto` varchar(4) NOT NULL default '',
-  `mapfrom` tinyint(4) NOT NULL default '0',
+  `action` enum('copy','staticvalue','number','currency','date','lookup','curdate','numeric','currencyleadingzero') NOT NULL default 'copy',
+  `mapfrom` tinyint(4) default NULL,
+  `val` text,
   PRIMARY KEY  (`id`)
-) ENGINE = innodb DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 
 $$$
-
--- --------------------------------------------------------
 
 --
 -- Table structure for table `importjob`
@@ -173,10 +339,22 @@ CREATE TABLE `importjob` (
   `importid` int(11) NOT NULL,
   `jobid` int(11) NOT NULL,
   PRIMARY KEY  (`id`)
-) ENGINE = innodb DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 
 $$$
 
--- --------------------------------------------------------
+--
+-- Table structure for table `importlogentry`
+--
+
+CREATE TABLE `importlogentry` (
+  `id` bigint(20) NOT NULL auto_increment,
+  `importid` int(11) NOT NULL,
+  `severity` enum('info','error','warn') NOT NULL,
+  `txt` varchar(255) NOT NULL,
+  `linenum` int(11) default NULL,
+  PRIMARY KEY  (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 
+$$$
 
 --
 -- Table structure for table `job`
@@ -184,18 +362,16 @@ $$$
 
 CREATE TABLE `job` (
   `id` int(11) NOT NULL auto_increment,
+  `messagegroupid` int(11) default NULL,
   `userid` int(11) NOT NULL default '0',
   `scheduleid` int(11) default NULL,
   `jobtypeid` int(11) default '0',
   `name` varchar(50) NOT NULL default '',
   `description` varchar(50) NOT NULL default '',
-  `listid` int(11) NOT NULL default '0',
-  `phonemessageid` int(11) default NULL,
-  `emailmessageid` int(11) default NULL,
-  `printmessageid` int(11) default NULL,
   `questionnaireid` int(11) default NULL,
-  `type` set('phone','email','print','survey') NOT NULL default 'phone',
+  `type` enum('notification','survey','alert') NOT NULL default 'notification',
   `createdate` datetime NOT NULL default '0000-00-00 00:00:00',
+  `modifydate` datetime default NULL,
   `startdate` date NOT NULL default '0000-00-00',
   `enddate` date NOT NULL default '2006-07-04',
   `starttime` time NOT NULL default '00:00:00',
@@ -207,7 +383,6 @@ CREATE TABLE `job` (
   `ranautoreport` tinyint(4) NOT NULL default '0',
   `priorityadjust` int(11) NOT NULL default '0',
   `cancelleduserid` int(11) default NULL,
-  `thesql` text,
   PRIMARY KEY  (`id`),
   KEY `status` (`status`,`id`),
   KEY `startdate` (`startdate`),
@@ -216,11 +391,12 @@ CREATE TABLE `job` (
   KEY `endtime` (`endtime`),
   KEY `startdate_2` (`startdate`,`enddate`,`starttime`,`endtime`,`id`),
   KEY `scheduleid` (`scheduleid`),
-  KEY `ranautoreport` (`ranautoreport`,`status`)
-) ENGINE = innodb DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci
+  KEY `ranautoreport` (`ranautoreport`,`status`),
+  KEY `useraccess` (`userid`,`status`,`deleted`),
+  KEY `modifydate` (`modifydate`),
+  KEY `messagegroupid` (`messagegroupid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 
 $$$
-
--- --------------------------------------------------------
 
 --
 -- Table structure for table `joblanguage`
@@ -230,14 +406,26 @@ CREATE TABLE `joblanguage` (
   `id` int(11) NOT NULL auto_increment,
   `jobid` int(11) NOT NULL default '0',
   `messageid` int(11) NOT NULL default '0',
-  `type` enum('phone','email','print') NOT NULL default 'phone',
+  `type` enum('phone','email','print','sms') NOT NULL default 'phone',
   `language` varchar(255) NOT NULL default '',
+  `translationeditlock` tinyint(4) NOT NULL default '0',
   PRIMARY KEY  (`id`),
   KEY `jobid` (`jobid`,`language`(50))
-) ENGINE = innodb DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 
 $$$
 
--- --------------------------------------------------------
+--
+-- Table structure for table `joblist`
+--
+
+CREATE TABLE `joblist` (
+  `id` int(11) NOT NULL auto_increment,
+  `jobid` int(11) NOT NULL,
+  `listid` int(11) NOT NULL,
+  PRIMARY KEY  (`id`),
+  KEY `jobid` (`jobid`,`listid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 
+$$$
 
 --
 -- Table structure for table `jobsetting`
@@ -248,10 +436,8 @@ CREATE TABLE `jobsetting` (
   `name` varchar(50) NOT NULL,
   `value` varchar(255) NOT NULL default '',
   PRIMARY KEY  (`jobid`,`name`)
-) ENGINE = innodb DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 
 $$$
-
--- --------------------------------------------------------
 
 --
 -- Table structure for table `jobstats`
@@ -261,10 +447,8 @@ CREATE TABLE `jobstats` (
   `jobid` int(11) NOT NULL,
   `count` int(11) NOT NULL,
   PRIMARY KEY  (`jobid`)
-) ENGINE = innodb DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 
 $$$
-
--- --------------------------------------------------------
 
 --
 -- Table structure for table `jobtype`
@@ -273,16 +457,26 @@ $$$
 CREATE TABLE `jobtype` (
   `id` int(11) NOT NULL auto_increment,
   `name` varchar(50) NOT NULL default '',
-  `priority` int(11) NOT NULL default '10000',
   `systempriority` tinyint(4) NOT NULL default '3',
-  `timeslices` smallint(6) NOT NULL default '0',
+  `info` varchar(255) NOT NULL,
+  `issurvey` tinyint(4) NOT NULL default '0',
   `deleted` tinyint(4) NOT NULL default '0',
-  PRIMARY KEY  (`id`),
-  KEY `customerid` (`priority`)
-) ENGINE = innodb DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci
+  PRIMARY KEY  (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 
 $$$
 
--- --------------------------------------------------------
+--
+-- Table structure for table `jobtypepref`
+--
+
+CREATE TABLE `jobtypepref` (
+  `jobtypeid` int(11) NOT NULL,
+  `type` enum('phone','email','print','sms') NOT NULL,
+  `sequence` tinyint(4) NOT NULL,
+  `enabled` tinyint(4) NOT NULL default '0',
+  PRIMARY KEY  (`jobtypeid`,`type`,`sequence`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 
+$$$
 
 --
 -- Table structure for table `language`
@@ -290,12 +484,12 @@ $$$
 
 CREATE TABLE `language` (
   `id` int(11) NOT NULL auto_increment,
-  `name` varchar(50) NOT NULL default '',
-  PRIMARY KEY  (`id`)
-) ENGINE = innodb DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci
+  `name` varchar(255) NOT NULL,
+  `code` varchar(3) character set ascii NOT NULL default '',
+  PRIMARY KEY  (`id`),
+  KEY `code` (`code`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 
 $$$
-
--- --------------------------------------------------------
 
 --
 -- Table structure for table `list`
@@ -304,16 +498,17 @@ $$$
 CREATE TABLE `list` (
   `id` int(11) NOT NULL auto_increment,
   `userid` int(11) NOT NULL default '0',
+  `type` enum('person','section','alert') NOT NULL default 'person',
   `name` varchar(50) NOT NULL default '',
   `description` varchar(50) NOT NULL default '',
+  `modifydate` datetime default NULL,
   `lastused` datetime default NULL,
   `deleted` tinyint(4) NOT NULL default '0',
   PRIMARY KEY  (`id`),
-  KEY `userid` (`userid`,`name`,`deleted`)
-) ENGINE = innodb DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci
+  KEY `userid` (`userid`,`name`,`deleted`),
+  KEY `modifydate` (`modifydate`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 
 $$$
-
--- --------------------------------------------------------
 
 --
 -- Table structure for table `listentry`
@@ -322,15 +517,16 @@ $$$
 CREATE TABLE `listentry` (
   `id` int(11) NOT NULL auto_increment,
   `listid` int(11) NOT NULL default '0',
-  `type` enum('R','A','N') NOT NULL default 'A',
+  `type` enum('rule','add','negate','organization','section') NOT NULL default 'add',
   `ruleid` int(11) default NULL,
   `personid` int(11) default NULL,
+  `organizationid` int(11) default NULL,
+  `sectionid` int(11) default NULL,
   PRIMARY KEY  (`id`),
-  KEY `type` (`personid`,`listid`,`type`)
-) ENGINE = innodb DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci
+  KEY `type` (`personid`,`listid`),
+  KEY `listrule` (`listid`,`personid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 
 $$$
-
--- --------------------------------------------------------
 
 --
 -- Table structure for table `message`
@@ -338,19 +534,60 @@ $$$
 
 CREATE TABLE `message` (
   `id` int(11) NOT NULL auto_increment,
+  `messagegroupid` int(11) default NULL,
   `userid` int(11) NOT NULL default '0',
   `name` varchar(50) NOT NULL default '',
   `description` varchar(50) NOT NULL default '',
-  `type` enum('phone','email','print') NOT NULL default 'phone',
+  `type` enum('phone','email','print','sms') NOT NULL default 'phone',
+  `subtype` varchar(20) NOT NULL,
   `data` text NOT NULL,
-  `lastused` datetime default NULL,
+  `modifydate` datetime default NULL,
   `deleted` tinyint(4) NOT NULL default '0',
+  `autotranslate` enum('none','translated','source','overridden') NOT NULL default 'none',
+  `languagecode` varchar(3) character set ascii default NULL,
   PRIMARY KEY  (`id`),
-  KEY `userid` (`userid`,`type`,`deleted`)
-) ENGINE = innodb DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci
+  KEY `userid` (`userid`,`type`,`deleted`),
+  KEY `modifydate` (`modifydate`),
+  KEY `messagegroupid` (`messagegroupid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 
 $$$
 
--- --------------------------------------------------------
+--
+-- Table structure for table `messageattachment`
+--
+
+CREATE TABLE `messageattachment` (
+  `id` int(11) NOT NULL auto_increment,
+  `messageid` int(11) NOT NULL,
+  `contentid` bigint(20) NOT NULL,
+  `filename` varchar(255) NOT NULL,
+  `size` int(11) NOT NULL,
+  `deleted` tinyint(4) NOT NULL default '0',
+  PRIMARY KEY  (`id`),
+  KEY `messageid` (`messageid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 
+$$$
+
+--
+-- Table structure for table `messagegroup`
+--
+
+CREATE TABLE `messagegroup` (
+  `id` int(11) NOT NULL auto_increment,
+  `userid` int(11) NOT NULL,
+  `type` enum('notification','targetedmessage','classroomtemplate') NOT NULL default 'notification',
+  `name` varchar(50) NOT NULL,
+  `description` varchar(50) NOT NULL,
+  `modified` datetime NOT NULL,
+  `lastused` datetime default NULL,
+  `permanent` tinyint(4) NOT NULL default '1',
+  `deleted` tinyint(4) NOT NULL default '0',
+  `defaultlanguagecode` varchar(3) character set ascii NOT NULL default 'en',
+  `data` text NOT NULL,
+  PRIMARY KEY  (`id`),
+  KEY `userid` (`userid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 
+$$$
 
 --
 -- Table structure for table `messagepart`
@@ -359,19 +596,32 @@ $$$
 CREATE TABLE `messagepart` (
   `id` int(11) NOT NULL auto_increment,
   `messageid` int(11) NOT NULL default '0',
-  `type` enum('A','T','V') NOT NULL default 'A',
+  `type` enum('A','T','V','I') NOT NULL default 'A',
   `audiofileid` int(11) default NULL,
+  `imagecontentid` bigint(20) default NULL,
   `txt` text,
   `fieldnum` varchar(4) default NULL,
   `defaultvalue` varchar(255) default NULL,
   `voiceid` int(11) default NULL,
   `sequence` tinyint(4) NOT NULL default '0',
+  `maxlen` smallint(6) default NULL,
   PRIMARY KEY  (`id`),
   KEY `messageid` (`messageid`,`sequence`)
-) ENGINE = innodb DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 
 $$$
 
--- --------------------------------------------------------
+--
+-- Table structure for table `organization`
+--
+
+CREATE TABLE `organization` (
+  `id` int(11) NOT NULL auto_increment,
+  `orgkey` varchar(255) NOT NULL,
+  `deleted` tinyint(4) NOT NULL default '0',
+  PRIMARY KEY  (`id`),
+  UNIQUE KEY `orgkey` (`orgkey`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 
+$$$
 
 --
 -- Table structure for table `permission`
@@ -382,11 +632,10 @@ CREATE TABLE `permission` (
   `accessid` int(11) NOT NULL default '0',
   `name` varchar(50) NOT NULL default '',
   `value` text NOT NULL,
-  PRIMARY KEY  (`id`)
-) ENGINE = innodb DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci
+  PRIMARY KEY  (`id`),
+  KEY `accessid` (`accessid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 
 $$$
-
--- --------------------------------------------------------
 
 --
 -- Table structure for table `person`
@@ -421,13 +670,8 @@ CREATE TABLE `person` (
   `f19` varchar(255) NOT NULL,
   `f20` varchar(255) NOT NULL,
   PRIMARY KEY  (`id`),
-  KEY `getbykey` (`pkey`(50)),
-  KEY `pkeysort` (`id`,`pkey`(50)),
-  KEY `pkeysortb` (`pkey`(50),`id`),
   KEY `lastimport` (`importid`,`lastimport`),
-  KEY `general` (`id`,`deleted`),
   KEY `ownership` (`userid`),
-  KEY `namesort` (`f02`,`f01`),
   KEY `lang` (`f03`),
   KEY `f04` (`f04`(20)),
   KEY `f05` (`f05`(20)),
@@ -445,11 +689,31 @@ CREATE TABLE `person` (
   KEY `f17` (`f17`(20)),
   KEY `f18` (`f18`(20)),
   KEY `f19` (`f19`(20)),
-  KEY `f20` (`f20`(20))
-) ENGINE = innodb DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci
+  KEY `f20` (`f20`(20)),
+  KEY `pkeysort` (`pkey`,`type`,`deleted`),
+  KEY `f01` (`f01`),
+  KEY `f02` (`f02`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 
 $$$
 
--- --------------------------------------------------------
+--
+-- Table structure for table `personassociation`
+--
+
+CREATE TABLE `personassociation` (
+  `id` int(11) NOT NULL auto_increment,
+  `personid` int(11) NOT NULL,
+  `importid` int(11) default NULL,
+  `importstatus` enum('none','checking','new') character set latin1 collate latin1_general_ci NOT NULL default 'none',
+  `type` enum('organization','section','event') NOT NULL,
+  `organizationid` int(11) default NULL,
+  `sectionid` int(11) default NULL,
+  `eventid` int(11) default NULL,
+  PRIMARY KEY  (`id`),
+  KEY `personid` (`personid`),
+  KEY `importid` (`importid`,`importstatus`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 
+$$$
 
 --
 -- Table structure for table `persondatavalues`
@@ -460,13 +724,26 @@ CREATE TABLE `persondatavalues` (
   `fieldnum` varchar(4) NOT NULL default '',
   `value` varchar(255) default NULL,
   `refcount` int(11) NOT NULL default '0',
+  `editlock` tinyint(4) NOT NULL default '0',
   PRIMARY KEY  (`id`),
   KEY `valuelookup` (`value`(50)),
   KEY `name` (`fieldnum`)
-) ENGINE = innodb DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 
 $$$
 
--- --------------------------------------------------------
+--
+-- Table structure for table `personsetting`
+--
+
+CREATE TABLE `personsetting` (
+  `id` int(11) NOT NULL auto_increment,
+  `personid` int(11) NOT NULL,
+  `name` varchar(50) NOT NULL,
+  `value` varchar(255) NOT NULL,
+  PRIMARY KEY  (`id`),
+  KEY `personid` (`personid`,`name`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 
+$$$
 
 --
 -- Table structure for table `phone`
@@ -478,14 +755,80 @@ CREATE TABLE `phone` (
   `phone` varchar(20) NOT NULL default '',
   `sequence` tinyint(4) NOT NULL default '0',
   `editlock` tinyint(4) NOT NULL default '0',
-  `smsenabled` tinyint(4) NOT NULL default '0',
+  `editlockdate` datetime default NULL,
   PRIMARY KEY  (`id`),
   KEY `personid` (`personid`,`sequence`),
-  KEY `dedupe` (`phone`,`sequence`)
-) ENGINE = innodb DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci
+  KEY `dedupe` (`phone`,`sequence`),
+  KEY `editlockdate` (`editlockdate`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 
 $$$
 
--- --------------------------------------------------------
+--
+-- Table structure for table `portalperson`
+--
+
+CREATE TABLE `portalperson` (
+  `portaluserid` int(11) NOT NULL,
+  `personid` int(11) NOT NULL,
+  `notifyemail` varchar(100) default NULL,
+  `notifysms` varchar(20) default NULL,
+  PRIMARY KEY  (`portaluserid`,`personid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 
+$$$
+
+--
+-- Table structure for table `portalpersontoken`
+--
+
+CREATE TABLE `portalpersontoken` (
+  `token` varchar(255) NOT NULL,
+  `expirationdate` date NOT NULL,
+  `personid` int(11) NOT NULL,
+  `creationuserid` int(11) NOT NULL,
+  PRIMARY KEY  (`personid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 
+$$$
+
+--
+-- Table structure for table `prompt`
+--
+
+CREATE TABLE `prompt` (
+  `id` int(11) NOT NULL auto_increment,
+  `type` enum('intro','emergencyintro','langmenu') NOT NULL,
+  `messageid` int(11) NOT NULL,
+  `dtmf` tinyint(4) default NULL,
+  `languagecode` varchar(3) character set ascii NOT NULL default '',
+  PRIMARY KEY  (`id`),
+  KEY `type` (`type`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 
+$$$
+
+--
+-- Table structure for table `publish`
+--
+
+CREATE TABLE `publish` (
+  `id` int(11) NOT NULL auto_increment,
+  `userid` int(11) NOT NULL,
+  `action` enum('publish','subscribe') NOT NULL,
+  `type` enum('messagegroup') NOT NULL,
+  `messagegroupid` int(11) default NULL,
+  PRIMARY KEY  (`id`),
+  KEY `userid` (`userid`),
+  KEY `messagegroupid` (`messagegroupid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 
+$$$
+
+--
+-- Table structure for table `reportarchive`
+--
+
+CREATE TABLE `reportarchive` (
+  `name` varchar(50) NOT NULL,
+  `contentid` bigint(20) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 
+$$$
 
 --
 -- Table structure for table `reportcontact`
@@ -494,7 +837,7 @@ $$$
 CREATE TABLE `reportcontact` (
   `jobid` int(11) NOT NULL,
   `personid` int(11) NOT NULL,
-  `type` enum('phone','email','print') NOT NULL,
+  `type` enum('phone','email','print','sms') NOT NULL,
   `sequence` tinyint(4) NOT NULL,
   `numattempts` tinyint(4) NOT NULL default '0',
   `userid` int(11) NOT NULL default '0',
@@ -502,21 +845,38 @@ CREATE TABLE `reportcontact` (
   `result` enum('C','A','M','N','B','X','F','sent','unsent','printed','notprinted','notattempted','duplicate','blocked') NOT NULL default 'notattempted',
   `participated` tinyint(4) NOT NULL default '0',
   `duration` float default NULL,
-  `resultdata` text,
+  `resultdata` varchar(255) default NULL,
   `attemptdata` varchar(255) default NULL,
   `phone` varchar(20) default NULL,
   `email` varchar(100) default NULL,
+  `sms` varchar(20) default NULL,
   `addressee` varchar(50) default NULL,
   `addr1` varchar(50) default NULL,
   `addr2` varchar(50) default NULL,
   `city` varchar(50) default NULL,
   `state` char(2) default NULL,
   `zip` varchar(10) default NULL,
+  `voicereplyid` int(11) default NULL,
+  `response` tinyint(4) default NULL,
+  `dispatchtype` enum('customer','system') NOT NULL default 'system',
   PRIMARY KEY  (`jobid`,`type`,`personid`,`sequence`)
-) ENGINE = innodb DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 
 $$$
 
--- --------------------------------------------------------
+--
+-- Table structure for table `reportgroupdata`
+--
+
+CREATE TABLE `reportgroupdata` (
+  `id` bigint(11) NOT NULL auto_increment,
+  `jobid` int(11) NOT NULL,
+  `personid` int(11) NOT NULL,
+  `fieldnum` tinyint(4) NOT NULL,
+  `value` varchar(255) NOT NULL,
+  PRIMARY KEY  (`id`),
+  KEY `jobpersonfield` (`jobid`,`personid`,`fieldnum`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 
+$$$
 
 --
 -- Table structure for table `reportinstance`
@@ -529,10 +889,8 @@ CREATE TABLE `reportinstance` (
   `activefields` text,
   `instancehash` varchar(32) NOT NULL default '',
   PRIMARY KEY  (`id`)
-) ENGINE = innodb DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 
 $$$
-
--- --------------------------------------------------------
 
 --
 -- Table structure for table `reportperson`
@@ -541,12 +899,14 @@ $$$
 CREATE TABLE `reportperson` (
   `jobid` int(11) NOT NULL,
   `personid` int(11) NOT NULL,
-  `type` enum('phone','email','print') NOT NULL,
+  `type` enum('phone','email','print','sms') NOT NULL,
   `userid` int(11) NOT NULL,
   `messageid` int(11) default NULL,
-  `status` enum('new','queued','assigned','fail','success','duplicate','blocked','nocontacts') NOT NULL,
+  `status` enum('new','queued','assigned','fail','success','duplicate','blocked','nocontacts','declined') NOT NULL,
+  `iscontacted` tinyint(4) NOT NULL default '0',
   `numcontacts` tinyint(4) NOT NULL,
   `numduperemoved` tinyint(4) NOT NULL,
+  `numdeclined` tinyint(4) NOT NULL default '0',
   `numblocked` tinyint(4) NOT NULL,
   `duplicateid` int(11) default NULL,
   `pkey` varchar(255) default NULL,
@@ -572,10 +932,8 @@ CREATE TABLE `reportperson` (
   `f20` varchar(255) NOT NULL default '',
   PRIMARY KEY  (`jobid`,`type`,`personid`),
   KEY `status` (`status`)
-) ENGINE = innodb DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 
 $$$
-
--- --------------------------------------------------------
 
 --
 -- Table structure for table `reportsubscription`
@@ -593,14 +951,14 @@ CREATE TABLE `reportsubscription` (
   `lastrun` datetime default NULL,
   `nextrun` datetime default NULL,
   `time` time default NULL,
+  `modifydate` datetime default NULL,
   `email` text NOT NULL,
   PRIMARY KEY  (`id`),
   KEY `subscription` (`userid`,`reportinstanceid`),
-  KEY `nextrun` (`nextrun`)
-) ENGINE = innodb DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci
+  KEY `nextrun` (`nextrun`),
+  KEY `modifydate` (`modifydate`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 
 $$$
-
--- --------------------------------------------------------
 
 --
 -- Table structure for table `rule`
@@ -610,13 +968,11 @@ CREATE TABLE `rule` (
   `id` int(11) NOT NULL auto_increment,
   `logical` enum('and','or','and not','or not') NOT NULL default 'and',
   `fieldnum` varchar(4) NOT NULL default '0',
-  `op` enum('eq','ne','gt','ge','lt','le','lk','sw','ew','cn','in','reldate') NOT NULL default 'eq',
+  `op` enum('eq','ne','sw','ew','cn','in','reldate','date_range','num_eq','num_ne','num_gt','num_ge','num_lt','num_le','num_range','date_offset','reldate_range') NOT NULL default 'eq',
   `val` text NOT NULL,
   PRIMARY KEY  (`id`)
-) ENGINE = innodb DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 
 $$$
-
--- --------------------------------------------------------
 
 --
 -- Table structure for table `schedule`
@@ -629,10 +985,34 @@ CREATE TABLE `schedule` (
   `time` time NOT NULL default '00:00:00',
   `nextrun` datetime default NULL,
   PRIMARY KEY  (`id`)
-) ENGINE = innodb DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 
 $$$
 
--- --------------------------------------------------------
+--
+-- Table structure for table `section`
+--
+
+CREATE TABLE `section` (
+  `id` int(11) NOT NULL auto_increment,
+  `skey` varchar(255) NOT NULL,
+  `organizationid` int(11) NOT NULL,
+  `c01` varchar(255) NOT NULL,
+  `c02` varchar(255) NOT NULL,
+  `c03` varchar(255) NOT NULL,
+  `c04` varchar(255) NOT NULL,
+  `c05` varchar(255) NOT NULL,
+  `c06` varchar(255) NOT NULL,
+  `c07` varchar(255) NOT NULL,
+  `c08` varchar(255) NOT NULL,
+  `c09` varchar(255) NOT NULL,
+  `c10` varchar(255) NOT NULL,
+  `importid` int(11) default NULL,
+  `importstatus` enum('none','checking','new') character set latin1 collate latin1_general_ci NOT NULL default 'none',
+  PRIMARY KEY  (`id`),
+  UNIQUE KEY `skey` (`organizationid`,`skey`),
+  KEY `importid` (`importid`,`importstatus`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 
+$$$
 
 --
 -- Table structure for table `setting`
@@ -643,49 +1023,27 @@ CREATE TABLE `setting` (
   `name` varchar(50) NOT NULL default '',
   `value` varchar(255) NOT NULL default '',
   PRIMARY KEY  (`id`),
-  KEY `lookup` (`name`)
-) ENGINE = innodb DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci
+  UNIQUE KEY `name` (`name`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 
 $$$
 
--- --------------------------------------------------------
-
 --
--- Table structure for table `smsjob`
+-- Table structure for table `sms`
 --
 
-CREATE TABLE `smsjob` (
+CREATE TABLE `sms` (
   `id` int(11) NOT NULL auto_increment,
-  `userid` int(11) NOT NULL,
-  `listid` int(11) NOT NULL,
-  `name` varchar(50) NOT NULL,
-  `description` varchar(50) NOT NULL,
-  `txt` varchar(160) NOT NULL,
-  `sendoptout` tinyint(4) NOT NULL,
-  `sentdate` datetime NOT NULL,
-  `status` enum('new','queued','sent','error') NOT NULL,
-  `deleted` tinyint(4) NOT NULL default '0',
+  `personid` int(11) NOT NULL default '0',
+  `sms` varchar(20) NOT NULL default '',
+  `sequence` tinyint(4) NOT NULL default '0',
+  `editlock` tinyint(4) NOT NULL default '0',
+  `editlockdate` datetime default NULL,
   PRIMARY KEY  (`id`),
-  KEY `status` (`status`)
-) ENGINE = innodb DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci
+  KEY `personid` (`personid`,`sequence`),
+  KEY `dedupe` (`sms`,`sequence`),
+  KEY `editlockdate` (`editlockdate`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 
 $$$
-
--- --------------------------------------------------------
-
---
--- Table structure for table `smsmsg`
---
-
-CREATE TABLE `smsmsg` (
-  `id` int(11) NOT NULL auto_increment,
-  `smsjobid` int(11) NOT NULL,
-  `personid` int(11) NOT NULL,
-  `sequence` tinyint(4) NOT NULL,
-  `phone` varchar(10) NOT NULL,
-  PRIMARY KEY  (`id`)
-) ENGINE = innodb DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci
-$$$
-
--- --------------------------------------------------------
 
 --
 -- Table structure for table `specialtask`
@@ -693,16 +1051,47 @@ $$$
 
 CREATE TABLE `specialtask` (
   `id` bigint(20) NOT NULL auto_increment,
+  `userid` int(11) NOT NULL,
   `status` enum('new','queued','assigned','done') NOT NULL,
   `type` varchar(50) NOT NULL default 'EasyCall',
   `data` text NOT NULL,
   `lastcheckin` datetime default NULL,
   PRIMARY KEY  (`id`),
   KEY `status` (`status`,`type`)
-) ENGINE = innodb DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 
 $$$
 
--- --------------------------------------------------------
+--
+-- Table structure for table `subscriber`
+--
+
+CREATE TABLE `subscriber` (
+  `id` int(11) NOT NULL auto_increment,
+  `username` varchar(255) collate utf8_bin NOT NULL,
+  `password` varchar(50) collate utf8_bin NOT NULL,
+  `personid` int(11) default NULL,
+  `lastlogin` datetime default NULL,
+  `lastreminder` datetime default NULL,
+  `enabled` tinyint(4) NOT NULL,
+  `preferences` text collate utf8_bin,
+  PRIMARY KEY  (`id`),
+  UNIQUE KEY `username` (`username`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin 
+$$$
+
+--
+-- Table structure for table `subscriberpending`
+--
+
+CREATE TABLE `subscriberpending` (
+  `id` int(11) NOT NULL auto_increment,
+  `subscriberid` int(11) NOT NULL,
+  `type` enum('phone','email','sms') collate utf8_bin NOT NULL,
+  `value` varchar(255) collate utf8_bin NOT NULL,
+  `token` varchar(255) collate utf8_bin NOT NULL,
+  PRIMARY KEY  (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin 
+$$$
 
 --
 -- Table structure for table `surveyquestion`
@@ -716,11 +1105,10 @@ CREATE TABLE `surveyquestion` (
   `phonemessageid` int(11) default NULL,
   `reportlabel` text,
   `validresponse` tinyint(4) NOT NULL,
-  PRIMARY KEY  (`id`)
-) ENGINE = innodb DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci
+  PRIMARY KEY  (`id`),
+  KEY `questionnaireid` (`questionnaireid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 
 $$$
-
--- --------------------------------------------------------
 
 --
 -- Table structure for table `surveyquestionnaire`
@@ -743,11 +1131,10 @@ CREATE TABLE `surveyquestionnaire` (
   `usehtml` tinyint(4) NOT NULL default '0',
   `leavemessage` tinyint(4) NOT NULL default '0',
   `deleted` tinyint(4) NOT NULL default '0',
-  PRIMARY KEY  (`id`)
-) ENGINE = innodb DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci
+  PRIMARY KEY  (`id`),
+  KEY `userid` (`userid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 
 $$$
-
--- --------------------------------------------------------
 
 --
 -- Table structure for table `surveyresponse`
@@ -759,10 +1146,8 @@ CREATE TABLE `surveyresponse` (
   `answer` tinyint(4) NOT NULL,
   `tally` int(11) NOT NULL default '0',
   PRIMARY KEY  (`jobid`,`questionnumber`,`answer`)
-) ENGINE = innodb DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 
 $$$
-
--- --------------------------------------------------------
 
 --
 -- Table structure for table `surveyweb`
@@ -777,10 +1162,22 @@ CREATE TABLE `surveyweb` (
   `loggedip` varchar(15) character set utf8 collate utf8_bin default NULL,
   `resultdata` text character set utf8 collate utf8_bin NOT NULL,
   PRIMARY KEY  (`jobid`,`personid`)
-) ENGINE = innodb DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 
 $$$
 
--- --------------------------------------------------------
+--
+-- Table structure for table `systemmessages`
+--
+
+CREATE TABLE `systemmessages` (
+  `id` int(11) NOT NULL auto_increment,
+  `message` varchar(1000) NOT NULL,
+  `icon` varchar(50) default NULL,
+  `modifydate` datetime NOT NULL,
+  PRIMARY KEY  (`id`),
+  KEY `modifydate` (`modifydate`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 
+$$$
 
 --
 -- Table structure for table `systemstats`
@@ -788,6 +1185,7 @@ $$$
 
 CREATE TABLE `systemstats` (
   `jobid` int(11) NOT NULL,
+  `attempt` tinyint(4) NOT NULL default '0',
   `date` date NOT NULL,
   `hour` int(11) NOT NULL,
   `answered` int(11) NOT NULL,
@@ -796,11 +1194,38 @@ CREATE TABLE `systemstats` (
   `noanswer` int(11) NOT NULL,
   `failed` int(11) NOT NULL,
   `disconnect` int(11) NOT NULL,
-  PRIMARY KEY  (`jobid`,`date`,`hour`)
-) ENGINE = innodb DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci
+  PRIMARY KEY  (`jobid`,`attempt`,`date`,`hour`),
+  KEY `graphs` (`date`,`attempt`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 
 $$$
 
--- --------------------------------------------------------
+--
+-- Table structure for table `targetedmessage`
+--
+
+CREATE TABLE `targetedmessage` (
+  `id` int(11) NOT NULL auto_increment,
+  `messagekey` varchar(255) NOT NULL,
+  `targetedmessagecategoryid` int(11) NOT NULL,
+  `overridemessagegroupid` int(11) default NULL,
+  `deleted` tinyint(4) NOT NULL default '0',
+  `enabled` tinyint(4) NOT NULL default '1',
+  PRIMARY KEY  (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 
+$$$
+
+--
+-- Table structure for table `targetedmessagecategory`
+--
+
+CREATE TABLE `targetedmessagecategory` (
+  `id` int(11) NOT NULL auto_increment,
+  `name` varchar(50) NOT NULL,
+  `deleted` tinyint(4) NOT NULL default '0',
+  `image` varchar(50) default NULL,
+  PRIMARY KEY  (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 
+$$$
 
 --
 -- Table structure for table `ttsvoice`
@@ -809,12 +1234,11 @@ $$$
 CREATE TABLE `ttsvoice` (
   `id` int(11) NOT NULL auto_increment,
   `language` varchar(20) NOT NULL default '',
+  `languagecode` varchar(3) character set ascii NOT NULL,
   `gender` enum('male','female') NOT NULL default 'male',
   PRIMARY KEY  (`id`)
-) ENGINE = innodb DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 
 $$$
-
--- --------------------------------------------------------
 
 --
 -- Table structure for table `user`
@@ -824,24 +1248,46 @@ CREATE TABLE `user` (
   `id` int(11) NOT NULL auto_increment,
   `accessid` int(11) NOT NULL default '0',
   `login` varchar(20) character set utf8 collate utf8_bin NOT NULL,
-  `password` varchar(255) NOT NULL default '',
+  `password` varchar(50) NOT NULL,
   `accesscode` varchar(10) NOT NULL default '',
-  `pincode` varchar(255) NOT NULL default '',
+  `pincode` varchar(50) NOT NULL,
   `firstname` varchar(50) NOT NULL default '',
   `lastname` varchar(50) NOT NULL default '',
   `description` varchar(50) NOT NULL default '',
   `phone` varchar(20) NOT NULL default '',
-  `email` text NOT NULL,
+  `email` varchar(255) NOT NULL,
+  `aremail` text NOT NULL,
   `enabled` tinyint(4) NOT NULL default '0',
   `lastlogin` datetime default NULL,
   `deleted` tinyint(4) NOT NULL default '0',
   `ldap` tinyint(10) NOT NULL default '0',
+  `staffpkey` varchar(255) default NULL,
+  `importid` int(11) default NULL,
+  `lastimport` datetime default NULL,
   PRIMARY KEY  (`id`),
-  KEY `login` (`login`,`password`,`enabled`,`deleted`)
-) ENGINE = innodb DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci
+  KEY `login` (`login`,`password`,`enabled`,`deleted`),
+  KEY `staffpkey` (`staffpkey`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 
 $$$
 
--- --------------------------------------------------------
+--
+-- Table structure for table `userassociation`
+--
+
+CREATE TABLE `userassociation` (
+  `id` int(11) NOT NULL auto_increment,
+  `userid` int(11) NOT NULL default '0',
+  `importid` int(11) default NULL,
+  `importstatus` enum('none','checking','new') character set latin1 collate latin1_general_ci NOT NULL default 'none',
+  `type` enum('rule','organization','section') NOT NULL default 'rule',
+  `organizationid` int(11) default NULL,
+  `sectionid` int(11) default NULL,
+  `ruleid` int(11) default NULL,
+  PRIMARY KEY  (`id`),
+  KEY `userid` (`userid`),
+  KEY `importid` (`importid`,`importstatus`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 
+$$$
 
 --
 -- Table structure for table `userjobtypes`
@@ -851,22 +1297,8 @@ CREATE TABLE `userjobtypes` (
   `userid` int(11) NOT NULL default '0',
   `jobtypeid` int(11) NOT NULL default '0',
   PRIMARY KEY  (`userid`,`jobtypeid`)
-) ENGINE = innodb DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 
 $$$
-
--- --------------------------------------------------------
-
---
--- Table structure for table `userrule`
---
-
-CREATE TABLE `userrule` (
-  `userid` int(11) NOT NULL default '0',
-  `ruleid` int(11) NOT NULL default '0'
-) ENGINE = innodb DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci
-$$$
-
--- --------------------------------------------------------
 
 --
 -- Table structure for table `usersetting`
@@ -879,10 +1311,8 @@ CREATE TABLE `usersetting` (
   `value` varchar(255) NOT NULL,
   PRIMARY KEY  (`id`),
   KEY `usersetting` (`userid`,`name`)
-) ENGINE = innodb DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 
 $$$
-
--- --------------------------------------------------------
 
 --
 -- Table structure for table `voicereply`
@@ -901,720 +1331,11 @@ CREATE TABLE `voicereply` (
   KEY `jobid` (`jobid`),
   KEY `userid` (`userid`),
   KEY `replytime` (`replytime`)
-) ENGINE = innodb DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 
 $$$
 
+-- ASP_7-5 rev8 ends here!!!
 
--- ASP_RELEASE_2007_08_10
 
-alter table reportperson add iscontacted tinyint(4) not null default 0 after status
-$$$
-
-update reportperson set iscontacted=1 where status='success'
-$$$
-
--- Parent Portal
-
-CREATE TABLE `portalperson` (
-  `portaluserid` int(11) NOT NULL,
-  `personid` int(11) NOT NULL,
-  PRIMARY KEY  (`portaluserid`,`personid`)
-) ENGINE = innodb DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci
-$$$
-
-CREATE TABLE `portalpersontoken` (
-  `token` varchar(255) NOT NULL,
-  `expirationdate` datetime NOT NULL,
-  `personid` int(11) NOT NULL,
-  `creationuserid` int(11) NOT NULL,
-  PRIMARY KEY  (`token`),
-  UNIQUE KEY `personid` (`personid`)
-) ENGINE = innodb DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci
-$$$
-
-ALTER TABLE `jobtype`
-ADD `infoforparents` VARCHAR( 255 ) NOT NULL DEFAULT ''  AFTER `timeslices` ,
-ADD `issurvey` TINYINT NOT NULL DEFAULT '0' AFTER `infoforparents`
-$$$
-
-CREATE TABLE `jobtypepref` (
-`jobtypeid` INT NOT NULL ,
-`type` ENUM( 'phone', 'email', 'print', 'sms' ) NOT NULL ,
-`sequence` TINYINT NOT NULL ,
-`enabled` TINYINT NOT NULL DEFAULT '0',
-PRIMARY KEY ( `jobtypeid` , `type` , `sequence` )
-) ENGINE = innodb DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci
-$$$
-
-CREATE TABLE `contactpref` (
-`personid` INT NOT NULL,
-`jobtypeid` INT NOT NULL,
-`type` ENUM( 'phone', 'email', 'print', 'sms' ) NOT NULL ,
-`sequence` TINYINT NOT NULL,
-`enabled` TINYINT NOT NULL DEFAULT '0',
-PRIMARY KEY ( `personid` , `jobtypeid` , `type` , `sequence` )
-) ENGINE = innodb DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci
-$$$
-
-ALTER TABLE `reportcontact` CHANGE `result` `result` enum('C','A','M','N','B','X','F','sent','unsent','printed','notprinted','notattempted','duplicate','blocked','declined') NOT NULL default 'notattempted'
-$$$
-
-ALTER TABLE `reportperson` CHANGE `status` `status` enum('new','queued','assigned','fail','success','duplicate','blocked','nocontacts','declined') NOT NULL
-$$$
-
-ALTER TABLE `reportperson`
-ADD `numdeclined` tinyint(4) NOT NULL default '0' AFTER `numduperemoved`
-$$$
-
-
--- alter sms
-
-ALTER TABLE `job`
-ADD   `smsmessageid` int(11) default NULL AFTER `printmessageid`
-$$$
-
-ALTER TABLE `job`
-CHANGE `type` `type` set('phone','email','print','sms','survey') NOT NULL default 'phone'
-$$$
-
-ALTER TABLE `joblanguage`
-CHANGE `type` `type` enum('phone','email','print','sms') NOT NULL default 'phone'
-$$$
-
-ALTER TABLE `message`
-CHANGE `type` `type` enum('phone','email','print','sms') NOT NULL default 'phone'
-$$$
-
-ALTER TABLE `reportcontact`
-CHANGE `type` `type` enum('phone','email','print','sms') NOT NULL
-$$$
-
-ALTER TABLE `reportperson`
-CHANGE `type` `type` enum('phone','email','print','sms') NOT NULL
-$$$
-
-ALTER TABLE `messagepart` ADD `maxlen` SMALLINT NULL
-$$$
-
-CREATE TABLE `sms` (
-  `id` int(11) NOT NULL auto_increment,
-  `personid` int(11) NOT NULL default '0',
-  `sms` varchar(20) NOT NULL default '',
-  `sequence` tinyint(4) NOT NULL default '0',
-  `editlock` tinyint(4) NOT NULL default '0',
-  PRIMARY KEY  (`id`),
-  KEY `personid` (`personid`,`sequence`),
-  KEY `dedupe` (`sms`,`sequence`)
-) ENGINE = innodb DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci
-$$$
-
-ALTER TABLE `reportcontact`
-ADD `sms` varchar(20) default NULL AFTER `email`
-$$$
-
-
--- import enhancements
-
-ALTER TABLE `importfield` add `action` ENUM( 'copy', 'staticvalue', 'number', 'currency', 'date', 'lookup' ) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT 'copy' after mapto
-$$$
-
-ALTER TABLE `importfield` add `val` TEXT CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL
-$$$
-
-ALTER TABLE `importfield` CHANGE `mapfrom` `mapfrom` TINYINT( 4 ) NULL
-$$$
-
--- more changes
-
-ALTER TABLE phone DROP smsenabled
-$$$
-
-ALTER TABLE jobtype DROP `priority`
-$$$
-
-ALTER TABLE `portalpersontoken` CHANGE `expirationdate` `expirationdate` DATE NOT NULL
-$$$
-
--- add curdate and skipheaders to imports
-
-ALTER TABLE `import` ADD `skipheaderlines` TINYINT NOT NULL DEFAULT '0' AFTER `datamodifiedtime`
-$$$
-
-ALTER TABLE `importfield` CHANGE `action` `action` ENUM( 'copy', 'staticvalue', 'number', 'currency', 'date', 'lookup', 'curdate' ) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT 'copy'
-$$$
-
--- timeslices moved to system setting
-ALTER TABLE jobtype DROP `timeslices`
-$$$
-
--- TODO remove the first alter when we added 'declined' we would not want to alter a huge table twice!
-ALTER TABLE `reportcontact` CHANGE `result` `result` enum('C','A','M','N','B','X','F','sent','unsent','printed','notprinted','notattempted','duplicate','blocked') NOT NULL default 'notattempted'
-$$$
-
-DROP TABLE smsjob
-$$$
-
-DROP TABLE smsmsg
-$$$
-
-ALTER TABLE `systemstats` ADD `attempt` TINYINT NOT NULL DEFAULT '0' AFTER `jobid`
-$$$
-
-ALTER TABLE `systemstats` DROP PRIMARY KEY ,
-ADD PRIMARY KEY ( `jobid` , `attempt` , `date` , `hour` )
-$$$
-
--- New table for destination labels
-CREATE TABLE `destlabel` (
-`type` ENUM( 'phone', 'email', 'sms' ) NOT NULL ,
-`sequence` TINYINT NOT NULL ,
-`label` VARCHAR( 20 ) NOT NULL ,
-PRIMARY KEY ( `type` , `sequence` )
-) ENGINE = innodb DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci
-$$$
-
-ALTER TABLE `jobtype` CHANGE `infoforparents` `info` VARCHAR( 255 ) NOT NULL
-$$$
-
-ALTER TABLE `portalpersontoken` DROP PRIMARY KEY ,
-ADD PRIMARY KEY ( `token` , `personid` )
-$$$
-
--- Dec 10
-
-ALTER TABLE `portalpersontoken` DROP INDEX `personid`
-$$$
-
-ALTER TABLE `portalpersontoken` DROP PRIMARY KEY ,
-ADD PRIMARY KEY ( `personid` )
-$$$
-
--- Dec 13
-
-ALTER TABLE `portalperson` ADD `notifyemail` VARCHAR( 100 ) NULL
-$$$
-
--- email attachments
-
-CREATE TABLE `messageattachment` (
-`id` INT NOT NULL AUTO_INCREMENT PRIMARY KEY ,
-`messageid` INT NOT NULL ,
-`contentid` BIGINT NOT NULL ,
-`filename` VARCHAR( 255 ) NOT NULL ,
-`size` INT NOT NULL ,
-`deleted` TINYINT NOT NULL DEFAULT '0',
-INDEX ( `messageid` )
-) ENGINE = innodb DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci
-$$$
-
--- After ASP_5-2 april 3
-
-CREATE TABLE `custdm` (
-  `dmid` int(11) NOT NULL,
-  `name` varchar(255) NOT NULL,
-  `enablestate` enum('new','active','disabled') NOT NULL,
-  PRIMARY KEY  (`dmid`)
-) ENGINE = innodb DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci
-$$$
-
-
-CREATE TABLE `dmroute` (
-  `id` int(11) NOT NULL auto_increment,
-  `dmid` int(11) NOT NULL,
-  `match` varchar(20) NOT NULL,
-  `strip` int(11) NOT NULL,
-  `prefix` varchar(20) NOT NULL,
-  `suffix` varchar(20) NOT NULL,
-  PRIMARY KEY  (`id`),
-  UNIQUE KEY `dmid` (`dmid`,`match`)
-) ENGINE = innodb DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci
-$$$
-
-ALTER TABLE `destlabel` ADD `notes` TEXT NULL
-$$$
-ALTER TABLE `import` ADD `notes` TEXT NULL AFTER `description`
-$$$
-ALTER TABLE `destlabel` CHANGE `notes` `notes` VARCHAR( 255 ) NULL
-$$$
-ALTER TABLE `custdm` ADD `routechange` INT NULL
-$$$
-ALTER TABLE `import` ADD `alertoptions` TEXT NULL
-$$$
-
-
-CREATE TABLE `dmcalleridroute` (
-  `id` int(11) NOT NULL auto_increment,
-  `dmid` int(11) NOT NULL,
-  `callerid` varchar(20) NOT NULL,
-  `prefix` varchar(20) NOT NULL,
-  PRIMARY KEY  (`id`),
-  UNIQUE KEY `dmid` (`dmid`,`callerid`)
-) ENGINE = innodb DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci
-$$$
-
-
-ALTER TABLE `custdm` ADD `telco_type` ENUM( 'Test', 'Asterisk', 'Jtapi' ) NOT NULL DEFAULT 'Test' AFTER `enablestate`
-$$$
-
-ALTER TABLE `custdm` CHANGE `routechange` `routechange` TINYINT( 4 )
-$$$
-
-ALTER TABLE `reportcontact` ADD `voicereplyid` INT(11) NULL ,
-ADD `response` TINYINT(4) NULL
-$$$
-
-ALTER TABLE `user` CHANGE `password` `password` VARCHAR( 50 ) NOT NULL ,
-CHANGE `pincode` `pincode` VARCHAR( 50 ) NOT NULL
-$$$
-
--- After 6.0.1
-
-ALTER TABLE `user` ADD `aremail` TEXT NOT NULL AFTER `email`
-$$$
-UPDATE `user` set `aremail` = `email`
-$$$
-UPDATE `user` set `email` = ''
-$$$
-ALTER TABLE `user` CHANGE `email` `email` VARCHAR( 255 ) NOT NULL
-$$$
-
-ALTER TABLE `import` ADD `datatype` ENUM( 'person', 'user', 'association' ) NOT NULL DEFAULT 'person' AFTER `type`,
-CHANGE `updatemethod` `updatemethod` ENUM( 'updateonly', 'update', 'full', 'createonly' ) NOT NULL DEFAULT 'full'
-$$$
-
-ALTER TABLE `user` ADD `staffpkey` VARCHAR( 255 ) NULL,
-ADD `importid` TINYINT NULL ,
-ADD `lastimport` DATETIME NULL
-$$$
-
-CREATE TABLE `personassociation` (
-`id` INT NOT NULL AUTO_INCREMENT PRIMARY KEY ,
-`personid` INT NOT NULL ,
-`c01` VARCHAR( 255 ) NOT NULL ,
-`c02` VARCHAR( 255 ) NOT NULL ,
-`c03` VARCHAR( 255 ) NOT NULL ,
-`c04` VARCHAR( 255 ) NOT NULL ,
-`c05` VARCHAR( 255 ) NOT NULL ,
-`c06` VARCHAR( 255 ) NOT NULL ,
-`c07` VARCHAR( 255 ) NOT NULL ,
-`c08` VARCHAR( 255 ) NOT NULL ,
-`c09` VARCHAR( 255 ) NOT NULL ,
-`c10` VARCHAR( 255 ) NOT NULL
-) ENGINE = innodb DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci
-$$$
-
-CREATE TABLE `groupdata` (
-`id` INT NOT NULL AUTO_INCREMENT PRIMARY KEY ,
-`personid` INT NOT NULL ,
-`fieldnum` TINYINT NOT NULL ,
-`value` VARCHAR( 255 ) NOT NULL,
-KEY `personfield`  (`personid`,`fieldnum`)
-) ENGINE = innodb DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci
-$$$
-
-CREATE TABLE `reportgroupdata` (
-`id` INT NOT NULL AUTO_INCREMENT PRIMARY KEY ,
-`jobid` INT NOT NULL,
-`personid` INT NOT NULL ,
-`fieldnum` TINYINT NOT NULL ,
-`value` VARCHAR( 255 ) NOT NULL,
-KEY `jobpersonfield`  (`jobid`,`personid`,`fieldnum`)
-) ENGINE = innodb DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci
-$$$
-
-ALTER TABLE `import` CHANGE `datatype` `datatype` ENUM( 'person', 'user', 'enrollment' ) NOT NULL DEFAULT 'person'
-$$$
-
-drop table `personassociation`
-$$$
-
-CREATE TABLE `enrollment` (
-`id` INT NOT NULL AUTO_INCREMENT PRIMARY KEY ,
-`personid` INT NOT NULL ,
-`c01` VARCHAR( 255 ) NOT NULL ,
-`c02` VARCHAR( 255 ) NOT NULL ,
-`c03` VARCHAR( 255 ) NOT NULL ,
-`c04` VARCHAR( 255 ) NOT NULL ,
-`c05` VARCHAR( 255 ) NOT NULL ,
-`c06` VARCHAR( 255 ) NOT NULL ,
-`c07` VARCHAR( 255 ) NOT NULL ,
-`c08` VARCHAR( 255 ) NOT NULL ,
-`c09` VARCHAR( 255 ) NOT NULL ,
-`c10` VARCHAR( 255 ) NOT NULL
-) ENGINE = innodb DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci
-$$$
-
-ALTER TABLE `enrollment` ADD INDEX `staffid` ( `c01` )
-$$$
-ALTER TABLE `userrule` ADD INDEX ( `userid` )
-$$$
-ALTER TABLE `user` ADD INDEX ( `staffpkey` )
-$$$
-ALTER TABLE `enrollment` ADD INDEX ( `personid` )
-$$$
-
-TRUNCATE `groupdata`
-$$$
-
-ALTER TABLE `groupdata` ADD `importid` TINYINT NOT NULL
-$$$
 
-ALTER TABLE `groupdata` ADD INDEX ( `importid` )
-$$$
-
-ALTER TABLE `groupdata` CHANGE `id` `id` BIGINT( 11 ) NOT NULL AUTO_INCREMENT
-$$$
-
-ALTER TABLE `reportgroupdata` CHANGE `id` `id` BIGINT( 11 ) NOT NULL AUTO_INCREMENT
-$$$
-
--- ASP 6.1
--- Start here for release 6.2
-
-create table if not exists customercallstats (
-  jobid int(11) NOT NULL,
-  userid int(11) NOT NULL,
-  finishdate datetime default NULL,
-  attempted int(11),
-  primary key (jobid)
-) ENGINE = innodb DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci
-$$$
-
-CREATE TABLE `dmschedule` (
-`id` INT NOT NULL auto_increment ,
-`dmid` INT NOT NULL ,
-`daysofweek` VARCHAR( 20 ) NOT NULL ,
-`starttime` TIME NOT NULL ,
-`endtime` TIME NOT NULL ,
-`resourcepercentage` float NOT NULL DEFAULT '1',
-PRIMARY KEY ( `id` )
-) ENGINE = innodb DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci
-$$$
-
-ALTER TABLE `groupdata` CHANGE `importid` `importid` INT NOT NULL
-$$$
-
-CREATE TABLE IF NOT EXISTS `importlogentry` (
-  `id` bigint(20) NOT NULL auto_increment,
-  `importid` int(11) NOT NULL,
-  `severity` enum('info','error','warn') NOT NULL,
-  `txt` varchar(255) NOT NULL,
-  `linenum` int(11) NULL,
-  PRIMARY KEY  (`id`)
-) ENGINE = innodb DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci
-$$$
-
-ALTER TABLE `reportcontact` ADD `dispatchtype` ENUM( 'customer', 'system' ) NOT NULL DEFAULT 'system'
-$$$
-
-CREATE TABLE `joblist` (
-`id` INT NOT NULL AUTO_INCREMENT PRIMARY KEY ,
-`jobid` INT NOT NULL ,
-`listid` INT NOT NULL ,
-`thesql` TEXT,
-KEY `jobid` (`jobid`,`listid`)
-) ENGINE = innodb DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci
-$$$
-
-ALTER TABLE `rule` CHANGE `op` `op` ENUM( 'eq', 'ne', 'sw', 'ew', 'cn', 'in', 'reldate', 'date_range',
-	'num_eq', 'num_ne', 'num_gt', 'num_ge', 'num_lt', 'num_le', 'num_range', 'date_offset' ) NOT NULL DEFAULT 'eq'
-$$$
-
-ALTER TABLE `portalperson` ADD `notifysms` VARCHAR( 20 ) NULL
-$$$
-
-ALTER TABLE `user` CHANGE `importid` `importid` INT( 11 ) NULL DEFAULT NULL
-$$$
-
-CREATE TABLE `personsetting` (
-`id` INT NOT NULL AUTO_INCREMENT PRIMARY KEY ,
-`personid` INT NOT NULL ,
-`name` VARCHAR( 50 ) NOT NULL ,
-`value` VARCHAR( 255 ) NOT NULL ,
-INDEX ( `personid` , `name` )
-) ENGINE = innodb DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci
-$$$
-
-ALTER TABLE `joblanguage` ADD `translationeditlock` tinyint(4) NOT NULL default 0
-$$$
-
-ALTER TABLE `rule` CHANGE `op` `op` ENUM( 'eq', 'ne', 'sw', 'ew', 'cn', 'in', 'reldate', 'date_range',
-	'num_eq', 'num_ne', 'num_gt', 'num_ge', 'num_lt', 'num_le', 'num_range', 'date_offset', 'reldate_range' ) NOT NULL DEFAULT 'eq'
-$$$
-
--- Post 6.2 below here.
-
--- Add aditional import field types
-ALTER TABLE `importfield` CHANGE `action` `action` ENUM( 'copy', 'staticvalue', 'number', 'currency', 'date', 'lookup', 'curdate',
-	'numeric', 'currencyleadingzero' ) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT 'copy'
-$$$
-
-
-ALTER TABLE `custdm` ADD `poststatus` TEXT NOT NULL default ''
-$$$
-
-
-CREATE TABLE `subscriber` (
-`id` INT NOT NULL AUTO_INCREMENT PRIMARY KEY ,
-`username` VARCHAR( 255 ) NOT NULL ,
-`password` VARCHAR( 50 ) NOT NULL ,
-`personid` INT NULL ,
-`lastlogin` DATETIME NULL ,
-`enabled` TINYINT NOT NULL
-) ENGINE = InnoDB CHARACTER SET utf8 COLLATE utf8_bin
-$$$
-
-ALTER TABLE `persondatavalues` ADD `editlock` TINYINT NOT NULL DEFAULT '0'
-$$$
-
-ALTER TABLE `subscriber` ADD `preferences` TEXT NOT NULL
-$$$
-
-CREATE TABLE `subscriberpending` (
-`id` INT NOT NULL AUTO_INCREMENT PRIMARY KEY ,
-`subscriberid` INT NOT NULL ,
-`type` ENUM( 'phone', 'email', 'sms' ) NOT NULL ,
-`value` VARCHAR( 255 ) NOT NULL ,
-`token` VARCHAR( 255 ) NOT NULL
-) ENGINE = InnoDB CHARACTER SET utf8 COLLATE utf8_bin
-$$$
-
-CREATE TABLE IF NOT EXISTS `prompt` (
-  `id` int(11) NOT NULL auto_increment,
-  `type` enum('intro','emergencyintro','langmenu') NOT NULL,
-  `messageid` int(11) NOT NULL,
-  `dtmf` tinyint(4) default NULL,
-  `language` varchar(50) default NULL,
-  PRIMARY KEY  (`id`),
-  KEY `type` (`type`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8
-$$$
-
-ALTER TABLE `subscriber` ADD UNIQUE `username` ( `username` )
-$$$
-
-ALTER TABLE `subscriber` ADD `lastreminder` DATETIME NULL DEFAULT NULL AFTER `lastlogin`
-$$$
-
--- missing indexes
-
-ALTER TABLE `permission` ADD INDEX ( `accessid` )
-$$$
-
-ALTER TABLE `surveyquestionnaire` ADD INDEX ( `userid` )
-$$$
-
-ALTER TABLE `job` ADD INDEX `useraccess` ( `userid` , `status` , `deleted` )
-$$$
-
-ALTER TABLE `systemstats` ADD INDEX `graphs` ( `date` , `attempt` )
-$$$
-
-ALTER TABLE `person` DROP INDEX `pkeysortb`
-$$$
-
-ALTER TABLE `person` DROP INDEX `pkeysort` ,
-ADD INDEX `pkeysort` ( `pkey` , `type` , `deleted` )
-$$$
-
-ALTER TABLE `blockednumber` ADD INDEX ( `userid` )
-$$$
-
-ALTER TABLE `person` DROP INDEX `namesort`
-$$$
-
-ALTER TABLE `person` DROP INDEX `getbykey`
-$$$
-
-ALTER TABLE `person` DROP INDEX `general`
-$$$
-
-ALTER TABLE `person` ADD INDEX ( `f01` )
-$$$
-
-ALTER TABLE `person` ADD INDEX ( `f02` )
-$$$
-
-ALTER TABLE `listentry` ADD INDEX `listrule` ( `listid` , `type` , `personid` )
-$$$
-
-ALTER TABLE `setting` DROP INDEX `lookup` , ADD UNIQUE `name` ( `name` )
-$$$
-
-ALTER TABLE `job` ADD `modifydate` datetime AFTER `createdate`
-$$$
-
-ALTER TABLE `job` ADD INDEX ( `modifydate` )
-$$$
-
-ALTER TABLE `message` ADD `modifydate` datetime AFTER `data`
-$$$
-
-ALTER TABLE `message` ADD INDEX ( `modifydate` )
-$$$
-
-ALTER TABLE `list` ADD `modifydate` datetime AFTER `description`
-$$$
-
-ALTER TABLE `list` ADD INDEX ( `modifydate` )
-$$$
-
-ALTER TABLE `reportsubscription` ADD `modifydate` datetime AFTER `time`
-$$$
-
-ALTER TABLE `reportsubscription` ADD INDEX ( `modifydate` )
-$$$
-
-CREATE TABLE IF NOT EXISTS `systemmessages` (
-  `id` int(11) NOT NULL auto_increment,
-  `message` VARCHAR( 1000 ) NOT NULL,
-  `icon` VARCHAR( 50 ),
-  `modifydate` datetime NOT NULL,
-  PRIMARY KEY  (`id`),
-  INDEX (`modifydate`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8
-$$$
-
-ALTER TABLE `reportcontact` CHANGE `resultdata` `resultdata` VARCHAR( 255 ) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL
-$$$
-
--- 7-0-x
-
-INSERT INTO systemmessages (id, message, icon, modifydate)
-VALUES (
-'1', '<div style="color:#3e693f;font-size: 20px;font-weight: bold;">New version 7.0!</div> <div style="font-size: 16px;margin: 25px;margin-bottom: 2px;">See for yourself <b>
-<a href="javascript: popup(''help/flash/Welcome.swf'',750,500);"><img src="img/icons/control_play_blue.gif" /> Play Video</a></b></div> <ul> <li>New users be sure to print the <a href="help/html/Quick_Start_for_New_Users.pdf"><img src="img/icons/page_white_acrobat.gif" /> Quick Start Guide</a> <li>Want more detail? See the step-by-step training guides for <a href="help/html/Getting_Started_with_v7.pdf"><img src="img/icons/page_white_acrobat.gif" /> New Users</a> and <a href="help/html/Advanced_Training_with_v7.pdf"><img src="img/icons/page_white_acrobat.gif" /> Advanced Users</a> </ul>', 'largeicons/news.jpg', NOW()
-)
-$$$
-
--- Set a permanent flag for messages/audiofiles that should never be deleted
-ALTER TABLE `message` ADD `permanent` TINYINT( 4 ) NOT NULL DEFAULT '0' AFTER `deleted`
-$$$
-ALTER TABLE `audiofile` ADD `permanent` TINYINT( 4 ) NOT NULL DEFAULT '0' AFTER `deleted`
-$$$
-
--- create table for archived report name to content id mappings
- CREATE TABLE `reportarchive` (
-`name` VARCHAR( 50 ) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL ,
-`contentid` BIGINT( 20 ) NOT NULL
-) ENGINE = InnoDB CHARACTER SET utf8 COLLATE utf8_general_ci
-$$$
-
--- surveyquestion index on questionnaireid
- ALTER TABLE `surveyquestion` ADD INDEX ( `questionnaireid` )
- $$$
-
--- create blocked destination table for blocked phone, sms, email
-CREATE TABLE IF NOT EXISTS `blockeddestination` (
-  `id` int(11) NOT NULL auto_increment,
-  `userid` int(11) default NULL,
-  `description` varchar(255) NOT NULL,
-  `destination` varchar(255) NOT NULL,
-  `type` enum('phone','sms','email') NOT NULL,
-  `createdate` datetime default NULL,
-  PRIMARY KEY  (`id`),
-  KEY `userid` (`userid`,`type`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8
-$$$
-
--- drop old blocked number table
- DROP TABLE `blockednumber`
- $$$
-
- ALTER TABLE `custdm` CHANGE `poststatus` `poststatus` MEDIUMTEXT CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL
- $$$
-
-INSERT INTO systemmessages (message, icon, modifydate)
-VALUES (
-'<div style="color:#3e693f;font-size: 20px;font-weight: bold;">New version 7.1!</div>
-  <ul>
-  <li>See what is new in version 7.1: <a href="help/html/New_in_Version_7_1.pdf"><img src="img/icons/page_white_acrobat.gif" /> New in Version 7.1</a> 
-  <li>Be sure to check out the new list building tutorial <a href="javascript: popup(''help/flash/listtutorial.swf'',750,500);"><img src="img/icons/control_play_blue.gif" /> Play Tutorial</a> great for new and advanced users!
-  </ul>', 'largeicons/news.jpg', NOW()
-)
-$$$
-
--- --------------------------
--- start here for release 7.5
-
-INSERT into `joblist` (`jobid`, `listid`) SELECT `id`, `listid` from `job`
-$$$
-
-ALTER TABLE `job` DROP `listid`, DROP `thesql`
-$$$
-
-ALTER TABLE `joblist` DROP `thesql`
-$$$
-
-ALTER TABLE `custdm` CHANGE `poststatus` `poststatus` MEDIUMTEXT CHARACTER SET utf8 COLLATE utf8_general_ci
-$$$
-
-ALTER TABLE `subscriber` CHANGE `preferences` `preferences` TEXT
-$$$
-
-ALTER TABLE `blockeddestination` ADD `failattempts` TINYINT( 4 ) NULL
-$$$
-
-ALTER TABLE `blockeddestination` ADD UNIQUE `typedestination` ( `type` , `destination` )
-$$$
-
-ALTER TABLE `blockeddestination` ADD `blockmethod` ENUM( 'manual', 'pending', 'autoblock' ) NOT NULL
-$$$
-
-ALTER TABLE `blockeddestination` ADD INDEX `methoddate` ( `blockmethod` , `createdate` )
-$$$
-
-CREATE TABLE `event` (
-	`id` INT NOT NULL AUTO_INCREMENT PRIMARY KEY ,
-	`userid` INT NOT NULL ,
-	`organizationid` INT NOT NULL ,
-	`sectionid` INT NULL ,
-	`targetedmessageid` INT NULL ,
-	`name` VARCHAR( 50 ) NOT NULL ,
-	`notes` TEXT NOT NULL ,
-	`occurence` DATETIME NOT NULL
-) ENGINE = InnoDB
-$$$
-
- CREATE TABLE `alert` (
-	`id` INT NOT NULL AUTO_INCREMENT PRIMARY KEY ,
-	`eventid` INT NOT NULL ,
-	`personid` INT NOT NULL ,
-	`date` DATE NOT NULL ,
-	`time` TIME NOT NULL
-) ENGINE = InnoDB
-$$$
-
-CREATE TABLE IF NOT EXISTS `targetedmessage` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `messagekey` varchar(255) NOT NULL,
-  `targetedmessagecategoryid` int(11) NOT NULL,
-  `overridemessagegroupid` int(11) DEFAULT NULL,
-  PRIMARY KEY  (`id`)
-) ENGINE=InnoDB
-$$$
-
-CREATE TABLE IF NOT EXISTS `personassociation` (
-  `personid` int(11) NOT NULL,
-  `type` enum('organization','section','event') NOT NULL,
-  `organizationid` int(11) DEFAULT NULL,
-  `sectionid` int(11) DEFAULT NULL,
-  `eventid` int(11) DEFAULT NULL,
-  KEY `personid` (`personid`)
-) ENGINE=InnoDB
-$$$
-
-CREATE TABLE IF NOT EXISTS `messagegroup` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `userid` int(11) NOT NULL,
-  `name` varchar(50) NOT NULL,
-  `description` varchar(50) NOT NULL,
-  `modified` datetime NOT NULL,
-  `lastused` datetime DEFAULT NULL,
-  `permanent` tinyint NOT NULL DEFAULT 1,
-  `deleted` tinyint NOT NULL DEFAULT 0, 
-  PRIMARY KEY  (`id`),
-  KEY `userid` (`userid`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8
-$$$
 
