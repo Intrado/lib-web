@@ -651,6 +651,15 @@ $destinationlayoutforms[] = makeSummaryTab($destinations, $customerlanguages, La
 //////////////////////////////////////////////////////////
 $buttons = array(icon_button(_L("Done"),"tick", "form_submit_all(null, 'done', $('formswitchercontainer'));", null), icon_button(_L("Cancel"),"cross",null,"messages.php"));
 
+$defaultlanguagecodevalidators = array(
+	array("ValRequired"),
+	array("ValInArray","values" => array_keys($customerlanguages)),
+);
+
+if ($cansendmultilingual) {
+	$defaultlanguagecodevalidators[] = array("ValDefaultLanguageCode");
+}
+
 $messagegroupsplitter = new FormSplitter("messagegroupbasics", "", null, "horizontalsplit", $buttons, array(
 	array("title" => "", "formdata" => array(
 		'name' => array(
@@ -667,12 +676,8 @@ $messagegroupsplitter = new FormSplitter("messagegroupbasics", "", null, "horizo
 		),
 		'defaultlanguagecode' => array(
 			"label" => _L('Default Language'),
-			"value" => $messagegroup->defaultlanguagecode,
-			"validators" => array(
-				array("ValRequired"),
-				array("ValInArray","values" => array_keys($customerlanguages)),
-				array("ValDefaultLanguageCode")
-			),
+			"value" => $cansendmultilingual ? $messagegroup->defaultlanguagecode : Language::getDefaultLanguageCode(),
+			"validators" => $defaultlanguagecodevalidators,
 			// NOTE: It is not necessary to capitalize the language names in $customerlanguages because it should already be so in the database.
 			"control" => array("SelectMenu","values" => $customerlanguages),
 			"helpstep" => 1
@@ -1216,7 +1221,8 @@ startWindow(_L('Message Editor'));
 
 $firstdestinationtype = reset(array_keys($destinations));
 $firstdestinationsubtype = reset($destinations[$firstdestinationtype]['subtypes']);
-$defaultsections = array("{$firstdestinationtype}-{$firstdestinationsubtype}", "{$firstdestinationtype}-{$firstdestinationsubtype}-" . Language::getDefaultLanguageCode());
+$preferredlanguagecode = $cansendmultilingual ? $messagegroup->defaultlanguagecode : Language::getDefaultLanguageCode();
+$defaultsections = array("{$firstdestinationtype}-{$firstdestinationsubtype}", "{$firstdestinationtype}-{$firstdestinationsubtype}-" . $preferredlanguagecode);
 if ($firstdestinationtype == 'email')
 	$defaultsections[] = "emailheaders";
 echo '<div id="messagegroupformcontainer">' . $messagegroupsplitter->render($defaultsections) . '</div>';
@@ -1227,9 +1233,10 @@ echo '<div id="messagegroupformcontainer">' . $messagegroupsplitter->render($def
 	(function() {
 		// Use an object to store state information.
 		var state = {
+			'countphonelanguages': <?=isset($destinations['phone']) ? count($destinations['phone']['languages']) : 0?>,
 			'currentdestinationtype': '<?=$firstdestinationtype?>',
 			'currentsubtype': '<?=$firstdestinationsubtype?>',
-			'currentlanguagecode': '<?=Language::getDefaultLanguageCode()?>',
+			'currentlanguagecode': '<?=$preferredlanguagecode?>',
 			'messagegroupsummary': <?=json_encode(MessageGroup::getSummary($_SESSION['messagegroupid']))?>
 		};
 
@@ -1303,7 +1310,7 @@ echo '<div id="messagegroupformcontainer">' . $messagegroupsplitter->render($def
 		}.bindAsEventListener(formswitchercontainer, state));
 
 		formswitchercontainer.observe('FormSplitter:BeforeTabLoad',
-			messagegroupHandleBeforeTabLoad.bindAsEventListener(formswitchercontainer, state, '<?=Language::getDefaultLanguageCode()?>')
+			messagegroupHandleBeforeTabLoad.bindAsEventListener(formswitchercontainer, state, '<?=$preferredlanguagecode?>')
 		);
 
 		var autotranslatorupdator = function (autotranslatorbutton, state) {
@@ -1380,7 +1387,7 @@ echo '<div id="messagegroupformcontainer">' . $messagegroupsplitter->render($def
 		
 		// When a tab is loaded, update the status icon of the previous tab.
 		formswitchercontainer.observe('FormSplitter:TabLoaded',
-			messagegroupHandleTabLoaded.bindAsEventListener(formswitchercontainer, state, '<?=$_SESSION['messagegroupid']?>', '<?=Language::getDefaultLanguageCode()?>', autotranslatorupdator, false)
+			messagegroupHandleTabLoaded.bindAsEventListener(formswitchercontainer, state, '<?=$_SESSION['messagegroupid']?>', '<?=$preferredlanguagecode?>', autotranslatorupdator, false)
 		);
 		
 		messagegroupStyleLayouts();

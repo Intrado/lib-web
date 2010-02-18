@@ -64,6 +64,7 @@ function messagegroupHandleTabLoaded (event, state, existingmessagegroupid, syst
 				event.stop();
 				
 				var pieces = element.identify().split('-');
+				
 				var specificsections = [
 					pieces[0] + '-' + pieces[1] + '-' + pieces[2]
 				];
@@ -76,8 +77,11 @@ function messagegroupHandleTabLoaded (event, state, existingmessagegroupid, syst
 				var nexttab;
 				if (pieces[0] == 'sms') {
 					nexttab = pieces[0] + '-' + pieces[1] + '-' + pieces[2];
-				} else {
-					nexttab = pieces[0] == 'email' ? 'emailheaders' : (pieces[0] + '-' + pieces[1]);
+				} else if (pieces[0] == 'email') {
+						nexttab = 'emailheaders'
+				} else { // phone
+					// NOTE: If is just a single phone language, there will not be a 'phone-voice' tab, it will be named 'phone-voice-en'.
+					nexttab = state.countphonelanguages > 1 ? pieces[0] + '-' + pieces[1] : pieces[0] + '-' + pieces[1] + '-' + pieces[2];
 				}
 
 				form_load_tab(this, widget, nexttab, specificsections, readonly);

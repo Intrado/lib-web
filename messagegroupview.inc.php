@@ -292,10 +292,8 @@ if ($countdestinations > 0) {
 	$preferreddestinationsubtype = isset($_GET['subtype']) && in_array($_GET['subtype'], $destinations[$preferreddestinationtype]['subtypes']) ? $_GET['subtype'] : reset($destinations[$preferreddestinationtype]['subtypes']);
 	if (isset($_GET['languagecode']) && isset($destinations[$preferreddestinationtype]['languages'][$_GET['languagecode']])) {
 		$preferredlanguagecode = $_GET['languagecode'];
-	} else if (isset($destinations[$preferreddestinationtype]['languages'][Language::getDefaultLanguageCode()])) {
-		$preferredlanguagecode = Language::getDefaultLanguageCode();
 	} else {
-		$preferredlanguagecode = reset(array_keys($destinations[$preferreddestinationtype]['languages']));
+		$preferredlanguagecode = $messagegroup->defaultlanguagecode;
 	}
 	$preferredtabs = array("{$preferreddestinationtype}-{$preferreddestinationsubtype}", "{$preferreddestinationtype}-{$preferreddestinationsubtype}-{$preferredlanguagecode}");
 	if ($preferreddestinationtype == 'email')
@@ -307,6 +305,7 @@ if ($countdestinations > 0) {
 		(function() {
 			// Use an object to store state information.
 			var state = {
+				'countphonelanguages': <?=isset($destinations['phone']) ? count($destinations['phone']['languages']) : 0?>,
 				'currentdestinationtype': '<?=$preferreddestinationtype?>',
 				'currentsubtype': '<?=$preferreddestinationsubtype?>',
 				'currentlanguagecode': '<?=$preferredlanguagecode?>',
