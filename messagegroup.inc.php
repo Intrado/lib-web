@@ -4,7 +4,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 // Returns an array structure accepted by FormSplitter's constructor for a child form.
-function makeSummaryTab($destinations, $customerlanguages, $systemdefaultlanguagecode, $existingmessagegroup = null) {
+function makeSummaryTab($destinations, $customerlanguages, $systemdefaultlanguagecode, $existingmessagegroup = null, $readonly = false) {
 	// Table Headers
 	$summaryheaders = '<th></th>';
 	$summarylanguagerows = "";
@@ -26,7 +26,7 @@ function makeSummaryTab($destinations, $customerlanguages, $systemdefaultlanguag
 					$icon = $hasmessage ? 'img/icons/accept.gif' : 'img/icons/diagona/16/160.gif';
 					$alt = $hasmessage ? escapehtml(_L("Message found.")) : escapehtml(_L("Message not found."));
 					$title = _L("Click to jump to this message");
-					$summarylanguagerows .= "<td class='StatusIcon'><img class='StatusIcon' id='{$type}-{$subtype}-{$languagecode}-summaryicon' title='$title' alt='$alt' src='$icon'/></td>";
+					$summarylanguagerows .= "<td class='StatusIcon'><img ".((!$readonly || $hasmessage) ? "class='StatusIcon'" : "")." id='{$type}-{$subtype}-{$languagecode}-summaryicon' title='$title' alt='$alt' src='$icon'/></td>";
 				}
 			}
 		}

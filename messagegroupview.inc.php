@@ -234,7 +234,7 @@ $buttons = ($popup) ? array() : array(icon_button(_L("Done"),"tick", null, "mess
 
 $countdestinations = count($destinations);
 if ($countdestinations > 0) {
-	$destinationlayoutforms[] = makeSummaryTab($destinations, $customerlanguages, Language::getDefaultLanguageCode(), $messagegroup);
+	$destinationlayoutforms[] = makeSummaryTab($destinations, $customerlanguages, Language::getDefaultLanguageCode(), $messagegroup, true);
 	$messagegroupsplitter = new FormSplitter("messagegroupbasics", "", null, "horizontalsplit", $buttons, array(
 		array("title" => "", "formdata" => array(
 			'name' => array(
