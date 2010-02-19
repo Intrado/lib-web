@@ -25,7 +25,7 @@ class ValSections extends Validator {
 				from section
 					inner join userassociation
 						on (userassociation.sectionid = section.id)
-				where userid=? and organizationid = ?",
+				where userid=? and section.organizationid = ?",
 				false, false, array($USER->id, $organizationid)
 			);
 		} else {
