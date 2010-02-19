@@ -47,6 +47,13 @@ $errormessage = is_string($result) ? $result : '';
 	<meta http-equiv="Content-type" value="text/html; charset=UTF-8" />
 	<link href="css.php?hash=<?=crc32(serialize($_SESSION['colorscheme']))?>" type="text/css" rel="stylesheet" media="screen, print">
 	<link href="css/form.css.php" type="text/css" rel="stylesheet">
+	<style type="text/css">
+		body {
+			margin: 0;
+			padding: 0;
+			border: 0;
+		}
+	</style>
 </head>
 
 <body style="margin-left: 0px; margin-top: 1px; margin-bottom: 0px">
