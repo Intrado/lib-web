@@ -57,7 +57,7 @@ function saveHtmlEditorContent(existinghtmleditorobject) {
 		for (var i = 0, count = images.length; i < count; i++) {
 			var image = images[i];
 			var matches = image.src.match(/viewimage\.php\?id=(\d+)/);
-			if (matches.length == 2) {
+			if (matches) {
 				image.replace('<img src="viewimage.php?id=' + matches[1] + '">');
 			}
 		}
