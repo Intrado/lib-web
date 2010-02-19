@@ -313,8 +313,28 @@ $dayoffset = (strtotime("now") > (strtotime(($ACCESS->getValue("calllate")?$ACCE
 $startvalues = newform_time_select(NULL, $ACCESS->getValue('callearly'), $ACCESS->getValue('calllate'), $USER->getCallEarly());
 $endvalues = newform_time_select(NULL, $ACCESS->getValue('callearly'), $ACCESS->getValue('calllate'), $USER->getCallLate());
 
+// get the user's owned and subscribed messages
+$messages = QuickQueryList(
+	"(select mg.id,
+		mg.name as name,
+		(mg.name +0) as digitsfirst
+	from messagegroup mg
+	where mg.userid=?
+		and not mg.deleted)
+	UNION
+	(select mg.id,
+		mg.name as name,
+		(mg.name +0) as digitsfirst
+	from publish p
+	inner join messagegroup mg on
+		(p.messagegroupid = mg.id)
+	where p.userid=?
+		and p.action = 'subscribe'
+		and p.type = 'messagegroup'
+		and not mg.deleted)
+	order by digitsfirst, name",
+	true,false,array($USER->id, $USER->id));
 
-$messages = QuickQueryList("select g.id, g.name, (g.name +0) as digitsfirst from messagegroup g, message m where g.userid=? and g.deleted=0 and m.messagegroupid = g.id order by digitsfirst,g.name", true,false,array($USER->id));
 if($messages === false) {
 	$messages = array("" =>_L("-- Select a Message --"));
 } else {
