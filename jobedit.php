@@ -197,22 +197,6 @@ class ValTranslationExpirationDate extends Validator {
 	}
 }
 
-class ValTranslationExpirationMessage extends Validator {
-	var $onlyserverside = true;
-	function validate ($value, $args,$requiredvalues) {
-		global $USER;
-		if(!isset($requiredvalues['date']))
-			return true;
-		$modifydate = QuickQuery("select min(modifydate) from message where messagegroupid = ? and autotranslate = 'translated'", false, array($value));
-		if($modifydate != false) {
-			if(strtotime("today") - strtotime($modifydate) > (7*86400))
-				return _L('The selected message contains auto-translated content older than 7 days. Regenerate translations to schedule a start date');
-			if(strtotime($requiredvalues['date']) - strtotime($modifydate) > (7*86400))
-				return _L("Can not schedule the job with a message containing auto-translated content older than 7 days from the Start Date");
-		}
-		return true;
-	}
-}
 
 
 /* TODO these validators are copied from the wizard
@@ -551,15 +535,12 @@ $helpsteps[] = _L("The name of your job. The best names are brief and discriptiv
 		$formdata[] = _L('Job Message');
 		$formdata["message"] = array(
 			"label" => _L('Message'),
-			"control" => array("FormHtml","html" => $messages[$job->messagegroupid]),
-			"requires" => array("date"),
+			"value" => (((isset($job->messagegroupid) && $job->messagegroupid))?$job->messagegroupid:""),
+			"validators" => array(),
+			"control" => array("MessageGroupSelectMenu", "values" => $messages, "static" => true),
 			"helpstep" => 5
 		);
-		$formdata["messagegrid"] = array(
-			"label" => _L('Message Info'),
-			"control" => array("FormHtml","html" => makeMessageGroupSummaryTable('jobedit','message',true,$job->messagegroupid)),
-			"helpstep" => 5
-		);
+
 		$formdata[] = _L('Advanced Options ');
 		$formdata["report"] = array(
 			"label" => _L('Completion Report'),
@@ -619,20 +600,17 @@ $helpsteps[] = _L("The name of your job. The best names are brief and discriptiv
 			"value" => (((isset($job->messagegroupid) && $job->messagegroupid))?$job->messagegroupid:""),
 			"validators" => array(
 				array("ValRequired"),
-				array("ValTranslationExpirationMessage")),
-			"control" => array("SelectMenu", "values" => $messages),
+				array("ValMessageTranslationExpiration"),
+				array("ValInArray","values"=>array_keys($messages))
+				),
+
+			"control" => array("MessageGroupSelectMenu", "values" => $messages),
 			"helpstep" => 5
 		);
 
 		if ($JOBTYPE != "repeating") {
 			$formdata["message"]["requires"] = array("date");
 		}
-
-		$formdata["messagegrid"] = array(
-			"label" => _L('Message Info'),
-			"control" => array("FormHtml","html" => makeMessageGroupSummaryTable('jobedit','message')),
-			"helpstep" => 5
-		);
 
 		$formdata[] = _L('Advanced Options ');
 		$formdata["report"] = array(
@@ -849,7 +827,7 @@ include_once("nav.inc.php");
 ?>
 <script type="text/javascript" src="script/listform.js.php"></script>
 <script type="text/javascript">
-<? Validator::load_validators(array("ValDuplicateNameCheck","ValTranslationExpirationDate","ValTranslationExpirationMessage","ValWeekRepeatItem","ValTimeWindowCallEarly","ValTimeWindowCallLate","ValDate","ValLists")); ?>
+<? Validator::load_validators(array("ValDuplicateNameCheck","ValTranslationExpirationDate","ValMessageTranslationExpiration","ValWeekRepeatItem","ValTimeWindowCallEarly","ValTimeWindowCallLate","ValDate","ValLists")); ?>
 </script>
 <?
 

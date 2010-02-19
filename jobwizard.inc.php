@@ -845,16 +845,10 @@ class JobWiz_messageGroupChoose extends WizStep {
 			"value" => "",
 			"validators" => array(
 				array("ValRequired"),
+				array("ValMessageTranslationExpiration"),
 				array("ValInArray","values"=>array_keys($messages))
 			),
-			"control" => array("SelectMenu","width"=>"80%", "values"=>$messages),
-			"helpstep" => 1
-		);
-
-		require_once("inc/MessageGroupSummary.inc.php");
-		$formdata["messagegrid"] = array(
-			"label" => _L('Message Info'),
-			"control" => array("FormHtml","html" => makeMessageGroupSummaryTable('messageGroupChoose','messagegroup')),
+			"control" => array("MessageGroupSelectMenu","width"=>"80%", "values"=>$messages),
 			"helpstep" => 1
 		);
 		return new Form("messageGroupChoose",$formdata,$helpsteps);
