@@ -27,6 +27,25 @@ function userOwns ($type,$id) {
 	}
 }
 
+function isSubscribed ($type,$id) {
+	global $USER;
+	switch($type) {
+		case "messagegroup":
+			return QuickQuery("select count(*) from publish where userid = ? and action = 'subscribe' and type = 'messagegroup' and messagegroupid=?", false, array($USER->id, $id));
+		default:
+			return false;
+	}
+}
+
+function isPublished ($type,$id) {
+	switch($type) {
+		case "messagegroup":
+			return QuickQuery("select count(*) from publish where action = 'publish' and type = 'messagegroup' and messagegroupid=?", false, array($id));
+		default:
+			return false;
+	}
+}
+
 function permitContent($id) {
 	if (!isset($_SESSION['usercontentids']))
 		$_SESSION['usercontentids'] = array();
