@@ -31,7 +31,9 @@ if (!$USER->authorize(array('sendmessage', 'sendemail', 'sendphone', 'sendsms'))
 if (isset($_GET['messagegroupid']) && isset($_GET['publish'])) {
 	// check this is a vaild messagegroup id and it's owned by this user
 	$msgGroup = DBFind("MessageGroup", "from messagegroup where id = ? and userid = ?", false, array($_GET['messagegroupid'], $USER->id));
-	if ($msgGroup) {
+	// make sure it isn't currently published
+	$publish = DBFind("Publish", "from publish where userid = ? and action = 'publish' and messagegroupid = ?", false, array($USER->id, $_GET['messagegroupid']));
+	if ($msgGroup && !$publish) {
 		// create a new publish dbmo
 		$publish = new Publish();
 		$publish->userid = $USER->id;
@@ -58,7 +60,7 @@ if (isset($_GET['publishid']) && isset($_GET['remove'])) {
 		$issubscribed = ($publish->action == 'subscribe');
 		// if the message group is valid  and user can publish message groups and it is published, remove it and all subscriptions
 		if ($msgGroup->userid == $USER->id && $USER->authorize('publishmessagegroup') && $ispublished) {
-			QuickQuery("delete from publish where type = 'messagegroup' and messagegroupid = ?", false, array($msgGroup->id));
+			QuickUpdate("delete from publish where type = 'messagegroup' and messagegroupid = ?", false, array($msgGroup->id));
 			notice(_L("The message, %s, is no longer published. All subscribers to this message have been removed.", escapehtml($msgGroup->name)));
 		}
 		// if the user can subscribe and it is a subscription, remove the subscription
@@ -71,10 +73,6 @@ if (isset($_GET['publishid']) && isset($_GET['remove'])) {
 	redirect();
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// Data Handling
-////////////////////////////////////////////////////////////////////////////////
-
 if (isset($_GET['delete'])) {
 	$deleteid = $_GET['delete'];
 	if (isset($_SESSION['messagegroupid']) && ($_SESSION['messagegroupid']== $deleteid))
@@ -84,6 +82,7 @@ if (isset($_GET['delete'])) {
 		Query("BEGIN");
 		QuickUpdate("update messagegroup set deleted=1 where id=?",false,array($deleteid));
 		QuickUpdate("update message set deleted=1 where messagegroupid=?",false,array($deleteid));
+		QuickUpdate("delete from publish where type = 'messagegroup' and messagegroupid = ?", false, array($deleteid));
 		Query("COMMIT");
 		notice(_L("The message, %s, is now deleted.", escapehtml($message->name)));
 		redirect();
@@ -92,8 +91,11 @@ if (isset($_GET['delete'])) {
 	}
 }
 
-
 $isajax = isset($_GET['ajax']);
+
+////////////////////////////////////////////////////////////////////////////////
+// Data Handling
+////////////////////////////////////////////////////////////////////////////////
 if($isajax === true) {
 	session_write_close();//WARNING: we don't keep a lock on the session file, any changes to session data are ignored past this point
 
@@ -107,20 +109,20 @@ if($isajax === true) {
 	}
 	switch ($filter) {
 		case "name":
-			$orderby = "name";
+			$orderby = "digitsfirst, name";
 			break;
 	}
 	
 	// get all the message group ids for this page
 	$msgGroupIds = QuickQueryList(
-		"(select SQL_CALC_FOUND_ROWS mg.id as id, mg.modified as modified, mg.name as name
+		"(select SQL_CALC_FOUND_ROWS mg.id as id, mg.modified as modified, mg.name as name, (mg.name +0) as digitsfirst
 		from messagegroup mg
 		where mg.userid = ? 
 			and not mg.deleted)
-		UNION ALL
-		(select mg.id as id, mg.modified as modified, mg.name as name
+		UNION
+		(select mg.id as id, mg.modified as modified, mg.name as name, (mg.name +0) as digitsfirst
 		from publish p
-		join messagegroup mg on
+		inner join messagegroup mg on
 			(p.messagegroupid = mg.id)
 		where p.userid = ?
 			and p.action = 'subscribe'
@@ -271,7 +273,7 @@ startWindow(_L('My Messages'), 'padding: 3px;', true, true);
 	<td class="feed" style="width: 180px;vertical-align: top;font-size: 12px;" >
 		<div>
 			<?= icon_button(_L('Create New Message'),"add","location.href='messagegroup.php?id=new'") ?>
-			<?=(($USER->authorize('subscribemessagegroup'))?icon_button(_L('Subscribe to Message'),"add", "popup('messagegroupsubscribepopup.php', 600, 500)"):'') ?>
+			<?=(($USER->authorize('subscribemessagegroup'))?icon_button(_L('Subscribe to Message'),"add", "document.location='messagegroupsubscribe.php'"):'') ?>
 			<div style="clear:both;"></div>
 		</div>
 		<br />
