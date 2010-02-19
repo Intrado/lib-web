@@ -680,7 +680,7 @@ var RuleEditor = Class.create({
 
 		this.trigger_event_in_column.bindAsEventListener(this, this.valueTD);
 
-		this.ruleWidget.container.style.width = '550px';
+		this.ruleWidget.container.style.width = 'auto';
 		var container = new Element('div');
 		switch(type) {
 			case 'association':
@@ -828,7 +828,7 @@ var RuleEditor = Class.create({
 					'fieldnum': ''
 				});
 			}
-			this.ruleWidget.container.style.width = '400px';
+			this.ruleWidget.container.style.width = 'auto';
 		}.bindAsEventListener(this));
 
 		this.fieldTD.down('fieldset').down('div').update(fieldSelectbox);
