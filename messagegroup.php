@@ -67,6 +67,8 @@ if (isset($_GET['id'])) {
 		unset($_SESSION['emailattachments']);
 		unset($_SESSION['autotranslatesourcetext']);
 	}
+	
+	unset($_SESSION['messagegroupid']);
 	setCurrentMessageGroup($_GET['id']);
 
 	if ($_GET['id'] === 'new') {
@@ -86,7 +88,7 @@ if (isset($_GET['id'])) {
 			$_SESSION['messagegroupid'] = $newmessagegroup->id;
 			
 		redirect();
-	} else {
+	} else if (isset($_SESSION['messagegroupid'])) {
 		$messagegroup = new MessageGroup(getCurrentMessageGroup());
 		if ($messagegroup->deleted)
 			redirect('messagegroupview.php?id=' . $_GET['id']);
