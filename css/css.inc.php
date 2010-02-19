@@ -540,7 +540,6 @@ div.scrollTableContainer {
 	padding: 0;
 }
 .horizontaltabstitlediv {
-	font-size: 12px;
 	padding:0;
 	cursor: pointer;
 	color: <?=$primary?>;
@@ -558,6 +557,7 @@ div.scrollTableContainer {
 	text-align: left;
 	white-space: nowrap;
 	overflow: hidden;
+	font-size: 90%;
 }
 
 .horizontaltabstitlediv td.middle {
@@ -577,14 +577,15 @@ div.scrollTableContainer {
 }
 
 .horizontaltabstitledivexpanded {
-	font-weight: bold;
-	color: <?=$theme2?>;
 	margin-bottom: -1px;
 	border-bottom: solid 1px white;
 }
 
 .horizontaltabstitledivexpanded td.middle {
 	background: <?=$theme2?> url('img/horizontaltab_middle.gif') repeat-x;
+	font-weight: bold;
+	color: <?=$primary?>;
+	font-size: 110%;
 }
 .horizontaltabstitledivexpanded td.left {
 	background: <?=$theme2?> url('img/horizontaltab_left.gif') repeat-x;
@@ -613,7 +614,6 @@ div.scrollTableContainer {
 	background: white;
 }
 .verticaltabstitlediv {
-	font-size: 12px;
 	cursor: pointer;
 	color: <?=$primary?>;
 	margin: 0;
@@ -681,7 +681,7 @@ div.scrollTableContainer {
 }
 .verticaltabspanelspane {
 	border-right: 2px solid <?=$theme2?>;
-	padding; 0;
+	padding: 0;
 	margin-bottom: 1px;
 	background: white;
 	z-index: 1;
