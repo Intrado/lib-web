@@ -76,10 +76,7 @@ CKEDITOR.dialog.add( 'image', function( editor )
 						filebrowser: 'tab1:viewimageurl',
 						'for': ['tab1', 'upload'],
 						type: 'fileButton',
-						label: 'Upload',
-						onLoad: function () {
-							CKEDITOR.document.getById(this.domId).hide();
-						}
+						label: 'Upload'
 					},
 					{
 						id : 'viewimageurl',
