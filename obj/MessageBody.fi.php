@@ -36,7 +36,7 @@ class MessageBody extends FormItem {
 			<table style="width:100%">
 				<tr>
 					<td valign="top" rowspan="5">
-						<textarea id="'.$n.'" name="'.$n.'" rows="12" cols="50">'.escapehtml($value).'</textarea>	';
+						<textarea id="'.$n.'" name="'.$n.'" rows="12" cols="35">'.escapehtml($value).'</textarea>	';
 						
 		if(!isset($this->args['playbutton']) || $this->args['playbutton'] === true) {
 			$str .= 		'<div>' . icon_button(_L("Play"),"fugue/control","var content = $('" . $n . "').getValue();
