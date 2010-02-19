@@ -17,7 +17,8 @@ require_once("obj/TargetedMessageCategory.obj.php");
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization
 ////////////////////////////////////////////////////////////////////////////////
-if (!$USER->authorize('createlist')) {
+
+if (!getSystemSetting('_hastargetedmessage', false) || !$USER->authorize('targetedmessage') || !$USER->authorize('managesystem')) {
 	redirect('unauthorized.php');
 }
 

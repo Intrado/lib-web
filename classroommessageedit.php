@@ -19,7 +19,7 @@ require_once("obj/MessagePart.obj.php");
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization
 ////////////////////////////////////////////////////////////////////////////////
-if (!getSystemSetting('_hastargetedmessage', false) || !$USER->authorize('managesystem')) {
+if (!getSystemSetting('_hastargetedmessage', false) || !$USER->authorize('targetedmessage') || !$USER->authorize('managesystem')) {
 	redirect('unauthorized.php');
 }
 
@@ -79,27 +79,23 @@ $formdata["category"] = array(
 	"control" => array("SelectMenu","values" => $categories),
 	"helpstep" => 1
 );
+
+$validator = array(array("ValLength","min" => 3,"max" => 150));
 foreach($languages as $language) {
 	$code = $language[2];
-
+	$langvalidator = ($code == 'en'?array(array("ValRequired")) + $validator:$validator);
 	$formdata[$code] = array(
 		"label" => $language[1],
 		"value" => "",
-		"validators" => array(
-			array("ValLength","min" => 3,"max" => 150)
-		),
+		"validators" => $langvalidator ,
 		"control" => array("TextField","size" => 50, "maxlength" => 150),
 		"helpstep" => 2
 	);
 	if(isset($languagemessages[$code]) && $languagemessages[$code] != "") {
 		// Populate the form with message data and complete with default data
 
-		//error_log("custom" . $code);
 		$formdata[$code]["value"] = $languagemessages[$code];
-		//$formdata[$code]["value"] = "Custom Data " . (isset($languagemessages[$code])?$languagemessages[$code]:"");
 	} else {
-		//error_log("default" . $code);
-		// Populate with default data
 		$filename = "messagedata/" . $code . "/targetedmessage.php";
 		if(file_exists($filename))
 			include_once($filename);
@@ -174,10 +170,8 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 							$messagegroupid = $messagegroup->id;
 
 							if(isset($targetedmesssage[0])) {
-								error_log("update targetedmessage set overridemessagegroupid = $messagegroupid where messagekey = " . $targetedmesssage[0]);
 								QuickUpdate("update targetedmessage set overridemessagegroupid = ? where messagekey = ?",false,array($messagegroupid,$targetedmesssage[0]));
 							} else {
-								error_log("insert into targete table $code");
 								QuickUpdate("insert into targetedmessage (messagekey,targetedmessagecategoryid,overridemessagegroupid) values (?,?,?)",false,array(substr($newvalue, 0, 10) . "-" .  $messagegroup->modified,$postdata["category"],$messagegroupid));
 							}
 						}
