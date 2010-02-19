@@ -193,7 +193,7 @@ function handleRequest() {
 					// If the user has any section associations, only get values from those sections;
 					// Or if the user only has organization associations, then get the values from sections in those organizations.
 					// Otherwise, get values from all sections.
-					if (QuickQuery('select count(*) from userassociation where userid = ? and type = "section" limit 1', false, array($USER->id)) > 0) {
+					if (QuickQuery('select count(*) from userassociation where userid = ? and type = "section"', false, array($USER->id)) > 0) {
 						return QuickQueryList("
 							select distinct $fieldnum as value
 							from section
@@ -201,7 +201,7 @@ function handleRequest() {
 									on (userassociation.sectionid = section.id)
 							where userid=? $limitsql
 						", false, false, array($USER->id));
-					} else if (QuickQuery('select count(*) from userassociation where userid = ? and type = "organization" limit 1', false, array($USER->id)) > 0) {
+					} else if (QuickQuery('select count(*) from userassociation where userid = ? and type = "organization"', false, array($USER->id)) > 0) {
 						return QuickQueryList("
 							select distinct $fieldnum as value
 							from section
@@ -241,9 +241,20 @@ function handleRequest() {
 			if (!$USER->authorizeOrganization($organizationid))
 				return false;
 			
-			// If the user has section associations, only retrieve those sections that also belong to this organization.
-			// Otherwise retrieve all sections from this organization.
-			if (QuickQuery('select count(*) from userassociation where userid = ? and type = "section" limit 1', false, array($USER->id)) > 0) {
+			// If the user is associated with this organization, return all sections from this organization.
+			// If the user has section associations belonging to this organization, return those sections.
+			// If the user has no associations, retrieve all sections from this organization.
+			if (QuickQuery('select count(*) from userassociation where userid = ? and type = "organization" and organizationid=?', false, array($USER->id, $organizationid)) > 0) {
+				// Return an array of id=>skey pairs.
+				return QuickQueryList("
+					select id, skey
+					from section
+					where organizationid = ?",
+					true, false, array($organizationid)
+				);
+			}
+			
+			if (QuickQuery('select count(*) from userassociation where userid = ? and type = "section"', false, array($USER->id)) > 0) {
 				// Return an array of id=>skey pairs.
 				return QuickQueryList("
 					select section.id, section.skey

@@ -88,10 +88,10 @@ class User extends DBMappedObject {
 			if (count($this->organizations()) < 1) {
 				$this->hassections = false;
 			// If the user has section associations, then he can obviously see those sections.
-			} else if (QuickQuery('select sectionid from userassociation where type="section" and userid = ? limit 1', false, array($this->id))) {
+			} else if (QuickQuery('select sectionid from userassociation where type="section" and userid = ?', false, array($this->id))) {
 				$this->hassections = true;
 			// If the user does not have section associations, then find out if any of the organizations that he can see has a section.
-			} else if (QuickQuery('select id from section where organizationid in ('.implode(',', array_keys($this->organizations())).') limit 1')) {
+			} else if (QuickQuery('select id from section where organizationid in ('.implode(',', array_keys($this->organizations())).')')) {
 				$this->hassections = true;
 			} else {
 				$this->hassections = false;
@@ -132,11 +132,16 @@ class User extends DBMappedObject {
 			$associatedorganizations = DBFindMany('Organization', 'from organization o inner join userassociation ua on o.id = ua.organizationid where userid = ?', 'o', array($this->id));
 
 			// If the user has specific organization associations, return those organizations.
+			// But if the user only has section associations, he can only see the organizations of those sections.
 			// Otherwise he can see all organizations.
-			if (count($associatedorganizations) > 0)
+			if (count($associatedorganizations) > 0) {
 				$USERSORGANIZATIONS[$this->id] = $associatedorganizations;
-			else
+			} else if (count($associatedsectionids = QuickQueryList('select sectionid from userassociation where userid = ? and type = "section"', false, false, array($this->id))) > 0) {
+				$sectionorganizationids = QuickQueryList('select distinct organizationid from section where id in (' . implode(',', $associatedsectionids) . ')', false, false);
+				$USERSORGANIZATIONS[$this->id] = DBFindMany('Organization', 'from organization where id in ('. implode(',', $sectionorganizationids).')');
+			} else {
 				$USERSORGANIZATIONS[$this->id] = DBFindMany('Organization', 'from organization where not deleted');
+			}
 		}
 		
 		return $USERSORGANIZATIONS[$this->id];
