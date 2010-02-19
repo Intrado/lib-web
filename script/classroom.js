@@ -642,7 +642,6 @@
 
 		tabs.container.observe('Tabs:ClickTitle', function(event) {
 			if(event.memo.currentSection == 'lib-search' || event.memo.section == 'lib-search'){
-				alert(event.memo.currentSection + " " + event.memo.section);
 				updatemessages(event.memo.currentSection,event.memo.section);
 
 				var searchBox = $('searchbox');
