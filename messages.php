@@ -184,9 +184,13 @@ if($isajax === true) {
 			$publishmessage = '';
 			if ($publishaction == 'publish')
 				$publishmessage = _L('Changes to this message are published.');
-			if ($publishaction == 'subscribe')
+			
+			// tell the user it's a subscription. change the href to view instead of edit
+			if ($publishaction == 'subscribe') {
 				$publishmessage = _L('You are subscribed to this message. Owner: (%s)', $item['owner']);
-
+				$defaultlink = "messagegroupview.php?id=$itemid";
+			}
+			
 			// Users with published messages or subscribed messages will get a special action item
 			$publishactionlink = "";
 			if ($USER->authorize("publishmessagegroup")) {
