@@ -689,16 +689,7 @@ var RuleEditor = Class.create({
 				container.setStyle({'border': 'solid 1px gray', 'background': 'white'});
 				container.update('<img src="img/ajax-loader.gif"/>');
 				if (this.ruleWidget.multisearchDomCache[fieldnum]) {
-					var multicheckboxDom = this.ruleWidget.multisearchDomCache[fieldnum];
-					
-					// Uncheck any checkboxes in the cache that were checked.
-					// TODO: May this is not necessary? Just keep them in the same state?
-					multicheckboxDom.select('input:checked').each(function (checkbox) {
-						checkbox.checked = false;
-						// TODO: May need to tweak in IE to uncheck this checkbox.
-					});
-					
-					container.update(multicheckboxDom);
+					container.update(this.ruleWidget.multisearchDomCache[fieldnum]);
 					this.add_multicheckbox_toolbar(container);
 				} else {
 					new Ajax.Request('ajax.php?type=getdatavalues&fieldnum=' + fieldnum, {
@@ -714,9 +705,10 @@ var RuleEditor = Class.create({
 								this.ruleWidget.associationTitles[fieldnum] = data;
 							
 							var multicheckboxDom = this.make_multicheckbox(data);
-							this.ruleWidget.multisearchDomCache[fieldnum] = multicheckboxDom;
 							container.update(multicheckboxDom);
-							section.update(this.add_multicheckbox_toolbar(container));
+							this.ruleWidget.multisearchDomCache[fieldnum] = container.innerHTML;
+							var tempdiv = new Element('div').insert(this.add_multicheckbox_toolbar(container));
+							section.update(container);
 						}.bindAsEventListener(this, fieldnum, type)
 					});
 				}
