@@ -16,7 +16,7 @@ if (!$cansendphone && !$cansendemail && !$cansendsms) {
 ///////////////////////////////////////////////////////////////////////////////
 // Request processing:
 ///////////////////////////////////////////////////////////////////////////////
-if (!isset($_GET['id']) || !userOwns('messagegroup',$_GET['id'] + 0))
+if (!isset($_GET['id']) || (!userOwns('messagegroup',$_GET['id'] + 0) && !isPublished('messagegroup', $_GET['id'])))
 	redirect('unauthorized.php');
 
 $messagegroup = new MessageGroup($_GET['id'] + 0);
