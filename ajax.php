@@ -178,7 +178,7 @@ function handleRequest() {
 					return false;
 
 				// The user may be restricted to specific values.
-				$limit = DBFind('Rule', 'from rule inner join userassociation on rule.id = userassociation.ruleid where userassociation.type = "rule" and userid=? and fieldnum=?', false, array($USER->id, $fieldnum));
+				$limit = DBFind('Rule', 'from rule r inner join userassociation on r.id = userassociation.ruleid where userassociation.type = "rule" and userid=? and fieldnum=?', 'r', array($USER->id, $fieldnum));
 				$limitsql = $limit ? $limit->toSQL(false, 'value', false, true) : '';
 				
 				// Get 'c' field values from the 'section' table, taking into account user section/organization restrictions.
