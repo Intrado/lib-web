@@ -324,32 +324,28 @@ function handleRequest() {
 
 			$result->headers = array();
 			$result->headers['language'] = "&nbsp;";
-			if($cansendphone)
-				$result->headers['phone'] = "Phone";
-			if($cansendemail) {
-				$result->headers['htmlemail'] = "Email (HTML)";
-				$result->headers['plainemail'] = "Email (Plain)";
+
+			$query = "select l.code,l.name, m.id, m.type, m.subtype from language l
+						inner join message m on (l.code = m.languagecode and m.messagegroupid = ?)";
+			$rows = QuickQueryMultiRow($query,true,false,array($_GET['id']));
+
+			if($rows) {
+				foreach($rows as $row) {
+						if($row['type'] == 'email') {
+							$result->data[$row['code']][$row['subtype'] . $row['type']] = $row['id'];
+							$result->headers['htmlemail'] = "Email (HTML)";
+							$result->headers['plainemail'] = "Email (Plain)";
+						} else {
+							$result->data[$row['code']][$row['type']] = $row['id'];
+							if($row['type']== 'phone')
+								$result->headers['phone'] = 'Phone';
+							if($row['type']== 'sms')
+								$result->headers['sms'] = 'SMS';
+						}
+						$result->data[$row['code']]['languagename'] = $row['name'];
+				}
 			}
-			if($cansendsms)
-				$result->headers['sms'] = "SMS";
-			$query = "select mt.id as id, ll.code as languagecode,ll.name as languagename
-						" . ($cansendphone?",mt.phone as phone":"") . "
-						" . ($cansendemail?",mt.htmlemail as htmlemail":"") . "
-						" . ($cansendemail?",mt.plainemail as plainemail":"") . "
-						" . ($cansendsms?",mt.sms as sms":"") . "
-						from language ll left join (
-						select m.id as id,l.code as code
-						" . ($cansendphone?",sum(type='phone') as phone":"") . "
-						" . ($cansendemail?",sum(type='email' and subtype='html') as htmlemail":"") . "
-						" . ($cansendemail?",sum(type='email' and subtype='plain') as plainemail":"") . "
-						" . ($cansendsms?",sum(type='sms') as sms":"") . "
-						from message m left join language l on (m.languagecode = l.code)
-						 where m.messagegroupid = ?
-						" . ($cansendmultilingual?"":"and m.languagecode = '$deflanguagecode'") . "
-						group by l.name order by l.name) mt on ll.code = mt.code where 1
-						" . ($cansendmultilingual?"":"and ll.code = '$deflanguagecode'");
-			$result->data = QuickQueryMultiRow($query,true,false,array($_GET['id']));
-			return $result;
+		return $result;
 		default:
 			error_log("No AJAX API for type=$type");
 			return false;

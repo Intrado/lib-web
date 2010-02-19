@@ -30,7 +30,8 @@ class MessageGroupSelectMenu extends FormItem {
 					var request = 'ajax.php?ajax&type=messagegrid&id=' + id;
 					cachedAjaxGet(request,function(result) {
 						var response = result.responseJSON;
-						if(response.data.length > 0) {
+						var data = \$H(response.data);
+						if(data.size() > 0) {
 							var headers = \$H(response.headers);
 
 							var str = '<table style=\'border-spacing: 15px 5px;\'>';
@@ -38,18 +39,18 @@ class MessageGroupSelectMenu extends FormItem {
 								str += '<th class=\'Destination\'>' + title.value + '</th>';
 							});
 
-							response.data.each(function(item) {
+							data.each(function(item) {
 								str += '<tr>';
-									str += '<th class=\'Language\'>' + item.languagename + '</th>';
+									str += '<th class=\'Language\'>' + item.value.languagename + '</th>';
 								if(response.headers['phone'])
-									str += '<td>' + (item.phone>0?'<a href=\"#\" onclick=\"popup(\'messagegroupviewpopup.php?type=phone&subtype=voice&language=' + item.languagename + '&id=' + id + '\', 500, 500); return false;\"><img src=\'img/icons/accept.gif\' /></a>':'<img src=\'img/icons/diagona/16/160.gif\' />') + '</td>';
+									str += '<td>' + (item.value.phone?'<a href=\"#\" onclick=\"popup(\'messagegroupviewpopup.php?type=phone&subtype=voice&languagecode=' + item.key + '&id=' + id + '\', 800, 500); return false;\"><img src=\'img/icons/accept.gif\' /></a>':'<img src=\'img/icons/diagona/16/160.gif\' />') + '</td>';
 								if(response.headers['htmlemail'])
-									str += '<td>' + (item.htmlemail>0?'<a href=\"#\" onclick=\"popup(\'messagegroupviewpopup.php?type=email&subtype=html&language=' + item.languagename + '&id=' + id  + '\', 500, 500); return false;\"><img src=\'img/icons/accept.gif\' /></a>':'<img src=\'img/icons/diagona/16/160.gif\' />') + '</td>';
+									str += '<td>' + (item.value.htmlemail?'<a href=\"#\" onclick=\"popup(\'messagegroupviewpopup.php?type=email&subtype=html&languagecode=' + item.value.key + '&id=' + id  + '\', 800, 500); return false;\"><img src=\'img/icons/accept.gif\' /></a>':'<img src=\'img/icons/diagona/16/160.gif\' />') + '</td>';
 								if(response.headers['plainemail'])
-									str += '<td>' + (item.plainemail>0?'<a href=\"#\" onclick=\"popup(\'messagegroupviewpopup.php?type=email&subtype=plain&language=' + item.languagename + '&id=' + id +  '\', 500, 500); return false;\"><img src=\'img/icons/accept.gif\' /></a>':'<img src=\'img/icons/diagona/16/160.gif\' />') + '</td>';
+									str += '<td>' + (item.value.plainemail?'<a href=\"#\" onclick=\"popup(\'messagegroupviewpopup.php?type=email&subtype=plain&languagecode=' + item.value.key + '&id=' + id +  '\', 800, 500); return false;\"><img src=\'img/icons/accept.gif\' /></a>':'<img src=\'img/icons/diagona/16/160.gif\' />') + '</td>';
 								if(response.headers['sms']) {
-									if(item.languagecode == 'en')
-										str += '<td>' + (item.sms>0?'<a href=\"#\" onclick=\"popup(\'messagegroupviewpopup.php?type=sms&subtype=plain&language=en&id=' + id  + '\', 500, 500); return false;\"><img src=\'img/icons/accept.gif\' /></a>':'<img src=\'img/icons/diagona/16/160.gif\' />') + '</td>';
+									if(item.key == 'en')
+										str += '<td>' + (item.value.sms?'<a href=\"#\" onclick=\"popup(\'messagegroupviewpopup.php?type=sms&subtype=plain&languagecode=en&id=' + id  + '\', 500, 500); return false;\"><img src=\'img/icons/accept.gif\' /></a>':'<img src=\'img/icons/diagona/16/160.gif\' />') + '</td>';
 									else
 										str += '<td>" . _L("N/A") . "</td>';
 								}
