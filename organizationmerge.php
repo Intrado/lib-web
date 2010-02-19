@@ -50,7 +50,7 @@ class MergeOrganizations extends FormItem {
 		// source org
 		$str .= 
 		'<div style="padding: 3px;">
-			<div style="float: left; padding: 3px; font-size: 12px; border: 1px solid grey">
+			<div style="float: left; padding: 3px; font-size: 12px; border: 1px solid gray">
 				' . $sourceOrgKey . '
 			</div>';
 		// dest org
