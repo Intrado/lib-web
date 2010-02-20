@@ -329,22 +329,39 @@ function handleRequest() {
 						inner join message m on (l.code = m.languagecode and m.messagegroupid = ?)";
 			$rows = QuickQueryMultiRow($query,true,false,array($_GET['id']));
 
+			$hasvoicephone = false;
+			$hashtmlemail = false;
+			$hasplainemail = false;
+			$hasplainsms = false;
+
 			if($rows) {
 				foreach($rows as $row) {
-						if($row['type'] == 'email') {
-							$result->data[$row['code']][$row['subtype'] . $row['type']] = $row['id'];
-							$result->headers['htmlemail'] = "Email (HTML)";
-							$result->headers['plainemail'] = "Email (Plain)";
-						} else {
-							$result->data[$row['code']][$row['type']] = $row['id'];
-							if($row['type']== 'phone')
-								$result->headers['phone'] = 'Phone';
-							if($row['type']== 'sms')
-								$result->headers['sms'] = 'SMS';
-						}
-						$result->data[$row['code']]['languagename'] = $row['name'];
+					$result->data[$row['code']][$row['subtype'] . $row['type']] = $row['id'];
+					$result->data[$row['code']]['languagename'] = $row['name'];
+					switch($row['subtype'] . $row['type']) {
+						case 'voicephone':
+							$hasvoicephone = true;
+							break;
+						case 'htmlemail':
+							$hashtmlemail = true;
+							break;
+						case 'plainemail':
+							$hasplainemail = true;
+							break;
+						case 'plainsms':
+							$hasplainsms = true;
+							break;
+					}
 				}
 			}
+			if($hasvoicephone)
+				$result->headers['voicephone'] = "Phone";
+			if($hashtmlemail)
+				$result->headers['htmlemail'] = "Email (HTML)";
+			if($hasplainemail)
+				$result->headers['plainemail'] = "Email (Plain)";
+			if($hasplainsms)
+				$result->headers['plainsms'] = "SMS";
 		return $result;
 		default:
 			error_log("No AJAX API for type=$type");

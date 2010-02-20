@@ -42,15 +42,15 @@ class MessageGroupSelectMenu extends FormItem {
 							data.each(function(item) {
 								str += '<tr>';
 									str += '<th class=\'Language\'>' + item.value.languagename + '</th>';
-								if(response.headers['phone'])
-									str += '<td>' + (item.value.phone?'<a href=\"#\" onclick=\"popup(\'messagegroupviewpopup.php?type=phone&subtype=voice&languagecode=' + item.key + '&id=' + id + '\', 800, 500); return false;\"><img src=\'img/icons/accept.gif\' /></a>':'<img src=\'img/icons/diagona/16/160.gif\' />') + '</td>';
+								if(response.headers['voicephone'])
+									str += '<td>' + (item.value.voicephone?'<a href=\"#\" onclick=\"popup(\'messagegroupviewpopup.php?type=phone&subtype=voice&languagecode=' + item.key + '&id=' + id + '\', 800, 500); return false;\"><img src=\'img/icons/accept.gif\' /></a>':'<img src=\'img/icons/diagona/16/160.gif\' />') + '</td>';
 								if(response.headers['htmlemail'])
 									str += '<td>' + (item.value.htmlemail?'<a href=\"#\" onclick=\"popup(\'messagegroupviewpopup.php?type=email&subtype=html&languagecode=' + item.value.key + '&id=' + id  + '\', 800, 500); return false;\"><img src=\'img/icons/accept.gif\' /></a>':'<img src=\'img/icons/diagona/16/160.gif\' />') + '</td>';
 								if(response.headers['plainemail'])
 									str += '<td>' + (item.value.plainemail?'<a href=\"#\" onclick=\"popup(\'messagegroupviewpopup.php?type=email&subtype=plain&languagecode=' + item.value.key + '&id=' + id +  '\', 800, 500); return false;\"><img src=\'img/icons/accept.gif\' /></a>':'<img src=\'img/icons/diagona/16/160.gif\' />') + '</td>';
-								if(response.headers['sms']) {
+								if(response.headers['plainsms']) {
 									if(item.key == 'en')
-										str += '<td>' + (item.value.sms?'<a href=\"#\" onclick=\"popup(\'messagegroupviewpopup.php?type=sms&subtype=plain&languagecode=en&id=' + id  + '\', 500, 500); return false;\"><img src=\'img/icons/accept.gif\' /></a>':'<img src=\'img/icons/diagona/16/160.gif\' />') + '</td>';
+										str += '<td>' + (item.value.plainsms?'<a href=\"#\" onclick=\"popup(\'messagegroupviewpopup.php?type=sms&subtype=plain&languagecode=en&id=' + id  + '\', 500, 500); return false;\"><img src=\'img/icons/accept.gif\' /></a>':'<img src=\'img/icons/diagona/16/160.gif\' />') + '</td>';
 									else
 										str += '<td>" . _L("N/A") . "</td>';
 								}
