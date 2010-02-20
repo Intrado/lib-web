@@ -860,7 +860,7 @@ if ($button = $messagegroupsplitter->getSubmit()) {
 													if ($formdestinationtype == 'email') {
 														$sourcemessage->createMessageAttachments($emailattachments);
 													}
-												} else {
+												} else if ($formdestinationtype == 'email') {
 													$sourcemessage->data = $emaildatastring;
 													$sourcemessage->readHeaders();
 													$sourcemessage->update();
@@ -925,7 +925,7 @@ if ($button = $messagegroupsplitter->getSubmit()) {
 													
 													if ($formdestinationtype == 'email')
 														$translatedmessage->createMessageAttachments($emailattachments);
-												} else {
+												} else if ($formdestinationtype) {
 													$translatedmessage->data = $emaildatastring;
 													$translatedmessage->readHeaders();
 													$translatedmessage->update();
