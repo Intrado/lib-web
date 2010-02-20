@@ -171,7 +171,23 @@ class SMAPI{
 				$result["resultdescription"] = "Invalid user";
 				return $result;
 			}
-			$queryresult = Query("select id, name, description, type from message where userid = ? and type= ? and autotranslate != 'source' and not deleted order by name", false, array($USER->id, strtolower($type)));
+			
+			$queryresult = Query("
+				select
+					m.id, m.name, m.description, m.type
+				from
+					message m inner join messagegroup mg
+						on (m.messagegroupid = mg.id)
+				where
+					mg.userid = ? and
+					mg.type = 'notification' and
+					m.type = ? and
+					m.autotranslate != 'source' and
+					not mg.deleted and
+					not m.deleted
+				order by
+					m.name", false, array($USER->id, strtolower($type)));
+			
 			$messages = array();
 			while($row = DBGetRow($queryresult)){
 				$message = new API_Message();
