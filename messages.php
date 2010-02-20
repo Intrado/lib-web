@@ -135,23 +135,27 @@ if($isajax === true) {
 	$total = QuickQuery("select FOUND_ROWS()");
 	
 	// get all the message group display data needed for this page
-	$mergeditems = QuickQueryMultiRow(
-		"select 'message' as type,'Saved' as status, 
-			mg.id as id, mg.name as name, mg.modified as date, mg.deleted as deleted, 
-			sum(m.type='phone') as phone, sum(m.type='email') as email,
-			sum(m.type='sms') as sms, p.action as publishaction, p.id as publishid, u.login as owner
-		from messagegroup mg
-		join message m on
-			(m.messagegroupid = mg.id)
-		join user u on
-			(mg.userid = u.id)
-		left join publish p on
-			(p.userid = ? and p.messagegroupid = m.messagegroupid)
-		where mg.id in (". implode(",", $msgGroupIds) .")
-		group by mg.id
-		order by mg.$orderby, mg.id",
-		true, false, array($USER->id));
-
+	if ($total) {
+		$mergeditems = QuickQueryMultiRow(
+			"select 'message' as type,'Saved' as status, 
+				mg.id as id, mg.name as name, mg.modified as date, mg.deleted as deleted, 
+				sum(m.type='phone') as phone, sum(m.type='email') as email,
+				sum(m.type='sms') as sms, p.action as publishaction, p.id as publishid, u.login as owner
+			from messagegroup mg
+			join message m on
+				(m.messagegroupid = mg.id)
+			join user u on
+				(mg.userid = u.id)
+			left join publish p on
+				(p.userid = ? and p.messagegroupid = m.messagegroupid)
+			where mg.id in (". implode(",", $msgGroupIds) .")
+			group by mg.id
+			order by mg.$orderby, mg.id",
+			true, false, array($USER->id));
+	} else {
+		$mergeditems = array();
+	}
+	
 	$numpages = ceil($total/$limit);
 	$curpage = ceil($start/$limit) + 1;
 	$displayend = ($start + $limit) > $total ? $total : ($start + $limit);
