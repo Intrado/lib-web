@@ -220,7 +220,7 @@ class ContactChangeReport extends ReportGenerator {
 						"5" => "Sequence",
 						"6" => "Destination",
 						"9" => "Modified Date",
-						"10" => "Organization");
+						"10" => "Current Org");
 		// index 7 is a flag to tell what type of destination
 		// index 8 editlock
 		// so set the title of starting f-field at appropriate place
@@ -284,7 +284,7 @@ class ContactChangeReport extends ReportGenerator {
 		session_write_close();//WARNING: we don't keep a lock on the session file, any changes to session data are ignored past this point
 		
 		//generate the CSV header
-		$header = 'ID#, First Name, Last Name, Address, Organization';
+		$header = '"ID#","First Name","Last Name","Address","Current Org"';
 
 		foreach($activefields as $active){
 			if(!$active) continue;
@@ -292,15 +292,15 @@ class ContactChangeReport extends ReportGenerator {
 		}
 		
 		for ($i=0; $i<$maxphones; $i++) {
-			$header .= ',"Phone '.($i +1).'","Modified"';
+			$header .= ',"Phone '.($i +1).'","Modified Ph'.($i+1).'"';
 		}
 		for ($i=0; $i<$maxemails; $i++) {
-			$header .= ',"Email '.($i +1).'","Modified"';
+			$header .= ',"Email '.($i +1).'","Modified Email'.($i+1).'"';
 		}
 		
 		if ($hassms) {
 			for ($i=0; $i<$maxsms; $i++) {
-				$header .= ',"SMS '.($i +1).'","Modified"';
+				$header .= ',"SMS '.($i +1).'","Modified SMS'.($i+1).'"';
 			}
 		}
 		
