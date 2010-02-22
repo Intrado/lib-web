@@ -318,7 +318,7 @@ if($error || $reportgenerator->format == "html"){
 		$back = button("Back", "location.href='" . (isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : $fallbackUrl) . "'");
 	}
 	buttons($back, submit($f, $s, "Refresh"), submit($f, "save", "Save/Schedule"));
-	startWindow("Display Options ".help('ReportContactChanges_DisplayOptions'), "padding: 3px;", "true");
+	startWindow("Display Options", "padding: 3px;", "true");
 	?>
 	<table border="0" cellpadding="3" cellspacing="0" width="100%">
 		<tr valign="top"><th align="right" class="windowRowHeader bottomBorder">Display Fields:</th>
