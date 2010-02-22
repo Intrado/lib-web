@@ -20,7 +20,7 @@ require_once("obj/ReportGenerator.obj.php");
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization
 ////////////////////////////////////////////////////////////////////////////////
-if (!($USER->authorize('createreport') || $USER->authorize('viewsystemreports'))) {
+if (!($USER->authorize('createreport'))) {
 	redirect('unauthorized.php');
 }
 
