@@ -112,7 +112,7 @@ if($options['classroomreporttype'] == 'person') {
 					$datesql
 					group by o.id
 					");
-	$titles = array("0" => _L("Organization"),
+	$titles = array("0" => _L("Current Org"),
 					"1" => _L("Comments Sent"));
 	$formatters = array("0" => "fmt_null",
 					"1" => "fmt_null");
