@@ -251,7 +251,7 @@ class SurveyTempleteWiz_settings extends WizStep {
 		$formdata = array();
 		$formdata["name"] = array(
 			"label" => _L('Name'),
-			"fieldhelp" => _L('TODO'),
+			"fieldhelp" => _L('The name of your survey. This will appear in reports and on the web survey.'),
 			"value" => $questionnaire->name,
 			"validators" => array(
 				array("ValRequired"),
@@ -262,7 +262,7 @@ class SurveyTempleteWiz_settings extends WizStep {
 		);
 		$formdata["description"] = array(
 			"label" => _L('Description'),
-			"fieldhelp" => _L('TODO'),
+			"fieldhelp" => _L('Enter an optional description of the survey for later identification.'),
 			"value" => $questionnaire->description,
 			"validators" => array(
 				array("ValLength","max" => 50)
@@ -283,7 +283,7 @@ class SurveyTempleteWiz_settings extends WizStep {
 
 			$formdata["surveytype"] = array(
 				"label" => _L('Survey Method'),
-				"fieldhelp" => _L('TODO'),
+				"fieldhelp" => _L('Select the delivery medium for your survey.'),
 				"value" => $type,
 				"validators" => array(
 					array("ValRequired"),
@@ -296,7 +296,7 @@ class SurveyTempleteWiz_settings extends WizStep {
 
 		$formdata["randomizeorder"] = array(
 			"label" => _L('Randomize Question Order'),
-			"fieldhelp" => _L('TODO'),
+			"fieldhelp" => _L('Shuffle the questions to ensure an even spread of responses in the event of recipients exiting the survey early. Do not use this if some of your questions are based on previous questions.'),
 			"value" => (bool)$questionnaire->dorandomizeorder,
 			"validators" => array(),
 			"control" => array("CheckBox"),
@@ -304,9 +304,9 @@ class SurveyTempleteWiz_settings extends WizStep {
 		);
 
 		$helpsteps = array(
-			_("Enter a name and description for your survey. Names are used in reports and the web page for the survey"),
-			_("Select a survey method. Phone will call contacts on your list and present them with a set of interactive prompts. Web will send an email with a link to a form"),
-			_("In order to remove potential statistical bias, you may select to randomize question order. Each person will be presented with the questions in a different order. This improves statistical validity of the responses received. Unselect this if some of your questions are based on previous questions.")
+			_("Enter a name and description for your survey. The name will appear in reports and on the web page associated with the survey."),
+			_("Select a survey method. Phone will call contacts on your list and present them with a set of interactive prompts. Web will send an email with a link to a form."),
+			_("Randomize Question Order shuffles the order of the questions for each recipient. In the event that recipients decide to leave the survey without finishing it, randomizing increases the likelihood of receiving data for all questions, not just the first few. Unselect this option if some of your questions are based on previous questions.")
 		);
 
 
@@ -328,7 +328,7 @@ class SurveyTemplateWiz_phonefeatures extends WizStep {
 		$machineoptions = array("message" => _('Leave a message for answering machines'),"hangup" => _('Hang up and try again later'));
 		$formdata["amsweringmachine"] = array(
 			"label" => _L('Answering Machine'),
-			"fieldhelp" => _L('Select an option for what to do when the system calls and reaches an answering machine'),
+			"fieldhelp" => _L('Select an option for what to do when the system calls and reaches an answering machine.'),
 			"value" => $questionnaire->machinemessageid ? "message" : "hangup",
 			"validators" => array(
 				array("ValInArray","values" => array_keys($machineoptions))
@@ -336,12 +336,12 @@ class SurveyTemplateWiz_phonefeatures extends WizStep {
 			"control" => array("RadioButton","values" => $machineoptions),
 			"helpstep" => $helpstepnum++
 		);
-		$helpsteps[] = _('If a survey phone call reaches an answering machine, it can either leave a message letting the person know why they received a call, or hang up and try again later. It is generally better to leave a message, however, hanging up and trying again may result in more surveys responses.');
+		$helpsteps[] = _('If a survey call reaches an answering machine, it can either leave a message letting the person know why they received a call, or hang up and try again later. It is generally better to leave a message. However, hanging up and trying again may result in more survey responses.');
 
 		$introopts = array("message" => _('Play an intro message'),"skip" => _('Skip right to asking questions'));
 		$formdata["intromessage"] = array(
 			"label" => _L('Introduction'),
-			"fieldhelp" => _L("If you'd like to play an introduction message, you can opt to here."),
+			"fieldhelp" => _L("If you'd like to play an introduction message explaining the purpose of your survey, you can opt to here."),
 			"value" => $questionnaire->intromessageid ? "message" : "skip",
 			"validators" => array(
 				array("ValInArray","values" => array_keys($introopts))
@@ -349,12 +349,12 @@ class SurveyTemplateWiz_phonefeatures extends WizStep {
 			"control" => array("RadioButton","values" => $introopts),
 			"helpstep" => $helpstepnum++
 		);
-		$helpsteps[] = _('It is reccomended to record an introduction message describing the survey process. People are more likely to participate in the survey if they know what it is about, and why their repsonse is important.');
+		$helpsteps[] = _('It is best practice to record an introduction message describing the survey process before asking questions. People are more likely to participate in the survey if they know what it is about and why their response is important.');
 
 		$byeopts = array("message" => _('Play a goodbye message'),"reply" => _('Play a goodbye message and allow reply'), "skip" => _('Hangup after the last question'));
 		$formdata["goodbyemessage"] = array(
 			"label" => _L('Goodbye message'),
-			"fieldhelp" => _L('If you\'d like to play a message after they survey, you can opt to here. You may also allow call recipients to leave a reply message'),
+			"fieldhelp" => _L('If you\'d like to play a message after the survey, you can opt to here. You may also allow call recipients to leave a reply message.'),
 			"value" => $questionnaire->leavemessage ? "reply" : ($questionnaire->exitmessageid ? "message" : "skip"),
 			"validators" => array(
 				array("ValInArray","values" => array_keys($byeopts))
@@ -362,7 +362,7 @@ class SurveyTemplateWiz_phonefeatures extends WizStep {
 			"control" => array("RadioButton","values" => $byeopts),
 			"helpstep" => $helpstepnum++
 		);
-		$helpsteps[] = _('It is reccomended to record a goodbye message thanking the person for their time and responses. People are more likely to participate in future surveys if they have been thanked for their time.<br><br>Reply messages can used to collect additional information from the person that is not otherwise covered in the survey questions, or to provide feedback about the survey. These messages will show up in the Responses tab. If you select this, you should record a goodbye message that lets the person know that this is available to them by pressing the zero key.');
+		$helpsteps[] = _('It is best practice to record a goodbye message thanking the person for their time. People will be more likely to answer future surveys when they know their feedback is appreciated.<br><br>Reply messages can used to collect additional information from the person that is not otherwise covered in the survey questions or to provide feedback about the survey. These messages will show up in the Responses tab. <br><br><b>Note:</b> If you allow replies, be sure to mention in your goodbye message that this is available by pressing the zero key.');
 
 
 		return new Form("phonefeatures", $formdata, $helpsteps);
@@ -399,7 +399,7 @@ class SurveyTemplateWiz_phonemessages extends WizStep {
 
 			$formdata["amsweringmachine"] = array(
 				"label" => _L('Answering Machine Message'),
-				"fieldhelp" => _L('TODO'),
+				"fieldhelp" => _L('Enter a phone number where the system can call you.'),
 				"value" => $questionnaire->machinemessageid ? '{"m":' . $questionnaire->machinemessageid . '}' : "",
 				"validators" => array(
 					array("ValRequired"),
@@ -408,7 +408,7 @@ class SurveyTemplateWiz_phonemessages extends WizStep {
 				"control" => array("PhoneMessageRecorder"),
 				"helpstep" => $helpstepnum++
 			);
-			$helpsteps[] = _L('TODO');
+			$helpsteps[] = _L('This message will be left in the event of the system reaching an answering machine. You should write your message before you record.');
 		}
 
 		//intro message
@@ -422,7 +422,7 @@ class SurveyTemplateWiz_phonemessages extends WizStep {
 
 			$formdata["intromessage"] = array(
 				"label" => _L('Intro Message'),
-				"fieldhelp" => _L('TODO'),
+				"fieldhelp" => _L('Enter a phone number where the system can call you.'),
 				"value" => $questionnaire->intromessageid ? '{"m":' . $questionnaire->intromessageid . '}' : "",
 				"validators" => array(
 					array("ValRequired"),
@@ -431,7 +431,7 @@ class SurveyTemplateWiz_phonemessages extends WizStep {
 				"control" => array("PhoneMessageRecorder"),
 				"helpstep" => $helpstepnum++
 			);
-			$helpsteps[] = _L('TODO');
+			$helpsteps[] = _L('Before you enter a phone number where the system can call you to record, you should prepare by writing your message down. This message will be played before the survey starts.');
 		}
 
 		//goodbye message
@@ -447,7 +447,7 @@ class SurveyTemplateWiz_phonemessages extends WizStep {
 
 			$formdata["goodbyemessage"] = array(
 				"label" => _L('Goodbye Message'),
-				"fieldhelp" => _L('TODO'),
+				"fieldhelp" => _L('Enter a phone number where the system can call you.'),
 				"value" => $questionnaire->exitmessageid ? '{"m":' . $questionnaire->exitmessageid . '}' : "",
 				"validators" => array(
 					array("ValRequired"),
@@ -456,7 +456,7 @@ class SurveyTemplateWiz_phonemessages extends WizStep {
 				"control" => array("PhoneMessageRecorder"),
 				"helpstep" => $helpstepnum++
 			);
-			$helpsteps[] = _L('TODO');
+			$helpsteps[] = _L('This message will be played after the recipient has completed your survey. Best Practice is to thank them for their time. You should write down your message before you try to record.');
 		}
 
 		return new Form("phonemessages", $formdata, $helpsteps);
@@ -526,7 +526,7 @@ class SurveyTemplateWiz_webfeatures extends WizStep {
 			"control" => array("TextArea", "rows" => 7, "cols" => 30),
 			"helpstep" => $helpstepnum++
 		);
-		$helpsteps[] = _('It is reccomended to enter a goodbye message thanking the person for their time and responses. People are more likely to participate in future surveys if they have been thanked for their time.');
+		$helpsteps[] = _('Entering a goodbye message thanking the person for their time and responses is highly recommended. People are more likely to participate in future surveys if they have been thanked for their time.');
 
 		$formdata["usehtml"] = array(
 			"label" => _L('Use HTML'),
@@ -536,7 +536,7 @@ class SurveyTemplateWiz_webfeatures extends WizStep {
 			"control" => array("CheckBox"),
 			"helpstep" => $helpstepnum++
 		);
-		$helpsteps[] = _('By enabling this feature, the title, thank you, and question text may be HTML. You can use this to insert images or links, or to style the questions.');
+		$helpsteps[] = _('This feature allows you to use HTML in the title, thank you, and question text. HTML lets you insert images or links. You can also add formatting style to the questions.');
 
 
 		$formdata[] = _('Email Link');
@@ -557,7 +557,7 @@ class SurveyTemplateWiz_webfeatures extends WizStep {
 
 		$formdata["from"] = array(
 			"label" => _L('From Email'),
-			"fieldhelp" => _L('This is the address the email is coming from. Recipients will also be able to reply to this address.'),
+			"fieldhelp" => _L('This is the sender\'s email address. Recipients will also be able to reply to this address.'),
 			"value" => $fromemail,
 			"validators" => array(
 				array("ValRequired"),
@@ -594,7 +594,7 @@ class SurveyTemplateWiz_webfeatures extends WizStep {
 			"control" => array("TextArea","rows"=>10,"cols"=>45),
 			"helpstep" =>  $helpstepnum++
 		);
-		$helpsteps[] = _L('The email message body text goes here. Be sure to introduce yourself and give some information about the survey and why their response is important.<br><br>A link to the survey will be appended to the end of this message.');
+		$helpsteps[] = _L('The main email message text goes here. Be sure to introduce yourself and give some information about the survey and why their response is important.<br><br><b>Note:</b> A link to the survey will be appended to the end of this message.');
 
 
 		return new Form("webfeatures", $formdata, $helpsteps);
@@ -689,7 +689,7 @@ class SurveyTemplateWiz_questions extends WizStep {
 
 			$formdata["question$qnum-reportlabel"] = array(
 				"label" => _L('Report Label'),
-				"fieldhelp" => _L('TODO'),
+				"fieldhelp" => _L('Enter an informative label for the question which will identify it in the report.'),
 				"value" => $questiondata[$qnum]["reportlabel"],
 				"transient" => true,
 				"validators" => array(
@@ -699,12 +699,12 @@ class SurveyTemplateWiz_questions extends WizStep {
 				"control" => array("TextField","size" => 30, "maxlength" => 50),
 				"helpstep" => $helpstepnum++
 			);
-			$helpsteps[] = _L('TODO');
+			$helpsteps[] = _L('Enter a descriptive label for the question which will allow you to identify it in the survey report.');
 
 
 			$formdata["question$qnum-validresponse"] = array(
 				"label" => _L('Valid Response'),
-				"fieldhelp" => _L('TODO'),
+				"fieldhelp" => _L('Select the number of possible responses. These values coordinate to the buttons your survey recipients will press.'),
 				"value" => $questiondata[$qnum]["validresponse"],
 				"transient" => true,
 				"validators" => array(
@@ -714,12 +714,12 @@ class SurveyTemplateWiz_questions extends WizStep {
 				"control" => array("SelectMenu","values" => $responseoptions),
 				"helpstep" => $helpstepnum++
 			);
-			$helpsteps[] = _L('TODO');
+			$helpsteps[] = _L('Choose the range of numbers survey recipients can press in response to the question. For example, if this is a yes/no question, select 1-2.');
 
 			if ($hasphone) {
 				$formdata["question$qnum-phonemessage"] = array(
 					"label" => _L('Phone Question'),
-					"fieldhelp" => _L('TODO'),
+					"fieldhelp" => _L('Enter the phone number where the system can call you to record your question.'),
 					"value" => $questiondata[$qnum]["phonemessage"],
 					"transient" => true,
 					"validators" => array(
@@ -729,14 +729,14 @@ class SurveyTemplateWiz_questions extends WizStep {
 					"control" => array("PhoneMessageRecorder"),
 					"helpstep" => $helpstepnum++
 				);
-				$helpsteps[] = _L('TODO');
+				$helpsteps[] = _L('Enter the number where the system can call you to record your question. It\'s a good idea to write down your questions before you begin. Also, make sure to explain the possible reponses to the recipient. For example, "Press 1 for yes or 2 for no."');
 
 			}
 
 			if ($hasweb) {
 				$formdata["question$qnum-webtext"] = array(
 				"label" => _L('Web Question Text'),
-				"fieldhelp" => _L('TODO'),
+				"fieldhelp" => _L('Enter the question as you would like it to appear on the web version of the survey.'),
 				"value" => $questiondata[$qnum]["webtext"],
 				"transient" => true,
 				"validators" => array(
@@ -746,13 +746,12 @@ class SurveyTemplateWiz_questions extends WizStep {
 				"control" => array("TextArea","rows"=>5,"cols"=>45),
 				"helpstep" => $helpstepnum++
 			);
-			$helpsteps[] = _L('TODO');
+			$helpsteps[] = _L('Enter the question as you would like it to appear on the web version of the survey. Make sure to explain what values the answers correspond to. If you\'ve selected the HTML option,  you can use HTML to format your question.');
 			}
 
 
 			$formdata["question$qnum-delete"] = array(
 				"label" => _L('Tools'),
-				"fieldhelp" => _L('TODO'),
 				"fieldhelp" => _L('To remove this question from your survey, click this button.'),
 				"value" => "",
 				"transient" => true,
@@ -760,13 +759,12 @@ class SurveyTemplateWiz_questions extends WizStep {
 				"control" => array("RemoveQuestionButton","name" => _L('Remove Question %1$s', $qnum),"qnum" => $qnum),
 				"helpstep" => $helpstepnum++
 			);
-			$helpsteps[] = _L('TODO');
+			$helpsteps[] = _L('You can remove this question from your survey by clicking the Remove Question button.');
 
 		}
 
 		$formdata["newquestionaction"] = array(
 			"label" => _L('Add Question'),
-			"fieldhelp" => _L('TODO'),
 			"fieldhelp" => _L('If you\'d like to add an additional question to your survey, click this button.'),
 			"value" => "",
 			"transient" => true,
@@ -774,7 +772,7 @@ class SurveyTemplateWiz_questions extends WizStep {
 			"control" => array("AddQuestionButton"),
 			"helpstep" => $helpstepnum++
 		);
-		$helpsteps[] = _L('TODO');
+		$helpsteps[] = _L('The Add Another Question button lets you add additional questions to your survey.');
 
 		return new Form("phonesurvey", $formdata, $helpsteps);
 	}
