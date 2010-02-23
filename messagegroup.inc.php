@@ -710,36 +710,6 @@ class ValTranslationItem extends Validator {
 	}
 }
 
-class ValOverridePlainText extends Validator {
-	var $onlyserverside = false;
-	
-	function validate ($value, $args, $requiredvalues) {
-		if ($value === "true" &&
-			(!isset($requiredvalues[$args['field']]) ||
-				trim($requiredvalues[$args['field']]) == "")
-		) {
-			return _L('When overriding plain-text, the message body is required.');
-		}
-		
-		return true;
-	}
-	
-	function getJSValidator () {
-		return '
-			function (name, label, value, args, requiredvalues) {
-				if (value &&
-					(!requiredvalues[args["field"]] ||
-						requiredvalues[args["field"]].strip() == "")
-				) {
-					return "' . _L('When overriding plain-text, the message body is required.') . '";
-				}
-				
-				return true;
-			}
-		';
-	}
-}
-
 class ValDefaultLanguageCode extends Validator {
 	var $onlyserverside = true;
 	function validate ($requestedlanguagecode, $args) {
@@ -747,28 +717,27 @@ class ValDefaultLanguageCode extends Validator {
 		$messages = DBFindMany('Message', 'from message where type != "sms" and messagegroupid=?', false, array($messagegroup->id));
 
 		if (!empty($messages)) {
-			$foundrequestedlanguage = false;
 			$existinglanguagecodes = array(); // example: ["{$message->type}-{$message->subtype}"] = array('en', 'es')
 			foreach ($messages as $message) {
-				if ($message->languagecode == $requestedlanguagecode)
-					$foundrequestedlanguage = true;
 				$key = "{$message->type}-{$message->subtype}";
 				if (!isset($existinglanguagecodes[$key]))
 					$existinglanguagecodes[$key] = array();
 				$existinglanguagecodes[$key][] = $message->languagecode;
 			}
 
-			if (!$foundrequestedlanguage)
-				return _L("Please first create the %s message.", Language::getName($requestedlanguagecode));
-
 			foreach ($existinglanguagecodes as $key => $languagecodes) {
 				if (!in_array($requestedlanguagecode, $languagecodes)) {
 					list($type, $subtype) = explode('-', $key);
 					
-					if ($type == 'email')
+					if ($type == 'email') {
+						// For html, it's not a problem as long as there is a plain email for the requested language code.
+						if ($subtype == 'html' && in_array($requestedlanguagecode, $existinglanguagecodes['email-plain']))
+							continue;
+						
 						return _L('Please first create the %1$s message for %2$s in %3$s.', Language::getName($requestedlanguagecode), ucfirst($type), $subtype == 'html' ? 'HTML' : ucfirst($subtype));
-					else
+					} else {
 						return _L('Please first create the %1$s message for %2$s.', Language::getName($requestedlanguagecode), $type == 'sms' ? 'SMS' : ucfirst($type));
+					}
 				}
 			}
 		}
