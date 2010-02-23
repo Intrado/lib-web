@@ -547,7 +547,9 @@ function makeAccordionSplitter($type, $subtype, $languagecode, $permanent, $pref
 							// Observe each button for a click; when a button is clicked, hide itself and show the other button. Then set the visibility of the accordion container appropriately.
 							
 							$("hideaccordiontools").observe("click", function(event) {
-								event.element().hide();
+								event.stop(); // In Safari, event.element() is a TD within the button.
+								
+								$("hideaccordiontools").hide();
 								$("showaccordiontools").show();
 								
 								var accordionsplitpane = form.down("td.SplitPane", 1);
@@ -559,8 +561,10 @@ function makeAccordionSplitter($type, $subtype, $languagecode, $permanent, $pref
 							});
 							
 							$("showaccordiontools").observe("click", function(event) {
-								event.element().hide();
+								event.stop(); // In Safari, event.element() is a TD within the button.
+								
 								$("hideaccordiontools").show();
+								$("showaccordiontools").hide();
 								
 								showAccordionContainer();
 							});
