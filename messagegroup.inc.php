@@ -261,30 +261,68 @@ function makeAccordionSplitter($type, $subtype, $languagecode, $permanent, $pref
 			
 			$callmelabeltext = _L('Voice Recording');
 			
-			$callmeformdata = !$USER->authorize('starteasy') ? array() : array(
-				"callmelabel" => makeFormHtml('
-					<label class="formlabel" for="' . "{$type}-{$subtype}-{$languagecode}_callme" . '">' . $callmelabeltext . '</label>
-				'),
-				"callme" => array(
-					"label" => $callmelabeltext,
-					"value" => "",
-					"fieldhelp" => _L("Enter your phone number and press Call Me to Record. The recorded audio file will appear in the Audio Library below."),
-					"validators" => array(
-						array('ValCallMeMessage')
-					),
-					"control" => array(
-						"CallMe",
-						"phone" => Phone::format($USER->phone),
-						"preferredaudiofilename" => $preferredaudiofilename
-					),
-					"renderoptions" => array(
-						"icon" => false,
-						"label" => false,
-						"errormessage" => true
-					),
-					"helpstep" => 1
-				)
-			);
+			if ($USER->authorize('starteasy')) {
+				$callmeformdata = array(
+					"callmelabel" => makeFormHtml('
+						<label class="formlabel" for="' . "{$type}-{$subtype}-{$languagecode}_callme" . '">' . $callmelabeltext . '</label>
+					'),
+					"callme" => array(
+						"label" => $callmelabeltext,
+						"value" => "",
+						"fieldhelp" => _L("Enter your phone number and press Call Me to Record. The recorded audio file will appear in the Audio Library below."),
+						"validators" => array(
+							array('ValCallMeMessage')
+						),
+						"control" => array(
+							"CallMe",
+							"phone" => Phone::format($USER->phone),
+							"preferredaudiofilename" => $preferredaudiofilename
+						),
+						"renderoptions" => array(
+							"icon" => false,
+							"label" => false,
+							"errormessage" => true
+						),
+						"helpstep" => 1
+					)
+				);
+				
+				// observe the callme container element for EasyCall events
+				$callmeobserver = "$('{$type}-{$subtype}-{$languagecode}_callme_content').observe('EasyCall:update', function(event) {
+						new Ajax.Request('ajaxmessagegroup.php', {
+							'method': 'post',
+							'parameters': {
+								'action': 'assignaudiofile',
+								'messagegroupid': {$_SESSION['messagegroupid']},
+								'audiofileid': event.memo.audiofileid
+							},
+							'onSuccess': function(transport) {
+								var audiofilename = transport.responseJSON;
+								
+								// if success
+								if (audiofilename) {
+									textInsert('{{' + audiofilename + '}}', getAudioTextarea());
+									this.reload();
+									
+								// if failed the action but success on the ajax request
+								} else {
+									alert('" . addslashes(_L('An error occured while trying to save your audio.\nPlease try again.')) . "');
+								}
+								
+								// create a new EasyCall to record another audio file if desired
+								newEasyCall();
+							}.bindAsEventListener(this),
+							'onFailure': function() {
+								alert('" . addslashes(_L('An error occured while trying to save your audio.\nPlease try again.')) . "');
+								newEasyCall();
+							}.bindAsEventListener(this)
+						});
+					}.bindAsEventListener(audiolibrarywidget));
+				";
+			} else {
+				$callmeformdata = array();
+				$callmeobserver = "";
+			}
 			
 			$audiouploadlabeltext = _L('Audio Upload');
 			
@@ -381,38 +419,7 @@ function makeAccordionSplitter($type, $subtype, $languagecode, $permanent, $pref
 									textInsert('{{' + audiofile.name + '}}', getAudioTextarea());
 								}.bindAsEventListener(audiolibrarywidget));
 
-								// observe the callme container element for EasyCall events
-								$('{$type}-{$subtype}-{$languagecode}_callme_content').observe('EasyCall:update', function(event) {
-									new Ajax.Request('ajaxmessagegroup.php', {
-										'method': 'post',
-										'parameters': {
-											'action': 'assignaudiofile',
-											'messagegroupid': {$_SESSION['messagegroupid']},
-											'audiofileid': event.memo.audiofileid
-										},
-										'onSuccess': function(transport) {
-											var audiofilename = transport.responseJSON;
-											
-											// if success
-											if (audiofilename) {
-												textInsert('{{' + audiofilename + '}}', getAudioTextarea());
-												this.reload();
-												
-											// if failed the action but success on the ajax request
-											} else {
-												alert('" . addslashes(_L('An error occured while trying to save your audio.\nPlease try again.')) . "');
-											}
-											
-											// create a new EasyCall to record another audio file if desired
-											newEasyCall();
-										}.bindAsEventListener(this),
-										'onFailure': function() {
-											alert('" . addslashes(_L('An error occured while trying to save your audio.\nPlease try again.')) . "');
-											newEasyCall();
-										}.bindAsEventListener(this)
-									});
-								}.bindAsEventListener(audiolibrarywidget));
-
+								$callmeobserver
 							})();
 						</script>
 					")
@@ -526,28 +533,11 @@ function makeAccordionSplitter($type, $subtype, $languagecode, $permanent, $pref
 							var form = $(formname);
 							
 							// Helper function for getting the accordion container.
-							function getAccordionContainer() {
-								var formvars = document.formvars && document.formvars[formname];
-								
-								var accordion;
-								
-								if (formvars) {
-									accordion = formvars.accordion;
-								}
-								
-								return accordion ? accordion.container : null;
-							}
-							
 							function showAccordionContainer() {
-								var accordioncontainer = getAccordionContainer();
-								
-								if (accordioncontainer) {
-									accordioncontainer.show();
-								}
-								
 								var accordionsplitpane = form.down("td.SplitPane", 1);
 								
 								if (accordionsplitpane) {
+									accordionsplitpane.down(".accordion").show();
 									accordionsplitpane.style.width = "45%";
 								}
 								
@@ -560,14 +550,10 @@ function makeAccordionSplitter($type, $subtype, $languagecode, $permanent, $pref
 								event.element().hide();
 								$("showaccordiontools").show();
 								
-								var accordioncontainer = getAccordionContainer();
-								if (accordioncontainer) {
-									accordioncontainer.hide();
-								}
-								
 								var accordionsplitpane = form.down("td.SplitPane", 1);
 								
 								if (accordionsplitpane) {
+									accordionsplitpane.down(".accordion").hide();
 									accordionsplitpane.style.width = "110px";
 								}
 							});
