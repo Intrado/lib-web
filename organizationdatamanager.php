@@ -92,7 +92,7 @@ if (count($data)) {
 	?></table><?
 	showPageMenu($total, $start, $limit);
 } else {
-	?><div><img src='img/largeicons/information.jpg' /><?=escapehtml(_L("No published messages at this time"))?></div><?
+	?><div><img src='img/largeicons/information.jpg' /><?=escapehtml(_L("No organizations defined"))?></div><?
 }
 endWindow();
 buttons();
