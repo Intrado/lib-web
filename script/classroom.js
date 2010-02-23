@@ -387,7 +387,7 @@
 				contacts.each(function(person) {
 					var id = 'c-' + person.key;
 					var tr = new Element('tr');
-					tr.insert('<td width="100%"><a href="#" id="' + id + '" title="Student id: ' +  person.value.pkey + '" style="text-decoration:none;cursor:pointer;">' + person.value.name +'</a></td>');
+					tr.insert('<td width="100%"><a href="#" id="' + id + '" title="Student id: ' +  person.value.pkey + '" style="text-decoration:none;cursor:pointer;white-space: nowrap;">' + person.value.pkey + ' - ' + person.value.name +'</a></td>');
 					var td = new Element('td', {style:'white-space:nowrap'});//{white-space:'nowrap'}
 					categoryinfo.each(function(category) {
 						td.insert('<img id="' + id + '-' + category.key + '"src="img/pixel.gif" title="' + category.value.name + '" style="width:10px;display:inline;" alt="" />');
@@ -402,10 +402,6 @@
 
 				contacts.each(function(person) {
 					var id = 'c-' + person.key;
-					dom.insert('<br />')
-
-					$('contactwrapper').insert(dom);
-
 					/*
 					 * Observe Contact Click. Select one contact at a time or multiple contacts with
 					 * alt key pressed.
@@ -442,7 +438,7 @@
 					$('picker').show();
 				} else {
 					$('picker').hide();
-				}å
+				}
 			}
 		});
 	}
