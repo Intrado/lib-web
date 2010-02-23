@@ -41,10 +41,11 @@ startWindow("Options", 'padding: 3px;');
 				<th align="left" class="nosort">Destination Labels</th>
 <?
 			}
-			// features - if contact manager, or self-signup, or smartcall appliance
+			// features - if contact manager, or self-signup, or smartcall appliance, or classroom
 			if ((getSystemSetting('_hasportal', false) && $USER->authorize('portalaccess')) ||
 				(getSystemSetting('_hasselfsignup', false) && $USER->authorize('metadata')) ||
-				($USER->authorize('managesystem') && getSystemSetting('_dmmethod', "")!='asp')) {
+				($USER->authorize('managesystem') && getSystemSetting('_dmmethod', "")!='asp') ||
+				($USER->authorize('managesystem') && getSystemSetting('_hastargetedmessage'))) {
 ?>
 				<th align="left" class="nosort">Features</th>
 <?
@@ -106,10 +107,11 @@ startWindow("Options", 'padding: 3px;');
 			</td>
 <?
 		}
-		// features - if contact manager, or self-signup, or smartcall appliance
+		// features - if contact manager, or self-signup, or smartcall appliance, or Classroom
 		if ((getSystemSetting('_hasportal', false) && $USER->authorize('portalaccess')) ||
 			(getSystemSetting('_hasselfsignup', false) && ($USER->authorize('metadata') || $USER->authorize('managesystem'))) ||
-			($USER->authorize('managesystem') && getSystemSetting('_dmmethod', "")!='asp')) {
+			($USER->authorize('managesystem') && getSystemSetting('_dmmethod', "")!='asp') ||
+			($USER->authorize('managesystem') && getSystemSetting('_hastargetedmessage'))) {
 ?>
 			<td>
 				<table>
