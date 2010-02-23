@@ -125,6 +125,8 @@ var RuleWidget = Class.create({
 		this.reldateOptions = null;
 		this.multisearchDomCache = {}; // Cache of multisearch DOM, indexed by fieldnum.
 		this.associationTitles = {}; // Cache of titles for associations.
+		this.languagemap = {}; // Cache of language code => language name.
+		this.languagefield = ''; // Identifies which field is for language.
 	},
 
 	// You must call startup() AFTER registering ruleWidget.container.observe('RuleWidget:Ready', ..);
@@ -141,6 +143,9 @@ var RuleWidget = Class.create({
 					//alert('<?=addslashes(_L('Sorry cannot get fieldmaps'))?>');
 					return;
 				}
+				
+				this.languagefield = data.languagefield;
+				this.languagemap = data.languagemap;
 				
 				this.operators = data['operators'];
 				this.reldateOptions = data['reldateOptions'];
@@ -168,14 +173,7 @@ var RuleWidget = Class.create({
 					this.fieldmaps['organization'].type = 'association';
 					this.fieldmaps['organization'].name = '<?=addslashes(_L("Organization"))?>';
 				}
-
-				// The customer has sections so show a selector for it
-				if (data.hassection) {
-					this.fieldmaps['section'] = {};
-					this.fieldmaps['section'].type = 'association';
-					this.fieldmaps['section'].name = '<?=addslashes(_L("Section"))?>';
-				}
-
+				
 				// Add "in" to the association type
 				this.operators['association'] = {};
 				this.operators['association']['in'] = '<?=addslashes(_L('is'))?>';
@@ -275,7 +273,17 @@ var RuleWidget = Class.create({
 				// We only want to display the titles.
 				value = $H(data.val).values().join(',');
 			} else if (data.type == 'multisearch') {
-				value = data.val.replace(/\|/g, ',');
+				if (data.fieldnum == this.languagefield) {
+					codes = data.val.split('|');
+					names = [];
+					for (var i = 0, count = codes.length; i < count; i++) {
+						var code = codes[i];
+						names.push(this.languagemap[code] || code);
+					}
+					value = names.join(',');
+				} else {
+					value = data.val.replace(/\|/g, ',');
+				}
 			} else if (data.op == 'reldate') {
 				value = this.reldateOptions[data.val];
 			} else {
@@ -293,7 +301,16 @@ var RuleWidget = Class.create({
 			
 			value = titles.join(',');
 		} else if (data.type == 'multisearch') { // Called from "Add" button.
-			value = data.val.join(',');
+			if (data.fieldnum == this.languagefield) {
+					names = [];
+					for (var i = 0, count = data.val.length; i < count; i++) {
+						var code = data.val[i];
+						names.push(this.languagemap[code] || code);
+					}
+					value = names.join(',');
+			} else {
+				value = data.val.join(',');
+			}
 		} else { // Called from "Add" button.
 			value = data.val.join(' <?=addslashes(_L('and'))?> ');
 		}
@@ -792,7 +809,7 @@ var RuleEditor = Class.create({
 
 			if (fieldnum.charAt(0) == 'f')
 				fieldSelectbox.insert(option);
-			else if (fieldnum.charAt(0) == 'g' || fieldnum == 'organization' || fieldnum == 'section')
+			else if (fieldnum.charAt(0) == 'g' || fieldnum == 'organization')
 				g.push(option);
 			else if (fieldnum.charAt(0) == 'c')
 				c.push(option);
