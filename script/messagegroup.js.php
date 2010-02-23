@@ -1,4 +1,4 @@
-function messagegroupHandleBeforeTabLoad (event, state, systemdefaultlanguagecode) {
+function messagegroupHandleBeforeTabLoad (event, state, messagegrouppdefaultlanguagecode) {
 	if ($$('.HTMLEditorAjaxLoader').length > 0) {
 		alert('Please wait until the HTML Editor has loaded.');
 		event.stop();
@@ -10,13 +10,13 @@ function messagegroupHandleBeforeTabLoad (event, state, systemdefaultlanguagecod
 		// If the user is tabbing between subtypes, make sure the language stays consistent.
 		event.memo.specificsections = [event.memo.nexttab + '-' + state.currentlanguagecode];
 	} else if (nexttab == 'emailheaders') {
-		event.memo.specificsections = ['emailheaders', 'email-html', 'email-html-' + systemdefaultlanguagecode];
+		event.memo.specificsections = ['emailheaders', 'email-html', 'email-html-' + messagegrouppdefaultlanguagecode];
 	} else if (nexttab == 'phone-voice') {
-		event.memo.specificsections = ['phone-voice', 'phone-voice-' + systemdefaultlanguagecode];
+		event.memo.specificsections = ['phone-voice', 'phone-voice-' + messagegrouppdefaultlanguagecode];
 	}
 }
 
-function messagegroupHandleTabLoaded (event, state, existingmessagegroupid, systemdefaultlanguagecode, autotranslatorUpdator, readonly) {
+function messagegroupHandleTabLoaded (event, state, existingmessagegroupid, messagegrouppdefaultlanguagecode, autotranslatorUpdator, readonly) {
 	// NOTE: Message tab icons are the only ones with an ID attribute.
 	var messagetabicon = event.memo.widget.sections[event.memo.tabloaded].titleDiv.down('img');
 	
@@ -50,7 +50,7 @@ function messagegroupHandleTabLoaded (event, state, existingmessagegroupid, syst
 		if (languagesectionpieces && languagesectionpieces.length == 3)
 			state.currentlanguagecode = languagesectionpieces[2];
 		else
-			state.currentlanguagecode = systemdefaultlanguagecode;
+			state.currentlanguagecode = messagegrouppdefaultlanguagecode;
 	} else if (tabloadedpieces.length == 2 && tabloadedpieces[0] == 'email') {
 		state.currentdestinationtype = 'email';
 		state.currentsubtype = tabloadedpieces[1];
@@ -102,25 +102,30 @@ function messagegroupHandleTabLoaded (event, state, existingmessagegroupid, syst
 			var tabloadedpieces = memo.tabloaded.split('-');
 
 			var results = transport.responseJSON;
-			state.messagegroupsummary = results || [];
-			if (results) {
-				for (var i = 0; i < results.length; i++) {
-					var result = results[i];
+			if (!results) {
+				state.messagegroupsummary = [];
+				return;
+			}
+			
+			state.messagegroupsummary = results.summary;
+			state.defaultlanguagecode = results.defaultlanguagecode;
+			
+			for (var i = 0, count = state.messagegroupsummary.length; i < count; i++) {
+				var result = state.messagegroupsummary[i];
 
-					var updateprevioustab = (result.type == 'email' && memo.previoustab == 'emailheaders') || result.type == previoustabpieces[0];
-					var updatetabloaded = (result.type == 'email' && memo.tabloaded == 'emailheaders') || result.type == tabloadedpieces[0];
-					if (updateprevioustab || updatetabloaded) {
-						if (result.type == 'email' && $('emailheadersicon')) {
-							$('emailheadersicon').src = "img/icons/accept.gif";
-						}
+				var updateprevioustab = (result.type == 'email' && memo.previoustab == 'emailheaders') || result.type == previoustabpieces[0];
+				var updatetabloaded = (result.type == 'email' && memo.tabloaded == 'emailheaders') || result.type == tabloadedpieces[0];
+				if (updateprevioustab || updatetabloaded) {
+					if (result.type == 'email' && $('emailheadersicon')) {
+						$('emailheadersicon').src = "img/icons/accept.gif";
+					}
 
-						if ($(result.type + '-' + result.subtype + 'icon')) {
-							$(result.type + '-' + result.subtype + 'icon').src = "img/icons/accept.gif";
-						}
+					if ($(result.type + '-' + result.subtype + 'icon')) {
+						$(result.type + '-' + result.subtype + 'icon').src = "img/icons/accept.gif";
+					}
 
-						if ($(result.type + '-' + result.subtype + '-' + result.languagecode + 'icon')) {
-							$(result.type + '-' + result.subtype + '-' + result.languagecode + 'icon').src = "img/icons/accept.gif";
-						}
+					if ($(result.type + '-' + result.subtype + '-' + result.languagecode + 'icon')) {
+						$(result.type + '-' + result.subtype + '-' + result.languagecode + 'icon').src = "img/icons/accept.gif";
 					}
 				}
 			}
