@@ -20,11 +20,8 @@
 	var highlightedmessages = new Hash();	// List of Messages that are currently highlighted
 	var highlightedcontacts = new Hash();	// List of Contacts that are currently highlighted
 
-
 	var markedcontacts = new Hash();
-
 	var markedcomment = false;
-
 	var revealmessages = true;			// Boolean to reveal messages on first click
 
 	var tabs;
@@ -77,15 +74,16 @@
 	 * The HTML ids for the are concatinated with 'c-' for a contact and something else for message
 	 */
 
-	function setEvent(contactid,messageid,isChecked,comment) {
-		var category = tabs.currentSection.substr(4); // strip 'lib-'
+	function setEvent(contactid,messageid,category,isChecked,comment) {
+		//var category = tabs.currentSection.substr(4); // strip 'lib-'
+
 		if(checkedcache.get(contactid) == undefined){
 			checkedcache.set(contactid,new Hash());
 		}
 		var contactlink = checkedcache.get(contactid);
+		var img = $('c-' + contactid + '-' + category);
 		if(isChecked) {
 			if(contactlink.get(messageid) == undefined || comment !== false) {
-				var img = $('c-' + contactid + '-' + category);
 				if(img != undefined) {
 					img.src = categoryinfo.get(category).img;
 				}
@@ -94,10 +92,8 @@
 		} else {
 			contactlink.unset(messageid);
 			if(contactlink.size() == 0) {
-				var img = $('c-' + contactid + '-' + category);
 				if(img != undefined) {
 					img.src = 'img/pixel.gif';
-
 				}
 				checkedcache.unset(contactid);
 			}
@@ -126,8 +122,9 @@
 					alert('Unable to save remark');
 				}
 				else {
+					var cat = $(prefix + '-' + id).readAttribute('category');
 					checkedcontacts.each(function(contact) {
-						setEvent(contact.key,id,true,text);
+						setEvent(contact.key,id,cat,true,text);
 					});
 					$(prefix + 'rem' + id).hide();
 					$(prefix + '-' + id).down('a').show();
@@ -209,12 +206,11 @@
 							//all += itm.key + " " + itm.value + '\n';
 							if(itm.value.categoryid != prevcategory) {
 								var cat = categoryinfo.get(itm.value.categoryid);
-								container.insert('<div style="clear:both;padding-top:5px"><h3><img src="' + cat.img + '"/>&nbsp;'+ cat.name +'</h3></div>');
+								container.insert('<div class="searchcategory"><img src="' + cat.img  + '" />&nbsp;' + cat.name +'</div><div style="clear:both;"></div>');
 								prevcategory = itm.value.categoryid;
 							}
-
 							container.insert(
-								'<div id="smsg-' + itm.key  + '" class="classroomcomment">' +
+								'<div id="smsg-' + itm.key  + '" class="classroomcomment" category="' + itm.value.categoryid +'">' +
 								'<img id="smsgchk-' + itm.key  + '" class="msgchk" src="img/checkbox-clear.png" alt=""/>' +
 								'<div id="smsgtxt-' + itm.key  + '" class="msgtxt" >' + itm.value.title +
 								' </div>' +
@@ -234,7 +230,8 @@
 						$('searchResult').update(container);
 
 						messages.each(function(itm) {
-							$('smsg-' + itm.key).observe('click',messageclick);
+							var div = $('smsg-' + itm.key);
+							div.observe('click',messageclick);
 						});
 
 						updatemessages('lib-search','lib-search');
@@ -457,7 +454,10 @@
 		var msgid = this.id.substr(c_prefix == "smsg"?5:4);
 
 		var state = checkedmessages.get(msgid) || 0;
-		if(event.target.hasClassName && event.target.hasClassName('remarklink')) {
+		var element = event.element();
+
+
+		if(element.hasClassName && element.hasClassName('remarklink')) {
 			if($(c_prefix + 'rem' + msgid).down('textarea').getValue() == '' && $(c_prefix + 'prem' + msgid).innerHTML != '') {
 				if(!confirm('Multiple Remarks. Edeting will replace all previous remarks.'))
 					return;
@@ -476,9 +476,11 @@
 				return;
 			}
 		}
+
 		// Don't modify anything if writing a comment'
 	//	if(!event.target.hasClassName('remark')) {
-		if(event.target.hasClassName && (event.target.hasClassName('msgtxt') || event.target.hasClassName('msgchk') || event.target.hasClassName('remarklink'))) {
+		if(element.hasClassName && (element.hasClassName('msgtxt') || element.hasClassName('msgchk') || element.hasClassName('remarklink'))) {
+
 			state = (state == 2)? 0 : 2;
 			var textarea = $(c_prefix + 'rem' + msgid).down('textarea');
 			if((state == 0) && (hascomments && textarea.getValue() != '' || $(c_prefix + 'prem' + msgid).innerHTML != '')) {
@@ -501,7 +503,7 @@
 							sectionid:$('classselect').getValue()},
 				onFailure: function(){ alert('Unable to Set Message') },
 				onException: function(){ alert('Unable to Set Message') },
-				onSuccess: function(response){
+				onSuccess: function(response) {
 					if (response.responseText.indexOf(" Login</title>") != -1) {
 						alert('Your changes cannot be saved because your session has expired or logged out.');
 						window.location="index.php?logout=1";
@@ -532,11 +534,11 @@
 						} else {
 							if(markedcomment == msgid) {
 								markedcontacts.unset(contact.key);
-								$('c-' + contact.key).setStyle('border:1px; solid white');
+								$('c-' + contact.key).setStyle('border:1px solid white;');
 							}
 							highlightedcontacts.unset('c-' + contact.key);
 						}
-						setEvent(contact.key,msgid,(state == 2),false);
+						setEvent(contact.key,msgid,$(htmlid).readAttribute('category'),(state == 2),false);
 					});
 				}
 			});
@@ -618,7 +620,7 @@
 
 
 		// Load tabs
-		tabs = new Tabs('tabsContainer',{});
+		tabs = new Tabs('tabsContainer',{hideDuration:0,showDuration:0});
 
 		categoryinfo.each(function(category) {
 			checkedcache.set(category.key,new Hash());

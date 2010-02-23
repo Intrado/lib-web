@@ -63,3 +63,12 @@ a.remarklink{
 	padding-left: 20px;
 	padding-top: 5px;
 }
+
+.searchcategory {
+	clear:both;
+	color:black;
+}
+
+.nowedit {
+	float:left;color:graytext;font-weight:lighter;font-style:italic;
+}

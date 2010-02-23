@@ -212,18 +212,8 @@ function updateenabled(input) {
 }
 
 function move(current, item) {
-	var value = item.getValue();
-	if(value == "") {
-		var options = '<option value="">-- Move To --</option>';
-		categoryinfo.each(function(category) {
-			if(category.key != current)
-				options += '<option value="' + category.key + '">' + category.value.name + '</option>';
-		});
-		item.update(options);
-	} else {
-		value = {action:"move",messageid:item.id.substring(5),tocategory:value};
-		updatecategory(current,value);
-	}
+	var value = {action:"move",messageid:item.id.substring(5),tocategory:item.value};
+	updatecategory(current,value);
 }
 
 
@@ -252,7 +242,6 @@ function deletecategory(id) {
 }
 
 function updatecategory(category, actioninfo) {
-
 	var sendvars = {
 		ajax:"true",
 		category:category,
@@ -266,7 +255,6 @@ function updatecategory(category, actioninfo) {
 			sendvars.deletemessageid = actioninfo.deletemessageid;
 		}
 	}
-
 	new Ajax.Request('classroommessagemanager.php', {
 		method:'get',
 		parameters: sendvars,
@@ -285,6 +273,11 @@ function updatecategory(category, actioninfo) {
 
 
 				items.insert(header);
+				var options = '<option value="">-- Move To --</option>';
+				categoryinfo.each(function(cat) {
+					if(cat.key != category)
+						options += '<option value="' + cat.key + '">' + cat.value.name + '</option>';
+				});
 
 				for(i=0;i<size;i++){
 					var item = result.list[i];
@@ -294,7 +287,7 @@ function updatecategory(category, actioninfo) {
 					row.insert(new Element('td',{align:"right"}).update(new Element('input',{id:'enable-' + item.id,type:'checkbox',checked:item.enabled,onclick:'updateenabled(this);return false;'})));
 					row.insert(new Element('td').update(item.title));
 					row.insert(new Element('td',{style:"white-space: nowrap;"}).update(
-					'<a href="classroommessageedit.php?id=' + item.id + '"  class="actionlink" title="Edit" ><img src="img/icons/pencil.gif" alt="Edit">Edit</a>&nbsp;|&nbsp;<a id="delete-' + item.id + '" href="#"  class="actionlink" title="delete" onclick="deletemessage(' + category + ',this); return false;" ><img src="img/icons/cross.gif" alt="delete">Delete</a>&nbsp;|&nbsp;<select id="move-' + item.id + '" onclick="move(' + category + ',this)"/><option value="">-- Move To --</option></select>'
+					'<a href="classroommessageedit.php?id=' + item.id + '"  class="actionlink" title="Edit" ><img src="img/icons/pencil.gif" alt="Edit">Edit</a>&nbsp;|&nbsp;<a id="delete-' + item.id + '" href="#"  class="actionlink" title="delete" onclick="deletemessage(' + category + ',this); return false;" ><img src="img/icons/cross.gif" alt="delete">Delete</a>&nbsp;|&nbsp;<select id="move-' + item.id + '" onchange="move(' + category + ',this)"/>' + options + '</select>'
 					));
 					items.insert(row);
 				}
@@ -303,8 +296,8 @@ function updatecategory(category, actioninfo) {
 
 				var pagetop = new Element('div',{style: 'float:right;'}).update(result.pageinfo[3]);
 				var pagebottom = new Element('div',{style: 'float:right;'}).update(result.pageinfo[3]);
-				var selecttop = new Element('select', {onchange: 'activepage = this.value;updatecategory(\'' + category + '\');'});
-				var selectbottom = new Element('select', {onchange: 'activepage = this.value;updatecategory(\'' + category + '\');'});
+				var selecttop = new Element('select');//activepage = this.value;updatecategory(\'' + category + '\');'});
+				var selectbottom = new Element('select');//, {onchange: 'activepage = this.value;updatecategory(\'' + category + '\');'});
 				for (var x = 0; x < result.pageinfo[0]; x++) {
 					var offset = x * result.pageinfo[1];
 					var psel = result.pageinfo[2] == x+1;
@@ -313,6 +306,9 @@ function updatecategory(category, actioninfo) {
 				}
 				pagetop.insert(selecttop);
 				pagebottom.insert(selectbottom);
+				selecttop.observe('change',(function(category) {activepage = this.value;updatecategory(category);}).curry(category));
+				selectbottom.observe('change',(function(category) {activepage = this.value;updatecategory(category);}).curry(category));
+
 				$('pagewrappertop-' + category).update(pagetop);
 				$('pagewrapperbottom-' + category).update(pagebottom);
 			}

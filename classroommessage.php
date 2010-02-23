@@ -14,6 +14,7 @@ require_once("obj/Event.obj.php");
 require_once("obj/Alert.obj.php");
 require_once("obj/TargetedMessageCategory.obj.php");
 require_once("obj/TargetedMessage.obj.php");
+require_once("obj/FieldMap.obj.php");
 
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization
@@ -146,7 +147,7 @@ if (isset($_GET['sectionid'])) {
 	if($usersection > 0) {
 		// User can access this section
 
-		$res = Query("select p.id, p.pkey,concat(p.f01,'&nbsp;', p.f02) name
+		$res = Query("select p.id, p.pkey,concat(p." . FieldMap::getFirstNameField() . ",'&nbsp;', p." . FieldMap::getLastNameField() . ") name
 											from person p join personassociation pa on (p.id = pa.personid)
 											where pa.type = 'section' and sectionid = ?",false,array($id));
 		while($row = DBGetRow($res)){
@@ -282,7 +283,7 @@ foreach($sections as $section)
 				foreach($library as $categoryid => $messages) {
 					// add library to id since user may change the title of the category
 					echo '<div id="lib-' . $categoryid . '" style="display:block;">
-						  <span id="nowedit-' . $categoryid . '" style="float:left;color:graytext;font-weight:lighter;font-style:italic;"></span>
+						  <span id="nowedit-' . $categoryid . '" class="nowedit"></span>
 						  <div style="clear:both"></div>';
 					foreach($messages as $message) {
 
@@ -293,7 +294,7 @@ foreach($sections as $section)
 						} else {
 							$title = ""; // Could not find message for this message key.
 						}
-						echo '<div id="msg-' . $message->id .'" class="classroomcomment">
+						echo '<div id="msg-' . $message->id .'" class="classroomcomment" category="'.$categoryid.'">
 								<img id="msgchk-' . $message->id .'" class="msgchk" src="img/checkbox-clear.png" alt=""/>
 								<div id="msgtxt-' . $message->id .'" class="msgtxt" >'
 								. $title .
