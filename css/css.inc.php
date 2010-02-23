@@ -645,7 +645,7 @@ div.scrollTableContainer {
 	height: 26px;
 }
 .verticaltabstitledivexpanded {
-	margin-left: -1px;
+	margin-left: -2px;
 	background: white;
 	position: relative;
 	z-index: 2;
