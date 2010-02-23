@@ -114,6 +114,7 @@ if (CheckFormSubmit($f,$s)){
 				// create customer tables
 				$tablequeries = explode("$$$",file_get_contents("../db/customer.sql"));
 				$tablequeries = array_merge($tablequeries, explode("$$$",file_get_contents("../db/createtriggers.sql")));
+				$tablequeries = array_merge($tablequeries, explode("$$$",file_get_contents("../db/targetedmessages.sql")));
 				foreach ($tablequeries as $tablequery) {
 					if (trim($tablequery)) {
 						$tablequery = str_replace('_$CUSTOMERID_', $customerid, $tablequery);
@@ -176,7 +177,8 @@ if (CheckFormSubmit($f,$s)){
 							('displayname', ?),
 							('timezone', ?),
 							('smscustomername', ?),
-							('enablesmsoptin', ?)";
+							('enablesmsoptin', ?),
+							('_dbversion', '7.5/8')"; // TODO we must update this for every release!!!
 
 				QuickUpdate($query, $newdb, array($hostname, $surveyurl, $displayname, $timezone, $displayname, $enablesmsoptin)) or dieWithError(" SQL:" . $query, $newdb);
 
@@ -245,6 +247,12 @@ if (CheckFormSubmit($f,$s)){
 							('_productname', ?)";
 				QuickUpdate($query, $newdb, array($defaultproductname)) or dieWithError(" SQL: " . $query, $newdb);
 
+				// Classroom Message Category
+				$query = "INSERT INTO `targetedmessagecategory` (`id`, `name`, `deleted`, `image`) VALUES
+							(1, 'Default', 0, 'blue dot')";
+				QuickUpdate($query, $newdb) or dieWithError(" SQL: " . $query, $newdb);
+				
+				// take them to the editor page for further configuration options
 				redirect("customeredit.php?id=" . $customerid);
 
 			}
