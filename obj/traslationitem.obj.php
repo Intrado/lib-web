@@ -34,6 +34,9 @@ class TranslationItem extends FormItem {
 			$msgdata = json_decode($value);
 		}
 
+		if (isset($this->args['transienttext']))
+			$msgdata->text = $this->args['transienttext'];
+		
 		if ($usehtmleditor === 'true') {
 			$msgdata->text = str_replace('<<', '&lt;&lt;', $msgdata->text);
 			$msgdata->text = str_replace('>>', '&gt;&gt;', $msgdata->text);
@@ -224,7 +227,7 @@ class TranslationItem extends FormItem {
 					
 					var srcbox = section + "text";
 					
-					var text = $(srcbox).getValue();
+					var text = $(srcbox).getValue().strip();
 					if(text == "")
 						return;
 					if(text != text.substring(0, 2000)){
@@ -257,14 +260,14 @@ class TranslationItem extends FormItem {
 					var englishText = $(section+"englishText");
 					var langtext = $(section + "text");
 					var overridesave = $(section + "overridesave");
-					if (!englishText.value) {
+					if (!englishText.value.strip()) {
 						langtext.value = overridesave.value;
 						return;
 					}
 					$(section + "textdiv").innerHTML = "<img src=\"img/ajax-loader.gif\" />";
 					new Ajax.Request("translate.php", {
 						method:"post",
-						parameters: {"english": makeTranslatableString(englishText.value), "languages": language},
+						parameters: {"english": makeTranslatableString(englishText.value.strip()), "languages": language},
 						onSuccess: function(transport) {
 							var data = transport.responseJSON;
 							if(data.responseStatus != 200 || data.responseData.translatedText == undefined)
