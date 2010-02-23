@@ -135,8 +135,8 @@ if (CheckFormSubmit($f,$s)){
 				QuickUpdate($query, $newdb) or dieWithError("SQL:" . $query, $newdb);
 
 				$query = "INSERT INTO `language` (`name`,`code`) VALUES
-							('English',`en`),
-							('Spanish',`es`)";
+							('English','en'),
+							('Spanish','es')";
 				QuickUpdate($query, $newdb) or dieWithError("SQL:" . $query, $newdb);
 
 				$query = "INSERT INTO `jobtype` (`name`, `systempriority`, `info`, `issurvey`, `deleted`) VALUES
