@@ -19,6 +19,8 @@ CKEDITOR.dialog.add( 'image', function( editor )
 			} else {
 				this.imageElement = null;
 			}
+			
+			this.getContentElement('tab1', 'uploadstatus').getElement().setText('');
 		},
 		onOk: function () {
 			var value = this.getContentElement('tab1', 'viewimageurl').getInputElement().getValue() || this.getContentElement('tab1', 'customurl').getInputElement().getValue(),
@@ -64,10 +66,6 @@ CKEDITOR.dialog.add( 'image', function( editor )
 							CKEDITOR.document.getById(this._.frameId).on('load', function() {
 								var inputelement = this.getInputElement();
 								var uploadbutton = this.getDialog().getContentElement('tab1', 'uploadbutton');
-
-								inputelement.on('change', function() {
-									uploadbutton.click();
-								});
 							}.bind(this));
 						}
 					},
@@ -79,16 +77,19 @@ CKEDITOR.dialog.add( 'image', function( editor )
 						label: 'Upload'
 					},
 					{
+						id : 'uploadstatus',
+						type : 'html',
+						html : ''
+					},
+					{
 						id : 'viewimageurl',
 						type : 'text',
 						label : 'Blank',
 						onLoad: function () {
-							CKEDITOR.document.getById(this.domId).hide();
+							CKEDITOR.document.getById(this.domId).$.style.visibility = "hidden";
 						},
 						onChange: function (event) {
-							if (this.getValue().indexOf("viewimage.php?id=") >= 0) {
-								this.getDialog().getButton('ok').click();
-							}
+							this.getDialog().getContentElement('tab1', 'uploadstatus').getElement().setText('Image uploaded.');
 						}
 					}
 				]
