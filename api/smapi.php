@@ -183,8 +183,7 @@ class SMAPI{
 					mg.type = 'notification' and
 					m.type = ? and
 					m.autotranslate != 'source' and
-					not mg.deleted and
-					not m.deleted
+					not mg.deleted
 				order by
 					m.name", false, array($USER->id, strtolower($type)));
 			
@@ -572,7 +571,7 @@ class SMAPI{
 			while($row = DBGetRow($queryresult)){
 				// NOTE: We don't want to return the autotranslate='source' messages because the autotranslate='translate' message would be included anyway.
 				$defaultlanguagecode = QuickQuery('select defaultlanguagecode from messagegroup where id = ?', false, array($row[3]));
-				$messages = DBFindMany('Message', 'from message where not deleted and not autotranslate="source" and messagegroupid = ? ', false, array($row[3]));
+				$messages = DBFindMany('Message', 'from message where not autotranslate="source" and messagegroupid = ? ', false, array($row[3]));
 				
 				$job = new API_Job();
 				$job->id = $row[0];
@@ -777,7 +776,7 @@ class SMAPI{
 						if ($duplicatephonemessage->id) {
 							// If the message is auto-translated, then copy its source message also, in case we need to refresh the translation.
 							if ($phonemessage->autotranslate == 'translated') {
-								$sourcephonemessage = DBFind('Message', 'from message where not deleted and messagegroupid=? and type="phone" and subtype=? and languagecode=? and autotranslate="source"', false, array($phonemessage->messagegroupid, $phonemessage->subtype, $phonemessage->languagecode));
+								$sourcephonemessage = DBFind('Message', 'from message where messagegroupid=? and type="phone" and subtype=? and languagecode=? and autotranslate="source"', false, array($phonemessage->messagegroupid, $phonemessage->subtype, $phonemessage->languagecode));
 								$duplicatesourcephonemessage = $sourcephonemessage->copy($messagegroup->id, true);
 								
 								if ($duplicatesourcephonemessage->id)
@@ -796,7 +795,7 @@ class SMAPI{
 						if ($duplicateemailmessage->id) {
 							// If the message is auto-translated, then copy its source message also, in case we need to refresh the translation.
 							if ($emailmessage->autotranslate == 'translated') {
-								$sourceemailmessage = DBFind('Message', 'from message where not deleted and messagegroupid=? and type="email" and subtype=? and languagecode=? and autotranslate="source"', false, array($emailmessage->messagegroupid, $emailmessage->subtype, $emailmessage->languagecode));
+								$sourceemailmessage = DBFind('Message', 'from message where messagegroupid=? and type="email" and subtype=? and languagecode=? and autotranslate="source"', false, array($emailmessage->messagegroupid, $emailmessage->subtype, $emailmessage->languagecode));
 								$duplicatesourceemailmessage = $sourceemailmessage->copy($messagegroup->id, true);
 								
 								if ($duplicatesourceemailmessage->id)
