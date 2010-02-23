@@ -5,8 +5,13 @@ class ValMessageBody extends Validator {
 		if (isset($args['messagegroup']) && $args['messagegroup']) {
 			$messagegroup = $args['messagegroup'];
 			$errormessagecreatefirst = _L("Please first create the %s message.", Language::getName($messagegroup->defaultlanguagecode));
+			
+			$hasmessage = $messagegroup->hasMessage($args['type'], $args['subtype']);
+			if (!$hasmessage && $args['languagecode'] == 'autotranslator' && !in_array($messagegroup->defaultlanguagecode, $args['translationlanguages']))
+				return $errormessagecreatefirst;
+			
 			// Unless the user is editing the default message or there are no messages, show an error if the messagegroup has no default message.
-			if ($messagegroup->hasMessage($args['type'], $args['subtype']) && !$messagegroup->hasDefaultMessage($args['type'], $args['subtype'])) {
+			if ($hasmessage && !$messagegroup->hasDefaultMessage($args['type'], $args['subtype'])) {
 				if ($args['languagecode'] == 'autotranslator') { // For autotranslator, $requiredvalues are jsonencoded from TranslationItem.
 					if (empty($requiredvalues))
 						return $errormessagecreatefirst;
