@@ -69,8 +69,8 @@ startWindow("Options", 'padding: 3px;');
 ?>
 						<tr><td><a href='persondatamanager.php'>Field Definitions</a></td></tr>
 						<tr><td><a href='groupdatamanager.php'>Group Field Definitions</a></td></tr>
-						<tr><td><a href='organizationdatamanager.php'>Organization Manager</a></td></tr>
 						<tr><td><a href='scheduledatamanager.php'>Section Field Definitions</a></td></tr>
+						<tr><td><a href='organizationdatamanager.php'>Organization Manager</a></td></tr>
 <?
 					}
 
