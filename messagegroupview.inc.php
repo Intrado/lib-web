@@ -272,6 +272,7 @@ if ($popup) {
 
 <script src="script/accordion.js" type="text/javascript"></script>
 <script src="script/messagegroup.js.php" type="text/javascript"></script>
+<link href="css/messagegroup.css" type="text/css" rel="stylesheet">
 <style type='text/css'>
 #messageemptyspan {
 	padding-top: 6px;
