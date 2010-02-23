@@ -198,7 +198,7 @@ foreach ($destinations as $type => $destination) {
 			$autotranslatorformdata["header"] = makeFormHtml("<div class='MessageBodyHeader'>" . _L("Automatic Translation") . "</div>" . icon_button(_L("Clear"),"delete", null, null, 'id="clearmessagebutton"') . "<span id='messageemptyspan'></span>");
 			
 			// NOTE: The plain-text autotranslator sets overrideplaintext = true because the user wouldn't be there unless he wanted to autotranslate a custom plain text message.
-			$autotranslatorformdata["sourcemessagebody"] = makeMessageBody($type == 'phone' ? $customerphonetranslationlanguages : $customeremailtranslationlanguages, false, $type, $subtype, 'autotranslator', _L('Automatic Translation'), $_SESSION['autotranslatesourcetext']["{$type}-{$subtype}"], $datafields, $subtype == 'html', $subtype == 'plain', true);
+			$autotranslatorformdata["sourcemessagebody"] = makeMessageBody(array_keys($type == 'phone' ? $customerphonetranslationlanguages : $customeremailtranslationlanguages), false, $type, $subtype, 'autotranslator', _L('Automatic Translation'), $_SESSION['autotranslatesourcetext']["{$type}-{$subtype}"], $datafields, $subtype == 'html', $subtype == 'plain', true);
 			$autotranslatorformdata["extrajavascript"] = makeFormHtml("
 				<script type='text/javascript'>
 					(function() {
@@ -976,7 +976,7 @@ if ($button = $messagegroupsplitter->getSubmit()) {
 													}
 													if (!$plainsourcemessage->overrideplaintext) {
 														if ($plainsourcemessageparts === false)
-															$plainsourcemessageparts = $plainsourcemessage->recreateParts(html_to_plain($sourcemessagetext));
+															$plainsourcemessageparts = $plainsourcemessage->recreateParts(html_to_plain($sourcemessagetext), null, null);
 														else
 															$plainsourcemessage->recreateParts(null, $plainsourcemessageparts, null);
 													}
