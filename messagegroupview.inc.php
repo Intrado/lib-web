@@ -104,8 +104,9 @@ foreach ($destinations as $type => $destination) {
 	//////////////////////
 	$subtypelayoutforms = array();
 
-	foreach ($destination['subtypes'] as $subtype) {
+	foreach ($destination['subtypes'] as $index => $subtype) {
 		if (!$messagegroup->hasMessage($type, $subtype)) {
+			unset($destinations[$type]['subtypes'][$index]);
 			continue;
 		}
 		
@@ -181,45 +182,40 @@ foreach ($destinations as $type => $destination) {
 		}
 	}
 
-	if (count($destination['subtypes']) > 1) {
-		if ($type == 'email') {
-			$emailheadersformdata = array(
-				'subject' => array(
-					"label" => _L('Subject'),
-					"control" => array("FormHtml","html" => $emailheaders['subject']),
-					"helpstep" => 1
-				),
-				'fromname' => array(
-					"label" => _L('From Name'),
-					"control" => array("FormHtml","html" => $emailheaders['fromname']),
-					"helpstep" => 1
-				),
-				'fromemail' => array(
-					"label" => _L('From Email'),
-					"control" => array("FormHtml","html" => $emailheaders['fromemail']),
-					"helpstep" => 1
-				)
-			);
+	if ($type == 'email') {
+		$emailheadersformdata = array(
+			'subject' => array(
+				"label" => _L('Subject'),
+				"control" => array("FormHtml","html" => $emailheaders['subject']),
+				"helpstep" => 1
+			),
+			'fromname' => array(
+				"label" => _L('From Name'),
+				"control" => array("FormHtml","html" => $emailheaders['fromname']),
+				"helpstep" => 1
+			),
+			'fromemail' => array(
+				"label" => _L('From Email'),
+				"control" => array("FormHtml","html" => $emailheaders['fromemail']),
+				"helpstep" => 1
+			)
+		);
 
-			$destinationlayoutforms[] = new FormSplitter("emailheaders", ucfirst($type),
-				// Icon.
-				$messagegroup->hasMessage($type) ? "img/icons/accept.gif" : "img/icons/diagona/16/160.gif",
-				// Layout-type.
-				"horizontalsplit",
-				// Buttons.
-				array(),
-				// Children.
-				array(
-					array("title" => "", "formdata" => $emailheadersformdata),
-					new FormTabber("", "", null, "horizontaltabs", $subtypelayoutforms)
-				)
-			);
-		}
-	} else if (count($subtypelayoutforms) == 1) { // Phone, Sms.
-		if ($type == 'sms')
-			$subtypelayoutforms[0]->title = 'SMS';
-		else
-			$subtypelayoutforms[0]->title = ucfirst($type);
+		$destinationlayoutforms[] = new FormSplitter("emailheaders", ucfirst($type),
+			// Icon.
+			$messagegroup->hasMessage($type) ? "img/icons/accept.gif" : "img/icons/diagona/16/160.gif",
+			// Layout-type.
+			"horizontalsplit",
+			// Buttons.
+			array(),
+			// Children.
+			array(
+				array("title" => "", "formdata" => $emailheadersformdata),
+				new FormTabber("", "", null, "horizontaltabs", $subtypelayoutforms)
+			)
+		);
+	} else if ($type == 'phone' || $type == 'sms') { // Phone, Sms.
+		$subtypelayoutforms[0]->title = $type == 'sms' ? 'SMS' : ucfirst($type);
 		
 		$destinationlayoutforms[] = $subtypelayoutforms[0];
 	}
