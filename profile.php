@@ -313,16 +313,16 @@ _L('Messaging Options'),
 		"helpstep" => 4
 	),
 	"publishmessagegroup" => array(
-		"label" => _L('Publish Message Groups'),
-		"fieldhelp" => _L('Allows users to publish message groups. These message groups can be used by any user with the "Subscribe to Message Groups" privilege.'),
+		"label" => _L('Publish Messages'),
+		"fieldhelp" => _L('Allows users to publish messages. These messages can be used by any user with the "Subscribe to Messages" privilege.'),
 		"value" => $obj->getValue("publishmessagegroup"),
 		"validators" => array(),
 		"control" => array("CheckBox"),
 		"helpstep" => 9
 	),
 	"subscribemessagegroup" => array(
-		"label" => _L('Subscribe to Message Groups'),
-		"fieldhelp" => _L('Allows users to view and subscribe to published message groups.'),
+		"label" => _L('Subscribe to Messages'),
+		"fieldhelp" => _L('Allows users to view and subscribe to published messages.'),
 		"value" => $obj->getValue("subscribemessagegroup"),
 		"validators" => array(),
 		"control" => array("CheckBox"),
