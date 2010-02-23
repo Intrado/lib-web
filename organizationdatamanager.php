@@ -24,30 +24,31 @@ if (isset($_GET['orgid']) && isset($_GET['delete'])) {
 	if ($org) {
 		// make sure this org doesn't have any associated rules
 		$orgAssociated = QuickQuery(
-			"select count(*)
+			"select count(id)
 			from organization o
-				inner join listentry le on
-					(o.id = le.organizationid)
-				inner join userassociation ua on
-					(o.id = ua.organizationid)
-			where o.id = ?
+			where (exists (
+					select * from listentry le where le.organizationid = o.id)
+				or exists (
+					select * from userassociation ua where ua.organizationid = o.id)
+				or exists (
+					select * from personassociation pa where pa.organizationid = o.id))
+				and o.id = ?
 				and not o.deleted", false, array($_GET['orgid']));
 		if ($orgAssociated) {
-			// cannot delete associated orgs
-			error_log("org associated");
+			notice(_L("The organization %s, cannot be deleted. It currently has active associations. Merge these into another organization to remove this organization.", $org->orgkey));
 		} else {
 			// delete the org
 			$org->deleted = 1;
 			$org->update();
+			notice(_L("The organization %s, has been deleted.", $org->orgkey));
 		}
 	}
-	redirect();
+	redirect("organizationdatamanager.php?pagestart=". $_GET['pagestart']);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Data Handling
 ////////////////////////////////////////////////////////////////////////////////
-session_write_close();//WARNING: we don't keep a lock on the session file, any changes to session data are ignored past this point
 
 function fmt_actions ($row, $index) {
 	global $start;
@@ -80,7 +81,7 @@ include_once("nav.inc.php");
 
 buttons(
 	icon_button("Done", "fugue/tick", "document.location='settings.php';"),
-	icon_button("New", "fugue/plus", "document.location='organizationnew.php';"));
+	icon_button("New", "add", "document.location='organizationnew.php';"));
 startWindow(_L("Organizations"));
 
 // if there are any messages to subscribe to
