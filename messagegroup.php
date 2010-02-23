@@ -47,16 +47,11 @@ if (!$cansendphone && !$cansendemail && !$cansendsms) {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-// Defaults.
+// MessageGroup Defaults.
 ///////////////////////////////////////////////////////////////////////////////
 $defaultautotranslate = 'none';
 $defaultpermanent = 0;
 $defaultmessagegroupname = 'Please enter a name';
-$defaultemailheaders = array(
-	'subject' => '',
-	'fromname' => $USER->firstname . " " . $USER->lastname,
-	'fromemail' => reset(explode(";", $USER->email))
-);
 
 ///////////////////////////////////////////////////////////////////////////////
 // Request processing:
@@ -108,6 +103,12 @@ if (!isset($messagegroup))
 ///////////////////////////////////////////////////////////////////////////////
 // Data Gathering:
 ///////////////////////////////////////////////////////////////////////////////
+$defaultemailheaders = array(
+	'subject' => $messagegroup->name,
+	'fromname' => $USER->firstname . " " . $USER->lastname,
+	'fromemail' => reset(explode(";", $USER->email))
+);
+
 // Make an array of just the default language, for use in SMS and when the user cannot send multilingual messages.
 $deflanguagecode = Language::getDefaultLanguageCode();
 $deflanguage = array($deflanguagecode => Language::getName($deflanguagecode));
@@ -115,54 +116,59 @@ $deflanguage = array($deflanguagecode => Language::getName($deflanguagecode));
 //if the user can send multi-lingual notifications use all languages, otherwise use an array of just the default.
 $customerlanguages = $cansendmultilingual ? Language::getLanguageMap() : $deflanguage;
 
-$ttslanguages = $cansendmultilingual ? Voice::getTTSLanguageMap() : array();
-unset($ttslanguages[Language::getDefaultLanguageCode()]);
-if ($cansendmultilingual)
-	$allowtranslation = isset($SETTINGS['translation']['disableAutoTranslate']) ? (!$SETTINGS['translation']['disableAutoTranslate']) : true;
-else
-	$allowtranslation = false;
-// NOTE: The customer may have a custom name for a particular language code, different from that of Google's.
-$translationlanguages = $allowtranslation ? getTranslationLanguages() : array();
-unset($translationlanguages[Language::getDefaultLanguageCode()]);
-$customeremailtranslationlanguages = array_intersect_key($customerlanguages, $translationlanguages);
-$customerphonetranslationlanguages = array_intersect_key($ttslanguages, $translationlanguages); // NOTE: $ttslanguages is already an a subset of $customerlanguages.
+if (!$messagegroup->deleted) {
+	$ttslanguages = $cansendmultilingual ? Voice::getTTSLanguageMap() : array();
+	unset($ttslanguages[Language::getDefaultLanguageCode()]);
+	if ($cansendmultilingual)
+		$allowtranslation = isset($SETTINGS['translation']['disableAutoTranslate']) ? (!$SETTINGS['translation']['disableAutoTranslate']) : true;
+	else
+		$allowtranslation = false;
+	// NOTE: The customer may have a custom name for a particular language code, different from that of Google's.
+	$translationlanguages = $allowtranslation ? getTranslationLanguages() : array();
+	unset($translationlanguages[Language::getDefaultLanguageCode()]);
+	$customeremailtranslationlanguages = array_intersect_key($customerlanguages, $translationlanguages);
+	$customerphonetranslationlanguages = array_intersect_key($ttslanguages, $translationlanguages); // NOTE: $ttslanguages is already an a subset of $customerlanguages.
 
-$datafields = FieldMap::getAuthorizedMapNames();
-$messagegroup->readHeaders();
+	$datafields = FieldMap::getAuthorizedMapNames();
+	$messagegroup->readHeaders();
 
-$permanent = $messagegroup->permanent;
+	$permanent = $messagegroup->permanent;
 
-if (!isset($_SESSION['emailheaders'])) {
-	$_SESSION['emailheaders'] = $messagegroup->getGlobalEmailHeaders($defaultemailheaders);
-}
+	if (!isset($_SESSION['emailheaders'])) {
+		$_SESSION['emailheaders'] = $messagegroup->getGlobalEmailHeaders($defaultemailheaders);
+	}
 
-// $emailattachments is a map indexed by contentid, containing size and name of each attachment, passed as data to the EmailAttach formitem.
-$emailattachments = array();
-foreach ($messagegroup->getGlobalEmailAttachments() as $attachment) {
-	$emailattachments[$attachment->contentid] = array("size" => $attachment->size, "name" => $attachment->filename);
-}
-if (empty($emailattachments) && isset($_SESSION['emailattachments']))
-	$emailattachments = $_SESSION['emailattachments'];
+	// $emailattachments is a map indexed by contentid, containing size and name of each attachment, passed as data to the EmailAttach formitem.
+	$emailattachments = array();
+	foreach ($messagegroup->getGlobalEmailAttachments() as $attachment) {
+		$emailattachments[$attachment->contentid] = array("size" => $attachment->size, "name" => $attachment->filename);
+	}
+	if (empty($emailattachments) && isset($_SESSION['emailattachments']))
+		$emailattachments = $_SESSION['emailattachments'];
 
-// $destinations is a tree that is populated according to the user's permissions; it contains destination types, subtypes, and languages.
-$destinations = array();
-if ($cansendphone) {
-	$destinations['phone'] = array(
-		'subtypes' => array('voice'),
-		'languages' => $customerlanguages
-	);
-}
-if ($cansendemail) {
-	$destinations['email'] = array(
-		'subtypes' => array('html', 'plain'),
-		'languages' => $customerlanguages
-	);
-}
-if ($cansendsms) {
-	$destinations['sms'] = array(
-		'subtypes' => array('plain'),
-		'languages' => $deflanguage
-	);
+	// $destinations is a tree that is populated according to the user's permissions; it contains destination types, subtypes, and languages.
+	$destinations = array();
+
+	if ($cansendphone) {
+		$destinations['phone'] = array(
+			'subtypes' => array('voice'),
+			'languages' => $customerlanguages
+		);
+	}
+	if ($cansendemail) {
+		$destinations['email'] = array(
+			'subtypes' => array('html', 'plain'),
+			'languages' => $customerlanguages
+		);
+	}
+	if ($cansendsms) {
+		$destinations['sms'] = array(
+			'subtypes' => array('plain'),
+			'languages' => $deflanguage
+		);
+	}
+} else {
+	$destinations = array();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -180,79 +186,94 @@ foreach ($destinations as $type => $destination) {
 		if ($countlanguages > 1) {
 			$autotranslatorformdata = array();
 
-			if (empty($_SESSION['autotranslatesourcetext']["{$type}{$subtype}"]))
-				$_SESSION['autotranslatesourcetext']["{$type}{$subtype}"] = $messagegroup->getMessageText($type,$subtype,Language::getDefaultLanguageCode(), 'none');
-
-			if ($type == 'phone' || $type == 'email') {
-				$autotranslatorformdata["header"] = makeFormHtml("<div class='MessageBodyHeader'>" . _L("Automatic Translation") . "</div>" . icon_button(_L("Clear"),"delete", null, null, 'id="clearmessagebutton"') . "<span id='messageemptyspan'></span>");
-				
-				// NOTE: The plain-text autotranslator sets overrideplaintext = true because the user wouldn't be there unless he wanted to autotranslate a custom plain text message.
-				$autotranslatorformdata["sourcemessagebody"] = makeMessageBody(false, $type, $subtype, 'autotranslator', _L('Automatic Translation'), $_SESSION['autotranslatesourcetext']["{$type}{$subtype}"], $datafields, $subtype == 'html', $subtype == 'plain', true);
-				$autotranslatorformdata["extrajavascript"] = makeFormHtml("
-					<script type='text/javascript'>
-						(function() {
-							var itemname = '{$type}-{$subtype}-autotranslator_sourcemessagebody';
-							if (!$(itemname))
-								return;
-								
-							var form = $(itemname).up('form');
-							var clearmessagebutton = $('clearmessagebutton');
-							var keytimer = null;
-							var validateHtmlEditor = function(event, checknow) {
-								var formelement;
-								var htmleditorobject;
-								
-								window.clearTimeout(keytimer);
-								if (!checknow) {
-									keytimer = window.setTimeout(function() {
-										validateHtmlEditor(null, true);
-									}, 500);
-									return;
-								}
-								
-								formelement = $(itemname);
-								htmleditorobject = getHtmlEditorObject();
-								if (htmleditorobject) {
-									saveHtmlEditorContent(htmleditorobject);
-									if (htmleditorobject.currenttextarea && htmleditorobject.currenttextarea.id.include(itemname)) {
-										form_do_validation(form, formelement);
-									}
-								}
-							};
-								
-							// Clear any existing click-observers on this element, then make a new one.
-							clearmessagebutton.stopObserving('click').observe('click', function() {
-								if (!confirm('".addslashes($clearmessageconfirmtext)."')) {
-									saveHtmlEditorContent();
-									return;
-								}
-								
-								$(itemname).value = '';
-								
-								clearHtmlEditorContent();
-							});
+			if (empty($_SESSION['autotranslatesourcetext']["{$type}-{$subtype}"]))
+				$_SESSION['autotranslatesourcetext']["{$type}-{$subtype}"] = $messagegroup->getMessageText($type,$subtype,Language::getDefaultLanguageCode(), 'none');
+			
+			$autotranslatorformdata["header"] = makeFormHtml("<div class='MessageBodyHeader'>" . _L("Automatic Translation") . "</div>" . icon_button(_L("Clear"),"delete", null, null, 'id="clearmessagebutton"') . "<span id='messageemptyspan'></span>");
+			
+			// NOTE: The plain-text autotranslator sets overrideplaintext = true because the user wouldn't be there unless he wanted to autotranslate a custom plain text message.
+			$autotranslatorformdata["sourcemessagebody"] = makeMessageBody(false, $type, $subtype, 'autotranslator', _L('Automatic Translation'), $_SESSION['autotranslatesourcetext']["{$type}-{$subtype}"], $datafields, $subtype == 'html', $subtype == 'plain', true);
+			$autotranslatorformdata["extrajavascript"] = makeFormHtml("
+				<script type='text/javascript'>
+					(function() {
+						var itemname = '{$type}-{$subtype}-autotranslator_sourcemessagebody';
+						if (!$(itemname))
+							return;
 							
-							registerHtmlEditorKeyListener(validateHtmlEditor);
-						})();
-					</script>
-				");
-					
-				$autotranslatorformdata["refreshtranslations"] = makeFormHtml(icon_button(_L("Refresh Translations"),"fugue/arrow_circle_double_135", null, null, 'id="autotranslatorrefreshtranslationbutton"') . "<div style='margin-top:35px;clear:both'></div>");
+						var form = $(itemname).up('form');
+						var clearmessagebutton = $('clearmessagebutton');
+						var keytimer = null;
+						var validateHtmlEditor = function(event, checknow) {
+							var formelement;
+							var htmleditorobject;
+							
+							window.clearTimeout(keytimer);
+							if (!checknow) {
+								keytimer = window.setTimeout(function() {
+									validateHtmlEditor(null, true);
+								}, 500);
+								return;
+							}
+							
+							formelement = $(itemname);
+							htmleditorobject = getHtmlEditorObject();
+							if (htmleditorobject) {
+								saveHtmlEditorContent(htmleditorobject);
+								if (htmleditorobject.currenttextarea && htmleditorobject.currenttextarea.id.include(itemname)) {
+									form_do_validation(form, formelement);
+								}
+							}
+						};
+							
+						// Clear any existing click-observers on this element, then make a new one.
+						clearmessagebutton.stopObserving('click').observe('click', function() {
+							if (!confirm('".addslashes($clearmessageconfirmtext)."')) {
+								saveHtmlEditorContent();
+								return;
+							}
+							
+							$(itemname).value = '';
+							
+							clearHtmlEditorContent();
+						});
+						
+						registerHtmlEditorKeyListener(validateHtmlEditor);
+					})();
+				</script>
+			");
+			
+			$autotranslatorformdata["refreshtranslations"] = makeFormHtml(icon_button(_L("Refresh Translations"),"fugue/arrow_circle_double_135", null, null, 'id="autotranslatorrefreshtranslationbutton"') . "<div style='margin-top:35px;clear:both'></div>");
 
-				$translationitems = array();
-				foreach ($destination['languages'] as $languagecode => $languagename) {
-					if ($type == 'phone' && !isset($customerphonetranslationlanguages[$languagecode]))
-						continue;
-					else if ($type == 'email' && !isset($customeremailtranslationlanguages[$languagecode]))
-						continue;
-
-					$translationitems[] = "{$languagecode}-translationitem";
-					$autotranslatorformdata["{$languagecode}-translationitem"] = makeTranslationItem(false, $type, $subtype, $languagecode, $languagename, $messagegroup->preferredgender, $_SESSION['autotranslatesourcetext']["{$type}{$subtype}"], "", 0, $languagename, false, false, false, !$messagegroup->hasMessage($type, $subtype, $languagecode), '', null, true);
-				}
-				$autotranslatorformdata["sourcemessagebody"]["requires"] = $translationitems;
-				
-				$autotranslatorformdata["branding"] = makeBrandingFormHtml();
+			$autotranslatorlanguages = $type == 'phone' ? $customerphonetranslationlanguages : $customeremailtranslationlanguages;
+			$autotranslatecodes = array();
+			foreach ($autotranslatorlanguages as $languagecode => $languagename) {
+				if (!$messagegroup->hasMessage($type, $subtype, $languagecode))
+					$autotranslatorcodes[] = $languagecode;
 			}
+			$autotranslatortranslations = translate_fromenglish(makeTranslatableString($_SESSION['autotranslatesourcetext']["{$type}-{$subtype}"]),$autotranslatecodes);
+			
+			$translationitems = array();
+			foreach ($autotranslatorlanguages as $languagecode => $languagename) {
+				$translationitems[] = "{$languagecode}-translationitem";
+				
+				if (is_array($autotranslatortranslations)) {
+					$translationtext = $autotranslatortranslations[$autotranslationlanguageindex]->responseData->translatedText;
+				} else if ($autotranslatortranslations) {
+					$translationtext = $autotranslatortranslations->translatedText;
+				} else {
+					$translationtext = '';
+				}
+				
+				$autotranslatorformdata["{$languagecode}-translationitem"] = makeTranslationItem(false, $type, $subtype, $languagecode, $languagename,
+					$messagegroup->preferredgender,
+					$_SESSION['autotranslatesourcetext']["{$type}-{$subtype}"],
+					$translationtext,
+					0, $languagename, false, false, false,
+					!in_array($languagecode, $autotranslatecodes), '', null, true);
+			}
+			$autotranslatorformdata["sourcemessagebody"]["requires"] = $translationitems;
+			
+			$autotranslatorformdata["branding"] = makeBrandingFormHtml();
 
 			$accordionsplitter = makeAccordionSplitter($type, $subtype, 'autotranslator', $permanent, $messagegroup->preferredgender, true, $type == 'email' ? $emailattachments : null, false);
 
@@ -264,19 +285,66 @@ foreach ($destinations as $type => $destination) {
 			$blankmessagewarning = $countlanguages > 1 ? _L("If the %s message is blank, these contacts will receive messages in the default language.", $languagename) : '';
 			$messageformname = "{$type}-{$subtype}-{$languagecode}";
 			
-			if ($subtype == 'html' && $languagecode == 'fr') {
-				$sourcemessagetext = $messagegroup->getMessageText($type,$subtype,$languagecode, 'source');
+			// If the HTML message is blank, then use the plain text message as the content for the html message.
+			// This prevents accidentally erasing the contents of a non-overridden plain text message by tabbing from a blank html message.
+			if ($subtype == 'html' && !$messagegroup->hasMessage('email', 'html', $languagecode)) {
+				$nonoverridemessage = null;
+				foreach ($messagegroup->getMessages() as $message) {
+					if ($message->type == 'email' && $message->subtype == 'plain' && $message->languagecode == $languagecode) {
+						$message->readHeaders();
+						if (!$message->overrideplaintext) {
+							$nonoverridemessage = $message;
+							break;
+						}
+					}
+				}
+				
+				if ($nonoverridemessage) {
+					$messagetexts = array(
+						'source' => $messagegroup->getMessageText('email','plain',$languagecode, 'source'),
+						'translated' => $messagegroup->getMessageText('email','plain',$languagecode, 'translated'),
+						'overridden' => $messagegroup->getMessageText('email','plain',$languagecode, 'overridden'),
+						'none' => $messagegroup->getMessageText('email','plain',$languagecode, 'none')
+					);
+				} else {
+					$messagetexts = array(
+						'source' => '',
+						'translated' => '',
+						'overridden' => '',
+						'none' => ''
+					);
+				}
+			} else {
+				$messagetexts = array(
+					'source' => $messagegroup->getMessageText($type,$subtype,$languagecode, 'source'),
+					'translated' => $messagegroup->getMessageText($type,$subtype,$languagecode, 'translated'),
+					'overridden' => $messagegroup->getMessageText($type,$subtype,$languagecode, 'overridden'),
+					'none' => $messagegroup->getMessageText($type,$subtype,$languagecode, 'none')
+				);
 			}
-			$messagetexts = array(
-				'source' => $messagegroup->getMessageText($type,$subtype,$languagecode, 'source'),
-				'translated' => $messagegroup->getMessageText($type,$subtype,$languagecode, 'translated'),
-				'overridden' => $messagegroup->getMessageText($type,$subtype,$languagecode, 'overridden'),
-				'none' => $messagegroup->getMessageText($type,$subtype,$languagecode, 'none')
-			);
 
 			$formdata = array();
 			
-			$required = ($messagegroup->defaultlanguagecode == $languagecode) && $messagegroup->hasMessage($type);
+			$required = false;
+			// If this message is for the default langauge code, make it
+			// required only if there are messages in other languages.
+			if ($messagegroup->defaultlanguagecode == $languagecode) {
+				foreach ($messagegroup->getMessages() as $message) {
+					if ($message->type != $type)
+						continue;
+						
+					if ($message->subtype == $subtype && $message->languagecode != $messagegroup->defaultlanguagecode) {
+						$required = true;
+					// Not required as long as there is an overrideplaintext default message.
+					} else if ($subtype == 'html' && $message->subtype == 'plain' && $message->languagecode == $messagegroup->defaultlanguagecode) {
+						$message->readHeaders();
+						if ($message->overrideplaintext) {
+							$required = false;
+							break;
+						}
+					}
+				}
+			}
 			
 			if (($type == 'phone' && isset($customerphonetranslationlanguages[$languagecode])) ||
 				($type == 'email' && isset($customeremailtranslationlanguages[$languagecode]))
@@ -305,28 +373,16 @@ foreach ($destinations as $type => $destination) {
 							$message->languagecode == $languagecode
 						) {
 							$plainmessage = $message;
+							$plainmessage->readHeaders();
 							break;
 						}
 					}
 					
-					if ($plainmessage) {
-						$plainmessage->readHeaders();
-					}
-					
-					foreach ($messagegroup->getMessages() as $message) {
-						if ($message->type == $type &&
-							$message->subtype == 'html' &&
-							$message->languagecode == $languagecode
-						) {
-							$required = false;
-							break;
-						}
-					}
+					if ($messagegroup->hasMessage('email', 'html', $languagecode))
+						$required = false;
 				}
 				
 				$overridingplaintext = isset($plainmessage) && $plainmessage && $plainmessage->overrideplaintext;
-				
-				$formdata["translationitem"] = makeTranslationItem($required, $type, $subtype, $languagecode, $languagename, $messagegroup->preferredgender, $messagetexts['source'], $messagetext,  $overridingplaintext ? 1 : 0, _L("Enable Translation"), !empty($messagetexts['overridden']), true, false, $translationenabled, "", $datafields);
 				
 				if ($emailplain) {
 					$formdata["overrideplaintext"] = array(
@@ -335,13 +391,17 @@ foreach ($destinations as $type => $destination) {
 						"fieldhelp" => _L("A plain-text message will be generated from the html message, however you may type a custom plain-text message by overriding it."),
 						"control" => array("CheckBox"),
 						"validators" => array(
-							array('ValInArray', 'values' => array('true', 'false')),
-							array('ValOverridePlainText', 'field' => 'translationitem')
+							array('ValInArray', 'values' => array('true', 'false'))
 						),
 						"requires" => array("translationitem"),
 						"helpstep" => 1
 					);
 				}
+				
+				$formdata["translationitem"] = makeTranslationItem($required, $type, $subtype, $languagecode, $languagename,
+					$messagegroup->preferredgender, $messagetexts['source'], $messagetext,
+					$overridingplaintext ? 1 : 0, _L("Enable Translation"), !empty($messagetexts['overridden']),
+					true, false, $translationenabled, "", $datafields);
 				
 				$formdata["extrajavascript"] = makeFormHtml("
 					<script type='text/javascript'>
@@ -479,21 +539,12 @@ foreach ($destinations as $type => $destination) {
 						
 						if ($plainmessage) {
 							$plainmessage->readHeaders();
-							foreach ($messagegroup->getMessages() as $message) {
-								if ($message->type == $type &&
-									$message->subtype == 'html' &&
-									$message->languagecode == $languagecode
-								) {
-									$required = false;
-									break;
-								}
-							}
+							if ($messagegroup->hasMessage('email', 'html', $languagecode))
+								$required = false;
 						}
 					}
 					
 					$overridingplaintext = isset($plainmessage) && $plainmessage && $plainmessage->overrideplaintext;
-					
-					$formdata['nonemessagebody'] = makeMessageBody($required, $type, $subtype, $languagecode, _L("%s Message", $languagename), $messagetexts['none'], $datafields, $subtype == 'html', $overridingplaintext ? 1 : 0);
 					
 					if ($emailplain) {
 						$formdata["overrideplaintext"] = array(
@@ -502,13 +553,15 @@ foreach ($destinations as $type => $destination) {
 							"fieldhelp" => _L("A plain-text message will be generated from the html message, however you may type a custom plain-text message by overriding it."),
 							"control" => array("CheckBox"),
 							"validators" => array(
-								array('ValInArray', 'values' => array('true', 'false')),
-								array('ValOverridePlainText', 'field' => 'nonemessagebody')
+								array('ValInArray', 'values' => array('true', 'false'))
 							),
 							"requires" => array("nonemessagebody"),
 							"helpstep" => 1
 						);
 					}
+					
+					$formdata['nonemessagebody'] = makeMessageBody($required, $type, $subtype, $languagecode, _L("%s Message", $languagename),
+						$messagetexts['none'], $datafields, $subtype == 'html', $overridingplaintext ? 1 : 0);
 					
 					$formdata["extrajavascript"] = makeFormHtml("
 						<script type='text/javascript'>
@@ -586,72 +639,69 @@ foreach ($destinations as $type => $destination) {
 			$accordionsplitter = makeAccordionSplitter($type, $subtype, $languagecode, $permanent, $messagegroup->preferredgender, false, $type == 'email' ? $emailattachments : null, isset($formdata['translationitem']) ? true : false, $messagegroup, $countlanguages > 1);
 
 			$messageformsplitters[] = new FormSplitter($messageformname, $languagename, $messagegroup->hasMessage($type, $subtype, $languagecode) ? "img/icons/accept.gif" : "img/icons/diagona/16/160.gif", "verticalsplit", array(), array(
-			array("title" => "", "formdata" => $formdata),
-			$accordionsplitter));
+				array("title" => "", "formdata" => $formdata),
+				$accordionsplitter));
 		}
 
 		if ($countlanguages > 1) {
-			$subtypelayoutforms[] = new FormTabber("{$type}-{$subtype}", $subtype == 'html' ? 'HTML' : ucfirst($subtype), $messagegroup->hasMessage($type, $subtype) ? "img/icons/accept.gif" : "img/icons/diagona/16/160.gif", "verticaltabs", $messageformsplitters);
+			$subtypelayoutforms[] = new FormTabber("{$type}-{$subtype}", $subtype == 'html' ? 'HTML' : ucfirst($subtype),
+				$messagegroup->hasMessage($type, $subtype) ? "img/icons/accept.gif" : "img/icons/diagona/16/160.gif",
+				"verticaltabs", $messageformsplitters);
 		} else if ($countlanguages == 1) {
 			$messageformsplitters[0]->title = ucfirst($subtype);
 			$subtypelayoutforms[] = $messageformsplitters[0];
 		}
 	}
 
-	if (count($destination['subtypes']) > 1) {
-		if ($type == 'email') {
-			$additionalvalidators = $messagegroup->getFirstMessageOfType('email') ? array(array("ValRequired")) : array();
+	if ($type == 'email') {
+		$emailheadersformdata = array();
+		$emailheadersformdata['subject'] = array(
+			"label" => _L('Subject'),
+			"value" => $_SESSION['emailheaders']['subject'],
+			"validators" => array(
+				array("ValRequired"),
+				array("ValLength","max" => 50)
+			),
+			"control" => array("TextField","size" => 30, "maxlength" => 50),
+			"helpstep" => 1
+		);
+		$emailheadersformdata['fromname'] = array(
+			"label" => _L('From Name'),
+			"value" => $_SESSION['emailheaders']['fromname'],
+			"validators" => array(
+				array("ValRequired"),
+				array("ValLength","max" => 50)
+			),
+			"control" => array("TextField","size" => 30, "maxlength" => 50),
+			"helpstep" => 1
+		);
+		$emailheadersformdata['fromemail'] = array(
+			"label" => _L('From Email'),
+			"value" => $_SESSION['emailheaders']['fromemail'],
+			"validators" => array(
+				array("ValRequired"),
+				array("ValLength","max" => 255),
+				array("ValEmail", "domain" => getSystemSetting('emaildomain'))
+			),
+			"control" => array("TextField","size" => 30, "maxlength" => 255),
+			"helpstep" => 1
+		);
 
-			$emailheadersformdata = array();
-			$emailheadersformdata['subject'] = array(
-				"label" => _L('Subject'),
-				"value" => $_SESSION['emailheaders']['subject'],
-				"validators" => array_merge($additionalvalidators, array(
-					array("ValLength","max" => 50)
-				)),
-				"control" => array("TextField","size" => 30, "maxlength" => 50),
-				"helpstep" => 1
-			);
-			$emailheadersformdata['fromname'] = array(
-				"label" => _L('From Name'),
-				"value" => $_SESSION['emailheaders']['fromname'],
-				"validators" => array_merge($additionalvalidators, array(
-					array("ValLength","max" => 50)
-				)),
-				"control" => array("TextField","size" => 30, "maxlength" => 50),
-				"helpstep" => 1
-			);
-			$emailheadersformdata['fromemail'] = array(
-				"label" => _L('From Email'),
-				"value" => $_SESSION['emailheaders']['fromemail'],
-				"validators" => array_merge($additionalvalidators, array(
-					array("ValLength","max" => 255),
-					array("ValEmail", "domain" => getSystemSetting('emaildomain'))
-				)),
-				"control" => array("TextField","size" => 30, "maxlength" => 255),
-				"helpstep" => 1
-			);
-
-			$destinationlayoutforms[] = new FormSplitter("emailheaders", ucfirst($type), $messagegroup->hasMessage($type) ? "img/icons/accept.gif" : "img/icons/diagona/16/160.gif", "horizontalsplit", array(), array(
+		$destinationlayoutforms[] = new FormSplitter("emailheaders",
+			ucfirst($type),$messagegroup->hasMessage($type) ? "img/icons/accept.gif" : "img/icons/diagona/16/160.gif",
+			"horizontalsplit", array(), array(
 				array("title" => "", "formdata" => $emailheadersformdata),
 				new FormTabber("", "", null, "horizontaltabs", $subtypelayoutforms)
 			));
-		}
-	} else if (count($subtypelayoutforms) == 1) { // Phone, Sms.
-		if ($type == 'sms')
-			$subtypelayoutforms[0]->title = 'SMS';
-		else
-			$subtypelayoutforms[0]->title = ucfirst($type);
+	} else if ($type == 'phone' || $type == 'sms') {
+		$subtypelayoutforms[0]->title = $type == 'sms' ? 'SMS' : ucfirst($type);
 		$destinationlayoutforms[] = $subtypelayoutforms[0];
 	}
 }
 
-$destinationlayoutforms[] = makeSummaryTab($destinations, $customerlanguages, Language::getDefaultLanguageCode(), $messagegroup);
-
 //////////////////////////////////////////////////////////
 // Finalize the formsplitter.
 //////////////////////////////////////////////////////////
-$buttons = array(icon_button(_L("Done"),"tick", "form_submit_all(null, 'done', $('formswitchercontainer'));", null), icon_button(_L("Cancel"),"cross",null,"messages.php"));
 
 $defaultlanguagecodevalidators = array(
 	array("ValRequired"),
@@ -662,31 +712,46 @@ if ($cansendmultilingual) {
 	$defaultlanguagecodevalidators[] = array("ValDefaultLanguageCode");
 }
 
-$messagegroupsplitter = new FormSplitter("messagegroupbasics", "", null, "horizontalsplit", $buttons, array(
-	array("title" => "", "formdata" => array(
-		'name' => array(
-			"label" => _L('Message Name'),
-			// If the user hasn't changed the message group's default name, then just show blank so that the user is forced to make a better one.
-			"value" => $messagegroup->name == $defaultmessagegroupname ? '' : $messagegroup->name,
-			"validators" => array(
-				array("ValDuplicateNameCheck", "type" => "messagegroup"),
-				array("ValRequired"),
-				array("ValLength","max" => 50)
-			),
-			"control" => array("TextField","size" => 30, "maxlength" => 50),
-			"helpstep" => 1
+if (!$messagegroup->deleted) {
+	$destinationlayoutforms[] = makeSummaryTab($destinations, $customerlanguages, Language::getDefaultLanguageCode(), $messagegroup);
+	$buttons = array(icon_button(_L("Done"),"tick", "form_submit_all(null, 'done', $('formswitchercontainer'));", null), icon_button(_L("Cancel"),"cross",null,"messages.php"));
+	$messagegrouptabberarray = array(new FormTabber("destinationstabber", "", null, "horizontaltabs", $destinationlayoutforms));
+} else {
+	$buttons = array(icon_button(_L("Next"),"tick", "form_submit_all(null, 'next', $('formswitchercontainer'));", null), icon_button(_L("Cancel"),"cross",null,"messages.php"));
+	$messagegrouptabberarray = array();
+}
+
+$messagegroupsplitter = new FormSplitter("messagegroupbasics", "", null, "horizontalsplit", $buttons,
+	array_merge(
+		array(
+			array("title" => "",
+				"formdata" => array(
+					'name' => array(
+						"label" => _L('Message Name'),
+						// If the user hasn't changed the message group's default name, then just show blank so that the user is forced to make a better one.
+						"value" => $messagegroup->name == $defaultmessagegroupname ? '' : $messagegroup->name,
+						"validators" => array(
+							array("ValDuplicateNameCheck", "type" => "messagegroup"),
+							array("ValRequired"),
+							array("ValLength","max" => 50)
+						),
+						"control" => array("TextField","size" => 30, "maxlength" => 50),
+						"helpstep" => 1
+					),
+					'defaultlanguagecode' => array(
+						"label" => _L('Default Language'),
+						"value" => $cansendmultilingual ? $messagegroup->defaultlanguagecode : Language::getDefaultLanguageCode(),
+						"validators" => $defaultlanguagecodevalidators,
+						// NOTE: It is not necessary to capitalize the language names in $customerlanguages because it should already be so in the database.
+						"control" => array("SelectMenu","values" => $customerlanguages),
+						"helpstep" => 1
+					)
+				)
+			)
 		),
-		'defaultlanguagecode' => array(
-			"label" => _L('Default Language'),
-			"value" => $cansendmultilingual ? $messagegroup->defaultlanguagecode : Language::getDefaultLanguageCode(),
-			"validators" => $defaultlanguagecodevalidators,
-			// NOTE: It is not necessary to capitalize the language names in $customerlanguages because it should already be so in the database.
-			"control" => array("SelectMenu","values" => $customerlanguages),
-			"helpstep" => 1
-		)
-	)),
-	new FormTabber("destinationstabber", "", null, "horizontaltabs", $destinationlayoutforms)
-));
+		$messagegrouptabberarray
+	)
+);
 
 ///////////////////////////////////////////////////////////////////////////////
 // Ajax
@@ -706,12 +771,15 @@ if ($button = $messagegroupsplitter->getSubmit()) {
 
 			switch($button) {
 				case 'tab':
+				case 'next':
 				case 'done': {
 					QuickQuery('BEGIN');
 
-					if ($form->name == 'messagegroupbasics') {
+					if ($button == 'next' || $form->name == 'messagegroupbasics') {
 						$messagegroup->name = trim($postdata['name']);
 						$messagegroup->defaultlanguagecode = $postdata['defaultlanguagecode'];
+						$messagegroup->deleted = 0;
+						$messagegroup->modified = makeDateTime(time());
 					} else if ($form->name == 'emailheaders') {
 						$_SESSION['emailheaders']['subject'] = trim($postdata['subject']);
 						$_SESSION['emailheaders']['fromname'] = trim($postdata['fromname']);
@@ -735,8 +803,6 @@ if ($button = $messagegroupsplitter->getSubmit()) {
 
 						if (in_array($formdestinationsubtype, $destination['subtypes']) && ($formdestinationlanguagecode == 'autotranslator' || isset($destination['languages'][$formdestinationlanguagecode]))) {
 							$messagegroup->permanent = $postdata['autoexpire'] + 0;
-							$messagegroup->deleted = 0;
-							$messagegroup->modified = makeDateTime(time());
 
 							// Update audio files' permanent flag; the user does not have to be editing a phone message to change the permanent flag.
 							QuickUpdate('update audiofile set permanent=? where messagegroupid=?', false, array($messagegroup->permanent, $messagegroup->id));
@@ -781,7 +847,7 @@ if ($button = $messagegroupsplitter->getSubmit()) {
 								$autotranslatorlanguages = array(); // [$languagecode] = $translationlanguagename
 								$trimmedautotranslatorsourcetext = trim($postdata['sourcemessagebody']);
 								if (!empty($trimmedautotranslatorsourcetext)) {
-									$_SESSION['autotranslatesourcetext']["{$formdestinationtype}{$formdestinationsubtype}"] = $trimmedautotranslatorsourcetext;
+									$_SESSION['autotranslatesourcetext']["{$formdestinationtype}-{$formdestinationsubtype}"] = $trimmedautotranslatorsourcetext;
 									// Determine the set of languages to autotranslate so that we can make a batch translation call.
 									foreach ($destination['languages'] as $languagecode => $languagename) {
 										if (($formdestinationtype == 'phone' && !isset($customerphonetranslationlanguages[$languagecode])) || ($formdestinationtype == 'email' && !isset($customeremailtranslationlanguages[$languagecode])))
@@ -798,7 +864,7 @@ if ($button = $messagegroupsplitter->getSubmit()) {
 									
 									if (!empty($autotranslatorlanguages)) {
 										// Batch translation.
-										$sourcemessagetext = $_SESSION['autotranslatesourcetext']["{$formdestinationtype}{$formdestinationsubtype}"];
+										$sourcemessagetext = $_SESSION['autotranslatesourcetext']["{$formdestinationtype}-{$formdestinationsubtype}"];
 										
 										if ($autotranslatortranslations = translate_fromenglish(makeTranslatableString($sourcemessagetext), array_keys($autotranslatorlanguages))) {
 											// NOTE: Reuse the same set of message parts for each language's source message; Message::recreateParts() calls DBMappedObject::create(), which will result in the message parts getting new IDs.
@@ -1182,7 +1248,9 @@ if ($button = $messagegroupsplitter->getSubmit()) {
 
 					QuickQuery('COMMIT');
 
-					if ($ajax && $button == 'done')
+					if ($ajax && $button == 'next')
+						$form->sendTo('messagegroup.php?id=' . $messagegroup->id);
+					else if ($ajax && $button == 'done')
 						$form->sendTo('messages.php');
 					else if ($ajax && $button == 'tab')
 						$form->sendTo('');
@@ -1207,7 +1275,7 @@ include_once('nav.inc.php');
 <script src="script/messagegroup.js.php" type="text/javascript"></script>
 <script src="script/audiolibrarywidget.js.php" type="text/javascript"></script>
 <script type="text/javascript">
-	<?php Validator::load_validators(array("ValOverridePlainText", "ValDefaultLanguageCode", "ValTranslationItem", "ValDuplicateNameCheck", "ValCallMeMessage", "ValMessageBody", "ValEmailMessageBody", "ValLength", "ValRegExp", "ValEmailAttach")); ?>
+	<?php Validator::load_validators(array("ValDefaultLanguageCode", "ValTranslationItem", "ValDuplicateNameCheck", "ValCallMeMessage", "ValMessageBody", "ValEmailMessageBody", "ValLength", "ValRegExp", "ValEmailAttach")); ?>
 </script>
 <style type='text/css'>
 #messageemptyspan {
@@ -1221,183 +1289,192 @@ include_once('nav.inc.php');
 <?php
 startWindow(_L('Message Editor'));
 
-$firstdestinationtype = reset(array_keys($destinations));
-$firstdestinationsubtype = reset($destinations[$firstdestinationtype]['subtypes']);
-$preferredlanguagecode = $cansendmultilingual ? $messagegroup->defaultlanguagecode : Language::getDefaultLanguageCode();
-$defaultsections = array("{$firstdestinationtype}-{$firstdestinationsubtype}", "{$firstdestinationtype}-{$firstdestinationsubtype}-" . $preferredlanguagecode);
-if ($firstdestinationtype == 'email')
-	$defaultsections[] = "emailheaders";
+if (!$messagegroup->deleted) {
+	$firstdestinationtype = reset(array_keys($destinations));
+	$firstdestinationsubtype = reset($destinations[$firstdestinationtype]['subtypes']);
+	$preferredlanguagecode = $cansendmultilingual ? $messagegroup->defaultlanguagecode : Language::getDefaultLanguageCode();
+	$defaultsections = array("{$firstdestinationtype}-{$firstdestinationsubtype}", "{$firstdestinationtype}-{$firstdestinationsubtype}-" . $preferredlanguagecode);
+	if ($firstdestinationtype == 'email')
+		$defaultsections[] = "emailheaders";
+} else {
+	$defaultsections = array();
+}
+
 echo '<div id="messagegroupformcontainer">' . $messagegroupsplitter->render($defaultsections) . '</div>';
 
-?>
+if (!$messagegroup->deleted) {
+	?>
 
-<script type="text/javascript">
-	(function() {
-		// Use an object to store state information.
-		var state = {
-			'countphonelanguages': <?=isset($destinations['phone']) ? count($destinations['phone']['languages']) : 0?>,
-			'currentdestinationtype': '<?=$firstdestinationtype?>',
-			'currentsubtype': '<?=$firstdestinationsubtype?>',
-			'currentlanguagecode': '<?=$preferredlanguagecode?>',
-			'messagegroupsummary': <?=json_encode(MessageGroup::getSummary($_SESSION['messagegroupid']))?>
-		};
+	<script type="text/javascript">
+		(function() {
+			// Use an object to store state information.
+			var state = {
+				'countphonelanguages': <?=isset($destinations['phone']) ? count($destinations['phone']['languages']) : 0?>,
+				'currentdestinationtype': '<?=$firstdestinationtype?>',
+				'currentsubtype': '<?=$firstdestinationsubtype?>',
+				'currentlanguagecode': '<?=$preferredlanguagecode?>',
+				'defaultlanguagecode': '<?=$preferredlanguagecode?>',
+				'messagegroupsummary': <?=json_encode(MessageGroup::getSummary($_SESSION['messagegroupid']))?>
+			};
 
-		var formswitchercontainer = $('messagegroupformcontainer');
-		form_init_splitter(formswitchercontainer, <?=json_encode($defaultsections)?>);
+			var formswitchercontainer = $('messagegroupformcontainer');
+			form_init_splitter(formswitchercontainer, <?=json_encode($defaultsections)?>);
 
-		var confirmAutotranslator = function(clickevent, tabevent, state) {
-			saveHtmlEditorContent(); // If this is email html, the autotranslator also uses the html editor for its source message body.
-			
-			var sourcetextarea = $(state.currentdestinationtype + '-' + state.currentsubtype + '-autotranslator_sourcemessagebody');
-			var sourcetext = sourcetextarea.value;
-			if (sourcetext.strip() == '') {
-				if (clickevent) {
-					alert('<?= addslashes(_L("Please enter a message to translate.")) ?>');
-					return null;
-				} else {
-					return {};
+			var confirmAutotranslator = function(clickevent, tabevent, state) {
+				saveHtmlEditorContent(); // If this is email html, the autotranslator also uses the html editor for its source message body.
+				
+				var sourcetextarea = $(state.currentdestinationtype + '-' + state.currentsubtype + '-autotranslator_sourcemessagebody');
+				var sourcetext = sourcetextarea.value;
+				if (sourcetext.strip() == '') {
+					if (clickevent) {
+						alert('<?= addslashes(_L("Please enter a message to translate.")) ?>');
+						return null;
+					} else {
+						return {};
+					}
 				}
-			}
 
-			var translationcheckboxes = $$('.TranslationItemCheckboxTD');
-			// Loop over list of languages to translate (languages that the user has checked), adding to the translationlanguagecodes array.
-			var translationlanguagecodes = []; // List of language names to be sent via ajax to translate.php.
+				var translationcheckboxes = $$('.TranslationItemCheckboxTD');
+				// Loop over list of languages to translate (languages that the user has checked), adding to the translationlanguagecodes array.
+				var translationlanguagecodes = []; // List of language names to be sent via ajax to translate.php.
 
-			var willoverwrite = false; // Indicates if any messages will get overwritten.
-			var messagegroupsummary = state.messagegroupsummary;
-			for (var i = 0, count = translationcheckboxes.length; i < count; i++) {
-				var checkbox = translationcheckboxes[i].down('input[type="checkbox"]');
-				if (checkbox.checked) {
-					var checkboxidpieces = checkbox.identify().split('-');
-					var languagecode = (checkboxidpieces[2]).split('_').pop(); // checkboxidpieces[2]: "autotranslator_{$languagecode}"
-					translationlanguagecodes.push(languagecode);
+				var willoverwrite = false; // Indicates if any messages will get overwritten.
+				var messagegroupsummary = state.messagegroupsummary;
+				for (var i = 0, count = translationcheckboxes.length; i < count; i++) {
+					var checkbox = translationcheckboxes[i].down('input[type="checkbox"]');
+					if (checkbox.checked) {
+						var checkboxidpieces = checkbox.identify().split('-');
+						var languagecode = (checkboxidpieces[2]).split('_').pop(); // checkboxidpieces[2]: "autotranslator_{$languagecode}"
+						translationlanguagecodes.push(languagecode);
 
-					// Detect if any message will get overwritten.
-					for (var j = 0, jcount = messagegroupsummary.length; j < jcount; j++) {
-						var messageinfo = messagegroupsummary[j];
-						if (messageinfo.type == state.currentdestinationtype && messageinfo.subtype == state.currentsubtype && messageinfo.languagecode == languagecode) {
-							willoverwrite = true;
-							break;
+						// Detect if any message will get overwritten.
+						for (var j = 0, jcount = messagegroupsummary.length; j < jcount; j++) {
+							var messageinfo = messagegroupsummary[j];
+							if (messageinfo.type == state.currentdestinationtype && messageinfo.subtype == state.currentsubtype && messageinfo.languagecode == languagecode) {
+								willoverwrite = true;
+								break;
+							}
 						}
 					}
 				}
-			}
 
-			if (translationlanguagecodes.length < 1) {
-				if (clickevent) {
-					alert('<?=addslashes(_L("Please select a language to translate.")) ?>');
+				if (translationlanguagecodes.length < 1) {
+					if (clickevent) {
+						alert('<?=addslashes(_L("Please select a language to translate.")) ?>');
+						return null;
+					} else {
+						return {};
+					}
+				}
+
+				if (willoverwrite && !confirm('<?= _L("Some messages will get overwritten, do you want to continue? If not, please clear the translation message.") ?>')) { // WORDSMITH: Better message.
 					return null;
-				} else {
-					return {};
-				}
-			}
-
-			if (willoverwrite && !confirm('<?= _L("Some messages will get overwritten, do you want to continue? If not, please clear the translation message.") ?>')) { // WORDSMITH: Better message.
-				return null;
-			}
-
-			return {'sourcetext': sourcetext, 'translationlanguagecodes': translationlanguagecodes};
-		};
-		var updateTranslationItem = function(form, languagecode, sourcetext, translatedtext) {
-			var formitemname = form.name + '_' + languagecode + '-translationitem';
-			$(formitemname+'text').value = translatedtext;
-			$(formitemname+"englishText").value = sourcetext;
-			$(formitemname+'textdiv').update(translatedtext.replace(/<</g, "&lt;&lt;").replace(/>>/g, "&gt;&gt;"));
-			setTranslationValue(formitemname);
-		};
-
-		formswitchercontainer.observe('FormSplitter:BeforeSubmitAll', function(event, state) {
-			if ($('autotranslatorrefreshtranslationbutton') && !confirmAutotranslator(null, event, state))
-				event.stop();
-		}.bindAsEventListener(formswitchercontainer, state));
-
-		formswitchercontainer.observe('FormSplitter:BeforeTabLoad',
-			messagegroupHandleBeforeTabLoad.bindAsEventListener(formswitchercontainer, state, '<?=$preferredlanguagecode?>')
-		);
-
-		var autotranslatorupdator = function (autotranslatorbutton, state) {
-			autotranslatorbutton.stopObserving('click');
-			autotranslatorbutton.observe('click', function(event, state) {
-				var autotranslateobject = confirmAutotranslator(event, null, state);
-				if (!autotranslateobject)
-					return;
-
-				var sourcetext = autotranslateobject.sourcetext;
-				var translationlanguagecodes = autotranslateobject.translationlanguagecodes;
-
-				// Show ajax loaders for the translating languages, and clear the retranslation text.
-				for (var i = 0, count = translationlanguagecodes.length; i < count; i++) {
-					var formitemname = this.name + '_' + translationlanguagecodes[i] + '-translationitem';
-
-					$(formitemname + 'textdiv').update('<img src=\"img/ajax-loader.gif\" />');
-					$(formitemname + 'retranslationtext').update();
 				}
 
-				var errortext = '<?=addslashes(_L('Sorry, an error occurred during translation. Please try again.'))?>';
-				new Ajax.Request('translate.php', {
-					'method':'post',
-					'parameters': {'english': makeTranslatableString(sourcetext), 'languages': translationlanguagecodes.join(';')},
-					'onSuccess': function(transport, translationlanguagecodes, errortext) {
-						var data = transport.responseJSON;
+				return {'sourcetext': sourcetext, 'translationlanguagecodes': translationlanguagecodes};
+			};
+			var updateTranslationItem = function(form, languagecode, sourcetext, translatedtext) {
+				var formitemname = form.name + '_' + languagecode + '-translationitem';
+				$(formitemname+'text').value = translatedtext;
+				$(formitemname+"englishText").value = sourcetext;
+				$(formitemname+'textdiv').update(translatedtext.replace(/<</g, "&lt;&lt;").replace(/>>/g, "&gt;&gt;"));
+				setTranslationValue(formitemname);
+			};
 
-						if (!data || !data.responseData || !data.responseStatus || data.responseStatus != 200 ||
-							(translationlanguagecodes.length > 1 && translationlanguagecodes.length != data.responseData.length)) {
-							alert(errortext);
-							return;
-						}
+			formswitchercontainer.observe('FormSplitter:BeforeSubmitAll', function(event, state) {
+				if ($('autotranslatorrefreshtranslationbutton') && !confirmAutotranslator(null, event, state))
+					event.stop();
+			}.bindAsEventListener(formswitchercontainer, state));
 
-						var dataResponseData = data.responseData;
-						
-						var count = translationlanguagecodes.length;
+			formswitchercontainer.observe('FormSplitter:BeforeTabLoad',
+				messagegroupHandleBeforeTabLoad.bindAsEventListener(formswitchercontainer, state, state.defaultlanguagecode)
+			);
 
-						// If there is a single language, the response is not an array.
-						if (count == 1) {
-							updateTranslationItem(this, languagecode, sourcetext, dataResponseData.translatedText);
-							return;
-						}
+			var autotranslatorupdator = function (autotranslatorbutton, state) {
+				autotranslatorbutton.stopObserving('click');
+				autotranslatorbutton.observe('click', function(event, state) {
+					var autotranslateobject = confirmAutotranslator(event, null, state);
+					if (!autotranslateobject)
+						return;
 
-						// Use a flag to indicate if any language has an error;
-						// we want to wait until after the for-loop to show an alert() otherwise the user could get multiple alerts.
-						var haserror = false;
+					var sourcetext = autotranslateobject.sourcetext;
+					var translationlanguagecodes = autotranslateobject.translationlanguagecodes;
 
-						for (var i = 0; i < count; i++) {
-							var languagecode = translationlanguagecodes[i];
+					// Show ajax loaders for the translating languages, and clear the retranslation text.
+					for (var i = 0, count = translationlanguagecodes.length; i < count; i++) {
+						var formitemname = this.name + '_' + translationlanguagecodes[i] + '-translationitem';
 
-							var response = dataResponseData[i];
-							var responseData = response.responseData;
+						$(formitemname + 'textdiv').update('<img src=\"img/ajax-loader.gif\" />');
+						$(formitemname + 'retranslationtext').update();
+					}
 
-							// If there is an error for a particular language, clear its contents, and flag haserror.
-							if (response.responseStatus != 200 || !responseData) {
-								updateTranslationItem(this, languagecode, '', '');
-								haserror = true;
-								continue;
-							} else {
-								updateTranslationItem(this, languagecode, sourcetext, responseData.translatedText);
+					var errortext = '<?=addslashes(_L('Sorry, an error occurred during translation. Please try again.'))?>';
+					new Ajax.Request('translate.php', {
+						'method':'post',
+						'parameters': {'english': makeTranslatableString(sourcetext), 'languages': translationlanguagecodes.join(';')},
+						'onSuccess': function(transport, translationlanguagecodes, errortext) {
+							var data = transport.responseJSON;
+
+							if (!data || !data.responseData || !data.responseStatus || data.responseStatus != 200 ||
+								(translationlanguagecodes.length > 1 && translationlanguagecodes.length != data.responseData.length)) {
+								alert(errortext);
+								return;
 							}
-						}
 
-						if (haserror)
+							var dataResponseData = data.responseData;
+							
+							var count = translationlanguagecodes.length;
+
+							// If there is a single language, the response is not an array.
+							if (count == 1) {
+								updateTranslationItem(this, languagecode, sourcetext, dataResponseData.translatedText);
+								return;
+							}
+
+							// Use a flag to indicate if any language has an error;
+							// we want to wait until after the for-loop to show an alert() otherwise the user could get multiple alerts.
+							var haserror = false;
+
+							for (var i = 0; i < count; i++) {
+								var languagecode = translationlanguagecodes[i];
+
+								var response = dataResponseData[i];
+								var responseData = response.responseData;
+
+								// If there is an error for a particular language, clear its contents, and flag haserror.
+								if (response.responseStatus != 200 || !responseData) {
+									updateTranslationItem(this, languagecode, '', '');
+									haserror = true;
+									continue;
+								} else {
+									updateTranslationItem(this, languagecode, sourcetext, responseData.translatedText);
+								}
+							}
+
+							if (haserror)
+								alert(errortext);
+						}.bindAsEventListener(this, translationlanguagecodes, errortext),
+						
+						'onFailure': function(transport, errortext) {
 							alert(errortext);
-					}.bindAsEventListener(this, translationlanguagecodes, errortext),
-					
-					'onFailure': function(transport, errortext) {
-						alert(errortext);
-					}.bindAsEventListener(this, errortext)
-				});
-			}.bindAsEventListener(autotranslatorbutton.up('form'), state));
-		};
-		
-		// When a tab is loaded, update the status icon of the previous tab.
-		formswitchercontainer.observe('FormSplitter:TabLoaded',
-			messagegroupHandleTabLoaded.bindAsEventListener(formswitchercontainer, state, '<?=$_SESSION['messagegroupid']?>', '<?=$preferredlanguagecode?>', autotranslatorupdator, false)
-		);
-		
-		messagegroupStyleLayouts();
-	})();
+						}.bindAsEventListener(this, errortext)
+					});
+				}.bindAsEventListener(autotranslatorbutton.up('form'), state));
+			};
+			
+			// When a tab is loaded, update the status icon of the previous tab.
+			formswitchercontainer.observe('FormSplitter:TabLoaded',
+				messagegroupHandleTabLoaded.bindAsEventListener(formswitchercontainer, state, '<?=$_SESSION['messagegroupid']?>', state.defaultlanguagecode, autotranslatorupdator, false)
+			);
+			
+			messagegroupStyleLayouts();
+		})();
 
-</script>
+	</script>
 
-<?php
+	<?php
+	}
+
 endWindow();
 include_once('navbottom.inc.php');
 ?>
