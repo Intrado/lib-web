@@ -144,7 +144,7 @@ function makeBrandingFormHtml() {
 	');
 }
 
-function makeMessageBody($required, $type, $subtype, $languagecode, $label, $messagetext, $datafields = null, $usehtmleditor = false, $overrideplaintext = 0, $hideplaybutton = false, $hidden = false, $maximages = 10) {
+function makeMessageBody($translationlanguages, $required, $type, $subtype, $languagecode, $label, $messagetext, $datafields = null, $usehtmleditor = false, $overrideplaintext = 0, $hideplaybutton = false, $hidden = false, $maximages = 10) {
 	$control = array("MessageBody",
 		"playbutton" => $type == 'phone' && !$hideplaybutton,
 		"usehtmleditor" => $usehtmleditor,
@@ -165,7 +165,8 @@ function makeMessageBody($required, $type, $subtype, $languagecode, $label, $mes
 			"messagegroup" => isset($_SESSION['messagegroupid']) ?
 				new MessageGroup($_SESSION['messagegroupid']) :
 				null,
-			"maximages" => $maximages
+			"maximages" => $maximages,
+			"translationlanguages" => $translationlanguages
 		)
 	);
 
