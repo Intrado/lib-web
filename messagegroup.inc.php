@@ -91,7 +91,10 @@ function makeTranslationItem($required, $type, $subtype, $languagecode, $languag
 			"maximages" => $maximages,
 			"messagegroup" => isset($_SESSION['messagegroupid']) ? new MessageGroup($_SESSION['messagegroupid']) : null
 		);
+	} else {
+		$control["transienttext"] = $messagetext;
 	}
+	
 	$validators[] = array("ValTranslationItem", "required" => $required);
 
 	if ($required)
@@ -105,7 +108,7 @@ function makeTranslationItem($required, $type, $subtype, $languagecode, $languag
 	} else {
 		$value = json_encode(array(
 			"enabled" => $enabled,
-			"text" => $messagetext,
+			"text" => $inautotranslator ? '' : $messagetext,
 			"englishText" => $sourcetext,
 			"override" => $override,
 			"gender" => $preferredgender,
@@ -255,9 +258,9 @@ function makeAccordionSplitter($type, $subtype, $languagecode, $permanent, $pref
 			}
 			
 			// If there are multiple languages for this destination type, append the language name.					
-			if ($multilingual) {					
-				$preferredaudiofilename .= ' - ' . Language::getName($languagecode);				
-			}					
+			if ($multilingual) {
+				$preferredaudiofilename .= ' - ' . Language::getName($languagecode);
+			}
 			
 			$callmelabeltext = _L('Voice Recording');
 			

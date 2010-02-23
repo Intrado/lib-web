@@ -178,12 +178,18 @@ $destinationlayoutforms = array();
 $clearmessageconfirmtext = _L("Are you sure you want to clear this message?");
 foreach ($destinations as $type => $destination) {
 	$countlanguages = count($destination['languages']);
+	if ($type == 'phone')
+		$counttranslationlanguages = count($customerphonetranslationlanguages);
+	else if ($type == 'email')
+		$counttranslationlanguages = count($customeremailtranslationlanguages);
+	else
+		$counttranslationlanguages = 0;
 	$subtypelayoutforms = array();
 	foreach ($destination['subtypes'] as $subtype) {
 		$messageformsplitters = array();
 
 		// Autotranslator.
-		if ($countlanguages > 1) {
+		if ($counttranslationlanguages > 0) {
 			$autotranslatorformdata = array();
 
 			if (empty($_SESSION['autotranslatesourcetext']["{$type}-{$subtype}"]))
@@ -248,11 +254,21 @@ foreach ($destinations as $type => $destination) {
 			$autotranslatecodes = array();
 			foreach ($autotranslatorlanguages as $languagecode => $languagename) {
 				if (!$messagegroup->hasMessage($type, $subtype, $languagecode))
-					$autotranslatorcodes[] = $languagecode;
+					$autotranslatecodes[] = $languagecode;
 			}
-			$autotranslatortranslations = translate_fromenglish(makeTranslatableString($_SESSION['autotranslatesourcetext']["{$type}-{$subtype}"]),$autotranslatecodes);
+			
+			// Translate only if tabbing to the autotranslator tab.
+			if (isset($_POST['loadtab']) && $_POST['loadtab'] == "$type-$subtype-autotranslator" &&
+				count($autotranslatecodes) > 0 &&
+				trim($_SESSION['autotranslatesourcetext']["{$type}-{$subtype}"]) != ""
+			) {
+				$autotranslatortranslations = translate_fromenglish(makeTranslatableString($_SESSION['autotranslatesourcetext']["{$type}-{$subtype}"]),$autotranslatecodes);
+			} else {
+				$autotranslatortranslations = null;
+			}
 			
 			$translationitems = array();
+			$autotranslationlanguageindex = 0;
 			foreach ($autotranslatorlanguages as $languagecode => $languagename) {
 				$translationitems[] = "{$languagecode}-translationitem";
 				
@@ -268,8 +284,10 @@ foreach ($destinations as $type => $destination) {
 					$messagegroup->preferredgender,
 					$_SESSION['autotranslatesourcetext']["{$type}-{$subtype}"],
 					$translationtext,
-					0, $languagename, false, false, false,
-					!in_array($languagecode, $autotranslatecodes), '', null, true);
+					0, ucfirst($languagename), false, false, false,
+					in_array($languagecode, $autotranslatecodes), '', null, true);
+					
+				$autotranslationlanguageindex++;
 			}
 			$autotranslatorformdata["sourcemessagebody"]["requires"] = $translationitems;
 			
@@ -991,7 +1009,7 @@ if ($button = $messagegroupsplitter->getSubmit()) {
 													
 													if ($formdestinationtype == 'email')
 														$translatedmessage->createMessageAttachments($emailattachments);
-												} else if ($formdestinationtype) {
+												} else if ($formdestinationtype == 'email') {
 													$translatedmessage->data = $emaildatastring;
 													$translatedmessage->readHeaders();
 													$translatedmessage->update();
@@ -1268,7 +1286,6 @@ $TITLE = _L('Message Editor');
 
 include_once('nav.inc.php');
 ?>
-
 <script src="script/ckeditor/ckeditor_basic.js" type="text/javascript"></script>
 <script src="script/htmleditor.js" type="text/javascript"></script>
 <script src="script/accordion.js" type="text/javascript"></script>
@@ -1277,6 +1294,7 @@ include_once('nav.inc.php');
 <script type="text/javascript">
 	<?php Validator::load_validators(array("ValDefaultLanguageCode", "ValTranslationItem", "ValDuplicateNameCheck", "ValCallMeMessage", "ValMessageBody", "ValEmailMessageBody", "ValLength", "ValRegExp", "ValEmailAttach")); ?>
 </script>
+<link href="css/messagegroup.css" type="text/css" rel="stylesheet">
 <style type='text/css'>
 #messageemptyspan {
 	padding-top: 6px;
