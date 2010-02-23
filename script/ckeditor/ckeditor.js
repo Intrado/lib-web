@@ -36,7 +36,7 @@ w.evaluator=p;return w[u==1?'checkBackward':'checkForward']();},checkStartOfBloc
 	var useSpacer = c&&b.version<7,
 		useBlank = c&&b.version==7;
 		
-		var l = useSpacer ? (a.basePath+'images/spacer.gif'): useBlank ? 'about:blank' : 'data:image/png;base64,';
+		var l = useSpacer ? (a.basePath+'images/spacer.gif'): useBlank ? 'blank.html' : 'data:image/png;base64,';
 
 		var m=h.createFromHtml('<div style="width:0px;height:0px;position:absolute;left:-10000px;background-image:url('+l+')"></div>',a.document);
 		m.appendTo(a.document.getHead());try{b.hc=m.getComputedStyle('background-image')=='none';}catch(n){b.hc=false;}if(b.hc)b.cssClass+=' cke_hc';m.remove();
@@ -90,7 +90,7 @@ B=h.createFromHtml('<iframe' + ' style="width:100%;height:100%"' + ' frameBorder
 'document.open();' + 
 'document.domain=\'' + document.domain + '\';' + 
 'document.close();' + 
-'})())"' : '' ) + 
+'})())"' : ' src="blank.html"' ) + 
 ' tabIndex="-1"' + 
 ' allowTransparency="true"' + 
 '></iframe>' ); 
