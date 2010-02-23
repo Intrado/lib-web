@@ -142,9 +142,14 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		if ($source && $dest) {
 			Query("BEGIN");
 			QuickUpdate("update userassociation set organizationid = ? where organizationid = ?", false, array($dest->id, $source->id));
+			QuickUpdate("update personassociation set organizationid = ? where organizationid = ?", false, array($dest->id, $source->id));
 			QuickUpdate("update listentry set organizationid = ? where organizationid = ?", false, array($dest->id, $source->id));
+			$source->deleted = 1;
+			$source->update();
 			Query("COMMIT");
 		}
+		
+		notice(_L('All associations from organization %1$s have been moved to %2$s', $source->orgkey, $dest->orgkey));
 		
 		if ($ajax)
 			$form->sendTo("organizationdatamanager.php");
