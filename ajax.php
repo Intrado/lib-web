@@ -3,6 +3,7 @@
 // Includes
 ////////////////////////////////////////////////////////////////////////////////
 require_once("inc/common.inc.php");
+require_once("obj/Language.obj.php");
 require_once("obj/Message.obj.php");
 require_once("obj/MessageGroup.obj.php");
 require_once("obj/MessagePart.obj.php");
@@ -94,7 +95,9 @@ function handleRequest() {
 		case 'messagegroupsummary':
 			if (!isset($_GET['messagegroupid']))
 				return false;
-			return MessageGroup::getSummary($_GET['messagegroupid']);
+			$messagegroup = new MessageGroup($_GET['messagegroupid']);
+			return array('summary' => MessageGroup::getSummary($_GET['messagegroupid']),
+				'defaultlanguagecode' => $messagegroup->defaultlanguagecode);
 
 		case 'hasmessage':
 			if (!isset($_GET['messagetype']) && !isset($_GET['messageid']))
@@ -216,6 +219,13 @@ function handleRequest() {
 								where 1 $limitsql
 						", false);
 					}
+				} else if ($fieldnum == FieldMap::getLanguageField()) {
+					$languagecodes = QuickQueryList("select value from persondatavalues where fieldnum=? $limitsql order by value", false, false, array($_GET['fieldnum']));
+					$languagenames = array();
+					foreach ($languagecodes as $code) {
+						$languagenames[$code] = Language::getName($code);
+					}
+					return $languagenames;
 				} else {
 					return QuickQueryList("select value from persondatavalues where fieldnum=? $limitsql order by value", false, false, array($_GET['fieldnum']));
 				}
@@ -282,6 +292,8 @@ function handleRequest() {
 				'reldateOptions' => $RELDATE_OPTIONS,
 				'fieldmaps' => cleanObjects(FieldMap::getAllAuthorizedFieldMaps()),
 				'hasorg' => count($USER->organizations()) > 0,
+				'languagefield' => FieldMap::getLanguageField(),
+				'languagemap' => Language::getLanguageMap()
 			);
 
 		// Return a whole message including it's message parts formatted into body text and any attachments.
