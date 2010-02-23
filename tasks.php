@@ -35,17 +35,19 @@ if (isset($_GET['delete'])) {
 	Query("BEGIN");
 		switch ($import->datatype) {
 			case "person" :
+				// delete all personassociation with this importid
+				QuickUpdate("delete from personassociation where importid=?", false, array($id));
 				// delete all groupdata with this importid
-				QuickUpdate("delete from groupdata where importid=$id");
+				QuickUpdate("delete from groupdata where importid=?", false, array($id));
 				//deactivate everyone with this importid
-				QuickUpdate("update person set deleted=1, lastimport=now() where importid=$id");
+				QuickUpdate("update person set deleted=1, lastimport=now() where importid=?", false, array($id));
 				//TODO this doesnt seem to do anything since it doesn't check the deleted flag???
 				QuickUpdate("delete le from listentry le
 							left join person p on (p.id = le.personid)
 							where p.id is null and le.personid is not null");
 
 				//recalc pdvalues for all fields mapped
-				$fieldnums = QuickQueryList("select distinct mapto from importfield where (mapto like 'f%' or mapto like 'g%') and importid=$id");
+				$fieldnums = QuickQueryList("select distinct mapto from importfield where (mapto like 'f%' or mapto like 'g%') and importid=?", false, false, array($id));
 				if (count($fieldnums) > 0) {
 					$fields = DBFindMany("FieldMap", "from fieldmap where fieldnum in ('" . implode("','",$fieldnums) . "')");
 					foreach ($fields as $field)
@@ -53,19 +55,20 @@ if (isset($_GET['delete'])) {
 				}
 			break;
 			case "user" :
+				// delete all userassociation with this importid
+				QuickUpdate("delete from userassociation where importid=?", false, array($id));
 				// disable all users with this importid and set importid to null
-				QuickUpdate("update user set enabled=0, lastimport=now(), importid=null where importid=$id");
-
+				QuickUpdate("update user set enabled=0, lastimport=now(), importid=null where importid=?", false, array($id));
+			break;
+			case "section" :
+				// delete all userassociation with this importid, DO NOT remove sectionid=0 do not inadvertently grant access to persons they should not see.
+				QuickUpdate("delete from userassociation where importid=? and sectionid != 0", false, array($id));
+				// delete all sections with this importid
+				QuickUpdate("delete from section where importid=?", false, array($id));
 			break;
 			case "enrollment" :
-				// NOTE: do not remove userrules... do not inadvertently grant access to persons they should not see.
-				// Next enrollment import (assuming there is a new one set up) will recreate necessary rules at that time
-
-				// clear out data
-				QuickUpdate("truncate enrollment");
-
-				//remove pdvalues for all Cfields
-				QuickUpdate("delete from persondatavalues where fieldnum like 'c%'");
+				// delete all personassociation with this importid
+				QuickUpdate("delete from personassociation where importid=?", false, array($id));
 			break;
 		}
 
