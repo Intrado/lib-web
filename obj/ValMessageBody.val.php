@@ -5,8 +5,8 @@ class ValMessageBody extends Validator {
 		if (isset($args['messagegroup']) && $args['messagegroup']) {
 			$messagegroup = $args['messagegroup'];
 			$errormessagecreatefirst = _L("Please first create the %s message.", Language::getName($messagegroup->defaultlanguagecode));
-			// Unless the user is editing the default message, show an error if the messagegroup has no default message.
-			if (!$messagegroup->hasDefaultMessage($args['type'], $args['subtype'])) {
+			// Unless the user is editing the default message or there are no messages, show an error if the messagegroup has no default message.
+			if ($messagegroup->hasMessage($args['type'], $args['subtype']) && !$messagegroup->hasDefaultMessage($args['type'], $args['subtype'])) {
 				if ($args['languagecode'] == 'autotranslator') { // For autotranslator, $requiredvalues are jsonencoded from TranslationItem.
 					if (empty($requiredvalues))
 						return $errormessagecreatefirst;
@@ -28,7 +28,10 @@ class ValMessageBody extends Validator {
 					if (!$editingdefault)
 						return _L("Please include %s or first create its message separately.", Language::getName($messagegroup->defaultlanguagecode));
 				} else if ($args['languagecode'] != $messagegroup->defaultlanguagecode) {
-					return $errormessagecreatefirst;
+					// It's ok for the default html message to be blank if there's a corresponding plain message.
+					if (!($args['subtype'] == 'html' && $messagegroup->hasDefaultMessage('email', 'plain'))) {
+						return $errormessagecreatefirst;
+					}
 				}
 			}
 		}
