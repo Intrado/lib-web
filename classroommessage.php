@@ -40,20 +40,6 @@ $cutoff = "22:00";
 // Action/Request Processing
 ////////////////////////////////////////////////////////////////////////////////
 
-if(isset($_GET['clock'])) {
-	header('Content-Type: application/json');
-	$time = strtotime($cutoff) -  time();
-	$response = false;
-	if($time) {
-		$response->active = true;
-		$response->hours = floor($time/3600);
-		$response->minutes = floor($time%3600/60);
-	} else {
-		$response->active = false;
-	}
-	echo json_encode($response);
-	exit(0);
-}
 
 if (isset($_POST['eventContacts']) && isset($_POST['eventMessage']) && isset($_POST['isChecked']) && isset($_POST['sectionid'])) {
 	header('Content-Type: application/json');
@@ -146,10 +132,12 @@ if (isset($_GET['sectionid'])) {
 							false,array($id,$USER->id));
 	if($usersection > 0) {
 		// User can access this section
+		$firstnamefield = FieldMap::getFirstNameField();
+		$lastnamefield = FieldMap::getLastNameField();
 
-		$res = Query("select p.id, p.pkey,concat(p." . FieldMap::getFirstNameField() . ",'&nbsp;', p." . FieldMap::getLastNameField() . ") name
+		$res = Query("select p.id, p.pkey,concat(p.$firstnamefield,'&nbsp;', p.$lastnamefield) name
 											from person p join personassociation pa on (p.id = pa.personid)
-											where pa.type = 'section' and sectionid = ?",false,array($id));
+											where pa.type = 'section' and sectionid = ? order by p.$firstnamefield,p.$lastnamefield",false,array($id));
 		while($row = DBGetRow($res)){
 			$obj = null;
 			$obj->pkey = $row[1];
@@ -159,10 +147,10 @@ if (isset($_GET['sectionid'])) {
 		if(isset($response->people) && count($response->people) > 0) {
 			$contactids = array_keys($response->people);
 			$query = "select tm.targetedmessagecategoryid, pa.personid, e.targetedmessageid, e.notes from
-					 personassociation pa left join event e on (pa.eventid = e.id)
-						left join targetedmessage tm on (e.targetedmessageid = tm.id)
-					 where e.targetedmessageid is not null and e.userid = ? and Date(e.occurence) = CURDATE() and pa.personid in (" . implode(",",$contactids) . ")";
-			$response->cache = QuickQueryMultiRow($query,false,false,array($USER->id));
+					  personassociation pa inner join event e on (pa.eventid = e.id)
+					  inner join targetedmessage tm on (e.targetedmessageid = tm.id)
+					  where e.userid = ? and e.sectionid = ? and Date(e.occurence) = CURDATE() and pa.personid in (" . implode(",",$contactids) . ")";
+			$response->cache = QuickQueryMultiRow($query,false,false,array($USER->id,$id));
 		} else {
 			$response = false;
 		}

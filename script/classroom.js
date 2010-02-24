@@ -593,7 +593,7 @@
 					if(contact.value.get(msgid) != undefined) {
 						var img = $('c-' + contact.key + '-' + categorystr);
 						Effect.Queues.get(img.id).each(function(effect) { effect.cancel(); });
-						new Effect.Pulsate(img,{pulses:2, from:0.5, duration: 1.5, queue: { position: 'end', scope: img.id }});
+						new Effect.Pulsate(img,{pulses:100, from:0.5, duration: 200, queue: { position: 'end', scope: img.id }});
 						highlightedcontacts.set('c-' + contact.key,true);
 					}
 				});

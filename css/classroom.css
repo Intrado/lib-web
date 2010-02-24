@@ -51,7 +51,7 @@ a.remark  {
 }
 
 div.remarklink {
-	float:left;color:graytext;overflow:hidden;padding-left:20px;width:200px;
+	float:left;color:black;font-style:italic;overflow:hidden;padding-left:20px;width:200px;
 }
 
 a.remarklink{
