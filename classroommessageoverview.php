@@ -22,86 +22,28 @@ if (!getSystemSetting('_hastargetedmessage', false) || !$USER->authorize('target
 	redirect('unauthorized.php');
 }
 
+if(isset($_GET['mode'])) {
+	$_SESSION['classroomoverview'] = $_GET['mode'];
+	redirect();
+}
+
+if(!isset($_SESSION['classroomoverview'])) {
+	$_SESSION['classroomoverview'] = 'contacts';
+}
+
+$start = 0 + (isset($_GET['pagestart']) ? $_GET['pagestart'] : 0);
+$limit = 100;
+
+$mode = $_SESSION['classroomoverview'];
+
+
 ////////////////////////////////////////////////////////////////////////////////
 // Data Handling
 ////////////////////////////////////////////////////////////////////////////////
 
+$messagedatapath = "messagedata/en/targetedmessage.php";
 
-if (isset($_POST['classid'])) {
-	$id = $_POST['classid'] + 0;
-	exit(0);
-}
-
-$categories = DBFindMany("TargetedMessageCategory", "from targetedmessagecategory where deleted = 0");
-
-$isajax = isset($_GET['ajax']);
-
-if($isajax === true) {
-	session_write_close();//WARNING: we don't keep a lock on the session file, any changes to session data are ignored past this point
-
-	if (isset($_GET['peoplemessageid'])) {
-		$query = "select p.f01 as firstname,p.f02 as lastname, e.notes as remark from
-			targetedmessage tm
-		join 
-			event e on (e.targetedmessageid = tm.id)
-		join
-			personassociation pa on (pa.eventid = e.id)
-		join
-			person p on (pa.personid = p.id)
-		where e.targetedmessageid = ? and e.userid = ? and Date(e.occurence) = CURDATE()";
-
-/*
-		$query = "select pa.personid, e.notes as remark from
-			targetedmessage tm
-		join
-			event e on (e.targetedmessageid = tm.id)
-		join
-			personassociation pa on (pa.eventid = e.id)
-		where e.targetedmessageid = ? and e.userid = ? and Date(e.occurence) = CURDATE()";
-*/
-		$people = QuickQueryMultiRow($query,true,false,array($_GET['peoplemessageid'],$USER->id));
-
-
-		header('Content-Type: application/json');
-		echo json_encode(!empty($people) ? $people : false);
-		exit();
-	}
-
-
-
-
-
-	$messagedatapath = "messagedata/en/targetedmessage.php";
-	$orderby = "name";
-
-	$sqlargs = array($USER->id);
-	$extrasql = "";
-	if (isset($_GET['category']) && $_GET['category'] != 'none') {
-		$sqlargs[] = $_GET['category'];
-		$extrasql .= " and tm.targetedmessagecategoryid = ? ";
-		$getcategory = true;
-	} else {
-		$getcategory = false;
-	}
-
-	if(isset($_GET['sortby'])) {
-		switch ($_GET['sortby']) {
-			case "name":
-				$orderby = "tm.messagekey";
-				break;
-			case "person":
-				$orderby = "persons desc";
-				break;
-		}
-	}
-
-	$query = "select tm.targetedmessagecategoryid as category, count(pa.personid) as persons, e.targetedmessageid as targetedmessageid,
-		 tm.messagekey, tm.overridemessagegroupid from
-		 personassociation pa left join event e on (pa.eventid = e.id)
-		 left join targetedmessage tm on (e.targetedmessageid = tm.id)
-		 where e.targetedmessageid is not null and e.userid = ? $extrasql and Date(e.occurence) = CURDATE() group by e.targetedmessageid order by " . $orderby;
-	$messages = QuickQueryMultiRow($query,true,false,$sqlargs);
-
+function getoverridemessages($messages) {
 	$overrideids = array();
 	if(!empty($messages)) {
 		foreach($messages as $message) {
@@ -111,51 +53,51 @@ if($isajax === true) {
 	}
 
 	if(!empty($overrideids)) {
-		$customtxt = QuickQueryList("select m.messagegroupid, p.txt from message m, messagepart p
+		 return QuickQueryList("select m.messagegroupid, p.txt from message m, messagepart p
 									where m.messagegroupid in (" . implode(",",$overrideids) . ") and
 									m.languagecode = 'en' and
 									p.messageid = m.id and p.sequence = 0",true);
 	}
-	if(file_exists($messagedatapath))
-		include_once($messagedatapath);
-
-
-	if(empty($messages)) {
-			$data->list[] = array("itemid" => "",
-										"defaultlink" => "",
-										"icon" => "largeicons/information.jpg",
-										"title" => $getcategory?_L("No Classroom Comments For This Category"):_L("No Classroom Comments"),
-										"content" => "",
-										"tools" => "");
-	} else {
-		foreach($messages as $message) {
-			if(isset($message["overridemessagegroupid"]) && isset($customtxt[$message["overridemessagegroupid"]])) {
-				$title = $customtxt[$message["overridemessagegroupid"]];
-			} else if(isset($messagedatacache["en"]) && isset($messagedatacache["en"][$message["messagekey"]])) {
-				$title = $messagedatacache["en"][$message["messagekey"]];
-			} else {
-				$title = ""; // Could not find message for this message key.
-			}
-			$persons = $message["persons"];
-			$title .= " (" . ($persons==1?_L("%s Person", $persons):_L("%s Persons", $persons)). ")";
-			$itemid = $message["targetedmessageid"];
-			$defaultlink = "";
-			$content = '<a href="' . $defaultlink . '"></a>';
-			$icon = 'icons/' . $classroomcategoryicons[$categories[$message["category"]]->image]  . '.gif';
-			$data->list[] = array("id" => $itemid,
-										"defaultlink" => $defaultlink,
-										"icon" => $icon,
-										"title" => $title,
-										"content" => $content,
-								);
-			//error_log($categories[$message["category"]]->img);
-		}
-	}
-	//error_log(json_encode(!empty($data) ? $data : false));
-	header('Content-Type: application/json');
-	echo json_encode(!empty($data) ? $data : false);
-	exit();
+	return null;
 }
+function getmessagetext($message,$customtxt) {
+	global $messagedatacache;
+	if(isset($message["overridemessagegroupid"]) && isset($customtxt[$message["overridemessagegroupid"]])) {
+		return $customtxt[$message["overridemessagegroupid"]];
+	} else if(isset($messagedatacache["en"]) && isset($messagedatacache["en"][$message["messagekey"]])) {
+		return $messagedatacache["en"][$message["messagekey"]];
+	}
+	return "";
+}
+
+$categories = DBFindMany("TargetedMessageCategory", "from targetedmessagecategory where deleted = 0");
+$personcomments = false;
+$commentpersons = false;
+
+
+$firstnamefield = FieldMap::getFirstNameField();
+$lastnamefield = FieldMap::getLastNameField();
+$orderby = "order by date desc, p.$firstnamefield,p.$lastnamefield";
+
+
+if($mode == 'comments') {
+	$orderby = "order by date desc,tm.messagekey";
+}
+
+$query = "select SQL_CALC_FOUND_ROWS
+Date(e.occurence) as date, p.id as personid,p.pkey, p.$firstnamefield as firstname,p.$lastnamefield as lastname,
+tm.id as commentid ,tm.messagekey, tm.overridemessagegroupid ,tm.targetedmessagecategoryid, e.targetedmessageid, e.notes
+from personassociation pa
+inner join person p on (pa.personid = p.id)
+inner join event e on (pa.eventid = e.id)
+inner join targetedmessage tm on (e.targetedmessageid = tm.id)
+where e.userid = ? $orderby limit $start, $limit";
+
+$personcomments = QuickQueryMultiRow($query,true,false,array($USER->id));
+
+$total = QuickQuery("select FOUND_ROWS()");
+
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // Display Functions
@@ -180,148 +122,156 @@ startWindow(_L('Classroom Comments'));
 
 
 		<?= icon_button("Pick Comments", "add", null, "classroommessage.php") ?>
-		<select style="margin-top:20px;">
-			<option value="" selected>-- All Classes --</option>
-		</select>
 		<div style="clear:both;"></div>
-		<h1 id="filterby">Filter By Category:</h1>
-		<div id="allcategories" class="feedfilter">
-			<a id="catfilter-none" href="#" onclick="applyfilter('none','category'); return false;"><img src="img/largeicons/tiny20x20/globe.jpg" />Show All</a>
-			<div style="padding-left:20px;">
-			<?
-				foreach($categories as $category) {
-					$id  = 'catfilter-' . $category->id;
-					echo '<a id="' . $id . '" href="#" onclick="applyfilter(\'' . $category->id . '\',\'category\'); return false;"><img src="img/icons/' . $classroomcategoryicons[$category->image]  . '.gif" />' . $category->name . '</a><br />';
-				}
-			?>
-			</div>
+		<h1 id="view">View By:</h1>
+		<div id="alloptions" class="feedfilter">
+			<a href="classroommessageoverview.php?mode=contacts" style="font-weight:<?= $mode=='contacts'?'bold':'normal' ?>"><img src="img/largeicons/tiny20x20/addresscard.jpg" />&nbsp;Contacts</a><br />
+			<a href="classroommessageoverview.php?mode=comments" style="font-weight:<?= $mode=='comments'?'bold':'normal' ?>"><img src="img/largeicons/tiny20x20/clipboard.jpg" />&nbsp;Comments</a><br />
 		</div>
-		<h1 id="sortby">Sort By:</h1>
-		<div id="allsorters" class="feedfilter">
-			<a id="sorter-person" href="#" onclick="applyfilter('person','sort'); return false;"><img src="img/largeicons/tiny20x20/barreport.jpg" />Person Count</a><br />
-			<a id="sorter-name" href="#" onclick="applyfilter('name','sort'); return false;"><img src="img/largeicons/tiny20x20/pencil.jpg" />Name</a><br />
+		<br />
+		<h1 id="view">View</h1>
+		<div id="alloptions" class="feedfilter">
+			<a id="expandall" href="#" onclick="expandall();return false;" style="font-weight:bold"><img src="img/icons/magnifier_zoom_in.gif" />&nbsp;Expanded</a><br />
+			<a id="collapseall" href="#" onclick="collapseall();return false;"><img src="img/icons/magifier_zoom_out.gif" />&nbsp;Compact</a><br />
 		</div>
+
 	</td>
 	<td width="10px" style="border-left: 1px dotted gray;" >&nbsp;</td>
 	<td class="feed" valign="top" >
-
+		<? if($personcomments) { showPageMenu ($total,$start, $limit);} ?>
 		<table id="feeditems">
-			<tr>
-				<td valign='top' width='60px'><img src='img/ajax-loader.gif' /></td>
-				<td >
-					<div class='feedtitle'>
-						<a href=''>
-						<?= _L("Loading Classroom Comments") ?></a>
-					</div>
-				</td>
-			</tr>
+			<?
+			if($personcomments) {
+				$customtxt = getoverridemessages($personcomments);
+				require_once($messagedatapath);
+				$currentdate = false;
+
+				$first = current($personcomments);
+				if($first['date'] != date("Y-m-d", time())) {
+				?>
+					<tr><td style="border-bottom:0px;vertical-align:top;text-align:center;width:30px;"><img src="img/largeicons/information.jpg" /></td><td style="border-bottom:0px;"><div class="feedtitle"><?=_L("No Classroom Comments for Today") ?></div>
+				<?
+				}
+
+
+				if($mode == 'comments') {
+					$commentid = false;
+					foreach($personcomments as $personcomment) {
+						$id = $personcomment['commentid'];
+						if($id != $commentid) {
+							if($commentid !== false) {
+								echo '</table></div></td>';
+							}
+							if($currentdate != $personcomment['date']) {
+								echo '<tr><td colspan="2" style="border-bottom:0px;font-weight:3em;"><h3>' . _L('Comments on %s',$personcomment['date']) . '</h3></td></tr>';
+								$currentdate = $personcomment['date'];
+							}
+
+							?>
+							<tr><td style="border-bottom:0px;vertical-align:top;text-align:center;width:30px;"><img src="img/icons/<?= $classroomcategoryicons[$categories[$personcomment["targetedmessagecategoryid"]]->image] ?>.gif" /></td><td style="border-bottom:0px;"><div class="feedtitle">
+										<a href="#" onclick="togglepersons('<?=$personcomment['date'] . $id ?>');return false;">
+								<?= escapehtml(getmessagetext($personcomment,$customtxt))?>
+								</a></div>
+							<?
+							echo '<div id="persons-' . $personcomment['date'] . $id . '" class="expandview"><table style="margin-left:2%;width:98%">';
+							$commentid = $id;
+						}
+						echo '<tr><td style="white-space: nowrap;">' . escapehtml($personcomment['firstname']) . '&nbsp;' .  escapehtml($personcomment['lastname']) . '<span style="color:graytext;font-style:italic;white-space:nowrap"> - ID: ' . $personcomment['pkey'] . '</span></td><td style="width:100%;padding-left:10%;">' .  ($personcomment['notes']?'<b>Remark: </b>' . escapehtml($personcomment['notes']):'') . '</td></tr>';
+					}
+					echo '</table></div></td>';
+				} else {
+					$contactid = false;
+					foreach($personcomments as $personcomment) {
+						$id = $personcomment['personid'];
+						if($id != $contactid) {
+							if($contactid !== false) {
+								echo '</table></div></td>';
+							}
+							if($currentdate != $personcomment['date']) {
+								echo '<tr><td colspan="2" style="border-bottom:0px;font-weight:3em;"><h3>' . _L('Contacts on %s', $personcomment['date'] ) . '</h3></td></tr>';
+								$currentdate = $personcomment['date'];
+							}
+							?>
+							<tr><td style="border-bottom:0px;vertical-align:top;text-align:center;width:30px;"><img id="img-<?= $personcomment['date'] . $id  ?>" src="img/arrow_down.gif" style="padding-top:5px;"/></td><td style="border-bottom:0px;"><div class="feedtitle">
+										<a href="#" onclick="togglecomments('<?=$personcomment['date'] . $id ?>');return false;">
+								<?= escapehtml($personcomment['firstname']) . '&nbsp;' .  escapehtml($personcomment['lastname'])  ?>
+								</a><span style="color:graytext;font-style:italic;white-space:nowrap"> - ID: <?= $personcomment['pkey'] ?></span></div>
+							<?
+							echo '<div id="comments-' . $personcomment['date'] . $id  . '" class="expandview"><table style="margin-left:2%;width:98%">';
+							$contactid = $id;
+						}
+						echo '<tr><td width="30px"><img src="img/icons/' . $classroomcategoryicons[$categories[$personcomment["targetedmessagecategoryid"]]->image]  . '.gif" /></td><td style="white-space: nowrap;">' . escapehtml(getmessagetext($personcomment,$customtxt)) . '</td><td style="width:100%;padding-left:10%;">' .  ($personcomment['notes']?'<b>Remark: </b>' . escapehtml($personcomment['notes']):'') . '</td></tr>';
+					}
+					echo '</table></div></td>';
+				}
+			} else {
+			?>
+				<tr><td valign="top" width="30px"><img src="img/largeicons/information.jpg" /></td><td><div class="feedtitle"><?=_L("No Classroom Comments") ?></div>
+			<?
+			}
+
+			?>
 		</table>
 		<br />
+
+		<? if($personcomments) { showPageMenu ($total,$start, $limit);} ?>
+
 	</td>
 </tr>
 </table>
-<br />
-
-
 <script type="text/javascript" language="javascript">
 
-var sections = Array();
-var categories = Array('none'<?= empty($categories)?"":"," . implode(",",array_keys($categories)) ?>);
-var sorters = Array('none','person','name');
-
-var currentsection = 'none';
-var currentcategory = 'none';
-var currentsorter = 'none';
-
-
-function setactions(prefix,action,actions,color) {
-	var itm = false;
-	size = actions.length;
-	for(var i=0;i<size;i++){
-		itm = $(prefix + actions[i]);
-		if(itm)
-			itm.setStyle({color: color, fontWeight: 'normal'});
-	}
-	itm = $(prefix + action);
-	if(itm) 
-		itm.setStyle({color: '#000000',fontWeight: 'bold'});
-	
-}
-
-
-function applyfilter(action,type) {
-		var section = type == 'section'? action : currentsection;
-		var category = type == 'category'? action : currentcategory;
-		var sorter = type == 'sort'? action : currentsorter;
-
-		new Ajax.Request('classroommessageoverview.php', {
-			method:'get',
-			parameters:{ajax:true,category:category,sortby:sorter},
-			onSuccess: function (response) {
-				var result = response.responseJSON;
-				if(result) {
-					var html = '';
-					var size = result.list.length;
-
-					for(i=0;i<size;i++){
-						var item = result.list[i];
-						html += '<tr><td valign=\"top\" width=\"60px\"><a href=\"' + item.defaultlink + '\" onclick="expandview(\'' + item.id + '\');return false;"><img src=\"img/' + item.icon + '\" /></a></td><td ><div class=\"feedtitle\"><a href=\"' + item.defaultlink + '\" onclick="expandview(\'' + item.id + '\');return false;">' + item.title + '</a></div><span>' + item.content + '</span><div id="itmwrap-' + item.id +'"><div id="itmdata-' + item.id +'" style="display:none;"></div></div></td>';
-						html += '</tr>';
-					}
-					$('feeditems').update(html);
-
-					var filtercolor = $('filterby').getStyle('color');
-					if(!filtercolor)
-						filtercolor = '#000';
-
-					setactions('catfilter-',category,categories,filtercolor);
-					setactions('sorter-',sorter,sorters,filtercolor);
-	
-					currentcategory = category;
-					currentsorter = sorter;
-				}
-
-			}
-		});
-}
-
-function expandview(id) {
-	var frame = $('itmdata-' + id);
-
-	if(!frame.visible()) {
-		new Ajax.Request('classroommessageoverview.php', {
-			method:'get',
-			parameters:{ajax:true,peoplemessageid:id},
-			onSuccess: function (response) {
-				var result = response.responseJSON;
-				if(result) {
-
-
-					var itminfo = '<table><tr><th align="left">First Name</th><th align="left">Last Name</th><th align="left">Remark</th></tr>';
-					var size = result.length;
-					for(var i = 0;i < size;i++) {
-						itminfo += "<tr><td>" + result[i].firstname + "</td><td>" + result[i].lastname + "</td><td>" + result[i].remark + "</td></tr>";
-					}
-					itminfo += "<table>";
-
-					frame.update(itminfo);
-					Effect.BlindDown(frame,{ duration: 0.5 });
-				}
-			}
-		});
+function togglecomments(id) {
+	var table = $('comments-' + id);
+	if(table.visible()) {
+		$('img-' + id).src = "img/arrow_right.gif";
+		Effect.BlindUp(table,{ duration: 0.5 });
 	} else {
-		Effect.BlindUp(frame,{ duration: 0.5 });
+		$('img-' + id).src = "img/arrow_down.gif";
+		Effect.BlindDown(table,{ duration: 0.5 });
 	}
 }
-document.observe('dom:loaded', function() {
-	applyfilter('person','sort');
-});
+function togglepersons(id) {
+	var table = $('persons-' + id);
+	if(table.visible()) {
+		Effect.BlindUp(table,{ duration: 0.5 });
+	} else {
+		Effect.BlindDown(table,{ duration: 0.5 });
+	}
+}
+
+function expandall() {
+	$('expandall').setStyle('font-weight:bold;');
+	$('collapseall').setStyle('font-weight:normal;');
+
+	$$('.expandview').each(function(item) {
+		item.show();
+		if(item.id.substring(0,9) == 'comments-') {
+			$('img-' + item.id.substring(9)).src = "img/arrow_down.gif";
+
+		}
+	});
+
+}
+function collapseall() {
+	$('collapseall').setStyle('font-weight:bold;');
+	$('expandall').setStyle('font-weight:normal;');
+	$$('.expandview').each(function(item) {
+		item.hide();
+		if(item.id.substring(0,9) == 'comments-') {
+			$('img-' + item.id.substring(9)).src = "img/arrow_right.gif";
+		}
+	});
+}
+
 </script>
+
+
 <?
 
 endWindow();
 
 
-
-
 include_once("navbottom.inc.php");
+
+?>
