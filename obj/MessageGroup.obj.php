@@ -69,13 +69,15 @@ class MessageGroup extends DBMappedObject {
 		return false;
 	}
 	
-	function hasMessage($type, $subtype = null, $languagecode = null) {
+	function hasMessage($type, $subtype = null, $languagecode = null, $autotranslate = null) {
 		foreach ($this->getMessages() as $message) {
 			if ($message->type != $type)
 				continue;
 			if($subtype != null && $message->subtype != $subtype)
 				continue;
 			if($languagecode != null && $message->languagecode != $languagecode)
+				continue;
+			if ($autotranslate != null && $message->autotranslate != $autotranslate)
 				continue;
 			return true;
 		}
