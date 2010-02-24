@@ -7,32 +7,41 @@ class ValMessageBody extends Validator {
 			$errormessagecreatefirst = _L("Please first create the %s message.", Language::getName($messagegroup->defaultlanguagecode));
 			
 			$hasmessage = $messagegroup->hasMessage($args['type'], $args['subtype']);
-			if (!$hasmessage && $args['languagecode'] == 'autotranslator' && !in_array($messagegroup->defaultlanguagecode, $args['translationlanguages']))
-				return $errormessagecreatefirst;
+			$hasdefault = $hasmessage ? $messagegroup->hasDefaultMessage($args['type'], $args['subtype']) : false;
 			
+			if (!$hasmessage && $args['languagecode'] == 'autotranslator' &&
+				!in_array($messagegroup->defaultlanguagecode, $args['translationlanguages'])
+			) {
+				return $errormessagecreatefirst;
+			}
+
 			// Unless the user is editing the default message or there are no messages, show an error if the messagegroup has no default message.
-			if ($hasmessage && !$messagegroup->hasDefaultMessage($args['type'], $args['subtype'])) {
+			if (!$hasdefault) {
 				if ($args['languagecode'] == 'autotranslator') { // For autotranslator, $requiredvalues are jsonencoded from TranslationItem.
-					if (empty($requiredvalues))
+					if (empty($requiredvalues)) {
 						return $errormessagecreatefirst;
-				
+					}
+					
+					if (!in_array($messagegroup->defaultlanguagecode, $args['translationlanguages'])) {
+						return $errormessagecreatefirst;
+					}
+					
 					$editingdefault = false;
-					$defaultincluded = false;
 					foreach ($requiredvalues as $value) {
 						$translationitemdata = json_decode($value);
-						if ($translationitemdata->language == $messagegroup->defaultlanguagecode) {
-							$defaultincluded = true;
-							if ($translationitemdata->enabled) {
-								$editingdefault = true;
-								break;
-							}
+						if ($translationitemdata &&
+							isset($translationitemdata->language) &&
+							$translationitemdata->language == $messagegroup->defaultlanguagecode &&
+							$translationitemdata->enabled
+						) {
+							$editingdefault = true;
+							break;
 						}
 					}
-					if (!$defaultincluded)
-						return $errormessagecreatefirst;
+					
 					if (!$editingdefault)
 						return _L("Please include %s or first create its message separately.", Language::getName($messagegroup->defaultlanguagecode));
-				} else if ($args['languagecode'] != $messagegroup->defaultlanguagecode) {
+				} else if($args['languagecode'] != $messagegroup->defaultlanguagecode) {
 					// It's ok for the default html message to be blank if there's a corresponding plain message.
 					if (!($args['subtype'] == 'html' && $messagegroup->hasDefaultMessage('email', 'plain'))) {
 						return $errormessagecreatefirst;
