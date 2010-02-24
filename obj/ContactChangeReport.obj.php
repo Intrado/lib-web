@@ -233,10 +233,8 @@ class ContactChangeReport extends ReportGenerator {
 							"9" => "fmt_editlock_date",
 							"10" => "fmt_organization");
 		
-		// TODO we should not lookup language name in database for every row! why doesn't the genfields work???
-		//I think this is safe since it starts appending f03 right after other fields
-		//if (in_array(FieldMap::getLanguageField(),$activefields))
-			//$formatters[11] = "fmt_languagecode";
+		if (in_array(FieldMap::getLanguageField(),$activefields))
+			$formatters[11] = "fmt_languagecode";
 
 		startWindow("Search Results", "padding: 3px;");
 		showPageMenu($total,$pagestart,$max);
@@ -264,7 +262,8 @@ class ContactChangeReport extends ReportGenerator {
 			$fieldlist[$field->fieldnum] = $field->name;
 		}
 		$activefields = explode(",", isset($this->params['activefields']) ? $this->params['activefields'] : "");
-
+		$languageField = FieldMap::getLanguageField();
+		
 		$maxphones = getSystemSetting('maxphones', '1');
 		$maxemails = getSystemSetting('maxemails', '1');
 		$maxsms = getSystemSetting('maxsms', '1');
@@ -318,30 +317,76 @@ class ContactChangeReport extends ReportGenerator {
 
 		while ($row = DBGetRow($result)) {
 
+			// id, name, address, org
 			$reportarray = array($row[0], $row[2], $row[3], $row[4], $row[5]);
 
+			// optional F/G fields
 			$count=0;
 			foreach($fieldlist as $index => $field){
 				if(in_array($index, $activefields)){
-					$reportarray[] = $row[6+$count];
+					if ($languageField == $index) {
+						$reportarray[] = Language::getName($row[6+$count]);
+					} else {
+						$reportarray[] = $row[6+$count];
+					}
 				}
 				$count++;
 			}
+			
+			// every phone
 			$phonelist = DBFindMany("Phone", "from phone where personid = '$row[1]' order by sequence", false, false, $this->_readonlyDB);
+			$seq = 0;
 			foreach($phonelist as $phone){
+				// fill any missing phones in sequence
+				for ($i=$seq; $i<$phone->sequence; $i++) {
+					$reportarray[] = "";
+					$reportarray[] = "";
+					$seq++;
+				}
+				// existing phone
 				$reportarray[] = Phone::format($phone->phone);
 				$reportarray[] = $phone->editlockdate;
+				$seq++;
 			}
+			// remaining missing phones
+			for ($i=$seq; $i<$maxphones; $i++) {
+				$reportarray[] = "";
+				$reportarray[] = "";
+			}
+
 			$emaillist = DBFindMany("Email", "from email where personid = '$row[1]' order by sequence", false, false, $this->_readonlyDB);
+			$seq = 0;
 			foreach($emaillist as $email){
+				for ($i=$seq; $i<$email->sequence; $i++) {
+					$reportarray[] = "";
+					$reportarray[] = "";
+					$seq++;
+				}
 				$reportarray[] = $email->email;
 				$reportarray[] = $email->editlockdate;
+				$seq++;
 			}
+			for ($i=$seq; $i<$maxemails; $i++) {
+				$reportarray[] = "";
+				$reportarray[] = "";
+			}
+			
 			if ($hassms) {
 				$smslist = DBFindMany("Sms", "from sms where personid = '$row[1]' order by sequence", false, false, $this->_readonlyDB);
+				$seq = 0;
 				foreach($smslist as $sms){
+					for ($i=$seq; $i<$sms->sequence; $i++) {
+						$reportarray[] = "";
+						$reportarray[] = "";
+						$seq++;
+					}
 					$reportarray[] = $sms->sms;
 					$reportarray[] = $sms->editlockdate;
+					$seq++;
+				}
+				for ($i=$seq; $i<$maxsms; $i++) {
+					$reportarray[] = "";
+					$reportarray[] = "";
 				}
 			}
 			
