@@ -4,7 +4,7 @@ header('Content-Type: application/json');
 require_once("inc/common.inc.php");
 require_once("inc/translate.inc.php");
 
-	$supportedlanguages = getTranslationLanguages(false);
+	$supportedlanguages = getTranslationLanguages();
 	$url = "http://ajax.googleapis.com/ajax/services/language/translate?v=1.0";
 	$url .= (isset($SETTINGS['translation']['apikey']) && $SETTINGS['translation']['apikey'])?"&key=" . $SETTINGS['translation']['apikey']:"";
 	$text = "";
