@@ -56,62 +56,175 @@ if($isajax === true) {
 	
 	switch ($filter) {
 		case "lists":
-			$mergeditems = array_merge($mergeditems,QuickQueryMultiRow("select 'list' as type,'Saved' as status, id, name, modifydate as date, lastused from list where userid=? and deleted = 0 and modifydate is not null order by modifydate desc limit 10",true,false,array($USER->id)));
+			$mergeditems = array_merge($mergeditems,QuickQueryMultiRow("
+				select 'list' as type, 'Saved' as status, id, name, modifydate as date, lastused
+				from list where userid = ? and not deleted and modifydate is not null
+				order by modifydate desc
+				limit 10",true,false,array($USER->id)));
 			break;
 		case "messages":
 			$mergeditems = array_merge($mergeditems,QuickQueryMultiRow("
-			select 'message' as type,'Saved' as status,g.id as id, g.name as name, g.modified as date, g.deleted as deleted,
-			 sum(m.type='phone') as phone, sum(m.type='email') as email,sum(m.type='sms') as sms
-			from messagegroup g, message m where g.userid=? and g.deleted = 0 and g.modified is not null and m.messagegroupid = g.id
-			group by g.id order by g.modified desc limit 10 ",true,false,array($USER->id)));
+				select 'message' as type, 'Saved' as status, mg.id as id, mg.name as name, mg.modified as date, mg.deleted as deleted,
+					sum(m.type='phone') as phone, sum(m.type='email') as email,sum(m.type='sms') as sms
+				from messagegroup mg
+					inner join message m on
+						(m.messagegroupid = mg.id)
+				where mg.userid=? and not mg.deleted and mg.modified is not null and mg.type = 'notification'
+				group by mg.id
+				order by mg.modified desc
+				limit 10",true,false,array($USER->id)));
 			break;
 		case "jobs":
-			$mergeditems = array_merge($mergeditems,QuickQueryMultiRow("select 'job' as type,status,id, name, modifydate as date,'modifydate' as datetype, type as jobtype, deleted from job where userid=? and deleted = 0 and (finishdate is null || status='repeating') and modifydate is not null order by modifydate desc limit 10",true,false,array($USER->id)));
-			$mergeditems = array_merge($mergeditems,QuickQueryMultiRow("select 'job' as type,status,id, name, finishdate as date,'finishdate' as datetype, type as jobtype, deleted from job where userid=? and deleted = 0 and status!='repeating' and finishdate is not null order by finishdate desc limit 10",true,false,array($USER->id)));
+			$mergeditems = array_merge($mergeditems,QuickQueryMultiRow("
+				select 'job' as type, status, id, name, modifydate as date, 'modifydate' as datetype, type as jobtype, deleted
+				from job
+				where userid=? and not deleted and (finishdate is null || status = 'repeating') and modifydate is not null and type != 'alert'
+				order by modifydate desc
+				limit 10",true,false,array($USER->id)));
+			$mergeditems = array_merge($mergeditems,QuickQueryMultiRow("
+				select 'job' as type, status, id, name, finishdate as date, 'finishdate' as datetype, type as jobtype, deleted
+				from job
+				where userid=? and not deleted and status != 'repeating' and finishdate is not null
+				order by finishdate desc
+				limit 10",true,false,array($USER->id)));
 			break;
 		case "savedjobs":
-			$mergeditems = array_merge($mergeditems,QuickQueryMultiRow("select 'job' as type,status,id, name, modifydate as date,'modifydate' as datetype, type as jobtype, deleted from job where userid=? and deleted = 0 and finishdate is null and modifydate is not null and status = 'new' order by modifydate desc limit 10",true,false,array($USER->id)));
+			$mergeditems = array_merge($mergeditems,QuickQueryMultiRow("
+				select 'job' as type, status, id, name, modifydate as date,'modifydate' as datetype, type as jobtype, deleted
+				from job
+				where userid = ? and not deleted and finishdate is null and modifydate is not null and status = 'new'
+				order by modifydate desc
+				limit 10",true,false,array($USER->id)));
 			break;
 		case "repeatingjobs":
-			$mergeditems = array_merge($mergeditems,QuickQueryMultiRow("select 'job' as type,status,id, name, modifydate as date,'modifydate' as datetype,type as jobtype, deleted from job where userid=? and deleted = 0 and modifydate is not null and status='repeating' order by modifydate desc limit 10",true,false,array($USER->id)));
+			$mergeditems = array_merge($mergeditems,QuickQueryMultiRow("
+				select 'job' as type, status, id, name, modifydate as date,'modifydate' as datetype, type as jobtype, deleted
+				from job
+				where userid = ? and not deleted and modifydate is not null and status='repeating' and type != 'alert'
+				order by modifydate desc
+				limit 10",true,false,array($USER->id)));
 			break;
 		case "scheduledjobs":
-			$mergeditems = array_merge($mergeditems,QuickQueryMultiRow("select 'job' as type,status,id, name, modifydate as date,'modifydate' as datetype, type as jobtype, deleted from job where userid=? and deleted = 0 and finishdate is null and modifydate is not null and status = 'scheduled' order by modifydate desc limit 10",true,false,array($USER->id)));
+			$mergeditems = array_merge($mergeditems,QuickQueryMultiRow("
+				select 'job' as type, status, id, name, modifydate as date, 'modifydate' as datetype, type as jobtype, deleted
+				from job
+				where userid=? and not deleted and finishdate is null and modifydate is not null and status = 'scheduled'
+				order by modifydate desc
+				limit 10",true,false,array($USER->id)));
 			break;
 		case "activejobs":
-			$mergeditems = array_merge($mergeditems,QuickQueryMultiRow("select 'job' as type,status,id, name, modifydate as date,'modifydate' as datetype, type as jobtype,percentprocessed, deleted from job where userid=? and deleted = 0 and finishdate is null and modifydate is not null and status in ('processing','procactive','active') order by modifydate desc limit 10",true,false,array($USER->id)));
+			$mergeditems = array_merge($mergeditems,QuickQueryMultiRow("
+				select 'job' as type, status, id, name, modifydate as date, 'modifydate' as datetype, type as jobtype, percentprocessed, deleted
+				from job
+				where userid = ? and not deleted and finishdate is null and modifydate is not null and status in ('processing','procactive','active')
+				order by modifydate desc
+				limit 10",true,false,array($USER->id)));
 			break;
 		case "cancelledjobs":
-			$mergeditems = array_merge($mergeditems,QuickQueryMultiRow("select 'job' as type,status,id, name, modifydate as date,'modifydate' as datetype, type as jobtype, deleted from job where userid=? and deleted = 0 and finishdate is null and modifydate is not null and status in ('cancelled','cancelling') order by modifydate desc limit 10",true,false,array($USER->id)));
-			$mergeditems = array_merge($mergeditems,QuickQueryMultiRow("select 'job' as type,status,id, name, finishdate as date,'finishdate' as datetype,type as jobtype, deleted from job where userid=? and deleted = 0 and finishdate is not null and status in ('cancelled','cancelling') order by finishdate desc limit 10",true,false,array($USER->id)));
+			$mergeditems = array_merge($mergeditems,QuickQueryMultiRow("
+				select 'job' as type, status, id, name, modifydate as date, 'modifydate' as datetype, type as jobtype, deleted
+				from job
+				where userid=? and deleted = 0 and finishdate is null and modifydate is not null and status in ('cancelled','cancelling')
+				order by modifydate desc
+				limit 10",true,false,array($USER->id)));
+			$mergeditems = array_merge($mergeditems,QuickQueryMultiRow("
+				select 'job' as type, status, id, name, finishdate as date, 'finishdate' as datetype, type as jobtype, deleted
+				from job
+				where userid = ? and not deleted and finishdate is not null and status in ('cancelled','cancelling')
+				order by finishdate desc
+				limit 10",true,false,array($USER->id)));
 			break;
 		case "completedjobs":
-			$mergeditems = array_merge($mergeditems,QuickQueryMultiRow("select 'job' as type,status,id, name, finishdate as date,'finishdate' as datetype,type as jobtype, deleted from job where userid=? and deleted = 0 and finishdate is not null and status = 'complete' order by finishdate desc limit 10",true,false,array($USER->id)));
-			$mergeditems = array_merge($mergeditems,QuickQueryMultiRow("select 'job' as type,status,id, name, modifydate as date,'modifydate' as datetype , type as jobtype, deleted from job where userid=? and deleted = 0 and finishdate is null and modifydate is not null and status in ('cancelled','cancelling') order by modifydate desc limit 10",true,false,array($USER->id)));
-			$mergeditems = array_merge($mergeditems,QuickQueryMultiRow("select 'job' as type,status,id, name, finishdate as date,'finishdate' as datetype,type as jobtype, deleted from job where userid=? and deleted = 0 and finishdate is not null and status in ('cancelled','cancelling') order by finishdate desc limit 10",true,false,array($USER->id)));
+			$mergeditems = array_merge($mergeditems,QuickQueryMultiRow("
+				select 'job' as type, status, id, name, finishdate as date, 'finishdate' as datetype, type as jobtype, deleted
+				from job
+				where userid = ? and deleted = 0 and finishdate is not null and status = 'complete'
+				order by finishdate desc
+				limit 10",true,false,array($USER->id)));
+			$mergeditems = array_merge($mergeditems,QuickQueryMultiRow("
+				select 'job' as type, status, id, name, modifydate as date, 'modifydate' as datetype, type as jobtype, deleted
+				from job
+				where userid = ? and not deleted and finishdate is null and modifydate is not null and status in ('cancelled','cancelling')
+				order by modifydate desc
+				limit 10",true,false,array($USER->id)));
+			$mergeditems = array_merge($mergeditems,QuickQueryMultiRow("
+				select 'job' as type, status, id, name, finishdate as date, 'finishdate' as datetype, type as jobtype, deleted
+				from job
+				where userid = ? and not deleted and finishdate is not null and status in ('cancelled','cancelling')
+				order by finishdate desc
+				limit 10",true,false,array($USER->id)));
 			break;
 		case "savedreports":
-			$mergeditems = array_merge($mergeditems, QuickQueryMultiRow("select 'report' as type,'Saved' as status,id, name, modifydate as date from reportsubscription where userid=? and modifydate is not null order by modifydate desc limit 10",true,false,array($USER->id)));
+			$mergeditems = array_merge($mergeditems, QuickQueryMultiRow("
+				select 'report' as type, 'Saved' as status, id, name, modifydate as date
+				from reportsubscription
+				where userid = ? and modifydate is not null
+				order by modifydate desc
+				limit 10",true,false,array($USER->id)));
 			break;
 		case "emailedreports":
-			$mergeditems = array_merge($mergeditems, QuickQueryMultiRow("select 'report' as type,'Emailed' as status,id, name, lastrun as date from reportsubscription where userid=? and lastrun is not null order by lastrun desc limit 10",true,false,array($USER->id)));
+			$mergeditems = array_merge($mergeditems, QuickQueryMultiRow("
+				select 'report' as type, 'Emailed' as status, id, name, lastrun as date
+				from reportsubscription
+				where userid = ? and lastrun is not null
+				order by lastrun desc
+				limit 10",true,false,array($USER->id)));
 			break;
 		case "systemmessages":
-			$mergeditems = array_merge($mergeditems, QuickQueryMultiRow("select 'systemmessage' as type,'' as status,id,icon, message, modifydate as date from systemmessages where modifydate is not null order by modifydate desc limit 10",true));
+			$mergeditems = array_merge($mergeditems, QuickQueryMultiRow("
+				select 'systemmessage' as type, '' as status, id, icon, message, modifydate as date
+				from systemmessages
+				where modifydate is not null
+				order by modifydate desc
+				limit 10",true));
 			break;
 		default:
-			$mergeditems = array_merge($mergeditems,QuickQueryMultiRow("select 'list' as type,'Saved' as status, id, name, modifydate as date, lastused from list where userid=? and deleted = 0  and modifydate is not null order by modifydate desc limit 10",true,false,array($USER->id)));
 			$mergeditems = array_merge($mergeditems,QuickQueryMultiRow("
-			select 'message' as type,'Saved' as status,g.id as id, g.name as name, g.modified as date, g.deleted as deleted,
-			 sum(m.type='phone') as phone, sum(m.type='email') as email,sum(m.type='sms') as sms
-			from messagegroup g, message m where g.userid=? and g.deleted = 0 and g.modified is not null and m.messagegroupid = g.id
-			group by g.id order by g.modified desc limit 10 ",true,false,array($USER->id)));
-
-			$mergeditems = array_merge($mergeditems,QuickQueryMultiRow("select 'job' as type,status,id, name, modifydate as date,'modifydate' as datetype, type as jobtype,percentprocessed, deleted from job where userid=? and deleted = 0  and (finishdate is null || status='repeating') and modifydate is not null order by modifydate desc limit 10",true,false,array($USER->id)));
-			$mergeditems = array_merge($mergeditems,QuickQueryMultiRow("select 'job' as type,status,id, name, finishdate as date,'finishdate' as datetype,type as jobtype,percentprocessed, deleted from job where userid=? and deleted = 0  and status!='repeating' and finishdate is not null order by finishdate desc limit 10",true,false,array($USER->id)));
-			$mergeditems = array_merge($mergeditems,QuickQueryMultiRow("select 'report' as type,'Saved' as status,id, name, modifydate as date from reportsubscription where userid=? and modifydate is not null order by modifydate desc limit 10",true,false,array($USER->id)));
-			$mergeditems = array_merge($mergeditems,QuickQueryMultiRow("select 'report' as type,'Emailed' as status,id, name, lastrun as date from reportsubscription where userid=? and lastrun is not null order by lastrun desc limit 10",true,false,array($USER->id)));
-			$mergeditems = array_merge($mergeditems, QuickQueryMultiRow("select 'systemmessage' as type,'' as status,id,icon, message, modifydate as date from systemmessages where modifydate is not null order by modifydate desc limit 10",true));
+				select 'list' as type, 'Saved' as status, id, name, modifydate as date, lastused
+				from list
+				where userid = ? and not deleted and modifydate is not null
+				order by modifydate desc
+				limit 10",true,false,array($USER->id)));
+			$mergeditems = array_merge($mergeditems,QuickQueryMultiRow("
+				select 'message' as type, 'Saved' as status, mg.id as id, mg.name as name, mg.modified as date, mg.deleted as deleted,
+					sum(m.type='phone') as phone, sum(m.type='email') as email, sum(m.type='sms') as sms
+				from messagegroup mg
+					inner join message m on
+						(m.messagegroupid = mg.id)
+				where mg.userid = ? and not mg.deleted and mg.modified is not null and mg.type = 'notification'
+				group by mg.id
+				order by mg.modified desc
+				limit 10 ",true,false,array($USER->id)));
+			$mergeditems = array_merge($mergeditems,QuickQueryMultiRow("
+				select 'job' as type, status, id, name, modifydate as date, 'modifydate' as datetype, type as jobtype, deleted
+				from job
+				where userid=? and not deleted and (finishdate is null || status = 'repeating') and modifydate is not null and type != 'alert'
+				order by modifydate desc
+				limit 10",true,false,array($USER->id)));
+			$mergeditems = array_merge($mergeditems,QuickQueryMultiRow("
+				select 'job' as type, status, id, name, finishdate as date, 'finishdate' as datetype, type as jobtype, deleted
+				from job
+				where userid=? and not deleted and status != 'repeating' and finishdate is not null
+				order by finishdate desc
+				limit 10",true,false,array($USER->id)));
+			$mergeditems = array_merge($mergeditems, QuickQueryMultiRow("
+				select 'report' as type, 'Saved' as status, id, name, modifydate as date
+				from reportsubscription
+				where userid = ? and modifydate is not null
+				order by modifydate desc
+				limit 10",true,false,array($USER->id)));
+			$mergeditems = array_merge($mergeditems, QuickQueryMultiRow("
+				select 'report' as type, 'Emailed' as status, id, name, lastrun as date
+				from reportsubscription
+				where userid = ? and lastrun is not null
+				order by lastrun desc
+				limit 10",true,false,array($USER->id)));
+			$mergeditems = array_merge($mergeditems, QuickQueryMultiRow("
+				select 'systemmessage' as type, '' as status, id, icon, message, modifydate as date
+				from systemmessages
+				where modifydate is not null
+				order by modifydate desc
+				limit 10",true));
 			break;
 	}
 
