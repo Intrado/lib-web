@@ -118,6 +118,7 @@ if($isajax === true) {
 		"(select SQL_CALC_FOUND_ROWS mg.id as id, mg.modified as modified, mg.name as name, (mg.name +0) as digitsfirst
 		from messagegroup mg
 		where mg.userid = ? 
+			and mg.type = 'notification'
 			and not mg.deleted)
 		UNION
 		(select mg.id as id, mg.modified as modified, mg.name as name, (mg.name +0) as digitsfirst
