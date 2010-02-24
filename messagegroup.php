@@ -1050,8 +1050,11 @@ if ($button = $messagegroupsplitter->getSubmit()) {
 									}
 								}
 							} else {
-								// If overrideplaintext is false, just soft-delete existing messages without creating new ones.
-								// Otherwise, either update existing messages or soft-delete them, depending on the user inputs for the sourcemessagebody/translationitem/messagebody.
+								if ($formdestinationlanguagecode == 'en')
+									unset($_SESSION['autotranslatesourcetext']["{$formdestinationtype}-{$formdestinationsubtype}"]);
+									
+								// If overrideplaintext is false, just unassociated existing messages without creating new ones.
+								// Otherwise, either update existing messages or unassociate them, depending on the user inputs for the sourcemessagebody/translationitem/messagebody.
 								if (isset($emaildata) && isset($emaildata['overrideplaintext']) && !$emaildata['overrideplaintext']) {
 									$newmessagesneeded = $messagesneeded = array();
 								} else if (count($destination['languages']) > 1 &&
@@ -1115,7 +1118,8 @@ if ($button = $messagegroupsplitter->getSubmit()) {
 										continue;
 									}
 									
-									$newmessagesneeded[$existingmessage->autotranslate] = false;
+									if (isset($newmessagesneeded[$existingmessage->autotranslate]))
+										$newmessagesneeded[$existingmessage->autotranslate] = false;
 
 									if (!isset($messagesneeded[$existingmessage->autotranslate]) || !$messagesneeded[$existingmessage->autotranslate] || $messagebodies[$existingmessage->autotranslate] == "") {
 										$existingmessage->readHeaders();
@@ -1124,7 +1128,7 @@ if ($button = $messagegroupsplitter->getSubmit()) {
 											if (!$existingmessage->overrideplaintext) {
 												continue;
 											} else {
-												// Indicate that we should revert to using generated plain-text message from existing html messages because previously overridden plain-text messages are being deleted.
+												// Indicate that we should revert to using generated plain-text message from existing html messages because previously overridden plain-text messages are being unassociated.
 												$generateplaintext = true;
 											}
 										}
@@ -1133,7 +1137,7 @@ if ($button = $messagegroupsplitter->getSubmit()) {
 										$existingmessage->messagegroupid = null;
 										$existingmessage->update();
 										
-										// NOTE: Don't bother updating parts and attachments for deleted messages.
+										// NOTE: Don't bother updating parts and attachments for unassociated messages.
 										continue;
 									}
 									
@@ -1231,7 +1235,7 @@ if ($button = $messagegroupsplitter->getSubmit()) {
 									$newmessage->recreateParts($messagebodies[$autotranslate], null, $formdestinationtype == 'phone' ? $messagegroup->preferredgender : null);
 								}
 								
-								// Previously overridden plain-text messages have been deleted, so we need to generate new ones from any existing html messages. This time, we do not want to override plain-text.
+								// Previously overridden plain-text messages have been unassociated, so we need to generate new ones from any existing html messages. This time, we do not want to override plain-text.
 								if (isset($generateplaintext) && $generateplaintext) {
 									foreach ($messagegroup->getMessages() as $message) {
 										if ($message->type != 'email' ||
