@@ -94,6 +94,7 @@ startWindow("Options", 'padding: 3px;');
 					<tr><td><a href='jobsettings.php'>Job Settings</a></td></tr>
 					<tr><td><a href='jobtypemanagement.php'>Job Types</a></td></tr>
 					<tr><td><a href='messageintro.php'>Message Intro</a></td></tr>
+					<?=($USER->authorize('manageclassroommessaging')?"<tr><td><a href='classroommessagetemplate.php'>Classroom Messaging Template</a></td></tr>":"")?>
 				</table>
 			</td>
 			<td>
