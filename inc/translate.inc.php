@@ -1,14 +1,42 @@
 <?
 
-// TODO: Fix translate.inc.php to always index by language code; different languages can potentially have the same name, although it would be bad for usability.
-
-function getTranslationLanguages($indexbyname = false) {
-	$languages = array("arabic"=>"ar", "bulgarian"=>"bg", "catalan"=>"ca", "chinese"=>"zh", "croatian"=>"hr", "czech"=>"cs", "danish"=>"da", "dutch"=>"nl", "english"=>"en", "filipino" => "tl","finnish"=>"fi", "french"=>"fr", "german"=>"de", "greek"=>"el", "hebrew"=>"iw", "hindi"=>"hi", "indonesian"=>"id", "italian"=>"it", "japanese"=>"ja", "korean"=>"ko", "latvian"=>"lv", "lithuanian"=>"lt", "norwegian"=>"no", "polish"=>"pl", "portuguese"=>"pt-PT", "romanian"=>"ro", "russian"=>"ru", "serbian"=>"sr", "slovak"=>"sk", "slovenian"=>"sl", "spanish"=>"es", "swedish"=>"sv", "ukrainian"=>"uk", "vietnamese"=>"vi");
-	
-	if (!$indexbyname)
-		$languages = array_flip($languages);
-		
-	return $languages;
+function getTranslationLanguages() {
+	return array(
+		"ar" => "arabic",
+		"bg" => "bulgarian",
+		"ca" => "catalan",
+		"zh" => "chinese",
+		"hr" => "croatian",
+		"cs" => "czech",
+		"da" => "danish",
+		"nl" => "dutch",
+		"en" => "english",
+		"tl" => "filipino",
+		"fi" => "finnish",
+		"fr" => "french",
+		"de" => "german",
+		"el" => "greek",
+		"iw" => "hebrew",
+		"hi" => "hindi",
+		"id" => "indonesian",
+		"it" => "italian",
+		"ja" => "japanese",
+		"ko" => "korean",
+		"lv" => "latvian",
+		"lt" => "lithuanian",
+		"no" => "norwegian",
+		"pl" => "polish",
+		"pt-PT" => "portuguese",
+		"ro" => "romanian",
+		"ru" => "russian",
+		"sr" => "serbian",
+		"sk" => "slovak",
+		"sl" => "slovenian",
+		"es" => "spanish",
+		"sv" => "swedish",
+		"uk" => "ukrainian",
+		"vi" => "vietnamese"
+	);
 }
 
 function googletranslate($text, $lang_pairs) {
@@ -40,8 +68,6 @@ function googletranslate($text, $lang_pairs) {
 			error_log("Unable to read from $url");
 			return false;
 		}
-
-		//error_log($response);
 		
 		$decoded = json_decode($response);
 		if($decoded->responseStatus == 200) {
@@ -57,19 +83,16 @@ function googletranslate($text, $lang_pairs) {
 			error_log("Google Translation Error: " . $response);
 			return false;
 		}
-		//return $decoded;
-		//echo json_encode($decoded);
 	}
 }
 
-// $indexbycode indicates that $languagearray is indexed by the language code; if false, it indicates that $languagearray is indexed by the language name.
 function translate_fromenglish($englishtext,$languagearray) {
 	
 	if(!isset($englishtext) || !isset($languagearray)) {
 		return false;
 	}
 		
-	$supportedlanguages = getTranslationLanguages(false);
+	$supportedlanguages = getTranslationLanguages();
 
 	$src_text = $englishtext;
 
@@ -104,7 +127,7 @@ function translate_toenglish($anytext,$anylanguage) {
 	}
 
 	$lang_pairs = "";
-	$supportedlanguages = getTranslationLanguages(true);
+	$supportedlanguages = getTranslationLanguages();
 	$language = $anylanguage;
 	$text = $anytext;
 
@@ -116,7 +139,7 @@ function translate_toenglish($anytext,$anylanguage) {
 	$language = strtolower($language);
 	if(array_key_exists($language,$supportedlanguages)) {
 		$text = "&q=" . urlencode($text);
-		$lang_pairs = "&langpair=" . urlencode($supportedlanguages[$language] . "|en");
+		$lang_pairs = "&langpair=" . urlencode($language . "|en");
 	}
 	return googletranslate($text, $lang_pairs);
 }
