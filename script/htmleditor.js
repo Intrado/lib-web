@@ -64,11 +64,9 @@ function saveHtmlEditorContent(existinghtmleditorobject) {
 
 		var html = cleanFieldInserts(tempdiv.innerHTML).replace(/&lt;&lt;/g, '<<').replace(/&gt;&gt;/g, '>>');
 
-		if (images.length < 1) {
-			// CKEditor inserts blank tags even if the user has deleted everything.
-			if (html.stripTags().strip() == '')
-				html = '';
-		}
+		// CKEditor inserts blank tags even if the user has deleted everything.
+		if (html.stripTags().strip().replace(/&nbsp;/g, '') == '')
+			html = '';
 
 		textarea.value = html;
 		textarea.fire('HtmlEditor:SavedContent');
@@ -81,7 +79,7 @@ function saveHtmlEditorContent(existinghtmleditorobject) {
 // Example: &lt;&lt;First <b>Name</b>&gt;&gt; becomes <b>&lt;&lt;First Name&gt;&gt;
 // NOTE: It is assumed that the tokens are &lt;&lt; and &gt;&gt; instead of << and >>.
 function cleanFieldInserts(html) {
-	var regex = /&lt;(<.*?>)*?&lt;(.+)?&gt;(<.*?>)?&gt;/g;
+	var regex = /&lt;(<.*?>)*?&lt;(.+?)&gt;(<.*?>)*?&gt;/g;
 	var matches = html.match(regex);
 	
 	if (!matches)
