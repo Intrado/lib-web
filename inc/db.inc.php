@@ -185,5 +185,13 @@ function DBConnect($host, $user, $pass, $database) {
 	}
 }
 
+function DBParamListString ($count) {
+	if ($count > 1)
+		return "?" . str_repeat(",?",$count-1);
+	else if ($count == 1)
+		return "?";
+	else
+		return "";
+}
 
 ?>
