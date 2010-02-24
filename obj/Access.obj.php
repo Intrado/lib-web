@@ -26,10 +26,10 @@ class Access extends DBMappedObject {
 		}
 	}
 	
-	function getValue($action) {
+	function getValue($action, $default = false) {
 		$this->loadPermissions();
 		$permission = $this->getPermission($action);
-		return $permission ? $permission->value : false;
+		return $permission ? $permission->value : $default;
 	}
 	
 	function getPermission($action) {
