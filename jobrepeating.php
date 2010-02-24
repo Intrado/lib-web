@@ -22,6 +22,8 @@ require_once("obj/FieldMap.obj.php");
 include_once("obj/Schedule.obj.php");
 require_once("obj/ValDuplicateNameCheck.val.php");
 require_once("obj/MessageGroupSelectMenu.fi.php");
+require_once("obj/WeekRepeat.fi.php");
+require_once("obj/WeekRepeat.val.php");
 
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization

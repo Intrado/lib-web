@@ -90,90 +90,6 @@ class JobListItem extends FormItem {
 	}
 }
 
-class WeekRepeatItem extends FormItem {
-	function render ($value) {
-		$n = $this->form->name."_".$this->name;
-		$str = '
-				<input id="'.$n.'" name="'.$n.'" type="hidden" value="' . escapehtml(json_encode($value)) . '"/>
-				<table border="0" cellpadding="2" cellspacing="1" class="list">
-					<tr class="listHeader" align="left" valign="bottom">
-						<th>Su</th>
-						<th>M</th>
-						<th>Tu</th>
-						<th>W</th>
-						<th>Th</th>
-						<th>F</th>
-						<th>Sa</th>
-						<th>Time</th>
-					</tr>
-					<tr>
-						<td><input id="itm0_'.$n.'" type="checkbox" '. ($value[0] ? 'checked' : '').' /></td>
-						<td><input id="itm1_'.$n.'" type="checkbox" '. ($value[1] ? 'checked' : '').' /></td>
-						<td><input id="itm2_'.$n.'" type="checkbox" '. ($value[2] ? 'checked' : '').' /></td>
-						<td><input id="itm3_'.$n.'" type="checkbox" '. ($value[3] ? 'checked' : '').' /></td>
-						<td><input id="itm4_'.$n.'" type="checkbox" '. ($value[4] ? 'checked' : '').' /></td>
-						<td><input id="itm5_'.$n.'" type="checkbox" '. ($value[5] ? 'checked' : '').' /></td>
-						<td><input id="itm6_'.$n.'" type="checkbox" '. ($value[6] ? 'checked' : '').' /></td>
-					<td>';
-
-		$str .= '<select id="itm7_'.$n.'">';
-		foreach ($this->args['timevalues'] as $selectvalue => $selectname) {
-			$checked = $value[7] == $selectvalue;
-			$str .= '<option value="'.escapehtml($selectvalue).'" '.($checked ? 'selected' : '').' >'.escapehtml($selectname).'</option>
-				';
-		}
-		$str .= '</select>';
-
-		$str .=		'</td>
-					</tr>
-				</table>
-				<script type="text/javascript" language="javascript">
-					function makerepeat(e) {
-						var n = "' .$n. '";
-						var values = Array();
-						for(var i=0;i < 7;i++) {
-							values.push($("itm" + i + "_" +  n).checked);
-						}
-						values.push($("itm7_" +  n).getValue());
-						$(n).value = values.toJSON();
-						form_do_validation($("' . $this->form->name . '"), $("' . $n . '"));
-					}
-					document.observe("dom:loaded", function() {
-						var n = "' .$n. '";
-						for(var i=0;i < 8;i++) {
-							$("itm" + i + "_"+ n).observe("change",makerepeat);
-						}
-					});
-				</script>
-		';
-		return $str;
-	}
-}
-
-class ValWeekRepeatItem extends Validator {
-	var $onlyserverside = true;
-	function validate ($value, $args) {
-		global $USER;
-
-		if(!is_array($value)) {
-			$value = json_decode($value);
-		}
-
-		if(count($value) != 8 )
-			return _L('An error occurred, try reloading the page'); // decoding problem or anything else
-		$time = strtotime($value[7]);
-		if($time < strtotime($USER->getCallEarly()))
-			return _L('Time is can not be before %1$s',$USER->getCallEarly());
-		else if($time > strtotime($USER->getCallLate()))
-			return _L('Time is can not be after %1$s',$USER->getCallLate());
-		for($i = 0;$i < 7;$i++){
-			if(!is_bool($value[$i]))
-				return _L('Invalid Input');
-		}
-		return true;
-	}
-}
-
 class ValTranslationExpirationDate extends Validator {
 	var $onlyserverside = true;
 	function validate ($value, $args,$requiredvalues) {
@@ -405,7 +321,7 @@ $helpsteps[] = _L("The name of your job. The best names are brief and discriptiv
 		for ($x = 0; $x < 7; $x++) {
 			$repeatvalues[] = isset($scheduledows[$x]);
 		}
-		$repeatvalues[] = date("g:i a", strtotime($schedule->time));
+		$repeatvalues[7] = date("g:i a", strtotime($schedule->time));
 
 		$helpsteps[] = _L("");  // Guide for the whole scheduling section
 		$formdata["repeat"] = array(
