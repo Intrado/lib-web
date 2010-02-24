@@ -296,14 +296,13 @@ class TranslationItem extends FormItem {
 					var mainTextarea = $(section+"text");
 					
 					// NOTE: Edit the existing value instead of overwriting it completely because there may be some properties that we want to keep, like state.language.
-					state.editWhenDisabled = 
 					state.enabled = $(section + "translatecheck").checked;
 					state.englishText = $(section + "englishText").value;
 					state.override = (($(section + "translatecheck").checked)?$(section + "override").checked:false);
 					state.text = mainTextarea.value;
 					
 					var statejson = Object.toJSON(state);
-						
+					
 					if ((mainTextarea.hasClassName("EditWhenDisabled") &&
 							state.enabled &&
 							!state.override &&
