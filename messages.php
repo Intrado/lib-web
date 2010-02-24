@@ -143,7 +143,7 @@ if($isajax === true) {
 				sum(m.type='phone') as phone, sum(m.type='email') as email, sum(m.type='sms') as sms,
 				p.action as publishaction, p.id as publishid, u.login as owner, (mg.name +0) as digitsfirst
 			from messagegroup mg
-			join message m on
+			left join message m on
 				(m.messagegroupid = mg.id)
 			join user u on
 				(mg.userid = u.id)
