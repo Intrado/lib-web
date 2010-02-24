@@ -63,6 +63,18 @@ $value = implode("\n", $staticvalues);
 // if organization
 if ("oid" == $fieldmap->fieldnum) {
 	$organizations = QuickQueryList("select id, orgkey from organization where not deleted", true);
+
+	if (count($organizations) > 5) {
+		$formdata["checkall"] = array (
+			"label" => "",
+			"control" => array("FormHtml", "html" => icon_button(_L('Check All'),"group_add",'checkAllCheckboxes(true);') . icon_button(_L('Uncheck All'),"group_delete",'checkAllCheckboxes(false);')),
+			"helpstep" => 1
+		);
+	}
+	$control = array("MultiCheckbox", "values" => $organizations);
+	if (count($organizations) > 9) {
+		$control = array("MultiCheckbox", "height" => "150px", "values" => $organizations);
+	}
 	$formdata["values"] = array(
    		"label" => _L("Field Value(s)"),
    		"fieldhelp" => _L('Select the organizations that subscribers may belong.'),
@@ -71,7 +83,7 @@ if ("oid" == $fieldmap->fieldnum) {
 			array("ValRequired"),
             array("ValInArray", 'values'=>array_keys($organizations))
       		),
-      	"control" => array("MultiCheckbox","values" => $organizations),
+      	"control" => $control,
       	"helpstep" => 1
 	);
 
@@ -251,5 +263,26 @@ echo $form->render();
 
 endWindow();
 
+?>
+<script>
+function checkAllCheckboxes(docheck) {
+
+	var form = document.forms[0].elements;
+	for (var i = 0; i < form.length; i++) {
+		if (form[i].type == "checkbox") {
+
+			if (docheck) {
+				if (!form[i].checked)
+					form[i].click();
+			} else {
+				if (form[i].checked)
+					form[i].click();
+			}
+		}
+	}
+}
+</script>
+
+<?
 include_once("navbottom.inc.php");
 ?>
