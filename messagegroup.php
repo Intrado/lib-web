@@ -735,7 +735,8 @@ if (!$messagegroup->deleted) {
 	$buttons = array(icon_button(_L("Done"),"tick", "form_submit_all(null, 'done', $('formswitchercontainer'));", null), icon_button(_L("Cancel"),"cross",null,"messages.php"));
 	$messagegrouptabberarray = array(new FormTabber("destinationstabber", "", null, "horizontaltabs", $destinationlayoutforms));
 } else {
-	$buttons = array(icon_button(_L("Next"),"tick", "form_submit_all(null, 'next', $('formswitchercontainer'));", null), icon_button(_L("Cancel"),"cross",null,"messages.php"));
+	$buttons = array(icon_button(_L("Cancel"),"cross",null,"messages.php"),
+		icon_button(_L("Next"),"arrow_right", "form_submit_all(null, 'next', $('formswitchercontainer'));", null));
 	$messagegrouptabberarray = array();
 }
 
