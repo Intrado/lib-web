@@ -260,14 +260,8 @@ class SMAPI{
 				}
 			}
 			
-			$parts = $message->parse($messagetext);
-			$voiceid = QuickQuery("select id from ttsvoice where languagecode = 'en' and gender = 'female'");
-			QuickUpdate("delete from messagepart where messageid=$message->id");
-			foreach ($parts as $part) {
-				$part->voiceid = $voiceid;
-				$part->messageid = $message->id;
-				$part->create();
-			}
+			$message->recreateParts($messagetext, null, null);
+			
 			$result["resultcode"] = "success";
 			$result["result"] = true;
 			return $result;
