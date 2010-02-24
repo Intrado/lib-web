@@ -261,14 +261,12 @@ function audio($name) {
 // such as replacing HR tags with dashes, or formatting tables as fixed width, etc..
 function html_to_plain($html) {
 	// Escape data-field-insert tags.
-	$html = str_replace('<<', '&lt;&lt;', $html);
-	$html = str_replace('>>', '&gt;&gt;', $html);
+	$html = str_replace(array('<<', '>>'), array('&lt;&lt;', '&gt;&gt;'), $html);
 	
 	$plain = strip_tags($html);
 	
-	// Unescape data-field-insert tags.
-	$plain = str_replace('&lt;&lt;', '<<', $plain);
-	$plain = str_replace('&gt;&gt;', '>>', $plain);
+	// Unescape data-field-insert tags, and &nbsp; characters.
+	$plain = str_replace(array('&lt;&lt;','&gt;&gt;', '&nbsp;'), array('<<', '>>', ''), $plain);
 	
 	return $plain;
 }
