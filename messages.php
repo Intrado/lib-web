@@ -140,8 +140,8 @@ if($isajax === true) {
 		$mergeditems = QuickQueryMultiRow(
 			"select 'message' as type,'Saved' as status, 
 				mg.id as id, mg.name as name, mg.modified as date, mg.deleted as deleted, 
-				sum(m.type='phone') as phone, sum(m.type='email') as email,
-				sum(m.type='sms') as sms, p.action as publishaction, p.id as publishid, u.login as owner
+				sum(m.type='phone') as phone, sum(m.type='email') as email, sum(m.type='sms') as sms,
+				p.action as publishaction, p.id as publishid, u.login as owner, (mg.name +0) as digitsfirst
 			from messagegroup mg
 			join message m on
 				(m.messagegroupid = mg.id)
@@ -151,7 +151,7 @@ if($isajax === true) {
 				(p.userid = ? and p.messagegroupid = m.messagegroupid)
 			where mg.id in (". implode(",", $msgGroupIds) .")
 			group by mg.id
-			order by mg.$orderby, mg.id",
+			order by $orderby, mg.id",
 			true, false, array($USER->id));
 	} else {
 		$mergeditems = array();
