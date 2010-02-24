@@ -524,8 +524,8 @@ function makeAccordionSplitter($type, $subtype, $languagecode, $permanent, $pref
 				'title' => '',
 				'formdata' => array(makeFormHtml('
 					<div style="float:right">'
-					. icon_button(_L('Show Tools'), 'tick', NULL, NULL, ' id="showaccordiontools" style="display:none" ')
-					. icon_button(_L('Hide Tools'), 'tick', NULL, NULL, ' id="hideaccordiontools" ')
+					. button(_L('Show Tools'), NULL, NULL, ' id="showaccordiontools" style="display:none" ')
+					. button(_L('Hide Tools'), NULL, NULL, ' id="hideaccordiontools" ')
 					. '<div style="clear:both"></div>
 					</div>
 					
