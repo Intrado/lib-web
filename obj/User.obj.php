@@ -19,10 +19,7 @@ class User extends DBMappedObject {
 	var $staffpkey;
 	var $importid;
 	var $lastimport;
-	
-	var $rules = false; //local cache of rules
-	var $hassections = null; // local cache of boolean indicating that there are sections that the user can see.
-	
+
 	//new constructor
 	function User ($id = NULL) {
 		$this->_allownulls = true;
@@ -83,22 +80,24 @@ class User extends DBMappedObject {
 	
 	// Returns true if there are sections that the user is permitted to see.
 	function hasSections() {
-		if ($this->hassections === null) {
+		global $USERHASSECTIONS;
+		
+		if (!isset($USERHASSECTIONS)) {
 			// If the user cannot see any organizations then he cannot see any sections either.
 			if (count($this->organizations()) < 1) {
-				$this->hassections = false;
+				$USERHASSECTIONS = false;
 			// If the user has section associations, then he can obviously see those sections.
 			} else if (QuickQuery('select sectionid from userassociation where type="section" and userid = ?', false, array($this->id))) {
-				$this->hassections = true;
+				$USERHASSECTIONS = true;
 			// If the user does not have section associations, then find out if any of the organizations that he can see has a section.
 			} else if (QuickQuery('select id from section where organizationid in ('.implode(',', array_keys($this->organizations())).')')) {
-				$this->hassections = true;
+				$USERHASSECTIONS = true;
 			} else {
-				$this->hassections = false;
+				$USERHASSECTIONS = false;
 			}
 		}
 		
-		return $this->hassections;
+		return $USERHASSECTIONS;
 	}
 	
 	function authorizeField($field) {
@@ -112,9 +111,11 @@ class User extends DBMappedObject {
 	}
 
 	function getRules() {
-		if ($this->rules === false)
-			$this->rules = DBFindMany("Rule","from rule r inner join userassociation ua on r.id = ua.ruleid where userid =?", 'r', array($this->id));
-		return $this->rules;
+		global $USERRULES;
+		
+		if (!isset($USERRULES))
+			$USERRULES = DBFindMany("Rule","from rule r inner join userassociation ua on r.id = ua.ruleid where userid =?", 'r', array($this->id));
+		return $USERRULES;
 	}
 
 	// Returns associated organizations or all organizations if unrestricted.
