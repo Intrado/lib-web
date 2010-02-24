@@ -586,6 +586,14 @@ _L('Security & Administrator Controls'),
 		"control" => array("CheckBox"),
 		"helpstep" => 10
 	),
+	"manageclassroommessaging" => array(
+		"label" => _L('Edit Classroom Messaging Template'),
+		"fieldhelp" => _L('Allows users to view and edit the classroom messaging template.'),
+		"value" => $obj->getValue("manageclassroommessaging"),
+		"validators" => array(),
+		"control" => array("CheckBox"),
+		"helpstep" => 10
+	)
 );
 
 //remove any formdata for features that are not enabled
@@ -698,6 +706,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 			$obj->setPermission("messageconfirmation", (bool)$postdata['messageconfirmation']);
 			$obj->setPermission("publishmessagegroup", (bool)$postdata['publishmessagegroup']);
 			$obj->setPermission("subscribemessagegroup", (bool)$postdata['subscribemessagegroup']);
+			$obj->setPermission("manageclassroommessaging", (bool)$postdata['manageclassroommessaging']);
 
 			if(getSystemSetting("_hasportal", false)) {
 				$obj->setPermission("portalaccess", (bool)$postdata['portalaccess']);
