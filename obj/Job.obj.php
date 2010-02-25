@@ -51,7 +51,7 @@ class Job extends DBMappedObject {
 		$messages = DBFindMany("Message", "from message where messagegroupid=$messagegroupid");
 		foreach ($messages as $message) {
 			// NOTE: $message-copy() already calls $newmessage->create().
-			$newmessage = $message->copy();
+			$newmessage = $message->copy($newmessagegroup->id);
 		}
 
 		return $newmessagegroup;
