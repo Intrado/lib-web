@@ -20,7 +20,7 @@ require_once("obj/Person.obj.php");
 // Authorization
 ////////////////////////////////////////////////////////////////////////////////
 
-if (!getSystemSetting('_hastargetedmessage', false) && !$USER->authorize('viewsystemreports') && !$USER->authorize('targetedmessage')) {
+if(!(getSystemSetting('_hastargetedmessage', false) && $USER->authorize('viewsystemreports') && $USER->authorize("targetedmessage"))){
 	redirect('unauthorized.php');
 }
 
@@ -48,6 +48,9 @@ $data = array();
 $titles = array();
 $formatters = array();
 $customxt = array();
+$displaydate = '';
+$startdate = '';
+$enddate = '';
 
 // ====== Note: Same date SQL is used for person and org report below ================
 if(isset($options['reldate']) && $options['reldate'] != ""){
@@ -57,12 +60,13 @@ if(isset($options['reldate']) && $options['reldate'] != ""){
 	$datesql = " AND (a.date >= '$startdate' and a.date < date_add('$enddate',interval 1 day) )";
 } else {
 	$datesql = " AND Date(a.occurence) = CURDATE()";
+	$enddate = $startdate = date("Y-m-d", time());
 }
 // ===================================================================================
 
 if($options['classroomreporttype'] == 'person') {
 	$pid = $_SESSION['report']['options']['pid'];
-	$TITLE = _L('Classroom Comment Report: %s',Person::getFullName($pid));
+	$TITLE = _L('Classroom Comment Report: %s (From: %s To: %s)',Person::getFullName($pid),$startdate,$enddate);
 
 
 	$result = Query("SELECT tm.id,tm.messagekey,e.notes,a.date,a.time,CONCAT(u.firstname,' ',u.lastname),s.skey,tm.overridemessagegroupid
@@ -103,7 +107,7 @@ if($options['classroomreporttype'] == 'person') {
 					"5" => "fmt_null",
 					"6" => "fmt_null");
 } else if($options['classroomreporttype'] == 'organization') {
-	$TITLE = _L('Classroom Comment Report:');
+	$TITLE = _L('Classroom Comment Report (From: %s To: %s)',$startdate,$enddate);
 	$data = QuickQueryMultiRow("SELECT o.orgkey, count(a.id)
 					FROM alert a
 					LEFT JOIN event e ON ( a.eventid = e.id )

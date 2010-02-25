@@ -10,11 +10,12 @@ require_once("inc/utils.inc.php");
 require_once("obj/Validator.obj.php");
 require_once("obj/Form.obj.php");
 require_once("obj/FormItem.obj.php");
+
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization
 ////////////////////////////////////////////////////////////////////////////////
 
-if (!getSystemSetting('_hastargetedmessage', false) && !$USER->authorize('viewsystemreports') && !$USER->authorize('targetedmessage')) {
+if(!(getSystemSetting('_hastargetedmessage', false) && $USER->authorize('viewsystemreports') && $USER->authorize("targetedmessage"))){
 	redirect('unauthorized.php');
 }
 
@@ -39,7 +40,6 @@ if (isset($_GET['type'])) {
 
 if($doredirect)
 	redirect();
-
 
 ////////////////////////////////////////////////////////////////////////////////
 // Data Handling
@@ -150,17 +150,16 @@ if($options['classroomreporttype'] == 'person') {
 	$helpstepscount++;
 }
 
-
 $formdata["dateoptions"] = array(
 	"label" => _L("Date Options"),
 	"value" => json_encode(array(
-		"reldate" => isset($options['reldate']) ? $options['reldate'] : 'xdays',
-		"xdays" => isset($options['lastxdays']) ? $options['lastxdays'] : '30',
+		"reldate" => isset($options['reldate']) ? $options['reldate'] : 'today',
+		"xdays" => isset($options['lastxdays']) ? $options['lastxdays'] : '',
 		"startdate" => isset($options['startdate']) ? $options['startdate'] : '',
 		"enddate" => isset($options['enddate']) ? $options['enddate'] : ''
 	)),
-	"control" => array("ReldateOptions", "rangedonly" => true),
-	"validators" => array(array("ValRequired"), array("ValReldate", "rangedonly" => true, "defaultxdays" => 7)),
+	"control" => array("ReldateOptions"),
+	"validators" => array(array("ValReldate")),
 	"helpstep" => $helpstepscount
 );
 
