@@ -40,6 +40,10 @@ $cutoff = "22:00";
 // Action/Request Processing
 ////////////////////////////////////////////////////////////////////////////////
 
+if (isset($_POST['settab'])) {
+	$USER->setSetting("classroomtab", $_POST['settab']);
+	exit();
+}
 
 if (isset($_POST['eventContacts']) && isset($_POST['eventMessage']) && isset($_POST['isChecked']) && isset($_POST['sectionid'])) {
 	header('Content-Type: application/json');
@@ -135,13 +139,13 @@ if (isset($_GET['sectionid'])) {
 		$firstnamefield = FieldMap::getFirstNameField();
 		$lastnamefield = FieldMap::getLastNameField();
 
-		$res = Query("select p.id, p.pkey,concat(p.$firstnamefield,'&nbsp;', p.$lastnamefield) name
+		$res = Query("select p.id, p.pkey,concat(p.$firstnamefield,' ', p.$lastnamefield) name
 											from person p join personassociation pa on (p.id = pa.personid)
 											where pa.type = 'section' and sectionid = ? order by p.$firstnamefield,p.$lastnamefield",false,array($id));
 		while($row = DBGetRow($res)){
 			$obj = null;
-			$obj->pkey = $row[1];
-			$obj->name = $row[2];
+			$obj->pkey = escapehtml($row[1]);
+			$obj->name = escapehtml($row[2]);
 			$response->people[$row[0]] = $obj;
 		}
 		if(isset($response->people) && count($response->people) > 0) {
@@ -187,7 +191,7 @@ if (isset($_GET['search'])) {
 		for($i = 0;$i < $searchcount && (trim($searchwords[$i]) == "" || stripos($title,trim($searchwords[$i])) !== false);$i++);
 		if($i == $searchcount) {
 			$obj = null;
-			$obj->title = $title;
+			$obj->title = escapehtml($title);
 			$obj->categoryid = $message->targetedmessagecategoryid;
 			$response[$message->id] = $obj;
 		}
@@ -240,8 +244,14 @@ echo button_bar(icon_button("Done Picking Comments", "tick", null, $redirect), '
 
 <label>Section: <select id="classselect" name="classselect">
 <?
-foreach($sections as $section)
-	echo '<option value="'.$section->id.'">'.escapehtml($section->skey).'</option>';
+
+if($sections) {
+	foreach($sections as $section)
+		echo '<option value="'.$section->id.'">'.escapehtml($section->skey).'</option>';
+} else {
+	echo '<option value="">' . _L('-- No Section Available --') . '</option>';
+}
+
 ?>
 </select></label><br />
 
@@ -259,7 +269,7 @@ foreach($sections as $section)
 		</td>
 
 		<td style="vertical-align:top;width:100%">
-			<div id="theinstructions"><img src="img/icons/fugue/arrow_180.png" alt="" style="vertical-align:middle;"/> Click on a Contact to Start</div>
+			<div id="theinstructions"><img src="img/icons/fugue/arrow_180.gif" alt="" style="vertical-align:middle;"/> Click on a Contact to Start</div>
 
 
 			<div id='tabsContainer' style='margin-right:0px;display:none;vertical-align:middle;'></div>
@@ -285,7 +295,7 @@ foreach($sections as $section)
 						echo '<div id="msg-' . $message->id .'" class="classroomcomment" category="'.$categoryid.'">
 								<img id="msgchk-' . $message->id .'" class="msgchk" src="img/checkbox-clear.png" alt=""/>
 								<div id="msgtxt-' . $message->id .'" class="msgtxt" >'
-								. $title .
+								. escapehtml($title) .
 								' </div>
 								<img src="img/icons/fugue/marker.gif" alt="Mark" title="Mark this Comment" style="float:right;margin:2px" onclick="markcomment(\'msg-\',\'' . $message->id .'\')" />
 								<div style="clear:both;">' .
@@ -306,7 +316,6 @@ foreach($sections as $section)
 					<div id="searchContainer" style="clear:both;margin:10px;padding-top:10px;display:none;"><input id="searchbox" class="searchbox" type="text" value="" size="50" style="float:left"/><?= icon_button("Search", "magnifier", 'dosearch(); return false;', null) ?></div>
 					<div id="searchResult" style="clear:both;"></div>
 				</div>
-
 			</div>
 		</td>
 	</tr>
@@ -326,6 +335,9 @@ endWindow();
 	var categoryinfo = $H(<?= json_encode($categoriesjson) ?>);
 	var requesturl = '<?= $requesturl ?>';
 	var timetocutoff = new Date(<?= (strtotime($cutoff) - 3600) . '000' ?>).getTime() / 1000;
+	document.observe("dom:loaded", function() {
+		tabs.show_section('lib-<?=  $USER->getSetting("classroomtab", "search") ?>');
+	});
 </script>
 <?
 include_once("navbottom.inc.php");

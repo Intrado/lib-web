@@ -648,6 +648,8 @@
 			} else{
 				$('nowedit-' + event.memo.section.substr(4)).update($('nowedit-' + event.memo.currentSection.substr(4)).innerHTML);
 			}
+
+			new Ajax.Request(requesturl,{method:'post',parameters:{settab:event.memo.section.substring(4)}});
 		});
 		var searchBox = $('searchbox');
 

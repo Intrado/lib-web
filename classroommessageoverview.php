@@ -81,7 +81,7 @@ $orderby = "order by date desc, p.$firstnamefield,p.$lastnamefield";
 
 
 if($mode == 'comments') {
-	$orderby = "order by date desc,tm.messagekey";
+	$orderby = "order by date desc";
 }
 
 $query = "select SQL_CALC_FOUND_ROWS
