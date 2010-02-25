@@ -127,7 +127,7 @@ if (CheckFormSubmit($f,$s)){
 				createLimitedUser($limitedusername, $limitedpassword, $newdbname, $newdb);
 
 				// 'schoolmessenger' user
-				createSMUserProfile($newdb);
+				createSMUserProfile($newdb, $newdbname);
 
 				$query = "INSERT INTO `fieldmap` (`fieldnum`, `name`, `options`) VALUES
 							('f01', 'First Name', 'searchable,text,firstname,subscribe,dynamic'),
