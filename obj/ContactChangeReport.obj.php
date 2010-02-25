@@ -73,7 +73,7 @@ class ContactChangeReport extends ReportGenerator {
 	}
 
 	function runHtml(){
-		$max = 100;
+		$max = 10; // TODO set back to 100
 		$ffields = FieldMap::getOptionalAuthorizedFieldMapsLike('f');
 		$gfields = FieldMap::getOptionalAuthorizedFieldMapsLike('g');
 		$fields = $ffields + $gfields;
@@ -87,6 +87,7 @@ class ContactChangeReport extends ReportGenerator {
 
 		$pagestart = isset($this->params['pagestart']) ? $this->params['pagestart'] : 0;
 		$query .= "limit $pagestart, $max";
+
 		$result = Query($query, $this->_readonlyDB);
 		$total = QuickQuery("select found_rows()", $this->_readonlyDB);
 
@@ -256,7 +257,9 @@ class ContactChangeReport extends ReportGenerator {
 
 	function runCSV($options = false){
 
-		$fields = FieldMap::getOptionalAuthorizedFieldMaps();
+		$ffields = FieldMap::getOptionalAuthorizedFieldMapsLike('f');
+		$gfields = FieldMap::getOptionalAuthorizedFieldMapsLike('g');
+		$fields = $ffields + $gfields;
 		$fieldlist = array();
 		foreach($fields as $field){
 			$fieldlist[$field->fieldnum] = $field->name;
@@ -313,10 +316,63 @@ class ContactChangeReport extends ReportGenerator {
 			echo "\r\n";
 		}
 
-		$result = Query($this->query, $this->_readonlyDB);
 
+		// batch query by 100 persons, cannot load all 100k into memory
+		$batchsize = 100;
+		$pagestart = 0;
+		$total = 1;
+		do {
+		$query = $this->query;
+		$query .= " limit $pagestart, $batchsize";
+		$result = Query($query, $this->_readonlyDB);
+		$total = QuickQuery("select found_rows()", $this->_readonlyDB);
+		
+		//fetch data with main query and populate arrays using personid as the key
+		$personlist = array();
+		$personidlist = array();
 		while ($row = DBGetRow($result)) {
+			$personlist[$row[1]] = $row;
+			$personidlist[] = $row[1];
+		}
+		$pagestart += count($personidlist);
 
+		// for each person, get maxphones, maxemails, maxsms to handle any missing records
+		$query = "select p.id,";
+		for ($seq=0; $seq<$maxphones; $seq++) {
+			$query .= "p$seq.phone, p$seq.editlockdate,";
+		}
+		for ($seq=0; $seq<$maxemails; $seq++) {
+			$query .= "e$seq.email, e$seq.editlockdate,";
+		}
+		if ($hassms) {
+			for ($seq=0; $seq<$maxsms; $seq++) {
+				$query .= "s$seq.sms, s$seq.editlockdate,";
+			}
+		}
+		$query = substr($query, 0, strlen($query)-1); // chop trailing comma
+		$query .= " from person p ";
+		for ($seq=0; $seq<$maxphones; $seq++) {
+			$query .= "left join phone p$seq on (p$seq.personid=p.id and p$seq.sequence=$seq) ";
+		}
+		for ($seq=0; $seq<$maxemails; $seq++) {
+			$query .= "left join email e$seq on (e$seq.personid=p.id and e$seq.sequence=$seq) ";
+		}
+		if ($hassms) {
+			for ($seq=0; $seq<$maxsms; $seq++) {
+				$query .= "left join sms s$seq on (s$seq.personid=p.id and s$seq.sequence=$seq) ";
+			}
+		}
+		$query .= "where p.id in ('" . implode("','",$personidlist) . "')";
+		
+		$result = Query($query, $this->_readonlyDB);
+		// store results indexed by person id $row[0]
+		$destinationdata = array();
+		while($row = DBGetRow($result)){
+			$destinationdata[$row[0]] = $row;
+		}
+
+		// for each person, write a row to the file
+		foreach ($personlist as $row) {
 			// id, name, address, org
 			$reportarray = array($row[0], $row[2], $row[3], $row[4], $row[5]);
 
@@ -332,61 +388,13 @@ class ContactChangeReport extends ReportGenerator {
 				}
 				$count++;
 			}
-			
-			// every phone
-			$phonelist = DBFindMany("Phone", "from phone where personid = '$row[1]' order by sequence", false, false, $this->_readonlyDB);
-			$seq = 0;
-			foreach($phonelist as $phone){
-				// fill any missing phones in sequence
-				for ($i=$seq; $i<$phone->sequence; $i++) {
-					$reportarray[] = "";
-					$reportarray[] = "";
-					$seq++;
-				}
-				// existing phone
-				$reportarray[] = Phone::format($phone->phone);
-				$reportarray[] = $phone->editlockdate;
-				$seq++;
-			}
-			// remaining missing phones
-			for ($i=$seq; $i<$maxphones; $i++) {
-				$reportarray[] = "";
-				$reportarray[] = "";
-			}
 
-			$emaillist = DBFindMany("Email", "from email where personid = '$row[1]' order by sequence", false, false, $this->_readonlyDB);
-			$seq = 0;
-			foreach($emaillist as $email){
-				for ($i=$seq; $i<$email->sequence; $i++) {
-					$reportarray[] = "";
-					$reportarray[] = "";
-					$seq++;
-				}
-				$reportarray[] = $email->email;
-				$reportarray[] = $email->editlockdate;
-				$seq++;
-			}
-			for ($i=$seq; $i<$maxemails; $i++) {
-				$reportarray[] = "";
-				$reportarray[] = "";
-			}
-			
-			if ($hassms) {
-				$smslist = DBFindMany("Sms", "from sms where personid = '$row[1]' order by sequence", false, false, $this->_readonlyDB);
-				$seq = 0;
-				foreach($smslist as $sms){
-					for ($i=$seq; $i<$sms->sequence; $i++) {
-						$reportarray[] = "";
-						$reportarray[] = "";
-						$seq++;
-					}
-					$reportarray[] = $sms->sms;
-					$reportarray[] = $sms->editlockdate;
-					$seq++;
-				}
-				for ($i=$seq; $i<$maxsms; $i++) {
-					$reportarray[] = "";
-					$reportarray[] = "";
+			// if there is any phone/email/sms for this person, write it out, else move to next person
+			if (isset($destinationdata[$row[1]])) {
+				$persondestinationdata = $destinationdata[$row[1]];
+				array_shift($persondestinationdata); // strip personid [0]
+				foreach ($persondestinationdata as $val) {
+					$reportarray[] = $val;
 				}
 			}
 			
@@ -399,6 +407,8 @@ class ContactChangeReport extends ReportGenerator {
 			}
 
 		}
+		} while ($pagestart < $total);
+		
 		if ($options) {
 			return fclose($fp);
 		}
