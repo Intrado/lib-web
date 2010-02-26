@@ -1403,6 +1403,8 @@ class JobWiz_messageEmailText extends WizStep {
 class JobWiz_messageEmailTranslate extends WizStep {
 
 	function getForm($postdata, $curstep) {
+		global $TRANSLATIONLANGUAGECODES;
+		
 		static $translations = false;
 		static $translationlanguages = false;
 
@@ -1416,7 +1418,7 @@ class JobWiz_messageEmailTranslate extends WizStep {
 		if(!$translations) {
 			//Get available languages
 			$alllanguages = QuickQueryList("select code, name from language", true);
-			$translationlanguages = array_intersect_key($alllanguages, getTranslationLanguages());
+			$translationlanguages = array_intersect_key($alllanguages, array_flip($TRANSLATIONLANGUAGECODES));
 			unset($translationlanguages['en']);
 			$translationlanguagecodes = array_keys($translationlanguages);
 			$translations = translate_fromenglish($englishtext,$translationlanguagecodes);
