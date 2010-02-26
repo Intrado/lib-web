@@ -159,8 +159,6 @@ class ValLists extends Validator {
 
 	function validate ($value, $args) {
 		global $USER;
-
-
 		if (strpos($value, 'pending') !== false)
 			return _L('Please finish adding this rule, or unselect the field');
 
@@ -182,8 +180,8 @@ class ValLists extends Validator {
 			if ($renderedlist->total >= 1)
 				$allempty = false;
 		}
-		if ($allempty)
-			return _L('All of these lists are empty');
+		if ($allempty && !(isset($args['jobtype']) && $args['jobtype'] == 'repeating'))
+			return _L('All of the selected lists are empty');
 		return true;
 	}
 }
@@ -498,7 +496,7 @@ $helpsteps[] = _L("The name of your job. The best names are brief and discriptiv
 			"value" => empty($selectedlists)?"":json_encode($selectedlists),
 			"validators" => array(
 				array("ValRequired"),
-				array("ValLists")
+				array("ValLists", 'jobtype' => $JOBTYPE)
 			),
 			"control" => array("JobListItem"),
 			"helpstep" => 4
