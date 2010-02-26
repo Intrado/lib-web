@@ -102,7 +102,7 @@ function handleFileUpload($formitemname, $maxfilesizebytes, $unsafeext = null, $
 			$uploaderror = true;
 			break;
 		case UPLOAD_ERR_PARTIAL:
-			$errormessage .= _L('The file upload did not complete').'\n'._L('Please try again').'\n'._L('If the problem persists').'\n'._L('please check your network settings');
+			$errormessage .= _L('The file upload did not complete').' '._L('Please try again').' '._L('If the problem persists').' '._L('please check your network settings');
 			$uploaderror = true;
 			break;
 		case UPLOAD_ERR_NO_FILE:
@@ -135,9 +135,9 @@ function handleFileUpload($formitemname, $maxfilesizebytes, $unsafeext = null, $
 		} else if (!is_file($newname) || !is_readable($newname)) {
 			$errormessage .= _L('Unable to complete file upload. Please try again');
 		} else if ($extdotpos === false) {
-			$errormessage .= _L('The file you uploaded does not have a file extension\nPlease make sure the file has the correct extension and try again');
+			$errormessage .= _L('The file you uploaded does not have a file extension. Please make sure the file has the correct extension and try again');
 		} else if ((is_array($allowedext) && !in_array($ext, $allowedext)) || (is_array($unsafeext) && array_search(strtolower($ext),$unsafeext) !== false)) {
-			$errormessage .= _L('The file you uploaded may pose a security risk and is not allowed. ').'\n'._L('Please check the help documentation for more information on safe and unsafe file types');
+			$errormessage .= _L('The file you uploaded may pose a security risk and is not allowed. ').' '._L('Please check the help documentation for more information on safe and unsafe file types');
 		} else if ($_FILES[$formitemname]['size'] >= $maxfilesizebytes) {
 			$errormessage .= _L('The file you uploaded exceeds the maximum email attachment limit of %s.', ($maxfilesizebytes / 1024) . 'K');
 		} else if ($_FILES[$formitemname]['size'] <= 0) {
@@ -147,7 +147,7 @@ function handleFileUpload($formitemname, $maxfilesizebytes, $unsafeext = null, $
 			if ($contentid) {
 				$uploaderror = false;
 			} else {
-				$errormessage .= _L('Unable to upload email attachment data, either the file was empty or there is a DB problem.');
+				$errormessage .= _L('Unable to upload email attachment data, either the file was empty or there is a DB problem. ');
 				$errormessage .= _L('Unable to complete file upload. Please try again');
 			}
 		}
