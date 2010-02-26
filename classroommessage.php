@@ -15,11 +15,18 @@ require_once("obj/Alert.obj.php");
 require_once("obj/TargetedMessageCategory.obj.php");
 require_once("obj/TargetedMessage.obj.php");
 require_once("obj/FieldMap.obj.php");
+require_once("obj/Schedule.obj.php");
 
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization
 ////////////////////////////////////////////////////////////////////////////////
 if (!getSystemSetting('_hastargetedmessage', false) || !$USER->authorize('targetedmessage')) {
+	redirect('unauthorized.php');
+}
+
+$schedule = DBFind("Schedule","from job j inner join schedule s on (j.scheduleid = s.id) where j.type = 'alert' and j.status = 'repeating'","s");
+
+if(!($schedule && strpos($schedule->daysofweek, Date('N',time())) !== false && strtotime($schedule->time) > time())) {
 	redirect('unauthorized.php');
 }
 
@@ -34,7 +41,7 @@ $requesturl = "classroommessage.php";
 $redirect = "classroommessageoverview.php";
 $commentname = "Comment";
 $remarkname = "Remark";
-$cutoff = "22:00";
+$cutoff = Date('H:i',strtotime($schedule->time));
 
 ////////////////////////////////////////////////////////////////////////////////
 // Action/Request Processing
