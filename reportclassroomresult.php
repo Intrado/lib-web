@@ -19,7 +19,7 @@ require_once("obj/FieldMap.obj.php");
 // Authorization
 ////////////////////////////////////////////////////////////////////////////////
 
-if(!(getSystemSetting('_hastargetedmessage', false) && $USER->authorize('viewsystemreports') && $USER->authorize("targetedmessage"))){
+if(!(getSystemSetting('_hastargetedmessage', false) && $USER->authorize('viewsystemreports'))){
 	redirect('unauthorized.php');
 }
 

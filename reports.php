@@ -79,34 +79,36 @@ startWindow("Select a Template"  . help('Reports_SelectATemplate'), 'padding: 3p
 		<tr align="left" valign="top">
 			<td>
 				<table>
-					<tr><td><a href='reportjobsearch.php?clear=1'/>Notification Summary</a></td></tr>
+					<tr><td><a href='reportjobsearch.php?clear=1' >Notification Summary</a></td></tr>
 <? if($USER->authorize('viewsystemreports') || $USER->authorize("sendphone")){ ?>
-					<tr><td><a href='reportjobdetailsearch.php?clear=1&type=phone'/>Phone Log</a></td></tr>
+					<tr><td><a href='reportjobdetailsearch.php?clear=1&type=phone' >Phone Log</a></td></tr>
 <?
 	}
 	if($USER->authorize('viewsystemreports') || $USER->authorize("sendemail")){
 ?>
-					<tr><td><a href='reportjobdetailsearch.php?clear=1&type=email'/>Email Log</a></td></tr>
+					<tr><td><a href='reportjobdetailsearch.php?clear=1&type=email' >Email Log</a></td></tr>
 <?
 	}
 	if(getSystemSetting('_hassms', false) && ($USER->authorize('viewsystemreports') || $USER->authorize("sendsms"))) {
 ?>
-					<tr><td><a href='reportjobdetailsearch.php?clear=1&type=sms'/>SMS Log</a></td></tr>
+					<tr><td><a href='reportjobdetailsearch.php?clear=1&type=sms' >SMS Log</a></td></tr>
 <?	}
 	if(getSystemSetting('_hassurvey', true) && ($USER->authorize('viewsystemreports') || $USER->authorize("survey"))){ ?>
-					<tr><td><a href='reportsurvey.php?clear=1'/>Survey Results</a></td></tr>
+					<tr><td><a href='reportsurvey.php?clear=1' >Survey Results</a></td></tr>
 <?	}
-	if(getSystemSetting('_hastargetedmessage', false) && $USER->authorize('viewsystemreports') && $USER->authorize("targetedmessage")){ ?>
-					<tr><td><a href='reportclassroomsearch.php?clear=1&type=organization'/>Classroom Report</a></td></tr>
+	if(getSystemSetting('_hastargetedmessage', false) && $USER->authorize('viewsystemreports')){ // Top level permission only
+?>
+					<tr><td><a href='reportclassroomsearch.php?clear=1&type=organization'>Classroom Report</a></td></tr>
 <? } ?>
 				</table>
 			</td>
 			<td>
 				<table>
-					<tr><td><a href='reportcallssearch.php?clear=1'/>Contact History</a></td></tr>
+					<tr><td><a href='reportcallssearch.php?clear=1' >Contact History</a></td></tr>
 <?	
-	if(getSystemSetting('_hastargetedmessage', false) && $USER->authorize('viewsystemreports') && $USER->authorize("targetedmessage")){ ?>
-					<tr><td><a href='reportclassroomsearch.php?clear=1&type=person'/>Classroom Contact History</a></td></tr>
+	if(getSystemSetting('_hastargetedmessage', false) && $USER->authorize('viewsystemreports')){ // Top level permission only
+?>
+					<tr><td><a href='reportclassroomsearch.php?clear=1&type=person' >Classroom Contact History</a></td></tr>
 <?  } ?>
 				</table>
 			</td>
@@ -114,10 +116,10 @@ startWindow("Select a Template"  . help('Reports_SelectATemplate'), 'padding: 3p
 			<td>
 				<table>
 <? if ($USER->authorize('viewsystemreports')) { ?>
-					<tr><td><a href='reportarchive.php'/>Systemwide Report Archive</a></td></tr>
+					<tr><td><a href='reportarchive.php' >Systemwide Report Archive</a></td></tr>
 <? } ?>
 <? if ($USER->authorize('createreport')) { ?>
-					<tr><td><a href='reportcontactchange.php?clear=1'/>Contact Information Changes</a></td></tr>
+					<tr><td><a href='reportcontactchange.php?clear=1' >Contact Information Changes</a></td></tr>
 <? } ?>
 				</table>
 			</td>
