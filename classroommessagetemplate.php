@@ -278,6 +278,8 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		$schedule->userid = $owner;
 		$schedule->daysofweek = implode(",", $days);
 		$schedule->time = $time;
+		$schedule->nextrun = $schedule->calcNextRun();
+		
 		if ($schedule->id)
 			$schedule->update();
 		else
