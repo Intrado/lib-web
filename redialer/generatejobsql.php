@@ -68,6 +68,11 @@ foreach ($joblists as $joblist) {
 	$thesql[$joblist->listid] = $joblist->generateSql($job->userid);
 }
 
+if (count($thesql) == 0) {
+	//echo("Error: no lists for thesql\n");
+	//exit(-1);
+	$thesql[-1] = "0"; // NOTE bug in json if $thesql[0] using 0 as a key
+}
 
 echo json_encode($thesql);
 
