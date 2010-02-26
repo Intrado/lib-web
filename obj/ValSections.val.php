@@ -3,6 +3,8 @@
 class ValSections extends Validator {
 	var $onlyserverside = true;
 	
+	// Error if any one of the $sectionids is not valid.
+	// NOTE: Assume that all these sections belong to the same organization.
 	function validate($sectionids) {
 		global $USER;
 		
@@ -11,44 +13,28 @@ class ValSections extends Validator {
 		if (!is_array($sectionids))
 			return $msgInvalidSections;
 		
-		// All these sections should belong to the same organization.
 		$organizationid = QuickQuery('select organizationid from section where id = ?', false, array(reset($sectionids)));
-		
-		if (!$USER->authorizeOrganization($organizationid))
-			return $msgInvalidSections;
-		
-		// If the user is associated with this organization, return all sections from this organization.
-		// If the user has section associations belonging to this organization, return those sections.
-		// If the user has no associations, retrieve all sections from this organization.
-		if (QuickQuery('select count(*) from userassociation where userid = ? and type = "organization" and organizationid=?', false, array($USER->id, $organizationid)) > 0) {
-			$authorizedsectionids = QuickQueryList("
-				select id
-				from section
-				where organizationid = ?",
-				false, false, array($organizationid)
-			);
-		}
-		
-		if ((!isset($authorizedsectionids) || count($authorizedsectionids) < 1) && QuickQuery('select count(*) from userassociation where userid = ? and type = "section"', false, array($USER->id)) > 0) {
-			$authorizedsectionids = QuickQueryList("
-				select section.id
-				from section
-					inner join userassociation
-						on (userassociation.sectionid = section.id)
-				where userid=? and section.organizationid = ?",
-				false, false, array($USER->id, $organizationid)
-			);
+
+		// If the user is unrestricted or is associated with this organization, $validsectionids = all sections for this organization.
+		// Otherwise if the user is associated to sections, $validsectionids = associated sections that are part of this organization.
+		if (QuickQuery('select 1 from userassociation where userid = ? limit 1', false, array($USER->id))) {
+			if (QuickQuery('select 1 from userassociation where userid = ? and organizationid = ? and type = "organization" limit 1', false, array($USER->id, $organizationid))) {
+				$validorganizationsectionids = QuickQueryList('select id from section where organizationid = ?', false, false, array($organizationid));
+			} else {
+				$validorganizationsectionids = QuickQueryList('
+					select s.id
+					from userassociation ua
+						inner join section s on (ua.sectionid = s.id)
+					where ua.userid = ? and ua.type = "section" and ua.sectionid != 0 and s.organizationid = ?',
+					false, false, array($USER->id, $organizationid)
+				);
+			}
 		} else {
-			$authorizedsectionids = QuickQueryList("
-				select id
-				from section
-				where organizationid = ?",
-				false, false, array($organizationid)
-			);
+			$validorganizationsectionids = QuickQueryList('select id from section where organizationid = ?', false, false, array($organizationid));
 		}
 		
 		foreach ($sectionids as $id) {
-			if (!in_array($id, $authorizedsectionids))
+			if (!in_array($id, $validorganizationsectionids))
 				return $msgInvalidSections;
 		}
 		
