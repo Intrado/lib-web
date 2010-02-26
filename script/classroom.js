@@ -254,8 +254,8 @@
 			$('clock').update((hours>0?hours + ' Hour' + (hours==1?' ':'s '):'') + minutes + ' Minute' + (minutes==1?' ':'s ') + ' left until cutoff');
 		} else {
 			clock.stop();
-			alert('The cutoff time for this page has passed');
-			window.location = '<?= $redirect ?>';
+			//alert('The cutoff time for this page has passed');
+			window.location = 'classroommessageredirect.php';
 		}
 	}
 
@@ -278,7 +278,7 @@
 				target.setStyle('height:4.5em;');
 				$(c_prefix + 'txt-' + msg.key).setStyle('height:3em;');
 
-				var target = target.down('img');
+				target = target.down('img');
 				target.src = getstatesrc(0);
 				if(hascomments) {
 					target = $(c_prefix + 'prem' + msg.key);

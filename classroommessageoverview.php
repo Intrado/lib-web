@@ -2,17 +2,18 @@
 ////////////////////////////////////////////////////////////////////////////////
 // Includes
 ////////////////////////////////////////////////////////////////////////////////
-include_once("inc/common.inc.php");
-include_once("inc/securityhelper.inc.php");
-include_once("obj/PeopleList.obj.php");
+require_once("inc/common.inc.php");
+require_once("inc/securityhelper.inc.php");
+require_once("obj/PeopleList.obj.php");
 require_once("inc/table.inc.php");
 require_once("inc/utils.inc.php");
 require_once("inc/date.inc.php");
-include_once("inc/form.inc.php");
-include_once("inc/html.inc.php");
-include_once("inc/formatters.inc.php");
+require_once("inc/form.inc.php");
+require_once("inc/html.inc.php");
+require_once("inc/formatters.inc.php");
 require_once("obj/FieldMap.obj.php");
 require_once("obj/TargetedMessageCategory.obj.php");
+require_once("obj/Schedule.obj.php");
 
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization
@@ -77,11 +78,11 @@ $commentpersons = false;
 
 $firstnamefield = FieldMap::getFirstNameField();
 $lastnamefield = FieldMap::getLastNameField();
-$orderby = "order by date desc, p.$firstnamefield,p.$lastnamefield";
+$orderby = "order by date desc, p.$firstnamefield,p.$lastnamefield,tm.id";
 
 
 if($mode == 'comments') {
-	$orderby = "order by date desc";
+	$orderby = "order by date desc,tm.id";
 }
 
 $query = "select SQL_CALC_FOUND_ROWS
@@ -121,7 +122,19 @@ startWindow(_L('Classroom Comments'));
 	<td class="feed" style="width: 180px;vertical-align: top;font-size: 12px;" >
 
 
-		<?= icon_button("Pick Comments", "add", null, "classroommessage.php") ?>
+		<?
+		$schedule = DBFind("Schedule","from job j inner join schedule s on (j.scheduleid = s.id) where j.type = 'alert' and j.status = 'repeating'","s");
+
+		if($schedule && strpos($schedule->daysofweek, Date('w',time()) + 1) !== false && strtotime($schedule->time) > time()) {
+			echo icon_button("Pick Comments", "add", null, "classroommessage.php");
+		} else {
+			//echo '<img src="img/largeicons/notepad.jpg" /> Please Comeback Tomorrow to Add Comments';
+			echo icon_button("Pick Comments", "diagona/16/160", null, "classroommessage.php");
+		}
+
+		?>
+
+
 		<div style="clear:both;"></div>
 		<h1 id="view">View By:</h1>
 		<div id="alloptions" class="feedfilter">

@@ -26,8 +26,8 @@ if (!getSystemSetting('_hastargetedmessage', false) || !$USER->authorize('target
 
 $schedule = DBFind("Schedule","from job j inner join schedule s on (j.scheduleid = s.id) where j.type = 'alert' and j.status = 'repeating'","s");
 
-if(!($schedule && strpos($schedule->daysofweek, Date('N',time())) !== false && strtotime($schedule->time) > time())) {
-	redirect('unauthorized.php');
+if(!($schedule && strpos($schedule->daysofweek, Date('w',time()) + 1) !== false && strtotime($schedule->time) > time())) {
+	redirect('classroommessageredirect.php');
 }
 
 //TODO add redirect if we are past time window
@@ -341,7 +341,7 @@ endWindow();
 	var hascomments = <?= $USER->authorize('targetedcomment')?"true":"false" ?>;
 	var categoryinfo = $H(<?= json_encode($categoriesjson) ?>);
 	var requesturl = '<?= $requesturl ?>';
-	var timetocutoff = new Date(<?= (strtotime($cutoff) - 3600) . '000' ?>).getTime() / 1000;
+	var timetocutoff = new Date(<?= (strtotime($cutoff)) . '000' ?>).getTime() / 1000;
 	document.observe("dom:loaded", function() {
 		tabs.show_section('lib-<?=  $USER->getSetting("classroomtab", "search") ?>');
 	});
