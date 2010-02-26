@@ -126,7 +126,7 @@ $formdata = array(
 			array("ValRequired"),
 			array("ValInArray", "values" => array_keys($activeusers))
 		),
-		"control" => array("SelectMenu", "values" => $activeusers),
+		"control" => array("SelectMenu", "values" => array_merge(array("-- Select One --"), $activeusers)),
 		"helpstep" => 4
 	)
 );
@@ -227,7 +227,7 @@ $helpsteps = array (
 );
 
 $buttons = array(submit_button(_L('Save'),"submit","tick"),
-				icon_button(_L('Cancel'),"cross",null,"organizationdatamanager.php"));
+				icon_button(_L('Cancel'),"cross",null,"settings.php"));
 $form = new Form("templateform",$formdata,$helpsteps,$buttons);
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -382,9 +382,9 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		Query("COMMIT");
 		
 		if ($ajax)
-			$form->sendTo("start.php");
+			$form->sendTo("settings.php");
 		else
-			redirect("start.php");
+			redirect("settings.php");
 	}
 }
 
