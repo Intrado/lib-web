@@ -1,18 +1,20 @@
 var SectionWidget = Class.create({
-	initialize: function(formitemname, organizationselector, sectionscontainer, selectedsectionids) {
+	// selectedsectionidsmap should be an object literal of sectionid => true pairs,
+	// so that selectedsectionidsmap[sectionid] indicates that a particular section is selected.
+	initialize: function(formitemname, organizationselectbox, sectionscontainer, selectedsectionidsmap) {
 		this.formitemname = formitemname;
-		this.organizationselector = $(organizationselector);
+		this.organizationselectbox = $(organizationselectbox);
 		this.sectionscontainer = $(sectionscontainer);
 		this.form = this.sectionscontainer.up('form');
-		this.selectedsectionids = selectedsectionids;
+		this.selectedsectionidsmap = selectedsectionidsmap;
 		
-		this.organizationselector.observe('change', function() {
+		this.organizationselectbox.observe('change', function() {
 			// Clear selected sections.
-			this.selectedsectionids = null;
+			this.selectedsectionidsmap = null;
 			this.getSectionsViaAjax();
 		}.bindAsEventListener(this));
 		
-		if (this.selectedsectionids)
+		if (this.selectedsectionidsmap)
 			this.getSectionsViaAjax();
 	},
 	
@@ -21,7 +23,7 @@ var SectionWidget = Class.create({
 	////////////////////////////////////////////////
 	
 	getSectionsViaAjax: function() {
-		var organizationid = this.organizationselector.getValue();
+		var organizationid = this.organizationselectbox.getValue();
 		if (!organizationid) {
 			// Clear the column contents and force form validation.
 			var blankinput = new Element('input', {'type': 'hidden', 'name': this.formitemname});
@@ -56,7 +58,7 @@ var SectionWidget = Class.create({
 						'for': checkbox.identify()
 					}).insert(skey.escapeHTML());
 					
-					if (this.selectedsectionids && this.selectedsectionids[id]) {
+					if (this.selectedsectionidsmap && this.selectedsectionidsmap[id]) {
 						checkbox.checked = true;
 						// TODO: Internet Explorer may need a tweak to appear checked before inserting into dom.
 						checkbox.defaultChecked = true;
@@ -86,7 +88,7 @@ var SectionWidget = Class.create({
 			// Show the section column and preselect selectedskeys.
 			this.sectionscontainer.update(radiobox);
 			
-			if (this.selectedsectionids) {
+			if (this.selectedsectionidsmap) {
 				form_do_validation(this.form, checkbox);
 			}
 		}.bindAsEventListener(this));
