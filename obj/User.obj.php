@@ -69,36 +69,6 @@ class User extends DBMappedObject {
 		}
 		return false;
 	}
-
-	// Returns true if the user is associated with this organization or is unrestricted.
-	// The user is unrestricted if he has no organization associations.
-	function authorizeOrganization($id) {
-		$organizations = $this->organizations();
-		
-		return isset($organizations[$id]);
-	}
-	
-	// Returns true if there are sections that the user is permitted to see.
-	function hasSections() {
-		global $USERHASSECTIONS;
-		
-		if (!isset($USERHASSECTIONS)) {
-			// If the user cannot see any organizations then he cannot see any sections either.
-			if (count($this->organizations()) < 1) {
-				$USERHASSECTIONS = false;
-			// If the user has section associations, then he can obviously see those sections.
-			} else if (QuickQuery('select sectionid from userassociation where type="section" and userid = ?', false, array($this->id))) {
-				$USERHASSECTIONS = true;
-			// If the user does not have section associations, then find out if any of the organizations that he can see has a section.
-			} else if (QuickQuery('select id from section where organizationid in ('.implode(',', array_keys($this->organizations())).')')) {
-				$USERHASSECTIONS = true;
-			} else {
-				$USERHASSECTIONS = false;
-			}
-		}
-		
-		return $USERHASSECTIONS;
-	}
 	
 	function authorizeField($field) {
 		$fields = $_SESSION['access']->getValue('datafields');
@@ -111,39 +81,30 @@ class User extends DBMappedObject {
 	}
 
 	function getRules() {
+		// Global cache of users' rules; we do not keep a local cache because it would serialize upon each request.
+		// This array is indexed by userid.
 		global $USERRULES;
 		
 		if (!isset($USERRULES))
-			$USERRULES = DBFindMany("Rule","from rule r inner join userassociation ua on r.id = ua.ruleid where userid =?", 'r', array($this->id));
-		return $USERRULES;
+			$USERRULES = array();
+		
+		if (!isset($USERRULES[$this->id]))
+			$USERRULES[$this->id] = DBFindMany("Rule","from rule r inner join userassociation ua on r.id = ua.ruleid where userid =?", 'r', array($this->id));
+		
+		return $USERRULES[$this->id];
 	}
 
-	// Returns associated organizations or all organizations if unrestricted.
-	// The user is unrestricted if he has no organization associations.
+	// Returns associated organizations.
 	function organizations() {
-		// Global cache of users' organizations; we do not keep a local cache because
-		// it would serialize upon each request.
+		// Global cache of users' organizations; we do not keep a local cache because it would serialize upon each request.
 		// This array is indexed by userid.
 		global $USERSORGANIZATIONS;
 		
 		if (!isset($USERSORGANIZATIONS))
-			$USERSORGANIZATIONS = array();
-			
-		if (!isset($USERSORGANIZATIONS[$this->id]) || $USERSORGANIZATIONS[$this->id] === false) {
-			$associatedorganizations = DBFindMany('Organization', 'from organization o inner join userassociation ua on o.id = ua.organizationid where userid = ?', 'o', array($this->id));
-
-			// If the user has specific organization associations, return those organizations.
-			// But if the user only has section associations, he can only see the organizations of those sections.
-			// Otherwise he can see all organizations.
-			if (count($associatedorganizations) > 0) {
-				$USERSORGANIZATIONS[$this->id] = $associatedorganizations;
-			} else if (count($associatedsectionids = QuickQueryList('select sectionid from userassociation where userid = ? and type = "section"', false, false, array($this->id))) > 0) {
-				$sectionorganizationids = QuickQueryList('select distinct organizationid from section where id in (' . implode(',', $associatedsectionids) . ')', false, false);
-				$USERSORGANIZATIONS[$this->id] = DBFindMany('Organization', 'from organization where id in ('. implode(',', $sectionorganizationids).')');
-			} else {
-				$USERSORGANIZATIONS[$this->id] = DBFindMany('Organization', 'from organization where not deleted');
-			}
-		}
+			$USERORGANIZATIONS = array();
+		
+		if (!isset($USERORGANIZATIONS[$this->id]))
+			$USERSORGANIZATIONS[$this->id] = DBFindMany('Organization', 'from organization o inner join userassociation ua on o.id = ua.organizationid where userid = ?', 'o', array($this->id));
 		
 		return $USERSORGANIZATIONS[$this->id];
 	}
