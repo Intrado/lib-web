@@ -4,7 +4,6 @@ header('Content-Type: application/json');
 require_once("inc/common.inc.php");
 require_once("inc/translate.inc.php");
 
-	$supportedlanguages = getTranslationLanguages();
 	$url = "http://ajax.googleapis.com/ajax/services/language/translate?v=1.0";
 	$url .= (isset($SETTINGS['translation']['apikey']) && $SETTINGS['translation']['apikey'])?"&key=" . $SETTINGS['translation']['apikey']:"";
 	$text = "";
@@ -36,7 +35,9 @@ require_once("inc/translate.inc.php");
 		$lang_pairs = "";
 		foreach ($destinationlanguages as $destlang){
 			$lang = strtolower($destlang);
-			if(array_key_exists($lang,$supportedlanguages)) {
+			if(in_array($lang,$TRANSLATIONLANGUAGECODES)) {
+				if ($lang == "pt") // Google uses "pt-PT" for Portuguese.
+					$lang = "pt-PT";
 				$lang_pairs .= "&langpair=" . urlencode("en|" . $lang);
 			}
 		}
@@ -54,8 +55,10 @@ require_once("inc/translate.inc.php");
     		$text = mb_substr($text,0,4000);
    
     	$language = strtolower($language);
-    	if(array_key_exists($language,$supportedlanguages)) {
+    	if(in_array($language,$TRANSLATIONLANGUAGECODES)) {
     		$text = "&q=" . urlencode($text);
+		if ($language == "pt") // Google uses "pt-PT" for Portuguese.
+				$language = "pt-PT";
     		$lang_pairs = "&langpair=" . urlencode($language . "|en");
 		}
     }
@@ -69,8 +72,10 @@ require_once("inc/translate.inc.php");
 
 
     	$language = strtolower($language);
-    	if(array_key_exists($language,$supportedlanguages)) {
+    	if(in_array($language,$TRANSLATIONLANGUAGECODES)) {
     		$text = "&q=" . urlencode($text);
+		if ($language == "pt") // Google uses "pt-PT" for Portuguese.
+			$language = "pt-PT";
     		$lang_pairs = "&langpair=" . urlencode($language . "|en");
 		}
     }
