@@ -1,4 +1,4 @@
-function messagegroupHandleBeforeTabLoad (event, state, messagegrouppdefaultlanguagecode) {
+function messagegroupHandleBeforeTabLoad (event, state) {
 	if ($$('.HTMLEditorAjaxLoader').length > 0) {
 		alert('Please wait until the HTML Editor has loaded.');
 		event.stop();
@@ -10,13 +10,13 @@ function messagegroupHandleBeforeTabLoad (event, state, messagegrouppdefaultlang
 		// If the user is tabbing between subtypes, make sure the language stays consistent.
 		event.memo.specificsections = [event.memo.nexttab + '-' + state.currentlanguagecode];
 	} else if (nexttab == 'emailheaders') {
-		event.memo.specificsections = ['emailheaders', 'email-html', 'email-html-' + messagegrouppdefaultlanguagecode];
+		event.memo.specificsections = ['emailheaders', 'email-html', 'email-html-' + state.defaultlanguagecode];
 	} else if (nexttab == 'phone-voice') {
-		event.memo.specificsections = ['phone-voice', 'phone-voice-' + messagegrouppdefaultlanguagecode];
+		event.memo.specificsections = ['phone-voice', 'phone-voice-' + state.defaultlanguagecode];
 	}
 }
 
-function messagegroupHandleTabLoaded (event, state, existingmessagegroupid, messagegrouppdefaultlanguagecode, autotranslatorUpdator, readonly) {
+function messagegroupHandleTabLoaded (event, state, existingmessagegroupid, autotranslatorUpdator, readonly) {
 	// NOTE: Message tab icons are the only ones with an ID attribute.
 	var messagetabicon = event.memo.widget.sections[event.memo.tabloaded].titleDiv.down('img');
 	
@@ -50,7 +50,7 @@ function messagegroupHandleTabLoaded (event, state, existingmessagegroupid, mess
 		if (languagesectionpieces && languagesectionpieces.length == 3)
 			state.currentlanguagecode = languagesectionpieces[2];
 		else
-			state.currentlanguagecode = messagegrouppdefaultlanguagecode;
+			state.currentlanguagecode = state.defaultlanguagecode;
 	} else if (tabloadedpieces.length == 2 && tabloadedpieces[0] == 'email') {
 		state.currentdestinationtype = 'email';
 		state.currentsubtype = tabloadedpieces[1];
