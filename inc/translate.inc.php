@@ -1,43 +1,41 @@
 <?
 
-function getTranslationLanguages() {
-	return array(
-		"ar" => "arabic",
-		"bg" => "bulgarian",
-		"ca" => "catalan",
-		"zh" => "chinese",
-		"hr" => "croatian",
-		"cs" => "czech",
-		"da" => "danish",
-		"nl" => "dutch",
-		"en" => "english",
-		"tl" => "filipino",
-		"fi" => "finnish",
-		"fr" => "french",
-		"de" => "german",
-		"el" => "greek",
-		"iw" => "hebrew",
-		"hi" => "hindi",
-		"id" => "indonesian",
-		"it" => "italian",
-		"ja" => "japanese",
-		"ko" => "korean",
-		"lv" => "latvian",
-		"lt" => "lithuanian",
-		"no" => "norwegian",
-		"pl" => "polish",
-		"pt-PT" => "portuguese",
-		"ro" => "romanian",
-		"ru" => "russian",
-		"sr" => "serbian",
-		"sk" => "slovak",
-		"sl" => "slovenian",
-		"es" => "spanish",
-		"sv" => "swedish",
-		"uk" => "ukrainian",
-		"vi" => "vietnamese"
-	);
-}
+$TRANSLATIONLANGUAGECODES = array(
+	"ar",
+	"bg",
+	"ca",
+	"cs",
+	"da",
+	"de",
+	"el",
+	"en",
+	"es",
+	"fi",
+	"fr",
+	"hi",
+	"hr",
+	"id",
+	"it",
+	"iw",
+	"ja",
+	"ko",
+	"lt",
+	"lv",
+	"nl",
+	"no",
+	"pl",
+	"pt", // NOTE: Check for pt-PT before sending to google.
+	"ro",
+	"ru",
+	"sk",
+	"sl",
+	"sr",
+	"sv",
+	"tl",
+	"uk",
+	"vi",
+	"zh"
+);
 
 function googletranslate($text, $lang_pairs) {
 	if($text == "" || $lang_pairs == "") {
@@ -52,10 +50,11 @@ function googletranslate($text, $lang_pairs) {
 			$referer = $_SERVER["HTTP_REFERER"];
 		}
 		$content = $text . $lang_pairs;
-    	if(strlen($content) > 4800){
-    		error_log("Request is too large to send to Google");
-    		return false;
-    	}
+		
+		if(strlen($content) > 4800){
+			error_log("Request is too large to send to Google");
+			return false;
+		}
 
 		$context_options = array ('http' => array ('method' => 'POST','header'=> "Referer: $referer",'content' => $content));
 		$context = stream_context_create($context_options);
@@ -87,13 +86,12 @@ function googletranslate($text, $lang_pairs) {
 }
 
 function translate_fromenglish($englishtext,$languagearray) {
+	global $TRANSLATIONLANGUAGECODES;
 	
 	if(!isset($englishtext) || !isset($languagearray)) {
 		return false;
 	}
-		
-	$supportedlanguages = getTranslationLanguages();
-
+	
 	$src_text = $englishtext;
 
 	if(mb_strlen($src_text) > 4000) {//Cap translation
@@ -109,7 +107,9 @@ function translate_fromenglish($englishtext,$languagearray) {
 	$lang_pairs = "";
 	foreach ($destinationlanguages as $destlang){
 		$lang = strtolower($destlang);
-		if(array_key_exists($lang,$supportedlanguages)) {
+		if(in_array($lang,$TRANSLATIONLANGUAGECODES)) {
+			if ($lang == "pt") // Google uses "pt-PT" for Portuguese.
+				$lang = "pt-PT";
 			$lang_pairs .= "&langpair=" . urlencode("en|" . $lang);
 		} else {
 			$lang_pairs .= "&langpair=" . urlencode("en|en"); //  If translation to a non suported language google has to return a value for that to not interfere with the ordering
@@ -122,12 +122,13 @@ function translate_fromenglish($englishtext,$languagearray) {
 }
 
 function translate_toenglish($anytext,$anylanguage) {
+	global $TRANSLATIONLANGUAGECODES;
+	
 	if(!isset($anytext) || !isset($anylanguage)){
 		return false;
 	}
 
 	$lang_pairs = "";
-	$supportedlanguages = getTranslationLanguages();
 	$language = $anylanguage;
 	$text = $anytext;
 
@@ -137,8 +138,10 @@ function translate_toenglish($anytext,$anylanguage) {
 	}
 	
 	$language = strtolower($language);
-	if(array_key_exists($language,$supportedlanguages)) {
+	if(in_array($language,$TRANSLATIONLANGUAGECODES)) {
 		$text = "&q=" . urlencode($text);
+		if ($language == "pt") // Google uses "pt-PT" for Portuguese.
+			$language = "pt-PT";
 		$lang_pairs = "&langpair=" . urlencode($language . "|en");
 	}
 	return googletranslate($text, $lang_pairs);
