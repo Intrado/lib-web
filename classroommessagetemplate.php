@@ -22,11 +22,15 @@ require_once("obj/Message.obj.php");
 require_once("obj/MessagePart.obj.php");
 require_once("obj/Voice.obj.php");
 require_once("obj/FieldMap.obj.php");
+require_once("obj/JobList.obj.php");
+require_once("obj/ListEntry.obj.php");
+require_once("obj/PeopleList.obj.php");
+require_once("obj/Rule.obj.php");
 
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization
 ////////////////////////////////////////////////////////////////////////////////
-if (!$USER->authorize('manageclassroommessaging'))
+if (!getSystemSetting('_hastargetedmessage', false) || !$USER->authorize('manageclassroommessaging'))
 	redirect("unauthorized.php");
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -380,7 +384,69 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 			$job->update();
 		else
 			$job->create();
-			
+		
+		// update or create the joblist
+		$joblist = DBFind("JobList", "from joblist where jobid = ?", false, array($job->id));
+		if (!$joblist)
+			$joblist = new JobList();
+		
+		// get the peoplelist or create a new one
+		if ($joblist)
+			$peoplelist = DBFind("PeopleList", "from list where id = ?", false, array($joblist->listid));
+		if (!isset($peoplelist) || !$peoplelist)
+			$peoplelist = new PeopleList();
+		
+		// get the list entry or create a new one
+		if ($peoplelist)
+			$listentry = DBFind("ListEntry", "from listentry where listid = ?", false, array($peoplelist->id));
+		if (!isset($listentry) || !$listentry)
+			$listentry = new ListEntry();
+		
+		// get the rule
+		if ($listentry)
+			$rule = DBFind("Rule", "from rule where id = ?", false, array($listentry->ruleid));
+		if (!isset($rule) || !$rule)
+			$rule = new Rule();
+		
+		// set all the rule, listentry, peoplelist, joblist values
+		$rule->logical = 'and';
+		$rule->fieldnum = 'alrt';
+		$rule->val = "";
+		
+		if ($rule->id)
+			$rule->update();
+		else
+			$rule->create();
+		
+		$peoplelist->userid = $owner;
+		$peoplelist->type = 'alert';
+		$peoplelist->name = $postdata['name'];
+		$peoplelist->description = "Classroom Messageing Template";
+		$peoplelist->modifydate = date("Y-m-d H:i:s");
+		$peoplelist->deleted = 0;
+		
+		if ($peoplelist->id)
+			$peoplelist->update();
+		else
+			$peoplelist->create();
+		
+		$listentry->listid = $peoplelist->id;
+		$listentry->type = 'rule';
+		$listentry->ruleid = $rule->id;
+		
+		if ($listentry->id)
+			$listentry->update();
+		else
+			$listentry->create();
+		
+		$joblist->jobid = $job->id;
+		$joblist->listid = $peoplelist->id;
+		
+		if ($joblist->id)
+			$joblist->update();
+		else
+			$joblist->create();
+		
 		Query("COMMIT");
 		
 		if ($ajax)
