@@ -10,16 +10,15 @@ class EmailAttach extends FormItem {
 		
 		$str = '
 			<input id="' . $n . '" name="' . $n . '" type="hidden" value="' . escapehtml($value) . '"/>
-			<div id="uploadedfiles"></div>
+			<div id="uploadedfiles" style="display: none;"></div>
 			<div id="upload_process" style="display: none;"><img src="img/ajax-loader.gif" /></div>
-			<iframe id="'.$n.'my_attach" class="UploadIFrame" src="emailattachment.php?formname='.$this->form->name.'&itemname='.$n.'" style="border:0; padding: 0; margin:0"></iframe>
-			<div id="uploaderror"></div>
+			<iframe id="'.$n.'my_attach" src="emailattachment.php?formname='.$this->form->name.'&itemname='.$n.'" style="border:0; padding: 0; margin:0; bottom:0px; height: 2em"></iframe>
 			';
 		return $str;
 	}
 	
 	function renderJavascriptLibraries() {
-		$str = '<script>
+		$str = '<script type="text/javascript">
 			function startUpload(){
 				$(\'upload_process\').show();	
 				return true;
@@ -39,6 +38,8 @@ class EmailAttach extends FormItem {
 				
 				var values = {};
 				var fieldelement = $(itemname);
+				var uploadedfiles = $("uploadedfiles");
+				
 				if (!fieldelement)
 					return;
 				var field = fieldelement.value;
@@ -48,10 +49,13 @@ class EmailAttach extends FormItem {
 					values[id] = {"size":size,"name":name};
 				}
 				
+				// if there are attachments display the div that shows them
+				if (Object.keys(values).length > 0)
+					uploadedfiles.setStyle({"display":"block"}).update();
+				else
+					uploadedfiles.update().setStyle({"display":"none"});
 				
 				var str = "";
-				var uploadedfiles = $("uploadedfiles").update();
-				
 				for(var contentid in values) {
 					var content = values[contentid];
 					
@@ -74,8 +78,11 @@ class EmailAttach extends FormItem {
 			
 				fieldelement.value = $H(values).toJSON();
 				
-				$("uploaderror").update(errormessage);
-				form_do_validation($(formname), fieldelement);
+				if (errormessage) {
+					form_validation_display($(itemname), "blank", errormessage);
+				} else {
+					form_do_validation($(formname), fieldelement);
+				}
 				return true;
 			}
 			
@@ -83,27 +90,31 @@ class EmailAttach extends FormItem {
 				if (!formname || !itemname)
 					return;
 				var values = $(itemname).value.evalJSON();
-				var uploadedfiles = $("uploadedfiles").update();
+				delete values[id];
+				
+				// if there are attachments display the div that shows them
+				var uploadedfiles = $("uploadedfiles");
+				if (Object.keys(values).length > 0)
+					uploadedfiles.setStyle({"display":"block"}).update();
+				else
+					uploadedfiles.update().setStyle({"display":"none"});
+				
 				Object.keys(values).each(function (contentid) {
-					if(contentid != id) {
-						var content = values[contentid];
-						var contentname = content.name;
-						
-						uploadedfiles.insert(
-							new Element("a", {"href": "emailattachment.php?id=" + contentid + "&name=" + encodeURIComponent(encodeURIComponent(contentname))}).insert(contentname)
-						).insert(
-							"&nbsp;(Size: " + Math.round(content.size / 1024) + "k)&nbsp;"
-						).insert(
-							new Element("a", {"href": "#"}).insert("'.addslashes(_L("Remove")).'").observe("click", function(event, contentid, formname, itemname) {
-								event.stop();
-								removeAttachment(contentid, formname, itemname);
-							}.bindAsEventListener(uploadedfiles, contentid, formname, itemname))
-						).insert(
-							"<br/>"
-						);
-					} else {
-						values[contentid] = undefined;
-					}
+					var content = values[contentid];
+					var contentname = content.name;
+					
+					uploadedfiles.insert(
+						new Element("a", {"href": "emailattachment.php?id=" + contentid + "&name=" + encodeURIComponent(encodeURIComponent(contentname))}).insert(contentname)
+					).insert(
+						"&nbsp;(Size: " + Math.round(content.size / 1024) + "k)&nbsp;"
+					).insert(
+						new Element("a", {"href": "#"}).insert("'.addslashes(_L("Remove")).'").observe("click", function(event, contentid, formname, itemname) {
+							event.stop();
+							removeAttachment(contentid, formname, itemname);
+						}.bindAsEventListener(uploadedfiles, contentid, formname, itemname))
+					).insert(
+						"<br/>"
+					);
 				});
 				$(itemname).value = Object.toJSON(values);
 				form_do_validation($(formname), $(itemname));
