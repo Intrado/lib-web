@@ -19,7 +19,7 @@ require_once("obj/MessagePart.obj.php");
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization
 ////////////////////////////////////////////////////////////////////////////////
-if (!getSystemSetting('_hastargetedmessage', false) || !$USER->authorize('targetedmessage') || !$USER->authorize('managesystem')) {
+if (!getSystemSetting('_hastargetedmessage', false) || !$USER->authorize('manageclassroommessaging')) {
 	redirect('unauthorized.php');
 }
 
