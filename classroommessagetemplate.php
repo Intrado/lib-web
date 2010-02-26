@@ -130,7 +130,7 @@ $formdata = array(
 			array("ValRequired"),
 			array("ValInArray", "values" => array_keys($activeusers))
 		),
-		"control" => array("SelectMenu", "values" => array_merge(array("-- Select One --"), $activeusers)),
+		"control" => array("SelectMenu", "values" => ($activeusers?array("-- Select One --") + $activeusers:array("-- Select One --"))),
 		"helpstep" => 4
 	)
 );
