@@ -137,7 +137,7 @@ class TranslationItem extends FormItem {
 						</div>
 					</td>
 					<td valign="top" width="100px" style="'.(!$isphone ? 'display:none' : '').'">
-						<div id="'.$n.'controls" style="display: '.(($msgdata->enabled)?"block":"none").'">
+						<div id="'.$n.'controls" style="display: '.(($msgdata->enabled || $editwhendisabled)?"block":"none").'">
 							'.($isphone ? icon_button(_L("Play"),"fugue/control","
 									var content = $('" . $n . "text').getValue();
 									if (content != '') {
@@ -395,15 +395,15 @@ class TranslationItem extends FormItem {
 						$(section +"textfields").hide();
 						$(section +"retranslationcontrols").hide();
 						$(section +"disableinfo").show();
-						$(section +"controls").hide();
-						
 						$(section+"englishText").up(".MessageBodyContainer").hide();
 						
 						var mainTextarea = $(section+"text");
-						if (mainTextarea.hasClassName("EditWhenDisabled"))
+						if (mainTextarea.hasClassName("EditWhenDisabled")) {
 							mainTextarea.up(".MessageBodyContainer").show();
-						else
+						} else {
+							$(section +"controls").hide();
 							mainTextarea.up(".MessageBodyContainer").hide();
+						}
 						
 						if (usehtmleditor)
 							applyHtmlEditor($(section+"text"));
