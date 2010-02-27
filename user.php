@@ -16,6 +16,7 @@ require_once("obj/ValRules.val.php");
 require_once("obj/ValSections.val.php");
 require_once("obj/FieldMap.obj.php");
 require_once("obj/FormUserItems.obj.php");
+require_once("obj/SectionWidget.fi.php");
 require_once("obj/FormRuleWidget.fi.php");
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -315,6 +316,17 @@ if ($hasenrollment) {
 		"helpstep" => 1
 	);
 	
+	$formdata["submit"] = array(
+		"label" => "",
+		"value" => "",
+		"validators" => array(),
+		"control" => array("InpageSubmitButton", "name" => (($hasstaffid)?_L('Remove Staff ID'):_L('Set Staff ID')), "icon" => (($hasstaffid)?"cross":"disk")),
+		"helpstep" => 1
+	);
+}
+
+// TODO: $hasenrollment means the same as getSystemSetting('_hasenrollment')?
+if (getSystemSetting('_hasenrollment')) {
 	$formdata["sectionids"] = array(
 		"label" => _L('Sections'),
 		"fieldhelp" => _L('Select sections from an organization.'),
@@ -327,14 +339,6 @@ if ($hasenrollment) {
 			"sectionids" => QuickQueryList("select sectionid from listentry where listid=? and type='section'", false, false, array($list->id))
 		),
 		"helpstep" => 2
-	);
-	
-	$formdata["submit"] = array(
-		"label" => "",
-		"value" => "",
-		"validators" => array(),
-		"control" => array("InpageSubmitButton", "name" => (($hasstaffid)?_L('Remove Staff ID'):_L('Set Staff ID')), "icon" => (($hasstaffid)?"cross":"disk")),
-		"helpstep" => 1
 	);
 }
 
