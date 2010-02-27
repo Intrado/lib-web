@@ -39,12 +39,12 @@ function makeSummaryTab($destinations, $customerlanguages, $systemdefaultlanguag
 		"title" => "Summary",
 		"icon" => "img/icons/application_view_columns.gif",
 		"formdata" => array(
-			'summary' => makeFormHtml("<table>{$summaryheaders}{$summarylanguagerows}</table>")
+			'summary' => makeFormHtml(null, null,"<table>{$summaryheaders}{$summarylanguagerows}</table>")
 		)
 	);
 }
 
-function makeTranslationItem($required, $type, $subtype, $languagecode, $languagename, $preferredgender, $sourcetext, $messagetext, $overrideplaintext, $translationcheckboxlabel, $override, $allowoverride = true, $hidetranslationcheckbox = false, $enabled = true, $disabledinfo = "", $datafields = null, $inautotranslator = false, $maximages = 10) {
+function makeTranslationItem($messagegroup, $required, $type, $subtype, $languagecode, $languagename, $preferredgender, $sourcetext, $messagetext, $overrideplaintext, $translationcheckboxlabel, $override, $allowoverride = true, $hidetranslationcheckbox = false, $enabled = true, $disabledinfo = "", $datafields = null, $inautotranslator = false, $maximages = 10) {
 	
 	$control = array("TranslationItem",
 		"phone" => $type == 'phone',
@@ -87,9 +87,15 @@ function makeTranslationItem($required, $type, $subtype, $languagecode, $languag
 			"translationitem" => true,
 			"type" => $type,
 			"subtype" => $subtype,
-			"languagecode" => $languagecode,
 			"maximages" => $maximages,
-			"messagegroup" => isset($_SESSION['messagegroupid']) ? new MessageGroup($_SESSION['messagegroupid']) : null
+		);
+		
+		$validators[] = array("ValDefaultMessage",
+			"messagegroup" => $messagegroup,
+			"languagecode" => $languagecode,
+			"requesteddefaultlanguagecode" => $_SESSION["requesteddefaultlanguagecode"],
+			"type" => $type,
+			"subtype" => $subtype
 		);
 	} else {
 		$control["transienttext"] = $messagetext;
@@ -127,24 +133,30 @@ function makeTranslationItem($required, $type, $subtype, $languagecode, $languag
 	);
 }
 
-function makeFormHtml($html) {
+// $verticallabel and $fieldhelp are optional.
+function makeFormHtml($verticallabel, $fieldhelp, $html, $for = null) {
+	if ($verticallabel && $verticallabel !== "") {
+		$html = '<label class="formlabel" for="' . $for . '">' . $verticallabel . '</label>' . $html;
+	}
+	
 	return array(
-		"label" => "",
+		"label" => $verticallabel,
 		"control" => array("FormHtml","html" => $html),
+		"fieldhelp" => $fieldhelp,
 		"renderoptions" => array("icon" => false, "label" => false, "errormessage" => true),
 		"helpstep" => 1
 	);
 }
 
 function makeBrandingFormHtml() {
-	return makeFormHtml('
+	return makeFormHtml('', '', '
 		<div id="branding" style="margin-top:20px">
 			<div style="color: rgb(103, 103, 103);" class="gBranding"><span style="vertical-align: middle; font-family: arial,sans-serif; font-size: 11px;" class="gBrandingText">Translation powered by<img style="padding-left: 1px; vertical-align: middle;" alt="Google" src="' . (isset($_SERVER['HTTPS'])?"https":"http") . '://www.google.com/uds/css/small-logo.png"></span></div>
 		</div>
 	');
 }
 
-function makeMessageBody($translationlanguages, $required, $type, $subtype, $languagecode, $label, $messagetext, $datafields = null, $usehtmleditor = false, $overrideplaintext = 0, $hideplaybutton = false, $hidden = false, $maximages = 10) {
+function makeMessageBody($messagegroup, $translationlanguages, $required, $type, $subtype, $languagecode, $label, $messagetext, $datafields = null, $usehtmleditor = false, $overrideplaintext = 0, $hideplaybutton = false, $hidden = false, $maximages = 10) {
 	$control = array("MessageBody",
 		"playbutton" => $type == 'phone' && !$hideplaybutton,
 		"usehtmleditor" => $usehtmleditor,
@@ -161,12 +173,16 @@ function makeMessageBody($translationlanguages, $required, $type, $subtype, $lan
 		array("ValMessageBody",
 			"type" => $type,
 			"subtype" => $subtype,
+			"maximages" => $maximages
+		),
+		array ("ValDefaultMessage",
+			"messagegroup" => $messagegroup,
 			"languagecode" => $languagecode,
-			"messagegroup" => isset($_SESSION['messagegroupid']) ?
-				new MessageGroup($_SESSION['messagegroupid']) :
-				null,
-			"maximages" => $maximages,
-			"translationlanguages" => $translationlanguages
+			"autotranslator" => $languagecode == "autotranslator",
+			"requesteddefaultlanguagecode" => $_SESSION["requesteddefaultlanguagecode"],
+			"translationlanguages" => $translationlanguages,
+			"type" => $type,
+			"subtype" => $subtype
 		)
 	);
 
@@ -208,6 +224,7 @@ function makeAccordionSplitter($type, $subtype, $languagecode, $permanent, $pref
 			"title" => _L("Attachments"),
 			"icon" => "img/icons/diagona/16/190.gif",
 			"formdata" =>  array(
+				"attachmentsheader" => makeFormHtml(_L("Attachments"), null, '', "{$formname}_attachments"),
 				"attachments" => array(
 					"label" => _L('Attachments'),
 					"fieldhelp" => "You may attach up to three files that are up to 2048kB each. Note: Some recipients may have different size restrictions on incoming mail which can cause them to not receive your message if you have attached large files.",
@@ -217,7 +234,7 @@ function makeAccordionSplitter($type, $subtype, $languagecode, $permanent, $pref
 					"renderoptions" => array("icon" => false, "label" => false, "errormessage" => true),
 					"helpstep" => 3
 				),
-				"attachmentsjavascript" => makeFormHtml("
+				"attachmentsjavascript" => makeFormHtml(null, null,"
 					<script type='text/javascript'>
 						(function () {
 							var attachmentsformitemname = '{$type}-{$subtype}-{$languagecode}_attachments';
@@ -267,9 +284,7 @@ function makeAccordionSplitter($type, $subtype, $languagecode, $permanent, $pref
 			
 			if ($USER->authorize('starteasy')) {
 				$callmeformdata = array(
-					"callmelabel" => makeFormHtml('
-						<label class="formlabel" for="' . "{$type}-{$subtype}-{$languagecode}_callme" . '">' . $callmelabeltext . '</label>
-					'),
+					"callmelabel" => makeFormHtml($callmelabeltext, null,'', "{$type}-{$subtype}-{$languagecode}_callme"),
 					"callme" => array(
 						"label" => $callmelabeltext,
 						"value" => "",
@@ -334,9 +349,7 @@ function makeAccordionSplitter($type, $subtype, $languagecode, $permanent, $pref
 				"title" => _L("Audio"),
 				"icon" => 'img/icons/fugue/microphone.gif',
 				"formdata" =>  array_merge($callmeformdata, array(
-					"audiouploadlabel" => makeFormHtml('
-						<label style="margin-top:15px; display:block" class="formlabel" for="' . "{$type}-{$subtype}-{$languagecode}_audioupload" . '">' . $audiouploadlabeltext . '</label>
-					'),
+					"audiouploadlabel" => makeFormHtml(_L($audiouploadlabeltext), null, '', "{$type}-{$subtype}-{$languagecode}_audioupload"),
 					"audioupload" => array(
 						"label" => $audiouploadlabeltext,
 						'fieldhelp' => _L('Upload an audio file. It will appear in the Audio Library below.'),
@@ -346,10 +359,7 @@ function makeAccordionSplitter($type, $subtype, $languagecode, $permanent, $pref
 						"renderoptions" => array("icon" => false, "label" => false, "errormessage" => true),
 						"helpstep" => 3
 					),
-					"audiolibrarylabel" => makeFormHtml('
-						<label style="margin-top:15px; display:block" class="formlabel" for="' . "{$type}-{$subtype}-{$languagecode}_audiolibrary" . '">' . _L('Audio Library') . '</label>
-					'),
-					"audiolibrary" => makeFormHtml("
+					"audiolibrary" => makeFormHtml(_L("Audio Library"), _L("fieldhelp"),"
 						<div id=\"audiolibrarycontainer\" style=\"border:1px dotted gray; padding-bottom: 10px\"></div>
 						<script type='text/javascript'>
 							(function () {
@@ -426,7 +436,7 @@ function makeAccordionSplitter($type, $subtype, $languagecode, $permanent, $pref
 								$callmeobserver
 							})();
 						</script>
-					")
+					", "{$type}-{$subtype}-{$languagecode}_audiolibrary")
 				))
 			);
 		}
@@ -439,7 +449,7 @@ function makeAccordionSplitter($type, $subtype, $languagecode, $permanent, $pref
 			"title" => _L("Data Fields"),
 			"icon" => 'img/icons/fugue/arrow_turn_180.gif',
 			"formdata" =>  array(
-				"datafields" => makeFormHtml("
+				"datafields" => makeFormHtml(_L("Data Fields"), _L("fieldhelp"),"
 					<div id='accordiondatafieldscontainer'></div>
 					<script type='text/javascript'>
 						(function() {
@@ -461,7 +471,7 @@ function makeAccordionSplitter($type, $subtype, $languagecode, $permanent, $pref
 				"title" => _L("Translation"),
 				"icon" => "img/icons/world.gif",
 				"formdata" =>  array(
-					"translation" => makeFormHtml("
+					"translation" => makeFormHtml(_L("Translation"), _L("fieldhelp"),"
 						<table style='width:100%'><tbody><tr id='accordiontranslationtr'></tr></tbody></table>
 						<script type='text/javascript'>
 							(function() {
@@ -482,9 +492,7 @@ function makeAccordionSplitter($type, $subtype, $languagecode, $permanent, $pref
 	
 	$autoexpirelabeltext = _L('Auto Expire');
 	$advancedoptionsformdata = array(
-		"autoexpirelabel" => makeFormHtml('
-			<label class="formlabel" for="' . "{$type}-{$subtype}-{$languagecode}_autoexpire" . '">' . $autoexpirelabeltext . '</label>
-		'),
+		"autoexpirelabel" => makeFormHtml(_L("Auto Expire"), null,'', "{$type}-{$subtype}-{$languagecode}_autoexpire"),
 		"autoexpire" => array(
 			"label" => $autoexpirelabeltext,
 			"value" => $permanent,
@@ -501,9 +509,7 @@ function makeAccordionSplitter($type, $subtype, $languagecode, $permanent, $pref
 	if ($type == 'phone') {
 		$gendervalues = array ("female" => "Female","male" => "Male");
 		$preferredgenderlabeltext = _L('Preferred Voice');
-		$advancedoptionsformdata['preferredgenderlabel'] = makeFormHtml('
-			<label style="margin-top: 10px; display:block;" class="formlabel" for="' . "{$type}-{$subtype}-{$languagecode}_preferredgender" . '">' . $preferredgenderlabeltext . '</label>
-		');
+		$advancedoptionsformdata['preferredgenderlabel'] = makeFormHtml($preferredgenderlabeltext, _L("fieldhelp"),'', "{$type}-{$subtype}-{$languagecode}_preferredgender");
 		$advancedoptionsformdata['preferredgender'] = array(
 			"label" => $preferredgenderlabeltext,
 			"fieldhelp" => _L('Choose the gender of the text-to-speech voice.'),
@@ -522,7 +528,7 @@ function makeAccordionSplitter($type, $subtype, $languagecode, $permanent, $pref
 		array(
 			array(
 				'title' => '',
-				'formdata' => array(makeFormHtml('
+				'formdata' => array(makeFormHtml(null, null,'
 					<div style="float:right">'
 					. button(_L('Show Tools'), NULL, NULL, ' id="showaccordiontools" style="display:none" ')
 					. button(_L('Hide Tools'), NULL, NULL, ' id="hideaccordiontools" ')
@@ -700,42 +706,6 @@ class ValTranslationItem extends Validator {
 				return _L('%s is required.', $this->label);
 			}
 		}
-		return true;
-	}
-}
-
-class ValDefaultLanguageCode extends Validator {
-	var $onlyserverside = true;
-	function validate ($requestedlanguagecode, $args) {
-		$messagegroup = new MessageGroup($_SESSION['messagegroupid']);
-		$messages = DBFindMany('Message', 'from message where type != "sms" and messagegroupid=?', false, array($messagegroup->id));
-
-		if (!empty($messages)) {
-			$existinglanguagecodes = array(); // example: ["{$message->type}-{$message->subtype}"] = array('en', 'es')
-			foreach ($messages as $message) {
-				$key = "{$message->type}-{$message->subtype}";
-				if (!isset($existinglanguagecodes[$key]))
-					$existinglanguagecodes[$key] = array();
-				$existinglanguagecodes[$key][] = $message->languagecode;
-			}
-
-			foreach ($existinglanguagecodes as $key => $languagecodes) {
-				if (!in_array($requestedlanguagecode, $languagecodes)) {
-					list($type, $subtype) = explode('-', $key);
-					
-					if ($type == 'email') {
-						// For html, it's not a problem as long as there is a plain email for the requested language code.
-						if ($subtype == 'html' && in_array($requestedlanguagecode, $existinglanguagecodes['email-plain']))
-							continue;
-						
-						return _L('Please first create the %1$s message for %2$s in %3$s.', Language::getName($requestedlanguagecode), ucfirst($type), $subtype == 'html' ? 'HTML' : ucfirst($subtype));
-					} else {
-						return _L('Please first create the %1$s message for %2$s.', Language::getName($requestedlanguagecode), $type == 'sms' ? 'SMS' : ucfirst($type));
-					}
-				}
-			}
-		}
-
 		return true;
 	}
 }

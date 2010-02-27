@@ -93,7 +93,7 @@ foreach ($destinations as $type => $destination) {
 		
 		$accordionsplitterchildren[] = array("title" => _L("Attachments"),
 			"icon" => "img/icons/diagona/16/190.gif",
-			"formdata" => array(makeFormHtml(
+			"formdata" => array(makeFormHtml(null, null,
 				$attachmentshtml != "" ? $attachmentshtml : _L("There are no attachments.")
 			))
 		);
@@ -137,10 +137,10 @@ foreach ($destinations as $type => $destination) {
 			}
 			
 			if ($type == 'sms') {
-				$messageformdata["header"] = makeFormHtml("<div class='MessageBodyHeader'>" . _L("SMS Message") . "</div>");
-				$messageformdata["message"] = makeFormHtml("<div class='MessageTextReadonly'>$messagetext</div>");
+				$messageformdata["header"] = makeFormHtml(null, null,"<div class='MessageBodyHeader'>" . _L("SMS Message") . "</div>");
+				$messageformdata["message"] = makeFormHtml(null, null,"<div class='MessageTextReadonly'>$messagetext</div>");
 			} else {
-				$messageformdata["header"] = makeFormHtml("<div class='MessageBodyHeader'>" . _L("%s Message", $languagename) . "</div>");
+				$messageformdata["header"] = makeFormHtml(null, null,"<div class='MessageBodyHeader'>" . _L("%s Message", $languagename) . "</div>");
 				$messagehtml = "<div class='MessageTextReadonly'>$messagetext</div>";
 					
 				if ($type == 'phone') {
@@ -150,7 +150,7 @@ foreach ($destinations as $type => $destination) {
 						"<div style='clear:both'></div>";
 				}
 				
-				$messageformdata["message"] = makeFormHtml($messagehtml);
+				$messageformdata["message"] = makeFormHtml(null, null,$messagehtml);
 				
 				if ($message->type == 'translated')
 					$messageformdata["branding"] = makeBrandingFormHtml();
@@ -306,18 +306,19 @@ if ($countdestinations > 0) {
 				'currentdestinationtype': '<?=$preferreddestinationtype?>',
 				'currentsubtype': '<?=$preferreddestinationsubtype?>',
 				'currentlanguagecode': '<?=$preferredlanguagecode?>',
+				'defaultlanguagecode': '<=$messagegroup->defaultlanguagecode?>',
 				'messagegroupsummary': <?=json_encode(MessageGroup::getSummary($messagegroup->id))?>
 			};
 		
 			var formswitchercontainer = $('messagegroupformcontainer');
 
 			formswitchercontainer.observe('FormSplitter:BeforeTabLoad',
-				messagegroupHandleBeforeTabLoad.bindAsEventListener(formswitchercontainer, state, '<?=$preferredlanguagecode?>')
+				messagegroupHandleBeforeTabLoad.bindAsEventListener(formswitchercontainer, state)
 			);
 
 			// When a tab is loaded, update the status icon of the previous tab.
 			formswitchercontainer.observe('FormSplitter:TabLoaded',
-				messagegroupHandleTabLoaded.bindAsEventListener(formswitchercontainer, state, '<?=$messagegroup->id?>', '<?=$preferredlanguagecode?>', null, true)
+				messagegroupHandleTabLoaded.bindAsEventListener(formswitchercontainer, state, '<?=$messagegroup->id?>', null, true)
 			);
 		
 			form_init_splitter(formswitchercontainer, <?=json_encode($preferredtabs)?>, true);
