@@ -12,6 +12,8 @@ require_once("obj/Form.obj.php");
 require_once("obj/FormItem.obj.php");
 require_once("obj/Phone.obj.php");
 require_once("obj/Rule.obj.php");
+require_once("obj/ValRules.val.php");
+require_once("obj/ValSections.val.php");
 require_once("obj/FieldMap.obj.php");
 require_once("obj/FormUserItems.obj.php");
 require_once("obj/FormRuleWidget.fi.php");
@@ -312,6 +314,21 @@ if ($hasenrollment) {
 		"control" => array("TextField","maxlength" => 20, "size" => 12),
 		"helpstep" => 1
 	);
+	
+	$formdata["sectionids"] = array(
+		"label" => _L('Sections'),
+		"fieldhelp" => _L('Select sections from an organization.'),
+		"value" => "",
+		"validators" => array(
+			array("ValRequired"),
+			array("ValSections")
+		),
+		"control" => array("SectionWidget",
+			"sectionids" => QuickQueryList("select sectionid from listentry where listid=? and type='section'", false, false, array($list->id))
+		),
+		"helpstep" => 2
+	);
+	
 	$formdata["submit"] = array(
 		"label" => "",
 		"value" => "",
@@ -611,7 +628,7 @@ include_once("nav.inc.php");
 
 ?>
 <script type="text/javascript">
-<? Validator::load_validators(array("ValLogin", "ValPassword", "ValAccesscode", "ValPin", "ValRules")); ?>
+<? Validator::load_validators(array("ValLogin", "ValPassword", "ValAccesscode", "ValPin", "ValRules", "ValSections")); ?>
 </script>
 <?
 
