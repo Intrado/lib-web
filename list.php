@@ -24,6 +24,7 @@ require_once("ruleeditform.inc.php");
 require_once("inc/rulesutils.inc.php");
 require_once("obj/Validator.obj.php");
 require_once("obj/ValSections.val.php");
+require_once("obj/ValRules.val.php");
 require_once("obj/Form.obj.php");
 require_once("obj/FormItem.obj.php");
 require_once("obj/FormRuleWidget.fi.php");

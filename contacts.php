@@ -25,6 +25,7 @@ require_once("inc/rulesutils.inc.php");
 require_once("obj/FormRuleWidget.fi.php");
 require_once("obj/SectionWidget.fi.php");
 require_once("obj/ValSections.val.php");
+require_once("obj/ValRules.val.php");
 require_once("inc/reportutils.inc.php");
 include_once("obj/Address.obj.php");
 include_once("obj/Language.obj.php");
@@ -83,7 +84,7 @@ $formdata["toggles"] = array(
 	"label" => _L('Search Options'),
 	"control" => array("FormHtml", 'html' => "
 		<input name='systemcontact_searchOption' id='searchByRules' type='radio' onclick=\"choose_search_by_rules();\"><label for='searchByRules'> Search by Rules </label>" .
-		($USER->hasSections() ?
+		(getSystemSetting('_hasenrollment') ?
 			"<input name='systemcontact_searchOption' id='searchBySections' type='radio' onclick=\"choose_search_by_sections();\"><label for='searchBySections'> Search by Sections </label>" :
 			""
 		) .
@@ -100,7 +101,7 @@ $formdata["ruledata"] = array(
 	"helpstep" => 2
 );
 
-if ($USER->hasSections()) {
+if (getSystemSetting('_hasenrollment')) {
 	$formdata["sectionids"] = array(
 		"label" => _L('Sections'),
 		"fieldhelp" => _L('Select sections from an organization.'),
@@ -205,7 +206,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 						if ($data->fieldnum == 'organization') {
 							$orgkeys = array();
 							
-							$organizations = $USER->organizations();
+							$organizations = Organization::getAuthorizedOrgKeyss();
 							foreach ($data->val as $id) {
 								$id = $id + 0;
 								$orgkeys[$id] = $organizations[$id]->orgkey;
@@ -240,7 +241,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 					break;
 					
 				case 'sectionsearch':
-					if ($USER->hasSections()) {
+					if (getSystemSetting('_hasenrollment')) {
 						systemcontact_clear_search_session('systemcontact_sectionids');
 						$_SESSION['systemcontact_sectionids'] = $postdata['sectionids'];
 					}
@@ -379,7 +380,7 @@ include_once("nav.inc.php");
 	function choose_search_by_rules() {
 		$('searchByRules').checked = true;
 		$('ruleWidgetContainer').up('tr').show();
-	<? if ($USER->hasSections()) { ?>
+	<? if (getSystemSetting('_hasenrollment')) { ?>
 		$('searchBySections').checked = false;
 		$('<?=$form->name?>_sectionids_fieldarea').hide();
 		$('sectionsearchButtonContainer').up('tr').hide();
@@ -394,7 +395,7 @@ include_once("nav.inc.php");
 	function choose_search_by_sections() {
 		$('searchByRules').checked = false;
 		$('ruleWidgetContainer').up('tr').hide();
-	<? if ($USER->hasSections()) { ?>
+	<? if (getSystemSetting('_hasenrollment')) { ?>
 		$('searchBySections').checked = true;
 		$('<?=$form->name?>_sectionids_fieldarea').show();
 		$('sectionsearchButtonContainer').up('tr').show();
@@ -409,7 +410,7 @@ include_once("nav.inc.php");
 	function choose_search_by_person() {
 		$('searchByRules').checked = false;
 		$('ruleWidgetContainer').up('tr').hide();
-	<? if ($USER->hasSections()) { ?>
+	<? if (getSystemSetting('_hasenrollment')) { ?>
 		$('searchBySections').checked = false;
 		$('<?=$form->name?>_sectionids_fieldarea').hide();
 		$('sectionsearchButtonContainer').up('tr').hide();

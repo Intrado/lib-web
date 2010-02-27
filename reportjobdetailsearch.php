@@ -22,6 +22,7 @@ require_once("inc/rulesutils.inc.php");
 require_once("obj/FormRuleWidget.fi.php");
 require_once("obj/SectionWidget.fi.php");
 require_once("obj/ValSections.val.php");
+require_once("obj/ValRules.val.php");
 require_once("obj/Job.obj.php");
 require_once("inc/reportutils.inc.php");
 
@@ -193,7 +194,7 @@ if (isset($options['rules']) && count($options['rules']) > 0) {
 	$rulewidgetdata = cleanObjects(array_values($options['rules']));
 }
 if (isset($options['organizationids']) && count($options['organizationids']) > 0) {
-	$organizations = $USER->organizations();
+	$organizations = Organization::getAuthorizedOrgKeys();
 	
 	if (count($organizations) > 0) {
 		$orgkeys = array(); // An array of value=>title pairs.
@@ -308,7 +309,7 @@ $formdata["ruledata"] = array(
 	"helpstep" => 1
 );
 
-if ($USER->hasSections()) {
+if (getSystemSetting('_hasenrollment')) {
 	$formdata["sectionids"] = array(
 		"label" => _L('Sections'),
 		"fieldhelp" => _L('Select sections from an organization.'),
@@ -411,7 +412,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 					'organizationids' => isset($organizationids) ? $organizationids : array()
 				);
 				
-				if ($USER->hasSections()) {
+				if (getSystemSetting('_hasenrollment')) {
 					$_SESSION['report']['options']['sectionids'] = isset($postdata['sectionids']) ? $postdata['sectionids'] : array();
 				}
 				

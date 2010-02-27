@@ -129,10 +129,12 @@ function handleRequest() {
 				QuickUpdate('BEGIN');
 					QuickUpdate("DELETE FROM listentry WHERE type='organization' AND listid=?", false, array($listid));
 					
+					$validorgkeys = Organization::getAuthorizedOrgKeys();
+					
 					foreach ($data->val as $id) {
 						$id = $id + 0;
 						
-						if ($USER->authorizeOrganization($id)) {
+						if (isset($validorgkeys[$id])) {
 							$le = new ListEntry();
 							$le->listid = $listid;
 							$le->type = "organization";

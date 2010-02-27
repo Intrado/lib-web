@@ -3,7 +3,7 @@ class ListForm extends Form {
 	function ListForm ($name) {
 		global $USER;
 
-		if ($USER->hasSections()) {
+		if (getSystemSetting('_hasenrollment')) {
 			$formdata['sectionwidget'] = array(
 				'label' => _L('Choose Sections'),
 				'value' => '',
@@ -82,7 +82,7 @@ class ListForm extends Form {
 				</div>
 		";
 		
-		if ($USER->hasSections()) {
+		if (getSystemSetting('_hasenrollment')) {
 			$str .= "
 				<table style='border-collapse:collapse' id='chooseSectionsWindow'>
 					<tbody></tbody>
@@ -204,7 +204,7 @@ class ListForm extends Form {
 					listform_load('{$this->name}', " . json_encode($this->formdata) . ", {$posturlJSON});
 		";
 		
-		if ($USER->hasSections()) {
+		if (getSystemSetting('_hasenrollment')) {
 			$str .= "
 					// Move SectionWidget things into chooseSectionsWindow.
 					(function() {

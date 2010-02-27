@@ -14,6 +14,8 @@ require_once("obj/FieldMap.obj.php");
 require_once("obj/PeopleList.obj.php");
 require_once("obj/Person.obj.php");
 require_once("obj/Rule.obj.php");
+require_once("obj/Validator.obj.php");
+require_once("obj/ValRules.val.php");
 require_once("obj/ListEntry.obj.php");
 require_once("obj/RenderedList.obj.php");
 require_once("inc/date.inc.php");
@@ -159,7 +161,7 @@ function handleRequest() {
 				$renderedlist->calcStats();
 				$stats[$list->id]= array(
 					'name' => $list->name,
-					'advancedlist' => !$list->deleted || $renderedlist->totalremoved || $renderedlist->totaladded,
+					'advancedlist' => false,//!$list->deleted || $renderedlist->totalremoved || $renderedlist->totaladded,
 					'totalremoved' => $renderedlist->totalremoved,
 					'totaladded' => $renderedlist->totaladded,
 					'totalrule' => $renderedlist->total - $renderedlist->totaladded + $renderedlist->totalremoved,
@@ -193,31 +195,30 @@ function handleRequest() {
 						$fieldnum != 'c' . str_pad($number, 2, '0', STR_PAD_LEFT))
 						return false;
 					
-					// If the user has any section associations, only get values from those sections;
-					// Or if the user only has organization associations, then get the values from sections in those organizations.
-					// Otherwise, get values from all sections.
-					if (QuickQuery('select count(*) from userassociation where userid = ? and type = "section"', false, array($USER->id)) > 0) {
-						return QuickQueryList("
+					// If the user is unrestricted, get values from all sections.
+					// Otherwise, get the union of values from organization associations and section associations.
+					if (QuickQuery('select 1 from userassociation where userid = ? limit 1', false, array($USER->id))) {
+						// Values from section associations.
+						$values = QuickQueryList("
 							select distinct $fieldnum as value
 							from section
-								inner join userassociation
-									on (userassociation.sectionid = section.id)
-							where userid=? $limitsql
-						", false, false, array($USER->id));
-					} else if (QuickQuery('select count(*) from userassociation where userid = ? and type = "organization"', false, array($USER->id)) > 0) {
-						return QuickQueryList("
+								inner join userassociation on (userassociation.sectionid = section.id)
+							where userid=? $limitsql",
+							false, false, array($USER->id)
+						);
+						
+						// Values from organization associations.
+						$values += QuickQueryList("
 							select distinct $fieldnum as value
 							from section
-								inner join userassociation
-									on (userassociation.organizationid = section.organizationid)
-							where userid=? $limitsql
-						", false, false, array($USER->id));
-					} else {
-						return QuickQueryList("
-							select distinct $fieldnum as value
-							from section
-								where 1 $limitsql
-						", false);
+								inner join userassociation on (userassociation.organizationid = section.organizationid)
+							where userid=? $limitsql",
+							false, false, array($USER->id)
+						);
+						
+						return $values;
+					} else { // Unrestricted.
+						return QuickQueryList("select distinct $fieldnum as value from section where 1 $limitsql", false);
 					}
 				} else if ($fieldnum == FieldMap::getLanguageField()) {
 					$languagecodes = QuickQueryList("select value from persondatavalues where fieldnum=? $limitsql order by value", false, false, array($_GET['fieldnum']));
@@ -231,16 +232,8 @@ function handleRequest() {
 				}
 			// if it's an organization field
 			} else if ($fieldnum == 'organization') {
-				// $orgkeys is an array of id=>orgkey pairs.
-				$orgkeys = array();
-				
-				foreach ($USER->organizations() as $organization) {
-					$orgkeys[$organization->id] = $organization->orgkey;
-				}
-				
-				return $orgkeys;
-			// unknown fieldnum?
-			} else {
+				return Organization::getAuthorizedOrgKeys();
+			} else { // Unknown fieldnum, return false.
 				return false;
 			}
 			
@@ -248,50 +241,31 @@ function handleRequest() {
 			if (!isset($_GET['organizationid']))
 				return false;
 			$organizationid = $_GET['organizationid'] + 0;
-			if (!$USER->authorizeOrganization($organizationid))
-				return false;
 			
-			// If the user is associated with this organization, return all sections from this organization.
-			// If the user has section associations belonging to this organization, return those sections.
-			// If the user has no associations, retrieve all sections from this organization.
-			if (QuickQuery('select count(*) from userassociation where userid = ? and type = "organization" and organizationid=?', false, array($USER->id, $organizationid)) > 0) {
-				// Return an array of id=>skey pairs.
-				return QuickQueryList("
-					select id, skey
-					from section
-					where organizationid = ?",
-					true, false, array($organizationid)
-				);
-			}
-			
-			if (QuickQuery('select count(*) from userassociation where userid = ? and type = "section"', false, array($USER->id)) > 0) {
-				// Return an array of id=>skey pairs.
-				return QuickQueryList("
-					select section.id, section.skey
-					from section
-						inner join userassociation
-							on (userassociation.sectionid = section.id)
-					where userid=? and section.organizationid = ?",
-					true, false, array($USER->id, $organizationid)
-				);
-			} else {
-				// Return an array of id=>skey pairs.
-				return QuickQueryList("
-					select id, skey
-					from section
-					where organizationid = ?",
-					true, false, array($organizationid)
-				);
+			// If the user is unrestricted or is associated with this organization, $validsectionids = all sections for this organization.
+			// Otherwise if the user is associated to sections, $validsectionids = associated sections that are part of this organization.
+			if (QuickQuery('select 1 from userassociation where userid = ? limit 1', false, array($USER->id))) {
+				if (QuickQuery('select 1 from userassociation where userid = ? and organizationid = ? and type = "organization" limit 1', false, array($USER->id, $organizationid))) {
+					return QuickQueryList('select id, skey from section where organizationid = ?', true, false, array($organizationid));
+				} else {
+					return QuickQueryList('
+						select s.id, s.skey
+						from userassociation ua
+							inner join section s on (ua.sectionid = s.id)
+						where ua.userid = ? and ua.type = "section" and ua.sectionid != 0 and s.organizationid = ?',
+						true, false, array($USER->id, $organizationid)
+					);
+				}
+			} else { // Unrestricted.
+				return QuickQueryList('select id, skey from section where organizationid = ?', true, false, array($organizationid));
 			}
 
 		case 'rulewidgetsettings':
-			// check userassociations for org to see if we should show organization selection
-			
 			return array(
 				'operators' => $RULE_OPERATORS,
 				'reldateOptions' => $RELDATE_OPTIONS,
 				'fieldmaps' => cleanObjects(FieldMap::getAllAuthorizedFieldMaps()),
-				'hasorg' => count($USER->organizations()) > 0,
+				'hasorg' => QuickQuery('select 1 from organization where not deleted limit 1') == 1,
 				'languagefield' => FieldMap::getLanguageField(),
 				'languagemap' => Language::getLanguageMap()
 			);

@@ -27,6 +27,7 @@ require_once("obj/ValSections.val.php");
 require_once("obj/Form.obj.php");
 require_once("obj/FormItem.obj.php");
 require_once("obj/FormRuleWidget.fi.php");
+require_once("obj/ValRules.val.php");
 require_once("obj/SectionWidget.fi.php");
 require_once("inc/rulesutils.inc.php");
 require_once("inc/formatters.inc.php");

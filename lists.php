@@ -200,7 +200,7 @@ startWindow('My Lists&nbsp;' . help('Lists_MyLists'));
 			<?= icon_button(_L('Create New List with Rules'),"add","location.href='editlistrules.php?id=new'") ?>
 			<div style="clear:both;"></div>
 			<?
-				if ($USER->hasSections()) {
+				if (getSystemSetting('_hasenrollment')) {
 					echo icon_button(_L('Create New List with Sections'),"add","location.href='editlistsections.php?id=new'");
 				}
 			?>

@@ -145,7 +145,9 @@ if ($method === 'sections') {
 			array("ValRequired"),
 			array("ValSections")
 		),
-		"control" => array("SectionWidget", "sectionids" => QuickQueryList("select sectionid from listentry where listid=? and type='section'", false, false, array($list->id))),
+		"control" => array("SectionWidget",
+			"sectionids" => QuickQueryList("select sectionid from listentry where listid=? and type='section'", false, false, array($list->id))
+		),
 		"helpstep" => 2
 	);
 }
