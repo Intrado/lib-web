@@ -1,17 +1,13 @@
 <?php
 
-// First fix organizations for the rulewidget.
-// Next finish up SectionWidget, just spit out table html in the FormItem rather than building it in the javascript class.
-
 class SectionWidget extends FormItem {
 	function render($value) {
 		global $USER;
 		
 		$n = $this->form->name . '_' . $this->name;
 		
-		if (isset($this->args['sectionids']) && is_array($this->args['sectionids']) && count($this->args['sectionids']) > 0) {
-			$organizationid = QuickQuery('select organizationid from section where id=?', false, array(reset($this->args['sectionids'])));
-		}
+		if (isset($this->args['sectionids']) && is_array($this->args['sectionids']) && count($this->args['sectionids']) > 0)
+			$selectedorganizationid = QuickQuery('select organizationid from section where id=?', false, array(reset($this->args['sectionids'])));
 		
 		$html = '
 			<table>
@@ -25,10 +21,38 @@ class SectionWidget extends FormItem {
 							<option value="">' . escapehtml(_L("Choose an Organization")) . '</option>
 		';
 	
-		// Loop through organizations.
-		foreach ($USER->organizations() as $organization) {
-			$selected = isset($organizationid) && $organizationid === $organization->id;
-			$html .= '<option value="'.$organization->id.'" '.($selected ? 'selected' : '').'>' . escapehtml($organization->orgkey) . '</option>';
+		// Populate the selectbox with organizations.
+		// If the user has section/organization associations,
+		// get a union of his associated organizations and the organizations of his associated sections.
+		// Otherwise, get all organizations.
+		if (QuickQuery('select 1 from userassociation where userid = ? limit 1', false, array($USER->id))) {
+			$validorgkeys = QuickQueryList('
+				select o.id, o.orgkey
+				from userassociation ua
+					inner join organization o
+						on (ua.organizationid = o.id)
+				where ua.userid = ? and ua.type = "organization"',
+				true, false, array($USER->id)
+			);
+			
+			$validorgkeys += QuickQueryList('
+				select distinct o.id, o.orgkey
+				from userassociation ua
+					inner join section s
+						on (ua.sectionid = s.id)
+					inner join organization o
+						on (s.organizationid = o.id)
+				where ua.userid = ? and ua.type = "section" and ua.sectionid != 0',
+				true, false, array($USER->id)
+			);
+		} else {
+			$validorgkeys = QuickQueryList('select id, orgkey from organization where not deleted', true, false);
+		}
+		
+		foreach ($validorgkeys as $organizationid => $orgkey) {
+			$validorgkeys = QuickQueryList('select id, orgkey from organization where not deleted', true, false);
+			$selected = isset($selectedorganizationid) && $selectedorganizationid == $organizationid;
+			$html .= '<option value="'.$organizationid.'" '.($selected ? 'selected' : '').'>' . escapehtml($orgkey) . '</option>';
 		}
 		
 		$html .= '
@@ -51,9 +75,9 @@ class SectionWidget extends FormItem {
 		
 		if (isset($this->args['sectionids']) && is_array($this->args['sectionids']) && count($this->args['sectionids']) > 0) {
 			// The javascript SectionWidget expects an object literal of sectionid => true pairs.
-			$sectionids = array_fill_keys($this->args['sectionids'], true);
+			$selectedsectionidsmap = array_fill_keys($this->args['sectionids'], true);
 		} else {
-			$sectionids = null;
+			$selectedsectionidsmap = null;
 		}
 		
 		return '
@@ -62,7 +86,7 @@ class SectionWidget extends FormItem {
 					"'.$n.'",
 					"'.$n.'organizationselector",
 					"'.$n.'sectionscontainer",
-					'.json_encode($sectionids).'
+					'.json_encode($selectedsectionidsmap).'
 				);
 			})();
 		';
