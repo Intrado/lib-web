@@ -222,6 +222,8 @@ foreach ($customers as $cust) {
 			$customerfeatures[] = "Callback";
 		if (getCustomerSystemSetting('_hasselfsignup', false, true, $custdb))
 			$customerfeatures[] = "Self-Signup";
+		if (getCustomerSystemSetting('_hasenrollment', false, true, $custdb))
+			$customerfeatures[] = "Enrollment";
 		if (getCustomerSystemSetting('_hastargetedmessage', false, true, $custdb))
 			$customerfeatures[] = "Classroom";
 
