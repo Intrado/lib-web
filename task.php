@@ -227,8 +227,10 @@ startWindow('Import Information ');
 							NewFormItem($form, $section, 'datatype', 'selectstart');
 							NewFormItem($form, $section, 'datatype', 'selectoption', "Person", 'person');
 							NewFormItem($form, $section, 'datatype', 'selectoption', "User", 'user');
-							NewFormItem($form, $section, 'datatype', 'selectoption', "Section", 'section');
-							NewFormItem($form, $section, 'datatype', 'selectoption', "Enrollment", 'enrollment');
+							if (getSystemSetting('_hasenrollment', false)) {
+								NewFormItem($form, $section, 'datatype', 'selectoption', "Section", 'section');
+								NewFormItem($form, $section, 'datatype', 'selectoption', "Enrollment", 'enrollment');
+							}
 							NewFormItem($form, $section, 'datatype', 'selectend');
 						} else {
 							echo ucfirst($IMPORT->datatype);
