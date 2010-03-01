@@ -13,13 +13,14 @@ if(!$schedule) {
 	redirect('unauthorized.php');
 }
 
-$cutoff = strtotime($schedule->time);
+$cutoff = (strtotime($schedule->time) - 900); // 15 minutes before Alert Job runs
+$currenttime = time();
 $errortext = "";
-if(strpos($schedule->daysofweek, Date('w',time() + 1)) === false) {
+if(strpos($schedule->daysofweek, (String) (Date('w',$currenttime + 1))) === false) {
 
 	$errortext .= _L('The Classroom Comment Feature is Disabled for Today');
 } else {
-	if($cutoff < time()) {
+	if($cutoff < $currenttime && strtotime('1.00') > $currenttime) {
 		$errortext .= _L('The Classroom Comment Feature is Disabled After: %s', Date('g:i a',$cutoff));
 	} else {
 		redirect('classroommessageoverview.php');
@@ -28,7 +29,7 @@ if(strpos($schedule->daysofweek, Date('w',time() + 1)) === false) {
 
 $dows = explode(',',$schedule->daysofweek);
 if(!empty($dows)) {
-	$today = Date('w',time()) + 1;
+	$today = Date('w',$currenttime) + 1;
 	$next = $today % 7 + 1;
 	while(!in_array($next,$dows) && $next != $today) {
 		$next = $next % 7 + 1;

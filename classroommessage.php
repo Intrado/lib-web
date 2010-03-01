@@ -25,8 +25,8 @@ if (!getSystemSetting('_hastargetedmessage', false) || !$USER->authorize('target
 }
 
 $schedule = DBFind("Schedule","from job j inner join schedule s on (j.scheduleid = s.id) where j.type = 'alert' and j.status = 'repeating'","s");
-
-if(!($schedule && strpos($schedule->daysofweek, Date('w',time()) + 1) !== false && strtotime($schedule->time) > time())) {
+																								// 15 minutes before Alert Job runs
+if(!($schedule && strpos($schedule->daysofweek, (String) (Date('w',time()) + 1)) !== false  && (strtotime($schedule->time) - 900) > time() && strtotime('1.00') < time())) {
 	redirect('classroommessageredirect.php');
 }
 

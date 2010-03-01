@@ -124,8 +124,8 @@ startWindow(_L('Classroom Comments'));
 
 		<?
 		$schedule = DBFind("Schedule","from job j inner join schedule s on (j.scheduleid = s.id) where j.type = 'alert' and j.status = 'repeating'","s");
-
-		if($schedule && strpos($schedule->daysofweek, Date('w',time()) + 1) !== false && strtotime($schedule->time) > time()) {
+		$currenttime = time();																			// 15 minutes before Alert Job runs
+		if($schedule && strpos($schedule->daysofweek,(String) (Date('w',$currenttime) + 1)) !== false && (strtotime($schedule->time) - 900) > $currenttime && strtotime('1.00') < $currenttime) {
 			echo icon_button("Pick Comments", "add", null, "classroommessage.php");
 		} else {
 			//echo '<img src="img/largeicons/notepad.jpg" /> Please Comeback Tomorrow to Add Comments';
