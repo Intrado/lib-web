@@ -13,6 +13,10 @@ class ValLists extends Validator {
 		if (empty($listids))
 			return _L("Please add a list");
 
+		if(isset($args['allowempty']) && $args['allowempty'] == true) {
+			return true;
+		}
+
 		$allempty = true;
 		foreach ($listids as $listid) {
 			if ($listid === 'addme') {
@@ -27,7 +31,7 @@ class ValLists extends Validator {
 			if ($renderedlist->total >= 1)
 				$allempty = false;
 		}
-		if ($allempty && !(isset($args['jobtype']) && $args['jobtype'] == 'repeating'))
+		if ($allempty)
 			return _L('All of the selected lists are empty');
 		return true;
 	}

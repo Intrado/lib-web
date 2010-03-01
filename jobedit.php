@@ -424,7 +424,7 @@ $helpsteps[] = _L("The name of your job. The best names are brief and discriptiv
 			"value" => empty($selectedlists)?"":json_encode($selectedlists),
 			"validators" => array(
 				array("ValRequired"),
-				array("ValLists", 'jobtype' => $JOBTYPE)
+				array("ValLists", 'allowempty' => ($JOBTYPE == "repeating"))
 			),
 			"control" => array("JobListItem"),
 			"helpstep" => 4
