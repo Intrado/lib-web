@@ -527,6 +527,18 @@ class ValTimeCheck extends Validator {
 	}
 }
 
+class ValDate extends Validator {
+	var $onlyserverside = true;
+	function validate ($value, $args) {
+		if (strtotime($value) < strtotime($args['min']))
+			return $this->label. " ". _L('cannot be a date earlier than %s', $args['min']);
+		if (isset($args['max']))
+			if (strtotime($value) > strtotime($args['max']))
+				return $this->label. " ". _L('cannot be a date later than %s', $args['max']);
+		return true;
+	}
+}
+
 // $args["rangedonly"] If true, only allow 'xdays' and 'daterange'
 class ValReldate extends Validator {
 	var $onlyserverside = true;
@@ -591,6 +603,7 @@ class ValRegExp extends Validator {
 			}';
 	}
 }
+
 
 
 //alpha

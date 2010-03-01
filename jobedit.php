@@ -114,78 +114,6 @@ class ValTranslationExpirationDate extends Validator {
 }
 
 
-
-/* TODO these validators are copied from the wizard
-	Make sure they are moved to avoid duplicate implementation
-*/
-
-class ValTimeWindowCallEarly extends Validator {
-	var $onlyserverside = true;
-	function validate ($value, $args, $requiredvalues) {
-		if ((strtotime($value) + 3600) > strtotime($requiredvalues['calllate']))
-			return $this->label. " ". _L('There must be a minimum of one hour between start and end time');
-		return true;
-	}
-}
-
-class ValTimeWindowCallLate extends Validator {
-	var $onlyserverside = true;
-	function validate ($value, $args, $requiredvalues) {
-		if ((strtotime($value) - 3600) < strtotime($requiredvalues['callearly']))
-			return $this->label. " ". _L('There must be a minimum of one hour between start and end time');
-		if(isset($requiredvalues['date'])) {
-			$now = strtotime("now");
-			if ((date('m/d/Y', $now) == $requiredvalues['date']) && (strtotime($value) -1800 < $now))
-				return $this->label. " ". _L("There must be a minimum of one-half hour between now and end time to submit with today's date");
-		}
-		return true;
-	}
-}
-
-class ValDate extends Validator {
-	var $onlyserverside = true;
-	function validate ($value, $args) {
-		if (strtotime($value) < strtotime($args['min']))
-			return $this->label. " ". _L('cannot be a date earlier than %s', $args['min']);
-		if (isset($args['max']))
-			if (strtotime($value) > strtotime($args['max']))
-				return $this->label. " ". _L('cannot be a date later than %s', $args['max']);
-		return true;
-	}
-}
-
-class ValLists extends Validator {
-	var $onlyserverside = true;
-
-	function validate ($value, $args) {
-		global $USER;
-		if (strpos($value, 'pending') !== false)
-			return _L('Please finish adding this rule, or unselect the field');
-
-		$listids = json_decode($value);
-		if (empty($listids))
-			return _L("Please add a list");
-
-		$allempty = true;
-		foreach ($listids as $listid) {
-			if ($listid === 'addme') {
-				$allempty = false;
-				continue;
-			}
-			if (!userOwns('list', $listid))
-				return _L('You have specified an invalid list');
-			$list = new PeopleList($listid + 0);
-			$renderedlist = new RenderedList($list);
-			$renderedlist->calcStats();
-			if ($renderedlist->total >= 1)
-				$allempty = false;
-		}
-		if ($allempty && !(isset($args['jobtype']) && $args['jobtype'] == 'repeating'))
-			return _L('All of the selected lists are empty');
-		return true;
-	}
-}
-
 ////////////////////////////////////////////////////////////////////////////////
 // Form Data
 ////////////////////////////////////////////////////////////////////////////////
@@ -741,7 +669,7 @@ include_once("nav.inc.php");
 ?>
 <script type="text/javascript" src="script/listform.js.php"></script>
 <script type="text/javascript">
-<? Validator::load_validators(array("ValDuplicateNameCheck","ValTranslationExpirationDate","ValMessageTranslationExpiration","ValWeekRepeatItem","ValTimeWindowCallEarly","ValTimeWindowCallLate","ValDate","ValLists")); ?>
+<? Validator::load_validators(array("ValDuplicateNameCheck","ValTranslationExpirationDate","ValMessageTranslationExpiration","ValWeekRepeatItem","ValTimeWindowCallEarly","ValTimeWindowCallLate","ValLists")); ?>
 </script>
 <?
 

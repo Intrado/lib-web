@@ -24,6 +24,9 @@ require_once("obj/ValDuplicateNameCheck.val.php");
 require_once("obj/MessageGroupSelectMenu.fi.php");
 require_once("obj/WeekRepeat.fi.php");
 require_once("obj/WeekRepeat.val.php");
+require_once("obj/ValLists.val.php");
+require_once("obj/ValTimeWindowCallEarly.val.php");
+require_once("obj/ValTimeWindowCallLate.val.php");
 
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization
