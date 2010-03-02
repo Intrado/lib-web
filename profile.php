@@ -318,7 +318,7 @@ _L('Messaging Options'),
 		"value" => $obj->getValue("publishmessagegroup"),
 		"validators" => array(),
 		"control" => array("CheckBox"),
-		"helpstep" => 9
+		"helpstep" => 4
 	),
 	"subscribemessagegroup" => array(
 		"label" => _L('Subscribe to Messages'),
@@ -326,9 +326,9 @@ _L('Messaging Options'),
 		"value" => $obj->getValue("subscribemessagegroup"),
 		"validators" => array(),
 		"control" => array("CheckBox"),
-		"helpstep" => 9
+		"helpstep" => 4
 	),
-_L('Classroom Messaging Options'),
+//_L('Classroom Messaging Options'),
 	"targetedmessage" => array(
 		"label" => _L('Send Classroom Messages'),
 		"fieldhelp" => _L('Allows users to select and send from a library of classroom messages'),
@@ -338,8 +338,8 @@ _L('Classroom Messaging Options'),
 		"helpstep" => 4
 	),
 	"targetedcomment" => array(
-		"label" => _L('Add Comment Classroom Message'),
-		"fieldhelp" => _L('Allows users to add a comment to the predefined classroom message'),
+		"label" => _L('Add Remark Classroom Message'),
+		"fieldhelp" => _L('Allows users to add a remark to the predefined classroom message'),
 		"value" => $obj->getValue("targetedcomment"),
 		"validators" => array(),
 		"control" => array("CheckBox"),
@@ -587,8 +587,8 @@ _L('Security & Administrator Controls'),
 		"helpstep" => 10
 	),
 	"manageclassroommessaging" => array(
-		"label" => _L('Edit Classroom Messaging Template'),
-		"fieldhelp" => _L('Allows users to view and edit the classroom messaging template.'),
+		"label" => _L('Manage Classroom Data'),
+		"fieldhelp" => _L('Allows users to view and edit the classroom messaging template and classroom categories'),
 		"value" => $obj->getValue("manageclassroommessaging"),
 		"validators" => array(),
 		"control" => array("CheckBox"),
@@ -609,6 +609,12 @@ if (!getSystemSetting("_hassurvey", true)) {
 
 if (!getSystemSetting("_hassms", false)) {
 	unset($formdata['sendsms']);
+}
+
+if (!getSystemSetting("_hastargetedmessage", false)) {
+	unset($formdata['targetedmessage']);
+	unset($formdata['targetedcomment']);
+	unset($formdata['manageclassroommessaging']);
 }
 
 
@@ -675,8 +681,6 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 			$obj->setPermission("callmax", $postdata['callmax']);
 			$obj->setPermission("sendemail", (bool)$postdata['sendemail']);
 			$obj->setPermission("sendmulti", (bool)$postdata['sendmulti']);
-			$obj->setPermission("targetedmessage", (bool)$postdata['targetedmessage']);
-			$obj->setPermission("targetedcomment", (bool)$postdata['targetedcomment']);
 			$obj->setPermission("createlist", (bool)$postdata['createlist']);
 			$obj->setPermission("listuploadids", (bool)$postdata['listuploadids']);
 			$obj->setPermission("listuploadcontacts", (bool)$postdata['listuploadcontacts']);
@@ -706,7 +710,6 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 			$obj->setPermission("messageconfirmation", (bool)$postdata['messageconfirmation']);
 			$obj->setPermission("publishmessagegroup", (bool)$postdata['publishmessagegroup']);
 			$obj->setPermission("subscribemessagegroup", (bool)$postdata['subscribemessagegroup']);
-			$obj->setPermission("manageclassroommessaging", (bool)$postdata['manageclassroommessaging']);
 
 			if(getSystemSetting("_hasportal", false)) {
 				$obj->setPermission("portalaccess", (bool)$postdata['portalaccess']);
@@ -720,6 +723,13 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 			if (getSystemSetting("_hassms", false)) {
 				$obj->setPermission("sendsms", (bool)$postdata['sendsms']);
 			}
+			
+			if (getSystemSetting("_hastargetedmessage", false)) {
+				$obj->setPermission("targetedmessage", (bool)$postdata['targetedmessage']);
+				$obj->setPermission("targetedcomment", (bool)$postdata['targetedcomment']);
+				$obj->setPermission("manageclassroommessaging", (bool)$postdata['manageclassroommessaging']);
+			}
+			
 		Query("COMMIT");
 
 		$_SESSION['editaccessid'] = $obj->id;
@@ -770,7 +780,7 @@ endWindow();
 <script>
 function checkAllCheckboxes(domanagement){
 
-	var managementoptions = "manageaccount,manageprofile,managesystem,managesystemjobs,managetasks,metadata".split(",");
+	var managementoptions = "manageaccount,manageprofile,managesystem,managesystemjobs,managetasks,metadata,manageclassroommessaging".split(",");
 
 	var form = document.forms[0].elements;
 	for(var i = 0; i < form.length; i++){
