@@ -87,6 +87,8 @@ if (!$maxsms = getSystemSetting("maxsms"))
 if (isset($personid)) {
 	// editing existing person
 	$data = DBFind("Person", "from person where id = " . $personid);
+	$query = "select group_concat(oz.orgkey separator ', ') from organization oz join personassociation pa on (pa.organizationid = oz.id) where personid=?";
+	$organization = QuickQuery($query, false, array($personid));
 	$address = DBFind("Address", "from address where personid = " . $personid);
 	if ($address === false) $address = new Address(); // contact was imported/uploaded without any address data, create one now
 	$types = array();
@@ -382,6 +384,11 @@ foreach ($fieldmaps as $map) {
 ?>
 
 	<tr>
+		<th align="right" class="windowRowHeader bottomBorder">Organization:</th>
+		<td class="bottomBorder"><? displayValue($organization); ?></td>
+	</tr>
+	
+	<tr>
 		<th align="right" valign="top" class="windowRowHeader bottomBorder" style="padding-top: 10px;">Address:</th>
 		<td class="bottomBorder">
 			<table border="0">
@@ -491,21 +498,35 @@ foreach ($fieldmaps as $map) {
 		<td>
 	</tr>
 
-
+<?
+	if (getSystemSetting('_hasenrollment', false)) {
+?>
 	<tr>
 		<th align="right" class="windowRowHeader bottomBorder">Enrollment Data:</th>
 		<td class="bottomBorder">
 		<table cellpadding="3" cellspacing="1" class="list sortable" id="enrollmenttable">
 <?
-		$assocdata = QuickQueryMultiRow("
-			select c01, c02, c03, c04, c05, c06, c07, c08, c09, c10
+		// find all sections associated with this person
+		$sections = QuickQueryMultiRow("
+			select section.id, c01, c02, c03, c04, c05, c06, c07, c08, c09, c10, oz.orgkey
 			from section
 				inner join personassociation pa
 					on (section.id = pa.sectionid)
+				join organization oz
+					on (section.organizationid = oz.id)
 			where personid=$personid",
 			true
 		);
+		// sort sections by c01 (period) strip non-numerics, second sort by id
+		$assocdata = array();
+		foreach ($sections as $row) {
+			$index = ereg_replace('[^0-9]+','',$row['c01']) . $row['id'];
+			$assocdata[$index] = $row;
+		}
+		ksort($assocdata);
+//var_dump($assocdata);
 		
+		// find display fields for this user
 		$fieldmaps = FieldMap::getAuthorizedFieldMapsLike('c');
 ?>
 		<tr class="listHeader">
@@ -517,6 +538,7 @@ foreach ($fieldmaps as $map) {
 <?
 		}
 ?>
+			<th align="left"><?=_L("Organization")?></th>
 		</tr>
 <?
 		$alt = 0;
@@ -524,10 +546,11 @@ foreach ($fieldmaps as $map) {
 			echo ++$alt % 2 ? '<tr>' : '<tr class="listAlt">';
 			foreach ($fieldmaps as $map) {
 ?>
-			<td><?=escapehtml($row[$map->fieldnum])?></td>
+				<td><?=escapehtml($row[$map->fieldnum])?></td>
 <?
 			}
 ?>
+				<td><?=escapehtml($row['orgkey'])?></td>
 			</tr>
 <?
 		}
@@ -535,7 +558,9 @@ foreach ($fieldmaps as $map) {
 		</table>
 		</td>
 	</tr>
-
+<?
+	} // end _hasenrollment
+?>
 
 <?
 	if(getSystemSetting("_hasportal", false) && $USER->authorize("portalaccess") && $associates){
