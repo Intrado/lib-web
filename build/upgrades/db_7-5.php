@@ -28,8 +28,9 @@ require_once("upgrades/db_7-5_oldcode.php");
 
 function upgrade_7_5 ($rev, $shardid, $customerid, $db) {
 	
-	
-	
+	// drop all triggers first, recreate after all revs completed
+	apply_sql("../db/droptriggers.sql",$customerid,$db);
+		
 	switch($rev) {
 		default:
 		case 0:
@@ -197,6 +198,10 @@ function upgrade_7_5 ($rev, $shardid, $customerid, $db) {
 			if ($schoolfieldnum) {
 				$num = substr($schoolfieldnum,1) + 0;
 				
+				// convert any import mapings from school to organization
+				$query = "update importfield set mapto='okey' where mapto=?";
+				QuickUpdate($query, false, array($schoolfieldnum));
+				
 				//create orgs for each school field
 				if ($schoolfieldnum[0] == "g")
 					$query = "select distinct value from groupdata where fieldnum=$num";
@@ -312,6 +317,7 @@ function upgrade_7_5 ($rev, $shardid, $customerid, $db) {
 	//do these always
 	//apply_sql("../db/targetedmessages.sql",$customerid,$db);
 	apply_sql("../db/update_SMAdmin_access.sql",$customerid,$db);
+	apply_sql("../db/createtriggers.sql",$customerid,$db);
 	
 	
 	return true;
