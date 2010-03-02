@@ -61,7 +61,7 @@ function wizHasPhone($postdata) {
 	$messagegroup = DBFind("MessageGroup", "from messagegroup where id = ?", false, array($messagegroupid));
 	
 	// if custom and select saved and selected message group has a phone message
-	if ($package == 'custom' && $messageoptions == 'pick' && $messagegroup->getFirstMessageOfType('phone'))
+	if ($package == 'custom' && $messageoptions == 'pick' && $messagegroup && $messagegroup->hasMessage('phone'))
 		return true;
 	
 	return false;
@@ -101,7 +101,7 @@ function wizHasEmail($postdata) {
 	$messagegroup = DBFind("MessageGroup", "from messagegroup where id = ?", false, array($messagegroupid));
 	
 	// if custom and select saved and selected message group has an email message
-	if ($package == 'custom' && $messageoptions == 'pick' && $messagegroup->getFirstMessageOfType('email'))
+	if ($package == 'custom' && $messageoptions == 'pick' && $messagegroup && $messagegroup->hasMessage('email'))
 		return true;
 	
 	return false;
@@ -141,7 +141,7 @@ function wizHasSms($postdata) {
 	$messagegroup = DBFind("MessageGroup", "from messagegroup where id = ?", false, array($messagegroupid));
 	
 	// if custom and select saved and selected message group has an sms message
-	if ($package == 'custom' && $messageoptions == 'pick' && $messagegroup->getFirstMessageOfType('sms'))
+	if ($package == 'custom' && $messageoptions == 'pick' && $messagegroup && $messagegroup->hasMessage('sms'))
 		return true;
 	
 	return false;
@@ -1510,7 +1510,7 @@ class JobWiz_messageSmsText extends WizStep {
 			}
 		} else if (isset($postdata['/message/email/text'])) {
 			if (isset($postdata['/message/email/text']['message']))
-				$text = $postdata['/message/email/text']['message'];
+				$text = html_to_plain($postdata['/message/email/text']['message']);
 		} else
 			$text = "";
 
