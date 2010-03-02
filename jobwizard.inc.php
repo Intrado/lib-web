@@ -3,136 +3,151 @@
 // global wizard functions
 ////////////////////////////////////////////////////////////////////////////////
 
-// Check the whole of the wizard post data and include user authorization to figure out if this wizard has an assigned valid phone message
+// Check the whole of the wizard post data and include user authorization to figure out if this wizard has an assigned message group
 function wizHasMessageGroup($postdata) {
 	global $USER;
-	if((isset($postdata["/start"]["package"]) && $postdata["/start"]["package"] == "custom" &&
-		isset($postdata["/message/options"]["options"]) && $postdata["/message/options"]["options"] == "pick" &&
-		isset($postdata["/message/pickmessage"]["messagegroup"])) &&
-		($USER->authorize("sendphone") || $USER->authorize("sendemail") || ($USER->authorize("sendsms") && getSystemSetting("_hassms")))) {
+	
+	// user has to be able to send some kind of message
+	if (!$USER->authorize("sendphone") && !$USER->authorize("sendemail") && !($USER->authorize("sendsms") && getSystemSetting("_hassms")))
+		return false;
+	
+	$package = isset($postdata["/start"]["package"])?$postdata["/start"]["package"]:false;
+	$messageoptions = isset($postdata["/message/options"]["options"])?$postdata["/message/options"]["options"]:false;
+	
+	// if it's custom and pick message and there is a message group selected
+	if($package == "custom" && $messageoptions == "pick" && isset($postdata["/message/pickmessage"]["messagegroup"]))
 		return true;
-	}
+	
 	return false;
 }
 
-// Check the whole of the wizard post data and include user authorization to figure out if this wizard has an assigned valid phone message
+// Check the whole of the wizard post data and include user authorization to figure out if this wizard has an assigned phone message
 function wizHasPhone($postdata) {
 	global $USER;
-	if (isset($postdata["/start"]["package"]) && $USER->authorize("sendemail")) {
-		$package = $postdata["/start"]["package"];
-		// Test Common Packges Phone
-		if(($package == "easycall" && isset($postdata["/message/phone/callme"]["message"]) && strlen($postdata["/message/phone/callme"]["message"]) > 2) ||
-		   ($package == "express" && isset($postdata["/message/phone/text"]["message"]) && strlen($postdata["/message/phone/text"]["message"]) > 2) ||
-		   ($package == "personalized" && isset($postdata["/message/phone/callme"]["message"]) && strlen($postdata["/message/phone/callme"]["message"]) > 2)
-		) {
-			return true;
-		}
-
-		// Test Custom For Phone
-		if($package == "custom" &&
-			isset($postdata["/message/options"]["options"])  &&
-			$postdata["/message/options"]["options"] == "create" && // Need to take create Path
-			isset($postdata["/message/pick"]["type"]) &&
-			in_array('phone', $postdata["/message/pick"]["type"]) &&  // Select Phone
-			isset($postdata["/message/select"]["phone"]) &&
-				(
-				($postdata["/message/select"]["phone"] == "record" && isset($postdata["/message/phone/callme"]["message"]) && strlen($postdata["/message/phone/callme"]["message"]) > 2)
-				||
-				($postdata["/message/select"]["phone"] == "text" && isset($postdata["/message/phone/text"]["message"]) && strlen($postdata["/message/phone/text"]["message"]) > 2)
-				)
-			)
-		{
-			return true;
-		}
+	
+	if (!$USER->authorize("sendphone"))
 		return false;
-	}
+	
+	$package = isset($postdata["/start"]["package"])?$postdata["/start"]["package"]:false;
+	$callme = isset($postdata["/message/phone/callme"]["message"])?json_decode($postdata["/message/phone/callme"]["message"]):false;
+
+	// if it's an easycall and message has been recorded
+	if ($package == 'easycall' && $callme)
+		return true;
+
+	$phonetext = isset($postdata["/message/phone/text"]["message"])?$postdata["/message/phone/text"]["message"]:false;
+	
+	// if it's express and message text entered
+	if ($package == 'express' && $phonetext)
+		return true;
+	
+	// if it's personalized and message recorded
+	if ($package == 'personalized' && $callme)
+		return true;
+	
+	$messageoptions = isset($postdata["/message/options"]["options"])?$postdata["/message/options"]["options"]:false;
+	$messagepick = isset($postdata["/message/pick"]["type"])?$postdata["/message/pick"]["type"]:false;
+	$messageselectphone = isset($postdata["/message/select"]["phone"])?$postdata["/message/select"]["phone"]:false;
+	
+	// if custom and create message and phone selected and record requested and message recorded
+	if ($package == 'custom' && $messageoptions == 'create' && in_array('phone', $messagepick) && $messageselectphone == 'record' && $callme)
+		return true;
+	
+	// if custom and create message and phone selected and text requested and message text entered
+	if ($package == 'custom' && $messageoptions == 'create' && in_array('phone', $messagepick) && $messageselectphone == 'text' && $phonetext)
+		return true;
+	
+	$messagegroupid = isset($postdata["/message/pickmessage"]["messagegroup"])?$postdata["/message/pickmessage"]["messagegroup"]:false;
+	$messagegroup = DBFind("MessageGroup", "from messagegroup where id = ?", false, array($messagegroupid));
+	
+	// if custom and select saved and selected message group has a phone message
+	if ($package == 'custom' && $messageoptions == 'pick' && $messagegroup->getFirstMessageOfType('phone'))
+		return true;
+	
+	return false;
 }
 
-// Check the whole of the wizard post data and include user authorization to figure out if this wizard has an assigned valid email message
+// Check the whole of the wizard post data and include user authorization to figure out if this wizard has an assigned email message
 function wizHasEmail($postdata) {
 	global $USER;
-	if (isset($postdata["/start"]["package"]) && $USER->authorize("sendemail")) {
-		$package = $postdata["/start"]["package"];
-		// Test Common Packges Email
-		if(($package == "easycall" && isset($postdata["/message/phone/callme"]["message"]) && strlen($postdata["/message/phone/callme"]["message"]) > 2 && $USER->authorize("sendphone")) ||
-		   (($package == "express" || $package == "personalized") && isset($postdata["/message/email/text"]["message"]) && $postdata["/message/email/text"]["message"])) {
-			return true;
-		}
-		// Test Custom For Email
-		if($package == "custom" &&
-			isset($postdata["/message/options"]["options"])  && 
-			$postdata["/message/options"]["options"] == "create" && // Need to take create Path
-			isset($postdata["/message/pick"]["type"]) &&
-			in_array('email', $postdata["/message/pick"]["type"]))  // Select Email
-		{
-			if(isset($postdata["/message/email/text"]["message"]) && $postdata["/message/email/text"]["message"]) {
-				return true;
-			}
+	
+	if (!$USER->authorize("sendemail"))
+		return false;
+	
+	$package = isset($postdata["/start"]["package"])?$postdata["/start"]["package"]:false;
 
-			// If phone is selected together with email; Check that select page has values; Optimized order of issets
-			if(isset($postdata["/message/select"]) &&
-			   isset($postdata["/message/select"]["email"]) && // Need to check if set since it is not checked above
-			   $postdata["/message/select"]["email"] == "record" &&
-			   isset($postdata["/message/select"]["phone"]) &&
-				// message/pick type is set because of if statement above
-			   in_array('phone', $postdata["/message/pick"]["type"]) &&
-			   $USER->authorize("sendphone") &&
-			   (
-				 $postdata["/message/select"]["phone"] == "record" && isset($postdata["/message/phone/callme"]["message"]) && strlen($postdata["/message/phone/callme"]["message"]) > 2
-				 ||
-				 $postdata["/message/select"]["phone"] == "text" && isset($postdata["/message/phone/text"]["message"]) && strlen($postdata["/message/phone/text"]["message"]) > 2
-			   ))
-			{
-				return true;
-			}
-		}
-	}
+	// easycall never attaches an email message
+	if ($package == 'easycall')
+		return false;
+	
+	$emailtext = isset($postdata["/message/email/text"]["message"])?$postdata["/message/email/text"]["message"]:false;
+
+	// express and email text entered
+	if ($package == 'express' && $emailtext)
+		return true;
+	
+	// personalized and email text entered
+	if ($package == 'personalized' && $emailtext)
+		return true;
+	
+	$messageoptions = isset($postdata["/message/options"]["options"])?$postdata["/message/options"]["options"]:false;
+	$messagepick = isset($postdata["/message/pick"]["type"])?$postdata["/message/pick"]["type"]:false;
+	
+	// if custom and create message and email selected and email text entered
+	if ($package == 'custom' && $messageoptions == 'create' && in_array('email', $messagepick) && $emailtext)
+		return true;
+	
+	$messagegroupid = isset($postdata["/message/pickmessage"]["messagegroup"])?$postdata["/message/pickmessage"]["messagegroup"]:false;
+	$messagegroup = DBFind("MessageGroup", "from messagegroup where id = ?", false, array($messagegroupid));
+	
+	// if custom and select saved and selected message group has an email message
+	if ($package == 'custom' && $messageoptions == 'pick' && $messagegroup->getFirstMessageOfType('email'))
+		return true;
+	
 	return false;
 }
 
-// Check the whole of the wizard post data and include user authorization to figure out if this wizard has an assigned valid sms message
+// Check the whole of the wizard post data and include user authorization to figure out if this wizard has an assigned sms message
 function wizHasSms($postdata) {
 	global $USER;
-	if (isset($postdata["/start"]["package"]) && $USER->authorize("sendsms") && getSystemSetting("_hassms")) {
-		$package = $postdata["/start"]["package"];
-		// Test Common Packges SMS
-		if(($package == "easycall" && isset($postdata["/message/phone/callme"]["message"]) && strlen($postdata["/message/phone/callme"]["message"]) > 2 && $USER->authorize("sendphone")) ||
-		   (($package == "express" || $package == "personalized") && isset($postdata["/message/sms/text"]["message"]) && $postdata["/message/sms/text"]["message"])) {
-			return true;
-		}
+	
+	if (!$USER->authorize("sendsms") || !getSystemSetting("_hassms"))
+		return false;
+	
+	$package = isset($postdata["/start"]["package"])?$postdata["/start"]["package"]:false;
 
-		// Test Custom For SMS
-		if($package == "custom" &&
-			isset($postdata["/message/options"]["options"])  &&
-			$postdata["/message/options"]["options"] == "create" && // Need to take create Path
-			isset($postdata["/message/pick"]["type"]) &&
-			in_array('sms', $postdata["/message/pick"]["type"]))  // Select SMS
-		{
-			if(isset($postdata["/message/sms/text"]["message"]) && $postdata["/message/sms/text"]["message"]) {
-				return true;
-			}
+	// easycall never attaches an sms message
+	if ($package == 'easycall')
+		return false;
+	
+	$smstext = isset($postdata["/message/sms/text"]["message"])?$postdata["/message/sms/text"]["message"]:false;
 
-			// If phone is selected together with email; Check that select page has values; Optimized order of issets
-			if(isset($postdata["/message/select"]) &&
-			   isset($postdata["/message/select"]["sms"]) && // Need to check if set since it is not checked above
-			   $postdata["/message/select"]["sms"] == "record" &&
-			   isset($postdata["/message/select"]["phone"]) &&
-				// message/pick type is set because of if statement above
-			   in_array('phone', $postdata["/message/pick"]["type"]) &&
-			   $USER->authorize("sendphone") &&
-			   (
-				 $postdata["/message/select"]["phone"] == "record" && isset($postdata["/message/phone/callme"]["message"]) && strlen($postdata["/message/phone/callme"]["message"]) > 2
-				 ||
-				 $postdata["/message/select"]["phone"] == "text" && isset($postdata["/message/phone/text"]["message"]) && strlen($postdata["/message/phone/text"]["message"]) > 2
-			   ))
-			{
-				return true;
-			}
-		}
-	}
+	// express and sms text entered
+	if ($package == 'express' && $smstext)
+		return true;
+	
+	// personalized and sms text entered
+	if ($package == 'personalized' && $smstext)
+		return true;
+	
+	$messageoptions = isset($postdata["/message/options"]["options"])?$postdata["/message/options"]["options"]:false;
+	$messagepick = isset($postdata["/message/pick"]["type"])?$postdata["/message/pick"]["type"]:false;
+	
+	// if custom and create message and sms selected and sms text entered
+	if ($package == 'custom' && $messageoptions == 'create' && in_array('sms', $messagepick) && $smstext)
+		return true;
+	
+	$messagegroupid = isset($postdata["/message/pickmessage"]["messagegroup"])?$postdata["/message/pickmessage"]["messagegroup"]:false;
+	$messagegroup = DBFind("MessageGroup", "from messagegroup where id = ?", false, array($messagegroupid));
+	
+	// if custom and select saved and selected message group has an sms message
+	if ($package == 'custom' && $messageoptions == 'pick' && $messagegroup->getFirstMessageOfType('sms'))
+		return true;
+	
 	return false;
 }
 
+// checks postdata to see if any auto translations are requested
 function wizHasTranslation($postdata) {
 	if (isset($postdata["/start"]["package"])) {
 		$package = $postdata["/start"]["package"];
@@ -166,11 +181,14 @@ function wizHasTranslation($postdata) {
 	return false;
 }
 
+// get the user requested schedule out of postdata
 function getSchedule($postdata) {
 	global $ACCESS;
 	global $USER;
 	$schedule = array();
-	switch ($postdata["/schedule/options"]["schedule"]) {
+	
+	$scheduleoptions = isset($postdata["/schedule/options"]["schedule"])?$postdata["/schedule/options"]["schedule"]:false;
+	switch ($scheduleoptions) {
 		case "now":
 			$callearly = date("g:i a");
 			$accessCallearly = $ACCESS->getValue("callearly");
@@ -486,9 +504,19 @@ class ValHasMessage extends Validator {
 	function validate ($value, $args) {
 		global $USER;
 		if ($value == 'pick') {
-			$msgcount = (QuickQuery("select count(*) from message where userid=? and not deleted and type=?", false, array($USER->id, $args['type'])));
-			if (!$msgcount)
-				return "$this->label: ". _L('There are no saved messages of this type.');
+			// find if there are any message groups the user owns or subscribes to
+			$hasowned = QuickQuery("
+				select 1
+				from messagegroup mg
+				where not mg.deleted and mg.userid = ?
+				limit 1", false, array($USER->id));
+			$hassubscribed = QuickQuery("
+				select 1
+				from publish p
+				where p.userid = ? and action = 'subscribe' and type = 'messagegroup'
+				limit 1", false, array($USER->id));
+			if (!$hasowned && !$hassubscribed)
+				return "$this->label: ". _L('You have no saved or subscribed messages.');
 		}
 		return true;
 	}
@@ -501,7 +529,7 @@ class ValEasycall extends Validator {
 		if (!$USER->authorize("starteasy"))
 			return "$this->label "._L("is not allowed for this user account");
 		$values = json_decode($value);
-		if ($value == "{}")
+		if ($values == null)
 			return "$this->label "._L("has messages that are not recorded");
 		foreach ($values as $langcode => $afid) {
 			$audiofile = DBFind("AudioFile", "from audiofile where id = ? and userid = ?", false, array($afid, $USER->id));
@@ -823,11 +851,18 @@ class JobWiz_messageGroupChoose extends WizStep {
 	//returns true if this step is enabled
 	function isEnabled($postdata, $step) {
 		global $USER;
-		if (isset($postdata['/message/options']['options']) && $postdata['/message/options']['options'] == "pick") {
-			return true;
-		} else {
+		
+		if (!$USER->authorize("sendphone") && !$USER->authorize("sendemail") && !($USER->authorize("sendsms") && getSystemSetting("_hassms")))
 			return false;
-		}
+		
+		$package = isset($postdata["/start"]["package"])?$postdata["/start"]["package"]:false;
+		$messageoptions = isset($postdata["/message/options"]["options"])?$postdata["/message/options"]["options"]:false;
+		
+		// if custom and pick message selected
+		if ($package == 'custom' && $messageoptions == "pick")
+			return true;
+		
+		return false;
 	}
 }
 
@@ -1381,7 +1416,7 @@ class JobWiz_messageEmailTranslate extends WizStep {
 				foreach($translations as $obj){
 					$languagecode = array_shift($translationlanguagecodes);
 					$formdata[] = Language::getName($languagecode);
-					$formdata[$languagecode."-enabled"] = array(
+					$formdata[$languagecode] = array(
 						"label" => _L("Enabled"),
 						"fieldhelp" => _L('Check this box to automatically translate your message using Google Translate.'),
 						"value" => 1,
@@ -1389,7 +1424,7 @@ class JobWiz_messageEmailTranslate extends WizStep {
 						"control" => array("CheckBox"),
 						"helpstep" => 1
 					);
-					$formdata[$languagecode] = array(
+					$formdata[$languagecode. "-preview"] = array(
 						"label" => _L("Message"),
 						"control" => array("FormHtml","html"=>'<div style="border: 1px solid gray; overflow: auto; height: 150px;">'.$obj->responseData->translatedText.'</div><br>'),
 						"helpstep" => 1
@@ -1398,7 +1433,7 @@ class JobWiz_messageEmailTranslate extends WizStep {
 			} else {
 				$languagecode = reset($translationlanguagecodes);
 				$formdata[] = Language::getName($languagecode);
-				$formdata[$languagecode."-enabled"] = array(
+				$formdata[$languagecode] = array(
 					"label" => _L("Enabled"),
 					"fieldhelp" => _L('Check this box to automatically translate your message using Google Translate.'),
 					"value" => 1,
@@ -1406,9 +1441,9 @@ class JobWiz_messageEmailTranslate extends WizStep {
 					"control" => array("CheckBox"),
 					"helpstep" => 1
 				);
-				$formdata[$languagecode] = array(
+				$formdata[$languagecode. "-preview"] = array(
 					"label" => _L("Message"),
-					"control" => array("FormHtml","html"=>'<div style="border: 1px solid gray; overflow: auto; height: 150px;">'.$obj->responseData->translatedText.'</div><br>'),
+					"control" => array("FormHtml","html"=>'<div style="border: 1px solid gray; overflow: auto; height: 150px;">'.$translations->responseData->translatedText.'</div><br>'),
 					"helpstep" => 1
 				);
 			}
