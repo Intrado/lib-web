@@ -43,7 +43,7 @@ startWindow("Options", 'padding: 3px;');
 			}
 			// features - if contact manager, or self-signup, or smartcall appliance, or classroom
 			if ((getSystemSetting('_hasportal', false) && $USER->authorize('portalaccess')) ||
-				(getSystemSetting('_hasselfsignup', false) && $USER->authorize('metadata')) ||
+				(getSystemSetting('_hasselfsignup', false) && ($USER->authorize('metadata') || $USER->authorize('managesystem'))) ||
 				($USER->authorize('managesystem') && getSystemSetting('_dmmethod', "")!='asp') ||
 				($USER->authorize('manageclassroommessaging') && getSystemSetting('_hastargetedmessage'))) {
 ?>
