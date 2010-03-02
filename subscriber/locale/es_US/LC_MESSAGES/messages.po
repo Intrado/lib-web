@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Subscriber Self-Signup 7.0.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2009-08-05 13:00-0800\n"
+"POT-Creation-Date: 2010-03-02 14:20-0800\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Gretel Baumgartner <gbaumgartner@schoolmessenger.com>\n"
 "Language-Team:  <gbaumgartner@schoolmessenger.com>\n"
@@ -13,66 +13,450 @@ msgstr ""
 "X-Poedit-Country: UNITED STATES\n"
 "X-Poedit-SourceCharset: utf-8\n"
 "X-Poedit-KeywordsList: _L\n"
-"X-Poedit-Basepath: /Gretel/workspace/kona/subscriber\n"
+"X-Poedit-Basepath: /home/gretel/workspace/kona/subscriber\n"
 "X-Poedit-Bookmarks: 60,-1,-1,-1,-1,-1,-1,-1,-1,-1\n"
 "X-Poedit-SearchPath-0: .\n"
 
-#: account.php:19
-#: changeemail.php:124
-msgid "Change Account Email"
-msgstr "Cambiar correo electrónico"
+#: loginbottom.inc.php:23
+msgid "Click to Verify - This site chose VeriSign SSL for secure e-commerce and confidential communications."
+msgstr "Haga clic aquí para verificar - Este sitio escogió SSL de VeriSign para la seguridad del comercio electrónico y comunicaciones confidenciales."
 
-#: account.php:21
-#: changepass.php:90
-#: changepass.php:111
-msgid "Change Password"
-msgstr "Cambiar contraseña"
+#: loginbottom.inc.php:26
+msgid "ABOUT SSL CERTIFICATES"
+msgstr "ACERCA DE LOS CERTIFICADOS SSL"
 
-#: account.php:23
-msgid "Permanently close my account"
-msgstr "Cerrar mi cuenta permanentemente"
+#: loginbottom.inc.php:35
+msgid "1999-2010 Reliance Communications, Inc. All Rights Reserved."
+msgstr "1999-2010 Reliance Communications, Inc. Todos los derechos reservados."
 
-#: account.php:28
+#: forgotpassword.php:30
+msgid "The 2 emails you have entered do not match"
+msgstr "Las 2 direcciones de correo electrónico que ha introducido no coinciden."
+
+#: forgotpassword.php:32
+msgid "That is not a valid email address"
+msgstr "Ese no es un correo electrónico válido."
+
+#: forgotpassword.php:41
+msgid "This user does not exist, please Create an Account."
+msgstr "Este usario no existe, por favor cree una cuenta."
+
+#: forgotpassword.php:51
+msgid "Password Assistance"
+msgstr "Asistencia para contraseñas"
+
+#: forgotpassword.php:54
+msgid "There was a problem with your request.  Please try again later"
+msgstr "Habia un problema con su solicitud. Por favor, inténtelo de nuevo más tarde."
+
+#: forgotpassword.php:79
+msgid "To begin the password reset process, enter your email address."
+msgstr "Para empezar el proceso de restablecimiento de contraseña, introduzca su dirección de correo electrónico."
+
+#: forgotpassword.php:91
+msgid "Submit"
+msgstr "Enviar"
+
+#: forgotpassword.php:95
+#: newsubscriber.php:356
+msgid "Return to Sign In"
+msgstr "Regresar al ingreso."
+
+#: forgotpassword.php:108
+msgid "Check your email to receive the password reset link."
+msgstr "Revise su correo electrónico para recibir el enlace de restablecimiento de contraseña."
+
+#: forgotpassword.php:109
+msgid "You will be redirected to the Activation page in 10 seconds, or you can"
+msgstr "Va a ser redirigido a la página de activación en 10 segundos, o puede"
+
+#: forgotpassword.php:109
+msgid "Click Here to continue."
+msgstr "Haga clic aquí para continuar."
+
+#: newsubscriber.php:53
+#, php-format
+msgid "%1$s already exists, please Return to Sign In"
+msgstr "%1$s ya existe, por favor regrese al Ingreso."
+
+#: newsubscriber.php:65
+#, php-format
+msgid "%1$s is not the correct value.  Letters are not case sensitive."
+msgstr "%1$s no es correcto.  Las letras no tiene que ser en mayúsculas y minúsculas."
+
+#: newsubscriber.php:77
+#, php-format
+msgid "%1$s is not the correct value"
+msgstr "%1$s no es correcto."
+
+#: newsubscriber.php:117
+msgid "Captcha"
+msgstr "CAPTCHA"
+
+#: newsubscriber.php:118
+msgid "Enter the characters in the captcha in the field below.  Letters are not case sensitive."
+msgstr "Introduzca los caracteres en la CAPTCHA abajo.  Las letras no tiene que ser en mayúsculas y minúsculas."
+
+#: newsubscriber.php:129
+msgid "Site Access Code"
+msgstr "Código de Accesso del Sitio"
+
+#: newsubscriber.php:130
+msgid "The site access code is a special code you should have received that will allow you to sign up for this service."
+msgstr "El código de accesso del sitio es un código especial que debe de haber recibido que le permite suscribirse a este servicio."
+
+#: newsubscriber.php:142
 msgid "First Name"
 msgstr "Nombre"
 
-#: account.php:39
+#: newsubscriber.php:143
+msgid "Enter your first name."
+msgstr "Introduzca su primer nombre."
+
+#: newsubscriber.php:153
 msgid "Last Name"
-msgstr "Nombre de Familia"
+msgstr "Apellido"
 
-#: account.php:50
+#: newsubscriber.php:154
+msgid "Enter your last name."
+msgstr "Introduzca su apellido."
+
+#: newsubscriber.php:164
 msgid "Account Email"
-msgstr "Correo electronico"
+msgstr "Correo electrónico de la cuenta"
 
-#: account.php:55
-msgid "Account Password"
+#: newsubscriber.php:165
+msgid "Enter your email address."
+msgstr "Introduzca su correo electrónico."
+
+#: newsubscriber.php:172
+msgid "Confirm Email"
+msgstr "Confirme su Correo Electrónico"
+
+#: newsubscriber.php:173
+msgid "Use this space to confirm the email address you entered above."
+msgstr "Use este espacio para confirmar el correo electrónico que introdució arriba."
+
+#: newsubscriber.php:184
+#: changeemail.php:41
+#: closeaccount.php:25
+msgid "Password"
 msgstr "Contraseña"
 
-#: account.php:60
-msgid "Account Status"
-msgstr "Estatus de Mi Cuenta"
+#: newsubscriber.php:185
+msgid "Create a password for logging into your account."
+msgstr "Cree una contraseña para entrar a su cuenta."
 
-#: account.php:65
+#: newsubscriber.php:197
+#: changepass.php:27
+msgid "Confirm Password"
+msgstr "Confirmar contraseña"
+
+#: newsubscriber.php:198
+msgid "Confirm your password by entering it again."
+msgstr "Confirme su contraseña, entrandola de nuevo."
+
+#: newsubscriber.php:210
+msgid "Terms Of Service"
+msgstr "Condiciones del servicio"
+
+#: newsubscriber.php:211
+msgid "Please read the rules governing your interaction with our service."
+msgstr "Por favor lee las reglas gobernando su interacción con nuestro servicio."
+
+#: newsubscriber.php:216
+msgid "Accept Terms"
+msgstr "Acceptar las condiciones del servicio"
+
+#: newsubscriber.php:217
+msgid "Check this box to agree to the Terms of Service."
+msgstr "Marque esta caja si esta de acuerdo con los Condiciones de Servicio."
+
+#: newsubscriber.php:228
+msgid "Create Account"
+msgstr "Crear Cuenta"
+
+#: newsubscriber.php:261
+msgid "That email address is already in use, please Return to Sign In"
+msgstr "Ese correo electrónico ya esta en uso.  Por favor regrese al Ingreso."
+
+#: newsubscriber.php:263
+msgid "An unknown error occurred, please try again"
+msgstr "Se ha producido un error, por favor, inténtelo de nuevo"
+
+#: newsubscriber.php:265
+msgid "Your account was not created"
+msgstr "Su cuenta no ha sido creada."
+
+#: newsubscriber.php:301
+msgid "Create a New Account"
+msgstr "Crear una cuenta nueva"
+
+#: newsubscriber.php:306
+#: changeemail.php:126
+#: changepass.php:115
+#: closeaccount.php:111
+msgid "Sorry, an error has occurred.  Please try again."
+msgstr "Se ha producido un error, por favor, inténtelo de nuevo"
+
+#: newsubscriber.php:318
+#: newsubscriber.php:322
+msgid "This form contains some errors"
+msgstr "Esta forma contiene algunos errores."
+
+#: newsubscriber.php:343
+msgid "Please complete this form to create your account.  A confirmation code will be sent to activate your new account so a valid email address is required.  Your password must be at least 5 characters long and cannot be similar to your first name, last name, or email address."
+msgstr "Por favor, llene esta forma para crear su cuenta.  Un código de confirmación será enviado para activar su cuenta, y entonces un correo electrónico válido es requerido.  Su contraseña debe ser por lo menos 5 carácteres de largo y no puede ser parecido cu su nombre, apellido, o correo electrónico.  "
+
+#: destinationwizard.php:19
+#: destinationwizard.php:30
+#: destinationwizard.php:41
+#, php-format
+msgid "%1$s is not unique.  You have already added this Contact Information."
+msgstr "%1$s no es único.  Ya ha añadido esta información de contacto."
+
+#: destinationwizard.php:55
+msgid "Phone Call"
+msgstr "Llamada de teléfono."
+
+#: destinationwizard.php:57
+msgid "Phone Call and SMS Text"
+msgstr "Llamada de teléfono y Mensaje de Texto"
+
+#: destinationwizard.php:59
+msgid "SMS Text"
+msgstr "Mensaje de Texto"
+
+#: destinationwizard.php:61
+#: destinationwizard.php:89
+msgid "Email"
+msgstr "Correo electrónico"
+
+#: destinationwizard.php:66
+msgid "Type"
+msgstr "Tipo"
+
+#: destinationwizard.php:67
+msgid "Select the type of messages to be received. For example, a new phone number may be for calls and text messages."
+msgstr "Seleccione le tipo de mensaje que quiere recibir.  Por ejemplo, un numero de teléfono puede ser para llamadas o mensajes de texto."
+
+#: destinationwizard.php:90
+msgid "Enter your new email address."
+msgstr "Introduzca su correo electrónico nuevo"
+
+#: destinationwizard.php:115
+msgid "Phone"
+msgstr "Teléfono"
+
+#: destinationwizard.php:116
+msgid "Enter your new phone number, area code first."
+msgstr "Introduzca su teléfono nuevo, código de área primero."
+
+#: destinationwizard.php:137
+msgid "Sorry, an error occurred.  Please try again later."
+msgstr "Lo sentimos, se ha producido un error.  Por favor, inténtelo de nuevo más tarde."
+
+#: destinationwizard.php:184
+msgid "Select Type"
+msgstr "Seleccione el tipo"
+
+#: destinationwizard.php:185
+msgid "Enter Contact Info"
+msgstr "Introduzca Información de Contacto"
+
+#: destinationwizard.php:188
+msgid "Activate"
+msgstr "Activar"
+
+#: destinationwizard.php:197
+msgid "Add Contact Information"
+msgstr "Añade Información de Contacto"
+
+#: changeemail.php:15
+msgid "New Account Email"
+msgstr "Correo Electrónico de la Cuenta Nueva"
+
+#: changeemail.php:16
+msgid "Enter the new email you would like to use as the primary email for this account. <br><br><b>Note:</b> This will become the email address that you use when logging into the system."
+msgstr "Introduzca el correo electrónico nuevo que le gustaría usar como el primario de esta cuenta.  Este sera el correco electrónico que usará para entrar al sistema."
+
+#: changeemail.php:27
+msgid "Confirm New Email"
+msgstr "Confirmar un Correo Electrónico Nuevo"
+
+#: changeemail.php:28
+msgid "Enter the new email again to confirm."
+msgstr "Introduzca el correo electrónico de nuevo para confirmar."
+
+#: changeemail.php:42
+msgid "Enter your password."
+msgstr "Introduzca su contraseña"
+
 #: changeemail.php:54
 #: changepass.php:52
 #: closeaccount.php:37
 msgid "Save"
 msgstr "Salvar"
 
-#: account.php:66
 #: changeemail.php:55
 #: changepass.php:53
 #: closeaccount.php:38
 msgid "Cancel"
 msgstr "Cancelar"
 
-#: account.php:97
-msgid "Account Information"
-msgstr "Información de la cuenta"
+#: changeemail.php:104
+msgid "Account Email : "
+msgstr "Correo Electrónico de la Cuenta:"
 
-#: account.php:100
-msgid "User Information"
-msgstr "Información del usuario"
+#: changeemail.php:117
+msgid "Your account email has been changed.  Please check your email for the activation step."
+msgstr "El correo electrónico de su cuenta ha sido cambiado.  Por favor revise su correo electrónico por el paso de activación."
+
+#: changeemail.php:118
+#: changepass.php:105
+#: closeaccount.php:101
+msgid "Done"
+msgstr "Hecho"
+
+#: changeemail.php:124
+msgid "Change Account Email"
+msgstr "Cambiar correo electrónico"
+
+#: changeemail.php:128
+msgid "Sorry, that account email already exists in the system.  Please try again."
+msgstr "Lo siento, una cuenta ya existe en el sistema con ese correo electrónico.  Por favor, inténtelo de nuevo."
+
+#: changeemail.php:130
+msgid "Sorry, that password is invalid.  Please try again."
+msgstr "Lo siento, esa contraseña no es válida.  Por favor, inténtelo de nuevo."
+
+#: changepass.php:15
+msgid "New Password"
+msgstr "Contraseña Nueva"
+
+#: changepass.php:16
+msgid "Enter the new password you would like to use when logging into the system."
+msgstr "Introduzca la contraseña nueva que le gustaria usar cuando entra al sistema."
+
+#: changepass.php:28
+msgid "Enter the new password to confirm."
+msgstr "Introduzca la contraseña nueva para confirmar"
+
+#: changepass.php:40
+msgid "Old Password"
+msgstr "Contraseña Vieja"
+
+#: changepass.php:41
+msgid "Enter your old password."
+msgstr "Introduzca la contraseña vieja."
+
+#: changepass.php:90
+#: changepass.php:111
+msgid "Change Password"
+msgstr "Cambiar contraseña"
+
+#: changepass.php:104
+#: closeaccount.php:100
+msgid "Your password has been changed."
+msgstr "Gracias, su contraseña ha sido cambiada."
+
+#: index.php:99
+#: index.php:162
+msgid "Sign In"
+msgstr "Ingresar"
+
+#: index.php:122
+msgid "Invalid customer URL. Please check the web address and try again."
+msgstr "URL invalido.  Por favor revise la direccion del sitio y inténtelo de nuevo."
+
+#: index.php:129
+msgid "Phone, Email, and SMS Text Messages"
+msgstr "Teléfono, Correo Electrónico y Mensajes de Texto"
+
+#: index.php:131
+#, php-format
+msgid "Get the latest communication from %1$s."
+msgstr "Obtenga la comunicación mas reciente de %1$s."
+
+#: index.php:140
+msgid "Incorrect account email or password. Please try again."
+msgstr "El correo electrónico o contraseña es incorrecto.  Por favor, inténtelo de nuevo."
+
+#: index.php:145
+msgid "Email:"
+msgstr "Correo electrónico:"
+
+#: index.php:151
+msgid "Password&nbsp;(case&nbsp;sensitive):"
+msgstr "Contraseña (mayúsculas y minúsculas)"
+
+#: index.php:153
+msgid "Forgot your password? Click Here"
+msgstr "¿Se le olvido su contraseña? Haga clic aquí"
+
+#: index.php:157
+msgid "Warning! Your Caps Lock key is on."
+msgstr "¡Advertencia! La tecla de bloqueo de mayúsculas está activado."
+
+#: index.php:171
+msgid "First time user?"
+msgstr "Usario de primera vez?"
+
+#: index.php:174
+msgid "Sign up now"
+msgstr "Regístrese ahora"
+
+#: subscribervalidators.inc.php:9
+#, php-format
+msgid "%1$s is not the correct password."
+msgstr "%1$s no es la contraseña correcta."
+
+#: subscribervalidators.inc.php:21
+#: subscribervalidators.inc.php:33
+#, php-format
+msgid "%1$s is invalid.  "
+msgstr "%1$s no es valido."
+
+#: closeaccount.php:15
+#: closeaccount.php:85
+#: closeaccount.php:107
+msgid "Close Account"
+msgstr "Cerrar Cuenta"
+
+#: closeaccount.php:16
+msgid "Selecting 'Yes' will cancel your account and cause you to not receive any more messages."
+msgstr "Seleccionando 'Si' cancelará su cuenta y usted no recibirá mas mensajes."
+
+#: closeaccount.php:26
+msgid "Enter your password to confirm your selection."
+msgstr "Introduzca su contraseña para confirmar su selección."
+
+#: navbottom.inc.php:6
+msgid "Privacy Policy"
+msgstr "Política de privacidad"
+
+#: navbottom.inc.php:6
+msgid "Terms of Service"
+msgstr "Condiciones del servicio"
+
+#: navbottom.inc.php:6
+#, php-format
+msgid "Use of this system is subject to the %1$s and %2$s"
+msgstr "El uso de este sistema está sujeto a las %1$s y %2$s"
+
+#: navbottom.inc.php:9
+msgid "All Rights Reserved."
+msgstr "Todos los derechos reservados."
+
+#: navbottom.inc.php:14
+#, php-format
+msgid "Logged in as %1$s %2$s (%3$s) "
+msgstr "Conectado como %1$s %2$s (%3$s) "
+
+#: navbottom.inc.php:14
+#, php-format
+msgid "Current system time is %s"
+msgstr "Hora actual del sistema es %s"
 
 #: activate.php:51
 msgid "The passwords do not match"
@@ -91,14 +475,9 @@ msgstr "Un error ha ocurrido"
 msgid "You are missing required fields"
 msgstr "Le hace falta unos requisitos."
 
-#: activate.php:109
-#: forgotpassword.php:51
-msgid "Password Assistance"
-msgstr "Asistencia para contraseñas"
-
 #: activate.php:111
 msgid "your new password.  Passwords must be 5 characters in length and cannot be similiar to your first name, last name, or email address"
-msgstr "Por favor, introduzca a continuación junto con su nueva contraseña. Las contraseñas deben ser de 5 caracteres de longitud y no puede ser similar a su nombre, apellido, o dirección de correo electrónico."
+msgstr "su nueva contraseña. Las contraseñas deben ser de 5 caracteres de largo y no puede ser parecido a su nombre, apellido, o dirección de correo electrónico."
 
 #: activate.php:113
 msgid "Change Email"
@@ -179,559 +558,189 @@ msgstr "Ese código no es válido o ha vencido."
 msgid "That code is invalid or has expired or that is an incorrect password."
 msgstr "Ese código no es válido o ha vencido, o es una contraseña incorrecta."
 
-#: activate.php:237
-#: forgotpassword.php:95
-msgid "Return to Sign In"
-msgstr "Regresar al ingreso."
-
-#: changeemail.php:15
-msgid "New Account Email"
-msgstr "Correo Electrónico de la Cuenta Nueva"
-
-#: changeemail.php:16
-msgid "Enter the new email you would like to use as the primary email for this account. <br><br><b>Note:</b> This will become the email address that you use when logging into the system."
-msgstr "Introduzca el correo electrónico nuevo que le gustaría usar como el primario de esta cuenta.  Este sera el correcto electronica que usará para entrar al sistema."
-
-#: changeemail.php:27
-msgid "Confirm New Email"
-msgstr "Confirmar un Correo Electrónico Nuevo"
-
-#: changeemail.php:28
-msgid "Enter the new email again to confirm."
-msgstr "Introduzca el correo electrónico de nuevo para confirmar."
-
-#: changeemail.php:41
-#: closeaccount.php:25
-msgid "Password"
-msgstr "Contraseña"
-
-#: changeemail.php:42
-msgid "Enter your password."
-msgstr "Introduzca su contraseña"
-
-#: changeemail.php:104
-msgid "Account Email : "
-msgstr "Correo Electronico de la Cuenta:"
-
-#: changeemail.php:117
-msgid "Your account email has been changed.  Please check your email for the activation step."
-msgstr "El correo electrónico de su cuenta ha sido cambiado.  Por favor revise su correo electrónico por el paso de activación."
-
-#: changeemail.php:118
-#: changepass.php:105
-#: closeaccount.php:101
-msgid "Done"
-msgstr "Hecho"
-
-#: changeemail.php:126
-#: changepass.php:115
-#: closeaccount.php:111
-msgid "Sorry, an error has occurred.  Please try again."
-msgstr "Se ha producido un error, por favor, inténtelo de nuevo"
-
-#: changeemail.php:128
-msgid "Sorry, that account email already exists in the system.  Please try again."
-msgstr "Lo siento, una cuenta ya existe en el sistema con ese correo electronico.  Por favor, inténtelo de nuevo."
-
-#: changeemail.php:130
-msgid "Sorry, that password is invalid.  Please try again."
-msgstr "Lo siento, esa contraseña no es válida, por favor, inténtelo de nuevo."
-
-#: changepass.php:15
-msgid "New Password"
-msgstr "Contraseña Nueva"
-
-#: changepass.php:16
-msgid "Enter the new password you would like to use when logging into the system."
-msgstr "Introduzca la contraseña nueva que le gustaria usar cuando entra al sistema."
-
-#: changepass.php:27
-msgid "Confirm Password"
-msgstr "Confirmar contraseña"
-
-#: changepass.php:28
-msgid "Enter the new password to confirm."
-msgstr "Introduzca la contraseña nueva para confirmar"
-
-#: changepass.php:40
-msgid "Old Password"
-msgstr "Contraseña Vieja"
-
-#: changepass.php:41
-msgid "Enter your old password."
-msgstr "Introduzca la contraseña vieja."
-
-#: changepass.php:104
-#: closeaccount.php:100
-msgid "Your password has been changed."
-msgstr "Gracias, su contraseña ha sido cambiada."
-
-#: closeaccount.php:15
-#: closeaccount.php:85
-#: closeaccount.php:107
-msgid "Close Account"
-msgstr "Cerrar Cuenta"
-
-#: closeaccount.php:16
-msgid "Selecting 'Yes' will cancel your account and cause you to not receive any more messages."
-msgstr "Seleccionando 'Si' cancelará su cuenta y usted no recibirá mas mensajes."
-
-#: closeaccount.php:26
-msgid "Enter your password to confirm your selection."
-msgstr "Introduzca su contraseña para confirmar su selección."
-
-#: destinationwizard.php:19
-#: destinationwizard.php:30
-#: destinationwizard.php:41
-#, php-format
-msgid "%1$s is not unique.  You have already added this Contact Information."
-msgstr "%1$s no es único.  Ya ha añadido esta información de contacto."
-
-#: destinationwizard.php:54
-msgid "Phone Call"
-msgstr "Llamada de teléfono."
-
-#: destinationwizard.php:56
-msgid "Phone Call and SMS Text"
-msgstr "Llamada y Mensaje de Texto"
-
-#: destinationwizard.php:58
-msgid "SMS Text"
-msgstr "Mensaje de Texto"
-
-#: destinationwizard.php:60
-#: destinationwizard.php:88
-msgid "Email"
-msgstr "Correo electrónico"
-
-#: destinationwizard.php:65
-msgid "Type"
-msgstr "Tipo"
-
-#: destinationwizard.php:66
-msgid "Select the type of messages to be received. For example, a new phone number may be for calls and text messages."
-msgstr "Seleccione le tipo de mensaje que quiere recibir.  Por ejemplo, un numero de teléfono puede ser para llamadas o mensajes de texto."
-
-#: destinationwizard.php:89
-msgid "Enter your new email address."
-msgstr "Introduzca su correo electrónico nuevo"
-
-#: destinationwizard.php:114
-msgid "Phone"
-msgstr "Teléfono"
-
-#: destinationwizard.php:115
-msgid "Enter your new phone number, area code first."
-msgstr "Introduzca su teléfono nuevo, código de área primero."
-
-#: destinationwizard.php:135
-msgid "Sorry, an error occurred.  Please try again later."
-msgstr "Se ha producido un error, por favor, inténtelo de nuevo más tarde."
-
-#: destinationwizard.php:156
-msgid "Select Type"
-msgstr "Seleccione el tipo"
-
-#: destinationwizard.php:157
-msgid "Enter Contact Info"
-msgstr "Introduzca Información de Contacto"
-
-#: destinationwizard.php:160
-msgid "Activate"
-msgstr "Activar"
-
-#: destinationwizard.php:169
-msgid "Add Contact Information"
-msgstr "Añade Información de Contacto"
-
-#: forgotpassword.php:30
-msgid "The 2 emails you have entered do not match"
-msgstr "Las 2 direcciones de correo electrónico que ha introducido no coinciden."
-
-#: forgotpassword.php:32
-msgid "That is not a valid email address"
-msgstr "Ese no es un correo electrónico válido."
-
-#: forgotpassword.php:41
-msgid "This user does not exist, please Create an Account."
-msgstr "Este usario no existe, por favor cree una cuenta."
-
-#: forgotpassword.php:54
-msgid "There was a problem with your request.  Please try again later"
-msgstr "Habia un problema con su solicitud. Por favor, inténtelo de nuevo más tarde."
-
-#: forgotpassword.php:79
-msgid "To begin the password reset process, enter your email address."
-msgstr "Para empezar el proceso de restablecimiento de contraseña, introduzca su dirección de correo electrónico."
-
-#: forgotpassword.php:91
-msgid "Submit"
-msgstr "Enviar"
-
-#: forgotpassword.php:108
-msgid "Check your email to receive the password reset link."
-msgstr "Revise su correo electrónico para recibir el enlace de restablecimiento de contraseña."
-
-#: forgotpassword.php:109
-msgid "You will be redirected to the Activation page in 10 seconds, or you can"
-msgstr "Va a ser redirigido a la página de activación en 10 segundos, o puede"
-
-#: forgotpassword.php:109
-msgid "Click Here to continue."
-msgstr "Haga clic aquí para continuar."
-
-#: index.php:99
-#: index.php:162
-msgid "Sign In"
-msgstr "Ingresar"
-
-#: index.php:122
-msgid "Invalid customer URL. Please check the web address and try again."
-msgstr "URL invalido.  Por favor revise la direccion del sitio y inténtelo de nuevo."
-
-#: index.php:129
-msgid "Phone, Email, and SMS Text Messages"
-msgstr "Teléfono, Correo Electrónico y Mensajes de Texto"
-
-#: index.php:131
-#, php-format
-msgid "Get the latest communication from %1$s."
-msgstr "Obtenga la comunicación mas reciente de %1$s."
-
-#: index.php:140
-msgid "Incorrect account email or password. Please try again."
-msgstr "El correo electrónico o contraseña es incorrecto.  Por favor, inténtelo de nuevo."
-
-#: index.php:145
-msgid "Email:"
-msgstr "Correo electrónico"
-
-#: index.php:151
-msgid "Password&nbsp;(case&nbsp;sensitive):"
-msgstr "Contraseña (mayúsculas y minúsculas)"
-
-#: index.php:153
-msgid "Forgot your password? Click Here"
-msgstr "¿Se le olvido su contraseña? Haga clic aquí"
-
-#: index.php:157
-msgid "Warning! Your Caps Lock key is on."
-msgstr "¡Advertencia! La tecla de bloqueo de mayúsculas está activado."
-
-#: index.php:171
-msgid "First time user?"
-msgstr "Usario de primera vez?"
-
-#: index.php:174
-msgid "Sign up now"
-msgstr "Regístrese ahora"
-
-#: loginbottom.inc.php:23
-#: logintop.inc.php:44
-msgid "Click to Verify - This site chose VeriSign SSL for secure e-commerce and confidential communications."
-msgstr "Haga clic aquí para verificar - Este sitio escogió SSL de VeriSign para la seguridad del comercio electrónico y comunicaciones confidenciales."
-
-#: loginbottom.inc.php:26
-#: logintop.inc.php:47
-msgid "ABOUT SSL CERTIFICATES"
-msgstr "ACERCA DE LOS CERTIFICADOS SSL"
-
-#: loginbottom.inc.php:35
-msgid "1999-2009 Reliance Communications, Inc. All Rights Reserved."
-msgstr "1999-2009 Reliance Communications, Inc. Todos los derechos reservados."
-
-#: nav.inc.php:23
+#: nav.inc.php:25
 msgid "Messages"
 msgstr "Mensajes"
 
-#: nav.inc.php:24
+#: nav.inc.php:26
 msgid "Contact Info"
-msgstr "Contacto"
+msgstr "Información del Contacto"
 
-#: nav.inc.php:25
+#: nav.inc.php:27
 msgid "My Account"
 msgstr "Mi Cuenta"
 
-#: nav.inc.php:137
+#: nav.inc.php:134
 msgid "Logout"
 msgstr "Cerrar sesión"
 
-#: navbottom.inc.php:6
-msgid "Privacy Policy"
-msgstr "Política de privacidad"
-
-#: navbottom.inc.php:6
-msgid "Terms of Service"
-msgstr "Condiciones del servicio"
-
-#: navbottom.inc.php:6
-#, php-format
-msgid "Use of this system is subject to the %1$s and %2$s"
-msgstr "El uso de este sistema está sujeto a las %1$s y %2$s"
-
-#: navbottom.inc.php:9
-msgid "All Rights Reserved."
-msgstr "Todos los derechos reservados."
-
-#: navbottom.inc.php:14
-#, php-format
-msgid "Logged in as %1$s %2$s (%3$s) "
-msgstr "Conectado como %1$s %2$s (%3$s) "
-
-#: navbottom.inc.php:14
-#, php-format
-msgid "Current system time is %s"
-msgstr "Hora actual del sistema es %s"
-
-#: newsubscriber.php:51
-#, php-format
-msgid "%1$s already exists, please Return to Sign In"
-msgstr "%1$s ya existe, por favor regrese al ingreso."
-
-#: newsubscriber.php:63
-#: newsubscriber.php:75
-#, php-format
-msgid "%1$s is not the correct value"
-msgstr "%1$s no es correcto."
-
-#: newsubscriber.php:116
-msgid "Enter your first name."
-msgstr "Introduzca su primer nombre."
-
-#: newsubscriber.php:127
-msgid "Enter your last name."
-msgstr "Introduzca su apellido."
-
-#: newsubscriber.php:138
-msgid "Enter your email address."
-msgstr "Introduzca su correo eletronico."
-
-#: newsubscriber.php:145
-msgid "Confirm Email"
-msgstr "Confirme su Correo Electronico"
-
-#: newsubscriber.php:146
-msgid "Use this space to confirm the email address you entered above."
-msgstr "Use este espacio para confirmar el correo electrónico que entro arriba."
-
-#: newsubscriber.php:158
-msgid "Create a password for logging into your account."
-msgstr "Cree una contraseña para entrar a su cuenta."
-
-#: newsubscriber.php:171
-msgid "Confirm your password by entering it again."
-msgstr "Confirme su contraseña, entrandola de nuevo."
-
-#: newsubscriber.php:184
-msgid "Site Access Code"
-msgstr "Código de Accesso del Sitio"
-
-#: newsubscriber.php:185
-msgid "The site access code is a special code you should have received that will allow you to sign up for this service."
-msgstr "El código de accesso del sitio es un código especial que debe de haber recibido que le permite suscribirse a este servicio."
-
-#: newsubscriber.php:197
-msgid "Captcha"
-msgstr "CAPTCHA"
-
-#: newsubscriber.php:198
-msgid "Enter the characters in the captcha in the field below."
-msgstr "Introduzca los caracteres en la CAPTCHA abajo."
-
-#: newsubscriber.php:208
-msgid "Terms Of Service"
-msgstr "Condiciones del servicio"
-
-#: newsubscriber.php:209
-msgid "Please read the rules governing your interaction with our service."
-msgstr "Por favor lee las reglas gobernando su interacción con nuestro servicio."
-
-#: newsubscriber.php:214
-msgid "Accept Terms"
-msgstr "Acceptar las condiciones del servicio"
-
-#: newsubscriber.php:215
-msgid "Check this box to agree to the Terms of Service."
-msgstr "Marque esta caja si esta de acuerdo con los Condiciones de Servicio."
-
-#: newsubscriber.php:226
-msgid "Create Account"
-msgstr "Crear Cuenta"
-
-#: newsubscriber.php:256
-msgid "That email address is already in use, please Return to Sign In"
-msgstr "Ese correo electrónico ya esta en uso.  Por favor regrese al ingreso."
-
-#: newsubscriber.php:258
-msgid "An unknown error occurred, please try again"
-msgstr "Se ha producido un error, por favor, inténtelo de nuevo"
-
-#: newsubscriber.php:260
-msgid "Your account was not created"
-msgstr "Su cuenta no ha sido creada."
-
-#: newsubscriber.php:290
-msgid "Create a New Account"
-msgstr "Crear una cuenta nueva"
-
-#: newsubscriber.php:307
-#: newsubscriber.php:311
-msgid "This form contains some errors"
-msgstr "Esta forma contiene algunos errores."
-
-#: newsubscriber.php:332
-msgid "Please complete this form to create your account.  A confirmation code will be sent to activate your new account so a valid email address is required.  Your password must be at least 5 characters long and cannot be similiar to your first name, last name, or email address."
-msgstr "Por favor, llene esta forma para crear su cuenta.  Un codigo de confirmacion sera enviado para activar su cuenta, y entonces un correo electronico valido es requerido.  Su contraseña debe ser por lo menos 5 caracteres de largo y no puede ser parecido cu su nombre, apellido, o correo electrónico.  "
-
-#: notificationpreferences.php:133
-msgid "Contact Information"
-msgstr "Información del usuario"
-
-#: notificationpreferences.php:135
-msgid "Status"
-msgstr "Estatus"
-
-#: notificationpreferences.php:136
-#: start.php:61
-msgid "Actions"
-msgstr "Acciones"
-
-#: notificationpreferences.php:149
-#: viewpending.php:34
-msgid "Pending"
-msgstr "Pendiete"
-
-#: notificationpreferences.php:150
-msgid "Active"
-msgstr "Activo"
-
-#: notificationpreferences.php:156
-msgid "Account Email cannot be removed"
-msgstr "Correo electrónico de la cuenta no puede ser borrado."
-
-#: notificationpreferences.php:158
-msgid "Delete"
-msgstr "Borrar"
-
-#: notificationpreferences.php:160
-msgid "Activation Info"
-msgstr "Informacion de activacion"
-
-#: notificationpreferences.php:211
-msgid "Language"
-msgstr "Idioma"
-
-#: notificationpreferences.php:434
-#: viewpending.php:30
-msgid "Notification Preferences"
-msgstr "Preferencias de notificación"
-
-#: notificationpreferences.php:438
-msgid "Contacts"
-msgstr "Contactos"
-
-#: notificationpreferences.php:446
-msgid "Add More"
-msgstr "Añadir más"
-
-#: notificationpreferences.php:450
-msgid "All available contacts have been added.  Delete one of the above contacts before you add more."
-msgstr "Todos los contactos disponibles han sido añadidos.  Borre uno de los contactos arriba, antes de añadir mas."
-
-#: notificationpreferences.php:458
-msgid "Interests"
-msgstr "Interés"
-
-#: notificationpreferences.php:460
-msgid "In addition to Emergency notifications, I would like to receive the following types of announcements:"
-msgstr "Además de las notificaciones de emergencia, me gustaría recibir los siguientes tipos de anuncios:"
-
-#: previewmessage.php:114
-#: previewmessage.php:168
-#: previewmessage.php:189
-msgid "Message"
-msgstr "Mensaje"
-
-#: previewmessage.php:121
-msgid "Details"
-msgstr "Detalles"
-
-#: previewmessage.php:125
-msgid "Message For"
-msgstr "Mensaje por"
-
-#: previewmessage.php:129
-#: start.php:58
-msgid "Job Name"
-msgstr "Nombre del Trabajo"
-
-#: previewmessage.php:133
-#: start.php:57
+#: start.php:55
+#: previewmessage.php:136
 msgid "Date"
 msgstr "Fecha"
 
-#: previewmessage.php:140
-msgid "Attachments"
-msgstr "Adjuntos"
+#: start.php:56
+#: previewmessage.php:132
+msgid "Job Name"
+msgstr "Nombre del Trabajo"
 
-#: previewmessage.php:144
-msgid "Name"
-msgstr "Nombre"
-
-#: previewmessage.php:145
-msgid "Size"
-msgstr "Tamaño"
-
-#: previewmessage.php:175
-msgid "Loading Windows Media Player components..."
-msgstr "Cargando los componentes del Reproductor de Windows Media ..."
-
-#: previewmessage.php:184
-msgid "Click here to download"
-msgstr "Haga clic aquí para descargar"
-
-#: start.php:59
+#: start.php:57
 msgid "Sent By"
 msgstr "Enviado por"
 
-#: start.php:60
+#: start.php:58
 msgid "Delivery Type"
 msgstr "Tipo de entrega"
 
-#: start.php:81
-msgid "Play"
-msgstr "Jugar"
+#: start.php:59
+#: notificationpreferences.php:137
+msgid "Actions"
+msgstr "Acciónes"
 
-#: start.php:84
+#: start.php:80
+msgid "Play"
+msgstr "Tocar"
+
+#: start.php:83
 msgid "Read Email"
 msgstr "Leer el correo electrónico"
 
-#: start.php:87
+#: start.php:86
 msgid "Read SMS"
-msgstr "Leer SMS"
+msgstr "Leer mensaje de texto"
 
-#: start.php:116
+#: start.php:115
 #, php-format
 msgid "Welcome - %1$s %2$s"
 msgstr "Bienvenido - %1$s %2$s"
 
-#: start.php:119
+#: start.php:118
 msgid "Messages from the last 30 days"
 msgstr "Mensajes de los últimos 30 días"
 
-#: start.php:123
+#: start.php:122
 #, php-format
 msgid "You may call %s at any time to listen to your phone messages."
 msgstr "Usted puede llamar a %s en cualquier momento para escuchar sus mensajes telefónicos."
 
-#: start.php:137
+#: start.php:135
 msgid "No Messages"
 msgstr "No hay mensajes."
+
+#: viewpending.php:30
+#: notificationpreferences.php:516
+msgid "Notification Preferences"
+msgstr "Preferencias de notificación"
+
+#: viewpending.php:34
+#: notificationpreferences.php:150
+msgid "Pending"
+msgstr "Pendiete"
+
+#: unauthorized.php:5
+msgid "Unauthorized"
+msgstr "No autorizado"
+
+#: unauthorized.php:13
+msgid "Sorry, you are not authorized to use this feature"
+msgstr "Lo sentimos, no está autorizado a utilizar esta función"
+
+#: unauthorized.php:13
+msgid "Sorry, your session has expired"
+msgstr "Lo sentimos, tu sesión ha caducado"
+
+#: unauthorized.php:14
+msgid "Please navigate to another page"
+msgstr "Por favor, vaya a otra página"
+
+#: unauthorized.php:14
+msgid "Click here to log in"
+msgstr "Haga clic aquí para ingresar"
+
+#: unauthorized.php:15
+msgid "You will be automatically redirected in 10 seconds"
+msgstr "Usted será redirigido automáticamente en 10 segundos"
+
+#: account.php:23
+msgid "Permanently close my account"
+msgstr "Cerrar mi cuenta permanentemente"
+
+#: account.php:55
+msgid "Account Password"
+msgstr "Contraseña de la cuenta"
+
+#: account.php:60
+msgid "Account Status"
+msgstr "Estatus de Mi Cuenta"
+
+#: account.php:97
+msgid "Account Information"
+msgstr "Información de la cuenta"
+
+#: account.php:100
+msgid "User Information"
+msgstr "Información del usuario"
+
+#: notificationpreferences.php:134
+msgid "Contact Information"
+msgstr "Información de contacto"
+
+#: notificationpreferences.php:136
+msgid "Status"
+msgstr "Estatus"
+
+#: notificationpreferences.php:151
+msgid "Active"
+msgstr "Activo"
+
+#: notificationpreferences.php:157
+msgid "Account Email cannot be removed"
+msgstr "Correo electrónico de la cuenta no puede ser borrado."
+
+#: notificationpreferences.php:159
+msgid "Delete"
+msgstr "Borrar"
+
+#: notificationpreferences.php:161
+msgid "Activation Info"
+msgstr "Información de activación"
+
+#: notificationpreferences.php:197
+msgid "Organization"
+msgstr "Organización"
+
+#: notificationpreferences.php:231
+msgid "Language"
+msgstr "Idioma"
+
+#: notificationpreferences.php:520
+msgid "Contacts"
+msgstr "Contactos"
+
+#: notificationpreferences.php:528
+msgid "Add More"
+msgstr "Añadir más"
+
+#: notificationpreferences.php:532
+msgid "All available contacts have been added.  Delete one of the above contacts before you add more."
+msgstr "Todos los contactos disponibles han sido añadidos.  Borre uno de los contactos arriba, antes de añadir mas."
+
+#: notificationpreferences.php:540
+msgid "Interests"
+msgstr "Interéses"
+
+#: notificationpreferences.php:542
+msgid "image of lightbulb"
+msgstr "imagen de un foco"
+
+#: notificationpreferences.php:542
+msgid "In addition to Emergency notifications, I would like to receive the following types of announcements:"
+msgstr "Además de las notificaciones de emergencia, me gustaría recibir los siguientes tipos de anuncios:"
 
 #: subscriberutils.inc.php:7
 #: subscriberutils.inc.php:21
 msgid "You must follow these steps within <b>24 hours</b> to complete this addition to your account."
-msgstr "Usted debe seguir estos pasos <b> dentro de 24 horas </b> para completar esta adición a su cuenta."
+msgstr "Usted debe seguir estos pasos dentro de <b> 24 horas </b> para completar esta adición a su cuenta."
 
 #: subscriberutils.inc.php:8
 msgid "Print this page now"
@@ -747,7 +756,7 @@ msgstr "Para verificar el identificador de llamadas."
 
 #: subscriberutils.inc.php:10
 msgid "If your phone service has caller identification blocked, you must first dial *82 to unblock it for this call."
-msgstr "Si su servicion de teléfono tiene identificador de llamadas bloqueado, primero debe marcar *82 para desbloquearlo para esta llamada."
+msgstr "Si su servicio de teléfono tiene identificador de llamadas bloqueado, primero debe marcar *82 para desbloquearlo para esta llamada."
 
 #: subscriberutils.inc.php:11
 msgid "Step 2: Call "
@@ -767,23 +776,44 @@ msgstr "Paso 5: Cuando la llamada se completa, vuelva a iniciar la sesión para 
 
 #: subscriberutils.inc.php:22
 msgid "Step 1: Check your email account"
-msgstr "Paso 1: Compruebe su correo electrónico"
+msgstr "Paso 1: Revise su correo electrónico"
 
 #: subscriberutils.inc.php:23
 msgid "Step 2: Click the activation link"
-msgstr "Paso 2: Haz click en el enlace de activación."
+msgstr "Paso 2: Haz clic en el enlace de activación."
 
-#: subscribervalidators.inc.php:9
-#, php-format
-msgid "%1$s is not the correct password."
-msgstr "%1$s no es la contraseña correcta."
+#: previewmessage.php:117
+#: previewmessage.php:171
+#: previewmessage.php:185
+msgid "Message"
+msgstr "Mensaje"
 
-#: subscribervalidators.inc.php:21
-#: subscribervalidators.inc.php:33
-#, php-format
-msgid "%1$s is invalid.  "
-msgstr "%1$s no es valido."
+#: previewmessage.php:124
+msgid "Details"
+msgstr "Detalles"
 
+#: previewmessage.php:128
+msgid "Message For"
+msgstr "Mensaje por"
+
+#: previewmessage.php:143
+msgid "Attachments"
+msgstr "Adjuntos"
+
+#: previewmessage.php:147
+msgid "Name"
+msgstr "Nombre"
+
+#: previewmessage.php:148
+msgid "Size"
+msgstr "Tamaño"
+
+#: previewmessage.php:180
+msgid "Click here to download"
+msgstr "Haga clic aquí para descargar"
+
+#~ msgid "Loading Windows Media Player components..."
+#~ msgstr "Cargando los componentes del Reproductor de Windows Media ..."
 #~ msgid "Text Message"
 #~ msgstr "Mensaje de Texto"
 #~ msgid "Help"
@@ -1035,16 +1065,4 @@ msgstr "%1$s no es valido."
 #~ "entrega de mensajes y le permite examinar los mensajes."
 #~ msgid "Click here to begin"
 #~ msgstr "Haga clic aquí para comenzar"
-#~ msgid "Unauthorized"
-#~ msgstr "No autorizado"
-#~ msgid "Sorry, you are not authorized to use this feature"
-#~ msgstr "Lo sentimos, no está autorizado a utilizar esta función"
-#~ msgid "Sorry, your session has expired"
-#~ msgstr "Lo sentimos, tu sesión ha caducado"
-#~ msgid "Please navigate to another page"
-#~ msgstr "Por favor, vaya a otra página"
-#~ msgid "Click here to log in"
-#~ msgstr "Haga clic aquí para acceder"
-#~ msgid "You will be automatically redirected in 10 seconds"
-#~ msgstr "Usted será redirigido automáticamente en 10 segundos"
 
