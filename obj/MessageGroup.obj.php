@@ -143,6 +143,56 @@ class MessageGroup extends DBMappedObject {
 		
 		return $summaries[$messagegroupid];
 	}
+	
+	// checks for attached auto translated messages that need re-translation, then re-translates them
+	function reTranslate() {
+		// get all the attached autotranslated messages that have mod dates more than six days ago
+		$retranslatemessages = DBFindMany("Message", "from message where messagegroupid = ? and autotranslate = 'translated' and date_add(modifydate, interval 7 day) < now()", false, array($this->id));
+		
+		// if there are any messages that need retranslation
+		if ($retranslatemessages) {
+			
+			// get all the langcodes used in the messages to retranslate
+			$langcodes = array();
+			foreach ($retranslatemessages as $message)
+				$langcodes[] = $message->languagecode;
+			
+			// do a query to get the voiceid to gender map for these codes
+			$voicemap = QuickQueryList("select id, gender from ttsvoice where languagecode in ('" . implode("','", $langcodes) . "')", true, false, array());
+			
+			
+			// get the source message parts for each translated message
+			foreach ($retranslatemessages as $message) {
+				
+				// look up all the message parts for the source message
+				$sourceparts = DBFindMany("MessagePart", "
+					from messagepart mp
+						inner join message m on
+							(mp.messageid = m.id)
+					where m.messagegroupid = ? and m.autotranslate = 'source' and m.languagecode = ? and m.type = ? and m.subtype = ?
+					order by mp.sequence", "mp", array($message->messagegroupid, $message->languagecode, $message->type, $message->subtype));
+				
+				if ($sourceparts) {
+					// if parts returned, format them into a body string
+					$sourcebody = Message::format($sourceparts);
+					
+					// try to figure out what the prefered gender was
+					$firstpart = array_pop($sourceparts);
+					$gender = isset($voicemap[$firstpart->voiceid])?$voicemap[$firstpart->voiceid]:'female';
+					
+					// get translated text from google
+					$translated = translate_fromenglish(makeTranslatableString($sourcebody), array($message->languagecode));
+					
+					// refresh the message with the new data
+					Query("BEGIN");
+					$message->recreateParts($translated->translatedText, null, $gender);
+					$message->modifydate = date("Y-m-d H:i:s");
+					$message->update();
+					Query("COMMIT");
+				}
+			}
+		}
+	}
 }
 
 ?>
