@@ -209,21 +209,24 @@
 								container.insert('<div class="searchcategory"><img src="' + cat.img  + '" />&nbsp;' + cat.name +'</div><div style="clear:both;"></div>');
 								prevcategory = itm.value.categoryid;
 							}
-							container.insert(
-								'<div id="smsg-' + itm.key  + '" class="classroomcomment" category="' + itm.value.categoryid +'">' +
-								'<img id="smsgchk-' + itm.key  + '" class="msgchk" src="img/checkbox-clear.png" alt=""/>' +
-								'<div id="smsgtxt-' + itm.key  + '" class="msgtxt" >' + itm.value.title +
-								' </div>' +
-								'<img src="img/icons/fugue/marker.gif" alt="Mark" title="Mark this Comment" style="float:right;margin:2px" onclick="markcomment(\'smsg-\',\'' + itm.key + '\')" />' +
-								'<div style="clear:both;">' +
-									(hascomments?'<div id="smsgprem' + itm.key + '" class="remarklink"></div><a href="#" class="remarklink">Remark</a>':'&nbsp;') +
-								'</div>' +
-								'<span id="smsgrem' + itm.key + '" class="remark" style="display:none;">' +
-									'<textarea class="remark"></textarea>' +
-									'<a class="remark" href="#" onclick="saveComment(\'' + itm.key + '\');false;">Done</a>' +
-								'</span>' +
-								'</div>'
-							);
+							var comment = new Element('div',{id:'smsg-' + itm.key,'class':'classroomcomment',category:itm.value.categoryid});
+							comment.insert(new Element('img',{id:'smsgchk-' + itm.key,'class':'msgchk',src:'img/checkbox-clear.png',alt:''}));
+							comment.insert(new Element('div',{id:'smsgtxt-' + itm.key,'class':'msgtxt'}).update(itm.value.title));
+							comment.insert('<img src="img/icons/fugue/marker.gif" alt="Mark" title="Mark this Comment" class="marker" onclick="markcomment(\'smsg-\',\'' + itm.key + '\')" />');
+							var remarklink = new Element('div',{style:'clear:both;'});
+
+							if(hascomments) {
+								remarklink.insert(new Element('div',{id:'smsgprem' + itm.key,'class':'remarklink'}));
+								remarklink.insert(new Element('a',{href:'#','class':'remarklink'}).update('Remark'));
+							}
+							comment.insert(remarklink);
+							var remarkbox = new Element('span',{id:'smsgrem' + itm.key,'class':'remark',style:'display:none;'});
+							remarkbox.insert(new Element('textarea',{'class':'remark'}));
+							remarkbox.insert(new Element('br'));
+							remarkbox.insert('<a href="#" class="remark" onclick="saveComment(\'' + itm.key + '\');return false;">Done</a>');
+
+							comment.insert(remarkbox);
+							container.insert(comment);
 						});
 
 						container.insert('<div style="clear:both;"></div>');
@@ -651,6 +654,9 @@
 
 			new Ajax.Request(requesturl,{method:'post',parameters:{settab:event.memo.section.substring(4)}});
 		});
+		
+		load_saved_tab();
+
 		var searchBox = $('searchbox');
 
 		searchBox.observe('keypress', function(event) {

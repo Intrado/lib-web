@@ -304,7 +304,7 @@ if($sections) {
 								<div id="msgtxt-' . $message->id .'" class="msgtxt" >'
 								. escapehtml($title) .
 								' </div>
-								<img src="img/icons/fugue/marker.gif" alt="Mark" title="Mark this Comment" style="float:right;margin:2px" onclick="markcomment(\'msg-\',\'' . $message->id .'\')" />
+								<img src="img/icons/fugue/marker.gif" alt="Mark" title="Mark this Comment" class="marker" onclick="markcomment(\'msg-\',\'' . $message->id .'\')" />
 								<div style="clear:both;">' .
 									($USER->authorize('targetedcomment')?'<div id="msgprem' . $message->id .'" class="remarklink"></div><a href="#" class="remarklink">Remark</a>':'&nbsp;') .
 								'</div>
@@ -342,9 +342,10 @@ endWindow();
 	var categoryinfo = $H(<?= json_encode($categoriesjson) ?>);
 	var requesturl = '<?= $requesturl ?>';
 	var timetocutoff = new Date(<?= (strtotime($cutoff)) . '000' ?>).getTime() / 1000;
-	document.observe("dom:loaded", function() {
+
+	function load_saved_tab() {
 		tabs.show_section('lib-<?=  $USER->getSetting("classroomtab", "search") ?>');
-	});
+	}
 </script>
 <?
 include_once("navbottom.inc.php");

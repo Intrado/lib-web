@@ -38,8 +38,14 @@
 	cursor:pointer;
 }
 
+.marker {
+	float:right;
+	margin:2px;
+	cursor:pointer;
+}
+
 span.remark  {
-	width:280px;padding-left:10px;height:100px;bottom:0px;
+	clear:both;width:280px;padding-left:10px;height:100px;bottom:0px;
 }
 
 textarea.remark  {
@@ -47,7 +53,7 @@ textarea.remark  {
 }
 
 a.remark  {
-
+	clear:both;
 }
 
 div.remarklink {
