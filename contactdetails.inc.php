@@ -508,7 +508,7 @@ foreach ($fieldmaps as $map) {
 <?
 		// find all sections associated with this person
 		$sections = QuickQueryMultiRow("
-			select section.id, c01, c02, c03, c04, c05, c06, c07, c08, c09, c10, oz.orgkey
+			select section.id, skey, c01, c02, c03, c04, c05, c06, c07, c08, c09, c10, oz.orgkey
 			from section
 				inner join personassociation pa
 					on (section.id = pa.sectionid)
@@ -530,6 +530,8 @@ foreach ($fieldmaps as $map) {
 		$fieldmaps = FieldMap::getAuthorizedFieldMapsLike('c');
 ?>
 		<tr class="listHeader">
+			<th align="left"><?=_L("Section")?></th>
+
 <?
 		foreach ($fieldmaps as $map) {
 			$header = $map->name;
@@ -544,6 +546,9 @@ foreach ($fieldmaps as $map) {
 		$alt = 0;
 		foreach ($assocdata as $row) {
 			echo ++$alt % 2 ? '<tr>' : '<tr class="listAlt">';
+?>
+				<td><?=escapehtml($row['skey'])?></td>
+<?
 			foreach ($fieldmaps as $map) {
 ?>
 				<td><?=escapehtml($row[$map->fieldnum])?></td>
