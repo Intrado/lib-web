@@ -8,7 +8,7 @@ Service & Support:&nbsp;<a href="mailto:<?=$_SESSION['_supportemail']?>"><?=$_SE
 Use of this system is subject to the <a href="privacy.html" target="_blank">Privacy Policy</a> and <a href="terms.html" target="_blank">Terms of Service</a>
 <br>
 <? } /*CSDELETEMARKER_END*/ ?>
-&copy; 1999-2009 Reliance Communications, Inc. All Rights Reserved.
+&copy; 1999-2010 Reliance Communications, Inc. All Rights Reserved.
 
 </div>
 <?
