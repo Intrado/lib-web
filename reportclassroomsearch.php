@@ -193,10 +193,14 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		if ($ajax) {
 			if ($button == 'view') {
 				if($options['classroomreporttype'] == 'person') {
-					if ($postdata['searchmethod'] == 'personid')
+					if ($postdata['searchmethod'] == 'personid') {
 						$_SESSION['report']['options']['personid'] = $postdata['searchvalue'];
-					else if ($postdata['searchmethod'] == 'email')
+						unset($_SESSION['report']['options']['email']);
+					}
+					else if ($postdata['searchmethod'] == 'email') {
 						$_SESSION['report']['options']['email'] = $postdata['searchvalue'];
+						unset($_SESSION['report']['options']['personid']);
+					}
 				}
 				$dateOptions = json_decode($postdata['dateoptions'], true);
 				if (!empty($dateOptions['reldate'])) {

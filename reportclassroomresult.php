@@ -35,8 +35,7 @@ $datesql = "";
 
 if(isset($options['personid']) && $options['personid'] != "")
 	$personsql = " AND p.pkey = '" . DBSafe($options['personid']) . "'";
-
-if(isset($options['email']) && $options['email'] != "") {
+else if(isset($options['email']) && $options['email'] != "") {
 	$emailtable = " LEFT JOIN email e ON ( e.personid = p.id )";
 	$emailsql = "AND e.email = '" . DBSafe($options['email']) . "'";
 }
@@ -64,7 +63,6 @@ $query = "SELECT p.pkey,
 				$datesql
 				group by p.pkey
 				";
-
 $result = Query($query);
 
 

@@ -66,77 +66,95 @@ if(isset($options['reldate']) && $options['reldate'] != ""){
 
 if($options['classroomreporttype'] == 'person') {
 	$pid = $_SESSION['report']['options']['pid'];
-	$TITLE = _L('Classroom Comment Report: %s (From: %s To: %s)',Person::getFullName($pid),$startdate,$enddate);
+
+	$person = new Person($pid);
 
 
-	$result = Query("SELECT tm.id,tm.messagekey,e.notes,a.date,a.time,CONCAT(u.firstname,' ',u.lastname),s.skey,tm.overridemessagegroupid
+	$TITLE = _L('Classroom Comment Report: %s ID: %s (From: %s To: %s)',escapehtml(Person::getFullName($person)),escapehtml($person->pkey),$startdate,$enddate);
+
+	$result = Query("SELECT s.skey,tm.id,tm.overridemessagegroupid,tm.messagekey,a.date,a.time,CONCAT(u.firstname,' ',u.lastname),e.notes
 					FROM person p
-					LEFT JOIN personassociation pa ON ( p.id = pa.personid )
-					LEFT JOIN event e ON ( pa.eventid = e.id )
-					LEFT JOIN targetedmessage tm ON ( e.targetedmessageid = tm.id )
-					LEFT JOIN alert a ON ( e.id = a.eventid )
-					LEFT JOIN user u ON ( e.userid = u.id)
-					LEFT JOIN section s ON (e.sectionid = s.id)
+					INNER JOIN personassociation pa ON ( p.id = pa.personid )
+					INNER JOIN event e ON ( pa.eventid = e.id )
+					INNER JOIN targetedmessage tm ON ( e.targetedmessageid = tm.id )
+					INNER JOIN alert a ON ( e.id = a.eventid )
+					INNER JOIN user u ON ( e.userid = u.id )
+					INNER JOIN section s ON ( e.sectionid = s.id )
 					WHERE pa.type = 'event' and p.id = ?
 					$datesql", false, array($pid));
 	$overrideids = array();
 	while($row = DBGetRow($result)){
 		$data[] = $row;
-		if($row[7]) {
-			$overrideids[] = $row[7];
+		if($row[2]) {
+			$overrideids[] = $row[2];
 		}
 	}
 
-	if(!empty($overrideids)) {
-		$customtxt = QuickQueryList("select t.id, p.txt from targetedmessage t, message m, messagepart p
-											where t.deleted = 0
-											and t.overridemessagegroupid = m.messagegroupid
-											and m.languagecode = 'en'
-											and	p.messageid = m.id
-											and p.sequence = 0
-											and t.overridemessagegroupid in (" . implode(",",$overrideids). ")",true);
-	}
 
-	$titles = array("1" => _L("Classroom Comment"),
-				"3" => _L("Date Sent"),
-				"5" => _L("User"),
-				"6" => _L("Section"));
+	$titles = array("3" => _L("Classroom Comment"),
+				"4" => _L("Date Sent"),
+				"6" => _L("User"),
+				"0" => _L("Section"));
 
-	$formatters = array("1" => "frm_classroommessage",
-					"3" => "fmt_null",
+	$formatters = array("3" => "frm_classroommessage",
+					"4" => "fmt_null",
 					"5" => "fmt_null",
-					"6" => "fmt_null");
+					"0" => "fmt_null");
 } else if($options['classroomreporttype'] == 'organization') {
 	$TITLE = _L('Classroom Comment Report (From: %s To: %s)',$startdate,$enddate);
-	$data = QuickQueryMultiRow("SELECT o.orgkey, count(a.id)
-					FROM alert a
-					LEFT JOIN event e ON ( a.eventid = e.id )
-					LEFT JOIN organization o ON ( e.organizationid = o.id )
-					WHERE 1
-					$datesql
-					group by o.id
-					");
-	$titles = array("0" => _L("Current Org"),
-					"1" => _L("Comments Sent"));
-	$formatters = array("0" => "fmt_null",
-					"1" => "fmt_null");
+	$result = Query("SELECT o.orgkey,tm.id,tm.overridemessagegroupid, tm.messagekey, count( tm.messagekey )
+						FROM organization o
+						INNER JOIN event e ON ( e.organizationid = o.id )
+						INNER JOIN targetedmessage tm ON ( e.targetedmessageid = tm.id )
+						INNER JOIN alert a ON ( a.eventid = e.id )
+						WHERE 1
+						$datesql
+						GROUP BY tm.messagekey
+						");
+	$overrideids = array();
+	$org = false;
+	$data = array();
+
+	while($row = DBGetRow($result)){
+		if($row[0] != $org) {
+			$org = $row[0];
+			$data[$org] = array();
+		}
+		$data[$org][] = $row;
+		if($row[2]) {
+			$overrideids[] = $row[2];
+		}
+	}
+	$titles = array("3" => _L("Comments"),
+					"4" => _L("Total Sent"));
+	$formatters = array("3" => "frm_classroommessage",
+					"4" => "fmt_null");
 }
+
+if(!empty($overrideids)) {
+	$customtxt = QuickQueryList("select t.id, p.txt from targetedmessage t, message m, messagepart p
+										where t.deleted = 0
+										and t.overridemessagegroupid = m.messagegroupid
+										and m.languagecode = 'en'
+										and	p.messageid = m.id
+										and p.sequence = 0
+										and t.overridemessagegroupid in (" . implode(",",$overrideids). ")",true);
+}
+
 
 
 
 
 function frm_classroommessage($row, $index) {
 		global $messagedatacache,$customtxt;
-		if(isset($row[7]) && isset($customtxt[$row[0]])) {
-			$title = $customtxt[$row[0]];
+		if(isset($row[2]) && isset($customtxt[$row[1]])) {
+			$title = $customtxt[$row[1]];
 		} else
 		if(isset($messagedatacache["en"]) && isset($messagedatacache["en"][$row[$index]])) {
 			$title = $messagedatacache["en"][$row[$index]];
 		} else {
 			$title = ""; // Could not find message for this message key.
 		}
-
-
 	return escapehtml($title);
 }
 
@@ -161,9 +179,21 @@ if(count($data) > 0){
 ?>
 	<br />
 <?= buttons($back,$donebutton);?>
-	<table class="list" cellpadding="3" cellspacing="1" >
-		<?= showTable($data, $titles, $formatters); ?>
-	</table>
+		<?
+		if($options['classroomreporttype'] == 'person') {
+			echo '<table class="list" cellpadding="3" cellspacing="1" >';
+			showTable($data, $titles, $formatters);
+			echo '</table>';
+		} else if($options['classroomreporttype'] == 'organization') {
+			foreach($data as $org => $comments) {
+				echo "<h3>$org</h3>";
+				echo '<table class="list" cellpadding="3" cellspacing="1" >';
+				showTable($comments, $titles, $formatters);
+				echo '</table>';
+			}
+		}
+		?>
+
 <?
 	buttons($back,$donebutton);
 } else {
@@ -173,8 +203,6 @@ if(count($data) > 0){
 	buttons($back,$donebutton);
 }
 endWindow();
-
-
 
 include_once("navbottom.inc.php");
 ?>
