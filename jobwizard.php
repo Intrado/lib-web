@@ -105,316 +105,35 @@ function getSmsMessageLinkText() {
 }
 
 class FinishJobWizard extends WizFinish {
-	function phoneRecordedMessage($msgdata) {
-		$retval = array();
-		foreach ($msgdata as $lang => $data) {
-			if ($data)
-				$retval[$lang] = array(
-					"id" => $data,
-					"text" => "",
-					"gender" => "",
-					"language" => ($lang == "Default")?"en":strtolower($lang),
-					"override" => false
-				);
-		}
-		return $retval;
-	}
-
-	function phoneTextMessage($msgdata) {
-		return array("Default" => array(
-			"id" => "",
-			"text" => $msgdata->text,
-			"gender" => $msgdata->gender,
-			"language" => 'en',
-			"override" => false
-		));
-	}
-
-	function phoneTextTranslation($msgdata) {
-		$retval = array();
-		foreach ($msgdata as $lang => $data) {
-			$newmsgdata = json_decode($data);
-			if ($newmsgdata->enabled)
-				$retval[$lang] = array(
-					"id" => "",
-					"text" => $newmsgdata->text,
-					"gender" => $newmsgdata->gender,
-					"language" => strtolower($lang),
-					"override" => $newmsgdata->override
-				);
-		}
-		return $retval;
-	}
-
-	function emailSavedMessage($msgdata) {
-		$retval = array();
-		foreach ($msgdata as $lang => $data) {
-			if ($data)
-				$retval[$lang] = array(
-					"id" => $data,
-					"from" => "",
-					"fromname" => "",
-					"subject" => "",
-					"attachments" => "",
-					"text" => "",
-					"language" => ($lang == "Default")?"en":strtolower($lang),
-					"override" => false
-				);
-		}
-		return $retval;
-	}
-
-	function emailTextMessage($msgdata) {
-		return array("Default" => array(
-			"id" => "",
-			"fromname" => $msgdata["fromname"],
-			"from" => $msgdata["from"],
-			"subject" => $msgdata["subject"],
-			"attachments" => json_decode($msgdata["attachments"]),
-			"text" => $msgdata["message"],
-			"language" => "en",
-			"override" => false
-		));
-	}
-
-	function emailTextTranslation($msgdata, $translationdata) {
-		$retval = array();
-		foreach ($translationdata as $lang => $data) {
-			$newmsgdata = json_decode($data);
-			if ($newmsgdata->enabled)
-				$retval[$lang] = array(
-					"id" => "",
-					"from" => $msgdata["from"],
-					"fromname" => $msgdata["fromname"],
-					"subject" => $msgdata["subject"],
-					"attachments" => json_decode($msgdata["attachments"]),
-					"text" => $newmsgdata->text,
-					"language" => strtolower($lang),
-					"override" => $newmsgdata->override
-				);
-		}
-		return $retval;
-	}
-
 	function finish ($postdata) {
 		// If the job has not ben confirmed, don't try to process the data.
 		if (!isset($postdata["/submit/confirm"]["jobconfirm"])  || !$postdata["/submit/confirm"]["jobconfirm"] )
 			return false;
-
-		$wizHasPhoneMsg = wizHasPhone($postdata);
-		$wizHasEmailMsg= wizHasEmail($postdata);
-		$wizHasSmsMsg= wizHasSms($postdata);
-
+		
 		global $USER;
 		global $ACCESS;
+		
+		// get job options
 		$jobtype = DBFind("JobType", "from jobtype where id=?", false, array($postdata["/start"]["jobtype"]));
 		$jobname = $postdata["/start"]["name"];
 
-		$phoneMsg = array();
-		$emailMsg = array();
-		$smsMsg = array();
-		$emailmessagelink = false;
-		$smsmessagelink = false;
+		// get the list or lists
+		$joblists = json_decode($postdata["/list"]["listids"]);
+		// Remove temporary 'addme' token from listids. (not a valid listid, obviously)
+		if (($i = array_search('addme', $joblists)) !== false)
+			unset($joblists[$i]);
 
-		switch ($postdata["/start"]["package"]) {
-			//If package is Easycall
-			case "easycall":
-				if ($wizHasPhoneMsg)
-					$phoneMsg = $this->phoneRecordedMessage(json_decode($postdata["/message/phone/callme"]["message"]));
-				if ($wizHasEmailMsg) {
-					$emailmessagelink = true;
-					$emailMsg = array("Default" => array(
-						"id" => "",
-						"from" => "contactme@schoolmessenger.com",
-						"fromname" => "SchoolMessenger",
-						"subject" => "Message from ". $_SESSION['custname'],
-						"attachments" => array(),
-						"text" => "An important telephone notification was sent to you by ". $_SESSION['custname']. ". Click the link below or copy and paste the link into your web browser to hear the message.\n\n",
-						"language" => "en",
-						"override" => false
-					));
-					if (getSystemSetting("_hascallback"))
-						$emailMsg["Default"]["text"] .= "You may also listen to this message over the phone by dialing the automated notification system at: ". Phone::format(getSystemSetting("inboundnumber")). "\n\n";
-					$emailMsg["Default"]["text"] .= "DO NOT REPLY: This is an automatically generated email. Please do not send a reply message.";
-				}
-				if ($wizHasSmsMsg) {
-
-					$smsmessagelink = true;
-					$smsMsg = array("Default" => array(
-						"id" => false,
-						"text" => getSmsMessageLinkText(),
-						"language" => "en"
-					));
-				}
-				break;
-			//Express Text
-			case "express":
-				if ($wizHasPhoneMsg) {
-					$phoneMsg = $this->phoneTextMessage(json_decode($postdata["/message/phone/text"]["message"]));
-					if (isset($postdata["/message/phone/text"]["translate"]) && $postdata["/message/phone/text"]["translate"])
-						$phoneMsg = array_merge($phoneMsg, $this->phoneTextTranslation($postdata["/message/phone/translate"]));
-				}
-				if ($wizHasEmailMsg) {
-					$emailMsg = $this->emailTextMessage($postdata["/message/email/text"]);
-					if (isset($postdata["/message/email/text"]["translate"]) && $postdata["/message/email/text"]["translate"])
-						$emailMsg = array_merge($emailMsg, $this->emailTextTranslation($postdata["/message/email/text"], $postdata["/message/email/translate"]));
-				}
-				if ($wizHasSmsMsg) {
-					$smsMsg = array("Default" => array(
-						"id" => false,
-						"text" => $postdata["/message/sms/text"]["message"],
-						"language" => "en"
-					));
-				}
-				break;
-			//Personalized
-			case "personalized":
-				if ($wizHasPhoneMsg)
-					$phoneMsg = $this->phoneRecordedMessage(json_decode($postdata["/message/phone/callme"]["message"]));
-				if ($wizHasEmailMsg) {
-					$emailMsg = $this->emailTextMessage($postdata["/message/email/text"]);
-					if (isset($postdata["/message/email/text"]["translate"]) && $postdata["/message/email/text"]["translate"])
-						$emailMsg = array_merge($emailMsg, $this->emailTextTranslation($postdata["/message/email/text"], $postdata["/message/email/translate"]));
-				}
-				if ($wizHasSmsMsg) {
-					$smsMsg = array("Default" => array(
-						"id" => false,
-						"text" => $postdata["/message/sms/text"]["message"],
-						"language" => "en"
-					));
-				}
-				break;
-			//Custom
-			case "custom":
-				if ($wizHasPhoneMsg) {
-					if(isset($postdata["/message/select"])) {
-						switch ($postdata["/message/select"]["phone"]) {
-							case "record":
-								$phoneMsg = $this->phoneRecordedMessage(json_decode($postdata["/message/phone/callme"]["message"]));
-								break;
-							case "text":
-								$phoneMsg = $this->phoneTextMessage(json_decode($postdata["/message/phone/text"]["message"]));
-								if (isset($postdata["/message/phone/text"]["translate"]) && $postdata["/message/phone/text"]["translate"])
-									$phoneMsg = array_merge($phoneMsg, $this->phoneTextTranslation($postdata["/message/phone/translate"]));
-								break;
-							//case "pick":
-							//	$phoneMsg = $this->phoneRecordedMessage($postdata["/message/phone/pick"]);
-							//	break;
-							default:
-								error_log($postdata["/message/select"]["phone"] . " is an unknown value for ['/message/select']['phone']");
-						}
-					} else {
-						$phoneMsg = $this->phoneTextMessage(json_decode($postdata["/message/phone/text"]["message"]));
-						if (isset($postdata["/message/phone/text"]["translate"]) && $postdata["/message/phone/text"]["translate"])
-							$phoneMsg = array_merge($phoneMsg, $this->phoneTextTranslation($postdata["/message/phone/translate"]));
-					}
-				}
-				if ($wizHasEmailMsg) {
-					if(isset($postdata["/message/select"])) {
-						switch ($postdata["/message/select"]["email"]) {
-							case "record":
-								$emailmessagelink = true;
-								$emailMsg = array("Default" => array(
-									"id" => "",
-									"from" => "contactme@schoolmessenger.com",
-									"fromname" => "SchoolMessenger",
-									"subject" => "Message from ". $_SESSION['custname'],
-									"attachments" => array(),
-									"text" => "An important telephone notification was sent to you by ". $_SESSION['custname']. ". Click the link below or copy and paste the link into your web browser to hear the message.\n\n",
-									"language" => "en",
-									"override" => false
-								));
-								if (getSystemSetting("_hascallback"))
-									$emailMsg["Default"]["text"] .= "You may also listen to this message over the phone by dialing the automated notification system at: ". Phone::format(getSystemSetting("inboundnumber")). "\n\n";
-								$emailMsg["Default"]["text"] .= "DO NOT REPLY: This is an automatically generated email. Please do not send a reply message.";
-								break;
-							case "text":
-								$emailMsg = $this->emailTextMessage($postdata["/message/email/text"]);
-								if (isset($postdata["/message/email/text"]["translate"]) && $postdata["/message/email/text"]["translate"])
-									$emailMsg = array_merge($emailMsg, $this->emailTextTranslation($postdata["/message/email/text"], $postdata["/message/email/translate"]));
-								break;
-							//case "pick":
-							//	$emailMsg = $this->emailSavedMessage($postdata["/message/email/pick"]);
-							//	break;
-							default:
-								error_log($postdata["/message/select"]["email"] . " is an unknown value for ['/message/select']['email']");
-						}
-					} else {
-						$emailMsg = $this->emailTextMessage($postdata["/message/email/text"]);
-						if (isset($postdata["/message/email/text"]["translate"]) && $postdata["/message/email/text"]["translate"])
-							$emailMsg = array_merge($emailMsg, $this->emailTextTranslation($postdata["/message/email/text"], $postdata["/message/email/translate"]));
-					}
-				}
-				if ($wizHasSmsMsg) {
-					if(isset($postdata["/message/select"])) {
-						switch ($postdata["/message/select"]["sms"]) {
-							case "record":
-								$smsmessagelink = true;
-								$smsMsg = array("Default" => array(
-									"id" => false,
-									"text" => getSmsMessageLinkText(),
-									"language" => "en"
-								));
-								break;
-							case "text":
-								$smsMsg = array("Default" => array(
-									"id" => false,
-									"text" => $postdata["/message/sms/text"]["message"],
-									"language" => "en"
-								));
-								break;
-							//case "pick":
-							//	$smsMsg = array("Default" => array(
-							//		"id" => $postdata["/message/sms/pick"]["message"],
-							//		"text" => false,
-							//		"language" => "english"
-							//	));
-							//	break;
-							default:
-								error_log($postdata["/message/select"]["sms"] . " is an unknown value for ['/message/select']['sms']");
-						}
-					} else {
-						$smsMsg = array("Default" => array(
-							"id" => false,
-							"text" => $postdata["/message/sms/text"]["message"],
-							"language" => "english"
-						));
-					}
-				}
-				break;
-
-			default:
-				error_log($postdata["/start"]["package"] . "is an unknown value for 'package'");
-		}
-
-		$schedule = getSchedule($postdata);
-
-		// for all the job settings on the "Advanced" step. set some advanced options that will get stuffed into the job
-		$advanced = array();
-		if (isset($postdata["/schedule/options"]["advanced"]) && $postdata["/schedule/options"]["advanced"])
-			foreach (array("skipduplicates", "skipemailduplicates", "leavemessage", "messageconfirmation") as $option)
-				if (isset($postdata["/schedule/advanced"][$option]))
-					$advanced[$option] = $postdata["/schedule/advanced"][$option];
-
-		$jobsettings = array(
-			"jobtype" => $jobtype->id,
-			"jobname" => $jobname,
-			"lists" => json_decode($postdata["/list"]["listids"]),
-			"Messagegroup" => "",          // Add this 
-			"phone" => $phoneMsg,
-			"email" => $emailMsg,
-			"sms" => $smsMsg,
-			"print" => array(),
-			"emailmessagelink" => $emailmessagelink,
-			"smsmessagelink" => $smsmessagelink
-		);
-		// Remove temporary 'addme' token from listids.
-		if (($i = array_search('addme', $jobsettings['lists'])) !== false)
-			unset($jobsettings['lists'][$i]);
-
+		// Start stuffing the job in the DB
 		Query("BEGIN");
-
+		
+		// if there is "addme" data in the list selection, create a person and list with the contact details
 		if ($postdata["/list"]["addme"]) {
+			// get the contact details out of postdata
+			$addme = array(
+				"phone" => Phone::parse($postdata["/list"]["addmePhone"]),
+				"email" => trim($postdata["/list"]["addmeEmail"]),
+				"sms" => Phone::parse($postdata["/list"]["addmeSms"])
+			);
 			// NOTE: getUserJobTypes() automatically applies user jobType restrictions
 			$jobTypes = JobType::getUserJobTypes(false);
 			$addmelist = new PeopleList(null);
@@ -422,7 +141,8 @@ class FinishJobWizard extends WizFinish {
 			$addmelist->name = _L("Me");
 			$addmelist->description = _L("JobWizard, addme");
 			$addmelist->deleted = 1;
-			$addmelist->update();
+			$addmelist->create();
+			
 			if ($addmelist->id) {
 				// Constants
 				$langfield = FieldMap::getLanguageField();
@@ -437,22 +157,21 @@ class FinishJobWizard extends WizFinish {
 				$person->$fnamefield = $USER->firstname;
 				$person->$lnamefield = $USER->lastname;
 				$person->$langfield = "en";
-				$person->update();
+				$person->create();
 
 				// New Phone, Email, SMS
 				$deliveryTypes = array();
-				if (isset($postdata["/list"]["addmePhone"])) {
+				if ($addme['phone']) {
 					$deliveryTypes["phone"] = new Phone();
-					$deliveryTypes["phone"]->phone = Phone::parse($postdata["/list"]["addmePhone"]);
+					$deliveryTypes["phone"]->phone = $addme['phone'];
 				}
-				if (isset($postdata["/list"]["addmeEmail"])) {
+				if ($addme['email']) {
 					$deliveryTypes["email"] = new Email();
-					$deliveryTypes["email"]->email = trim($postdata["/list"]["addmeEmail"]);
+					$deliveryTypes["email"]->email = $addme['email'];
 				}
-				if ($wizHasSmsMsg && isset($postdata["/list"]["addmeSms"])) {
+				if ($addme['sms']) {
 					$deliveryTypes["sms"] = new Sms();
-					$deliveryTypes["sms"]->sms = Phone::parse($postdata["/list"]["addmeSms"]);
-
+					$deliveryTypes["sms"]->sms = $addme['sms'];
 				}
 
 				// Delivery Types and Job Types
@@ -478,19 +197,23 @@ class FinishJobWizard extends WizFinish {
 				$le->create();
 
 				// Include this single-person list in the job.
-				$jobsettings["lists"][] = $addmelist->id;
+				$joblists[] = $addmelist->id;
 			}
 		}
 
 		$job = Job::jobWithDefaults();
 
 		$job->userid = $USER->id;
-		$job->jobtypeid = $jobsettings['jobtype'];
-		$job->name = $jobsettings['jobname'];
+		$job->jobtypeid = $jobtype->id;
+		$job->name = $jobname;
 		$job->description = "";
 
 		$job->type = 'notification';
-		$job->modifydate = $job->createdate = date("Y-m-d H:i:s", time());
+		$job->modifydate = $job->createdate = date("Y-m-d H:i:s");
+		
+		// parse the schedule data out of postdata
+		$schedule = getSchedule($postdata);
+		
 		$job->scheduleid = null;
 		if ($schedule['date'])
 			$job->startdate = date("Y-m-d", strtotime($schedule['date']));
@@ -503,115 +226,216 @@ class FinishJobWizard extends WizFinish {
 		$job->status = "new";
 		$job->create();
 
-		$messagegroupid = null;
+		// if this wizard has an already created message group selected. use it
 		if (wizHasMessageGroup($postdata)) {
-			$messagegroupid = $postdata["/message/pickmessage"]["messagegroup"];
+			$messagegroup = new MessageGroup($postdata["/message/pickmessage"]["messagegroup"]);
+		// if not, create one
 		} else {
+
 			$messagegroup = new MessageGroup();
 			$messagegroup->userid = $USER->id;
-			$messagegroup->name = $jobsettings["jobname"];
+			$messagegroup->name = $jobname;
 			$messagegroup->description = "";
 			$messagegroup->modified = $job->modifydate;
 			$messagegroup->deleted = 1;
 			$messagegroup->create();
-			$messagegroupid = $messagegroup->id;
-			foreach (array("phone","email","sms") as $type){
-				if ($jobsettings[$type]) {
-					// there is a message for this type
-					$messages = $jobsettings[$type]; // There may be many messages for each type
-					foreach ($messages as $title => $message) {
-						$lang = isset($message['language'])?$message['language']:"en";
-						if (!$message['id']) {
-							// create a new message
-							$voiceid = null;
-							if ($type == 'phone') {
-								$voiceid = QuickQuery("select id from ttsvoice where languagecode=? and gender=?",false,array($lang,$message["gender"]));
-								if($voiceid === false)
-									$voiceid = 1; // default to english
-							}
-							$newmessage = new Message();
-							$newmessage->messagegroupid = $messagegroup->id;
-							$newmessage->type = $type;
-							switch($type) {
-								case 'phone':
-									$newmessage->subtype = 'voice';
-									break;
-								case 'email':
-									$newmessage->subtype = 'plain';  // TODO: Add HTML support to wizard
-									break;
-								default:
-									$newmessage->subtype = 'plain';
-									break;
-							}
+			
+			// #################################################################
+			// CallMe based message
+			// easycall, personalized and custom (with record option selected)
+			
+			if (JobWiz_messagePhoneEasyCall::isEnabled($postdata, false)) {
+				$audiofileidmap = json_decode($postdata["/message/phone/callme"]["message"]);
+				foreach ($audiofileidmap as $langcode => $audiofileid) {
+					$message = new Message();
+					$message->messagegroupid = $messagegroup->id;
+					$message->type = 'phone';
+					$message->subtype = 'voice';
+					$message->autotranslate = 'none';
 
-							$newmessage->autotranslate = 'none';
-
-							$newmessage->name = ($jobsettings["jobname"]);
-							$newmessage->description = "";
-							$newmessage->userid = $USER->id;
-							$newmessage->modifydate = $messagegroup->modified;//QuickQuery("select now()");
-							$newmessage->languagecode = $lang;
-							$newmessage->deleted = 1;
-							if ($type == 'email') {
-								$newmessage->subject = $message["subject"];
-								$newmessage->fromname = ($message["fromname"])?$message["fromname"]:$USER->firstname." ".$USER->lastname;
-								$newmessage->fromemail = ($message["from"]);
+					$message->name = $messagegroup->name;
+					$message->description = Language::getName($langcode);
+					$message->userid = $USER->id;
+					$message->modifydate = $messagegroup->modified;
+					$message->languagecode = $langcode;
+					$message->deleted = 1;
+					$message->stuffHeaders();
+					$message->create();
+					
+					$part = new MessagePart();
+					$part->messageid = $message->id;
+					$part->type = "A";
+					$part->audiofileid = $audiofileid;
+					$part->sequence = 0;
+					$part->create();
+				}
+			}
+			
+			// #################################################################
+			// Text based messages
+			// express, personalized and custom could have text components
+			
+			// keep track of the message data we are going to create messages for
+			// format msgArray(typeArray(translateflagArray(data)))
+			$messages = array(
+				'phone' => array(),
+				'email' => array(),
+				'sms' => array());
+			
+			// phone message
+			if (JobWiz_messagePhoneText::isEnabled($postdata, false)) {
+				$sourcemessage = json_decode($postdata["/message/phone/text"]["message"]);
+				
+				// this is the default 'en' message so it's autotranslate value is 'none'
+				$messages['phone']['en']['none']['text'] = $sourcemessage->text;
+				$messages['phone']['en']['none']['gender'] = $sourcemessage->gender;
+				
+				// check for and retrieve translations
+				if (JobWiz_messagePhoneTranslate::isEnabled($postdata, false)) {
+					foreach ($postdata["/message/phone/translate"] as $langcode => $msgdata) {
+						$translatedmessage =json_decode($msgdata);
+						// if this translation message is enabled
+						if ($translatedmessage->enabled) {
+							// if the translation text is overridden, don't attach a source message
+							// it isn't applicable since we have no way to know what they changed the text to.
+							if ($translatedmessage->override) {
+								$messages['phone'][$langcode]['overridden']['text'] = $translatedmessage->text;
+								$messages['phone'][$langcode]['overridden']['gender'] = $translatedmessage->gender;
+							} else {
+								$messages['phone'][$langcode]['translated']['text'] = $translatedmessage->text;
+								$messages['phone'][$langcode]['translated']['gender'] = $translatedmessage->gender;
+								$messages['phone'][$langcode]['source'] = $messages['phone']['en']['none'];
 							}
-							$newmessage->stuffHeaders();
-							$newmessage->create();
-
-							/* This chunk parses the message contents and stuffs it in message parts. It is commented out and replaced by the next code that just stuffs all the text into one message part.
-							$parts = $newmessage->parse($message["text"]);
-							foreach ($parts as $part) {
-								$part->voiceid = $voiceid;
-								$part->messageid = $newmessage->id;
-								$part->create();
-							}*/
-							$part = new MessagePart();
-							$part->messageid = $newmessage->id;
-							$part->type = "T";
-							$part->txt = $message["text"];
-							$part->voiceid = $voiceid;
-							$part->sequence = 0;
-							$part->create();
-
-							if (isset($message['attachments']) && $message['attachments']) {
-								foreach ($message['attachments'] as $cid => $details) {
-									$msgattachment = new MessageAttachment();
-									$msgattachment->messageid = $newmessage->id;
-									$msgattachment->contentid = $cid;
-									$msgattachment->filename = $details->name;
-									$msgattachment->size = $details->size;
-									$msgattachment->deleted = 1;
-									$msgattachment->create();
-								}
-							}
-							//$messageid = $newmessage->id;
-						} else {
-							//$messageid = $message['id'];
 						}
 					}
 				}
 			}
-
-
+			
+			// email message
+			if (JobWiz_messageEmailText::isEnabled($postdata, false)) {
+				// this is the default 'en' message so it's autotranslate value is 'none'
+				$messages['email']['en']['none']['text'] = $postdata["/message/email/text"]["message"];
+				$messages['email']['en']['none']["fromname"] = $postdata["/message/email/text"]["fromname"];
+				$messages['email']['en']['none']["from"] = $postdata["/message/email/text"]["from"];
+				$messages['email']['en']['none']["subject"] = $postdata["/message/email/text"]["subject"];
+				$messages['email']['en']['none']['attachments'] = json_decode($postdata["/message/email/text"]['attachments']);
+				if ($messages['email']['en']['none']['attachments'] == null) $messages['email']['en']['none']['attachments'] = array();
+				
+				// check for and retrieve translations
+				if (JobWiz_messageEmailTranslate::isEnabled($postdata, false)) {
+					foreach ($postdata["/message/email/translate"] as $langcode => $enabled) {
+						// emails don't have any actual translation text in session data other than the source message
+						// when the message group is created. the modify date will be set in the past and retranslation will
+						// get called before attaching to the job
+						if ($enabled) {
+							$messages['email'][$langcode]['translated'] = $messages['email']['en']['none'];
+							$messages['email'][$langcode]['source'] = $messages['email']['en']['none'];
+						}
+					}
+				}
+			}
+			
+			// sms message
+			if (JobWiz_messageSmsText::isEnabled($postdata, false))
+				$messages['sms']['en']['none']['text'] = $postdata["/message/sms/text"]["message"];
+			
+			// #################################################################
+			// create a message for each one
+			
+			// for each message type
+			foreach ($messages as $type => $msgdata) {
+				// for each language code
+				foreach ($msgdata as $langcode => $autotranslatevalues) {
+					// for each autotranslate value
+					foreach ($autotranslatevalues as $autotranslate => $data) {
+						$message = new Message();
+						$message->messagegroupid = $messagegroup->id;
+						$message->type = $type;
+						switch($type) {
+							case 'phone':
+								$message->subtype = 'voice';
+								break;
+							case 'email':
+								$message->subtype = 'html';
+								break;
+							default:
+								$message->subtype = 'plain';
+								break;
+						}
+						
+						$message->autotranslate = $autotranslate;
+						$message->name = $messagegroup->name;
+						$message->description = Language::getName($langcode);
+						$message->userid = $USER->id;
+						
+						// if this is an autotranslated message and an email. set the modify date in the past
+						// this way re-translate will populate the message parts for us
+						if ($autotranslate == 'translated' && $type == 'email')
+							$message->modifydate = date("Y-m-d H:i:s", '1');
+						else
+							$message->modifydate = $messagegroup->modified;
+						
+						$message->languagecode = $langcode;
+						$message->deleted = 1;
+						
+						if ($type == 'email') {
+							$message->subject = $data["subject"];
+							$message->fromname = $data["fromname"];
+							$message->fromemail = $data["from"];
+						}
+						
+						$message->stuffHeaders();
+						$message->create();
+						
+						$part = new MessagePart();
+						$part->messageid = $message->id;
+						$part->type = "T";
+						$part->txt = $data["text"];
+						
+						if ($type == 'phone') {
+							$voiceid = QuickQuery("select id from ttsvoice where languagecode=? and gender=?",false,array($langcode,$data["gender"]));
+							if($voiceid === false)
+								$voiceid = 1; // default to english
+							$part->voiceid = $voiceid;
+						}
+						
+						$part->sequence = 0;
+						$part->create();
+						
+						// if there are message attachments, attach them
+						if (isset($data['attachments']) && $data['attachments']) {
+							foreach ($data['attachments'] as $cid => $details) {
+								$msgattachment = new MessageAttachment();
+								$msgattachment->messageid = $message->id;
+								$msgattachment->contentid = $cid;
+								$msgattachment->filename = $details->name;
+								$msgattachment->size = $details->size;
+								$msgattachment->deleted = 1;
+								$msgattachment->create();
+							}
+						}
+					}
+				}
+			}
 		}
-		$job->messagegroupid = $messagegroupid;//$messageid;
-		//TODO
-		//When the user picks an existing message the messageid is a message group
-		//but when the content is created on the fly.....
+		
+		// refresh any stale auto translations
+		$messagegroup->reTranslate();
+		
+		$job->messagegroupid = $messagegroup->id;
 
 		// store job lists
-		$listids = $jobsettings['lists'];
-		foreach ($listids as $listid)
+		foreach ($joblists as $listid)
 			QuickUpdate("insert into joblist (jobid,listid) values (?,?)", false, array($job->id, $listid));
 
 		$job->setSetting('translationexpire', date("Y-m-d", strtotime("+15 days"))); // now plus 15 days
-		if ($jobsettings['emailmessagelink'])
-			$job->setSetting('emailmessagelink', "1");
-
-		if ($jobsettings['smsmessagelink'])
-			$job->setSetting('smsmessagelink', "1");
+		
+		// for all the job settings on the "Advanced" step. set some advanced options that will get stuffed into the job
+		$advanced = array();
+		if (isset($postdata["/schedule/options"]["advanced"]) && $postdata["/schedule/options"]["advanced"])
+			foreach (array("skipduplicates", "skipemailduplicates", "leavemessage", "messageconfirmation") as $option)
+				if (isset($postdata["/schedule/advanced"][$option]))
+					$advanced[$option] = $postdata["/schedule/advanced"][$option];
 
 		foreach ($advanced as $option => $value) {
 			if ($value == true)
