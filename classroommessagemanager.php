@@ -39,7 +39,7 @@ if (isset($_GET['enable']) && isset($_GET['id'])) {
 	$items = QuickQuery("select count(*) from targetedmessage where targetedmessagecategoryid = ? and deleted = 0",false,array($_GET['deletecategoryid']));
 
 	if($items === "0")
-		QuickUpdate("update targetedmessagecategory set deleted=1 where id=?",false,array($_GET['deletecategoryid']));
+		QuickUpdate("update targetedmessagecategory set deleted=1 where id=? and SUBSTRING(messagekey,0,6) == 'custom'",false,array($_GET['deletecategoryid']));
 
 
 	//echo json_encode($items === "0" && QuickUpdate("delete from targetedmessagecategory where id=?",false,array($_GET['deletecategoryid'])));
@@ -118,7 +118,8 @@ if($ajax === true) {
 		$data->list[] = array(
 			"id" => $item["id"],
 			"enabled" => ($item["enabled"]==1),
-			"title" => $title
+			"title" => $title,
+			"deletable" => (substr($item["messagekey"],0,6) == "custom")
 		);
 	}
 	echo json_encode($data);
@@ -287,7 +288,7 @@ function updatecategory(category, actioninfo) {
 					row.insert(new Element('td',{align:"right"}).update(new Element('input',{id:'enable-' + item.id,type:'checkbox',checked:item.enabled,onclick:'updateenabled(this);return false;'})));
 					row.insert(new Element('td').update(item.title));
 					row.insert(new Element('td',{style:"white-space: nowrap;"}).update(
-					'<a href="classroommessageedit.php?id=' + item.id + '"  class="actionlink" title="Edit" ><img src="img/icons/pencil.gif" alt="Edit">Edit</a>&nbsp;|&nbsp;<a id="delete-' + item.id + '" href="#"  class="actionlink" title="delete" onclick="deletemessage(' + category + ',this); return false;" ><img src="img/icons/cross.gif" alt="delete">Delete</a>&nbsp;|&nbsp;<select id="move-' + item.id + '" onchange="move(' + category + ',this)"/>' + options + '</select>'
+					'<a href="classroommessageedit.php?id=' + item.id + '"  class="actionlink" title="Edit" ><img src="img/icons/pencil.gif" alt="Edit">Edit</a>' + (item.deletable?'&nbsp;|&nbsp;<a id="delete-' + item.id + '" href="#"  class="actionlink" title="delete" onclick="deletemessage(' + category + ',this); return false;" ><img src="img/icons/cross.gif" alt="delete">Delete</a>':'') + '&nbsp;|&nbsp;<select id="move-' + item.id + '" onchange="move(' + category + ',this)"/>' + options + '</select>'
 					));
 					items.insert(row);
 				}

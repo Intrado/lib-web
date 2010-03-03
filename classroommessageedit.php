@@ -172,7 +172,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 							if(isset($targetedmesssage[0])) {
 								QuickUpdate("update targetedmessage set overridemessagegroupid = ? where messagekey = ?",false,array($messagegroupid,$targetedmesssage[0]));
 							} else {
-								QuickUpdate("insert into targetedmessage (messagekey,targetedmessagecategoryid,overridemessagegroupid) values (?,?,?)",false,array(substr($newvalue, 0, 10) . "-" .  $messagegroup->modified,$postdata["category"],$messagegroupid));
+								QuickUpdate("insert into targetedmessage (messagekey,targetedmessagecategoryid,overridemessagegroupid) values (?,?,?)",false,array("custom-" .  $messagegroupid,$postdata["category"],$messagegroupid));
 							}
 						}
 					}
