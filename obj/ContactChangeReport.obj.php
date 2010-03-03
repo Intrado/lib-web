@@ -73,7 +73,7 @@ class ContactChangeReport extends ReportGenerator {
 	}
 
 	function runHtml(){
-		$max = 10; // TODO set back to 100
+		$max = 100;
 		$ffields = FieldMap::getOptionalAuthorizedFieldMapsLike('f');
 		$gfields = FieldMap::getOptionalAuthorizedFieldMapsLike('g');
 		$fields = $ffields + $gfields;
