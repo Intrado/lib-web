@@ -48,7 +48,7 @@ if ($makeNewUser) {
 ////////////////////////////////////////////////////////////////////////////////
 $edituser = new User($id);
 
-$readonly = $edituser->importid != null || QuickQuery("select 1 from userassociation where importid is not NULL and userid = ? limit 1", false, array($edituser->id));
+$readonly = $edituser->importid != null;
 $ldapuser = $edituser->ldap;
 $profilename = QuickQuery("select name from access where id=?", false, array($edituser->accessid));
 
@@ -323,25 +323,19 @@ if ($hasenrollment) {
 		"control" => array("InpageSubmitButton", "name" => (($hasstaffid)?_L('Remove Staff ID'):_L('Set Staff ID')), "icon" => (($hasstaffid)?"cross":"disk")),
 		"helpstep" => 1
 	);
-
-	if ($makeNewUser || QuickQuery('select 1 from userassociation where sectionid = 0 and userid = ? limit 1', false, array($edituser->id)))
-		$sectionids = array(0 => _L("Default New User Section"));
-	else
-		$sectionids = array();
-	$sectionids += QuickQueryList("
-		select s.id, s.skey
-		from userassociation ua
-			inner join section s
-				on (ua.sectionid = s.id)
-		where ua.userid=? and ua.type='section'
-		order by s.skey",
-		true, false, array($edituser->id)
-	);
 	
 	$formdata["sectionids"] = array(
 		"label" => _L('Section Restrictions'),
 		"fieldhelp" => _L('Select sections from an organization.'),
-		"value" => $sectionids,
+		"value" => QuickQueryList("
+			select s.id, s.skey
+			from userassociation ua
+				inner join section s
+					on (ua.sectionid = s.id)
+			where ua.userid=? and ua.type='section'
+			order by s.skey",
+			true, false, array($edituser->id)
+		),
 		"validators" => array(
 			array("ValSections")
 		),
