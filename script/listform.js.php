@@ -88,42 +88,46 @@ function listform_load(listformID, formData, postURL) {
 
 	// SectionWidget
 	if (sectionsWindow) {
-		var createlistbutton = icon_button('Create This List','tick').observe('click', function() {
-			var value = $('listChoose_sectionwidget').value.strip();
-		
-			if ($('listChoose_sectionwidgetorganizationselectbox').selectedIndex == 0 || value == "") {
-				alert('Please choose a section.');
-				return;
-			}
-		
-			new Ajax.Request('ajaxlistform.php?type=createlist', {
-				'method': 'post',
-				'parameters': {
-					'sectionids': value
-				},
-				'onSuccess': function(transport) {
-					$('listsTableStatus').update();
-					var listid = transport.responseJSON;
-					if (!listid) {
-						alert('<?=addslashes(_L('Sorry, you are not able to create lists'))?>');
-						return;
-					} else if (typeof listid.error === 'string') {
-						alert(listid.error);
-						return;
-					}
-					listformVars.pendingList = null;
-					listform_add_list(listid);
-					accordion.collapse_all();
-					$('listChoose_sectionwidgetorganizationselectbox').selectedIndex = 0;
-					$('listChoose_sectionwidgetsectioncheckboxescontainer').update();
-				},
-				'onFailure': function() {
-					alert('There is a connection problem.');
+		sectionsWindow.insert(
+			icon_button('Create This List','tick').observe('click', function() {
+				var selectedcheckboxes = $('listChoose_sectionwidget_fieldarea').select('input:checked');
+			
+				if (selectedcheckboxes.length < 1) {
+					alert('Please choose a section.');
+					return;
 				}
-			});
-		});
-		sectionsWindow.insert({'after': createlistbutton});
-		createlistbutton.insert({'after': new Element('div', {'style':'clear:both'})});
+			
+				var sectionids = [];
+				for (var i = 0, count = selectedcheckboxes.length; i < count; i++)
+					sectionids.push(selectedcheckboxes[i].value);
+			
+				new Ajax.Request('ajaxlistform.php?type=createlist', {
+					'method': 'post',
+					'parameters': {
+						'sectionids[]': sectionids
+					},
+					'onSuccess': function(transport) {
+						$('listsTableStatus').update();
+						var listid = transport.responseJSON;
+						if (!listid) {
+							alert('<?=addslashes(_L('Sorry, you are not able to create lists'))?>');
+							return;
+						} else if (typeof listid.error === 'string') {
+							alert(listid.error);
+							return;
+						}
+						listformVars.pendingList = null;
+						listform_add_list(listid);
+						accordion.collapse_all();
+						$('listChoose_sectionwidgetorganizationselector').selectedIndex = 0;
+						$('listChoose_sectionwidget').update();
+					},
+					'onFailure': function() {
+						alert('There is a connection problem.');
+					}
+				});
+			})
+		);
 	}
 	
 	// RuleWidget

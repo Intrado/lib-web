@@ -83,15 +83,14 @@ function handleRequest() {
 				return false;
 			
 			if (isset($_POST['sectionids'])) {
+				if (!is_array($_POST['sectionids']) || count($_POST['sectionids']) <= 0)
+					return false;
+					
 				$valsection = new ValSections();
 				$valsection->label = _L('Section');
 				$errormessage = $valsection->validate($_POST['sectionids']);
 				if ($errormessage !== true)
 					return array('error' => $errormessage);
-				
-				$sectionids = explode(",", $_POST['sectionids']);
-				if (!is_array($sectionids) || count($sectionids) <= 0)
-					return false;
 			}
 			
 			// CREATE list
@@ -100,13 +99,13 @@ function handleRequest() {
 			$list->userid = $USER->id;
 			$list->name = _L('Please Add Rules to This List');
 			$list->deleted = 1;
-			$list->type = isset($sectionids) ? 'section' : 'person';
+			$list->type = isset($_POST['sectionids']) ? 'section' : 'person';
 			$list->update();
 			if (!$list->id)
 				return false;
 				
-			if (isset($sectionids)) {
-				foreach ($sectionids as $sectionid) {
+			if (isset($_POST['sectionids'])) {
+				foreach ($_POST['sectionids'] as $sectionid) {
 					QuickUpdate('insert into listentry set type="section", listid=?, sectionid=?', false, array($list->id, $sectionid));
 				}
 				summarizeListName($list->id);

@@ -52,7 +52,7 @@ $readonly = $edituser->importid != null;
 $ldapuser = $edituser->ldap;
 $profilename = QuickQuery("select name from access where id=?", false, array($edituser->accessid));
 
-$hasenrollment = getSystemSetting("_hasenrollment");
+$hasenrollment = QuickQuery("select count(id) from import where datatype = 'enrollment'")?true:false;
 
 $hasstaffid = QuickQuery("select count(r.id) from userassociation ur, rule r where ur.userid=? and ur.ruleid = r.id and r.fieldnum = 'c01'", false, array($edituser->id))?true:false;
 
@@ -83,7 +83,7 @@ class InpageSubmitButton extends FormItem {
 	function render ($value) {
 		$n = $this->form->name."_".$this->name;
 		$str = '<input id="'.$n.'" name="'.$n.'" type="hidden" value=""/>';
-		return $str.submit_button($this->args['name'], "inpagesubmit", $this->args['icon']);
+		return $str.submit_button($this->args['name'], 'inpagesubmit', $this->args['icon']);
 	}
 }
 
@@ -323,23 +323,21 @@ if ($hasenrollment) {
 		"control" => array("InpageSubmitButton", "name" => (($hasstaffid)?_L('Remove Staff ID'):_L('Set Staff ID')), "icon" => (($hasstaffid)?"cross":"disk")),
 		"helpstep" => 1
 	);
-	
+}
+
+// TODO: $hasenrollment means the same as getSystemSetting('_hasenrollment')?
+if (getSystemSetting('_hasenrollment')) {
 	$formdata["sectionids"] = array(
-		"label" => _L('Section Restrictions'),
+		"label" => _L('Sections'),
 		"fieldhelp" => _L('Select sections from an organization.'),
-		"value" => QuickQueryList("
-			select s.id, s.skey
-			from userassociation ua
-				inner join section s
-					on (ua.sectionid = s.id)
-			where ua.userid=? and ua.type='section'
-			order by s.skey",
-			true, false, array($edituser->id)
-		),
+		"value" => "",
 		"validators" => array(
+			array("ValRequired"),
 			array("ValSections")
 		),
-		"control" => array("SectionWidget", "selectmultipleorganizations" => true),
+		"control" => array("SectionWidget",
+			"sectionids" => QuickQueryList("select sectionid from listentry where listid=? and type='section'", false, false, array($list->id))
+		),
 		"helpstep" => 2
 	);
 }
@@ -351,20 +349,6 @@ foreach ($fields as $fieldnum)
 	$ignoredFields[] = $fieldnum[0];
 if (!in_array('c01', $ignoredFields))
 	$ignoredFields[] = 'c01';
-
-$userorganizations = $edituser->organizations();
-if (count($userorganizations) > 0) {
-	$orgkeys = array(); // An array of value=>title pairs.
-	foreach ($userorganizations as $organization) {
-		$orgkeys[$organization->id] = $organization->orgkey;
-	}
-	
-	$rules[] = array(
-		'fieldnum' => 'organization',
-		'val' => $orgkeys
-	);
-}
-
 $formdata["datarules"] = array(
 	"label" => _L("Data Restriction"),
 	"fieldhelp" => _L('If the user should only be able to access certain data, you may create restriction rules here.'),
@@ -446,17 +430,6 @@ if ($readonly) {
 	if ($hasenrollment) {
 		unset($formdata["staffpkey"]);
 		unset($formdata["submit"]);
-		
-		$skeys = $formdata["sectionids"]["value"];
-		if (count($skeys) > 0) {
-			$formdata["sectionids"]["control"] = array("FormHtml", "html" => '<ul style="margin:2px; padding-left: 0; list-style:inside">');
-			foreach ($skeys as $skey) {
-				$formdata["sectionids"]["control"]["html"] .= '<li>' . escapehtml($skey) . '</li>';
-			}
-			$formdata["sectionids"]["control"]["html"] .= '</ul>';
-		} else {
-			unset($formdata["sectionids"]);
-		}
 	}
 	// Data restrictions
 	if (count($rules)) {
@@ -589,36 +562,22 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 							unset($datarules[$index]);
 			}
 
-			// Delete all the user's organization and section associations.
-			Query("delete from userassociation where type in ('section', 'organization') and userid=?", false, array($edituser->id));
-			
 			if (count($datarules)) {
 				foreach ($datarules as $datarule) {
-					if ($datarule->fieldnum == "organization") {
-						foreach ($datarule->val as $organizationid) {
-							Query("insert into userassociation (userid, type, organizationid) values (?, 'organization', ?)", false, array($edituser->id, $organizationid));
-						}
-					} else {
-						$rule = new Rule();
-						$rule->fieldnum = $datarule->fieldnum;
-						$rule->type = $datarule->type;
-						$rule->logical = $datarule->logical;
-						$rule->op = $datarule->op;
-						$rule->val = is_array($datarule->val)?implode("|", $datarule->val):$datarule->val;
-						$rule->create();
+					$rule = new Rule();
+					$rule->fieldnum = $datarule->fieldnum;
+					$rule->type = $datarule->type;
+					$rule->logical = $datarule->logical;
+					$rule->op = $datarule->op;
+					$rule->val = is_array($datarule->val)?implode("|", $datarule->val):$datarule->val;
+					$rule->create();
 
-						Query("insert into userassociation (userid, type, ruleid) values (?, 'rule', ?)", false, array($edituser->id, $rule->id));
-					}
+					Query("insert into userassociation (userid, type, ruleid) values (?, 'rule', ?)", false, array($edituser->id, $rule->id));
 				}
 			}
-			
+
 			// update again for staffid
 			$edituser->update();
-			
-			$sectionids = isset($postdata['sectionids']) ? explode(',', $postdata['sectionids']) : array();
-			foreach ($sectionids as $sectionid) {
-				Query("insert into userassociation (userid, type, sectionid) values (?, 'section', ?)", false, array($edituser->id, $sectionid));
-			}
 
 			QuickUpdate("delete from userjobtypes where userid =?", false, array($edituser->id));
 
@@ -653,8 +612,8 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 			else
 				redirect("user.php?id=".$edituser->id);
 		} else {
-			notice(_L("Changes to %s's account are now saved.", $edituser->login));
-			
+			// TODO, Release 7.2: notice(_L("Changes to %s's account is now saved", $edituser->login));
+
 			if ($ajax)
 				$form->sendTo("users.php");
 			else
