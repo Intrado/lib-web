@@ -630,8 +630,8 @@ class JobWiz_start extends WizStep {
 				"label" => _L("Record & Write"), "enabled" => false
 			),
 			"custom" => array(
-				0 => "",
-				1 => "",
+				0 => _L('Use Your Saved Messages'),
+				1 => _L('Customize Message Combination Options'),
 				2 => "",
 				"icon" => "img/customize.gif",
 				"label" => _L("Customize"), "enabled" => true
@@ -731,7 +731,7 @@ class JobWiz_start extends WizStep {
 			<li><b>Record</b> - Record a phone message in your voice. In addition to the phone call the system will automatically send email and SMS text message alerts.
 			<li><b>Write</b> - Type your phone, email and SMS text messages. The phone message text will be automatically converted to a call using text-to-speech. Auto-translation is optional.
 			<li><b>Record and Write</b> - Record a phone message in your voice. Type your phone and SMS text message.
-			<li><b>Customize</b> - Use the Customize option to manually select any combination of message options you require.
+			<li><b>Customize</b> - Use the Customize option to choose a message that you\'ve already saved or to manually select any combination of message options you require.
 			</ul>
 			<i><b>Note:</b> Email and SMS text messaging are optional features and may not be enabled.</i>"),
 			"validators" => array(
@@ -749,8 +749,7 @@ class JobWiz_start extends WizStep {
 			<li><b>Record</b> - Record a phone message in your voice. In addition to the phone call the system will automatically send email and SMS text message alerts to those recipients with the appropriate email and SMS contact information and preference settings.
 			<li><b>Write</b> - Type your phone, email and SMS text messages. The phone message text will be automatically converted to a call using text-to-speech. Both the phone and email messages can also be automatically translated into the other languages defined in your account.
 			<li><b>Record and Write</b> - Record a phone message in your voice. Type your phone and SMS text message.
-			<li><b>Customize</b> - Use the Customize option to manually select any combination of message options you require. For advanced notification options, such as selecting from previously created messages, choose Customize.
-			</ul>
+			<li><b>Customize</b> - Use the Customize option to choose a previously saved message or to manually select any combination of message options you require. 			</ul>
 			<b>Note:</b> Email and SMS text messaging are optional features and may not be enabled for some user accounts.")
 		);
 		return new Form("start",$formdata,$helpsteps);
@@ -776,10 +775,10 @@ class JobWiz_messageOptions extends WizStep {
 		$values["pick"] =_L("Select Saved Message");
 
 		$formdata[] = $this->title;
-		$helpsteps = array(_L("Select to either create a message or select an existing message"));
+		$helpsteps = array(_L("Select to either create a new message or choose an existing message you've already saved or subscribed to."));
 		$formdata["options"] = array(
 			"label" => _L("Message Options"),
-			"fieldhelp" => _L("Create a message"),
+			"fieldhelp" => _L("Choose whether you would like to create a new message or use one you have already saved or subscribed to."),
 			"value" => "",
 			"validators" => array(
 				array("ValRequired")
@@ -833,9 +832,10 @@ class JobWiz_messageGroupChoose extends WizStep {
 		$formdata = array();
 
 		$formdata[] = $this->title;
-		$helpsteps = array(_L("Select from list of existing messages. If you do not find an appropriate message, you may click the Message Source link from the navigation on the left and choose to create a new message."));
+		$helpsteps = array(_L("Select from list of existing messages. After selecting a message, the message components will display below. Clicking the icon for any component will open a preview window."));
 		$formdata["messagegroup"] = array(
 			"label" => _L("Select a Message"),
+			"fieldhelp" => _L("Choose a saved message from the menu."),
 			"value" => "",
 			"validators" => array(
 				array("ValRequired"),
@@ -886,10 +886,10 @@ class JobWiz_messageType extends WizStep {
 			unset($values['sms']);
 
 		$formdata[] = $this->title;
-		$helpsteps = array(_L("Select a method or methods for message delivery."));
+		$helpsteps = array(_L("Choose how you you like your message to be delivered."));
 		$formdata["type"] = array(
 			"label" => _L("Message Type"),
-			"fieldhelp" => _L("Choose the types of messages you would like to send."),
+			"fieldhelp" => _L("Choose the message options you would like to configure."),
 			"value" => "",
 			"validators" => array(
 				array("ValRequired")
