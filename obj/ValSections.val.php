@@ -19,12 +19,22 @@ class ValSections extends Validator {
 		// Otherwise get a union of associated sections and sections that are part of the user's associated organization.
 		// $validsectionids is indexed by sectionid for checking isset($validsectionids[$id])
 		if (QuickQuery('select 1 from userassociation where userid = ? limit 1', false, array($USER->id))) {
+			// Use two separate queries when getting the union of sectionids, using a single query is unoptimized
 			$validsectionids = array_flip(QuickQueryList('
 				select distinct s.id
 				from userassociation ua
 					inner join section s
-						on (ua.sectionid = s.id or ua.organizationid = s.organizationid)
-				where ua.userid = ? and ua.type in ("section", "organization")',
+						on (ua.sectionid = s.id)
+				where ua.userid = ? and ua.type = "section"',
+				false, false, array($USER->id)
+			));
+			
+			$validsectionids += array_flip(QuickQueryList('
+				select distinct s.id
+				from userassociation ua
+					inner join section s
+						on (ua.organizationid = s.organizationid)
+				where ua.userid = ? and ua.type = "organization"',
 				false, false, array($USER->id)
 			));
 		} else {
