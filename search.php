@@ -110,11 +110,13 @@ if (!isset($_SESSION['listsearchpreview'])) {
 		$formdata["sectionids"] = array(
 			"label" => _L('Sections'),
 			"fieldhelp" => _L('Select sections from an organization.'),
-			"value" => "",
+			"value" => isset($_SESSION['listsearchsectionids']) && count($_SESSION['listsearchsectionids']) > 0 ?
+				QuickQueryList("select id, skey from section where id in (" .implode(",", $_SESSION['listsearchsectionids']) . ")", true, false) :
+				array(),
 			"validators" => array(
 				array("ValSections")
 			),
-			"control" => array("SectionWidget", "sectionids" => isset($_SESSION['listsearchsectionids']) ? $_SESSION['listsearchsectionids'] : array()),
+			"control" => array("SectionWidget"),
 			"helpstep" => 2
 		);
 	
@@ -191,7 +193,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 							$organizations = Organization::getAuthorizedOrgKeys();
 							foreach ($data->val as $id) {
 								$id = $id + 0;
-								$orgkeys[$id] = $organizations[$id]->orgkey;
+								$orgkeys[$id] = $organizations[$id];
 							}
 							
 							if (!isset($_SESSION['listsearchrules']))
@@ -226,7 +228,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 				case 'sectionsearch':
 					if (getSystemSetting('_hasenrollment')) {
 						list_clear_search_session('listsearchsectionids');
-						$_SESSION['listsearchsectionids'] = $postdata['sectionids'];
+						$_SESSION['listsearchsectionids'] = explode(",", $postdata['sectionids']);
 					}
 					$form->sendTo("search.php");
 					break;

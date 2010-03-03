@@ -201,7 +201,7 @@ if (isset($options['organizationids']) && count($options['organizationids']) > 0
 		
 		foreach ($options['organizationids'] as $id) {
 			if (isset($organizations[$id]))
-				$orgkeys[$id] = $organizations[$id]->orgkey;
+				$orgkeys[$id] = $organizations[$id];
 		}
 		
 		if (count($orgkeys) > 0) {
@@ -313,15 +313,13 @@ if (getSystemSetting('_hasenrollment')) {
 	$formdata["sectionids"] = array(
 		"label" => _L('Sections'),
 		"fieldhelp" => _L('Select sections from an organization.'),
-		"value" => "",
+		"value" => isset($options['sectionids']) && count($options['sectionids']) > 0 ?
+			QuickQueryList("select id, skey from section where id in (" .implode(",", $options['sectionids']) . ")", true, false) :
+			array(),
 		"validators" => array(
 			array("ValSections")
 		),
-		"control" => array("SectionWidget",
-			"sectionids" => isset($options['sectionids']) && count($options['sectionids']) > 0 ?
-				$options['sectionids'] :
-				array()
-		),
+		"control" => array("SectionWidget"),
 		"helpstep" => 2
 	);
 }
@@ -413,7 +411,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 				);
 				
 				if (getSystemSetting('_hasenrollment')) {
-					$_SESSION['report']['options']['sectionids'] = isset($postdata['sectionids']) ? $postdata['sectionids'] : array();
+					$_SESSION['report']['options']['sectionids'] = isset($postdata['sectionids']) ? explode(",", $postdata['sectionids']) : array();
 				}
 				
 				set_session_options_reporttype();

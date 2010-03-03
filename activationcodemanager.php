@@ -168,14 +168,15 @@ if (getSystemSetting('_hasenrollment')) {
 	$formdata["sectionids"] = array(
 		"label" => _L('Sections'),
 		"fieldhelp" => _L('Select sections from an organization.'),
-		"value" => "",
+		"value" => isset($_SESSION['activationcodemanager_sectionids']) && count($_SESSION['activationcodemanager_sectionids']) > 0 ?
+			QuickQueryList("select id, skey from section where id in (" .implode(",", $_SESSION['activationcodemanager_sectionids']) . ")", true, false) :
+			array(),
 		"validators" => array(
 			array("ValSections")
 		),
-		"control" => array("SectionWidget", "sectionids" => isset($_SESSION['activationcodemanager_sectionids']) ? $_SESSION['activationcodemanager_sectionids'] : array()),
+		"control" => array("SectionWidget"),
 		"helpstep" => 2
 	);
-
 
 	$formdata["sectionsearchbutton"] = array(
 		"label" => _L(''),
@@ -243,7 +244,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 							$organizations = Organization::getAuthorizedOrgKeys();
 							foreach ($data->val as $id) {
 								$id = $id + 0;
-								$orgkeys[$id] = $organizations[$id]->orgkey;
+								$orgkeys[$id] = $organizations[$id];
 							}
 							
 							if (!isset($_SESSION['activationcodemanager_rules']))
@@ -277,7 +278,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 				case 'sectionsearch':
 					if (getSystemSetting('_hasenrollment')) {
 						activationcodemanager_clear_search_session('activationcodemanager_sectionids');
-						$_SESSION['activationcodemanager_sectionids'] = $postdata['sectionids'];
+						$_SESSION['activationcodemanager_sectionids'] = explode(",", $postdata['sectionids']);
 					}
 					
 					$form->sendTo("activationcodemanager.php");

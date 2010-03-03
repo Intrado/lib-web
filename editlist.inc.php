@@ -140,14 +140,20 @@ if ($method === 'sections') {
 	$formdata["sectionids"] = array(
 		"label" => _L('Sections'),
 		"fieldhelp" => _L('Select sections from an organization.'),
-		"value" => "",
+		"value" => QuickQueryList("
+			select s.id, s.skey
+			from listentry le
+				inner join section s
+					on (le.sectionid = s.id)
+			where le.listid=? and le.type='section'
+			order by s.skey",
+			true, false, array($list->id)
+		),
 		"validators" => array(
 			array("ValRequired"),
 			array("ValSections")
 		),
-		"control" => array("SectionWidget",
-			"sectionids" => QuickQueryList("select sectionid from listentry where listid=? and type='section'", false, false, array($list->id))
-		),
+		"control" => array("SectionWidget"),
 		"helpstep" => 2
 	);
 }
@@ -220,7 +226,8 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 			
 				// Delete existing section listentries, then add new ones.
 				QuickUpdate('delete from listentry where listid=? and type="section"', false, array($list->id));
-				foreach ($postdata['sectionids'] as $sectionid) {
+				$sectionids = explode(',', $postdata['sectionids']);
+				foreach ($sectionids as $sectionid) {
 					QuickUpdate('insert into listentry set type="section", listid=?, sectionid=?', false, array($list->id, $sectionid));
 				}
 			
