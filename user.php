@@ -52,9 +52,9 @@ $readonly = $edituser->importid != null;
 $ldapuser = $edituser->ldap;
 $profilename = QuickQuery("select name from access where id=?", false, array($edituser->accessid));
 
-$hasenrollment = QuickQuery("select count(id) from import where datatype = 'enrollment'")?true:false;
+$hasenrollment = getSystemSetting('_hasenrollment', false);
 
-$hasstaffid = QuickQuery("select count(r.id) from userassociation ur, rule r where ur.userid=? and ur.ruleid = r.id and r.fieldnum = 'c01'", false, array($edituser->id))?true:false;
+$hasstaffid = QuickQuery("select count(*) from userassociation where userid=? and sectionid=0", false, array($edituser->id)) ? true : false;
 
 if($IS_COMMSUITE) {
 	$accessprofiles = QuickQueryList("select id, name from access", true);
@@ -325,6 +325,7 @@ if ($hasenrollment) {
 	);
 }
 
+/*
 // TODO: $hasenrollment means the same as getSystemSetting('_hasenrollment')?
 if (getSystemSetting('_hasenrollment')) {
 	$formdata["sectionids"] = array(
@@ -341,6 +342,7 @@ if (getSystemSetting('_hasenrollment')) {
 		"helpstep" => 2
 	);
 }
+*/
 
 $rules = cleanObjects($edituser->getRules());
 $fields = QuickQueryMultiRow("select fieldnum from fieldmap where options not like '%multisearch%'");
@@ -521,40 +523,21 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 				}
 			}
 
-			$existingstaffidrule = QuickQuery("select r.id from userassociation ur, rule r where ur.userid=? and ur.ruleid = r.id and r.fieldnum = 'c01'", false, array($edituser->id));
 			if (isset($postdata['datarules']))
 				$datarules = json_decode($postdata['datarules']);
 
 			if ($button == 'inpagesubmit' && $hasstaffid) {
-				// remove existing c01 rule if exists
-				if ($existingstaffidrule) {
-					Query("delete from rule where id=?", false, array($existingstaffidrule));
-					Query("delete from userassociation where userid=? and ruleid=?", false, array($edituser->id, $existingstaffidrule));
-				}
 				// remove current staff id from user
 				$edituser->staffpkey = "";
+				Query("delete from userassociation where userid=? and sectionid=0", false, array($edituser->id));
 			}
 
 			if (!$hasstaffid && isset($postdata['staffpkey']) && strlen($postdata['staffpkey'])) {
-				// remove existing c01 rule if exists
-				if ($existingstaffidrule) {
-					Query("delete from rule where id=?", false, array($existingstaffidrule));
-					Query("delete from userassociation where userid=? and ruleid=?", false, array($edituser->id, $existingstaffidrule));
-				}
-				// create the c01 rule based on current staffid
-				$rule = new Rule();
-				$rule->fieldnum = "c01";
-				$rule->type = "multisearch";
-				$rule->logical = "and";
-				$rule->op = "in";
-				$rule->val =$postdata['staffpkey'];
-				$rule->create();
-
-				Query("insert into userassociation (userid, type, ruleid) values (?, 'rule', ?)", false, array($edituser->id, $rule->id));
-
 				// set current staffid
 				$edituser->staffpkey = $postdata['staffpkey'];
-
+				// give them association to no sections (section assoc created via section import)
+				Query("insert into userassociation (userid, type, sectionid) values (?, 'section', 0)", false, array($edituser->id));
+				
 				// remove any c fields from data rules
 				if (count($datarules))
 					foreach ($datarules as $index => $datarule)
