@@ -1027,6 +1027,10 @@ CREATE TABLE `setting` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 
 $$$
 
+-- TODO must update for every release
+INSERT INTO `setting` (`name`, `value`) values ('_dbversion', '7.5/8')
+$$$
+
 --
 -- Table structure for table `sms`
 --
@@ -1239,6 +1243,34 @@ CREATE TABLE `ttsvoice` (
   PRIMARY KEY  (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 
 $$$
+
+INSERT INTO `ttsvoice` (`languagecode`, `language`, `gender`) VALUES
+	('en', 'english', 'male'),
+	('en', 'english', 'female'),
+	('es', 'spanish', 'male'),
+	('es', 'spanish', 'female'),
+	('ca', 'catalan', 'female'),
+	('ca', 'catalan', 'male'),
+	('zh', 'chinese', 'female'),
+	('nl', 'dutch', 'female'),
+	('nl', 'dutch', 'male'),
+	('fi', 'finnish', 'female'),
+	('fr', 'french', 'female'),
+	('fr', 'french', 'male'),
+	('de', 'german', 'female'),
+	('de', 'german', 'male'),
+	('el', 'greek', 'female'),
+	('it', 'italian', 'female'),
+	('it', 'italian', 'male'),
+	('pl', 'polish', 'female'),
+	('pl', 'polish', 'male'),
+	('pt', 'portuguese', 'female'),
+	('pt', 'portuguese', 'male'),
+	('ru', 'russian', 'female'),
+	('sv', 'swedish', 'female'),
+	('sv', 'swedish', 'male')
+$$$
+
 
 --
 -- Table structure for table `user`
