@@ -177,39 +177,9 @@ if (CheckFormSubmit($f,$s)){
 							('displayname', ?),
 							('timezone', ?),
 							('smscustomername', ?),
-							('enablesmsoptin', ?),
-							('_dbversion', '7.5/8')"; // TODO we must update this for every release!!!
+							('enablesmsoptin', ?)";
 
 				QuickUpdate($query, $newdb, array($hostname, $surveyurl, $displayname, $timezone, $displayname, $enablesmsoptin)) or dieWithError(" SQL:" . $query, $newdb);
-
-				$query = "INSERT INTO `ttsvoice` (`languagecode`, `language`, `gender`) VALUES
-							('en', 'english', 'male'),
-							('en', 'english', 'female'),
-							('es', 'spanish', 'male'),
-							('es', 'spanish', 'female'),
-							('ca', 'catalan', 'female'),
-							('ca', 'catalan', 'male'),
-							('zh', 'chinese', 'female'),
-							('nl', 'dutch', 'female'),
-							('nl', 'dutch', 'male'),
-							('fi', 'finnish', 'female'),
-							('fr', 'french', 'female'),
-							('fr', 'french', 'male'),
-							('de', 'german', 'female'),
-							('de', 'german', 'male'),
-							('el', 'greek', 'female'),
-							('it', 'italian', 'female'),
-							('it', 'italian', 'male'),
-							('pl', 'polish', 'female'),
-							('pl', 'polish', 'male'),
-							('pt', 'portuguese', 'female'),
-							('pt', 'portuguese', 'male'),
-							('ru', 'russian', 'female'),
-							('sv', 'swedish', 'female'),
-							('sv', 'swedish', 'male')
-							";
-
-				QuickUpdate($query, $newdb) or dieWithError(" SQL: " . $query, $newdb);
 
 				// Brand/LOGO Info
 
