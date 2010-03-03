@@ -359,6 +359,34 @@ class HtmlTextArea extends FormItem {
 	}
 }
 
+class CheckBoxWithHtmlPreview extends FormItem {
+	function render ($value) {
+		$n = $this->form->name."_".$this->name;
+		$str = '<input id="'.$n.'" name="'.$n.'" type="checkbox" value="true" '. ($value ? 'checked' : '').' 
+				onclick="showhidepreview(\''. $n .'\')"/>
+			<div id="'.$n.'-checked" name="'.$n.'" style="border: 1px solid gray; overflow: auto; padding: 4px; max-height: 150px; display: '. ($value ? 'block' : 'none') .'">
+				'. $this->args['checkedhtml'] .'
+			</div>
+			<div id="'.$n.'-unchecked" name="'.$n.'" style="border: 1px solid gray; overflow: auto; padding: 4px; max-height: 150px; color: gray; display: '. ($value ? 'none' : 'block') .'">
+				'. $this->args['uncheckedhtml'] .'
+			</div>
+			<script type="text/javascript">
+				function showhidepreview(e) {
+					e = $(e);
+					if (e.checked) {
+						$(e.id + "-checked").show();
+						$(e.id + "-unchecked").hide();
+					} else {
+						$(e.id + "-checked").hide();
+						$(e.id + "-unchecked").show();
+					}
+				}
+			</script>
+		';
+		return $str;
+	}
+}
+
 class EasyCall extends FormItem {
 	function render ($value) {
 		$n = $this->form->name."_".$this->name;
@@ -1421,12 +1449,7 @@ class JobWiz_messageEmailTranslate extends WizStep {
 						"fieldhelp" => _L('Check this box to automatically translate your message using Google Translate.'),
 						"value" => 1,
 						"validators" => array(),
-						"control" => array("CheckBox"),
-						"helpstep" => 1
-					);
-					$formdata[$languagecode. "-preview"] = array(
-						"label" => _L("Message"),
-						"control" => array("FormHtml","html"=>'<div style="border: 1px solid gray; overflow: auto; height: 150px;">'.$obj->responseData->translatedText.'</div><br>'),
+						"control" => array("CheckBoxWithHtmlPreview", "checkedhtml" => $obj->responseData->translatedText, "uncheckedhtml" => addslashes(_L("People tagged with this language will receive the English version."))),
 						"helpstep" => 1
 					);
 				}
@@ -1438,12 +1461,7 @@ class JobWiz_messageEmailTranslate extends WizStep {
 					"fieldhelp" => _L('Check this box to automatically translate your message using Google Translate.'),
 					"value" => 1,
 					"validators" => array(),
-					"control" => array("CheckBox"),
-					"helpstep" => 1
-				);
-				$formdata[$languagecode. "-preview"] = array(
-					"label" => _L("Message"),
-					"control" => array("FormHtml","html"=>'<div style="border: 1px solid gray; overflow: auto; height: 150px;">'.$translations->responseData->translatedText.'</div><br>'),
+					"control" => array("CheckBoxWithHtmlPreview", "checkedhtml" => $translations->translatedText, "uncheckedhtml" => addslashes(_L("People tagged with this language will receive the English version."))),
 					"helpstep" => 1
 				);
 			}
