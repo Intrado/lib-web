@@ -25,6 +25,8 @@ require_once("obj/FieldMap.obj.php");
 require_once("obj/ListEntry.obj.php");
 require_once("obj/PeopleList.obj.php");
 require_once("obj/Rule.obj.php");
+require_once("obj/JobList.obj.php");
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization
