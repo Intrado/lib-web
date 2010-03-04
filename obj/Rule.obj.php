@@ -200,6 +200,7 @@ class Rule extends DBMappedObject {
 	/**static functions**/
 
 	//isreport flags that we need to join differently for group fields
+	//TODO $fieldoverride is never used in makeQuery() context, should be removed
 	static function makeQuery ($rulesarray, $alias, $fieldoverride = false, $isreport = false) {
 		$fquery = ""; // ffield
 		$gquery = ""; // gfield
