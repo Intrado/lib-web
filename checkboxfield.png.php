@@ -11,7 +11,7 @@ if($_GET['saved']== "false"){
 	$usersetting = DBFind("UserSetting", "from usersetting where name ='" . DBSafe($field) . "' and userid = '$USER->id'");
 	if($usersetting == null){
 		$usersetting = new UserSetting();
-		$usersetting->name = DBSafe($field);
+		$usersetting->name = $field;
 		$usersetting->userid = $USER->id;
 	}
 	if($toggle == "true"){
