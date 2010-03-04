@@ -50,16 +50,6 @@ class Person extends DBMappedObject {
 		return $person->$fnamefield . ' ' . $person->$lnamefield;
 	}
 
-	static function findPerson($custid,$key) {
-		$query = "select id from person where pkey=? and not deleted";
-		$id = QuickQuery($query, false, array($key));
-
-		if ($id)
-			return new Person($id);
-		else
-			return false;
-	}
-
 	function getAddress () {
 		return DBFind("Address", "from address where personid = '" . $this->id . "'");
 	}
