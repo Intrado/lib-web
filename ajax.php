@@ -14,8 +14,6 @@ require_once("obj/FieldMap.obj.php");
 require_once("obj/PeopleList.obj.php");
 require_once("obj/Person.obj.php");
 require_once("obj/Rule.obj.php");
-require_once("obj/Validator.obj.php");
-require_once("obj/ValRules.val.php");
 require_once("obj/ListEntry.obj.php");
 require_once("obj/RenderedList.obj.php");
 require_once("inc/date.inc.php");
@@ -157,15 +155,15 @@ function handleRequest() {
 				if (!userOwns('list', $id))
 					continue;
 				$list = new PeopleList($id+0);
-				$renderedlist = new RenderedList($list);
-				$renderedlist->calcStats();
+				$renderedlist = new RenderedList2();
+				$renderedlist->initWithList($list);
 				$stats[$list->id]= array(
 					'name' => $list->name,
-					'advancedlist' => false,//!$list->deleted || $renderedlist->totalremoved || $renderedlist->totaladded,
-					'totalremoved' => $renderedlist->totalremoved,
-					'totaladded' => $renderedlist->totaladded,
-					'totalrule' => $renderedlist->total - $renderedlist->totaladded + $renderedlist->totalremoved,
-					'total' => $renderedlist->total);
+					'advancedlist' => false, //TODO remove this
+					'totalremoved' => $list->countRemoved(),
+					'totaladded' => $list->countAdded(),
+					'totalrule' => -999, //TOOD remove this
+					'total' => $renderedlist->getTotal());
 			}
 			return $stats;
 
