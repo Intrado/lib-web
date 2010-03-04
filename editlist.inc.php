@@ -16,8 +16,8 @@ $list = new PeopleList(isset($_SESSION['listid']) ? $_SESSION['listid'] : null);
 if ($list->id) {
 	$method = ($list->type === 'section') ? 'sections' : 'rules';
 	
-	$renderedlist = new RenderedList($list);
-	$renderedlist->calcStats();
+	$renderedlist = new RenderedList2();
+	$renderedlist->initWithList($list);
 }
 
 if (!isset($method) || !in_array($method, array('rules', 'sections')))
@@ -75,9 +75,9 @@ if ($method === 'rules') {
 	}
 }
 
-$total = isset($renderedlist) ? $renderedlist->total : '0';
-$showAdditions = isset($renderedlist) && $renderedlist->totaladded > 0;
-$showSkips = isset($renderedlist) && $renderedlist->totalremoved > 0;
+$total = isset($renderedlist) ? $renderedlist->getTotal() : 0;
+$showAdditions = $list->countAdded() > 0;
+$showSkips = $list->countRemoved() > 0;
 
 $formdata = array(
 	// A hidden submit button is needed because otherwise pressing ENTER would take you to the Preview page.
@@ -140,20 +140,14 @@ if ($method === 'sections') {
 	$formdata["sectionids"] = array(
 		"label" => _L('Sections'),
 		"fieldhelp" => _L('Select sections from an organization.'),
-		"value" => QuickQueryList("
-			select s.id, s.skey
-			from listentry le
-				inner join section s
-					on (le.sectionid = s.id)
-			where le.listid=? and le.type='section'
-			order by s.skey",
-			true, false, array($list->id)
-		),
+		"value" => "",
 		"validators" => array(
 			array("ValRequired"),
 			array("ValSections")
 		),
-		"control" => array("SectionWidget"),
+		"control" => array("SectionWidget",
+			"sectionids" => QuickQueryList("select sectionid from listentry where listid=? and type='section'", false, false, array($list->id))
+		),
 		"helpstep" => 2
 	);
 }
@@ -226,8 +220,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 			
 				// Delete existing section listentries, then add new ones.
 				QuickUpdate('delete from listentry where listid=? and type="section"', false, array($list->id));
-				$sectionids = explode(',', $postdata['sectionids']);
-				foreach ($sectionids as $sectionid) {
+				foreach ($postdata['sectionids'] as $sectionid) {
 					QuickUpdate('insert into listentry set type="section", listid=?, sectionid=?', false, array($list->id, $sectionid));
 				}
 			
@@ -353,13 +346,11 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 						break;
 
 					case 'preview':
-						$_SESSION['listsearchpreview'] = true;
 						$form->sendTo("showlist.php?id=" . $list->id);
 						break;
 
 					case 'search':
-						unset($_SESSION['listsearchpreview']);
-						$form->sendTo("search.php");
+						$form->sendTo("search.php?id=" . $list->id);
 						break;
 
 					case 'manualAdd':
