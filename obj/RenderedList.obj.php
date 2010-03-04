@@ -94,7 +94,7 @@ class RenderedList2 {
 		
 		$ordersql = "";
 		$limitsql = "";
-		$sqlflags = $sqlflags ? "" : "SQL_CALC_FOUND_ROWS";
+		$sqlflags = $calctotal ? "" : "SQL_CALC_FOUND_ROWS";
 		
 		if ($addorderlimit) {
 			if (count($this->orderby) > 0) {
