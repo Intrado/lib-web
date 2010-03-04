@@ -31,8 +31,8 @@ $list = new PeopleList($_SESSION['newjob']['list']);
 $jobtype = new JobType($_SESSION['newjob']['jobtypeid']);
 
 
-$renderedlist = new RenderedList($list);
-$renderedlist->calcStats();
+$renderedlist = new RenderedList2($list);
+$renderedlist->initWithList($list);
 
 $languages = DBFindMany("Language","from language order by name");
 
@@ -45,7 +45,7 @@ header("Content-type: text/xml");
 echo "Job:" . (($_SESSION['newjob']['name']) ? $_SESSION['newjob']['name'] : "(Automatic)") . "\r\n";
 echo "Message:" . $messagename . "\r\n";
 echo "List:" . $list->name . "\r\n";
-echo "Total people in list:" . $renderedlist->total . "\r\n";
+echo "Total people in list:" . $renderedlist->getTotal() . "\r\n";
 echo "Priority:" . $jobtype->name . "\r\n";
 if($_SESSION['newjob']['easycall']) {
 	echo "Languages:Default - English\r\n";

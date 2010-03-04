@@ -215,9 +215,9 @@ if($REQUEST_TYPE == "new"){
 			loadUser(); // must load user before rendering list
 			global $USER, $ACCESS;
 			$list = new PeopleList($_SESSION['listid']);
-			$renderedlist = new RenderedList($list);
-			$renderedlist->calcStats();
-			$listsize = $renderedlist->total;
+			$renderedlist = new RenderedList2();
+			$renderedlist->initWithList($list);
+			$listsize = $renderedlist->getTotal();
 			//error_log("number of people in list: ".$listsize);
 
 			if ($listsize == 0) {

@@ -65,11 +65,11 @@ if (count($multilistids) > 0) {
 	$multirenderedlist = array();
 	foreach ($multilistids as $listid) {
 		$nextlist = new PeopleList($listid);
-		$nextrenderedlist = new RenderedList($nextlist);
-		$nextrenderedlist->calcStats();
+		$nextrenderedlist = new RenderedList2();
+		$nextrenderedlist->initWithList($nextlist);
 		$multilist[] = $nextlist;
 		$multirenderedlist[] = $nextrenderedlist;
-		$totalpersons += $nextrenderedlist->total;
+		$totalpersons += $nextrenderedlist->getTotal();
 		$list = $nextlist; // used by single list display
 	}
 }

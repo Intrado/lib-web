@@ -51,12 +51,12 @@ $listids = QuickQueryList("select listid from joblist where jobid=?", false, fal
 if (isset($listids[0]))
 	$listid = $listids[0];
 $list = new PeopleList($listid);
-$renderedlist = new RenderedList($list);
-$renderedlist->calcStats();
+$renderedlist = new RenderedList2($list);
+$renderedlist->initWithList($list);
 $questionnaire = new SurveyQuestionnaire($job->questionnaireid);
 $questions = DBFindMany("SurveyQuestion", "from surveyquestion where questionnaireid = $job->questionnaireid order by questionnumber");
 
-if ($renderedlist->total == 0)
+if ($renderedlist->getTotal() == 0)
 	error("The list you've selected does not have any people in it","Click Cancel to return to the Job configuration page");
 
 if (count($questions) == 0)
@@ -84,7 +84,7 @@ $f = "survey";
 include_once("nav.inc.php");
 NewForm($f);
 
-if ($renderedlist->total > 0 && count($questions) > 0)
+if ($renderedlist->getTotal() > 0 && count($questions) > 0)
 	buttons(button('Back',null, 'survey.php'), button('Submit Survey',null, 'jobsubmit.php?jobid=' . $jobid));
 else
 	buttons(button('Cancel',null, 'survey.php'));

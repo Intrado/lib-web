@@ -44,10 +44,7 @@ if (isset($_GET['delete'])) {
 }
 
 
-
-$isajax = isset($_GET['ajax']);
-
-if($isajax === true) {
+if (isset($_GET['ajax'])) {
 	session_write_close();//WARNING: we don't keep a lock on the session file, any changes to session data are ignored past this point
 	$start = 0 + (isset($_GET['pagestart']) ? $_GET['pagestart'] : 0);
 	$limit = 20;
@@ -172,9 +169,9 @@ function listcontacts ($obj,$name) {
 	$calctotal = 0;
 	foreach ($lists as $id) {
 		$list = new PeopleList($id);
-		$renderedlist = new RenderedList($list);
-		$renderedlist->calcStats();
-		$calctotal = $calctotal + $renderedlist->total;
+		$renderedlist = new RenderedList2();
+		$renderedlist->initWithList($list);
+		$calctotal += $renderedlist->getTotal();
 	}
 	return "<b>" . $calctotal . ($calctotal!=1?"</b>&nbsp;contacts":"</b>&nbsp;contact");
 }

@@ -7,7 +7,6 @@ require_once("obj/Job.obj.php");
 require_once("obj/Message.obj.php");
 require_once("obj/MessagePart.obj.php");
 require_once("obj/AudioFile.obj.php");
-require_once("obj/JobList.obj.php");
 require_once("obj/Schedule.obj.php");
 require_once("inc/form.inc.php");
 require_once("inc/html.inc.php");
@@ -18,6 +17,9 @@ require_once("inc/securityhelper.inc.php");
 require_once("inc/formatters.inc.php");
 require_once("obj/ImportJob.obj.php");
 require_once("obj/MessageGroup.obj.php");
+require_once("obj/PeopleList.obj.php");
+require_once("obj/RenderedList.obj.php");
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization

@@ -13,8 +13,8 @@ if (!$USER->authorize('sendphone')) {
 }
 
 $list = new PeopleList($_SESSION['newjob']['list']);
-$renderedlist = new RenderedList($list);
-$renderedlist->calcStats();
+$renderedlist = new RenderedList2();
+$renderedlist->initWithList($list);
 
 
 header("Content-type: text/xml");
@@ -26,11 +26,7 @@ header("Content-type: text/xml");
 <Text><?
 echo "Name:\t" . $list->name . "\r\n";
 echo "Desc:\t" . $list->description . "\r\n";
-
-echo "From rules:\t\t" . ($renderedlist->totalrule ? $renderedlist->totalrule : 0) . "\r\n";
-echo "From adds:\t\t" . $renderedlist->totaladded . "\r\n";
-echo "--------------------\r\n";
-echo "Total people:\t" . $renderedlist->total . "\r\n";
+echo "Total people:\t" . $renderedlist->getTotal() . "\r\n";
 
 
 

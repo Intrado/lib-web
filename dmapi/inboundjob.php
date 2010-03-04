@@ -79,9 +79,9 @@ function jobConfirm($listname, $priority, $numdays=1, $playback=true)
 
 	// find list size
 	$list = new PeopleList($_SESSION['listid']);
-	$renderedlist = new RenderedList($list);
-	$renderedlist->calcStats();
-	$listsize = $renderedlist->total;
+	$renderedlist = new RenderedList2();
+	$renderedlist->initWithList($list);
+	$listsize = $renderedlist->getTotal();
 	$jobtype = new JobType($priority);
 
 	//error_log("number of people in list: ".$listsize);

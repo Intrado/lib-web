@@ -308,9 +308,9 @@ function listcontacts ($obj,$name) {
 	$calctotal = 0;
 	foreach ($lists as $id) {
 		$list = new PeopleList($id);
-		$renderedlist = new RenderedList($list);
-		$renderedlist->calcStats();
-		$calctotal = $calctotal + $renderedlist->total;
+		$renderedlist = new RenderedList2();
+		$renderedlist->initWithList($list);		
+		$calctotal = $calctotal + $renderedlist->getTotal();
 	}
 	return "<b>" . $calctotal . ($calctotal!=1?"</b>&nbsp;contacts":"</b>&nbsp;contact");
 }
