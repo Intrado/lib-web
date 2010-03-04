@@ -112,26 +112,6 @@ function fmt_checkbox_addrbook($row,$index) {
 	return $result . '</div>';
 }
 
-
-
-function fmt_checkbox($row, $index) {
-	global $renderedlist;
-
-	$personid = $row[1];
-
-	$checked = '';
-	if (in_array($row[0], array(1, 'add', 'rule', 'organization', 'section')) || in_array($personid, $renderedlist->pageaddids))
-		$checked = 'checked';
-	if (in_array($personid, $renderedlist->pageremoveids))
-		$checked = '';
-
-	$onclick = "do_ajax_listbox(this, $personid);";
-	return "<input type=\"checkbox\" onclick=\"$onclick\" $checked />";
-}
-
-
-
-
 function fmt_idmagnify ($row,$index) {
 	// TODO must I load the person in order to get the person->userid ?
 	$person = new Person($row[1]);
@@ -142,23 +122,6 @@ function fmt_idmagnify ($row,$index) {
 	}
 	$result .= "&nbsp;". escapehtml($row[$index]);
 	return $result;
-}
-
-function fmt_persontip ($row, $index) {
-	global $USER;
-
-	$person = new Person($row[1]);
-	if (!$person->id || $person->deleted)
-		return _L('This person cannot be found.');
-
-	$pkey = escapehtml($person->pkey);
-
-	if ($person->userid)
-		return "<a href=\"addressedit.php?id=$person->id&origin=preview\">  <img src=\"img/icons/pencil.png\"></a> $pkey";
-
-	$onmouseover = "";//"make_person_tip('$person->id', '');"; // TODO: Make a better persontip
-	$icon =  "<a href=\"viewcontact.php?id={$person->id}\">" . "<img id=\"persontip_$person->id\" style=\"cursor:pointer\" src=\"img/icons/diagona/16/049.gif\" onmouseover=\"$onmouseover\"/>" . "</a>" . " $pkey ";
-	return $icon;
 }
 
 function fmt_jobs_actions ($obj, $name) {
