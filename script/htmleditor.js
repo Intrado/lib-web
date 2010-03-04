@@ -31,10 +31,23 @@ function registerHtmlEditorKeyListener(listener) {
 		return;
 	}
 	
-	if (currenthtmleditorkeylistener)
+	if (currenthtmleditorkeylistener) {
 		htmleditorobject.instance.removeListener('key', currenthtmleditorkeylistener);
-	if (listener)
+		htmleditorobject.instance.removeListener('blur', currenthtmleditorkeylistener);
+		htmleditorobject.instance.removeListener('saveSnapshot', currenthtmleditorkeylistener);
+		htmleditorobject.instance.removeListener('afterCommandExec', currenthtmleditorkeylistener);
+		htmleditorobject.instance.removeListener('insertHtml', currenthtmleditorkeylistener);
+		htmleditorobject.instance.removeListener('insertElement', currenthtmleditorkeylistener);
+	}
+	
+	if (listener) {
 		htmleditorobject.instance.on('key', listener);
+		htmleditorobject.instance.on('blur', listener);
+		htmleditorobject.instance.on('saveSnapshot', listener);
+		htmleditorobject.instance.on('afterCommandExec', listener);
+		htmleditorobject.instance.on('insertHtml', listener);
+		htmleditorobject.instance.on('insertElement', listener);
+	}
 	
 	currenthtmleditorkeylistener = listener;
 }
@@ -141,7 +154,7 @@ function applyHtmlEditor(textarea) {
 				'removePlugins': 'wsc,scayt,smiley,showblocks,flash,elementspath,save',
 				'toolbar': [
 					['Preview','Print'],
-					['Undo','Redo','-','SelectAll','Cut','Copy','Paste','PasteText','PasteFromWord','Find','Replace'],
+					['Undo','Redo','-','SelectAll','PasteFromWord','Find','Replace'],
 					'/',
 					['Styles','Format'],
 					['NumberedList','BulletedList','JustifyLeft','JustifyCenter','JustifyRight','JustifyBlock','Outdent','Indent'],
