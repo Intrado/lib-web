@@ -157,7 +157,7 @@ var AccordionSection = Class.create({
 		this.titleIcon = new Element('img', {'class':this.widget.classPrefix+'titleicon'});
 		this.titleSpan = new Element('span', {'class':this.widget.classPrefix+'titlespan'});
 		this.titleDiv.insert(
-			new Element('table', {'style':'margin:0;border:0;border-collapse:collapse; width:100%; border-spacing:0'}).insert(
+			new Element('table', {'style':'margin:0;border:0;border-collapse:collapse; border-spacing:0'}).insert(
 				new Element('tbody').insert(
 					new Element('tr').insert(
 						new Element('td', {'class':'left'})

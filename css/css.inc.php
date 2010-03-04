@@ -544,19 +544,15 @@ div.scrollTableContainer {
 	cursor: pointer;
 	color: <?=$primary?>;
 	float: left;
-	width: 20ex;
 	margin:0;
 }
 .horizontaltabstitlediv table {
-	table-layout: fixed;
-	width: 100%;
 }
 .horizontaltabstitlediv td {
 	padding: 0;
 	margin: 0;
 	text-align: left;
 	white-space: nowrap;
-	overflow: hidden;
 	font-size: 90%;
 }
 
