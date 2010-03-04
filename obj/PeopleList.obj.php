@@ -54,21 +54,17 @@ class PeopleList extends DBMappedObject {
 		return $this->sections;
 	}
 	
-	function getListRuleSQL () {
-		//get and compose list rules
-		$listrules = $this->getListRules();
-
-		if (count($listrules) > 0)
-			$listsql = "1" . Rule::makeQuery($listrules, "p");
-		else if (count($this->getOrganizations()) == 0 && count($this->getSections()) == 0)
-			$listsql = "0"; //dont assume anyone is in the list if there are no restrictions on rules, organizations, or sections.
-		else {
-			// TODO: Need to restrict by list's organization and section sql
-			$listsql = "1";
-		}
-		
-		return $listsql;
+	
+	function countRemoved () {
+		$query = "select count(*) from listentry le inner join person p on (p.id = le.personid) where le.type='negate' and le.listid = ?";
+		return QuickQuery($query, false, array($this->id));
 	}
+
+	function countAdded () {
+		$query = "select count(*) from listentry le inner join person p on (p.id = le.personid and not p.deleted) where  le.type='add' and le.listid = ?";
+		return QuickQuery($query, false, array($this->id));
+	}
+	
 }
 
 ?>
