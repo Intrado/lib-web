@@ -137,26 +137,6 @@ class Job extends DBMappedObject {
 		return $newjob;
 	}
 
-	function hasPeople($listid, $thesql) {
-		$hasPeople = false;
-		// find all person ids from list rules
-		$query = "select p.id from person p " .
-			"left join listentry le on (p.id=le.personid and le.listid=".$listid.") " .
-			"where ".$thesql." and not p.deleted and le.type is null and p.userid is null " .
-			"limit 1";
-		$p = QuickQuery($query);
-		if ($p) $hasPeople = true;
-
-		$query = "select p.id " .
-			"from listentry le " .
-			"straight_join person p on (p.id=le.personid and not p.deleted) " .
-			"where le.listid=".$listid." and le.type='add' " .
-			"limit 1";
-		$p = QuickQuery($query);
-		if ($p) $hasPeople = true;
-		return $hasPeople;
-	}
-
 	// assumes this job was already created in the database
 	// returns newjob else returns null
 	function runNow() {
@@ -166,13 +146,17 @@ class Job extends DBMappedObject {
 				// check for empty message
 				if ($this->messagegroupid != null || $this->questionnaireid != null) {
 
-					// check lists for people
+					// check lists for any people
 					$hasPeople = false;
-					$joblists = DBFindMany('JobList', "from joblist where jobid=$this->id");
+					$joblists = DBFindMany('PeopleList', "from list l inner join joblist jl on (jl.listid=l.id) where jl.jobid=$this->id","l");
 					foreach ($joblists as $joblist) {
-						$thesql = $joblist->generateSql($this->userid); // update thesql
-						$p = $this->hasPeople($joblist->listid, $thesql);
-						if ($p) $hasPeople = true;
+						$renderedlist = new RenderedList2();
+						$renderedlist->initWithList($joblist);
+						$renderedlist->pagelimit = 0;
+						if ($renderedlist->getTotal() > 0) {
+							$hasPeople = true;
+							break; //stop checking as soon as any list is not empty
+						}
 					}
 
 					if ($hasPeople == true) {
