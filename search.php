@@ -2,37 +2,40 @@
 ////////////////////////////////////////////////////////////////////////////////
 // Includes
 ////////////////////////////////////////////////////////////////////////////////
-include_once("inc/common.inc.php");
-include_once("inc/form.inc.php");
-include_once("inc/table.inc.php");
-include_once("inc/html.inc.php");
-include_once("inc/formatters.inc.php");
-include_once("inc/date.inc.php");
-include_once("obj/Person.obj.php");
-include_once("obj/PeopleList.obj.php");
-include_once("obj/ListEntry.obj.php");
-include_once("obj/RenderedList.obj.php");
-include_once("obj/Validator.obj.php");
+require_once("inc/common.inc.php");
+require_once("inc/form.inc.php");
+require_once("inc/table.inc.php");
+require_once("inc/html.inc.php");
+require_once("inc/formatters.inc.php");
+require_once("inc/date.inc.php");
+require_once("inc/securityhelper.inc.php");
+require_once("inc/rulesutils.inc.php");
+require_once("obj/Person.obj.php");
+require_once("obj/PeopleList.obj.php");
+require_once("obj/ListEntry.obj.php");
+require_once("obj/RenderedList.obj.php");
+require_once("obj/Validator.obj.php");
 require_once("obj/Form.obj.php");
-include_once("obj/Rule.obj.php");
-include_once("obj/FieldMap.obj.php");
+require_once("obj/Rule.obj.php");
+require_once("obj/FieldMap.obj.php");
 require_once("obj/FormItem.obj.php");
 require_once("obj/Phone.obj.php");
 require_once("obj/Email.obj.php");
 require_once("obj/Sms.obj.php");
-require_once("inc/securityhelper.inc.php");
-include_once("ruleeditform.inc.php");
-require_once("inc/rulesutils.inc.php");
 require_once("obj/FormRuleWidget.fi.php");
 require_once("obj/SectionWidget.fi.php");
 require_once("obj/ValSections.val.php");
 require_once("obj/ValRules.val.php");
-require_once("inc/reportutils.inc.php");
-require_once("list.inc.php");
+require_once("obj/Address.obj.php");
+require_once("obj/Language.obj.php");
+require_once("obj/JobType.obj.php");
+require_once("obj/UserSetting.obj.php");
 
-include_once("obj/Address.obj.php");
-include_once("obj/Language.obj.php");
-include_once("obj/JobType.obj.php");
+
+require_once("inc/reportutils.inc.php"); //used by list.inc.php
+require_once("list.inc.php");
+require_once("ruleeditform.inc.php");
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization
@@ -45,124 +48,141 @@ if (!$USER->authorize('createlist')) {
 // Action/Request Processing
 ////////////////////////////////////////////////////////////////////////////////
 
-if (isset($_SESSION['listsearchpreview']))
-	$containerID = 'listPreviewContainer';
-else
-	$containerID = 'listSearchContainer';
-
-$list = new PeopleList(isset($_SESSION['listid']) ? $_SESSION['listid'] : null);
-if (!userOwns('list', $list->id)) {
-	redirect('lists.php');
-}
-if (!$renderedlist = new RenderedList($list)) {
-	redirect('list.php');
+//get the message to edit from the request params or session
+if (isset($_GET['id'])) {
+	setCurrentList($_GET['id']);
+	unset($_SESSION['listsearch']);
+	$_SESSION['listreferer'] = $_SERVER['HTTP_REFERER'];
+	redirect();
 }
 
-$rulewidgetvaluejson = '';
+if (isset($_GET['showall']))
+	$_SESSION['listsearch'] = array("showall" => true);
 
-if (isset($_GET['showall'])) {
-	list_clear_search_session();
-	$_SESSION['listsearchshowall'] = true;
-} else {
-	// NOTE: $_SESSION['listsearchrules'] may also contain array("fieldnum" => "organization", "val" =>  $organizationids)
-	$rulewidgetdata = array();
-	
-	if (isset($_SESSION['listsearchrules']) && count($_SESSION['listsearchrules']) > 0) {
-		$rules = $_SESSION['listsearchrules'];
-		$rulewidgetdata = cleanObjects(array_values($rules));
+handle_list_checkbox_ajax(); //for handling check/uncheck from the list
+
+
+$list = new PeopleList($_SESSION['listid']);
+$renderedlist = new RenderedList2();
+$renderedlist->pagelimit = 100;
+
+$hassomesearchcriteria = true;
+if (isset($_SESSION['listsearch']['rules'])) {
+	$rules = $_SESSION['listsearch']['rules'];
+	//take out any orgids
+	$orgids = array();
+	if (isset($rules['organization'])) {
+		$orgids = array_keys($rules['organization']['val']);
+		unset($rules['organization']);
 	}
 	
-	if (count($rulewidgetdata) > 0)
-		$rulewidgetvaluejson = json_encode($rulewidgetdata);
+	$renderedlist->initWithSearchCriteria($rules, $orgids,array());
+} else if (isset($_SESSION['listsearch']['sectionids'])) {
+	$renderedlist->initWithSearchCriteria(array(), array(), $_SESSION['listsearch']['sectionids']);
+} else if (isset($_SESSION['listsearch']['individual'])) {
+	$pkey = $_SESSION['listsearch']['individual']['pkey'];
+	$phone = $_SESSION['listsearch']['individual']['phone'];
+	$email = $_SESSION['listsearch']['individual']['email'];
+	
+	var_dump( $_SESSION['listsearch']['individual']);
+	
+	$renderedlist->initWithIndividualCriteria($pkey == "" ? false : $pkey,$phone == "" ? false : $phone,$email == "" ? false : $email);
+} else if (isset($_SESSION['listsearch']['showall'])) {
+	$renderedlist->initWithSearchCriteria(array(), array(), array());
+} else {
+	$hassomesearchcriteria = false;
 }
-
-list_handle_ajax_table($renderedlist, array($containerID));
 
 ////////////////////////////////////////////////////////////////////////////////
 // Form Data
 ////////////////////////////////////////////////////////////////////////////////
 
+// NOTE: $_SESSION['listsearchrules'] may also contain array("fieldnum" => "organization", "val" =>  $organizationids)
+$rulewidgetvaluejson = '';
+$rulewidgetdata = array();
+if (isset($_SESSION['listsearch']['rules']) && count($_SESSION['listsearch']['rules']) > 0) {
+	$rules = $_SESSION['listsearch']['rules'];
+	$rulewidgetdata = cleanObjects(array_values($rules));
+	$rulewidgetvaluejson = json_encode($rulewidgetdata);
+}
+
+
 $formdata = array();
 
-if (!isset($_SESSION['listsearchpreview'])) {
-	$formdata["toggles"] = array(
-		"label" => _L('Search Options'),
-		"control" => array("FormHtml", 'html' => "
-			<input id='searchByRules' type='radio' onclick=\"choose_search_by_rules();\"><label for='searchByRules'> Search by Rules </label>" .
-			(getSystemSetting('_hasenrollment') ?
-				"<input id='searchBySections' type='radio' onclick=\"choose_search_by_sections();\"><label for='searchBySections'> Search by Sections </label>" :
-				""
-			) .
-			"<input id='searchByPerson' type='radio' onclick=\"choose_search_by_person();\"><label for='searchByPerson'> Search for Person </label>
-		"),
-		"helpstep" => 2
-	);
-	
-	$formdata["ruledata"] = array(
-		"label" => _L('Rules'),
-		"value" => $rulewidgetvaluejson,
-		"control" => array("FormRuleWidget"),
-		"validators" => array(array('ValRules')),
-		"helpstep" => 2
-	);
-	
+$formdata["toggles"] = array(
+	"label" => _L('Search Options'),
+	"control" => array("FormHtml", 'html' => "
+		<input id='searchByRules' type='radio' onclick=\"choose_search_by_rules();\"><label for='searchByRules'> Search by Rules </label>" .
+		(getSystemSetting('_hasenrollment') ?
+			"<input id='searchBySections' type='radio' onclick=\"choose_search_by_sections();\"><label for='searchBySections'> Search by Sections </label>" :
+			""
+		) .
+		"<input id='searchByPerson' type='radio' onclick=\"choose_search_by_person();\"><label for='searchByPerson'> Search for Person </label>
+	"),
+	"helpstep" => 2
+);
+
+$formdata["ruledata"] = array(
+	"label" => _L('Rules'),
+	"value" => $rulewidgetvaluejson,
+	"control" => array("FormRuleWidget"),
+	"validators" => array(array('ValRules')),
+	"helpstep" => 2
+);
+
 	if (getSystemSetting('_hasenrollment')) {
-		$formdata["sectionids"] = array(
-			"label" => _L('Sections'),
-			"fieldhelp" => _L('Select sections from an organization.'),
-			"value" => isset($_SESSION['listsearchsectionids']) && count($_SESSION['listsearchsectionids']) > 0 ?
-				QuickQueryList("select id, skey from section where id in (" .implode(",", $_SESSION['listsearchsectionids']) . ")", true, false) :
-				array(),
-			"validators" => array(
-				array("ValSections")
-			),
-			"control" => array("SectionWidget"),
-			"helpstep" => 2
-		);
-	
-		$formdata["sectionsearchbutton"] = array(
-			"label" => _L(''),
-			"control" => array("FormHtml", "html" => "<div id='sectionsearchButtonContainer'>" . submit_button(_L('Search'),'sectionsearch',"magnifier") . "</div>"),
-			"helpstep" => 2
-		);
-	}
-
-	$formdata["pkey"] = array(
-		"label" => _L('Person ID'),
-		"value" => !empty($_SESSION['listsearchpkey']) ? $_SESSION['listsearchpkey'] : '',
+	$formdata["sectionids"] = array(
+		"label" => _L('Sections'),
+		"fieldhelp" => _L('Select sections from an organization.'),
+		"value" => "",
 		"validators" => array(
+			array("ValSections")
 		),
-		"control" => array("TextField"),
-		"helpstep" => 2
-	);
-	$formdata["phone"] = array(
-		"label" => _L('Phone or SMS Number'),
-		"value" => !empty($_SESSION['listsearchphone']) ? $_SESSION['listsearchphone'] : '',
-		"validators" => array(array("ValPhone")),
-		"control" => array("TextField"),
-		"helpstep" => 2
-	);
-	$formdata["email"] = array(
-		"label" => _L('Email Address'),
-		"value" => !empty($_SESSION['listsearchemail']) ? $_SESSION['listsearchemail'] : '',
-		"validators" => array(array("ValEmail")),
-		"control" => array("TextField"),
+		"control" => array("SectionWidget", "sectionids" => isset($_SESSION['listsearch']['sectionids']) ? $_SESSION['listsearch']['sectionids'] : array()),
 		"helpstep" => 2
 	);
 
-	$formdata["personsearchbutton"] = array(
+	$formdata["sectionsearchbutton"] = array(
 		"label" => _L(''),
-		"control" => array("FormHtml", "html" => "<div id='personsearchButtonContainer'>" . submit_button(_L('Search'),'personsearch',"magnifier") . "</div>"),
+		"control" => array("FormHtml", "html" => "<div id='sectionsearchButtonContainer'>" . submit_button(_L('Search'),'sectionsearch',"magnifier") . "</div>"),
 		"helpstep" => 2
 	);
 }
 
+$formdata["pkey"] = array(
+	"label" => _L('Person ID'),
+	"value" => isset($_SESSION['listsearch']['individual']['pkey']) ? $_SESSION['listsearch']['individual']['pkey'] : '',
+	"validators" => array(
+	),
+	"control" => array("TextField"),
+	"helpstep" => 2
+);
+$formdata["phone"] = array(
+	"label" => _L('Phone or SMS Number'),
+	"value" => isset($_SESSION['listsearch']['individual']['phone']) ? $_SESSION['listsearch']['individual']['phone'] : '',
+	"validators" => array(array("ValPhone")),
+	"control" => array("TextField"),
+	"helpstep" => 2
+);
+$formdata["email"] = array(
+	"label" => _L('Email Address'),
+	"value" => isset($_SESSION['listsearch']['individual']['email']) ? $_SESSION['listsearch']['individual']['email'] : '',
+	"validators" => array(array("ValEmail")),
+	"control" => array("TextField"),
+	"helpstep" => 2
+);
+
+$formdata["personsearchbutton"] = array(
+	"label" => _L(''),
+	"control" => array("FormHtml", "html" => "<div id='personsearchButtonContainer'>" . submit_button(_L('Search'),'personsearch',"magnifier") . "</div>"),
+	"helpstep" => 2
+);
+
 $buttons = array(
 	submit_button(_L('Refresh'),"refresh","arrow_refresh"),
 );
-if (!isset($_SESSION['listsearchpreview']))
-	$buttons[] = icon_button(_L('Show All Contacts'),"tick",null,"search.php?showall");
-$buttons[] = icon_button(_L('Done'),"tick",null, isset($_SESSION['previewfrom']) ? $_SESSION['previewfrom'] : "list.php");
+$buttons[] = icon_button(_L('Show All Contacts'),"tick",null,"search.php?showall");
+$buttons[] = icon_button(_L('Done'),"tick",null, isset($_SESSION['listreferer']) ? $_SESSION['listreferer'] : "list.php");
 
 $form = new Form('listsearch',$formdata,array(),$buttons);
 $form->ajaxsubmit = true;
@@ -184,70 +204,69 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		if ($ajax) {
 			switch ($button) {
 				case 'addrule':
-					list_clear_search_session('listsearchrules');
+					
+					if (!isset($_SESSION['listsearch']['rules']))
+						$_SESSION['listsearch'] = array ('rules' => array());
+					
 					$data = json_decode($postdata['ruledata']);
 					if (isset($data->fieldnum, $data->logical, $data->op, $data->val)) {
 						if ($data->fieldnum == 'organization') {
-							$orgkeys = array();
+							$orgmap = array();
 							
 							$organizations = Organization::getAuthorizedOrgKeys();
 							foreach ($data->val as $id) {
 								$id = $id + 0;
-								$orgkeys[$id] = $organizations[$id];
+								$orgmap[$id] = $organizations[$id]->orgkey;
 							}
 							
-							if (!isset($_SESSION['listsearchrules']))
-								$_SESSION['listsearchrules'] = array();
-							
-							$_SESSION['listsearchrules']['organization'] = array(
+							$_SESSION['listsearch']['rules']['organization'] = array(
 								"fieldnum" => "organization",
-								"val" => $orgkeys
+								"val" => $orgmap
 							);
 						} else if ($type = Rule::getType($data->fieldnum)) {
 							$data->val = prepareRuleVal($type, $data->op, $data->val);
 							
 							if ($rule = Rule::initFrom($data->fieldnum, $data->logical, $data->op, $data->val)) {
-								if (!isset($_SESSION['listsearchrules']))
-									$_SESSION['listsearchrules'] = array();
-								$_SESSION['listsearchrules'][$data->fieldnum] = $rule;
+								$_SESSION['listsearch']['rules'][$data->fieldnum] = $rule;
 							}
 						}
 					}
-					$form->sendTo("search.php");
+					
 					break;
 					
 				case 'deleterule':
-					list_clear_search_session('listsearchrules');
-					if (!empty($_SESSION['listsearchrules'])) {
-						$fieldnum = $postdata['ruledata'];
-						unset($_SESSION['listsearchrules'][$fieldnum]);
-					}
-					$form->sendTo("search.php");
+					$fieldnum = $postdata['ruledata'];
+					unset($_SESSION['listsearch']['rules'][$fieldnum]);
+					//if user removes last rule, default back to no search mode (instead of showing all)
+					if (count($_SESSION['listsearch']['rules']) == 0)
+						unset($_SESSION['listsearch']);
 					break;
 					
 				case 'sectionsearch':
 					if (getSystemSetting('_hasenrollment')) {
-						list_clear_search_session('listsearchsectionids');
-						$_SESSION['listsearchsectionids'] = explode(",", $postdata['sectionids']);
+						$_SESSION['listsearch'] = array (
+							'sectionids' => $postdata['sectionids']
+						);
 					}
-					$form->sendTo("search.php");
 					break;
 					
 				case 'personsearch':
-					list_clear_search_session();
-					$_SESSION['listsearchperson'] = true;
-					$_SESSION['listsearchpkey'] = isset($postdata['pkey']) ? $postdata['pkey'] : false;
-					$_SESSION['listsearchphone'] = isset($postdata['phone']) ? Phone::parse($postdata['phone']) : false;
-					$_SESSION['listsearchemail'] = isset($postdata['email']) ? $postdata['email'] : false;	
-					$form->sendTo("search.php");
+					$_SESSION['listsearch'] = array (
+						"individual" => array (
+							"pkey" => isset($postdata['pkey']) ? $postdata['pkey'] : false,
+							"phone" => isset($postdata['phone']) ? $postdata['phone'] : false,
+							"email" => isset($postdata['email']) ? $postdata['email'] : false,	
+						)					
+					);
+
 					break;
 					
 				case 'refresh':
-					$form->sendTo("search.php");
 					break;
 			}
+			$form->sendTo("search.php");
 		} else {
-			redirect("list.php");
+			redirect("search.php");
 		}
 	}
 }
@@ -257,16 +276,13 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 ////////////////////////////////////////////////////////////////////////////////
 
 $PAGE = "notifications:lists";
-$TITLE = ($containerID == 'listSearchContainer' ? "List Search" : "List Preview" ) . ": " . escapehtml($list->name);
-include_once("nav.inc.php");
+$TITLE = "List Search: " . escapehtml($list->name);
+require_once("nav.inc.php");
 ?>
 
 <script type="text/javascript">
-	var notpreview = <?= !isset($_SESSION['listsearchpreview']) ? "true;" : "false;" ?>
 
-	<? if (!isset($_SESSION['listsearchpreview'])) {
-		Validator::load_validators(array("ValSections", "ValRules"));
-	} ?>
+	<? Validator::load_validators(array("ValSections", "ValRules")); ?>
 
 	function choose_search_by_rules() {
 		$('searchByRules').checked = true;
@@ -314,60 +330,54 @@ include_once("nav.inc.php");
 	}
 
 	function list_clear_person() {
-		if (notpreview) {
-			$('listsearch_pkey').value = '';
-			$('listsearch_phone').value = '';
-			$('listsearch_email').value = '';
-		}
+		$('listsearch_pkey').value = '';
+		$('listsearch_phone').value = '';
+		$('listsearch_email').value = '';
 	}
 	
 	function rulewidget_add_rule(event) {
-		if (notpreview) {
-			$('listsearch_ruledata').value = event.memo.ruledata.toJSON();
-			list_clear_person();
-			form_submit(event, 'addrule');
-		}
+		$('listsearch_ruledata').value = event.memo.ruledata.toJSON();
+		list_clear_person();
+		form_submit(event, 'addrule');
 	}
 
 	function rulewidget_delete_rule(event) {
-		if (notpreview) {
-			$('listsearch_ruledata').value = event.memo.fieldnum;
-			list_clear_person();
-			form_submit(event, 'deleterule');
-		}
+		$('listsearch_ruledata').value = event.memo.fieldnum;
+		list_clear_person();
+		form_submit(event, 'deleterule');
 	}
 	
 	document.observe('dom:loaded', function() {
-		if (notpreview) {
-			ruleWidget.delayActions = true;
-			ruleWidget.container.observe('RuleWidget:AddRule', rulewidget_add_rule);
-			ruleWidget.container.observe('RuleWidget:DeleteRule', rulewidget_delete_rule);
-			
-			<?
-				if (!empty($_SESSION['listsearchrules']) || (empty($_SESSION['listsearchperson']) && empty($_SESSION['listsearchsectionids'])))
-					echo 'choose_search_by_rules();';
-				else if (!empty($_SESSION['listsearchsectionids']))
-					echo 'choose_search_by_sections();';
-				else
-					echo 'choose_search_by_person();';
-			?>
-		}
+		ruleWidget.delayActions = true;
+		ruleWidget.container.observe('RuleWidget:AddRule', rulewidget_add_rule);
+		ruleWidget.container.observe('RuleWidget:DeleteRule', rulewidget_delete_rule);
 		
-		$('<?=$containerID?>').update('<?=addslashes(list_get_results_html($containerID, $renderedlist))?>');
+<?
+		if (isset($_SESSION['listsearch']['individual']))
+			echo 'choose_search_by_person();';
+		else if (isset($_SESSION['listsearch']['sectionids']))
+			echo 'choose_search_by_sections();';
+		else 
+			echo 'choose_search_by_rules();';
+?>
 	});
 </script>
 <?
-if (!isset($_SESSION['listsearchpreview']))
-	startWindow("Search Options");
-	
+
+startWindow("Search Options");
+
 echo $form->render();
 
-if (!isset($_SESSION['listsearchpreview']))
-	endWindow();
-
-startWindow("Search Results");
-	echo "<div id='$containerID'></div>";
 endWindow();
 
-include_once("navbottom.inc.php");
+startWindow("Search Results");
+
+if ($hassomesearchcriteria)
+	showRenderedListTable($renderedlist, $list);
+else
+	echo "<h2>Select some search options to begin.</h2>";
+
+endWindow();
+
+require_once("navbottom.inc.php");
 ?>
