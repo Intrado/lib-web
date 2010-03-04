@@ -315,20 +315,14 @@ function fmt_jobs_actions_customer($row, $index) {
 		$jobowner = new User($row->userid);
 		$jobownerlogin = $jobowner->login;
 		$jobownerid = $jobowner->id;
-		$type = "job";
-		if ($row->questionnaireid != null) {
-			$type = "survey";
-		}
+		$type = $row->type;
 	} else {
 		$id = $row[$index];
 		$status = $row[$index + 1];
 		$deleted = $row[$index + 2];
 		$jobownerlogin = $row[$index + 3];
 		$jobownerid = $row[$index + 4];//change to id
-		$type = "job";
-		if (isset($row[21]) && $row[21] == "survey") {
-			$type = "survey";
-		}
+		$type = $row[$index+6];
 	}
 
 	if ($USER->id == $jobownerid) {
@@ -386,7 +380,10 @@ function fmt_jobs_actions_customer($row, $index) {
 				$editLink = action_link(_L("Edit"),"pencil","jobrepeating.php?id=$id");
 				$copyLink = action_link(_L("Copy"),"page_copy","jobs.php?copy=$id");
 			}
-			return action_links($editLink,$copyLink,$runrepeatLink,$deleteLink);
+			if ($type == "notification")
+				return action_links($editLink,$copyLink,$runrepeatLink,$deleteLink);
+			else
+				return action_links($runrepeatLink);
 		default:
 			return action_links($editLink,$copyLink,$reportLink);
 	}
