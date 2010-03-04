@@ -1027,9 +1027,6 @@ CREATE TABLE `setting` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 
 $$$
 
--- TODO must update for every release
-INSERT INTO `setting` (`name`, `value`) values ('_dbversion', '7.5/8')
-$$$
 
 --
 -- Table structure for table `sms`
@@ -1366,8 +1363,36 @@ CREATE TABLE `voicereply` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 
 $$$
 
--- ASP_7-5 rev8 ends here!!!
+INSERT INTO `setting` (`name`, `value`) values ('_dbversion', '7.5/8')
+$$$
+-- END REV 7.5/8
 
 
+-- START REV 7.5/9
 
+ALTER TABLE `section` DROP INDEX `skey` ,
+ADD UNIQUE `skey` ( `organizationid` , `skey` )
+$$$
+
+ALTER TABLE `publish` ADD INDEX ( `action` , `userid` )
+$$$
+
+drop table joblanguage
+$$$
+
+drop table jobstats
+$$$
+
+ALTER TABLE `personassociation` ADD INDEX ( `sectionid` )
+$$$
+
+ALTER TABLE `personassociation` ADD INDEX ( `organizationid` )
+$$$
+
+ALTER TABLE `personassociation` ADD INDEX ( `eventid` )
+$$$
+
+update setting set value='7.5/9' where name='_dbversion';
+$$$
+-- END REV 7.5/9
 

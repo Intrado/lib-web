@@ -516,9 +516,6 @@ $$$
 ALTER TABLE `section` DROP INDEX organizationid
 $$$
 
-ALTER TABLE `section` DROP INDEX `skey` ,
-ADD UNIQUE `skey` ( `organizationid` , `skey` ( 10 ) )
-$$$
 
 delete from persondatavalues where fieldnum like 'c%'
 $$$
@@ -533,5 +530,31 @@ CREATE TABLE publish (
   KEY userid (userid),
   KEY messagegroupid (messagegroupid)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
+
+
+-- $rev 9
+
+ALTER TABLE `section` DROP INDEX `skey` ,
+ADD UNIQUE `skey` ( `organizationid` , `skey` )
+$$$
+
+ALTER TABLE `publish` ADD INDEX ( `action` , `userid` )
+$$$
+
+drop table joblanguage
+$$$
+
+drop table jobstats
+$$$
+
+ALTER TABLE `personassociation` ADD INDEX ( `sectionid` )
+$$$
+
+ALTER TABLE `personassociation` ADD INDEX ( `organizationid` )
+$$$
+
+ALTER TABLE `personassociation` ADD INDEX ( `eventid` )
+$$$
+
 
 
