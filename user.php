@@ -87,6 +87,106 @@ class InpageSubmitButton extends FormItem {
 	}
 }
 
+// requires org to section map as an argument
+class UserSectionFormItem extends FormItem {
+	function render ($value) {
+		$n = $this->form->name."_".$this->name;
+		
+		$orgs = ($this->args['organizations']?$this->args['organizations']:array());
+		
+		$str = '<div id="'. $n .'-sectionsdiv" style="padding: 4px; border: 1px solid gray; max-height: 150px; overflow: auto; display: '. ($value?'block':'none') .'">';
+		if ($value) {
+			foreach ($value as $sectionid => $skey) {
+				$id = $n . $sectionid;
+				$str .= '<input  id="'.$id.'" name="'.$n.'[]" type="checkbox" value="'.$sectionid.'" checked /><label id="'.$id.'-label" for="'.$id.'">'.escapehtml($skey).'</label><br />';
+			}
+		}
+		$str .= '</div>';
+		if ($orgs) {
+			$str .= '<select id="'. $n .'-select" style="float: left" onchange="getSections(this, \''. $n .'-sectionchoosediv\', \''. $n .'\', \''. $n .'-addbutton\')">
+				<option value="0" >--- '.escapehtml(_L("Select an Organization")).' ---</option>';
+			foreach ($orgs as $orgid => $okey) {
+				$str .= '<option value="'. $orgid .'" >'.escapehtml($okey).'</option>';
+			}
+			$str .= '</select>
+				<div id="'. $n .'-sectionchoosediv" style="margin-left: 6px; border: 1px solid gray; padding: 4px; overflow: auto; max-height: 150px; width: 150px; float: left; display: none;"></div>';
+		}
+		//$name,$icon,$onclick = NULL, $href = NULL, $extrahtml = NULL
+		$str .= icon_button("Add", "add", "moveSections(this, '$n-sectionchoosediv', '$n-sectionsdiv', '$n-select')", null, "id=\"$n-addbutton\" style=\"display: none;\"");
+		
+		// javascript to populate the sections and move the checkbox up into selected sections
+		$str .= '<script type="text/javascript">
+			// get sections from an ajax call and populate a div with checkboxes for each section key
+			function getSections(selectelement, targetelement, formitemid, addbutton) {
+				selectelement = $(selectelement);
+				targetelement = $(targetelement);
+				addbutton = $(addbutton);
+				
+				// empty out the choose div and put a loading gif in there
+				targetelement.show();
+				targetelement.update("<img src=\"img/ajax-loader.gif\" /><br>Please wait.<br>Loading content...");
+				
+				// populate the choose div with data from an ajax call
+				cachedAjaxGet("ajax.php?type=getsections&organizationid=" + selectelement.value, function(result, itemid) {
+					var sections = result.responseJSON;
+					targetelement.update();
+					for (id in sections) {
+						chkid = itemid + id.toString();
+						chkname = itemid + "[]";
+						lblid = chkid + "-label";
+						targetelement.insert(
+							new Element("input", {"id": chkid, "name": chkname, "type": "checkbox", "value": id})
+						).insert(
+							new Element("label", {"id": lblid, "for": chkid}).update(sections[id])
+						).insert(
+							new Element("br")
+						);
+					}
+				}, formitemid, true);
+				
+				// make the add button visible
+				addbutton.show()
+
+			}
+			
+			// move checked section key checkbox elements from the source div into the target div
+			function moveSections(buttonelement, sourceelement, targetelement, menuelement) {
+				
+				sourceelement = $(sourceelement);
+				targetelement = $(targetelement);
+				menuelement = $(menuelement);
+				
+				// show the targetelement
+				targetelement.show();
+				
+				// hide the add button
+				$(buttonelement).hide();
+				
+				// move all checked items into the targetelement
+				sourceelement.descendants().each(function(e) {
+					if (e.checked) {
+						targetelement.insert(
+							e.remove()
+						).insert(
+							$(e.id + "-label").remove()
+						).insert(
+							new Element("br")
+						);
+					}
+				});
+				// empty and hide the sourceelement
+				sourceelement.update();
+				sourceelement.hide();
+				
+				// reset the select menu to default
+				menuelement.value = 0;
+			}
+			</script>';
+		
+		return $str;
+	}
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 // Form Data
 ////////////////////////////////////////////////////////////////////////////////
@@ -325,24 +425,24 @@ if ($hasenrollment) {
 	);
 }
 
-/*
-// TODO: $hasenrollment means the same as getSystemSetting('_hasenrollment')?
+// get all orgid to orgkey values
+$orgs = QuickQueryList("select id, orgkey from organization where not deleted", true);
+// get user's section id and sectionkey restrictions
+$usersections = QuickQueryList("select ua.sectionid, s.skey from userassociation ua inner join section s on (ua.sectionid = s.id) where ua.userid = ?", true, false, array($edituser->id));
+
 if (getSystemSetting('_hasenrollment')) {
 	$formdata["sectionids"] = array(
 		"label" => _L('Sections'),
-		"fieldhelp" => _L('Select sections from an organization.'),
-		"value" => "",
+		"fieldhelp" => _L('Add or remove user section associations'),
+		"value" => $usersections,
 		"validators" => array(
 			array("ValRequired"),
-			array("ValSections")
+			array("ValUserSection")
 		),
-		"control" => array("SectionWidget",
-			"sectionids" => QuickQueryList("select sectionid from listentry where listid=? and type='section'", false, false, array($list->id))
-		),
+		"control" => array("UserSectionFormItem", "organizations" => $orgs),
 		"helpstep" => 2
 	);
 }
-*/
 
 $rules = cleanObjects($edituser->getRules());
 $fields = QuickQueryMultiRow("select fieldnum from fieldmap where options not like '%multisearch%'");
