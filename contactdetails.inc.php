@@ -1,4 +1,24 @@
 <?
+
+////////////////////////////////////////////////////////////////////////////////
+// Includes
+////////////////////////////////////////////////////////////////////////////////
+include_once("inc/common.inc.php");
+include_once("inc/utils.inc.php");
+include_once("inc/securityhelper.inc.php");
+include_once("inc/form.inc.php");
+include_once("inc/html.inc.php");
+include_once("inc/table.inc.php");
+include_once("obj/FieldMap.obj.php");
+include_once("obj/Person.obj.php");
+include_once("obj/Address.obj.php");
+include_once("obj/Phone.obj.php");
+include_once("obj/Email.obj.php");
+include_once("obj/Language.obj.php");
+include_once("obj/JobType.obj.php");
+include_once("obj/Sms.obj.php");
+
+
 $FORMDISABLE = " DISABLED ";
 if(isset($method)){
 	if($method == "edit"){
@@ -16,14 +36,7 @@ if (isset($_GET['id'])) {
 	}
 
 	// validate user has rights to view this contact
-	$usersql = $USER->userSQL("p");
-	$query = "
-		select p.id
-		from 		person p
-		where p.id='$personid' $usersql
-	";
-
-	if (!($personid = QuickQuery($query))) {
+	if (!$USER->canSeePerson($personid)) {
 		// bad
 		redirect('unauthorized.php');
 	}
