@@ -12,11 +12,14 @@ require_once("../obj/User.obj.php");
 require_once("../obj/Access.obj.php");
 require_once("../obj/Permission.obj.php");
 require_once("../obj/Job.obj.php");
-require_once("../obj/JobList.obj.php");
 require_once("../obj/JobType.obj.php");
 require_once("../obj/Rule.obj.php");
 require_once("../obj/FieldMap.obj.php");
 require_once("../obj/SurveyQuestionnaire.obj.php");
+require_once("../obj/Organization.obj.php");
+require_once("../obj/Section.obj.php");
+require_once("../obj/PeopleList.obj.php");
+require_once("../obj/RenderedList.obj.php");
 
 
 $custid = $argv[1] +0;
@@ -63,9 +66,15 @@ $thesql = array(); // key=listid, value=thesql
 
 // generate thesql for every list in this job
 $job = new Job($jobid);
-$joblists = DBFindMany('JobList', "from joblist where jobid=$jobid");
+
+$USER = new User($job->userid);
+
+$joblists = DBFindMany('PeopleList', "from list l inner join joblist jl on (jl.listid=l.id) where jl.jobid=$jobid","l");
 foreach ($joblists as $joblist) {
-	$thesql[$joblist->listid] = $joblist->generateSql($job->userid);
+	$renderedlist = new RenderedList2();
+	$renderedlist->initWithList($joblist);
+	$sql = $renderedlist->getPersonSql(false,false);
+	$thesql[$joblist->id] = $sql;
 }
 
 if (count($thesql) == 0) {
