@@ -94,7 +94,24 @@ class UserSectionFormItem extends FormItem {
 		
 		$orgs = ($this->args['organizations']?$this->args['organizations']:array());
 		
-		$str = '<div id="'. $n .'-sectionsdiv" style="padding: 4px; border: 1px solid gray; max-height: 150px; overflow: auto; display: '. ($value?'block':'none') .'">';
+		$str = '<style type="text/css">
+		.usersection {
+			padding: 4px;
+			border: 1px solid gray;
+			max-height: 150px;
+			overflow: auto;
+		}
+		.usersectionchoose {
+			margin-left: 6px;
+			border: 1px solid gray;
+			padding: 4px;
+			overflow: auto;
+			max-height: 150px;
+			width: 150px;
+			float: left;
+		}
+		</style>
+		<div id="'. $n .'-sectionsdiv" class="usersection" style="display: '. ($value?'block':'none') .'">';
 		if ($value) {
 			foreach ($value as $sectionid => $skey) {
 				$id = $n . $sectionid;
@@ -109,7 +126,7 @@ class UserSectionFormItem extends FormItem {
 				$str .= '<option value="'. $orgid .'" >'.escapehtml($okey).'</option>';
 			}
 			$str .= '</select>
-				<div id="'. $n .'-sectionchoosediv" style="margin-left: 6px; border: 1px solid gray; padding: 4px; overflow: auto; max-height: 150px; width: 150px; float: left; display: none;"></div>';
+				<div id="'. $n .'-sectionchoosediv" class="usersectionchoose" style="display: none"></div>';
 		}
 		//$name,$icon,$onclick = NULL, $href = NULL, $extrahtml = NULL
 		$str .= icon_button("Add", "add", "moveSections(this, '$n-sectionchoosediv', '$n-sectionsdiv', '$n-select')", null, "id=\"$n-addbutton\" style=\"display: none;\"");
@@ -121,6 +138,13 @@ class UserSectionFormItem extends FormItem {
 				selectelement = $(selectelement);
 				targetelement = $(targetelement);
 				addbutton = $(addbutton);
+				
+				// if they selected the first element then hide the sections and add button
+				if (selectelement.value == 0) {
+					addbutton.hide();
+					targetelement.hide();
+					return;
+				}
 				
 				// empty out the choose div and put a loading gif in there
 				targetelement.show();
@@ -134,13 +158,17 @@ class UserSectionFormItem extends FormItem {
 						chkid = itemid + id.toString();
 						chkname = itemid + "[]";
 						lblid = chkid + "-label";
-						targetelement.insert(
-							new Element("input", {"id": chkid, "name": chkname, "type": "checkbox", "value": id})
-						).insert(
-							new Element("label", {"id": lblid, "for": chkid}).update(sections[id])
-						).insert(
-							new Element("br")
-						);
+						
+						// if this checkbox already exists it is in user sections
+						if ($(chkid) == null) {
+							targetelement.insert(
+								new Element("input", {"id": chkid, "name": chkname, "type": "checkbox", "value": id})
+							).insert(
+								new Element("label", {"id": lblid, "for": chkid}).update(sections[id])
+							).insert(
+								new Element("br")
+							);
+						}
 					}
 				}, formitemid, true);
 				
@@ -184,6 +212,19 @@ class UserSectionFormItem extends FormItem {
 			</script>';
 		
 		return $str;
+	}
+}
+
+class ValUserSection extends Validator {
+	var $onlyserverside = true;
+
+	function validate ($value, $args) {
+		global $USER;
+		
+		$count = QuickQuery("select count(id) from section where id in (". DBParamListString(array_keys($value)) .")", false, array(array_keys($value)));
+		if ($count !== count($value))
+			return "$this->label: ". _L('Selected sections do not appear valid.');
+		return true;
 	}
 }
 
@@ -425,18 +466,17 @@ if ($hasenrollment) {
 	);
 }
 
-// get all orgid to orgkey values
-$orgs = QuickQueryList("select id, orgkey from organization where not deleted", true);
-// get user's section id and sectionkey restrictions
-$usersections = QuickQueryList("select ua.sectionid, s.skey from userassociation ua inner join section s on (ua.sectionid = s.id) where ua.userid = ?", true, false, array($edituser->id));
-
 if (getSystemSetting('_hasenrollment')) {
+	// get all orgid to orgkey values
+	$orgs = QuickQueryList("select id, orgkey from organization where not deleted", true);
+	// get user's section id and sectionkey restrictions
+	$usersections = QuickQueryList("select ua.sectionid, s.skey from userassociation ua inner join section s on (ua.sectionid = s.id) where ua.userid = ?", true, false, array($edituser->id));
+
 	$formdata["sectionids"] = array(
 		"label" => _L('Sections'),
 		"fieldhelp" => _L('Add or remove user section associations'),
 		"value" => $usersections,
 		"validators" => array(
-			array("ValRequired"),
 			array("ValUserSection")
 		),
 		"control" => array("UserSectionFormItem", "organizations" => $orgs),
@@ -715,7 +755,7 @@ include_once("nav.inc.php");
 
 ?>
 <script type="text/javascript">
-<? Validator::load_validators(array("ValLogin", "ValPassword", "ValAccesscode", "ValPin", "ValRules", "ValSections")); ?>
+<? Validator::load_validators(array("ValLogin", "ValPassword", "ValAccesscode", "ValPin", "ValRules", "ValUserSection")); ?>
 </script>
 <?
 
