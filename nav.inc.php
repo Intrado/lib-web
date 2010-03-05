@@ -64,7 +64,7 @@ $SHORTCUTS['Help'] = "javascript: popup('help/index.php',750,500);";
 
 $NAVTREE = array (
 	array("Start","start.php",NULL,$MAINTAB=="start",array()),
-	array("Notifications",NULL,array("createlist","sendphone","sendprint","sendemail", "sendsms"),$MAINTAB=="notifications",array(
+	array("Notifications",NULL,array("createlist","sendphone","sendprint","sendemail", "sendsms",getSystemSetting("_hastargetedmessage", false) ? "targetedmessage" : "dummy"),$MAINTAB=="notifications",array(
 		array("Lists","lists.php","createlist",$SUBTAB=="lists"),
 		array("Messages","messages.php",array('sendmessage', 'sendemail', 'sendphone', "sendsms"),$SUBTAB=="messages"),
 		array("Jobs","jobs.php",array('sendmessage', 'sendemail', 'sendphone', "sendsms"),$SUBTAB=="jobs"),
