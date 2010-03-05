@@ -42,7 +42,7 @@ startWindow("Options", 'padding: 3px;');
 <?
 			}
 			// features - if contact manager, or self-signup, or smartcall appliance, or classroom
-			if ((getSystemSetting('_hasportal', false) && $USER->authorize('portalaccess')) ||
+			if ((getSystemSetting('_hasportal', false) && $USER->authorize('portalaccess') && $USER->authorize('managesystem')) ||
 				(getSystemSetting('_hasselfsignup', false) && ($USER->authorize('metadata') || $USER->authorize('managesystem'))) ||
 				($USER->authorize('managesystem') && getSystemSetting('_dmmethod', "")!='asp') ||
 				($USER->authorize('manageclassroommessaging') && getSystemSetting('_hastargetedmessage'))) {
@@ -108,7 +108,7 @@ startWindow("Options", 'padding: 3px;');
 <?
 		}
 		// features - if contact manager, or self-signup, or smartcall appliance, or Classroom
-		if ((getSystemSetting('_hasportal', false) && $USER->authorize('portalaccess')) ||
+		if ((getSystemSetting('_hasportal', false) && $USER->authorize('portalaccess') && $USER->authorize('managesystem')) ||
 			(getSystemSetting('_hasselfsignup', false) && ($USER->authorize('metadata') || $USER->authorize('managesystem'))) ||
 			($USER->authorize('managesystem') && getSystemSetting('_dmmethod', "")!='asp') ||
 			($USER->authorize('manageclassroommessaging') && getSystemSetting('_hastargetedmessage'))) {
@@ -116,7 +116,7 @@ startWindow("Options", 'padding: 3px;');
 			<td>
 				<table>
 <?
-					if (getSystemSetting('_hasportal', false) && $USER->authorize('portalaccess')) {
+					if (getSystemSetting('_hasportal', false) && $USER->authorize('portalaccess') && $USER->authorize('managesystem')) {
 ?>
 						<tr><td><a href='contactmanagersettings.php'>Contact Manager Settings</a></td></tr>
 <?
