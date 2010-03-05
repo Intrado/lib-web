@@ -54,7 +54,7 @@ $profilename = QuickQuery("select name from access where id=?", false, array($ed
 
 $hasenrollment = getSystemSetting('_hasenrollment', false);
 
-$hasstaffid = QuickQuery("select count(*) from userassociation where userid=? and sectionid=0", false, array($edituser->id)) ? true : false;
+$hasstaffid = ($edituser->staffpkey) ? true : false;
 
 if($IS_COMMSUITE) {
 	$accessprofiles = QuickQueryList("select id, name from access", true);
@@ -447,15 +447,24 @@ if (getSystemSetting("_hassurvey", true)) {
 
 $formdata[] = _L("Data View");
 
-if (getSystemSetting('_hasenrollment')) {
-	$formdata["staffpkey"] = array(
-		"label" => _L("Staff ID"),
-		"fieldhelp" => _L("If the user is directly related to a staff ID and data access should be controlled based on it's value."),
-		"value" => $edituser->staffpkey,
-		"validators" => array(),
-		"control" => array("TextField","maxlength" => 20, "size" => 12),
-		"helpstep" => 1
-	);
+if ($hasenrollment) {
+	// if the user already has a staff id then display a read only version.
+	if ($hasstaffid) {
+		$formdata["staffpkey"] = array(
+			"label" => _L('Staff ID'),
+			"control" => array("FormHtml", "html" => '<div style="border: 1px dotted gray; padding 3px">'. $edituser->staffpkey ."</div>"),
+			"helpstep" => 2
+		);
+	} else {
+		$formdata["staffpkey"] = array(
+			"label" => _L("Staff ID"),
+			"fieldhelp" => _L("If the user is directly related to a staff ID and data access should be controlled based on it's value."),
+			"value" => $edituser->staffpkey,
+			"validators" => array(),
+			"control" => array("TextField","maxlength" => 20, "size" => 12),
+			"helpstep" => 1
+		);
+	}
 	
 	$formdata["submit"] = array(
 		"label" => "",
@@ -516,8 +525,8 @@ $formdata["datarules"] = array(
 	"helpstep" => 1
 );
 
+// if user has a staff ID then only f and g field restrictions can be used.
 if ($hasstaffid) {
-	if (isset($formdata["staffpkey"])) $formdata["staffpkey"]["control"] = array("FormHtml", "html" => '<div style="border: 1px solid gray; width: 20%">'.$edituser->staffpkey.'</div>');
 	$formdata["datarules"]["control"]["allowedFields"] = array('f', 'g');
 }
 
@@ -584,7 +593,11 @@ if ($readonly) {
 	}
 	// Staff Pkey value
 	if ($hasenrollment) {
-		unset($formdata["staffpkey"]);
+		$formdata["staffpkey"] = array(
+			"label" => _L('Staff ID'),
+			"control" => array("FormHtml", "html" => '<div style="border: 1px dotted gray; padding 3px">'. $edituser->staffpkey ."</div>"),
+			"helpstep" => 2
+		);
 		unset($formdata["submit"]);
 	}
 	// Data restrictions
