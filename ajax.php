@@ -89,7 +89,14 @@ function handleRequest() {
 				else
 					return false;
 			}
-			return QuickQueryList('select id,name from message where not deleted and userid=? and type=? order by id', true, false, array($userid, $_GET['messagetype']));
+			$sqlargs = array($userid, $_GET['messagetype']);
+			$extrasql = '';
+			if(isset($_GET['languagecode'])) {
+				$extrasql = "and languagecode = ?";
+				$sqlargs[] = $_GET['languagecode'];
+			}
+
+			return QuickQueryList("select id,name from message where deleted = 0 and autotranslate not in ('source','translated') and userid=? and type=? $extrasql order by id", true, false,$sqlargs);
 
 		//--------------------------- RPC -------------------------------
 		case 'messagegroupsummary':

@@ -45,7 +45,7 @@ class IntroSelect extends FormItem {
 		foreach ($this->args['values'] as $key => $selectbox) {
 			$str .= '<td>';
 			if($key == "user")
-				$str .= '<select  id="' . $n . $key .'" '.$size .' onchange="loaduser(\'' . $n . '\');updatemessage($(\''.$n.'\'));">';
+				$str .= '<select  id="' . $n . $key .'" '.$size .' onchange="loaduser(\'' . $n . '\',\'' . $this->args['languagecode'] . '\');updatemessage($(\''.$n.'\'));">';
 			else if($key == "message")
 				$str .= '<select  id="' . $n . $key .'" '.$size .' onchange="updatemessage(\''.$n.'\');">';
 			else
@@ -109,7 +109,7 @@ class ValIntroSelect extends Validator {
 // Note that id is the message id and name is the mssage group id
 $messages = QuickQueryList("select m.id as id, g.name as name,(g.name + 0) as digitsfirst
 							from messagegroup g, message m where g.userid=? and g.deleted = 0 and m.messagegroupid = g.id and m.type = 'phone'
-							and m.autotranslate != 'translated' and m.languagecode = 'en' order by digitsfirst",true,false,array($USER->id));
+							and m.autotranslate not in ('source','translated') and m.languagecode = 'en' order by digitsfirst",true,false,array($USER->id));
 
 if($messages == false) {
 	$messages = array("" => "English - System General Intro");
@@ -166,7 +166,8 @@ if($allowedjobtypes["Other"] > 0) {
 		"validators" => array(array("ValIntroSelect","languagecode" => "en")),
 		"control" => array("IntroSelect",
 			"values"=>$defaultmessages,
-			"defaultfile" => "DefaultIntro.wav"
+			"defaultfile" => "DefaultIntro.wav",
+			"languagecode" => "en"
 		),
 		"helpstep" => 1
 	);
@@ -179,7 +180,8 @@ if($allowedjobtypes["Emergency"] > 0) {
 		"validators" => array(array("ValIntroSelect", "languagecode" => "en")),
 		"control" => array("IntroSelect",
 			"values"=>$emergencymessages,
-			"defaultfile" => "EmergencyIntro.wav"
+			"defaultfile" => "EmergencyIntro.wav",
+			"languagecode" => "en"
 		),
 		"helpstep" => 1
 	);
@@ -193,7 +195,7 @@ foreach($languages as $language => $code) {
 	// Note that id is the message id and name is the mssage group id
 	$messages = QuickQueryList("select m.id as id, g.name as name,(g.name + 0) as digitsfirst
 						from messagegroup g, message m where g.userid=? and g.deleted = 0 and m.messagegroupid = g.id and m.type = 'phone'
-						and m.autotranslate != 'translated' and m.languagecode = ? order by digitsfirst",true,false,array($USER->id,$code));
+						and m.autotranslate not in ('source','translated') and m.languagecode = ? order by digitsfirst",true,false,array($USER->id,$code));
 	if($messages == false) {
 		$messagevalues["message"] = array("" => "English - System General Intro");
 	} else {
@@ -223,6 +225,7 @@ foreach($languages as $language => $code) {
 			"control" => array("IntroSelect",
 				 "values"=>$generalmessages,
 				 "defaultfile" => "$code/DefaultIntro.wav",
+				 "languagecode" => $code
 			),
 			"helpstep" => $helpstepindex
 		);
@@ -251,6 +254,7 @@ foreach($languages as $language => $code) {
 			"control" => array("IntroSelect",
 				 "values"=>$emergencymessages,
 				 "defaultfile" => "$code/EmergencyIntro.wav",
+				 "languagecode" => $code
 			),
 			"helpstep" => $helpstepindex
 		);
@@ -391,9 +395,9 @@ $(id + 'message').update(output);
 $(id + 'message').update('<option value=\"\">' + defaulttext + '</option>');
 }
 }
-function loaduser(id) {
+function loaduser(id,languagecode) {
 $(id).value = Object.toJSON({"message": ""});
-var request = 'ajax.php?ajax&type=Messages&messagetype=phone';
+var request = 'ajax.php?ajax&type=Messages&messagetype=phone&languagecode=' + languagecode;
 
 if($(id + 'user').getValue() != '')
 request += '&userid=' + $(id + 'user').getValue();
