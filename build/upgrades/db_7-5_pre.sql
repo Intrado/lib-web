@@ -299,14 +299,13 @@ $$$
 alter table message add originalid int(11) null
 $$$
 
-
--- $rev 4
-
-
 ALTER TABLE `listentry` 
 	ADD `organizationid` INT NULL ,
 	ADD `sectionid` INT NULL
 $$$
+
+-- $rev 4
+
 
 -- switch person language field to codes
 update person p
