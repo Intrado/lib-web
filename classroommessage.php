@@ -16,6 +16,8 @@ require_once("obj/TargetedMessageCategory.obj.php");
 require_once("obj/TargetedMessage.obj.php");
 require_once("obj/FieldMap.obj.php");
 require_once("obj/Schedule.obj.php");
+require_once("inc/classroom.inc.php");
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization
@@ -26,8 +28,8 @@ if (!getSystemSetting('_hastargetedmessage', false) || !$USER->authorize('target
 
 $schedule = DBFind("Schedule","from job j inner join schedule s on (j.scheduleid = s.id) where j.type = 'alert' and j.status = 'repeating'","s");
 
-if(!($schedule && strpos($schedule->daysofweek, (String) (Date('w',time()) + 1)) !== false  && strtotime($schedule->time) > time())) {
-	redirect('classroommessageoverview.php');
+if(!classroomavailable($schedule)) {
+	redirect('classroommessageunautherized.php');
 }
 
 //TODO add redirect if we are past time window
@@ -239,7 +241,7 @@ foreach($categoriesjson as $id => $obj) {
 // Display
 ////////////////////////////////////////////////////////////////////////////////
 $PAGE = "notifications:classroom";
-$TITLE = _L('Classroom Comments');
+$TITLE = _L('Classroom Messaging');
 
 include_once("nav.inc.php");
 ?>

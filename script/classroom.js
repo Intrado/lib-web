@@ -257,8 +257,8 @@
 			$('clock').update((hours>0?hours + ' Hour' + (hours==1?' ':'s '):'') + minutes + ' Minute' + (minutes==1?' ':'s ') + ' left until cutoff');
 		} else {
 			clock.stop();
-			alert('The cutoff time for classroom messaging page has passed.');
-			window.location = 'classroommessageoverview.php';
+			//alert('The cutoff time for classroom messaging page has passed.');
+			window.location = 'classroommessageunautherized.php';
 		}
 	}
 

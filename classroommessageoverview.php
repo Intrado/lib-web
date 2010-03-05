@@ -14,6 +14,7 @@ require_once("inc/formatters.inc.php");
 require_once("obj/FieldMap.obj.php");
 require_once("obj/TargetedMessageCategory.obj.php");
 require_once("obj/Schedule.obj.php");
+require_once("inc/classroom.inc.php");
 
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization
@@ -110,7 +111,7 @@ $total = QuickQuery("select FOUND_ROWS()");
 
 
 $PAGE = "notifications:classroom";
-$TITLE = _L('Classroom Comments');
+$TITLE = _L('Classroom Messaging');
 
 include_once("nav.inc.php");
 
@@ -124,24 +125,10 @@ startWindow(_L('Classroom Comments'));
 
 		<?
 		$schedule = DBFind("Schedule","from job j inner join schedule s on (j.scheduleid = s.id) where j.type = 'alert' and j.status = 'repeating'","s");
-		$currenttime = time();
-		$available = '';
-		if($schedule && strpos($schedule->daysofweek,(String) (Date('w',$currenttime) + 1)) !== false && strtotime($schedule->time) > $currenttime) {
+		if(classroomavailable($schedule)) {
 			echo icon_button("Pick Comments", "add", null, "classroommessage.php");
 		} else {
-			if($schedule->daysofweek != "") {
-				$dows = explode(',',$schedule->daysofweek);
-				$today = Date('w',$currenttime) + 1;
-				$next = $today % 7 + 1;
-				while(!in_array($next,$dows) && $next != $today) {
-					$next = $next % 7 + 1;
-				}
-				$weekdays = array(_L('Sunday'),_L('Monday'),_L('Tuesday'),_L('Wednesday'),_L('Thursday'),_L('Friday'),_L('Saturday'));
-				echo _L('Classroom Messaging is currently unavailable until %s at 12:00 am.',$weekdays[$next - 1]);
-
-			} else {
-				echo _L('Classroom Messaging is unavailable.');;
-			}
+			classroomnextavailable($schedule);
 		}
 
 		?>
