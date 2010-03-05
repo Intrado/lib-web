@@ -144,15 +144,17 @@ foreach ($customers as  $customerid => $customer) {
 	}
 	
 	//only allow one instance of the updater per customer to run at a time
-	if (QuickQuery("select value from setting where name='_dbupgrade_inprogress' for update",$db) != null) {
+	//try to insert our updater code, it should either error out due to duplicate key, or return 1
+	//indicating 1 row was modified.
+	if (QuickUpdate("insert into setting (name,value) values ('_dbupgrade_inprogress','$updater')",$db)) {
 		Query("commit",$db);
+		Query("begin",$db);
+	} else {
+		Query("rollback",$db);
 		echo "an upgrade is already in process, skipping\n";
 		continue;
-	} else {
-		QuickUpdate("insert into setting (name,value) values ('_dbupgrade_inprogress','$updater')",$db);
-		Query("commit",$db);
-		Query("begin",$db);		
 	}
+
 	
 	/*******************************************************/
 	
