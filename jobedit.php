@@ -184,10 +184,10 @@ $formdata = array();
 
 $formdata[] = _L('Job Settings');
 
-$helpsteps[] = _L("The name of your job. The best names are brief and discriptive of the message content.");
-
+$helpsteps[] = _L("Enter a name for your job. Using a descriptive name that indicates the message content will make it easier to find the job later. You may also optionally enter a description of the the job.");
 	$formdata["name"] = array(
 		"label" => _L('Job Name'),
+		"fieldhelp" => _L('Enter a name for your job.'),
 		"value" => isset($job->name)?$job->name:"",
 		"validators" => array(
 			array("ValRequired"),
@@ -199,6 +199,7 @@ $helpsteps[] = _L("The name of your job. The best names are brief and discriptiv
 	);
 	$formdata["description"] = array(
 		"label" => _L('Description'),
+		"fieldhelp" => _L('Enter a description of the job. This is optional, but can help identify the job later.'),
 		"value" => isset($job->description)?$job->description:"",
 		"validators" => array(
 			array("ValLength","min" => 3,"max" => 50)
@@ -207,8 +208,9 @@ $helpsteps[] = _L("The name of your job. The best names are brief and discriptiv
 		"helpstep" => 1
 	);
 
+
 	if($submittedmode || $completedmode) {
-		$helpsteps[] = _L("The option that best describes the type of notification you are sending.");
+		$helpsteps[] = _L("Select the option that best describes the type of notification you are sending. The category you select will determine which introduction your recipients will hear.");
 		$formdata["jobtype"] = array(
 			"label" => _L("Type/Category"),
 			"fieldhelp" => _L("The option that best describes the type of notification you are sending."),
@@ -216,10 +218,10 @@ $helpsteps[] = _L("The name of your job. The best names are brief and discriptiv
 			"helpstep" => 2
 		);
 	} else {
-		$helpsteps[] = _L("Select the option that best describes the type of notification you are sending.");
+		$helpsteps[] = _L("Select the option that best describes the type of notification you are sending. The category you select will determine which introduction your recipients will hear.");
 		$formdata["jobtype"] = array(
 			"label" => _L("Type/Category"),
-			"fieldhelp" => _L("Select the option that best describes the type of notification you are sending."),
+			"fieldhelp" => _L("Select the option that best describes the type of notification you are sending. The category you select will determine which introduction your recipients will hear."),
 			"value" => isset($job->jobtypeid)?$job->jobtypeid:"",
 			"validators" => array(
 				array("ValRequired"),
@@ -249,10 +251,10 @@ $helpsteps[] = _L("The name of your job. The best names are brief and discriptiv
 		}
 		$repeatvalues[7] = date("g:i a", strtotime($schedule->time));
 
-		$helpsteps[] = _L("");  // Guide for the whole scheduling section
+		$helpsteps[] = _L("The options in this section create a delivery window for your job. It's important that you leave enough time for the system to contact everyone in your list. The options are: <ul><li>Start Date - This is the day the job will start running. <li>Days to Run - The number of days the job should run within the times you select.<li>Start Time and End Time - These represent the time the job should start and stop.</ul>");  // Guide for the whole scheduling section
 		$formdata["repeat"] = array(
 			"label" => _L("Repeat"),
-			"fieldhelp" => _L(""),
+			"fieldhelp" => _L("Select this option if you would like your job to repeat."),
 			"value" => $repeatvalues,
 			"validators" => array(
 				array("ValRequired"),
@@ -292,7 +294,7 @@ $helpsteps[] = _L("The name of your job. The best names are brief and discriptiv
 	if($completedmode) {
 		$formdata["days"] = array(
 			"label" => _L("Days to Run"),
-			"fieldhelp" => _L(""),
+			"fieldhelp" => _L("Select the number of days this job should run."),
 			"control" => array("FormHtml","html" => (86400 + strtotime($job->enddate) - strtotime($job->startdate) ) / 86400),
 			"helpstep" => 3
 		);
@@ -314,7 +316,7 @@ $helpsteps[] = _L("The name of your job. The best names are brief and discriptiv
 		$numdays = array_combine(range(1,$maxdays),range(1,$maxdays));
 		$formdata["days"] = array(
 			"label" => _L("Days to Run"),
-			"fieldhelp" => _L(""),
+			"fieldhelp" => _L("Select the number of days this job should run."),
 			"value" => (86400 + strtotime($job->enddate) - strtotime($job->startdate) ) / 86400,
 			"validators" => array(
 				array("ValRequired"),
@@ -357,26 +359,29 @@ $helpsteps[] = _L("The name of your job. The best names are brief and discriptiv
 		}
 	}
 
-	$helpsteps[] = _L("List");
-	$helpsteps[] = _L("Message");
-	$helpsteps[] = _L("Advanced");
+	$helpsteps[] = _L("Select an existing list to use. If you do not see the list you need, you can make one by clicking the Lists subtab above. <br><br>You may also opt to skip duplicates. Skip Duplicates is for calling each number once, so if, for example, two recipients have the same number, they will only be called once.");
+	$helpsteps[] = _L("Select an existing message to use. If you do not see the message you need, you can make a new message by clicking the Messages subtab above.");
+	$helpsteps[] = _L("<ul><li>Auto Report - Selecting this option causes the system to email a report to the email address associated with your account when the job is finished.<li>Max Attempts - This option lets you select the maximum number of times the system should try to contact a recipient.<li>Allow Reply - Check this if you want recipients to be able to record responses.<br><br><b>Note:</b>You will need to include instructions to press '0' to record a response in your message.<br><br><li>Allow Confirmation - Select this option if you would like recipients to give a 'yes' or 'no' response to your message.<br><br><b>Note:</b>You will need to include instructions to press '1' for 'yes' and '2' for 'no' in your message.</ul>");
 
 	if($submittedmode || $completedmode) {
 		$formdata[] = _L('Job Lists');
 
 		$formdata["lists"] = array(
 			"label" => _L('Lists'),
+			"fieldhelp" => _L('Select a list from your existing lists.'),
 			"control" => array("FormHtml","html" => implode("<br/>",QuickQueryList("select name from list where id in (" . repeatWithSeparator("?", ",", count($selectedlists)) . ")", false,false,$selectedlists))),
 			"helpstep" => 4
 		);
 		$formdata["skipduplicates"] = array(
 			"label" => _L('Skip Duplicates'),
+			"fieldhelp" => _L('Skip Duplicates if you would like to only contact recipients who share contact information once.'),
 			"control" => array("FormHtml","html" => ($job->isOption("skipduplicates") || $job->isOption("skipemailduplicates"))?"<input type='checkbox' checked disabled/>":"<input type='checkbox' disabled/>"),
 			"helpstep" => 4
 		);
 		$formdata[] = _L('Job Message');
 		$formdata["message"] = array(
 			"label" => _L('Message'),
+			"fieldhelp" => _L('Select an existing message to use from the menu.'),
 			"value" => (((isset($job->messagegroupid) && $job->messagegroupid))?$job->messagegroupid:""),
 			"validators" => array(),
 			"control" => array("MessageGroupSelectMenu", "values" => $messages, "static" => true),
@@ -385,7 +390,8 @@ $helpsteps[] = _L("The name of your job. The best names are brief and discriptiv
 
 		$formdata[] = _L('Advanced Options ');
 		$formdata["report"] = array(
-			"label" => _L('Completion Report'),
+			"label" => _L('Auto Report'),
+			"fieldhelp" => _L("Select this option if you would like the system to email you when the job has finished running."),
 			"control" => array("FormHtml","html" => $job->isOption("sendreport")?"<input type='checkbox' checked disabled/>":"<input type='checkbox' disabled/>"),
 			"helpstep" => 6
 		);
@@ -393,6 +399,7 @@ $helpsteps[] = _L("The name of your job. The best names are brief and discriptiv
 		if ($USER->authorize('setcallerid') && !getSystemSetting('_hascallback', false)) {
 			$formdata["callerid"] = array(
 				"label" => _L("Personal Caller ID"),
+				"fieldhelp" => ("This features allows you to override the number that will display on recipient's Caller IDs."),
 				"control" => array("FormHtml","html" => Phone::format($job->getSetting("callerid",getDefaultCallerID()))),
 				"helpstep" => 6
 			);
@@ -404,16 +411,19 @@ $helpsteps[] = _L("The name of your job. The best names are brief and discriptiv
 
 		$formdata["attempts"] = array(
 			"label" => _L('Max Attempts'),
+			"fieldhelp" => _L("Select the maximum number of times the system should try to contact an individual."),
 			"control" => array("FormHtml","html" => $job->getOptionValue("maxcallattempts")),
 			"helpstep" => 6
 		);
 		$formdata["replyoption"] = array(
 			"label" => _L('Allow Reply'),
+			"fieldhelp" => _L("Select this option if recipients should be able to record replies. Make sure that the message instructs recipients to press '0' to record a response."),
 			"control" => array("FormHtml","html" => $job->isOption("leavemessage")?"<input type='checkbox' checked disabled/>":"<input type='checkbox' disabled/>"),
 			"helpstep" => 6
 		);
 		$formdata["confirmoption"] = array(
 			"label" => _L('Allow Confirmation'),
+			"fieldhelp" => _L("Select this option if you would like recipients to be able to respond to your message by pressing 1' for 'yes' or '2' for 'no'. You will need to instruct recipients to do this in your message."),
 			"control" => array("FormHtml","html" => $job->isOption("messageconfirmation")?"<input type='checkbox' checked disabled/>":"<input type='checkbox' disabled/>"),
 			"helpstep" => 6
 		);
@@ -421,6 +431,7 @@ $helpsteps[] = _L("The name of your job. The best names are brief and discriptiv
 		$formdata[] = _L('Job Lists');
 		$formdata["lists"] = array(
 			"label" => _L('Lists'),
+			"fieldhelp" => _L('Select a list from your existing lists.'),
 			"value" => empty($selectedlists)?"":json_encode($selectedlists),
 			"validators" => array(
 				array("ValRequired"),
@@ -431,6 +442,7 @@ $helpsteps[] = _L("The name of your job. The best names are brief and discriptiv
 		);
 		$formdata["skipduplicates"] = array(
 			"label" => _L('Skip Duplicates'),
+			"fieldhelp" => ("This features allows you to override the number that will display on recipient's Caller IDs."),
 			"value" => $job->isOption("skipduplicates") || $job->isOption("skipemailduplicates"),
 			"validators" => array(),
 			"control" => array("CheckBox"),
@@ -439,6 +451,7 @@ $helpsteps[] = _L("The name of your job. The best names are brief and discriptiv
 		$formdata[] = _L('Job Message');
 		$formdata["message"] = array(
 			"label" => _L('Message'),
+			"fieldhelp" => _L('Select a list from your existing lists.'),
 			"value" => (((isset($job->messagegroupid) && $job->messagegroupid))?$job->messagegroupid:""),
 			"validators" => array(
 				array("ValRequired"),
@@ -456,7 +469,8 @@ $helpsteps[] = _L("The name of your job. The best names are brief and discriptiv
 
 		$formdata[] = _L('Advanced Options ');
 		$formdata["report"] = array(
-			"label" => _L('Completion Report'),
+			"label" => _L('Auto Report'),
+			"fieldhelp" => _L("Select this option if you would like the system to email you when the job has finished running."),
 			"value" => $job->isOption("sendreport"),
 			"validators" => array(),
 			"control" => array("CheckBox"),
@@ -466,7 +480,7 @@ $helpsteps[] = _L("The name of your job. The best names are brief and discriptiv
 		if ($USER->authorize('setcallerid') && !getSystemSetting('_hascallback', false)) {
 			$formdata["callerid"] = array(
 				"label" => _L("Personal Caller ID"),
-				"fieldhelp" => (""),
+				"fieldhelp" => _L("This features allows you to override the number that will display on recipient's Caller IDs."),
 				"value" => Phone::format($job->getSetting("callerid",getDefaultCallerID())),
 				"validators" => array(
 					array("ValLength","min" => 3,"max" => 20),
@@ -483,6 +497,7 @@ $helpsteps[] = _L("The name of your job. The best names are brief and discriptiv
 
 		$formdata["attempts"] = array(
 			"label" => _L('Max Attempts'),
+			"fieldhelp" => ("This features allows you to override the number that will display on recipient's Caller IDs."),
 			"value" => $job->getOptionValue("maxcallattempts"),
 			"validators" => array(array("ValRequired")),
 			"control" => array("SelectMenu", "values" => $attempts),
@@ -490,6 +505,7 @@ $helpsteps[] = _L("The name of your job. The best names are brief and discriptiv
 		);
 		$formdata["replyoption"] = array(
 			"label" => _L('Allow Reply'),
+			"fieldhelp" => _L("Select this option if recipients should be able to record replies. Make sure that the message instructs recipients to press '0' to record a response."),
 			"value" => $job->isOption("leavemessage"),
 			"validators" => array(),
 			"control" => array("CheckBox"),
@@ -497,6 +513,7 @@ $helpsteps[] = _L("The name of your job. The best names are brief and discriptiv
 		);
 		$formdata["confirmoption"] = array(
 			"label" => _L('Allow Confirmation'),
+			"fieldhelp" => _L("Select this option if you would like recipients to be able to respond to your message by pressing 1' for 'yes' or '2' for 'no'. You will need to instruct recipients to do this in your message."),
 			"value" => $job->isOption("messageconfirmation"),
 			"validators" => array(),
 			"control" => array("CheckBox"),
