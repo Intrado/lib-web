@@ -124,12 +124,24 @@ startWindow(_L('Classroom Comments'));
 
 		<?
 		$schedule = DBFind("Schedule","from job j inner join schedule s on (j.scheduleid = s.id) where j.type = 'alert' and j.status = 'repeating'","s");
-		$currenttime = time();																			// 15 minutes before Alert Job runs
-		if($schedule && strpos($schedule->daysofweek,(String) (Date('w',$currenttime) + 1)) !== false && (strtotime($schedule->time) - 900) > $currenttime && strtotime('1.00') < $currenttime) {
+		$currenttime = time();
+		$available = '';
+		if($schedule && strpos($schedule->daysofweek,(String) (Date('w',$currenttime) + 1)) !== false && strtotime($schedule->time) > $currenttime) {
 			echo icon_button("Pick Comments", "add", null, "classroommessage.php");
 		} else {
-			//echo '<img src="img/largeicons/notepad.jpg" /> Please Comeback Tomorrow to Add Comments';
-			echo icon_button("Pick Comments", "diagona/16/160", null, "classroommessage.php");
+			if($schedule->daysofweek != "") {
+				$dows = explode(',',$schedule->daysofweek);
+				$today = Date('w',$currenttime) + 1;
+				$next = $today % 7 + 1;
+				while(!in_array($next,$dows) && $next != $today) {
+					$next = $next % 7 + 1;
+				}
+				$weekdays = array(_L('Sunday'),_L('Monday'),_L('Tuesday'),_L('Wednesday'),_L('Thursday'),_L('Friday'),_L('Saturday'));
+				echo _L('Classroom Messaging is currently unavailable until %s at 12:00 am.',$weekdays[$next - 1]);
+
+			} else {
+				echo _L('Classroom Messaging is unavailable.');;
+			}
 		}
 
 		?>

@@ -25,9 +25,9 @@ if (!getSystemSetting('_hastargetedmessage', false) || !$USER->authorize('target
 }
 
 $schedule = DBFind("Schedule","from job j inner join schedule s on (j.scheduleid = s.id) where j.type = 'alert' and j.status = 'repeating'","s");
-																								// 15 minutes before Alert Job runs
-if(!($schedule && strpos($schedule->daysofweek, (String) (Date('w',time()) + 1)) !== false  && (strtotime($schedule->time) - 900) > time() && strtotime('1.00') < time())) {
-	redirect('classroommessageredirect.php');
+
+if(!($schedule && strpos($schedule->daysofweek, (String) (Date('w',time()) + 1)) !== false  && strtotime($schedule->time) > time())) {
+	redirect('classroommessageoverview.php');
 }
 
 //TODO add redirect if we are past time window
@@ -227,7 +227,7 @@ $categories = array(0 => "Positive",1 => "Corrective",2 => "Informational");
 $library = array();
 
 foreach($categoriesjson as $id => $obj) {
-	$library[$id] = DBFindMany("TargetedMessage","from targetedmessage where enabled = 1 and targetedmessagecategoryid = ?",false,array($id));
+	$library[$id] = DBFindMany("TargetedMessage","from targetedmessage where enabled = 1 and deleted = 0 and targetedmessagecategoryid = ?",false,array($id));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
