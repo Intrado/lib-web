@@ -86,10 +86,10 @@ $NAVTREE = array (
 		array("Blocked Lists","blocked.php","blocknumbers",$SUBTAB=="blockednumbers")
 		)),
 	array("Admin",NULL,array('manageaccount', 'manageprofile', 'managesystem',
-							'metadata', 'managetasks', 'portalaccess', 'manageclassroommessaging'),$MAINTAB=="admin",array(
+							'metadata', 'managetasks', 'manageclassroommessaging'),$MAINTAB=="admin",array(
 		array("Users","users.php","manageaccount",$SUBTAB=="users"),
 		array("Profiles","profiles.php","manageprofile",$SUBTAB=="profiles"),
-		array("Settings","settings.php",array("managesystem", "portalaccess","metadata","manageclassroommessaging"),$SUBTAB=="settings"),
+		array("Settings","settings.php",array("managesystem","metadata","manageclassroommessaging"),$SUBTAB=="settings"),
 		array("Imports","tasks.php","managetasks",$SUBTAB=="taskmanager")
 		))
 );
