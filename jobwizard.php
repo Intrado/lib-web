@@ -131,8 +131,8 @@ class FinishJobWizard extends WizFinish {
 			// get the contact details out of postdata
 			$addme = array(
 				"phone" => Phone::parse($postdata["/list"]["addmePhone"]),
-				"email" => trim($postdata["/list"]["addmeEmail"]),
-				"sms" => Phone::parse($postdata["/list"]["addmeSms"])
+				"email" => (isset($postdata["/list"]["addmeEmail"])?trim($postdata["/list"]["addmeEmail"]):""),
+				"sms" => (isset($postdata["/list"]["addmeSms"])?Phone::parse($postdata["/list"]["addmeSms"]):"")
 			);
 			// NOTE: getUserJobTypes() automatically applies user jobType restrictions
 			$jobTypes = JobType::getUserJobTypes(false);
@@ -387,20 +387,8 @@ class FinishJobWizard extends WizFinish {
 						$message->stuffHeaders();
 						$message->create();
 						
-						$part = new MessagePart();
-						$part->messageid = $message->id;
-						$part->type = "T";
-						$part->txt = $data["text"];
-						
-						if ($type == 'phone') {
-							$voiceid = QuickQuery("select id from ttsvoice where languagecode=? and gender=?",false,array($langcode,$data["gender"]));
-							if($voiceid === false)
-								$voiceid = 1; // default to english
-							$part->voiceid = $voiceid;
-						}
-						
-						$part->sequence = 0;
-						$part->create();
+						// create the message parts
+						$message->recreateParts($data['text'], null, isset($data['gender'])?$data['gender']:false);
 						
 						// if there are message attachments, attach them
 						if (isset($data['attachments']) && $data['attachments']) {
