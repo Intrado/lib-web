@@ -253,15 +253,30 @@ class SMAPI{
 				$result["resultdescription"] = "Translation message cannot be edited.";
 				return $result;
 			}
+
+			// delete all old parts
+			QuickUpdate("delete from messagepart where messageid=$message->id");
 			
-			if($message->type == "sms"){
-				if(strlen($messagetext) > 160){
+			// recreate new parts, if sms only one part, else parse() parts to create
+			if ($message->type == "sms") {
+				if (strlen($messagetext) > 160) {
 					$messagetext = substr($messagetext, 0, 160);
 				}
+				$part = new MessagePart();
+				$part->messageid = $message->id;
+				$part->txt = $messagetext;
+				$part->type = "T";
+				$part->sequence = 0;
+				$part->create();
+			} else {
+				$errors = array();
+				$voiceid = QuickQuery("select id from ttsvoice where language = 'english' and gender = 'female'");
+				$parts = Message::parse($messagetext, $errors, $voiceid);
+				foreach ($parts as $part) {
+					$part->messageid = $message->id;
+					$part->create();
+				}
 			}
-			
-			$message->recreateParts($messagetext, null, null);
-			
 			$result["resultcode"] = "success";
 			$result["result"] = true;
 			return $result;
