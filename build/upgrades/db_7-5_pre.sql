@@ -19,6 +19,15 @@ $$$
 ALTER TABLE `blockeddestination` ADD `failattempts` TINYINT( 4 ) NULL
 $$$
 
+ALTER TABLE  `blockeddestination` ADD INDEX (  `destination` ,  `type` )
+$$$
+
+delete bd2 from blockeddestination bd inner join blockeddestination bd2 on (bd.destination = bd2.destination and bd.type = bd2.type and bd.id < bd2.id)
+$$$
+
+ALTER TABLE  `blockeddestination` DROP INDEX  `destination`
+$$$
+
 ALTER TABLE `blockeddestination` ADD UNIQUE `typedestination` ( `type` , `destination` )
 $$$
 
