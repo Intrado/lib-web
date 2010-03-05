@@ -91,31 +91,28 @@ class InpageSubmitButton extends FormItem {
 class UserSectionFormItem extends FormItem {
 	function render ($value) {
 		$n = $this->form->name."_".$this->name;
-		$usersections = ($this->args['usersections']?$this->args['usersections']:array());
-		$orgs = ($this->args['organizations']?$this->args['organizations']:array());
+		// get all orgid to orgkey values
+		$orgs = QuickQueryList("select id, orgkey from organization where not deleted", true);
+		// get sectionkeys for current value
+		if ($value)
+			$sections = QuickQueryList("select id, skey from section where id in (". DBParamListString(count($value)) .")", true, false, $value);
 		
 		$str = '<style type="text/css">
-		.usersection {
-			padding: 4px;
-			border: 1px dotted gray;
-			max-height: 150px;
-			overflow: auto;
-		}
 		.usersectionchoose {
 			margin-left: 6px;
 			border: 1px dotted gray;
 			padding: 4px;
 			overflow: auto;
 			max-height: 150px;
-			width: 150px;
+			width: 30%;
 			float: left;
 		}
 		</style>
-		<div id="'. $n .'-sectionsdiv" class="usersection" style="display: '. ($value?'block':'none') .'">';
+		<div id='.$n.' class="radiobox" style="overflow: auto; max-height: 150px; display: '. ($value?'block':'none') .'">';
 		if ($value) {
 			foreach ($value as $sectionid) {
 				$id = $n . $sectionid;
-				$str .= '<input  id="'.$id.'" name="'.$n.'[]" type="checkbox" value="'.$sectionid.'" checked /><label id="'.$id.'-label" for="'.$id.'">'.escapehtml($usersections[$sectionid]).'</label><br />';
+				$str .= '<input  id="'.$id.'" name="'.$n.'[]" type="checkbox" value="'.$sectionid.'" checked /><label id="'.$id.'-label" for="'.$id.'">'.escapehtml($sections[$sectionid]).'</label><br />';
 			}
 		}
 		$str .= '</div>';
@@ -128,11 +125,15 @@ class UserSectionFormItem extends FormItem {
 			$str .= '</select>
 				<div id="'. $n .'-sectionchoosediv" class="usersectionchoose" style="display: none"></div>';
 		}
-		//$name,$icon,$onclick = NULL, $href = NULL, $extrahtml = NULL
-		$str .= icon_button("Add", "add", "moveSections(this, '$n-sectionchoosediv', '$n-sectionsdiv', '$n-select')", null, "id=\"$n-addbutton\" style=\"display: none;\"");
+		// create an add button for use later
+		$str .= icon_button("Add", "add", "moveSections(this, '$n-sectionchoosediv', '$n', '$n-select')", null, "id=\"$n-addbutton\" style=\"display: none;\"");
 		
+		return $str;
+	}
+	
+	function renderJavascriptLibraries() {
 		// javascript to populate the sections and move the checkbox up into selected sections
-		$str .= '<script type="text/javascript">
+		$str = '<script type="text/javascript">
 			// get sections from an ajax call and populate a div with checkboxes for each section key
 			function getSections(selectelement, targetelement, formitemid, addbutton) {
 				selectelement = $(selectelement);
@@ -159,7 +160,7 @@ class UserSectionFormItem extends FormItem {
 						chkname = itemid + "[]";
 						lblid = chkid + "-label";
 						
-						// if this checkbox already exists it is in user sections
+						// if this checkbox already exists it is in user sections and we cant re-create it
 						if ($(chkid) == null) {
 							targetelement.insert(
 								new Element("input", {"id": chkid, "name": chkname, "type": "checkbox", "value": id})
@@ -173,8 +174,7 @@ class UserSectionFormItem extends FormItem {
 				}, formitemid, true);
 				
 				// make the add button visible
-				addbutton.show()
-
+				addbutton.show();
 			}
 			
 			// move checked section key checkbox elements from the source div into the target div
@@ -219,9 +219,11 @@ class ValUserSection extends Validator {
 	var $onlyserverside = true;
 
 	function validate ($value, $args) {
-		$count = QuickQuery("select count(id) from section where id in (". DBParamListString($value) .")", false, array($value));
-		if ($count !== count($value))
-			return "$this->label: ". _L('Selected sections do not appear valid.');
+		if ($value) {
+			$count = QuickQuery("select count(id) from section where id in (". DBParamListString(count($value)) .")", false, $value);
+			if ($count + 0 !== count($value))
+				return _L('%s has invalid data selected.', $this->label);
+		}
 		return true;
 	}
 }
@@ -445,7 +447,7 @@ if (getSystemSetting("_hassurvey", true)) {
 
 $formdata[] = _L("Data View");
 
-if ($hasenrollment) {
+if (getSystemSetting('_hasenrollment')) {
 	$formdata["staffpkey"] = array(
 		"label" => _L("Staff ID"),
 		"fieldhelp" => _L("If the user is directly related to a staff ID and data access should be controlled based on it's value."),
@@ -462,22 +464,36 @@ if ($hasenrollment) {
 		"control" => array("InpageSubmitButton", "name" => (($hasstaffid)?_L('Remove Staff ID'):_L('Set Staff ID')), "icon" => (($hasstaffid)?"cross":"disk")),
 		"helpstep" => 1
 	);
-}
-
-if (getSystemSetting('_hasenrollment')) {
-	// get all orgid to orgkey values
-	$orgs = QuickQueryList("select id, orgkey from organization where not deleted", true);
-	// get user's section id and sectionkey restrictions
-	$usersections = QuickQueryList("select ua.sectionid, s.skey from userassociation ua inner join section s on (ua.sectionid = s.id) where ua.userid = ?", true, false, array($edituser->id));
-
+	
+	// display read only section associations, if there are any
+	$userimportsections = QuickQueryList("
+		select s.skey
+		from userassociation ua
+			inner join section s on
+				(ua.sectionid = s.id)
+		where ua.userid = ? and ua.importid is not NULL", false, false, array($edituser->id));
+	if ($userimportsections) {
+		$html = '<div style="border: 1px dotted gray; padding: 3px;">';
+		foreach ($userimportsections as $skey)
+			$html .= "<div>$skey</div>";
+		$html .= "</div>";
+		$formdata["readonlysectoins"] = array(
+			"label" => _L('Imported Sections'),
+			"control" => array("FormHtml", "html" => $html),
+			"helpstep" => 2
+		);
+	}
+	
+	// get user section associations that arn't created by an import
+	$usersections = QuickQueryList("select sectionid from userassociation where userid = ? and importid is null", false, false, array($edituser->id));
 	$formdata["sectionids"] = array(
 		"label" => _L('Sections'),
 		"fieldhelp" => _L('Add or remove user section associations'),
-		"value" => array_keys($usersections),
+		"value" => $usersections,
 		"validators" => array(
 			array("ValUserSection")
 		),
-		"control" => array("UserSectionFormItem", "usersections" => $usersections, "organizations" => $orgs),
+		"control" => array("UserSectionFormItem"),
 		"helpstep" => 2
 	);
 }
