@@ -527,7 +527,7 @@ $buttons = array(submit_button(_L('Save'),"submit","tick"));
 if ($JOBTYPE == "normal" && !$submittedmode) {
 	$buttons[] = submit_button(_L('Proceed To Confirmation'),"send","arrow_right");
 } 
-$buttons[] = icon_button(_L('Cancel'),"cross",null,"start.php");
+$buttons[] = icon_button(_L('Cancel'),"cross",null,(isset($_SESSION['origin']) && ($_SESSION['origin'] == 'start')?"start.php":"jobs.php"));
 
 
 $form = new Form("jobedit",$formdata,$helpsteps,$buttons);
@@ -657,7 +657,12 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 			$_SESSION['jobid'] = $job->id;
 			$sendto = "jobconfirm.php";
 		} else {
-			$sendto = "jobs.php";
+			if (isset($_SESSION['origin']) && ($_SESSION['origin'] == 'start')) {
+				unset($_SESSION['origin']);
+				$sendto = 'start.php';
+			} else {
+				$sendto = 'jobs.php';
+			}
 		}
 		if ($ajax)
 			$form->sendTo($sendto);
