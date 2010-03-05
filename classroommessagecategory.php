@@ -80,6 +80,7 @@ $category = new TargetedMessageCategory($id);
 $formdata = array(
 	"name" => array(
 		"label" => _L('Name'),
+		"fieldhelp" => _L('Enter a name for the message category that will appear on the tab.'),
 		"value" => $category->name,
 		"validators" => array(
 			array("ValRequired"),
@@ -90,7 +91,8 @@ $formdata = array(
 		"helpstep" => 1
 	),
 	"image" => array(
-		"label" => _L('Image'),
+		"label" => _L('Icon'),
+		"fieldhelp" => _L('Select an icon to display on the message category tab.'),
 		"value" => $category->image,
 		"validators" => array(
 			array("ValRequired"),
@@ -102,8 +104,8 @@ $formdata = array(
 );
 
 $helpsteps = array (
-	_L('The name of the category should reflect the content of its messages.'),
-	_L('The category image is a visual aid that can help the user find the appropriate category.')
+	_L('Enter a name for your new message category. The name of the category will appear on the category tab and should reflect the content of its messages.'),
+	_L('The category icon adds a visual cue for the category and will appear next to the category name on its tab.')
 	);
 
 $buttons = array(submit_button(_L('Save'),"submit","tick"),

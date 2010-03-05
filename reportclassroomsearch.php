@@ -127,16 +127,18 @@ if($options['classroomreporttype'] == 'person') {
 	);
 	$formdata["searchmethod"] = array(
 		"label" => _L("Search By"),
+		"fieldhelp" => _L("Search for an individual by their ID number or Email address."),
 		"value" => $searchmethod,
 		"control" => array("RadioButton", "values" => $validsearchmethods),
 		"validators" => array(array("ValRequired"), array("ValInArray", "values" => array_keys($validsearchmethods))),
 		"helpstep" => $helpstepscount
 	);
-	$helpsteps[] = _L('Search Method');
+	$helpsteps[] = _L('You can search for an individual by their ID Number or Email address. Select which one you would prefer to use.');
 	$helpstepscount++;
 
 	$formdata["searchvalue"] = array(
 		"label" => _L("Search Value"),
+		"fieldhelp" => _L("Enter a search value that matches the type you selected above."),
 		"value" => $searchvalue,
 		"control" => array("TextField"),
 		"validators" => array(
@@ -146,12 +148,13 @@ if($options['classroomreporttype'] == 'person') {
 		"requires" => array("searchmethod"),
 		"helpstep" => $helpstepscount
 	);
-	$helpsteps[] = _L('Search Value');
+	$helpsteps[] = _L('Enter a term to search for. It must be an ID Number or Email address, depending on what you chose in the previous step.');
 	$helpstepscount++;
 }
 
 $formdata["dateoptions"] = array(
 	"label" => _L("Date Options"),
+	"fieldhelp" => _L("Select the date or date range that the report should cover."),
 	"value" => json_encode(array(
 		"reldate" => isset($options['reldate']) ? $options['reldate'] : 'today',
 		"xdays" => isset($options['lastxdays']) ? $options['lastxdays'] : '',
@@ -163,7 +166,7 @@ $formdata["dateoptions"] = array(
 	"helpstep" => $helpstepscount
 );
 
-$helpsteps[] = _L('Date Reange');
+$helpsteps[] = _L('The Date Options menu contains date options that are relative to today as well as date ranges which you can configure.');
 $helpstepscount++;
 
 $buttons = array(
