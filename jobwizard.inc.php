@@ -46,7 +46,7 @@ function wizHasPhone($postdata) {
 		return true;
 	
 	$messageoptions = isset($postdata["/message/options"]["options"])?$postdata["/message/options"]["options"]:false;
-	$messagepick = isset($postdata["/message/pick"]["type"])?$postdata["/message/pick"]["type"]:false;
+	$messagepick = isset($postdata["/message/pick"]["type"])?$postdata["/message/pick"]["type"]:array();
 	$messageselectphone = isset($postdata["/message/select"]["phone"])?$postdata["/message/select"]["phone"]:false;
 	
 	// if custom and create message and phone selected and record requested and message recorded
@@ -91,7 +91,7 @@ function wizHasEmail($postdata) {
 		return true;
 	
 	$messageoptions = isset($postdata["/message/options"]["options"])?$postdata["/message/options"]["options"]:false;
-	$messagepick = isset($postdata["/message/pick"]["type"])?$postdata["/message/pick"]["type"]:false;
+	$messagepick = isset($postdata["/message/pick"]["type"])?$postdata["/message/pick"]["type"]:array();
 	
 	// if custom and create message and email selected and email text entered
 	if ($package == 'custom' && $messageoptions == 'create' && in_array('email', $messagepick) && $emailtext)
@@ -131,7 +131,7 @@ function wizHasSms($postdata) {
 		return true;
 	
 	$messageoptions = isset($postdata["/message/options"]["options"])?$postdata["/message/options"]["options"]:false;
-	$messagepick = isset($postdata["/message/pick"]["type"])?$postdata["/message/pick"]["type"]:false;
+	$messagepick = isset($postdata["/message/pick"]["type"])?$postdata["/message/pick"]["type"]:array();
 	
 	// if custom and create message and sms selected and sms text entered
 	if ($package == 'custom' && $messageoptions == 'create' && in_array('sms', $messagepick) && $smstext)
@@ -1839,8 +1839,8 @@ class JobWiz_submitConfirm extends WizStep {
 		$calctotal = $postdata["/list"]["addme"] ? 1 : 0;
 		foreach ($lists as $id) {
 			$list = new PeopleList($id+0);
-			$renderedlist = new RenderedList($list);
-			$renderedlist->calcStats();
+			$renderedlist = new RenderedList2($list);
+			$renderedlist->pagelimit = 0;
 			$calctotal = $calctotal + $renderedlist->total;
 		}
 
