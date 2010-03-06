@@ -46,6 +46,7 @@ require_once("obj/MessageGroupSelectMenu.fi.php");
 require_once("obj/ValLists.val.php");
 require_once("obj/ValTimeWindowCallEarly.val.php");
 require_once("obj/ValTimeWindowCallLate.val.php");
+require_once("obj/ValMessageBody.val.php");
 
 // Job step form data
 require_once("jobwizard.inc.php");
@@ -504,7 +505,7 @@ require_once("nav.inc.php");
 
 ?>
 <script type="text/javascript">
-<? Validator::load_validators(array("ValInArray", "ValJobName", "ValHasMessage", "ValTextAreaPhone","ValEasycall","ValLists","ValTranslation","ValEmailAttach", "ValTimeWindowCallLate", "ValTimeWindowCallEarly","ValRegExp", "valPhone","ValMessageTranslationExpiration"));// Included in jobwizard.inc.php ?>
+<? Validator::load_validators(array("ValInArray", "ValJobName", "ValHasMessage", "ValTextAreaPhone","ValEasycall","ValLists","ValTranslation","ValEmailAttach", "ValTimeWindowCallLate", "ValTimeWindowCallEarly","ValRegExp", "valPhone", "ValMessageTranslationExpiration", "ValMessageBody"));// Included in jobwizard.inc.php ?>
 </script>
 <?
 
