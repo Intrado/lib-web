@@ -1346,7 +1346,8 @@ class JobWiz_messageEmailText extends WizStep {
 			"fieldhelp" => _L('Enter the message you would like to send. Helpful tips for successful messages can be found at the Help link in the upper right corner.'),
 			"value" => $msgdata->text,
 			"validators" => array(
-				array("ValRequired")
+				array("ValRequired"),
+				array("ValMessageBody")
 			),
 			"control" => array("HtmlTextArea","rows"=>10),
 			"helpstep" => 5
