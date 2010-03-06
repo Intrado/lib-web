@@ -317,6 +317,49 @@ function upgrade_7_5 ($rev, $shardid, $customerid, $db) {
 			// upgrade from rev 8 to rev 9
 			echo "|";
 			apply_sql("upgrades/db_7-5_pre.sql",$customerid,$db, 9);
+		case 9:
+			// upgrade from rev 9 to rev 10
+			echo "|";
+			apply_sql("upgrades/db_7-5_pre.sql",$customerid,$db, 10);
+			
+			if (isset($schoolfieldnum) && $schoolfieldnum) {
+				$num = substr($schoolfieldnum,1) +0;
+				
+				//insert $schoolfieldnum into customer settings in case we need it in future revs
+				QuickUpdate("insert into setting (name, value) values ('_schoolfieldnum',$schoolfieldnum)");
+	
+				//create orgs for each school field
+				if ($schoolfieldnum[0] == "g")
+					$query = "select distinct value from reportgroupdata where fieldnum=$num";
+				else
+					$query = "select distinct $schoolfieldnum from reportperson";
+				QuickUpdate("insert ignore into organization (orgkey) $query");
+			
+				// additonal report migration goes here
+				if ($schoolfieldnum[0] == "g") { // gfield
+					QuickUpdate("insert into reportorganization (jobid, personid, organizationid) 
+						select rgd.jobid, rgd.personid, oz.id from reportgroupdata rgd 
+						join organization oz on (oz.orgkey = rgd.value) 
+						where rgd.fieldnum=?", false, array($num));
+				} else { // ffield
+					QuickUpdate("insert into reportorganization (jobid, personid, organizationid) 
+						select rp.jobid, rp.personid, oz.id from reportperson rp 
+						join organization oz on (oz.orgkey = rp.$schoolfieldnum)");
+				}
+
+				//delete f field values or gfield group entries
+				if ($schoolfieldnum[0] == "g") {
+					$query = "delete from reportgroupdata where fieldnum=$num";
+				} else {
+					$query = "update reportperson set $schoolfieldnum = null";					
+				}
+				QuickUpdate($query);
+				
+			} else {
+				// no easy way to tell schoolfieldnum...
+				echo " sorry, your reportorganization data is lost ";
+			}
+
 	}
 	
 	//do these always

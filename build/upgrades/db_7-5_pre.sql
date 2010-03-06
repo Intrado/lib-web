@@ -564,5 +564,17 @@ $$$
 ALTER TABLE `personassociation` ADD INDEX ( `eventid` )
 $$$
 
+-- $rev 10
 
+delete from fieldmap where options like '%staff%'
+$$$
+
+CREATE TABLE `reportorganization` (
+ `id` BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY , 
+ `jobid` INT NOT NULL , 
+ `personid` INT NOT NULL , 
+ `organizationid` INT NOT NULL , 
+ INDEX ( `jobid` , `personid` ) 
+) ENGINE = InnoDB 
+$$$ 
 
