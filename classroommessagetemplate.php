@@ -59,8 +59,11 @@ $userjobtypes = JobType::getUserJobTypes();
 $jobtypes = array();
 $jobtips = array();
 foreach ($userjobtypes as $id => $jobtype) {
-	$jobtypes[$id] = $jobtype->name;
-	$jobtips[$id] = escapehtml($jobtype->info);
+	// don't show systempriority 1 job types
+	if ($jobtype->systempriority > 1) {
+		$jobtypes[$id] = $jobtype->name;
+		$jobtips[$id] = escapehtml($jobtype->info);
+	}
 }
 
 // get this jobs messagegroup and it's messages
@@ -143,7 +146,7 @@ $formdata[] = _L("Message Template");
 $formdata["fromname"] = array(
 	"label" => _L('From Name'),
 	"fieldhelp" => _L('Recipients will see this name as the sender of the email.'),
-	"value" => $USER->firstname . " " . $USER->lastname,
+	"value" => (isset($messagesbylangcode[$defaultcode])?$messagesbylangcode[$defaultcode]->fromname:$USER->firstname . " " . $USER->lastname),
 	"validators" => array(
 			array("ValRequired"),
 			array("ValLength","max" => 50)
@@ -165,8 +168,6 @@ $formdata["fromemail"] = array(
 	"helpstep" => 5
 );
 
-
-// set the default language first and make it required
 // get the message parts for this message if it exists
 $message = false;
 if (isset($messagesbylangcode[$defaultcode])) {
@@ -174,6 +175,7 @@ if (isset($messagesbylangcode[$defaultcode])) {
 	$parts = DBFindMany("MessagePart","from messagepart where messageid=? order by sequence", false, array($message->id));
 }
 
+// set the default language first and make it required
 $formdata[] = $defaultlanguage;
 $formdata[$defaultcode . "-subject"] = array(
 	"label" => _L("Subject"),
@@ -376,7 +378,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 			$job->createdate = date("Y-m-d H:i:s");
 		$job->modifydate = date("Y-m-d H:i:s");
 		$job->startdate = date("Y-m-d", 86400);
-		$job->enddate = date("Y-m-d", (2 * 86400));
+		$job->enddate = $job->startdate;
 		$job->starttime = $time;
 		$job->endtime = date("H:i", strtotime($time . " + 1 hour"));
 		$job->status = 'repeating';
@@ -422,7 +424,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		$peoplelist->userid = $owner;
 		$peoplelist->type = 'alert';
 		$peoplelist->name = $postdata['name'];
-		$peoplelist->description = "Classroom Messageing Template";
+		$peoplelist->description = "Classroom Messaging Template";
 		$peoplelist->modifydate = date("Y-m-d H:i:s");
 		$peoplelist->deleted = 0;
 		
@@ -466,7 +468,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 // Display
 ////////////////////////////////////////////////////////////////////////////////
 $PAGE = "admin:settings";
-$TITLE = _L('Classroom Messageing Template');
+$TITLE = _L('Classroom Messaging Template');
 
 include_once("nav.inc.php");
 
