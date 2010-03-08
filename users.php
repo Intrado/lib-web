@@ -28,12 +28,15 @@ if (isset($_GET['noprofiles']))
 // Data Handling
 ////////////////////////////////////////////////////////////////////////////////
 if (isset($_GET['download'])) {
-	$userdetails = Query("select u.login, u.accesscode, u.firstname, u.lastname, u.description, u.phone, us.value callerid, u.email, u.aremail, u.enabled, u.lastlogin, u.staffpkey, a.name, a.description profiledescription,
-		(select group_concat(jt.name separator ', ') from jobtype jt, userjobtypes ujt where ujt.jobtypeid = jt.id and ujt.userid = u.id and not jt.deleted) as jobtype,
-		r.fieldnum, r.op, r.val
+	$userdetails = Query("
+		select u.login, u.accesscode, u.firstname, u.lastname, u.description, u.phone, us.value callerid, u.email, u.aremail, u.enabled, u.lastlogin, u.staffpkey, a.name, a.description profiledescription,
+			(select group_concat(jt.name separator ', ') from jobtype jt, userjobtypes ujt where ujt.jobtypeid = jt.id and ujt.userid = u.id and not jt.deleted) as jobtype,
+			(select group_concat(s.skey separator ', ') from userassociation ua2 inner join section s on (ua2.sectionid = s.id) where ua2.type = 'section' and ua2.userid = u.id) as section,
+			(select group_concat(o.orgkey separator ', ') from userassociation ua3 inner join organization o on (ua3.organizationid = o.id) where ua3.type = 'organization' and ua3.userid = u.id) as organization,
+			r.fieldnum, r.op, r.val
 		from user u
-			left join userrule ur on (ur.userid = u.id)
-			left join rule r on (r.id = ur.ruleid)
+			left join userassociation ua on (u.id = ua.userid and ua.type = 'rule')
+			left join rule r on (ua.ruleid = r.id)
 			left join access a on (a.id = u.accessid)
 			left join usersetting us on (us.userid = u.id and us.name = 'callerid')
 		where not u.deleted and u.login != 'schoolmessenger'");
@@ -44,7 +47,7 @@ if (isset($_GET['download'])) {
 	header("Content-disposition: attachment; filename=users.csv");
 	header("Content-type: application/vnd.ms-excel");
 	// echo out the data
-	echo '"login","accesscode","firstname","lastname","description","phone","callerid","email","aremail","enabled","lastlogin","staffpkey","profile name","profile description","jobtypes","fieldnum","op","val"' . "\n";
+	echo '"login","accesscode","firstname","lastname","description","phone","callerid","email","aremail","enabled","lastlogin","staffpkey","profile name","profile description","jobtypes","sections","organizations","fieldnum","op","val"' . "\n";
 	while ($row = $userdetails->fetch(PDO::FETCH_ASSOC))
 		echo '"' . implode('","', $row) . '"' . "\n";
 	exit;
