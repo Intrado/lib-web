@@ -45,6 +45,9 @@ class Job extends DBMappedObject {
 	
 		// copy the message group
 		$newmessagegroup = new MessageGroup($messagegroupid);
+		$newmessagegroup->name .= ' (Copy)';
+		if (strlen($newmessagegroup->name) > 40)
+			$newmessagegroup->name = substr($newmessagegroup->name,0,39) . "... ";
 		$newmessagegroup->id = null;
 		$newmessagegroup->create();
 
