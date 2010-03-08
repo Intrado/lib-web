@@ -292,16 +292,18 @@ function list_prepare_ajax_table($containerID, $renderedlist) {
 	}
 
 	$allFieldmaps = FieldMap::getMapNames();
+	$firstnamefield = FieldMap::getFirstNameField();
+	$lastnamefield = FieldMap::getLastNameField();
 	$titles = array(
 		0 => "In List",
 		2 => "ID #",
-		3 => $allFieldmaps[$renderedlist->firstname],
-		4 => $allFieldmaps[$renderedlist->lastname]
+		3 => $allFieldmaps[$firstnamefield],
+		4 => $allFieldmaps[$lastnamefield]
 	);
 	$sorting = array(
 		2 => "pkey",
-		3 => $renderedlist->firstname,
-		4 => $renderedlist->lastname
+		3 => $firstnamefield,
+		4 => $lastnamefield
 	);
 	$formatters = array(
 		0 => "fmt_checkbox",
@@ -340,24 +342,24 @@ function list_prepare_ajax_table($containerID, $renderedlist) {
 		$groupBy = 1;
 	} else {
 		$authorizedFieldmaps = FieldMap::getAuthorizedMapNames();
-		if (isset($authorizedFieldmaps[$renderedlist->language])) {
-			$titles[5] = $authorizedFieldmaps[$renderedlist->language];
-			$sorting[5] = $renderedlist->language;
+		$languagefield = FieldMap::getLanguageField();
+		if (isset($authorizedFieldmaps[$languagefield])) {
+			$titles[5] = $authorizedFieldmaps[$languagefield];
+			$sorting[5] = $languagefield;
 		}
 	}
 
-	$orderbySQL = ajax_table_get_orderby($containerID, $sorting);
-	if (!empty($orderbySQL))
-		$renderedlist->orderby = $orderbySQL;
+	//$orderbySQL = ajax_table_get_orderby($containerID, $sorting);
+	//if (!empty($orderbySQL))
+	//	$renderedlist->orderby = $orderbySQL;
 
-	$renderedlist->hasstats = false;
 
 	if (!isset($_SESSION['ajaxtablepagestart']) || !isset($_GET['ajax']))
 		$_SESSION['ajaxtablepagestart'] = array();
 	if (isset($_GET['start']) && isset($_GET['containerID']))
 		$_SESSION['ajaxtablepagestart'][$_GET['containerID']] = $_GET['start'] + 0;
 
-	$data = $renderedlist->getPage(isset($_SESSION['ajaxtablepagestart'][$containerID]) ? $_SESSION['ajaxtablepagestart'][$containerID] : 0, $renderedlist->pagelimit);
+	$data = $renderedlist->getPageData();
 
 	if (empty($data)) {
 		if ($containerID == 'listSearchContainer')
@@ -366,13 +368,13 @@ function list_prepare_ajax_table($containerID, $renderedlist) {
 			return _L('Nobody in your list!');
 	}
 
-	return ajax_table_show_menu($containerID, $renderedlist->total, $renderedlist->pageoffset, $renderedlist->pagelimit) 
+	return ajax_table_show_menu($containerID, $renderedlist->total, $renderedlist->pageoffset, $renderedlist->pagelimit)
 		. ajax_show_table($containerID, $data, $titles, $formatters, $sorting, isset($repeatedColumns) ? $repeatedColumns : false, isset($groupBy) ? $groupBy : false, ($searchable ? 3 : 0), ($searchable ? true : false), ($searchable ? false : true));
 }
 
 function list_get_results_html($containerID, $renderedlist) {
 	$resultsHtml = list_prepare_ajax_table($containerID, $renderedlist);
-	if (empty($renderedlist->pageids))
+	if (!$renderedlist->getTotal())
 		return _L("No results");
 	return $resultsHtml;
 }
