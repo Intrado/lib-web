@@ -21,7 +21,7 @@ function insertNewWizEasyCall(formitemname, maincontainerid, langselect, langcod
 
 	// insert a new container for the language at the end of the content element
 	$(maincontainerid).insert({ "bottom":
-		new Element("div",{ id: maincontainerid+"_"+langcode, class: "wizeasycallcontainer" })
+		new Element("div",{ id: maincontainerid+"_"+langcode, "className": "wizeasycallcontainer" })
 	});
 
 	// set the selector to index 0
@@ -70,13 +70,13 @@ var WizEasyCall = Class.create(EasyCall,{
 
 		// add the language name and an action element
 		$(this.containerid+"_callcontrol").insert({ "before":
-			new Element("div",{id: this.containerid+"_action", class: "wizeasycallaction"})
+			new Element("div",{id: this.containerid+"_action", "className": "wizeasycallaction"})
 		});
 
 		// if there is more than 1 audofile, display the title
 		if (totalaudiofiles > 1) {
 			$(this.containerid+"_action").insert({ "before":
-				new Element("div", { class: "wizeasycalllanguage"}).update(
+				new Element("div", { "className": "wizeasycalllanguage"}).update(
 					(this.langcode == "en")?"Default":languages[this.langcode]
 				)
 			});
@@ -114,11 +114,11 @@ var WizEasyCall = Class.create(EasyCall,{
 		// display the language and add an action div
 		$(this.containerid).update();
 		$(this.containerid).insert(
-				new Element("div", { class: "wizeasycalllanguage"}).update(
+				new Element("div", { "className": "wizeasycalllanguage"}).update(
 					(this.langcode == "en")?"Default":languages[this.langcode]
 				)
 			).insert(
-				new Element("div", {id: this.containerid+"_action", class: "wizeasycallaction"}).insert(
+				new Element("div", {id: this.containerid+"_action", "className": "wizeasycallaction"}).insert(
 					this.getPlayButton()
 				).insert(
 					this.getReRecordButton()
@@ -130,7 +130,7 @@ var WizEasyCall = Class.create(EasyCall,{
 			$(this.containerid+"_action").insert(this.getRemoveButton());
 
 		// JobWizard EasyCall gets a bottom border
-		$(this.containerid).insert(new Element("div", {class: "easycallunderline"}));
+		$(this.containerid).insert(new Element("div", {"className": "easycallunderline"}));
 
 		// show the language select element
 		$(this.formitemname+"_altlangs").show();
