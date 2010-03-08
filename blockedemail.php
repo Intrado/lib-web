@@ -111,7 +111,7 @@ function fmt_blocking_actions($row, $index) {
 
 function fmt_blockedby($row, $index) {
 	if ($row[$index])
-		return $row[$index];
+		return escapehtml($row[$index]);
 	else if ($row[9] == "autoblock")
 		return "Auto-Blocked";
 	return "Recipient";
