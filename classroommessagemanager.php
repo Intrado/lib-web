@@ -39,8 +39,7 @@ if (isset($_GET['enable']) && isset($_GET['id'])) {
 	$items = QuickQuery("select count(*) from targetedmessage where targetedmessagecategoryid = ? and deleted = 0",false,array($_GET['deletecategoryid']));
 
 	if($items === "0")
-		QuickUpdate("update targetedmessagecategory set deleted=1 where id=? and SUBSTRING(messagekey,0,6) == 'custom'",false,array($_GET['deletecategoryid']));
-
+		QuickUpdate("update targetedmessagecategory set deleted=1 where id=?",false,array($_GET['deletecategoryid']));
 
 	//echo json_encode($items === "0" && QuickUpdate("delete from targetedmessagecategory where id=?",false,array($_GET['deletecategoryid'])));
 	echo json_encode($items === "0");
