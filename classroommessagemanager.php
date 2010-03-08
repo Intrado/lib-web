@@ -284,7 +284,7 @@ function updatecategory(category, actioninfo) {
 					var row = new Element('tr');
 					if(i%2)
 						row.addClassName("listAlt");
-					row.insert(new Element('td',{align:"right"}).update(new Element('input',{id:'enable-' + item.id,type:'checkbox',checked:item.enabled,onclick:'updateenabled(this);return false;'})));
+					row.insert(new Element('td',{align:"right"}).update('<input id="enable-' + item.id + '" type="checkbox" ' + (item.enabled?'checked':'') + ' onclick="updateenabled(this);return false;" />'));
 					row.insert(new Element('td').update(item.title));
 					row.insert(new Element('td',{style:"white-space: nowrap;"}).update(
 					'<a href="classroommessageedit.php?id=' + item.id + '"  class="actionlink" title="Edit" ><img src="img/icons/pencil.gif" alt="Edit">Edit</a>' + (item.deletable?'&nbsp;|&nbsp;<a id="delete-' + item.id + '" href="#"  class="actionlink" title="delete" onclick="deletemessage(' + category + ',this); return false;" ><img src="img/icons/cross.gif" alt="delete">Delete</a>':'') + '&nbsp;|&nbsp;<select id="move-' + item.id + '" onchange="move(' + category + ',this)"/>' + options + '</select>'
