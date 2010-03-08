@@ -109,6 +109,11 @@ function fmt_dmmethod($row, $index){
 	}
 }
 
+function fmt_smsoptin($row, $index){
+	if ($row[$index])
+		return "yes";
+	return "";
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 // request handling
@@ -240,6 +245,7 @@ foreach ($customers as $cust) {
 		$row[20] = getCustomerSystemSetting('autoreport_replyemail', false, true, $custdb);
 		$row[21] = $shardinfo[$cust[1]][3];
 		$row[22] = $cust[7]; //enabled
+		$row[23] = getCustomerSystemSetting('enablesmsoptin', false, true, $custdb);
 		$data[] = $row;
 	}
 }
@@ -268,6 +274,7 @@ $titles = array("0" => "#ID",
 		"15" => "@#Inbound",
 		"16" => "@#Has Flex DM",
 		"11" => "#DM Method",
+		"23" => "@#SMS Opt-in",
 		"10" => "#Features",
 		"7" => "#Max Users",
 		"8" => "#Users",
@@ -289,6 +296,7 @@ $formatters = array("0" => "fmt_custid",
 		"9" => "fmt_jobcount",
 		"Actions" => "fmt_actions",
 		"11" => "fmt_dmmethod",
+		"23" => "fmt_smsoptin",
 		"16" => "fmt_hasdm");
 
 $lockedTitles = array(0, "status", "actions");
