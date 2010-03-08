@@ -499,7 +499,11 @@ $helpsteps[] = _L("Enter a name for your job. Using a descriptive name that indi
 			"label" => _L('Max Attempts'),
 			"fieldhelp" => ("This features allows you to override the number that will display on recipient's Caller IDs."),
 			"value" => $job->getOptionValue("maxcallattempts"),
-			"validators" => array(array("ValRequired")),
+			"validators" => array(
+				array("ValRequired"),
+				array("ValNumeric"),
+				array("ValNumber", "min" => 1, "max" => $maxattempts)
+			),
 			"control" => array("SelectMenu", "values" => $attempts),
 			"helpstep" => 6
 		);
