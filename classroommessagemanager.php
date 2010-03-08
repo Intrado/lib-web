@@ -51,7 +51,7 @@ $categoriesjson = array();
 
 foreach($categories as $category) {
 	$obj = null;
-	$obj->name = $category["name"];
+	$obj->name = escapehtml($category["name"]);
 	if(isset($category["image"]) && isset($classroomcategoryicons[$category["image"]]))
 		$obj->img = "img/icons/" . $classroomcategoryicons[$category["image"]]  . ".gif";
 	else
@@ -117,7 +117,7 @@ if($ajax === true) {
 		$data->list[] = array(
 			"id" => $item["id"],
 			"enabled" => ($item["enabled"]==1),
-			"title" => $title,
+			"title" => escapehtml($title),
 			"deletable" => (substr($item["messagekey"],0,6) == "custom")
 		);
 	}
