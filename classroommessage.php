@@ -346,7 +346,10 @@ endWindow();
 	var timetocutoff = new Date(<?= (strtotime($cutoff)) . '000' ?>).getTime() / 1000;
 
 	function load_saved_tab() {
-		tabs.show_section('lib-<?=  $USER->getSetting("classroomtab", "search") ?>');
+		var saved_tab = 'lib-<?=  $USER->getSetting("classroomtab", "search") ?>';
+		if(tabs.sections[saved_tab] == undefined)
+			saved_tab = 'lib-search';	
+		tabs.show_section(saved_tab);
 	}
 </script>
 <?
