@@ -69,17 +69,6 @@ class RenderedList2 {
 		$this->searchphone = $searchphone;
 		$this->searchemail = $searchemail;
 	}
-
-	function prepareAdditionsMode () {
-		$this->mode = "add";
-		$this->pagepersonids = false;
-	}
-
-	function prepareSkipsMode () {
-		$this->mode = "remove";
-		$this->pagepersonids = false;
-
-	}
 	
 	function setOrder ($field1, $desc1 = false, $field2 = false, $desc2 = false, $field3 = false, $desc3 = false) {
 		$this->orderby = array();
@@ -191,17 +180,6 @@ class RenderedList2 {
 						." $rulesql $contactwheresql \n"
 						."$ordersql $limitsql ";
 				
-				break;
-			case "add" || "remove":
-				$leTypeSQL = $this->mode == "add" ? "AND le.type='add'" : "AND le.type='negate'";
-				$query = "select $sqlflags distinct $fieldsql
-					from person p
-					left join listentry le on (le.listid=" . DBSafe($this->listid) . " and p.id=le.personid)
-					where
-						not p.deleted
-						$leTypeSQL
-						$ordersql
-						$limitsql";
 				break;
 		}
 		return $query;
