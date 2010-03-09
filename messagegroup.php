@@ -1,4 +1,4 @@
-<?php
+<?
 ////////////////////////////////////////////////////////////////////////////////
 // Includes
 ////////////////////////////////////////////////////////////////////////////////
@@ -1300,7 +1300,7 @@ include_once('nav.inc.php');
 <script src="script/messagegroup.js.php" type="text/javascript"></script>
 <script src="script/audiolibrarywidget.js.php" type="text/javascript"></script>
 <script type="text/javascript">
-	<?php Validator::load_validators(array("ValDefaultMessage", "ValTranslationItem", "ValDuplicateNameCheck", "ValCallMeMessage", "ValMessageBody", "ValEmailMessageBody", "ValLength", "ValRegExp", "ValEmailAttach")); ?>
+	<? Validator::load_validators(array("ValDefaultMessage", "ValTranslationItem", "ValDuplicateNameCheck", "ValCallMeMessage", "ValMessageBody", "ValEmailMessageBody", "ValLength", "ValRegExp", "ValEmailAttach")); ?>
 </script>
 <link href="css/messagegroup.css" type="text/css" rel="stylesheet">
 <style type='text/css'>
@@ -1312,7 +1312,7 @@ include_once('nav.inc.php');
 	visibility: hidden;
 }
 </style>
-<?php
+<?
 startWindow(_L('Message Editor'));
 
 if (!$messagegroup->deleted) {
@@ -1498,7 +1498,7 @@ if (!$messagegroup->deleted) {
 
 	</script>
 
-	<?php
+	<?
 	}
 
 endWindow();

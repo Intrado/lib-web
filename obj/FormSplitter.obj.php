@@ -1,4 +1,4 @@
-<?php
+<?
 
 
 // NOTE: Putting this class in FormSplitter for now, but SubForm may get refactored out because it adds little to the base Form except a $parentform and $title.

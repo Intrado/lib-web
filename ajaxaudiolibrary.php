@@ -1,4 +1,4 @@
-<?php
+<?
 require_once("inc/common.inc.php");
 require_once("obj/AudioFile.obj.php");
 require_once("inc/securityhelper.inc.php");

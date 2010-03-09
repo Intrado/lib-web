@@ -1,4 +1,4 @@
-<?php
+<?
 
 ///////////////////////////////////////////////////////////////////////////////
 // Authorization:
@@ -281,7 +281,7 @@ if ($popup) {
 	color: rgb(130,130,130);
 }
 </style>
-<?php
+<?
 startWindow(_L('Message Viewer'));
 
 if ($countdestinations > 0) {
@@ -327,7 +327,7 @@ if ($countdestinations > 0) {
 		})();
 
 	</script>
-	<?php
+	<?
 } else {
 	echo '<br/>' . _L('This message is empty.') . '<br/><br/>' . implode('', $buttons) . '<div style="clear:both"></div>';
 }

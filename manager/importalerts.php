@@ -135,13 +135,13 @@ NewForm($f);
 		<td id="actualsizetarget">
 			<?=number_format($import['filesize'])?> (bytes)
 			&plusmn;
-			<?php
+<?
 				NewFormItem($f,$s,"filesizepercent", "selectstart", NULL, NULL, "id='filesizepercent'");
 				for ($i = 10; $i <= 100; $i += 10) {
 					NewFormItem($f,$s,"filesizepercent", "selectoption", $i, $i);
 				}
 				NewFormItem($f,$s,"filesizepercent", "selectend");
-			?>
+?>
 			%
 			<button type='button' onclick='calculateminmax()'>Calculate</button></td></tr>
 	<tr><td colspan=6><input id="filesizechecking" onblur="togglefilesizecheck(true)" onclick="togglefilesizecheck()" type="checkbox"/><label for="filesizechecking">Enable File Size Checking</label></td></tr>
@@ -185,13 +185,13 @@ NewForm($f);
 									<td><? time_select($f, $s, "scheduledtime") ?></td>
 									<td>
 										&plusmn;
-										<?php
+<?
 											NewFormItem($f,$s,"scheduledwindowminutes", "selectstart");
 											for ($i = 10; $i <= 140; $i += 15) {
 												NewFormItem($f,$s,"scheduledwindowminutes", "selectoption", $i, $i);
 											}
 											NewFormItem($f,$s,"scheduledwindowminutes", "selectend");
-											?>
+?>
 											minutes
 									</td>
 								</tr>
@@ -215,7 +215,7 @@ NewForm($f);
 	<tr>
 		<td>Last Notified:</td>
 		<td><?= isset($alertoptions['lastnotified']) ? date("M j, Y g:i a", $alertoptions['lastnotified']) : "--Never--" ?>
-			<?php NewFormItem($f, "Clear", "Clear", "submit"); ?>
+			<? NewFormItem($f, "Clear", "Clear", "submit"); ?>
 		</td>
 	</tr>
 </table>
@@ -233,7 +233,7 @@ if(new getObj('dostaledata').obj.checked){
 	$('staledatamindays').hide();
 }
 
-<?php
+<?
 if (isset($alertoptions['minsize']) || isset($alertoptions['maxsize'])) {
 	print "togglefilesizecheck(false, true);";
 }

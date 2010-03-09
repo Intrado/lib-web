@@ -1,4 +1,4 @@
-<?php
+<?
 
 // TODO: Perhaps FormTabber should not extend Form because FormTabber only contains child forms.
 class FormTabber extends Form {

@@ -1,4 +1,4 @@
-<?php
+<?
 
 class SectionWidget extends FormItem {
 	function render($value) {

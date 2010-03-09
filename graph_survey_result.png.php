@@ -1,10 +1,8 @@
-<?php
-
+<?
 
 include_once("inc/common.inc.php");
 include_once("inc/securityhelper.inc.php");
 include_once("obj/Job.obj.php");
-
 
 include ("jpgraph/jpgraph.php");
 include ("jpgraph/jpgraph_bar.php");

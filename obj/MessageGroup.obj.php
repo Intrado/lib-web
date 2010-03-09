@@ -1,4 +1,4 @@
-<?php
+<?
 class MessageGroup extends DBMappedObject {
 	var $userid;
 	var $type = 'notification'; // enum('notification','targetedmessage','classroomtemplate')

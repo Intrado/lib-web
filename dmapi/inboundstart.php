@@ -1,4 +1,4 @@
-<?php
+<?
 include_once("inboundutils.inc.php");
 
 global $BFXML_VARS;

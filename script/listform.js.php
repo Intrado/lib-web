@@ -1,4 +1,4 @@
-<?php
+<?
 require_once("../inc/subdircommon.inc.php");
 require_once("../inc/html.inc.php");
 

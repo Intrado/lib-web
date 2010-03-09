@@ -1,4 +1,4 @@
-<?php
+<?
 require_once("inc/common.inc.php");
 require_once("obj/FieldMap.obj.php");
 require_once("obj/PeopleList.obj.php");

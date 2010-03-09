@@ -1,21 +1,4 @@
-<?php
-
-/*
-
-schema for reportschedule table
-
-CREATE TABLE `reportschedule` (
-  `ID` int(11) NOT NULL auto_increment,
-  `Name` varchar(20) NOT NULL default '',
-  `Shared` tinyint(4) NOT NULL default '0',
-  `NextRun` datetime NOT NULL default '0000-00-00 00:00:00',
-  `ScheduleType` enum('T','C','E','A','AE') NOT NULL default 'T',
-  `CallScheduleID` int(11) default NULL,
-  PRIMARY KEY  (`ID`),
-  KEY `NextRun` (`NextRun`,`ScheduleType`,`ID`)
-) TYPE=MyISAM
-
-*/
+<?
 
 class ReportSchedule extends DBMappedObject {
 

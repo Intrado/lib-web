@@ -1,4 +1,4 @@
-<?php
+<?
 class ListForm extends Form {
 	function ListForm ($name) {
 		global $USER;

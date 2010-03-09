@@ -1,4 +1,4 @@
-<?php
+<?
 include_once("common.inc.php");
 include_once("../inc/securityhelper.inc.php");
 include_once("../obj/Job.obj.php");

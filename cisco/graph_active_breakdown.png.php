@@ -1,4 +1,4 @@
-<?php
+<?
 include_once("common.inc.php");
 
 include ("../jpgraph/jpgraph.php");

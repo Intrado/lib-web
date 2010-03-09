@@ -1,4 +1,4 @@
-<?php
+<?
 include_once("inc/common.inc.php");
 include_once("inc/securityhelper.inc.php");
 include_once("inc/content.inc.php");
