@@ -16,7 +16,7 @@ if($PERSONID){
 			<th align="left"><?=_L("Destination")?></th>
 <?
 			foreach($jobtypes as $jobtype){
-				?><th><?=jobtype_info($jobtype)?></th><?
+				?><th><?=escapehtml($jobtype->name)?></th><?
 			}
 ?>
 		</tr>
@@ -53,7 +53,7 @@ if($PERSONID){
 				<th align="left">Destination</th>
 <?
 				foreach($jobtypes as $jobtype){
-					?><th><?=jobtype_info($jobtype)?></th><?
+					?><th><?=escapehtml($jobtype->name)?></th><?
 				}
 ?>
 			</tr>
@@ -91,7 +91,7 @@ if($PERSONID){
 					<th align="left"><?=_L("Destination")?></th>
 <?
 					foreach($jobtypes as $jobtype){
-						?><th><?=jobtype_info($jobtype)?></th><?
+						?><th><?=escapehtml($jobtype->name)?></th><?
 					}
 ?>
 				</tr>
