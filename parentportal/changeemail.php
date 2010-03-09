@@ -78,7 +78,7 @@ $TITLE = _L("Change Email");
 include_once("nav.inc.php");
 
 if($success){
-	startWindow(_L('Change Email') . help("Changeemail"));
+	startWindow(_L('Change Email'));
 	?>
 	<div style="margin:5px"><?=_L("You should receive an email shortly at the new address with a confirmation code.")?></div>
 	<form method='POST' action="index.php?c" name="activate" id="activate">
@@ -103,7 +103,7 @@ if($success){
 	NewForm($f);
 	if(!$success)
 		buttons(submit($f, $s, _L('Submit')), button(_L("Cancel"), NULL, "start.php"));
-	startWindow(_L('Change Email') . help("Changeemail"));
+	startWindow(_L('Change Email'));
 ?>
 	<table>
 		<tr>
