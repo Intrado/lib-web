@@ -152,18 +152,97 @@ if ($method === 'sections') {
 	);
 }
 
-$formdata["additions"] = array(
-	"label" => _L('Additions'),
-	"control" => array("FormHtml", 'html' => '<div id="removeAllAdditions" style="float:left; margin:0;margin-top:3px;"></div><div id="listAdditionsContainer" style="margin:0; margin-bottom:10px; padding:0"></div>'),
-	"helpstep" => 2
-);
+if ($showAdditions) {
+	$pagestart = (isset($_GET['pagestart']) ? $_GET['pagestart'] + 0 : 0);
+	$pagelimit = 100;
+	
+	$query = "select SQL_CALC_FOUND_ROWS p.id, p.pkey, p.f01, p.f02 
+			from person p inner join listentry le 
+				on (le.personid=p.id and le.type='add' and le.listid=?) 
+			order by f02, f01
+			limit $pagestart, $pagelimit";
+	$data = QuickQueryMultiRow($query,false,false,array($list->id));
+	
+	//add all found IDs to $PAGEINLISTMAP
+	$PAGEINLISTMAP = array();
+	foreach ($data as $row)
+		$PAGEINLISTMAP[$row[0]] = true;
+	
+	$total = QuickQuery("select found_rows()");
+	$titles = array(
+		0 => "In List",
+		1 => "Unique ID",
+		2 => FieldMap::getName(FieldMap::getFirstNameField()),
+		3 => FieldMap::getName(FieldMap::getLastNameField())
+	);
+	
+	$formatters = array (
+		0 => "fmt_checkbox",
+		1 => "fmt_persontip"
+	);
+	
+	ob_start();
+	showPageMenu($total,$pagestart,$pagelimit);
+	echo '<div style="margin-bottom: 10px;">';
+	if(count($data) > 8)
+		echo '<div class="scrollTableContainer">';
+	echo '<table id="listadds" width="100%" cellpadding="3" cellspacing="1" class="list">';
+	showTable($data, $titles, $formatters);
+	echo "\n</table>";
+	if(count($data) > 8)
+		echo '</div>';
+	echo '</div>';
+	//second page menu confusing
+	//showPageMenu($total,$pagestart,$pagelimit);
+	$additionshtml = ob_get_clean();
+	
+	$formdata["additions"] = array(
+		"label" => _L('Additions'),
+		"control" => array("FormHtml", 'html' => $additionshtml),
+		"helpstep" => 2
+	);
+}
 
-$formdata["skips"] = array(
-	"label" => _L('Skips'),
-	"control" => array("FormHtml", 'html' => '<div id="removeAllSkips" style="float:left; margin:0;margin-top:3px;"></div><div id="listSkipsContainer" style="margin:0;padding:0"></div>'),
-	"helpstep" => 2
-);
 
+if ($showSkips) {
+	$query = "select p.id, p.pkey, p.f01, p.f02 
+			from person p inner join listentry le 
+				on (le.personid=p.id and le.type='negate' and le.listid=?)
+			order by f02, f01";
+	$data = QuickQueryMultiRow($query,false,false,array($list->id));
+	
+	//add all found IDs to $PAGEINLISTMAP
+	$PAGEINLISTMAP = array();
+	
+	$total = count($data);
+	$titles = array(
+		0 => "In List",
+		1 => "Unique ID",
+		2 => FieldMap::getName(FieldMap::getFirstNameField()),
+		3 => FieldMap::getName(FieldMap::getLastNameField())
+	);
+	
+	$formatters = array (
+		0 => "fmt_checkbox",
+		1 => "fmt_persontip"
+	);
+	ob_start();
+	echo '<div class="pagenav" style="text-align:right;"> Showing '.$total.' records.</div>';
+	if(count($data) > 8)
+		echo '<div class="scrollTableContainer">';
+	echo '<table id="listadds" width="100%" cellpadding="3" cellspacing="1" class="list">';
+	showTable($data, $titles, $formatters);
+	echo "\n</table>";
+	if(count($data) > 8)
+		echo '</div>';
+	$skipshtml = ob_get_clean();
+	
+	$formdata["skips"] = array(
+		"label" => _L('Skips'),
+		"control" => array("FormHtml", 'html' => $skipshtml),
+		"helpstep" => 2
+	);
+}
 $advancedtools = '<tr class="listHeader"><th style="text-align:left">' . _L("Tool") . '</th><th style="text-align:left">' . _L("Description") . '</th></tr>';
 $advancedtools .= '<tr><td>'.submit_button(_L('Enter Contacts'),'manualAdd').'</td><td>'._L('Manually type in new contacts').'</td></tr>';
 $advancedtools .= '<tr class="listAlt"><td>'.submit_button(_L('Open Address Book'),'addressBookAdd').'</td><td>'._L('Choose from contacts you manually typed into your personal address book').'</td></tr>';
@@ -413,32 +492,7 @@ endWindow();
 			ruleWidget.container.observe('RuleWidget:DeleteRule', list_delete_rule);
 			ruleWidget.container.observe('RuleWidget:RemoveAllRules', list_clear_rules);
 		}
-		
-		$('listAdditionsContainer').up('tr').hide();
-		$('listSkipsContainer').up('tr').hide();
-		
-		<?php if ($showAdditions) { ?>
-			if ($('listAdditionsContainer')) {
-				$('listAdditionsContainer').up('tr').show();
-				$('listAdditionsContainer').update('<?=addslashes(list_get_results_html('listAdditionsContainer', $renderedlist))?>');
-			}
-		<?php } ?>
 
-		<?php if ($showSkips) { ?>
-			if ($('listSkipsContainer')) {
-				$('listSkipsContainer').up('tr').show();
-				$('listSkipsContainer').update('<?=addslashes(list_get_results_html('listSkipsContainer', $renderedlist))?>');
-			}
-		<?php } ?>
-
-		$('removeAllAdditions').insert(action_link('<?=addslashes(_L("Remove All Additions"))?>', 'diagona/16/101', 'removeAllAdditionsLink').observe('click', function(event) {
-			form_submit(event, 'clearadditions');
-		}).setStyle({'margin':'0'}));
-		$('removeAllAdditions').down('img').remove(); // no icon necessary
-		$('removeAllSkips').insert(action_link('<?=addslashes(_L("Remove All Skips"))?>', 'diagona/16/101', 'removeAllSkipsLink').observe('click', function(event) {
-			form_submit(event, 'clearskips');
-		}).setStyle({'margin':'0'}));
-		$('removeAllSkips').down('img').remove(); // no icon necessary
 	});
 </script>
 <?
