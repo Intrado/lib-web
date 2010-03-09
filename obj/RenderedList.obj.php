@@ -133,7 +133,7 @@ class RenderedList2 {
 							."where not p.deleted )\n"
 							."$ordersql $limitsql ";
 				} else {
-					$query = "select $sqlflags null from dual where 0"; //dual is the mysql dummy table, used to update SQL_CALC_FOUND_ROWS
+					$query = "select $sqlflags null as id from dual where 0"; //dual is the mysql dummy table, used to update SQL_CALC_FOUND_ROWS
 				}
 				
 				break;
