@@ -29,7 +29,7 @@ if(isset($method)){
 }
 
 if (isset($_GET['id'])) {
-	$personid = DBSafe($_GET['id']);
+	$personid = $_GET['id'] + 0;
 	if ($personid == "") {
 		// bad
 		redirect('unauthorized.php');
@@ -40,6 +40,12 @@ if (isset($_GET['id'])) {
 		// bad
 		redirect('unauthorized.php');
 	}
+	
+	//check to see if trying to viewcontact on a person this user created, and redirect to addressbook edit
+	$person = new Person($personid);
+	if ($person->userid == $USER->id)
+		redirect("addressedit.php?id=$personid&origin=preview");
+	
 	$_SESSION['currentpid'] = $personid;
 	if (!isset($_GET['ajax']))
 		redirect();
