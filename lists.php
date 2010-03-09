@@ -86,8 +86,9 @@ if (isset($_GET['ajax'])) {
 			if(isset($item["lastused"]))
 				$content .= 'This list was last used: <i>' . date("M j, g:i a",strtotime($item["lastused"])) . "</i>";
 			else
-				$content .= 'This list has never been used ';
-			$content .= " and has " . listcontacts($itemid,"list") . '</a>';
+				$content .= 'This list has never been used';
+			//$content .= " and has " . listcontacts($itemid,"list") . '</a>';
+			$content .= '</a>';
 			$tools = action_links (
 				action_link("Edit", "pencil", "list.php?id=$itemid"),
 				action_link("Preview", "application_view_list", "showlist.php?id=$itemid"),
@@ -116,6 +117,7 @@ if (isset($_GET['ajax'])) {
 // Display Functions
 ////////////////////////////////////////////////////////////////////////////////
 
+/* DO NOT USE */
 function listcontacts ($obj,$name) {
 	$lists = array();
 	if($name == "job") {
