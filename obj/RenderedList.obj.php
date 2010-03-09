@@ -133,7 +133,12 @@ class RenderedList2 {
 							."where not p.deleted )\n"
 							."$ordersql $limitsql ";
 				} else {
-					$query = "select $sqlflags null as id from dual where 0"; //dual is the mysql dummy table, used to update SQL_CALC_FOUND_ROWS
+					//with no rules/orgs/sections, just use manual adds, if any
+					$query = "select $sqlflags $fieldsql from person p \n"
+							."	inner join listentry le on \n"
+							."		(p.id = le.personid and le.listid=" . $this->listid . " and le.type='add') \n"
+							."where not p.deleted\n"
+							."$ordersql $limitsql ";
 				}
 				
 				break;
@@ -336,21 +341,29 @@ class RenderedList2 {
 		else
 			$owneruser = new User($list->userid);
 		
-		$joinsql = $owneruser->getPersonAssociationJoinSql($organizationids, $sectionids, "p");
-		$rulesql = $owneruser->getRuleSql($this->rules, "p");
-			
-		$query = "(select p.id, 'rule' as entrytype from person p \n"
-				."	$joinsql \n"
-				."	left join listentry le on \n"
-				."		(p.id = le.personid and le.listid=" . $list->id . ") \n" //skip anyone that is directly referenced, add or negate
-				."	where not p.deleted and p.userid is null and le.type is null \n"
-				."	and p.id in ($pagepidcsv) \n"
-				." $rulesql ) \n"
-				." UNION ALL \n"
-				."(select p.id, 'add' as entrytype from person p \n"
-				."	inner join listentry le on \n"
-				."		(p.id = le.personid and le.listid=" . $list->id . " and le.type='add') \n"
-				."where not p.deleted and p.id in ($pagepidcsv) )\n";
+		
+		
+		if (count($organizationids) > 0 || count($sectionids) > 0 || count($rules) > 0) {
+			$joinsql = $owneruser->getPersonAssociationJoinSql($organizationids, $sectionids, "p");
+			$rulesql = $owneruser->getRuleSql($rules, "p");
+			$query = "(select p.id, 'rule' as entrytype from person p \n"
+					."	$joinsql \n"
+					."	left join listentry le on \n"
+					."		(p.id = le.personid and le.listid=" . $list->id . ") \n" //skip anyone that is directly referenced, add or negate
+					."	where not p.deleted and p.userid is null and le.type is null \n"
+					."	and p.id in ($pagepidcsv) \n"
+					." $rulesql ) \n"
+					." UNION ALL \n"
+					."(select p.id, 'add' as entrytype from person p \n"
+					."	inner join listentry le on \n"
+					."		(p.id = le.personid and le.listid=" . $list->id . " and le.type='add') \n"
+					."where not p.deleted and p.id in ($pagepidcsv) )\n";
+		} else {
+			$query = "select p.id, 'add' as entrytype from person p \n"
+					."	inner join listentry le on \n"
+					."		(p.id = le.personid and le.listid=" . $list->id . " and le.type='add') \n"
+					."where not p.deleted and p.id in ($pagepidcsv)\n";
+		}
 		
 		return $this->pageinlistmap[$list->id] = QuickQueryList($query,true);
 	}
