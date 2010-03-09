@@ -321,12 +321,17 @@ function upgrade_7_5 ($rev, $shardid, $customerid, $db) {
 			// upgrade from rev 9 to rev 10
 			echo "|";
 			apply_sql("upgrades/db_7-5_pre.sql",$customerid,$db, 10);
-			
+
+			if (!isset($schoolfieldnum) || !$schoolfieldnum) {
+				$schoolfieldnum = QuickQuery("select value from setting where name='_schoolfieldnum'");
+			}
 			if (isset($schoolfieldnum) && $schoolfieldnum) {
 				$num = substr($schoolfieldnum,1) +0;
 				
-				//insert $schoolfieldnum into customer settings in case we need it in future revs
-				QuickUpdate("insert into setting (name, value) values ('_schoolfieldnum',$schoolfieldnum)");
+				if (!QuickQuery("select count(*) from setting where name='_schoolfieldnum'")) {
+					//insert $schoolfieldnum into customer settings in case we need it in future revs
+					QuickUpdate("insert into setting (name, value) values ('_schoolfieldnum',$schoolfieldnum)");
+				}
 	
 				//create orgs for each school field
 				if ($schoolfieldnum[0] == "g")
