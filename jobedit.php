@@ -4,9 +4,8 @@
 ////////////////////////////////////////////////////////////////////////////////
 $job = null;
 if (isset($_GET['id'])) {
-	$job = new Job($_GET['id'] + 0);
-	//if ($job->type == "survey")
-	//	redirect("survey.php?id=" . ($_GET['id'] + 0));
+	if($_GET['id'] !== "new" && !userOwns("job",$_GET['id']))
+		redirect('unauthorized.php');
 	setCurrentJob($_GET['id']);
 	redirect();
 }
@@ -24,6 +23,8 @@ if ($_SESSION['jobid'] == NULL) {
 	$job = Job::jobWithDefaults();
 } else {
 	$job = new Job($_SESSION['jobid']);
+	if($job->type != "notification")
+		redirect('unauthorized.php');
 	$completedmode = in_array($job->status, array('complete','cancelled','cancelling'));
 	$submittedmode = ($completedmode || in_array($job->status,array('active','procactive','processing','scheduled')));
 }
