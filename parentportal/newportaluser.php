@@ -67,6 +67,10 @@ if ((strtolower($_SERVER['REQUEST_METHOD']) == 'post') ) {
 		error(_L("Zip code must be a 5 digit number"));
 	} else if(strlen($zipcode) != 5){
 		error(_L("Zip code must be a 5 digit number"));
+	} else if(strlen($firstname) == 0){
+		error(_L("You must enter a First Name"));
+	} else if(strlen($lastname) == 0){
+		error(_L("You must enter a Last Name"));
 	} else if($_POST['password1'] == ""){
 		error(_L("You must enter a password"));
 	} else if($password1 != $password2){
