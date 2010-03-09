@@ -36,8 +36,9 @@ if(isset($_POST["submit"])) {
 		error_log("Manager login by $login");
 		$_SESSION['aspadminuserid'] = $id;
 		
-		$_SESSION['expiretime'] = time() + 60*30; //30 minutes
-
+		$autologoutminutes = isset($SETTINGS['feature']['autologoutminutes']) ? $SETTINGS['feature']['autologoutminutes'] : 30;
+		$_SESSION['expiretime'] = time() + 60*$autologoutminutes; //30 minutes
+	
 		redirect("/$login/manager/customers.php");
 	} else {
 		$badlogin = true;

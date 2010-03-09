@@ -49,7 +49,8 @@ if(!isset($isasplogin)){
 	}
 	
 	//refresh idle timer
-	$_SESSION['expiretime'] = time() + 60*30; //30 minutes
+	$autologoutminutes = isset($SETTINGS['feature']['autologoutminutes']) ? $SETTINGS['feature']['autologoutminutes'] : 30;
+	$_SESSION['expiretime'] = time() + 60*$autologoutminutes; //30 minutes
 }
 
 ?>
