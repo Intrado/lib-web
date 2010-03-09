@@ -544,7 +544,7 @@ function setDefaultFieldValue(value, event) {
 }
 
 // @param textbox, can also be an ID.
-function pickDate (textbox, allowPast, allowFuture, closeOnBlur) {
+function pickDate (textbox, allowPast, allowFuture, closeOnBlur, afterClose) {
 	var element = $(textbox);
 
 	var filter = new DatePickerFilter();
@@ -558,7 +558,8 @@ function pickDate (textbox, allowPast, allowFuture, closeOnBlur) {
 		enableCloseOnBlur: closeOnBlur ? true : false,
 		topOffset:20,
 		relativePosition: true,
-		dateFilter: filter
+		dateFilter: filter,
+		afterClose: afterClose
 	});
 }
 
