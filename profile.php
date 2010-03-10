@@ -43,6 +43,9 @@ if (isset($_GET['id'])) {
 
 
 class RestrictedFields extends FormItem {
+	var $clearonsubmit = true;
+	var $clearvalue = array();
+	
 	function render ($value) {
 		$n = $this->form->name."_".$this->name;
 

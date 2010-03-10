@@ -4,6 +4,8 @@ abstract class FormItem {
 	var $form;
 	var $name;
 	var $args;
+	var $clearonsubmit = false;
+	var $clearvalue = false;
 
 	function FormItem ($form, $name,$args) {
 		$this->form = $form;
@@ -59,6 +61,9 @@ class PasswordField extends FormItem {
 }
 
 class CheckBox extends FormItem {
+	var $clearonsubmit = true;
+	var $clearvalue = false;
+	
 	function render ($value) {
 		$n = $this->form->name."_".$this->name;
 		return '<input id="'.$n.'" name="'.$n.'" type="checkbox" value="true" '. ($value ? 'checked' : '').' />';
@@ -139,6 +144,9 @@ class MultiSelect extends FormItem {
 }
 
 class MultiCheckBox extends FormItem {
+	var $clearonsubmit = true;
+	var $clearvalue = array();
+	
 	function render ($value) {
 		$n = $this->form->name."_".$this->name;
 		$style = isset($this->args['height']) ? ('style="height: ' . $this->args['height'] . '; overflow: auto;"') : '';

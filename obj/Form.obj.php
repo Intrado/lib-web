@@ -84,16 +84,18 @@ class Form {
 			foreach ($this->formdata as $name => $data) {
 				if (is_string($data))
 					continue;
-
-				if (isset($data['control'])) {
-					$controltype = strtolower($data['control'][0]);
-					if ($controltype == "checkbox")
-						$this->formdata[$name]['value'] = false;
-					else if ($controltype == "multicheckbox")
-						$this->formdata[$name]['value'] = array();
-					else if ($controltype == "restrictedfields")
-						$this->formdata[$name]['value'] = array();
-				}
+				
+				// get the form control
+				$control = $data['control'];
+				// get the class of the form control
+				$formclass = $control[0];
+				// create an instance of the form item
+				$item = new $formclass($this, $name, $control);
+				
+				// some form items need to be set to an initial value on submit
+				// check boxes and multicheck boxes don't send post data when they have nothing checked
+				if ($item->clearonsubmit)
+					$this->formdata[$name]['value'] = $item->clearvalue;
 			}
 
 			foreach ($_POST as $name => $value) {
