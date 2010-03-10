@@ -458,7 +458,7 @@
 
 		if(element.hasClassName && element.hasClassName('remarklink')) {
 			if($(c_prefix + 'rem' + msgid).down('textarea').getValue() == '' && $(c_prefix + 'prem' + msgid).innerHTML != '') {
-				if(!confirm('Multiple Remarks. Edeting will replace all previous remarks.'))
+				if(!confirm('Multiple Remarks. Editing will replace all previous remarks.'))
 					return;
 			}
 
