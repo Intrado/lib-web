@@ -482,7 +482,7 @@
 
 			state = (state == 2)? 0 : 2;
 			var textarea = $(c_prefix + 'rem' + msgid).down('textarea');
-			if((state == 0) && (hascomments && textarea.getValue() != '' || $(c_prefix + 'prem' + msgid).innerHTML != '')) {
+			if((state == 0) && hascomments && (textarea.getValue() != '' || $(c_prefix + 'prem' + msgid).innerHTML != '')) {
 				if(!confirm('The custom remark will be removed if unselecting.'))
 					return;
 				else {
