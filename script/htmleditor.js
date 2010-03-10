@@ -137,7 +137,7 @@ function clearHtmlEditorContent() {
 // NOTE: It is assumed that there be only a single html editor on the page; CKEditor is buggy with multiple instances.
 function applyHtmlEditor(textarea) {
 	textarea = $(textarea);
-
+	
 	var editorobject = getHtmlEditorObject();
 	if (!editorobject) {
 		if ($('reusableckeditor'))
@@ -145,10 +145,11 @@ function applyHtmlEditor(textarea) {
 
 		textarea.insert({'before': '<span class="HTMLEditorAjaxLoader"><img src="img/ajax-loader.gif"/> Please wait while the HTML editor loads. </span>'});
 		textarea.hide();
-
+		
 		var reusableckeditor = new Element('div', {'id':'reusableckeditor'});
 		if (document.body) {
 			document.body.insert(new Element('div', {'id':'reusableckeditorhider'}).hide().insert(reusableckeditor));
+			
 			CKEDITOR.replace(reusableckeditor, {
 				'customConfig': '', // Prevent ckeditor from trying to load an external configuration file, should improve startup time.
 				'removePlugins': 'wsc,scayt,smiley,showblocks,flash,elementspath,save',
@@ -178,7 +179,7 @@ function applyHtmlEditor(textarea) {
 		} else {
 			document.observe('dom:loaded', function(event) {
 				applyHtmlEditor(this);
-			}.bindAseventListener(textaera));
+			}.bindAsEventListener(textarea));
 		}
 
 		return;
