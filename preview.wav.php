@@ -82,8 +82,8 @@ if (isset($_GET['usetext']) && isset($_SESSION['ttstext']) && isset($_SESSION['t
 		if(in_array($mediafile, array(
 				"DefaultIntro.wav",
 				"EmergencyIntro.wav",
-				"Spanish/DefaultIntro.wav",
-				"Spanish/EmergencyIntro.wav"
+				"es/DefaultIntro.wav",
+				"es/EmergencyIntro.wav"
 			))) {
 			Message::playParts(array(),"mp3",$mediapath . $mediafile);		
 			exit();
