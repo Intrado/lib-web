@@ -867,7 +867,6 @@ class JobWiz_messageGroupChoose extends WizStep {
 			"value" => "",
 			"validators" => array(
 				array("ValRequired"),
-				array("ValMessageTranslationExpiration"),
 				array("ValInArray","values"=>array_keys($messages))
 			),
 			"control" => array("MessageGroupSelectMenu","width"=>"80%", "values"=>$messages),
