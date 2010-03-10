@@ -26,6 +26,11 @@ require_once("obj/WeekRepeat.val.php");
 require_once("obj/ValLists.val.php");
 require_once("obj/ValTimeWindowCallEarly.val.php");
 require_once("obj/ValTimeWindowCallLate.val.php");
+require_once("obj/MessageGroup.obj.php");
+require_once("obj/Message.obj.php");
+require_once("obj/MessagePart.obj.php");
+require_once("obj/Voice.obj.php");
+require_once("inc/translate.inc.php");
 
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization

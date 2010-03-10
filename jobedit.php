@@ -98,22 +98,31 @@ class ValTranslationExpirationDate extends Validator {
 		global $submittedmode;
 		if($submittedmode) {
 			global $job;
-			$modifydate = QuickQuery("select min(modifydate) from message where messagegroupid = ? and autotranslate = 'translated'", false, array($job->messagegroupid));
+			$hastranslated = QuickQuery("select count(*) from message where messagegroupid = ? and autotranslate = 'translated'", false, array($job->messagegroupid));
 		} else {
 			if($requiredvalues['message'] == "")
 				return true;
-			$modifydate = QuickQuery("select min(modifydate) from message where messagegroupid = ? and autotranslate = 'translated'", false, array($requiredvalues['message']));
+			$hastranslated = QuickQuery("select count(*) from message where messagegroupid = ? and autotranslate = 'translated'", false, array($requiredvalues['message']));
 		}
-		if($modifydate != false) {
-			if(strtotime("today") - strtotime($modifydate) > (7*86400))
-				return $this->label. " ". _L('The selected message below contains auto-translated content older than 7 days. Regenerate translations to schedule a start date');
-			if(strtotime($value) - strtotime($modifydate) > (7*86400))
+
+		if($hastranslated != false) {
+			if(strtotime($value) > strtotime("today") + (7*86400))
 				return _L("Can not schedule the job with a message containing auto-translated content older than 7 days from the Start Date");
 		}
 		return true;
 	}
 }
 
+class ValIsTranslated extends Validator {
+	var $onlyserverside = true;
+	function validate ($value) {
+		$istranslated = QuickQuery("select count(*) from message where messagegroupid = ? and autotranslate = 'translated'", false, array($value));
+		if($istranslated > 0) {
+			return _L("Can not select a message that is auto-translated with a repeating job");
+		}
+		return true;
+	}
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 // Form Data
@@ -450,16 +459,18 @@ $helpsteps[] = _L("Enter a name for your job. Using a descriptive name that indi
 			"helpstep" => 4
 		);
 		$formdata[] = _L('Job Message');
+		$messagevalidators = array(
+				array("ValRequired"),
+				array("ValInArray","values"=>array_keys($messages))
+				);
+		if ($JOBTYPE == "repeating") {
+			$messagevalidators[] = array("ValIsTranslated");
+		}
 		$formdata["message"] = array(
 			"label" => _L('Message'),
 			"fieldhelp" => _L('Select a list from your existing lists.'),
 			"value" => (((isset($job->messagegroupid) && $job->messagegroupid))?$job->messagegroupid:""),
-			"validators" => array(
-				array("ValRequired"),
-				array("ValMessageTranslationExpiration"),
-				array("ValInArray","values"=>array_keys($messages))
-				),
-
+			"validators" => $messagevalidators,
 			"control" => array("MessageGroupSelectMenu", "values" => $messages),
 			"helpstep" => 5
 		);
@@ -610,9 +621,12 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 				$job->setOption("skipduplicates",$postdata['skipduplicates']?1:0);
 				$job->setOption("skipemailduplicates",$postdata['skipduplicates']?1:0);
 
-
+				if ($JOBTYPE != "repeating") {
+					$messagegroup = new MessageGroup($postdata['message']);
+					$messagegroup->reTranslate();
+				}
+				
 				$job->messagegroupid = $postdata['message'];
-
 
 				// set jobsetting 'callerid' blank for jobprocessor to lookup the current default at job start
 				if ($USER->authorize('setcallerid') && !getSystemSetting('_hascallback', false)) {
@@ -696,7 +710,7 @@ include_once("nav.inc.php");
 ?>
 <script type="text/javascript" src="script/listform.js.php"></script>
 <script type="text/javascript">
-<? Validator::load_validators(array("ValDuplicateNameCheck","ValTranslationExpirationDate","ValMessageTranslationExpiration","ValWeekRepeatItem","ValTimeWindowCallEarly","ValTimeWindowCallLate","ValLists")); ?>
+<? Validator::load_validators(array("ValDuplicateNameCheck","ValTranslationExpirationDate","ValWeekRepeatItem","ValTimeWindowCallEarly","ValTimeWindowCallLate","ValLists","ValIsTranslated")); ?>
 </script>
 <?
 
