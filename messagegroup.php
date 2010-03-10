@@ -1422,7 +1422,7 @@ if (!$messagegroup->deleted) {
 					var autotranslateobject = confirmAutotranslator(event, null, state);
 					if (!autotranslateobject)
 						return;
-
+					
 					var sourcetext = autotranslateobject.sourcetext;
 					var translationlanguagecodes = autotranslateobject.translationlanguagecodes;
 
@@ -1453,14 +1453,14 @@ if (!$messagegroup->deleted) {
 
 							// If there is a single language, the response is not an array.
 							if (count == 1) {
-								updateTranslationItem(this, languagecode, sourcetext, dataResponseData.translatedText);
+								updateTranslationItem(this, translationlanguagecodes[0], sourcetext, dataResponseData.translatedText);
 								return;
 							}
 
 							// Use a flag to indicate if any language has an error;
 							// we want to wait until after the for-loop to show an alert() otherwise the user could get multiple alerts.
 							var haserror = false;
-
+							
 							for (var i = 0; i < count; i++) {
 								var languagecode = translationlanguagecodes[i];
 

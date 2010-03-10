@@ -48,6 +48,8 @@ class ValDefaultMessage extends Validator {
 			if (!($args['subtype'] == 'html' && $messagegroup->hasMessage('email', 'plain', $args['requesteddefaultlanguagecode'])))
 				return $errormessagecreatefirst;
 		}
+		
+		return true;
 	}
 }
 
