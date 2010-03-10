@@ -30,8 +30,19 @@ function userOwns ($type,$id) {
 function isSubscribed ($type,$id) {
 	global $USER;
 	switch($type) {
+		case "message":
+			// see if the current user is subscribed to the requested message group id
+			return QuickQuery("
+				select 1
+				from message m
+					inner join publish p on
+						(m.messagegroupid = p.messagegroupid)
+				where p.type = 'messagegroup'
+					and p.userid = ?
+					and p.action = 'subscribe'
+					and m.id = ?", false, array($USER->id, $id));
 		case "messagegroup":
-			return QuickQuery("select count(*) from publish where userid = ? and action = 'subscribe' and type = 'messagegroup' and messagegroupid=?", false, array($USER->id, $id));
+			return QuickQuery("select 1 from publish where userid = ? and action = 'subscribe' and type = 'messagegroup' and messagegroupid=?", false, array($USER->id, $id));
 		default:
 			return false;
 	}
@@ -39,8 +50,25 @@ function isSubscribed ($type,$id) {
 
 function isPublished ($type,$id) {
 	switch($type) {
+		case "message":
+			// if the user is not autorized to subscribe to message groups. return false
+			if (!$USER->authorize('subscribemessagegroup'))
+				return false;
+			// look up the requested message id and see if it is associated with a published message group
+			return QuickQuery("
+				select 1
+				from message m
+					inner join publish p on
+						(m.messagegroupid = p.messagegroupid)
+				where p.type = 'messagegroup'
+					and p.action = 'publish'
+					and m.id = ?", false, array($id));
 		case "messagegroup":
-			return QuickQuery("select count(*) from publish where action = 'publish' and type = 'messagegroup' and messagegroupid=?", false, array($id));
+			// if the user is not autorized to subscribe to message groups. return false
+			if (!$USER->authorize('subscribemessagegroup'))
+				return false;
+			// look up the requested message group id and see if it is published
+			return QuickQuery("select 1 from publish where action = 'publish' and type = 'messagegroup' and messagegroupid=?", false, array($id));
 		default:
 			return false;
 	}
