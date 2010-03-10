@@ -38,8 +38,9 @@ if (isset($_GET['unloadsession'])) {
 $id = false;
 if (isset($_GET['id'])) {
 	$_SESSION['ttstext'] = false;
-	if(userOwns("message", $_GET['id'] + 0) || $USER->authorize('managesystem')) {
-		$id = $_GET['id'] + 0;
+	$id = $_GET['id'] + 0;
+	// if the user owns the message, can manage the system or the message is published
+	if(userOwns("message", $id) || $USER->authorize('managesystem') || isPublished("message", $id)) {
 		//find all unique fields and values used in this message
 		$messagefields = DBFindMany("FieldMap", "from fieldmap where fieldnum in (select distinct fieldnum from messagepart where messageid=?)", false, array($id));
 		if (count($messagefields) > 0) {
