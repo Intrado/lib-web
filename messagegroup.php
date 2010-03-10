@@ -266,9 +266,11 @@ foreach ($destinations as $type => $destination) {
 			foreach ($autotranslatorlanguages as $languagecode => $languagename) {
 				$translationitems[] = "{$languagecode}-translationitem";
 				
-				if (is_array($autotranslatortranslations)) {
+				$pretranslate = in_array($languagecode, $autotranslatecodes);
+				
+				if ($pretranslate && is_array($autotranslatortranslations)) {
 					$translationtext = $autotranslatortranslations[$autotranslationlanguageindex]->responseData->translatedText;
-				} else if ($autotranslatortranslations) {
+				} else if ($pretranslate && $autotranslatortranslations) {
 					$translationtext = $autotranslatortranslations->translatedText;
 				} else {
 					$translationtext = '';
@@ -279,9 +281,10 @@ foreach ($destinations as $type => $destination) {
 					$_SESSION['autotranslatesourcetext']["{$type}-{$subtype}"],
 					$translationtext,
 					0, ucfirst($languagename), false, false, false,
-					in_array($languagecode, $autotranslatecodes), '', null, true);
+					$pretranslate, '', null, true);
 					
-				$autotranslationlanguageindex++;
+				if ($pretranslate)
+					$autotranslationlanguageindex++;
 			}
 			$autotranslatorformdata["sourcemessagebody"]["requires"] = $translationitems;
 			
@@ -1420,8 +1423,9 @@ if (!$messagegroup->deleted) {
 				autotranslatorbutton.stopObserving('click');
 				autotranslatorbutton.observe('click', function(event, state) {
 					var autotranslateobject = confirmAutotranslator(event, null, state);
-					if (!autotranslateobject)
+					if (!autotranslateobject) {
 						return;
+					}
 					
 					var sourcetext = autotranslateobject.sourcetext;
 					var translationlanguagecodes = autotranslateobject.translationlanguagecodes;
