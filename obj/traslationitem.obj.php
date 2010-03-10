@@ -115,7 +115,11 @@ class TranslationItem extends FormItem {
 							'  . (isset($this->args['disabledinfo']) ? $this->args['disabledinfo'] : ('<ul><li> ' . _L('%1$s recipients will now receive the default English message.',ucfirst($language)) . '</li></ul>')) . '
 						</div>
 						<div id="'.$n.'textfields" style="width: 100%; display: '.(($msgdata->enabled)?"block":"none").'">
-							<div id="'.$n.'textdiv" name="'.$n.'textdiv" style="display: '.((!$msgdata->override)?"block":"none").'; width: 99%; '.(!empty($this->args['usehtmleditor']) ? "" : "height: 50px;").' border: 1px solid gray; color: gray; overflow:auto">'.(!empty($this->args['usehtmleditor']) ? $msgdata->text : escapehtml($msgdata->text)).'</div>
+							<div id="'.$n.'textdiv" name="'.$n.'textdiv" style="display: '.((!$msgdata->override)?"block":"none").'; width: 99%; '.(!empty($this->args['usehtmleditor']) ? "" : "height: 50px;").' border: 1px solid gray; color: gray; overflow:auto">' .
+								((isset($this->args['usehtmleditor']) && $this->args['usehtmleditor']) || (isset($this->args['escapehtml']) && !$this->args['escapehtml']) ?
+									$msgdata->text :
+									escapehtml($msgdata->text)) .
+							'</div>
 						</div>
 						
 						<div class="MessageBodyContainer" style="display: '.(($msgdata->override || !$msgdata->enabled)?"block":"none").'">
