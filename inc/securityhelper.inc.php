@@ -49,6 +49,7 @@ function isSubscribed ($type,$id) {
 }
 
 function isPublished ($type,$id) {
+	global $USER;
 	switch($type) {
 		case "message":
 			// if the user is not autorized to subscribe to message groups. return false
