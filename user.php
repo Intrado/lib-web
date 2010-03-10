@@ -89,6 +89,9 @@ class InpageSubmitButton extends FormItem {
 
 // requires org to section map as an argument
 class UserSectionFormItem extends FormItem {
+	var $clearonsubmit = true;
+	var $clearvalue = array();
+	
 	function render ($value) {
 		$n = $this->form->name."_".$this->name;
 		// get all orgid to orgkey values
@@ -220,9 +223,24 @@ class ValUserSection extends Validator {
 
 	function validate ($value, $args) {
 		if ($value) {
-			$count = QuickQuery("select count(id) from section where id in (". DBParamListString(count($value)) .")", false, $value);
-			if ($count + 0 !== count($value))
-				return _L('%s has invalid data selected.', $this->label);
+			$validsections = QuickQueryList("select id, skey from section where id in (". DBParamListString(count($value)) .")", true, false, $value);
+			foreach ($value as $id)
+				if (!isset($validsections[$id]))
+					return _L('%s has invalid data selected.', $this->label);
+		}
+		return true;
+	}
+}
+
+class ValUserOrganization extends Validator {
+	var $onlyserverside = true;
+
+	function validate ($value, $args) {
+		if ($value) {
+			$validorgs = QuickQueryList("select id, orgkey from organization where id in (". DBParamListString(count($value)) .")", true, false, $value);
+			foreach ($value as $id)
+				if (!isset($validorgs[$id]))
+					return _L('%s has invalid data selected.', $this->label);
 		}
 		return true;
 	}
@@ -480,7 +498,7 @@ if ($hasenrollment) {
 		from userassociation ua
 			inner join section s on
 				(ua.sectionid = s.id)
-		where ua.userid = ? and ua.importid is not NULL", false, false, array($edituser->id));
+		where ua.userid = ? and ua.importid is not NULL order by skey", false, false, array($edituser->id));
 	if ($userimportsections) {
 		$html = '<div style="border: 1px dotted gray; padding: 3px;">';
 		foreach ($userimportsections as $skey)
@@ -494,9 +512,9 @@ if ($hasenrollment) {
 	}
 	
 	// get user section associations that arn't created by an import
-	$usersections = QuickQueryList("select sectionid from userassociation where userid = ? and importid is null", false, false, array($edituser->id));
+	$usersections = QuickQueryList("select sectionid from userassociation where userid = ? and type = 'section' and importid is null", false, false, array($edituser->id));
 	$formdata["sectionids"] = array(
-		"label" => _L('Sections'),
+		"label" => _L('Additional Sections'),
 		"fieldhelp" => _L('Add or remove user section associations'),
 		"value" => $usersections,
 		"validators" => array(
@@ -506,6 +524,41 @@ if ($hasenrollment) {
 		"helpstep" => 2
 	);
 }
+
+// display read only organization associations, if there are any
+$userimportorgs = QuickQueryList("
+	select o.orgkey
+	from userassociation ua
+		inner join organization o on
+			(ua.organizationid = o.id)
+	where ua.userid = ? and ua.importid is not NULL order by orgkey", false, false, array($edituser->id));
+if ($userimportorgs) {
+	$html = '<div style="border: 1px dotted gray; padding: 3px;">';
+	foreach ($userimportorgs as $okey)
+		$html .= "<div>$okey</div>";
+	$html .= "</div>";
+	$formdata["readonlyorgs"] = array(
+		"label" => _L('Imported Organizations'),
+		"control" => array("FormHtml", "html" => $html),
+		"helpstep" => 2
+	);
+}
+
+// get user organization associations that arn't created by an import
+$usersections = QuickQueryList("select organizationid from userassociation where userid = ? and type = 'organization' and importid is null", false, false, array($edituser->id));
+$orgs = QuickQueryList("select o.id, o.orgkey from organization o left join userassociation ua on (o.id = ua.organizationid and ua.userid = ?) where not o.deleted and ua.importid is null order by orgkey", true, false, array($edituser->id));
+$formdata["organizationids"] = array(
+	"label" => _L('Additional Organizations'),
+	"fieldhelp" => _L('Add or remove user organization associations'),
+	"value" => $usersections,
+	"validators" => array(
+		array("ValUserOrganization")
+	),
+	"control" => array("MultiCheckBox", "height" => "150px", "values" => $orgs),
+	"helpstep" => 2
+);
+
+
 
 $rules = cleanObjects($edituser->getRules());
 $fields = QuickQueryMultiRow("select fieldnum from fieldmap where options not like '%multisearch%'");
@@ -538,6 +591,8 @@ if ($readonly) {
 	// Last Name
 	$formdata["lastname"]["control"] = array("FormHtml","html" => $edituser->lastname);
 	unset($formdata["lastname"]["validators"]);
+	// Description
+	unset($formdata["description"]);
 	// User Login
 	$formdata["login"]["control"] = array("FormHtml","html" => $edituser->login);
 	unset($formdata["login"]["validators"]);
@@ -748,6 +803,17 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		// If the pincode is all 0 characters then it was a default form value, so ignore it
 		if (!ereg("^0*$", $postdata['pin']))
 			$edituser->setPincode($postdata['pin']);
+			
+		// add user associations for sections
+		if ($hasenrollment) {
+			// remove all custom user associations
+			QuickUpdate("delete from userassociation where userid = ? and importid is null and type = 'section' and sectionid != 0", false, array($edituser->id));
+			// re add new user associations
+			$sectionids = (isset($postdata['sectionids'])?$postdata['sectionids']:array());
+			foreach ($postdata['sectionids'] as $sectionid)
+				QuickUpdate("insert into userassociation (userid, type, sectionid) values (?, 'section', ?)", false, array($edituser->id, $sectionid));
+			
+		}
 
 		Query("COMMIT");
 
@@ -782,7 +848,7 @@ include_once("nav.inc.php");
 
 ?>
 <script type="text/javascript">
-<? Validator::load_validators(array("ValLogin", "ValPassword", "ValAccesscode", "ValPin", "ValRules", "ValUserSection")); ?>
+<? Validator::load_validators(array("ValLogin", "ValPassword", "ValAccesscode", "ValPin", "ValRules", "ValUserSection", "ValUserOrganization")); ?>
 </script>
 <?
 
