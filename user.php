@@ -511,8 +511,8 @@ if ($hasenrollment) {
 		);
 	}
 	
-	// get user section associations that arn't created by an import
-	$usersections = QuickQueryList("select sectionid from userassociation where userid = ? and type = 'section' and importid is null", false, false, array($edituser->id));
+	// get user section associations that arn't created by an import or are zero
+	$usersections = QuickQueryList("select sectionid from userassociation where userid = ? and type = 'section' and importid is null and sectionid != 0", false, false, array($edituser->id));
 	$formdata["sectionids"] = array(
 		"label" => _L('Additional Sections'),
 		"fieldhelp" => _L('Add or remove user section associations'),
@@ -545,20 +545,18 @@ if ($userimportorgs) {
 }
 
 // get user organization associations that arn't created by an import
-$usersections = QuickQueryList("select organizationid from userassociation where userid = ? and type = 'organization' and importid is null", false, false, array($edituser->id));
+$userorgs = QuickQueryList("select organizationid from userassociation where userid = ? and type = 'organization' and importid is null", false, false, array($edituser->id));
 $orgs = QuickQueryList("select o.id, o.orgkey from organization o left join userassociation ua on (o.id = ua.organizationid and ua.userid = ?) where not o.deleted and ua.importid is null order by orgkey", true, false, array($edituser->id));
 $formdata["organizationids"] = array(
 	"label" => _L('Additional Organizations'),
 	"fieldhelp" => _L('Add or remove user organization associations'),
-	"value" => $usersections,
+	"value" => $userorgs,
 	"validators" => array(
 		array("ValUserOrganization")
 	),
 	"control" => array("MultiCheckBox", "height" => "150px", "values" => $orgs),
 	"helpstep" => 2
 );
-
-
 
 $rules = cleanObjects($edituser->getRules());
 $fields = QuickQueryMultiRow("select fieldnum from fieldmap where options not like '%multisearch%'");
@@ -660,7 +658,6 @@ if ($readonly) {
 		$formdata["datarules"]["control"] = array("FormRuleWidget", "readonly" => true);
 	} else {
 		unset($formdata["datarules"]);
-		unset($formdata["and"]);
 	}
 }
 
@@ -814,6 +811,13 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 				QuickUpdate("insert into userassociation (userid, type, sectionid) values (?, 'section', ?)", false, array($edituser->id, $sectionid));
 			
 		}
+		
+		// add user associations for organizations
+		QuickUpdate("delete from userassociation where userid = ? and importid is null and type = 'organization' and organizationid != 0", false, array($edituser->id));
+		// re add new user associations
+		$sectionids = (isset($postdata['sectionids'])?$postdata['sectionids']:array());
+		foreach ($postdata['organizationids'] as $orgid)
+			QuickUpdate("insert into userassociation (userid, type, organizationid) values (?, 'organization', ?)", false, array($edituser->id, $orgid));
 
 		Query("COMMIT");
 
