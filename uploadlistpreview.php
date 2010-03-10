@@ -54,9 +54,8 @@ $notfound = 0;
 $notfounddata = array();
 $errormsg = false;
 $defaultareacode = getSystemSetting("defaultareacode");
-$usersql = $USER->userSQL("p");
-if ($curfilename && !(CheckFormSubmit($f,'save') && $type =="ids") ) {
 
+if ($curfilename && !(CheckFormSubmit($f,'save') && $type =="ids") ) {
 
 	if ($type == "contacts") {
 		if ($fp = @fopen($curfilename, "r")) {
@@ -87,33 +86,26 @@ if ($curfilename && !(CheckFormSubmit($f,'save') && $type =="ids") ) {
 		}
 	} else {
 		if ($fp = fopen($curfilename, "r")) {
-
-			$personids = array();
 			$count = 5000;
 			$total = 0;
 			while (($row = fgetcsv($fp,4096)) !== FALSE) {
 				$pkey = DBSafe(trim($row[0]));
 				if ($pkey == "")
 					continue;
-				$query = "
-					select p.id
-					from 		person p
-					where p.pkey='$pkey' and not p.deleted $usersql
-				";
 
-				$personid = QuickQuery($query);
+				$p = false;
 				$total++;
 				$count--;
-				if ($personid) {
-
-					if ($count > 0) {
-						$p = DBFind("Person","from person where id='$personid'");
-						$phone = DBFind("Phone","from phone where personid='$personid'");
-						$email = DBFind("Email","from email where personid='$personid'");
+				if ($count > 0) {
+					$p = $USER->getPidAndNameIfCanSee($pkey);
+					if ($p) {
+						$phone = DBFind("Phone","from phone where personid=?", false, array($p['id']));
+						$email = DBFind("Email","from email where personid=?", false, array($p['id']));
 						//check if the object isnt false else display empty string
-						$listpreviewdata[] = array($pkey,$p->f01,$p->f02, $phone ? Phone::format($phone->phone) : "", $email ? $email->email : "");
+						$listpreviewdata[] = array($pkey,$p['f01'],$p['f02'], $phone ? Phone::format($phone->phone) : "", $email ? $email->email : "");
 					}
-				} else {
+				}
+				if (!$p) {
 					$notfound++;
 
 					//$listpreviewdata[] = array($pkey, "### Not Found ###", "### Not Found ###", "-","-");
@@ -219,15 +211,11 @@ if (CheckFormSubmit($f,'save') && !$errormsg) {
 				$pkey = DBSafe(trim($row[0]));
 				if ($pkey == "")
 					continue;
-				$query = "
-					select p.id
-					from 		person p
-					where p.pkey='$pkey' and not p.deleted $usersql
-				";
 
-				if ($personid = QuickQuery($query)){
+				$p = $USER->getPidAndNameIfCanSee($pkey);
+				if ($p) {
 					//use associative array to dedupe pids
-					$temppersonids[$personid] = 1;
+					$temppersonids[$p['id']] = 1;
 				}
 			}
 			fclose($fp);
