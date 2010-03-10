@@ -135,11 +135,15 @@ if (isset($_GET['runrepeating'])) {
 	$runnow = $_GET['runrepeating'] + 0;
 	if (userOwns("job",$runnow) || $USER->authorize('managesystemjobs')) {
 		$job = new Job($runnow);
-		Query('BEGIN');
-			$job->runNow();
-		Query('COMMIT');
-
-		notice(_L("The repeating job, %s, will now run.", escapehtml($job->name)));
+		if ($job->status != 'repeating') {
+			notice(_L("The job, %s, is not a repeating job.", escapehtml($job->name)));
+		} else {
+			Query('BEGIN');
+				$job->runNow();
+			Query('COMMIT');
+		
+			notice(_L("The repeating job, %s, will now run.", escapehtml($job->name)));
+		}
 	} else {
 		notice(_L("You do not have permission to run this repeating job."));
 	}
