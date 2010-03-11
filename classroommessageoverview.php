@@ -143,8 +143,8 @@ startWindow(_L('Classroom Comments'));
 		<br />
 		<h1 id="view">View</h1>
 		<div id="alloptions" class="feedfilter">
-			<a id="expandall" href="#" onclick="expandall();return false;" style="font-weight:bold"><img src="img/icons/magnifier_zoom_in.gif" />&nbsp;Expanded</a><br />
-			<a id="collapseall" href="#" onclick="collapseall();return false;"><img src="img/icons/magifier_zoom_out.gif" />&nbsp;Compact</a><br />
+			<a id="collapseall" href="#" onclick="collapseall();return false;" style="font-weight:bold"><img src="img/icons/magifier_zoom_out.gif" />&nbsp;Compact</a><br />
+			<a id="expandall" href="#" onclick="expandall();return false;" ><img src="img/icons/magnifier_zoom_in.gif" />&nbsp;Expanded</a><br />
 		</div>
 
 	</td>
@@ -179,16 +179,20 @@ startWindow(_L('Classroom Comments'));
 								$currentdate = $personcomment['date'];
 							}
 
+							if(isset($categories[$personcomment["targetedmessagecategoryid"]]) && isset($classroomcategoryicons[$categories[$personcomment["targetedmessagecategoryid"]]->image]))
+								$icon = $classroomcategoryicons[$categories[$personcomment["targetedmessagecategoryid"]]->image];
+							else
+								$icon = false;
 							?>
-							<tr><td style="border-bottom:0px;vertical-align:top;text-align:center;width:30px;"><img src="img/icons/<?= $classroomcategoryicons[$categories[$personcomment["targetedmessagecategoryid"]]->image] ?>.gif" /></td><td style="border-bottom:0px;"><div class="feedtitle">
+							<tr><td style="border-bottom:0px;vertical-align:top;text-align:center;width:30px;"><?= $icon?'<img src="img/icons/' . $icon . '.gif" />':'' ?></td><td style="border-bottom:0px;"><div class="feedtitle">
 										<a href="#" onclick="togglepersons('<?=$personcomment['date'] . $id ?>');return false;">
 								<?= escapehtml(getmessagetext($personcomment,$customtxt))?>
 								</a></div>
 							<?
-							echo '<div id="persons-' . $personcomment['date'] . $id . '" class="expandview"><table style="margin-left:2%;width:98%">';
+							echo '<div id="persons-' . $personcomment['date'] . $id . '" class="expandview" style="display:none;"><table style="margin-left:2%;width:98%">';
 							$commentid = $id;
 						}
-						echo '<tr><td style="white-space: nowrap;">' . escapehtml($personcomment['firstname']) . '&nbsp;' .  escapehtml($personcomment['lastname']) . '<span style="color:graytext;font-style:italic;white-space:nowrap"> - ID: ' . $personcomment['pkey'] . '</span></td><td style="width:100%;padding-left:10%;">' .  ($personcomment['notes']?'<b>Remark: </b>' . escapehtml($personcomment['notes']):'') . '</td></tr>';
+						echo '<tr><td style="white-space: nowrap;width:100%;">' . escapehtml($personcomment['firstname']) . '&nbsp;' .  escapehtml($personcomment['lastname']) . '<span style="color:graytext;font-style:italic;white-space:nowrap"> - ID: ' . $personcomment['pkey'] . '</span></td><td style="width:100%;padding-left:10%;">' .  ($personcomment['notes']?'<b>Remark: </b>' . escapehtml($personcomment['notes']):'') . '</td></tr>';
 					}
 					echo '</table></div></td>';
 				} else {
@@ -204,15 +208,20 @@ startWindow(_L('Classroom Comments'));
 								$currentdate = $personcomment['date'];
 							}
 							?>
-							<tr><td style="border-bottom:0px;vertical-align:top;text-align:center;width:30px;"><img id="img-<?= $personcomment['date'] . $id  ?>" src="img/arrow_down.gif" style="padding-top:5px;"/></td><td style="border-bottom:0px;"><div class="feedtitle">
+							<tr><td style="border-bottom:0px;vertical-align:top;text-align:center;width:30px;"><img id="img-<?= $personcomment['date'] . $id  ?>" src="img/arrow_right.gif" style="padding-top:5px;"/></td><td style="border-bottom:0px;"><div class="feedtitle">
 										<a href="#" onclick="togglecomments('<?=$personcomment['date'] . $id ?>');return false;">
 								<?= escapehtml($personcomment['firstname']) . '&nbsp;' .  escapehtml($personcomment['lastname'])  ?>
 								</a><span style="color:graytext;font-style:italic;white-space:nowrap"> - ID: <?= $personcomment['pkey'] ?></span></div>
 							<?
-							echo '<div id="comments-' . $personcomment['date'] . $id  . '" class="expandview"><table style="margin-left:2%;width:98%">';
+							echo '<div id="comments-' . $personcomment['date'] . $id  . '" class="expandview" style="display:none;"><table style="margin-left:2%;width:98%">';
 							$contactid = $id;
 						}
-						echo '<tr><td width="30px"><img src="img/icons/' . $classroomcategoryicons[$categories[$personcomment["targetedmessagecategoryid"]]->image]  . '.gif" /></td><td style="white-space: nowrap;">' . escapehtml(getmessagetext($personcomment,$customtxt)) . '</td><td style="width:100%;padding-left:10%;">' .  ($personcomment['notes']?'<b>Remark: </b>' . escapehtml($personcomment['notes']):'') . '</td></tr>';
+						//$icon = $classroomcategoryicons[$categories[$personcomment["targetedmessagecategoryid"]]->image];
+						if(isset($categories[$personcomment["targetedmessagecategoryid"]]) && isset($classroomcategoryicons[$categories[$personcomment["targetedmessagecategoryid"]]->image]))
+							$icon = $classroomcategoryicons[$categories[$personcomment["targetedmessagecategoryid"]]->image];
+						else
+							$icon = false;
+						echo '<tr><td width="30px">' . ($icon?'<img src="img/icons/' . $icon . '.gif" />':'') . '</td><td style="white-space: nowrap;">' . escapehtml(getmessagetext($personcomment,$customtxt)) . '</td><td style="width:100%;padding-left:10%;">' .  ($personcomment['notes']?'<b>Remark: </b>' . escapehtml($personcomment['notes']):'') . '</td></tr>';
 					}
 					echo '</table></div></td>';
 				}
@@ -237,18 +246,22 @@ function togglecomments(id) {
 	var table = $('comments-' + id);
 	if(table.visible()) {
 		$('img-' + id).src = "img/arrow_right.gif";
-		Effect.BlindUp(table,{ duration: 0.5 });
+		table.hide();
+		//Effect.BlindUp(table,{ duration: 0.5 });
 	} else {
 		$('img-' + id).src = "img/arrow_down.gif";
-		Effect.BlindDown(table,{ duration: 0.5 });
+		table.show();
+		//Effect.BlindDown(table,{ duration: 0.5 });
 	}
 }
 function togglepersons(id) {
 	var table = $('persons-' + id);
 	if(table.visible()) {
-		Effect.BlindUp(table,{ duration: 0.5 });
+		table.hide();
+		//Effect.BlindUp(table,{ duration: 0.5 });
 	} else {
-		Effect.BlindDown(table,{ duration: 0.5 });
+		table.show();
+		//Effect.BlindDown(table,{ duration: 0.5 });
 	}
 }
 
