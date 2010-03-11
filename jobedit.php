@@ -715,6 +715,20 @@ include_once("nav.inc.php");
 <?
 
 startWindow(_L('Job Information'));
+if ($JOBTYPE == "repeating" && getSystemSetting("disablerepeat") ) {
+?>
+<table width="100%" border="0" cellpadding="0" cellspacing="0">
+	<tr>
+		<td align="center" >
+		<div class='alertmessage noprint'>The System Administrator has
+		disabled all Repeating Jobs. <br>
+		No Repeating Jobs can be run while this setting remains in effect.</div>
+		</td>
+	</tr>
+</table>
+<?
+}
+
 echo $form->render();
 endWindow();
 include_once("navbottom.inc.php");
