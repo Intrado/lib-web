@@ -216,7 +216,7 @@ $categories = QuickQueryMultiRow("select id, name, image from targetedmessagecat
 $categoriesjson = array();
 foreach($categories as $category) {
 	$obj = null;
-	$obj->name = $category["name"];
+	$obj->name = escapehtml($category["name"]);
 	if(isset($category["image"]) && isset($classroomcategoryicons[$category["image"]]))
 		$obj->img = "img/icons/" . $classroomcategoryicons[$category["image"]]  . ".gif";
 	else

@@ -176,7 +176,7 @@
 	function remarkpreview(prefix,id,remark) {
 		if(remark.length > 20)
 			remark = remark.substring(0, 20) + '...';
-		$(prefix + 'prem' + id).update(remark);
+		$(prefix + 'prem' + id).update(remark.escapeHTML());
 	}
 
 	function highlight(obj) {
