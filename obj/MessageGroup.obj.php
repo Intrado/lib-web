@@ -139,7 +139,7 @@ class MessageGroup extends DBMappedObject {
 		static $summaries = array();
 		
 		if (!isset($summaries[$messagegroupid]))
-			$summaries[$messagegroupid] = QuickQueryMultiRow("select distinct type,subtype,languagecode from message where userid=? and messagegroupid=? order by type,subtype,languagecode", true, false, array($USER->id, $messagegroupid));
+			$summaries[$messagegroupid] = QuickQueryMultiRow("select distinct type,subtype,languagecode,data from message where userid=? and messagegroupid=? order by type,subtype,languagecode", true, false, array($USER->id, $messagegroupid));
 		
 		return $summaries[$messagegroupid];
 	}

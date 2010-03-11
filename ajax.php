@@ -103,8 +103,14 @@ function handleRequest() {
 			if (!isset($_GET['messagegroupid']))
 				return false;
 			$messagegroup = new MessageGroup($_GET['messagegroupid']);
-			return array('summary' => MessageGroup::getSummary($_GET['messagegroupid']),
-				'defaultlanguagecode' => $messagegroup->defaultlanguagecode);
+			$summary = MessageGroup::getSummary($_GET['messagegroupid']);
+			// parse the header data for each message.
+			foreach ($summary as $i => $messagesummary) {
+				$summary[$i]["data"] = (object)sane_parsestr($messagesummary["data"]);
+			}
+			return array('summary' => $summary,
+				'defaultlanguagecode' => $messagegroup->defaultlanguagecode
+			);
 
 		case 'hasmessage':
 			if (!isset($_GET['messagetype']) && !isset($_GET['messageid']))

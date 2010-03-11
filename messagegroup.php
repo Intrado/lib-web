@@ -63,12 +63,15 @@ if (isset($_GET['id'])) {
 		unset($_SESSION['emailattachments']);
 		unset($_SESSION['autotranslatesourcetext']);
 		unset($_SESSION['requesteddefaultlanguagecode']);
+		unset($_SESSION['inmessagegrouptabs']);
 	}
 	
 	unset($_SESSION['messagegroupid']);
 	setCurrentMessageGroup($_GET['id']);
 
 	if ($_GET['id'] === 'new') {
+		unset($_SESSION['inmessagegrouptabs']);
+		
 		// For a new messagegroup, it is first created in the database as deleted
 		// in case the user does not submit the form. Once the form is submitted, the
 		// messagegroup is set as not deleted; the permanent flag is toggled by the user.
@@ -81,26 +84,30 @@ if (isset($_GET['id'])) {
 		$newmessagegroup->deleted = 1; // Set to deleted in case the user does not submit the form.
 		$newmessagegroup->permanent = $defaultpermanent;
 
-		if ($newmessagegroup->create())
+		if ($newmessagegroup->create()) {
 			$_SESSION['messagegroupid'] = $newmessagegroup->id;
-			
-		redirect();
-	} else if (isset($_SESSION['messagegroupid'])) {
-		$messagegroup = new MessageGroup(getCurrentMessageGroup());
-		if ($messagegroup->deleted)
-			redirect('messagegroupview.php?id=' . $_GET['id']);
+			$_SESSION['inmessagegrouptabs'] = false;
+		}
 	}
+	redirect();
 }
 
-if (!isset($_SESSION['messagegroupid'])) {
+if (!isset($_SESSION['messagegroupid']))
 	redirect('unauthorized.php');
+$messagegroup = new MessageGroup(getCurrentMessageGroup());
+if (!isset($_SESSION['inmessagegrouptabs'])) {
+	if (!QuickQuery('select 1 from message where messagegroupid = ? limit 1', false, array($messagegroup->id))) {
+		$messagegroup->deleted = 1;
+		$messagegroup->update();
+	}
+	if ($messagegroup->deleted)
+		redirect('messagegroupview.php?id=' . $messagegroup->id);
+	
+	$_SESSION['inmessagegrouptabs'] = true;
 }
 
 if (!isset($_SESSION['autotranslatesourcetext']))
 	$_SESSION['autotranslatesourcetext'] = array();
-
-if (!isset($messagegroup))
-	$messagegroup = new MessageGroup(getCurrentMessageGroup());
 
 if (!isset($_SESSION['requesteddefaultlanguagecode']))
 	$_SESSION['requesteddefaultlanguagecode'] = $cansendmultilingual ? $messagegroup->defaultlanguagecode : Language::getDefaultLanguageCode();
@@ -121,7 +128,7 @@ $deflanguage = array($deflanguagecode => Language::getName($deflanguagecode));
 //if the user can send multi-lingual notifications use all languages, otherwise use an array of just the default.
 $customerlanguages = $cansendmultilingual ? Language::getLanguageMap() : $deflanguage;
 
-if (!$messagegroup->deleted) {
+if (isset($_SESSION['inmessagegrouptabs']) && $_SESSION['inmessagegrouptabs']) {
 	$ttslanguages = $cansendmultilingual ? Voice::getTTSLanguageMap() : array();
 	unset($ttslanguages[Language::getDefaultLanguageCode()]);
 	if ($cansendmultilingual)
@@ -723,13 +730,13 @@ foreach ($destinations as $type => $destination) {
 // Finalize the formsplitter.
 //////////////////////////////////////////////////////////
 
-if (!$messagegroup->deleted) {
+if (isset($_SESSION['inmessagegrouptabs']) && $_SESSION['inmessagegrouptabs']) {
 	$destinationlayoutforms[] = makeSummaryTab($destinations, $customerlanguages, Language::getDefaultLanguageCode(), $messagegroup);
-	$buttons = array(icon_button(_L("Done"),"tick", "form_submit_all(null, 'done', $('formswitchercontainer'));", null), icon_button(_L("Cancel"),"cross",null,"messages.php"));
+	$buttons = array(icon_button(_L("Done"),"tick", "form_submit_all(null, 'done', $('messagegroupformcontainer'));", null), icon_button(_L("Cancel"),"cross",null,"messages.php"));
 	$messagegrouptabberarray = array(new FormTabber("destinationstabber", "", null, "horizontaltabs", $destinationlayoutforms));
 } else {
 	$buttons = array(icon_button(_L("Cancel"),"cross",null,"messages.php"),
-		icon_button(_L("Next"),"arrow_right", "form_submit_all(null, 'next', $('formswitchercontainer'));", null));
+		icon_button(_L("Next"),"arrow_right", "form_submit_all(null, 'next', $('messagegroupformcontainer'));", null));
 	$messagegrouptabberarray = array();
 }
 
@@ -796,13 +803,14 @@ if ($button = $messagegroupsplitter->getSubmit()) {
 						
 						if ($button == 'next') {
 							$messagegroup->defaultlanguagecode = $_SESSION['requesteddefaultlanguagecode'] = $postdata['defaultlanguagecode'];
+							$_SESSION['inmessagegrouptabs'] = true;
 						} else {
 							// Store the requested default language code in session and
 							// wait until the message body gets saved before setting the defaultlanguagecode
 							// so that $messagegroup->defaultlanguagecode stays consistent.
 							$_SESSION['requesteddefaultlanguagecode'] = $postdata['defaultlanguagecode'];
 						}
-						$messagegroup->deleted = 0;
+						
 						$messagegroup->modified = makeDateTime(time());
 					} else if ($form->name == 'emailheaders') {
 						$_SESSION['emailheaders']['subject'] = trim($postdata['subject']);
@@ -1270,15 +1278,22 @@ if ($button = $messagegroupsplitter->getSubmit()) {
 									}
 								}
 							}
+							
+							// Soft-delete empty messagegroups.
+							if (!QuickQuery('select 1 from message where messagegroupid = ? limit 1', false, array($messagegroup->id))) {
+								$messagegroup->deleted = 1;
+							} else {
+								$messagegroup->deleted = 0;
+							}
 						}
 					}
 
 					$messagegroup->update();
-
+					
 					QuickQuery('COMMIT');
 
 					if ($ajax && $button == 'next')
-						$form->sendTo('messagegroup.php?id=' . $messagegroup->id);
+						$form->sendTo('messagegroup.php');
 					else if ($ajax && $button == 'done')
 						$form->sendTo('messages.php');
 					else if ($ajax && $button == 'tab')
@@ -1318,7 +1333,7 @@ include_once('nav.inc.php');
 <?
 startWindow(_L('Message Editor'));
 
-if (!$messagegroup->deleted) {
+if (isset($_SESSION['inmessagegrouptabs']) && $_SESSION['inmessagegrouptabs']) {
 	$firstdestinationtype = reset(array_keys($destinations));
 	$firstdestinationsubtype = reset($destinations[$firstdestinationtype]['subtypes']);
 	$preferredlanguagecode = $cansendmultilingual ? $messagegroup->defaultlanguagecode : Language::getDefaultLanguageCode();
@@ -1331,7 +1346,7 @@ if (!$messagegroup->deleted) {
 
 echo '<div id="messagegroupformcontainer">' . $messagegroupsplitter->render($defaultsections) . '</div>';
 
-if (!$messagegroup->deleted) {
+if (isset($_SESSION['inmessagegrouptabs']) && $_SESSION['inmessagegrouptabs']) {
 	?>
 
 	<script type="text/javascript">
@@ -1410,10 +1425,54 @@ if (!$messagegroup->deleted) {
 				setTranslationValue(formitemname);
 			};
 
-			formswitchercontainer.observe('FormSplitter:BeforeSubmitAll', function(event, state) {
-				if ($('autotranslatorrefreshtranslationbutton') && !confirmAutotranslator(null, event, state))
+			formswitchercontainer.observe('FormSplitter:BeforeSubmitAll', function(event) {
+				// Warn the user if he's about to use the autotranslator to overwrite existing messages.
+				if ($('autotranslatorrefreshtranslationbutton') && !confirmAutotranslator(null, event, state)) {
 					event.stop();
-			}.bindAsEventListener(formswitchercontainer, state));
+					return;
+				}
+				
+				// Warn the user if they are about to clear the last message, thereby soft-deleting the messagegroup.
+				if (state.messagegroupsummary.length === 1 || state.messagegroupsummary.length === 2) {
+					var warn = false;
+					var message0 = state.messagegroupsummary[0];
+					// Phone, NonOverridePlainText Email, SMS
+					if (state.messagegroupsummary.length === 1) {
+						if (message0.type === state.currentdestinationtype && message0.subtype === state.currentsubtype && message0.languagecode === state.currentlanguagecode)
+							warn = true;
+					// OverridePlainText Email
+					} else if (state.currentsubtype === 'html') {
+						var message1 = state.messagegroupsummary[1];
+						if ('email' === message0.type && 'email' === message1.type &&
+							state.currentlanguagecode === message0.languagecode && state.currentlanguagecode === message1.languagecode &&
+							((message0.subtype === 'html' && message1.subtype === 'plain' && (typeof message1.data.overrideplaintext === 'undefined' || !message1.data.overrideplaintext)) ||
+								(message1.subtype === 'html' && message0.subtype === 'plain' && (typeof message0.data.overrideplaintext === 'undefined' || !message0.data.overrideplaintext)))
+						) {
+							warn = true;
+						}
+					}
+					
+					if (warn) {
+						var messageformitem = $(state.currentdestinationtype + '-' + state.currentsubtype + '-' + state.currentlanguagecode + '_nonemessagebody');
+						var messagetext = messageformitem ? messageformitem.value : '';
+						if (!messageformitem) {
+							var messageformitem = $(state.currentdestinationtype + '-' + state.currentsubtype + '-' + state.currentlanguagecode + '_translationitem');
+							if (messageformitem) {
+								if (messageformitem.value.strip() !== '') {
+									var valueobject = messageformitem.value.evalJSON();
+									messagetext = valueobject ? valueobject.text : '';
+								}
+							}
+						}
+						if (messageformitem && messagetext.strip() === '') {
+							if (!confirm('<?=addslashes(_L('This entire message will be deleted. Do you want to continue?'))?>')) {
+								event.stop();
+								return;
+							}
+						}
+					}
+				}
+			}.bindAsEventListener(formswitchercontainer));
 
 			formswitchercontainer.observe('FormSplitter:BeforeTabLoad',
 				messagegroupHandleBeforeTabLoad.bindAsEventListener(formswitchercontainer, state)
