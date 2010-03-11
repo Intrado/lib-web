@@ -133,7 +133,7 @@ foreach ($destinations as $type => $destination) {
 				$messagetext = str_replace('<<', '&lt;&lt;', $message->format($parts));
 				$messagetext = str_replace('>>', '&gt;&gt;', $messagetext);
 			} else {
-				$messagetext = str_replace("\n", "<br/>", escapehtml($message->format($parts)));
+				$messagetext = nl2br(escapehtml($message->format($parts)));
 			}
 			
 			if ($type == 'sms') {
