@@ -461,7 +461,8 @@ $helpsteps[] = _L("Enter a name for your job. Using a descriptive name that indi
 		$formdata[] = _L('Job Message');
 		$messagevalidators = array(
 				array("ValRequired"),
-				array("ValInArray","values"=>array_keys($messages))
+				array("ValInArray","values"=>array_keys($messages)),
+				array("ValNonEmptyMessage")
 				);
 		if ($JOBTYPE == "repeating") {
 			$messagevalidators[] = array("ValIsTranslated");
@@ -710,7 +711,7 @@ include_once("nav.inc.php");
 ?>
 <script type="text/javascript" src="script/listform.js.php"></script>
 <script type="text/javascript">
-<? Validator::load_validators(array("ValDuplicateNameCheck","ValTranslationExpirationDate","ValWeekRepeatItem","ValTimeWindowCallEarly","ValTimeWindowCallLate","ValLists","ValIsTranslated")); ?>
+<? Validator::load_validators(array("ValDuplicateNameCheck","ValTranslationExpirationDate","ValWeekRepeatItem","ValTimeWindowCallEarly","ValTimeWindowCallLate","ValLists","ValIsTranslated","ValNonEmptyMessage")); ?>
 </script>
 <?
 
