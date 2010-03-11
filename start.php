@@ -196,7 +196,7 @@ if($isajax === true) {
 				order by mg.modified desc
 				limit 10 ",true,false,array($USER->id)));
 			$mergeditems = array_merge($mergeditems,QuickQueryMultiRow("
-				select 'job' as type, status, id, name, modifydate as date, 'modifydate' as datetype, type as jobtype, deleted
+				select 'job' as type, status, id, name, modifydate as date, 'modifydate' as datetype, type as jobtype, deleted,percentprocessed
 				from job
 				where userid=? and not deleted and (finishdate is null || status = 'repeating') and modifydate is not null and type != 'alert'
 				order by modifydate desc
