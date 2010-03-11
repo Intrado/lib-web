@@ -128,12 +128,12 @@ foreach ($destinations as $type => $destination) {
 			
 			$messageformdata = array();
 			
-			$parts = DBFindMany('MessagePart', 'from messagepart where messageid=?', false, array($message->id));
+			$parts = DBFindMany('MessagePart', 'from messagepart where messageid=? order by sequence', false, array($message->id));
 			if ($subtype == 'html') {
 				$messagetext = str_replace('<<', '&lt;&lt;', $message->format($parts));
 				$messagetext = str_replace('>>', '&gt;&gt;', $messagetext);
 			} else {
-				$messagetext = escapehtml($message->format($parts));
+				$messagetext = str_replace("\n", "<br/>", escapehtml($message->format($parts)));
 			}
 			
 			if ($type == 'sms') {
