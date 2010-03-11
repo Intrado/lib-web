@@ -194,7 +194,7 @@ class RenderedList2 {
 		if ($this->pagepersonids === false) {
 			$personsql = $this->getPersonSql(true);		
 			$this->pagepersonids = QuickQueryList($personsql);
-			$this->total = QuickQuery("select found_rows()");
+			$this->total = QuickQuery("select found_rows()") + 0;
 		}
 	}
 	
