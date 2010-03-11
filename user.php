@@ -656,6 +656,7 @@ if ($readonly) {
 	// Data restrictions
 	if (count($rules)) {
 		$formdata["datarules"]["control"] = array("FormRuleWidget", "readonly" => true);
+		$formdata["datarules"]["validators"] = array();
 	} else {
 		unset($formdata["datarules"]);
 	}
