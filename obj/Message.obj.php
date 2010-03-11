@@ -340,7 +340,7 @@ class Message extends DBMappedObject {
 		return $parts;
 	}
 	
-	function format ($parts) {
+	static function format ($parts, $fields = array()) {
 		$map = FieldMap::getMapNames();
 		$data = "";
 		$voices = DBFindMany("Voice", "from ttsvoice");
@@ -365,9 +365,11 @@ class Message extends DBMappedObject {
 				break;
 			case 'V':
 				$partstr .= "<<" . $map[$part->fieldnum];
-
-				if ($part->defaultvalue !== null && strlen($part->defaultvalue) > 0)
-					$partstr .= ":" . $part->defaultvalue;
+				if (!isset($fields[$part->fieldnum]) || !($value = $fields[$part->fieldnum])) {
+					$value = $part->defaultvalue;
+				}
+				if ($value !== null && strlen($value) > 0)
+					$partstr .= ":" . $value;
 				$partstr .= ">>";
 				break;
 			case 'I':
