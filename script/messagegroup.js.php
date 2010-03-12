@@ -17,6 +17,8 @@ function messagegroupHandleBeforeTabLoad (event, state) {
 }
 
 function messagegroupHandleTabLoaded (event, state, existingmessagegroupid, autotranslatorUpdator, readonly) {
+	Tips.hideAll();
+	
 	// NOTE: Message tab icons are the only ones with an ID attribute.
 	var messagetabicon = event.memo.widget.sections[event.memo.tabloaded].titleDiv.down('img');
 	

@@ -214,17 +214,27 @@ class FormSplitter extends Form {
 			}
 		}
 		
-		if (!$this->parentform && $this->name)
-			$html .= '</form>';
-		
 		// Tabbers are not part of this splitter's FORM element.
+		$tabberhtml = '';
 		foreach ($this->children as $child) {
 			if ($child instanceof FormTabber)
-				$html .= $child->render($specificsections);
+				$tabberhtml .= $child->render($specificsections);
 		}
 		
+		$buttonhtml = '';
 		foreach ($this->buttons as $code) {
-			$html .= $code;
+			$buttonhtml .= $code;
+		}
+		
+		if ($tabberhtml) {
+			if (!$this->parentform && $this->name)
+				$html .= '</form>';
+			$html .= $tabberhtml;
+			$html .= $buttonhtml;
+		} else {
+			$html .= $buttonhtml;
+			if (!$this->parentform && $this->name)
+				$html .= '</form>';
 		}
 		
 		$html .= '<div style="clear: both;"></div></div>';

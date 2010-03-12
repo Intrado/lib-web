@@ -58,20 +58,15 @@ $defaultmessagegroupname = 'Please enter a name';
 // Request processing:
 ///////////////////////////////////////////////////////////////////////////////
 if (isset($_GET['id'])) {
-	if (!isset($_SESSION['messagegroupid']) || $_SESSION['messagegroupid'] != $_GET['id']) {
-		unset($_SESSION['emailheaders']);
-		unset($_SESSION['emailattachments']);
-		unset($_SESSION['autotranslatesourcetext']);
-		unset($_SESSION['requesteddefaultlanguagecode']);
-		unset($_SESSION['inmessagegrouptabs']);
-	}
-	
+	unset($_SESSION['emailheaders']);
+	unset($_SESSION['emailattachments']);
+	unset($_SESSION['autotranslatesourcetext']);
+	unset($_SESSION['requesteddefaultlanguagecode']);
+	unset($_SESSION['inmessagegrouptabs']);
 	unset($_SESSION['messagegroupid']);
 	setCurrentMessageGroup($_GET['id']);
 
 	if ($_GET['id'] === 'new') {
-		unset($_SESSION['inmessagegrouptabs']);
-		
 		// For a new messagegroup, it is first created in the database as deleted
 		// in case the user does not submit the form. Once the form is submitted, the
 		// messagegroup is set as not deleted; the permanent flag is toggled by the user.
@@ -736,8 +731,8 @@ if (isset($_SESSION['inmessagegrouptabs']) && $_SESSION['inmessagegrouptabs']) {
 	$buttons = array(icon_button(_L("Done"),"tick", "form_submit_all(null, 'done', $('messagegroupformcontainer'));", null), icon_button(_L("Cancel"),"cross",null,"messages.php"));
 	$messagegrouptabberarray = array(new FormTabber("destinationstabber", "", null, "horizontaltabs", $destinationlayoutforms));
 } else {
-	$buttons = array(icon_button(_L("Cancel"),"cross",null,"messages.php"),
-		icon_button(_L("Next"),"arrow_right", "form_submit_all(null, 'next', $('messagegroupformcontainer'));", null));
+	$buttons = array(submit_button(_L("Next"), "next", "arrow_right"),
+		icon_button(_L("Cancel"),"cross",null,"messages.php"));
 	$messagegrouptabberarray = array();
 }
 
@@ -757,6 +752,16 @@ $messagegroupsplitter = new FormSplitter("messagegroupbasics", "", null, "horizo
 							array("ValLength","max" => 50)
 						),
 						"control" => array("TextField","size" => 30, "maxlength" => 50),
+						"helpstep" => 1
+					),
+					'description' => array(
+						"label" => _L('Message Description'),
+						"fieldhelp" => _L('You may enter an optional description for this message.'),
+						"value" => $messagegroup->description,
+						"validators" => array(
+							array("ValLength","max" => 50)
+						),
+						"control" => array("TextField", "size" => 30, "maxlength" => 50),
 						"helpstep" => 1
 					),
 					'defaultlanguagecode' => array(
@@ -801,6 +806,7 @@ if ($button = $messagegroupsplitter->getSubmit()) {
 
 					if ($button == 'next' || $form->name == 'messagegroupbasics') {
 						$messagegroup->name = trim($postdata['name']);
+						$messagegroup->description = trim($postdata['description']);
 						
 						if ($button == 'next') {
 							$messagegroup->defaultlanguagecode = $_SESSION['requesteddefaultlanguagecode'] = $postdata['defaultlanguagecode'];
