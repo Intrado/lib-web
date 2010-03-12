@@ -110,7 +110,7 @@ include_once("cmlogintop.inc.php");
 	<table style="color: #365F8D;" >
 		<tr>
 			<td colspan="3">
-				<div><div style="font-size: 20px; font-weight: bold; float: left"><?=_L("SchoolMessenger Contact Manager")?></div>
+				<div><div style="font-size: 20px; font-weight: bold; float: left">SchoolMessenger Contact Manager</div>
 				<div style="float:right;"> 
 				<?
 					NewFormItem("login", "main", '_locale', 'selectstart', null, null, "id='locale' onchange='window.location.href=\"index.php".$appendcustomerurl."&locale=\"+this.options[this.selectedIndex].value'");
