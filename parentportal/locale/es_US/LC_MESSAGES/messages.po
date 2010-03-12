@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: ContactManager 7.0.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-03-02 14:20-0800\n"
+"POT-Creation-Date: 2010-03-12 09:55-0800\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Gretel Baumgartner <gbaumgartner@schoolmessenger.com>\n"
 "Language-Team:  <gbaumgartner@schoolmessenger.com>\n"
@@ -42,8 +42,8 @@ msgid "Submit"
 msgstr "Enviar"
 
 #: forgotpassword.php:96
-#: newportaluser.php:193
-#: activate.php:211
+#: newportaluser.php:197
+#: activate.php:215
 msgid "Return to Sign In"
 msgstr "Regresar al Ingreso"
 
@@ -59,15 +59,11 @@ msgstr "Va a ser redirigido a la página de activación en 10 segundos, o puede"
 msgid "Click Here to continue."
 msgstr "Haga clic aquí para continuar."
 
-#: cmlogintop.inc.php:5
-msgid "Contact Manager"
-msgstr "Manejador de Contacto"
-
-#: cmlogintop.inc.php:24
+#: cmlogintop.inc.php:33
 msgid "Click to Verify - This site chose VeriSign SSL for secure e-commerce and confidential communications."
 msgstr "Haga clic aquí para verificar - Este sitio escogió SSL de VeriSign para la seguridad del comercio electrónico y comunicaciones confidenciales."
 
-#: cmlogintop.inc.php:27
+#: cmlogintop.inc.php:36
 msgid "ABOUT SSL CERTIFICATES"
 msgstr "ACERCA DE LOS CERTIFICADOS SSL"
 
@@ -85,93 +81,103 @@ msgid "Zip code must be a 5 digit number"
 msgstr "Código postal debe ser un número de 5 dígitos"
 
 #: newportaluser.php:71
-msgid "You must enter a password"
+#, fuzzy
+msgid "You must enter a First Name"
 msgstr "Tiene que introducir una contraseña"
 
 #: newportaluser.php:73
+#, fuzzy
+msgid "You must enter a Last Name"
+msgstr "Tiene que introducir una contraseña"
+
+#: newportaluser.php:75
+msgid "You must enter a password"
+msgstr "Tiene que introducir una contraseña"
+
+#: newportaluser.php:77
 msgid "Your passwords don't match"
 msgstr "Las contraseñas no coinciden"
 
-#: newportaluser.php:75
+#: newportaluser.php:79
 #: activate.php:36
 msgid "Passwords must be at least 5 characters long"
 msgstr "Las contraseñas deben tener al menos 5 caracteres"
 
-#: newportaluser.php:119
+#: newportaluser.php:123
 msgid "Create a New Account"
 msgstr "Crear una cuenta nueva"
 
-#: newportaluser.php:140
+#: newportaluser.php:144
 msgid "Please complete this form to create your Contact Manager account.  A confirmation code will be sent to activate your new account so a valid email address is required.  Your password must be at least 5 characters long and cannot be similiar to your first name, last name, or email address."
-msgstr "Por favor, llene esta forma para crear su cuenta de Manejador de Contacto.  Un codigo de confirmacion sera enviado para activar su cuenta, y entonces un correo electronico valido es requerido.  Su contraseña debe ser por lo menos 5 caracteres de largo y no puede ser parecido con su nombre, apellido, o correo electrónico.  "
+msgstr "Por favor, llene esta forma para crear su cuenta de Contact Manager.  Un codigo de confirmacion sera enviado para activar su cuenta, y entonces un correo electronico valido es requerido.  Su contraseña debe ser por lo menos 5 caracteres de largo y no puede ser parecido con su nombre, apellido, o correo electrónico.  "
 
-#: newportaluser.php:146
+#: newportaluser.php:150
 msgid "Email (this will be your login name)"
 msgstr "Correo electrónico (este será su nombre de usuario)"
 
-#: newportaluser.php:150
+#: newportaluser.php:154
 msgid "Confirm Email"
 msgstr "Confirmar correo electrónico"
 
-#: newportaluser.php:154
+#: newportaluser.php:158
 #: changeemail.php:91
 #: changeemail.php:114
-#: activate.php:181
+#: activate.php:185
 msgid "Password"
 msgstr "Contraseña"
 
-#: newportaluser.php:158
-#: activate.php:174
+#: newportaluser.php:162
+#: activate.php:178
 msgid "Confirm Password"
 msgstr "Confirmar contraseña"
 
-#: newportaluser.php:162
-#: contactpreferences.php:176
+#: newportaluser.php:166
+#: contactpreferences.php:177
 msgid "First Name"
 msgstr "Nombre"
 
-#: newportaluser.php:166
-#: contactpreferences.php:177
+#: newportaluser.php:170
+#: contactpreferences.php:178
 msgid "Last Name"
 msgstr "Apellido"
 
-#: newportaluser.php:170
+#: newportaluser.php:174
 msgid "ZIP Code"
 msgstr "Código postal"
 
-#: newportaluser.php:174
+#: newportaluser.php:178
 msgid "Email me when I have a new phone message."
 msgstr "Envíeme un correo electrónico cuando tengo un mensaje de teléfono nuevo."
 
-#: newportaluser.php:177
+#: newportaluser.php:181
 msgid "Text me when I have a new phone message."
 msgstr "Envíeme un mensaje de texto  cuando tengo un mensaje de teléfono nuevo."
 
-#: newportaluser.php:180
+#: newportaluser.php:184
 msgid "Mobile Phone for SMS Text"
 msgstr "Teléfono móvil para mensajes de texto"
 
-#: newportaluser.php:187
+#: newportaluser.php:191
 msgid "Accept Terms of Service"
 msgstr "Aceptar las condiciones del servicio"
 
-#: newportaluser.php:190
+#: newportaluser.php:194
 msgid "Create Account"
 msgstr "Crear Cuenta"
 
-#: newportaluser.php:205
+#: newportaluser.php:209
 msgid "Thank you, Your account has been created."
 msgstr "Gracias, Su cuenta ha sido creada."
 
-#: newportaluser.php:206
+#: newportaluser.php:210
 msgid "Please check your email to activate your account."
 msgstr "Por favor, revise su correo electrónico para activar su cuenta."
 
-#: newportaluser.php:207
+#: newportaluser.php:211
 msgid "You will be redirected to the activate page in 10 seconds."
 msgstr "Va a ser redirigido a la página de activación en 10 segundos."
 
-#: newportaluser.php:207
+#: newportaluser.php:211
 msgid "Click Here to redirect now."
 msgstr "Haga clic aquí para redirigir ahora."
 
@@ -201,11 +207,11 @@ msgstr "Contactos"
 msgid "Add A Contact"
 msgstr "Añadir un contacto"
 
-#: contactpreferences.php:178
+#: contactpreferences.php:179
 msgid "ID#"
 msgstr "Número de Identificación"
 
-#: contactpreferences.php:179
+#: contactpreferences.php:180
 msgid "Actions"
 msgstr "Acciones"
 
@@ -240,7 +246,7 @@ msgid "You should receive an email shortly at the new address with a confirmatio
 msgstr "Usted debe recibir un mensaje a su correo electrónico nuevo que contiene un código de confirmación."
 
 #: changeemail.php:87
-#: activate.php:163
+#: activate.php:167
 msgid "Confirmation Code"
 msgstr "Código de confirmación"
 
@@ -252,40 +258,36 @@ msgstr "Cancelar"
 msgid "New Email Address"
 msgstr "Nueva dirección de correo electrónico"
 
-#: index.php:101
-#: index.php:152
+#: index.php:105
+#: index.php:156
 msgid "Sign In"
 msgstr "Ingresar"
 
-#: index.php:109
-msgid "SchoolMessenger Contact Manager"
-msgstr "SchoolMessenger Manjedor de Contacto"
-
-#: index.php:129
+#: index.php:133
 msgid "Incorrect username/password. Please try again."
 msgstr "Nombre de usuario / contraseña incorrecto. Por favor, inténtelo de nuevo."
 
-#: index.php:135
+#: index.php:139
 msgid "Email"
 msgstr "Correo electrónico"
 
-#: index.php:141
+#: index.php:145
 msgid "Password (case sensitive)"
 msgstr "Contraseña (mayúsculas y minúsculas)"
 
-#: index.php:143
+#: index.php:147
 msgid "Forgot your password? Click Here"
 msgstr "¿Se le olvido su contraseña? Haga clic aquí"
 
-#: index.php:147
+#: index.php:151
 msgid "Warning! Your Caps Lock key is on."
 msgstr "¡Advertencia! Tecla de bloqueo de mayúsculas está activado."
 
-#: index.php:156
+#: index.php:160
 msgid "First time accessing the SchoolMessenger Contact Manager?"
-msgstr "¿Primera vez entrando al SchoolMessenger Manejador de Contacto?"
+msgstr "¿Primera vez entrando al SchoolMessenger Contact Manager?"
 
-#: index.php:159
+#: index.php:163
 msgid "Sign up now"
 msgstr "Regístrese ahora"
 
@@ -346,52 +348,52 @@ msgstr "Regresar"
 msgid "The passwords do not match"
 msgstr "Las contraseñas no coinciden"
 
-#: activate.php:92
+#: activate.php:96
 msgid "Please enter it below along with your new password.  Passwords must be 5 characters in length and cannot be similiar to your first name, last name, or email address"
 msgstr "Por favor, introduzcalo abajo junto con su contraseña nueva. Las contraseñas deben ser de 5 caracteres de largo y no puede ser parecido a su nombre, apellido, o dirección de correo electrónico."
 
-#: activate.php:99
-#: activate.php:106
+#: activate.php:103
+#: activate.php:110
 msgid "Please enter it below along with your password"
 msgstr "Por favor, introduzcalo abajo junto con su contraseña."
 
-#: activate.php:121
+#: activate.php:125
 msgid "Thank you, your password has been reset."
 msgstr "Gracias, su contraseña ha sido restablecido."
 
-#: activate.php:122
-#: activate.php:130
-#: activate.php:138
+#: activate.php:126
+#: activate.php:134
+#: activate.php:142
 msgid "You will be redirected to the main page in 10 seconds or"
 msgstr "Usted va a ser redirigido a la página principal en 10 segundos o"
 
-#: activate.php:122
-#: activate.php:130
-#: activate.php:138
+#: activate.php:126
+#: activate.php:134
+#: activate.php:142
 msgid "Click Here."
 msgstr "Haga clic aquí."
 
-#: activate.php:129
+#: activate.php:133
 msgid "Thank you, your account has been activated."
 msgstr "Gracias, su cuenta ha sido activada."
 
-#: activate.php:137
+#: activate.php:141
 msgid "Thank you, your email address has been changed."
 msgstr "Gracias, su correo electrónico ha sido cambiado."
 
-#: activate.php:159
+#: activate.php:163
 msgid "You should have received an email containing a confirmation code."
 msgstr "Usted debería de haber recibido un mensaje de correo electrónico que contiene un código de confirmación."
 
-#: activate.php:170
+#: activate.php:174
 msgid "New Password"
 msgstr "Contraseña Nueva"
 
-#: activate.php:197
+#: activate.php:201
 msgid "That code is invalid or has expired."
 msgstr "Ese código no es válido o ha vencido."
 
-#: activate.php:201
+#: activate.php:205
 msgid "That code is invalid or has expired or that is an incorrect password."
 msgstr "Ese código no es válido o ha vencido, o es una contraseña incorrecta."
 
@@ -414,23 +416,23 @@ msgstr "Salvar a Todos los Contactos"
 msgid "Save"
 msgstr "Salvar"
 
-#: nav.inc.php:23
+#: nav.inc.php:25
 msgid "Messages"
 msgstr "Mensajes"
 
-#: nav.inc.php:122
+#: nav.inc.php:132
 msgid "My Account"
 msgstr "Mi Cuenta"
 
-#: nav.inc.php:133
+#: nav.inc.php:143
 msgid "Change Customer"
 msgstr "Cambiar cliente"
 
-#: nav.inc.php:136
+#: nav.inc.php:148
 msgid "Help"
 msgstr "Ayuda"
 
-#: nav.inc.php:143
+#: nav.inc.php:155
 msgid "Logout"
 msgstr "Cerrar sesión"
 
@@ -482,7 +484,7 @@ msgstr "No hay mensajes"
 
 #: start.php:167
 msgid "The Contact Manager allows you to customize your message delivery preferences and enables you to review past messages."
-msgstr "El Manejador de Contacto le permite personalizar sus preferencias de la entrega de mensajes y le permite examinar los mensajes."
+msgstr "El Contact Manager le permite personalizar sus preferencias de la entrega de mensajes y le permite examinar los mensajes."
 
 #: start.php:173
 msgid "Click here to begin"
@@ -810,43 +812,47 @@ msgstr "Paso 5"
 
 #: phoneactivation2.php:142
 msgid "When the call is complete, log back into your Contact Manager account to edit your notification preferences."
-msgstr "Cuando la llamada se completa, vuelve a iniciar la sesión del Manjeador de Contacto para editar sus preferencias de notificación."
+msgstr "Cuando la llamada se completa, vuelve a iniciar la sesión del Contact Manager para editar sus preferencias de notificación."
 
 #: phoneactivation2.php:163
-#: previewmessage.php:123
+#: previewmessage.php:108
 msgid "Done"
 msgstr "Hecho"
 
-#: previewmessage.php:119
+#: previewmessage.php:104
+#: previewmessage.php:159
 #: previewmessage.php:174
-#: previewmessage.php:189
 msgid "Message"
 msgstr "Mensaje"
 
-#: previewmessage.php:126
+#: previewmessage.php:111
 msgid "Details"
 msgstr "Detalles"
 
-#: previewmessage.php:131
+#: previewmessage.php:116
 msgid "Message For"
 msgstr "Mensaje por"
 
-#: previewmessage.php:146
+#: previewmessage.php:131
 msgid "Attachments"
 msgstr "Adjuntos"
 
-#: previewmessage.php:150
+#: previewmessage.php:135
 msgid "Name"
 msgstr "Nombre"
 
-#: previewmessage.php:151
+#: previewmessage.php:136
 msgid "Size"
 msgstr "Tamaño"
 
-#: previewmessage.php:184
+#: previewmessage.php:169
 msgid "Click here to download"
 msgstr "Haga clic aquí para descargar"
 
+#~ msgid "Contact Manager"
+#~ msgstr "Manejador de Contacto"
+#~ msgid "SchoolMessenger Contact Manager"
+#~ msgstr "SchoolMessenger Manjedor de Contacto"
 #~ msgid "Loading Windows Media Player components..."
 #~ msgstr "Cargando los componentes del Reproductor de Windows Media ..."
 
