@@ -65,15 +65,6 @@ function doNavTabs ($navtree) {
 	}
 }
 
-function doLogo () {
-	$logohash = crc32("cid".getSystemSetting("_logocontentid"));
-	$clickurl = getSystemSetting("_logoclickurl");
-	if($clickurl != "" && $clickurl != "http://")
-		echo '<a href="' . $clickurl . '" target="_blank" title="Logo"><img src="logo.img.php?hash=' . $logohash .'></a>';
-	else
-		echo '<img src="logo.img.php?hash=' . $logohash .'" alt="Logo">';
-}
-
 // only show tabs if they have contacts
 if (isset($contactList) && $contactList)
 	doNavTabs($NAVTREE);
@@ -182,7 +173,7 @@ header('Content-type: text/html; charset=UTF-8') ;
 
 
 <div class="subnavmenu hoverlinks">
-	<?= $SUBTABS ?>
+<? if (isset($contactList) && $contactList) echo $SUBTABS ?>
 </div>
 
 	<div class="pagetitle"><? if(isset($ICON)) print '<img alt="" src="img/themes/' .getBrandTheme() . '/icon_' . $ICON . '" align="absmiddle">'; ?> <?= $TITLE ?></div>
