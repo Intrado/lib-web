@@ -168,8 +168,9 @@ if($PERSONID){
 	$TITLE .= " - " . escapehtml($person->$firstnamefield) . " " . escapehtml($person->$lastnamefield);
 }
 include_once("nav.inc.php");
-startWindow(_L("Contacts") . help("Contactpreferences"), 'padding: 3px;');
+startWindow(_L("Contacts"));
 buttons(button(_L("Add A Contact"), null, "phoneactivation0.php"));
+
 
 if(isset($contactList) && $contactList){
 
@@ -178,7 +179,6 @@ if(isset($contactList) && $contactList){
 					"pkey" => _L("ID#"),
 					"Actions" => _L("Actions"));
 	$formatters = array("Actions" => "contact_actions");
-
 
 	echo '<table width="100%" cellpadding="3" cellspacing="1" class="list">';
 	echo '<tr class="listHeader">';
@@ -214,6 +214,7 @@ if(isset($contactList) && $contactList){
 	echo "</table>";
 
 }
+
 endWindow();
 
 if($PERSONID){
