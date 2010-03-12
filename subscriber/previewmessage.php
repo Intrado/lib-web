@@ -48,6 +48,7 @@ if (isset($_GET['jobid'])) {
 $jobid = isset($_SESSION['previewmessage_jobid']) ? $_SESSION['previewmessage_jobid'] : 0;
 $personid = isset($_SESSION['previewmessage_personid']) ? $_SESSION['previewmessage_personid'] : 0;
 $messageid = isset($_SESSION['previewmessageid']) ? $_SESSION['previewmessageid'] : 0;
+$subtype = QuickQuery("select subtype from message where id=?", false, array($messageid));
 $phone = isset($_SESSION['type']) && $_SESSION['type'] == "phone" ? true : false;
 $email = isset($_SESSION['type']) && $_SESSION['type'] == "email" ? true : false;
 $sms = isset($_SESSION['type']) && $_SESSION['type'] == "sms" ? true : false;
@@ -78,7 +79,15 @@ if ($jobid != 0 && $personid != 0) {
 	$historicdata = QuickQueryRow($query, true, false, $args);
 }
 if($email || $sms){
-	$message = formatText($messageid, $historicdata);
+	$parts = DBFindMany('MessagePart', 'from messagepart where messageid=? order by sequence', false, array($messageid));
+
+	$messagetext = Message::format($parts, $historicdata);
+	if ("html" == $subtype) {
+		$messagetext = str_replace('<<', '&lt;&lt;', $messagetext);
+		$messagetext = str_replace('>>', '&gt;&gt;', $messagetext);
+	} else {
+		$messagetext = nl2br(escapehtml(($messagetext)));
+	}
 	if($email){
 		$attachments = DBFindMany("messageattachment","from messageattachment where messageid=?", false, array($messageid));
 	}
@@ -184,7 +193,7 @@ if ($phone) {
 } else if ($email || $sms) {
 	startWindow(_L('Message'), 'padding: 3px;');
 ?>
-		<div><?= str_replace("\n", "<br/>", escapehtml($message))?></div>
+		<div><?= $messagetext ?></div>
 <?
 	endWindow();
 }
