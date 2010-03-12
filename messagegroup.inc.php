@@ -173,7 +173,8 @@ function makeMessageBody($messagegroup, $translationlanguages, $required, $type,
 		array("ValMessageBody",
 			"type" => $type,
 			"subtype" => $subtype,
-			"maximages" => $maximages
+			"maximages" => $maximages,
+			"messagegroupid" => $messagegroup->id
 		),
 		array ("ValDefaultMessage",
 			"messagegroup" => $messagegroup,
@@ -320,7 +321,7 @@ function makeAccordionSplitter($type, $subtype, $languagecode, $permanent, $pref
 								
 								// if success
 								if (audiofilename) {
-									textInsert('{{' + audiofilename + '}}', getAudioTextarea());
+									insertIntoAudioTextarea('{{' + audiofilename + '}}');
 									this.reload();
 									
 								// if failed the action but success on the ajax request
@@ -367,18 +368,22 @@ function makeAccordionSplitter($type, $subtype, $languagecode, $permanent, $pref
 
 								var audiouploadformitem = $('{$type}-{$subtype}-{$languagecode}_audioupload');
 
-								var getAudioTextarea = function () {
+								var insertIntoAudioTextarea = function (text) {
 									var audiotextareaid = '" . ($allowtranslation ? "{$type}-{$subtype}-{$languagecode}_translationitem" : "{$type}-{$subtype}-{$languagecode}_nonemessagebody") . "';
-									
+									var textarea = null;
 									var sourcetextarea = $(audiotextareaid + 'englishText');
 									if (sourcetextarea) {
 										if (sourcetextarea.up('.MessageBodyContainer').visible())
-											return sourcetextarea;
+											textarea = sourcetextarea;
 										else
-											return $(audiotextareaid + 'text');
+											textarea = $(audiotextareaid + 'text');
 									} else {
-										return $(audiotextareaid);
+										textarea = $(audiotextareaid);
 									}
+									
+									textInsert(text, textarea);
+									if (audiotextareaid.match('_translationitem'))
+										setTranslationValue(audiotextareaid);
 								};
 
 								var translationcheckbox = $('{$type}-{$subtype}-{$languagecode}_translationitem' + 'translatecheck');
@@ -422,7 +427,7 @@ function makeAccordionSplitter($type, $subtype, $languagecode, $permanent, $pref
 									hideHtmlEditor();
 									var audiofile = event.memo;
 
-									textInsert('{{' + audiofile.name + '}}', getAudioTextarea());
+									insertIntoAudioTextarea('{{' + audiofile.name + '}}');
 									this.reload();
 								}.bindAsEventListener(audiolibrarywidget));
 
@@ -430,7 +435,7 @@ function makeAccordionSplitter($type, $subtype, $languagecode, $permanent, $pref
 									hideHtmlEditor();
 									var audiofile = event.memo.audiofile;
 
-									textInsert('{{' + audiofile.name + '}}', getAudioTextarea());
+									insertIntoAudioTextarea('{{' + audiofile.name + '}}');
 								}.bindAsEventListener(audiolibrarywidget));
 
 								$callmeobserver

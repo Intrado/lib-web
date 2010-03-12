@@ -31,7 +31,12 @@ function handleRequest() {
 			$preferredaudiofilename = SmartTruncate($audiofile->name, 47);
 			
 			// Find out if this messagegroup contains any audiofiles whose name begins with the preferred name.
-			$duplicatenames = QuickQueryList('select name from audiofile where not deleted and id != ? and name like ? and messagegroupid = ?', false, false, array($audiofile->id, $preferredaudiofilename . '%', $messagegroupid));
+			// Do not include this audiofile.
+			$audiofileids = MessageGroup::getReferencedAudioFileIDs($messagegroupid);
+			$i = array_search($audiofile->id, $audiofileids);
+			if ($i !== false)
+				array_splice($audiofileids, $i, 1);
+			$duplicatenames = count($audiofileids) > 0 ? QuickQueryList('select name from audiofile where not deleted and id in (' . implode(',', $audiofileids) . ') and name like ?', false, false, array($preferredaudiofilename . '%')) : array();
 			
 			// If there are any duplicate names, then find the largest sequence number so that we can set our final name to "$preferredaudiofilename " . ($largestsequencenumber + 1)
 			if (count($duplicatenames) > 0) {
@@ -54,22 +59,7 @@ function handleRequest() {
 			$audiofile->update();
 			
 			return $audiofile->name;
-			
-		// set the delete flag on an audio file
-		case 'deleteaudiofile':
-			if (isset($_REQUEST['audiofileid']))
-				$audiofileid = $_REQUEST['audiofileid'] + 0;
-			
-			if (!isset($audiofileid) || !userOwns('audiofile', $audiofileid))
-				return false;
-
-			// get the audiofile object and set it to deleted
-			$audiofile = new AudioFile($_REQUEST['audiofileid']+0);
-			$audiofile->deleted = 1;
-			$audiofile->update();
-
-			return true;
-
+		
 		default:
 			error_log("Unknown request " . $_REQUEST['action']);
 			return false;

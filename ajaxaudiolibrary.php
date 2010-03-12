@@ -1,6 +1,7 @@
 <?
 require_once("inc/common.inc.php");
 require_once("obj/AudioFile.obj.php");
+require_once("obj/MessageGroup.obj.php");
 require_once("inc/securityhelper.inc.php");
 
 // All actions require a valid audiofile; the user must own the audiofile.
@@ -17,23 +18,30 @@ function handleRequest() {
 				$newname = trim($_REQUEST['newname']);
 			
 			// Check for blank name.
-			if (!isset($newname) || strlen($newname) < 1) {
-				return array(
-					'error' => _L('The audio file name cannot be blank.')
-				);
-			}
+			if (!isset($newname) || strlen($newname) < 1)
+				return array('error' => _L('The audio file name cannot be blank.'));
 			
 			$audiofile = new AudioFile($audiofileid);
 			
-			// Check for duplicate names.
-			if (QuickQuery('select id from audiofile where not deleted and id != ? and messagegroupid = ? and name = ? limit 1',
-				false,
-				array($audiofile->id, $audiofile->messagegroupid, $newname))
-			) {
-				return array(
-					'error' => _L('There is already an audio file with that name.')
-				);
+			// Require a messagegroupid if the audiofile is not assigned a messagegroup.
+			if (!$audiofile->messagegroupid) {
+				if (!isset($_REQUEST['messagegroupid']))
+					return array('error' => _L('This audio file cannot be found.'));
+				$messagegroupid = $_REQUEST['messagegroupid'] + 0;
+				if (!userOwns('messagegroup', $messagegroupid))
+					return array('error' => $msgUnauthorized);
+			} else {
+				$messagegroupid = $audiofile->messagegroupid;
 			}
+			
+			// Check for duplicate names.
+			// Do not include this audiofile.
+			$audiofileids = MessageGroup::getReferencedAudioFileIDs($messagegroupid);
+			$i = array_search($audiofile->id, $audiofileids);
+			if ($i !== false)
+				array_splice($audiofileids, $i, 1);
+			if (count($audiofileids) > 0 && QuickQuery('select 1 from audiofile where not deleted and id in (' . implode(',', $audiofileids) . ') and name = ? limit 1', false, array($newname)))
+				return array('error' => _L('There is already an audio file with that name.'));
 			
 			// Update the audiofile's name.
 			$audiofile->name = $newname;

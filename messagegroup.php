@@ -129,6 +129,7 @@ $deflanguage = array($deflanguagecode => Language::getName($deflanguagecode));
 $customerlanguages = $cansendmultilingual ? Language::getLanguageMap() : $deflanguage;
 
 if (isset($_SESSION['inmessagegrouptabs']) && $_SESSION['inmessagegrouptabs']) {
+	$audiofileids = MessageGroup::getReferencedAudioFileIDs($messagegroup->id);
 	$ttslanguages = $cansendmultilingual ? Voice::getTTSLanguageMap() : array();
 	unset($ttslanguages[Language::getDefaultLanguageCode()]);
 	if ($cansendmultilingual)
@@ -966,9 +967,9 @@ if ($button = $messagegroupsplitter->getSubmit()) {
 												}
 
 												if ($sourcemessageparts === false)
-													$sourcemessageparts = $sourcemessage->recreateParts($sourcemessagetext, null, $formdestinationtype == 'phone' ? $messagegroup->preferredgender : null);
+													$sourcemessageparts = $sourcemessage->recreateParts($sourcemessagetext, null, $formdestinationtype == 'phone' ? $messagegroup->preferredgender : null, $formdestinationtype == 'phone' ? $audiofileids : array());
 												else
-													$sourcemessage->recreateParts(null, $sourcemessageparts, $formdestinationtype == 'phone' ? $messagegroup->preferredgender : null);
+													$sourcemessage->recreateParts(null, $sourcemessageparts, $formdestinationtype == 'phone' ? $messagegroup->preferredgender : null, $formdestinationtype == 'phone' ? $audiofileids : array());
 												
 												if (isset($plaintextoverriden) && !$plaintextoverriden) {
 													if ($plainsourcemessage = $messagegroup->getMessage($formdestinationtype, 'plain', $languagecode, 'source')) {
@@ -991,9 +992,9 @@ if ($button = $messagegroupsplitter->getSubmit()) {
 													}
 													if (!$plainsourcemessage->overrideplaintext) {
 														if ($plainsourcemessageparts === false)
-															$plainsourcemessageparts = $plainsourcemessage->recreateParts(html_to_plain($sourcemessagetext), null, null);
+															$plainsourcemessageparts = $plainsourcemessage->recreateParts(html_to_plain($sourcemessagetext), null, null, array());
 														else
-															$plainsourcemessage->recreateParts(null, $plainsourcemessageparts, null);
+															$plainsourcemessage->recreateParts(null, $plainsourcemessageparts, null, array());
 													}
 												}
 												
@@ -1030,7 +1031,7 @@ if ($button = $messagegroupsplitter->getSubmit()) {
 													$translatedmessage->update();
 												}
 												
-												$translatedmessage->recreateParts($translationtext, null, $formdestinationtype == 'phone' ? $messagegroup->preferredgender : null);
+												$translatedmessage->recreateParts($translationtext, null, $formdestinationtype == 'phone' ? $messagegroup->preferredgender : null, $formdestinationtype == 'phone' ? $audiofileids : array());
 												
 												if (isset($plaintextoverriden) && !$plaintextoverriden) {
 													if ($plaintranslatedmessage = $messagegroup->getMessage('email', 'plain', $languagecode, 'translated')) {
@@ -1053,7 +1054,7 @@ if ($button = $messagegroupsplitter->getSubmit()) {
 													}
 													
 													if (!$plaintranslatedmessage->overrideplaintext) {
-														$plaintranslatedmessage->recreateParts(html_to_plain($translationtext), null, null);
+														$plaintranslatedmessage->recreateParts(html_to_plain($translationtext), null, null, array());
 													}
 												}
 												
@@ -1112,7 +1113,6 @@ if ($button = $messagegroupsplitter->getSubmit()) {
 									'overridden' => !empty($messagesneeded['overridden']) ? $translationitemdata->text : '',
 									'none' => !empty($messagesneeded['none']) ? $nonemessagebody : ''
 								);
-								
 								// Use this flag to indicate whether or not to generate/update a plain-text message.
 								$plaintextoverriden = false;
 								
@@ -1158,7 +1158,7 @@ if ($button = $messagegroupsplitter->getSubmit()) {
 									
 									if ($formdestinationtype == 'email' && $formdestinationsubtype == 'html' && $existingmessage->subtype == 'plain') {
 										// Update existing plain messages that are not overridden.
-										$existingmessage->recreateParts(html_to_plain($messagebodies[$existingmessage->autotranslate]), null, null);
+										$existingmessage->recreateParts(html_to_plain($messagebodies[$existingmessage->autotranslate]), null, null, array());
 									} else {
 										if ($formdestinationtype == 'email' && $formdestinationsubtype == 'plain') {
 											$existingmessage->data = $emaildatastring;
@@ -1166,7 +1166,7 @@ if ($button = $messagegroupsplitter->getSubmit()) {
 											$existingmessage->update();
 										}
 										
-										$existingmessage->recreateParts($messagebodies[$existingmessage->autotranslate], null, $formdestinationtype == 'phone' ? $messagegroup->preferredgender : null);
+										$existingmessage->recreateParts($messagebodies[$existingmessage->autotranslate], null, $formdestinationtype == 'phone' ? $messagegroup->preferredgender : null, $formdestinationtype == 'phone' ? $audiofileids : array());
 									}
 								}
 								
@@ -1195,7 +1195,7 @@ if ($button = $messagegroupsplitter->getSubmit()) {
 											$newplainmessage->description = SmartTruncate('Plain ' . Language::getName($formdestinationlanguagecode), 50);
 											$newplainmessage->create();
 											$newplainmessage->createMessageAttachments($emailattachments);
-											$newplainmessage->recreateParts(html_to_plain($messagebodies[$autotranslate]), null, null);
+											$newplainmessage->recreateParts(html_to_plain($messagebodies[$autotranslate]), null, null, array());
 										}
 									}
 								}
@@ -1235,7 +1235,7 @@ if ($button = $messagegroupsplitter->getSubmit()) {
 											$newplainmessage->description = SmartTruncate('Plain ' . Language::getName($formdestinationlanguagecode), 50);
 											$newplainmessage->create();
 											$newplainmessage->createMessageAttachments($emailattachments);
-											$newplainmessage->recreateParts(html_to_plain($messagebodies[$autotranslate]), null, null);
+											$newplainmessage->recreateParts(html_to_plain($messagebodies[$autotranslate]), null, null, array());
 										}
 									} else if ($formdestinationtype != 'sms') {
 										$newmessage->description = SmartTruncate(Language::getName($formdestinationlanguagecode), 50);
@@ -1247,7 +1247,7 @@ if ($button = $messagegroupsplitter->getSubmit()) {
 									if ($formdestinationtype == 'email')
 										$newmessage->createMessageAttachments($emailattachments);
 
-									$newmessage->recreateParts($messagebodies[$autotranslate], null, $formdestinationtype == 'phone' ? $messagegroup->preferredgender : null);
+									$newmessage->recreateParts($messagebodies[$autotranslate], null, $formdestinationtype == 'phone' ? $messagegroup->preferredgender : null, $formdestinationtype == 'phone' ? $audiofileids : array());
 								}
 								
 								// Previously overridden plain-text messages have been unassociated, so we need to generate new ones from any existing html messages. This time, we do not want to override plain-text.
@@ -1274,7 +1274,7 @@ if ($button = $messagegroupsplitter->getSubmit()) {
 										$newplainmessage->description = SmartTruncate('Plain ' . Language::getName($formdestinationlanguagecode), 50);
 										$newplainmessage->create();
 										$newplainmessage->createMessageAttachments($emailattachments);
-										$newplainmessage->recreateParts(html_to_plain($messagegroup->getMessageText($message->type, $message->subtype, $message->languagecode, $message->autotranslate)), null, null);
+										$newplainmessage->recreateParts(html_to_plain($messagegroup->getMessageText($message->type, $message->subtype, $message->languagecode, $message->autotranslate)), null, null, array());
 									}
 								}
 							}

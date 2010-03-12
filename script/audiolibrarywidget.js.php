@@ -10,7 +10,7 @@ header("Cache-Control: private");
 
 var AudioLibraryWidget = Class.create({
 	initialize: function(container, messagegroupid) {
-		this.audiofiles = {};
+		this.audiofiles = [];
 		this.container = $(container);
 		this.messagegroupid = messagegroupid;
 		
@@ -21,12 +21,10 @@ var AudioLibraryWidget = Class.create({
 	
 	showAudioFiles: function(audiofiles) {
 		var tbody = new Element('tbody');
-		
-		for (var audiofileid in audiofiles) {
-			var audiofile = audiofiles[audiofileid];
-			
-			// We need to set the id property because the audiofile objects in the ajax response do not have it.
-			audiofile.id = audiofileid;
+		var i = 0;
+		var count = audiofiles.length;
+		for (i = 0; i < count; ++i) {
+			var audiofile = audiofiles[i];
 			
 			var namelink = new Element('a', {'href': '#'});
 			namelink.update(audiofile.name.escapeHTML());
@@ -63,7 +61,7 @@ var AudioLibraryWidget = Class.create({
 		new Ajax.Request('ajax.php', {
 			'method': 'get',
 			'parameters': {
-				'type': 'AudioFiles',
+				'type': 'getaudiolibrary',
 				'messagegroupid': this.messagegroupid
 			},
 			
@@ -71,7 +69,6 @@ var AudioLibraryWidget = Class.create({
 				var audiofiles = transport.responseJSON;
 				if (!audiofiles)
 					return; // Do not show an error, this just means that there are no audiofiles found.
-				
 				this.showAudioFiles(audiofiles);
 			}.bindAsEventListener(this),
 			
@@ -146,7 +143,8 @@ var AudioLibraryWidget = Class.create({
 			'method': 'post',
 			'parameters': {
 				'id': audiofile.id,
-				'newname': newname
+				'newname': newname,
+				'messagegroupid': this.messagegroupid
 			},
 			'onSuccess': function(transport) {
 				var data = transport.responseJSON;

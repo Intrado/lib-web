@@ -12,9 +12,12 @@ class ValMessageBody extends Validator {
 			$text = $value;
 		}
 		
+		if (isset($args['messagegroupid']))
+			$audiofileids = MessageGroup::getReferencedAudioFileIDs($args['messagegroupid']);
+		
 		$message = new Message();
-		$errors = array();	
-		$parts = $message->parse($text,$errors);  // Fill in with voice id later
+		$errors = array();
+		$parts = $message->parse($text,$errors, null, isset($audiofileids) ? $audiofileids : null); // Fill in with voice id later
 		if (count($errors) > 0)	{
 			$str = "There was an error parsing the message: ";
 			foreach($errors as $error)

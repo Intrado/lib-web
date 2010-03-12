@@ -32,11 +32,6 @@ function handleRequest() {
 		case 'lists':
 			return cleanObjects(DBFindMany('PeopleList', ', (name+0) as lettersfirst from list where userid=? and not deleted order by lettersfirst,name', false, array($USER->id)));
 
-		// Returns a map of audiofiles belonging to a particular messagegroup. Results are sorted by recorddate.
-		case 'AudioFiles':
-			$messagegroupid = !empty($_GET['messagegroupid']) ? $_GET['messagegroupid'] + 0 : 0;
-			return cleanObjects(DBFindMany('AudioFile', 'from audiofile where userid=? and messagegroupid=? and not deleted order by messagegroupid desc, recorddate desc', false, array($USER->id, $messagegroupid)));
-
 		// Return an AudioFile object specified by its ID.
 		case 'AudioFile':
 			if (!isset($_GET['id']))
@@ -119,6 +114,22 @@ function handleRequest() {
 				return QuickQuery("select count(id) from message where userid=? and not deleted and type=?", false, array($USER->id, $_GET['messagetype']))?true:false;
 			if (isset($_GET['messageid']))
 				return QuickQuery("select count(id) from message where userid=? and not deleted and id=?", false, array($USER->id, $_GET['messageid']))?true:false;
+
+		// Returns an array of id,name,messagegroupid for audiofiles either belonging to this messagegroup or referenced by messages in this messagegroup.
+		case 'getaudiolibrary':
+			if (!isset($_GET['messagegroupid']) || !$_GET['messagegroupid'])
+				return false;
+			
+			$messagegroupid = $_GET['messagegroupid'] + 0;
+			
+			if (!userOwns("messagegroup", $messagegroupid))
+				return false;
+
+			$audiofileids = MessageGroup::getReferencedAudioFileIDs($messagegroupid);
+			if (count($audiofileids) > 0)
+				return QuickQueryMultiRow('select id, name, messagegroupid from audiofile where not deleted and id in ('.implode(',', $audiofileids).') order by recorddate desc', true, false);
+			else
+				return false;
 
 		case 'listrules':
 			// $_GET['listids'] should be json-encoded array.

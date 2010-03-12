@@ -454,6 +454,7 @@ class TranslationItem extends FormItem {
 					if (sel.options[sel.selectedIndex].value != '') {
 						 def = datafieldstable.down('.DataFieldDefaultValue').value;
 						 textInsert('<<' + sel.options[sel.selectedIndex].text + (def ? ':' : '') + def + '>>', textarea);
+						 setTranslationValue(formitemelement.identify());
 					}
 				}.bindAsEventListener(datafieldinsertbutton));
 			";

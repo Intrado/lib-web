@@ -117,7 +117,7 @@ class Message extends DBMappedObject {
 	
 	// This will delete any existing message parts and recreate new ones.
 	// There are 2 usage patterns: either $body is null, or $parts is null.
-	function recreateParts($body, $parts, $preferredgender) {
+	function recreateParts($body, $parts, $preferredgender, $audiofileids = null) {
 		global $USER;
 		
 		if (!is_null($this->id))
@@ -137,7 +137,6 @@ class Message extends DBMappedObject {
 				$part->create();
 			} else {
 				$errors = array();
-				$audiofileids = QuickQueryList("select id from audiofile where userid=? and deleted = 0 and messagegroupid=?", false, false, array($USER->id, $this->messagegroupid));
 				$parts = $this->parse($body, $errors, $voiceid, $audiofileids);
 			}
 		}
