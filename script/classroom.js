@@ -49,6 +49,12 @@
 	}
 
 	function setcache(cache) {
+		var marked = $(markedcomment);
+		if(marked != undefined) {
+			marked.setStyle('border-color:silver');
+		}
+		markedcontacts = new Hash();
+		
 		cache.each(function(event) {
 			var people = checkedcache;//.get(event[0]);
 			var contactid = event[1];
@@ -61,7 +67,8 @@
 			var img = $('c-' + contactid + '-' + event[0]);
 			if(img != undefined) {
 				img.src = categoryinfo.get(event[0]).img;
-				//img.show();
+				var title = img.title;
+				img.title = (parseInt(title) + 1)  + img.title.substr(title.indexOf(" "));
 			}
 			contactlink.set(event[2],event[3]);
 		});
@@ -86,15 +93,21 @@
 			if(contactlink.get(messageid) == undefined || comment !== false) {
 				if(img != undefined) {
 					img.src = categoryinfo.get(category).img;
+					var title = img.title;
+					img.title = (parseInt(title) + 1)  + img.title.substr(title.indexOf(" "));
 				}
 				contactlink.set(messageid,comment);
 			}
 		} else {
 			contactlink.unset(messageid);
-			if(contactlink.size() == 0) {
-				if(img != undefined) {
+			if(img != undefined) {
+				var title = img.title;
+				var count = (parseInt(title) - 1);
+				img.title = count  + img.title.substr(title.indexOf(" "));
+				if(count == 0)
 					img.src = 'img/pixel.gif';
-				}
+			}
+			if(contactlink.size() == 0) {
 				checkedcache.unset(contactid);
 			}
 		}
@@ -136,25 +149,17 @@
 		});
 	 }
 
-	// has link in this section only
-	function haslink(contact,message) {
-		if(checkedcache.get(contact) == undefined || checkedcache.get(contact).get(message) == undefined)
-			return false;
-		return true;
-	}
-
-
 	function markcomment(prefix,id) {
 		var previous;
-		if(markedcomment == id) {
+		if(markedcomment == (prefix + id)) {
 			previous = $(prefix + id);
 			$(prefix + id).setStyle('border-color:silver');
 			markedcomment = false;
 		} else {
 			if(markedcomment)
-				previous = $(prefix + markedcomment);
+				previous = $(markedcomment);
 			$(prefix + id).setStyle('border-color:red');
-			markedcomment = id;
+			markedcomment = prefix + id;
 		}
 
 		if(previous != undefined) {
@@ -165,8 +170,9 @@
 		});
 
 		if(markedcomment) {
+			var markedid = markedcomment.substr(markedcomment.indexOf('-')+1);
 			checkedcache.each(function(contact) {
-				if(contact.value.get(markedcomment) != undefined) {
+				if(contact.value.get(markedid) != undefined) {
 					$('c-' + contact.key).setStyle('border:1px solid red;');
 					markedcontacts.set(contact.key,true);
 				}
@@ -300,9 +306,6 @@
 
 		clearchecked();
 
-
-
-
 		var selectedmessages = new Hash();
 		var selectedcomments = new Hash();
 		var newcontct = false;
@@ -393,7 +396,7 @@
 					tr.insert('<td width="100%"><a href="#" id="' + id + '" title="Student id: ' +  person.value.pkey + '" style="text-decoration:none;cursor:pointer;white-space: nowrap;">' + person.value.pkey + ' - ' + person.value.name +'</a></td>');
 					var td = new Element('td', {style:'white-space:nowrap'});//{white-space:'nowrap'}
 					categoryinfo.each(function(category) {
-						td.insert('<img id="' + id + '-' + category.key + '"src="img/pixel.gif" title="' + category.value.name + '" style="width:10px;display:inline;" alt="" />');
+						td.insert('<img id="' + id + '-' + category.key + '"src="img/pixel.gif" title="0 Comment(s) for ' + category.value.name + '" style="width:10px;display:inline;" alt="" />');
 					});
 					tr.insert(td);
 					tbody.insert(tr);
@@ -523,15 +526,17 @@
 						target.down('a').show();
 					}
 
+					var markedid = markedcomment?markedcomment.substr(markedcomment.indexOf('-')+1):'';
+
 					checkedcontacts.each(function(contact) {
 						if(state == 2) {
 							highlightedcontacts.set('c-' + contact.key,true);
-							if(markedcomment == msgid) {
+							if(markedid == msgid) {
 								markedcontacts.set(contact.key,true);
 								$('c-' + contact.key).setStyle('border:1px solid red;');
 							}
 						} else {
-							if(markedcomment == msgid) {
+							if(markedid == msgid) {
 								markedcontacts.unset(contact.key);
 								$('c-' + contact.key).setStyle('border:1px solid white;');
 							}
