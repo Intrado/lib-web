@@ -181,8 +181,8 @@ startWindow("Display Options" . help('Replies_DisplayOptions'), "padding: 3px;")
 			NewFormItem($f, $s, 'jobselect', 'selectoption', $name, $id);
 		}
 	}
-?>
 	NewFormItem($f, $s, 'jobselect', 'selectend');
+?>
 	</td>
 </tr>
 <tr>
