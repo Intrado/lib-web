@@ -92,7 +92,11 @@ if($id){
 		doStartSession();
 	$_SESSION['portaluserid'] = $id;
 	$_SESSION['colorscheme']['_brandtheme'] = "3dblue";
-
+	$_SESSION['colorscheme']['_brandprimary'] = "26477D";
+	$_SESSION['colorscheme']['_brandtheme1'] = "89A3CE";
+	$_SESSION['colorscheme']['_brandtheme2'] = "89A3CE";
+	$_SESSION['colorscheme']['_brandratio'] = ".3";
+	
 	redirect("choosecustomer.php".$appendcustomerurl);
 }
 
