@@ -12,8 +12,8 @@ class EmailAttach extends FormItem {
 			<input id="' . $n . '" name="' . $n . '" type="hidden" value="' . escapehtml($value) . '"/>
 			<div id="uploadedfiles" style="display: none;"></div>
 			<div id="upload_process" style="display: none;"><img src="img/ajax-loader.gif" /></div>
-			<iframe id="'.$n.'my_attach" src="emailattachment.php?formname='.$this->form->name.'&itemname='.$n.'" style="border:0; padding: 0; margin:0; bottom:0px; height: 2em"></iframe>
-			';
+			<iframe id="'.$n.'my_attach" src="emailattachment.php?formname='.$this->form->name.'&itemname='.$n.'" style="border:0; padding: 0; margin:0; bottom:0px; height: 3.2em"></iframe>
+			';																																		// Don't make height smalles or the iframe will scroll in some browsers
 		return $str;
 	}
 	
