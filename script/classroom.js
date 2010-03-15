@@ -50,11 +50,11 @@
 
 	function setcache(cache) {
 		var marked = $(markedcomment);
-		if(marked != undefined) {
+		if(marked && marked != undefined) {
 			marked.setStyle('border-color:silver');
 		}
 		markedcontacts = new Hash();
-		
+
 		cache.each(function(event) {
 			var people = checkedcache;//.get(event[0]);
 			var contactid = event[1];
