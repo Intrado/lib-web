@@ -37,7 +37,7 @@ function nomatchhangup() {
 ?>
 <voice>
 	<message name="hangup">
-	       	<tts gender="female">I'm sorry, but I was not able to locate that Student ID Number. Please verify your Student ID Number and try again. goodbye!</tts>
+	       	<tts gender="female">Please verify your Student ID Number and try again. goodbye!</tts>
 	       	<hangup />
 
 	</message>
