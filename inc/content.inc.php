@@ -141,7 +141,7 @@ function handleFileUpload($formitemname, $maxfilesizebytes, $unsafeext = null, $
 		} else if ($_FILES[$formitemname]['size'] >= $maxfilesizebytes) {
 			$errormessage .= _L('The file you uploaded exceeds the maximum email attachment limit of %s.', ($maxfilesizebytes / 1024) . 'K');
 		} else if ($_FILES[$formitemname]['size'] <= 0) {
-			$errormessage .= _L('The file you uploaded apears to be empty\nPlease check the file and try again');
+			$errormessage .= _L('The file you uploaded appears to be empty. Please check the file and try again');
 		} else {
 			$contentid = contentPut($newname,$mimetype);
 			if ($contentid) {
