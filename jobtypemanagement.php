@@ -77,8 +77,10 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f, "add") || CheckFormSubmit($f, "
 				foreach($types[$index] as $type){
 					if(CheckFormSubmit($f, 'delete') !== false &&
 						CheckFormSubmit($f, 'delete') == $type->id){
-						$type->deleted = 1;
-						$type->update();
+						if(($type->systempriority == 2 && $IS_COMMSUITE) || $type->systempriority == 3) {
+							$type->deleted = 1;
+							$type->update();
+						}
 					} else {
 						getJobtypeForm($f, $s, $type, $maxphones, $maxemails, $maxsms);
 					}
