@@ -155,7 +155,8 @@ if ($_SESSION['addressesorigin'] == "manualadd" && $_SESSION['listid'] != null) 
 	$titles = array(2 => "First Name",
 					3 => "Last Name",
 					4 => "Language");
-	$formatters = array(5 => "fmt_phone",
+	$formatters = array(4 => "fmt_languagecode",
+						5 => "fmt_phone",
 						6 => "fmt_email",
 						7 => "fmt_phone",
 						8 => "fmt_null",
