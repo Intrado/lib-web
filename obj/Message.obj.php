@@ -339,7 +339,8 @@ class Message extends DBMappedObject {
 		return $parts;
 	}
 	
-	static function format ($parts, $fields = array()) {
+	// used to prepare parts to display in editor (use renderXXX methods for preview)
+	static function format ($parts) {
 		$map = FieldMap::getMapNames();
 		$data = "";
 		$voices = DBFindMany("Voice", "from ttsvoice");
@@ -364,11 +365,8 @@ class Message extends DBMappedObject {
 				break;
 			case 'V':
 				$partstr .= "<<" . $map[$part->fieldnum];
-				if (!isset($fields[$part->fieldnum]) || !($value = $fields[$part->fieldnum])) {
-					$value = $part->defaultvalue;
-				}
-				if ($value !== null && strlen($value) > 0)
-					$partstr .= ":" . $value;
+				if ($part->defaultvalue !== null && strlen($part->defaultvalue) > 0)
+					$partstr .= ":" . $part->defaultvalue;
 				$partstr .= ">>";
 				break;
 			case 'I':
@@ -384,11 +382,66 @@ class Message extends DBMappedObject {
 		return $data;
 	}
 
-	static function renderMessageParts($id, $fields) {
-		$parts = DBFindMany("MessagePart", "from messagepart where messageid=$id order by sequence");
-		return Message::renderParts($parts,$fields);
+	// preview sms message
+	static function renderSmsParts($parts) {
+		$message = "";
+		// only one part expected in sms message
+		$firstpart = reset($parts);
+		if ($firstpart && $firstpart->type == 'T')
+			$message = $firstpart->txt;
+	
+		return nl2br(escapehtml($message));
 	}
-	static function renderParts($parts, $fields) {
+	
+	// preview plain email message
+	static function renderEmailPlainParts($parts, $fields = array()) {
+		$message = "";	
+		foreach ($parts as $part) {
+			switch ($part->type) {
+			case 'T':
+				$message .= $part->txt;
+				break;
+			case 'V':
+				if (isset($fields[$part->fieldnum]))
+					$d = $fields[$part->fieldnum];
+				else
+					$d = $part->defaultvalue;
+				$message .= $d;			
+				break;
+			}
+		}
+	
+		return nl2br(escapehtml($message));
+	}
+	
+	// preview html email message
+	static function renderEmailHtmlParts($parts, $fields = array()) {
+		$message = "";	
+		foreach ($parts as $part) {
+			switch ($part->type) {
+			case 'T':
+				$message .= $part->txt;
+				break;
+			case 'V':
+				if (isset($fields[$part->fieldnum]))
+					$d = $fields[$part->fieldnum];
+				else
+					$d = $part->defaultvalue;
+				$message .= $d;			
+				break;
+			case 'I':
+				$message .= '<img src="viewimage.php?id=' . $part->imagecontentid . '">';
+				permitContent($part->imagecontentid);
+				break;
+			}
+		}
+		$message = str_replace('<<', '&lt;&lt;', $message);
+		$message = str_replace('>>', '&gt;&gt;', $message);
+		return $message;
+	}
+
+	// preview phone message, returns array
+	static function renderPhoneParts($parts, $fields) {
 		// -- digest the message --
 		$renderedparts = array();
 		$curpart = 0;
