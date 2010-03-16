@@ -56,7 +56,7 @@ if (isset($_GET['usetext']) && isset($_SESSION['ttstext']) && isset($_SESSION['t
 				$part->voiceid = $voiceid;
 		}	
 	}
-	$renderedparts = Message::renderParts($parts,$fields);
+	$renderedparts = Message::renderPhoneParts($parts,$fields);
 	
 	session_write_close();//WARNING: we don't keep a lock on the session file, any changes to session data are ignored past this point
 	Message::playParts($renderedparts,"mp3");
