@@ -187,7 +187,7 @@ function handleRequest() {
 					'totalremoved' => $list->countRemoved(),
 					'totaladded' => $list->countAdded(),
 					'totalrule' => -999, //TOOD remove this
-					'total' => $renderedlist->getTotal());
+					'total' => $renderedlist->getTotal() + 0);
 			}
 			return $stats;
 
