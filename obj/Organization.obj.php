@@ -25,12 +25,21 @@ class Organization extends DBMappedObject {
 	
 		if ($validorgkeys === false) {
 			if (QuickQuery('select 1 from userassociation where userid = ? limit 1', false, array($USER->id))) {
-				$validorgkeys = QuickQueryList('
-					select o.id, o.orgkey
+				$validorgkeys = QuickQueryList("
+					(select o.id as oid, o.orgkey as okey
 					from userassociation ua
 						inner join organization o on (ua.organizationid = o.id)
-					where ua.userid = ? and ua.type = "organization"',
-					true, false, array($USER->id)
+					where ua.userid = ? and ua.type = 'organization')
+					UNION
+					(select o.id as oid, o.orgkey as okey
+					from userassociation ua
+						inner join section s on
+							(ua.sectionid = s.id and ua.type = 'sectoin')
+						inner join organization o on
+							(s.organizationid = o.id)
+					where ua.userid = ?)
+					order by okey",
+					true, false, array($USER->id, $USER->id)
 				);
 			} else { // Unrestricted
 				$validorgkeys = QuickQueryList('select id, orgkey from organization where not deleted', true, false);
