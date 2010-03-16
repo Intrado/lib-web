@@ -260,22 +260,6 @@ class User extends DBMappedObject {
 		return QuickQuery($query,false,array($personid,$this->id));
 	}
 	
-	/**
-	 * Checks to see if the specified person is visible to the user. Checks addressbook, orgs, and rules.
-	 * @param $pkey
-	 * @return Person's PID, F01, F02, or false
-	 */
-	function getPidAndNameIfCanSee ($pkey) {
-		$joinsql = $this->getPersonAssociationJoinSql(array(), array(), "p");
-		$rulesql = $this->getRuleSql(array(), "p");
-		$query = "select p.id, p.f01, p.f02 from person p \n"
-				."	$joinsql \n"
-				."	where p.pkey=? and not p.deleted and (p.userid=0 OR p.userid=? or (1 $rulesql))  \n";
-
-		return QuickQueryRow($query,true,false,array($pkey,$this->id));
-	}
-	
-
 	//see if the login is used
 	function checkDuplicateLogin ($newlogin, $id) {
 		if (QuickQuery("select count(*) from user where id != ? and login=? and not deleted", false, array($id, $newlogin)) > 0 )
