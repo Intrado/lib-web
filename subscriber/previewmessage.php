@@ -78,46 +78,20 @@ if ($jobid != 0 && $personid != 0) {
 	}
 	$historicdata = QuickQueryRow($query, true, false, $args);
 }
-if($email || $sms){
+if ($email || $sms) {
 	$parts = DBFindMany('MessagePart', 'from messagepart where messageid=? order by sequence', false, array($messageid));
-
-	$messagetext = Message::format($parts, $historicdata);
-	if ("html" == $subtype) {
-		$messagetext = str_replace('<<', '&lt;&lt;', $messagetext);
-		$messagetext = str_replace('>>', '&gt;&gt;', $messagetext);
-	} else {
-		$messagetext = nl2br(escapehtml(($messagetext)));
-	}
-	if($email){
+	if ($email) { //email
 		$attachments = DBFindMany("messageattachment","from messageattachment where messageid=?", false, array($messageid));
-	}
-}
-
-
-
-////////////////////////////////////////////////////////////////////////////////
-// Display Functions
-////////////////////////////////////////////////////////////////////////////////
-
-function formatText($messageid, $historicdata) {
-	$messageparts = DBFindMany("MessagePart", "from messagepart where messageid = ? order by sequence", false, array($messageid));
-	$message = "";	
-	foreach ($messageparts as $part) {
-		switch ($part->type) {
-		case 'T':
-			$message .= $part->txt;
-			break;
-		case 'V':
-			$d = $historicdata[$part->fieldnum];
-			if ($d == "")
-				$d = $part->defaultvalue;
-			$message .= $d;			
-			break;
+		if ("html" == $subtype) { // html
+			$messagetext = Message::renderEmailHtmlParts($parts, $historicdata);
+		} else { // plain
+			$messagetext = Message::renderEmailPlainParts($parts, $historicdata);
 		}
+	} else { // sms
+		$messagetext = Message::renderSmsParts($parts);
 	}
-	
-	return $message;
 }
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // Display
