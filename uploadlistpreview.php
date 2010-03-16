@@ -17,6 +17,7 @@ include_once("obj/PeopleList.obj.php");
 include_once("obj/Person.obj.php");
 include_once("obj/Phone.obj.php");
 include_once("obj/Email.obj.php");
+include_once("obj/FieldMap.obj.php");
 require_once("inc/ftpfile.inc.php");
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -39,6 +40,9 @@ if (isset($_SESSION['listuploadfiles'][$list->id])) {
 	$curfilename = false;
 	$errormsg = "Please upload a file";
 }
+
+$firstnameField = FieldMap::getFirstNameField();
+$lastnameField = FieldMap::getLastNameField();
 
 $phonefield = isset($_SESSION['listupload']['phonefield']) ? $_SESSION['listupload']['phonefield'] : 0;
 $emailfield = isset($_SESSION['listupload']['emailfield']) ? $_SESSION['listupload']['emailfield'] : 0;
@@ -97,12 +101,14 @@ if ($curfilename && !(CheckFormSubmit($f,'save') && $type =="ids") ) {
 				$total++;
 				$count--;
 				if ($count > 0) {
-					$p = $USER->getPidAndNameIfCanSee($pkey);
-					if ($p) {
-						$phone = DBFind("Phone","from phone where personid=?", false, array($p['id']));
-						$email = DBFind("Email","from email where personid=?", false, array($p['id']));
+					$p = DBFind("Person","from person where pkey=?", false, array($pkey));
+					if ($p && $USER->canSeePerson($p->id)) {
+						$phone = DBFind("Phone","from phone where personid=?", false, array($p->id));
+						$email = DBFind("Email","from email where personid=?", false, array($p->id));
 						//check if the object isnt false else display empty string
-						$listpreviewdata[] = array($pkey,$p['f01'],$p['f02'], $phone ? Phone::format($phone->phone) : "", $email ? $email->email : "");
+						$listpreviewdata[] = array($pkey,$p->$firstnameField,$p->$lastnameField, $phone ? Phone::format($phone->phone) : "", $email ? $email->email : "");
+					} else {
+						$p = false;
 					}
 				}
 				if (!$p) {
