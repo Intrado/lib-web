@@ -117,6 +117,11 @@
 	 function saveComment(id) {
 		var prefix = tabs.currentSection == 'lib-search'?'smsg':'msg';
 		var text = $(prefix+ 'rem' + id).down('textarea').getValue();
+		if(text.length > 5000) {
+			alert('Remarks must contain less than 5000.');
+			return;
+		}
+
 		// Save event to database
 		new Ajax.Request(requesturl,
 		{

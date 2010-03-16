@@ -32,8 +32,6 @@ if(!classroomavailable($schedule)) {
 	redirect('classroommessageunautherized.php');
 }
 
-//TODO add redirect if we are past time window
-
 ////////////////////////////////////////////////////////////////////////////////
 // Settings
 ////////////////////////////////////////////////////////////////////////////////
@@ -97,8 +95,6 @@ if (isset($_POST['eventContacts']) && isset($_POST['eventMessage']) && isset($_P
 											and e.userid = ? and e.targetedmessageid = ? and e.sectionid = ? and Date(e.occurence) = CURDATE()",
 											true,false,$args);
 
-
-
 		foreach($contacts as $contact) {
 			$eventid = isset($events[$contact])?$events[$contact]:null;
 			QuickQuery("BEGIN");
@@ -108,8 +104,8 @@ if (isset($_POST['eventContacts']) && isset($_POST['eventMessage']) && isset($_P
 			$event->sectionid = $section->id;
 			$event->targetedmessageid = $message;
 			$event->name = "Teacher Comment";
-			if(isset($_POST['eventComments'])) {
-				$event->notes = $USER->authorize('targetedmessage')?$_POST['eventComments']:"";
+			if(isset($_POST['eventComments']) && $USER->authorize('targetedmessage')) {
+				$event->notes = $_POST['eventComments'].length > 5000 ? substr($_POST['eventComments']):$_POST['eventComments'];
 			}
 			else if(!$event->notes){
 				$event->notes = "";
