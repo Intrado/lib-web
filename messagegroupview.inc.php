@@ -126,20 +126,26 @@ foreach ($destinations as $type => $destination) {
 				}
 			}
 			
+			$parts = DBFindMany('MessagePart', 'from messagepart where messageid=? order by sequence', false, array($message->id));
+
 			$messageformdata = array();
 			
-			$parts = DBFindMany('MessagePart', 'from messagepart where messageid=? order by sequence', false, array($message->id));
-			if ($subtype == 'html') {
-				$messagetext = str_replace('<<', '&lt;&lt;', $message->format($parts));
-				$messagetext = str_replace('>>', '&gt;&gt;', $messagetext);
-			} else {
-				$messagetext = nl2br(escapehtml($message->format($parts)));
-			}
-			
 			if ($type == 'sms') {
+				$messagetext = Message::renderSmsParts($parts);
 				$messageformdata["header"] = makeFormHtml(null, null,"<div class='MessageBodyHeader'>" . _L("SMS Message") . "</div>");
 				$messageformdata["message"] = makeFormHtml(null, null,"<div class='MessageTextReadonly'>$messagetext</div>");
 			} else {
+				if ($type == 'email') {
+					// $attachments = DBFindMany("messageattachment","from messageattachment where messageid=?", false, array($message->id));
+					if ("html" == $subtype) { // html
+						$messagetext = Message::renderEmailHtmlParts($parts);
+					} else { // plain
+						$messagetext = Message::renderEmailPlainParts($parts);
+					}
+				} else { // phone
+					$messagetext = nl2br(escapehtml(Message::format($parts)));
+				}
+
 				$messageformdata["header"] = makeFormHtml(null, null,"<div class='MessageBodyHeader'>" . _L("%s Message", $languagename) . "</div>");
 				$messagehtml = "<div class='MessageTextReadonly'>$messagetext</div>";
 					
@@ -236,6 +242,11 @@ if ($countdestinations > 0) {
 			'name' => array(
 				"label" => _L('Message Name'),
 				"control" => array("FormHtml","html" => $messagegroup->name),
+				"helpstep" => 1
+			),
+			'desc' => array(
+				"label" => _L('Description'),
+				"control" => array("FormHtml","html" => $messagegroup->description),
 				"helpstep" => 1
 			),
 			'defaultlanguagecode' => array(
