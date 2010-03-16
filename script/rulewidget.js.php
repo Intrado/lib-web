@@ -24,10 +24,10 @@ var RuleWidget = Class.create({
 
 	// @param container, the DOM container for this widget.
 	// @param readonly, disables rule editor
-	// @param, allowedFields, single letters, example: ['f','g','c']
+	// @param, allowedFieldTypes, single letters, example: ['f','g','c']
 	// @param, ignoredFields, specific fieldnums to ignore, example: ['c01']
 	// @param, showRemoveAllButton, "Remove All Rules" button, fires "RuleWidget:RemoveAllRules"
-	initialize: function(container, readonly, allowedFields, ignoredFields, showRemoveAllButton) {
+	initialize: function(container, readonly, allowedFieldTypes, ignoredFields, showRemoveAllButton) {
 		this.ruleEditorGuideContents = <?=json_encode(array(
 			// Fieldmap
 			'additionalChooseFieldmap' => _L('To add another filter rule select a field'), // Used instead of 'chooseFieldmap' if there are existing rules
@@ -66,10 +66,10 @@ var RuleWidget = Class.create({
 		this.guideStepIndex = 0;
 		this.guideFieldset = null;
 
-		if (!allowedFields)
-			this.allowedFields = ['f','g','c'];
+		if (!allowedFieldTypes)
+			this.allowedFieldTypes = ['f','g','c','organization'];
 		else
-			this.allowedFields = allowedFields;
+			this.allowedFieldTypes = allowedFieldTypes;
 
 		if (!ignoredFields)
 			this.ignoredFields = [];
@@ -150,12 +150,18 @@ var RuleWidget = Class.create({
 				this.operators = data['operators'];
 				this.reldateOptions = data['reldateOptions'];
 				this.fieldmaps = {};
+				
 				// data['fieldmaps'] is indexed by record id, we prefer indexing by fieldnum.
+				// This is for all f, g and c fields
+				var fieldnum = "";
 				for (var i in data['fieldmaps']) {
-					var fieldnum = data['fieldmaps'][i].fieldnum;
+					fieldnum = data['fieldmaps'][i].fieldnum;
+					
+					// Specific field types are allowed. Skip any not included in allowedFieldTypes
 					// Test first letter
-					if (this.allowedFields.indexOf(fieldnum.charAt(0)) < 0)
+					if (this.allowedFieldTypes.indexOf(fieldnum.charAt(0)) < 0)
 						continue;
+					// Specific fields may be ignored. skip any in ignoredFields
 					// Test fieldnum name
 					if (this.ignoredFields.indexOf(fieldnum) >= 0)
 						continue;
@@ -167,8 +173,8 @@ var RuleWidget = Class.create({
 					}
 				}
 
-				// The customer has organizations so show a selector for it
-				if (data.hasorg) {
+				// The customer has organizations so show a selector for it if organization type fields are allowed
+				if (data.hasorg && this.allowedFieldTypes.indexOf('organization') >= 0) {
 					this.fieldmaps['organization'] = {};
 					this.fieldmaps['organization'].type = 'association';
 					this.fieldmaps['organization'].name = '<?=addslashes(_L("Organization"))?>';
@@ -204,6 +210,7 @@ var RuleWidget = Class.create({
 					this.warningDiv.update('<?=addslashes(_L("WARNING: Some rules are not visible due to security restrictions or system configuration."))?>');
 					this.warningDiv.show();
 				}
+				
 				this.container.fire('RuleWidget:Ready');
 			}.bindAsEventListener(this, preloadedRules ? preloadedRules : null)
 		);
@@ -645,18 +652,24 @@ var RuleEditor = Class.create({
 
 		// radio buttons
 		var radiobuttons = criteriaSelectbox.select('input');
-
+		
 		// if this has only one possible criteria, there is no radiobutton. just load values
 		if (radiobuttons.length == 0){
 			this.show_value_column(this.get_selected_fieldmap().fieldnum);
+			// set help hint to value column
+			this.trigger_event_in_column(null, this.valueTD);
+		// if there are criteria to choose from...
 		} else {
-
+			// set help hint to criteria column
+			this.trigger_event_in_column(null, this.criteriaTD);
 			// Invoke onclick for each radiobox.
 			radiobuttons.invoke('observe', 'click', function(event) {
 				var fieldmap = this.get_selected_fieldmap();
+				// replace the value column, but only if you have to.
 				if (fieldmap.type != 'multisearch' || (!this.valueTD.down('input') && !this.valueTD.down('select'))) {
 					this.show_value_column(fieldmap.fieldnum);
 				}
+				// set help hint to value column
 				this.trigger_event_in_column(null, this.valueTD);
 			}.bindAsEventListener(this));
 		}
@@ -695,19 +708,18 @@ var RuleEditor = Class.create({
 			op = operators[0];
 		}
 
-		this.trigger_event_in_column.bindAsEventListener(this, this.valueTD);
-
 		this.ruleWidget.container.style.width = 'auto';
 		var container = new Element('div');
 		switch(type) {
 			case 'association':
 				// fall through, shares cache and ajax call with multisearch
 			case 'multisearch':
-				container.setStyle({'border': 'solid 1px gray', 'background': 'white'});
+				container.setStyle({'border': 'solid 1px gray', 'background': 'white', 'padding':'2px'});
 				container.update('<img src="img/ajax-loader.gif"/>');
 				if (this.ruleWidget.multisearchDomCache[fieldnum]) {
 					container.update(this.ruleWidget.multisearchDomCache[fieldnum]);
 					this.add_multicheckbox_toolbar(container);
+					this.show_action_column();
 				} else {
 					new Ajax.Request('ajax.php?type=getdatavalues&fieldnum=' + fieldnum, {
 						onSuccess: function(transport, fieldnum, type) {
@@ -726,9 +738,12 @@ var RuleEditor = Class.create({
 							this.ruleWidget.multisearchDomCache[fieldnum] = container.innerHTML;
 							var tempdiv = new Element('div').insert(this.add_multicheckbox_toolbar(container));
 							section.update(container);
+							this.show_action_column();
+
 						}.bindAsEventListener(this, fieldnum, type)
 					});
 				}
+
 				break;
 
 			case 'numeric':
@@ -737,6 +752,7 @@ var RuleEditor = Class.create({
 					container.insert('<div><?=addslashes(_L('and'))?></div>');
 					container.insert(this.make_textbox('',true));
 				}
+				this.show_action_column();
 				break;
 
 			case 'reldate':
@@ -756,17 +772,18 @@ var RuleEditor = Class.create({
 						container.insert(this.make_textbox('',true));
 					}
 				}
+				this.show_action_column();
 				break;
 
 			case 'text':
 				container.update(this.make_textbox(''));
+				this.show_action_column();
 				break;
 		}
 
 		section.update(container);
 
 		this.valueTD.down('span').show().observe('click', this.trigger_event_in_column.bindAsEventListener(this, this.valueTD));
-		this.show_action_column();
 	},
 
 	show_action_column: function(clear) {
@@ -837,9 +854,7 @@ var RuleEditor = Class.create({
 			var fieldnum = this.fieldTD.down('select').getValue();
 			this.show_value_column(null);
 			this.show_criteria_column(fieldnum);
-			if (fieldnum !== '')
-				this.trigger_event_in_column(null, this.criteriaTD);
-			else {
+			if (fieldnum == '') {
 				this.ruleWidget.refresh_guide(true);
 				this.ruleWidget.container.fire('RuleWidget:ChangeField', {
 					'fieldnum': ''
