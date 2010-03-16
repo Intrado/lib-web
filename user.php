@@ -563,22 +563,21 @@ $fields = QuickQueryMultiRow("select fieldnum from fieldmap where options not li
 $ignoredFields = array();
 foreach ($fields as $fieldnum)
 	$ignoredFields[] = $fieldnum[0];
-if (!in_array('c01', $ignoredFields))
-	$ignoredFields[] = 'c01';
 $formdata["datarules"] = array(
 	"label" => _L("Data Restriction"),
 	"fieldhelp" => _L('If the user should only be able to access certain data, you may create restriction rules here.'),
 	"value" => json_encode(array_values($rules)),
 	"validators" => array(
-		array("ValRules")
+		array("ValRules", "allowedFieldTypes" => array('f', 'g', 'c'))
 	),
-	"control" => array("FormRuleWidget", "ignoredFields" => $ignoredFields, "showRemoveAllButton" => true),
+	"control" => array("FormRuleWidget", "allowedFieldTypes" => array('f', 'g', 'c'), "ignoredFields" => $ignoredFields, "showRemoveAllButton" => true),
 	"helpstep" => 1
 );
 
 // if user has a staff ID then only f and g field restrictions can be used.
 if ($hasstaffid) {
-	$formdata["datarules"]["control"]["allowedFields"] = array('f', 'g');
+	$formdata["datarules"]["validators"][0]["allowedFieldTypes"] = array('f', 'g');
+	$formdata["datarules"]["control"]["allowedFieldTypes"] = array('f', 'g');
 }
 
 // Read only users have some control items disabled and some validators removed
@@ -833,7 +832,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 			else
 				redirect("user.php?id=".$edituser->id);
 		} else {
-			// TODO, Release 7.2: notice(_L("Changes to %s's account is now saved", $edituser->login));
+			notice(_L("Changes to account %s are now saved", $edituser->login));
 
 			if ($ajax)
 				$form->sendTo("users.php");
