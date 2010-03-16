@@ -300,12 +300,12 @@ $formdata["dateoptions"] = array(
 );
 
 $formdata[] = _L("Filter By");
-$allowedFields = array('f','g');
+$allowedFieldTypes = array('f','g');
 $formdata["ruledata"] = array(
 	"label" => _L('Criteria'),
 	"value" => $rulewidgetvaluejson,
-	"control" => array("FormRuleWidget", "allowedFields" => $allowedFields),
-	"validators" => array(array('ValRules', "allowedFields" => $allowedFields)),
+	"control" => array("FormRuleWidget", "allowedFieldTypes" => $allowedFieldTypes),
+	"validators" => array(array('ValRules', "allowedFieldTypes" => $allowedFieldTypes)),
 	"helpstep" => 1
 );
 

@@ -1,5 +1,5 @@
 <?
-// @param optional $args["allowedFields"], example: array('f','g','c')
+// @param optional $args["allowedFieldTypes"], example: array('f','g','c')
 class ValRules extends Validator {
 	var $onlyserverside = true;
 	
@@ -52,7 +52,7 @@ class ValRules extends Validator {
 				if (!ctype_digit($id) || !isset($validorgkeys[$id]))
 					return $msgUnauthorizedOrganization;
 			}
-		} else if (isset($args['allowedFields']) && !in_array($data->fieldnum[0], $args['allowedFields'])) {
+		} else if (isset($args['allowedFieldTypes']) && !in_array($data->fieldnum[0], $args['allowedFieldTypes'])) {
 			return $msgUnauthorizedFieldmap;
 		} else if (!Rule::initFrom($data->fieldnum, $data->logical, $data->op, $data->val)) {
 			return $msgUnauthorizedFieldmap;
