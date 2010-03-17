@@ -23,6 +23,7 @@
 	var markedcontacts = new Hash();
 	var markedcomment = false;
 	var revealmessages = true;			// Boolean to reveal messages on first click
+	var progresstack = new Array();
 
 	var tabs;
 	var clock;
@@ -46,6 +47,7 @@
 
 	function clearchecked() {
 		checkedmessages = new Hash();
+		progresstack = new Array();
 	}
 
 	function setcache(cache) {
@@ -309,6 +311,10 @@
 			}
 		});
 
+		progresstack.each(function(msg) {
+			$(msg).down('img').src = 'img/checkbox-clear.png';
+		});
+
 		clearchecked();
 
 		var selectedmessages = new Hash();
@@ -426,13 +432,15 @@
 								});
 							}
 
+							var contactid = this.id.substr(2);
+
 							// Select or deselect the itme depending on alt click. Unable to deselect if only one item is selected
-							if (event.shiftKey && checkedcontacts.get(this.id.substr(2)) != undefined && checkedcontacts.size() > 1) {
+							if (event.shiftKey && checkedcontacts.get(contactid) != undefined && checkedcontacts.size() > 1) {
 								clearhighlight(this);
-								checkedcontacts.unset(this.id.substr(2));
+								checkedcontacts.unset(contactid);
 							} else {
 								highlight(this);
-								checkedcontacts.set(this.id.substr(2),true);
+								checkedcontacts.set(contactid,true);
 							}
 							// First click reveals the message board
 							if(revealmessages) {
@@ -499,6 +507,9 @@
 					textarea.stopObserving();
 				}
 			}
+			$(htmlid).down('img').src = 'img/ajax-loader.gif';
+			progresstack.push(htmlid);
+
 
 			// Save event to database
 			new Ajax.Request(requesturl,
@@ -510,46 +521,51 @@
 							sectionid:$('classselect').getValue()},
 				onFailure: function(){ alert('Unable to Set Message') },
 				onException: function(){ alert('Unable to Set Message') },
-				onSuccess: function(response) {
+				onSuccess: function(response,cuurentcontacts) {
 					if (response.responseText.indexOf(" Login</title>") != -1) {
 						alert('Your changes cannot be saved because your session has expired or logged out.');
 						window.location="index.php?logout=1";
 					}
 
-					$(htmlid).down('img').src = getstatesrc(state);
-					checkedmessages.set(msgid,state);                  // Set Message to appropriate state
-					// Set each selected contact to
-
-					if(state == 2) {
-						highlight($(htmlid));
-					} else {
-						var target = $(htmlid);
-						clearhighlight(target);
-						target.setStyle('height:4.5em;');//background:' + c_none);
-						$(c_prefix + 'txt-' + msgid).setStyle('height:3em;');
-						target.down('span').hide();
-						target.down('a').show();
-					}
-
 					var markedid = markedcomment?markedcomment.substr(markedcomment.indexOf('-')+1):'';
 
-					checkedcontacts.each(function(contact) {
+					cuurentcontacts.each(function(contact) {
 						if(state == 2) {
-							highlightedcontacts.set('c-' + contact.key,true);
+							//highlightedcontacts.set('c-' + contact.key,true);
 							if(markedid == msgid) {
 								markedcontacts.set(contact.key,true);
-								$('c-' + contact.key).setStyle('border:1px solid red;');
+								$('c-' + contact).setStyle('border:1px solid red;');
 							}
 						} else {
 							if(markedid == msgid) {
-								markedcontacts.unset(contact.key);
-								$('c-' + contact.key).setStyle('border:1px solid white;');
+								markedcontacts.unset(contact);
+								$('c-' + contact).setStyle('border:1px solid white;');
 							}
-							highlightedcontacts.unset('c-' + contact.key);
+							//highlightedcontacts.unset('c-' + contact.key);
 						}
-						setEvent(contact.key,msgid,$(htmlid).readAttribute('category'),(state == 2),false);
+						setEvent(contact,msgid,$(htmlid).readAttribute('category'),(state == 2),false);
 					});
-				}
+
+					if(checkedcontacts.keys().toJSON() != cuurentcontacts.toJSON()) {
+				
+						updatemessages(tabs.currentSection,tabs.currentSection);
+					} else {
+						$(htmlid).down('img').src = getstatesrc(state);
+						checkedmessages.set(msgid,state);                  // Set Message to appropriate state
+						// Set each selected contact to
+
+						if(state == 2) {
+							highlight($(htmlid));
+						} else {
+							var target = $(htmlid);
+							clearhighlight(target);
+							target.setStyle('height:4.5em;');
+							$(c_prefix + 'txt-' + msgid).setStyle('height:3em;');
+							target.down('span').hide();
+							target.down('a').show();
+						}
+					}
+				}.bindAsEventListener(this, checkedcontacts.keys())
 			});
 		}
 	};
