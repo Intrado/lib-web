@@ -211,7 +211,7 @@ if($isajax === true) {
 					$publishactionlink = action_link("Un-Subscribe", "fugue/star__minus", "messages.php?publishid=$publishid&remove");
 			}
 			
-			// if the user is only subscribed to this message group, they can't edit, delete, rename
+			// if the user is only subscribed to this message group, they can't edit, delete
 			if ($publishaction == 'subscribe')
 				$tools = action_links (
 					action_link("Preview", "fugue/control", 'messagegroupview.php?id=' . $itemid),
@@ -220,8 +220,8 @@ if($isajax === true) {
 				$tools = action_links (
 					action_link("Edit", "pencil", 'messagegroup.php?id=' . $itemid),
 					$publishactionlink,
-					action_link("Delete", "cross", 'messages.php?delete=' . $itemid, "return confirmDelete();"),
-					action_link("Rename", "textfield_rename", 'messagerename.php?id=' . $itemid));
+					action_link("Delete", "cross", 'messages.php?delete=' . $itemid, "return confirmDelete();")
+				);
 
 
 			$data->list[] = array("itemid" => $itemid,
