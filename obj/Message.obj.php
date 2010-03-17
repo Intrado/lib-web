@@ -468,7 +468,8 @@ class Message extends DBMappedObject {
 	}
 
 	static function playAudio($id, $fields,$audioformat = "wav",$intro = "") {
-		$renderedparts = Message::renderMessageParts($id, $fields);
+		$parts = DBFindMany('MessagePart', 'from messagepart where messageid=? order by sequence', false, array($id));
+		$renderedparts = Message::renderPhoneParts($parts, $fields);
 		Message::playParts($renderedparts,$audioformat,$intro);
 	}
 	static function playParts($renderedparts, $audioformat = "wav",$intro = "") {
