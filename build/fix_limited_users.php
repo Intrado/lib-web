@@ -1,6 +1,4 @@
 <?
-// USAGE: php apply_customer_sql.php customerchanges.sql <all> | <cid1> ... <cidN>
-
 ////////////////////////////////
 // authserver variables must be set!!!
 $authhost="localhost:3306";
