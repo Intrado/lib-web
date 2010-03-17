@@ -40,6 +40,7 @@ foreach($data as $customer){
 // create the subscriber application database user
 function createLimitedUser($limitedusername, $limitedpassword, $custdbname, $sharddb) {
 	mysql_query("drop user '$limitedusername'", $sharddb);
+	mysql_query("flush privileges", $sharddb);
 	if (mysql_query("create user '$limitedusername' identified by '$limitedpassword'", $sharddb) === false)
 		die("Failed to create user $limitedusername on ".$custdbname." error:".mysql_error($sharddb));
 
@@ -72,6 +73,7 @@ function createLimitedUser($limitedusername, $limitedpassword, $custdbname, $sha
 			die("Failed to grant ".$tablename." on ".$custdbname." error:".mysql_error($sharddb));
 		
 	}
+	mysql_query("flush privileges", $sharddb);
 }
 
 ?>
