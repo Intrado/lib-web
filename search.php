@@ -84,8 +84,6 @@ if (isset($_SESSION['listsearch']['rules'])) {
 	$phone = $_SESSION['listsearch']['individual']['phone'];
 	$email = $_SESSION['listsearch']['individual']['email'];
 	
-	var_dump( $_SESSION['listsearch']['individual']);
-	
 	$renderedlist->initWithIndividualCriteria($pkey == "" ? false : $pkey,$phone == "" ? false : $phone,$email == "" ? false : $email);
 } else if (isset($_SESSION['listsearch']['showall'])) {
 	$renderedlist->initWithSearchCriteria(array(), array(), array());
