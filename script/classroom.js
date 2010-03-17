@@ -133,7 +133,7 @@
 						isChecked: true,
 						eventComments:text,
 						sectionid:$('classselect').getValue()},
-			onSuccess: function(response){
+			onSuccess: function(response,cuurentcontacts){
 				if (response.responseText.indexOf(" Login</title>") != -1) {
 					alert('Your changes cannot be saved because your session has expired or logged out.');
 					window.location="index.php?logout=1";
@@ -143,16 +143,21 @@
 				}
 				else {
 					var cat = $(prefix + '-' + id).readAttribute('category');
-					checkedcontacts.each(function(contact) {
-						setEvent(contact.key,id,cat,true,text);
+					cuurentcontacts.each(function(contact) {
+						setEvent(contact,id,cat,true,text);
 					});
-					$(prefix + 'rem' + id).hide();
-					$(prefix + '-' + id).down('a').show();
-					$(prefix + '-' + id).setStyle("height:4.5em;")
-					$(prefix + 'txt-' + id).setStyle("height:3em;")
-					remarkpreview(prefix,id,text);
+
+					if(checkedcontacts.keys().toJSON() != cuurentcontacts.toJSON()) {
+						updatemessages(tabs.currentSection,tabs.currentSection);
+					} else {
+						$(prefix + 'rem' + id).hide();
+						$(prefix + '-' + id).down('a').show();
+						$(prefix + '-' + id).setStyle("height:4.5em;")
+						$(prefix + 'txt-' + id).setStyle("height:3em;")
+						remarkpreview(prefix,id,text);
+					}
 				}
-			}
+			}.bindAsEventListener(this, checkedcontacts.keys())
 		});
 	 }
 
@@ -545,9 +550,7 @@
 						}
 						setEvent(contact,msgid,$(htmlid).readAttribute('category'),(state == 2),false);
 					});
-
 					if(checkedcontacts.keys().toJSON() != cuurentcontacts.toJSON()) {
-				
 						updatemessages(tabs.currentSection,tabs.currentSection);
 					} else {
 						$(htmlid).down('img').src = getstatesrc(state);
