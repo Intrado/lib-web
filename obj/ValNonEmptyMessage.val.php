@@ -3,8 +3,7 @@
 class ValNonEmptyMessage extends Validator {
 	var $onlyserverside = true;
 	function validate ($value) {
-		$messages = QuickQuery("select count(*) from message where messagegroupid = ?", false, array($value));
-		if(!$messages) {
+		if(!QuickQuery("select 1 from message where messagegroupid = ? limit 1", false, array($value))) {
 			return _L("The selected message is empty");
 		}
 		return true;

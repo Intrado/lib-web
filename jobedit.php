@@ -98,11 +98,11 @@ class ValTranslationExpirationDate extends Validator {
 		global $submittedmode;
 		if($submittedmode) {
 			global $job;
-			$hastranslated = QuickQuery("select count(*) from message where messagegroupid = ? and autotranslate = 'translated'", false, array($job->messagegroupid));
+			$hastranslated = QuickQuery("select 1 from message where messagegroupid = ? and autotranslate = 'translated' limit 1", false, array($job->messagegroupid));
 		} else {
 			if($requiredvalues['message'] == "")
 				return true;
-			$hastranslated = QuickQuery("select count(*) from message where messagegroupid = ? and autotranslate = 'translated'", false, array($requiredvalues['message']));
+			$hastranslated = QuickQuery("select 1 from message where messagegroupid = ? and autotranslate = 'translated' limit 1", false, array($requiredvalues['message']));
 		}
 
 		if($hastranslated != false) {
@@ -116,7 +116,7 @@ class ValTranslationExpirationDate extends Validator {
 class ValIsTranslated extends Validator {
 	var $onlyserverside = true;
 	function validate ($value) {
-		$istranslated = QuickQuery("select count(*) from message where messagegroupid = ? and autotranslate = 'translated'", false, array($value));
+		$istranslated = QuickQuery("select 1 from message where messagegroupid = ? and autotranslate = 'translated' limit 1", false, array($value));
 		if($istranslated > 0) {
 			return _L("Can not select a message that is auto-translated with a repeating job");
 		}

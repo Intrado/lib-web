@@ -180,7 +180,7 @@ function wizHasTranslation($postdata) {
 		if($package == "custom" && isset($postdata['/message/options']["options"]) &&
 			$postdata["/message/options"]["options"] == "pick" &&
 			isset($postdata['/message/pickmessage']["messagegroup"]) &&
-			0 < QuickQuery("select count(*) from message where messagegroupid = ? and autotranslate = 'translated'", false, array($postdata['/message/pickmessage']["messagegroup"]))) {
+				QuickQuery("select 1 from message where messagegroupid = ? and autotranslate = 'translated' limit 1", false, array($postdata['/message/pickmessage']["messagegroup"]))) {
 				return true;
 		}
 	}
