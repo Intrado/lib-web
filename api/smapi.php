@@ -769,7 +769,7 @@ class SMAPI{
 				$messagegroup->defaultlanguagecode = 'en'; // NOTE: Default language is assumed to be English.
 				$messagegroup->name = $job->name;
 				$messagegroup->description = $job->description;
-				$messagegroup->modified = makeDateTime(time());
+				$messagegroup->modified = date("Y-m-d H:i:s", time());
 				$messagegroup->deleted = 1; // NOTE: We don't want this messagegroup to show in the UI.
 				$messagegroup->permanent = 0; // NOTE: This is a hidden messagegroup anyway, so why keep it? The original messages remain intact.
 				$messagegroup->create();

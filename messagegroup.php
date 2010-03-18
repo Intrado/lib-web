@@ -75,7 +75,7 @@ if (isset($_GET['id'])) {
 		$newmessagegroup->name = $defaultmessagegroupname;
 		$newmessagegroup->defaultlanguagecode = Language::getDefaultLanguageCode();
 		$newmessagegroup->description = '';
-		$newmessagegroup->modified =  makeDateTime(time());
+		$newmessagegroup->modified =  date("Y-m-d H:i:s", time());
 		$newmessagegroup->deleted = 1; // Set to deleted in case the user does not submit the form.
 		$newmessagegroup->permanent = $defaultpermanent;
 
@@ -818,7 +818,7 @@ if ($button = $messagegroupsplitter->getSubmit()) {
 							$_SESSION['requesteddefaultlanguagecode'] = $postdata['defaultlanguagecode'];
 						}
 						
-						$messagegroup->modified = makeDateTime(time());
+						$messagegroup->modified = date("Y-m-d H:i:s", time());
 					} else if ($form->name == 'emailheaders') {
 						$_SESSION['emailheaders']['subject'] = trim($postdata['subject']);
 						$_SESSION['emailheaders']['fromname'] = trim($postdata['fromname']);
@@ -938,7 +938,7 @@ if ($button = $messagegroupsplitter->getSubmit()) {
 															} else {
 																$message->deleted = 1;
 																$message->messagegroupid = null;
-																$message->modifydate = makeDateTime(time());
+																$message->modifydate = date("Y-m-d H:i:s", time());
 																$message->update();
 															}
 														}
@@ -954,7 +954,7 @@ if ($button = $messagegroupsplitter->getSubmit()) {
 													$sourcemessage->subtype = $formdestinationsubtype;
 													$sourcemessage->languagecode = $languagecode;
 													$sourcemessage->autotranslate = 'source';
-													$sourcemessage->modifydate = makeDateTime(time());
+													$sourcemessage->modifydate = date("Y-m-d H:i:s", time());
 													$sourcemessage->deleted = 0;
 													if ($formdestinationtype == 'email') {
 														$sourcemessage->data = $emaildatastring;
@@ -969,7 +969,7 @@ if ($button = $messagegroupsplitter->getSubmit()) {
 													}
 												} else if ($formdestinationtype == 'email') {
 													$sourcemessage->data = $emaildatastring;
-													$sourcemessage->modifydate = makeDateTime(time());
+													$sourcemessage->modifydate = date("Y-m-d H:i:s", time());
 													$sourcemessage->readHeaders();
 													$sourcemessage->update();
 												}
@@ -991,7 +991,7 @@ if ($button = $messagegroupsplitter->getSubmit()) {
 														$plainsourcemessage->subtype = 'plain';
 														$plainsourcemessage->languagecode = $languagecode;
 														$plainsourcemessage->autotranslate = 'source';
-														$plainsourcemessage->modifydate = makeDateTime(time());
+														$plainsourcemessage->modifydate = date("Y-m-d H:i:s", time());
 														$plainsourcemessage->data = $emaildatastring;
 														$plainsourcemessage->description = SmartTruncate('Plain ' . Language::getName($languagecode), 50);
 														$plainsourcemessage->deleted = 0;
@@ -1021,7 +1021,7 @@ if ($button = $messagegroupsplitter->getSubmit()) {
 													$translatedmessage->subtype = $formdestinationsubtype;
 													$translatedmessage->languagecode = $languagecode;
 													$translatedmessage->autotranslate = 'translated';
-													$translatedmessage->modifydate = makeDateTime(time());
+													$translatedmessage->modifydate = date("Y-m-d H:i:s", time());
 													$translatedmessage->deleted = 0;
 													if ($formdestinationtype == 'email') {
 														$translatedmessage->data = $emaildatastring;
@@ -1035,11 +1035,11 @@ if ($button = $messagegroupsplitter->getSubmit()) {
 														$translatedmessage->createMessageAttachments($emailattachments);
 												} else if ($formdestinationtype == 'email') {
 													$translatedmessage->data = $emaildatastring;
-													$translatedmessage->modifydate = makeDateTime(time());
+													$translatedmessage->modifydate = date("Y-m-d H:i:s", time());
 													$translatedmessage->readHeaders();
 													$translatedmessage->update();
 												} else {
-													$translatedmessage->modifydate = makeDateTime(time());
+													$translatedmessage->modifydate = date("Y-m-d H:i:s", time());
 													$translatedmessage->update();
 												}
 												
@@ -1057,7 +1057,7 @@ if ($button = $messagegroupsplitter->getSubmit()) {
 														$plaintranslatedmessage->subtype = 'plain';
 														$plaintranslatedmessage->languagecode = $languagecode;
 														$plaintranslatedmessage->autotranslate = 'translated';
-														$plaintranslatedmessage->modifydate = makeDateTime(time());
+														$plaintranslatedmessage->modifydate = date("Y-m-d H:i:s", time());
 														$plaintranslatedmessage->data = $emaildatastring;
 														$plaintranslatedmessage->description = SmartTruncate('Plain ' . Language::getName($languagecode), 50);
 														$plaintranslatedmessage->deleted = 0;
@@ -1162,7 +1162,7 @@ if ($button = $messagegroupsplitter->getSubmit()) {
 										
 										$existingmessage->deleted = 1;
 										$existingmessage->messagegroupid = null;
-										$existingmessage->modifydate = makeDateTime(time());
+										$existingmessage->modifydate = date("Y-m-d H:i:s", time());
 										$existingmessage->update();
 										
 										// NOTE: Don't bother updating parts and attachments for unassociated messages.
@@ -1175,7 +1175,7 @@ if ($button = $messagegroupsplitter->getSubmit()) {
 									} else {
 										if ($formdestinationtype == 'email' && $formdestinationsubtype == 'plain') {
 											$existingmessage->data = $emaildatastring;
-											$existingmessage->modifydate = makeDateTime(time());
+											$existingmessage->modifydate = date("Y-m-d H:i:s", time());
 											$existingmessage->readHeaders();
 											$existingmessage->update();
 										}
@@ -1203,7 +1203,7 @@ if ($button = $messagegroupsplitter->getSubmit()) {
 											$newplainmessage->subtype = 'plain';
 											$newplainmessage->languagecode = $formdestinationlanguagecode;
 											$newplainmessage->autotranslate = $autotranslate;
-											$newplainmessage->modifydate = makeDateTime(time());
+											$newplainmessage->modifydate = date("Y-m-d H:i:s", time());
 											$newplainmessage->deleted = 0;
 											$newplainmessage->data = $emaildatastring;
 											$newplainmessage->description = SmartTruncate('Plain ' . Language::getName($formdestinationlanguagecode), 50);
@@ -1225,7 +1225,7 @@ if ($button = $messagegroupsplitter->getSubmit()) {
 									$newmessage->subtype = $formdestinationsubtype;
 									$newmessage->languagecode = $formdestinationlanguagecode;
 									$newmessage->autotranslate = $autotranslate;
-									$newmessage->modifydate = makeDateTime(time());
+									$newmessage->modifydate = date("Y-m-d H:i:s", time());
 									$newmessage->deleted = 0;
 									if ($formdestinationtype == 'email') {
 										$newmessage->data = $emaildatastring;
@@ -1243,7 +1243,7 @@ if ($button = $messagegroupsplitter->getSubmit()) {
 											$newplainmessage->subtype = 'plain';
 											$newplainmessage->languagecode = $formdestinationlanguagecode;
 											$newplainmessage->autotranslate = $autotranslate;
-											$newplainmessage->modifydate = makeDateTime(time());
+											$newplainmessage->modifydate = date("Y-m-d H:i:s", time());
 											$newplainmessage->deleted = 0;
 											$newplainmessage->data = $emaildatastring;
 											$newplainmessage->description = SmartTruncate('Plain ' . Language::getName($formdestinationlanguagecode), 50);
@@ -1282,7 +1282,7 @@ if ($button = $messagegroupsplitter->getSubmit()) {
 										$newplainmessage->subtype = 'plain';
 										$newplainmessage->languagecode = $formdestinationlanguagecode;
 										$newplainmessage->autotranslate = $message->autotranslate;
-										$newplainmessage->modifydate = makeDateTime(time());
+										$newplainmessage->modifydate = date("Y-m-d H:i:s", time());
 										$newplainmessage->deleted = 0;
 										$newplainmessage->data = $emaildatastring;
 										$newplainmessage->description = SmartTruncate('Plain ' . Language::getName($formdestinationlanguagecode), 50);

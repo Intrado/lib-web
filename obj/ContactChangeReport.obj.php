@@ -23,10 +23,10 @@ class ContactChangeReport extends ReportGenerator {
 			$reldate = $this->params['reldate'];
 		list($startdate, $enddate) = getStartEndDate($reldate, $this->params);
 
-		$peoplephonelist = QuickQueryList("select personid from phone where editlockdate >= ? and editlock=1", false, false, array(makeDateTime($startdate)));
-		$peopleemaillist = QuickQueryList("select personid from email where editlockdate >= ? and editlock=1", false, false, array(makeDateTime($startdate)));
+		$peoplephonelist = QuickQueryList("select personid from phone where editlockdate >= ? and editlock=1", false, false, array(date("Y-m-d H:i:s", $startdate)));
+		$peopleemaillist = QuickQueryList("select personid from email where editlockdate >= ? and editlock=1", false, false, array(date("Y-m-d H:i:s", $startdate)));
 		if ($hassms) {
-			$peoplesmslist = QuickQueryList("select personid from sms where editlockdate >= ? and editlock=1", false, false, array(makeDateTime($startdate)));
+			$peoplesmslist = QuickQueryList("select personid from sms where editlockdate >= ? and editlock=1", false, false, array(date("Y-m-d H:i:s", $startdate)));
 		} else {
 			$peoplesmslist = array();
 		}

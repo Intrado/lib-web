@@ -71,9 +71,4 @@ function getStartEndDate($type, $arguments = array()){
 	return $res;
 }
 
-// Converts a unix timestamp to a mysql datetime string, not to be confused with php's builtin class DateTime.
-function makeDateTime($timestamp) {
-	return date("Y-m-d H:i:s", $timestamp);
-}
-
 ?>
