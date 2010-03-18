@@ -111,12 +111,17 @@ function messagegroupHandleTabLoaded (event, state, existingmessagegroupid, auto
 			
 			state.messagegroupsummary = results.summary;
 			state.defaultlanguagecode = results.defaultlanguagecode;
-			
+			var tabstatus = false;
+
 			for (var i = 0, count = state.messagegroupsummary.length; i < count; i++) {
 				var result = state.messagegroupsummary[i];
 
 				var updateprevioustab = (result.type == 'email' && memo.previoustab == 'emailheaders') || result.type == previoustabpieces[0];
 				var updatetabloaded = (result.type == 'email' && memo.tabloaded == 'emailheaders') || result.type == tabloadedpieces[0];
+
+				if(result.type == previoustabpieces[0])
+					tabstatus = true;
+
 				if (updateprevioustab || updatetabloaded) {
 					if (result.type == 'email' && $('emailheadersicon')) {
 						$('emailheadersicon').src = "img/icons/accept.gif";
@@ -130,6 +135,9 @@ function messagegroupHandleTabLoaded (event, state, existingmessagegroupid, auto
 						$(result.type + '-' + result.subtype + '-' + result.languagecode + 'icon').src = "img/icons/accept.gif";
 					}
 				}
+			}
+			if ($(memo.previoustab + 'icon')) {
+				$(memo.previoustab + 'icon').src = tabstatus?"img/icons/accept.gif":"img/icons/diagona/16/160.gif";
 			}
 		}.bindAsEventListener(this, memo, state),
 		null,
