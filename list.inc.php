@@ -147,7 +147,7 @@ function fmt_list_destination_sequence($row, $index){
 	// destination type is +2 to the sequence index
 	$typeindex = $index+2;
 	if($row[$typeindex] != "" || $row[$typeindex] != false){
-		return destination_label($row[$typeindex], $row[$index]);
+		return escapehtml(destination_label($row[$typeindex], $row[$index]));
 	} else {
 		return "";
 	}

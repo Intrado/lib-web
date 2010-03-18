@@ -469,7 +469,7 @@ foreach ($fieldmaps as $map) {
 		</tr>
 <?
 		foreach($types[$type] as $item){
-			$header = destination_label($type, $item->sequence);
+			$header = escapehtml(destination_label($type, $item->sequence));
 ?>
 			<tr>
 				<td class="bottomBorder"><?= $header ?></td>

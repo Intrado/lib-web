@@ -63,7 +63,7 @@ function fmt_contacthistory_result($row, $index){
 //index 3 is type
 function fmt_dst_src($row, $index){
 	if($row[$index] != null)
-		return destination_label($row[3], $row[$index]);
+		return escapehtml(destination_label($row[3], $row[$index]));
 	else
 		return "";
 }

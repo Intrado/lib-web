@@ -211,7 +211,7 @@ if ($USER->authorize('sendphone')) {
 	$x = 0;
 	foreach ($phones as $phone) {		
 		$formdata["phone$x"] = array (
-			"label" => destination_label("phone",$x),
+			"label" => escapehtml(destination_label("phone",$x)),
 			"fieldhelp" => _L('Phone numbers entered here will recieve calls when this person is contacted'), 
 			"value" => Phone::format($phone->phone),
 			"validators" => array(
@@ -263,7 +263,7 @@ if ($USER->authorize('sendemail')) {
 	$x = 0;
 	foreach ($emails as $email) {		
 		$formdata["email$x"] = array (
-			"label" => destination_label("email",$x),
+			"label" => escapehtml(destination_label("email",$x)),
 			"fieldhelp" => _L('Emails will be sent to this address when this person is contacted'), 
 			"value" => $email->email,
 			"validators" => array(
@@ -314,7 +314,7 @@ if (getSystemSetting('_hassms', false) && $USER->authorize('sendsms')) {
 	$x = 0;
 	foreach ($smses as $sms) {		
 		$formdata["sms$x"] = array (
-			"label" => destination_label("sms",$x),
+			"label" => escapehtml(destination_label("sms",$x)),
 			"fieldhelp" => _L('SMS numbers entered here will recieve texts when this person is contacted'), 
 			"value" => Phone::format($sms->sms),
 			"validators" => array(

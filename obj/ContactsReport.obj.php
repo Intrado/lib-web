@@ -180,7 +180,7 @@ class ContactsReport extends ReportGenerator {
 		//type at index 7
 		function fmt_destination_sequence($row, $index){
 			if($row[$index] != "" || $row[$index] != false){
-				return destination_label($row[7], $row[$index]);
+				return escapehtml(destination_label($row[7], $row[$index]));
 			} else {
 				return "";
 			}

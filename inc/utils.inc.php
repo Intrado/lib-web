@@ -588,7 +588,7 @@ function fetch_labels($type, $sequence, $refresh=false){
 function destination_label($type, $sequence){
 	$label = fetch_labels($type, $sequence);
 	if($label){
-		$text = format_delivery_type($type). " ". ($sequence+1) . " (" . escapehtml($label) . ")";
+		$text = format_delivery_type($type). " ". ($sequence+1) . " (" . $label . ")";
 		return $text;
 	} else {
 		return format_delivery_type($type). " ". ($sequence+1);
@@ -598,7 +598,7 @@ function destination_label($type, $sequence){
 //TODO: Create more generic functions for popup that would wrap around
 //code or text. ex startHover, endHover
 function destination_label_popup($type, $sequence, $f, $s, $itemname){
-	$label = destination_label($type, $sequence);
+	$label = escapehtml(destination_label($type, $sequence));
 
 
 	if (!isset($GLOBALS['TIPS']))

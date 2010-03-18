@@ -41,7 +41,7 @@ if (!($USER->authorize('createreport'))) {
 //index 5 is type
 function fmt_dst_src($row, $index){
 	if($row[$index] != null)
-		return destination_label($row[5], $row[$index]);
+		return escapehtml(destination_label($row[5], $row[$index]));
 	else
 		return "";
 }

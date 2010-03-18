@@ -24,7 +24,7 @@ if($PERSONID){
 			foreach($phones as $phone){
 ?>
 				<tr>
-					<td class="bottomBorder" ><?=destination_label("phone",$phone->sequence)?></td>
+					<td class="bottomBorder" ><?=escapehtml(destination_label("phone",$phone->sequence))?></td>
 					<td class="bottomBorder" >
 					<? 
 						if(!$lockedphones[$phone->sequence]){ 
@@ -61,7 +61,7 @@ if($PERSONID){
 			foreach($emails as $email){
 ?>
 				<tr>
-					<td class="bottomBorder" ><?=destination_label("email",$email->sequence)?></td>
+					<td class="bottomBorder" ><?=escapehtml(destination_label("email",$email->sequence))?></td>
 					<td class="bottomBorder" >
 						<? 
 							if(!$lockedemails[$email->sequence]){ 
@@ -99,7 +99,7 @@ if($PERSONID){
 				foreach($smses as $sms){
 ?>
 				<tr>
-					<td class="bottomBorder" ><?=destination_label("sms",$sms->sequence)?></td>
+					<td class="bottomBorder" ><?=escapehtml(destination_label("sms",$sms->sequence))?></td>
 					<td class="bottomBorder" >
 						<? 
 							if(!$lockedsms[$sms->sequence]){
