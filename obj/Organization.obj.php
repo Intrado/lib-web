@@ -34,7 +34,7 @@ class Organization extends DBMappedObject {
 					(select o.id as oid, o.orgkey as okey
 					from userassociation ua
 						inner join section s on
-							(ua.sectionid = s.id and ua.type = 'sectoin')
+							(ua.sectionid = s.id and ua.type = 'section')
 						inner join organization o on
 							(s.organizationid = o.id)
 					where ua.userid = ?)
