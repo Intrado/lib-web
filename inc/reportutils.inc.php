@@ -46,7 +46,7 @@ function generateGFieldQuery($personidalias, $isreporthistory = false, $hackPDF 
 }
 
 function generateOrganizationFieldQuery($personidalias) {
-	return ", (select group_concat(oz.orgkey separator ',') from organization oz join personassociation pa on (oz.id = pa.organizationid) where pa.personid=$personidalias and not oz.deleted) as org \n";
+	return ", (select group_concat(oz.orgkey separator ',') from organization oz join personassociation pa on (oz.id = pa.organizationid) where pa.personid=$personidalias ) as org \n";
 }
 
 function select_metadata($tablename=null, $start=null, $fields){
