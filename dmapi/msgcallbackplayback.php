@@ -47,7 +47,7 @@ function renderMessageParts($messagedata) {
 	$msgid = $messagedata['messageid'];
 	$fields = $messagedata['personfields'];
 
-	$renderedparts = Message::renderMessageParts($msgid, $fields);
+	$renderedparts = Message::renderPhoneParts($msgid, $fields);
 	$voices = DBFindMany("Voice","from ttsvoice");
 
 	foreach ($renderedparts as $part) {
