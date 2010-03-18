@@ -97,24 +97,19 @@ if ($curfilename && !(CheckFormSubmit($f,'save') && $type =="ids") ) {
 				if ($pkey == "")
 					continue;
 
-				$p = false;
 				$total++;
 				$count--;
-				if ($count > 0) {
-					$p = DBFind("Person","from person where pkey=?", false, array($pkey));
-					if ($p && $USER->canSeePerson($p->id)) {
+				$p = DBFind("Person","from person where pkey=?", false, array($pkey));
+				if ($p && $USER->canSeePerson($p->id)) {
+					// preview up to limit, but continue to parse to verify all pkeys found or not
+					if ($count > 0) {
 						$phone = DBFind("Phone","from phone where personid=?", false, array($p->id));
 						$email = DBFind("Email","from email where personid=?", false, array($p->id));
 						//check if the object isnt false else display empty string
 						$listpreviewdata[] = array($pkey,$p->$firstnameField,$p->$lastnameField, $phone ? Phone::format($phone->phone) : "", $email ? $email->email : "");
-					} else {
-						$p = false;
 					}
-				}
-				if (!$p) {
+				} else {
 					$notfound++;
-
-					//$listpreviewdata[] = array($pkey, "### Not Found ###", "### Not Found ###", "-","-");
 					$notfounddata[] = array($pkey, "### Not Found ###");
 				}
 			}
