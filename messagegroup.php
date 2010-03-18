@@ -918,7 +918,7 @@ if ($button = $messagegroupsplitter->getSubmit()) {
 											foreach ($autotranslatorlanguages as $languagecode => $translationlanguagename) {
 												// Delete any existing messages of the same type-subtype-languagecode that are not relevent for autotranslate.
 												QuickUpdate('update message set deleted=1 where autotranslate not in ("source", "translated") and messagegroupid=? and type=? and subtype=? and languagecode=?', false, array($messagegroup->id, $formdestinationtype, $formdestinationsubtype, $languagecode));
-												
+
 												if ($formdestinationtype == 'email' && $formdestinationsubtype == 'html') {
 													// Use this flag to determine whether or not to generate a plain text message.
 													$plaintextoverriden = false;
@@ -938,6 +938,7 @@ if ($button = $messagegroupsplitter->getSubmit()) {
 															} else {
 																$message->deleted = 1;
 																$message->messagegroupid = null;
+																$message->modifydate = makeDateTime(time());
 																$message->update();
 															}
 														}
@@ -968,6 +969,7 @@ if ($button = $messagegroupsplitter->getSubmit()) {
 													}
 												} else if ($formdestinationtype == 'email') {
 													$sourcemessage->data = $emaildatastring;
+													$sourcemessage->modifydate = makeDateTime(time());
 													$sourcemessage->readHeaders();
 													$sourcemessage->update();
 												}
@@ -1033,12 +1035,16 @@ if ($button = $messagegroupsplitter->getSubmit()) {
 														$translatedmessage->createMessageAttachments($emailattachments);
 												} else if ($formdestinationtype == 'email') {
 													$translatedmessage->data = $emaildatastring;
+													$translatedmessage->modifydate = makeDateTime(time());
 													$translatedmessage->readHeaders();
+													$translatedmessage->update();
+												} else {
+													$translatedmessage->modifydate = makeDateTime(time());
 													$translatedmessage->update();
 												}
 												
 												$translatedmessage->recreateParts($translationtext, null, $formdestinationtype == 'phone' ? $messagegroup->preferredgender : null, $formdestinationtype == 'phone' ? $audiofileids : array());
-												
+
 												if (isset($plaintextoverriden) && !$plaintextoverriden) {
 													if ($plaintranslatedmessage = $messagegroup->getMessage('email', 'plain', $languagecode, 'translated')) {
 														$plaintranslatedmessage->readHeaders();
@@ -1156,6 +1162,7 @@ if ($button = $messagegroupsplitter->getSubmit()) {
 										
 										$existingmessage->deleted = 1;
 										$existingmessage->messagegroupid = null;
+										$existingmessage->modifydate = makeDateTime(time());
 										$existingmessage->update();
 										
 										// NOTE: Don't bother updating parts and attachments for unassociated messages.
@@ -1168,6 +1175,7 @@ if ($button = $messagegroupsplitter->getSubmit()) {
 									} else {
 										if ($formdestinationtype == 'email' && $formdestinationsubtype == 'plain') {
 											$existingmessage->data = $emaildatastring;
+											$existingmessage->modifydate = makeDateTime(time());
 											$existingmessage->readHeaders();
 											$existingmessage->update();
 										}
