@@ -90,6 +90,12 @@ if (isset($_GET['id'])) {
 if (!isset($_SESSION['messagegroupid']))
 	redirect('unauthorized.php');
 $messagegroup = new MessageGroup(getCurrentMessageGroup());
+
+if($messagegroup->type != 'notification') {
+	unset($_SESSION['messagegroupid']);
+	redirect('unauthorized.php');
+}
+
 if (!isset($_SESSION['inmessagegrouptabs'])) {
 	if (!QuickQuery('select 1 from message where messagegroupid = ? limit 1', false, array($messagegroup->id))) {
 		$messagegroup->deleted = 1;

@@ -21,6 +21,10 @@ if (!isset($_GET['id']) || (!userOwns('messagegroup',$_GET['id'] + 0) && !isPubl
 
 $messagegroup = new MessageGroup($_GET['id'] + 0);
 
+if($messagegroup->type != 'notification') {
+	redirect('unauthorized.php');
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 // Data Gathering:
 ///////////////////////////////////////////////////////////////////////////////
