@@ -87,7 +87,6 @@ if (isset($_GET['ajax'])) {
 				$content .= 'This list was last used: <i>' . date("M j, g:i a",strtotime($item["lastused"])) . "</i>";
 			else
 				$content .= 'This list has never been used';
-			//$content .= " and has " . listcontacts($itemid,"list") . '</a>';
 			$content .= '</a>';
 			$tools = action_links (
 				action_link("Edit", "pencil", "list.php?id=$itemid"),
@@ -116,67 +115,6 @@ if (isset($_GET['ajax'])) {
 ////////////////////////////////////////////////////////////////////////////////
 // Display Functions
 ////////////////////////////////////////////////////////////////////////////////
-
-/* DO NOT USE */
-function listcontacts ($obj,$name) {
-	$lists = array();
-	if($name == "job") {
-		if(in_array($obj->status,array("active","cancelling"))) {
-			$result = QuickQueryRow("select
-				sum(rc.type='phone' and rc.result not in ('duplicate', 'blocked')) as total_phone,
-            	sum(rc.type='email' and rc.result not in ('duplicate', 'blocked')) as total_email,
-            	sum(rc.type='sms' and rc.result not in ('duplicate', 'blocked')) as total_sms,
-            	j.type LIKE '%phone%' AS has_phone,
-				j.type LIKE '%email%' AS has_email,
-				j.type LIKE '%sms%' AS has_sms,
-            	sum(rc.result not in ('A', 'M', 'duplicate', 'nocontacts', 'blocked') and rc.type='phone' and rc.numattempts < js.value) as remaining_phone,
-            	sum(rc.result not in ('sent', 'duplicate', 'nocontacts') and rc.type='email' and rc.numattempts < 1) as remaining_email,
-            	sum(rc.result not in ('sent', 'duplicate', 'nocontacts', 'blocked') and rc.type='sms' and rc.numattempts < 1) as remaining_sms,
-            	j.percentprocessed as percentprocessed
-				from job j
-           		left join reportcontact rc on j.id = rc.jobid
-      			left join jobsetting js on (js.jobid = j.id and js.name = 'maxcallattempts')
-            	where j.id=? group by j.id",true,false,array($obj->id));
-			$content = "";
-			if($result["has_phone"] && $result["total_phone"] != 0)
-				$content .= $result["total_phone"] . " Phone" . ($result["total_phone"]!=1?"s":"") . " (" .  sprintf("%0.2f",(100*$result["remaining_phone"]/$result["total_phone"])) . "%	Remaining), ";
-			if($result["has_email"] && $result["total_email"] != 0)
-				$content .= $result["total_email"] . " Email" . ($result["total_email"]!=1?"s":"") . " (" .  sprintf("%0.2f",(100*$result["remaining_email"]/$result["total_email"])) . "%	Remaining), ";
-			if($result["has_sms"]  && $result["total_sms"] != 0)
-				$content .= $result["total_sms"] . " SMS (" .  sprintf("%0.2f",(100*$result["remaining_sms"]/$result["total_sms"])) . "% Remaining)";
-			return trim($content,", ");
-		} else if(in_array($obj->status,array("cancelled","complete"))) {
-			$content = "";
-			$result = Query("select rp.type,
-							sum(rp.numcontacts and rp.status != 'duplicate') as total,
-							100 * sum(rp.numcontacts and rp.status='success') / (sum(rp.numcontacts and rp.status != 'duplicate') +0.00) as success_rate
-							from reportperson rp where rp.jobid = ?	group by rp.jobid, rp.type",false,array($obj->id));
-			while ($row = DBGetRow($result)) {
-				if($row[0] == "phone")
-					$content .= $row[1] . " Phone" . ($row[1]!=1?"s":"") . " (" . sprintf("%0.2f",(isset($row[2]) ? $row[2] : "")) . "% Contacted), ";
-				else if($row[0] == "email")
-					$content .= $row[1] . " Email" . ($row[1]!=1?"s":"") . " (" . sprintf("%0.2f",(isset($row[2]) ? $row[2] : "")) . "% Contacted), ";
-				else if($row[0] == "sms")
-					$content .= $row[1] . " SMS (" . sprintf("%0.2f",(isset($row[2]) ? $row[2] : "")) . "% Contacted)";
-
-			}
-			return trim($content,", ");
-		} else {
-			$lists = QuickQueryList("select listid from joblist where jobid = ?",false,false,array($obj->id));
-
-		}
-	} else if($name == "list") {
-		$lists[] = $obj;
-	}
-	$calctotal = 0;
-	foreach ($lists as $id) {
-		$list = new PeopleList($id);
-		$renderedlist = new RenderedList2();
-		$renderedlist->initWithList($list);
-		$calctotal += $renderedlist->getTotal();
-	}
-	return "<b>" . $calctotal . ($calctotal!=1?"</b>&nbsp;contacts":"</b>&nbsp;contact");
-}
 
 
 ////////////////////////////////////////////////////////////////////////////////
