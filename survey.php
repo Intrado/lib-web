@@ -186,7 +186,7 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'send'))
 				$job->setOption("sendreport",GetFormData($f,$s,"sendreport"));
 			}
 
-			if ($questionnaire->hasphone && $USER->authorize('setcallerid')) {
+			if ($questionnaire->hasphone && $USER->authorize('setcallerid') && !getSystemSetting('_hascallback', false)) {
 				$job->setOptionValue("callerid",Phone::parse(GetFormData($f,$s,"callerid")));
 			} else if ($questionnaire->hasphone) {
 				$callerid = $USER->getSetting("callerid",getSystemSetting('callerid'));
@@ -394,7 +394,7 @@ startWindow('Survey Information');
 						?>
 					</td>
 				</tr>
-<? if ($USER->authorize('setcallerid')) { ?>
+<? if ($USER->authorize('setcallerid') && !getSystemSetting('_hascallback', false)) { ?>
 					<tr>
 						<td>Caller&nbsp;ID <?= help('SurveyScheduler_CallerID',NULL,"small"); ?></td>
 						<td><? NewFormItem($f,$s,"callerid","text", 20, 20, ($completedmode ? "DISABLED" : 'dependson="phonesurvey"')); ?></td>
