@@ -1,5 +1,12 @@
 <?
 
+////////////////////////////////////////////////////////////////////////////////
+// Authorization
+////////////////////////////////////////////////////////////////////////////////
+if (!$USER->authorize('createlist')) {
+	redirect('unauthorized.php');
+}
+
 unset($_SESSION['listsearchpreview']);
 list_clear_search_session();
 
@@ -14,6 +21,9 @@ if (isset($_GET['id'])) {
 
 $list = new PeopleList(isset($_SESSION['listid']) ? $_SESSION['listid'] : null);
 if ($list->id) {
+	if($list->type == 'alert')
+		redirect('unauthorized.php');
+
 	$method = ($list->type === 'section') ? 'sections' : 'rules';
 	
 	$renderedlist = new RenderedList2();
