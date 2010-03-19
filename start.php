@@ -64,7 +64,7 @@ if($isajax === true) {
 			break;
 		case "messages":
 			$mergeditems = array_merge($mergeditems,QuickQueryMultiRow("
-				select 'message' as type, 'Saved' as status, mg.id as id, mg.name as name, mg.modified as date, mg.deleted as deleted,
+				select 'message' as type, 'Saved' as status, mg.id as id, mg.name as name,mg.description,mg.modified as date, mg.deleted as deleted,
 					sum(m.type='phone') as phone, sum(m.type='email') as email,sum(m.type='sms') as sms
 				from messagegroup mg
 					inner join message m on
@@ -78,7 +78,7 @@ if($isajax === true) {
 			$mergeditems = array_merge($mergeditems,QuickQueryMultiRow("
 				select 'job' as type, status, id, name, modifydate as date, 'modifydate' as datetype, type as jobtype, deleted
 				from job
-				where userid=? and not deleted and (finishdate is null || status = 'repeating') and modifydate is not null and type != 'alert'
+				where userid=? and not deleted and (finishdate is null || (status = 'repeating' and type != 'alert')) and modifydate is not null
 				order by modifydate desc
 				limit 10",true,false,array($USER->id)));
 			$mergeditems = array_merge($mergeditems,QuickQueryMultiRow("
@@ -186,19 +186,19 @@ if($isajax === true) {
 				order by modifydate desc
 				limit 10",true,false,array($USER->id)));
 			$mergeditems = array_merge($mergeditems,QuickQueryMultiRow("
-				select 'message' as type, 'Saved' as status, mg.id as id, mg.name as name, mg.modified as date, mg.deleted as deleted,
+				select 'message' as type, 'Saved' as status, mg.id as id, mg.name as name,mg.description, mg.modified as date, mg.deleted as deleted,
 					sum(m.type='phone') as phone, sum(m.type='email') as email, sum(m.type='sms') as sms
 				from messagegroup mg
 					inner join message m on
 						(m.messagegroupid = mg.id)
-				where mg.userid = ? and not mg.deleted and mg.modified is not null and mg.type = 'notification'
+				where mg.userid = ? and not mg.deleted and mg.modified is not null
 				group by mg.id
 				order by mg.modified desc
 				limit 10 ",true,false,array($USER->id)));
 			$mergeditems = array_merge($mergeditems,QuickQueryMultiRow("
 				select 'job' as type, status, id, name, modifydate as date, 'modifydate' as datetype, type as jobtype, deleted,percentprocessed
 				from job
-				where userid=? and not deleted and (finishdate is null || status = 'repeating') and modifydate is not null and type != 'alert'
+				where userid=? and not deleted and (finishdate is null || (status = 'repeating' and type != 'alert')) and modifydate is not null
 				order by modifydate desc
 				limit 10",true,false,array($USER->id)));
 			$mergeditems = array_merge($mergeditems,QuickQueryMultiRow("
@@ -464,7 +464,7 @@ function activityfeed($mergeditems,$ajax = false) {
 					$title = _L('Message %1$s with %2$s Content',escapehtml($title),typestring(substr($types,1)));
 
 					$defaultlink = "messagegroup.php?id=$itemid";
-					$content = '<a href="' . $defaultlink . '" ' . $defaultonclick . '>' . $time .  ' - <b>' .  escapehtml($item["name"]) . '</b>' . '</a>';
+					$content = '<a href="' . $defaultlink . '" ' . $defaultonclick . '>' . $time .  ' - <b>' .  escapehtml($item["name"]) . "</b>" . ($item["description"] != ""?" - " . escapehtml($item["description"]):"") . '</a>';
 
 					$icon = 'largeicons/letter.jpg';
 					$tools = action_links (action_link("Edit", "pencil", 'messagegroup.php?id=' . $itemid));
