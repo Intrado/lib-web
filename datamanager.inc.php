@@ -70,7 +70,9 @@ if (isset($_GET['clear'])) {
 	if (ereg("^g[0-9]{2}$",$fieldnum)) {
 		QuickUpdate("delete from groupdata where fieldnum=".substr($fieldnum, 1) . " and importid != 0");
 	}
-
+	if (ereg("^c[0-9]{2}$",$fieldnum)) {
+		QuickUpdate("update section set `$fieldnum`=NULL where importid is not null");
+	}
 	notice(_L("Data for the field, %s, is now cleared.", escapehtml(FieldMap::getName($fieldnum))));
 	redirect();
 }
@@ -405,7 +407,8 @@ break;
 				case "schedule" :
 ?>
 					<td><?= action_links(
-							action_link(_L("Delete"),"cross","$datapage?delete=$field->id","return confirmDelete();")
+							action_link(_L("Delete"),"cross","$datapage?delete=$field->id","return confirmDelete();"),
+							action_link(_L("Clear Data"),"lightning","$datapage?clear=$fieldnum","return confirm('Are you sure you want to clear (erase) all data for this field?');")
 							) ?></td>
 <?
 				break;
