@@ -59,6 +59,7 @@ if($isajax === true) {
 			$mergeditems = array_merge($mergeditems,QuickQueryMultiRow("
 				select 'list' as type, 'Saved' as status, id, name, modifydate as date, lastused
 				from list where userid = ? and not deleted and modifydate is not null
+					and type != 'alert'
 				order by modifydate desc
 				limit 10",true,false,array($USER->id)));
 			break;
@@ -78,13 +79,15 @@ if($isajax === true) {
 			$mergeditems = array_merge($mergeditems,QuickQueryMultiRow("
 				select 'job' as type, status, id, name, modifydate as date, 'modifydate' as datetype, type as jobtype, deleted
 				from job
-				where userid=? and not deleted and (finishdate is null || (status = 'repeating' and type != 'alert')) and modifydate is not null
+				where userid=? and not deleted and (finishdate is null || status = 'repeating') and modifydate is not null
+					and type != 'alert'
 				order by modifydate desc
 				limit 10",true,false,array($USER->id)));
 			$mergeditems = array_merge($mergeditems,QuickQueryMultiRow("
 				select 'job' as type, status, id, name, finishdate as date, 'finishdate' as datetype, type as jobtype, deleted
 				from job
 				where userid=? and not deleted and status != 'repeating' and finishdate is not null
+					and type != 'alert'
 				order by finishdate desc
 				limit 10",true,false,array($USER->id)));
 			break;
@@ -93,6 +96,7 @@ if($isajax === true) {
 				select 'job' as type, status, id, name, modifydate as date,'modifydate' as datetype, type as jobtype, deleted
 				from job
 				where userid = ? and not deleted and finishdate is null and modifydate is not null and status = 'new'
+					and type != 'alert'
 				order by modifydate desc
 				limit 10",true,false,array($USER->id)));
 			break;
@@ -100,7 +104,8 @@ if($isajax === true) {
 			$mergeditems = array_merge($mergeditems,QuickQueryMultiRow("
 				select 'job' as type, status, id, name, modifydate as date,'modifydate' as datetype, type as jobtype, deleted
 				from job
-				where userid = ? and not deleted and modifydate is not null and status='repeating' and type != 'alert'
+				where userid = ? and not deleted and modifydate is not null and status='repeating'
+					and type != 'alert'
 				order by modifydate desc
 				limit 10",true,false,array($USER->id)));
 			break;
@@ -109,6 +114,7 @@ if($isajax === true) {
 				select 'job' as type, status, id, name, modifydate as date, 'modifydate' as datetype, type as jobtype, deleted
 				from job
 				where userid=? and not deleted and finishdate is null and modifydate is not null and status = 'scheduled'
+					 and type != 'alert'
 				order by modifydate desc
 				limit 10",true,false,array($USER->id)));
 			break;
@@ -117,6 +123,7 @@ if($isajax === true) {
 				select 'job' as type, status, id, name, modifydate as date, 'modifydate' as datetype, type as jobtype, percentprocessed, deleted
 				from job
 				where userid = ? and not deleted and finishdate is null and modifydate is not null and status in ('processing','procactive','active')
+					 and type != 'alert'
 				order by modifydate desc
 				limit 10",true,false,array($USER->id)));
 			break;
@@ -125,12 +132,14 @@ if($isajax === true) {
 				select 'job' as type, status, id, name, modifydate as date, 'modifydate' as datetype, type as jobtype, deleted
 				from job
 				where userid=? and deleted = 0 and finishdate is null and modifydate is not null and status in ('cancelled','cancelling')
+					and type != 'alert'
 				order by modifydate desc
 				limit 10",true,false,array($USER->id)));
 			$mergeditems = array_merge($mergeditems,QuickQueryMultiRow("
 				select 'job' as type, status, id, name, finishdate as date, 'finishdate' as datetype, type as jobtype, deleted
 				from job
 				where userid = ? and not deleted and finishdate is not null and status in ('cancelled','cancelling')
+					and type != 'alert'
 				order by finishdate desc
 				limit 10",true,false,array($USER->id)));
 			break;
@@ -139,18 +148,21 @@ if($isajax === true) {
 				select 'job' as type, status, id, name, finishdate as date, 'finishdate' as datetype, type as jobtype, deleted
 				from job
 				where userid = ? and deleted = 0 and finishdate is not null and status = 'complete'
+					and type != 'alert'
 				order by finishdate desc
 				limit 10",true,false,array($USER->id)));
 			$mergeditems = array_merge($mergeditems,QuickQueryMultiRow("
 				select 'job' as type, status, id, name, modifydate as date, 'modifydate' as datetype, type as jobtype, deleted
 				from job
 				where userid = ? and not deleted and finishdate is null and modifydate is not null and status in ('cancelled','cancelling')
+					and type != 'alert'
 				order by modifydate desc
 				limit 10",true,false,array($USER->id)));
 			$mergeditems = array_merge($mergeditems,QuickQueryMultiRow("
 				select 'job' as type, status, id, name, finishdate as date, 'finishdate' as datetype, type as jobtype, deleted
 				from job
 				where userid = ? and not deleted and finishdate is not null and status in ('cancelled','cancelling')
+					and type != 'alert'
 				order by finishdate desc
 				limit 10",true,false,array($USER->id)));
 			break;
@@ -183,6 +195,7 @@ if($isajax === true) {
 				select 'list' as type, 'Saved' as status, id, name, modifydate as date, lastused
 				from list
 				where userid = ? and not deleted and modifydate is not null
+					 and type != 'alert'
 				order by modifydate desc
 				limit 10",true,false,array($USER->id)));
 			$mergeditems = array_merge($mergeditems,QuickQueryMultiRow("
@@ -198,13 +211,15 @@ if($isajax === true) {
 			$mergeditems = array_merge($mergeditems,QuickQueryMultiRow("
 				select 'job' as type, status, id, name, modifydate as date, 'modifydate' as datetype, type as jobtype, deleted,percentprocessed
 				from job
-				where userid=? and not deleted and (finishdate is null || (status = 'repeating' and type != 'alert')) and modifydate is not null
+				where userid=? and not deleted and (finishdate is null || status = 'repeating') and modifydate is not null
+					and type != 'alert'
 				order by modifydate desc
 				limit 10",true,false,array($USER->id)));
 			$mergeditems = array_merge($mergeditems,QuickQueryMultiRow("
 				select 'job' as type, status, id, name, finishdate as date, 'finishdate' as datetype, type as jobtype, deleted
 				from job
 				where userid=? and not deleted and status != 'repeating' and finishdate is not null
+					and type != 'alert'
 				order by finishdate desc
 				limit 10",true,false,array($USER->id)));
 			$mergeditems = array_merge($mergeditems, QuickQueryMultiRow("
