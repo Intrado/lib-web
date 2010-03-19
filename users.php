@@ -65,10 +65,17 @@ function is_sm_user($id) {
 }
 /*CSDELETEMARKER_END*/
 
+$hasldap = getSystemSetting('_hasldap', '0');
 
 if (isset($_GET['resetpass'])) {
 	$id = 0 + $_GET['resetpass'];
 	$usr = new User($id);
+	// check if ldap user (cannot reset them)
+	if ($hasldap && $usr->ldap) {
+		notice(_L("Unable to reset the password for %s. This user is authorized by the LDAP server.", escapehtml($usr->login)));
+		redirect();
+	}
+	// else not ldap user, check if they have email for resetting
 	if (empty($usr->email)) {
 		notice(_L("Unable to reset the password for %s. This user does not have an email address.", escapehtml($usr->login)));
 		redirect();
@@ -159,18 +166,21 @@ $newusers = QuickQueryList("select id,1 from user where not enabled and deleted=
 // Display Functions
 ////////////////////////////////////////////////////////////////////////////////
 function fmt_actions_enabled_account ($account,$name) {
-	global $USER;
+	global $USER, $hasldap;
 
 	$id = $account['id'];
 	$importid = $account['importid'];
 	$login = $account['login'];
+	$userldap = $account['ldap'];
 
 	$activeuseranchor = (isset($_SESSION['userid']) && $_SESSION['userid'] == $id) ? '<a name="viewrecent">' : '';
 
 	$links = array();
 	$links[] = action_link($importid > 0 ? _L("View") : _L("Edit"),"pencil","user.php?id=$id");
 	$links[] = action_link(_L("Login as this user"),"key_go","./?login=$login");
-	$links[] = action_link(_L("Reset Password"),"fugue/lock__pencil","", "if (window.confirm('"._L('Send an email reset reminder?')."')) window.location='?resetpass=$id'");
+	if (!($hasldap && $userldap)) {
+		$links[] = action_link(_L("Reset Password"),"fugue/lock__pencil","", "if (window.confirm('"._L('Send an email reset reminder?')."')) window.location='?resetpass=$id'");
+	}
 	if ($id != $USER->id)
 		$links[] = action_link(_L("Disable"),"user_delete","?disable=$id");
 
@@ -178,17 +188,20 @@ function fmt_actions_enabled_account ($account,$name) {
 }
 
 function fmt_actions_disabled_account ($account,$name) {
-	global $newusers;
+	global $newusers, $hasldap;
+	
 	$editviewaction = "Edit";
 	$importid = $account['importid'];
 	if ($importid > 0) $editviewaction = "View";
 	$id = $account['id'];
+	$userldap = $account['ldap'];
 
 	$links = array();
 	$links[] = action_link($importid > 0 ? _L("View") : _L("Edit"),"pencil","user.php?id=$id");
 	$links[] = action_link(_L("Enable"),"user_add","?enable=$id");
-	if(isset($newusers[$id]))
+	if(isset($newusers[$id]) && !($hasldap && $userldap)) {
 		$links[] = action_link(_L("Enable & Reset Password"),"fugue/lock__pencil","?resetpass=$id");
+	}
 
 	$links[] = action_link(_L("Delete"),"cross","?delete=$id","return confirmDelete()");
 
