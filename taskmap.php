@@ -111,13 +111,16 @@ if ($datatype == "person") {
 	$maptofields["a5"] = "Zip";
 
 } else if ($datatype == "user") {
-
+	$hasldap = getSystemSetting('_hasldap', '0');
+	
 	$maptofields = array();
 	$maptofields[""] = "- Unmapped -";
 	$maptofields["u1"] = "Username";
 	$maptofields["u2"] = "First Name";
 	$maptofields["u3"] = "Last Name";
 	$maptofields["u4"] = "Description";
+	if ($hasldap)
+		$maptofields["u13"] = "Use LDAP";
 	$maptofields["u5"] = "Telephone User ID";
 	$maptofields["u6"] = "Email";
 	$maptofields["u7"] = "Auto Report Emails";
