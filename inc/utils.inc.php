@@ -257,7 +257,7 @@ function base64url_decode($string) {
 }
 
 function getSmsRegExp() {
-	return "^[a-zA-Z0-9\x20\x09\x0a\x0b\x0C\x0d\x2a\<\>\?\,\.\/\{\}\|\!\@\#\$\%\&\(\)\_\+\'\"\:\;\=\-]*$";
+	return "^[a-zA-Z0-9\x20\x09\x0a\x0b\x0C\x0d\x2a\<\>\?\,\.\/\|\!\@\#\$\%\&\(\)\_\+\'\"\:\;\=\-]*$";
 }
 
 function getDomainRegExp() {
