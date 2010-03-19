@@ -156,6 +156,7 @@ $messages = QuickQueryList(
 		(mg.name +0) as digitsfirst
 	from messagegroup mg
 	where mg.userid=?
+		and mg.type = 'notification'
 		and not mg.deleted)
 	UNION
 	(select mg.id,
