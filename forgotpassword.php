@@ -37,7 +37,11 @@ if ((strtolower($_SERVER['REQUEST_METHOD']) == 'post') ) {
 		if ($result['result'] == "") {
 			$success = true;
 		} else if ($result['result'] == "invalid data") {
-			error("There was a problem with your request.  Either the username you entered is not valid, or there is no email address associated with this user. Please contact your System Administrator or call support for assistance.");
+			if ($result['resultdetail'] == "bad data: user is ldap") {
+				error("This account is managed by another authentication server.  Please contact your System Administrator to update your password");
+			} else {
+				error("There was a problem with your request.  Either the username you entered is not valid, or there is no email address associated with this user. Please contact your System Administrator or call support for assistance");
+			}
 		} else {
 			error("There was a problem with your request.  Please try again later");
 		}
