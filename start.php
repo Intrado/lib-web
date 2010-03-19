@@ -204,7 +204,7 @@ if($isajax === true) {
 				from messagegroup mg
 					inner join message m on
 						(m.messagegroupid = mg.id)
-				where mg.userid = ? and not mg.deleted and mg.modified is not null
+				where mg.userid = ? and not mg.deleted and mg.modified is not null and mg.type = 'notification'
 				group by mg.id
 				order by mg.modified desc
 				limit 10 ",true,false,array($USER->id)));
