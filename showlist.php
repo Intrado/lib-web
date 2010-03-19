@@ -45,6 +45,9 @@ handle_list_checkbox_ajax(); //for handling check/uncheck from the list
 
 $list = new PeopleList($_SESSION['listid']);
 
+if($list->type == 'alert')
+	redirect('unauthorized.php');
+
 $renderedlist = new RenderedList2();
 $renderedlist->initWithList($list);
 $renderedlist->pagelimit = 100;
