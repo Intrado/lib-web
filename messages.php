@@ -115,13 +115,13 @@ if($isajax === true) {
 	
 	// get all the message group ids for this page
 	$msgGroupIds = QuickQueryList(
-		"(select SQL_CALC_FOUND_ROWS mg.id as id, mg.modified as modified, mg.name as name, (mg.name +0) as digitsfirst
+		"(select SQL_CALC_FOUND_ROWS mg.id as id, mg.modified as modified, mg.name as name,mg.description, (mg.name +0) as digitsfirst
 		from messagegroup mg
 		where mg.userid = ? 
 			and mg.type = 'notification'
 			and not mg.deleted)
 		UNION
-		(select mg.id as id, mg.modified as modified, mg.name as name, (mg.name +0) as digitsfirst
+		(select mg.id as id, mg.modified as modified, mg.name as name,mg.description, (mg.name +0) as digitsfirst
 		from publish p
 		inner join messagegroup mg on
 			(p.messagegroupid = mg.id)
@@ -139,7 +139,7 @@ if($isajax === true) {
 	if ($total) {
 		$mergeditems = QuickQueryMultiRow(
 			"select 'message' as type,'Saved' as status, 
-				mg.id as id, mg.name as name, mg.modified as date, mg.deleted as deleted, 
+				mg.id as id, mg.name as name,mg.description, mg.modified as date, mg.deleted as deleted,
 				sum(m.type='phone') as phone, sum(m.type='email') as email, sum(m.type='sms') as sms,
 				p.action as publishaction, p.id as publishid, u.login as owner, (mg.name +0) as digitsfirst
 			from messagegroup mg
@@ -179,7 +179,7 @@ if($isajax === true) {
 			$types .= $item["sms"] > 0?"," . _L("sms"):"";
 			$title = escapehtml($item["name"]);
 			$defaultlink = "messagegroup.php?id=$itemid";
-			$content = '<a href="' . $defaultlink . '" >' . $time .  ' - <b>' .  _L('%1$s Content',typestring(substr($types,1))). '</b>' . '</a>';
+			$content = '<a href="' . $defaultlink . '" >' . $time .  ($item["description"] != ""?" - " . escapehtml($item["description"]):"") . ' - <b>' .  _L('%1$s Content',typestring(substr($types,1))). '</b>' . '</a>';
 			$publishaction = $item['publishaction'];
 			$publishid = $item['publishid'];
 			
