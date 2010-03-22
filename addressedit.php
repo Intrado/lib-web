@@ -112,10 +112,11 @@ foreach ($jobtypes as $jobtype) {
 $types = array();
 
 $helpstep = 1;
-$helpsteps = array (_L('Name & Address'));
+$helpsteps = array (_L("Enter the contact's name and address."));
 $formdata = array(
 	"firstname" => array(
 		"label" => _L('First Name'),
+		"fieldhelp" => _L("Enter the contact's first name."), 
 		"value" => $person->$fnamefield ,
 		"validators" => array(
 			array("ValLength","max" => 50)
@@ -125,6 +126,7 @@ $formdata = array(
 	),
 	"lastname" => array(
 		"label" => _L('Last Name'),
+		"fieldhelp" => _L("Enter the contact's last name."),
 		"value" => $person->$lnamefield,
 		"validators" => array(
 			array("ValLength","max" => 50)
@@ -145,6 +147,7 @@ $formdata = array(
 	),
 	"addr1" => array(
 		"label" => _L('Address Line 1'),
+		"fieldhelp" => _L("Enter the contact's address."),
 		"value" => $address->addr1,
 		"validators" => array(
 			array("ValLength","max" => 50)
@@ -154,6 +157,7 @@ $formdata = array(
 	),
 	"addr2" => array(
 		"label" => _L('Address Line 2'),
+		"fieldhelp" => _L("Enter the contact's address."),
 		"value" =>  $address->addr2,
 		"validators" => array(
 			array("ValLength","max" => 50)
@@ -163,6 +167,7 @@ $formdata = array(
 	),
 	"city" => array(
 		"label" => _L('City'),
+		"fieldhelp" => _L("Enter the city where the address is located."),
 		"value" =>  $address->city,
 		"validators" => array(
 			array("ValLength","max" => 50)
@@ -172,6 +177,7 @@ $formdata = array(
 	),
 	"state" => array(
 		"label" => _L('State'),
+		"fieldhelp" => _L("Enter the state for the address."),
 		"value" =>  $address->state,
 		"validators" => array(
 			array("ValLength","min" => 2,"max" => 2)
@@ -181,6 +187,7 @@ $formdata = array(
 	),
 	"zip" => array(
 		"label" => _L('ZIP Code'),
+		"fieldhelp" => _L("Enter the contact's ZIP code."),
 		"value" =>  $address->zip,
 		"validators" => array(
 			array("ValNumeric","min" => 5, "max" => 5)
@@ -193,7 +200,7 @@ $formdata = array(
 
 //add phone settings
 if ($USER->authorize('sendphone')) {
-	$helpsteps[$helpstep++] = _L('Phone Settings');
+	$helpsteps[$helpstep++] = _L('Enter the phone numbers where the contact can be reached. Then select the types of jobs that should be sent to each number.');
 	$formdata[] = _L('Phone Settings');
 	
 	$maxphones = getSystemSetting("maxphones",3);
@@ -212,7 +219,7 @@ if ($USER->authorize('sendphone')) {
 	foreach ($phones as $phone) {		
 		$formdata["phone$x"] = array (
 			"label" => escapehtml(destination_label("phone",$x)),
-			"fieldhelp" => _L('Phone numbers entered here will recieve calls when this person is contacted'), 
+			"fieldhelp" => _L("Enter a phone number for the contact."), 
 			"value" => Phone::format($phone->phone),
 			"validators" => array(
 				array("ValPhone")
@@ -229,7 +236,7 @@ if ($USER->authorize('sendphone')) {
 		
 		$formdata["phone$x-jobtypes"] = array (
 			"label" => _L('Preferences'),
-			"fieldhelp" => _L('These settings control when this phone number is used. Checking a box next to a notification type enables calls of that type.'), 
+			"fieldhelp" => _L("Select the types of jobs which should be sent to this number."), 
 			"value" => $prefjobids,
 			"validators" => array(
 				array("ValInArray","values" => array_keys($jobtypenames))
@@ -245,7 +252,7 @@ if ($USER->authorize('sendphone')) {
 
 //add email settings
 if ($USER->authorize('sendemail')) {
-	$helpsteps[$helpstep++] = _L('Email Settings');
+	$helpsteps[$helpstep++] = _L("Enter the contact's email addresses and then select which types of jobs should be sent to each address.");
 	$formdata[] = _L('Email Settings');
 	
 	$maxemails = getSystemSetting("maxemails",2);
@@ -264,7 +271,7 @@ if ($USER->authorize('sendemail')) {
 	foreach ($emails as $email) {		
 		$formdata["email$x"] = array (
 			"label" => escapehtml(destination_label("email",$x)),
-			"fieldhelp" => _L('Emails will be sent to this address when this person is contacted'), 
+			"fieldhelp" => _L("Enter the contact's email address."), 
 			"value" => $email->email,
 			"validators" => array(
 				array("ValEmail")
@@ -281,7 +288,7 @@ if ($USER->authorize('sendemail')) {
 				
 		$formdata["email$x-jobtypes"] = array (
 			"label" => _L('Preferences'),
-			"fieldhelp" => _L('These settings control when this email is used. Checking a box next to a notification type enables emails for that type.'), 
+			"fieldhelp" => _L("Select the types of jobs which should be sent to this email."), 
 			"value" => $prefjobids,
 			"validators" => array(
 				array("ValInArray","values" => array_keys($jobtypenames))
@@ -296,7 +303,7 @@ if ($USER->authorize('sendemail')) {
 
 //add sms settings
 if (getSystemSetting('_hassms', false) && $USER->authorize('sendsms')) {
-	$helpsteps[$helpstep++] = _L('SMS Text Settings');
+	$helpsteps[$helpstep++] = _L("Enter numbers where the contact may receive SMS text messages. Then select the types of jobs which should be sent to each number.");
 	$formdata[] = _L('SMS Text Settings');
 	
 	$maxsms = getSystemSetting("maxsms",2);
@@ -315,7 +322,7 @@ if (getSystemSetting('_hassms', false) && $USER->authorize('sendsms')) {
 	foreach ($smses as $sms) {		
 		$formdata["sms$x"] = array (
 			"label" => escapehtml(destination_label("sms",$x)),
-			"fieldhelp" => _L('SMS numbers entered here will recieve texts when this person is contacted'), 
+			"fieldhelp" => _L('Enter a number where SMS text messages may be received.'), 
 			"value" => Phone::format($sms->sms),
 			"validators" => array(
 				array("ValPhone")
@@ -332,7 +339,7 @@ if (getSystemSetting('_hassms', false) && $USER->authorize('sendsms')) {
 		
 		$formdata["sms$x-jobtypes"] = array (
 			"label" => _L('Preferences'),
-			"fieldhelp" => _L('These settings control when this sms number is used. Checking a box next to a notification type enables texts of that type.'), 
+			"fieldhelp" => _L('Select the types of jobs which should be sent to this SMS number.'), 
 			"value" => $prefjobids,
 			"validators" => array(
 				array("ValInArray","values" => array_keys($jobtypenames))
@@ -347,11 +354,12 @@ if (getSystemSetting('_hassms', false) && $USER->authorize('sendsms')) {
 
 //if this is from the list page, add a checkbox to save to addrbook
 if ($_SESSION['addresseditorigin'] == "manualadd") {
-	$helpsteps[$helpstep++] = _L('This will save this person to your address book so that you can use it again later in other lists.');
+	$helpsteps[$helpstep++] = _L('Check this option to save the contact to your address book so you may easily include them in future lists.');
 	$formdata[] = _L('Save to Address Book');
 	
 	$formdata["savetoaddrbook"] = array(
 		"label" => _L('Save to Address Book'),
+		"fieldhelp" => _L("Check this option to save this contact to your address book."),
 		"value" =>  true,
 		"validators" => array(
 		),
