@@ -94,7 +94,7 @@ $formdata = array(
 	_L("Job Template"),
 	"name" => array(
 		"label" => _L('Template Name'),
-		"fieldhelp" => _L("TODO: Help"),
+		"fieldhelp" => _L("Enter a name for Classroom Messaging jobs."),
 		"value" => ($job)?$job->name:"",
 		"validators" => array(
 			array("ValRequired"),
@@ -117,7 +117,7 @@ $formdata = array(
 	),
 	"schedule" => array(
 		"label" => _L("Days to run"),
-		"fieldhelp" => _L("TODO: Help"),
+		"fieldhelp" => _L("Select which days Classroom Messages should be sent."),
 		"value" => $dowvalues,
 		"validators" => array(
 			array("ValRequired"),
@@ -128,7 +128,7 @@ $formdata = array(
 	),
 	"owner" => array(
 		"label" => _L("Owner"),
-		"fieldhelp" => _L("TODO: Help"),
+		"fieldhelp" => _L("Select who the job should belong to."),
 		"value" => ($job)?$job->userid:$USER->id,
 		"validators" => array(
 			array("ValRequired"),
@@ -152,7 +152,7 @@ $formdata["fromname"] = array(
 			array("ValLength","max" => 50)
 			),
 	"control" => array("TextField","size" => 25, "maxlength" => 50),
-	"helpstep" => 4
+	"helpstep" => 5
 );
 
 $formdata["fromemail"] = array(
@@ -190,12 +190,12 @@ $formdata[$defaultcode . "-subject"] = array(
 );
 $formdata[$defaultcode . "-body"] = array(
 	"label" => _L("Message Body"),
-	"fieldhelp" => _L("TODO: Help"),
+	"fieldhelp" => _L("Enter a template message which Classroom Messages will be appended to."),
 	"value" => ($message)?$message->format($parts):"",
 	"validators" => array(
 		array("ValRequired")),
 	"control" => array("TextArea", "rows" => 10, "cols" => 60),
-	"helpstep" => 4
+	"helpstep" => 6
 );
 
 // unset the default language so it doesn't get overwritten below
@@ -221,16 +221,22 @@ foreach ($languagemap as $code => $language) {
 	);
 	$formdata[$code . "-body"] = array(
 		"label" => _L("Message Body"),
-		"fieldhelp" => _L("TODO: Help"),
+		"fieldhelp" => _L("Enter a template message which Classroom Messages will be appended too."),
 		"value" => ($message)?$message->format($parts):"",
 		"validators" => array(),
 		"control" => array("TextArea", "rows" => 10, "cols" => 60),
-		"helpstep" => 4
+		"helpstep" => 6
 	);
 }
 
 $helpsteps = array (
-	_L('TODO: Help')
+	_L('The Template Name will be displayed in reports'),
+	_L('The Job Type determines where the system sends the message.'),
+	_L('Select which days Classroom Messages should be sent.'),
+	_L('Select the owner of the template.'),
+	_L('The From Name and From Email tell the recipient who the email came from.'),
+	_L('The Subject is the default subject for all Classroom Messages.<br><br>
+	In the Message Body section, enter a message which Classroom Messages will be appended to.')
 );
 
 $buttons = array(submit_button(_L('Save'),"submit","tick"),

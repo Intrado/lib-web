@@ -39,8 +39,8 @@ class ValOrgKey extends Validator {
 
 $formdata = array(
 	"neworg" => array(
-		"label" => _L('Organization Key'),
-		"fieldhelp" => _L("TODO: Help describing new org key generation"),
+		"label" => _L('Organization Name'),
+		"fieldhelp" => _L("Enter a unique name for the new organization."),
 		"value" => "",
 		"validators" => array(
 			array("ValRequired"),
@@ -53,7 +53,7 @@ $formdata = array(
 );
 
 $helpsteps = array (
-	_L('TODO: Help describing new org key generation')
+	_L('Enter a unique name for the new organization. It should clearly indicate what the organization is.')
 );
 
 $buttons = array(submit_button(_L('Save'),"submit","tick"),
@@ -107,7 +107,7 @@ include_once("nav.inc.php");
 </script>
 <?
 
-startWindow(_L('Create Organization Key'));
+startWindow(_L('Settings'));
 echo $form->render();
 endWindow();
 include_once("navbottom.inc.php");
