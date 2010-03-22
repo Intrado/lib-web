@@ -20,6 +20,7 @@ require_once("obj/Message.obj.php");
 require_once("obj/MessagePart.obj.php");
 require_once("obj/AudioFile.obj.php");
 require_once("obj/FormSelectMessage.fi.php");
+require_once("obj/Language.obj.php");
 
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization
@@ -48,7 +49,7 @@ if (isset($_GET['id'])) {
 			$fielddata = array();
 			foreach ($messagefields as $fieldmap) {
 				$fields[$fieldmap->fieldnum] = $fieldmap;
-				if ($fieldmap->isOptionEnabled("multisearch")) {
+				if (!$fieldmap->isOptionEnabled("language") && $fieldmap->isOptionEnabled("multisearch")) {
 					$limit = DBFind('Rule', "from rule r inner join userassociation ua on r.id = ua.ruleid where ua.userid=? and type = 'rule' and r.fieldnum=?", "r", array($USER->id, $fieldmap->fieldnum));
 					$limitsql = $limit ? $limit->toSQL(false, 'value', false, true) : '';
 					$fielddata[$fieldmap->fieldnum] = QuickQueryList("select value,value from persondatavalues where fieldnum=? $limitsql order by value limit 5000", true, false, array($fieldmap->fieldnum));
@@ -119,7 +120,6 @@ if($_SESSION['ttstext']) {
 			$limit = DBFind('Rule', "from rule r inner join userassociation ua on r.id = ua.ruleid where ua.userid=? and type = 'rule' and r.fieldnum=?", "r", array($USER->id, $fieldmap->fieldnum));
 			$limitsql = $limit ? $limit->toSQL(false, 'value', false, true) : '';
 			$fielddata[$fieldmap->fieldnum] = QuickQueryList("select value,value from persondatavalues where fieldnum=? $limitsql order by value limit 5000", true, false, array($fieldmap->fieldnum));
-			error_log(json_encode($fielddata));
 		}
 	}
 	$msgType = 'phone';	
@@ -154,6 +154,14 @@ if (isset($fields) && count($fields) && $msgType == 'phone') {
 				"value" => $USER->lastname,
 				"validators" => array(),
 				"control" => array("TextField", "maxlength" => 50, "size"=>20),
+				"helpstep" => 1
+			);
+		} else if ($fieldmap->isOptionEnabled("language")) {
+			$formdata[$field] = array (
+				"label" => $fieldmap->name,
+				"value" => $fielddefaults[$field],
+				"validators" => array(),
+				"control" => array("SelectMenu", "values" => Language::getLanguageMap()),
 				"helpstep" => 1
 			);
 		} else if ($fieldmap->isOptionEnabled("multisearch")) {
