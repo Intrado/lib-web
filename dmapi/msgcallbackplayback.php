@@ -46,8 +46,9 @@ function renderMessageParts($messagedata) {
 	$customerid = $_SESSION['customerid'];
 	$msgid = $messagedata['messageid'];
 	$fields = $messagedata['personfields'];
+	$parts = DBFindMany('MessagePart', 'from messagepart where messageid=? order by sequence', false, array($msgid));
 
-	$renderedparts = Message::renderPhoneParts($msgid, $fields);
+	$renderedparts = Message::renderPhoneParts($parts, $fields);
 	$voices = DBFindMany("Voice","from ttsvoice");
 
 	foreach ($renderedparts as $part) {
