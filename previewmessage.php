@@ -49,9 +49,9 @@ if (isset($_GET['id'])) {
 			foreach ($messagefields as $fieldmap) {
 				$fields[$fieldmap->fieldnum] = $fieldmap;
 				if ($fieldmap->isOptionEnabled("multisearch")) {
-					$limit = DBFind('Rule', 'from rule inner join userrule on rule.id = userrule.ruleid where userid=? and fieldnum=?', false, array($USER->id, $fieldmap->fieldnum));
+					$limit = DBFind('Rule', "from rule r inner join userassociation ua on r.id = ua.ruleid where ua.userid=? and type = 'rule' and r.fieldnum=?", "r", array($USER->id, $fieldmap->fieldnum));
 					$limitsql = $limit ? $limit->toSQL(false, 'value', false, true) : '';
-					$fielddata[$fieldmap->fieldnum] = QuickQueryList("select value,value from persondatavalues where fieldnum=? $limitsql order by value", true, false, array($fieldmap->fieldnum));
+					$fielddata[$fieldmap->fieldnum] = QuickQueryList("select value,value from persondatavalues where fieldnum=? $limitsql order by value limit 5000", true, false, array($fieldmap->fieldnum));
 				}
 			}
 			// Get message parts so we can find the default values, if specified in the message
@@ -116,9 +116,10 @@ if($_SESSION['ttstext']) {
 	foreach ($messagefields as $fieldmap) {		
 		$fields[$fieldmap->fieldnum] = $fieldmap;
 		if ($fieldmap->isOptionEnabled("multisearch")) {
-			$limit = DBFind('Rule', 'from rule inner join userrule on rule.id = userrule.ruleid where userid=? and fieldnum=?', false, array($USER->id, $fieldmap->fieldnum));
+			$limit = DBFind('Rule', "from rule r inner join userassociation ua on r.id = ua.ruleid where ua.userid=? and type = 'rule' and r.fieldnum=?", "r", array($USER->id, $fieldmap->fieldnum));
 			$limitsql = $limit ? $limit->toSQL(false, 'value', false, true) : '';
-			$fielddata[$fieldmap->fieldnum] = QuickQueryList("select value,value from persondatavalues where fieldnum=? $limitsql order by value", true, false, array($fieldmap->fieldnum));
+			$fielddata[$fieldmap->fieldnum] = QuickQueryList("select value,value from persondatavalues where fieldnum=? $limitsql order by value limit 5000", true, false, array($fieldmap->fieldnum));
+			error_log(json_encode($fielddata));
 		}
 	}
 	$msgType = 'phone';	
@@ -251,6 +252,7 @@ if (isset($_GET['parentfield'])) {
 		var sessiondata = true;
 	</script>
 	<div id="previewcontainer"></div>
+	<script type="text/javascript" language="javascript" src="script/datepicker.js"></script>
 	<script type="text/javascript" language="javascript" src="script/niftyplayer.js.php"></script>
 	<script language="JavaScript" type="text/javascript">
 				function unloadsession(){
