@@ -128,7 +128,7 @@ $formdata = array(
 	),
 	"owner" => array(
 		"label" => _L("Owner"),
-		"fieldhelp" => _L("Select who the job should belong to."),
+		"fieldhelp" => _L("Select the user account Classroom Message jobs should run under."),
 		"value" => ($job)?$job->userid:$USER->id,
 		"validators" => array(
 			array("ValRequired"),
@@ -233,7 +233,7 @@ $helpsteps = array (
 	_L('The Template Name will be displayed in reports'),
 	_L('The Job Type determines where the system sends the message.'),
 	_L('Select which days Classroom Messages should be sent.'),
-	_L('Select the owner of the template.'),
+	_L('Select the user account that Classroom Messaging jobs should be sent from.'),
 	_L('The From Name and From Email tell the recipient who the email came from.'),
 	_L('The Subject is the default subject for all Classroom Messages.<br><br>
 	In the Message Body section, enter a message which Classroom Messages will be appended to.')
