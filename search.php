@@ -109,6 +109,7 @@ $formdata = array();
 
 $formdata["toggles"] = array(
 	"label" => _L('Search Options'),
+	"fieldhelp" => _L("Choose which method to search by."),
 	"control" => array("FormHtml", 'html' => "
 		<input id='searchByRules' type='radio' onclick=\"choose_search_by_rules();\"><label for='searchByRules'> Search by Rules </label>" .
 		(getSystemSetting('_hasenrollment') ?
@@ -122,6 +123,7 @@ $formdata["toggles"] = array(
 
 $formdata["ruledata"] = array(
 	"label" => _L('Rules'),
+	"fieldhelp" => _L("Select rules to filter search results."),
 	"value" => $rulewidgetvaluejson,
 	"control" => array("FormRuleWidget"),
 	"validators" => array(array('ValRules')),
@@ -149,6 +151,7 @@ $formdata["ruledata"] = array(
 
 $formdata["pkey"] = array(
 	"label" => _L('Person ID'),
+	"fieldhelp" => _L("Search for the person by their ID number."),
 	"value" => isset($_SESSION['listsearch']['individual']['pkey']) ? $_SESSION['listsearch']['individual']['pkey'] : '',
 	"validators" => array(
 	),
@@ -157,6 +160,7 @@ $formdata["pkey"] = array(
 );
 $formdata["phone"] = array(
 	"label" => _L('Phone or SMS Number'),
+	"fieldhelp" => _L("Search for the person by their phone or SMS number."),
 	"value" => isset($_SESSION['listsearch']['individual']['phone']) ? $_SESSION['listsearch']['individual']['phone'] : '',
 	"validators" => array(array("ValPhone")),
 	"control" => array("TextField"),
@@ -164,6 +168,7 @@ $formdata["phone"] = array(
 );
 $formdata["email"] = array(
 	"label" => _L('Email Address'),
+	"fieldhelp" => _L("Search for the person by their email address."),
 	"value" => isset($_SESSION['listsearch']['individual']['email']) ? $_SESSION['listsearch']['individual']['email'] : '',
 	"validators" => array(array("ValEmail")),
 	"control" => array("TextField"),
