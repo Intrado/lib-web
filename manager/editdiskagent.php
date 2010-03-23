@@ -62,7 +62,7 @@ if (CheckFormSubmit($f,$s) || CheckFormSubmit($f, "authorize") || CheckFormSubmi
 			} else {
 				// TODO transactions
 
-				// cleanup and set customer's setting for 'diskagentuuid', also update disk.customeragent table
+				// cleanup and set customer's setting for 'authdiskuuid', also update disk.customeragent table
 				
 				// get existing customers for this agent
 				$samecustid = false;
@@ -77,7 +77,7 @@ if (CheckFormSubmit($f,$s) || CheckFormSubmit($f, "authorize") || CheckFormSubmi
 								inner join customer c on (c.shardid = s.id)
 								where c.id = ?", false, false, array($cid));
 						$custdb = DBConnect($custinfo[0], $custinfo[1], $custinfo[2], "c_" . $cid);
-						QuickUpdate("delete from setting where name='diskagentuuid'", $custdb);
+						QuickUpdate("delete from setting where name='authdiskuuid'", $custdb);
 						
 						// remove from disk.customeragent
 						QuickUpdate("delete from customeragent where customerid=? and agentid=?", $diskdb, array($cid, $agentid));
@@ -88,10 +88,10 @@ if (CheckFormSubmit($f,$s) || CheckFormSubmit($f, "authorize") || CheckFormSubmi
 						inner join customer c on (c.shardid = s.id)
 						where c.id = ?", false, false, array($customerid));
 				$custdb = DBConnect($custinfo[0], $custinfo[1], $custinfo[2], "c_" . $customerid);
-				if (QuickQuery("select 1 from setting where name='diskagentuuid' limit 1", $custdb)) {
-					QuickUpdate("update setting set value=? where name='diskagentuuid'", $custdb, array($agent['uuid']));
+				if (QuickQuery("select 1 from setting where name='authdiskuuid' limit 1", $custdb)) {
+					QuickUpdate("update setting set value=? where name='authdiskuuid'", $custdb, array($agent['uuid']));
 				} else {
-					QuickUpdate("insert into setting (name, value) values ('diskagentuuid', ?)", $custdb, array($agent['uuid']));
+					QuickUpdate("insert into setting (name, value) values ('authdiskuuid', ?)", $custdb, array($agent['uuid']));
 				}
 				
 				// if not the same as before, add relationship

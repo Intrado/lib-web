@@ -68,7 +68,7 @@ if (isset($_POST['genuuid'])) {
 					$genstatus = "Error, failure connecting to customer database";
 				} else {
 					// TODO future release to support mulitple agents per customer
-					if (QuickQuery("select 1 from setting where name='diskagentuuid' limit 1", $custdb)) {
+					if (QuickQuery("select 1 from setting where name='authdiskuuid' limit 1", $custdb)) {
 						$genstatus = "Error, customer already has agent associated";
 					} else {
 						// generate new UUID
@@ -77,7 +77,7 @@ if (isset($_POST['genuuid'])) {
 						QuickUpdate("insert into agent (uuid, name, numpollthreads) values (?, ?, 2)", $diskdb, array($uuid, $newagentname));
 						QuickUpdate("insert into customeragent (customerid, agentid) values (?, (select id from agent where uuid=?))", $diskdb, array($cid, $uuid));
 						// insert into customer database
-						QuickUpdate("insert into setting (name, value) values ('diskagentuuid', ?)", $custdb, array($uuid));
+						QuickUpdate("insert into setting (name, value) values ('authdiskuuid', ?)", $custdb, array($uuid));
 						$genstatus = "Success";
 					}
 				}
