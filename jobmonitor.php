@@ -39,7 +39,7 @@ $job = new Job($jobid);
 // Prepare $_SESSION['jobstats'][$job->id], needed by graph_detail_callprogress.php
 $readonlyconn = readonlyDBConnect();
 $jobstats = array ("validstamp" => time());
-if ($job->sendphone) {
+if ($job->hasPhone()) {
 	$jobstats['phone'] = array(
 			"A" => 0,
 			"M" => 0,
@@ -58,7 +58,7 @@ if ($job->sendphone) {
 		$jobstats["phone"][$row[1]] += $row[0];
 	}
 }
-if ($job->sendemail) {
+if ($job->hasEmail()) {
 	$jobstats['email'] = array(
 			"sent" => 0,
 			"unsent" => 0,
@@ -73,7 +73,7 @@ if ($job->sendemail) {
 		$jobstats["email"][$row[1]] += $row[0];
 	}
 }
-if ($job->sendsms) {
+if ($job->hasSMS()) {
 	$jobstats['sms'] = array(
 			"sent" => 0,
 			"unsent" => 0,
@@ -136,7 +136,7 @@ switch ($job->status) {
 }
 
 $destinationresults = array();
-if ($job->sendphone) {
+if ($job->hasPhone()) {
 		$phoneinfo = JobSummaryReport::getPhoneInfo($job->id, $readonlyconn);
 		$destinationresults['phone'] = array(
 			'recipients' => $phoneinfo[0]+0,
@@ -146,7 +146,7 @@ if ($job->sendphone) {
 			'percentcontacted' => sprintf("%0.2f", isset($phoneinfo[8]) ? $phoneinfo[8] : "") . '%'
 		);
 }
-if ($job->sendemail) {
+if ($job->hasEmail()) {
 		$destinationresults['email'] = JobSummaryReport::getEmailInfo($job->id, $readonlyconn);
 		$destinationresults['email'] = array(
 			'recipients' => $destinationresults['email'][0]+0,
@@ -155,7 +155,7 @@ if ($job->sendemail) {
 			'percentcontacted' => sprintf("%0.2f", isset($destinationresults['email'][6]) ? $destinationresults['email'][6] : "") . '%'
 		);
 }
-if ($job->sendsms) {
+if ($job->hasSMS()) {
 		$destinationresults['sms'] = JobSummaryReport::getSmsInfo($job->id, $readonlyconn);
 		$destinationresults['sms'] = array(
 			'recipients' => $destinationresults['sms'][0]+0,
@@ -213,7 +213,7 @@ startWindow($windowtitle);
 		</td>
 	</tr>
 <?
-if ($job->sendphone) { ?>
+if ($job->hasPhone()) { ?>
 		<tr class='destination'>
 			<th align="right" class="windowRowHeader bottomBorder">Phone:</th>
 			<td class="bottomBorder">
@@ -237,7 +237,7 @@ if ($job->sendphone) { ?>
 			</td>
 		</tr>
 <? }
-if ($job->sendemail) { ?>
+if ($job->hasEmail()) { ?>
 		<tr class='destination'>
 			<th align="right" class="windowRowHeader bottomBorder">Email:</th>
 			<td class="bottomBorder">
@@ -259,7 +259,7 @@ if ($job->sendemail) { ?>
 			</td>
 		</tr>
 <? }
-if ($job->sendsms) { ?>
+if ($job->hasSMS()) { ?>
 		<tr class='destination'>
 			<th align="right" class="windowRowHeader bottomBorder">SMS:</th>
 			<td class="bottomBorder">
