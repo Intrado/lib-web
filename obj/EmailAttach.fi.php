@@ -2,9 +2,7 @@
 class EmailAttach extends FormItem {
 	function render ($value) {
 		$n = $this->form->name."_".$this->name;
-		if(!is_array($value) || empty($value)) {
-			$value = "";
-		} else {
+		if(is_array($value)) {
 			$value = json_encode($value);
 		}
 		
