@@ -322,14 +322,16 @@ function fmt_jobs_actions_customer($row, $index) {
 		$deleted = $row[$index + 2];
 		$jobownerlogin = $row[$index + 3];
 		$jobownerid = $row[$index + 4];//change to id
-		$type = $row[$index+6];
+		$type = $row[$index+5];
 	}
 
 	if ($USER->id == $jobownerid) {
-		$editLink = action_link(_L("Edit"),"pencil","job.php?id=$id");
+		error_log("$type  $index");
 		if ($type == 'survey') {
+			$editLink = action_link(_L("Edit"),"pencil","survey.php?id=$id");
 			$copyLink = ''; // no copy survey feature
 		} else {
+			$editLink = action_link(_L("Edit"),"pencil","job.php?id=$id");
 			$copyLink = action_link(_L("Copy"),"page_copy","jobs.php?copy=$id");
 		}
 	} elseif ($USER->authorize('manageaccount')) {
