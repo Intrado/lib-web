@@ -394,7 +394,7 @@ function activityfeed($mergeditems,$ajax = false) {
 					switch($status) {
 						case "new":
 							$title = _L('%1$s Saved',$jobtype);
-							$defaultlink = "job.php?id=$itemid";
+							$defaultlink = $item["jobtype"] == "survey" ? "survey.php?id=$itemid" : "job.php?id=$itemid";
 							$icon = 'largeicons/folderandfiles.jpg';
 							$jobcontent = typestring($item["jobtype"]) . "&nbsp;message&nbsp;with&nbsp;" . listcontacts($job,"job");
 							break;
@@ -435,14 +435,14 @@ function activityfeed($mergeditems,$ajax = false) {
 						case "scheduled":
 							$title = _L('%1$s Submitted, Status: Scheduled',$jobtype);
 							$icon = 'largeicons/clock.jpg';
-							$defaultlink = "job.php?id=$itemid";
+							$defaultlink = $item["jobtype"] == "survey" ? "survey.php?id=$itemid" : "job.php?id=$itemid";
 							$jobcontent = typestring($item["jobtype"]) . "&nbsp;message&nbsp;with&nbsp;" . listcontacts($job,"job");
 							break;
 						case "procactive" || "processing":
 							$job->percentprocessed = $item["percentprocessed"];
 							$title = _L('%1$s Submitted, Status: %2$s',$jobtype,escapehtml(fmt_status($job,$item["name"])));
 							$icon = 'largeicons/gear.jpg';
-							$defaultlink = "job.php?id=$itemid";
+							$defaultlink = $item["jobtype"] == "survey" ? "survey.php?id=$itemid" : "job.php?id=$itemid";
 							$jobcontent = typestring($item["jobtype"]) . "&nbsp;message&nbsp;with&nbsp;" . listcontacts($job,"job");
 							break;
 						default:
