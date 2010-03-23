@@ -2,7 +2,7 @@ CREATE TABLE `agent` (
  `id` int(11) NOT NULL auto_increment,
  `uuid` varchar(255) CHARACTER SET ascii COLLATE ascii_general_ci NOT NULL,
  `name` varchar(50) NOT NULL,
- `numpollthreads` smallint(6) NOT NULL,
+ `numpollthread` smallint(6) NOT NULL,
  PRIMARY KEY  (`id`),
  UNIQUE KEY `uuid` (`uuid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;

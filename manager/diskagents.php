@@ -74,7 +74,7 @@ if (isset($_POST['genuuid'])) {
 						// generate new UUID
 						$uuid = md5($newcusturl . microtime());
 						// insert into disk database
-						QuickUpdate("insert into agent (uuid, name, numpollthreads) values (?, ?, 2)", $diskdb, array($uuid, $newagentname));
+						QuickUpdate("insert into agent (uuid, name, numpollthread) values (?, ?, 2)", $diskdb, array($uuid, $newagentname));
 						QuickUpdate("insert into customeragent (customerid, agentid) values (?, (select id from agent where uuid=?))", $diskdb, array($cid, $uuid));
 						// insert into customer database
 						QuickUpdate("insert into setting (name, value) values ('_authdiskuuid', ?)", $custdb, array($uuid));

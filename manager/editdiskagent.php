@@ -23,7 +23,7 @@ if (isset($_GET['agentid'])) {
 }
 
 // get the agent
-$agent = QuickQueryRow("select uuid, name, numpollthreads from agent where id=?", true, $diskdb, array($agentid));
+$agent = QuickQueryRow("select uuid, name, numpollthread from agent where id=?", true, $diskdb, array($agentid));
 // NOTE support for 1-1 relationship, TODO many-many
 $agent['customerid'] = QuickQuery("select customerid from customeragent where agentid=?", $diskdb, array($agentid));
 
@@ -42,12 +42,12 @@ if (CheckFormSubmit($f,$s) || CheckFormSubmit($f, "authorize") || CheckFormSubmi
 
 		TrimFormData($f, $s, "customerid");
 		TrimFormData($f, $s, "agent_name");
-		TrimFormData($f, $s, "agent_numpollthreads");
+		TrimFormData($f, $s, "agent_numpollthread");
 
 		$customerid = GetFormData($f, $s, "customerid") + 0;
 		$agentname = GetFormData($f, $s, "agent_name");
 		$agentnamelength = strlen($agentname);
-		$numpollthreads = GetFormData($f, $s, "agent_numpollthreads") + 0;
+		$numpollthread = GetFormData($f, $s, "agent_numpollthread") + 0;
 
 		//do check
 		if ( CheckFormSection($f, $s) ) {
@@ -57,7 +57,7 @@ if (CheckFormSubmit($f,$s) || CheckFormSubmit($f, "authorize") || CheckFormSubmi
 				error('Invalid Customer ID');
 			} else if ($agentnamelength < 5 || $agentnamelength > 50) {
 				error('Agent name must be between 5 and 50 characters');
-			} else if ($numpollthreads < 2 || $numpollthreads > 10) {
+			} else if ($numpollthread < 2 || $numpollthread > 10) {
 				error('Number of Polling Threads must be between 2 and 10');
 			} else {
 				// TODO transactions
@@ -100,7 +100,7 @@ if (CheckFormSubmit($f,$s) || CheckFormSubmit($f, "authorize") || CheckFormSubmi
 				}
 
 				// update agent properties
-				QuickUpdate("update agent set name=?, numpollthreads=? where id=?", $diskdb, array($agentname, $numpollthreads, $agentid));
+				QuickUpdate("update agent set name=?, numpollthread=? where id=?", $diskdb, array($agentname, $numpollthread, $agentid));
 
 				// back to main page
 				redirect("diskagents.php");
@@ -117,7 +117,7 @@ if ( $reloadform ) {
 	
 	PutFormData($f, $s, "customerid", $agent['customerid'], "number", "1", "nomax", true);
 	PutFormData($f, $s, "agent_name", $agent['name'], "text", "nomin", "nomax", true);
-	PutFormData($f, $s, "agent_numpollthreads", $agent['numpollthreads'], "number", "2", "10", true);
+	PutFormData($f, $s, "agent_numpollthread", $agent['numpollthread'], "number", "2", "10", true);
 }
 
 
@@ -141,7 +141,7 @@ NewForm($f);
 	</tr>
 	<tr>
 		<td>Number of Polling Threads: </td>
-		<td><? NewFormItem($f, $s, "agent_numpollthreads", "text", "5");?></td>
+		<td><? NewFormItem($f, $s, "agent_numpollthread", "text", "5");?></td>
 	</tr>
 
 	<tr>
