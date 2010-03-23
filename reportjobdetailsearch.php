@@ -255,7 +255,8 @@ foreach ($jobsarchived as $job) {
 
 $formdata = array();
 $formdata["radioselect"] = array(
-	"label" => _L("Search on job or date"),
+	"label" => _L("Search By"),
+	"fieldhelp" => _L("Search by job name or the date it was sent."),
 	"value" => isset($options['jobid']) ? 'job' : 'date',
 	"control" => array("RadioButton", "values" => array("job" => _L("Job"), "date" => _L("Date"))),
 	"validators" => array(array("ValRequired"), array("ValInArray", "values" => array('job', 'date'))),
@@ -264,6 +265,7 @@ $formdata["radioselect"] = array(
 
 $formdata["jobid"] = array(
 	"label" => _L("Jobs"),
+	"fieldhelp" => _L("Select a previously sent job from the menu."),
 	"value" => !empty($options['archived']) ? '' : $jobid,
 	"control" => array("SelectMenu", "values" => $jobids),
 	"validators" => array(array("ValInArray", "values" => array_keys($jobids))),
@@ -272,6 +274,7 @@ $formdata["jobid"] = array(
 
 $formdata["jobidarchived"] = array(
 	"label" => _L("Archived Jobs"),
+	"fieldhelp" => _L("Choose an archived job from the menu."),
 	"value" => !empty($options['archived']) ? $jobid : '',
 	"control" => array("SelectMenu", "values" => $jobidsarchived),
 	"validators" => array(array("ValInArray", "values" => array_keys($jobidsarchived))),
@@ -279,7 +282,8 @@ $formdata["jobidarchived"] = array(
 );
 
 $formdata["checkarchived"] = array(
-	"label" => _L("Show archived jobs"),
+	"label" => _L("Search Archived Jobs"),
+	"fieldhelp" => _L("Select this option if you need to search for a job that has been archived."),
 	"value" => !empty($options['archived']) ? 1 : 0,
 	"control" => array("CheckBox"),
 	"validators" => array(),
@@ -288,6 +292,7 @@ $formdata["checkarchived"] = array(
 
 $formdata["dateoptions"] = array(
 	"label" => _L("Date Options"),
+	"fieldhelp" => _L("Use this menu to search by the date the job was sent."),
 	"value" => json_encode(array(
 		"reldate" => isset($options['reldate']) ? $options['reldate'] : 'today',
 		"xdays" => isset($options['lastxdays']) ? $options['lastxdays'] : '',
@@ -303,6 +308,7 @@ $formdata[] = _L("Filter By");
 $allowedFieldTypes = array('f','g');
 $formdata["ruledata"] = array(
 	"label" => _L('Criteria'),
+	"fieldhelp" => _L("Use rules to narrow your report results."),
 	"value" => $rulewidgetvaluejson,
 	"control" => array("FormRuleWidget", "allowedFieldTypes" => $allowedFieldTypes),
 	"validators" => array(array('ValRules', "allowedFieldTypes" => $allowedFieldTypes)),
@@ -328,6 +334,7 @@ if (getSystemSetting('_hasenrollment')) {
 
 $formdata["jobtype"] = array(
 	"label" => _L("Filter by job type"),
+	"fieldhelp" => _L("Use these options if you want to show reports only for certain job types."),
 	"value" => isset($options['jobtypes']) ? 1 : 0,
 	"control" => array("CheckBox"),
 	"validators" => array(),
@@ -344,6 +351,7 @@ $formdata["jobtypes"] = array(
 
 $formdata["result"] = array(
 	"label" => _L("Filter by result"),
+	"fieldhelp" => _L("These options let you create results based on delivery results."),
 	"value" => isset($options['result']) ? 1 : 0,
 	"control" => array("CheckBox"),
 	"validators" => array(),
@@ -362,12 +370,14 @@ $formdata[] = _L("Report Options");
 
 $formdata["displayoptions"] = array(
 	"label" => _L("Display Fields"),
+	"fieldhelp" => _L("Select which fields you would like to display in your report."),
 	"control" => array("FormHtml", "html" => "<div id='metadataDiv'></div>"),
 	"helpstep" => 1
 );
 
 $formdata["multipleorderby"] = array(
 	"label" => _L('Sort By'),
+	"fieldhelp" => _L("Choose which field you would like to sort the results by."),
 	"value" => !empty($validOrdering) ? $validOrdering : '',
 	"control" => array("MultipleOrderBy", "count" => 3, "values" => $validOrdering),
 	"validators" => array(),
@@ -576,7 +586,7 @@ if(isset($_SESSION['reportid']))
 
 require_once("nav.inc.php");
 
-startWindow(_L("Select"), "padding: 3px;");
+startWindow(_L("Options"), "padding: 3px;");
 
 	echo "<div id='metadataTempDiv' style='display:none'>";
 		select_metadata(null, null, $fields);

@@ -269,7 +269,7 @@ if($sections) {
 				<div id="contactbox" style="width:100%;text-decoration:none;"></div>
 			</div>
 			<hr />
-			<img src="img/icons/fugue/light_bulb.gif" alt="" />Press shift key to <br />&nbsp;&nbsp;&nbsp;&nbsp;multiselect
+			<img src="img/icons/fugue/light_bulb.gif" alt="" />Press and hold shift key to <br />&nbsp;&nbsp;&nbsp;&nbsp;multiselect
 			<hr />
 		</td>
 

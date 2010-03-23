@@ -265,7 +265,7 @@ $helpsteps[] = _L("Enter a name for your job. Using a descriptive name that indi
 		$helpsteps[] = _L("The options in this section create a delivery window for your job. It's important that you leave enough time for the system to contact everyone in your list. The options are: <ul><li>Start Date - This is the day the job will start running. <li>Days to Run - The number of days the job should run within the times you select.<li>Start Time and End Time - These represent the time the job should start and stop.</ul>");  // Guide for the whole scheduling section
 		$formdata["repeat"] = array(
 			"label" => _L("Repeat"),
-			"fieldhelp" => _L("Select this option if you would like your job to repeat."),
+			"fieldhelp" => _L("Select which days this job should run."),
 			"value" => $repeatvalues,
 			"validators" => array(
 				array("ValRequired"),
