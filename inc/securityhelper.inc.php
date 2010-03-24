@@ -30,91 +30,60 @@ function userOwns ($type,$id) {
 function isSubscribed ($type,$id) {
 	global $USER;
 	switch($type) {
-		case "message":
-			// see if the current user is subscribed to the requested message group id
-			return QuickQuery("
-				select 1
-				from message m
-					inner join publish p on
-						(m.messagegroupid = p.messagegroupid)
-				where p.type = 'messagegroup'
-					and p.userid = ?
-					and p.action = 'subscribe'
-					and m.id = ?", false, array($USER->id, $id));
 		case "messagegroup":
 			return QuickQuery("select 1 from publish where userid = ? and action = 'subscribe' and type = 'messagegroup' and messagegroupid=?", false, array($USER->id, $id));
 		case "list":
 			return QuickQuery("select 1 from publish where userid = ? and action = 'subscribe' and type = 'list' and listid=?", false, array($USER->id, $id));
-		default:
-			return false;
 	}
+	return false;
 }
 
-// returns true if the object is published and the user is authorized to subscribe to it.
+// returns true if the object is published
 function isPublished ($type,$id) {
-	global $USER;
-	// if the user is not authorized to subscribe to anything return false
-	if (!$USER->authorize('subscribe'))
-		return false;
-	$orgids = array();
 	switch($type) {
-		case "message":
-			// if the user is not autorized to subscribe to message groups. return false
-			if (!in_array('messagegroup', explode("|", $USER->authorize('subscribe'))))
-				return false;
-			// get organizationids for the published message group associated with the requested message id
-			$orgids = QuickQueryList("
-				select p.organizationid
-				from message m
-					inner join publish p on
-						(m.messagegroupid = p.messagegroupid)
-				where p.type = 'messagegroup'
-					and p.action = 'publish'
-					and m.id = ?", false, false, array($id));
-			break;
-			
 		case "messagegroup":
-			// if the user is not autorized to subscribe to message groups. return false
-			if (!in_array('messagegroup', explode("|", $USER->authorize('subscribe'))))
-				return false;
-			// get organizationids for the requested message group id
-			$orgids = QuickQueryList("select p.organizationid from publish where action = 'publish' and type = 'messagegroup' and messagegroupid=?", false, false, array($id));
-			break;
-			
+			return QuickQuery("select 1 from publish where action = 'publish' and type = 'messagegroup' and messagegroupid=?", false, array($id));
 		case "list":
-			// if the usr is not authorized to subscribe to lists, return false
-			if (!in_array('list', explode("|", $USER->authorize('subscribe'))))
-				return false;
-			// get organizationids for the requested message group id
-			$orgids = QuickQueryList("select p.organizationid from publish where action = 'publish' and type = 'list' and listid=?", false, false, array($id));
-			break;
-			
-		default:
-			return false;
-	}
-	
-	// check the published organizationids to see if the user has rights to any of them
-	if ($orgids) {
-		// if it has a NULL organizationid, that means anybody can subscribe to it
-		if (in_array(null, $orgids))
-			return true;
-		// special case organizationid = 0 means only un-restricted users
-		// if the object is for un-restricted users only and the user has no org or section restrictions
-		if (in_array(0, $orgids) && !QuickQuery("select 1 from userassociation where userid = ? and type in ('organization', 'section') limit 1", false, array($USER->id)))
-			return true;
-		$userauthorizedorgs = Organization::getAuthorizedOrgKeys();
-		foreach ($orgids as $orgid) {
-			if (isset($userauthorizedorgs[$orgid]))
-				return true;
-		}
+			return QuickQuery("select 1 from publish where action = 'publish' and type = 'list' and listid=?", false, array($id));
 	}
 	return false;
 }
 
 // returns true if the current user can subscribe to the requested type
-function userCanSubscribe($type) {
+// if optional id is used, it checks if the user can subscribe to the type and id requested
+function userCanSubscribe($type, $id = false) {
+	global $USER;
 	global $ACCESS;
-	return in_array($type, explode("|", $ACCESS->getValue('subscribe')));
+	$cansubscribe = in_array($type, explode("|", $ACCESS->getValue('subscribe')));
+	if ($id !== false && $cansubscribe) {
+		// check if the user has restrictions
+		$userrestrictions = QuickQuery("select 1 from userassociation where userid = ? and (sectionid is not null or organizationid is not null) limit 1", false, array($USER->id));
+		$authorgs = array();
+		// if they are restricted
+		if ($userrestrictions) {
+			$authorgs = Organization::getAuthorizedOrgKeys();
+			$publishedtoorg = false;
+			switch ($type) {
+				case "messagegroup":
+					$publishedtoorg = QuickQuery("
+						select 1
+						from publish
+						where action = 'publish' and type = 'messagegroup' and messagegroupid = ? and organizationid in (". DBParamListString(count($authorgs)) . ") limit 1",
+						false, array($id) + $authorgs);
+					break;
+				case "list";
+					$publishedtoorg = QuickQuery("
+						select 1
+						from publish
+						where action = 'publish' and type = 'list' and listid = ? and organizationid in (". DBParamListString(count($authorgs)) . ") limit 1",
+						false, array($id) + $authorgs);
+						break;
+					break;
+			}
+			return $publishedtoorg;
+		}
+	}
+	return $cansubscribe;
 }
 
 // returns true if the current user can publish the requested type
