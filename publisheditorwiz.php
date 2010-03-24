@@ -270,24 +270,28 @@ $wizdata = array(
 	"confirm" => new PublishTargetWiz_confirm(_L("Confirm"))
 	);
 
+// get subtab and done url
+$subtab = "";
+$doneurl = "";
+switch ($_SESSION['publishtargetwiz']['type']) {
+	case "messagegroup":
+		$subtab = "messages";
+		$doneurl = "messages.php";
+		break;
+	case "list":
+		$subtab = "lists";
+		$doneurl = "lists.php";
+		break;
+	default:
+}
+
 $wizard = new Wizard("publishtargetwiz", $wizdata, new FinishPublishTargetWiz(_L("Finish")));
-$wizard->doneurl = "lists.php";
+$wizard->doneurl = $doneurl;
 $wizard->handleRequest();
 
 ////////////////////////////////////////////////////////////////////////////////
 // Display
 ////////////////////////////////////////////////////////////////////////////////
-$subtab = "";
-switch ($_SESSION['publishtargetwiz']['type']) {
-	case "messagegroup":
-		$subtab = "messages";
-		break;
-	case "list":
-		$subtab = "lists";
-		break;
-	default:
-}
-
 $PAGE = "notifications:$subtab";
 $TITLE = "Publication Editor";
 
