@@ -105,7 +105,7 @@ if (isset($_POST['eventContacts']) && isset($_POST['eventMessage']) && isset($_P
 			$event->targetedmessageid = $message;
 			$event->name = "Teacher Comment";
 			if(isset($_POST['eventComments']) && $USER->authorize('targetedmessage')) {
-				$event->notes = $_POST['eventComments'].length > 5000 ? substr($_POST['eventComments']):$_POST['eventComments'];
+				$event->notes = mb_strlen($_POST['eventComments']) > 5000 ? mb_substr($_POST['eventComments']):$_POST['eventComments'];
 			}
 			else if(!$event->notes){
 				$event->notes = "";
