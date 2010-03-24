@@ -175,6 +175,7 @@ $validsearchmethods = array(
 );
 $formdata["searchmethod"] = array(
 	"label" => _L("Search By"),
+	"fieldhelp" => _L("You may search for an individual by their ID number, phone, or email."),
 	"value" => $searchmethod,
 	"control" => array("RadioButton", "values" => $validsearchmethods),
 	"validators" => array(array("ValRequired"), array("ValInArray", "values" => array_keys($validsearchmethods))),
@@ -183,6 +184,7 @@ $formdata["searchmethod"] = array(
 
 $formdata["searchvalue"] = array(
 	"label" => _L("Search Value"),
+	"fieldhelp" => _L("Enter a search term that matches the type you selected above."),
 	"value" => $searchvalue,
 	"control" => array("TextField"),
 	"validators" => array(
@@ -197,6 +199,7 @@ $formdata[] = _L("Filter By");
 
 $formdata["dateoptions"] = array(
 	"label" => _L("Date Options"),
+	"fieldhelp" => _L("Use the date options for the time period of the report."),
 	"value" => json_encode(array(
 		"reldate" => isset($options['reldate']) ? $options['reldate'] : 'xdays',
 		"xdays" => isset($options['lastxdays']) ? $options['lastxdays'] : '30',
@@ -210,6 +213,7 @@ $formdata["dateoptions"] = array(
 
 $formdata["jobtype"] = array(
 	"label" => _L("Filter by job type"),
+	"fieldhelp" => _L("If you would like to filter report results by job type, select the type here."),
 	"value" => isset($options['jobtypes']) ? 1 : 0,
 	"control" => array("CheckBox"),
 	"validators" => array(),
@@ -226,6 +230,7 @@ $formdata["jobtypes"] = array(
 
 $formdata["result"] = array(
 	"label" => _L("Filter by result"),
+	"fieldhelp" => _L("Use this section to create a report based on delivery results."),
 	"value" => isset($options['results']) ? 1 : 0,
 	"control" => array("CheckBox"),
 	"validators" => array(),
@@ -244,6 +249,7 @@ $formdata[] = _L("Report Options");
 
 $formdata["displayoptions"] = array(
 	"label" => _L("Display Fields"),
+	"fieldhelp" => _L("Select which fields you would like to display."),
 	"control" => array("FormHtml", "html" => "<div id='metadataDiv'></div>"),
 	"helpstep" => 1
 );
@@ -331,7 +337,7 @@ if(isset($_SESSION['reportid'])){
 
 require_once("nav.inc.php");
 
-startWindow(_L("Person Notification Search"), "padding: 3px;");
+startWindow(_L("Options"), "padding: 3px;");
 
 	echo "<div id='metadataTempDiv' style='display:none'>";
 		select_metadata(null, null, $fields);
