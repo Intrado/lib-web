@@ -423,7 +423,7 @@ class TranslationItem extends FormItem {
 		$n = $this->form->name."_".$this->name;
 
 		$str = "
-			(function() {
+			document.observe(\"dom:loaded\", function() {
 				var formitemelement = $('$n');
 				var stateelement = $('{$n}state');
 				var formitemcontainer = formitemelement.up('.TranslationItemContainer');
@@ -491,7 +491,7 @@ class TranslationItem extends FormItem {
 				sourceTextarea.observe('mouseup',setselection.bindAsEventListener(textarea));
 				mainTextarea.observe('keyup',setselection.bindAsEventListener(textarea));
 				mainTextarea.observe('mouseup',setselection.bindAsEventListener(textarea));
-			})();
+			});
 		";
 		
 		return $str;
