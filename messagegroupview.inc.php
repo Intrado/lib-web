@@ -16,9 +16,14 @@ if (!$cansendphone && !$cansendemail && !$cansendsms) {
 ///////////////////////////////////////////////////////////////////////////////
 // Request processing:
 ///////////////////////////////////////////////////////////////////////////////
-if (!isset($_GET['id']) || (!userOwns('messagegroup',$_GET['id'] + 0) && !isPublished('messagegroup', $_GET['id'])))
+// no messagegroup id
+if (!isset($_GET['id']))
 	redirect('unauthorized.php');
 
+// user doesn't have access to this message group
+if (!userOwns('messagegroup',$_GET['id'] + 0) && !isPublished('messagegroup', $_GET['id']) && !userCanSubscribe('messagegroup', $_GET['id']))
+	redirect('unauthorized.php');
+ 
 $messagegroup = new MessageGroup($_GET['id'] + 0);
 
 if($messagegroup->type != 'notification') {
