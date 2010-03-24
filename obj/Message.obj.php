@@ -551,7 +551,8 @@ class Message extends DBMappedObject {
 	// The only reliable way to check the message length is to render it. Return negative value on error.
 	static function getAudioLength($id, $fields) {
 		$size = -1;
-		$renderedparts = Message::renderMessageParts($id, $fields);
+		$parts = DBFindMany('MessagePart', 'from messagepart where messageid=? order by sequence', false, array($id));
+		$renderedparts = Message::renderPhoneParts($parts, $fields);
 		$voices = DBFindMany("Voice","from ttsvoice");
 
 		// -- get the wav files --
