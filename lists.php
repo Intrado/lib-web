@@ -55,10 +55,25 @@ if (isset($_GET['ajax'])) {
 	}
 	switch ($filter) {
 		case "name":
-			$orderby = "name";
+			$orderby = "digitsfirst, name";
 			break;
 	}
-	$mergeditems = QuickQueryMultiRow("select  SQL_CALC_FOUND_ROWS 'list' as type,'Saved' as status, id, name, modifydate as date, lastused from list where type in ('person','section') and userid=? and deleted = 0 order by $orderby limit $start, $limit",true,false,array($USER->id));
+	$mergeditems = QuickQueryMultiRow("
+		select SQL_CALC_FOUND_ROWS 
+			'list' as type, 'Saved' as status, l.id as id, l.name as name, (l.name +0) as digitsfirst, l.modifydate as date, l.lastused as lastused,
+			p.action as publishaction, p.id as publishid, u.login as owner
+		from list l
+			inner join user u on
+				(l.userid = u.id)
+			left join publish p on
+				(p.listid = l.id)
+		where l.type in ('person','section')
+			and (l.userid = ? or p.userid = ?)
+			and not l.deleted
+		group by id
+		order by $orderby
+		limit $start, $limit",
+		true,false,array($USER->id, $USER->id));
 
 	$total = QuickQuery("select FOUND_ROWS()");
 	$numpages = ceil($total/$limit);
@@ -83,17 +98,56 @@ if (isset($_GET['ajax'])) {
 			$title = escapehtml($item["name"]);
 			$defaultlink = "list.php?id=$itemid";
 			$content = '<a href="' . $defaultlink . '">' . ($item["date"]!== null?$time . '&nbsp;-&nbsp;':"");
+			$publishaction = $item['publishaction'];
+			$publishid = $item['publishid'];
+
+			// give the user some text
+			$publishmessage = '';
+			if ($publishaction == 'publish')
+				$publishmessage = _L('Changes to this message are published.');
+			
+			// tell the user it's a subscription. change the href to view instead of edit
+			if ($publishaction == 'subscribe') {
+				$publishmessage = _L('You are subscribed to this message. Owner: (%s)', $item['owner']);
+				$defaultlink = "messagegroupview.php?id=$itemid";
+			}
+			
+			// Users with published or subscribed lists will get a special action item
+			$publishactionlink = "";
+			if ($USER->authorize("publish") && userCanPublish('list')) {
+				// this message is published, else allow it to be
+				if ($publishaction == 'publish')
+					$publishactionlink = action_link(_L("Modify Publication"), "fugue/star__pencil", "publisheditorwiz.php?id=$itemid&type=list");
+				else
+					$publishactionlink = action_link(_L("Publish"), "fugue/star__plus", "publisheditorwiz.php?id=$itemid&type=list");
+			}
+			if ($USER->authorize("subscribe") && userCanSubscribe('list')) {
+				// this message is subscribed to
+				if ($publishaction == 'subscribe')
+					$publishactionlink = action_link("Un-Subscribe", "fugue/star__minus", "lists.php?publishid=$publishid");
+			}
+
 			if(isset($item["lastused"]))
 				$content .= 'This list was last used: <i>' . date("M j, g:i a",strtotime($item["lastused"])) . "</i>";
 			else
 				$content .= 'This list has never been used';
 			$content .= '</a>';
-			$tools = action_links (
-				action_link("Edit", "pencil", "list.php?id=$itemid"),
-				action_link("Preview", "application_view_list", "showlist.php?id=$itemid"),
-				action_link("Delete", "cross", "lists.php?delete=$itemid", "return confirmDelete();")
-				);
-			//$tools = str_replace("&nbsp;|&nbsp;","<br />",$tools);
+			
+			
+			
+			
+			// if the user is only subscribed to this list, they can't edit or delete
+			if ($publishaction == 'subscribe')
+				$tools = action_links (
+					action_link("Preview", "application_view_list", "showlist.php?id=$itemid"),
+					$publishactionlink);
+			else
+				$tools = action_links (
+					action_link("Edit", "pencil", "list.php?id=$itemid"),
+					action_link("Preview", "application_view_list", "showlist.php?id=$itemid"),
+					$publishactionlink,
+					action_link("Delete", "cross", "lists.php?delete=$itemid", "return confirmDelete();"));
+				
 			$icon = 'largeicons/addrbook.jpg';
 
 			$data->list[] = array("itemid" => $itemid,
@@ -101,7 +155,8 @@ if (isset($_GET['ajax'])) {
 										"icon" => $icon,
 										"title" => $title,
 										"content" => $content,
-										"tools" => $tools);
+										"tools" => $tools,
+										"publishmessage" => $publishmessage);
 		}
 	}
 	$data->pageinfo = array($numpages,$limit,$curpage, "Showing $displaystart - $displayend of $total records on $numpages pages ");
@@ -141,6 +196,8 @@ startWindow('My Lists&nbsp;' . help('Lists_MyLists'));
 					echo icon_button(_L('Create New List with Sections'),"add","location.href='editlistsections.php?id=new'");
 				}
 			?>
+			<div style="clear:both;"></div>
+			<?=(($USER->authorize('subscribe') && userCanSubscribe('messagegroup'))?icon_button(_L('Subscribe to List'),"add", "document.location='listsubscribe.php'"):'') ?>
 			<div style="clear:both;"></div>
 		</div>
 		<br />
@@ -188,7 +245,11 @@ function applyfilter(filter) {
 					
 					for(i=0;i<size;i++){
 						var item = result.list[i];
-						html += '<tr><td valign=\"top\" width=\"60px\"><a href=\"' + item.defaultlink + '\"><img src=\"img/' + item.icon + '\" /></a></td><td ><div class=\"feedtitle\"><a href=\"' + item.defaultlink + '\">' + item.title + '</a></div><span>' + item.content + '</span></td>';
+						html += '<tr><td valign=\"top\" width=\"60px\"><a href=\"' + item.defaultlink + '\"><img src=\"img/' + item.icon + '\" /></a></td><td ><div class=\"feedtitle\"><a href=\"' + item.defaultlink + '\">' + item.title + '</a></div>';
+						if(item.publishmessage) {
+							html += '<div class=\"feedsubtitle\"><a href=\"' + item.defaultlink + '\"><img src=\"img/icons/diagona/10/031.gif\" />' + item.publishmessage + '</div><div style=\"clear both;\"></div>';
+						}
+						html += '<span>' + item.content + '</span></td>';
 						if(item.tools) {
 							html += '<td valign=\"middle\" width=\"100px\"><div>' + item.tools + '</div></td>';
 						}

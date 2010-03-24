@@ -27,51 +27,6 @@ if (!$USER->authorize(array('sendmessage', 'sendemail', 'sendphone', 'sendsms'))
 ///////////////////////////////////////////////////////////////////////////////
 // Request processing:
 ///////////////////////////////////////////////////////////////////////////////
-// requests to publish a messagegroupid
-if (isset($_GET['messagegroupid']) && isset($_GET['publish'])) {
-	// check this is a vaild messagegroup id and it's owned by this user
-	$msgGroup = DBFind("MessageGroup", "from messagegroup where id = ? and userid = ?", false, array($_GET['messagegroupid'], $USER->id));
-	// make sure it isn't currently published
-	$publish = DBFind("Publish", "from publish where userid = ? and action = 'publish' and messagegroupid = ?", false, array($USER->id, $_GET['messagegroupid']));
-	if ($msgGroup && !$publish) {
-		// create a new publish dbmo
-		$publish = new Publish();
-		$publish->userid = $USER->id;
-		$publish->action = 'publish';
-		$publish->type = 'messagegroup';
-		$publish->messagegroupid = $msgGroup->id;
-		$publish->create();
-		
-		notice(_L("The message, %s, is now published.", escapehtml($msgGroup->name)));
-	}
-	
-	redirect();
-}
-
-// requests to remove a publishid
-if (isset($_GET['publishid']) && isset($_GET['remove'])) {
-	// check that this is a vaid publish id
-	$publish = DBFind("Publish", "from publish where id = ? and userid = ? and type = 'messagegroup'", false, array($_GET['publishid'], $USER->id));
-	if ($publish) {
-		// get the message group for this published item
-		$msgGroup = DBFind("MessageGroup", "from messagegroup where id = ?", false, array($publish->messagegroupid));
-		// is it published or subscription
-		$ispublished = ($publish->action == 'publish');
-		$issubscribed = ($publish->action == 'subscribe');
-		// if the message group is valid  and user can publish message groups and it is published, remove it and all subscriptions
-		if ($msgGroup->userid == $USER->id && $USER->authorize('publishmessagegroup') && $ispublished) {
-			QuickUpdate("delete from publish where type = 'messagegroup' and messagegroupid = ?", false, array($msgGroup->id));
-			notice(_L("The message, %s, is no longer published. All subscribers to this message have been removed.", escapehtml($msgGroup->name)));
-		}
-		// if the user can subscribe and it is a subscription, remove the subscription
-		if ($USER->authorize('subscribemessagegroup') && $issubscribed) {
-			$publish->destroy();
-			notice(_L("You are no longer subscribed to message, %s.", escapehtml($msgGroup->name)));
-		}
-	}
-	
-	redirect();
-}
 
 if (isset($_GET['delete'])) {
 	$deleteid = $_GET['delete'];
@@ -197,14 +152,14 @@ if($isajax === true) {
 			
 			// Users with published messages or subscribed messages will get a special action item
 			$publishactionlink = "";
-			if ($USER->authorize("publishmessagegroup")) {
+			if ($USER->authorize("publish") && userCanPublish('messagegroup')) {
 				// this message is published, else allow it to be
 				if ($publishaction == 'publish')
-					$publishactionlink = action_link("Un-Publish", "fugue/star__minus", "messages.php?publishid=$publishid&remove");
+					$publishactionlink = action_link(_L("Modify Publication"), "fugue/star__pencil", "publisheditorwiz.php?id=$itemid&type=messagegroup");
 				else
-					$publishactionlink = action_link("Publish", "fugue/star__plus", "messages.php?messagegroupid=$itemid&publish");
+					$publishactionlink = action_link(_L("Publish"), "fugue/star__plus", "publisheditorwiz.php?id=$itemid&type=messagegroup");
 			}
-			if ($USER->authorize("subscribemessagegroup")) {
+			if ($USER->authorize("subscribe") && userCanSubscribe('messagegroup')) {
 				// this message is subscribed to
 				if ($publishaction == 'subscribe')
 					$publishactionlink = action_link("Un-Subscribe", "fugue/star__minus", "messages.php?publishid=$publishid&remove");
@@ -281,7 +236,7 @@ startWindow(_L('My Messages'), 'padding: 3px;', true, true);
 	<td class="feed" style="width: 180px;vertical-align: top;font-size: 12px;" >
 		<div>
 			<?= icon_button(_L('Create New Message'),"add","location.href='messagegroup.php?id=new'") ?>
-			<?=(($USER->authorize('subscribemessagegroup'))?icon_button(_L('Subscribe to Message'),"add", "document.location='messagegroupsubscribe.php'"):'') ?>
+			<?=(($USER->authorize('subscribe') && userCanSubscribe('messagegroup'))?icon_button(_L('Subscribe to Message'),"add", "document.location='messagegroupsubscribe.php'"):'') ?>
 			<div style="clear:both;"></div>
 		</div>
 		<br />

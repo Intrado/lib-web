@@ -42,62 +42,54 @@ if (isset($_GET['id'])) {
 ////////////////////////////////////////////////////////////////////////////////
 
 
-class RestrictedFields extends FormItem {
+class RestrictedValues extends FormItem {
 	var $clearonsubmit = true;
 	var $clearvalue = array();
 	
 	function render ($value) {
 		$n = $this->form->name."_".$this->name;
 
+		$label = (isset($this->args['label']) && $this->args['label'])? $this->args['label']: _L('Restrict to these fields:');
 		$restrictchecked = count($value) > 0 ? "checked" : "";
-		$str = '<input type="checkbox" id="'.$n.'-restrict" '.$restrictchecked .'>Restrict to these fields:';
+		$str = '<input type="checkbox" id="'.$n.'-restrict" '.$restrictchecked .' onclick="restrictcheck(\''.$n.'-restrict\', \''.$n.'\')"><label for="'.$n.'-restrict">'.$label.'</label>';
 
 		$str .= '<div id='.$n.' class="radiobox" style="margin-left: 1em;">';
 
-		$hoverdata = array();
 		$counter = 1;
 		foreach ($this->args['values'] as $checkvalue => $checkname) {
 			$id = $n.'-'.$counter;
 			$checked = $value == $checkvalue || (is_array($value) && in_array($checkvalue, $value));
-			$str .= '<input id="'.$id.'" name="'.$n.'[]" type="checkbox" value="'.escapehtml($checkvalue).'" '.($checked ? 'checked' : '').' /><label id="'.$id.'-label" for="'.$id.'">'.escapehtml($checkname).'</label><br />
+			$str .= '<input id="'.$id.'" name="'.$n.'[]" type="checkbox" value="'.escapehtml($checkvalue).'" '.($checked ? 'checked' : '').'  onclick="datafieldcheck(\''.$id.'\', \''.$n.'-restrict\')"/><label id="'.$id.'-label" for="'.$id.'">'.escapehtml($checkname).'</label><br />
 				';
-			if (isset($this->args['hover'])) {
-				$hoverdata[$id] = $this->args['hover'][$checkvalue];
-				$hoverdata[$id.'-label'] = $this->args['hover'][$checkvalue];
-			}
 			$counter++;
 		}
 		$str .= '</div>
 		';
-		if (isset($this->args['hover']))
-			$str .= '<script type="text/javascript">form_do_hover(' . json_encode($hoverdata) .');</script>
-			';
-
-		$str .= '<script type="text/javascript">
+		return $str;
+	}
+	
+	function renderJavascript($value) {
+		return '
 		//if we uncheck the restrict box, uncheck each field
-		var restrictcheckbox = $("'.$n.'-restrict");
-		var datafieldcheckboxes = restrictcheckbox.next().select("input");
-		restrictcheckbox.observe("click", function (event) {
+		function restrictcheck(restrictcheckbox, checkboxdiv) {
+			restrictcheckbox = $(restrictcheckbox);
+			checkboxdiv = $(checkboxdiv);
 			if (!restrictcheckbox.checked) {
-				datafieldcheckboxes.each(function(e) {
+				checkboxdiv.descendants().each(function(e) {
 					e.checked = false;
 				});
 			}
-		});
+		}
 
-		datafieldcheckboxes.each(function(checkbox) {
-			checkbox.observe("click",function(e) {
-				if (e.element().checked)
+		// if a data field is checked. Check the restrict box
+		function datafieldcheck(checkbox, restrictcheckbox) {
+			checkbox = $(checkbox);
+			restrictcheckbox = $(restrictcheckbox);
+			if (checkbox.checked)
 					restrictcheckbox.checked = true;
-			});
-		});
-		</script>';
-
-		return $str;
+		}';
 	}
 }
-
-
 
 class ValJobWindowTime extends Validator {
 	var $onlyserverside = true;
@@ -143,6 +135,9 @@ $calltimes = array_merge(array("" => _L("No Restriction")),$calltimes); //prepen
 $FIELDMAP = array_merge(FieldMap::getMapNamesLike('f'), FieldMap::getMapNamesLike('g'), FieldMap::getMapNamesLike('c'));
 
 $datafields = $obj->getValue('datafields') ? explode('|',$obj->getValue('datafields')) : array();
+
+$published = $obj->getValue('publish') ? explode('|',$obj->getValue('publish')) : array();
+$subscribed = $obj->getValue('subscribe') ? explode('|',$obj->getValue('subscribe')) : array();
 
 $blockednumberoptions = array (
 	"none" => _L("No Access"),
@@ -315,22 +310,6 @@ _L('Messaging Options'),
 		"control" => array("CheckBox"),
 		"helpstep" => 4
 	),
-	"publishmessagegroup" => array(
-		"label" => _L('Publish Messages'),
-		"fieldhelp" => _L('Allows users to publish messages. These messages can be used by any user with the "Subscribe to Messages" privilege.'),
-		"value" => $obj->getValue("publishmessagegroup"),
-		"validators" => array(),
-		"control" => array("CheckBox"),
-		"helpstep" => 4
-	),
-	"subscribemessagegroup" => array(
-		"label" => _L('Subscribe to Messages'),
-		"fieldhelp" => _L('Allows users to view and subscribe to published messages.'),
-		"value" => $obj->getValue("subscribemessagegroup"),
-		"validators" => array(),
-		"control" => array("CheckBox"),
-		"helpstep" => 4
-	),
 //_L('Classroom Messaging Options'),
 	"targetedmessage" => array(
 		"label" => _L('Send Classroom Messages'),
@@ -416,6 +395,25 @@ _L('List Options'),
 		"helpstep" => 6
 	),
 
+_L('Publish/Subscribe Options'),
+
+	"publish" => array(
+		"label" => _L('Publish'),
+		"fieldhelp" => _L('Allows users to publish objects. These objects can be used by users with the "Subscribe" privilege for that object type.'),
+		"value" => $published,
+		"validators" => array(),
+		"control" => array("RestrictedValues", "values" => array("messagegroup"=>"Messages","list"=>"Lists"), "label" => _L("Allow publishing these types:")),
+		"helpstep" => 7
+	),
+	"subscribe" => array(
+		"label" => _L('Subscribe'),
+		"fieldhelp" => _L('Allows users to view and subscribe to published objects.'),
+		"value" => $subscribed,
+		"validators" => array(),
+		"control" => array("RestrictedValues", "values" => array("messagegroup"=>"Messages","list"=>"Lists"), "label" => _L("Allow subscribing to these types:")),
+		"helpstep" => 7
+	),
+
 _L('Contact & Field Options'),
 	"datafields" => array(
 		"label" => _L('Field Restriction'),
@@ -424,8 +422,8 @@ _L('Contact & Field Options'),
 		"validators" => array(
 			array("ValInArray","values" => array_keys($FIELDMAP))
 		),
-		"control" => array("RestrictedFields", "values" => $FIELDMAP), //TODO write a control similar to what was used on old form
-		"helpstep" => 7
+		"control" => array("RestrictedValues", "values" => $FIELDMAP), //TODO write a control similar to what was used on old form
+		"helpstep" => 8
 	),
 	"viewcontacts" => array(
 		"label" => _L('View Contacts'),
@@ -433,7 +431,7 @@ _L('Contact & Field Options'),
 		"value" => $obj->getValue("viewcontacts"),
 		"validators" => array(),
 		"control" => array("CheckBox"),
-		"helpstep" => 7
+		"helpstep" => 8
 	),
 	"managecontactdetailsettings" => array(
 		"label" => _L('Edit Contact Details'),
@@ -441,7 +439,7 @@ _L('Contact & Field Options'),
 		"value" => $obj->getValue("managecontactdetailsettings"),
 		"validators" => array(),
 		"control" => array("CheckBox"),
-		"helpstep" => 7
+		"helpstep" => 8
 	),
 	"portalaccess" => array(
 		"label" => _L('Contact Manager Administration'),
@@ -449,7 +447,7 @@ _L('Contact & Field Options'),
 		"value" => $obj->getValue("portalaccess"),
 		"validators" => array(),
 		"control" => array("CheckBox"),
-		"helpstep" => 7
+		"helpstep" => 8
 	),
 	"generatebulktokens" => array(
 		"label" => _L('Generate Bulk Activation Codes'),
@@ -457,7 +455,7 @@ _L('Contact & Field Options'),
 		"value" => $obj->getValue("generatebulktokens"),
 		"validators" => array(),
 		"control" => array("CheckBox"),
-		"helpstep" => 7
+		"helpstep" => 8
 	),
 
 
@@ -468,7 +466,7 @@ _L('Report Options'),
 		"value" => $obj->getValue("createreport"),
 		"validators" => array(),
 		"control" => array("CheckBox"),
-		"helpstep" => 8
+		"helpstep" => 9
 	),
 
 _L('Systemwide View Options'),
@@ -478,7 +476,7 @@ _L('Systemwide View Options'),
 		"value" => $obj->getValue("viewsystemreports"),
 		"validators" => array(),
 		"control" => array("CheckBox"),
-		"helpstep" => 9
+		"helpstep" => 10
 	),
 	"viewusagestats" => array(
 		"label" => _L('Usage Stats'),
@@ -486,7 +484,7 @@ _L('Systemwide View Options'),
 		"value" => $obj->getValue("viewusagestats"),
 		"validators" => array(),
 		"control" => array("CheckBox"),
-		"helpstep" => 9
+		"helpstep" => 10
 	),
 	"viewcalldistribution" => array(
 		"label" => _L('Call Distribution'),
@@ -494,7 +492,7 @@ _L('Systemwide View Options'),
 		"value" => $obj->getValue("viewcalldistribution"),
 		"validators" => array(),
 		"control" => array("CheckBox"),
-		"helpstep" => 9
+		"helpstep" => 10
 	),
 	"viewsystemactive" => array(
 		"label" => _L('Active Jobs'),
@@ -502,7 +500,7 @@ _L('Systemwide View Options'),
 		"value" => $obj->getValue("viewsystemactive"),
 		"validators" => array(),
 		"control" => array("CheckBox"),
-		"helpstep" => 9
+		"helpstep" => 10
 	),
 	"viewsystemcompleted" => array(
 		"label" => _L('Completed Jobs'),
@@ -510,7 +508,7 @@ _L('Systemwide View Options'),
 		"value" => $obj->getValue("viewsystemcompleted"),
 		"validators" => array(),
 		"control" => array("CheckBox"),
-		"helpstep" => 9
+		"helpstep" => 10
 	),
 	"viewsystemrepeating" => array(
 		"label" => _L('Repeating Jobs'),
@@ -518,7 +516,7 @@ _L('Systemwide View Options'),
 		"value" => $obj->getValue("viewsystemrepeating"),
 		"validators" => array(),
 		"control" => array("CheckBox"),
-		"helpstep" => 9
+		"helpstep" => 10
 	),
 	"callblockingperms" => array(
 		"label" => _L('Blocked Destination Access'),
@@ -528,18 +526,18 @@ _L('Systemwide View Options'),
 			array("ValInArray","values" => array_keys($blockednumberoptions))
 		),
 		"control" => array("RadioButton", "values" => $blockednumberoptions),
-		"helpstep" => 9
+		"helpstep" => 10
 	),
 _L('Security & Administrator Controls'),
 	"securitywarning" => array (
 		"label" => _L('Security Notice'),
 		"control" => array("FormHtml", "html" => '<p style="border: 3px double red; font-weight: bold; width: 50%; padding: 5px;"><img src="img/icons/error.gif" alt="" style="vertical-align: top;">'._L('The following settings control top-level administration functions. Only top-level administrators should have these enabled.').'</p>'),
-		"helpstep" => 10
+		"helpstep" => 11
 	),
 	"enableadminoptions" => array (
 		"label" => _L('Enable All'),
 		"control" => array("FormHtml", "html" => icon_button(_L('Enable Administrator Options'),"key",'checkAllCheckboxes(true);')),
-		"helpstep" => 1
+		"helpstep" => 11
 	),
 	"manageaccount" => array(
 		"label" => _L('Manage Users'),
@@ -547,7 +545,7 @@ _L('Security & Administrator Controls'),
 		"value" => $obj->getValue("manageaccount"),
 		"validators" => array(),
 		"control" => array("CheckBox"),
-		"helpstep" => 10
+		"helpstep" => 11
 	),
 	"manageprofile" => array(
 		"label" => _L('Manage Profiles'),
@@ -555,7 +553,7 @@ _L('Security & Administrator Controls'),
 		"value" => $obj->getValue("manageprofile"),
 		"validators" => array(),
 		"control" => array("CheckBox"),
-		"helpstep" => 10
+		"helpstep" => 11
 	),
 	"managesystem" => array(
 		"label" => _L('Manage System Settings'),
@@ -563,7 +561,7 @@ _L('Security & Administrator Controls'),
 		"value" => $obj->getValue("managesystem"),
 		"validators" => array(),
 		"control" => array("CheckBox"),
-		"helpstep" => 10
+		"helpstep" => 11
 	),
 	"managesystemjobs" => array(
 		"label" => _L('Manage All Jobs'),
@@ -571,7 +569,7 @@ _L('Security & Administrator Controls'),
 		"value" => $obj->getValue("managesystemjobs"),
 		"validators" => array(),
 		"control" => array("CheckBox"),
-		"helpstep" => 10
+		"helpstep" => 11
 	),
 	"managetasks" => array(
 		"label" => _L('Manage Data Imports'),
@@ -579,7 +577,7 @@ _L('Security & Administrator Controls'),
 		"value" => $obj->getValue("managetasks"),
 		"validators" => array(),
 		"control" => array("CheckBox"),
-		"helpstep" => 10
+		"helpstep" => 11
 	),
 	"metadata" => array(
 		"label" => _L('Manage Field Definitions'),
@@ -587,7 +585,7 @@ _L('Security & Administrator Controls'),
 		"value" => $obj->getValue("metadata"),
 		"validators" => array(),
 		"control" => array("CheckBox"),
-		"helpstep" => 10
+		"helpstep" => 11
 	),
 	"manageclassroommessaging" => array(
 		"label" => _L('Manage Classroom Data'),
@@ -595,7 +593,7 @@ _L('Security & Administrator Controls'),
 		"value" => $obj->getValue("manageclassroommessaging"),
 		"validators" => array(),
 		"control" => array("CheckBox"),
-		"helpstep" => 10
+		"helpstep" => 11
 	)
 );
 
@@ -628,6 +626,7 @@ $helpsteps = array (
 	_L('Select the combination of messaging options most appropriate for the users of this profile. Click on the individual options for more information about their functions.'),
 	_L('Users can send one time jobs by default. This section allows you to enable repeating job and survey creation. You can also limit the number of days a job can run and allow users to change their Caller ID.'),
 	_L('This section determines whether the user can create and edit lists.').'<br><br>'._L('Uploading lists by ID number allows users to create lists of ID numbers, referencing contacts in the database. It will not allow them contact people outside of their restrictions.').'<br><br>'._L('Uploading lists by contact data will let users create lists from CSV files containing any contact information, independent of existing data.'),
+	_L('Select oject types users should be able to publish and subscribe to.'),
 	_L('Select the fields users should be able to see. They can use these fields for lists, messages, and reports. Leave everything blank to allow unlimited access.').'<br><br>'._L('You may also use this section to allow access to the Contacts Tab and allow users to edit contact details.'),
 	_L('Choose whether the user can create reports or not.'),
 	_L('The options in this section control views of all of the activity in the system.'),
@@ -673,6 +672,11 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 			$allowedfields = $postdata['datafields'];
 			$allowedfields = (isset($allowedfields) ? implode('|',$allowedfields) : "");
 
+			// get published object types
+			$published = (isset($postdata['publish']) && $postdata['publish'])? implode('|',$postdata['publish']): false;
+			// get subscribed object types
+			$subscribed = (isset($postdata['subscribe']) && $postdata['subscribe'])? implode('|',$postdata['subscribe']): false;
+			
 			$obj->setPermission("loginweb", (bool)$postdata['loginweb']);
 			$obj->setPermission("loginphone", (bool)$postdata['loginphone']);
 			$obj->setPermission("startstats", (bool)$postdata['startstats']);
@@ -687,6 +691,8 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 			$obj->setPermission("createlist", (bool)$postdata['createlist']);
 			$obj->setPermission("listuploadids", (bool)$postdata['listuploadids']);
 			$obj->setPermission("listuploadcontacts", (bool)$postdata['listuploadcontacts']);
+			$obj->setPermission("publish", $published);
+			$obj->setPermission("subscribe", $subscribed);
 			$obj->setPermission("datafields", $allowedfields);
 			$obj->setPermission("createrepeat", (bool)$postdata['createrepeat']);
 			$obj->setPermission("setcallerid", (bool)$postdata['setcallerid']);
@@ -711,8 +717,6 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 			$obj->setPermission("viewsystemcompleted", (bool)$postdata['viewsystemcompleted']);
 			$obj->setPermission("leavemessage", (bool)$postdata['leavemessage']);
 			$obj->setPermission("messageconfirmation", (bool)$postdata['messageconfirmation']);
-			$obj->setPermission("publishmessagegroup", (bool)$postdata['publishmessagegroup']);
-			$obj->setPermission("subscribemessagegroup", (bool)$postdata['subscribemessagegroup']);
 
 			if(getSystemSetting("_hasportal", false)) {
 				$obj->setPermission("portalaccess", (bool)$postdata['portalaccess']);
@@ -780,7 +784,7 @@ echo $form->render();
 endWindow();
 
 ?>
-<script>
+<script type="text/javascript">
 function checkAllCheckboxes(domanagement){
 
 	var managementoptions = "manageaccount,manageprofile,managesystem,managesystemjobs,managetasks,metadata,manageclassroommessaging".split(",");
