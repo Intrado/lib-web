@@ -73,9 +73,7 @@ function makeTranslationItem($messagegroup, $required, $type, $subtype, $languag
 	if ($type == 'phone') {
 		$validators[] = array("ValLength","max" => 4000);
 	}
-	if ($type == 'email' && !$inautotranslator) {
-		$validators[] = array("ValEmailMessageBody");
-		
+	if ($type == 'email' && !$inautotranslator) {	
 		if ($subtype == 'plain') {
 			$control["overrideplaintext"] = $overrideplaintext;
 			$control["plaintextmessage"] = $messagetext;
@@ -190,9 +188,7 @@ function makeMessageBody($messagegroup, $translationlanguages, $required, $type,
 	if ($type == 'phone') {
 		$validators[] = array("ValLength","max" => 4000);
 	}
-	if ($type == 'email') {
-		$validators[] = array("ValEmailMessageBody");
-		
+	if ($type == 'email') {	
 		if ($subtype == 'plain') {
 			$control["overrideplaintext"] = $overrideplaintext;
 			$control["plaintextmessage"] = $messagetext;
@@ -681,22 +677,6 @@ class ValCallMeMessage extends Validator {
 		if (!$USER->authorize("starteasy"))
 			return _L("%s is not allowed for this user account", $this->label);
 		$values = json_decode($value);
-		return true;
-	}
-}
-
-class ValEmailMessageBody extends Validator {
-	var $onlyserverside = true;
-	function validate ($value, $args) {
-		if (!isset($_SESSION['emailheaders']))
-			return false;
-		// It is an error if any of the headers are blank.
-		foreach ($_SESSION['emailheaders'] as $headervalue) {
-			$headervalue = trim($headervalue);
-			
-			if (empty($headervalue))
-				return _L('Email headers are incomplete. Please fill in the Subject, From Name, and From Email.');
-		}
 		return true;
 	}
 }

@@ -80,7 +80,6 @@ function saveHtmlEditorContent(existinghtmleditorobject) {
 		// CKEditor inserts blank tags even if the user has deleted everything.
 		if (html.stripTags().strip().replace(/&nbsp;/g, '') == '')
 			html = '';
-
 		textarea.value = html;
 		textarea.fire('HtmlEditor:SavedContent');
 	}
@@ -135,21 +134,39 @@ function clearHtmlEditorContent() {
 
 // Loads the html editor if necessary.
 // NOTE: It is assumed that there be only a single html editor on the page; CKEditor is buggy with multiple instances.
-function applyHtmlEditor(textarea) {
+var htmleditorloadinterval = null;
+
+function applyHtmlEditor(textarea, dontwait) {
+
 	textarea = $(textarea);
-	
+
 	var editorobject = getHtmlEditorObject();
 	if (!editorobject) {
 		if ($('reusableckeditor'))
 			return; // The editor instance is still loading.
 
-		textarea.insert({'before': '<span class="HTMLEditorAjaxLoader"><img src="img/ajax-loader.gif"/> Please wait while the HTML editor loads. </span>'});
 		textarea.hide();
-		
+		if (!$('htmleditorloadericon'))
+			textarea.insert({'before': '<span class="HTMLEditorAjaxLoader" id="htmleditorloadericon"><img src="img/ajax-loader.gif"/> Please wait while the HTML editor loads. </span>'});
+
 		var reusableckeditor = new Element('div', {'id':'reusableckeditor'});
-		if (document.body) {
+
+		if (!dontwait) {
+			document.observe('dom:loaded', function(event) {
+				applyHtmlEditor(this, true);
+			}.bindAsEventListener(textarea));
+		}
+
+		htmleditorloadinterval = setInterval(function() {
+
+			if (getHtmlEditorObject()) {
+				clearInterval(htmleditorloadinterval);
+				return;
+			}
+
+
 			document.body.insert(new Element('div', {'id':'reusableckeditorhider'}).hide().insert(reusableckeditor));
-			
+
 			CKEDITOR.replace(reusableckeditor, {
 				'customConfig': '', // Prevent ckeditor from trying to load an external configuration file, should improve startup time.
 				'removePlugins': 'wsc,scayt,smiley,showblocks,flash,elementspath,save',
@@ -173,24 +190,22 @@ function applyHtmlEditor(textarea) {
 						applyHtmlEditor(this);
 						registerHtmlEditorKeyListener(pendinghtmleditorkeylistener);
 						pendinghtmleditorkeylistener = null;
+						if ($('htmleditorloadericon'))
+							$('htmleditorloadericon').remove();
 					}.bindAsEventListener(textarea)
 				}
 			});
-		} else {
-			document.observe('dom:loaded', function(event) {
-				applyHtmlEditor(this);
-			}.bindAsEventListener(textarea));
-		}
+			clearInterval(htmleditorloadinterval);
 
+		}, dontwait ? 0 : 2000);
 		return;
 	}
-	
+
 	if (!editorobject.currenttextarea || editorobject.currenttextarea.identify() != textarea.identify()) {
 		saveHtmlEditorContent(editorobject);
 	}
 
 	var html = textarea.value.replace(/<</g, "&lt;&lt;").replace(/>>/g, "&gt;&gt;");
 	editorobject.instance.setData(html);
-	
 	textarea.hide().addClassName('HtmlEditor').insert({'after':editorobject.container});
 }

@@ -457,7 +457,7 @@ foreach ($destinations as $type => $destination) {
 								
 								formelement = $(itemname);
 								htmleditorobject = getHtmlEditorObject();
-								if (htmleditorobject) {
+								if (event && htmleditorobject) {
 									saveHtmlEditorContent(htmleditorobject);
 									if (htmleditorobject.currenttextarea && htmleditorobject.currenttextarea.id.include(itemname)) {
 										form_do_validation(form, formelement);
@@ -613,10 +613,9 @@ foreach ($destinations as $type => $destination) {
 										}, 500);
 										return;
 									}
-									
 									formelement = $(itemname);
 									htmleditorobject = getHtmlEditorObject();
-									if (htmleditorobject) {
+									if (event && htmleditorobject) {
 										saveHtmlEditorContent(htmleditorobject);
 										if (htmleditorobject.currenttextarea && htmleditorobject.currenttextarea.id.include(itemname)) {
 											form_do_validation(form, formelement);
@@ -846,8 +845,17 @@ if ($button = $messagegroupsplitter->getSubmit()) {
 
 						$destination = isset($destinations[$formdestinationtype]) ? $destinations[$formdestinationtype] : null;
 
-						if (in_array($formdestinationsubtype, $destination['subtypes']) && ($formdestinationlanguagecode == 'autotranslator' || isset($destination['languages'][$formdestinationlanguagecode]))) {
-							$messagegroup->permanent = $postdata['autoexpire'] + 0;
+						// Check if any of the email headers is blank; if so, don't submit this message.
+						$cansave = true;
+						if ($formdestinationtype == 'email') {
+							foreach ($_SESSION['emailheaders'] as $headervalue) {
+								$headervalue = trim($headervalue);
+								if ($headervalue == "")
+									$cansave = false;
+							}
+						}
+
+						if ($cansave && (in_array($formdestinationsubtype, $destination['subtypes']) && ($formdestinationlanguagecode == 'autotranslator' || isset($destination['languages'][$formdestinationlanguagecode])))) {							$messagegroup->permanent = $postdata['autoexpire'] + 0;
 							$messagegroup->defaultlanguagecode = $_SESSION['requesteddefaultlanguagecode'];
 							
 							// Update audio files' permanent flag; the user does not have to be editing a phone message to change the permanent flag.
@@ -1338,7 +1346,7 @@ include_once('nav.inc.php');
 <script src="script/messagegroup.js.php" type="text/javascript"></script>
 <script src="script/audiolibrarywidget.js.php" type="text/javascript"></script>
 <script type="text/javascript">
-	<? Validator::load_validators(array("ValDefaultMessage", "ValTranslationItem", "ValDuplicateNameCheck", "ValCallMeMessage", "ValMessageBody", "ValEmailMessageBody", "ValLength", "ValRegExp", "ValEmailAttach")); ?>
+	<? Validator::load_validators(array("ValDefaultMessage", "ValTranslationItem", "ValDuplicateNameCheck", "ValCallMeMessage", "ValMessageBody", "ValLength", "ValRegExp", "ValEmailAttach")); ?>
 </script>
 <link href="css/messagegroup.css" type="text/css" rel="stylesheet">
 <style type='text/css'>
@@ -1388,8 +1396,10 @@ if (isset($_SESSION['inmessagegrouptabs']) && $_SESSION['inmessagegrouptabs']) {
 				saveHtmlEditorContent(); // If this is email html, the autotranslator also uses the html editor for its source message body.
 				
 				var sourcetextarea = $(state.currentdestinationtype + '-' + state.currentsubtype + '-autotranslator_sourcemessagebody');
-				var sourcetext = sourcetextarea.value;
-				if (sourcetext.strip() == '') {
+				//console.info(sourcetextarea);
+				var sourcetext = sourcetextarea.value.strip();
+
+				if (sourcetext == '') {
 					if (clickevent) {
 						alert('<?= addslashes(_L("Please enter a message to translate.")) ?>');
 						return null;
@@ -1451,7 +1461,8 @@ if (isset($_SESSION['inmessagegrouptabs']) && $_SESSION['inmessagegrouptabs']) {
 					event.stop();
 					return;
 				}
-				
+
+
 				// Warn the user if they are about to clear the last message, thereby soft-deleting the messagegroup.
 				if (state.messagegroupsummary.length === 1 || state.messagegroupsummary.length === 2) {
 					var warn = false;
@@ -1505,8 +1516,15 @@ if (isset($_SESSION['inmessagegrouptabs']) && $_SESSION['inmessagegrouptabs']) {
 					if (!autotranslateobject) {
 						return;
 					}
-					
-					var sourcetext = autotranslateobject.sourcetext;
+
+					var sourcetext = "";
+					if(autotranslateobject.sourcetext.length > 4000) {
+						alert("This message will be truncated to 4000 characters.");
+						sourcetext = autotranslateobject.sourcetext.substring(0,4000);
+					} else {
+						sourcetext = autotranslateobject.sourcetext;
+					}
+
 					var translationlanguagecodes = autotranslateobject.translationlanguagecodes;
 
 					// Show ajax loaders for the translating languages, and clear the retranslation text.

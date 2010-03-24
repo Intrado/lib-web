@@ -262,16 +262,24 @@ class TranslationItem extends FormItem {
 					if (usehtmleditor)
 						saveHtmlEditorContent();
 					var englishText = $(section+"englishText");
+					var sourcetext = "";
+					if(englishText.value.length > 4000) {
+						alert("This message will be truncated to 4000 characters.");
+						sourcetext = englishText.value.strip().substring(0,4000);
+					} else {
+						sourcetext = englishText.value.strip();
+					}
+
 					var langtext = $(section + "text");
 					var overridesave = $(section + "overridesave");
-					if (!englishText.value.strip()) {
+					if (!sourcetext) {
 						langtext.value = overridesave.value;
 						return;
 					}
 					$(section + "textdiv").innerHTML = "<img src=\"img/ajax-loader.gif\" />";
 					new Ajax.Request("translate.php", {
 						method:"post",
-						parameters: {"english": makeTranslatableString(englishText.value.strip()), "languages": language},
+						parameters: {"english": makeTranslatableString(sourcetext), "languages": language},
 						onSuccess: function(transport) {
 							var data = transport.responseJSON;
 							if(data.responseStatus != 200 || data.responseData.translatedText == undefined)
@@ -423,7 +431,7 @@ class TranslationItem extends FormItem {
 		$n = $this->form->name."_".$this->name;
 
 		$str = "
-			document.observe(\"dom:loaded\", function() {
+			(function() {
 				var formitemelement = $('$n');
 				var stateelement = $('{$n}state');
 				var formitemcontainer = formitemelement.up('.TranslationItemContainer');
@@ -491,7 +499,7 @@ class TranslationItem extends FormItem {
 				sourceTextarea.observe('mouseup',setselection.bindAsEventListener(textarea));
 				mainTextarea.observe('keyup',setselection.bindAsEventListener(textarea));
 				mainTextarea.observe('mouseup',setselection.bindAsEventListener(textarea));
-			});
+			})();
 		";
 		
 		return $str;
