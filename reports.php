@@ -98,7 +98,7 @@ startWindow("Select a Template"  . help('Reports_SelectATemplate'), 'padding: 3p
 <?	}
 	if(getSystemSetting('_hastargetedmessage', false) && $USER->authorize('viewsystemreports')){ // Top level permission only
 ?>
-					<tr><td><a href='reportclassroomsearch.php?clear=1&type=organization'>Classroom Report</a></td></tr>
+					<tr><td><a href='reportclassroomsearch.php?clear=1&type=organization'>Classroom Messaging Summary</a></td></tr>
 <? } ?>
 				</table>
 			</td>

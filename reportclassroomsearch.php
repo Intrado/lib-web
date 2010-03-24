@@ -239,7 +239,16 @@ function fmt_template ($obj, $field) {
 // Display
 ////////////////////////////////////////////////////////////////////////////////
 $PAGE = "reports:reports";
-$TITLE = _L('Classroom Comment Report');
+//$TITLE = _L('Classroom Messaging Report');
+
+if(isset($_SESSION['report']['options']['classroomreporttype'])){
+	if($_SESSION['report']['options']['classroomreporttype'] == 'organization'){
+		$TITLE = "Classroom Messaging Summary";
+	} else if($_SESSION['report']['options']['classroomreporttype'] == 'person'){
+		$TITLE = "Classroom Messaging Report";
+	}
+}
+
 
 include_once("nav.inc.php");
 
@@ -250,7 +259,7 @@ include_once("nav.inc.php");
 </script>
 <?
 
-startWindow(_L('Classroom Comment Report'));
+startWindow(_L('Options'));
 echo $form->render();
 endWindow();
 include_once("navbottom.inc.php");
