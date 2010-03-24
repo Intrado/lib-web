@@ -32,14 +32,22 @@ class Publish extends DBMappedObject {
 	}
 }
 
-function _findPublishObjects($type, $id, $action) {
+// look up publish objects by type, id, action and optionally userid
+function _findPublishObjects($type, $id, $action, $userid = false) {
 	$args = array($action, $id);
+	
+	$usersql = "";
+	if ($userid !== false) {
+		$usersql = "and userid = ?";
+		$args[] = $userid;
+	}
+	
 	switch ($type) {
 		case "messagegroup":
-			return DBFindMany("publish", "from publish where action = ? and type = 'messagegroup' and messagegroupid = ?", false, $args);
+			return DBFindMany("publish", "from publish where action = ? and type = 'messagegroup' and messagegroupid = ? $usersql", false, $args);
 			break;
 		case "list":
-			return DBFindMany("publish", "from publish where action = ? and type = 'list' and listid = ?", false, $args);
+			return DBFindMany("publish", "from publish where action = ? and type = 'list' and listid = ? $usersql", false, $args);
 			break;
 		default:
 			return false;
@@ -53,8 +61,9 @@ function getPublications ($type, $id) {
 }
 
 // get all the subscriptions for a specific type and specific messagegroup or list id
-function getSubscriptions ($type, $id) {
-	return _findPublishObjects($type, $id, 'subscribe');
+// optionally restrict to a specific user id to test if the user is subscribed to this type, id combination
+function getSubscriptions ($type, $id, $userid = false) {
+	return _findPublishObjects($type, $id, 'subscribe', $userid);
 }
 
 ?>
