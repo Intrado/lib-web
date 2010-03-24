@@ -143,7 +143,7 @@ class MessageBody extends FormItem {
 		$n = $this->form->name."_".$this->name;
 		
 		$str = "
-			(function() {
+			document.observe(\"dom:loaded\", function() {
 				var setselection = function () {
 					if(document.selection)
 						this.sel = document.selection.createRange();
@@ -184,7 +184,7 @@ class MessageBody extends FormItem {
 		}
 		
 		$str .= "
-			})();
+			});
 		";
 		
 		return $str;
