@@ -40,8 +40,9 @@ $id = false;
 if (isset($_GET['id'])) {
 	$_SESSION['ttstext'] = false;
 	$id = $_GET['id'] + 0;
-	// if the user owns the message, can manage the system or the message is published
-	if(userOwns("message", $id) || $USER->authorize('managesystem') || isPublished("message", $id)) {
+	// if its a valid message, and the user has rights to listen to it
+	$message = DBFind("Message", "from message where id = ?", false, array($id));
+	if($message && (userOwns("message", $id) || $USER->authorize('managesystem') || (isPublished("messagegroup", $message->messagegroupid) && userCanSubscribe("messagegroup", $message->messagegroupid)))) {
 		//find all unique fields and values used in this message
 		$messagefields = DBFindMany("FieldMap", "from fieldmap where fieldnum in (select distinct fieldnum from messagepart where messageid=?)", false, array($id));
 		if (count($messagefields) > 0) {
