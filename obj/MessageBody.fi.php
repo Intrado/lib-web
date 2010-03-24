@@ -19,7 +19,7 @@ class MessageBody extends FormItem {
 		if (isset($this->args['overrideplaintext'])) {
 			$str .= '
 				<div id="'.$n.'plaintextpreview" style="display:'.($this->args['overrideplaintext'] ? 'none' : 'block').';">
-					<pre style="color:gray; border: solid 1px gray;">' .
+					<pre style="white-space:normal;color:gray; border: solid 1px gray;">' .
 					(isset($this->args['plaintextmessage']) && $this->args['plaintextmessage'] != '' ?
 						escapehtml($this->args['plaintextmessage']) :
 						"<em>" . escapehtml(_L("A plain-text message will be generated from the HTML message.")) . "</em>"
