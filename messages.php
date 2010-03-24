@@ -24,6 +24,20 @@ if (!$USER->authorize(array('sendmessage', 'sendemail', 'sendphone', 'sendsms'))
 	redirect('unauthorized.php');
 }
 
+////////////////////////////////////////////////////////////////////////////////
+// Action/Request Processing
+////////////////////////////////////////////////////////////////////////////////
+
+// requests to remove a publishid
+if (isset($_GET['id']) && isset($_GET['remove'])) {
+	// check that this is a vaid publish id
+	$publish = DBFind("Publish", "from publish where id = ? and action = 'subscribe' and userid = ?", false, array($_GET['id'], $USER->id));
+	if ($publish) {
+		$publish->destroy();
+	}
+	redirect();
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 // Request processing:
 ///////////////////////////////////////////////////////////////////////////////
@@ -162,7 +176,7 @@ if($isajax === true) {
 			if ($USER->authorize("subscribe") && userCanSubscribe('messagegroup')) {
 				// this message is subscribed to
 				if ($publishaction == 'subscribe')
-					$publishactionlink = action_link("Un-Subscribe", "fugue/star__minus", "messages.php?publishid=$publishid&remove");
+					$publishactionlink = action_link("Un-Subscribe", "fugue/star__minus", "messages.php?id=$publishid&remove");
 			}
 			
 			// if the user is only subscribed to this message group, they can't edit, delete
