@@ -4,6 +4,8 @@ require_once("../inc/form.inc.php");
 require_once("../inc/html.inc.php");
 require_once("../inc/table.inc.php");
 require_once("../inc/formatters.inc.php");
+require_once("XML/RPC.php");
+require_once("diskclient.inc.php");
 
 if (!$MANAGERUSER->authorized("diskagent"))
 	exit("Not Authorized");
@@ -114,8 +116,11 @@ if(isset($_GET['showall'])) {
 //index 2 is customer url
 function fmt_customerUrl($row, $index){
 	$url = "";
-	if($row[2])
+	if($row[2] == "UNKNOWN")
+		$url = $row[2];
+	else {
 		$url = "<a href=\"customerlink.php?id=" . $row[1] ."\" target=\"_blank\">" . $row[2] . "</a>";
+	}
 	return $url;
 }
 
@@ -126,11 +131,11 @@ function fmt_DMActions($row, $index){
 }
 
 // index 1 is customerid
-// index 7 is last seen
+// index 5 is last seen
 function fmt_dmstatus($row,$index) {
 	$problems = array();
 
-	if ($row[7]/1000 < time() - 30)
+	if ($row[5]/1000 < time() - 30)
 		$problems[] = "Agent Lost Connection";
 
 	if ($row[1] == null || $row[1] <= 0)
@@ -159,12 +164,21 @@ if (count($customerids))
 else
 	$customerlookup = array();
 
+// query diskserver for online agent status
+$diskserverresults = getAgentList();
 
 $agents = array();
-$query = "select a.id, ca.customerid, 'UNKNOWN', a.name, 'TODO lastip', 'TODO lastseen', 'TODO version', a.uuid from agent a inner join customeragent ca on (ca.agentid = a.id)";
+// TODO how to concat() customerids and urls when one agent associated with many customers?
+$query = "select a.id, ca.customerid, 'UNKNOWN', a.name, 'UNKNOWN', 'UNKNOWN', 'UNKNOWN', a.uuid, a.numpollthread from agent a left join customeragent ca on (ca.agentid = a.id) group by a.id";
 $result = Query($query, $diskdb);
 $data = array();
 while ($row = DBGetRow($result)) {
+	if (isset($row[7]) && isset($diskserverresults[$row[7]])) {
+		$agentprops = $diskserverresults[$row[7]];
+		$row[4] = $agentprops['ip'];
+		$row[5] = $agentprops['lastseen'];
+		$row[6] = $agentprops['version'];
+	}
 	if (isset($row[1]) && isset($customerlookup[$row[1]])) {
 		$row[2] = $customerlookup[$row[1]];
 	}
@@ -214,6 +228,7 @@ $titles[5] = "#Last Seen";
 $titles["status"] = "#Status";
 $titles[6] = "#Version";
 $titles[7] = "@#Agent UUID";
+$titles[8] = "#Polling Threads";
 $titles["actions"] = "Actions";
 
 // Do not provide a checkbox to hide these columns.
@@ -343,7 +358,7 @@ show_column_selector('customer_dm_table', $titles, $lockedTitles);
 	}
 </script>
 <?
-if(file_exists("diskagentbuild.txt")){
+if (file_exists("diskagentbuild.txt")) {
 ?>
 	<div>Latest Version: <?=file_get_contents("diskagentbuild.txt");?></div>
 <?

@@ -13,6 +13,19 @@ user="root"
 pass=""
 db="authserver"
 
+;diskdb for manager use
+[diskdb]
+persistent=true
+host="localhost"
+user="root"
+pass=""
+db="disk"
+
+;diskserver to query active agent status
+[diskserver]
+host="localhost:8082"
+path="/diskinternalapi"
+
 ;override's the information in the shard table in order to read from slaves
 ;remember on asp shard2 is swapped IDs with shard1 (shard2 is index1, and shard1 is index2)
 ;readonly[]=localhost
@@ -31,6 +44,6 @@ force_ssl=true
 customer_url_prefix=https://localhost
 
 [content]
-tts="localhost,8080,/phone/Tts"
+tts="10.25.25.232,8080,/ttsserver/tts"
 
 ;*/?>
