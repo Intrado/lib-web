@@ -18,13 +18,16 @@ class Organization extends DBMappedObject {
 	
 	// Returns an array of organizationid => orgkey for organizations that
 	// that the user can add as a rule.
-	static function getAuthorizedOrgKeys() {
+	static function getAuthorizedOrgKeys($userid = false) {
 		global $USER;
+		
+		if ($userid === false)
+			$userid = $USER->id;
 		
 		static $validorgkeys = false; // Cache of valid organization ids.
 	
 		if ($validorgkeys === false) {
-			if (QuickQuery('select 1 from userassociation where userid = ? limit 1', false, array($USER->id))) {
+			if (QuickQuery("select 1 from userassociation where userid = ? and type in ('organization', 'section') limit 1", false, array($userid))) {
 				$validorgkeys = QuickQueryList("
 					(select o.id as oid, o.orgkey as okey
 					from userassociation ua
@@ -39,10 +42,10 @@ class Organization extends DBMappedObject {
 							(s.organizationid = o.id)
 					where ua.userid = ?)
 					order by okey",
-					true, false, array($USER->id, $USER->id)
+					true, false, array($userid, $userid)
 				);
 			} else { // Unrestricted
-				$validorgkeys = QuickQueryList('select id, orgkey from organization where not deleted', true, false);
+				$validorgkeys = QuickQueryList('select id, orgkey from organization where not deleted order by orgkey', true, false);
 			}
 		}
 		
