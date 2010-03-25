@@ -8,7 +8,8 @@ class JobDetailReport extends ReportGenerator{
 		$this->reporttype = $this->params['reporttype'];
 		$orderquery = getOrderSql($this->params);
 		$rulesql = getRuleSql($this->params, "rp");
-
+		$orgsql = getOrgSql($this->params);
+		
 		$jobtypes = "";
 		if(isset($this->params['jobtypes'])){
 			$jobtypes = $this->params['jobtypes'];
@@ -151,6 +152,7 @@ class JobDetailReport extends ReportGenerator{
 			where 1
 			$searchquery
 			$rulesql
+			$orgsql
 			$orderquery
 			";
 		//query to test resulting dataset
@@ -169,6 +171,7 @@ class JobDetailReport extends ReportGenerator{
 				where 1
 				$searchquery
 				$rulesql
+				$orgsql
 				$orderquery
 				";
 
