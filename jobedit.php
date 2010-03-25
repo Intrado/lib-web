@@ -34,60 +34,48 @@ if ($_SESSION['jobid'] == NULL) {
 // Optional Form Items And Validators
 ////////////////////////////////////////////////////////////////////////////////
 
-class JobListItem extends FormItem {
-	function render ($value) {
-		$n = $this->form->name."_".$this->name;
-		return "<input id='" .$n."' name='".$n."' type='hidden' value='". escapehtml($value) ."'/>
-				<div>
-				<div id='listSelectboxContainer' style='float:left;width:40%;'></div>
-				<div id='listchooseTotalsContainer' style='display:none'>
-					<table>
-						<tr><th valign=top style='text-align:left'>"._L('List Total')."</th><td valign=top id='listchooseTotal'>0</td></tr>
-						<tr><td valign=top style='text-align:left'>"._L('Matched by Rules')."</td><td valign=top id='listchooseTotalRule'>0</td></tr>
-						<tr><td valign=top style='text-align:left'>"._L('Additions')."</td><td valign=top id='listchooseTotalAdded'>0</td></tr>
-						<tr><td valign=top style='text-align:left'>"._L('Skips')."</td><td valign=top id='listchooseTotalRemoved'>0</td></tr>
-					</table>
-				</div>
-				<div id='allListsWindow' style='float:right;width:50%;overflow:hidden;' >
-					<table width='100%' cellspacing='1' cellpadding='3' class='list' style='table-layout:fixed; font-size:90%;'>
-						<thead>
-							<tr class='listHeader'>
-								<th width='70%' style='overflow: hidden; overflow: hidden; white-space: nowrap; text-align:left'>"._L('List Name')."</th>
-								<th width='20%' style='overflow: hidden; text-align:left'>Count</th>
-								<th width='16'></th>
-							</tr>
-						</thead>
-						<tbody id='listsTableBody'>
-						</tbody>
-						<tfoot>
-							<tr id='listsTableMyself' style='display:none'>
-								<td>"._L('Myself')."</td>
-								<td>1</td>
-								<td></td>
-							</tr>
-							<tr>
-								<td class='border'>
-									<b>"._L('Total')."</b>
-								</td>
-								<td class='border' colspan=2>
-									<b><span id='listGrandTotal'>0</span></b><span style='vertical-align:middle' id='listsTableStatus'></span>
-								</td>
-							</tr>
-						</tfoot>
-					</table>
-				 </div>
-				 </div>
-				<script type=\"text/javascript\" language=\"javascript\">
-					document.observe('dom:loaded', function() {
-						listformVars = {listidsElement: $('" .$n."')};
-						listform_load_cached_list();
-						forcevalidator = function() {
-							form_do_validation($('" . $this->form->name . "'), $('" . $n . "'));
-						};
-					});
-				</script>
-
-				";
+class ValFormListSelect extends Validator {
+	var $onlyserverside = true;
+	
+	function validate ($value, $args) {
+		global $USER;
+		
+		// build the arguement array
+		$args = array();
+		foreach ($value as $id)
+			$args[] = $id;
+		$args[] = $USER->id;
+		foreach ($value as $id)
+			$args[] = $id;
+		$args[] = $USER->id;
+		
+		// get the valid lists
+		$validlists = QuickQueryList("
+			(select l.id as id, l.name as name
+			from list l
+				inner join publish p on
+					(l.id = p.listid)
+			where l.id in (". DBParamListString(count($value)) .")
+				and not l.deleted
+				and l.type != 'alert'
+				and p.action = 'subscribe'
+				and p.type = 'list'
+				and p.userid = ?)
+			UNION
+			(select id, name
+			from list
+			where id in (". DBParamListString(count($value)) .")
+				and type != 'alert'
+				and userid = ?
+				and not deleted)",
+			true, false, $args);
+		
+		// see if any of the value lists are not in the valid lists
+		foreach ($value as $id)
+			if (!isset($validlists[$id]))
+				return _L("%s has invalid list selections", $this->label);
+		
+		return true;
 	}
 }
 
@@ -443,12 +431,12 @@ $helpsteps[] = _L("Enter a name for your job. Using a descriptive name that indi
 		$formdata["lists"] = array(
 			"label" => _L('Lists'),
 			"fieldhelp" => _L('Select a list from your existing lists.'),
-			"value" => empty($selectedlists)?"":json_encode($selectedlists),
+			"value" => ($selectedlists)?$selectedlists:array(),
 			"validators" => array(
 				array("ValRequired"),
-				array("ValLists", 'skipemptycheck' => ($JOBTYPE == "repeating"))
+				array("ValFormListSelect")
 			),
-			"control" => array("JobListItem"),
+			"control" => array("FormListSelect"),
 			"helpstep" => 4
 		);
 		$formdata["skipduplicates"] = array(
@@ -658,7 +646,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 				if($job->id) {
 					/* Store lists*/
 					QuickUpdate("DELETE FROM joblist WHERE jobid=$job->id");
-					$listids = json_decode($postdata['lists']);
+					$listids = $postdata['lists'];
 					$batchvalues = array();
 					foreach ($listids as $id) {
 						$values = "($job->id,". ($id+0) . ")"; // TODO prepstmt args
@@ -710,9 +698,8 @@ include_once("nav.inc.php");
 
 // Optional Load Custom Form Validators
 ?>
-<script type="text/javascript" src="script/listform.js.php"></script>
 <script type="text/javascript">
-<? Validator::load_validators(array("ValDuplicateNameCheck","ValTranslationExpirationDate","ValWeekRepeatItem","ValTimeWindowCallEarly","ValTimeWindowCallLate","ValLists","ValIsTranslated","ValNonEmptyMessage")); ?>
+<? Validator::load_validators(array("ValDuplicateNameCheck","ValTranslationExpirationDate","ValWeekRepeatItem","ValTimeWindowCallEarly","ValTimeWindowCallLate","ValFormListSelect","ValIsTranslated","ValNonEmptyMessage")); ?>
 </script>
 <?
 
