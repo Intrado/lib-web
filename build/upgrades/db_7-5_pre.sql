@@ -578,3 +578,24 @@ CREATE TABLE `reportorganization` (
 ) ENGINE = InnoDB 
 $$$ 
 
+ALTER TABLE `audiofile` ADD INDEX ( `messagegroupid` )
+$$$
+
+-- dont let any messages go dissapearing on us
+update messagegroup mg inner join job j on (j.messagegroupid = mg.id and j.status='repeating')
+set permanent=1
+$$$
+
+ALTER TABLE `publish` ADD `listid` INT NULL AFTER `messagegroupid`
+$$$
+ALTER TABLE `publish` CHANGE `type` `type` ENUM( 'messagegroup', 'list' ) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL 
+$$$
+ALTER TABLE `publish` ADD `organizationid` INT NULL AFTER `listid`
+$$$
+
+ ALTER TABLE `publish` ADD INDEX ( `organizationid` )
+ $$$
+ ALTER TABLE `publish` ADD INDEX ( `listid` )
+ $$$
+ 
+ 
