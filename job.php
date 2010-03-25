@@ -32,6 +32,7 @@ require_once("obj/Message.obj.php");
 require_once("obj/MessagePart.obj.php");
 require_once("obj/Voice.obj.php");
 require_once("inc/translate.inc.php");
+require_once("obj/FormListSelect.fi.php");
 
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization
