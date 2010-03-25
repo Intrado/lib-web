@@ -176,7 +176,7 @@ function handleRequest() {
 				return false;
 			$stats = array();
 			foreach ($listids as $id) {
-				if (!userOwns('list', $id))
+				if (!userOwns('list', $id) && !isSubscribed("list", $id))
 					continue;
 				$list = new PeopleList($id+0);
 				$renderedlist = new RenderedList2();
