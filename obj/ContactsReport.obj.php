@@ -10,11 +10,13 @@ class ContactsReport extends ReportGenerator {
 		$this->reporttype = $this->params['reporttype'];
 
 		$orderquery = getOrderSql($this->params);
-		$rulesql = getRuleSql($this->params, "p", false);
-
+		$rules = isset($this->params['rules']) ? $this->params['rules'] : array();
+		$rulesql = $USER->getRuleSql($rules, "p", false); //add in any user SQL rules
+		
 		$userJoin = " and p.userid = '$USER->id' ";
 
-		$usersql = $USER->userSQL("p");
+		$userorgsql = getUserOrganizationSql();
+		
 		$phonequery="";
 		$emailquery="";
 		$personquery="";
@@ -63,7 +65,7 @@ class ContactsReport extends ReportGenerator {
 					and p.type='system'
 					$peoplequery
 					$personquery
-					$usersql
+					$userorgsql
 					$rulesql
 					$orderquery
 					";

@@ -8,8 +8,9 @@ class PortalReport extends ReportGenerator{
 		global $USER;
 		
 		$this->params = $this->reportinstance->getParameters();
-		$rulesql = getRuleSql($this->params, "p", false);
-		$usersql = $USER->userSQL("p");
+		$rules = isset($this->params['rules']) ? $this->params['rules'] : array();
+		$rulesql = $USER->getRuleSql($rules, "p", false); //add in any user SQL rules		
+		$userorgsql = getUserOrganizationSql();
 		$pkeysql = "";
 		$hideactivecodes = "";
 		$hideassociated = "";
@@ -49,7 +50,7 @@ class PortalReport extends ReportGenerator{
 						. $rulesql
 						. $hideactivecodes
 						. $hideassociated
-						. $usersql;
+						. $userorgsql;
 			//test query used to confirm no active codes are in the list
 			$this->testquery = "select count(ppt.token)
 						from person p
@@ -61,7 +62,7 @@ class PortalReport extends ReportGenerator{
 						. $rulesql
 						. $hideactivecodes
 						. $hideassociated
-						. $usersql;
+						. $userorgsql;
 		} else {
 			$this->query = "";
 			$this->testquery = "";
