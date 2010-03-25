@@ -62,21 +62,26 @@ function userCanSubscribe($type, $id = false) {
 		// if they are restricted
 		if ($userrestrictions) {
 			$authorgs = Organization::getAuthorizedOrgKeys();
+			error_log(count($authorgs));
+			$args = array($id);
+			foreach ($authorgs as $orgid => $orgkey)
+				$args[] = $orgid;
+			
 			$publishedtoorg = false;
 			switch ($type) {
 				case "messagegroup":
 					$publishedtoorg = QuickQuery("
 						select 1
 						from publish
-						where action = 'publish' and type = 'messagegroup' and messagegroupid = ? and organizationid in (". DBParamListString(count($authorgs)) . ") limit 1",
-						false, array($id) + $authorgs);
+						where action = 'publish' and type = 'messagegroup' and messagegroupid = ? and (organizationid is null or organizationid in (". DBParamListString(count($authorgs)) . ")) limit 1",
+						false, $args);
 					break;
 				case "list";
 					$publishedtoorg = QuickQuery("
 						select 1
 						from publish
-						where action = 'publish' and type = 'list' and listid = ? and organizationid in (". DBParamListString(count($authorgs)) . ") limit 1",
-						false, array($id) + $authorgs);
+						where action = 'publish' and type = 'list' and listid = ? and (organizationid is null or organizationid in (". DBParamListString(count($authorgs)) . ")) limit 1",
+						false, $args);
 						break;
 					break;
 			}
