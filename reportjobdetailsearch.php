@@ -20,8 +20,6 @@ require_once("obj/Sms.obj.php");
 require_once("inc/securityhelper.inc.php");
 require_once("inc/rulesutils.inc.php");
 require_once("obj/FormRuleWidget.fi.php");
-require_once("obj/SectionWidget.fi.php");
-require_once("obj/ValSections.val.php");
 require_once("obj/ValRules.val.php");
 require_once("obj/Job.obj.php");
 require_once("inc/reportutils.inc.php");
@@ -201,7 +199,7 @@ if (isset($options['organizationids']) && count($options['organizationids']) > 0
 		
 		foreach ($options['organizationids'] as $id) {
 			if (isset($organizations[$id]))
-				$orgkeys[$id] = $organizations[$id]->orgkey;
+				$orgkeys[$id] = $organizations[$id];
 		}
 		
 		if (count($orgkeys) > 0) {
@@ -315,23 +313,6 @@ $formdata["ruledata"] = array(
 	"helpstep" => 1
 );
 
-if (getSystemSetting('_hasenrollment')) {
-	$formdata["sectionids"] = array(
-		"label" => _L('Sections'),
-		"fieldhelp" => _L('Select sections from an organization.'),
-		"value" => "",
-		"validators" => array(
-			array("ValSections")
-		),
-		"control" => array("SectionWidget",
-			"sectionids" => isset($options['sectionids']) && count($options['sectionids']) > 0 ?
-				$options['sectionids'] :
-				array()
-		),
-		"helpstep" => 2
-	);
-}
-
 $formdata["jobtype"] = array(
 	"label" => _L("Filter by job type"),
 	"fieldhelp" => _L("Use these options if you want to show reports only for certain job types."),
@@ -421,10 +402,6 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 					'rules' => isset($rules) ? $rules : array(),
 					'organizationids' => isset($organizationids) ? $organizationids : array()
 				);
-				
-				if (getSystemSetting('_hasenrollment')) {
-					$_SESSION['report']['options']['sectionids'] = isset($postdata['sectionids']) ? $postdata['sectionids'] : array();
-				}
 				
 				set_session_options_reporttype();
 
@@ -592,11 +569,11 @@ startWindow(_L("Options"), "padding: 3px;");
 		select_metadata(null, null, $fields);
 	echo "</div>";
 
-	?>
+?>
 		<script type="text/javascript">
-			<? Validator::load_validators(array("ValSections", "ValRules", "ValReldate")); ?>
+			<? Validator::load_validators(array("ValRules", "ValReldate")); ?>
 		</script>
-	<?
+<?
 	echo $form->render();
 endWindow();
 ?>
