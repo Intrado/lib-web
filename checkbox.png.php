@@ -10,26 +10,18 @@ if ($id && $USER->authorize('createlist') && userOwns("list",$_SESSION['listid']
 			if (!userOwns('person', $id))
 				exit();
 
-			QuickUpdate("begin");
 			//insert into db
-			$usersql = $USER->userSQL("p");
-			$query = "select p.id
-					from 		person p
-
-					where p.id='$id' and (p.userid = 0 or
-										p.userid = $USER->id or
-										(1 $usersql))
-				";
-			if ($personid = QuickQuery($query)) {
+			if ($USER->canSeePerson($id)) {
 				//make sure the person doesn't already exist in the list
+				QuickUpdate("begin");
 				if(!QuickQuery("select count(*) from listentry where personid = " . $id . " and listid = " . $_SESSION['listid'])){
 					QuickUpdate("insert into listentry (listid,type,personid)"
 								. "values ('" . $_SESSION['listid'] . "','add','$id')");
 				}
+				QuickUpdate("commit");
 				//if the person already exists in the list, keep displaying the checkbox
 				readfile("img/checkbox-add.png");
 			}
-			QuickUpdate("commit");
 		} else {
 			QuickUpdate("delete from listentry where listid='" . $_SESSION['listid']
 						. "' and personid='$id'");
