@@ -14,8 +14,6 @@ class ReportSubscription extends DBMappedObject {
 	var $modifydate;
 	var $email;
 
-
-	//var $reportinstance; // doesnt make sence in this context, subscriptions are children of reportinstance
 	var $reportschedule;
 
 	//new constructor
