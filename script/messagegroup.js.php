@@ -102,7 +102,6 @@ function messagegroupHandleTabLoaded (event, state, existingmessagegroupid, auto
 	cachedAjaxGet('ajax.php?type=messagegroupsummary&messagegroupid='+existingmessagegroupid,
 		function(transport) {
 			var previoustabpieces = memo.previoustab.split('-');
-			var tabloadedpieces = memo.tabloaded.split('-');
 
 			var results = transport.responseJSON;
 			if (!results) {
@@ -112,33 +111,28 @@ function messagegroupHandleTabLoaded (event, state, existingmessagegroupid, auto
 			
 			state.messagegroupsummary = results.summary;
 			state.defaultlanguagecode = results.defaultlanguagecode;
-			var tabstatus = false;
+
+			// Set tabs to the blank icon first, then set them to accept.gif based on state.messagegroupsummary.
+			if (previoustabpieces[0] != 'summary') {
+				$(memo.previoustab + 'icon').src = "img/icons/diagona/16/160.gif";
+				if ($('email-htmlicon'))
+					$('email-htmlicon').src = "img/icons/diagona/16/160.gif";
+				if ($('email-plainicon'))
+					$('email-plainicon').src = "img/icons/diagona/16/160.gif";
+				if ($('emailheadersicon'))
+					$('emailheadersicon').src = "img/icons/diagona/16/160.gif";
+				if ($('phone-voiceicon'))
+					$('phone-voiceicon').src = "img/icons/diagona/16/160.gif";
+			}
 
 			for (var i = 0, count = state.messagegroupsummary.length; i < count; i++) {
 				var result = state.messagegroupsummary[i];
-
-				var updateprevioustab = (result.type == 'email' && memo.previoustab == 'emailheaders') || result.type == previoustabpieces[0];
-				var updatetabloaded = (result.type == 'email' && memo.tabloaded == 'emailheaders') || result.type == tabloadedpieces[0];
-
-				if(result.type == previoustabpieces[0])
-					tabstatus = true;
-
-				if (updateprevioustab || updatetabloaded) {
-					if (result.type == 'email' && $('emailheadersicon')) {
-						$('emailheadersicon').src = "img/icons/accept.gif";
-					}
-
-					if ($(result.type + '-' + result.subtype + 'icon')) {
-						$(result.type + '-' + result.subtype + 'icon').src = "img/icons/accept.gif";
-					}
-
-					if ($(result.type + '-' + result.subtype + '-' + result.languagecode + 'icon')) {
-						$(result.type + '-' + result.subtype + '-' + result.languagecode + 'icon').src = "img/icons/accept.gif";
-					}
-				}
-			}
-			if ($(memo.previoustab + 'icon')) {
-				$(memo.previoustab + 'icon').src = tabstatus?"img/icons/accept.gif":"img/icons/diagona/16/160.gif";
+				if (result.type == 'email' && $('emailheadersicon'))
+					$('emailheadersicon').src = "img/icons/accept.gif";
+				if ($(result.type + '-' + result.subtype + 'icon'))
+					$(result.type + '-' + result.subtype + 'icon').src = "img/icons/accept.gif";
+				if ($(result.type + '-' + result.subtype + '-' + result.languagecode + 'icon'))
+					$(result.type + '-' + result.subtype + '-' + result.languagecode + 'icon').src = "img/icons/accept.gif";
 			}
 		}.bindAsEventListener(this, memo, state),
 		null,
