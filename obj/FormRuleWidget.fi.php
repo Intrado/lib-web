@@ -35,12 +35,10 @@ class FormRuleWidget extends FormItem {
 				// store the values in the hidden input item
 				$('$inputname').value = values;
 				// if there are any rules, validate them
-				if (values.size())
-					rulewidget_do_validation();
+				if (\$A(values).length)
+					form_do_validation($('".$this->form->name."'), $('$inputname'));
 			}
-			function rulewidget_do_validation() {
-				form_do_validation($('".$this->form->name."'), $('".$inputname."'));
-			}
+			
 			ruleWidget.container.observe('RuleWidget:Ready', rulewidget_update_value.bindAsEventListener(ruleWidget));
 			ruleWidget.container.observe('RuleWidget:AddRule', rulewidget_update_value.bindAsEventListener(ruleWidget));
 			ruleWidget.container.observe('RuleWidget:DeleteRule', rulewidget_update_value.bindAsEventListener(ruleWidget));
