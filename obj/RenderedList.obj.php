@@ -22,7 +22,7 @@ class RenderedList2 {
 	//vars for paginating and sorting
 	var $pageoffset = 0;
 	var $pagelimit = 100;
-	var $orderby = array ("f02" => false, "f01" => false);// key is field, value if true is descending order
+	var $orderby = array(array ("f02", false), array("f01",false));// key is field, value if true is descending order
 	
 	//data for this page
 	var $pagepersonids = false; //list of personids from main person query
@@ -70,17 +70,6 @@ class RenderedList2 {
 		$this->searchemail = $searchemail;
 	}
 	
-	function setOrder ($field1, $desc1 = false, $field2 = false, $desc2 = false, $field3 = false, $desc3 = false) {
-		$this->orderby = array();
-		
-		$this->orderby[$field1] = $desc1;
-		if ($field2)
-			$this->orderby[$field2] = $desc2;
-		if ($field3)
-			$this->orderby[$field3] = $desc3;
-	}
-	
-	
 	/**
 	 * Generates a query to select personids matching criteria set up with one of the init functions.
 	 * Only minimal column data is returned: personid and any fields used in the orderby. (ie to use query as subquery/union/etc)
@@ -98,9 +87,9 @@ class RenderedList2 {
 		
 		if ($addorderlimit) {
 			if (count($this->orderby) > 0) {
-				
 				$orderbits = array();
-				foreach ($this->orderby as $field => $desc) {
+				foreach ($this->orderby as $orderopts) {
+					list($field,$desc) = $orderopts;
 					$orderbits[] = $field . ($desc ? " desc " : " ");
 					$fields[] = "p.".$field; //add to list of fields also, so that unions can still sort
 				}
