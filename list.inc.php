@@ -91,8 +91,6 @@ function handle_list_checkbox_ajax () {
 		return;
 	
 	if (isset($_GET['addpersonid'])) {
-		error_log("addpersonid");
-		
 		$id = $_GET['addpersonid'];
 		$existingtype = QuickQuery("select type from listentry where personid=? and listid=?", false, array($id, $_SESSION['listid']));
 		if ($existingtype == "negate") {
