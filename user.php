@@ -95,7 +95,7 @@ class UserSectionFormItem extends FormItem {
 	function render ($value) {
 		$n = $this->form->name."_".$this->name;
 		// get all orgid to orgkey values
-		$orgs = QuickQueryList("select id, orgkey from organization where not deleted", true);
+		$orgs = QuickQueryList("select id, orgkey from organization where not deleted order by orgkey", true);
 		// get sectionkeys for current value
 		if ($value)
 			$sections = QuickQueryList("select id, skey from section where id in (". DBParamListString(count($value)) .")", true, false, $value);
