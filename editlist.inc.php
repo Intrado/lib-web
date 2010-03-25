@@ -34,8 +34,7 @@ if (!isset($method) || !in_array($method, array('rules', 'sections')))
 	$method = 'rules';
 $methodlink = $method == 'sections' ? 'editlistsections.php' : 'editlistrules.php';
 
-if (isset($renderedlist))
-	list_handle_ajax_table($renderedlist, array('listAdditionsContainer','listSkipsContainer'));
+handle_list_checkbox_ajax(); //for handling check/uncheck from the list
 
 ////////////////////////////////////////////////////////////////////////////////
 // Validators
