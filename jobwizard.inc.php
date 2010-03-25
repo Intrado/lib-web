@@ -1449,6 +1449,14 @@ class JobWiz_messageEmailTranslate extends WizStep {
 				"helpstep" => 1
 			);
 		} else {
+			$formdata[] = Language::getName('en');
+			
+			$formdata["englishversion"] = array(
+				"label" => _L("Default"),
+				"control" => array("FormHtml","html" => '<div style="border: 1px solid gray; overflow: auto; padding: 4px; max-height: 150px;">'. $englishtext .'</div>'),
+				"helpstep" => 1
+			);
+			
 			if(is_array($translations)) {
 				foreach($translations as $obj){
 					$languagecode = array_shift($translationlanguagecodes);
