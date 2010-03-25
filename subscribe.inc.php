@@ -90,14 +90,13 @@ if (count($userassociatedorgs) == 0) {
 } else if (count($userassociatedorgs) == 1 && $userassociatedorgs[0] == null) {
 	// do nothing, this user is restricted to sectionid 0 and has no additional associations that provide orgs
 } else {
-	$orgrestrictionsql = "or p.organizationid in (" . DBParamListString(count($value)) .")";
+	$orgrestrictionsql = "or p.organizationid in (" . DBParamListString(count($userassociatedorgs)) .")";
 }
 
 // build the argument array 
 $args = array($USER->id);
 foreach ($userassociatedorgs as $orgid)
-	if ($orgid !== null)
-		$args[] = $orgid;
+	$args[] = $orgid;
 
 if ($SUBSCRIBETYPE == 'messagegroup') {
 
@@ -111,7 +110,7 @@ if ($SUBSCRIBETYPE == 'messagegroup') {
 			(p.userid = u.id)
 		where p.userid != ?
 			and action = 'publish'
-			and (p.organizationid = null " .$orgrestrictionsql. ")
+			and (p.organizationid is null " .$orgrestrictionsql. ")
 		group by id
 		order by name, pubid
 		limit $start, $limit", 
@@ -134,7 +133,7 @@ if ($SUBSCRIBETYPE == 'messagegroup') {
 			(p.userid = u.id)
 		where p.userid != ?
 			and action = 'publish'
-			and (p.organizationid = null " .$orgrestrictionsql. ")
+			and (p.organizationid is null " .$orgrestrictionsql. ")
 		group by id
 		order by name, pubid
 		limit $start, $limit", 
