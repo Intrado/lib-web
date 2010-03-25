@@ -87,11 +87,11 @@ function makeTranslationItem($messagegroup, $required, $type, $subtype, $languag
 			"subtype" => $subtype,
 			"maximages" => $maximages,
 		);
-		
+
 		$validators[] = array("ValDefaultMessage",
 			"messagegroup" => $messagegroup,
 			"languagecode" => $languagecode,
-			"requesteddefaultlanguagecode" => $_SESSION["requesteddefaultlanguagecode"],
+			"requesteddefaultlanguagecode" => $messagegroup->defaultlanguagecode,
 			"type" => $type,
 			"subtype" => $subtype
 		);
@@ -178,7 +178,7 @@ function makeMessageBody($messagegroup, $translationlanguages, $required, $type,
 			"messagegroup" => $messagegroup,
 			"languagecode" => $languagecode,
 			"autotranslator" => $languagecode == "autotranslator",
-			"requesteddefaultlanguagecode" => $_SESSION["requesteddefaultlanguagecode"],
+			"requesteddefaultlanguagecode" => $messagegroup->defaultlanguagecode,
 			"translationlanguages" => $translationlanguages,
 			"type" => $type,
 			"subtype" => $subtype
