@@ -193,6 +193,39 @@ function showPageMenu ($total,$start, $perpage, $link = NULL) {
 <?
 }
 
+/**
+ * shows a menu for selecting fields to sort by
+ * @param $fields array of field -> display name
+ * @param $sortdata existing sort data to prepopulate
+ * @return unknown_type
+ */
+function showSortMenu ($fields, $sortdata) {
+?>
+	<table border="0">
+		<tr>
+			<th>Sort By</th>
+<?
+			$count = min(count($fields),3);
+			for ($x = 0; $x < $count; $x++) {
+				list($selectedfield,$desc) = isset($sortdata[$x]) ? $sortdata[$x] : array(false,false);
+				echo '<td><select onchange="location.href=\'?sort'.$x.'=\' + this.value;" name="sort'.$x.'"><option value="">- None -</option>';
+				foreach ($fields as $field => $name) {
+					$selected = $field == $selectedfield ? "selected" : "";
+					echo '<option value="'.escapehtml($field).'" '.$selected .'>'.escapehtml($name).'</option>';
+				}
+				echo '</select></td>';
+				
+				//TODO add asc/desc toggle
+			}
+?>
+		</tr>
+	</table>
+<?	
+}
+
+
+
+
 function ajax_table_handle_togglers($containerID) {
 	global $USER;
 
