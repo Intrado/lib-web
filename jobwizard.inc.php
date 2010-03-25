@@ -498,20 +498,21 @@ class EasyCall extends FormItem {
 					// create a new wizard easycall
 					insertNewWizEasyCall( "'.$n.'", "'.$n.'_content", "'.$n.'_select", langcode );
 				});
-
+				
 				// listen for selections from the _select element
-				$("'.$n.'_select").observe("change", function (event) {
-					e = event.element();
-					if (e.value == 0)
-						return;
+				if ($("'.$n.'_select")) {
+					$("'.$n.'_select").observe("change", function (event) {
+						e = event.element();
+						if (e.value == 0)
+							return;
 
-					var langcode = $("'.$n.'_select").value;
+						var langcode = $("'.$n.'_select").value;
 
-					// create a new wizard easycall
-					insertNewWizEasyCall( "'.$n.'", "'.$n.'_content", "'.$n.'_select", langcode );
+						// create a new wizard easycall
+						insertNewWizEasyCall( "'.$n.'", "'.$n.'_content", "'.$n.'_select", langcode );
 
-				});
-
+					});
+				}
 			</script>';
 		return $str;
 	}

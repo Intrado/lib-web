@@ -24,13 +24,15 @@ function insertNewWizEasyCall(formitemname, maincontainerid, langselect, langcod
 		new Element("div",{ id: maincontainerid+"_"+langcode, "className": "wizeasycallcontainer" })
 	});
 
-	// set the selector to index 0
-	$(langselect).value = 0;
+	if ($(langselect)) {
+		// set the selector to index 0
+		$(langselect).value = 0;
 
-	// hide the language from the selector
-	if ($(langselect+"_"+langcode))
-		$(langselect+"_"+langcode).hide();
-
+		// hide the language from the selector
+		if ($(langselect+"_"+langcode))
+			$(langselect+"_"+langcode).hide();
+	}
+	
 	new WizEasyCall(
 		formitemname,
 		maincontainerid+"_"+langcode,
