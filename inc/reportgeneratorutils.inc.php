@@ -16,12 +16,49 @@ function getOrderSql($params){
 	return $orderquery;
 }
 
+/*
+ * TODO this is used only by reports that pull off of person table for showing contacts.
+ * Can be rewritten to do something similar to renderedlist (or perhaps use renderedlist)
+ */
+function getUserOrganizationSql () {
+	global $USER;
+	$query = "select ua.organizationid from userassociation ua where ua.userid=? 
+		union
+		select s.organizationid from userassociation ua left join section s on (ua.sectionid=s.id) where ua.userid=?";
+	$restrictedorgs = QuickQueryList($query, false, false, array($USER->id, $USER->id));
+	$count = count($restrictedorgs);
+	if ($count == 0)
+		return "";
+	else if ($count == 1 && $restrictedorgs[0] == null) {
+		return " and 0 /* no org access */ "; //if only thing in user association is section id=0, then it will return a single null
+	} else {
+		//check for and remove null elements from section id=0
+		foreach ($restrictedorgs as $k => $v)
+			if ($v == null)
+				unset($restrictedorgs[$k]);
+		$orgidcsv = implode(",",$restrictedorgs);
+		return "and exists (select * from personassociation pa 
+				where pa.personid=p.id and pa.organizationid in ($orgidcsv))";
+	}
+}
+
+//deprecated
 function getRuleSql($params, $alias, $isjobreport=true){
 	$rulesql = "";
 	if(isset($params['rules'])){
 		$rulesql = Rule::makeQuery($params['rules'], $alias,false,$isjobreport);
 	}
 	return $rulesql;
+}
+
+function getOrgSql($params) {
+	if (isset($params['organizationids']) && count($params['organizationids']) > 0) {
+		$orgidcsv = implode(",",$params['organizationids']);
+		$query = " and exists (select * from reportorganization ro 
+				where ro.jobid=rp.jobid and ro.personid=rp.personid and ro.organizationid in ($orgidcsv))";
+		return $query;
+	}
+	return "";
 }
 
 function getJobSummary($joblist, $readonlyDB = false){
