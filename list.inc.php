@@ -12,8 +12,28 @@ function showRenderedListTable($renderedlist, $list = false) {
 	global $PAGEINLISTMAP;
 	static $tableidcounter = 1;
 	
+	
+	$validsortfields = array("pkey" => "ID#");
+	foreach (FieldMap::getAuthorizedFieldMapsLike("f") as $fieldmap) {
+		$validsortfields[$fieldmap->fieldnum] = $fieldmap->name;
+	}
+	
+	$ordering = isset($_SESSION['showlistorder']) ? $_SESSION['showlistorder'] : array(array("f02", false),array("f01",false));
+	for ($x = 0; $x < 3; $x++) {
+		if (!isset($_GET["sort$x"]))
+			continue;
+		if ($_GET["sort$x"] == "")
+			unset($ordering[$x]);
+		else if (isset($validsortfields[$_GET["sort$x"]])) {
+			$ordering[$x] = array($_GET["sort$x"],isset($_GET["desc$x"]));
+		}
+	}	
+	$_SESSION['showlistorder'] = $ordering = array_values($ordering); //remove gaps
+	
+	
 	$pagestart = (isset($_GET['pagestart']) ? $_GET['pagestart'] + 0 : 0);
 	$renderedlist->pageoffset = $pagestart;
+	$renderedlist->orderby = $ordering;
 	$data = $renderedlist->getPageData();
 	$total = $renderedlist->getTotal();
 	
@@ -58,6 +78,7 @@ function showRenderedListTable($renderedlist, $list = false) {
 	$optionalfields = array_merge(FieldMap::getOptionalAuthorizedFieldMapsLike('f'), FieldMap::getAuthorizedFieldMapsLike('g'));
 	$optionalfieldstart = $list ? 6 : 5; //table col of last non optional field
 	select_metadata($tableid,$optionalfieldstart,$optionalfields);
+	showSortMenu($validsortfields,$ordering);
 	
 	//now use session display prefs to set up titles and whatnot for the optional fields
 	$i = 8;
@@ -71,7 +92,7 @@ function showRenderedListTable($renderedlist, $list = false) {
 		else
 			$titles[$i++] = "@" . $field->name;
 	}
-
+	
 	showPageMenu($total,$pagestart,$renderedlist->pagelimit);
 	echo '<table id="'.$tableid.'" width="100%" cellpadding="3" cellspacing="1" class="list">';
 	showTable($data, $titles, $formatters, $repeatedcolumns, $groupby);
@@ -126,9 +147,7 @@ function handle_list_checkbox_ajax () {
 		header('Content-Type: application/json');
 		exit(json_encode(true));
 	}
-
 }
-
 
 function fmt_persontip ($row, $index) {
 	global $USER;
@@ -156,7 +175,7 @@ function fmt_checkbox($row, $index) {
 	global $PAGEINLISTMAP;
 	
 	$personid = $row[$index];
-
+	
 	$checked = '';
 	if (isset($PAGEINLISTMAP[$personid]))
 		$checked = 'checked';
