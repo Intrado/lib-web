@@ -12,7 +12,8 @@ if (isset($_GET['monitor'])) {
 	$time = $_GET['monitor'] ? $_GET['monitor'] : 15;
 	echo '<meta http-equiv="refresh" content="'.$time.'">';
 } else {
-	echo '<meta http-equiv="refresh" content="1800;url=index.php?logout=1&reason=timeout">';
+	$autologoutminutes = isset($SETTINGS['feature']['autologoutminutes']) ? $SETTINGS['feature']['autologoutminutes'] : 30;
+	echo '<meta http-equiv="refresh" content="'. 60*$autologoutminutes  .';url=index.php?logout=1&reason=timeout">';
 }
 ?>
 <style media="print">
