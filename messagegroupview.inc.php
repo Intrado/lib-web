@@ -326,7 +326,7 @@ if ($countdestinations > 0) {
 				'currentdestinationtype': '<?=$preferreddestinationtype?>',
 				'currentsubtype': '<?=$preferreddestinationsubtype?>',
 				'currentlanguagecode': '<?=$preferredlanguagecode?>',
-				'defaultlanguagecode': '<=$messagegroup->defaultlanguagecode?>',
+				'defaultlanguagecode': '<?=$messagegroup->defaultlanguagecode?>',
 				'messagegroupsummary': <?=json_encode(MessageGroup::getSummary($messagegroup->id))?>
 			};
 		
