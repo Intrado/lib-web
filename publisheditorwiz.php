@@ -97,7 +97,7 @@ class PublishTargetWiz_publishtarget extends WizStep {
 		// un-restricted users can publish to anything
 		$userrestrictions = QuickQuery("select 1 from userassociation where userid = ? and (sectionid is not null or organizationid is not null) limit 1", false, array($USER->id));
 		
-		$values = array("nobody" => _L("Nobody May Subscribe"));
+		$values = array("nobody" => _L("Unpublish This Item"));
 		if (!$userrestrictions) {
 			$values["anyone"] = _L("Anyone May Subscribe");
 			$values["unrestricted"] = _L("Top Level Users");
@@ -105,8 +105,8 @@ class PublishTargetWiz_publishtarget extends WizStep {
 		$values["organization"] = _L("Specific Organization(s)");
 		
 		$formdata['target'] = array(
-			"label" => _L("Select who can subscribe"),
-			"fieldhelp" => _L("TODO: Help"),
+			"label" => _L("Subscription Permissions"),
+			"fieldhelp" => _L("Select who has permission to subscribe to this item."),
 			"value" => $value,
 			"validators" => array(
 				array("ValRequired"),
@@ -116,7 +116,7 @@ class PublishTargetWiz_publishtarget extends WizStep {
 			"helpstep" => 1
 		);
 
-		$helpsteps = array(_L("TODO: Help"));
+		$helpsteps = array(_L("This step allows you to control who can subscribe to this item. <br><br><ul> <li>Unpublish this item - Makes this item no longer appear as a subscribable option. Users will no longer be able to create jobs with this item.<li>Anyone May Subscribe - Allow any user to subscribe to this item. <li>Top Level Users - Only users with no restrictions, such as system administrators, may subscribe.<li>Specific Organizations - Only users from certain organization may subscribe.</ul>"));
 
 		return new Form("publishtargetwiz-publishtarget",$formdata,$helpsteps);
 	}
@@ -144,7 +144,7 @@ class PublishTargetWiz_chooseorganizations extends WizStep {
 		
 		$formdata["organizationids"] = array(
 			"label" => _L('Organization(s)'),
-			"fieldhelp" => _L('Add or remove user organization associations'),
+			"fieldhelp" => _L('Select the organizations whose users may subscribe to this item.'),
 			"value" => (isset($orgs) && $orgs)?$orgs:array(),
 			"validators" => array(
 				array("ValRequired"),
@@ -154,7 +154,7 @@ class PublishTargetWiz_chooseorganizations extends WizStep {
 			"helpstep" => 2
 		);
 		
-		$helpsteps = array(_L("TODO: Help"));
+		$helpsteps = array(_L("Users from the organizations you select here will be able to subscribe to this item."));
 
 		return new Form("publishtargetwiz-chooseorganizations",$formdata,$helpsteps);
 	}
@@ -167,23 +167,24 @@ class PublishTargetWiz_chooseorganizations extends WizStep {
 
 class PublishTargetWiz_confirm extends WizStep {
 	function getForm($postdata, $curstep) {
+		//This should tell them what they selected. I was going to add a new formdata thing with the subscription permission choices.
 		
 		$formdata['confirmationtext'] = array(
-			"label" => _L(""),
+			"label" => _L("Summary"),
 			"fieldhelp" => _L("TODO: Help"),
-			"control" => array("FormHtml", "html" => "<div>TODO: Confirmation text goes here</div>"),
+			"control" => array("FormHtml", "html" => "<div>You are about to publish the {list or message} called <b>ITEM NAME</b>.<p>Permitted subscribers:<b> This school, that school, and the other school.</b></p></div>"),
 			"helpstep" => 1
 		);
 		$formdata['confirm'] = array(
 			"label" => _L("Confirm"),
-			"fieldhelp" => _L("TODO: Help"),
+			"fieldhelp" => _L("Check this box and click next to confirm your selections."),
 			"value" => "",
 			"validators" => array(
 				array("ValRequired")),
 			"control" => array("CheckBox"),
 			"helpstep" => 1
 		);
-		$helpsteps = array(_L("TODO: Help"));
+		$helpsteps = array(_L("Read over your selections and make sure everything looks correct. Then check Confirm and click next to finish publishing this item."));
 		return new Form("publishtargetwiz-confirm",$formdata,$helpsteps);
 	}
 	//returns true if this step is enabled
@@ -259,7 +260,7 @@ class FinishPublishTargetWiz extends WizFinish {
 	}
 	
 	function getFinishPage ($postdata) {
-		return "<h1>Finshed!</h1>";
+		return "<h1>Success!</h1><p>This item has been published and is now available to your subscribers.</p>";
 	}
 }
 

@@ -115,7 +115,7 @@ $TITLE = _L('Classroom Messaging');
 
 include_once("nav.inc.php");
 
-startWindow(_L('Classroom Comments'));
+startWindow(_L('My Classroom Messages'));
 
 ?>
 <table width="100%" style="padding-top: 7px;">
