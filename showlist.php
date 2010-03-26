@@ -36,7 +36,7 @@ if (!$USER->authorize('createlist')) {
 //get the message to edit from the request params or session
 if (isset($_GET['id'])) {
 	setCurrentList($_GET['id']);
-	$_SESSION['listreferer'] = $_SERVER['HTTP_REFERER'];
+	$_SESSION['listreferer'] = isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : 'list.php';
 	redirect();
 }
 
