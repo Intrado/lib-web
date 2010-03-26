@@ -68,7 +68,28 @@ if (!empty($_POST) && empty($_FILES['audio'])) {
 				unlink($dest);
 
 				if ($contentid) {
-					$audioname = $audio->name = $filename . ' - ' . date("F jS, Y h:i a");
+					$audiofileids = MessageGroup::getReferencedAudioFileIDs($messagegroup->id);
+					$duplicatenames = count($audiofileids) > 0 ? QuickQueryList('select name from audiofile where not deleted and id in (' . implode(',', $audiofileids) . ') and name like ?', false, false, array($filename . '%')) : array();
+
+					// If there are any duplicate names, then find the largest sequence number so that we can set our final name to "$filename " . ($largestsequencenumber + 1)
+					if (count($duplicatenames) > 0) {
+						$largestsequencenumber = 1;
+
+						foreach ($duplicatenames as $duplicatename) {
+							if (preg_match('/ \d+$/', $duplicatename, $matches)) {
+								$sequencenumber = intval($matches[0]);
+
+								if ($sequencenumber > $largestsequencenumber) {
+									$largestsequencenumber = $sequencenumber;
+								}
+							}
+						}
+
+						$finalaudiofilename = "$filename " . ($largestsequencenumber + 1);
+					} else {
+						$finalaudiofilename = $filename;
+					}
+					$audioname = $audio->name = $finalaudiofilename;
 					$audio->contentid = $contentid;
 					$audio->update();
 					$audioid = $audio->id;
