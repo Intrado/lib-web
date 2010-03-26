@@ -115,7 +115,7 @@ class TranslationItem extends FormItem {
 							'  . (isset($this->args['disabledinfo']) ? $this->args['disabledinfo'] : ('<ul><li> ' . _L("People tagged with this language will receive the English version.") . '</li></ul>')) . '
 						</div>
 						<div id="'.$n.'textfields" style="width: 100%; display: '.(($msgdata->enabled)?"block":"none").'">
-							<div id="'.$n.'textdiv" name="'.$n.'textdiv" style="display: '.((!$msgdata->override)?"block":"none").'; width: 99%; '.($isphone ? "height: 50px;" : "height: 300px;").' border: 1px solid gray; color: gray; overflow:auto">' .
+							<div id="'.$n.'textdiv" name="'.$n.'textdiv" style="display: '.((!$msgdata->override)?"block":"none").'; width: 99%; '.($isphone ? "height: 100px;" : "height: 300px;").' border: 1px solid gray; color: gray; overflow:auto">' .
 								((isset($this->args['usehtmleditor']) && $this->args['usehtmleditor']) || (isset($this->args['escapehtml']) && !$this->args['escapehtml']) ?
 									$msgdata->text :
 									escapehtml($msgdata->text)) .
@@ -136,7 +136,7 @@ class TranslationItem extends FormItem {
 
 							<div id="'.$n.'retranslation" style="width: 100%; display: none;margin-top: 15px; clear:both">
 								'. icon_button(_L('Refresh %s to English Translation', Language::getName($language)),"fugue/arrow_circle_double_135","submitRetranslation('$n','$language', $usehtmleditor, $escapehtml)", null, 'style="margin-bottom: 12px"') . '
-								<div id="'.$n.'retranslationtext" name="'.$n.'retranslation" style="width: 99%; '.($isphone ? "height: 50px;" : "height: 300px;").' border: 1px solid gray; color: gray; overflow:auto; clear:both"></div>
+								<div id="'.$n.'retranslationtext" name="'.$n.'retranslation" style="width: 99%; '.($isphone ? "height: 100px;" : "height: 300px;").' border: 1px solid gray; color: gray; overflow:auto; clear:both"></div>
 							</div>
 						</div>
 					</td>
