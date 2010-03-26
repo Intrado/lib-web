@@ -210,7 +210,7 @@ class ListForm extends Form {
 					(function() {
 						var tbody = $('chooseSectionsWindow').down('tbody');
 						if (tbody) {
-							tbody.insert($('listChoose_sectionwidget_fieldarea'));
+							tbody.insert({'top': $('listChoose_sectionwidget_fieldarea')});
 						}
 					})();
 			";
