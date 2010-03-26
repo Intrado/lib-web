@@ -117,12 +117,15 @@ $custname = getCustomerName($CUSTOMERURL); // also found by getSystemSetting("di
 $TITLE=_L("Login");
 //primary colors are pulled in login top
 include_once("logintop.inc.php");
+
 if ($IS_COMMSUITE) {
 ?>
 	<form action="index.php" method="POST">
 		<table border="0" cellpadding="10" cellspacing="0" style="width: 500px; color: #9B9B9B; font-size: 14px; color: #<?=$primary?>;" align="center">
 			<tr>
 				<td colspan="2">
+					<noscript><p><?=_L("It looks like you don't have JavaScript enabled! You must have JavaScript enabled for full use of this system. Please enable JavaScript in your browser or contact your system administrator for assistance.")?></p></noscript>
+
 <?if ($badlogin) { ?>
 					<div style="color: red;"><?=_L("Incorrect username/password. Please try again.")?></div>
 <? } else if ($softlock) { ?>
@@ -157,7 +160,7 @@ if ($IS_COMMSUITE) {
 <? if ($custname) { ?>
 
 	<div style="margin-top: 50px; margin-left: 25px;">
-
+		<noscript><p><?=_L("It looks like you don't have JavaScript enabled! You must have JavaScript enabled for full use of this system. Please enable JavaScript in your browser or contact your system administrator for assistance.")?></p></noscript>
 
 <? if ($badlogin) { ?>
 		<div style="font-size: 12px; font-weight: bold; color: red;"><?=_L("Incorrect username/password. Please try again.")?>
