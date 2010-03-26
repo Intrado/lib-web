@@ -213,7 +213,7 @@ class CallsReport extends ReportGenerator{
 				$jobtypenames = array();
 				foreach($jobtypes as $jobtype){
 					$jobtypeobj = new JobType($jobtype);
-					$jobtypenames[] = $jobtypeobj->name;
+					$jobtypenames[] = escapehtml($jobtypeobj->name);
 				}
 				$jobtypenames = implode(", ",$jobtypenames);
 ?>
