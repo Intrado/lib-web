@@ -1604,9 +1604,14 @@ if (isset($_SESSION['inmessagegrouptabs']) && $_SESSION['inmessagegrouptabs']) {
 			};
 			
 			// When a tab is loaded, update the status icon of the previous tab.
-			formswitchercontainer.observe('FormSplitter:TabLoaded',
-				messagegroupHandleTabLoaded.bindAsEventListener(formswitchercontainer, state, '<?=$_SESSION['messagegroupid']?>', autotranslatorupdator, false)
-			);
+			formswitchercontainer.observe('FormSplitter:TabLoaded',function(event) {
+				var handler = messagegroupHandleTabLoaded.bind(formswitchercontainer);
+				handler(event,state, '<?=$_SESSION['messagegroupid']?>', autotranslatorupdator, false);
+				var sourcetextarea = $(state.currentdestinationtype + '-' + state.currentsubtype + '-autotranslator_sourcemessagebody');
+				if(sourcetextarea && sourcetextarea.value.strip().length > 4000) {
+					alert("This message will be truncated to 4000 characters.");
+				}
+			});
 			
 			messagegroupStyleLayouts();
 		})();

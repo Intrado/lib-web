@@ -70,9 +70,6 @@ function makeTranslationItem($messagegroup, $required, $type, $subtype, $languag
 
 	$validators = array();
 
-	if ($type == 'phone') {
-		$validators[] = array("ValLength","max" => 4000);
-	}
 	if ($type == 'email' && !$inautotranslator) {	
 		if ($subtype == 'plain') {
 			$control["overrideplaintext"] = $overrideplaintext;
@@ -185,9 +182,6 @@ function makeMessageBody($messagegroup, $translationlanguages, $required, $type,
 		)
 	);
 
-	if ($type == 'phone') {
-		$validators[] = array("ValLength","max" => 4000);
-	}
 	if ($type == 'email') {	
 		if ($subtype == 'plain') {
 			$control["overrideplaintext"] = $overrideplaintext;

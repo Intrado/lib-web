@@ -113,17 +113,21 @@ function messagegroupHandleTabLoaded (event, state, existingmessagegroupid, auto
 			state.defaultlanguagecode = results.defaultlanguagecode;
 
 			// Set tabs to the blank icon first, then set them to accept.gif based on state.messagegroupsummary.
-			if (previoustabpieces[0] != 'summary') {
+
+			if(!(previoustabpieces.length == 2 && (previoustabpieces[2] == 'autotranslate')))
 				$(memo.previoustab + 'icon').src = "img/icons/diagona/16/160.gif";
-				if ($('email-htmlicon'))
-					$('email-htmlicon').src = "img/icons/diagona/16/160.gif";
-				if ($('email-plainicon'))
-					$('email-plainicon').src = "img/icons/diagona/16/160.gif";
-				if ($('emailheadersicon'))
-					$('emailheadersicon').src = "img/icons/diagona/16/160.gif";
-				if ($('phone-voiceicon'))
-					$('phone-voiceicon').src = "img/icons/diagona/16/160.gif";
-			}
+			else if(previoustabpieces[0] != 'summary')
+				$(memo.previoustab + 'icon').src = "img/icons/diagona/16/160.gif";
+
+			if ($('email-htmlicon'))
+				$('email-htmlicon').src = "img/icons/diagona/16/160.gif";
+			if ($('email-plainicon'))
+				$('email-plainicon').src = "img/icons/diagona/16/160.gif";
+			if ($('emailheadersicon'))
+				$('emailheadersicon').src = "img/icons/diagona/16/160.gif";
+			if ($('phone-voiceicon'))
+				$('phone-voiceicon').src = "img/icons/diagona/16/160.gif";
+			
 
 			for (var i = 0, count = state.messagegroupsummary.length; i < count; i++) {
 				var result = state.messagegroupsummary[i];
