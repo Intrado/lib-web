@@ -326,7 +326,6 @@ function fmt_jobs_actions_customer($row, $index) {
 	}
 
 	if ($USER->id == $jobownerid) {
-		error_log("$type  $index");
 		if ($type == 'survey') {
 			$editLink = action_link(_L("Edit"),"pencil","survey.php?id=$id");
 			$copyLink = ''; // no copy survey feature
