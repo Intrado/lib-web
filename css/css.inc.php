@@ -670,7 +670,6 @@ div.scrollTableContainer {
 	margin: 2px;
 	margin-right: 0;
 	padding-bottom: 25px;
-	padding-right: 10px;
 }
 .verticaltabstabspane {
 	padding: 0;
@@ -685,7 +684,7 @@ div.scrollTableContainer {
 }
 table.SplitPane {
 	border-collapse: collapse;
-	width: 100%;
+	width: 98%;
 	margin: 0;
 }
 td.SplitPane {

@@ -114,9 +114,7 @@ function messagegroupHandleTabLoaded (event, state, existingmessagegroupid, auto
 
 			// Set tabs to the blank icon first, then set them to accept.gif based on state.messagegroupsummary.
 
-			if(!(previoustabpieces.length == 2 && (previoustabpieces[2] == 'autotranslate')))
-				$(memo.previoustab + 'icon').src = "img/icons/diagona/16/160.gif";
-			else if(previoustabpieces[0] != 'summary')
+			if(!(previoustabpieces.length == 2 && (previoustabpieces[2] == 'autotranslate')) && previoustabpieces[0] != 'summary')
 				$(memo.previoustab + 'icon').src = "img/icons/diagona/16/160.gif";
 
 			if ($('email-htmlicon'))
@@ -149,5 +147,15 @@ function messagegroupStyleLayouts(readonly) {
 		var verticaltabs = $$('div.verticaltabstitlediv');
 		if (verticaltabs.length > 0)
 			verticaltabs[0].setStyle({'marginBottom':'20px'});
+	} else {
+		// Fix IE problem with table.SplitPane overflowing in messagegroupviewpopup.php
+		var verticaltabs = $$('table.SplitPane');
+		
+		verticaltabs.each(function(t) {
+			var splitpane = t.up('form');
+			if (splitpane) {
+				splitpane.style.paddingRight = '45px';
+			}
+		});
 	}
 }
