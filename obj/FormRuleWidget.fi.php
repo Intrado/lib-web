@@ -44,7 +44,7 @@ class FormRuleWidget extends FormItem {
 			ruleWidget.container.observe('RuleWidget:DeleteRule', rulewidget_update_value.bindAsEventListener(ruleWidget));
 			ruleWidget.container.observe('RuleWidget:RemoveAllRules', function() {
 				this.clear_rules();
-				rulewidget_update_value(null).bind(this);
+				rulewidget_update_value(null);
 			}.bindAsEventListener(ruleWidget));
 			ruleWidget.startup($rulesJSON);
 			</script>";
