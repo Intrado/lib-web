@@ -1136,6 +1136,7 @@ if ($button = $messagegroupsplitter->getSubmit()) {
 								if (!empty($messagesneeded['translated']) && !empty($trimmedsourcetext)) {
 									if (!$translation = translate_fromenglish(makeTranslatableString($trimmedsourcetext), array($formdestinationlanguagecode))) {
 										unset($translation);
+										unset($messagesneeded['source']);
 									}
 								}
 
