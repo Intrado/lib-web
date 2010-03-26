@@ -213,10 +213,10 @@ if (CheckFormSubmit($f,'save') && !$errormsg) {
 				if ($pkey == "")
 					continue;
 
-				$p = $USER->getPidAndNameIfCanSee($pkey);
-				if ($p) {
+				$p = DBFind("Person","from person where pkey=?", false, array($pkey));
+				if ($p && $USER->canSeePerson($p->id)) {
 					//use associative array to dedupe pids
-					$temppersonids[$p['id']] = 1;
+					$temppersonids[$p->id] = 1;
 				}
 			}
 			fclose($fp);
