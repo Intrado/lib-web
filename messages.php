@@ -84,13 +84,13 @@ if($isajax === true) {
 	
 	// get all the message group ids for this page
 	$msgGroupIds = QuickQueryList(
-		"(select SQL_CALC_FOUND_ROWS mg.id as id
+		"(select SQL_CALC_FOUND_ROWS mg.id as id,modified, (mg.name +0) as digitsfirst,name
 		from messagegroup mg
 		where mg.userid = ? 
 			and mg.type = 'notification'
 			and not mg.deleted)
 		UNION
-		(select mg.id as id
+		(select mg.id as id,modified, (mg.name +0) as digitsfirst,name
 		from publish p
 		inner join messagegroup mg on
 			(p.messagegroupid = mg.id)
@@ -98,6 +98,7 @@ if($isajax === true) {
 			and p.action = 'subscribe'
 			and p.type = 'messagegroup'
 			and not mg.deleted)
+		order by $orderby, id
 		limit $start, $limit", false, false, array($USER->id, $USER->id));
 
   	// total rows
