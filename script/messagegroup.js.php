@@ -149,12 +149,13 @@ function messagegroupStyleLayouts(readonly) {
 			verticaltabs[0].setStyle({'marginBottom':'20px'});
 	} else {
 		// Fix IE problem with table.SplitPane overflowing in messagegroupviewpopup.php
-		var verticaltabs = $$('table.SplitPane');
-		
-		verticaltabs.each(function(t) {
-			var splitpane = t.up('form');
-			if (splitpane) {
-				splitpane.style.paddingRight = '45px';
+		var splitpanes = $$('table.SplitPane');
+		splitpanes.each(function(pane) {
+			if (pane.down('.verticaltabscontentdiv'))
+				pane.style.width = 'auto';
+			var form = pane.up('form');
+			if (form) {
+				form.style.paddingRight = '45px';
 			}
 		});
 	}
