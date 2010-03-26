@@ -563,14 +563,17 @@ $fields = QuickQueryMultiRow("select fieldnum from fieldmap where options not li
 $ignoredFields = array();
 foreach ($fields as $fieldnum)
 	$ignoredFields[] = $fieldnum[0];
+
+$allowedfieldtypes = array('f', 'g', 'c');
+
 $formdata["datarules"] = array(
 	"label" => _L("Data Restriction"),
 	"fieldhelp" => _L('If the user should only be able to access certain data, you may create restriction rules here.'),
 	"value" => json_encode(array_values($rules)),
 	"validators" => array(
-		array("ValRules", "allowedFieldTypes" => array('f', 'g', 'c'))
+		array("ValRules", "allowedFieldTypes" => $allowedfieldtypes)
 	),
-	"control" => array("FormRuleWidget", "allowedFieldTypes" => array('f', 'g', 'c'), "ignoredFields" => $ignoredFields, "showRemoveAllButton" => true),
+	"control" => array("FormRuleWidget", "allowedFieldTypes" => $allowedfieldtypes, "ignoredFields" => $ignoredFields, "showRemoveAllButton" => true),
 	"helpstep" => 1
 );
 
