@@ -19,6 +19,7 @@ if(isset($_GET['resetdm'])){
 		window.location="dms.php";
 </script>
 <?
+		exit;
 	} else {
 		error("An error occured when trying to reset a SmartCall Appliance", "Please try again later");
 	}
