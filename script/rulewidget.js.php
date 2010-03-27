@@ -793,9 +793,9 @@ var RuleEditor = Class.create({
 			return;
 		}
 
-		this.actionTD.down('fieldset').down('div').update('<?=addslashes(icon_button(_L('Add'), 'add'))?><span style="clear:both"></span>');
+		this.actionTD.down('fieldset').down('div').update('<?=addslashes(icon_button(_L('Add'), 'add'))?><div style="width:100px; clear:both"></div>');
 		var addRuleButton = this.actionTD.down('button');
-
+		
 		// Events
 		addRuleButton.observe('click', function(event) {
 				this.ruleWidget.insert_rule(this.get_data());
