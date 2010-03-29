@@ -139,6 +139,9 @@ if($isajax === true) {
 										"content" => "",
 										"tools" => "");
 	} else {
+		// get user associated orgs
+		$authorizedorgs = Organization::getAuthorizedOrgKeys();
+		
 		while(!empty($mergeditems)) {
 			$item = array_shift($mergeditems);
 			$time = date("M j, g:i a",strtotime($item["date"]));
@@ -167,7 +170,8 @@ if($isajax === true) {
 			
 			// Users with published messages or subscribed messages will get a special action item
 			$publishactionlink = "";
-			if ($USER->authorize("publish") && userCanPublish('messagegroup')) {
+			// if the user can publish message groups and they are authorized for atleast one org
+			if ($USER->authorize("publish") && userCanPublish('messagegroup') && $authorizedorgs) {
 				// this message is published, else allow it to be
 				if ($publishaction == 'publish')
 					$publishactionlink = action_link(_L("Modify Publication"), "fugue/star__pencil", "publisheditorwiz.php?id=$itemid&type=messagegroup");

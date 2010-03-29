@@ -104,6 +104,9 @@ if (isset($_GET['ajax'])) {
 										"content" => "",
 										"tools" => "");
 	} else {
+		// get user associated orgs
+		$authorizedorgs = Organization::getAuthorizedOrgKeys();
+
 		while(!empty($mergeditems) && $limit > 0) {
 			$item = array_shift($mergeditems);
 			$time = date("M j, g:i a",strtotime($item["date"]));
@@ -129,7 +132,8 @@ if (isset($_GET['ajax'])) {
 			
 			// Users with published or subscribed lists will get a special action item
 			$publishactionlink = "";
-			if ($USER->authorize("publish") && userCanPublish('list')) {
+			// if the user can publish lists and they are authorized for atleast one org
+			if ($USER->authorize("publish") && userCanPublish('list') && $authorizedorgs) {
 				// this message is published, else allow it to be
 				if ($publishaction == 'publish')
 					$publishactionlink = action_link(_L("Modify Publication"), "fugue/star__pencil", "publisheditorwiz.php?id=$itemid&type=list");
