@@ -95,7 +95,7 @@ class ValIntroSelect extends Validator {
 			if ( 1 != QuickQuery('select count(*) from message where id=? and type=\'phone\' and languagecode=?', false, array($value["message"],$args["languagecode"]))) {
 				$errortext .= "Message can not be found";
 			} else if (Message::getAudioLength($value["message"],array()) < 70000) { // 70000 ~ 5 second audio
-				$errortext .= "Message must be more than 5 seconds long to be an intro message.";
+				$errortext .= "Intro messages must be more than 5 seconds long";
 			}		
 		}				
 		if ($errortext)

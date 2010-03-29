@@ -28,7 +28,7 @@ class ValOrgKey extends Validator {
 		// look up this orgkey to see if it already exists
 		$org = DBFind("Organization", "from organization where orgkey = ? and not deleted", false, array($value));
 		if ($org)
-			return $this->label . " " . _L("This organization key already exists. Please enter a unique organizaton key");
+			return $this->label . " " . _L("This organization name already exists. Please enter a unique organizaton name");
 		return true;
 	}
 }
