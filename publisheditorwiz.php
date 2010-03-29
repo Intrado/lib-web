@@ -21,6 +21,11 @@ if (!$USER->authorize('publish')) {
 	redirect('unauthorized.php');
 }
 
+// check that the user has at a minimum one organization autorization
+$authorizedorgs = Organization::getAuthorizedOrgKeys();
+if (!$authorizedorgs)
+	redirect('unauthorized.php');
+
 ////////////////////////////////////////////////////////////////////////////////
 // Action/Request Processing
 ////////////////////////////////////////////////////////////////////////////////
