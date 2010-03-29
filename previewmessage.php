@@ -21,6 +21,7 @@ require_once("obj/MessagePart.obj.php");
 require_once("obj/AudioFile.obj.php");
 require_once("obj/FormSelectMessage.fi.php");
 require_once("obj/Language.obj.php");
+require_once("inc/previewfields.inc.php");
 
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization
@@ -44,24 +45,8 @@ if (isset($_GET['id'])) {
 	$message = DBFind("Message", "from message where id = ?", false, array($id));
 	if($message && (userOwns("message", $id) || $USER->authorize('managesystem') || (isPublished("messagegroup", $message->messagegroupid) && userCanSubscribe("messagegroup", $message->messagegroupid)))) {
 		//find all unique fields and values used in this message
-		$messagefields = DBFindMany("FieldMap", "from fieldmap where fieldnum in (select distinct fieldnum from messagepart where messageid=?)", false, array($id));
-		if (count($messagefields) > 0) {
-			$fields = array();
-			$fielddata = array();
-			foreach ($messagefields as $fieldmap) {
-				$fields[$fieldmap->fieldnum] = $fieldmap;
-				if (!$fieldmap->isOptionEnabled("language") && $fieldmap->isOptionEnabled("multisearch")) {
-					$limit = DBFind('Rule', "from rule r inner join userassociation ua on r.id = ua.ruleid where ua.userid=? and type = 'rule' and r.fieldnum=?", "r", array($USER->id, $fieldmap->fieldnum));
-					$limitsql = $limit ? $limit->toSQL(false, 'value', false, true) : '';
-					$fielddata[$fieldmap->fieldnum] = QuickQueryList("select value,value from persondatavalues where fieldnum=? $limitsql order by value limit 5000", true, false, array($fieldmap->fieldnum));
-				}
-			}
-			// Get message parts so we can find the default values, if specified in the message
-			$messageparts = DBFindMany("MessagePart", "from messagepart where messageid = ? and type = 'V'", false, array($id));
-			$fielddefaults = array();
-			foreach ($messageparts as $messagepart)
-				$fielddefaults[$messagepart->fieldnum] = $messagepart->defaultvalue;
-		}
+
+		list($fields,$fielddata,$fielddefaults) = getpreviewfieldmapdata($id);
 		$msgType = QuickQuery("select type from message where id=?", false, array($id));
 	}
 }
@@ -137,61 +122,7 @@ if (!$id && !isset($_SESSION['ttstext']) && !isset($_GET['parentfield']) && !iss
 ////////////////////////////////////////////////////////////////////////////////
 // Form Data
 ////////////////////////////////////////////////////////////////////////////////
-$formdata = array();
-
-if (isset($fields) && count($fields) && $msgType == 'phone') {
-	foreach ($fields as $field => $fieldmap) {
-		if ($fieldmap->isOptionEnabled("firstname")) {
-			$formdata[$field] = array (
-				"label" => $fieldmap->name,
-				"value" => $USER->firstname,
-				"validators" => array(),
-				"control" => array("TextField", "maxlength" => 50, "size"=>20),
-				"helpstep" => 1
-			);
-		} else if ($fieldmap->isOptionEnabled("lastname")) {
-			$formdata[$field] = array (
-				"label" => $fieldmap->name,
-				"value" => $USER->lastname,
-				"validators" => array(),
-				"control" => array("TextField", "maxlength" => 50, "size"=>20),
-				"helpstep" => 1
-			);
-		} else if ($fieldmap->isOptionEnabled("language")) {
-			$formdata[$field] = array (
-				"label" => $fieldmap->name,
-				"value" => $fielddefaults[$field],
-				"validators" => array(),
-				"control" => array("SelectMenu", "values" => Language::getLanguageMap()),
-				"helpstep" => 1
-			);
-		} else if ($fieldmap->isOptionEnabled("multisearch")) {
-			$formdata[$field] = array (
-				"label" => $fieldmap->name,
-				"value" => $fielddefaults[$field],
-				"validators" => array(),
-				"control" => array("SelectMenu", "values" => $fielddata[$fieldmap->fieldnum]),
-				"helpstep" => 1
-			);
-		} else if ($fieldmap->isOptionEnabled("reldate")) {
-			$formdata[$field] = array (
-				"label" => $fieldmap->name,
-				"value" => $fielddefaults[$field],
-				"validators" => array(),
-				"control" => array("TextDate", "size"=>12),
-				"helpstep" => 1
-			);
-		} else {
-			$formdata[$field] = array (
-				"label" => $fieldmap->name,
-				"value" => $fielddefaults[$field],
-				"validators" => array(),
-				"control" => array("TextField", "maxlength" => 20, "size"=>20),
-				"helpstep" => 1
-			);
-		}
-	}
-}
+$formdata = getpreviewformdata($fields,$fielddata,$fielddefaults,$msgType);
 
 $buttons = array();
 if ($msgType == 'phone')

@@ -24,6 +24,7 @@ require_once("obj/MessageGroup.obj.php");
 require_once("obj/MessageAttachment.obj.php");
 require_once("obj/Language.obj.php");
 require_once("messagegroup.inc.php");
+require_once("inc/previewfields.inc.php");
 
 
 $popup = false;

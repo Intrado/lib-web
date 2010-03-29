@@ -148,23 +148,44 @@ foreach ($destinations as $type => $destination) {
 					// $attachments = DBFindMany("messageattachment","from messageattachment where messageid=?", false, array($message->id));
 					if ("html" == $subtype) { // html
 						$messagetext = Message::renderEmailHtmlParts($parts);
-					} else { // plain
+					} else {				// plain
 						$messagetext = Message::renderEmailPlainParts($parts);
 					}
-				} else { // phone
-					$messagetext = nl2br(escapehtml(Message::format($parts)));
-				}
+				} 
 
 				$messageformdata["header"] = makeFormHtml(null, null,"<div class='MessageBodyHeader'>" . _L("%s Message", $languagename) . "</div>");
-				$messagehtml = "<div class='MessageTextReadonly'>$messagetext</div>";
-					
-				if ($type == 'phone') {
-					$messagehtml .= icon_button(_L("Play"), "fugue/control",
-							"popup('previewmessage.php?id={$message->id}', 400, 400,'preview');"
-						) .
-						"<div style='clear:both'></div>";
+				$messagehtml = "";
+				if ($type != 'phone') {
+					$messagehtml .= "<div class='MessageTextReadonly'>$messagetext</div>";
+				} else { // phone
+					list($fields,$fielddata,$fielddefaults) = getpreviewfieldmapdata($message->id);
+					$messageformdata += getpreviewformdata($fields,$fielddata,$fielddefaults,"phone");
+					$hasdata = count($messageformdata) > 1;
+					$messageformdata[] = array(
+						"label" => "",
+						"control" => array("FormHtml","html" =>
+							($hasdata?submit_button(_L('Play with Field(s)'),"submit","fugue/control"):'') . '
+							<script type="text/javascript" language="javascript" src="script/niftyplayer.js.php"></script>
+							<div id="messageresultdiv" name="messageresultdiv"></div>
+							<div id="messagepreviewdiv" name="messagepreviewdiv">
+								<div align="center" style="clear:left">
+									<div id="player"></div>' .
+									($hasdata?'':'<script language="JavaScript" type="text/javascript">
+													embedPlayer("preview.wav.php/embed_preview.wav?id=' . $message->id . '","player",true);
+												</script>') .
+									'<div id="download">' . ($hasdata?'':'<a href="preview.wav.php/download_preview.wav?id=' . $message->id . '&download=true" onclick="sessiondata=false;">' . _L("Click here to download") . '</a>') .
+									'</div>
+								</div>
+							</div>
+
+						'),
+						"fieldhelp" => "",
+						"renderoptions" => array("icon" => false, "label" => false, "errormessage" => true),
+						"helpstep" => 1
+					);
+
+					//$messagetext = nl2br(escapehtml(Message::format($parts)));
 				}
-				
 				$messageformdata["message"] = makeFormHtml(null, null,$messagehtml);
 				
 				if ($message->type == 'translated')
@@ -272,8 +293,48 @@ if ($countdestinations > 0) {
 ///////////////////////////////////////////////////////////////////////////////
 // Ajax
 ///////////////////////////////////////////////////////////////////////////////
-if ($countdestinations > 0)
-	$messagegroupsplitter->handleRequest(); // Handles $_REQUEST["loadtab"]
+
+////////////////////////////////////////////////////////////////////////////////
+// Data Handling
+////////////////////////////////////////////////////////////////////////////////
+
+$messagegroupsplitter->handleRequest();
+
+///////////////////////////////////////////////////////////////////////////////
+// Submit
+///////////////////////////////////////////////////////////////////////////////
+
+if ($button = $messagegroupsplitter->getSubmit()) {
+	$form = $messagegroupsplitter->getSubmittedForm();
+	if ($form) {
+		$ajax = $form->isAjaxSubmit();
+		if (!$form->checkForDataChange() && $form->validate() === false) {
+			$postdata = $form->getData();
+			$previewdata = "";
+			foreach ($postdata as $field => $value) {
+				$previewdata .= "&$field=" . urlencode($value);
+			}
+			list($formdestinationtype, $formdestinationsubtype, $formdestinationlanguagecode) = explode('-', $form->name);
+			if ($formdestinationtype == 'phone') {
+				if (!$message = $messagegroup->getMessage('phone','voice',$formdestinationlanguagecode, 'overridden')) {
+					if (!$message = $messagegroup->getMessage('phone','voice',$formdestinationlanguagecode, 'translated')) {
+						if (!$message = $messagegroup->getMessage('phone','voice',$formdestinationlanguagecode, 'none')) {
+						}
+					}
+				}
+				error_log($form->name);
+
+				$request = ($message)?"id=$message->id":"blank=true";
+				$form->modifyElement("messageresultdiv", '
+						<script language="JavaScript" type="text/javascript">
+							embedPlayer("preview.wav.php/embed_preview.wav?' . $request . $previewdata. '","player");
+							$("download").update(\'<a href="preview.wav.php/download_preview.wav?'  . $request .  $previewdata . '&download=true" onclick="sessiondata=false;">' . _L("Click here to download") . '</a>\');
+						</script>');
+			}
+			return;
+		}
+	}
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 // Display

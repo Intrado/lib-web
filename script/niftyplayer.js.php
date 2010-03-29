@@ -116,8 +116,8 @@ function hasFlashPlayer(){
 	return (typeof(FlashHelper.getMovie('niftyPlayer1')) != 'undefined' && typeof(FlashHelper.getMovie('niftyPlayer1').PercentLoaded) != 'undefined');
 }
 
-function embedPlayer(url,target) { 
-	if(hasFlashPlayer()){
+function embedPlayer(url,target, forceload) {
+	if(forceload != true && hasFlashPlayer()){
 		niftyplayer("niftyPlayer1").loadAndPlay(url);
 	} else {
 		$(target).update('<object classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000" codebase="<?= isset($_SERVER['HTTPS'])?"https":"http" ?>://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=6,0,0,0" width="165" height="38" id="niftyPlayer1" align="">' +
