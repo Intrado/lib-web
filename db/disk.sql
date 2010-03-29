@@ -10,6 +10,7 @@ CREATE TABLE `agent` (
 CREATE TABLE `customeragent` (
  `customerid` int(11) NOT NULL,
  `agentid` int(11) NOT NULL,
+ `options` varchar(255) CHARACTER SET ascii COLLATE ascii_general_ci NOT NULL,
  PRIMARY KEY  (`customerid`,`agentid`)
 ) ENGINE=InnoDB;
 
