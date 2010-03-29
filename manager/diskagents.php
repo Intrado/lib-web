@@ -48,6 +48,12 @@ if (isset($_POST['showmatch'])) {
 }
 */
 
+if (isset($_GET['reset'])) {
+	// we use uuid instead of agent.id for the rare case that an agent is online but not in our database when it authenticated
+	// reset will cause agents to re-authenticate and pickup numpollthreads
+	resetAgent($_GET['reset']);
+}
+
 // generate new agent uuid and add to database, display in agent table
 $genstatus = false;
 if (isset($_POST['genuuid'])) {
@@ -69,19 +75,12 @@ if (isset($_POST['genuuid'])) {
 				if (!$custdb) {
 					$genstatus = "Error, failure connecting to customer database";
 				} else {
-					// TODO future release to support mulitple agents per customer
-					if (QuickQuery("select 1 from setting where name='_authdiskuuid' limit 1", $custdb)) {
-						$genstatus = "Error, customer already has agent associated";
-					} else {
-						// generate new UUID
-						$uuid = md5($newcusturl . microtime());
-						// insert into disk database
-						QuickUpdate("insert into agent (uuid, name, numpollthread) values (?, ?, 2)", $diskdb, array($uuid, $newagentname));
-						QuickUpdate("insert into customeragent (customerid, agentid) values (?, (select id from agent where uuid=?))", $diskdb, array($cid, $uuid));
-						// insert into customer database
-						QuickUpdate("insert into setting (name, value) values ('_authdiskuuid', ?)", $custdb, array($uuid));
-						$genstatus = "Success";
-					}
+					// generate new UUID
+					$uuid = md5($newcusturl . microtime());
+					// insert into disk database
+					QuickUpdate("insert into agent (uuid, name, numpollthread) values (?, ?, 2)", $diskdb, array($uuid, $newagentname));
+					QuickUpdate("insert into customeragent (customerid, agentid) values (?, (select id from agent where uuid=?))", $diskdb, array($cid, $uuid));
+					$genstatus = "Success";
 				}
 			} else {
 				$genstatus = "Error, customer not found";
@@ -125,8 +124,10 @@ function fmt_customerUrl($row, $index){
 }
 
 // index 0 is agentid
+// index 7 is uuid
 function fmt_DMActions($row, $index){
 	$url =  '<a href="editdiskagent.php?agentid=' . $row[0] . '" title="Edit"><img src="img/s-edit.png" border=0></a>&nbsp;' ;
+	$url .= '<a href="#" onclick="if(confirm(\'Are you sure you want to reset Agent ' . addslashes($row[3]) . '?\')) window.location=\'diskagents.php?reset=' . $row[7] . '\'" title="Reset"><img src="img/s-restart.png" border=0></a>&nbsp;';
 	return $url;
 }
 
@@ -178,11 +179,19 @@ while ($row = DBGetRow($result)) {
 		$row[4] = $agentprops['ip'];
 		$row[5] = $agentprops['lastseen'];
 		$row[6] = $agentprops['version'];
+		$diskserverresults[$row[7]]['existsindb'] = true;
 	}
 	if (isset($row[1]) && isset($customerlookup[$row[1]])) {
 		$row[2] = $customerlookup[$row[1]];
 	}
 	$data[] = $row;
+}
+// add any online agents that the server has, but the database does not
+foreach ($diskserverresults as $uuid => $agentprops) {
+	if (isset($agentprops['existsindb']))
+		continue;
+	// else not in db, let's add to display table
+	$data[] = array("UNKNOWN", "UNKNOWN", "UNKNOWN", "UNKNOWN", $agentprops['ip'], $agentprops['lastseen'], $agentprops['version'], $uuid, "UNKNOWN");
 }
 
 
