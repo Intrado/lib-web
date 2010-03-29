@@ -91,6 +91,12 @@ if (file_exists($logofilename) ) {
 	background-color: <?=$topbg?>;
 }
 
+.indexdisplayname {
+	font-size: 175%;
+	padding-bottom: 10px;
+	color: #<?=$primary?>;
+}
+
 .indexform {
 	font-size: 110%;
 	color: #<?=$primary?>;

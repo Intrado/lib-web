@@ -159,7 +159,8 @@ if ($IS_COMMSUITE) {
 
 <? if ($custname) { ?>
 
-	<div style="margin-top: 50px; margin-left: 25px;">
+	<div style="margin-top: 25px; margin-left: 25px;">
+		<div class="indexdisplayname"><?=escapehtml($custname)?></div>
 		<noscript><p><?=_L("It looks like you don't have JavaScript enabled! You must have JavaScript enabled for full use of this system. Please enable JavaScript in your browser or contact your system administrator for assistance.")?></p></noscript>
 
 <? if ($badlogin) { ?>
