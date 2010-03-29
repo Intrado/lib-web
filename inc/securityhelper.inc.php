@@ -56,16 +56,24 @@ function userCanSubscribe($type, $id = false) {
 	global $ACCESS;
 	$cansubscribe = in_array($type, explode("|", $ACCESS->getValue('subscribe')));
 	if ($id !== false && $cansubscribe) {
+		// check that this id is published
+		if(!isPublished($type, $id))
+			return false;
+		
 		// check if the user has restrictions
 		$userrestrictions = QuickQuery("select 1 from userassociation where userid = ? and (sectionid is not null or organizationid is not null) limit 1", false, array($USER->id));
-		$authorgs = array();
+		
 		// if they are restricted
 		if ($userrestrictions) {
 			$authorgs = Organization::getAuthorizedOrgKeys();
-			error_log(count($authorgs));
 			$args = array($id);
 			foreach ($authorgs as $orgid => $orgkey)
 				$args[] = $orgid;
+			
+			// get organization restriction sql
+			$orgrestrictionsql = "";
+			if ($authorgs)
+				$orgrestrictionsql = "or organizationid in (". DBParamListString(count($authorgs)) . ")";
 			
 			$publishedtoorg = false;
 			switch ($type) {
@@ -73,14 +81,14 @@ function userCanSubscribe($type, $id = false) {
 					$publishedtoorg = QuickQuery("
 						select 1
 						from publish
-						where action = 'publish' and type = 'messagegroup' and messagegroupid = ? and (organizationid is null or organizationid in (". DBParamListString(count($authorgs)) . ")) limit 1",
+						where action = 'publish' and type = 'messagegroup' and messagegroupid = ? and (organizationid is null $orgrestrictionsql) limit 1",
 						false, $args);
 					break;
 				case "list";
 					$publishedtoorg = QuickQuery("
 						select 1
 						from publish
-						where action = 'publish' and type = 'list' and listid = ? and (organizationid is null or organizationid in (". DBParamListString(count($authorgs)) . ")) limit 1",
+						where action = 'publish' and type = 'list' and listid = ? and (organizationid is null $orgrestrictionsql) limit 1",
 						false, $args);
 						break;
 					break;
