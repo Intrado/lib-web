@@ -28,6 +28,7 @@ require_once("obj/ValLists.val.php");
 require_once("obj/ValTimeWindowCallEarly.val.php");
 require_once("obj/ValTimeWindowCallLate.val.php");
 require_once("obj/ValNonEmptyMessage.val.php");
+require_once("obj/FormListSelect.fi.php");
 
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization
