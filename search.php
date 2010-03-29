@@ -67,6 +67,9 @@ $list = new PeopleList($_SESSION['listid']);
 // Form Data
 ////////////////////////////////////////////////////////////////////////////////
 
+$renderedlist = new RenderedList2();
+$renderedlist->pagelimit = 100;
+
 // buttons must be defined before include 'contactsearchformdata.inc'
 $buttons = array(
 	submit_button(_L('Refresh'),"refresh","arrow_refresh"),

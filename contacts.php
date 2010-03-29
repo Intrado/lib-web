@@ -33,8 +33,8 @@ include_once("obj/JobType.obj.php");
 require_once("inc/utils.inc.php");
 require_once("inc/reportgeneratorutils.inc.php");
 require_once("obj/FieldMap.obj.php");
-require_once("obj/ReportGenerator.obj.php");
-require_once("obj/ReportInstance.obj.php");
+//require_once("obj/ReportGenerator.obj.php");
+//require_once("obj/ReportInstance.obj.php");
 require_once("obj/UserSetting.obj.php");
 //require_once("obj/ContactsReport.obj.php");
 require_once("obj/RenderedList.obj.php");
@@ -52,6 +52,9 @@ if (!$USER->authorize('viewcontacts')) {
 // Action/Request Processing
 ////////////////////////////////////////////////////////////////////////////////
 
+if (isset($_GET['clear']))
+	$_SESSION['listsearch'] = array();
+	
 if (isset($_GET['showall']))
 	$_SESSION['listsearch'] = array("showall" => true);
 
@@ -59,6 +62,9 @@ if (isset($_GET['showall']))
 ////////////////////////////////////////////////////////////////////////////////
 // Form Data
 ////////////////////////////////////////////////////////////////////////////////
+
+$renderedlist = new RenderedList2();
+$renderedlist->pagelimit = 100;
 
 $buttons = array(
 	submit_button(_L('Refresh'),"refresh","arrow_refresh"),

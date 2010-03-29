@@ -1,10 +1,9 @@
 <?
 // NOTE to use this include be sure to have set the following:
+// $renderedlist = new RenderedList2();
 // $buttons = array(); of some buttons
 // $redirectpage = ""; the calling page
-
-$renderedlist = new RenderedList2();
-$renderedlist->pagelimit = 100;
+// optional $additionalformdata = array();
 
 $hassomesearchcriteria = true;
 if (isset($_SESSION['listsearch']['rules'])) {
@@ -120,6 +119,10 @@ $formdata["personsearchbutton"] = array(
 	"control" => array("FormHtml", "html" => "<div id='personsearchButtonContainer'>" . submit_button(_L('Search'),'personsearch',"magnifier") . "</div>"),
 	"helpstep" => 2
 );
+
+if (isset($additionalformdata)) {
+	$formdata = array_merge($formdata, $additionalformdata);
+}
 
 $form = new Form('listsearch',$formdata,array(),$buttons);
 $form->ajaxsubmit = true;
