@@ -216,7 +216,7 @@ startWindow('My Lists&nbsp;' . help('Lists_MyLists'));
 				}
 			?>
 			<div style="clear:both;"></div>
-			<?=(($USER->authorize('subscribe') && userCanSubscribe('messagegroup'))?icon_button(_L('Subscribe to List'),"add", "document.location='listsubscribe.php'"):'') ?>
+			<?=(($USER->authorize('subscribe') && userCanSubscribe('list'))?icon_button(_L('Subscribe to List'),"add", "document.location='listsubscribe.php'"):'') ?>
 			<div style="clear:both;"></div>
 		</div>
 		<br />
