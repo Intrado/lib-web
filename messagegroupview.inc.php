@@ -145,11 +145,11 @@ foreach ($destinations as $type => $destination) {
 				$messageformdata["message"] = makeFormHtml(null, null,"<div class='MessageTextReadonly'>$messagetext</div>");
 			} else {
 				if ($type == 'email') {
-					// $attachments = DBFindMany("messageattachment","from messageattachment where messageid=?", false, array($message->id));
-					if ("html" == $subtype) { // html
-						$messagetext = Message::renderEmailHtmlParts($parts);
-					} else {				// plain
-						$messagetext = Message::renderEmailPlainParts($parts);
+					if ($subtype == 'html') {
+						$messagetext = str_replace('<<', '&lt;&lt;', $message->format($parts));
+						$messagetext = str_replace('>>', '&gt;&gt;', $messagetext);
+					} else {
+						$messagetext = escapehtml($message->format($parts));
 					}
 				} 
 
