@@ -148,7 +148,7 @@ class ValBrandTheme extends Validator {
 		$checkval = json_decode($value);
 		$errortext = "";
 		if ($checkval->customize) {
-			if (!$checkval->theme)
+			if (!$checkval->theme || !in_array($checkval->theme, $args['values']))
 				$errortext .= " " . _L("Theme must be a valid choice.");
 			if (!((strlen($checkval->color) == 6) && is_numeric('0x'.substr($checkval->color, 0, 2)) && is_numeric('0x'.substr($checkval->color, 2, 2)) && is_numeric('0x'.substr($checkval->color, 4, 2))))
 				$errortext .= " " . _L("Primary Color must be a valid Hex representation of your color choice.");
@@ -166,7 +166,7 @@ class ValBrandTheme extends Validator {
 				vals = value.evalJSON();
 				var errortext = "";
 				if (vals.customize) {
-					if (!vals.theme)
+					if (!vals.theme || $A(args["values"]).indexOf(vals.theme) == -1)
 						errortext += " "+ "'.addslashes(_L("Theme must be a valid choice.")).'";
 					if (!(vals.color.length == 6))
 						errortext += " "+ "'.addslashes(_L("Primary Color must be a valid Hex representation of your color choice.")).'";
