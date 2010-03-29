@@ -46,10 +46,9 @@ class ValUserOrganization extends Validator {
 
 	function validate ($value, $args) {
 		if ($value) {
-			$validorgs = QuickQueryList("select id, orgkey from organization where id in (". DBParamListString(count($value)) .")", true, false, $value);
+			$validorgs = Organization::getAuthorizedOrgKeys();
 			foreach ($value as $id) {
 				if (!isset($validorgs[$id]) && ($id + 0) !== 0) {
-					error_log($id);
 					return _L('%s has invalid data selected.', $this->label);
 				}
 			}
