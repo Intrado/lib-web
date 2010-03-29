@@ -472,7 +472,7 @@ class SurveyTemplateWiz_phonemessages extends WizStep {
 			return false;
 		if (@$postdata['/phonefeatures']['amsweringmachine'] == "message" ||
 			@$postdata['/phonefeatures']['intromessage'] == "message" ||
-			@$postdata['/phonefeatures']['goodbyemessage'] == "goodbyemessage" ||
+			@$postdata['/phonefeatures']['goodbyemessage'] == "message" ||
 			@$postdata['/phonefeatures']['goodbyemessage'] == "reply")
 			return true;
 		return false;
