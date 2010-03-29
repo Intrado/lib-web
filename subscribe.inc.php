@@ -83,20 +83,29 @@ $userassociatedorgs = QuickQueryList("
 	where ua.userid = ?)",
 	false, false, array($USER->id, $USER->id));
 
+// build the argument array 
+$args = array($USER->id);
+
 // create the sql that limits results by orgs, or doesn't depending on user associations
 $orgrestrictionsql = "";
 if (count($userassociatedorgs) == 0) {
-	$orgrestrictionsql = "or 1";
+	unset($userassociatedorgs);
+	$orgrestrictionsql = "1";
 } else if (count($userassociatedorgs) == 1 && $userassociatedorgs[0] == null) {
-	// do nothing, this user is restricted to sectionid 0 and has no additional associations that provide orgs
+	// this user is restricted to sectionid 0 and has no additional associations that provide orgs
+	unset($userassociatedorgs);
+	$orgrestrictionsql = "p.organizationid is null";
 } else {
-	$orgrestrictionsql = "or p.organizationid in (" . DBParamListString(count($userassociatedorgs)) .")";
+	// user has org restrictions, add them to the args array but skip null
+	$orgcount = 0;
+	foreach ($userassociatedorgs as $index => $orgid) {
+		if ($orgid !== null) {
+			$orgcount++;
+			$args[] = $orgid;
+		}
+	}
+	$orgrestrictionsql = "(p.organizationid is null or p.organizationid in (" . DBParamListString($orgcount) ."))";
 }
-
-// build the argument array 
-$args = array($USER->id);
-foreach ($userassociatedorgs as $orgid)
-	$args[] = $orgid;
 
 if ($SUBSCRIBETYPE == 'messagegroup') {
 
@@ -110,7 +119,7 @@ if ($SUBSCRIBETYPE == 'messagegroup') {
 			(p.userid = u.id)
 		where p.userid != ?
 			and action = 'publish'
-			and (p.organizationid is null " .$orgrestrictionsql. ")
+			and " .$orgrestrictionsql. "
 		group by id
 		order by name, pubid
 		limit $start, $limit", 
@@ -133,7 +142,7 @@ if ($SUBSCRIBETYPE == 'messagegroup') {
 			(p.userid = u.id)
 		where p.userid != ?
 			and action = 'publish'
-			and (p.organizationid is null " .$orgrestrictionsql. ")
+			and " .$orgrestrictionsql. "
 		group by id
 		order by name, pubid
 		limit $start, $limit", 
