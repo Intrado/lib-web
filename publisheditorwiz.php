@@ -370,7 +370,7 @@ echo $wizard->render();
 
 endWindow();
 
-if (true) {
+if (false) {
 	startWindow("Wizard Data");
 	echo "<pre>";
 	var_dump($_SESSION['publishtargetwiz']);
