@@ -281,7 +281,9 @@ $formdata["description"] = array(
 	"label" => _L("Description"),
 	"fieldhelp" => _L('An optional description of the user.'),
 	"value" => $edituser->description,
-	"validators" => array(),
+	"validators" => array(
+		array("ValLength", "max" => 50)
+	),
 	"control" => array("TextField","maxlength" => 50, "size" => 40),
 	"helpstep" => 1
 );
@@ -448,7 +450,9 @@ $formdata["jobtypes"] = array(
 	"label" => _L("Job Type Restriction"),
 	"fieldhelp" => _L('If the user should only be able to send certain types of jobs, check the job types here. Checking nothing will allow the user to send any job type.'),
 	"value" => $userjobtypeids,
-	"validators" => array(),
+	"validators" => array(
+		array("ValInArray", "values" => array_keys($jobtypes))
+	),
 	"control" => array("MultiCheckBox", "values"=>$jobtypes),
 	"helpstep" => 2
 );
@@ -457,7 +461,9 @@ if (getSystemSetting("_hassurvey", true)) {
 		"label" => _L("Survey Type Restriction"),
 		"fieldhelp" => _L('If the user should only be able to send certain types of surveys, check the survey types here. Checking nothing will allow the user to send any survey type.'),
 		"value" => $usersurveytypes,
-		"validators" => array(),
+		"validators" => array(
+			array("ValInArray", "values" => array_keys($surveytypes))
+		),
 		"control" => array("MultiCheckBox", "values"=>$surveytypes),
 		"helpstep" => 2
 	);
@@ -478,7 +484,9 @@ if ($hasenrollment) {
 			"label" => _L("Staff ID"),
 			"fieldhelp" => _L("If the user is directly related to a staff ID and data access should be controlled based on it's value."),
 			"value" => $edituser->staffpkey,
-			"validators" => array(),
+			"validators" => array(
+				array("ValLength", "max" => 20)
+			),
 			"control" => array("TextField","maxlength" => 20, "size" => 12),
 			"helpstep" => 1
 		);
