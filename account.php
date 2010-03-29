@@ -288,6 +288,8 @@ $formdata["callearly"] = array(
 	"fieldhelp" => ("This is the earliest time to send calls. This is also determined by your security profile."),
 	"value" => $USER->getCallEarly(),
 	"validators" => array(
+		array("ValRequired"),
+		array("ValInArray", "values" => array_keys($startvalues))
 	),
 	"control" => array("SelectMenu", "values"=>$startvalues),
 	"helpstep" => 2
@@ -298,6 +300,8 @@ $formdata["calllate"] = array(
 	"fieldhelp" => ("This is the latest time to send calls. This is also determined by your security profile."),
 	"value" => $USER->getCallLate(),
 	"validators" => array(
+		array("ValRequired"),
+		array("ValInArray", "values" => array_keys($endvalues))
 	),
 	"control" => array("SelectMenu", "values"=>$endvalues),
 	"helpstep" => 2
@@ -312,6 +316,7 @@ $formdata["callmax"] = array(
 	"fieldhelp" => ("This indicates the default number of times the system should try to call an individual number before considering the message undelivered."),
 	"value" => $usercallmax,
 	"validators" => array(
+		array("ValRequired"),
 		array("ValNumber", "min" => 1, "max" => $callmax),
 		array("ValNumeric")
 	),
@@ -328,6 +333,7 @@ $formdata["maxjobdays"] = array(
 	"fieldhelp" => ("Use this menu to set the default number of days your jobs should run."),
 	"value" => $maxjobdays,
 	"validators" => array(
+		array("ValRequired"),
 		array("ValNumber", "min" => 1, "max" => $maxdays),
 		array("ValNumeric")
 	),
@@ -361,13 +367,16 @@ if ($USER->authorize('setcallerid') && !getSystemSetting('_hascallback', false))
 // Display Defaults
 $formdata[] = _L("Display Settings");
 
+$actionlinkvalues = array("both"=>"Icons and Text", "icons"=>"Icons Only", "text"=>"Text Only");
 $formdata["actionlinks"] = array(
 	"label" => _L("Action Links"),
 	"fieldhelp" => ("This determines the appearance of the Actions column on all Builder pages. You can choose to have text, icons, or both."),
 	"value" => $USER->getSetting("actionlinks","both"),
 	"validators" => array(
+		array("ValRequired"),
+		array("ValInArray", "values" => array_keys($actionlinkvalues))
 	),
-	"control" => array("SelectMenu", "values"=>array("both"=>"Icons and Text", "icons"=>"Icons Only", "text"=>"Text Only")),
+	"control" => array("SelectMenu", "values" => $actionlinkvalues),
 	"helpstep" => 3
 );
 
@@ -392,7 +401,9 @@ $formdata["brandtheme"] = array(
 		"ratio"=>$USER->getSetting('_brandratio',getSystemSetting('_brandratio')),
 		"customize"=>($USER->getSetting('_brandtheme'))?true:false
 		)),
-	"validators" => array(array("ValBrandTheme")),
+	"validators" => array(
+		array("ValBrandTheme", "values" => array_keys($COLORSCHEMES))
+	),
 	"control" => array("BrandTheme","values"=>$COLORSCHEMES,"toggle"=>true),
 	"helpstep" => 3
 );
