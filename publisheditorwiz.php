@@ -62,6 +62,21 @@ class ValUserOrganization extends Validator {
 // Form Data
 ////////////////////////////////////////////////////////////////////////////////
 
+function getPublishedOrgs($type, $id) {
+	// if it is currently published, get the published organizations
+	switch ($type) {
+		case "messagegroup":
+			$orgs = QuickQueryList("select organizationid from publish where action = 'publish' and type = 'messagegroup' and messagegroupid = ?", false, false, array($id));
+			break;
+		case "list":
+			$orgs = QuickQueryList("select organizationid from publish where action = 'publish' and type = 'list' and listid = ?", false, false, array($id));
+			break;
+		default:
+			$orgs = array();
+	}
+	return $orgs;
+}
+
 class PublishTargetWiz_publishtarget extends WizStep {
 	function getForm($postdata, $curstep) {
 		global $USER;
@@ -69,17 +84,7 @@ class PublishTargetWiz_publishtarget extends WizStep {
 		$type = $_SESSION['publishtargetwiz']['type'];
 		$id = $_SESSION['publishtargetwiz']['id'];
 		
-		// if it is currently published, get the published organizations
-		switch ($type) {
-			case "messagegroup":
-				$orgs = QuickQueryList("select organizationid from publish where action = 'publish' and type = 'messagegroup' and messagegroupid = ?", false, false, array($id));
-				break;
-			case "list":
-				$orgs = QuickQueryList("select organizationid from publish where action = 'publish' and type = 'list' and listid = ?", false, false, array($id));
-				break;
-			default:
-				$orgs = array();
-		}
+		$orgs = getPublishedOrgs($type, $id);
 		
 		$value = "";
 		// open for anyone to subscribe to it
@@ -129,23 +134,17 @@ class PublishTargetWiz_chooseorganizations extends WizStep {
 	function getForm($postdata, $curstep) {
 		global $USER;
 		
-		// if it is currently published, get the published organizations
-		switch ($_SESSION['publishtargetwiz']['type']) {
-			case "messagegroup":
-				$orgs = QuickQueryList("select organizationid from publish where action = 'publish' and type = 'messagegroup' and organizationid is not null and messagegroupid = ?", false, false, array($_SESSION['publishtargetwiz']['id']));
-				break;
-			case "list":
-				$orgs = QuickQueryList("select organizationid from publish where action = 'publish' and type = 'list' and organizationid is not null and listid = ?", false, false, array($_SESSION['publishtargetwiz']['id']));
-				break;
-			default:
-		}
+		$type = $_SESSION['publishtargetwiz']['type'];
+		$id = $_SESSION['publishtargetwiz']['id'];
+
+		$orgs = getPublishedOrgs($type, $id);
 		
 		$values = Organization::getAuthorizedOrgKeys();
 		
 		$formdata["organizationids"] = array(
 			"label" => _L('Organization(s)'),
 			"fieldhelp" => _L('Select the organizations whose users may subscribe to this item.'),
-			"value" => (isset($orgs) && $orgs)?$orgs:array(),
+			"value" => $orgs,
 			"validators" => array(
 				array("ValRequired"),
 				array("ValUserOrganization")
@@ -167,12 +166,47 @@ class PublishTargetWiz_chooseorganizations extends WizStep {
 
 class PublishTargetWiz_confirm extends WizStep {
 	function getForm($postdata, $curstep) {
-		//This should tell them what they selected. I was going to add a new formdata thing with the subscription permission choices.
+		
+		$target = $postdata['/publishtarget']['target'];
+		$type = $_SESSION['publishtargetwiz']['type'];
+		$id = $_SESSION['publishtargetwiz']['id'];
+		$orgids = isset($postdata['/chooseorganizations']['organizationids'])?$postdata['/chooseorganizations']['organizationids']:array();
+		
+		// get the published orgkeys and publish action
+		$publishaction = _L("publish");
+		if ($target == "organization") {
+			$orgkeys = QuickQueryList("select orgkey from organization where id in (". DBParamListString(count($orgids)) .") order by orgkey", false, false, $orgids);
+		} else if ($target == "anyone") {
+			$orgkeys = array("All Organizations");
+		} else if ($target == "unrestricted") {
+			$orgkeys = array("Only Top Level Users");
+		} else if ($target == "nobody") {
+			$publishaction = _L("un-publish");
+			$orgkeys = array("NO ONE");
+		}
+		
+		// get the list or message name and the localized type
+		$localizedtype = "";
+		switch ($type) {
+			case "messagegroup":
+				$name = QuickQuery("select name from messagegroup where id = ?", false, array($id));
+				$localizedtype = _L("message");
+				break;
+			case "list":
+				$name = QuickQuery("select name from list where id = ?", false, array($id));
+				$localizedtype = _L("list");
+				break;
+			default:
+				$localizedtype = _L("unknown item");
+		}
+		
+		$orgs = implode(", ", $orgkeys);
+		
+		$html = _L('<div>You are about to %1$s the %2$s called <b>%3$s</b>.<p>Permitted subscribers: <b>%4$s</b></p></div>', $publishaction, $localizedtype, $name, $orgs);
 		
 		$formdata['confirmationtext'] = array(
 			"label" => _L("Summary"),
-			"fieldhelp" => _L("TODO: Help"),
-			"control" => array("FormHtml", "html" => "<div>You are about to publish the {list or message} called <b>ITEM NAME</b>.<p>Permitted subscribers:<b> This school, that school, and the other school.</b></p></div>"),
+			"control" => array("FormHtml", "html" => $html),
 			"helpstep" => 1
 		);
 		$formdata['confirm'] = array(
@@ -260,7 +294,15 @@ class FinishPublishTargetWiz extends WizFinish {
 	}
 	
 	function getFinishPage ($postdata) {
-		return "<h1>Success!</h1><p>This item has been published and is now available to your subscribers.</p>";
+		$target = $postdata['/publishtarget']['target'];
+		
+		// get the published orgkeys and publish action
+		if ($target == "nobody")
+			$publishaction = _L("un-published");
+		else
+			$publishaction = _L("published");
+		
+		return _L("<h1>Success!</h1><p>This item has been <b>%s</b>.</p>", $publishaction);
 	}
 }
 
@@ -310,7 +352,7 @@ echo $wizard->render();
 
 endWindow();
 
-if (false) {
+if (true) {
 	startWindow("Wizard Data");
 	echo "<pre>";
 	var_dump($_SESSION['publishtargetwiz']);
