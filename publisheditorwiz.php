@@ -48,7 +48,7 @@ class ValUserOrganization extends Validator {
 		if ($value) {
 			$validorgs = Organization::getAuthorizedOrgKeys();
 			foreach ($value as $id) {
-				if (!isset($validorgs[$id]) && ($id + 0) !== 0) {
+				if (!isset($validorgs[$id])) {
 					return _L('%s has invalid data selected.', $this->label);
 				}
 			}
@@ -250,7 +250,8 @@ class FinishPublishTargetWiz extends WizFinish {
 		else if ($target == "unrestricted")
 			$addorgs[] = 0;
 		else if ($target == "organization")
-			$addorgs = $postdata['/chooseorganizations']["organizationids"];
+			foreach ($postdata['/chooseorganizations']["organizationids"] as $orgid)
+				$addorgs[] = $orgid + 0;
 		
 		Query("BEGIN");
 		
@@ -351,7 +352,7 @@ echo $wizard->render();
 
 endWindow();
 
-if (false) {
+if (true) {
 	startWindow("Wizard Data");
 	echo "<pre>";
 	var_dump($_SESSION['publishtargetwiz']);
