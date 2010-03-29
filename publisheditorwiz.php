@@ -28,8 +28,21 @@ if (!$USER->authorize('publish')) {
 if (isset($_GET['type']) && isset($_GET['id'])) {
 	// if the requested object is owned by this user and they are authorized to publish the requested type
 	if (userOwns($_GET['type'], $_GET['id']) && userCanPublish($_GET['type'])) {
-		$_SESSION['publishtargetwiz'] = array("data" => array(), "type" => $_GET['type'], "id" => $_GET['id']);
-		redirect("");
+		// check that the object requested has a valid type for publishing
+		switch ($_GET['type']) {
+			case "messagegroup":
+				$valid = QuickQuery("select 1 from messagegroup where id = ? and type = 'notification'", false, array($_GET['id']));
+				break;
+			case "list":
+				$valid = QuickQuery("select 1 from list where id = ? and type in ('person', 'section')", false, array($_GET['id']));
+				break;
+			default:
+				$valid = false;
+		}
+		if ($valid) {
+			$_SESSION['publishtargetwiz'] = array("data" => array(), "type" => $_GET['type'], "id" => $_GET['id']);
+			redirect("");
+		}
 	}
 	redirect("unauthorized.php");
 }
