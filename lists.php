@@ -33,6 +33,7 @@ if (isset($_GET['id']) && isset($_GET['remove'])) {
 	$publish = DBFind("Publish", "from publish where id = ? and action = 'subscribe' and userid = ?", false, array($_GET['id'], $USER->id));
 	if ($publish) {
 		$publish->destroy();
+		notice(_L("The subscription was removed."));
 	}
 	redirect();
 }
@@ -49,9 +50,18 @@ if (isset($_GET['delete'])) {
 		$_SESSION['listid'] = NULL;
 	if (userOwns("list",$deleteid)) {
 		$list = new PeopleList($deleteid);
+		Query("BEGIN");
 		//QuickUpdate("delete from listentry where listid='$deleteid'");
 		QuickUpdate("update list set deleted=1 where id=?", false, array($list->id));
 		notice(_L("The list, %s, is now deleted.", escapehtml($list->name)));
+		// if there are any publish records for this list, remove them
+		if (isPublished('list', $list->id)) {
+			$publications = DBFindMany("Publish", "from publish where type = 'list' and listid = ?", false, array($list->id));
+			foreach ($publications as $publish)
+				$publish->destroy();
+			notice(_L("The list, %s, is now un-published. Any subscriptions were also removed.", escapehtml($list->name)));
+		}
+		Query("COMMIT");
 	} else {
 		notice(_L("You do not have permission to delete this list."));
 	}

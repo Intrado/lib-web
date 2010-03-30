@@ -24,9 +24,9 @@ if (!$USER->authorize(array('sendmessage', 'sendemail', 'sendphone', 'sendsms'))
 	redirect('unauthorized.php');
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// Action/Request Processing
-////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+// Request processing:
+///////////////////////////////////////////////////////////////////////////////
 
 // requests to remove a publishid
 if (isset($_GET['id']) && isset($_GET['remove'])) {
@@ -34,13 +34,10 @@ if (isset($_GET['id']) && isset($_GET['remove'])) {
 	$publish = DBFind("Publish", "from publish where id = ? and action = 'subscribe' and userid = ?", false, array($_GET['id'], $USER->id));
 	if ($publish) {
 		$publish->destroy();
+		notice(_L("The subscription was removed."));
 	}
 	redirect();
 }
-
-///////////////////////////////////////////////////////////////////////////////
-// Request processing:
-///////////////////////////////////////////////////////////////////////////////
 
 if (isset($_GET['delete'])) {
 	$deleteid = $_GET['delete'];
@@ -52,12 +49,20 @@ if (isset($_GET['delete'])) {
 		QuickUpdate("update messagegroup set deleted=1 where id=?",false,array($deleteid));
 		QuickUpdate("update message set deleted=1 where messagegroupid=?",false,array($deleteid));
 		QuickUpdate("delete from publish where type = 'messagegroup' and messagegroupid = ?", false, array($deleteid));
-		Query("COMMIT");
 		notice(_L("The message, %s, is now deleted.", escapehtml($message->name)));
-		redirect();
+		// if there are any publish records for this messagegroup, remove them
+		if (isPublished('messagegroup', $message->id)) {
+			$publications = DBFindMany("Publish", "from publish where type = 'messagegroup' and messagegroupid = ?", false, array($message->id));
+			foreach ($publications as $publish)
+				$publish->destroy();
+			notice(_L("The message, %s, is now un-published. Any subscriptions were also removed.", escapehtml($message->name)));
+		}
+		Query("COMMIT");
 	} else {
 		notice(_L("You do not have permission to delete this message."));
 	}
+	
+	redirect();
 }
 
 $isajax = isset($_GET['ajax']);
