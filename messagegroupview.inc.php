@@ -322,8 +322,6 @@ if ($button = $messagegroupsplitter->getSubmit()) {
 						}
 					}
 				}
-				error_log($form->name);
-
 				$request = ($message)?"id=$message->id":"blank=true";
 				$form->modifyElement("messageresultdiv", '
 						<script language="JavaScript" type="text/javascript">
