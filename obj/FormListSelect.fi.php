@@ -27,7 +27,8 @@ class FormListSelect extends FormItem {
 		// look up the list details for lists in $value
 		$listdetails = array();
 		foreach ($value as $listid) {
-			if (userOwns('list', $listid) || isSubscribed('list', $listid)) {
+			// only get list stats if the user has access to the listid, ignore invalid listids
+			if (isset($lists[$listid])) {
 				$list = new PeopleList($listid);
 				$renderedlist = new RenderedList2();
 				$renderedlist->initWithList($list);
@@ -48,7 +49,7 @@ class FormListSelect extends FormItem {
 		
 		// add a checkbox for every list this user can use and check ones already selected
 		foreach ($lists as $id => $name) {
-			$checked = in_array($id, $value);
+			$checked = isset($listdetails[$id]);
 			$str .= '<div><input id="'. "$n-$id" .'" name="'.$n.'[]" type=checkbox value="'. $id .'" '. ($checked?'checked':'') .' onclick="formlistselectcheck(this.id, \''.$n.'\')"/>
 			<label for="'. "$n-$id" .'">'. $name .'</label></div>';
 		}
