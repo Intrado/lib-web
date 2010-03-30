@@ -106,10 +106,8 @@ function handleFileUpload($formitemname, $maxfilesizebytes, $unsafeext = null, $
 			$uploaderror = true;
 			break;
 		case UPLOAD_ERR_NO_FILE:
-			if (CheckFormSubmit($form,"upload")) {
-				$errormessage .= "Please select a file to upload";
-				$uploaderror = true;
-			}
+			$errormessage .= "Please select a file to upload";
+			$uploaderror = true;
 			break;
 		case UPLOAD_ERR_NO_TMP_DIR:
 		case UPLOAD_ERR_CANT_WRITE:
