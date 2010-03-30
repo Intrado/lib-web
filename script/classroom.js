@@ -92,8 +92,9 @@
 		var contactlink = checkedcache.get(contactid);
 		var img = $('c-' + contactid + '-' + category);
 		if(isChecked) {
-			if(contactlink.get(messageid) == undefined || comment !== false) {
-				if(img != undefined) {
+			var link = contactlink.get(messageid);
+			if(link == undefined || comment !== false) {
+				if(link == undefined && img != undefined) {
 					img.src = categoryinfo.get(category).img;
 					var title = img.title;
 					img.title = (parseInt(title) + 1)  + img.title.substr(title.indexOf(" "));
@@ -195,6 +196,7 @@
 		if(remark.length > 20)
 			remark = remark.substring(0, 20) + '...';
 		$(prefix + 'prem' + id).update(remark.escapeHTML());
+		$(prefix + 'prem' + id).show();
 	}
 
 	function highlight(obj) {
@@ -482,7 +484,7 @@
 				if(!confirm('Multiple Remarks. Editing will replace all previous remarks.'))
 					return;
 			}
-
+			$(c_prefix + 'prem' + msgid).next('a').hide();
 			$(c_prefix + 'txt-' + msgid).setStyle('height:auto');
 			event.target.hide();
 			$(htmlid).setStyle('height:auto');
