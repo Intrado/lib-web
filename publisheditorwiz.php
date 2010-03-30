@@ -33,13 +33,13 @@ if (!$authorizedorgs)
 if (isset($_GET['type']) && isset($_GET['id'])) {
 	// if the requested object is owned by this user and they are authorized to publish the requested type
 	if (userOwns($_GET['type'], $_GET['id']) && userCanPublish($_GET['type'])) {
-		// check that the object requested has a valid type for publishing
+		// check that the object requested isn't deleted and has a valid type for publishing
 		switch ($_GET['type']) {
 			case "messagegroup":
-				$valid = QuickQuery("select 1 from messagegroup where id = ? and type = 'notification'", false, array($_GET['id']));
+				$valid = QuickQuery("select 1 from messagegroup where id = ? and type = 'notification' and not deleted", false, array($_GET['id']));
 				break;
 			case "list":
-				$valid = QuickQuery("select 1 from list where id = ? and type in ('person', 'section')", false, array($_GET['id']));
+				$valid = QuickQuery("select 1 from list where id = ? and type in ('person', 'section') and not deleted", false, array($_GET['id']));
 				break;
 			default:
 				$valid = false;
