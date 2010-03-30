@@ -72,7 +72,7 @@ startWindow("Select a Template"  . help('Reports_SelectATemplate'), 'padding: 3p
 		<tr class="listHeader">
 			<th align="left" class="nosort">Job and Date Range</th>
 			<th align="left" class="nosort">Individual</th>
-<? if ($USER->authorize('viewsystemreports') || $USER->authorize('createreport')) { ?>
+<? if ($USER->authorize('viewsystemreports')) { ?>
 			<th align="left" class="nosort">Other</th>
 <? } ?>
 		</tr>
@@ -112,15 +112,11 @@ startWindow("Select a Template"  . help('Reports_SelectATemplate'), 'padding: 3p
 <?  } ?>
 				</table>
 			</td>
-<? if ($USER->authorize('viewsystemreports') || $USER->authorize('createreport')) { ?>
+<? if ($USER->authorize('viewsystemreports')) { ?>
 			<td>
 				<table>
-<? if ($USER->authorize('viewsystemreports')) { ?>
 					<tr><td><a href='reportarchive.php' >Systemwide Report Archive</a></td></tr>
-<? } ?>
-<? if ($USER->authorize('createreport')) { ?>
 					<tr><td><a href='reportcontactchange.php?clear=1' >Contact Information Changes</a></td></tr>
-<? } ?>
 				</table>
 			</td>
 <? } ?>
