@@ -86,7 +86,26 @@ $TITLE = "Contact Database";
 
 include_once("nav.inc.php");
 
-require_once("script/contactsearch.js.php");
+?>
+	<script src="script/contactsearch.js.php" type="text/javascript"></script>
+
+	<script type="text/javascript">
+		document.observe('dom:loaded', function() {
+			ruleWidget.delayActions = true;
+			ruleWidget.container.observe('RuleWidget:AddRule', rulewidget_add_rule);
+			ruleWidget.container.observe('RuleWidget:DeleteRule', rulewidget_delete_rule);
+		
+<?
+			if (isset($_SESSION['listsearch']['individual']))
+				echo 'choose_search_by_person();';
+			else if (isset($_SESSION['listsearch']['sectionids']))
+				echo 'choose_search_by_sections();';
+			else 
+				echo 'choose_search_by_rules();';
+?>
+		});
+	</script>
+<?
 
 startWindow("Search Options");
 

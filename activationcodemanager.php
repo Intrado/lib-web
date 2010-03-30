@@ -319,41 +319,54 @@ if ($csv) {
 	$TITLE = _L("Activation Code Manager");
 
 	include_once("nav.inc.php");
-	
-	require_once("script/contactsearch.js.php");
+?>
+	<script src="script/contactsearch.js.php" type="text/javascript"></script>
 
-	?>
-		<script type="text/javascript">
+	<script type="text/javascript">
+		document.observe('dom:loaded', function() {
+			ruleWidget.delayActions = true;
+			ruleWidget.container.observe('RuleWidget:AddRule', rulewidget_add_rule);
+			ruleWidget.container.observe('RuleWidget:DeleteRule', rulewidget_delete_rule);
+		
+<?
+			if (isset($_SESSION['listsearch']['individual']))
+				echo 'choose_search_by_person();';
+			else if (isset($_SESSION['listsearch']['sectionids']))
+				echo 'choose_search_by_sections();';
+			else 
+				echo 'choose_search_by_rules();';
+?>
+		});
 
-			function confirmGenerate () {
-			<?
-				$hassome = true; // TODO
-				if ($hassome) {
-					$str = addslashes(_L("Are you sure you want to generate activation codes for these people?"));
-					echo "
-						return confirm('$str');
-					";
-				} else {
-					$str = addslashes(_L("There are no people in this list."));
-					echo "
-						window.alert('$str');
-						return false;
-					";
-				}
-			?>
-			}
-
-			function confirmGenerateActive () {
-			<?
-				$str = addslashes(_L("Some activation codes exist in this list.  Are you sure you want to overwrite them?"));
+		function confirmGenerate () {
+		<?
+			$hassome = true; // TODO
+			if ($hassome) {
+				$str = addslashes(_L("Are you sure you want to generate activation codes for these people?"));
 				echo "
 					return confirm('$str');
 				";
-			?>
+			} else {
+				$str = addslashes(_L("There are no people in this list."));
+				echo "
+					window.alert('$str');
+					return false;
+				";
 			}
+		?>
+		}
+
+		function confirmGenerateActive () {
+		<?
+			$str = addslashes(_L("Some activation codes exist in this list.  Are you sure you want to overwrite them?"));
+			echo "
+				return confirm('$str');
+			";
+		?>
+		}
 			
-		</script>
-	<?
+	</script>
+<?
 
 	startWindow("Contact Search", "padding: 3px;");
 
