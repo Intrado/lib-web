@@ -9,7 +9,7 @@
  * @return unknown_type
  */
 function showRenderedListTable($renderedlist, $list = false) {
-	global $PAGEINLISTMAP;
+	global $PAGEINLISTMAP,$USER;
 	static $tableidcounter = 1;
 	
 	
