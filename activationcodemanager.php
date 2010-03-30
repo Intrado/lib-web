@@ -322,6 +322,8 @@ if ($csv) {
 	<script src="script/contactsearch.js.php" type="text/javascript"></script>
 
 	<script type="text/javascript">
+		<? Validator::load_validators(array("ValSections", "ValRules")); ?>
+
 		document.observe('dom:loaded', function() {
 			ruleWidget.delayActions = true;
 			ruleWidget.container.observe('RuleWidget:AddRule', rulewidget_add_rule);

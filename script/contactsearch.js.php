@@ -5,8 +5,6 @@ header("Content-Type: text/javascript");
 header("Cache-Control: private");
 ?>
 
-Validator::load_validators(array("ValSections", "ValRules"));
-
 function choose_search_by_rules() {
 	$('searchByRules').checked = true;
 	$('ruleWidgetContainer').up('tr').show();
