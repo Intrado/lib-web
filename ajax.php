@@ -180,6 +180,7 @@ function handleRequest() {
 					continue;
 				$list = new PeopleList($id+0);
 				$renderedlist = new RenderedList2();
+				$renderedlist->pagelimit = 0;
 				$renderedlist->initWithList($list);
 				$stats[$list->id]= array(
 					'name' => $list->name,
