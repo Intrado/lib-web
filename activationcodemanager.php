@@ -182,7 +182,6 @@ function showRenderedListTableCM($renderedlist) {
 	$renderedlist->pageoffset = $pagestart;
 	$renderedlist->orderby = $ordering;
 
-error_log("pagestart ".$pagestart);
 	$data = $renderedlist->getPageData();
 
 	$total = $renderedlist->getTotal();
@@ -340,8 +339,7 @@ if ($csv) {
 
 		function confirmGenerate () {
 		<?
-			$hassome = true; // TODO
-			if ($hassome) {
+			if ($renderedlist->getTotal()) {
 				$str = addslashes(_L("Are you sure you want to generate activation codes for these people?"));
 				echo "
 					return confirm('$str');
