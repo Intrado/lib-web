@@ -68,6 +68,17 @@ function fmt_destination ($row,$index) {
 	return "&nbsp;";
 }
 
+//used by renderedlist to format dest
+function fmt_renderedlist_destination_sequence($row, $index){
+	// destination type is +2 to the sequence index
+	$typeindex = $index+2;
+	if($row[$typeindex] != "" || $row[$typeindex] != false){
+		return escapehtml(destination_label($row[$typeindex], $row[$index]));
+	} else {
+		return "";
+	}
+}
+
 function fmt_languagecode ($row,$index) {
 	return escapehtml(Language::getName($row[$index]));
 }
@@ -123,6 +134,18 @@ function fmt_idmagnify ($row,$index) {
 	$result .= "&nbsp;". escapehtml($row[$index]);
 	return $result;
 }
+
+
+function fmt_persontip ($row, $index) {
+	global $USER;
+
+	$pkey = escapehtml($row[1]);
+	$personid = $row[0];
+	
+	return "<a href=\"viewcontact.php?id=$personid\" class=\"actionlink\">" 
+		. "<img src=\"img/icons/diagona/16/049.gif\" /> $pkey</a>";
+}
+
 
 function fmt_jobs_actions ($obj, $name) {
 	return action_links(jobs_actionlinks ($obj));

@@ -35,7 +35,9 @@ if (!$USER->authorize('createlist')) {
 
 //get the message to edit from the request params or session
 if (isset($_GET['id'])) {
-	setCurrentList($_GET['id']);
+	$listid = $_GET['id'] + 0;
+	if (userOwns("list",$listid) || isSubscribed("list",$listid))
+		$_SESSION['previewlistid'] = $listid;
 	$_SESSION['listreferer'] = isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : 'list.php';
 	redirect();
 }
@@ -43,7 +45,7 @@ if (isset($_GET['id'])) {
 handle_list_checkbox_ajax(); //for handling check/uncheck from the list
 
 
-$list = new PeopleList($_SESSION['listid']);
+$list = new PeopleList($_SESSION['previewlistid']);
 
 if($list->type == 'alert')
 	redirect('unauthorized.php');
@@ -59,7 +61,7 @@ $renderedlist->pagelimit = 100;
 ////////////////////////////////////////////////////////////////////////////////
 
 $PAGE = "notifications:lists";
-$TITLE = 'List Preview: ' . escapehtml(QuickQuery("select name from list where id = $_SESSION[listid]"));
+$TITLE = 'List Preview: ' . escapehtml($list->name);
 
 include_once("nav.inc.php");
 

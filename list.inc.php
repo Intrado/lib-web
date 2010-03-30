@@ -13,7 +13,7 @@ function showRenderedListTable($renderedlist, $list = false) {
 	static $tableidcounter = 1;
 	
 	
-	$validsortfields = array("pkey" => "ID#");
+	$validsortfields = array("pkey" => "Unique ID");
 	foreach (FieldMap::getAuthorizedFieldMapsLike("f") as $fieldmap) {
 		$validsortfields[$fieldmap->fieldnum] = $fieldmap->name;
 	}
@@ -27,7 +27,7 @@ function showRenderedListTable($renderedlist, $list = false) {
 		else if (isset($validsortfields[$_GET["sort$x"]])) {
 			$ordering[$x] = array($_GET["sort$x"],isset($_GET["desc$x"]));
 		}
-	}	
+	}
 	$_SESSION['showlistorder'] = $ordering = array_values($ordering); //remove gaps
 	
 	
@@ -37,7 +37,9 @@ function showRenderedListTable($renderedlist, $list = false) {
 	$data = $renderedlist->getPageData();
 	$total = $renderedlist->getTotal();
 	
-	if ($list)
+	$showinlist = $list && $list->userid == $USER->id;
+	
+	if ($showinlist)
 		$PAGEINLISTMAP = $renderedlist->getPageInListMap($list);
 	
 	$titles = array();
@@ -46,7 +48,7 @@ function showRenderedListTable($renderedlist, $list = false) {
 	$groupby = 0; //personid
 	
 	//set up formatters and titles for the basic fields.
-	if ($list) {
+	if ($showinlist) {
 		$titles[0] = "In List";
 		$formatters[0] = "fmt_checkbox";	
 	}
@@ -58,7 +60,7 @@ function showRenderedListTable($renderedlist, $list = false) {
 	$titles[7] = FieldMap::getName(FieldMap::getLastNameField());
 
 	$titles[2] = "Sequence";
-	$formatters[2] = "fmt_list_destination_sequence";
+	$formatters[2] = "fmt_renderedlist_destination_sequence";
 	
 	$titles[3] = "Destination";
 	$formatters[3] = "fmt_destination";
@@ -76,7 +78,7 @@ function showRenderedListTable($renderedlist, $list = false) {
 	
 	$tableid = "renderedlist". $tableidcounter++;
 	$optionalfields = array_merge(FieldMap::getOptionalAuthorizedFieldMapsLike('f'), FieldMap::getAuthorizedFieldMapsLike('g'));
-	$optionalfieldstart = $list ? 6 : 5; //table col of last non optional field
+	$optionalfieldstart = $showinlist ? 6 : 5; //table col of last non optional field
 	select_metadata($tableid,$optionalfieldstart,$optionalfields);
 	showSortMenu($validsortfields,$ordering);
 	
@@ -149,28 +151,6 @@ function handle_list_checkbox_ajax () {
 	}
 }
 
-function fmt_persontip ($row, $index) {
-	global $USER;
-
-	$pkey = escapehtml($row[1]);
-	$personid = $row[0];
-	
-	return "<a href=\"viewcontact.php?id=$personid\" class=\"actionlink\">" 
-		. "<img src=\"img/icons/diagona/16/049.gif\" /> $pkey</a>";
-}
-
-
-function fmt_list_destination_sequence($row, $index){
-	// destination type is +2 to the sequence index
-	$typeindex = $index+2;
-	if($row[$typeindex] != "" || $row[$typeindex] != false){
-		return escapehtml(destination_label($row[$typeindex], $row[$index]));
-	} else {
-		return "";
-	}
-}
-
-
 function fmt_checkbox($row, $index) {
 	global $PAGEINLISTMAP;
 	
@@ -183,6 +163,31 @@ function fmt_checkbox($row, $index) {
 	$onclick = "do_ajax_listbox(this, $personid);";
 	return "<input type=\"checkbox\" onclick=\"$onclick\" $checked />";
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 /************************ PAST THIS POINT THERE BE DRAGONS ************************************/
