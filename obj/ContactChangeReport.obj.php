@@ -5,21 +5,18 @@
 class ContactChangeReport extends ReportGenerator {
 
 	function generateQuery(){
-		global $USER;
 		$hassms = getSystemSetting("_hassms", false);
 
 		$this->params = $this->reportinstance->getParameters();
 		$this->reporttype = $this->params['reporttype'];
 
 		$orderquery = getOrderSql($this->params);
-		$rules = isset($this->params['rules']) ? $this->params['rules'] : array();
-		$rulesql = $USER->getRuleSql($rules, "p", false); //add in any user SQL rules
-		$orgsql = getOrgSql($this->params);
 
-		$userJoin = " and p.userid = '$USER->id' ";
-
-		$userorgsql = getUserOrganizationSql();
-
+		$orgsql = "";
+		if (isset($this->params['organizationids']) && count($this->params['organizationids'])) {
+			$orgsql = "and pa.organizationid in ('". implode("','", $this->params['organizationids']) ."')";
+		}
+		
 		$reldate = "today";
 		if(isset($this->params['reldate']))
 			$reldate = $this->params['reldate'];
@@ -42,7 +39,6 @@ class ContactChangeReport extends ReportGenerator {
 			$peoplequery = " and false ";
 		}
 
-		$personquery = "";
 		$orgfieldquery = generateOrganizationFieldQuery("p.id");
 		$fieldquery = generateFields("p");
 		$gfieldquery = generateGFieldQuery("p.id");
@@ -65,11 +61,10 @@ class ContactChangeReport extends ReportGenerator {
 					from person p
 					left join address a on (a.personid = p.id)
 					left join language l on (l.code = p." . FieldMap::GetLanguageField() . ")
+					left join personassociation pa on (pa.personid = p.id)
 					where not p.deleted
 					and p.type='system'
 					$peoplequery
-					$userorgsql
-					$rulesql
 					$orgsql
 					$orderquery
 					";
@@ -431,11 +426,11 @@ class ContactChangeReport extends ReportGenerator {
 
 		$ordering = array();
 		$ordering["ID#"] = "p.pkey";
-
+		$ordering["Organization"] = "org";
+		
 		foreach($fields as $field){
 			$ordering[$field->name]= "p." . $field->fieldnum;
 		}
-		$ordering["Address"] = "address";
 		return $ordering;
 	}
 }
