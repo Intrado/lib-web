@@ -100,7 +100,6 @@ class RenderedListCM extends RenderedList2 {
 	}
 	
 	function getPageData() {
-error_log("getpagedata");
 		if ($this->pagedata !== false)
 			return $this->pagedata;
 		
