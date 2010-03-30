@@ -1855,10 +1855,13 @@ class JobWiz_submitConfirm extends WizStep {
 		unset($lists['addme']);
 		$calctotal = $postdata["/list"]["addme"] ? 1 : 0;
 		foreach ($lists as $id) {
+			if (!userOwns('list', $id) && !isSubscribed("list", $id))
+				continue;
 			$list = new PeopleList($id+0);
-			$renderedlist = new RenderedList2($list);
+			$renderedlist = new RenderedList2();
 			$renderedlist->pagelimit = 0;
-			$calctotal = $calctotal + $renderedlist->total;
+			$renderedlist->initWithList($list);
+			$calctotal = $calctotal + $renderedlist->getTotal();
 		}
 
 		$formdata = array($this->title);
