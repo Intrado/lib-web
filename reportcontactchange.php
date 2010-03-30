@@ -16,12 +16,84 @@ require_once("inc/form.inc.php");
 require_once("inc/reportutils.inc.php");
 require_once("obj/UserSetting.obj.php");
 require_once("obj/ReportGenerator.obj.php");
+require_once("obj/Validator.obj.php");
+require_once("obj/Form.obj.php");
+require_once("obj/FormItem.obj.php");
+require_once("obj/ContactChangeReport.obj.php");
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization
 ////////////////////////////////////////////////////////////////////////////////
-if (!($USER->authorize('createreport'))) {
+if (!($USER->authorize('viewsystemreports'))) {
 	redirect('unauthorized.php');
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Custom Form Controls And Validators
+////////////////////////////////////////////////////////////////////////////////
+
+class RestrictedValues extends FormItem {
+	var $clearonsubmit = true;
+	var $clearvalue = array();
+	
+	function render ($value) {
+		$n = $this->form->name."_".$this->name;
+
+		$label = (isset($this->args['label']) && $this->args['label'])? $this->args['label']: _L('Restrict to these organizations:');
+		$restrictchecked = count($value) > 0 ? "checked" : "";
+		$str = '<input type="checkbox" id="'.$n.'-restrict" '.$restrictchecked .' onclick="restrictcheck(\''.$n.'-restrict\', \''.$n.'\')"><label for="'.$n.'-restrict">'.$label.'</label>';
+
+		$str .= '<div id='.$n.' class="radiobox" style="margin-left: 1em;">';
+
+		$counter = 1;
+		foreach ($this->args['values'] as $checkvalue => $checkname) {
+			$id = $n.'-'.$counter;
+			$checked = $value == $checkvalue || (is_array($value) && in_array($checkvalue, $value));
+			$str .= '<input id="'.$id.'" name="'.$n.'[]" type="checkbox" value="'.escapehtml($checkvalue).'" '.($checked ? 'checked' : '').'  onclick="datafieldcheck(\''.$id.'\', \''.$n.'-restrict\')"/><label id="'.$id.'-label" for="'.$id.'">'.escapehtml($checkname).'</label><br />
+				';
+			$counter++;
+		}
+		$str .= '</div>
+		';
+		return $str;
+	}
+	
+	function renderJavascript($value) {
+		return '
+		//if we uncheck the restrict box, uncheck each field
+		function restrictcheck(restrictcheckbox, checkboxdiv) {
+			restrictcheckbox = $(restrictcheckbox);
+			checkboxdiv = $(checkboxdiv);
+			if (!restrictcheckbox.checked) {
+				checkboxdiv.descendants().each(function(e) {
+					e.checked = false;
+				});
+			}
+		}
+
+		// if a data field is checked. Check the restrict box
+		function datafieldcheck(checkbox, restrictcheckbox) {
+			checkbox = $(checkbox);
+			restrictcheckbox = $(restrictcheckbox);
+			if (checkbox.checked)
+					restrictcheckbox.checked = true;
+		}';
+	}
+}
+
+class ValOrganization extends Validator {
+	var $onlyserverside = true;
+
+	function validate ($value, $args) {
+		if ($value) {
+			$validorgs = QuickQueryList("select id, orgkey from organization where id in (". DBParamListString(count($value)) .")", true, false, $value);
+			foreach ($value as $id)
+				if (!isset($validorgs[$id]))
+					return _L('%s has invalid data selected.', $this->label);
+		}
+		return true;
+	}
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -62,76 +134,136 @@ if(isset($_GET['reportid'])){
 	}
 }
 
-$f="reports";
-$s="contactchange";
-$reload=0;
+$fields = FieldMap::getOptionalAuthorizedFieldMaps() + FieldMap::getOptionalAuthorizedFieldMapsLike('g');
 
-if(CheckFormSubmit($f, $s) || CheckFormSubmit($f, "save") || CheckFormSubmit($f, "view"))
-{
-	if(CheckFormInvalid($f))
-	{
-		error('Form was edited in another window, reloading data');
-		$reload = 1;
-	}
-	else
-	{
-		MergeSectionFormData($f, $s);
-		//do check
+$validOrdering = ContactChangeReport::getOrdering();
 
-		$startdate = TrimFormData($f, $s, "startdate");
-		$enddate = TrimFormData($f, $s, "enddate");
+$formdata = array();
 
-		if(GetFormData($f, $s, "relativedate") != "xdays") {
-			PutFormData($f, $s, 'xdays',"", "number");
-		} else {
-			TrimFormData($f, $s,'xdays');
-		}
-		
-		$radio = GetFormData($f, $s, "radioselect");
-		
-		if( CheckFormSection($f, $s) ) {
-			error('There was a problem trying to save your changes', 'Please verify that all required field information has been entered properly');
-		} else if((GetFormData($f, $s, "relativedate") == "daterange") && !strtotime($startdate)){
-			error('Beginning Date is not in a valid format.  February 1, 2007 would be 02/01/07');
-		} else if((GetFormData($f, $s, "relativedate") == "daterange") && !strtotime($enddate)){
-			error('Ending Date is not in a valid format.  February 1, 2007 would be 02/01/07');
-		} else if((GetFormData($f, $s, "relativedate") == "xdays") && GetFormData($f, $s, "xdays") == ""){
-			error('You must enter a number for X days');
-		} else {
-			$options = array();
-			$options['reldate'] = GetFormData($f, $s, "relativedate");
+$formdata["dateoptions"] = array(
+	"label" => _L("Date Option"),
+	"fieldhelp" => _L("Use this menu to search by the date the contact information was updated."),
+	"value" => json_encode(array(
+		"reldate" => isset($options['reldate']) ? $options['reldate'] : 'today',
+		"xdays" => isset($options['lastxdays']) ? $options['lastxdays'] : '',
+		"startdate" => isset($options['startdate']) ? $options['startdate'] : '',
+		"enddate" => isset($options['enddate']) ? $options['enddate'] : ''
+	)),
+	"control" => array("ReldateOptions"),
+	"validators" => array(array("ValReldate")),
+	"helpstep" => 1
+);
 
-			if($options['reldate'] == "xdays"){
-				$options['lastxdays'] = GetFormData($f, $s, "xdays")+0;
-			} else if($options['reldate'] == "daterange"){
-				$options['startdate'] = $startdate;
-				$options['enddate'] = $enddate;
+$orgs = QuickQueryList("select id, orgkey from organization where not deleted order by orgkey", true);
+$selectedorgs = array();
+if (isset($_SESSION['report']['options']['organizationids'])) {
+	$selectedorgs = $_SESSION['report']['options']['organizationids'];
+}
+$formdata["organizationids"] = array(
+	"label" => _L("Organizations"),
+	"fieldhelp" => _L("Use this menu to narrow your report results to those contacts belonging to the selected organizations."),
+	"value" => $selectedorgs,
+	"control" => array("RestrictedValues", "values" => $orgs),
+	"validators" => array(
+		array("ValInArray","values" => array_keys($orgs))
+	),
+	"helpstep" => 1
+);
+
+$formdata[] = _L("Display Options");
+
+$formdata["displayoptions"] = array(
+	"label" => _L("Display Fields"),
+	"fieldhelp" => _L("Select which fields you would like to display in your report."),
+	"control" => array("FormHtml", "html" => "<div id='metadataDiv'></div>"),
+	"helpstep" => 1
+);
+
+$formdata["multipleorderby"] = array(
+	"label" => _L('Sort By'),
+	"fieldhelp" => _L("Choose which field you would like to sort the results by."),
+	"value" => !empty($validOrdering) ? $validOrdering : '',
+	"control" => array("MultipleOrderBy", "count" => 3, "values" => $validOrdering),
+	"validators" => array(),
+	"helpstep" => 1
+);
+
+
+$buttons = array(
+	icon_button(_L('Back'), 'tick', null, 'reports.php'),
+	submit_button(_L("View Report"),"view","arrow_refresh"),
+	submit_button(_L("Save/Schedule"),"save","arrow_refresh")
+);
+
+$form = new Form('reportcallssearch',$formdata,array(),$buttons);
+$form->ajaxsubmit = true;
+///////////////////////////////////////////////////////////
+// FORM HANDLING
+$form->handleRequest();
+
+$datachange = false;
+$errors = false;
+
+//check for form submission
+if ($button = $form->getSubmit()) { //checks for submit and merges in post data
+	$ajax = $form->isAjaxSubmit(); //whether or not this requires an ajax response
+
+	if ($form->checkForDataChange()) {
+		$datachange = true;
+	} else if (($errors = $form->validate()) === false) { //checks all of the items in this form
+		$postdata = $form->getData(); //gets assoc array of all values {name:value,...}
+
+		if ($ajax) {
+			$_SESSION['report']['options']['reporttype'] = "contactchangereport";
+
+			$dateOptions = json_decode($postdata['dateoptions'], true);
+			if (!empty($dateOptions['reldate'])) {
+				$_SESSION['report']['options']['reldate'] = $dateOptions['reldate'];
+
+				if ($dateOptions['reldate'] == 'xdays' && isset($dateOptions['xdays'])) {
+					$_SESSION['report']['options']['lastxdays'] = $dateOptions['xdays'] + 0;
+				} else if ($dateOptions['reldate'] == 'daterange') {
+					if (!empty($dateOptions['startdate']))
+						$_SESSION['report']['options']['startdate'] = $dateOptions['startdate'];
+					if (!empty($dateOptions['enddate']))
+						$_SESSION['report']['options']['enddate'] = $dateOptions['enddate'];
+				}
 			}
-			foreach($options as $index => $option){
-				if($option === "")
-					unset($options[$index]);
+			$_SESSION['report']['options']['organizationids'] = $postdata['organizationids'];
+			
+			switch ($button) {
+			case 'view':
+				$form->sendTo("reportcontactchangesummary.php");
+				break;
+			case 'save':
+				set_session_options_activefields();
+				$form->sendTo("reportedit.php");
+				break;
 			}
-
-			$options['reporttype'] = "contactchangereport";
-			$_SESSION['report']['options'] = $options;
-			ClearFormData($f);
-			if(CheckFormSubmit($f, "save"))
-				redirect("reportedit.php");
-			if(CheckFormSubmit($f, "view"))
-				redirect("reportcontactchangesummary.php");
+		} else {
+			redirect("reportcontactchange.php");
 		}
 	}
-} else {
-	$reload=1;
 }
 
+function set_session_options_activefields() {
+	global $fields;
 
-if($reload){
-	ClearFormData($f, $s);
-	PutFormData($f, $s, "relativedate", isset($options['reldate']) ? $options['reldate'] : "today");
-	PutFormData($f, $s, 'xdays', isset($options['lastxdays']) ? $options['lastxdays'] : "", "number");
-	PutFormData($f, $s, "startdate", isset($options['startdate']) ? $options['startdate'] : "", "text");
-	PutFormData($f, $s, "enddate", isset($options['enddate']) ? $options['enddate'] : "", "text");
+	$activefields = array();
+	foreach($fields as $field){
+		if(isset($_SESSION['report']['fields'][$field->fieldnum]) && $_SESSION['report']['fields'][$field->fieldnum]){
+			$activefields[] = $field->fieldnum;
+		}
+	}
+	$_SESSION['report']['options']['activefields'] = implode(",",$activefields);
+}
+
+function set_session_options_orderby() {
+	if (!empty($_SESSION['reportjobdetailsearch_orderby'])) {
+		foreach ($_SESSION['reportjobdetailsearch_orderby'] as $i => $orderby) {
+			$_SESSION['report']['options']["order" . ($i+1)] = $orderby;
+		}
+	}
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -139,43 +271,33 @@ if($reload){
 ////////////////////////////////////////////////////////////////////////////////
 
 $PAGE = "reports:reports";
-
 $TITLE = "Contact Information Changes";
-if(isset($_SESSION['reportid'])){
+if (isset($_SESSION['reportid'])) {
 	$subscription = new ReportSubscription($_SESSION['reportid']);
 	$TITLE .= " - " . escapehtml($subscription->name);
 }
 include_once("nav.inc.php");
-NewForm($f);
 
-buttons( button('Back', null, "reports.php"), submit($f, "view", "View Report"),submit($f, "save", "Save/Schedule"));
+startWindow(_L("Options"), "padding: 3px;");
 
-//--------------- Select window ---------------
-startWindow("Select", NULL, false);
+echo "<div id='metadataTempDiv' style='display:none'>";
+	select_metadata(null, null, $fields);
+echo "</div>";
 ?>
-<table border="0" cellpadding="3" cellspacing="0" width="100%">
-	<tr valign="top">
-		<th align="right" class="windowRowHeader bottomBorder">Report Options:</th>
-		<td class="bottomBorder">
-			<table>
-				<tr>
-					<td>
-						<div id="daterange" style="display:block">
+		<script type="text/javascript">
+			<? Validator::load_validators(array("ValOrganization","ValReldate")); ?>
+		</script>
 <?
-					dateOptions($f, $s, "daterangetbl");
-?>
-						</div>
-					</td>
-				</tr>
-			</table>
-		</td>
-	</tr>
-</table>
-
-<?
+echo $form->render();
 endWindow();
-buttons();
-EndForm();
+
+?>
+	<script type="text/javascript">
+		document.observe('dom:loaded', function() {
+				$('metadataDiv').update($('metadataTempDiv').innerHTML);
+			});
+	</script>
+<?
 include_once("navbottom.inc.php");
 ?>
 <script type="text/javascript" src="script/datepicker.js"></script>
