@@ -76,7 +76,7 @@ $userassociatedorgs = QuickQueryList("
 	from userassociation ua
 	where ua.userid = ? and ua.type = 'organization')
 	UNION
-	(select ua.organizationid as oid
+	(select s.organizationid as oid
 	from userassociation ua
 		left join section s on
 			(ua.sectionid = s.id and ua.type = 'section')
@@ -91,7 +91,7 @@ $orgrestrictionsql = "";
 if (count($userassociatedorgs) == 0) {
 	unset($userassociatedorgs);
 	$orgrestrictionsql = "1";
-} else if (count($userassociatedorgs) == 1 && $userassociatedorgs[0] == null) {
+} else if (count($userassociatedorgs) == 1 && $userassociatedorgs[0] === null) {
 	// this user is restricted to sectionid 0 and has no additional associations that provide orgs
 	unset($userassociatedorgs);
 	$orgrestrictionsql = "p.organizationid is null";
