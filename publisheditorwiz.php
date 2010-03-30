@@ -119,7 +119,9 @@ class PublishTargetWiz_publishtarget extends WizStep {
 		// un-restricted users can publish to anything
 		$userrestrictions = QuickQuery("select 1 from userassociation where userid = ? and (sectionid is not null or organizationid is not null) limit 1", false, array($USER->id));
 		
-		$values = array("nobody" => _L("Unpublish This Item"));
+		$values = array();
+		if (isPublished($type, $id))
+			$values["nobody"] = _L("Un-publish This Item");
 		if (!$userrestrictions) {
 			$values["anyone"] = _L("Anyone May Subscribe");
 			$values["unrestricted"] = _L("Top Level Users");
@@ -289,7 +291,7 @@ class FinishPublishTargetWiz extends WizFinish {
 		
 		// remove publish objects that arn't valid
 		foreach ($publishedorgs as $orgid => $publish) {
-			if (!in_array($orgid, $addorgs, true))
+			if ($target == "nobody" || !in_array($orgid, $addorgs, true))
 				$publish->destroy();
 		}
 
@@ -297,12 +299,18 @@ class FinishPublishTargetWiz extends WizFinish {
 		$subscriptions = getSubscriptions($type, $id);
 		// check each of the subscriptions user access to see if we should remove the subscription
 		foreach ($subscriptions as $subscribe) {
+			// if this is an un-publish request...
+			if ($target == "nobody")
+				$subscribe->destroy();
+			
 			// check if the user has restrictions
 			$userrestrictions = QuickQuery("select 1 from userassociation where userid = ? and (sectionid is not null or organizationid is not null) limit 1", false, array($subscribe->userid));
 			$authorgs = array();
+			
 			// if they are restricted, get their authorized organizations
 			if ($userrestrictions)
 				$authorgs = Organization::getAuthorizedOrgKeys($subscribe->userid);
+			
 			// if the user is restriced and the organization id is not null and they don't have association to any of the publish orgs, remove the subscription
 			if ($userrestrictions && !in_array(null, $addorgs, true) && !array_intersect_key($authorgs, $addorgs))
 				$subscribe->destroy();
