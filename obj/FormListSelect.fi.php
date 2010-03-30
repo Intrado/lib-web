@@ -27,10 +27,12 @@ class FormListSelect extends FormItem {
 		// look up the list details for lists in $value
 		$listdetails = array();
 		foreach ($value as $listid) {
-			$list = new PeopleList($listid);
-			$renderedlist = new RenderedList2();
-			$renderedlist->initWithList($list);
-			$listdetails[$listid] = array("name" => $list->name, "total" => $renderedlist->getTotal());
+			if (userOwns('list', $listid) || isSubscribed('list', $listid)) {
+				$list = new PeopleList($listid);
+				$renderedlist = new RenderedList2();
+				$renderedlist->initWithList($list);
+				$listdetails[$listid] = array("name" => $list->name, "total" => $renderedlist->getTotal());
+			}
 		}
 		
 		$str = '<style type="text/css">
