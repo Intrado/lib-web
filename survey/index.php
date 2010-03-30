@@ -103,7 +103,7 @@ if (isset($_POST['Submit']) && $reason == 'ok') {
 	$exitmsg = true; // display the exit message
 }
 
-$TITLE= isset($questionnaire->webpagetitle) ? escapehtml($questionnaire->webpagetitle) : "";
+$TITLE= isset($questionnaire->webpagetitle) ? $questionnaire->usehtml ? $questionnaire->webpagetitle : escapehtml($questionnaire->webpagetitle) : "";
 
 
 //Do inpage CSS
