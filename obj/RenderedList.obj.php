@@ -181,9 +181,9 @@ class RenderedList2 {
 	
 	function loadPagePersonIds() {
 		if ($this->pagepersonids === false) {
-			$personsql = $this->getPersonSql(true);		
+			$personsql = $this->getPersonSql(true);
 			$this->pagepersonids = QuickQueryList($personsql);
-			$this->total = QuickQuery("select found_rows()");
+			$this->total = count($this->pagepersonids); //QuickQuery("select found_rows()"); returns 1 for empty sql, should be count 0
 		}
 	}
 	
