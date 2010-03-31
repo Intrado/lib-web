@@ -122,7 +122,7 @@ if (!$id && !isset($_SESSION['ttstext']) && !isset($_GET['parentfield']) && !iss
 ////////////////////////////////////////////////////////////////////////////////
 // Form Data
 ////////////////////////////////////////////////////////////////////////////////
-$formdata = getpreviewformdata($fields,$fielddata,$fielddefaults,$msgType);
+$formdata = (isset($fields) && count($fields) && $msgType == 'phone')?getpreviewformdata($fields,$fielddata,$fielddefaults,$msgType):array();
 
 $buttons = array();
 if ($msgType == 'phone')
