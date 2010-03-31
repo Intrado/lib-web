@@ -30,7 +30,7 @@ function handleRequest() {
 	switch($type) {
 		//--------------------------- SIMPLE OBJECTS, should mirror objects in obj/*.obj.php (simplified to _fieldlist) -------------------------------
 		case 'lists':
-			return cleanObjects(DBFindMany('PeopleList', ', (name+0) as lettersfirst from list where userid=? and not deleted order by lettersfirst,name', false, array($USER->id)));
+			return cleanObjects(DBFindMany('PeopleList', ", (name+0) as lettersfirst from list where userid=? and type != 'alert' and not deleted order by lettersfirst,name", false, array($USER->id)));
 
 		// Return an AudioFile object specified by its ID.
 		case 'AudioFile':
