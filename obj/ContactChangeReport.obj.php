@@ -219,7 +219,7 @@ class ContactChangeReport extends ReportGenerator {
 						"5" => "Sequence",
 						"6" => "Destination",
 						"9" => "Modified Date",
-						"10" => "Current Org");
+						"10" => "Organization");
 		// index 7 is a flag to tell what type of destination
 		// index 8 editlock
 		// so set the title of starting f-field at appropriate place
@@ -284,7 +284,7 @@ class ContactChangeReport extends ReportGenerator {
 		session_write_close();//WARNING: we don't keep a lock on the session file, any changes to session data are ignored past this point
 		
 		//generate the CSV header
-		$header = '"ID#","First Name","Last Name","Address","Current Org"';
+		$header = '"ID#","First Name","Last Name","Address","Organization"';
 
 		foreach($activefields as $active){
 			if(!$active) continue;
@@ -375,16 +375,19 @@ class ContactChangeReport extends ReportGenerator {
 			$reportarray = array($row[0], $row[2], $row[3], $row[4], $row[5]);
 
 			// optional F/G fields
-			$count=0;
 			foreach($fieldlist as $index => $field){
 				if(in_array($index, $activefields)){
+					$fieldindex = substr($index, 1) + 0;
+					if ($index[0] == 'f')
+						$rowindex = 6 + $fieldindex - 3;
+					else
+						$rowindex = 26 + $fieldindex -3;
 					if ($languageField == $index) {
-						$reportarray[] = Language::getName($row[6+$count]);
+						$reportarray[] = Language::getName($row[$rowindex]);
 					} else {
-						$reportarray[] = $row[6+$count];
+						$reportarray[] = $row[$rowindex];
 					}
 				}
-				$count++;
 			}
 
 			// if there is any phone/email/sms for this person, write it out, else move to next person
