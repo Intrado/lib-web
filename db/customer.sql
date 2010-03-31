@@ -1367,9 +1367,7 @@ INSERT INTO `setting` (`name`, `value`) values ('_dbversion', '7.5/8')
 $$$
 -- END REV 7.5/8
 
-
 -- START REV 7.5/9
-
 ALTER TABLE `section` DROP INDEX `skey` ,
 ADD UNIQUE `skey` ( `organizationid` , `skey` )
 $$$
@@ -1396,3 +1394,31 @@ update setting set value='7.5/9' where name='_dbversion';
 $$$
 -- END REV 7.5/9
 
+-- START REV 7.5/10
+CREATE TABLE `reportorganization` (
+ `id` BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY , 
+ `jobid` INT NOT NULL , 
+ `personid` INT NOT NULL , 
+ `organizationid` INT NOT NULL , 
+ INDEX ( `jobid` , `personid` ) 
+) ENGINE = InnoDB 
+$$$ 
+
+ALTER TABLE `audiofile` ADD INDEX ( `messagegroupid` )
+$$$
+
+ALTER TABLE `publish` ADD `listid` INT NULL AFTER `messagegroupid`
+$$$
+ALTER TABLE `publish` CHANGE `type` `type` ENUM( 'messagegroup', 'list' ) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL 
+$$$
+ALTER TABLE `publish` ADD `organizationid` INT NULL AFTER `listid`
+$$$
+
+ALTER TABLE `publish` ADD INDEX ( `organizationid` )
+$$$
+ALTER TABLE `publish` ADD INDEX ( `listid` )
+$$$
+
+update setting set value='7.5/10' where name='_dbversion'
+$$$
+-- END REV 7.5/10
