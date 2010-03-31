@@ -95,7 +95,7 @@ if($form){
 				<td colspan="2"><h1 style="font-size: 20px; "><?=$TITLE?></h1></td>
 			</tr>
 			<tr>
-				<td colspan="2">You should receive an email containing a confirmation code shortly.  Please enter the confirmation code below along with your new password.  Passwords must be 5 characters in length and cannot be similar to your first name, last name, or email address.  If you do not receive the email, please contact your System Administrator or call support for assistance.<br><br></td>
+				<td colspan="2">You should receive an email containing a confirmation code shortly.  Please enter the confirmation code below along with your new password.  Passwords cannot be similar to your first name, last name, or email address.  If you do not receive the email, please contact your System Administrator or call support for assistance.<br><br></td>
 			</tr>
 
 			<tr>
