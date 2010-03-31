@@ -540,7 +540,7 @@
 						if(state == 2) {
 							//highlightedcontacts.set('c-' + contact.key,true);
 							if(markedid == msgid) {
-								markedcontacts.set(contact.key,true);
+								markedcontacts.set(contact,true);
 								$('c-' + contact).setStyle('border:1px solid red;');
 							}
 						} else {
@@ -675,13 +675,19 @@
 		tabs.container.observe('Tabs:ClickTitle', function(event) {
 			if(event.memo.currentSection == 'lib-search' || event.memo.section == 'lib-search'){
 				updatemessages(event.memo.currentSection,event.memo.section);
-
 				var searchBox = $('searchbox');
-				//searchBox.focus();
 				searchBox.blur();
 			} else{
 				$('nowedit-' + event.memo.section.substr(4)).update($('nowedit-' + event.memo.currentSection.substr(4)).innerHTML);
 			}
+			// clear markers
+			if(markedcomment) {
+				$(markedcomment).setStyle('border-color:silver');
+				markedcomment = false;
+			} 
+			markedcontacts.each(function(contact) {
+				$('c-' + contact.key).setStyle('border:0px');
+			});
 
 			new Ajax.Request(requesturl,{method:'post',parameters:{settab:event.memo.section.substring(4)}});
 		});
