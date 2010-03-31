@@ -59,18 +59,19 @@ if (isset($_POST['eventContacts']) && isset($_POST['eventMessage']) && isset($_P
 	$sectionid = DBSafe($_POST['sectionid']);
 	$ischecked = DBSafe($_POST['isChecked']);
 
-
-	$args = array();
-	foreach($contacts as $contact) {
-		$args[] = $contact + 0; // DB Safe! Make sure its an integer
+	if (!is_array($contacts) || empty($contacts)) {
+		echo json_encode(false);
+		exit(0);
 	}
+
+	$args = $contacts;
 	$args[] = $USER->id;
 	$args[] = $message;
 	$args[] = $sectionid;
-	if($ischecked == "false") {
+	if ($ischecked == "false") {
 		$eventids = QuickQueryList("select e.id from personassociation pa left join event e on (pa.eventid = e.id) where pa.personid in (" . repeatWithSeparator("?",",",count($contacts)) . ") and e.userid = ? and e.targetedmessageid = ? and e.sectionid = ? and Date(e.occurence) = CURDATE()",
 						false,false,$args);
-		if (count($eventids) > 0) {
+		if ($eventids && count($eventids) > 0) {
 			$idstr = implode(",",$eventids);
 			QuickQuery("BEGIN");
 			QuickQuery("delete from alert where eventid in (" . $idstr . ")");
@@ -82,49 +83,56 @@ if (isset($_POST['eventContacts']) && isset($_POST['eventMessage']) && isset($_P
 			exit(0);
 		}
   	} else {
-		$section = DBFind("Section","from section where id = ?",false,array($sectionid));
 
+		// Making sure that the section exists and that the user owns the section
+		$section = DBFind("Section","from section s inner join userassociation pa on (pa.sectionid = s.id) where s.id = ? and pa.userid = ?",'s',array($sectionid,$USER->id));
 		if(!$section) {
 			echo json_encode(false);
 			exit(0);
 		}
 
+		// Get the events if they exist. They may exist if a remark is added to the comment
 		$events = QuickQueryList("select pa.personid,e.id from personassociation pa
 											left join event e on (pa.eventid = e.id)
 											where pa.personid in (" . repeatWithSeparator("?",",",count($contacts)) . ")
 											and e.userid = ? and e.targetedmessageid = ? and e.sectionid = ? and Date(e.occurence) = CURDATE()",
 											true,false,$args);
 
-		foreach($contacts as $contact) {
-			$eventid = isset($events[$contact])?$events[$contact]:null;
-			QuickQuery("BEGIN");
-			$event = new Event($eventid);
-			$event->userid = $USER->id;
-			$event->organizationid = $section->organizationid;
-			$event->sectionid = $section->id;
-			$event->targetedmessageid = $message;
-			$event->name = "Teacher Comment";
-			if(isset($_POST['eventComments']) && $USER->authorize('targetedmessage')) {
-				$event->notes = mb_strlen($_POST['eventComments']) > 5000 ? mb_substr($_POST['eventComments']):$_POST['eventComments'];
-			}
-			else if(!$event->notes){
-				$event->notes = "";
-			}
-			$event->occurence = date("Y-m-d H:i:s");
-			$event->update();
+		// Making sure that the contacts belong to the section
+    	$sectioncontacts = QuickQueryList("select personid from personassociation where type = 'section' and sectionid = ? and personid in (" . repeatWithSeparator("?",",",count($contacts)) . ")",false,false,array_merge(array($section->id),$contacts));
 
-			// Get the alert since this is a targeted message there should only be one alert
-			$alert = ($eventid)?new Alert(QuickQuery("select id from alert where eventid = ?",false,array($event->id))):new Alert();
-			$alert->eventid = $event->id;
-			$alert->personid = $contact;
-			$alert->date = date("Y-m-d");
-			$alert->time = date("H:i:s");
-			$alert->update();
+		if($sectioncontacts) {
+			foreach($sectioncontacts as $contact) {
+				$eventid = isset($events[$contact])?$events[$contact]:null;
+				QuickQuery("BEGIN");
+				$event = new Event($eventid);
+				$event->userid = $USER->id;
+				$event->organizationid = $section->organizationid;
+				$event->sectionid = $section->id;
+				$event->targetedmessageid = $message;
+				$event->name = "Teacher Comment";
+				if(isset($_POST['eventComments']) && $USER->authorize('targetedmessage')) {
+					$event->notes = mb_strlen($_POST['eventComments']) > 5000 ? mb_substr($_POST['eventComments']):$_POST['eventComments'];
+				}
+				else if(!$event->notes){
+					$event->notes = "";
+				}
+				$event->occurence = date("Y-m-d H:i:s");
+				$event->update();
 
-			if(!$eventid) {
-				QuickQuery("insert into personassociation (personid,type,eventid) values (?,?,?)",false,array($contact,'event',$event->id));
+				// Get the alert since this is a targeted message there should only be one alert
+				$alert = ($eventid)?new Alert(QuickQuery("select id from alert where eventid = ?",false,array($event->id))):new Alert();
+				$alert->eventid = $event->id;
+				$alert->personid = $contact;
+				$alert->date = date("Y-m-d");
+				$alert->time = date("H:i:s");
+				$alert->update();
+
+				if(!$eventid) {
+					QuickQuery("insert into personassociation (personid,type,eventid) values (?,?,?)",false,array($contact,'event',$event->id));
+				}
+				QuickQuery("COMMIT");
 			}
-			QuickQuery("COMMIT");
 		}
 	}
 	echo json_encode(true);
