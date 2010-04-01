@@ -125,7 +125,7 @@ if(count($data) > 0){
 <?
 } else {
 ?>
-	<div>Your search did not find any matching results. Click the back button and try modifying your search settings.<div>
+	<div>Your search did not find any matching results.<div>
 <?
 }
 buttons(icon_button(_L('Modify Search'), 'fugue/arrow_180', null, 'reportclassroomsearch.php'),
