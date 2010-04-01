@@ -101,7 +101,7 @@ if (!isset($_POST['startdate'])) {
 			if (!isset($data[$cid]))
 				$data[$cid] = array($cid,-1,-1);
 			$data[$cid][3] = $row[0]; //system calls
-			$data[$cid][4] = $row[1]; //flex calls
+			$data[$cid][4] = $row[1]; //SmartCall calls
 			$data[$cid][5] = $row[2]; //duration
 			$data[$cid][6] = $row[3]; //emergency
 			$data[$cid][7] = $row[4]; //attendance

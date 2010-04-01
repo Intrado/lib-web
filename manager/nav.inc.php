@@ -94,7 +94,7 @@ table {
 		<td><a href="lockedusers.php" title="Locked&nbsp;Users"><img src="img/lockedusers.png" border=0><div>Locked&nbsp;Users</div></a></td>
 	<? } ?>
 	<? if ($MANAGERUSER->authorized("editdm")) { ?>
-		<td><a href="customerdms.php?clear" title="Flex Appliances"><img src="img/rdms.png" border=0><div>Flex</div></a></td>
+		<td><a href="customerdms.php?clear" title="SmartCall"><img src="img/rdms.png" border=0><div>SmartCall</div></a></td>
 	<? } ?>
 	<? if ($MANAGERUSER->authorized("systemdm")) { ?>
 		<td><a href="systemdms.php" title="System DMs"><img src="img/sysdm.png" border=0><div>System&nbsp;DMs</div></a></td>

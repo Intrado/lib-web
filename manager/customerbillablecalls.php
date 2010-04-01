@@ -72,7 +72,7 @@ if (!isset($_POST['startdate'])) {
 		if (!isset($data[$row[0]]))
 			$data[$row[0]] = array($row[0],-1,-1);
 		$data[$row[0]][3] = $row[1]; //system calls
-		$data[$row[0]][4] = $row[2]; //flex calls
+		$data[$row[0]][4] = $row[2]; //SmartCall calls
 		$data[$row[0]][5] = $row[3]; //duration
 	}
 	
@@ -92,7 +92,7 @@ if (!isset($_POST['startdate'])) {
 		0 => "#Date",
 		1 => "#Billable Calls",
 		3 => "#Cost calls",
-		4 => "#Flex calls",
+		4 => "#SmartCall calls",
 		2 => "#Num Jobs",
 		5 => "#Cost Minutes",
 		"cost" => "#Blended cost (rnd up)"

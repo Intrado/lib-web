@@ -29,7 +29,7 @@ function fmt_custid($row, $index){
 
 function fmt_hasdm($row, $index) {
 	if($row[$index])
-		return "Has Flex";
+		return "Has SmartCall";
 	else
 		return "&nbsp;";
 }
