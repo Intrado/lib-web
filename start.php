@@ -518,7 +518,7 @@ function activityfeed($mergeditems,$ajax = false) {
 				<script>
 				var actionids = $actioncount;
 
-				var jobfiltes = Array('none','jobs','savedjobs','scheduledjobs','activejobs','completedjobs','repeatingjobs','messages','phonemessages','emailmessages','smsmessages','lists','savedreports','systemmessages');
+				var jobfiltes = Array('none','jobs','savedjobs','scheduledjobs','activejobs','completedjobs','repeatingjobs','messages','lists','savedreports','systemmessages');
 
 				function addfeedtools() {
 					for(var id=0;id<actionids;id++){
