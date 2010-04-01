@@ -100,7 +100,7 @@ if (!isset($_POST['startdate'])) {
 			$d[3] = $row[2]; //message
 			$d[4] = $row[3]; //user
 			$d[5] = $row[4]; //emergency calls
-			$d[6] = $row[5]; //has flex
+			$d[6] = $row[5]; //has SmartCall
 			$d[7] = $row[6]; //job id
 			$data[] = $d;
 		}

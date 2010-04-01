@@ -152,7 +152,7 @@ include("nav.inc.php");
 Task dispatch type:&nbsp;
 <select id='dispatchtypeselect' onchange="window.location='customeractivejobs.php?'+this.options[this.selectedIndex].value;">
 <option value='system' <?=($dispatchtype=='system')?"selected":""?>>Asp</option>
-<option value='customer' <?=($dispatchtype=='customer')?"selected":""?>>Flex</option>
+<option value='customer' <?=($dispatchtype=='customer')?"selected":""?>>SmartCall</option>
 </select>
 
 <?

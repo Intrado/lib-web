@@ -133,7 +133,7 @@ if (!isset($_POST['startdate'])) {
 		"9" => "#DM?",
 		1 => "#Billable Calls",
 		3 => "#Cost calls",
-		4 => "#Flex calls",
+		4 => "#SC calls", //SmartCall calls
 		6 => "Cost by Type",
 		2 => "#Num Jobs",
 		5 => "#minutes",

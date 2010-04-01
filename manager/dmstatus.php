@@ -28,7 +28,7 @@ if(isset($_GET['dmid'])){
 }
 
 if ($dmType == "customer") {
-	// customer Flex Appliance
+	// customer SmartCall Appliance
 	
 	$custid = QuickQuery("select customerid from dm where id = ?", false, array($dmid));
 	$custinfo = QuickQueryRow("select s.dbhost, c.dbusername, c.dbpassword from customer c inner join shard s on (c.shardid = s.id) where c.id = '$custid'");

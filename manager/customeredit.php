@@ -515,8 +515,8 @@ NewForm($f);
 			NewFormItem($f, $s, '_dmmethod', 'selectstart');
 			NewFormItem($f, $s, '_dmmethod', 'selectoption', '--Choose a Method--', '');
 			NewFormItem($f, $s, '_dmmethod', 'selectoption', 'CommSuite (fully hosted)', 'asp');
-			NewFormItem($f, $s, '_dmmethod', 'selectoption', 'CS + Flex + Emergency', 'hybrid');
-			NewFormItem($f, $s, '_dmmethod', 'selectoption', 'CS + Flex (data only)', 'cs');
+			NewFormItem($f, $s, '_dmmethod', 'selectoption', 'CS + SmartCall + Emergency', 'hybrid');
+			NewFormItem($f, $s, '_dmmethod', 'selectoption', 'CS + SmartCall (data only)', 'cs');
 			NewFormItem($f, $s, '_dmmethod', 'selectend');
 		?>
 		<span>

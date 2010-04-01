@@ -22,7 +22,7 @@ $roles = array(
 	"lockedusers" => "Manage locked users",
 	"smsblock" => "Manage SMS blocked numbers",
 	"activejobs" => "View active jobs",
-	"editdm" => "Edit Flex Appliances",
+	"editdm" => "Edit SmartCall Appliances",
 	"diskagent" => "Manage DISK Agents",
 	
 	"ffield2gfield" => "ADVANCED - F field to G field migration",
