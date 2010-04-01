@@ -84,10 +84,10 @@ $formdata["loginlockoutattempts"] = array(
 	"helpstep" => $helpstepnum
 );
 
-$helpsteps[$helpstepnum++] = _L("This setting controls the number of hours a user is temporarily locked out of their account if they have triggered an invalid login lockout.");
+$helpsteps[$helpstepnum++] = _L("This setting controls the number of minutes a user is temporarily locked out of their account if they have triggered an invalid login lockout.");
 $formdata["loginlockouttime"] = array(
 	"label" => _L("Invalid Login Lockout Period"),
-	"fieldhelp" => _L("Controls the number of hours a temporary lockout lasts."),
+	"fieldhelp" => _L("Controls the number of minutes a temporary lockout lasts."),
 	"value" => getSystemSetting('loginlockouttime'),
 	"validators" => array(
 		array("ValRequired"),
