@@ -266,12 +266,12 @@ if($sections) {
 }
 
 ?>
-</select></label><br />
+</select></label><div id="sectionloading">&nbsp;<?= $sections?'<img src="img/ajax-loader.gif" alt="Loading Section" />' . _L('Loading Section'):'' ?></div><br />
 
-<table width="100%" id="picker" style="clear:both; margin-top: 3px;">
+<table width="100%" id="picker" style="display:none;clear:both; margin-top: 3px;">
 	<tr>
 		<td style="top: 0px; vertical-align: top; padding-right: 10px;white-space: nowrap;">
-
+			<div id="sectionloaded" style="display:none;">
 			<a id="checkall" href="#" style="float:left;white-space: nowrap;">Select All</a><br />
 			<div id="contactwrapper" >
 				<div id="contactbox" style="width:100%;text-decoration:none;"></div>
@@ -279,6 +279,7 @@ if($sections) {
 			<hr />
 			<img src="img/icons/fugue/light_bulb.gif" alt="" />Press and hold shift key to <br />&nbsp;&nbsp;&nbsp;&nbsp;multiselect
 			<hr />
+			</div>
 		</td>
 
 		<td style="vertical-align:top;width:100%">

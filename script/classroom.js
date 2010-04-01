@@ -387,6 +387,10 @@
 	 * Get the class contacts and set observers
 	 */
 	function getclass(selected) {
+		$('sectionloading').show();
+		$('sectionloaded').hide();
+		$('theinstructions').hide();
+
 		new Ajax.Request(requesturl,
 		{
 			method:'get',
@@ -398,6 +402,8 @@
 				$('contactbox').update("");
 
 				$('theinstructions').show();
+				$('sectionloaded').show();
+				$('sectionloading').hide();
 				$('tabsContainer').hide();
 				$('searchContainer').hide();
 
