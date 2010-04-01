@@ -192,7 +192,7 @@ startWindow(_L('My Classroom Messages'));
 							echo '<div id="persons-' . $personcomment['date'] . $id . '" class="expandview" style="display:none;"><table style="margin-left:2%;width:98%">';
 							$commentid = $id;
 						}
-						echo '<tr><td style="white-space: nowrap;width:100%;">' . escapehtml($personcomment['firstname']) . '&nbsp;' .  escapehtml($personcomment['lastname']) . '<span style="color:graytext;font-style:italic;white-space:nowrap"> - ID: ' . $personcomment['pkey'] . '</span></td><td style="width:100%;padding-left:10%;">' .  ($personcomment['notes']?'<b>Remark: </b>' . escapehtml($personcomment['notes']):'') . '</td></tr>';
+						echo '<tr><td style="white-space: nowrap;">' . escapehtml($personcomment['firstname']) . '&nbsp;' .  escapehtml($personcomment['lastname']) . '<span style="color:graytext;font-style:italic;white-space:nowrap"> - ID: ' . $personcomment['pkey'] . '</span></td><td style="width:100%;padding-left:10%;">' .  ($personcomment['notes']?'<b>Remark: </b>' . escapehtml($personcomment['notes']):'') . '</td></tr>';
 					}
 					echo '</table></div></td>';
 				} else {
