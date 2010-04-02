@@ -1,4 +1,88 @@
 <?xml version='1.0' encoding='utf-8' ?>
 <ftstdata>
+<topic name="Adding People By Searching" url="creating_a_list/adding_people_by_searching.htm" />
+<topic name="Adding People From Your Address Book" url="creating_a_list/adding_people_from_your_address_book.htm" />
+<topic name="Adding People Manually" url="creating_a_list/adding_people_manually.htm" />
+<topic name="Adding People Using Rules" url="creating_a_list/adding_people_using_rules.htm" />
+<topic name="Creating a New List" url="creating_a_list/creating_a_new_list.htm" />
+<topic name="Editing or Deleting an Existing List" url="creating_a_list/editing_or_deleting_an_existing_list.htm" />
+<topic name="Lists Overview" url="creating_a_list/listsoverview.htm" />
+<topic name="Removing Individuals From Your List" url="creating_a_list/removing_individuals_from_your_list.htm" />
+<topic name="The List Editor Screen" url="creating_a_list/the_list_editor_screen.htm" />
+<topic name="Uploading a List From Your Computer" url="creating_a_list/uploading_a_list_from_your_computer.htm" />
+<topic name="Creating a New Email Message" url="creating_a_message/creating_a_new_email_message.htm" />
+<topic name="Creating a Simple Phone Message" url="creating_a_message/creating_a_simple_phone_message.htm" />
+<topic name="Creating an Advanced Phone Message" url="creating_a_message/creating_an_advanced_phone_message.htm" />
+<topic name="Creating an SMS Message" url="creating_a_message/creating_an_sms_message.htm" />
+<topic name="Editing or Deleting an Existing Message" url="creating_a_message/editing_or_deleting_an_existing_message.htm" />
+<topic name="Message Overview" url="creating_a_message/messageoverview.htm" />
+<topic name="The Audio File Library" url="creating_a_message/the_audio_file_library.htm" />
+<topic name="Copying a Job" url="creating_a_notification_job/copying_a_job.htm" />
+<topic name="Creating a Job with EasyCall" url="creating_a_notification_job/creating_a_job_with_easycall.htm" />
+<topic name="Creating a New Job Using the Job Editor" url="creating_a_notification_job/creating_a_new_job.htm" />
+<topic name="Creating a Repeating Job" url="creating_a_notification_job/creating_a_repeating_job.htm" />
+<topic name="Editing an Existing Job" url="creating_a_notification_job/editing_an_existing_job.htm" />
+<topic name="Jobs Overview" url="creating_a_notification_job/jobsoverview.htm" />
+<topic name="Sending an SMS Job" url="creating_a_notification_job/sending_an_sms_job.htm" />
+<topic name="Building a Survey Template" url="creating_a_survey_job/building_a_survey_template.htm" />
+<topic name="Important Tips for Creating Surveys" url="creating_a_survey_job/important_tips_for_creating_surveys.htm" />
+<topic name="About Web Survey Template Features" url="creating_a_survey_job/more_on_web_survey_template_features.htm" />
+<topic name="Scheduling a Survey Job" url="creating_a_survey_job/scheduling_a_survey_job.htm" />
+<topic name="Survey Overview" url="creating_a_survey_job/survey_overview.htm" />
+<topic name="Emergency Preparedness" url="getting_started/emergency_preparedness.htm" />
+<topic name="Getting Started" url="getting_started/getting_started.htm" />
+<topic name="Managing Your Account Settings" url="getting_started/managing_your_account_settings.htm" />
+<topic name="Message Tips and Ideas" url="getting_started/message_tips_and_ideas.htm" />
+<topic name="New Features" url="getting_started/new_features.htm" />
+<topic name="The Start Page" url="getting_started/the_start_page.htm" />
+<topic name="Enabling the Voice Response Option" url="receiving_responses/enabling_the_voice_response_option.htm" />
+<topic name="Reviewing Your Response Messages" url="receiving_responses/reviewing_your_response_messages.htm" />
+<topic name="Remote Telephone Access Overview" url="remote_telephone_access/remote_telephone_access_overview.htm" />
+<topic name="Remotely Create a Multilingual Job" url="remote_telephone_access/remotely_create_a_multilingual_job.htm" />
+<topic name="Remotely Create a Single Language Job" url="remote_telephone_access/remotely_create_a_single_language_job.htm" />
+<topic name="Configuring a Hybrid System" url="remote_telephony_appliance/configuring_a_hybrid_system.htm" />
+<topic name="Remote Telephony Appliance Overview" url="remote_telephony_appliance/remote_telephony_appliance_overview.htm" />
+<topic name="Call Distribution Report" url="reports/call_distribution_report.htm" />
+<topic name="Contact History Report" url="reports/contact_history_report.htm" />
+<topic name="Email Logs" url="reports/email_logs.htm" />
+<topic name="Using the Report Builder" url="reports/querying_report_data.htm" />
+<topic name="Reports Overview" url="reports/reports.htm" />
+<topic name="Saving and Scheduling Reports" url="reports/saving_and_scheduling_reports.htm" />
+<topic name="SMS Logs" url="reports/sms_logs.htm" />
+<topic name="SMS Reports" url="reports/sms_reports.htm" />
+<topic name="Notification Summaries" url="reports/standard_job_reports.htm" />
+<topic name="Survey Reports" url="reports/survey_job_reports.htm" />
+<topic name="Phone Logs" url="reports/understanding_call_logs.htm" />
+<topic name="Usage Stats Report" url="reports/usage_stats_report.htm" />
+<topic name="Intro" url="step-by-step_guides/basics/intro.htm" />
+<topic name="Basics - Making a List" url="step-by-step_guides/basics/step1_-_making_a_list.htm" />
+<topic name="Step2 - Send an EasyCall" url="step-by-step_guides/basics/step2_-_send_an_easycall.htm" />
+<topic name="Step3 - Send an Email" url="step-by-step_guides/basics/step3_-_send_an_email.htm" />
+<topic name="Make a List for Emergencies" url="step-by-step_guides/common_tasks/making_a_list_for_emergencies.htm" />
+<topic name="Sending a Job with Calls and Emails" url="step-by-step_guides/common_tasks/sending_a_job_with_calls_and_emails.htm" />
+<topic name="Sending a Text-to-Speech Message" url="step-by-step_guides/common_tasks/sending_a_text-to-speech_message.htm" />
+<topic name="Step-by-Step:Create a List" url="step-by-step_guides/step-by-step_create_a_list.htm" />
+<topic name="Step-by-Step:Send a Job with EasyCall" url="step-by-step_guides/step-by-step_send_a_call_job.htm" />
+<topic name="Step-by-Step:Send a Phone and Email Job" url="step-by-step_guides/step-by-step_send_a_phone_and_email_job.htm" />
+<topic name="Step-by-Step:Send an Email Job" url="step-by-step_guides/step-by-step_send_an_email_job.htm" />
+<topic name="Contact Settings" url="the_admin_tab/contact_settings.htm" />
+<topic name="Destination Labels" url="the_admin_tab/destination_labels.htm" />
+<topic name="Job" url="the_admin_tab/job.htm" />
+<topic name="Managing Access Profiles" url="the_admin_tab/managing_access_profiles.htm" />
+<topic name="Managing Systemwide Settings" url="the_admin_tab/managing_systemwide_settings.htm" />
+<topic name="Managing User Accounts" url="the_admin_tab/managing_user_accounts.htm" />
+<topic name="Settings" url="the_admin_tab/settings.htm" />
+<topic name="System" url="the_admin_tab/system.htm" />
+<topic name="The Import Manager" url="the_admin_tab/the_import_manager.htm" />
+<topic name="The Metadata Manager" url="the_admin_tab/the_metadata_manager.htm" />
+<topic name="Activating by Phone" url="the_contact_manager/activating_by_phone.htm" />
+<topic name="Bulk Activation Code Management" url="the_contact_manager/bulk_activation_code_management.htm" />
+<topic name="Contact Manager Overview" url="the_contact_manager/contact_manager_overview.htm" />
+<topic name="Contact Manager Settings" url="the_contact_manager/contact_manager_settings.htm" />
+<topic name="Generate an Individual Activation Code" url="the_contact_manager/generate_an_individual_activation_code.htm" />
+<topic name="Blocking Phone Numbers" url="the_system_tab/blocking_phone_numbers.htm" />
+<topic name="Systemwide Reports" url="the_system_tab/systemwide_reports.htm" />
+<topic name="The Contact Database" url="the_system_tab/the_contact_database.htm" />
+<topic name="Viewing and Editing Contact Details" url="the_system_tab/viewing_and_editing_contact_details.htm" />
 
 </ftstdata>  

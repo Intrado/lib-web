@@ -1,0 +1,177 @@
+<?xml version='1.0' encoding='utf-8' ?>
+<indexdata>
+<key name="Messages" >
+  <topic name="Creating a Job with EasyCall" url="creating_a_notification_job/creating_a_job_with_easycall.htm" />
+  <topic name="Creating a New Email Message" url="creating_a_message/creating_a_new_email_message.htm" />
+  <topic name="Creating a New Phone Message" url="creating_a_message/creating_an_advanced_phone_message.htm" />
+  <topic name="Editing or Deleting an Existing Message" url="creating_a_message/editing_or_deleting_an_existing_message.htm" />
+  <topic name="Message Overview" url="creating_a_message/messageoverview.htm" />
+  <topic name="Step-by-Step:Send a Multi-language Call Job" url="step-by-step_guides/step-by-step_send_a_phone_and_email_job.htm" />
+  <topic name="Step-by-Step:Send an Email Job" url="step-by-step_guides/step-by-step_send_an_email_job.htm" />
+  <topic name="Step-by-Step:Send a Call Job" url="step-by-step_guides/step-by-step_send_a_call_job.htm" />
+  <topic name="The Start Page" url="getting_started/the_start_page.htm" />
+  <key name="audio file library" >
+    <topic name="The Audio File Library" url="creating_a_message/the_audio_file_library.htm" />
+  </key>
+  <key name="call me to record" >
+    <topic name="Creating a Simple Phone Message" url="creating_a_message/creating_a_simple_phone_message.htm" />
+  </key>
+  <key name="communication strategies" >
+    <topic name="Message Tips and Ideas" url="getting_started/message_tips_and_ideas.htm" />
+  </key>
+  <key name="create advanced phone message" >
+    <topic name="Creating an Advanced Phone Message#The_Phone_Message_Editor" url="creating_a_message/creating_an_advanced_phone_message.htm#The_Phone_Message_Editor" />
+  </key>
+  <key name="create email message" >
+    <topic name="Creating a New Email Message" url="creating_a_message/creating_a_new_email_message.htm" />
+    <topic name="Step-by-Step:Send an Email Job" url="step-by-step_guides/step-by-step_send_an_email_job.htm" />
+  </key>
+  <key name="create from start page" >
+    <topic name="The Start Page" url="getting_started/the_start_page.htm" />
+  </key>
+  <key name="create new" >
+    <topic name="Creating a New Phone Message" url="creating_a_message/creating_an_advanced_phone_message.htm" />
+    <topic name="Creating a New Email Message" url="creating_a_message/creating_a_new_email_message.htm" />
+    <topic name="Creating a Simple Phone Message" url="creating_a_message/creating_a_simple_phone_message.htm" />
+  </key>
+  <key name="create phone message" >
+    <topic name="Creating an Advanced Phone Message" url="creating_a_message/creating_an_advanced_phone_message.htm" />
+    <topic name="Creating a Simple Phone Message" url="creating_a_message/creating_a_simple_phone_message.htm" />
+  </key>
+  <key name="deleting" >
+    <topic name="Editing or Deleting an Existing Message" url="creating_a_message/editing_or_deleting_an_existing_message.htm" />
+  </key>
+  <key name="dynamic content" >
+    <topic name="Creating an Advanced Phone Message" url="creating_a_message/creating_an_advanced_phone_message.htm" />
+    <topic name="Creating a New Email Message" url="creating_a_message/creating_a_new_email_message.htm" />
+  </key>
+  <key name="edit existing" >
+    <topic name="Editing or Deleting an Existing Message" url="creating_a_message/editing_or_deleting_an_existing_message.htm" />
+  </key>
+  <key name="email message editor" >
+    <topic name="Creating a New Email Message" url="creating_a_message/creating_a_new_email_message.htm" />
+    <topic name="Step-by-Step:Send an Email Job" url="step-by-step_guides/step-by-step_send_an_email_job.htm" />
+  </key>
+  <key name="multi-part" >
+    <topic name="Creating an Advanced Phone Message" url="creating_a_message/creating_an_advanced_phone_message.htm" />
+  </key>
+  <key name="multilingual" >
+    <topic name="Step-by-Step:Send a Multi-language Call Job" url="step-by-step_guides/step-by-step_send_a_phone_and_email_job.htm" />
+    <topic name="Creating an Advanced Phone Message" url="creating_a_message/creating_an_advanced_phone_message.htm" />
+    <topic name="Creating a Simple Phone Message" url="creating_a_message/creating_a_simple_phone_message.htm" />
+  </key>
+  <key name="overview" >
+    <topic name="Message Overview" url="creating_a_message/messageoverview.htm" />
+  </key>
+  <key name="phone message editor" >
+    <topic name="The Phone Message Editor" url="creating_a_message/creating_an_advanced_phone_message.htm#The_Phone_Message_Editor" />
+  </key>
+  <key name="recording phone messages" >
+    <topic name="Creating a Job with EasyCall" url="creating_a_notification_job/creating_a_job_with_easycall.htm" />
+    <topic name="The Audio File Library" url="creating_a_message/the_audio_file_library.htm" />
+    <topic name="Step-by-Step:Send a Call Job" url="step-by-step_guides/step-by-step_send_a_call_job.htm" />
+    <topic name="Creating a Simple Phone Message" url="creating_a_message/creating_a_simple_phone_message.htm" />
+    <topic name="Creating an Advanced Phone Message" url="creating_a_message/creating_an_advanced_phone_message.htm" />
+  </key>
+  <key name="recording with EasyCall" >
+    <topic name="Creating a Job with EasyCall" url="creating_a_notification_job/creating_a_job_with_easycall.htm" />
+  </key>
+  <key name="TTS (text-to-speech)" >
+    <topic name="Step-by-Step:Send a Multi-language Call Job" url="step-by-step_guides/step-by-step_send_a_phone_and_email_job.htm" />
+    <topic name="Step-by-Step:Send a Call Job" url="step-by-step_guides/step-by-step_send_a_call_job.htm" />
+    <topic name="Creating an Advanced Phone Message" url="creating_a_message/creating_an_advanced_phone_message.htm" />
+  </key>
+  <key name="upload audio message" >
+    <topic name="Upload Audio File" url="creating_a_message/the_audio_file_library.htm#Upload_Audio_File" />
+  </key>
+</key>
+<key name="Phone" >
+  <topic name="Creating a New Phone Message" url="creating_a_message/creating_an_advanced_phone_message.htm" />
+  <topic name="Step-by-Step:Send a Call Job" url="step-by-step_guides/step-by-step_send_a_call_job.htm" />
+  <topic name="Step-by-Step:Send a Multi-language Call Job" url="step-by-step_guides/step-by-step_send_a_phone_and_email_job.htm" />
+  <topic name="Creating a Simple Phone Message" url="creating_a_message/creating_a_simple_phone_message.htm" />
+  <key name="block number" >
+    <topic name="Blocking Phone Numbers" url="the_system_tab/blocking_phone_numbers.htm" />
+  </key>
+  <key name="log" >
+    <topic name="Phone Logs" url="reports/understanding_call_logs.htm" />
+  </key>
+  <key name="message" >
+    <topic name="Creating an Advanced Phone Message" url="creating_a_message/creating_an_advanced_phone_message.htm" />
+    <topic name="The Audio File Library" url="creating_a_message/the_audio_file_library.htm" />
+    <topic name="Creating a Simple Phone Message" url="creating_a_message/creating_a_simple_phone_message.htm" />
+  </key>
+  <key name="notification job" >
+    <topic name="Creating a New Job" url="creating_a_notification_job/creating_a_new_job.htm" />
+    <topic name="Creating a Repeating Job" url="creating_a_notification_job/creating_a_repeating_job.htm" />
+    <topic name="Step-by-Step:Send a Call Job" url="step-by-step_guides/step-by-step_send_a_call_job.htm" />
+    <topic name="Step-by-Step:Send a Multi-language Call Job" url="step-by-step_guides/step-by-step_send_a_phone_and_email_job.htm" />
+  </key>
+  <key name="phone message editor" >
+    <topic name="The Phone Message Editor" url="creating_a_message/creating_an_advanced_phone_message.htm#The_Phone_Message_Editor" />
+  </key>
+  <key name="text-to-speech" >
+    <topic name="The_Phone_Message_Editor" url="creating_a_message/creating_an_advanced_phone_message.htm#The_Phone_Message_Editor" />
+    <topic name="Step-by-Step:Send a Call Job" url="step-by-step_guides/step-by-step_send_a_call_job.htm" />
+    <topic name="Step-by-Step:Send a Multi-language Call Job" url="step-by-step_guides/step-by-step_send_a_phone_and_email_job.htm" />
+  </key>
+</key>
+<key name="Remote Telephone Access" >
+  <topic name="Remote Telephone Access Overview" url="remote_telephone_access/remote_telephone_access_overview.htm" />
+  <topic name="Creating a Simple Phone Message" url="creating_a_message/creating_a_simple_phone_message.htm" />
+  <key name="create job" >
+    <topic name="Remotely Create a Multilingual Job" url="remote_telephone_access/remotely_create_a_multilingual_job.htm" />
+    <topic name="Remotely Create a Simple Job" url="remote_telephone_access/remotely_create_a_single_language_job.htm" />
+  </key>
+  <key name="multilingual message" >
+    <topic name="Remotely Create a Multilingual Job" url="remote_telephone_access/remotely_create_a_multilingual_job.htm" />
+    <topic name="Creating a Simple Phone Message" url="creating_a_message/creating_a_simple_phone_message.htm" />
+  </key>
+  <key name="record message" >
+    <topic name="Remotely Create a Multilingual Job" url="remote_telephone_access/remotely_create_a_multilingual_job.htm" />
+    <topic name="Remotely Create a Simple Job" url="remote_telephone_access/remotely_create_a_single_language_job.htm" />
+    <topic name="Creating a Simple Phone Message" url="creating_a_message/creating_a_simple_phone_message.htm" />
+  </key>
+</key>
+<key name="Reports" >
+  <topic name="Creating Notification Reports" url="reports/querying_report_data.htm" />
+  <topic name="Reports Overview" url="reports/reports.htm" />
+  <topic name="Understanding Report Results" url="reports/understanding_call_logs.htm" />
+  <topic name="Standard Job Reports" url="reports/standard_job_reports.htm" />
+  <key name="configure" >
+    <topic name="Creating Notification Reports" url="reports/querying_report_data.htm" />
+  </key>
+  <key name="create" >
+    <topic name="Creating Notification Reports" url="reports/querying_report_data.htm" />
+  </key>
+  <key name="email" >
+    <topic name="Creating a New Job" url="creating_a_notification_job/creating_a_new_job.htm" />
+    <topic name="Creating a Repeating Job" url="creating_a_notification_job/creating_a_repeating_job.htm" />
+    <topic name="Email Logs" url="reports/email_logs.htm" />
+  </key>
+  <key name="filter options" >
+    <topic name="Creating Notification Reports" url="reports/querying_report_data.htm" />
+  </key>
+  <key name="overview" >
+    <topic name="Reports Overview" url="reports/reports.htm" />
+  </key>
+  <key name="report builder" >
+    <topic name="Creating Notification Reports" url="reports/querying_report_data.htm" />
+  </key>
+  <key name="results" >
+    <topic name="Creating Notification Reports" url="reports/querying_report_data.htm" />
+    <topic name="Understanding Report Results" url="reports/understanding_call_logs.htm" />
+  </key>
+  <key name="standard" >
+    <topic name="Standard Job Reports" url="reports/standard_job_reports.htm" />
+  </key>
+  <key name="systemwide" >
+    <topic name="Systemwide Reports" url="the_system_tab/systemwide_reports.htm" />
+  </key>
+  <key name="view" >
+    <topic name="Creating Notification Reports" url="reports/querying_report_data.htm" />
+    <topic name="Understanding Report Results" url="reports/understanding_call_logs.htm" />
+  </key>
+</key>
+
+</indexdata>

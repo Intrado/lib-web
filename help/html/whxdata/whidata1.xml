@@ -1,0 +1,152 @@
+<?xml version='1.0' encoding='utf-8' ?>
+<indexdata>
+<key name="Jobs" >
+  <topic name="Creating a New Job" url="creating_a_notification_job/creating_a_new_job.htm" />
+  <topic name="Creating a Repeating Job" url="creating_a_notification_job/creating_a_repeating_job.htm" />
+  <topic name="Editing an Existing Job" url="creating_a_notification_job/editing_an_existing_job.htm" />
+  <topic name="Jobs Overview" url="creating_a_notification_job/jobsoverview.htm" />
+  <topic name="Step-by-Step:Send a Call Job" url="step-by-step_guides/step-by-step_send_a_call_job.htm" />
+  <topic name="Step-by-Step:Send a Multi-language Call Job" url="step-by-step_guides/step-by-step_send_a_phone_and_email_job.htm" />
+  <topic name="Step-by-Step:Send an Email Job" url="step-by-step_guides/step-by-step_send_an_email_job.htm" />
+  <key name="active &amp; pending" >
+    <topic name="Reports Overview" url="reports/reports.htm" />
+    <topic name="Systemwide Reports#Active___Pending_Jobs" url="the_system_tab/systemwide_reports.htm#Active___Pending_Jobs" />
+  </key>
+  <key name="cancel" >
+    <topic name="Editing an Existing Job" url="creating_a_notification_job/editing_an_existing_job.htm" />
+  </key>
+  <key name="completed" >
+    <topic name="Reports Overview" url="reports/reports.htm" />
+    <topic name="Systemwide Reports#Completed Jobs" url="the_system_tab/systemwide_reports.htm#Completed Jobs" />
+  </key>
+  <key name="configure" >
+    <topic name="Creating a New Job" url="creating_a_notification_job/creating_a_new_job.htm" />
+  </key>
+  <key name="create new" >
+    <topic name="Creating a Job with EasyCall" url="creating_a_notification_job/creating_a_job_with_easycall.htm" />
+    <topic name="Creating a New Job" url="creating_a_notification_job/creating_a_new_job.htm" />
+  </key>
+  <key name="edit existing" >
+    <topic name="Editing an Existing Job" url="creating_a_notification_job/editing_an_existing_job.htm" />
+  </key>
+  <key name="email" >
+    <topic name="Creating a New Job" url="creating_a_notification_job/creating_a_new_job.htm" />
+    <topic name="Step-by-Step:Send an Email Job" url="step-by-step_guides/step-by-step_send_an_email_job.htm" />
+    <topic name="Creating a Repeating Job" url="creating_a_notification_job/creating_a_repeating_job.htm" />
+  </key>
+  <key name="email when complete" >
+    <topic name="Creating a Repeating Job" url="creating_a_notification_job/creating_a_repeating_job.htm" />
+    <topic name="Creating a New Job" url="creating_a_notification_job/creating_a_new_job.htm" />
+  </key>
+  <key name="job editor" >
+    <topic name="Creating a New Job" url="creating_a_notification_job/creating_a_new_job.htm" />
+  </key>
+  <key name="multilingual" >
+    <topic name="Step-by-Step:Send a Multi-language Call Job" url="step-by-step_guides/step-by-step_send_a_phone_and_email_job.htm" />
+    <topic name="Creating a New Job" url="creating_a_notification_job/creating_a_new_job.htm" />
+    <topic name="Creating a Repeating Job" url="creating_a_notification_job/creating_a_repeating_job.htm" />
+  </key>
+  <key name="overview" >
+    <topic name="Jobs Overview" url="creating_a_notification_job/jobsoverview.htm" />
+  </key>
+  <key name="phone" >
+    <topic name="Creating a New Job" url="creating_a_notification_job/creating_a_new_job.htm" />
+    <topic name="Step-by-Step:Send a Call Job" url="step-by-step_guides/step-by-step_send_a_call_job.htm" />
+    <topic name="Step-by-Step:Send a Multi-language Call Job" url="step-by-step_guides/step-by-step_send_a_phone_and_email_job.htm" />
+    <topic name="Creating a Repeating Job" url="creating_a_notification_job/creating_a_repeating_job.htm" />
+  </key>
+  <key name="print" >
+    <topic name="Creating a New Job" url="creating_a_notification_job/creating_a_new_job.htm" />
+  </key>
+  <key name="priority" >
+    <topic name="Creating a New Job" url="creating_a_notification_job/creating_a_new_job.htm" />
+    <topic name="Creating a Repeating Job" url="creating_a_notification_job/creating_a_repeating_job.htm" />
+  </key>
+  <key name="repeating" >
+    <topic name="Creating a Repeating Job" url="creating_a_notification_job/creating_a_repeating_job.htm" />
+  </key>
+  <key name="send using EasyCall" >
+    <topic name="Creating a Job with EasyCall" url="creating_a_notification_job/creating_a_job_with_easycall.htm" />
+  </key>
+  <key name="send using remote access" >
+    <topic name="Remotely Create a Simple Job" url="remote_telephone_access/remotely_create_a_single_language_job.htm" />
+    <topic name="Remotely Create a Multilingual Job" url="remote_telephone_access/remotely_create_a_multilingual_job.htm" />
+  </key>
+  <key name="settings" >
+    <topic name="Creating a New Job" url="creating_a_notification_job/creating_a_new_job.htm" />
+    <topic name="Creating a Repeating Job" url="creating_a_notification_job/creating_a_repeating_job.htm" />
+  </key>
+  <key name="tutorial" >
+    <topic name="Step-by-Step:Send a Call Job" url="step-by-step_guides/step-by-step_send_a_call_job.htm" />
+    <topic name="Step-by-Step:Send a Multi-language Call Job" url="step-by-step_guides/step-by-step_send_a_phone_and_email_job.htm" />
+    <topic name="Step-by-Step:Send an Email Job" url="step-by-step_guides/step-by-step_send_an_email_job.htm" />
+  </key>
+  <key name="view active and pending" >
+    <topic name="The Start Page" url="getting_started/the_start_page.htm" />
+  </key>
+</key>
+<key name="Lists" >
+  <topic name="Adding People By Searching" url="creating_a_list/adding_people_by_searching.htm" />
+  <topic name="Adding People From Your Address Book" url="creating_a_list/adding_people_from_your_address_book.htm" />
+  <topic name="Adding People Manually" url="creating_a_list/adding_people_manually.htm" />
+  <topic name="Adding People Using Rules" url="creating_a_list/adding_people_using_rules.htm" />
+  <topic name="Creating a New List" url="creating_a_list/creating_a_new_list.htm" />
+  <topic name="Step-by-Step:Create a List" url="step-by-step_guides/step-by-step_create_a_list.htm" />
+  <topic name="Editing or Deleting an Existing List" url="creating_a_list/editing_or_deleting_an_existing_list.htm" />
+  <topic name="The List Editor Screen" url="creating_a_list/the_list_editor_screen.htm" />
+  <topic name="Lists Overview" url="creating_a_list/listsoverview.htm" />
+  <topic name="Removing Individuals From Your List" url="creating_a_list/removing_individuals_from_your_list.htm" />
+  <topic name="Uploading a List From Your Computer" url="creating_a_list/uploading_a_list_from_your_computer.htm" />
+  <key name="add new person" >
+    <topic name="Adding People Manually" url="creating_a_list/adding_people_manually.htm" />
+    <topic name="Adding People From Your Address Book" url="creating_a_list/adding_people_from_your_address_book.htm" />
+    <topic name="Adding People By Searching" url="creating_a_list/adding_people_by_searching.htm" />
+  </key>
+  <key name="address book" >
+    <topic name="Adding People From Your Address Book" url="creating_a_list/adding_people_from_your_address_book.htm" />
+  </key>
+  <key name="create from start page" >
+    <topic name="The Start Page" url="getting_started/the_start_page.htm" />
+  </key>
+  <key name="create new" >
+    <topic name="Creating a New List" url="creating_a_list/creating_a_new_list.htm" />
+  </key>
+  <key name="creating dynamic" >
+    <topic name="Adding People Using Rules" url="creating_a_list/adding_people_using_rules.htm" />
+  </key>
+  <key name="deleting" >
+    <topic name="Editing or Deleting an Existing List" url="creating_a_list/editing_or_deleting_an_existing_list.htm" />
+  </key>
+  <key name="edit existing" >
+    <topic name="Editing or Deleting an Existing List" url="creating_a_list/editing_or_deleting_an_existing_list.htm" />
+  </key>
+  <key name="list editor" >
+    <topic name="The List Editor Screen" url="creating_a_list/the_list_editor_screen.htm" />
+  </key>
+  <key name="overview" >
+    <topic name="Lists Overview" url="creating_a_list/listsoverview.htm" />
+  </key>
+  <key name="preview" >
+    <topic name="Adding People Using Rules" url="creating_a_list/adding_people_using_rules.htm" />
+  </key>
+  <key name="remove person" >
+    <topic name="Removing Individuals From Your List" url="creating_a_list/removing_individuals_from_your_list.htm" />
+  </key>
+  <key name="search" >
+    <topic name="Adding People By Searching" url="creating_a_list/adding_people_by_searching.htm" />
+  </key>
+  <key name="skip person" >
+    <topic name="Removing Individuals From Your List" url="creating_a_list/removing_individuals_from_your_list.htm" />
+  </key>
+  <key name="tutorial" >
+    <topic name="Step-by-Step:Create a List" url="step-by-step_guides/step-by-step_create_a_list.htm" />
+  </key>
+  <key name="upload" >
+    <topic name="Uploading a List From Your Computer" url="creating_a_list/uploading_a_list_from_your_computer.htm" />
+  </key>
+  <key name="using rules" >
+    <topic name="Adding People Using Rules" url="creating_a_list/adding_people_using_rules.htm" />
+  </key>
+</key>
+
+</indexdata>

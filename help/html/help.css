@@ -1,42 +1,46 @@
-﻿SPAN.maincontent { 
-                  font-size:10pt; 
-                  font-family:Verdana, sans-serif;  }
-A:active { 
-          font-family:Verdana, sans-serif; 
-          color:#a45200; 
-          font-size:8pt;  }
-A:hover { 
-         font-family:Verdana, sans-serif; 
-         color:#208fff; 
-         font-size:8pt;  }
-A:link { 
-        font-family:Verdana, sans-serif; 
-        color:#004891; 
-        font-size:8pt;  }
-A:visited { 
-           font-family:Verdana, sans-serif; 
-           color:#572c00; 
-           font-size:8pt;  }
-SPAN.glosstext { 
-                font-size:10pt; 
-                font-family:Verdana, sans-serif;  }
-SPAN.expandtext { 
-                 font-size:10pt; 
-                 font-family:Verdana, sans-serif;  }
-BODY { 
-      font-family:Verdana, sans-serif; 
-      color:#585858;  }
-OL { 
+﻿A { 
+   font-family:"Lucida Grande" , Verdana, Arial, Helvetica, sans-serif; 
+   color:#365F8D; 
+   font-size:10pt; 
+   text-decoration:underline;  }
+a:hover { 
+         font-family:"Lucida Grande" , Verdana, Arial, Helvetica, sans-serif; 
+         color:#4274aa; 
+         font-size:10pt; 
+         text-decoration:underline;  }
+body { 
+      font-family:"Lucida Grande" , Verdana, Arial, Helvetica, sans-serif; 
+      color:#595959; 
+      background:#f0f0f0; 
+      text-align:left; 
+      font-size:10pt; 
+      background-color:#ffffff;  }
+a:link { 
+        color:#365F8D; 
+        font-size:10pt; 
+        text-decoration:underline;  }
+a:visited { 
+           color:#365F8D; 
+           font-size:10pt; 
+           text-decoration:underline;  }
+#mainscreen { 
+             width:100%; 
+             border:1px solid #c0c0c0; 
+             text-align:left; 
+             background:#365F8D;  }
+td { 
     font-size:10pt; 
-    font-family:Verdana, sans-serif;  }
-UL { 
-    font-size:10pt; 
-    font-family:Verdana, sans-serif;  }
-P { 
-   font-size:8pt;  }
-LI.P { 
-      font-size:8pt;  }
+    font-family:"Lucida Grande" , Verdana, Arial, Helvetica, sans-serif;  }
+object id="RelatedTopics"  { 
+                            font-size:small; 
+                            font-family:"Lucida Grande" , Verdana, Arial, Helvetica, sans-serif; 
+                            color:#365F8D; 
+                            text-decoration:underline;  }
+A.popupspot {  }
 H1 { 
-    font-size:large;  }
+    font-size:18pt;  }
 LI.H1 { 
-       font-size:large;  }
+       font-size:18pt;  }
+P { 
+   margin-left:40px;  }
+LI.P {  }

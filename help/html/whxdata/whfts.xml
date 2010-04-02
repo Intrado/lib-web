@@ -1,5 +1,15 @@
 <?xml version='1.0' encoding='utf-8' ?>
 <fts>
+<chunkinfo url="whfwdata0.xml" first="!" last="automatic"/>
+<chunkinfo url="whfwdata1.xml" first="automatical" last="cpl"/>
+<chunkinfo url="whfwdata2.xml" first="creat" last="extension"/>
+<chunkinfo url="whfwdata3.xml" first="fac" last="informandol"/>
+<chunkinfo url="whfwdata4.xml" first="information" last="new"/>
+<chunkinfo url="whfwdata5.xml" first="next" last="reason"/>
+<chunkinfo url="whfwdata6.xml" first="receiv" last="smil"/>
+<chunkinfo url="whfwdata7.xml" first="smith" last="usernam"/>
+<chunkinfo url="whfwdata8.xml" first="utility" last="•"/>
 
+<tchunkinfo first="0" last="83" url="whftdata0.xml" />
 
 </fts>

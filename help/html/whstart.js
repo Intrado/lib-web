@@ -31,10 +31,10 @@ function delayReload()
 	}
 }
 
-var gsToolbarOrder = "toc|blankblock";
+var gsToolbarOrder = "toc|idx|fts|blankblock";
 var gsMinibarOrder = "blankblock|hide2|";
 
-var gsTopic = "Getting_Started/Welcome.htm";
+var gsTopic = "getting_started/getting_started.htm";
 var PANE_OPT_SEARCH = 1;
 var PANE_OPT_BROWSESEQ = 2;
 var gnOpts=-1;

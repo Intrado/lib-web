@@ -1,0 +1,130 @@
+<?xml version='1.0' encoding='utf-8' ?>
+<indexdata>
+<key name="Audio File Library" >
+  <topic name="The Audio File Library" url="creating_a_message/the_audio_file_library.htm" />
+  <key name="call me to record" >
+    <topic name="The Audio File Library#Call_Me_to_Record" url="creating_a_message/the_audio_file_library.htm#Call_Me_to_Record" />
+  </key>
+  <key name="delete file" >
+    <topic name="The Audio File Library" url="creating_a_message/the_audio_file_library.htm" />
+  </key>
+  <key name="edit name" >
+    <topic name="The Audio File Library" url="creating_a_message/the_audio_file_library.htm" />
+  </key>
+  <key name="upload audio files" >
+    <topic name="The Audio File Library#Upload_Audio_File" url="creating_a_message/the_audio_file_library.htm#Upload_Audio_File" />
+  </key>
+</key>
+<key name="Create" >
+  <topic name="Creating a New Phone Message" url="creating_a_message/creating_an_advanced_phone_message.htm" />
+  <topic name="Creating a New Email Message" url="creating_a_message/creating_a_new_email_message.htm" />
+  <topic name="Creating a Job with EasyCall" url="creating_a_notification_job/creating_a_job_with_easycall.htm" />
+  <topic name="Creating a New List" url="creating_a_list/creating_a_new_list.htm" />
+  <topic name="Creating a New Job" url="creating_a_notification_job/creating_a_new_job.htm" />
+  <topic name="Creating a Repeating Job" url="creating_a_notification_job/creating_a_repeating_job.htm" />
+  <topic name="Creating Notification Reports" url="reports/querying_report_data.htm" />
+  <key name="call jobs" >
+    <topic name="Creating a New Job" url="creating_a_notification_job/creating_a_new_job.htm" />
+    <topic name="Creating a Repeating Job" url="creating_a_notification_job/creating_a_repeating_job.htm" />
+    <topic name="Step-by-Step:Send a Call Job" url="step-by-step_guides/step-by-step_send_a_call_job.htm" />
+  </key>
+  <key name="dynamic lists" >
+    <topic name="Adding People Using Rules" url="creating_a_list/adding_people_using_rules.htm" />
+  </key>
+  <key name="dynamic messages" >
+    <topic name="Creating a New Phone Message#The_Phone_Message_Editor" url="creating_a_message/creating_an_advanced_phone_message.htm#The_Phone_Message_Editor" />
+    <topic name="Creating a New Email Message" url="creating_a_message/creating_a_new_email_message.htm" />
+  </key>
+  <key name="email jobs" >
+    <topic name="Creating a New Job" url="creating_a_notification_job/creating_a_new_job.htm" />
+    <topic name="Creating a Repeating Job" url="creating_a_notification_job/creating_a_repeating_job.htm" />
+    <topic name="Step-by-Step:Send an Email Job" url="step-by-step_guides/step-by-step_send_an_email_job.htm" />
+  </key>
+  <key name="lists" >
+    <topic name="Creating a New List" url="creating_a_list/creating_a_new_list.htm" />
+  </key>
+  <key name="messages" >
+    <topic name="Creating a New Phone Message" url="creating_a_message/creating_an_advanced_phone_message.htm" />
+    <topic name="Creating a New Email Message" url="creating_a_message/creating_a_new_email_message.htm" />
+  </key>
+  <key name="repeating jobs" >
+    <topic name="Creating a Repeating Job" url="creating_a_notification_job/creating_a_repeating_job.htm" />
+  </key>
+  <key name="reports" >
+    <topic name="Creating Notification Reports" url="reports/querying_report_data.htm" />
+  </key>
+  <key name="static lists" >
+    <topic name="Adding People Manually" url="creating_a_list/adding_people_manually.htm" />
+    <topic name="Adding People From Your Address Book" url="creating_a_list/adding_people_from_your_address_book.htm" />
+  </key>
+  <key name="static messages" >
+    <topic name="Creating a New Email Message" url="creating_a_message/creating_a_new_email_message.htm" />
+  </key>
+</key>
+<key name="Delete" >
+  <topic name="Editing an Existing Job" url="creating_a_notification_job/editing_an_existing_job.htm" />
+  <topic name="Editing or Deleting an Existing List" url="creating_a_list/editing_or_deleting_an_existing_list.htm" />
+  <topic name="Editing or Deleting an Existing Message" url="creating_a_message/editing_or_deleting_an_existing_message.htm" />
+  <topic name="Removing Individuals From Your List" url="creating_a_list/removing_individuals_from_your_list.htm" />
+  <key name="blocked phone number" >
+    <topic name="Blocking Phone Numbers" url="the_system_tab/blocking_phone_numbers.htm" />
+  </key>
+  <key name="existing job" >
+    <topic name="Editing an Existing Job" url="creating_a_notification_job/editing_an_existing_job.htm" />
+  </key>
+  <key name="existing list" >
+    <topic name="Editing or Deleting an Existing List" url="creating_a_list/editing_or_deleting_an_existing_list.htm" />
+  </key>
+  <key name="existing message" >
+    <topic name="Editing or Deleting an Existing Message" url="creating_a_message/editing_or_deleting_an_existing_message.htm" />
+  </key>
+  <key name="person from list" >
+    <topic name="Removing Individuals From Your List" url="creating_a_list/removing_individuals_from_your_list.htm" />
+  </key>
+</key>
+<key name="EasyCall" >
+  <topic name="Creating a Job with EasyCall" url="creating_a_notification_job/creating_a_job_with_easycall.htm" />
+  <topic name="The Start Page" url="getting_started/the_start_page.htm" />
+</key>
+<key name="Edit" >
+  <topic name="Editing an Existing Job" url="creating_a_notification_job/editing_an_existing_job.htm" />
+  <topic name="Editing or Deleting an Existing List" url="creating_a_list/editing_or_deleting_an_existing_list.htm" />
+  <topic name="Editing or Deleting an Existing Message" url="creating_a_message/editing_or_deleting_an_existing_message.htm" />
+  <key name="existing job" >
+    <topic name="Editing an Existing Job" url="creating_a_notification_job/editing_an_existing_job.htm" />
+  </key>
+  <key name="existing list" >
+    <topic name="Editing or Deleting an Existing List" url="creating_a_list/editing_or_deleting_an_existing_list.htm" />
+  </key>
+  <key name="existing message" >
+    <topic name="Editing or Deleting an Existing Message" url="creating_a_message/editing_or_deleting_an_existing_message.htm" />
+  </key>
+</key>
+<key name="Email" >
+  <topic name="Creating a New Email Message" url="creating_a_message/creating_a_new_email_message.htm" />
+  <topic name="Step-by-Step:Send an Email Job" url="step-by-step_guides/step-by-step_send_an_email_job.htm" />
+  <key name="create message" >
+    <topic name="Creating a New Email Message" url="creating_a_message/creating_a_new_email_message.htm" />
+    <topic name="Step-by-Step:Send an Email Job" url="step-by-step_guides/step-by-step_send_an_email_job.htm" />
+  </key>
+  <key name="email message editor" >
+    <topic name="Creating a New Email Message" url="creating_a_message/creating_a_new_email_message.htm" />
+    <topic name="Step-by-Step:Send an Email Job" url="step-by-step_guides/step-by-step_send_an_email_job.htm" />
+  </key>
+  <key name="send job" >
+    <topic name="Step-by-Step:Send an Email Job" url="step-by-step_guides/step-by-step_send_an_email_job.htm" />
+    <topic name="Creating a New Job" url="creating_a_notification_job/creating_a_new_job.htm" />
+    <topic name="Creating a Repeating Job" url="creating_a_notification_job/creating_a_repeating_job.htm" />
+  </key>
+</key>
+<key name="Emergency" >
+  <topic name="Emergency Preparedness" url="getting_started/emergency_preparedness.htm" />
+  <key name="prepare" >
+    <topic name="Emergency Preparedness" url="getting_started/emergency_preparedness.htm" />
+  </key>
+</key>
+<key name="Help" >
+  <topic name="Getting Started" url="getting_started/getting_started.htm" />
+</key>
+
+</indexdata>

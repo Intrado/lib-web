@@ -1,4 +1,8 @@
 <?xml version='1.0' encoding='utf-8' ?>
 <index>
+<chunkinfo url="whidata0.xml" first="Audio File Library" last="Help" num="34" />
+<chunkinfo url="whidata1.xml" first="Jobs" last="Lists" num="38" />
+<chunkinfo url="whidata2.xml" first="Messages" last="Reports" num="43" />
+<chunkinfo url="whidata3.xml" first="Responses" last="System" num="24" />
 
 </index>
