@@ -5,6 +5,7 @@ Description:
 This script will import classroom messages data
 
 Usage:
+-t type must be php or prop
 -l languagecode ie 'en', 'es' etc.
 -i input csv file
 -o output root path
@@ -23,6 +24,9 @@ foreach ($argv as $arg) {
 	if ($arg[0] == "-") {
 		for ($x = 1; $x < strlen($arg); $x++) {
 			switch ($arg[$x]) {
+				case "t":
+					$flag = "t";
+					break;
 				case "l":
 					$flag = "l";
 					break;
@@ -51,7 +55,8 @@ foreach ($argv as $arg) {
 		}
 	}
 }
-
+if (!isset($values["t"]) || !($values["t"] == "php" || $values["t"] == "prop"))
+	exit("No type specified\n$usage");
 if (!isset($values["l"]))
 	exit("No language specified\n$usage");
 if (!isset($values["i"]))
@@ -70,12 +75,16 @@ $path = $values["o"] . "/" . $values["l"];
 if(!file_exists($path)) {
 	mkdir($path, 0755);
 }
-$output = fopen($path . "/targetedmessage.php", 'w') or die("Can't open output file \"" . $values["o"] . "\"\n");
-
+if($values["t"] == "php") {
+	$output = fopen($path . "/targetedmessage.php", 'w') or die("Can't open output file \"" . $values["o"] . "\"\n");
+	fwrite($output, "<? \n\$messagedatacache[\"" . $values["l"] . "\"] = array(\n");
+	// no need to specify utf-8
+} else {
+	$output = fopen($path . "/targetedmessage.properties", 'w') or die("Can't open output file \"" . $values["o"] . "\"\n");
+	fwrite($output,"\xEF\xBB\xBF");//bit order mark for utf-8, this Is the only whay that works
+}
 echo "Processing";
 $count = 0;
-
-fwrite($output, "<? \n\$messagedatacache[\"" . $values["l"] . "\"] = array(\n");
 
 $checkarray = array();
 
@@ -99,15 +108,19 @@ while (($data = fgetcsv($input)) !== FALSE) {
 	$key = addslashes(strtolower(trim($data[0])));
 	$value = addcslashes($data[2],"'");
 	if(!isset($checkarray[$key])) {
-		fwrite($output, "'$key'=>'$value',\n");
+		if($values["t"] == "php")
+			fwrite($output, "'$key'=>'$value',\n");
+		else
+			fwrite($output,"$key=$value\n");
 		$checkarray[$key] = $value;
 		$count++;
 	} else {
 		echo "\nWarning " . ($checkarray[$key]==$value?"Two identical key/value pairs ($key => $value)":"Two messages with the same key ($key)") . " - skipping\n";
 	}
 }
-fwrite($output,");\n ?>");
-
+if($values["t"] == "php") {
+	fwrite($output,");\n ?>");
+}
 echo "\nImported $count records\n";
 
 if(isset($values["s"])) {
