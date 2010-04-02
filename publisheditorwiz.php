@@ -140,7 +140,7 @@ class PublishTargetWiz_publishtarget extends WizStep {
 			"helpstep" => 1
 		);
 
-		$helpsteps = array(_L("This step allows you to control who can subscribe to this item. <br><br><ul> <li>Unpublish this item - Makes this item no longer appear as a subscribable option. Users will no longer be able to create jobs with this item.<li>Anyone May Subscribe - Allow any user to subscribe to this item. <li>Top Level Users - Only users with no restrictions, such as system administrators, may subscribe.<li>Specific Organizations - Only users from certain organization may subscribe.</ul>"));
+		$helpsteps = array(_L("This step allows you to control who can subscribe to this item. <br><br><ul> <li>Unpublish this item - Makes this item no longer appear as a subscribable option. Users will no longer be able to create jobs with this item.<li>Anyone May Subscribe - Allow any user to subscribe to this item. <li>Top Level Users - Only users with no restrictions, such as system administrators, may subscribe.<li>Specific Organizations - Only users from certain organization, such as a school or department, may subscribe.</ul>"));
 
 		return new Form("publishtargetwiz-publishtarget",$formdata,$helpsteps);
 	}
