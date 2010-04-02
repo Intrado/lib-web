@@ -786,6 +786,12 @@ td.SplitPane {
 	padding-right: 4px;
 }
 
+.feedbuttoncontainer {
+	border-bottom: 1px solid <?=$theme2?>;
+	padding-bottom: 5px;
+	margin-bottom: 5px;
+}
+
 .feed a {
 	text-decoration: none;
 }

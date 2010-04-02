@@ -257,17 +257,20 @@ startWindow(_L('My Messages'), 'padding: 3px;', true, true);
 ?>
 <table width="100%" style="padding-top: 7px;">
 <tr>
-	<td class="feed" style="width: 180px;vertical-align: top;font-size: 12px;" >
-		<div>
-			<?= icon_button(_L('Create New Message'),"add","location.href='messagegroup.php?id=new'") ?>
-			<?=(($USER->authorize('subscribe') && userCanSubscribe('messagegroup'))?icon_button(_L('Subscribe to Message'),"add", "document.location='messagegroupsubscribe.php'"):'') ?>
+	<td style="width: 180px;vertical-align: top;font-size: 12px;" >
+		<div class="feedbuttoncontainer">
+			<?= icon_button(_L('Create a Message'),"add","location.href='messagegroup.php?id=new'") ?>
 			<div style="clear:both;"></div>
 		</div>
+		<?=(($USER->authorize('subscribe') && userCanSubscribe('messagegroup'))?icon_button(_L('Subscribe to a Message'),"fugue/star", "document.location='messagegroupsubscribe.php'"):'') ?>
+		<div style="clear:both;"></div>
 		<br />
-		<h1 id="filterby">Sort By:</h1>
-		<div id="allfilters" class="feedfilter">
-			<a id="datefilter" href="#" onclick="applyfilter('date'); return false;"><img src="img/largeicons/tiny20x20/clock.jpg" />Modify Date</a><br />
-			<a id="namefilter" href="#" onclick="applyfilter('name'); return false;"><img src="img/largeicons/tiny20x20/pencil.jpg" />Name</a><br />
+		<div class="feed">
+			<h1 id="filterby">Sort By:</h1>
+			<div id="allfilters" class="feedfilter">
+				<a id="datefilter" href="#" onclick="applyfilter('date'); return false;"><img src="img/largeicons/tiny20x20/clock.jpg" />Modify Date</a><br />
+				<a id="namefilter" href="#" onclick="applyfilter('name'); return false;"><img src="img/largeicons/tiny20x20/pencil.jpg" />Name</a><br />
+			</div>
 		</div>
 	</td>
 	<td width="10px" style="border-left: 1px dotted gray;" >&nbsp;</td>

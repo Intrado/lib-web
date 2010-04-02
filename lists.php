@@ -216,24 +216,29 @@ startWindow('My Lists&nbsp;' . help('Lists_MyLists'));
 ?>
 <table width="100%" style="padding-top: 7px;">
 <tr>
-	<td class="feed" style="width: 180px;vertical-align: top;font-size: 12px;" >
-		<div>
-			<?= icon_button(_L('Create New List with Rules'),"add","location.href='editlistrules.php?id=new'") ?>
+	<td style="width: 180px;vertical-align: top;font-size: 12px;" >
+		<!-- Create List buttons -->
+		<div class="feedbuttoncontainer">
+			<?= icon_button(_L('Create a List'),"add","location.href='editlistrules.php?id=new'") ?>
 			<div style="clear:both;"></div>
-			<?
-				if (getSystemSetting('_hasenrollment')) {
-					echo icon_button(_L('Create New List with Sections'),"add","location.href='editlistsections.php?id=new'");
-				}
-			?>
-			<div style="clear:both;"></div>
-			<?=(($USER->authorize('subscribe') && userCanSubscribe('list'))?icon_button(_L('Subscribe to List'),"add", "document.location='listsubscribe.php'"):'') ?>
-			<div style="clear:both;"></div>
+			<? if (getSystemSetting('_hasenrollment')) {
+				echo icon_button(_L('Create a List by Section'),"add","location.href='editlistsections.php?id=new'");
+				?><div style="clear:both;"></div><?
+			} ?>
 		</div>
+		<div>
+			<?=(($USER->authorize('subscribe') && userCanSubscribe('list'))?icon_button(_L('Subscribe to a List'),"fugue/star", "document.location='listsubscribe.php'"):'') ?>
+		</div>
+		<div style="clear:both;"></div>
+		
+		
 		<br />
-		<h1 id="filterby">Sort By:</h1>
-		<div id="allfilters" class="feedfilter">
-			<a id="datefilter" href="#" onclick="applyfilter('date'); return false;"><img src="img/largeicons/tiny20x20/clock.jpg" />Modify Date</a><br />
-			<a id="namefilter" href="#" onclick="applyfilter('name'); return false;"><img src="img/largeicons/tiny20x20/pencil.jpg" />Name</a><br />
+		<div class="feed">
+			<h1 id="filterby">Sort By:</h1>
+			<div id="allfilters" class="feedfilter">
+				<a id="datefilter" href="#" onclick="applyfilter('date'); return false;"><img src="img/largeicons/tiny20x20/clock.jpg" />Modify Date</a><br />
+				<a id="namefilter" href="#" onclick="applyfilter('name'); return false;"><img src="img/largeicons/tiny20x20/pencil.jpg" />Name</a><br />
+			</div>
 		</div>
 	</td>
 	<td width="10px" style="border-left: 1px dotted gray;" >&nbsp;</td>
