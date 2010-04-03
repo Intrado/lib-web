@@ -17,6 +17,7 @@ function messagegroupHandleBeforeTabLoad (event, state) {
 }
 
 function messagegroupHandleTabLoaded (event, state, existingmessagegroupid, autotranslatorUpdator, readonly) {
+
 	if (typeof Tips !== "undefined")
 		Tips.hideAll();
 	
@@ -31,6 +32,11 @@ function messagegroupHandleTabLoaded (event, state, existingmessagegroupid, auto
 		messagetabicon.src = 'img/icons/diagona/16/160.gif';
 
 	messagegroupStyleLayouts(readonly);
+
+	if(readonly) {
+		messagetabicon.src = "img/icons/accept.gif";
+		return;
+	}
 	
 	var memo = event.memo;
 	var languagesectionpieces = memo.specificsections ? memo.specificsections[0].split('-') : null;
@@ -97,7 +103,7 @@ function messagegroupHandleTabLoaded (event, state, existingmessagegroupid, auto
 				autotranslatorUpdator(autotranslatorbutton, state);
 		}
 	}
-	
+
 	// Update the status icons on tabs.
 	cachedAjaxGet('ajax.php?type=messagegroupsummary&messagegroupid='+existingmessagegroupid,
 		function(transport) {
@@ -108,7 +114,7 @@ function messagegroupHandleTabLoaded (event, state, existingmessagegroupid, auto
 				state.messagegroupsummary = [];
 				return;
 			}
-			
+
 			state.messagegroupsummary = results.summary;
 			state.defaultlanguagecode = results.defaultlanguagecode;
 
@@ -125,7 +131,8 @@ function messagegroupHandleTabLoaded (event, state, existingmessagegroupid, auto
 				$('emailheadersicon').src = "img/icons/diagona/16/160.gif";
 			if ($('phone-voiceicon'))
 				$('phone-voiceicon').src = "img/icons/diagona/16/160.gif";
-			
+
+			console.info('test' + state.messagegroupsummary.length);
 
 			for (var i = 0, count = state.messagegroupsummary.length; i < count; i++) {
 				var result = state.messagegroupsummary[i];
@@ -140,6 +147,7 @@ function messagegroupHandleTabLoaded (event, state, existingmessagegroupid, auto
 		null,
 		readonly || false
 	);
+	
 }
 
 function messagegroupStyleLayouts(readonly) {
