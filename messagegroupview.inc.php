@@ -3,20 +3,8 @@
 ///////////////////////////////////////////////////////////////////////////////
 // Authorization:
 ///////////////////////////////////////////////////////////////////////////////
-$cansendphone = $USER->authorize('sendphone');
-$cansendemail = $USER->authorize('sendemail');
-$cansendsms = getSystemSetting('_hassms', false) && $USER->authorize('sendsms');
-$cansendmultilingual = $USER->authorize('sendmulti');
-
-// Only kick the user out if he does not have permission to create any message at all (neither phone, email, nor sms).
-if (!$cansendphone && !$cansendemail && !$cansendsms) {
-	redirect('unauthorized.php');
-}
-
-///////////////////////////////////////////////////////////////////////////////
-// Request processing:
-///////////////////////////////////////////////////////////////////////////////
 // no messagegroup id
+
 if (!isset($_GET['id']))
 	redirect('unauthorized.php');
 
@@ -24,11 +12,20 @@ if (!isset($_GET['id']))
 if (!userOwns('messagegroup',$_GET['id'] + 0) && !isPublished('messagegroup', $_GET['id']) && !userCanSubscribe('messagegroup', $_GET['id']))
 	redirect('unauthorized.php');
  
+///////////////////////////////////////////////////////////////////////////////
+// Request processing:
+///////////////////////////////////////////////////////////////////////////////
+
 $messagegroup = new MessageGroup($_GET['id'] + 0);
 
 if($messagegroup->type != 'notification') {
 	redirect('unauthorized.php');
 }
+
+$cansendphone = $messagegroup->hasMessage('phone','voice');
+$cansendemail = $messagegroup->hasMessage('email','plain') || $messagegroup->hasMessage('email','html');
+$cansendsms = getSystemSetting('_hassms', false) && $messagegroup->hasMessage('sms','plain');
+$cansendmultilingual = QuickQuery("select 1 from `message` where messagegroupid = ? and languagecode != 'en' limit 1", false, array($messagegroup->id));
 
 ///////////////////////////////////////////////////////////////////////////////
 // Data Gathering:
