@@ -16,10 +16,16 @@ if (isset($_GET['usetext']) && isset($_SESSION['ttstext']) && isset($_SESSION['t
 	$gender = strtolower($_SESSION['ttsgender']);
 	
 	$fields=array();
+	$languagefield = FieldMap::getLanguageField();
 	for($i=1; $i <= 20; $i++){
 		$fieldnum = sprintf("f%02d", $i);
-		if(isset($_REQUEST[$fieldnum]))
-			$fields[$fieldnum] = $_REQUEST[$fieldnum];
+		if(isset($_REQUEST[$fieldnum])) {
+			if($languagefield == $fieldnum) {
+				$languages = QuickQueryList("select code,name from language order by name",true);
+				$fields[$fieldnum] = $languages[$_REQUEST[$fieldnum]];
+			} else
+				$fields[$fieldnum] = $_REQUEST[$fieldnum];
+		}
 	}
 	
 	$voiceid = false;
@@ -41,7 +47,7 @@ if (isset($_GET['usetext']) && isset($_SESSION['ttstext']) && isset($_SESSION['t
 	$message = new Message();
 	$errors = array();	
 	$parts = $message->parse($text,$errors,$voiceid);
-	
+
 	if(count($fields) == 0) {
 		foreach($parts as $part) {
 			if(isset($part->fieldnum)) {
@@ -68,10 +74,16 @@ if (isset($_GET['usetext']) && isset($_SESSION['ttstext']) && isset($_SESSION['t
 	
 	if (userOwns("message",$id) || $USER->authorize('managesystem') || isPublished("message", $id)) {
 		$fields=array();
+		$languagefield = FieldMap::getLanguageField();
 		for($i=1; $i <= 20; $i++){
 			$fieldnum = sprintf("f%02d", $i);
-			if(isset($_REQUEST[$fieldnum]))
-				$fields[$fieldnum] = $_REQUEST[$fieldnum];
+			if(isset($_REQUEST[$fieldnum])) {
+				if($languagefield == $fieldnum) {
+					$languages = QuickQueryList("select code,name from language order by name",true);
+					$fields[$fieldnum] = $languages[$_REQUEST[$fieldnum]];
+				} else
+					$fields[$fieldnum] = $_REQUEST[$fieldnum];
+			}
 		}
 		Message::playAudio($id, $fields,"mp3");
 		exit();
