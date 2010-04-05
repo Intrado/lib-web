@@ -132,8 +132,6 @@ function messagegroupHandleTabLoaded (event, state, existingmessagegroupid, auto
 			if ($('phone-voiceicon'))
 				$('phone-voiceicon').src = "img/icons/diagona/16/160.gif";
 
-			console.info('test' + state.messagegroupsummary.length);
-
 			for (var i = 0, count = state.messagegroupsummary.length; i < count; i++) {
 				var result = state.messagegroupsummary[i];
 				if (result.type == 'email' && $('emailheadersicon'))
