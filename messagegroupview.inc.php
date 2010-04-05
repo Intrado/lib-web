@@ -168,8 +168,8 @@ foreach ($destinations as $type => $destination) {
 								<div align="center" style="clear:left">
 									<div id="player"></div>' .
 									($hasdata?'':'<script language="JavaScript" type="text/javascript">
-													embedPlayer("preview.wav.php/embed_preview.wav?id=' . $message->id . '","player",true);
-												</script>') .
+														embedPlayer("preview.wav.php/embed_preview.wav?id=' . $message->id . '","player");
+													</script>') .
 									'<div id="download">' . ($hasdata?'':'<a href="preview.wav.php/download_preview.wav?id=' . $message->id . '&download=true" onclick="sessiondata=false;">' . _L("Click here to download") . '</a>') .
 									'</div>
 								</div>

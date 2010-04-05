@@ -19,8 +19,8 @@ var FlashHelper =
 
 	getMovie : function (movieName)
 	{
-  	if (navigator.appName.indexOf ("Microsoft") !=-1) return window[movieName];
-	  else return document[movieName];
+		return (navigator.appName.indexOf ("Microsoft") !=-1 && typeof(window[movieName]) != 'undefined')?
+				window[movieName]:document[movieName];
 	}
 };
 
@@ -112,7 +112,7 @@ function niftyplayer(name)
  * Embed the NiftyPlayer and load audio if flash player was embedded sucessfully. Otherwise use the native mp3 player.
  */
 
-function hasFlashPlayer(){	
+function hasFlashPlayer(){
 	return (typeof(FlashHelper.getMovie('niftyPlayer1')) != 'undefined' && typeof(FlashHelper.getMovie('niftyPlayer1').PercentLoaded) != 'undefined');
 }
 
@@ -127,9 +127,10 @@ function embedPlayer(url,target, forceload) {
 		   '<embed src="media/niftyplayer.swf?file=' + encodeURIComponent(url) + '&as=1" quality=high bgcolor=#FFFFFF width="165" height="38" name="niftyPlayer1" align="" type="application/x-shockwave-flash" pluginspage="<?= isset($_SERVER['HTTPS'])?"https":"http" ?>://get.adobe.com/flashplayer">' +
 		   '</embed>' + 
 		   '</object>');
-	} 
-	
+	}
+
 	if(!hasFlashPlayer()) {
+
 		   $(target).update("<object classid='clsid:22D6F312-B0F6-11D0-94AB-0080C74C7E95' width='280' height='45'>"+
 			"<param name='type' value='audio/mpeg'>"+
 			"<param name='src' value='" + url + "'>"+
