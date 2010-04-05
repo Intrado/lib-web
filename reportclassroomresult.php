@@ -116,8 +116,8 @@ startWindow("Search Results");
 
 if(count($data) > 0){
 ?>
-	<div>Your search returned more than one result.
-	<br>Please select one of the following:<div>
+	<div><?= _L('Your search returned more than one result.<br />
+	<br>Please select one of the following:') ?></div>
 	<br>
 	<table class="list" cellpadding="3" cellspacing="1" >
 	<?= showTable($data, $titles, $formatters); ?>
@@ -125,7 +125,7 @@ if(count($data) > 0){
 <?
 } else {
 ?>
-	<div>Your search did not find any matching results.<div>
+	<div><?= _L('Your search did not find any matching results.'); ?></div>
 <?
 }
 buttons(icon_button(_L('Modify Search'), 'fugue/arrow_180', null, 'reportclassroomsearch.php'),

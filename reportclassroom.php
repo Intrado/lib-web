@@ -198,7 +198,7 @@ if(count($data) > 0){
 	buttons($back,$donebutton);
 } else {
 ?>
-	<div>Your search did not find any matching results. Click the back button and try modifying your search settings.<div>
+	<div><?= _L('Your search did not find any matching results.'); ?></div>
 <?
 	buttons($back,$donebutton);
 }
