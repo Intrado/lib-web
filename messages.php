@@ -298,6 +298,12 @@ startWindow(_L('My Messages'), 'padding: 3px;', true, true);
 <script type="text/javascript" language="javascript">
 var filtes = Array('date','name');
 var activepage = 0;
+var currentfilter = 'date';
+
+function page(event) {
+	activepage = event.element().value;
+	applyfilter(currentfilter);
+}
 
 function applyfilter(filter) {
 	new Ajax.Request('messages.php', {
@@ -365,8 +371,8 @@ function applyfilter(filter) {
 				var pagetop = new Element('div',{style: 'float:right;'}).update(result.pageinfo[3]);
 				var pagebottom = new Element('div',{style: 'float:right;'}).update(result.pageinfo[3]);
 
-				var selecttop = new Element('select', {onchange: 'activepage = this.value;applyfilter(\'' + filter + '\');'});
-				var selectbottom = new Element('select', {onchange: 'activepage = this.value;applyfilter(\'' + filter + '\');'});
+				var selecttop = new Element('select', {id:'selecttop'});
+				var selectbottom = new Element('select', {id:'selectbottom'});
 				for (var x = 0; x < result.pageinfo[0]; x++) {
 					var offset = x * result.pageinfo[1];
 					var selected = (result.pageinfo[2] == x+1);
@@ -377,6 +383,10 @@ function applyfilter(filter) {
 				pagebottom.insert(selectbottom);
 				$('pagewrappertop').update(pagetop);
 				$('pagewrapperbottom').update(pagebottom);
+
+				currentfilter = filter
+				$('selecttop').observe('change',page);
+				$('selectbottom').observe('change',page);
 
 				var filtercolor = $('filterby').getStyle('color');
 				if(!filtercolor)
