@@ -360,10 +360,7 @@ function upgrade_7_5 ($rev, $shardid, $customerid, $db) {
 				}
 				QuickUpdate($query);
 				
-			} else {
-				// no easy way to tell schoolfieldnum...
-				echo " sorry, your reportorganization data is lost ";
-			}
+			} // else no school field
 
 	}
 	
