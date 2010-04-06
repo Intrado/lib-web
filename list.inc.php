@@ -133,7 +133,6 @@ function handle_list_checkbox_ajax () {
 	}
 	
 	if (isset($_GET['removepersonid'])) {
-		error_log("removepersonid");
 		$id = $_GET['removepersonid'];
 		$existingtype = QuickQuery("select type from listentry where personid=? and listid=?", false, array($id, $_SESSION['listid']));
 		if ($existingtype == "add") {
