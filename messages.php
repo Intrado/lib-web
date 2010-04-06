@@ -157,7 +157,6 @@ if($isajax === true) {
 			$types .= $item["sms"] > 0?"," . _L("sms"):"";
 			$title = escapehtml($item["name"]);
 			$defaultlink = "messagegroup.php?id=$itemid";
-			$content = '<a href="' . $defaultlink . '" >' . $time .  ($item["description"] != ""?" - " . escapehtml($item["description"]):"") . ' - <b>' .  _L('%1$s Content',typestring(substr($types,1))). '</b>' . '</a>';
 			$publishaction = $item['publishaction'];
 			$publishid = $item['publishid'];
 			
@@ -203,6 +202,8 @@ if($isajax === true) {
 				);
 
 
+			$content = '<a href="' . $defaultlink . '" >' . $time .  ($item["description"] != ""?" - " . escapehtml($item["description"]):"") . ' - <b>' .  _L('%1$s Content',typestring(substr($types,1))). '</b>' . '</a>';
+			
 			$data->list[] = array("itemid" => $itemid,
 										"defaultlink" => $defaultlink,
 										"icon" => $icon,
