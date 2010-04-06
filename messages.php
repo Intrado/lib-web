@@ -43,8 +43,9 @@ if (isset($_GET['delete'])) {
 	$deleteid = $_GET['delete'];
 	if (isset($_SESSION['messagegroupid']) && ($_SESSION['messagegroupid']== $deleteid))
 		$_SESSION['messagegroupid'] = NULL;
-	if (userOwns("messagegroup",$deleteid)) {
-		$message = new MessageGroup($deleteid);
+
+	$message = new MessageGroup($deleteid);
+	if (userOwns("messagegroup",$deleteid) && $message->type == 'notification') {
 		Query("BEGIN");
 		QuickUpdate("update messagegroup set deleted=1 where id=?",false,array($deleteid));
 		QuickUpdate("update message set deleted=1 where messagegroupid=?",false,array($deleteid));

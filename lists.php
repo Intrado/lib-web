@@ -48,8 +48,9 @@ if (isset($_GET['delete'])) {
 	$deleteid = $_GET['delete'] + 0;
 	if (isset($_SESSION['listid']) && $_SESSION['listid'] == $deleteid)
 		$_SESSION['listid'] = NULL;
-	if (userOwns("list",$deleteid)) {
-		$list = new PeopleList($deleteid);
+
+	$list = new PeopleList($deleteid);
+	if (userOwns("list",$deleteid) && $list->type != 'alert') {
 		Query("BEGIN");
 		//QuickUpdate("delete from listentry where listid='$deleteid'");
 		QuickUpdate("update list set deleted=1 where id=?", false, array($list->id));
