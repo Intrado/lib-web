@@ -123,40 +123,41 @@ if (isset($_GET['ajax'])) {
 			$time = date("M j, g:i a",strtotime($item["date"]));
 			$title = $item["status"];
 			$itemid = $item["id"];
-			$defaultlink = "";
 			$title = escapehtml($item["name"]);
 			$defaultlink = "list.php?id=$itemid";
-			$content = '<a href="' . $defaultlink . '">' . ($item["date"]!== null?$time . '&nbsp;-&nbsp;':"");
 			$publishaction = $item['publishaction'];
 			$publishid = $item['publishid'];
 
 			// give the user some text
 			$publishmessage = '';
 			if ($publishaction == 'publish')
-				$publishmessage = _L('Changes to this message are published.');
+				$publishmessage = _L('Changes to this list are published.');
 			
 			// tell the user it's a subscription. change the href to view instead of edit
 			if ($publishaction == 'subscribe') {
-				$publishmessage = _L('You are subscribed to this message. Owner: (%s)', $item['owner']);
-				$defaultlink = "messagegroupview.php?id=$itemid";
+				$publishmessage = _L('You are subscribed to this list. Owner: (%s)', $item['owner']);
+				$defaultlink = "showlist.php?id=$itemid";
 			}
 			
 			// Users with published or subscribed lists will get a special action item
 			$publishactionlink = "";
 			// if the user can publish lists and they are authorized for atleast one org
 			if ($USER->authorize("publish") && userCanPublish('list') && $authorizedorgs) {
-				// this message is published, else allow it to be
+				// this list is published, else allow it to be
 				if ($publishaction == 'publish')
 					$publishactionlink = action_link(_L("Modify Publication"), "fugue/star__pencil", "publisheditorwiz.php?id=$itemid&type=list");
 				else
 					$publishactionlink = action_link(_L("Publish"), "fugue/star__plus", "publisheditorwiz.php?id=$itemid&type=list");
 			}
 			if ($USER->authorize("subscribe") && userCanSubscribe('list')) {
-				// this message is subscribed to
+				// this list is subscribed to
 				if ($publishaction == 'subscribe')
 					$publishactionlink = action_link("Un-Subscribe", "fugue/star__minus", "lists.php?id=$publishid&remove");
 			}
 
+
+			$content = '<a href="' . $defaultlink . '">' . ($item["date"]!== null?$time . '&nbsp;-&nbsp;':"");
+			
 			if(isset($item["lastused"]))
 				$content .= 'This list was last used: <i>' . date("M j, g:i a",strtotime($item["lastused"])) . "</i>";
 			else
