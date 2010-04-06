@@ -644,7 +644,7 @@ class SMAPI{
 				return $result;
 			}
 			if(!$jobid){
-				$result["resultdescription"] = "Invalid Job ID";
+				$result["resultdescription"] = "InvRealid Job ID";
 				return $result;
 			}
 			$job = new Job($jobid);
@@ -1306,6 +1306,10 @@ require_once("../inc/date.inc.php");
 require_once("../inc/securityhelper.inc.php");
 
 // OBJECTS
+require_once("../obj/Section.obj.php");
+require_once("../obj/Organization.obj.php");
+require_once("../obj/RenderedList.obj.php");
+require_once("../obj/PeopleList.obj.php");
 require_once("../obj/MessageGroup.obj.php");
 require_once("../obj/Message.obj.php");
 require_once("../obj/MessagePart.obj.php");
