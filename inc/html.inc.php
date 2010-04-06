@@ -268,7 +268,7 @@ function html_to_plain($html) {
 	// Unescape data-field-insert tags, and &nbsp; characters.
 	$plain = str_replace(array('&lt;&lt;','&gt;&gt;', '&nbsp;'), array('<<', '>>', ''), $plain);
 	
-	return $plain;
+	return trim($plain);
 }
 
 ?>
