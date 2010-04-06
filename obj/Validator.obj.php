@@ -465,7 +465,7 @@ class ValInArray extends Validator {
 		if (is_array($value)) {
 			foreach ($value as $item) {
 				if (!in_array($item, $args['values']))
-					return "$this->label must be items from the list of available choices.";
+					return "$this->label must be an item from the list of available choices.";
 			}
 		} else if (!in_array($value, $args['values']))
 			return "$this->label must be an item from the list of available choices.";
@@ -487,7 +487,7 @@ class ValInArray extends Validator {
 								found = true;
 						}
 						if (!found)
-							return label + " must be items from the list of available choices.";
+							return label + " must be an item from the list of available choices.";
 					}
 				} else {
 					var found = false;
