@@ -40,6 +40,8 @@ $$$
 
 -- $rev 2
 
+DELETE from `joblanguage` where `jobid`=0
+$$$
 
 ALTER TABLE `message` ADD `messagegroupid` INT( 11 ) NOT NULL AFTER `id` 
 $$$
