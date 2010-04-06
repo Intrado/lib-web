@@ -80,8 +80,8 @@ if ("oid" == $fieldmap->fieldnum) {
    		"fieldhelp" => _L('Select the organizations that subscribers may belong.'),
    		"value" => $staticvalues,
    		"validators" => array(
-			array("ValRequired"),
-            array("ValInArray", 'values'=>array_keys($organizations))
+			array("ValRequired")
+			// ValInArray causes javascript form error "formhtml TypeError: formvars.jsgetvalue[targetname] is not a function" (bug 3494)
       		),
       	"control" => $control,
       	"helpstep" => 1
@@ -140,7 +140,13 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 			$query = "delete from persondatavalues where fieldnum='oid'";
 			QuickUpdate($query);
 
-			$datavalues = $postdata['values'];
+			// NOTE $postdata['values'] are not trusted! ValInArray does not work with ValRequired on MultiCheckbox formitem
+			$datavalues = array();
+			$orgids = array_keys($organizations);
+			foreach ($postdata['values'] as $val) {
+				if (in_array($val, $orgids))
+					$datavalues[] = $val;
+			}
 			$numvalues = count($datavalues);
 			if ($numvalues > 0) {
 				$query = "insert into persondatavalues (fieldnum, value, editlock) values " . repeatWithSeparator("('oid', ?, 1)", ",", $numvalues);
@@ -150,20 +156,22 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 				$query = "select id from person where importid is null and type='system'";
 				$pids = QuickQueryList($query);
 				
-				// remove any obsolete values from personassocation
-				$query = "delete from personassociation where personid in (". repeatWithSeparator("?", ",", count($pids)) .") and type='organization' and organizationid not in (". repeatWithSeparator("?", ",", $numvalues) .")";
-				QuickUpdate($query, false, array_merge($pids, $datavalues));
+				if (count($pids) > 0) {
+					// remove any obsolete values from personassocation
+					$query = "delete from personassociation where personid in (". repeatWithSeparator("?", ",", count($pids)) .") and type='organization' and organizationid not in (". repeatWithSeparator("?", ",", $numvalues) .")";
+					QuickUpdate($query, false, array_merge($pids, $datavalues));
 				
-				// if single value, update all subscriber's personassociation to the one organization
-				if ($numvalues == 1) {
-					// remove any associations they may have had
-					$query = "delete from personassociation where personid in (". repeatWithSeparator("?", ",", count($pids)) .") and type='organization'";
-					QuickUpdate($query, false, array_merge($pids, $pids));
+					// if single value, update all subscriber's personassociation to the one organization
+					if ($numvalues == 1) {
+						// remove any associations they may have had
+						$query = "delete from personassociation where personid in (". repeatWithSeparator("?", ",", count($pids)) .") and type='organization'";
+						QuickUpdate($query, false, array_merge($pids, $pids));
 					
-					// insert the single association
-					$oid = $datavalues[0];
-					$query = "insert into personassociation (personid, type, organizationid) values " . repeatWithSeparator("(?, 'organization', ".$oid.")", ",", count($pids));
-					QuickUpdate($query, false, $pids);
+						// insert the single association
+						$oid = $datavalues[0];
+						$query = "insert into personassociation (personid, type, organizationid) values " . repeatWithSeparator("(?, 'organization', ".$oid.")", ",", count($pids));
+						QuickUpdate($query, false, $pids);
+					}
 				}
 			}
 			
