@@ -84,7 +84,9 @@ function fmt_actions ($obj, $name) {
 		$obj->fieldnum == $languageField)
 			return '';
 	
+	$action_links = "";
 	if ("oid" == $obj->fieldnum) {
+		if (QuickQuery("select 1 from organization where not deleted limit 1"))
 			$action_links = action_link("Edit Values", "pencil", "subscriberfieldedit.php?id='oid'");
 	} else {		
 		$action_links = action_link("Delete", "cross", "subscriberfields.php?delete=$obj->id", "return confirmDelete();");
