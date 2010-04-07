@@ -170,7 +170,7 @@ startWindow(_L('My Classroom Messages'));
 					$commentid = false;
 					foreach($personcomments as $personcomment) {
 						$id = $personcomment['commentid'];
-						if($id != $commentid) {
+						if($id != $commentid || $currentdate != $personcomment['date']) {
 							if($commentid !== false) {
 								echo '</table></div></td>';
 							}
@@ -199,7 +199,7 @@ startWindow(_L('My Classroom Messages'));
 					$contactid = false;
 					foreach($personcomments as $personcomment) {
 						$id = $personcomment['personid'];
-						if($id != $contactid) {
+						if($id != $contactid || $currentdate != $personcomment['date']) {
 							if($contactid !== false) {
 								echo '</table></div></td>';
 							}
