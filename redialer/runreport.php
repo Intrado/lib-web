@@ -47,6 +47,7 @@ require_once("../obj/Sms.obj.php");
 require_once("../obj/User.obj.php");
 require_once("../obj/Rule.obj.php");
 require_once("../obj/FieldMap.obj.php");
+require_once("../obj/Language.obj.php");
 require_once("../obj/Job.obj.php");
 require_once("../inc/reportutils.inc.php");
 require_once("../inc/reportgeneratorutils.inc.php");
