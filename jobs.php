@@ -155,7 +155,9 @@ if (isset($_GET['copy'])) {
 	$copyid = DBSafe($_GET['copy']);
 	if (userOwns("job",$copyid) || $USER->authorize('managesystemjobs')) {
 		$job = new Job($copyid);
-		if ($job->userid !== null) {
+		if ($job->type != 'notification') {
+			notice(_L("Unable to copy this job"));
+		} else if ($job->userid !== null) {
 			 Query('BEGIN');
 				$newjob = $job->copyNew();
 			Query('COMMIT');

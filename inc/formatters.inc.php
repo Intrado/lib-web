@@ -240,20 +240,22 @@ function jobs_actionlinks ($obj) {
 				$usedelbtn = $deletebtn;
 			else
 				$usedelbtn = $archivebtn;
-
-			if ($type == "survey") {
-				$buttons = array($editbtn);
-			} else {
-				$buttons = array($editbtn, $copybtn);
-			}
-
-			if ($USER->authorize('createreport')){
+			if ($type == "alert") {
 				$buttons[] = $reportbtn;
-				$buttons[] = $graphbtn;
-			}
-			if($USER->authorize('leavemessage'))
-				$buttons[] = $viewresponses;
+			} else {
+				if ($type == "survey") {
+					$buttons = array($editbtn);
+				} else {
+					$buttons = array($editbtn, $copybtn);
+				}
 
+				if ($USER->authorize('createreport')){
+					$buttons[] = $reportbtn;
+					$buttons[] = $graphbtn;
+				}
+				if($USER->authorize('leavemessage'))
+					$buttons[] = $viewresponses;
+			}
 			if($deleted == 2)
 				$buttons[] = $unarchivebtn;
 
@@ -353,8 +355,13 @@ function fmt_jobs_actions_customer($row, $index) {
 			$editLink = action_link(_L("Edit"),"pencil","survey.php?id=$id");
 			$copyLink = ''; // no copy survey feature
 		} else {
-			$editLink = action_link(_L("Edit"),"pencil","job.php?id=$id");
-			$copyLink = action_link(_L("Copy"),"page_copy","jobs.php?copy=$id");
+			if ($type == "notification") {
+				$editLink = action_link(_L("Edit"),"pencil","job.php?id=$id");
+				$copyLink = action_link(_L("Copy"),"page_copy","jobs.php?copy=$id");
+			} else {
+				$editLink = '';
+				$copyLink = '';
+			}
 		}
 	} elseif ($USER->authorize('manageaccount')) {
 		$editLink = action_link(_L("Login as this user"),"key_go","./?login=$jobownerlogin");
