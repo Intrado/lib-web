@@ -157,7 +157,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 							$organizations = Organization::getAuthorizedOrgKeys();
 							foreach ($data->val as $id) {
 								$id = $id + 0;
-								$orgmap[$id] = $organizations[$id]->orgkey;
+								$orgmap[$id] = $organizations[$id];
 							}
 							
 							$_SESSION['listsearch']['rules']['organization'] = array(
