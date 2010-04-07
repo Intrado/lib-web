@@ -45,8 +45,11 @@ function generateGFieldQuery($personidalias, $isreporthistory = false, $hackPDF 
 	return $fieldstring;
 }
 
-function generateOrganizationFieldQuery($personidalias) {
-	return ", (select group_concat(oz.orgkey separator ',') from organization oz join personassociation pa on (oz.id = pa.organizationid) where pa.personid=$personidalias ) as org \n";
+function generateOrganizationFieldQuery($personidalias, $isreporthistory = false) {
+	if ($isreporthistory)
+		return ", (select group_concat(oz.orgkey separator ',') from organization oz join reportorganization roz on (oz.id = roz.organizationid) where roz.personid=$personidalias and roz.jobid=j.id ) as org \n";
+	else
+		return ", (select group_concat(oz.orgkey separator ',') from organization oz join personassociation pa on (oz.id = pa.organizationid) where pa.personid=$personidalias ) as org \n";
 }
 
 function select_metadata($tablename=null, $start=null, $fields){

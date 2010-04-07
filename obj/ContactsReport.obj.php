@@ -203,7 +203,7 @@ class ContactsReport extends ReportGenerator {
 						"4" => "Address",
 						"5" => "Sequence",
 						"6" => "Destination",
-						"9" => "Current Org");
+						"9" => "Organization");
 		// index 7 is a flag to tell what type of destination
 		// so set the title of starting f-field at appropriate place
 		// append begins after index specified
@@ -252,7 +252,7 @@ class ContactsReport extends ReportGenerator {
 		session_write_close();//WARNING: we don't keep a lock on the session file, any changes to session data are ignored past this point
 
 		//generate the CSV header
-		$header = '"ID#","First Name","Last Name","Address","Current Org"';
+		$header = '"ID#","First Name","Last Name","Address","Organization"';
 
 		foreach($activefields as $active){
 			if(!$active) continue;

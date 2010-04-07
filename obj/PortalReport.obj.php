@@ -124,7 +124,7 @@ class PortalReport extends ReportGenerator{
 						4 => "Activation Code",
 						5 => "Expiration Date",
 						6 => "Contact Manager Account(s)",
-						7 => "Current Org");
+						7 => "Organization");
 
 		$titles = appendFieldTitles($titles, 7, $fieldlist, $activefields);
 
@@ -165,7 +165,7 @@ class PortalReport extends ReportGenerator{
 						3 => "Last Name",
 						4 => "Token",
 						5 => "Expiration Date",
-						6 => "Current Org");
+						6 => "Organization");
 
 		// find the f-fields the same way as the query did
 		// strip off the f, use the field number as the index and

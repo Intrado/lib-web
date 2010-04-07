@@ -50,7 +50,7 @@ class CallsReport extends ReportGenerator{
 
 		$search = $personquery . $phonequery . $emailquery . $jobtypesquery . $resultquery  . $jobquery;
 
-		$orgfieldquery = generateOrganizationFieldQuery("rp.personid");
+		$orgfieldquery = generateOrganizationFieldQuery("rp.personid", true);
 		$fieldquery = generateFields("rp");
 		$gfieldquery = generateGFieldQuery("rp.personid", true);
 
@@ -106,9 +106,7 @@ class CallsReport extends ReportGenerator{
 		if(isset($this->params['reldate']) && $this->params['reldate'] != ""){
 			$joblist = $this->params['joblist'];
 		}
-		//$queryfields = explode(",",generateFields("rp")) + explode(",",generateGFieldQuery("rp.personid", $joblist));
 
-//echo count($queryfields);
 		$result = Query($this->query, $this->_readonlyDB);
 		$data = array();
 		// parse through data and seperate attempts.

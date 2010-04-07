@@ -101,7 +101,7 @@ class JobDetailReport extends ReportGenerator{
 
 		$searchquery = " and rp.jobid in ('" . $joblist. "')";
 		$searchquery .= $resultquery . $typequery;
-		$orgfieldquery = generateOrganizationFieldQuery("rp.personid");
+		$orgfieldquery = generateOrganizationFieldQuery("rp.personid", true);
 		$fieldquery = generateFields("rp");
 		$gfieldquery = generateGFieldQuery("rp.personid", true, $hackPDF);
 		$this->query =
@@ -312,7 +312,7 @@ class JobDetailReport extends ReportGenerator{
 						8 => "Last Attempt",
 						9 => "Last Result",
 						14 => "Response",
-						17 => "Current Org");
+						17 => "Organization");
 		$titles = appendFieldTitles($titles, 18, $fieldlist, $activefields);
 
 		$formatters = array(7 => "fmt_destination",
@@ -385,7 +385,7 @@ class JobDetailReport extends ReportGenerator{
 		$fieldindex = getFieldIndexList("p");
 		$activefields = array_flip($activefields);
 		//generate the CSV header
-		$header = '"Job Name","Submitted by","ID","First Name","Last Name","Dst. Src.","Destination","Attempts","Last Attempt","Last Result","Response","Current Org"';
+		$header = '"Job Name","Submitted by","ID","First Name","Last Name","Dst. Src.","Destination","Attempts","Last Attempt","Last Result","Response","Organization"';
 		foreach($fieldlist as $fieldnum => $fieldname){
 			if(isset($activefields[$fieldnum])){
 				$header .= ',"' . $fieldname . '"';
