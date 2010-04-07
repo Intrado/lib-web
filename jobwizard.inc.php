@@ -1319,7 +1319,7 @@ class JobWiz_messageEmailText extends WizStep {
 			"validators" => array(
 				array("ValRequired"),
 				array("ValLength","max" => 255),
-				array("ValEmail")
+				array("ValEmail", "domain" => getSystemSetting('emaildomain'))
 				),
 			"control" => array("TextField","max"=>255,"min"=>3,"size"=>35),
 			"helpstep" => 2

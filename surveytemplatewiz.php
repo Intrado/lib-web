@@ -562,7 +562,7 @@ class SurveyTemplateWiz_webfeatures extends WizStep {
 			"validators" => array(
 				array("ValRequired"),
 				array("ValLength","max" => 255),
-				array("ValEmail")
+				array("ValEmail", "domain" => getSystemSetting('emaildomain'))
 				),
 			"control" => array("TextField","size" => 35, "maxlength" => 255),
 			"helpstep" => $helpstepnum++
