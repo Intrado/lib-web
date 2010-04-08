@@ -132,7 +132,7 @@ class FinishJobWizard extends WizFinish {
 		if ($postdata["/list"]["addme"]) {
 			// get the contact details out of postdata
 			$addme = array(
-				"phone" => Phone::parse($postdata["/list"]["addmePhone"]),
+				"phone" => (isset($postdata["/list"]["addmePhone"])?Phone::parse($postdata["/list"]["addmePhone"]):""),
 				"email" => (isset($postdata["/list"]["addmeEmail"])?trim($postdata["/list"]["addmeEmail"]):""),
 				"sms" => (isset($postdata["/list"]["addmeSms"])?Phone::parse($postdata["/list"]["addmeSms"]):"")
 			);
