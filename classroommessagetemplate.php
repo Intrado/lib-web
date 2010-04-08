@@ -52,7 +52,11 @@ $dowvalues = array();
 $data = explode(",", $schedule->daysofweek);
 for ($x = 1; $x < 8; $x++)
 	$dowvalues[$x-1] = in_array($x,$data);
-$dowvalues[7] = ($schedule->time?date("g:i a", strtotime($schedule->time)):$USER->getCallEarly());
+
+$defaulttime = date("g:i a", strtotime("5:00 pm"));
+if($USER->getCallLate() < date("g:i a", strtotime($defaulttime . " + 1 hour")))
+	$defaulttime = $USER->getCallEarly();
+$dowvalues[7] = ($schedule->time?date("g:i a", strtotime($schedule->time)):$defaulttime);
 
 // Prepare Job JobType data
 $userjobtypes = JobType::getUserJobTypes();
@@ -385,8 +389,8 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		$job->modifydate = date("Y-m-d H:i:s");
 		$job->startdate = date("Y-m-d", 86400);
 		$job->enddate = $job->startdate;
-		$job->starttime = $time;
-		$job->endtime = date("H:i", strtotime($time . " + 1 hour"));
+		$job->starttime = $USER->getCallEarly();
+		$job->endtime = $USER->getCallLate();//date("H:i", strtotime($time . " + 1 hour"));
 		$job->status = 'repeating';
 		$job->setOption("skipemailduplicates",0);
 		if ($job->id)
