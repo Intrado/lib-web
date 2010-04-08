@@ -65,7 +65,22 @@ if (getCurrentSurvey() != NULL) {
 }
 
 $VALIDJOBTYPES = JobType::getUserJobTypes(true);
-$PEOPLELISTS = DBFindMany("PeopleList",", (name +0) as foo from list where userid=$USER->id and deleted=0 order by foo,name");
+$PEOPLELISTS = QuickQueryList("
+			(select id, name, (name +0) as digitsfirst
+			from list
+			where type != 'alert' and not deleted and userid = ?)
+			UNION
+			(select l.id as id, l.name as name, (l.name +0) as digitsfirst
+			from list l
+				inner join publish p on
+					(l.id = p.listid)
+			where not l.deleted
+				and p.userid = ?
+				and p.action = 'subscribe'
+				and p.type = 'list')
+			order by digitsfirst, name",
+			true, false, array($USER->id, $USER->id));
+
 $QUESTIONNAIRES = array();
 // if submitted or completed, gather only the selected questionnaireid
 // because the schedulemanager copies the questionnaire setting deleted=1 when job is due to start
@@ -127,7 +142,27 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'send'))
 			$questionnaire = new SurveyQuestionnaire($questionnaireid);
 
 			$listid = GetFormData($f, $s, "listid") + 0;
-			if (!userOwns("list", $listid))
+			$validlist = QuickQuery("
+			(select 1
+			from list l
+				inner join publish p on
+					(l.id = p.listid)
+			where l.id = ?
+				and not l.deleted
+				and l.type != 'alert'
+				and p.action = 'subscribe'
+				and p.type = 'list'
+				and p.userid = ?)
+			UNION
+			(select 1
+			from list
+			where id = ?
+				and type != 'alert'
+				and userid = ?
+				and not deleted)",
+			false, array($listid,$USER->id,$listid,$USER->id));
+
+			if (!$validlist)
 				exit();
 				
 			//submit changes
@@ -332,8 +367,8 @@ startWindow('Survey Information');
 						<?
 						NewFormItem($f,$s,"listid", "selectstart", NULL, NULL, ($submittedmode ? "DISABLED" : ""));
 						NewFormItem($f,$s,"listid", "selectoption", "-- Select a List --", NULL);
-						foreach ($PEOPLELISTS as $plist) {
-							NewFormItem($f,$s,"listid", "selectoption", $plist->name, $plist->id);
+						foreach ($PEOPLELISTS as $id => $name) {
+							NewFormItem($f,$s,"listid", "selectoption", $name, $id);
 						}
 						NewFormItem($f,$s,"listid", "selectend");
 						?>
