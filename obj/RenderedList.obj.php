@@ -166,6 +166,10 @@ class RenderedList2 {
 					$contactwheresql = " and p.pkey='$pkey' ";
 				}
 				
+				// if searching without any criteria, fetch empty set
+				if ("" == $contactwheresql)
+					$contactwheresql = "and p.id=0";
+
 				
 				$query = "select SQL_CALC_FOUND_ROWS distinct $fieldsql from person p \n"
 						."	$joinsql \n"
