@@ -745,7 +745,7 @@ class JobWiz_start extends WizStep {
 				array("ValJobName"),
 				array("ValLength","max" => 30)
 			),
-			"control" => array("TextField","maxlength" => 50, "size" => 50),
+			"control" => array("TextField","maxlength" => 30, "size" => 30),
 			"helpstep" => 1
 		);
 		$formdata["jobtype"] = array(
