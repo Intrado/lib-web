@@ -464,21 +464,25 @@ class FinishJobWizard extends WizFinish {
 				<script>
 					window.location="unauthorized.php";
 				</script>';
-
-		$html = '<h1>Success! Your notification request has been submitted.</h1>';
-		$html .= '<div id="embedjobmonitor"></div>';
-		$html .= "
-			<script type='text/javascript'>
-				new Ajax.Updater('embedjobmonitor', 'jobmonitor.php', {
-					evalScripts: true,
-					method: 'get',
-					parameters: {
-						notpopup: true,
-						jobid: {$_SESSION['wizard_job']['submitted_jobid']}
-					}
-				});
-			</script>
-		";
+		$html = '';
+		if ($postdata["/schedule/options"]["schedule"] == "template") {
+			$html = '<h3>Success! Your notification request has been saved</h3>';
+		} else {
+			$html = '<h3>Success! Your notification request has been submitted.</h3>';
+			$html .= '<div id="embedjobmonitor"></div>';
+			$html .= "
+				<script type='text/javascript'>
+					new Ajax.Updater('embedjobmonitor', 'jobmonitor.php', {
+						evalScripts: true,
+						method: 'get',
+						parameters: {
+							notpopup: true,
+							jobid: {$_SESSION['wizard_job']['submitted_jobid']}
+						}
+					});
+				</script>
+			";
+		}
 		//if ($postdata["/schedule/options"]["schedule"] == "template")
 		//	$html .= '<script>window.location="start.php";</script>';
 		return $html;
