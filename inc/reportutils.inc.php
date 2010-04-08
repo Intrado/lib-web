@@ -15,8 +15,8 @@ function generateFields($tablealias){
 		}
 		if($num == $first || $num == $last){
 			continue;
-		//} else if ($num == $lang) {
-			//$fieldstring .= ", ifnull(l.name, " . $tablealias . "." . $num . ") as " . $num;
+		} else if ($num == $lang) {
+			$fieldstring .= ", ifnull((select language.name from language where language.code = $tablealias.f03),$tablealias.f03) as " . $num;
 		} else {
 			$fieldstring .= "," . $tablealias . "." . $num;
 		}
