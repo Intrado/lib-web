@@ -7,9 +7,6 @@ if (!$USER->authorize('createlist')) {
 	redirect('unauthorized.php');
 }
 
-unset($_SESSION['listsearchpreview']);
-list_clear_search_session();
-
 if (isset($_GET['origin'])) {
 	$_SESSION['origin'] = trim($_GET['origin']);
 }
