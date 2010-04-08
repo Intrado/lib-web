@@ -185,8 +185,12 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 					
 				case 'sectionsearch':
 					if (getSystemSetting('_hasenrollment')) {
+						$sids = $postdata['sectionids'];
+						// if no sections selected, send array of sectionid=0 to return empty list
+						if (!is_array($sids))
+							$sids = array(0);
 						$_SESSION['listsearch'] = array (
-							'sectionids' => $postdata['sectionids']
+							'sectionids' => $sids
 						);
 					}
 					break;
