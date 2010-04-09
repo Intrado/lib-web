@@ -21,9 +21,9 @@ if (!$USER->authorize('publish')) {
 	redirect('unauthorized.php');
 }
 
-// check that the user has at a minimum one organization autorization
+// check that the user has at a minimum one organization autorization if the customer has organizations
 $authorizedorgs = Organization::getAuthorizedOrgKeys();
-if (!$authorizedorgs)
+if (!$authorizedorgs && Organization::custHasOrgs())
 	redirect('unauthorized.php');
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -126,7 +126,9 @@ class PublishTargetWiz_publishtarget extends WizStep {
 			$values["anyone"] = _L("Anyone May Subscribe");
 			$values["unrestricted"] = _L("Top Level Users");
 		}
-		$values["organization"] = _L("Specific Organization(s)");
+		
+		if (Organization::custHasOrgs())
+			$values["organization"] = _L("Specific Organization(s)");
 		
 		$formdata['target'] = array(
 			"label" => _L("Subscription Permissions"),
