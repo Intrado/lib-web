@@ -313,7 +313,7 @@ class JobDetailReport extends ReportGenerator{
 						9 => "Last Result",
 						14 => "Response",
 						17 => "Organization");
-		$titles = appendFieldTitles($titles, 18, $fieldlist, $activefields);
+		$titles = appendFieldTitles($titles, 17, $fieldlist, $activefields);
 
 		$formatters = array(7 => "fmt_destination",
 							8 => "fmt_date",
