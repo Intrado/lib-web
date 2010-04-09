@@ -284,15 +284,15 @@ $PAGE = "admin:settings";
 
 switch ($DATATYPE) {
 case "person" :
-$TITLE = "Field Definitions";
+$TITLE = _L("Field Definitions");
 $hover = "DataManager_Fields";
 break;
 case "group" :
-$TITLE = "Group Field Definitions";
+$TITLE = _L("Group Field Definitions");
 $hover = "DataManager_GFields";
 break;
 case "schedule" :
-$TITLE = "Enrollment Field Definitions";
+$TITLE = _L("Section Field Definitions");
 $hover = "DataManager_CFields";
 break;
 }
