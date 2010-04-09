@@ -644,7 +644,7 @@ class SMAPI{
 				return $result;
 			}
 			if(!$jobid){
-				$result["resultdescription"] = "InvRealid Job ID";
+				$result["resultdescription"] = "Invalid Job ID";
 				return $result;
 			}
 			$job = new Job($jobid);
