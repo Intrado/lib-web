@@ -51,5 +51,9 @@ class Organization extends DBMappedObject {
 		
 		return $validorgkeys;
 	}
+	
+	function custHasOrgs() {
+		return QuickQuery("select 1 from organization where not deleted limit 1");
+	}
 }
 ?>
