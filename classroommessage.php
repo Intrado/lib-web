@@ -348,7 +348,7 @@ endWindow();
 	var hascomments = <?= $USER->authorize('targetedcomment')?"true":"false" ?>;
 	var categoryinfo = $H(<?= json_encode($categoriesjson) ?>);
 	var requesturl = '<?= $requesturl ?>';
-	var timetocutoff = new Date(<?= (strtotime($cutoff)) . '000' ?>).getTime() / 1000;
+	var timetocutoff =  (new Date(<?= (strtotime($cutoff)) . '000' ?>).getTime() / 1000) + ((new Date().getTime() / 1000) -  (new Date(<?= (strtotime("now")) . '000' ?>).getTime() / 1000));;
 
 	function load_saved_tab() {
 		var saved_tab = 'lib-<?=  $USER->getSetting("classroomtab", "search") ?>';
