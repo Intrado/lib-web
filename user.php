@@ -555,16 +555,19 @@ if ($userimportorgs) {
 // get user organization associations that arn't created by an import
 $userorgs = QuickQueryList("select organizationid from userassociation where userid = ? and type = 'organization' and importid is null", false, false, array($edituser->id));
 $orgs = QuickQueryList("select o.id, o.orgkey from organization o left join userassociation ua on (o.id = ua.organizationid and ua.userid = ?) where not o.deleted and ua.importid is null order by orgkey", true, false, array($edituser->id));
-$formdata["organizationids"] = array(
-	"label" => _L('Additional Organizations'),
-	"fieldhelp" => _L('Add or remove user organization associations'),
-	"value" => $userorgs,
-	"validators" => array(
-		array("ValUserOrganization")
-	),
-	"control" => array("MultiCheckBox", "height" => "150px", "values" => $orgs),
-	"helpstep" => 2
-);
+// if there are no orgs. don't show the form item
+if ($orgs) {
+	$formdata["organizationids"] = array(
+		"label" => _L('Additional Organizations'),
+		"fieldhelp" => _L('Add or remove user organization associations'),
+		"value" => $userorgs,
+		"validators" => array(
+			array("ValUserOrganization")
+		),
+		"control" => array("MultiCheckBox", "height" => "150px", "values" => $orgs),
+		"helpstep" => 2
+	);
+}
 
 $rules = cleanObjects($edituser->getRules());
 $fields = QuickQueryMultiRow("select fieldnum from fieldmap where options not like '%multisearch%'");
@@ -825,10 +828,9 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		
 		// add user associations for organizations
 		QuickUpdate("delete from userassociation where userid = ? and importid is null and type = 'organization' and organizationid != 0", false, array($edituser->id));
-		// re add new user associations
-		$sectionids = (isset($postdata['sectionids'])?$postdata['sectionids']:array());
-		foreach ($postdata['organizationids'] as $orgid)
-			QuickUpdate("insert into userassociation (userid, type, organizationid) values (?, 'organization', ?)", false, array($edituser->id, $orgid));
+		if (isset($postdata['organizationids']))
+			foreach ($postdata['organizationids'] as $orgid)
+				QuickUpdate("insert into userassociation (userid, type, organizationid) values (?, 'organization', ?)", false, array($edituser->id, $orgid));
 
 		Query("COMMIT");
 
