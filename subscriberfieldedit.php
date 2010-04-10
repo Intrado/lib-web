@@ -46,15 +46,12 @@ if (isset($_GET['id'])) { // edit mode
 	} else {
 		$fieldmap = new FieldMap($id);
 	}
-   	$formhtml = "<div>".$fieldmap->name."</div>";
-   	$formdata["formhtml"] = array(
-   		"label" => _L("Field Name"),
-   		"value" => "",
-   		"validators" => array(    
-   		),
-   		"control" => array("FormHtml", "html"=>$formhtml),
-   		"helpstep" => 1
-   	);
+	$formdata["fieldname"] = array(
+		"label" => _L("Field Name"),
+		"fieldhelp" => _L("Field Definition values for subscriber to select."),
+		"control" => array("FormHtml","html" => $fieldmap->name),
+		"helpstep" => 1
+	);
 }
 
 $staticvalues = QuickQueryList("select value from persondatavalues where fieldnum=? and editlock=1", false, false, array($fieldmap->fieldnum));
@@ -80,8 +77,8 @@ if ("oid" == $fieldmap->fieldnum) {
    		"fieldhelp" => _L('Select the organizations that subscribers may belong.'),
    		"value" => $staticvalues,
    		"validators" => array(
-			array("ValRequired")
-			// ValInArray causes javascript form error "formhtml TypeError: formvars.jsgetvalue[targetname] is not a function" (bug 3494)
+			array("ValRequired"),
+			array("ValInArray", 'values'=>array_keys($organizations))
       		),
       	"control" => $control,
       	"helpstep" => 1
@@ -140,13 +137,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 			$query = "delete from persondatavalues where fieldnum='oid'";
 			QuickUpdate($query);
 
-			// NOTE $postdata['values'] are not trusted! ValInArray does not work with ValRequired on MultiCheckbox formitem
-			$datavalues = array();
-			$orgids = array_keys($organizations);
-			foreach ($postdata['values'] as $val) {
-				if (in_array($val, $orgids))
-					$datavalues[] = $val;
-			}
+			$datavalues = $postdata['values'];
 			$numvalues = count($datavalues);
 			if ($numvalues > 0) {
 				$query = "insert into persondatavalues (fieldnum, value, editlock) values " . repeatWithSeparator("('oid', ?, 1)", ",", $numvalues);
