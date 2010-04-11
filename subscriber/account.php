@@ -85,6 +85,10 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		$person->f02 = $postdata['f02'];
 		$person->update();
         
+		// update name in session
+		$_SESSION['subscriber.firstname'] = $postdata['f01'];
+		$_SESSION['subscriber.lastname'] = $postdata['f02'];
+		
         if ($ajax)
             $form->sendTo("account.php");
         else
