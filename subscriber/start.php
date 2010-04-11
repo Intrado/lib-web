@@ -31,7 +31,7 @@ if (isset($_SESSION['firstlogin'])) {
 	$contactCount[$pid] = 1;
 	$allData[$pid] = array();
 
-	$result = Query("select j.id, j.startdate, j.name, j.type, u.firstname, u.lastname, rp.personid
+	$result = Query("select j.id, j.startdate, j.name, u.firstname, u.lastname, rp.personid
 		from job j
 		left join jobsetting js on (js.jobid=j.id and js.name='translationexpire')
 		left join reportperson rp on (rp.jobid = j.id)
@@ -40,8 +40,9 @@ if (isset($_SESSION['firstlogin'])) {
 		j.startdate <= curdate() and j.startdate >= date_sub(curdate(),interval 30 day)
 		and rp.personid = ?
 		and j.status in ('active', 'complete')
-		and j.questionnaireid is null
+		and j.type = 'notification'
 		and (js.value is null or js.value >= curdate())
+		and rp.messageid != 0
 		group by j.id, rp.personid
 		order by j.startdate desc, j.starttime, j.id desc", false, array($pid));
 		
@@ -74,7 +75,7 @@ function message_action($row, $index){
 	//index 1 is job id
 	//index 7 is person id
 
-	$messagetypes = QuickQueryList("select type, type from reportperson where jobid=? and personid=?", true, false, array($row[1], $row[7]));
+	$messagetypes = QuickQueryList("select type, type from reportperson where jobid=? and personid=? and messageid != 0", true, false, array($row[1], $row[7]));
 
 	if (isset($messagetypes['phone'])) {
 		$buttons[] = button(_L("Play"), "popup('previewmessage.php?jobid=" . $row[1] . "&personid=" . $row[7] . "&type=phone', 400, 500,'preview');",null);
@@ -100,7 +101,7 @@ function sender($row, $index){
 	//index 7 is personid
 	
 	$emailmsgid = QuickQuery("select messageid from reportperson where jobid=? and personid=? and type='email'", false, array($row[1], $row[7]));
-	if (isset($emailmsgid)) {
+	if (isset($emailmsgid) && $emailmsgid != 0) {
 		$message = DBFind("Message", "from message where id=?", false, array($emailmsgid));
 		$messagedata = sane_parsestr($message->data);
 		return "<a href='mailto:" . $messagedata['fromemail'] . "'>" . escapehtml($messagedata['fromname']) . "</a>";
