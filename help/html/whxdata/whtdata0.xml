@@ -1,0 +1,72 @@
+<?xml version='1.0' encoding='utf-8' ?>
+<tocdata>
+<book name="Getting Started" >
+  <item name="Welcome" url="Getting_Started/Welcome.htm" />
+  <item name="Start Page" url="Getting_Started/Start_Page.htm" />
+</book>
+<book name="Tips for Effective Communication" >
+  <item name="Messaging Tips" url="Tips_for_Effective_Communication/Messaging_Tips.htm" />
+  <item name="Message Templates" url="Tips_for_Effective_Communication/Simple_Message_Templates.htm" />
+  <item name="Communication Ideas" url="Tips_for_Effective_Communication/Communication_Ideas.htm" />
+</book>
+<book name="Surveys" >
+  <item name="Survey Overview" url="Surveys/Survey_Overview.htm" />
+  <item name="Important Tips for Creating Surveys" url="Surveys/Important_Tips_for_Creating_Surveys.htm" />
+</book>
+<book name="Remote Telephone Access" >
+  <item name="Remote Telephone Access Overview" url="Remote_Telephone_Access/Remote_Telephone_Access_Overview.htm" />
+  <item name="Remotely Create a Single Language Job" url="Remote_Telephone_Access/Remotely_Create_a_Single_Language_Job.htm" />
+  <item name="Remotely Create a Multilingual Job" url="Remote_Telephone_Access/Remotely_Create_a_Multilingual_Job.htm" />
+</book>
+<book name="Reports" >
+  <item name="Reports Overview" url="Reports/Reports.htm" />
+  <item name="Using the Report Builder" url="Reports/Querying_Report_Data.htm" />
+  <item name="Notification Summaries" url="Reports/Standard_Job_Reports.htm" />
+  <item name="Phone Logs" url="Reports/Understanding_Call_Logs.htm" />
+  <item name="Email Logs" url="Reports/Email_Logs.htm" />
+  <item name="SMS Logs" url="Reports/SMS_Logs.htm" />
+  <item name="Contact History Report" url="Reports/Contact_History_Report.htm" />
+  <item name="Survey Reports" url="Reports/Survey_Job_Reports.htm" />
+  <item name="Saving and Scheduling Reports" url="Reports/Saving_and_Scheduling_Reports.htm" />
+  <item name="Call Distribution Report" url="Reports/Call_Distribution_Report.htm" />
+  <item name="Usage Stats Report" url="Reports/Usage_Stats_Report.htm" />
+</book>
+<book name="Systemwide Reports and Contacts" >
+  <item name="Systemwide Reports" url="Systemwide_Reports_and_Contacts/Systemwide_Reports.htm" />
+  <item name="The Contact Database" url="Systemwide_Reports_and_Contacts/The_Contact_Database.htm" />
+  <item name="Viewing and Editing Contact Details" url="Systemwide_Reports_and_Contacts/Viewing_and_Editing_Contact_Details.htm" />
+</book>
+<book name="SMS Messaging" >
+  <item name="Before Sending SMS Messages" url="SMS_Messaging/Before_You_Send_an_SMS.htm" />
+  <item name="About SMS Messaging" url="SMS_Messaging/About_SMS_Messaging.htm" />
+</book>
+<book name="System Administration" >
+  <book name="User Management" >
+    <item name="Managing User Accounts" url="System_Administration/User_Management/Managing_User_Accounts.htm" />
+    <item name="Managing Access Profiles" url="System_Administration/User_Management/Managing_Access_Profiles.htm" />
+  </book>
+  <book name="Blocking Phone/Email/SMS" >
+    <item name="Blocking Email Addresses" url="System_Administration/System_Settings/Blocking_Email_Addresses.htm" />
+    <item name="Blocking Phone Numbers" url="System_Administration/System_Settings/Blocking_Phone_Numbers.htm" />
+  </book>
+  <book name="Settings" >
+    <item name="Job Settings" url="System_Administration/System_Settings/Job.htm" />
+    <item name="Systemwide Settings" url="System_Administration/System_Settings/System.htm" />
+    <item name="Destination Labels" url="System_Administration/System_Settings/Destination_Labels.htm" />
+  </book>
+  <book name="Intro Message Management" >
+    <item name="Customizing Intro Messages" url="System_Administration/Intro_Messages/Customizing_Intro_Messages.htm" />
+  </book>
+  <book name="Data Imports" >
+    <item name="The Import Manager" url="System_Administration/Data_Imports/The_Import_Manager.htm" />
+  </book>
+  <book name="Self-Signup" >
+    <item name="Configuring the Self-Signup Feature" url="System_Administration/Subscriber_Feat/Configuring_the_Self-Signup_Feature.htm" />
+    <item name="Setting Up Self-Signup Fields" url="System_Administration/Subscriber_Feat/Setting_Up_Self-Signup_Fields.htm" />
+  </book>
+  <book name="SmartCall" >
+    <item name="Using SmartCall" url="System_Administration/SmartCall/Using_SmartCall.htm" />
+  </book>
+</book>
+
+</tocdata>

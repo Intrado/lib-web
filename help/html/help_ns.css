@@ -1,0 +1,49 @@
+﻿SPAN.maincontent { 
+                  font-size:10pt; 
+                  font-family:Verdana, sans-serif;  }
+A:active { 
+          font-family:Verdana, sans-serif; 
+          color:#a45200; 
+          font-size:8pt;  }
+A:hover { 
+         font-family:Verdana, sans-serif; 
+         color:#208fff; 
+         font-size:8pt;  }
+A:link { 
+        font-family:Verdana, sans-serif; 
+        color:#004891; 
+        font-size:8pt;  }
+A:visited { 
+           font-family:Verdana, sans-serif; 
+           color:#572c00; 
+           font-size:8pt;  }
+SPAN.glosstext { 
+                font-size:10pt; 
+                font-family:Verdana, sans-serif;  }
+SPAN.expandtext { 
+                 font-size:10pt; 
+                 font-family:Verdana, sans-serif;  }
+BODY { 
+      font-family:Verdana, sans-serif; 
+      color:#585858;  }
+OL { 
+    font-size:10pt; 
+    font-family:Verdana, sans-serif; 
+    color:#585858;  }
+UL { 
+    font-size:10pt; 
+    font-family:Verdana, sans-serif; 
+    color:#585858;  }
+P { 
+   font-size:8pt; 
+   font-family:Verdana, sans-serif; 
+   color:#585858;  }
+LI.P { 
+      font-size:8pt;  }
+H1 { 
+    font-size:large; 
+    font-family:Verdana, sans-serif; 
+    color:#585858; 
+    font-weight:bold;  }
+LI.H1 { 
+       font-size:large;  }
