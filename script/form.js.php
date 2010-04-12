@@ -349,7 +349,7 @@ function form_fieldset_event_handler (event) {
 	var e = event.element();
 
 	var fieldset = e.up("fieldset");
-	var step = fieldset?fieldset.id.substring(fieldset.id.lastIndexOf("_")+1)-1:null;
+	var step = fieldset ? fieldset.id.substring(fieldset.id.lastIndexOf("_") + 1) - 1 : null;
 	form_go_step(form,null,step);
 }
 
