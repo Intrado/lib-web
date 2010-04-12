@@ -30,7 +30,15 @@ function handleRequest() {
 	switch($type) {
 		//--------------------------- SIMPLE OBJECTS, should mirror objects in obj/*.obj.php (simplified to _fieldlist) -------------------------------
 		case 'lists':
-			return cleanObjects(DBFindMany('PeopleList', ", (name+0) as lettersfirst from list where userid=? and type != 'alert' and not deleted order by lettersfirst,name", false, array($USER->id)));
+			return cleanObjects(DBFindMany('PeopleList',
+					", (l.name+0) as lettersfirst
+					from list l
+						left join publish p on
+							(l.id = p.listid and p.type = 'list' and p.action = 'subscribe')
+					where (l.userid=? or p.userid=?)
+						and l.type != 'alert'
+						and not l.deleted
+					order by lettersfirst,l.name", "l", array($USER->id,$USER->id)));
 
 		// Return an AudioFile object specified by its ID.
 		case 'AudioFile':
@@ -141,7 +149,7 @@ function handleRequest() {
 			$listrules = array();
 			$fieldmaps = FieldMap::getAllAuthorizedFieldMaps();
 			foreach ($listids as $id) {
-				if (!userOwns('list', $id))
+				if (!userOwns('list', $id) && !isSubscribed('list', $id))
 					continue;
 				$list = new PeopleList($id+0);
 				$listrules[$id] = $list->getListRules();
