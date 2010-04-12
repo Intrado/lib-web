@@ -259,7 +259,7 @@ class FinishPublishTargetWiz extends WizFinish {
 		$target = $postdata['/publishtarget']["target"];
 		
 		// look up existing publications for this object
-		$publications = getPublications($type, $id);
+		$publications = Publish::getPublications($type, $id);
 		
 		$publishedorgs = array();
 		if ($publications)
@@ -298,7 +298,7 @@ class FinishPublishTargetWiz extends WizFinish {
 		}
 
 		// remove subscriptions that are no longer authorized
-		$subscriptions = getSubscriptions($type, $id);
+		$subscriptions = Publish::getSubscriptions($type, $id);
 		// check each of the subscriptions user access to see if we should remove the subscription
 		foreach ($subscriptions as $subscribe) {
 			// if this is an un-publish request...

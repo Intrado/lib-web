@@ -30,40 +30,42 @@ class Publish extends DBMappedObject {
 		// no match, failed
 		return false;
 	}
-}
-
-// look up publish objects by type, id, action and optionally userid
-function _findPublishObjects($type, $id, $action, $userid = false) {
-	$args = array($action, $id);
 	
-	$usersql = "";
-	if ($userid !== false) {
-		$usersql = "and userid = ?";
-		$args[] = $userid;
+	// look up publish objects by type, id, action and optionally userid
+	static function _findPublishObjects($type, $id, $action, $userid = false) {
+		$args = array($action, $id);
+		
+		$usersql = "";
+		if ($userid !== false) {
+			$usersql = "and userid = ?";
+			$args[] = $userid;
+		}
+		
+		switch ($type) {
+			case "messagegroup":
+				return DBFindMany("publish", "from publish where action = ? and type = 'messagegroup' and messagegroupid = ? $usersql", false, $args);
+				break;
+			case "list":
+				return DBFindMany("publish", "from publish where action = ? and type = 'list' and listid = ? $usersql", false, $args);
+				break;
+			default:
+				return false;
+		}
+		return false;
 	}
 	
-	switch ($type) {
-		case "messagegroup":
-			return DBFindMany("publish", "from publish where action = ? and type = 'messagegroup' and messagegroupid = ? $usersql", false, $args);
-			break;
-		case "list":
-			return DBFindMany("publish", "from publish where action = ? and type = 'list' and listid = ? $usersql", false, $args);
-			break;
-		default:
-			return false;
+	// get all the publications for a specific type and specific messagegroup or list id
+	static function getPublications ($type, $id) {
+		return Publish::_findPublishObjects($type, $id, 'publish');
 	}
-	return false;
+	
+	// get all the subscriptions for a specific type and specific messagegroup or list id
+	// optionally restrict to a specific user id to test if the user is subscribed to this type, id combination
+	static function getSubscriptions ($type, $id, $userid = false) {
+		return Publish::_findPublishObjects($type, $id, 'subscribe', $userid);
+	}
 }
 
-// get all the publications for a specific type and specific messagegroup or list id
-function getPublications ($type, $id) {
-	return _findPublishObjects($type, $id, 'publish');
-}
 
-// get all the subscriptions for a specific type and specific messagegroup or list id
-// optionally restrict to a specific user id to test if the user is subscribed to this type, id combination
-function getSubscriptions ($type, $id, $userid = false) {
-	return _findPublishObjects($type, $id, 'subscribe', $userid);
-}
 
 ?>

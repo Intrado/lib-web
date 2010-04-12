@@ -9,7 +9,7 @@ if (!isset($SUBSCRIBETYPE))
 // requests to subscribe to a publishid
 if (isset($_GET['id']) && isset($_GET['subscribe'])) {
 	// see that they don't subscribe more than once
-	$subscription = getSubscriptions($SUBSCRIBETYPE, $_GET['id'], $USER->id);
+	$subscription = Publish::getSubscriptions($SUBSCRIBETYPE, $_GET['id'], $USER->id);
 	if (userCanSubscribe($SUBSCRIBETYPE, $_GET['id']) && !$subscription) {
 		// create a new publish dbmo
 		$subscribe = new Publish();
