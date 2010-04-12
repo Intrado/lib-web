@@ -600,4 +600,13 @@ $$$
  ALTER TABLE `publish` ADD INDEX ( `listid` )
  $$$
  
- 
+-- $rev 11
+
+drop table `enrollment`
+$$$
+
+insert ignore into targetedmessagecategory(id,name,deleted,image) values('1', 'Default', '0', 'blue dot')
+$$$
+update targetedmessagecategory set deleted = 0 where id = 1
+$$$
+

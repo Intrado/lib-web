@@ -217,29 +217,6 @@ CREATE TABLE `email` (
 $$$
 
 --
--- Table structure for table `enrollment`
---
-
-CREATE TABLE `enrollment` (
-  `id` int(11) NOT NULL auto_increment,
-  `personid` int(11) NOT NULL,
-  `c01` varchar(255) NOT NULL,
-  `c02` varchar(255) NOT NULL,
-  `c03` varchar(255) NOT NULL,
-  `c04` varchar(255) NOT NULL,
-  `c05` varchar(255) NOT NULL,
-  `c06` varchar(255) NOT NULL,
-  `c07` varchar(255) NOT NULL,
-  `c08` varchar(255) NOT NULL,
-  `c09` varchar(255) NOT NULL,
-  `c10` varchar(255) NOT NULL,
-  PRIMARY KEY  (`id`),
-  KEY `staffid` (`c01`),
-  KEY `personid` (`personid`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 
-$$$
-
---
 -- Table structure for table `event`
 --
 
@@ -1068,7 +1045,7 @@ $$$
 
 CREATE TABLE `subscriber` (
   `id` int(11) NOT NULL auto_increment,
-  `username` varchar(255) collate utf8_bin NOT NULL,
+  `username` varchar(255) collate utf8_general_ci NOT NULL,
   `password` varchar(50) collate utf8_bin NOT NULL,
   `personid` int(11) default NULL,
   `lastlogin` datetime default NULL,
@@ -1422,3 +1399,13 @@ $$$
 update setting set value='7.5/10' where name='_dbversion'
 $$$
 -- END REV 7.5/10
+
+-- START REV 7.5/11
+
+insert into targetedmessagecategory(name,deleted,image) values( 'Default', '0', 'blue dot')
+$$$
+
+
+update setting set value='7.5/11' where name='_dbversion'
+$$$
+-- END REV 7.5/11

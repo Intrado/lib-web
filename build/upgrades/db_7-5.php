@@ -361,7 +361,16 @@ function upgrade_7_5 ($rev, $shardid, $customerid, $db) {
 				QuickUpdate($query);
 				
 			} // else no school field
+		case 10:
+			// upgrade from rev 10 to rev 11
+			echo "|";
+			apply_sql("upgrades/db_7-5_pre.sql",$customerid,$db, 11);
 
+			// if they have an enrollment import, set the customer setting _hasenrollment
+			if ( QuickQuery("select 1 from import where datatype = 'enrollment' limit 1") ) {
+				setSystemSetting("_hasenrollment", "1");
+			}
+			
 	}
 	
 	//do these always
