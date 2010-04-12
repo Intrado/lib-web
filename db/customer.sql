@@ -1402,10 +1402,6 @@ $$$
 
 -- START REV 7.5/11
 
-insert into targetedmessagecategory(name,deleted,image) values( 'Default', '0', 'blue dot')
-$$$
-
-
 update setting set value='7.5/11' where name='_dbversion'
 $$$
 -- END REV 7.5/11
