@@ -36,9 +36,9 @@
 <item name="Show_Navigation_Component" value="Show Navigation Component" />
 <item name="Book" value="Book" />
 <item name="Disabled Next" value="&gt;&gt;" />
-<item name="FtsHilitePrompt" value="Highlight search results" />
 <item name="nls_body_empty" value="Sorry, we were unable to find a good answer for your question." />
 <item name="nls_button_go_hint" value="Go Search" />
+<item name="FtsHilitePrompt" value="Highlight search results" />
 <item name="Find" value="Find" />
 <item name="CantOpenURLorFile" value="Can't open URL or file" />
 <item name="Print" value="Print" />
@@ -82,8 +82,6 @@
 
   <panes show="0">
     <toc />
-    <index />
-    <fts />
   </panes>
 
   <stopwords>
