@@ -13,6 +13,7 @@ require_once("obj/FormItem.obj.php");
 require_once("obj/Phone.obj.php");
 require_once("obj/Rule.obj.php");
 require_once("obj/ValRules.val.php");
+require_once("obj/ValSections.val.php");
 require_once("obj/FieldMap.obj.php");
 require_once("obj/FormUserItems.obj.php");
 require_once("obj/FormRuleWidget.fi.php");
@@ -148,6 +149,9 @@ class UserSectionFormItem extends FormItem {
 					return;
 				}
 				
+				// make the add button hidden
+				addbutton.hide();
+				
 				// empty out the choose div and put a loading gif in there
 				targetelement.show();
 				targetelement.update("<img src=\"img/ajax-loader.gif\" /><br>Please wait.<br>Loading content...");
@@ -156,26 +160,29 @@ class UserSectionFormItem extends FormItem {
 				cachedAjaxGet("ajax.php?type=getsections&organizationid=" + selectelement.value, function(result, itemid) {
 					var sections = result.responseJSON;
 					targetelement.update();
-					for (id in sections) {
-						chkid = itemid + id.toString();
-						chkname = itemid + "[]";
-						lblid = chkid + "-label";
-						
-						// if this checkbox already exists it is in user sections and we cant re-create it
-						if ($(chkid) == null) {
-							targetelement.insert(
-								new Element("input", {"id": chkid, "name": chkname, "type": "checkbox", "value": id})
-							).insert(
-								new Element("label", {"id": lblid, "for": chkid}).update(sections[id])
-							).insert(
-								new Element("br")
-							);
+					if (sections == false) {
+						targetelement.update("'. addslashes(_L("No sections available")). '");
+					} else {
+						for (id in sections) {
+							chkid = itemid + id.toString();
+							chkname = itemid + "[]";
+							lblid = chkid + "-label";
+							
+							// if this checkbox already exists it is in user sections and we cant re-create it
+							if ($(chkid) == null) {
+								targetelement.insert(
+									new Element("input", {"id": chkid, "name": chkname, "type": "checkbox", "value": id})
+								).insert(
+									new Element("label", {"id": lblid, "for": chkid}).update(sections[id])
+								).insert(
+									new Element("br")
+								);
+							}
 						}
+						// make the add button visible
+						addbutton.show();
 					}
 				}, formitemid, true);
-				
-				// make the add button visible
-				addbutton.show();
 			}
 			
 			// move checked section key checkbox elements from the source div into the target div
@@ -216,26 +223,12 @@ class UserSectionFormItem extends FormItem {
 	}
 }
 
-class ValUserSection extends Validator {
-	var $onlyserverside = true;
-
-	function validate ($value, $args) {
-		if ($value) {
-			$validsections = QuickQueryList("select id, skey from section where id in (". DBParamListString(count($value)) .")", true, false, $value);
-			foreach ($value as $id)
-				if (!isset($validsections[$id]))
-					return _L('%s has invalid data selected.', $this->label);
-		}
-		return true;
-	}
-}
-
 class ValUserOrganization extends Validator {
 	var $onlyserverside = true;
 
 	function validate ($value, $args) {
 		if ($value) {
-			$validorgs = QuickQueryList("select id, orgkey from organization where id in (". DBParamListString(count($value)) .")", true, false, $value);
+			$validorgs = Organization::getAuthorizedOrgKeys();
 			foreach ($value as $id)
 				if (!isset($validorgs[$id]))
 					return _L('%s has invalid data selected.', $this->label);
@@ -524,7 +517,7 @@ if ($hasenrollment) {
 		"fieldhelp" => _L('Add or remove user section associations'),
 		"value" => $usersections,
 		"validators" => array(
-			array("ValUserSection")
+			array("ValSections")
 		),
 		"control" => array("UserSectionFormItem"),
 		"helpstep" => 2
@@ -863,7 +856,7 @@ include_once("nav.inc.php");
 
 ?>
 <script type="text/javascript">
-<? Validator::load_validators(array("ValLogin", "ValPassword", "ValAccesscode", "ValPin", "ValRules", "ValUserSection", "ValUserOrganization")); ?>
+<? Validator::load_validators(array("ValLogin", "ValPassword", "ValAccesscode", "ValPin", "ValRules", "ValSections", "ValUserOrganization")); ?>
 </script>
 <?
 
