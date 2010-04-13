@@ -26,7 +26,7 @@ class FieldMap extends DBMappedObject {
 	static function getSubscriberOrganizationFieldMap() {
 		$fieldmap = new FieldMap();
 		$fieldmap->fieldnum = "oid";
-		$fieldmap->name = getSystemSetting("_organizationfieldname","Organization");
+		$fieldmap->name = getSystemSetting("organizationfieldname","Organization");
 		$fieldmap->options = "searchable,multisearch,subscribe,static";
 		return $fieldmap;
 	}

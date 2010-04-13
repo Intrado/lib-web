@@ -160,7 +160,7 @@ if (isset($_SESSION['report']['options']['organizationids'])) {
 	$selectedorgs = $_SESSION['report']['options']['organizationids'];
 }
 $formdata["organizationids"] = array(
-	"label" => getSystemSetting("_organizationfieldname","Organization"),
+	"label" => getSystemSetting("organizationfieldname","Organization"),
 	"fieldhelp" => _L("Use this menu to narrow your report results to those contacts belonging to the selected organizations."),
 	"value" => $selectedorgs,
 	"control" => array("RestrictedValues", "values" => $orgs),

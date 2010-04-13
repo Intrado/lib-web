@@ -219,7 +219,7 @@ class ContactChangeReport extends ReportGenerator {
 						"5" => "Sequence",
 						"6" => "Destination",
 						"9" => "Modified Date",
-						"10" => getSystemSetting("_organizationfieldname","Organization"));
+						"10" => getSystemSetting("organizationfieldname","Organization"));
 		// index 7 is a flag to tell what type of destination
 		// index 8 editlock
 		// so set the title of starting f-field at appropriate place
@@ -429,7 +429,7 @@ class ContactChangeReport extends ReportGenerator {
 
 		$ordering = array();
 		$ordering["ID#"] = "p.pkey";
-		$ordering[getSystemSetting("_organizationfieldname","Organization")] = "org";
+		$ordering[getSystemSetting("organizationfieldname","Organization")] = "org";
 		
 		foreach($fields as $field){
 			$ordering[$field->name]= "p." . $field->fieldnum;

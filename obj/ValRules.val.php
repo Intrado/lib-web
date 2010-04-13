@@ -39,7 +39,7 @@ class ValRules extends Validator {
 		
 		$msgIncompleteRule = addslashes(_L("Incomplete rule data"));
 		$msgUnauthorizedFieldmap = addslashes(_L("Unauthorized fieldmap"));
-		$msgUnauthorizedOrganization = addslashes(_L("Unauthorized %s",getSystemSetting("_organizationfieldname","Organization")));
+		$msgUnauthorizedOrganization = addslashes(_L("Unauthorized %s",getSystemSetting("organizationfieldname","Organization")));
 		
 		// if any of the rule data isn't set
 		if (!isset($data->fieldnum, $data->logical, $data->op, $data->val)) {

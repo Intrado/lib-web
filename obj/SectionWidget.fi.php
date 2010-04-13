@@ -12,13 +12,13 @@ class SectionWidget extends FormItem {
 		$html = '
 			<table>
 				<tr>
-					<th style="text-align:left; vertical-align:top">'.escapehtml(getSystemSetting("_organizationfieldname","Organization")).'</th>
+					<th style="text-align:left; vertical-align:top">'.escapehtml(getSystemSetting("organizationfieldname","Organization")).'</th>
 					<th style="text-align:left; vertical-align:top">'.escapehtml(_L("Sections")).'</th>
 				</tr>
 				<tr>
 					<td style="text-align:left; vertical-align:top">
 						<select id="'.$n.'organizationselector">
-							<option value="">--- ' . escapehtml(_L("Choose a %s",getSystemSetting("_organizationfieldname","Organization"))) . ' ---</option>
+							<option value="">--- ' . escapehtml(_L("Choose a %s",getSystemSetting("organizationfieldname","Organization"))) . ' ---</option>
 		';
 	
 		// Populate the selectbox with authorized organizations.
