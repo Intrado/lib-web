@@ -413,10 +413,13 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		
 		$person->userid = $USER->id;		
 		$person->deleted = 0;
-		$person->type = "addressbook";
-		//the only time we don't set to addressbook is from manual add page where they've uncheck the box
-		if ($_SESSION['addresseditorigin'] == "manualadd" && !$postdata['savetoaddrbook'])
-			$person->type = "manualadd";
+		// if new person, set if addressbook/manualadd (else of editing, leave this setting alone)
+		if (!$person->id) {
+			$person->type = "addressbook";
+			//the only time we don't set to addressbook is from manual add page where they've uncheck the box
+			if ($_SESSION['addresseditorigin'] == "manualadd" && !$postdata['savetoaddrbook'])
+				$person->type = "manualadd";
+		}
 		
 		$person->$fnamefield = $postdata['firstname'];
 		$person->$lnamefield = $postdata['lastname'];
