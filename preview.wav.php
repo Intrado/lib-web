@@ -70,9 +70,9 @@ if (isset($_GET['usetext']) && isset($_SESSION['ttstext']) && isset($_SESSION['t
 	
 } else if(isset($_GET['id'])) {
 	//session_write_close();//WARNING: we don't keep a lock on the session file, any changes to session data are ignored past this point
-	$id = $_GET['id'] + 0;
-	
-	if (userOwns("message",$id) || $USER->authorize('managesystem') || isPublished("message", $id)) {
+	$message = new Message($_GET['id'] + 0);
+		
+	if (userOwns("message",$message->id) || $USER->authorize('managesystem') || isPublished("messagegroup", $message->messagegroupid)) {
 		$fields=array();
 		$languagefield = FieldMap::getLanguageField();
 		for($i=1; $i <= 20; $i++){
@@ -85,7 +85,7 @@ if (isset($_GET['usetext']) && isset($_SESSION['ttstext']) && isset($_SESSION['t
 					$fields[$fieldnum] = $_REQUEST[$fieldnum];
 			}
 		}
-		Message::playAudio($id, $fields,"mp3");
+		Message::playAudio($message->id, $fields,"mp3");
 		exit();
 	}
 } else if(isset($_GET['mediafile'])) {
