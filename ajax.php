@@ -273,23 +273,27 @@ function handleRequest() {
 				return false;
 			$organizationid = $_GET['organizationid'] + 0;
 			
-			// If the user is unrestricted or is associated with this organization, $validsectionids = all sections for this organization.
-			// Otherwise if the user is associated to sections, $validsectionids = associated sections that are part of this organization.
-			if (QuickQuery('select 1 from userassociation where userid = ? limit 1', false, array($USER->id))) {
-				if (QuickQuery('select 1 from userassociation where userid = ? and organizationid = ? and type = "organization" limit 1', false, array($USER->id, $organizationid))) {
-					return QuickQueryList('select id, skey from section where organizationid = ?', true, false, array($organizationid));
-				} else {
-					return QuickQueryList('
-						select s.id, s.skey
-						from userassociation ua
-							inner join section s on (ua.sectionid = s.id)
-						where ua.userid = ? and ua.type = "section" and ua.sectionid != 0 and s.organizationid = ?',
-						true, false, array($USER->id, $organizationid)
-					);
-				}
-			} else { // Unrestricted.
-				return QuickQueryList('select id, skey from section where organizationid = ?', true, false, array($organizationid));
+			// check user restrictions for this organization's sections
+			$sections = QuickQueryList(
+					"select s.id, s.skey
+					from section s
+						inner join userassociation ua on
+						(s.id = ua.sectionid)
+					where s.organizationid = ?
+						and ua.type = 'section'
+						and ua.userid = ?
+						order by s.skey", true, false, array($organizationid, $USER->id));
+			
+			// if there are none, check that the requested orgid is authorized for this user
+			if (!$sections) {
+				$validorgs = Organization::getAuthorizedOrgkeys();
+				if (isset($validorgs[$organizationid]))
+					$sections = QuickQueryList("select id, skey from section where organizationid = ?", true, false, array($organizationid));
 			}
+			
+			// if there are no sections to return, return false
+			return ($sections?$sections:false);
+			
 
 		case 'rulewidgetsettings':
 			return array(
