@@ -442,7 +442,7 @@ $formdata["accessid"] = array(
 		array("ValRequired"),
 		array("ValInArray", "values" => array_keys($accessprofiles))
 	),
-	"control" => array("SelectMenu", "values"=>$accessprofiles),
+	"control" => array("SelectMenu", "values"=>array(0=>"--- ". escapehtml(_L("Select a profile")). " ---") + $accessprofiles),
 	"helpstep" => 2
 );
 
