@@ -18,39 +18,13 @@ class SectionWidget extends FormItem {
 				<tr>
 					<td style="text-align:left; vertical-align:top">
 						<select id="'.$n.'organizationselector">
-							<option value="">' . escapehtml(_L("Choose an Organization")) . '</option>
+							<option value="">--- ' . escapehtml(_L("Choose an Organization")) . ' ---</option>
 		';
 	
-		// Populate the selectbox with organizations.
-		// If the user has section/organization associations,
-		// get a union of his associated organizations and the organizations of his associated sections.
-		// Otherwise, get all organizations.
-		if (QuickQuery('select 1 from userassociation where userid = ? limit 1', false, array($USER->id))) {
-			$validorgkeys = QuickQueryList('
-				select o.id, o.orgkey
-				from userassociation ua
-					inner join organization o
-						on (ua.organizationid = o.id)
-				where ua.userid = ? and ua.type = "organization"',
-				true, false, array($USER->id)
-			);
-			
-			$validorgkeys += QuickQueryList('
-				select distinct o.id, o.orgkey
-				from userassociation ua
-					inner join section s
-						on (ua.sectionid = s.id)
-					inner join organization o
-						on (s.organizationid = o.id)
-				where ua.userid = ? and ua.type = "section" and ua.sectionid != 0',
-				true, false, array($USER->id)
-			);
-		} else {
-			$validorgkeys = QuickQueryList('select id, orgkey from organization where not deleted', true, false);
-		}
+		// Populate the selectbox with authorized organizations.
+		$validorgkeys = Organization::getAuthorizedOrgKeys();
 		
 		foreach ($validorgkeys as $organizationid => $orgkey) {
-			$validorgkeys = QuickQueryList('select id, orgkey from organization where not deleted', true, false);
 			$selected = isset($selectedorganizationid) && $selectedorganizationid == $organizationid;
 			$html .= '<option value="'.$organizationid.'" '.($selected ? 'selected' : '').'>' . escapehtml($orgkey) . '</option>';
 		}
