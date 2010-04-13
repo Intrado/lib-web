@@ -44,7 +44,7 @@ class JobSummaryReport extends ReportGenerator{
 	// @param $rptypequery, sql of the form: "and ___", like "and rp.type = 'phone'"
 	static function getDestinationResultQuery($joblistquery, $rptypequery) {
 		return "select count(*) as cnt,
-				coalesce(rc.result, rp.status) as currentstatus,
+				coalesce(if(rc.result='X' and rc.numattempts<3,'F',rc.result), rp.status) as currentstatus,
 				sum(rc.result not in ('A','M', 'sent', 'blocked', 'duplicate') and rc.numattempts < js.value) as remaining
 				from reportperson rp
 				left join reportcontact rc on (rp.jobid = rc.jobid and rp.type = rc.type and rp.personid = rc.personid)

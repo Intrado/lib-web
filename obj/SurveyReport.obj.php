@@ -268,8 +268,7 @@ class SurveyReport extends ReportGenerator{
 							coalesce(rc.zip,''))
 					) as destination,
 			from_unixtime(rc.starttime/1000) as lastattempt,
-			coalesce(rc.result,
-					rp.status) as result,
+			coalesce(if(rc.result='X' and rc.numattempts<3,'F',rc.result), rp.status) as result,
 			rp.status,
 			rc.numattempts as attempts,
 			rc.resultdata,

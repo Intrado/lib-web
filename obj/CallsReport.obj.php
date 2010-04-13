@@ -71,7 +71,7 @@ class CallsReport extends ReportGenerator{
 							coalesce(rc.zip,''))
 							) as destination,
 					rc.attemptdata as attemptdata,
-					coalesce(rc.result, rp.status) as status,
+					coalesce(if(rc.result='X' and rc.numattempts<3,'F',rc.result), rp.status) as status,
 					rc.sequence as sequence
 					$orgfieldquery
 					$fieldquery
