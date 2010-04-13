@@ -203,7 +203,7 @@ class ContactsReport extends ReportGenerator {
 						"4" => "Address",
 						"5" => "Sequence",
 						"6" => "Destination",
-						"9" => "Organization");
+						"9" => getSystemSetting("_organizationfieldname","Organization"));
 		// index 7 is a flag to tell what type of destination
 		// so set the title of starting f-field at appropriate place
 		// append begins after index specified
@@ -306,7 +306,7 @@ class ContactsReport extends ReportGenerator {
 			$ordering[$field->name]= "p." . $field->fieldnum;
 		}
 		$ordering["Address"] = "address";
-		$ordering["Organization"]="org";
+		$ordering[getSystemSetting("_organizationfieldname","Organization")]="org";
 		return $ordering;
 	}
 }

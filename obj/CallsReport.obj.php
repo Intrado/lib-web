@@ -165,7 +165,7 @@ class CallsReport extends ReportGenerator{
 						"5" => "Destination",
 						"6" => "Date/Time",
 						"7" => "Result",
-						"9" => "Organization");
+						"9" => getSystemSetting("_organizationfieldname","Organization"));
 		$titles = appendFieldTitles($titles, 9, $fieldlist, $activefields);
 
 		$formatters = array("3" => "fmt_delivery_type_list",
@@ -398,7 +398,7 @@ class CallsReport extends ReportGenerator{
 		$ordering["Destination"] = "destination";
 		$ordering["Date/Time"] = "date";
 		$ordering["result"] = "result";
-		$ordering["Organization"] = "org";
+		$ordering[getSystemSetting("_organizationfieldname","Organization")] = "org";
 		foreach($fields as $field){
 			$ordering[$field->name]= "rp." . $field->fieldnum;
 		}

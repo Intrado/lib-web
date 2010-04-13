@@ -311,7 +311,7 @@ class JobDetailReport extends ReportGenerator{
 						8 => "Last Attempt",
 						9 => "Last Result",
 						14 => "Response",
-						17 => "Organization");
+						17 => getSystemSetting("_organizationfieldname","Organization"));
 		$titles = appendFieldTitles($titles, 17, $fieldlist, $activefields);
 
 		$formatters = array(7 => "fmt_destination",
@@ -486,7 +486,7 @@ class JobDetailReport extends ReportGenerator{
 		$ordering["Last Attempt"]="lastattempt";
 		$ordering["Last Result"]="result";
 		$ordering["Response"]="confirmed DESC, voicereplyid DESC";
-		$ordering["Organization"]="org";
+		$ordering[getSystemSetting("_organizationfieldname","Organization")]="org";
 
 		foreach($fields as $field){
 			$ordering[$field->name]= "rp." . $field->fieldnum;

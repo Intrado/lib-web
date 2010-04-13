@@ -403,7 +403,7 @@ foreach ($fieldmaps as $map) {
 ?>
 
 	<tr>
-		<th align="right" class="windowRowHeader bottomBorder">Organization:</th>
+		<th align="right" class="windowRowHeader bottomBorder"><?=escapehtml(getSystemSetting("_organizationfieldname","Organization"))?>:</th>
 		<td class="bottomBorder"><? displayValue($organization); ?></td>
 	</tr>
 	
@@ -559,7 +559,7 @@ foreach ($fieldmaps as $map) {
 <?
 		}
 ?>
-			<th align="left"><?=_L("Organization")?></th>
+			<th align="left"><?=escapehtml(getSystemSetting("_organizationfieldname","Organization"))?></th>
 		</tr>
 <?
 		$alt = 0;

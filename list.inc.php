@@ -65,7 +65,7 @@ function showRenderedListTable($renderedlist, $list = false) {
 	$titles[3] = "Destination";
 	$formatters[3] = "fmt_destination";
 	
-	$titles[5] = "Organization";
+	$titles[5] = getSystemSetting("_organizationfieldname","Organization");
 	
 	//after that, show F fields, then G fields
 	//optional F fields start at index 8 (skip f01, f02)

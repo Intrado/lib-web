@@ -121,7 +121,7 @@ class UserSectionFormItem extends FormItem {
 		$str .= '</div>';
 		if ($orgs) {
 			$str .= '<select id="'. $n .'-select" style="float: left" onchange="getSections(this, \''. $n .'-sectionchoosediv\', \''. $n .'\', \''. $n .'-addbutton\')">
-				<option value="0" >--- '.escapehtml(_L("Select an Organization")).' ---</option>';
+				<option value="0" >--- '.escapehtml(_L("Select a %s",getSystemSetting("_organizationfieldname","Organization"))).' ---</option>';
 			foreach ($orgs as $orgid => $okey) {
 				$str .= '<option value="'. $orgid .'" >'.escapehtml($okey).'</option>';
 			}
@@ -546,7 +546,7 @@ if ($userimportorgs) {
 		$html .= "<div>$okey</div>";
 	$html .= "</div>";
 	$formdata["readonlyorgs"] = array(
-		"label" => _L('Imported Organizations'),
+		"label" => _L('Imported %s',getSystemSetting("_organizationfieldname","Organization")),
 		"control" => array("FormHtml", "html" => $html),
 		"helpstep" => 2
 	);
@@ -558,7 +558,7 @@ $orgs = QuickQueryList("select o.id, o.orgkey from organization o left join user
 // if there are no orgs. don't show the form item
 if ($orgs) {
 	$formdata["organizationids"] = array(
-		"label" => _L('Additional Organizations'),
+		"label" => _L('Additional %s',getSystemSetting("_organizationfieldname","Organization")),
 		"fieldhelp" => _L('Add or remove user organization associations'),
 		"value" => $userorgs,
 		"validators" => array(

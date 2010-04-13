@@ -58,7 +58,7 @@ function fmt_actions ($row, $index) {
 }
 
 $titles = array(
-	"orgkey" => 'Organization',
+	"orgkey" => getSystemSetting("_organizationfieldname","Organization"),
 	"id" => 'Action');
 $formatters = array(
 	"id" => "fmt_actions");
