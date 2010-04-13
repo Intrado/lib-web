@@ -21,7 +21,7 @@ if (isset($_GET['delete']) && isset($_GET['agentid']) && isset($_GET['cid'])) {
 if (isset($_GET['agentid'])) {
 	$agentid = $_GET['agentid']+0;
 	if (!QuickQuery("select 1 from agent where id = ? limit 1", $diskdb, array($agentid))) {
-		echo "Invalid Agent ID.";
+		echo "Invalid SwiftSync ID.";
 		exit();
 	}
 	$_SESSION['agentid'] = $agentid;
@@ -177,13 +177,13 @@ include_once("nav.inc.php");
 //custom newform declaration to catch if manager password is submitted
 NewForm($f);
 ?>
-<div>Settings for DISK Agent: <?=$agent['name']?></div>
+<div>Settings for SwiftSync: <?=$agent['name']?></div>
 <table>
 <?
 
 ?>
 	<tr>
-		<td>Agent Name: </td>
+		<td>SwiftSync Name: </td>
 		<td><? NewFormItem($f, $s, "agent_name", "text", "20");?></td>
 	</tr>
 	<tr>
@@ -192,7 +192,7 @@ NewForm($f);
 	</tr>
 	<tr>
 		<td colspan="2">
-Customers this Agent is associated with:<BR>
+Customers this SwiftSync is associated with:<BR>
 <table class="list sortable" id="customer_agent_table">
 <?
 	showTable($data, $titles, $formatters);

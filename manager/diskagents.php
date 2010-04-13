@@ -63,7 +63,7 @@ if (isset($_POST['genuuid'])) {
 		$newagentname = escapehtml(trim($_POST['newagentname']));
 		$agentnamelength = strlen($newagentname);
 		if ($agentnamelength < 5 || $agentnamelength > 50) {
-			$genstatus = "Error, agent name must be between 5 and 50 characters";
+			$genstatus = "Error, name must be between 5 and 50 characters";
 		} else {
 			// verify customerurl exists
 			$cid = QuickQuery("select id from customer where urlcomponent=?", false, array(trim($_POST['newcusturl'])));
@@ -127,7 +127,7 @@ function fmt_customerUrl($row, $index){
 // index 7 is uuid
 function fmt_DMActions($row, $index){
 	$url =  '<a href="editdiskagent.php?agentid=' . $row[0] . '" title="Edit"><img src="img/s-edit.png" border=0></a>&nbsp;' ;
-	$url .= '<a href="#" onclick="if(confirm(\'Are you sure you want to reset Agent ' . addslashes($row[3]) . '?\')) window.location=\'diskagents.php?reset=' . $row[7] . '\'" title="Reset"><img src="img/s-restart.png" border=0></a>&nbsp;';
+	$url .= '<a href="#" onclick="if(confirm(\'Are you sure you want to reset SwiftSync ' . addslashes($row[3]) . '?\')) window.location=\'diskagents.php?reset=' . $row[7] . '\'" title="Reset"><img src="img/s-restart.png" border=0></a>&nbsp;';
 	return $url;
 }
 
@@ -137,7 +137,7 @@ function fmt_dmstatus($row,$index) {
 	$problems = array();
 
 	if ($row[5]/1000 < time() - 30)
-		$problems[] = "Agent Lost Connection";
+		$problems[] = "Lost Connection";
 
 	if ($row[1] == null || $row[1] <= 0)
 		$problems[] = "Invalid Customer ID";
@@ -228,7 +228,7 @@ if ($data) {
 */
 
 // Add field titles, leading # means it is sortable leading @ means it is hidden by default
-$titles = array(0 => "#Agent ID");
+$titles = array(0 => "#SwiftSync ID");
 $titles[1] = "#Cust ID";
 $titles[2] = "#Customer URL";
 $titles[3] = "#Name";
@@ -236,7 +236,7 @@ $titles[4] = "#Last IP";
 $titles[5] = "#Last Seen";
 $titles["status"] = "#Status";
 $titles[6] = "#Version";
-$titles[7] = "@#Agent UUID";
+$titles[7] = "@#SwiftSync UUID";
 $titles[8] = "#Polling Threads";
 $titles["actions"] = "Actions";
 
@@ -294,7 +294,7 @@ include_once("nav.inc.php");
 			<table border="0" cellpadding="2" cellspacing="1" class="list">
 				<tr class="listHeader" align="left" valign="bottom">
 					<td>
-						Setup new Agent
+						Setup new SwiftSync
 					</td>
 				</tr>
 				<tr>
@@ -310,7 +310,7 @@ include_once("nav.inc.php");
 							</tr>
 							<tr>
 								<td valign="top" align="left">
-									Agent Name:
+									SwiftSync Name:
 								</td>
 								<td>
 									<input type="text" name="newagentname" id="newagentname" value="<?=$newagentname?>" size="20" maxlength="50" />
@@ -318,7 +318,7 @@ include_once("nav.inc.php");
 							</tr>
 							<tr>
 								<td colspan="2">
-									<input type="submit" name="genuuid" id="genuuid" value="Generate Agent UUID" />   
+									<input type="submit" name="genuuid" id="genuuid" value="Generate SwiftSync UUID" />   
 								</td>
 							</tr>
 <?						if ($genstatus) { ?>
@@ -367,9 +367,9 @@ show_column_selector('customer_dm_table', $titles, $lockedTitles);
 	}
 </script>
 <?
-if (file_exists("diskagentbuild.txt")) {
+if (file_exists("swiftsyncbuild.txt")) {
 ?>
-	<div>Latest Version: <?=file_get_contents("diskagentbuild.txt");?></div>
+	<div>Latest Version: <?=file_get_contents("swiftsyncbuild.txt");?></div>
 <?
 }
 include_once("navbottom.inc.php");

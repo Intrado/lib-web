@@ -100,7 +100,7 @@ table {
 		<td><a href="systemdms.php" title="System DMs"><img src="img/sysdm.png" border=0><div>System&nbsp;DMs</div></a></td>
 	<? } ?>
 	<? if ($MANAGERUSER->authorized("diskagent")) { ?>
-		<td><a href="diskagents.php" title="DISK Agents"><img src="img/diskagent.png" border=0><div>DISK&nbsp;Agents</div></a></td>
+		<td><a href="diskagents.php" title="SwiftSync"><img src="img/diskagent.png" border=0><div>SwiftSync</div></a></td>
 	<? } ?>
 	<? if ($MANAGERUSER->authorized("customercontacts")) { ?>
 		<td><a href="customercontactsearch.php" title="Contact Search"><img src="img/search.png" border=0><div>Contact&nbsp;Search</div></a></td>
