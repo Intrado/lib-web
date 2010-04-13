@@ -771,7 +771,6 @@ function search(event) {
 		event.stop();
 		var searchtxt = event.target.getValue();
 
-		console.info('enter '  + searchtxt);
 		new Ajax.Request('languagesearch.php',
 		{
 			method:'get',
@@ -795,7 +794,6 @@ function search(event) {
 						row.insert(new Element('td').update('<a href="#" onclick="addlang(\'' + itm.key + '\',\'' + itm.value + '\');return false;">' + itm.value + '</a>'));
 						items.insert(row);
 						i++;
-						console.info(itm.key + ' '  + itm.value);
 					});
 				} else {
 					header.insert(new Element('th').update('No Language Found containing the search sting "' + searchtxt + '"'));
