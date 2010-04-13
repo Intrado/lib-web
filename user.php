@@ -13,10 +13,8 @@ require_once("obj/FormItem.obj.php");
 require_once("obj/Phone.obj.php");
 require_once("obj/Rule.obj.php");
 require_once("obj/ValRules.val.php");
-require_once("obj/ValSections.val.php");
 require_once("obj/FieldMap.obj.php");
 require_once("obj/FormUserItems.obj.php");
-require_once("obj/SectionWidget.fi.php");
 require_once("obj/FormRuleWidget.fi.php");
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -95,7 +93,7 @@ class UserSectionFormItem extends FormItem {
 	function render ($value) {
 		$n = $this->form->name."_".$this->name;
 		// get all orgid to orgkey values
-		$orgs = QuickQueryList("select id, orgkey from organization where not deleted order by orgkey", true);
+		$orgs = Organization::getAuthorizedOrgKeys();
 		// get sectionkeys for current value
 		if ($value)
 			$sections = QuickQueryList("select id, skey from section where id in (". DBParamListString(count($value)) .")", true, false, $value);
@@ -554,7 +552,7 @@ if ($userimportorgs) {
 
 // get user organization associations that arn't created by an import
 $userorgs = QuickQueryList("select organizationid from userassociation where userid = ? and type = 'organization' and importid is null", false, false, array($edituser->id));
-$orgs = QuickQueryList("select o.id, o.orgkey from organization o left join userassociation ua on (o.id = ua.organizationid and ua.userid = ?) where not o.deleted and ua.importid is null order by orgkey", true, false, array($edituser->id));
+$orgs = Organization::getAuthorizedOrgKeys();
 // if there are no orgs. don't show the form item
 if ($orgs) {
 	$formdata["organizationids"] = array(
