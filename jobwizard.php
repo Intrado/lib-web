@@ -50,7 +50,7 @@ require_once("obj/ValMessageBody.val.php");
 require_once("obj/ValNonEmptyMessage.val.php");
 
 // Job step form data
-require_once("jobwizard.inc.php");
+require_once("inc/jobwizard.inc.php");
 
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization

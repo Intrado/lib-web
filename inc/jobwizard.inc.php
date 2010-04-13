@@ -564,7 +564,7 @@ class ValEasycall extends Validator {
 		if (!$USER->authorize("starteasy"))
 			return "$this->label "._L("is not allowed for this user account");
 		$values = json_decode($value);
-		if ($values == null)
+		if ($values == json_decode("{}"))
 			return "$this->label "._L("has messages that are not recorded");
 		foreach ($values as $langcode => $afid) {
 			$audiofile = DBFind("AudioFile", "from audiofile where id = ? and userid = ?", false, array($afid, $USER->id));
