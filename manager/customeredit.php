@@ -550,7 +550,7 @@ NewForm($f);
 <tr><td width="30%">Failed login attempts to cause lockout:</td><td><? NewFormItem($f,$s,'loginlockoutattempts','text', 2) ?> 1 - 15 attempts, or 0 to disable</td></tr>
 <tr><td>Failed login attempts before account disable:</td><td><? NewFormItem($f,$s,'logindisableattempts','text', 2) ?> 1 - 15 attempts, or 0 to disable</td></tr>
 <tr><td>Number of minutes for login lockout:</td><td><? NewFormItem($f,$s,'loginlockouttime','text', 2) ?> 1 - 60 minutes</td></tr>
-<td></td><th align="left">Language:/ Google and TTS Support:</th>
+<tr><td></td><th align="left">Language:/ Google and TTS Support:</th>
 <?
 foreach($languages as $language){
 	$lang = "Language" . $language->id;
@@ -574,11 +574,10 @@ foreach($languages as $language){
 	</td></tr><?
 }
 ?>
-<tr><td>New Language: </td><td><div style="display:inline" id="newlangcodedisp"></div><?
-		NewFormItem($f, $s, 'newlangcode', 'hidden', 25, 50, "id='newlangcode'");
-		NewFormItem($f, $s, 'newlang', 'text', 25, 50, "id='newlanginput' onkeyup=\"var s = new getObj('newlanginputselect'); s.obj.selectedIndex = 0;\"")?>
+<tr ><td>New Language: </td><td style="border: 1px solid black;">
+		To add a new language, select a commonly used language or use the search box.<br>
 		<select id='newlanginputselect' onchange="var o = new getObj('newlanginput');var h = new getObj('newlangcode');if (this.selectedIndex !== 0) { var value = this.options[this.selectedIndex].value; o.obj.value = value.substring(4); h.obj.value = value.substring(0,3); $('newlangcodedisp').update(value.substring(0,3));}">
-		<option value=0> -- No Translation Support -- </option>
+		<option value=0> -- Select Common Language -- </option>
 		<?foreach ($googlangs as $code => $googlang) {
 			$ttsLangSup = '';
 			if (isset($ttslangs[strtolower($googlang)]))
@@ -588,10 +587,15 @@ foreach($languages as $language){
 			<option value="<?= str_pad($code,3) . " " . $googlang?>" ><?=$googlang . $ttsLangSup?></option>
 		<?}?>
 		</select>
-		<div style="display:inline;">
-		Search Languages: <input id="searchbox" type="text" size="30" />
-		</div><? NewFormItem($f, "Save","Add", 'submit');?>
+		<div>
+		Search: <input id="searchbox" type="text" size="15" /> (type search term and press ENTER)
+		</div>
 		<table id="searchresult" style=""><tr><td></td></tr></table>
+		
+		<div style="display:inline" id="newlangcodedisp">___</div><?
+		NewFormItem($f, $s, 'newlangcode', 'hidden', 25, 50, "id='newlangcode'");
+		NewFormItem($f, $s, 'newlang', 'text', 25, 50, "id='newlanginput' onkeyup=\"var s = new getObj('newlanginputselect'); s.obj.selectedIndex = 0;\"")?>
+		<? NewFormItem($f, "Save","Add", 'submit');?>
 </td></tr>
 
 <tr><td> Has LDAP </td><td><? NewFormItem($f, $s, 'hasldap', 'checkbox') ?> LDAP</td></tr>
