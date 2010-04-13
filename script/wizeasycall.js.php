@@ -63,10 +63,18 @@ var WizEasyCall = Class.create(EasyCall,{
 			this.createPlayReRecordRemoveButtons();
 		}
 	},
+	
+	// override record to save the phone entered as the default
+	record: function ($super) {
+		// make the phone they entered the default
+		msgphone = $(this.containerid+"_callcontrol").down("input").value;
+		
+		// call the super function
+		$super();
+	},
 
 	// override the setupRecord function to add the audiofile language name
 	setupRecord: function ($super) {
-
 		// call the super function
 		$super();
 
