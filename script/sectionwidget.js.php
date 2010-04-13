@@ -1,3 +1,9 @@
+<?
+//set expire time to + 1 hour so browsers cache this file
+header("Expires: " . gmdate('D, d M Y H:i:s', time() + 60*60) . " GMT"); //exire in 1 hour, but if theme changes so will hash pointing to this file
+header("Content-Type: text/javascript");
+header("Cache-Control: private");
+?>
 var SectionWidget = Class.create({
 	// selectedsectionidsmap should be an object literal of sectionid => true pairs,
 	// so that selectedsectionidsmap[sectionid] indicates that a particular section is selected.
