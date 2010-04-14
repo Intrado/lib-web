@@ -128,7 +128,7 @@ class PublishTargetWiz_publishtarget extends WizStep {
 		}
 		
 		if (Organization::custHasOrgs())
-			$values["organization"] = _L("Specific Organization(s)");
+			$values["organization"] = _L("One or more %s", getSystemSetting("organizationfieldname","Organization"));
 		
 		$formdata['target'] = array(
 			"label" => _L("Subscription Permissions"),
@@ -142,7 +142,7 @@ class PublishTargetWiz_publishtarget extends WizStep {
 			"helpstep" => 1
 		);
 
-		$helpsteps = array(_L("This step allows you to control who can subscribe to this item. <br><br><ul> <li>Unpublish this item - Makes this item no longer appear as a subscribable option. Users will no longer be able to create jobs with this item.<li>Anyone May Subscribe - Allow any user to subscribe to this item. <li>Top Level Users - Only users with no restrictions, such as system administrators, may subscribe.<li>Specific Organizations - Only users from certain organization, such as a school or department, may subscribe.</ul>"));
+		$helpsteps = array(_L("This step allows you to control who can subscribe to this item. <br><br><ul> <li>Unpublish this item - Makes this item no longer appear as a subscribable option. Users will no longer be able to create jobs with this item.<li>Anyone May Subscribe - Allow any user to subscribe to this item. <li>Top Level Users - Only users with no restrictions, such as system administrators, may subscribe.<li>One or more %s - Only specific users may subscribe.</ul>", getSystemSetting("organizationfieldname","Organization")));
 
 		return new Form("publishtargetwiz-publishtarget",$formdata,$helpsteps);
 	}
@@ -163,8 +163,8 @@ class PublishTargetWiz_chooseorganizations extends WizStep {
 		$values = Organization::getAuthorizedOrgKeys();
 		
 		$formdata["organizationids"] = array(
-			"label" => _L('Organization(s)'),
-			"fieldhelp" => _L('Select the organizations whose users may subscribe to this item.'),
+			"label" => getSystemSetting("organizationfieldname","Organization"),
+			"fieldhelp" => _L('Select the %s whose users may subscribe to this item.',getSystemSetting("organizationfieldname","Organization")),
 			"value" => $orgs,
 			"validators" => array(
 				array("ValRequired"),
@@ -174,7 +174,7 @@ class PublishTargetWiz_chooseorganizations extends WizStep {
 			"helpstep" => 2
 		);
 		
-		$helpsteps = array(_L("Users from the organizations you select here will be able to subscribe to this item."));
+		$helpsteps = array(_L("Users from the %s you select here will be able to subscribe to this item.",getSystemSetting("organizationfieldname","Organization")));
 
 		return new Form("publishtargetwiz-chooseorganizations",$formdata,$helpsteps);
 	}
@@ -198,7 +198,7 @@ class PublishTargetWiz_confirm extends WizStep {
 		if ($target == "organization") {
 			$orgkeys = QuickQueryList("select orgkey from organization where id in (". DBParamListString(count($orgids)) .") order by orgkey", false, false, $orgids);
 		} else if ($target == "anyone") {
-			$orgkeys = array("All Organizations");
+			$orgkeys = array("All Users");
 		} else if ($target == "unrestricted") {
 			$orgkeys = array("Only Top Level Users");
 		} else if ($target == "nobody") {
