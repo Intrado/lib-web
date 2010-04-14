@@ -38,6 +38,7 @@ function showRenderedListTable($renderedlist, $list = false) {
 	$total = $renderedlist->getTotal();
 	
 	$showinlist = $list && $list->userid == $USER->id;
+	$showpersontip = !$list || ($list && $list->userid == $USER->id);
 	
 	if ($showinlist)
 		$PAGEINLISTMAP = $renderedlist->getPageInListMap($list);
@@ -54,7 +55,8 @@ function showRenderedListTable($renderedlist, $list = false) {
 	}
 	
 	$titles[1] = "Unique ID";
-	$formatters[1] = "fmt_persontip";
+	if ($showpersontip)
+		$formatters[1] = "fmt_persontip"; //only show magnifying glass if we own list, or not using a list
 	
 	$titles[6] = FieldMap::getName(FieldMap::getFirstNameField());
 	$titles[7] = FieldMap::getName(FieldMap::getLastNameField());
@@ -65,7 +67,7 @@ function showRenderedListTable($renderedlist, $list = false) {
 	$titles[3] = "Destination";
 	$formatters[3] = "fmt_destination";
 	
-	$titles[5] = getSystemSetting("_organizationfieldname","Organization");
+	$titles[5] = getSystemSetting("organizationfieldname","Organization");
 	
 	//after that, show F fields, then G fields
 	//optional F fields start at index 8 (skip f01, f02)
