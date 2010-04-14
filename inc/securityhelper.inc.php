@@ -61,7 +61,7 @@ function userCanSubscribe($type, $id = false) {
 			return false;
 		
 		// check if the user has restrictions
-		$userrestrictions = QuickQuery("select 1 from userassociation where userid = ? and (sectionid is not null or organizationid is not null) limit 1", false, array($USER->id));
+		$userrestrictions = QuickQuery("select 1 from userassociation where userid = ? and type in ('organization', 'section') limit 1", false, array($USER->id));
 		
 		// if they are restricted
 		if ($userrestrictions) {
