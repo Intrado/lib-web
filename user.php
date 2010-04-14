@@ -75,6 +75,8 @@ $surveytypes = QuickQueryList("select id, name from jobtype where not deleted an
 
 $IS_LDAP = getSystemSetting('_hasldap', '0');
 
+$orgs = Organization::getAuthorizedOrgKeys();
+
 ////////////////////////////////////////////////////////////////////////////////
 // Custom form items
 ////////////////////////////////////////////////////////////////////////////////
@@ -512,16 +514,19 @@ if ($hasenrollment) {
 	
 	// get user section associations that arn't created by an import or are zero
 	$usersections = QuickQueryList("select sectionid from userassociation where userid = ? and type = 'section' and importid is null and sectionid != 0", false, false, array($edituser->id));
-	$formdata["sectionids"] = array(
-		"label" => _L('Additional Sections'),
-		"fieldhelp" => _L('Add or remove user section associations'),
-		"value" => $usersections,
-		"validators" => array(
-			array("ValSections")
-		),
-		"control" => array("UserSectionFormItem"),
-		"helpstep" => 2
-	);
+	// if no authorized orgs. don't allow setting sections
+	if ($orgs) {
+		$formdata["sectionids"] = array(
+			"label" => _L('Additional Sections'),
+			"fieldhelp" => _L('Add or remove user section associations'),
+			"value" => $usersections,
+			"validators" => array(
+				array("ValSections")
+			),
+			"control" => array("UserSectionFormItem"),
+			"helpstep" => 2
+		);
+	}
 }
 
 // display read only organization associations, if there are any
@@ -545,7 +550,6 @@ if ($userimportorgs) {
 
 // get user organization associations that arn't created by an import
 $userorgs = QuickQueryList("select organizationid from userassociation where userid = ? and type = 'organization' and importid is null", false, false, array($edituser->id));
-$orgs = Organization::getAuthorizedOrgKeys();
 // if there are no orgs. don't show the form item
 if ($orgs) {
 	$formdata["organizationids"] = array(
