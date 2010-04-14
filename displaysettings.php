@@ -46,7 +46,9 @@ $formdata["brandtheme"] = array(
 		"ratio"=>getSystemSetting('_brandratio'),
 		"customize"=>true
 		)),
-	"validators" => array(array("ValBrandTheme")),
+	"validators" => array(
+		array("ValRequired"),
+		array("ValBrandTheme", "values" => array_keys($COLORSCHEMES))),
 	"control" => array("BrandTheme","values"=>$COLORSCHEMES,"toggle"=>false),
 	"helpstep" => $helpstepnum
 );
