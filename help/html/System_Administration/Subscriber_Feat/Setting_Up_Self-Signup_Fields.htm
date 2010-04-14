@@ -15,30 +15,11 @@ if (navigator.appName !="Netscape")
 img_whs1 { border:none; width:20px; height:20px; float:none; border-style:none; }
 p.whs2 { font-weight:bold; }
 p.whs3 { font-weight:normal; }
-img_whs4 { border:none; width:400px; height:139px; float:none; }
-img_whs5 { border:none; width:400px; height:154px; float:none; }
+img_whs4 { border:none; width:400px; height:139px; float:none; border-style:none; }
+img_whs5 { border:none; width:400px; height:154px; float:none; border-style:none; }
 ul.whs6 { list-style:disc; }
 -->
-</style><script type="text/javascript" language="JavaScript">
-<!--
-function ehlp_showtip(current,e,text)
-{
-  if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == 'Netscape'))
-  {
-    document.tooltip.document.write("<layer bgColor='yellow' style='border:1px solid black;font-size:12px;'>"+ text + "</layer>");
-    document.tooltip.document.close();
-    document.tooltip.left=e.pageX+5;
-    document.tooltip.top=e.pageY+5;
-    document.tooltip.visibility="show";
-  }
-}
-function ehlp_hidetip()
-{
-  document.tooltip.visibility="hidden";
-}
-//-->
-</script>
-<script type="text/javascript" language="JavaScript" title="WebHelpInlineScript">
+</style><script type="text/javascript" language="JavaScript" title="WebHelpInlineScript">
 <!--
 function reDo() {
   if (innerWidth != origWidth || innerHeight != origHeight)
@@ -103,23 +84,22 @@ else
 //-->
 </script>
 <h1>Setting Up Self-Signup Fields</h1>
-<p><span style="font-weight: bold;"><B><img src="../../important.gif" x-maintain-ratio="TRUE" width="20px" height="20px" border="0" class="img_whs1"> Important:</B></span><span style="font-style: italic;"><I> This feature 
- is only visible if your system includes the Self-Signup feature. Self-Signup 
- is a new feature from SchoolMessenger that allows your recipients to sign 
- up for messages on a simple web page. For more information regarding the 
- Self-Signup feature, please call 1-800-527-5225.</I></span></p>
-<p>You may choose any <a title="Click to learn more about fields." href="../System_Settings/System.htm#Field_Definitions" onmouseover="if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == 'Netscape')) ehlp_showtip(this,event,'Click to learn more about fields.');" onmouseout="if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == 'Netscape')) ehlp_hidetip();">fields</a> 
- from your database, including <a title="Click to learn more about group fields." href="../System_Settings/System.htm#Group_Field_Definitions" onmouseover="if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == 'Netscape')) ehlp_showtip(this,event,'Click to learn more about group fields.');" onmouseout="if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == 'Netscape')) ehlp_hidetip();">group fields</a>, 
+<p><span style="font-weight: bold;"><B><img src="../../important.gif" x-maintain-ratio="TRUE" width="20px" height="20px" border="0" class="img_whs1"> Important:</B></span><span style="font-style: italic;"><I> 
+ This feature is only visible if your system includes the Self-Signup feature. 
+ Self-Signup is a new feature from SchoolMessenger that allows your recipients 
+ to sign up for messages on a simple web page. For more information regarding 
+ the Self-Signup feature, please call 1-800-527-5225.</I></span></p>
+<p>You may choose any fields from your database, including group fields, 
  for use with Self-Signup. The fields you choose here will be seen on the 
  web page people will visit when signing up for your messages. All of the 
  fields you would like to use must be defined before you can choose your 
  Self-Signup fields. If your system is already running with data in the 
  database and you wish to modify field definitions, you should contact 
  support services before attempting to change anything. </p>
-<p><span style="font-weight: bold;"><B><img src="../../important.gif" x-maintain-ratio="TRUE" width="20px" height="20px" border="0" class="img_whs1"> Important:</B></span><span style="font-style: italic;"><I> Modifying 
- data field definitions after users have begun using your system can cause 
- unexpected results. Please contact support services for assistance before 
- modifying your field definitions. Call 1-800-920-3897.</I></span></p>
+<p><span style="font-weight: bold;"><B><img src="../../important.gif" x-maintain-ratio="TRUE" width="20px" height="20px" border="0" class="img_whs1"> Important:</B></span><span style="font-style: italic;"><I> 
+ Modifying data field definitions after users have begun using your system 
+ can cause unexpected results. Please contact support services for assistance 
+ before modifying your field definitions. Call 1-800-920-3897.</I></span></p>
 <p class="whs2">Configuring Self-Signup Fields</p>
 <p class="whs3">Navigate to the Settings page by clicking 
  the Admin Tab followed by the Settings sub tab. Click the Self-Signup 
@@ -137,27 +117,22 @@ else
  type of data the field allows (text or list).</p>
 <p>If the field was of the List type, the options are:</p>
 <ul type="disc" class="whs6">
-	<li class=P><p>Manually Entered List of Values - Choose this if you 
+	<li class=p><p>Manually Entered List of Values - Choose this if you 
  want to specify the field's options by entering a list of values. When 
  you click Next, you will be brought to a text box to enter the list. </p></li>
-	<li class=P><p>Dynamically Generated by Imported Data - This option 
+	<li class=p><p>Dynamically Generated by Imported Data - This option 
  lets you use an import to generate the options.</p></li>
 </ul>
 <p>For fields of the Text type, the options are:</p>
 <ul type="disc" class="whs6">
-	<li class=P><p>Set by Admin - Select this if you would like to set 
+	<li class=p><p>Set by Admin - Select this if you would like to set 
  a default value which will be assigned to all subscribers as they sign 
  up.</p></li>
-	<li class=P><p>Set by Subscriber - Select this if you like subscribers 
+	<li class=p><p>Set by Subscriber - Select this if you like subscribers 
  to be able to type anything in the field.</p></li>
 </ul>
 <p><img src="../../Self-SignFieldsDataSource.gif" alt="Selecting the data source for a Self-Signup field." x-maintain-ratio="TRUE" width="400px" height="154px" border="0" class="img_whs5"></p>
-<script type="text/javascript" language="JavaScript">
-<!--
- if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == 'Netscape'))
-  document.write("<div id='tooltip' class='WebHelpPopupMenu'></div>");
-//-->
-</script><script type="text/javascript" language="javascript1.2">
+<script type="text/javascript" language="javascript1.2">
 <!--
 highlightSearch();
 if (window.writeIntopicBar)
