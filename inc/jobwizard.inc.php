@@ -1570,6 +1570,11 @@ class JobWiz_messageSmsText extends WizStep {
 	//returns true if this step is enabled
 	function isEnabled($postdata, $step) {
 		global $USER;
+		
+		// if the customer doesn't have sms
+		if (!getSystemSetting('_hassms'))
+			return false;
+		
 		if (!$USER->authorize("sendsms"))
 			return false;
 
