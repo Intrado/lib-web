@@ -287,6 +287,7 @@ if(CheckFormSubmit($f,"Save") || CheckFormSubmit($f, "Return")) {
 				setCustomerSystemSetting('_hastargetedmessage', GetFormData($f, $s, 'hastargetedmessage'), $custdb);
 				setCustomerSystemSetting('_hasselfsignup', $hasselfsignup, $custdb);
 				setCustomerSystemSetting('_timeslice', GetFormData($f, $s, 'timeslice'), $custdb);
+				setCustomerSystemSetting('_organizationfieldname', GetFormData($f, $s, 'organizationfieldname'), $custdb);
 
 				setCustomerSystemSetting('loginlockoutattempts', GetFormData($f, $s, 'loginlockoutattempts'), $custdb);
 				setCustomerSystemSetting('logindisableattempts', GetFormData($f, $s, 'logindisableattempts'), $custdb);
@@ -445,6 +446,7 @@ if( $reloadform ) {
 	PutFormData($f,$s,'callbackdefault', getCustomerSystemSetting('callbackdefault', 'inboundnumber', true, $custdb), null, null, null);
 	PutFormData($f,$s,"hasenrollment", getCustomerSystemSetting('_hasenrollment', false, true, $custdb), "bool", 0, 1);
 	PutFormData($f,$s,"hastargetedmessage", getCustomerSystemSetting('_hastargetedmessage', false, true, $custdb), "bool", 0, 1);
+	PutFormData($f,$s,"organizationfieldname", getCustomerSystemSetting('_organizationfieldname', "School", true, $custdb), "text", 0, 255, true);
 	PutFormData($f,$s,"timeslice", getCustomerSystemSetting('_timeslice', 450, true, $custdb), "number", 60, 1800);
 	PutFormData($f, $s, "loginlockoutattempts", getCustomerSystemSetting('loginlockoutattempts', 5, true, $custdb), "number", 0);
 	PutFormData($f, $s, "logindisableattempts", getCustomerSystemSetting('logindisableattempts', 0, true, $custdb), "number", 0);
@@ -618,6 +620,7 @@ foreach($languages as $language){
 </td></tr>
 <tr><td> Has Enrollment </td><td><? NewFormItem($f, $s, 'hasenrollment', 'checkbox') ?> Enrollment </td></tr>
 <tr><td> Has Classroom Comments </td><td><? NewFormItem($f, $s, 'hastargetedmessage', 'checkbox') ?> Classroom Comments</td></tr>
+<tr><td> 'Organization' Display Name: </td><td><? NewFormItem($f, $s, 'organizationfieldname', 'text', 10, 50) ?></td></tr>
 <tr><td>Notes: </td><td><? NewFormitem($f, $s, 'managernote', 'textarea', 30) ?></td></tr>
 <tr><td>OEM: </td><td><? NewFormitem($f, $s, 'oem', 'text', 10, 50) ?></td></tr>
 <tr><td>OEM ID: </td><td><? NewFormitem($f, $s, 'oemid', 'text', 10, 50) ?></td></tr>
