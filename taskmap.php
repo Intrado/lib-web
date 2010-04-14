@@ -79,7 +79,7 @@ if ($datatype == "person") {
 	$maptofields = array();
 	$maptofields[""] = "- Unmapped -";
 	$maptofields["key"] = "Unique ID";
-	$maptofields["okey"] = getSystemSetting("organizationfieldname","Organization");
+	$maptofields["okey"] = getSystemSetting("_organizationfieldname","Organization");
 	//F fields
 	foreach ($fieldmaps as $fieldmap)
 		$maptofields[$fieldmap->fieldnum] = $fieldmap->name;
@@ -128,7 +128,7 @@ if ($datatype == "person") {
 	$maptofields["u9"] = "Caller ID";
 	$maptofields["u11"] = "Access Profile";
 	$maptofields["u12"] = "Restricted Job Types";
-	$maptofields["okey"] = getSystemSetting("organizationfieldname","Organization");
+	$maptofields["okey"] = getSystemSetting("_organizationfieldname","Organization");
 	$maptofields["u10"] = "Staff ID";
 	$maptofields["sep"] = "--------------";
 
@@ -160,14 +160,14 @@ if ($datatype == "person") {
 	$maptofields[""] = "- Unmapped -";
 	$maptofields["pkey"] = "Person ID";
 	$maptofields["skey"] = "Section";
-	$maptofields["okey"] = getSystemSetting("organizationfieldname","Organization");
+	$maptofields["okey"] = getSystemSetting("_organizationfieldname","Organization");
 	
 } else if ($datatype == "section") {
 	
 	$maptofields = array();
 	$maptofields[""] = "- Unmapped -";
 	$maptofields["skey"] = "Section";
-	$maptofields["okey"] = getSystemSetting("organizationfieldname","Organization");
+	$maptofields["okey"] = getSystemSetting("_organizationfieldname","Organization");
 	$maptofields["u10"] = "Staff ID"; // 'u10' is used in user import, and keys of $maptofields must be 4 chars or less, so cannot use 'staffpkey' or something nicer
 
 	$fieldmaps = DBFindMany("FieldMap","from fieldmap where fieldnum like 'c%' order by fieldnum");

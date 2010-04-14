@@ -58,7 +58,7 @@ function summarizeListName($listid) {
 				$orgkeys[] = $organization->orgkey;
 			}
 			
-			$summary[] = getSystemSetting("organizationfieldname","Organization") . ' is ' . implode(', ', $orgkeys);
+			$summary[] = getSystemSetting("_organizationfieldname","Organization") . ' is ' . implode(', ', $orgkeys);
 		}
 	}
 	

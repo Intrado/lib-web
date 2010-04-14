@@ -343,7 +343,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 								
 								QuickUpdate('COMMIT');
 							
-								notice(_L('The rule for %s is now added.',getSystemSetting("organizationfieldname","Organization")));
+								notice(_L('The rule for %s is now added.',getSystemSetting("_organizationfieldname","Organization")));
 							} else {
 								if (!$type = Rule::getType($data->fieldnum)) {
 									notice(_L('There is a problem adding the rule for %s.', escapehtml(FieldMap::getName($data->fieldnum))));
@@ -381,7 +381,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 							if ($fieldnum == 'organization') {
 								QuickUpdate("DELETE FROM listentry WHERE listid=? AND type='organization'", false, array($list->id));
 							
-								notice(_L('The rule for %s is now removed.',getSystemSetting("organizationfieldname","Organization")));
+								notice(_L('The rule for %s is now removed.',getSystemSetting("_organizationfieldname","Organization")));
 							} else if ($USER->authorizeField($fieldnum)) {
 								QuickUpdate("DELETE le.*, r.* FROM listentry le, rule r WHERE le.ruleid=r.id AND le.listid=? AND r.fieldnum=?", false, array($list->id, $fieldnum));
 							
