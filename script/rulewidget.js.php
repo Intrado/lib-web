@@ -177,7 +177,7 @@ var RuleWidget = Class.create({
 				if (data.hasorg && this.allowedFieldTypes.indexOf('organization') >= 0) {
 					this.fieldmaps['organization'] = {};
 					this.fieldmaps['organization'].type = 'association';
-					this.fieldmaps['organization'].name = '<?=addslashes(getSystemSetting("organizationfieldname","Organization"))?>';
+					this.fieldmaps['organization'].name = '<?=addslashes(escapehtml(getSystemSetting("organizationfieldname","Organization")))?>';
 				}
 				
 				// Add "in" to the association type
