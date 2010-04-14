@@ -273,22 +273,25 @@ function handleRequest() {
 				return false;
 			$organizationid = $_GET['organizationid'] + 0;
 			
-			// check user restrictions for this organization's sections
-			$sections = QuickQueryList(
-					"select s.id, s.skey
-					from section s
-						inner join userassociation ua on
-						(s.id = ua.sectionid)
-					where s.organizationid = ?
-						and ua.type = 'section'
-						and ua.userid = ?
-						order by s.skey", true, false, array($organizationid, $USER->id));
+			// if the user has an association with this organization directly
+			$userassociatedorg = QuickQuery("select 1 from userassociation where userid = ? and type = 'organization' and organizationid = ? limit 1", false, array($USER->id, $organizationid));
 			
-			// if there are none, check that the requested orgid is authorized for this user
-			if (!$sections) {
-				$validorgs = Organization::getAuthorizedOrgkeys();
-				if (isset($validorgs[$organizationid]))
-					$sections = QuickQueryList("select id, skey from section where organizationid = ?", true, false, array($organizationid));
+			// if user has no org or section associations
+			$userhasassociations = QuickQuery("select 1 from userassociation where userid = ? and type in ('organization', 'section') limit 1", false, array($USER->id));
+			
+			if ($userassociatedorg || !$userhasassociations) {
+				$sections = QuickQueryList("select id, skey from section where organizationid = ?", true, false, array($organizationid));
+			} else {
+				// get user associations with sections for this organization
+				$sections = QuickQueryList(
+						"select s.id, s.skey
+						from section s
+							inner join userassociation ua on
+							(s.id = ua.sectionid)
+						where s.organizationid = ?
+							and ua.type = 'section'
+							and ua.userid = ?
+							order by s.skey", true, false, array($organizationid, $USER->id));
 			}
 			
 			// if there are no sections to return, return false
