@@ -380,8 +380,8 @@ class ValPhone extends Validator {
 		return
 			'function (name, label, value, args) {
 				// read min and max length args for easycall and callme
-				var minlength = (args.min)?args.min:10;
-				var maxlength = (args.max)?args.max:10;
+				var minlength = (args.minlength)?args.minlength:10;
+				var maxlength = (args.maxlength)?args.maxlength:10;
 				var phone = value.replace(/[^0-9]/g,"");
 				if (minlength == maxlength && maxlength == 10 && phone.length == 10) {
 					var areacode = phone.substring(0, 3);
