@@ -21,8 +21,8 @@ var EasyCall = Class.create({
 		this.formitemname = $(formitemname).id;
 		this.containerid = $(containerid).id;
 		this.validatorargs = {
-			"min": "<?=getSystemSetting('easycallmin',10)?>",
-			"max": "<?=getSystemSetting('easycallmax',10)?>"
+			"minlength": "<?=getSystemSetting('easycallmin',10)?>",
+			"maxlength": "<?=getSystemSetting('easycallmax',10)?>"
 		};
 		this.defaultphone = defaultphone;
 		this.audiofilename = audiofilename;
