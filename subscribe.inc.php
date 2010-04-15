@@ -90,13 +90,13 @@ $args = array($USER->id);
 $orgrestrictionsql = "";
 if (count($userassociatedorgs) == 0) {
 	unset($userassociatedorgs);
-	$orgrestrictionsql = "1";
+	$orgrestrictionsql = "(p.organizationid is null or p.organizationid = 0)";
 } else if (count($userassociatedorgs) == 1 && $userassociatedorgs[0] === null) {
 	// this user is restricted to sectionid 0 and has no additional associations that provide orgs
 	unset($userassociatedorgs);
 	$orgrestrictionsql = "p.organizationid is null";
 } else {
-	// user has org restrictions, add them to the args array but skip null
+	// user has org restrictions, add them to the args array but skip null org (in user org associations)
 	$orgcount = 0;
 	foreach ($userassociatedorgs as $index => $orgid) {
 		if ($orgid !== null) {
