@@ -17,7 +17,7 @@ class ValLists extends Validator {
 		foreach ($listids as $listid) {
 			if ($listid === 'addme')
 				continue;
-			if (!userOwns('list', $listid))
+			if (!userOwns('list', $listid) && !isSubscribed('list', $listid))
 				return _L('You have specified an invalid list');
 		}
 		
