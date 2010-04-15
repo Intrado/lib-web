@@ -102,7 +102,7 @@ $formdata = array(
 			array("ValLength","max" => 50),
 			array("ValListName")
 		),
-		"control" => array("TextField","size" => 30, "maxlength" => 51),
+		"control" => array("TextField","size" => 30, "maxlength" => 50),
 		"helpstep" => 1
 	),
 	"description" => array(
@@ -112,7 +112,7 @@ $formdata = array(
 		"validators" => array(
 			array("ValLength","max" => 50)
 		),
-		"control" => array("TextField","size" => 30, "maxlength" => 51),
+		"control" => array("TextField","size" => 30, "maxlength" => 50),
 		"helpstep" => 1
 	),
 	"preview" => array(

@@ -84,10 +84,10 @@ $formdata = array(
 		"value" => $category->name,
 		"validators" => array(
 			array("ValRequired"),
-			array("ValLength","min" => 3,"max" => 50),
+			array("ValLength","min" => 0,"max" => 50),
 			array("ValDuplicateNameCheck","type" => "targetedmessagecategory")
 		),
-		"control" => array("TextField","size" => 30, "maxlength" => 51),
+		"control" => array("TextField","size" => 30, "maxlength" => 50),
 		"helpstep" => 1
 	),
 	"image" => array(

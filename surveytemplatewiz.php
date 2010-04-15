@@ -576,7 +576,7 @@ class SurveyTemplateWiz_webfeatures extends WizStep {
 			"value" => $subject,
 			"validators" => array(
 				array("ValRequired"),
-				array("ValLength","min" => 3,"max" => 255)
+				array("ValLength","min" => 0,"max" => 255)
 			),
 			"control" => array("TextField","size" => 45, "maxlength"=>255),
 			"helpstep" => $helpstepnum++

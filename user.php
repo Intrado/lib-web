@@ -380,7 +380,7 @@ $formdata["email"] = array(
 	"fieldhelp" => ("This is used for forgot passwords, reporting, and as the return address in email messages."),
 	"value" => $edituser->email,
 	"validators" => array(
-		array("ValLength","min" => 3,"max" => 255),
+		array("ValLength","min" => 0,"max" => 255),
 		array("ValEmail")
 	),
 	"control" => array("TextField","maxlength" => 255, "size" => 35),
@@ -392,7 +392,7 @@ $formdata["aremail"] = array(
 	"fieldhelp" => _L("Email addresses entered here will receive copies of any autoreports associated with this user. The user's email address will automatically receive reports and should not be entered here."),
 	"value" => $edituser->aremail,
 	"validators" => array(
-		array("ValLength","min" => 3,"max" => 1024),
+		array("ValLength","min" => 0,"max" => 1024),
 		array("ValEmailList")
 	),
 	"control" => array("TextField","maxlength" => 1024, "size" => 50),

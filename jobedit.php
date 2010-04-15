@@ -193,7 +193,7 @@ $helpsteps[] = _L("Enter a name for your job. Using a descriptive name that indi
 			array("ValDuplicateNameCheck","type" => "job"),
 			array("ValLength","max" => ($JOBTYPE == "repeating")?30:50)
 		),
-		"control" => array("TextField","size" => 30, "maxlength" => 51),
+		"control" => array("TextField","size" => 30, "maxlength" => 50),
 		"helpstep" => 1
 	);
 	$formdata["description"] = array(
@@ -201,9 +201,9 @@ $helpsteps[] = _L("Enter a name for your job. Using a descriptive name that indi
 		"fieldhelp" => _L('Enter a description of the job. This is optional, but can help identify the job later.'),
 		"value" => isset($job->description)?$job->description:"",
 		"validators" => array(
-			array("ValLength","min" => 3,"max" => 50)
+			array("ValLength","min" => 0,"max" => 50)
 		),
-		"control" => array("TextField","size" => 30, "maxlength" => 51),
+		"control" => array("TextField","size" => 30, "maxlength" => 50),
 		"helpstep" => 1
 	);
 

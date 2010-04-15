@@ -248,7 +248,7 @@ if ($readonly) {
 		"fieldhelp" => ("This is used for forgot passwords, reporting, and as the return address in email messages."),
 		"value" => $USER->email,
 		"validators" => array(
-			array("ValLength","min" => 3,"max" => 255),
+			array("ValLength","min" => 0,"max" => 255),
 			array("ValEmail")
 		),
 		"control" => array("TextField","maxlength" => 255, "size" => 35),
@@ -260,7 +260,7 @@ if ($readonly) {
 		"fieldhelp" => ("If reports should be sent to any additional email addresses, enter them here."),
 		"value" => $USER->aremail,
 		"validators" => array(
-			array("ValLength","min" => 3,"max" => 1024),
+			array("ValLength","min" => 0,"max" => 1024),
 			array("ValEmailList")
 		),
 		"control" => array("TextField","maxlength" => 1024, "size" => 50),
@@ -355,7 +355,7 @@ if ($USER->authorize('setcallerid') && !getSystemSetting('_hascallback', false))
 			"fieldhelp" => (""),
 			"value" => Phone::format($USER->getSetting("callerid","")),
 			"validators" => array(
-				array("ValLength","min" => 3,"max" => 20),
+				array("ValLength","min" => 0,"max" => 20),
 				array("ValPhone")
 			),
 			"control" => array("TextField","maxlength" => 20, "size" => 15),

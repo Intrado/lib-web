@@ -80,7 +80,7 @@ $formdata["category"] = array(
 	"helpstep" => 1
 );
 
-$validator = array(array("ValLength","min" => 3,"max" => 150));
+$validator = array(array("ValLength","min" => 0,"max" => 150));
 foreach($languages as $language) {
 	$code = $language[2];
 	$langvalidator = ($code == 'en'?array(array("ValRequired")) + $validator:$validator);
