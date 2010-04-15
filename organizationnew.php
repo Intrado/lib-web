@@ -45,7 +45,7 @@ $formdata = array(
 		"validators" => array(
 			array("ValRequired"),
 			array("ValOrgKey"),
-			array("ValLength","min" => 3,"max" => 255)
+			array("ValLength","min" => 1,"max" => 255)
 		),
 		"control" => array("TextField","size" => 30, "maxlength" => 255),
 		"helpstep" => 1
@@ -79,10 +79,28 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 	} else if (($errors = $form->validate()) === false) { //checks all of the items in this form
 		$postdata = $form->getData(); //gets assoc array of all values {name:value,...}
 		
-		$org = new Organization();
-		$org->orgkey = $postdata['neworg'];
+		$orgkey = trim($postdata['neworg']);
 		Query("BEGIN");
-		$org->create();
+		// check if this org already exists
+		$existingorg = DBFind("Organization", "from organization where orgkey = ?", false, array($orgkey));
+		
+		// if the org exists
+		if ($existingorg) {
+			// if it's deleted, undelete it
+			if ($existingorg->deleted) {
+				$existingorg->deleted = 0;
+				$existingorg->update();
+				notice(_L("%s was un-deleted.", $orgkey));
+			} else {
+				notice(_L("%s already exists.", $orgkey));
+			}
+		} else {
+			// create a new organization
+			$org = new Organization();
+			$org->orgkey = $orgkey;
+			$org->create();
+			notice(_L("%s has been created.", $orgkey));
+		}
 		Query("COMMIT");
 		
 		if ($ajax)
