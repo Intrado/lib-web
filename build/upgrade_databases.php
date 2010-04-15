@@ -32,7 +32,7 @@ $authpass = "";
 //rev is mainly for internal dev where we may have already deployed that version, but made some changes
 $versions = array (
 	"7.1.5/0",
-	"7.5/11"
+	"7.5/12"
 	//7.5.1
 	//7.6
 	//etc

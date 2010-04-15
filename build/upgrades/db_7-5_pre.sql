@@ -610,3 +610,18 @@ $$$
 update targetedmessagecategory set deleted = 0 where id = 1
 $$$
 
+-- $rev 12
+
+insert into setting (name, value) values ('organizationfieldname', 'School')
+$$$
+
+INSERT INTO systemmessages (message, icon, modifydate)
+VALUES (
+'<div style="color:#3e693f;font-size: 20px;font-weight: bold;">New Spring 2010 Release!</div>
+  <ul>
+  <li>See what is new in the Spring 2010 Release: <a href="help/html/New_in_Spring_2010_Release.pdf" target="new"><img src="img/icons/page_white_acrobat.gif" /> New in Spring 2010</a> 
+  <li>Be sure to check out the overview of features: <a href="javascript: popup(''help/flash/overview_7-5.swf'',750,500);"><img src="img/icons/control_play_blue.gif" /> Play Overview</a>
+  </ul>', 'largeicons/news.jpg', NOW()
+)
+$$$
+

@@ -370,6 +370,11 @@ function upgrade_7_5 ($rev, $shardid, $customerid, $db) {
 			if ( QuickQuery("select 1 from import where datatype = 'enrollment' limit 1") ) {
 				setSystemSetting("_hasenrollment", "1");
 			}
+		case 11:
+			// upgrade from rev 11 to rev 12
+			echo "|";
+			apply_sql("upgrades/db_7-5_pre.sql",$customerid,$db, 12);
+
 			
 	}
 	
