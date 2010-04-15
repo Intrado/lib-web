@@ -1,7 +1,7 @@
 <?
 class Organization extends DBMappedObject {
 	var $orgkey;
-	var $deleted;
+	var $deleted = 0;
 	
 
 	function Organization ($id = NULL) {
