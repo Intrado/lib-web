@@ -23,7 +23,7 @@ class TranslationItem extends FormItem {
 		
 		if (trim($value) == "") {
 			$msgdata = (object)array(
-				"enabled" => true,
+				"enabled" => false,
 				"text" => isset($this->args['plaintextmessage']) ? $this->args['plaintextmessage'] : "",
 				"englishText" => "",
 				"override" => false,
