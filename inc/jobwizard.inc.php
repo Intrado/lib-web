@@ -1344,7 +1344,7 @@ class JobWiz_messageEmailText extends WizStep {
 			"fieldhelp" => _L("You may attach up to three files that are up to 2MB each. For greater security, certain file types are not permitted. Be aware that some email accounts may not accept attachments above a certain size and may reject your message."),
 			"value" => "",
 			"validators" => array(array("ValEmailAttach")),
-			"control" => array("EmailAttach","size" => 30, "maxlength" => 51),
+			"control" => array("EmailAttach"),
 			"helpstep" => 4
 		);
 
