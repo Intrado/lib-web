@@ -1775,6 +1775,7 @@ class JobWiz_scheduleAdvanced extends WizStep {
 				"fieldhelp" => ("Use this menu to set the default number of days your jobs should run."),
 				"value" => $maxjobdays,
 				"validators" => array(
+					array("ValRequired"),
 					array("ValInArray", "values" => range(1,$maxdays))
 				),
 				"control" => array("SelectMenu", "values"=>array_combine(range(1,$maxdays),range(1,$maxdays))),
