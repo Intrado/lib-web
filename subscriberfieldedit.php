@@ -59,7 +59,7 @@ $value = implode("\n", $staticvalues);
 
 // if organization
 if ("oid" == $fieldmap->fieldnum) {
-	$organizations = QuickQueryList("select id, orgkey from organization where not deleted", true);
+	$organizations = QuickQueryList("select id, orgkey from organization where not deleted order by orgkey", true);
 
 	if (count($organizations) > 5) {
 		$formdata["checkall"] = array (
