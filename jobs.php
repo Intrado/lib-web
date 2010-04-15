@@ -68,18 +68,22 @@ if (isset($_GET['delete'])) {
 			Query('COMMIT');
 			notice(_L("The job, %s, is now deleted.", escapehtml($job->name)));
 		} else if ($job->status == "repeating") {
-			Query('BEGIN');
-				if ($job->scheduleid) {
-					$schedule = new Schedule($job->scheduleid);
-					$schedule->destroy();
-				}
-				$associatedimports = DBFindMany("ImportJob", "from importjob where jobid = '$deleteid'");
-				foreach($associatedimports as $importjob){
-					$importjob->destroy();
-				}
-				$job->destroy();
-			Query('COMMIT');
-			notice(_L("The job, %s, is now deleted.", escapehtml($job->name)));
+			if ($job->type == 'alert') {
+				notice(_L("You do not have permission to delete this job."));
+			} else {
+				Query('BEGIN');
+					if ($job->scheduleid) {
+						$schedule = new Schedule($job->scheduleid);
+						$schedule->destroy();
+					}
+					$associatedimports = DBFindMany("ImportJob", "from importjob where jobid = '$deleteid'");
+					foreach($associatedimports as $importjob){
+						$importjob->destroy();
+					}
+					$job->destroy();
+				Query('COMMIT');
+				notice(_L("The job, %s, is now deleted.", escapehtml($job->name)));
+			}
 		} else {
 			notice(_L("The job, %s, is still running. Please cancel it first.", escapehtml($job->name)));
 		}
