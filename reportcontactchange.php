@@ -39,12 +39,13 @@ class RestrictedValues extends FormItem {
 	
 	function render ($value) {
 		$n = $this->form->name."_".$this->name;
+		$style = isset($this->args['height']) ? ('style="height: ' . $this->args['height'] . '; overflow: auto;"') : '';
 
-		$label = (isset($this->args['label']) && $this->args['label'])? $this->args['label']: _L('Restrict to these organizations:');
+		$label = (isset($this->args['label']) && $this->args['label'])? $this->args['label']: _L('Restrict to the following:');
 		$restrictchecked = count($value) > 0 ? "checked" : "";
 		$str = '<input type="checkbox" id="'.$n.'-restrict" '.$restrictchecked .' onclick="restrictcheck(\''.$n.'-restrict\', \''.$n.'\')"><label for="'.$n.'-restrict">'.$label.'</label>';
 
-		$str .= '<div id='.$n.' class="radiobox" style="margin-left: 1em;">';
+		$str .= '<div id='.$n.' class="radiobox" '.$style.'>';
 
 		$counter = 1;
 		foreach ($this->args['values'] as $checkvalue => $checkname) {
@@ -159,16 +160,29 @@ $selectedorgs = array();
 if (isset($_SESSION['report']['options']['organizationids'])) {
 	$selectedorgs = $_SESSION['report']['options']['organizationids'];
 }
+
+if (count($orgs) > 5) {
+	$formdata["checkall"] = array (
+		"label" => "",
+		"control" => array("FormHtml", "html" => icon_button(_L('Check All'),"group_add",'checkAllCheckboxes(true);') . icon_button(_L('Uncheck All'),"group_delete",'checkAllCheckboxes(false);')),
+		"helpstep" => 1
+	);
+}
+$control = array("RestrictedValues", "values" => $orgs);
+if (count($orgs) > 9) {
+	$control = array("RestrictedValues", "height" => "150px", "values" => $orgs);
+}
 $formdata["organizationids"] = array(
 	"label" => getSystemSetting("organizationfieldname","Organization"),
 	"fieldhelp" => _L("Use this menu to narrow your report results to those contacts belonging to the selected organizations."),
 	"value" => $selectedorgs,
-	"control" => array("RestrictedValues", "values" => $orgs),
 	"validators" => array(
-		array("ValInArray","values" => array_keys($orgs))
-	),
+		array("ValInArray", 'values'=>array_keys($orgs))
+     ),
+	"control" => $control,
 	"helpstep" => 1
 );
+
 
 $formdata[] = _L("Display Options");
 
@@ -290,7 +304,27 @@ echo "</div>";
 <?
 echo $form->render();
 endWindow();
+?>
+<script>
+function checkAllCheckboxes(docheck) {
 
+	var form = document.forms[0].elements;
+	for (var i = 0; i < form.length; i++) {
+		if (form[i].type == "checkbox") {
+
+			if (docheck) {
+				if (!form[i].checked)
+					form[i].click();
+			} else {
+				if (form[i].checked)
+					form[i].click();
+			}
+		}
+	}
+}
+</script>
+
+<?
 ?>
 	<script type="text/javascript">
 		document.observe('dom:loaded', function() {
