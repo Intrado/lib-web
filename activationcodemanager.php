@@ -206,7 +206,7 @@ function showRenderedListTableCM($renderedlist) {
 	
 	$titles[6] = "Contact Manager Account(s)";
 	
-	$titles[7] = getSystemSetting("_organizationfieldname","Organization");
+	$titles[7] = getSystemSetting("organizationfieldname","Organization");
 	
 	//after that, show F fields, then G fields
 	//optional F fields start at index 8 (skip f01, f02)
@@ -268,7 +268,7 @@ if ($csv) {
 	$titles[4] = "Activation Code";
 	$titles[5] = "Expiration Date";
 	//$titles[6] = "Contact Manager Account(s)";
-	$titles[7] = getSystemSetting("_organizationfieldname","Organization");
+	$titles[7] = getSystemSetting("organizationfieldname","Organization");
 	//now use session display prefs to set up titles and whatnot for the optional fields
 	$i = 8;
 	foreach ($optionalfields as $field) {
