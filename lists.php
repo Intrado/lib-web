@@ -84,6 +84,7 @@ if (isset($_GET['ajax'])) {
 			$orderby = "digitsfirst, name";
 			break;
 	}
+	// get all lists owned by this user or lists this user has publish records for (both publications and subscriptions)
 	$mergeditems = QuickQueryMultiRow("
 		select SQL_CALC_FOUND_ROWS 
 			'list' as type, 'Saved' as status, l.id as id, l.name as name, (l.name +0) as digitsfirst, l.modifydate as date, l.lastused as lastused,
@@ -92,14 +93,14 @@ if (isset($_GET['ajax'])) {
 			inner join user u on
 				(l.userid = u.id)
 			left join publish p on
-				(p.listid = l.id)
+				(p.listid = l.id and p.userid = ?)
 		where l.type in ('person','section')
 			and (l.userid = ? or p.userid = ?)
 			and not l.deleted
 		group by id
 		order by $orderby
 		limit $start, $limit",
-		true,false,array($USER->id, $USER->id));
+		true,false,array($USER->id, $USER->id, $USER->id));
 
 	$total = QuickQuery("select FOUND_ROWS()");
 	$numpages = ceil($total/$limit);
