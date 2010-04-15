@@ -17,7 +17,7 @@ $formdata = array(
         "value" => "",
         "validators" => array(
             array("ValRequired"),
-            array("ValLength","min" => 3,"max" => 255),
+            array("ValLength","min" => 0,"max" => 255),
             array("ValEmail")
         ),
         "control" => array("TextField","maxlength" => 255),
@@ -29,7 +29,7 @@ $formdata = array(
         "value" => "",
         "validators" => array(
             array("ValRequired"),
-            array("ValLength","min" => 3,"max" => 255),
+            array("ValLength","min" => 0,"max" => 255),
             array("ValEmail"),
             array("ValFieldConfirmation", "field" => "newusername1")
         ),
