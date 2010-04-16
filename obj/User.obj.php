@@ -134,7 +134,9 @@ class User extends DBMappedObject {
 		$userorgids = QuickQueryList("select organizationid,1 from userassociation where type='organization' and userid = ?",true,false,array($this->id));
 		$usersectionorgs = QuickQueryList("select ua.sectionid, s.organizationid from userassociation ua inner join section s on (s.id=ua.sectionid) where ua.userid = ?",true,false,array($this->id));
 
-		$isunrestricted = count($userorgids) == 0 && count($usersectionorgs) == 0;
+		//$isunrestricted = count($userorgids) == 0 && count($usersectionorgs) == 0;
+		$isunrestricted = !QuickQuery("select 1 from userassociation where type in ('organization','section') and userid = ? limit 1",false,array($this->id));
+		
 		$aliasid = ($personalias ? $personalias . ".id" : "person.id");
 
 		$joinsql = "";
@@ -223,8 +225,10 @@ class User extends DBMappedObject {
 				if (count($usersectionorgs) > 0)
 					$components[] = "pa.sectionid in (" . implode(",",array_keys($usersectionorgs)) . ")";	
 				
-				//$components can't be empty if user is unrestricted, dont need to check again
-				$joinsql .= " and ( " . implode(" or ", $components) . " ) )";
+				if (count($components) == 0)
+					$joinsql .= " and 0 )"; //impossible query, nothing valid to search on
+				else
+					$joinsql .= " and ( " . implode(" or ", $components) . " ) )";
 			}
 		}
 		
