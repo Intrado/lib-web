@@ -2,8 +2,8 @@
 //settings
 
 //authserver db info
-$authhost = "10.25.25.131";
-$authuser = "relcom";
+$authhost = "10.25.25.68";
+$authuser = "root";
 $authpass = "";
 
 // interupt file, stops execution. Will wait till current move operation completes
@@ -106,6 +106,28 @@ foreach ($customerids as $customerid) {
 	if ($retval != 0)
 		dieerror("Problem backing up data for transfer\ncustomerid: $customerid\n" . implode("\n",$output));
 
+	// dump all messagelink for this customer into the transfer file
+	echo "adding all messagelink records to transfer file\n";
+	
+	if (!$fp = fopen($backupfilename, 'a'))
+		dieerror("Unable to open transfer file for writing: $backupfilename\n");
+	
+	$query = "use aspshard;\n";
+	if (!fwrite($fp, $query))
+		dieerror("Failed to write to transfer file : $query\n");
+	
+	$query = "select * from messagelink where customerid=?";
+	if ($res = Query($query, $srcsharddb, array($customerid))) {
+		while ($row = $res->fetch(PDO::FETCH_ASSOC)) {
+			$query = "insert ignore into messagelink (`customerid`,`jobid`,`personid`,`createtime`,`code`) values (".$row['customerid'].",".$row['jobid'].",".$row['personid'].",".$row['createtime'].",".$row['code'].");\n";
+			if (!fwrite($fp, $query))
+				dieerror("Failed to write to transfer file : $query\n");
+		}
+	}
+	
+	if (!fclose($fp))
+		dieerror("Failed to close transfer file : $backupfilename\n");
+
 	//create a db, user, etc for the customer database on the shard
 	echo "creating destination DB\n";
 	$newdbname = "c_$customerid";
@@ -197,22 +219,9 @@ foreach ($customerids as $customerid) {
 	if (false === QuickUpdate("START TRANSACTION", $destsharddb))
 		dieerror("cannot start transaction\ncustomerid: $customerid\n");
 
-	// jobsetting
-	echo ("Copy repeating jobs and settings\n");
-	$query = "INSERT INTO aspshard.qjobsetting (customerid, jobid, name, value) SELECT ".$customerid.", jobid, name, value FROM jobsetting WHERE jobid in (select id from job where status in ('repeating', 'scheduled'))";
-	$rowcount = QuickUpdate($query,$destsharddb);
-	if ($rowcount === false)
-		dieerror ("Failed to execute statement \n$query\n\nfor c_$customerid : ", $destsharddb);
-
-	// joblist
-	$query = "INSERT INTO aspshard.qjoblist (customerid, jobid, listid) SELECT ".$customerid.", jobid, listid FROM joblist WHERE jobid in (select id from job where status in ('repeating', 'scheduled'))";
-	$rowcount = QuickUpdate($query,$destsharddb);
-	if ($rowcount === false)
-		dieerror ("Failed to execute statement \n$query\n\nfor c_$customerid : ", $destsharddb);
-
 	// repeating job
-	$query = "INSERT INTO aspshard.qjob (id, customerid, userid, scheduleid, listid, phonemessageid, emailmessageid, printmessageid, smsmessageid, questionnaireid, timezone, startdate, enddate, starttime, endtime, status, jobtypeid, thesql)" .
-         " select id, ".$customerid.", userid, scheduleid, listid, phonemessageid, emailmessageid, printmessageid, smsmessageid, questionnaireid, '".$timezone."', startdate, enddate, starttime, endtime, 'repeating', jobtypeid, thesql from job where status='repeating'";
+	$query = "INSERT INTO aspshard.qjob (id, customerid, userid, scheduleid, timezone, startdate, enddate, starttime, endtime, status)" .
+         " select id, ".$customerid.", userid, scheduleid, '".$timezone."', startdate, enddate, starttime, endtime, 'repeating' from job where status='repeating'";
 	$rowcount = QuickUpdate($query,$destsharddb);
 	if ($rowcount === false)
 		dieerror ("Failed to execute statement \n$query\n\nfor c_$customerid : ", $destsharddb);
@@ -224,8 +233,8 @@ foreach ($customerids as $customerid) {
 		dieerror ("Failed to execute statement \n$query\n\nfor c_$customerid : ", $destsharddb);
 
 	// future job
-	$query = "INSERT INTO aspshard.qjob (id, customerid, userid, scheduleid, listid, phonemessageid, emailmessageid, printmessageid, smsmessageid, questionnaireid, timezone, startdate, enddate, starttime, endtime, status, jobtypeid, thesql)" .
-         " select id, ".$customerid.", userid, scheduleid, listid, phonemessageid, emailmessageid, printmessageid, smsmessageid, questionnaireid, '".$timezone."', startdate, enddate, starttime, endtime, 'scheduled', jobtypeid, thesql from job where status='scheduled'";
+	$query = "INSERT INTO aspshard.qjob (id, customerid, userid, scheduleid, timezone, startdate, enddate, starttime, endtime, status)" .
+         " select id, ".$customerid.", userid, scheduleid, '".$timezone."', startdate, enddate, starttime, endtime, 'scheduled' from job where status='scheduled'";
 	$rowcount = QuickUpdate($query,$destsharddb);
 	if ($rowcount === false)
 		dieerror ("Failed to execute statement \n$query\n\nfor c_$customerid : ", $destsharddb);
@@ -248,7 +257,7 @@ foreach ($customerids as $customerid) {
 
 	//remove this customer's shard data from old shard
 	echo "deleting old shard records:";
-	$tablearray = array("importqueue", "qjobperson", "qjobtask", "specialtaskqueue", "qreportsubscription", "qjobsetting", "qschedule", "qjob");
+	$tablearray = array("importqueue", "qjobperson", "qjobtask", "specialtaskqueue", "qreportsubscription", "qschedule", "qjob");
 	foreach ($tablearray as $t) {
 		echo ".";
 		$query = "delete from ".$t." where customerid=$customerid";

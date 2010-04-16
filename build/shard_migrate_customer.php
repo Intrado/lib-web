@@ -1,6 +1,6 @@
 <?
 //////////////////////////////////////
-// Migrate a customer into this shard database (From a CommSuite with Flex Appliance)
+// Migrate a customer into this shard database (From a CommSuite with SmartCall Appliance)
 //
 // EDIT VARIABLES AT TOP OF SCRIPT, avoid entering on command line or prompts
 //////////////////////////////////////
@@ -76,12 +76,15 @@ echo "No active jobs found\n";
 // backup data
 $backupfilename = $customerdbname . "_backup.sql";
 echo("Backing up to $backupfilename \n");
-exec("mysqldump -u$dbuser -p$dbpass $customerdbname > $backupfilename", $output, $return_var);
+if ("" == $dbpass) {
+	exec("mysqldump -h$shardhost -u$dbuser $customerdbname > $backupfilename", $output, $return_var);
+} else {
+	exec("mysqldump -h$shardhost -u$dbuser -p$dbpass $customerdbname > $backupfilename", $output, $return_var);
+}
 if ($return_var) {
 	echo "mysqldump failed with return var ".$return_var."\n";
 	die();
 }
-
 
 //////////////////////////////////////
 // drop triggers
@@ -102,7 +105,7 @@ mysql_query("COMMIT",$custdb);
 // remove any data from shard (customer may have been active for a bit in testing)
 echo "Removing shard bits\n";
 mysql_select_db("aspshard");
-$tablearray = array("importqueue", "qjobperson", "qjobtask", "specialtaskqueue", "qreportsubscription", "qjobsetting", "qschedule", "qjob");
+$tablearray = array("importqueue", "qjobperson", "qjobtask", "specialtaskqueue", "qreportsubscription", "qschedule", "qjob");
 $rollback = false;
 mysql_query("START TRANSACTION",$custdb);
 foreach ($tablearray as $t) {
@@ -154,6 +157,7 @@ mysql_select_db($customerdbname);
 $customertables = array(
 	"access",
 	"address",
+	"alert",
 	"audiofile",
 	"blockeddestination",
 	"contactpref",
@@ -165,7 +169,7 @@ $customertables = array(
 	// dmroute
 	// dmschedule
 	"email",
-	"enrollment",
+	"event",
 	"fieldmap",
 	"groupdata",
 	"import",
@@ -182,21 +186,29 @@ $customertables = array(
 	"listentry",
 	"message",
 	"messageattachment",
+	"messagegroup",
 	"messagepart",
+	"organization",
 	"permission",
 	"person",
+	"personassociation",
 	"persondatavalues",
+	"personsetting",
 	"phone",
 	"portalperson",
 	"portalpersontoken",
+	"prompt",
+	"publish",
 	"reportarchive",
 	"reportcontact",
 	"reportgroupdata",
 	"reportinstance",
+	"reportorganization",
 	"reportperson",
 	"reportsubscription",
 	"rule",
 	"schedule",
+	"section",
 	"setting",
 	"sms",
 	"specialtask",
@@ -208,10 +220,12 @@ $customertables = array(
 	"surveyweb",
 	"systemmessages",
 	"systemstats",
+	"targetedmessage",
+	"targetedmessagecategory",
 	//"ttsvoice",
 	"user",
+	"userassociation",
 	"userjobtypes",
-	"userrule",
 	"usersetting",
 	"voicereply");
 	
@@ -238,7 +252,11 @@ mysql_query("COMMIT",$custdb);
 //////////////////////////////////////
 // import data
 echo("Import customer data\n");
-exec("mysql -u $dbuser -p$dbpass $customerdbname < $customerdatafile", $output, $return_var);
+if ("" == $dbpass) {
+exec("mysql -h$shardhost -u $dbuser $customerdbname < $customerdatafile", $output, $return_var);
+} else {
+exec("mysql -h$shardhost -u $dbuser -p$dbpass $customerdbname < $customerdatafile", $output, $return_var);
+}
 if ($return_var) {
 	echo "import failed with return var ".$return_var."\n";
 	die();
@@ -288,43 +306,32 @@ mysql_query("COMMIT", $custdb);
 $query = "select value from setting where name='timezone'";
 $res = mysql_query($query,$custdb);
 if (!$res) die ("Failed to execute statement \n$query\n\nfor $customerdbname : " . mysql_error($custdb));
-$timezone = "'".mysql_result($res, 0)."'";
+$timezone = mysql_result($res, 0);
 
 // reportsubscription
 echo ("Copy reportsubscriptions\n");
-$query = "INSERT ignore INTO aspshard.qreportsubscription (id, customerid, userid, type, daysofweek, dayofmonth, time, timezone, nextrun, email) select id, ".$customerid.", userid, type, daysofweek, dayofmonth, time, ".$timezone.", nextrun, email from reportsubscription";
+$query = "INSERT ignore INTO aspshard.qreportsubscription (id, customerid, userid, type, daysofweek, dayofmonth, time, timezone, nextrun, email) select id, ".$customerid.", userid, type, daysofweek, dayofmonth, time, '".$timezone."', nextrun, email from reportsubscription";
 mysql_query("START TRANSACTION", $custdb);
 mysql_query($query,$custdb)
 	or die ("Failed to execute statement \n$query\n\nfor $customerdbname : " . mysql_error($custdb));
 mysql_query("COMMIT", $custdb);
 
-// jobsetting
-echo ("Copy repeating jobs and settings\n");
-$query = "INSERT ignore INTO aspshard.qjobsetting (customerid, jobid, name, value) SELECT ".$customerid.", jobid, name, value FROM jobsetting WHERE jobid in (select id from job where status in ('repeating', 'scheduled'))";
-mysql_query("START TRANSACTION", $custdb);
-mysql_query($query,$custdb)
-	or die ("Failed to execute statement \n$query\n\nfor $customerdbname : " . mysql_error($custdb));
-
-// joblist
-$query = "INSERT ignore INTO aspshard.qjoblist (customerid, jobid, listid) SELECT ".$customerid.", jobid, listid FROM joblist WHERE jobid in (select id from job where status in ('repeating', 'scheduled'))";
-mysql_query("START TRANSACTION", $custdb);
-mysql_query($query,$custdb)
-	or die ("Failed to execute statement \n$query\n\nfor $customerdbname : " . mysql_error($custdb));
-
 // repeating job
-$query = "INSERT ignore INTO aspshard.qjob (id, customerid, userid, scheduleid, phonemessageid, emailmessageid, printmessageid, smsmessageid, questionnaireid, timezone, startdate, enddate, starttime, endtime, status, jobtypeid)" .
-         " select id, ".$customerid.", userid, scheduleid, phonemessageid, emailmessageid, printmessageid, smsmessageid, questionnaireid, ".$timezone.", startdate, enddate, starttime, endtime, 'repeating', jobtypeid from job where status='repeating'";
+echo ("Copy repeating jobs\n");
+$query = "INSERT ignore INTO aspshard.qjob (id, customerid, userid, scheduleid, timezone, startdate, enddate, starttime, endtime, status)" .
+         " select id, ".$customerid.", userid, scheduleid, '".$timezone."', startdate, enddate, starttime, endtime, 'repeating' from job where status='repeating'";
 mysql_query($query,$custdb)
 	or die ("Failed to execute statement \n$query\n\nfor $customerdbname : " . mysql_error($custdb));
 
 // schedule
-$query = "INSERT ignore INTO aspshard.qschedule (id, customerid, daysofweek, time, nextrun, timezone) select id, ".$customerid.", daysofweek, time, nextrun, ".$timezone." from schedule";
+$query = "INSERT ignore INTO aspshard.qschedule (id, customerid, daysofweek, time, nextrun, timezone) select id, ".$customerid.", daysofweek, time, nextrun, '".$timezone."' from schedule";
 mysql_query($query,$custdb)
 	or die ("Failed to execute statement \n$query\n\nfor $customerdbname : " . mysql_error($custdb));
 
 // future job
-$query = "INSERT ignore INTO aspshard.qjob (id, customerid, userid, scheduleid, phonemessageid, emailmessageid, printmessageid, smsmessageid, questionnaireid, timezone, startdate, enddate, starttime, endtime, status, jobtypeid)" .
-         " select id, ".$customerid.", userid, scheduleid, phonemessageid, emailmessageid, printmessageid, smsmessageid, questionnaireid, ".$timezone.", startdate, enddate, starttime, endtime, 'scheduled', jobtypeid from job where status='scheduled'";
+echo ("Copy scheduled jobs\n");
+$query = "INSERT ignore INTO aspshard.qjob (id, customerid, userid, scheduleid, timezone, startdate, enddate, starttime, endtime, status)" .
+         " select id, ".$customerid.", userid, scheduleid, '".$timezone."', startdate, enddate, starttime, endtime, 'scheduled' from job where status='scheduled'";
 mysql_query($query,$custdb)
 	or die ("Failed to execute statement \n$query\n\nfor $customerdbname : " . mysql_error($custdb));
 mysql_query("COMMIT", $custdb);
