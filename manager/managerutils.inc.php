@@ -52,6 +52,7 @@ function createLimitedUser($limitedusername, $limitedpassword, $custdbname, $sha
 	$tables['job'] 			= "select";
 	$tables['jobsetting'] 	= "select";
 	$tables['jobtype'] 		= "select";
+	$tables['language']		= "select";
 	$tables['message'] 		= "select";
 	$tables['messageattachment'] = "select";
 	$tables['messagegroup'] = "select";
