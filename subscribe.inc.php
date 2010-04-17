@@ -79,8 +79,8 @@ $userassociatedorgs = QuickQueryList("
 	(select s.organizationid as oid
 	from userassociation ua
 		left join section s on
-			(ua.sectionid = s.id and ua.type = 'section')
-	where ua.userid = ?)",
+			(ua.sectionid = s.id)
+	where ua.userid = ?  and ua.type = 'section')",
 	false, false, array($USER->id, $USER->id));
 
 // build the argument array 
