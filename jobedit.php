@@ -374,7 +374,7 @@ $helpsteps[] = _L("Enter a name for your job. Using a descriptive name that indi
 		$formdata["skipduplicates"] = array(
 			"label" => _L('Skip Duplicates'),
 			"fieldhelp" => _L('Skip Duplicates if you would like to only contact recipients who share contact information once.'),
-			"control" => array("FormHtml","html" => ($job->isOption("skipduplicates") || $job->isOption("skipemailduplicates"))?"<input type='checkbox' checked disabled/>":"<input type='checkbox' disabled/>"),
+			"control" => array("FormHtml","html" => ($job->isOption("skipduplicates"))?"<input type='checkbox' checked disabled/>":"<input type='checkbox' disabled/>"),
 			"helpstep" => 4
 		);
 		$formdata[] = _L('Job Message');
@@ -442,7 +442,7 @@ $helpsteps[] = _L("Enter a name for your job. Using a descriptive name that indi
 		$formdata["skipduplicates"] = array(
 			"label" => _L('Skip Duplicates'),
 			"fieldhelp" => ("This features allows you to override the number that will display on recipient's Caller IDs."),
-			"value" => $job->isOption("skipduplicates") || $job->isOption("skipemailduplicates"),
+			"value" => $job->isOption("skipduplicates"),
 			"validators" => array(),
 			"control" => array("CheckBox"),
 			"helpstep" => 4
