@@ -260,16 +260,18 @@ function makeAccordionSplitter($type, $subtype, $languagecode, $permanent, $pref
 		);
 	} else if ($type == 'phone') {
 		if (!$inautotranslator) {
-			if ($messagegroup && !$messagegroup->deleted) {
-				$preferredaudiofilename = $messagegroup->name;
+			$preferredaudiofilename = "";
+			
+			// If there are multiple languages for this destination type use the language name.					
+			if ($multilingual) {
+				$preferredaudiofilename = Language::getName($languagecode);
 			} else {
-				$preferredaudiofilename = 'Call Me to Record';
+				$preferredaudiofilename = $messagegroup->name;
 			}
 			
-			// If there are multiple languages for this destination type, append the language name.					
-			if ($multilingual) {
-				$preferredaudiofilename .= ' - ' . Language::getName($languagecode);
-			}
+			// if the message length is more than 24 charcters, we don't have enough left to add the date. Truncate it
+			if (mb_strlen($preferredaudiofilename) > 22)
+				$preferredaudiofilename = substr($preferredaudiofilename, 0, 22);
 			
 			$callmelabeltext = _L('Voice Recording');
 			
@@ -653,7 +655,7 @@ class CallMe extends FormItem {
 					"'.$n.'",
 					"'.$n.'_content'.'",
 					"'.$defaultphone.'",
-					"'.addslashes($this->args['preferredaudiofilename']).'"
+					"'.addslashes($this->args['preferredaudiofilename']).' - " + curDate()
 				);
 			};
 			newEasyCall();
