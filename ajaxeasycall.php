@@ -23,7 +23,7 @@ function taskNew($phone) {
 
 	// get min and max extension length
 	$min = getSystemSetting('easycallmin',10);
-	$max = getSystemSetting('easycallmin',10);
+	$max = getSystemSetting('easycallmax',10);
 
 	$phone = Phone::parse($phone);
 
@@ -34,7 +34,7 @@ function taskNew($phone) {
 			return array("error"=>"badphone");
 	} else {
 		// check that phone length is in the allowable range if less than 10-digits is allowed
-		$pl = length($phone);
+		$pl = mb_strlen($phone);
 		if ($pl < $min || $pl > $max)
 			return array("error"=>"badphone");
 	}
