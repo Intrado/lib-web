@@ -150,8 +150,9 @@ function applyHtmlEditor(textarea, dontwait) {
 			textarea.insert({'before': '<span class="HTMLEditorAjaxLoader" id="htmleditorloadericon"><img src="img/ajax-loader.gif"/> Please wait while the HTML editor loads. </span>'});
 
 		var reusableckeditor = new Element('div', {'id':'reusableckeditor'});
-
-		document.body.insert(new Element('div', {'id':'reusableckeditorhider'}).hide().insert(reusableckeditor));
+		var hider = new Element('div', {'id':'reusableckeditorhider', style:'display:none'});
+		hider.insert(reusableckeditor);
+		document.body.insert(reusableckeditor);
 
 		CKEDITOR.replace(reusableckeditor, {
 			'customConfig': '', // Prevent ckeditor from trying to load an external configuration file, should improve startup time.
