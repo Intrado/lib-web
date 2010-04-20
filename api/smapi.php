@@ -937,7 +937,7 @@ class SMAPI{
 				$result["resultdescription"] = "Invalid user";
 				return $result;
 			}
-			$personid = QuickQuery("select id from person where pkey = '" . DBSafe($pkey) . "' and not deleted " . $USER->userSQL("p"));
+			$personid = QuickQuery("select id from person where pkey = '" . DBSafe($pkey) . "' and not deleted ");
 			if(!$personid){
 				$result["resultdescription"] = "Invalid person";
 				return $result;
