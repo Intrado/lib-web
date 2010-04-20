@@ -151,14 +151,15 @@ class RenderedList2 {
 				
 				if ($this->searchphone !== false) {
 					$phone = DBSafe($this->searchphone);
-					$contactjoinsql .= "left join phone ph on (ph.personid = p.id and ph.phone like '$phone') \n";
-					$contactjoinsql .= "left join sms s on (s.personid = p.id and s.sms like '$phone') \n";
-					$contactwheresql .= "and (ph.id is not null or sms.id is not null) ";
+					$contactjoinsql .= "left join phone ph on (ph.personid = p.id and ph.phone like '".Phone::parse($phone)."') \n";
+					$contactjoinsql .= "left join sms s on (s.personid = p.id and s.sms like '".Phone::parse($phone)."') \n";
+					$contactwheresql .= " and (ph.id is not null or s.id is not null) ";
 				}
 				
 				if ($this->searchemail !== false) {
 					$email = DBSafe($this->searchemail);
 					$contactjoinsql .= "inner join email e on (e.personid = p.id and e.email like '$email') \n";
+					$contactwheresql .= " and e.id is not null ";
 				}
 				
 				if ($this->searchpkey !== false) {
