@@ -13,6 +13,16 @@ if (isset($_GET['origin'])) {
 
 if (isset($_GET['id'])) {
 	setCurrentList($_GET['id']);
+	
+	// check for requests to remove additions and/or skips
+	if(isset($_GET['removealladds'])) {
+		QuickUpdate("DELETE le.* FROM listentry le WHERE le.type='add' AND le.listid=?", false, array($_GET['id']));
+		notice(_L('All additions are now removed.'));
+	}
+	if (isset($_GET['removeallskips'])) {
+		QuickUpdate("DELETE le.* FROM listentry le WHERE le.type='negate' AND le.listid=?", false, array($_GET['id']));
+		notice(_L('All skips are now removed.'));
+	}
 	redirect();
 }
 
@@ -188,6 +198,7 @@ if ($showAdditions) {
 	);
 	
 	ob_start();
+	echo '<div style="float: left; margin-top: 5px"><a href="?removealladds&id='. $list->id. '">'. escapehtml(_L("Remove all adds")). '</a></div>';
 	showPageMenu($total,$pagestart,$pagelimit);
 	echo '<div style="margin-bottom: 10px;">';
 	if(count($data) > 8)
@@ -233,6 +244,7 @@ if ($showSkips) {
 		1 => "fmt_persontip"
 	);
 	ob_start();
+	echo '<div style="float: left; margin-top: 5px"><a href="?removeallskips&id='. $list->id. '">'. escapehtml(_L("Remove all skips")). '</a></div>';
 	echo '<div class="pagenav" style="text-align:right;"> Showing '.$total.' records.</div>';
 	if(count($data) > 8)
 		echo '<div class="scrollTableContainer">';
@@ -399,20 +411,6 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 						
 							notice(_L('All rules are now removed.'));
 						}
-						$form->sendTo($methodlink);
-						break;
-
-					case 'clearadditions':
-						QuickUpdate("DELETE le.* FROM listentry le WHERE le.type='add' AND le.listid=?", false, array($list->id));
-
-						notice(_L('All additions are now removed.'));
-						$form->sendTo($methodlink);
-						break;
-
-					case 'clearskips':
-						QuickUpdate("DELETE le.* FROM listentry le WHERE le.type='negate' AND le.listid=?", false, array($list->id));
-
-						notice(_L('All skips are now removed.'));
 						$form->sendTo($methodlink);
 						break;
 
