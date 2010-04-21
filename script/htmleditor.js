@@ -150,39 +150,54 @@ function applyHtmlEditor(textarea, dontwait) {
 			textarea.insert({'before': '<span class="HTMLEditorAjaxLoader" id="htmleditorloadericon"><img src="img/ajax-loader.gif"/> Please wait while the HTML editor loads. </span>'});
 
 		var reusableckeditor = new Element('div', {'id':'reusableckeditor'});
-		var hider = new Element('div', {'id':'reusableckeditorhider', style:'display:none'});
-		hider.insert(reusableckeditor);
-		document.body.insert(reusableckeditor);
 
-		CKEDITOR.replace(reusableckeditor, {
-			'customConfig': '', // Prevent ckeditor from trying to load an external configuration file, should improve startup time.
-			'removePlugins': 'wsc,scayt,smiley,showblocks,flash,elementspath,save',
-			'toolbar': [
-				['Preview','Print'],
-				['Undo','Redo','-','SelectAll','PasteFromWord','Find','Replace'],
-				'/',
-				['Styles','Format'],
-				['NumberedList','BulletedList','JustifyLeft','JustifyCenter','JustifyRight','JustifyBlock','Outdent','Indent'],
-				'/',
-				['Font','FontSize','Bold', 'Italic', 'Underline','Strike','Subscript','Superscript',  'TextColor','BGColor', 'RemoveFormat'],
-				['SpecialChar','Blockquote','Link', 'Image','Table','HorizontalRule','PageBreak']
-			],
-			'disableObjectResizing': true,
-			'resize_enabled': false,
-			'width': '100%',
-			'filebrowserImageUploadUrl' : 'uploadimage.php',
-			'on': {
-				'instanceReady': function(event) {
-					this.previous('.HTMLEditorAjaxLoader').remove();
-					applyHtmlEditor(this);
-					registerHtmlEditorKeyListener(pendinghtmleditorkeylistener);
-					pendinghtmleditorkeylistener = null;
-					if ($('htmleditorloadericon'))
-						$('htmleditorloadericon').remove();
-				}.bindAsEventListener(textarea)
+		if (!dontwait) {
+			document.observe('dom:loaded', function(event) {
+				applyHtmlEditor(this, true);
+			}.bindAsEventListener(textarea));
+		}
+
+		htmleditorloadinterval = setInterval(function() {
+
+			if (getHtmlEditorObject()) {
+				clearInterval(htmleditorloadinterval);
+				return;
 			}
-		});
 
+
+			document.body.insert(new Element('div', {'id':'reusableckeditorhider'}).hide().insert(reusableckeditor));
+
+			CKEDITOR.replace(reusableckeditor, {
+				'customConfig': '', // Prevent ckeditor from trying to load an external configuration file, should improve startup time.
+				'removePlugins': 'wsc,scayt,smiley,showblocks,flash,elementspath,save',
+				'toolbar': [
+					['Preview','Print'],
+					['Undo','Redo','-','SelectAll','PasteFromWord','Find','Replace'],
+					'/',
+					['Styles','Format'],
+					['NumberedList','BulletedList','JustifyLeft','JustifyCenter','JustifyRight','JustifyBlock','Outdent','Indent'],
+					'/',
+					['Font','FontSize','Bold', 'Italic', 'Underline','Strike','Subscript','Superscript',  'TextColor','BGColor', 'RemoveFormat'],
+					['SpecialChar','Blockquote','Link', 'Image','Table','HorizontalRule','PageBreak']
+				],
+				'disableObjectResizing': true,
+				'resize_enabled': false,
+				'width': '100%',
+				'filebrowserImageUploadUrl' : 'uploadimage.php',
+				'on': {
+					'instanceReady': function(event) {
+						this.previous('.HTMLEditorAjaxLoader').remove();
+						applyHtmlEditor(this);
+						registerHtmlEditorKeyListener(pendinghtmleditorkeylistener);
+						pendinghtmleditorkeylistener = null;
+						if ($('htmleditorloadericon'))
+							$('htmleditorloadericon').remove();
+					}.bindAsEventListener(textarea)
+				}
+			});
+			clearInterval(htmleditorloadinterval);
+
+		}, dontwait ? 0 : 2000);
 		return;
 	}
 
