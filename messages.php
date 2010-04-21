@@ -254,7 +254,7 @@ $TITLE = "Message Builder";
 
 include_once("nav.inc.php");
 
-startWindow(_L('My Messages'), 'padding: 3px;', true, true);
+startWindow(_L('My Messages'), 'padding: 3px;', false, true);
 
 ?>
 <table width="100%" style="padding-top: 7px;">
