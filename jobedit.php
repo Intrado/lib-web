@@ -499,7 +499,7 @@ $helpsteps[] = _L("Enter a name for your job. Using a descriptive name that indi
 
 		$formdata["attempts"] = array(
 			"label" => _L('Max Attempts'),
-			"fieldhelp" => ("This features allows you to override the number that will display on recipient's Caller IDs."),
+			"fieldhelp" => ("Select the maximum number of times the system should try to contact an individual."),
 			"value" => $job->getOptionValue("maxcallattempts"),
 			"validators" => array(
 				array("ValRequired"),
