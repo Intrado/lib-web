@@ -1048,7 +1048,7 @@ class SMAPI{
 
 			$personcontactprefs = array();
 
-			$personid = QuickQuery("select id from person where pkey = '" . DBSafe($contact->pkey) . "' and not deleted " . $USER->userSQL("p"));
+			$personid = QuickQuery("select id from person where pkey = '" . DBSafe($contact->pkey) . "' and not deleted ");
 			if(!$personid){
 				$result["resultdescription"] = "Invalid person: " . $contact->pkey;
 				return $result;
