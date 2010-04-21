@@ -336,3 +336,9 @@ ALTER TABLE `qjob` ADD `messagegroupid` INT default NULL AFTER `scheduleid` ;
 ALTER TABLE `qjob` DROP `messagegroupid`,
 	DROP `questionnaireid`;
 	
+-- ---------------------------
+-- start here for release 7.5.1
+
+ ALTER TABLE `renderedmessage` CHANGE `renderedmessage` `renderedmessage` MEDIUMTEXT CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL ;
+ 
+ 
