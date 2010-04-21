@@ -95,7 +95,7 @@ class ValTranslationExpirationDate extends Validator {
 
 		if($hastranslated != false) {
 			if(strtotime($value) > strtotime("today") + (7*86400))
-				return _L("Cannot schedule a job which uses an auto-translated message for later than 7 days from today");
+				return _L("Can not schedule the job with a message containing auto-translated content older than 7 days from the Start Date");
 		}
 		return true;
 	}
@@ -106,7 +106,7 @@ class ValIsTranslated extends Validator {
 	function validate ($value) {
 		$istranslated = QuickQuery("select 1 from message where messagegroupid = ? and autotranslate = 'translated' limit 1", false, array($value));
 		if($istranslated > 0) {
-			return _L("Cannot select an auto-translated message for use with a repeating job");
+			return _L("Can not select a message that is auto-translated with a repeating job");
 		}
 		return true;
 	}
