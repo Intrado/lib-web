@@ -340,13 +340,14 @@ class HtmlTextArea extends FormItem {
 			$value = '';
 		$rows = isset($this->args['rows']) ? 'rows="'.$this->args['rows'].'"' : "";
 		$str = '<textarea id="'.$n.'" name="'.$n.'" '.$rows.'/>'.escapehtml($value).'</textarea>
+			<div id ="'.$n.'htmleditor"></div>
 			<script type="text/javascript" src="script/ckeditor/ckeditor_basic.js"></script>
 			<script type="text/javascript" src="script/htmleditor.js"></script>
 			<script type="text/javascript">
 				document.observe("dom:loaded",
 					function() {
 						// add the ckeditor to the textarea
-						applyHtmlEditor($("'.$n.'"));
+						applyHtmlEditor($("'.$n.'"),true,"'.$n.'htmleditor");
 
 						// set up a keytimer to save content and validate
 						var htmlTextArea_keytimer = null;

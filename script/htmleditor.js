@@ -136,7 +136,7 @@ function clearHtmlEditorContent() {
 // NOTE: It is assumed that there be only a single html editor on the page; CKEditor is buggy with multiple instances.
 var htmleditorloadinterval = null;
 
-function applyHtmlEditor(textarea, dontwait) {
+function applyHtmlEditor(textarea, dontwait,target) {
 
 	textarea = $(textarea);
 
@@ -153,7 +153,7 @@ function applyHtmlEditor(textarea, dontwait) {
 
 		if (!dontwait) {
 			document.observe('dom:loaded', function(event) {
-				applyHtmlEditor(this, true);
+				applyHtmlEditor(this, true,target);
 			}.bindAsEventListener(textarea));
 		}
 
@@ -163,9 +163,15 @@ function applyHtmlEditor(textarea, dontwait) {
 				clearInterval(htmleditorloadinterval);
 				return;
 			}
-
-
-			document.body.insert(new Element('div', {'id':'reusableckeditorhider'}).hide().insert(reusableckeditor));
+			var hider = new Element('div', {'id':'reusableckeditorhider'});
+			hider.hide();
+			hider.insert(reusableckeditor);
+			
+			if(target != undefined) {
+				$(target).insert(hider);
+			} else {
+				document.body.insert(hider);
+			}
 
 			CKEDITOR.replace(reusableckeditor, {
 				'customConfig': '', // Prevent ckeditor from trying to load an external configuration file, should improve startup time.
