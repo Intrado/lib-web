@@ -31,7 +31,14 @@ if (isset($_SESSION['firstlogin'])) {
 	$contactCount[$pid] = 1;
 	$allData[$pid] = array();
 
-	$result = Query("select j.id, j.startdate, j.name, u.firstname, u.lastname, rp.personid
+	// index 1 = jobid
+	// 2 = startdate
+	// 3 = name
+	// 4 = type (not used anymore, was phone/email/sms, now is notification/alert)
+	// 5 = firstname
+	// 6 = lastname
+	// 7 = personid
+	$result = Query("select j.id, j.startdate, j.name, j.type, u.firstname, u.lastname, rp.personid
 		from job j
 		left join jobsetting js on (js.jobid=j.id and js.name='translationexpire')
 		left join reportperson rp on (rp.jobid = j.id)
@@ -56,13 +63,13 @@ if (isset($_SESSION['firstlogin'])) {
 					"2" => _L("Date"),
 					"3" => "#" . _L("Job Name"),
 					"SentBy" => "#" . _L("Sent By"),
-					"4" => "#" . _L("Delivery Type"),
+					//"4" => "#" . _L("Delivery Type"),
 					"Actions" => _L("Actions")
 				);
 
 	$formatters = array("2" => "format_date",
 						"SentBy" => "sender",
-						"4" => "fmt_delivery_type_list",
+						//"4" => "fmt_delivery_type_list",
 						"Actions" => "message_action"
 					);
 
