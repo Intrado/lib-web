@@ -8,6 +8,7 @@ include_once("inc/table.inc.php");
 include_once("inc/html.inc.php");
 include_once("inc/utils.inc.php");
 include_once("inc/form.inc.php");
+include_once("inc/date.inc.php");
 include_once("obj/Job.obj.php");
 include_once("obj/JobType.obj.php");
 include_once("obj/PeopleList.obj.php");
