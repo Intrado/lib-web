@@ -14,6 +14,8 @@ class ValMessageBody extends Validator {
 		
 		if (isset($args['messagegroupid']))
 			$audiofileids = MessageGroup::getReferencedAudioFileIDs($args['messagegroupid']);
+		else
+			error_log("ERROR: ValMessagebody called on text with no messagegroupid");
 		
 		$message = new Message();
 		$errors = array();
