@@ -72,10 +72,9 @@ class Message extends DBMappedObject {
 		// copy the parts
 		$parts = DBFindMany("MessagePart", "from messagepart where messageid=$this->id");
 		foreach ($parts as $part) {
-			$newpart = new MessagePart($part->id);
-			$newpart->id = null;
-			$newpart->messageid = $newmessage->id;
-			$newpart->create();
+			$part->id = null;
+			$part->messageid = $newmessage->id;
+			$part->create();
 		}
 		// copy the attachments
 		QuickUpdate("insert into messageattachment (messageid,contentid,filename,size,deleted) " .
