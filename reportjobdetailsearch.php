@@ -156,6 +156,7 @@ switch($_SESSION['report']['type']){
 		$possibleresults = array("sent" => "Sent",
 			"unsent" => "Unsent",
 			"duplicate" => "Duplicate",
+			"blocked" => "Blocked",
 			"declined" => "No Email Selected");
 
 		break;
@@ -164,6 +165,7 @@ switch($_SESSION['report']['type']){
 		$possibleresults = array("sent" => "Sent",
 			"unsent" => "Unsent",
 			"duplicate" => "Duplicate",
+			"blocked" => "Blocked",
 			"declined" => "No SMS Selected");
 		break;
 
