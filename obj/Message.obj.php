@@ -166,8 +166,18 @@ class Message extends DBMappedObject {
 			$pos_f = strpos($data,"<<");
 			$pos_a = strpos($data,"{{");
 			$pos_l = strpos($data,"[[");
-			$pos_i = strpos($data,'<img src="viewimage.php?id=');
-
+			
+			// get imageupload tags
+			$matches = array();
+			$uploadimageurl = "";
+			if (eregi("(\<img src\=\"[^\=]*viewimage\.php\?id\=)", $data, $matches) !== false) {
+				// we only care about the first match, index 1 has this info
+				$uploadimageurl = $matches[1];
+				$pos_i = strpos($data, $uploadimageurl);
+			} else {
+				$pos_i = false;
+			}
+			
 			$poses = array();
 			if($pos_f !== false)
 				$poses[] = $pos_f;
@@ -206,9 +216,10 @@ class Message extends DBMappedObject {
 				$parts[] = $part;
 			}
 
-			if ($type == 'I')
-				$pos += strlen('<img src="viewimage.php?id=');
-			else
+			if ($type == 'I') {
+				// find the start of the id
+				$pos += mb_strlen($uploadimageurl);
+			} else
 				$pos += 2; // pass over the begintoken
 
 			switch($type){
