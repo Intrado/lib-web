@@ -208,7 +208,7 @@ if ($showAdditions) {
 	ob_start();
 	echo '<div style="float: left; margin-top: 5px"><a href="?removealladds='. $list->id. '">'. escapehtml(_L("Remove all adds")). '</a></div>';
 	showPageMenu($total,$pagestart,$pagelimit);
-	echo '<div style="margin-bottom: 10px;">';
+	echo '<div style="clear:both"></div><div style="margin-bottom: 10px;">';
 	if(count($data) > 8)
 		echo '<div class="scrollTableContainer">';
 	echo '<table id="listadds" width="100%" cellpadding="3" cellspacing="1" class="list">';
