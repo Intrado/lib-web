@@ -46,7 +46,15 @@ if (isset($_GET['usetext']) && isset($_SESSION['ttstext']) && isset($_SESSION['t
 				
 	$message = new Message();
 	$errors = array();	
-	$parts = $message->parse($text,$errors,$voiceid);
+	
+	//load all audiofileids for this messagegroup, should be OK since only way to preview via text parse is inside MG editor
+	$audiofileids = null;
+	if (isset($_SESSION['messagegroupid']))
+		$audiofileids = MessageGroup::getReferencedAudioFileIDs($_SESSION['messagegroupid']);
+	else
+		error_log("ERROR: preview.wav.php called on text with no messagegroupid");
+	
+	$parts = $message->parse($text,$errors,$voiceid, $audiofileids);
 
 	if(count($fields) == 0) {
 		foreach($parts as $part) {

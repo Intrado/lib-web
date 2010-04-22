@@ -82,9 +82,17 @@ if(isset($_GET['parentfield']) || $id || isset($_GET['mediafile'])) {
 }
 
 // Third Text Request - Session data is already set but nee to parse again. Set fields and return form again 
-if($_SESSION['ttstext']) {	
+if($_SESSION['ttstext']) {
+	
+	//load all audiofileids for this messagegroup, should be OK since only way to preview via text parse is inside MG editor
+	$audiofileids = null;
+	if (isset($_SESSION['messagegroupid']))
+		$audiofileids = MessageGroup::getReferencedAudioFileIDs($_SESSION['messagegroupid']);
+	else
+		error_log("ERROR: preview.wav.php called on text with no messagegroupid");
+	
 	$message = new Message();
-	$parts = $message->parse($_SESSION['ttstext'],$errors,1);
+	$parts = $message->parse($_SESSION['ttstext'],$errors,1,$audiofileids);
 	$fieldnums = array();
 	$fielddefaults = array();
 	
