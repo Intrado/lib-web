@@ -441,7 +441,7 @@ $helpsteps[] = _L("Enter a name for your job. Using a descriptive name that indi
 		);
 		$formdata["skipduplicates"] = array(
 			"label" => _L('Skip Duplicates'),
-			"fieldhelp" => ("This features allows you to override the number that will display on recipient's Caller IDs."),
+			"fieldhelp" => ("Skip Duplicates if you would like to only contact recipients who share contact information once."),
 			"value" => $job->isOption("skipduplicates"),
 			"validators" => array(),
 			"control" => array("CheckBox"),
