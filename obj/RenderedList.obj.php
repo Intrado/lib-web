@@ -225,7 +225,7 @@ class RenderedList2 {
 		$extrafieldsql = ", " . implode(',', $extrafields);
 		
 		//load all of the person, f, and g fields
-		$query = "select p.id, pkey, 0 as sequence_placeholder, 0 as destination_placeholder, 0 as destinationtype_placeholder
+		$query = "select p.id, pkey, 0 as sequence_placeholder, 0 as destination_placeholder, 0 as destinationtype_placeholder, 0 as editlock_placeholder
 					$extrafieldsql
 				from person p
 				where p.id in ($pagepidcsv)";
@@ -245,6 +245,7 @@ class RenderedList2 {
 				phone as destination,
 				sequence as sequence,
 				'phone' as type,
+				editlock as editlock,
 				'1' as ordering
 				from phone ph
 				where
@@ -255,6 +256,7 @@ class RenderedList2 {
 				email as destination,
 				sequence as sequence,
 				'email' as type,
+				editlock as editlock,
 				'2' as ordering
 				from email
 				where
@@ -266,6 +268,7 @@ class RenderedList2 {
 					sms as destination,
 					sequence as sequence,
 					'sms' as type,
+					editlock as editlock,
 					'3' as ordering
 					from sms
 					where
@@ -292,6 +295,7 @@ class RenderedList2 {
 						$person[2] = $destination[2];
 						$person[3] = $destination[1];
 						$person[4] = $destination[3];
+						$person[5] = $destination[4];
 						$this->pagedata[] = $person;
 						$allBlank = false;
 					}
@@ -301,6 +305,7 @@ class RenderedList2 {
 				$person[2] = _L("--None--");
 				$person[3] = "";
 				$person[4] = "";
+				$person[5] = "";
 				$this->pagedata[] = $person;
 			}
 		}

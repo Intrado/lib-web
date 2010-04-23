@@ -57,6 +57,18 @@ function fmt_null ($row,$index) {
 		return "&nbsp;";
 }
 
+//index+2 should be the editlock flag;
+function fmt_editlocked_destination($row, $index) {
+	if (isset($row[$index])) {
+		$output = fmt_destination($row, $index);
+		if ($row[$index+2] == 1) {
+			$output = "<img src='img/padlock.gif'>&nbsp;" . $output;
+		}
+		return $output;
+	}
+	return "&nbsp;";
+}
+
 function fmt_destination ($row,$index) {
 	if (isset($row[$index])) {
 		if (ereg("[0-9]{10}", $row[$index])) {

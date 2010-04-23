@@ -57,20 +57,20 @@ function showRenderedListTable($renderedlist, $list = false) {
 	$titles[1] = "Unique ID";
 	if ($showpersontip)
 		$formatters[1] = "fmt_persontip"; //only show magnifying glass if we own list, or not using a list
-	
-	$titles[6] = FieldMap::getName(FieldMap::getFirstNameField());
-	$titles[7] = FieldMap::getName(FieldMap::getLastNameField());
 
+	$titles[7] = FieldMap::getName(FieldMap::getFirstNameField());
+	$titles[8] = FieldMap::getName(FieldMap::getLastNameField());
+	
 	$titles[2] = "Sequence";
 	$formatters[2] = "fmt_renderedlist_destination_sequence";
 	
 	$titles[3] = "Destination";
-	$formatters[3] = "fmt_destination";
+	$formatters[3] = "fmt_editlocked_destination";
 	
-	$titles[5] = getSystemSetting("organizationfieldname","Organization");
-	
+	$titles[6] = getSystemSetting("organizationfieldname","Organization");
+
 	//after that, show F fields, then G fields
-	//optional F fields start at index 8 (skip f01, f02)
+	//optional F fields start at index 9 (skip f01, f02)
 	//save some data for field show/hide tool
 	
 	//show field togglers, reuse whats in reportutils.inc.php (needs to be refactored)
@@ -80,12 +80,12 @@ function showRenderedListTable($renderedlist, $list = false) {
 	
 	$tableid = "renderedlist". $tableidcounter++;
 	$optionalfields = array_merge(FieldMap::getOptionalAuthorizedFieldMapsLike('f'), FieldMap::getAuthorizedFieldMapsLike('g'));
-	$optionalfieldstart = $showinlist ? 6 : 5; //table col of last non optional field
+	$optionalfieldstart = $showinlist ? 7 : 6; //table col of last non optional field
 	select_metadata($tableid,$optionalfieldstart,$optionalfields);
 	showSortMenu($validsortfields,$ordering);
 	
 	//now use session display prefs to set up titles and whatnot for the optional fields
-	$i = 8;
+	$i = 9;
 	foreach ($optionalfields as $field) {
 		//add a formatter for language field
 		if ($field->fieldnum == FieldMap::getLanguageField())
