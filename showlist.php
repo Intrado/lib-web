@@ -36,8 +36,13 @@ if (!$USER->authorize('createlist')) {
 //get the message to edit from the request params or session
 if (isset($_GET['id'])) {
 	$listid = $_GET['id'] + 0;
-	if (userOwns("list",$listid) || isSubscribed("list",$listid))
+	
+	if (isSubscribed("list",$listid))
 		$_SESSION['previewlistid'] = $listid;
+	if (userOwns("list",$listid)) {
+		$_SESSION['previewlistid'] = $listid;
+		$_SESSION['listid'] = $listid; //if the user owns the list, additionally set the listid so that the "in list" checkboxes work
+	}
 	$_SESSION['listreferer'] = isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : 'list.php';
 	redirect();
 }
