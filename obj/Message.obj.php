@@ -79,7 +79,7 @@ class Message extends DBMappedObject {
 		// copy the attachments
 		QuickUpdate("insert into messageattachment (messageid,contentid,filename,size,deleted) " .
 		"select $newmessage->id, ma.contentid, ma.filename, ma.size, 1 as deleted " .
-		"from messageattachment ma where ma.messageid=$this->id and not deleted");
+		"from messageattachment ma where ma.messageid=$this->id");
 		
 		return $newmessage;
 	}
