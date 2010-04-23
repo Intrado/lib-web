@@ -52,10 +52,10 @@ $result = Query(
             	sum(rc.type='email') as total_email,
             	sum(rc.type='print') as total_print,
             	sum(rc.type='sms') as total_sms,
-            	j.type LIKE '%phone%' AS has_phone,
-				j.type LIKE '%email%' AS has_email,
-				j.type LIKE '%print%' AS has_print,
-				j.type LIKE '%sms%' AS has_sms,
+            	(select 1 from message m where m.messagegroupid = j.messagegroupid and m.type = 'phone' limit 1) AS has_phone,
+				(select 1 from message m where m.messagegroupid = j.messagegroupid and m.type = 'email' limit 1) AS has_email,
+				(select 1 from message m where m.messagegroupid = j.messagegroupid and m.type = 'print' limit 1) AS has_print,
+				(select 1 from message m where m.messagegroupid = j.messagegroupid and m.type = 'sms' limit 1) AS has_sms,
             	sum(rc.result not in ('A', 'M', 'duplicate', 'nocontacts', 'blocked') and rc.type='phone' and rc.numattempts < js.value) as remaining_phone,
             	sum(rc.result not in ('sent', 'duplicate', 'nocontacts') and rc.type='email' and rc.numattempts < 1) as remaining_email,
             	sum(rc.result not in ('sent', 'duplicate', 'nocontacts') and rc.type='print' and rc.numattempts < 1) as remaining_print,
@@ -93,7 +93,6 @@ function fmt_total ($row, $index) {
 		$data[] = "Print:&nbsp;" . $row[$index+2];
 	if ($row[$index+7])
 		$data[] = "SMS:&nbsp;" . $row[$index+3];
-
 
 	return implode("<br>",$data);
 }
