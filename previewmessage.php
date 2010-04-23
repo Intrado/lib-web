@@ -21,6 +21,9 @@ require_once("obj/MessagePart.obj.php");
 require_once("obj/AudioFile.obj.php");
 require_once("obj/FormSelectMessage.fi.php");
 require_once("obj/Language.obj.php");
+require_once("obj/MessageGroup.obj.php");
+
+
 require_once("inc/previewfields.inc.php");
 
 ////////////////////////////////////////////////////////////////////////////////
