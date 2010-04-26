@@ -53,7 +53,7 @@ $formdata["autoreportreplyemail"] = array(
 	"validators" => array(
 		array("ValRequired"),
 		array("ValLength","min" => 0,"max" => 255),
-		array("ValEmail", "domain" => getSystemSetting('emaildomain'))
+		array("ValEmail")
 	),
 	"control" => array("TextField","maxlength" => 255),
 	"helpstep" => $helpstepnum
