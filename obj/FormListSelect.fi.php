@@ -23,6 +23,14 @@ class FormListSelect extends FormItem {
 				and p.type = 'list')
 			order by digitsfirst, name",
 			true, false, array($USER->id, $USER->id));
+			
+		if(!empty($value)) { // Add in selected lists that mey be deleted. Such as Add mee from the wizard or published lists
+			$lists = $lists + QuickQueryList("
+			select id, name, (name +0) as digitsfirst
+			from list
+			where type != 'alert' and id in (" . DBParamListString(count($value)) . ")",
+			true, false, $value);
+		}
 		
 		// look up the list details for lists in $value
 		$listdetails = array();

@@ -56,7 +56,6 @@ class ValFormListSelect extends Validator {
 				inner join publish p on
 					(l.id = p.listid)
 			where l.id in (". DBParamListString(count($value)) .")
-				and not l.deleted
 				and l.type != 'alert'
 				and p.action = 'subscribe'
 				and p.type = 'list'
@@ -66,8 +65,7 @@ class ValFormListSelect extends Validator {
 			from list
 			where id in (". DBParamListString(count($value)) .")
 				and type != 'alert'
-				and userid = ?
-				and not deleted)",
+				and userid = ?)",
 			true, false, $args);
 		
 		// see if any of the value lists are not in the valid lists
