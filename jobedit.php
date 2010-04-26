@@ -434,7 +434,7 @@ $helpsteps[] = _L("Enter a name for your job. Using a descriptive name that indi
 				array("ValRequired"),
 				array("ValFormListSelect")
 			),
-			"control" => array("FormListSelect"),
+			"control" => array("FormListSelect","jobid" => $job->id),
 			"helpstep" => 4
 		);
 		$formdata["skipduplicates"] = array(

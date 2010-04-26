@@ -7,31 +7,29 @@ class FormListSelect extends FormItem {
 		global $USER;
 		$n = $this->form->name."_".$this->name;
 		
-		// get lists this user has access to, both owned and subscribed
-		$lists = QuickQueryList("
-			(select id, name, (name +0) as digitsfirst
-			from list
-			where type != 'alert' and not deleted and userid = ?)
-			UNION
-			(select l.id as id, l.name as name, (l.name +0) as digitsfirst
-			from list l
-				inner join publish p on
-					(l.id = p.listid)
-			where not l.deleted
-				and p.userid = ?
-				and p.action = 'subscribe'
-				and p.type = 'list')
-			order by digitsfirst, name",
-			true, false, array($USER->id, $USER->id));
-			
-		if(!empty($value)) { // Add in selected lists that mey be deleted. Such as Add mee from the wizard or published lists
-			$lists = $lists + QuickQueryList("
-			select id, name, (name +0) as digitsfirst
-			from list
-			where type != 'alert' and id in (" . DBParamListString(count($value)) . ")",
-			true, false, $value);
+		$args = array();
+		$extrasql = "";
+		if (isset($this->args['jobid'])) {
+			$args[] = $this->args['jobid'];
+			$extrasql = " or exists (select * from joblist jl where jl.jobid = ? and jl.listid = list.id)";
 		}
+		// Need to pass in user id twice
+		$args[] = $USER->id;  
+		$args[] = $USER->id;
+		// get lists this user has access to, both owned and subscribed
+		$query = "(select id, name, (name +0) as digitsfirst from list 
+					where type != 'alert' and (not deleted $extrasql) and userid = ?)
+					UNION
+					(select l.id as id, l.name as name, (l.name +0) as digitsfirst from list l inner join publish p on (l.id = p.listid)
+					where not l.deleted
+					and p.userid = ?
+					and p.action = 'subscribe'
+					and p.type = 'list'
+					)
+					order by digitsfirst, name";
 		
+		$lists = QuickQueryList($query,true, false, $args);
+				
 		// look up the list details for lists in $value
 		$listdetails = array();
 		foreach ($value as $listid) {
