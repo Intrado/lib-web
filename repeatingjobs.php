@@ -54,7 +54,7 @@ $query = "select SQL_CALC_FOUND_ROWS u.login, j.name, schedule.nextrun, j.id, j.
 				on (j.userid = jobowner.id)
 			left join schedule on (j.scheduleid = schedule.id),
 			user u
-			where j.userid = u.id and j.status = 'repeating' and j.type in ('notification', 'survey')
+			where j.userid = u.id and j.status = 'repeating'
 			group by j.id order by u.login,foo,name limit $start, $limit
 ";
 
