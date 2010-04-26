@@ -305,7 +305,7 @@ $formdata["dateoptions"] = array(
 );
 
 $formdata[] = _L("Filter By");
-$allowedFieldTypes = array('f','g');
+$allowedFieldTypes = array('f','g','organization');
 $formdata["ruledata"] = array(
 	"label" => _L('Criteria'),
 	"fieldhelp" => _L("Use rules to narrow your report results."),
