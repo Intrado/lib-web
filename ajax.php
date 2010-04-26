@@ -228,14 +228,15 @@ function handleRequest() {
 					
 					// If the user is unrestricted, get values from all sections.
 					// Otherwise, get the union of values from organization associations and section associations.
-					if (QuickQuery('select 1 from userassociation where userid = ? limit 1', false, array($USER->id))) {
+					if (QuickQuery('select 1 from userassociation where userid = ? and type in ("organization", "section") limit 1', false, array($USER->id))) {
 						// Values from section associations.
-						$values = QuickQueryList("
-							select distinct $fieldnum as value
+						$query = "select distinct $fieldnum as value
 							from section
 								inner join userassociation on (userassociation.sectionid = section.id)
-							where userid=? $limitsql",
-							false, false, array($USER->id)
+							where userid=?
+								$limitsql
+							order by value";
+						$values = QuickQueryList($query, false, false, array($USER->id)
 						);
 						
 						// Values from organization associations.
@@ -243,13 +244,15 @@ function handleRequest() {
 							select distinct $fieldnum as value
 							from section
 								inner join userassociation on (userassociation.organizationid = section.organizationid)
-							where userid=? $limitsql",
+							where userid=?
+								$limitsql
+							order by value",
 							false, false, array($USER->id)
 						);
 						
 						return $values;
 					} else { // Unrestricted.
-						return QuickQueryList("select distinct $fieldnum as value from section where 1 $limitsql", false);
+						return QuickQueryList("select distinct $fieldnum as value from section where 1 $limitsql order by value", false);
 					}
 				} else if ($fieldnum == FieldMap::getLanguageField()) {
 					$languagecodes = QuickQueryList("select value from persondatavalues where fieldnum=? $limitsql order by value", false, false, array($_GET['fieldnum']));
