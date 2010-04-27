@@ -147,6 +147,8 @@ class TranslationItem extends FormItem {
 									if (content != '') {
 										var gender = 'female'; // Default female.
 										var preferredgenderdiv = $('$preferredgenderformitem');
+										if(!preferredgenderdiv) 
+											preferredgenderdiv = $('phone-voice-autotranslator_preferredgender');
 										if (preferredgenderdiv) {
 											var selectedradio = preferredgenderdiv.down('input:checked');
 											if (selectedradio) {
