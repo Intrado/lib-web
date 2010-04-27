@@ -70,56 +70,23 @@ if (isset($_GET['hideactivecodes']))
 if (isset($_GET['hideassociated']))
 	$_SESSION['hideassociated'] = $_GET['hideassociated'] == "true" ? true : false;
 
-$renderedlist = new RenderedListCM();
-$renderedlist->pagelimit = 100;
-
-$generateBulkTokens = $USER->authorize('generatebulktokens');
-
-if ($generateBulkTokens && isset($_GET['generate'])) {
-	$renderedlist->mode = "search";
-	$totalgenerated = 0;
-	$pageoffset = 0;
-	$renderedlist->pageoffset = $pageoffset;
-	$personsql = $renderedlist->getPersonSql(true);
-	$personids = QuickQueryList($personsql);
-	while (count($personids) > 0) {
-		$count = generatePersonTokens($personids);
-		if ($count)
-			$totalgenerated += $count;
-		else
-			$count = 0; // failure
-		
-		$pageoffset += 100;
-		$renderedlist->pageoffset = $pageoffset;
-		$personsql = $renderedlist->getPersonSql(true);
-		$personids = QuickQueryList($personsql);
-
-	}
-	if ($totalgenerated > 0)
-		notice(_L("%s activation codes have been generated.", number_format($totalgenerated)));
-	else
-		notice(_L("An unexpected error occurred.  Please try again."));
-			
-	redirect();
-}
-
 // if csv download, else html
 if (isset($_GET['csv']) && $_GET['csv'])
 	$csv = true;
 else
 	$csv = false;
 
+// basic rendered list initialization
+$renderedlist = new RenderedListCM();
+$pagelimit = 100;
+$renderedlist->pagelimit = $pagelimit;
+
+$generateBulkTokens = $USER->authorize('generatebulktokens');
+
 // FORM DATA
-$extrajs = '';
-if ($generateBulkTokens) {
-	$query = $renderedlist->getPersonSql();
-	$result = ($query != "") ? QuickQuery($query) : false;
-	$extrajs = ($result) ? "if(confirmGenerateActive())" : "if(confirmGenerate())";
-}
 
 $checkHideActiveCodes = (!empty($_SESSION['hideactivecodes'])) ? 'checked' : '';
 $checkHideAssociated = (!empty($_SESSION['hideassociated'])) ? 'checked' : '';
-
 
 $buttons = array(
 	icon_button(_L('Back'),"tick",null,"contacts.php"),
@@ -127,7 +94,7 @@ $buttons = array(
 	icon_button(_L('Show All Contacts'),"tick",null,"?showall")
 );
 if ($generateBulkTokens)
-	$buttons[] = icon_button("Generate Activation Codes", "tick", "$extrajs window.location='?generate=1'", "activationcodemanager.php");
+	$buttons[] = icon_button("Generate Activation Codes", "tick", "if(confirmGenerate()) window.location='?generate=1'", "activationcodemanager.php");
 
 $redirectpage = "activationcodemanager.php";
 
@@ -150,6 +117,80 @@ $additionalformdata["outputformat"] = array(
 include_once("contactsearchformdata.inc.php");
 
 
+
+
+// Prepare RenderedList options
+
+$validsortfields = array("pkey" => "ID#");
+foreach (FieldMap::getAuthorizedFieldMapsLike("f") as $fieldmap) {
+	$validsortfields[$fieldmap->fieldnum] = $fieldmap->name;
+}
+	
+$ordering = isset($_SESSION['showlistorder']) ? $_SESSION['showlistorder'] : array(array("f02", false),array("f01",false));
+for ($x = 0; $x < 3; $x++) {
+	if (!isset($_GET["sort$x"]))
+		continue;
+	if ($_GET["sort$x"] == "")
+		unset($ordering[$x]);
+	else if (isset($validsortfields[$_GET["sort$x"]])) {
+		$ordering[$x] = array($_GET["sort$x"],isset($_GET["desc$x"]));
+	}
+}	
+$_SESSION['showlistorder'] = $ordering = array_values($ordering); //remove gaps
+	
+$pagestart = (isset($_GET['pagestart']) ? $_GET['pagestart'] + 0 : 0);
+$renderedlist->pageoffset = $pagestart;
+$renderedlist->orderby = $ordering;
+
+$data = $renderedlist->getPageData();
+
+$total = $renderedlist->getTotal();
+
+// find if any active tokens in display results
+$hasactivecodes = false;
+$personsql = $renderedlist->getPersonSql(false);
+if ($personsql != "") {
+	$personids = QuickQueryList($personsql); // TODO page this
+	if (count($personids) > 0) {
+		$query = "select 1 from portalpersontoken where exists (select * from portalpersontoken where personid in (".repeatWithSeparator("?", ",", count($personids)).") and token is not null and expirationdate > curdate() limit 1)";
+		$hasactivecodes = QuickQuery($query, false, $personids);
+	}
+}
+
+// this needs to be after the rules for renderedlist are loaded, etc. cannot go up top with the usual GET handlers
+// check if generating tokens
+if ($generateBulkTokens && isset($_GET['generate'])) {
+	if (isset($_SESSION['listsearch']['individual'])) {
+		$renderedlist->mode = "individual";
+	} else {
+		$renderedlist->mode = "search";
+	}
+	
+	$totalgenerated = 0;
+	$pageoffset = 0;
+	$renderedlist->pageoffset = $pageoffset;
+	$personsql = $renderedlist->getPersonSql(true);
+	$personids = QuickQueryList($personsql);
+	while (count($personids) > 0) {
+		$count = generatePersonTokens($personids);
+		if ($count)
+			$totalgenerated += $count;
+		else
+			$count = 0; // failure
+		
+		$pageoffset += $pagelimit;
+		$renderedlist->pageoffset = $pageoffset;
+		$personsql = $renderedlist->getPersonSql(true);
+		$personids = QuickQueryList($personsql);
+	}
+	if ($totalgenerated > 0)
+		notice(_L("%s activation codes have been generated.", number_format($totalgenerated)));
+	else
+		notice(_L("An unexpected error occurred.  Please try again."));
+			
+	redirect();
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 // Functions
 ////////////////////////////////////////////////////////////////////////////////
@@ -157,41 +198,13 @@ include_once("contactsearchformdata.inc.php");
 /**
  * similar to list.inc.php function
  */
-function showRenderedListTableCM($renderedlist) {
+function showRenderedListTableCM($data, $total, $pagestart, $pagelimit, $validsortfields, $ordering) {
 	static $tableidcounter = 1;
-	
-	$validsortfields = array("pkey" => "ID#");
-	foreach (FieldMap::getAuthorizedFieldMapsLike("f") as $fieldmap) {
-		$validsortfields[$fieldmap->fieldnum] = $fieldmap->name;
-	}
-	
-	$ordering = isset($_SESSION['showlistorder']) ? $_SESSION['showlistorder'] : array(array("f02", false),array("f01",false));
-	for ($x = 0; $x < 3; $x++) {
-		if (!isset($_GET["sort$x"]))
-			continue;
-		if ($_GET["sort$x"] == "")
-			unset($ordering[$x]);
-		else if (isset($validsortfields[$_GET["sort$x"]])) {
-			$ordering[$x] = array($_GET["sort$x"],isset($_GET["desc$x"]));
-		}
-	}	
-	$_SESSION['showlistorder'] = $ordering = array_values($ordering); //remove gaps
-	
-	
-	$pagestart = (isset($_GET['pagestart']) ? $_GET['pagestart'] + 0 : 0);
-	$renderedlist->pageoffset = $pagestart;
-	$renderedlist->orderby = $ordering;
-
-	$data = $renderedlist->getPageData();
-
-	$total = $renderedlist->getTotal();
-	
 	
 	$titles = array();
 	$formatters = array();
 	$repeatedcolumns = array();
 	$groupby = 0; //personid
-	
 
 	$titles[1] = "Unique ID";
 	$formatters[1] = "fmt_persontip";
@@ -236,11 +249,11 @@ function showRenderedListTableCM($renderedlist) {
 			$titles[$i++] = "@" . $field->name;
 	}
 	
-	showPageMenu($total,$pagestart,$renderedlist->pagelimit);
+	showPageMenu($total,$pagestart,$pagelimit);
 	echo '<table id="'.$tableid.'" width="100%" cellpadding="3" cellspacing="1" class="list">';
 	showTable($data, $titles, $formatters, $repeatedcolumns, $groupby);
 	echo "\n</table>";
-	showPageMenu($total,$pagestart,$renderedlist->pagelimit);
+	showPageMenu($total,$pagestart,$pagelimit);
 }
 
 
@@ -254,6 +267,7 @@ function fmt_activation_code($row, $index){
 	}
 	return $row[$index];
 }
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // Display
@@ -276,8 +290,6 @@ if ($csv) {
 			$titles[$i++] = $field->name;
 	}
 	
-	$data = $renderedlist->getPageData();
-	
 	header("Pragma: private");
 	header("Cache-Control: private");
 	header("Content-disposition: attachment; filename=report.csv");
@@ -289,28 +301,42 @@ if ($csv) {
 	echo '"' . implode('","', $titles) . '"';
 	echo "\r\n";
 
-	// write out the rows of data
-	foreach ($data as $row) {
-		// index=4 is code, index=5 is expirationdate
-		if ($row[4]) {
-			if (strtotime($row[5]) < strtotime("now")) {
-				$row[4] = "Expired";
+	$pagesize = 1000;
+	$renderedlist->pagelimit = $pagesize;
+
+	$pageoffset = 0;
+	$renderedlist->pageoffset = $pageoffset;
+	$data = $renderedlist->getPageData();
+	while (count($data) > 0) {
+		// write out the rows of data
+		foreach ($data as $row) {
+			// index=4 is code, index=5 is expirationdate
+			if ($row[4]) {
+				if (strtotime($row[5]) < strtotime("now")) {
+					$row[4] = "Expired";
+				}
 			}
-		}
-		if ($row[5]) {
-			$row[5] = date("m/d/Y", strtotime($row[5]));
+			if ($row[5]) {
+				$row[5] = date("m/d/Y", strtotime($row[5]));
+			}
+
+			$displaydata = array($row[1], $row[2], $row[3], $row[4], $row[5], $row[7]);
+		
+			$i = 8;
+			foreach ($optionalfields as $field) {
+				if (isset($_SESSION['report']['fields'][$field->fieldnum]) && $_SESSION['report']['fields'][$field->fieldnum])
+					$displaydata[] = $row[$i++];
+				else
+					$i++;
+			}
+		
+			echo '"' . implode('","', $displaydata) . '"';
+			echo "\r\n";
 		}
 
-		$displaydata = array($row[1], $row[2], $row[3], $row[4], $row[5], $row[7]);
-		
-		$i = 8;
-		foreach ($optionalfields as $field) {
-			if (isset($_SESSION['report']['fields'][$field->fieldnum]) && $_SESSION['report']['fields'][$field->fieldnum])
-				$displaydata[] = $row[$i++];
-		}
-		
-		echo '"' . implode('","', $displaydata) . '"';
-		echo "\r\n";
+		$pageoffset += $pagesize;
+		$renderedlist->pageoffset = $pageoffset;
+		$data = $renderedlist->getPageData();
 	}
 	
 } else {
@@ -341,11 +367,18 @@ if ($csv) {
 
 		function confirmGenerate () {
 		<?
-			if ($renderedlist->getTotal()) {
-				$str = addslashes(_L("Are you sure you want to generate activation codes for these people?"));
-				echo "
-					return confirm('$str');
-				";
+			if (count($data)) {
+				if ($hasactivecodes) {
+					$str = addslashes(_L("Some activation codes exist in this list.  Are you sure you want to overwrite them?"));
+					echo "
+						return confirm('$str');
+					";
+				} else {
+					$str = addslashes(_L("Are you sure you want to generate activation codes for these people?"));
+					echo "
+						return confirm('$str');
+					";
+				}
 			} else {
 				$str = addslashes(_L("There are no people in this list."));
 				echo "
@@ -355,16 +388,7 @@ if ($csv) {
 			}
 		?>
 		}
-
-		function confirmGenerateActive () {
-		<?
-			$str = addslashes(_L("Some activation codes exist in this list.  Are you sure you want to overwrite them?"));
-			echo "
-				return confirm('$str');
-			";
-		?>
-		}
-			
+		
 	</script>
 <?
 
@@ -377,7 +401,7 @@ if ($csv) {
 	startWindow("Search Results");
 
 	if ($hassomesearchcriteria)
-		showRenderedListTableCM($renderedlist);
+		showRenderedListTableCM($data, $total, $pagestart, $pagelimit, $validsortfields, $ordering);
 	else
 		echo "<h2>Select some search options to begin.</h2>";
 

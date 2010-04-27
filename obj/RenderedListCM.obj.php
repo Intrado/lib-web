@@ -7,6 +7,17 @@ class RenderedListCM extends RenderedList2 {
 		$this->owneruser = $USER; //default to global user unless we are set to use a list with a different user
 	}
 	
+	function loadPagePersonIds() {
+		$personsql = $this->getPersonSql(true);
+		if ($personsql != "") {
+			$this->pagepersonids = QuickQueryList($personsql);
+			$this->total = QuickQuery("select found_rows()");
+		} else {
+			$this->pagepersonids = array();
+			$this->total = 0;
+		}
+	}
+
 	/**
 	 * Generates a query to select personids matching criteria set up with one of the init functions.
 	 * Only minimal column data is returned: personid and any fields used in the orderby. (ie to use query as subquery/union/etc)
