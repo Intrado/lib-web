@@ -65,7 +65,8 @@ class ValFormListSelect extends Validator {
 			from list
 			where id in (". DBParamListString(count($value)) .")
 				and type != 'alert'
-				and userid = ?)",
+				and userid = ?
+				and not deleted)",
 			true, false, $args);
 		
 		// see if any of the value lists are not in the valid lists
