@@ -1464,9 +1464,14 @@ if (isset($_SESSION['inmessagegrouptabs']) && $_SESSION['inmessagegrouptabs']) {
 			};
 			var updateTranslationItem = function(form, languagecode, sourcetext, translatedtext) {
 				var formitemname = form.name + '_' + languagecode + '-translationitem';
+
+				translatedtext = translatedtext.replace(/<</g, "&lt;&lt;").replace(/>>/g, "&gt;&gt;");
 				$(formitemname+'text').value = translatedtext;
 				$(formitemname+"englishText").value = sourcetext;
-				$(formitemname+'textdiv').update(translatedtext.replace(/<</g, "&lt;&lt;").replace(/>>/g, "&gt;&gt;"));
+				// This is an ugly hack. Update is not working correctly for IE 8. 
+				// Clearing the insert div with a hidden link will make the translationtext insert correctly.
+				$(formitemname+'textdiv').update("<div style=\"height:0px;\"><a href=\"#\"></a></div>");
+				$(formitemname+'textdiv').insert(translatedtext);
 				setTranslationValue(formitemname);
 			};
 

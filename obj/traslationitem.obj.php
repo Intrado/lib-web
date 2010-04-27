@@ -253,7 +253,10 @@ class TranslationItem extends FormItem {
 									else
 										translatedtext = translatedtext.replace(/<</g, "&lt;&lt;").replace(/>>/g, "&gt;&gt;");
 										
-									$(dstbox).innerHTML = translatedtext;
+									// This is an ugly hack. Update is not working correctly for IE 8. 
+									// Clearing the insert div with a hidden link will make the translationtext insert correctly.
+									$(dstbox).update("<div style=\"height:0px;\"><a href=\"#\"></a></div>");
+									$(dstbox).insert(translatedtext);
 							}
 					});
 					return false;
@@ -290,9 +293,12 @@ class TranslationItem extends FormItem {
 								translatedtext = translatedtext.escapeHTML();
 							else
 								translatedtext = translatedtext.replace(/<</g, "&lt;&lt;").replace(/>>/g, "&gt;&gt;");
-							
-							$(section+"textdiv").innerHTML = translatedtext;
-							$(section+"text").value = data.responseData.translatedText;
+
+							// This is an ugly hack. Update is not working correctly for IE 8. 
+							// Clearing the insert div with a hidden link will make the translationtext insert correctly.  
+							$(section + "textdiv").update("<div style=\"height:0px;\"><a href=\"#\"></a></div>"); 
+							$(section+"textdiv").insert(translatedtext);
+							$(section+"text").value = translatedtext;
 							setTranslationValue(section);
 						}
 					});
