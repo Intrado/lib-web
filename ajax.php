@@ -215,10 +215,10 @@ function handleRequest() {
 
 				// The user may be restricted to specific values.
 				$limit = DBFind('Rule', 'from rule r inner join userassociation on r.id = userassociation.ruleid where userassociation.type = "rule" and userid=? and fieldnum=?', 'r', array($USER->id, $fieldnum));
-				$limitsql = $limit ? $limit->toSQL(false, 'value', false, true) : '';
-				
+	
 				// Get 'c' field values from the 'section' table, taking into account user section/organization restrictions.
 				if ($fieldnum[0] == 'c') {
+					$limitsql = $limit ? $limit->toSQL(false, false, false, true) : '';
 					// Make sure fieldnum is 'c01' through 'c10', to safeguard against SQL injection.
 					$number = substr($fieldnum, 1) + 0;
 					if ($number < 1 ||
@@ -229,32 +229,27 @@ function handleRequest() {
 					// If the user is unrestricted, get values from all sections.
 					// Otherwise, get the union of values from organization associations and section associations.
 					if (QuickQuery('select 1 from userassociation where userid = ? and type in ("organization", "section") limit 1', false, array($USER->id))) {
-						// Values from section associations.
-						$query = "select distinct $fieldnum as value
+						// Values from section and org associations.
+						$query = "(select distinct $fieldnum as value
 							from section
 								inner join userassociation on (userassociation.sectionid = section.id)
 							where userid=?
-								$limitsql
-							order by value";
-						$values = QuickQueryList($query, false, false, array($USER->id)
-						);
-						
-						// Values from organization associations.
-						$values += QuickQueryList("
-							select distinct $fieldnum as value
+								$limitsql)
+							union
+							(select distinct $fieldnum as value
 							from section
 								inner join userassociation on (userassociation.organizationid = section.organizationid)
 							where userid=?
-								$limitsql
-							order by value",
-							false, false, array($USER->id)
-						);
+								$limitsql)
+							order by value";
+						$values = QuickQueryList($query, false, false, array($USER->id, $USER->id));
 						
 						return $values;
 					} else { // Unrestricted.
 						return QuickQueryList("select distinct $fieldnum as value from section where 1 $limitsql order by value", false);
 					}
 				} else if ($fieldnum == FieldMap::getLanguageField()) {
+					$limitsql = $limit ? $limit->toSQL(false, 'value', false, true) : '';
 					$languagecodes = QuickQueryList("select value from persondatavalues where fieldnum=? $limitsql order by value", false, false, array($_GET['fieldnum']));
 					$languagenames = array();
 					foreach ($languagecodes as $code) {
@@ -262,6 +257,7 @@ function handleRequest() {
 					}
 					return $languagenames;
 				} else {
+					$limitsql = $limit ? $limit->toSQL(false, 'value', false, true) : '';
 					return QuickQueryList("select value from persondatavalues where fieldnum=? $limitsql order by value", false, false, array($_GET['fieldnum']));
 				}
 			// if it's an organization field
