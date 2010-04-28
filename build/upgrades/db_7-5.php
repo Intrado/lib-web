@@ -20,8 +20,9 @@
 //require_once("../obj/MessagePart.obj.php");
 //require_once("../obj/AudioFile.obj.php");
 require_once("../obj/FieldMap.obj.php");
-//require_once("../obj/Rule.obj.php");
+require_once("../obj/Rule.obj.php");
 //require_once("../obj/ListEntry.obj.php");
+require_once("../obj/ReportInstance.obj.php");
 
 //some old or transitional objects used here
 require_once("upgrades/db_7-5_oldcode.php");
@@ -330,7 +331,7 @@ function upgrade_7_5 ($rev, $shardid, $customerid, $db) {
 				
 				if (!QuickQuery("select count(*) from setting where name='_schoolfieldnum'")) {
 					//insert $schoolfieldnum into customer settings in case we need it in future revs
-					QuickUpdate("insert into setting (name, value) values ('_schoolfieldnum',$schoolfieldnum)");
+					QuickUpdate("insert into setting (name, value) values ('_schoolfieldnum','$schoolfieldnum')");
 				}
 	
 				//create orgs for each school field
@@ -378,6 +379,57 @@ function upgrade_7_5 ($rev, $shardid, $customerid, $db) {
 			// upgrade from rev 12 to rev 13
 			echo "|";
 			apply_sql("upgrades/db_7-5_pre.sql",$customerid,$db, 13);
+		case 13:
+			// upgrade from rev 13 to rev 14
+			echo "|";
+			// fix all the report instances which reference old school field
+			// get the old school field
+			$oldschool = QuickQuery("select value from setting where name = '_schoolfieldnum'");
+			if ($oldschool) {
+				// if there is an old school value set, get all the report instances and organizations
+				$reportinstances = DBFindMany("ReportInstance", "from reportinstance where 1");
+				$orgs = QuickQueryList("select lower(orgkey), id from organization", true);
+				
+				foreach ($reportinstances as $riid => $reportinstance) {
+					$parameters = $reportinstance->getParameters();
+					
+					// check the parameter rules for the old school field
+					foreach ($parameters['rules'] as $ruleid => $rule) {
+						if ($rule->fieldnum == $oldschool) {
+							$vals = explode("|", $rule->val);
+							// check and make sure we can match EVERY val to an org id
+							$orgids = array();
+							$nomatch = false;
+							foreach ($vals as $val) {
+								// do all orgkey comparisons in a non-case-sensitive manner
+								$checkval = mb_strtolower($val);
+								if (isset($orgs[$checkval]))
+									$orgids[] = $orgs[$checkval];
+								else
+									$nomatch = true;
+							}
+							// if there were any values that didn't match
+							if ($nomatch) {
+								echo "Error matching a rule on old schoolnum:$oldschool for reportinstance:$riid\n";
+								continue;
+							} else {
+								// remove the rule from the parameters
+								unset($parameters['rules'][$ruleid]);
+								// create and/or add to an organizationids parameter
+								if (!isset($parameters['organizationids']))
+									$parameters['organizationids'] = array();
+								foreach ($orgids as $orgid)
+									$parameters['organizationids'][] = $orgid;
+							}
+						}
+					}
+					// if the parameters contain organizationids then update the reportinstance
+					if (isset($parameters['organizationids'])) {
+						$reportinstance->setParameters($parameters);
+						$reportinstance->update();	
+					}
+				}
+			}
 
 	}
 	
