@@ -634,5 +634,8 @@ update rule r
 	where r.fieldnum='f03'
 $$$
 
+-- $rev 14
 
+GRANT SELECT ON `language` TO 'c__$CUSTOMERID__limited'@'%'
+$$$
 
