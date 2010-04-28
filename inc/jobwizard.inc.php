@@ -1905,6 +1905,7 @@ class JobWiz_submitConfirm extends WizStep {
 				array("ValRequired")
 			),
 			"control" => array("CheckBox"),
+			"transient" => true,
 			"helpstep" => 1
 		);
 
