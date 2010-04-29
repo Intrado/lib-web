@@ -413,18 +413,22 @@ $helpsteps[] = _L("Enter a name for your job. Using a descriptive name that indi
 			"control" => array("FormHtml","html" => $job->getOptionValue("maxcallattempts")),
 			"helpstep" => 6
 		);
-		$formdata["replyoption"] = array(
-			"label" => _L('Allow Reply'),
-			"fieldhelp" => _L("Select this option if recipients should be able to record replies. Make sure that the message instructs recipients to press '0' to record a response."),
-			"control" => array("FormHtml","html" => $job->isOption("leavemessage")?"<input type='checkbox' checked disabled/>":"<input type='checkbox' disabled/>"),
-			"helpstep" => 6
-		);
-		$formdata["confirmoption"] = array(
-			"label" => _L('Allow Confirmation'),
-			"fieldhelp" => _L("Select this option if you would like recipients to be able to respond to your message by pressing 1' for 'yes' or '2' for 'no'. You will need to instruct recipients to do this in your message."),
-			"control" => array("FormHtml","html" => $job->isOption("messageconfirmation")?"<input type='checkbox' checked disabled/>":"<input type='checkbox' disabled/>"),
-			"helpstep" => 6
-		);
+		if($USER->authorize('leavemessage')) {
+			$formdata["replyoption"] = array(
+				"label" => _L('Allow Reply'),
+				"fieldhelp" => _L("Select this option if recipients should be able to record replies. Make sure that the message instructs recipients to press '0' to record a response."),
+				"control" => array("FormHtml","html" => $job->isOption("leavemessage")?"<input type='checkbox' checked disabled/>":"<input type='checkbox' disabled/>"),
+				"helpstep" => 6
+			);
+		}
+		if($USER->authorize('messageconfirmation')) { 
+			$formdata["confirmoption"] = array(
+				"label" => _L('Allow Confirmation'),
+				"fieldhelp" => _L("Select this option if you would like recipients to be able to respond to your message by pressing 1' for 'yes' or '2' for 'no'. You will need to instruct recipients to do this in your message."),
+				"control" => array("FormHtml","html" => $job->isOption("messageconfirmation")?"<input type='checkbox' checked disabled/>":"<input type='checkbox' disabled/>"),
+				"helpstep" => 6
+			);
+		}
 	} else {
 		$formdata[] = _L('Job Lists');
 		$formdata["lists"] = array(
@@ -508,22 +512,26 @@ $helpsteps[] = _L("Enter a name for your job. Using a descriptive name that indi
 			"control" => array("SelectMenu", "values" => $attempts),
 			"helpstep" => 6
 		);
-		$formdata["replyoption"] = array(
-			"label" => _L('Allow Reply'),
-			"fieldhelp" => _L("Select this option if recipients should be able to record replies. Make sure that the message instructs recipients to press '0' to record a response."),
-			"value" => $job->isOption("leavemessage"),
-			"validators" => array(),
-			"control" => array("CheckBox"),
-			"helpstep" => 6
-		);
-		$formdata["confirmoption"] = array(
-			"label" => _L('Allow Confirmation'),
-			"fieldhelp" => _L("Select this option if you would like recipients to be able to respond to your message by pressing 1' for 'yes' or '2' for 'no'. You will need to instruct recipients to do this in your message."),
-			"value" => $job->isOption("messageconfirmation"),
-			"validators" => array(),
-			"control" => array("CheckBox"),
-			"helpstep" => 6
-		);
+		if($USER->authorize('leavemessage')) { 
+			$formdata["replyoption"] = array(
+				"label" => _L('Allow Reply'),
+				"fieldhelp" => _L("Select this option if recipients should be able to record replies. Make sure that the message instructs recipients to press '0' to record a response."),
+				"value" => $job->isOption("leavemessage"),
+				"validators" => array(),
+				"control" => array("CheckBox"),
+				"helpstep" => 6
+			);
+		}
+		if($USER->authorize('messageconfirmation')) { 
+			$formdata["confirmoption"] = array(
+				"label" => _L('Allow Confirmation'),
+				"fieldhelp" => _L("Select this option if you would like recipients to be able to respond to your message by pressing 1' for 'yes' or '2' for 'no'. You will need to instruct recipients to do this in your message."),
+				"value" => $job->isOption("messageconfirmation"),
+				"validators" => array(),
+				"control" => array("CheckBox"),
+				"helpstep" => 6
+			);
+		}
 	}
 
 
