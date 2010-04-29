@@ -55,7 +55,17 @@ function confirmContinue()
 
 function loadListsDB()
 {
-	return DBFindMany("PeopleList",", (name +0) as foo from list where userid=".$_SESSION['userid']." and deleted=0 order by foo,name");
+	$query = ", (name +0) as foo
+		from list l
+			inner join user u on
+				(l.userid = u.id)
+			left join publish p on
+				(p.listid = l.id and p.userid = ? and p.action = 'subscribe')
+		where l.type in ('person','section')
+			and (l.userid = ? or p.userid = ?)
+			and not l.deleted
+		 order by foo,name";
+	return DBFindMany("PeopleList", $query, "l", array($_SESSION['userid'], $_SESSION['userid'], $_SESSION['userid']));
 }
 
 function loadLists($incr)
