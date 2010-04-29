@@ -79,13 +79,13 @@ if ($datatype == "person") {
 	$maptofields = array();
 	$maptofields[""] = "- Unmapped -";
 	$maptofields["key"] = "Unique ID";
-	$maptofields["okey"] = getSystemSetting("organizationfieldname","Organization");
 	//F fields
 	foreach ($fieldmaps as $fieldmap)
 		$maptofields[$fieldmap->fieldnum] = $fieldmap->name;
 
 	$maptofields["sep"] = "--------------";
 	//G fields
+	$maptofields["okey"] = getSystemSetting("organizationfieldname","Organization");
 	foreach ($gfieldmaps as $fieldmap)
 		$maptofields[$fieldmap->fieldnum] = $fieldmap->name;
 	if (count($gfieldmaps) > 0) $maptofields["sep2"] = "--------------";
@@ -128,7 +128,6 @@ if ($datatype == "person") {
 	$maptofields["u9"] = "Caller ID";
 	$maptofields["u11"] = "Access Profile";
 	$maptofields["u12"] = "Restricted Job Types";
-	$maptofields["okey"] = getSystemSetting("organizationfieldname","Organization");
 	$maptofields["u10"] = "Staff ID";
 	$maptofields["sep"] = "--------------";
 
@@ -143,6 +142,7 @@ if ($datatype == "person") {
 	//G fields
 	$gfieldmaps = DBFindMany("FieldMap","from fieldmap where fieldnum like 'g%' order by fieldnum");
 	if (count($gfieldmaps) > 0) $maptofields["sep2"] = "--------------";
+	$maptofields["okey"] = getSystemSetting("organizationfieldname","Organization");
 	foreach ($gfieldmaps as $fieldmap)
 		$maptofields[$fieldmap->fieldnum] = "Rule - " . $fieldmap->name;
 
