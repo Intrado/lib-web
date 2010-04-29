@@ -519,9 +519,9 @@ class ValTimeCheck extends Validator {
 		if ($value == -1 || $value === false)
 			return _L('%s is not a valid time format',$this->label);
 		if ($hasmin && $value < $min)
-			return _L('%1$s cannot be earlier than %1$s', $this->label, $args['min']);
+			return _L('%1$s cannot be earlier than %2$s', $this->label, $args['min']);
 		if ($hasmax && $value > $max)
-			return _L('%1$s cannot be later than %1$s', $this->label, $args['min']);
+			return _L('%1$s cannot be later than %2$s', $this->label, $args['min']);
 
 		return true;
 	}
