@@ -124,7 +124,7 @@ class SMAPI{
 				$result["resultdescription"] = "Invalid user";
 				return $result;
 			}
-			$queryresult = Query("select id, name, description from list where userid = " . $USER->id . " and not deleted order by name");
+			$queryresult = Query("select id, name, description from list where userid = " . $USER->id . " and not deleted and type != 'alert' order by name");
 			$lists = array();
 			while($row = DBGetRow($queryresult)){
 				$list = new API_List();
@@ -238,8 +238,14 @@ class SMAPI{
 				return $result;
 			}
 
-			$message = new Message($messageid);
-			if ($message->id && $message->userid != $USER->id || $message->deleted ) {
+			$message = DBFind("Message", "from message m inner join messagegroup mg on (m.messagegroupid = mg.id)
+					where
+						mg.userid = ? and
+						mg.type = 'notification' and
+						not mg.deleted
+					order by
+						m.name","m",array($USER->id));
+			if ($message && $message->userid != $USER->id || $message->deleted ) {
 				$result["resultdescription"] = "Unauthorized access";
 				return $result;
 			}
@@ -572,7 +578,7 @@ class SMAPI{
 			}
 
 			$queryresult = Query("select id, name, description, messagegroupid
-									from job where status = 'repeating' and userid = ? order by finishdate asc", false, array($USER->id));
+									from job where status = 'repeating' and type != 'alert' and userid = ? order by finishdate asc", false, array($USER->id));
 			
 			$hassms = getSystemSetting('_hassms');
 			$multilingual = $USER->authorize('sendmulti');
