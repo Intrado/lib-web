@@ -91,7 +91,7 @@ class ValPassword extends Validator {
 	var $onlyserverside = true;
 	function passwordcheck($password){
 		$tally = 0;
-		if(ereg("^0*$", $password)){
+		if($password == 'nopasswordchange'){
 			return true;
 		}
 		if(ereg("[0-9]", $password))

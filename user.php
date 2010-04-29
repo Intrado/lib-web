@@ -306,7 +306,7 @@ if($IS_LDAP){
 	// TODO how to determine if password is required or not, based on ldap checkbox
 }
 
-$pass = (!$makeNewUser) ? '00000000' : '';
+$pass = (!$makeNewUser) ? 'nopasswordchange' : '';
 $passlength = getSystemSetting("passwordlength", 5);
 $formdata["password"] = array(
 	"label" => _L("Password"),
@@ -801,8 +801,8 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		}
 
 		if((!$edituser->ldap && $IS_LDAP) || !$IS_LDAP){
-			// If the password is all 0 characters then it was a default form value, so ignore it
-			if (!ereg("^0*$", $postdata['password']))
+			// If the password is "nopasswordchange" then it was a default form value, so ignore it
+			if ($postdata['password'] !== "nopasswordchange")
 				$edituser->setPassword($postdata['password']);
 		}
 

@@ -113,7 +113,7 @@ if ($ldapuser || $readonly) {
 }
 
 if (!$ldapuser) {
-	$pass = $USER->id ? '00000000' : '';
+	$pass = $USER->id ? 'nopasswordchange' : '';
 	$passlength = getSystemSetting("passwordlength", 5);
 	if ($readonly) {
 		$formdata["password"] = array(
@@ -452,7 +452,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		// If the password is all 0 characters then it was a default form value, so ignore it
 		if(!$USER->ldap) {
 			$newpassword = $postdata['password'];
-			if (!ereg("^0*$", $newpassword))
+			if ($newpassword !== "nopasswordchange")
 				$USER->setPassword($newpassword);
 		}
 
