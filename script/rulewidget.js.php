@@ -817,6 +817,7 @@ var RuleEditor = Class.create({
 
 		var g = [];
 		var c = [];
+		var org = '';
 		for (var fieldnum in this.ruleWidget.fieldmaps) {
 			// Don't allow adding the same rule twice.
 			if (this.ruleWidget.appliedRules[fieldnum])
@@ -826,13 +827,20 @@ var RuleEditor = Class.create({
 
 			if (fieldnum.charAt(0) == 'f')
 				fieldSelectbox.insert(option);
-			else if (fieldnum.charAt(0) == 'g' || fieldnum == 'organization')
+			else if (fieldnum == 'organization')
+				org = option;
+			else if (fieldnum.charAt(0) == 'g')
 				g.push(option);
 			else if (fieldnum.charAt(0) == 'c')
 				c.push(option);
 		}
-		if (g.length > 0) {
+		if (org !== '') {
 			if (fieldSelectbox.down('option',1)) // Add separator only if necessary
+				fieldSelectbox.insert(new Element('option', {'value':'', 'disabled':true}).update('-----------'));
+			fieldSelectbox.insert(org);
+		}
+		if (g.length > 0) {
+			if (org == '') // Add separator only if no organization field
 				fieldSelectbox.insert(new Element('option', {'value':'', 'disabled':true}).update('-----------'));
 			g.each(function(option) {
 				fieldSelectbox.insert(option);
