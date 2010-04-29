@@ -205,19 +205,19 @@ function upgrade_7_5 ($rev, $shardid, $customerid, $db) {
 				
 				//create orgs for each school field
 				if ($schoolfieldnum[0] == "g")
-					$query = "select distinct value from groupdata where fieldnum=$num";
+					$query = "select distinct trim(value) from groupdata where fieldnum=$num";
 				else
-					$query = "select distinct $schoolfieldnum from person";
+					$query = "select distinct trim($schoolfieldnum) from person";
 				QuickUpdate("insert ignore into organization (orgkey) $query");
 
 				//create person associations
 				if ($schoolfieldnum[0] == "g") {
 					$query = "insert into personassociation (personid,type,organizationid)
-					select g.personid,'organization',o.id from groupdata g inner join organization o on (o.orgkey=g.value and g.fieldnum=$num)
+					select g.personid,'organization',o.id from groupdata g inner join organization o on (o.orgkey=trim(g.value) and g.fieldnum=$num)
 					group by g.personid, o.id";
 				} else {
 					$query = "insert into personassociation (personid,type,organizationid)
-					select p.id,'organization',o.id from person p inner join organization o on (o.orgkey=p.$schoolfieldnum)
+					select p.id,'organization',o.id from person p inner join organization o on (o.orgkey=trim(p.$schoolfieldnum))
 					group by p.id, o.id";
 				}
 				QuickUpdate($query);
@@ -230,7 +230,7 @@ function upgrade_7_5 ($rev, $shardid, $customerid, $db) {
 				}
 				QuickUpdate($query);
 				
-				QuickUpdate("update fieldmap set fieldnum='o01' where fieldnum='$schoolfieldnum'"); //TODO delete this fieldmap instead?
+				QuickUpdate("update fieldmap set fieldnum='o01' where fieldnum='$schoolfieldnum'");
 				
 				
 				//create orgs for rules, in case rules are set up for nonexisting schools
@@ -240,23 +240,26 @@ function upgrade_7_5 ($rev, $shardid, $customerid, $db) {
 				$orgs = array();
 				foreach ($rulevals as $ruleval) {
 					foreach (explode("|",$ruleval) as $org) {
+						$org = trim($org);
 						$orgs[$org] = true;
 					}
 				}
 				if (count($orgs) > 0) {
-					//add to list of orgs
+					//add to list of orgs, NOTE if duplicate upper/lower orgkeys "insert ignore" will simply insert the first one
+					// need to handle case-sensitive orgkey rules for users and lists
 					$query = "insert ignore into organization (orgkey) values " . repeatWithSeparator("(?)",",",count($orgs));
 					QuickUpdate($query,$db, array_keys($orgs));				
 				}
 				
 				//load all org ids
-				$orgs = QuickQueryList("select orgkey,id from organization",true);
+				$orgs = QuickQueryList("select lower(orgkey),id from organization",true);
 
 				//create userassociations
 				$query = "select ua.userid,r.val from userassociation ua inner join rule r on (r.id=ua.ruleid) where r.fieldnum='$schoolfieldnum'";
 				$userorgs = array();
 				foreach (QuickQueryList($query,true) as $userid => $ruleval) {
 					foreach (explode("|",$ruleval) as $org) {
+						$org = trim(strtolower($org));
 						$userorgs[] = "($userid,'organization'," . $orgs[$org] . ")"; 
 					}
 				}
@@ -273,6 +276,7 @@ function upgrade_7_5 ($rev, $shardid, $customerid, $db) {
 				$listorgs = array();
 				foreach (QuickQueryList($query,true) as $listid => $ruleval) {
 					foreach (explode("|",$ruleval) as $org) {
+						$org = trim(strtolower($org));
 						$listorgs[] = "($listid,'organization'," . $orgs[$org] . ")"; 
 					}
 				}
@@ -331,7 +335,7 @@ function upgrade_7_5 ($rev, $shardid, $customerid, $db) {
 				
 				if (!QuickQuery("select count(*) from setting where name='_schoolfieldnum'")) {
 					//insert $schoolfieldnum into customer settings in case we need it in future revs
-					QuickUpdate("insert into setting (name, value) values ('_schoolfieldnum','$schoolfieldnum')");
+					QuickUpdate("insert into setting (name, value) values ('_schoolfieldnum',?)", false, array($schoolfieldnum));
 				}
 	
 				//create orgs for each school field
