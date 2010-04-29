@@ -161,10 +161,9 @@ class UserSectionFormItem extends FormItem {
 				// populate the choose div with data from an ajax call
 				cachedAjaxGet("ajax.php?type=getsections&organizationid=" + selectelement.value, function(result, itemid) {
 					var sections = result.responseJSON;
+					var insertedelements = false;
 					targetelement.update();
-					if (sections == false) {
-						targetelement.update("'. addslashes(_L("No sections available")). '");
-					} else {
+					if (sections !== false) {
 						for (id in sections) {
 							chkid = itemid + id.toString();
 							chkname = itemid + "[]";
@@ -179,11 +178,15 @@ class UserSectionFormItem extends FormItem {
 								).insert(
 									new Element("br")
 								);
+								insertedelements = true;
 							}
 						}
-						// make the add button visible
-						addbutton.show();
 					}
+					// if we didnt insert anything then put some text in
+					if (!insertedelements)
+						targetelement.update("'. addslashes(_L("No sections available")). '");
+					else // make the add button visible
+						addbutton.show();
 				}, formitemid, true);
 			}
 			
