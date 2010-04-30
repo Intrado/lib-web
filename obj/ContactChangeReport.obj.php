@@ -193,15 +193,6 @@ class ContactChangeReport extends ReportGenerator {
 			}
 		}
 
-		//index 8 should be the editlock flag;
-		function fmt_editlocked_destination($row, $index){
-			$output = fmt_destination($row, $index);
-			if($row[8] == 1){
-				$output = "<img src='img/padlock.gif'>&nbsp;" . $output;
-			}
-			return $output;
-		}
-		
 		// index 9 should be the editlockdate
 		function fmt_editlock_date($row, $index) {
 			return $row[9];
@@ -224,7 +215,7 @@ class ContactChangeReport extends ReportGenerator {
 		// index 8 editlock
 		// so set the title of starting f-field at appropriate place
 		// append begins after index specified
-		$titles = appendFieldTitles($titles, 10, $fieldlist, $activefields);
+		$titles = appendFieldTitles($titles, 9, $fieldlist, $activefields);
 
 		$formatters = array("0" => "fmt_idmagnify",
 							"5" => "fmt_destination_sequence",
