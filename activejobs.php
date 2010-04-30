@@ -78,7 +78,7 @@ while ($row = DBGetRow($result)) {
 function fmt_job_type ($row,$index) {
 	global $jobtypes;
 
-	return $jobtypes[$row[24]]->name . " " . ucfirst($row[21]);
+	return escapehtml($jobtypes[$row[24]]->name . " " . ucfirst($row[21]));
 }
 
 

@@ -133,7 +133,7 @@ function fmt_rate ($obj, $name) {
 
 function fmt_jobmode ($obj,$name) {
 	global $jobtypes;
-	return $jobtypes[$obj->jobtypeid]->name . " " . ucfirst($obj->type);
+	return escapehtml($jobtypes[$obj->jobtypeid]->name . " " . ucfirst($obj->type));
 }
 
 $titles = array ("Owner" => "Submitted by",
