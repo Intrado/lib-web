@@ -819,7 +819,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 			QuickUpdate("delete from userassociation where userid = ? and importid is null and type = 'section' and sectionid != 0", false, array($edituser->id));
 			// re add new user associations
 			$sectionids = (isset($postdata['sectionids'])?$postdata['sectionids']:array());
-			foreach ($postdata['sectionids'] as $sectionid)
+			foreach ($sectionids as $sectionid)
 				QuickUpdate("insert into userassociation (userid, type, sectionid) values (?, 'section', ?)", false, array($edituser->id, $sectionid));
 			
 		}
