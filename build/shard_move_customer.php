@@ -257,7 +257,7 @@ foreach ($customerids as $customerid) {
 
 	//remove this customer's shard data from old shard
 	echo "deleting old shard records:";
-	$tablearray = array("importqueue", "qjobperson", "qjobtask", "specialtaskqueue", "qreportsubscription", "qschedule", "qjob");
+	$tablearray = array("importqueue", "qjobperson", "qjobtask", "specialtaskqueue", "qreportsubscription", "qschedule", "qjob", "messagelink");
 	foreach ($tablearray as $t) {
 		echo ".";
 		$query = "delete from ".$t." where customerid=$customerid";
@@ -274,12 +274,12 @@ foreach ($customerids as $customerid) {
 	//drop old limited customer user
 	$query = "drop user c_".$customerid."_limited";
 	if (QuickUpdate($query,$srcsharddb) === false)
-		dieerror("Problem dropping old limited customer user:" . errorinfo($srcsharddb) . "\n");
+		dieerror("Problem dropping old limited customer user:" . errorinfo($srcsharddb) . "\ncustomerid: $customerid\n");
 	//drop old customer db
 	echo "Dropping old database\n";
 	$query = "drop database c_$customerid";
 	if (QuickUpdate($query,$srcsharddb) === false)
-		dieerror("Problem updating customer table:" . errorinfo($srcsharddb) . "\ncustomerid: $customerid\n");
+		dieerror("Problem dropping old customer db:" . errorinfo($srcsharddb) . "\ncustomerid: $customerid\n");
 
 	// Made it! Customer moved successfully!
 	$successful[] = $customerid;
