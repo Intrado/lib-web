@@ -422,11 +422,11 @@ class JobDetailReport extends ReportGenerator{
 			foreach($fieldlist as $fieldnum => $fieldname){
 				if(isset($activefields[$fieldnum])){
 					if (strpos($fieldnum, "g") === 0) {
-						$num = 18 + substr($fieldnum, 1); // gfields come after the 20 ffields (firstname/lastname excluded, 18 more ffields)
+						$num = 17 + substr($fieldnum, 1); // gfields come after the 20 ffields (firstname/lastname excluded, 18 more ffields)
 					} else {
 						$num = $fieldindex[$fieldnum]; // ffield
 					}
-					$reportarray[] = $row[18+$num]; // 18 is last index, $num starts at 1 for f03
+					$reportarray[] = $row[17+$num]; // 18 is last index, $num starts at 1 for f03
 				}
 			}
 			if ($issurvey) {
