@@ -678,16 +678,17 @@ class JobWiz_start extends WizStep {
 			$packageDetails["express"][2] = "";
 			$packageDetails["personalized"][2] = "";
 		}
+		$canstarteasy = $USER->authorize("starteasy");
 
 		// All delivery types allowed
 		if ($deliverytypes['sendphone'] && $deliverytypes['sendemail'] && $deliverytypes['sendsms']) {
-			$packageDetails["easycall"]["enabled"] = true;
+			$packageDetails["easycall"]["enabled"] = $canstarteasy;
 			$packageDetails["express"]["enabled"] = true;
-			$packageDetails["personalized"]["enabled"] = true;
+			$packageDetails["personalized"]["enabled"] = $canstarteasy;
 		// Only phone
 		} elseif ($deliverytypes['sendphone'] && !$deliverytypes['sendemail'] && !$deliverytypes['sendsms']) {
 			$packageDetails["easycall"][2] = "";
-			$packageDetails["easycall"]["enabled"] = true;
+			$packageDetails["easycall"]["enabled"] = $canstarteasy;
 		// Only email
 		} elseif ($deliverytypes['sendemail'] && !$deliverytypes['sendphone'] && !$deliverytypes['sendsms']) {
 			$packageDetails["express"][0] = _L('Type Email message');
@@ -699,19 +700,19 @@ class JobWiz_start extends WizStep {
 		// Phone and Email
 		} elseif ($deliverytypes['sendphone'] && $deliverytypes['sendemail'] && !$deliverytypes['sendsms']) {
 			$packageDetails["easycall"][2] = _L('Auto Email Alerts');
-			$packageDetails["easycall"]["enabled"] = true;
+			$packageDetails["easycall"]["enabled"] = $canstarteasy;
 			$packageDetails["express"]["enabled"] = true;
 			$packageDetails["personalized"][1] = _L('Type Email Message');
-			$packageDetails["personalized"]["enabled"] = true;
+			$packageDetails["personalized"]["enabled"] = $canstarteasy;
 		// Phone and SMS
 		} elseif ($deliverytypes['sendphone'] && !$deliverytypes['sendemail'] && $deliverytypes['sendsms']) {
 			$packageDetails["easycall"][2] = _L('Auto SMS Text Alerts');
-			$packageDetails["easycall"]["enabled"] = true;
+			$packageDetails["easycall"]["enabled"] = $canstarteasy;
 			$packageDetails["express"][2] = "";
 			$packageDetails["express"]["enabled"] = true;
 			$packageDetails["personalized"][1] = _L('Type SMS Text');
 			$packageDetails["personalized"][2] = "";
-			$packageDetails["personalized"]["enabled"] = true;
+			$packageDetails["personalized"]["enabled"] = $canstarteasy;
 		// Email and SMS
 		} elseif (!$deliverytypes['sendphone'] && $deliverytypes['sendemail'] && $deliverytypes['sendsms']) {
 			$packageDetails["express"][0] = _L('Type Email and SMS Text');
