@@ -119,7 +119,7 @@ foreach ($customerids as $customerid) {
 	$query = "select * from messagelink where customerid=?";
 	if ($res = Query($query, $srcsharddb, array($customerid))) {
 		while ($row = $res->fetch(PDO::FETCH_ASSOC)) {
-			$query = "insert ignore into messagelink (`customerid`,`jobid`,`personid`,`createtime`,`code`) values (".$row['customerid'].",".$row['jobid'].",".$row['personid'].",".$row['createtime'].",".$row['code'].");\n";
+			$query = "insert ignore into messagelink (`customerid`,`jobid`,`personid`,`createtime`,`code`) values (".$row['customerid'].",".$row['jobid'].",".$row['personid'].",'".$row['createtime']."','".$row['code']."');\n";
 			if (!fwrite($fp, $query))
 				dieerror("Failed to write to transfer file : $query\n");
 		}
@@ -251,7 +251,7 @@ foreach ($customerids as $customerid) {
 
 	//update authserver to point to new customer info
 	//update shardid and password
-	$query = "update customer set dbusername='" . DBSafe($newdbname,$authdb) . "', limitedusername='" . DBSafe($limitedusername, $authdb) . "', shardid=$destshard, dbpassword='" . DBSafe($newpass,$authdb) . "' where id=$customerid";
+	$query = "update customer set dbusername='" . DBSafe($newdbname,$authdb) . "', limitedusername='" . DBSafe($limitedusername, $authdb) . "', limitedpassword='". DBSafe($limitedpassword, $authdb) . "', shardid=$destshard, dbpassword='" . DBSafe($newpass,$authdb) . "' where id=$customerid";
 	if (QuickUpdate($query,$authdb) === false)
 		dieerror("Problem updating customer table:" . errorinfo($authdb) . "\ncustomerid: $customerid\n");
 
