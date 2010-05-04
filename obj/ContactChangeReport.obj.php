@@ -153,7 +153,8 @@ class ContactChangeReport extends ReportGenerator {
 
 
 		// personrow index 4 is address
-		// personrow index 5 is the start of f-fields
+		// personrow index 5 is organization
+		// personrow index 6 is the start of f-fields
 		// personrow insert all destinations before f-fields
 		// array_splice inserts data after 2nd argument's array index
 		// destination index 1 is phone/email/sms

@@ -166,7 +166,7 @@ class CallsReport extends ReportGenerator{
 						"6" => "Date/Time",
 						"7" => "Result",
 						"9" => getSystemSetting("organizationfieldname","Organization"));
-		$titles = appendFieldTitles($titles, 9, $fieldlist, $activefields);
+		$titles = appendFieldTitles($titles, 8, $fieldlist, $activefields);
 
 		$formatters = array("3" => "fmt_delivery_type_list",
 							"5" => "fmt_destination",

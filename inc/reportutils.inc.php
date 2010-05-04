@@ -264,7 +264,7 @@ function appendFieldTitles($titles, $startindex, $fieldlist, $activefields){
 
 	foreach($fieldlist as $fieldnum => $fieldname){
 		if (strpos($fieldnum, "g") === 0) {
-			$num = 18 + substr($fieldnum, 1); // gfields come after the 20 ffields (firstname, lastname, 18 more ffields)
+			$num = 19 + substr($fieldnum, 1); // gfields come after the 20 ffields (firstname, lastname, 18 more ffields)
 		} else {
 			$num = $fieldindex[$fieldnum]; // ffield
 		}

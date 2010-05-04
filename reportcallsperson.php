@@ -165,7 +165,7 @@ startWindow("Display Options", "padding: 3px;", "true");
 		<tr valign="top"><th align="right" class="windowRowHeader bottomBorder">Display Fields:</th>
 			<td class="bottomBorder">
 <?
-				select_metadata('searchresultstable', 7, $fields);
+				select_metadata('searchresults', 7, $fields);
 ?>
 			</td>
 		</tr>
