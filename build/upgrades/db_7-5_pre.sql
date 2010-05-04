@@ -634,8 +634,30 @@ update rule r
 	where r.fieldnum='f03'
 $$$
 
--- $rev 14
 
+-- remove old c field rules
+delete ua,r from userassociation ua join rule r on (r.id = ua.ruleid) where ua.type='rule' and r.fieldnum like 'c%'
+$$$
+
+-- add section zero for staff users
+insert into userassociation (userid,type,sectionid) select id,'section',0 from user where staffpkey is not null and staffpkey != ''
+$$$
+
+-- update MG defauly language in case where there's only a single nonenglish message
+update messagegroup mg 
+inner join message m2 on (m2.messagegroupid=mg.id) 
+set mg.defaultlanguagecode=m2.languagecode
+where not exists (select * from message m where m.messagegroupid=mg.id and m.languagecode ='en') 
+$$$
+
+-- fix email editor bug
+update message set data = concat(data, '&overrideplaintext=1') where type='email' and subtype='plain'
+$$$
+
+-- missing permission
 GRANT SELECT ON `language` TO 'c__$CUSTOMERID__limited'@'%'
 $$$
+
+
+
 
