@@ -172,7 +172,11 @@ function DBGetRow ($result, $assoc = false) {
 }
 
 function DBConnect($host, $user, $pass, $database) {
-	$dsn = 'mysql:dbname='.$database.';host='.$host;
+	if (strpos($host,":") !== false) {
+		list($host,$port) = explode(":",$host);
+		$dsn = 'mysql:dbname='.$database.';host='.$host.';port='.$port;
+	} else
+		$dsn = 'mysql:dbname='.$database.';host='.$host;
 	try {
 		$custdb = new PDO($dsn, $user, $pass);
 		$custdb->setAttribute(PDO::ATTR_EMULATE_PREPARES, true);
@@ -180,7 +184,7 @@ function DBConnect($host, $user, $pass, $database) {
 		$custdb->query($setcharset);
 		return $custdb;
 	} catch (PDOException $e) {
-		error_log("Problem connecting to MySQL database: " . $database . " error:" . $e->getMessage());
+		error_log("Problem connecting to MySQL database: " . $database . " args: ($host, $user, xxxxx, $database) error:" . $e->getMessage());
 		return false;
 	}
 }
