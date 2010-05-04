@@ -107,6 +107,8 @@ class ValPassword extends Validator {
 		return false;
 	}
 	function validate ($value, $args, $requiredvalues) {
+		if ($value == 'nopasswordchange')
+			return true;
 		if ($detail = validateNewPassword(
 				isset($requiredvalues['login'])? $requiredvalues['login']: $args['login'], 
 				$value, 
