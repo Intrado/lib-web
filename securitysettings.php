@@ -45,6 +45,10 @@ class Vallogindisableattempts extends Validator {
 $formdata = array();
 $helpstepnum = 1;
 
+if (getSystemSetting('_hasldap', '0')) {
+	$formdata[] = _L("Standard Authentication");
+}
+
 $helpsteps = array(_L("Select the minimum number of characters a username must contain."));
 $formdata["usernamelength"] = array(
 	"label" => _L("Minimum Username Length"),
@@ -126,9 +130,11 @@ if (getSystemSetting('_hascallback', '0') && !getSystemSetting('_hasselfsignup',
 }
 
 if (getSystemSetting('_hasldap', '0')) {
+	$formdata[] = _L("LDAP Authentication");
+
 	$helpsteps[$helpstepnum++] = array(_L("Enter the hostname or IP address of your LDAP server."));
 	$formdata["ldaphost"] = array(
-		"label" => _L("LDAP Host"),
+		"label" => _L("Host"),
 		"fieldhelp" => _L("LDAP Server hostname"),
 		"value" => getSystemSetting('ldaphost', ''),
 		"validators" => array(
@@ -141,7 +147,7 @@ if (getSystemSetting('_hasldap', '0')) {
 
 	$helpsteps[$helpstepnum++] = array(_L("Enter the port number that your LDAP server listens on."));
 	$formdata["ldapport"] = array(
-		"label" => _L("LDAP Port"),
+		"label" => _L("Port"),
 		"fieldhelp" => _L("LDAP Server port, default is 389"),
 		"value" => getSystemSetting('ldapport', '389'),
 		"validators" => array(
@@ -152,36 +158,10 @@ if (getSystemSetting('_hasldap', '0')) {
 		"control" => array("TextField","maxlength" => 50),
 		"helpstep" => $helpstepnum
 	);
-	
-	$helpsteps[$helpstepnum++] = array(_L("Enter a binding username for lookups to your LDAP server."));
-	$formdata["ldapuser"] = array(
-		"label" => _L("LDAP Username"),
-		"fieldhelp" => _L("LDAP binding username"),
-		"value" => getSystemSetting('ldapuser', ''),
-		"validators" => array(
-			array("ValRequired"),
-			array("ValLength","min" => 1,"max" => 50)
-		),
-		"control" => array("TextField","maxlength" => 50),
-		"helpstep" => $helpstepnum
-	);
-
-	$helpsteps[$helpstepnum++] = array(_L("Enter the password for the binding user to your LDAP server."));
-	$formdata["ldappass"] = array(
-		"label" => _L("LDAP Password"),
-		"fieldhelp" => _L("LDAP binding user's password"),
-		"value" => getSystemSetting('ldappass', ''),
-		"validators" => array(
-			array("ValRequired"),
-			array("ValLength","min" => 1,"max" => 50)
-		),
-		"control" => array("PasswordField","maxlength" => 50),
-		"helpstep" => $helpstepnum
-	);
 
 	$helpsteps[$helpstepnum++] = array(_L("Enter the domain used by your LDAP server."));
 	$formdata["ldapdomain"] = array(
-		"label" => _L("LDAP Domain"),
+		"label" => _L("Domain"),
 		"fieldhelp" => _L("LDAP domain"),
 		"value" => getSystemSetting('ldapdomain', ''),
 		"validators" => array(
@@ -190,6 +170,41 @@ if (getSystemSetting('_hasldap', '0')) {
 			array("ValLength","min" => 1,"max" => 50)
 		),
 		"control" => array("TextField","maxlength" => 50),
+		"helpstep" => $helpstepnum
+	);
+
+	$helpsteps[$helpstepnum++] = array(_L("Enter a binding username for lookups to your LDAP server.  This is used to verify an account is enabled (not disabled), during phone login."));
+	$formdata["ldapuser"] = array(
+		"label" => _L("Username"),
+		"fieldhelp" => _L("LDAP binding username.  Used only for phone login."),
+		"value" => getSystemSetting('ldapuser', ''),
+		"validators" => array(
+			array("ValLength","min" => 1,"max" => 50)
+		),
+		"control" => array("TextField","maxlength" => 50),
+		"helpstep" => $helpstepnum
+	);
+
+	$pass = (getSystemSetting('ldappass', '') == '') ? '' : 'nopasswordchange';
+	$helpsteps[$helpstepnum++] = array(_L("Enter the password for the binding user to your LDAP server.  This is used to verify an account is enabled (not disabled), during phone login."));
+	$formdata["ldappass"] = array(
+		"label" => _L("Password"),
+		"fieldhelp" => _L("LDAP binding user's password.  Used only for phone login."),
+		"value" => $pass,
+		"validators" => array(
+			array("ValLength","min" => 1,"max" => 50)
+		),
+		"control" => array("PasswordField","maxlength" => 50),
+		"helpstep" => $helpstepnum
+	);
+
+	$helpsteps[$helpstepnum++] = array(_L("Select if you require SSL between your SwiftSync and LDAP server.  This requires installation of SSL Certificates on your SwiftSync host."));
+	$formdata["ldapsecure"] = array(
+		"label" => _L("Require SSL"),
+		"fieldhelp" => _L("LDAP server requires SSL connection"),
+		"value" => getSystemSetting('ldapsecure', '0'),
+		"validators" => array(),
+		"control" => array("CheckBox"),
 		"helpstep" => $helpstepnum
 	);
 
@@ -232,8 +247,10 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 			setSystemSetting('ldaphost', $postdata['ldaphost']);
 			setSystemSetting('ldapport', $postdata['ldapport']);
 			setSystemSetting('ldapuser', $postdata['ldapuser']);
-			setSystemSetting('ldappass', $postdata['ldappass']);
 			setSystemSetting('ldapdomain', $postdata['ldapdomain']);
+			setSystemSetting('ldapsecure', $postdata['ldapsecure'] ? "1" : "0");
+			if ($postdata['ldappass'] !== "nopasswordchange")
+				setSystemSetting('ldappass', $postdata['ldappass']);
 		}
 		
 		if ($ajax)
