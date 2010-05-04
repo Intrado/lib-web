@@ -286,6 +286,11 @@ function upgrade_7_5 ($rev, $shardid, $customerid, $db) {
 				}
 				//delete old rule listentries
 				QuickUpdate("delete r, le from rule r inner join listentry le on (le.ruleid=r.id and r.fieldnum='$schoolfieldnum')");
+
+				// update static school subscriber field values
+				$query = "update persondatavalues pdv inner join organization oz on (oz.orgkey like pdv.value) set pdv.fieldnum='oid', pdv.value=oz.id where pdv.editlock=1 and pdv.fieldnum=?";
+				QuickUpdate($query, false, array($schoolfieldnum));
+				
 			} //end if schoolfieldnum
 			
 			
