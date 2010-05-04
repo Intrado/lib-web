@@ -92,25 +92,33 @@ if($REQUEST_TYPE == "new" ||
 
 		// do not allow empty code/pin
 		if ($code != "" && $pin != "") {
-		// find user and authenticate them against database
-		$query = "from user where enabled=1 and deleted=0 and accesscode='".$code."' and (pincode=password('".$pin."') or pincode=old_password('".$pin."'))";
-		$user = DBFind("User", $query);
-		if ($user) {
-			$access = new Access($user->accessid);
+			// find user and authenticate them against database
+			$query = "from user where enabled=1 and deleted=0 and accesscode='".$code."' and (pincode=password('".$pin."') or pincode=old_password('".$pin."'))";
+			$user = DBFind("User", $query);
+			if ($user) {
+				$access = new Access($user->accessid);
 
-			// check their permissions
-			if ($access->getPermission("loginphone") &&
-				$access->getPermission("sendphone")) {
+				// check their permissions
+				if ($access->getPermission("loginphone") &&
+					$access->getPermission("sendphone")) {
 
-				// successful login, save the userid and move on
-				$_SESSION['userid'] = $user->id;
-				forwardToPage("inboundmessage.php");
-				$success = true;
-			}
-		}
-		}
+					// now check if LDAP customer/user
+					if (getSystemSetting("_hasldap") && $user->ldap) {
+						if (doLoginPhoneUserEnabled($code, $pin, $inboundNumber)) {
+							$success = true;
+						}
+					} else {
+						$success = true;
+					}
+				} // access
+			} // user
+		} // code pin
 	}
-	if (!$success) {
+	if ($success) {
+		// successful login, save the userid and move on
+		$_SESSION['userid'] = $user->id;
+		forwardToPage("inboundmessage.php");
+	} else {
 		// count authorization attempts, kick them out after 3
 		if (isset($_SESSION['authcount'])) {
 			$_SESSION['authcount']++; // increment

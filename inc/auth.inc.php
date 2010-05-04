@@ -79,6 +79,17 @@ function doLoginPhone($loginname, $password, $inboundnumber = null, $url = null)
 	return false;
 }
 
+function doLoginPhoneUserEnabled($loginname, $password, $inboundnumber = null, $url = null) {
+	$params = array(new XML_RPC_Value($loginname, 'string'), new XML_RPC_Value($password, 'string'), new XML_RPC_Value($inboundnumber, 'string'), new XML_RPC_Value($url, 'string'));
+	$method = "AuthServer.loginPhone";
+	$result = pearxmlrpc($method, $params);
+	if ($result !== false) {
+		// login success
+		return $result['userID'];
+	}
+	return false;
+}
+
 function forceLogin($loginname, $url = null) {
 	$params = array(new XML_RPC_Value($loginname, 'string'), new XML_RPC_Value($url, 'string'), new XML_RPC_Value(session_id(), 'string'));
 	$method = "AuthServer.forceLogin";
