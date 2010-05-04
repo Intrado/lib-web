@@ -13,16 +13,16 @@
  * would also be nice to start solving the upgrade version problem.
  * auto detect what version schema, perhaps from setting, and upgrade from there
  * would also help in dev since there are lots of small changes in between major versions
+ * 
+ * put required external objects in the db_7-5_oldcode.php file. DO NOT INCLUDE files from kona
+ * 
  */
 
 //require_once("../obj/MessageGroup.obj.php");
 //require_once("../obj/Message.obj.php");
 //require_once("../obj/MessagePart.obj.php");
 //require_once("../obj/AudioFile.obj.php");
-require_once("../obj/FieldMap.obj.php");
-require_once("../obj/Rule.obj.php");
 //require_once("../obj/ListEntry.obj.php");
-require_once("../obj/ReportInstance.obj.php");
 
 //some old or transitional objects used here
 require_once("upgrades/db_7-5_oldcode.php");
@@ -386,12 +386,14 @@ function upgrade_7_5 ($rev, $shardid, $customerid, $db) {
 		case 13:
 			// upgrade from rev 13 to rev 14
 			echo "|";
+			apply_sql("upgrades/db_7-5_pre.sql",$customerid,$db, 11);
+			
 			// fix all the report instances which reference old school field
 			// get the old school field
 			$oldschool = QuickQuery("select value from setting where name = '_schoolfieldnum'");
 			if ($oldschool) {
 				// if there is an old school value set, get all the report instances and organizations
-				$reportinstances = DBFindMany("ReportInstance", "from reportinstance where 1");
+				$reportinstances = DBFindMany("ReportInstance_7_5_r14", "from reportinstance where 1");
 				$orgs = QuickQueryList("select lower(orgkey), id from organization", true);
 				
 				foreach ($reportinstances as $riid => $reportinstance) {
