@@ -238,14 +238,8 @@ class SMAPI{
 				return $result;
 			}
 
-			$message = DBFind("Message", "from message m inner join messagegroup mg on (m.messagegroupid = mg.id)
-					where
-						mg.userid = ? and
-						mg.type = 'notification' and
-						not mg.deleted
-					order by
-						m.name","m",array($USER->id));
-			if ($message && $message->userid != $USER->id || $message->deleted ) {
+			$message = new Message($messageid);
+			if ($message->id && $message->userid != $USER->id || $message->deleted ) {
 				$result["resultdescription"] = "Unauthorized access";
 				return $result;
 			}
