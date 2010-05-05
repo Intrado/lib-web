@@ -803,11 +803,9 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 					QuickUpdate("insert into userjobtypes values (?, ?)", false, array($edituser->id, $type));
 		}
 
-		if((!$edituser->ldap && $IS_LDAP) || !$IS_LDAP){
-			// If the password is "nopasswordchange" then it was a default form value, so ignore it
-			if ($postdata['password'] !== "nopasswordchange")
-				$edituser->setPassword($postdata['password']);
-		}
+		// If the password is "nopasswordchange" then it was a default form value, so ignore it
+		if ($postdata['password'] !== "nopasswordchange")
+			$edituser->setPassword($postdata['password']);
 
 		// If the pincode is all 0 characters then it was a default form value, so ignore it
 		if (!ereg("^0*$", $postdata['pin']))
