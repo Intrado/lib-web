@@ -521,7 +521,7 @@ class ValTimeCheck extends Validator {
 		if ($hasmin && $value < $min)
 			return _L('%1$s cannot be earlier than %2$s', $this->label, $args['min']);
 		if ($hasmax && $value > $max)
-			return _L('%1$s cannot be later than %2$s', $this->label, $args['min']);
+			return _L('%1$s cannot be later than %2$s', $this->label, $args['max']);
 
 		return true;
 	}
