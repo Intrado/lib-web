@@ -23,7 +23,7 @@ $roles = array(
 	"smsblock" => "Manage SMS blocked numbers",
 	"activejobs" => "View active jobs",
 	"editdm" => "Edit SmartCall Appliances",
-	"diskagent" => "Manage DISK Agents",
+	"diskagent" => "Manage SwiftSync Agents",
 	
 	"ffield2gfield" => "ADVANCED - F field to G field migration",
 	"billablecalls" => "ADVANCED - Billable call information",
