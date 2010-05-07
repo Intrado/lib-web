@@ -30,7 +30,22 @@ $_dbcon = DBConnect($custinfo[0], $custinfo[1], $custinfo[2], "c_" . $_SESSION['
 if (!$_dbcon) {
 	exit("Connection failed for customer: $custinfo[0], db: c_" .  $_SESSION['previewmessage_customerid']);
 }
-$messageid = QuickQuery("select phonemessageid from job j where id = '" . $_SESSION['previewmessage_jobid'] . "'");
+$messages = QuickQueryList("select m.id, m.autotranslate, m.* from job j inner join messagegroup mg on (j.messagegroupid = mg.id)
+							inner join message m on (mg.id = m.messagegroupid and mg.defaultlanguagecode = m.languagecode) where j.id =? and m.type = 'phone'", true, false, array($_SESSION['previewmessage_jobid'] ));
+$messageid = false;
+if ($messages) {
+	$mode = false;
+	// Select the right message out of the possible messages in the messagegroup
+	// overridden ---> translated ---> none
+	foreach ($messages as $id => $autotranslate) {
+		if ($autotranslate == "overridden" || 
+			($autotranslate == "translated" && $mode != "overridden") ||
+			($autotranslate == "none" && !$mode)) {
+				$mode = $autotranslate;
+				$messageid = $id;
+		}
+	}
+}
 
 //find all unique fields used in this message
 $messagefields = array();
