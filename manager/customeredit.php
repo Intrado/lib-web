@@ -297,16 +297,16 @@ if(CheckFormSubmit($f,"Save") || CheckFormSubmit($f, "Return")) {
 				QuickUpdate("update persondatavalues set editlock=0 where fieldnum='f03'", $custdb);
 				if ($hasselfsignup) {
 					// English
-					if (QuickQuery("select count(*) from persondatavalues where fieldnum='f03' and value='English'", $custdb)) {
-						QuickUpdate("update persondatavalues set editlock=1 where fieldnum='f03' and value='English'", $custdb);
+					if (QuickQuery("select count(*) from persondatavalues where fieldnum='f03' and value='en'", $custdb)) {
+						QuickUpdate("update persondatavalues set editlock=1 where fieldnum='f03' and value='en'", $custdb);
 					} else {
-						QuickUpdate("insert into persondatavalues (fieldnum, value, refcount, editlock) values ('f03','English',0,1)", $custdb);
+						QuickUpdate("insert into persondatavalues (fieldnum, value, refcount, editlock) values ('f03','en',0,1)", $custdb);
 					}
 					// Spanish
-					if (QuickQuery("select count(*) from persondatavalues where fieldnum='f03' and value='Spanish'", $custdb)) {
-						QuickUpdate("update persondatavalues set editlock=1 where fieldnum='f03' and value='Spanish'", $custdb);
+					if (QuickQuery("select count(*) from persondatavalues where fieldnum='f03' and value='es'", $custdb)) {
+						QuickUpdate("update persondatavalues set editlock=1 where fieldnum='f03' and value='es'", $custdb);
 					} else {
-						QuickUpdate("insert into persondatavalues (fieldnum, value, refcount, editlock) values ('f03','Spanish',0,1)", $custdb);
+						QuickUpdate("insert into persondatavalues (fieldnum, value, refcount, editlock) values ('f03','es',0,1)", $custdb);
 					}
 				}
 
