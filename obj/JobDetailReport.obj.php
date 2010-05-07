@@ -80,6 +80,13 @@ class JobDetailReport extends ReportGenerator{
 					$resultqueryarray[] = " rp.status='declined' ";
 					unset($resultarray["declined"]);
 				}
+				if (isset($resultarray["X"])) {
+					$resultqueryarray[] = " (rc.result = 'X' and if (rc.result = 'X' and rc.numattempts < 3, 'F', rc.result)) ";
+					unset($resultarray["X"]);
+				}
+				if (isset($resultarray["F"])) {
+					$resultqueryarray[] = " (rc.result = 'X' and rc.numattempts < 3) ";
+				}
 				
 				//combine the rest, assuming they are rc.result codes
 				if(count($resultarray)){
