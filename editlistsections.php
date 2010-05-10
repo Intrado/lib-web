@@ -32,7 +32,7 @@ require_once("obj/SectionWidget.fi.php");
 require_once("inc/rulesutils.inc.php");
 require_once("inc/formatters.inc.php");
 require_once("obj/JobType.obj.php");
-require_once("list.inc.php");
+require_once("inc/list.inc.php");
 
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization

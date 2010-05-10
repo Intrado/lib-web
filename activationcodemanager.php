@@ -28,7 +28,7 @@ require_once("obj/SectionWidget.fi.php");
 require_once("obj/ValSections.val.php");
 require_once("obj/ValRules.val.php");
 require_once("inc/reportutils.inc.php");
-require_once("list.inc.php");
+require_once("inc/list.inc.php");
 
 include_once("obj/Address.obj.php");
 include_once("obj/Language.obj.php");
@@ -43,7 +43,6 @@ require_once("obj/UserSetting.obj.php");
 
 require_once("obj/RenderedList.obj.php");
 require_once("obj/RenderedListCM.obj.php");
-require_once("list.inc.php");
 
 
 ////////////////////////////////////////////////////////////////////////////////

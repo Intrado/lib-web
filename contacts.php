@@ -38,7 +38,7 @@ require_once("obj/FieldMap.obj.php");
 require_once("obj/UserSetting.obj.php");
 //require_once("obj/ContactsReport.obj.php");
 require_once("obj/RenderedList.obj.php");
-require_once("list.inc.php");
+require_once("inc/list.inc.php");
 
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization
