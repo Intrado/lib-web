@@ -11,13 +11,12 @@ $cansendrepeatingjob = ($JOBTYPE == "repeating" && $USER->authorize('createrepea
 if ($JOBTYPE != "normal" && !$cansendrepeatingjob)
 	redirect('unauthorized.php');
 
-
 ////////////////////////////////////////////////////////////////////////////////
 // Action/Request Processing
 ////////////////////////////////////////////////////////////////////////////////
 $job = null;
 if (isset($_GET['id'])) {
-	if($_GET['id'] !== "new" && !userOwns("job",$_GET['id']))
+	if ($_GET['id'] !== "new" && !userOwns("job",$_GET['id']))
 		redirect('unauthorized.php');
 	setCurrentJob($_GET['id']);
 	redirect();
@@ -27,16 +26,18 @@ if (isset($_GET['origin'])) {
 	$_SESSION['origin'] = trim($_GET['origin']);
 }
 
+// Flag indicating that a job is complete or cancelled so only allow editing of name and description.
+$completedmode = false; 
 
-$completedmode = false; // Flag indicating that a job is complete or cancelled so only allow editing of name and description.
-$submittedmode = false; // Flag indicating that a job has been submitted, allowing editing of date/time, name/desc, and a few selected options.
+// Flag indicating that a job has been submitted, allowing editing of date/time, name/desc, and a few selected options.
+$submittedmode = false; 
 
 $jobid = $_SESSION['jobid'];
 if ($_SESSION['jobid'] == NULL) {
 	$job = Job::jobWithDefaults();
 } else {
 	$job = new Job($_SESSION['jobid']);
-	if($job->type != "notification")
+	if ($job->type != "notification")
 		redirect('unauthorized.php');
 	$completedmode = in_array($job->status, array('complete','cancelled','cancelling'));
 	$submittedmode = ($completedmode || in_array($job->status,array('active','procactive','processing','scheduled')));
@@ -83,41 +84,47 @@ class ValFormListSelect extends Validator {
 			true, false, $args);
 		
 		// see if any of the value lists are not in the valid lists
-		foreach ($value as $id)
+		foreach ($value as $id) {
 			if (!isset($validlists[$id]))
 				return _L("%s has invalid list selections", $this->label);
-		
+		}
 		return true;
 	}
 }
+
 
 class ValTranslationExpirationDate extends Validator {
 	var $onlyserverside = true;
 	function validate ($value, $args,$requiredvalues) {
 		global $USER;	
 		global $submittedmode;
-		if($submittedmode) {
+		if ($submittedmode) {
 			global $job;
-			$hastranslated = QuickQuery("select 1 from message where messagegroupid = ? and autotranslate = 'translated' limit 1", false, array($job->messagegroupid));
+			$query = "select 1 from message where messagegroupid = ? and autotranslate = 'translated' limit 1";
+			$hastranslated = QuickQuery($query, false, array($job->messagegroupid));
 		} else {
-			if($requiredvalues['message'] == "")
+			if ($requiredvalues['message'] == "")
 				return true;
-			$hastranslated = QuickQuery("select 1 from message where messagegroupid = ? and autotranslate = 'translated' limit 1", false, array($requiredvalues['message']));
+			$query = "select 1 from message where messagegroupid = ? and autotranslate = 'translated' limit 1";
+			$hastranslated = QuickQuery($query, false, array($requiredvalues['message']));
 		}
 
-		if($hastranslated != false) {
-			if(strtotime($value) > strtotime("today") + (7*86400))
-				return _L("Can not schedule the job with a message containing auto-translated content older than 7 days from the Start Date");
+		if ($hastranslated != false) {
+			if (strtotime($value) > strtotime("today") + (7*86400))
+				return _L("Can not schedule the job with a message containing
+							 auto-translated content older than 7 days from the Start Date");
 		}
 		return true;
 	}
 }
 
+// ValIsTranslated is used to prevent a repeating job to contain a translated message
 class ValIsTranslated extends Validator {
 	var $onlyserverside = true;
 	function validate ($value) {
-		$istranslated = QuickQuery("select 1 from message where messagegroupid = ? and autotranslate = 'translated' limit 1", false, array($value));
-		if($istranslated > 0) {
+		$query = "select 1 from message where messagegroupid = ? and autotranslate = 'translated' limit 1";
+		$istranslated = QuickQuery($query, false, array($value));
+		if ($istranslated > 0) {
 			return _L("Can not select a message that is auto-translated with a repeating job");
 		}
 		return true;
@@ -138,7 +145,6 @@ foreach ($userjobtypes as $id => $jobtype) {
 }
 
 // Prepare List data
-
 $selectedlists = array();
 if (isset($job->id)) {
 	$selectedlists = QuickQueryList("select listid from joblist where jobid=?", false,false,array($job->id));
@@ -149,53 +155,38 @@ $dayoffset = (strtotime("now") > (strtotime(($ACCESS->getValue("calllate")?$ACCE
 $startvalues = newform_time_select(NULL, $ACCESS->getValue('callearly'), $ACCESS->getValue('calllate'), $USER->getCallEarly());
 $endvalues = newform_time_select(NULL, $ACCESS->getValue('callearly'), $ACCESS->getValue('calllate'), $USER->getCallLate());
 
+
 // get the user's owned and subscribed messages
-$messages = QuickQueryList(
-	"(select mg.id,
-		mg.name as name,
-		(mg.name +0) as digitsfirst
-	from messagegroup mg
-	where mg.userid=?
-		and mg.type = 'notification'
-		and not mg.deleted)
-	UNION
-	(select mg.id,
-		mg.name as name,
-		(mg.name +0) as digitsfirst
-	from publish p
-	inner join messagegroup mg on
-		(p.messagegroupid = mg.id)
-	where p.userid=?
-		and p.action = 'subscribe'
-		and p.type = 'messagegroup'
-		and not mg.deleted)
-	order by digitsfirst, name",
-	true,false,array($USER->id, $USER->id));
-
-if($messages === false) {
-	$messages = array("" =>_L("-- Select a Message --"));
-} else {
-	$messages = array("" =>_L("-- Select a Message --")) + $messages;
+$messages = array("" =>_L("-- Select a Message --"));
+$query = "(select mg.id,mg.name as name,(mg.name +0) as digitsfirst	from messagegroup mg 
+			where mg.userid=? and mg.type = 'notification' and not mg.deleted)
+		UNION
+			(select mg.id,mg.name as name,(mg.name +0) as digitsfirst from publish p
+			inner join messagegroup mg on (p.messagegroupid = mg.id)
+			where p.userid=? and p.action = 'subscribe'	and p.type = 'messagegroup'	and not mg.deleted)
+			order by digitsfirst, name";
+if ($selectmessages = QuickQueryList($query,true,false,array($USER->id, $USER->id))) {
+	foreach ($selectmessages as $id => $name) {
+		$messages[$id] = $name;
+	} 
 }
 
-if($job->messagegroupid != null) {
-	$deletedmessage = QuickQueryRow("select id, name from messagegroup where id = ? and deleted = 1", false, false,array($job->messagegroupid));
-	if($deletedmessage != false)
-		$messages += array($deletedmessage[0] => $deletedmessage[1]);
+// Add the selected message to the list if it happens to be deleted 
+if ($job->messagegroupid != null) {
+	$query = "select id, name from messagegroup where id = ? and deleted = 1";
+	if ($deletedmessage = QuickQueryRow($query, false, false,array($job->messagegroupid))) {
+		$messages[$deletedmessage[0]] = $deletedmessage[1];
+	}
 }
-
-
-$cansendphone = $USER->authorize('sendphone');
-$cansendemail = $USER->authorize('sendemail');
-$cansendsms = getSystemSetting('_hassms', false) && $USER->authorize('sendsms');
-$cansendmultilingual = $USER->authorize('sendmulti');
 
 $helpsteps = array();
 $formdata = array();
 
 $formdata[] = _L('Job Settings');
 
-$helpsteps[] = _L("Enter a name for your job. Using a descriptive name that indicates the message content will make it easier to find the job later. You may also optionally enter a description of the the job.");
+$helpsteps[] = _L("Enter a name for your job. " .
+					"Using a descriptive name that indicates the message content will make it easier to find the job later. " .
+					"You may also optionally enter a description of the the job.");
 	$formdata["name"] = array(
 		"label" => _L('Job Name'),
 		"fieldhelp" => _L('Enter a name for your job.'),
@@ -220,8 +211,9 @@ $helpsteps[] = _L("Enter a name for your job. Using a descriptive name that indi
 	);
 
 
-	if($submittedmode || $completedmode) {
-		$helpsteps[] = _L("Select the option that best describes the type of notification you are sending. The category you select will determine which introduction your recipients will hear.");
+	if ($submittedmode || $completedmode) {
+		$helpsteps[] = _L("Select the option that best describes the type of notification you are sending. 
+							The category you select will determine which introduction your recipients will hear.");
 		$formdata["jobtype"] = array(
 			"label" => _L("Type/Category"),
 			"fieldhelp" => _L("The option that best describes the type of notification you are sending."),
@@ -229,10 +221,12 @@ $helpsteps[] = _L("Enter a name for your job. Using a descriptive name that indi
 			"helpstep" => 2
 		);
 	} else {
-		$helpsteps[] = _L("Select the option that best describes the type of notification you are sending. The category you select will determine which introduction your recipients will hear.");
+		$helpsteps[] = _L("Select the option that best describes the type of notification you are sending.
+							 The category you select will determine which introduction your recipients will hear.");
 		$formdata["jobtype"] = array(
 			"label" => _L("Type/Category"),
-			"fieldhelp" => _L("Select the option that best describes the type of notification you are sending. The category you select will determine which introduction your recipients will hear."),
+			"fieldhelp" => _L("Select the option that best describes the type of notification you are sending. 
+								The category you select will determine which introduction your recipients will hear."),
 			"value" => isset($job->jobtypeid)?$job->jobtypeid:"",
 			"validators" => array(
 				array("ValRequired"),
@@ -252,7 +246,7 @@ $helpsteps[] = _L("Enter a name for your job. Using a descriptive name that indi
 		} else {
 			$data = explode(",", $schedule->daysofweek);
 			for ($x = 1; $x < 8; $x++){
-				if(in_array($x,$data))
+				if (in_array($x,$data))
 					$scheduledows[$x-1] = true;
 			}
 		}
@@ -262,7 +256,15 @@ $helpsteps[] = _L("Enter a name for your job. Using a descriptive name that indi
 		}
 		$repeatvalues[7] = date("g:i a", strtotime($schedule->time));
 
-		$helpsteps[] = _L("The options in this section create a delivery window for your job. It's important that you leave enough time for the system to contact everyone in your list. The options are: <ul><li>Start Date - This is the day the job will start running. <li>Days to Run - The number of days the job should run within the times you select.<li>Start Time and End Time - These represent the time the job should start and stop.</ul>");  // Guide for the whole scheduling section
+		$helpsteps[] = _L("The options in this section create a delivery window for your job.
+							It's important that you leave enough time for the system to contact everyone in your list. 
+							The options are: 
+								<ul>
+									<li>Start Date - This is the day the job will start running. 
+									<li>Days to Run - The number of days the job should run within the times you select.
+									<li>Start Time and End Time - These represent the time the job should start and stop.
+								</ul>");
+		$timevalues = newform_time_select(NULL, $ACCESS->getValue('callearly'), $ACCESS->getValue('calllate'), $USER->getCallLate());
 		$formdata["repeat"] = array(
 			"label" => _L("Repeat"),
 			"fieldhelp" => _L("Select which days this job should run."),
@@ -271,13 +273,16 @@ $helpsteps[] = _L("Enter a name for your job. Using a descriptive name that indi
 				array("ValRequired"),
 				array("ValWeekRepeatItem")
 			),
-			"control" => array("WeekRepeatItem","timevalues" => newform_time_select(NULL, $ACCESS->getValue('callearly'), $ACCESS->getValue('calllate'), $USER->getCallLate())),
+			"control" => array(
+				"WeekRepeatItem",
+				"timevalues" => $timevalues
+				),
 			"helpstep" => 3
 		);
 	} else {
-		if($completedmode) {
-
-			$helpsteps[] = _L("The Delivery Window designates the earliest call time and the latest call time allowed for notification delivery.");  // Guide for the whole scheduling section
+		$helpsteps[] = _L("The Delivery Window designates the earliest call time 
+								and the latest call time allowed for notification delivery.");
+		if ($completedmode) {
 			$formdata["date"] = array(
 				"label" => _L("Start Date"),
 				"fieldhelp" => _L("Notification will begin on the selected date."),
@@ -285,7 +290,6 @@ $helpsteps[] = _L("Enter a name for your job. Using a descriptive name that indi
 				"helpstep" => 3
 			);
 		} else {
-			$helpsteps[] = _L("The Delivery Window designates the earliest call time and the latest call time allowed for notification delivery.");  // Guide for the whole scheduling section
 			$formdata["date"] = array(
 				"label" => _L("Start Date"),
 				"fieldhelp" => _L("Notification will begin on the selected date."),
@@ -298,11 +302,11 @@ $helpsteps[] = _L("Enter a name for your job. Using a descriptive name that indi
 				"control" => array("TextDate", "size"=>12, "nodatesbefore" => $dayoffset),
 				"helpstep" => 3
 			);
-			if(!$submittedmode)
+			if (!$submittedmode)
 				$formdata["date"]["requires"] = array("message");
 		}
 	}
-	if($completedmode) {
+	if ($completedmode) {
 		$formdata["days"] = array(
 			"label" => _L("Days to Run"),
 			"fieldhelp" => _L("Select the number of days this job should run."),
@@ -365,28 +369,46 @@ $helpsteps[] = _L("Enter a name for your job. Using a descriptive name that indi
 			"helpstep" => 3
 		);
 
-		if($JOBTYPE != "repeating") {// is only required for non repeating jobs
+		if ($JOBTYPE != "repeating") {// is only required for non repeating jobs
 			$formdata["calllate"]["requires"][] = "date";
 		}
 	}
 
-	$helpsteps[] = _L("Select an existing list to use. If you do not see the list you need, you can make one by clicking the Lists subtab above. <br><br>You may also opt to skip duplicates. Skip Duplicates is for calling each number once, so if, for example, two recipients have the same number, they will only be called once.");
-	$helpsteps[] = _L("Select an existing message to use. If you do not see the message you need, you can make a new message by clicking the Messages subtab above.");
-	$helpsteps[] = _L("<ul><li>Auto Report - Selecting this option causes the system to email a report to the email address associated with your account when the job is finished.<li>Max Attempts - This option lets you select the maximum number of times the system should try to contact a recipient.<li>Allow Reply - Check this if you want recipients to be able to record responses.<br><br><b>Note:</b>You will need to include instructions to press '0' to record a response in your message.<br><br><li>Allow Confirmation - Select this option if you would like recipients to give a 'yes' or 'no' response to your message.<br><br><b>Note:</b>You will need to include instructions to press '1' for 'yes' and '2' for 'no' in your message.</ul>");
+	$helpsteps[] = _L("Select an existing list to use. If you do not see the list you need,
+						 you can make one by clicking the Lists subtab above. <br><br>
+						 You may also opt to skip duplicates. Skip Duplicates is for calling 
+						 each number once, so if, for example, two recipients have the same 
+						 number, they will only be called once.");
+	$helpsteps[] = _L("Select an existing message to use. If you do not see the message
+						 you need, you can make a new message by clicking the Messages subtab above.");
+	$helpsteps[] = _L("<ul><li>Auto Report - Selecting this option causes the system to email
+						 a report to the email address associated with your account when the job 
+						 is finished.<li>Max Attempts - This option lets you select the maximum
+						 number of times the system should try to contact a recipient.
+						 <li>Allow Reply - Check this if you want recipients to be able to
+						 record responses.<br><br><b>Note:</b>You will need to include instructions
+						 to press '0' to record a response in your message.<br><br>
+						 <li>Allow Confirmation - Select this option if you would like recipients
+						 to give a 'yes' or 'no' response to your message.<br><br>
+						 <b>Note:</b>You will need to include instructions 
+						 to press '1' for 'yes' and '2' for 'no' in your message.</ul>");
 
-	if($submittedmode || $completedmode) {
+	if ($submittedmode || $completedmode) {
 		$formdata[] = _L('Job Lists');
-
+		$query = "select name from list where id in (" . repeatWithSeparator("?", ",", count($selectedlists)) . ")";
+		$listhtml = implode("<br/>",QuickQueryList($query,false,false,$selectedlists));
 		$formdata["lists"] = array(
 			"label" => _L('Lists'),
 			"fieldhelp" => _L('Select a list from your existing lists.'),
-			"control" => array("FormHtml","html" => implode("<br/>",QuickQueryList("select name from list where id in (" . repeatWithSeparator("?", ",", count($selectedlists)) . ")", false,false,$selectedlists))),
+			"control" => array("FormHtml","html" => $listhtml),
 			"helpstep" => 4
 		);
 		$formdata["skipduplicates"] = array(
 			"label" => _L('Skip Duplicates'),
 			"fieldhelp" => _L('Skip Duplicates if you would like to only contact recipients who share contact information once.'),
-			"control" => array("FormHtml","html" => ($job->isOption("skipduplicates"))?"<input type='checkbox' checked disabled/>":"<input type='checkbox' disabled/>"),
+			"control" => array(
+				"FormHtml",
+				"html" => "<input type='checkbox' " . ($job->isOption("skipduplicates")?"checked":"") . " disabled />"),
 			"helpstep" => 4
 		);
 		$formdata[] = _L('Job Message');
@@ -403,7 +425,9 @@ $helpsteps[] = _L("Enter a name for your job. Using a descriptive name that indi
 		$formdata["report"] = array(
 			"label" => _L('Auto Report'),
 			"fieldhelp" => _L("Select this option if you would like the system to email you when the job has finished running."),
-			"control" => array("FormHtml","html" => $job->isOption("sendreport")?"<input type='checkbox' checked disabled/>":"<input type='checkbox' disabled/>"),
+			"control" => array(
+				"FormHtml",
+				"html" => "<input type='checkbox' " . ($job->isOption("sendreport")?"checked":"") . " disabled />"),
 			"helpstep" => 6
 		);
 
@@ -426,19 +450,26 @@ $helpsteps[] = _L("Enter a name for your job. Using a descriptive name that indi
 			"control" => array("FormHtml","html" => $job->getOptionValue("maxcallattempts")),
 			"helpstep" => 6
 		);
-		if($USER->authorize('leavemessage')) {
+		if ($USER->authorize('leavemessage')) {
 			$formdata["replyoption"] = array(
 				"label" => _L('Allow Reply'),
-				"fieldhelp" => _L("Select this option if recipients should be able to record replies. Make sure that the message instructs recipients to press '0' to record a response."),
-				"control" => array("FormHtml","html" => $job->isOption("leavemessage")?"<input type='checkbox' checked disabled/>":"<input type='checkbox' disabled/>"),
+				"fieldhelp" => _L("Select this option if recipients should be able to record replies. 
+									Make sure that the message instructs recipients to press '0' to record a response."),
+				"control" => array(
+					"FormHtml",
+					"html" => "<input type='checkbox' " . ($job->isOption("leavemessage")?"checked":"") . " disabled />"),
 				"helpstep" => 6
 			);
 		}
-		if($USER->authorize('messageconfirmation')) { 
+		if ($USER->authorize('messageconfirmation')) { 
 			$formdata["confirmoption"] = array(
 				"label" => _L('Allow Confirmation'),
-				"fieldhelp" => _L("Select this option if you would like recipients to be able to respond to your message by pressing 1' for 'yes' or '2' for 'no'. You will need to instruct recipients to do this in your message."),
-				"control" => array("FormHtml","html" => $job->isOption("messageconfirmation")?"<input type='checkbox' checked disabled/>":"<input type='checkbox' disabled/>"),
+				"fieldhelp" => _L("Select this option if you would like recipients to be able to respond to your message 
+									by pressing 1' for 'yes' or '2' for 'no'. 
+									You will need to instruct recipients to do this in your message."),
+				"control" => array(
+					"FormHtml",
+					"html" => "<input type='checkbox' " . ($job->isOption("messageconfirmation")?"checked":"") . " disabled />"),
 				"helpstep" => 6
 			);
 		}
@@ -508,7 +539,7 @@ $helpsteps[] = _L("Enter a name for your job. Using a descriptive name that indi
 				"helpstep" => 6
 			);
 		}
-
+		
 		// Prepare attempt data
 		$maxattempts = first($ACCESS->getValue('callmax'), 1);
 		$attempts = array_combine(range(1,$maxattempts),range(1,$maxattempts));
@@ -525,20 +556,23 @@ $helpsteps[] = _L("Enter a name for your job. Using a descriptive name that indi
 			"control" => array("SelectMenu", "values" => $attempts),
 			"helpstep" => 6
 		);
-		if($USER->authorize('leavemessage')) { 
+		if ($USER->authorize('leavemessage')) { 
 			$formdata["replyoption"] = array(
 				"label" => _L('Allow Reply'),
-				"fieldhelp" => _L("Select this option if recipients should be able to record replies. Make sure that the message instructs recipients to press '0' to record a response."),
+				"fieldhelp" => _L("Select this option if recipients should be able to record replies. 
+									Make sure that the message instructs recipients to press '0' to record a response."),
 				"value" => $job->isOption("leavemessage"),
 				"validators" => array(),
 				"control" => array("CheckBox"),
 				"helpstep" => 6
 			);
 		}
-		if($USER->authorize('messageconfirmation')) { 
+		if ($USER->authorize('messageconfirmation')) { 
 			$formdata["confirmoption"] = array(
 				"label" => _L('Allow Confirmation'),
-				"fieldhelp" => _L("Select this option if you would like recipients to be able to respond to your message by pressing 1' for 'yes' or '2' for 'no'. You will need to instruct recipients to do this in your message."),
+				"fieldhelp" => _L("Select this option if you would like recipients to be able to respond to your message 
+									by pressing 1' for 'yes' or '2' for 'no'. You will need to instruct recipients to do
+								    this in your message."),
 				"value" => $job->isOption("messageconfirmation"),
 				"validators" => array(),
 				"control" => array("CheckBox"),
@@ -584,7 +618,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		$job->modifydate = date("Y-m-d H:i:s", time());
 		$job->type = 'notification';
 		
-		if($completedmode) {
+		if ($completedmode) {
 			$job->update();
 		} else {
 			if ($JOBTYPE == "repeating") {
@@ -598,7 +632,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 
 				$dow = array();
 				for ($x = 0; $x < 7; $x++) {
-					if($repeatdata[$x] === true) {
+					if ($repeatdata[$x] === true) {
 						$dow[$x] = $x+1;
 					}
 				}
@@ -615,14 +649,13 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 			} else if ($JOBTYPE == 'normal') {
 				$numdays = $postdata['days'];
 				$job->startdate = date("Y-m-d", strtotime($postdata['date']));
-				
 				$job->enddate = date("Y-m-d", strtotime($job->startdate) + (($numdays - 1) * 86400));
 			}
 			
 			$job->starttime = date("H:i", strtotime($postdata['callearly']));
 			$job->endtime = date("H:i", strtotime($postdata['calllate']));
 
-			if($submittedmode) {
+			if ($submittedmode) {
 				$job->update();
 			} else {
 				$job->jobtypeid = $postdata['jobtype'];
@@ -663,26 +696,27 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 					$job->createdate = date("Y-m-d H:i:s", time());
 					$job->create();
 				}
-				if($job->id) {
+				if ($job->id) {
 					/* Store lists*/
-					QuickUpdate("DELETE FROM joblist WHERE jobid=$job->id");
+					QuickUpdate("DELETE FROM joblist WHERE jobid=?",false,array($job->id));
 					$listids = $postdata['lists'];
-					$batchvalues = array();
+					$batchargs = array();
+					$batchsql = "";
 					foreach ($listids as $id) {
-						$values = "($job->id,". ($id+0) . ")"; // TODO prepstmt args
-						$batchvalues[] = $values;
+						$batchsql .= "(?,?),";
+						$batchargs[] = $job->id;
+						$batchargs[] = $id;
 					}
-					if (!empty($batchvalues)) {
-						$sql = "INSERT INTO joblist (jobid,listid) VALUES ";
-						$sql .= implode(",",$batchvalues);
-						QuickUpdate($sql);
+					if ($batchsql) {
+						$sql = "INSERT INTO joblist (jobid,listid) VALUES " . trim($batchsql,",");
+						QuickUpdate($sql,false,$batchargs);
 					}
 				}
 			}
 		}
 		Query("COMMIT");
 
-		if($button=="send") {
+		if ($button=="send") {
 			$_SESSION['jobid'] = $job->id;
 			$sendto = "jobconfirm.php";
 		} else {
@@ -701,25 +735,28 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-// Display Functions
-////////////////////////////////////////////////////////////////////////////////
-
-function fmt_template ($obj, $field) {
-	return $obj->$field;
-}
-
-////////////////////////////////////////////////////////////////////////////////
 // Display
 ////////////////////////////////////////////////////////////////////////////////
 $PAGE = "notifications:jobs";
-$TITLE = ($JOBTYPE == 'repeating' ? _L('Repeating Job Editor: ') : _L('Job Editor: ')) . ($jobid == NULL ? _L("New Job") : escapehtml($job->name));
+
+$TITLE = ($JOBTYPE == 'repeating' ? _L('Repeating Job Editor: ') : _L('Job Editor: '));
+$TITLE .= ($jobid == NULL ? _L("New Job") : escapehtml($job->name));
 
 include_once("nav.inc.php");
 
-// Optional Load Custom Form Validators
+// Load Custom Form Validators
 ?>
 <script type="text/javascript">
-<? Validator::load_validators(array("ValDuplicateNameCheck","ValTranslationExpirationDate","ValWeekRepeatItem","ValTimeWindowCallEarly","ValTimeWindowCallLate","ValFormListSelect","ValIsTranslated","ValNonEmptyMessage")); ?>
+<? 
+Validator::load_validators(array("ValDuplicateNameCheck",
+								"ValTranslationExpirationDate",
+								"ValWeekRepeatItem",
+								"ValTimeWindowCallEarly",
+								"ValTimeWindowCallLate",
+								"ValFormListSelect",
+								"ValIsTranslated",
+								"ValNonEmptyMessage"));
+?>
 </script>
 <?
 
