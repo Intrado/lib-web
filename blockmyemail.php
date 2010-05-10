@@ -111,7 +111,7 @@ if ($badcode) {
 	?>
 		<div>
 			<h1>To unsubscribe from <b>ALL</b> messages, confirm your email address below</h1>
-			<p>Once blocked, you will no longer receive any emails from <?=$customer?> to the following address.</p>
+			<p>Once blocked, you will no longer receive any emails distributed through this system on behalf of <?=$customer?> to the following address.</p>
 			<p><big style="color: #cc0000;">This may include emergency broadcasts and other important announcements.</big></p>
 			<div><div style="float:left; margin-right: 5px">Email:</div><div style="padding-left: 3px; padding-right: 3px; width: auto; float: left"><?=$email?></div></div>
 			<div style="clear: both; margin-bottom: 10px"><img src="img/pixel.gif" /></div>
