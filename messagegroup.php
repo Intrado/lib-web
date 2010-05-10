@@ -32,7 +32,7 @@ require_once("obj/AudioUpload.fi.php");
 require_once("obj/EmailAttach.fi.php");
 require_once("obj/EmailAttach.val.php");
 require_once("obj/Language.obj.php");
-require_once("messagegroup.inc.php");
+require_once("inc/messagegroup.inc.php");
 
 ///////////////////////////////////////////////////////////////////////////////
 // Authorization:
