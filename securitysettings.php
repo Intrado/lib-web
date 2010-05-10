@@ -135,7 +135,7 @@ if (getSystemSetting('_hasldap', '0')) {
 	$helpsteps[$helpstepnum++] = array(_L("Enter the hostname or IP address of your LDAP server."));
 	$formdata["ldaphost"] = array(
 		"label" => _L("Host"),
-		"fieldhelp" => _L("LDAP Server hostname"),
+		"fieldhelp" => _L("This is the LDAP Server hostname."),
 		"value" => getSystemSetting('ldaphost', ''),
 		"validators" => array(
 			array("ValRequired"),
@@ -145,10 +145,10 @@ if (getSystemSetting('_hasldap', '0')) {
 		"helpstep" => $helpstepnum
 	);
 
-	$helpsteps[$helpstepnum++] = array(_L("Enter the port number that your LDAP server listens on."));
+	$helpsteps[$helpstepnum++] = array(_L("Enter the port number that your LDAP server listens on. The default is 389."));
 	$formdata["ldapport"] = array(
 		"label" => _L("Port"),
-		"fieldhelp" => _L("LDAP Server port, default is 389"),
+		"fieldhelp" => _L("The port your LDAP server uses."),
 		"value" => getSystemSetting('ldapport', '389'),
 		"validators" => array(
 			array("ValRequired"),
@@ -162,7 +162,7 @@ if (getSystemSetting('_hasldap', '0')) {
 	$helpsteps[$helpstepnum++] = array(_L("Enter the domain used by your LDAP server."));
 	$formdata["ldapdomain"] = array(
 		"label" => _L("Domain"),
-		"fieldhelp" => _L("LDAP domain"),
+		"fieldhelp" => _L("The domain used by your LDAP server."),
 		"value" => getSystemSetting('ldapdomain', ''),
 		"validators" => array(
 			array("ValRequired"),
@@ -176,7 +176,7 @@ if (getSystemSetting('_hasldap', '0')) {
 	$helpsteps[$helpstepnum++] = array(_L("Enter a binding username for lookups to your LDAP server.  This is used to verify an account is enabled (not disabled), during phone login."));
 	$formdata["ldapuser"] = array(
 		"label" => _L("Username"),
-		"fieldhelp" => _L("LDAP binding username.  Used only for phone login."),
+		"fieldhelp" => _L("The LDAP binding username which is only used for phone login."),
 		"value" => getSystemSetting('ldapuser', ''),
 		"validators" => array(
 			array("ValLength","min" => 1,"max" => 50)
