@@ -20,7 +20,7 @@ require_once("obj/UserSetting.obj.php");
 
 
 require_once("inc/reportutils.inc.php"); //used by list.inc.php
-require_once("list.inc.php");
+require_once("inc/list.inc.php");
 
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization
