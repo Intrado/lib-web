@@ -1470,7 +1470,7 @@ if (isset($_SESSION['inmessagegrouptabs']) && $_SESSION['inmessagegrouptabs']) {
 				$(formitemname+"englishText").value = sourcetext;
 				// This is an ugly hack. Update is not working correctly for IE 8. 
 				// Clearing the insert div with a hidden link will make the translationtext insert correctly.
-				$(formitemname+'textdiv').update("<div style=\"height:0px;\"><a href=\"#\"></a></div>");
+				$(formitemname+'textdiv').update("<div style=\"height:0px;\"><img src=\"img/pixel.gif\" alt=\"\"/></div>");
 				$(formitemname+'textdiv').insert(translatedtext);
 				setTranslationValue(formitemname);
 			};

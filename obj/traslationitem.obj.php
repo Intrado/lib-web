@@ -257,7 +257,7 @@ class TranslationItem extends FormItem {
 										
 									// This is an ugly hack. Update is not working correctly for IE 8. 
 									// Clearing the insert div with a hidden link will make the translationtext insert correctly.
-									$(dstbox).update("<div style=\"height:0px;\"><a href=\"#\"></a></div>");
+									$(dstbox).update("<div style=\"height:0px;\"><img src=\"img/pixel.gif\" alt=\"\"/></div>");
 									$(dstbox).insert(translatedtext);
 							}
 					});
@@ -298,7 +298,7 @@ class TranslationItem extends FormItem {
 
 							// This is an ugly hack. Update is not working correctly for IE 8. 
 							// Clearing the insert div with a hidden link will make the translationtext insert correctly.  
-							$(section + "textdiv").update("<div style=\"height:0px;\"><a href=\"#\"></a></div>"); 
+							$(section + "textdiv").update("<div style=\"height:0px;\"><img src=\"img/pixel.gif\" alt=\"\"/></div>"); 
 							$(section+"textdiv").insert(translatedtext);
 							$(section+"text").value = translatedtext;
 							setTranslationValue(section);
