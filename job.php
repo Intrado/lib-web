@@ -35,12 +35,6 @@ require_once("inc/translate.inc.php");
 require_once("obj/FormListSelect.fi.php");
 require_once("inc/date.inc.php");
 
-////////////////////////////////////////////////////////////////////////////////
-// Authorization
-////////////////////////////////////////////////////////////////////////////////
-if (!$USER->authorize('sendphone') && !$USER->authorize('sendemail') && !$USER->authorize('sendsms')) {
-	redirect('unauthorized.php');
-}
 $JOBTYPE = "normal";
 
-include("jobedit.php");
+include("jobedit.inc.php");
