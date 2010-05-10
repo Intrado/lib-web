@@ -30,14 +30,7 @@ require_once("obj/ValTimeWindowCallLate.val.php");
 require_once("obj/ValNonEmptyMessage.val.php");
 require_once("obj/FormListSelect.fi.php");
 
-////////////////////////////////////////////////////////////////////////////////
-// Authorization
-////////////////////////////////////////////////////////////////////////////////
-if (!$USER->authorize('createrepeat')) {
-	redirect('unauthorized.php');
-}
-
 $JOBTYPE = "repeating";
 
-include("jobedit.php");
+include("jobedit.inc.php");
 
