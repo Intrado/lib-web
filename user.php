@@ -636,9 +636,9 @@ if ($readonly) {
 	foreach ($jobtypes as $jobtypeid => $jobtypename) {
 		if (count($userjobtypeids)) {
 			if (in_array($jobtypeid, $userjobtypeids))
-				$displayjobtypes .= $jobtypename. "<br>";
+				$displayjobtypes .= escapehtml($jobtypename) . "<br>";
 		} else
-			$displayjobtypes .= $jobtypename. "<br>";
+			$displayjobtypes .= escapehtml($jobtypename) . "<br>";
 	}
 	$formdata["jobtypes"]["control"] = array("FormHtml", "html" => "<div style='border: 1px dotted;'>$displayjobtypes</div>");
 	unset($formdata["jobtypes"]["validators"]);
