@@ -255,7 +255,7 @@ if(getSystemSetting('_hassms', false)){
 				<?
 					NewFormItem($f, $s, "groupby", "selectstart");
 					NewFormItem($f, $s, "groupby", "selectoption", " -- System -- ", "");
-					NewFormItem($f, $s, "groupby", "selectoption", "Organization", "org");
+					NewFormItem($f, $s, "groupby", "selectoption", getSystemSetting('organizationfieldname', 'School'), "org");
 					foreach($fields as $field){
 						NewFormItem($f, $s, "groupby", "selectoption", $field->name, $field->fieldnum);
 					}
@@ -311,7 +311,7 @@ startWindow("Total Messages Delivered", "padding: 3px;");
 			if ($groupby == "")
 				$name = "System";
 			else if ($groupby == "org")
-				$name = "Organization: " . $display;
+				$name = getSystemSetting('organizationfieldname', 'School'). ": " . $display;
 			else if ($groupby == $languageField) {
 				// display language name, instead of code
 				$display = Language::getName($index);
