@@ -135,6 +135,8 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'send'))
 			error('A job or survey named \'' . $name . '\' already exists');
 		} else if (GetFormData($f,$s,"callerid") != "" && strlen(Phone::parse(GetFormData($f,$s,"callerid"))) != 10) {
 			error('The Caller ID must be exactly 10 digits long (including area code)');
+		} else if (!in_array(GetFormData($f,$s,"jobtypeid"), array_keys($VALIDJOBTYPES))) {
+			error('Invalid jobtype');
 		} else {
 
 			$questionnaireid = GetFormData($f,$s,"questionnaireid") + 0;
