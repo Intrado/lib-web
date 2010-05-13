@@ -39,6 +39,7 @@ log_db_queries=false
 tmp_dir="/tmp"
 has_ssl=true
 force_ssl=true
+should_grant_local=false
 
 ; server to redirect customer link to
 customer_url_prefix=https://localhost

@@ -38,9 +38,9 @@ function createSMUserProfile($newdb, $newdbname = "") {
 }
 
 // create the subscriber application database user
-function createLimitedUser($limitedusername, $limitedpassword, $custdbname, $sharddb) {
-	QuickUpdate("drop user '$limitedusername'", $sharddb);
-	QuickUpdate("create user '$limitedusername' identified by '$limitedpassword'", $sharddb);
+function createLimitedUser($limitedusername, $limitedpassword, $custdbname, $sharddb, $grantedhost = '%') {
+	QuickUpdate("drop user '$limitedusername'@'$grantedhost'", $sharddb);
+	QuickUpdate("create user '$limitedusername'@'$grantedhost' identified by '$limitedpassword'", $sharddb);
 
 	$tables = array();
 	$tables['audiofile'] 	= "select";

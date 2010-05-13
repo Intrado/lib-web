@@ -107,9 +107,13 @@ if (CheckFormSubmit($f,$s)){
 					or dieWithError("Failed to connect to DB ".$newdbname, $newdb);
 
 				// customer db user
-				QuickUpdate("drop user '$newdbname'", $newdb); //ensure mysql credentials match our records, which it won't if create user fails because the user already exists
-				QuickUpdate("create user '$newdbname' identified by '$dbpassword'", $newdb);
-				QuickUpdate("grant select, insert, update, delete, create temporary tables, execute on $newdbname . * to '$newdbname'", $newdb);
+				$grantedhost = '%';
+				if (isset($SETTINGS['feature']['should_grant_local']) && $SETTINGS['feature']['should_grant_local']) {
+					$grantedhost = 'localhost';
+				}
+				QuickUpdate("drop user '$newdbname'@'$grantedhost'", $newdb); //ensure mysql credentials match our records, which it won't if create user fails because the user already exists
+				QuickUpdate("create user '$newdbname'@'$grantedhost' identified by '$dbpassword'", $newdb);
+				QuickUpdate("grant select, insert, update, delete, create temporary tables, execute on $newdbname . * to '$newdbname'@'$grantedhost'", $newdb);
 
 				// create customer tables
 				$tablequeries = explode("$$$",file_get_contents("../db/customer.sql"));
@@ -124,7 +128,7 @@ if (CheckFormSubmit($f,$s)){
 				}
 
 				// subscriber db user
-				createLimitedUser($limitedusername, $limitedpassword, $newdbname, $newdb);
+				createLimitedUser($limitedusername, $limitedpassword, $newdbname, $newdb, $grantedhost);
 
 				// 'schoolmessenger' user
 				createSMUserProfile($newdb, $newdbname);
