@@ -43,7 +43,7 @@ class ContactChangeReport extends ReportGenerator {
 		$fieldquery = generateFields("p");
 		$gfieldquery = generateGFieldQuery("p.id");
 		
-		$this->query = "select SQL_CALC_FOUND_ROWS
+		$this->query = "select SQL_CALC_FOUND_ROWS distinct 
 					p.pkey as pkey,
 					p.id as pid,
 					p." . FieldMap::GetFirstNameField() . " as firstname,
