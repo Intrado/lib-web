@@ -391,7 +391,7 @@ function upgrade_7_5 ($rev, $shardid, $customerid, $db) {
 		case 13:
 			// upgrade from rev 13 to rev 14
 			echo "|";
-			apply_sql("upgrades/db_7-5_pre.sql",$customerid,$db, 11);
+			apply_sql("upgrades/db_7-5_pre.sql",$customerid,$db, 14);
 			
 			// fix all the report instances which reference old school field
 			// get the old school field

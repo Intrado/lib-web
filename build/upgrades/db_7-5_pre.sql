@@ -658,6 +658,6 @@ $$$
 GRANT SELECT ON `language` TO 'c__$CUSTOMERID__limited'@'%'
 $$$
 
+-- $rev14
 
-
-
+-- nothing in rev 14
