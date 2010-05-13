@@ -116,24 +116,6 @@ function fmt_percent ($row,$index) {
 	return "&nbsp;";
 }
 
-function fmt_checkbox_addrbook($row,$index) {
-	global $inlistids;
-
-	$result = '<div align="center">';
-	//see if it is in add show +, otherwise show blank
-	if (in_array($row[0],$inlistids)) {
-		$result .= '<img src="img/checkbox-add.png"';
-		$checked = true;
-	} else {
-		$result .= '<img src="img/checkbox-clear.png"';
-		$checked = false;
-	}
-
-	$result .= " onclick=\"dolistbox(this,'add',";
-
-	$result .=  (($checked) ? "true":"false") . "," . $row[0] . ');" />';
-	return $result . '</div>';
-}
 
 function fmt_idmagnify ($row,$index) {
 	// TODO must I load the person in order to get the person->userid ?
