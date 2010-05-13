@@ -51,6 +51,25 @@ function fmt_actions($row, $name) {
 	));
 }
 
+function fmt_checkbox_addrbook($row,$index) {
+	global $inlistids;
+
+	$result = '<div align="center">';
+	//see if it is in add show +, otherwise show blank
+	if (in_array($row[0],$inlistids)) {
+		$result .= '<img src="img/checkbox-add.png"';
+		$checked = true;
+	} else {
+		$result .= '<img src="img/checkbox-clear.png"';
+		$checked = false;
+	}
+
+	$result .= " onclick=\"dolistbox(this,";
+
+	$result .=  (($checked) ? "true":"false") . "," . $row[0] . ');" />';
+	return $result . '</div>';
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 // Display
 ////////////////////////////////////////////////////////////////////////////////
@@ -63,13 +82,13 @@ include_once("nav.inc.php");
 ?>
 <script langauge="javascript">
 
-function dolistbox (img, type, init, id) {
+function dolistbox (img, init, id) {
 	if (!img.toggleset) {
 		img.toggleset = true;
 		img.toggle = init;
 	}
 	img.toggle = !img.toggle;
-	img.src = "checkbox.png.php?type=" + type + "&toggle=" + img.toggle + "&id=" + id + "&foo=" + new Date();
+	img.src = "checkbox.png.php?toggle=" + img.toggle + "&id=" + id + "&foo=" + new Date();
 }
 </script>
 
