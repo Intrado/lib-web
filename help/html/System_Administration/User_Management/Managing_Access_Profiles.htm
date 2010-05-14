@@ -14,13 +14,13 @@ if (navigator.appName !="Netscape")
 <!--
 div.whs1 { width:100%; }
 img_whs2 { border:none; width:20px; height:20px; float:none; border-style:none; }
-img_whs3 { border:none; border-style:none; width:400px; height:117px; float:none; }
+img_whs3 { border:none; width:400px; height:117px; float:none; border-style:none; }
 p.whs4 { font-weight:bold; line-height:Normal; }
 ol.whs5 { list-style:decimal; }
 p.whs6 { line-height:Normal; }
 p.whs7 { margin-left:18pt; line-height:Normal; }
 p.whs8 { line-height:150%; font-weight:bold; }
-img_whs9 { border:none; border-style:none; width:400px; height:1010px; float:none; }
+img_whs9 { border:none; border-style:none; width:400px; height:1393px; float:none; }
 ul.whs10 { list-style:disc; }
 p.whs11 { line-height:Normal; font-weight:bold; }
 p.whs12 { line-height:Normal; font-weight:normal; }
@@ -162,8 +162,8 @@ else
  Edit Access Profile screen shown below allows you to configure your Access 
  Profiles, controlling what certain users will be able to do within the 
  system. It has several sections which will be explained below.</span></p>
-<p class="whs8"><img src="../../AccessProfileConfigure.gif" alt="Edit Access Profile Screen" x-maintain-ratio="TRUE" width="400px" height="1010px" border="0" class="img_whs9"></p>
-<p class="whs4">Login:</p>
+<p class="whs8"><img src="../../AccessProfileConfigure.gif" alt="Edit Access Profile Screen" x-maintain-ratio="TRUE" width="400px" height="1393px" border="0" class="img_whs9"></p>
+<p class="whs4">Login Options:</p>
 <ul type="disc" class="whs10">
 	<li class=p><p class="whs6">Log into the system via 
  the web - Check this option to allow users with this profile to access 
@@ -175,7 +175,8 @@ else
  - Check this option to allow users with this profile to edit their personal 
  account information such as their name and password.</p></li>
 </ul>
-<p class="whs4">Start Page:</p>
+<p class="whs4">Start Page &amp; Nav 
+ Options:</p>
 <ul type="disc" class="whs10">
 	<li class=p><p class="whs6">View Start Page Job Statistics 
  - Check this option to allow users with this Access Profile to see their 
@@ -183,12 +184,11 @@ else
 	<li class=p><p class="whs6">View Start Page Shortcuts 
  - Check this option to allow users to see the Shortcuts section of their 
  start page.</p></li>
-	<li class=p><p class="whs6">Enable Outbound Recording 
- - Check this option to give users with this profile the ability to use 
- EasyCall for their callouts. It also allows them to use the Call Me to 
- Record feature.</p></li>
+	<li class=p><p class="whs6">Outbound Recording - Check 
+ this option to give users with this profile the ability to use EasyCall 
+ for their callouts. It also allows them to use the Call Me to Record feature.</p></li>
 </ul>
-<p class="whs4">Messages:</p>
+<p class="whs4">Messaging Options</p>
 <ul type="disc" class="whs10">
 	<li class=p><p class="whs6">Send phone calls - Check 
  this option to allow users with this profile to create phone jobs. The 
@@ -196,105 +196,137 @@ else
  the calls can run as well as the maximum number of times the system can 
  try to call each recipient. The user will be able to alter these values 
  only to values which fall within this range.</p></li>
-	<li class=p><p class="whs6">Allow voice responses - 
- Check this option to allow users with this profile to enable the voice 
- response option on their jobs.</p></li>
-	<li class=p><p class="whs6">Send emails - This allows 
+	<li class=p><p class="whs6">Don't Call Before - Select 
+ the earliest time a call may be sent from users with this profile.</p></li>
+	<li class=p><p class="whs6">Don't Call After - Select 
+ the latest time a call may be sent from users with this profile.</p></li>
+	<li class=p><p class="whs6">Max Call Attempts - Select 
+ the number of times a job may attempt to call a recipient for users with 
+ this profile.</p></li>
+	<li class=p><p class="whs6">Voice Responses - Check 
+ this option to allow users with this profile to enable the voice response 
+ option on their jobs.</p></li>
+	<li class=p><p class="whs6">Send Emails - This allows 
  the user to create email jobs.</p></li>
 	<li class=p><p class="whs6">Send SMS messages - This 
  allows the user to send SMS message notifications.</p></li>
-	<li class=p><p class="whs6">Send multi-language messages 
+	<li class=p><p class="whs6">Multi-language Messages 
  - Check this to enable the Multilingual Job Options feature on all enabled 
  job types.</p></li>
+	<li class=p><p class="whs6">Send Classroom Messages 
+ - If your system has Classroom Messaging, check this option to allow users 
+ to send classroom messages.</p></li>
+	<li class=p><p class="whs6">Add Remark to Classroom 
+ Message - Click this to allow users to add remarks to the pre-made classroom 
+ messages.</p></li>
 </ul>
-<p class="whs4">Lists:</p>
-<ul type="disc" class="whs10">
-	<li class=p><p class="whs6">Create/Edit Lists - Check 
- this to allow users to create or edit lists.</p></li>
-</ul>
-<p class="whs4">Data:</p>
-<ul type="disc" class="whs10">
-	<li class=p><p class="whs6">Allow user to build lists 
- and construct messages using the following fields - Check this option 
- and select data fields from the list to the right to give the user the 
- ability to create dynamic lists and messages based on the fields they 
- are given access to. Select which fields the user may use in the menu 
- to the right. Hold down the Ctrl key (Command key for Mac users) while 
- selecting to choose multiple fields.</p></li>
-</ul>
-<p class="whs4">Jobs:</p>
+<p class="whs4"><span style="font-weight: bold; line-height: Normal;"><B>Advanced 
+ </B></span>Job Options:</p>
 <ul type="disc" class="whs10">
 	<li class=p><p class="whs6">Create Repeating Jobs - 
  This gives the user the ability to create repeating jobs such as attendance.</p></li>
-	<li class=p><p class="whs6">Set the job caller ID - 
- This gives the user the ability to enter information recipients will see 
- on their caller ID.</p></li>
-	<li class=p><p class="whs6">Maximum number of days 
- for which users can schedule a job to run - This sets the maximum number 
- of days a user can schedule a job to run.</p></li>
+	<li class=p><p class="whs6">Create Surveys - Allows 
+ users to create surveys.</p></li>
+	<li class=p><p class="whs6">Override Caller ID - This 
+ gives the user the ability to enter information recipients will see on 
+ their caller ID.</p></li>
+	<li class=p><p class="whs6">Max Job Run Days - This 
+ sets the maximum number of days a user can schedule a job to run.</p></li>
 </ul>
-<p class="whs4">Reports:</p>
+<p class="whs4">List Options:</p>
+<ul type="disc" class="whs10">
+	<li class=p><p class="whs6">Create/Edit Lists - Check 
+ this to allow users to create or edit lists.</p></li>
+	<li class=p><p class="whs6">Upload Lists by ID# - Allows 
+ the user to upload CSV files containing a list of user IDs to make lists 
+ for jobs.</p></li>
+	<li class=p><p class="whs6">Upload List by Contact 
+ Data - Allows the user to upload a CSV file containing a list of recipients' 
+ contact data.</p></li>
+</ul>
+<p class="whs11">Publish/Subscribe Options:</p>
+<ul type="disc" class="whs10">
+	<li class=p><p class="whs6">Publish - Select whether 
+ users with this access profile may publish messages or lists for other 
+ users.</p></li>
+	<li class=p><p class="whs6">Subscribe - Select whether 
+ users with this access profile may subscribe to messages or lists other 
+ users have published.</p></li>
+</ul>
+<p class="whs4">Contact &amp; Field 
+ Options:</p>
+<ul type="disc" class="whs10">
+	<li class=p><p class="whs6">Field Restriction - Check 
+ this option and select data fields from the list to the right to give 
+ the user the ability to create dynamic lists and messages based on the 
+ fields they may access.</p></li>
+	<li class=p><p class="whs6">View Contacts - This option 
+ allows users to view all of their viewable contacts.</p></li>
+	<li class=p><p class="whs6">Edit Contact Details - 
+ Gives the user permission to update recipients' contact details like phone 
+ numbers or email addresses.</p></li>
+</ul>
+<p class="whs4">Report Options:</p>
 <ul type="disc" class="whs10">
 	<li class=p><p class="whs6">Create Reports - Check 
  this box to give the user the ability to create reports.</p></li>
 </ul>
-<p class="whs4">Security:</p>
+<p class="whs11"><span style="line-height: Normal; font-weight: bold;"><B>Systemwide 
+ View:</B></span></p>
 <ul type="disc" class="whs10">
-	<li class=p><p class="whs6">Manage User Accounts - 
- Check this box to allow users to create, edit, and delete User Accounts.</p></li>
-	<li class=p><p class="whs6">Manage Access Profiles 
- - Check this box to allow users to create, edit, and delete Access Profiles.</p></li>
-	<li class=p><p class="whs6">Manage Systemwide Settings 
- - Check this box to allow users to edit System Settings.</p></li>
-</ul>
-<p class="whs4">Contacts:</p>
-<ul type="disc" class="whs10">
-	<li class=p><p class="whs6">View Contacts - Check this 
- box to allow users to view contacts stored in the system's contact list.</p></li>
-	<li class=p><p class="whs6">Manage Contact Details 
- Settings - This option allows users to edit individual contact preferences 
- settings, otherwise they can only view contact preference settings.</p></li>
-</ul>
-<p class="whs11">Systemwide View:</p>
-<ul type="disc" class="whs10">
-	<li class=p><p class="whs12">View 
- systemwide reports - Allows the user to see systemwide information when 
- they view the completed jobs page or when they generate a report from 
- the Reports tab.</p></li>
-	<li class=p><p class="whs12">View 
- systemwide usage stats - Select to allow the user to view the Usage Stats 
- subtab.</p></li>
-	<li class=p><p class="whs12">View 
- all active jobs - Select to allow the user to view all jobs currently 
- running in the system.</p></li>
-	<li class=p><p class="whs12">View 
- all completed jobs - Select to allow the user to view all completed jobs 
- in the system.</p></li>
-	<li class=p><p class="whs12">View 
- all repeating jobs - Select to allow the user to view all repeating jobs 
- currently scheduled in the system.</p></li>
-	<li class=p><p class="whs12">Manage 
- systemwide jobs - Select to allow the user to edit or cancel any job in 
+	<li class=p><p class="whs12">Systemwide 
+ Reports - Allows the user to see systemwide information when they view 
+ the completed jobs page or when they generate a report from the Reports 
+ tab.</p></li>
+	<li class=p><p class="whs12">Usage 
+ Stats - Select to allow the user to view the Usage Stats subtab.</p></li>
+	<li class=p><p class="whs12">Call 
+ Distribution - Shows the distribution of calls over time.</p></li>
+	<li class=p><p class="whs12">Active 
+ Jobs - Select to allow the user to view all jobs currently running in 
  the system.</p></li>
+	<li class=p><p class="whs12">Completed 
+ Jobs - Select to allow the user to view all completed jobs in the system.</p></li>
+	<li class=p><p class="whs12">Repeating 
+ Jobs - Select to allow the user to view all repeating jobs currently scheduled 
+ in the system.</p></li>
+	<li class=p><p class="whs12">Blocked 
+ Destination List - Select to allow the user to view the systemwide blocked 
+ number list. If you select this option, you may choose the amount of access 
+ the user will have from the options below. The options are:</p></li>
+</ul>
+<p class="whs13">No Access - The user 
+ may not access the </p>
+<p class="whs13">View Only - Allows the 
+ user to view the phone numbers, but not add or remove any numbers.</p>
+<p class="whs13">Add/Delete Own - Allows 
+ the user to add or delete blocked destinations, but they cannot delete 
+ destinations entered by any other user.</p>
+<p class="whs13">Add/Delete All - Allows 
+ the user unlimited ability to add or delete blocked destinations.</p>
+<p class="whs4">Security &amp; Administrator 
+ Controls:</p>
+<ul type="disc" class="whs10">
+	<li class=p><p class="whs6">Manage Users - Check this 
+ box to allow users to create, edit, and delete User Accounts.</p></li>
+	<li class=p><p class="whs6">Manage Profiles - Check 
+ this box to allow users to create, edit, and delete Access Profiles.</p></li>
+	<li class=p><p class="whs6">Manage System Settings 
+ - Check this box to allow users to edit System Settings.</p></li>
+	<li class=p><p class="whs12">Manage 
+ All Jobs - Select to allow the user to edit or cancel any job in the system.</p></li>
+	<li class=p><p class="whs12">Manage 
+ Data Imports - Select to allow the user to configure, create, and delete 
+ data imports in the system.</p></li>
 	<li class=p><p class="whs12">Manage 
  Field Definitions - Select to allow the user to configure new fields in 
  the system's database for data imports.</p></li>
 	<li class=p><p class="whs12">Manage 
- Imports - Select to allow the user to configure, create, and delete data 
- imports in the system.</p></li>
-	<li class=p><p class="whs12">Access 
- systemwide blocked numbers list - Select to allow the user to view the 
- systemwide blocked number list. If you select this option, you may choose 
- the amount of access the user will have from the options below. The options 
- are:</p></li>
+ Classroom Data - Permits the user to edit the Classroom Messaging template 
+ and message categories.</p></li>
 </ul>
-<p class="whs13">View numbers only - 
- Allows the user to view the phone numbers, but not add or remove any numbers.</p>
-<p class="whs13">Add/Delete Own Numbers 
- - Allows the user to add or delete phone numbers, but they cannot delete 
- numbers entered by any other user.</p>
-<p class="whs13">Add/Delete All Numbers 
- - Allows the user unlimited ability to add or delete phone numbers.</p>
+<p class="whs6">&nbsp;</p>
+<p class="whs13">&nbsp;</p>
 <p class="whs11">&nbsp;</p>
 <div placeholder id="footer" class="whs1">
 &nbsp; <span style="font-size: xx-small;"><font size=1 style="font-size: xx-small;">©1999-2009 Reliance Communications, 

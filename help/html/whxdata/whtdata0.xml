@@ -9,6 +9,9 @@
   <item name="Message Templates" url="Tips_for_Effective_Communication/Simple_Message_Templates.htm" />
   <item name="Communication Ideas" url="Tips_for_Effective_Communication/Communication_Ideas.htm" />
 </book>
+<book name="Publish and Subscribe" >
+  <item name="Publish and Subscribe Overview" url="Publish_and_Subscribe/Publish_and_Subscribe_Overview.htm" />
+</book>
 <book name="Surveys" >
   <item name="Survey Overview" url="Surveys/Survey_Overview.htm" />
   <item name="Important Tips for Creating Surveys" url="Surveys/Important_Tips_for_Creating_Surveys.htm" />
