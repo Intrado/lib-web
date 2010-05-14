@@ -50,7 +50,7 @@ if ($checkpassword) {
 $formdata = array();
 $helpsteps = array();
 
-$formdata[] = _L("Account Information!");
+$formdata[] = _L("Account Information");
 
 if ($readonly) {
 	$formdata["firstname"] = array(
