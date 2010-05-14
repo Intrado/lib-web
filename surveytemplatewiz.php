@@ -495,7 +495,7 @@ class SurveyTemplateWiz_webfeatures extends WizStep {
 			$fromname = $USER->firstname . " " . $USER->lastname;
 			$fromemail =  $USER->email;
 			$subject = "Web Survey for " . getCustomerSystemSetting("displayname");
-			$body = "This is a web survey from " . getCustomerSystemSetting("displayname") . ".\n\nYour responses are important to us. Please follow the link at the end of this email to participate in this survey.\n\nThank you,\n" . getCustomerSystemSetting("displayname");
+			$body = "This is a web survey from " . getCustomerSystemSetting("displayname") . ".\n\nYour responses are important to us. To participate in the survey please follow the link below or copy and paste the link into your web browser.\n\nThank you,\n" . getCustomerSystemSetting("displayname");
 		}
 
 		$formdata = array();
