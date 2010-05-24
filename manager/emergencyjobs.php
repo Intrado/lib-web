@@ -31,7 +31,7 @@ function fmt_hasdm ($row,$index) {
 
 function fmt_play_link($row, $index){
 	$url = "";
-	if($row[7])
+	if (isset($row[0]) && $row[0] != "" && isset($row[7]) && $row[7] != "")
 		$url = "<a onclick='popup(\"customerplaymessage.php?customerid=" . $row[0] . "&jobid=" . $row[7] . "\", 400, 500); return false;' href=\"#\" title='Play Message'><img src='img/s-play.png' border=0></a>";
 	return $url;
 }
@@ -81,13 +81,13 @@ if (!isset($_POST['startdate'])) {
 			$jtsql = "and j.jobtypeid in (".implode(",",$jtids).")";
 		}
 		
-		$query = "select j.name, j.description, m.name, u.login, count(*) as calls,
+		$query = "select j.name, j.description, mg.name, u.login, count(*) as calls,
 				(select count(*) from custdm) as hasflex, j.id
 				from job j
 				inner join reportperson rp on (j.id = rp.jobid and rp.type='phone')
 				inner join reportcontact rc on (rc.jobid = j.id and rc.type='phone' and rc.personid = rp.personid and rc.result in ('A','M'))
 				inner join user u on (u.id = j.userid)
-				inner join message m on (m.id = j.phonemessageid)
+				inner join messagegroup mg on (mg.id = j.messagegroupid)
 				where j.finishdate between ? and ? + interval 1 day
 				$jtsql
 				group by j.id";
@@ -108,11 +108,9 @@ if (!isset($_POST['startdate'])) {
 		echo ".";
 		if (++$count % 20 == 0)
 			echo "<wbr></wbr>";
-		ob_flush();
-		flush();
 	}
 	
-	$totalrow = array("Total","","","","",0,"");
+	$totalrow = array("Total","","","","",0,"","");
 	foreach ($data as $row) {
 		$totalrow[5] += $row[5];
 	}
