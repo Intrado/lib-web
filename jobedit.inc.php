@@ -217,7 +217,7 @@ $helpsteps[] = _L("Enter a name for your job. " .
 		$formdata["jobtype"] = array(
 			"label" => _L("Type/Category"),
 			"fieldhelp" => _L("The option that best describes the type of notification you are sending."),
-			"control" => array("FormHtml","html" => $jobtypes[$job->jobtypeid]),
+			"control" => array("FormHtml","html" => escapehtml($jobtypes[$job->jobtypeid])),
 			"helpstep" => 2
 		);
 	} else {
