@@ -44,7 +44,7 @@ $id = $_SESSION["targetedmessageid"];
 ////////////////////////////////////////////////////////////////////////////////
 
 $value = "";
-$languages = QuickQueryMultiRow("select * from language");
+$languages = QuickQueryMultiRow("select id,name,code from language");
 $values = array();
 
 if($id) {
@@ -166,6 +166,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 							$messagegroup->description = '';
 							$messagegroup->modified = date("Y-m-d H:i:s", time());
 							$messagegroup->deleted = 1;
+							$messagegroup->permanent = 1;
 							$messagegroup->create();
 							$messagegroupid = $messagegroup->id;
 
