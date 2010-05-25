@@ -207,7 +207,7 @@ function upgrade_7_5 ($rev, $shardid, $customerid, $db) {
 				if ($schoolfieldnum[0] == "g")
 					$query = "select distinct trim(value) from groupdata where fieldnum=$num";
 				else
-					$query = "select distinct trim($schoolfieldnum) from person";
+					$query = "select distinct trim($schoolfieldnum) from person where type='system'";
 				QuickUpdate("insert ignore into organization (orgkey) $query");
 
 				//create person associations
@@ -286,7 +286,7 @@ function upgrade_7_5 ($rev, $shardid, $customerid, $db) {
 				}
 				//delete old rule listentries
 				QuickUpdate("delete r, le from rule r inner join listentry le on (le.ruleid=r.id and r.fieldnum='$schoolfieldnum')");
-
+				
 				// update static school subscriber field values
 				$query = "update persondatavalues pdv inner join organization oz on (oz.orgkey like pdv.value) set pdv.fieldnum='oid', pdv.value=oz.id where pdv.editlock=1 and pdv.fieldnum=?";
 				QuickUpdate($query, false, array($schoolfieldnum));
@@ -301,7 +301,7 @@ function upgrade_7_5 ($rev, $shardid, $customerid, $db) {
 			echo "|";
 			apply_sql("upgrades/db_7-5_pre.sql",$customerid,$db, 4);
 			
-			$f03 = DBFind("FieldMap","from fieldmap where fieldnum='f03'",false,false,$db);
+			$f03 = DBFind("FieldMap_7_5_r14","from fieldmap where fieldnum='f03'",false,false,$db);
 			$f03->updatePersonDataValues();
 		case 4:
 			// upgrade from rev 4 to rev 5
@@ -404,6 +404,10 @@ function upgrade_7_5 ($rev, $shardid, $customerid, $db) {
 				foreach ($reportinstances as $riid => $reportinstance) {
 					$parameters = $reportinstance->getParameters();
 					
+					// skip if no rules, no need to search for school->organization upgrade
+					if (!isset($parameters['rules']))
+						continue;
+
 					// check the parameter rules for the old school field
 					foreach ($parameters['rules'] as $ruleid => $rule) {
 						if ($rule->fieldnum == $oldschool) {

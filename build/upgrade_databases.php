@@ -1,5 +1,6 @@
 <?
 
+// NOTE in 'migrate' mode these must be set to the shard host info with the 'csmigrate' database
 $authhost = "127.0.0.1";
 $authuser = "root";
 $authpass = "";
@@ -48,10 +49,12 @@ Usage:
 php upgrade_database.php -a 
 php upgrade_database.php -c <customerid> [<customerid> ...] 
 php upgrade_database.php -s <shardid> [<shardid> ...] 
+php upgrade_database.php -m
 
 -a : run on everything
 -s : shard mode, specific shards
 -c : customer mode, specific customers
+-m : migration mode, upgrade 7.1.5 commsuite-flex migration to 7.5 on 'csmigrate' database
 ";
 
 $opts = array();
@@ -71,6 +74,9 @@ foreach ($argv as $arg) {
 				case "c":
 					$mode = "customer";
 					break;
+				case "m":
+					$mode = "migrate";
+					break;
 				default:
 					echo "Unknown option " . $arg[$x] . "\n";
 					exit($usage);
@@ -83,7 +89,7 @@ foreach ($argv as $arg) {
 
 if (!$mode)
 	exit("No mode specified\n$usage");
-if ($mode != "all" && count($ids) == 0)
+if ($mode != "migrate" && $mode != "all" && count($ids) == 0)
 	exit("No IDs specified\n$usage");
 
 
@@ -94,40 +100,53 @@ require_once("../inc/DBMappedObject.php");
 require_once("../inc/DBRelationMap.php");
 require_once("../inc/utils.inc.php");
 
+$updater = mt_rand();
+echo "Updater id: $updater\n";
 
 //connect to authserver db
 echo "connecting to authserver db\n";
 $authdb = DBConnect($authhost,$authuser,$authpass,"authserver");
 
-$res = Query("select id,dbhost,dbusername,dbpassword from shard", $authdb)
-	or exit(mysql_error());
-$shards = array();
-while ($row = DBGetRow($res, true))
-	$shards[$row['id']] = DBConnect($row['dbhost'],$row['dbusername'],$row['dbpassword'], "aspshard")
+// if $mode == 'migrate' skip the authserver/shard/customer lookup and simply connect to 'csmigrate' database
+if ($mode == 'migrate') {
+	$_dbcon = $db = $authdb;
+	QuickUpdate("use csmigrate",$db);
+	
+	// customerid=0, shardid=0 just dummy placeholders that are not really used
+	update_customer($db, 0, 0);
+} else {
+	$res = Query("select id,dbhost,dbusername,dbpassword from shard", $authdb)
 		or exit(mysql_error());
+	$shards = array();
+	while ($row = DBGetRow($res, true))
+		$shards[$row['id']] = DBConnect($row['dbhost'],$row['dbusername'],$row['dbpassword'], "aspshard")
+			or exit(mysql_error());
 
-switch ($mode) {
-	case "all": $optsql = ""; break;
-	case "customer": $optsql = "and id in (" . implode(",",$ids) . ")"; break;
-	case "shard": $optsql = "and shardid in (" . implode(",",$ids) . ")"; break;
+	switch ($mode) {
+		case "all": $optsql = ""; break;
+		case "customer": $optsql = "and id in (" . implode(",",$ids) . ")"; break;
+		case "shard": $optsql = "and shardid in (" . implode(",",$ids) . ")"; break;
+	}
+
+	$res = Query("select id, shardid, urlcomponent, dbusername, dbpassword from customer where 1 $optsql order by id", $authdb)
+		or exit(mysql_error());
+	$customers = array();
+	while ($row = DBGetRow($res, true))
+		$customers[$row['id']] = $row;
+		
+	foreach ($customers as  $customerid => $customer) {
+		echo "doing $customerid ";
+		$_dbcon = $db = $shards[$customer['shardid']];
+		QuickUpdate("use c_$customerid",$db);
+		update_customer($db, $customerid, $customer['shardid']);
+	}
 }
 
-$res = Query("select id, shardid, urlcomponent, dbusername, dbpassword from customer where 1 $optsql order by id", $authdb)
-	or exit(mysql_error());
-$customers = array();
-while ($row = DBGetRow($res, true))
-	$customers[$row['id']] = $row;
 
-$updater = mt_rand();
-echo "Updater id: $updater\n";
-
-
-foreach ($customers as  $customerid => $customer) {
-	echo "doing $customerid ";
-
-	$_dbcon = $db = $shards[$customer['shardid']];
-	
-	QuickUpdate("use c_$customerid",$db);
+function update_customer($db, $customerid, $shardid) {
+	global $targetversion;
+	global $targetrev;
+	global $updater;
 	
 	Query("begin",$db);
 
@@ -164,7 +183,7 @@ foreach ($customers as  $customerid => $customer) {
 	require_once("upgrades/db_7-5.php");
 	$rev = $version == "7.5" ? $rev : 0; //reset revision to 0 each time we go to a new release, unless we're doing the same release.
 	echo "upgrading from $version/$rev to $targetversion/$targetrev\n";
-	if (upgrade_7_5($rev, $customer['shardid'], $customerid, $db)) {
+	if (upgrade_7_5($rev, $shardid, $customerid, $db)) {
 		QuickUpdate("insert into setting (name,value) values ('_dbversion','$targetversion/$targetrev') on duplicate key update value=values(value)", $db);
 	} else {
 		exit("Error upgrading DB");
