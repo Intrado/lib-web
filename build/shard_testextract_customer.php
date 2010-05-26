@@ -49,7 +49,7 @@ if (!QuickQuery("show databases like 'c_$customerid'",$srcsharddb))
 
 //backup the existing customer db
 $backupfilename = "c_$customerid.xfer.sql";
-$cmd = "nice mysqldump -h $srchost -u $srcuser -p$srcpass --skip-triggers c_$customerid > $backupfilename";
+$cmd = "nice mysqldump -h $srchost -u $srcuser -p$srcpass --no-create-info --skip-triggers c_$customerid > $backupfilename";
 echo "Backing up customer data\n$cmd\n";
 $result = exec($cmd,$output,$retval);
 
