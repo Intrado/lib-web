@@ -1,6 +1,6 @@
 <?
 
-// NOTE in 'migrate' mode these must be set to the shard host info with the 'csmigrate' database
+// NOTE in 'csimport' mode these must be set to the host info with the 'csimport' database
 $authhost = "127.0.0.1";
 $authuser = "root";
 $authpass = "";
@@ -49,12 +49,12 @@ Usage:
 php upgrade_database.php -a 
 php upgrade_database.php -c <customerid> [<customerid> ...] 
 php upgrade_database.php -s <shardid> [<shardid> ...] 
-php upgrade_database.php -m
+php upgrade_database.php -i
 
 -a : run on everything
 -s : shard mode, specific shards
 -c : customer mode, specific customers
--m : migration mode, upgrade 7.1.5 commsuite-flex migration to 7.5 on 'csmigrate' database
+-i : commsuite import mode, upgrade 7.1.5 commsuite-flex migration to 7.5 on 'csimport' database
 ";
 
 $opts = array();
@@ -74,8 +74,8 @@ foreach ($argv as $arg) {
 				case "c":
 					$mode = "customer";
 					break;
-				case "m":
-					$mode = "migrate";
+				case "i":
+					$mode = "csimport";
 					break;
 				default:
 					echo "Unknown option " . $arg[$x] . "\n";
@@ -89,7 +89,7 @@ foreach ($argv as $arg) {
 
 if (!$mode)
 	exit("No mode specified\n$usage");
-if ($mode != "migrate" && $mode != "all" && count($ids) == 0)
+if ($mode != "csimport" && $mode != "all" && count($ids) == 0)
 	exit("No IDs specified\n$usage");
 
 
@@ -107,10 +107,10 @@ echo "Updater id: $updater\n";
 echo "connecting to authserver db\n";
 $authdb = DBConnect($authhost,$authuser,$authpass,"authserver");
 
-// if $mode == 'migrate' skip the authserver/shard/customer lookup and simply connect to 'csmigrate' database
-if ($mode == 'migrate') {
+// if $mode == 'csimport' skip the authserver/shard/customer lookup and simply connect to 'csimport' database
+if ($mode == 'csimport') {
 	$_dbcon = $db = $authdb;
-	QuickUpdate("use csmigrate",$db);
+	QuickUpdate("use csimport",$db);
 	
 	// customerid=0, shardid=0 just dummy placeholders that are not really used
 	update_customer($db, 0, 0);
