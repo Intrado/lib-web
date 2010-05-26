@@ -207,7 +207,7 @@ function upgrade_7_5 ($rev, $shardid, $customerid, $db) {
 				if ($schoolfieldnum[0] == "g")
 					$query = "select distinct trim(value) from groupdata where fieldnum=$num";
 				else
-					$query = "select distinct trim($schoolfieldnum) from person where type='system'";
+					$query = "select distinct trim($schoolfieldnum) from person where type='system' and not deleted";
 				QuickUpdate("insert ignore into organization (orgkey) $query");
 
 				//create person associations
@@ -216,9 +216,9 @@ function upgrade_7_5 ($rev, $shardid, $customerid, $db) {
 					select g.personid,'organization',o.id from groupdata g inner join organization o on (o.orgkey=trim(g.value) and g.fieldnum=$num)
 					group by g.personid, o.id";
 				} else {
-					$query = "insert into personassociation (personid,type,organizationid)
-					select p.id,'organization',o.id from person p inner join organization o on (o.orgkey=trim(p.$schoolfieldnum))
-					group by p.id, o.id";
+					$query = "insert into personassociation (personid,importid,type,organizationid)
+					select p.id,p.importid,'organization',o.id from person p inner join organization o on (o.orgkey=trim(p.$schoolfieldnum))
+					where p.type='system' and not p.deleted group by p.id, o.id";
 				}
 				QuickUpdate($query);
 				
