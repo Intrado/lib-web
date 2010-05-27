@@ -114,6 +114,9 @@ if ($mode == 'csimport') {
 	
 	// customerid=0, shardid=0 just dummy placeholders that are not really used
 	update_customer($db, 0, 0);
+	
+	// set systemmessages in time order
+	QuickUpdate("update systemmessages set modifydate = now() + interval id second", $db);
 } else {
 	$res = Query("select id,dbhost,dbusername,dbpassword from shard", $authdb)
 		or exit(mysql_error());
