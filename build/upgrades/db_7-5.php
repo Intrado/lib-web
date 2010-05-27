@@ -216,8 +216,8 @@ function upgrade_7_5 ($rev, $shardid, $customerid, $db) {
 					select g.personid,'organization',o.id from groupdata g inner join organization o on (o.orgkey=trim(g.value) and g.fieldnum=$num)
 					group by g.personid, o.id";
 				} else {
-					$query = "insert into personassociation (personid,importid,type,organizationid)
-					select p.id,p.importid,'organization',o.id from person p inner join organization o on (o.orgkey=trim(p.$schoolfieldnum))
+					$query = "insert into personassociation (personid,type,organizationid)
+					select p.id,'organization',o.id from person p inner join organization o on (o.orgkey=trim(p.$schoolfieldnum))
 					where p.type='system' and not p.deleted group by p.id, o.id";
 				}
 				QuickUpdate($query);
@@ -317,7 +317,10 @@ function upgrade_7_5 ($rev, $shardid, $customerid, $db) {
 			// upgrade from rev 6 to rev 7
 			echo "|";
 			apply_sql("upgrades/db_7-5_pre.sql",$customerid,$db, 7);
-				
+			
+			$query = "update personassociation pa join person p on (p.id = pa.personid) set pa.importid = p.importid";
+			QuickUpdate($query);
+			
 		case 7:
 			// upgrade from rev 7 to rev 8
 			echo "|";
