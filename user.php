@@ -472,13 +472,14 @@ if ($hasenrollment) {
 	if ($hasstaffid) {
 		$formdata["staffpkey"] = array(
 			"label" => _L('Staff ID'),
+			"fieldhelp" => _L("Set if the user is directly related to a staff ID and data access should be controlled based on it's value."),
 			"control" => array("FormHtml", "html" => '<div style="border: 1px dotted gray; padding 3px">'. $edituser->staffpkey ."</div>"),
 			"helpstep" => 2
 		);
 	} else {
 		$formdata["staffpkey"] = array(
 			"label" => _L("Staff ID"),
-			"fieldhelp" => _L("If the user is directly related to a staff ID and data access should be controlled based on it's value."),
+			"fieldhelp" => _L("Set if the user is directly related to a staff ID and data access should be controlled based on it's value."),
 			"value" => $edituser->staffpkey,
 			"validators" => array(
 				array("ValLength", "max" => 20)
@@ -510,6 +511,7 @@ if ($hasenrollment) {
 		$html .= "</div>";
 		$formdata["readonlysectoins"] = array(
 			"label" => _L('Imported Sections'),
+			"fieldhelp" => _L('Sections for this user associated during data import'),
 			"control" => array("FormHtml", "html" => $html),
 			"helpstep" => 2
 		);
@@ -521,7 +523,7 @@ if ($hasenrollment) {
 	if ($orgs) {
 		$formdata["sectionids"] = array(
 			"label" => _L('Additional Sections'),
-			"fieldhelp" => _L('Add or remove user section associations'),
+			"fieldhelp" => _L('Add or remove sections to associate with this user'),
 			"value" => $usersections,
 			"validators" => array(
 				array("ValSections")
