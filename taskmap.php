@@ -112,6 +112,7 @@ if ($datatype == "person") {
 
 } else if ($datatype == "user") {
 	$hasldap = getSystemSetting('_hasldap', '0');
+	$hasenrollment = getSystemSetting('_hasenrollment', '0');
 	
 	$maptofields = array();
 	$maptofields[""] = "- Unmapped -";
@@ -128,7 +129,8 @@ if ($datatype == "person") {
 	$maptofields["u9"] = "Caller ID";
 	$maptofields["u11"] = "Access Profile";
 	$maptofields["u12"] = "Restricted Job Types";
-	$maptofields["u10"] = "Staff ID";
+	if ($hasenrollment)
+		$maptofields["u10"] = "Staff ID";
 	$maptofields["sep"] = "--------------";
 
 	//F fields, limit to multisearch
