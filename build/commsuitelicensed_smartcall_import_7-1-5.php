@@ -1,37 +1,17 @@
 <?
 //////////////////////////////////////
 // Import a customer into this database (From a CommSuite with Flex Appliance)
-// Into Staging 7.1.5 customer database, ready for 7.5 upgrade_databases script
+// Into Staging 7.1.5 customer database 'csimport', ready for 7.5 upgrade_databases script
 //
 // EDIT VARIABLES AT TOP OF SCRIPT, avoid entering on command line or prompts
 //////////////////////////////////////
 
 $customerdatafile = "donotdelete_c_XXX_ASP_7-1-2.sql"; // file exported from old commsuite
-$shardhost = "localhost"; // you want to run on the db machine for the 'mysqldump' to work
-$dbuser = "";
+$shardhost = "127.0.0.1:3306"; // you want to run on the db machine for the 'mysql < importfile' to work
+$dbuser = "root";
 $dbpass = "";
 
 require_once('../inc/db.inc.php');
-
-/////////////
-// functions
-function echoarray($somearray){
-	foreach($somearray as $line){
-		echo $line . "\n";
-	}
-}
-
-function generalmenu($questions = array(), $validresponses = array()){
-	echoarray($questions);
-	$response = fread(STDIN, 1024);
-	$response = trim($response);
-	while(!in_array($response, $validresponses)){
-		echo "\nThat was not an option\n";
-		$response = fread(STDIN, 1024);
-		$response = trim($response);
-	}
-	return $response;
-}
 
 ///////////////////////
 // main program
@@ -43,13 +23,6 @@ echo "Connecting to database...\n";
 $custdb = mysql_connect($shardhost, $dbuser, $dbpass)
 	or die("Failed to connect to database");
 echo "connection ok\n";
-
-// confirm before continue
-$confirm = "n";
-while($confirm != "y"){
-	$confirm = generalMenu(array("Are you sure you want to import into database ".$csimportdbname."?", "y or n"), array("y", "n"));
-	if ($confirm == "n") exit();
-}
 
 // drop database, recreate with new tables
 echo "Drop and Create ".$csimportdbname." database\n";
@@ -184,7 +157,17 @@ mysql_query("COMMIT",$custdb);
 //////////////////////////////////////
 // import data
 echo("Import customer data\n");
-exec("mysql -u $dbuser -p$dbpass $csimportdbname < $customerdatafile", $output, $return_var);
+$password_arg = "";
+if ($dbpass != "") {
+	$password_arg = "-p $dbpass";
+}
+$host_port = "-h " . $shardhost;
+if (strpos($shardhost,":") !== false) {
+	list($host,$port) = explode(":",$shardhost);
+	$host_port = "-h $host -P $port";
+}
+exec("mysql $host_port -u $dbuser $password_arg $csimportdbname < $customerdatafile", $output, $return_var);
+
 if ($return_var) {
 	echo "import failed with return var ".$return_var."\n";
 	die();
