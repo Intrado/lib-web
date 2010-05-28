@@ -71,7 +71,7 @@ function createLimitedUser($limitedusername, $limitedpassword, $custdbname, $sha
 	$tables['user'] 		= "select";
 			
 	foreach ($tables as $tablename => $privs) {
-		if (QuickUpdate("grant ".$privs." on $custdbname . ".$tablename." to '$limitedusername'", $sharddb) === false)
+		if (QuickUpdate("grant ".$privs." on $custdbname . ".$tablename." to '$limitedusername'@'$grantedhost'", $sharddb) === false)
 			dieWithError("Failed to grant ".$tablename." on ".$custdbname, $sharddb);
 		
 	}
