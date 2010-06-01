@@ -11,7 +11,7 @@ if (isset($_SESSION['_locale']))
 if (isset($_SESSION['portaluser']['portaluser.preferences']['_locale']))
 	$LOCALE = $_SESSION['portaluser']['portaluser.preferences']['_locale'];
 
-if (!isset($LOCALE) || !isset($LOCALE, $LOCALES)) {
+if (!isset($LOCALE) || !isset($LOCALES[$LOCALE])) {
 	$LOCALE = 'en_US';
 }
 
