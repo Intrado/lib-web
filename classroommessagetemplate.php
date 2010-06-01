@@ -219,7 +219,8 @@ foreach ($languagemap as $code => $language) {
 		"label" => _L("Subject"),
 		"fieldhelp" => _L('The Subject will appear as the subject line of the email.'),
 		"value" => ($message)?$message->subject:"",
-		"validators" => array(),
+		"validators" => array(
+			array("ValLength","max" => 255)),
 		"control" => array("TextField","max"=>255,"size"=>45),
 		"helpstep" => 6
 	);
@@ -368,8 +369,8 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 			} else {
 				if (isset($messagesbylangcode[$code])) {
 					$messagesbylangcode[$code]->deleted = 1;
-					$messagesbylangcode[$code]->messagegroup = null;
 					$messagesbylangcode[$code]->update();
+					QuickUpdate("update message set messagegroupid = null where id = ?", false, array($messagesbylangcode[$code]->id));
 				}
 			}
 		}
