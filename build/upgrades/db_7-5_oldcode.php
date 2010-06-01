@@ -312,13 +312,6 @@ class ReportInstance_7_5_r14 extends DBMappedObject {
 		$this->setParameterString($paramstring);
 			
 	}
-	
-	function setString ($paramstring) {
-		$params = explode("&", $paramstring);
-		sort($params);
-		return implode("&", $params);
-		//$this->rehash();
-	}
 		
 	function getParameters () {
 		$paramarray = array();
@@ -334,17 +327,6 @@ class ReportInstance_7_5_r14 extends DBMappedObject {
 			
 		return $paramarray;
 	}
-	
-	function setReport ($reportobj) {
-		$this->report = $reportobj;
-		$this->reportid = $reportobj->id;
-	}
-	
-	function setReportID ($id) {
-		$this->reportid = $id;
-		$this->report = new Report($id);
-	}
-	
 	
 	// takes the rules string and converts it to an array of rules
 	function ruleStringtoArray($rules = ""){
