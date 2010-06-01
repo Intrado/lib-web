@@ -53,8 +53,9 @@ if (isset($_GET['orgid']) && isset($_GET['delete'])) {
 function fmt_actions ($row, $index) {
 	global $start;
 	return action_links(
-		action_link("Delete", "cross", "organizationdatamanager.php?orgid=". $row[$index] ."&delete&pagestart=$start","return confirm('". addslashes(_L('Are you sure you want to delete this organization?')) ."');"),
-		action_link("Merge", "fugue/arrow_join", "organizationmerge.php?orgid=". $row[$index]));
+		action_link("Rename", "pencil", "organizationrename.php?orgid=". $row[$index]),
+		action_link("Merge", "fugue/arrow_join", "organizationmerge.php?orgid=". $row[$index]),
+		action_link("Delete", "cross", "organizationdatamanager.php?orgid=". $row[$index] ."&delete&pagestart=$start","return confirm('". addslashes(_L('Are you sure you want to delete this organization?')) ."');"));
 }
 
 $titles = array(
