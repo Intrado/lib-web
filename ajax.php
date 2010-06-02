@@ -262,7 +262,14 @@ function handleRequest() {
 				}
 			// if it's an organization field
 			} else if ($fieldnum == 'organization') {
-				return Organization::getAuthorizedOrgKeys();
+				$organizations = Organization::getAuthorizedOrgKeys();
+				if($organizations) {
+					$result = array();
+					foreach($organizations as $id => $orgkey) 
+						$result[] = array("value" => $id, "title" => $orgkey);
+					return $result;
+				}
+				return false;
 			} else { // Unknown fieldnum, return false.
 				return false;
 			}
