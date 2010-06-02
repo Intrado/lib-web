@@ -80,20 +80,17 @@ $formdata["category"] = array(
 	"helpstep" => 1
 );
 
-$validator = array(array("ValLength","min" => 0,"max" => 150));
 foreach($languages as $language) {
 	$code = $language[2];
-	$langvalidator = ($code == 'en'?array(array("ValRequired")) + $validator:$validator);
 	$formdata[$code] = array(
 		"label" => $language[1],
 		"value" => "",
-		"validators" => $langvalidator ,
+		"validators" => array(array("ValLength","min" => 0,"max" => 150)),
 		"control" => array("TextField","size" => 50, "maxlength" => 150),
 		"helpstep" => 2
 	);
 	if(isset($languagemessages[$code]) && $languagemessages[$code] != "") {
 		// Populate the form with message data and complete with default data
-
 		$formdata[$code]["value"] = $languagemessages[$code];
 	} else {
 		$filename = "messagedata/" . $code . "/targetedmessage.php";
@@ -144,17 +141,16 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 				$code = $language[2];
 				$newvalue = $postdata[$code];
 				$message = false;
-				//
+				$isasdefault = isset($messagedatacache[$code]) && 
+								isset($messagedatacache[$code][$targetedmesssage[0]]) &&
+								$messagedatacache[$code][$targetedmesssage[0]] == $newvalue;
+				
 				if($targetedmesssage[1]) {
-					$message = DBFind("Message", "from message m where m.messagegroupid = ? and languagecode = ?",false, array($targetedmesssage[1],$code));
+					$message = DBFind("Message", "from message where messagegroupid = ? and languagecode = ?",false, array($targetedmesssage[1],$code));
 					$messagegroupid = $targetedmesssage[1];
 				} else {
-					if(	isset($messagedatacache[$code]) &&
-						isset($messagedatacache[$code][$targetedmesssage[0]]) &&
-						$messagedatacache[$code][$targetedmesssage[0]] == $newvalue
-						) {
+					if($isasdefault) {
 							// There is a default value for this message/language and the value has not changed
-
 							continue;
 					} else {
 						if($newvalue != '' && !$messagegroupid) {
@@ -180,34 +176,43 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 				}
 				if($messagegroupid) {
 					if($message === false) {
-						// create a new message
-						$message = new Message();
-						$message->messagegroupid = $messagegroupid;
-						$message->userid = $USER->id;
-						$message->name = "Custom Classroom";
-						$message->description = '';
-						$message->type = 'email';
-						$message->subtype = 'plain';
-						$message->data = '';
-						$message->modifydate = date("Y-m-d H:i:s", time());
-						$message->deleted = 1;
-						$message->autotranslate = 'none';
-						$message->languagecode = $code;
-						$message->create();
-
-						$messagepart = new MessagePart();
-						$messagepart->messageid = $message->id;
-						$messagepart->type = 'T';
-						$messagepart->txt = $newvalue;
-						$messagepart->sequence = 0;
-						$messagepart->create();
-					} else {
-						$message->modifydate = date("Y-m-d H:i:s", time());
-						$message->update();
-						$messagepart = DBFind("MessagePart","from messagepart where messageid = ? and sequence = 0",false,array($message->id));
-						if($messagepart) {
+						if ($newvalue != '' || !$isasdefault) {
+							// create a new message
+							$message = new Message();
+							$message->messagegroupid = $messagegroupid;
+							$message->userid = $USER->id;
+							$message->name = "Custom Classroom";
+							$message->description = '';
+							$message->type = 'email';
+							$message->subtype = 'plain';
+							$message->data = '';
+							$message->modifydate = date("Y-m-d H:i:s", time());
+							$message->deleted = 1;
+							$message->autotranslate = 'none';
+							$message->languagecode = $code;
+							$message->create();
+	
+							$messagepart = new MessagePart();
+							$messagepart->messageid = $message->id;
+							$messagepart->type = 'T';
 							$messagepart->txt = $newvalue;
-							$messagepart->update();
+							$messagepart->sequence = 0;
+							$messagepart->create();
+						}
+					} else {
+						if ($newvalue == '' || $isasdefault) {
+							QuickQuery("BEGIN");
+							QuickQuery("delete from message where id = ?",false,array($message->id));
+							QuickQuery("delete from messagepart where messageid = ?",false,array($message->id));
+							QuickQuery("COMMIT");
+						} else {
+							$message->modifydate = date("Y-m-d H:i:s", time());
+							$message->update();
+							$messagepart = DBFind("MessagePart","from messagepart where messageid = ? and sequence = 0",false,array($message->id));
+							if($messagepart) {
+								$messagepart->txt = $newvalue;
+								$messagepart->update();
+							}
 						}
 					}
 				}
