@@ -104,29 +104,36 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		
 		$orgkey = trim($postdata['neworg']);
 		Query("BEGIN");
-		// check if this org already exists
-		$existingorg = DBFind("Organization", "from organization where orgkey = ?", false, array($orgkey));
+
+		$originalorg = DBFind("Organization", "from organization where id = ? and not deleted", false, array($originalorgid));
 		
-		// if the org exists and it's a case change, rename the org
-		if (mb_strtolower($orgkey) == mb_strtolower($originalorgkey)) {
-			QuickUpdate("update organization set orgkey = ? where id = ?", false, array($orgkey, $originalorgid));
-			
-		// if it's a new name then do a merge and mark the old org deleted.
+		$existingorg = DBFind("Organization", "from organization where orgkey = ?", false, array($orgkey));
+		// if the org already exists make it our target org
+		if ($existingorg) {
+			$org = $existingorg;
+			$org->orgkey = $orgkey;
+			$org->deleted = 0;
+			$org->update();
+						
+		// if it's a new org then crete a new one
 		} else {
 			$org = new Organization();
 			$org->orgkey = $orgkey;
 			$org->create();
-			
+		}
+		
+		// if the original org and the new org are not the same, update associations and delete the original
+		if ($org->id !== $originalorg->id) {
 			QuickUpdate("update userassociation set organizationid = ? where organizationid = ?", false, array($org->id, $originalorgid));
 			QuickUpdate("update personassociation set organizationid = ? where organizationid = ?", false, array($org->id, $originalorgid));
 			QuickUpdate("update listentry set organizationid = ? where organizationid = ?", false, array($org->id, $originalorgid));
 			
-			$originalorg = DBFind("Organization", "from organization where id = ? and not deleted", false, array($originalorgid));
 			$originalorg->deleted = 1;
 			$originalorg->update();
 		}
+		
 
-		notice(_L("%s has been renamed.", $originalorgkey));
+		notice(_L("$1%s has been renamed to $2%s.", $originalorgkey, $orgkey));
 		
 		Query("COMMIT");
 		
