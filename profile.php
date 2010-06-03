@@ -618,6 +618,9 @@ if (!getSystemSetting("_hastargetedmessage", false)) {
 	unset($formdata['manageclassroommessaging']);
 }
 
+if (getSystemSetting('_hascallback', false)) {
+	unset($formdata['setcallerid']);
+}
 
 $helpsteps = array (
 	_L('Enter a name and optional description for this Access Profile.'),
@@ -695,7 +698,6 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 			$obj->setPermission("subscribe", $subscribed);
 			$obj->setPermission("datafields", $allowedfields);
 			$obj->setPermission("createrepeat", (bool)$postdata['createrepeat']);
-			$obj->setPermission("setcallerid", (bool)$postdata['setcallerid']);
 			$obj->setPermission("maxjobdays", $postdata['maxjobdays']);
 			$obj->setPermission("blocknumbers", $postdata['callblockingperms'] != "none");
 			$obj->setPermission("callblockingperms", $postdata['callblockingperms']);
@@ -735,6 +737,10 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 				$obj->setPermission("targetedmessage", (bool)$postdata['targetedmessage']);
 				$obj->setPermission("targetedcomment", (bool)$postdata['targetedcomment']);
 				$obj->setPermission("manageclassroommessaging", (bool)$postdata['manageclassroommessaging']);
+			}
+			
+			if (!getSystemSetting('_hascallback', false)) {
+				$obj->setPermission("setcallerid", (bool)$postdata['setcallerid']);
 			}
 			
 		Query("COMMIT");
