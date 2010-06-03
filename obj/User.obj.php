@@ -255,11 +255,16 @@ class User extends DBMappedObject {
 	 * @return unknown_type
 	 */
 	function canSeePerson ($personid) {
+		$query = "select 1 from person where id=? and not deleted and userid=? and type in ('addressbook','manualadd','upload') \n";
+		if (QuickQuery($query,false,array($personid,$this->id))) {
+			return true;
+		}
+		
 		$joinsql = $this->getPersonAssociationJoinSql(array(), array(), "p");
 		$rulesql = $this->getRuleSql(array(), "p");
 		$query = "select 1 from person p \n"
 				."	$joinsql \n"
-				."	where p.id=? and not p.deleted and (p.userid=0 OR p.userid=? or (1 $rulesql))  \n";
+				."	where p.id=? and not p.deleted and (p.userid=? or (1 $rulesql))  \n";
 		
 		return QuickQuery($query,false,array($personid,$this->id));
 	}
