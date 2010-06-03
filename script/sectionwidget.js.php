@@ -45,7 +45,7 @@ var SectionWidget = Class.create({
 		
 		cachedAjaxGet('ajax.php?type=getsections&organizationid=' + organizationid, function(transport) {
 			var sections = transport.responseJSON,
-				radiobox = new Element('div', {'id':this.formitemname, 'class':'radiobox', 'style':'width: 200px; white-space: nowrap; overflow:auto'}),
+				radiobox = new Element('div', {'id':this.formitemname, 'class':'radiobox', 'style':'width: auto; white-space: nowrap; overflow:auto'}),
 				checkboxname = this.formitemname + '[]',
 				count = 0,
 				i = 0;

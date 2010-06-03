@@ -9,16 +9,8 @@ class SectionWidget extends FormItem {
 		if (isset($this->args['sectionids']) && is_array($this->args['sectionids']) && count($this->args['sectionids']) > 0)
 			$selectedorganizationid = QuickQuery('select organizationid from section where id=?', false, array(reset($this->args['sectionids'])));
 		
-		$html = '
-			<table>
-				<tr>
-					<th style="text-align:left; vertical-align:top">'.escapehtml(getSystemSetting("organizationfieldname","Organization")).'</th>
-					<th style="text-align:left; vertical-align:top">'.escapehtml(_L("Sections")).'</th>
-				</tr>
-				<tr>
-					<td style="text-align:left; vertical-align:top">
-						<select id="'.$n.'organizationselector">
-							<option value="">--- ' . escapehtml(_L("Choose a %s",getSystemSetting("organizationfieldname","Organization"))) . ' ---</option>
+		$html = '<select id="'.$n.'organizationselector">
+					<option value="">--- ' . escapehtml(_L("Choose a %s",getSystemSetting("organizationfieldname","Organization"))) . ' ---</option>
 		';
 	
 		// Populate the selectbox with authorized organizations.
@@ -29,16 +21,12 @@ class SectionWidget extends FormItem {
 			$html .= '<option value="'.$organizationid.'" '.($selected ? 'selected' : '').'>' . escapehtml($orgkey) . '</option>';
 		}
 		
-		$html .= '
-						</select>
-					</td>
-					<td id="'.$n.'sectionscontainer" style="text-align:left; vertical-align:top">
+		$html .= '</select>
+					<div id="'.$n.'sectionscontainer">
 						<!-- This is necessary for form_make_validators() to actually instantiate the validator for this form item. -->
 						<!-- This hidden input will get deleted when the section widget loads new content. -->
 						<input id="'.$n.'" type="hidden" value=""/>
-					</td>
-				</tr>
-			</table>
+					</div>
 		';
 		
 		return $html;

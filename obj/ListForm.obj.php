@@ -84,7 +84,7 @@ class ListForm extends Form {
 		
 		if (getSystemSetting('_hasenrollment')) {
 			$str .= "
-				<table style='border-collapse:collapse' id='chooseSectionsWindow'>
+				<table style='border-collapse:collapse;width:100%;' id='chooseSectionsWindow'>
 					<tbody></tbody>
 				</table>
 			";
