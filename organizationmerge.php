@@ -144,6 +144,18 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 			QuickUpdate("update userassociation set organizationid = ? where organizationid = ?", false, array($dest->id, $source->id));
 			QuickUpdate("update personassociation set organizationid = ? where organizationid = ?", false, array($dest->id, $source->id));
 			QuickUpdate("update listentry set organizationid = ? where organizationid = ?", false, array($dest->id, $source->id));
+			
+			// check persondatavalues and update/create/delete entries
+			$sourcepdvid = QuickQuery("select id from persondatavalues where fieldnum = 'oid' and value = ?", false, array($source->id));
+			$destpdvid = QuickQuery("select id from persondatavalues where fieldnum = 'oid' and value = ?", false, array($dest->id));
+			// if the source org exists in persondatavalues, remove it
+			if ($sourcepdvid)
+				QuickUpdate("delete from persondatavalues where id = ?", false, array($sourcepdvid));
+			// if the dest org doesn't exist in persondatavalues, add it
+			if (!$destpdvid) {
+				QuickUpdate("insert into persondatavalues values (null, 'oid', ?, 0, 1)", false, array($dest->id));
+			}
+			
 			$source->deleted = 1;
 			$source->update();
 			Query("COMMIT");
