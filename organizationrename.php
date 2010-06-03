@@ -141,7 +141,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		}
 		
 
-		notice(_L("$1%s has been renamed to $2%s.", $originalorgkey, $orgkey));
+		notice(_L('%1$s has been renamed to %2$s.', $originalorgkey, $orgkey));
 		
 		Query("COMMIT");
 		
