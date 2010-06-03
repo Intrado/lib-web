@@ -137,6 +137,7 @@ $settings['surveyurl'] = "";
 $settings['autoreport_replyname'] = "";
 $settings['autoreport_replyemail'] = "";
 $settings['inboundnumber'] = "";
+$settings['callerid'] = "";
 $settings['_supportemail'] = "";
 $settings['_supportphone'] = "";
 $settings['emaildomain'] = "";
