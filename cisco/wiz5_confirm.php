@@ -2,7 +2,7 @@
 require_once("common.inc.php");
 require_once("../obj/Person.obj.php");
 require_once("../obj/PeopleList.obj.php");
-require_once("../obj/Message.obj.php");
+require_once("../obj/MessageGroup.obj.php");
 require_once("../obj/JobType.obj.php");
 include_once("../obj/Rule.obj.php");
 include_once("../obj/ListEntry.obj.php");
@@ -24,7 +24,7 @@ if(isset($_GET['jobtypeid'])) {
 if ($_SESSION['newjob']['message'] == "callme") {
 	$messagename = "-Not yet recorded-";
 } else {
-	$message = new Message($_SESSION['newjob']['message']);
+	$message = new MessageGroup($_SESSION['newjob']['message']);
 	$messagename = $message->name;
 }
 $list = new PeopleList($_SESSION['newjob']['list']);

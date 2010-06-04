@@ -31,7 +31,7 @@ function getSetting($name) {
 
 
 if (! (userOwns("list",DBSafe($_SESSION['newjob']['list'])) &&
-		userOwns("message",DBSafe($_SESSION['newjob']['message'])) )) {
+		userOwns("messagegroup",DBSafe($_SESSION['newjob']['message'])) )) {
 	exit();
 }
 

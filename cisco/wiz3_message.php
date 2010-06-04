@@ -1,6 +1,6 @@
 <?
 require_once("common.inc.php");
-require_once("../obj/Message.obj.php");
+require_once("../obj/MessageGroup.obj.php");
 
 if (!$USER->authorize('sendphone')) {
 	header("Location: $URL/index.php");
@@ -29,7 +29,7 @@ if($min - 30 <= 0){
 	$back = $min - 30;
 }
 
-$messages = DBFindMany("Message","from message where type='phone' and userid=$USER->id and deleted=0 order by name
+$messages = DBFindMany("MessageGroup","from messagegroup where type='notification' and userid=$USER->id and deleted=0 order by name
 	limit 29 offset $min");
 
 header("Content-type: text/xml");

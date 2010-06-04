@@ -12,7 +12,7 @@ if (!isset($_GET['edit'])) {
 	$_SESSION['newjob']['name'] = "";
 	$_SESSION['newjob']['desc'] = "";
 	$_SESSION['newjob']['numdays'] = min($ACCESS->getValue('maxjobdays'), $USER->getSetting("maxjobdays","2"));
-	$_SESSION['newjob']['retries'] = min(4,$ACCESS->getValue('callmax'));
+	$_SESSION['newjob']['retries'] = min($ACCESS->getValue('callmax'), $USER->getSetting("callmax","4"));
 	$_SESSION['newjob']['easycall'] = false;
 }
 

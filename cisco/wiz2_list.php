@@ -15,10 +15,18 @@ if (isset($_GET['desc'])) {
 	$_SESSION['newjob']['desc'] = $_GET['desc'];
 }
 if (isset($_GET['numdays'])) {
-	$_SESSION['newjob']['numdays'] = $_GET['numdays'];
+	// validate numdays in range, else set to 1
+	$numdays = $_GET['numdays'] + 0;
+	if ($numdays < 1 || $numdays > $ACCESS->getValue('callmax'))
+		$numdays = 1;
+	$_SESSION['newjob']['numdays'] = $numdays;
 }
 if (isset($_GET['retries'])) {
-	$_SESSION['newjob']['retries'] = $_GET['retries'];
+	// validate retries in range, else set to 1
+	$retries = $_GET['retries'];
+	if ($retries < 1 || $retries > $ACCESS->getValue('callmax'))
+		$retries = 1;
+	$_SESSION['newjob']['retries'] = $retries;
 }
 
 if(isset($_GET['listcount'])) {
