@@ -42,7 +42,7 @@ $job->name = ($_SESSION['newjob']['name'] ? $_SESSION['newjob']['name'] : $defau
 $job->description = ($_SESSION['newjob']['desc'] ? $_SESSION['newjob']['desc'] : $defaultname);
 
 $job->jobtypeid = $_SESSION['newjob']['jobtypeid'];
-$job->setOptionValue("retry",$_SESSION['newjob']['retries']);
+$job->setOptionValue("maxcallattempts",$_SESSION['newjob']['retries']);
 
 $job->enddate = date("Y-m-d", strtotime($job->startdate) + (($_SESSION['newjob']['numdays'] - 1) * 86400));
 
