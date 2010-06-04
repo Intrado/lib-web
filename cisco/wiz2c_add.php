@@ -55,7 +55,7 @@ if (isset($_GET['firstname']) || isset($_GET['lasttname']) || isset($_GET['phone
 		$person->deleted = 0;
 		$person->$fnf = $fname;
 		$person->$lnf = $lname;
-		$person->$langf = "English";
+		$person->$langf = "en";
 		$person->type = "manualadd";
 		$person->create();
 
