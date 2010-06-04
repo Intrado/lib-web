@@ -23,7 +23,7 @@ if (isset($_GET['numdays'])) {
 }
 if (isset($_GET['retries'])) {
 	// validate retries in range, else set to 1
-	$retries = $_GET['retries'];
+	$retries = $_GET['retries'] + 0;
 	if ($retries < 1 || $retries > $ACCESS->getValue('callmax'))
 		$retries = 1;
 	$_SESSION['newjob']['retries'] = $retries;
