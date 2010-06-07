@@ -489,6 +489,7 @@ class EasyCall extends FormItem {
 
 				// store the language code to name map in a json object, we need this in WizEasyCall
 				languages = '.json_encode($languages).';
+				languages["en"] = "Default";
 
 				// save default phone into msgphone, this variable tracks changes the user makes to desired call me number
 				msgphone = "'.$defaultphone.'";
