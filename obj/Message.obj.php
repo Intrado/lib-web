@@ -136,12 +136,26 @@ class Message extends DBMappedObject {
 				$part->create();
 			} else {
 				$errors = array();
+				// VoiceID Sanity Check
+				if ($this->type == 'phone' && $voiceid == null) {
+					error_log("ERROR: Fund phone message with voiceid null");
+					if ($preferredgender == null) 
+						$preferredgender = "female";
+					$voiceid = Voice::getPreferredVoice($this->languagecode, $preferredgender);
+				}
 				$parts = $this->parse($body, $errors, $voiceid, $audiofileids);
 			}
 		}
 		
 		if (is_array($parts)) {
 			foreach ($parts as $part) {
+				// VoiceID Sanity Check
+				if ($this->type == 'phone' && $part->voiceid == null) {
+					error_log("ERROR: Fund phone message part with voiceid null");
+					if ($preferredgender == null) 
+						$preferredgender = "female";
+					$voiceid = Voice::getPreferredVoice($this->languagecode, $preferredgender);
+				}
 				$part->messageid = $this->id;
 				$part->create();
 			}
