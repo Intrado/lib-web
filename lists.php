@@ -239,8 +239,8 @@ startWindow('My Lists&nbsp;' . help('Lists_MyLists'));
 		<div class="feed">
 			<h1 id="filterby">Sort By:</h1>
 			<div id="allfilters" class="feedfilter">
-				<a id="datefilter" href="#" onclick="applyfilter('date'); return false;"><img src="img/largeicons/tiny20x20/clock.jpg" />Modify Date</a><br />
 				<a id="namefilter" href="#" onclick="applyfilter('name'); return false;"><img src="img/largeicons/tiny20x20/pencil.jpg" />Name</a><br />
+				<a id="datefilter" href="#" onclick="applyfilter('date'); return false;"><img src="img/largeicons/tiny20x20/clock.jpg" />Modify Date</a><br />
 			</div>
 		</div>
 	</td>
@@ -337,7 +337,7 @@ function applyfilter(filter) {
 		});
 }
 document.observe('dom:loaded', function() {
-	applyfilter('date');
+	applyfilter('name');
 });
 </script>
 <?
