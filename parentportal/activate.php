@@ -93,7 +93,7 @@ if ($forgot) {
 		$action = "?f";
 	else
 		$action = $appendcustomerurl."&f";
-	$text = _L("Please enter it below along with your new password.  Passwords must be 5 characters in length and cannot be similiar to your first name, last name, or email address");
+	$text = _L("Please enter it below along with your new password.  Passwords must be at least 5 characters in length and cannot be similiar to your first name, last name, or email address");
 } else if ($changeuser) {
 	$TITLE = "Change Email";
 	if ($appendcustomerurl == "")
