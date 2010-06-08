@@ -1,7 +1,5 @@
 <?
 require_once("common.inc.php");
-include_once("../inc/securityhelper.inc.php");
-include_once("../inc/utils.inc.php");
 include_once("../obj/SpecialTask.obj.php");
 require_once("../obj/Phone.obj.php");
 include_once("../obj/Language.obj.php");
@@ -18,6 +16,7 @@ if (isset($_GET['dn'])) {
 
 	if (! (userOwns("list",DBSafe($_SESSION['newjob']['list'])) &&
 			($_SESSION['newjob']['message'] == "callme"))) {
+		header("Location: $URL/index.php");
 		exit();
 	}
 
@@ -72,7 +71,7 @@ header("Content-type: text/xml");
 <Prompt> </Prompt>
 
 <Text>
-You should recieve a call shortly.
+You should receive a call shortly.
 </Text>
 
 <SoftKeyItem>

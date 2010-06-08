@@ -21,6 +21,7 @@ require_once("XML/RPC.php");
 require_once("../inc/auth.inc.php");
 require_once("../inc/sessionhandler.inc.php");
 
+require_once("../inc/securityhelper.inc.php");
 require_once("../inc/utils.inc.php");
 require_once("../obj/User.obj.php");
 require_once("../obj/Access.obj.php");

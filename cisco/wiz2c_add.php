@@ -62,6 +62,7 @@ if (isset($_GET['firstname']) || isset($_GET['lasttname']) || isset($_GET['phone
 		$ph = new Phone();
 		$ph->personid = $person->id;
 		$ph->sequence = 0;
+		$ph->editlock = 0;
 		$ph->phone = Phone::parse($phone);
 		$ph->create();
 

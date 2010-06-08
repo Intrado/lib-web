@@ -21,10 +21,13 @@ $scheme = getCustomerData($CUSTOMERURL);
 
 //try logging in once user/pass or code/pin is checked
 function tryLogin ($userid) {
-	if (!$userid)
+	if (!$userid) {
+		error_log("User trying to log in but has bad user/pass/url");
 		return false;
-	if($userid == -1)
-		return false;
+	}
+	if ($userid == -1) {
+		return false; // -1 for login lockout period
+	}
 	doStartSession();
 	$newuser = new User($userid);
 	$newaccess = new Access($newuser->accessid);

@@ -1,6 +1,5 @@
 <?
 include_once("common.inc.php");
-include_once("../inc/securityhelper.inc.php");
 include_once("../obj/Job.obj.php");
 
 include ("../jpgraph/jpgraph.php");
@@ -12,8 +11,7 @@ include ("../jpgraph/jpgraph_canvas.php");
 $jobid = $_GET['jobid']+0;
 
 if (!userOwns("job",$jobid) && !$USER->authorize('viewsystemreports')) {
-	header("Content-type: image/gif");
-	readfile("img/icon_logout.gif");
+	header("Location: $URL/index.php");
 	exit();
 }
 $job = new Job($jobid);
@@ -24,7 +22,7 @@ select count(*) as cnt,
 			if(rc.result not in ('A', 'M') and rc.numattempts > '0' and rc.numattempts < js.value and j.status not in ('complete','cancelled'), 'retry', null),
 			if(rc.result='notattempted' and j.status in ('complete','cancelled'), 'fail', null),
 			if(rc.result not in ('A', 'M', 'duplicate', 'blocked') and rc.numattempts = '0' and j.status not in ('complete','cancelled'), 'inprogress', null),
-			rc.result)
+			if (rc.result = 'X' and rc.numattempts < 3, 'F', rc.result))
 			as callprogress2
 
 from job j

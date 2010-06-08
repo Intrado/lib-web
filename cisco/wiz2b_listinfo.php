@@ -47,7 +47,7 @@ echo "Total people:\t" . $renderedlist->getTotal() . "\r\n";
 </SoftKeyItem>
 
 
-<? if ($USER->authorize('createlist')) { ?>
+<? if ($USER->authorize('createlist') && $USER->id == $list->userid) { ?>
 	<SoftKeyItem>
 	<Name>Add #</Name>
 	<URL><?= htmlentities($URL . "/wiz2c_add.php") ?></URL>

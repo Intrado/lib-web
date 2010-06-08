@@ -39,7 +39,7 @@ select count(*) as cnt,
 			if(rc.result not in ('A', 'M', 'duplicate', 'blocked') and rc.numattempts > '0' and rc.numattempts < js.value, 'retry', null),
 			if(rc.result='notattempted' and j.status in ('complete','cancelled'), 'fail', null),
 			if(rc.result not in ('A', 'M', 'duplicate', 'blocked') and rc.numattempts = '0', 'inprogress', null),
-			rc.result)
+			if (rc.result = 'X' and rc.numattempts < 3, 'F', rc.result))
 			as callprogress2
 
 from job j

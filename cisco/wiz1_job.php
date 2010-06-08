@@ -38,21 +38,6 @@ header("Content-type: text/xml");
 </InputItem>
 
 
-<InputItem>
-<DisplayName>Days to run</DisplayName>
-<QueryStringParam>numdays</QueryStringParam>
-<DefaultValue><?= $_SESSION['newjob']['numdays'] ?></DefaultValue>
-<InputFlags>N</InputFlags>
-</InputItem>
-
-<InputItem>
-<DisplayName>Call retries</DisplayName>
-<QueryStringParam>retries</QueryStringParam>
-<DefaultValue><?= $_SESSION['newjob']['retries'] ?></DefaultValue>
-<InputFlags>N</InputFlags>
-</InputItem>
-
-
 <?/* overide the back/exit button */?>
 
 <SoftKeyItem>

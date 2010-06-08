@@ -10,8 +10,14 @@ if (!$USER->authorize('sendphone')) {
 	exit();
 }
 
-if(isset($_GET['message'])) {
-	$_SESSION['newjob']['message'] = $_GET['message'];
+if (isset($_GET['message'])) {
+	$messagegroupid = $_GET['message'] + 0;
+	if (userOwns("messagegroup", $messagegroupid) || isSubscribed("messagegroup", $messagegroupid)) {
+		$_SESSION['newjob']['message'] = $messagegroupid;
+	} else {
+		header("Location: $URL/index.php");
+		exit();
+	}
 
 	if ($_GET['message'] == "callme") {
 		if (!$USER->authorize('starteasy')) {
@@ -22,7 +28,6 @@ if(isset($_GET['message'])) {
 	} else {
 		$_SESSION['newjob']['easycall'] = false;
 	}
-
 }
 
 $VALIDJOBTYPES = JobType::getUserJobTypes();

@@ -2,7 +2,7 @@
 require_once("common.inc.php");
 
 if(isset($_GET['jobid'])) {
-	$jobid = $_GET['jobid'];
+	$jobid = $_GET['jobid'] + 0;
 }
 
 //TODO refresh header

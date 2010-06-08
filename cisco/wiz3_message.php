@@ -7,8 +7,14 @@ if (!$USER->authorize('sendphone')) {
 	exit();
 }
 
-if(isset($_GET['list'])) {
-	$_SESSION['newjob']['list'] = $_GET['list']+0;
+if (isset($_GET['list'])) {
+	$listid = $_GET['list'] + 0;
+	if (userOwns("list", $listid) || isSubscribed("list", $listid)) {
+		$_SESSION['newjob']['list'] = $listid;
+	} else {
+		header("Location: $URL/index.php");
+		exit();
+	}
 }
 
 if(isset($_GET['info'])) {
@@ -29,8 +35,25 @@ if($min - 30 <= 0){
 	$back = $min - 30;
 }
 
-$messages = DBFindMany("MessageGroup","from messagegroup where type='notification' and userid=$USER->id and deleted=0 order by name
-	limit 29 offset $min");
+// get all the message groups
+$messages = QuickQueryMultiRow(
+		"(select mg.id as id, (mg.name +0) as digitsfirst, mg.name as name
+		from messagegroup mg
+		where mg.userid = ? 
+			and mg.type = 'notification'
+			and not mg.deleted)
+		UNION
+		(select mg.id as id, (mg.name +0) as digitsfirst, mg.name as name
+		from publish p
+		inner join messagegroup mg on
+			(p.messagegroupid = mg.id)
+		where p.userid = ?
+			and p.action = 'subscribe'
+			and p.type = 'messagegroup'
+			and not mg.deleted)
+		order by digitsfirst, name, id
+		limit 29 offset $min", true, false, array($USER->id, $USER->id));
+
 
 header("Content-type: text/xml");
 
@@ -50,10 +73,11 @@ header("Content-type: text/xml");
 <?
 
 foreach ($messages as $message) {
+
 ?>
 	<MenuItem>
-	<Name><?= htmlentities($message->name) ?></Name>
-	<URL><?= htmlentities($URL . "/wiz4_priority.php?message=" . $message->id) ?></URL>
+	<Name><?= htmlentities($message['name']) ?></Name>
+	<URL><?= htmlentities($URL . "/wiz4_priority.php?message=" . $message['id']) ?></URL>
 	</MenuItem>
 <?
 

@@ -12,7 +12,21 @@ if (!$USER->authorize('sendphone')) {
 }
 
 if(isset($_GET['jobtypeid'])) {
-	$_SESSION['newjob']['jobtypeid'] = $_GET['jobtypeid'];
+	$jtid = $_GET['jobtypeid'] + 0;
+	$isValidJobType = false;
+	$VALIDJOBTYPES = JobType::getUserJobTypes();
+	foreach ($VALIDJOBTYPES as $jobtype) {
+		if ($jobtype->id == $jtid) {
+			$isValidJobType = true;
+			break;
+		}
+	}
+	if (!$isValidJobType) {
+		header("Location: $URL/index.php");
+		exit();
+	}
+
+	$_SESSION['newjob']['jobtypeid'] = $jtid;
 }
 
 if(!isset($_SESSION['newjob']['language']['Default'])){

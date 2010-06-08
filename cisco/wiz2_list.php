@@ -14,20 +14,6 @@ if (isset($_GET['jobname'])) {
 if (isset($_GET['desc'])) {
 	$_SESSION['newjob']['desc'] = $_GET['desc'];
 }
-if (isset($_GET['numdays'])) {
-	// validate numdays in range, else set to 1
-	$numdays = $_GET['numdays'] + 0;
-	if ($numdays < 1 || $numdays > $ACCESS->getValue('callmax'))
-		$numdays = 1;
-	$_SESSION['newjob']['numdays'] = $numdays;
-}
-if (isset($_GET['retries'])) {
-	// validate retries in range, else set to 1
-	$retries = $_GET['retries'] + 0;
-	if ($retries < 1 || $retries > $ACCESS->getValue('callmax'))
-		$retries = 1;
-	$_SESSION['newjob']['retries'] = $retries;
-}
 
 if(isset($_GET['listcount'])) {
 	$min = $_GET['listcount'] + 1;
@@ -43,9 +29,22 @@ if($min - 31 <= 0){
 	$back = $min - 31;
 }
 
-
-$lists = DBFindMany("PeopleList",", (name +0) as foo from list where userid=$USER->id and deleted=0 order by foo,name
-	limit 30 offset $min");
+// get all lists owned by this user or lists this user has publish records for (both publications and subscriptions)
+$lists = QuickQueryMultiRow("
+		select  
+			l.id as id, l.name as name, (l.name +0) as digitsfirst
+		from list l
+			inner join user u on
+				(l.userid = u.id)
+			left join publish p on
+				(p.listid = l.id and p.userid = ?)
+		where l.type in ('person','section')
+			and (l.userid = ? or p.userid = ?)
+			and not l.deleted
+		group by id
+		order by digitsfirst, name
+		limit 30 offset $min",
+		true, false, array($USER->id, $USER->id, $USER->id));
 
 
 header("Content-type: text/xml");
@@ -61,8 +60,8 @@ foreach ($lists as $list) {
 
 ?>
 	<MenuItem>
-	<Name><?= htmlentities($list->name) ?></Name>
-	<URL><?= $URL . "/wiz3_message.php?list=" . $list->id ?></URL>
+	<Name><?= htmlentities($list['name']) ?></Name>
+	<URL><?= $URL . "/wiz3_message.php?list=" . $list['id'] ?></URL>
 	</MenuItem>
 <?
 }
