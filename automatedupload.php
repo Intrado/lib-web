@@ -147,13 +147,13 @@ if (isset($_GET['authCode']) && isset($_GET['sessionId'])) {
 		//check for the file
 		if (!(isset($_SESSION['filename']) && file_exists($_SESSION['filename'])))
 			return array ("resumeLength" => $_SESSION['length'],
-						"errorMsg" => "No HTTP POST recieved",
+						"errorMsg" => "No HTTP POST received",
 						"errorCode" => "PARTIAL_FILE");
 
 		//see if its all there
 		if (filesize($_SESSION['filename']) < $_SESSION['length'])
 			return array ("resumeLength" => ($_SESSION['length'] - filesize($_SESSION['filename'])),
-						"errorMsg" => "Partial file recieved",
+						"errorMsg" => "Partial file received",
 						"errorCode" => "PARTIAL_FILE");
 		//got too much?
 		if (filesize($_SESSION['filename']) < $_SESSION['length'])

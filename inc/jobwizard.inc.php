@@ -1168,7 +1168,7 @@ class JobWiz_messagePhoneTranslate extends WizStep {
 		}
 
 		$helpsteps = array(
-			_L("This is the message that all contacts will recieve if they do not have any other language message specified"),
+			_L("This is the message that all contacts will receive if they do not have any other language message specified"),
 			_L("This is an automated translation powered by Google Translate. Please note that although machine translation is always improving, it is not perfect yet. You can try reverse translation for an idea of how well your message was translated.")
 		);
 
