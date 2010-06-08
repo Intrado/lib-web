@@ -28,7 +28,6 @@ if (!in_array($type, array('phone', 'email', 'sms')))
 if ($type == 'phone') {
 	$coalesceSQL = "
 		if(rc.result not in ('A', 'M') and rc.numattempts > 0 and rc.numattempts < js.value and j.status not in ('complete','cancelled'), 'retry', null),
-		if(rc.result='notattempted' and j.status in ('complete','cancelled'), 'fail', null),
 		if(rc.result not in ('A', 'M', 'duplicate', 'blocked') and rc.numattempts = 0 and j.status not in ('complete','cancelled'), 'inprogress', null),
 		rc.result
 	";
@@ -40,6 +39,7 @@ if ($type == 'phone') {
 		"N" => "No Answer",
 		"X" => "Disconnect",
 		"F" => "Unknown",
+		"notattempted" => "Not Attempted",
 		"inprogress" => "Queued",
 		"retry" => "Retrying"
 	);
@@ -79,8 +79,9 @@ $templatecolors = array(
 	"unsent" => "#1DC10",
 	"duplicate" => "lightgray",
 	"declined" => "yellow",
-	"inprogress" => "blue",
-	"retry" => "cyan"
+	"inprogress" => "lightblue",
+	"retry" => "cyan",
+	"notattempted" => "blue"
 );
 
 $data = $resultcodes;
