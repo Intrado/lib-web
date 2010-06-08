@@ -162,7 +162,7 @@ function update_customer($db, $customerid, $shardid) {
 	if ($version === $targetversion && $rev == $targetrev) {
 		Query("commit",$db);
 		echo "already up to date, skipping\n";
-		continue;
+		return;
 	}
 	
 	//only allow one instance of the updater per customer to run at a time
@@ -174,7 +174,7 @@ function update_customer($db, $customerid, $shardid) {
 	} else {
 		Query("rollback",$db);
 		echo "an upgrade is already in process, skipping\n";
-		continue;
+		return;
 	}
 
 	
