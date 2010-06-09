@@ -84,11 +84,13 @@ if ($datatype == "person") {
 		$maptofields[$fieldmap->fieldnum] = $fieldmap->name;
 
 	$maptofields["sep"] = "--------------";
-	//G fields
 	$maptofields["okey"] = getSystemSetting("organizationfieldname","Organization");
+	$maptofields["sep2"] = "--------------";
+	
+	//G fields
 	foreach ($gfieldmaps as $fieldmap)
 		$maptofields[$fieldmap->fieldnum] = $fieldmap->name;
-	if (count($gfieldmaps) > 0) $maptofields["sep2"] = "--------------";
+	if (count($gfieldmaps) > 0) $maptofields["sep3"] = "--------------";
 
 	//phones, emails, SMS
 	$maxphones = getSystemSetting("maxphones",3);
@@ -141,16 +143,18 @@ if ($datatype == "person") {
 		}
 	}
 
+	$maptofields["sep2"] = "--------------";
+	$maptofields["okey"] = getSystemSetting("organizationfieldname","Organization");
+	
 	//G fields
 	$gfieldmaps = DBFindMany("FieldMap","from fieldmap where fieldnum like 'g%' order by fieldnum");
-	if (count($gfieldmaps) > 0) $maptofields["sep2"] = "--------------";
-	$maptofields["okey"] = getSystemSetting("organizationfieldname","Organization");
+	if (count($gfieldmaps) > 0) $maptofields["sep3"] = "--------------";
 	foreach ($gfieldmaps as $fieldmap)
 		$maptofields[$fieldmap->fieldnum] = "Rule - " . $fieldmap->name;
 
 	//C fields (all assumed multisearch)
 	$cfieldmaps = DBFindMany("FieldMap","from fieldmap where fieldnum like 'c%' order by fieldnum");
-	if (count($cfieldmaps) > 1) $maptofields["sep3"] = "--------------";
+	if (count($cfieldmaps) > 1) $maptofields["sep4"] = "--------------";
 	foreach ($cfieldmaps as $fieldmap) {
 		if ($fieldmap->fieldnum == "c01") continue; // skip the teacherid
 		$maptofields[$fieldmap->fieldnum] = "Rule - " . $fieldmap->name;
