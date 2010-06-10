@@ -11,21 +11,21 @@ if (!$USER->authorize('sendphone')) {
 }
 
 if (isset($_GET['message'])) {
-	$messagegroupid = $_GET['message'] + 0;
-	if (userOwns("messagegroup", $messagegroupid) || isSubscribed("messagegroup", $messagegroupid)) {
-		$_SESSION['newjob']['message'] = $messagegroupid;
-	} else {
-		header("Location: $URL/index.php");
-		exit();
-	}
-
 	if ($_GET['message'] == "callme") {
 		if (!$USER->authorize('starteasy')) {
 			header("Location: $URL/wiz3_message.php");
 			exit();
 		}
+		$_SESSION['newjob']['message'] = "callme";
 		$_SESSION['newjob']['easycall'] = true;
 	} else {
+		$messagegroupid = $_GET['message'] + 0;
+		if (userOwns("messagegroup", $messagegroupid) || isSubscribed("messagegroup", $messagegroupid)) {
+			$_SESSION['newjob']['message'] = $messagegroupid;
+		} else {
+			header("Location: $URL/index.php");
+			exit();
+		}
 		$_SESSION['newjob']['easycall'] = false;
 	}
 }

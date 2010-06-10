@@ -9,12 +9,12 @@ include_once("../obj/ListEntry.obj.php");
 include_once("../obj/RenderedList.obj.php");
 include_once("../obj/FieldMap.obj.php");
 
-$list = new PeopleList($_SESSION['newjob']['list']);
-
-if (!$USER->authorize('createlist')) {
+if (!$USER->authorize('createlist') || !userOwns("list", $_SESSION['newjob']['list'])) {
 	header("Location: $URL/index.php");
 	exit();
 }
+
+$list = new PeopleList($_SESSION['newjob']['list']);
 
 $flagfname = false;
 $flaglname = false;

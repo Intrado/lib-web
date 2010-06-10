@@ -28,13 +28,6 @@ function getSetting($name) {
 	return QuickQuery("select value from setting where name = '$name'");
 }
 
-
-if (! (userOwns("list",DBSafe($_SESSION['newjob']['list'])) &&
-		userOwns("messagegroup",DBSafe($_SESSION['newjob']['message'])) )) {
-	header("Location: $URL/index.php");
-	exit();
-}
-
 $job = Job::jobWithDefaults();
 
 $defaultname = "IP Phone - " . date("F jS, Y g:i a");

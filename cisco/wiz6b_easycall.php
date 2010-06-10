@@ -13,13 +13,6 @@ if (!$USER->authorize('sendphone')) {
 }
 
 if (isset($_GET['dn'])) {
-
-	if (! (userOwns("list",DBSafe($_SESSION['newjob']['list'])) &&
-			($_SESSION['newjob']['message'] == "callme"))) {
-		header("Location: $URL/index.php");
-		exit();
-	}
-
 	$_SESSION['dn'] = Phone::parse($_GET['dn']);
 
 	$defaultname = "IP Phone - " . date("F jS, Y g:i a");
