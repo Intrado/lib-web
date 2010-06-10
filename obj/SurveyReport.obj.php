@@ -271,7 +271,7 @@ class SurveyReport extends ReportGenerator{
 							(m.id = rp.messageid)
 			left join surveyquestionnaire sq on (sq.id = j.questionnaireid)
 			left join surveyweb sw on (sw.personid = rp.personid and sw.jobid = rp.jobid)
-			where rp.jobid = '$jobid' order by rp.pkey, rp." . FieldMap::GetLastNameField(), rp.personid;
+			where rp.jobid = '$jobid' order by rp.pkey, rp." . FieldMap::GetLastNameField() . ", rp.personid";
 			
 		header("Pragma: private");
 		header("Cache-Control: private");
