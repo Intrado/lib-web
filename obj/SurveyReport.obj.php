@@ -245,35 +245,24 @@ class SurveyReport extends ReportGenerator{
 		endWindow();	
 	}
 	
+	function writeSurveyLine($reportarray) {
+		echo '"' . implode('","', $reportarray) . '"' . "\r\n";
+	}
+
 	function runCSV(){
 	//For csv data, give them call details
-		$fieldquery = generateFields("rp");
 		$options = $this->params;
 		$jobid = $options['jobid'];
 		$query = "select SQL_CALC_FOUND_ROWS
 			j.name as jobname,
 			u.login,
+			rp.personid,
 			rp.pkey,
 			rp." . FieldMap::GetFirstNameField() . " as firstname,
 			rp." . FieldMap::GetLastNameField() . " as lastname,
 			rp.type as jobtype,
-			coalesce(m.name, sq.name) as messagename,
-			coalesce(rc.phone,
-						rc.email,
-						concat(
-							coalesce(rc.addr1,''), ' ',
-							coalesce(rc.addr2,''), ' ',
-							coalesce(rc.city,''), ' ',
-							coalesce(rc.state,''), ' ',
-							coalesce(rc.zip,''))
-					) as destination,
-			from_unixtime(rc.starttime/1000) as lastattempt,
-			coalesce(if(rc.result='X' and rc.numattempts<3,'F',rc.result), rp.status) as result,
-			rp.status,
-			rc.numattempts as attempts,
 			rc.resultdata,
 			sw.resultdata
-			$fieldquery
 			from reportperson rp
 			inner join job j on (rp.jobid = j.id)
 			inner join user u on (u.id = j.userid)
@@ -282,18 +271,8 @@ class SurveyReport extends ReportGenerator{
 							(m.id = rp.messageid)
 			left join surveyquestionnaire sq on (sq.id = j.questionnaireid)
 			left join surveyweb sw on (sw.personid = rp.personid and sw.jobid = rp.jobid)
-			where rp.jobid = '$jobid'";
+			where rp.jobid = '$jobid' group by rp.personid order by rp.pkey, rp." . FieldMap::GetLastNameField();
 			
-		$fields = FieldMap::getOptionalAuthorizedFieldMaps();
-		$fieldlist = array();
-		foreach($fields as $field){
-			$fieldlist[$field->fieldnum] = $field->name;
-		}
-		if(isset($options['activefields']))
-			$activefields = explode(",", $options['activefields']);
-		else
-			$activefields = array();	
-		
 		header("Pragma: private");
 		header("Cache-Control: private");
 		header("Content-disposition: attachment; filename=report.csv");
@@ -303,25 +282,9 @@ class SurveyReport extends ReportGenerator{
 
 		$job = new Job($jobid);
 		$maxquestions = QuickQuery("select count(*) from surveyquestion where questionnaireid=$job->questionnaireid", $this->_readonlyDB);
-		// find the f-fields the same way as the query did
-		// strip off the f, use the field number as the index and
-		// it's position as the offset
-		$fieldindex = explode(",",generateFields("p"));
-		foreach($fieldindex as $index => $fieldnumber){
-			$aliaspos = strpos($fieldnumber, ".");
-			if($aliaspos !== false){
-				$fieldindex[$index] = substr($fieldnumber, $aliaspos+1);
-			}
-		}
-		$fieldindex = array_flip($fieldindex);
-		$activefields = array_flip($activefields);
+
 		//generate the CSV header
-		$header = '"Job Name","Submitted by","ID","First Name","Last Name","Message","Deliver by","Destination","Attempts","Last Attempt","Last Result"';
-		foreach($fieldlist as $fieldnum => $fieldname){
-			if(isset($activefields[$fieldnum])){
-				$header .= ',"' . $fieldname . '"';
-			}
-		}
+		$header = '"Job Name","Submitted by","ID","First Name","Last Name"';
 
 		for ($x = 1; $x <= $maxquestions; $x++) {
 			$header .= ',"Question '. $x .'"';
@@ -332,49 +295,54 @@ class SurveyReport extends ReportGenerator{
 
 		$result = Query($query, $this->_readonlyDB);
 
+		$currentPersonid = 0;
+		$isPersonWritten = false;
 		while ($row = DBGetRow($result)) {
-			if($row[5] == "phone")
-				$row[7] = Phone::format($row[7]);
-			$row[11] = (isset($row[11]) ? $row[11] : "");
-
-
-			if (isset($row[8])) {
-				$time = strtotime($row[8]);
-				if ($time !== -1 && $time !== false)
-					$row[8] = date("m/d/Y h:i A",$time);
-			} else {
-				$row[8] = "";
-			}
-			$row[9] = html_entity_decode(fmt_jobdetail_result($row,9));
-
-
-			$reportarray = array($row[0], $row[1], $row[2],$row[3],$row[4],$row[6],format_delivery_type($row[5]),$row[7],$row[11],$row[8],$row[9]);
-		
-			//index 13 is the last position of a non-ffield
-			foreach($fieldlist as $fieldnum => $fieldname){
-				if(isset($activefields[$fieldnum])){
-					$num = $fieldindex[$fieldnum];
-					$reportarray[] = $row[13+$num];
+			// if next person
+			if ($currentPersonid != $row[2]) {
+				// if person not written
+				if (!$isPersonWritten && $currentPersonid != 0) {
+					$this->writeSurveyLine($reportarray);
 				}
+				// reset variables for new person
+				$currentPersonid = $row[2];
+				$isPersonWritten = false;
 			}
+
+			// fill first columns of row with basic person info
+			$reportarray = array($row[0], $row[1], $row[3], $row[4], $row[5]);
+
 			//fill in survey result data, be sure to fill in an array element for all questions, even if blank
 			$startindex = count($reportarray);
 
 			$questiondata = array();
-			if ($row[5] == "phone")
-				parse_str($row[12],$questiondata);
-			else if ($row[5] == "email")
-				parse_str($row[13],$questiondata);
+			if ($row[6] == "phone")
+				parse_str($row[7],$questiondata);
+			else if ($row[6] == "email")
+				parse_str($row[8],$questiondata);
 
 			//add data to the report for each question
+			$found = false;
 			for ($x = 0; $x < $maxquestions; $x++) {
-				$reportarray[$startindex + $x] = isset($questiondata["q$x"]) ? $questiondata["q$x"] : "";
+				if (isset($questiondata["q$x"])) {
+					$found = true;
+					$reportarray[$startindex + $x] = $questiondata["q$x"];
+				} else {
+					$reportarray[$startindex + $x] = "";
+				}
 			}
-			
-			echo '"' . implode('","', $reportarray) . '"' . "\r\n";
+			// if one or more answers found, then write results for this person
+			// NOTE only the first result found for each person will be reported - if any other results for other phone/email they are discarded (rare case)
+			if ($found && !$isPersonWritten) {
+				$this->writeSurveyLine($reportarray);
+				$isPersonWritten = true;
+			}
+		}
+		if (!$isPersonWritten && $currentPersonid != 0) {
+			$this->writeSurveyLine($reportarray);
 		}
 	}
-
+	
 	function setReportFile(){
 		$this->reportfile = "survey.jasper";
 	}
