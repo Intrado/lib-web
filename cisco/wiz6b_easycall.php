@@ -15,6 +15,19 @@ if (!$USER->authorize('sendphone')) {
 if (isset($_GET['dn'])) {
 	$_SESSION['dn'] = Phone::parse($_GET['dn']);
 
+
+	// validate all required arguments exist for this job to submit
+	if (!isset($_SESSION['newjob']['jobtypeid']) ||
+		!isset($_SESSION['newjob']['retries']) ||
+		!isset($_SESSION['newjob']['numdays']) ||
+		!isset($_SESSION['newjob']['message']) ||
+		!isset($_SESSION['newjob']['list']))
+	{
+		sleep(1);
+		header("Location: $URL/main.php");
+		exit();
+	}
+
 	$defaultname = "IP Phone - " . date("F jS, Y g:i a");
 	$_SESSION['newjob']['name'] = ($_SESSION['newjob']['name'] ? $_SESSION['newjob']['name'] : $defaultname);
 	$_SESSION['newjob']['desc'] = ($_SESSION['newjob']['desc'] ? $_SESSION['newjob']['desc'] : $defaultname);

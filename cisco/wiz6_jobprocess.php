@@ -14,7 +14,13 @@ if (!$USER->authorize('sendphone')) {
 	exit();
 }
 
-if (count($_SESSION['newjob']) < 3) {
+// validate all required arguments exist for this job to submit
+if (!isset($_SESSION['newjob']['jobtypeid']) ||
+	!isset($_SESSION['newjob']['retries']) ||
+	!isset($_SESSION['newjob']['numdays']) ||
+	!isset($_SESSION['newjob']['message']) ||
+	!isset($_SESSION['newjob']['list']))
+{
 	sleep(1);
 	header("Location: $URL/main.php");
 	exit();
@@ -31,8 +37,8 @@ function getSetting($name) {
 $job = Job::jobWithDefaults();
 
 $defaultname = "IP Phone - " . date("F jS, Y g:i a");
-$job->name = ($_SESSION['newjob']['name'] ? $_SESSION['newjob']['name'] : $defaultname);
-$job->description = ($_SESSION['newjob']['desc'] ? $_SESSION['newjob']['desc'] : $defaultname);
+$job->name = isset($_SESSION['newjob']['name']) ? $_SESSION['newjob']['name'] : $defaultname;
+$job->description = isset($_SESSION['newjob']['desc']) ? $_SESSION['newjob']['desc'] : $defaultname;
 
 $job->jobtypeid = $_SESSION['newjob']['jobtypeid'];
 $job->setOptionValue("maxcallattempts",$_SESSION['newjob']['retries']);
