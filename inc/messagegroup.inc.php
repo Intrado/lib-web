@@ -322,11 +322,11 @@ function makeAccordionSplitter($type, $subtype, $languagecode, $permanent, $pref
 								}
 								
 								// create a new EasyCall to record another audio file if desired
-								newEasyCall();
+								newEasyCall($('{$type}-{$subtype}-{$languagecode}_callme'), '". addslashes($preferredaudiofilename). "');
 							}.bindAsEventListener(this),
 							'onFailure': function() {
 								alert('" . addslashes(_L('An error occured while trying to save your audio.\nPlease try again.')) . "');
-								newEasyCall();
+								newEasyCall($('{$type}-{$subtype}-{$languagecode}_callme'), '". addslashes($preferredaudiofilename). "');
 							}.bindAsEventListener(this)
 						});
 					}.bindAsEventListener(audiolibrarywidget));
@@ -647,18 +647,22 @@ class CallMe extends FormItem {
 		$defaultphone = escapehtml(Phone::format($this->args['phone']));
 		
 		return '
-			function newEasyCall() {
+			function newEasyCall(e, audiofilename) {
+				e = $(e);
+				var content = $(e.id+"_content");
+				
 				// remove any existing content
-				$("'.$n.'_content").update();
+				content.update();
+				
 				// Create an EasyCall!
 				new EasyCall(
-					"'.$n.'",
-					"'.$n.'_content'.'",
+					e,
+					content,
 					"'.$defaultphone.'",
-					"'.addslashes($this->args['preferredaudiofilename']).' - " + curDate()
+					audiofilename + " - " + curDate()
 				);
 			};
-			newEasyCall();
+			newEasyCall("'. $n. '", "'. addslashes($this->args['preferredaudiofilename']). '");
 		';
 	}
 }
