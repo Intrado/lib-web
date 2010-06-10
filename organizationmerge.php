@@ -95,7 +95,7 @@ $data = QuickQueryList("select id, orgkey from organization where id != ? and no
 $formdata = array(
 	"mergeorg" => array(
 		"label" => _L('Organization Target'),
-		"fieldhelp" => _L("TODO: Help describing org merge"),
+		"fieldhelp" => _L("Select which organization this organization should merge into. Note: Merging can't be undone."),
 		"value" => "",
 		"validators" => array(
 			array("ValRequired"),
@@ -107,7 +107,7 @@ $formdata = array(
 );
 
 $helpsteps = array (
-	_L('TODO: Help describing org merge')
+	_L('Merge will combine the contents of one organization into another. <br><b>Note:</b>Merge is permanent and cannot be undone.')
 );
 
 $buttons = array(submit_button(_L('Save'),"submit","tick"),
