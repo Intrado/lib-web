@@ -128,8 +128,12 @@ if (isset($_GET['deleteunassociated'])) {
 		$associatedorgids[$orgid] = true;
 	foreach ($personassociationorgids as $orgid)
 		$associatedorgids[$orgid] = true;
-		
-	$unassociatedorgids = QuickQueryList("select id from organization where not deleted and id not in (". DBParamListString(count(array_keys($associatedorgids))). ")", false, false, array_keys($associatedorgids));
+	
+	// if there are any associated org ids, query out the un-associated ones. Otherwise just get all the un-deleted ones.
+	if ($associatedorgids)
+		$unassociatedorgids = QuickQueryList("select id from organization where not deleted and id not in (". DBParamListString(count(array_keys($associatedorgids))). ")", false, false, array_keys($associatedorgids));
+	else
+		$unassociatedorgids = QuickQueryList("select id from organization where not deleted", false, false, array());
 	
 	// batch delete orgids 1k at a time
 	if ($unassociatedorgids) {
