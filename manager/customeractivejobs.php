@@ -120,22 +120,27 @@ foreach ($shards as $shardid => $sharddb) {
 
 	QuickUpdate("set time_zone='GMT'",$sharddb);
 
-	$query = "select j.systempriority, j.customerid, j.id, j.startdate, j.starttime, j.timezone,
-			timediff(addtime(j.startdate,j.starttime), convert_tz(now(),'GMT',j.timezone)) as timetostart
-			from qjob j where j.status='scheduled'
-			order by hour(timetostart), minute(timetostart), second(timetostart), j.systempriority, j.customerid, j.id
-			";
+	$query = "select systempriority, customerid, id, startdate, starttime, timezone,
+			convert_tz(addtime(startdate,starttime),timezone,'SYSTEM') systemstarttime
+			from qjob where status='scheduled'
+			order by systemstarttime , systempriority, customerid, id";
+			
 	$res = Query($query,$sharddb);
 	while ($row = DBGetRow($res)) {
-		list($hours,$minutes,$seconds) = explode(":",$row[6]);
-		$days = floor(abs($hours)/24);
-		if($hours < 0)
-			$days = 0 - $days;
-		$hours = $hours%24;
-			
-		$timetorun = implode(":",array($hours,$minutes,$seconds)) . ($days ? " + $days Days" : "");
-		$schedjobs[$row[0]][($days*24*60*60)+($hours*60*60)+($minutes*60)+$seconds][] = array ($row[1], $customers[$row[1]], $row[2], $row[3], $row[4], $row[5], $timetorun);
-
+		$secondstostart = strtotime($row[6]) - time();
+		$seconds = abs($secondstostart);	
+		$days = floor($seconds/86400);
+		$seconds -= $days*86400;
+		$hours = floor($seconds/3600);
+		$seconds -= $hours*3600;
+		$minutes = floor($seconds/60);
+		$seconds -= $minutes*60;
+		
+		$timetorun = str_pad($hours,2, "0",STR_PAD_LEFT) . ":" . str_pad($minutes,2, "0",STR_PAD_LEFT) . ":" . str_pad($minutes,2, "0",STR_PAD_LEFT) . ($days ? " + $days Days" : "");
+		if($secondstostart < 0)
+			$timetorun = " - " . $timetorun;
+		
+		$schedjobs[$row[0]][$secondstostart][] = array ($row[1], $customers[$row[1]], $row[2], $row[3], $row[4], $row[5], $timetorun);
 	}
 }
 
