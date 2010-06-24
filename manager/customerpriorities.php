@@ -87,7 +87,7 @@ if(CheckFormSubmit($f, 'new')) {
 
 if($reload){
 	ClearFormData($f);
-	PutFormData($f, $s, 'newname', "", 'text');
+	PutFormData($f, $s, 'newname', "", 'text', 0, 50);
 	PutFormData($f, 'new', 'add', '');
 	PutFormData($f,$s,'priority', 2, "number");
 
@@ -148,7 +148,7 @@ NewForm($f);
 	}
 ?>
 	<tr>
-		<td><? NewFormItem($f, $s, 'newname', 'text', 20)?></td>
+		<td><? NewFormItem($f, $s, 'newname', 'text',"20","50")?></td>
 		<td>
 		<?
 			NewFormItem($f, $s, 'priority', 'selectstart');
