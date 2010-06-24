@@ -108,6 +108,8 @@ if (!isset($_POST['startdate'])) {
 		echo ".";
 		if (++$count % 20 == 0)
 			echo "<wbr></wbr>";
+		ob_flush();
+		flush();
 	}
 	
 	$totalrow = array("Total","","","","",0,"","");
