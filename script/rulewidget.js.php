@@ -925,42 +925,19 @@ var RuleEditor = Class.create({
 		var labelstyle = 'margin:0;padding:1px; font-size:90%;';
 		var checkboxstyle = 'font-size:90%;';
 		var divstyle = 'white-space:nowrap;';
-		var max = values.length;
 		
-		if(max == 0)
-			return multicheckbox;
-			
-		if (typeof(values[0]) == 'object') {
-			if (max == 1) {
-				return new Element('select').insert(
-					new Element('option', {'value': values[0].value}).update(values[0].title.escapeHTML())
-				);
-			}
-			for (var i = 0; i < max; ++i) {
-				var tuple = values[i];
-				var checkbox = new Element('input', {
-					'type': 'checkbox',
-					'value': tuple.value,
-					'style': checkboxstyle
-				});
-				
-				var label = new Element('label', {
-					'for': checkbox.identify(),
-					'style': labelstyle
-				}).update(tuple.title.escapeHTML());
-				
-				multicheckbox.insert(
-					new Element('div', {'style': divstyle}).insert(checkbox).insert(label)
-				);
-			}
-		} else {
+		// Determine if values is an array or an object of value:title pairs.
+		if (typeof(values.join) != 'undefined') { // values is an array.
+			var max = values.length;
 			if (max == 1) {
 				return new Element('select').insert(
 					new Element('option', {'value': values[0]}).update(values[0].escapeHTML())
 				);
 			}
+			
 			for (var i = 0; i < max; ++i) {
 				var value = values[i];
+				
 				var checkbox = new Element('input', {
 					'type': 'checkbox',
 					'value': value,
@@ -974,6 +951,37 @@ var RuleEditor = Class.create({
 				
 				multicheckbox.insert(
 					new Element('div', {'style': divstyle}).insert(checkbox).insert(label)
+				);
+			}
+		} else { // values is an object of value:title pairs.
+			var max = 0;
+			var value;
+			var title;
+			
+			for (value in values) {
+				title = values[value];
+				
+				var checkbox = new Element('input', {
+					'type': 'checkbox',
+					'value': value,
+					'style': checkboxstyle
+				});
+				
+				var label = new Element('label', {
+					'for': checkbox.identify(),
+					'style': labelstyle
+				}).update(title.escapeHTML());
+				
+				multicheckbox.insert(
+					new Element('div', {'style': divstyle}).insert(checkbox).insert(label)
+				);
+				
+				max++;
+			}
+			
+			if (max == 1) {
+				return new Element('select').insert(
+					new Element('option', {'value': value}).update(title.escapeHTML())
 				);
 			}
 		}
