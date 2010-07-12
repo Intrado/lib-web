@@ -1,0 +1,15 @@
+Nifty Player is a open source (MIT licensed) flash based mp3 player
+
+The original version of niftyplayer will handle one mp3 file and can
+be controlled by javascript. The original source is in version 1.7 
+and can be downloaded at:
+http://www.varal.org/media/niftyplayer/niftyplayer.zip
+
+The reliance version of nifty player can handle a sequence of mp3 files
+and will play them in the order listed. The modified version will need to
+download all the files prior to playing them in contrast to the original version 
+that will start playback as soon as enough is buffered.
+From a user perspective it looks like one file is played the time shows the total
+time from the first file and there is no buffering between files.
+Dragging the timebar does currently not move the position of the playback
+
