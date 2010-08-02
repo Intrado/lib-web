@@ -68,6 +68,37 @@ class ValCaptcha extends Validator {
 	}
 }
 
+// TODO this is a copy of ValLength global validator, only to reword the ending of the "min" alert
+class ValCaptchaLength extends Validator {
+
+	function validate ($value, $args) {
+		$hasmin = isset($args['min']) && $args['min'] !== false;
+		if ($hasmin)
+			$min = $args['min']+0;
+		$hasmax = isset($args['max']) && $args['max'] !== false;
+		if ($hasmax)
+			$max = $args['max']+0;
+
+		if ($hasmin && mb_strlen($value) < $min)
+			return "$this->label must be at least $min characters (enter the remaining values)";
+		if ($hasmax && mb_strlen($value) > $max)
+			return "$this->label cannot be more than $max characters long";
+
+		return true;
+	}
+
+	function getJSValidator () {
+		return
+			'function (name, label, value, args) {
+				if (args.min && value.length < args.min)
+					return label + " must be at least " + args.min + " characters (enter the remaining values)";
+				if (args.max && value.length > args.max)
+					return label + " cannot be more than " + args.max + " characters long";
+				return true;
+			}';
+	}
+}
+
 // case-insensitive
 class ValSiteCode extends Validator {
 	var $onlyserverside = true;
@@ -119,6 +150,7 @@ $formdata["captcha"] = array(
         "value" => "",
         "validators" => array(
             array("ValRequired"),
+			array("ValCaptchaLength", "max" => 5, "min" => 5),
             array("ValCaptcha",)
         ),
         "control" => array("CaptchaField"),
@@ -309,7 +341,7 @@ if (isset($_GET['err'])) {
 ?>
 <script type="text/javascript">
 
-<? Validator::load_validators(array("ValPassword","ValCaptcha","ValSiteCode","ValUsernameUnique")); ?>
+<? Validator::load_validators(array("ValPassword","ValCaptcha","ValCaptchaLength","ValSiteCode","ValUsernameUnique")); ?>
 </script>
 
 <script type="text/javascript">
