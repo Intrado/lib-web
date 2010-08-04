@@ -515,7 +515,7 @@ function form_submit (event, value, form) {
 
 	var submit = document.createElement('input');
 	submit.setAttribute('name','submit');
-	submit.value = value;
+	submit.setAttribute('value',value);
 	submit.setAttribute('type','hidden');
 	form.appendChild(submit);
 
