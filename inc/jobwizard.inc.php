@@ -543,7 +543,7 @@ class TimeSelectMenu extends FormItem {
 		
 		if (strtotime($value) < strtotime($warnearly) || strtotime($value) > strtotime($warnlate)) {
 			$icon = "img/icons/moon_16.gif";
-			$timeNote = stripslashes(_L("Outside typical calling hours."));
+			$timeNote = stripslashes(_L("WARNING: Outside typical calling hours."));
 		} else {
 			$icon = "img/icons/weather_sun.gif";
 			$timeNote = "";
@@ -558,7 +558,7 @@ class TimeSelectMenu extends FormItem {
 					
 					if (thisTime < earlyTime || thisTime > lateTime) {
 						$(element + "-timenoteimg").src = "img/icons/moon_16.gif";
-						$(element + "-timenote").update("'.stripslashes(_L("Outside typical calling hours.")).'");
+						$(element + "-timenote").update("'.stripslashes(_L("WARNING: Outside typical calling hours.")).'");
 					} else {
 						$(element + "-timenoteimg").src = "img/icons/weather_sun.gif";
 						$(element + "-timenote").update();
