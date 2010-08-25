@@ -353,13 +353,13 @@ $helpsteps[] = _L("Enter a name for your job. " .
 		$formdata["callearly"] = array(
 			"label" => _L("Start Time"),
 			"fieldhelp" => ("This is the earliest time to send calls. This is also determined by your security profile."),
-			"control" => array("FormHtml","html" => $USER->getCallEarly()),
+			"control" => array("FormHtml","html" => date("g:i a", strtotime($job->starttime))),
 			"helpstep" => 3
 		);
 		$formdata["calllate"] = array(
 			"label" => _L("End Time"),
 			"fieldhelp" => ("This is the latest time to send calls. This is also determined by your security profile."),
-			"control" => array("FormHtml","html" => $USER->getCallLate()),
+			"control" => array("FormHtml","html" => date("g:i a", strtotime($job->endtime))),
 			"helpstep" => 3
 		);
 	} else {
