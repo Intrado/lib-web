@@ -520,6 +520,56 @@ class EasyCall extends FormItem {
 	}
 }
 
+class TimeSelectMenu extends FormItem {
+	function render ($value) {
+		global $SETTINGS;
+		global $ACCESS;
+		global $USER;
+		
+		$values = newform_time_select(NULL, $ACCESS->getValue('callearly'), $ACCESS->getValue('calllate'), $value);
+		
+		$n = $this->form->name."_".$this->name;
+		$size = isset($this->args['size']) ? 'size="'.$this->args['size'].'"' : "";
+		$str = '<select style="float:left" id='.$n.' name="'.$n.'" '.$size .' onchange="changeTimeSelectNote(\''.$n.'\', this.value)">';
+		foreach ($values as $selectvalue => $selectname) {
+			$checked = $value == $selectvalue;
+			$str .= '<option value="'.escapehtml($selectvalue).'" '.($checked ? 'selected' : '').' >'.escapehtml($selectname).'</option>
+				';
+		}
+		
+		// choose icon based on time of day
+		$warnearly = $SETTINGS['feature']['warn_earliest'] ? $SETTINGS['feature']['warn_earliest'] : "7:00 am";
+		$warnlate = $SETTINGS['feature']['warn_latest'] ? $SETTINGS['feature']['warn_latest'] : "9:00 pm";
+		
+		if (strtotime($value) < strtotime($warnearly) || strtotime($value) > strtotime($warnlate)) {
+			$icon = "img/icons/moon_16.gif";
+			$timeNote = stripslashes(_L("Outside typical calling hours."));
+		} else {
+			$icon = "img/icons/weather_sun.gif";
+			$timeNote = "";
+		}
+		
+		$str .= '</select><img style="padding-left: 5px; float:left" id="'.$n.'-timenoteimg" src="'. $icon. '" /><div style="padding-left: 5px; padding-top: 2px; float:left; color:red" id="'.$n.'-timenote" >'. $timeNote. '</div>
+			<script type="text/javascript">
+				function changeTimeSelectNote(element, value) {
+					var earlyTime = new Date("1/1/2010 '. $warnearly. '");
+					var lateTime = new Date("1/1/2010 '. $warnlate. '");
+					var thisTime = new Date("1/1/2010 " + value); 
+					
+					if (thisTime < earlyTime || thisTime > lateTime) {
+						$(element + "-timenoteimg").src = "img/icons/moon_16.gif";
+						$(element + "-timenote").update("'.stripslashes(_L("Outside typical calling hours.")).'");
+					} else {
+						$(element + "-timenoteimg").src = "img/icons/weather_sun.gif";
+						$(element + "-timenote").update();
+					}
+				}
+			</script>';
+		return $str;
+	}
+
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 // Validators
 ////////////////////////////////////////////////////////////////////////////////
@@ -1702,7 +1752,7 @@ class JobWiz_scheduleDate extends WizStep {
 		}
 
 		$helpsteps[] = _L("The Delivery Window designates the earliest call time and the latest call time allowed for notification delivery.");
-		$startvalues = newform_time_select(NULL, $ACCESS->getValue('callearly'), $ACCESS->getValue('calllate'), $USER->getCallEarly());
+		
 		$formdata["callearly"] = array(
 			"label" => _L("Start Time"),
 			"fieldhelp" => ("This is the earliest time to send calls. This is also determined by your security profile."),
@@ -1713,10 +1763,10 @@ class JobWiz_scheduleDate extends WizStep {
 				array("ValTimeWindowCallEarly")
 			),
 			"requires" => array("calllate"),
-			"control" => array("SelectMenu", "values"=>$startvalues),
+			"control" => array("TimeSelectMenu"),
 			"helpstep" => 2
 		);
-		$endvalues = newform_time_select(NULL, $ACCESS->getValue('callearly'), $ACCESS->getValue('calllate'), $USER->getCallLate());
+		
 		$formdata["calllate"] = array(
 			"label" => _L("End Time"),
 			"fieldhelp" => ("This is the latest time to send calls. This is also determined by your security profile."),
@@ -1727,7 +1777,7 @@ class JobWiz_scheduleDate extends WizStep {
 				array("ValTimeWindowCallLate")
 			),
 			"requires" => array("callearly", "date"),
-			"control" => array("SelectMenu", "values"=>$endvalues),
+			"control" => array("TimeSelectMenu"),
 			"helpstep" => 2
 		);
 
