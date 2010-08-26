@@ -220,10 +220,29 @@ class User extends DBMappedObject {
 				$joinsql = "inner join personassociation pa on (pa.personid = $aliasid";
 				
 				$components = array();
-				if (count($userorgids) > 0)
-					$components[] = "pa.organizationid in (" . implode(",",array_keys($userorgids)) . ")";	
-				if (count($usersectionorgs) > 0)
-					$components[] = "pa.sectionid in (" . implode(",",array_keys($usersectionorgs)) . ")";	
+				if (count($userorgids) > 0) {
+					// relplace NULL key values with "NULL" for sql sanity
+					$correctedorgids = array();
+					foreach ($userorgids as $orgid => $junk) {
+						if ($orgid == "")
+							$correctedorgids[] = "NULL";
+						else
+							$correctedorgids[] = $orgid;
+					}
+					$components[] = "pa.organizationid in (" . implode(",",$correctedorgids) . ")";
+				}
+				
+				if (count($usersectionorgs) > 0) {
+					// relplace NULL key values with "NULL" for sql sanity
+					$correctedorgids = array();
+					foreach ($usersectionorgs as $orgid => $junk) {
+						if ($orgid == "")
+							$correctedorgids[] = "NULL";
+						else
+							$correctedorgids[] = $orgid;
+					}
+					$components[] = "pa.sectionid in (" . implode(",",$correctedorgids) . ")";
+				}
 				
 				if (count($components) == 0)
 					$joinsql .= " and 0 )"; //impossible query, nothing valid to search on
