@@ -121,25 +121,32 @@ function embedPlayer(url,target, forceload) {
 		niftyplayer("niftyPlayer1").loadAndPlay(url);
 	} else {
 		$(target).update('<object classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000" codebase="<?= isset($_SERVER['HTTPS'])?"https":"http" ?>://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=6,0,0,0" width="165" height="38" id="niftyPlayer1" align="">' +
-		   '<param name=movie value="media/niftyplayer.swf?file=' + encodeURIComponent(url)  + '&as=1">' + 
-		   '<param name=quality value=high>' + 
-		   '<param name=bgcolor value=#FFFFFF>' + 
-		   '<embed src="media/niftyplayer.swf?file=' + encodeURIComponent(url) + '&as=1" quality=high bgcolor=#FFFFFF width="165" height="38" name="niftyPlayer1" align="" type="application/x-shockwave-flash" pluginspage="<?= isset($_SERVER['HTTPS'])?"https":"http" ?>://get.adobe.com/flashplayer">' +
-		   '</embed>' + 
-		   '</object>');
+			'<param name=movie value="media/niftyplayer.swf?file=' + encodeURIComponent(url)  + '&as=1">' + 
+			'<param name=quality value=high>' + 
+			'<param name=bgcolor value=#FFFFFF>' + 
+			'<embed src="media/niftyplayer.swf?file=' + encodeURIComponent(url) + '&as=1" quality=high bgcolor=#FFFFFF width="165" height="38" name="niftyPlayer1" align="" type="application/x-shockwave-flash" pluginspage="<?= isset($_SERVER['HTTPS'])?"https":"http" ?>://get.adobe.com/flashplayer">' +
+			'</embed>' + 
+			'</object>');
 	}
+if(!hasFlashPlayer()) {
+<?
 
-	if(!hasFlashPlayer()) {
+$android = strpos($_SERVER['HTTP_USER_AGENT'],"Android");
 
-		   $(target).update("<object classid='clsid:22D6F312-B0F6-11D0-94AB-0080C74C7E95' width='280' height='45'>"+
-			"<param name='type' value='audio/mpeg'>"+
-			"<param name='src' value='" + url + "'>"+
-			"<param name='autostart' value='1'>"+
-			"<param name='showcontrols' value='1'>"+
-			"<param name='showstatusbar' value='0'>"+
-			"<embed src ='" + url + "' type='audio/mpeg' autoplay='true' autostart='1' width='280' height='45' controller='1' showstatusbar='0' bgcolor='#ffffff'></embed>"+ 
-			"</object>");
-   	}	   		
+if($android) {
+?>
+	$(target).update("Unable to play message. Please install Flash for Android 2.2 or higher or click the link to download the message.");
+<? } else { ?>
+	$(target).update("<object classid='clsid:22D6F312-B0F6-11D0-94AB-0080C74C7E95' width='280' height='45'>"+
+		"<param name='type' value='audio/mpeg'>"+
+		"<param name='src' value='" + url + "'>"+
+		"<param name='autostart' value='1'>"+
+		"<param name='showcontrols' value='1'>"+
+		"<param name='showstatusbar' value='0'>"+
+		"<embed src ='" + url + "' type='audio/mpeg' autoplay='true' autostart='1' width='280' height='45' controller='1' showstatusbar='0' bgcolor='#ffffff'></embed>"+ 
+		"</object>");
+<? } ?>
+	}
 }
 
 
