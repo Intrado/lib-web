@@ -4,13 +4,10 @@ setlocale(LC_ALL, 'en_US.UTF-8');
 mb_internal_encoding('UTF-8');
 $SETTINGS = parse_ini_file("inc/settings.ini.php",true);
 
-require_once("XML/RPC.php");
-require_once("inc/db.inc.php");
-require_once("inc/auth.inc.php");
+require_once("inc/thrift.inc.php");
+require_once($GLOBALS['THRIFT_ROOT'].'/packages/messagelink/MessageLink.php');
 require_once("inc/utils.inc.php");
 require_once("inc/table.inc.php");
-require_once("inc/DBMappedObject.php");
-require_once("obj/Job.obj.php");
 
 $code = '';
 if (isset($_GET['s'])) {
@@ -29,26 +26,43 @@ function fadecolor($primary, $fade, $ratio){
 	return $newcolor;
 }
 
-// find the message from authserver for this code
-$messageinfo = loginMessageLink($code);
-$customer = "Not Found";
-
-$badcode = true;
-$urlcomponent = 'm';
-if ($messageinfo !== false) {
-	$badcode = false;
-	$customer = ($messageinfo)?getSystemSetting("displayname"):"Not Found";
-	$urlcomponent = getSystemSetting('urlcomponent');
-	$job = new Job($messageinfo['jobid']+0);
-	$jobname = escapehtml($job->name);
-	$jobdescription = escapehtml($job->description);
-	$jobstarttime = strtotime($job->startdate . $job->starttime);
+$appservererror = false;
+if($appserverprotocol == null || $appservertransport == null) {
+	error_log("Can not use AppServer");
+	$appservererror = true;
 }
 
-apache_note("CS_CUST",urlencode($urlcomponent)); //for logging
+try {
+	$client = new MessageLinkClient($appserverprotocol);
+	
+	// Open up the connection
+	$appservertransport->open();
+	
+	$messageinfo = $client->getInfo($code);
+	
+	$appservertransport->close();
+} catch (TException $tx) {
+	// a general thrift exception, like no such server
+	error_log("Exception Connection to AppServer (" . $tx->getMessage() . ")");
+	$appservererror = true;
+}
 
+if ($appservererror) {
+	$theme = "classroom";
+	$theme1 = "3e693f";
+	$theme2 = "b47727";
+	$TITLE = "School Messenger";
+	$urlcomponent = "m";
+} else {
+	$theme = $messageinfo->brandinfo["theme"];
+	$theme1 = $messageinfo->brandinfo["theme1"];
+	$theme2 = $messageinfo->brandinfo["theme2"];
+	$TITLE = $messageinfo->customerdisplayname;
+	$urlcomponent = $messageinfo->urlcomponent;
+}
 
-$TITLE = $customer;
+apache_note("CS_CUST",urlencode($appservererror?"m":$messageinfo->urlcomponent)); //for logging
+
 ?>
 <html>
 <head>
@@ -56,15 +70,15 @@ $TITLE = $customer;
 	<style>
 		.navband1 {
 			height: 6px; 
-			background: #3e693f;
+			background: #<?=$theme1 ?>;
 		}
 		.navband2 {
 			height: 2px; 
-			background: #b47727;
+			background: #<?=$theme1 ?>;
 			margin-bottom: 3px;
 		}
 		.swooshbg {
-			background: <?=fadecolor("b47727", "FFFFFF", .1)?>
+			background: <?=fadecolor($theme2, "FFFFFF", .1)?>
 		}
 	</style>
 	<title><?=$TITLE?></title>
@@ -74,7 +88,7 @@ $TITLE = $customer;
 		<tr>
 			<td>
 				<div style="padding-left:10px; padding-bottom:10px">
-					<img src="logo.img.php?urlcomponent=<?=$urlcomponent?>" />
+					<img src="messagelinklogo.img.php?code=<?=$code?>" />
 				</div>
 			</td>
 			<td>
@@ -90,29 +104,36 @@ $TITLE = $customer;
 	<div style="margin: 15px">
 <?
 startWindow("Message Preview", false, false, false);
-if ($badcode) {
+if ($appservererror) {
+?>
+	<div>
+		<h1></h1>
+		<p>An error occured while trying to retrieve your message. Please try again.</p>
+	</div>
+<?
+} else if($messageinfo === false){
 ?>
 	<div>
 		<h1>The requested information was not found.</h1>
 		<p>The message you are looking for does not exist or has expired.</p>
 	</div>
-<?
+<?	
 } else {
 ?>
 	<div style="margin: 10px; margin-top: 15px; padding: 5px; float: left; border: 1px solid #3e693f">
-		Phone Message: <?=date('m/d/Y g:i a', $jobstarttime)?><br>
-		<div style="font-size: 20px; margin-bottom: 5px"><?=$customer?></div>
-		<div style="font-size: 16px; margin-bottom: 2px"><?=$jobname?></div>
-		<div style="font-size: 12px">&nbsp;&nbsp;<?=$jobdescription?></div>
+		Phone Message: <?=date('m/d/Y g:i a', $messageinfo->jobstarttime)?><br>
+		<div style="font-size: 20px; margin-bottom: 5px"><?=$messageinfo->customerdisplayname?></div>
+		<div style="font-size: 16px; margin-bottom: 2px"><?=$messageinfo->jobname?></div>
+		<div style="font-size: 12px">&nbsp;&nbsp;<?=$messageinfo->jobdescription?></div>
 	</div>
 	<div style="margin:10px; clear:both;">
 		<div id="player"></div>		
 		<script type="text/javascript" language="javascript" src="script/prototype.js"></script>	
 		<script type="text/javascript" language="javascript" src="script/niftyplayer.js.php"></script>
 		<script language="JavaScript" type="text/javascript">
-	 		embedPlayer("messagelink_preview.wav.php/embed_preview.wav?jobcode=<?=$code?>","player");
+	 		embedPlayer("messagelink_audio.php?code=<?=$code?>","player",<?= $messageinfo->nummessageparts ?>);
 		</script>
-		<br><a href="messagelink_preview.wav.php/message.wav?jobcode=<?=$code?>">Click here to download</a>
+		<br><a href="messagelink_audio.php?code=<?=$code?>">Click here to download</a>
 	</div>
 <?
 }
