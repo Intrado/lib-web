@@ -27,6 +27,8 @@ function fadecolor($primary, $fade, $ratio){
 }
 
 $appservererror = false;
+$badcode = false;
+
 if($appserverprotocol == null || $appservertransport == null) {
 	error_log("Can not use AppServer");
 	$appservererror = true;
@@ -37,9 +39,12 @@ try {
 	
 	// Open up the connection
 	$appservertransport->open();
-	
-	$messageinfo = $client->getInfo($code);
-	
+	try {
+		$messageinfo = $client->getInfo($code);
+	} catch (messagelink_MessageLinkCodeNotFoundException $e) {
+		$badcode = true;
+		error_log("Unable to find the messagelinkcode: " . $code);
+	}
 	$appservertransport->close();
 } catch (TException $tx) {
 	// a general thrift exception, like no such server
@@ -47,7 +52,7 @@ try {
 	$appservererror = true;
 }
 
-if ($appservererror) {
+if ($appservererror || $badcode) {
 	$theme = "classroom";
 	$theme1 = "3e693f";
 	$theme2 = "b47727";
@@ -59,9 +64,10 @@ if ($appservererror) {
 	$theme2 = $messageinfo->brandinfo["theme2"];
 	$TITLE = $messageinfo->customerdisplayname;
 	$urlcomponent = $messageinfo->urlcomponent;
+	apache_note("CS_CUST",urlencode($messageinfo->urlcomponent)); //for logging
+	
 }
 
-apache_note("CS_CUST",urlencode($appservererror?"m":$messageinfo->urlcomponent)); //for logging
 
 ?>
 <html>
@@ -111,7 +117,7 @@ if ($appservererror) {
 		<p>An error occured while trying to retrieve your message. Please try again.</p>
 	</div>
 <?
-} else if($messageinfo === false){
+} else if($badcode){
 ?>
 	<div>
 		<h1>The requested information was not found.</h1>

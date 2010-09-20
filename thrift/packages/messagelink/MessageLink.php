@@ -74,6 +74,9 @@ class MessageLinkClient implements MessageLinkIf {
     if ($result->success !== null) {
       return $result->success;
     }
+    if ($result->nfe !== null) {
+      throw $result->nfe;
+    }
     throw new Exception("getInfo failed: unknown result");
   }
 
@@ -124,6 +127,9 @@ class MessageLinkClient implements MessageLinkIf {
     }
     if ($result->success !== null) {
       return $result->success;
+    }
+    if ($result->nfe !== null) {
+      throw $result->nfe;
     }
     throw new Exception("getLogo failed: unknown result");
   }
@@ -177,6 +183,9 @@ class MessageLinkClient implements MessageLinkIf {
     if ($result->success !== null) {
       return $result->success;
     }
+    if ($result->nfe !== null) {
+      throw $result->nfe;
+    }
     throw new Exception("getAudioPart failed: unknown result");
   }
 
@@ -227,6 +236,9 @@ class MessageLinkClient implements MessageLinkIf {
     }
     if ($result->success !== null) {
       return $result->success;
+    }
+    if ($result->nfe !== null) {
+      throw $result->nfe;
     }
     throw new Exception("getAudioFull failed: unknown result");
   }
@@ -311,6 +323,7 @@ class messagelink_MessageLink_getInfo_result {
   static $_TSPEC;
 
   public $success = null;
+  public $nfe = null;
 
   public function __construct($vals=null) {
     if (!isset(self::$_TSPEC)) {
@@ -320,11 +333,19 @@ class messagelink_MessageLink_getInfo_result {
           'type' => TType::STRUCT,
           'class' => 'messagelink_Info',
           ),
+        1 => array(
+          'var' => 'nfe',
+          'type' => TType::STRUCT,
+          'class' => 'messagelink_MessageLinkCodeNotFoundException',
+          ),
         );
     }
     if (is_array($vals)) {
       if (isset($vals['success'])) {
         $this->success = $vals['success'];
+      }
+      if (isset($vals['nfe'])) {
+        $this->nfe = $vals['nfe'];
       }
     }
   }
@@ -356,6 +377,14 @@ class messagelink_MessageLink_getInfo_result {
             $xfer += $input->skip($ftype);
           }
           break;
+        case 1:
+          if ($ftype == TType::STRUCT) {
+            $this->nfe = new messagelink_MessageLinkCodeNotFoundException();
+            $xfer += $this->nfe->read($input);
+          } else {
+            $xfer += $input->skip($ftype);
+          }
+          break;
         default:
           $xfer += $input->skip($ftype);
           break;
@@ -375,6 +404,11 @@ class messagelink_MessageLink_getInfo_result {
       }
       $xfer += $output->writeFieldBegin('success', TType::STRUCT, 0);
       $xfer += $this->success->write($output);
+      $xfer += $output->writeFieldEnd();
+    }
+    if ($this->nfe !== null) {
+      $xfer += $output->writeFieldBegin('nfe', TType::STRUCT, 1);
+      $xfer += $this->nfe->write($output);
       $xfer += $output->writeFieldEnd();
     }
     $xfer += $output->writeFieldStop();
@@ -460,6 +494,7 @@ class messagelink_MessageLink_getLogo_result {
   static $_TSPEC;
 
   public $success = null;
+  public $nfe = null;
 
   public function __construct($vals=null) {
     if (!isset(self::$_TSPEC)) {
@@ -469,11 +504,19 @@ class messagelink_MessageLink_getLogo_result {
           'type' => TType::STRUCT,
           'class' => 'messagelink_Logo',
           ),
+        1 => array(
+          'var' => 'nfe',
+          'type' => TType::STRUCT,
+          'class' => 'messagelink_MessageLinkCodeNotFoundException',
+          ),
         );
     }
     if (is_array($vals)) {
       if (isset($vals['success'])) {
         $this->success = $vals['success'];
+      }
+      if (isset($vals['nfe'])) {
+        $this->nfe = $vals['nfe'];
       }
     }
   }
@@ -505,6 +548,14 @@ class messagelink_MessageLink_getLogo_result {
             $xfer += $input->skip($ftype);
           }
           break;
+        case 1:
+          if ($ftype == TType::STRUCT) {
+            $this->nfe = new messagelink_MessageLinkCodeNotFoundException();
+            $xfer += $this->nfe->read($input);
+          } else {
+            $xfer += $input->skip($ftype);
+          }
+          break;
         default:
           $xfer += $input->skip($ftype);
           break;
@@ -524,6 +575,11 @@ class messagelink_MessageLink_getLogo_result {
       }
       $xfer += $output->writeFieldBegin('success', TType::STRUCT, 0);
       $xfer += $this->success->write($output);
+      $xfer += $output->writeFieldEnd();
+    }
+    if ($this->nfe !== null) {
+      $xfer += $output->writeFieldBegin('nfe', TType::STRUCT, 1);
+      $xfer += $this->nfe->write($output);
       $xfer += $output->writeFieldEnd();
     }
     $xfer += $output->writeFieldStop();
@@ -629,6 +685,7 @@ class messagelink_MessageLink_getAudioPart_result {
   static $_TSPEC;
 
   public $success = null;
+  public $nfe = null;
 
   public function __construct($vals=null) {
     if (!isset(self::$_TSPEC)) {
@@ -638,11 +695,19 @@ class messagelink_MessageLink_getAudioPart_result {
           'type' => TType::STRUCT,
           'class' => 'messagelink_Audio',
           ),
+        1 => array(
+          'var' => 'nfe',
+          'type' => TType::STRUCT,
+          'class' => 'messagelink_MessageLinkCodeNotFoundException',
+          ),
         );
     }
     if (is_array($vals)) {
       if (isset($vals['success'])) {
         $this->success = $vals['success'];
+      }
+      if (isset($vals['nfe'])) {
+        $this->nfe = $vals['nfe'];
       }
     }
   }
@@ -674,6 +739,14 @@ class messagelink_MessageLink_getAudioPart_result {
             $xfer += $input->skip($ftype);
           }
           break;
+        case 1:
+          if ($ftype == TType::STRUCT) {
+            $this->nfe = new messagelink_MessageLinkCodeNotFoundException();
+            $xfer += $this->nfe->read($input);
+          } else {
+            $xfer += $input->skip($ftype);
+          }
+          break;
         default:
           $xfer += $input->skip($ftype);
           break;
@@ -693,6 +766,11 @@ class messagelink_MessageLink_getAudioPart_result {
       }
       $xfer += $output->writeFieldBegin('success', TType::STRUCT, 0);
       $xfer += $this->success->write($output);
+      $xfer += $output->writeFieldEnd();
+    }
+    if ($this->nfe !== null) {
+      $xfer += $output->writeFieldBegin('nfe', TType::STRUCT, 1);
+      $xfer += $this->nfe->write($output);
       $xfer += $output->writeFieldEnd();
     }
     $xfer += $output->writeFieldStop();
@@ -778,6 +856,7 @@ class messagelink_MessageLink_getAudioFull_result {
   static $_TSPEC;
 
   public $success = null;
+  public $nfe = null;
 
   public function __construct($vals=null) {
     if (!isset(self::$_TSPEC)) {
@@ -787,11 +866,19 @@ class messagelink_MessageLink_getAudioFull_result {
           'type' => TType::STRUCT,
           'class' => 'messagelink_Audio',
           ),
+        1 => array(
+          'var' => 'nfe',
+          'type' => TType::STRUCT,
+          'class' => 'messagelink_MessageLinkCodeNotFoundException',
+          ),
         );
     }
     if (is_array($vals)) {
       if (isset($vals['success'])) {
         $this->success = $vals['success'];
+      }
+      if (isset($vals['nfe'])) {
+        $this->nfe = $vals['nfe'];
       }
     }
   }
@@ -823,6 +910,14 @@ class messagelink_MessageLink_getAudioFull_result {
             $xfer += $input->skip($ftype);
           }
           break;
+        case 1:
+          if ($ftype == TType::STRUCT) {
+            $this->nfe = new messagelink_MessageLinkCodeNotFoundException();
+            $xfer += $this->nfe->read($input);
+          } else {
+            $xfer += $input->skip($ftype);
+          }
+          break;
         default:
           $xfer += $input->skip($ftype);
           break;
@@ -842,6 +937,11 @@ class messagelink_MessageLink_getAudioFull_result {
       }
       $xfer += $output->writeFieldBegin('success', TType::STRUCT, 0);
       $xfer += $this->success->write($output);
+      $xfer += $output->writeFieldEnd();
+    }
+    if ($this->nfe !== null) {
+      $xfer += $output->writeFieldBegin('nfe', TType::STRUCT, 1);
+      $xfer += $this->nfe->write($output);
       $xfer += $output->writeFieldEnd();
     }
     $xfer += $output->writeFieldStop();

@@ -17,7 +17,6 @@ if($appserverprotocol == null || $appservertransport == null) {
 
 
 try {
-	
 	$client = new MessageLinkClient($appserverprotocol);
 	
 	// Open up the connection
@@ -25,15 +24,10 @@ try {
 	
 	$code = $_GET['code'];
 	
-	if(isset($_GET['partnum'])) {
-		
-		$messagepartnumber = $_GET['partnum'];
-		
-		// Perform operation on the server
-		$audiopart = $client->getAudioPart($code,$messagepartnumber);
-		//$audiopart = $client->getAudioFull($code);
-		
-		if ($audiopart) {
+	try {
+		if(isset($_GET['partnum'])) {
+			$messagepartnumber = $_GET['partnum'];
+			$audiopart = $client->getAudioPart($code,$messagepartnumber);
 			header("HTTP/1.0 200 OK");
 			if (isset($_GET['download']))
 				header('Content-type: application/x-octet-stream');
@@ -46,15 +40,8 @@ try {
 			header("Content-Length: " . strlen($audiopart->data));
 			header("Connection: close");
 			echo $audiopart->data;
-		} else {
-			echo "An error occurred trying to generate the preview file. Please try again.";
-		}
-		
-	} else {
-		// Perform operation on the server
-		$audiofull = $client->getAudioFull($code);
-		
-		if ($audiofull) {
+		} else {		
+			$audiofull = $client->getAudioFull($code);
 			header("HTTP/1.0 200 OK");
 			if (isset($_GET['download']))
 				header('Content-type: application/x-octet-stream');
@@ -67,9 +54,10 @@ try {
 			header("Content-Length: " . strlen($audiofull->data));
 			header("Connection: close");
 			echo $audiofull->data;
-		} else {
-			echo "An error occurred trying to generate the preview file. Please try again.";
 		}
+	} catch (messagelink_MessageLinkCodeNotFoundException $e) {
+		echo "The requested information was not found. The message you are looking for does not exist or has expired.";
+		error_log("Unable to find the messagelinkcode: " . $code);
 	}
 	// And finally, we close the thrift connection
 	$appservertransport->close();
