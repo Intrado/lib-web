@@ -1,3 +1,274 @@
+<?php
+
+require_once("../inc/subdircommon.inc.php");
+require_once("../obj/FieldMap.obj.php");
+require_once("../obj/Organization.obj.php");
+
+function generateNonExistantData($ajaxCall, $options) {
+}
+
+function generateWrongOwnerData($ajaxCall, $options) {
+	global $USER;
+	
+	// N/A calls
+	if (in_array($ajaxCall, array('lists', 'Messages', 'getdatavalues', 'getsections', 'rulewidgetsettings')))
+		return null;
+		
+	$userId = QuickQuery("select id from user where login != 'schoolmessenger' and id != ? and enabled = 1 and deleted = 0", false, array($USER->id));
+
+	return generateGoodDataForUser($userId, $ajaxCall, $options);
+}
+
+function generateGoodData($ajaxCall, $options) {
+	global $USER;
+	
+	return generateGoodDataForUser($USER->id, $ajaxCall, $options);
+}
+
+function generateGoodDataForUser($userId, $ajaxCall, $options) {
+	$get = array();
+	$post = array();
+
+	switch ($ajaxCall) {
+		case 'lists':
+			break;
+		
+		case 'AudioFile':
+			$get['id'] = QuickQuery("select id from audiofile where userid = ? and deleted = 0 limit 1", false, array($userId));
+			if (empty($get['id']))
+				return null;
+			break;
+		
+		case 'Message':
+			$get['id'] = QuickQuery("select id from message where userid = ? and deleted = 0 limit 1", false, array($userId));
+			if (empty($get['id']))
+				return null;
+			break;
+		
+		case 'MessagePart':
+			$get['id'] = QuickQuery("select id from messagepart where userid = ? and deleted = 0 and messageid > 0 limit 1", false, array($userId));
+			if (empty($get['id']))
+				return null;
+			break;
+		
+		case 'MessageParts':
+			$get['id'] = QuickQuery("select messageid from messagepart where userid = ? and deleted = 0 and messageid > 0 limit 1", false, array($userId));
+			if (empty($get['id']))
+				return null;
+			break;
+		
+		case 'Messages':
+			// NOTE: 'managesystem' only necessary if specifying a different user
+			if (!empty($options['useDifferentUserId'])) {
+				$differentUserId = QuickQuery("select id from user where login != 'schoolmessenger' and deleted = 0 and enabled = 1 and id != ? limit 1", false, array($userId));
+				if (empty($differentUserId))
+					return null;
+				
+				$get['userid'] = $differentUserId;
+			} else {
+				$get['userid'] = $userId;
+			}
+			
+			$get['messagetype'] = QuickQuery("select type from message where deleted = 0 and userid = ? and autotranslate not in ('source','translated') limit 1", false, array($get['userid']));
+			break;
+			
+		case 'messagegroupsummary':
+			$get['messagegroupid'] = QuickQuery("select id from messagegroup where userid = ? and deleted = 0 limit 1", false, array($userId));
+			if (empty($get['messagegroupid']))
+				return null;
+			break;
+		
+		case 'hasmessage':
+			$get['messageid'] = QuickQuery("select id from message where userid = ? and deleted = 0 limit 1", false, array($userId));
+			if (empty($get['messageid']))
+				return null;
+			break;
+		
+		case 'getaudiolibrary':
+			$get['messagegroupid'] = QuickQuery("select messagegroupid from audiofile where userid = ? and messagegroupid > 0 and deleted = 0 limit 1", false, array($userId));
+			if (empty($get['messagegroupid']))
+				return null;
+			break;
+		
+		case 'listrules':
+		case 'liststats':
+			$listId = QuickQuery("select id from list where userid = ? and deleted = 0 limit 1", false, array($userId));
+			if (empty($listId))
+				return null;
+			$get['listids'] = json_encode(array($listId));
+			break;
+		
+		case 'getdatavalues':
+			$get['fieldnum'] = FieldMap::getFieldnumWithOption('multisearch', FieldMap::getLanguageField());
+			if (empty($get['fieldnum']))
+				return null;
+			break;
+		
+		case 'getsections':
+			$orgKeys = Organization::getAuthorizedOrgKeys();
+			if (empty($orgKeys))
+				return null;
+			$get['organizationid'] = QuickQuery('select id from organization where orgkey = ? limit 1', false, array(reset($orgKeys)));
+			if (empty($get['organizationid']))
+				return null;
+			break;
+		
+		case 'rulewidgetsettings':
+			break;
+		
+		case 'previewmessage':
+			$get['id'] = QuickQuery("select id from message where userid = ? and deleted = 0 limit 1", false, array($userId));
+			if (empty($get['id']))
+				return null;
+			break;
+		
+		case 'messagegrid':
+			$get['id'] = QuickQuery("select id from messagegroup where userid = ? and deleted = 0 limit 1", false, array($userId));
+			if (empty($get['id']))
+				return null;
+			break;
+	}
+	return array(
+		'get' => $get,
+		'post' => $post
+	);
+}
+
+function returnFalse () {
+	return false;
+}
+
+function checkUserHasFieldPermissions($fieldnums) {
+	global $USER;
+	
+	if (!$fieldnums)
+		return true;
+	
+	foreach ($fieldnums as $fieldnum) {
+		if (!$USER->authorizeField($fieldnum))
+			return false;
+	}
+	
+	return true;
+}
+
+function checkUserHasProfilePermissions($permissions) {
+	global $USER;
+	
+	if (!$permissions)
+		return true;
+		
+	foreach ($permissions as $permission) {
+		if (!$USER->authorize($permission))
+			return false;
+	}
+	
+	return true;
+}
+
+function createWrongOwnerTests() {
+	global $USER;
+
+	$ajaxCallsWithAssertionDetails = array(
+		'lists' => null,
+		'AudioFile' => null,
+		'Message' => null,
+		'MessagePart' => null,
+		'MessageParts' => null,
+		'Messages' => null,
+		'messagegroupsummary' => null,
+		'hasmessage' => null,
+		'getaudiolibrary' => null,
+		'listrules' => null,
+		'liststats' => null,
+		'getdatavalues' => null,
+		'getsections' => null,
+		'rulewidgetsettings' => null,
+		'previewmessage' => null,
+		'messagegrid' => null
+	);
+	
+	return createTests(
+		'returnFalse', $ajaxCallsWithAssertionDetails,
+		'generateWrongOwnerData', array()
+	);
+}
+
+function createProfilePermissionTests() {
+	global $USER;
+	
+	$optionsForGeneratingData = array(
+		'Messages' => array('useDifferentUserId' => true)
+	);
+	
+	$ajaxCallsWithAssertionDetails = array(
+		'lists' => null,
+		'AudioFile' => null,
+		'Message' => null,
+		'MessagePart' => null,
+		'MessageParts' => null,
+		
+		// NOTE: 'managesystem' only necessary if specifying a different user
+		'Messages' => isset($optionsForGeneratingData['Messages']['useDifferentUserId']) ? array('managesystem') : null,
+		
+		'messagegroupsummary' => null,
+		'hasmessage' => null,
+		'getaudiolibrary' => null,
+		'listrules' => null,
+		'liststats' => null,
+		'getdatavalues' => null,
+		'getsections' => null,
+		'rulewidgetsettings' => null,
+		'previewmessage' => null,
+		'messagegrid' => null
+	);
+	
+	return createTests(
+		'checkUserHasProfilePermissions', $ajaxCallsWithAssertionDetails,
+		'generateGoodData', $optionsForGeneratingData
+	);
+}
+
+function assembleTestsAsJson($creators) {
+	$tests = array();
+	
+	foreach ($creators as $creator) {
+		$tests = array_merge($tests, $creator());
+	}
+	
+	return json_encode($tests);
+}
+
+function createTests($shouldAssertTrue, $ajaxCallsWithAssertionDetails, $dataGenerator, $optionsForGeneratingData) {
+	$ajaxTests = array();
+	
+	foreach ($ajaxCallsWithAssertionDetails as $ajaxCall => $assertionDetails) {
+		$data = $dataGenerator(
+			$ajaxCall,
+			isset($optionsForGeneratingData[$ajaxCall]) ? $optionsForGeneratingData[$ajaxCall] : null
+		);
+		
+		// Skip.
+		if (empty($data))
+			continue;
+		
+		$ajaxCall = "ajax.php?type=$ajaxCall";
+		
+		if ($shouldAssertTrue($assertionDetails))
+			$key  = "ASSERT TRUE--" . $ajaxCall;
+		else
+			$key = "ASSERT FALSE--" . $ajaxCall;
+		
+		if (!empty($data['get']))
+			$key .= '&' . http_build_query($data['get'], '', '&');
+		$ajaxTests[$key] = !empty($data['post']) ? json_encode($data['post']) : '';
+	}
+	
+	return $ajaxTests;
+}
+
+?>
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
 	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
@@ -42,7 +313,9 @@ GET
 </table>
 
 <script type='text/javascript'>
-var testcaseData = {};
+var testcaseData = (<?php echo assembleTestsAsJson(array('createWrongOwnerTests', 'createProfilePermissionTests')); ?>);
+
+/*
 testcaseData['ASSERT FALSE--ajax.php'] = '';
 testcaseData['ASSERT FALSE--ajax.php?type'] = '';
 testcaseData['ASSERT FALSE--ajax.php?type='] = '';
@@ -162,52 +435,52 @@ testcaseData['ASSERT FALSE--ajax.php?type=messagefields&id=???\';;;'] = '';
 testcaseData['ASSERT FALSE--ajax.php?type=messagefields&id=$_SESSION'] = '';
 testcaseData['ajax.php?type=messagefields&id=1'] = '';
 testcaseData['ASSERT FALSE--ajax.php?type=fieldvalues'] = '';
-testcaseData['ASSERT FALSE--ajaxeasycall.php?id'] = '';
-testcaseData['ASSERT FALSE--ajaxeasycall.php?id='] = '';
-testcaseData['ASSERT FALSE--ajaxeasycall.php?id=$_SESSION'] = '';
-testcaseData['ASSERT FALSE--ajaxeasycall.php?id=\0\0'] = '';
-testcaseData['ASSERT FALSE--ajaxeasycall.php?id=???\';;;*'] = '';
-testcaseData['ASSERT FALSE--ajaxeasycall.php?id=???\';;;**'] = 'phone';
-testcaseData['ASSERT FALSE--ajaxeasycall.php?id=???\';;;***'] = 'phone=';
-testcaseData['ASSERT FALSE--ajaxeasycall.php?id=???\';;;****'] = 'phone=???\';;;';
-testcaseData['ASSERT FALSE--ajaxeasycall.php?id=???\';;;*****'] = 'phone=$_SESSION';
-testcaseData['ASSERT FALSE--ajaxeasycall.php?id=???\';;;******'] = 'phone=\0\0';
-testcaseData['ASSERT FALSE--ajaxeasycall.php?id=???\';;;*******'] = 'language';
-testcaseData['ASSERT FALSE--ajaxeasycall.php?id=???\';;;********'] = 'language=';
-testcaseData['ASSERT FALSE--ajaxeasycall.php?id=???\';;;*********'] = 'language=???\';;;';
-testcaseData['ASSERT FALSE--ajaxeasycall.php?id=???\';;;**********'] = 'language=$_SESSION';
-testcaseData['ASSERT FALSE--ajaxeasycall.php?id=???\';;;***********'] = 'language=\0\0';
-testcaseData['ASSERT FALSE--ajaxeasycall.php?id=???\';;;************'] = 'phone=8316001337&language';
-testcaseData['ASSERT FALSE--ajaxeasycall.php?id=???\';;;*************'] = 'phone=8316001337&language=';
-testcaseData['ASSERT FALSE--ajaxeasycall.php?id=???\';;;****************'] = 'phone=8316001337&language=\0\0';
-testcaseData['ASSERT FALSE--ajaxeasycall.php?id=new*'] = 'phone';
-testcaseData['ASSERT FALSE--ajaxeasycall.php?id=new**'] = 'phone=';
-testcaseData['ASSERT FALSE--ajaxeasycall.php?id=new***'] = 'phone=???\';;;';
-testcaseData['ASSERT FALSE--ajaxeasycall.php?id=new****'] = 'phone=$_SESSION';
-testcaseData['ASSERT FALSE--ajaxeasycall.php?id=new*****'] = 'phone=\0\0';
-testcaseData['ASSERT FALSE--ajaxeasycall.php?id=new******'] = 'language';
-testcaseData['ASSERT FALSE--ajaxeasycall.php?id=new*******'] = 'language=';
-testcaseData['ASSERT FALSE--ajaxeasycall.php?id=new********'] = 'language=???\';;;';
-testcaseData['ASSERT FALSE--ajaxeasycall.php?id=new*********'] = 'language=$_SESSION';
-testcaseData['ASSERT FALSE--ajaxeasycall.php?id=new**********'] = 'language=\0\0';
-testcaseData['ASSERT FALSE--ajaxeasycall.php*'] = '';
-testcaseData['ASSERT FALSE--ajaxeasycall.php**'] = 'phone=8316001337&language';
-testcaseData['ASSERT FALSE--ajaxeasycall.php***'] = 'phone=8316001337&language=';
-testcaseData['ASSERT FALSE--ajaxeasycall.php****'] = 'phone=???\';;;&language=english';
-testcaseData['ASSERT FALSE--ajaxeasycall.php*****'] = 'phone=junk&language=english';
-testcaseData['ajaxeasycall.php*phone,language,name sql'] = 'phone=8316001337&language=english&name=???\';;;';
-testcaseData['ajaxeasycall.php*phone,language,origin sql'] = 'phone=8316001337&language=english&origin=???\';;;';
-testcaseData['ajaxeasycall.php*phone,language,name,origin sql'] = 'phone=8316001337&language=english&name=Ajax Teseter&origin=???\';;;';
-testcaseData['ajaxeasycall.php*phone,language,name sql,origin'] = 'phone=8316001337&language=english&name=???\';;;&origin=ajaxtester';
-testcaseData['ASSERT FALSE--ajaxeasycall.php*name'] = 'name=Ajax Teseter';
-testcaseData['ASSERT FALSE--ajaxeasycall.php*origin=ajaxtester'] = 'origin=ajaxtester';
-testcaseData['ASSERT FALSE--ajaxeasycall.php*origin=start'] = 'origin=start';
-testcaseData['ASSERT FALSE--ajaxeasycall.php*name,origin'] = 'name=Ajax Tester&origin=start';
-testcaseData['ajaxeasycall.php*phone,language'] = 'phone=8316001337&language=english';
-testcaseData['ajaxeasycall.php*phone,language,name'] = 'phone=8316001337&language=english&name=Ajax Tester';
-testcaseData['ajaxeasycall.php*phone,language,origin'] = 'phone=8316001337&language=english&origin=ajaxtester';
-testcaseData['ajaxeasycall.php*phone,language,name,origin'] = 'phone=8316001337&language=english&name=Ajax Tester&origin=ajaxtester';
-testcaseData['ajaxeasycall.php?id=1'] = '';
+testcaseData['ASSERT FALSE--ajaxeasyCall.php?id'] = '';
+testcaseData['ASSERT FALSE--ajaxeasyCall.php?id='] = '';
+testcaseData['ASSERT FALSE--ajaxeasyCall.php?id=$_SESSION'] = '';
+testcaseData['ASSERT FALSE--ajaxeasyCall.php?id=\0\0'] = '';
+testcaseData['ASSERT FALSE--ajaxeasyCall.php?id=???\';;;*'] = '';
+testcaseData['ASSERT FALSE--ajaxeasyCall.php?id=???\';;;**'] = 'phone';
+testcaseData['ASSERT FALSE--ajaxeasyCall.php?id=???\';;;***'] = 'phone=';
+testcaseData['ASSERT FALSE--ajaxeasyCall.php?id=???\';;;****'] = 'phone=???\';;;';
+testcaseData['ASSERT FALSE--ajaxeasyCall.php?id=???\';;;*****'] = 'phone=$_SESSION';
+testcaseData['ASSERT FALSE--ajaxeasyCall.php?id=???\';;;******'] = 'phone=\0\0';
+testcaseData['ASSERT FALSE--ajaxeasyCall.php?id=???\';;;*******'] = 'language';
+testcaseData['ASSERT FALSE--ajaxeasyCall.php?id=???\';;;********'] = 'language=';
+testcaseData['ASSERT FALSE--ajaxeasyCall.php?id=???\';;;*********'] = 'language=???\';;;';
+testcaseData['ASSERT FALSE--ajaxeasyCall.php?id=???\';;;**********'] = 'language=$_SESSION';
+testcaseData['ASSERT FALSE--ajaxeasyCall.php?id=???\';;;***********'] = 'language=\0\0';
+testcaseData['ASSERT FALSE--ajaxeasyCall.php?id=???\';;;************'] = 'phone=8316001337&language';
+testcaseData['ASSERT FALSE--ajaxeasyCall.php?id=???\';;;*************'] = 'phone=8316001337&language=';
+testcaseData['ASSERT FALSE--ajaxeasyCall.php?id=???\';;;****************'] = 'phone=8316001337&language=\0\0';
+testcaseData['ASSERT FALSE--ajaxeasyCall.php?id=new*'] = 'phone';
+testcaseData['ASSERT FALSE--ajaxeasyCall.php?id=new**'] = 'phone=';
+testcaseData['ASSERT FALSE--ajaxeasyCall.php?id=new***'] = 'phone=???\';;;';
+testcaseData['ASSERT FALSE--ajaxeasyCall.php?id=new****'] = 'phone=$_SESSION';
+testcaseData['ASSERT FALSE--ajaxeasyCall.php?id=new*****'] = 'phone=\0\0';
+testcaseData['ASSERT FALSE--ajaxeasyCall.php?id=new******'] = 'language';
+testcaseData['ASSERT FALSE--ajaxeasyCall.php?id=new*******'] = 'language=';
+testcaseData['ASSERT FALSE--ajaxeasyCall.php?id=new********'] = 'language=???\';;;';
+testcaseData['ASSERT FALSE--ajaxeasyCall.php?id=new*********'] = 'language=$_SESSION';
+testcaseData['ASSERT FALSE--ajaxeasyCall.php?id=new**********'] = 'language=\0\0';
+testcaseData['ASSERT FALSE--ajaxeasyCall.php*'] = '';
+testcaseData['ASSERT FALSE--ajaxeasyCall.php**'] = 'phone=8316001337&language';
+testcaseData['ASSERT FALSE--ajaxeasyCall.php***'] = 'phone=8316001337&language=';
+testcaseData['ASSERT FALSE--ajaxeasyCall.php****'] = 'phone=???\';;;&language=english';
+testcaseData['ASSERT FALSE--ajaxeasyCall.php*****'] = 'phone=junk&language=english';
+testcaseData['ajaxeasyCall.php*phone,language,name sql'] = 'phone=8316001337&language=english&name=???\';;;';
+testcaseData['ajaxeasyCall.php*phone,language,origin sql'] = 'phone=8316001337&language=english&origin=???\';;;';
+testcaseData['ajaxeasyCall.php*phone,language,name,origin sql'] = 'phone=8316001337&language=english&name=Ajax Teseter&origin=???\';;;';
+testcaseData['ajaxeasyCall.php*phone,language,name sql,origin'] = 'phone=8316001337&language=english&name=???\';;;&origin=ajaxtester';
+testcaseData['ASSERT FALSE--ajaxeasyCall.php*name'] = 'name=Ajax Teseter';
+testcaseData['ASSERT FALSE--ajaxeasyCall.php*origin=ajaxtester'] = 'origin=ajaxtester';
+testcaseData['ASSERT FALSE--ajaxeasyCall.php*origin=start'] = 'origin=start';
+testcaseData['ASSERT FALSE--ajaxeasyCall.php*name,origin'] = 'name=Ajax Tester&origin=start';
+testcaseData['ajaxeasyCall.php*phone,language'] = 'phone=8316001337&language=english';
+testcaseData['ajaxeasyCall.php*phone,language,name'] = 'phone=8316001337&language=english&name=Ajax Tester';
+testcaseData['ajaxeasyCall.php*phone,language,origin'] = 'phone=8316001337&language=english&origin=ajaxtester';
+testcaseData['ajaxeasyCall.php*phone,language,name,origin'] = 'phone=8316001337&language=english&name=Ajax Tester&origin=ajaxtester';
+testcaseData['ajaxeasyCall.php?id=1'] = '';
 testcaseData['ajaxlistform.php?type=saverules*f01*'] = 'ruledata=' + [{fieldnum:'f01', type:'text', logical:'and', op:'eq', val:'keeyip'}].toJSON();
 testcaseData['ajaxlistform.php?type=saverules*f01,f02*'] = 'ruledata=' + [{fieldnum:'f01', type:'text', logical:'and', op:'eq', val:'keeyip'}, {fieldnum:'f02', type:'text', logical:'and', op:'eq', val:'chan'}].toJSON();
 testcaseData['ASSERT FALSE--ajaxlistform.php'] = '';
@@ -249,6 +522,7 @@ testcaseData['ASSERT FALSE--ajaxlistform.php?type=saverules*f01 correct, next op
 testcaseData['ASSERT FALSE--ajaxlistform.php?type=saverules*f01 correct, f01 again'] = 'ruledata=' + [{fieldnum:'f01', type:'text', logical:'and', op:'eq', val:'keeyip'}, {fieldnum:'f01', type:'text', logical:'and', op:'eq', val:'chan'}].toJSON();
 testcaseData['ajaxlistform.php?type=saverules*f01 correct,f02 val empty'] = 'ruledata=' + [{fieldnum:'f01', type:'text', logical:'and', op:'eq', val:'keeyip'}, {fieldnum:'f02', type:'text', logical:'and', op:'eq', val:''}].toJSON();
 testcaseData['ajaxlistform.php?type=saverules*val sql*'] = 'ruledata=' + [{fieldnum:'f01', type:'text', logical:'and', op:'eq', val:'???\';;;'}].toJSON();
+*/
 
 $('automatedTestcasesContainer').hide();
 $('manualTestcasesConstainer').show();
@@ -276,7 +550,7 @@ automatedTestcaseSelectbox.observe('change', function(event) {
 	$('dataGET').value = automatedTestcaseSelectbox.getValue();
 	if ($('dataGET').value.indexOf('*') >= 0)
 		$('dataGET').value = $('dataGET').value.substring(0, $('dataGET').value.indexOf('*'));
-	$('dataGET').value = $('dataGET').value.replace(/ASSERT FALSE--/g, '');
+	$('dataGET').value = $('dataGET').value.replace(/ASSERT FALSE--/g, '').replace(/ASSERT TRUE--/g, '');
 });
 var manualTestcaseSelectbox = new Element('select');
 manualTestcaseSelectbox.observe('change', function(event) {
@@ -290,7 +564,7 @@ manualTestcaseSelectbox.observe('change', function(event) {
 
 for (var url in testcaseData) {
 	var option = new Element('option', {'value':url}).insert(url);
-	if (url.startsWith('ASSERT FALSE--'))
+	if (url.startsWith('ASSERT FALSE--') || url.startsWith('ASSERT TRUE--'))
 		automatedTestcaseSelectbox.insert(option);
 	else
 		manualTestcaseSelectbox.insert(option);
@@ -319,7 +593,7 @@ $('sendButton').observe('click', function() {
 
 	$('result').value = '--- Loading ---';
 	new Ajax.Request('../' + url, {
-		'method': 'post',
+		'Call': 'post',
 		'postBody': postBody,
 		onSuccess: function(transport) {
 			$('result').value = transport.responseText;
@@ -348,10 +622,10 @@ $('runautomatedButton').observe('click', function() {
 		testCount = 0;
 		$('result').value = '';
 		$('raw').value = '--- Running ---';
-		ajax_assert_false();
+		ajax_assert();
 	}
 });
-function ajax_assert_false() {
+function ajax_assert() {
 	if (runIndex <= 0) {
 		if (runIndex === 0)
 			$('raw').value = "--- Finished ---";
@@ -381,30 +655,46 @@ function ajax_assert_false() {
 	var postBody = testcaseData[url];
 	if (url.indexOf('*') >= 0)
 		url = url.substring(0, url.indexOf('*'));
-	url = url.replace(/ASSERT FALSE--/g, '');
+	var shouldAssertTrue = url.startsWith('ASSERT TRUE--');
+	url = url.replace(/ASSERT FALSE--/g, '').replace(/ASSERT TRUE--/g, '');
 	$('result').value += '            ' + automatedTestcaseSelectbox.options[runIndex].value;
 	new Ajax.Request('../' + url, {
-		'method': 'post',
+		'Call': 'post',
 		'postBody': postBody,
 		onSuccess: function(transport) {
 			var data = transport.responseJSON;
-			if (data) {
-				if (data['error']) {
-					$('result').value += "\nWARNING data['error']=" + data['error'] + " \n";
-					warningCount++;
+			
+			if (shouldAssertTrue) {
+				if (data) {
+					if (data['error']) {
+						$('result').value += "\nWARNING data['error']=" + data['error'] + " \n";
+						warningCount++;
+					} else {
+						$('result').value += " --- Assertion Success\n";
+					}
 				} else {
-					$('result').value += "\n!!! ASSERTION FAILED, Got Data !!!\n";
-					failCount++;
+					$('result').value += "\n!!! ASSERTION FAILED, No Data !!!\n";
+						failCount++;
+				}
+			} else {
+				if (data) {
+					if (data['error']) {
+						$('result').value += "\nWARNING data['error']=" + data['error'] + " \n";
+						warningCount++;
+					} else {
+						$('result').value += "\n!!! ASSERTION FAILED, Got Data !!!\n";
+						failCount++;
+					}
+				} else {
+					$('result').value += " --- Assertion Success\n";
 				}
 			}
-			else {
-				$('result').value += " --- Assertion Success\n";
-			}
+			
 			if (runIndex > 0)
 				runIndex++;
 			if (runIndex >= automatedTestcaseSelectbox.options.length)
 				runIndex = 0;
-			setTimeout('ajax_assert_false()', 10);
+			setTimeout('ajax_assert()', 10);
 		}
 	});
 }
