@@ -128,9 +128,9 @@ if ($appservererror) {
 ?>
 	<div style="margin: 10px; margin-top: 15px; padding: 5px; float: left; border: 1px solid #3e693f">
 		Phone Message: <?=date('M j, Y g:i a', $messageinfo->jobstarttime)?><br>
-		<div style="font-size: 20px; margin-bottom: 5px"><?=$messageinfo->customerdisplayname?></div>
-		<div style="font-size: 16px; margin-bottom: 2px"><?=$messageinfo->jobname?></div>
-		<div style="font-size: 12px">&nbsp;&nbsp;<?=$messageinfo->jobdescription?></div>
+		<div style="font-size: 20px; margin-bottom: 5px"><?=escapehtml($messageinfo->customerdisplayname)?></div>
+		<div style="font-size: 16px; margin-bottom: 2px"><?=escapehtml($messageinfo->jobname)?></div>
+		<div style="font-size: 12px">&nbsp;&nbsp;<?=escapehtml($messageinfo->jobdescription)?></div>
 	</div>
 	<div style="margin:10px; clear:both;">
 		<div id="player"></div>		
