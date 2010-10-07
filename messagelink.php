@@ -62,7 +62,7 @@ if ($appservererror || $badcode) {
 	$theme = $messageinfo->brandinfo["theme"];
 	$theme1 = $messageinfo->brandinfo["theme1"];
 	$theme2 = $messageinfo->brandinfo["theme2"];
-	$TITLE = $messageinfo->customerdisplayname;
+	$TITLE = escapehtml($messageinfo->customerdisplayname);
 	$urlcomponent = $messageinfo->urlcomponent;
 	apache_note("CS_CUST",urlencode($messageinfo->urlcomponent)); //for logging
 	
