@@ -50,20 +50,20 @@ $formdata["portalphoneactivation"] = array(
         "control" => array("Checkbox"),
         "helpstep" => 1
 );
-$formdata["priorityenforcement"] = array(
+$formdata["requireemergency"] = array(
 		"label" => _L("Require Emergency Phone"),
         "fieldhelp" => _L("Require at least one phone number for every Emergency Job Type."),
-        "value" => getSystemSetting('priorityenforcement', 0),
+        "value" => in_array('1',explode('|',getSystemSetting('priorityenforcement', ''))),
         "validators" => array(
         ),
         "control" => array("CheckBox"),
         "helpstep" => 1
 );
 
-$formdata["highpriorityenforcement"] = array(
+$formdata["requirehighpriority"] = array(
 		"label" => _L("Require High Priority Phone"),
 		"fieldhelp" => _L("Require at least one phone number for every High Priority Job Type."),
-		"value" => getSystemSetting('highpriorityenforcement', 0),
+		"value" => in_array('2',explode('|',getSystemSetting('priorityenforcement', ''))),
 		"validators" => array(),
 		"control" => array("CheckBox"),
 		"helpstep" => 1
@@ -143,13 +143,14 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
         	setSystemSetting('portalphoneactivation', '1');
         else
         	setSystemSetting('portalphoneactivation', '0');
-        
-        if ($postdata['priorityenforcement'])
-        	setSystemSetting('priorityenforcement', '1');
-        else
-        	setSystemSetting('priorityenforcement', '0');
 		
-		setSystemSetting('highpriorityenforcement',$postdata['highpriorityenforcement']?'1':'0');
+		$requirepriorities = array();
+		if($postdata['requireemergency'])
+			$requirepriorities[] = 1;
+		if($postdata['requirehighpriority'])
+			$requirepriorities[] = 2;
+		
+		setSystemSetting('priorityenforcement',implode('|',$requirepriorities));
 		
         $fields = $postdata['multicheckbox'];
 		// unset them all
