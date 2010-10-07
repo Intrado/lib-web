@@ -5,6 +5,9 @@
 host="localhost:8088"
 path="/xmlrpc"
 
+[appserver]
+host="localhost:9090"
+
 [feature]
 is_commsuite=false
 has_ssl=true
