@@ -121,7 +121,7 @@ if($PERSONID){
 			if( CheckFormSection($f, $s) ) {
 				error('There was a problem trying to save your changes', 'Please verify that all required field information has been entered properly');
 			} else {
-				if ($error = checkPriorityPhone($f, $s, $phones, getSystemSetting('priorityenforcement'))) {
+				if ($error = checkPriorityPhone($f, $s, $phones)) {
 					error(_L("You must have at least one phone number that can receive calls for these job types: ") . implode(", ", $error));
 				} else {
 					getsetContactFormData($f, $s, $PERSONID, $phones, $emails, $smses, $jobtypes, $locked);

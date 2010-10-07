@@ -250,9 +250,10 @@ function getsetContactFormData($f, $s, $PERSONID, $phones, $emails, $smses, $job
 	QuickUpdate("Commit");
 }
 
-function checkPriorityPhone($f, $s, $phones, $systempriorities){
+function checkPriorityPhone($f, $s, $phones){
+	$systempriorities = getSystemSetting('priorityenforcement');
 	if(!$systempriorities)
-		return;
+		return false;
 	
 	$hasemergency = false;
 	
