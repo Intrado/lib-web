@@ -250,9 +250,9 @@ function getsetContactFormData($f, $s, $PERSONID, $phones, $emails, $smses, $job
 	QuickUpdate("Commit");
 }
 
-function checkPriorityPhone($f, $s, $phones){
+function checkPriorityPhone($f, $s, $phones, $systempriority){
 	$hasemergency = false;
-	$jobtypenames = QuickQueryList("select id, name from jobtype where systempriority in ('1') and not deleted", true);
+	$jobtypenames = QuickQueryList("select id, name from jobtype where systempriority in (?) and not deleted", true, false, array($systempriority));
 	$jobtypelist = $jobtypenames;
 	$maxphones = getSystemSetting("maxphones", 3);
 	$lockedphones = array();

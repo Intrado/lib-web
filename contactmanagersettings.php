@@ -60,6 +60,15 @@ $formdata["priorityenforcement"] = array(
         "helpstep" => 1
 );
 
+$formdata["highpriorityenforcement"] = array(
+		"label" => _L("Require High Priority Phone"),
+		"fieldhelp" => _L("Require at least one phone number for every High Priority Job Type."),
+		"value" => getSystemSetting('highpriorityenforcement', 0),
+		"validators" => array(),
+		"control" => array("CheckBox"),
+		"helpstep" => 1
+);
+
 $phonelabels = QuickQueryList("select sequence, label from destlabel where type='phone'", true);
 $emaillabels = QuickQueryList("select sequence, label from destlabel where type='email'", true);
 
@@ -139,7 +148,9 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
         	setSystemSetting('priorityenforcement', '1');
         else
         	setSystemSetting('priorityenforcement', '0');
-        
+		
+		setSystemSetting('highpriorityenforcement',$postdata['highpriorityenforcement']?'1':'0');
+		
         $fields = $postdata['multicheckbox'];
 		// unset them all
 		for ($i = 0; $i < $maxphones; $i++) {
