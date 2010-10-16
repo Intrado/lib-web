@@ -229,6 +229,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 
 		if ($ajax) {
 			$_SESSION['report']['options']['reporttype'] = "contactchangereport";
+			$_SESSION['report']['options']['format'] = "csv"; // pdf not supported, always set to csv
 
 			$dateOptions = json_decode($postdata['dateoptions'], true);
 			if (!empty($dateOptions['reldate'])) {
