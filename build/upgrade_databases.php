@@ -30,12 +30,13 @@ $authpass = "";
 
 //list supported versons here in order of upgrade
 //format is major.minor.point/revision
-//rev is mainly for internal dev where we may have already deployed that version, but made some changes
+//rev is mainly for internal dev where we may have already deployed that version, but made some changes (rev starts at 0)
 $versions = array (
 	"7.1.5/0",
-	"7.5/14"
-	//7.5.1
-	//7.6
+	"7.5/14",
+	"7.6/0"
+	//7.6.1
+	//8.0
 	//etc
 );
 
@@ -147,6 +148,7 @@ if ($mode == 'csimport') {
 
 
 function update_customer($db, $customerid, $shardid) {
+	global $versions;
 	global $targetversion;
 	global $targetrev;
 	global $updater;
@@ -178,21 +180,38 @@ function update_customer($db, $customerid, $shardid) {
 	}
 
 	
-	/*******************************************************/
-	
-	//TODO find index of current version in $versions array, run upgrade for version of index +1, repeat until index == $targetversion index
-	//for now, just run 7.5
-	
+	// require the necessary version upgrade scripts	
 	require_once("upgrades/db_7-5.php");
-	$rev = $version == "7.5" ? $rev : 0; //reset revision to 0 each time we go to a new release, unless we're doing the same release.
-	echo "upgrading from $version/$rev to $targetversion/$targetrev\n";
-	if (upgrade_7_5($rev, $shardid, $customerid, $db)) {
-		QuickUpdate("insert into setting (name,value) values ('_dbversion','$targetversion/$targetrev') on duplicate key update value=values(value)", $db);
-	} else {
-		exit("Error upgrading DB");
+	require_once("upgrades/db_7-6.php");
+
+	// for each version, upgrade to the next
+	$foundstartingversion = false;
+	foreach ($versions as $vr) {
+		list($v, $r) = explode("/",$vr);
+		// skip past versions, find our current version to start the upgrade
+		if (!$foundstartingversion && $version != $v)
+			continue;
+		$foundstartingversion = true;
+		
+		// skip version if already on max revision
+		if ($r != $rev || $r == 0) {
+			echo "upgrading from $version/$rev to $v/$r\n";
+		
+			if ("7.5" == $v) {
+				if (!upgrade_7_5($rev, $shardid, $customerid, $db)) {
+					exit("Error upgrading DB");
+				}
+			} else if ("7.6" == $v) {
+				if (!upgrade_7_6($rev, $shardid, $customerid, $db)) {
+					exit("Error upgrading DB");
+				}
+			}
+			$rev = 0; // reset for next version
+		}
+		$version = $v; // set the current version
 	}
-	
-	/*******************************************************/
+	// upgrade success
+	QuickUpdate("insert into setting (name,value) values ('_dbversion','$targetversion/$targetrev') on duplicate key update value=values(value)", $db);
 	
 	QuickUpdate("delete from setting where name='_dbupgrade_inprogress'",$db);
 	Query("commit",$db);
