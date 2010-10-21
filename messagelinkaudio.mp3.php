@@ -8,8 +8,6 @@ $SETTINGS = parse_ini_file("inc/settings.ini.php",true);
 require_once("inc/thrift.inc.php");
 require_once $GLOBALS['THRIFT_ROOT'].'/packages/messagelink/MessageLink.php';
 
-session_write_close();//WARNING: we don't keep a lock on the session file, any changes to session data are ignored past this point
-
 if($appserverprotocol == null || $appservertransport == null) {
 	error_log("Can not use AppServer");
 	exit();

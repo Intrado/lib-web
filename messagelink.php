@@ -137,9 +137,9 @@ if ($appservererror) {
 		<script type="text/javascript" language="javascript" src="script/prototype.js"></script>	
 		<script type="text/javascript" language="javascript" src="script/niftyplayer.js.php"></script>
 		<script language="JavaScript" type="text/javascript">
-	 		embedPlayer("messagelink_audio.php?code=<?=$code?>","player",<?= $messageinfo->nummessageparts ?>);
+	 		embedPlayer("messagelinkaudio.mp3.php?code=<?=$code?>","player",<?= $messageinfo->nummessageparts ?>);
 		</script>
-		<br><a href="messagelink_audio.php?code=<?=$code?>">Click here to download</a>
+		<br><a href="messagelinkaudio.mp3.php?code=<?=$code?>">Click here to download</a>
 	</div>
 <?
 }
