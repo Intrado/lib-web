@@ -7,7 +7,7 @@ path="/xmlrpc"
 
 [appserver]
 host="localhost:9090"
-timeout="60000"
+timeout="5500"
 
 [feature]
 is_commsuite=false

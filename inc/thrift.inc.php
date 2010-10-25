@@ -23,7 +23,7 @@ try {
 			if(isset($SETTINGS['appserver']['timeout'])) {
 				$appserversocket->setRecvTimeout($SETTINGS['appserver']['timeout']);
 			} else {
-				$appserversocket->setRecvTimeout(60000);
+				$appserversocket->setRecvTimeout(5500);
 			}
 			$appservertransport = new TFramedTransport($appserversocket);
 			//$appserverprotocol = new TBinaryProtocol($appservertransport);
