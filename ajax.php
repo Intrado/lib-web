@@ -103,7 +103,10 @@ function handleRequest() {
 
 		//--------------------------- RPC -------------------------------
 		case 'messagegroupsummary':
+			// Check if has messagegroupid and that user either owns or subscribs to the message
 			if (!isset($_GET['messagegroupid']))
+				return false;
+			if(!userOwns('messagegroup',$_GET['messagegroupid']) && !isSubscribed("messagegroup",$_GET['messagegroupid']))
 				return false;
 			$messagegroup = new MessageGroup($_GET['messagegroupid']);
 			$summary = MessageGroup::getSummary($_GET['messagegroupid']);
@@ -336,7 +339,10 @@ function handleRequest() {
 
 		case 'messagegrid':
 			// TODO lookup default language code
-			if (!isset($_GET['id']) && !userOwns('messagegroup',$_GET['id']))
+			// Check if has messagegroupid and that user either owns or subscribs to the message
+			if (!isset($_GET['id']))
+				return false;
+			if(!userOwns('messagegroup',$_GET['id']) && !isSubscribed("messagegroup",$_GET['id']))
 				return false;
 
 			$cansendphone = $USER->authorize('sendphone');
