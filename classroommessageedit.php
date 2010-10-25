@@ -104,8 +104,8 @@ foreach($languages as $language) {
 }
 
 $helpsteps = array (
-	_L('Category'),
-	_L('Type the Message in as many languages as you are able to.')
+	_L('Select which category this message belongs in. This should allow teachers to find the message easily.'),
+	_L('Type the message as it should appear in your Classroom Messaging email. You will need to enter the translated versions of the message. If you are unable to enter a translated version, English will be used by default.')
 );
 
 $buttons = array(submit_button(_L('Save'),"submit","tick"),
