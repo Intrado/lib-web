@@ -27,11 +27,7 @@ while(true) {
 				$messagepartnumber = $_GET['partnum'];
 				$audiopart = $client->getAudioPart($code,$messagepartnumber);
 				header("HTTP/1.0 200 OK");
-				if (isset($_GET['download']))
-					header('Content-type: application/x-octet-stream');
-				else {
-					header("Content-Type: " . $audiopart->contenttype);
-				}
+				header("Content-Type: " . $audiopart->contenttype);
 				header("Content-disposition: attachment; filename=message.mp3");
 				header('Pragma: private');
 				header('Cache-control: private, must-revalidate');
@@ -67,7 +63,22 @@ while(true) {
 		$appservertransport->close();
 		if($attempts > 2) {
 			error_log("Failed 3 times to get content from appserver");
-			echo "An error occurred trying to generate the preview file. Please try again.";
+			
+			// For a partrequest reply with an empty audiofile since it will 
+			// eventually generate the text error in Niftyplayer. 
+			// Just echoing an error message will not be visable and 
+			// niftyplayer will show playing.
+			if(isset($_GET['partnum'])) {
+				header("HTTP/1.0 200 OK");
+				header("Content-Type: audio/mpeg");
+				header("Content-disposition: attachment; filename=error.mp3");
+				header('Pragma: private');
+				header('Cache-control: private, must-revalidate');
+				header("Content-Length: 0");
+				header("Connection: close");
+			} else {
+				echo "An error occurred trying to generate the preview file. Please try again.";
+			}
 			break;
 		}
 	}
