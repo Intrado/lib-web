@@ -66,7 +66,7 @@ while(true) {
 		error_log("Exception Connection to AppServer (" . $tx->getMessage() . ") Attempt: " . $attempts);
 		$appservertransport->close();
 		if($attempts > 2) {
-			error_log("Failed last attempt");
+			error_log("Failed 3 times to get content from appserver");
 			echo "An error occurred trying to generate the preview file. Please try again.";
 			break;
 		}
