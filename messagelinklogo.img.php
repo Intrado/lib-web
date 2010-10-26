@@ -36,10 +36,10 @@ while(true) {
 	} catch (TException $tx) {
 		$attempts++;
 		// a general thrift exception, like no such server
-		error_log("Exception Connection to AppServer (" . $tx->getMessage() . ")");
+		error_log("getLogo: Exception Connection to AppServer (" . $tx->getMessage() . ")");
 		$appservertransport->close();
 		if($attempts > 2) {
-			error_log("Failed 3 times to get content from appserver");
+			error_log("getLogo: Failed 3 times to get content from appserver");
 			$data = file_get_contents("img/logo_small.gif");
 			$contenttype = "image/gif";
 			break;

@@ -59,26 +59,16 @@ while(true) {
 	} catch (TException $tx) {
 		$attempts++;
 		// a general thrift exception, like no such server
-		error_log("Exception Connection to AppServer (" . $tx->getMessage() . ") Attempt: " . $attempts);
+		
+		error_log((isset($_GET['partnum'])?"getAudioPart":"getAudioFull") .
+		 ": Exception Connection to AppServer (" . $tx->getMessage() . ") Attempt: " . $attempts);
 		$appservertransport->close();
 		if($attempts > 2) {
-			error_log("Failed 3 times to get content from appserver");
+			header("HTTP/1.0 500 Internal Server Error");
 			
-			// For a partrequest reply with an empty audiofile since it will 
-			// eventually generate the text error in Niftyplayer. 
-			// Just echoing an error message will not be visable and 
-			// niftyplayer will show playing.
-			if(isset($_GET['partnum'])) {
-				header("HTTP/1.0 200 OK");
-				header("Content-Type: audio/mpeg");
-				header("Content-disposition: attachment; filename=error.mp3");
-				header('Pragma: private');
-				header('Cache-control: private, must-revalidate');
-				header("Content-Length: 0");
-				header("Connection: close");
-			} else {
-				echo "An error occurred trying to generate the preview file. Please try again.";
-			}
+			echo "An error occurred trying to generate the preview file. Please try again.";
+			error_log((isset($_GET['partnum'])?"getAudioPart":"getAudioFull") .
+						 ": Failed 3 times to get content from appserver");
 			break;
 		}
 	}

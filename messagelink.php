@@ -52,10 +52,10 @@ while(true) {
 	} catch (TException $tx) {
 		$attempts++;
 		// a general thrift exception, like no such server
-		error_log("Exception Connection to AppServer (" . $tx->getMessage() . ")");
+		error_log("getInfo: Exception Connection to AppServer (" . $tx->getMessage() . ")");
 		$appservertransport->close();
 		if($attempts > 2) {
-			error_log("Failed 3 times to get content from appserver");
+			error_log("getInfo: Failed 3 times to get content from appserver");
 			$appservererror = true;
 			break;
 		}
