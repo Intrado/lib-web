@@ -530,7 +530,7 @@ class Message extends DBMappedObject {
 		if (!$res2 && file_exists($outname)) {
 			if($audioformat == "mp3") {
 				$outnamemp3 = secure_tmpname("preview",".mp3");
-				$cmd = 'lame -S -b 64 "' . $outname . '" "' . $outnamemp3 . '"';
+				$cmd = 'lame -S -b24 "' . $outname . '" "' . $outnamemp3 . '"';
 				$result = exec($cmd, $res1, $res2);
 				if (!$res2 && file_exists($outname)) {
 					$data = file_get_contents ($outnamemp3); //readfile seems to cause problems

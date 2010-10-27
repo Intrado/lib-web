@@ -21,7 +21,7 @@ if(isset($_GET['id'])) {
 		if ($data) {
 			$wavfile = writeWav($data);
 			$outname = secure_tmpname("previewaudio",".mp3");
-			$cmd = 'lame -S -V3 "' . $wavfile . '" "' . $outname . '"';
+			$cmd = 'lame -S -b24 "' . $wavfile . '" "' . $outname . '"';
 			$result = exec($cmd, $res1, $res2);
 			unlink($wavfile);
 			
