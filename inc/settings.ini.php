@@ -6,7 +6,7 @@ host="localhost:8088"
 path="/xmlrpc"
 
 [appserver]
-host="localhost:9090"
+host="localhost:7911"
 timeout="5500"
 
 [feature]
