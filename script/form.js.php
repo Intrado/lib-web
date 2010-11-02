@@ -66,33 +66,37 @@ function form_default_get_value (form,targetname) {
 
 		//prototype doesn't handle radio boxes or multicheckboxes so well, so try to handle them here
 		var elements = form.elements[targetname] || form.elements[targetname + "[]"];
-		if (elements.length) {
-
-			switch (elements[0].type) {
-			case "radio":
-				for (var i = 0; i < elements.length; i++) {
-					if (elements[i].checked) {
-						value = elements[i].value.strip();
-						break;
+		try {
+			if (elements.length) {
+	
+				switch (elements[0].type) {
+				case "radio":
+					for (var i = 0; i < elements.length; i++) {
+						if (elements[i].checked) {
+							value = elements[i].value.strip();
+							break;
+						}
 					}
+					break;
+				case "checkbox":
+					value = [];
+					for (var i = 0; i < elements.length; i++) {
+						if (elements[i].checked)
+							value.push(elements[i].value);
+					}
+					break;
 				}
-				break;
-			case "checkbox":
+			} else {
+				//single item with braces?
 				value = [];
-				for (var i = 0; i < elements.length; i++) {
-					if (elements[i].checked)
-						value.push(elements[i].value);
-				}
-				break;
+				if (elements.checked)
+					value.push(elements.value);
 			}
-		} else {
-			//single item with braces?
-			value = [];
-			if (elements.checked)
-				value.push(elements.value);
+		} catch (e) {
+			// prototype is creating a popup when this fails on radiobox elemets with no contents
+			// discarding the exception and moving on
 		}
 	}
-
 	return value;
 }
 
