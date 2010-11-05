@@ -1427,3 +1427,9 @@ $$$
 update setting set value='7.5/14' where name='_dbversion'
 $$$
 -- END REV 7.5/14
+
+-- START REV 7.6/0
+
+update setting set value='7.6/0' where name='_dbversion'
+$$$
+-- END REV 7.6/0
