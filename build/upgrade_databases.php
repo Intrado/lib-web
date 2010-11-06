@@ -198,6 +198,8 @@ function update_customer($db, $customerid, $shardid) {
 		//check to see that we are already on the latest rev, then skip upgrading current version, go to next version
 		if ($version == $targetversion && $rev == $targetrev)
 			continue;
+
+		echo "upgrading from $version/$rev to $targetversion/$targetrev\n";
 		
 		
 		/* if we are looking at same major version, check for revs
@@ -223,6 +225,7 @@ function update_customer($db, $customerid, $shardid) {
 		}
 		
 		$version = $targetversion;
+		$rev = $targetrev;
 	}
 	
 	if ($foundstartingversion !== false) { 
