@@ -88,12 +88,12 @@ $checkHideActiveCodes = (!empty($_SESSION['hideactivecodes'])) ? 'checked' : '';
 $checkHideAssociated = (!empty($_SESSION['hideassociated'])) ? 'checked' : '';
 
 $buttons = array(
-	icon_button(_L('Back'),"tick",null,"contacts.php"),
+	icon_button(_L('Back'),"arrow_left",null,"contacts.php"),
 	submit_button(_L('Refresh'),"refresh","arrow_refresh"),
-	icon_button(_L('Show All Contacts'),"tick",null,"?showall")
+	icon_button(_L('Show All Contacts'),"group",null,"?showall")
 );
 if ($generateBulkTokens)
-	$buttons[] = icon_button("Generate Activation Codes", "tick", "if(confirmGenerate()) window.location='?generate=1'", "activationcodemanager.php");
+	$buttons[] = icon_button("Generate Activation Codes", "key_go", "if(confirmGenerate()) window.location='?generate=1'", "activationcodemanager.php");
 
 $redirectpage = "activationcodemanager.php";
 

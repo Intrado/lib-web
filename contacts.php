@@ -68,10 +68,10 @@ $renderedlist->pagelimit = 100;
 
 $buttons = array(
 	submit_button(_L('Refresh'),"refresh","arrow_refresh"),
-	icon_button(_L('Show All Contacts'),"tick",null,"contacts.php?showall")
+	icon_button(_L('Show All Contacts'),"group",null,"contacts.php?showall")
 );
 if (getSystemSetting("_hasportal", false) && $USER->authorize('portalaccess'))
-	$buttons[] = icon_button("Manage Activation Codes", "tick", null, "activationcodemanager.php");
+	$buttons[] = icon_button("Manage Activation Codes", "key_go", null, "activationcodemanager.php");
 
 $redirectpage = "contacts.php";
 
