@@ -205,6 +205,33 @@
 			<xsd:element name="label" type="xsd:string"></xsd:element>
 		</xsd:sequence>
 	</xsd:complexType>
+            <xsd:complexType name="createMessageResult">
+            	<xsd:sequence>
+            		<xsd:element name="resultcode" type="xsd:string"></xsd:element>
+            		<xsd:element name="resultdescription"
+            			type="xsd:string">
+            		</xsd:element>
+            		<xsd:element name="messageid" type="xsd:int"></xsd:element>
+            	</xsd:sequence>
+
+            </xsd:complexType>
+            <xsd:complexType name="listids">
+            	<xsd:sequence>
+            		<xsd:element name="listid" type="xsd:int" minOccurs="1" maxOccurs="unbounded"></xsd:element>
+            	</xsd:sequence>
+            </xsd:complexType>
+            <xsd:complexType name="jobOptions">
+            	<xsd:sequence>
+            		<xsd:element name="jobOption" type="sm:jobOptionEntry" minOccurs="0" maxOccurs="unbounded"></xsd:element>
+            	</xsd:sequence>
+            </xsd:complexType>
+
+            <xsd:complexType name="jobOptionEntry">
+            	<xsd:sequence>
+            		<xsd:element name="name" type="xsd:string"></xsd:element>
+            		<xsd:element name="value" type="xsd:string"></xsd:element>
+            	</xsd:sequence>
+            </xsd:complexType>
 </xsd:schema></wsdl:types>
     <wsdl:message name="loginRequest">
     	<wsdl:part name="loginname" type="xsd:string"></wsdl:part>
@@ -341,6 +368,63 @@
     </wsdl:message>
     <wsdl:message name="getSurveyJobTypesResponse">
     	<wsdl:part name="result" type="sm:getJobTypesResult"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="createEmailMessageRequest">
+    	<wsdl:part name="sessionid" type="xsd:string"></wsdl:part>
+        <wsdl:part name="name" type="xsd:string"></wsdl:part>
+        <wsdl:part name="description" type="xsd:string"></wsdl:part>
+        <wsdl:part name="messagetext" type="xsd:string"></wsdl:part>
+        <wsdl:part name="subject" type="xsd:string"></wsdl:part>
+    	<wsdl:part name="fromname" type="xsd:string"></wsdl:part>
+    	<wsdl:part name="fromemail" type="xsd:string"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="createEmailMessageResponse">
+    	<wsdl:part name="result" type="sm:createMessageResult">
+    	</wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="createPhoneMessageRequest">
+    	<wsdl:part name="sessionid" type="xsd:string"></wsdl:part>
+    	<wsdl:part name="name" type="xsd:string"></wsdl:part>
+    	<wsdl:part name="description" type="xsd:string"></wsdl:part>
+    	<wsdl:part name="messagetext" type="xsd:string"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="createPhoneMessageResponse">
+    	<wsdl:part name="result" type="sm:createMessageResult"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="createSmsMessageRequest">
+    	<wsdl:part name="sessionid" type="xsd:string"></wsdl:part>
+    	<wsdl:part name="name" type="xsd:string"></wsdl:part>
+    	<wsdl:part name="description" type="xsd:string"></wsdl:part>
+    	<wsdl:part name="messagetext" type="xsd:string"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="createSmsMessageResponse">
+    	<wsdl:part name="result" type="sm:createMessageResult"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="sendJobExtendedRequest">
+    	<wsdl:part name="sessionid" type="xsd:string"></wsdl:part>
+    	<wsdl:part name="name" type="xsd:string"></wsdl:part>
+    	<wsdl:part name="description" type="xsd:string"></wsdl:part>
+    	<wsdl:part name="listids" type="sm:listids"></wsdl:part>
+    	<wsdl:part name="jobtypeid" type="xsd:int"></wsdl:part>
+    	<wsdl:part name="startdate" type="xsd:string"></wsdl:part>
+    	<wsdl:part name="starttime" type="xsd:string"></wsdl:part>
+    	<wsdl:part name="endtime" type="xsd:string"></wsdl:part>
+    	<wsdl:part name="daystorun" type="xsd:int"></wsdl:part>
+    	<wsdl:part name="phonemessageid" type="xsd:int"></wsdl:part>
+    	<wsdl:part name="emailmessageid" type="xsd:int"></wsdl:part>
+    	<wsdl:part name="smsmessageid" type="xsd:int"></wsdl:part>
+    	<wsdl:part name="maxcallattempts" type="xsd:int"></wsdl:part>
+    	<wsdl:part name="options" type="sm:jobOptions">
+    		<wsdl:documentation>Possibe options incliude:
+
+callerid: the callerid to use.
+leavemessage: true/false, alows recipients to press zero to leave a message.
+messageconfirmation: true/false, allows recipients to press  '1' for 'yes' and '2' for 'no'.
+sendreport: true/false, sends an report when the job is finished.
+</wsdl:documentation></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="sendJobExtendedResponse">
+    	<wsdl:part name="result" type="sm:sendJobResult"></wsdl:part>
     </wsdl:message>
     <wsdl:portType name="SMClient">
     	<wsdl:operation name="login">
@@ -579,6 +663,23 @@ getJobTypes:
 		error: string</wsdl:documentation>
     		<wsdl:input message="sm:getSurveyJobTypesRequest"></wsdl:input>
     		<wsdl:output message="sm:getSurveyJobTypesResponse"></wsdl:output>
+    	</wsdl:operation>
+    	<wsdl:operation name="createEmailMessage">
+    		<wsdl:documentation> </wsdl:documentation>
+    		<wsdl:input message="sm:createEmailMessageRequest"></wsdl:input>
+    		<wsdl:output message="sm:createEmailMessageResponse"></wsdl:output>
+    	</wsdl:operation>
+    	<wsdl:operation name="createPhoneMessage">
+    		<wsdl:input message="sm:createPhoneMessageRequest"></wsdl:input>
+    		<wsdl:output message="sm:createPhoneMessageResponse"></wsdl:output>
+    	</wsdl:operation>
+    	<wsdl:operation name="createSmsMessage">
+    		<wsdl:input message="sm:createSmsMessageRequest"></wsdl:input>
+    		<wsdl:output message="sm:createSmsMessageResponse"></wsdl:output>
+    	</wsdl:operation>
+    	<wsdl:operation name="sendJobExtended">
+    		<wsdl:input message="sm:sendJobExtendedRequest"></wsdl:input>
+    		<wsdl:output message="sm:sendJobExtendedResponse"></wsdl:output>
     	</wsdl:operation></wsdl:portType>
     <wsdl:binding name="SMBinding" type="sm:SMClient">
 
