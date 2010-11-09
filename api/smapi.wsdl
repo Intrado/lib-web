@@ -940,6 +940,54 @@ getJobTypes:
     				namespace="http://asp.schoolmessenger.com" />
     		</wsdl:output>
     	</wsdl:operation>
+    	<wsdl:operation name="createEmailMessage">
+    		<soap:operation
+    			soapAction="http://asp.schoolmessenger.com/createEmailMessage" />
+    		<wsdl:input>
+    			<soap:body use="literal"
+    				namespace="http://asp.schoolmessenger.com" />
+    		</wsdl:input>
+    		<wsdl:output>
+    			<soap:body use="literal"
+    				namespace="http://asp.schoolmessenger.com" />
+    		</wsdl:output>
+    	</wsdl:operation>
+    	<wsdl:operation name="createPhoneMessage">
+    		<soap:operation
+    			soapAction="http://asp.schoolmessenger.com/createPhoneMessage" />
+    		<wsdl:input>
+    			<soap:body use="literal"
+    				namespace="http://asp.schoolmessenger.com" />
+    		</wsdl:input>
+    		<wsdl:output>
+    			<soap:body use="literal"
+    				namespace="http://asp.schoolmessenger.com" />
+    		</wsdl:output>
+    	</wsdl:operation>
+    	<wsdl:operation name="createSmsMessage">
+    		<soap:operation
+    			soapAction="http://asp.schoolmessenger.com/createSmsMessage" />
+    		<wsdl:input>
+    			<soap:body use="literal"
+    				namespace="http://asp.schoolmessenger.com" />
+    		</wsdl:input>
+    		<wsdl:output>
+    			<soap:body use="literal"
+    				namespace="http://asp.schoolmessenger.com" />
+    		</wsdl:output>
+    	</wsdl:operation>
+    	<wsdl:operation name="sendJobExtended">
+    		<soap:operation
+    			soapAction="http://asp.schoolmessenger.com/sendJobExtended" />
+    		<wsdl:input>
+    			<soap:body use="literal"
+    				namespace="http://asp.schoolmessenger.com" />
+    		</wsdl:input>
+    		<wsdl:output>
+    			<soap:body use="literal"
+    				namespace="http://asp.schoolmessenger.com" />
+    		</wsdl:output>
+    	</wsdl:operation>
     </wsdl:binding>
     <wsdl:service name="SMAPI">
 		<wsdl:port name="SMAPIPort" binding="sm:SMBinding">
