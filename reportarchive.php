@@ -21,12 +21,18 @@ if (!$USER->authorize('viewsystemreports')) {
 // Data Handling
 ////////////////////////////////////////////////////////////////////////////////
 
-$reports = QuickQueryList('select name, contentid from reportarchive order by name desc', true);
-$archivedata = '<div style="margin-top: 5px; padding: 4px; height: 150px; width: 150px; overflow: auto; border: 1px solid gray; scroll: auto;">';
-foreach ($reports as $name => $contentid) {
-	$archivedata .= '<div>
-		<a href="download_reportarchive.php/'. escapehtml($name). '.zip?id='. $contentid. '&name='.escapehtml($name).'">'. escapehtml($name). '</a>
-		</div>';
+$reports = QuickQueryList('select date, contentid from reportarchive order by date desc', true);
+$archivedata = '<div style="margin-top: 5px; padding: 4px; height: 150px; width: 75px; overflow: auto; border: 1px solid gray; scroll: auto;">';
+
+foreach ($reports as $date => $content) {
+	$displaydate = substr($date, 0, 7);
+	if ($content) {
+		$archivedata .= '<div>
+			<a href="download_reportarchive.php/'. escapehtml($displaydate). '.zip?date='. escapehtml($date). '">'. escapehtml($displaydate). '</a>
+			</div>';
+	} else {
+		$archivedata .= '<div>'. escapehtml($date). '</div>';
+	}
 }
 if (!$reports)
 	$archivedata .= escapehtml(_L("There are no archived reports at this time."));
