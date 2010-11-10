@@ -345,7 +345,7 @@ class SMAPI{
 				$result['resultdescription'] = "Failed to generate audio file";
 				return $result;
 			}
-			$cmd = "sox \"$origtempfile\" -r 8000 -c 1 -s -w \"$cleanedtempfile\" ";
+			$cmd = "sox \"$origtempfile\" -r 8000 -c 1 -s  \"$cleanedtempfile\" ";
 			$soxresult = exec($cmd, $res1,$res2);
 			$content = null;
 			if($res2 || !file_exists($cleanedtempfile)) {
@@ -1141,6 +1141,73 @@ class SMAPI{
             else{
             	// No valid content preferences
             }
+			$result["resultcode"] = "success";
+			return $result;
+		}
+	}
+	
+	function createPhoneMessage($sessionid, $name, $description, $messagetext) {
+		global $USER, $ACCESS;
+		$result = array("resultcode" => "failure","resultdescription" => "", "messageid" => 0);
+		if (!APISession($sessionid)) {
+			$result["resultdescription"] = "Invalid Session ID";
+			return $result;
+		} else {
+			$USER = $_SESSION['user'];
+			$ACCESS = $_SESSION['access'];
+
+			if (!$USER->id) {
+				$result["resultdescription"] = "Invalid User";
+				return $result;
+			}
+			// validate args
+			if (strlen($name) < 1 || strlen($name) > 50) {
+				$result["resultdescription"] = "Invalid Name, must be 1-50 characters";
+				return $result;
+			}
+			if (strlen($description) > 50) {
+				$result["resultdescription"] = "Invalid Description, maximum 50 characters";
+				return $result;
+			}
+			if (strlen($messagetext) < 1) {  // not checking for max length of text, assume if they try to send something so big, they can deal with the consequences
+				$result["resultdescription"] = "Invalid Text, must be at least one character";
+				return $result;
+			}
+			// validate permissions
+			if ($ACCESS->getValue('sendphone') != 1) {
+				$result["resultdescription"] = "Unauthorized - user does not have privilege to create phone messages";
+				return $result;
+			}
+			
+			// English-Female supported only
+			$voiceid = QuickQuery("select id from ttsvoice where language = 'english' and gender = 'female'");
+						
+			// create the message
+			$message = new Message();
+			$message->messagegroupid = null; // not used in a group, these messages are unseen by the application
+			$message->userid = $USER->id;
+			$message->name = $name;
+			$message->description = $description;
+			$message->type = "phone";
+			$message->subtype = "voice";
+			$message->data = ""; // not used by phone
+			$message->modifydate = date("Y-m-d H:i:s", time());
+			$message->deleted = 0;
+			$message->autotranslate = "none";
+			$message->languagecode = "en"; // hardcoded English
+			$message->create();
+			
+			// create the message part, stores the text
+			$messagepart = new MessagePart();
+			$messagepart->messageid = $message->id;
+			$messagepart->txt = $messagetext;
+			$messagepart->type = "T";
+			$messagepart->sequence = 0;
+			$messagepart->voiceid = $voiceid;
+			$messagepart->create();
+			
+			// success, return id
+			$result["messageid"] = $message->id;
 			$result["resultcode"] = "success";
 			return $result;
 		}
