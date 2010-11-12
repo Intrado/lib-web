@@ -36,6 +36,20 @@ if(isset($_GET['wsdl'])){
 ////////////////////////////////////////////////////////////////////////////////
 // Server Class
 ////////////////////////////////////////////////////////////////////////////////
+
+class ListIdList {
+	var $listid; // array of int (listids)
+}
+
+class JobOptions {
+	var $jobOption; // array of joboptionentry
+}
+
+class JobOptionEntry {
+	var $name;
+	var $value;
+}
+
 class SMAPI{
 
 	/*
@@ -280,6 +294,19 @@ class SMAPI{
 			$result["resultcode"] = "success";
 			$result["result"] = true;
 			return $result;
+		}
+	}
+	
+	/*
+	 * Internal helper function, creates all message parts from the provided text
+	 */
+	function createMessageParts($messageid, $messagetext) {
+		$errors = array();
+		$voiceid = QuickQuery("select id from ttsvoice where language = 'english' and gender = 'female'");
+		$parts = Message::parse($messagetext, $errors, $voiceid);
+		foreach ($parts as $part) {
+			$part->messageid = $messageid;
+			$part->create();
 		}
 	}
 
@@ -694,166 +721,17 @@ class SMAPI{
 
 
 	function sendJob($sessionid, $name, $desc, $listid, $jobtypeid, $startdate, $starttime, $endtime, $daystorun, $phonemsgid, $emailmsgid, $smsmsgid, $maxcallattempts ){
-		global $USER, $ACCESS;
-		$result = array("resultcode" => "failure","resultdescription" => "", "jobid" => 0);
-
-		$listid = $listid+0;
-		$jobtypeid = $jobtypeid+0;
-		$daystorun = $daystorun+0;
-		$phonemsgid = $phonemsgid+0;
-		$emailmsgid = $emailmsgid+0;
-		$smsmsgid = $smsmsgid+0;
-		$maxcallattempts = $maxcallattempts+0;
-
-		if(!APISession($sessionid)){
-			$result["resultdescription"] = "Invalid Session ID";
-			return $result;
-		} else {
-			$USER = $_SESSION['user'];
-			$ACCESS = $_SESSION['access'];
-
-			if(!$USER->id){
-				$result["resultdescription"] = "Invalid user";
-				return $result;
-			}
-			if(!strtotime($startdate)){
-
-				$result["resultdescription"] = "Invalid Start Date";
-				return $result;
-			} else if(!strtotime($starttime)){
-
-				$result["resultdescription"] = "Invalid Start Time";
-				return $result;
-			} else if(!strtotime($endtime)){
-
-				$result["resultdescription"] = "Invalid End Time";
-				return $result;
-			} else if(!$daystorun){
-
-				$result["resultdescription"] = "Invalid Run Days";
-				return $result;
-			} else if(!$maxcallattempts){
-
-				$result["resultdescription"] = "Invalid Max Call Attempts";
-				return $result;
-			} else if(!userOwns("list", $listid)){
-
-				$result["resultdescription"] =  "Invalid List";
-				return $result;
-			} else if($USER->authorize('sendphone') && $phonemsgid && !userOwns("message", $phonemsgid)){
-
-				$result["resultdescription"] =  "Invalid Phone Message ID";
-				return $result;
-			} else if($USER->authorize('sendemail') && $emailmsgid && !userOwns("message", $emailmsgid)){
-
-				$result["resultdescription"] =  "Invalid Email Message ID";
-				return $result;
-			} else if(getSystemSetting('_hassms') && $USER->authorize('sendsms') && $smsmsgid && !userOwns("message", $smsmsgid)){
-
-				$result["resultdescription"] = "Invalid SMS Message ID";
-				return $result;
-			} else if(strtotime($starttime) > strtotime($endtime)){
-
-				$result["resultdescription"] = "Start Time must be before End Time";
-				return $result;
-			} else {
-				$job = Job::jobWithDefaults();
-				$job->name = $name;
-				$job->description = $desc;
-				$job->jobtypeid = $jobtypeid;
-				$job->type = 'notification';
-				
-				// Create a deleted non-permanent messagegroup that contains duplicates of the client-supplied messages.
-				$messagegroup = new MessageGroup();
-				$messagegroup->userid = $USER->id;
-				$messagegroup->defaultlanguagecode = 'en'; // NOTE: Default language is assumed to be English.
-				$messagegroup->name = $job->name;
-				$messagegroup->description = $job->description;
-				$messagegroup->modified = date("Y-m-d H:i:s", time());
-				$messagegroup->deleted = 1; // NOTE: We don't want this messagegroup to show in the UI.
-				$messagegroup->permanent = 0; // NOTE: This is a hidden messagegroup anyway, so why keep it? The original messages remain intact.
-				$messagegroup->create();
-				$job->messagegroupid = $messagegroup->id;
-				$job->sendphone = false; // Default value.
-				$job->sendemail = false; // Default value.
-				$job->sendsms = false; // Default value.
-				if ($USER->authorize('sendphone') && $phonemsgid) {
-					$phonemessage = new Message($phonemsgid);
-					if ($phonemessage->userid == $USER->id && $phonemessage->type == 'phone') {
-						// NOTE: $phonemessage->copy() already calls $duplicatephonemessage->create();
-						$duplicatephonemessage = $phonemessage->copy($messagegroup->id, true);
-						if ($duplicatephonemessage->id) {
-							// If the message is auto-translated, then copy its source message also, in case we need to refresh the translation.
-							if ($phonemessage->autotranslate == 'translated') {
-								$sourcephonemessage = DBFind('Message', 'from message where messagegroupid=? and type="phone" and subtype=? and languagecode=? and autotranslate="source"', false, array($phonemessage->messagegroupid, $phonemessage->subtype, $phonemessage->languagecode));
-								$duplicatesourcephonemessage = $sourcephonemessage->copy($messagegroup->id, true);
-								
-								if ($duplicatesourcephonemessage->id)
-									$job->sendphone = true;
-							} else {
-								$job->sendphone = true;
-							}
-						}
-					}
-				}
-				if ($USER->authorize('sendemail') && $emailmsgid) {
-					$emailmessage = new Message($emailmsgid);
-					if ($emailmessage->userid == $USER->id && $emailmessage->type == 'email') {
-						// NOTE: $emailmessage->copy() already calls $duplicateemailmessage->create();
-						$duplicateemailmessage = $emailmessage->copy($messagegroup->id, true);
-						if ($duplicateemailmessage->id) {
-							// If the message is auto-translated, then copy its source message also, in case we need to refresh the translation.
-							if ($emailmessage->autotranslate == 'translated') {
-								$sourceemailmessage = DBFind('Message', 'from message where messagegroupid=? and type="email" and subtype=? and languagecode=? and autotranslate="source"', false, array($emailmessage->messagegroupid, $emailmessage->subtype, $emailmessage->languagecode));
-								$duplicatesourceemailmessage = $sourceemailmessage->copy($messagegroup->id, true);
-								
-								if ($duplicatesourceemailmessage->id)
-									$job->sendemail = true;
-							} else {
-								$job->sendemail = true;
-							}
-						}
-					}
-				}
-				if (getSystemSetting('_hassms') && $USER->authorize('sendsms') && $smsmsgid) {
-					$smsmessage = new Message($smsmsgid);
-					if ($smsmessage->userid == $USER->id && $smsmessage->type == 'sms') {
-						// NOTE: $smsmessage->copy() already calls $duplicatesmsmessage->create();
-						$duplicatesmsmessage = $smsmessage->copy($messagegroup->id, true);
-						if ($duplicatesmsmessage->id)
-							$job->sendsms = true;
-					}
-				}
-
-				$job->startdate = date("Y-m-d", strtotime($startdate));
-				if($ACCESS->getValue('maxjobdays') && $daystorun > $ACCESS->getValue('maxjobdays')){
-					$daystorun = $ACCESS->getValue('maxjobdays');
-				}
-				$job->enddate = date("Y-m-d", strtotime($job->startdate) + (($daystorun - 1) * 86400));
-				$job->starttime = date("H:i", strtotime($starttime));
-				$job->endtime = date("H:i", strtotime($endtime));
-
-				$job->setOption("sendreport", 1);
-				$job->setOptionValue("maxcallattempts", $maxcallattempts);
-
-
-				if(!$job->sendphone && !$job->sendemail && !$job->sendsms){
-
-					$result["resultdescription"] = "You must have at least one message type";
-					return $result;
-				}
-
-				$job->create(); // create to generate the jobid
-				
-				// associate this jobid with the listid
-				QuickUpdate("insert into joblist (jobid, listid) values (?, ?)", false, array($job->id, $listid));
-				
-				$job->runNow();
-				$result["resultcode"] = "success";
-				$result["jobid"] = $job->id;
-				return $result;
-			}
-		}
+		// put the single listid onto an array (to support multi-list via extended job)
+		$listids = new ListIdList();
+		$lids = array();
+		$lids[] = $listid;
+		$listids->listid = $lids;
+		
+		// create empty job options, all optional values for extended job
+		$options = new JobOptions();
+		$options->jobOption = array();
+		
+		return $this->sendJobExtended($sessionid, $name, $desc, $listids, $jobtypeid, $startdate, $starttime, $endtime, $daystorun, $phonemsgid, $emailmsgid, $smsmsgid, $maxcallattempts, $options);
 	}
 
 	/*
@@ -1145,8 +1023,8 @@ class SMAPI{
 			return $result;
 		}
 	}
-	
-	function createPhoneMessage($sessionid, $name, $description, $messagetext) {
+		
+	function createPhoneMessage($sessionid, $name, $description, $messagetext, $gender) {
 		global $USER, $ACCESS;
 		$result = array("resultcode" => "failure","resultdescription" => "", "messageid" => 0);
 		if (!APISession($sessionid)) {
@@ -1173,15 +1051,17 @@ class SMAPI{
 				$result["resultdescription"] = "Invalid Text, must be at least one character";
 				return $result;
 			}
+			// no error for invalid gender, use default
+			$gender = strtolower($gender);
+			if ($gender != "female" && gender != "male") {
+				$gender = "female";
+			}
 			// validate permissions
 			if ($ACCESS->getValue('sendphone') != 1) {
 				$result["resultdescription"] = "Unauthorized - user does not have privilege to create phone messages";
 				return $result;
 			}
 			
-			// English-Female supported only
-			$voiceid = QuickQuery("select id from ttsvoice where language = 'english' and gender = 'female'");
-						
 			// create the message
 			$message = new Message();
 			$message->messagegroupid = null; // not used in a group, these messages are unseen by the application
@@ -1197,21 +1077,313 @@ class SMAPI{
 			$message->languagecode = "en"; // hardcoded English
 			$message->create();
 			
-			// create the message part, stores the text
-			$messagepart = new MessagePart();
-			$messagepart->messageid = $message->id;
-			$messagepart->txt = $messagetext;
-			$messagepart->type = "T";
-			$messagepart->sequence = 0;
-			$messagepart->voiceid = $voiceid;
-			$messagepart->create();
-			
+			$this->createMessageParts($message->id, $messagetext);
+								
 			// success, return id
 			$result["messageid"] = $message->id;
 			$result["resultcode"] = "success";
 			return $result;
 		}
 	}
+	
+	function createSmsMessage($sessionid, $name, $description, $messagetext) {
+		global $USER, $ACCESS;
+		$result = array("resultcode" => "failure","resultdescription" => "", "messageid" => 0);
+		if (!APISession($sessionid)) {
+			$result["resultdescription"] = "Invalid Session ID";
+			return $result;
+		} else {
+			$USER = $_SESSION['user'];
+			$ACCESS = $_SESSION['access'];
+
+			if (!$USER->id) {
+				$result["resultdescription"] = "Invalid User";
+				return $result;
+			}
+			// validate args
+			if (strlen($name) < 1 || strlen($name) > 50) {
+				$result["resultdescription"] = "Invalid Name, must be 1-50 characters";
+				return $result;
+			}
+			if (strlen($description) > 50) {
+				$result["resultdescription"] = "Invalid Description, maximum 50 characters";
+				return $result;
+			}
+			if (strlen($messagetext) < 1 || strlen($messagetext) > 160) {
+				$result["resultdescription"] = "Invalid Text, must be 1-160 characters";
+				return $result;
+			}
+			// validate permissions
+			if ($ACCESS->getValue('sendsms') != 1) {
+				$result["resultdescription"] = "Unauthorized - user does not have privilege to create sms messages";
+				return $result;
+			}
+			
+			// create the message
+			$message = new Message();
+			$message->messagegroupid = null; // not used in a group, these messages are unseen by the application
+			$message->userid = $USER->id;
+			$message->name = $name;
+			$message->description = $description;
+			$message->type = "sms";
+			$message->subtype = "plain";
+			$message->data = ""; // not used by phone
+			$message->modifydate = date("Y-m-d H:i:s", time());
+			$message->deleted = 0;
+			$message->autotranslate = "none";
+			$message->languagecode = "en"; // hardcoded English
+			$message->create();
+			
+			$this->createMessageParts($message->id, $messagetext);
+						
+			// success, return id
+			$result["messageid"] = $message->id;
+			$result["resultcode"] = "success";
+			return $result;
+		}
+	}
+
+	function createEmailMessage($sessionid, $name, $description, $messagetext, $subject, $fromname, $fromemail) {
+		global $USER, $ACCESS;
+		$result = array("resultcode" => "failure","resultdescription" => "", "messageid" => 0);
+		if (!APISession($sessionid)) {
+			$result["resultdescription"] = "Invalid Session ID";
+			return $result;
+		} else {
+			$USER = $_SESSION['user'];
+			$ACCESS = $_SESSION['access'];
+
+			if (!$USER->id) {
+				$result["resultdescription"] = "Invalid User";
+				return $result;
+			}
+			// validate args
+			if (strlen($name) < 1 || strlen($name) > 50) {
+				$result["resultdescription"] = "Invalid Name, must be 1-50 characters";
+				return $result;
+			}
+			if (strlen($description) > 50) {
+				$result["resultdescription"] = "Invalid Description, maximum 50 characters";
+				return $result;
+			}
+			if (strlen($messagetext) < 1) {  // not checking for max length of text, assume if they try to send something so big, they can deal with the consequences
+				$result["resultdescription"] = "Invalid Text, must be at least one character";
+				return $result;
+			}
+			// TODO validate fromemail
+			
+			// validate permissions
+			if ($ACCESS->getValue('sendemail') != 1) {
+				$result["resultdescription"] = "Unauthorized - user does not have privilege to create email messages";
+				return $result;
+			}
+			
+			// create the message
+			$message = new Message();
+			$message->messagegroupid = null; // not used in a group, these messages are unseen by the application
+			$message->userid = $USER->id;
+			$message->name = $name;
+			$message->description = $description;
+			$message->type = "email";
+			$message->subtype = "plain";
+			$message->data = "subject=" . urlencode($subject) . "&fromname=" . urlencode($fromname) . "&fromemail=" . urlencode($fromemail) . "&overrideplaintext=1";
+			$message->modifydate = date("Y-m-d H:i:s", time());
+			$message->deleted = 0;
+			$message->autotranslate = "none";
+			$message->languagecode = "en"; // hardcoded English
+			$message->create();
+			
+			$this->createMessageParts($message->id, $messagetext);
+									
+			// success, return id
+			$result["messageid"] = $message->id;
+			$result["resultcode"] = "success";
+			return $result;
+		}
+	}
+	
+	function sendJobExtended($sessionid, $name, $desc, $listids, $jobtypeid, $startdate, $starttime, $endtime, $daystorun, $phonemsgid, $emailmsgid, $smsmsgid, $maxcallattempts, $options) {
+/*
+		error_log("options count " . count($options->jobOption));
+		
+		$ops = $options->jobOption;
+		foreach ($ops as $op) {
+			error_log($op->name . " -> " . $op->value);
+		}
+*/		
+		///////////
+		global $USER, $ACCESS;
+		$result = array("resultcode" => "failure","resultdescription" => "", "jobid" => 0);
+
+		$jobtypeid = $jobtypeid+0;
+		$daystorun = $daystorun+0;
+		$phonemsgid = $phonemsgid+0;
+		$emailmsgid = $emailmsgid+0;
+		$smsmsgid = $smsmsgid+0;
+		$maxcallattempts = $maxcallattempts+0;
+
+		if(!APISession($sessionid)){
+			$result["resultdescription"] = "Invalid Session ID";
+			return $result;
+		} else {
+			$USER = $_SESSION['user'];
+			$ACCESS = $_SESSION['access'];
+
+			if(!$USER->id){
+				$result["resultdescription"] = "Invalid user";
+				return $result;
+			}
+			if(!strtotime($startdate)){
+
+				$result["resultdescription"] = "Invalid Start Date";
+				return $result;
+			} else if(!strtotime($starttime)){
+
+				$result["resultdescription"] = "Invalid Start Time";
+				return $result;
+			} else if(!strtotime($endtime)){
+
+				$result["resultdescription"] = "Invalid End Time";
+				return $result;
+			} else if(!$daystorun){
+
+				$result["resultdescription"] = "Invalid Run Days";
+				return $result;
+			} else if(!$maxcallattempts){
+
+				$result["resultdescription"] = "Invalid Max Call Attempts";
+				return $result;
+			} else if($USER->authorize('sendphone') && $phonemsgid && !userOwns("message", $phonemsgid)){
+
+				$result["resultdescription"] =  "Invalid Phone Message ID";
+				return $result;
+			} else if($USER->authorize('sendemail') && $emailmsgid && !userOwns("message", $emailmsgid)){
+
+				$result["resultdescription"] =  "Invalid Email Message ID";
+				return $result;
+			} else if(getSystemSetting('_hassms') && $USER->authorize('sendsms') && $smsmsgid && !userOwns("message", $smsmsgid)){
+
+				$result["resultdescription"] = "Invalid SMS Message ID";
+				return $result;
+			} else if(strtotime($starttime) > strtotime($endtime)){
+
+				$result["resultdescription"] = "Start Time must be before End Time";
+				return $result;
+			}
+			// validate listids
+			foreach ($listids->listid as $listid) {
+				if (!userOwns("list", $listid)) {
+					$result["resultdescription"] =  "Invalid List " . $listid;
+					return $result;
+				}
+			}
+			
+			// validate joboptions
+			
+			
+			// all valid, continue to create and submit job
+				$job = Job::jobWithDefaults();
+				$job->name = $name;
+				$job->description = $desc;
+				$job->jobtypeid = $jobtypeid;
+				$job->type = 'notification';
+				
+				// Create a deleted non-permanent messagegroup that contains duplicates of the client-supplied messages.
+				$messagegroup = new MessageGroup();
+				$messagegroup->userid = $USER->id;
+				$messagegroup->defaultlanguagecode = 'en'; // NOTE: Default language is assumed to be English.
+				$messagegroup->name = $job->name;
+				$messagegroup->description = $job->description;
+				$messagegroup->modified = date("Y-m-d H:i:s", time());
+				$messagegroup->deleted = 1; // NOTE: We don't want this messagegroup to show in the UI.
+				$messagegroup->permanent = 0; // NOTE: This is a hidden messagegroup anyway, so why keep it? The original messages remain intact.
+				$messagegroup->create();
+				$job->messagegroupid = $messagegroup->id;
+				$job->sendphone = false; // Default value.
+				$job->sendemail = false; // Default value.
+				$job->sendsms = false; // Default value.
+				if ($USER->authorize('sendphone') && $phonemsgid) {
+					$phonemessage = new Message($phonemsgid);
+					if ($phonemessage->userid == $USER->id && $phonemessage->type == 'phone') {
+						// NOTE: $phonemessage->copy() already calls $duplicatephonemessage->create();
+						$duplicatephonemessage = $phonemessage->copy($messagegroup->id, true);
+						if ($duplicatephonemessage->id) {
+							// If the message is auto-translated, then copy its source message also, in case we need to refresh the translation.
+							if ($phonemessage->autotranslate == 'translated') {
+								$sourcephonemessage = DBFind('Message', 'from message where messagegroupid=? and type="phone" and subtype=? and languagecode=? and autotranslate="source"', false, array($phonemessage->messagegroupid, $phonemessage->subtype, $phonemessage->languagecode));
+								$duplicatesourcephonemessage = $sourcephonemessage->copy($messagegroup->id, true);
+								
+								if ($duplicatesourcephonemessage->id)
+									$job->sendphone = true;
+							} else {
+								$job->sendphone = true;
+							}
+						}
+					}
+				}
+				if ($USER->authorize('sendemail') && $emailmsgid) {
+					$emailmessage = new Message($emailmsgid);
+					if ($emailmessage->userid == $USER->id && $emailmessage->type == 'email') {
+						// NOTE: $emailmessage->copy() already calls $duplicateemailmessage->create();
+						$duplicateemailmessage = $emailmessage->copy($messagegroup->id, true);
+						if ($duplicateemailmessage->id) {
+							// If the message is auto-translated, then copy its source message also, in case we need to refresh the translation.
+							if ($emailmessage->autotranslate == 'translated') {
+								$sourceemailmessage = DBFind('Message', 'from message where messagegroupid=? and type="email" and subtype=? and languagecode=? and autotranslate="source"', false, array($emailmessage->messagegroupid, $emailmessage->subtype, $emailmessage->languagecode));
+								$duplicatesourceemailmessage = $sourceemailmessage->copy($messagegroup->id, true);
+								
+								if ($duplicatesourceemailmessage->id)
+									$job->sendemail = true;
+							} else {
+								$job->sendemail = true;
+							}
+						}
+					}
+				}
+				if (getSystemSetting('_hassms') && $USER->authorize('sendsms') && $smsmsgid) {
+					$smsmessage = new Message($smsmsgid);
+					if ($smsmessage->userid == $USER->id && $smsmessage->type == 'sms') {
+						// NOTE: $smsmessage->copy() already calls $duplicatesmsmessage->create();
+						$duplicatesmsmessage = $smsmessage->copy($messagegroup->id, true);
+						if ($duplicatesmsmessage->id)
+							$job->sendsms = true;
+					}
+				}
+
+				$job->startdate = date("Y-m-d", strtotime($startdate));
+				if($ACCESS->getValue('maxjobdays') && $daystorun > $ACCESS->getValue('maxjobdays')){
+					$daystorun = $ACCESS->getValue('maxjobdays');
+				}
+				$job->enddate = date("Y-m-d", strtotime($job->startdate) + (($daystorun - 1) * 86400));
+				$job->starttime = date("H:i", strtotime($starttime));
+				$job->endtime = date("H:i", strtotime($endtime));
+
+				$job->setOption("sendreport", 1);
+				$job->setOptionValue("maxcallattempts", $maxcallattempts);
+
+
+				if(!$job->sendphone && !$job->sendemail && !$job->sendsms){
+
+					$result["resultdescription"] = "You must have at least one message type";
+					return $result;
+				}
+
+				$job->create(); // create to generate the jobid
+				
+				// associate this jobid with each listid
+				foreach ($listids->listid as $listid) {
+					// TODO batch insert
+					QuickUpdate("insert into joblist (jobid, listid) values (?, ?)", false, array($job->id, $listid));
+				}
+				
+				$job->runNow();
+				$result["resultcode"] = "success";
+				$result["jobid"] = $job->id;
+				return $result;
+
+		}
+	}
+	
 }
 
 ////////////////////////////////////////////////////////////////////////////////
