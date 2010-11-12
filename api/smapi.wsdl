@@ -387,6 +387,8 @@
     	<wsdl:part name="name" type="xsd:string"></wsdl:part>
     	<wsdl:part name="description" type="xsd:string"></wsdl:part>
     	<wsdl:part name="messagetext" type="xsd:string"></wsdl:part>
+    	<wsdl:part name="ttsgender" type="xsd:string">
+    		<wsdl:documentation>use either male or female text to speech voice</wsdl:documentation></wsdl:part>
     </wsdl:message>
     <wsdl:message name="createPhoneMessageResponse">
     	<wsdl:part name="result" type="sm:createMessageResult"></wsdl:part>
@@ -415,7 +417,7 @@
     	<wsdl:part name="smsmessageid" type="xsd:int"></wsdl:part>
     	<wsdl:part name="maxcallattempts" type="xsd:int"></wsdl:part>
     	<wsdl:part name="options" type="sm:jobOptions">
-    		<wsdl:documentation>Possibe options incliude:
+    		<wsdl:documentation>Possible options include:
 
 callerid: the callerid to use.
 leavemessage: true/false, alows recipients to press zero to leave a message.
