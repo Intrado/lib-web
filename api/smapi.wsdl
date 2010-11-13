@@ -227,7 +227,10 @@
             </xsd:complexType>
 
             <xsd:complexType name="jobOptionEntry">
-            	<xsd:sequence>
+                <xsd:annotation>
+                	<xsd:documentation></xsd:documentation>
+                </xsd:annotation>
+                <xsd:sequence>
             		<xsd:element name="name" type="xsd:string"></xsd:element>
             		<xsd:element name="value" type="xsd:string"></xsd:element>
             	</xsd:sequence>
@@ -371,12 +374,17 @@
     </wsdl:message>
     <wsdl:message name="createEmailMessageRequest">
     	<wsdl:part name="sessionid" type="xsd:string"></wsdl:part>
-        <wsdl:part name="name" type="xsd:string"></wsdl:part>
-        <wsdl:part name="description" type="xsd:string"></wsdl:part>
+        <wsdl:part name="name" type="xsd:string">
+        	<wsdl:documentation>required. max 50 char</wsdl:documentation></wsdl:part>
+        <wsdl:part name="description" type="xsd:string">
+        	<wsdl:documentation>optional. max 50 char</wsdl:documentation></wsdl:part>
         <wsdl:part name="messagetext" type="xsd:string"></wsdl:part>
-        <wsdl:part name="subject" type="xsd:string"></wsdl:part>
-    	<wsdl:part name="fromname" type="xsd:string"></wsdl:part>
-    	<wsdl:part name="fromemail" type="xsd:string"></wsdl:part>
+        <wsdl:part name="subject" type="xsd:string">
+        	<wsdl:documentation>optional.</wsdl:documentation></wsdl:part>
+    	<wsdl:part name="fromname" type="xsd:string">
+    		<wsdl:documentation>optiona</wsdl:documentation></wsdl:part>
+    	<wsdl:part name="fromemail" type="xsd:string">
+    		<wsdl:documentation>required. must be valid email address forma</wsdl:documentation></wsdl:part>
     </wsdl:message>
     <wsdl:message name="createEmailMessageResponse">
     	<wsdl:part name="result" type="sm:createMessageResult">
@@ -384,20 +392,26 @@
     </wsdl:message>
     <wsdl:message name="createPhoneMessageRequest">
     	<wsdl:part name="sessionid" type="xsd:string"></wsdl:part>
-    	<wsdl:part name="name" type="xsd:string"></wsdl:part>
-    	<wsdl:part name="description" type="xsd:string"></wsdl:part>
-    	<wsdl:part name="messagetext" type="xsd:string"></wsdl:part>
+    	<wsdl:part name="name" type="xsd:string">
+    		<wsdl:documentation>required. max 50 char</wsdl:documentation></wsdl:part>
+    	<wsdl:part name="description" type="xsd:string">
+    		<wsdl:documentation>optional. max 50 char</wsdl:documentation></wsdl:part>
+    	<wsdl:part name="messagetext" type="xsd:string">
+    		<wsdl:documentation>required. message parts parsed from tex</wsdl:documentation></wsdl:part>
     	<wsdl:part name="ttsgender" type="xsd:string">
-    		<wsdl:documentation>use either male or female text to speech voice</wsdl:documentation></wsdl:part>
+    		<wsdl:documentation>optional.text-to-speech voice gender is 'female' unless 'male' is specified (default is 'female')</wsdl:documentation></wsdl:part>
     </wsdl:message>
     <wsdl:message name="createPhoneMessageResponse">
     	<wsdl:part name="result" type="sm:createMessageResult"></wsdl:part>
     </wsdl:message>
     <wsdl:message name="createSmsMessageRequest">
     	<wsdl:part name="sessionid" type="xsd:string"></wsdl:part>
-    	<wsdl:part name="name" type="xsd:string"></wsdl:part>
-    	<wsdl:part name="description" type="xsd:string"></wsdl:part>
-    	<wsdl:part name="messagetext" type="xsd:string"></wsdl:part>
+    	<wsdl:part name="name" type="xsd:string">
+    		<wsdl:documentation>required. max 50 char</wsdl:documentation></wsdl:part>
+    	<wsdl:part name="description" type="xsd:string">
+    		<wsdl:documentation>optional max 50 char</wsdl:documentation></wsdl:part>
+    	<wsdl:part name="messagetext" type="xsd:string">
+    		<wsdl:documentation>required. max 160 char</wsdl:documentation></wsdl:part>
     </wsdl:message>
     <wsdl:message name="createSmsMessageResponse">
     	<wsdl:part name="result" type="sm:createMessageResult"></wsdl:part>
@@ -417,7 +431,7 @@
     	<wsdl:part name="smsmessageid" type="xsd:int"></wsdl:part>
     	<wsdl:part name="maxcallattempts" type="xsd:int"></wsdl:part>
     	<wsdl:part name="options" type="sm:jobOptions">
-    		<wsdl:documentation>Possible options include:
+    		<wsdl:documentation>Any of the following options may be used, zero, one or more, if missing an option the default is used.
 
 callerid: the callerid to use.
 leavemessage: true/false, alows recipients to press zero to leave a message.
