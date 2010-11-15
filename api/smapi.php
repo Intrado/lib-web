@@ -1278,8 +1278,8 @@ class SMAPI{
 			// prep the job options into a name-value array
 			$joboptions = array();
 			foreach ($options->jobOption as $op) {
-				error_log($op->name . " -> " . $op->value);
-				$joboptions['$op->name'] = $op->value;
+				//error_log($op->name . " -> " . $op->value);
+				$joboptions[$op->name] = $op->value;
 			}
 			
 			// set job options
@@ -1297,7 +1297,8 @@ class SMAPI{
 			}
 			// if user is allowed to override callerid, then check that phone number is valid or error, otherwise we just ignore the option
 			if (isset($joboptions['callerid']) && $USER->authorize('setcallerid') && !getSystemSetting('_hascallback', false)) {
-				if (!Phone::validate($joboptions['callerid'])) {
+				$errors = Phone::validate($joboptions['callerid']);
+				if (count($errors)  > 0) {
 					$result["resultdescription"] =  "Invalid callerid in job options";
 					return $result;
 				}
