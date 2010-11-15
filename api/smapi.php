@@ -257,6 +257,30 @@ class SMAPI{
 				$result["resultdescription"] = "Unauthorized access";
 				return $result;
 			}
+			// validate user has privilage to update this type of message
+			switch ($message->type) {
+				case "phone":
+					if (!$USER->authorize('sendphone')) {
+						$result["resultdescription"] = "Unauthorized - user does not have privilege to edit phone messages";
+						return $result;
+					}
+					break;
+				case "email":
+					if (!$USER->authorize('sendemail')) {
+						$result["resultdescription"] = "Unauthorized - user does not have privilege to edit email messages";
+						return $result;
+					}
+					break;
+				case "sms":
+					if (!getSystemSetting('_hassms') || !$USER->authorize('sendsms')) {
+						$result["resultdescription"] = "Unauthorized - user does not have privilege to edit sms messages";
+						return $result;
+					}
+					break;
+				default:
+					$result["resultdescription"] = "Invalid message type : " . $message->type;
+					return $result;
+			}
 
 			// NOTE: Assumes tts message is English
 			// because messageparts are recreated with the English female voice.
