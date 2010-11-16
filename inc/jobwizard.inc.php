@@ -1661,11 +1661,14 @@ class JobWiz_scheduleOptions extends WizStep {
 		global $ACCESS;
 		$wizHasPhoneMsg = wizHasPhone($postdata);
 		$wizHasEmailMsg= wizHasEmail($postdata);
-
+		
+		//get the callearly
 		$callearly = date("g:i a");
 		$accessCallearly = $ACCESS->getValue("callearly");
 		if (!$accessCallearly)
 			$accessCallearly = "12:00 am";
+		
+		//get calllate first from user pref, try to ensure it is at least an hour after start, up to access restriction
 		$calllate = $USER->getCallLate();
 		if ((strtotime($callearly) + 3600) > strtotime($calllate))
 			$calllate = date("g:i a", strtotime($callearly) + 3600);
@@ -1674,18 +1677,18 @@ class JobWiz_scheduleOptions extends WizStep {
 			$accessCalllate = "11:59 pm";
 		if (strtotime($calllate)  > strtotime($accessCalllate))
 			$calllate = $accessCalllate;
-
+		
 		$menu = array();
 		$callearlysec = strtotime($callearly) ;
 		$calllatesec = strtotime($calllate);
 		$accessCallearlysec = strtotime($accessCallearly);
 		$accessCalllatesec = strtotime($accessCalllate);
 
-		// Check that the NOW call early time is less than the NOW call late time
-		// and it's greater than or equal to the access profile call early time
-		// and the call late time is less than or equal to the access call late time
-		// and the proposed job window would be half an hour or more
-		if (($callearlysec < $calllatesec) && ($callearlysec >= $accessCallearlysec) && ($calllatesec <= $accessCalllatesec) && (($calllatesec - $callearlysec) >= 1800))
+				
+		$isStartBeforeEnd = $callearlysec < $calllatesec; // Check that the NOW call early time is less than the NOW call late time
+		$isStartAllowed = $callearlysec >= $accessCallearlysec; // and it's greater than or equal to the access profile call early time
+		$isEndAllowed = $calllatesec <= $accessCalllatesec; // and the call late time is less than or equal to the access call late time
+		if ($isStartBeforeEnd && $isStartAllowed && $isEndAllowed)
 			$menu["now"] = _L("Now"). " ($callearly - $calllate)";
 		$menu["schedule"] = _L("Schedule and Send");
 		$menu["template"] = _L("Save for Later");

@@ -205,17 +205,26 @@ function newform_time_select($inc = NULL, $start = NULL, $stop = NULL, $customti
 	$values = array();
 	if (!$inc) $inc = 5;
 	if (!$start) $start = '12:00 am';
-	if (!$stop) $stop = '11:55 pm';
+	if (!$stop) $stop = '11:59 pm';
 	$current = strtotime($start);
 	$end = strtotime($stop);
 	$customtime = strtotime($customtime);
+	$didend = false;
 	while($current <= $end) {
 		$values[date('g:i a', $current)] = date('g:i a', $current);
 		if( ($customtime > $current) && ($customtime < ($current+($inc *60))) ) {
 			$values[date('g:i a', $customtime)] = date('g:i a', $customtime);
 		}
+
+		if ($current == $end)
+			$didend = true;
+		
 		$current += $inc *60;
 	}
+	
+	if (!$didend)
+		$values[date('g:i a', $end)] = date('g:i a', $end);
+	
 	return $values;
 }
 

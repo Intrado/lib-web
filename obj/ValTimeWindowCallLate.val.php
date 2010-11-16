@@ -3,13 +3,23 @@
 class ValTimeWindowCallLate extends Validator {
 	var $onlyserverside = true;
 	function validate ($value, $args, $requiredvalues) {
-		if ((strtotime($value) - 3600) < strtotime($requiredvalues['callearly']))
-			return $this->label. " ". _L('There must be a minimum of one hour between start and end time');
-		if(isset($requiredvalues['date'])) {
-			$now = strtotime("now");
-			if ((date('m/d/Y', $now) == $requiredvalues['date']) && (strtotime($value) -1800 < $now))
-				return $this->label. " ". _L("There must be a minimum of one-half hour between now and end time to submit with today's date");
-		}
+		global $ACCESS;
+		
+		$accessCalllate = $ACCESS->getValue("calllate");
+		if (!$accessCalllate)
+			$accessCalllate = "11:59 pm";
+		
+		//give an exception for late calls, don't restrict to min hour window
+		$isLateCall = strtotime($value) >= strtotime($accessCalllate); 
+		$isAfterStartTime = strtotime($value) > strtotime($requiredvalues['callearly']);
+		$isAtLeastAnHourAfterStartTime = strtotime($value) >= strtotime($requiredvalues['callearly']) + 3600;
+		
+		if (!$isAfterStartTime)
+			return _L('%1$s must be after the end time.', $this->label);
+		
+		if (!$isLateCall && !$isAtLeastAnHourAfterStartTime)
+			return _L('%1$s must be at least an hour after the start time', $this->label);
+		
 		return true;
 	}
 }
