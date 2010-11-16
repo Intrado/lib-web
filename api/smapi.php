@@ -270,6 +270,15 @@ class SMAPI{
 						$result["resultdescription"] = "Unauthorized - user does not have privilege to edit email messages";
 						return $result;
 					}
+					
+					// if plain text email, be sure to set 'overrideplaintext' so the GUI checkmark will display
+					if ($message->subtype == 'plain' && strpos($message->data, 'overrideplaintext=1') === false) {
+						$message->readHeaders();
+						$message->overrideplaintext = '1';
+						$message->stuffHeaders();
+						$message->update();
+					}
+					// else html, simply set the body assuming they know what they are doing
 					break;
 				case "sms":
 					if (!getSystemSetting('_hassms') || !$USER->authorize('sendsms')) {
@@ -406,7 +415,7 @@ class SMAPI{
 				return $result;
 			} else {
 				$content = new Content();
-				$content->type = $mimetype;
+				$content->contenttype = $mimetype;
 				$content->data = base64_encode(file_get_contents($cleanedtempfile));
 				$content->create();
 
@@ -1288,6 +1297,19 @@ class SMAPI{
 				$result["resultdescription"] = "Start Time must be before End Time";
 				return $result;
 			}
+			$jobtypeok = false;
+			$userjobtypes = JobType::getUserJobTypes();
+			foreach ($userjobtypes as $userjobtype) {
+				if ($userjobtype->id == $jobtypeid) {
+					$jobtypeok = true;
+					break;
+				}
+			}
+			if (!$jobtypeok) {
+				$result["resultdescription"] = "Invalid Jobtype : User not authorized to send jobs of this type";
+				return $result;
+			}
+			
 			// validate listids
 			foreach ($listids->listid as $listid) {
 				if (!userOwns("list", $listid)) {
