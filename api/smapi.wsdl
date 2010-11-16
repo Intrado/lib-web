@@ -235,6 +235,42 @@
             		<xsd:element name="value" type="xsd:string"></xsd:element>
             	</xsd:sequence>
             </xsd:complexType>
+            <xsd:complexType name="setContactDestinationResult">
+            	<xsd:sequence>
+            		<xsd:element name="resultcode" type="xsd:string"></xsd:element>
+            		<xsd:element name="resultdescription" type="xsd:string"></xsd:element>
+            	</xsd:sequence>
+            </xsd:complexType>
+            <xsd:complexType name="setContactPreferenceResult">
+            	<xsd:sequence>
+            		<xsd:element name="resultcode" type="xsd:string"></xsd:element>
+            		<xsd:element name="resultdescription" type="xsd:string"></xsd:element>
+            	</xsd:sequence>
+            </xsd:complexType>
+            <xsd:complexType name="getPermissionsResult">
+            	<xsd:sequence>
+            		<xsd:element name="resultcode" type="xsd:string"></xsd:element>
+            		<xsd:element name="resultdescription"
+            			type="xsd:string">
+            		</xsd:element>
+            		<xsd:element name="permissions" type="sm:permissionEntry" minOccurs="0" maxOccurs="unbounded">
+            			<xsd:annotation>
+            				<xsd:documentation>Permissions contain the following:
+'sendphone' = true/false
+'sendemail' = true/false
+'sendsms' = true/false
+'callerid' = true/false
+</xsd:documentation>
+            			</xsd:annotation></xsd:element>
+            	</xsd:sequence>
+            </xsd:complexType>
+
+            <xsd:complexType name="permissionEntry">
+            	<xsd:sequence>
+            		<xsd:element name="name" type="xsd:string"></xsd:element>
+            		<xsd:element name="value" type="xsd:string"></xsd:element>
+            	</xsd:sequence>
+            </xsd:complexType>
 </xsd:schema></wsdl:types>
     <wsdl:message name="loginRequest">
     	<wsdl:part name="loginname" type="xsd:string"></wsdl:part>
@@ -441,6 +477,51 @@ sendreport: true/false, sends an report when the job is finished.
     </wsdl:message>
     <wsdl:message name="sendJobExtendedResponse">
     	<wsdl:part name="result" type="sm:sendJobResult"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="setContactDestinationRequest">
+    	<wsdl:part name="sessionid" type="xsd:string"></wsdl:part>
+    	<wsdl:part name="pkey" type="xsd:string">
+    		<wsdl:documentation>unique person identifier - max 255 character</wsdl:documentation></wsdl:part>
+    	<wsdl:part name="type" type="xsd:string">
+    		<wsdl:documentation>type of destination to set values are 'phone', 'email', 'sms'</wsdl:documentation></wsdl:part>
+    	<wsdl:part name="sequence" type="xsd:string">
+    		<wsdl:documentation>which destination sequence to set '0', '1', '2', ... max depends on the number configured for your accoun</wsdl:documentation></wsdl:part>
+    	<wsdl:part name="destination" type="xsd:string">
+    		<wsdl:documentation>the contact destination, could be a valid phone number or email addres
+max 20 characters for type 'phone'
+max 100 characters for type 'email'
+max 20 characters for type 'sms'
+</wsdl:documentation></wsdl:part>
+    	<wsdl:part name="editlock" type="xsd:string">
+    		<wsdl:documentation>'true' to lock the contact data - imports do not overwrite this destination
+'false' to unlock the contact data - imports may overwrit</wsdl:documentation></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="setContactDestinationResponse">
+    	<wsdl:part name="result"
+    		type="sm:setContactDestinationResult">
+    	</wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="setContactPreferenceRequest">
+    	<wsdl:part name="sessionid" type="xsd:string"></wsdl:part>
+    	<wsdl:part name="pkey" type="xsd:string">
+    		<wsdl:documentation></wsdl:documentation></wsdl:part>
+    	<wsdl:part name="type" type="xsd:string">
+    		<wsdl:documentation></wsdl:documentation></wsdl:part>
+    	<wsdl:part name="sequence" type="xsd:string">
+    		<wsdl:documentation></wsdl:documentation></wsdl:part>
+    	<wsdl:part name="jobtypeid" type="xsd:int">
+    		<wsdl:documentation>jobtype identifie</wsdl:documentation></wsdl:part>
+    	<wsdl:part name="enabled" type="xsd:string">
+    		<wsdl:documentation>value is 'true' or 'false'</wsdl:documentation></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="setContactPreferenceResponse">
+    	<wsdl:part name="result" type="sm:setContactPreferenceResult"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="getPermissionsRequest">
+    	<wsdl:part name="sessionid" type="xsd:string"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="getPermissionsResponse">
+    	<wsdl:part name="result" type="sm:getPermissionsResult"></wsdl:part>
     </wsdl:message>
     <wsdl:portType name="SMClient">
     	<wsdl:operation name="login">
@@ -696,6 +777,21 @@ getJobTypes:
     	<wsdl:operation name="sendJobExtended">
     		<wsdl:input message="sm:sendJobExtendedRequest"></wsdl:input>
     		<wsdl:output message="sm:sendJobExtendedResponse"></wsdl:output>
+    	</wsdl:operation>
+    	<wsdl:operation name="setContactDestination">
+    		<wsdl:documentation>update a contact destination (phone/email/sms</wsdl:documentation>
+    		<wsdl:input message="sm:setContactDestinationRequest"></wsdl:input>
+    		<wsdl:output message="sm:setContactDestinationResponse"></wsdl:output>
+    	</wsdl:operation>
+    	<wsdl:operation name="setContactPreference">
+    		<wsdl:documentation>specify whether or not a contact destination should receive messages for the given job typ</wsdl:documentation>
+    		<wsdl:input message="sm:setContactPreferenceRequest"></wsdl:input>
+    		<wsdl:output message="sm:setContactPreferenceResponse"></wsdl:output>
+    	</wsdl:operation>
+    	<wsdl:operation name="getPermissions">
+    		<wsdl:documentation>find this user's permissions.  use to determine functionality available to them</wsdl:documentation>
+    		<wsdl:input message="sm:getPermissionsRequest"></wsdl:input>
+    		<wsdl:output message="sm:getPermissionsResponse"></wsdl:output>
     	</wsdl:operation></wsdl:portType>
     <wsdl:binding name="SMBinding" type="sm:SMClient">
 
@@ -1004,7 +1100,44 @@ getJobTypes:
     				namespace="http://asp.schoolmessenger.com" />
     		</wsdl:output>
     	</wsdl:operation>
+    	<wsdl:operation name="setContactDestination">
+    		<soap:operation
+    			soapAction="http://asp.schoolmessenger.com/setContactDestination" />
+    		<wsdl:input>
+    			<soap:body use="literal"
+    				namespace="http://asp.schoolmessenger.com" />
+    		</wsdl:input>
+    		<wsdl:output>
+    			<soap:body use="literal"
+    				namespace="http://asp.schoolmessenger.com" />
+    		</wsdl:output>
+    	</wsdl:operation>
+    	<wsdl:operation name="setContactPreference">
+    		<soap:operation
+    			soapAction="http://asp.schoolmessenger.com/setContactPreference" />
+    		<wsdl:input>
+    			<soap:body use="literal"
+    				namespace="http://asp.schoolmessenger.com" />
+    		</wsdl:input>
+    		<wsdl:output>
+    			<soap:body use="literal"
+    				namespace="http://asp.schoolmessenger.com" />
+    		</wsdl:output>
+    	</wsdl:operation>
+    	<wsdl:operation name="getPermissions">
+    		<soap:operation
+    			soapAction="http://asp.schoolmessenger.com/getPermissions" />
+    		<wsdl:input>
+    			<soap:body use="literal"
+    				namespace="http://asp.schoolmessenger.com" />
+    		</wsdl:input>
+    		<wsdl:output>
+    			<soap:body use="literal"
+    				namespace="http://asp.schoolmessenger.com" />
+    		</wsdl:output>
+    	</wsdl:operation>
     </wsdl:binding>
+    
     <wsdl:service name="SMAPI">
 		<wsdl:port name="SMAPIPort" binding="sm:SMBinding">
 			<soap:address location="smapiurl"></soap:address>
