@@ -50,6 +50,11 @@ class JobOptionEntry {
 	var $value;
 }
 
+class PermissionEntry {
+	var $name;
+	var $value;
+}
+
 class SMAPI{
 
 	/*
@@ -62,7 +67,7 @@ class SMAPI{
 
 		*/
 
-	function getCustomerURL($oem, $oemid){
+	function getCustomerURL ($oem, $oemid) {
 		global $IS_COMMSUITE;
 		$result = array("resultcode" => "failure", "resultdescription" => "", "customerurl" => "");
 
@@ -96,7 +101,7 @@ class SMAPI{
 		returns: string resultcode, string resultdescription, string sessionid
 
 		*/
-	function login($loginname, $password){
+	function login ($loginname, $password) {
 		return systemLogin($loginname, $password);
 	}
 
@@ -109,7 +114,7 @@ class SMAPI{
 		returns: string resultcode, string resultdescription, string sessionid
 
 		*/
-	function loginToCustomer($loginname, $password, $customerurl){
+	function loginToCustomer ($loginname, $password, $customerurl) {
 		return systemLogin($loginname, $password, $customerurl);
 	}
 
@@ -125,7 +130,7 @@ class SMAPI{
 		resultdescription: string
 
 		*/
-	function getLists($sessionid){
+	function getLists ($sessionid) {
 		global $USER;
 		$result = array("resultcode" => "failure", "resultdescription" => "", "lists" => array());
 
@@ -170,7 +175,7 @@ class SMAPI{
 		resultdescription: string
 
 		*/
-	function getMessages($sessionid, $type = "phone"){
+	function getMessages ($sessionid, $type = "phone") {
 		global $USER;
 		$result = array("resultcode" => "failure","resultdescription" => "", "messages" => array());
 
@@ -227,7 +232,7 @@ class SMAPI{
 
 		*/
 
-	function setMessageBody($sessionid, $messageid, $messagetext){
+	function setMessageBody ($sessionid, $messageid, $messagetext) {
 		global $USER;
 		$result = array("resultcode" => "failure","resultdescription" => "", "result" => false);
 
@@ -333,7 +338,7 @@ class SMAPI{
 	/*
 	 * Internal helper function, creates all message parts from the provided text
 	 */
-	function createMessageParts($messageid, $messagetext) {
+	function createMessageParts ($messageid, $messagetext) {
 		$errors = array();
 		$voiceid = QuickQuery("select id from ttsvoice where language = 'english' and gender = 'female'");
 		$parts = Message::parse($messagetext, $errors, $voiceid);
@@ -360,7 +365,7 @@ class SMAPI{
 
 		*/
 
-	function uploadAudio($sessionid, $name, $audio, $mimetype){
+	function uploadAudio ($sessionid, $name, $audio, $mimetype) {
 		global $USER, $SETTINGS;
 		$result = array("resultcode" => "failure","resultdescription" => "", "audioname" => "");
 
@@ -461,7 +466,7 @@ class SMAPI{
 		resultdescription: string
 
 		*/
-	function getJobTypes($sessionid){
+	function getJobTypes ($sessionid) {
 		global $USER;
 		$result = array("resultcode" => "failure","resultdescription" => "", "jobtypes" => array());
 
@@ -504,7 +509,7 @@ class SMAPI{
 		resultdescription: string
 
 		*/
-	function getSurveyJobTypes($sessionid){
+	function getSurveyJobTypes ($sessionid) {
 		global $USER;
 		$result = array("resultcode" => "failure","resultdescription" => "", "jobtypes" => array());
 
@@ -549,7 +554,7 @@ class SMAPI{
 		*/
 
 	//jobid, name, desc, total, remaining
-	function getActiveJobs($sessionid){
+	function getActiveJobs ($sessionid) {
 		global $USER;
 		$result = array("resultcode" => "failure","resultdescription" => "", "jobs" => array());
 
@@ -583,7 +588,7 @@ class SMAPI{
 
 		*/
 
-	function getJobStatus($sessionid, $jobid){
+	function getJobStatus ($sessionid, $jobid) {
 		global $USER;
 		$result = array("resultcode" => "failure","resultdescription" => "", "job" => null);
 		$jobid = $jobid + 0;
@@ -616,7 +621,7 @@ class SMAPI{
 		resultdescription: string
 
 		*/
-	function getRepeatingJobs($sessionid){
+	function getRepeatingJobs ($sessionid) {
 		global $USER;
 		$result = array("resultcode" => "failure","resultdescription" => "", "jobs" => array());
 		if(!APISession($sessionid)){
@@ -689,7 +694,7 @@ class SMAPI{
 
 		*/
 
-	function sendRepeatingJob($sessionid, $jobid){
+	function sendRepeatingJob ($sessionid, $jobid) {
 		global $USER;
 		$result = array("resultcode" => "failure","resultdescription" => "", "jobid" => 0);
 		$jobid = $jobid + 0;
@@ -753,7 +758,7 @@ class SMAPI{
 		*/
 
 
-	function sendJob($sessionid, $name, $desc, $listid, $jobtypeid, $startdate, $starttime, $endtime, $daystorun, $phonemsgid, $emailmsgid, $smsmsgid, $maxcallattempts ){
+	function sendJob ($sessionid, $name, $desc, $listid, $jobtypeid, $startdate, $starttime, $endtime, $daystorun, $phonemsgid, $emailmsgid, $smsmsgid, $maxcallattempts ){
 		// put the single listid onto an array (to support multi-list via extended job)
 		$listids = new ListIdList();
 		$lids = array();
@@ -778,7 +783,7 @@ class SMAPI{
 
 		*/
 
-	function getLabels($sessionid,$type){
+	function getLabels ($sessionid,$type){
 		global $USER, $ACCESS;
 		$result = array("resultcode" => "failure","resultdescription" => "", "labels" => null);
 
@@ -833,7 +838,7 @@ class SMAPI{
 
 		*/
 
-	function getContacts($sessionid, $pkey){
+	function getContacts ($sessionid, $pkey){
 		global $USER, $ACCESS;
 		$result = array("resultcode" => "failure","resultdescription" => "", "contacts" => null);
 
@@ -848,9 +853,13 @@ class SMAPI{
 				$result["resultdescription"] = "Invalid user";
 				return $result;
 			}
-			$personid = QuickQuery("select id from person where pkey = '" . DBSafe($pkey) . "' and not deleted ");
+			$personid = QuickQuery("select id from person where pkey = ? and not deleted", false, array($pkey));
 			if(!$personid){
 				$result["resultdescription"] = "Invalid person";
+				return $result;
+			}
+			if (!$USER->canSeePerson($personid)) {
+				$result["resultdescription"] = "Unauthorized - User does not have access to view this person";
 				return $result;
 			}
 			// build multidimensional array to reduce duplicate code when building return objects
@@ -942,28 +951,14 @@ class SMAPI{
 		*/
 
 
-	function setContact($sessionid, $contact){
-		global $USER, $ACCESS;
+	function setContact ($sessionid, $contact){
+
+		$personid = $this->helperSetContact($sessionid, $contact->pkey);
+		if (count($personid) > 1) {
+			return $personid; // actually a result array with failure and description
+		}
+		
 		$result = array("resultcode" => "failure","resultdescription" => "", "contacts" => null);
-		if(!APISession($sessionid)){
-			$result["resultdescription"] = "Invalid Session ID";
-			return $result;
-		} else {
-			$USER = $_SESSION['user'];
-			$ACCESS = $_SESSION['access'];
-
-			if(!$USER->id){
-				$result["resultdescription"] = "Invalid user";
-				return $result;
-			}
-
-			$personcontactprefs = array();
-
-			$personid = QuickQuery("select id from person where pkey = '" . DBSafe($contact->pkey) . "' and not deleted ");
-			if(!$personid){
-				$result["resultdescription"] = "Invalid person: " . $contact->pkey;
-				return $result;
-			}
 
 			//if any fields are invalid, do not update system and return problems
 			if(!in_array($contact->type, array("phone", "email", "sms"))){
@@ -1003,9 +998,7 @@ class SMAPI{
 				return $result;
 			}
 
-
 			$obj = DBFind(ucfirst($contact->type), "from " . $contact->type . " where personid = " . $personid . " and sequence = " . ($contact->sequence + 0));
-
 
 			//if the contact obj doesn't exist, create a new one in the db
 			//else update the one we found
@@ -1037,6 +1030,7 @@ class SMAPI{
 				$obj->update();
 			}
             if(is_array($contact->contactpreferences)){
+            	$personcontactprefs = array();
 			    //generate array of contact prefs so that we can iterate later in a transaction
 		    	foreach($contact->contactpreferences as $contactpreference){
 				 	$personcontactprefs[($contactpreference->jobtypeid+0)] = ($contactpreference->enabled ? "1" : "0");
@@ -1050,14 +1044,14 @@ class SMAPI{
 				QuickUpdate("commit");
             }
             else{
-            	// No valid content preferences
+            	// No valid contact preferences
             }
 			$result["resultcode"] = "success";
 			return $result;
-		}
+
 	}
 		
-	function createPhoneMessage($sessionid, $name, $description, $messagetext, $gender) {
+	function createPhoneMessage ($sessionid, $name, $description, $messagetext, $gender) {
 		global $USER, $ACCESS;
 		$result = array("resultcode" => "failure","resultdescription" => "", "messageid" => 0);
 		if (!APISession($sessionid)) {
@@ -1119,7 +1113,7 @@ class SMAPI{
 		}
 	}
 	
-	function createSmsMessage($sessionid, $name, $description, $messagetext) {
+	function createSmsMessage ($sessionid, $name, $description, $messagetext) {
 		global $USER, $ACCESS;
 		$result = array("resultcode" => "failure","resultdescription" => "", "messageid" => 0);
 		if (!APISession($sessionid)) {
@@ -1176,7 +1170,7 @@ class SMAPI{
 		}
 	}
 
-	function createEmailMessage($sessionid, $name, $description, $messagetext, $subject, $fromname, $fromemail) {
+	function createEmailMessage ($sessionid, $name, $description, $messagetext, $subject, $fromname, $fromemail) {
 		global $USER, $ACCESS;
 		$result = array("resultcode" => "failure","resultdescription" => "", "messageid" => 0);
 		if (!APISession($sessionid)) {
@@ -1238,7 +1232,7 @@ class SMAPI{
 		}
 	}
 	
-	function sendJobExtended($sessionid, $name, $desc, $listids, $jobtypeid, $startdate, $starttime, $endtime, $daystorun, $phonemsgid, $emailmsgid, $smsmsgid, $maxcallattempts, $options) {
+	function sendJobExtended ($sessionid, $name, $desc, $listids, $jobtypeid, $startdate, $starttime, $endtime, $daystorun, $phonemsgid, $emailmsgid, $smsmsgid, $maxcallattempts, $options) {
 		global $USER, $ACCESS;
 		$result = array("resultcode" => "failure","resultdescription" => "", "jobid" => 0);
 
@@ -1477,6 +1471,254 @@ class SMAPI{
 			return $result;
 		}
 	}
+	
+	function getPermissions ($sessionid) {
+		global $USER, $ACCESS;
+		$result = array("resultcode" => "failure", "resultdescription" => "", "permissions" => array());
+
+		if (!APISession($sessionid)) {
+			$result["resultdescription"] = "Invalid Session ID";
+			return $result;
+		}
+		
+		$USER = $_SESSION['user'];
+		$ACCESS = $_SESSION['access'];
+
+		if (!$USER->id) {
+			$result["resultdescription"] = "Invalid user";
+			return $result;
+		}
+		
+		$permissions = array();
+		
+		// sendphone
+		$entry = new PermissionEntry();
+		$entry->name = "sendphone";
+		if ($USER->authorize('sendphone')) {
+			$entry->value = "true";
+		} else {
+			$entry->value = "false";
+		}
+		$permissions[] = $entry;
+			
+		// sendemail
+		$entry = new PermissionEntry();
+		$entry->name = "sendemail";
+		if ($USER->authorize('sendemail')) {
+			$entry->value = "true";
+		} else {
+			$entry->value = "false";
+		}
+		$permissions[] = $entry;
+			
+		// sendsms
+		$entry = new PermissionEntry();
+		$entry->name = "sendsms";
+		if (getSystemSetting('_hassms') && $USER->authorize('sendsms')) {
+			$entry->value = "true";
+		} else {
+			$entry->value = "false";
+		}
+		$permissions[] = $entry;
+
+		// callerid
+		$entry = new PermissionEntry();
+		$entry->name = "callerid";
+		if ($USER->authorize('setcallerid') && !getSystemSetting('_hascallback', false)) {
+			$entry->value = "true";
+		} else {
+			$entry->value = "false";
+		}
+		$permissions[] = $entry;
+		
+		// success
+		$result["resultcode"] = "success";
+		$result["permissions"] = $permissions;
+		return $result;
+	}
+	
+	function helperSetContact($sessionid, $pkey) {
+		global $USER, $ACCESS;
+		$result = array("resultcode" => "failure", "resultdescription" => "");
+
+		if (!APISession($sessionid)) {
+			$result["resultdescription"] = "Invalid Session ID";
+			return $result;
+		}
+		
+		$USER = $_SESSION['user'];
+		$ACCESS = $_SESSION['access'];
+
+		if (!$USER->id) {
+			$result["resultdescription"] = "Invalid user";
+			return $result;
+		}
+		
+		// user must be able to edit system contacts
+		if (!$USER->authorize('managecontactdetailsettings')) {
+			$result["resultdescription"] = "Unauthorized - user does not have privilege to edit contact details";
+			return $result;
+		}
+		
+		// validate the person to update
+		$pid = QuickQuery("select id from person where pkey = ? and not deleted", false, array($pkey));
+		if (!$pid) {
+			$result["resultdescription"] = "Invalid pkey - Person does not exist";
+			return $result;
+		}
+		
+		if (!$USER->canSeePerson($pid)) {
+			$result["resultdescription"] = "Unauthorized - User does not have access to update this person";
+			return $result;
+		}
+		
+		// success
+		return $pid;
+	}
+	
+	function setContactDestination ($sessionid, $pkey, $type, $sequence, $destination, $editlock) {
+		
+		$pid = $this->helperSetContact($sessionid, $pkey);
+		if (count($pid) > 1) {
+			return $pid; // actually a result array with failure and description
+		}
+		
+		$result = array("resultcode" => "failure", "resultdescription" => "");
+		
+		if ($editlock != 'true' && $editlock != 'false') {
+			$result["resultdescription"] = "Invalid editlock, must be 'true' or 'false'";
+			return $result;
+		}
+		
+		$maxsettingname; // 'maxphones', 'maxemails', 'maxsms'
+		
+		// validate destination type
+		switch ($type) {
+			case "phone" :
+				$errors = Phone::validate($destination); 
+				if (count($errors)) {
+					$result["resultdescription"] = "Invalid destination - must be valid phone number";
+					return $result;
+				}
+				$destination = Phone::parse($destination); // strip the junk down to 10 digits
+				$maxsettingname = "maxphones";
+				break;
+			case "email" :
+				if (!validEmail($destination)) {
+					$result["resultdescription"] = "Invalid destination - must be valid email address";
+					return $result;
+				}
+				$maxsettingname = "maxemails";
+				break;
+			case "sms" :
+				if (!getSystemSetting('_hassms')) {
+					$result["resultdescription"] = "Invalid type - sms disabled for account";
+					return $result;
+				}
+				$errors = Phone::validate($destination); 
+				if (count($errors)) {
+					$result["resultdescription"] = "Invalid destination - must be valid phone number";
+					return $result;
+				}
+				$destination = Phone::parse($destination); // strip the junk down to 10 digits
+				$maxsettingname = "maxsms";
+				break;
+			default :
+				$result["resultdescription"] = "Invalid type - must be 'phone', 'email', 'sms'";
+				return $result;
+		}
+		
+		// validate sequence < max
+		if ($sequence < 0 || $sequence >= getSystemSetting($maxsettingname, '1')) {
+			$result["resultdescription"] = "Invalid sequence.";
+			return $result;
+		}
+		
+		// validate destination record exists, create if none found
+		$destrecord = DBFind(ucfirst($type), "from " . $type . " where personid = ? and sequence = ?", false, array($pid, $sequence));
+		if (!$destrecord) {
+			switch ($type) {
+				case "phone" :
+					$destrecord = new Phone();
+					break;
+				case "email" :
+					$destrecord = new Email();
+					break;
+				case "sms" :
+					$destrecord = new Sms();
+					break;
+			}
+			$destrecord->personid = $pid;
+			$destrecord->sequence = $sequence;
+		}
+		
+		// convert from string to int
+		if ($editlock == 'true') {
+			$destrecord->editlock = 1;
+			$destrecord->editlockdate = date("Y-m-d G:i:s");
+		} else {
+			$destrecord->editlock = 0;
+			$destrecord->editlockdate = null;
+		}
+		$destrecord->$type = $destination;
+		
+		// update/create destination record
+		if ($destrecord->update() === false) {
+			$result["resultdescription"] = "Failed to update record.";
+			return $result;
+		}
+		
+		// success
+		$result["resultcode"] = "success";
+		return $result;
+	}
+
+	function setContactPreference ($sessionid, $pkey, $type, $sequence, $jobtypeid, $enabled) {
+		
+		$pid = $this->helperSetContact($sessionid, $pkey);
+		if (count($pid) > 1) {
+			return $pid; // actually a result array with failure and description
+		}
+		
+		$result = array("resultcode" => "failure", "resultdescription" => "");
+		
+		if ($enabled != 'true' && $enabled != 'false') {
+			$result["resultdescription"] = "Invalid value for 'enabled' parameter- must be 'true' or 'false'";
+			return $result;
+		}
+		
+		// validate jobtypeid
+		if (!QuickQuery("select 1 from jobtype where id = ? and not deleted", false, array($jobtypeid))) {
+			$result["resultdescription"] = "Invalid jobtypeid";
+			return $result;
+		}
+		
+		// convert from string to int
+		if ($enabled == 'true') {
+			$enabled = 1;
+		} else {
+			$enabled = 0;
+		}
+		
+		// TODO code review - should create ContactPref.obj and use DBFind along with update()
+		// find if contactpref already exists to determine insert/update
+		if (QuickQuery("select 1 from contactpref where personid = ? and jobtypeid = ? and type = ? and sequence = ?", false, array($pid, $jobtypeid, $type, $sequence))) {
+			if (!QuickUpdate("update contactpref set enabled = ? where personid = ? and jobtypeid = ? and type = ? and sequence = ?", false, array($enabled, $pid, $jobtypeid, $type, $sequence))) {
+				$result["resultdescription"] = "Failed to update record.";
+				return $result;
+			}
+		} else {
+			if (!QuickUpdate("insert into contactpref (enabled, personid, jobtypeid, type, sequence) values (?, ?, ?, ?, ?)", false, array($enabled, $pid, $jobtypeid, $type, $sequence))) {
+				$result["resultdescription"] = "Failed to update record.";
+				return $result;
+			}
+		}
+		
+		// success
+		$result["resultcode"] = "success";
+		return $result;
+	}
+	
 }
 
 ////////////////////////////////////////////////////////////////////////////////
