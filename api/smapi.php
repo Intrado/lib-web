@@ -195,7 +195,17 @@ class SMAPI{
 				$result["resultdescription"] = "Invalid user";
 				return $result;
 			}
-			$queryresult = Query("select id, name, description from list where userid = " . $USER->id . " and not deleted and type != 'alert' order by name");
+			$queryresult = Query("select l.id, l.name, l.description 
+				from list l 
+					inner join user u on
+						(l.userid = u.id)
+					left join publish p on
+						(p.listid = l.id and p.userid = ?)
+				where l.type in ('person','section')
+					and (l.userid = ? or p.userid = ?)
+					and not l.deleted
+				group by id
+				order by l.name", false, array($USER->id, $USER->id, $USER->id));
 			$lists = array();
 			while($row = DBGetRow($queryresult)){
 				$list = new API_List();
@@ -1345,7 +1355,7 @@ class SMAPI{
 			
 			// validate listids
 			foreach ($listids->listid as $listid) {
-				if (!userOwns("list", $listid)) {
+				if (!userOwns("list", $listid) && !isSubscribed("list", $listid)) {
 					$result["resultdescription"] =  "Invalid List " . $listid;
 					return $result;
 				}
