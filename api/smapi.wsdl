@@ -484,7 +484,7 @@ sendreport: true/false, sends an report when the job is finished.
     		<wsdl:documentation>unique person identifier - max 255 character</wsdl:documentation></wsdl:part>
     	<wsdl:part name="type" type="xsd:string">
     		<wsdl:documentation>type of destination to set values are 'phone', 'email', 'sms'</wsdl:documentation></wsdl:part>
-    	<wsdl:part name="sequence" type="xsd:string">
+    	<wsdl:part name="sequence" type="xsd:int">
     		<wsdl:documentation>which destination sequence to set '0', '1', '2', ... max depends on the number configured for your accoun</wsdl:documentation></wsdl:part>
     	<wsdl:part name="destination" type="xsd:string">
     		<wsdl:documentation>the contact destination, could be a valid phone number or email addres
@@ -492,7 +492,7 @@ max 20 characters for type 'phone'
 max 100 characters for type 'email'
 max 20 characters for type 'sms'
 </wsdl:documentation></wsdl:part>
-    	<wsdl:part name="editlock" type="xsd:string">
+    	<wsdl:part name="editlock" type="xsd:boolean">
     		<wsdl:documentation>'true' to lock the contact data - imports do not overwrite this destination
 'false' to unlock the contact data - imports may overwrit</wsdl:documentation></wsdl:part>
     </wsdl:message>
@@ -507,11 +507,11 @@ max 20 characters for type 'sms'
     		<wsdl:documentation></wsdl:documentation></wsdl:part>
     	<wsdl:part name="type" type="xsd:string">
     		<wsdl:documentation></wsdl:documentation></wsdl:part>
-    	<wsdl:part name="sequence" type="xsd:string">
+    	<wsdl:part name="sequence" type="xsd:int">
     		<wsdl:documentation></wsdl:documentation></wsdl:part>
     	<wsdl:part name="jobtypeid" type="xsd:int">
     		<wsdl:documentation>jobtype identifie</wsdl:documentation></wsdl:part>
-    	<wsdl:part name="enabled" type="xsd:string">
+    	<wsdl:part name="enabled" type="xsd:boolean">
     		<wsdl:documentation>value is 'true' or 'false'</wsdl:documentation></wsdl:part>
     </wsdl:message>
     <wsdl:message name="setContactPreferenceResponse">
@@ -789,7 +789,8 @@ getJobTypes:
     		<wsdl:output message="sm:setContactPreferenceResponse"></wsdl:output>
     	</wsdl:operation>
     	<wsdl:operation name="getPermissions">
-    		<wsdl:documentation>find this user's permissions.  use to determine functionality available to them</wsdl:documentation>
+    		<wsdl:documentation>find this user's permissions.  use to determine functionality available to them.
+</wsdl:documentation>
     		<wsdl:input message="sm:getPermissionsRequest"></wsdl:input>
     		<wsdl:output message="sm:getPermissionsResponse"></wsdl:output>
     	</wsdl:operation></wsdl:portType>
