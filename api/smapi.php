@@ -57,6 +57,58 @@ class PermissionEntry {
 
 class SMAPI{
 
+	function helperSetContact($sessionid, $pkey) {
+		global $USER, $ACCESS;
+		$result = array("resultcode" => "failure", "resultdescription" => "");
+
+		if (!APISession($sessionid)) {
+			$result["resultdescription"] = "Invalid Session ID";
+			return $result;
+		}
+		
+		$USER = $_SESSION['user'];
+		$ACCESS = $_SESSION['access'];
+
+		if (!$USER->id) {
+			$result["resultdescription"] = "Invalid user";
+			return $result;
+		}
+		
+		// user must be able to edit system contacts
+		if (!$USER->authorize('managecontactdetailsettings')) {
+			$result["resultdescription"] = "Unauthorized - user does not have privilege to edit contact details";
+			return $result;
+		}
+		
+		// validate the person to update
+		$personid = QuickQuery("select id from person where pkey = ? and not deleted", false, array($pkey));
+		if (!$personid) {
+			$result["resultdescription"] = "Invalid pkey - Person does not exist";
+			return $result;
+		}
+		
+		if (!$USER->canSeePerson($personid)) {
+			$result["resultdescription"] = "Unauthorized - User does not have access to update this person";
+			return $result;
+		}
+		
+		// success
+		return $personid;
+	}
+
+	/*
+	 * Internal helper function, creates all message parts from the provided text
+	 */
+	function createMessageParts ($messageid, $messagetext) {
+		$errors = array();
+		$voiceid = QuickQuery("select id from ttsvoice where language = 'english' and gender = 'female'");
+		$parts = Message::parse($messagetext, $errors, $voiceid);
+		foreach ($parts as $part) {
+			$part->messageid = $messageid;
+			$part->create();
+		}
+	}
+	
 	/*
 	 Given a valid oem/oemid combination, the customer url corresponding to the
 	 matching customer is returned
@@ -335,19 +387,6 @@ class SMAPI{
 		}
 	}
 	
-	/*
-	 * Internal helper function, creates all message parts from the provided text
-	 */
-	function createMessageParts ($messageid, $messagetext) {
-		$errors = array();
-		$voiceid = QuickQuery("select id from ttsvoice where language = 'english' and gender = 'female'");
-		$parts = Message::parse($messagetext, $errors, $voiceid);
-		foreach ($parts as $part) {
-			$part->messageid = $messageid;
-			$part->create();
-		}
-	}
-
 	/*
 	 Given a valid sessionid, name, mimetype, and audio file,
 	 an audio file record will be generated and its resulting
@@ -1537,58 +1576,14 @@ class SMAPI{
 		return $result;
 	}
 	
-	function helperSetContact($sessionid, $pkey) {
-		global $USER, $ACCESS;
-		$result = array("resultcode" => "failure", "resultdescription" => "");
-
-		if (!APISession($sessionid)) {
-			$result["resultdescription"] = "Invalid Session ID";
-			return $result;
-		}
-		
-		$USER = $_SESSION['user'];
-		$ACCESS = $_SESSION['access'];
-
-		if (!$USER->id) {
-			$result["resultdescription"] = "Invalid user";
-			return $result;
-		}
-		
-		// user must be able to edit system contacts
-		if (!$USER->authorize('managecontactdetailsettings')) {
-			$result["resultdescription"] = "Unauthorized - user does not have privilege to edit contact details";
-			return $result;
-		}
-		
-		// validate the person to update
-		$pid = QuickQuery("select id from person where pkey = ? and not deleted", false, array($pkey));
-		if (!$pid) {
-			$result["resultdescription"] = "Invalid pkey - Person does not exist";
-			return $result;
-		}
-		
-		if (!$USER->canSeePerson($pid)) {
-			$result["resultdescription"] = "Unauthorized - User does not have access to update this person";
-			return $result;
-		}
-		
-		// success
-		return $pid;
-	}
-	
 	function setContactDestination ($sessionid, $pkey, $type, $sequence, $destination, $editlock) {
 		
-		$pid = $this->helperSetContact($sessionid, $pkey);
-		if (count($pid) > 1) {
-			return $pid; // actually a result array with failure and description
+		$personid = $this->helperSetContact($sessionid, $pkey);
+		if (count($personid) > 1) {
+			return $personid; // actually a result array with failure and description
 		}
 		
 		$result = array("resultcode" => "failure", "resultdescription" => "");
-		
-		if ($editlock != 'true' && $editlock != 'false') {
-			$result["resultdescription"] = "Invalid editlock, must be 'true' or 'false'";
-			return $result;
-		}
 		
 		$maxsettingname; // 'maxphones', 'maxemails', 'maxsms'
 		
@@ -1628,32 +1623,47 @@ class SMAPI{
 				return $result;
 		}
 		
+		$maxdestinations = getSystemSetting($maxsettingname, 1);
+		
 		// validate sequence < max
-		if ($sequence < 0 || $sequence >= getSystemSetting($maxsettingname, '1')) {
-			$result["resultdescription"] = "Invalid sequence.";
+		if ($sequence < 0 || $sequence >= $maxdestinations) {
+			$result["resultdescription"] = "Invalid sequence - must be 0 through " . ($maxdestinations - 1);
 			return $result;
 		}
 		
-		// validate destination record exists, create if none found
-		$destrecord = DBFind(ucfirst($type), "from " . $type . " where personid = ? and sequence = ?", false, array($pid, $sequence));
-		if (!$destrecord) {
-			switch ($type) {
-				case "phone" :
-					$destrecord = new Phone();
-					break;
-				case "email" :
-					$destrecord = new Email();
-					break;
-				case "sms" :
-					$destrecord = new Sms();
-					break;
+		
+		// get existing phones from db, then create any additional based on the max allowed
+		// what if the max is less than the number they already have? the GUI does not allow to decrease this value, so NO WORRIES :)
+		// use array_values to reset starting index to 0
+		$tempdestinations = resequence(DBFindMany(ucfirst($type), "from " . $type . " where personid = ? order by sequence", false, array($personid)), "sequence");
+		$destinations = array();
+		for ($i=0; $i<$maxdestinations; $i++) {
+			if (!isset($tempdestinations[$i])) {
+				switch ($type) {
+					case "phone" :
+						$destinations[$i] = new Phone();
+						break;
+					case "email" :
+						$destinations[$i] = new Email();
+						break;
+					case "sms" :
+						$destinations[$i] = new Sms();
+						break;
+				}
+				$destinations[$i]->$type = "";
+				$destinations[$i]->sequence = $i;
+				$destinations[$i]->personid = $personid;
+				$destinations[$i]->editlock = 0;
+			} else {
+				$destinations[$i] = $tempdestinations[$i];
 			}
-			$destrecord->personid = $pid;
-			$destrecord->sequence = $sequence;
 		}
 		
-		// convert from string to int
-		if ($editlock == 'true') {
+		// set the fields for the destination being updated
+		$destrecord = $destinations[$sequence];
+	
+		// convert boolean to int
+		if ($editlock) {
 			$destrecord->editlock = 1;
 			$destrecord->editlockdate = date("Y-m-d G:i:s");
 		} else {
@@ -1662,10 +1672,9 @@ class SMAPI{
 		}
 		$destrecord->$type = $destination;
 		
-		// update/create destination record
-		if ($destrecord->update() === false) {
-			$result["resultdescription"] = "Failed to update record.";
-			return $result;
+		// update/create all destination records
+		foreach ($destinations as $dest) {
+			$dest->update();
 		}
 		
 		// success
@@ -1675,17 +1684,12 @@ class SMAPI{
 
 	function setContactPreference ($sessionid, $pkey, $type, $sequence, $jobtypeid, $enabled) {
 		
-		$pid = $this->helperSetContact($sessionid, $pkey);
-		if (count($pid) > 1) {
-			return $pid; // actually a result array with failure and description
+		$personid = $this->helperSetContact($sessionid, $pkey);
+		if (count($personid) > 1) {
+			return $personid; // actually a result array with failure and description
 		}
 		
 		$result = array("resultcode" => "failure", "resultdescription" => "");
-		
-		if ($enabled != 'true' && $enabled != 'false') {
-			$result["resultdescription"] = "Invalid value for 'enabled' parameter- must be 'true' or 'false'";
-			return $result;
-		}
 		
 		// validate jobtypeid
 		if (!QuickQuery("select 1 from jobtype where id = ? and not deleted", false, array($jobtypeid))) {
@@ -1693,25 +1697,16 @@ class SMAPI{
 			return $result;
 		}
 		
-		// convert from string to int
-		if ($enabled == 'true') {
+		// convert boolean to int
+		if ($enabled) {
 			$enabled = 1;
 		} else {
 			$enabled = 0;
 		}
 		
-		// TODO code review - should create ContactPref.obj and use DBFind along with update()
-		// find if contactpref already exists to determine insert/update
-		if (QuickQuery("select 1 from contactpref where personid = ? and jobtypeid = ? and type = ? and sequence = ?", false, array($pid, $jobtypeid, $type, $sequence))) {
-			if (!QuickUpdate("update contactpref set enabled = ? where personid = ? and jobtypeid = ? and type = ? and sequence = ?", false, array($enabled, $pid, $jobtypeid, $type, $sequence))) {
-				$result["resultdescription"] = "Failed to update record.";
-				return $result;
-			}
-		} else {
-			if (!QuickUpdate("insert into contactpref (enabled, personid, jobtypeid, type, sequence) values (?, ?, ?, ?, ?)", false, array($enabled, $pid, $jobtypeid, $type, $sequence))) {
-				$result["resultdescription"] = "Failed to update record.";
-				return $result;
-			}
+		if (!QuickUpdate("insert into contactpref (personid, jobtypeid, type, sequence, enabled) values (?, ?, ?, ?, ?) on duplicate key update enabled = ?", false, array($personid, $jobtypeid, $type, $sequence, $enabled, $enabled))) {
+			$result["resultdescription"] = "Failed to update contact preference";
+			return $result;
 		}
 		
 		// success
