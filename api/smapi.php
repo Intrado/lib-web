@@ -438,16 +438,22 @@ class SMAPI{
 				$result["resultdescription"] = "Audio data cannot be empty";
 				return $result;
 			}
+			
+			// default is wav unless mpeg specifically sent
+			if ($mimetype == 'audio/mpeg') {
+				$fileext = ".mp3";
+			} else {
+				$fileext = ".wav";
+			}
 
 			//generate 2 temp files
 			//write audio data to first file then run through sox to clean audio and output to second file
 			//read second file and base64 encode it for the DB
-
-			if(!$origtempfile = secure_tmpname($name . "origtempapiaudio", ".wav")){
+			if (!$origtempfile = secure_tmpname($name . "origtempapiaudio", $fileext)) {
 				$result["resultdescription"] = "Failed to generate audio file";
 				return $result;
 			}
-			if(!$cleanedtempfile = secure_tmpname("cleanedtempapiaudio", ".wav")){
+			if (!$cleanedtempfile = secure_tmpname("cleanedtempapiaudio", $fileext)) {
 				$result["resultdescription"] = "Failed to generate audio file";
 				return $result;
 			}
@@ -455,15 +461,19 @@ class SMAPI{
 			//delete temp file that secure_tmpname generated so we can check if sox generated a file later
 			unlink($cleanedtempfile);
 
-			if(!file_put_contents($origtempfile, base64_decode($audio))){
+			if (!file_put_contents($origtempfile, base64_decode($audio))) {
 				$result['resultdescription'] = "Failed to generate audio file";
 				return $result;
 			}
 			$cmd = "sox \"$origtempfile\" -r 8000 -c 1 -s -w \"$cleanedtempfile\" ";
+			
+			//error_log($cmd);
 			$soxresult = exec($cmd, $res1,$res2);
+			//error_log("output " . $res1[0]);
+			
 			$content = null;
-			if($res2 || !file_exists($cleanedtempfile)) {
-				$result["resultdescription"]= 'There was an error reading your audio file. Please try another file. Supported formats include: .wav';
+			if ($res2 || !file_exists($cleanedtempfile)) {
+				$result["resultdescription"]= "There was an error reading your audio file. Please try another file, or ensure the mimetype is correct. Supported mimetypes include: 'audio/wav' for .wav and 'audio/mpeg' for .mp3 files.";
 				unlink($origtempfile);
 				unlink($cleanedtempfile);
 				return $result;
@@ -1315,7 +1325,7 @@ class SMAPI{
 
 				$result["resultdescription"] = "Invalid End Time";
 				return $result;
-			} else if (!$daystorun || $daystorun < 0 || $daystorun > $ACCESS->getValue('maxjobdays', '7')) {
+			} else if ($daystorun < 1 || $daystorun > $ACCESS->getValue('maxjobdays', '7')) {
 
 				$result["resultdescription"] = "Invalid Run Days.  Must be between 1 and " . $ACCESS->getValue('maxjobdays', '7');
 				return $result;
