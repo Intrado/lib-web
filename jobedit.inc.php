@@ -317,8 +317,8 @@ $helpsteps[] = _L("Enter a name for your job. " .
 			"helpstep" => 3
 		);
 	} else {
-		$helpsteps[] = _L("The Delivery Window designates the earliest call time 
-								and the latest call time allowed for notification delivery.");
+		$helpsteps[] = _L("The Delivery Window designates the earliest call time and the latest call time allowed for notification delivery.<br><br>
+		<b>Note:</b> You may send a job up until one minute before the cutoff time specified in your Access Profile. You should set the job to run for two days to ensure all calls are made.");
 		if ($completedmode) {
 			$formdata["date"] = array(
 				"label" => _L("Start Date"),
