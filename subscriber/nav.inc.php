@@ -72,7 +72,7 @@ function doLogo () {
 	if($clickurl != "" && $clickurl != "http://")
 		echo '<a href="' . $clickurl . '" target="_blank" title="Logo"><img src="logo.img.php?hash=' . $logohash .'></a>';
 	else
-		echo '<img src="logo.img.php?hash=' . $logohash .'" alt="Logo">';
+		echo '<img src="logo.img.php?hash=' . $logohash .'" alt="">';
 }
 
 doNavTabs($NAVTREE);

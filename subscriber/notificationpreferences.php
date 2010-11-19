@@ -529,7 +529,7 @@ if (count($available) > 0)
 else {
 ?>
 <div style="margin: 5px;">
-	<img src="img/bug_lightbulb.gif" alt="image of lightbulb"><?=_L("All available contacts have been added.  Delete one of the above contacts before you add more.")?>
+	<img src="img/bug_lightbulb.gif" alt="note"><?=_L("All available contacts have been added.  Delete one of the above contacts before you add more.")?>
 </div>
 <?
 }
@@ -539,7 +539,7 @@ echo "<br>";
 // form data
 startWindow(_L('Interests'));
 if(count($jobtypes) > 0)
-	echo '<table cellpadding="3"><tr><td>&nbsp;&nbsp;<img src="img/bug_lightbulb.gif" alt="' . _L("image of lightbulb") . '">&nbsp;&nbsp;' . _L("In addition to Emergency notifications, I would like to receive the following types of announcements:") . '</td></tr></table>';
+	echo '<table cellpadding="3"><tr><td>&nbsp;&nbsp;<img src="img/bug_lightbulb.gif" alt="note">&nbsp;&nbsp;' . _L("In addition to Emergency notifications, I would like to receive the following types of announcements:") . '</td></tr></table>';
 echo $form->render();
 
 endWindow();
