@@ -126,6 +126,7 @@ if($reload){
 	$groupbyquery = "";
 	$groupbyorder = "";
 	$rgroupdata = "";
+	$union = "";
 	
 //error_log("groupby ".$groupby);
 	if ($groupby == "") {
@@ -134,11 +135,17 @@ if($reload){
 		$groupbyorder = "";
 	} else if ($groupby == "org") {
 		// Organization
-		// TODO people not associated with any organization are not being selected, need help with this query to include them 'not assigned'
-		// TODO people in two organizations get counted twice
+		// TODO people in two organizations get counted twice - si this true for Gfields?
 		$groupbyquery = "oz.orgkey";
 		$groupbyorder = $groupbyquery . ", ";
-		$rgroupdata = "join personassociation pa on (pa.personid = rp.personid and pa.type='organization') join organization oz on (oz.id = pa.organizationid)";
+		$rgroupdata = "join reportorganization ro on (ro.personid = rp.personid) join organization oz on (oz.id = ro.organizationid)";
+		$union = "UNION select '' as field, rp.userid, rp.jobid, count(*) from reportperson rp 
+					where not exists (select * from reportorganization ro where ro.personid = rp.personid) 
+					and rp.status in ('fail', 'success')
+					$joblistquery
+					and rp.type = '" . DBSafe($type) . "' 
+					group by rp.jobid, rp.userid";
+					
 	} else {
 		// F or G field
 		if (strpos($groupby, "g") === 0) {
@@ -167,7 +174,8 @@ if($reload){
 				where rp.status in ('fail', 'success')
 				$joblistquery
 				and rp.type = '" . DBSafe($type) . "'
-				group by $groupbyorder rp.jobid, rp.userid";
+				group by $groupbyorder rp.jobid, rp.userid
+				$union";
 //error_log($query);
 
 	$result = Query($query);
