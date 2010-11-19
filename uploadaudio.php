@@ -40,10 +40,16 @@ if (!empty($_POST) && empty($_FILES['audio'])) {
 	} else {
 		$filename = $_FILES['audio']['name'];
 		$path_parts = pathinfo($filename);
-		
-		$ext = isset($path_parts['extension'])?$path_parts['extension']:"wav";
-		if (strlen($ext) < 1 || !in_array(strtolower($ext),array('wav','aiff','au','aif'))) {
-			$ext = "wav";
+
+		// get file extension and verify it's one we support
+		$ext = isset($path_parts['extension']) ? $path_parts['extension'] : "";
+		if (strlen($ext) < 1 || !in_array(strtolower($ext),array('wav','aiff','au','aif','mp3'))) {
+			// if uncertain, let's try the mime type
+			if (isset($_FILES['audio']['type']) && $_FILES['audio']['type'] == 'audio/mpeg') {
+				$ext = "mp3";
+			} else {
+				$ext = "wav"; // default
+			}
 		}
 		$audio->recorddate = date("Y-m-d G:i:s");
 
@@ -58,7 +64,7 @@ if (!empty($_POST) && empty($_FILES['audio'])) {
 			$result = exec($cmd, $res1,$res2);
 
 			if($res2 || !file_exists($dest)) {
-				$errormessage = _L("There was an error reading your audio file.\nPlease try another file.\nSupported formats include: .wav, .aiff, and .au");
+				$errormessage = _L("There was an error reading your audio file.\nPlease try another file.\nSupported formats include: .wav, .aiff, .au, and .mp3");
 				unlink($source);
 				unlink($dest);
 			} else {
