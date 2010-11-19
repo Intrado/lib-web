@@ -15,6 +15,8 @@ require_once("obj/Form.obj.php");
 require_once("obj/FormItem.obj.php");
 require_once("obj/FormBrandTheme.obj.php");
 require_once("obj/FormUserItems.obj.php");
+require_once("obj/facebook.php");
+require_once("obj/FormFacebookAuth.fi.php");
 
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization
@@ -364,6 +366,22 @@ if ($USER->authorize('setcallerid') && !getSystemSetting('_hascallback', false))
 	}
 }
 
+// Social Media options
+if ($USER->authorize('facebookpost')) {
+	$formdata[] = _L('Social Media Options');
+	
+	$formdata["facebookauth"] = array(
+		"label" => _L('Facebook Authorization'),
+		"fieldhelp" => _L("Authorize this application to post into your facebook pages. If you want to authorize a different account, be sure to log out of Facebook first."),
+		"value" => json_encode(array("access_token" => $USER->getSetting("fb_access_token", false), 
+									"pageid" => $USER->getSetting("fb_pageid", "me"), 
+									"page_access_token" => $USER->getSetting("fb_page_access_token", false))),
+		"validators" => array(),
+		"control" => array("FacebookAuth"),
+		"helpstep" => 4
+	);
+}
+
 // Display Defaults
 $formdata[] = _L("Display Settings");
 
@@ -498,6 +516,13 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 			$_SESSION['colorscheme']['_brandtheme2'] = getSystemSetting("_brandtheme2");
 			$_SESSION['colorscheme']['_brandprimary'] = getSystemSetting("_brandprimary");
 			$_SESSION['colorscheme']['_brandratio'] = getSystemSetting("_brandratio");
+		}
+		
+		if (isset($postdata["facebookauth"])) {
+			$facebookauth = json_decode($postdata["facebookauth"]);
+			$USER->setSetting("fb_access_token", $facebookauth->access_token);
+			$USER->setSetting("fb_page_access_token", $facebookauth->page_access_token);
+			$USER->setSetting("fb_pageid", $facebookauth->pageid);
 		}
 
 		Query('COMMIT');

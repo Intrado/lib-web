@@ -327,6 +327,14 @@ _L('Messaging Options'),
 		"control" => array("CheckBox"),
 		"helpstep" => 4
 	),
+	"facebookpost" => array(
+		"label" => _L('Post to Facebook'),
+		"fieldhelp" => _L('Allow users to post messages to facebook pages that they have admin rights for'),
+		"value" => $obj->getValue("facebookpost"),
+		"validators" => array(),
+		"control" => array("CheckBox"),
+		"helpstep" => 4
+	),
 _L('Advanced Job Options'),
 	"createrepeat" => array(
 		"label" => _L('Create Repeating Jobs'),
@@ -719,6 +727,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 			$obj->setPermission("viewsystemcompleted", (bool)$postdata['viewsystemcompleted']);
 			$obj->setPermission("leavemessage", (bool)$postdata['leavemessage']);
 			$obj->setPermission("messageconfirmation", (bool)$postdata['messageconfirmation']);
+			$obj->setPermission("facebookpost", (bool)$postdata['facebookpost']);
 
 			if(getSystemSetting("_hasportal", false)) {
 				$obj->setPermission("portalaccess", (bool)$postdata['portalaccess']);
