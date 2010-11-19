@@ -453,7 +453,7 @@ class SMAPI{
 				$result["resultdescription"] = "Failed to generate audio file";
 				return $result;
 			}
-			if (!$cleanedtempfile = secure_tmpname("cleanedtempapiaudio", $fileext)) {
+			if (!$cleanedtempfile = secure_tmpname("cleanedtempapiaudio", ".wav")) {
 				$result["resultdescription"] = "Failed to generate audio file";
 				return $result;
 			}
@@ -479,7 +479,7 @@ class SMAPI{
 				return $result;
 			} else {
 				$content = new Content();
-				$content->contenttype = $mimetype;
+				$content->contenttype = "audio/wav"; // even if they upload .mp3 we store it as .wav
 				$content->data = base64_encode(file_get_contents($cleanedtempfile));
 				$content->create();
 
