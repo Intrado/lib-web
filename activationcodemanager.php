@@ -231,7 +231,7 @@ function showRenderedListTableCM($data, $total, $pagestart, $pagelimit, $validso
 	
 	$tableid = "renderedlist". $tableidcounter++;
 	$optionalfields = array_merge(FieldMap::getOptionalAuthorizedFieldMapsLike('f'), FieldMap::getAuthorizedFieldMapsLike('g'));
-	$optionalfieldstart = 7; //table col of last non optional field
+	$optionalfieldstart = 6; //table col of last non optional field
 	select_metadata($tableid,$optionalfieldstart,$optionalfields);
 	showSortMenu($validsortfields,$ordering);
 	
