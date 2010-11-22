@@ -24,7 +24,7 @@ class FacebookAuth extends FormItem {
 		// check that the auth token is any good
 		try {
 			// get the user's pages
-			$fbaccounts = $facebook->api("/me/accounts", array('access_token' => $fb_authdata->access_token));
+			$fbaccounts = $facebook->api("/me/accounts", array('access_token' => $fb_authdata->access_token, "type" => "page"));
 			
 			$user = $facebook->api("/me", array('access_token' => $fb_authdata->access_token));
 			
@@ -36,8 +36,11 @@ class FacebookAuth extends FormItem {
 		// main details div
 		$str .= '<div id="'. $n. 'fbdetails" style="padding-left: 5px;">';
 		
+		// facebook js api loads into this div
+		$str .= '<div id="fb-root"></div>';
+		
 		// connected options div
-		$str .= '<div id="'. $n. 'fbconnected" style="'. (($user)? "": "display:none;"). '">';
+		$str .= '<div id="'. $n. 'fbconnected" style="float: left;'. (($user)? "": "display:none;"). '">';
 		$str .= '<div id="'. $n. 'fbgreeting">'. _L("You are currently connected to Facebook."). '</div>';
 		
 		// button to remove access_token
@@ -51,24 +54,22 @@ class FacebookAuth extends FormItem {
 		$str .= '<option value="'. escapehtml($value). '" >'. escapehtml(_L("My Wall")). "</option>";
 		if ($fbaccounts) {
 			foreach ($fbaccounts["data"] as $account) {
-				if ($account["category"] != "Application") {
-					$checked = $fb_authdata->pageid == $account["id"];
-					$value = json_encode(array("id" => $account["id"], "access_token" => $account["access_token"]));
-					$str .= '<option value="'.escapehtml($value).'" '.($checked ? 'selected' : '').' >'.escapehtml($account["name"]).'</option>
-						';
-				}
+				$checked = $fb_authdata->pageid == $account["id"];
+				$value = json_encode(array("id" => $account["id"], "access_token" => $account["access_token"]));
+				$str .= '<option value="'.escapehtml($value).'" '.($checked ? 'selected' : '').' >'.escapehtml($account["name"]).'</option>
+					';
 			}
 		}
 		$str .= '</select></div>';
 		
 		// disconnected options div
-		$str .= '<div id="'. $n. 'fbdisconnected" style="'. (($user)? "display:none;": ""). '">';
+		$str .= '<div id="'. $n. 'fbdisconnected" style="float: left;'. (($user)? "display:none;": ""). '">';
 		
 		// Do facebook login to get good auth token
 		$perms = "publish_stream,offline_access,manage_pages";
 		$str .= button("Connect to Facebook", "FB.login(handleFbLoginResponse, {perms: '$perms'})");
 		
-		$str .= '</div>';
+		$str .= '</div></div>';
 		
 		$str .= '<script type="text/javascript">
 		
@@ -78,9 +79,10 @@ class FacebookAuth extends FormItem {
 				};
 				(function() {
 					var e = document.createElement("script");
+					e.type = "text/javascript";
 					e.async = true;
 					e.src = document.location.protocol + "//connect.facebook.net/en_US/all.js";
-					document.getElementById("'.$n.'fbdetails").appendChild(e);
+					document.getElementById("fb-root").appendChild(e);
 				}());
 		
 				// when the page is changed, update the pageid and access_token used to post to it
@@ -108,16 +110,14 @@ class FacebookAuth extends FormItem {
 					// if we have an access token. display the disconnect button and pages selection
 					if (access_token) {
 						// get user pages
-						FB.api("/me/accounts", { access_token: access_token }, function(res) {
+						FB.api("/me/accounts", { access_token: access_token, type: "page" }, function(res) {
 							var e = $("'.$n.'fbpageselect").update();
 							// populate pages selection
 							e.insert(new Element("option", { value: "me" }).update("'. escapehtml(_L("My Wall")). '"));
 							for (var i=0, l=res.data.length; i<l; i++) {
 								var account = res.data[i];
-								if (account.id && account.category != "Application") {
-									var val = Object.toJSON({ id: account.id, access_token: account.access_token });
-									e.insert(new Element("option", { value: val }).update(account.name));
-								}
+								var val = Object.toJSON({ id: account.id, access_token: account.access_token });
+								e.insert(new Element("option", { value: val }).update(account.name));
 							}
 						});
 						

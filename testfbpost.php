@@ -11,6 +11,8 @@ require_once("obj/Validator.obj.php");
 require_once("obj/Form.obj.php");
 require_once("obj/FormItem.obj.php");
 require_once('obj/facebook.php');
+require_once('inc/facebook.inc.php');
+require_once('obj/FormFacebookAuth.val.php');
 
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization
@@ -33,7 +35,9 @@ $formdata = array(
 	"fbwalltext" => array(
 		"label" => _L('Text'),
 		"value" => "",
-		"validators" => array(),
+		"validators" => array(
+			array("ValRequired"),
+			array("ValFacebookAuth")),
 		"control" => array("TextArea", "cols" => 50, "rows" => 10),
 		"helpstep" => 1
 	)
@@ -66,38 +70,12 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 	} else if (($errors = $form->validate()) === false) { //checks all of the items in this form
 		$postdata = $form->getData(); //gets assoc array of all values {name:value,...}
 		
-		// get auth data for facebook
-		$access_token = $USER->getSetting("fb_page_access_token", false);
-		$pageid = $USER->getSetting("fb_pageid", "me");
-			
-		if ($postdata['fbwalltext'] && $pageid && $access_token) {
-			
-			
-			// set up the post data, the magic is the offline/serverside usable access token
-			$post = array(
-				'access_token' => $access_token,
-				'message' => $postdata['fbwalltext']
-			);
-			
-			// configure facebook app settings
-			$fbconfig = array (
-				'appId' => $SETTINGS['facebook']['appid'],
-				'cookie' => false,
-				'secret' => $SETTINGS['facebook']['appsecret']
-			);
-	
-			// get a new instance of the facebook api
-			$facebookapi = new Facebook($fbconfig);
-			
-			// get a session
-			$facebookapi->getSession();
-			
-			// attempt to post to the user's page
-			try {
-				$facebookapi->api("/$pageid/feed", 'POST', $post);
-			} catch (FacebookApiException $e) {
-				error_log($e);
+		if (fb_hasValidAccessToken()) {
+			if (!fb_post($postdata['fbwalltext'])) {
+				// TODO: unable to post error
 			}
+		} else {
+			// TODO: invalid access token error
 		}
 		
 		if ($ajax)
@@ -126,7 +104,7 @@ include_once("nav.inc.php");
 // Optional Load Custom Form Validators
 ?>
 <script type="text/javascript">
-<? Validator::load_validators(array()); ?>
+<? Validator::load_validators(array("ValFacebookAuth")); ?>
 </script>
 <?
 
