@@ -52,16 +52,17 @@ $f="addstudent";
 $s="main";
 $reloadform = 0;
 
-
-if (CheckFormSubmit($f,$s) || CheckFormSubmit($f,'add')) {
+// check for 'enter' key form submission, does not send us the submit button info, must check the post 'pkeyadd' data
+if (isset($_POST['frm'])) {
+	MergeSectionFormData($f, $s);
+	TrimFormData($f, $s, "pkeyadd");
+}
+if (CheckFormSubmit($f,$s) || CheckFormSubmit($f,'add') || GetFormData($f, $s, "pkeyadd")) {
 	//check to see if formdata is valid
 	if (CheckFormInvalid($f)) {
 		error(_L('Form was edited in another window, reloading data'));
 		$reloadform = 1;
 	} else {
-		MergeSectionFormData($f, $s);
-
-		TrimFormData($f, $s, "pkeyadd");
 		//do check
 		if ( CheckFormSection($f, $s) ) {
 			error(_L('There was a problem trying to save your changes', 'Please verify that all required field information has been entered properly'));
