@@ -27,14 +27,14 @@ class FacebookAuth extends FormItem {
 		$str .= '<div id="'. $n. 'fbgreeting">'. _L("You are currently connected to Facebook."). '</div>';
 		
 		// button to remove access_token
-		$str .= button("Disconnect this Facebook Account", "handleFbLoginResponse(null)"). '<div style="clear: both;"></div></div>';
+		$str .= button("Disconnect this Facebook Account", "handleFbLoginAuthResponse('".$n."', null)"). '<div style="clear: both;"></div></div>';
 		
 		// disconnected options div
 		$str .= '<div id="'. $n. 'fbdisconnected" style="float: left;'. (($validtoken)? "display:none;": ""). '">';
 		
 		// Do facebook login to get good auth token
 		$perms = "publish_stream,offline_access,manage_pages";
-		$str .= button("Connect to Facebook", "FB.login(handleFbAuthLoginResponse.curry('".$n."'), {perms: '$perms'})");
+		$str .= button("Connect to Facebook", "FB.login(handleFbLoginAuthResponse.curry('".$n."'), {perms: '$perms'})");
 				
 		$str .= '</div></div>';
 		
@@ -53,7 +53,7 @@ class FacebookAuth extends FormItem {
 				}());
 				
 				// handle updateing information when the user allows or disallows the facebook application
-				function handleFbAuthLoginResponse(formitem, res) {
+				function handleFbLoginAuthResponse(formitem, res) {
 					var access_token = false;
 					if (res != null && res.session) {
 						if (res.perms) {
