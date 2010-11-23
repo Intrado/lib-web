@@ -12,7 +12,7 @@ require_once("obj/Form.obj.php");
 require_once("obj/FormItem.obj.php");
 require_once('obj/facebook.php');
 require_once('inc/facebook.inc.php');
-require_once('obj/FormFacebookAuth.val.php');
+require_once('obj/FormFacebookPages.fi.php');
 
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization
@@ -31,13 +31,18 @@ require_once('obj/FormFacebookAuth.val.php');
 ////////////////////////////////////////////////////////////////////////////////
 
 $formdata = array(
-	_L('Facebook Wall Text'),
+	_L('Facebook Posting'),
+	"fbpages" => array(
+		"label" => _L('Pages'),
+		"value" => json_encode(array("access_token" => $USER->getSetting("fb_access_token", false), "page" => array())),
+		"validators" => array(),
+		"control" => array("FacebookPages"),
+		"helpstep" => 1
+	),
 	"fbwalltext" => array(
 		"label" => _L('Text'),
 		"value" => "",
-		"validators" => array(
-			array("ValRequired"),
-			array("ValFacebookAuth")),
+		"validators" => array(),
 		"control" => array("TextArea", "cols" => 50, "rows" => 10),
 		"helpstep" => 1
 	)
@@ -70,12 +75,16 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 	} else if (($errors = $form->validate()) === false) { //checks all of the items in this form
 		$postdata = $form->getData(); //gets assoc array of all values {name:value,...}
 		
-		if (fb_hasValidAccessToken()) {
-			if (!fb_post($postdata['fbwalltext'])) {
+		// read/store access token
+		$fbdata = json_decode($postdata['fbpages']);
+		$USER->setSetting("fb_access_token", $fbdata->access_token);
+		
+		// foreach pageid, post the message
+		foreach ($fbdata->page as $pageid => $accessToken) {
+			
+			if (!fb_post($pageid, $accessToken, $postdata['fbwalltext'])) {
 				// TODO: unable to post error
 			}
-		} else {
-			// TODO: invalid access token error
 		}
 		
 		if ($ajax)
@@ -104,7 +113,7 @@ include_once("nav.inc.php");
 // Optional Load Custom Form Validators
 ?>
 <script type="text/javascript">
-<? Validator::load_validators(array("ValFacebookAuth")); ?>
+<? Validator::load_validators(array()); ?>
 </script>
 <?
 

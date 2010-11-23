@@ -11,16 +11,18 @@ $facebookapi = new Facebook(array (
 $facebookapi->getSession();
 
 // test the user's access token
-function fb_hasValidAccessToken() {
+function fb_hasValidAccessToken($accessToken = false) {
 	global $facebookapi;
 	global $USER;
 	
 	// get the user's auth data for facebook
-	$access_token = $USER->getSetting("fb_page_access_token", false);
-	$pageid = $USER->getSetting("fb_pageid", "me");
+	if ($accessToken)
+		$access_token = $accessToken;
+	else
+		$access_token = $USER->getSetting("fb_access_token", false);
 	
 	try {
-		$data = $facebookapi->api("/$pageid", array('access_token' => $access_token));
+		$data = $facebookapi->api("/me", array('access_token' => $access_token));
 	} catch (FacebookApiException $e) {
 		error_log($e);
 		return false;
@@ -29,24 +31,20 @@ function fb_hasValidAccessToken() {
 	return true;
 }
 
-function fb_post($text) {
+function fb_post($pageid, $pageAccessToken, $text) {
 	global $facebookapi;
 	global $USER;
 	
-	// get the user's auth data for facebook
-	$access_token = $USER->getSetting("fb_page_access_token", false);
-	$pageid = $USER->getSetting("fb_pageid", "me");
-	
 	try {
 		$facebookapi->api("/$pageid/feed", 'POST', array(
-			'access_token' => $access_token,
-			//'name' => "name field: ". $USER->firstname,
-			//'caption' => "caption field: Caption...",
+			'access_token' => $pageAccessToken,
+			//'name' => $USER->firstname,
+			//'caption' => "Caption...",
 			//'source' => "http://www.schoolmessenger.com/source",
 			//'link' => "http://www.schoolmessenger.com/link",
-			//'description' => "description field: Posted by application...",
+			//'description' => "Posted by application...",
 			//'picture' => "http://schoolmessenger.com/i/home/taut-1.jpg",
-			'message' => "message field: ". $text
+			'message' => $text
 		));
 	} catch (FacebookApiException $e) {
 		error_log($e);
