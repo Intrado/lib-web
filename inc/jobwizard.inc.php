@@ -830,6 +830,20 @@ class JobWiz_start extends WizStep {
 			"control" => array("HtmlRadioButtonBigCheck", "values" => $packages),
 			"helpstep" => 3
 		);
+		
+		if ($USER->authorize("facebookpost")) {
+			$formdata["socialmedia"] = array(
+				"label" => _L("Post to social media sites (Facebook)"),
+				"fieldhelp" => _L("Post your message to popular social media websites."),
+				"value" => false,
+				"control" => array("CheckBox"),
+				"validators" => array(),
+				"helpstep" => 3
+			);	
+			
+			
+		}
+		
 		$helpsteps = array (
 			_L("Job names are used for email subjects and reporting, so they should be descriptive.<br><br><b>Note:</b> Before you send your first job, you should make a test list by selecting New List in the Shortcuts menu."),
 			_L("Job Types are used to determine which phones or emails will be contacted. Choosing the correct job type is important for effective communication.<br><br><b>Note:</b> Emergency jobs include a notification that the message is regarding an emergency."),
@@ -1651,6 +1665,46 @@ class JobWiz_messageSmsText extends WizStep {
 		if ($package == 'custom' && $messageoption == 'create' && in_array('sms',$messagepick))
 			return true;
 
+		return false;
+	}
+}
+
+class JobWiz_socialMedia extends WizStep {
+	function getForm($postdata, $curstep) {
+		global $USER;
+		
+		$formdata = array($this->title);
+		$helpsteps = array(_L("Enter the message you wish to deliver via Facebook."));
+		$formdata = array(
+			_L('Facebook Posting'),
+			"fbpages" => array(
+				"label" => _L('Pages'),
+				"fieldhelp" => _L("Select which pages to post to."),
+				"value" => json_encode(array("access_token" => $USER->getSetting("fb_access_token", false), "page" => array())),
+				"validators" => array(),
+				"control" => array("FacebookPages"),
+				"helpstep" => 1
+			),
+			"fbtext" => array(
+				"label" => _L('Text'),
+				"fieldhelp" => _L("Enter the text you would like to post to Facebook pages."),
+				"value" => "",
+				"validators" => array(),
+				"control" => array("TextArea", "cols" => 50, "rows" => 10),
+				"helpstep" => 1
+			)
+		);
+
+		return new Form("socialMedia",$formdata,$helpsteps);
+	}
+
+	//returns true if this step is enabled
+	function isEnabled($postdata, $step) {
+		global $USER;
+		
+		if ($USER->authorize("facebookpost") && isset($postdata['/start']['socialmedia']) && $postdata['/start']['socialmedia']) {
+			return true;
+		}
 		return false;
 	}
 }

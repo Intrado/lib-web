@@ -48,6 +48,9 @@ require_once("obj/ValTimeWindowCallEarly.val.php");
 require_once("obj/ValTimeWindowCallLate.val.php");
 require_once("obj/ValMessageBody.val.php");
 require_once("obj/ValNonEmptyMessage.val.php");
+require_once("obj/facebook.php");
+require_once("inc/facebook.inc.php");
+require_once("obj/FormFacebookPages.fi.php");
 
 // Job step form data
 require_once("inc/jobwizard.inc.php");
@@ -89,7 +92,8 @@ $wizdata = array(
 		)),
 		"sms" => new WizSection ("SMS",array(
 			"text" => new JobWiz_messageSmsText(_L("SMS Text"))
-		))
+		)),
+		"socialmedia" => new JobWiz_socialMedia(_L("Social Media"))
 	)),
 	"schedule" => new WizSection ("Schedule",array(
 		"options" => new JobWiz_scheduleOptions(_L("Schedule Options")),
@@ -453,6 +457,27 @@ class FinishJobWizard extends WizFinish {
 			$job->runNow();
 
 		$_SESSION['wizard_job']['submitted_jobid'] = $job->id;
+		
+		// Do social media posting
+		
+		// Do Facebook tasks
+		if ($USER->authorize("facebookpost") && isset($postdata["/message/socialmedia"]["fbpages"])) {
+			$fbdata = json_decode($postdata["/message/socialmedia"]["fbpages"]);
+			
+			// save the access token if it exists
+			if ($fbdata->access_token)
+				$USER->setSetting("fb_access_token", $fbdata->access_token);
+			
+			// post to pages if there is a message
+			if (isset($postdata["/message/socialmedia"]["fbtext"]) && $postdata["/message/socialmedia"]["fbtext"]) {
+				foreach ($fbdata->page as $pageid => $accessToken) {
+					if (!fb_post($pageid, $accessToken, $postdata["/message/socialmedia"]["fbtext"])) {
+						// unable to post error
+						error_log("Failed to post to facebook pageid: ". $pageid. " for user: ". $USER->id);
+					}
+				}
+			}
+		}
 
 		Query("COMMIT");
 	}
