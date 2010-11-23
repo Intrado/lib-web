@@ -39,7 +39,7 @@ class FacebookPages extends FormItem {
 		
 				// init the value of the hidden form item
 				var val = $("'.$n.'").value.evalJSON();
-				if (!val.page || val.page.size() == 0) {
+				if (Object.isArray(val.page)) {
 					val.page = new Hash({});
 					$("'.$n.'").value = Object.toJSON(val);
 				}
@@ -79,6 +79,9 @@ class FacebookPages extends FormItem {
 					
 					if (access_token) {
 						
+						var val = $(formitem).value.evalJSON();
+						var pages = $H(val.page);
+					
 						// display loading gif while we get the users accounts
 						$(container).update(new Element("img", { src: "img/ajax-loader.gif" }));
 						
@@ -93,7 +96,8 @@ class FacebookPages extends FormItem {
 												type: "checkbox", 
 												value: Object.toJSON({ id: "me", access_token: access_token }), 
 												name: "me",
-												onchange: "handleFbPageChange(\'"+formitem+"\', this);" })
+												onchange: "handleFbPageChange(\'"+formitem+"\', this);",
+												checked: ((pages.get("me"))?true:false) })
 										).insert(
 											new Element("label", { for: "me" }).insert("'. escapehtml(_L('My Wall')). '")
 										).insert(
@@ -106,7 +110,8 @@ class FacebookPages extends FormItem {
 													type: "checkbox", 
 													value: val, 
 													name: account.id,
-													onchange: "handleFbPageChange(\'"+formitem+"\', this);" })
+													onchange: "handleFbPageChange(\'"+formitem+"\', this);",
+													checked: ((pages.get(account.id))?true:false) })
 											).insert(
 												new Element("label", { for: account.id }).insert(account.name)
 											).insert(
