@@ -104,9 +104,9 @@ class SMAPI {
 	/*
 	 * Internal helper function, creates all message parts from the provided text
 	 */
-	function createMessageParts ($messageid, $messagetext) {
+	function createMessageParts ($messageid, $messagetext, $gender = 'female') {
 		$errors = array();
-		$voiceid = QuickQuery("select id from ttsvoice where language = 'english' and gender = 'female'");
+		$voiceid = QuickQuery("select id from ttsvoice where language = 'english' and gender = ?", false, array($gender));
 		$parts = Message::parse($messagetext, $errors, $voiceid);
 		foreach ($parts as $part) {
 			$part->messageid = $messageid;
@@ -1182,7 +1182,7 @@ class SMAPI {
 			$message->languagecode = "en"; // hardcoded English
 			$message->create();
 			
-			$this->createMessageParts($message->id, $messagetext);
+			$this->createMessageParts($message->id, $messagetext, $gender);
 								
 			// success, return id
 			$result["messageid"] = $message->id;
