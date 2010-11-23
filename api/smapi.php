@@ -55,13 +55,14 @@ class PermissionEntry {
 	var $value;
 }
 
-class SMAPI{
+class SMAPI {
 
 	function helperSetContact($sessionid, $pkey) {
 		global $USER, $ACCESS;
 		$result = array("resultcode" => "failure", "resultdescription" => "");
 
 		if (!APISession($sessionid)) {
+			$result['resultcode'] = 'invalidsession';
 			$result["resultdescription"] = "Invalid Session ID";
 			return $result;
 		}
@@ -70,12 +71,14 @@ class SMAPI{
 		$ACCESS = $_SESSION['access'];
 
 		if (!$USER->id) {
-			$result["resultdescription"] = "Invalid user";
+			$result['resultcode'] = 'invalidsession';
+			$result["resultdescription"] = "Invalid user for sessionid";
 			return $result;
 		}
 		
 		// user must be able to edit system contacts
 		if (!$USER->authorize('managecontactdetailsettings')) {
+			$result['resultcode'] = 'unauthorized';
 			$result["resultdescription"] = "Unauthorized - user does not have privilege to edit contact details";
 			return $result;
 		}
@@ -83,11 +86,13 @@ class SMAPI{
 		// validate the person to update
 		$personid = QuickQuery("select id from person where pkey = ? and not deleted", false, array($pkey));
 		if (!$personid) {
+			$result['resultcode'] = 'invalidparam';
 			$result["resultdescription"] = "Invalid pkey - Person does not exist";
 			return $result;
 		}
 		
 		if (!$USER->canSeePerson($personid)) {
+			$result['resultcode'] = 'unauthorized';
 			$result["resultdescription"] = "Unauthorized - User does not have access to update this person";
 			return $result;
 		}
@@ -828,7 +833,12 @@ class SMAPI{
 		$options = new JobOptions();
 		$options->jobOption = array();
 		
-		return $this->sendJobExtended($sessionid, $name, $desc, $listids, $jobtypeid, $startdate, $starttime, $endtime, $daystorun, $phonemsgid, $emailmsgid, $smsmsgid, $maxcallattempts, $options);
+		$result = $this->sendJobExtended($sessionid, $name, $desc, $listids, $jobtypeid, $startdate, $starttime, $endtime, $daystorun, $phonemsgid, $emailmsgid, $smsmsgid, $maxcallattempts, $options);
+		if ($result['resultcode'] != 'success') {
+				// API v1.0 only used 'failure' and no other codes, so roll them all back to 'failure'
+				$result['resultcode'] = 'failure';
+		}
+		return $result;
 	}
 
 	/*
@@ -1014,7 +1024,10 @@ class SMAPI{
 
 		$personid = $this->helperSetContact($sessionid, $contact->pkey);
 		if (count($personid) > 1) {
-			return $personid; // actually a result array with failure and description
+			// on failure, $personid is a result array with resultcode and resultdescription
+			// API v1.0 only used 'failure' and no other codes, so roll them all back to 'failure'
+			$personid['resultcode'] = 'failure';
+			return $personid;
 		}
 		
 		$result = array("resultcode" => "failure","resultdescription" => "", "contacts" => null);
@@ -1114,6 +1127,7 @@ class SMAPI{
 		global $USER, $ACCESS;
 		$result = array("resultcode" => "failure","resultdescription" => "", "messageid" => 0);
 		if (!APISession($sessionid)) {
+			$result['resultcode'] = 'invalidsession';
 			$result["resultdescription"] = "Invalid Session ID";
 			return $result;
 		} else {
@@ -1121,19 +1135,23 @@ class SMAPI{
 			$ACCESS = $_SESSION['access'];
 
 			if (!$USER->id) {
+				$result['resultcode'] = 'invalidsession';
 				$result["resultdescription"] = "Invalid User";
 				return $result;
 			}
 			// validate args
 			if (strlen($name) < 1 || strlen($name) > 50) {
+				$result['resultcode'] = 'invalidparam';
 				$result["resultdescription"] = "Invalid Name, must be 1-50 characters";
 				return $result;
 			}
 			if (strlen($description) > 50) {
+				$result['resultcode'] = 'invalidparam';
 				$result["resultdescription"] = "Invalid Description, maximum 50 characters";
 				return $result;
 			}
 			if (strlen($messagetext) < 1) {  // not checking for max length of text, assume if they try to send something so big, they can deal with the consequences
+				$result['resultcode'] = 'invalidparam';
 				$result["resultdescription"] = "Invalid Text, must be at least one character";
 				return $result;
 			}
@@ -1144,6 +1162,7 @@ class SMAPI{
 			}
 			// validate permissions
 			if (!$USER->authorize('sendphone')) {
+				$result['resultcode'] = 'unauthorized';
 				$result["resultdescription"] = "Unauthorized - user does not have privilege to create phone messages";
 				return $result;
 			}
@@ -1176,6 +1195,7 @@ class SMAPI{
 		global $USER, $ACCESS;
 		$result = array("resultcode" => "failure","resultdescription" => "", "messageid" => 0);
 		if (!APISession($sessionid)) {
+			$result['resultcode'] = 'invalidsession';
 			$result["resultdescription"] = "Invalid Session ID";
 			return $result;
 		} else {
@@ -1183,24 +1203,29 @@ class SMAPI{
 			$ACCESS = $_SESSION['access'];
 
 			if (!$USER->id) {
+				$result['resultcode'] = 'invalidsession';
 				$result["resultdescription"] = "Invalid User";
 				return $result;
 			}
 			// validate args
 			if (strlen($name) < 1 || strlen($name) > 50) {
+				$result['resultcode'] = 'invalidparam';
 				$result["resultdescription"] = "Invalid Name, must be 1-50 characters";
 				return $result;
 			}
 			if (strlen($description) > 50) {
+				$result['resultcode'] = 'invalidparam';
 				$result["resultdescription"] = "Invalid Description, maximum 50 characters";
 				return $result;
 			}
 			if (strlen($messagetext) < 1 || strlen($messagetext) > 160) {
+				$result['resultcode'] = 'invalidparam';
 				$result["resultdescription"] = "Invalid Text, must be 1-160 characters";
 				return $result;
 			}
 			// validate permissions
 			if (!getSystemSetting('_hassms') || !$USER->authorize('sendsms')) {
+				$result['resultcode'] = 'unauthorized';
 				$result["resultdescription"] = "Unauthorized - user does not have privilege to create sms messages";
 				return $result;
 			}
@@ -1233,6 +1258,7 @@ class SMAPI{
 		global $USER, $ACCESS;
 		$result = array("resultcode" => "failure","resultdescription" => "", "messageid" => 0);
 		if (!APISession($sessionid)) {
+			$result['resultcode'] = 'invalidsession';
 			$result["resultdescription"] = "Invalid Session ID";
 			return $result;
 		} else {
@@ -1240,29 +1266,35 @@ class SMAPI{
 			$ACCESS = $_SESSION['access'];
 
 			if (!$USER->id) {
+				$result['resultcode'] = 'invalidsession';
 				$result["resultdescription"] = "Invalid User";
 				return $result;
 			}
 			// validate args
 			if (strlen($name) < 1 || strlen($name) > 50) {
+				$result['resultcode'] = 'invalidparam';
 				$result["resultdescription"] = "Invalid Name, must be 1-50 characters";
 				return $result;
 			}
 			if (strlen($description) > 50) {
+				$result['resultcode'] = 'invalidparam';
 				$result["resultdescription"] = "Invalid Description, maximum 50 characters";
 				return $result;
 			}
 			if (strlen($messagetext) < 1) {  // not checking for max length of text, assume if they try to send something so big, they can deal with the consequences
+				$result['resultcode'] = 'invalidparam';
 				$result["resultdescription"] = "Invalid Text, must be at least one character";
 				return $result;
 			}
 			if (!validEmail($fromemail)) {
+				$result['resultcode'] = 'invalidparam';
 				$result["resultdescription"] = "Invalid fromemail, must be a valid email address";
 				return $result;
 			}
 			
 			// validate permissions
 			if (!$USER->authorize('sendemail')) {
+				$result['resultcode'] = 'unauthorized';
 				$result["resultdescription"] = "Unauthorized - user does not have privilege to create email messages";
 				return $result;
 			}
@@ -1303,6 +1335,7 @@ class SMAPI{
 		$maxcallattempts = $maxcallattempts+0;
 
 		if (!APISession($sessionid)) {
+			$result['resultcode'] = 'invalidsession';
 			$result["resultdescription"] = "Invalid Session ID";
 			return $result;
 		} else {
@@ -1310,43 +1343,44 @@ class SMAPI{
 			$ACCESS = $_SESSION['access'];
 
 			if (!$USER->id) {
+				$result['resultcode'] = 'invalidsession';
 				$result["resultdescription"] = "Invalid user";
 				return $result;
 			}
 			if (!strtotime($startdate)) {
-
+				$result['resultcode'] = 'invalidparam';
 				$result["resultdescription"] = "Invalid Start Date";
 				return $result;
 			} else if (!strtotime($starttime)) {
-
+				$result['resultcode'] = 'invalidparam';
 				$result["resultdescription"] = "Invalid Start Time";
 				return $result;
 			} else if (!strtotime($endtime)) {
-
+				$result['resultcode'] = 'invalidparam';
 				$result["resultdescription"] = "Invalid End Time";
 				return $result;
 			} else if ($daystorun < 1 || $daystorun > $ACCESS->getValue('maxjobdays', '7')) {
-
+				$result['resultcode'] = 'invalidparam';
 				$result["resultdescription"] = "Invalid Run Days.  Must be between 1 and " . $ACCESS->getValue('maxjobdays', '7');
 				return $result;
 			} else if (!$maxcallattempts) {
-
+				$result['resultcode'] = 'invalidparam';
 				$result["resultdescription"] = "Invalid Max Call Attempts";
 				return $result;
 			} else if ($USER->authorize('sendphone') && $phonemsgid && !userOwns("message", $phonemsgid)) {
-
+				$result['resultcode'] = 'unauthorized';
 				$result["resultdescription"] =  "Invalid Phone Message ID";
 				return $result;
 			} else if ($USER->authorize('sendemail') && $emailmsgid && !userOwns("message", $emailmsgid)) {
-
+				$result['resultcode'] = 'unauthorized';
 				$result["resultdescription"] =  "Invalid Email Message ID";
 				return $result;
 			} else if ($smsmsgid && (!getSystemSetting('_hassms') || !$USER->authorize('sendsms') || !userOwns("message", $smsmsgid))) {
-
+				$result['resultcode'] = 'unauthorized';
 				$result["resultdescription"] = "Invalid SMS Message ID";
 				return $result;
 			} else if (strtotime($starttime) > strtotime($endtime)) {
-
+				$result['resultcode'] = 'invalidparam';
 				$result["resultdescription"] = "Start Time must be before End Time";
 				return $result;
 			}
@@ -1359,6 +1393,7 @@ class SMAPI{
 				}
 			}
 			if (!$jobtypeok) {
+				$result['resultcode'] = 'unauthorized';
 				$result["resultdescription"] = "Invalid Jobtype : User not authorized to send jobs of this type";
 				return $result;
 			}
@@ -1366,6 +1401,7 @@ class SMAPI{
 			// validate listids
 			foreach ($listids->listid as $listid) {
 				if (!userOwns("list", $listid) && !isSubscribed("list", $listid)) {
+					$result['resultcode'] = 'unauthorized';
 					$result["resultdescription"] =  "Invalid List " . $listid;
 					return $result;
 				}
@@ -1398,6 +1434,7 @@ class SMAPI{
 			if (isset($joboptions['callerid']) && $USER->authorize('setcallerid') && !getSystemSetting('_hascallback', false)) {
 				$errors = Phone::validate($joboptions['callerid']);
 				if (count($errors)  > 0) {
+					$result['resultcode'] = 'invalidparam';
 					$result["resultdescription"] =  "Invalid callerid in job options";
 					return $result;
 				}
@@ -1502,6 +1539,7 @@ class SMAPI{
 			}
 			// validate at least one message type was added
 			if(!$job->sendphone && !$job->sendemail && !$job->sendsms) {
+				$result['resultcode'] = 'invalidparam';
 				$result["resultdescription"] = "You must have at least one message type";
 				return $result;
 			}
@@ -1536,6 +1574,7 @@ class SMAPI{
 		$result = array("resultcode" => "failure", "resultdescription" => "", "permissions" => array());
 
 		if (!APISession($sessionid)) {
+			$result['resultcode'] = 'invalidsession';
 			$result["resultdescription"] = "Invalid Session ID";
 			return $result;
 		}
@@ -1544,6 +1583,7 @@ class SMAPI{
 		$ACCESS = $_SESSION['access'];
 
 		if (!$USER->id) {
+			$result['resultcode'] = 'invalidsession';
 			$result["resultdescription"] = "Invalid user";
 			return $result;
 		}
@@ -1600,7 +1640,7 @@ class SMAPI{
 		
 		$personid = $this->helperSetContact($sessionid, $pkey);
 		if (count($personid) > 1) {
-			return $personid; // actually a result array with failure and description
+			return $personid; // actually a result array with code and description
 		}
 		
 		$result = array("resultcode" => "failure", "resultdescription" => "");
@@ -1612,6 +1652,7 @@ class SMAPI{
 			case "phone" :
 				$errors = Phone::validate($destination); 
 				if (count($errors)) {
+					$result['resultcode'] = 'invalidparam';
 					$result["resultdescription"] = "Invalid destination - must be valid phone number";
 					return $result;
 				}
@@ -1620,6 +1661,7 @@ class SMAPI{
 				break;
 			case "email" :
 				if (!validEmail($destination)) {
+					$result['resultcode'] = 'invalidparam';
 					$result["resultdescription"] = "Invalid destination - must be valid email address";
 					return $result;
 				}
@@ -1627,11 +1669,13 @@ class SMAPI{
 				break;
 			case "sms" :
 				if (!getSystemSetting('_hassms')) {
+					$result['resultcode'] = 'invalidparam';
 					$result["resultdescription"] = "Invalid type - sms disabled for account";
 					return $result;
 				}
 				$errors = Phone::validate($destination); 
 				if (count($errors)) {
+					$result['resultcode'] = 'invalidparam';
 					$result["resultdescription"] = "Invalid destination - must be valid phone number";
 					return $result;
 				}
@@ -1639,6 +1683,7 @@ class SMAPI{
 				$maxsettingname = "maxsms";
 				break;
 			default :
+				$result['resultcode'] = 'invalidparam';
 				$result["resultdescription"] = "Invalid type - must be 'phone', 'email', 'sms'";
 				return $result;
 		}
@@ -1647,6 +1692,7 @@ class SMAPI{
 		
 		// validate sequence < max
 		if ($sequence < 0 || $sequence >= $maxdestinations) {
+			$result['resultcode'] = 'invalidparam';
 			$result["resultdescription"] = "Invalid sequence - must be 0 through " . ($maxdestinations - 1);
 			return $result;
 		}
@@ -1706,13 +1752,14 @@ class SMAPI{
 		
 		$personid = $this->helperSetContact($sessionid, $pkey);
 		if (count($personid) > 1) {
-			return $personid; // actually a result array with failure and description
+			return $personid; // actually a result array with code and description
 		}
 		
 		$result = array("resultcode" => "failure", "resultdescription" => "");
 		
 		// validate jobtypeid
 		if (!QuickQuery("select 1 from jobtype where id = ? and not deleted", false, array($jobtypeid))) {
+			$result['resultcode'] = 'invalidparam';
 			$result["resultdescription"] = "Invalid jobtypeid";
 			return $result;
 		}
