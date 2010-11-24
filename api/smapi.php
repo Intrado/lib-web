@@ -303,8 +303,6 @@ class SMAPI {
 		global $USER;
 		$result = array("resultcode" => "failure","resultdescription" => "", "result" => false);
 
-		$messageid = $messageid+0;
-
 		if(!APISession($sessionid)){
 			$result["resultdescription"] = "Invalid Session ID";
 			return $result;
@@ -655,7 +653,6 @@ class SMAPI {
 	function getJobStatus ($sessionid, $jobid) {
 		global $USER;
 		$result = array("resultcode" => "failure","resultdescription" => "", "job" => null);
-		$jobid = $jobid + 0;
 		if(!APISession($sessionid)){
 
 			$result["resultdescription"] = "Invalid Session ID";
@@ -761,7 +758,6 @@ class SMAPI {
 	function sendRepeatingJob ($sessionid, $jobid) {
 		global $USER;
 		$result = array("resultcode" => "failure","resultdescription" => "", "jobid" => 0);
-		$jobid = $jobid + 0;
 		if(!APISession($sessionid)){
 			$result["resultdescription"] = "Invalid Session ID";
 			return $result;
@@ -1110,8 +1106,8 @@ class SMAPI {
 
 				QuickUpdate("begin");
 				foreach($personcontactprefs as $jobtypeid => $enabled){
-					QuickUpdate("delete from contactpref where personid = " . $personid . " and jobtypeid = " . $jobtypeid . "  and type = '" . $contact->type . "' and sequence = " . ($contact->sequence + 0));
-					QuickUpdate("insert into contactpref values (" . $personid . ", " . $jobtypeid . ", '" . $contact->type . "', " . ($contact->sequence + 0) . ", '" . $enabled . "')");
+					// TODO validate $jobtypeid, caller can pass anything here like 99 
+					QuickUpdate("insert into contactpref (personid, jobtypeid, type, sequence, enabled) values (?, ?, ?, ?, ?) on duplicate key update enabled = ?", false, array($personid, $jobtypeid, $contact->type, $contact->sequence, $enabled, $enabled));
 				}
 				QuickUpdate("commit");
             }
@@ -1326,13 +1322,6 @@ class SMAPI {
 	function sendJobExtended ($sessionid, $name, $desc, $listids, $jobtypeid, $startdate, $starttime, $endtime, $daystorun, $phonemsgid, $emailmsgid, $smsmsgid, $maxcallattempts, $options) {
 		global $USER, $ACCESS;
 		$result = array("resultcode" => "failure","resultdescription" => "", "jobid" => 0);
-
-		$jobtypeid = $jobtypeid+0;
-		$daystorun = $daystorun+0;
-		$phonemsgid = $phonemsgid+0;
-		$emailmsgid = $emailmsgid+0;
-		$smsmsgid = $smsmsgid+0;
-		$maxcallattempts = $maxcallattempts+0;
 
 		if (!APISession($sessionid)) {
 			$result['resultcode'] = 'invalidsession';
@@ -1771,10 +1760,7 @@ class SMAPI {
 			$enabled = 0;
 		}
 		
-		if (!QuickUpdate("insert into contactpref (personid, jobtypeid, type, sequence, enabled) values (?, ?, ?, ?, ?) on duplicate key update enabled = ?", false, array($personid, $jobtypeid, $type, $sequence, $enabled, $enabled))) {
-			$result["resultdescription"] = "Failed to update contact preference";
-			return $result;
-		}
+		QuickUpdate("insert into contactpref (personid, jobtypeid, type, sequence, enabled) values (?, ?, ?, ?, ?) on duplicate key update enabled = ?", false, array($personid, $jobtypeid, $type, $sequence, $enabled, $enabled));
 		
 		// success
 		$result["resultcode"] = "success";
@@ -1880,14 +1866,17 @@ function getJobData($jobid=0){
 	left join jobsetting js on (js.jobid = j.id and js.name = 'maxcallattempts')
 	where 1 and j.deleted=0
 	and j.userid = $USER->id ";
-	if($jobid){
-		$jobid = $jobid + 0;
-		$query .= " and j.id = $jobid ";
+	if ($jobid) {
+		$query .= " and j.id = ? ";
 	} else {
 		$query .= " and (j.status = 'active' or j.status='scheduled' or j.status='procactive' or j.status='processing' or j.status = 'new' or j.status = 'cancelling') ";
 	}
 	$query .=" group by j.id order by j.startdate, j.starttime, j.id desc";
-	$queryresult = Query($query);
+	if ($jobid) {
+		$queryresult = Query($query, false, array($jobid));
+	} else {
+		$queryresult = Query($query);
+	}
 	$jobs = array();
 	while($row = DBGetRow($queryresult)){
 		$job = new API_JobStatus();
@@ -1911,9 +1900,8 @@ function getJobData($jobid=0){
 
 		$jobs[] = $job;
 	}
-	if($jobid){
+	if ($jobid) {
 		return array_shift($jobs);
-		//return $jobs[0];
 	} else {
 		return $jobs;
 	}
