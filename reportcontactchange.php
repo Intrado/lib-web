@@ -246,6 +246,19 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 			}
 			$_SESSION['report']['options']['organizationids'] = $postdata['organizationids'];
 			
+			if (isset($postdata['multipleorderby'])) {
+				$multipleorderby = $postdata['multipleorderby'];
+				if (is_array($multipleorderby)) {
+					$_SESSION['reportcontactchange_orderby'] = array();
+					foreach ($multipleorderby as $i=>$orderby) {
+						if (in_array($orderby, $validOrdering)) {
+							$_SESSION['reportcontactchange_orderby'][] = $orderby;
+						}
+					}
+					set_session_options_orderby();
+				}
+			}
+						
 			switch ($button) {
 			case 'view':
 				$form->sendTo("reportcontactchangesummary.php");
@@ -274,8 +287,8 @@ function set_session_options_activefields() {
 }
 
 function set_session_options_orderby() {
-	if (!empty($_SESSION['reportjobdetailsearch_orderby'])) {
-		foreach ($_SESSION['reportjobdetailsearch_orderby'] as $i => $orderby) {
+	if (!empty($_SESSION['reportcontactchange_orderby'])) {
+		foreach ($_SESSION['reportcontactchange_orderby'] as $i => $orderby) {
 			$_SESSION['report']['options']["order" . ($i+1)] = $orderby;
 		}
 	}
