@@ -202,7 +202,7 @@ function showRenderedListTableCM($data, $total, $pagestart, $pagelimit, $validso
 	
 	$titles = array();
 	$formatters = array();
-	$repeatedcolumns = array();
+	$repeatedcolumns = array(6); // contact manager accounts
 	$groupby = 0; //personid
 
 	$titles[1] = "Unique ID";

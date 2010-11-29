@@ -111,8 +111,9 @@ class RenderedListCM extends RenderedList2 {
 	}
 	
 	function getPageData() {
-		if ($this->pagedata !== false)
-			return $this->pagedata;
+		// always refresh page data or the csv will loop infinite
+		//if ($this->pagedata !== false)
+			//return $this->pagedata;
 		
 		$this->loadPagePersonIds();
 		
@@ -171,30 +172,37 @@ class RenderedListCM extends RenderedList2 {
 				";
 
 //error_log("final query ".$query);	
-		
+				
 		//note: we'll want to keep the ordering of the returned list of person ids as they are already presorted
 		//array_fill_keys will give us a new array indexed by personid in the same order, then we just fill in the data
 		$persondata = array_fill_keys($this->pagepersonids,array());
-
 		$res = Query($query);
-	
 		while ($row = DBGetRow($res)) {
-			if (!isset($personportalusers[$row[0]])) {
-				array_splice($row, 6, 0, array(""));
-				$persondata[$row[0]] = $row;
+			$persondata[$row[0]] = $row;
+		}
+		
+		// now create return array, could have duplicate rows for persons with multiple contact manager accounts
+		$this->pagedata = array();
+		
+		foreach ($persondata as $id => $person) {
+			
+			if (!isset($personportalusers[$id])) {
+				array_splice($person, 6, 0, array(""));
+				$this->pagedata[] = $person;
 			} else {
-				foreach($personportalusers[$row[0]] as $portaluserid){
-					if(isset($portalusers[$portaluserid])){
+				foreach($personportalusers[$id] as $portaluserid) {
+					if (isset($portalusers[$portaluserid])) {
 						$portaluser = $portalusers[$portaluserid];
 						$portaluserinfo = $portaluser['portaluser.firstname'] . " " . $portaluser['portaluser.lastname'] . " (" . $portaluser['portaluser.username'] . ")";
-						array_splice($row, 6, 0, array($portaluserinfo));
-						$persondata[$row[0]] = $row;
+						array_splice($person, 6, 0, array($portaluserinfo));
+						$this->pagedata[] = $person;
 					}
 				}
 			}
+			
 		}
-		
-		return $persondata;
+
+		return $this->pagedata;
 	}
 
 }
