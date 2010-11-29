@@ -1673,6 +1673,17 @@ class JobWiz_socialMedia extends WizStep {
 	function getForm($postdata, $curstep) {
 		global $USER;
 		
+		if (isset($postdata['/message/phone/text'])) {
+			if (isset($postdata['/message/phone/text']['message'])) {
+				$msgdata = json_decode($postdata['/message/phone/text']['message']);
+				$text = $msgdata->text;
+			}
+		} else if (isset($postdata['/message/email/text'])) {
+			if (isset($postdata['/message/email/text']['message']))
+				$text = html_to_plain($postdata['/message/email/text']['message']);
+		} else
+			$text = "";
+
 		$formdata = array($this->title);
 		$helpsteps = array(_L("Enter the message you wish to deliver via Facebook."));
 		$formdata = array(
@@ -1688,8 +1699,11 @@ class JobWiz_socialMedia extends WizStep {
 			"fbtext" => array(
 				"label" => _L('Text'),
 				"fieldhelp" => _L("Enter the text you would like to post to Facebook pages."),
-				"value" => "",
-				"validators" => array(),
+				"value" => $text,
+				"validators" => array(
+					array("ValLength", "max" => 420),
+					array("ValFacebookToken")),
+				"requires" => array("fbpages"),
 				"control" => array("TextArea", "cols" => 50, "rows" => 10),
 				"helpstep" => 1
 			)
