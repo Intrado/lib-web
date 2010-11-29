@@ -21,10 +21,15 @@ function fb_hasValidAccessToken($accessToken = false) {
 	else
 		$access_token = $USER->getSetting("fb_access_token", false);
 	
-	try {
-		$data = $facebookapi->api("/me", array('access_token' => $access_token));
-	} catch (FacebookApiException $e) {
-		error_log($e);
+	// if we have an access token
+	if ($access_token) {
+		try {
+			$data = $facebookapi->api("/me", array('access_token' => $access_token));
+		} catch (FacebookApiException $e) {
+			error_log($e);
+			return false;
+		}
+	} else {
 		return false;
 	}
 	
