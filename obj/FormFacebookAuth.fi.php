@@ -10,7 +10,7 @@ class FacebookAuth extends FormItem {
 		$str = '<input id="'.$n.'" name="'.$n.'" type="hidden" value="'.escapehtml($value).'"/>';
 		
 		// check that the auth token is any good
-		if (fb_hasValidAccessToken($value)) {
+		if ($value && fb_hasValidAccessToken($value)) {
 			$validtoken = true;
 		} else {
 			$validtoken = false;
@@ -27,15 +27,22 @@ class FacebookAuth extends FormItem {
 		$str .= '<div id="'. $n. 'fbgreeting">'. _L("You are currently connected to Facebook."). '</div>';
 		
 		// button to remove access_token
-		$str .= button("Disconnect this Facebook Account", "handleFbLoginAuthResponse('".$n."', null)"). '<div style="clear: both;"></div></div>';
+		$str .= button("Disconnect this Facebook Account", "handleFbLoginAuthResponse('".$n."', null)");
+		
+		$str .= "</div>";
 		
 		// disconnected options div
 		$str .= '<div id="'. $n. 'fbdisconnected" style="float: left;'. (($validtoken)? "display:none;": ""). '">';
 		
 		// Do facebook login to get good auth token
 		$perms = "publish_stream,offline_access,manage_pages";
-		$str .= button("Connect to Facebook", "FB.login(handleFbLoginAuthResponse.curry('".$n."'), {perms: '$perms'})");
-				
+		$str .= button("Connect to Facebook", 
+			"try { 
+				FB.login(handleFbLoginAuthResponse.curry('$n'), {perms: '$perms'});
+			} catch (e) { 
+				alert('". _L("Could not connect to Facebook")."'); 
+			}");
+			
 		$str .= '</div></div>';
 		
 		$str .= '<script type="text/javascript">

@@ -7,6 +7,7 @@ class FacebookPages extends FormItem {
 		
 		$n = $this->form->name."_".$this->name;
 		
+		// { access_token: <token>, page: { <pageid>: <token>, <pageid>: <token>, ... } }
 		$str = '<input id="'.$n.'" name="'.$n.'" type="hidden" value="'.escapehtml($value).'" />';
 		
 		$fb_data = json_decode($value);
@@ -18,7 +19,7 @@ class FacebookPages extends FormItem {
 		$str .= '<div id="fb-root"></div>';
 		
 		// check that the auth token is any good
-		if (fb_hasValidAccessToken()) {
+		if ($fb_data->access_token && fb_hasValidAccessToken($fb_data->access_token)) {
 			$validtoken = true;
 		} else {
 			$validtoken = false;
@@ -32,8 +33,17 @@ class FacebookPages extends FormItem {
 		// show connect button div
 		$str .= '<div id="'. $n. 'fbconnect" style="float: left;'. (($validtoken)? "display:none;": ""). '">';
 		$perms = "publish_stream,offline_access,manage_pages";
-		$str .= button("Connect to Facebook", "FB.login(handleFbLoginPagesResponse.curry('".$n."'), {perms: '$perms'})");
-		$str .= '</div></div>';
+		$str .= button("Connect to Facebook", 
+			"try { 
+				FB.login(handleFbLoginPagesResponse.curry('$n'), {perms: '$perms'});
+			} catch (e) { 
+				alert('". _L("Could not connect to Facebook")."');
+			}");
+		
+		$str .= '</div>';
+		$str .= '<div id="'. $n. 'fbnote" style="padding-top: 5px; clear: both;'. (($validtoken)? "": "display:none;"). '">'. 
+			escapehtml(_L("Note: Posting to these pages happens immediatly on job submit.")). 
+			'</div></div>';
 		
 		$str .= '<script type="text/javascript">
 		
@@ -86,43 +96,44 @@ class FacebookPages extends FormItem {
 						$(container).update(new Element("img", { src: "img/ajax-loader.gif" }));
 						
 						// get user pages
-						try {
-							FB.api("/me/accounts", { access_token: access_token, type: "page" }, function(res) {
-								if (res.data != undefined) {
-									$(container).update();
-									// populate pages selection
+						FB.api("/me/accounts", { access_token: access_token, type: "page" }, function(res) {
+							if (res.data != undefined) {
+								$(container).update();
+								// populate pages selection
+								$(container).insert(
+										new Element("input", { 
+											type: "checkbox", 
+											value: Object.toJSON({ id: "me", access_token: access_token }), 
+											name: "me",
+											onchange: "handleFbPageChange(\'"+formitem+"\', this);",
+											checked: ((pages.get("me"))?true:false) })
+									).insert(
+										new Element("label", { for: "me" }).insert("'. escapehtml(_L('My Wall')). '")
+									).insert(
+										new Element("br")
+								);
+								res.data.each(function(account) {
+									var val = Object.toJSON({ id: account.id, access_token: account.access_token });
 									$(container).insert(
 											new Element("input", { 
 												type: "checkbox", 
-												value: Object.toJSON({ id: "me", access_token: access_token }), 
-												name: "me",
+												value: val, 
+												name: account.id,
 												onchange: "handleFbPageChange(\'"+formitem+"\', this);",
-												checked: ((pages.get("me"))?true:false) })
+												checked: ((pages.get(account.id))?true:false) })
 										).insert(
-											new Element("label", { for: "me" }).insert("'. escapehtml(_L('My Wall')). '")
+											new Element("label", { for: account.id }).insert(account.name)
 										).insert(
 											new Element("br")
 									);
-									res.data.each(function(account) {
-										var val = Object.toJSON({ id: account.id, access_token: account.access_token });
-										$(container).insert(
-												new Element("input", { 
-													type: "checkbox", 
-													value: val, 
-													name: account.id,
-													onchange: "handleFbPageChange(\'"+formitem+"\', this);",
-													checked: ((pages.get(account.id))?true:false) })
-											).insert(
-												new Element("label", { for: account.id }).insert(account.name)
-											).insert(
-												new Element("br")
-										);
-									});
-								}
-							});
-						} catch (e) {
-							// do nothing
-						}
+								});
+							} else {
+								// no data returned
+								$(container).update(
+									new Element("div").setStyle({padding: "5px"}).update(
+										"'. escapehtml(_L('Error encountered trying to get administered pages')). '"));
+							}
+						});
 					}
 				}
 				
@@ -141,10 +152,13 @@ class FacebookPages extends FormItem {
 						$(formitem + "fbpages").setStyle({display: "block"});
 						$(formitem + "fbconnect").setStyle({display: "none"});
 						updateFbPages(formitem, formitem + "fbpages", access_token);
+						$(formitem + "fbnote").setStyle({display: "block"});
+						
 					} else {
 						// no access token, show the connect button
 						$(formitem + "fbpages").setStyle({display: "none"});
 						$(formitem + "fbconnect").setStyle({display: "block"});
+						$(formitem + "fbnote").setStyle({display: "none"});
 					}
 					
 					// store access_token value
