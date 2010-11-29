@@ -110,7 +110,7 @@ class RenderedListCM extends RenderedList2 {
 		return $query;
 	}
 	
-	function getPageData() {
+	function getPageData($iscsv = false) {
 		// always refresh page data or the csv will loop infinite
 		//if ($this->pagedata !== false)
 			//return $this->pagedata;
@@ -185,8 +185,8 @@ class RenderedListCM extends RenderedList2 {
 		$this->pagedata = array();
 		
 		foreach ($persondata as $id => $person) {
-			
-			if (!isset($personportalusers[$id])) {
+			// csv skips the account user info
+			if ($iscsv || !isset($personportalusers[$id])) {
 				array_splice($person, 6, 0, array(""));
 				$this->pagedata[] = $person;
 			} else {

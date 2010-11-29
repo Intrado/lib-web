@@ -305,7 +305,7 @@ if ($csv) {
 
 	$pageoffset = 0;
 	$renderedlist->pageoffset = $pageoffset;
-	$data = $renderedlist->getPageData();
+	$data = $renderedlist->getPageData(true);
 	while (count($data) > 0) {
 		// write out the rows of data
 		foreach ($data as $row) {
