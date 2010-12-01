@@ -454,32 +454,35 @@ class FinishJobWizard extends WizFinish {
 		$job->setSetting('callerid', $callerid);
 
 		$job->update();
-		if ($schedule['date'])
+		if ($schedule['date']) {
+			// run the job if it's scheduled
 			$job->runNow();
-
-		$_SESSION['wizard_job']['submitted_jobid'] = $job->id;
 		
-		// Do social media posting
-		
-		// Do Facebook tasks
-		if ($USER->authorize("facebookpost") && isset($postdata["/message/socialmedia"]["fbdata"])) {
-			$fbdata = json_decode($postdata["/message/socialmedia"]["fbdata"]);
+			// Do social media posting
 			
-			if ($fbdata->access_token) {
-				// save the access token if it exists
-				$USER->setSetting("fb_access_token", $fbdata->access_token);
-			
-				// post to pages if there is a message
-				if ($fbdata->message) {
-					foreach ($fbdata->page as $pageid => $accessToken) {
-						if (!fb_post($pageid, $accessToken, $fbdata->message)) {
-							// unable to post error
-							error_log("Failed to post to facebook pageid: ". $pageid. " for user: ". $USER->id);
+			// Do Facebook tasks
+			if ($USER->authorize("facebookpost") && isset($postdata["/message/socialmedia"]["fbdata"])) {
+				$fbdata = json_decode($postdata["/message/socialmedia"]["fbdata"]);
+				
+				if ($fbdata->access_token) {
+					// post to pages if there is a message
+					if ($fbdata->message) {
+						foreach ($fbdata->page as $pageid => $accessToken) {
+							if (!fb_post($pageid, $accessToken, $fbdata->message)) {
+								// unable to post error
+								error_log("Failed to post to facebook pageid: ". $pageid. " for user: ". $USER->id);
+							}
 						}
 					}
 				}
 			}
 		}
+		
+		// save the Facebook access token if it exists
+		if ($fbdata->access_token) {
+			$USER->setSetting("fb_access_token", $fbdata->access_token);
+		
+		$_SESSION['wizard_job']['submitted_jobid'] = $job->id;
 
 		Query("COMMIT");
 	}
