@@ -1681,30 +1681,24 @@ class JobWiz_socialMedia extends WizStep {
 		} else if (isset($postdata['/message/email/text'])) {
 			if (isset($postdata['/message/email/text']['message']))
 				$text = html_to_plain($postdata['/message/email/text']['message']);
+		} else if (isset($postdata['/message/sms/text'])) {
+			if (isset($postdata['/message/sms/text']['message']))
+				$text = $postdata['/message/sms/text']['message'];
 		} else
 			$text = "";
 
 		$formdata = array($this->title);
 		$helpsteps = array(_L("Enter the message you wish to deliver via Facebook."));
 		$formdata = array(
-			_L('Facebook Posting'),
-			"fbpages" => array(
-				"label" => _L('Pages'),
+			_L('Social Media'),
+			"fbdata" => array(
+				"label" => _L('Facebook'),
 				"fieldhelp" => _L("Select which pages to post to."),
-				"value" => json_encode(array("access_token" => $USER->getSetting("fb_access_token", false), "page" => array())),
-				"validators" => array(),
-				"control" => array("FacebookPages"),
-				"helpstep" => 1
-			),
-			"fbtext" => array(
-				"label" => _L('Text'),
-				"fieldhelp" => _L("Enter the text you would like to post to Facebook pages."),
-				"value" => $text,
+				"value" => json_encode(array("access_token" => $USER->getSetting("fb_access_token", false), "message" => $text,"page" => array())),
 				"validators" => array(
-					array("ValLength", "max" => 420),
-					array("ValFacebookToken")),
-				"requires" => array("fbpages"),
-				"control" => array("TextArea", "cols" => 50, "rows" => 10),
+					array("ValRequired"),
+					array("ValFacebookPost")),
+				"control" => array("FacebookPost"),
 				"helpstep" => 1
 			)
 		);

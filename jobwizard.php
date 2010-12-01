@@ -50,8 +50,8 @@ require_once("obj/ValMessageBody.val.php");
 require_once("obj/ValNonEmptyMessage.val.php");
 require_once("obj/facebook.php");
 require_once("inc/facebook.inc.php");
-require_once("obj/FormFacebookPages.fi.php");
-require_once("obj/ValFacebookToken.val.php");
+require_once("obj/FacebookPost.fi.php");
+require_once("obj/ValFacebookPost.val.php");
 
 // Job step form data
 require_once("inc/jobwizard.inc.php");
@@ -462,19 +462,20 @@ class FinishJobWizard extends WizFinish {
 		// Do social media posting
 		
 		// Do Facebook tasks
-		if ($USER->authorize("facebookpost") && isset($postdata["/message/socialmedia"]["fbpages"])) {
-			$fbdata = json_decode($postdata["/message/socialmedia"]["fbpages"]);
+		if ($USER->authorize("facebookpost") && isset($postdata["/message/socialmedia"]["fbdata"])) {
+			$fbdata = json_decode($postdata["/message/socialmedia"]["fbdata"]);
 			
-			// save the access token if it exists
-			if ($fbdata->access_token)
+			if ($fbdata->access_token) {
+				// save the access token if it exists
 				$USER->setSetting("fb_access_token", $fbdata->access_token);
 			
-			// post to pages if there is a message
-			if (isset($postdata["/message/socialmedia"]["fbtext"]) && $postdata["/message/socialmedia"]["fbtext"]) {
-				foreach ($fbdata->page as $pageid => $accessToken) {
-					if (!fb_post($pageid, $accessToken, $postdata["/message/socialmedia"]["fbtext"])) {
-						// unable to post error
-						error_log("Failed to post to facebook pageid: ". $pageid. " for user: ". $USER->id);
+				// post to pages if there is a message
+				if ($fbdata->message) {
+					foreach ($fbdata->page as $pageid => $accessToken) {
+						if (!fb_post($pageid, $accessToken, $fbdata->message)) {
+							// unable to post error
+							error_log("Failed to post to facebook pageid: ". $pageid. " for user: ". $USER->id);
+						}
 					}
 				}
 			}
@@ -536,7 +537,7 @@ require_once("nav.inc.php");
 
 ?>
 <script type="text/javascript">
-<? Validator::load_validators(array("ValInArray", "ValJobName", "ValHasMessage", "ValTextAreaPhone","ValEasycall","ValLists","ValTranslation","ValEmailAttach", "ValTimeWindowCallLate", "ValTimeWindowCallEarly","ValRegExp", "valPhone", "ValMessageBody","ValNonEmptyMessage","ValFacebookToken"));// Included in jobwizard.inc.php ?>
+<? Validator::load_validators(array("ValInArray", "ValJobName", "ValHasMessage", "ValTextAreaPhone","ValEasycall","ValLists","ValTranslation","ValEmailAttach", "ValTimeWindowCallLate", "ValTimeWindowCallEarly","ValRegExp", "valPhone", "ValMessageBody","ValNonEmptyMessage","ValFacebookPost"));// Included in jobwizard.inc.php ?>
 </script>
 <?
 

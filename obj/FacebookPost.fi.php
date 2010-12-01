@@ -1,14 +1,16 @@
 <?
 // get access token and pageid for facebook posting
 
-class FacebookPages extends FormItem {
+class FacebookPost extends FormItem {
 	function render ($value) {
 		global $SETTINGS;
 		
 		$n = $this->form->name."_".$this->name;
 		
-		// { access_token: <token>, page: { <pageid>: <token>, <pageid>: <token>, ... } }
+		// { access_token: <token>, message: <text>, page: { <pageid>: <token>, <pageid>: <token>, ... } }
 		$str = '<input id="'.$n.'" name="'.$n.'" type="hidden" value="'.escapehtml($value).'" />';
+		
+		$fbMaxChars = 420;
 		
 		$fb_data = json_decode($value);
 		
@@ -31,7 +33,7 @@ class FacebookPages extends FormItem {
 				</div>';
 	
 		// show connect button div
-		$str .= '<div id="'. $n. 'fbconnect" style="float: left;'. (($validtoken)? "display:none;": ""). '">';
+		$str .= '<div id="'. $n. 'fbconnect" style="'. (($validtoken)? "display:none;": ""). '">';
 		$perms = "publish_stream,offline_access,manage_pages";
 		$str .= button("Connect to Facebook", 
 			"try { 
@@ -41,9 +43,13 @@ class FacebookPages extends FormItem {
 			}");
 		
 		$str .= '</div>';
-		$str .= '<div id="'. $n. 'fbnote" style="padding-top: 5px; clear: both;'. (($validtoken)? "": "display:none;"). '">'. 
-			escapehtml(_L("Note: Posting to these pages happens immediatly on job submit.")). 
-			'</div></div>';
+		
+		// show text area for post message
+		$str .= '<div id="'.$n.'fbmessage" style="'. (($validtoken)? "": "display:none;"). '">
+			<textarea id="'.$n.'fbmessagetext" rows=10 cols=50>'. escapehtml($fb_data->message). '</textarea>
+			<div id="'.$n.'charsleft">'.escapehtml(_L('Characters remaining')). ':&nbsp;'. ( $fbMaxChars - mb_strlen($fb_data->message)). '</div></div>';
+		
+		$str .= '</div>';
 		
 		$str .= '<script type="text/javascript">
 		
@@ -54,12 +60,42 @@ class FacebookPages extends FormItem {
 					$("'.$n.'").value = Object.toJSON(val);
 				}
 				
+				// observe changes to the textarea
+				$("'.$n.'fbmessagetext").observe("change", fbMessage_storedata.curry("'.$n.'", "'.$fbMaxChars.'"));
+				$("'.$n.'fbmessagetext").observe("blur", fbMessage_storedata.curry("'.$n.'", "'.$fbMaxChars.'"));
+				$("'.$n.'fbmessagetext").observe("keyup", fbMessage_storedata.curry("'.$n.'", "'.$fbMaxChars.'"));
+				$("'.$n.'fbmessagetext").observe("focus", fbMessage_storedata.curry("'.$n.'", "'.$fbMaxChars.'"));
+				$("'.$n.'fbmessagetext").observe("click", fbMessage_storedata.curry("'.$n.'", "'.$fbMaxChars.'"));
+
+				var fbMessage_keyupTimer = null;
+				function fbMessage_storedata(formitem, maxchars, event) {
+					var form = event.findElement("form");
+					
+					// if there is a running timer for storing the message text, clear it.
+					if (fbMessage_keyupTimer) {
+						window.clearTimeout(fbMessage_keyupTimer);
+					}
+					
+					// update the character counter
+					form_count_field_characters(maxchars, formitem + "charsleft", event);
+					
+					// set a timer to store the message text
+					fbMessage_keyupTimer = window.setTimeout(function () {
+							var val = $(formitem).value.evalJSON();
+							val.message = $(formitem+"fbmessagetext").value;
+							$(formitem).value = Object.toJSON(val);
+							form_do_validation(form, $(formitem));
+						},
+						event.type == "keyup" ? 300 : 100
+					);
+				}
+
 				// Facebook javascript API initialization, pulled from facebook documentation
 				window.fbAsyncInit = function() {
 					FB.init({appId: "'. $SETTINGS['facebook']['appid']. '", status: true, cookie: false, xfbml: true});
 					
 					// load the initial list of pages if possible
-					updateFbPages("'.$n.'", "'.$n.'fbpages", "'. $fb_data->access_token. '");
+					updateFbPages("'.$n.'", "'.$n.'fbpages");
 				};
 				(function() {
 					var e = document.createElement("script");
@@ -83,27 +119,28 @@ class FacebookPages extends FormItem {
 					}
 					val.page = pages;
 					$(formitem).value = Object.toJSON(val);
+					form_do_validation($(formitem).up("form"), $(formitem));
 				}
 				
-				function updateFbPages(formitem, container, access_token) {
+				function updateFbPages(formitem, container) {
 					
-					if (access_token) {
-						
-						var val = $(formitem).value.evalJSON();
-						var pages = $H(val.page);
+					var val = $(formitem).value.evalJSON();
+					var pages = $H(val.page);
+					
+					if (val.access_token) {
 					
 						// display loading gif while we get the users accounts
 						$(container).update(new Element("img", { src: "img/ajax-loader.gif" }));
 						
 						// get user pages
-						FB.api("/me/accounts", { access_token: access_token, type: "page" }, function(res) {
+						FB.api("/me/accounts", { access_token: val.access_token, type: "page" }, function(res) {
 							if (res.data != undefined) {
 								$(container).update();
 								// populate pages selection
 								$(container).insert(
 										new Element("input", { 
 											type: "checkbox", 
-											value: Object.toJSON({ id: "me", access_token: access_token }), 
+											value: Object.toJSON({ id: "me", access_token: val.access_token }), 
 											name: "me",
 											onchange: "handleFbPageChange(\'"+formitem+"\', this);",
 											checked: ((pages.get("me"))?true:false) })
@@ -147,24 +184,24 @@ class FacebookPages extends FormItem {
 						}
 					}
 					
+					// store access_token value
+					var val = $(formitem).value.evalJSON();
+					val.access_token = access_token;
+					$(formitem).value = Object.toJSON(val);
+					
 					// if we have an access token. display the pages selection
 					if (access_token) {
 						$(formitem + "fbpages").setStyle({display: "block"});
 						$(formitem + "fbconnect").setStyle({display: "none"});
-						updateFbPages(formitem, formitem + "fbpages", access_token);
-						$(formitem + "fbnote").setStyle({display: "block"});
+						updateFbPages(formitem, formitem + "fbpages");
+						$(formitem + "fbmessage").setStyle({display: "block"});
 						
 					} else {
 						// no access token, show the connect button
 						$(formitem + "fbpages").setStyle({display: "none"});
 						$(formitem + "fbconnect").setStyle({display: "block"});
-						$(formitem + "fbnote").setStyle({display: "none"});
+						$(formitem + "fbmessage").setStyle({display: "none"});
 					}
-					
-					// store access_token value
-					var val = $(formitem).value.evalJSON();
-					val.access_token = access_token;
-					$(formitem).value = Object.toJSON(val);
 					
 				}
 				
