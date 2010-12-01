@@ -59,6 +59,21 @@ class FacebookPost extends FormItem {
 					val.page = new Hash({});
 					$("'.$n.'").value = Object.toJSON(val);
 				}
+
+				// Facebook javascript API initialization, pulled from facebook documentation
+				window.fbAsyncInit = function() {
+					FB.init({appId: "'. $SETTINGS['facebook']['appid']. '", status: true, cookie: false, xfbml: true});
+					
+					// load the initial list of pages if possible
+					updateFbPages("'.$n.'", "'.$n.'fbpages");
+				};
+				(function() {
+					var e = document.createElement("script");
+					e.type = "text/javascript";
+					e.async = true;
+					e.src = document.location.protocol + "//connect.facebook.net/en_US/all.js";
+					document.getElementById("fb-root").appendChild(e);
+				}());
 				
 				// observe changes to the textarea
 				$("'.$n.'fbmessagetext").observe("change", fbMessage_storedata.curry("'.$n.'", "'.$fbMaxChars.'"));
@@ -89,21 +104,6 @@ class FacebookPost extends FormItem {
 						event.type == "keyup" ? 300 : 100
 					);
 				}
-
-				// Facebook javascript API initialization, pulled from facebook documentation
-				window.fbAsyncInit = function() {
-					FB.init({appId: "'. $SETTINGS['facebook']['appid']. '", status: true, cookie: false, xfbml: true});
-					
-					// load the initial list of pages if possible
-					updateFbPages("'.$n.'", "'.$n.'fbpages");
-				};
-				(function() {
-					var e = document.createElement("script");
-					e.type = "text/javascript";
-					e.async = true;
-					e.src = document.location.protocol + "//connect.facebook.net/en_US/all.js";
-					document.getElementById("fb-root").appendChild(e);
-				}());
 		
 				// when the page is changed, update the pageid and access_token used to post to it
 				function handleFbPageChange(formitem, element) {
