@@ -1673,19 +1673,19 @@ class JobWiz_socialMedia extends WizStep {
 	function getForm($postdata, $curstep) {
 		global $USER;
 		
-		if (isset($postdata['/message/phone/text'])) {
+ 		if (isset($postdata['/message/email/text'])) {
+			if (isset($postdata['/message/email/text']['message']))
+				$fbtext = html_to_plain($postdata['/message/email/text']['message']);
+		} else if (isset($postdata['/message/phone/text'])) {
 			if (isset($postdata['/message/phone/text']['message'])) {
 				$msgdata = json_decode($postdata['/message/phone/text']['message']);
-				$text = $msgdata->text;
+				$fbtext = $msgdata->text;
 			}
-		} else if (isset($postdata['/message/email/text'])) {
-			if (isset($postdata['/message/email/text']['message']))
-				$text = html_to_plain($postdata['/message/email/text']['message']);
 		} else if (isset($postdata['/message/sms/text'])) {
 			if (isset($postdata['/message/sms/text']['message']))
-				$text = $postdata['/message/sms/text']['message'];
+				$fbtext = $postdata['/message/sms/text']['message'];
 		} else
-			$text = "";
+			$fbtext = "";
 
 		$formdata = array($this->title);
 		$helpsteps = array(_L("Enter the message you wish to deliver via Facebook."));
@@ -1694,7 +1694,7 @@ class JobWiz_socialMedia extends WizStep {
 			"fbdata" => array(
 				"label" => _L('Facebook'),
 				"fieldhelp" => _L("Select which pages to post to."),
-				"value" => json_encode(array("access_token" => $USER->getSetting("fb_access_token", false), "message" => $text,"page" => array())),
+				"value" => json_encode(array("access_token" => $USER->getSetting("fb_access_token", false), "message" => $fbtext,"page" => array())),
 				"validators" => array(
 					array("ValRequired"),
 					array("ValFacebookPost")),
