@@ -15,7 +15,7 @@ require_once("obj/Form.obj.php");
 require_once("obj/FormItem.obj.php");
 require_once("obj/FormBrandTheme.obj.php");
 require_once("obj/FormUserItems.obj.php");
-require_once("obj/facebook.php");
+require_once("inc/facebook.php");
 require_once("obj/FacebookAuth.fi.php");
 require_once("inc/facebook.inc.php");
 

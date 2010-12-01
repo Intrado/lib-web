@@ -48,7 +48,7 @@ require_once("obj/ValTimeWindowCallEarly.val.php");
 require_once("obj/ValTimeWindowCallLate.val.php");
 require_once("obj/ValMessageBody.val.php");
 require_once("obj/ValNonEmptyMessage.val.php");
-require_once("obj/facebook.php");
+require_once("inc/facebook.php");
 require_once("inc/facebook.inc.php");
 require_once("obj/FacebookPost.fi.php");
 require_once("obj/ValFacebookPost.val.php");
