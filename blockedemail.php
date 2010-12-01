@@ -33,6 +33,19 @@ if (isset($_GET['delete'])) {
 	redirect();
 }
 
+// add columns to display contact details
+if (isset($_GET['displaycontact']) && $_GET['displaycontact'] == 'true')
+	$shoulddisplaycontact = true;
+else
+	$shoulddisplaycontact = false;
+
+// if csv download, else html
+if (isset($_GET['csv']) && $_GET['csv'])
+	$csv = true;
+else
+	$csv = false;
+
+	
 $form = "blockedemail";
 $section = "main";
 $reloadform = false;
@@ -94,16 +107,78 @@ if( $reloadform )
 }
 
 
+$titles = array(
+			"4" => '#Email Address',
+			"5" => '#Reason for Blocking',
+			"6" => '#Blocked by',
+			"11" => 'Blocked on'); // date sort does not work with paging
+
+if ($ACCESS->getValue('callblockingperms') == 'editall' || $ACCESS->getValue('callblockingperms') == 'addonly') {
+	$titles = $titles + array("7" => 'Actions');
+}
+
+$formatters = array(
+			"4" => 'fmt_email',
+			"6" => 'fmt_blockedby',
+			"7" => 'fmt_blocking_actions',
+			"1" => 'fmt_persontip');
+
+if ($shoulddisplaycontact) {
+	$personfields = array(
+		"1" => _L("ID #"),
+		"2" => _L("First Name"),
+		"3" => _L("Last Name"));
+	$titles = $personfields + $titles; // prepend the person fields, keeping the indecies in place
+	
+	// must have pid index 0, pkey index 1, for fmt_persontip to work
+	$result = Query(
+		"select p.id, p.pkey, p.f01, p.f02,
+			b.destination, b.description, CONCAT(u.firstname, ' ', u.lastname) as fullname, b.id, b.userid, '" .
+			$ACCESS->getValue('callblockingperms') . "' as permission, b.type, b.createdate, b.failattempts, b.blockmethod 
+		from blockeddestination b
+		join user u on (u.id = b.userid)
+		left join email e on (e.email = b.destination)
+		left join person p on (p.id = e.personid)
+		where b.userid = u.id and b.type = 'email'
+		and b.blockmethod in ('autoblock', 'manual')
+		order by createdate desc");
+			
+} else {
+	// must stub in dummy contact details for pid and pkey index order, if we do the same query with person details we get duplicate rows when multiple people share a phone
+	$result = Query(
+		"select 'pid', 'pkey', 'f01', 'f02', b.destination, b.description, CONCAT(u.firstname, ' ', u.lastname) as fullname, b.id, b.userid, '" .
+			$ACCESS->getValue('callblockingperms') . "' as permission, b.type, b.createdate, b.failattempts, b.blockmethod
+			from blockeddestination b
+			join user u on (b.userid = u.id)
+			where b.userid = u.id and b.type = 'email'
+			and b.blockmethod in ('autoblock', 'manual')
+			order by createdate desc");
+}
+		
+$data = array();
+while ($row = DBGetRow($result)) {
+	$data[] = $row;
+}
+
+///////////////////////////////
+// Functions
+//////////////////////////////
+
 function fmt_blocking_actions($row, $index) {
-	global $USER;
+	global $USER, $shoulddisplaycontact;
 	$id = $row[$index];
 	$ownerid = $row[$index + 1];
 	$perm = $row[$index + 2];
 
+	if ($shoulddisplaycontact)
+		$displaytruefalse = "true";
+	else
+		$displaytruefalse = "false";
+	
 	// Only show the delete link in 'addonly' mode for blocked calls created by this user
 	if ($perm == 'editall' ||
 		($perm == 'addonly' && $USER->id == $ownerid)) {
-		return action_links(action_link(_L("Delete"),"cross","blockedemail.php?delete=$id","return confirmDelete();"));
+		return action_links(action_link(_L("Delete"),"cross","blockedemail.php?delete=$id&displaycontact=$displaytruefalse","return confirmDelete();"));
 	} else {
 		return '';
 	}
@@ -120,7 +195,53 @@ function fmt_blockedby($row, $index) {
 ////////////////////////////////////////////////////////////////////////////////
 // Display
 ////////////////////////////////////////////////////////////////////////////////
+if ($csv) {
+	
+	$titles = array(
+			"4" => 'Email Address',
+			"5" => 'Reason for Blocking',
+			"6" => 'Blocked by',
+			"11" => 'Blocked on');
 
+	if ($shoulddisplaycontact) {
+		$personfields = array(
+			"1" => _L("ID #"),
+			"2" => _L("First Name"),
+			"3" => _L("Last Name"));
+		$titles = $personfields + $titles; // prepend the person fields, keeping the indecies in place
+	}
+	
+	header("Pragma: private");
+	header("Cache-Control: private");
+	header("Content-disposition: attachment; filename=blockedphone.csv");
+	header("Content-type: application/vnd.ms-excel");
+
+	session_write_close();//WARNING: we don't keep a lock on the session file, any changes to session data are ignored past this point
+	
+	// write column titles
+	echo '"' . implode('","', $titles) . '"';
+	echo "\r\n";
+	
+	// write out the rows of data
+	foreach ($data as $row) {
+		// [6] blocked by
+		if ($row[6])
+			$row[6] = $row[6];
+		else if ($row[9] == "autoblock")
+			$row[6] = "Auto-Blocked";
+		else
+			$row[6] = "Recipient";
+		
+		if ($shoulddisplaycontact)
+			$displaydata = array($row[1], $row[2], $row[3], $row[4], $row[5], $row[6], $row[11]);
+		else
+			$displaydata = array($row[4], $row[5], $row[6], $row[11]);
+		
+		echo '"' . implode('","', $displaydata) . '"';
+		echo "\r\n";
+	}
+	
+} else { // HTML view
 $PAGE = "system:blocked";
 $TITLE = "Blocked List";
 
@@ -128,49 +249,36 @@ include_once("nav.inc.php");
 
 NewForm($form);
 startWindow(_L('Systemwide Blocked Email') , 'padding: 3px;', false, true);
-if ($ACCESS->getValue('callblockingperms') == 'addonly' || $ACCESS->getValue('callblockingperms') == 'editall') {
 ?>
 	<table style="margin-top: 5px;" border="0" cellpadding="0" cellspacing="0">
+<?
+if ($ACCESS->getValue('callblockingperms') == 'addonly' || $ACCESS->getValue('callblockingperms') == 'editall') {
+?>
 		<tr>
 			<td>Email: <? NewFormItem($form, $section, 'email', 'text',20,200); ?>&nbsp;&nbsp;</td>
 			<td>Reason: <? NewFormItem($form, $section, 'reason', 'text',30,100); ?>&nbsp;&nbsp;</td>
 			<td><?= submit($form, $section, 'Add'); ?></td>
 		</tr>
+<? 
+}
+?>
+		<tr>
+			<td>
+			<input type='checkbox' id='checkboxDisplayContact' onclick='location.href="?displaycontact=" + this.checked' <?=$shoulddisplaycontact ? 'checked' : ''?>><label for='checkboxDisplayContact'><?=_L('Display Contacts')?></label> 
+			</td>
+<?
+if (!($ACCESS->getValue('callblockingperms') == 'addonly' || $ACCESS->getValue('callblockingperms') == 'editall')) {
+?>
+			<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
+<? 
+}
+?>
+			<td>
+			<a href='blockedemail.php?csv=true&displaycontact=<?= $shoulddisplaycontact ? "true" : "false" ?>'><?= _L("CSV Download"); ?></a>
+			</td>
+		</tr>
 	</table>
 <?
-} // End if
-
-if ($ACCESS->getValue('callblockingperms') == 'editall' || $ACCESS->getValue('callblockingperms') == 'addonly') {
-	$titles = array(
-				"0" => '#Email Address',
-				"1" => '#Reason for Blocking',
-				"2" => '#Blocked by',
-				"7" => 'Blocked on',
-				"3" => 'Actions');
-} else {
-	$titles = array(
-				"0" => '#Email Address',
-				"1" => '#Reason for Blocking',
-				"2" => '#Blocked by');
-}
-
-$formatters = array(
-				"0" => 'fmt_email',
-				"2" => 'fmt_blockedby',
-				"3" => 'fmt_blocking_actions');
-
-$result = Query(
-		"select b.destination, b.description, CONCAT(u.firstname, ' ', u.lastname) as fullname, b.id, b.userid, '" .
-			$ACCESS->getValue('callblockingperms') . "' as permission, b.type, b.createdate, b.failattempts, b.blockmethod
-			from blockeddestination b
-			left join user u on (b.userid = u.id)
-			where b.type = 'email'
-			and b.blockmethod in ('autoblock', 'manual')
-			order by b.id desc");
-$data=array();
-while ($row = DBGetRow($result)) {
-	$data[] = $row;
-}
 
 echo '<table width="100%" cellpadding="3" cellspacing="1" class="list sortable" id="blocked_numbers">';
 showTable($data, $titles, $formatters);
@@ -180,5 +288,5 @@ endWindow();
 EndForm();
 
 include_once("navbottom.inc.php");
-
+}
 ?>
