@@ -105,17 +105,27 @@ if( $reloadform )
 	PutFormData($form, $section,"type", "both", "text");
 }
 
+// add columns to display contact details
+if (isset($_GET['displaycontact']) && $_GET['displaycontact'] == 'true')
+	$shoulddisplaycontact = true;
+else
+	$shoulddisplaycontact = false;
 
 function fmt_blocking_actions($row, $index) {
-	global $USER;
+	global $USER, $shoulddisplaycontact;
 	$id = $row[$index];
 	$ownerid = $row[$index + 1];
 	$perm = $row[$index + 2];
+	
+	if ($shoulddisplaycontact)
+		$displaytruefalse = "true";
+	else
+		$displaytruefalse = "false";
 
 	// Only show the delete link in 'addonly' mode for blocked calls created by this user
 	if ($perm == 'editall' ||
 		($perm == 'addonly' && $USER->id == $ownerid)) {
-		return action_links(action_link(_L("Delete"),"cross","blockedphone.php?delete=$id","return confirmDelete();"));
+		return action_links(action_link(_L("Delete"),"cross","blockedphone.php?delete=$id&displaycontact=$displaytruefalse","return confirmDelete();"));
 	} else {
 		return '';
 	}
@@ -163,38 +173,80 @@ if ($ACCESS->getValue('callblockingperms') == 'addonly' || $ACCESS->getValue('ca
 			<td><?= submit($form, $section, 'Add'); ?></td>
 			<td><? print help('Blocked_Add', 'style="margin-left: 5px;"'); ?></td>
 		</tr>
+		<tr>
+			<td>
+			<input type='checkbox' id='checkboxDisplayContact' onclick='location.href="?displaycontact=" + this.checked' <?=$shoulddisplaycontact ? 'checked' : ''?>><label for='checkboxDisplayContact'><?=_L('Display Contacts')?></label> 
+			</td>
+		</tr>
 	</table>
 <?
 } // End if
 
+$formatters = array(
+				"10" => "fmt_bntype",
+				"4" => 'fmt_phone',
+				"7" => 'fmt_blocking_actions',
+				"1" => 'fmt_persontip');
+
 if ($ACCESS->getValue('callblockingperms') == 'editall' || $ACCESS->getValue('callblockingperms') == 'addonly') {
 	$titles = array(
-				"0" => '#Phone Number',
-				"6" => "#Type",
-				"1" => '#Reason for Blocking',
-				"2" => '#Blocked by',
-				"7" => 'Blocked on',
-				"3" => 'Actions');
+				"4" => '#Phone Number',
+				"10" => "#Type",
+				"5" => '#Reason for Blocking',
+				"6" => '#Blocked by',
+				"11" => 'Blocked on',
+				"7" => 'Actions');
 } else {
 	$titles = array(
-				"0" => '#Phone Number',
-				"6" => "#Type",
-				"1" => '#Reason for Blocking',
-				"2" => '#Blocked by');
+				"4" => '#Phone Number',
+				"10" => "#Type",
+				"5" => '#Reason for Blocking',
+				"6" => '#Blocked by');
 }
 
-$formatters = array(
-				"6" => "fmt_bntype",
-				"0" => 'fmt_phone',
-				"3" => 'fmt_blocking_actions');
-
-$result = Query(
-		"select b.destination, b.description, CONCAT(u.firstname, ' ', u.lastname) as fullname, b.id, b.userid, '" .
+if ($shoulddisplaycontact) {
+	$personfields = array(
+				"1" => _L("ID #"),
+				"2" => _L("First Name"),
+				"3" => _L("Last Name"));
+	$titles = $personfields + $titles; // prepend the person fields, keeping the indecies in place
+	
+	// must have pid index 0, pkey index 1, for fmt_persontip to work
+	$result = Query(
+		"(select p.id, p.pkey, p.f01, p.f02,
+			b.destination, b.description, CONCAT(u.firstname, ' ', u.lastname) as fullname, b.id, b.userid, '" .
+			$ACCESS->getValue('callblockingperms') . "' as permission, b.type, b.createdate 
+		from blockeddestination b
+		join user u on (u.id = b.userid)
+		left join phone ph on (ph.phone = b.destination)
+		left join person p on (p.id = ph.personid)
+		where b.userid = u.id
+			and b.type = 'phone'
+		)
+		union
+		(select p.id, p.pkey, p.f01, p.f02,
+			b.destination, b.description, CONCAT(u.firstname, ' ', u.lastname) as fullname, b.id, b.userid, '" .
+			$ACCESS->getValue('callblockingperms') . "' as permission, b.type, b.createdate 
+		from blockeddestination b
+		join user u on (u.id = b.userid)
+		left join sms s on (s.sms = b.destination)
+		left join person p on (p.id = s.personid)
+		where b.userid = u.id
+			and b.type = 'sms'
+		)
+		order by createdate desc, type");
+	
+} else {
+	// must stub in dummy contact details for pid and pkey index order, if we do the same query with person details we get duplicate rows when multiple people share a phone
+	$result = Query(
+		"select 'pid', 'pkey', 'f01', 'f02', b.destination, b.description, CONCAT(u.firstname, ' ', u.lastname) as fullname, b.id, b.userid, '" .
 			$ACCESS->getValue('callblockingperms') . "' as permission, b.type, b.createdate
 			from blockeddestination b, user u
 			where b.userid = u.id
 			and b.type in ('phone', 'sms')
 			order by b.id desc");
+}
+
 $data=array();
 while ($row = DBGetRow($result)) {
 	$data[] = $row;
