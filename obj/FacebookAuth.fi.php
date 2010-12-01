@@ -27,7 +27,7 @@ class FacebookAuth extends FormItem {
 		$str .= '<div id="'. $n. 'fbgreeting">'. _L("You are currently connected to Facebook."). '</div>';
 		
 		// button to remove access_token
-		$str .= button("Disconnect this Facebook Account", "handleFbLoginAuthResponse('".$n."', null)");
+		$str .= icon_button("Disconnect this Facebook Account", "facebook" ,"handleFbLoginAuthResponse('".$n."', null)");
 		
 		$str .= "</div>";
 		
@@ -36,7 +36,7 @@ class FacebookAuth extends FormItem {
 		
 		// Do facebook login to get good auth token
 		$perms = "publish_stream,offline_access,manage_pages";
-		$str .= button("Connect to Facebook", 
+		$str .= icon_button("Connect to Facebook", "facebook", 
 			"try { 
 				FB.login(handleFbLoginAuthResponse.curry('$n'), {perms: '$perms'});
 			} catch (e) { 

@@ -35,7 +35,7 @@ class FacebookPost extends FormItem {
 		// show connect button div
 		$str .= '<div id="'. $n. 'fbconnect" style="'. (($validtoken)? "display:none;": ""). '">';
 		$perms = "publish_stream,offline_access,manage_pages";
-		$str .= button("Connect to Facebook", 
+		$str .= icon_button("Connect to Facebook", "facebook", 
 			"try { 
 				FB.login(handleFbLoginPagesResponse.curry('$n'), {perms: '$perms'});
 			} catch (e) { 
