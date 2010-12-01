@@ -106,9 +106,10 @@ class FacebookPost extends FormItem {
 				}
 		
 				// when the page is changed, update the pageid and access_token used to post to it
-				function handleFbPageChange(formitem, element) {
-					element = $(element);
+				function handleFbPageChange(formitem, event) {
+					element = $(event.element());
 					
+					// get the value of the checked box and store it in the hidden form item
 					var val = $(formitem).value.evalJSON();
 					var pageinfo = element.value.evalJSON();
 					var pages = $H(val.page);
@@ -134,18 +135,25 @@ class FacebookPost extends FormItem {
 						
 						// get user pages
 						FB.api("/me/accounts", { access_token: val.access_token, type: "page" }, function(res) {
-							if (res.data != undefined) {
+							if (res.data !== undefined) {
 								$(container).update();
 								// populate pages selection
 								$(container).insert(
 										new Element("input", { 
 											type: "checkbox", 
-											value: Object.toJSON({ id: "me", access_token: val.access_token }), 
+											value: Object.toJSON({ id: "me", "access_token": val.access_token }), 
 											name: "me",
-											onchange: "handleFbPageChange(\'"+formitem+"\', this);",
-											checked: ((pages.get("me"))?true:false) })
+											checked: ((pages.get("me"))?true:false) }
+										).observe(
+											"change",handleFbPageChange.curry(formitem)
+										).observe(
+											"click",handleFbPageChange.curry(formitem)
+										).observe(
+											"blur",handleFbPageChange.curry(formitem)
+										).observe(
+											"focus",handleFbPageChange.curry(formitem))
 									).insert(
-										new Element("label", { for: "me" }).insert("'. escapehtml(_L('My Wall')). '")
+										new Element("label", { "for": "me" }).insert("'. escapehtml(_L('My Wall')). '")
 									).insert(
 										new Element("br")
 								);
@@ -156,10 +164,17 @@ class FacebookPost extends FormItem {
 												type: "checkbox", 
 												value: val, 
 												name: account.id,
-												onchange: "handleFbPageChange(\'"+formitem+"\', this);",
-												checked: ((pages.get(account.id))?true:false) })
+												checked: ((pages.get(account.id))?true:false) }
+											).observe(
+												"change",handleFbPageChange.curry(formitem)
+											).observe(
+												"click",handleFbPageChange.curry(formitem)
+											).observe(
+												"blur",handleFbPageChange.curry(formitem)
+											).observe(
+												"focus",handleFbPageChange.curry(formitem))
 										).insert(
-											new Element("label", { for: account.id }).insert(account.name)
+											new Element("label", { "for": account.id }).insert(account.name)
 										).insert(
 											new Element("br")
 									);
