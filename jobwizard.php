@@ -106,11 +106,6 @@ $wizdata = array(
 	))
 );
 
-function getSmsMessageLinkText() {
-	// Redialer will append the URL with link code, and if has callback the inbound number, HELP 4 info.
-	return getSystemSetting("smscustomername", "SchoolMessenger") . " sent a msg. ";
-}
-
 class FinishJobWizard extends WizFinish {
 	function finish ($postdata) {
 		// If the job has not ben confirmed, don't try to process the data.
