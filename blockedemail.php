@@ -33,14 +33,19 @@ if (isset($_GET['delete'])) {
 	redirect();
 }
 
-// add columns to display contact details
-if (isset($_GET['displaycontact']) && $_GET['displaycontact'] == 'true')
-	$shoulddisplaycontact = true;
+// should add columns to display contact details?
+if (isset($_GET['displaycontact'])) {
+	if ($_GET['displaycontact'] == 'true')
+		$_SESSION['shouldblockeddisplaycontact'] = true;
+	else
+		$_SESSION['shouldblockeddisplaycontact'] = false;
+} else if (isset($_SESSION['shouldblockeddisplaycontact']) && $_SESSION['shouldblockeddisplaycontact'] == true)
+	$_SESSION['shouldblockeddisplaycontact'] = true;
 else
-	$shoulddisplaycontact = false;
+	$_SESSION['shouldblockeddisplaycontact'] = false;
 
 // if csv download, else html
-if (isset($_GET['csv']) && $_GET['csv'])
+if (isset($_GET['csv']))
 	$csv = true;
 else
 	$csv = false;
@@ -126,7 +131,7 @@ $formatters = array(
 $start = 0 + (isset($_GET['pagestart']) ? $_GET['pagestart'] : 0);
 $limit = 500;
 
-if ($shoulddisplaycontact) {
+if ($_SESSION['shouldblockeddisplaycontact']) {
 	$personfields = array(
 		"1" => _L("ID #"),
 		"2" => _L("First Name"),
@@ -162,20 +167,15 @@ if ($shoulddisplaycontact) {
 //////////////////////////////
 
 function fmt_blocking_actions($row, $index) {
-	global $USER, $shoulddisplaycontact;
+	global $USER;
 	$id = $row[$index];
 	$ownerid = $row[$index + 1];
 	$perm = $row[$index + 2];
 
-	if ($shoulddisplaycontact)
-		$displaytruefalse = "true";
-	else
-		$displaytruefalse = "false";
-	
 	// Only show the delete link in 'addonly' mode for blocked calls created by this user
 	if ($perm == 'editall' ||
 		($perm == 'addonly' && $USER->id == $ownerid)) {
-		return action_links(action_link(_L("Delete"),"cross","blockedemail.php?delete=$id&displaycontact=$displaytruefalse","return confirmDelete();"));
+		return action_links(action_link(_L("Delete"),"cross","blockedemail.php?delete=$id","return confirmDelete();"));
 	} else {
 		return '';
 	}
@@ -200,7 +200,7 @@ if ($csv) {
 			"6" => 'Blocked by',
 			"11" => 'Blocked on');
 
-	if ($shoulddisplaycontact) {
+	if ($_SESSION['shouldblockeddisplaycontact']) {
 		$personfields = array(
 			"1" => _L("ID #"),
 			"2" => _L("First Name"),
@@ -235,7 +235,7 @@ if ($csv) {
 			else
 				$row[6] = "Recipient";
 		
-			if ($shoulddisplaycontact)
+			if ($_SESSION['shouldblockeddisplaycontact'])
 				$displaydata = array($row[1], $row[2], $row[3], $row[4], $row[5], $row[6], $row[11]);
 			else
 				$displaydata = array($row[4], $row[5], $row[6], $row[11]);
@@ -275,7 +275,7 @@ if ($ACCESS->getValue('callblockingperms') == 'addonly' || $ACCESS->getValue('ca
 ?>
 		<tr>
 			<td>
-			<input type='checkbox' id='checkboxDisplayContact' onclick='location.href="?displaycontact=" + this.checked + "&pagestart=" + "<? echo($start); ?>"' <?=$shoulddisplaycontact ? 'checked' : ''?>><label for='checkboxDisplayContact'><?=_L('Display Contacts')?></label> 
+			<input type='checkbox' id='checkboxDisplayContact' onclick='location.href="?displaycontact=" + this.checked + "&pagestart=" + "<? echo($start); ?>"' <?=$_SESSION['shouldblockeddisplaycontact'] ? 'checked' : ''?>><label for='checkboxDisplayContact'><?=_L('Display Contacts')?></label> 
 			</td>
 <?
 if (!($ACCESS->getValue('callblockingperms') == 'addonly' || $ACCESS->getValue('callblockingperms') == 'editall')) {
@@ -285,17 +285,17 @@ if (!($ACCESS->getValue('callblockingperms') == 'addonly' || $ACCESS->getValue('
 }
 ?>
 			<td>
-			<a href='blockedemail.php?csv=true&displaycontact=<?= $shoulddisplaycontact ? "true" : "false" ?>'><?= _L("CSV Download"); ?></a>
+			<a href='blockedemail.php?csv'><?= _L("CSV Download"); ?></a>
 			</td>
 		</tr>
 	</table>
 <?
 
-showPageMenu($total, $start, $limit, $shoulddisplaycontact ? "&displaycontact=true" : "&displaycontact=false");
+showPageMenu($total, $start, $limit);
 echo '<table width="100%" cellpadding="3" cellspacing="1" class="list sortable" id="blocked_numbers">';
 showTable($data, $titles, $formatters);
 echo "\n</table>";
-showPageMenu($total, $start, $limit, $shoulddisplaycontact ? "&displaycontact=true" : "&displaycontact=false");
+showPageMenu($total, $start, $limit);
 
 endWindow();
 EndForm();
