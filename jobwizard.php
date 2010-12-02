@@ -479,7 +479,7 @@ class FinishJobWizard extends WizFinish {
 		}
 		
 		// save the Facebook access token if it exists
-		if ($fbdata->access_token) {
+		if ($fbdata->access_token)
 			$USER->setSetting("fb_access_token", $fbdata->access_token);
 		
 		$_SESSION['wizard_job']['submitted_jobid'] = $job->id;
