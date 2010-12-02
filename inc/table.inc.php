@@ -173,14 +173,14 @@ function endWindow() {
 
 
 
-function showPageMenu ($total,$start, $perpage, $link = NULL) {
+function showPageMenu ($total, $start, $perpage, $params = "") {
 	$numpages = ceil($total/$perpage);
 	$curpage = ceil($start/$perpage) + 1;
 
 	$displayend = ($start + $perpage) > $total ? $total : ($start + $perpage);
 	$displaystart = ($total) ? $start +1 : 0;
 ?>
-<div class="pagenav" style="text-align:right;"> Showing <?= $displaystart ?>-<?= $displayend ?> of <?= $total ?> records<span class='noprint'> on <?= $numpages ?> pages</span>. <select class='noprint' onchange="location.href='?pagestart=' + this.value;">
+<div class="pagenav" style="text-align:right;"> Showing <?= $displaystart ?>-<?= $displayend ?> of <?= $total ?> records<span class='noprint'> on <?= $numpages ?> pages</span>. <select class='noprint' onchange='location.href="?pagestart=" + this.value + "<? echo($params); ?>"'>
 <?
 	for ($x = 0; $x < $numpages; $x++) {
 		$offset = $x * $perpage;
