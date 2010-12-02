@@ -125,6 +125,9 @@ $formatters = array(
 	"7" => 'fmt_blocking_actions',
 	"1" => 'fmt_persontip');
 
+$start = 0 + (isset($_GET['pagestart']) ? $_GET['pagestart'] : 0);
+$limit = 500;
+
 $titles = array(
 	"4" => '#Phone Number',
 	"10" => "#Type",
@@ -144,8 +147,7 @@ if ($shoulddisplaycontact) {
 	$titles = $personfields + $titles; // prepend the person fields, keeping the indecies in place
 	
 	// must have pid index 0, pkey index 1, for fmt_persontip to work
-	$result = Query(
-		"(select p.id, p.pkey, p.f01, p.f02,
+	$dataquery = "(select SQL_CALC_FOUND_ROWS p.id, p.pkey, p.f01, p.f02,
 			b.destination, b.description, CONCAT(u.firstname, ' ', u.lastname) as fullname, b.id, b.userid, '" .
 			$ACCESS->getValue('callblockingperms') . "' as permission, b.type, b.createdate 
 		from blockeddestination b
@@ -164,22 +166,16 @@ if ($shoulddisplaycontact) {
 		left join person p on (p.id = s.personid)
 		where b.userid = u.id and b.type = 'sms'
 		)
-		order by createdate desc, type");
+		order by createdate desc, type";
 	
 } else {
 	// must stub in dummy contact details for pid and pkey index order, if we do the same query with person details we get duplicate rows when multiple people share a phone
-	$result = Query(
-		"select 'pid', 'pkey', 'f01', 'f02', b.destination, b.description, CONCAT(u.firstname, ' ', u.lastname) as fullname, b.id, b.userid, '" .
+	$dataquery = "select SQL_CALC_FOUND_ROWS 'pid', 'pkey', 'f01', 'f02', b.destination, b.description, CONCAT(u.firstname, ' ', u.lastname) as fullname, b.id, b.userid, '" .
 			$ACCESS->getValue('callblockingperms') . "' as permission, b.type, b.createdate
 			from blockeddestination b
 			join user u on (u.id = b.userid) 
 			where b.userid = u.id and b.type in ('phone', 'sms')
-			order by createdate desc, type");
-}
-
-$data = array();
-while ($row = DBGetRow($result)) {
-	$data[] = $row;
+			order by createdate desc, type";
 }
 
 //////////////////////////////////
@@ -243,31 +239,44 @@ if ($csv) {
 	// write column titles
 	echo '"' . implode('","', $titles) . '"';
 	echo "\r\n";
+
+	$limit = 1000;
+	$start = 0;
+	$data = QuickQueryMultiRow($dataquery .  " limit $start, $limit");
 	
-	// write out the rows of data
-	foreach ($data as $row) {
-		// [10] type
-		if ($row[10]) {
-			if ($row[10] == "sms")
-				$row[10] = "Text Messages";
-			else
-				$row[10] = "Phone Calls";
-		}
-		// [4] destination number
-		if ($row[4]) {
-			$row[4] = Phone::format($row[4]);
-		}
-		
-		if ($shoulddisplaycontact)
-			$displaydata = array($row[1], $row[2], $row[3], $row[4], $row[10], $row[5], $row[6], $row[11]);
+	while (count($data) > 0) {
+	
+		// write out the rows of data
+		foreach ($data as $row) {
+			// 	[10] type
+			if ($row[10]) {
+				if ($row[10] == "sms")
+					$row[10] = "Text Messages";
 				else
-			$displaydata = array($row[4], $row[10], $row[5], $row[6], $row[11]);
+					$row[10] = "Phone Calls";
+			}
+			// [4] destination number
+			if ($row[4]) {
+				$row[4] = Phone::format($row[4]);
+			}
 		
-		echo '"' . implode('","', $displaydata) . '"';
-		echo "\r\n";
+			if ($shoulddisplaycontact)
+				$displaydata = array($row[1], $row[2], $row[3], $row[4], $row[10], $row[5], $row[6], $row[11]);
+					else
+				$displaydata = array($row[4], $row[10], $row[5], $row[6], $row[11]);
+		
+			echo '"' . implode('","', $displaydata) . '"';
+			echo "\r\n";
+		}
+		
+		$start += $limit;
+		$data = QuickQueryMultiRow($dataquery .  " limit $start, $limit");
 	}
 	
 } else { // HTML view
+
+$data = QuickQueryMultiRow($dataquery .  " limit $start, $limit");
+$total = QuickQuery("select FOUND_ROWS()");
 	
 $PAGE = "system:blocked";
 $TITLE = "Blocked List";
@@ -308,7 +317,7 @@ if ($ACCESS->getValue('callblockingperms') == 'addonly' || $ACCESS->getValue('ca
 
 		<tr>
 			<td>
-			<input type='checkbox' id='checkboxDisplayContact' onclick='location.href="?displaycontact=" + this.checked' <?=$shoulddisplaycontact ? 'checked' : ''?>><label for='checkboxDisplayContact'><?=_L('Display Contacts')?></label> 
+			<input type='checkbox' id='checkboxDisplayContact' onclick='location.href="?displaycontact=" + this.checked + "&pagestart=" + "<? echo($start); ?>"' <?=$shoulddisplaycontact ? 'checked' : ''?>><label for='checkboxDisplayContact'><?=_L('Display Contacts')?></label> 
 			</td>
 <?
 if (!($ACCESS->getValue('callblockingperms') == 'addonly' || $ACCESS->getValue('callblockingperms') == 'editall')) {
@@ -324,9 +333,11 @@ if (!($ACCESS->getValue('callblockingperms') == 'addonly' || $ACCESS->getValue('
 	</table>
 <?
 
+showPageMenu($total, $start, $limit, $shoulddisplaycontact ? "&displaycontact=true" : "&displaycontact=false");
 echo '<table width="100%" cellpadding="3" cellspacing="1" class="list sortable" id="blocked_numbers">';
 showTable($data, $titles, $formatters);
 echo "\n</table>";
+showPageMenu($total, $start, $limit, $shoulddisplaycontact ? "&displaycontact=true" : "&displaycontact=false");
 
 endWindow();
 EndForm();
