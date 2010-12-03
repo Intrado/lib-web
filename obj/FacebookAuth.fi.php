@@ -1,5 +1,5 @@
 <?
-// get access token and pageid for facebook posting
+// get offline access token for facebook posting
 
 class FacebookAuth extends FormItem {
 	function render ($value) {
@@ -17,22 +17,23 @@ class FacebookAuth extends FormItem {
 		}
 		
 		// main details div
-		$str .= '<div id="'. $n. 'fbdetails" style="padding-left: 5px;">';
+		$str .= '<div id="'. $n. 'fbdetails" style="border: 1px dotted grey; padding: 5px;">';
 		
 		// facebook js api loads into this div
 		$str .= '<div id="fb-root"></div>';
 		
 		// connected options div
-		$str .= '<div id="'. $n. 'fbconnected" style="float: left;'. (($validtoken)? "": "display:none;"). '">';
-		$str .= '<div id="'. $n. 'fbgreeting">'. _L("You are currently connected to Facebook."). '</div>';
+		$str .= '<div id="'. $n. 'fbconnected" style="'. (($validtoken)? "": "display:none;"). '">';
+		
+		$str .= '<div id="'. $n. 'fbuser"></div>';
 		
 		// button to remove access_token
 		$str .= icon_button("Disconnect this Facebook Account", "facebook" ,"handleFbLoginAuthResponse('".$n."', null)");
 		
-		$str .= "</div>";
+		$str .= '<div style="clear: both"></div></div>';
 		
 		// disconnected options div
-		$str .= '<div id="'. $n. 'fbdisconnected" style="float: left;'. (($validtoken)? "display:none;": ""). '">';
+		$str .= '<div id="'. $n. 'fbdisconnected" style="'. (($validtoken)? "display:none;": ""). '">';
 		
 		// Do facebook login to get good auth token
 		$perms = "publish_stream,offline_access,manage_pages";
@@ -43,13 +44,16 @@ class FacebookAuth extends FormItem {
 				alert('". _L("Could not connect to Facebook")."'); 
 			}");
 			
-		$str .= '</div></div>';
+		$str .= '<div style="clear: both"></div></div></div>';
 		
 		$str .= '<script type="text/javascript">
 		
 				// Facebook javascript API initialization, pulled from facebook documentation
 				window.fbAsyncInit = function() {
 					FB.init({appId: "'. $SETTINGS['facebook']['appid']. '", status: true, cookie: false, xfbml: true});
+					
+					// after init, load the user data
+					fbLoadUserData("'.$n.'");
 				};
 				(function() {
 					var e = document.createElement("script");
@@ -69,21 +73,45 @@ class FacebookAuth extends FormItem {
 						}
 					}
 					
+					// store access_token value
+					var val = $(formitem).value;
+					val = access_token;
+					$(formitem).value = val;
+					
 					// if we have an access token. display the pages selection
 					if (access_token) {
 						$(formitem + "fbconnected").setStyle({display: "block"});
 						$(formitem + "fbdisconnected").setStyle({display: "none"});
+						fbLoadUserData(formitem);
 					} else {
 						// no access token, show the connect button
 						$(formitem + "fbconnected").setStyle({display: "none"});
 						$(formitem + "fbdisconnected").setStyle({display: "block"});
 					}
 					
-					// store access_token value
-					var val = $(formitem).value;
-					val = access_token;
-					$(formitem).value = val;
+				}
+			
+				function fbLoadUserData(formitem) {
+					element = $(formitem + "fbuser");
+					var access_token = $(formitem).value;
+					element.update(new Element("img", { src: "img/ajax-loader.gif" }));
 					
+					FB.api("/me", { access_token: access_token }, function(r) {
+						var e = new Element("div").insert(
+								new Element("div").setStyle({ float: "left" }).insert(
+									new Element("img", { 
+										src: "https://graph.facebook.com/me/picture?type=square&access_token=" + access_token,
+										width: "48",
+										height: "48" })
+								)
+							).insert(
+								new Element("div").setStyle({ float: "left", padding: "7px" }).insert(
+									new Element("div").setStyle({ "fontWeight": "bold" }).update(r.name)
+								)
+							);
+						
+						element.update(e);
+					});
 				}
 				
 				</script>';
