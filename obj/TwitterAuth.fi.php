@@ -10,21 +10,14 @@ class TwitterAuth extends FormItem {
 		
 		$str = '<input id="'.$n.'" name="'.$n.'" type="hidden" value="'.escapehtml($value).'"/>';
 		
-		// check that the auth token is any good
-		$twitterdata = json_decode($USER->getSetting("tw_access_token", false));
-		$twitter = new Twitter();
-		if ($twitterdata) {
-			$twitter = new Twitter($twitterdata->oauth_token, $twitterdata->oauth_token_secret);
-			$userData = $twitter->getUserData();
-		} else {
-			$userData = false;
-		}
+		// Page should have checked the auth token already and passed true/false
+		$validtoken = $value;
 		
 		// main details div
-		$str .= '<div id="'. $n. 'twdetails" style="border: 1px dotted grey; padding: 5px;">';
+		$str .= '<div id="'. $n. 'twdetails">';
 		
 		// connected options div
-		$str .= '<div id="'. $n. 'twconnected" style="'. (($userData)? "": "display:none;"). '">';
+		$str .= '<div id="'. $n. 'twconnected" style="border: 1px dotted grey; padding: 5px;'. (($validtoken)? "": "display:none;"). '">';
 		
 		$str .= '<div id="'. $n. 'twuser"></div>';
 		
@@ -34,7 +27,7 @@ class TwitterAuth extends FormItem {
 		$str .= '<div style="clear: both"></div></div>';
 		
 		// disconnected options div
-		$str .= '<div id="'. $n. 'twdisconnected" style="'. (($userData)? "display:none;": ""). '">';
+		$str .= '<div id="'. $n. 'twdisconnected" style="'. (($validtoken)? "display:none;": ""). '">';
 		
 		// Do twitter login to get good auth token
 		$thispage = substr($_SERVER["SCRIPT_NAME"], strrpos($_SERVER["SCRIPT_NAME"], "/") + 1);
@@ -44,7 +37,7 @@ class TwitterAuth extends FormItem {
 		
 		$str .= '<script type="text/javascript">
 		
-			if ('. (($userData)?true:false). ') {
+			if ('. (($validtoken)?"true":"false"). ') {
 				twLoadUserData("'. $n. 'twuser");
 			}
 		

@@ -6,7 +6,7 @@ class ValFacebookPost extends Validator {
 		$fbdata = json_decode($value);
 		
 		// it's ok to not have an access_token, that just means facebook will be "skipped"
-		if (!$fbdata->access_token)
+		if ($fbdata->access_token == "false")
 			return true;
 		
 		// if we have an access token, be sure it's a good one

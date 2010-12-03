@@ -10,20 +10,20 @@ class FacebookAuth extends FormItem {
 		$str = '<input id="'.$n.'" name="'.$n.'" type="hidden" value="'.escapehtml($value).'"/>';
 		
 		// check that the auth token is any good
-		if ($value && fb_hasValidAccessToken($value)) {
+		if ($value !== "false" && fb_hasValidAccessToken($value)) {
 			$validtoken = true;
 		} else {
 			$validtoken = false;
 		}
 		
 		// main details div
-		$str .= '<div id="'. $n. 'fbdetails" style="border: 1px dotted grey; padding: 5px;">';
+		$str .= '<div id="'. $n. 'fbdetails">';
 		
 		// facebook js api loads into this div
 		$str .= '<div id="fb-root"></div>';
 		
 		// connected options div
-		$str .= '<div id="'. $n. 'fbconnected" style="'. (($validtoken)? "": "display:none;"). '">';
+		$str .= '<div id="'. $n. 'fbconnected" style="border: 1px dotted grey; padding: 5px;'. (($validtoken)? "": "display:none;"). '">';
 		
 		$str .= '<div id="'. $n. 'fbuser"></div>';
 		

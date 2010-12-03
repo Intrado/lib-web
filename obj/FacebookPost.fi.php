@@ -21,7 +21,7 @@ class FacebookPost extends FormItem {
 		$str .= '<div id="fb-root"></div>';
 		
 		// check that the auth token is any good
-		if ($fb_data->access_token && fb_hasValidAccessToken($fb_data->access_token)) {
+		if ($fb_data->access_token !== "false" && fb_hasValidAccessToken($fb_data->access_token)) {
 			$validtoken = true;
 		} else {
 			$validtoken = false;

@@ -1841,7 +1841,8 @@ class JobWiz_scheduleOptions extends WizStep {
 		$formdata = array($this->title);
 		
 		// indicate with a note that social media posts can not be scheduled or saved
-		if ($USER->authorize("facebookpost") && isset($postdata['/start']['socialmedia']) && $postdata['/start']['socialmedia']) {
+		if (($USER->authorize("facebookpost") || $USER->authorize("twitterpost")) && 
+				isset($postdata['/start']['socialmedia']) && $postdata['/start']['socialmedia']) {
 			
 			$html = "<div>". escapehtml(_L("Social Media posting happens immediatly on job submit. Reguardless of scheduling options.")). "<br>". 
 				escapehtml(_L("Posts may not be Saved for later. They will be discarded if \"Save for Later\" option is selected.")). "</div>";

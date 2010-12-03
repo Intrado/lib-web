@@ -395,12 +395,26 @@ if ($USER->authorize('facebookpost')) {
 		"helpstep" => 4
 	);
 }
+
 if ($USER->authorize('twitterpost')) {
+
+	$twitterdata = json_decode($USER->getSetting("tw_access_token", false));
+	$twValidToken = false;
+	if ($twitterdata) {
+		$twitter = new Twitter($twitterdata->oauth_token, $twitterdata->oauth_token_secret);
+		try {
+			$userData = $twitter->getUserData();
+			if ($userData)
+				$twValidToken = true;
+		} catch (Exception $e) {
+			// nothing
+		}
+	}
 	
 	$formdata["twitterauth"] = array(
 		"label" => _L('Twitter Auth'),
 		"fieldhelp" => _L("Authorize this application to tweet to your Twitter status. If you want to authorize a different account, be sure to log out of Twitter first."),
-		"value" => ($USER->getSetting("tw_access_token", false)?true:false),
+		"value" => $twValidToken,
 		"validators" => array(),
 		"control" => array("TwitterAuth"),
 		"helpstep" => 4
