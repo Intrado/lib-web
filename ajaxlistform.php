@@ -95,7 +95,7 @@ function handleRequest() {
 			
 			// CREATE list
 			$list = new PeopleList(null);
-			$list->description = 'JobWizard List ' . date('Y M d, H:i:s', time());
+			$list->description = 'Created in MessageSender';
 			$list->userid = $USER->id;
 			$list->name = _L('Please Add Rules to This List');
 			$list->deleted = 1;
