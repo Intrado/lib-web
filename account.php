@@ -18,6 +18,10 @@ require_once("obj/FormUserItems.obj.php");
 require_once("inc/facebook.php");
 require_once("obj/FacebookAuth.fi.php");
 require_once("inc/facebook.inc.php");
+require_once("obj/TwitterAuth.fi.php");
+require_once("inc/twitteroauth/OAuth.php");
+require_once("inc/twitteroauth/twitteroauth.php");
+require_once("obj/Twitter.obj.php");
 
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization
@@ -45,6 +49,15 @@ if ($checkpassword) {
 	$securityrules = _L('The username must be at least %1$s characters.  The password cannot be made from your username/firstname/lastname.  It cannot be a dictionary word and it must be at least %2$s characters.  It must contain at least one letter and number', $usernamelength, $passwordlength);
 } else {
 	$securityrules = _L('The username must be at least %1$s characters.  The password cannot be made from your username/firstname/lastname.  It must be at least %2$s characters.  It must contain at least one letter and number', $usernamelength, $passwordlength);
+}
+
+// if oauth_token is set, this is a redirect back from twitter authorization
+if (isset($_GET['oauth_token']) && isset($_GET['oauth_verifier']) && isset($_SESSION['twitterRequestToken'])) {
+	$twitter = new Twitter($_SESSION['twitterRequestToken']['oauth_token'], $_SESSION['twitterRequestToken']['oauth_token_secret']);
+	$twAccessToken = $twitter->getAccessToken($_GET['oauth_verifier']);
+	$USER->setSetting("tw_access_token", json_encode($twAccessToken));
+	unset($_SESSION['twitterRequestToken']);
+	redirect();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -368,11 +381,13 @@ if ($USER->authorize('setcallerid') && !getSystemSetting('_hascallback', false))
 }
 
 // Social Media options
-if ($USER->authorize('facebookpost')) {
+if ($USER->authorize('facebookpost') || $USER->authorize('twitterpost'))
 	$formdata[] = _L('Social Media Options');
 	
+if ($USER->authorize('facebookpost')) {
+	
 	$formdata["facebookauth"] = array(
-		"label" => _L('Facebook Authorization'),
+		"label" => _L('Facebook Auth'),
 		"fieldhelp" => _L("Authorize this application to post into your facebook pages. If you want to authorize a different account, be sure to log out of Facebook first."),
 		"value" => $USER->getSetting("fb_access_token", false),
 		"validators" => array(),
@@ -380,6 +395,18 @@ if ($USER->authorize('facebookpost')) {
 		"helpstep" => 4
 	);
 }
+if ($USER->authorize('twitterpost')) {
+	
+	$formdata["twitterauth"] = array(
+		"label" => _L('Twitter Auth'),
+		"fieldhelp" => _L("Authorize this application to tweet to your Twitter status. If you want to authorize a different account, be sure to log out of Twitter first."),
+		"value" => ($USER->getSetting("tw_access_token", false)?true:false),
+		"validators" => array(),
+		"control" => array("TwitterAuth"),
+		"helpstep" => 4
+	);
+}
+
 
 // Display Defaults
 $formdata[] = _L("Display Settings");
@@ -519,7 +546,12 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		
 		if (isset($postdata["facebookauth"]))
 			$USER->setSetting("fb_access_token", $postdata["facebookauth"]);
-
+			
+		if (isset($postdata["twitterauth"])) {
+			if (!$postdata["twitterauth"] || $postdata["twitterauth"] == "")
+				$USER->setSetting("tw_access_token", false);
+		}
+		
 		Query('COMMIT');
 
 		// TODO, Release 7.2, add notice()

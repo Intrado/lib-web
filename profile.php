@@ -335,6 +335,14 @@ _L('Messaging Options'),
 		"control" => array("CheckBox"),
 		"helpstep" => 4
 	),
+	"twitterpost" => array(
+		"label" => _L('Tweet to Twitter'),
+		"fieldhelp" => _L('Allow users to tweet messages to their Twitter status'),
+		"value" => $obj->getValue("twitterpost"),
+		"validators" => array(),
+		"control" => array("CheckBox"),
+		"helpstep" => 4
+	),
 _L('Advanced Job Options'),
 	"createrepeat" => array(
 		"label" => _L('Create Repeating Jobs'),
@@ -728,6 +736,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 			$obj->setPermission("leavemessage", (bool)$postdata['leavemessage']);
 			$obj->setPermission("messageconfirmation", (bool)$postdata['messageconfirmation']);
 			$obj->setPermission("facebookpost", (bool)$postdata['facebookpost']);
+			$obj->setPermission("twitterpost", (bool)$postdata['twitterpost']);
 
 			if(getSystemSetting("_hasportal", false)) {
 				$obj->setPermission("portalaccess", (bool)$postdata['portalaccess']);
