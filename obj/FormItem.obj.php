@@ -1,5 +1,5 @@
 <?
-//test
+
 abstract class FormItem {
 	var $form;
 	var $name;
