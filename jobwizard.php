@@ -52,6 +52,10 @@ require_once("inc/facebook.php");
 require_once("inc/facebook.inc.php");
 require_once("obj/FacebookPost.fi.php");
 require_once("obj/ValFacebookPost.val.php");
+require_once("obj/TwitterAuth.fi.php");
+require_once("inc/twitteroauth/OAuth.php");
+require_once("inc/twitteroauth/twitteroauth.php");
+require_once("obj/Twitter.obj.php");
 
 // Job step form data
 require_once("inc/jobwizard.inc.php");
@@ -471,6 +475,18 @@ class FinishJobWizard extends WizFinish {
 							// unable to post error
 							error_log("Failed to post to facebook pageid: ". $pageid. " for user: ". $USER->id);
 						}
+					}
+				}
+			}
+			
+			// do twitter tweeting
+			if ($USER->authorize("twitterpost") && isset($postdata["/message/socialmedia"]["twdata"])) {
+				$twitterdata = json_decode($USER->getSetting("tw_access_token", false));
+				if ($twitterdata) {
+					$twitter = new Twitter($twitterdata->oauth_token, $twitterdata->oauth_token_secret);
+					if (!$twitter->tweet($postdata["/message/socialmedia"]["twdata"])) {
+							// unable to post error
+							error_log("Failed to post to twitter for user: ". $USER->id);
 					}
 				}
 			}
