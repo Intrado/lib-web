@@ -1765,7 +1765,7 @@ class JobWiz_socialMedia extends WizStep {
 					"validators" => array(
 						array("ValRequired"),
 						array("ValLength","max"=>140)),
-					"control" => array("TextArea","rows"=>5,"cols"=>35,"counter"=>140),
+					"control" => array("TextArea","rows"=>5,"cols"=>50,"counter"=>140),
 					"helpstep" => $helpstepnum++
 				
 				);
