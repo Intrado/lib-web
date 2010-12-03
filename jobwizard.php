@@ -96,10 +96,11 @@ $wizdata = array(
 		)),
 		"socialmedia" => new JobWiz_socialMedia(_L("Social Media"))
 	)),
-	"schedule" => new WizSection ("Schedule",array(
-		"options" => new JobWiz_scheduleOptions(_L("Schedule Options")),
+	"schedule" => new WizSection ("Options",array(
+		"options" => new JobWiz_scheduleOptions(_L("Job Options")),
 		"date" => new JobWiz_scheduleDate(_L("Schedule Date/Time")),
-		"advanced" => new JobWiz_scheduleAdvanced(_L("Advanced Options"))
+		"advanced" => new JobWiz_scheduleAdvanced(_L("Advanced Options")),
+		"savelists" => new JobWiz_scheduleSaveLists(_L("Save & Review Lists"))
 	)),
 	"submit" => new WizSection ("Confirm",array(
 		"confirm" => new JobWiz_submitConfirm(_L("Review and Confirm"))
@@ -201,7 +202,7 @@ class FinishJobWizard extends WizFinish {
 				// Include this single-person list in the job.
 				$joblists[] = $addmelist->id;
 			}
-		}
+		} //end addme
 
 		$job = Job::jobWithDefaults();
 
@@ -237,7 +238,7 @@ class FinishJobWizard extends WizFinish {
 			$messagegroup = new MessageGroup();
 			$messagegroup->userid = $USER->id;
 			$messagegroup->name = $jobname;
-			$messagegroup->description = "";
+			$messagegroup->description = "Created in MessageSender";
 			$messagegroup->modified = $job->modifydate;
 			$messagegroup->deleted = 1;
 			$messagegroup->create();
@@ -478,6 +479,23 @@ class FinishJobWizard extends WizFinish {
 		// save the Facebook access token if it exists
 		if ($fbdata && $fbdata->access_token)
 			$USER->setSetting("fb_access_token", $fbdata->access_token);
+		
+		//check for saved messages and lists and undelete as appropriate
+		if (JobWiz_scheduleSaveLists::isEnabled($postdata,false)) {
+			foreach ($postdata["/schedule/savelists"]["savelists"] as $savelistid) {
+				$list = new PeopleList($savelistid);
+				if ($list->userid != $USER->id)
+					continue;
+				
+				$list->deleted = 0;
+				$list->update();
+			}
+		}
+		
+		if (isset($postdata["/schedule/options"]["savemessage"]) && $postdata["/schedule/options"]["savemessage"]) {
+			$messagegroup->deleted = 0;
+			$messagegroup->update();
+		}
 		
 		$_SESSION['wizard_job']['submitted_jobid'] = $job->id;
 

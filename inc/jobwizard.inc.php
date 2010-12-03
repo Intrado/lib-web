@@ -238,6 +238,29 @@ function getSchedule($postdata) {
 	return $schedule;
 }
 
+function parseLists ($postdata) {
+	// get the list or lists
+	$joblists = json_decode($postdata["/list"]["listids"]);
+	// Remove temporary 'addme' token from listids. (not a valid listid, obviously)
+	if (($i = array_search('addme', $joblists)) !== false)
+		unset($joblists[$i]);
+	
+	return array_values($joblists); //have to re-key array, pdo explodes if gap in keys
+}
+
+//returns true if some of the lists were created in the wizard
+function someListsAreNew ($postdata) {
+	$joblists = parseLists($postdata);
+		
+	if (count($joblists) == 0)
+		return false;
+	
+	//see if any of the lists are softdeleted, which means they must have been created in the wizard (can't select them otherwise)
+	$query = "select 1 from list where deleted and id in (" . DBParamListString(count($joblists)). ") limit 1";
+	
+	return QuickQuery($query, false, $joblists); 
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 // Custom Form Item Definitions
 ////////////////////////////////////////////////////////////////////////////////
@@ -1724,6 +1747,8 @@ class JobWiz_scheduleOptions extends WizStep {
 		$wizHasPhoneMsg = wizHasPhone($postdata);
 		$wizHasEmailMsg= wizHasEmail($postdata);
 		
+		$helpstepnum = 1;
+		
 		//get the callearly
 		$callearly = date("g:i a");
 		$accessCallearly = $ACCESS->getValue("callearly");
@@ -1768,7 +1793,7 @@ class JobWiz_scheduleOptions extends WizStep {
 				"value" => "",
 				"validators" => array(),
 				"control" => array("FormHtml","html" => $html),
-				"helpstep" => 1
+				"helpstep" => $helpstepnum
 			);
 		}
 		
@@ -1782,7 +1807,7 @@ class JobWiz_scheduleOptions extends WizStep {
 				array("ValInArray", "values" => array_keys($menu))
 			),
 			"control" => array("RadioButton","values"=>$menu),
-			"helpstep" => 1
+			"helpstep" => $helpstepnum
 		);
 
 		if ($wizHasEmailMsg || $wizHasPhoneMsg) {
@@ -1793,9 +1818,36 @@ class JobWiz_scheduleOptions extends WizStep {
 				"value" => "",
 				"validators" => array(),
 				"control" => array("CheckBox"),
-				"helpstep" => 2
+				"helpstep" => ++$helpstepnum
 			);
 		}
+		
+		//add checkbox for reviewing and saving lists if some lists were created in the wizard
+		if (someListsAreNew($postdata)) {
+			$helpsteps[] = _L("Review and optionally save Lists created in the MessageSender.");
+			$formdata["savelists"] = array(
+				"label" => _L("Save & Review Lists"),
+				"fieldhelp" => _L('Check here if you would like to save lists for reuse later.'),
+				"value" => false,
+				"validators" => array(),
+				"control" => array("CheckBox"),
+				"helpstep" => ++$helpstepnum
+			);
+		}
+		//add checkbox for reviewing and saving the message, only show message checkbox if they created the message
+		if (!wizHasMessageGroup($postdata)) {
+			$helpsteps[] = _L("Save your message created in the MessageSender.");
+			$formdata["savemessage"] = array(
+				"label" => _L("Save Message"),
+				"fieldhelp" => _L('Check here if you would like to save your message for reuse later.'),
+				"value" => false,
+				"validators" => array(),
+				"control" => array("CheckBox"),
+				"helpstep" => ++$helpstepnum
+			);
+		}
+		
+		
 
 		return new Form("scheduleOptions",$formdata,$helpsteps);
 	}
@@ -1970,6 +2022,56 @@ class JobWiz_scheduleAdvanced extends WizStep {
 		if (isset($postdata['/schedule/options']['advanced']) && $postdata['/schedule/options']['advanced'] && ($wizHasEmailMsg || $wizHasPhoneMsg))
 			return true;
 		return false;
+	}
+}
+
+
+class JobWiz_scheduleSaveLists extends WizStep {
+	function getForm($postdata, $curstep) {
+		global $USER;
+		global $ACCESS;
+
+		$helpstepnum = 1;
+		$helpsteps = array();
+		
+		$formdata = array($this->title);
+		
+		$joblists = parseLists($postdata);
+		$lists = DBFindMany("PeopleList", "from list where deleted and id in (" . DBParamListString(count($joblists)). ")", false, $joblists);
+		
+		$hover = array();
+		$values = array();
+		foreach ($lists as $list) {
+			$renderedlist = new RenderedList2();
+			$renderedlist->pagelimit = 0;
+			$renderedlist->initWithList($list);
+			$total = $renderedlist->getTotal() + 0;
+			
+			$values[$list->id] = $list->name;
+			$hover[$list->id] = '
+			<table>
+				<tr><th>Name:</th><td>'.escapehtml($list->name).'</td></tr>
+				<tr><th>Total:</th><td>'.$total.'</td></tr>
+			</table>
+			';
+		}
+				
+		$helpsteps[] = _L("TODO");
+		$formdata["savelists"] = array(
+			"label" => _L("Save Lists"),
+			"fieldhelp" => _L('TODO'),
+			"value" => array(),
+			"validators" => array(),
+			"control" => array("MultiCheckBox", "values" => $values, "hover" => $hover),
+			"helpstep" => $helpstepnum
+		);
+		
+		return new Form("scheduleSaveLists",$formdata,$helpsteps);
+	}
+	function isEnabled($postdata, $step) {
+		return isset($postdata['/schedule/options']['savelists']) && 
+			$postdata['/schedule/options']['savelists'] && 
+			someListsAreNew($postdata);
 	}
 }
 
