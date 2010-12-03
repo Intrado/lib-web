@@ -15,7 +15,7 @@ class FacebookPost extends FormItem {
 		$fb_data = json_decode($value);
 		
 		// main details div
-		$str .= '<div id="'. $n. 'fbdetails" style="padding-left: 5px;">';
+		$str .= '<div id="'. $n. 'fbdetails">';
 		
 		// facebook js api loads into this div
 		$str .= '<div id="fb-root"></div>';
