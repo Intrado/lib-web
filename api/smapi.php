@@ -1156,7 +1156,7 @@ class SMAPI {
 			}
 			// no error for invalid gender, use default
 			$gender = strtolower($gender);
-			if ($gender != "female" && gender != "male") {
+			if ($gender != "female" && $gender != "male") {
 				$gender = "female";
 			}
 			// validate permissions
