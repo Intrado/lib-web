@@ -1,2 +1,2 @@
 @help/schoolmessenger_help.htm#reports/standard_job_reports.htm
-Get more detailed report information.<br>PDF: Download report details.<br>Time Distribution: View job progression through the call durration.<br>Recipients Not Contacted: View recipients who were not contacted.
+Get more detailed report information.<br>PDF: Download report details.<br>Time Distribution: View job progression through the call duration.<br>Recipients Not Contacted: View recipients who were not contacted.
