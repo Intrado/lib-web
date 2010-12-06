@@ -918,6 +918,9 @@ class SMAPI {
 				$result["resultdescription"] = "Invalid user";
 				return $result;
 			}
+			if (!$ACCESS->getValue('viewcontacts', '0')) {
+				$result['resultdescription'] = "Unauthorized - User is not authorized to view contact details";
+			}
 			$personid = QuickQuery("select id from person where pkey = ? and not deleted", false, array($pkey));
 			if(!$personid){
 				$result["resultdescription"] = "Invalid person";
