@@ -445,6 +445,8 @@ class SMAPI {
 			// default is wav unless mpeg specifically sent
 			if ($mimetype == 'audio/mpeg') {
 				$fileext = ".mp3";
+			} if ($mimetype == 'audio/x-caf') {
+				$fileext = ".caf";
 			} else {
 				$fileext = ".wav";
 			}
@@ -468,11 +470,16 @@ class SMAPI {
 				$result['resultdescription'] = "Failed to generate audio file";
 				return $result;
 			}
-			$cmd = "sox \"$origtempfile\" -r 8000 -c 1 -s -w \"$cleanedtempfile\" ";
 			
-			//error_log($cmd);
-			$soxresult = exec($cmd, $res1,$res2);
-			//error_log("output " . $res1[0]);
+			if ($mimetype == 'audio/x-caf') {
+				$cmd = "ffmpeg -i \"$origtempfile\" -ar 8000 -ac 1 \"$cleanedtempfile\" 2>/dev/null"; //  the 2>/dev/null is to make ffmpeg silent, there Is no other way of making it silent with a flag. 
+				$ffmpegresult = exec($cmd, $res1,$res2);
+			} else {
+				$cmd = "sox \"$origtempfile\" -r 8000 -c 1 -s -w \"$cleanedtempfile\" ";
+				//error_log($cmd);
+				$soxresult = exec($cmd, $res1,$res2);
+				//error_log("output " . $res1[0]);
+			}
 			
 			$content = null;
 			if ($res2 || !file_exists($cleanedtempfile)) {
