@@ -138,9 +138,9 @@ if($reload){
 		// TODO people in two organizations get counted twice - si this true for Gfields?
 		$groupbyquery = "oz.orgkey";
 		$groupbyorder = $groupbyquery . ", ";
-		$rgroupdata = "join reportorganization ro on (ro.personid = rp.personid) join organization oz on (oz.id = ro.organizationid)";
+		$rgroupdata = "join reportorganization ro on (ro.jobid = rp.jobid and ro.personid = rp.personid) join organization oz on (oz.id = ro.organizationid)";
 		$union = "UNION select '' as field, rp.userid, rp.jobid, count(*) from reportperson rp 
-					where not exists (select * from reportorganization ro where ro.personid = rp.personid) 
+					where not exists (select * from reportorganization ro where ro.jobid = rp.jobid and ro.personid = rp.personid) 
 					and rp.status in ('fail', 'success')
 					$joblistquery
 					and rp.type = '" . DBSafe($type) . "' 
