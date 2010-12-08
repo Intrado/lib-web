@@ -1,22 +1,34 @@
 <?
 
 class Twitter extends TwitterOAuth {
-
-	function Twitter ($oauth_token = false, $oauth_token_secret = false) {
+	
+	function Twitter ($jsonAccessToken = false) {
 		global $SETTINGS;
 		
-		if ($oauth_token && $oauth_token_secret) {
+		if ($jsonAccessToken) {
+			$twitterdata = json_decode($jsonAccessToken);
 			TwitterOAuth::__construct(
 				$SETTINGS['twitter']['consumerkey'], 
 				$SETTINGS['twitter']['consumersecret'],
-				$oauth_token,
-				$oauth_token_secret);
+				$twitterdata->oauth_token,
+				$twitterdata->oauth_token_secret);
 		} else {
 			// no access. get generic connection
 			TwitterOAuth::__construct(
 				$SETTINGS['twitter']['consumerkey'], 
 				$SETTINGS['twitter']['consumersecret']);
 		}
+	}
+	
+	function hasValidAccessToken() {
+		try {
+			$userData = $this->getUserData();
+			if (isset($userData->screen_name))
+				return true;
+		} catch (Exception $e) {
+			// nothing
+		}
+		return false;
 	}
 	
 	function getUserData() {
