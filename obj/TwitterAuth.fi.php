@@ -6,18 +6,21 @@ class TwitterAuth extends FormItem {
 		global $SETTINGS;
 		global $USER;
 		
+		// NOTE: this form item changes DB values and thus, cannot get it's value from the $value variable
+		// if you set value on the form item you will get errors submitting the form
+		
 		$n = $this->form->name."_".$this->name;
 		
-		$str = '<input id="'.$n.'" name="'.$n.'" type="hidden" value="'.escapehtml($value).'"/>';
+		$twitter = new Twitter($USER->getSetting("tw_access_token", false));
+		$validToken = $twitter->hasValidAccessToken();
 		
-		// Page should have checked the auth token already and passed true/false
-		$validtoken = $value;
+		$str = '<input id="'.$n.'" name="'.$n.'" type="hidden" value="'.escapehtml($validToken).'"/>';
 		
 		// main details div
 		$str .= '<div id="'. $n. 'twdetails">';
 		
 		// connected options div
-		$str .= '<div id="'. $n. 'twconnected" style="border: 1px dotted grey; padding: 5px;'. (($validtoken)? "": "display:none;"). '">';
+		$str .= '<div id="'. $n. 'twconnected" style="border: 1px dotted grey; padding: 5px;'. (($validToken)? "": "display:none;"). '">';
 		
 		$str .= '<div id="'. $n. 'twuser"></div>';
 		
@@ -27,7 +30,7 @@ class TwitterAuth extends FormItem {
 		$str .= '<div style="clear: both"></div></div>';
 		
 		// disconnected options div
-		$str .= '<div id="'. $n. 'twdisconnected" style="'. (($validtoken)? "display:none;": ""). '">';
+		$str .= '<div id="'. $n. 'twdisconnected" style="'. (($validToken)? "display:none;": ""). '">';
 		
 		// Do twitter login to get good auth token
 		$thispage = substr($_SERVER["SCRIPT_NAME"], strrpos($_SERVER["SCRIPT_NAME"], "/") + 1);
@@ -37,12 +40,19 @@ class TwitterAuth extends FormItem {
 		
 		$str .= '<script type="text/javascript">
 		
-			if ('. (($validtoken)?"true":"false"). ') {
+			if ('. (($validToken)?"true":"false"). ') {
 				twLoadUserData("'. $n. 'twuser");
 			}
 		
 			function twClearValue(formitem) {
-				$(formitem).value = "";
+				$(formitem).value = false;
+				
+				// ajax request to remove it from the db
+				new Ajax.Request("ajaxtwitter.php", {
+					method:"post",
+					parameters: {
+						"type": "store_access_token",
+						"access_token": false}});
 				
 				// display the connect button
 				$(formitem + "twconnected").setStyle({display: "none"});
@@ -55,18 +65,15 @@ class TwitterAuth extends FormItem {
 				element.update(new Element("img", { src: "img/ajax-loader.gif" }));
 				
 				new Ajax.Request("ajaxtwitter.php", {
-					method:"post",
+					method:"get",
 					parameters: {
 						"type": "user"
 					},
 					onSuccess: function(r) {
 						var data = r.responseJSON;
-						// TODO: image url is http not https, need to convert it
-						var imgurlparts = data.profile_image_url.split("://");
-						var imgurl = "https://" + imgurlparts[1];
 						
-						// NOTE: Above doesnt work because twitter is using amazon for storage and the ssl cert doesnt 
-						// match the url
+						// TODO: image url is http not https, need to convert it
+						// NOTE: https profile image is NOT currently supported by twitter
 						
 						var e = new Element("div").insert(
 								new Element("div").setStyle({ float: "left" }).insert(
