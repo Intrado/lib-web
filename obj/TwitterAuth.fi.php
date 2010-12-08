@@ -33,8 +33,12 @@ class TwitterAuth extends FormItem {
 		$str .= '<div id="'. $n. 'twdisconnected" style="'. (($validToken)? "display:none;": ""). '">';
 		
 		// Do twitter login to get good auth token
-		$thispage = substr($_SERVER["SCRIPT_NAME"], strrpos($_SERVER["SCRIPT_NAME"], "/") + 1);
-		$str .= icon_button("Connect to Twitter", "twitter", "", "twitterauth.php/$thispage");
+		if (isset($this->args["submit"])) {
+			$str .= submit_button(_L("Connect to Twitter"), "twitterauth", "twitter");
+		} else {
+			$thispage = substr($_SERVER["SCRIPT_NAME"], strrpos($_SERVER["SCRIPT_NAME"], "/") + 1);
+			$str .= icon_button(_L("Connect to Twitter"), "twitter", "", "twitterauth.php/$thispage");
+		}
 		
 		$str .= '<div style="clear: both"></div></div></div>';
 		

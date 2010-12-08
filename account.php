@@ -403,7 +403,7 @@ if ($USER->authorize('twitterpost')) {
 		"fieldhelp" => _L("Authorize this application to tweet to your Twitter status. If you want to authorize a different account, be sure to log out of Twitter first."),
 		"value" => false,
 		"validators" => array(),
-		"control" => array("TwitterAuth"),
+		"control" => array("TwitterAuth", "submit" => true),
 		"helpstep" => 4
 	);
 }
@@ -547,6 +547,12 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		
 		Query('COMMIT');
 
+		// check submit button, if it's twitter auth request, redirect to twitterauth
+		if ($button == "twitterauth") {
+			$thispage = substr($_SERVER["SCRIPT_NAME"], strrpos($_SERVER["SCRIPT_NAME"], "/") + 1);
+			$form->sendTo("twitterauth.php/$thispage");
+		}
+		
 		// TODO, Release 7.2, add notice()
 
 		if ($ajax)
