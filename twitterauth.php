@@ -1,4 +1,6 @@
 <?
+// This page is a redirect used in twitter authorization requests.
+// It will redirect to twitter if redirection is needed and then back to the calling page once authorization is accepted.
 
 require_once("inc/common.inc.php");
 require_once("inc/twitteroauth/OAuth.php");
@@ -8,11 +10,16 @@ require_once("obj/Twitter.obj.php");
 global $SETTINGS;
 global $USER;
 
+if (!$USER->authorize('twitterpost'))
+	redirect('unauthorized.php');
+		
 // if oauth_token is set, this is a redirect back from twitter authorization
 if (isset($_GET['oauth_token']) && isset($_GET['oauth_verifier']) && isset($_SESSION['twitterRequestToken'])) {
 	
 	// create a twitter connection with the temporary auth tokens stored in session data
-	$twitter = new Twitter($_SESSION['twitterRequestToken']['oauth_token'], $_SESSION['twitterRequestToken']['oauth_token_secret']);
+	$twitter = new Twitter(json_encode(array(
+		"oauth_token" => $_SESSION['twitterRequestToken']['oauth_token'],
+		"oauth_token_secret" => $_SESSION['twitterRequestToken']['oauth_token_secret'])));
 	
 	// get the access token and store it in the DB for this user
 	$twAccessToken = $twitter->getAccessToken($_GET['oauth_verifier']);
