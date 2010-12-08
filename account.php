@@ -389,7 +389,7 @@ if ($USER->authorize('facebookpost')) {
 	$formdata["facebookauth"] = array(
 		"label" => _L('Facebook Auth'),
 		"fieldhelp" => _L("Authorize this application to post into your facebook pages. If you want to authorize a different account, be sure to log out of Facebook first."),
-		"value" => $USER->getSetting("fb_access_token", false),
+		"value" => false,
 		"validators" => array(),
 		"control" => array("FacebookAuth"),
 		"helpstep" => 4
@@ -397,24 +397,11 @@ if ($USER->authorize('facebookpost')) {
 }
 
 if ($USER->authorize('twitterpost')) {
-
-	$twitterdata = json_decode($USER->getSetting("tw_access_token", false));
-	$twValidToken = false;
-	if ($twitterdata) {
-		$twitter = new Twitter($twitterdata->oauth_token, $twitterdata->oauth_token_secret);
-		try {
-			$userData = $twitter->getUserData();
-			if ($userData)
-				$twValidToken = true;
-		} catch (Exception $e) {
-			// nothing
-		}
-	}
 	
 	$formdata["twitterauth"] = array(
 		"label" => _L('Twitter Auth'),
 		"fieldhelp" => _L("Authorize this application to tweet to your Twitter status. If you want to authorize a different account, be sure to log out of Twitter first."),
-		"value" => $twValidToken,
+		"value" => false,
 		"validators" => array(),
 		"control" => array("TwitterAuth"),
 		"helpstep" => 4
@@ -556,14 +543,6 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 			$_SESSION['colorscheme']['_brandtheme2'] = getSystemSetting("_brandtheme2");
 			$_SESSION['colorscheme']['_brandprimary'] = getSystemSetting("_brandprimary");
 			$_SESSION['colorscheme']['_brandratio'] = getSystemSetting("_brandratio");
-		}
-		
-		if (isset($postdata["facebookauth"]))
-			$USER->setSetting("fb_access_token", $postdata["facebookauth"]);
-			
-		if (isset($postdata["twitterauth"])) {
-			if (!$postdata["twitterauth"] || $postdata["twitterauth"] == "")
-				$USER->setSetting("tw_access_token", false);
 		}
 		
 		Query('COMMIT');
