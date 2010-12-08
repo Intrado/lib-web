@@ -7,12 +7,13 @@ class FacebookPost extends FormItem {
 		
 		$n = $this->form->name."_".$this->name;
 		
-		// { access_token: <token>, message: <text>, page: { <pageid>: <token>, <pageid>: <token>, ... } }
+		// { message: <text>, page: { <pageid>: <token>, <pageid>: <token>, ... } }
 		$str = '<input id="'.$n.'" name="'.$n.'" type="hidden" value="'.escapehtml($value).'" />';
 		
 		$fbMaxChars = 420;
 		
 		$fb_data = json_decode($value);
+		$message = (isset($fb_data->message))?$fb_data->message:$this->args['message'];
 		
 		// main details div
 		$str .= '<div id="'. $n. 'fbdetails">';
@@ -20,52 +21,31 @@ class FacebookPost extends FormItem {
 		// facebook js api loads into this div
 		$str .= '<div id="fb-root"></div>';
 		
-		// check that the auth token is any good
-		if ($fb_data->access_token !== "false" && fb_hasValidAccessToken($fb_data->access_token)) {
-			$validtoken = true;
-		} else {
-			$validtoken = false;
-		}
-		
 		// show pages div
-		$str .= '<div id="'. $n. 'fbpages" class="radiobox" style="'. (($validtoken)? "": "display:none;"). '">
+		$str .= '<div id="'. $n. 'fbpages" class="radiobox">
 					<img src="img/ajax-loader.gif" alt="'. escapehtml(_L("Loading")). '"/>
 				</div>';
-	
-		// show connect button div
-		$str .= '<div id="'. $n. 'fbconnect" style="'. (($validtoken)? "display:none;": ""). '">';
-		$perms = "publish_stream,offline_access,manage_pages";
-		$str .= icon_button("Connect to Facebook", "facebook", 
-			"try { 
-				FB.login(handleFbLoginPagesResponse.curry('$n'), {perms: '$perms'});
-			} catch (e) { 
-				alert('". _L("Could not connect to Facebook")."');
-			}");
-		
-		$str .= '</div>';
 		
 		// show text area for post message
-		$str .= '<div id="'.$n.'fbmessage" style="'. (($validtoken)? "": "display:none;"). '">
-			<textarea id="'.$n.'fbmessagetext" rows=10 cols=50>'. escapehtml($fb_data->message). '</textarea>
-			<div id="'.$n.'charsleft">'.escapehtml(_L('Characters remaining')). ':&nbsp;'. ( $fbMaxChars - mb_strlen($fb_data->message)). '</div></div>';
+		$str .= '<div id="'.$n.'fbmessage">
+			<textarea id="'.$n.'fbmessagetext" rows=10 cols=50>'. escapehtml($message). '</textarea>
+			<div id="'.$n.'charsleft">'.escapehtml(_L('Characters remaining')). ':&nbsp;'. ( $fbMaxChars - mb_strlen($message)). '</div></div>';
 		
 		$str .= '</div>';
 		
 		$str .= '<script type="text/javascript">
 		
 				// init the value of the hidden form item
-				var val = $("'.$n.'").value.evalJSON();
-				if (Object.isArray(val.page)) {
-					val.page = new Hash({});
-					$("'.$n.'").value = Object.toJSON(val);
-				}
+				var val = $("'.$n.'").value;
+				if (val == "")
+					$("'.$n.'").value = Object.toJSON({ message: "", page: {} });
 
 				// Facebook javascript API initialization, pulled from facebook documentation
 				window.fbAsyncInit = function() {
 					FB.init({appId: "'. $SETTINGS['facebook']['appid']. '", status: true, cookie: false, xfbml: true});
 					
 					// load the initial list of pages if possible
-					updateFbPages("'.$n.'", "'.$n.'fbpages");
+					updateFbPages("'.$this->args['access_token'].'", "'.$n.'", "'.$n.'fbpages");
 				};
 				(function() {
 					var e = document.createElement("script");
@@ -105,7 +85,7 @@ class FacebookPost extends FormItem {
 					);
 				}
 		
-				// when the page is changed, update the pageid and access_token used to post to it
+				// when a facebook page is checked/unchecked, update the pageid and access_token used to post to it
 				function handleFbPageChange(formitem, event) {
 					element = $(event.element());
 					
@@ -119,29 +99,36 @@ class FacebookPost extends FormItem {
 						pages.unset(pageinfo.id);
 					}
 					val.page = pages;
+					
+					// get the text area and store it too
+					val.message = $(formitem+"fbmessagetext").value;
+					
 					$(formitem).value = Object.toJSON(val);
 					form_do_validation($(formitem).up("form"), $(formitem));
 				}
 				
-				function updateFbPages(formitem, container) {
+				function updateFbPages(access_token, formitem, container) {
 					
 					var val = $(formitem).value.evalJSON();
 					var pages = $H(val.page);
 					
-					if (val.access_token) {
+					if (access_token) {
 					
 						// display loading gif while we get the users accounts
 						$(container).update(new Element("img", { src: "img/ajax-loader.gif" }));
 						
 						// get user pages
-						FB.api("/me/accounts", { access_token: val.access_token, type: "page" }, function(res) {
+						FB.api("/me/accounts", { access_token: access_token, type: "page" }, function(res) {
 							if (res.data !== undefined) {
 								$(container).update();
+								// if there are more than 8 facebook pages in the response data, set the div to scroll
+								if (res.data.size() > 8)
+									$(container).setStyle({ height: "150px", overflow: "auto" });
 								// populate pages selection
 								$(container).insert(
 										new Element("input", { 
 											type: "checkbox", 
-											value: Object.toJSON({ id: "me", "access_token": val.access_token }), 
+											value: Object.toJSON({ id: "me", "access_token": access_token }), 
 											name: "me",
 											checked: ((pages.get("me"))?true:false) }
 										).observe(
@@ -187,37 +174,6 @@ class FacebookPost extends FormItem {
 							}
 						});
 					}
-				}
-				
-				// handle updateing information when the user allows or disallows the facebook application
-				function handleFbLoginPagesResponse(formitem, res) {
-					var access_token = false;
-					if (res != null && res.session) {
-						if (res.perms) {
-							// user is logged in and granted some permissions.
-							access_token = res.session.access_token;
-						}
-					}
-					
-					// store access_token value
-					var val = $(formitem).value.evalJSON();
-					val.access_token = access_token;
-					$(formitem).value = Object.toJSON(val);
-					
-					// if we have an access token. display the pages selection
-					if (access_token) {
-						$(formitem + "fbpages").setStyle({display: "block"});
-						$(formitem + "fbconnect").setStyle({display: "none"});
-						updateFbPages(formitem, formitem + "fbpages");
-						$(formitem + "fbmessage").setStyle({display: "block"});
-						
-					} else {
-						// no access token, show the connect button
-						$(formitem + "fbpages").setStyle({display: "none"});
-						$(formitem + "fbconnect").setStyle({display: "block"});
-						$(formitem + "fbmessage").setStyle({display: "none"});
-					}
-					
 				}
 				
 				</script>';
