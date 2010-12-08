@@ -3,16 +3,12 @@
 class ValFacebookPost extends Validator {
 	
 	function validate ($value, $args) {
+		global $USER;
+		if (!$USER->authorize('facebookpost'))
+			return $this->label. " ". _L("current user is not authorized to post messages.");
+		
 		$fbdata = json_decode($value);
 		
-		// it's ok to not have an access_token, that just means facebook will be "skipped"
-		if ($fbdata->access_token == "false")
-			return true;
-		
-		// if we have an access token, be sure it's a good one
-		if (!fb_hasValidAccessToken($fbdata->access_token))
-			return _L("Valid access token not found. Please connect this account with your Facebook account.");
-	
 		// check to see if any pages are selected
 		$haspage = false;
 		foreach ($fbdata->page as $pageid => $token) {
@@ -36,12 +32,6 @@ class ValFacebookPost extends Validator {
 		return
 			'function (name, label, value) {
 				var fbdata = value.evalJSON();
-				
-				// access token can be false if not connected, and that is fine...
-				if (!fbdata.access_token)
-					return true;
-					
-				// no syncrhonous way to make sure the access token we have is good in js currently
 				
 				// check if any pages are selected
 				var haspage = false;
