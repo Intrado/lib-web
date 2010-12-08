@@ -1703,13 +1703,26 @@ class JobWiz_messageSmsText extends WizStep {
 class JobWiz_facebookAuth extends WizStep {
 	function getForm($postdata, $curstep) {
 	
-		$formdata["facebookauth"] = array(
-			"label" => _L('Facebook Auth'),
-			"fieldhelp" => _L("Authorize this application to post into your facebook pages. If you want to authorize a different account, be sure to log out of Facebook first."),
-			"value" => false,
-			"validators" => array(),
-			"control" => array("FacebookAuth"),
-			"helpstep" => 1
+		
+		// Twitter auth note
+		$html = "<div>". escapehtml(_L("You must authorize a Facebook account with your schoolmessenger account if you wish to post to Facebook pages.")). "</div>";
+		
+		// Form Fields.
+		$formdata = array(
+			$this->title,
+			"facebooknote" => array(
+				"label" => _L("Note"),
+				"control" => array("FormHtml","html" => $html),
+				"helpstep" => 1
+			),
+			"facebookauth" => array(
+				"label" => _L('Facebook Auth'),
+				"fieldhelp" => _L("Authorize this application to post into your facebook pages. If you want to authorize a different account, be sure to log out of Facebook first."),
+				"value" => false,
+				"validators" => array(),
+				"control" => array("FacebookAuth"),
+				"helpstep" => 1
+			)
 		);
 		$helpsteps = array(_L("TODO: Facebook auth"));
 		return new Form("facebookauth",$formdata,$helpsteps);
@@ -1733,14 +1746,26 @@ class JobWiz_facebookAuth extends WizStep {
 class JobWiz_twitterAuth extends WizStep {
 	function getForm($postdata, $curstep) {
 		global $USER;
-	
-		$formdata["twitterauth"] = array(
-			"label" => _L('Twitter Auth'),
-			"fieldhelp" => _L("Authorize this application to tweet to your Twitter status. If you want to authorize a different account, be sure to log out of Twitter first."),
-			"value" => false,
-			"validators" => array(),
-			"control" => array("TwitterAuth"),
-			"helpstep" => 1
+		
+		// Twitter auth note
+		$html = "<div>". escapehtml(_L("You must authorize a Twitter account with your schoolmessenger account if you wish to update twitter status.")). "</div>";
+		
+		// Form Fields.
+		$formdata = array(
+			$this->title,
+			"twitternote" => array(
+				"label" => _L("Note"),
+				"control" => array("FormHtml","html" => $html),
+				"helpstep" => 1
+			),
+			"twitterauth" => array(
+				"label" => _L('Twitter Auth'),
+				"fieldhelp" => _L("Authorize this application to tweet to your Twitter status. If you want to authorize a different account, be sure to log out of Twitter first."),
+				"value" => false,
+				"validators" => array(),
+				"control" => array("TwitterAuth"),
+				"helpstep" => 1
+			)
 		);
 		$helpsteps = array(_L("TODO: Twitter auth"));
 		return new Form("twitterauth",$formdata,$helpsteps);
