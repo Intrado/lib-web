@@ -4,17 +4,17 @@
 class FacebookAuth extends FormItem {
 	function render ($value) {
 		global $SETTINGS;
+		global $USER;
+		
+		// NOTE: this form item changes DB values and thus, cannot get it's value from the $value variable
+		// if you set value on the form item you will get errors submitting the form
 		
 		$n = $this->form->name."_".$this->name;
 		
-		$str = '<input id="'.$n.'" name="'.$n.'" type="hidden" value="'.escapehtml($value).'"/>';
+		$str = '<input id="'.$n.'" name="'.$n.'" type="hidden" value="'.escapehtml($USER->getSetting("fb_access_token", false)).'"/>';
 		
 		// check that the auth token is any good
-		if ($value !== "false" && fb_hasValidAccessToken($value)) {
-			$validtoken = true;
-		} else {
-			$validtoken = false;
-		}
+		$validtoken = fb_hasValidAccessToken();
 		
 		// main details div
 		$str .= '<div id="'. $n. 'fbdetails">';
@@ -77,6 +77,13 @@ class FacebookAuth extends FormItem {
 					var val = $(formitem).value;
 					val = access_token;
 					$(formitem).value = val;
+					
+					// ajax request to store it in the db
+					new Ajax.Request("ajaxfacebook.php", {
+						method:"post",
+						parameters: {
+							"type": "store_access_token",
+							"access_token": access_token}});
 					
 					// if we have an access token. display the pages selection
 					if (access_token) {
