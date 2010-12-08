@@ -51,6 +51,7 @@ require_once("obj/ValNonEmptyMessage.val.php");
 require_once("inc/facebook.php");
 require_once("inc/facebook.inc.php");
 require_once("obj/FacebookPost.fi.php");
+require_once("obj/FacebookAuth.fi.php");
 require_once("obj/ValFacebookPost.val.php");
 require_once("obj/TwitterAuth.fi.php");
 require_once("inc/twitteroauth/OAuth.php");
@@ -98,6 +99,8 @@ $wizdata = array(
 		"sms" => new WizSection ("SMS",array(
 			"text" => new JobWiz_messageSmsText(_L("SMS Text"))
 		)),
+		"facebookauth" => new JobWiz_facebookAuth(_L("Facebook Auth")),
+		"twitterauth" => new JobWiz_twitterAuth(_L("Twitter Auth")),
 		"socialmedia" => new JobWiz_socialMedia(_L("Social Media"))
 	)),
 	"schedule" => new WizSection ("Options",array(
@@ -467,34 +470,24 @@ class FinishJobWizard extends WizFinish {
 			// Do social media posting
 			
 			// Do Facebook posting
-			if ($fbdata && $fbdata->access_token) {
-				// post to pages if there is a message
-				if ($fbdata->message) {
-					foreach ($fbdata->page as $pageid => $accessToken) {
-						if (!fb_post($pageid, $accessToken, $fbdata->message)) {
-							// unable to post error
-							error_log("Failed to post to facebook pageid: ". $pageid. " for user: ". $USER->id);
-						}
+			if ($fbdata->message) {
+				foreach ($fbdata->page as $pageid => $accessToken) {
+					if (!fb_post($pageid, $accessToken, $fbdata->message)) {
+						// unable to post error
+						error_log("Failed to post to facebook pageid: ". $pageid. " for user: ". $USER->id);
 					}
 				}
 			}
 			
 			// do twitter tweeting
 			if ($USER->authorize("twitterpost") && isset($postdata["/message/socialmedia"]["twdata"])) {
-				$twitterdata = json_decode($USER->getSetting("tw_access_token", false));
-				if ($twitterdata) {
-					$twitter = new Twitter($twitterdata->oauth_token, $twitterdata->oauth_token_secret);
-					if (!$twitter->tweet($postdata["/message/socialmedia"]["twdata"])) {
-							// unable to post error
-							error_log("Failed to post to twitter for user: ". $USER->id);
-					}
+				$twitter = new Twitter($USER->getSetting("tw_access_token", false));
+				if (!$twitter->tweet($postdata["/message/socialmedia"]["twdata"])) {
+					// unable to post error
+					error_log("Failed to post to twitter for user: ". $USER->id);
 				}
 			}
 		}
-		
-		// save the Facebook access token if it exists
-		if ($fbdata && $fbdata->access_token)
-			$USER->setSetting("fb_access_token", $fbdata->access_token);
 		
 		//check for saved messages and lists and undelete as appropriate
 		if (JobWiz_scheduleSaveLists::isEnabled($postdata,false)) {

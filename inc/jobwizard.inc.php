@@ -854,19 +854,6 @@ class JobWiz_start extends WizStep {
 			"helpstep" => 3
 		);
 		
-		if ($USER->authorize("facebookpost") || $USER->authorize("twitterpost")) {
-			$formdata["socialmedia"] = array(
-				"label" => _L("Post to social media sites"),
-				"fieldhelp" => _L("Post your message to popular social media websites such as Facebook and Twitter."),
-				"value" => false,
-				"control" => array("CheckBox"),
-				"validators" => array(),
-				"helpstep" => 3
-			);	
-			
-			
-		}
-		
 		$helpsteps = array (
 			_L("Job names are used for email subjects and reporting, so they should be descriptive.<br><br><b>Note:</b> Before you send your first job, you should make a test list by selecting New List in the Shortcuts menu."),
 			_L("Job Types are used to determine which phones or emails will be contacted. Choosing the correct job type is important for effective communication.<br><br><b>Note:</b> Emergency jobs include a notification that the message is regarding an emergency."),
@@ -877,6 +864,27 @@ class JobWiz_start extends WizStep {
 			<li><b>Customize</b> - Use the Customize option to choose a previously saved message or to manually select any combination of message options you require. 			</ul>
 			<b>Note:</b> Email and SMS text messaging are optional features and may not be enabled for some user accounts.")
 		);
+		
+		if ($USER->authorize("facebookpost") || $USER->authorize("twitterpost")) {
+			// check facebook access token for validity
+			$_SESSION['wiz_facebookauth'] = fb_hasValidAccessToken();
+			
+			// check twitter access token for validity
+			$twitter = new Twitter($USER->getSetting("tw_access_token", false));
+			$_SESSION['wiz_twitterauth'] = $twitter->hasValidAccessToken();
+			
+			$formdata["socialmedia"] = array(
+				"label" => _L("Post to social media sites"),
+				"fieldhelp" => _L("Post your message to popular social media websites such as Facebook and Twitter."),
+				"value" => false,
+				"control" => array("CheckBox"),
+				"validators" => array(),
+				"helpstep" => 4
+			);	
+			
+			$helpsteps[] = _L("TODO: guide data for social media");
+			
+		}
 		return new Form("start",$formdata,$helpsteps);
 	}
 }
@@ -1692,6 +1700,67 @@ class JobWiz_messageSmsText extends WizStep {
 	}
 }
 
+class JobWiz_facebookAuth extends WizStep {
+	function getForm($postdata, $curstep) {
+	
+		$formdata["facebookauth"] = array(
+			"label" => _L('Facebook Auth'),
+			"fieldhelp" => _L("Authorize this application to post into your facebook pages. If you want to authorize a different account, be sure to log out of Facebook first."),
+			"value" => false,
+			"validators" => array(),
+			"control" => array("FacebookAuth"),
+			"helpstep" => 1
+		);
+		$helpsteps = array(_L("TODO: Facebook auth"));
+		return new Form("facebookauth",$formdata,$helpsteps);
+	}
+
+	//returns true if this step is enabled
+	function isEnabled($postdata, $step) {
+		global $USER;
+		
+		if ($USER->authorize("facebookpost") && 
+				isset($postdata['/start']['socialmedia']) && 
+				$postdata['/start']['socialmedia'] && 
+				isset($_SESSION['wiz_facebookauth']) && 
+				!$_SESSION['wiz_facebookauth']) {
+			return true;
+		}
+		return false;
+	}
+}
+
+class JobWiz_twitterAuth extends WizStep {
+	function getForm($postdata, $curstep) {
+		global $USER;
+	
+		$formdata["twitterauth"] = array(
+			"label" => _L('Twitter Auth'),
+			"fieldhelp" => _L("Authorize this application to tweet to your Twitter status. If you want to authorize a different account, be sure to log out of Twitter first."),
+			"value" => false,
+			"validators" => array(),
+			"control" => array("TwitterAuth"),
+			"helpstep" => 1
+		);
+		$helpsteps = array(_L("TODO: Twitter auth"));
+		return new Form("twitterauth",$formdata,$helpsteps);
+	}
+
+	//returns true if this step is enabled
+	function isEnabled($postdata, $step) {
+		global $USER;
+		
+		if ($USER->authorize("twitterpost") && 
+				isset($postdata['/start']['socialmedia']) && 
+				$postdata['/start']['socialmedia'] && 
+				isset($_SESSION['wiz_twitterauth']) && 
+				!$_SESSION['wiz_twitterauth']) {
+			return true;
+		}
+		return false;
+	}
+}
+
 class JobWiz_socialMedia extends WizStep {
 	function getForm($postdata, $curstep) {
 		global $USER;
@@ -1731,33 +1800,27 @@ class JobWiz_socialMedia extends WizStep {
 		$helpsteps = array();
 		
 		// Facebook
-		if ($USER->authorize('facebookpost')) {
+		if ($USER->authorize('facebookpost') && fb_hasValidAccessToken()) {
 			$helpsteps[] = _L("Select one or more pages and enter the message you wish to deliver via Facebook.");
 			$formdata["fbdata"] = array(
 				"label" => _L('Facebook'),
 				"fieldhelp" => _L("Select which pages to post to."),
-				"value" => json_encode(array("access_token" => $USER->getSetting("fb_access_token", false), "message" => $fbtext,"page" => array())),
+				"value" => "",
 				"validators" => array(
 					array("ValRequired"),
 					array("ValFacebookPost")),
-				"control" => array("FacebookPost"),
+				"control" => array("FacebookPost", "message" => $fbtext, "access_token" => $USER->getSetting("fb_access_token", false)),
 				"helpstep" => $helpstepnum++
 			);
 		}
 		
 		// Twitter
 		if ($USER->authorize('twitterpost')) {
-			$twitterdata = json_decode($USER->getSetting("tw_access_token", false));
-			if ($twitterdata) {
-				$twitter = new Twitter($twitterdata->oauth_token, $twitterdata->oauth_token_secret);
-				$userData = $twitter->getUserData();
-			} else {
-				$twitter = new Twitter();
-				$userData = false;
-			}
+		
+			$twitter = new Twitter($USER->getSetting("tw_access_token", false));
 			
-			// if user data exists, this is a good twitter access token and we can display a text box
-			if ($userData) {
+			// if this is a good twitter access token, we can display a text box
+			if ($twitter->hasValidAccessToken()) {
 				$helpsteps[] = _L("Enter the message you wish to deliver via Twitter.");
 				$formdata["twdata"] = array(
 					"label" => _L("Twitter"),
@@ -1769,18 +1832,6 @@ class JobWiz_socialMedia extends WizStep {
 					"helpstep" => $helpstepnum++
 				
 				);
-				
-			} else {
-				// no userdata, display auth form item
-				$helpsteps[] = _L("This account is not currently authorized to send messages to Twitter. Click the button to authorize it.");
-				$formdata["twitterauth"] = array(
-					"label" => _L('Twitter Auth'),
-					"fieldhelp" => _L("Authorize this application to tweet to your Twitter status. If you want to authorize a different account, be sure to log out of Twitter first."),
-					"value" => "",
-					"validators" => array(),
-					"control" => array("TwitterAuth"),
-					"helpstep" => $helpstepnum++
-				);
 			}
 		}
 		
@@ -1791,7 +1842,47 @@ class JobWiz_socialMedia extends WizStep {
 	function isEnabled($postdata, $step) {
 		global $USER;
 		
-		if (($USER->authorize("facebookpost") || $USER->authorize('twitterpost')) && isset($postdata['/start']['socialmedia']) && $postdata['/start']['socialmedia']) {
+		// check if facebook is enabled
+		$facebookEnabled = false;
+		if ($USER->authorize("facebookpost") && 
+				isset($postdata['/start']['socialmedia']) && 
+				$postdata['/start']['socialmedia']) {
+			
+			// if we started the wizard with valid facebook access token
+			if (isset($_SESSION['wiz_facebookauth']) && 
+					$_SESSION['wiz_facebookauth'])
+				$facebookEnabled = true;
+					
+			// if we had invalid access token but authed it later
+			if (isset($_SESSION['wiz_facebookauth']) && 
+					!$_SESSION['wiz_facebookauth'] && 
+					isset($postdata['/message/facebookauth']['facebookauth']) && 
+					($postdata['/message/facebookauth']['facebookauth'] != "false"))
+				$facebookEnabled = true;
+			
+		}
+		
+		// check if twitter is enabled
+		$twitterEnabled = false;
+		if ($USER->authorize("twitterpost") && 
+				isset($postdata['/start']['socialmedia']) && 
+				$postdata['/start']['socialmedia']) {
+			
+			// if we started the wizard with valid facebook access token
+			if (isset($_SESSION['wiz_twitterauth']) && 
+					$_SESSION['wiz_twitterauth'])
+				$twitterEnabled = true;
+					
+			// if we had invalid access token but authed it later
+			if (isset($_SESSION['wiz_twitterauth']) && 
+					!$_SESSION['wiz_twitterauth'] && 
+					isset($postdata['/message/twitterauth']['twitterauth']) && 
+					($postdata['/message/twitterauth']['twitterauth'] == true))
+				$twitterEnabled = true;
+			
+		}
+		
+		if ($facebookEnabled || $twitterEnabled) {
 			return true;
 		}
 		return false;
@@ -1849,8 +1940,6 @@ class JobWiz_scheduleOptions extends WizStep {
 			
 			$formdata["socialmedianote"] = array(
 				"label" => _L("Social Media"),
-				"value" => "",
-				"validators" => array(),
 				"control" => array("FormHtml","html" => $html),
 				"helpstep" => $helpstepnum
 			);
