@@ -1433,3 +1433,18 @@ $$$
 update setting set value='7.6/0' where name='_dbversion'
 $$$
 -- END REV 7.6/0
+
+-- START REV 7.7/1
+
+--
+-- Table structure for table `reportarchive`
+--
+ALTER TABLE `reportarchive` CHANGE `name` `reportdate` DATE NOT NULL 
+$$$
+
+ALTER TABLE `reportarchive` ADD INDEX ( `reportdate` ) 
+$$$
+
+update setting set value='7.7/1' where name='_dbversion'
+$$$
+-- END REV 7.7/1
