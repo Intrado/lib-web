@@ -34,7 +34,8 @@ $authpass = "";
 $versions = array (
 	"7.1.5/0",	//this is the assumed version when no _dbversion exists. it is special
 	"7.5/14",
-	"7.6/1"		//rev 1 is always the first complete revision (not zero)
+	"7.6/1",		//rev 1 is always the first complete revision (not zero)
+	"7.7/1"
 	//7.6.1
 	//8.0
 	//etc
@@ -188,6 +189,7 @@ function update_customer($db, $customerid, $shardid) {
 	// require the necessary version upgrade scripts	
 	require_once("upgrades/db_7-5.php");
 	require_once("upgrades/db_7-6.php");
+	require_once("upgrades/db_7-7.php");
 
 	// for each version, upgrade to the next
 	$foundstartingversion = false;
@@ -224,6 +226,11 @@ function update_customer($db, $customerid, $shardid) {
 				break;
 			case "7.6":
 				if (!upgrade_7_6($rev, $shardid, $customerid, $db)) {
+					exit("Error upgrading DB");
+				}
+				break;
+			case "7.7":
+				if (!upgrade_7_7($rev, $shardid, $customerid, $db)) {
 					exit("Error upgrading DB");
 				}
 				break;
