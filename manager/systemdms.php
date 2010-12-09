@@ -169,9 +169,23 @@ $query = "select dm.id, dm.name, dm.authorizedip, dm.lastip,
 			order by dm.name";
 $result = Query($query);
 $data = array();
+$restotal = 0;
+$resactout = 0;
+$resactin = 0;
 while($row = DBGetRow($result)){
 	$data[] = $row;
+	
+	$poststatus = json_decode($row[13]);
+	$poststatus = $poststatus[0];
+	
+	$restotal += $poststatus->restotal;
+	$resactout += $poststatus->resactout;
+	$resactin += $poststatus->resactin;
 }
+
+//scale to 0-100
+$respctout = $restotal ? $resactout/$restotal * 100 : 0;
+$respctin = $restotal ? $resactin/$restotal * 100 : 0;
 
 // Add field titles, leading # means it is sortable leading @ means it is hidden by default
 $titles = array(0 => "#DM ID");
@@ -231,6 +245,14 @@ if($showingDisabledDMs) {
 show_column_selector('customer_dm_table', $titles, $lockedTitles);
 
 ?>
+
+<div style="float: left;">Total resources: <?= ($resactin + $resactout) ?>/<?= $restotal?></div>
+<div style="float: left; margin-left: 10px; width: 100px; height: 16px; border: 1px solid black;">
+	<div style="float: left; width: <?=$respctout?>px; height: 16px; background: #00BBFF;"></div>
+	<div style="float: left; width: <?=$respctin?>px; height: 16px; background: #FF00BB;"></div>
+</div>
+
+
 <table class="list sortable" id="customer_dm_table" width="100%">
 <?
 	showTable($data, $titles, $formatters);
