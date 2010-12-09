@@ -1,14 +1,6 @@
 -- $rev 1
 
-CREATE TABLE reportarchive_old LIKE reportarchive 
-$$$
-
-INSERT INTO reportarchive_old(
-SELECT *
-FROM reportarchive )
-$$$
-
-DROP TABLE `reportarchive`
+RENAME TABLE `reportarchive` TO `reportarchive_old`
 $$$
 
 CREATE TABLE `reportarchive` (
