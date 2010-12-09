@@ -48,6 +48,8 @@ INSERT INTO `permission` (accessid,name,value) VALUES
 						 (@smaccessid, 'subscribe', 'messagegroup|list'),
 						 (@smaccessid, 'targetedmessage', '1'),
 						 (@smaccessid, 'targetedcomment', '1'),
+						 (@smaccessid, 'facebookpost', '1'),
+						 (@smaccessid, 'twitterpost', '1'),
 						 (@smaccessid, 'manageclassroommessaging', '1');
 $$$
 						
