@@ -104,12 +104,13 @@ require_once("../inc/utils.inc.php");
 $updater = mt_rand();
 echo "Updater id: $updater\n";
 
-//connect to authserver db
-echo "connecting to authserver db\n";
-$authdb = DBConnect($authhost,$authuser,$authpass,"authserver");
-
 // if $mode == 'csimport' skip the authserver/shard/customer lookup and simply connect to 'csimport' database
 if ($mode == 'csimport') {
+	
+	//connect to csimport db
+	echo "connecting to csimport db\n";
+	$authdb = DBConnect($authhost,$authuser,$authpass,"csimport");
+	
 	$_dbcon = $db = $authdb;
 	QuickUpdate("use csimport",$db);
 	
@@ -119,6 +120,10 @@ if ($mode == 'csimport') {
 	// set systemmessages in time order
 	QuickUpdate("update systemmessages set modifydate = now() + interval id second", $db);
 } else {
+	//connect to authserver db
+	echo "connecting to authserver db\n";
+	$authdb = DBConnect($authhost,$authuser,$authpass,"authserver");
+	
 	$res = Query("select id,dbhost,dbusername,dbpassword from shard", $authdb)
 		or exit(mysql_error());
 	$shards = array();
