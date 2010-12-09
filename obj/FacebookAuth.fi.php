@@ -65,7 +65,7 @@ class FacebookAuth extends FormItem {
 				
 				// handle updateing information when the user allows or disallows the facebook application
 				function handleFbLoginAuthResponse(formitem, res) {
-					var access_token = false;
+					var access_token = "";
 					if (res != null && res.session) {
 						if (res.perms) {
 							// user is logged in and granted some permissions.
@@ -113,7 +113,7 @@ class FacebookAuth extends FormItem {
 								)
 							).insert(
 								new Element("div").setStyle({ float: "left", padding: "7px" }).insert(
-									new Element("div").setStyle({ "fontWeight": "bold" }).update(r.name)
+									new Element("div").setStyle({ "fontWeight": "bold" }).update(r.name.escapeHTML())
 								)
 							);
 						

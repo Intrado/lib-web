@@ -161,7 +161,7 @@ class FacebookPost extends FormItem {
 											).observe(
 												"focus",handleFbPageChange.curry(formitem))
 										).insert(
-											new Element("label", { "for": account.id }).insert(account.name)
+											new Element("label", { "for": account.id }).insert(account.name.escapeHTML())
 										).insert(
 											new Element("br")
 									);

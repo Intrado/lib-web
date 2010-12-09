@@ -49,7 +49,7 @@ class TwitterAuth extends FormItem {
 			}
 		
 			function twClearValue(formitem) {
-				$(formitem).value = false;
+				$(formitem).value = "";
 				
 				// ajax request to remove it from the db
 				new Ajax.Request("ajaxtwitter.php", {
@@ -88,9 +88,9 @@ class TwitterAuth extends FormItem {
 								)
 							).insert(
 								new Element("div").setStyle({ float: "left", padding: "7px" }).insert(
-									new Element("div").setStyle({ "fontWeight": "bold" }).update(data.screen_name)
+									new Element("div").setStyle({ "fontWeight": "bold" }).update(data.screen_name.escapeHTML())
 								).insert(
-									new Element("div").setStyle({ color: "grey" }).update(data.name)
+									new Element("div").setStyle({ color: "grey" }).update(data.name.escapeHTML())
 								)
 							);
 						

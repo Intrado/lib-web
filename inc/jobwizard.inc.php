@@ -1884,7 +1884,7 @@ class JobWiz_socialMedia extends WizStep {
 			if (isset($_SESSION['wiz_facebookauth']) && 
 					!$_SESSION['wiz_facebookauth'] && 
 					isset($postdata['/message/facebookauth']['facebookauth']) && 
-					($postdata['/message/facebookauth']['facebookauth'] != "false"))
+					$postdata['/message/facebookauth']['facebookauth'])
 				$facebookEnabled = true;
 			
 		}
@@ -1904,7 +1904,7 @@ class JobWiz_socialMedia extends WizStep {
 			if (isset($_SESSION['wiz_twitterauth']) && 
 					!$_SESSION['wiz_twitterauth'] && 
 					isset($postdata['/message/twitterauth']['twitterauth']) && 
-					($postdata['/message/twitterauth']['twitterauth'] == true))
+					$postdata['/message/twitterauth']['twitterauth'])
 				$twitterEnabled = true;
 			
 		}
