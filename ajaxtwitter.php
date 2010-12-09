@@ -10,7 +10,7 @@ global $USER;
 
 header('Content-Type: application/json');
 
-if (!$USER->authorize('twitterpost'))
+if (!getSystemSetting('_hastwitter', false) || !$USER->authorize('twitterpost'))
 	echo false;
 
 if (!isset($_GET['type']) && !isset($_POST['type']))

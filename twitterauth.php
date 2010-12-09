@@ -10,7 +10,7 @@ require_once("obj/Twitter.obj.php");
 global $SETTINGS;
 global $USER;
 
-if (!$USER->authorize('twitterpost'))
+if (!getSystemSetting('_hastwitter', false) || !$USER->authorize('twitterpost'))
 	redirect('unauthorized.php');
 		
 // if oauth_token is set, this is a redirect back from twitter authorization

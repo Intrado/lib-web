@@ -865,7 +865,9 @@ class JobWiz_start extends WizStep {
 			<b>Note:</b> Email and SMS text messaging are optional features and may not be enabled for some user accounts.")
 		);
 		
-		if ($USER->authorize("facebookpost") || $USER->authorize("twitterpost")) {
+		if ((getSystemSetting('_hastwitter', false) && $USER->authorize('facebookpost')) || 
+				(getSystemSetting('_hasfacebook', false) && $USER->authorize('twitterpost'))) {
+			
 			// check facebook access token for validity
 			$_SESSION['wiz_facebookauth'] = fb_hasValidAccessToken();
 			

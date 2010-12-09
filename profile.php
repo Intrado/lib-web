@@ -638,6 +638,12 @@ if (getSystemSetting('_hascallback', false)) {
 	unset($formdata['setcallerid']);
 }
 
+if (!getSystemSetting('_hasfacebook', false))
+	unset($formdata['facebookpost']);
+
+if (!getSystemSetting('_hastwitter', false))
+	unset($formdata['twitterpost']);
+
 $helpsteps = array (
 	_L('Enter a name and optional description for this Access Profile.'),
 	_L('Choose how you want users with this profile to be able to access the system. Then select whether they should be able to edit their own account information or not.'),

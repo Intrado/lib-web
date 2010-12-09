@@ -381,10 +381,12 @@ if ($USER->authorize('setcallerid') && !getSystemSetting('_hascallback', false))
 }
 
 // Social Media options
-if ($USER->authorize('facebookpost') || $USER->authorize('twitterpost'))
+if ((getSystemSetting('_hastwitter', false) && $USER->authorize('facebookpost')) || 
+		(getSystemSetting('_hasfacebook', false) && $USER->authorize('twitterpost'))) {
 	$formdata[] = _L('Social Media Options');
+}
 	
-if ($USER->authorize('facebookpost')) {
+if (getSystemSetting('_hasfacebook', false) && $USER->authorize('facebookpost')) {
 	
 	$formdata["facebookauth"] = array(
 		"label" => _L('Facebook Auth'),
@@ -396,7 +398,7 @@ if ($USER->authorize('facebookpost')) {
 	);
 }
 
-if ($USER->authorize('twitterpost')) {
+if (getSystemSetting('_hastwitter', false) && $USER->authorize('twitterpost')) {
 	
 	$formdata["twitterauth"] = array(
 		"label" => _L('Twitter Auth'),

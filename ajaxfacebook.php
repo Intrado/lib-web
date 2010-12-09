@@ -9,7 +9,7 @@ global $USER;
 
 header('Content-Type: application/json');
 
-if (!$USER->authorize('facebookpost'))
+if (!getSystemSetting('_hasfacebook', false) || !$USER->authorize('facebookpost'))
 	echo false;
 
 if (!isset($_GET['type']) && !isset($_POST['type']))
