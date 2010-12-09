@@ -470,7 +470,7 @@ class FinishJobWizard extends WizFinish {
 			// Do social media posting
 			
 			// Do Facebook posting
-			if ($fbdata->message) {
+			if ($fbdata && isset($fbdata->message)) {
 				foreach ($fbdata->page as $pageid => $accessToken) {
 					if (!fb_post($pageid, $accessToken, $fbdata->message)) {
 						// unable to post error
