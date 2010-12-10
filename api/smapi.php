@@ -1303,8 +1303,13 @@ class SMAPI {
 				$result["resultdescription"] = "Invalid fromemail, must be a valid email address";
 				return $result;
 			}
-			// TODO validate if email domain restricted
-			
+			// validate if email domain restricted
+			$domain = getSystemSetting('emaildomain');
+			if ($domain && !checkEmailDomain($fromemail, $domain)) {
+				$result['resultcode'] = 'invalidparam';
+				$result["resultdescription"] = "Invalid fromemail, must be a valid email address with the domain " . $domain;
+				return $result;
+			}
 			
 			// validate permissions
 			if (!$USER->authorize('sendemail')) {
