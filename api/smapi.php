@@ -1399,10 +1399,18 @@ class SMAPI {
 			}
 			
 			// validate listids
-			foreach ($listids->listid as $listid) {
-				if (!userOwns("list", $listid) && !isSubscribed("list", $listid)) {
+			if (is_array($listids)) {
+				foreach ($listids->listid as $listid) {
+					if (!userOwns("list", $listid) && !isSubscribed("list", $listid)) {
+						$result['resultcode'] = 'unauthorized';
+						$result["resultdescription"] =  "Invalid List " . $listid;
+						return $result;
+					}
+				}
+			} else {
+				if (!userOwns("list", $listids->listid) && !isSubscribed("list", $listids->listid)) {
 					$result['resultcode'] = 'unauthorized';
-					$result["resultdescription"] =  "Invalid List " . $listid;
+					$result["resultdescription"] =  "Invalid List " . $listids->listid;
 					return $result;
 				}
 			}
@@ -1555,9 +1563,13 @@ class SMAPI {
 			$job->create(); // create to generate the jobid
 				
 			// associate this jobid with each listid
-			foreach ($listids->listid as $listid) {
-				// TODO batch insert
-				QuickUpdate("insert into joblist (jobid, listid) values (?, ?)", false, array($job->id, $listid));
+			if (is_array($listids)) {
+				foreach ($listids->listid as $listid) {
+					// TODO batch insert
+					QuickUpdate("insert into joblist (jobid, listid) values (?, ?)", false, array($job->id, $listid));
+				}
+			} else {
+				QuickUpdate("insert into joblist (jobid, listid) values (?, ?)", false, array($job->id, $listids->listid));
 			}
 				
 			$job->runNow(); // run the job
