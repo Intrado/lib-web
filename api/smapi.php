@@ -483,13 +483,13 @@ class SMAPI {
 			
 			$content = null;
 			if ($res2 || !file_exists($cleanedtempfile)) {
-				$result["resultdescription"]= "There was an error reading your audio file. Please try another file, or ensure the mimetype is correct. Supported mimetypes include: 'audio/wav' for .wav and 'audio/mpeg' for .mp3 files.";
+				$result["resultdescription"]= "There was an error reading your audio file. Please try another file, or ensure the mimetype is correct. Supported mimetypes include: 'audio/wav' for .wav, 'audio/mpeg' for .mp3, and 'audio/x-caf' for .caf files.";
 				unlink($origtempfile);
 				unlink($cleanedtempfile);
 				return $result;
 			} else {
 				$content = new Content();
-				$content->contenttype = "audio/wav"; // even if they upload .mp3 we store it as .wav
+				$content->contenttype = "audio/wav"; // even if they upload .mp3 or .caf we store it as .wav
 				$content->data = base64_encode(file_get_contents($cleanedtempfile));
 				$content->create();
 
@@ -1114,11 +1114,16 @@ class SMAPI {
 		    	foreach($contact->contactpreferences as $contactpreference){
 				 	$personcontactprefs[($contactpreference->jobtypeid+0)] = ($contactpreference->enabled ? "1" : "0");
 				}
+				// find all valid jobtypeids, used to verify against input
+				$jobtypeids = QuickQueryList("select id from jobtype where not deleted");
 
+				// insert/update all contact preferences
 				QuickUpdate("begin");
-				foreach($personcontactprefs as $jobtypeid => $enabled){
-					// TODO validate $jobtypeid, caller can pass anything here like 99 
-					QuickUpdate("insert into contactpref (personid, jobtypeid, type, sequence, enabled) values (?, ?, ?, ?, ?) on duplicate key update enabled = ?", false, array($personid, $jobtypeid, $contact->type, $contact->sequence, $enabled, $enabled));
+				foreach ($personcontactprefs as $jobtypeid => $enabled) {
+					// validate $jobtypeid, caller can pass anything here like 99
+					if (in_array($jobtypeid, $jobtypeids))
+						QuickUpdate("insert into contactpref (personid, jobtypeid, type, sequence, enabled) values (?, ?, ?, ?, ?) on duplicate key update enabled = ?", false, array($personid, $jobtypeid, $contact->type, $contact->sequence, $enabled, $enabled));
+					// else not a valid jobtypeid, just skip it (could error, but we don't want to break v1.0 api users)
 				}
 				QuickUpdate("commit");
             }
@@ -1298,6 +1303,8 @@ class SMAPI {
 				$result["resultdescription"] = "Invalid fromemail, must be a valid email address";
 				return $result;
 			}
+			// TODO validate if email domain restricted
+			
 			
 			// validate permissions
 			if (!$USER->authorize('sendemail')) {
@@ -1399,30 +1406,24 @@ class SMAPI {
 			}
 			
 			// validate listids
-			if (is_array($listids)) {
-				foreach ($listids->listid as $listid) {
-					if (!userOwns("list", $listid) && !isSubscribed("list", $listid)) {
-						$result['resultcode'] = 'unauthorized';
-						$result["resultdescription"] =  "Invalid List " . $listid;
-						return $result;
-					}
-				}
-			} else {
-				if (!userOwns("list", $listids->listid) && !isSubscribed("list", $listids->listid)) {
+			foreach ($listids->listid as $listid) {
+				if (!userOwns("list", $listid) && !isSubscribed("list", $listid)) {
 					$result['resultcode'] = 'unauthorized';
-					$result["resultdescription"] =  "Invalid List " . $listids->listid;
+					$result["resultdescription"] =  "Invalid List " . $listid;
 					return $result;
 				}
 			}
-			
+						
 			// all valid, continue to create and submit job
 			$job = Job::jobWithDefaults();
 			
 			// prep the job options into a name-value array
 			$joboptions = array();
-			foreach ($options->jobOption as $op) {
-				//error_log($op->name . " -> " . $op->value);
-				$joboptions[$op->name] = $op->value;
+			if (isset($options->jobOption)) {
+				foreach ($options->jobOption as $op) {
+					//error_log($op->name . " -> " . $op->value);
+					$joboptions[$op->name] = $op->value;
+				}
 			}
 			
 			// set job options
@@ -1563,13 +1564,9 @@ class SMAPI {
 			$job->create(); // create to generate the jobid
 				
 			// associate this jobid with each listid
-			if (is_array($listids)) {
-				foreach ($listids->listid as $listid) {
-					// TODO batch insert
-					QuickUpdate("insert into joblist (jobid, listid) values (?, ?)", false, array($job->id, $listid));
-				}
-			} else {
-				QuickUpdate("insert into joblist (jobid, listid) values (?, ?)", false, array($job->id, $listids->listid));
+			foreach ($listids->listid as $listid) {
+				// TODO batch insert
+				QuickUpdate("insert into joblist (jobid, listid) values (?, ?)", false, array($job->id, $listid));
 			}
 				
 			$job->runNow(); // run the job
@@ -1981,7 +1978,10 @@ require_once("API_ContactPreference.obj.php");
 require_once("API_Label.obj.php");
 
 ini_set("soap.wsdl_cache_enabled", "0"); // disabling WSDL cache
-$server=new SoapServer("smapi.wsdl");
+
+// without SOAP_SINGLE_ELEMENT_ARRAYS any params expecting an array will contain an array but instead the single object in it's place
+// add this feature so that even a single element will be passed in an array
+$server = new SoapServer("smapi.wsdl", array('features' => SOAP_SINGLE_ELEMENT_ARRAYS));
 $server->setClass("SMAPI");
 $server->handle();
 //var_dump($server->getFunctions());
