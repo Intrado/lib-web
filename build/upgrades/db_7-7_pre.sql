@@ -17,3 +17,8 @@ $$$
 
 DROP TABLE `reportarchive_old`
 $$$
+
+-- $rev 2
+
+ALTER TABLE `email` ADD INDEX `dedupe` ( `email` , `sequence` )
+$$$
