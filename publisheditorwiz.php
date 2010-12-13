@@ -316,6 +316,8 @@ class FinishPublishTargetWiz extends WizFinish {
 			// if the user is restriced and the organization id is not null and they don't have association to any of the publish orgs, remove the subscription
 			if ($userrestrictions && !in_array(null, $addorgs, true) && !array_intersect_key($authorgs, $addorgs))
 				$subscribe->destroy();
+				
+			// TODO: unrestricted user subscriptions need cleaned up too on un-publish requests. http://63.249.90.232:888/bugs/view.php?id=3983
 		}
 		
 		Query("COMMIT");
