@@ -5,7 +5,7 @@ $$$
 
 CREATE TABLE `reportarchive` (
   `reportdate` date NOT NULL,
-  `contentid` bigint(20) NOT NULL,
+  `contentid` bigint(20) default NULL,
   INDEX `date` (`reportdate`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8
 $$$
