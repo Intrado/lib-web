@@ -38,6 +38,7 @@ function registerHtmlEditorKeyListener(listener) {
 		htmleditorobject.instance.removeListener('afterCommandExec', currenthtmleditorkeylistener);
 		htmleditorobject.instance.removeListener('insertHtml', currenthtmleditorkeylistener);
 		htmleditorobject.instance.removeListener('insertElement', currenthtmleditorkeylistener);
+		htmleditorobject.instance.removeListener('focus', currenthtmleditorkeylistener); // Needed for Link plugin's OK button.
 	}
 	
 	if (listener) {
@@ -47,6 +48,7 @@ function registerHtmlEditorKeyListener(listener) {
 		htmleditorobject.instance.on('afterCommandExec', listener);
 		htmleditorobject.instance.on('insertHtml', listener);
 		htmleditorobject.instance.on('insertElement', listener);
+		htmleditorobject.instance.on('focus', listener); // Needed for Link plugin's OK button.
 	}
 	
 	currenthtmleditorkeylistener = listener;
