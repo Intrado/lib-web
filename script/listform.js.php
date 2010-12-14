@@ -255,7 +255,6 @@ function listform_load(listformID, formData, postURL) {
 				$('listchooseTotal').update();
 				$('listchooseTotalAdded').update();
 				$('listchooseTotalRemoved').update();
-				$('listchooseTotalRule').update();
 
 				if (!listformVars.pendingList) {
 					ruleWidget.clear_rules();
@@ -536,7 +535,6 @@ function listform_hover_existing_list(label, listid, tr) {
 	$('listchooseTotal').update();
 	$('listchooseTotalAdded').update();
 	$('listchooseTotalRemoved').update();
-	$('listchooseTotalRule').update();
 
 	Tips.hideAll();
 
@@ -573,7 +571,6 @@ function listform_hover_existing_list(label, listid, tr) {
 		$('listchooseTotal').update(format_thousands_separator(data.total));
 		$('listchooseTotalAdded').update(format_thousands_separator(data.totaladded));
 		$('listchooseTotalRemoved').update(format_thousands_separator(data.totalremoved));
-		$('listchooseTotalRule').update(format_thousands_separator(data.totalrule));
 
 		new Tip (targetElement, $('listchooseTotalsContainer').innerHTML, {
 			style: "protogrey",
