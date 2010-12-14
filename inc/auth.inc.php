@@ -344,24 +344,6 @@ function prefetchUserInfo($activationcode) {
 	return false;
 }
 
-// given a messagelink code, authserver to provide customer db, jobid, personid
-// then lookup the messageid to return
-function loginMessageLink($code) {
-	$params = array(new XML_RPC_Value($code, 'string'));
-	$method = "AuthServer.loginMessageLink";
-	$result = pearxmlrpc($method, $params);
-	if ($result !== false && $result['result'] == "") {
-		$retval = array();
-		doDBConnect($result);
-		$msgid = QuickQuery("select messageid from reportperson where jobid=? and personid=? and type='phone'", false, array($result['jobid'], $result['personid']));
-		$retval['jobid'] = $result['jobid'];
-		$retval['personid'] = $result['personid'];
-		$retval['messageid'] = $msgid;
-		return $retval;
-	}
-	return false;
-}
-
 function emailUnsubscribe($urlcomponent, $email) {
 	$params = array(new XML_RPC_Value($urlcomponent, 'string'), new XML_RPC_Value($email, 'string'));
 	$method = "AuthServer.emailUnsubscribe";
