@@ -37,8 +37,6 @@ include_once("../obj/SurveyQuestionnaire.obj.php");
 include_once("../obj/SurveyQuestion.obj.php");
 
 
-$custname = getCustomerName($CUSTOMERURL);
-
 $custdisplayname = getCustomerName($CUSTOMERURL);
 
 $reason = authorizeSurveyWeb($code, $CUSTOMERURL);
