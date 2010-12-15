@@ -14,6 +14,8 @@ class RenderedList2 {
 	var $searchphone = false;
 	var $searchemail = false;
 	
+	var $quickaddsearch = false;//quick add search string
+	
 	var $listid = false; //used to filter out any skips, or to get manual adds.
 	
 	var $pageinlistmap = array(); // array of personids in this page (from search) that match a list to type of entry (rule or add)
@@ -68,6 +70,11 @@ class RenderedList2 {
 		$this->searchpkey = $searchpkey;
 		$this->searchphone = $searchphone;
 		$this->searchemail = $searchemail;
+	}
+	
+	function initWithQuickAddSearch ($quickaddsearch) {
+		$this->mode = "quickaddsearch";
+		$this->quickaddsearch = $quickaddsearch;
 	}
 	
 	/**
@@ -135,7 +142,7 @@ class RenderedList2 {
 				$joinsql = $this->owneruser->getPersonAssociationJoinSql($this->organizationids, $this->sectionids, "p");
 				$rulesql = $this->owneruser->getRuleSql($this->rules,"p");
 				
-				$query = "select SQL_CALC_FOUND_ROWS distinct $fieldsql from person p \n"
+				$query = "select $sqlflags distinct $fieldsql from person p \n"
 						."	$joinsql \n"
 						."	where not p.deleted and p.userid is null \n"
 						." $rulesql \n"
@@ -172,13 +179,96 @@ class RenderedList2 {
 					$contactwheresql = "and p.id=0";
 
 				
-				$query = "select SQL_CALC_FOUND_ROWS distinct $fieldsql from person p \n"
+				$query = "select $sqlflags distinct $fieldsql from person p \n"
 						."	$joinsql \n"
 						."	$contactjoinsql "
 						."	where not p.deleted and p.userid is null \n"
 						." $rulesql $contactwheresql \n"
 						."$ordersql $limitsql ";
 				
+				break;
+			case "quickaddsearch":
+				
+				$digits = Phone::parse($this->quickaddsearch); //get any digits out of the string
+				$searchstring = DBEscapeLikeWildcards(DBSafe($this->quickaddsearch));
+				
+				//if not enough search data, dont search
+				if (strlen($searchstring) < 2) {
+					return "select $fieldsql from person p where 0";
+				}
+				
+				//because mysql doesn't optimize OR and LIKE very well at all, it is more efficient to search
+				//each condition individually and union them together, assuming we didn't find a very large
+				//dataset in each query
+				$queries = array();
+				
+				//remains the same for all queries
+				$joinsql = $this->owneruser->getPersonAssociationJoinSql(array(), array(), "p");
+				$rulesql = $this->owneruser->getRuleSql(array(), "p");
+				
+				//add the person search criteria first
+				foreach (array("p.pkey","p.f01","p.f02") as $personfield) {
+					
+					$query = "select $sqlflags distinct $fieldsql from person p \n"
+						."	$joinsql \n"
+						."	where not p.deleted and p.userid is null \n"
+						." $rulesql and $personfield like '$searchstring%' \n";
+					
+					$queries[] = $query;
+					
+					//avoid setting SQL_CALC_FOUND_ROWS on subsequent queries in the union
+					//http://dev.mysql.com/doc/refman/5.0/en/information-functions.html#function_found-rows
+					//The SQL_CALC_FOUND_ROWS keyword must appear in the first SELECT of the UNION.
+					$sqlflags = ""; 
+				}
+				
+				//if there are two words separated by a spaces or commas, do a first, last and last, first search
+				$words = preg_split("/[\s,]+/", $this->quickaddsearch, -1, PREG_SPLIT_NO_EMPTY);
+				if (count($words) == 2) {
+					//if using a comma, do "last, first" otherwise "first last"
+					if (strpos($this->quickaddsearch, ",") === false) {
+						$word1 = DBEscapeLikeWildcards(DBSafe($words[0]));
+						$word2 = DBEscapeLikeWildcards(DBSafe($words[1]));
+					} else {
+						$word1 = DBEscapeLikeWildcards(DBSafe($words[1]));
+						$word2 = DBEscapeLikeWildcards(DBSafe($words[0]));
+					}
+					
+					$query = "select distinct $fieldsql from person p \n"
+						."	$joinsql \n"
+						."	where not p.deleted and p.userid is null \n"
+						." $rulesql and p.f01 like '$word1%' and p.f02 like '$word2%'\n";
+					$queries[] = $query;
+				}
+				
+				
+				
+				//add phone, sms if we have at least 4 digits
+				//less than 4 seems to not use any index, and would get entire area codes anyhow
+				if (strlen($digits) >= 4) {
+					foreach (array("phone","sms") as $type) {
+						$query = "select distinct $fieldsql from person p \n"
+							."	$joinsql \n"
+							." inner join $type x on (x.personid = p.id) \n"
+							."	where not p.deleted and p.userid is null \n"
+							." $rulesql and x.$type like '$digits%' \n";
+						$queries[] = $query;
+					}
+				}
+				
+				//add email if we have at least 3 chars
+				if (strlen($searchstring) >= 3) {
+					$query = "select distinct $fieldsql from person p \n"
+						."	$joinsql \n"
+						." inner join email x on (x.personid = p.id) \n"
+						."	where not p.deleted and p.userid is null \n"
+						." $rulesql and x.email like '$searchstring%' \n";
+					$queries[] = $query;
+				}
+				
+				$query = "(\n" . implode("\n ) \n union \n ( \n",$queries) . "\n ) \n"
+						."$ordersql $limitsql ";
+								
 				break;
 		}
 		return $query;
