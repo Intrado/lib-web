@@ -89,6 +89,10 @@ function DBSafe ($string, $dbconnect=false) {
 	return substr($quoted, 1, strlen($quoted)-2);
 }
 
+function DBEscapeLikeWildcards ($string) {
+	return str_replace("_","\\_",str_replace("%","\\%",$string));
+}
+
 function Query ($query, $dbconnect=false, $args=false) {
 	global $_dbcon;
 	$connection = $dbconnect ? $dbconnect : $_dbcon;
