@@ -136,8 +136,11 @@ function fmt_persontip ($row, $index) {
 	$pkey = escapehtml($row[1]);
 	$personid = $row[0];
 	
-	return "<a href=\"viewcontact.php?id=$personid\" class=\"actionlink\">" 
-		. "<img src=\"img/icons/diagona/16/049.gif\" /> $pkey</a>";
+	if ($personid == '')
+		return "";
+	else
+		return "<a href=\"viewcontact.php?id=$personid\" class=\"actionlink\">" 
+				. "<img src=\"img/icons/diagona/16/049.gif\" /> $pkey</a>";
 }
 
 
