@@ -268,7 +268,7 @@ class FinishJobWizard extends WizFinish {
 					$message->userid = $USER->id;
 					$message->modifydate = $messagegroup->modified;
 					$message->languagecode = $langcode;
-					$message->deleted = 1;
+					$message->deleted = 0;
 					$message->stuffHeaders();
 					$message->create();
 					
@@ -299,6 +299,12 @@ class FinishJobWizard extends WizFinish {
 				// this is the default 'en' message so it's autotranslate value is 'none'
 				$messages['phone']['en']['none']['text'] = $sourcemessage->text;
 				$messages['phone']['en']['none']['gender'] = $sourcemessage->gender;
+				
+				//also set the messagegroup preferred gender
+				$messagegroup->preferredgender = $sourcemessage->gender;
+				$messagegroup->stuffHeaders();
+				$messagegroup->update(array("data"));
+				
 				
 				// check for and retrieve translations
 				if (JobWiz_messagePhoneTranslate::isEnabled($postdata, false)) {
@@ -386,7 +392,7 @@ class FinishJobWizard extends WizFinish {
 							$message->modifydate = $messagegroup->modified;
 						
 						$message->languagecode = $langcode;
-						$message->deleted = 1;
+						$message->deleted = 0;
 						
 						if ($type == 'email') {
 							$message->subject = $data["subject"];
@@ -408,7 +414,7 @@ class FinishJobWizard extends WizFinish {
 								$msgattachment->contentid = $cid;
 								$msgattachment->filename = $details->name;
 								$msgattachment->size = $details->size;
-								$msgattachment->deleted = 1;
+								$msgattachment->deleted = 0;
 								$msgattachment->create();
 							}
 						}
