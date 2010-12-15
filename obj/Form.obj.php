@@ -145,13 +145,13 @@ class Form {
 				$control = $itemdata['control'];
 			} else {
 				//set a hidden field
-				$control = array("HiddenField");
+				$control = array("HiddenField"); //FIXME just continue? no point in echoing ''
 			}
 
 			$formclass = $control[0];
 			$item = new $formclass($this,$name, $control);
 			
-			if ($formclass != "FormHtml") {
+			if ($formclass != "FormHtml") { //FIXME what is the harm of calling renderjs for html? it returns ''
 				$value = $itemdata['value'];
 				$str .= $item->renderJavascript($value);
 			}
