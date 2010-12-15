@@ -48,7 +48,7 @@ if (!$USER->authorize('createlist')) {
 // Action/Request Processing
 ////////////////////////////////////////////////////////////////////////////////
 
-//get the message to edit from the request params or session
+//get the list to edit from the request params or session
 if (isset($_GET['id'])) {
 	setCurrentList($_GET['id']);
 	unset($_SESSION['listsearch']);
@@ -74,7 +74,7 @@ $renderedlist->pagelimit = 100;
 $buttons = array(
 	submit_button(_L('Refresh'),"refresh","arrow_refresh"),
 );
-$buttons[] = icon_button(_L('Show All Contacts'),"tick",null,"search.php?showall");
+$buttons[] = icon_button(_L('Show All Contacts'),"application_view_list",null,"search.php?showall");
 $buttons[] = icon_button(_L('Done'),"tick",null, isset($_SESSION['listreferer']) ? $_SESSION['listreferer'] : "list.php");
 
 // variable for page redirect, used by include 'contactsearchformdata.inc'
