@@ -47,8 +47,39 @@ class TextField extends FormItem {
 		$n = $this->form->name."_".$this->name;
 		$max = isset($this->args['maxlength']) ? 'maxlength="'.$this->args['maxlength'].'"' : "";
 		$size = isset($this->args['size']) ? 'size="'.$this->args['size'].'"' : "";
-		return '<input id="'.$n.'" name="'.$n.'" type="text" value="'.escapehtml($value).'" '.$max.' '.$size.'/>';
+		
+		$str = '<input id="'.$n.'" name="'.$n.'" type="text" value="'.escapehtml($value).'" '.$max.' '.$size.'/>';
+				
+		if (isset($this->args['autocomplete'])) {
+			$str .= '<span id="'.$n.'_autocomplete_indicator" style="display: none"><img src="img/ajax-loader.gif" alt="Working..." /></span>';	
+			$str .= '<div id="'.$n.'_autocomplete_choices" class="autocomplete"></div>';
+		}
+		
+		return $str;
 	}
+	
+	function renderJavascript($value) {
+		
+		//autocomplete using scriptaculous and autocomplete.php as the back-end
+		//set arg autocomplete=myautocompletename and add a handler for it in autocomplete.php
+		if (isset($this->args['autocomplete'])) {
+			$n = $this->form->name."_".$this->name;
+			$autoname = $this->args['autocomplete'];
+			$autominchars = $size = isset($this->args['autocompleteminchars']) ? $this->args['autocompleteminchars'] : 2;
+			
+			return '
+				new Ajax.Autocompleter("'.$n.'", "'.$n.'_autocomplete_choices", "autocomplete.php", {
+				  paramName: "'.$autoname.'", 
+				  minChars: '.$autominchars.', 
+				  indicator: \''.$n.'_autocomplete_indicator\'
+				});
+			';
+		} else {
+			return '';
+		}
+	}
+	
+	
 }
 
 class PasswordField extends FormItem {

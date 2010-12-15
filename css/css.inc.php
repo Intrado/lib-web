@@ -805,6 +805,29 @@ td.SplitPane {
 	border-bottom: 1px solid <?=$theme2?>;
 }
 
+div.autocomplete {
+  position:absolute;
+  width:250px;
+  background-color:white;
+  border:1px solid <?=$theme2?>;
+  margin:0;
+  padding:0;
+}
+div.autocomplete ul {
+  list-style-type:none;
+  margin:0;
+  padding:0;
+}
+div.autocomplete ul li.selected { background-color: <?=$newfade1?>;}
+div.autocomplete ul li {
+  list-style-type:none;
+  display:block;
+  margin:0;
+  padding:2px;
+  height:32px;
+  cursor:pointer;
+}
+
 
 <? if ($theme == "classroom") { /* TODO move this to theme based css includes */ ?>
 
