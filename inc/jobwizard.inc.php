@@ -877,14 +877,14 @@ class JobWiz_start extends WizStep {
 			
 			$formdata["socialmedia"] = array(
 				"label" => _L("Post to social media sites"),
-				"fieldhelp" => _L("Post your message to popular social media websites such as Facebook and Twitter."),
+				"fieldhelp" => _L("Post your message to Facebook and Twitter."),
 				"value" => false,
 				"control" => array("CheckBox"),
 				"validators" => array(),
 				"helpstep" => 4
 			);	
 			
-			$helpsteps[] = _L("TODO: guide data for social media");
+			$helpsteps[] = _L("Post your message to Facebook and Twitter. Each site has a different character limit, so you may need to edit your message to fit within the limits.");
 			
 		}
 		return new Form("start",$formdata,$helpsteps);
@@ -1707,7 +1707,7 @@ class JobWiz_facebookAuth extends WizStep {
 	
 		
 		// Twitter auth note
-		$html = "<div>". escapehtml(_L("You must authorize a Facebook account with your schoolmessenger account if you wish to post to Facebook pages.")). "</div>";
+		$html = "<div>". escapehtml(_L("You must authorize a Facebook account before you can post to Facebook.")). "</div>";
 		
 		// Form Fields.
 		$formdata = array(
@@ -1726,7 +1726,7 @@ class JobWiz_facebookAuth extends WizStep {
 				"helpstep" => 1
 			)
 		);
-		$helpsteps = array(_L("TODO: Facebook auth"));
+		$helpsteps = array(_L("Before you can post your message to Facebook, you must authorize this application. Click the Connect to Facebook button to get started. <br><br>If you are logged into Facebook already, make sure you are logged into the account you plan to use for messaging. If you authorize the wrong account, you can disconnect from Facebook on your Account page, accessible from the Account link in the upper right corner. Then log out of Facebook using Facebook's web site. When you attempt to connect to Facebook again, you will be able to log into the correct account.<br><br><b>Note:</b> Disconnecting from Facebook from within this application will not automatically remove authorization from your Facebook account. You will need to do that from your Facebook account."));
 		return new Form("facebookauth",$formdata,$helpsteps);
 	}
 
@@ -1750,7 +1750,7 @@ class JobWiz_twitterAuth extends WizStep {
 		global $USER;
 		
 		// Twitter auth note
-		$html = "<div>". escapehtml(_L("You must authorize a Twitter account with your schoolmessenger account if you wish to update twitter status.")). "</div>";
+		$html = "<div>". escapehtml(_L("You must authorize a Twitter account before you can post to Twitter.")). "</div>";
 		
 		// Form Fields.
 		$formdata = array(
@@ -1769,7 +1769,7 @@ class JobWiz_twitterAuth extends WizStep {
 				"helpstep" => 1
 			)
 		);
-		$helpsteps = array(_L("TODO: Twitter auth"));
+		$helpsteps = array(_L("Before you can post messages to Twitter, you must authorize this application. Clicking on the Connect to Twitter button will redirect you to Twitter. After you authorize this application, you will return to this page.<br><br> If you need to authorize a different account, make sure to log out of Twitter. Clicking the Connect to Twitter button will then allow you to select a different Twitter account."));
 		return new Form("twitterauth",$formdata,$helpsteps);
 	}
 
@@ -1963,7 +1963,7 @@ class JobWiz_scheduleOptions extends WizStep {
 		if (($USER->authorize("facebookpost") || $USER->authorize("twitterpost")) && 
 				isset($postdata['/start']['socialmedia']) && $postdata['/start']['socialmedia']) {
 			
-			$html = "<div>". escapehtml(_L("Social Media posting happens immediatly on job submit. Reguardless of scheduling options.")). "<br>". 
+			$html = "<div>". escapehtml(_L("Social Media posting happens immediately when the job is submitted, regardless of scheduling options.")). "<br>". 
 				escapehtml(_L("Posts may not be Saved for later. They will be discarded if \"Save for Later\" option is selected.")). "</div>";
 			
 			$formdata["socialmedianote"] = array(
@@ -1973,10 +1973,10 @@ class JobWiz_scheduleOptions extends WizStep {
 			);
 		}
 		
-		$helpsteps = array(_L("Select when to send this message."));
+		$helpsteps = array(_L("Select when to send this message or you may choose to save this job for later."));
 		$formdata["schedule"] = array(
 			"label" => _L("Delivery Schedule"),
-			"fieldhelp" => _L("Select when to send this message."),
+			"fieldhelp" => _L("Select when to send this message or you may choose to save this job for later. Please note that Social Media posts may not be saved for later."),
 			"value" => "",
 			"validators" => array(
 				array("ValRequired"),
@@ -2012,10 +2012,10 @@ class JobWiz_scheduleOptions extends WizStep {
 		}
 		//add checkbox for reviewing and saving the message, only show message checkbox if they created the message
 		if (!wizHasMessageGroup($postdata)) {
-			$helpsteps[] = _L("Save your message created in the MessageSender.");
+			$helpsteps[] = _L("You may save the message you've created in MessageSender so that it is available for future jobs. Your list will be viewable in the Message Builder, found under the Notifications tab.");
 			$formdata["savemessage"] = array(
 				"label" => _L("Save Message"),
-				"fieldhelp" => _L('Check here if you would like to save your message for reuse later.'),
+				"fieldhelp" => _L('Select this option if you would like to save your message for future jobs.'),
 				"value" => false,
 				"validators" => array(),
 				"control" => array("CheckBox"),
@@ -2232,10 +2232,10 @@ class JobWiz_scheduleSaveLists extends WizStep {
 			';
 		}
 				
-		$helpsteps[] = _L("TODO");
+		$helpsteps[] = _L("You may save the list you've created in MessageSender so that it is available for future jobs. Your list will be viewable in the List Builder, found under the Notifications tab.");
 		$formdata["savelists"] = array(
 			"label" => _L("Save Lists"),
-			"fieldhelp" => _L('TODO'),
+			"fieldhelp" => _L('Select this option to save your list for future jobs.'),
 			"value" => array(),
 			"validators" => array(),
 			"control" => array("MultiCheckBox", "values" => $values, "hover" => $hover),
