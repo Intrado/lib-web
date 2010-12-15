@@ -42,15 +42,10 @@ class ListIdList {
 }
 
 class JobOptions {
-	var $jobOption; // array of joboptionentry
+	var $jobOption; // array of name/value pairs
 }
 
-class JobOptionEntry {
-	var $name;
-	var $value;
-}
-
-class PermissionEntry {
+class NameValuePair {
 	var $name;
 	var $value;
 }
@@ -1560,7 +1555,7 @@ class SMAPI {
 			// start-end times
 			$job->startdate = date("Y-m-d", strtotime($startdate));
 			if ($ACCESS->getValue('maxjobdays') && $daystorun > $ACCESS->getValue('maxjobdays')) {
-				$daystorun = $ACCESS->getValue('maxjobdays');
+				$daystorun = $USER->getSetting('maxjobdays', $ACCESS->getValue('maxjobdays', '2'));
 			}
 			$job->enddate = date("Y-m-d", strtotime($job->startdate) + (($daystorun - 1) * 86400));
 			$job->starttime = date("H:i", strtotime($starttime));
@@ -1581,6 +1576,70 @@ class SMAPI {
 			$result["jobid"] = $job->id;
 			return $result;
 		}
+	}
+	
+	function getSettings ($sessionid) {
+		global $USER, $ACCESS;
+		$result = array("resultcode" => "failure", "resultdescription" => "", "permissions" => array());
+
+		if (!APISession($sessionid)) {
+			$result['resultcode'] = 'invalidsession';
+			$result["resultdescription"] = "Invalid Session ID";
+			return $result;
+		}
+		
+		$USER = $_SESSION['user'];
+		$ACCESS = $_SESSION['access'];
+
+		if (!$USER->id) {
+			$result['resultcode'] = 'invalidsession';
+			$result["resultdescription"] = "Invalid user";
+			return $result;
+		}
+		
+		$settings = array();
+		
+
+		// maxjobdays
+		$entry = new NameValuePair();
+		$entry->name = "maxjobdays";
+		$entry->value = $USER->getSetting('maxjobdays');
+		$settings[] = $entry;
+		
+		// callmax
+		$entry = new NameValuePair();
+		$entry->name = "callmax";
+		$entry->value = $USER->getSetting('callmax');
+		$settings[] = $entry;
+		
+		// callearly
+		$entry = new NameValuePair();
+		$entry->name = "callearly";
+		$entry->value = $USER->getSetting('callearly');
+		$settings[] = $entry;
+		
+		// calllate
+		$entry = new NameValuePair();
+		$entry->name = "calllate";
+		$entry->value = $USER->getSetting('calllate');
+		$settings[] = $entry;
+
+		// timezone
+		$entry = new NameValuePair();
+		$entry->name = "timezone";
+		$entry->value = getSystemSetting('timezone');
+		$settings[] = $entry;
+		
+		// emaildomain
+		$entry = new NameValuePair();
+		$entry->name = "emaildomain";
+		$entry->value = getSystemSetting('emaildomain');
+		$settings[] = $entry;
+		
+		// success
+		$result["resultcode"] = "success";
+		$result["settings"] = $settings;
+		return $result;
 	}
 	
 	function getPermissions ($sessionid) {
@@ -1605,7 +1664,7 @@ class SMAPI {
 		$permissions = array();
 		
 		// sendphone
-		$entry = new PermissionEntry();
+		$entry = new NameValuePair();
 		$entry->name = "sendphone";
 		if ($USER->authorize('sendphone')) {
 			$entry->value = "true";
@@ -1615,7 +1674,7 @@ class SMAPI {
 		$permissions[] = $entry;
 			
 		// sendemail
-		$entry = new PermissionEntry();
+		$entry = new NameValuePair();
 		$entry->name = "sendemail";
 		if ($USER->authorize('sendemail')) {
 			$entry->value = "true";
@@ -1625,7 +1684,7 @@ class SMAPI {
 		$permissions[] = $entry;
 			
 		// sendsms
-		$entry = new PermissionEntry();
+		$entry = new NameValuePair();
 		$entry->name = "sendsms";
 		if (getSystemSetting('_hassms') && $USER->authorize('sendsms')) {
 			$entry->value = "true";
@@ -1635,13 +1694,37 @@ class SMAPI {
 		$permissions[] = $entry;
 
 		// callerid
-		$entry = new PermissionEntry();
+		$entry = new NameValuePair();
 		$entry->name = "callerid";
 		if ($USER->authorize('setcallerid') && !getSystemSetting('_hascallback', false)) {
 			$entry->value = "true";
 		} else {
 			$entry->value = "false";
 		}
+		$permissions[] = $entry;
+
+		// maxjobdays
+		$entry = new NameValuePair();
+		$entry->name = "maxjobdays";
+		$entry->value = $ACCESS->getValue('maxjobdays');
+		$permissions[] = $entry;
+		
+		// callmax
+		$entry = new NameValuePair();
+		$entry->name = "callmax";
+		$entry->value = $ACCESS->getValue('callmax');
+		$permissions[] = $entry;
+		
+		// callearly
+		$entry = new NameValuePair();
+		$entry->name = "callearly";
+		$entry->value = $ACCESS->getValue('callearly');
+		$permissions[] = $entry;
+		
+		// calllate
+		$entry = new NameValuePair();
+		$entry->name = "calllate";
+		$entry->value = $ACCESS->getValue('calllate');
 		$permissions[] = $entry;
 		
 		// success
