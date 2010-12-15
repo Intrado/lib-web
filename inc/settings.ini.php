@@ -7,7 +7,7 @@ path="/xmlrpc"
 
 [appserver]
 host="localhost:7911"
-timeout="5500"
+timeout=5500
 
 [feature]
 is_commsuite=false
@@ -15,7 +15,7 @@ has_ssl=true
 force_ssl=true
 log_dir="/usr/commsuite/logs/"
 log_db_errors=true
-log_db_queries=true
+log_db_queries=false
 log_dmapi=false
 has_print=false
 tmp_dir="/tmp"
@@ -26,7 +26,7 @@ warn_earliest=
 warn_latest=
 
 [content]
-tts="localhost,8080,/tts/ttsserver"
+tts="10.25.25.66,8080,/tts/ttsserver"
 
 
 [translation]
@@ -37,7 +37,6 @@ disableAutoTranslate=false
 
 [txtreply]
 txt_datfile="/usr/commsuite/cache/txtreply.dat"
-
 
 [facebook]
 appid="170562026304359"
