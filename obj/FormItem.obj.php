@@ -59,24 +59,30 @@ class TextField extends FormItem {
 	}
 	
 	function renderJavascript($value) {
-		
+		$n = $this->form->name."_".$this->name;
+		$js = "";
 		//autocomplete using scriptaculous and autocomplete.php as the back-end
 		//set arg autocomplete=myautocompletename and add a handler for it in autocomplete.php
 		if (isset($this->args['autocomplete'])) {
-			$n = $this->form->name."_".$this->name;
 			$autoname = $this->args['autocomplete'];
 			$autominchars = $size = isset($this->args['autocompleteminchars']) ? $this->args['autocompleteminchars'] : 2;
 			
-			return '
+			$js .= '
 				new Ajax.Autocompleter("'.$n.'", "'.$n.'_autocomplete_choices", "autocomplete.php", {
 				  paramName: "'.$autoname.'", 
 				  minChars: '.$autominchars.', 
 				  indicator: \''.$n.'_autocomplete_indicator\'
 				});
 			';
-		} else {
-			return '';
 		}
+		
+		if (isset($this->args['blankfieldvalue'])) {
+			$js = '
+				blankFieldValue("'.$n.'","'.$this->args['blankfieldvalue'].'");
+			';
+		}
+		
+		return $js;
 	}
 	
 	
