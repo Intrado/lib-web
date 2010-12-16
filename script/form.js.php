@@ -552,10 +552,19 @@ function form_handle_submit(form,event) {
 		'ajax': 'true'
 	});
 	
+	//start spinner
+	var spinner =  $(form.name + "_spinner");
+	if (spinner) {
+		spinner.show();
+	}
+	
 	new Ajax.Request(posturl, {
 		method:'post',
 		parameters: form.serialize(true),
 		onSuccess: function(response) {
+			if (spinner) {
+				spinner.hide();
+			}
 			var res = response.responseJSON;
 			try {
 			if (res == null) {
@@ -606,6 +615,9 @@ function form_handle_submit(form,event) {
 			formvars.submitting = false;
 		},
 		onFailure: function(){
+			if (spinner) {
+				spinner.hide();
+			}
 			alert('There was a problem submitting the form. Please try again.'); //TODO better error handling
 			formvars.submitting = false;
 		}

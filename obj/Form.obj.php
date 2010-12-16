@@ -340,6 +340,7 @@ class Form {
 		}
 
 		$str .= '
+				<div id="'.$this->name.'_spinner" class="formspinner" style="display: none;"><img src="img/ajax-loader.gif" alt="Loading..."></div>
 				<!-- END FORM CONTENT -->
 				</td>
 				<td id="'.$this->name.'_helpercell" valign="top" width="'.($this->helpsteps ? '100px' : '0px').'">

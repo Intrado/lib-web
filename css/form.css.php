@@ -19,6 +19,11 @@ form.newform {
 	clear: both;
 }
 
+.formspinner {
+	margin-top: 5px; 
+	margin-left: 10px;
+}
+
 .helpicon {
 	margin-left: 10px; 
 }
