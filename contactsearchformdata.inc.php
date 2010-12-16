@@ -94,7 +94,7 @@ $formdata["quickaddsearch"] = array(
 	"validators" => array(
 		array("ValLength","min" => 2, "max" => 255)
 	),
-	"control" => array("TextField", "size" => 30),
+	"control" => array("TextField", "size" => 50, "blankfieldvalue" => "Enter a name, phone number, ID#, or email" ),
 	"helpstep" => 2
 );
 

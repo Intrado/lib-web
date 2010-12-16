@@ -308,7 +308,7 @@ if ($showSkips) {
 $advancedtools = '<tr class="listHeader"><th style="text-align:left">' . _L("Tool") . '</th><th style="text-align:left">' . _L("Description") . '</th></tr>';
 $advancedtools .= '<tr><td>'.submit_button(_L('Enter Contacts'),'manualAdd','add').'</td><td>'._L('Manually type in new contacts').'</td></tr>';
 $advancedtools .= '<tr class="listAlt"><td>'.submit_button(_L('Open Address Book'),'addressBookAdd', 'book_addresses').'</td><td>'._L('Choose from contacts you manually typed into your personal address book').'</td></tr>';
-$advancedtools .= '<tr><td>'.submit_button(_L('Quick Search'),'quickadd','find').'</td><td>'._L('Search for people by name, ID#, email, or phone number').'</td></tr>';
+$advancedtools .= '<tr><td>'.submit_button(_L('Quick Pick'),'quickadd','find').'</td><td>'._L('Search for people by name, ID#, email, or phone number').'</td></tr>';
 $advancedtools .= '<tr class="listAlt"><td>'.submit_button(_L('Search by Rules'),'search','application_form_add').'</td><td>'._L('Search the shared system contact database using rules').'</td></tr>';
 
 if ($USER->authorize('listuploadids') || $USER->authorize('listuploadcontacts'))
@@ -479,10 +479,10 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 						break;
 
 					case 'search':
-						$form->sendTo("search.php?id=" . $list->id);
+						$form->sendTo("search.php?mode=rules&id=" . $list->id);
 						break;
 					case 'quickadd':
-						$form->sendTo("searchquickadd.php?id=" . $list->id);
+						$form->sendTo("search.php?mode=individual&id=" . $list->id);
 						break;
 					case 'manualAdd':
 						$form->sendTo("addressedit.php?id=new&origin=manualadd");

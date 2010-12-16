@@ -51,10 +51,17 @@ if (!$USER->authorize('createlist')) {
 //get the list to edit from the request params or session
 if (isset($_GET['id'])) {
 	setCurrentList($_GET['id']);
-	unset($_SESSION['listsearch']);
+	unset($_SESSION['listsearch']); //will also default to rules mode
+	
+	if (isset($_GET['mode']) && $_GET['mode'] == "individual") {
+		$_SESSION['listsearch'] = array ("individual" => array ("quickaddsearch" => ''));
+	}
+	
 	$_SESSION['listreferer'] = $_SERVER['HTTP_REFERER'];
 	redirect();
 }
+
+
 
 if (isset($_GET['showall']))
 	$_SESSION['listsearch'] = array("showall" => true);
@@ -121,6 +128,7 @@ endWindow();
 
 startWindow("Search Results");
 ?>
+
 <div id="renderedlistcontent">
 <? 
 if ($hassomesearchcriteria)
