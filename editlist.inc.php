@@ -172,7 +172,7 @@ $formdata = array(
 	"preview" => array(
 		"label" => 'Total',
 		"fieldhelp" => _L('This number indicates how many people are currently in your list. Click the preview button to view contact information.'),
-		"control" => array("FormHtml", 'html' => '<div id="listTotal" style="float:left; padding:5px; margin-right: 10px;">'.$total.'</div>' . submit_button(_L('Preview'), 'preview', 'tick')),
+		"control" => array("FormHtml", 'html' => '<div id="listTotal" style="float:left; padding:5px; margin-right: 10px;">'.$total.'</div>' . submit_button(_L('Preview'), 'preview', 'diagona/16/049')),
 		"helpstep" => 1
 	)
 );
@@ -306,11 +306,13 @@ if ($showSkips) {
 	);
 }
 $advancedtools = '<tr class="listHeader"><th style="text-align:left">' . _L("Tool") . '</th><th style="text-align:left">' . _L("Description") . '</th></tr>';
-$advancedtools .= '<tr><td>'.submit_button(_L('Enter Contacts'),'manualAdd').'</td><td>'._L('Manually type in new contacts').'</td></tr>';
-$advancedtools .= '<tr class="listAlt"><td>'.submit_button(_L('Open Address Book'),'addressBookAdd').'</td><td>'._L('Choose from contacts you manually typed into your personal address book').'</td></tr>';
-$advancedtools .= '<tr><td>'.submit_button(_L('Search Contacts'),'search').'</td><td>'._L('Search the shared system contact database').'</td></tr>';
+$advancedtools .= '<tr><td>'.submit_button(_L('Enter Contacts'),'manualAdd','add').'</td><td>'._L('Manually type in new contacts').'</td></tr>';
+$advancedtools .= '<tr class="listAlt"><td>'.submit_button(_L('Open Address Book'),'addressBookAdd', 'book_addresses').'</td><td>'._L('Choose from contacts you manually typed into your personal address book').'</td></tr>';
+$advancedtools .= '<tr><td>'.submit_button(_L('Quick Search'),'quickadd','find').'</td><td>'._L('Search for people by name, ID#, email, or phone number').'</td></tr>';
+$advancedtools .= '<tr class="listAlt"><td>'.submit_button(_L('Search by Rules'),'search','application_form_add').'</td><td>'._L('Search the shared system contact database using rules').'</td></tr>';
+
 if ($USER->authorize('listuploadids') || $USER->authorize('listuploadcontacts'))
-	$advancedtools .= '<tr class="listAlt"><td>'.submit_button(_L('Upload List'),'uploadList').'</td><td>'._L('Upload a list of contacts using a CSV file').'</td></tr>';
+	$advancedtools .= '<tr><td>'.submit_button(_L('Upload List'),'uploadList','folder').'</td><td>'._L('Upload a list of contacts using a CSV file').'</td></tr>';
 $formdata[] = _L('Additional List Tools');
 $formdata["advancedtools"] = array(
 	"label" => '',
@@ -479,7 +481,9 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 					case 'search':
 						$form->sendTo("search.php?id=" . $list->id);
 						break;
-
+					case 'quickadd':
+						$form->sendTo("searchquickadd.php?id=" . $list->id);
+						break;
 					case 'manualAdd':
 						$form->sendTo("addressedit.php?id=new&origin=manualadd");
 						break;
