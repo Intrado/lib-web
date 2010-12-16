@@ -89,6 +89,7 @@ $formdata = array(
 
 $buttons = array(
 	submit_button(_L('Search'),"search","find"),
+	icon_button(_L('Done'),"tick",null, isset($_SESSION['listreferer']) ? $_SESSION['listreferer'] : "list.php")
 );
 
 $form = new Form('quickaddsearch',$formdata,array(),$buttons);
@@ -127,7 +128,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 				ob_end_clean();
 			} else {
 				$renderedlisthtml = '<div style="margin: 15px;"><h2>No records match that search</h2>
-					<img src="img/bug_lightbulb.gif" alt="Tip">You may enter a name, phone number, email address, or ID #. 
+					<img src="img/bug_lightbulb.gif" alt="Tip" style="margin-right: 10px;">You may enter a name, phone number, email address, or ID #. 
 					You may also enter both a first and last name to narrow the search.</div>
 				';
 			}
@@ -152,11 +153,11 @@ if (!$initedrenderedlist && isset($_SESSION['quickaddsearch']) && strlen($_SESSI
 ////////////////////////////////////////////////////////////////////////////////
 
 $PAGE = "notifications:lists";
-$TITLE = "List Quick Add: " . escapehtml($list->name);
+$TITLE = "List Quick Search: " . escapehtml($list->name);
 require_once("nav.inc.php");
 
 
-startWindow("Quick Add");
+startWindow("Quick Search");
 
 echo $form->render();
 
@@ -169,7 +170,7 @@ if ($initedrenderedlist) {
 ?>
 <div style="margin: 15px;">
 <h2>Start typing in the search box to begin.</h2>
-<img src="img/bug_lightbulb.gif" alt="Tip">You may enter a name, phone number, email address, or ID #. You may also enter both a first and last name to narrow the search.
+<img src="img/bug_lightbulb.gif" alt="Tip" style="margin-right: 10px;">You may enter a name, phone number, email address, or ID #. You may also enter both a first and last name to narrow the search.
 </div>
 <?
 }
