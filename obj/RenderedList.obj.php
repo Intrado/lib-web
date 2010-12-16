@@ -2,7 +2,7 @@
 
 class RenderedList2 {
 	
-	var $mode = false; //list,search,individual
+	var $mode = false; //list,search,individual,quickaddsearch
 	var $owneruser;
 	
 	//vars to hold search criteria (or list search contents)
@@ -15,6 +15,9 @@ class RenderedList2 {
 	var $searchemail = false;
 	
 	var $quickaddsearch = false;//quick add search string
+	
+	//extra search sql
+	var $extrawheresql = ''; //used by activation code manager to filter stuff. don't forget the "and ..."
 	
 	var $listid = false; //used to filter out any skips, or to get manual adds.
 	
@@ -78,6 +81,13 @@ class RenderedList2 {
 	}
 	
 	/**
+	 * adds some sql to the where clause of getPersonSql()
+	 */ 
+	function setExtraWhereSql ($extrawheresql) {
+		$this->extrawheresql = $extrawheresql;
+	}
+	
+	/**
 	 * Generates a query to select personids matching criteria set up with one of the init functions.
 	 * Only minimal column data is returned: personid and any fields used in the orderby. (ie to use query as subquery/union/etc)
 	 * @param $addorderlimit set to false to avoid appending "order by" or "limit" clauses
@@ -121,7 +131,7 @@ class RenderedList2 {
 							."	left join listentry le on \n"
 							."		(p.id = le.personid and le.listid=" . $this->listid . ") \n" //skip anyone that is directly referenced, add or negate
 							."	where not p.deleted and p.userid is null and le.type is null \n"
-							." $rulesql ) \n"
+							." $rulesql $this->extrawheresql) \n"
 							." UNION ALL \n"
 							."(select $fieldsql from person p \n"
 							."	inner join listentry le on \n"
@@ -145,7 +155,7 @@ class RenderedList2 {
 				$query = "select $sqlflags distinct $fieldsql from person p \n"
 						."	$joinsql \n"
 						."	where not p.deleted and p.userid is null \n"
-						." $rulesql \n"
+						." $rulesql $this->extrawheresql \n"
 						."$ordersql $limitsql ";
 				
 				break;
@@ -183,7 +193,7 @@ class RenderedList2 {
 						."	$joinsql \n"
 						."	$contactjoinsql "
 						."	where not p.deleted and p.userid is null \n"
-						." $rulesql $contactwheresql \n"
+						." $rulesql $this->extrawheresql $contactwheresql \n"
 						."$ordersql $limitsql ";
 				
 				break;
@@ -212,7 +222,7 @@ class RenderedList2 {
 					$query = "select $sqlflags distinct $fieldsql from person p \n"
 						."	$joinsql \n"
 						."	where not p.deleted and p.userid is null \n"
-						." $rulesql and $personfield like '$searchstring%' \n";
+						." $rulesql $this->extrawheresql and $personfield like '$searchstring%' \n";
 					
 					$queries[] = $query;
 					
@@ -237,7 +247,7 @@ class RenderedList2 {
 					$query = "select distinct $fieldsql from person p \n"
 						."	$joinsql \n"
 						."	where not p.deleted and p.userid is null \n"
-						." $rulesql and p.f01 like '$word1%' and p.f02 like '$word2%'\n";
+						." $rulesql $this->extrawheresql and p.f01 like '$word1%' and p.f02 like '$word2%'\n";
 					$queries[] = $query;
 				}
 				
@@ -251,7 +261,7 @@ class RenderedList2 {
 							."	$joinsql \n"
 							." inner join $type x on (x.personid = p.id) \n"
 							."	where not p.deleted and p.userid is null \n"
-							." $rulesql and x.$type like '$digits%' \n";
+							." $rulesql $this->extrawheresql and x.$type like '$digits%' \n";
 						$queries[] = $query;
 					}
 				}
@@ -262,7 +272,7 @@ class RenderedList2 {
 						."	$joinsql \n"
 						." inner join email x on (x.personid = p.id) \n"
 						."	where not p.deleted and p.userid is null \n"
-						." $rulesql and x.email like '$searchstring%' \n";
+						." $rulesql $this->extrawheresql and x.email like '$searchstring%' \n";
 					$queries[] = $query;
 				}
 				
@@ -273,6 +283,16 @@ class RenderedList2 {
 		}
 		return $query;
 	}
+	
+	
+	function setPageOffset ($newoffset) {
+		$this->pageoffset = $newoffset;
+		$this->pagepersonids = false;
+		$this->pagedata = false;
+		$this->total = 0;
+	}
+	
+
 	
 	function loadPagePersonIds() {
 		if ($this->pagepersonids === false) {

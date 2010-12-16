@@ -77,6 +77,16 @@ else
 
 // basic rendered list initialization
 $renderedlist = new RenderedListCM();
+$extrawheresql = "";
+if (isset($_SESSION['hideactivecodes']) && $_SESSION['hideactivecodes']) {
+	$extrawheresql .= " and not exists (select * from portalpersontoken ppt where ppt.personid = p.id and ppt.expirationdate >= curdate()) ";
+}
+if (isset($_SESSION['hideassociated']) && $_SESSION['hideassociated']) {
+	$extrawheresql .= " and not exists (select * from portalperson pp2 where pp2.personid = p.id) ";
+}
+
+$renderedlist->setExtraWhereSql($extrawheresql);
+		
 $pagelimit = 100;
 $renderedlist->pagelimit = $pagelimit;
 
@@ -113,6 +123,7 @@ $additionalformdata["outputformat"] = array(
 	"helpstep" => 2
 );
 
+$disablerenderedlistajax = true;
 include_once("contactsearchformdata.inc.php");
 
 
@@ -134,11 +145,11 @@ for ($x = 0; $x < 3; $x++) {
 	else if (isset($validsortfields[$_GET["sort$x"]])) {
 		$ordering[$x] = array($_GET["sort$x"],isset($_GET["desc$x"]));
 	}
-}	
+}
 $_SESSION['showlistorder'] = $ordering = array_values($ordering); //remove gaps
-	
+
 $pagestart = (isset($_GET['pagestart']) ? $_GET['pagestart'] + 0 : 0);
-$renderedlist->pageoffset = $pagestart;
+$renderedlist->setPageOffset($pagestart);
 $renderedlist->orderby = $ordering;
 
 $data = $renderedlist->getPageData();
@@ -159,15 +170,10 @@ if ($personsql != "") {
 // this needs to be after the rules for renderedlist are loaded, etc. cannot go up top with the usual GET handlers
 // check if generating tokens
 if ($generateBulkTokens && isset($_GET['generate'])) {
-	if (isset($_SESSION['listsearch']['individual'])) {
-		$renderedlist->mode = "individual";
-	} else {
-		$renderedlist->mode = "search";
-	}
 	
 	$totalgenerated = 0;
 	$pageoffset = 0;
-	$renderedlist->pageoffset = $pageoffset;
+	$renderedlist->setPageOffset($pageoffset);
 	$personsql = $renderedlist->getPersonSql(true);
 	$personids = QuickQueryList($personsql);
 	while (count($personids) > 0) {
@@ -178,7 +184,7 @@ if ($generateBulkTokens && isset($_GET['generate'])) {
 			$count = 0; // failure
 		
 		$pageoffset += $pagelimit;
-		$renderedlist->pageoffset = $pageoffset;
+		$renderedlist->setPageOffset($pageoffset);
 		$personsql = $renderedlist->getPersonSql(true);
 		$personids = QuickQueryList($personsql);
 	}
@@ -304,7 +310,7 @@ if ($csv) {
 	$renderedlist->pagelimit = $pagesize;
 
 	$pageoffset = 0;
-	$renderedlist->pageoffset = $pageoffset;
+	$renderedlist->setPageOffset($pageoffset);
 	$data = $renderedlist->getPageData(true);
 	while (count($data) > 0) {
 		// write out the rows of data
@@ -334,7 +340,7 @@ if ($csv) {
 		}
 
 		$pageoffset += $pagesize;
-		$renderedlist->pageoffset = $pageoffset;
+		$renderedlist->setPageOffset($pageoffset);
 		$data = $renderedlist->getPageData();
 	}
 	
@@ -359,7 +365,7 @@ if ($csv) {
 				echo 'choose_search_by_person();';
 			else if (isset($_SESSION['listsearch']['sectionids']))
 				echo 'choose_search_by_sections();';
-			else 
+			else
 				echo 'choose_search_by_rules();';
 ?>
 		});
