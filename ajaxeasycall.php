@@ -104,7 +104,7 @@ function createaudiofile($id, $name = "") {
 	$audiofile->description = "EasyCall - " . date('Y-m-d H:i:s');
 	$audiofile->contentid = $content->id;
 	$audiofile->recorddate = date('Y-m-d H:i:s');
-	$audiofile->deleted = 1;
+	$audiofile->deleted = 0;
 	$audiofile->permanent = 0;
 	$audiofile->messagegroupid = NULL;
 	$audiofile->create();
