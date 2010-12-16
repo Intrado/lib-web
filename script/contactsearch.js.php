@@ -14,9 +14,7 @@ function choose_search_by_rules() {
 		$('sectionsearchButtonContainer').up('tr').hide();
 	}
 	$('searchByPerson').checked = false;
-	$('listsearch_pkey').up('tr').hide();
-	$('listsearch_phone').up('tr').hide();
-	$('listsearch_email').up('tr').hide();
+	$('listsearch_quickaddsearch').up('tr').hide();
 	$('personsearchButtonContainer').up('tr').hide();
 }
 
@@ -29,9 +27,7 @@ function choose_search_by_sections() {
 		$('sectionsearchButtonContainer').up('tr').show();
 	}
 	$('searchByPerson').checked = false;
-	$('listsearch_pkey').up('tr').hide();
-	$('listsearch_phone').up('tr').hide();
-	$('listsearch_email').up('tr').hide();
+	$('listsearch_quickaddsearch').up('tr').hide();
 	$('personsearchButtonContainer').up('tr').hide();
 }
 
@@ -44,16 +40,12 @@ function choose_search_by_person() {
 		$('sectionsearchButtonContainer').up('tr').hide();
 	}
 	$('searchByPerson').checked = true;
-	$('listsearch_pkey').up('tr').show();
-	$('listsearch_phone').up('tr').show();
-	$('listsearch_email').up('tr').show();
+	$('listsearch_quickaddsearch').up('tr').show();
 	$('personsearchButtonContainer').up('tr').show();
 }
 
 function list_clear_person() {
-	$('listsearch_pkey').value = '';
-	$('listsearch_phone').value = '';
-	$('listsearch_email').value = '';
+	$('listsearch_quickaddsearch').value = '';
 }
 
 function rulewidget_add_rule(event) {
