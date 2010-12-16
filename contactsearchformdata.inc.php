@@ -4,6 +4,8 @@
 // $buttons = array(); of some buttons
 // $redirectpage = ""; the calling page
 // optional $additionalformdata = array();
+// optional $list (a list if editing one)
+// optional $disablerenderedlistajax = true to turn off rendered list ajax refreshing (ie activation code manager)
 
 $hassomesearchcriteria = true;
 if (isset($_SESSION['listsearch']['rules'])) {
@@ -19,11 +21,7 @@ if (isset($_SESSION['listsearch']['rules'])) {
 } else if (isset($_SESSION['listsearch']['sectionids'])) {
 	$renderedlist->initWithSearchCriteria(array(), array(), $_SESSION['listsearch']['sectionids']);
 } else if (isset($_SESSION['listsearch']['individual'])) {
-	$pkey = $_SESSION['listsearch']['individual']['pkey'];
-	$phone = $_SESSION['listsearch']['individual']['phone'];
-	$email = $_SESSION['listsearch']['individual']['email'];
-	
-	$renderedlist->initWithIndividualCriteria($pkey == "" ? false : $pkey,$phone == "" ? false : $phone,$email == "" ? false : $email);
+	$renderedlist->initWithQuickAddSearch($_SESSION['listsearch']['individual']['quickaddsearch']);
 } else if (isset($_SESSION['listsearch']['showall'])) {
 	$renderedlist->initWithSearchCriteria(array(), array(), array());
 } else {
@@ -88,35 +86,22 @@ $formdata["ruledata"] = array(
 	);
 }
 
-$formdata["pkey"] = array(
-	"label" => _L('Person ID'),
-	"fieldhelp" => _L("Search for the person by their ID number."),
-	"value" => isset($_SESSION['listsearch']['individual']['pkey']) ? $_SESSION['listsearch']['individual']['pkey'] : '',
+$formdata["quickaddsearch"] = array(
+	"label" => _L("Search"),
+	"fieldhelp" => _L('You may enter a name, phone number, email address, or ID #. 
+					You may also enter both a first and last name to narrow the search in either "first last" or "last, first" format.'),
+	"value" => "",
 	"validators" => array(
+		array("ValLength","min" => 2, "max" => 255)
 	),
-	"control" => array("TextField"),
-	"helpstep" => 2
-);
-$formdata["phone"] = array(
-	"label" => _L('Phone or SMS Number'),
-	"fieldhelp" => _L("Search for the person by their phone or SMS number."),
-	"value" => isset($_SESSION['listsearch']['individual']['phone']) ? $_SESSION['listsearch']['individual']['phone'] : '',
-	"validators" => array(array("ValPhone")),
-	"control" => array("TextField"),
-	"helpstep" => 2
-);
-$formdata["email"] = array(
-	"label" => _L('Email Address'),
-	"fieldhelp" => _L("Search for the person by their email address."),
-	"value" => isset($_SESSION['listsearch']['individual']['email']) ? $_SESSION['listsearch']['individual']['email'] : '',
-	"validators" => array(array("ValEmail")),
-	"control" => array("TextField"),
+	"control" => array("TextField", "size" => 30),
 	"helpstep" => 2
 );
 
+
 $formdata["personsearchbutton"] = array(
 	"label" => _L(''),
-	"control" => array("FormHtml", "html" => "<div id='personsearchButtonContainer'>" . submit_button(_L('Search'),'personsearch',"magnifier") . "</div>"),
+	"control" => array("FormHtml", "html" => "<div id='personsearchButtonContainer'>" . submit_button(_L('Search'),"personsearch","find") . "</div>"),
 	"helpstep" => 2
 );
 
@@ -198,12 +183,24 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 				case 'personsearch':
 					$_SESSION['listsearch'] = array (
 						"individual" => array (
-							"pkey" => isset($postdata['pkey']) ? $postdata['pkey'] : false,
-							"phone" => isset($postdata['phone']) ? $postdata['phone'] : false,
-							"email" => isset($postdata['email']) ? $postdata['email'] : false,	
-						)					
+							"quickaddsearch" => isset($postdata['quickaddsearch']) ? $postdata['quickaddsearch'] : ''
+						)
 					);
-
+					
+					if (!isset($disablerenderedlistajax) || !$disablerenderedlistajax) {
+						$renderedlist->initWithQuickAddSearch($postdata['quickaddsearch']);
+						
+						ob_start();
+						$_GET['pagestart'] = 0; //override previous paging offsets which are still stuck in the GET query
+						if (isset($list))
+							showRenderedListTable($renderedlist, $list);
+						else
+							showRenderedListTable($renderedlist);
+						$renderedlisthtml = ob_get_clean();
+						ob_end_clean();
+						
+						$form->modifyElement("renderedlistcontent", $renderedlisthtml);
+					}
 					break;
 					
 				case 'refresh':
