@@ -117,12 +117,17 @@ echo $form->render();
 endWindow();
 
 startWindow("Search Results");
-
+?>
+<div id="renderedlistcontent">
+<? 
 if ($hassomesearchcriteria)
 	showRenderedListTable($renderedlist);
 else
 	echo "<h2>Select some search options to begin.</h2>";
-
+?>
+</div>
+<?
+	
 endWindow();
 
 require_once("navbottom.inc.php");
