@@ -416,7 +416,7 @@ function do_ajax_listbox(checkbox, personid) {
 			var data = transport.responseJSON;
 			if (!data) {
 				this.checked = false;
-				alert('Sorry, error when trying to add to list');
+				alert('Sorry, there was an error when trying to add to the list');
 				return;
 			}
 		}.bindAsEventListener(checkbox), null, false);
@@ -426,7 +426,7 @@ function do_ajax_listbox(checkbox, personid) {
 			var data = transport.responseJSON;
 			if (!data) {
 				this.checked = true;
-				alert('Sorry, error when trying to remove from list');
+				alert('Sorry, there was an error when trying to remove from the list');
 				return;
 			}
 		}.bindAsEventListener(checkbox), null, false);
