@@ -741,8 +741,8 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 			$obj->setPermission("viewsystemcompleted", (bool)$postdata['viewsystemcompleted']);
 			$obj->setPermission("leavemessage", (bool)$postdata['leavemessage']);
 			$obj->setPermission("messageconfirmation", (bool)$postdata['messageconfirmation']);
-			$obj->setPermission("facebookpost", (bool)$postdata['facebookpost']);
-			$obj->setPermission("twitterpost", (bool)$postdata['twitterpost']);
+			$obj->setPermission("facebookpost", (bool)(isset($postdata['facebookpost'])?$postdata['facebookpost']:false));
+			$obj->setPermission("twitterpost", (bool)(isset($postdata['twitterpost'])?$postdata['twitterpost']:false));
 
 			if(getSystemSetting("_hasportal", false)) {
 				$obj->setPermission("portalaccess", (bool)$postdata['portalaccess']);
