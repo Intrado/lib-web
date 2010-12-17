@@ -19,7 +19,8 @@ require_once("obj/Publish.obj.php");
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization
 ////////////////////////////////////////////////////////////////////////////////
-if (!$USER->authorize('createlist')) {
+
+if (!$USER->authorize('createlist') && !($USER->authorize("subscribe") && userCanSubscribe('list'))) {
 	redirect('unauthorized.php');
 }
 
@@ -135,7 +136,7 @@ if (isset($_GET['ajax'])) {
 				$publishmessage = _L('Changes to this list are published.');
 			
 			// tell the user it's a subscription. change the href to view instead of edit
-			if ($publishaction == 'subscribe') {
+			if ($publishaction == 'subscribe' || !$USER->authorize('createlist')) {
 				$publishmessage = _L('You are subscribed to this list. Owner: (%s)', $item['owner']);
 				$defaultlink = "showlist.php?id=$itemid";
 			}
@@ -169,17 +170,19 @@ if (isset($_GET['ajax'])) {
 			
 			
 			// if the user is only subscribed to this list, they can't edit or delete
-			if ($publishaction == 'subscribe')
+			if ($publishaction == 'subscribe') {
 				$tools = action_links (
 					action_link("Preview", "application_view_list", "showlist.php?id=$itemid"),
 					$publishactionlink);
-			else
+			} else if ($USER->authorize('createlist')) {
 				$tools = action_links (
 					action_link("Edit", "pencil", "list.php?id=$itemid"),
 					action_link("Preview", "application_view_list", "showlist.php?id=$itemid"),
 					$publishactionlink,
 					action_link("Delete", "cross", "lists.php?delete=$itemid", "return confirmDelete();"));
-				
+			} else {
+				$tools = action_links(action_link("Preview", "application_view_list", "showlist.php?id=$itemid"));
+			}
 			$icon = 'largeicons/addrbook.jpg';
 
 			$data->list[] = array("itemid" => $itemid,
@@ -221,6 +224,7 @@ startWindow('My Lists&nbsp;' . help('Lists_MyLists'));
 <tr>
 	<td style="width: 180px;vertical-align: top;font-size: 12px;" >
 		<!-- Create List buttons -->
+<? if ($USER->authorize('createlist')) { ?>
 		<div class="feedbuttoncontainer">
 			<?= icon_button(_L('Create a List'),"add","location.href='editlistrules.php?id=new'") ?>
 			<div style="clear:both;"></div>
@@ -229,6 +233,8 @@ startWindow('My Lists&nbsp;' . help('Lists_MyLists'));
 				?><div style="clear:both;"></div><?
 			} ?>
 		</div>
+<? } ?>
+
 		<div>
 			<?=(($USER->authorize('subscribe') && userCanSubscribe('list'))?icon_button(_L('Subscribe to a List'),"fugue/star", "document.location='listsubscribe.php'"):'') ?>
 		</div>

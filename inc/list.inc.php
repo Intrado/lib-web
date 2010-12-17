@@ -37,7 +37,7 @@ function showRenderedListTable($renderedlist, $list = false) {
 	$data = $renderedlist->getPageData();
 	$total = $renderedlist->getTotal();
 	
-	$showinlist = $list && $list->userid == $USER->id;
+	$showinlist = $list && $list->userid == $USER->id && $USER->authorize('createlist');
 	$showpersontip = !$list || ($list && $list->userid == $USER->id);
 	
 	if ($showinlist)
@@ -112,7 +112,7 @@ function showRenderedListTable($renderedlist, $list = false) {
 function handle_list_checkbox_ajax () {
 	global $USER;
 	
-	if (!isset($_GET['ajax']))
+	if (!isset($_GET['ajax']) || !$USER->authorize('createlist')) //make sure user can edit lists
 		return;
 	
 	if (isset($_GET['addpersonid'])) {

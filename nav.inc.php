@@ -17,12 +17,12 @@ if (isset($_GET['timer']) || isset($_SESSION['timer'])) {
 	$_SESSION['timer'] = true;
 }
 
-if ($USER->authorize(array('starteasy','sendmessage', 'sendemail', 'sendphone', 'sendsms'))) {
+if ($USER->authorize(array('starteasy', 'sendemail', 'sendphone', 'sendsms'))) {
 	$SHORTCUTS['-- Jobs & Messages --'] = "false;";
 	if ($USER->authorize("starteasy")) {
 		$SHORTCUTS['EasyStart'] = "jobwizard.php?new";
 	}
-	if ($USER->authorize(array('sendmessage', 'sendemail', 'sendphone', 'sendsms'))) {
+	if ($USER->authorize(array('sendemail', 'sendphone', 'sendsms'))) {
 		$SHORTCUTS['My Messages'] = "messages.php";
 		$SHORTCUTS['My Jobs'] = "jobs.php";
 		$SHORTCUTS['My Archived Jobs'] = "jobsarchived.php";
@@ -65,9 +65,9 @@ $SHORTCUTS['Help'] = "javascript: popup('help/index.php',750,500);";
 $NAVTREE = array (
 	array("Start","start.php",NULL,$MAINTAB=="start",array()),
 	array("Notifications",NULL,array("createlist","sendphone","sendprint","sendemail", "sendsms",getSystemSetting("_hastargetedmessage", false) ? "targetedmessage" : "dummy"),$MAINTAB=="notifications",array(
-		array("Lists","lists.php","createlist",$SUBTAB=="lists"),
-		array("Messages","messages.php",array('sendmessage', 'sendemail', 'sendphone', "sendsms"),$SUBTAB=="messages"),
-		array("Jobs","jobs.php",array('sendmessage', 'sendemail', 'sendphone', "sendsms"),$SUBTAB=="jobs"),
+		array("Lists","lists.php",array("createlist","subscribe"),$SUBTAB=="lists"),
+		array("Messages","messages.php",array('sendemail', 'sendphone', "sendsms","subscribe"),$SUBTAB=="messages"),
+		array("Jobs","jobs.php",array('sendemail', 'sendphone', "sendsms"),$SUBTAB=="jobs"),
 		array("Classroom","classroommessageoverview.php",getSystemSetting("_hastargetedmessage", false) ? "targetedmessage" : "dummy",$SUBTAB=="classroom"),
 		array("Surveys","surveys.php",getSystemSetting("_hassurvey", true) ? "survey" : "dummy",$SUBTAB=="survey"),
 		array("Responses","replies.php?reset=1","leavemessage",$SUBTAB=="responses")

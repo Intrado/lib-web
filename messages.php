@@ -20,7 +20,7 @@ require_once("inc/formatters.inc.php");
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization
 ////////////////////////////////////////////////////////////////////////////////
-if (!$USER->authorize(array('sendmessage', 'sendemail', 'sendphone', 'sendsms'))) {
+if (!$USER->authorize(array('sendemail', 'sendphone', 'sendsms'))) {
 	redirect('unauthorized.php');
 }
 

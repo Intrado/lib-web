@@ -25,7 +25,7 @@ require_once("inc/list.inc.php");
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization
 ////////////////////////////////////////////////////////////////////////////////
-if (!$USER->authorize('createlist')) {
+if (!$USER->authorize('createlist') && !($USER->authorize("subscribe") && userCanSubscribe('list'))) {
 	redirect('unauthorized.php');
 }
 
@@ -41,7 +41,8 @@ if (isset($_GET['id'])) {
 		$_SESSION['previewlistid'] = $listid;
 	if (userOwns("list",$listid)) {
 		$_SESSION['previewlistid'] = $listid;
-		$_SESSION['listid'] = $listid; //if the user owns the list, additionally set the listid so that the "in list" checkboxes work
+		if ($USER->authorize('createlist'))
+			$_SESSION['listid'] = $listid; //if the user owns the list and can edit lists, additionally set the listid so that the "in list" checkboxes work
 	}
 	$_SESSION['listreferer'] = isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : 'list.php';
 	redirect();
