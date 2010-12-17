@@ -202,7 +202,7 @@ function showSortMenu ($fields, $sortdata) {
 ?>
 	<table border="0">
 		<tr>
-			<th>Sort By</th>
+			<td>Sort By</td>
 <?
 			$count = min(count($fields),3);
 			for ($x = 0; $x < $count; $x++) {
