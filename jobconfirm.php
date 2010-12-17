@@ -90,9 +90,6 @@ if( ( (strtotime($job->starttime) > strtotime($warnlate)) || (strtotime($job->en
 if ((strtotime($job->enddate) <= strtotime("today")) && (strtotime($job->endtime) < strtotime("now"))) {
 	$blocksubmit = true;
 	error("The end time has passed","Click 'Modify Job Settings' to return to the Job configuration page");
-} else if ((strtotime($job->enddate) <= strtotime("today")) && (strtotime($job->endtime) < strtotime("now")+1800)) {
-	$blocksubmit = true;
-	error("The end time can not be less than 30 minutes from now","Click 'Modify Job Settings' to return to the Job configuration page");
 }
 if($jobtype->systempriority == 1){
 	error("........................................");// Spacing for readability between error messages
