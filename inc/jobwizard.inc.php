@@ -1926,29 +1926,36 @@ class JobWiz_scheduleOptions extends WizStep {
 		
 		$helpstepnum = 1;
 		
-		//get the callearly
+		//get the callearly and calllate defaults
 		$callearly = date("g:i a");
+		$calllate = $USER->getCallLate();
+		
+		//get access profile settings
 		$accessCallearly = $ACCESS->getValue("callearly");
 		if (!$accessCallearly)
 			$accessCallearly = "12:00 am";
-		
-		//get calllate first from user pref, try to ensure it is at least an hour after start, up to access restriction
-		$calllate = $USER->getCallLate();
-		if ((strtotime($callearly) + 3600) > strtotime($calllate))
-			$calllate = date("g:i a", strtotime($callearly) + 3600);
 		$accessCalllate = $ACCESS->getValue("calllate");
 		if (!$accessCalllate)
 			$accessCalllate = "11:59 pm";
-		if (strtotime($calllate)  > strtotime($accessCalllate))
-			$calllate = $accessCalllate;
 		
-		$menu = array();
-		$callearlysec = strtotime($callearly) ;
+		//convert everything to timestamps for comparisons
+		$callearlysec = strtotime($callearly);
 		$calllatesec = strtotime($calllate);
 		$accessCallearlysec = strtotime($accessCallearly);
-		$accessCalllatesec = strtotime($accessCalllate);
-
+		$accessCalllatesec = strtotime($accessCalllate);		
 				
+		//get calllate first from user pref, try to ensure it is at least an hour after start, up to access restriction
+		if ($callearlysec + 3600 > $calllatesec)
+			$calllatesec = $callearlysec + 3600;
+		
+		//make sure the calculated calllate is not past access profile
+		if ($calllatesec  > $accessCalllatesec)
+			$calllatesec = $accessCalllatesec;
+		
+		$calllate = date("g:i a", $calllatesec);
+			
+		$menu = array();
+
 		$isStartBeforeEnd = $callearlysec < $calllatesec; // Check that the NOW call early time is less than the NOW call late time
 		$isStartAllowed = $callearlysec >= $accessCallearlysec; // and it's greater than or equal to the access profile call early time
 		$isEndAllowed = $calllatesec <= $accessCalllatesec; // and the call late time is less than or equal to the access call late time
