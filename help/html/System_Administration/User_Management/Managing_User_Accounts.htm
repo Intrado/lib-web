@@ -14,11 +14,11 @@ if (navigator.appName !="Netscape")
 <!--
 div.whs1 { width:100%; }
 img_whs2 { border:none; width:20px; height:20px; float:none; border-style:none; }
-img_whs3 { border:none; border-style:none; float:none; width:400px; height:136px; }
+img_whs3 { border:none; float:none; width:400px; height:136px; border-style:none; }
 p.whs4 { font-weight:bold; }
 ul.whs5 { list-style:disc; }
 p.whs6 { margin-left:80px; }
-img_whs7 { border:none; border-style:none; width:400px; height:448px; float:none; }
+img_whs7 { border:none; border-style:none; width:400px; height:623px; float:none; }
 -->
 </style><script type="text/javascript" language="JavaScript">
 <!--
@@ -131,6 +131,9 @@ else
 <ul type="disc" class="whs5">
 	<li class=p><p>Login as this user - Allows you to log into the system 
  as that user.</p></li>
+	<li class=p><p>Reset Password - Click this to reset the user's password. 
+ An email will be sent to the user with instructions for completing this 
+ process.</p></li>
 	<li class=p><p>Disable - Clicking this link renders that user inactive. 
  They will be displayed in the Inactive Users section of the page.</p></li>
 </ul>
@@ -155,10 +158,10 @@ else
 <p class="whs6"><span style="font-weight: bold;"><B>Note:</B></span> 
  <span style="font-style: italic;"><I>If the user is part of a user import, 
  only the password and PIN will be editable.</I></span></p>
-<p><img src="../../UserEditor.gif" alt="User Editor Screen" x-maintain-ratio="TRUE" width="400px" height="448px" border="0" class="img_whs7"></p>
-<p class="whs4">Access Credentials:</p>
+<p><img src="../../UserEditor.gif" alt="User Editor Screen" x-maintain-ratio="TRUE" width="400px" height="623px" border="0" class="img_whs7"></p>
+<p class="whs4">Account Information:</p>
 <ul type="disc" class="whs5">
-	<li class=p><p>Enter the users information into the fields provided. 
+	<li class=p><p>Enter the user's information into the fields provided. 
  It is important to remember that the user name and password are case-sensitive. 
  The Telephone User ID and Pin Code must be numeric. The Email field is 
  for the user's email address and is where the link to the password reset 
@@ -172,40 +175,29 @@ else
 <ul type="disc" class="whs5">
 	<li class=p><p>Access Profile - Choose an <a title="Click to learn more about Access Profiles." href="Managing_Access_Profiles.htm" onmouseover="if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == 'Netscape')) ehlp_showtip(this,event,'Click to learn more about Access Profiles.');" onmouseout="if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == 'Netscape')) ehlp_hidetip();">Access Profile</a> from the drop down 
  menu</p></li>
-	<li class=p><p>Restrict this user to the following types of jobs - 
- Check this and select the job types this user should be able to do. Hold 
- down the Ctrl key (Command key on Macs) to select multiple choices. </p></li>
-	<li class=p><p>Restrict this user to the following types of survey 
- jobs - Check this and select the types of survey jobs this user should 
- be able to do. Hold down the Ctrl key (Command key on Macs) to select 
- multiple choices. </p></li>
+	<li class=p><p>Job Type Restrictions - Select the job types this user 
+ should be able to do. &nbsp;</p></li>
+	<li class=p><p>Survey Type Restriction - Select the types of survey 
+ jobs this user should be able to do. </p></li>
 </ul>
 <p>&nbsp;</p>
 <p class="whs4">Data View:</p>
 <ul type="disc" class="whs5">
-	<li class=p><p>User's data access can be restricted by Data or Staff 
- ID.</p></li>
-</ul>
-<p class="whs6">By Data - Select this to restrict a user 
- to certain types of data. For example, if the user should only be able 
- to call any student in Anytown Elementary, you could select School Name 
- is Anytown Elementary, which would restrict them to contacts who are associated 
- with Anytown Elementary.</p>
-<p class="whs6">By Staff ID - Select this to restrict a user 
- to only contacts associated with the user's Staff ID. Staff ID associations 
- are managed by the Enrollment Import data. For example, if the user was 
- a teacher who only needed to be able to communicate with students enrolled 
- in his classes, selecting this option would only allow him to see students 
- with his Staff ID in their enrollment data. &nbsp;</p>
-<p class="whs4">Email to Reset Password:</p>
-<ul type="disc" class="whs5">
-	<li class=p><p>Click this button to send an email to the user which 
- guides them through resetting their password. They will need to click 
- a link in the email which will take them to a screen where they may enter 
- a new password.</p></li>
+	<li class=p><p>Staff ID - If this user is a staff member, this field 
+ should contain their unique ID number. </p></li>
+	<li class=p><p>Additional Sections - If this staff member should be 
+ associated to sections within an organization, such as classes in a school, 
+ first select the organization from the dropdown menu. Then select the 
+ Section from the list of available sections. For example, if you are creating 
+ a teacher's account with a staff ID, you would want to select the school 
+ where this user is teaching, then the classes taught. This allows the 
+ user to send messages only to their associated organizations.</p></li>
+	<li class=p><p>Data Restrictions - If this user should only have access 
+ to certain fields in the database, select the fields here.</p></li>
 </ul>
 <p>When you have finished making changes, click the Save button to save 
  your changes.</p>
+<p>&nbsp;</p>
 <div placeholder id="footer" class="whs1">
 &nbsp; <span style="font-size: xx-small;"><font size=1 style="font-size: xx-small;">©1999-2009 Reliance Communications, 
  Inc.</font></span> 

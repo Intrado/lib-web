@@ -390,7 +390,7 @@ if (getSystemSetting('_hasfacebook', false) && $USER->authorize('facebookpost'))
 	
 	$formdata["facebookauth"] = array(
 		"label" => _L('Facebook Auth'),
-		"fieldhelp" => _L("Authorize this application to post into your facebook pages. If you want to authorize a different account, be sure to log out of Facebook first."),
+		"fieldhelp" => _L("Authorize this application to post into your Facebook pages. If you want to authorize a different account, you must first log out of Facebook from their web site."),
 		"value" => false,
 		"validators" => array(),
 		"control" => array("FacebookAuth"),
@@ -402,7 +402,7 @@ if (getSystemSetting('_hastwitter', false) && $USER->authorize('twitterpost')) {
 	
 	$formdata["twitterauth"] = array(
 		"label" => _L('Twitter Auth'),
-		"fieldhelp" => _L("Authorize this application to tweet to your Twitter status. If you want to authorize a different account, be sure to log out of Twitter first."),
+		"fieldhelp" => _L("Authorize this application to send tweets on your Twitter account. If you want to authorize a different account, you must first log out of Twitter from their web site."),
 		"value" => false,
 		"validators" => array(),
 		"control" => array("TwitterAuth", "submit" => true),
