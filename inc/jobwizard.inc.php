@@ -838,12 +838,7 @@ class JobWiz_start extends WizStep {
 
 		$formdata["package"] = array(
 			"label" => _L("Notification Method"),
-			"fieldhelp" => _L("Choose a notification method. <br><br><ul>
-			<li><b>Record</b> - Record a phone message in your voice. In addition to the phone call the system will automatically send email and SMS text message alerts.
-			<li><b>Write</b> - Type your phone, email and SMS text messages. The phone message text will be automatically converted to a call using text-to-speech. Auto-translation is optional.
-			<li><b>Record and Write</b> - Record a phone message in your voice. Type your email and SMS text messages.
-			<li><b>Customize</b> - Use the Customize option to choose a message that you've already saved or to manually select any combination of message options you require.
-			</ul>
+			"fieldhelp" => _L("Choose a notification method. Click the \"Guide\" button to the right for a detailed description of each method.<br><br>
 			<i><b>Note:</b> Email and SMS text messaging are optional features and may not be enabled.</i>"),
 			"validators" => array(
 				array("ValRequired"),
