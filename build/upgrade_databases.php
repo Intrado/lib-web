@@ -34,9 +34,8 @@ $authpass = "";
 $versions = array (
 	"7.1.5/0",	//this is the assumed version when no _dbversion exists. it is special
 	"7.5/14",
-	"7.6/1",		//rev 1 is always the first complete revision (not zero)
-	"7.7/3"
-	//7.6.1
+	"7.6/1",	//rev 1 is always the first complete revision (not zero)
+	"7.7/4"
 	//8.0
 	//etc
 );

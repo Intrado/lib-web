@@ -26,3 +26,8 @@ $$$
 -- $rev 3
 ALTER TABLE `messagegroup` ADD `originalmessagegroupid` INT NULL AFTER `id` 
 $$$
+
+-- $rev 4
+ALTER TABLE `subscriber` ADD INDEX `lastlogin` ( `lastlogin` , `enabled` , `personid` )
+$$$
+

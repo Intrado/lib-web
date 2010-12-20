@@ -18,7 +18,11 @@ function upgrade_7_7 ($rev, $shardid, $customerid, $db) {
 			echo "|";
 			apply_sql("upgrades/db_7-7_pre.sql", $customerid, $db, 3);
 			//no code needed, fall through
-			
+		case 3:
+			// upgrade from rev 3 to rev 4
+			echo "|";
+			apply_sql("upgrades/db_7-7_pre.sql", $customerid, $db, 4);
+			//no code needed, fall through
 	}
 	
 	apply_sql("../db/update_SMAdmin_access.sql",$customerid,$db);
