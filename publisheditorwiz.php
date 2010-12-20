@@ -297,8 +297,11 @@ class FinishPublishTargetWiz extends WizFinish {
 				$publish->destroy();
 		}
 
+		// If there are no orgs, everyone is unrestricted (Top Level, Admin)
+		
 		// remove subscriptions that are no longer authorized
 		$subscriptions = Publish::getSubscriptions($type, $id);
+		
 		// check each of the subscriptions user access to see if we should remove the subscription
 		foreach ($subscriptions as $subscribe) {
 			// if this is an un-publish request...
@@ -317,7 +320,6 @@ class FinishPublishTargetWiz extends WizFinish {
 			if ($userrestrictions && !in_array(null, $addorgs, true) && !array_intersect_key($authorgs, $addorgs))
 				$subscribe->destroy();
 				
-			// TODO: unrestricted user subscriptions need cleaned up too on un-publish requests. http://63.249.90.232:888/bugs/view.php?id=3983
 		}
 		
 		Query("COMMIT");
