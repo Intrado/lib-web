@@ -22,3 +22,7 @@ $$$
 
 ALTER TABLE `email` ADD INDEX `dedupe` ( `email` , `sequence` )
 $$$
+
+-- $rev 3
+ALTER TABLE `messagegroup` ADD `originalmessagegroupid` INT NULL AFTER `id` 
+$$$

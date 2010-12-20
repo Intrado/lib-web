@@ -339,12 +339,18 @@ function handleRequest() {
 
 		case 'messagegrid':
 			// TODO lookup default language code
-			// Check if has messagegroupid and that user either owns or subscribs to the message
+			// Check if has messagegroupid
 			if (!isset($_GET['id']))
 				return false;
-			if(!userOwns('messagegroup',$_GET['id']) && !isSubscribed("messagegroup",$_GET['id']))
+			
+			// check if the user owns the message, they subscribe to the message or they subscribe to the original message
+			$messagegroup = new MessageGroup($_GET['id']);
+			if(!userOwns('messagegroup',$_GET['id']) && 
+					!isSubscribed("messagegroup",$_GET['id']) && 
+					!isSubscribed("messagegroup", $messagegroup->originalmessagegroupid)) {
 				return false;
-
+			}
+			
 			$cansendphone = $USER->authorize('sendphone');
 			$cansendemail = $USER->authorize('sendemail');
 			$cansendsms = getSystemSetting('_hassms', false) && $USER->authorize('sendsms');

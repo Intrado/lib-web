@@ -13,6 +13,11 @@ function upgrade_7_7 ($rev, $shardid, $customerid, $db) {
 			echo "|";
 			apply_sql("upgrades/db_7-7_pre.sql", $customerid, $db, 2);
 			//no code needed, fall through
+		case 2:
+			// upgrade from rev 2 to rev 3
+			echo "|";
+			apply_sql("upgrades/db_7-7_pre.sql", $customerid, $db, 3);
+			//no code needed, fall through
 			
 	}
 	

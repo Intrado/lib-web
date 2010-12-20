@@ -1445,6 +1445,16 @@ $$$
 ALTER TABLE `reportarchive` ADD INDEX ( `reportdate` ) 
 $$$
 
+ALTER TABLE `reportarchive` CHANGE `contentid` `contentid` BIGINT NULL
+$$$
+
 update setting set value='7.7/1' where name='_dbversion'
 $$$
 -- END REV 7.7/1
+
+-- START REV 7.7/3
+ALTER TABLE `messagegroup` ADD `originalmessagegroupid` INT NULL AFTER `id`
+$$$
+update setting set value='7.7/3' where name='_dbversion'
+$$$
+-- END REV 7.7/3

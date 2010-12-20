@@ -7,16 +7,24 @@
 
 if (!isset($_GET['id']))
 	redirect('unauthorized.php');
+	
+$messagegroup = new MessageGroup($_GET['id'] + 0);
 
-// user doesn't have access to this message group
-if (!userOwns('messagegroup',$_GET['id'] + 0) && !isPublished('messagegroup', $_GET['id']) && !userCanSubscribe('messagegroup', $_GET['id']))
+// check publication and subscription restrictions on this message (or original if it is a copy)
+if ($messagegroup->originalmessagegroupid) {
+	if(!userOwns('messagegroup',$messagegroup->originalmessagegroupid) && 
+			!isSubscribed("messagegroup",$messagegroup->originalmessagegroupid)) {
+		redirect('unauthorized.php');
+	}
+} else if (!userOwns('messagegroup',$_GET['id'] + 0) && 
+		!isPublished('messagegroup', $_GET['id']) && 
+		!userCanSubscribe('messagegroup', $_GET['id'])) {
 	redirect('unauthorized.php');
+}
  
 ///////////////////////////////////////////////////////////////////////////////
 // Request processing:
 ///////////////////////////////////////////////////////////////////////////////
-
-$messagegroup = new MessageGroup($_GET['id'] + 0);
 
 if($messagegroup->type != 'notification') {
 	redirect('unauthorized.php');
