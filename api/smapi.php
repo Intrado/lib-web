@@ -1954,15 +1954,11 @@ function APISession($sessionid){
 function getJobData($jobid=0){
 	global $USER;
 
-	$query = "select j.id, j.name, j.description,
+	$query = "select j.id, j.name, j.description, j.messagegroupid,
 	sum(rc.type='phone') as total_phone,
 	sum(rc.type='email') as total_email,
 	sum(rc.type='print') as total_print,
 	sum(rc.type='sms') as total_sms,
-	j.type LIKE '%phone%' AS has_phone,
-	j.type LIKE '%email%' AS has_email,
-	j.type LIKE '%print%' AS has_print,
-	j.type LIKE '%sms%' AS has_sms,
 	sum(rc.result not in ('A', 'M', 'duplicate', 'nocontacts', 'blocked') and rc.type='phone' and rc.numattempts < js.value) as remaining_phone,
 	sum(rc.result not in ('sent', 'duplicate', 'nocontacts') and rc.type='email' and rc.numattempts < 1) as remaining_email,
 	sum(rc.result not in ('sent', 'duplicate', 'nocontacts') and rc.type='print' and rc.numattempts < 1) as remaining_print,
@@ -1986,25 +1982,28 @@ function getJobData($jobid=0){
 		$queryresult = Query($query);
 	}
 	$jobs = array();
-	while($row = DBGetRow($queryresult)){
+	while ($row = DBGetRow($queryresult)) {
+		// get this job messagegroup to find if 'has_phone', email, sms
+		$messagegroup = new MessageGroup($row[3]);
+		
 		$job = new API_JobStatus();
 		$job->id = $row[0];
 		$job->name = $row[1];
 		$job->description = $row[2];
-		$job->phonetotal = $row[3];
-		$job->emailtotal = $row[4];
-		$job->printtotal = $row[5];
-		$job->smstotal = $row[6];
-		$job->hasphone = $row[7];
-		$job->hasemail = $row[8];
-		$job->hasprint = $row[9];
-		$job->hassms = $row[10];
-		$job->phoneremaining = $row[11];
-		$job->emailremaining = $row[12];
-		$job->printremaining = $row[13];
-		$job->smsremaining = $row[14];
-		$job->startdate = $row[15];
-		$job->status = $row[16];
+		$job->phonetotal = $row[4];
+		$job->emailtotal = $row[5];
+		$job->printtotal = $row[6];
+		$job->smstotal = $row[7];
+		$job->hasphone = $messagegroup->hasMessage('phone') ? 1 : 0;
+		$job->hasemail = $messagegroup->hasMessage('email') ? 1 : 0;
+		$job->hasprint = 0;
+		$job->hassms = $messagegroup->hasMessage('sms') ? 1 : 0;
+		$job->phoneremaining = $row[7];
+		$job->emailremaining = $row[8];
+		$job->printremaining = $row[9];
+		$job->smsremaining = $row[10];
+		$job->startdate = $row[11];
+		$job->status = $row[12];
 
 		$jobs[] = $job;
 	}
