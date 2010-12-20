@@ -1398,7 +1398,7 @@ class JobWiz_messageEmailText extends WizStep {
 		// Form Fields.
 		$formdata = array($this->title);
 
-		$helpsteps = array(_L("Enter the name for the email acount."));
+		$helpsteps = array(_L("Enter the name for the email account."));
 		$formdata["fromname"] = array(
 			"label" => _L('From Name'),
 			"fieldhelp" => _L('Recipients will see this name as the sender of the email.'),
