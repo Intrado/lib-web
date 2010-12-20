@@ -38,7 +38,10 @@ if (isset($_GET["delete"]) && isset($_GET["orgid"])) {
 												from listentry le 
 													inner join list l on 
 														(le.listid = l.id)
-												where not l.deleted and le.organizationid = o.id)",
+													inner join user u on
+														(l.userid = u.id)
+												where not l.deleted and le.organizationid = o.id
+													and not u.deleted)",
 											false, array($org["id"]));
 											
 		$userassociationorgid = QuickQuery("select o.id
@@ -65,7 +68,7 @@ if (isset($_GET["delete"]) && isset($_GET["orgid"])) {
 												from personassociation pa
 													inner join person p on
 														(pa.personid = p.id)
-												where not p.deleted and pa.importid is null and pa.organizationid = o.id)",
+												where not p.deleted and p.importid is null and pa.organizationid = o.id)",
 											false, array($org["id"]));
 		
 		if ($listentryorgid || $userassociationorgid || $persondatavaluesorgid || $personassociationorgid)
@@ -93,7 +96,10 @@ if (isset($_GET['deleteunassociated'])) {
 											from listentry le
 												inner join list l on
 													(le.listid = l.id)
+												inner join user u on
+													(l.userid = u.id)
 											where not l.deleted and le.type = 'organization'
+												and not u.deleted
 											group by le.organizationid",
 											false, false, array());
 	
