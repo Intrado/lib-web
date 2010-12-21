@@ -35,7 +35,7 @@ if(isset($_GET['clear'])){
 
 // default to 'Organization' only if they have any organizations in their database
 $defaultgroupby = (QuickQuery("select count(*) from organization") > 0) ? "org" : "";
-$groupby = isset($_SESSION['usagestats']['groupby']) ? $_SESSION['usagestats']['groupby'] : $defaultgroupby;
+$requestedgroupby = isset($_SESSION['usagestats']['groupby']) ? $_SESSION['usagestats']['groupby'] : $defaultgroupby;
 
 $fields = DBFindMany("FieldMap", "from fieldmap where options like '%multisearch%' and (fieldnum like 'f%' or fieldnum like 'g%') order by fieldnum");
 
@@ -95,7 +95,7 @@ if(CheckFormSubmit($f,$s))
 
 if($reload){
 	ClearFormData($f);
-	PutFormData($f, $s, "groupby", $groupby);
+	PutFormData($f, $s, "groupby", $requestedgroupby);
 	PutFormData($f, $s, "showusers", $showusers, "bool", 0, 1);
 
 	PutFormData($f, $s, "relativedate", $reldate);
@@ -111,114 +111,95 @@ if($reload){
 ////////////////////////////////////////////////////////////////////////////////
 // Data Calculation
 ////////////////////////////////////////////////////////////////////////////////
-	$languageField = FieldMap::getLanguageField();
-	$joblistquery = "";
-	$surveysql = getSystemSetting('_hassurvey', true) ? '' : 'and issurvey=0';
-	$jobtypelist = QuickQueryList("select id, name from jobtype where not deleted $surveysql", true);
+$languageField = FieldMap::getLanguageField();
 
-	$paramdata = array("lastxdays" =>  GetFormData($f, $s, "xdays"), "startdate" => $startdate, "enddate" => $enddate);
+// get job types, don't show survey if they don't have it
+$surveysql = getSystemSetting('_hassurvey', true) ? '' : 'and issurvey=0';
+$jobtypelist = QuickQueryList("select id, name from jobtype where not deleted $surveysql", true);
 
-	list($startdate, $enddate) = getStartEndDate($reldate, $paramdata);
+$paramdata = array("lastxdays" =>  GetFormData($f, $s, "xdays"), "startdate" => $startdate, "enddate" => $enddate);
+
+list($startdate, $enddate) = getStartEndDate($reldate, $paramdata);
+
+// get the list of jobids for the requested date or range
+$joblist = getJobList($startdate, $enddate, implode("','", array_keys($jobtypelist)), "", $type);
+$joblistquery = " and rp.jobid in ('" . implode("','", $joblist) . "') ";
+
+// query data based on which field the user requesed us to group by
+$field = "''";
+$fieldname = "";
+$groupby = "";
+$join = "";
+if ($requestedgroupby == "") {
+	// --System--
+} else if ($requestedgroupby == "org") {
+	// organization
+	$field = "o.orgkey";
+	$groupby = "ro.organizationid, ";
+	$join = "left join reportorganization ro on (ro.jobid = rp.jobid and ro.personid = rp.personid)
+			left join organization o on (o.id = ro.organizationid)";
 	
-	$joblist = getJobList($startdate, $enddate, implode("','", array_keys($jobtypelist)), "", $type);
-	$joblistquery = " and rp.jobid in ('" . implode("','", $joblist) . "') ";
-	$jobidtypelist = QuickQueryList("select id, jobtypeid from job j where j.id in ('" . implode("','",$joblist) ."') ", true);
-	$groupbyquery = "";
-	$groupbyorder = "";
-	$rgroupdata = "";
-	$union = "";
-	
-//error_log("groupby ".$groupby);
-	if ($groupby == "") {
-		// --System--
-		$groupbyquery = "''";
-		$groupbyorder = "";
-	} else if ($groupby == "org") {
-		// Organization
-		// TODO people in two organizations get counted twice - si this true for Gfields?
-		$groupbyquery = "oz.orgkey";
-		$groupbyorder = $groupbyquery . ", ";
-		$rgroupdata = "join reportorganization ro on (ro.jobid = rp.jobid and ro.personid = rp.personid) join organization oz on (oz.id = ro.organizationid)";
-		$union = "UNION select '' as field, rp.userid, rp.jobid, count(*) from reportperson rp 
-					where not exists (select * from reportorganization ro where ro.jobid = rp.jobid and ro.personid = rp.personid) 
-					and rp.status in ('fail', 'success')
-					$joblistquery
-					and rp.type = '" . DBSafe($type) . "' 
-					group by rp.jobid, rp.userid";
-					
+	// get organization field name
+	$fieldname = getSystemSetting("organizationfieldname","Organization");
+} else {
+	// F or G field
+	if (strpos($requestedgroupby, "g") === 0) {
+		// Gfield
+		$field = "rgd.value";
+		$groupby = "rgd.value, ";
+		$join = "left join reportgroupdata rgd on (rgd.personid=rp.personid and rgd.jobid=rp.jobid and rgd.fieldnum=".DBSafe(substr($groupby,1)).")";
 	} else {
-		// F or G field
-		if (strpos($groupby, "g") === 0) {
-			// Gfield
-			$groupbyquery = "rgd.value"; // reportgroupdata
-			$rgroupdata = "join reportgroupdata rgd on (rgd.personid=rp.personid and rgd.jobid=rp.jobid and rgd.fieldnum=".substr($groupby,1).")";
-		} else {
-			// Ffield
-			$groupbyquery = "rp." . $groupby; // reportperson
-		}
-		$groupbyorder = $groupbyquery . ", ";
+		// Ffield
+		$field = "rp." . DBSafe($requestedgroupby);
+		$groupby = "rp." . DBSafe($requestedgroupby) . ", ";
 	}
+	
+	// get fieldmap name value
+	$fieldname = QuickQuery("select name from fieldmap where fieldnum = ?", false, array($requestedgroupby));
+}
 
-	$userlist = array();
-	$userresult = Query("Select login, id from user");
-	while($row = DBGetRow($userresult)){
-		$userlist[$row[1]] = $row[0];
-	}
+// if show users requested, query the user info
+$userfield = "''";
+if ($showusers) {
+	$userfield = "u.login";
+	$groupby .= " rp.userid, ";
+	$join .= " inner join user u on (u.id = rp.userid) ";
+}
 
-	$query = "SELECT $groupbyquery as field,
-				rp.userid,
-				rp.jobid,
-				count(*)
-				from reportperson rp
-				$rgroupdata
-				where rp.status in ('fail', 'success')
-				$joblistquery
-				and rp.type = '" . DBSafe($type) . "'
-				group by $groupbyorder rp.jobid, rp.userid
-				$union";
-//error_log($query);
+$query = "SELECT $field as field,
+			$userfield as userlogin,
+			jt.id as jobtypeid,
+			count(*) as contactcount
+		from reportperson rp
+		inner join job j on 
+			(j.id = rp.jobid)
+		inner join jobtype jt on 
+			(jt.id = j.jobtypeid)
+		$join
+		where rp.status in ('fail', 'success')
+			$joblistquery
+			and rp.type = '" . DBSafe($type) . "'
+		group by $groupby jobtypeid";
 
-	$result = Query($query);
-	$data = array();
-	$userlistarray = array();
-	foreach($userlist as $userid => $name){
-		$jobtypearray = array();
-		foreach($jobtypelist as $jobtypeid => $jobtypename){
-			$jobtypearray[$jobtypeid] = 0;
-		}
-		$userlistarray[$userid] = $jobtypearray;
-	}
-	$groupbyarray = array();
-	while($row = DBGetRow($result)){
-		if(!isset($groupbyarray[$row[0]]))
-			$groupbyarray[$row[0]]= $userlistarray;
-		$groupbyarray[$row[0]][$row[1]][$jobidtypelist[$row[2]]] += $row[3];
-	}
-	$schooltotals = array();
-	$systemtotal = 0;
-	foreach($groupbyarray as $school => $users){
-		$schooltotals[$school] = array();
-		foreach($users as $userid => $jobtypes){
-			foreach($jobtypelist as $jobtypeid => $jobtypename){
-				if(!isset($groupbyarray[$school][$userid][$jobtypeid]))
-					$groupbyarray[$school][$userid][$jobtypeid]=0;
-				if(!isset($schooltotals[$school][$jobtypeid]))
-					$schooltotals[$school][$jobtypeid] = 0;
-				if(!isset($schooltotals[$school]["total"]))
-					$schooltotals[$school]["total"] = 0;
-				$schooltotals[$school][$jobtypeid]+=$groupbyarray[$school][$userid][$jobtypeid];
-				$schooltotals[$school]["total"] +=$groupbyarray[$school][$userid][$jobtypeid];
-				$systemtotal +=$groupbyarray[$school][$userid][$jobtypeid];
-			}
-		}
-		foreach($users as $userid => $jobtypes){
-			if($schooltotals[$school]["total"] == 0)
-				$groupbyarray[$school][$userid]["total"] = 0;
-			else
-				$groupbyarray[$school][$userid]["total"] = (array_sum($groupbyarray[$school][$userid])/$schooltotals[$school]["total"]) * 100;
-		}
+$results = QuickQueryMultiRow($query, true);
 
+// add up all the job type totals
+$fieldtotals = array();
+$systemtotal = 0;
+foreach($results as $result){
+	$jobtype = $result['jobtypeid'];
+	$field = $result['field'];
+	$contacts = $result['contactcount'];
+	
+	if (!isset($fieldtotals[$field])) {
+		$fieldtotals[$field] = array();
+		foreach($jobtypelist as $id => $name)
+			$fieldtotals[$field][$id] = 0;
 	}
+	
+	$fieldtotals[$field][$jobtype] = $fieldtotals[$field][$jobtype] + $contacts;
+	$systemtotal = $systemtotal + $contacts;
+}
 
 
 
@@ -305,67 +286,97 @@ startWindow("Total Messages Delivered", "padding: 3px;");
 			<td>Group %</td>
 		</tr>
 <?
-		$alt=0;
 
-		foreach($groupbyarray as $index => $groupbyfield){
-
-			echo ++$alt % 2 ? '<tr>' : '<tr class="listAlt">';
-
-			// index contains the person data value (could be empty, 'not assigned')
-			$display = $index;
-			if ($index == "")
-				$display = escapehtml("<Not Assigned>");
-				
-			if ($groupby == "")
-				$name = "System";
-			else if ($groupby == "org")
-				$name = getSystemSetting('organizationfieldname', 'School'). ": " . $display;
-			else if ($groupby == $languageField) {
-				// display language name, instead of code
-				$display = Language::getName($index);
-				if ($index == "")
-					$display = escapehtml("<Not Assigned>");
-
-				$name = FieldMap::getName($groupby) . ": " . $display;
-			} else
-				$name = FieldMap::getName($groupby) . ": " . $display;
-?>
-			<td><u><?=$name?><u></td>
-<?
-			$schooltotal = 0;
-			foreach($jobtypelist as $jobtypeid => $jobtypename){
-?>
-				<td><?=$schooltotals[$index][$jobtypeid]?></td>
-<?
-			}
-?>
-				<td><?=$schooltotals[$index]["total"]?></td>
-				<td>100.00%</td>
-			</tr>
-<?
-			if($showusers){
-				foreach($groupbyfield as $uindex => $user){
-					if($user["total"] == 0) continue;
-					echo $alt % 2 ? '<tr>' : '<tr class="listAlt">';
-?>
-						<td>&nbsp;&nbsp;&nbsp;User: <?=$userlist[$uindex]?></td>
-<?
-					$usertotal = 0;
-					foreach($jobtypelist as $jobtypeid => $jobtypename){
-						$usertotal += $user[$jobtypeid];
-?>
-						<td><?=$user[$jobtypeid]?></td>
-<?
-					}
-?>
-						<td><?=$usertotal?></td>
-						<td><?=number_format($user["total"],2)?>%</td>
-					</tr>
-<?
-
-				}
-			}
+$lastfield = 0;
+$lastuser = 0;
+$userdata = array();
+$bgtoggle = 0;
+foreach ($results as $result) {
+	// results are ordered by requested groupby field then userid then jobtypeid
+	$userlogin = $result['userlogin'];
+	$jobtypeid = $result['jobtypeid'];
+	$field = $result['field'];
+	$contacts = $result['contactcount'];
+	
+	// if field value changes, output field header
+	if ($field !== $lastfield) {
+		echo "<tr><td style='text-decoration: underline'>";
+		if ($fieldname == "") {
+			echo escapehtml(_L("System"));
+		} else if ($field == "") {
+			echo $fieldname . ": " . escapehtml(_L("Undefined"));
+		} else {
+			echo $fieldname . ": " . escapehtml($field);
 		}
+		echo "</td>";
+		
+		// output the totals for each job type
+		$total = 0;
+		foreach($jobtypelist as $id => $name) {
+			echo "<td>" . $fieldtotals[$field][$id] . "</td>";
+			$total += $fieldtotals[$field][$id];
+		}
+		
+		// output the total and percentage
+		echo "<td>" . $total . "</td><td>" . number_format(($total/$systemtotal)*100,2) . "%</td></tr>";
+		
+		$lastfield = $field;
+	}
+	
+	if ($showusers) {
+		// if initial value for last user then init it to the first user
+		if ($lastuser === 0) {
+			$userdata[0] = "&nbsp;&nbsp;" . escapehtml(_L("User")) . ": " . escapehtml($userlogin);
+			foreach($jobtypelist as $id => $name) 
+				$userdata[$id] = 0;
+			$lastuser = $userlogin;
+		}
+		// if the user changes, output the last user's collected data and start collecting on a new one
+		if ($userlogin != $lastuser) {
+			
+			// output the previous user's data
+			echo "<tr><td>" . $userdata[0] . "</td>";
+			
+			// output and clear user jobtype data
+			$total = 0;
+			foreach($jobtypelist as $id => $name) {
+				echo "<td>" . $userdata[$id] . "</td>";
+				$total += $userdata[$id];
+				$userdata[$id] = 0;
+			}
+			
+			// output the total and percentage
+			echo "<td>" . $total . "</td><td>" . number_format(($total/$systemtotal)*100,2) . "%</td></tr>";
+			
+			// set next user's label
+			$userdata[0] = "&nbsp;&nbsp;" . escapehtml(_L("User")) . ": " . escapehtml($userlogin);
+			$lastuser = $userlogin;
+		}
+		
+		// collect user data
+		$userdata[$jobtypeid] = $contacts;
+	}
+	
+}
+
+if ($showusers) {
+	
+	// output last user's data
+	echo "<tr><td>" . $userdata[0] . "</td>";
+	
+	// output and clear user jobtype data
+	$total = 0;
+	foreach($jobtypelist as $id => $name) {
+		echo "<td>" . $userdata[$id] . "</td>";
+		$total += $userdata[$id];
+	}
+	
+	// output the total and percentage
+	echo "<td>" . $total . "</td><td>" . number_format(($total/$systemtotal)*100,2) . "%</td></tr>";
+			
+		
+}
+
 ?>
 	</table>
 <?
