@@ -85,10 +85,19 @@ function portalLogin($username, $password) {
 
 function portalGetCustomerAssociations() {
 	$sessionid = session_id();
-	$customerurl = "";
+	
+	// find optional customerurl either by url param or cookie
+	$customerurl = false;
 	if (isset($_GET['u'])) {
 		$customerurl = $_GET['u'];
+	} else if (isset($_COOKIE['customerurl'])) {
+		$customerurl = $_COOKIE['customerurl'];
+	}
+	if ($customerurl) {
+		// store in session for logout, just in case user's cookies are disabled
 		$_SESSION['customerurl'] = $customerurl; // store this for logout to append
+	} else {
+		$customerurl = "";
 	}
 	$params = array(new XML_RPC_Value($sessionid, 'string'), new XML_RPC_Value($customerurl, 'string'));
 	$method = "PortalServer.portal_getCustomerAssociations";

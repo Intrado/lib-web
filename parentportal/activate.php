@@ -4,11 +4,7 @@ require_once("common.inc.php");
 require_once("../inc/html.inc.php");
 require_once("../inc/table.inc.php");
 
-// pass along the customerurl (used by phone activation feature to find a customer without any existing associations)
-$appendcustomerurl = "";
-if (isset($_GET['u'])) {
-	$appendcustomerurl = "?u=".urlencode($_GET['u']);
-}
+$appendcustomerurl = getAppendCustomerUrl();
 
 $form = true;
 $forgotsuccess = false;

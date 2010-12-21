@@ -62,4 +62,30 @@ if(!isset($ppNotLoggedIn)){
 
 // load customer/user locale 
 require_once("../inc/locale.inc.php");
+
+/*
+ * return string to append on url redirects, may contain the customerurl option
+ */
+function getAppendCustomerUrl() {
+	// find optional customerurl either by url param or cookie
+	$customerurl = false;
+	if (isset($_GET['u'])) {
+		$customerurl = $_GET['u'];
+	} else if (isset($_COOKIE['customerurl'])) {
+		$customerurl = $_COOKIE['customerurl'];
+	}
+
+	// pass along the customerurl (used by phone activation feature to find a customer without any existing associations)
+	$appendcustomerurl = "";
+	if ($customerurl) {
+		$appendcustomerurl = "?u=".urlencode($customerurl);
+		// if cookie not set, or already set but different, then set it
+		if (!isset($_COOKIE['customerurl']) ||
+			(isset($_COOKIE['customerurl']) && $_COOKIE['customerurl'] != $customerurl)) {
+				setcookie('customerurl', $customerurl, time()+60*60*24*365);
+		}
+	}
+	return $appendcustomerurl;
+}
+
 ?>

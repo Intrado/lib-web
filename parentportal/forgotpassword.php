@@ -8,12 +8,7 @@ require_once("../inc/html.inc.php");
 require_once("../inc/table.inc.php");
 require_once("../inc/form.inc.php");
 
-// pass along the customerurl (used by phone activation feature to find a customer without any existing associations)
-$appendcustomerurl = "?";
-if (isset($_GET['u'])) {
-	$appendcustomerurl = "?u=".urlencode($_GET['u']);
-}
-
+$appendcustomerurl = getAppendCustomerUrl();
 
 if (isset($_GET['locale'])) {
 	setcookie('locale', $_GET['locale']);
