@@ -147,7 +147,7 @@ if ($requestedgroupby == "") {
 		// Gfield
 		$field = "rgd.value";
 		$groupby = "rgd.value, ";
-		$join = "left join reportgroupdata rgd on (rgd.personid=rp.personid and rgd.jobid=rp.jobid and rgd.fieldnum=".DBSafe(substr($groupby,1)).")";
+		$join = "left join reportgroupdata rgd on (rgd.personid=rp.personid and rgd.jobid=rp.jobid and rgd.fieldnum=".DBSafe(substr($requestedgroupby,1)).")";
 	} else {
 		// Ffield
 		$field = "rp." . DBSafe($requestedgroupby);
@@ -297,32 +297,7 @@ foreach ($results as $result) {
 	$jobtypeid = $result['jobtypeid'];
 	$field = $result['field'];
 	$contacts = $result['contactcount'];
-	
-	// if field value changes, output field header
-	if ($field !== $lastfield) {
-		echo "<tr><td style='text-decoration: underline'>";
-		if ($fieldname == "") {
-			echo escapehtml(_L("System"));
-		} else if ($field == "") {
-			echo $fieldname . ": " . escapehtml(_L("Undefined"));
-		} else {
-			echo $fieldname . ": " . escapehtml($field);
-		}
-		echo "</td>";
-		
-		// output the totals for each job type
-		$total = 0;
-		foreach($jobtypelist as $id => $name) {
-			echo "<td>" . $fieldtotals[$field][$id] . "</td>";
-			$total += $fieldtotals[$field][$id];
-		}
-		
-		// output the total and percentage
-		echo "<td>" . $total . "</td><td>" . number_format(($total/$systemtotal)*100,2) . "%</td></tr>";
-		
-		$lastfield = $field;
-	}
-	
+
 	if ($showusers) {
 		// if initial value for last user then init it to the first user
 		if ($lastuser === 0) {
@@ -355,6 +330,33 @@ foreach ($results as $result) {
 		
 		// collect user data
 		$userdata[$jobtypeid] = $contacts;
+	}
+	
+	// if field value changes, output field header
+	if ($field !== $lastfield) {
+		echo "<tr " . ($showusers?"class='listAlt'":"") . "><td>";
+		if ($fieldname == "") {
+			echo escapehtml(_L("System"));
+		} else if ($field == "") {
+			echo $fieldname . ": " . escapehtml(_L("Undefined"));
+		} else {
+			echo $fieldname . ": " . escapehtml($field);
+		}
+		echo "</td>";
+		
+		// output the totals for each job type
+		$total = 0;
+		foreach($jobtypelist as $id => $name) {
+			echo "<td>" . $fieldtotals[$field][$id] . "</td>";
+			$total += $fieldtotals[$field][$id];
+		}
+		
+		// output the total and percentage
+		echo "<td>" . $total . "</td><td>" . number_format(($total/$systemtotal)*100,2) . "%</td></tr>";
+		
+		$lastfield = $field;
+		if ($lastuser !== 0)
+			$lastuser = "";
 	}
 	
 }
