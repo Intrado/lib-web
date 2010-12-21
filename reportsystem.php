@@ -179,7 +179,8 @@ $query = "SELECT $field as field,
 		where rp.status in ('fail', 'success')
 			$joblistquery
 			and rp.type = '" . DBSafe($type) . "'
-		group by $groupby jobtypeid";
+		group by $groupby jobtypeid
+		order by $groupby jobtypeid";
 
 $results = QuickQueryMultiRow($query, true);
 
@@ -201,7 +202,24 @@ foreach($results as $result){
 	$systemtotal = $systemtotal + $contacts;
 }
 
-
+function outputUserData($userdata, $jobtypelist, $systemtotal) {
+	// output the previous user's data
+	echo "<tr><td>" . $userdata[0] . "</td>";
+	
+	// output and clear user jobtype data
+	$total = 0;
+	foreach($jobtypelist as $id => $name) {
+		echo "<td>" . $userdata[$id] . "</td>";
+		$total += $userdata[$id];
+	}
+	
+	// output the total and percentage
+	echo "<td>" . $total . "</td><td>" . number_format(($total/$systemtotal)*100,2) . "%</td></tr>";
+	
+	// clear jobtype data
+	foreach($jobtypelist as $id => $name)
+		$userdata[$id] = 0;
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 // Display
@@ -297,43 +315,18 @@ foreach ($results as $result) {
 	$jobtypeid = $result['jobtypeid'];
 	$field = $result['field'];
 	$contacts = $result['contactcount'];
+	$wroteheader = false;
 
-	if ($showusers) {
-		// if initial value for last user then init it to the first user
-		if ($lastuser === 0) {
-			$userdata[0] = "&nbsp;&nbsp;" . escapehtml(_L("User")) . ": " . escapehtml($userlogin);
-			foreach($jobtypelist as $id => $name) 
-				$userdata[$id] = 0;
-			$lastuser = $userlogin;
-		}
-		// if the user changes, output the last user's collected data and start collecting on a new one
-		if ($userlogin != $lastuser) {
-			
-			// output the previous user's data
-			echo "<tr><td>" . $userdata[0] . "</td>";
-			
-			// output and clear user jobtype data
-			$total = 0;
-			foreach($jobtypelist as $id => $name) {
-				echo "<td>" . $userdata[$id] . "</td>";
-				$total += $userdata[$id];
-				$userdata[$id] = 0;
-			}
-			
-			// output the total and percentage
-			echo "<td>" . $total . "</td><td>" . number_format(($total/$systemtotal)*100,2) . "%</td></tr>";
-			
-			// set next user's label
-			$userdata[0] = "&nbsp;&nbsp;" . escapehtml(_L("User")) . ": " . escapehtml($userlogin);
-			$lastuser = $userlogin;
-		}
-		
-		// collect user data
-		$userdata[$jobtypeid] = $contacts;
-	}
-	
 	// if field value changes, output field header
 	if ($field !== $lastfield) {
+		
+		// output the user data so we can continue collecting for the next field value
+		if ($lastfield !== 0) {
+			outputUserData($userdata, $jobtypelist, $systemtotal);
+			$wroteheader = true;
+		}
+		
+		// output field headers
 		echo "<tr " . ($showusers?"class='listAlt'":"") . "><td>";
 		if ($fieldname == "") {
 			echo escapehtml(_L("System"));
@@ -355,8 +348,31 @@ foreach ($results as $result) {
 		echo "<td>" . $total . "</td><td>" . number_format(($total/$systemtotal)*100,2) . "%</td></tr>";
 		
 		$lastfield = $field;
-		if ($lastuser !== 0)
-			$lastuser = "";
+	}
+	
+	if ($showusers) {
+		// if initial value for last user then init it to the first user
+		if ($lastuser === 0) {
+			$userdata[0] = "&nbsp;&nbsp;" . escapehtml(_L("User")) . ": " . escapehtml($userlogin);
+			foreach($jobtypelist as $id => $name) 
+				$userdata[$id] = 0;
+			$lastuser = $userlogin;
+		}
+		
+		// if the user changes, output the last user's collected data and start collecting on a new one
+		if ($userlogin != $lastuser) {
+			
+			// write out the userdata for the previous user, if the header changed... it already wrote it out
+			if (!$wroteheader)
+				outputUserData($userdata, $jobtypelist, $systemtotal);
+			
+			// set next user's label
+			$userdata[0] = "&nbsp;&nbsp;" . escapehtml(_L("User")) . ": " . escapehtml($userlogin);
+			$lastuser = $userlogin;
+		}
+		
+		// collect user data
+		$userdata[$jobtypeid] = $contacts;
 	}
 	
 }
