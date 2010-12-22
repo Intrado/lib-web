@@ -478,20 +478,46 @@ class FinishJobWizard extends WizFinish {
 			// Do Facebook posting
 			if ($fbdata && isset($fbdata->message)) {
 				foreach ($fbdata->page as $pageid => $accessToken) {
-					if (!fb_post($pageid, $accessToken, $fbdata->message)) {
-						// unable to post error
+					$posted = fb_post($pageid, $accessToken, $fbdata->message);
+					
+					// write to facebook log
+					$f = fopen('/usr/commsuite/logs/facebookposting.csv', 'a');
+					flock($f, LOCK_EX);
+					
+					global $CUSTOMERURL;
+					// timestamp, customerurl, userlogin, successful, facebook pageid, message 
+					fwrite($f, date('Y-m-d H:i:s') . "," . $CUSTOMERURL . "," . $USER->login . "," . 
+							($posted?"true":"false") . "," . $pageid . ',"' .  
+							str_replace(array("\r\n", "\n", "\r"), " ", $fbdata->message) . "\"\n");
+					
+					fclose($f);
+					
+					// unable to post error
+					if (!$posted)
 						error_log("Failed to post to facebook pageid: ". $pageid. " for user: ". $USER->id);
-					}
 				}
 			}
 			
 			// do twitter tweeting
 			if ($USER->authorize("twitterpost") && isset($postdata["/message/socialmedia"]["twdata"])) {
 				$twitter = new Twitter($USER->getSetting("tw_access_token", false));
-				if (!$twitter->tweet($postdata["/message/socialmedia"]["twdata"])) {
-					// unable to post error
+				$posted = $twitter->tweet($postdata["/message/socialmedia"]["twdata"]);
+				
+				// write to twitter log
+				$f = fopen('/usr/commsuite/logs/twitterposting.csv', 'a');
+				flock($f, LOCK_EX);
+				
+				global $CUSTOMERURL;
+				// timestamp, customerurl, userlogin, successful, message
+				fwrite($f, date('Y-m-d H:i:s') . "," . $CUSTOMERURL . "," . $USER->login . "," . 
+						($posted?"true":"false") . ',"' . 
+						str_replace(array("\r\n", "\n", "\r"), " ", $postdata["/message/socialmedia"]["twdata"]) . "\"\n");
+				
+				fclose($f);
+				
+				// unable to post error
+				if (!$posted)
 					error_log("Failed to post to twitter for user: ". $USER->id);
-				}
 			}
 		}
 		
