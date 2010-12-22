@@ -44,6 +44,14 @@ if (isset($_SESSION['listsearch']['rules']) && count($_SESSION['listsearch']['ru
 
 $formdata = array();
 
+
+if (isset($_SESSION['listsearch']['sectionids']))
+	$searchmode = "sections";
+ else if (isset($_SESSION['listsearch']['individual']))
+	$searchmode = "individual";
+else
+	$searchmode = "rules";
+
 $formdata["toggles"] = array(
 	"label" => _L('Search Options'),
 	"fieldhelp" => _L("Choose which method to search by."),

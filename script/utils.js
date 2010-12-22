@@ -247,6 +247,7 @@ function modifyMarkedNodes (parent,attribute,marker,callback) {
 	}
 }
 
+//used by reportutils.inc.php for select_metadata()
 function dofieldbox (img, init, field, saved) {
 	if (!img.toggleset) {
 		img.toggleset = true;
@@ -327,7 +328,7 @@ function cachedAjaxGet(uri,ajaxhandler,ajaxhandlerarg,usecache) {
 	usecache = typeof(usecache) != 'undefined' ? usecache : true;
 	if(usecache) {
 		var returnvalue = cachedajaxgetdata[uri];
-		if(returnvalue) {
+		if(returnvalue && ajaxhandler) {
 			ajaxhandler(returnvalue,ajaxhandlerarg);
 			return;
 		}
@@ -335,8 +336,14 @@ function cachedAjaxGet(uri,ajaxhandler,ajaxhandlerarg,usecache) {
 	new Ajax.Request(uri, {
 		method:'get',
 		onSuccess: function (result) {
-			cachedajaxgetdata[uri] = result;
-			ajaxhandler(result,ajaxhandlerarg);
+			//don't save results unless we're using cache
+			if (usecache) {
+				cachedajaxgetdata[uri] = result;
+			}
+			//handler optional
+			if (ajaxhandler) {
+				ajaxhandler(result,ajaxhandlerarg);
+			}
 		}
 	});
 }
@@ -433,8 +440,18 @@ function do_ajax_listbox(checkbox, personid) {
 	}
 }
 
+//handles toggle of field checkboxes, sends ajax to save state for next page load
+function set_list_fieldvisibility(checkbox, fnum, tableid, col) {
 
-
+	try { 
+		setColVisability($(tableid), col, checkbox.checked); 
+	} catch (e) {}
+	if (checkbox.checked) {
+		cachedAjaxGet('?ajax&showfield='+fnum, null, null, false);
+	} else {
+		cachedAjaxGet('?ajax&hidefield='+fnum, null, null, false);
+	}
+}
 
 var personTips = [];
 function make_person_tip(personid, tiptitle){
