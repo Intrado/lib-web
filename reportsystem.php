@@ -322,7 +322,8 @@ foreach ($results as $result) {
 		
 		// output the user data so we can continue collecting for the next field value
 		if ($lastfield !== 0) {
-			outputUserData($userdata, $jobtypelist, $systemtotal);
+			if ($showusers)
+				outputUserData($userdata, $jobtypelist, $systemtotal);
 			$wroteheader = true;
 		}
 		
