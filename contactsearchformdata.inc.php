@@ -166,7 +166,7 @@ if ($searchmode == "individual") {
 		"label" => _L("Search"),
 		"fieldhelp" => _L('You may enter a name, phone number, email address, or ID #. 
 						You may also enter both a first and last name to narrow the search in either "first last" or "last, first" format.'),
-		"value" => isset($_SESSION['listsearch']['individual']['quickaddsearch']) ? $_SESSION['listsearch']['individual']['quickaddsearch'] : "",
+		"value" => "",
 		"validators" => array(
 			array("ValLength","min" => 2, "max" => 255)
 		),
