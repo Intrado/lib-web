@@ -48,23 +48,35 @@ if (!$USER->authorize('createlist')) {
 // Action/Request Processing
 ////////////////////////////////////////////////////////////////////////////////
 
+
+
+//handle list search mode switches (contactsearchformdata.inc.php)
+if (isset($_GET['listsearchmode'])) {
+
+	if ($_GET['listsearchmode'] == "rules" && !isset($_SESSION['listsearch']['rules'])) {
+		unset($_SESSION['listsearch']); //defaults to rules mode with no search criteria
+	}
+	
+	if ($_GET['listsearchmode'] == "individual" && !isset($_SESSION['listsearch']['individual'])) {
+		$_SESSION['listsearch'] = array ("individual" => array ("quickaddsearch" => ''));
+	}
+	
+	if ($_GET['listsearchmode'] == "sections" && !isset($_SESSION['listsearch']['sectionx'])) {
+		$_SESSION['listsearch'] = array ("sectionids" => array ());
+	}
+	
+	if ($_GET['listsearchmode'] == "showall" && !isset($_SESSION['listsearch']['showall'])) {
+		$_SESSION['listsearch'] = array("showall" => true);
+	}
+}
+
 //get the list to edit from the request params or session
 if (isset($_GET['id'])) {
 	setCurrentList($_GET['id']);
-	unset($_SESSION['listsearch']); //will also default to rules mode
-	
-	if (isset($_GET['mode']) && $_GET['mode'] == "individual") {
-		$_SESSION['listsearch'] = array ("individual" => array ("quickaddsearch" => ''));
-	}
 	
 	$_SESSION['listreferer'] = $_SERVER['HTTP_REFERER'];
 	redirect();
 }
-
-
-
-if (isset($_GET['showall']))
-	$_SESSION['listsearch'] = array("showall" => true);
 
 handle_list_checkbox_ajax(); //for handling check/uncheck from the list
 
@@ -79,10 +91,8 @@ $renderedlist->pagelimit = 100;
 
 // buttons must be defined before include 'contactsearchformdata.inc'
 $buttons = array(
-	submit_button(_L('Refresh'),"refresh","arrow_refresh"),
+	icon_button(_L('Done'),"tick",null, isset($_SESSION['listreferer']) ? $_SESSION['listreferer'] : "list.php")
 );
-$buttons[] = icon_button(_L('Show All Contacts'),"application_view_list",null,"search.php?showall");
-$buttons[] = icon_button(_L('Done'),"tick",null, isset($_SESSION['listreferer']) ? $_SESSION['listreferer'] : "list.php");
 
 // variable for page redirect, used by include 'contactsearchformdata.inc'
 $redirectpage = "search.php";
@@ -97,25 +107,26 @@ $PAGE = "notifications:lists";
 $TITLE = "List Search: " . escapehtml($list->name);
 require_once("nav.inc.php");
 
-?>
-	<script src="script/contactsearch.js.php" type="text/javascript"></script>
 
+//load validator for rules, handle rule add/delete to form submit (contactsearchformdata.inc.php)
+?>
 	<script type="text/javascript">
 		<? Validator::load_validators(array("ValSections", "ValRules")); ?>
+
+		function rulewidget_add_rule(event) {
+			$('listsearch_ruledata').value = event.memo.ruledata.toJSON();
+			form_submit(event, 'addrule');
+		}
+
+		function rulewidget_delete_rule(event) {
+			$('listsearch_ruledata').value = event.memo.fieldnum;
+			form_submit(event, 'deleterule');
+		}
 
 		document.observe('dom:loaded', function() {
 			ruleWidget.delayActions = true;
 			ruleWidget.container.observe('RuleWidget:AddRule', rulewidget_add_rule);
 			ruleWidget.container.observe('RuleWidget:DeleteRule', rulewidget_delete_rule);
-		
-<?
-			if (isset($_SESSION['listsearch']['individual']))
-				echo 'choose_search_by_person();';
-			else if (isset($_SESSION['listsearch']['sectionids']))
-				echo 'choose_search_by_sections();';
-			else 
-				echo 'choose_search_by_rules();';
-?>
 		});
 	</script>
 <?

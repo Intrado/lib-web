@@ -54,7 +54,7 @@ if ($USER->authorize("createlist")) {
 }
 $SHORTCUTS['My Address Book'] = "addresses.php?origin=nav";
 if ($USER->authorize("viewcontacts"))
-	$SHORTCUTS['System Contacts'] = "contacts.php?clear=1";
+	$SHORTCUTS['System Contacts'] = "contacts.php";
 $SHORTCUTS['-- Help & Documentation --'] = "false;";
 $SHORTCUTS['Message Tips & Ideas'] = "javascript: popup('help/html/Tips_for_Effective_Communication/Messaging_Tips.htm',750,500);";
 $SHORTCUTS['Help'] = "javascript: popup('help/index.php',750,500);";
@@ -82,7 +82,7 @@ $NAVTREE = array (
 		array("Active Jobs","activejobs.php","viewsystemactive",$SUBTAB=="activejobs"),
 		array("Completed Jobs","completedjobs.php","viewsystemcompleted",$SUBTAB=="completedjobs"),
 		array("Repeating Jobs","repeatingjobs.php","viewsystemrepeating",$SUBTAB=="repeatingjobs"),
-		array("Contacts","contacts.php?clear=1","viewcontacts",$SUBTAB=="contacts"),
+		array("Contacts","contacts.php","viewcontacts",$SUBTAB=="contacts"),
 		array("Blocked Lists","blocked.php","blocknumbers",$SUBTAB=="blockednumbers")
 		)),
 	array("Admin",NULL,array('manageaccount', 'manageprofile', 'managesystem',

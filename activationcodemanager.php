@@ -57,11 +57,28 @@ if (!getSystemSetting("_hasportal", false) || !$USER->authorize('portalaccess'))
 // Action/Request Processing
 ////////////////////////////////////////////////////////////////////////////////
 
-if (isset($_GET['clear']))
-	$_SESSION['listsearch'] = array();
+
+//handle list search mode switches (contactsearchformdata.inc.php)
+if (isset($_GET['listsearchmode'])) {
+
+	if ($_GET['listsearchmode'] == "rules" && !isset($_SESSION['listsearch']['rules'])) {
+		unset($_SESSION['listsearch']); //defaults to rules mode with no search criteria
+	}
 	
-if (isset($_GET['showall']))
-	$_SESSION['listsearch'] = array("showall" => true);
+	if ($_GET['listsearchmode'] == "individual" && !isset($_SESSION['listsearch']['individual'])) {
+		$_SESSION['listsearch'] = array ("individual" => array ("quickaddsearch" => ''));
+	}
+	
+	if ($_GET['listsearchmode'] == "sections" && !isset($_SESSION['listsearch']['sectionx'])) {
+		$_SESSION['listsearch'] = array ("sectionids" => array ());
+	}
+	
+	if ($_GET['listsearchmode'] == "showall" && !isset($_SESSION['listsearch']['showall'])) {
+		$_SESSION['listsearch'] = array("showall" => true);
+	}
+}
+
+
 
 if (isset($_GET['hideactivecodes']))
 	$_SESSION['hideactivecodes'] = $_GET['hideactivecodes'] == "true" ? true : false;
@@ -98,13 +115,14 @@ $checkHideActiveCodes = (!empty($_SESSION['hideactivecodes'])) ? 'checked' : '';
 $checkHideAssociated = (!empty($_SESSION['hideassociated'])) ? 'checked' : '';
 
 $buttons = array(
-	icon_button(_L('Back'),"arrow_left",null,"contacts.php"),
-	submit_button(_L('Refresh'),"refresh","arrow_refresh"),
-	icon_button(_L('Show All Contacts'),"group",null,"?showall")
+	icon_button(_L('Download CSV'), "disk",null,"activationcodemanager.php/report.csv?csv=true")
 );
 if ($generateBulkTokens)
-	$buttons[] = icon_button("Generate Activation Codes", "key_go", "if(confirmGenerate()) window.location='?generate=1'", "activationcodemanager.php");
+	$buttons[] = icon_button("Generate Activation Codes", "key_go", "if(confirmGenerate()) window.location='?generate=1'", "activationcodemanager.php");	
 
+$buttons[] = icon_button(_L('Back to Contacts'),"arrow_left",null,"contacts.php");
+	
+	
 $redirectpage = "activationcodemanager.php";
 
 $additionalformdata = array();
@@ -114,12 +132,6 @@ $additionalformdata["filter"] = array(
 		<div><input type='checkbox' id='checkboxHideActiveCodes' onclick='location.href=\"?hideactivecodes=\" + this.checked' $checkHideActiveCodes><label for='checkboxHideActiveCodes'>"._L('Hide people with unexpired codes')."</label></div>
 		<div><input type='checkbox' id='checkboxHideAssociated' onclick='location.href=\"?hideassociated=\" + this.checked' $checkHideAssociated><label for='checkboxHideAssociated'>"._L('Hide people with Contact Manager accounts')."</label></div>
 	"),
-	"helpstep" => 2
-);
-
-$additionalformdata["outputformat"] = array(
-	"label" => _L("Output Format"),
-	"control" => array("FormHtml", "html" => "<a href='activationcodemanager.php/report.csv?csv=true'>CSV</a>"),
 	"helpstep" => 2
 );
 
@@ -238,9 +250,22 @@ function showRenderedListTableCM($data, $total, $pagestart, $pagelimit, $validso
 	$tableid = "renderedlist". $tableidcounter++;
 	$optionalfields = array_merge(FieldMap::getOptionalAuthorizedFieldMapsLike('f'), FieldMap::getAuthorizedFieldMapsLike('g'));
 	$optionalfieldstart = 6; //table col of last non optional field
-	select_metadata($tableid,$optionalfieldstart,$optionalfields);
-	showSortMenu($validsortfields,$ordering);
 	
+?>
+	<table border="0" width="100%">
+	<tr>
+		<td>
+<?
+		showSortMenu($validsortfields,$ordering);
+?>		
+		</td>
+		<td>
+<?
+		show_field_visibility_selector($tableid, $optionalfields, $optionalfieldstart);
+?>		
+		</td>
+<?
+
 	//now use session display prefs to set up titles and whatnot for the optional fields
 	$i = 8;
 	foreach ($optionalfields as $field) {
@@ -248,13 +273,22 @@ function showRenderedListTableCM($data, $total, $pagestart, $pagelimit, $validso
 		if ($field->fieldnum == FieldMap::getLanguageField())
 			$formatters[$i] = "fmt_languagecode";
 		
-		if (isset($_SESSION['report']['fields'][$field->fieldnum]) && $_SESSION['report']['fields'][$field->fieldnum])
+		if (isset($_SESSION['fieldvisibility'][$field->fieldnum]))
 			$titles[$i++] = $field->name;
 		else
 			$titles[$i++] = "@" . $field->name;
 	}
+?>
+		<td halign="right">
+<?
+		showPageMenu($total,$pagestart,$pagelimit);
+?>		
+		</td>
+	</tr>
+	</table>
+<?	
 	
-	showPageMenu($total,$pagestart,$pagelimit);
+
 	echo '<table id="'.$tableid.'" width="100%" cellpadding="3" cellspacing="1" class="list">';
 	showTable($data, $titles, $formatters, $repeatedcolumns, $groupby);
 	echo "\n</table>";
@@ -350,24 +384,23 @@ if ($csv) {
 
 	include_once("nav.inc.php");
 ?>
-	<script src="script/contactsearch.js.php" type="text/javascript"></script>
-
 	<script type="text/javascript">
 		<? Validator::load_validators(array("ValSections", "ValRules")); ?>
+
+		function rulewidget_add_rule(event) {
+			$('listsearch_ruledata').value = event.memo.ruledata.toJSON();
+			form_submit(event, 'addrule');
+		}
+
+		function rulewidget_delete_rule(event) {
+			$('listsearch_ruledata').value = event.memo.fieldnum;
+			form_submit(event, 'deleterule');
+		}
 
 		document.observe('dom:loaded', function() {
 			ruleWidget.delayActions = true;
 			ruleWidget.container.observe('RuleWidget:AddRule', rulewidget_add_rule);
 			ruleWidget.container.observe('RuleWidget:DeleteRule', rulewidget_delete_rule);
-		
-<?
-			if (isset($_SESSION['listsearch']['individual']))
-				echo 'choose_search_by_person();';
-			else if (isset($_SESSION['listsearch']['sectionids']))
-				echo 'choose_search_by_sections();';
-			else
-				echo 'choose_search_by_rules();';
-?>
 		});
 
 		function confirmGenerate () {

@@ -479,10 +479,10 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 						break;
 
 					case 'search':
-						$form->sendTo("search.php?mode=rules&id=" . $list->id);
+						$form->sendTo("search.php?listsearchmode=rules&id=" . $list->id);
 						break;
 					case 'quickadd':
-						$form->sendTo("search.php?mode=individual&id=" . $list->id);
+						$form->sendTo("search.php?listsearchmode=individual&id=" . $list->id);
 						break;
 					case 'manualAdd':
 						$form->sendTo("addressedit.php?id=new&origin=manualadd");

@@ -52,11 +52,25 @@ if (!$USER->authorize('viewcontacts')) {
 // Action/Request Processing
 ////////////////////////////////////////////////////////////////////////////////
 
-if (isset($_GET['clear']))
-	$_SESSION['listsearch'] = array();
+//handle list search mode switches (contactsearchformdata.inc.php)
+if (isset($_GET['listsearchmode'])) {
+
+	if ($_GET['listsearchmode'] == "rules" && !isset($_SESSION['listsearch']['rules'])) {
+		unset($_SESSION['listsearch']); //defaults to rules mode with no search criteria
+	}
 	
-if (isset($_GET['showall']))
-	$_SESSION['listsearch'] = array("showall" => true);
+	if ($_GET['listsearchmode'] == "individual" && !isset($_SESSION['listsearch']['individual'])) {
+		$_SESSION['listsearch'] = array ("individual" => array ("quickaddsearch" => ''));
+	}
+	
+	if ($_GET['listsearchmode'] == "sections" && !isset($_SESSION['listsearch']['sectionx'])) {
+		$_SESSION['listsearch'] = array ("sectionids" => array ());
+	}
+	
+	if ($_GET['listsearchmode'] == "showall" && !isset($_SESSION['listsearch']['showall'])) {
+		$_SESSION['listsearch'] = array("showall" => true);
+	}
+}
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -66,10 +80,7 @@ if (isset($_GET['showall']))
 $renderedlist = new RenderedList2();
 $renderedlist->pagelimit = 100;
 
-$buttons = array(
-	submit_button(_L('Refresh'),"refresh","arrow_refresh"),
-	icon_button(_L('Show All Contacts'),"group",null,"contacts.php?showall")
-);
+$buttons = array();
 if (getSystemSetting("_hasportal", false) && $USER->authorize('portalaccess'))
 	$buttons[] = icon_button("Manage Activation Codes", "key_go", null, "activationcodemanager.php");
 
@@ -87,25 +98,23 @@ $TITLE = "Contact Database";
 include_once("nav.inc.php");
 
 ?>
-	<script src="script/contactsearch.js.php" type="text/javascript"></script>
-
 	<script type="text/javascript">
-	
-	<? Validator::load_validators(array("ValSections", "ValRules")); ?>
+		<? Validator::load_validators(array("ValSections", "ValRules")); ?>
+
+		function rulewidget_add_rule(event) {
+			$('listsearch_ruledata').value = event.memo.ruledata.toJSON();
+			form_submit(event, 'addrule');
+		}
+
+		function rulewidget_delete_rule(event) {
+			$('listsearch_ruledata').value = event.memo.fieldnum;
+			form_submit(event, 'deleterule');
+		}
 
 		document.observe('dom:loaded', function() {
 			ruleWidget.delayActions = true;
 			ruleWidget.container.observe('RuleWidget:AddRule', rulewidget_add_rule);
 			ruleWidget.container.observe('RuleWidget:DeleteRule', rulewidget_delete_rule);
-		
-<?
-			if (isset($_SESSION['listsearch']['individual']))
-				echo 'choose_search_by_person();';
-			else if (isset($_SESSION['listsearch']['sectionids']))
-				echo 'choose_search_by_sections();';
-			else 
-				echo 'choose_search_by_rules();';
-?>
 		});
 	</script>
 <?
