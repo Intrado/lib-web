@@ -378,7 +378,7 @@ foreach ($results as $result) {
 	
 }
 
-if ($showusers) {
+if ($results && $showusers) {
 	
 	// output last user's data
 	echo "<tr><td>" . $userdata[0] . "</td>";
