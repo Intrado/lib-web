@@ -106,8 +106,7 @@ $wizdata = array(
 	"schedule" => new WizSection ("Options",array(
 		"options" => new JobWiz_scheduleOptions(_L("Job Options")),
 		"date" => new JobWiz_scheduleDate(_L("Schedule Date/Time")),
-		"advanced" => new JobWiz_scheduleAdvanced(_L("Advanced Options")),
-		"savelists" => new JobWiz_scheduleSaveLists(_L("Save & Review Lists"))
+		"advanced" => new JobWiz_scheduleAdvanced(_L("Advanced Options"))
 	)),
 	"submit" => new WizSection ("Confirm",array(
 		"confirm" => new JobWiz_submitConfirm(_L("Review and Confirm"))
@@ -522,8 +521,8 @@ class FinishJobWizard extends WizFinish {
 		}
 		
 		//check for saved messages and lists and undelete as appropriate
-		if (JobWiz_scheduleSaveLists::isEnabled($postdata,false)) {
-			foreach ($postdata["/schedule/savelists"]["savelists"] as $savelistid) {
+		if (isset($postdata["/schedule/options"]["savelists"])) {
+			foreach ($postdata["/schedule/options"]["savelists"] as $savelistid) {
 				$list = new PeopleList($savelistid);
 				if ($list->userid != $USER->id)
 					continue;

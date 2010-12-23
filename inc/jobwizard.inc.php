@@ -2002,16 +2002,38 @@ class JobWiz_scheduleOptions extends WizStep {
 		
 		//add checkbox for reviewing and saving lists if some lists were created in the wizard
 		if (someListsAreNew($postdata)) {
-			$helpsteps[] = _L("Review and optionally save Lists created in the MessageSender.");
+			
+			$joblists = parseLists($postdata);
+			$lists = DBFindMany("PeopleList", "from list where deleted and id in (" . DBParamListString(count($joblists)). ")", false, $joblists);
+			
+			
+			
+			foreach ($lists as $list) {
+			$renderedlist = new RenderedList2();
+			$renderedlist->pagelimit = 0;
+			$renderedlist->initWithList($list);
+			$total = $renderedlist->getTotal() + 0;
+			
+			$values[$list->id] = $list->name;
+			$hover[$list->id] = '
+				<table>
+					<tr><th>Name:</th><td>'.escapehtml($list->name).'</td></tr>
+					<tr><th>Total:</th><td>'.$total.'</td></tr>
+				</table>
+				';
+			}
+					
+			$helpsteps[] = _L("You may save the list you've created in MessageSender so that it is available for future jobs. Your list will be viewable in the List Builder, found under the Notifications tab.");
 			$formdata["savelists"] = array(
-				"label" => _L("Save & Review Lists"),
-				"fieldhelp" => _L('Check here if you would like to save lists for reuse later.'),
-				"value" => false,
+				"label" => _L("Save Lists"),
+				"fieldhelp" => _L('Check each list that you would like to save for future jobs.'),
+				"value" => array(),
 				"validators" => array(),
-				"control" => array("CheckBox"),
+				"control" => array("MultiCheckBox", "values" => $values, "hover" => $hover),
 				"helpstep" => ++$helpstepnum
 			);
 		}
+		
 		//add checkbox for reviewing and saving the message, only show message checkbox if they created the message
 		if (!wizHasMessageGroup($postdata)) {
 			$helpsteps[] = _L("You may save the message you've created in MessageSender so that it is available for future jobs. Your list will be viewable in the Message Builder, found under the Notifications tab.");
@@ -2200,56 +2222,6 @@ class JobWiz_scheduleAdvanced extends WizStep {
 		if (isset($postdata['/schedule/options']['advanced']) && $postdata['/schedule/options']['advanced'] && ($wizHasEmailMsg || $wizHasPhoneMsg))
 			return true;
 		return false;
-	}
-}
-
-
-class JobWiz_scheduleSaveLists extends WizStep {
-	function getForm($postdata, $curstep) {
-		global $USER;
-		global $ACCESS;
-
-		$helpstepnum = 1;
-		$helpsteps = array();
-		
-		$formdata = array($this->title);
-		
-		$joblists = parseLists($postdata);
-		$lists = DBFindMany("PeopleList", "from list where deleted and id in (" . DBParamListString(count($joblists)). ")", false, $joblists);
-		
-		$hover = array();
-		$values = array();
-		foreach ($lists as $list) {
-			$renderedlist = new RenderedList2();
-			$renderedlist->pagelimit = 0;
-			$renderedlist->initWithList($list);
-			$total = $renderedlist->getTotal() + 0;
-			
-			$values[$list->id] = $list->name;
-			$hover[$list->id] = '
-			<table>
-				<tr><th>Name:</th><td>'.escapehtml($list->name).'</td></tr>
-				<tr><th>Total:</th><td>'.$total.'</td></tr>
-			</table>
-			';
-		}
-				
-		$helpsteps[] = _L("You may save the list you've created in MessageSender so that it is available for future jobs. Your list will be viewable in the List Builder, found under the Notifications tab.");
-		$formdata["savelists"] = array(
-			"label" => _L("Save Lists"),
-			"fieldhelp" => _L('Select this option to save your list for future jobs.'),
-			"value" => array(),
-			"validators" => array(),
-			"control" => array("MultiCheckBox", "values" => $values, "hover" => $hover),
-			"helpstep" => $helpstepnum
-		);
-		
-		return new Form("scheduleSaveLists",$formdata,$helpsteps);
-	}
-	function isEnabled($postdata, $step) {
-		return isset($postdata['/schedule/options']['savelists']) && 
-			$postdata['/schedule/options']['savelists'] && 
-			someListsAreNew($postdata);
 	}
 }
 
