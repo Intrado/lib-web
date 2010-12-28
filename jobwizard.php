@@ -99,8 +99,8 @@ $wizdata = array(
 		"sms" => new WizSection ("SMS",array(
 			"text" => new JobWiz_messageSmsText(_L("SMS Text"))
 		)),
-		"facebookauth" => new JobWiz_facebookAuth(_L("Facebook Auth")),
-		"twitterauth" => new JobWiz_twitterAuth(_L("Twitter Auth")),
+		"facebookauth" => new JobWiz_facebookAuth(_L("Connect to Facebook")),
+		"twitterauth" => new JobWiz_twitterAuth(_L("Connect to Twitter")),
 		"socialmedia" => new JobWiz_socialMedia(_L("Social Media"))
 	)),
 	"schedule" => new WizSection ("Options",array(

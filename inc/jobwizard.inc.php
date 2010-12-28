@@ -1701,7 +1701,7 @@ class JobWiz_facebookAuth extends WizStep {
 	function getForm($postdata, $curstep) {
 	
 		
-		// Twitter auth note
+		// FB auth note
 		$html = "<div>". escapehtml(_L("You must authorize a Facebook account before you can post to Facebook.")). "</div>";
 		
 		// Form Fields.
@@ -1713,8 +1713,8 @@ class JobWiz_facebookAuth extends WizStep {
 				"helpstep" => 1
 			),
 			"facebookauth" => array(
-				"label" => _L('Facebook Auth'),
-				"fieldhelp" => _L("Authorize this application to post into your facebook pages. If you want to authorize a different account, be sure to log out of Facebook first."),
+				"label" => _L('Add Facebook Account'),
+				"fieldhelp" => _L("Authorize this application to post to your Facebook account. If you want to authorize a different account, be sure to log out of Facebook first."),
 				"value" => false,
 				"validators" => array(),
 				"control" => array("FacebookAuth"),
@@ -1756,8 +1756,8 @@ class JobWiz_twitterAuth extends WizStep {
 				"helpstep" => 1
 			),
 			"twitterauth" => array(
-				"label" => _L('Twitter Auth'),
-				"fieldhelp" => _L("Authorize this application to tweet to your Twitter status. If you want to authorize a different account, be sure to log out of Twitter first."),
+				"label" => _L('Add Twitter Account'),
+				"fieldhelp" => _L("Authorize this application to post to your Twitter account. If you want to authorize a different account, be sure to log out of Twitter first."),
 				"value" => false,
 				"validators" => array(),
 				"control" => array("TwitterAuth"),
@@ -1965,8 +1965,7 @@ class JobWiz_scheduleOptions extends WizStep {
 		if (($USER->authorize("facebookpost") || $USER->authorize("twitterpost")) && 
 				isset($postdata['/start']['socialmedia']) && $postdata['/start']['socialmedia']) {
 			
-			$html = "<div>". escapehtml(_L("Social Media posting happens immediately when the job is submitted, regardless of scheduling options.")). "<br>". 
-				escapehtml(_L("Posts may not be Saved for later. They will be discarded if \"Save for Later\" option is selected.")). "</div>";
+			$html = "<div>". escapehtml(_L("Messages for social media sites must be posted immediately. If the \"Save for Later\" option is selected, these posts will be discarded.")). "</div>";
 			
 			$formdata["socialmedianote"] = array(
 				"label" => _L("Social Media"),
