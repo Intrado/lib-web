@@ -329,6 +329,7 @@ class Form {
 		$str .= '
 		<div class="newform_container">
 		' . (empty($this->parentform) ? '<form class="newform" id="'.$this->name.'" name="'.$this->name.'" method="POST" action="'.$posturl.'">
+		<!--[if IE]><input type="text" style="display: none;" disabled="disabled" size="1" /><![endif]-->
 		<input name="'.$this->name.'-formsnum" type="hidden" value="' . $this->serialnum . '">' : '') . '
 		<table summary="Form" width="100%" cellspacing="0" cellpadding="0" table-layout="fixed" ><tr><td valign="top"> <!-- FORM CONTENT -->';
 
