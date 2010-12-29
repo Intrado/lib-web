@@ -274,7 +274,6 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 							else
 								showRenderedListTable($renderedlist);
 							$renderedlisthtml = ob_get_clean();
-							ob_end_clean();
 							
 							$form->modifyElement("renderedlistcontent", $renderedlisthtml);
 						}
