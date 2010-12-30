@@ -381,8 +381,8 @@ if ($USER->authorize('setcallerid') && !getSystemSetting('_hascallback', false))
 }
 
 // Social Media options
-if ((getSystemSetting('_hastwitter', false) && $USER->authorize('facebookpost')) || 
-		(getSystemSetting('_hasfacebook', false) && $USER->authorize('twitterpost'))) {
+if ((getSystemSetting('_hastwitter', false) && $USER->authorize('twitterpost')) || 
+		(getSystemSetting('_hasfacebook', false) && $USER->authorize('facebookpost'))) {
 	$formdata[] = _L('Social Media Options');
 }
 	
