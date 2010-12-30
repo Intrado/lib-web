@@ -80,8 +80,11 @@ if (isset($_GET['usetext']) && isset($_SESSION['ttstext']) && isset($_SESSION['t
 } else if(isset($_GET['id'])) {
 	//session_write_close();//WARNING: we don't keep a lock on the session file, any changes to session data are ignored past this point
 	$message = new Message($_GET['id'] + 0);
+	$messagegroup = new MessageGroup($message->messagegroupid);
 		
-	if (userOwns("message",$message->id) || $USER->authorize('managesystem') || isPublished("messagegroup", $message->messagegroupid)) {
+	if (userOwns("message",$message->id) || $USER->authorize('managesystem') || 
+			isPublished("messagegroup", $message->messagegroupid) || 
+			isPublished("messagegroup", $messagegroup->originalmessagegroupid)) {
 		$fields=array();
 		$languagefield = FieldMap::getLanguageField();
 		for($i=1; $i <= 20; $i++){
