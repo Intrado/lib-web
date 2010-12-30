@@ -336,8 +336,8 @@ _L('Messaging Options'),
 		"helpstep" => 4
 	),
 	"twitterpost" => array(
-		"label" => _L('Tweet to Twitter'),
-		"fieldhelp" => _L('Allow users to tweet messages to their Twitter status'),
+		"label" => _L('Post to Twitter'),
+		"fieldhelp" => _L('Allow users to post messages to their Twitter status'),
 		"value" => $obj->getValue("twitterpost"),
 		"validators" => array(),
 		"control" => array("CheckBox"),
