@@ -26,7 +26,7 @@ function fb_hasValidAccessToken($accessToken = false) {
 		try {
 			$data = $facebookapi->api("/me", array('access_token' => $access_token));
 		} catch (FacebookApiException $e) {
-			error_log($e);
+			//error_log($e);
 			return false;
 		}
 	} else {
