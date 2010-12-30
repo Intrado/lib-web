@@ -368,7 +368,7 @@ if ($USER->authorize('setcallerid') && !getSystemSetting('_hascallback', false))
 	} else {
 		$formdata["callerid"] = array(
 			"label" => _L("Personal Caller ID"),
-			"fieldhelp" => (""),
+			"fieldhelp" => ("Enter the Caller ID phone number to be associated with your jobs."),
 			"value" => Phone::format($USER->getSetting("callerid","")),
 			"validators" => array(
 				array("ValLength","min" => 0,"max" => 20),
