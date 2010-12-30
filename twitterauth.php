@@ -37,7 +37,7 @@ if (isset($_GET['oauth_token']) && isset($_GET['oauth_verifier']) && isset($_SES
 	$unauthconnection = new Twitter();
 		
 	// get a temporary request token
-	$thispage = (($_SERVER["HTTPS"])?"https://":"http://"). $_SERVER["SERVER_NAME"]. $_SERVER["REQUEST_URI"];
+	$thispage = ((isset($_SERVER["HTTPS"]))?"https://":"http://"). $_SERVER["SERVER_NAME"]. $_SERVER["REQUEST_URI"];
 	$requestToken = $unauthconnection->getRequestToken($thispage);
 	
 	// if the request token is valid
