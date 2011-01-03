@@ -1580,7 +1580,7 @@ class SMAPI {
 	
 	function getSettings ($sessionid) {
 		global $USER, $ACCESS;
-		$result = array("resultcode" => "failure", "resultdescription" => "", "permissions" => array());
+		$result = array("resultcode" => "failure", "resultdescription" => "", "settings" => array());
 
 		if (!APISession($sessionid)) {
 			$result['resultcode'] = 'invalidsession';
@@ -1603,25 +1603,25 @@ class SMAPI {
 		// maxjobdays
 		$entry = new NameValuePair();
 		$entry->name = "maxjobdays";
-		$entry->value = $USER->getSetting('maxjobdays');
+		$entry->value = $USER->getSetting('maxjobdays', $ACCESS->getValue('maxjobdays', '2'));
 		$settings[] = $entry;
 		
 		// callmax
 		$entry = new NameValuePair();
 		$entry->name = "callmax";
-		$entry->value = $USER->getSetting('callmax');
+		$entry->value = $USER->getSetting('callmax', $ACCESS->getValue('callmax', '4'));
 		$settings[] = $entry;
 		
 		// callearly
 		$entry = new NameValuePair();
 		$entry->name = "callearly";
-		$entry->value = $USER->getSetting('callearly');
+		$entry->value = $USER->getCallEarly();
 		$settings[] = $entry;
 		
 		// calllate
 		$entry = new NameValuePair();
 		$entry->name = "calllate";
-		$entry->value = $USER->getSetting('calllate');
+		$entry->value = $USER->getCallLate();
 		$settings[] = $entry;
 
 		// timezone
