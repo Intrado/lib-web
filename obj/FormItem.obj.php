@@ -103,7 +103,14 @@ class CheckBox extends FormItem {
 	
 	function render ($value) {
 		$n = $this->form->name."_".$this->name;
-		return '<input id="'.$n.'" name="'.$n.'" type="checkbox" value="true" '. ($value ? 'checked' : '').' />';
+		
+		if (isset($this->args['label']))
+			$label = $this->args['label'];
+		
+		$str = '<input id="'.$n.'" name="'.$n.'" type="checkbox" value="true" '. ($value ? 'checked' : '').' />';
+		if (isset($label))
+			$str .= '<label for="'.$n.'">'. $label . '</lable>';
+		return $str;
 	}
 }
 
