@@ -1998,12 +1998,12 @@ function getJobData($jobid=0){
 		$job->hasemail = $messagegroup->hasMessage('email') ? 1 : 0;
 		$job->hasprint = 0;
 		$job->hassms = $messagegroup->hasMessage('sms') ? 1 : 0;
-		$job->phoneremaining = $row[7];
-		$job->emailremaining = $row[8];
-		$job->printremaining = $row[9];
-		$job->smsremaining = $row[10];
-		$job->startdate = $row[11];
-		$job->status = $row[12];
+		$job->phoneremaining = $row[8];
+		$job->emailremaining = $row[9];
+		$job->printremaining = $row[10];
+		$job->smsremaining = $row[11];
+		$job->startdate = $row[12];
+		$job->status = $row[13];
 
 		$jobs[] = $job;
 	}
