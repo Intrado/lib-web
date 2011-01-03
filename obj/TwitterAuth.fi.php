@@ -95,6 +95,9 @@ class TwitterAuth extends FormItem {
 							);
 						
 						element.update(e);
+					},
+					onFailure: function() {
+						element.update();
 					}
 				});
 			}
