@@ -868,10 +868,10 @@ class JobWiz_start extends WizStep {
 			$_SESSION['wiz_twitterauth'] = $twitter->hasValidAccessToken();
 			
 			$formdata["twitter"] = array(
-				"label" => _L("Post to Twitter") . '&nbsp;<img src=img/icons/twitter.gif />',
+				"label" => _L("Post to Twitter"),
 				"fieldhelp" => _L("Post to your Twitter status."),
 				"value" => false,
-				"control" => array("CheckBox"),
+				"control" => array("CheckBox", "label" => '&nbsp;<img src="img/icons/twitter.gif" />'),
 				"validators" => array(),
 				"helpstep" => $helpstepnum++
 			);	
@@ -886,10 +886,10 @@ class JobWiz_start extends WizStep {
 			$_SESSION['wiz_facebookauth'] = fb_hasValidAccessToken();
 			
 			$formdata["facebook"] = array(
-				"label" => _L("Post to Facebook") . '&nbsp;<img src=img/icons/facebook.gif />',
+				"label" => _L("Post to Facebook"),
 				"fieldhelp" => _L("Post your message to Facebook pages."),
 				"value" => false,
-				"control" => array("CheckBox"),
+				"control" => array("CheckBox", "label" => '&nbsp;<img src="img/icons/facebook.gif" />'),
 				"validators" => array(),
 				"helpstep" => $helpstepnum++
 			);	
