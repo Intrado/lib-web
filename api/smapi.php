@@ -1578,6 +1578,9 @@ class SMAPI {
 		}
 	}
 	
+	/**
+	 * If setting does not exist, return empty value, do not return defaults, allow calling application to determine
+	 */
 	function getSettings ($sessionid) {
 		global $USER, $ACCESS;
 		$result = array("resultcode" => "failure", "resultdescription" => "", "settings" => array());
@@ -1598,32 +1601,31 @@ class SMAPI {
 		}
 		
 		$settings = array();
-		
 
 		// maxjobdays
 		$entry = new NameValuePair();
 		$entry->name = "maxjobdays";
-		$entry->value = $USER->getSetting('maxjobdays', $ACCESS->getValue('maxjobdays', '2'));
+		$entry->value = $USER->getSetting('maxjobdays');
 		$settings[] = $entry;
 		
 		// callmax
 		$entry = new NameValuePair();
 		$entry->name = "callmax";
-		$entry->value = $USER->getSetting('callmax', $ACCESS->getValue('callmax', '4'));
+		$entry->value = $USER->getSetting('callmax');
 		$settings[] = $entry;
 		
 		// callearly
 		$entry = new NameValuePair();
 		$entry->name = "callearly";
-		$entry->value = $USER->getCallEarly();
+		$entry->value = $USER->getSetting('callearly');
 		$settings[] = $entry;
 		
 		// calllate
 		$entry = new NameValuePair();
 		$entry->name = "calllate";
-		$entry->value = $USER->getCallLate();
+		$entry->value = $USER->getSetting('calllate');
 		$settings[] = $entry;
-
+		
 		// timezone
 		$entry = new NameValuePair();
 		$entry->name = "timezone";
