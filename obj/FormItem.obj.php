@@ -109,7 +109,7 @@ class CheckBox extends FormItem {
 		
 		$str = '<input id="'.$n.'" name="'.$n.'" type="checkbox" value="true" '. ($value ? 'checked' : '').' />';
 		if (isset($label))
-			$str .= '<label for="'.$n.'">'. $label . '</lable>';
+			$str .= '<label for="'.$n.'">'. $label . '</label>';
 		return $str;
 	}
 }
