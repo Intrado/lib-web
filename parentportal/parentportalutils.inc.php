@@ -252,19 +252,27 @@ function getsetContactFormData($f, $s, $PERSONID, $phones, $emails, $smses, $job
 
 function checkPriorityPhone($f, $s, $phones){
 	$systempriorities = getSystemSetting('priorityenforcement');
-	if(!$systempriorities)
+	if (!$systempriorities)
 		return false;
-	
-	$hasemergency = false;
 	
 	$priorityarray = explode('|',$systempriorities);
 	$jobtypenames = QuickQueryList("select id, name from jobtype where systempriority in (" . DBParamListString(count($priorityarray))  . ") and not deleted", true, false, $priorityarray);
 	$jobtypelist = $jobtypenames;
+	
 	$maxphones = getSystemSetting("maxphones", 3);
 	$lockedphones = array();
+	$allphoneslocked = true;
 	for($i=0; $i < $maxphones; $i++){
 		$lockedphones[$i] = getSystemSetting("lockedphone" . $i, 0);
+		if (!$lockedphones[$i]) {
+			$allphoneslocked = false;
+		}
 	}
+	// if all phone fields are locked, skip the jobtype check since user cannot edit them
+	if ($allphoneslocked)
+		return false;
+
+	// check each jobtype for any required phone
 	foreach($jobtypenames as $jobtypeid => $jobtypename){
 		for($i=0; $i < $maxphones; $i++){
 			if(!$lockedphones[$i] && GetFormData($f, $s, "phone" . $i . "jobtype" . $jobtypeid) && GetFormData($f, $s, "phone" . $i) !== "") {
