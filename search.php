@@ -124,9 +124,11 @@ require_once("nav.inc.php");
 		}
 
 		document.observe('dom:loaded', function() {
-			ruleWidget.delayActions = true;
-			ruleWidget.container.observe('RuleWidget:AddRule', rulewidget_add_rule);
-			ruleWidget.container.observe('RuleWidget:DeleteRule', rulewidget_delete_rule);
+			if (window.ruleWidget) {
+				ruleWidget.delayActions = true;
+				ruleWidget.container.observe('RuleWidget:AddRule', rulewidget_add_rule);
+				ruleWidget.container.observe('RuleWidget:DeleteRule', rulewidget_delete_rule);
+			}
 		});
 	</script>
 <?
