@@ -43,7 +43,7 @@ $userid = false;
 $updatelogin = false;
 $sessionstarted = false;
 if (isset($_GET['login'])) {
-	$login = get_magic_quotes_gpc() ? stripslashes($_GET['login']) : $_GET['login'];
+	$login = trim(get_magic_quotes_gpc() ? stripslashes($_GET['login']) : $_GET['login']);
 	/*CSDELETEMARKER_START*/
 	if(!$IS_COMMSUITE && $_GET['login'] == 'schoolmessenger'){
 		@session_destroy();
@@ -64,7 +64,7 @@ if (isset($_GET['login'])) {
 	/*CSDELETEMARKER_END*/
 
 } else if ((strtolower($_SERVER['REQUEST_METHOD']) == 'post') ) {
-	$f_login = get_magic_quotes_gpc() ? stripslashes($_POST['login']) : $_POST['login'];
+	$f_login = trim(get_magic_quotes_gpc() ? stripslashes($_POST['login']) : $_POST['login']);
 	$f_pass = get_magic_quotes_gpc() ? stripslashes($_POST['password']) : $_POST['password'];
 	$userid = doLogin($f_login, $f_pass, $CUSTOMERURL, $_SERVER['REMOTE_ADDR']);
 	if ($userid == -1) {
