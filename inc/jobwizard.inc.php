@@ -1985,21 +1985,6 @@ class JobWiz_scheduleOptions extends WizStep {
 
 		$formdata = array($this->title);
 		
-		// indicate with a note that social media posts can not be scheduled or saved
-		if (($USER->authorize("facebookpost") &&
-				isset($postdata['/start']['facebook']) && $postdata['/start']['facebook']) ||
-				($USER->authorize("twitterpost") &&
-				isset($postdata['/start']['twitter']) && $postdata['/start']['twitter'])) {
-			
-			$html = "<div>". escapehtml(_L("Messages for social media sites must be posted immediately. If the \"Save for Later\" option is selected, these posts will be discarded.")). "</div>";
-			
-			$formdata["socialmedianote"] = array(
-				"label" => _L("Social Media"),
-				"control" => array("FormHtml","html" => $html),
-				"helpstep" => $helpstepnum
-			);
-		}
-		
 		$helpsteps = array(_L("Select when to send this message or you may choose to save this job for later."));
 		$formdata["schedule"] = array(
 			"label" => _L("Delivery Schedule"),
@@ -2298,9 +2283,9 @@ class JobWiz_submitConfirm extends WizStep {
 			$html .= escapehtml(_L('You are about to save a notification to be used at a later date.')). "<br>". escapehtml(_L('Confirm and click Next to save this notification.'));
 		else {
 			if ($calctotal == 1)
-				$html = escapehtml(_L('Confirm and click Next to send this notification to the 1 person you selected'));
+				$html .= escapehtml(_L('Confirm and click Next to send this notification to the 1 person you selected'));
 			else
-				$html = escapehtml(_L('Confirm and click Next to send this notification to the %1$s people you selected.', $calctotal, count($lists)));
+				$html .= escapehtml(_L('Confirm and click Next to send this notification to the %1$s people you selected.', $calctotal, count($lists)));
 		}
 		$html .= '</div>';
 		$formdata["jobinfo"] = array(
@@ -2308,6 +2293,25 @@ class JobWiz_submitConfirm extends WizStep {
 			"control" => array("FormHtml", "html" => $html),
 			"helpstep" => 1
 		);
+		
+		// indicate with a note that social media posts can not be scheduled or saved
+		if (($postdata["/schedule/options"]["schedule"] == "template" || $postdata["/schedule/options"]["schedule"] == "schedule") && 
+				((isset($postdata['/start']['facebook']) && $postdata['/start']['facebook']) ||
+				(isset($postdata['/start']['twitter']) && $postdata['/start']['twitter']))) {
+			
+			if ($postdata["/schedule/options"]["schedule"] == "template")
+				$html = "<div>". escapehtml(_L("Messages for social media sites must be posted immediately. These posts will be discarded after confirmation.")). "</div>";
+			
+			if ($postdata["/schedule/options"]["schedule"] == "schedule")
+				$html = "<div>". escapehtml(_L("Messages for social media sites must be posted immediately. These posts will be delivered after confirmation.")). "</div>";
+			
+			$formdata["socialmedianote"] = array(
+				"label" => _L("Social Media"),
+				"control" => array("FormHtml","html" => $html),
+				"helpstep" => 1
+			);
+		}
+		
 		$formdata["jobconfirm"] = array(
 			"label" => _L("Confirm"),
 			"value" => "",
