@@ -76,6 +76,12 @@ if ($_SESSION['jobid'] == NULL) {
 	$job = new Job($_SESSION['jobid']);
 	if ($job->type != "notification")
 		redirect('unauthorized.php');
+	// check if editing a repeating job or normal job, verify job obj is of correct type
+	if ($job->status == "repeating" && $JOBTYPE != "repeating")
+		redirect('unauthorized.php');
+	if ($JOBTYPE == "repeating" && $job->status != "repeating")
+		redirect('unauthorized.php');
+		
 	$completedmode = in_array($job->status, array('complete','cancelled','cancelling'));
 	$submittedmode = ($completedmode || in_array($job->status,array('active','procactive','processing','scheduled')));
 }
