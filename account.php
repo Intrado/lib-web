@@ -361,7 +361,7 @@ if ($USER->authorize('setcallerid') && !getSystemSetting('_hascallback', false))
 	if ($readonly) {
 		$formdata["callerid"] = array(
 			"label" => _L("Personal Caller ID"),
-			"fieldhelp" => ("Enter the personal phone number which will be used for Caller ID if the 'Use personal' option is selected."),
+			"fieldhelp" => ("Enter the Caller ID phone number to be associated with your jobs."),
 			"control" => array("FormHtml","html" => Phone::format($USER->getSetting("callerid",""))),
 			"helpstep" => 1
 		);
