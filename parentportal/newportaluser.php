@@ -98,7 +98,7 @@ if ((strtolower($_SERVER['REQUEST_METHOD']) == 'post') ) {
 			if($result['result'] == "duplicate"){
 				$errordetails = "That email address is already in use";
 			} else {
-				$errordetails = "An unknown error occured, please try again";
+				$errordetails = "An unknown error occurred, please try again";
 			}
 			error("Your account was not created", $errordetails);
 		} else {
