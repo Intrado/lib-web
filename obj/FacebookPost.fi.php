@@ -125,12 +125,10 @@ class FacebookPost extends FormItem {
 								if (res.data.size() > 8)
 									$(container).setStyle({ height: "150px", overflow: "auto" });
 								// populate pages selection
-								$(container).insert(
-										new Element("input", { 
-											type: "checkbox", 
+								var newcb = new Element("input", { 
+											type: "checkbox",
 											value: Object.toJSON({ id: "me", "access_token": access_token }), 
-											name: "me",
-											checked: ((pages.get("me"))?true:false) }
+											name: "me" }
 										).observe(
 											"change",handleFbPageChange.curry(formitem)
 										).observe(
@@ -138,20 +136,26 @@ class FacebookPost extends FormItem {
 										).observe(
 											"blur",handleFbPageChange.curry(formitem)
 										).observe(
-											"focus",handleFbPageChange.curry(formitem))
+											"focus",handleFbPageChange.curry(formitem));
+								
+								$(container).insert(
+										newcb
 									).insert(
 										new Element("label", { "for": "me" }).insert("'. escapehtml(_L('My Wall')). '")
 									).insert(
-										new Element("br")
-								);
+										new Element("br"));
+								
+								// if the pageid is in our currently selected list of pages, check its checkbox
+								if (pages.get("me"))
+									newcb.checked = true;
+								
 								res.data.each(function(account) {
 									var val = Object.toJSON({ id: account.id, access_token: account.access_token });
-									$(container).insert(
-											new Element("input", { 
+									
+									var newcb = new Element("input", { 
 												type: "checkbox", 
 												value: val, 
-												name: account.id,
-												checked: ((pages.get(account.id))?true:false) }
+												name: account.id }
 											).observe(
 												"change",handleFbPageChange.curry(formitem)
 											).observe(
@@ -159,12 +163,18 @@ class FacebookPost extends FormItem {
 											).observe(
 												"blur",handleFbPageChange.curry(formitem)
 											).observe(
-												"focus",handleFbPageChange.curry(formitem))
+												"focus",handleFbPageChange.curry(formitem));
+									
+									$(container).insert(
+											newcb
 										).insert(
 											new Element("label", { "for": account.id }).insert(account.name.escapeHTML())
 										).insert(
-											new Element("br")
-									);
+											new Element("br"));
+									
+									// if the pageid is in our currently selected list of pages, check its checkbox
+									if (pages.get(account.id))
+										newcb.checked = true;
 								});
 							} else {
 								// no data returned
