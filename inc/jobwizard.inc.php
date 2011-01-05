@@ -1838,7 +1838,12 @@ class JobWiz_socialMedia extends WizStep {
 		$helpsteps = array();
 		
 		// Facebook
-		if ($USER->authorize('facebookpost') && fb_hasValidAccessToken()) {
+		if (isset($postdata['/start']['facebook']) && 
+				$postdata['/start']['facebook'] && 
+				getSystemSetting('_hasfacebook', false) && 
+				$USER->authorize('facebookpost') && 
+				fb_hasValidAccessToken()) {
+					
 			$helpsteps[] = _L("Select one or more pages and enter the message you wish to deliver via Facebook.");
 			$formdata["fbdata"] = array(
 				"label" => _L('Facebook'),
@@ -1853,7 +1858,10 @@ class JobWiz_socialMedia extends WizStep {
 		}
 		
 		// Twitter
-		if ($USER->authorize('twitterpost')) {
+		if (isset($postdata['/start']['twitter']) && 
+				$postdata['/start']['twitter'] && 
+				getSystemSetting('_hastwitter', false) && 
+				$USER->authorize('twitterpost')) {
 		
 			$twitter = new Twitter($USER->getSetting("tw_access_token", false));
 			
