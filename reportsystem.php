@@ -112,10 +112,11 @@ if($reload){
 // Data Calculation
 ////////////////////////////////////////////////////////////////////////////////
 $languageField = FieldMap::getLanguageField();
+$readOnlyDb = readonlyDBConnect();
 
 // get job types, don't show survey if they don't have it
 $surveysql = getSystemSetting('_hassurvey', true) ? '' : 'and issurvey=0';
-$jobtypelist = QuickQueryList("select id, name from jobtype where not deleted $surveysql", true);
+$jobtypelist = QuickQueryList("select id, name from jobtype where not deleted $surveysql", true, $readOnlyDb);
 
 $paramdata = array("lastxdays" =>  GetFormData($f, $s, "xdays"), "startdate" => $startdate, "enddate" => $enddate);
 
@@ -182,7 +183,7 @@ $query = "SELECT $field as field,
 		group by $groupby jobtypeid
 		order by $groupby jobtypeid";
 
-$results = QuickQueryMultiRow($query, true);
+$results = QuickQueryMultiRow($query, true, $readOnlyDb);
 
 // add up all the job type totals
 $fieldtotals = array();
@@ -215,10 +216,6 @@ function outputUserData($userdata, $jobtypelist, $systemtotal) {
 	
 	// output the total and percentage
 	echo "<td>" . $total . "</td><td>" . number_format(($total/$systemtotal)*100,2) . "%</td></tr>";
-	
-	// clear jobtype data
-	foreach($jobtypelist as $id => $name)
-		$userdata[$id] = 0;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -322,8 +319,12 @@ foreach ($results as $result) {
 		
 		// output the user data so we can continue collecting for the next field value
 		if ($lastfield !== 0) {
-			if ($showusers)
+			if ($showusers) {
 				outputUserData($userdata, $jobtypelist, $systemtotal);
+				// clear jobtype data
+				foreach($jobtypelist as $id => $name)
+					$userdata[$id] = 0;
+			}
 			$wroteheader = true;
 		}
 		
@@ -364,8 +365,12 @@ foreach ($results as $result) {
 		if ($userlogin != $lastuser) {
 			
 			// write out the userdata for the previous user, if the header changed... it already wrote it out
-			if (!$wroteheader)
-				outputUserData($userdata, $jobtypelist, $systemtotal);
+			if (!$wroteheader) {
+				outputUserData($userdata, $jobtypelist, $systemtotal);	
+				// clear jobtype data
+				foreach($jobtypelist as $id => $name)
+					$userdata[$id] = 0;
+			}
 			
 			// set next user's label
 			$userdata[0] = "&nbsp;&nbsp;" . escapehtml(_L("User")) . ": " . escapehtml($userlogin);
