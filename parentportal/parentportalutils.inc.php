@@ -268,11 +268,21 @@ function checkPriorityPhone($f, $s, $phones){
 			$allphoneslocked = false;
 		}
 	}
-	// if all phone fields are locked, skip the jobtype check since user cannot edit them
-	if ($allphoneslocked)
-		return false;
 
-	// check each jobtype for any required phone
+	// rare special case: if all phone fields are locked and all values blank, skip the jobtype check since user cannot edit them (bugfix 2895)
+	if ($allphoneslocked) {
+		$allphonesblank = true;
+		for ($i=0; $i < $maxphones; $i++) {
+			if ($phones[$i]->phone) {
+				$allphonesblank = false;
+				break;
+			}
+		}
+		if ($allphonesblank)
+			return false;
+	}
+	
+	// check each required jobtype for any required phone
 	foreach($jobtypenames as $jobtypeid => $jobtypename){
 		for($i=0; $i < $maxphones; $i++){
 			if(!$lockedphones[$i] && GetFormData($f, $s, "phone" . $i . "jobtype" . $jobtypeid) && GetFormData($f, $s, "phone" . $i) !== "") {
@@ -284,7 +294,7 @@ function checkPriorityPhone($f, $s, $phones){
 			}
 		}
 	}
-
+	
 	return $jobtypelist;
 }
 
