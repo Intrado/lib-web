@@ -49,6 +49,7 @@ if (!$USER->authorize('createreport') && !$USER->authorize('viewsystemreports'))
 // Action/Request Processing
 ////////////////////////////////////////////////////////////////////////////////
 $fields = FieldMap::getOptionalAuthorizedFieldMaps() + FieldMap::getOptionalAuthorizedFieldMapsLike('g');
+$preselectedorderby = array();
 
 if (isset($_GET['clear']) && $_GET['clear']) {
 	unset($_SESSION['reportid']);
@@ -89,6 +90,15 @@ if (isset($_GET['reportid'])) {
 		} else {
 			$_SESSION['report']['fields'][$field->fieldnum] = false;
 		}
+	}
+	if (isset($options['order1'])) {
+		$preselectedorderby[0] = $options['order1'];
+	}
+	if (isset($options['order2'])) {
+		$preselectedorderby[1] = $options['order2'];
+	}
+	if (isset($options['order3'])) {
+		$preselectedorderby[2] = $options['order3'];
 	}
 	$_SESSION['saved_report'] = true;
 	$_SESSION['report']['options'] = $options;
@@ -361,7 +371,7 @@ $formdata["displayoptions"] = array(
 $formdata["multipleorderby"] = array(
 	"label" => _L('Sort By'),
 	"fieldhelp" => _L("Choose which field you would like to sort the results by."),
-	"value" => !empty($validOrdering) ? $validOrdering : '',
+	"value" => $preselectedorderby,
 	"control" => array("MultipleOrderBy", "count" => 3, "values" => $validOrdering),
 	"validators" => array(),
 	"helpstep" => 1

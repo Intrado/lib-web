@@ -112,7 +112,8 @@ if(isset($_GET['clear']) && $_GET['clear']){
 if($clear)
 	redirect();
 
-
+$preselectedorderby = array();
+	
 if(isset($_GET['reportid'])){
 	$reportid = $_GET['reportid'] +0;
 	if(!userOwns("reportsubscription", $reportid)){
@@ -123,6 +124,16 @@ if(isset($_GET['reportid'])){
 	$instance = new ReportInstance($subscription->reportinstanceid);
 	$options = $instance->getParameters();
 
+	if (isset($options['order1'])) {
+		$preselectedorderby[0] = $options['order1'];
+	}
+	if (isset($options['order2'])) {
+		$preselectedorderby[1] = $options['order2'];
+	}
+	if (isset($options['order3'])) {
+		$preselectedorderby[2] = $options['order3'];
+	}
+	
 	$_SESSION['saved_report'] = true;
 	$_SESSION['report']['options'] = $options;
 } else {
@@ -196,7 +207,7 @@ $formdata["displayoptions"] = array(
 $formdata["multipleorderby"] = array(
 	"label" => _L('Sort By'),
 	"fieldhelp" => _L("Choose which field you would like to sort the results by."),
-	"value" => !empty($validOrdering) ? $validOrdering : '',
+	"value" => $preselectedorderby,
 	"control" => array("MultipleOrderBy", "count" => 3, "values" => $validOrdering),
 	"validators" => array(),
 	"helpstep" => 1
