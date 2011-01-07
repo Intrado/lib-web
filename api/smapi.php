@@ -1346,6 +1346,9 @@ class SMAPI {
 			$result["resultdescription"] = "Invalid Session ID";
 			return $result;
 		} else {
+			
+			QuickQuery("begin");
+			
 			$USER = $_SESSION['user'];
 			$ACCESS = $_SESSION['access'];
 
@@ -1389,6 +1392,10 @@ class SMAPI {
 			} else if (strtotime($starttime) > strtotime($endtime)) {
 				$result['resultcode'] = 'invalidparam';
 				$result["resultdescription"] = "Start Time must be before End Time";
+				return $result;
+			} else if ($name == null || $name == "") {
+				$result['resultcode'] = 'invalidparam';
+				$result["resultdescription"] = "Name must be set";
 				return $result;
 			}
 			$jobtypeok = false;
@@ -1479,7 +1486,7 @@ class SMAPI {
 			*/
 			
 			$job->name = $name;
-			$job->description = $desc;
+			$job->description = isset($desc) ? $desc : ""; //avoid nulls
 			$job->jobtypeid = $jobtypeid;
 			$job->type = 'notification';
 				
@@ -1492,7 +1499,11 @@ class SMAPI {
 			$messagegroup->modified = date("Y-m-d H:i:s", time());
 			$messagegroup->deleted = 1; // NOTE: We don't want this messagegroup to show in the UI.
 			$messagegroup->permanent = 0; // NOTE: This is a hidden messagegroup anyway, so why keep it? The original messages remain intact.
-			$messagegroup->create();
+			if (!$messagegroup->create()) {
+				$result['resultcode'] = 'failure';
+				$result["resultdescription"] = "Unable to create message group";
+				return $result;
+			}
 			$job->messagegroupid = $messagegroup->id;
 			$job->sendphone = false; // Default value.
 			$job->sendemail = false; // Default value.
@@ -1561,16 +1572,21 @@ class SMAPI {
 			$job->starttime = date("H:i", strtotime($starttime));
 			$job->endtime = date("H:i", strtotime($endtime));
 
-			$job->create(); // create to generate the jobid
-				
+			if (!$job->create()) { // create to generate the jobid
+				$result['resultcode'] = 'failure';
+				$result["resultdescription"] = "Unable to create job";
+				return $result;
+			}
 			// associate this jobid with each listid
 			foreach ($listids->listid as $listid) {
 				// TODO batch insert
 				QuickUpdate("insert into joblist (jobid, listid) values (?, ?)", false, array($job->id, $listid));
 			}
-				
+			
 			$job->runNow(); // run the job
-				
+			
+			QuickQuery("commit");
+			
 			// success
 			$result["resultcode"] = "success";
 			$result["jobid"] = $job->id;
