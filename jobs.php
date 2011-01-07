@@ -188,6 +188,7 @@ $TITLE = "Notification Jobs";
 
 include_once("nav.inc.php");
 
+// Active Jobs
 $data = DBFindMany("Job","from job where userid=$USER->id and (status='new' or status='scheduled' or status='procactive' or status='processing' or status='active' or status='cancelling') and type != 'survey' and deleted=0 order by id desc");
 $titles = array(	"name" => "#Job Name",
 					"description" => "#Description",
@@ -220,7 +221,7 @@ button_bar(button('Create New Job', NULL,"job.php?id=new") . help('Jobs_AddStand
 showObjects($data, $titles, $formatters, $scroll, true);
 endWindow();
 
-
+// Repeating Jobs
 print '<br>';
 if ($USER->authorize('createrepeat')) {
 
@@ -252,8 +253,10 @@ if ($USER->authorize('createrepeat')) {
 	print '<br>';
 }
 
-
-$data = DBFindMany("Job","from job where userid=$USER->id and (status='complete' or status='cancelled') and type != 'survey' and deleted = 0 order by finishdate desc");
+// Completed Jobs
+$query = "from job where userid=$USER->id and (status='complete' or status='cancelled') and type != 'survey' and deleted = 0";
+$totalcompletedjobs = QuickQuery("select count(*) " . $query);
+$data = DBFindMany("Job", $query . " order by finishdate desc limit 100");
 $titles = array(	"name" => "#Job Name",
 					"description" => "#Description",
 					"type" => "#Type",
@@ -283,6 +286,20 @@ startWindow('My Completed Jobs ' . help('Jobs_MyCompletedJobs'),'padding: 3px;',
 showObjects($data, $titles, $formatters, $scroll, true);
 ?>
 	<table style="margin-top: 5px;" border="0" cellpadding="0" cellspacing="0">
+<?
+	if ($totalcompletedjobs > 100) {
+?>
+		<tr>
+		<td width="100%">
+			&nbsp;
+		</td>
+			<td>
+				<div style="text-align:right; white-space:nowrap"><a href="jobscompleted.php">More Completed Jobs...</a></div>
+			</td>
+		</tr>
+<?
+	}
+?>
 		<tr>
 		<td width="100%">
 			&nbsp;
