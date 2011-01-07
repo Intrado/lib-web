@@ -45,31 +45,6 @@ if (getSystemSetting('_hascallback', false)) {
 	);
 }
 
-$helpsteps[$helpstepnum++] = _L("The Autoreport email address and name is used by the system when sending Autoreports. The reports will come from this address and name.");
-$formdata["autoreportreplyemail"] = array(
-	"label" => _L("Autoreport Email Address"),
-	"fieldhelp" => "Autoreports will originate from this email address.",
-	"value" => getSystemSetting('autoreport_replyemail'),
-	"validators" => array(
-		array("ValRequired"),
-		array("ValLength","min" => 0,"max" => 255),
-		array("ValEmail")
-	),
-	"control" => array("TextField","maxlength" => 255),
-	"helpstep" => $helpstepnum
-);
-
-$formdata["autoreportreplyname"] = array(
-	"label" => _L("Autoreport Email Name"),
-	"fieldhelp" => "This is the name associated with the email address above.",
-	"value" => getSystemSetting('autoreport_replyname'),
-	"validators" => array(
-		array("ValRequired"),
-		array("ValLength","min" => 1,"max" => 100)),
-	"control" => array("TextField","maxlength" => 100),
-	"helpstep" => $helpstepnum
-);
-
 if($IS_COMMSUITE || getSystemSetting('_dmmethod', 'asp') != 'asp'){
 
 	$helpsteps[$helpstepnum++] = _L("If you use a SmartCall appliance or have a licensed solution, enter the minimum and maximum length of extensions on your local network. For example, to have the system call  four digit extensions on your local network, set these values to 4.");
@@ -120,9 +95,6 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 
 		if (isset($postdata['callerid']))
 			setSystemSetting('callerid', Phone::parse($postdata['callerid']));
-
-		setSystemSetting('autoreport_replyemail', $postdata['autoreportreplyemail']);
-		setSystemSetting('autoreport_replyname', $postdata['autoreportreplyname']);
 
 		if($IS_COMMSUITE || getSystemSetting('_dmmethod', 'asp') != 'asp'){
 			setSystemSetting('easycallmin', $postdata['easycallmin']);
