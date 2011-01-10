@@ -24,23 +24,12 @@ if (!$USER->authorize('sendphone') && !$USER->authorize('sendemail') && !$USER->
 // Data Handling
 ////////////////////////////////////////////////////////////////////////////////
 
-
-////////////////////////////////////////////////////////////////////////////////
-// Display
-////////////////////////////////////////////////////////////////////////////////
-
-$PAGE = "notifications:jobs:completed";
-$TITLE = "Completed Jobs";
-
-include_once("nav.inc.php");
-
-
-
-print '<br>';
+$start = 0 + (isset($_GET['pagestart']) ? $_GET['pagestart'] : 0);
+$limit = 100;
 
 $query = "from job where userid=$USER->id and (status='complete' or status='cancelled') and type != 'survey' and deleted = 0";
-//$totalcompletedjobs = QuickQuery("select count(*) " . $query);
-$data = DBFindMany("Job", $query . " order by finishdate desc");
+$total = QuickQuery("select count(*) " . $query);
+$data = DBFindMany("Job", $query . " order by finishdate desc limit $start, $limit");
 $titles = array(	"name" => "#Job Name",
 					"description" => "#Description",
 					"type" => "#Type",
@@ -57,12 +46,28 @@ $formatters = array("Actions" => "fmt_jobs_actions",
 					"type" => "fmt_obj_delivery_type_list",
 					"responses" => "fmt_response_count");
 
-if(!$USER->authorize('leavemessage')){
+if (!$USER->authorize('leavemessage')) {
 	unset($titles["responses"]);
 	unset($formatters["responses"]);
 }
+
+////////////////////////////////////////////////////////////////////////////////
+// Display
+////////////////////////////////////////////////////////////////////////////////
+
+$PAGE = "notifications:jobs:completed";
+$TITLE = "Completed Jobs";
+
+include_once("nav.inc.php");
+
 startWindow('My Completed Jobs ' . help('Jobs_MyCompletedJobs'),'padding: 3px;', false, true);
+
+showPageMenu($total, $start, $limit);
+
 showObjects($data, $titles, $formatters);
+
+showPageMenu($total, $start, $limit);
+
 endWindow();
 
 include_once("navbottom.inc.php");

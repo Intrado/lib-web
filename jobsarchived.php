@@ -24,6 +24,33 @@ if (!$USER->authorize('sendphone') && !$USER->authorize('sendemail') && !$USER->
 // Data Handling
 ////////////////////////////////////////////////////////////////////////////////
 
+$start = 0 + (isset($_GET['pagestart']) ? $_GET['pagestart'] : 0);
+$limit = 100;
+
+$query = "from job where userid=$USER->id and deleted = 2";
+$total = QuickQuery("select count(*) " . $query);
+$data = DBFindMany("Job", $query . " order by id desc limit $start, $limit");
+$titles = array(	"name" => "Name",
+					"description" => "Description",
+					"type" => "#Type",
+					"startdate" => "Start Date",
+					"Status" => "Status",
+					"enddate" => "End Date",
+					"responses" => "Responses (Unplayed/Total)",
+					"Actions" => "Actions"
+					);
+$formatters = array("Actions" => "fmt_jobs_actions",
+					'Status' => 'fmt_status',
+					"type" => "fmt_obj_delivery_type_list",
+					"startdate" => "fmt_job_startdate",
+					"enddate" => "fmt_job_enddate",
+					"responses" => "fmt_response_count");
+
+if (!$USER->authorize('leavemessage')) {
+	unset($titles["responses"]);
+	unset($formatters["responses"]);
+}
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // Display
@@ -34,27 +61,14 @@ $TITLE = "Archived Jobs";
 
 include_once("nav.inc.php");
 
-
-
-print '<br>';
-
-$data = DBFindMany("Job","from job where userid=$USER->id and deleted = 2 order by id desc");
-$titles = array(	"name" => "Name",
-					"description" => "Description",
-					"type" => "#Type",
-					"startdate" => "Start Date",
-					"Status" => "Status",
-					"enddate" => "End Date",
-					"responses" => "Responses (Unplayed/Total)",
-					"Actions" => "Actions"
-					);
-$formatters = array("Actions" => "fmt_jobs_actions", 'Status' => 'fmt_status', "type" => "fmt_obj_delivery_type_list","startdate" => "fmt_job_startdate", "enddate" => "fmt_job_enddate", "responses" => "fmt_response_count");
-if(!$USER->authorize('leavemessage')){
-	unset($titles["responses"]);
-	unset($formatters["responses"]);
-}
 startWindow('My Archived Jobs ' . help('Jobs_MyArchivedJobs'),'padding: 3px;', false, true);
+
+showPageMenu($total, $start, $limit);
+
 showObjects($data, $titles, $formatters);
+
+showPageMenu($total, $start, $limit);
+
 endWindow();
 
 include_once("navbottom.inc.php");
