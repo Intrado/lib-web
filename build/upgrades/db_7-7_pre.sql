@@ -31,3 +31,6 @@ $$$
 ALTER TABLE `subscriber` ADD INDEX `lastlogin` ( `lastlogin` , `enabled` , `personid` )
 $$$
 
+-- $rev 5
+ALTER TABLE `language` CHANGE `code` `code` VARCHAR( 3 ) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL 
+$$$
