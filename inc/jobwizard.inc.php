@@ -917,7 +917,7 @@ class JobWiz_messageOptions extends WizStep {
 		global $USER;
 
 		$values = array();
-		$values["create"] =_L("Create A Message");
+		$values["create"] =_L("Create a Message");
 		$values["pick"] =_L("Select Saved Message");
 
 		$formdata[] = $this->title;
@@ -1067,7 +1067,7 @@ class JobWiz_messageSelect extends WizStep {
 		$values = array();
 		if ($USER->authorize("starteasy") && $USER->authorize("sendphone") && in_array('phone', $postdata['/message/pick']['type']))
 			$values["record"] = _L("Call Me to Record");
-		$values["text"] =_L("Type A Message");
+		$values["text"] =_L("Type a Message");
 		//$values["pick"] =_L("Select Saved Message");
 
 		$formdata[] = $this->title;
