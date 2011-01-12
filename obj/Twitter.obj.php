@@ -42,13 +42,18 @@ class Twitter extends TwitterOAuth {
 	// tweet a message to the user's status
 	function tweet($message) {
 		
+		$response = false;
 		try {
-			$this->post('statuses/update', array('status' => $message));
+			$response = $this->post('statuses/update', array('status' => $message));
 		} catch (Exception $e) {
 			error_log("Problem tweeting: ". $e);
 			return false;
 		}
-		return true;
+		
+		if ($response)
+			return true;
+		else
+			return false;
 	}
 }
 ?>
