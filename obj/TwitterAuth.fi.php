@@ -79,22 +79,26 @@ class TwitterAuth extends FormItem {
 						// TODO: image url is http not https, need to convert it
 						// NOTE: https profile image is NOT currently supported by twitter
 						
-						var e = new Element("div").insert(
-								new Element("div").setStyle({ float: "left" }).insert(
-									new Element("img", { 
-										src: data.profile_image_url,
-										width: "48",
-										height: "48" })
-								)
-							).insert(
-								new Element("div").setStyle({ float: "left", padding: "7px" }).insert(
-									new Element("div").setStyle({ "fontWeight": "bold" }).update(data.screen_name.escapeHTML())
+						if (data) {
+							var e = new Element("div").insert(
+									new Element("div").setStyle({ float: "left" }).insert(
+										new Element("img", { 
+											src: data.profile_image_url,
+											width: "48",
+											height: "48" })
+									)
 								).insert(
-									new Element("div").setStyle({ color: "grey" }).update(data.name.escapeHTML())
-								)
-							);
-						
-						element.update(e);
+									new Element("div").setStyle({ float: "left", padding: "7px" }).insert(
+										new Element("div").setStyle({ "fontWeight": "bold" }).update(data.screen_name.escapeHTML())
+									).insert(
+										new Element("div").setStyle({ color: "grey" }).update(data.name.escapeHTML())
+									)
+								);
+							
+							element.update(e);
+						} else {
+							element.update();
+						}
 					},
 					onFailure: function() {
 						element.update();
