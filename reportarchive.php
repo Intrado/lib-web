@@ -21,7 +21,7 @@ if (!$USER->authorize('viewsystemreports')) {
 // Data Handling
 ////////////////////////////////////////////////////////////////////////////////
 
-$reports = QuickQueryList('select date, contentid from reportarchive order by date desc', true);
+$reports = QuickQueryList('select reportdate, contentid from reportarchive order by reportdate desc', true);
 $archivedata = '<div style="margin-top: 5px; padding: 4px; height: 150px; width: 75px; overflow: auto; border: 1px solid gray; scroll: auto;">';
 
 foreach ($reports as $date => $content) {

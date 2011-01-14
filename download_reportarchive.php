@@ -17,12 +17,10 @@ if (!$USER->authorize('viewsystemreports')) {
 if (!isset($_GET['date']))
 	redirect('unauthorized.php');
 
-error_log("Request for reportarchive date: ". $_GET['date']);
-
 // get all the content ids for this date
-$contentids = QuickQueryList("select contentid from reportarchive where date = ?", false, false, array($_GET['date']));
+$contentid = QuickQuery("select contentid from reportarchive where reportdate = ?", false, array($_GET['date']));
 
-if ($contentids) {
+if ($contentid) {
 	
 	$name = "reportarchive";
 	if (isset($_GET['name']))
@@ -35,10 +33,8 @@ if ($contentids) {
 	header("Cache-control: private, must-revalidate");
 	header("Connection: close");
 
-	foreach ($contentids as $contentid) {
-		list($contenttype, $data) = contentGet($contentid, false);
-		echo $data;
-	}
+	list($contenttype, $data) = contentGet($contentid, false);
+	echo $data;
 	
 } else {
 	echo _L("An error occurred trying to generate the report file. Please try again.");
