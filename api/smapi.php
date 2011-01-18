@@ -1933,9 +1933,18 @@ function systemLogin($loginname, $password, $CUSTOMERURL=null){
 	} else if ($userid){
 		doStartSession();
 		loadCredentials($userid);
-		$result["resultcode"] = "success";
-		$result["sessionid"] = session_id();
-		return $result;
+		
+		// check if api is disabled for this customer
+		$hassmapi = getSystemSetting("_hassmapi");
+		
+		if ($hassmapi) {
+			$result["resultcode"] = "success";
+			$result["sessionid"] = session_id();
+			return $result;
+		} else {
+			$result["resultdescription"] = "This service is currently unavailable. Please contact your system administrator for details on enabling this service.";
+			return $result;
+		}
 	}
 
 	$result["resultdescription"] = "Invalid LoginName/Password combination";
