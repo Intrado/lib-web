@@ -34,3 +34,7 @@ $$$
 -- $rev 5
 ALTER TABLE `language` CHANGE `code` `code` VARCHAR( 3 ) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL 
 $$$
+
+-- $rev 6
+INSERT INTO setting (id ,name ,value) VALUES (NULL , '_hassmapi', '1') on duplicate key update value = 1
+$$$
