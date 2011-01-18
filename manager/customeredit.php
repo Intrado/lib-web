@@ -154,6 +154,7 @@ if(CheckFormSubmit($f,"Save") || CheckFormSubmit($f, "Return")) {
 			$hasselfsignup = GetFormData($f, $s, 'hasselfsignup');
 			$hasfacebook = GetFormData($f, $s, 'hasfacebook');
 			$hastwitter = GetFormData($f, $s, 'hastwitter');
+			$hassmapi = GetFormData($f, $s, 'hassmapi');
 			$emaildomain = trim(GetFormData($f, $s, 'emaildomain'));
 			$emaildomainerror = validateDomainList($emaildomain);
 			$fileerror = false;
@@ -290,6 +291,7 @@ if(CheckFormSubmit($f,"Save") || CheckFormSubmit($f, "Return")) {
 				setCustomerSystemSetting('_hasselfsignup', $hasselfsignup, $custdb);
 				setCustomerSystemSetting('_hasfacebook', $hasfacebook, $custdb);
 				setCustomerSystemSetting('_hastwitter', $hastwitter, $custdb);
+				setCustomerSystemSetting('_hassmapi', $hassmapi, $custdb);
 				setCustomerSystemSetting('_timeslice', GetFormData($f, $s, 'timeslice'), $custdb);
 				setCustomerSystemSetting('organizationfieldname', GetFormData($f, $s, 'organizationfieldname'), $custdb);
 
@@ -452,6 +454,7 @@ if( $reloadform ) {
 	PutFormData($f,$s,"hastargetedmessage", getCustomerSystemSetting('_hastargetedmessage', false, true, $custdb), "bool", 0, 1);
 	PutFormData($f,$s,"hasfacebook", getCustomerSystemSetting('_hasfacebook', false, true, $custdb), "bool", 0, 1);
 	PutFormData($f,$s,"hastwitter", getCustomerSystemSetting('_hastwitter', false, true, $custdb), "bool", 0, 1);
+	PutFormData($f,$s,"hassmapi", getCustomerSystemSetting('_hassmapi', true, true, $custdb), "bool", 0, 1);
 	PutFormData($f,$s,"organizationfieldname", getCustomerSystemSetting('organizationfieldname', "School", true, $custdb), "text", 0, 255, true);
 	PutFormData($f,$s,"timeslice", getCustomerSystemSetting('_timeslice', 450, true, $custdb), "number", 60, 1800);
 	PutFormData($f, $s, "loginlockoutattempts", getCustomerSystemSetting('loginlockoutattempts', 5, true, $custdb), "number", 0);
@@ -628,6 +631,7 @@ foreach($languages as $language){
 <tr><td> Has Classroom Comments </td><td><? NewFormItem($f, $s, 'hastargetedmessage', 'checkbox') ?> Classroom Comments</td></tr>
 <tr><td> Has Facebook </td><td><? NewFormItem($f, $s, 'hasfacebook', 'checkbox') ?> Facebook</td></tr>
 <tr><td> Has Twitter </td><td><? NewFormItem($f, $s, 'hastwitter', 'checkbox') ?> Twitter</td></tr>
+<tr><td> Has SMAPI </td><td><? NewFormItem($f, $s, 'hassmapi', 'checkbox') ?> SMAPI</td></tr>
 <tr><td>Notes: </td><td><? NewFormitem($f, $s, 'managernote', 'textarea', 30) ?></td></tr>
 <tr><td>OEM: </td><td><? NewFormitem($f, $s, 'oem', 'text', 10, 50) ?></td></tr>
 <tr><td>OEM ID: </td><td><? NewFormitem($f, $s, 'oemid', 'text', 10, 50) ?></td></tr>
