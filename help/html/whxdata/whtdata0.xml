@@ -39,6 +39,10 @@
   <item name="The Contact Database" url="Systemwide_Reports_and_Contacts/The_Contact_Database.htm" />
   <item name="Viewing and Editing Contact Details" url="Systemwide_Reports_and_Contacts/Viewing_and_Editing_Contact_Details.htm" />
 </book>
+<book name="Social Media" >
+  <item name="Facebook" url="Social_Media/Facebook.htm" />
+  <item name="Twitter" url="Social_Media/Twitter.htm" />
+</book>
 <book name="SMS Messaging" >
   <item name="Before Sending SMS Messages" url="SMS_Messaging/Before_You_Send_an_SMS.htm" />
   <item name="About SMS Messaging" url="SMS_Messaging/About_SMS_Messaging.htm" />
