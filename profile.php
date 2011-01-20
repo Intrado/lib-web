@@ -329,7 +329,7 @@ _L('Messaging Options'),
 	),
 	"facebookpost" => array(
 		"label" => _L('Post to Facebook'),
-		"fieldhelp" => _L('Allow users to post messages to facebook pages that they have admin rights for'),
+		"fieldhelp" => _L('Allow users to post messages to Facebook pages that they have admin rights for'),
 		"value" => $obj->getValue("facebookpost"),
 		"validators" => array(),
 		"control" => array("CheckBox"),
