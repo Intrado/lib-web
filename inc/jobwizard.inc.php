@@ -2063,7 +2063,7 @@ class JobWiz_scheduleOptions extends WizStep {
 		
 		//add checkbox for reviewing and saving the message, only show message checkbox if they created the message
 		if (!wizHasMessageGroup($postdata)) {
-			$helpsteps[] = _L("You may save the message you've created in MessageSender so that it is available for future jobs. Your list will be viewable in the Message Builder, found under the Notifications tab.");
+			$helpsteps[] = _L("You may save the message you've created in MessageSender so that it is available for future jobs. Your message will be viewable in the Message Builder, found under the Notifications tab.");
 			$formdata["savemessage"] = array(
 				"label" => _L("Save Message"),
 				"fieldhelp" => _L('Select this option if you would like to save your message for future jobs.'),
