@@ -143,10 +143,10 @@ if ($_SESSION['shouldblockeddisplaycontact']) {
 			b.destination, b.description, CONCAT(u.firstname, ' ', u.lastname) as fullname, b.id, b.userid, '" .
 			$ACCESS->getValue('callblockingperms') . "' as permission, b.type, b.createdate, b.failattempts, b.blockmethod 
 		from blockeddestination b
-		join user u on (u.id = b.userid)
+		left join user u on (u.id = b.userid)
 		left join email e on (e.email = b.destination)
 		left join person p on (p.id = e.personid)
-		where b.userid = u.id and b.type = 'email'
+		where b.type = 'email'
 		and b.blockmethod in ('autoblock', 'manual')
 		order by createdate desc";
 			
@@ -155,8 +155,8 @@ if ($_SESSION['shouldblockeddisplaycontact']) {
 	$dataquery = "select SQL_CALC_FOUND_ROWS 'pid', 'pkey', 'f01', 'f02', b.destination, b.description, CONCAT(u.firstname, ' ', u.lastname) as fullname, b.id, b.userid, '" .
 			$ACCESS->getValue('callblockingperms') . "' as permission, b.type, b.createdate, b.failattempts, b.blockmethod
 			from blockeddestination b
-			join user u on (b.userid = u.id)
-			where b.userid = u.id and b.type = 'email'
+			left join user u on (b.userid = u.id)
+			where b.type = 'email'
 			and b.blockmethod in ('autoblock', 'manual')
 			order by createdate desc";
 }
