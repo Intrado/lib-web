@@ -3,6 +3,7 @@
 require_once("../inc/subdircommon.inc.php");
 require_once("../obj/Job.obj.php");
 require_once("../inc/formatters.inc.php");
+require_once("../inc/securityhelper.inc.php");
 
 function jsonFormatObjects ($data, $titles, $formatters = array()) {
 	$outputTitles = array();
