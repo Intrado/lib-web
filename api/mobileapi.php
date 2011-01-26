@@ -4,6 +4,9 @@ require_once("../inc/subdircommon.inc.php");
 require_once("../obj/Job.obj.php");
 require_once("../inc/formatters.inc.php");
 require_once("../inc/securityhelper.inc.php");
+require_once("../obj/PeopleList.obj.php");
+require_once("../obj/RenderedList.obj.php");
+
 
 function jsonFormatObjects ($data, $titles, $formatters = array()) {
 	$outputTitles = array();
@@ -58,7 +61,7 @@ function handleRequest() {
 	global $USER, $ACCESS;
 	
 	if (!isset($_GET['version']) || !isset($_GET['requesttype'])) {
-		return array("resultcode" => "falure", "resultdescription" => "Invalid request. Please upgrade the application.");
+		return array("resultcode" => "failure", "resultdescription" => "Invalid request. Please upgrade the application.");
 	}
 	
 	if ($_GET['version'] == "1.0") {
@@ -82,7 +85,7 @@ function handleRequest() {
 					Query("COMMIT");
 					return array("resultcode" => "success", "resultdescription" => "");
 				} 
-				return array("resultcode" => "falure", "resultdescription" => _L("You do not have permission to cancel this job."));
+				return array("resultcode" => "failure", "resultdescription" => _L("You do not have permission to cancel this job."));
 			}
 			
 			if (isset($_GET['archive'])) {
@@ -97,10 +100,10 @@ function handleRequest() {
 						Query('COMMIT');
 						return array("resultcode" => "success", "resultdescription" => "");
 					} else {
-						return array("resultcode" => "falure", "resultdescription" => _L("The job, is still running. Please cancel it first."));
+						return array("resultcode" => "failure", "resultdescription" => _L("The job, is still running. Please cancel it first."));
 					}
 				}
-				return array("resultcode" => "falure", "resultdescription" => _L("You do not have permission to archive this job."));
+				return array("resultcode" => "failure", "resultdescription" => _L("You do not have permission to archive this job."));
 			}
 			
 			if (isset($_GET['joblist'])) {
@@ -133,12 +136,41 @@ function handleRequest() {
 									"startdate" => "fmt_job_startdate");
 					return array_merge(array("resultcode" => "success", "resultdescription" => ""),
 										jsonFormatObjects($data,$titles,$formatters));
-				
+			}
+		} else if ($_GET['requesttype'] == "list") {
+			if (isset($_GET['statsforids'])) {
+				$listids = json_decode($_GET['statsforids']);
+				if (!is_array($listids))
+					return false;
+				$stats = array();
+				foreach ($listids as $id) {
+					if (!userOwns('list', $id) && !isSubscribed("list", $id))
+						continue;
+					$list = new PeopleList($id+0);
+					$renderedlist = new RenderedList2();
+					$renderedlist->pagelimit = 0;
+					$renderedlist->initWithList($list);
+					$stats[$list->id]= array(
+						'name' => $list->name,
+						'advancedlist' => false, //TODO remove this
+						'totalremoved' => $list->countRemoved(),
+						'totaladded' => $list->countAdded(),
+						'totalrule' => -999, //TOOD remove this
+						'total' => $renderedlist->getTotal() + 0);
+				}
+				return array("resultcode" => "success", "resultdescription" => "","stats" => $stats);
 			}
 		}
+		else if ($_GET['requesttype'] == "checkversion") {
+			return array("resultcode" => "success", "resultdescription" => "This Version is supported");
+			// If failure is returned here the user will be prompted with the resultdescription after login in the iPhone application
+			//return array("resultcode" => "failure", "resultdescription" => "Please upgrade the application. Some functionality in this application may no longer be supported.");
+		}
 	} else  {
-		return array("resultcode" => "falure", "resultdescription" => "Please upgrade the application. This version is no longer supported.");
+		return array("resultcode" => "failure", "resultdescription" => "Please upgrade the application. This version is no longer supported.");
 	}
+	// Unkown API request
+	return array("resultcode" => "failure", "resultdescription" => "Please upgrade the application. Some functionality in this application may no longer be supported.");
 }
 
 header('Content-Type: application/json');
