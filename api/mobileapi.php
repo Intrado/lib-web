@@ -107,19 +107,26 @@ function handleRequest() {
 			}
 			
 			if (isset($_GET['joblist'])) {
-					$limit = 100;
-					$start = 0 + (isset($_GET['page']) ? $_GET['page'] : 0);
+					$limit = 20;
+					$start = 0 + (isset($_GET['pagestart']) ? $_GET['pagestart'] : 0);
+					if ($start < 0 ) 
+						$start = 0;
 					
+					$total = 0;
+					// TODO figure out how to use SQL_CALC_FOUND_ROWS with DBFindMany
 					if ($_GET['joblist'] === "active") {
-						$data = DBFindMany("Job","from job where userid=$USER->id and (status='new' or status='scheduled' or status='procactive' or status='processing' or status='active' or status='cancelling') and type != 'survey' and deleted=0 order by modifydate desc limit $start, $limit");
+						$data = DBFindMany("Job","from job where userid=$USER->id and (status='scheduled' or status='procactive' or status='processing' or status='active' or status='cancelling') and type != 'survey' and deleted=0 order by modifydate desc limit $start, $limit");
+						$total = QuickQuery("select count(id) from job where userid=$USER->id and (status='scheduled' or status='procactive' or status='processing' or status='active' or status='cancelling') and type != 'survey' and deleted=0") + 0;
 					} else if($_GET['joblist'] === "completed") {
 						$data = DBFindMany("Job","from job where userid=$USER->id and (status='complete' or status='cancelled') and type != 'survey' and deleted = 0 order by finishdate desc limit $start, $limit");
+						$total = QuickQuery("select count(id) from job where userid=$USER->id and (status='complete' or status='cancelled') and type != 'survey' and deleted = 0") + 0;
 					} else  {
-						$data = DBFindMany("Job","from job where userid=$USER->id and status!='repeating' and type != 'survey' and deleted=0  order by modifydate desc limit $start, $limit");
+						$data = DBFindMany("Job","from job where userid=$USER->id and status!='new' and status!='repeating' and type != 'survey' and deleted=0  order by modifydate desc limit $start, $limit");
+						$total = QuickQuery("select count(id) from job where userid=$USER->id and status!='new' and status!='repeating' and type != 'survey' and deleted=0") + 0;
 						uasort($data, 'jobdatecompare');
 					}
 					
-					$total = QuickQuery("select FOUND_ROWS()");
+					//$total = QuickQuery("select FOUND_ROWS()");
 					$numpages = ceil($total/$limit);
 					$curpage = ceil($start/$limit) + 1;
 					$displayend = ($start + $limit) > $total ? $total : ($start + $limit);
@@ -127,14 +134,17 @@ function handleRequest() {
 					//TODO return paging information
 					
 					$titles = array("id" => "id",
-								"name" => "Job Name",
-								"description" => "#Description",
-								"startdate" => "Start date",
-								"status" => "Status");
+								"name" => "name",
+								"description" => "description",
+								"startdate" => "startdate",
+								"status" => "status");
 					$formatters = array('Status' => 'fmt_status',
 									"type" => "fmt_obj_delivery_type_list",
 									"startdate" => "fmt_job_startdate");
-					return array_merge(array("resultcode" => "success", "resultdescription" => ""),
+					return array_merge(array("resultcode" => "success", "resultdescription" => "",
+											"totalrows" => $total,
+											"startrow" => $displaystart
+										),
 										jsonFormatObjects($data,$titles,$formatters));
 			}
 		} else if ($_GET['requesttype'] == "list") {
