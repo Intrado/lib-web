@@ -454,7 +454,7 @@ if( $reloadform ) {
 	PutFormData($f,$s,"hastargetedmessage", getCustomerSystemSetting('_hastargetedmessage', false, true, $custdb), "bool", 0, 1);
 	PutFormData($f,$s,"hasfacebook", getCustomerSystemSetting('_hasfacebook', false, true, $custdb), "bool", 0, 1);
 	PutFormData($f,$s,"hastwitter", getCustomerSystemSetting('_hastwitter', false, true, $custdb), "bool", 0, 1);
-	PutFormData($f,$s,"hassmapi", getCustomerSystemSetting('_hassmapi', true, true, $custdb), "bool", 0, 1);
+	PutFormData($f,$s,"hassmapi", getCustomerSystemSetting('_hassmapi', false, true, $custdb), "bool", 0, 1);
 	PutFormData($f,$s,"organizationfieldname", getCustomerSystemSetting('organizationfieldname', "School", true, $custdb), "text", 0, 255, true);
 	PutFormData($f,$s,"timeslice", getCustomerSystemSetting('_timeslice', 450, true, $custdb), "number", 60, 1800);
 	PutFormData($f, $s, "loginlockoutattempts", getCustomerSystemSetting('loginlockoutattempts', 5, true, $custdb), "number", 0);
