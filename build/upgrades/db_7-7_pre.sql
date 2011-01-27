@@ -36,5 +36,5 @@ ALTER TABLE `language` CHANGE `code` `code` VARCHAR( 3 ) CHARACTER SET utf8 COLL
 $$$
 
 -- $rev 6
-INSERT INTO setting (id ,name ,value) VALUES (NULL , '_hassmapi', '1') on duplicate key update value = 1
+-- empty rev to revert incorrect insert into customer settings for enabling the hassmapi setting
 $$$
