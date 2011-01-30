@@ -125,7 +125,7 @@ if (isset($_GET['usetext']) && isset($_SESSION['ttstext']) && isset($_SESSION['t
 } 
 
 header("HTTP/1.0 200 OK");
-header("Content-Type: audio/mp3");
+header("Content-Type: audio/mpeg");
 header("Content-disposition: attachment; filename=message.mp3");
 header('Pragma: private');
 header('Cache-control: private, must-revalidate');
