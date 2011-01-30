@@ -19,7 +19,6 @@ class TranslationItem extends FormItem {
 		}
 		
 		$language = $this->args['language'];
-		$gender = isset($msgdata->gender)?$msgdata->gender:"female";
 		
 		if (trim($value) == "") {
 			$msgdata = (object)array(
@@ -27,7 +26,7 @@ class TranslationItem extends FormItem {
 				"text" => isset($this->args['plaintextmessage']) ? $this->args['plaintextmessage'] : "",
 				"englishText" => "",
 				"override" => false,
-				"gender" => $gender,
+				"gender" => "female",
 				"language" => $language
 			);
 		} else {
@@ -145,7 +144,7 @@ class TranslationItem extends FormItem {
 							'.($isphone ? icon_button(_L("Play"),"fugue/control","
 									var content = $('" . $n . "text').getValue();
 									if (content != '') {
-										var gender = 'female'; // Default female.
+										var gender = '$msgdata->gender';
 										var preferredgenderdiv = $('$preferredgenderformitem');
 										if(!preferredgenderdiv) 
 											preferredgenderdiv = $('phone-voice-autotranslator_preferredgender');
@@ -155,6 +154,8 @@ class TranslationItem extends FormItem {
 												var value = selectedradio.getValue();
 												if (value == 'male' || value == 'Male')
 													gender = 'male';
+												else if (value == 'female' || value == 'Female')
+													gender = 'female'
 											}
 										}
 																
