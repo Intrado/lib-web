@@ -170,7 +170,6 @@ foreach ($destinations as $type => $destination) {
 						"label" => "",
 						"control" => array("FormHtml","html" =>
 							($hasdata?submit_button(_L('Play with Field(s)'),"submit","fugue/control"):'') . '
-							<script type="text/javascript" language="javascript" src="script/niftyplayer.js.php"></script>
 							<div id="messageresultdiv" name="messageresultdiv"></div>
 							<div id="messagepreviewdiv" name="messagepreviewdiv">
 								<div align="center" style="clear:left">
@@ -356,6 +355,7 @@ if ($popup) {
 
 <script src="script/accordion.js" type="text/javascript"></script>
 <script src="script/messagegroup.js.php" type="text/javascript"></script>
+<script type="text/javascript" language="javascript" src="script/niftyplayer.js.php"></script>
 <link href="css/messagegroup.css" type="text/css" rel="stylesheet">
 <style type='text/css'>
 #messageemptyspan {
