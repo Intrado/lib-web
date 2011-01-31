@@ -94,14 +94,14 @@ $TITLE = $customer;
 if ($badcode) {
 	startWindow("Bad Request!");
 	?>
-		<h1>Your request appears to be invalid</h1>
-		<p>Please check your URL and try again</p>
+		<h1>Your request appears to be invalid.</h1>
+		<p>Please check your URL and try again.</p>
 	<?
 	endWindow();
 } else if ($submit) {
 	startWindow("Unsubscribe Email");
 	?>
-		<h1>Your request has been processed</h1>
+		<h1>Your request has been processed.</h1>
 		<p>Your email (<?=$email?>) will no longer receive <b>ANY</b> messages from <?=$customer?>.</p>
 		<p>To re-subscribe, contact <?=$customer?>.</p>
 	<?
@@ -110,7 +110,7 @@ if ($badcode) {
 	startWindow("Unsubscribe My Email Address", false, false, false);
 	?>
 		<div>
-			<h1>To unsubscribe from <b>ALL</b> messages, confirm your email address below</h1>
+			<h1>To unsubscribe from <b>ALL</b> messages, confirm your email address below.</h1>
 			<p>Once unsubscribed, you will no longer receive any emails distributed through this system on behalf of <?=$customer?> to the following address.</p>
 			<p><big style="color: #cc0000;">This may include emergency broadcasts and other important announcements.</big></p>
 			<div><div style="float:left; margin-right: 5px">Email:</div><div style="padding-left: 3px; padding-right: 3px; width: auto; float: left"><?=$email?></div></div>
