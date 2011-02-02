@@ -43,9 +43,8 @@ include_once("nav.inc.php");
 <h2>Jobs for all customers</h2>
 
 <form method=post>
-<label>Priority:<select name="type">
-<option value=0 selected>All types</option>
-<option value=1 selected>Emergency</option>
+<label>Priority:<select multiple name="types[]">
+<option selected value=1 >Emergency</option>
 <option value=2 >Attendance</option>
 <option value=3 >General</option>
 </select></label>
@@ -75,9 +74,9 @@ if (!isset($_POST['startdate'])) {
 		//do stuff here
 		//get list of jobtypes for systempriority
 		$jtsql = "";
-		if ($_POST['type'] != "0") {
-			$query = "select id from jobtype where systempriority=?";
-			$jtids = QuickQueryList($query,false,$custdb,array($_POST['type']));
+		if (isset($_POST['types']) && is_array($_POST['types'])) {
+			$query = "select id from jobtype where systempriority in (" . DBParamListString(count($_POST['types'])) . ")";
+			$jtids = QuickQueryList($query,false,$custdb,$_POST['types']);
 			$jtsql = "and j.jobtypeid in (".implode(",",$jtids).")";
 		}
 		
@@ -91,18 +90,24 @@ if (!isset($_POST['startdate'])) {
 				where j.finishdate between ? and ? + interval 1 day
 				$jtsql
 				group by j.id";
+
 		$costs = QuickQueryMultiRow($query,false,$custdb,array($_POST['startdate'],$_POST['enddate']));
-		foreach ($costs as $row) {
-			$d = array();
-			$d[0] = $cid;
-			$d[1] = $row[0]; //name
-			$d[2] = $row[1]; //desc
-			$d[3] = $row[2]; //message
-			$d[4] = $row[3]; //user
-			$d[5] = $row[4]; //emergency calls
-			$d[6] = $row[5]; //has SmartCall
-			$d[7] = $row[6]; //job id
-			$data[] = $d;
+		
+		if (count($costs) > 0) {
+			$customernotes = QuickQuery("select notes from customer where id = ?",false, array($cid));
+			foreach ($costs as $row) {
+				$d = array();
+				$d[0] = $cid;
+				$d[1] = $row[0]; //name
+				$d[2] = $row[1]; //desc
+				$d[3] = $row[2]; //message
+				$d[4] = $row[3]; //user
+				$d[5] = $row[4]; //emergency calls
+				$d[6] = $row[5]; //has SmartCall
+				$d[7] = $row[6]; //job id
+				$d[8] = $customernotes;
+				$data[] = $d;
+			}
 		}
 		
 		echo ".";
@@ -112,7 +117,7 @@ if (!isset($_POST['startdate'])) {
 		flush();
 	}
 	
-	$totalrow = array("Total","","","","",0,"","");
+	$totalrow = array("Total","","","","",0,"","","");
 	foreach ($data as $row) {
 		$totalrow[5] += $row[5];
 	}
@@ -128,6 +133,7 @@ if (!isset($_POST['startdate'])) {
 		3 => "#Message Name",
 		4 => "#User",
 		5 => "#Calls",
+		8 => "Customer Notes",
 		"play" => "Play"
 	);
 	$formatters = array(
@@ -137,14 +143,20 @@ if (!isset($_POST['startdate'])) {
 		"play" => "fmt_play_link"
 	);
 	
-	switch ($_POST['type']) {
-		case "0": $type = "All"; break;
-		case "1": $type = "Emergency"; break;
-		case "2": $type = "Attendance"; break;
-		case "3": $type = "General"; break;
+	$types = array();
+	if (isset($_POST['types']) && is_array($_POST['types'])) {
+		foreach ($_POST['types'] as $type) {
+			switch ($type) {
+			case "1": $types[] = "Emergency"; break;
+			case "2": $types[] = "Attendance"; break;
+			case "3": $types[] = "General"; break;
+			}
+		}
+	} else {
+		$types = array("All");
 	}
 	
-	echo "<h3>$type Calls from $_POST[startdate] to $_POST[enddate]</h3>";
+	echo "<h3>" . implode(",",$types) . " Calls from $_POST[startdate] to $_POST[enddate]</h3>";
 	echo '<table id="bibllable" class="list sortable">';
 	
 	showTable($data,$titles,$formatters);
