@@ -1452,9 +1452,28 @@ update setting set value='7.7/1' where name='_dbversion'
 $$$
 -- END REV 7.7/1
 
--- START REV 7.7/3
-ALTER TABLE `messagegroup` ADD `originalmessagegroupid` INT NULL AFTER `id`
+-- $rev 2
+
+ALTER TABLE `email` ADD INDEX `dedupe` ( `email` , `sequence` )
 $$$
-update setting set value='7.7/3' where name='_dbversion'
+
+-- $rev 3
+ALTER TABLE `messagegroup` ADD `originalmessagegroupid` INT NULL AFTER `id` 
 $$$
--- END REV 7.7/3
+
+-- $rev 4
+ALTER TABLE `subscriber` ADD INDEX `lastlogin` ( `lastlogin` , `enabled` , `personid` )
+$$$
+
+-- $rev 5
+ALTER TABLE `language` CHANGE `code` `code` VARCHAR( 3 ) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL 
+$$$
+
+-- $rev 6
+-- empty rev to revert incorrect insert into customer settings for enabling the hassmapi setting
+$$$
+
+update setting set value='7.7/6' where name='_dbversion'
+$$$
+-- END REV 7.7/6
+
