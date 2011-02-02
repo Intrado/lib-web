@@ -4,6 +4,9 @@
   <item name="Welcome" url="Getting_Started/Welcome.htm" />
   <item name="Start Page" url="Getting_Started/Start_Page.htm" />
 </book>
+<book name="Printable PDFs" >
+  <item name="PDF Guides" url="PDFs/PDF_Guides.htm" />
+</book>
 <book name="Tips for Effective Communication" >
   <item name="Messaging Tips" url="Tips_for_Effective_Communication/Messaging_Tips.htm" />
   <item name="Message Templates" url="Tips_for_Effective_Communication/Simple_Message_Templates.htm" />
