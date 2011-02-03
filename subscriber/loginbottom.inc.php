@@ -32,7 +32,7 @@ if(isset($_COOKIE['embeddedpage']) && $_COOKIE['embeddedpage']=="1"){
 	</tr>
 	<tr style="background-color: white;">
 		<td>&nbsp;</td>
-		<td><div align="right">&copy; <?=_L("1999-2010 Reliance Communications, Inc. All Rights Reserved.")?></div></td>
+		<td><div align="right">&copy; <?=_L("1999-2011 Reliance Communications, Inc. All Rights Reserved.")?></div></td>
 	</tr>
 </table>
 <?

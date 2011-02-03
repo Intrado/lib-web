@@ -6,7 +6,7 @@
 <?=_L('Use of this system is subject to the %1$s and %2$s', '<a href="locale/' . $LOCALE . '/privacy.html" target="_blank" title="'. _L("Privacy Policy") .'">' . _L("Privacy Policy") . "</a>", '<a href="locale/' . $LOCALE . '/terms.html" target="_blank" title="'. _L("Terms of Service") .'">' . _L("Terms of Service") . "</a>")?>
 <br>
 <? } /*CSDELETEMARKER_END*/ ?>
-&copy; 1999-2010 Reliance Communications, Inc. <?=_L("All Rights Reserved.")?>
+&copy; 1999-2011 Reliance Communications, Inc. <?=_L("All Rights Reserved.")?>
 
 </div>
 <?
