@@ -127,7 +127,9 @@ if(!$success){
 					<div style="font-size: 20px; font-weight: bold; text-align: left; float: left;"><?=$TITLE?></div>
 					<div style="float:right;"> 
 					<?
-						NewFormItem("login", "main", '_locale', 'selectstart', null, null, "id='locale' onchange='window.location.href=\"newportaluser.php".$appendcustomerurl."&locale=\"+this.options[this.selectedIndex].value'");
+						// if no customerurl, need to include the ?, otherwise append with &
+						$urlparams = (strlen($appendcustomerurl) == 0) ? "?locale=" : $appendcustomerurl . "&locale=";
+						NewFormItem("login", "main", '_locale', 'selectstart', null, null, "id='locale' onchange='window.location.href=\"newportaluser.php" . $urlparams . "\"+this.options[this.selectedIndex].value'");
 						foreach($LOCALES as $loc => $lang){
 							NewFormItem("login", "main", '_locale', 'selectoption', $lang, $loc);
 						}
