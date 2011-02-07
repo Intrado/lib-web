@@ -76,7 +76,7 @@ function getAppendCustomerUrl() {
 	}
 
 	// pass along the customerurl (used by phone activation feature to find a customer without any existing associations)
-	$appendcustomerurl = "";
+	$appendcustomerurl = "?"; // empty url params is ok, safe to append &locale or other options even if no u=customerurl
 	if ($customerurl) {
 		$appendcustomerurl = "?u=".urlencode($customerurl);
 		// if cookie not set, or already set but different, then set it
