@@ -6,7 +6,7 @@ require_once("../inc/utils.inc.php");
 require_once("../obj/Phone.obj.php");
 require_once("../inc/themes.inc.php");
 
-if (!$MANAGERUSER->authorizedAny(array("ffield2gfield","billablecalls")))
+if (!$MANAGERUSER->authorizedAny(array("ffield2gfield","billablecalls","editcustomer")))
 	exit("Not Authorized");
 
 if (!isset($_GET['cid']))
@@ -28,6 +28,9 @@ include_once("nav.inc.php");
 <li><a href="customerbillablecalls.php?cid=<?=$cid?>">Billable calls</a></li>
 <? } ?>
 
+<? if ($MANAGERUSER->authorized("editcustomer")) { ?>
+<li><a href="customertemplates.php?cid=<?=$cid?>">Templates</a></li>
+<? } ?>
 
 </ul>
 <?
