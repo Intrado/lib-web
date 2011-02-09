@@ -485,7 +485,7 @@ if( $reloadform ) {
 	PutFormData($f, $s, "theme", getCustomerSystemSetting('_brandtheme', "Classroom", true, $custdb), "text", "nomin", "nomax", true);
 	PutFormData($f, $s, "_brandratio", getCustomerSystemSetting('_brandratio', ".2", true, $custdb), "text", true);
 	PutFormData($f, $s, "_brandprimary", getCustomerSystemSetting('_brandprimary', "3e693f", true, $custdb), "text", true);
-	PutFormData($f, $s, "_logoclickurl", getCustomerSystemSetting('_logoclickurl', "http://", true, $custdb), "text");
+	PutFormData($f, $s, "_logoclickurl", getCustomerSystemSetting('_logoclickurl', "", true, $custdb), "text", "nomin", "nomax", true);
 
 	PutFormData($f, $s, "_supportemail", getCustomerSystemSetting('_supportemail', "", true, $custdb), "email", "nomin", "nomax", true);
 	PutFormData($f, $s, "_supportphone", Phone::format(getCustomerSystemSetting('_supportphone', "", true, $custdb)), "phone", 10, 10, true);
