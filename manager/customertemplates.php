@@ -5,7 +5,7 @@ require_once("../inc/html.inc.php");
 require_once("../inc/table.inc.php");
 require_once("../inc/utils.inc.php");
 require_once("../inc/themes.inc.php");
-require_once("../obj/Template.obj.php");
+//require_once("../obj/Template.obj.php");
 
 if (!$MANAGERUSER->authorized("editcustomer"))
 	exit("Not Authorized");
