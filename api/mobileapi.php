@@ -2,6 +2,7 @@
 
 require_once("../inc/subdircommon.inc.php");
 require_once("../obj/Job.obj.php");
+require_once("../obj/JobType.obj.php");
 require_once("../inc/formatters.inc.php");
 require_once("../inc/securityhelper.inc.php");
 require_once("../obj/PeopleList.obj.php");
@@ -106,7 +107,7 @@ function handleRequest() {
 				return array("resultcode" => "failure", "resultdescription" => _L("You do not have permission to archive this job."));
 			}
 			
-			if (isset($_GET['joblist'])) {
+			if (isset($_GET['view'])) {
 					$limit = 20;
 					$start = 0 + (isset($_GET['pagestart']) ? $_GET['pagestart'] : 0);
 					if ($start < 0 ) 
@@ -114,10 +115,10 @@ function handleRequest() {
 					
 					$total = 0;
 					// TODO figure out how to use SQL_CALC_FOUND_ROWS with DBFindMany
-					if ($_GET['joblist'] === "active") {
+					if ($_GET['view'] === "active") {
 						$data = DBFindMany("Job","from job where userid=$USER->id and (status='scheduled' or status='procactive' or status='processing' or status='active' or status='cancelling') and type != 'survey' and deleted=0 order by modifydate desc limit $start, $limit");
 						$total = QuickQuery("select count(id) from job where userid=$USER->id and (status='scheduled' or status='procactive' or status='processing' or status='active' or status='cancelling') and type != 'survey' and deleted=0") + 0;
-					} else if($_GET['joblist'] === "completed") {
+					} else if($_GET['view'] === "completed") {
 						$data = DBFindMany("Job","from job where userid=$USER->id and (status='complete' or status='cancelled') and type != 'survey' and deleted = 0 order by finishdate desc limit $start, $limit");
 						$total = QuickQuery("select count(id) from job where userid=$USER->id and (status='complete' or status='cancelled') and type != 'survey' and deleted = 0") + 0;
 					} else  {
@@ -126,27 +127,74 @@ function handleRequest() {
 						uasort($data, 'jobdatecompare');
 					}
 					
-					//$total = QuickQuery("select FOUND_ROWS()");
-					$numpages = ceil($total/$limit);
-					$curpage = ceil($start/$limit) + 1;
-					$displayend = ($start + $limit) > $total ? $total : ($start + $limit);
 					$displaystart = ($total) ? $start +1 : 0;
-					//TODO return paging information
 					
 					$titles = array("id" => "id",
 								"name" => "name",
 								"description" => "description",
+								"jobtypeid" => "jobtypeid",
+								"status" => "status",
 								"startdate" => "startdate",
-								"status" => "status");
+								"enddate" => "enddate",
+								"starttime" => "starttime",
+								"endtime" => "endtime"
+								);
 					$formatters = array('Status' => 'fmt_status',
-									"type" => "fmt_obj_delivery_type_list",
-									"startdate" => "fmt_job_startdate");
+									"type" => "fmt_obj_delivery_type_list");
 					return array_merge(array("resultcode" => "success", "resultdescription" => "",
 											"totalrows" => $total,
 											"startrow" => $displaystart
 										),
 										jsonFormatObjects($data,$titles,$formatters));
 			}
+			
+			
+			if (isset($_GET['info'])) {
+				$jobid = DBSafe($_GET['info']);
+				
+				if (userOwns("job",$jobid)) {
+					$listids = QuickQueryList("select listid from joblist where jobid = ?",false,false,array($jobid));
+					$lists = array();
+					
+					$totallistcount = 0;
+					foreach ($listids as $id) {
+						if (!userOwns('list', $id) && !isSubscribed("list", $id))
+							continue;
+						
+						$list = new PeopleList($id+0);
+						$renderedlist = new RenderedList2();
+						$renderedlist->pagelimit = 0;
+						$renderedlist->initWithList($list);
+						
+						$count = $renderedlist->getTotal() + 0;
+						$totallistcount+= $count;
+						$lists[] = array("id" => $list->id, "name" => $list->name,"contacts" => $count);
+					}
+					
+					$job = new Job($jobid);
+					$jobtype = new JobType($job->jobtypeid);
+					$jobinfo = array(	"id" => $job->id,
+							"name" => $job->name,
+							"description" => $job->description,
+							"jobtype" => array("id" => $jobtype->id, "name" => $jobtype->name, "info" => $jobtype->info),
+							"lists" => $lists,
+							"messagegroup" => $job->messagegroupid,
+							"messagetypes" => array("phone" => $job->hasPhone(),"email" => $job->hasEmail(),"sms" => $job->hasSMS()),
+							"status" => $job->status,
+							"startdate" => $job->startdate,
+							"enddate" => $job->enddate,
+							"starttime" => $job->starttime,
+							"endtime" => $job->endtime
+							//,"options" => $job->optionsarray
+							);
+
+					error_log(json_encode(array("resultcode" => "success", "resultdescription" => "","jobinfo" => $jobinfo)));
+					return array("resultcode" => "success", "resultdescription" => "","jobinfo" => $jobinfo);
+					
+				}
+				return array("resultcode" => "failure", "resultdescription" => _L("You do not have to view information for this job."));
+			}
+
 		} else if ($_GET['requesttype'] == "list") {
 			if (isset($_GET['statsforids'])) {
 				$listids = json_decode($_GET['statsforids']);
