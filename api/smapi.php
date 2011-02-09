@@ -1423,13 +1423,13 @@ class SMAPI {
 						
 			// all valid, continue to create and submit job
 			$job = Job::jobWithDefaults();
-			
 			// prep the job options into a name-value array
 			$joboptions = array();
 			if (isset($options->jobOption)) {
 				foreach ($options->jobOption as $op) {
 					//error_log($op->name . " -> " . $op->value);
-					$joboptions[$op->name] = $op->value;
+					if (isset($op->name) && isset($op->value) && $op->value != "")
+						$joboptions[$op->name] = $op->value;
 				}
 			}
 			
