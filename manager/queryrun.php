@@ -30,6 +30,11 @@ if (CheckFormSubmit($f,$s)) {
 		error('Form was edited in another window, reloading data');
 		$reloadform = 1;
 	} else {
+		
+		//HACK work around workaround for sticky checkboxes
+		//checkbox values get reset in NewFormItem, which happens to late for us to use the value
+		PutFormData($f, $s, "savecsv",false,"bool", 0, 1);
+		
 		MergeSectionFormData($f, $s);
 		//do check
 		if( CheckFormSection($f, $s) ) {
