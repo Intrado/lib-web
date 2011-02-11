@@ -11,11 +11,11 @@ if (!$MANAGERUSER->authorized("runqueries"))
 	exit("Not Authorized");
 	
 if (isset($_GET['id'])) {
-	$_SESSION['runqueryid'] = $_GET['id']+0;	
+	$id = $_GET['id']+0;
+	if ($MANAGERUSER->authQuery($id))
+		$_SESSION['runqueryid'] = $id;
 	redirect();
 }
-
-//TODO also check permission for this specific query
 
 
 $managerquery = new AspAdminQuery($_SESSION['runqueryid']);

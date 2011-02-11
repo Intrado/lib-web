@@ -7,14 +7,17 @@ class AspAdminUser extends DBMappedObject{
 	var $login = "";
 	var $preferences = "";
 	var $permissions = "";
+	var $queries = "";
 	
 	var $prefsarray = false;
 	var $permsarray = false;
+	var $queryarray = false;
+	
 
 	function AspAdminUser($id = NULL){
 		$this->_allownulls = true;
 		$this->_tablename = "aspadminuser";
-		$this->_fieldlist = array("firstname","lastname", "email", "login","preferences","permissions");
+		$this->_fieldlist = array("firstname","lastname", "email", "login","preferences","permissions","queries");
 
 		//call super's constructor
 		DBMappedObject::DBMappedObject($id);
@@ -67,6 +70,18 @@ class AspAdminUser extends DBMappedObject{
 			$this->update();
 		}
 	}
+	
+	
+	function authQuery($queryid) {
+		if ($this->queryarray === false)
+			$this->queryarray = explode(",",$this->queries);
+		
+		if ($this->queries == "unrestricted" || in_array($queryid,$this->queryarray))
+			return true;
+		
+		return false;
+	}
+	
 
 	/**static functions**/
 

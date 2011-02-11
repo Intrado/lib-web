@@ -11,9 +11,13 @@ if (!$MANAGERUSER->authorized("runqueries"))
 	exit("Not Authorized");
 
 //TODO implement individual query permissions
-$managerqueries = DBFindMany("AspAdminQuery", "from aspadminquery order by name");
-
-
+if ($MANAGERUSER->queries == "unrestricted")
+	$managerqueries = DBFindMany("AspAdminQuery", "from aspadminquery order by name");
+else if ($MANAGERUSER->queries)
+	$managerqueries = DBFindMany("AspAdminQuery", "from aspadminquery where id in ($MANAGERUSER->queries) order by name");
+else
+	$managerqueries = array();
+	
 include_once("nav.inc.php");
 
 ?>

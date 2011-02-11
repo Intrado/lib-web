@@ -5,6 +5,7 @@ require_once("../inc/form.inc.php");
 require_once("../inc/table.inc.php");
 require_once("../obj/Phone.obj.php");
 require_once("../inc/html.inc.php");
+require_once("AspAdminQuery.obj.php");
 
 
 if (!$MANAGERUSER->authorized("superuser"))
@@ -82,9 +83,19 @@ if(CheckFormSubmit($f,$s)) {
 			foreach ($roles as $role => $desc) {
 				if (GetFormData($f,$s,$role))
 					$permissions[] = $role;
-			}			
-			$query = "update aspadminuser set permissions='" . DBSafe(implode(",",$permissions)) . "' where id in (" . implode(",",$_SESSION['edituserids']) . ")";
+			}
+			
+			if (GetFormData($f, $s, "query_unrestricted")) {
+				$queriesval = "unrestricted";
+			} else {
+				$queriesval = implode(",",GetFormData($f,$s,"queries"));
+			}
+			
+			$query = "update aspadminuser set permissions='" . DBSafe(implode(",",$permissions)) . "',
+							queries='" . DBSafe($queriesval) . "' 
+							where id in (" . implode(",",$_SESSION['edituserids']) . ")";
 			QuickUpdate($query);
+
 			$message = "<em>Permissions updated</em>";
 			$reloadform = 1;
 		}
@@ -101,15 +112,34 @@ $logins = array();
 foreach ($users as $id => $u)
 	$logins[$id] = $u->login;
 
+$managerqueries = DBFindMany("AspAdminQuery", "from aspadminquery order by name");
+$querymap = array();
+foreach ($managerqueries as $managerquery) {
+	$querymap[$managerquery->id] = $managerquery->name;
+}
+	
 if (isset($_SESSION['edituserids'])) {
 	$activeroles = array();
+	$activequeries = array();
+	$activeunrestricted = false;
 	foreach ($users as $u) {
-		if (in_array($u->id, $_SESSION['edituserids']))
+		if (in_array($u->id, $_SESSION['edituserids'])) {
 			$activeroles = array_merge($activeroles,explode(",",$u->permissions));
+			
+			$activequeries = array_merge($activequeries,explode(",",$u->queries));
+			if ($u->queries == "unrestricted")
+				$activeunrestricted = true;
+		}
 	}
 	$activeroles = array_unique($activeroles);
+	if ($activeunrestricted)
+		$activequeries = array(); //override with empty list if unrestricte
+	else
+		$activequeries = array_unique($activequeries);
 } else {
 	$activeroles = array();
+	$activequeries = array();
+	$activeunrestricted = false;
 }
 
 if( $reloadform ) {
@@ -120,7 +150,13 @@ if( $reloadform ) {
 	foreach ($roles as $role => $desc) {
 		PutFormData($f,$s,$role,in_array($role,$activeroles) ? 1 : 0,"bool",0,1);
 	}
+	
+	PutFormData($f,$s,"query_unrestricted",$activeunrestricted,"bool", 0, 1);
+	PutFormData($f,$s,"queries",$activequeries,"array", array_keys($querymap));
+	
 }
+
+
 
 //---------------------------------
 
@@ -133,37 +169,55 @@ NewForm($f);
 <?= $message ?>
 <table>
 <tr>
-<th>Users:</th>
-<td>
+	<th>Users:</th>
+	<td>
 <? 
-	NewFormItem($f,$s,"edituserids","selectmultiple",10,$logins);
+		NewFormItem($f,$s,"edituserids","selectmultiple",10,$logins);
 ?>
-</td>
-<td><? NewFormItem($f,"loadusers","Load User Permissions","submit"); ?></td>
+	</td>
+	<td><? NewFormItem($f,"loadusers","Load User Permissions","submit"); ?></td>
 
 </tr>
 
 <? if (isset($_SESSION['edituserids'])) { ?>
 <tr>
-<th valign="top">Permissions:</th>
+	<th valign="top">Permissions:</th>
 
 
-<td>
-<table>
-	<tr>
-		<th>Enable</th><th>Role</th>
-	</tr>
+	<td>
+	<table>
+		<tr>
+			<th>Enable</th><th>Role</th>
+		</tr>
 <?
-	foreach ($roles as $roleval => $roledesc) {
+		foreach ($roles as $roleval => $roledesc) {
 ?>
-	<tr>
-		<td><? NewFormItem($f,$s,$roleval,"checkbox"); ?></td>
-		<td><?= $roledesc ?></td>
-	</tr>
+			<tr>
+				<td><? NewFormItem($f,$s,$roleval,"checkbox"); ?></td>
+				<td><?= $roledesc ?></td>
+			</tr>
 <?
 	}
 ?>
-</table>
+
+	</table>
+	</td>
+</tr>
+
+<tr>
+	<th valign="top">User Queries:</th>
+	
+	
+	<td>
+	
+	Unrestricted: <? NewFormItem($f, $s, "query_unrestricted", "checkbox",null,null,
+			'id="query_unrestricted" onclick="if (this.checked) clearAll(new getObj(\'queries\').obj);"') ?><br>
+	<? NewFormItem($f, $s, "queries", "selectmultiple",count($querymap),$querymap,
+			'id="queries" onmousedown="var x = new getObj(\'query_unrestricted\'); x.obj.checked=false;"'); ?>
+	</td>
+</tr>
+
+<tr><td>
 
 <? NewFormItem($f,$s,"Save","submit"); ?>
 
@@ -172,6 +226,7 @@ NewForm($f);
 <? } ?>
 
 </table>
+
 <?
 EndForm();
 include_once("navbottom.inc.php");

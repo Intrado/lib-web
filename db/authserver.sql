@@ -353,3 +353,6 @@ CREATE TABLE `aspadminquery` (
 	`query` TEXT NOT NULL ,
 	`numargs` TINYINT NOT NULL
 ) ENGINE = InnoDB;
+
+ALTER TABLE `aspadminuser` ADD `queries` TEXT NOT NULL ;
+
