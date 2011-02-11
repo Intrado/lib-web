@@ -30,10 +30,18 @@ include_once("nav.inc.php");
 <li><a href="emergencyjobs.php">List of Recent Jobs</a></li>
 <? } ?>
 
+<? if ($MANAGERUSER->authorized("runqueries")) { ?>
+<li><a href="querylist.php">Run Queries</a></li>
+<? } ?>
+
+<? if ($MANAGERUSER->authorized("editqueries")) { ?>
+<li><a href="queryedit.php">Edit/Add Queries</a></li>
+<? } ?>
 
 <? if ($MANAGERUSER->authorized("superuser")) { ?>
 <li><a href="editroles.php">Edit Manager User Roles</a></li>
 <? } ?>
+
 
 
 </ul>

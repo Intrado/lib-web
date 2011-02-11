@@ -343,3 +343,13 @@ ALTER TABLE `dm` CHANGE `poststatus` `poststatus` MEDIUMTEXT NOT NULL ;
 -- start here for 7.5
 
 ALTER TABLE `dm` CHANGE `poststatus` `poststatus` MEDIUMTEXT ;
+
+-- 7.8 manager enhancement
+
+CREATE TABLE `aspadminquery` (
+	`id` INT NOT NULL AUTO_INCREMENT PRIMARY KEY ,
+	`name` VARCHAR( 255 ) NOT NULL ,
+	`notes` text NOT NULL,
+	`query` TEXT NOT NULL ,
+	`numargs` TINYINT NOT NULL
+) ENGINE = InnoDB;

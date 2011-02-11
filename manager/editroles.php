@@ -25,12 +25,14 @@ $roles = array(
 	"editdm" => "Edit SmartCall Appliances",
 	"diskagent" => "Manage SwiftSync Agents",
 	
+	"runqueries" => "ADVANCED - Run custom queries",
 	"ffield2gfield" => "ADVANCED - F field to G field migration",
 	"billablecalls" => "ADVANCED - Billable call information",
 	"bouncedemailsearch" => "ADVANCED - Bounced email search",
 	"passwordcheck" => "ADVANCED - Check for bad/similar passwords",
 	"emergencyjobs" => "ADVANCED - List of Recent Emergency Jobs",
 
+	"editqueries" => "SUPER - Edit/Add Queries (arbitrary sql)",
 	"systemdm" => "SUPER - Manage System DMs",
 	"superuser" => "SUPER - Edit Manager Roles (this page)"
 );
