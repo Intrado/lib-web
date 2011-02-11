@@ -173,4 +173,6 @@ NewForm($f);
 </div>
 <?
 EndForm();
+include_once("navbottom.inc.php");
+
 ?>
