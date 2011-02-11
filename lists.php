@@ -88,7 +88,7 @@ if (isset($_GET['ajax'])) {
 	// get all lists owned by this user or lists this user has publish records for (both publications and subscriptions)
 	$mergeditems = QuickQueryMultiRow("
 		select SQL_CALC_FOUND_ROWS 
-			'list' as type, 'Saved' as status, l.id as id, l.name as name, (l.name +0) as digitsfirst, l.modifydate as date, l.lastused as lastused,
+			'list' as type, 'Saved' as status, l.id as id, l.name as name, l.description, (l.name +0) as digitsfirst, l.modifydate as date, l.lastused as lastused,
 			p.action as publishaction, p.id as publishid, u.login as owner
 		from list l
 			inner join user u on
@@ -158,8 +158,12 @@ if (isset($_GET['ajax'])) {
 			}
 
 
-			$content = '<a href="' . $defaultlink . '">' . ($item["date"]!== null?$time . '&nbsp;-&nbsp;':"");
-			
+			$content = '<a href="' . $defaultlink . '">' . ($item["date"]!== null?$time:"");
+
+			if ($item["description"] != "") {
+				$content .= '&nbsp;-&nbsp;' . escapehtml($item["description"]);
+			}
+			$content .= '<br />';
 			if(isset($item["lastused"]))
 				$content .= 'This list was last used: <i>' . date("M j, g:i a",strtotime($item["lastused"])) . "</i>";
 			else

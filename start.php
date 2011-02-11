@@ -57,7 +57,7 @@ if($isajax === true) {
 	switch ($filter) {
 		case "lists":
 			$mergeditems = array_merge($mergeditems,QuickQueryMultiRow("
-				select 'list' as type, 'Saved' as status, id, name, modifydate as date, lastused
+				select 'list' as type, 'Saved' as status, id, name, description, modifydate as date, lastused
 				from list where userid = ? and not deleted and modifydate is not null
 					and type != 'alert'
 				order by modifydate desc
@@ -192,7 +192,7 @@ if($isajax === true) {
 			break;
 		default:
 			$mergeditems = array_merge($mergeditems,QuickQueryMultiRow("
-				select 'list' as type, 'Saved' as status, id, name, modifydate as date, lastused
+				select 'list' as type, 'Saved' as status, id, name, description, modifydate as date, lastused
 				from list
 				where userid = ? and not deleted and modifydate is not null
 					 and type != 'alert'
@@ -479,9 +479,11 @@ function activityfeed($mergeditems,$ajax = false) {
 				} else if($item["type"] == "list" ) {
 					$title = "Contact List " . escapehtml($title);
 					$defaultlink = "list.php?id=$itemid";
-					$content = '<a href="' . $defaultlink . '">' . $time .  ' - <b>' .   escapehtml($item["name"]) . "</b>";
-
-					$content .= '&nbsp;-&nbsp;';
+					$content = '<a href="' . $defaultlink . '">' . $time . ' - <b>' . escapehtml($item["name"]) . "</b>";
+					if ($item["description"] != "") {
+						$content .= "&nbsp;-&nbsp;" . escapehtml($item["description"]) ;
+					}
+					$content .= '<br/>';
 					if(isset($item["lastused"]))
 						$content .= 'This list was last used: <i>' . date("M j, g:i a",strtotime($item["lastused"])) . "</i>";
 					else
