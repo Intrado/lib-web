@@ -344,7 +344,7 @@ ALTER TABLE `dm` CHANGE `poststatus` `poststatus` MEDIUMTEXT NOT NULL ;
 
 ALTER TABLE `dm` CHANGE `poststatus` `poststatus` MEDIUMTEXT ;
 
--- 7.8 manager enhancement
+-- 7.7.2 manager enhancement
 
 CREATE TABLE `aspadminquery` (
 	`id` INT NOT NULL AUTO_INCREMENT PRIMARY KEY ,
