@@ -11,7 +11,8 @@ if (!isset($_GET['id']))
 $messagegroup = new MessageGroup($_GET['id'] + 0);
 
 // check publication and subscription restrictions on this message (or original if it is a copy)
-if ($messagegroup->originalmessagegroupid) {
+// if the user owns this message, they can preview it. Otherwise, check the original message group id
+if (!userOwns("messagegroup", $messagegroup->id) && $messagegroup->originalmessagegroupid) {
 	if(!userOwns('messagegroup',$messagegroup->originalmessagegroupid) && 
 			!isSubscribed("messagegroup",$messagegroup->originalmessagegroupid)) {
 		redirect('unauthorized.php');
