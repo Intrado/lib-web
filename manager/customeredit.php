@@ -371,7 +371,7 @@ if(CheckFormSubmit($f,"Save") || CheckFormSubmit($f, "Return")) {
 				setCustomerSystemSetting('_brandtheme2', $COLORSCHEMES[$theme]['_brandtheme2'], $custdb);
 				setCustomerSystemSetting('_brandratio', GetFormData($f, $s, '_brandratio') ? GetFormData($f, $s, '_brandratio') : $COLORSCHEMES[$theme]['_brandratio'], $custdb);
 
-				setCustomerSystemSetting('_logoclickurl', DBSafe(GetFormData($f, $s, "_logoclickurl")), $custdb);
+				setCustomerSystemSetting('_logoclickurl', TrimFormData($f, $s, "_logoclickurl"), $custdb);
 
 				setCustomerSystemSetting('_supportemail', DBSafe(GetFormData($f, $s, "_supportemail")), $custdb);
 				setCustomerSystemSetting('_supportphone', Phone::parse(GetFormData($f, $s, "_supportphone")), $custdb);
