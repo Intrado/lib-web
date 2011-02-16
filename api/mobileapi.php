@@ -156,6 +156,29 @@ function doJobInfo($jobid) {
 	return array("resultcode" => "success", "resultdescription" => "","jobinfo" => $jobinfo);	
 }
 
+function doliststats($statsids) {
+	$listids = json_decode($statsids);
+	if (!is_array($listids))
+		return false;
+	$stats = array();
+	foreach ($listids as $id) {
+		if (!userOwns('list', $id) && !isSubscribed("list", $id))
+			continue;
+		$list = new PeopleList($id+0);
+		$renderedlist = new RenderedList2();
+		$renderedlist->pagelimit = 0;
+		$renderedlist->initWithList($list);
+		$stats[$list->id]= array(
+			'name' => $list->name,
+			'advancedlist' => false, //TODO remove this
+			'totalremoved' => $list->countRemoved(),
+			'totaladded' => $list->countAdded(),
+			'totalrule' => -999, //TOOD remove this
+			'total' => $renderedlist->getTotal() + 0);
+	}
+	return array("resultcode" => "success", "resultdescription" => "","stats" => $stats);
+}
+
 function handleRequest() {
 	global $USER, $ACCESS;
 	
@@ -179,28 +202,8 @@ function handleRequest() {
 				return doJobInfo($_GET['info']);
 			}
 		} else if ($_GET['requesttype'] == "list") {
-			//TODO move to doListStats
-			if (isset($_GET['statsforids'])) {
-				$listids = json_decode($_GET['statsforids']);
-				if (!is_array($listids))
-					return false;
-				$stats = array();
-				foreach ($listids as $id) {
-					if (!userOwns('list', $id) && !isSubscribed("list", $id))
-						continue;
-					$list = new PeopleList($id+0);
-					$renderedlist = new RenderedList2();
-					$renderedlist->pagelimit = 0;
-					$renderedlist->initWithList($list);
-					$stats[$list->id]= array(
-						'name' => $list->name,
-						'advancedlist' => false, //TODO remove this
-						'totalremoved' => $list->countRemoved(),
-						'totaladded' => $list->countAdded(),
-						'totalrule' => -999, //TOOD remove this
-						'total' => $renderedlist->getTotal() + 0);
-				}
-				return array("resultcode" => "success", "resultdescription" => "","stats" => $stats);
+			if (isset($_GET['stats'])) {
+				return doliststats($_GET['stats']);
 			}
 		}
 	} else  {
