@@ -81,6 +81,7 @@ function doJobArchive($archiveid) {
 
 
 function doJobView($start,$limit) {
+	global $USER;
 	if ($start < 0 ) 
 		$start = 0;
 	
@@ -113,7 +114,7 @@ function doJobView($start,$limit) {
 						formatObjects($data,$titles,$formatters));
 }
 
-function doJobInfo() {
+function doJobInfo($jobid) {
 	if (!userOwns("job",$jobid))
 		return array("resultcode" => "failure", "resultdescription" => _L("You do not have to view information for this job."));
 		
@@ -152,7 +153,6 @@ function doJobInfo() {
 			//,"options" => $job->optionsarray
 			);
 
-	error_log(json_encode(array("resultcode" => "success", "resultdescription" => "","jobinfo" => $jobinfo)));
 	return array("resultcode" => "success", "resultdescription" => "","jobinfo" => $jobinfo);	
 }
 
@@ -176,7 +176,7 @@ function handleRequest() {
 				$start = 0 + (isset($_GET['pagestart']) ? $_GET['pagestart'] : 0);
 				return doJobView($start,$limit);
 			} else if (isset($_GET['info'])) {
-				return doJobInfo();
+				return doJobInfo($_GET['info']);
 			}
 		} else if ($_GET['requesttype'] == "list") {
 			//TODO move to doListStats
