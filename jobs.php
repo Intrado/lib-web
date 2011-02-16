@@ -36,22 +36,8 @@ if (isset($_GET['cancel'])) {
 	$cancelid = DBSafe($_GET['cancel']);
 	if (userOwns("job",$cancelid) || $USER->authorize('managesystemjobs')) {
 		$job = new Job($cancelid);
-		$job->cancelleduserid = $USER->id;
-
-		Query("BEGIN");
-			if ($job->status == "active" || $job->status == "procactive" || $job->status == "processing" || $job->status == "scheduled") {
-				$job->status = "cancelling";
-			} else if ($job->status == "new") {
-				$job->status = "cancelled";
-				$job->finishdate = QuickQuery("select now()");
-				//skip running autoreports for this job since there is nothing to report on
-				QuickUpdate("update job set ranautoreport=1 where id='$cancelid'");
-			}
-			$job->update();
-		Query("COMMIT");
-		notice(_L("The job, %s, is now cancelled.", escapehtml($job->name)));
-	} else {
-		notice(_L("You do not have permission to cancel this job."));
+		if ($job->cancel())
+			notice(_L("The job, %s, is now cancelled.", escapehtml($job->name)));
 	}
 
 	redirectToReferrer();
@@ -61,36 +47,9 @@ if (isset($_GET['delete'])) {
 	$deleteid = DBSafe($_GET['delete']);
 	if (userOwns("job",$deleteid) || $USER->authorize('managesystemjobs')) {
 		$job = new Job($deleteid);
-		if ($job->status == "cancelled" || $job->status == "cancelling" || $job->status == "complete") {
-			Query('BEGIN');
-				$job->deleted = 1;
-				$job->update();
-			Query('COMMIT');
+		if ($job->softDelete())
 			notice(_L("The job, %s, is now deleted.", escapehtml($job->name)));
-		} else if ($job->status == "repeating") {
-			if ($job->type == 'alert') {
-				notice(_L("You do not have permission to delete this job."));
-			} else {
-				Query('BEGIN');
-					if ($job->scheduleid) {
-						$schedule = new Schedule($job->scheduleid);
-						$schedule->destroy();
-					}
-					$associatedimports = DBFindMany("ImportJob", "from importjob where jobid = '$deleteid'");
-					foreach($associatedimports as $importjob){
-						$importjob->destroy();
-					}
-					$job->destroy();
-				Query('COMMIT');
-				notice(_L("The job, %s, is now deleted.", escapehtml($job->name)));
-			}
-		} else {
-			notice(_L("The job, %s, is still running. Please cancel it first.", escapehtml($job->name)));
-		}
-	} else {
-		notice(_L("You do not have permission to delete this job."));
 	}
-
 	redirectToReferrer();
 }
 
@@ -98,20 +57,9 @@ if (isset($_GET['archive'])) {
 	$archiveid = DBSafe($_GET['archive']);
 	if (userOwns("job",$archiveid) || $USER->authorize('managesystemjobs')) {
 		$job = new Job($archiveid);
-		if ($job->status == "cancelled" || $job->status == "cancelling" || $job->status == "complete") {
-			Query('BEGIN');
-				$job->deleted = 2;
-				$job->modifydate = date("Y-m-d H:i:s", time());
-				$job->update();
-			Query('COMMIT');
+		if ($job->archive())
 			notice(_L("The job, %s, is now archived.", escapehtml($job->name)));
-		} else {
-			notice(_L("The job, %s, is still running. Please cancel it first.", escapehtml($job->name)));
-		}
-	} else {
-		notice(_L("You do not have permission to archive this job."));
 	}
-
 	redirectToReferrer();
 }
 

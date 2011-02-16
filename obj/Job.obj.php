@@ -184,6 +184,71 @@ class Job extends DBMappedObject {
 		}
 		return null;
 	}
+	
+	
+	function cancel() {
+		global $USER;
+		
+		$didCancel = false;
+		
+		$this->cancelleduserid = $USER->id;
+
+		Query("BEGIN");
+			if ($this->status == "active" || $this->status == "procactive" || $this->status == "processing" || $this->status == "scheduled") {
+				$this->status = "cancelling";
+				$didCancel = true;
+			} else if ($job->status == "new") {
+				$this->status = "cancelled";
+				$this->finishdate = QuickQuery("select now()");
+				//skip running autoreports for this job since there is nothing to report on
+				QuickUpdate("update job set ranautoreport=1 where id=?", null, array($this->id));
+				$didCancel = true;
+			}
+			$this->update();
+		Query("COMMIT");
+		return $didCancel;
+	}
+	
+	function archive() {
+		if ($this->status == "cancelled" || $this->status == "cancelling" || $this->status == "complete") {
+			Query('BEGIN');
+			$this->deleted = 2;
+			$this->modifydate = date("Y-m-d H:i:s", time());
+			$this->update();
+			Query('COMMIT');
+			return true;
+		}
+		return false;
+	}
+	
+	function softDelete() {
+		$didDelete = false;
+		
+		if ($this->status == "cancelled" || $this->status == "cancelling" || $this->status == "complete") {
+			Query('BEGIN');
+			$this->deleted = 1;
+			$this->update();
+			Query('COMMIT');
+			$didDelete = true;
+		} else if ($this->status == "repeating") {
+			if ($this->type != 'alert') {
+				Query('BEGIN');
+				if ($this->scheduleid) {
+					$schedule = new Schedule($this->scheduleid);
+					$schedule->destroy();
+				}
+				$associatedimports = DBFindMany("ImportJob", "from importjob where jobid = '$this->id'");
+				foreach($associatedimports as $importjob){
+					$importjob->destroy();
+				}
+				$this->destroy();
+				Query('COMMIT');
+				$didDelete = true;
+			}
+		}
+		return $didDelete;
+	}
+	
 
 	//creates a new job object prepopulated with all of the user/system defaults
 	//date/time values are in DB format and should be beautified for forms

@@ -1,5 +1,22 @@
 <? 
 
+//do version check before any auth/session/etc
+if ($_GET['requesttype'] == "checkversion") {
+	header('Content-Type: application/json');
+	if ($_GET['version'] == "1.0") //or other suported version
+		echo json_encode(array("resultcode" => "success", "resultdescription" => 
+			"This Version is supported"));
+	else if ($_GET['version'] == "0.1")
+		echo json_encode(array("resultcode" => "warn", "resultdescription" => 
+			"A new version of this application is available. You can continue, but this "
+			."version may not be supported in the future."));
+	else 
+		echo json_encode(array("resultcode" => "success", "resultdescription" => 
+			"This Version is not supported. Please update to continue using this application."));
+	
+	exit();
+}
+
 require_once("../inc/subdircommon.inc.php");
 require_once("../obj/Job.obj.php");
 require_once("../obj/JobType.obj.php");
@@ -9,31 +26,28 @@ require_once("../obj/PeopleList.obj.php");
 require_once("../obj/RenderedList.obj.php");
 
 
-function jsonFormatObjects ($data, $titles, $formatters = array()) {
-	$outputTitles = array();
-	foreach ($titles as $title) {
-		if (strpos($title,"#") === 0)
-			$title = substr($title,1);
-		$outputTitles[] = $title;
-		//$outputTitles[] = escapehtml($title);
-	}
-
+/**
+ * Similar to showTable
+ * @param unknown_type $data array of objects
+ * @param unknown_type $titles ordered name->title map (unlisted fields are not returned)
+ * @param unknown_type $formatters name->formatter name formatter callbacks.
+ * @return {titles : $titles, items: [...]}
+ */
+function formatObjects ($data, $titles, $formatters = array()) {
+	$outputTitles = array_values($titles);
+	
 	$items = array();
 	foreach ($data as $obj) {
 		//only show cels with titles
-		
 		$item = array();
-		foreach ($titles as $index => $title) {
-			if (isset($formatters[$index])) {
-				$fn = $formatters[$index];
-				$cel = $fn($obj,$index);
+		foreach ($titles as $name => $title) {
+			if (isset($formatters[$name])) {
+				$fn = $formatters[$name];
+				$cel = $fn($obj,$name);
 			} else {
-				$cel = $obj->$index;
-				//$cel = escapehtml($obj->$index);
+				$cel = $obj->$name;
 			}
-			if (strpos($title,"#") === 0)
-				$title = substr($title,1);
-			$item[$title] = $cel;
+			$item[] = $cel;
 		}
 		$items[] = $item;
 	}
@@ -41,22 +55,106 @@ function jsonFormatObjects ($data, $titles, $formatters = array()) {
 	return array("titles" => $outputTitles,"items" => $items);
 }
 
-function jobdatecompare($a, $b) {
-	$acompleted = $a->status == "completed" || $a->status == "cancelled";
-	$bcompleted = $b->status == "completed" || $b->status == "cancelled";
-	
-	if($acompleted && $bcompleted) {
-		return $a->finishdate == $b->finishdate ? 0 : ($a->finishdate > $b->finishdate ? -1 : 1);	
-	} else if ($acompleted){
-		return $a->finishdate == $b->modifydate ? 0 : ($a->finishdate > $b->modifydate ? -1 : 1);
-	} else if ($bcompleted){
-		return $a->modifydate > $b->finishdate ? 0 : ($a->modifydate > $b->finishdate ? -1 : 1);
-	}
-	
-	return $a->modifydate == $b->modifydate ? 0 : ($a->modifydate > $b->modifydate ? -1 : 1);
+function doJobCancel($cancelid) {
+	$didCancel = false;
+	if (userOwns("job",$cancelid) || $USER->authorize('managesystemjobs')) {
+		$job = new Job($cancelid);
+		$didCancel = $job->cancel();
+	}	
+	if ($didCancel)
+		return array("resultcode" => "success", "resultdescription" => "");
+	else
+		return array("resultcode" => "failure", "resultdescription" => _L("There was a problem trying to cancel this job."));
+}
+
+function doJobArchive($archiveid) {
+	$didArchive = false;
+	if (userOwns("job",$archiveid) || $USER->authorize('managesystemjobs')) {
+		$job = new Job($archiveid);
+		$didArchive = $job->archive();
+	}	
+	if ($didArchive)
+		return array("resultcode" => "success", "resultdescription" => "");
+	else
+		return array("resultcode" => "failure", "resultdescription" => _L("There was a problem trying to archive this job."));
 }
 
 
+function doJobView($start,$limit) {
+	if ($start < 0 ) 
+		$start = 0;
+	
+	$total = 0;
+	$query = "from job where userid=$USER->id 
+			and status not in ('new','repeating','survey') 
+			and deleted=0 
+			order by ifnull(finishdate,modifydate) desc";
+	$data = DBFindMany("Job",$query . " limit $start, $limit");
+	$total = QuickQuery("select count(id) " . $query) + 0;
+
+	$displaystart = ($total) ? $start +1 : 0;
+	
+	$titles = array("id" => "id",
+				"name" => "name",
+				"description" => "description",
+				"jobtypeid" => "jobtypeid",
+				"status" => "status",
+				"startdate" => "startdate",
+				"enddate" => "enddate",
+				"starttime" => "starttime",
+				"endtime" => "endtime"
+				);
+	$formatters = array('Status' => 'fmt_status',
+					"type" => "fmt_obj_delivery_type_list");
+	return array_merge(array("resultcode" => "success", "resultdescription" => "",
+							"totalrows" => $total,
+							"startrow" => $displaystart
+						),
+						formatObjects($data,$titles,$formatters));
+}
+
+function doJobInfo() {
+	if (!userOwns("job",$jobid))
+		return array("resultcode" => "failure", "resultdescription" => _L("You do not have to view information for this job."));
+		
+	$listids = QuickQueryList("select listid from joblist where jobid = ?",false,false,array($jobid));
+	$lists = array();
+	
+	$totallistcount = 0;
+	foreach ($listids as $id) {
+		if (!userOwns('list', $id) && !isSubscribed("list", $id))
+			continue;
+		
+		$list = new PeopleList($id+0);
+		$renderedlist = new RenderedList2();
+		$renderedlist->pagelimit = 0;
+		$renderedlist->initWithList($list);
+		
+		$count = $renderedlist->getTotal() + 0;
+		$totallistcount+= $count;
+		$lists[] = array("id" => $list->id, "name" => $list->name,"contacts" => $count);
+	}
+	
+	$job = new Job($jobid);
+	$jobtype = new JobType($job->jobtypeid);
+	$jobinfo = array(	"id" => $job->id,
+			"name" => $job->name,
+			"description" => $job->description,
+			"jobtype" => array("id" => $jobtype->id, "name" => $jobtype->name, "info" => $jobtype->info),
+			"lists" => $lists,
+			"messagegroup" => $job->messagegroupid,
+			"messagetypes" => array("phone" => $job->hasPhone(),"email" => $job->hasEmail(),"sms" => $job->hasSMS()),
+			"status" => $job->status,
+			"startdate" => $job->startdate,
+			"enddate" => $job->enddate,
+			"starttime" => $job->starttime,
+			"endtime" => $job->endtime
+			//,"options" => $job->optionsarray
+			);
+
+	error_log(json_encode(array("resultcode" => "success", "resultdescription" => "","jobinfo" => $jobinfo)));
+	return array("resultcode" => "success", "resultdescription" => "","jobinfo" => $jobinfo);	
+}
 
 function handleRequest() {
 	global $USER, $ACCESS;
@@ -66,136 +164,22 @@ function handleRequest() {
 	}
 	
 	if ($_GET['version'] == "1.0") {
+		
+		//stuff related to this version's API
 		if ($_GET['requesttype'] == "job") {
 			if (isset($_GET['cancel'])) {
-				$cancelid = DBSafe($_GET['cancel']);
-				if (userOwns("job",$cancelid) || $USER->authorize('managesystemjobs')) {
-					$job = new Job($cancelid);
-					$job->cancelleduserid = $USER->id;
-			
-					Query("BEGIN");
-						if ($job->status == "active" || $job->status == "procactive" || $job->status == "processing" || $job->status == "scheduled") {
-							$job->status = "cancelling";
-						} else if ($job->status == "new") {
-							$job->status = "cancelled";
-							$job->finishdate = QuickQuery("select now()");
-							//skip running autoreports for this job since there is nothing to report on
-							QuickUpdate("update job set ranautoreport=1 where id='$cancelid'");
-						}
-						$job->update();
-					Query("COMMIT");
-					return array("resultcode" => "success", "resultdescription" => "");
-				} 
-				return array("resultcode" => "failure", "resultdescription" => _L("You do not have permission to cancel this job."));
+				return doJobCancel($_GET['cancel']);
+			} else if (isset($_GET['archive'])) {
+				return doJobArchive($_GET['archive']);
+			} else if (isset($_GET['view'])) {
+				$limit = 0 + (isset($_GET['limit']) ? $_GET['limit'] : 20);
+				$start = 0 + (isset($_GET['pagestart']) ? $_GET['pagestart'] : 0);
+				return doJobView($start,$limit);
+			} else if (isset($_GET['info'])) {
+				return doJobInfo();
 			}
-			
-			if (isset($_GET['archive'])) {
-				$archiveid = DBSafe($_GET['archive']);
-				if (userOwns("job",$archiveid) || $USER->authorize('managesystemjobs')) {
-					$job = new Job($archiveid);
-					if ($job->status == "cancelled" || $job->status == "cancelling" || $job->status == "complete") {
-						Query('BEGIN');
-							$job->deleted = 2;
-							$job->modifydate = date("Y-m-d H:i:s", time());
-							$job->update();
-						Query('COMMIT');
-						return array("resultcode" => "success", "resultdescription" => "");
-					} else {
-						return array("resultcode" => "failure", "resultdescription" => _L("The job, is still running. Please cancel it first."));
-					}
-				}
-				return array("resultcode" => "failure", "resultdescription" => _L("You do not have permission to archive this job."));
-			}
-			
-			if (isset($_GET['view'])) {
-					$limit = 20;
-					$start = 0 + (isset($_GET['pagestart']) ? $_GET['pagestart'] : 0);
-					if ($start < 0 ) 
-						$start = 0;
-					
-					$total = 0;
-					// TODO figure out how to use SQL_CALC_FOUND_ROWS with DBFindMany
-					if ($_GET['view'] === "active") {
-						$data = DBFindMany("Job","from job where userid=$USER->id and (status='scheduled' or status='procactive' or status='processing' or status='active' or status='cancelling') and type != 'survey' and deleted=0 order by modifydate desc limit $start, $limit");
-						$total = QuickQuery("select count(id) from job where userid=$USER->id and (status='scheduled' or status='procactive' or status='processing' or status='active' or status='cancelling') and type != 'survey' and deleted=0") + 0;
-					} else if($_GET['view'] === "completed") {
-						$data = DBFindMany("Job","from job where userid=$USER->id and (status='complete' or status='cancelled') and type != 'survey' and deleted = 0 order by finishdate desc limit $start, $limit");
-						$total = QuickQuery("select count(id) from job where userid=$USER->id and (status='complete' or status='cancelled') and type != 'survey' and deleted = 0") + 0;
-					} else  {
-						$data = DBFindMany("Job","from job where userid=$USER->id and status!='new' and status!='repeating' and type != 'survey' and deleted=0  order by modifydate desc limit $start, $limit");
-						$total = QuickQuery("select count(id) from job where userid=$USER->id and status!='new' and status!='repeating' and type != 'survey' and deleted=0") + 0;
-						uasort($data, 'jobdatecompare');
-					}
-					
-					$displaystart = ($total) ? $start +1 : 0;
-					
-					$titles = array("id" => "id",
-								"name" => "name",
-								"description" => "description",
-								"jobtypeid" => "jobtypeid",
-								"status" => "status",
-								"startdate" => "startdate",
-								"enddate" => "enddate",
-								"starttime" => "starttime",
-								"endtime" => "endtime"
-								);
-					$formatters = array('Status' => 'fmt_status',
-									"type" => "fmt_obj_delivery_type_list");
-					return array_merge(array("resultcode" => "success", "resultdescription" => "",
-											"totalrows" => $total,
-											"startrow" => $displaystart
-										),
-										jsonFormatObjects($data,$titles,$formatters));
-			}
-			
-			
-			if (isset($_GET['info'])) {
-				$jobid = DBSafe($_GET['info']);
-				
-				if (userOwns("job",$jobid)) {
-					$listids = QuickQueryList("select listid from joblist where jobid = ?",false,false,array($jobid));
-					$lists = array();
-					
-					$totallistcount = 0;
-					foreach ($listids as $id) {
-						if (!userOwns('list', $id) && !isSubscribed("list", $id))
-							continue;
-						
-						$list = new PeopleList($id+0);
-						$renderedlist = new RenderedList2();
-						$renderedlist->pagelimit = 0;
-						$renderedlist->initWithList($list);
-						
-						$count = $renderedlist->getTotal() + 0;
-						$totallistcount+= $count;
-						$lists[] = array("id" => $list->id, "name" => $list->name,"contacts" => $count);
-					}
-					
-					$job = new Job($jobid);
-					$jobtype = new JobType($job->jobtypeid);
-					$jobinfo = array(	"id" => $job->id,
-							"name" => $job->name,
-							"description" => $job->description,
-							"jobtype" => array("id" => $jobtype->id, "name" => $jobtype->name, "info" => $jobtype->info),
-							"lists" => $lists,
-							"messagegroup" => $job->messagegroupid,
-							"messagetypes" => array("phone" => $job->hasPhone(),"email" => $job->hasEmail(),"sms" => $job->hasSMS()),
-							"status" => $job->status,
-							"startdate" => $job->startdate,
-							"enddate" => $job->enddate,
-							"starttime" => $job->starttime,
-							"endtime" => $job->endtime
-							//,"options" => $job->optionsarray
-							);
-
-					error_log(json_encode(array("resultcode" => "success", "resultdescription" => "","jobinfo" => $jobinfo)));
-					return array("resultcode" => "success", "resultdescription" => "","jobinfo" => $jobinfo);
-					
-				}
-				return array("resultcode" => "failure", "resultdescription" => _L("You do not have to view information for this job."));
-			}
-
 		} else if ($_GET['requesttype'] == "list") {
+			//TODO move to doListStats
 			if (isset($_GET['statsforids'])) {
 				$listids = json_decode($_GET['statsforids']);
 				if (!is_array($listids))
@@ -218,11 +202,6 @@ function handleRequest() {
 				}
 				return array("resultcode" => "success", "resultdescription" => "","stats" => $stats);
 			}
-		}
-		else if ($_GET['requesttype'] == "checkversion") {
-			return array("resultcode" => "success", "resultdescription" => "This Version is supported");
-			// If failure is returned here the user will be prompted with the resultdescription after login in the iPhone application
-			//return array("resultcode" => "failure", "resultdescription" => "Please upgrade the application. Some functionality in this application may no longer be supported.");
 		}
 	} else  {
 		return array("resultcode" => "failure", "resultdescription" => "Please upgrade the application. This version is no longer supported.");
