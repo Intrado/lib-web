@@ -139,7 +139,7 @@ if(!$success){
 				</td>
 			</tr>
 			<tr>
-				<td colspan="2"><?=_L("Please complete this form to create your Contact Manager account.  A confirmation code will be sent to activate your new account so a valid email address is required.  Your password must be at least 5 characters long and cannot be similiar to your first name, last name, or email address.")?></td>
+				<td colspan="2"><?=_L("Please complete this form to create your Contact Manager account.  A confirmation code will be sent to activate your new account so a valid email address is required.  Your password must be at least 5 characters long and cannot be similar to your first name, last name, or email address.")?></td>
 			</tr>
 			<tr>
 				<td colspan="4">&nbsp;</td>

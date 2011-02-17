@@ -2,9 +2,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: ContactManager 7.0.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-02-15 10:55-0800\n"
+"POT-Creation-Date: 2011-02-17 15:37-0800\n"
 "PO-Revision-Date: \n"
-"Last-Translator: Krystal Cruz <kcruz@schoolmessenger.com>\n"
+"Last-Translator: Gretel Baumgartner <gbaumgartner@schoolmessenger.com>\n"
 "Language-Team:  <gbaumgartner@schoolmessenger.com>\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
@@ -249,7 +249,7 @@ msgid "Create a New Account"
 msgstr "Crear una cuenta nueva"
 
 #: newportaluser.php:142
-msgid "Please complete this form to create your Contact Manager account.  A confirmation code will be sent to activate your new account so a valid email address is required.  Your password must be at least 5 characters long and cannot be similiar to your first name, last name, or email address."
+msgid "Please complete this form to create your Contact Manager account.  A confirmation code will be sent to activate your new account so a valid email address is required.  Your password must be at least 5 characters long and cannot be similar to your first name, last name, or email address."
 msgstr "Por favor, llene esta forma para crear su cuenta de Contact Manager.  Un codigo de confirmacion sera enviado para activar su cuenta, y entonces un correo electronico valido es requerido.  Su contraseña debe ser por lo menos 5 caracteres de largo y no puede ser parecido con su nombre, apellido, o correo electrónico.  "
 
 #: newportaluser.php:148
@@ -469,7 +469,7 @@ msgid "The passwords do not match"
 msgstr "Las contraseñas no coinciden"
 
 #: activate.php:92
-msgid "Please enter it below along with your new password.  Passwords must be at least 5 characters in length and cannot be similiar to your first name, last name, or email address"
+msgid "Please enter it below along with your new password.  Passwords must be at least 5 characters in length and cannot be similar to your first name, last name, or email address"
 msgstr "Por favor, introduzcalo abajo junto con su contraseña nueva. Las contraseñas deben ser de 5 carácteres de largo y no puede ser parecido a su nombre, apellido, o dirección de correo electrónico."
 
 #: activate.php:99

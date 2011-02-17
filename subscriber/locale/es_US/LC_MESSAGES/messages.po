@@ -2,9 +2,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Subscriber Self-Signup 7.0.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-02-15 10:56-0800\n"
+"POT-Creation-Date: 2011-02-17 15:39-0800\n"
 "PO-Revision-Date: \n"
-"Last-Translator: Krystal Cruz <kcruz@schoolmessenger.com>\n"
+"Last-Translator: Gretel Baumgartner <gbaumgartner@schoolmessenger.com>\n"
 "Language-Team:  <gbaumgartner@schoolmessenger.com>\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
@@ -76,7 +76,7 @@ msgstr "Cancelar"
 
 #: closeaccount.php:100
 msgid "Your password has been changed."
-msgstr "Gracias, su contraseña ha sido cambiada."
+msgstr "Su contraseña ha sido cambiada."
 
 #: closeaccount.php:101
 #: previewmessage.php:104
@@ -411,8 +411,8 @@ msgid "Password Assistance"
 msgstr "Asistencia para contraseñas"
 
 #: activate.php:111
-msgid "your new password.  Passwords must be at least 5 characters in length and cannot be similiar to your first name, last name, or email address"
-msgstr "Por favor, introduzcalo abajo junto con su contraseña nueva. Las contraseñas deben ser de 5 carácteres de largo y no puede ser parecido a su nombre, apellido, o dirección de correo electrónico."
+msgid "your new password.  Passwords must be at least 5 characters in length and cannot be similar to your first name, last name, or email address"
+msgstr "su contraseña nueva. Las contraseñas deben ser de 5 carácteres de largo y no puede ser parecido a su nombre, apellido, o dirección de correo electrónico."
 
 #: activate.php:113
 msgid "Change Email"
@@ -422,7 +422,7 @@ msgstr "Cambiar correo electrónico"
 #: activate.php:119
 #: activate.php:123
 msgid "your password"
-msgstr "Su contraseña"
+msgstr "su contraseña"
 
 #: activate.php:117
 msgid "Add Email to Account"
