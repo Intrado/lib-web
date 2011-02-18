@@ -26,6 +26,9 @@ if (CheckFormSubmit($f,$s)) {
 		//do check
 		if( CheckFormSection($f, $s) ) {
 			error('There was a problem trying to save your changes', 'Please verify that all required field information has been entered properly');
+		
+		} else if (GetFormData($f,$s,"query_new") != "" && (GetFormData($f,$s,"numargs_new") == "" || GetFormData($f,$s,"name_new") == "")) {
+			error('Dont forget to fill in num args and name');
 		} else {
 			$uids = GetFormData($f,$s,"edituserids");
 			
@@ -80,7 +83,7 @@ NewForm($f);
 <p>Allows writing custom queries to be run on each customer. Results will be shown in an html table or CSV download. The customer ID is prepended to each CSV row.</p>
 <p>You can specify custom arguments:</p>
 <ul>
-<li>_$<i>n</i>_ where <i>n</i> is the argument number. Don't forget to update Num Args appropriately.</li>
+<li>_$<i>n</i>_ where <i>n</i> is the argument number (starting at 1). Don't forget to update Num Args appropriately.</li>
 <li>_$CUSTOMERID_ is replaced with the customer id.</li>
 </ul>
 <p>Be sure to include a description of your query and each argument in the notes field.</p>

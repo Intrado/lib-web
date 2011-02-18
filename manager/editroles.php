@@ -88,7 +88,7 @@ if(CheckFormSubmit($f,$s)) {
 			if (GetFormData($f, $s, "query_unrestricted")) {
 				$queriesval = "unrestricted";
 			} else {
-				$queriesval = implode(",",GetFormData($f,$s,"queries"));
+				$queriesval = implode(",",is_array(GetFormData($f,$s,"queries")) ? GetFormData($f,$s,"queries") : array());
 			}
 			
 			$query = "update aspadminuser set permissions='" . DBSafe(implode(",",$permissions)) . "',
