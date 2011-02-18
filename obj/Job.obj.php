@@ -197,7 +197,7 @@ class Job extends DBMappedObject {
 			if ($this->status == "active" || $this->status == "procactive" || $this->status == "processing" || $this->status == "scheduled") {
 				$this->status = "cancelling";
 				$didCancel = true;
-			} else if ($job->status == "new") {
+			} else if ($this->status == "new") {
 				$this->status = "cancelled";
 				$this->finishdate = QuickQuery("select now()");
 				//skip running autoreports for this job since there is nothing to report on
