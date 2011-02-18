@@ -21,6 +21,13 @@ if (!userOwns("job",$jobid) && !$USER->authorize('viewsystemreports')) {
 }
 
 $type = isset($_GET['type']) ? $_GET['type'] : '';
+
+if ($type == 'empty_report') {
+	header("Content-type: image/png");
+	readfile("img/empty_report.png");
+	exit();
+}
+
 if (!in_array($type, array('phone', 'email', 'sms')))
 	$type = 'phone'; // Default to phone
 
