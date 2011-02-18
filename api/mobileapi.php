@@ -11,7 +11,7 @@ if ($_GET['requesttype'] == "checkversion") {
 			"A new version of this application is available. You can continue, but this "
 			."version may not be supported in the future."));
 	else 
-		echo json_encode(array("resultcode" => "success", "resultdescription" => 
+		echo json_encode(array("resultcode" => "failure", "resultdescription" => 
 			"This Version is not supported. Please update to continue using this application."));
 	
 	exit();
