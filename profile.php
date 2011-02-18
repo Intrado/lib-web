@@ -236,25 +236,25 @@ _L('Messaging Options'),
 		"helpstep" => 4
 	),
 	"callearly" => array(
-		"label" => _L('Don\'t Call Before'),
+		"label" => _L('Can\'t Schedule Before'),
 		"fieldhelp" => _L('Restricts the earliest time that a user may schedule a job.'),
 		"value" => $obj->getValue("callearly"),
 		"requires" => array("calllate"),
 		"validators" => array(
 			array("ValInArray","values" => array_keys($calltimes)),
-			array("ValJobWindowTime","field" => "calllate", "fieldlabel" => _L('Don\'t Call After'), "op" => "earlier")
+			array("ValJobWindowTime","field" => "calllate", "fieldlabel" => _L('Can\'t Schedule After'), "op" => "earlier")
 		),
 		"control" => array("SelectMenu", "values" => $calltimes),
 		"helpstep" => 4
 	),
 	"calllate" => array(
-		"label" => _L('Don\'t Call After'),
+		"label" => _L('Can\'t Schedule After'),
 		"fieldhelp" => _L('Restricts the latest time that a user may schedule a job.'),
 		"value" => $obj->getValue("calllate"),
 		"requires" => array("callearly"),
 		"validators" => array(
 			array("ValInArray","values" => array_keys($calltimes)),
-			array("ValJobWindowTime","field" => "callearly", "fieldlabel" => _L('Don\'t Call Before'), "op" => "later")
+			array("ValJobWindowTime","field" => "callearly", "fieldlabel" => _L('Can\'t Schedule Before'), "op" => "later")
 		),
 		"control" => array("SelectMenu", "values" => $calltimes),
 		"helpstep" => 4

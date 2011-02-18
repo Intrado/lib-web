@@ -228,13 +228,13 @@ if ($job->messagegroupid != null) {
 $helpsteps = array();
 $formdata = array();
 
-$formdata[] = _L('Job Settings');
+$formdata[] = _L('Job');
 
 $helpsteps[] = _L("Enter a name for your job. " .
 					"Using a descriptive name that indicates the message content will make it easier to find the job later. " .
 					"You may also optionally enter a description of the the job.");
 	$formdata["name"] = array(
-		"label" => _L('Job Name'),
+		"label" => _L('Name'),
 		"fieldhelp" => _L('Enter a name for your job.'),
 		"value" => isset($job->name)?$job->name:"",
 		"validators" => array(
@@ -440,7 +440,7 @@ $helpsteps[] = _L("Enter a name for your job. " .
 						 to press '1' for 'yes' and '2' for 'no' in your message.</ul>");
 
 	if ($submittedmode || $completedmode) {
-		$formdata[] = _L('Job Lists');
+		$formdata[] = _L('List(s)');
 		$query = "select name from list where id in (" . repeatWithSeparator("?", ",", count($selectedlists)) . ")";
 		$listhtml = implode("<br/>",QuickQueryList($query,false,false,$selectedlists));
 		$formdata["lists"] = array(
@@ -457,7 +457,7 @@ $helpsteps[] = _L("Enter a name for your job. " .
 				"html" => "<input type='checkbox' " . ($job->isOption("skipduplicates")?"checked":"") . " disabled />"),
 			"helpstep" => 4
 		);
-		$formdata[] = _L('Job Message');
+		$formdata[] = _L('Message');
 		$formdata["message"] = array(
 			"label" => _L('Message'),
 			"fieldhelp" => _L('Select an existing message to use from the menu.'),
@@ -520,7 +520,7 @@ $helpsteps[] = _L("Enter a name for your job. " .
 			);
 		}
 	} else {
-		$formdata[] = _L('Job Lists');
+		$formdata[] = _L('List(s)');
 		$formdata["lists"] = array(
 			"label" => _L('Lists'),
 			"fieldhelp" => _L('Select a list from your existing lists.'),
@@ -540,7 +540,7 @@ $helpsteps[] = _L("Enter a name for your job. " .
 			"control" => array("CheckBox"),
 			"helpstep" => 4
 		);
-		$formdata[] = _L('Job Message');
+		$formdata[] = _L('Message');
 		$messagevalidators = array(
 				array("ValRequired"),
 				array("ValInArray","values"=>array_keys($messages)),
@@ -551,7 +551,7 @@ $helpsteps[] = _L("Enter a name for your job. " .
 		}
 		$formdata["message"] = array(
 			"label" => _L('Message'),
-			"fieldhelp" => _L('Select a list from your existing lists.'),
+			"fieldhelp" => _L('Select a message from your existing messages.'),
 			"value" => (((isset($job->messagegroupid) && $job->messagegroupid))?$job->messagegroupid:""),
 			"validators" => $messagevalidators,
 			"control" => array("MessageGroupSelectMenu", "values" => $messages),
