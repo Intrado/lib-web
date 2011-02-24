@@ -303,13 +303,20 @@ if ($countdestinations > 0) {
 // Data Handling
 ////////////////////////////////////////////////////////////////////////////////
 
+$button = $messagegroupsplitter->getSubmit();
+
+// If loadtab is set, handleRequest will exit causing the submit not to be handled.
+// Therefore unset loadtab when button was pressed even if within the tab
+if ($button)
+	unset($_REQUEST['loadtab']);
+
 $messagegroupsplitter->handleRequest();
 
 ///////////////////////////////////////////////////////////////////////////////
 // Submit
 ///////////////////////////////////////////////////////////////////////////////
 
-if ($button = $messagegroupsplitter->getSubmit()) {
+if ($button) {
 	$form = $messagegroupsplitter->getSubmittedForm();
 	if ($form) {
 		$ajax = $form->isAjaxSubmit();
