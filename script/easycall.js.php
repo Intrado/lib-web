@@ -119,11 +119,15 @@ var EasyCall = Class.create({
 			$(this.containerid+"_progress_text").update(response.progress);
 			// if the result indicates that the task is complete
 			if (response.status == "done") {
-				// stop the periodical executor and get the audiofile
-				if (this.pe)
+				// stop the periodical executor and get the audiofile, but only if it was running
+				// this could prevent issues where there are multiple done responses creating
+				// more than one audio file insert in the message group editor
+				if (this.pe != null) {
 					this.pe.stop();
-				// ajax request the audio file
-				this.getAudioFile();
+					this.pe = null;
+					// ajax request the audio file
+					this.getAudioFile();
+				}
 			}
 		} else {
 			this.handleStatus(response.error, "");
