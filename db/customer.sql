@@ -1477,3 +1477,14 @@ update setting set value='7.7/6' where name='_dbversion'
 $$$
 -- END REV 7.7/6
 
+
+-- START REV 7.8/1
+
+ALTER TABLE `user` ADD `salt` VARCHAR( 29 ) NOT NULL AFTER `password` ,
+ADD `passwordversion` TINYINT NOT NULL AFTER `salt` 
+$$$
+
+ALTER TABLE `subscriber` ADD `salt` VARCHAR( 29 ) NOT NULL AFTER `password` ,
+ADD `passwordversion` TINYINT NOT NULL AFTER `salt` 
+$$$
+

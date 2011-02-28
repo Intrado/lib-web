@@ -356,3 +356,10 @@ CREATE TABLE `aspadminquery` (
 
 ALTER TABLE `aspadminuser` ADD `queries` TEXT NOT NULL ;
 
+-- START REV 7.8/1
+
+ALTER TABLE `portaluser` ADD `salt` VARCHAR( 29 ) NOT NULL AFTER `password` ,
+ADD `passwordversion` TINYINT NOT NULL AFTER `salt` ;
+
+update portaluser set passwordversion = 1 where length(password) > 16 ;
+
