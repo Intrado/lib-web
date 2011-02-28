@@ -31,13 +31,6 @@ class User extends DBMappedObject {
 		DBMappedObject::DBMappedObject($id);
 	}
 
-
-	function setPassword ($password) {
-		$query = "update user set password=password(?) "
-				."where id=?";
-		QuickUpdate($query, false, array($password, $this->id));
-	}
-
 	function setPincode ($password) {
 		$query = "update user set pincode=password(?)"
 				."where id=?";

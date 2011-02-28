@@ -355,6 +355,18 @@ function emailUnsubscribe($urlcomponent, $email) {
 	return false;
 }
 
+function setUserPassword($userid, $password) {
+	$sessionid = session_id();
+	$params = array(new XML_RPC_Value($sessionid, 'string'), new XML_RPC_Value($userid, 'int'), new XML_RPC_Value($password, 'string'));
+	$method = "AuthServer.setUserPassword";
+	$result = pearxmlrpc($method, $params);
+	if ($result !== false) {
+		// success
+		return true;
+	}
+	return false;
+}
+
 function readonlyDBInfo() {
 	$sessionid = session_id();
 	// if no session, return false

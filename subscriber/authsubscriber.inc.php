@@ -200,6 +200,27 @@ function subscriberCloseAccount($password) {
 	return $result;
 }
 
+// set subscriber user password
+function subscriberSetPassword($password) {
+	$sessionid = session_id();
+	$params = array(new XML_RPC_Value($sessionid, 'string'), new XML_RPC_Value($password, 'string'));
+	$method = "SubscriberServer.subscriber_setPassword";
+	$result = pearxmlrpc($method, $params);
+	if ($result['result'] == "")
+		return true; // success
+	return false; // failure
+}
+
+// verify subscriber user password
+function subscriberVerifyPassword($password) {
+	$sessionid = session_id();
+	$params = array(new XML_RPC_Value($sessionid, 'string'), new XML_RPC_Value($password, 'string'));
+	$method = "SubscriberServer.subscriber_verifyPassword";
+	$result = pearxmlrpc($method, $params);
+	if ($result['result'] == "")
+		return true; // success
+	return false; // failure
+}
 
 function subscriberGetSessionData($id) {
 	$params = array(new XML_RPC_Value($id, 'string'));

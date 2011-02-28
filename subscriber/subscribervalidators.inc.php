@@ -5,7 +5,7 @@ class ValSubscriberPassword extends Validator {
     var $onlyserverside = true;
     
     function validate ($value, $args) {
-		if (0 == QuickQuery("select count(*) from subscriber where id=? and `password`=password(?)", false, array($_SESSION['subscriberid'], $value)))
+		if (!subscriberVerifyPassword($value))
             return _L('%1$s is not the correct password.', $this->label);
         
         return true;

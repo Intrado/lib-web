@@ -496,13 +496,6 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 			}
 		}
 
-		// If the password is all 0 characters then it was a default form value, so ignore it
-		if(!$USER->ldap) {
-			$newpassword = $postdata['password'];
-			if ($newpassword !== "nopasswordchange")
-				$USER->setPassword($newpassword);
-		}
-
 		// If the pincode is all 0 characters then it was a default form value, so ignore it
 		$newpin = $postdata['pin'];
 		if (!ereg("^0*$", $newpin))
@@ -549,6 +542,14 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		
 		Query('COMMIT');
 
+		// MUST set password outside of the transaction or the authserver will get a lock timeout on the user object
+		// If the password is all 0 characters then it was a default form value, so ignore it
+		if (!$USER->ldap) {
+			$newpassword = $postdata['password'];
+			if ($newpassword !== "nopasswordchange")
+				setUserPassword($USER->id, $newpassword);
+		}
+		
 		// check submit button, if it's twitter auth request, redirect to twitterauth
 		if ($button == "twitterauth") {
 			$thispage = substr($_SERVER["SCRIPT_NAME"], strrpos($_SERVER["SCRIPT_NAME"], "/") + 1);

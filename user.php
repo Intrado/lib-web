@@ -805,10 +805,6 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 					QuickUpdate("insert into userjobtypes values (?, ?)", false, array($edituser->id, $type));
 		}
 
-		// If the password is "nopasswordchange" then it was a default form value, so ignore it
-		if ($postdata['password'] !== "nopasswordchange")
-			$edituser->setPassword($postdata['password']);
-
 		// If the pincode is all 0 characters then it was a default form value, so ignore it
 		if (!ereg("^0*$", $postdata['pin']))
 			$edituser->setPincode($postdata['pin']);
@@ -831,7 +827,12 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 				QuickUpdate("insert into userassociation (userid, type, organizationid) values (?, 'organization', ?)", false, array($edituser->id, $orgid));
 
 		Query("COMMIT");
-
+		
+		// MUST set password outside of the transaction or the authserver will get a lock timeout on the user object
+		// If the password is "nopasswordchange" then it was a default form value, so ignore it
+		if ($postdata['password'] !== "nopasswordchange")
+			setUserPassword($edituser->id, $postdata['password']);
+		
 		if ($button == 'inpagesubmit') {
 			if ($hasstaffid)
 				notice(_L("Staff ID is now removed from Data View."));

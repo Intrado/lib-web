@@ -70,10 +70,10 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
     } else if (($errors = $form->validate()) === false) { //checks all of the items in this form
         $postdata = $form->getData(); //gets assoc array of all values {name:value,...}
             
-        $params = "?err";
-        
-        if (QuickUpdate("update subscriber set `password`=password(?) where id=?", false, array($postdata['newpassword1'], $_SESSION['subscriberid'])));
-        	$params = "?thanks";
+		if (subscriberSetPassword($postdata['newpassword1']))
+			$params = "?thanks";
+		else
+			$params = "?err";
         
         if ($ajax)
             $form->sendTo("changepass.php".$params);
