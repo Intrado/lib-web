@@ -831,7 +831,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		// MUST set password outside of the transaction or the authserver will get a lock timeout on the user object
 		// If the password is "nopasswordchange" then it was a default form value, so ignore it
 		if ($postdata['password'] !== "nopasswordchange")
-			setUserPassword($edituser->id, $postdata['password']);
+			$edituser->setPassword($postdata['password']);
 		
 		if ($button == 'inpagesubmit') {
 			if ($hasstaffid)

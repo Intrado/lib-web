@@ -31,6 +31,11 @@ class User extends DBMappedObject {
 		DBMappedObject::DBMappedObject($id);
 	}
 
+	function setPassword($password) {
+		// call to authserver
+		setUserPassword($this->id, $password);
+	}
+	
 	function setPincode ($password) {
 		$query = "update user set pincode=password(?)"
 				."where id=?";

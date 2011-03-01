@@ -547,7 +547,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		if (!$USER->ldap) {
 			$newpassword = $postdata['password'];
 			if ($newpassword !== "nopasswordchange")
-				setUserPassword($USER->id, $newpassword);
+				$USER->setPassword($newpassword);
 		}
 		
 		// check submit button, if it's twitter auth request, redirect to twitterauth
