@@ -104,20 +104,24 @@ class FacebookAuth extends FormItem {
 					element.update(new Element("img", { src: "img/ajax-loader.gif" }));
 					
 					FB.api("/me", { access_token: access_token }, function(r) {
-						var e = new Element("div").insert(
-								new Element("div").setStyle({ float: "left" }).insert(
-									new Element("img", { 
-										src: "https://graph.facebook.com/me/picture?type=square&access_token=" + access_token,
-										width: "48",
-										height: "48" })
-								)
-							).insert(
-								new Element("div").setStyle({ float: "left", padding: "7px" }).insert(
-									new Element("div").setStyle({ "fontWeight": "bold" }).update(r.name.escapeHTML())
-								)
-							);
-						
-						element.update(e);
+						if (r.error) {
+							element.update();
+						} else {
+							var e = new Element("div").insert(
+									new Element("div").setStyle({ float: "left" }).insert(
+										new Element("img", { 
+											src: "https://graph.facebook.com/me/picture?type=square&access_token=" + access_token,
+											width: "48",
+											height: "48" })
+									)
+								).insert(
+									new Element("div").setStyle({ float: "left", padding: "7px" }).insert(
+										new Element("div").setStyle({ "fontWeight": "bold" }).update(r.name.escapeHTML())
+									)
+								);
+							
+							element.update(e);
+						}
 					});
 				}
 				
