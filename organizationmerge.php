@@ -144,6 +144,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 			QuickUpdate("update userassociation set organizationid = ? where organizationid = ?", false, array($dest->id, $source->id));
 			QuickUpdate("update personassociation set organizationid = ? where organizationid = ?", false, array($dest->id, $source->id));
 			QuickUpdate("update listentry set organizationid = ? where organizationid = ?", false, array($dest->id, $source->id));
+			QuickUpdate("update section set organizationid = ? where organizationid = ?", false, array($dest->id, $source->id));
 			
 			// check persondatavalues and update/create/delete entries
 			$sourcepdvid = QuickQuery("select id from persondatavalues where fieldnum = 'oid' and value = ?", false, array($source->id));
