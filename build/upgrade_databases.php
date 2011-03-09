@@ -36,7 +36,7 @@ $versions = array (
 	"7.5/14",
 	"7.6/1",	//rev 1 is always the first complete revision (not zero)
 	"7.7/6",
-	"7.8/2"
+	"7.8/3"
 	//8.0
 	//etc
 );
