@@ -256,6 +256,39 @@ function upgrade_7_8 ($rev, $shardid, $customerid, $db) {
 			
 			// restore global db connection
 			$_dbcon = $savedbcon;
+			
+		case 3:
+			echo "|";
+			
+			// set global to customer db, restore after this section
+			global $_dbcon;
+			$savedbcon = $_dbcon;
+			$_dbcon = $db;
+			
+			// schoolmessenger user to own the template messages
+			$schoolmessengeruserid = QuickQuery("select id from user where login = 'schoolmessenger'");
+			
+			// emergency notification
+			$notification_englishplain = "\${body}\n\nTo stop receiving all email messages distributed through this system on behalf of \${displayname}, follow this link and confirm: \${unsubscribelink}\n";
+			$notification_englishhtml = "\${body}<br><p>To stop receiving all email messages distributed through this system on behalf of \${displayname}, follow this link and confirm: <a href=\"\${unsubscribelink}\">Unsubscribe</a></p>";
+			$notification_spanishplain = $notification_englishplain; // TODO
+			$notification_spanishhtml = $notification_englishhtml;
+			
+			if (!createTemplate('emergency', $schoolmessengeruserid, $notification_englishplain, $notification_englishhtml, $notification_spanishplain, $notification_spanishhtml))
+				return false;
+
+			// survey
+			$survey_englishplain = "\${body}\n\n\${surveylink}\n\nTo stop receiving all email messages distributed through this system on behalf of \${displayname}, follow this link and confirm: \${unsubscribelink}\n";
+			$survey_englishhtml = "\${body}<br><br>\${surveylink}<br><p>To stop receiving all email messages distributed through this system on behalf of \${displayname}, follow this link and confirm: <a href=\"\${unsubscribelink}\">Unsubscribe</a></p>";
+			$survey_spanishplain = $survey_englishplain; // TODO
+			$survey_spanishhtml = $survey_englishhtml;
+			
+			if (!createTemplate('survey', $schoolmessengeruserid, $survey_englishplain, $survey_englishhtml, $survey_spanishplain, $survey_spanishhtml))
+				return false;
+		
+			// restore global db connection
+			$_dbcon = $savedbcon;
+			
 	}
 	
 	apply_sql("../db/update_SMAdmin_access.sql",$customerid,$db);
