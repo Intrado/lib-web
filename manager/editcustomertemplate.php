@@ -51,6 +51,13 @@ if ($messagegroup) {
 	}
 }
 
+// some types require subject/fromname/fromaddr
+if ($templatetype == "messagelink") {
+	$showheaders = true;
+} else {
+	$showheaders = false;
+}
+
 // get the customer default language data
 $defaultcode = Language::getDefaultLanguageCode();
 $defaultlanguage = Language::getName(Language::getDefaultLanguageCode());
@@ -89,9 +96,31 @@ if (CheckFormSubmit($f, "Save")) {
 			error('There was a problem trying to save your changes', 'Please verify that all required field information has been entered properly');
 		} else {
 			Query("BEGIN");
-			
+			$haserror = false;
 			foreach (array_keys($languagemap) as $langcode) {
+				if ($haserror)
+					break; // exit loop
 				foreach (array('plain', 'html') as $subtype) {
+					
+					// verify required fields in template, based on type
+					$body = GetFormData($f, $s, $subtype . "_" . $langcode);
+					switch ($templatetype) {
+						case "notification":
+							if (!strstr($body, "\${body}")) {
+								error('Template must contain "${body}" variable. ' . $subtype . ' ' . $langcode);
+								$haserror = true;
+							}
+							break;
+						case "messagelink":
+							if (!strstr($body, "\${messagelink}")) {
+								error('Template must contain "${messagelink}" variable. ' . $subtype . ' ' . $langcode);
+								$haserror = true;
+							}
+							break;
+					}
+					if ($haserror)
+						break; // exit loop
+					
 					// if the message is already associated, reuse it. otherwise create a new one
 					$message = $messagegroup->getMessage("email", $subtype, $langcode, "none");
 					if ($message == null) {
@@ -105,11 +134,13 @@ if (CheckFormSubmit($f, "Save")) {
 					$message->subtype = $subtype;
 					$message->languagecode = $langcode;
 					$message->autotranslate = "none";
-					$message->fromname = GetFormData($f, $s, "fromname");
-					$message->fromemail = GetFormData($f, $s, "fromemail");
-					$message->subject = GetFormData($f, $s, "subject_" . $langcode);
-					$message->recreateParts(GetFormData($f, $s, $subtype . "_" . $langcode), null, null);
-					$message->stuffHeaders();
+					$message->recreateParts($body, null, null);
+					if ($showheaders) {
+						$message->fromname = GetFormData($f, $s, "fromname");
+						$message->fromemail = GetFormData($f, $s, "fromemail");
+						$message->subject = GetFormData($f, $s, "subject_" . $langcode);
+						$message->stuffHeaders();
+					}
 					$message->modifydate = date("Y-m-d H:i:s");
 					
 					if ($message->id) {
@@ -120,9 +151,13 @@ if (CheckFormSubmit($f, "Save")) {
 					// TODO should delete languages that have empty body
 				}
 			}
-			Query("COMMIT");
+			if (!$haserror) {
+				Query("COMMIT");
 			
-			redirect("customertemplates.php?cid=" . $currentid);
+				redirect("customertemplates.php?cid=" . $currentid);
+			} else {
+				Query("ROLLBACK");
+			}
 		}
 	}
 } else {
@@ -132,11 +167,15 @@ if (CheckFormSubmit($f, "Save")) {
 if ($reloadform) {
 	ClearFormData($f);
 
-	PutFormData($f, $s, 'fromname', $fromname, "text", 1, 50, true);
-	PutFormData($f, $s, 'fromemail', $fromemail, "email", 1, 255, true);
+	if ($showheaders) {
+		PutFormData($f, $s, 'fromname', $fromname, "text", 1, 50, true);
+		PutFormData($f, $s, 'fromemail', $fromemail, "email", 1, 255, true);
+	}
 	
 	foreach ($languagedata as $langcode => $data) {
-		PutFormData($f, $s, 'subject_' . $langcode, $data['subject'], "text", 1, 255, false);
+		if ($showheaders) {
+			PutFormData($f, $s, 'subject_' . $langcode, $data['subject'], "text", 1, 255, false);
+		}
 		PutFormData($f, $s, 'plain_' . $langcode, $data['plain'], "text", "nomin", "nomax", false);
 		PutFormData($f, $s, 'html_' . $langcode, $data['html'], "text", "nomin", "nomax", false);
 	}
@@ -152,6 +191,9 @@ NewForm($f);
 ?>
 <h3>Edit Email Template (<?= $templatetype?>) for Customer: <?= $custinfo[3]?></h3>
 <br />
+<?
+if ($showheaders) {
+?>
 <table>
 	<tr>
 		<td>From Name:</td>
@@ -162,13 +204,22 @@ NewForm($f);
 		<td><? NewFormItem($f, $s, "fromemail", "text", 0, 50); ?></td>
 	</tr>
 </table>
+<?
+}
+?>
 <h3>--------------------------------------------------------------------------</h3>
 <h3><?= $defaultlanguage?></h3>
 <table>
+<?
+if ($showheaders) {
+?>
 	<tr>
 		<td>Subject:</td>
 		<td><? NewFormItem($f, $s, "subject_" . $defaultcode, "text", 0, 50); ?></td>
 	</tr>
+<?
+}
+?>
 	<tr>
 		<td>HTML:</td>
 		<td><? NewFormItem($f, $s, "html_" . $defaultcode, "textarea", 100); ?></td>
