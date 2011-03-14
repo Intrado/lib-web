@@ -37,7 +37,7 @@ if ($customerid <= 0) {
 $authdb = DBConnect($authhost,$authuser,$authpass,"authserver");
 $query = "select s.dbhost, s.dbusername, s.dbpassword, s.readonlyhost 
 		from shard s inner join customer c on (s.id = c.shardid) where c.id=$customerid";
-list($dbhost,$dbuser,$dbpass,$readonlyhost) = QuickQueryRow($query, false, $authdb) or die("Can't query shard info:" . errorinfo($authdb));
+list($dbhost,$dbuser,$dbpass,$readonlyhost) = QuickQueryRow($query, false, $authdb) or die("Can't query shard info: " . errorinfo($authdb). "\n");
 
 // Check host info...
 if (!$dbhost || !$dbuser || !$dbpass || !$readonlyhost) {
