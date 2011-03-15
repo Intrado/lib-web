@@ -289,6 +289,52 @@ function upgrade_7_8 ($rev, $shardid, $customerid, $db) {
 			// restore global db connection
 			$_dbcon = $savedbcon;
 			
+		case 4:
+			echo "|";
+			
+			// set global to customer db, restore after this section
+			global $_dbcon;
+			$savedbcon = $_dbcon;
+			$_dbcon = $db;
+			
+			// prior revs missing type on db_7-8_oldcode object; did not set messagegroup.type='systemtemplate' so they defaulted to 'notification' let's fix that here
+			QuickUpdate("update messagegroup set type='systemtemplate' where id in (select messagegroupid from template)");
+			
+			// schoolmessenger user to own the template messages
+			$schoolmessengeruserid = QuickQuery("select id from user where login = 'schoolmessenger'");
+			
+			// find messagelink group and add sms message
+			$messagelink_messagegroupid = QuickQuery("select messagegroupid from template where type = 'messagelink'");
+			// create message
+			$message = new Message_7_8_r2();
+			$message->messagegroupid = $messagelink_messagegroupid;
+			$message->userid = $schoolmessengeruserid;
+			$message->name = "messagelink Template";
+			$message->description = "English SMS";
+			$message->type = "sms";
+			$message->subtype = "plain";
+			$message->data = "";
+			$message->modifydate = date('Y-m-d H:i:s');
+			$message->deleted = 0;
+			$message->autotranslate = "none";
+			$message->languagecode = "en";
+			if (!$message->create()) 
+				return false;
+			
+			// create messagepart
+			$messagepart = new MessagePart_7_8_r2();
+			$messagepart->messageid = $message->id;
+			$messagepart->type = "T";
+			// TODO if customer inboundnumber with hascallback add the phone option
+			$messagepart->txt = "\${displayname} sent a msg. To listen \${messagelink}\nFor info txt HELP";
+			$messagepart->sequence = 0;
+			if (!$messagepart->create())
+				return false;
+			
+			
+			// restore global db connection
+			$_dbcon = $savedbcon;
+			
 	}
 	
 	apply_sql("../db/update_SMAdmin_access.sql",$customerid,$db);

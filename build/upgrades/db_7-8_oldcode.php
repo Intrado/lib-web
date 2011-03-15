@@ -43,7 +43,7 @@ class MessagePart_7_8_r2 extends DBMappedObject {
 	function MessagePart_7_8_r2 ($id = NULL) {
 		$this->_allownulls = true;
 		$this->_tablename = "messagepart";
-		$this->_fieldlist = array("messageid", "type", "audiofileid", "txt", "fieldnum", "defaultvalue", "voiceid", "sequence", "maxlen");
+		$this->_fieldlist = array("messageid", "type", "audiofileid", "txt", "fieldnum", "defaultvalue", "voiceid", "sequence", "maxlen","imagecontentid");
 
 		//call super's constructor
 		DBMappedObject::DBMappedObject($id);
@@ -68,12 +68,15 @@ class MessageGroup_7_8_r2 extends DBMappedObject {
 		$this->_tablename = "messagegroup";
 		$this->_fieldlist = array(
 			"userid",
+			"type",
 			"name",
 			"description",
 			"modified",
 			"lastused",
 			"permanent",
-			"deleted"
+			"deleted",
+			"defaultlanguagecode",
+			"data"
 		);
 
 		//call super's constructor
