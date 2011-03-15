@@ -30,7 +30,7 @@ function fmt_actions($row, $index) {
 }
 
 $templates = array();
-$result = Query("select type, messagegroupid from template", $custdb);
+$result = Query("select type, messagegroupid from template order by type", $custdb);
 while ($row = DBGetRow($result)) {
 	$templates[] = $row;
 }
