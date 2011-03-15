@@ -37,10 +37,10 @@ $_dbcon = $custdb; // set global database connection
 ////////////////////////////////////////////////////////////////////////////////
 
 $templatetype = QuickQuery("select type from template where messagegroupid = ?", $custdb, array($messagegroupid));
-// get this jobs messagegroup and it's messages
+
+// find all html email messages, per language - read headers used for subject
 $messagesbylangcode = array();
-// TODO new 'template' type of messagegroup
-$messagegroup = DBFind("MessageGroup", "from messagegroup where id = ? and type = 'notification'", false, array($messagegroupid));
+$messagegroup = DBFind("MessageGroup", "from messagegroup where id = ?", false, array($messagegroupid));
 if ($messagegroup) {
 	$messages = DBFindMany("Message", "from message where messagegroupid = ? and type = 'email' and subtype = 'html'", false, array($messagegroupid));
 	if ($messages) {
@@ -54,6 +54,10 @@ if ($messagegroup) {
 // some types require subject/fromname/fromaddr
 if ($templatetype == "messagelink") {
 	$showheaders = true;
+	// there should be only one message
+	$smsmessage = DBFind("Message", "from message where messagegroupid = ? and type = 'sms' and languagecode = 'en'", false, array($messagegroupid));
+	// only one part
+	$smsbody = QuickQuery("select txt from messagepart where messageid = ?", false, array($smsmessage->id));
 } else {
 	$showheaders = false;
 }
@@ -64,7 +68,7 @@ $defaultlanguage = Language::getName(Language::getDefaultLanguageCode());
 $languagemap = Language::getLanguageMap();
 // default message from default language
 $defaultmessage = $messagegroup->getMessage("email", "html", $defaultcode, "none");
-$defaultmessage->readHeaders(); // TODO do we support separate subject per language
+$defaultmessage->readHeaders();
 
 // read from default, but write to all in group
 $fromname = $defaultmessage->fromname;
@@ -74,7 +78,7 @@ $languagedata = array();
 // sorted by language name
 foreach (array_keys($languagemap) as $langcode) {
 	$languagedata[$langcode]['name'] = $languagemap[$langcode];
-	$languagedata[$langcode]['subject'] = $defaultmessage->subject;
+	$languagedata[$langcode]['subject'] = $messagesbylangcode[$langcode]->subject;
 	$languagedata[$langcode]['plain'] = $messagegroup->getMessageText("email", "plain", $langcode, "none");
 	$languagedata[$langcode]['html'] = $messagegroup->getMessageText("email", "html", $langcode, "none");
 }
@@ -97,6 +101,15 @@ if (CheckFormSubmit($f, "Save")) {
 		} else {
 			Query("BEGIN");
 			$haserror = false;
+			// we only support sms in english
+			if (isset($smsmessage)) {
+				$smsbody = GetFormData($f, $s, "sms_en");
+				if (!strstr($smsbody, "\${messagelink}")) {
+					error('Template must contain "${messagelink}" variable. SMS');
+					$haserror = true;
+				}
+				// TODO trim and check length
+			}
 			foreach (array_keys($languagemap) as $langcode) {
 				if ($haserror)
 					break; // exit loop
@@ -125,15 +138,15 @@ if (CheckFormSubmit($f, "Save")) {
 					$message = $messagegroup->getMessage("email", $subtype, $langcode, "none");
 					if ($message == null) {
 						$message = new Message();
+						$message->userid = $defaultmessage->userid;
+						$message->messagegroupid = $defaultmessage->messagegroupid;
+						$message->name = $defaultmessage->name;
+						$message->description = $languagemap[$langcode] . " " . ucfirst($subtype);
+						$message->type = "email";
+						$message->subtype = $subtype;
+						$message->languagecode = $langcode;
+						$message->autotranslate = "none";
 					}
-					$message->userid = $defaultmessage->userid;
-					$message->messagegroupid = $defaultmessage->messagegroupid;
-					$message->name = $defaultmessage->name;
-					$message->description = $defaultmessage->description;
-					$message->type = "email";
-					$message->subtype = $subtype;
-					$message->languagecode = $langcode;
-					$message->autotranslate = "none";
 					$message->recreateParts($body, null, null);
 					if ($showheaders) {
 						$message->fromname = GetFormData($f, $s, "fromname");
@@ -151,6 +164,21 @@ if (CheckFormSubmit($f, "Save")) {
 					// TODO should delete languages that have empty body
 				}
 			}
+			// single sms message for messagelink
+			if (isset($smsmessage)) {
+					//$message->userid = $defaultmessage->userid;
+					//$message->messagegroupid = $defaultmessage->messagegroupid;
+					//$message->name = $defaultmessage->name;
+					//$message->description = $defaultmessage->description;
+					//$message->type = "sms";
+					//$message->subtype = "";
+					//$message->languagecode = "en";
+					//$message->autotranslate = "none";
+					$message->recreateParts($smsbody, null, null);
+					$message->modifydate = date("Y-m-d H:i:s");
+					$message->update();
+			}
+			
 			if (!$haserror) {
 				Query("COMMIT");
 			
@@ -170,6 +198,9 @@ if ($reloadform) {
 	if ($showheaders) {
 		PutFormData($f, $s, 'fromname', $fromname, "text", 1, 50, true);
 		PutFormData($f, $s, 'fromemail', $fromemail, "email", 1, 255, true);
+	}
+	if (isset($smsmessage)) {
+		PutFormData($f, $s, 'sms_en', $smsbody, "text", 1, 160, true);
 	}
 	
 	foreach ($languagedata as $langcode => $data) {
@@ -203,6 +234,17 @@ if ($showheaders) {
 		<td>From Email:</td>
 		<td><? NewFormItem($f, $s, "fromemail", "text", 0, 50); ?></td>
 	</tr>
+<?
+	// just so happens that smsmessage is always within showheaders
+	if (isset($smsmessage)) {
+?>
+	<tr>
+		<td>SMS English:</td>
+		<td><? NewFormItem($f, $s, "sms_en", "text", 0, 160); ?></td>
+	</tr>
+<?
+	} 
+?>
 </table>
 <?
 }
