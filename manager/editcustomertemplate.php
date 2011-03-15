@@ -111,6 +111,10 @@ if (CheckFormSubmit($f, "Save")) {
 				// TODO trim and check length
 			}
 			foreach (array_keys($languagemap) as $langcode) {
+				// survey only supports English, all others in various languages
+				if ($templatetype == "survey" && $langcode != "en")
+					continue;
+				
 				if ($haserror)
 					break; // exit loop
 				foreach (array('plain', 'html') as $subtype) {
@@ -272,16 +276,24 @@ if ($showheaders) {
 	</tr>
 </table>
 <?
+// survey only supports English, all others in various languages
+if ($templatetype != "survey")
 foreach ($languagedata as $langcode => $data) {
 	if ($langcode != $defaultcode) {
 ?>
 <h3>--------------------------------------------------------------------------</h3>
 <h3><?= $data['name']?></h3>
 <table>
+<?
+if ($showheaders) {
+?>
 	<tr>
 		<td>Subject:</td>
 		<td><? NewFormItem($f, $s, "subject_" . $langcode, "text", 0, 50); ?></td>
 	</tr>
+<?
+}
+?>
 	<tr>
 		<td>HTML:</td>
 		<td><? NewFormItem($f, $s, "html_" . $langcode, "textarea", 100); ?></td>
