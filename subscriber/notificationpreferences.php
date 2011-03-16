@@ -178,7 +178,7 @@ foreach ($jobtypes as $jt) {
 // OK because e0 is never deleted, it is only set to empty email field
 $values = QuickQueryList("select cp.jobtypeid from contactpref cp join jobtype jt on (cp.jobtypeid=jt.id) where cp.personid=? and cp.type='email' and cp.sequence=0 and cp.enabled=1 and jt.systempriority != 1 and jt.deleted=0".$survey, false, false, array($pid));
 
-if(count($jobtypes) > 0) {
+if (count($jobtypes) > 0) {
 	$formdata["jobtypes"] = array(
 		"label" => "",
 		"value" => $values,
@@ -352,15 +352,18 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		// new contactpref rows
 		$query = "insert into contactpref (personid, jobtypeid, type, sequence, enabled) values ";
 		$values = array();
-		
 		foreach ($phoneList as $phone) {
 			if ($phone->phone == '') continue;
-			// add opt-in for these job types
-			foreach ($postdata["jobtypes"] as $jtid) {
-				$query .= "(?, ?, 'phone', ?, 1),";
-				$values[] = $pid;
-				$values[] = $jtid;
-				$values[] = $phone->sequence;
+			
+			// if display jobtypes
+			if (count($jobtypes) > 0) {
+				// add opt-in for job types selected by the user
+				foreach ($postdata["jobtypes"] as $jtid) {
+					$query .= "(?, ?, 'phone', ?, 1),";
+					$values[] = $pid;
+					$values[] = $jtid;
+					$values[] = $phone->sequence;
+				}
 			}
 			// always opt-in for emergency job types
 			foreach ($emergencyjtid as $jtid) {
@@ -369,7 +372,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 				$values[] = $jtid;
 				$values[] = $phone->sequence;
 			}
-			// add opt-out for these job types
+			// add opt-out for these job types, unless selected by user
 			foreach ($nonemergencyjtid as $jtid) {
 				if (in_array($jtid, $postdata['jobtypes'])) continue;
 				$query .= "(?, ?, 'phone', ?, 0),";
@@ -382,11 +385,14 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		foreach ($emailList as $email) {
 			// email sequence 0 is special case, must always set because we read from it to load initial values
 			if ($email->sequence != 0 && $email->email == '') continue;
-			foreach ($postdata["jobtypes"] as $jtid) {
-				$query .= "(?, ?, 'email', ?, 1),";
-				$values[] = $pid;
-				$values[] = $jtid;
-				$values[] = $email->sequence;
+			
+			if (count($jobtypes) > 0) {
+				foreach ($postdata["jobtypes"] as $jtid) {
+					$query .= "(?, ?, 'email', ?, 1),";
+					$values[] = $pid;
+					$values[] = $jtid;
+					$values[] = $email->sequence;
+				}
 			}
 			foreach ($emergencyjtid as $jtid) {
 				$query .= "(?, ?, 'email', ?, 1),";
@@ -394,7 +400,6 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 				$values[] = $jtid;
 				$values[] = $email->sequence;
 			}
-			// add opt-out for these job types
 			foreach ($nonemergencyjtid as $jtid) {
 				if (in_array($jtid, $postdata['jobtypes'])) continue;
 				$query .= "(?, ?, 'email', ?, 0),";
@@ -405,11 +410,14 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		}
 		foreach ($smsList as $sms) {
 			if ($sms->sms == '') continue;
-			foreach ($postdata["jobtypes"] as $jtid) {
-				$query .= "(?, ?, 'sms', ?, 1),";
-				$values[] = $pid;
-				$values[] = $jtid;
-				$values[] = $sms->sequence;
+			
+			if (count($jobtypes) > 0) {
+				foreach ($postdata["jobtypes"] as $jtid) {
+					$query .= "(?, ?, 'sms', ?, 1),";
+					$values[] = $pid;
+					$values[] = $jtid;
+					$values[] = $sms->sequence;
+				}
 			}
 			foreach ($emergencyjtid as $jtid) {
 				$query .= "(?, ?, 'sms', ?, 1),";
@@ -417,7 +425,6 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 				$values[] = $jtid;
 				$values[] = $sms->sequence;
 			}	
-			// add opt-out for these job types
 			foreach ($nonemergencyjtid as $jtid) {
 				if (in_array($jtid, $postdata['jobtypes'])) continue;
 				$query .= "(?, ?, 'sms', ?, 0),";
@@ -426,6 +433,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 				$values[] = $sms->sequence;
 			}
 		}
+		
 		QuickUpdate("Begin");
 		QuickUpdate("delete from contactpref where personid=?", false, array($pid));
 		$query = substr($query, 0, strlen($query)-1); // remove trailing comma
