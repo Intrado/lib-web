@@ -103,10 +103,11 @@ class FacebookAuth extends FormItem {
 					var access_token = $(formitem).value;
 					element.update(new Element("img", { src: "img/ajax-loader.gif" }));
 					
+					// read user data from facebook api
+					var fbLoaded = false;
 					FB.api("/me", { access_token: access_token }, function(r) {
-						if (r.error) {
-							element.update();
-						} else {
+						if (r && !r.error) {
+							fbLoaded = true;
 							var e = new Element("div").insert(
 									new Element("div").setStyle({ float: "left" }).insert(
 										new Element("img", { 
@@ -122,7 +123,11 @@ class FacebookAuth extends FormItem {
 							
 							element.update(e);
 						}
-					});
+					}); // end facebook api call
+					// if the call to load user data failed, remove the loader gif
+					if (!fbLoaded) {
+						element.update();
+					}
 				}
 				
 				</script>';
