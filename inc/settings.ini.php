@@ -17,6 +17,7 @@ log_dir="/usr/commsuite/logs/"
 log_db_errors=true
 log_db_queries=false
 log_dmapi=false
+query_trace=true
 has_print=false
 tmp_dir="/tmp"
 

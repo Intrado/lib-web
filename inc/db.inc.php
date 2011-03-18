@@ -30,10 +30,35 @@ function DBDebug($query, $dbcon) {
 
 //wrap mysql query, and optionally log query errors
 function DBQueryWrapper($dbcon, $query, $args=false) {
-	global $SETTINGS;
+	global $SETTINGS, $CUSTOMERURL, $USER;
 
 	static $initdblog = false;
 	static $logfp;
+	
+	if ($SETTINGS['feature']['query_trace']) {
+		//prepend a comment with trace info to the query
+		
+		//the first frame is the original caller
+		$frame = array_pop(debug_backtrace());
+		//Add the PHP source location, customer, and user info.
+		$query_header = "/* File: {$frame['file']}\t"
+						."Line: {$frame['line']}\t"
+						."Function: {$frame['function']}\t"
+						."Customer: {$CUSTOMERURL}\t"
+						."Username: " . str_replace(array("*/","\t","\n","\0"), "", $USER->login)
+						."*/";
+		//TODO add more debug vars
+		//ie:
+//		foreach($keys as $x => $key) { 
+//			$val = $this->get($key); 
+//			if($val) {
+//				$key = strtolower(str_replace(array(": ","\t","\n","\0"), "", $key));
+//				$val = str_replace(array("\t","\n","\0"), "", $val); /* all other chars are safe in comments */
+//				$query_header .= "\t{$key}: {$val}";
+//			}
+//		}
+		$query = $query_header . "\n" . $query;
+	}	
 
 	if ($args) {
 		$stmt = $dbcon->prepare($query);
