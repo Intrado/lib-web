@@ -19,3 +19,18 @@ $$$
 
 ALTER TABLE `messagegroup` CHANGE `type` `type` ENUM( 'notification', 'targetedmessage', 'classroomtemplate', 'systemtemplate' ) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT 'notification'
 $$$
+
+-- $rev 3
+
+-- $rev 4
+
+-- $rev 5
+
+-- $rev 6
+
+ALTER TABLE `messagegroup` CHANGE `userid` `userid` INT( 11 ) NULL DEFAULT NULL
+$$$
+
+ALTER TABLE `message` CHANGE `userid` `userid` INT( 11 ) NULL DEFAULT NULL
+$$$
+

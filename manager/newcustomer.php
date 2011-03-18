@@ -3,6 +3,11 @@ require_once("common.inc.php");
 require_once("../inc/form.inc.php");
 require_once("../inc/html.inc.php");
 require_once("../inc/utils.inc.php");
+require_once("../obj/MessageGroup.obj.php");
+require_once("../obj/Message.obj.php");
+require_once("../obj/MessagePart.obj.php");
+require_once("../db/createtemplates.php");
+
 
 if (!$MANAGERUSER->authorized("newcustomer"))
 	exit("Not Authorized");
@@ -225,6 +230,19 @@ if (CheckFormSubmit($f,$s)){
 				$query = "INSERT INTO `targetedmessagecategory` (`id`, `name`, `deleted`, `image`) VALUES
 							(1, 'Default', 0, 'blue dot')";
 				QuickUpdate($query, $newdb) or dieWithError(" SQL: " . $query, $newdb);
+				
+				// set global to customer db, restore after this section
+				global $_dbcon;
+				$savedbcon = $_dbcon;
+				$_dbcon = $newdb;
+			
+				// Default Email Templates
+				if (!createDefaultTemplates_7_8())
+					return false;
+			
+				// restore global db connection
+				$_dbcon = $savedbcon;
+				
 				
 				// take them to the editor page for further configuration options
 				redirect("customeredit.php?id=" . $customerid);
