@@ -13,6 +13,7 @@ if ($IS_COMMSUITE) {
 	$BASEURL = "/$CUSTOMERURL";
 } /*CSDELETEMARKER_END*/
 
+apache_note("CS_APP","sub"); //for logging
 apache_note("CS_CUST",urlencode($CUSTOMERURL)); //for logging
 
 require_once("XML/RPC.php");

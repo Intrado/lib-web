@@ -14,6 +14,9 @@ require_once("../inc/DBMappedObject.php");
 require_once("../inc/DBRelationMap.php");
 require_once("../inc/utils.inc.php");
 
+apache_note("CS_APP","cm"); //for logging
+
+
 if(!isset($ppNotLoggedIn)){
 	// we are logged in
 

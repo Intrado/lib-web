@@ -11,6 +11,7 @@ if ($IS_COMMSUITE) {
 	$CUSTOMERURL = strtolower(substr($CUSTOMERURL,0,strpos($CUSTOMERURL,"/")));
 } /*CSDELETEMARKER_END*/
 
+apache_note("CS_APP","survey"); //for logging
 apache_note("CS_CUST",urlencode($CUSTOMERURL)); //for logging
 
 $code = (isset($_GET['s']) ? $_GET['s'] : "");

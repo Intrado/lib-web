@@ -4,6 +4,8 @@ setlocale(LC_ALL, 'en_US.UTF-8');
 mb_internal_encoding('UTF-8');
 $SETTINGS = parse_ini_file("inc/settings.ini.php",true);
 
+apache_note("CS_APP","ml"); //for logging
+
 require_once("inc/thrift.inc.php");
 require_once($GLOBALS['THRIFT_ROOT'].'/packages/messagelink/MessageLink.php');
 require_once("inc/utils.inc.php");

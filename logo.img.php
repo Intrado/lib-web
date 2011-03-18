@@ -14,7 +14,7 @@ if ($IS_COMMSUITE) {
 if (isset($_GET['urlcomponent'])) {
 	$CUSTOMERURL = $_GET['urlcomponent'];
 }
-
+apache_note("CS_APP","cs"); //for logging
 apache_note("CS_CUST",urlencode($CUSTOMERURL)); //for logging
 
 require_once("XML/RPC.php");

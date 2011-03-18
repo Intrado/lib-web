@@ -42,6 +42,7 @@ if ($IS_COMMSUITE) {
 	$CUSTOMERURL = strtolower(substr($CUSTOMERURL,0,strpos($CUSTOMERURL,"/")));
 } /*CSDELETEMARKER_END*/
 
+apache_note("CS_APP","unsubscribe"); //for logging
 apache_note("CS_CUST",urlencode($CUSTOMERURL)); //for logging
 
 $customer = getCustomerName($CUSTOMERURL);

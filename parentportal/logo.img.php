@@ -1,6 +1,8 @@
 <?
 include("common.inc.php");
 
+apache_note("CS_APP","cm"); //for logging
+
 
 /*
 $CUSTOMERURL = substr($_SERVER["SCRIPT_NAME"],1);

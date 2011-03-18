@@ -3,6 +3,7 @@
 $SETTINGS = parse_ini_file("managersettings.ini.php",true);
 $IS_COMMSUITE = false;
 
+apache_note("CS_APP","manager"); //for logging
 apache_note("CS_CUST","_Manager_"); //for logging
 
 $dsn = 'mysql:dbname='.$SETTINGS['db']['db'].';host='.$SETTINGS['db']['host'];

@@ -49,7 +49,7 @@ if ($inboundshortcode != "45305" && // 3ci
 	error_log("unexpected incoming shortcode ".$inboundshortcode);
 }
 
-
+apache_note("CS_APP","txtreply"); //for logging
 apache_note("CS_CUST", $sourceaddress);
 apache_note("CS_USER", $message_id);
 
