@@ -103,12 +103,31 @@ if (CheckFormSubmit($f, "Save")) {
 			$haserror = false;
 			// we only support sms in english
 			if (isset($smsmessage)) {
-				$smsbody = GetFormData($f, $s, "sms_en");
+				$smsbody = trim(GetFormData($f, $s, "sms_en"));
 				if (!strstr($smsbody, "\${messagelink}")) {
 					error('Template must contain "${messagelink}" variable. SMS');
 					$haserror = true;
 				}
-				// TODO trim and check length
+				// check length, assume max for variables
+				$smsbodylength = strlen($smsbody);
+				if (strstr($smsbody, "\${messagelink}") != false) {
+					$smsbodylength -= 14; // variable text
+					// TODO what max should we use? customerurl can be very long, asp.schoolmessenger.com may change, etc
+					$smsbodylength += 50; // max length of value
+				}
+				if (strstr($smsbody, "\${displayname}") != false) {
+					$smsbodylength -= 14; // variable text
+					$smsbodylength += 50; // max length of value
+				}
+				if (strstr($smsbody, "\${inboundnumber}") != false) {
+					$smsbodylength -= 16; // variable text
+					$smsbodylength += 13; // max length of value
+				}
+				// US max 160 chars (ugh, do we care about Canada and 132 max?)
+				if ($smsbodylength > 160) {
+					error('Template exceeds 160 character limit, when variables filled with maximum lengths. SMS');
+					$haserror = true;
+				}
 			}
 			foreach (array_keys($languagemap) as $langcode) {
 				// survey only supports English, all others in various languages
@@ -117,23 +136,35 @@ if (CheckFormSubmit($f, "Save")) {
 				
 				if ($haserror)
 					break; // exit loop
+					
 				foreach (array('plain', 'html') as $subtype) {
 					
-					// verify required fields in template, based on type
+					// do not trim the body, maybe they want to start indented or something
 					$body = GetFormData($f, $s, $subtype . "_" . $langcode);
-					switch ($templatetype) {
-						case "notification":
-							if (!strstr($body, "\${body}")) {
-								error('Template must contain "${body}" variable. ' . $subtype . ' ' . $langcode);
-								$haserror = true;
-							}
-							break;
-						case "messagelink":
-							if (!strstr($body, "\${messagelink}")) {
-								error('Template must contain "${messagelink}" variable. ' . $subtype . ' ' . $langcode);
-								$haserror = true;
-							}
-							break;
+					
+					// English always required, optional for other languages - if spanish is blank then no template
+					if (strlen(trim($body)) == 0) {
+						if ($langcode == "en") {
+							error('Template cannot be blank. ' . $subtype . ' ' . $langcode);
+							$haserror = true;
+						}
+					} else {
+						// verify required fields in template, based on type
+						switch ($templatetype) {
+							case "notification":
+							case "emergency":
+								if (!strstr($body, "\${body}")) {
+									error('Template must contain "${body}" variable. ' . $subtype . ' ' . $langcode);
+									$haserror = true;
+								}
+								break;
+							case "messagelink":
+								if (!strstr($body, "\${messagelink}")) {
+									error('Template must contain "${messagelink}" variable. ' . $subtype . ' ' . $langcode);
+									$haserror = true;
+								}
+								break;
+						}
 					}
 					if ($haserror)
 						break; // exit loop
