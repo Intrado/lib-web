@@ -377,4 +377,3 @@ function createTemplate($dbversion, $templatetype, $englishplain, $englishhtml, 
 }
 
 ?>
-
