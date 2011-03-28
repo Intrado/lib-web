@@ -166,12 +166,34 @@ function fmt_lastseen($row, $index){
 	return $output;
 }
 
+function fmt_resources ($row,$index) {
+	//index 16 is poststatus
+	if (!isset($row[16]) || $row[16] == "")
+		return ""; // unauth dm has no poststatus
+		
+	$data = json_decode($row[16]);
+	$data = $data[0];
+	
+	$restotal = $data->restotal;
+	$resactout = $data->restotal ? $data->resactout/$restotal * 100 : 0;
+	$resactin = $data->restotal ? $data->resactin/$restotal * 100 : 0;
+	
+	$used = $data->resactout + $data->resactin;
+	
+	$str = $used .'/'. $row[$index] . 
+		'<div style="float: right; width: 100px; height: 16px; border: 1px solid black;">
+			<div style="float: left; width: '.$resactout.'px; height: 16px; background: #00BBFF;"></div>
+			<div style="float: left; width: '.$resactin.'px; height: 16px; background: #FF00BB;"></div>
+		</div>';
+	
+	return $str;
+}
 
 $dms = array();
 $query = "select dm.id, dm.customerid, c.urlcomponent, dm.name, dm.authorizedip, dm.lastip,
 			dm.enablestate, dm.lastseen, dm.version, dm.dmuuid, dm.command, s_telco_calls_sec.value as telco_calls_sec, 
 			s_telco_type.value as telco_type, s_delmech_resource_count.value as delmech_resource_count,
-			s_telco_inboundtoken.value as telco_inboundtoken, c.shardid
+			s_telco_inboundtoken.value as telco_inboundtoken, c.shardid, dm.poststatus
 			from dm dm
 			left join customer c on (c.id = dm.customerid)
 			left join dmsetting s_telco_calls_sec on 
@@ -239,8 +261,8 @@ $titles[6] = "#Auth";
 $titles["status"] = "#Status";
 $titles[8] = "#Version";
 $titles[11] = "@#Calls/Sec";
-$titles[12] = "#Type";
-$titles[13] = "@#Resources";
+$titles[12] = "@#Type";
+$titles[13] = "Resources";
 $titles[14] = "@#Inbound";
 $titles[9] = "@#DM UUID";
 $titles[10] = "@#Cmd";
@@ -255,7 +277,8 @@ $formatters = array(2 => "fmt_customerUrl",
 					"actions" => "fmt_DMActions",
 					"status" => "fmt_dmstatus",
 					7 => "fmt_lastseen",
-					6 => "fmt_state");
+					6 => "fmt_state",
+					13 => "fmt_resources");
 
 $filterFormatters = array("status" => "fmt_dmstatus_nohtml",6 => "fmt_state");
 /////////////////////////////
