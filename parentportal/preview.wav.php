@@ -22,7 +22,7 @@ if(isset($_GET['pid'])){
 	}
 }
 
-if(isset($_GET['jid']) && isset($_GET['pid'])) {
+if (isset($_GET['jid']) && isset($_GET['pid'])) {
 	$jid = DBSafe($_GET['jid']);
 	$pid = DBSafe($_GET['pid']);
 	$query = "select
@@ -30,13 +30,21 @@ if(isset($_GET['jid']) && isset($_GET['pid'])) {
 			rp." . FieldMap::GetLastNameField()
 			. generateFields("rp")
 			. "
-			,rp.messageid as messageid
 			from reportperson rp
 			where rp.jobid = '$jid'
 			and rp.personid = '$pid'
 			and rp.type = 'phone'";
 
 	$historicdata = QuickQueryRow($query, true);
-	Message::playAudio($historicdata['messageid'], $historicdata,"mp3");
+	
+	if (isset($_GET['langcode']))
+		$languagecode = $_GET['langcode'];
+	else
+		$languagecode = "en";
+	$messagegroupid = QuickQuery("select messagegroupid from job where id = ?", false, array($jid));
+	$messageid = QuickQuery("select id from message where messagegroupid = ? and type = 'phone' and languagecode = ? and autotranslate in ('none', 'translated')", false, array($messagegroupid, $languagecode));
+
+//error_log("playing messageid=".$messageid." lang=".$languagecode);
+	Message::playAudio($messageid, $historicdata, "mp3");
 }
 ?>

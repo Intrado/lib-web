@@ -17,11 +17,16 @@ require_once("../inc/formatters.inc.php");
 require_once("../inc/reportutils.inc.php");
 require_once("../obj/Phone.obj.php");
 require_once("../obj/Message.obj.php");
+require_once("../obj/MessageGroup.obj.php");
 require_once("../obj/AudioFile.obj.php");
 require_once("../obj/MessagePart.obj.php");
 require_once("../obj/MessageAttachment.obj.php");
 require_once("../obj/Voice.obj.php");
+require_once("../obj/Language.obj.php");
 require_once("parentportalutils.inc.php");
+require_once("../inc/appserver.inc.php");
+require_once("../inc/thrift.inc.php");
+require_once($GLOBALS['THRIFT_ROOT'].'/packages/commsuite/CommSuite.php');
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -42,28 +47,69 @@ if(isset($_GET['type'])){
 if(isset($_GET['jobid']) && isset($_GET['personid'])){
 	$_SESSION['previewmessage_jobid'] = $_GET['jobid']+0;
 	$_SESSION['previewmessage_personid'] = $_GET['personid']+0;
-	$query = "select messageid from reportperson where jobid = '" . $_SESSION['previewmessage_jobid'] . "'
-												 and personid = '" . $_SESSION['previewmessage_personid'] . "'";
-	if(isset($_SESSION['type'])){
-		$query .= " and type = '" . DBSafe($_SESSION['type']) . "'";
-	}
-	$_SESSION['previewmessageid'] = QuickQuery($query);
+	$_SESSION['previewmessagegroupid'] = QuickQuery("select messagegroupid from job where id = " . $_SESSION['previewmessage_jobid']);
 	redirect();
 }
 
+if ($appserverCommsuiteProtocol == null || $appserverCommsuiteTransport == null) {
+	error_log("Can not use AppServer");
+	$appservererror = true;
+}
+
+
 $jobid = isset($_SESSION['previewmessage_jobid']) ? $_SESSION['previewmessage_jobid'] : 0;
+$messagegroupid = isset($_SESSION['previewmessagegroupid']) ? $_SESSION['previewmessagegroupid'] : 0;
 $personid = isset($_SESSION['previewmessage_personid']) ? $_SESSION['previewmessage_personid'] : 0;
-$messageid = isset($_SESSION['previewmessageid']) ? $_SESSION['previewmessageid'] : 0;
-$subtype = QuickQuery("select subtype from message where id=?", false, array($messageid));
 $phone = isset($_SESSION['type']) && $_SESSION['type'] == "phone" ? true : false;
 $email = isset($_SESSION['type']) && $_SESSION['type'] == "email" ? true : false;
 $sms = isset($_SESSION['type']) && $_SESSION['type'] == "sms" ? true : false;
-
 $dopreview = 0;
 $fields = array();
 
+// find messagegroup for job
+$messagegroup = new MessageGroup($messagegroupid);
+// list of available languages for this message type
+$availableMessageLanguages = $messagegroup->getMessageLanguageCodesOfType($_SESSION['type']);
+// now map languagecodes to language display name
+foreach ($availableMessageLanguages as $langcode) {
+	$availableMessageLanguages[$langcode] = Language::getName($langcode);
+}
+
+
+// language form
+$f="popuppreviewmessage";
+$s="main";
+$reloadform = 0;
+$_SESSION['previewmessage_langcode'] = $messagegroup->defaultlanguagecode;
+$_SESSION['formdata'][$f]['timestamp'] = ""; // hack to avoid error_log
+
+if (CheckFormSubmit($f,$s)) {
+	//check to see if formdata is valid
+	if (CheckFormInvalid($f)) {
+		error('Form was edited in another window, reloading data');
+		$reloadform = 1;
+	} else {
+		MergeSectionFormData($f, $s);
+
+		if (CheckFormSection($f, $s)) {
+			error('There was a problem trying to save your changes', 'Please verify that all required field information has been entered properly');
+		}
+		// all good, save data
+		// nothing to save, just display message language
+		$_SESSION['previewmessage_langcode'] = getFormData($f, $s, "language");
+		
+	}
+} else {
+	$reloadform = 1;
+}
+
+if ($reloadform) {
+	PutFormData($f, $s, "language", $_SESSION['previewmessage_langcode'], "text", "nomin", "nomax");
+}
+
+
 // if historic data should be used, fetch it now
-if($jobid != 0 && $personid != 0){
+if ($jobid != 0 && $personid != 0) {
 	$query = "select
 			rp." . FieldMap::GetFirstNameField() . ",
 			rp." . FieldMap::GetLastNameField()
@@ -80,21 +126,22 @@ if($jobid != 0 && $personid != 0){
 	}
 	$historicdata = QuickQueryRow($query, true);
 }
-if ($email || $sms) {
-	$parts = DBFindMany('MessagePart', 'from messagepart where messageid=? order by sequence', false, array($messageid));
-	if ($email) { //email
-		$attachments = DBFindMany("messageattachment","from messageattachment where messageid=?", false, array($messageid));
-		if ("html" == $subtype) { // html
-			$messagetext = Message::renderEmailHtmlParts($parts, $historicdata);
-		} else { // plain
-			$messagetext = Message::renderEmailPlainParts($parts, $historicdata);
-		}
-	} else { // sms
-		$messagetext = Message::renderSmsParts($parts);
+
+if ($email) {
+	$attachments = $messagegroup->getGlobalEmailAttachments(true);
+	
+	// call appserver to render email
+	$templateGroup = renderEmailNotification($messagegroupid, $personid);
+	$template = $templateGroup->templates[$_SESSION['previewmessage_langcode']];
+	
+	if ($template->htmlbody != "") {
+		$messagetext = $template->htmlbody;
+	} else {
+		$messagetext = $template->body;
 	}
+} else if ($sms) {
+	$messagetext = $messagegroup->getMessageText("sms", "plain", "en", "none");
 }
-
-
 
 ////////////////////////////////////////////////////////////////////////////////
 // Display
@@ -103,6 +150,8 @@ if ($email || $sms) {
 $TITLE = _L("Message");
 
 include_once("popup.inc.php");
+
+NewForm($f);
 
 buttons(button(_L('Done'), 'window.close()'));
 
@@ -124,7 +173,28 @@ startWindow(_L('Details'), 'padding: 3px;');
 			<td class="bottomBorder"><?=date("M j, Y", strtotime($historicdata['startdate']))?></td>
 		</tr>
 <?
-	if($email && count($attachments)){
+	if (count($availableMessageLanguages) > 1) {
+?>
+		<tr>
+			<th align="right" class="windowRowHeader bottomBorder"><?=_L("Language")?>:</td>
+			<td><table><tr><td>
+			<?
+				NewFormItem($f, $s, 'language', 'selectstart', null, null, "id='language'");
+				foreach ($availableMessageLanguages as $langcode => $lang) {
+					NewFormItem($f, $s, 'language', 'selectoption', $lang, $langcode);
+				}
+				NewFormItem($f, $s, 'language', 'selectend');
+				
+				$changebutton = submit($f, $s, _L('Change'));
+				echo "</td><td>" . $changebutton;
+			?>
+			</td></tr></table>
+		</tr>
+<?
+	}
+?>
+<?
+	if ($email && count($attachments)) {
 ?>
 			<tr>
 				<th align="right" class="windowRowHeader bottomBorder"><?=_L("Attachments")?>:</th>
@@ -154,7 +224,7 @@ startWindow(_L('Details'), 'padding: 3px;');
 <?
 endWindow();
 
-if($phone){
+if ($phone) {
 	startWindow(_L('Message'), 'padding: 3px;');
 	?>
 
@@ -163,13 +233,13 @@ if($phone){
 		<div id="player"></div>		
 		<script type="text/javascript" language="javascript" src="script/niftyplayer.js.php"></script>
 		<script language="JavaScript" type="text/javascript">
-	 				embedPlayer("preview.wav.php/embed_preview.wav?jid=<?= $jobid ?>&pid=<?= $personid ?>","player");
+	 				embedPlayer("preview.wav.php/embed_preview.wav?jid=<?= $jobid ?>&pid=<?= $personid ?>&langcode=<?= $_SESSION['previewmessage_langcode'] ?>","player");
 		</script>
-		<br><a href="preview.wav.php/download_preview.wav?jid=<?= $jobid ?>&pid=<?= $personid ?>&download=true"><?=_L("Click here to download")?></a>
+		<br><a href="preview.wav.php/download_preview.wav?jid=<?= $jobid ?>&pid=<?= $personid ?>&langcode=<?= $_SESSION['previewmessage_langcode'] ?>&download=true"><?=_L("Click here to download")?></a>
 		</div>
 	<?
 	endWindow();
-} else if ($email || $sms){
+} else if ($email || $sms) {
 	startWindow(_L('Message'), 'padding: 3px;');
 ?>
 		<div><?= $messagetext ?></div>

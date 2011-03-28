@@ -5,6 +5,11 @@
 host="localhost:8088"
 path="/xmlrpc"
 
+; commsuite appserver service
+[appserver_commsuite]
+host="localhost:7912"
+timeout=5500
+
 [feature]
 is_commsuite=false
 has_ssl=true
@@ -15,8 +20,8 @@ log_db_queries=true
 tmp_dir="/tmp"
 
 [content]
-;tts="localhost,8080,/phone/Tts"
-tts="localhost,8080,/tts/ttsloquendo"
+tts="10.25.25.66,8080,/tts/ttsserver"
+
 
 externalcontent=false
 

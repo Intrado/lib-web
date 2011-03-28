@@ -116,6 +116,8 @@ function portalAccessCustomer($customerid) {
 		if (!doDBConnect($result)) {
 			$result['result'] = "unknown error";
 			$result['resultdetail'] = "unexpected failure condition";
+		} else {
+			$_SESSION['_dbcid'] = $customerid;
 		}
 	}
 	return $result;

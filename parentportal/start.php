@@ -40,7 +40,6 @@ if(isset($_SESSION['customerid']) && $_SESSION['customerid']){
 		and j.status in ('active', 'complete')
 		and j.type = 'notification'
 		and (js.value is null or js.value >= curdate())
-		and rp.messageid != 0
 		group by j.id, rp.personid
 		order by j.startdate desc, j.starttime, j.id desc");
 	while ($row = DBGetRow($result)) {
@@ -79,15 +78,18 @@ function message_action($row, $index){
 	//index 1 is job id
 	//index 7 is person id
 
-	$messagetypes = QuickQueryList("select type, type from reportperson where jobid=? and personid=? and messageid != 0", true, false, array($row[1], $row[7]));
+	// TODO seems inefficient
+	// select exists message where type = 'phone' and messagegroupid = (select messagegroupid from job where id = ?)
+	$messagegroupid = QuickQuery("select messagegroupid from job where id = ?", false, array($row[1]));
+	$messagegroup = new MessageGroup($messagegroupid);
 
-	if (isset($messagetypes['phone'])) {
+	if ($messagegroup->hasMessage("phone")) {
 		$buttons[] = button(_L("Play"), "popup('previewmessage.php?jobid=" . $row[1] . "&personid=" . $row[7] . "&type=phone', 400, 500,'preview');",null);
 	}
-	if (isset($messagetypes['email'])) {
+	if ($messagegroup->hasMessage("email")) {
 		$buttons[] = button(_L("Read Email"), "popup('previewmessage.php?jobid=" . $row[1] . "&personid=" . $row[7] . "&type=email', 400, 500,'preview');",null);
 	}
-	if (isset($messagetypes['sms'])) {
+	if ($messagegroup->hasMessage("sms")) {
 		$buttons[] = button(_L("Read SMS"), "popup('previewmessage.php?jobid=" . $row[1] . "&personid=" . $row[7] . "&type=sms', 400, 500,'preview');",null);
 	}
 	
@@ -104,7 +106,8 @@ function sender($row, $index){
 	//index 6 is last name
 	//index 7 is personid
 	
-	$emailmsgid = QuickQuery("select messageid from reportperson where jobid=? and personid=? and type='email'", false, array($row[1], $row[7]));
+	// all email messages have same sent from data, so it does not matter if this is plain or html
+	$emailmsgid = QuickQuery("select id from message where messagegroupid = (select messagegroupid from job where id = ?) and type = 'email'", false, array($row[1]));
 	if (isset($emailmsgid) && $emailmsgid != 0) {
 		$message = DBFind("Message", "from message where id=?", false, array($emailmsgid));
 		$messagedata = sane_parsestr($message->data);

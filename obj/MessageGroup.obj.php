@@ -94,11 +94,26 @@ class MessageGroup extends DBMappedObject {
 		}
 		return null;
 	}
+	
+	// array of language codes for messages of the specified type (index and value both contain the languagecode)
+	function getMessageLanguageCodesOfType($type) {
+		$availableMessageLanguages = array();
+		foreach ($this->getMessages() as $message) {
+			if ($message->type == $type)
+				$availableMessageLanguages[$message->languagecode] = $message->languagecode;
+			// keyed with languagecode to avoid duplicates, in the case of plain and html email
+		}
+		return $availableMessageLanguages;
+	}
 
-	function getGlobalEmailAttachments() {
+	function getGlobalEmailAttachments($isDeletedOk = false) {
 		if (!$emailmessage = $this->getFirstMessageOfType('email'))
 			return array();
-		return DBFindMany('MessageAttachment', 'from messageattachment where not deleted and messageid=?', false, array($emailmessage->id));
+		if ($isDeletedOk)
+			$appendDeleted = "";
+		else
+			$appendDeleted = " and not deleted";
+		return DBFindMany('MessageAttachment', 'from messageattachment where messageid = ?' . $appendDeleted, false, array($emailmessage->id));
 	}
 	
 	function getGlobalEmailHeaders($default) {
