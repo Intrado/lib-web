@@ -35,7 +35,7 @@ function DBQueryWrapper($dbcon, $query, $args=false) {
 	static $initdblog = false;
 	static $logfp;
 	
-	if ($SETTINGS['feature']['query_trace']) {
+	if (isset($SETTINGS['feature']['query_trace']) && $SETTINGS['feature']['query_trace']) {
 		//prepend a comment with trace info to the query
 		
 		//the first frame is the original caller
