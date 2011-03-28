@@ -18,6 +18,7 @@ log_dir="/usr/commsuite/logs/"
 log_db_errors=true
 log_db_queries=true
 tmp_dir="/tmp"
+query_trace=true
 
 [content]
 tts="10.25.25.66,8080,/tts/ttsserver"

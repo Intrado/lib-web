@@ -35,7 +35,7 @@ function DBQueryWrapper($dbcon, $query, $args=false) {
 	static $initdblog = false;
 	static $logfp;
 	
-	if (isset($SETTINGS['feature']['query_trace']) && $SETTINGS['feature']['query_trace']) {
+	if ($SETTINGS['feature']['query_trace']) {
 		//prepend a comment with trace info to the query
 		
 		//the first frame is the original caller
@@ -45,7 +45,7 @@ function DBQueryWrapper($dbcon, $query, $args=false) {
 						."Line: {$frame['line']}\t"
 						."Function: {$frame['function']}\t"
 						."Customer: {$CUSTOMERURL}\t"
-						."Username: " . str_replace(array("*/","\t","\n","\0"), "", $USER->login)
+						."Username: " . str_replace(array("*/","\t","\n","\0"), "", @$USER->login)
 						."*/";
 		//TODO add more debug vars
 		//ie:
