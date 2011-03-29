@@ -152,10 +152,12 @@ foreach ($destinations as $type => $destination) {
 			} else {
 				if ($type == 'email') {
 					if ($subtype == 'html') {
-						$messagetext = str_replace('<<', '&lt;&lt;', $message->format($parts));
-						$messagetext = str_replace('>>', '&gt;&gt;', $messagetext);
+						//$messagetext = str_replace('<<', '&lt;&lt;', $message->format($parts));
+						//$messagetext = str_replace('>>', '&gt;&gt;', $messagetext);
+						$messagetext = $message->renderEmailWithTemplate();
 					} else {
-						$messagetext = escapehtml($message->format($parts));
+						//$messagetext = escapehtml($message->format($parts));
+						$messagetext = escapehtml($message->renderEmailWithTemplate());
 					}
 				} 
 

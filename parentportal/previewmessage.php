@@ -131,9 +131,8 @@ if ($email) {
 	$attachments = $messagegroup->getGlobalEmailAttachments(true);
 	
 	// call appserver to render email
-	$templateGroup = renderEmailNotification($messagegroupid, $personid);
-	$template = $templateGroup->templates[$_SESSION['previewmessage_langcode']];
-	
+	$template = renderEmailTemplateForJobLanguagePerson($jobid, $_SESSION['previewmessage_langcode'], $personid);
+
 	if ($template->htmlbody != "") {
 		$messagetext = $template->htmlbody;
 	} else {
