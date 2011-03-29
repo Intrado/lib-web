@@ -9,7 +9,8 @@ include_once $GLOBALS['THRIFT_ROOT'].'/Thrift.php';
 include_once $GLOBALS['THRIFT_ROOT'].'/packages/commsuite/commsuite_types.php';
 
 interface CommSuiteIf {
-  public function renderEmailTemplateGroupForCustomerMessagePerson($customerid, $messagegroupid, $personid);
+  public function renderEmailTemplateForMessageLanguage($sessionid, $messagegroupid, $jobtype, $languagecode);
+  public function renderEmailTemplateForJobLanguagePerson($sessionid, $jobid, $languagecode, $personid);
 }
 
 class CommSuiteClient implements CommSuiteIf {
@@ -23,36 +24,37 @@ class CommSuiteClient implements CommSuiteIf {
     $this->output_ = $output ? $output : $input;
   }
 
-  public function renderEmailTemplateGroupForCustomerMessagePerson($customerid, $messagegroupid, $personid)
+  public function renderEmailTemplateForMessageLanguage($sessionid, $messagegroupid, $jobtype, $languagecode)
   {
-    $this->send_renderEmailTemplateGroupForCustomerMessagePerson($customerid, $messagegroupid, $personid);
-    return $this->recv_renderEmailTemplateGroupForCustomerMessagePerson();
+    $this->send_renderEmailTemplateForMessageLanguage($sessionid, $messagegroupid, $jobtype, $languagecode);
+    return $this->recv_renderEmailTemplateForMessageLanguage();
   }
 
-  public function send_renderEmailTemplateGroupForCustomerMessagePerson($customerid, $messagegroupid, $personid)
+  public function send_renderEmailTemplateForMessageLanguage($sessionid, $messagegroupid, $jobtype, $languagecode)
   {
-    $args = new commsuite_CommSuite_renderEmailTemplateGroupForCustomerMessagePerson_args();
-    $args->customerid = $customerid;
+    $args = new commsuite_CommSuite_renderEmailTemplateForMessageLanguage_args();
+    $args->sessionid = $sessionid;
     $args->messagegroupid = $messagegroupid;
-    $args->personid = $personid;
+    $args->jobtype = $jobtype;
+    $args->languagecode = $languagecode;
     $bin_accel = ($this->output_ instanceof TProtocol::$TBINARYPROTOCOLACCELERATED) && function_exists('thrift_protocol_write_binary');
     if ($bin_accel)
     {
-      thrift_protocol_write_binary($this->output_, 'renderEmailTemplateGroupForCustomerMessagePerson', TMessageType::CALL, $args, $this->seqid_, $this->output_->isStrictWrite());
+      thrift_protocol_write_binary($this->output_, 'renderEmailTemplateForMessageLanguage', TMessageType::CALL, $args, $this->seqid_, $this->output_->isStrictWrite());
     }
     else
     {
-      $this->output_->writeMessageBegin('renderEmailTemplateGroupForCustomerMessagePerson', TMessageType::CALL, $this->seqid_);
+      $this->output_->writeMessageBegin('renderEmailTemplateForMessageLanguage', TMessageType::CALL, $this->seqid_);
       $args->write($this->output_);
       $this->output_->writeMessageEnd();
       $this->output_->getTransport()->flush();
     }
   }
 
-  public function recv_renderEmailTemplateGroupForCustomerMessagePerson()
+  public function recv_renderEmailTemplateForMessageLanguage()
   {
     $bin_accel = ($this->input_ instanceof TProtocol::$TBINARYPROTOCOLACCELERATED) && function_exists('thrift_protocol_read_binary');
-    if ($bin_accel) $result = thrift_protocol_read_binary($this->input_, 'commsuite_CommSuite_renderEmailTemplateGroupForCustomerMessagePerson_result', $this->input_->isStrictRead());
+    if ($bin_accel) $result = thrift_protocol_read_binary($this->input_, 'commsuite_CommSuite_renderEmailTemplateForMessageLanguage_result', $this->input_->isStrictRead());
     else
     {
       $rseqid = 0;
@@ -66,7 +68,7 @@ class CommSuiteClient implements CommSuiteIf {
         $this->input_->readMessageEnd();
         throw $x;
       }
-      $result = new commsuite_CommSuite_renderEmailTemplateGroupForCustomerMessagePerson_result();
+      $result = new commsuite_CommSuite_renderEmailTemplateForMessageLanguage_result();
       $result->read($this->input_);
       $this->input_->readMessageEnd();
     }
@@ -76,52 +78,117 @@ class CommSuiteClient implements CommSuiteIf {
     if ($result->e !== null) {
       throw $result->e;
     }
-    throw new Exception("renderEmailTemplateGroupForCustomerMessagePerson failed: unknown result");
+    throw new Exception("renderEmailTemplateForMessageLanguage failed: unknown result");
+  }
+
+  public function renderEmailTemplateForJobLanguagePerson($sessionid, $jobid, $languagecode, $personid)
+  {
+    $this->send_renderEmailTemplateForJobLanguagePerson($sessionid, $jobid, $languagecode, $personid);
+    return $this->recv_renderEmailTemplateForJobLanguagePerson();
+  }
+
+  public function send_renderEmailTemplateForJobLanguagePerson($sessionid, $jobid, $languagecode, $personid)
+  {
+    $args = new commsuite_CommSuite_renderEmailTemplateForJobLanguagePerson_args();
+    $args->sessionid = $sessionid;
+    $args->jobid = $jobid;
+    $args->languagecode = $languagecode;
+    $args->personid = $personid;
+    $bin_accel = ($this->output_ instanceof TProtocol::$TBINARYPROTOCOLACCELERATED) && function_exists('thrift_protocol_write_binary');
+    if ($bin_accel)
+    {
+      thrift_protocol_write_binary($this->output_, 'renderEmailTemplateForJobLanguagePerson', TMessageType::CALL, $args, $this->seqid_, $this->output_->isStrictWrite());
+    }
+    else
+    {
+      $this->output_->writeMessageBegin('renderEmailTemplateForJobLanguagePerson', TMessageType::CALL, $this->seqid_);
+      $args->write($this->output_);
+      $this->output_->writeMessageEnd();
+      $this->output_->getTransport()->flush();
+    }
+  }
+
+  public function recv_renderEmailTemplateForJobLanguagePerson()
+  {
+    $bin_accel = ($this->input_ instanceof TProtocol::$TBINARYPROTOCOLACCELERATED) && function_exists('thrift_protocol_read_binary');
+    if ($bin_accel) $result = thrift_protocol_read_binary($this->input_, 'commsuite_CommSuite_renderEmailTemplateForJobLanguagePerson_result', $this->input_->isStrictRead());
+    else
+    {
+      $rseqid = 0;
+      $fname = null;
+      $mtype = 0;
+
+      $this->input_->readMessageBegin($fname, $mtype, $rseqid);
+      if ($mtype == TMessageType::EXCEPTION) {
+        $x = new TApplicationException();
+        $x->read($this->input_);
+        $this->input_->readMessageEnd();
+        throw $x;
+      }
+      $result = new commsuite_CommSuite_renderEmailTemplateForJobLanguagePerson_result();
+      $result->read($this->input_);
+      $this->input_->readMessageEnd();
+    }
+    if ($result->success !== null) {
+      return $result->success;
+    }
+    if ($result->e !== null) {
+      throw $result->e;
+    }
+    throw new Exception("renderEmailTemplateForJobLanguagePerson failed: unknown result");
   }
 
 }
 
 // HELPER FUNCTIONS AND STRUCTURES
 
-class commsuite_CommSuite_renderEmailTemplateGroupForCustomerMessagePerson_args {
+class commsuite_CommSuite_renderEmailTemplateForMessageLanguage_args {
   static $_TSPEC;
 
-  public $customerid = null;
+  public $sessionid = null;
   public $messagegroupid = null;
-  public $personid = null;
+  public $jobtype = null;
+  public $languagecode = null;
 
   public function __construct($vals=null) {
     if (!isset(self::$_TSPEC)) {
       self::$_TSPEC = array(
         1 => array(
-          'var' => 'customerid',
-          'type' => TType::I32,
+          'var' => 'sessionid',
+          'type' => TType::STRING,
           ),
         2 => array(
           'var' => 'messagegroupid',
           'type' => TType::I32,
           ),
         3 => array(
-          'var' => 'personid',
+          'var' => 'jobtype',
           'type' => TType::I32,
+          ),
+        4 => array(
+          'var' => 'languagecode',
+          'type' => TType::STRING,
           ),
         );
     }
     if (is_array($vals)) {
-      if (isset($vals['customerid'])) {
-        $this->customerid = $vals['customerid'];
+      if (isset($vals['sessionid'])) {
+        $this->sessionid = $vals['sessionid'];
       }
       if (isset($vals['messagegroupid'])) {
         $this->messagegroupid = $vals['messagegroupid'];
       }
-      if (isset($vals['personid'])) {
-        $this->personid = $vals['personid'];
+      if (isset($vals['jobtype'])) {
+        $this->jobtype = $vals['jobtype'];
+      }
+      if (isset($vals['languagecode'])) {
+        $this->languagecode = $vals['languagecode'];
       }
     }
   }
 
   public function getName() {
-    return 'CommSuite_renderEmailTemplateGroupForCustomerMessagePerson_args';
+    return 'CommSuite_renderEmailTemplateForMessageLanguage_args';
   }
 
   public function read($input)
@@ -140,8 +207,8 @@ class commsuite_CommSuite_renderEmailTemplateGroupForCustomerMessagePerson_args 
       switch ($fid)
       {
         case 1:
-          if ($ftype == TType::I32) {
-            $xfer += $input->readI32($this->customerid);
+          if ($ftype == TType::STRING) {
+            $xfer += $input->readString($this->sessionid);
           } else {
             $xfer += $input->skip($ftype);
           }
@@ -155,7 +222,14 @@ class commsuite_CommSuite_renderEmailTemplateGroupForCustomerMessagePerson_args 
           break;
         case 3:
           if ($ftype == TType::I32) {
-            $xfer += $input->readI32($this->personid);
+            $xfer += $input->readI32($this->jobtype);
+          } else {
+            $xfer += $input->skip($ftype);
+          }
+          break;
+        case 4:
+          if ($ftype == TType::STRING) {
+            $xfer += $input->readString($this->languagecode);
           } else {
             $xfer += $input->skip($ftype);
           }
@@ -172,10 +246,10 @@ class commsuite_CommSuite_renderEmailTemplateGroupForCustomerMessagePerson_args 
 
   public function write($output) {
     $xfer = 0;
-    $xfer += $output->writeStructBegin('CommSuite_renderEmailTemplateGroupForCustomerMessagePerson_args');
-    if ($this->customerid !== null) {
-      $xfer += $output->writeFieldBegin('customerid', TType::I32, 1);
-      $xfer += $output->writeI32($this->customerid);
+    $xfer += $output->writeStructBegin('CommSuite_renderEmailTemplateForMessageLanguage_args');
+    if ($this->sessionid !== null) {
+      $xfer += $output->writeFieldBegin('sessionid', TType::STRING, 1);
+      $xfer += $output->writeString($this->sessionid);
       $xfer += $output->writeFieldEnd();
     }
     if ($this->messagegroupid !== null) {
@@ -183,9 +257,14 @@ class commsuite_CommSuite_renderEmailTemplateGroupForCustomerMessagePerson_args 
       $xfer += $output->writeI32($this->messagegroupid);
       $xfer += $output->writeFieldEnd();
     }
-    if ($this->personid !== null) {
-      $xfer += $output->writeFieldBegin('personid', TType::I32, 3);
-      $xfer += $output->writeI32($this->personid);
+    if ($this->jobtype !== null) {
+      $xfer += $output->writeFieldBegin('jobtype', TType::I32, 3);
+      $xfer += $output->writeI32($this->jobtype);
+      $xfer += $output->writeFieldEnd();
+    }
+    if ($this->languagecode !== null) {
+      $xfer += $output->writeFieldBegin('languagecode', TType::STRING, 4);
+      $xfer += $output->writeString($this->languagecode);
       $xfer += $output->writeFieldEnd();
     }
     $xfer += $output->writeFieldStop();
@@ -195,7 +274,7 @@ class commsuite_CommSuite_renderEmailTemplateGroupForCustomerMessagePerson_args 
 
 }
 
-class commsuite_CommSuite_renderEmailTemplateGroupForCustomerMessagePerson_result {
+class commsuite_CommSuite_renderEmailTemplateForMessageLanguage_result {
   static $_TSPEC;
 
   public $success = null;
@@ -207,7 +286,7 @@ class commsuite_CommSuite_renderEmailTemplateGroupForCustomerMessagePerson_resul
         0 => array(
           'var' => 'success',
           'type' => TType::STRUCT,
-          'class' => 'commsuite_EmailTemplateGroup',
+          'class' => 'commsuite_EmailTemplate',
           ),
         1 => array(
           'var' => 'e',
@@ -227,7 +306,7 @@ class commsuite_CommSuite_renderEmailTemplateGroupForCustomerMessagePerson_resul
   }
 
   public function getName() {
-    return 'CommSuite_renderEmailTemplateGroupForCustomerMessagePerson_result';
+    return 'CommSuite_renderEmailTemplateForMessageLanguage_result';
   }
 
   public function read($input)
@@ -247,7 +326,7 @@ class commsuite_CommSuite_renderEmailTemplateGroupForCustomerMessagePerson_resul
       {
         case 0:
           if ($ftype == TType::STRUCT) {
-            $this->success = new commsuite_EmailTemplateGroup();
+            $this->success = new commsuite_EmailTemplate();
             $xfer += $this->success->read($input);
           } else {
             $xfer += $input->skip($ftype);
@@ -273,7 +352,238 @@ class commsuite_CommSuite_renderEmailTemplateGroupForCustomerMessagePerson_resul
 
   public function write($output) {
     $xfer = 0;
-    $xfer += $output->writeStructBegin('CommSuite_renderEmailTemplateGroupForCustomerMessagePerson_result');
+    $xfer += $output->writeStructBegin('CommSuite_renderEmailTemplateForMessageLanguage_result');
+    if ($this->success !== null) {
+      if (!is_object($this->success)) {
+        throw new TProtocolException('Bad type in structure.', TProtocolException::INVALID_DATA);
+      }
+      $xfer += $output->writeFieldBegin('success', TType::STRUCT, 0);
+      $xfer += $this->success->write($output);
+      $xfer += $output->writeFieldEnd();
+    }
+    if ($this->e !== null) {
+      $xfer += $output->writeFieldBegin('e', TType::STRUCT, 1);
+      $xfer += $this->e->write($output);
+      $xfer += $output->writeFieldEnd();
+    }
+    $xfer += $output->writeFieldStop();
+    $xfer += $output->writeStructEnd();
+    return $xfer;
+  }
+
+}
+
+class commsuite_CommSuite_renderEmailTemplateForJobLanguagePerson_args {
+  static $_TSPEC;
+
+  public $sessionid = null;
+  public $jobid = null;
+  public $languagecode = null;
+  public $personid = null;
+
+  public function __construct($vals=null) {
+    if (!isset(self::$_TSPEC)) {
+      self::$_TSPEC = array(
+        1 => array(
+          'var' => 'sessionid',
+          'type' => TType::STRING,
+          ),
+        2 => array(
+          'var' => 'jobid',
+          'type' => TType::I32,
+          ),
+        3 => array(
+          'var' => 'languagecode',
+          'type' => TType::STRING,
+          ),
+        4 => array(
+          'var' => 'personid',
+          'type' => TType::I32,
+          ),
+        );
+    }
+    if (is_array($vals)) {
+      if (isset($vals['sessionid'])) {
+        $this->sessionid = $vals['sessionid'];
+      }
+      if (isset($vals['jobid'])) {
+        $this->jobid = $vals['jobid'];
+      }
+      if (isset($vals['languagecode'])) {
+        $this->languagecode = $vals['languagecode'];
+      }
+      if (isset($vals['personid'])) {
+        $this->personid = $vals['personid'];
+      }
+    }
+  }
+
+  public function getName() {
+    return 'CommSuite_renderEmailTemplateForJobLanguagePerson_args';
+  }
+
+  public function read($input)
+  {
+    $xfer = 0;
+    $fname = null;
+    $ftype = 0;
+    $fid = 0;
+    $xfer += $input->readStructBegin($fname);
+    while (true)
+    {
+      $xfer += $input->readFieldBegin($fname, $ftype, $fid);
+      if ($ftype == TType::STOP) {
+        break;
+      }
+      switch ($fid)
+      {
+        case 1:
+          if ($ftype == TType::STRING) {
+            $xfer += $input->readString($this->sessionid);
+          } else {
+            $xfer += $input->skip($ftype);
+          }
+          break;
+        case 2:
+          if ($ftype == TType::I32) {
+            $xfer += $input->readI32($this->jobid);
+          } else {
+            $xfer += $input->skip($ftype);
+          }
+          break;
+        case 3:
+          if ($ftype == TType::STRING) {
+            $xfer += $input->readString($this->languagecode);
+          } else {
+            $xfer += $input->skip($ftype);
+          }
+          break;
+        case 4:
+          if ($ftype == TType::I32) {
+            $xfer += $input->readI32($this->personid);
+          } else {
+            $xfer += $input->skip($ftype);
+          }
+          break;
+        default:
+          $xfer += $input->skip($ftype);
+          break;
+      }
+      $xfer += $input->readFieldEnd();
+    }
+    $xfer += $input->readStructEnd();
+    return $xfer;
+  }
+
+  public function write($output) {
+    $xfer = 0;
+    $xfer += $output->writeStructBegin('CommSuite_renderEmailTemplateForJobLanguagePerson_args');
+    if ($this->sessionid !== null) {
+      $xfer += $output->writeFieldBegin('sessionid', TType::STRING, 1);
+      $xfer += $output->writeString($this->sessionid);
+      $xfer += $output->writeFieldEnd();
+    }
+    if ($this->jobid !== null) {
+      $xfer += $output->writeFieldBegin('jobid', TType::I32, 2);
+      $xfer += $output->writeI32($this->jobid);
+      $xfer += $output->writeFieldEnd();
+    }
+    if ($this->languagecode !== null) {
+      $xfer += $output->writeFieldBegin('languagecode', TType::STRING, 3);
+      $xfer += $output->writeString($this->languagecode);
+      $xfer += $output->writeFieldEnd();
+    }
+    if ($this->personid !== null) {
+      $xfer += $output->writeFieldBegin('personid', TType::I32, 4);
+      $xfer += $output->writeI32($this->personid);
+      $xfer += $output->writeFieldEnd();
+    }
+    $xfer += $output->writeFieldStop();
+    $xfer += $output->writeStructEnd();
+    return $xfer;
+  }
+
+}
+
+class commsuite_CommSuite_renderEmailTemplateForJobLanguagePerson_result {
+  static $_TSPEC;
+
+  public $success = null;
+  public $e = null;
+
+  public function __construct($vals=null) {
+    if (!isset(self::$_TSPEC)) {
+      self::$_TSPEC = array(
+        0 => array(
+          'var' => 'success',
+          'type' => TType::STRUCT,
+          'class' => 'commsuite_EmailTemplate',
+          ),
+        1 => array(
+          'var' => 'e',
+          'type' => TType::STRUCT,
+          'class' => 'commsuite_RenderException',
+          ),
+        );
+    }
+    if (is_array($vals)) {
+      if (isset($vals['success'])) {
+        $this->success = $vals['success'];
+      }
+      if (isset($vals['e'])) {
+        $this->e = $vals['e'];
+      }
+    }
+  }
+
+  public function getName() {
+    return 'CommSuite_renderEmailTemplateForJobLanguagePerson_result';
+  }
+
+  public function read($input)
+  {
+    $xfer = 0;
+    $fname = null;
+    $ftype = 0;
+    $fid = 0;
+    $xfer += $input->readStructBegin($fname);
+    while (true)
+    {
+      $xfer += $input->readFieldBegin($fname, $ftype, $fid);
+      if ($ftype == TType::STOP) {
+        break;
+      }
+      switch ($fid)
+      {
+        case 0:
+          if ($ftype == TType::STRUCT) {
+            $this->success = new commsuite_EmailTemplate();
+            $xfer += $this->success->read($input);
+          } else {
+            $xfer += $input->skip($ftype);
+          }
+          break;
+        case 1:
+          if ($ftype == TType::STRUCT) {
+            $this->e = new commsuite_RenderException();
+            $xfer += $this->e->read($input);
+          } else {
+            $xfer += $input->skip($ftype);
+          }
+          break;
+        default:
+          $xfer += $input->skip($ftype);
+          break;
+      }
+      $xfer += $input->readFieldEnd();
+    }
+    $xfer += $input->readStructEnd();
+    return $xfer;
+  }
+
+  public function write($output) {
+    $xfer = 0;
+    $xfer += $output->writeStructBegin('CommSuite_renderEmailTemplateForJobLanguagePerson_result');
     if ($this->success !== null) {
       if (!is_object($this->success)) {
         throw new TProtocolException('Bad type in structure.', TProtocolException::INVALID_DATA);
