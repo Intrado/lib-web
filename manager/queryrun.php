@@ -9,16 +9,22 @@ require_once("AspAdminQuery.obj.php");
 
 if (!$MANAGERUSER->authorized("runqueries"))
 	exit("Not Authorized");
-	
+
+$cid = false;
+if (isset($_GET["cid"])) {
+	$cid = $_GET["cid"] + 0;
+}
+
 if (isset($_GET['id'])) {
 	$id = $_GET['id']+0;
 	if ($MANAGERUSER->authQuery($id))
-		$_SESSION['runqueryid'] = $id;
+		$_SESSION['runquery'] = array("queryid" => $id, "cid" => $cid);
 	redirect();
 }
 
 
-$managerquery = new AspAdminQuery($_SESSION['runqueryid']);
+$managerquery = new AspAdminQuery($_SESSION['runquery']["queryid"]);
+$cid = $_SESSION['runquery']["cid"];
 
 $f = "editroles";
 $s = "main";
@@ -34,6 +40,7 @@ if (CheckFormSubmit($f,$s)) {
 		//HACK work around workaround for sticky checkboxes
 		//checkbox values get reset in NewFormItem, which happens to late for us to use the value
 		PutFormData($f, $s, "savecsv",false,"bool", 0, 1);
+		PutFormData($f, $s, "enabledcustomersonly",false,"bool", 0, 1);
 		
 		MergeSectionFormData($f, $s);
 		//do check
@@ -43,6 +50,7 @@ if (CheckFormSubmit($f,$s)) {
 			
 			
 			$savecsv = GetFormData($f, $s, "savecsv");
+			$enabledonly = GetFormData($f, $s, "enabledcustomersonly");
 			
 			if ($savecsv) {
 				// Begin output to csv
@@ -54,10 +62,20 @@ if (CheckFormSubmit($f,$s)) {
 				$queryoutput .= '<table class=list width="100%">';
 			}
 			
+			$limit = "";
+			$args = array();
+			// if only enabled customers requested
+			if ($enabledonly)
+				$limit .= " and c.enabled";
 			
+			if ($cid) {
+				$limit .= " and c.id = ?";
+				$args[] = $cid;
+			}
+				
 			//Following code mostly taken from query_customers, modified somewhat to fit this page	
-			$query = "select c.id, s.readonlyhost, s.dbusername, s.dbpassword, s.id from shard s inner join customer c on (c.shardid = s.id) where 1 order by c.id";
-			$res = Query($query);
+			$query = "select c.id, s.readonlyhost, s.dbusername, s.dbpassword, s.id from shard s inner join customer c on (c.shardid = s.id) where 1 $limit order by c.id";
+			$res = Query($query, false, $args);
 			
 			$data = array();
 			while($row = DBGetRow($res)){
@@ -167,6 +185,7 @@ if( $reloadform ) {
 	}
 	
 	PutFormData($f, $s, "savecsv",false,"bool", 0, 1);
+	PutFormData($f, $s, "enabledcustomersonly",false,"bool", 0, 1);
 	
 }
 include_once("nav.inc.php");
@@ -195,10 +214,17 @@ NewForm($f);
 		</tr>
 <?
 	}
+	// dont show the "Enabled customers only" check box when querying a single customer
+	if (!$cid) {
 ?>
 	<tr <?= $counter++ % 2 == 1 ? 'class="listAlt"' : ''?>>
-	<th class="listHeader" align="left">Download&nbsp;CSV</th>
-	<td><? NewFormItem($f, $s, "savecsv", "checkbox");?></td>
+		<th class="listHeader" align="left">Enabled&nbsp;Customers&nbsp;Only</th>
+		<td><? NewFormItem($f, $s, "enabledcustomersonly", "checkbox");?></td>
+	</tr>
+<?	}?>
+	<tr <?= $counter++ % 2 == 1 ? 'class="listAlt"' : ''?>>
+		<th class="listHeader" align="left">Download&nbsp;CSV</th>
+		<td><? NewFormItem($f, $s, "savecsv", "checkbox");?></td>
 	</tr>
 </table>
 

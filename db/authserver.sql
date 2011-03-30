@@ -363,3 +363,5 @@ ADD `passwordversion` TINYINT NOT NULL AFTER `salt` ;
 
 update portaluser set passwordversion = 1 where length(password) > 16 ;
 
+-- 7.7.x aspadminquery enhancement
+ALTER TABLE `aspadminquery` ADD `options` TEXT NOT NULL;

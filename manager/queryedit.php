@@ -38,6 +38,16 @@ if (CheckFormSubmit($f,$s)) {
 				$managerquery->query = GetFormData($f,$s,"query_$id");
 				$managerquery->numargs = GetFormData($f,$s,"numargs_$id");
 				
+				if (GetFormData($f,$s,"singlecustomer_$id"))
+					$managerquery->setOption("singlecustomer");
+				else
+					$managerquery->unsetOption("singlecustomer");
+					
+				if (GetFormData($f,$s,"usemaster_$id"))
+					$managerquery->setOption("usemaster");
+				else
+					$managerquery->unsetOption("usemaster");
+					
 				$managerquery->update();
 			}
 			
@@ -47,6 +57,16 @@ if (CheckFormSubmit($f,$s)) {
 				$managerquery->notes = GetFormData($f,$s,"notes_new");
 				$managerquery->query = GetFormData($f,$s,"query_new");
 				$managerquery->numargs = GetFormData($f,$s,"numargs_new");
+				
+				if (GetFormData($f,$s,"singlecustomer_new"))
+					$managerquery->setOption("singlecustomer");
+				else
+					$managerquery->unsetOption("singlecustomer");
+					
+				if (GetFormData($f,$s,"usemaster_new"))
+					$managerquery->setOption("usemaster");
+				else
+					$managerquery->unsetOption("usemaster");
 				
 				$managerquery->create();
 			}
@@ -67,12 +87,16 @@ if( $reloadform ) {
 		PutFormData($f,$s,"notes_$id",$managerquery->notes,"text");
 		PutFormData($f,$s,"query_$id",$managerquery->query,"text","nomin","nomax",true);
 		PutFormData($f,$s,"numargs_$id",$managerquery->numargs,"numeric",0,20,true);
+		PutFormData($f, $s, "singlecustomer_$id",$managerquery->getOption("singlecustomer"),"bool", 0, 1);
+		PutFormData($f, $s, "usemaster_$id",$managerquery->getOption("usemaster"),"bool", 0, 1);
 	}
 	
 	PutFormData($f,$s,"name_new","","text",0,255);
 	PutFormData($f,$s,"notes_new","","text");
 	PutFormData($f,$s,"query_new","","text");
 	PutFormData($f,$s,"numargs_new","","numeric",0,20);
+	PutFormData($f, $s, "singlecustomer_new",false,"bool", 0, 1);
+	PutFormData($f, $s, "usemaster_new",false,"bool", 0, 1);
 }
 include_once("nav.inc.php");
 
@@ -94,6 +118,7 @@ NewForm($f);
 		<th align="left">Notes</th>
 		<th align="left">Query</th>
 		<th align="left">Num Args</th>
+		<th align="left">Options</th>
 	</tr>
 <?
 	$counter = 0;
@@ -104,16 +129,24 @@ NewForm($f);
 		<td><? NewFormItem($f, $s, "notes_$id", 'textarea', "30","4",'style="width:100%;"'); ?></td>
 		<td><? NewFormItem($f, $s, "query_$id", 'textarea', "30","4",'style="width:100%;"'); ?></td>
 		<td valign=top><? NewFormItem($f, $s, "numargs_$id", 'text', "3","2"); ?></td>
+		<td valign=top>
+			<? NewFormItem($f, $s, "singlecustomer_$id", 'checkbox', 0, 0, "id=singlecustomer_$id"); ?><label for="singlecustomer_<?=$id?>">Single&nbsp;Customer&nbsp;Query</label><br>
+			<? NewFormItem($f, $s, "usemaster_$id", 'checkbox', 0, 0, "id=usemaster_$id"); ?><label for="usemaster_<?=$id?>">Run&nbsp;on&nbsp;Master</label>
+		</td>
 		</tr>
 <?
 	}
 ?>
-	<tr><td style="border-top: 3px dotted black;" colspan=4>New:</td></tr>
+	<tr><td style="border-top: 3px dotted black;" colspan=5>New:</td></tr>
 	<tr>
 		<td valign=top><? NewFormItem($f, $s, "name_new", 'text', "20","255"); ?></td>
 		<td><? NewFormItem($f, $s, "notes_new", 'textarea', "30","4",'style="width:100%;"'); ?></td>
 		<td><? NewFormItem($f, $s, "query_new", 'textarea', "30","4",'style="width:100%;"'); ?></td>
 		<td valign=top><? NewFormItem($f, $s, "numargs_new", 'text', "3","2"); ?></td>
+		<td valign=top>
+			<? NewFormItem($f, $s, "singlecustomer_new", 'checkbox', 0, 0, "id=singlecustomer_new"); ?><label for="singlecustomer_new">Single&nbsp;Customer&nbsp;Query</label><br>
+			<? NewFormItem($f, $s, "usemaster_new", 'checkbox', 0, 0, "id=usemaster_new"); ?><label for="usemaster_new">Run&nbsp;on&nbsp;Master</label>
+		</td>
 		</tr>
 </table>
 

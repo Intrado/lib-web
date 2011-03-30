@@ -10,6 +10,13 @@ require_once("AspAdminQuery.obj.php");
 if (!$MANAGERUSER->authorized("runqueries"))
 	exit("Not Authorized");
 
+if (isset($_GET['cid'])) {
+	$singlecustomer = true;
+	$cid = $_GET['cid'] + 0;
+} else {
+	$singlecustomer = false;
+}
+
 //TODO implement individual query permissions
 if ($MANAGERUSER->queries == "unrestricted")
 	$managerqueries = DBFindMany("AspAdminQuery", "from aspadminquery order by name");
@@ -17,7 +24,7 @@ else if ($MANAGERUSER->queries)
 	$managerqueries = DBFindMany("AspAdminQuery", "from aspadminquery where id in ($MANAGERUSER->queries) order by name");
 else
 	$managerqueries = array();
-	
+
 include_once("nav.inc.php");
 
 ?>
@@ -31,13 +38,18 @@ include_once("nav.inc.php");
 <?
 	$counter = 0;
 	foreach ($managerqueries as $id => $managerquery) {
+		// if querying for a single customer and it's a single customer query
+		// or.. if querying for all customers and it's an all customer query
+		if (($singlecustomer && $managerquery->getOption("singlecustomer")) ||
+					(!$singlecustomer && !$managerquery->getOption("singlecustomer"))) {
 ?>
-		<tr <?= $counter++ % 2 == 1 ? 'class="listAlt"' : ''?>>
-		<td><?=escapehtml($managerquery->name)?></td>
-		<td><div style="overflow: hidden; white-space:nowrap;"><?=escapehtml($managerquery->notes)?></div></td>
-		<td><a href="queryrun.php?id=<?=$id?>" title="Run"><img src="img/application_go.png" border=0></a></td>
-		</tr>
+			<tr <?= $counter++ % 2 == 1 ? 'class="listAlt"' : ''?>>
+			<td><?=escapehtml($managerquery->name)?></td>
+			<td><div style="overflow: hidden; white-space:nowrap;"><?=escapehtml($managerquery->notes)?></div></td>
+			<td><a href="queryrun.php?id=<?="$id".($singlecustomer?"&cid=$cid":"")?>" title="Run"><img src="img/application_go.png" border=0></a></td>
+			</tr>
 <?
+		}
 	}
 ?>
 </table>
