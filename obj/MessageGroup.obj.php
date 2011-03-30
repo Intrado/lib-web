@@ -138,13 +138,13 @@ class MessageGroup extends DBMappedObject {
 		return $message->format($parts);
 	}
 	
-	function getMessage($type, $subtype, $languagecode, $autotranslate) {
+	function getMessage($type, $subtype, $languagecode, $autotranslate = false) {
 		foreach ($this->getMessages() as $message) {
 			if ($message->type == $type &&
 				$message->subtype == $subtype &&
 				$message->languagecode == $languagecode &&
-				$message->autotranslate == $autotranslate)
-				return $message;
+				(!$autotranslate || $message->autotranslate == $autotranslate))
+						return $message;
 		}
 		
 		return null;

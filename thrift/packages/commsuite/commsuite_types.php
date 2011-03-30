@@ -7,119 +7,85 @@
 include_once $GLOBALS['THRIFT_ROOT'].'/Thrift.php';
 
 
-class commsuite_RenderException extends TException {
+class commsuite_MessageView {
   static $_TSPEC;
 
-
-  public function __construct() {
-    if (!isset(self::$_TSPEC)) {
-      self::$_TSPEC = array(
-        );
-    }
-  }
-
-  public function getName() {
-    return 'RenderException';
-  }
-
-  public function read($input)
-  {
-    $xfer = 0;
-    $fname = null;
-    $ftype = 0;
-    $fid = 0;
-    $xfer += $input->readStructBegin($fname);
-    while (true)
-    {
-      $xfer += $input->readFieldBegin($fname, $ftype, $fid);
-      if ($ftype == TType::STOP) {
-        break;
-      }
-      switch ($fid)
-      {
-        default:
-          $xfer += $input->skip($ftype);
-          break;
-      }
-      $xfer += $input->readFieldEnd();
-    }
-    $xfer += $input->readStructEnd();
-    return $xfer;
-  }
-
-  public function write($output) {
-    $xfer = 0;
-    $xfer += $output->writeStructBegin('RenderException');
-    $xfer += $output->writeFieldStop();
-    $xfer += $output->writeStructEnd();
-    return $xfer;
-  }
-
-}
-
-class commsuite_EmailTemplate {
-  static $_TSPEC;
-
-  public $fromname = null;
-  public $fromaddr = null;
-  public $subject = null;
-  public $body = null;
-  public $htmlbody = null;
-  public $languagecode = null;
+  public $type = null;
+  public $subtype = null;
+  public $emailbody = null;
+  public $emailsubject = null;
+  public $emailfromname = null;
+  public $emailfromaddress = null;
+  public $phonetodo = null;
+  public $smsbody = null;
 
   public function __construct($vals=null) {
     if (!isset(self::$_TSPEC)) {
       self::$_TSPEC = array(
         1 => array(
-          'var' => 'fromname',
+          'var' => 'type',
           'type' => TType::STRING,
           ),
         2 => array(
-          'var' => 'fromaddr',
+          'var' => 'subtype',
           'type' => TType::STRING,
           ),
         3 => array(
-          'var' => 'subject',
+          'var' => 'emailbody',
           'type' => TType::STRING,
           ),
         4 => array(
-          'var' => 'body',
+          'var' => 'emailsubject',
           'type' => TType::STRING,
           ),
         5 => array(
-          'var' => 'htmlbody',
+          'var' => 'emailfromname',
           'type' => TType::STRING,
           ),
         6 => array(
-          'var' => 'languagecode',
+          'var' => 'emailfromaddress',
+          'type' => TType::STRING,
+          ),
+        7 => array(
+          'var' => 'phonetodo',
+          'type' => TType::STRING,
+          ),
+        8 => array(
+          'var' => 'smsbody',
           'type' => TType::STRING,
           ),
         );
     }
     if (is_array($vals)) {
-      if (isset($vals['fromname'])) {
-        $this->fromname = $vals['fromname'];
+      if (isset($vals['type'])) {
+        $this->type = $vals['type'];
       }
-      if (isset($vals['fromaddr'])) {
-        $this->fromaddr = $vals['fromaddr'];
+      if (isset($vals['subtype'])) {
+        $this->subtype = $vals['subtype'];
       }
-      if (isset($vals['subject'])) {
-        $this->subject = $vals['subject'];
+      if (isset($vals['emailbody'])) {
+        $this->emailbody = $vals['emailbody'];
       }
-      if (isset($vals['body'])) {
-        $this->body = $vals['body'];
+      if (isset($vals['emailsubject'])) {
+        $this->emailsubject = $vals['emailsubject'];
       }
-      if (isset($vals['htmlbody'])) {
-        $this->htmlbody = $vals['htmlbody'];
+      if (isset($vals['emailfromname'])) {
+        $this->emailfromname = $vals['emailfromname'];
       }
-      if (isset($vals['languagecode'])) {
-        $this->languagecode = $vals['languagecode'];
+      if (isset($vals['emailfromaddress'])) {
+        $this->emailfromaddress = $vals['emailfromaddress'];
+      }
+      if (isset($vals['phonetodo'])) {
+        $this->phonetodo = $vals['phonetodo'];
+      }
+      if (isset($vals['smsbody'])) {
+        $this->smsbody = $vals['smsbody'];
       }
     }
   }
 
   public function getName() {
-    return 'EmailTemplate';
+    return 'MessageView';
   }
 
   public function read($input)
@@ -139,42 +105,56 @@ class commsuite_EmailTemplate {
       {
         case 1:
           if ($ftype == TType::STRING) {
-            $xfer += $input->readString($this->fromname);
+            $xfer += $input->readString($this->type);
           } else {
             $xfer += $input->skip($ftype);
           }
           break;
         case 2:
           if ($ftype == TType::STRING) {
-            $xfer += $input->readString($this->fromaddr);
+            $xfer += $input->readString($this->subtype);
           } else {
             $xfer += $input->skip($ftype);
           }
           break;
         case 3:
           if ($ftype == TType::STRING) {
-            $xfer += $input->readString($this->subject);
+            $xfer += $input->readString($this->emailbody);
           } else {
             $xfer += $input->skip($ftype);
           }
           break;
         case 4:
           if ($ftype == TType::STRING) {
-            $xfer += $input->readString($this->body);
+            $xfer += $input->readString($this->emailsubject);
           } else {
             $xfer += $input->skip($ftype);
           }
           break;
         case 5:
           if ($ftype == TType::STRING) {
-            $xfer += $input->readString($this->htmlbody);
+            $xfer += $input->readString($this->emailfromname);
           } else {
             $xfer += $input->skip($ftype);
           }
           break;
         case 6:
           if ($ftype == TType::STRING) {
-            $xfer += $input->readString($this->languagecode);
+            $xfer += $input->readString($this->emailfromaddress);
+          } else {
+            $xfer += $input->skip($ftype);
+          }
+          break;
+        case 7:
+          if ($ftype == TType::STRING) {
+            $xfer += $input->readString($this->phonetodo);
+          } else {
+            $xfer += $input->skip($ftype);
+          }
+          break;
+        case 8:
+          if ($ftype == TType::STRING) {
+            $xfer += $input->readString($this->smsbody);
           } else {
             $xfer += $input->skip($ftype);
           }
@@ -191,35 +171,45 @@ class commsuite_EmailTemplate {
 
   public function write($output) {
     $xfer = 0;
-    $xfer += $output->writeStructBegin('EmailTemplate');
-    if ($this->fromname !== null) {
-      $xfer += $output->writeFieldBegin('fromname', TType::STRING, 1);
-      $xfer += $output->writeString($this->fromname);
+    $xfer += $output->writeStructBegin('MessageView');
+    if ($this->type !== null) {
+      $xfer += $output->writeFieldBegin('type', TType::STRING, 1);
+      $xfer += $output->writeString($this->type);
       $xfer += $output->writeFieldEnd();
     }
-    if ($this->fromaddr !== null) {
-      $xfer += $output->writeFieldBegin('fromaddr', TType::STRING, 2);
-      $xfer += $output->writeString($this->fromaddr);
+    if ($this->subtype !== null) {
+      $xfer += $output->writeFieldBegin('subtype', TType::STRING, 2);
+      $xfer += $output->writeString($this->subtype);
       $xfer += $output->writeFieldEnd();
     }
-    if ($this->subject !== null) {
-      $xfer += $output->writeFieldBegin('subject', TType::STRING, 3);
-      $xfer += $output->writeString($this->subject);
+    if ($this->emailbody !== null) {
+      $xfer += $output->writeFieldBegin('emailbody', TType::STRING, 3);
+      $xfer += $output->writeString($this->emailbody);
       $xfer += $output->writeFieldEnd();
     }
-    if ($this->body !== null) {
-      $xfer += $output->writeFieldBegin('body', TType::STRING, 4);
-      $xfer += $output->writeString($this->body);
+    if ($this->emailsubject !== null) {
+      $xfer += $output->writeFieldBegin('emailsubject', TType::STRING, 4);
+      $xfer += $output->writeString($this->emailsubject);
       $xfer += $output->writeFieldEnd();
     }
-    if ($this->htmlbody !== null) {
-      $xfer += $output->writeFieldBegin('htmlbody', TType::STRING, 5);
-      $xfer += $output->writeString($this->htmlbody);
+    if ($this->emailfromname !== null) {
+      $xfer += $output->writeFieldBegin('emailfromname', TType::STRING, 5);
+      $xfer += $output->writeString($this->emailfromname);
       $xfer += $output->writeFieldEnd();
     }
-    if ($this->languagecode !== null) {
-      $xfer += $output->writeFieldBegin('languagecode', TType::STRING, 6);
-      $xfer += $output->writeString($this->languagecode);
+    if ($this->emailfromaddress !== null) {
+      $xfer += $output->writeFieldBegin('emailfromaddress', TType::STRING, 6);
+      $xfer += $output->writeString($this->emailfromaddress);
+      $xfer += $output->writeFieldEnd();
+    }
+    if ($this->phonetodo !== null) {
+      $xfer += $output->writeFieldBegin('phonetodo', TType::STRING, 7);
+      $xfer += $output->writeString($this->phonetodo);
+      $xfer += $output->writeFieldEnd();
+    }
+    if ($this->smsbody !== null) {
+      $xfer += $output->writeFieldBegin('smsbody', TType::STRING, 8);
+      $xfer += $output->writeString($this->smsbody);
       $xfer += $output->writeFieldEnd();
     }
     $xfer += $output->writeFieldStop();

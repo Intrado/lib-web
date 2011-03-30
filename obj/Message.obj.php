@@ -419,19 +419,8 @@ class Message extends DBMappedObject {
 	
 	// preview email message, call appserver to use common rendering logic to support custom templates
 	function renderEmailWithTemplate($jobpriority = 3) {
-		// TODO, maybe this really belongs on the MessageGroup
-		error_log("renderEmailWithTemplate ");
-		error_log("id= ".$this->id);
-		
-		// call appserver to render email
-		$template = renderEmailTemplateForMessageLanguage($this->messagegroupid, $jobpriority, $this->languagecode);
-	
-		if ($this->subtype == "html") {
-			$messagetext = $template->htmlbody;
-		} else {
-			$messagetext = $template->body;
-		}
-		return $messagetext;
+		$view = messagePreviewForPriority($this->id, $jobpriority);
+		return $view->emailbody;
 	}
 	
 	// preview plain email message

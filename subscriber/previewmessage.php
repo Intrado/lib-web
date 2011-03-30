@@ -120,15 +120,14 @@ if ($jobid != 0 && $personid != 0) {
 
 if ($email) {
 	$attachments = $messagegroup->getGlobalEmailAttachments(true);
+	// find which message exists in the group, prefer html
+	$message = $messagegroup->getMessage("email", "html", $_SESSION['previewmessage_langcode']);
+	if ($message == null)
+		$message = $messagegroup->getMessage("email", "plain", $_SESSION['previewmessage_langcode']);
 	
 	// call appserver to render email
-	$template = renderEmailTemplateForJobLanguagePerson($jobid, $_SESSION['previewmessage_langcode'], $personid);
-
-	if ($template->htmlbody != "") {
-		$messagetext = $template->htmlbody;
-	} else {
-		$messagetext = $template->body;
-	}
+	$view = messageViewForJobPerson($message->id, $jobid, $personid);
+	$messagetext = $view->emailbody;
 } else if ($sms) {
 	$messagetext = $messagegroup->getMessageText("sms", "plain", "en", "none");
 }
