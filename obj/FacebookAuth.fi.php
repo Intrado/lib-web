@@ -124,10 +124,12 @@ class FacebookAuth extends FormItem {
 							element.update(e);
 						}
 					}); // end facebook api call
-					// if the call to load user data failed, remove the loader gif
-					if (!fbLoaded) {
-						element.update();
-					}
+					
+					// set a timeout (5 sec) to expire the loader gif if the callback never happened
+					setTimeout(function(){
+						if (!fbLoaded)
+							element.update();
+					}, 5000);
 				}
 				
 				</script>';
