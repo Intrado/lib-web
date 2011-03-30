@@ -98,6 +98,8 @@ if($reload){
 
 }
 
+$custurl = QuickQuery("select c.urlcomponent from customer c where c.id = ?", false, array($currentid));
+
 //////////////////////////////////////////
 // Display functions
 //////////////////////////////////////////
@@ -118,6 +120,7 @@ include("nav.inc.php");
 
 NewForm($f);
 ?>
+<h2>Priorities for customer: <?=$custurl?></h2>
 
 <table class=list>
 	<tr>

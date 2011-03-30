@@ -192,7 +192,13 @@ include_once("nav.inc.php");
 
 
 NewForm($f);
+
+if ($cid) {
+	$custurl = QuickQuery("select c.urlcomponent from customer c where c.id = ?", false, array($cid));
 ?>
+	<h2>Query results for customer: <?=$custurl?></h2>
+<?
+}?>
 
 <table class=list width="100%">
 	<tr>

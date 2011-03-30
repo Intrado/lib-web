@@ -116,11 +116,15 @@ if( $reloadform )
 	PutFormData($f, $s, "gfield",0, "text", "nomin", "nomax", true);
 }
 
+$custurl = QuickQuery("select c.urlcomponent from customer c where c.id = ?", false, array($currentid));
+
 include_once("nav.inc.php");
 
 //custom newform declaration to catch if manager password is submitted
 NewForm($f);
 ?>
+<h2>F field to G field migration for customer: <?=$custurl?></h2>
+
 <br>
 <? 
 NewFormItem($f, $s, "ffield", "selectstart", null, null, "");

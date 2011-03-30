@@ -27,8 +27,14 @@ else
 
 include_once("nav.inc.php");
 
-?>
 
+if ($singlecustomer) {
+	$custurl = QuickQuery("select c.urlcomponent from customer c where c.id = ?", false, array($cid));
+?>
+<h2>Queries for customer: <?=$custurl?></h2>
+
+<?
+}?>
 <table class=list width="100%" style="table-layout: fixed;">
 	<tr class="listHeader">
 		<th align="left">Name</th>

@@ -14,9 +14,11 @@ if (!isset($_GET['cid']))
 
 $cid = $_GET['cid'] + 0;
 
+$custurl = QuickQuery("select c.urlcomponent from customer c where c.id = ?", false, array($cid));
 
 include_once("nav.inc.php");
 ?>
+<h2>Advanced Actions for customer: <?=$custurl?></h2>
 
 <ul>
 
