@@ -19,9 +19,12 @@ class AspAdminQuery extends DBMappedObject{
 	
 	// returns true if the specified option name is attached to this query
 	function getOption($name) {
-		if ($this->optionarray === false)
-			$this->optionarray = explode(",", $this->options);
-		
+		if ($this->optionarray === false) {
+			if ($this->options == "")
+				$this->optionarray = array();
+			else
+				$this->optionarray = explode(",", $this->options);
+		}
 		return in_array($name, $this->optionarray);
 	}
 	
