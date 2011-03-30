@@ -1,9 +1,7 @@
 <?
-// Shared code used by new customer and upgrade customer to create default templates
 // NOTE assumes global $_dbcon already connected to customer database
 
-// dbversion must be 'new' or '7-8', yes a bit of a hack, but saves duplication between new customer and upgrade
-function createDefaultTemplates_7_8($dbversion = 'new', $useSmsMessagelinkInboundnumber = false) {
+function createDefaultTemplates_7_8($useSmsMessagelinkInboundnumber = false) {
 			////////////////////////
 			// general notification
 			$notification_englishplain = "\${body}\n\nTo stop receiving all email messages distributed through this system on behalf of \${displayname}, follow this link and confirm: \${unsubscribelink}\n";
@@ -11,7 +9,7 @@ function createDefaultTemplates_7_8($dbversion = 'new', $useSmsMessagelinkInboun
 			$notification_spanishplain = $notification_englishplain; // TODO
 			$notification_spanishhtml = $notification_englishhtml;
 			
-			if (!createTemplate($dbversion, 'notification', $notification_englishplain, $notification_englishhtml, $notification_spanishplain, $notification_spanishhtml))
+			if (!createTemplate('notification', $notification_englishplain, $notification_englishhtml, $notification_spanishplain, $notification_spanishhtml))
 				return false;
 
 			////////////////////////
@@ -21,7 +19,7 @@ function createDefaultTemplates_7_8($dbversion = 'new', $useSmsMessagelinkInboun
 			$notification_spanishplain = $notification_englishplain; // TODO
 			$notification_spanishhtml = $notification_englishhtml;
 			
-			if (!createTemplate($dbversion, 'emergency', $notification_englishplain, $notification_englishhtml, $notification_spanishplain, $notification_spanishhtml))
+			if (!createTemplate('emergency', $notification_englishplain, $notification_englishhtml, $notification_spanishplain, $notification_spanishhtml))
 				return false;
 				
 			///////////////////////
@@ -100,7 +98,7 @@ function createDefaultTemplates_7_8($dbversion = 'new', $useSmsMessagelinkInboun
 			$messagelink_spanishplain = $messagelink_englishplain; // TODO
 			$messagelink_spanishhtml = $messagelink_englishhtml;
 			
-			$messagegroupid = createTemplate($dbversion, 'messagelink', $messagelink_englishplain, $messagelink_englishhtml, $messagelink_spanishplain, $messagelink_spanishhtml);
+			$messagegroupid = createTemplate('messagelink', $messagelink_englishplain, $messagelink_englishhtml, $messagelink_spanishplain, $messagelink_spanishhtml);
 			if (!$messagegroupid)
 				return false;
 				
@@ -120,14 +118,7 @@ function createDefaultTemplates_7_8($dbversion = 'new', $useSmsMessagelinkInboun
 				$appendinbound = "";
 			}
 			// create message
-			switch ($dbversion) {
-				case 'new':
-					$message = new Message();
-					break;
-				case '7-8':
-					$message = new Message_7_8_r2();
-					break;
-			}	
+			$message = new Message();
 			$message->messagegroupid = $messagegroupid;
 			$message->userid = null;
 			$message->name = "messagelink Template";
@@ -143,14 +134,7 @@ function createDefaultTemplates_7_8($dbversion = 'new', $useSmsMessagelinkInboun
 				return false;
 			
 			// create messagepart
-			switch ($dbversion) {
-				case 'new':
-					$messagepart = new MessagePart();
-					break;
-				case '7-8':
-					$messagepart = new MessagePart_7_8_r2();
-					break;
-			}	
+			$messagepart = new MessagePart();
 			$messagepart->messageid = $message->id;
 			$messagepart->type = "T";
 			$messagepart->txt = "\${displayname} sent a msg. To listen \${messagelink}" . $appendinbound . "\nFor info txt HELP";
@@ -166,24 +150,14 @@ function createDefaultTemplates_7_8($dbversion = 'new', $useSmsMessagelinkInboun
 			$survey_spanishplain = $survey_englishplain; // TODO
 			$survey_spanishhtml = $survey_englishhtml;
 			
-			if (!createTemplate($dbversion, 'survey', $survey_englishplain, $survey_englishhtml, $survey_spanishplain, $survey_spanishhtml))
+			if (!createTemplate('survey', $survey_englishplain, $survey_englishhtml, $survey_spanishplain, $survey_spanishhtml))
 				return false;
 				
 		return true;
 }
 
-function createTemplate($dbversion, $templatetype, $englishplain, $englishhtml, $spanishplain, $spanishhtml) {
-	// validate dbversion, create correct version of object
-	switch ($dbversion) {
-		case 'new':
-			$messagegroup = new MessageGroup();
-			break;
-		case '7-8':
-			$messagegroup = new MessageGroup_7_8_r2();
-			break;
-		default:
-			return false;// invalid dbversion, we don't know what MessageGroup object to create
-	}
+function createTemplate($templatetype, $englishplain, $englishhtml, $spanishplain, $spanishhtml) {
+	$messagegroup = new MessageGroup();
 	// create messagegroup
 	$messagegroup->userid = null;
 	$messagegroup->type = "systemtemplate";
@@ -198,14 +172,7 @@ function createTemplate($dbversion, $templatetype, $englishplain, $englishhtml, 
 			
 	//// English Plain
 	// create message
-	switch ($dbversion) {
-		case 'new':
-			$message = new Message();
-						break;
-		case '7-8':
-			$message = new Message_7_8_r2();
-			break;
-	}	
+	$message = new Message();
 	$message->messagegroupid = $messagegroup->id;
 	$message->userid = null;
 	$message->name = $templatetype . " Template";
@@ -221,14 +188,7 @@ function createTemplate($dbversion, $templatetype, $englishplain, $englishhtml, 
 		return false;
 			
 	// create messagepart
-	switch ($dbversion) {
-		case 'new':
-			$messagepart = new MessagePart();
-			break;
-		case '7-8':
-			$messagepart = new MessagePart_7_8_r2();
-			break;
-	}	
+	$messagepart = new MessagePart();
 	$messagepart->messageid = $message->id;
 	$messagepart->type = "T";
 	$messagepart->txt = $englishplain;
@@ -238,14 +198,7 @@ function createTemplate($dbversion, $templatetype, $englishplain, $englishhtml, 
 		
 	//// English HTML
 	// create message
-	switch ($dbversion) {
-		case 'new':
-			$message = new Message();
-						break;
-		case '7-8':
-			$message = new Message_7_8_r2();
-			break;
-	}	
+	$message = new Message();
 	$message->messagegroupid = $messagegroup->id;
 	$message->userid = null;
 	$message->name = $templatetype . " Template";
@@ -261,14 +214,7 @@ function createTemplate($dbversion, $templatetype, $englishplain, $englishhtml, 
 		return false;
 			
 	// create messagepart
-	switch ($dbversion) {
-		case 'new':
-			$messagepart = new MessagePart();
-			break;
-		case '7-8':
-			$messagepart = new MessagePart_7_8_r2();
-			break;
-	}	
+	$messagepart = new MessagePart();
 	$messagepart->messageid = $message->id;
 	$messagepart->type = "T";
 	$messagepart->txt = $englishhtml;
@@ -278,14 +224,7 @@ function createTemplate($dbversion, $templatetype, $englishplain, $englishhtml, 
 	
 	//// Spanish Plain
 	// create message
-	switch ($dbversion) {
-		case 'new':
-			$message = new Message();
-						break;
-		case '7-8':
-			$message = new Message_7_8_r2();
-			break;
-	}	
+	$message = new Message();
 	$message->messagegroupid = $messagegroup->id;
 	$message->userid = null;
 	$message->name = $templatetype . " Template";
@@ -301,14 +240,7 @@ function createTemplate($dbversion, $templatetype, $englishplain, $englishhtml, 
 		return false;
 			
 	// create messagepart
-	switch ($dbversion) {
-		case 'new':
-			$messagepart = new MessagePart();
-			break;
-		case '7-8':
-			$messagepart = new MessagePart_7_8_r2();
-			break;
-	}	
+	$messagepart = new MessagePart();
 	$messagepart->messageid = $message->id;
 	$messagepart->type = "T";
 	$messagepart->txt = $spanishplain;
@@ -318,14 +250,7 @@ function createTemplate($dbversion, $templatetype, $englishplain, $englishhtml, 
 			
 	//// Spanish HTML
 	// create message
-	switch ($dbversion) {
-		case 'new':
-			$message = new Message();
-						break;
-		case '7-8':
-			$message = new Message_7_8_r2();
-			break;
-	}	
+	$message = new Message();
 	$message->messagegroupid = $messagegroup->id;
 	$message->userid = null;
 	$message->name = $templatetype . " Template";
@@ -341,14 +266,7 @@ function createTemplate($dbversion, $templatetype, $englishplain, $englishhtml, 
 		return false;
 			
 	// create messagepart
-	switch ($dbversion) {
-		case 'new':
-			$messagepart = new MessagePart();
-			break;
-		case '7-8':
-			$messagepart = new MessagePart_7_8_r2();
-			break;
-	}	
+	$messagepart = new MessagePart();
 	$messagepart->messageid = $message->id;
 	$messagepart->type = "T";
 	$messagepart->txt = $spanishhtml;

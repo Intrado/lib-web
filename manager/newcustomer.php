@@ -6,7 +6,7 @@ require_once("../inc/utils.inc.php");
 require_once("../obj/MessageGroup.obj.php");
 require_once("../obj/Message.obj.php");
 require_once("../obj/MessagePart.obj.php");
-require_once("../db/createtemplates.php");
+require_once("createtemplates.php");
 
 
 if (!$MANAGERUSER->authorized("newcustomer"))
