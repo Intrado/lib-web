@@ -19,33 +19,45 @@ require_once("parentportalutils.inc.php");
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization
 ////////////////////////////////////////////////////////////////////////////////
-if(isset($_GET['pid'])){
+
+// verify person is ok for this user
+if (isset($_GET['pid'])) {
 	$personid = DBSafe($_GET['pid']);
 	$ids = getContactIDs($_SESSION['portaluserid']);
-	if(!in_array($personid, $ids)){
+	if (!in_array($personid, $ids)) {
 		redirect("unauthorized.php");
 	}
 } else {
 	exit();
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// Data Handling
-////////////////////////////////////////////////////////////////////////////////
-
-
-if(isset($_GET['mid'])) {
-	$mid = $_GET['mid']+0;
+// get the jobid
+if (isset($_GET['jid'])) {
+	$jobid = $_GET['jid']+0;
 } else {
 	exit();
 }
 
-$messageattachment = new MessageAttachment($mid);
+// verify attachment was for message for job for this person
+if (isset($_GET['attid'])) {
+	$attachmentid = $_GET['attid']+0;
+} else {
+	exit();
+}
 
+$messageattachment = new MessageAttachment($attachmentid);
 $messageid = $messageattachment->messageid;
-if(!QuickQuery("select count(*) from reportperson where personid = $personid and messageid = $messageid and type='email'")){
+if (!QuickQuery("select 1 from job j left join message m on (m.messagegroupid = j.messagegroupid) where j.id = ? and m.id = ?", null, array($jobid, $messageid))) {
 	redirect("unauthorized.php");
 }
+
+if (!QuickQuery("select 1 from reportperson where jobid = ? and personid = ? and type='email'", null, array($jobid, $personid))) {
+	redirect("unauthorized.php");
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Data Handling
+////////////////////////////////////////////////////////////////////////////////
 
 if ($c = contentGet($messageattachment->contentid)) {
 	list($contenttype,$data) = $c;

@@ -197,7 +197,7 @@ startWindow(_L('Details'), 'padding: 3px;');
 				foreach ($attachments as $attachment) {
 ?>
 					<tr>
-						<td><a href="messageattachmentdownload.php?pid=<?= $personid ?>&mid=<?= $attachment->id ?>"><?= escapehtml($attachment->filename)?></a></td>
+						<td><a href="messageattachmentdownload.php?pid=<?= $personid ?>&jid=<?= $jobid ?>&attid=<?= $attachment->id ?>"><?= escapehtml($attachment->filename)?></a></td>
 						<td><?= max(1,round($attachment->size/1024)) ?>K</td>
 					</tr>
 <?
