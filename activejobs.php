@@ -44,8 +44,7 @@ startWindow('Active & Pending Notification Jobs ' . help('System_ActiveJobs'),NU
 $start = 0 + (isset($_GET['pagestart']) ? $_GET['pagestart'] : 0);
 $limit = 100;
 $data = array();
-// reportperson columns are: jobid type userid personid messageid status
-// reportcontact columns are : resultdata
+
 $result = Query(
 			"select SQL_CALC_FOUND_ROWS jobowner.login, j.name, j.status,
 				sum(rc.type='phone') as total_phone,
