@@ -40,7 +40,7 @@ class JobAutoReport extends ReportGenerator{
 			rp." . FieldMap::GetFirstNameField() . " as firstname,
 			rp." . FieldMap::GetLastNameField() . " as lastname,
 			rp.type,
-			coalesce(m.name, sq.name) as messagename,
+			coalesce(mg.name, sq.name) as messagename,
 			coalesce(rc.phone,
 						rc.email,
 						rc.sms,
@@ -72,8 +72,8 @@ class JobAutoReport extends ReportGenerator{
 			inner join job j on (rp.jobid = j.id)
 			inner join user u on (u.id = j.userid)
 			left join	reportcontact rc on (rc.jobid = rp.jobid and rc.type = rp.type and rc.personid = rp.personid)
-			left join	message m on
-							(m.id = rp.messageid)
+			left join	messagegroup mg on
+							(mg.id = j.messagegroupid)
 			left join surveyquestionnaire sq on (sq.id = j.questionnaireid)
 			left join surveyweb sw on (sw.personid = rp.personid and sw.jobid = rp.jobid)
 			left join destlabel dl on (rc.type = dl.type and rc.sequence = dl.sequence)

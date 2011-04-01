@@ -60,7 +60,7 @@ class CallsReport extends ReportGenerator{
 					u.login as username,
 					jt.name as jobtype,
 					rp.type as type,
-					coalesce(m.name, sq.name) as message,
+					coalesce(mg.name, sq.name) as message,
 					coalesce(rc.phone,
 						rc.email,
 						concat(
@@ -80,7 +80,7 @@ class CallsReport extends ReportGenerator{
 					left join reportcontact rc on (rp.jobid = rc.jobid and rp.personid = rc.personid and rp.type = rc.type)
 					inner join job j on (rp.jobid= j.id)
 					inner join jobtype jt on (j.jobtypeid = jt.id)
-					left join message m on (m.id = rp.messageid)
+					left join messagegroup mg on (mg.id = j.messagegroupid)
 					left join surveyquestionnaire sq on (sq.id = j.questionnaireid)
 					inner join user u on (u.id = j.userid)
 					where 1

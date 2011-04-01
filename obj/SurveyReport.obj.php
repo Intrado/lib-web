@@ -267,8 +267,6 @@ class SurveyReport extends ReportGenerator{
 			inner join job j on (rp.jobid = j.id)
 			inner join user u on (u.id = j.userid)
 			left join	reportcontact rc on (rc.jobid = rp.jobid and rc.type = rp.type and rc.personid = rp.personid)
-			left join	message m on
-							(m.id = rp.messageid)
 			left join surveyquestionnaire sq on (sq.id = j.questionnaireid)
 			left join surveyweb sw on (sw.personid = rp.personid and sw.jobid = rp.jobid)
 			where rp.jobid = '$jobid' order by rp.pkey, rp." . FieldMap::GetLastNameField() . ", rp.personid";
