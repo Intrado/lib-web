@@ -144,22 +144,24 @@ if (CheckFormSubmit($f,$s)) {
 							$data[] = $row;
 						}
 					}
-
-					$queryoutput .= '<tr class="listHeader"><th style="border-top: 1px solid black;" colspan=' . count($fields) . '>Customer ' . $customer[0] . '</th></tr>';
-	
-					$line = '<tr class="listHeader">';
-					foreach ($fields as $index => $field)
-							$line .= '<th align="left">' . escapehtml($field->name) . '</th>';
-					$queryoutput .= $line . "</tr>\n";	
-	
-					$counter = 0;
-					foreach ($data as $row) {
-						$line = '<tr '. ($counter++ % 2 == 1 ? 'class="listAlt"' : '') .'>';
-						for ($i = 0; $i < count($row); $i++) {
-							$line .= '<td>' . escapehtml($row[$i]) . '</td>';
+					
+					if (count($data) > 0) { //don't show headers and stuff if there is no data
+						$queryoutput .= '<tr class="listHeader"><th style="border-top: 1px solid black;" colspan=' . count($fields) . '>Customer ' . $customer[0] . '</th></tr>';
+		
+						$line = '<tr class="listHeader">';
+						foreach ($fields as $index => $field)
+								$line .= '<th align="left">' . escapehtml($field->name) . '</th>';
+						$queryoutput .= $line . "</tr>\n";	
+		
+						$counter = 0;
+						foreach ($data as $row) {
+							$line = '<tr '. ($counter++ % 2 == 1 ? 'class="listAlt"' : '') .'>';
+							for ($i = 0; $i < count($row); $i++) {
+								$line .= '<td>' . escapehtml($row[$i]) . '</td>';
+							}
+		
+							$queryoutput .=  $line . "</tr>\n";
 						}
-	
-						$queryoutput .=  $line . "</tr>\n";
 					}
 				}
 			}//foreach customer
@@ -167,7 +169,7 @@ if (CheckFormSubmit($f,$s)) {
 			if ($savecsv) {
 				exit();
 			} else {
-				$queryoutput .= "</table>";
+				$queryoutput .= "</table><hr>";
 			}
 			
 		}
