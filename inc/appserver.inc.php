@@ -4,7 +4,7 @@
 //////////////////////////////////////////////////////
 
 
-// Returns TemplateDTO filled with the reportperson values of the given job.
+// Returns MessageView filled with the reportperson values of the given job.
 //
 // Finds the job's messagegroup and priority, 
 //		appends all message parts for the message of the given language,
@@ -12,12 +12,12 @@
 //		fills all customer variables, fills all person variables,
 //		returns both plain and html email bodies.
 // Used by Contact Manager and Subscriber message viewer
-function renderEmailTemplateForJobLanguagePerson($jobid, $languagecode, $personid) {
+function messageViewForJobPerson($messageid, $jobid, $personid) {
 	global $appserverCommsuiteSocket;
 	global $appserverCommsuiteTransport;
 	global $appserverCommsuiteProtocol;
 	
-//	error_log("renderEmailTemplateForJobLanguagePerson jobid=".$jobid." languagecode=".$languagecode." personid=".$personid);
+//	error_log("messageViewForJobPerson messageid=".$messageid." jobid=".$jobid." personid=".$personid);
 	
 	$attempts = 0;
 	while (true) {
@@ -27,9 +27,9 @@ function renderEmailTemplateForJobLanguagePerson($jobid, $languagecode, $personi
 			// Open up the connection
 			$appserverCommsuiteTransport->open();
 			try {
-				$result = $client->renderEmailTemplateForJobLanguagePerson(session_id(), $jobid, $languagecode, $personid);
+				$result = $client->messageViewForJobPerson(session_id(), $messageid, $jobid, $personid);
 			} catch (commsuite_CommSuite_MessageRendererException $e) {
-				error_log("Unable to render jobid=".$jobid." languagecode=".$languagecode." personid=".$personid);
+				error_log("Unable to render messageid=".$messageid." jobid=".$jobid." personid=".$personid);
 				return false;
 			}
 			$appserverCommsuiteTransport->close();
@@ -37,10 +37,10 @@ function renderEmailTemplateForJobLanguagePerson($jobid, $languagecode, $personi
 		} catch (TException $tx) {
 			$attempts++;
 			// a general thrift exception, like no such server
-			error_log("renderEmailTemplateForJobLanguagePerson: Exception Connection to AppServer (" . $tx->getMessage() . ")");
+			error_log("messageViewForJobPerson: Exception Connection to AppServer (" . $tx->getMessage() . ")");
 			$appserverCommsuiteTransport->close();
 			if ($attempts > 2) {
-				error_log("renderEmailTemplateForJobLanguagePerson: Failed 3 times to get content from appserver");
+				error_log("messageViewForJobPerson: Failed 3 times to get content from appserver");
 				return false;
 			}
 		}
@@ -48,7 +48,7 @@ function renderEmailTemplateForJobLanguagePerson($jobid, $languagecode, $personi
 	return $result;
 }
 
-// Returns TemplateDTO filled with the customer variables for a given language and jobpriority
+// Returns MessageView filled with the customer variables for a given language and jobpriority
 //
 // Finds the template based on job priority,
 //		appends all message parts for the message of the given language,
@@ -56,12 +56,12 @@ function renderEmailTemplateForJobLanguagePerson($jobid, $languagecode, $personi
 //		fills all customer variables, leaving person field inserts as <<First Name>> for display
 //		returns both plain and html email bodies.
 // Used by job message preview
-function renderEmailTemplateForMessageLanguage($messagegroupid, $jobpriority, $languagecode) {
+function messagePreviewForPriority($messageid, $jobpriority) {
 	global $appserverCommsuiteSocket;
 	global $appserverCommsuiteTransport;
 	global $appserverCommsuiteProtocol;
 	
-//	error_log("renderEmailTemplateForMessageLanguage messagegroupid=".$messagegroupid." jobpriority=".$jobpriority." languagecode=".$languagecode);
+//	error_log("messagePreviewForPriority messageid=".$messageid." jobpriority=".$jobpriority);
 	
 	$attempts = 0;
 	while (true) {
@@ -71,9 +71,9 @@ function renderEmailTemplateForMessageLanguage($messagegroupid, $jobpriority, $l
 			// Open up the connection
 			$appserverCommsuiteTransport->open();
 			try {
-				$result = $client->renderEmailTemplateForMessageLanguage(session_id(), $messagegroupid, $jobpriority, $languagecode);
+				$result = $client->messagePreviewForPriority(session_id(), $messageid, $jobpriority);
 			} catch (commsuite_CommSuite_MessageRendererException $e) {
-				error_log("Unable to render messagegroupid=".$messagegroupid." jobpriority=".$jobpriority." languagecode=".$languagecode);
+				error_log("Unable to render messageid=".$messageid." jobpriority=".$jobpriority);
 				return false;
 			}
 			$appserverCommsuiteTransport->close();
@@ -81,10 +81,10 @@ function renderEmailTemplateForMessageLanguage($messagegroupid, $jobpriority, $l
 		} catch (TException $tx) {
 			$attempts++;
 			// a general thrift exception, like no such server
-			error_log("renderEmailTemplateForMessageLanguage: Exception Connection to AppServer (" . $tx->getMessage() . ")");
+			error_log("messagePreviewForPriority: Exception Connection to AppServer (" . $tx->getMessage() . ")");
 			$appserverCommsuiteTransport->close();
 			if ($attempts > 2) {
-				error_log("renderEmailTemplateForMessageLanguage: Failed 3 times to get content from appserver");
+				error_log("messagePreviewForPriority: Failed 3 times to get content from appserver");
 				return false;
 			}
 		}
