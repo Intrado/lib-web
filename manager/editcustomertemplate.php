@@ -58,6 +58,8 @@ if ($templatetype == "messagelink") {
 	$smsmessage = DBFind("Message", "from message where messagegroupid = ? and type = 'sms' and languagecode = 'en'", false, array($messagegroupid));
 	// only one part
 	$smsbody = QuickQuery("select txt from messagepart where messageid = ?", false, array($smsmessage->id));
+} else if ($templatetype == "subscriber") {
+	$showheaders = true;
 } else {
 	$showheaders = false;
 }
