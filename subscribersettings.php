@@ -37,6 +37,8 @@ if ($emaildomain == "")
 	
 $formdata = array();
 
+$formdata['signupsection'] = _L('Account Creation');
+
 $formdata["restrictdomain"] = array(
         "label" => _L("Restrict to Domain"),
         "fieldhelp" => _L('Select this option to restrict which email domains a new subscriber may use.  Account may only be created with an email in one of the domains or subdomains listed.'),
@@ -75,6 +77,48 @@ $formdata["sitecode"] = array(
         "helpstep" => 1
     );
 
+$formdata['accountwarningoptions'] = _L('Account Expiration');
+$formdata["reminder1"] = array(
+        "label" => _L("First Reminder"),
+        "fieldhelp" => _L('...'),
+        "value" => getSystemSetting("subscriber.reminder.1", "30"),
+        "validators" => array(
+            array("ValNumber","min" => 0,"max" => 60)
+        ),
+        "control" => array("TextField","maxlength" => 5),
+        "helpstep" => 2
+    );
+$formdata["reminder2"] = array(
+        "label" => _L("Second Reminder"),
+        "fieldhelp" => _L('...'),
+        "value" => getSystemSetting("subscriber.reminder.2", "15"),
+        "validators" => array(
+            array("ValNumber","min" => 0,"max" => 60)
+        ),
+        "control" => array("TextField","maxlength" => 5),
+        "helpstep" => 2
+    );
+$formdata["reminder3"] = array(
+        "label" => _L("Final Reminder"),
+        "fieldhelp" => _L('...'),
+        "value" => getSystemSetting("subscriber.reminder.3", "2"),
+        "validators" => array(
+            array("ValNumber","min" => 0,"max" => 60)
+        ),
+        "control" => array("TextField","maxlength" => 5),
+        "helpstep" => 2
+    );
+$formdata["expiredays"] = array(
+        "label" => _L("Automatic Close After"),
+        "fieldhelp" => _L('...'),
+        "value" => getSystemSetting("subscriber.expiredays", "180"),
+        "validators" => array(
+            array("ValNumber","min" => 0,"max" => 365)
+        ),
+        "control" => array("TextField","maxlength" => 5),
+        "helpstep" => 2
+    );
+
 
 $buttons = array(submit_button("Done","submit","accept"),
                 icon_button("Cancel","cross",null,"settings.php"));
@@ -100,10 +144,17 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 	} else if (($errors = $form->validate()) === false) { //checks all of the items in this form
 		$postdata = $form->getData(); //gets assoc array of all values {name:value,...}
         
+		// account creation settings
 		$postdata['restrictdomain'] ? setSystemSetting("subscriberauthdomain", "1") : setSystemSetting("subscriberauthdomain", "0");
 		$postdata['requiresitecode'] ? setSystemSetting("subscriberauthcode", "1") : setSystemSetting("subscriberauthcode", "0");
 		setSystemSetting("subscribersitecode", $postdata['sitecode']);
-				
+		// account expiration settings
+		setSystemSetting("subscriber.reminder.1", $postdata['reminder1']);
+		setSystemSetting("subscriber.reminder.2", $postdata['reminder2']);
+		setSystemSetting("subscriber.reminder.3", $postdata['reminder3']);
+		setSystemSetting("subscriber.expiredays", $postdata['expiredays']);
+		
+		// return to settings page
         if ($ajax)
             $form->sendTo("settings.php");
         else
@@ -117,11 +168,11 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 ////////////////////////////////////////////////////////////////////////////////
 
 $PAGE = "admin:settings";
-$TITLE = 'Self-Signup Settings';
+$TITLE = _L('Self-Signup Settings');
 
 include_once("nav.inc.php");
 
-startWindow('Subscriber Options');
+startWindow(_L('Subscriber Options'));
 echo $form->render();
 ?>
 <div style="margin: 5px;">
