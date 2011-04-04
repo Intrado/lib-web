@@ -53,7 +53,44 @@ function upgrade_7_8 ($rev, $shardid, $customerid, $db) {
 			
 			// restore global db connection
 			$_dbcon = $savedbcon;
+		
+		case 6:
+			// case 6 is rev 7, 7.8/7			
+			echo "|";
+			apply_sql("upgrades/db_7-8_pre.sql", $customerid, $db, 7);
+
+						// set global to customer db, restore after this section
+			global $_dbcon;
+			$savedbcon = $_dbcon;
+			$_dbcon = $db;
 			
+			$subscriber_englishplain = "The \${productname} account you created to manage your contact preferences for \${displayname} has not been logged into recently. Your account will be automatically disabled in \${daystotermination} days if you do not log into it.\n\n" .
+					"To keep your account active please login.\n\n" .
+					"Click the link to sign in, or simply enter the address below into your browser.\n" .
+					"\${loginurl}\n\n" .
+					"Thank you,\n" .
+					"\${productname}\n" .
+					"\${logoclickurl}\n\n" .
+					"DO NOT REPLY: This is an automatically generated email. Please do not send a reply message.\n";
+			$subscriber_englishhtml = $subscriber_englishplain;
+			$subscriber_spanishplain = $subscriber_englishplain; // TODO
+			$subscriber_spanishhtml = $subscriber_englishhtml;
+			
+			$messagegroupid = createTemplate('subscriber', $subscriber_englishplain, $subscriber_englishhtml, $subscriber_spanishplain, $subscriber_spanishhtml);
+			if (!$messagegroupid)
+				return false;
+				
+			// set english headers
+			$data = "subject=" . urlencode("Reminder : \${displayname} \${productname} Account Termination Warning") . 
+					"&fromname=" . urlencode("\${productname}") . 
+					"&fromemail=" . urlencode("contactme@schoolmessenger.com");
+			QuickUpdate("update message set data = ? where messagegroupid = ? and type = 'email' and languagecode = 'en'", null, array($data, $messagegroupid));
+			// set spanish headers
+			// TODO spanish subject in $data
+			QuickUpdate("update message set data = ? where messagegroupid = ? and type = 'email' and languagecode = 'es'", null, array($data, $messagegroupid));
+			
+			// restore global db connection
+			$_dbcon = $savedbcon;
 			
 	}
 	

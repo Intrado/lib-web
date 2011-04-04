@@ -34,3 +34,8 @@ $$$
 ALTER TABLE `message` CHANGE `userid` `userid` INT( 11 ) NULL DEFAULT NULL
 $$$
 
+-- $rev 7
+
+ALTER TABLE `reportperson` DROP `messageid`
+$$$
+
