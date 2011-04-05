@@ -56,11 +56,11 @@ $hasenrollment = getSystemSetting('_hasenrollment', false);
 $hasstaffid = ($edituser->staffpkey) ? true : false;
 
 if($IS_COMMSUITE) {
-	$accessprofiles = QuickQueryList("select id, name from access", true);
+	$accessprofiles = QuickQueryList("select id, name from access order by name", true);
 }
 /*CSDELETEMARKER_START*/
 else
-	$accessprofiles = QuickQueryList("select id, name from access where name != 'SchoolMessenger Admin'", true);
+	$accessprofiles = QuickQueryList("select id, name from access where name != 'SchoolMessenger Admin' order by name", true);
 /*CSDELETEMARKER_END*/
 
 if (!count($accessprofiles)) {
