@@ -80,7 +80,10 @@ $languagedata = array();
 // sorted by language name
 foreach (array_keys($languagemap) as $langcode) {
 	$languagedata[$langcode]['name'] = $languagemap[$langcode];
-	$languagedata[$langcode]['subject'] = $messagesbylangcode[$langcode]->subject;
+	if (isset($messagesbylangcode[$langcode]))
+		$languagedata[$langcode]['subject'] = $messagesbylangcode[$langcode]->subject;
+	else
+		$languagedata[$langcode]['subject'] = "";
 	$languagedata[$langcode]['plain'] = $messagegroup->getMessageText("email", "plain", $langcode, "none");
 	$languagedata[$langcode]['html'] = $messagegroup->getMessageText("email", "html", $langcode, "none");
 }
@@ -203,17 +206,14 @@ if (CheckFormSubmit($f, "Save")) {
 			}
 			// single sms message for messagelink
 			if (isset($smsmessage)) {
-					//$message->userid = $defaultmessage->userid;
-					//$message->messagegroupid = $defaultmessage->messagegroupid;
-					//$message->name = $defaultmessage->name;
-					//$message->description = $defaultmessage->description;
-					//$message->type = "sms";
-					//$message->subtype = "";
-					//$message->languagecode = "en";
-					//$message->autotranslate = "none";
-					$message->recreateParts($smsbody, null, null);
-					$message->modifydate = date("Y-m-d H:i:s");
+				$message = $messagegroup->getMessage("sms", "plain", "en", "none");
+				$message->recreateParts($smsbody, null, null);
+				$message->modifydate = date("Y-m-d H:i:s");
+				if ($message->id) {
 					$message->update();
+				} else {
+					$message->create();
+				}
 			}
 			
 			if (!$haserror) {
@@ -265,11 +265,11 @@ if ($showheaders) {
 <table>
 	<tr>
 		<td>From Name:</td>
-		<td><? NewFormItem($f, $s, "fromname", "text", 0, 50); ?></td>
+		<td><? NewFormItem($f, $s, "fromname", "text", 40); ?></td>
 	</tr>
 	<tr>
 		<td>From Email:</td>
-		<td><? NewFormItem($f, $s, "fromemail", "text", 0, 50); ?></td>
+		<td><? NewFormItem($f, $s, "fromemail", "text", 40); ?></td>
 	</tr>
 <?
 	// just so happens that smsmessage is always within showheaders
@@ -277,7 +277,7 @@ if ($showheaders) {
 ?>
 	<tr>
 		<td>SMS English:</td>
-		<td><? NewFormItem($f, $s, "sms_en", "text", 0, 160); ?></td>
+		<td><? NewFormItem($f, $s, "sms_en", "textarea", 55); ?></td>
 	</tr>
 <?
 	} 
@@ -294,18 +294,18 @@ if ($showheaders) {
 ?>
 	<tr>
 		<td>Subject:</td>
-		<td><? NewFormItem($f, $s, "subject_" . $defaultcode, "text", 0, 50); ?></td>
+		<td><? NewFormItem($f, $s, "subject_" . $defaultcode, "text", 40); ?></td>
 	</tr>
 <?
 }
 ?>
 	<tr>
 		<td>HTML:</td>
-		<td><? NewFormItem($f, $s, "html_" . $defaultcode, "textarea", 100); ?></td>
+		<td><? NewFormItem($f, $s, "html_" . $defaultcode, "textarea", 120); ?></td>
 	</tr>
 	<tr>
 		<td>Plain:</td>
-		<td><? NewFormItem($f, $s, "plain_" . $defaultcode, "textarea", 100); ?></td>
+		<td><? NewFormItem($f, $s, "plain_" . $defaultcode, "textarea", 120); ?></td>
 	</tr>
 </table>
 <?
@@ -322,18 +322,18 @@ if ($showheaders) {
 ?>
 	<tr>
 		<td>Subject:</td>
-		<td><? NewFormItem($f, $s, "subject_" . $langcode, "text", 0, 50); ?></td>
+		<td><? NewFormItem($f, $s, "subject_" . $langcode, "text", 40); ?></td>
 	</tr>
 <?
 }
 ?>
 	<tr>
 		<td>HTML:</td>
-		<td><? NewFormItem($f, $s, "html_" . $langcode, "textarea", 100); ?></td>
+		<td><? NewFormItem($f, $s, "html_" . $langcode, "textarea", 120); ?></td>
 	</tr>
 	<tr>
 		<td>Plain:</td>
-		<td><? NewFormItem($f, $s, "plain_" . $langcode, "textarea", 100); ?></td>
+		<td><? NewFormItem($f, $s, "plain_" . $langcode, "textarea", 120); ?></td>
 	</tr>
 </table>
 
