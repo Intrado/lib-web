@@ -56,9 +56,9 @@ $formdata["usernamelength"] = array(
 	"value" => getSystemSetting('usernamelength',5),
 	"validators" => array(
 		array("ValRequired"),
-		array("ValNumber","min" => 4,"max" => 10)
+		array("ValNumber","min" => 1,"max" => 10)
 	),
-	"control" => array("SelectMenu","values"=>array_combine(range(4,10),range(4,10))),
+	"control" => array("SelectMenu","values"=>array_combine(range(1,10),range(1,10))),
 	"helpstep" => $helpstepnum
 );
 
