@@ -48,21 +48,46 @@ if ($jobid != NULL) {
 $jobtype = new JobType($job->jobtypeid);
 
 // assume one list for survey job, TODO support multilist
-$listids = QuickQueryList("select listid from joblist where jobid=?", false, false, array($jobid));
-if (isset($listids[0]))
-	$listid = $listids[0];
-$list = new PeopleList($listid);
-$renderedlist = new RenderedList2($list);
-$renderedlist->initWithList($list);
+//$listids = QuickQueryList("select listid from joblist where jobid=?", false, false, array($jobid));
+//if (isset($listids[0]))
+//	$listid = $listids[0];
+//$list = new PeopleList($listid);
+//$renderedlist = new RenderedList2($list);
+//$renderedlist->initWithList($list);
+$totalpersons = 0;
+$ismultilist = false;
+$multilistids = QuickQueryList("select listid from joblist where jobid=".$job->id);
+if (count($multilistids) > 0) {
+	if (count($multilistids) > 1)
+		$ismultilist = true;
+		
+	$multilist = array();
+	$multirenderedlist = array();
+	foreach ($multilistids as $listid) {
+		$nextlist = new PeopleList($listid);
+		$nextrenderedlist = new RenderedList2();
+		$nextrenderedlist->initWithList($nextlist);
+		$multilist[] = $nextlist;
+		$multirenderedlist[] = $nextrenderedlist;
+		$totalpersons += $nextrenderedlist->getTotal();
+		$list = $nextlist; // used by single list display
+	}
+}
+
+
 $questionnaire = new SurveyQuestionnaire($job->questionnaireid);
 $questions = DBFindMany("SurveyQuestion", "from surveyquestion where questionnaireid = $job->questionnaireid order by questionnumber");
 
-if ($renderedlist->getTotal() == 0)
+$blocksubmit = false;
+if ($totalpersons == 0) {
+	$blocksubmit = true;
 	error("The list you've selected does not have any people in it","Click Cancel to return to the Job configuration page");
+}
 
-if (count($questions) == 0)
+if (count($questions) == 0) {
+	$blocksubmit = true;
 	error("The questionnaire you've selected does not contain any questions","Click Cancel to return to the Survey configuration page");
-
+}
 $warnearly = $SETTINGS['feature']['warn_earliest'] ? $SETTINGS['feature']['warn_earliest'] : "7:00 am";
 $warnlate = $SETTINGS['feature']['warn_latest'] ? $SETTINGS['feature']['warn_latest'] : "9:00 pm";
 if( ( (strtotime($job->starttime) > strtotime($warnlate)) || (strtotime($job->endtime) < strtotime($warnearly))
@@ -75,6 +100,40 @@ if( ( (strtotime($job->starttime) > strtotime($warnlate)) || (strtotime($job->en
 
 
 ////////////////////////////////////////////////////////////////////////////////
+// Display Functions
+////////////////////////////////////////////////////////////////////////////////
+function displayMultilist() {
+	global $multilist, $multirenderedlist, $totalpersons;
+?>
+	<table border="0" cellpadding="2" cellspacing="1" class="list">
+		<tr class="listHeader" align="left" valign="bottom">
+			<th>List</th>
+			<th>Total People</th>
+		</tr>
+<?
+$count = 0;
+foreach($multilist as $mlist) {
+	$rlist = $multirenderedlist[$count++];
+?>
+			<tr valign="middle">
+				<td><?= escapehtml($mlist->name) ?>
+				</td>
+				<td>
+					<?= $rlist->total ?>
+				</td>
+			</tr>
+<?
+}
+?>
+			<tr>
+				<td class="topBorder">TOTAL:</td>
+				<td class="topBorder"><span style="font-weight:bold; font-size: 120%;"><?= number_format($totalpersons) ?></span></td>
+			</tr>
+	</table>
+<?
+}
+
+////////////////////////////////////////////////////////////////////////////////
 // Display
 ////////////////////////////////////////////////////////////////////////////////
 $PAGE = "notifications:survey";
@@ -85,11 +144,14 @@ $f = "survey";
 include_once("nav.inc.php");
 NewForm($f);
 
-if ($renderedlist->getTotal() > 0 && count($questions) > 0)
-	buttons(button('Back',null, 'survey.php'), button('Submit Survey',null, 'jobsubmit.php?jobid=' . $jobid));
-else
-	buttons(button('Cancel',null, 'survey.php'));
-
+if (!$blocksubmit)
+	buttons(button('Save For Later', null, 'surveys.php'),
+			button('Modify Survey Settings',null, 'survey.php'),
+			button('Submit Survey',null, 'jobsubmit.php?jobid=' . $jobid));
+else {
+	buttons(button('Modify Survey Settings',null, 'survey.php'));
+}	
+	
 startWindow("Confirmation &amp; Submit");
 ?>
 <table border="0" cellpadding="3" cellspacing="0" width="100%">
@@ -109,14 +171,25 @@ startWindow("Confirmation &amp; Submit");
 					<td class="bottomBorder" >Job Type</td>
 					<td class="bottomBorder" ><?= escapehtml($jobtype->name); ?></td>
 				</tr>
+<?				if ($ismultilist) {
+?>
+				<tr>
+					<td class="bottomBorder" >List selections</td>
+					<td class="bottomBorder" ><? displayMultilist(); ?></td>
+				</tr>
+
+<?				} else {
+?>
 				<tr>
 					<td class="bottomBorder" >List</td>
 					<td class="bottomBorder" ><?= escapehtml($list->name); ?></td>
 				</tr>
 				<tr>
 					<td class="bottomBorder" >Total people in list:</td>
-					<td class="bottomBorder" ><span style="font-weight:bold; font-size: 120%;"><?= number_format($renderedlist->total) ?></span></td>
+					<td class="bottomBorder" ><span style="font-weight:bold; font-size: 120%;"><?= number_format($totalpersons) ?></span></td>
 				</tr>
+<?				}
+?>
 				<tr>
 					<td class="bottomBorder" >Start Date</td>
 					<td class="bottomBorder" ><?= escapehtml(date("F jS, Y", strtotime($job->startdate))); ?></td>

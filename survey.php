@@ -1,35 +1,47 @@
 <?
+
 ////////////////////////////////////////////////////////////////////////////////
 // Includes
 ////////////////////////////////////////////////////////////////////////////////
-include_once("inc/common.inc.php");
-include_once("inc/securityhelper.inc.php");
-include_once("inc/table.inc.php");
-include_once("inc/html.inc.php");
-include_once("inc/utils.inc.php");
-include_once("inc/date.inc.php");
-include_once("inc/form.inc.php");
-include_once("inc/date.inc.php");
-include_once("obj/Job.obj.php");
-include_once("obj/JobType.obj.php");
-include_once("obj/PeopleList.obj.php");
-include_once("obj/Person.obj.php");
-include_once("obj/Phone.obj.php");
-include_once("obj/SurveyQuestionnaire.obj.php");
-include_once("obj/Phone.obj.php");
+
+require_once("inc/common.inc.php");
+require_once("inc/securityhelper.inc.php");
+require_once("inc/table.inc.php");
+require_once("inc/html.inc.php");
+require_once("inc/utils.inc.php");
+require_once("obj/Validator.obj.php");
+require_once("obj/Form.obj.php");
+require_once("obj/FormItem.obj.php");
+require_once("obj/Job.obj.php");
+require_once("obj/JobType.obj.php");
+require_once("obj/Phone.obj.php"); // Required by job
+require_once("obj/PeopleList.obj.php");
+require_once("obj/Person.obj.php");
+require_once("obj/RenderedList.obj.php");
+require_once("obj/FieldMap.obj.php");
+require_once("obj/Schedule.obj.php");
+require_once("obj/ValDuplicateNameCheck.val.php");
+require_once("obj/MessageGroupSelectMenu.fi.php");
+require_once("obj/ValLists.val.php");
+require_once("obj/ValTimeWindowCallEarly.val.php");
+require_once("obj/ValTimeWindowCallLate.val.php");
+require_once("obj/FormListSelect.fi.php");
+require_once("inc/date.inc.php");
+require_once("obj/ValListSelection.val.php");
+require_once("obj/SurveyQuestionnaire.obj.php");
 
 
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization
 ////////////////////////////////////////////////////////////////////////////////
+
 if (!getSystemSetting('_hassurvey', true) || !$USER->authorize('survey')) {
 	redirect('unauthorized.php');
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-// Data Handling
+// Action/Request Processing
 ////////////////////////////////////////////////////////////////////////////////
-
 if (isset($_GET['id'])) {
 	setCurrentSurvey($_GET['id']);
 	if ($jobid = getCurrentSurvey()) {
@@ -66,22 +78,14 @@ if (getCurrentSurvey() != NULL) {
 	}
 }
 
-$VALIDJOBTYPES = JobType::getUserJobTypes(true);
-$PEOPLELISTS = QuickQueryList("
-			(select id, name, (name +0) as digitsfirst
-			from list
-			where type != 'alert' and not deleted and userid = ?)
-			UNION
-			(select l.id as id, l.name as name, (l.name +0) as digitsfirst
-			from list l
-				inner join publish p on
-					(l.id = p.listid)
-			where not l.deleted
-				and p.userid = ?
-				and p.action = 'subscribe'
-				and p.type = 'list')
-			order by digitsfirst, name",
-			true, false, array($USER->id, $USER->id));
+$userjobtypes = JobType::getUserJobTypes(true);
+// Prepare Job Type data
+$jobtypes = array();
+$jobtips = array();
+foreach ($userjobtypes as $id => $jobtype) {
+	$jobtypes[$id] = $jobtype->name;
+	$jobtips[$id] = escapehtml($jobtype->info);
+}
 
 $QUESTIONNAIRES = array();
 // if submitted or completed, gather only the selected questionnaireid
@@ -92,385 +96,433 @@ if ($submittedmode || $completedmode) {
 	$QUESTIONNAIRES = DBFindMany("SurveyQuestionnaire", "from surveyquestionnaire where userid=$USER->id and deleted = 0 order by name");
 }
 
-/****************** main message section ******************/
-
-$f = "survey";
-$s = "main";
-$reloadform = 0;
-
-
-if(CheckFormSubmit($f,$s) || CheckFormSubmit($f,'send'))
-{
-	//check to see if formdata is valid
-	if(CheckFormInvalid($f))
-	{
-		error('Form was edited in another window, reloading data');
-		$reloadform = 1;
-	}
-	else
-	{
-		MergeSectionFormData($f, $s);
-
-		$name = trim(GetFormData($f,$s,"name"));
-		if ( empty($name) ) {
-			PutFormData($f,$s,"name",'',"text",1,50,true);
-		}
-
-		//do check
-		if( CheckFormSection($f, $s) ) {
-			error('There was a problem trying to save your changes', 'Please verify that all required field information has been entered properly');
-		} else if (strtotime(GetFormData($f,$s,"startdate")) === -1 || strtotime(GetFormData($f,$s,"startdate")) === false) {
-			error('The start date is invalid');
-		} else if (strtotime(GetFormData($f,$s,"starttime")) === -1 || strtotime(GetFormData($f,$s,"starttime")) === false) {
-			error('The start time is invalid');
-		} else if (strtotime(GetFormData($f,$s,"endtime")) === -1 || strtotime(GetFormData($f,$s,"endtime")) === false) {
-			error('The end time is invalid');
-		} else if (strtotime(GetFormData($f,$s,"endtime")) < strtotime(GetFormData($f,$s,"starttime")) ) {
-			error('The end time cannot be before the start time');
-		} else if ((strtotime(GetFormData($f,$s,"startdate"))+((GetFormData($f,$s,"numdays")-1)*86400) < strtotime("today")) && !$completedmode){
-			error('The end date has already passed. Please correct this problem before proceeding');
-		} else if ( (strtotime(GetFormData($f,$s,"startdate"))+((GetFormData($f,$s,"numdays")-1)*86400) == strtotime("today")) && (strtotime(GetFormData($f,$s,"endtime")) < strtotime("now")) && !$completedmode) {
-			error('The end time has already passed. Please correct this problem before proceeding');
-		} else if (QuickQuery("select count(*) from job where deleted = 0 and name = '" . DBsafe($name) . "' and userid = $USER->id and status in ('new','scheduled','processing','procactive','active','repeating') and id!= " . (0 + getCurrentSurvey()))) {
-			error('A job or survey named \'' . $name . '\' already exists');
-		} else if (GetFormData($f,$s,"callerid") != "" && strlen(Phone::parse(GetFormData($f,$s,"callerid"))) != 10) {
-			error('The Caller ID must be exactly 10 digits long (including area code)');
-		} else if (!in_array(GetFormData($f,$s,"jobtypeid"), array_keys($VALIDJOBTYPES))) {
-			error('Invalid jobtype');
-		} else {
-
-			$questionnaireid = GetFormData($f,$s,"questionnaireid") + 0;
-			if (!userOwns("surveyquestionnaire",$questionnaireid))
-				exit();
-
-			$questionnaire = new SurveyQuestionnaire($questionnaireid);
-
-			$listid = GetFormData($f, $s, "listid") + 0;
-			$validlist = QuickQuery("
-			(select 1
-			from list l
-				inner join publish p on
-					(l.id = p.listid)
-			where l.id = ?
-				and not l.deleted
-				and l.type != 'alert'
-				and p.action = 'subscribe'
-				and p.type = 'list'
-				and p.userid = ?)
-			UNION
-			(select 1
-			from list
-			where id = ?
-				and type != 'alert'
-				and userid = ?
-				and not deleted)",
-			false, array($listid,$USER->id,$listid,$USER->id));
-
-			if (!$validlist)
-				exit();
-				
-			//submit changes
-			$jobid = getCurrentSurvey();
-			if ($jobid == null) {
-				$job = Job::jobWithDefaults();
-			} else {
-				$job = new Job($jobid);
-			}
-
-			$job->questionnaireid = $questionnaireid;
-
-			//set unchangable fields
-			$job->type="survey";
-			$job->sendphone = false;
-			$job->messagegroupid = NULL;
-			$job->sendemail = false;
-			$job->modifydate = date("Y-m-d H:i:s", time());
-
-			//always skip dupes
-			$job->setOption("skipduplicates",true);
-
-			//only allow editing some fields
-			if ($completedmode) {
-				$job->name = $name;
-				$job->description = trim(GetFormData($f,$s,"description"));
-			} else if ($submittedmode) {
-				$job->name = $name;
-				$job->description = trim(GetFormData($f,$s,"description"));
-				$fieldsarray = array("startdate", "starttime", "endtime");
-				PopulateObject($f,$s,$job,$fieldsarray);
-				if ($questionnaire->hasphone)
-					$job->setOption("maxcallattempts", GetFormData($f, $s, 'maxcallattempts'));
-				$job->startdate = GetFormData($f, $s, 'startdate');
-								$numdays = GetFormData($f, $s, 'numdays');
-				$job->enddate = date("Y-m-d", strtotime($job->startdate) + (($numdays - 1) * 86400));
-			} else {
-				$job->name = $name;
-				$job->description = trim(GetFormData($f,$s,"description"));
-				$fieldsarray = array("jobtypeid", "starttime", "endtime", "startdate");
-				PopulateObject($f,$s,$job,$fieldsarray);
-				if ($questionnaire->hasphone)
-					$job->setOption("maxcallattempts", GetFormData($f, $s, 'maxcallattempts'));
-				$job->startdate = GetFormData($f, $s, 'startdate');
-				$numdays = GetFormData($f, $s, 'numdays');
-				$job->enddate = date("Y-m-d", strtotime($job->startdate) + (($numdays - 1) * 86400));
-				if($USER->authorize("leavemessage")){
-					if($questionnaire->leavemessage)
-						$job->setOption("leavemessage", true);
-					else
-						$job->setOption("leavemessage", false);
-				}
-			}
-
-			if(!$completedmode){
-				$job->setOption("sendreport",GetFormData($f,$s,"sendreport"));
-			}
-
-			if ($questionnaire->hasphone && $USER->authorize('setcallerid') && !getSystemSetting('_hascallback', false)) {
-				$job->setOptionValue("callerid",Phone::parse(GetFormData($f,$s,"callerid")));
-			} else if ($questionnaire->hasphone) {
-				$callerid = $USER->getSetting("callerid",getSystemSetting('callerid'));
-				$job->setOptionValue("callerid", $callerid);
-			}
-
-
-			//reformat the dates & times to DB friendly format
-			$job->startdate = date("Y-m-d", strtotime($job->startdate));
-			$job->enddate = date("Y-m-d", strtotime($job->enddate));
-			$job->starttime = date("H:i", strtotime($job->starttime));
-			$job->endtime = date("H:i", strtotime($job->endtime));
-
-			$job->update();
-
-			setCurrentSurvey($job->id);
-
-			// save lists after job, need jobid for a new job
-			if (!$completedmode && !$submittedmode) {
-				// single list
-				QuickUpdate("DELETE FROM joblist WHERE jobid=$job->id");
-				QuickUpdate("INSERT into joblist (jobid, listid) VALUES ($job->id, $listid)");
-			}
-
-
-			ClearFormData($f);
-			if (CheckFormSubmit($f,'send')) {
-				redirect("surveyconfirm.php?id=" . $job->id);
-			} else {
-				redirect("surveys.php");
-			}
-		}
-	}
-} else {
-	$reloadform = 1;
+$templates = array("" =>_L("-- Select a template --"));
+foreach ($QUESTIONNAIRES as $questionnaire) {
+	$templates[$questionnaire->id] = $questionnaire->name;
 }
 
-if( $reloadform )
-{
-	ClearFormData($f);
+////////////////////////////////////////////////////////////////////////////////
+// Form Data
+////////////////////////////////////////////////////////////////////////////////
 
-	$jobid = getCurrentSurvey();
-	$listid = null;
-	if ($jobid == null) {
-		$job = Job::jobWithDefaults();
-		$job->questionnaireid = $_SESSION['scheduletemplate'];
+// Prepare List data
+$selectedlists = array();
+if (isset($job->id)) {
+	$selectedlists = QuickQueryList("select listid from joblist where jobid=?", false,false,array($job->id));
+}
+
+// Prepare Scheduling data
+$dayoffset = (strtotime("now") > (strtotime(($ACCESS->getValue("calllate")?$ACCESS->getValue("calllate"):"11:59 pm"))))?1:0;
+
+$customstarttime = isset($job->id)? date("g:i a", strtotime($job->starttime)) : $USER->getCallEarly();
+$costomendtime = isset($job->id)? date("g:i a", strtotime($job->endtime)) : $USER->getCallLate();
+$startvalues = newform_time_select(NULL, $ACCESS->getValue('callearly'), $ACCESS->getValue('calllate'), $customstarttime);
+$endvalues = newform_time_select(NULL, $ACCESS->getValue('callearly'), $ACCESS->getValue('calllate'), $costomendtime);
+
+
+$helpsteps = array();
+$formdata = array();
+
+$formdata[] = _L('Survey');
+
+$helpsteps[] = _L("Enter a name for your survey. " .
+					"Using a descriptive name that indicates the message content will make it easier to find the survey later. " .
+					"You may also optionally enter a description of the survey.");
+	$formdata["name"] = array(
+		"label" => _L('Name'),
+		"fieldhelp" => _L('Enter a name for your survey.'),
+		"value" => isset($job->name)?$job->name:"",
+		"validators" => array(
+			array("ValRequired"),
+			array("ValDuplicateNameCheck","type" => "survey"),
+			array("ValLength","max" => 30)
+		),
+		"control" => array("TextField","size" => 30, "maxlength" => 50),
+		"helpstep" => 1
+	);
+	$formdata["description"] = array(
+		"label" => _L('Description'),
+		"fieldhelp" => _L('Enter a description of the survey. This is optional, but can help identify the survey later.'),
+		"value" => isset($job->description)?$job->description:"",
+		"validators" => array(
+			array("ValLength","min" => 0,"max" => 50)
+		),
+		"control" => array("TextField","size" => 30, "maxlength" => 50),
+		"helpstep" => 1
+	);
+	
+	if ($submittedmode || $completedmode) {
+		$helpsteps[] = _L("Select the option that best describes the type of notification you are sending. 
+							The category you select will determine which introduction your recipients will hear.");
+		$formdata["jobtype"] = array(
+			"label" => _L("Type/Category"),
+			"fieldhelp" => _L("The option that best describes the type of notification you are sending."),
+			"control" => array("FormHtml","html" => escapehtml($jobtypes[$job->jobtypeid])),
+			"helpstep" => 2
+		);
 	} else {
-		$job = new Job($jobid);
-		// assume one list for survey job, TODO support multilist
-		$listids = QuickQueryList("select listid from joblist where jobid=?", false, false, array($jobid));
-		if (isset($listids[0]))
-			$listid = $listids[0];
+		$helpsteps[] = _L("Select the option that best describes the type of notification you are sending.
+							 The category you select will determine which introduction your recipients will hear.");
+		$formdata["jobtype"] = array(
+			"label" => _L("Type/Category"),
+			"fieldhelp" => _L("Select the option that best describes the type of notification you are sending. 
+								The category you select will determine which introduction your recipients will hear."),
+			"value" => isset($job->jobtypeid)?$job->jobtypeid:"",
+			"validators" => array(
+				array("ValRequired"),
+				array("ValInArray", "values" => array_keys($jobtypes))
+			),
+			"control" => array("RadioButton", "values" => $jobtypes, "hover" => $jobtips),
+			"helpstep" => 2
+		);
+	}
+	
+	$helpsteps[] = _L("The Delivery Window designates the earliest call time and the latest call time allowed for notification delivery.<br><br>
+	<b>Note:</b> You may send a survey up until one minute before the cutoff time specified in your Access Profile. You should set the survey to run for two days to ensure all calls are made.");
+	if ($completedmode) {
+		$formdata["date"] = array(
+			"label" => _L("Start Date"),
+			"fieldhelp" => _L("Notification will begin on the selected date."),
+			"control" => array("FormHtml","html" => date("m/d/Y", strtotime($job->startdate))),
+			"helpstep" => 3
+		);
+	} else {
+		$formdata["date"] = array(
+			"label" => _L("Start Date"),
+			"fieldhelp" => _L("Notification will begin on the selected date."),
+			"value" => isset($job->startdate)?$job->startdate:"now + $dayoffset days",
+			"validators" => array(
+				array("ValRequired"),
+				array("ValDate", "min" => date("m/d/Y", strtotime("now + $dayoffset days")))
+			),
+			"control" => array("TextDate", "size"=>12, "nodatesbefore" => $dayoffset),
+			"helpstep" => 3
+		);
+	}
+	if ($completedmode) {
+		$formdata["days"] = array(
+			"label" => _L("Days to Run"),
+			"fieldhelp" => _L("Select the number of days this survey should run."),
+			"control" => array("FormHtml","html" => (86400 + strtotime($job->enddate) - strtotime($job->startdate) ) / 86400),
+			"helpstep" => 3
+		);
+		$formdata["callearly"] = array(
+			"label" => _L("Start Time"),
+			"fieldhelp" => ("This is the earliest time to send calls. This is also determined by your security profile."),
+			"control" => array("FormHtml","html" => date("g:i a", strtotime($job->starttime))),
+			"helpstep" => 3
+		);
+		$formdata["calllate"] = array(
+			"label" => _L("End Time"),
+			"fieldhelp" => ("This is the latest time to send calls. This is also determined by your security profile."),
+			"control" => array("FormHtml","html" => date("g:i a", strtotime($job->endtime))),
+			"helpstep" => 3
+		);
+	} else {
+		// Prepare the the "Number of Days to run" data
+		$maxdays = first($ACCESS->getValue('maxjobdays'), 7);
+		$numdays = array_combine(range(1,$maxdays),range(1,$maxdays));
+		$formdata["days"] = array(
+			"label" => _L("Days to Run"),
+			"fieldhelp" => _L("Select the number of days this survey should run."),
+			"value" => (86400 + strtotime($job->enddate) - strtotime($job->startdate) ) / 86400,
+			"validators" => array(
+				array("ValRequired"),
+				array("ValDate", "min" => 1, "max" => ($ACCESS->getValue('maxjobdays') != null ? $ACCESS->getValue('maxjobdays') : "7"))
+			),
+			"control" => array("SelectMenu", "values" => $numdays),
+			"helpstep" => 3
+		);
+
+		$formdata["callearly"] = array(
+			"label" => _L("Start Time"),
+			"fieldhelp" => ("This is the earliest time to send calls. This is also determined by your security profile."),
+			"value" => date("g:i a", strtotime($job->starttime)),
+			"validators" => array(
+						array("ValRequired"),
+						array("ValTimeCheck", "min" => $ACCESS->getValue('callearly'), "max" => $ACCESS->getValue('calllate')),
+						array("ValTimeWindowCallEarly")
+			),
+			"requires" => array("calllate"),// is only required for non repeating jobs
+			"control" => array("SelectMenu", "values"=>$startvalues),
+			"helpstep" => 3
+		);
+
+		$formdata["calllate"] = array(
+			"label" => _L("End Time"),
+			"fieldhelp" => ("This is the latest time to send calls. This is also determined by your security profile."),
+			"value" => date("g:i a", strtotime($job->endtime)),
+			"validators" => array(
+						array("ValRequired"),
+						array("ValTimeCheck", "min" => $ACCESS->getValue('callearly'), "max" => $ACCESS->getValue('calllate')),
+						array("ValTimeWindowCallLate")
+			),
+			"requires" => array("callearly"), // is only required for non repeating jobs
+			"control" => array("SelectMenu", "values"=>$endvalues),
+			"helpstep" => 3
+		);
+		$formdata["calllate"]["requires"][] = "date";
 	}
 
-	//beautify the dates & times
-	$job->startdate = date("m/j/Y", strtotime($job->startdate));
-	$job->enddate = date("F jS, Y", strtotime($job->enddate));
-	$job->starttime = date("g:i a", strtotime($job->starttime));
-	$job->endtime = date("g:i a", strtotime($job->endtime));
+	$helpsteps[] = _L("Select an existing list to use. If you do not see the list you need,
+						 you can make one by clicking the Lists subtab above. <br><br>
+						 You may also opt to skip duplicates. Skip Duplicates is for calling 
+						 each number once, so if, for example, two recipients have the same 
+						 number, they will only be called once.");
+	$helpsteps[] = _L("Select an existing message to use. If you do not see the message
+						 you need, you can make a new message by clicking the Messages subtab above.");
+	$helpsteps[] = _L("<ul><li>Auto Report - Selecting this option causes the system to email
+						 a report to the email address associated with your account when the job 
+						 is finished.<li>Max Attempts - This option lets you select the maximum
+						 number of times the system should try to contact a recipient.
+						 <li>Allow Reply - Check this if you want recipients to be able to
+						 record responses.<br><br><b>Note:</b>You will need to include instructions
+						 to press '0' to record a response in your message.<br><br>
+						 <li>Allow Confirmation - Select this option if you would like recipients
+						 to give a 'yes' or 'no' response to your message.<br><br>
+						 <b>Note:</b>You will need to include instructions 
+						 to press '1' for 'yes' and '2' for 'no' in your message.</ul>");
+
+	if ($submittedmode || $completedmode) {
+		$formdata[] = _L('List(s)');
+		$query = "select name from list where id in (" . repeatWithSeparator("?", ",", count($selectedlists)) . ")";
+		$listhtml = implode("<br/>",QuickQueryList($query,false,false,$selectedlists));
+		$formdata["lists"] = array(
+			"label" => _L('Lists'),
+			"fieldhelp" => _L('Select a list from your existing lists.'),
+			"control" => array("FormHtml","html" => $listhtml),
+			"helpstep" => 4
+		);
+		
+		$formdata[] = _L('Template');
+		$formdata["template"] = array(
+			"label" => _L('Template'),
+			"fieldhelp" => _L('Select an existing survey template to use from the menu.'),
+			"value" => (((isset($job->questionnaireid) && $job->questionnaireid))?$job->questionnaireid:""),
+			"validators" => array(),
+			"control" => array("MessageGroupSelectMenu", "values" => $templates, "static" => true),
+			"helpstep" => 5
+		);
+		
+		$formdata[] = _L('Advanced Options ');
+		$formdata["report"] = array(
+			"label" => _L('Auto Report'),
+			"fieldhelp" => _L("Select this option if you would like the system to email you when the survey has finished running."),
+			"control" => array(
+				"FormHtml",
+				"html" => "<input type='checkbox' " . ($job->isOption("sendreport")?"checked":"") . " disabled />"),
+			"helpstep" => 6
+		);
+		
+		// Prepare attempt data
+		$maxattempts = first($ACCESS->getValue('callmax'), 1);
+		$attempts = array_combine(range(1,$maxattempts),range(1,$maxattempts));
+
+		$formdata["attempts"] = array(
+			"label" => _L('Max Attempts'),
+			"fieldhelp" => _L("Select the maximum number of times the system should try to contact an individual."),
+			"control" => array("FormHtml","html" => $job->getOptionValue("maxcallattempts")),
+			"helpstep" => 6
+		);
+		
+	} else {
+		$formdata[] = _L('List(s)');
+		$formdata["lists"] = array(
+			"label" => _L('Lists'),
+			"fieldhelp" => _L('Select a list from your existing lists.'),
+			"value" => ($selectedlists)?$selectedlists:array(),
+			"validators" => array(
+				array("ValRequired"),
+				array("ValFormListSelect")
+			),
+			"control" => array("FormListSelect","jobid" => $job->id),
+			"helpstep" => 4
+		);
+		
+		$formdata[] = _L('Template');
+		$formdata["template"] = array(
+			"label" => _L('Template'),
+			"fieldhelp" => _L('Select a survey template from your existing survey templates.'),
+			"value" => (((isset($job->questionnaireid) && $job->questionnaireid))?$job->questionnaireid:""),
+			"validators" => array(
+				array("ValRequired"),
+				array("ValInArray","values"=>array_keys($templates))
+			),
+			"control" => array("MessageGroupSelectMenu", "values" => $templates),
+			"helpstep" => 5
+		);
+		
+		$formdata[] = _L('Advanced Options ');
+		$formdata["report"] = array(
+			"label" => _L('Auto Report'),
+			"fieldhelp" => _L("Select this option if you would like the system to email you when the survey has finished running."),
+			"value" => $job->isOption("sendreport"),
+			"validators" => array(),
+			"control" => array("CheckBox"),
+			"helpstep" => 6
+		);
+		
+				// Prepare attempt data
+		$maxattempts = first($ACCESS->getValue('callmax'), 1);
+		$attempts = array_combine(range(1,$maxattempts),range(1,$maxattempts));
+
+		$formdata["attempts"] = array(
+			"label" => _L('Max Attempts'),
+			"fieldhelp" => ("Select the maximum number of times the system should try to contact an individual."),
+			"value" => $job->getOptionValue("maxcallattempts"),
+			"validators" => array(
+				array("ValRequired"),
+				array("ValNumeric"),
+				array("ValNumber", "min" => 1, "max" => $maxattempts)
+			),
+			"control" => array("SelectMenu", "values" => $attempts),
+			"helpstep" => 6
+		);
+	}
 
 
-	$fields = array(
-		array("name","text",1,50,true),
-		array("description","text",1,50,false),
-		array("jobtypeid","number","nomin","nomax", true),
-		array("questionnaireid","number","nomin","nomax",true),
-		array("starttime","text",1,50,true),
-		array("endtime","text",1,50,true),
-		array('startdate','text', 1, 50, true),
-	);
 
-	PutFormData($f, $s, "listid", $listid, "number", "nomin", "nomax", true);
-	
-	PutFormData($f,$s,"maxcallattempts",$job->getOptionValue("maxcallattempts"), "number",1,$ACCESS->getValue('callmax'),true);
+$buttons = array(submit_button(_L('Save'),"submit","tick"));
+if (!$submittedmode) {
+	$buttons[] = submit_button(_L('Proceed To Confirmation'),"send","arrow_right");
+} 
+$buttons[] = icon_button(_L('Cancel'),"cross",null,(isset($_SESSION['origin']) && ($_SESSION['origin'] == 'start')?"start.php":"surveys.php"));
 
-	PutFormData($f,$s,"callerid", Phone::format($job->getOptionValue("callerid")), "phone", 10, 10, false);
 
-	PopulateForm($f,$s,$job,$fields);
+$form = new Form("jobedit",$formdata,$helpsteps,$buttons);
 
-	PutFormData($f,$s,"sendreport",$job->isOption("sendreport"), "bool",0,1);
-	PutFormData($f, $s, 'numdays', (86400 + strtotime($job->enddate) - strtotime($job->startdate) ) / 86400, 'number', 1, $ACCESS->getValue('maxjobdays'), true);
+////////////////////////////////////////////////////////////////////////////////
+// Form Data Handling
+////////////////////////////////////////////////////////////////////////////////
+
+//check and handle an ajax request (will exit early)
+//or merge in related post data
+$form->handleRequest();
+
+$datachange = false;
+$errors = false;
+//check for form submission
+if ($button = $form->getSubmit()) { //checks for submit and merges in post data
+	$ajax = $form->isAjaxSubmit(); //whether or not this requires an ajax response
+
+	if ($form->checkForDataChange()) {
+		$datachange = true;
+	} else if (($errors = $form->validate()) === false) { //checks all of the items in this form
+		$postdata = $form->getData(); //gets assoc array of all values {name:value,...}
+
+		Query("BEGIN");
+		//save data here
+		$job->name = $postdata['name'];
+		$job->description = $postdata['description'];
+		$job->modifydate = date("Y-m-d H:i:s", time());
+		$job->type = 'survey';
+		
+		$job->sendphone = false;
+		$job->messagegroupid = NULL;
+		$job->sendemail = false;
+		
+		if ($completedmode) {
+			$job->update();
+		} else {
+			$numdays = $postdata['days'];
+			$job->startdate = date("Y-m-d", strtotime($postdata['date']));
+			$job->enddate = date("Y-m-d", strtotime($job->startdate) + (($numdays - 1) * 86400));
+
+			$job->starttime = date("H:i", strtotime($postdata['callearly']));
+			$job->endtime = date("H:i", strtotime($postdata['calllate']));
+
+			if ($submittedmode) {
+				$job->update();
+			} else {
+				$job->jobtypeid = $postdata['jobtype'];
+				$job->userid = $USER->id;
+				
+				$job->setOption("skipduplicates",true);
+				$job->setOption("skipemailduplicates",true);
+				
+				$job->questionnaireid = $postdata['template'];
+				
+				// set jobsetting 'callerid' blank for jobprocessor to lookup the current default at job start
+				if ($USER->authorize('setcallerid') && !getSystemSetting('_hascallback', false)) {
+						// blank callerid is fine, save this setting and default will be looked up by job processor when job starts
+						$job->setOptionValue("callerid",Phone::parse($postdata['callerid']));
+				} else {
+					$job->setOptionValue("callerid", getDefaultCallerID());
+				}
+				
+				$job->setOption("sendreport",$postdata['report']?1:0);
+				$job->setOptionValue("maxcallattempts", $postdata['attempts']);
+
+				if ($job->id) {
+					$job->update();
+				} else {
+					$job->status = "new";
+					$job->createdate = date("Y-m-d H:i:s", time());
+					$job->create();
+				}
+				if ($job->id) {
+					/* Store lists*/
+					QuickUpdate("DELETE FROM joblist WHERE jobid=?",false,array($job->id));
+					$listids = $postdata['lists'];
+					$batchargs = array();
+					$batchsql = "";
+					foreach ($listids as $id) {
+						$batchsql .= "(?,?),";
+						$batchargs[] = $job->id;
+						$batchargs[] = $id;
+					}
+					if ($batchsql) {
+						$sql = "INSERT INTO joblist (jobid,listid) VALUES " . trim($batchsql,",");
+						QuickUpdate($sql,false,$batchargs);
+					}
+				}
+			}
+		}
+		Query("COMMIT");
+
+		if ($button=="send") {
+			$_SESSION['jobid'] = $job->id;
+			$sendto = "surveyconfirm.php";
+		} else {
+			if (isset($_SESSION['origin']) && ($_SESSION['origin'] == 'start')) {
+				unset($_SESSION['origin']);
+				$sendto = 'start.php';
+			} else {
+				$sendto = 'surveys.php';
+			}
+		}
+		if ($ajax)
+			$form->sendTo($sendto);
+		else
+			redirect($sendto);
+	}
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Display
 ////////////////////////////////////////////////////////////////////////////////
 $PAGE = "notifications:survey";
-$TITLE = "Survey Scheduler: " . (getCurrentSurvey() == NULL ? "New Survey" : escapehtml($job->name));
+
+$TITLE = _L('Survey Editor: ');
+$TITLE .= ($job->id == NULL ? _L("New Survey") : escapehtml($job->name));
 
 include_once("nav.inc.php");
-NewForm($f);
 
-if ($submittedmode)
-	buttons(submit($f, $s, 'Save'));
-else
-	buttons(submit($f, $s, 'Save For Later'),submit($f, 'send','Proceed To Confirmation'));
-
-startWindow('Survey Information');
+// Load Custom Form Validators
 ?>
-<table border="0" cellpadding="3" cellspacing="0" width="100%">
-	<tr valign="top">
-		<th align="right" class="windowRowHeader bottomBorder">Settings:<br></th>
-		<td class="bottomBorder">
-			<table border="0" cellpadding="2" cellspacing="0" width="100%">
-				<tr>
-					<td width="30%" >Survey Name <?= help('SurveyScheduler_SurveyName',NULL,"small"); ?></td>
-					<td><? NewFormItem($f,$s,"name","text", 30,50); ?></td>
-				</tr>
-				<tr>
-					<td>Description <?= help('SurveyScheduler_SurveyDesc',NULL,"small"); ?></td>
-					<td><? NewFormItem($f,$s,"description","text", 30,50); ?></td>
-				</tr>
-				<tr>
-					<td>Job Type <?= help('SurveyScheduler_Priority',NULL,"small"); ?></td>
-					<td>
-						<?
-
-						NewFormItem($f,$s,"jobtypeid", "selectstart", NULL, NULL, ($submittedmode ? "DISABLED" : ""));
-						NewFormItem($f,$s,"jobtypeid", "selectoption", " -- Select a Job Type -- ", "");
-						foreach ($VALIDJOBTYPES as $item) {
-							NewFormItem($f,$s,"jobtypeid", "selectoption", $item->name, $item->id);
-						}
-						NewFormItem($f,$s,"jobtypeid", "selectend");
-						?>
-					</td>
-				</tr>
-				<tr>
-					<td>Survey Template <?= help('SurveyScheduler_SurveyTemplate',NULL,"small"); ?></td>
-					<td>
-						<?
-						NewFormItem($f,$s,"questionnaireid", "selectstart", NULL, NULL, ($submittedmode ? "DISABLED" : 'id="questionnaireselect" onchange="checkphonesurvey(this.options[this.selectedIndex].value);"'));
-						NewFormItem($f,$s,"questionnaireid", "selectoption", "-- Select a Template --", NULL);
-						foreach ($QUESTIONNAIRES as $questionnaire) {
-							NewFormItem($f,$s,"questionnaireid", "selectoption", $questionnaire->name, $questionnaire->id);
-						}
-						NewFormItem($f,$s,"questionnaireid", "selectend");
-						?>
-					</td>
-				</tr>
-				<tr>
-					<td>List <?= help('SurveyScheduler_List',NULL,"small"); ?></td>
-					<td>
-						<?
-						NewFormItem($f,$s,"listid", "selectstart", NULL, NULL, ($submittedmode ? "DISABLED" : ""));
-						NewFormItem($f,$s,"listid", "selectoption", "-- Select a List --", NULL);
-						foreach ($PEOPLELISTS as $id => $name) {
-							NewFormItem($f,$s,"listid", "selectoption", $name, $id);
-						}
-						NewFormItem($f,$s,"listid", "selectend");
-						?>
-					</td>
-				</tr>
-				<tr>
-					<td>Start Date <?= help('SurveyScheduler_StartDate',NULL,"small"); ?></td>
-					<td><? NewFormItem($f,$s,"startdate","text", 30, NULL, ($completedmode ? "DISABLED" : "onfocus=\"this.select();pickDate(this,false,true)\" onclick=\"event.cancelBubble=true;\"")); ?>
-					</td>
-				</tr>
-				<tr>
-					<td>Number of days to run <?= help('SurveyScheduler_NumberOfDays', NULL, "small"); ?></td>
-					<td>
-					<?
-					NewFormItem($f, $s, 'numdays', "selectstart", NULL, NULL, ($completedmode ? "DISABLED" : ""));
-					$maxdays = $ACCESS->getValue('maxjobdays');
-					if ($maxdays == null) {
-						$maxdays = 7; // Max out at 7 days if the permission is not set.
-					}
-					for ($i = 1; $i <= $maxdays; $i++) {
-						NewFormItem($f, $s, 'numdays', "selectoption", $i, $i);
-					}
-					NewFormItem($f, $s, 'numdays', "selectend");
-					?>
-					</td>
-				</tr>
-				<tr>
-					<td colspan="2">Survey Time Window:</td>
-				<tr>
-					<td>&nbsp;&nbsp;Earliest <?= help('SurveyScheduler_Earliest', NULL, 'small') ?></td>
-					<td><? time_select($f,$s,"starttime", NULL, NULL, $ACCESS->getValue('callearly'), $ACCESS->getValue('calllate'), ($completedmode ? "DISABLED" : "")); ?></td>
-				</tr>
-				<tr>
-					<td>&nbsp;&nbsp;Latest <?= help('SurveyScheduler_Latest', NULL, 'small') ?></td>
-					<td><? time_select($f,$s,"endtime", NULL, NULL, $ACCESS->getValue('callearly'), $ACCESS->getValue('calllate'), ($completedmode ? "DISABLED" : "")); ?></td>
-				</tr>
-				<tr>
-					<td>Email a report when the survey completes <?= help('SurveyScheduler_EmailReport', NULL, 'small'); ?></td>
-					<td><? NewFormItem($f,$s,"sendreport","checkbox",1, NULL, ($completedmode ? "DISABLED" : "")); ?>Report</td>
-				</tr>
-			</table>
-		</td>
-	</tr>
-	<tr valign="top">
-		<th align="right" class="windowRowHeader">Phone:</th>
-		<td>
-			<table border="0" cellpadding="2" cellspacing="0" width="100%">
-				<tr>
-					<td width="30%">Maximum attempts <?= help('SurveyScheduler_MaxAttempts', NULL, 'small')  ?></td>
-					<td>
-						<?
-						$max = first($ACCESS->getValue('callmax'), 1);
-						NewFormItem($f,$s,"maxcallattempts","selectstart", NULL, NULL, ($completedmode ? "DISABLED" : 'dependson="phonesurvey"'));
-						for($i = 1; $i <= $max; $i++) {
-							NewFormItem($f,$s,"maxcallattempts","selectoption",$i,$i);
-						}
-						NewFormItem($f,$s,"maxcallattempts","selectend");
-						?>
-					</td>
-				</tr>
-<? if ($USER->authorize('setcallerid') && !getSystemSetting('_hascallback', false)) { ?>
-					<tr>
-						<td>Caller&nbsp;ID <?= help('SurveyScheduler_CallerID',NULL,"small"); ?></td>
-						<td><? NewFormItem($f,$s,"callerid","text", 20, 20, ($completedmode ? "DISABLED" : 'dependson="phonesurvey"')); ?></td>
-					</tr>
-<? } ?>
-			</table>
-		</td>
-	</tr>
-</table>
-<?
-endWindow();
-
-
-buttons();
-EndForm();
-
-
-
-$ids = array();
-foreach ($QUESTIONNAIRES as $questionnaire) {
-	$ids[] = $questionnaire->id . ":" . ($questionnaire->hasphone ? "true" : "false");
-}
-
+<script type="text/javascript">
+<? 
+Validator::load_validators(array("ValDuplicateNameCheck",
+								"ValTimeWindowCallEarly",
+								"ValTimeWindowCallLate",
+								"ValFormListSelect"));
 ?>
-
-<script>
-
-var ids = {<?= implode(",",$ids) ?>};
-
-function checkphonesurvey(id) {
-	var callback = function(obj) {obj.disabled = !ids[id];};
-	modifyMarkedNodes (document.forms[0],"dependson","phonesurvey",callback)
-}
-
 </script>
-<script SRC="script/datepicker.js"></script>
-
 <?
+
+startWindow(_L('Survey Information'));
+
+echo $form->render();
+endWindow();
 include_once("navbottom.inc.php");
 ?>

@@ -21,6 +21,11 @@ class ValDuplicateNameCheck extends Validator {
 			if($existsid && $existsid != $_SESSION['jobid']) {
 				return "$this->label: ". _L('There is already an active notification with this name. Please choose another.');
 			}
+		} else if($type == "survey") {
+			$existsid = QuickQuery("select id from job where not deleted and userid=? and name=? and status in ('new','scheduled','processing','procactive','active')",false,array($USER->id, $value));
+			if($existsid && $existsid != $_SESSION['surveyid']) {
+				return "$this->label: ". _L('There is already an active notification with this name. Please choose another.');
+			}
 		} else if($type == "targetedmessagecategory") {
 			$existsid = QuickQuery("select id from targetedmessagecategory where name=? and deleted = 0",false,array($value));
 			if($existsid && $existsid != $_SESSION["targetedmessagecategoryid"]) {
