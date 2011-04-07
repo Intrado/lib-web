@@ -111,16 +111,22 @@ if(isset($_GET['showall'])) {
 */
 
 
-//index 1 is customer id
-//index 2 is customer url
-function fmt_customerUrl($row, $index){
-	$url = "";
+//index 1 is customer ids
+//index 2 is customer urls
+function fmt_customerUrls($row, $index){
+	$links = "";
 	if($row[2] == "UNKNOWN")
-		$url = $row[2];
+		$links = $row[2];
 	else {
-		$url = "<a href=\"customerlink.php?id=" . $row[1] ."\" target=\"_blank\">" . $row[2] . "</a>";
+		$ids =  explode(",",$row[1]);
+		$urls = explode(",",$row[2]);
+		
+		$limit = min(count($ids),count($urls)); // Should be the same
+		for($i = 0;$i < $limit; $i++) {
+			$links .= "<a href=\"customerlink.php?id=" . $ids[$i] ."\" target=\"_blank\">" . $urls[$i] . "</a>, ";
+		}
 	}
-	return $url;
+	return trim($links,", ");
 }
 
 // index 0 is agentid
@@ -169,9 +175,10 @@ else
 $diskserverresults = getAgentList();
 
 $agents = array();
-// TODO how to concat() customerids and urls when one agent associated with many customers?
-$query = "select a.id, ca.customerid, 'UNKNOWN', a.name, 'UNKNOWN', 'UNKNOWN', 'UNKNOWN', a.uuid, a.numpollthread from agent a left join customeragent ca on (ca.agentid = a.id) group by a.id";
+$query = "select a.id, GROUP_CONCAT(DISTINCT  CONVERT(ca.customerid, CHAR(5)) SEPARATOR ','), 'UNKNOWN', a.name, 'UNKNOWN', 'UNKNOWN', 'UNKNOWN', a.uuid, a.numpollthread from agent a left join customeragent ca on (ca.agentid = a.id) group by a.id";
+
 $result = Query($query, $diskdb);
+
 $data = array();
 while ($row = DBGetRow($result)) {
 	if (isset($row[7]) && isset($diskserverresults[$row[7]])) {
@@ -181,9 +188,15 @@ while ($row = DBGetRow($result)) {
 		$row[6] = $agentprops['version'];
 		$diskserverresults[$row[7]]['existsindb'] = true;
 	}
-	if (isset($row[1]) && isset($customerlookup[$row[1]])) {
-		$row[2] = $customerlookup[$row[1]];
+	
+	$customers = explode(",",$row[1]);
+	$customerurls = "";
+	foreach($customers as $customer) {
+		if (isset($customerlookup[$customer])) {
+			$customerurls .= $customerlookup[$customer] . ",";
+		}
 	}
+	$row[2] = trim($customerurls,",");
 	$data[] = $row;
 }
 // add any online agents that the server has, but the database does not
@@ -229,8 +242,8 @@ if ($data) {
 
 // Add field titles, leading # means it is sortable leading @ means it is hidden by default
 $titles = array(0 => "#SwiftSync ID");
-$titles[1] = "#Cust ID";
-$titles[2] = "#Customer URL";
+$titles[1] = "#Cust IDs";
+$titles[2] = "#Customer URLs";
 $titles[3] = "#Name";
 $titles[4] = "#Last IP";
 $titles[5] = "#Last Seen";
@@ -243,7 +256,7 @@ $titles["actions"] = "Actions";
 // Do not provide a checkbox to hide these columns.
 $lockedTitles = array(0, "status", "actions", 2, 3);
 
-$formatters = array(2 => "fmt_customerUrl",
+$formatters = array(2 => "fmt_customerUrls",
 					"actions" => "fmt_DMActions",
 					"status" => "fmt_dmstatus",
 					5 => "fmt_lastseen");
