@@ -319,7 +319,7 @@ if(CheckFormSubmit($f,"Save") || CheckFormSubmit($f, "Return")) {
 				$oldlanguages = GetFormData($f, $s, "oldlanguages");
 				foreach($oldlanguages as $oldlanguage){
 					$lang = "Language" . $oldlanguage;
-					if(GetFormData($f, $s, $lang) === "") {
+					if(GetFormData($f, $s, $lang) === "" && $oldlanguage != 1) {
 						QuickUpdate("delete from language where id = $oldlanguage", $custdb);
 					} else {
 						QuickUpdate("update language set name='" . GetFormData($f, $s, $lang) . "' where id = '" . $oldlanguage . "'", $custdb);
@@ -465,7 +465,9 @@ if( $reloadform ) {
 	foreach($languages as $language){
 		$oldlanguages[] = $language->id;
 		$lang = "Language" . $language->id;
-		PutFormData($f, $s, $lang, $language->name, "text");
+		// only allow language changes to non english languages
+		if ($language->id > 1) 
+			PutFormData($f, $s, $lang, $language->name, "text");
 	}
 	PutFormData($f, $s, "oldlanguages", $oldlanguages);
 	PutFormData($f, $s, "newlangcode", "", "text");
@@ -565,10 +567,11 @@ NewForm($f);
 <?
 foreach($languages as $language){
 	$lang = "Language" . $language->id;
-	?><tr><td><?=$lang?></td><td><div style="display:inline"><?=str_pad($language->code,3)?></div><?
-	NewFormItem($f, $s, $lang, 'text', 25, 50, "id='$lang' onkeyup=\"var s = new getObj('$lang"."_select'); s.obj.selectedIndex = 0;\" onchange=\"var sel = new getObj('$lang"."_select');	for (var i in sel.obj.options) if (this.value == sel.obj.options[i].value) sel.obj.selectedIndex = i;\"") ?>
+	?><tr><td><?=$lang?></td><td><div style="display:inline"><?=str_pad($language->code,3)?></div>
 	<?
-	if ($language->id > 1) {?>
+	if ($language->id > 1) {
+		NewFormItem($f, $s, $lang, 'text', 25, 50, "id='$lang' onkeyup=\"var s = new getObj('$lang"."_select'); s.obj.selectedIndex = 0;\" onchange=\"var sel = new getObj('$lang"."_select');	for (var i in sel.obj.options) if (this.value == sel.obj.options[i].value) sel.obj.selectedIndex = i;\"");
+		?>
 		<select disabled id='<?="$lang"."_select"?>' onchange="if (this.selectedIndex != 0) {var o = new getObj('<?=$lang?>'); o.obj.value = this.options[this.selectedIndex].value;}">
 		<option value=0> -- No Translation Support -- </option>
 		<?foreach ($googlangs as $code => $googlang) {
@@ -579,9 +582,10 @@ foreach($languages as $language){
 			<option value="<?= str_pad($code,3) . " " . $googlang?>" <?=($code == $language->code)?"selected":""?>><?=$googlang . $ttsLangSup?></option>
 		<?}?>
 		</select>
-	<?} else {?>
-		This Language should always be set to English
-	<?}?>
+	<?} else {
+		echo $language->name;
+		//This Language should always be set to English 
+	}?>
 	</td></tr><?
 }
 ?>
