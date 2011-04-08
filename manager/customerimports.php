@@ -264,7 +264,8 @@ if (isset($_GET['cid'])) {
 if (isset($_POST['showmatch'])) {
 	if (isset($_POST['alerttxt']) && trim($_POST['alerttxt'])) {
 		$alerttxt = escapehtml(trim($_POST['alerttxt']));
-		$querytypes = " and alertoptions like '%" . DBSafe(trim($_POST['alerttxt'])) . "%' ";
+		// email addresses are urlencoded in the options i.e. @ => %40. DBSafe will not escape the % so escape it to make it work with mysql like
+		$querytypes = " and alertoptions like '%" . str_replace("%", "\%",DBSafe(urlencode(trim($_POST['alerttxt'])))) . "%' ";
 	}
 	if (isset($_POST['custtxt']) && trim($_POST['custtxt'])) {
 		$custtxt = escapehtml(trim($_POST['custtxt']));
