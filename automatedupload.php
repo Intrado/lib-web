@@ -234,8 +234,8 @@ if (isset($_GET['authCode']) && isset($_GET['sessionId'])) {
 /*
 Authorize (String customer, String identity)
 	Params
-		customer = some string representing the customer. TBD
-		identity = the UUID of this data integration tool.
+		customer = the urlcomponent for the customer. eg "springfieldisd"
+		identity = the UUID for the import, aka upload key.
 	Return values:
 		sessionId = the session id to use if authorized. tracks this session.
 		errorMsg = the error message if failure.
@@ -251,7 +251,9 @@ RequestUpload (String sessionId, String length, String md5checksum)
 		errorMsg = the error message if failure.
 		errorCode = NO_ERROR | INVALID_SESSION
 
-**use http post to send the binary data, (not application/x-www-form-urlencoded) sending the authcode in the GET query ex: "?authCode=xxx" **
+**use http post to send the binary data, (application/octet-stream not application/x-www-form-urlencoded) **
+**send the authcode and sessionid in the GET query ex: "?authCode=xxx&sessionId=xxx" **
+**response is usually HTTP 200 OK, with a minimal debug message, use RequestUploadConfirmation for programatic error handling **
 
 RequestUploadConfirmation (String sessionId, String authcode)
 	Params
