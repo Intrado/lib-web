@@ -105,7 +105,7 @@ if (isset($_GET['authCode']) && isset($_GET['sessionId'])) {
 			$newauthcode = md5(mt_rand() . microtime() . $_SERVER['REMOTE_ADDR']);
 			$_SESSION['authcode'] = $newauthcode;
 			$_SESSION['uploadsuccess'] = false;
-			$_SESSION['length'] = $sess['remaining'] = $length;
+			$_SESSION['length'] = $sess['remaining'] = $length + 0;
 			$_SESSION['md5'] = $md5checksum;
 			$_SESSION['filename'] = secure_tmpname("autoupload",".csv");
 			return array ("authCode" => $newauthcode,
@@ -128,19 +128,19 @@ if (isset($_GET['authCode']) && isset($_GET['sessionId'])) {
 		session_id($sessionid);
 		doStartSession();
 		if (!isset($_SESSION['importid']))
-			return array ("resumeLength" => "0",
+			return array ("resumeLength" => 0,
 						"errorMsg" => "Unknown session",
 						"errorCode" => "INVALID_SESSION");
 
 		//find the authcode
 		if (! (isset($_SESSION['authcode']) && $_SESSION['authcode'] == $authcode) )
-			return array ("resumeLength" => "0",
+			return array ("resumeLength" => 0,
 						"errorMsg" => "Unknown authcode",
 						"errorCode" => "UNAUTHORIZED");
 
 		//have we already uploaded? (handle duplicate confirmation requests)
 		if ($_SESSION['uploadsuccess']) {
-			return array ("resumeLength" => "0",
+			return array ("resumeLength" => 0,
 						"errorMsg" => "",
 						"errorCode" => "NO_ERROR");
 		}
@@ -158,14 +158,14 @@ if (isset($_GET['authCode']) && isset($_GET['sessionId'])) {
 						"errorCode" => "PARTIAL_FILE");
 		//got too much?
 		if (filesize($_SESSION['filename']) < $_SESSION['length'])
-			return array ("resumeLength" => "0",
+			return array ("resumeLength" => 0,
 						"errorMsg" => "Too much data for original file size",
 						"errorCode" => "CHECKSUM_FAILURE");
 
 		//check teh md5
 		$currentmd5 = md5_file($_SESSION['filename']);
 		if ($currentmd5 != $_SESSION['md5'])
-			return array ("resumeLength" => "0",
+			return array ("resumeLength" => 0,
 						"errorMsg" => "Md5 is different. Request mdd5 = " . $_SESSION['md5'] . " Md5 of file on server: $currentmd5",
 						"errorCode" => "CHECKSUM_FAILURE");
 
@@ -178,7 +178,7 @@ if (isset($_GET['authCode']) && isset($_GET['sessionId'])) {
 		$data = file_get_contents($_SESSION['filename']);
 		unlink($_SESSION['filename']);
 		if (!$data  || !$import->upload($data))
-			return array ("resumeLength" => "0",
+			return array ("resumeLength" => 0,
 						"errorMsg" => "There was an error uploading the file",
 						"errorCode" => "UPLOAD_ERROR");
 
@@ -191,7 +191,7 @@ if (isset($_GET['authCode']) && isset($_GET['sessionId'])) {
 		//set uploadsuccess in case the client misses our reply
 		$_SESSION['uploadsuccess'] = true;
 
-		return array ("resumeLength" => "0",
+		return array ("resumeLength" => 0,
 						"errorMsg" => "",
 						"errorCode" => "NO_ERROR");
 
@@ -232,24 +232,28 @@ if (isset($_GET['authCode']) && isset($_GET['sessionId'])) {
 }
 
 /*
+
+NOTE: All arguments are strings. Return values are in an xml-rpc struct with string names and string values
+except RequestUploadConfirmation resumeLength, which is an integer (<i4> or <int>).
+
 Authorize (String customer, String identity)
 	Params
-		customer = the urlcomponent for the customer. eg "springfieldisd"
-		identity = the UUID for the import, aka upload key.
+		string customer = the urlcomponent for the customer. eg "springfieldisd"
+		string identity = the UUID for the import, aka upload key.
 	Return values:
-		sessionId = the session id to use if authorized. tracks this session.
-		errorMsg = the error message if failure.
-		errorCode = NO_ERROR | UNAUTHORIZED
+		string sessionId = the session id to use if authorized. tracks this session.
+		string errorMsg = the error message if failure.
+		string errorCode = NO_ERROR | UNAUTHORIZED
 
 RequestUpload (String sessionId, String length, String md5checksum)
 	Params
-		sessionId
-		length
-		md5checksum
+		string sessionId
+		string length
+		string md5checksum
 	Return values:
-		authcode = request authorization code/token. tracks this upload request. used in http post data.
-		errorMsg = the error message if failure.
-		errorCode = NO_ERROR | INVALID_SESSION
+		string authcode = request authorization code/token. tracks this upload request. used in http post data.
+		string errorMsg = the error message if failure.
+		string errorCode = NO_ERROR | INVALID_SESSION
 
 **use http post to send the binary data, (application/octet-stream not application/x-www-form-urlencoded) **
 **send the authcode and sessionid in the GET query ex: "?authCode=xxx&sessionId=xxx" **
@@ -257,19 +261,19 @@ RequestUpload (String sessionId, String length, String md5checksum)
 
 RequestUploadConfirmation (String sessionId, String authcode)
 	Params
-		sessionId
-		authcode
+		string sessionId
+		string authcode
 	Return values:
-		resumeLength = the number of remaining bytes, if any, that need to be sent.
-		errorMsg = the error message if failure.
-		errorCode = NO_ERROR | INVALID_SESSION | UNAUTHORIZED | CHECKSUM_FAILURE | PARTIAL_FILE | UPLOAD_ERROR
+		int resumeLength = the number of remaining bytes, if any, that need to be sent. normally 0 unless errorCode=PARTIAL_FILE
+		string errorMsg = the error message if failure.
+		string errorCode = NO_ERROR | INVALID_SESSION | UNAUTHORIZED | CHECKSUM_FAILURE | PARTIAL_FILE | UPLOAD_ERROR
 
 CloseSession (String sessionId)
 	Params
-		sessionId
+		string sessionId
 	Return values:
-		errorMsg = the error message if failure.
-		errorCode = NO_ERROR | INVALID_SESSION
+		string errorMsg = the error message if failure.
+		string errorCode = NO_ERROR | INVALID_SESSION
 
 
  */
