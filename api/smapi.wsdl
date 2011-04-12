@@ -303,6 +303,180 @@
             		<xsd:element name="value" type="xsd:string"></xsd:element>
             	</xsd:sequence>
             </xsd:complexType>
+            <xsd:complexType name="getImportsResult">
+            	<xsd:sequence>
+            		<xsd:element
+            			name="resultcode"
+            			type="xsd:string">
+            		</xsd:element>
+            		<xsd:element
+            			name="resultdescription"
+            			type="xsd:string">
+            		</xsd:element>
+            		<xsd:element
+            			name="imports"
+            			type="sm:import" minOccurs="0" maxOccurs="unbounded">
+            		</xsd:element>
+            	</xsd:sequence>
+            </xsd:complexType>
+
+            <xsd:complexType name="import">
+            	<xsd:sequence>
+            		<xsd:element
+            			name="id"
+            			type="xsd:int">
+            		</xsd:element>
+            		<xsd:element
+            			name="name"
+            			type="xsd:string">
+            		</xsd:element>
+            		<xsd:element
+            			name="description"
+            			type="xsd:string">
+            		</xsd:element>
+            		<xsd:element
+            			name="notes"
+            			type="xsd:string">
+            		</xsd:element>
+            		<xsd:element
+            			name="uploadkey"
+            			type="xsd:string">
+            		</xsd:element>
+            		<xsd:element
+            			name="type"
+            			type="xsd:string">
+            		</xsd:element>
+            		<xsd:element
+            			name="method"
+            			type="xsd:string">
+            		</xsd:element>
+            		<xsd:element
+            			name="status"
+            			type="xsd:string">
+            		</xsd:element>
+            		<xsd:element
+            			name="lastrun"
+            			type="xsd:string">
+            		</xsd:element>
+            		<xsd:element
+            			name="filedate"
+            			type="xsd:string">
+            		</xsd:element>
+            		<xsd:element
+            			name="filesize"
+            			type="xsd:int">
+            		</xsd:element>
+            		<xsd:element
+            			name="automatic"
+            			type="xsd:boolean">
+            		</xsd:element>
+            		<xsd:element
+            			name="skipheaderlines"
+            			type="xsd:int">
+            		</xsd:element>
+            	</xsd:sequence>
+            </xsd:complexType>
+            <xsd:complexType name="uploadImportResult">
+            	<xsd:sequence>
+            		<xsd:element
+            			name="resultcode"
+            			type="xsd:string">
+            		</xsd:element>
+            		<xsd:element
+            			name="resultdescription"
+            			type="xsd:string">
+            		</xsd:element>
+            	</xsd:sequence>
+            </xsd:complexType>
+            <xsd:complexType name="runImportResult">
+            	<xsd:sequence>
+            		<xsd:element
+            			name="resultcode"
+            			type="xsd:string">
+            		</xsd:element>
+            		<xsd:element
+            			name="resultdescription"
+            			type="xsd:string">
+            		</xsd:element>
+            	</xsd:sequence>
+            </xsd:complexType>
+            <xsd:complexType name="getImportDetailResult">
+            	<xsd:sequence>
+            		<xsd:element
+            			name="resultcode"
+            			type="xsd:string">
+            		</xsd:element>
+            		<xsd:element
+            			name="resultdescription"
+            			type="xsd:string">
+            		</xsd:element>
+            		<xsd:element
+            			name="import"
+            			type="sm:import">
+            		</xsd:element>
+            		<xsd:element
+            			name="logentries"
+            			type="sm:logentry" minOccurs="0" maxOccurs="unbounded">
+            		</xsd:element>
+            	</xsd:sequence>
+            </xsd:complexType>
+
+            <xsd:complexType name="logentry">
+            	<xsd:sequence>
+            		<xsd:element
+            			name="severity"
+            			type="xsd:string">
+            		</xsd:element>
+            		<xsd:element
+            			name="line"
+            			type="xsd:int">
+            		</xsd:element>
+            		<xsd:element
+            			name="message"
+            			type="xsd:string">
+            		</xsd:element>
+            	</xsd:sequence>
+            </xsd:complexType>
+            <xsd:complexType name="pkeys">
+            	<xsd:sequence>
+            		<xsd:element
+            			name="pkeys"
+            			type="xsd:string" minOccurs="0" maxOccurs="unbounded">
+            		</xsd:element>
+            	</xsd:sequence>
+            </xsd:complexType>
+            <xsd:complexType name="createListFromIdsResult">
+            	<xsd:sequence>
+            		<xsd:element
+            			name="resultcode"
+            			type="xsd:string">
+            		</xsd:element>
+            		<xsd:element
+            			name="resultdescription"
+            			type="xsd:string">
+            		</xsd:element>
+            		<xsd:element
+            			name="listid"
+            			type="xsd:int">
+            		</xsd:element>
+            		<xsd:element
+            			name="numpeople"
+            			type="xsd:int">
+            		</xsd:element>
+            	</xsd:sequence>
+            </xsd:complexType>
+            <xsd:complexType name="deleteListResult">
+            	<xsd:sequence>
+            		<xsd:element
+            			name="resultcode"
+            			type="xsd:string">
+            		</xsd:element>
+            		<xsd:element
+            			name="resultdescription"
+            			type="xsd:string">
+            		</xsd:element>
+            	</xsd:sequence>
+            </xsd:complexType>
 </xsd:schema></wsdl:types>
     <wsdl:message name="loginRequest">
     	<wsdl:part name="loginname" type="xsd:string"></wsdl:part>
@@ -560,6 +734,110 @@ max 20 characters for type 'sms'
     </wsdl:message>
     <wsdl:message name="getSettingsResponse">
     	<wsdl:part name="result" type="sm:getSettingsResult"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="getImportsRequest">
+    	<wsdl:part
+    		name="sessionid"
+    		type="xsd:string">
+    	</wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="getImportsResponse">
+    	<wsdl:part
+    		name="getImportsResponse"
+    		type="sm:getImportsResult">
+    	</wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="uploadImportRequest">
+    	<wsdl:part
+    		name="sessionid"
+    		type="xsd:string">
+    	</wsdl:part>
+    	<wsdl:part
+    		name="importid"
+    		type="xsd:int">
+    	</wsdl:part>
+    	<wsdl:part
+    		name="base64data"
+    		type="xsd:string">
+    	</wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="uploadImportResponse">
+    	<wsdl:part
+    		name="result"
+    		type="sm:uploadImportResult">
+    	</wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="runImportRequest">
+    	<wsdl:part
+    		name="sessionid"
+    		type="xsd:string">
+    	</wsdl:part>
+    	<wsdl:part
+    		name="importid"
+    		type="xsd:int">
+    	</wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="runImportResponse">
+    	<wsdl:part
+    		name="result"
+    		type="sm:runImportResult">
+    	</wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="getImportDetailRequest">
+    	<wsdl:part
+    		name="sessionid"
+    		type="xsd:string">
+    	</wsdl:part>
+    	<wsdl:part
+    		name="importid"
+    		type="xsd:int">
+    	</wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="getImportDetailResponse">
+    	<wsdl:part
+    		name="result"
+    		type="sm:getImportDetailResult">
+    	</wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="createListFromIdsRequest">
+    	<wsdl:part
+    		name="sessionid"
+    		type="xsd:string">
+    	</wsdl:part>
+    	<wsdl:part
+    		name="name"
+    		type="xsd:string">
+    	</wsdl:part>
+    	<wsdl:part
+    		name="description"
+    		type="xsd:string">
+    	</wsdl:part>
+    	<wsdl:part
+    		name="pkeys"
+    		type="sm:pkeys">
+    	</wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="createListFromIdsResponse">
+    	<wsdl:part
+    		name="result"
+    		type="sm:createListFromIdsResult">
+    	</wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="deleteListRequest">
+    	<wsdl:part
+    		name="sessionid"
+    		type="xsd:string">
+    	</wsdl:part>
+    	<wsdl:part
+    		name="listid"
+    		type="xsd:int">
+    	</wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="deleteListResponse">
+    	<wsdl:part
+    		name="result"
+    		type="sm:deleteListResult">
+    	</wsdl:part>
     </wsdl:message>
     <wsdl:portType name="SMClient">
     	<wsdl:operation name="login">
@@ -861,6 +1139,36 @@ returns:
     		<wsdl:documentation>find this user's settings.  use to determine user preferences and other customer settings.</wsdl:documentation>
     		<wsdl:input message="sm:getSettingsRequest"></wsdl:input>
     		<wsdl:output message="sm:getSettingsResponse"></wsdl:output>
+    	</wsdl:operation>
+    	<wsdl:operation name="getImports">
+    		<wsdl:documentation>Returns a list of system imports with status and other data.</wsdl:documentation>
+    		<wsdl:input message="sm:getImportsRequest"></wsdl:input>
+    		<wsdl:output message="sm:getImportsResponse"></wsdl:output>
+    	</wsdl:operation>
+    	<wsdl:operation name="uploadImport">
+    		<wsdl:documentation>Uploads the base64 encoded data to the specified import. If the import is set to automatically run, it will.</wsdl:documentation>
+    		<wsdl:input message="sm:uploadImportRequest"></wsdl:input>
+    		<wsdl:output message="sm:uploadImportResponse"></wsdl:output>
+    	</wsdl:operation>
+    	<wsdl:operation name="runImport">
+    		<wsdl:documentation>Causes the specified import to be queued.</wsdl:documentation>
+    		<wsdl:input message="sm:runImportRequest"></wsdl:input>
+    		<wsdl:output message="sm:runImportResponse"></wsdl:output>
+    	</wsdl:operation>
+    	<wsdl:operation name="getImportDetail">
+    		<wsdl:documentation>Gets data about an import as well as associated log entries.</wsdl:documentation>
+    		<wsdl:input message="sm:getImportDetailRequest"></wsdl:input>
+    		<wsdl:output message="sm:getImportDetailResponse"></wsdl:output>
+    	</wsdl:operation>
+    	<wsdl:operation name="createListFromIds">
+    		<wsdl:documentation>Creates a new list and adds entries for each person authorized from the list of pkeys.</wsdl:documentation>
+    		<wsdl:input message="sm:createListFromIdsRequest"></wsdl:input>
+    		<wsdl:output message="sm:createListFromIdsResponse"></wsdl:output>
+    	</wsdl:operation>
+    	<wsdl:operation name="deleteList">
+    		<wsdl:documentation>Marks a list for deletion, causing it to be soft-deleted. It may still be referenced, but won't be visible in the UI, and will be deleted during periodic mantenance. Does not modify the list contents.</wsdl:documentation>
+    		<wsdl:input message="sm:deleteListRequest"></wsdl:input>
+    		<wsdl:output message="sm:deleteListResponse"></wsdl:output>
     	</wsdl:operation></wsdl:portType>
     <wsdl:binding name="SMBinding" type="sm:SMClient">
 
