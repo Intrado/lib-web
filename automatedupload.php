@@ -249,7 +249,7 @@ RequestUpload (String sessionId, String length, String md5checksum)
 	Return values:
 		authcode = request authorization code/token. tracks this upload request. used in http post data.
 		errorMsg = the error message if failure.
-		errorCode = NO_ERROR | INVALID_SESSION | UNAUTHORIZED | UNKNOWN_TYPE
+		errorCode = NO_ERROR | INVALID_SESSION
 
 **use http post to send the binary data, (not application/x-www-form-urlencoded) sending the authcode in the GET query ex: "?authCode=xxx" **
 
