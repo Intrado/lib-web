@@ -160,14 +160,14 @@ if (isset($_GET['authCode']) && isset($_GET['sessionId'])) {
 		if (filesize($_SESSION['filename']) < $_SESSION['length'])
 			return array ("resumeLength" => "0",
 						"errorMsg" => "Too much data for original file size",
-						"errorCode" => "CHECHSUM_FAILURE");
+						"errorCode" => "CHECKSUM_FAILURE");
 
 		//check teh md5
 		$currentmd5 = md5_file($_SESSION['filename']);
 		if ($currentmd5 != $_SESSION['md5'])
 			return array ("resumeLength" => "0",
 						"errorMsg" => "Md5 is different. Request mdd5 = " . $_SESSION['md5'] . " Md5 of file on server: $currentmd5",
-						"errorCode" => "CHECHSUM_FAILURE");
+						"errorCode" => "CHECKSUM_FAILURE");
 
 		$timezone = getSystemSetting("timezone");
 		@date_default_timezone_set($timezone);
@@ -251,7 +251,7 @@ RequestUpload (String sessionId, String length, String md5checksum)
 		errorMsg = the error message if failure.
 		errorCode = NO_ERROR | INVALID_SESSION | UNAUTHORIZED | UNKNOWN_TYPE
 
-**use http post to send the binary data, sending the authcode in the GET query ex: "?authCode=xxx" **
+**use http post to send the binary data, (not application/x-www-form-urlencoded) sending the authcode in the GET query ex: "?authCode=xxx" **
 
 RequestUploadConfirmation (String sessionId, String authcode)
 	Params
@@ -260,7 +260,7 @@ RequestUploadConfirmation (String sessionId, String authcode)
 	Return values:
 		resumeLength = the number of remaining bytes, if any, that need to be sent.
 		errorMsg = the error message if failure.
-		errorCode = NO_ERROR | INVALID_SESSION | UNAUTHORIZED | CHECHSUM_FAILURE | PARTIAL_FILE | UPLOAD_ERROR
+		errorCode = NO_ERROR | INVALID_SESSION | UNAUTHORIZED | CHECKSUM_FAILURE | PARTIAL_FILE | UPLOAD_ERROR
 
 CloseSession (String sessionId)
 	Params
