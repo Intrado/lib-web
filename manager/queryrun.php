@@ -74,7 +74,7 @@ if (CheckFormSubmit($f,$s)) {
 			}
 				
 			//Following code mostly taken from query_customers, modified somewhat to fit this page	
-			$query = "select c.id, s.readonlyhost, s.dbusername, s.dbpassword, s.id from shard s inner join customer c on (c.shardid = s.id) where 1 $limit order by c.id";
+			$query = "select c.id, s.dbhost, s.readonlyhost, s.dbusername, s.dbpassword, s.id from shard s inner join customer c on (c.shardid = s.id) where 1 $limit order by c.id";
 			$res = Query($query, false, $args);
 			
 			$data = array();
@@ -87,7 +87,12 @@ if (CheckFormSubmit($f,$s)) {
 			$wroteheaders = false;
 			foreach($data as $customer){
 	
-				$custdb = mysql_connect($customer[1], $customer[2], $customer[3]);
+				// if "usemaster", run the query on the master db, not the slave
+				if ($managerquery->getOption("usemaster")) {
+					$custdb = mysql_connect($customer[1], $customer[3], $customer[4]);
+				} else {
+					$custdb = mysql_connect($customer[2], $customer[3], $customer[4]);
+				}
 				mysql_select_db("c_$customer[0]", $custdb);
 			
 				$sqlquery = $managerquery->query;
