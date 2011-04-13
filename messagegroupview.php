@@ -25,6 +25,9 @@ require_once("obj/MessageAttachment.obj.php");
 require_once("obj/Language.obj.php");
 require_once("inc/messagegroup.inc.php");
 require_once("inc/previewfields.inc.php");
+require_once("inc/appserver.inc.php");
+require_once("inc/thrift.inc.php");
+require_once($GLOBALS['THRIFT_ROOT'].'/packages/commsuite/CommSuite.php');
 
 
 $popup = false;
