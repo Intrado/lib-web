@@ -168,6 +168,20 @@ if (CheckFormSubmit($f, "Save")) {
 									error('Template must contain "${messagelink}" variable. ' . $subtype . ' ' . $langcode);
 									$haserror = true;
 								}
+								// also requires a subject
+								$subject = GetFormData($f, $s, "subject_" . $langcode);
+								if (strlen(trim($subject)) == 0) {
+									error('Subject cannot be blank. ' . $langcode);
+									$haserror = true;
+								}
+								break;
+							case "subscriber":
+								// also requires a subject
+								$subject = GetFormData($f, $s, "subject_" . $langcode);
+								if (strlen(trim($subject)) == 0) {
+									error('Subject cannot be blank. ' . $langcode);
+									$haserror = true;
+								}
 								break;
 						}
 					}
@@ -241,11 +255,17 @@ if ($reloadform) {
 	}
 	
 	foreach ($languagedata as $langcode => $data) {
+		// English is required
+		if ($langcode == "en")
+			$isRequired = true;
+		else
+			$isRequired = false;
+		
 		if ($showheaders) {
-			PutFormData($f, $s, 'subject_' . $langcode, $data['subject'], "text", 1, 255, false);
+			PutFormData($f, $s, 'subject_' . $langcode, $data['subject'], "text", 1, 255, $isRequired);
 		}
-		PutFormData($f, $s, 'plain_' . $langcode, $data['plain'], "text", "nomin", "nomax", false);
-		PutFormData($f, $s, 'html_' . $langcode, $data['html'], "text", "nomin", "nomax", false);
+		PutFormData($f, $s, 'plain_' . $langcode, $data['plain'], "text", "nomin", "nomax", $isRequired);
+		PutFormData($f, $s, 'html_' . $langcode, $data['html'], "text", "nomin", "nomax", $isRequired);
 	}
 }
 
