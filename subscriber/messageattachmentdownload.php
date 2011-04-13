@@ -15,16 +15,7 @@ require_once("../inc/content.inc.php");
 require_once("../obj/Content.obj.php");
 require_once("../obj/MessageAttachment.obj.php");
 
-// verify person is ok for this user
-if (isset($_GET['pid'])) {
-	$personid = DBSafe($_GET['pid']);
-	$ids = getContactIDs($_SESSION['portaluserid']);
-	if (!in_array($personid, $ids)) {
-		redirect("unauthorized.php");
-	}
-} else {
-	exit();
-}
+$personid = $_SESSION['personid'];
 
 // get the jobid
 if (isset($_GET['jid'])) {
