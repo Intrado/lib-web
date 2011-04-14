@@ -30,7 +30,7 @@ include_once("nav.inc.php");
 <li><a href="customerbillablecalls.php?cid=<?=$cid?>">Billable calls</a></li>
 <? } ?>
 
-<? if ($MANAGERUSER->authorized("editcustomer")) { ?>
+<? if ($MANAGERUSER->authorized("edittemplate")) { ?>
 <li><a href="customertemplates.php?cid=<?=$cid?>">Templates</a></li>
 <? } ?>
 

@@ -15,6 +15,7 @@ $roles = array(
 	"logincustomer" => "Log in to customer account",
 	"newcustomer" => "Create customers",
 	"editcustomer" => "Edit existing customers",
+	"edittemplate" => "Edit customer templates",
 	"editpriorities" => "Manage customer job types",
 	"customercontacts" => "Search customer contacts",
 	"users" => "View Customer users",

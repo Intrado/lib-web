@@ -5,7 +5,6 @@ require_once("../inc/html.inc.php");
 require_once("../inc/table.inc.php");
 require_once("../inc/utils.inc.php");
 require_once("../inc/themes.inc.php");
-//require_once("../obj/Template.obj.php");
 require_once("../obj/MessageGroup.obj.php");
 require_once("../obj/Message.obj.php");
 require_once("../obj/MessagePart.obj.php");
@@ -14,7 +13,7 @@ require_once("../obj/Voice.obj.php");
 require_once("../obj/Language.obj.php");
 
 
-if (!$MANAGERUSER->authorized("editcustomer"))
+if (!$MANAGERUSER->authorized("edittemplate"))
 	exit("Not Authorized");
 
 if (!isset($_GET['cid']))
