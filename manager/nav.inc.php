@@ -1,4 +1,6 @@
 <?
+header('Content-type: text/html; charset=UTF-8') ;
+
 if ($MANAGERUSER->preference("favcustomers"))
 	$favcid = "?cid=" . implode(",",$MANAGERUSER->preference("favcustomers"));
 else
