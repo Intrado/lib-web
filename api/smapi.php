@@ -1893,6 +1893,128 @@ class SMAPI {
 		return $result;
 	}
 	
+	/**
+	 * Create a new List with the given student IDs.
+	 * 
+	 * @param string $sessionid
+	 * @param string $name - unique list name for this user
+	 * @param string $description
+	 * @param array of strings $ids - array of pkeys, maxsize 10,000
+	 */
+	function createListFromIds($sessionid, $name, $description, $ids) {
+		global $USER, $ACCESS;
+		$result = array("resultcode" => "warning", "resultdescription" => "", "listid" => 0, "numpeople" => 0);
+
+		// validate session
+		if (!APISession($sessionid)) {
+			$result['resultcode'] = 'invalidsession';
+			$result["resultdescription"] = "Invalid Session ID";
+			return $result;
+		}
+		
+		// set user and access of this session
+		$USER = $_SESSION['user'];
+		$ACCESS = $_SESSION['access'];
+
+		// validate user
+		if (!$USER->id) {
+			$result['resultcode'] = 'invalidsession';
+			$result["resultdescription"] = "Invalid user";
+			return $result;
+		}
+		
+		// authorize
+		if (!$USER->authorize('createlist') || !$USER->authorize('listuploadids')) {
+			$result['resultcode'] = 'unauthorized';
+			$result["resultdescription"] =  "User does not have permission to create lists";
+			return $result;
+		}
+		
+		// validate name length
+		if (strlen($name) > 50) {
+			$result['resultcode'] = 'invalidparam';
+			$result["resultdescription"] =  "Name cannot be greater than 50 characters";
+			return $result;
+		}
+		
+		// validate description length
+		if (strlen($description) > 50) {
+			$result['resultcode'] = 'invalidparam';
+			$result["resultdescription"] =  "Description cannot be greater than 50 characters";
+			return $result;
+		}
+		
+		// validate unique name
+		if (QuickQuery('select id from list where deleted=0 and name=? and userid=?', false, array($name, $USER->id))) {
+			$result['resultcode'] = 'invalidparam';
+			$result["resultdescription"] =  "There is already a list with this name";
+			return $result;
+		}
+		
+		$pkeys = $ids->pkeys;
+		
+		// create the new list
+		$list = new PeopleList();
+		$list->userid = $USER->id;
+		$list->type = "person";
+		$list->name = $name;
+		$list->description = $description;
+		$list->modifydate = QuickQuery("select now()");
+		$list->deleted = 0;
+		if (!$list->create()) {
+			// TODO why doesn't api spec have a result 'failure'
+		}
+		$result['listid'] = $list->id;
+		
+		// add the people
+		$numpeople = $list->updateManualAddByPkeys($pkeys);
+		$result['numpeople'] = $numpeople;
+		
+		// success if all people added, else warning
+		if ($numpeople == count($pkeys))
+			$result["resultcode"] = "success";
+		else
+			$result["resultcode"] = "warning"; // somple people skipped, not added to list
+		return $result;
+	}
+	
+	function deleteList($sessionid, $listid) {
+		global $USER, $ACCESS;
+		$result = array("resultcode" => "failure", "resultdescription" => "");
+
+		// validate session
+		if (!APISession($sessionid)) {
+			$result['resultcode'] = 'invalidsession';
+			$result["resultdescription"] = "Invalid Session ID";
+			return $result;
+		}
+		
+		// set user and access of this session
+		$USER = $_SESSION['user'];
+		$ACCESS = $_SESSION['access'];
+
+		// validate user
+		if (!$USER->id) {
+			$result['resultcode'] = 'invalidsession';
+			$result["resultdescription"] = "Invalid user";
+			return $result;
+		}
+		
+		// validate list
+		if (!userOwns("list", $listid)) {
+			$result['resultcode'] = 'unauthorized';
+			$result["resultdescription"] =  "Invalid List " . $listid;
+			return $result;
+		}
+		
+		// soft-delete list
+		QuickUpdate("update list set deleted = 1 where id = ?", false, array($listid));
+		
+		// success
+		$result["resultcode"] = "success";
+		return $result;
+	}
+	
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -2068,6 +2190,7 @@ require_once("../obj/Section.obj.php");
 require_once("../obj/Organization.obj.php");
 require_once("../obj/RenderedList.obj.php");
 require_once("../obj/PeopleList.obj.php");
+require_once("../obj/Person.obj.php");
 require_once("../obj/MessageGroup.obj.php");
 require_once("../obj/Message.obj.php");
 require_once("../obj/MessagePart.obj.php");

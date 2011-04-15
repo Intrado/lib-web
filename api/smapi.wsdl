@@ -1525,6 +1525,78 @@ returns:
     				namespace="http://asp.schoolmessenger.com"></soap:body>
     		</wsdl:output>
     	</wsdl:operation>
+    	<wsdl:operation name="getImports">
+    		<soap:operation
+    			soapAction="http://asp.schoolmessenger.com/getImports" />
+    		<wsdl:input>
+    			<soap:body use="literal"
+    				namespace="http://asp.schoolmessenger.com" />
+    		</wsdl:input>
+    		<wsdl:output>
+    			<soap:body use="literal"
+    				namespace="http://asp.schoolmessenger.com" />
+    		</wsdl:output>
+    	</wsdl:operation>
+    	<wsdl:operation name="uploadImport">
+    		<soap:operation
+    			soapAction="http://asp.schoolmessenger.com/uploadImport" />
+    		<wsdl:input>
+    			<soap:body use="literal"
+    				namespace="http://asp.schoolmessenger.com" />
+    		</wsdl:input>
+    		<wsdl:output>
+    			<soap:body use="literal"
+    				namespace="http://asp.schoolmessenger.com" />
+    		</wsdl:output>
+    	</wsdl:operation>
+    	<wsdl:operation name="runImport">
+    		<soap:operation
+    			soapAction="http://asp.schoolmessenger.com/runImport" />
+    		<wsdl:input>
+    			<soap:body use="literal"
+    				namespace="http://asp.schoolmessenger.com" />
+    		</wsdl:input>
+    		<wsdl:output>
+    			<soap:body use="literal"
+    				namespace="http://asp.schoolmessenger.com" />
+    		</wsdl:output>
+    	</wsdl:operation>
+    	<wsdl:operation name="getImportDetail">
+    		<soap:operation
+    			soapAction="http://asp.schoolmessenger.com/getImportDetail" />
+    		<wsdl:input>
+    			<soap:body use="literal"
+    				namespace="http://asp.schoolmessenger.com" />
+    		</wsdl:input>
+    		<wsdl:output>
+    			<soap:body use="literal"
+    				namespace="http://asp.schoolmessenger.com" />
+    		</wsdl:output>
+    	</wsdl:operation>
+    	<wsdl:operation name="createListFromIds">
+    		<soap:operation
+    			soapAction="http://asp.schoolmessenger.com/createListFromIds" />
+    		<wsdl:input>
+    			<soap:body use="literal"
+    				namespace="http://asp.schoolmessenger.com" />
+    		</wsdl:input>
+    		<wsdl:output>
+    			<soap:body use="literal"
+    				namespace="http://asp.schoolmessenger.com" />
+    		</wsdl:output>
+    	</wsdl:operation>
+    	<wsdl:operation name="deleteList">
+    		<soap:operation
+    			soapAction="http://asp.schoolmessenger.com/deleteList" />
+    		<wsdl:input>
+    			<soap:body use="literal"
+    				namespace="http://asp.schoolmessenger.com" />
+    		</wsdl:input>
+    		<wsdl:output>
+    			<soap:body use="literal"
+    				namespace="http://asp.schoolmessenger.com" />
+    		</wsdl:output>
+    	</wsdl:operation>
     </wsdl:binding>
 
     <wsdl:service name="SMAPI">
