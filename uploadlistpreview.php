@@ -203,36 +203,15 @@ if (CheckFormSubmit($f,'save') && !$errormsg) {
 		}
 
 	} else {
-		//just sync the IDs
-
-		$personids = array();
+		// read pkeys from file
 		if ($fp = fopen($curfilename, "r")) {
-			$temppersonids = array();
+			$pkeys = array();
 			while ($row = fgetcsv($fp,4096)) {
-				$pkey = DBSafe(trim($row[0]));
-				if ($pkey == "")
-					continue;
-
-				$p = DBFind("Person","from person where pkey=?", false, array($pkey));
-				if ($p && $USER->canSeePerson($p->id)) {
-					//use associative array to dedupe pids
-					$temppersonids[$p->id] = 1;
-				}
+				$pkeys[] = DBSafe(trim($row[0]));
 			}
 			fclose($fp);
-			//flip associative array
-			$personids = array_keys($temppersonids);
-
-			$oldids = QuickQueryList("select p.id from person p, listentry le where p.id=le.personid and le.type='add' and p.userid is null and le.listid=$list->id");
-			$deleteids = array_diff($oldids, $personids);
-			$addids = array_diff($personids, $oldids);
-
-			$query = "delete from listentry where personid in ('" . implode("','",$deleteids) . "') and listid = " . $list->id;
-			QuickUpdate($query);
-			if (count($addids) > 0) {
-				$query = "insert into listentry (listid, type, personid) values ($list->id,'add','" . implode("'),($list->id,'add','",$addids) . "')";
-				QuickUpdate($query);
-			}
+			// update the list of people
+			$list->updateManualAddByPkeys($pkeys);
 		} else {
 			$errormsg = "Unable to open the file";
 		}

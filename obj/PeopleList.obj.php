@@ -65,6 +65,41 @@ class PeopleList extends DBMappedObject {
 		return QuickQuery($query, false, array($this->id));
 	}
 	
+	function updateManualAddByPkeys($pkeys) {
+		global $USER;
+		
+		// find all personids
+		$temppersonids = array();
+		foreach ($pkeys as $pkey) {
+			if ($pkey == "")
+				continue;
+			$p = DBFind("Person","from person where pkey=?", false, array($pkey));
+			if ($p && $USER->canSeePerson($p->id)) {
+				//use associative array to dedupe pids
+				$temppersonids[$p->id] = 1;
+			}
+		}
+		//flip associative array
+		$personids = array_keys($temppersonids);
+		
+		// sync up the ids
+		$oldids = QuickQueryList("select p.id from person p, listentry le where p.id=le.personid and le.type='add' and p.userid is null and le.listid=$this->id");
+		$deleteids = array_diff($oldids, $personids);
+		$addids = array_diff($personids, $oldids);
+
+		if (count($deleteids) > 0) {
+			$query = "delete from listentry where personid in ('" . implode("','",$deleteids) . "') and listid = " . $this->id;
+			QuickUpdate($query);
+		}
+		if (count($addids) > 0) {
+			$query = "insert into listentry (listid, type, personid) values ($this->id,'add','" . implode("'),($this->id,'add','",$addids) . "')";
+			QuickUpdate($query);
+		}
+		
+		// return number of system contacts manually added to list
+		return count($personids);
+	}
+	
 }
 
 ?>
