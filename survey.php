@@ -76,6 +76,10 @@ if (getCurrentSurvey() != NULL) {
 	if ($job->status == 'active' || $job->status == 'procactive' || $job->status == 'processing' || $job->status == 'scheduled' || $completedmode) {
 		$submittedmode = true;
 	}
+} else {
+	$job = Job::jobWithDefaults();
+	setCurrentSurvey("new");
+	$job->questionnaireid = $_SESSION['scheduletemplate'];
 }
 
 $userjobtypes = JobType::getUserJobTypes(true);
