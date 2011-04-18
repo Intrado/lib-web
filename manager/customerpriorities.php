@@ -21,7 +21,14 @@ if (isset($_SESSION['currentid'])) {
 }
 
 if (isset($_GET['delete'])) {
-	QuickUpdate("update jobtype set deleted=1 where id=?",$custdb,array($_GET['delete']));
+	list($priority,$issurvey) = QuickQueryRow("select systempriority,issurvey from jobtype where id=?",false,$custdb,array($_GET['delete']));
+	
+	$hasmorejobtypes = 1 < QuickQuery("select count(*) from jobtype where issurvey=? and deleted=0",$custdb, array($issurvey));
+	if ($hasmorejobtypes) {
+		QuickUpdate("update jobtype set deleted=1 where id=?",$custdb,array($_GET['delete']));
+	} else {
+		error("You cannot delete the last survey or the last non survey job type");
+	}
 	redirect();
 }
 
