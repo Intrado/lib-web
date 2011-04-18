@@ -1962,7 +1962,9 @@ class SMAPI {
 		$list->modifydate = QuickQuery("select now()");
 		$list->deleted = 0;
 		if (!$list->create()) {
-			// TODO why doesn't api spec have a result 'failure'
+			$result['resultcode'] = 'failure';
+			$result["resultdescription"] =  "Database Failure, list was not created, please try again later.";
+			return $result;
 		}
 		$result['listid'] = $list->id;
 		
@@ -2008,7 +2010,196 @@ class SMAPI {
 		}
 		
 		// soft-delete list
-		QuickUpdate("update list set deleted = 1 where id = ?", false, array($listid));
+		if (QuickUpdate("update list set deleted = 1 where id = ?", false, array($listid)) === false) {
+			$result['resultcode'] = 'failure';
+			$result["resultdescription"] =  "Database Failure, list was not deleted, please try again later.";
+			return $result;
+		}
+		
+		// success
+		$result["resultcode"] = "success";
+		return $result;
+	}
+	
+	function getImports($sessionid) {
+		global $USER, $ACCESS;
+		$result = array("resultcode" => "failure", "resultdescription" => "", "imports" => array());
+
+		// validate session
+		if (!APISession($sessionid)) {
+			$result['resultcode'] = 'invalidsession';
+			$result["resultdescription"] = "Invalid Session ID";
+			return $result;
+		}
+		
+		// set user and access of this session
+		$USER = $_SESSION['user'];
+		$ACCESS = $_SESSION['access'];
+
+		// validate user
+		if (!$USER->id) {
+			$result['resultcode'] = 'invalidsession';
+			$result["resultdescription"] = "Invalid user";
+			return $result;
+		}
+		
+		if (!$USER->authorize('managetasks')) {
+			$result['resultcode'] = 'unauthorized';
+			$result["resultdescription"] =  "User does not have permission";
+			return $result;
+		}
+		
+		$imports = DBFindMany("Import", "from import where ownertype != 'user' order by id");
+		foreach ($imports as $import) {
+			$result['imports'][] = new API_Import($import);
+		}
+		
+		// success
+		$result["resultcode"] = "success";
+		return $result;
+	}
+	
+	function uploadImport($sessionid, $importid, $base64data) {
+		global $USER, $ACCESS;
+		$result = array("resultcode" => "failure", "resultdescription" => "");
+
+		// validate session
+		if (!APISession($sessionid)) {
+			$result['resultcode'] = 'invalidsession';
+			$result["resultdescription"] = "Invalid Session ID";
+			return $result;
+		}
+		
+		// set user and access of this session
+		$USER = $_SESSION['user'];
+		$ACCESS = $_SESSION['access'];
+
+		// validate user
+		if (!$USER->id) {
+			$result['resultcode'] = 'invalidsession';
+			$result["resultdescription"] = "Invalid user";
+			return $result;
+		}
+		if (!$USER->authorize('managetasks')) {
+			$result['resultcode'] = 'unauthorized';
+			$result["resultdescription"] =  "User does not have permission";
+			return $result;
+		}
+		// verify there is some data
+		if (strlen($base64data) == 0) {
+			$result['resultcode'] = 'invalidparam';
+			$result["resultdescription"] =  "Invalid Parameter : base64data cannot be empty";
+			return $result;
+		}
+		
+		$import = new Import($importid);
+		// validate importid
+		if ($import->id != $importid || $import->type != "automatic") {
+			$result['resultcode'] = 'invalidparam';
+			$result["resultdescription"] =  "Invalid Parameter : importid";
+			return $result;
+		}
+		
+		// store data, but decode first
+		if ($import->upload(base64_decode($base64data)) === false) {
+			$result['resultcode'] = 'failure';
+			$result["resultdescription"] =  "Database Failure, data not uploaded, please try again later.";
+			return $result;
+		}
+		
+		// success
+		$result["resultcode"] = "success";
+		return $result;
+	}
+
+	function runImport($sessionid, $importid) {
+		global $USER, $ACCESS;
+		$result = array("resultcode" => "failure", "resultdescription" => "");
+
+		// validate session
+		if (!APISession($sessionid)) {
+			$result['resultcode'] = 'invalidsession';
+			$result["resultdescription"] = "Invalid Session ID";
+			return $result;
+		}
+		
+		// set user and access of this session
+		$USER = $_SESSION['user'];
+		$ACCESS = $_SESSION['access'];
+
+		// validate user
+		if (!$USER->id) {
+			$result['resultcode'] = 'invalidsession';
+			$result["resultdescription"] = "Invalid user";
+			return $result;
+		}
+		if (!$USER->authorize('managetasks')) {
+			$result['resultcode'] = 'unauthorized';
+			$result["resultdescription"] =  "User does not have permission";
+			return $result;
+		}
+		
+		$import = new Import($importid);
+		// validate importid
+		if ($import->id != $importid || $import->type != "automatic") {
+			$result['resultcode'] = 'invalidparam';
+			$result["resultdescription"] =  "Invalid Parameter : importid";
+			return $result;
+		}
+		
+		// run the import
+		$import->runNow();
+		
+		// success
+		$result["resultcode"] = "success";
+		return $result;
+	}
+
+	function getImportDetail($sessionid, $importid) {
+		global $USER, $ACCESS;
+		$result = array("resultcode" => "failure", "resultdescription" => "", "import" => false, "logentries" => array());
+
+		// validate session
+		if (!APISession($sessionid)) {
+			$result['resultcode'] = 'invalidsession';
+			$result["resultdescription"] = "Invalid Session ID";
+			return $result;
+		}
+		
+		// set user and access of this session
+		$USER = $_SESSION['user'];
+		$ACCESS = $_SESSION['access'];
+
+		// validate user
+		if (!$USER->id) {
+			$result['resultcode'] = 'invalidsession';
+			$result["resultdescription"] = "Invalid user";
+			return $result;
+		}
+		if (!$USER->authorize('managetasks')) {
+			$result['resultcode'] = 'unauthorized';
+			$result["resultdescription"] =  "User does not have permission";
+			return $result;
+		}
+		
+		$import = new Import($importid);
+		// validate importid
+		if ($import->id != $importid || $import->type != "automatic") {
+			$result['resultcode'] = 'invalidparam';
+			$result["resultdescription"] =  "Invalid Parameter : importid";
+			return $result;
+		}
+
+		// fill the log entries
+		$logentries = DBFind("ImportLogEntry", "from importlogentry where importid = ?", false, array($importid));
+		if ($logentries != false) {
+			foreach ($logentries as $logentry) {
+				$result['logentries'][] = new API_ImportLogEntry($logentry);
+			}
+		}
+		
+		// set the import object
+		$result['import'] = new API_Import($import);
 		
 		// success
 		$result["resultcode"] = "success";
@@ -2203,6 +2394,8 @@ require_once("../obj/Language.obj.php");
 require_once("../obj/Phone.obj.php");
 require_once("../obj/Email.obj.php");
 require_once("../obj/Sms.obj.php");
+require_once("../obj/Import.obj.php");
+require_once("../obj/ImportLogEntry.obj.php");
 
 // API Files
 require_once("API_List.obj.php");
@@ -2213,6 +2406,9 @@ require_once("API_JobStatus.obj.php");
 require_once("API_Contact.obj.php");
 require_once("API_ContactPreference.obj.php");
 require_once("API_Label.obj.php");
+require_once("API_Import.obj.php");
+require_once("API_ImportLogEntry.obj.php");
+
 
 ini_set("soap.wsdl_cache_enabled", "0"); // disabling WSDL cache
 
