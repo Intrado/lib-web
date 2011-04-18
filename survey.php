@@ -485,7 +485,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		Query("COMMIT");
 
 		if ($button=="send") {
-			$_SESSION['jobid'] = $job->id;
+			$_SESSION['surveyid'] = $job->id;
 			$sendto = "surveyconfirm.php";
 		} else {
 			if (isset($_SESSION['origin']) && ($_SESSION['origin'] == 'start')) {
