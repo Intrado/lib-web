@@ -12,8 +12,10 @@ class MessageGroupSelectMenu extends FormItem {
 		}
 		$str .= '</select>';
 
-		$nn = $n."_preview";
-		$str .= "
+		$issurveytemplate = isset($this->args['surveytemplate']) && $this->args['surveytemplate'] == true;
+		if (!$issurveytemplate) {
+			$nn = $n."_preview";
+			$str .= "
 			<div id=\"$nn\"></div>
 			<script type=\"text/javascript\">
 				document.observe('dom:loaded', function() {
@@ -45,9 +47,9 @@ class MessageGroupSelectMenu extends FormItem {
 								if(response.headers['voicephone'])
 									str += '<td>' + (item.value.voicephone?'<a href=\"#\" onclick=\"popup(\'messagegroupviewpopup.php?type=phone&subtype=voice&languagecode=' + item.key + '&id=' + id + '\', 800, 500); return false;\"><img src=\'img/icons/accept.gif\' /></a>':'<img src=\'img/icons/diagona/16/160.gif\' />') + '</td>';
 								if(response.headers['htmlemail'])
-									str += '<td>' + (item.value.htmlemail?'<a href=\"#\" onclick=\"popup(\'messagegroupviewpopup.php?type=email&subtype=html&languagecode=' + item.value.key + '&id=' + id  + '\', 800, 500); return false;\"><img src=\'img/icons/accept.gif\' /></a>':'<img src=\'img/icons/diagona/16/160.gif\' />') + '</td>';
+									str += '<td>' + (item.value.htmlemail?'<a href=\"#\" onclick=\"popup(\'messagegroupviewpopup.php?type=email&subtype=html&languagecode=' + item.key + '&id=' + id  + '\', 800, 500); return false;\"><img src=\'img/icons/accept.gif\' /></a>':'<img src=\'img/icons/diagona/16/160.gif\' />') + '</td>';
 								if(response.headers['plainemail'])
-									str += '<td>' + (item.value.plainemail?'<a href=\"#\" onclick=\"popup(\'messagegroupviewpopup.php?type=email&subtype=plain&languagecode=' + item.value.key + '&id=' + id +  '\', 800, 500); return false;\"><img src=\'img/icons/accept.gif\' /></a>':'<img src=\'img/icons/diagona/16/160.gif\' />') + '</td>';
+									str += '<td>' + (item.value.plainemail?'<a href=\"#\" onclick=\"popup(\'messagegroupviewpopup.php?type=email&subtype=plain&languagecode=' + item.key + '&id=' + id +  '\', 800, 500); return false;\"><img src=\'img/icons/accept.gif\' /></a>':'<img src=\'img/icons/diagona/16/160.gif\' />') + '</td>';
 								if(response.headers['plainsms']) {
 									if(item.key == 'en')
 										str += '<td>' + (item.value.plainsms?'<a href=\"#\" onclick=\"popup(\'messagegroupviewpopup.php?type=sms&subtype=plain&languagecode=en&id=' + id  + '\', 500, 500); return false;\"><img src=\'img/icons/accept.gif\' /></a>':'<img src=\'img/icons/diagona/16/160.gif\' />') + '</td>';
@@ -64,6 +66,7 @@ class MessageGroupSelectMenu extends FormItem {
 					});
 				}
 			</script>";
+		}
 		return $str;
 	}
 }

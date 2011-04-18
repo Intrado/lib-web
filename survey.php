@@ -66,7 +66,7 @@ if (isset($_GET['scheduletemplate'])) {
 $completedmode = false;
 $submittedmode = false;
 
-if (getCurrentSurvey() != NULL) {
+if (isset($_SESSION['surveyid'])) {
 	$job = new Job(getCurrentSurvey());
 
 	if ('complete' == $job->status || 'cancelled' == $job->status || 'cancelling' == $job->status) {
@@ -79,7 +79,9 @@ if (getCurrentSurvey() != NULL) {
 } else {
 	$job = Job::jobWithDefaults();
 	setCurrentSurvey("new");
-	$job->questionnaireid = $_SESSION['scheduletemplate'];
+	if (isset($_SESSION['scheduletemplate'])) {
+		$job->questionnaireid = $_SESSION['scheduletemplate'];
+	}
 }
 
 $userjobtypes = JobType::getUserJobTypes(true);
@@ -157,7 +159,7 @@ $helpsteps[] = _L("Enter a name for your survey. " .
 	
 	if ($submittedmode || $completedmode) {
 		$helpsteps[] = _L("Select the option that best describes the type of notification you are sending. 
-							The category you select will determine which introduction your recipients will hear.");
+							The c you select will determine which introduction your recipients will hear.");
 		$formdata["jobtype"] = array(
 			"label" => _L("Type/Category"),
 			"fieldhelp" => _L("The option that best describes the type of notification you are sending."),
@@ -352,7 +354,7 @@ $helpsteps[] = _L("Enter a name for your survey. " .
 				array("ValRequired"),
 				array("ValInArray","values"=>array_keys($templates))
 			),
-			"control" => array("MessageGroupSelectMenu", "values" => $templates),
+			"control" => array("MessageGroupSelectMenu", "values" => $templates, "surveytemplate" => true),
 			"helpstep" => 5
 		);
 		
