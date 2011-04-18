@@ -319,10 +319,12 @@ if(CheckFormSubmit($f,"Save") || CheckFormSubmit($f, "Return")) {
 				$oldlanguages = GetFormData($f, $s, "oldlanguages");
 				foreach($oldlanguages as $oldlanguage){
 					$lang = "Language" . $oldlanguage;
-					if(GetFormData($f, $s, $lang) === "" && $oldlanguage != 1) {
-						QuickUpdate("delete from language where id = $oldlanguage", $custdb);
-					} else {
-						QuickUpdate("update language set name='" . GetFormData($f, $s, $lang) . "' where id = '" . $oldlanguage . "'", $custdb);
+					if ($oldlanguage != 1) {
+						if(GetFormData($f, $s, $lang) === "") {
+							QuickUpdate("delete from language where id = $oldlanguage", $custdb);
+						} else {
+							QuickUpdate("update language set name='" . GetFormData($f, $s, $lang) . "' where id = '" . $oldlanguage . "'", $custdb);
+						}
 					}
 				}
 
