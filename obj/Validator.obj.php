@@ -42,7 +42,7 @@ abstract class Validator {
 		foreach ($validators as $validatordata) {
 			$validator = $validatordata[0];
 			//only validate non empty values (unless its the ValRequired validator)
-			if ($validator == "ValRequired" || ((is_array($value) && count($value)) || (!is_array($value) && mb_strlen($value) > 0))) {
+			if ($validator == "ValRequired" || $validator == "ValConditionallyRequired" || ((is_array($value) && count($value)) || (!is_array($value) && mb_strlen($value) > 0))) {
 				$obj = new $validator();
 				$obj->label = $formdata[$name]['label'];
 				$obj->name = $name;
@@ -85,6 +85,30 @@ class ValRequired extends Validator {
 		return
 			'function (name, label, value, args) {
 				if (value.length == 0)
+					return label + " is required";
+				return true;
+			}';
+	}
+}
+
+// Is required if and only if the depended field is set
+class ValConditionallyRequired extends Validator {
+	
+	function validate ($value, $args, $requiredvalues) {
+		$conditionvalue = $requiredvalues[$args['field']];
+		$isemptycondition = ((is_array($conditionvalue) && !count($conditionvalue)) || (!is_array($conditionvalue) && mb_strlen($conditionvalue) == 0));
+		
+		$isemptyvalue = (is_array($value) && !count($value)) || (!is_array($value) && mb_strlen($value) == 0);
+		if (!$isemptycondition && $isemptyvalue)
+			return "$this->label is required";
+		return true;
+	}
+	
+	function getJSValidator () {
+		return
+			'function (name, label, value, args, requiredvalues) {
+				conditionvalue = requiredvalues[args["field"]];
+				if (conditionvalue.length != 0 && value.length == 0)
 					return label + " is required";
 				return true;
 			}';

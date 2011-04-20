@@ -10,7 +10,7 @@ header("Cache-Control: private");
 ?>
 
 /* ======= BEGIN VALIDATORS =======  */
-<? Validator::load_validators(array("ValRequired","ValLength","ValNumber","ValNumeric","ValEmail","ValEmailList","ValPhone","ValFieldConfirmation","ValInArray","ValDomain","ValTimeCheck","ValDomainList","ValDate")); ?>
+<? Validator::load_validators(array("ValRequired","ValConditionallyRequired","ValLength","ValNumber","ValNumeric","ValEmail","ValEmailList","ValPhone","ValFieldConfirmation","ValInArray","ValDomain","ValTimeCheck","ValDomainList","ValDate")); ?>
 /* ======= END VALIDATORS =======  */
 
 // TODO: Need to localize text
@@ -158,7 +158,7 @@ function form_do_validation (form, element) {
 			for (var i = 0; i < validators.length; i++) {
 				var v = validators[i];
 				var res;
-				if (value.length > 0 || v.validator == "ValRequired") {
+				if (value.length > 0 || v.validator == "ValRequired" || v.validator == "ValConditionallyRequired") {
 					res = v.validate(v.name,v.label,value,v.args,requiredvalues);
 					if (res != true) {
 						form_validation_display(element,"error",res);

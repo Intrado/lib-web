@@ -357,6 +357,7 @@ $formdata["pin"] = array(
 	"fieldhelp" => _L('The number in this field is like a password for logging into the system by phone.'),
 	"value" => $pin,
 	"validators" => array(
+		array("ValConditionallyRequired", "field" => "accesscode"),
 		array("ValNumeric", "min" => 4),
 		array("ValPin", "accesscode" => $edituser->accesscode)
 	),
@@ -370,6 +371,7 @@ $formdata["pinconfirm"] = array(
 	"fieldhelp" => _L('This field is used to confirm a new PIN number.'),
 	"value" => $pin,
 	"validators" => array(
+		array("ValConditionallyRequired", "field" => "pin"),
 		array("ValNumeric"),
 		array("ValFieldConfirmation", "field" => "pin")
 	),
