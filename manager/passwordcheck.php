@@ -7,11 +7,24 @@ require_once("../obj/Phone.obj.php");
 require_once("../inc/themes.inc.php");
 require_once("../inc/table.inc.php");
 require_once("../inc/formatters.inc.php");
+require_once("XML/RPC.php");
+require_once("authclient.inc.php");
 
 
 if (!$MANAGERUSER->authorized("passwordcheck"))
 	exit("Not Authorized");
 	
+loadManagerConnectionData();
+
+if (isset($_GET["action"]) && $_GET["action"] == "resetpassword") {
+	$params = array(new XML_RPC_Value($_GET["username"], 'string'), new XML_RPC_Value($_GET["customerurl"], 'string'));
+	$method = "AuthServer.forgotPassword";
+	$result = pearxmlrpc($method, $params, true);
+	header('Content-Type: application/json');
+	echo ($result && $result['result'] == "")?"true":"false";
+	exit();	
+}
+
 function fmt_custurl($row, $index){
 	global $MANAGERUSER, $CUSTOMERINFO;
 	
@@ -22,6 +35,10 @@ function fmt_custurl($row, $index){
 		return "<a href='customerlink.php?id=" . $row[0] ."' target=\"_blank\">" . escapehtml($CUSTOMERINFO[$row[0]]['urlcomponent']) . "</a>";
 	else
 		return escapehtml(escapehtml($CUSTOMERINFO[$row[0]]['urlcomponent']));
+}
+function fmt_resetpassword($row, $index){
+	global $CUSTOMERINFO;
+	return "<a href='passwordcheck.php?action=resetpassword&customerurl=" . $CUSTOMERINFO[$row[0]]['urlcomponent'] ."&username=" . $row[2] ."' onclick='resetpassword(\"" . $CUSTOMERINFO[$row[0]]['urlcomponent'] ."\",\"" . $row[2] ."\");return false;' target=\"_blank\">reset</a>";
 }
 
 $badpasswords = array("1qaz2wsx","abc123","admin1","admin123","admin2","admin3","administrator123","aministrator1","asp123","bond007","changeme","changeMe","cookie123","drowssap1","letmein1","letmein123","login1","login123","monster7","ncc1701","nopass1","password0","password1","password123","password1234","password123456","password123456","password2","password3","p@ssw0rd","qazwsx123","qwer123","qwerty12345","reliance202","sch00l","sch00lm3ss3ng3r","schmsgr1","school1","school123","schoolmessenger1","schoolmessenger123","schoolmessenger2","thx1138","trustno1","changem3","hello123");
@@ -39,7 +56,7 @@ include_once("nav.inc.php");
 <?
 
 
-loadManagerConnectionData();
+
 
 // With the list of customers ready, connect to each customer's shard and retrieve a bunch of helpful information about the customer.
 $data = array();
@@ -94,10 +111,12 @@ $titles = array(
 	1 => "#User ID",
 	2 => "#User Login",
 	3 => "#Reason",
-	4 => "#Last login"
+	4 => "#Last login",
+	"reset" => ""
 );
 $formatters = array(
 	"url" => "fmt_custurl",
+	"reset" => "fmt_resetpassword"
 );
 
 echo '<table id="bounced" class="list sortable">';
@@ -106,5 +125,26 @@ showTable($data,$titles,$formatters);
 
 echo '</table>';
 
+?>
 
+<script>
+function resetpassword(customerurl,username) {
+	new Ajax.Request('passwordcheck.php', {
+		method:'get',
+		parameters: {action: 'resetpassword', customerurl: customerurl, username: username},
+		onSuccess: function (response) {
+			var result = response.responseJSON;
+			if(!result) {
+				alert("Unable to reset password, Most likely because the user do not have a email assigned to the account");
+			}
+		},
+		onFailure: function(){
+			alert("Failed to reset password");
+		}
+	});	
+	return false;
+}
+</script>
+
+<?
 include_once("navbottom.inc.php");
