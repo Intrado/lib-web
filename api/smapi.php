@@ -2107,6 +2107,10 @@ class SMAPI {
 			return $result;
 		}
 		
+		// if automatic, run the import now
+		if ($import->type == "automatic")
+			$import->runNow();
+		
 		// success
 		$result["resultcode"] = "success";
 		return $result;
