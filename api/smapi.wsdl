@@ -6,57 +6,171 @@
 
 	<xsd:complexType name="list">
 		<xsd:sequence>
-			<xsd:element name="id" type="xsd:int"></xsd:element>
-			<xsd:element name="name" type="xsd:string"></xsd:element>
-			<xsd:element name="description" type="xsd:string"></xsd:element>
+			<xsd:element name="id" type="xsd:int">
+				<xsd:annotation>
+					<xsd:documentation>unique identifier of list
+</xsd:documentation>
+				</xsd:annotation></xsd:element>
+			<xsd:element name="name" type="xsd:string">
+				<xsd:annotation>
+					<xsd:documentation>name of list
+</xsd:documentation>
+				</xsd:annotation></xsd:element>
+			<xsd:element name="description" type="xsd:string">
+				<xsd:annotation>
+					<xsd:documentation>description of list
+</xsd:documentation>
+				</xsd:annotation></xsd:element>
 		</xsd:sequence>
 	</xsd:complexType>
 
 	
 	<xsd:complexType name="message">
 		<xsd:sequence>
-			<xsd:element name="id" type="xsd:int"></xsd:element>
-			<xsd:element name="name" type="xsd:string"></xsd:element>
-			<xsd:element name="description" type="xsd:string"></xsd:element>
-			<xsd:element name="type" type="xsd:string"></xsd:element>
-			<xsd:element name="language" type="xsd:string"></xsd:element>
+			<xsd:element name="id" type="xsd:int">
+				<xsd:annotation>
+					<xsd:documentation>unique identifier
+</xsd:documentation>
+				</xsd:annotation></xsd:element>
+			<xsd:element name="name" type="xsd:string">
+				<xsd:annotation>
+					<xsd:documentation>name
+</xsd:documentation>
+				</xsd:annotation></xsd:element>
+			<xsd:element name="description" type="xsd:string">
+				<xsd:annotation>
+					<xsd:documentation>description
+</xsd:documentation>
+				</xsd:annotation></xsd:element>
+			<xsd:element name="type" type="xsd:string">
+				<xsd:annotation>
+					<xsd:documentation>'phone', 'email', 'sms'
+</xsd:documentation>
+				</xsd:annotation></xsd:element>
+			<xsd:element name="language" type="xsd:string">
+				<xsd:annotation>
+					<xsd:documentation>'default' (usually 'English'), 'Spanish', ...
+</xsd:documentation>
+				</xsd:annotation></xsd:element>
 		</xsd:sequence>
 	</xsd:complexType>
 
 	<xsd:complexType name="jobtype">
 		<xsd:sequence>
-			<xsd:element name="id" type="xsd:int"></xsd:element>
-			<xsd:element name="name" type="xsd:string"></xsd:element>
-			<xsd:element name="info" type="xsd:string"></xsd:element>
+			<xsd:element name="id" type="xsd:int">
+				<xsd:annotation>
+					<xsd:documentation>unique identifier
+</xsd:documentation>
+				</xsd:annotation></xsd:element>
+			<xsd:element name="name" type="xsd:string">
+				<xsd:annotation>
+					<xsd:documentation>display name of job type
+</xsd:documentation>
+				</xsd:annotation></xsd:element>
+			<xsd:element name="info" type="xsd:string">
+				<xsd:annotation>
+					<xsd:documentation>detailed display information about job type
+</xsd:documentation>
+				</xsd:annotation></xsd:element>
 		</xsd:sequence>
 	</xsd:complexType>
 
 
 	<xsd:complexType name="jobstatus">
 		<xsd:sequence>
-			<xsd:element name="id" type="xsd:int"></xsd:element>
-			<xsd:element name="name" type="xsd:string"></xsd:element>
-			<xsd:element name="description" type="xsd:string"></xsd:element>
-			<xsd:element name="hasphone" type="xsd:boolean"></xsd:element>
-			<xsd:element name="hasemail" type="xsd:boolean"></xsd:element>
-			<xsd:element name="hassms" type="xsd:boolean"></xsd:element>
-			<xsd:element name="phonetotal" type="xsd:int"></xsd:element>
-			<xsd:element name="emailtotal" type="xsd:int"></xsd:element>
-			<xsd:element name="printtotal" type="xsd:int"></xsd:element>
-			<xsd:element name="smstotal" type="xsd:int"></xsd:element>
-			<xsd:element name="phoneremaining" type="xsd:int"></xsd:element>
-			<xsd:element name="emailremaining" type="xsd:int"></xsd:element>
-			<xsd:element name="smsremaining" type="xsd:int"></xsd:element>
-			<xsd:element name="startdate" type="xsd:string"></xsd:element>
-			<xsd:element name="status" type="xsd:string"></xsd:element>
+			<xsd:element name="id" type="xsd:int">
+				<xsd:annotation>
+					<xsd:documentation>unique identifier of job
+
+</xsd:documentation>
+				</xsd:annotation></xsd:element>
+			<xsd:element name="name" type="xsd:string">
+				<xsd:annotation>
+					<xsd:documentation>name of job
+</xsd:documentation>
+				</xsd:annotation></xsd:element>
+			<xsd:element name="description" type="xsd:string">
+				<xsd:annotation>
+					<xsd:documentation>description
+</xsd:documentation>
+				</xsd:annotation></xsd:element>
+			<xsd:element name="hasphone" type="xsd:boolean">
+				<xsd:annotation>
+					<xsd:documentation>job has phone message
+</xsd:documentation>
+				</xsd:annotation></xsd:element>
+			<xsd:element name="hasemail" type="xsd:boolean">
+				<xsd:annotation>
+					<xsd:documentation>job has email message
+</xsd:documentation>
+				</xsd:annotation></xsd:element>
+			<xsd:element name="hassms" type="xsd:boolean">
+				<xsd:annotation>
+					<xsd:documentation>job has sms message
+</xsd:documentation>
+				</xsd:annotation></xsd:element>
+			<xsd:element name="phonetotal" type="xsd:int">
+				<xsd:annotation>
+					<xsd:documentation>total phone numbers called
+</xsd:documentation>
+				</xsd:annotation></xsd:element>
+			<xsd:element name="emailtotal" type="xsd:int">
+				<xsd:annotation>
+					<xsd:documentation>total email sent
+</xsd:documentation>
+				</xsd:annotation></xsd:element>
+			<xsd:element name="printtotal" type="xsd:int">
+				<xsd:annotation>
+					<xsd:documentation>(obsolete)
+</xsd:documentation>
+				</xsd:annotation></xsd:element>
+			<xsd:element name="smstotal" type="xsd:int">
+				<xsd:annotation>
+					<xsd:documentation>total SMS messages sent
+</xsd:documentation>
+				</xsd:annotation></xsd:element>
+			<xsd:element name="phoneremaining" type="xsd:int">
+				<xsd:annotation>
+					<xsd:documentation>remaining phone numbers to call
+</xsd:documentation>
+				</xsd:annotation></xsd:element>
+			<xsd:element name="emailremaining" type="xsd:int">
+				<xsd:annotation>
+					<xsd:documentation>remaining email to send
+</xsd:documentation>
+				</xsd:annotation></xsd:element>
+			<xsd:element name="smsremaining" type="xsd:int">
+				<xsd:annotation>
+					<xsd:documentation>remaining SMS to send
+</xsd:documentation>
+				</xsd:annotation></xsd:element>
+			<xsd:element name="startdate" type="xsd:string">
+				<xsd:annotation>
+					<xsd:documentation>date and time job started, format YYYY-MM-DD HH:MM:SS
+</xsd:documentation>
+				</xsd:annotation></xsd:element>
+			<xsd:element name="status" type="xsd:string">
+				<xsd:annotation>
+					<xsd:documentation>'new','scheduled','processing','procactive','active','complete','cancelled','cancelling','repeating'
+</xsd:documentation>
+				</xsd:annotation></xsd:element>
 		</xsd:sequence>
 	</xsd:complexType>
 
 	<xsd:complexType name="loginResult">
 		<xsd:sequence>
-			<xsd:element name="sessionid" type="xsd:string"></xsd:element>
-			<xsd:element name="resultcode" type="xsd:string"></xsd:element>
-			<xsd:element name="resultdescription" type="xsd:string"></xsd:element>
+			<xsd:element name="sessionid" type="xsd:string">
+				<xsd:annotation>
+					<xsd:documentation>a newly generated session identifier for use with this login session.</xsd:documentation>
+				</xsd:annotation></xsd:element>
+			<xsd:element name="resultcode" type="xsd:string">
+				<xsd:annotation>
+					<xsd:documentation>'success', 'failure'</xsd:documentation>
+				</xsd:annotation></xsd:element>
+			<xsd:element name="resultdescription" type="xsd:string">
+				<xsd:annotation>
+					<xsd:documentation>if not success, contains the reason for error</xsd:documentation>
+				</xsd:annotation></xsd:element>
 		</xsd:sequence>
 	</xsd:complexType>
 	
@@ -65,50 +179,114 @@
 		<xsd:sequence>
 			<xsd:element name="lists" type="sm:list" minOccurs="0"
 				maxOccurs="unbounded">
+                        <xsd:annotation>
+                        	<xsd:documentation>array of lists
+</xsd:documentation>
+                        </xsd:annotation>
 			</xsd:element>
-			<xsd:element name="resultcode" type="xsd:string"></xsd:element>
-			<xsd:element name="resultdescription" type="xsd:string"></xsd:element>
+			<xsd:element name="resultcode" type="xsd:string">
+				<xsd:annotation>
+					<xsd:documentation>'success', 'failure'
+</xsd:documentation>
+				</xsd:annotation></xsd:element>
+			<xsd:element name="resultdescription" type="xsd:string">
+				<xsd:annotation>
+					<xsd:documentation>if not success, contains the reason for error</xsd:documentation></xsd:annotation></xsd:element>
 		</xsd:sequence>
 	</xsd:complexType>
 	<xsd:complexType name="getMessagesResult">
 		<xsd:sequence>
 			<xsd:element name="messages" type="sm:message" minOccurs="0"
 				maxOccurs="unbounded">
+                        <xsd:annotation>
+                        	<xsd:documentation>array of messages
+</xsd:documentation>
+                        </xsd:annotation>
 			</xsd:element>
-			<xsd:element name="resultcode" type="xsd:string"></xsd:element>
-			<xsd:element name="resultdescription" type="xsd:string"></xsd:element>
+			<xsd:element name="resultcode" type="xsd:string">
+				<xsd:annotation>
+					<xsd:documentation>'success', 'failure'
+</xsd:documentation>
+				</xsd:annotation></xsd:element>
+			<xsd:element name="resultdescription" type="xsd:string">
+				<xsd:annotation>
+					<xsd:documentation>if not success, contains the reason for error</xsd:documentation></xsd:annotation></xsd:element>
 		</xsd:sequence>
 	</xsd:complexType>
 	<xsd:complexType name="setMessagebodyResult">
 		<xsd:sequence>
-			<xsd:element name="result" type="xsd:boolean"></xsd:element>
-			<xsd:element name="resultcode" type="xsd:string"></xsd:element>
-			<xsd:element name="resultdescription" type="xsd:string"></xsd:element>
+			<xsd:element name="result" type="xsd:boolean">
+				<xsd:annotation>
+					<xsd:documentation>true if success, else false
+</xsd:documentation>
+				</xsd:annotation></xsd:element>
+			<xsd:element name="resultcode" type="xsd:string">
+				<xsd:annotation>
+					<xsd:documentation>'success', 'failure'
+</xsd:documentation>
+				</xsd:annotation></xsd:element>
+			<xsd:element name="resultdescription" type="xsd:string">
+				<xsd:annotation>
+					<xsd:documentation>if not success, contains the reason for error</xsd:documentation></xsd:annotation></xsd:element>
 		</xsd:sequence>
 	</xsd:complexType>
 	<xsd:complexType name="uploadAudioResult">
 		<xsd:sequence>
-			<xsd:element name="audioname" type="xsd:string"></xsd:element>
-			<xsd:element name="resultcode" type="xsd:string"></xsd:element>
-			<xsd:element name="resultdescription" type="xsd:string"></xsd:element>
+			<xsd:element name="audioname" type="xsd:string">
+				<xsd:annotation>
+					<xsd:documentation>name of audiofile record created, may append current date and time
+</xsd:documentation>
+				</xsd:annotation></xsd:element>
+			<xsd:element name="resultcode" type="xsd:string">
+				<xsd:annotation>
+					<xsd:documentation>'success', 'failure'
+</xsd:documentation>
+				</xsd:annotation></xsd:element>
+			<xsd:element name="resultdescription" type="xsd:string">
+				<xsd:annotation>
+					<xsd:documentation>if not success, contains the reason for error</xsd:documentation></xsd:annotation></xsd:element>
 		</xsd:sequence>
 	</xsd:complexType>
 	<xsd:complexType name="getJobTypesResult">
 		<xsd:sequence>
 			<xsd:element name="jobtypes" type="sm:jobtype" minOccurs="0"
 				maxOccurs="unbounded">
+                        <xsd:annotation>
+                        	<xsd:documentation>array of jobtypes, empty on failure
+</xsd:documentation>
+                        </xsd:annotation>
 			</xsd:element>
-			<xsd:element name="resultcode" type="xsd:string"></xsd:element>
-			<xsd:element name="resultdescription" type="xsd:string"></xsd:element>
+			<xsd:element name="resultcode" type="xsd:string">
+				<xsd:annotation>
+					<xsd:documentation>'success', 'failure'
+</xsd:documentation>
+				</xsd:annotation></xsd:element>
+			<xsd:element name="resultdescription" type="xsd:string">
+				<xsd:annotation>
+					<xsd:documentation>if not success, contains the reason for error
+</xsd:documentation>
+				</xsd:annotation></xsd:element>
 		</xsd:sequence>
 	</xsd:complexType>
 	<xsd:complexType name="getRepeatingJobsResult">
 		<xsd:sequence>
 			<xsd:element name="jobs" type="sm:job" minOccurs="0"
 				maxOccurs="unbounded">
+                        <xsd:annotation>
+                        	<xsd:documentation>array of repeating jobs
+</xsd:documentation>
+                        </xsd:annotation>
 			</xsd:element>
-			<xsd:element name="resultcode" type="xsd:string"></xsd:element>
-			<xsd:element name="resultdescription" type="xsd:string"></xsd:element>
+			<xsd:element name="resultcode" type="xsd:string">
+				<xsd:annotation>
+					<xsd:documentation>'success', 'failure'
+</xsd:documentation>
+				</xsd:annotation></xsd:element>
+			<xsd:element name="resultdescription" type="xsd:string">
+				<xsd:annotation>
+					<xsd:documentation>if not success, contains the reason for error
+</xsd:documentation>
+				</xsd:annotation></xsd:element>
 		</xsd:sequence>
 	</xsd:complexType>
 	
@@ -116,103 +294,277 @@
 	<xsd:complexType name="getJobStatusResult">
 		<xsd:sequence>
 			<xsd:element name="job" type="sm:jobstatus"></xsd:element>
-			<xsd:element name="resultcode" type="xsd:string"></xsd:element>
-			<xsd:element name="resultdescription" type="xsd:string"></xsd:element>
+			<xsd:element name="resultcode" type="xsd:string">
+				<xsd:annotation>
+					<xsd:documentation>'success', 'failure'
+</xsd:documentation>
+				</xsd:annotation></xsd:element>
+			<xsd:element name="resultdescription" type="xsd:string">
+				<xsd:annotation>
+					<xsd:documentation>if not success, contains the reason for error
+</xsd:documentation>
+				</xsd:annotation></xsd:element>
 		</xsd:sequence>
 	</xsd:complexType>
 	<xsd:complexType name="sendJobResult">
 		<xsd:sequence>
-			<xsd:element name="jobid" type="xsd:int"></xsd:element>
-			<xsd:element name="resultcode" type="xsd:string"></xsd:element>
-			<xsd:element name="resultdescription" type="xsd:string"></xsd:element>
+			<xsd:element name="jobid" type="xsd:int">
+				<xsd:annotation>
+					<xsd:documentation>the job identifier
+</xsd:documentation>
+				</xsd:annotation></xsd:element>
+			<xsd:element name="resultcode" type="xsd:string">
+				<xsd:annotation>
+					<xsd:documentation>'success', 'failure' for sendJob()
+sendJobExtended() supports more results
+        'success' : operation successful
+        'failure' : unexpected failure
+        'invalidsession' : sessionid invalid or expired
+        'invalidparam' : invalid parameter
+        'unauthorized' : user is not authorized to perform action on these parameters
+
+</xsd:documentation>
+				</xsd:annotation></xsd:element>
+			<xsd:element name="resultdescription" type="xsd:string">
+				<xsd:annotation>
+					<xsd:documentation>if not success, contains the reason for error
+</xsd:documentation>
+				</xsd:annotation></xsd:element>
 		</xsd:sequence>
 	</xsd:complexType>
         
 	<xsd:complexType name="job">
 		<xsd:sequence>
-			<xsd:element name="id" type="xsd:int"></xsd:element>
-			<xsd:element name="name" type="xsd:string"></xsd:element>
-			<xsd:element name="description" type="xsd:string"></xsd:element>
-			<xsd:element name="phonemessages" type="sm:message" maxOccurs="unbounded" minOccurs="0"></xsd:element>
-			<xsd:element name="emailmessages" type="sm:message" maxOccurs="unbounded" minOccurs="0"></xsd:element>
-			<xsd:element name="smsmessages" type="sm:message" maxOccurs="unbounded" minOccurs="0"></xsd:element>
+			<xsd:element name="id" type="xsd:int">
+				<xsd:annotation>
+					<xsd:documentation>unique identifier of job
+</xsd:documentation>
+				</xsd:annotation></xsd:element>
+			<xsd:element name="name" type="xsd:string">
+				<xsd:annotation>
+					<xsd:documentation>name
+</xsd:documentation>
+				</xsd:annotation></xsd:element>
+			<xsd:element name="description" type="xsd:string">
+				<xsd:annotation>
+					<xsd:documentation>description
+</xsd:documentation>
+				</xsd:annotation></xsd:element>
+			<xsd:element name="phonemessages" type="sm:message" maxOccurs="unbounded" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>array of phone messages
+</xsd:documentation>
+				</xsd:annotation></xsd:element>
+			<xsd:element name="emailmessages" type="sm:message" maxOccurs="unbounded" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>array of email messages
+</xsd:documentation>
+				</xsd:annotation></xsd:element>
+			<xsd:element name="smsmessages" type="sm:message" maxOccurs="unbounded" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>array of sms messages
+</xsd:documentation>
+				</xsd:annotation></xsd:element>
 		</xsd:sequence>
 	</xsd:complexType>
 	<xsd:complexType name="getActiveJobsResult">
 		<xsd:sequence>
 			<xsd:element name="jobs" type="sm:jobstatus" minOccurs="0"
 				maxOccurs="unbounded">
+                        <xsd:annotation>
+                        	<xsd:documentation>array of active jobs
+</xsd:documentation>
+                        </xsd:annotation>
 			</xsd:element>
-			<xsd:element name="resultcode" type="xsd:string"></xsd:element>
-			<xsd:element name="resultdescription" type="xsd:string"></xsd:element>
+			<xsd:element name="resultcode" type="xsd:string">
+				<xsd:annotation>
+					<xsd:documentation>'success', 'failure'
+</xsd:documentation>
+				</xsd:annotation></xsd:element>
+			<xsd:element name="resultdescription" type="xsd:string">
+				<xsd:annotation>
+					<xsd:documentation>if not success, contains the reason for error
+</xsd:documentation>
+				</xsd:annotation></xsd:element>
 		</xsd:sequence>
 	</xsd:complexType>
 	<xsd:complexType name="getContactsResult">
 		<xsd:sequence>
-			<xsd:element name="resultcode" type="xsd:string"></xsd:element>
-			<xsd:element name="resultdescription" type="xsd:string"></xsd:element>
-			<xsd:element name="contacts" type="sm:Contact" minOccurs="0" maxOccurs="unbounded"></xsd:element>
+			<xsd:element name="resultcode" type="xsd:string">
+				<xsd:annotation>
+					<xsd:documentation>'success', 'failure'
+</xsd:documentation>
+				</xsd:annotation></xsd:element>
+			<xsd:element name="resultdescription" type="xsd:string">
+				<xsd:annotation>
+					<xsd:documentation>if not success, contains the reason for error
+</xsd:documentation>
+				</xsd:annotation></xsd:element>
+			<xsd:element name="contacts" type="sm:Contact" minOccurs="0" maxOccurs="unbounded">
+				<xsd:annotation>
+					<xsd:documentation>array of contact destinations (phone, email, sms) for this person
+
+</xsd:documentation>
+				</xsd:annotation></xsd:element>
 		</xsd:sequence>
 	</xsd:complexType>
 
 	<xsd:complexType name="Contact">
 		<xsd:sequence>
-			<xsd:element name="pkey" type="xsd:string"></xsd:element>
-			<xsd:element name="type" type="xsd:string"></xsd:element>
-			<xsd:element name="destination" type="xsd:string"></xsd:element>
-			<xsd:element name="sequence" type="xsd:string"></xsd:element>
-			<xsd:element name="contactpreferences" type="sm:ContactPreference" minOccurs="0" maxOccurs="unbounded"></xsd:element>
+			<xsd:element name="pkey" type="xsd:string">
+				<xsd:annotation>
+					<xsd:documentation>unique identifier of person
+</xsd:documentation>
+				</xsd:annotation></xsd:element>
+			<xsd:element name="type" type="xsd:string">
+				<xsd:annotation>
+					<xsd:documentation>'phone', 'email', 'sms'
+</xsd:documentation>
+				</xsd:annotation></xsd:element>
+			<xsd:element name="destination" type="xsd:string">
+				<xsd:annotation>
+					<xsd:documentation>based on type, either the phone number or email address
+</xsd:documentation>
+				</xsd:annotation></xsd:element>
+			<xsd:element name="sequence" type="xsd:string">
+				<xsd:annotation>
+					<xsd:documentation>0, 1, 2, ...
+</xsd:documentation>
+				</xsd:annotation></xsd:element>
+			<xsd:element name="contactpreferences" type="sm:ContactPreference" minOccurs="0" maxOccurs="unbounded">
+				<xsd:annotation>
+					<xsd:documentation>array of contact preferences (based on job type)
+</xsd:documentation>
+				</xsd:annotation></xsd:element>
 		</xsd:sequence>
 	</xsd:complexType>
 
 	<xsd:complexType name="ContactPreference">
 		<xsd:sequence>
-			<xsd:element name="jobtypeid" type="xsd:int"></xsd:element>
-			<xsd:element name="enabled" type="xsd:boolean"></xsd:element>
+			<xsd:element name="jobtypeid" type="xsd:int">
+				<xsd:annotation>
+					<xsd:documentation>job type identifier
+</xsd:documentation>
+				</xsd:annotation></xsd:element>
+			<xsd:element name="enabled" type="xsd:boolean">
+				<xsd:annotation>
+					<xsd:documentation>true if prefer contact this destination for this job type, false if prefer not to contact
+
+</xsd:documentation>
+				</xsd:annotation></xsd:element>
 		</xsd:sequence>
 	</xsd:complexType>
 	<xsd:complexType name="setContactsResult">
 		<xsd:sequence>
-			<xsd:element name="resultcode" type="xsd:string"></xsd:element>
-			<xsd:element name="resultdescription" type="xsd:string"></xsd:element>
+			<xsd:element name="resultcode" type="xsd:string">
+				<xsd:annotation>
+					<xsd:documentation>'success', 'failure'
+</xsd:documentation>
+				</xsd:annotation></xsd:element>
+			<xsd:element name="resultdescription" type="xsd:string">
+				<xsd:annotation>
+					<xsd:documentation>if not success, contains the reason for error
+</xsd:documentation>
+				</xsd:annotation></xsd:element>
 		</xsd:sequence>
 	</xsd:complexType>
 
 	<xsd:complexType name="getCustomerURLResult">
 		<xsd:sequence>
-			<xsd:element name="resultcode" type="xsd:string"></xsd:element>
-			<xsd:element name="resultdescription" type="xsd:string"></xsd:element>
-			<xsd:element name="customerurl" type="xsd:string"></xsd:element>
+			<xsd:element name="resultcode" type="xsd:string">
+				<xsd:annotation>
+					<xsd:documentation>'success', 'failure'
+</xsd:documentation>
+				</xsd:annotation></xsd:element>
+			<xsd:element name="resultdescription" type="xsd:string">
+				<xsd:annotation>
+					<xsd:documentation>if not success, contains the reason for error
+</xsd:documentation>
+				</xsd:annotation></xsd:element>
+			<xsd:element name="customerurl" type="xsd:string">
+				<xsd:annotation>
+					<xsd:documentation>URL component for this customer, used by loginToCustomer()
+
+</xsd:documentation>
+				</xsd:annotation></xsd:element>
 		</xsd:sequence>
 	</xsd:complexType>
 	<xsd:complexType name="loginToCustomerResult">
 		<xsd:sequence>
-                    <xsd:element name="sessionid" type="xsd:string"></xsd:element>
-                    <xsd:element name="resultcode" type="xsd:string"></xsd:element>
-                    <xsd:element name="resultdescription" type="xsd:string"></xsd:element>
+                    <xsd:element name="sessionid" type="xsd:string">
+                    	<xsd:annotation>
+                    		<xsd:documentation>a newly generated session identifier for use with this login session.
+</xsd:documentation>
+                    	</xsd:annotation></xsd:element>
+                    <xsd:element name="resultcode" type="xsd:string">
+                    	<xsd:annotation>
+                    		<xsd:documentation>'success', 'failure'
+</xsd:documentation>
+                    	</xsd:annotation></xsd:element>
+                    <xsd:element name="resultdescription" type="xsd:string">
+                    	<xsd:annotation>
+                    		<xsd:documentation>if not success, contains the reason for error
+</xsd:documentation>
+                    	</xsd:annotation></xsd:element>
                 </xsd:sequence>
 	</xsd:complexType>
 	<xsd:complexType name="getLabelsResult">
 		<xsd:sequence>
-			<xsd:element name="resultcode" type="xsd:string"></xsd:element>
-			<xsd:element name="resultdescription" type="xsd:string"></xsd:element>
-			<xsd:element name="labels" type="sm:Label" maxOccurs="unbounded" minOccurs="0"></xsd:element>
+			<xsd:element name="resultcode" type="xsd:string">
+				<xsd:annotation>
+					<xsd:documentation>'success', 'failure'
+</xsd:documentation>
+				</xsd:annotation></xsd:element>
+			<xsd:element name="resultdescription" type="xsd:string">
+				<xsd:annotation>
+					<xsd:documentation>if not success, contains the reason for error
+</xsd:documentation>
+				</xsd:annotation></xsd:element>
+			<xsd:element name="labels" type="sm:Label" maxOccurs="unbounded" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>array of labels, based on destination type (phone, email, sms)
+</xsd:documentation>
+				</xsd:annotation></xsd:element>
 		</xsd:sequence>
 	</xsd:complexType>
 
 	<xsd:complexType name="Label">
 		<xsd:sequence>
-			<xsd:element name="sequence" type="xsd:string"></xsd:element>
-			<xsd:element name="label" type="xsd:string"></xsd:element>
+			<xsd:element name="sequence" type="xsd:string">
+				<xsd:annotation>
+					<xsd:documentation>0, 1, 2, ...
+</xsd:documentation>
+				</xsd:annotation></xsd:element>
+			<xsd:element name="label" type="xsd:string">
+				<xsd:annotation>
+					<xsd:documentation>display description of label for destination type (phone, email, sms) Example: Home Phone
+</xsd:documentation>
+				</xsd:annotation></xsd:element>
 		</xsd:sequence>
 	</xsd:complexType>
             <xsd:complexType name="createMessageResult">
             	<xsd:sequence>
-            		<xsd:element name="resultcode" type="xsd:string"></xsd:element>
+            		<xsd:element name="resultcode" type="xsd:string">
+            			<xsd:annotation>
+            				<xsd:documentation>        'success' : operation successful
+        'failure' : unexpected failure
+        'invalidsession' : sessionid invalid or expired
+        'invalidparam' : invalid parameter
+        'unauthorized' : user is not authorized to perform action on these parameters
+</xsd:documentation>
+            			</xsd:annotation></xsd:element>
             		<xsd:element name="resultdescription"
             			type="xsd:string">
+                        <xsd:annotation>
+                        	<xsd:documentation>if not success, contains the reason for error
+</xsd:documentation>
+                        </xsd:annotation>
             		</xsd:element>
-            		<xsd:element name="messageid" type="xsd:int"></xsd:element>
+            		<xsd:element name="messageid" type="xsd:int">
+            			<xsd:annotation>
+            				<xsd:documentation>unique identifier of message just created
+</xsd:documentation>
+            			</xsd:annotation></xsd:element>
             	</xsd:sequence>
 
             </xsd:complexType>
@@ -232,27 +584,69 @@
                 	<xsd:documentation></xsd:documentation>
                 </xsd:annotation>
                 <xsd:sequence>
-            		<xsd:element name="name" type="xsd:string"></xsd:element>
+            		<xsd:element name="name" type="xsd:string">
+            			<xsd:annotation>
+            				<xsd:documentation>all job options are optional, the following is a list of supported name/value pairs:
+"leavemessage" with value 'true' or 'false'
+"messageconfirmation" with value 'true' or 'false'
+"sendreport" with value 'true' or 'false'
+"callerid" with valid 10 digit phone number
+
+</xsd:documentation>
+            			</xsd:annotation></xsd:element>
             		<xsd:element name="value" type="xsd:string"></xsd:element>
             	</xsd:sequence>
             </xsd:complexType>
             <xsd:complexType name="setContactDestinationResult">
             	<xsd:sequence>
-            		<xsd:element name="resultcode" type="xsd:string"></xsd:element>
-            		<xsd:element name="resultdescription" type="xsd:string"></xsd:element>
+            		<xsd:element name="resultcode" type="xsd:string">
+            			<xsd:annotation>
+            				<xsd:documentation>        'success' : operation successful
+        'failure' : unexpected failure
+        'invalidsession' : sessionid invalid or expired
+        'invalidparam' : invalid parameter
+        'unauthorized' : user is not authorized to perform action on these parameters
+</xsd:documentation></xsd:annotation></xsd:element>
+            		<xsd:element name="resultdescription" type="xsd:string">
+            			<xsd:annotation>
+            				<xsd:documentation>if not success, contains the reason for error
+</xsd:documentation>
+            			</xsd:annotation></xsd:element>
             	</xsd:sequence>
             </xsd:complexType>
             <xsd:complexType name="setContactPreferenceResult">
             	<xsd:sequence>
-            		<xsd:element name="resultcode" type="xsd:string"></xsd:element>
-            		<xsd:element name="resultdescription" type="xsd:string"></xsd:element>
+            		<xsd:element name="resultcode" type="xsd:string">
+            			<xsd:annotation>
+            				<xsd:documentation>        'success' : operation successful
+        'failure' : unexpected failure
+        'invalidsession' : sessionid invalid or expired
+        'invalidparam' : invalid parameter
+        'unauthorized' : user is not authorized to perform action on these parameters
+</xsd:documentation></xsd:annotation></xsd:element>
+            		<xsd:element name="resultdescription" type="xsd:string">
+            			<xsd:annotation>
+            				<xsd:documentation>if not success, contains the reason for error
+</xsd:documentation>
+            			</xsd:annotation></xsd:element>
             	</xsd:sequence>
             </xsd:complexType>
             <xsd:complexType name="getPermissionsResult">
             	<xsd:sequence>
-            		<xsd:element name="resultcode" type="xsd:string"></xsd:element>
+            		<xsd:element name="resultcode" type="xsd:string">
+            			<xsd:annotation>
+            				<xsd:documentation>        'success' : operation successful
+        'failure' : unexpected failure
+        'invalidsession' : sessionid invalid or expired
+        'invalidparam' : invalid parameter
+        'unauthorized' : user is not authorized to perform action on these parameters
+</xsd:documentation></xsd:annotation></xsd:element>
             		<xsd:element name="resultdescription"
             			type="xsd:string">
+                        <xsd:annotation>
+                        	<xsd:documentation>if not success, contains the reason for error
+</xsd:documentation>
+                        </xsd:annotation>
             		</xsd:element>
             		<xsd:element name="permissions" type="sm:permissionEntry" minOccurs="0" maxOccurs="unbounded">
             			<xsd:annotation>
@@ -278,9 +672,20 @@
             </xsd:complexType>
             <xsd:complexType name="getSettingsResult">
             	<xsd:sequence>
-            		<xsd:element name="resultcode" type="xsd:string"></xsd:element>
+            		<xsd:element name="resultcode" type="xsd:string">
+            			<xsd:annotation>
+            				<xsd:documentation>        'success' : operation successful
+        'failure' : unexpected failure
+        'invalidsession' : sessionid invalid or expired
+        'invalidparam' : invalid parameter
+        'unauthorized' : user is not authorized to perform action on these parameters
+</xsd:documentation></xsd:annotation></xsd:element>
             		<xsd:element name="resultdescription"
             			type="xsd:string">
+                        <xsd:annotation>
+                        	<xsd:documentation>if not success, contains the reason for error
+</xsd:documentation>
+                        </xsd:annotation>
             		</xsd:element>
             		<xsd:element name="settings" type="sm:SettingEntry" minOccurs="0" maxOccurs="unbounded">
             			<xsd:annotation>
@@ -308,10 +713,21 @@
             		<xsd:element
             			name="resultcode"
             			type="xsd:string">
+                        <xsd:annotation>
+                        	<xsd:documentation>        'success' : operation successful
+        'failure' : unexpected failure
+        'invalidsession' : sessionid invalid or expired
+        'invalidparam' : invalid parameter
+        'unauthorized' : user is not authorized to perform action on these parameters
+</xsd:documentation></xsd:annotation>
             		</xsd:element>
             		<xsd:element
             			name="resultdescription"
             			type="xsd:string">
+                        <xsd:annotation>
+                        	<xsd:documentation>if not success, contains the reason for error
+</xsd:documentation>
+                        </xsd:annotation>
             		</xsd:element>
             		<xsd:element
             			name="imports"
@@ -325,54 +741,115 @@
             		<xsd:element
             			name="id"
             			type="xsd:int">
+                        <xsd:annotation>
+                        	<xsd:documentation>unique identifier
+</xsd:documentation>
+                        </xsd:annotation>
             		</xsd:element>
             		<xsd:element
             			name="name"
             			type="xsd:string">
+                        <xsd:annotation>
+                        	<xsd:documentation>name
+</xsd:documentation>
+                        </xsd:annotation>
             		</xsd:element>
             		<xsd:element
             			name="description"
             			type="xsd:string">
+                        <xsd:annotation>
+                        	<xsd:documentation>description
+</xsd:documentation>
+                        </xsd:annotation>
             		</xsd:element>
             		<xsd:element
             			name="notes"
             			type="xsd:string">
+                        <xsd:annotation>
+                        	<xsd:documentation>additional notes about this import
+</xsd:documentation>
+                        </xsd:annotation>
             		</xsd:element>
             		<xsd:element
             			name="uploadkey"
             			type="xsd:string">
+                        <xsd:annotation>
+                        	<xsd:documentation>unique key used by import data uploader to identify which import to use
+</xsd:documentation>
+                        </xsd:annotation>
             		</xsd:element>
             		<xsd:element
             			name="type"
             			type="xsd:string">
+                        <xsd:annotation>
+                        	<xsd:documentation>'person', 'user', 'enrollment', 'section'
+</xsd:documentation>
+                        </xsd:annotation>
             		</xsd:element>
             		<xsd:element
             			name="method"
             			type="xsd:string">
+                        <xsd:annotation>
+                        	<xsd:documentation>'updateonly' only update existing data,
+'update' update existing data and create new,
+'full' update, create, and delete data records to match latest import data file,
+'createonly' only create new data
+
+</xsd:documentation>
+                        </xsd:annotation>
             		</xsd:element>
             		<xsd:element
             			name="status"
             			type="xsd:string">
+                        <xsd:annotation>
+                        	<xsd:documentation>'idle', 'queued', 'running', 'error'
+</xsd:documentation>
+                        </xsd:annotation>
             		</xsd:element>
             		<xsd:element
             			name="lastrun"
             			type="xsd:string">
+                        <xsd:annotation>
+                        	<xsd:documentation>date import was last executed, format YYYY-MM-DD HH:MM:SS
+empty if never
+
+</xsd:documentation>
+                        </xsd:annotation>
             		</xsd:element>
             		<xsd:element
             			name="filedate"
             			type="xsd:string">
+                        <xsd:annotation>
+                        	<xsd:documentation>date last import data was uploaded, format YYYY-MM-DD HH:MM:SS
+empty if never
+
+</xsd:documentation>
+                        </xsd:annotation>
             		</xsd:element>
             		<xsd:element
             			name="filesize"
             			type="xsd:int">
+                        <xsd:annotation>
+                        	<xsd:documentation>number of bytes in data file
+
+</xsd:documentation>
+                        </xsd:annotation>
             		</xsd:element>
             		<xsd:element
             			name="automatic"
             			type="xsd:boolean">
+                        <xsd:annotation>
+                        	<xsd:documentation>true to automatically run import after new import data file is uploaded
+</xsd:documentation>
+                        </xsd:annotation>
             		</xsd:element>
             		<xsd:element
             			name="skipheaderlines"
             			type="xsd:int">
+                        <xsd:annotation>
+                        	<xsd:documentation>number of lines to skip at top of import data file
+</xsd:documentation>
+                        </xsd:annotation>
             		</xsd:element>
             	</xsd:sequence>
             </xsd:complexType>
@@ -381,10 +858,21 @@
             		<xsd:element
             			name="resultcode"
             			type="xsd:string">
+                        <xsd:annotation>
+                        	<xsd:documentation>        'success' : operation successful
+        'failure' : unexpected failure
+        'invalidsession' : sessionid invalid or expired
+        'invalidparam' : invalid parameter
+        'unauthorized' : user is not authorized to perform action on these parameters
+</xsd:documentation></xsd:annotation>
             		</xsd:element>
             		<xsd:element
             			name="resultdescription"
             			type="xsd:string">
+                        <xsd:annotation>
+                        	<xsd:documentation>if not success, contains the reason for error
+</xsd:documentation>
+                        </xsd:annotation>
             		</xsd:element>
             	</xsd:sequence>
             </xsd:complexType>
@@ -393,10 +881,21 @@
             		<xsd:element
             			name="resultcode"
             			type="xsd:string">
+                        <xsd:annotation>
+                        	<xsd:documentation>        'success' : operation successful
+        'failure' : unexpected failure
+        'invalidsession' : sessionid invalid or expired
+        'invalidparam' : invalid parameter
+        'unauthorized' : user is not authorized to perform action on these parameters
+</xsd:documentation></xsd:annotation>
             		</xsd:element>
             		<xsd:element
             			name="resultdescription"
             			type="xsd:string">
+                        <xsd:annotation>
+                        	<xsd:documentation>if not success, contains the reason for error
+</xsd:documentation>
+                        </xsd:annotation>
             		</xsd:element>
             	</xsd:sequence>
             </xsd:complexType>
@@ -405,10 +904,21 @@
             		<xsd:element
             			name="resultcode"
             			type="xsd:string">
+                        <xsd:annotation>
+                        	<xsd:documentation>        'success' : operation successful
+        'failure' : unexpected failure
+        'invalidsession' : sessionid invalid or expired
+        'invalidparam' : invalid parameter
+        'unauthorized' : user is not authorized to perform action on these parameters
+</xsd:documentation></xsd:annotation>
             		</xsd:element>
             		<xsd:element
             			name="resultdescription"
             			type="xsd:string">
+                        <xsd:annotation>
+                        	<xsd:documentation>if not success, contains the reason for error
+</xsd:documentation>
+                        </xsd:annotation>
             		</xsd:element>
             		<xsd:element
             			name="import"
@@ -426,14 +936,26 @@
             		<xsd:element
             			name="severity"
             			type="xsd:string">
+                        <xsd:annotation>
+                        	<xsd:documentation>'info', 'error', 'warn'
+</xsd:documentation>
+                        </xsd:annotation>
             		</xsd:element>
             		<xsd:element
             			name="line"
             			type="xsd:int">
+                        <xsd:annotation>
+                        	<xsd:documentation>line number in import data where logentry was caused
+</xsd:documentation>
+                        </xsd:annotation>
             		</xsd:element>
             		<xsd:element
             			name="message"
             			type="xsd:string">
+                        <xsd:annotation>
+                        	<xsd:documentation>log entry message detail
+</xsd:documentation>
+                        </xsd:annotation>
             		</xsd:element>
             	</xsd:sequence>
             </xsd:complexType>
@@ -450,18 +972,39 @@
             		<xsd:element
             			name="resultcode"
             			type="xsd:string">
+                        <xsd:annotation>
+                        	<xsd:documentation>        'success' : operation successful
+	'warning' : operation successful, however at least one pkey was skipped
+        'failure' : unexpected failure
+        'invalidsession' : sessionid invalid or expired
+        'invalidparam' : invalid parameter
+        'unauthorized' : user is not authorized to perform action on these parameters
+</xsd:documentation>
+                        </xsd:annotation>
             		</xsd:element>
             		<xsd:element
             			name="resultdescription"
             			type="xsd:string">
+                        <xsd:annotation>
+                        	<xsd:documentation>if not success, contains the reason for error
+</xsd:documentation>
+                        </xsd:annotation>
             		</xsd:element>
             		<xsd:element
             			name="listid"
             			type="xsd:int">
+                        <xsd:annotation>
+                        	<xsd:documentation>unique identifier of list just created
+</xsd:documentation>
+                        </xsd:annotation>
             		</xsd:element>
             		<xsd:element
             			name="numpeople"
             			type="xsd:int">
+                        <xsd:annotation>
+                        	<xsd:documentation>number of people added to the list.  This may not match the number of pkeys in the method input parameter. invalid ids are skipped.
+</xsd:documentation>
+                        </xsd:annotation>
             		</xsd:element>
             	</xsd:sequence>
             </xsd:complexType>
@@ -470,36 +1013,52 @@
             		<xsd:element
             			name="resultcode"
             			type="xsd:string">
+                        <xsd:annotation>
+                        	<xsd:documentation>        'success' : operation successful
+        'failure' : unexpected failure
+        'invalidsession' : sessionid invalid or expired
+        'invalidparam' : invalid parameter
+        'unauthorized' : user is not authorized to perform action on these parameters
+</xsd:documentation></xsd:annotation>
             		</xsd:element>
             		<xsd:element
             			name="resultdescription"
             			type="xsd:string">
+                        <xsd:annotation>
+                        	<xsd:documentation>if not success, contains the reason for error
+</xsd:documentation>
+                        </xsd:annotation>
             		</xsd:element>
             	</xsd:sequence>
             </xsd:complexType>
 </xsd:schema></wsdl:types>
     <wsdl:message name="loginRequest">
-    	<wsdl:part name="loginname" type="xsd:string"></wsdl:part>
-    	<wsdl:part name="password" type="xsd:string"></wsdl:part>
+    	<wsdl:part name="loginname" type="xsd:string">
+    		<wsdl:documentation>loginname (or username) to login as</wsdl:documentation></wsdl:part>
+    	<wsdl:part name="password" type="xsd:string">
+    		<wsdl:documentation>the user's password</wsdl:documentation></wsdl:part>
     </wsdl:message>
     <wsdl:message name="loginResponse">
     	<wsdl:part name="result" type="sm:loginResult"></wsdl:part>
     </wsdl:message>
     <wsdl:message name="getListsRequest">
-    	<wsdl:part name="sessionid" type="xsd:string"></wsdl:part>
+    	<wsdl:part name="sessionid" type="xsd:string">
+    		<wsdl:documentation>the session identifier</wsdl:documentation></wsdl:part>
     </wsdl:message>
     <wsdl:message name="getListsResponse">
     	<wsdl:part name="result" type="sm:getListsResult"></wsdl:part>
     </wsdl:message>
     <wsdl:message name="getMessagesRequest">
-    	<wsdl:part name="sessionid" type="xsd:string"></wsdl:part>
+    	<wsdl:part name="sessionid" type="xsd:string">
+    		<wsdl:documentation>the session identifier</wsdl:documentation></wsdl:part>
     	<wsdl:part name="type" type="xsd:string"></wsdl:part>
     </wsdl:message>
     <wsdl:message name="getMessagesResponse">
     	<wsdl:part name="result" type="sm:getMessagesResult"></wsdl:part>
     </wsdl:message>
     <wsdl:message name="setMessageBodyRequest">
-    	<wsdl:part name="sessionid" type="xsd:string"></wsdl:part>
+    	<wsdl:part name="sessionid" type="xsd:string">
+    		<wsdl:documentation></wsdl:documentation></wsdl:part>
     	<wsdl:part name="messageid" type="xsd:int"></wsdl:part>
     	<wsdl:part name="messagetext" type="xsd:string"></wsdl:part>
     </wsdl:message>
@@ -507,7 +1066,8 @@
     	<wsdl:part name="result" type="sm:setMessagebodyResult"></wsdl:part>
     </wsdl:message>
     <wsdl:message name="uploadAudioRequest">
-    	<wsdl:part name="sessionid" type="xsd:string"></wsdl:part>
+    	<wsdl:part name="sessionid" type="xsd:string">
+    		<wsdl:documentation></wsdl:documentation></wsdl:part>
     	<wsdl:part name="name" type="xsd:string"></wsdl:part>
     	<wsdl:part name="audio" type="xsd:string"></wsdl:part>
     	<wsdl:part name="mimetype" type="xsd:string"></wsdl:part>
@@ -516,44 +1076,55 @@
     	<wsdl:part name="result" type="sm:uploadAudioResult"></wsdl:part>
     </wsdl:message>
     <wsdl:message name="getJobTypesRequest">
-    	<wsdl:part name="sessionid" type="xsd:string"></wsdl:part>
+    	<wsdl:part name="sessionid" type="xsd:string">
+    		<wsdl:documentation></wsdl:documentation></wsdl:part>
     </wsdl:message>
     <wsdl:message name="getJobTypesResponse">
     	<wsdl:part name="result" type="sm:getJobTypesResult"></wsdl:part>
     </wsdl:message>
     <wsdl:message name="getActiveJobsRequest">
-    	<wsdl:part name="sessionid" type="xsd:string"></wsdl:part>
+    	<wsdl:part name="sessionid" type="xsd:string">
+    		<wsdl:documentation></wsdl:documentation></wsdl:part>
     </wsdl:message>
     <wsdl:message name="getActiveJobsResponse">
     	<wsdl:part name="result" type="sm:getActiveJobsResult"></wsdl:part>
     </wsdl:message>
     <wsdl:message name="getRepeatingJobsRequest">
-    	<wsdl:part name="sessionid" type="xsd:string"></wsdl:part>
+    	<wsdl:part name="sessionid" type="xsd:string">
+    		<wsdl:documentation></wsdl:documentation></wsdl:part>
     </wsdl:message>
     <wsdl:message name="getRepeatingJobsResponse">
     	<wsdl:part name="result" type="sm:getRepeatingJobsResult"></wsdl:part>
     </wsdl:message>
     <wsdl:message name="sendRepeatingJobRequest">
-    	<wsdl:part name="sessionid" type="xsd:string"></wsdl:part>
+    	<wsdl:part name="sessionid" type="xsd:string">
+    		<wsdl:documentation></wsdl:documentation></wsdl:part>
     	<wsdl:part name="jobid" type="xsd:int"></wsdl:part>
     </wsdl:message>
     <wsdl:message name="sendRepeatingJobResponse">
     	<wsdl:part name="result" type="sm:sendJobResult"></wsdl:part>
     </wsdl:message>
     <wsdl:message name="getJobStatusRequest">
-    	<wsdl:part name="sessionid" type="xsd:string"></wsdl:part>
+    	<wsdl:part name="sessionid" type="xsd:string">
+    		<wsdl:documentation></wsdl:documentation></wsdl:part>
     	<wsdl:part name="jobid" type="xsd:int"></wsdl:part>
     </wsdl:message>
     <wsdl:message name="getJobStatusResponse">
     	<wsdl:part name="result" type="sm:getJobStatusResult"></wsdl:part>
     </wsdl:message>
     <wsdl:message name="sendJobRequest">
-    	<wsdl:part name="sessionid" type="xsd:string"></wsdl:part>
-    	<wsdl:part name="name" type="xsd:string"></wsdl:part>
-    	<wsdl:part name="description" type="xsd:string"></wsdl:part>
-    	<wsdl:part name="listid" type="xsd:int"></wsdl:part>
-    	<wsdl:part name="jobtypeid" type="xsd:int"></wsdl:part>
-        <wsdl:part name="startdate" type="xsd:string"></wsdl:part>
+    	<wsdl:part name="sessionid" type="xsd:string">
+    		<wsdl:documentation>this session identifier</wsdl:documentation></wsdl:part>
+    	<wsdl:part name="name" type="xsd:string">
+    		<wsdl:documentation>name of the job</wsdl:documentation></wsdl:part>
+    	<wsdl:part name="description" type="xsd:string">
+    		<wsdl:documentation>description of the job</wsdl:documentation></wsdl:part>
+    	<wsdl:part name="listid" type="xsd:int">
+    		<wsdl:documentation>list identifier</wsdl:documentation></wsdl:part>
+    	<wsdl:part name="jobtypeid" type="xsd:int">
+    		<wsdl:documentation>job type identifier</wsdl:documentation></wsdl:part>
+        <wsdl:part name="startdate" type="xsd:string">
+        	<wsdl:documentation>date to start this job</wsdl:documentation></wsdl:part>
         <wsdl:part name="starttime" type="xsd:string"></wsdl:part>
         <wsdl:part name="endtime" type="xsd:string"></wsdl:part>
         <wsdl:part name="daystorun" type="xsd:int"></wsdl:part>
@@ -573,14 +1144,16 @@
     	<wsdl:part name="Response" type="xsd:string"></wsdl:part>
     </wsdl:message>
     <wsdl:message name="getContactsRequest">
-    	<wsdl:part name="sessionid" type="xsd:string"></wsdl:part>
+    	<wsdl:part name="sessionid" type="xsd:string">
+    		<wsdl:documentation></wsdl:documentation></wsdl:part>
     	<wsdl:part name="pkey" type="xsd:string"></wsdl:part>
     </wsdl:message>
     <wsdl:message name="getContactsResponse">
     	<wsdl:part name="result" type="sm:getContactsResult"></wsdl:part>
     </wsdl:message>
     <wsdl:message name="setContactRequest">
-    	<wsdl:part name="sessionid" type="xsd:string"></wsdl:part>
+    	<wsdl:part name="sessionid" type="xsd:string">
+    		<wsdl:documentation></wsdl:documentation></wsdl:part>
     	<wsdl:part name="contacts" type="sm:Contact"></wsdl:part>
     </wsdl:message>
     <wsdl:message name="setContactResponse">
@@ -602,44 +1175,50 @@
     	<wsdl:part name="result" type="sm:loginToCustomerResult"></wsdl:part>
     </wsdl:message>
     <wsdl:message name="getLabelsRequest">
-    	<wsdl:part name="sessionid" type="xsd:string"></wsdl:part>
-    	<wsdl:part name="type" type="xsd:string"></wsdl:part>
+    	<wsdl:part name="sessionid" type="xsd:string">
+    		<wsdl:documentation></wsdl:documentation></wsdl:part>
+    	<wsdl:part name="type" type="xsd:string">
+    		<wsdl:documentation>'phone', 'email', 'sms'</wsdl:documentation></wsdl:part>
     </wsdl:message>
     <wsdl:message name="getLabelsResponse">
     	<wsdl:part name="result" type="sm:getLabelsResult"></wsdl:part>
     </wsdl:message>
     <wsdl:message name="getSurveyJobTypesRequest">
-    	<wsdl:part name="sessionid" type="xsd:string"></wsdl:part>
+    	<wsdl:part name="sessionid" type="xsd:string">
+    		<wsdl:documentation></wsdl:documentation></wsdl:part>
     </wsdl:message>
     <wsdl:message name="getSurveyJobTypesResponse">
     	<wsdl:part name="result" type="sm:getJobTypesResult"></wsdl:part>
     </wsdl:message>
     <wsdl:message name="createEmailMessageRequest">
-    	<wsdl:part name="sessionid" type="xsd:string"></wsdl:part>
+    	<wsdl:part name="sessionid" type="xsd:string">
+    		<wsdl:documentation>this session identifier</wsdl:documentation></wsdl:part>
         <wsdl:part name="name" type="xsd:string">
         	<wsdl:documentation>required. max 50 char</wsdl:documentation></wsdl:part>
         <wsdl:part name="description" type="xsd:string">
         	<wsdl:documentation>optional. max 50 char</wsdl:documentation></wsdl:part>
-        <wsdl:part name="messagetext" type="xsd:string"></wsdl:part>
+        <wsdl:part name="messagetext" type="xsd:string">
+        	<wsdl:documentation>body of the message</wsdl:documentation></wsdl:part>
         <wsdl:part name="subject" type="xsd:string">
-        	<wsdl:documentation>optional.</wsdl:documentation></wsdl:part>
+        	<wsdl:documentation>optional subject</wsdl:documentation></wsdl:part>
     	<wsdl:part name="fromname" type="xsd:string">
-    		<wsdl:documentation>optiona</wsdl:documentation></wsdl:part>
+    		<wsdl:documentation>optional</wsdl:documentation></wsdl:part>
     	<wsdl:part name="fromemail" type="xsd:string">
-    		<wsdl:documentation>required. must be valid email address forma</wsdl:documentation></wsdl:part>
+    		<wsdl:documentation>required. must be valid email address format</wsdl:documentation></wsdl:part>
     </wsdl:message>
     <wsdl:message name="createEmailMessageResponse">
     	<wsdl:part name="result" type="sm:createMessageResult">
     	</wsdl:part>
     </wsdl:message>
     <wsdl:message name="createPhoneMessageRequest">
-    	<wsdl:part name="sessionid" type="xsd:string"></wsdl:part>
+    	<wsdl:part name="sessionid" type="xsd:string">
+    		<wsdl:documentation>this session identifier</wsdl:documentation></wsdl:part>
     	<wsdl:part name="name" type="xsd:string">
     		<wsdl:documentation>required. max 50 char</wsdl:documentation></wsdl:part>
     	<wsdl:part name="description" type="xsd:string">
     		<wsdl:documentation>optional. max 50 char</wsdl:documentation></wsdl:part>
     	<wsdl:part name="messagetext" type="xsd:string">
-    		<wsdl:documentation>required. message parts parsed from tex</wsdl:documentation></wsdl:part>
+    		<wsdl:documentation>required. message parts parsed from text</wsdl:documentation></wsdl:part>
     	<wsdl:part name="ttsgender" type="xsd:string">
     		<wsdl:documentation>optional.text-to-speech voice gender is 'female' unless 'male' is specified (default is 'female')</wsdl:documentation></wsdl:part>
     </wsdl:message>
@@ -647,7 +1226,8 @@
     	<wsdl:part name="result" type="sm:createMessageResult"></wsdl:part>
     </wsdl:message>
     <wsdl:message name="createSmsMessageRequest">
-    	<wsdl:part name="sessionid" type="xsd:string"></wsdl:part>
+    	<wsdl:part name="sessionid" type="xsd:string">
+    		<wsdl:documentation></wsdl:documentation></wsdl:part>
     	<wsdl:part name="name" type="xsd:string">
     		<wsdl:documentation>required. max 50 char</wsdl:documentation></wsdl:part>
     	<wsdl:part name="description" type="xsd:string">
@@ -659,19 +1239,34 @@
     	<wsdl:part name="result" type="sm:createMessageResult"></wsdl:part>
     </wsdl:message>
     <wsdl:message name="sendJobExtendedRequest">
-    	<wsdl:part name="sessionid" type="xsd:string"></wsdl:part>
-    	<wsdl:part name="name" type="xsd:string"></wsdl:part>
-    	<wsdl:part name="description" type="xsd:string"></wsdl:part>
-    	<wsdl:part name="listids" type="sm:listids"></wsdl:part>
-    	<wsdl:part name="jobtypeid" type="xsd:int"></wsdl:part>
-    	<wsdl:part name="startdate" type="xsd:string"></wsdl:part>
-    	<wsdl:part name="starttime" type="xsd:string"></wsdl:part>
-    	<wsdl:part name="endtime" type="xsd:string"></wsdl:part>
-    	<wsdl:part name="daystorun" type="xsd:int"></wsdl:part>
-    	<wsdl:part name="phonemessageid" type="xsd:int"></wsdl:part>
-    	<wsdl:part name="emailmessageid" type="xsd:int"></wsdl:part>
-    	<wsdl:part name="smsmessageid" type="xsd:int"></wsdl:part>
-    	<wsdl:part name="maxcallattempts" type="xsd:int"></wsdl:part>
+    	<wsdl:part name="sessionid" type="xsd:string">
+    		<wsdl:documentation>this session identifier</wsdl:documentation></wsdl:part>
+    	<wsdl:part name="name" type="xsd:string">
+    		<wsdl:documentation>required. max chars 50</wsdl:documentation></wsdl:part>
+    	<wsdl:part name="description" type="xsd:string">
+    		<wsdl:documentation>optional. max chars 50
+</wsdl:documentation></wsdl:part>
+    	<wsdl:part name="listids" type="sm:listids">
+    		<wsdl:documentation>array of list identifiers (one or more)</wsdl:documentation></wsdl:part>
+    	<wsdl:part name="jobtypeid" type="xsd:int">
+    		<wsdl:documentation>job type identifier</wsdl:documentation></wsdl:part>
+    	<wsdl:part name="startdate" type="xsd:string">
+    		<wsdl:documentation>date to start job, format YYYY-MM-DD</wsdl:documentation></wsdl:part>
+    	<wsdl:part name="starttime" type="xsd:string">
+    		<wsdl:documentation>time of day to start job, format HH:MM:SS</wsdl:documentation></wsdl:part>
+    	<wsdl:part name="endtime" type="xsd:string">
+    		<wsdl:documentation>time of day to stop/pause job, format HH:MM:SS</wsdl:documentation></wsdl:part>
+    	<wsdl:part name="daystorun" type="xsd:int">
+    		<wsdl:documentation>number of days to run.  minimum 1, max depends on user's profile setting</wsdl:documentation></wsdl:part>
+    	<wsdl:part name="phonemessageid" type="xsd:int">
+    		<wsdl:documentation>message identifier for phone message, optional but at least phone, email, or sms must be set
+</wsdl:documentation></wsdl:part>
+    	<wsdl:part name="emailmessageid" type="xsd:int">
+    		<wsdl:documentation>message identifier for email message, optional but at least phone, email, or sms must be set</wsdl:documentation></wsdl:part>
+    	<wsdl:part name="smsmessageid" type="xsd:int">
+    		<wsdl:documentation>message identifier for sm message, optional but at least phone, email, or sms must be set</wsdl:documentation></wsdl:part>
+    	<wsdl:part name="maxcallattempts" type="xsd:int">
+    		<wsdl:documentation>number of attempts to call each phone number.  minimum 1, maximum set by user's profile</wsdl:documentation></wsdl:part>
     	<wsdl:part name="options" type="sm:jobOptions">
     		<wsdl:documentation>Any of the following options may be used, zero, one or more, if missing an option the default is used.
 
@@ -685,22 +1280,24 @@ sendreport: true/false, sends an report when the job is finished.
     	<wsdl:part name="result" type="sm:sendJobResult"></wsdl:part>
     </wsdl:message>
     <wsdl:message name="setContactDestinationRequest">
-    	<wsdl:part name="sessionid" type="xsd:string"></wsdl:part>
+    	<wsdl:part name="sessionid" type="xsd:string">
+    		<wsdl:documentation></wsdl:documentation></wsdl:part>
     	<wsdl:part name="pkey" type="xsd:string">
     		<wsdl:documentation>unique person identifier - max 255 character</wsdl:documentation></wsdl:part>
     	<wsdl:part name="type" type="xsd:string">
     		<wsdl:documentation>type of destination to set values are 'phone', 'email', 'sms'</wsdl:documentation></wsdl:part>
     	<wsdl:part name="sequence" type="xsd:int">
-    		<wsdl:documentation>which destination sequence to set '0', '1', '2', ... max depends on the number configured for your accoun</wsdl:documentation></wsdl:part>
+    		<wsdl:documentation>which destination sequence to set '0', '1', '2', ... max depends on the number configured for your account</wsdl:documentation></wsdl:part>
     	<wsdl:part name="destination" type="xsd:string">
-    		<wsdl:documentation>the contact destination, could be a valid phone number or email addres
+    		<wsdl:documentation>the contact destination, could be a valid phone number or email address
+
 max 20 characters for type 'phone'
 max 100 characters for type 'email'
 max 20 characters for type 'sms'
 </wsdl:documentation></wsdl:part>
     	<wsdl:part name="editlock" type="xsd:boolean">
     		<wsdl:documentation>'true' to lock the contact data - imports do not overwrite this destination
-'false' to unlock the contact data - imports may overwrit</wsdl:documentation></wsdl:part>
+'false' to unlock the contact data - imports may overwrite</wsdl:documentation></wsdl:part>
     </wsdl:message>
     <wsdl:message name="setContactDestinationResponse">
     	<wsdl:part name="result"
@@ -708,29 +1305,32 @@ max 20 characters for type 'sms'
     	</wsdl:part>
     </wsdl:message>
     <wsdl:message name="setContactPreferenceRequest">
-    	<wsdl:part name="sessionid" type="xsd:string"></wsdl:part>
+    	<wsdl:part name="sessionid" type="xsd:string">
+    		<wsdl:documentation> session identifier</wsdl:documentation></wsdl:part>
     	<wsdl:part name="pkey" type="xsd:string">
-    		<wsdl:documentation></wsdl:documentation></wsdl:part>
+    		<wsdl:documentation>person unique identifier</wsdl:documentation></wsdl:part>
     	<wsdl:part name="type" type="xsd:string">
-    		<wsdl:documentation></wsdl:documentation></wsdl:part>
+    		<wsdl:documentation>either 'phone', 'email', or 'sms</wsdl:documentation></wsdl:part>
     	<wsdl:part name="sequence" type="xsd:int">
-    		<wsdl:documentation></wsdl:documentation></wsdl:part>
+    		<wsdl:documentation>sequence of destination, begins with 0 (0, 1, 2, ...)</wsdl:documentation></wsdl:part>
     	<wsdl:part name="jobtypeid" type="xsd:int">
-    		<wsdl:documentation>jobtype identifie</wsdl:documentation></wsdl:part>
+    		<wsdl:documentation>jobtype identifier</wsdl:documentation></wsdl:part>
     	<wsdl:part name="enabled" type="xsd:boolean">
-    		<wsdl:documentation>value is 'true' or 'false'</wsdl:documentation></wsdl:part>
+    		<wsdl:documentation>'true' if the destination should be contacted for this job type, 'false' otherwise</wsdl:documentation></wsdl:part>
     </wsdl:message>
     <wsdl:message name="setContactPreferenceResponse">
     	<wsdl:part name="result" type="sm:setContactPreferenceResult"></wsdl:part>
     </wsdl:message>
     <wsdl:message name="getPermissionsRequest">
-    	<wsdl:part name="sessionid" type="xsd:string"></wsdl:part>
+    	<wsdl:part name="sessionid" type="xsd:string">
+    		<wsdl:documentation></wsdl:documentation></wsdl:part>
     </wsdl:message>
     <wsdl:message name="getPermissionsResponse">
     	<wsdl:part name="result" type="sm:getPermissionsResult"></wsdl:part>
     </wsdl:message>
     <wsdl:message name="getSettingsRequest">
-    	<wsdl:part name="sessionid" type="xsd:string"></wsdl:part>
+    	<wsdl:part name="sessionid" type="xsd:string">
+    		<wsdl:documentation></wsdl:documentation></wsdl:part>
     </wsdl:message>
     <wsdl:message name="getSettingsResponse">
     	<wsdl:part name="result" type="sm:getSettingsResult"></wsdl:part>
@@ -739,6 +1339,7 @@ max 20 characters for type 'sms'
     	<wsdl:part
     		name="sessionid"
     		type="xsd:string">
+    		<wsdl:documentation></wsdl:documentation>
     	</wsdl:part>
     </wsdl:message>
     <wsdl:message name="getImportsResponse">
@@ -751,14 +1352,17 @@ max 20 characters for type 'sms'
     	<wsdl:part
     		name="sessionid"
     		type="xsd:string">
+    		<wsdl:documentation>this session identifier</wsdl:documentation>
     	</wsdl:part>
     	<wsdl:part
     		name="importid"
     		type="xsd:int">
+    		<wsdl:documentation>unique identifier of import to upload data for</wsdl:documentation>
     	</wsdl:part>
     	<wsdl:part
     		name="base64data"
     		type="xsd:string">
+    		<wsdl:documentation>base64 encoded data</wsdl:documentation>
     	</wsdl:part>
     </wsdl:message>
     <wsdl:message name="uploadImportResponse">
@@ -771,10 +1375,12 @@ max 20 characters for type 'sms'
     	<wsdl:part
     		name="sessionid"
     		type="xsd:string">
+    		<wsdl:documentation>this session identifier</wsdl:documentation>
     	</wsdl:part>
     	<wsdl:part
     		name="importid"
     		type="xsd:int">
+    		<wsdl:documentation>unique identifier of import to run</wsdl:documentation>
     	</wsdl:part>
     </wsdl:message>
     <wsdl:message name="runImportResponse">
@@ -787,10 +1393,12 @@ max 20 characters for type 'sms'
     	<wsdl:part
     		name="sessionid"
     		type="xsd:string">
+    		<wsdl:documentation>this session identifier</wsdl:documentation>
     	</wsdl:part>
     	<wsdl:part
     		name="importid"
     		type="xsd:int">
+    		<wsdl:documentation>unique identifier of import to get details about</wsdl:documentation>
     	</wsdl:part>
     </wsdl:message>
     <wsdl:message name="getImportDetailResponse">
@@ -803,18 +1411,22 @@ max 20 characters for type 'sms'
     	<wsdl:part
     		name="sessionid"
     		type="xsd:string">
+    		<wsdl:documentation>this session identifier</wsdl:documentation>
     	</wsdl:part>
     	<wsdl:part
     		name="name"
     		type="xsd:string">
+    		<wsdl:documentation>name of list</wsdl:documentation>
     	</wsdl:part>
     	<wsdl:part
     		name="description"
     		type="xsd:string">
+    		<wsdl:documentation>description of list</wsdl:documentation>
     	</wsdl:part>
     	<wsdl:part
     		name="pkeys"
     		type="sm:pkeys">
+    		<wsdl:documentation>array of pkeys - a 'pkey' is the person unique identifier</wsdl:documentation>
     	</wsdl:part>
     </wsdl:message>
     <wsdl:message name="createListFromIdsResponse">
@@ -827,10 +1439,12 @@ max 20 characters for type 'sms'
     	<wsdl:part
     		name="sessionid"
     		type="xsd:string">
+    		<wsdl:documentation>this session identifier</wsdl:documentation>
     	</wsdl:part>
     	<wsdl:part
     		name="listid"
     		type="xsd:int">
+    		<wsdl:documentation>unique identifier of list to delete</wsdl:documentation>
     	</wsdl:part>
     </wsdl:message>
     <wsdl:message name="deleteListResponse">
@@ -842,30 +1456,18 @@ max 20 characters for type 'sms'
     <wsdl:portType name="SMClient">
     	<wsdl:operation name="login">
     		<wsdl:documentation>Given a valid loginname/password, a session id is generated and passed back.
-If an error occurs, error will contain the error and sessionid will be empty string.
-
-login:
-	params: string loginname, string password
-	returns: string error, string sessionid
-
 </wsdl:documentation>
     		<wsdl:input message="sm:loginRequest"></wsdl:input>
     		<wsdl:output message="sm:loginResponse"></wsdl:output>
         </wsdl:operation>
     	<wsdl:operation name="getLists">
-    		<wsdl:documentation>Given a valid sessionid, an array of lists will be returned.
-If error occurs, error will contain error string and lists will not be set.
-
-getLists:
-	params: string sessionid
-	returns:
-		lists: array of lists
-		error: string</wsdl:documentation>
+    		<wsdl:documentation>Given a valid sessionid, an array of lists will be returned for this session's user.
+</wsdl:documentation>
     		<wsdl:input message="sm:getListsRequest"></wsdl:input>
     		<wsdl:output message="sm:getListsResponse"></wsdl:output>
         </wsdl:operation>
     	<wsdl:operation name="getMessages">
-    		<wsdl:documentation>Given a valid sessionid and a valid message type, an array of messages will be returned.
+    		<wsdl:documentation>Given a valid sessionid and a valid message type, an array of messages will be returned for this session's user.
 If error occurs, error will contain error string and messages will not be set.
 
 Valid messages types are:
@@ -1082,19 +1684,23 @@ getJobTypes:
     		<wsdl:output message="sm:getSurveyJobTypesResponse"></wsdl:output>
     	</wsdl:operation>
     	<wsdl:operation name="createEmailMessage">
-    		<wsdl:documentation> </wsdl:documentation>
+    		<wsdl:documentation> Create an Email message, English language is assumed</wsdl:documentation>
     		<wsdl:input message="sm:createEmailMessageRequest"></wsdl:input>
     		<wsdl:output message="sm:createEmailMessageResponse"></wsdl:output>
     	</wsdl:operation>
     	<wsdl:operation name="createPhoneMessage">
+    		<wsdl:documentation>Create a Phone message, text used in text-to-speech. English is the language assumed (but may specify the voice gender)</wsdl:documentation>
     		<wsdl:input message="sm:createPhoneMessageRequest"></wsdl:input>
     		<wsdl:output message="sm:createPhoneMessageResponse"></wsdl:output>
     	</wsdl:operation>
     	<wsdl:operation name="createSmsMessage">
+    		<wsdl:documentation>Create a new SMS message, English is the language assumed.</wsdl:documentation>
     		<wsdl:input message="sm:createSmsMessageRequest"></wsdl:input>
     		<wsdl:output message="sm:createSmsMessageResponse"></wsdl:output>
     	</wsdl:operation>
     	<wsdl:operation name="sendJobExtended">
+    		<wsdl:documentation>Create and Submit a new Job.
+Like sendJob() with additional parameters.</wsdl:documentation>
     		<wsdl:input message="sm:sendJobExtendedRequest"></wsdl:input>
     		<wsdl:output message="sm:sendJobExtendedResponse"></wsdl:output>
     	</wsdl:operation>
@@ -1115,28 +1721,19 @@ returns:
     		<wsdl:output message="sm:setContactDestinationResponse"></wsdl:output>
     	</wsdl:operation>
     	<wsdl:operation name="setContactPreference">
-    		<wsdl:documentation>specify whether or not a contact destination should receive messages for the given job type
-params:
-    string sessionid : this session id
-    string pkey : person unique identifier
-    string type : 'phone', 'email', 'sms'
-    int sequence : 0, 1, 2, ...
-    int jobtypeid : id of the jobtype
-    boolean enabled : true if the destination should be contacted for this job type, false otherwise
-returns:
-   string resultcode : 'success' , 'invalidparam', 'unauthorized', 'failure'
-   string resultdescription : reason for failure</wsdl:documentation>
+    		<wsdl:documentation>Specify whether or not a contact destination should receive messages for the given job type.
+</wsdl:documentation>
     		<wsdl:input message="sm:setContactPreferenceRequest"></wsdl:input>
     		<wsdl:output message="sm:setContactPreferenceResponse"></wsdl:output>
     	</wsdl:operation>
     	<wsdl:operation name="getPermissions">
-    		<wsdl:documentation>find this user's permissions.  use to determine functionality available to them.
+    		<wsdl:documentation>Find this user's permissions. Use to determine functionality available to them.
 </wsdl:documentation>
     		<wsdl:input message="sm:getPermissionsRequest"></wsdl:input>
     		<wsdl:output message="sm:getPermissionsResponse"></wsdl:output>
     	</wsdl:operation>
     	<wsdl:operation name="getSettings">
-    		<wsdl:documentation>find this user's settings.  use to determine user preferences and other customer settings.</wsdl:documentation>
+    		<wsdl:documentation>Find this user's settings.  se to determine user preferences and other customer settings.</wsdl:documentation>
     		<wsdl:input message="sm:getSettingsRequest"></wsdl:input>
     		<wsdl:output message="sm:getSettingsResponse"></wsdl:output>
     	</wsdl:operation>
@@ -1151,7 +1748,7 @@ returns:
     		<wsdl:output message="sm:uploadImportResponse"></wsdl:output>
     	</wsdl:operation>
     	<wsdl:operation name="runImport">
-    		<wsdl:documentation>Causes the specified import to be queued.</wsdl:documentation>
+    		<wsdl:documentation>Causes the specified import to be queued for execution</wsdl:documentation>
     		<wsdl:input message="sm:runImportRequest"></wsdl:input>
     		<wsdl:output message="sm:runImportResponse"></wsdl:output>
     	</wsdl:operation>
@@ -1161,12 +1758,12 @@ returns:
     		<wsdl:output message="sm:getImportDetailResponse"></wsdl:output>
     	</wsdl:operation>
     	<wsdl:operation name="createListFromIds">
-    		<wsdl:documentation>Creates a new list and adds entries for each person authorized from the list of pkeys.</wsdl:documentation>
+    		<wsdl:documentation>Creates a new list and adds entries for each person authorized from the list of pkeys.  A 'pkey' is the unique id of the person. If the pkey is not found or not authorized, it is skipped. Results contain the number of people added.</wsdl:documentation>
     		<wsdl:input message="sm:createListFromIdsRequest"></wsdl:input>
     		<wsdl:output message="sm:createListFromIdsResponse"></wsdl:output>
     	</wsdl:operation>
     	<wsdl:operation name="deleteList">
-    		<wsdl:documentation>Marks a list for deletion, causing it to be soft-deleted. It may still be referenced, but won't be visible in the UI, and will be deleted during periodic mantenance. Does not modify the list contents.</wsdl:documentation>
+    		<wsdl:documentation>Marks a list for deletion, causing it to be soft-deleted. It may still be referenced, but won't be visible in the UI, and will be deleted during periodic mantainance. Does not modify the list contents.</wsdl:documentation>
     		<wsdl:input message="sm:deleteListRequest"></wsdl:input>
     		<wsdl:output message="sm:deleteListResponse"></wsdl:output>
     	</wsdl:operation></wsdl:portType>
