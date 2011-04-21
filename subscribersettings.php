@@ -80,7 +80,7 @@ $formdata["sitecode"] = array(
 $formdata['accountwarningoptions'] = _L('Account Expiration');
 $formdata["reminder1"] = array(
         "label" => _L("First Reminder"),
-        "fieldhelp" => _L('...'),
+        "fieldhelp" => _L('Subscribers who have not logged in will receive their first email warning this many days prior to account expiration. Entering 0 disables this feature.'),
         "value" => getSystemSetting("subscriber.reminder.1", "30"),
         "validators" => array(
             array("ValNumber","min" => 0,"max" => 60)
@@ -90,7 +90,7 @@ $formdata["reminder1"] = array(
     );
 $formdata["reminder2"] = array(
         "label" => _L("Second Reminder"),
-        "fieldhelp" => _L('...'),
+        "fieldhelp" => _L('Subscribers who have not logged in will receive their second email warning this many days prior to account expiration. Entering 0 disables this feature.'),
         "value" => getSystemSetting("subscriber.reminder.2", "15"),
         "validators" => array(
             array("ValNumber","min" => 0,"max" => 60)
@@ -100,7 +100,7 @@ $formdata["reminder2"] = array(
     );
 $formdata["reminder3"] = array(
         "label" => _L("Final Reminder"),
-        "fieldhelp" => _L('...'),
+        "fieldhelp" => _L('Subscribers who have not logged in will receive their final email warning this many days prior to account expiration. Entering 0 disables this feature.'),
         "value" => getSystemSetting("subscriber.reminder.3", "2"),
         "validators" => array(
             array("ValNumber","min" => 0,"max" => 60)
@@ -110,7 +110,7 @@ $formdata["reminder3"] = array(
     );
 $formdata["expiredays"] = array(
         "label" => _L("Automatic Close After"),
-        "fieldhelp" => _L('...'),
+        "fieldhelp" => _L('A subscriber\'s account will automatically expire after not logging in for this many days. Entering 0 disables this feature.'),
         "value" => getSystemSetting("subscriber.expiredays", "180"),
         "validators" => array(
             array("ValNumber","min" => 0,"max" => 365)
