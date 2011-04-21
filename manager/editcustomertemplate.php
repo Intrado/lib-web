@@ -174,7 +174,22 @@ if (CheckFormSubmit($f, "Save")) {
 									$haserror = true;
 								}
 								break;
+							case survey:
+								if (!strstr($body, "\${body}")) {
+									error('Template must contain "${body}" variable. ' . $subtype . ' ' . $langcode);
+									$haserror = true;
+								}
+								if (!strstr($body, "\${surveylink}")) {
+									error('Template must contain "${surveylink}" variable. ' . $subtype . ' ' . $langcode);
+									$haserror = true;
+								}
+								break;
 							case "subscriber":
+								if (!strstr($body, "\${daystotermination}")) {
+									error('Template must contain "${daystotermination}" variable. ' . $subtype . ' ' . $langcode);
+									$haserror = true;
+								}
+								
 								// also requires a subject
 								$subject = GetFormData($f, $s, "subject_" . $langcode);
 								if (strlen(trim($subject)) == 0) {
