@@ -22,7 +22,14 @@ if (!userOwns("messagegroup", $messagegroup->id) && $messagegroup->originalmessa
 		!userCanSubscribe('messagegroup', $_GET['id'])) {
 	redirect('unauthorized.php');
 }
- 
+
+// jobtype systempriority, used by email message previewer to select appropriate email template (emergency or notification)
+if (isset($_GET['jobpriority'])) {
+	$jobpriority = $_GET['jobpriority'] +0;
+}
+else
+	$jobpriority = 3; // general
+
 ///////////////////////////////////////////////////////////////////////////////
 // Request processing:
 ///////////////////////////////////////////////////////////////////////////////
@@ -154,10 +161,10 @@ foreach ($destinations as $type => $destination) {
 					if ($subtype == 'html') {
 						//$messagetext = str_replace('<<', '&lt;&lt;', $message->format($parts));
 						//$messagetext = str_replace('>>', '&gt;&gt;', $messagetext);
-						$messagetext = $message->renderEmailWithTemplate();
+						$messagetext = $message->renderEmailWithTemplate($jobpriority);
 					} else {
 						//$messagetext = escapehtml($message->format($parts));
-						$messagetext = escapehtml($message->renderEmailWithTemplate());
+						$messagetext = escapehtml($message->renderEmailWithTemplate($jobpriority));
 					}
 				} 
 

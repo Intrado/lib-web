@@ -2,6 +2,12 @@
 class MessageGroupSelectMenu extends FormItem {
 	function render ($value) {
 
+		// jobtype.systempriority used for email message preview
+		if (isset($this->args['jobpriority']))
+			$jobpriority = $this->args['jobpriority'];
+		else
+			$jobpriority = 3; // general
+		
 		$n = $this->form->name."_".$this->name;
 		$size = isset($this->args['size']) ? 'size="'.$this->args['size'].'"' : "";
 		$isstatic = isset($this->args['static']) && $this->args['static'] == true && $value;
@@ -45,14 +51,14 @@ class MessageGroupSelectMenu extends FormItem {
 								str += '<tr>';
 									str += '<th class=\'Language\'>' + item.value.languagename + '</th>';
 								if(response.headers['voicephone'])
-									str += '<td>' + (item.value.voicephone?'<a href=\"#\" onclick=\"popup(\'messagegroupviewpopup.php?type=phone&subtype=voice&languagecode=' + item.key + '&id=' + id + '\', 800, 500); return false;\"><img src=\'img/icons/accept.gif\' /></a>':'<img src=\'img/icons/diagona/16/160.gif\' />') + '</td>';
+									str += '<td>' + (item.value.voicephone?'<a href=\"#\" onclick=\"popup(\'messagegroupviewpopup.php?jobpriority=$jobpriority&type=phone&subtype=voice&languagecode=' + item.key + '&id=' + id + '\', 800, 500); return false;\"><img src=\'img/icons/accept.gif\' /></a>':'<img src=\'img/icons/diagona/16/160.gif\' />') + '</td>';
 								if(response.headers['htmlemail'])
-									str += '<td>' + (item.value.htmlemail?'<a href=\"#\" onclick=\"popup(\'messagegroupviewpopup.php?type=email&subtype=html&languagecode=' + item.key + '&id=' + id  + '\', 800, 500); return false;\"><img src=\'img/icons/accept.gif\' /></a>':'<img src=\'img/icons/diagona/16/160.gif\' />') + '</td>';
+									str += '<td>' + (item.value.htmlemail?'<a href=\"#\" onclick=\"popup(\'messagegroupviewpopup.php?jobpriority=$jobpriority&type=email&subtype=html&languagecode=' + item.key + '&id=' + id  + '\', 800, 500); return false;\"><img src=\'img/icons/accept.gif\' /></a>':'<img src=\'img/icons/diagona/16/160.gif\' />') + '</td>';
 								if(response.headers['plainemail'])
-									str += '<td>' + (item.value.plainemail?'<a href=\"#\" onclick=\"popup(\'messagegroupviewpopup.php?type=email&subtype=plain&languagecode=' + item.key + '&id=' + id +  '\', 800, 500); return false;\"><img src=\'img/icons/accept.gif\' /></a>':'<img src=\'img/icons/diagona/16/160.gif\' />') + '</td>';
+									str += '<td>' + (item.value.plainemail?'<a href=\"#\" onclick=\"popup(\'messagegroupviewpopup.php?jobpriority=$jobpriority&type=email&subtype=plain&languagecode=' + item.key + '&id=' + id +  '\', 800, 500); return false;\"><img src=\'img/icons/accept.gif\' /></a>':'<img src=\'img/icons/diagona/16/160.gif\' />') + '</td>';
 								if(response.headers['plainsms']) {
 									if(item.key == 'en')
-										str += '<td>' + (item.value.plainsms?'<a href=\"#\" onclick=\"popup(\'messagegroupviewpopup.php?type=sms&subtype=plain&languagecode=en&id=' + id  + '\', 500, 500); return false;\"><img src=\'img/icons/accept.gif\' /></a>':'<img src=\'img/icons/diagona/16/160.gif\' />') + '</td>';
+										str += '<td>' + (item.value.plainsms?'<a href=\"#\" onclick=\"popup(\'messagegroupviewpopup.php?jobpriority=$jobpriority&type=sms&subtype=plain&languagecode=en&id=' + id  + '\', 500, 500); return false;\"><img src=\'img/icons/accept.gif\' /></a>':'<img src=\'img/icons/diagona/16/160.gif\' />') + '</td>';
 									else
 										str += '<td>" . _L("N/A") . "</td>';
 								}

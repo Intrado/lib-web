@@ -993,6 +993,14 @@ class JobWiz_messageGroupChoose extends WizStep {
 			true,false,array($USER->id, $USER->id));
 		$messages = ($messages === false)?array("" =>_L("-- Select a Message --")):(array("" =>_L("-- Select a Message --")) + $messages);
 
+		// used to preview email message with correct template (emergency, or notification)
+		$wizJobType = isset($_SESSION['wizard_job']['jobtype'])?$_SESSION['wizard_job']['jobtype']:"all";
+		// TODO fix hack, should really get the jobtype.systempriority value
+		if ($wizJobType == "emergency")
+			$jobpriority = 1;
+		else
+			$jobpriority = 3;
+		
 		$formdata = array();
 
 		$formdata[] = $this->title;
@@ -1006,7 +1014,7 @@ class JobWiz_messageGroupChoose extends WizStep {
 				array("ValInArray","values"=>array_keys($messages)),
 				array("ValNonEmptyMessage")
 			),
-			"control" => array("MessageGroupSelectMenu","width"=>"80%", "values"=>$messages),
+			"control" => array("MessageGroupSelectMenu","width"=>"80%", "values"=>$messages, "jobpriority"=>$jobpriority),
 			"helpstep" => 1
 		);
 		return new Form("messageGroupChoose",$formdata,$helpsteps);
