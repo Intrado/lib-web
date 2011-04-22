@@ -275,3 +275,9 @@ li.wiznav_2 {
 	padding: 0px;
 	margin: 0px;
 }
+
+li.wizbuttonlist {
+	list-style-type: circle;
+	list-style-image: url(../img/icons/bullet_blue.gif);
+	list-style-position: outside;
+}
