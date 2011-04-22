@@ -174,7 +174,7 @@ if (CheckFormSubmit($f, "Save")) {
 									$haserror = true;
 								}
 								break;
-							case survey:
+							case "survey":
 								if (!strstr($body, "\${body}")) {
 									error('Template must contain "${body}" variable. ' . $subtype . ' ' . $langcode);
 									$haserror = true;
