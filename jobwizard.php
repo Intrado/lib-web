@@ -58,8 +58,6 @@ require_once("inc/twitteroauth/OAuth.php");
 require_once("inc/twitteroauth/twitteroauth.php");
 require_once("obj/Twitter.obj.php");
 require_once("obj/HtmlRadioButtonBigCheck.fi.php");
-require_once("obj/EasyCall.fi.php");
-require_once("obj/EasyCall.val.php");
 require_once("obj/TextAreaPhone.fi.php");
 require_once("obj/TextAreaPhone.val.php");
 require_once("obj/HtmlTextArea.fi.php");
