@@ -204,32 +204,42 @@ if (CheckFormSubmit($f, "Save")) {
 					
 					// if the message is already associated, reuse it. otherwise create a new one
 					$message = $messagegroup->getMessage("email", $subtype, $langcode, "none");
-					if ($message == null) {
-						$message = new Message();
-						$message->userid = $defaultmessage->userid;
-						$message->messagegroupid = $defaultmessage->messagegroupid;
-						$message->name = $defaultmessage->name;
-						$message->description = $languagemap[$langcode] . " " . ucfirst($subtype);
-						$message->type = "email";
-						$message->subtype = $subtype;
-						$message->languagecode = $langcode;
-						$message->autotranslate = "none";
-					}
-					$message->recreateParts($body, null, null);
-					if ($showheaders) {
-						$message->fromname = GetFormData($f, $s, "fromname");
-						$message->fromemail = GetFormData($f, $s, "fromemail");
-						$message->subject = GetFormData($f, $s, "subject_" . $langcode);
-						$message->stuffHeaders();
-					}
-					$message->modifydate = date("Y-m-d H:i:s");
-					
-					if ($message->id) {
-						$message->update();
+					// if no body, delete pre-existing message
+					if (strlen(trim($body)) == 0) {
+						if ($message != null) {
+							// cleanup parts
+							$message->recreateParts($body, null, null);
+							// cleanup message
+							$message->destroy(true);
+						}
 					} else {
-						$message->create();
+						// create or recreate message from body text
+						if ($message == null) {
+							$message = new Message();
+							$message->userid = $defaultmessage->userid;
+							$message->messagegroupid = $defaultmessage->messagegroupid;
+							$message->name = $defaultmessage->name;
+							$message->description = $languagemap[$langcode] . " " . ucfirst($subtype);
+							$message->type = "email";
+							$message->subtype = $subtype;
+							$message->languagecode = $langcode;
+							$message->autotranslate = "none";
+						}
+						$message->recreateParts($body, null, null);
+						if ($showheaders) {
+							$message->fromname = GetFormData($f, $s, "fromname");
+							$message->fromemail = GetFormData($f, $s, "fromemail");
+							$message->subject = GetFormData($f, $s, "subject_" . $langcode);
+							$message->stuffHeaders();
+						}
+						$message->modifydate = date("Y-m-d H:i:s");
+					
+						if ($message->id) {
+							$message->update();
+						} else {
+							$message->create();
+						}
 					}
-					// TODO should delete languages that have empty body
 				}
 			}
 			// single sms message for messagelink
