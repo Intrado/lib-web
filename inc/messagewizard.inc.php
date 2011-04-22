@@ -117,8 +117,8 @@ class MsgWiz_method extends WizStep {
 				$methoddetails["write"]["description"] = 
 					'<ol>
 						<li class="wizbuttonlist">'.escapehtml(_L("Write a simple phone message")).'</li>
-						<li class="wizbuttonlist">'.escapehtml(_L("Text-to-speech")).'</li>
-						<li class="wizbuttonlist">'.escapehtml(_L("Auto-translate available for English messages")).'</li>
+						<li class="wizbuttonlist">'.escapehtml(_L("Text-to-speech")).'</li>'.
+						($USER->authorize('sendmulti')?'<li class="wizbuttonlist">'.escapehtml(_L("Auto-translate available")).'</li>':'').'
 					</ol>';
 				$methoddetails["custom"]["description"] = 
 					'<ol>
@@ -140,12 +140,12 @@ class MsgWiz_method extends WizStep {
 				$methoddetails["custom"]["description"] = 
 					'<ol>
 						<li class="wizbuttonlist">'.escapehtml(_L("Enhanced email message")).'</li>
-						<li class="wizbuttonlist">'.escapehtml(_L("Use advanced features like field inserts")).'</li>
+						<li class="wizbuttonlist">'.escapehtml(_L("Auto-translate available for English messages")).'</li>
 					</ol>';
 				break;
 				
 			case "sendsms":
-				// should never happen. This step is disabled for SMS
+				// TODO: should never happen? This step is "currently" disabled for SMS
 				break;
 		}
 			
@@ -202,16 +202,21 @@ class MsgWiz_method extends WizStep {
 
 class MsgWiz_language extends WizStep {
 	function getForm($postdata, $curstep) {
+		global $USER;
 		
 		$langs = array();
-		$langs["en"] = '<div style="text-align:left">'. _L("Write the <b>Default/English</b> message"). '</div>';
-		// TODO: alpha sort, but with english as the first entry
+		// alpha sorted, but with english as the first entry
+		$langs["en"] = _L("Create the <b>Default/English</b> message");
 		foreach (Language::getLanguageMap() as $key => $lang) {
 			if ($lang != "English")
-				$langs[$key] = '<div style="text-align:left">'. _L("Write the <b>%s</b> message", $lang). '</div>';
+				$langs[$key] = _L("Create the <b>%s</b> message", $lang);
 		}
 		
-		$langs["autotranslate"] = "Automatically translate to other languages";
+		// only allow auto translation on "write" messages
+		if ($USER->authorize('sendmulti') 
+				&& isset($postdata["/method"]["method"]) && $postdata["/method"]["method"] == "write") {
+			$langs["autotranslate"] = "Automatically translate to other languages";
+		}
 		
 		$formdata = array(
 			$this->title,
@@ -223,7 +228,7 @@ class MsgWiz_language extends WizStep {
 					array("ValInArray", "values" => array_keys($langs))
 				),
 				"value" => "",
-				"control" => array("HtmlRadioButtonBigCheck", "values" => $langs),
+				"control" => array("RadioButton", "values" => $langs, "ishtml" => true),
 				"helpstep" => 1)
 		);
 		
@@ -252,6 +257,9 @@ class MsgWiz_phoneText extends WizStep {
 		global $USER;
 		// Form Fields.
 		$helpsteps = array(_L("Enter your message text in the provided text area. Be sure to introduce yourself and give detailed information, including call back information if appropriate."));
+
+		// TODO: Note here on auto-translate that this message should be in English and it will be used to generate the other languages
+		
 		$formdata = array(
 			$this->title,
 			"message" => array(
@@ -266,19 +274,6 @@ class MsgWiz_phoneText extends WizStep {
 				"helpstep" => 1
 			)
 		);
-
-		if ($USER->authorize('sendmulti')
-				&& isset($postdata["/create/language"]["language"]) && $postdata["/create/language"]["language"] == "autotranslate") {
-			$helpsteps[] = _L("Automatically translate into alternate languages powered by Google Translate.");
-			$formdata["translate"] = array(
-				"label" => _L("Translate"),
-				"fieldhelp" => _L('Check here if you would like to use automatic translation. Remember automatic translation is improving all the time, but it\'s not perfect yet. Be sure to preview and try reverse translation in the next screen.'),
-				"value" => false,
-				"validators" => array(),
-				"control" => array("CheckBox"),
-				"helpstep" => 2
-			);
-		}
 
 		return new Form("phoneText",$formdata,$helpsteps);
 	}
@@ -313,9 +308,8 @@ class MsgWiz_phoneTranslate extends WizStep {
 			return false;
 		
 		if (isset($postdata["/start"]["messagetype"]) && $postdata["/start"]["messagetype"] == "sendphone"
-				&& isset($postdata["/language"]["language"]) && $postdata["/language"]["language"] == "en"
 				&& isset($postdata["/method"]["method"]) && $postdata["/method"]["method"] == "write"
-				&& isset($postdata["/create/phonetext"]["translate"]) && $postdata["/create/phonetext"]["translate"])
+				&& isset($postdata["/create/language"]["language"]) && $postdata["/create/language"]["language"] == "autotranslate")
 			return true;
 		
 		return false;
@@ -379,6 +373,8 @@ class MsgWiz_emailText extends WizStep {
 		// Form Fields.
 		$formdata = array($this->title);
 
+		// TODO: Note here on auto-translate that this message should be in English and it will be used to generate the other languages
+		
 		$helpsteps = array(_L("Enter the name for the email account."));
 		$formdata["fromname"] = array(
 			"label" => _L('From Name'),
@@ -442,19 +438,6 @@ class MsgWiz_emailText extends WizStep {
 			"helpstep" => 5
 		);
 
-		if ($USER->authorize('sendmulti')
-				&& isset($postdata["/create/language"]["language"]) && $postdata["/create/language"]["language"] == "autotranslate") {
-			$helpsteps[] = _L("Automatically translate into alternate languages. Please note that automatic translation is always improving, but is not perfect yet. Try reverse translating your message for a preview of how well it translated.");
-			$formdata["translate"] = array(
-				"label" => _L("Translate"),
-				"fieldhelp" => _L('Check this box to automatically translate your message using Google Translate.'),
-				"value" => false,
-				"validators" => array(),
-				"control" => array("CheckBox"),
-				"helpstep" => 6
-			);
-		}
-
 		return new Form("emailText",$formdata,$helpsteps);
 	}
 
@@ -482,9 +465,13 @@ class MsgWiz_emailTranslate extends WizStep {
 
 	//returns true if this step is enabled
 	function isEnabled($postdata, $step) {
+		global $USER;
+		if (!$USER->authorize("sendemail") || !$USER->authorize("sendmulti"))
+			return false;
+		
 		if (isset($postdata["/start"]["messagetype"]) && $postdata["/start"]["messagetype"] == "sendemail"
 				&& isset($postdata["/method"]["method"]) && $postdata["/method"]["method"] == "write"
-				&& isset($postdata["/create/emailtext"]["translate"]) && $postdata["/create/emailtext"]["translate"])
+				&& isset($postdata["/create/language"]["language"]) && $postdata["/create/language"]["language"] == "autotranslate")
 			return true;
 		
 		return false;
