@@ -205,6 +205,7 @@ class MsgWiz_language extends WizStep {
 		
 		$langs = array();
 		$langs["en"] = '<div style="text-align:left">'. _L("Write the <b>Default/English</b> message"). '</div>';
+		// TODO: alpha sort, but with english as the first entry
 		foreach (Language::getLanguageMap() as $key => $lang) {
 			if ($lang != "English")
 				$langs[$key] = '<div style="text-align:left">'. _L("Write the <b>%s</b> message", $lang). '</div>';
@@ -326,7 +327,7 @@ class MsgWiz_phoneEasyCall extends WizStep {
 	function getForm($postdata, $curstep) {
 		global $USER;
 		
-		// TODO: make easycall display this value
+		// Phone message recorder will store the audiofile with this name
 		$language = Language::getName(isset($postdata["/language"]["language"])?$postdata["/language"]["language"]:"en");
 		
 		$formdata = array($this->title);
@@ -348,12 +349,9 @@ class MsgWiz_phoneEasyCall extends WizStep {
 			"value" => "",
 			"validators" => array(
 				array("ValRequired"),
-				array("ValEasycall")
+				array("PhoneMessageRecorderValidator")
 			),
-			"control" => array(
-				"EasyCall",
-				"phone" => $USER->phone
-			),
+			"control" => array( "PhoneMessageRecorder", "phone" => $USER->phone, "name" => $language),
 			"helpstep" => 1
 		);
 		$helpsteps[] = _L("The system will call you at the number you enter in this form and guide you through a series of prompts to record your message. The default message is always required and will be sent to any recipients who do not have a language specified.<br><br>

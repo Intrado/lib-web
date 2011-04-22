@@ -23,6 +23,8 @@ require_once("obj/Voice.obj.php");
 require_once("obj/FieldMap.obj.php");
 require_once("obj/SurveyQuestion.obj.php");
 require_once("obj/SurveyQuestionnaire.obj.php");
+require_once("obj/PhoneMessageRecorder.fi.php");
+require_once("obj/PhoneMessageRecorder.val.php");
 
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization
@@ -82,144 +84,6 @@ class RemoveQuestionButton extends FormItem {
 	}
 }
 
-class PhoneMessageRecorder extends FormItem {
-
-	function render ($value) {
-		$n = $this->form->name."_".$this->name;
-		if (!$value)
-			$value = '{}';
-		// Hidden input item to store values in
-		$str = '<input id="'.$n.'" name="'.$n.'" type="hidden" value="'.escapehtml($value).'" />';
-
-		// set up easycall stylesheet
-		$str .= '
-		<style type="text/css">
-		.easycallcallprogress {
-			float:left;
-		}
-		.easycallunderline {
-			padding-top: 3px;
-			margin-bottom: 5px;
-			border-bottom:
-			1px solid gray;
-			clear: both;
-		}
-		.easycallphoneinput {
-			margin-bottom: 5px;
-			border: 1px solid gray;
-		}
-
-		.surveytemplatecontent {
-			padding: 6px;
-			white-space:nowrap
-		}
-		</style>';
-
-		$str .= '
-		<div>
-			<div id="'.$n.'_content" class="surveytemplatecontent"></div>
-		</div>
-		<script type="text/javascript">
-		setupMessageRecorderButtons("'.$n.'");
-		</script>
-		';
-
-		return $str;
-	}
-
-	function renderJavascriptLibraries() {
-		global $USER;
-		// include the easycall javascript object and setup to record
-		$str = '<script type="text/javascript" src="script/easycall.js.php"></script>';
-		$str .= '
-		<script type="text/javascript">
-
-		function setupMessageRecorderButtons(e) {
-			e = $(e);
-			var value = e.value.evalJSON();
-			var formname = e.up("form").name;
-			var content = $(e.id+"_content");
-
-			if (value.m || value.af) {
-				var playbtn = icon_button("'.escapehtml(_L('Play')).'", "fugue/control");
-				var rerecordbtn = icon_button("'.escapehtml(_L('Re-record')).'", "diagona/16/118");
-
-				playbtn.observe("click", function () {
-					var value = e.value.evalJSON();
-					if (value.m)
-						popup("previewmessage.php?id=" + value.m, 400, 400);
-					else if (value.af)
-						popup("previewaudio.php?close=1&id="+value.af, 400, 500);
-				});
-
-				function curry (fn,obj) {
-					return new function() {
-						fn(obj);
-					}
-				}
-
-				rerecordbtn.observe("click", function () {
-					setupMessageRecorderEasyCall(e);
-				});
-
-				content.update();
-				content.insert(playbtn);
-				content.insert(rerecordbtn);
-			} else {
-				setupMessageRecorderEasyCall(e);
-			}
-		}
-
-		function setupMessageRecorderEasyCall (e) {
-			e = $(e);
-			var content = $(e.id+"_content");
-
-			new EasyCall(e, content, "'.Phone::format($USER->phone).'", "Survey Message");
-
-			content.observe("EasyCall:update", function(event) {
-				e.value = "{\"af\":" + event.memo.audiofileid + "}";
-				setupMessageRecorderButtons(e);
-				Event.stopObserving(content,"EasyCall:update");
-			});
-		}
-		</script>
-		';
-
-		return $str;
-	}
-}
-
-
-class PhoneMessageRecorderValidator extends Validator {
-	var $onlyserverside = true;
-	function validate ($value, $args) {
-		global $USER;
-
-
-		if (!$USER->authorize("starteasy"))
-			return _L('%1$s is not allowed for this user account',$this->label);
-		$values = json_decode($value);
-
-		if ($values == null || (!isset($values->m) && !isset($values->af) && !isset($values->delete)))
-			return _L('%1$s does not have a message recorded', $this->label);
-
-		//special allow for delete
-		if (isset($values->delete))
-			return true;
-
-		if (isset($values->m)) {
-			if (!QuickQuery("select count(*) from message where id=? and userid=?",false,array($values->m,$USER->id)))
-				return _L('%1$s has an invalid or missing message', $this->label);
-		}
-
-		if (isset($values->af)) {
-			if (!QuickQuery("select count(*) from audiofile where id=? and userid=?",false,array($values->af,$USER->id)))
-				return _L('%1$s has an invalid or missing message', $this->label);
-		}
-
-		return true;
-	}
-}
 ////////////////////////////////////////////////////////////////////////////////
 // Data Handling
 ////////////////////////////////////////////////////////////////////////////////
@@ -405,7 +269,7 @@ class SurveyTemplateWiz_phonemessages extends WizStep {
 					array("ValRequired"),
 					array("PhoneMessageRecorderValidator")
 				),
-				"control" => array("PhoneMessageRecorder"),
+				"control" => array("PhoneMessageRecorder", "name" => _L("Survey Machine Message")),
 				"helpstep" => $helpstepnum++
 			);
 			$helpsteps[] = _L('This message will be left in the event of the system reaching an answering machine. You should write your message before you record.');
@@ -428,7 +292,7 @@ class SurveyTemplateWiz_phonemessages extends WizStep {
 					array("ValRequired"),
 					array("PhoneMessageRecorderValidator")
 				),
-				"control" => array("PhoneMessageRecorder"),
+				"control" => array("PhoneMessageRecorder", "name" => _L("Survey Intro Message")),
 				"helpstep" => $helpstepnum++
 			);
 			$helpsteps[] = _L('Before you enter a phone number where the system can call you to record, you should prepare by writing your message down. This message will be played before the survey starts.');
@@ -453,7 +317,7 @@ class SurveyTemplateWiz_phonemessages extends WizStep {
 					array("ValRequired"),
 					array("PhoneMessageRecorderValidator")
 				),
-				"control" => array("PhoneMessageRecorder"),
+				"control" => array("PhoneMessageRecorder", "name" => _L("Survey Goodbye Message")),
 				"helpstep" => $helpstepnum++
 			);
 			$helpsteps[] = _L('This message will be played after the recipient has completed your survey. Best Practice is to thank them for their time. You should write down your message before you try to record.');
@@ -726,7 +590,7 @@ class SurveyTemplateWiz_questions extends WizStep {
 						array("ValRequired"),
 						array("PhoneMessageRecorderValidator")
 					),
-					"control" => array("PhoneMessageRecorder"),
+					"control" => array("PhoneMessageRecorder", "name" => _L("Survey Question")),
 					"helpstep" => $helpstepnum++
 				);
 				$helpsteps[] = _L('Enter the number where the system can call you to record your question. It\'s a good idea to write down your questions before you begin. Also, make sure to explain the possible reponses to the recipient. For example, "Press 1 for yes or 2 for no."');

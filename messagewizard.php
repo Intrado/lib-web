@@ -22,8 +22,8 @@ require_once("obj/Sms.obj.php");
 require_once("obj/FormItem.obj.php");
 require_once("obj/Validator.obj.php");
 require_once("obj/HtmlRadioButtonBigCheck.fi.php");
-require_once("obj/EasyCall.fi.php");
-require_once("obj/EasyCall.val.php");
+require_once("obj/PhoneMessageRecorder.fi.php");
+require_once("obj/PhoneMessageRecorder.val.php");
 require_once("obj/TextAreaPhone.fi.php");
 require_once("obj/TextAreaPhone.val.php");
 require_once("obj/EmailAttach.fi.php");
@@ -90,7 +90,7 @@ require_once("nav.inc.php");
 
 ?>
 <script type="text/javascript">
-<?	Validator::load_validators(array("ValEasycall", "ValTextAreaPhone", "ValMessageBody"));?>
+<?	Validator::load_validators(array("PhoneMessageRecorderValidator", "ValTextAreaPhone", "ValMessageBody"));?>
 </script>
 <?
 
