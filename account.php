@@ -198,14 +198,17 @@ if ($readonly) {
 
 $pin = $USER->accesscode ? '00000' : '';
 if ($readonly) {
+	$validators = array(
+						array("ValNumeric", "min" => 4),
+						array("ValPin", "accesscode" => $USER->accesscode));
+	if ($USER->accesscode)
+		$validators[] = array("ValRequired");
+	
 	$formdata["pin"] = array(
 		"label" => _L("Phone PIN Code"),
 		"fieldhelp" => _L("The PIN code is your password for logging into your account via phone."),
 		"value" => $pin,
-		"validators" => array(
-			array("ValNumeric", "min" => 4),
-			array("ValPin", "accesscode" => $USER->accesscode)
-		),
+		"validators" => $validators,
 		"control" => array("PasswordField","maxlength" => 20, "size" => 8),
 		"helpstep" => 1
 	);
@@ -215,6 +218,7 @@ if ($readonly) {
 		"fieldhelp" => ("The PIN code is your password for logging into your account via phone."),
 		"value" => $pin,
 		"validators" => array(
+			array("ValConditionallyRequired", "field" => "accesscode"),
 			array("ValNumeric", "min" => 4),
 			array("ValPin", "accesscode" => $USER->accesscode)
 		),
@@ -229,6 +233,7 @@ $formdata["pinconfirm"] = array(
 	"fieldhelp" => ("Enter your PIN code a second time to make sure it's correct."),
 	"value" => $pin,
 	"validators" => array(
+		array("ValConditionallyRequired", "field" => "pin"),
 		array("ValNumeric"),
 		array("ValFieldConfirmation", "field" => "pin")
 	),
