@@ -345,7 +345,11 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
         $postdata = $form->getData(); //gets assoc array of all values {name:value,...}
             
         $emergencyjtid = QuickQueryList("select id from jobtype where systempriority = 1 and deleted = 0");
-        $nonemergencyjtid = QuickQueryList("select id from jobtype where systempriority != 1 and deleted = 0");
+        // remove survey if not supported
+		$survey = "";
+		if (!getSystemSetting("_hassurvey","0"))
+			$survey = " and issurvey=0";
+        $nonemergencyjtid = QuickQueryList("select id from jobtype where systempriority != 1 and deleted = 0".$survey);
         
         //save data here
 
