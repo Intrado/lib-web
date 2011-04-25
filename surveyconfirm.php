@@ -139,10 +139,8 @@ foreach($multilist as $mlist) {
 $PAGE = "notifications:survey";
 $TITLE = "Review and Confirm Selections";
 $DESCRIPTION = "After verifying survey settings click Submit Survey";
-$f = "survey";
 
 include_once("nav.inc.php");
-NewForm($f);
 
 if (!$blocksubmit)
 	buttons(button('Save For Later', null, 'surveys.php'),
@@ -289,6 +287,5 @@ endWindow();
 
 
 buttons();
-EndForm();
 include_once("navbottom.inc.php");
 ?>

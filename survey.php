@@ -320,6 +320,15 @@ $helpsteps[] = _L("Enter a name for your survey. " .
 			"helpstep" => 6
 		);
 		
+		if ($USER->authorize('setcallerid') && !getSystemSetting('_hascallback', false)) {
+			$formdata["callerid"] = array(
+				"label" => _L("Personal Caller ID"),
+				"fieldhelp" => ("This features allows you to override the number that will display on recipient's Caller IDs."),
+				"control" => array("FormHtml","html" => Phone::format($job->getSetting("callerid",getDefaultCallerID()))),
+				"helpstep" => 6
+			);
+		}
+		
 		// Prepare attempt data
 		$maxattempts = first($ACCESS->getValue('callmax'), 1);
 		$attempts = array_combine(range(1,$maxattempts),range(1,$maxattempts));
@@ -367,6 +376,20 @@ $helpsteps[] = _L("Enter a name for your survey. " .
 			"control" => array("CheckBox"),
 			"helpstep" => 6
 		);
+		
+		if ($USER->authorize('setcallerid') && !getSystemSetting('_hascallback', false)) {
+			$formdata["callerid"] = array(
+				"label" => _L("Personal Caller ID"),
+				"fieldhelp" => _L("This features allows you to override the number that will display on recipient's Caller IDs."),
+				"value" => Phone::format($job->getSetting("callerid",getDefaultCallerID())),
+				"validators" => array(
+					array("ValLength","min" => 3,"max" => 20),
+					array("ValPhone")
+				),
+				"control" => array("TextField","maxlength" => 20, "size" => 15),
+				"helpstep" => 6
+			);
+		}
 		
 				// Prepare attempt data
 		$maxattempts = first($ACCESS->getValue('callmax'), 1);
@@ -497,6 +520,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 				$sendto = 'surveys.php';
 			}
 		}
+		
 		if ($ajax)
 			$form->sendTo($sendto);
 		else
