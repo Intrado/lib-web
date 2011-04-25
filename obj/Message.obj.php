@@ -420,6 +420,9 @@ class Message extends DBMappedObject {
 	// preview email message, call appserver to use common rendering logic to support custom templates
 	function renderEmailWithTemplate($jobpriority = 3) {
 		$view = messagePreviewForPriority($this->id, $jobpriority);
+		foreach ($view->emailcontentids as $contentid) {
+			permitContent($contentid);
+		}	
 		return $view->emailbody;
 	}
 	
