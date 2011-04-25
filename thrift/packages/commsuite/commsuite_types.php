@@ -16,6 +16,7 @@ class commsuite_MessageView {
   public $emailsubject = null;
   public $emailfromname = null;
   public $emailfromaddress = null;
+  public $emailcontentids = null;
   public $phonetodo = null;
   public $smsbody = null;
 
@@ -47,10 +48,18 @@ class commsuite_MessageView {
           'type' => TType::STRING,
           ),
         7 => array(
+          'var' => 'emailcontentids',
+          'type' => TType::LST,
+          'etype' => TType::I64,
+          'elem' => array(
+            'type' => TType::I64,
+            ),
+          ),
+        8 => array(
           'var' => 'phonetodo',
           'type' => TType::STRING,
           ),
-        8 => array(
+        9 => array(
           'var' => 'smsbody',
           'type' => TType::STRING,
           ),
@@ -74,6 +83,9 @@ class commsuite_MessageView {
       }
       if (isset($vals['emailfromaddress'])) {
         $this->emailfromaddress = $vals['emailfromaddress'];
+      }
+      if (isset($vals['emailcontentids'])) {
+        $this->emailcontentids = $vals['emailcontentids'];
       }
       if (isset($vals['phonetodo'])) {
         $this->phonetodo = $vals['phonetodo'];
@@ -146,13 +158,30 @@ class commsuite_MessageView {
           }
           break;
         case 7:
+          if ($ftype == TType::LST) {
+            $this->emailcontentids = array();
+            $_size0 = 0;
+            $_etype3 = 0;
+            $xfer += $input->readListBegin($_etype3, $_size0);
+            for ($_i4 = 0; $_i4 < $_size0; ++$_i4)
+            {
+              $elem5 = null;
+              $xfer += $input->readI64($elem5);
+              $this->emailcontentids []= $elem5;
+            }
+            $xfer += $input->readListEnd();
+          } else {
+            $xfer += $input->skip($ftype);
+          }
+          break;
+        case 8:
           if ($ftype == TType::STRING) {
             $xfer += $input->readString($this->phonetodo);
           } else {
             $xfer += $input->skip($ftype);
           }
           break;
-        case 8:
+        case 9:
           if ($ftype == TType::STRING) {
             $xfer += $input->readString($this->smsbody);
           } else {
@@ -202,13 +231,30 @@ class commsuite_MessageView {
       $xfer += $output->writeString($this->emailfromaddress);
       $xfer += $output->writeFieldEnd();
     }
+    if ($this->emailcontentids !== null) {
+      if (!is_array($this->emailcontentids)) {
+        throw new TProtocolException('Bad type in structure.', TProtocolException::INVALID_DATA);
+      }
+      $xfer += $output->writeFieldBegin('emailcontentids', TType::LST, 7);
+      {
+        $output->writeListBegin(TType::I64, count($this->emailcontentids));
+        {
+          foreach ($this->emailcontentids as $iter6)
+          {
+            $xfer += $output->writeI64($iter6);
+          }
+        }
+        $output->writeListEnd();
+      }
+      $xfer += $output->writeFieldEnd();
+    }
     if ($this->phonetodo !== null) {
-      $xfer += $output->writeFieldBegin('phonetodo', TType::STRING, 7);
+      $xfer += $output->writeFieldBegin('phonetodo', TType::STRING, 8);
       $xfer += $output->writeString($this->phonetodo);
       $xfer += $output->writeFieldEnd();
     }
     if ($this->smsbody !== null) {
-      $xfer += $output->writeFieldBegin('smsbody', TType::STRING, 8);
+      $xfer += $output->writeFieldBegin('smsbody', TType::STRING, 9);
       $xfer += $output->writeString($this->smsbody);
       $xfer += $output->writeFieldEnd();
     }
