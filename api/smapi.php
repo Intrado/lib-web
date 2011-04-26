@@ -1963,7 +1963,7 @@ class SMAPI {
 		$list->deleted = 0;
 		if (!$list->create()) {
 			$result['resultcode'] = 'failure';
-			$result["resultdescription"] =  "Database Failure, list was not created, please try again later.";
+			$result["resultdescription"] =  "Unable to create list.";
 			return $result;
 		}
 		$result['listid'] = $list->id;
@@ -2013,7 +2013,7 @@ class SMAPI {
 		$list = new PeopleList($listid);
 		if (!$list->softDelete()) {
 			$result['resultcode'] = 'failure';
-			$result["resultdescription"] =  "Database Failure, list was not deleted, please try again later.";
+			$result["resultdescription"] =  "Unable to delete list.";
 			return $result;
 		}
 		
@@ -2104,7 +2104,7 @@ class SMAPI {
 		// store data, but decode first
 		if ($import->upload(base64_decode($base64data)) === false) {
 			$result['resultcode'] = 'failure';
-			$result["resultdescription"] =  "Database Failure, data not uploaded, please try again later.";
+			$result["resultdescription"] =  "Unable to upload data.";
 			return $result;
 		}
 		
