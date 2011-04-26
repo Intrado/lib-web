@@ -17,6 +17,7 @@ require_once("obj/Language.obj.php");
 require_once("obj/Voice.obj.php");
 require_once("inc/translate.inc.php");
 require_once("obj/Sms.obj.php");
+require_once("obj/MessageGroup.obj.php");
 
 // form items
 require_once("obj/FormItem.obj.php");
@@ -30,6 +31,9 @@ require_once("obj/EmailAttach.fi.php");
 require_once("obj/EmailAttach.val.php");
 require_once("obj/HtmlTextArea.fi.php");
 require_once("obj/ValMessageBody.val.php");
+require_once("obj/traslationitem.obj.php");
+require_once("obj/AutoTranslateForm.obj.php");
+require_once("obj/CheckBoxWithHtmlPreview.fi.php");
 
 // Message step form data
 require_once("inc/messagewizard.inc.php");
@@ -41,6 +45,9 @@ require_once("inc/messagewizard.inc.php");
 ////////////////////////////////////////////////////////////////////////////////
 // Passed parameter checking
 ////////////////////////////////////////////////////////////////////////////////
+if (isset($_GET['mgid']) && $_GET['mgid'])
+	$_SESSION['wizard_message_mgid'] = ($_GET['mgid'] + 0);
+
 if (isset($_GET['debug']))
 	$_SESSION['wizard_message']['debug'] = true;
 
@@ -61,14 +68,6 @@ $wizdata = array(
 	))
 );
 
-class FinishMessageWizard extends WizFinish {
-	function finish ($postdata) {
-	}
-	
-	function getFinishPage ($postdata) {
-	}
-}	
-
 $wizard = new Wizard("wizard_message",$wizdata, new FinishMessageWizard("Finish"));
 $wizard->doneurl = "start.php";
 $wizard->handlerequest();
@@ -78,6 +77,10 @@ if (isset($_SESSION['wizard_message_mgid'])) {
 	$_SESSION['wizard_message']['mgid'] = $_SESSION['wizard_message_mgid'];
 	unset($_SESSION['wizard_message_mgid']);
 }
+
+// if the message group id isn't set in session data, redirect to unauth
+if (!isset($_SESSION['wizard_message']['mgid']))
+	redirect('unauthorized.php');
 
 ////////////////////////////////////////////////////////////////////////////////
 // Display
