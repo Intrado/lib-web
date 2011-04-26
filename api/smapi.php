@@ -2010,7 +2010,8 @@ class SMAPI {
 		}
 		
 		// soft-delete list
-		if (QuickUpdate("update list set deleted = 1 where id = ?", false, array($listid)) === false) {
+		$list = new PeopleList($listid);
+		if (!$list->softDelete()) {
 			$result['resultcode'] = 'failure';
 			$result["resultdescription"] =  "Database Failure, list was not deleted, please try again later.";
 			return $result;
@@ -2385,6 +2386,7 @@ require_once("../obj/Section.obj.php");
 require_once("../obj/Organization.obj.php");
 require_once("../obj/RenderedList.obj.php");
 require_once("../obj/PeopleList.obj.php");
+require_once("../obj/Publish.obj.php");
 require_once("../obj/Person.obj.php");
 require_once("../obj/MessageGroup.obj.php");
 require_once("../obj/Message.obj.php");

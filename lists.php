@@ -52,18 +52,13 @@ if (isset($_GET['delete'])) {
 
 	$list = new PeopleList($deleteid);
 	if (userOwns("list",$deleteid) && $list->type != 'alert') {
-		Query("BEGIN");
-		//QuickUpdate("delete from listentry where listid='$deleteid'");
-		QuickUpdate("update list set deleted=1 where id=?", false, array($list->id));
-		notice(_L("The list, %s, is now deleted.", escapehtml($list->name)));
-		// if there are any publish records for this list, remove them
-		if (isPublished('list', $list->id)) {
-			$publications = DBFindMany("Publish", "from publish where type = 'list' and listid = ?", false, array($list->id));
-			foreach ($publications as $publish)
-				$publish->destroy();
-			notice(_L("The list, %s, is now un-published. Any subscriptions were also removed.", escapehtml($list->name)));
-		}
-		Query("COMMIT");
+		$isPublished = isPublished('list', $list->id);
+		if ($list->softDelete()) {
+			notice(_L("The list, %s, is now deleted.", escapehtml($list->name)));
+			
+			if ($isPublished)
+				notice(_L("The list, %s, is now un-published. Any subscriptions were also removed.", escapehtml($list->name)));
+		}	
 	} else {
 		notice(_L("You do not have permission to delete this list."));
 	}

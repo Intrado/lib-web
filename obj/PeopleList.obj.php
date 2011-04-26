@@ -100,6 +100,25 @@ class PeopleList extends DBMappedObject {
 		return count($personids);
 	}
 	
+	function softDelete() {
+		$isSuccess = false;
+		if (userOwns("list",$this->id) && $this->type != 'alert') {
+			Query("BEGIN");
+			QuickUpdate("update list set deleted=1 where id=?", false, array($this->id));
+			$isSuccess = true;
+			// if there are any publish records for this list, remove them
+			if (isPublished('list', $this->id)) {
+				$publications = DBFindMany("Publish", "from publish where type = 'list' and listid = ?", false, array($this->id));
+				foreach ($publications as $publish)
+					$publish->destroy();
+			}
+			Query("COMMIT");
+		} else {
+			$isSuccess = false;
+		}
+		return $isSuccess;
+	}
+		
 }
 
 ?>
