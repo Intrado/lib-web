@@ -61,6 +61,7 @@ require_once("obj/HtmlRadioButtonBigCheck.fi.php");
 require_once("obj/TextAreaPhone.fi.php");
 require_once("obj/TextAreaPhone.val.php");
 require_once("obj/HtmlTextArea.fi.php");
+require_once("obj/CheckBoxWithHtmlPreview.fi.php");
 
 // Job step form data
 require_once("inc/jobwizard.inc.php");
