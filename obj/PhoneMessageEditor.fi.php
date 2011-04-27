@@ -15,9 +15,18 @@
  */
 
 class PhoneMessageEditor extends FormItem {
+	
 	function render ($value) {
 		
 		$n = $this->form->name."_".$this->name;
+		
+		// message id
+		if (isset($this->args['messageid']) && $this->args['messageid'])
+			$messageid = $this->args['messageid'];
+		
+		// messagegroup id
+		if (isset($this->args['messagegroupid']) && $this->args['messagegroupid'])
+			$messagegroupid = $this->args['messagegroupid'];
 		
 		// hidden form item stores the message value
 		$str = '<input id="' . $n . '" name="' . $n . '" type="hidden" value="' . escapehtml($value) . '"/>';
@@ -26,11 +35,20 @@ class PhoneMessageEditor extends FormItem {
 		$str .= '
 			<style>
 				.controlcontainer {
-					margin-bottom: 6px;
+					margin-bottom: 10px;
 					white-space: nowrap;
 				}
-				.controlcontainer .content {
+				.controlcontainer .library {
 					border: 1px dotted black;
+				}
+				.controlcontainer .datafields {
+					font-size: 9px;
+					float: left;
+				}
+				.controlcontainer .datafieldsinsert {
+					font-size: 9px;
+					float: left;
+					margin-top: 8px;
 				}
 				.uploadiframe {
 					overflow: hidden;
@@ -112,14 +130,36 @@ class PhoneMessageEditor extends FormItem {
 		$audiolibrary = '
 			<div class="controlcontainer">
 				<div>'._L("Audio Library").'</div>
-				<div id="'.$n.'-library" name="'.$n.'-library" class="content">TODO: audio library here</div>
+				<div id="'.$n.'-library" name="'.$n.'-library" class="library"></div>
 			</div>';
 		
 		// Data field inserts
 		$datafieldinsert = '
 			<div class="controlcontainer">
 				<div>'._L("Data Fields").'</div>
-				<div>TODO: data fields here</div>
+				<div>
+					<div class="datafields">
+						Default&nbsp;Value:<br />
+							<input id="'.$n.'datadefault" type="text" size="10" value=""/>
+					</div>
+					<div class="datafields">
+						Data&nbsp;Field:<br />
+						<select id="'.$n.'datafield">
+							<option value="">-- Select a Field --</option>';								
+		foreach(FieldMap::getAuthorizedMapNames() as $field) {
+			$datafieldinsert .= '<option value="' . $field . '">' . $field . '</option>';
+		}
+		$datafieldinsert .=	'</select>
+					</div>
+					<div class="datafieldsinsert">
+						'. icon_button(_L("Insert"),"fugue/arrow_turn_180","
+										sel = $('" . $n . "datafield');
+										if (sel.options[sel.selectedIndex].value != '') { 
+											 def = $('" . $n . "datadefault').value;
+											 textInsert('<<' + sel.options[sel.selectedIndex].text + (def ? ':' : '') + def + '>>', $('$n'));
+										}"). '					
+					</div>
+				</div>
 			</div>';
 		
 		// main containers
@@ -145,9 +185,10 @@ class PhoneMessageEditor extends FormItem {
 	}
 
 	function renderJavascript($value) {
+		$n = $this->form->name."_".$this->name;
 		$str = '
-			setupVoiceRecorder("'.$this->form->name."_".$this->name.'", "todo:name");';
-		
+			setupVoiceRecorder("'.$n.'", "todo:audiofilename");
+			setupAudioLibrary("'.$n.'-library", "'.(isset($this->args['messagegroupid'])?$this->args['messagegroupid']:0).'");';
 		return $str;
 	}
 	
@@ -156,6 +197,7 @@ class PhoneMessageEditor extends FormItem {
 		$str = AudioUpload::renderJavascriptLibraries();
 		$str .= '
 			<script type="text/javascript" src="script/easycall.js.php"></script>
+			<script type="text/javascript" src="script/audiolibrarywidget.js.php"></script>
 			<script type="text/javascript">
 			
 				function setupVoiceRecorder (e, name) {
@@ -174,6 +216,10 @@ class PhoneMessageEditor extends FormItem {
 						
 						setupVoiceRecorder(e, name);
 					});
+				}
+				
+				function setupAudioLibrary(e, mgid) {
+					new AudioLibraryWidget(e, mgid);
 				}
 			</script>';
 		
