@@ -317,12 +317,32 @@ startWindow('Import Information ');
 				<tr>
 					<td>
 						<?
-							NewFormItem($form, $section, "trigger_checkbox", "checkbox", null, null, "id='trigger_checkbox' onclick=\"clearAllIfNotChecked(this,'associated_jobs');\"");
+							NewFormItem($form, $section, "trigger_checkbox", "checkbox", null, null, 
+								"id='trigger_checkbox' onclick=\"
+									if (this.checked) { 
+										this.checked = confirm('Enabling this feature will cause Jobs to run ' + 
+															'when the import finishes. Do you want some jobs to run automatically?') 
+									} 
+									clearAllIfNotChecked(this,'associated_jobs');
+								\"
+							");
 						?>
 					</td>
 					<td style="vertical-align: top">
 						<?
-							NewFormItem($form, $section,"associatedjobs", "selectmultiple", "20", $repeatingjobs, "id=associated_jobs onmousedown=\"setChecked('trigger_checkbox');\"");
+							NewFormItem($form, $section,"associatedjobs", "selectmultiple", "20", $repeatingjobs, 
+								"id=associated_jobs onmouseup=\"
+									var cb = new getObj('trigger_checkbox'); 
+									if (!cb.obj.checked) {
+										if(confirm('Enabling this feature will cause associated jobs to run when ' +
+															'the import finishes.\\nDo you want some jobs to run automatically?')) { 
+											setChecked('trigger_checkbox');
+										} else {
+											clearAll(this);
+										}
+									} 
+								\"
+							");
 						?>
 					</td>
 				</tr>
