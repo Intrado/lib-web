@@ -2095,7 +2095,7 @@ class SMAPI {
 		
 		$import = new Import($importid);
 		// validate importid
-		if ($import->id != $importid || $import->type != "automatic") {
+		if ($import->id != $importid) {
 			$result['resultcode'] = 'invalidparam';
 			$result["resultdescription"] =  "Invalid Parameter : importid";
 			return $result;
