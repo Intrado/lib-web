@@ -58,6 +58,16 @@ function handleRequest() {
 			
 			return true;
 			
+		case 'assignaudiofile':
+			if (!isset($_REQUEST['messagegroupid']) || !userOwns('messagegroup', $_REQUEST['messagegroupid']))
+				return false;
+			// assign the audiofile to this message group
+			$audiofile = new AudioFile($audiofileid);
+			$audiofile->messagegroupid = $_REQUEST['messagegroupid'];
+			$audiofile->update();
+			
+			return true;
+			
 		default:
 			error_log("Unknown request " . $_REQUEST['action']);
 			return false;
