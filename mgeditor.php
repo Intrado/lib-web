@@ -109,9 +109,9 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		Query("COMMIT");
 		$_SESSION['messagegroupid'] = $messagegroup->id;
 		if ($ajax)
-			$form->sendTo("_mymessagegroup.php");
+			$form->sendTo("mgeditor.php");
 		else
-			redirect("_mymessagegroup.php");
+			redirect("mgeditor.php");
 	}
 }
 ////////////////////////////////////////////////////////////////////////////////
@@ -297,7 +297,7 @@ if ($messagegroup->id) {
 	echo icon_button(_L('Add Content Wizard'),"add",null,"messagewizard.php?mgid=$messagegroup->id");
 	echo "<br /><br />";
 	makeMessageGrid($messagegroup);
-	echo icon_button(_L('Done'),"tick",null,(isset($_SESSION['origin']) && ($_SESSION['origin'] == 'start')?"start.php":"messagess.php"));
+	echo icon_button(_L('Done'),"tick",null,(isset($_SESSION['origin']) && ($_SESSION['origin'] == 'start')?"start.php":"messages.php"));
 }
 endWindow();
 
