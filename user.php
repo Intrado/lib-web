@@ -17,6 +17,7 @@ require_once("obj/ValSections.val.php");
 require_once("obj/FieldMap.obj.php");
 require_once("obj/FormUserItems.obj.php");
 require_once("obj/FormRuleWidget.fi.php");
+require_once("obj/InpageSubmitButton.fi.php");
 
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization
@@ -80,13 +81,6 @@ $orgs = Organization::getAuthorizedOrgKeys();
 ////////////////////////////////////////////////////////////////////////////////
 // Custom form items
 ////////////////////////////////////////////////////////////////////////////////
-class InpageSubmitButton extends FormItem {
-	function render ($value) {
-		$n = $this->form->name."_".$this->name;
-		$str = '<input id="'.$n.'" name="'.$n.'" type="hidden" value=""/>';
-		return $str.submit_button($this->args['name'], 'inpagesubmit', $this->args['icon']);
-	}
-}
 
 // requires org to section map as an argument
 class UserSectionFormItem extends FormItem {
