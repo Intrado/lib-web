@@ -23,24 +23,20 @@ class PhoneMessageEditor extends FormItem {
 		
 		$n = $this->form->name."_".$this->name;
 		
-		// get the individual bits from the value
-		$jsonvalue = json_decode($value);
-		
-		$text = $jsonvalue->text;
-		$gender = $jsonvalue->gender;
-		$messagegroupid = $jsonvalue->messagegroupid;
-		$langcode = $jsonvalue->langcode;
-		
-		// hidden form item stores the message value
-		// value = {text: "...", gender: "...", messagegroupid: "...", langcode: "..."}
-		$str = '<input id="' . $n . '" name="' . $n . '" type="hidden" value="' . escapehtml($value) . '"/>';
+		// langcode and messagegroupid should be passed as args
+		$langcode = $this->args['langcode'];
+		$messagegroupid = $this->args['messagegroupid'];
 		
 		// style 
-		$str .= '
+		$str = '
 			<style>
 				.controlcontainer {
 					margin-bottom: 10px;
 					white-space: nowrap;
+				}
+				.controlcontainer .messagearea {
+					height: 205px; 
+					width: 100%
 				}
 				.controlcontainer .library {
 					padding: 2px;
@@ -71,7 +67,7 @@ class PhoneMessageEditor extends FormItem {
 				.maincontainerseperator {
 					float:left; 
 					width:15px; 
-					margin-top:60px;
+					margin-top:80px;
 				}
 				.maincontainerright {
 					float:left; width:45%; 
@@ -86,24 +82,7 @@ class PhoneMessageEditor extends FormItem {
 		$textarea = '
 			<div class="controlcontainer">
 				<div>'._L("Phone Message").'</div>
-				<textarea id="'.$n.'-messagearea" name="'.$n.'" style="height: 150px; width: 100%"/>'.escapehtml($text).'</textarea>
-			</div>';
-		
-		// gender selection
-		// TODO: some languages don't support both genders
-		$gender = '
-			<div class="controlcontainer">
-				<div>'._L("Text-to-speech gender").'</div>
-				<div class="radiobox">
-					<input id="'.$n.'-female" name="'.$n.'-gender" type="radio" '.(($gender != "male")?"checked":"").'/><label for="'.$n.'-female">'._L("Female").'</label><br />
-					<input id="'.$n.'-male" name="'.$n.'-gender" type="radio" '.(($gender == "male")?"checked":"").'/><label for="'.$n.'-male">'._L("Male").'</label>
-				</div>
-			</div>';
-		
-		// preview button
-		$preview = '
-			<div class="controlcontainer">
-				'.icon_button(_L("Play"),"fugue/control",null,null,"id=\"".$n."-play\"").'
+				<textarea id="'.$n.'" name="'.$n.'" class="messagearea"/>'.escapehtml($value).'</textarea>
 			</div>';
 		
 		// this is the vertical seperator
@@ -161,7 +140,7 @@ class PhoneMessageEditor extends FormItem {
 								sel = $('" . $n . "datafield');
 								if (sel.options[sel.selectedIndex].value != '') { 
 									 def = $('" . $n . "datadefault').value;
-									 textInsert('<<' + sel.options[sel.selectedIndex].text + (def ? ':' : '') + def + '>>', $('$n-messagearea'));
+									 textInsert('<<' + sel.options[sel.selectedIndex].text + (def ? ':' : '') + def + '>>', $('$n'));
 								}"). '					
 					</div>
 				</div>
@@ -172,8 +151,6 @@ class PhoneMessageEditor extends FormItem {
 			<div>
 				<div class="maincontainerleft">
 					'.$textarea.'
-					'.$gender.'
-					'.$preview.'
 				</div>
 				<div class="maincontainerseperator">
 					'.$seperator.'
@@ -192,10 +169,10 @@ class PhoneMessageEditor extends FormItem {
 	function renderJavascript($value) {
 		$n = $this->form->name."_".$this->name;
 		
-		// get the message group id from the value
-		$jsonvalue = json_decode($value);
-		$messagegroupid = $jsonvalue->messagegroupid;
-		$language = Language::getName($jsonvalue->langcode);
+		// langcode and messagegroupid should be passed as args
+		$langcode = $this->args['langcode'];
+		$messagegroupid = $this->args['messagegroupid'];
+		$language = Language::getName($langcode);
 		
 		$str = '
 			var audiolibrarywidget = setupAudioLibrary("'.$n.'", "'.$messagegroupid.'");
@@ -255,7 +232,7 @@ class PhoneMessageEditor extends FormItem {
 					e = $(e);
 					var recorder = $(e.id+"-voicerecorder");
 					var library = $(e.id+"-library");
-					var messagearea = $(e.id+"-messagearea");
+					var messagearea = e;
 					
 					new EasyCall(e, recorder, "'.Phone::format($USER->phone).'", name+" - "+curDate());
 		
@@ -295,7 +272,7 @@ class PhoneMessageEditor extends FormItem {
 				function setupAudioLibrary(e, mgid) {
 					e = $(e);
 					var library = $(e.id+"-library");
-					var messagearea = $(e.id+"-messagearea");
+					var messagearea = e;
 					
 					var audiolibrarywidget = new AudioLibraryWidget(library, mgid);
 					
