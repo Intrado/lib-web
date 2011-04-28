@@ -216,7 +216,8 @@ class PhoneMessageEditor extends FormItem {
 					$(itemname + "uploaderror").update(errormessage);
 					
 					// fire an event in the parent form item so we can further handle objects in this form
-					$(itemname+"-audioupload").fire("AudioUpload:complete", {"audiofileid": audioid, "audiofilename": audioname});
+					if (audioid)
+						$(itemname+"-audioupload").fire("AudioUpload:complete", {"audiofileid": audioid, "audiofilename": audioname});
 					
 					return true;
 				}
