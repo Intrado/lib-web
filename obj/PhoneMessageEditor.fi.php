@@ -51,6 +51,11 @@ class PhoneMessageEditor extends FormItem {
 					float: left;
 					margin-top: 8px;
 				}
+				.controlcontainer .uploaderror {
+					white-space: normal;
+					font-style: italic;
+					color: red;
+				}
 				.uploadiframe {
 					overflow: hidden;
 					width: 100%;
@@ -103,11 +108,11 @@ class PhoneMessageEditor extends FormItem {
 			<div class="controlcontainer">
 				<div>'._L("Audio Upload").'</div>
 				<div id="'.$n.'upload_process" style="display: none;"><img src="img/ajax-loader.gif" /></div>
-				<iframe id="'.$n.'my_attach" 
+				<iframe id="'.$n.'-audioupload" 
 					class="uploadiframe" 
-					src="uploadaudio.php?formname='.$this->form->name.'&itemname='.$n.'-audioupload">
+					src="uploadaudio.php?formname='.$this->form->name.'&itemname='.$n.'">
 				</iframe>
-				<div id="'.$n.'uploaderror"></div>
+				<div id="'.$n.'uploaderror" class="uploaderror"></div>
 			</div>';
 		
 		// Audio library control
@@ -177,6 +182,7 @@ class PhoneMessageEditor extends FormItem {
 		$str = '
 			var audiolibrarywidget = setupAudioLibrary("'.$n.'", "'.$messagegroupid.'");
 			setupVoiceRecorder("'.$n.'", "'.$language.'", "'.$messagegroupid.'", audiolibrarywidget);
+			setupAudioUpload("'.$n.'", audiolibrarywidget);
 			';
 		
 		return $str;
@@ -207,24 +213,30 @@ class PhoneMessageEditor extends FormItem {
 						
 					setTimeout ("var uploadprocess = $(\'"+itemname+ "upload_process\'); if (uploadprocess) uploadprocess.hide();", 500 );
 					
-					var values = {};
-					var fieldelement = $(itemname);
-					if (!fieldelement)
-						return;
-					var field = fieldelement.value;
-					if(field != "")
-						values = field.evalJSON();
-					if (audioid && audioname && !errormessage) {
-						var newaudio = {"id":audioid, "name":audioname};
-						values[audioid] = newaudio;
-						fieldelement.fire("AudioUpload:AudioUploaded", newaudio);
-					}
-					
-					fieldelement.value = $H(values).toJSON();
-					
 					$(itemname + "uploaderror").update(errormessage);
-					form_do_validation($(formname), fieldelement);
+					
+					// fire an event in the parent form item so we can further handle objects in this form
+					$(itemname+"-audioupload").fire("AudioUpload:complete", {"audiofileid": audioid, "audiofilename": audioname});
+					
 					return true;
+				}
+				
+				// setup the event handler for new audio file uploads
+				function setupAudioUpload(e, audiolibrarywidget) {
+					e = $(e);
+					var messagearea = e;
+					var audioupload = $(e.id+"-audioupload");
+					
+					audioupload.observe("AudioUpload:complete", function(event) {
+						var audiofilename = event.memo.audiofilename;
+						
+						// insert the audiofile into the message
+						textInsert("{{" + audiofilename + "}}", messagearea);
+						
+						// reload the audio library
+						audiolibrarywidget.reload();
+					});
+					
 				}
 			
 				// create a new easycall in the provided form element. audiofiles have name "name"
