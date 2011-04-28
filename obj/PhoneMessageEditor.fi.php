@@ -4,6 +4,9 @@
  * needed to create a message using all the features
  * they may need for constructed messaging.
  * 
+ * Note: You MUST pass langcode and messagegroupid 
+ * 	arguments!
+ * 
  * Supporting the following feature set
  * 	Record audio
  * 	Upload audo files
@@ -11,9 +14,11 @@
  * 	Insert fields
  * 	Text-to-speech
  * 
- * Requires the following:
- * 	TODO: requirements
- * 
+ * Requires the following objects:
+ * 	FieldMap
+ * 	Phone
+ * 	Language
+ * 	
  * Nickolas Heckman
  */
 
@@ -22,10 +27,6 @@ class PhoneMessageEditor extends FormItem {
 	function render ($value) {
 		
 		$n = $this->form->name."_".$this->name;
-		
-		// langcode and messagegroupid should be passed as args
-		$langcode = $this->args['langcode'];
-		$messagegroupid = $this->args['messagegroupid'];
 		
 		// style 
 		$str = '
@@ -51,12 +52,12 @@ class PhoneMessageEditor extends FormItem {
 					float: left;
 					margin-top: 8px;
 				}
-				.controlcontainer .uploaderror {
+				.controlcontainer .error {
 					white-space: normal;
 					font-style: italic;
 					color: red;
 				}
-				.uploadiframe {
+				.controlcontainer .uploadiframe {
 					overflow: hidden;
 					width: 100%;
 					border: 0;
@@ -82,6 +83,13 @@ class PhoneMessageEditor extends FormItem {
 					border: 1px solid #'.$_SESSION['colorscheme']['_brandtheme2'].';
 				}
 			</style>';
+		
+		// langcode and messagegroupid must be passed as args, this form item won't work w/o them!
+		if (!isset($this->args['langcode']) || !isset($this->args['messagegroupid']))
+			return $str .= "<div class='controlcontainer'><div class='error'>". _L("Some required information is missing! To use this function, please contact your system administrator."). "</div></div>";
+		
+		$langcode = $this->args['langcode'];
+		$messagegroupid = $this->args['messagegroupid'];
 		
 		// textarea for message bits
 		$textarea = '
@@ -112,7 +120,7 @@ class PhoneMessageEditor extends FormItem {
 					class="uploadiframe" 
 					src="uploadaudio.php?formname='.$this->form->name.'&itemname='.$n.'">
 				</iframe>
-				<div id="'.$n.'uploaderror" class="uploaderror"></div>
+				<div id="'.$n.'uploaderror" class="error"></div>
 			</div>';
 		
 		// Audio library control
@@ -179,6 +187,7 @@ class PhoneMessageEditor extends FormItem {
 		$messagegroupid = $this->args['messagegroupid'];
 		$language = Language::getName($langcode);
 		
+		// set up the controls in the form and initialize any event listeners
 		$str = '
 			var audiolibrarywidget = setupAudioLibrary("'.$n.'", "'.$messagegroupid.'");
 			setupVoiceRecorder("'.$n.'", "'.$language.'", "'.$messagegroupid.'", audiolibrarywidget);
@@ -228,6 +237,7 @@ class PhoneMessageEditor extends FormItem {
 					var messagearea = e;
 					var audioupload = $(e.id+"-audioupload");
 					
+					// listen for any new uploaded audio files so they can be inserted into the message and the library can be reloaded
 					audioupload.observe("AudioUpload:complete", function(event) {
 						var audiofilename = event.memo.audiofilename;
 						
@@ -249,6 +259,7 @@ class PhoneMessageEditor extends FormItem {
 					
 					new EasyCall(e, recorder, "'.Phone::format($USER->phone).'", name+" - "+curDate());
 		
+					// listen for any new recordings so we can insert them into the message, attach them to the message group and reload the library
 					recorder.observe("EasyCall:update", function(event) {
 						// dont observe any more events on this recorder
 						Event.stopObserving(recorder,"EasyCall:update");
@@ -281,14 +292,16 @@ class PhoneMessageEditor extends FormItem {
 					});
 				}
 				
-				// set up the library of audio files for this message group
+				// set up the library of audio files for this message group, returns a reference to the widget
 				function setupAudioLibrary(e, mgid) {
 					e = $(e);
 					var library = $(e.id+"-library");
 					var messagearea = e;
 					
+					// keep a reference to the audio library widget so we can pass it to other methods which will call reload() on it
 					var audiolibrarywidget = new AudioLibraryWidget(library, mgid);
 					
+					// If insert is clicked in the library, insert that audio file into the message
 					library.observe("AudioLibraryWidget:ClickInsert", function(event) {
 						var audiofile = event.memo.audiofile;
 						textInsert("{{" + audiofile.name + "}}", messagearea);
