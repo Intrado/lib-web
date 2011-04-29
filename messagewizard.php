@@ -18,6 +18,7 @@ require_once("obj/Voice.obj.php");
 require_once("inc/translate.inc.php");
 require_once("obj/Sms.obj.php");
 require_once("obj/MessageGroup.obj.php");
+require_once("obj/FieldMap.obj.php");
 
 // form items
 require_once("obj/FormItem.obj.php");
@@ -34,6 +35,9 @@ require_once("obj/ValMessageBody.val.php");
 require_once("obj/traslationitem.obj.php");
 require_once("obj/AutoTranslateForm.obj.php");
 require_once("obj/CheckBoxWithHtmlPreview.fi.php");
+require_once("obj/PhoneMessageEditor.fi.php");
+require_once("obj/EmailMessageEditor.fi.php");
+require_once("obj/InpageSubmitButton.fi.php");
 
 // Message step form data
 require_once("inc/messagewizard.inc.php");
@@ -41,12 +45,17 @@ require_once("inc/messagewizard.inc.php");
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization
 ////////////////////////////////////////////////////////////////////////////////
+// TODO: message sending auth check
 
 ////////////////////////////////////////////////////////////////////////////////
 // Passed parameter checking
 ////////////////////////////////////////////////////////////////////////////////
-if (isset($_GET['mgid']) && $_GET['mgid'])
-	$_SESSION['wizard_message_mgid'] = ($_GET['mgid'] + 0);
+if (isset($_GET['mgid']) && $_GET['mgid']) {
+	if (!userOwns('messagegroup', $_GET['mgid']))
+		redirect('unauthorized.php');
+	
+	$_SESSION['wizard_message_mgid'] = ($_GET['mgid'] + 0);		
+}
 
 if (isset($_GET['debug']))
 	$_SESSION['wizard_message']['debug'] = true;
@@ -57,10 +66,10 @@ $wizdata = array(
 	"create" => new WizSection ("Create",array(
 		"language" => new MsgWiz_language(_L("Language")),
 		"phonetext" => new MsgWiz_phoneText(_L("Text-to-speech")),
-		"phonetranslate" => new MsgWiz_phoneTranslate(_L("Translations")),
 		"callme" => new MsgWiz_phoneEasyCall(_L("Record")),
+		"phoneadvanced" => new MsgWiz_phoneAdvanced(_L("Advanced")),
 		"emailtext" => new MsgWiz_emailText(_L("Compose Email")),
-		"emailtranslate" => new MsgWiz_emailTranslate(_L("Translations")),
+		"translatepreview" => new MsgWiz_translatePreview(_L("Translations")),
 		"smstext" => new MsgWiz_smsText(_L("SMS Text"))
 	)),
 	"submit" => new WizSection ("Confirm",array(
