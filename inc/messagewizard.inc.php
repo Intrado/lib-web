@@ -1,6 +1,9 @@
 <?
-
-
+/* TODO: See below items...
+ * 	Translation is stripping out field and audio file inserts
+ * 	Email messages, do they need a plain version stored also?
+ * 	Should we undelete deleted messages and modify them or create new ones?
+ */
 
 ////////////////////////////////////////////////////////////////////////////////
 // Form Items
@@ -93,7 +96,7 @@ class MsgWiz_method extends WizStep {
 				"icon" => "img/write.gif",
 				"label" => _L("Write"),
 				"enabled" => false),
-			'custom' => array(
+			'advanced' => array(
 				"icon" => "img/customize.gif",
 				"label" => _L("Advanced"),
 				"enabled" => false)
@@ -106,7 +109,7 @@ class MsgWiz_method extends WizStep {
 					$methoddetails["record"]["enabled"] = true;
 				
 				$methoddetails["write"]["enabled"] = true;
-				$methoddetails["custom"]["enabled"] = true;
+				$methoddetails["advanced"]["enabled"] = true;
 				
 				$methoddetails["record"]["description"] = 
 					'<ol>
@@ -120,7 +123,7 @@ class MsgWiz_method extends WizStep {
 						<li class="wizbuttonlist">'.escapehtml(_L("Text-to-speech")).'</li>'.
 						($USER->authorize('sendmulti')?'<li class="wizbuttonlist">'.escapehtml(_L("Auto-translate available")).'</li>':'').'
 					</ol>';
-				$methoddetails["custom"]["description"] = 
+				$methoddetails["advanced"]["description"] = 
 					'<ol>
 						<li class="wizbuttonlist">'.escapehtml(_L("Upload Pre-recorded Audio")).'</li>
 						<li class="wizbuttonlist">'.escapehtml(_L("Wav, Mp3, Au Format Support")).'</li>
@@ -129,23 +132,12 @@ class MsgWiz_method extends WizStep {
 				break;
 				
 			case "sendemail":
-				$methoddetails["write"]["enabled"] = true;
-				$methoddetails["custom"]["enabled"] = true;
-				
-				$methoddetails["write"]["description"] = 
-					'<ol>
-						<li class="wizbuttonlist">'.escapehtml(_L("Write a simple email message")).'</li>
-						<li class="wizbuttonlist">'.escapehtml(_L("Auto-translate available for English messages")).'</li>
-					</ol>';
-				$methoddetails["custom"]["description"] = 
-					'<ol>
-						<li class="wizbuttonlist">'.escapehtml(_L("Enhanced email message")).'</li>
-						<li class="wizbuttonlist">'.escapehtml(_L("Auto-translate available for English messages")).'</li>
-					</ol>';
-				break;
+				// This step is "currently" disabled for email
 				
 			case "sendsms":
-				// TODO: should never happen? This step is "currently" disabled for SMS
+				// This step is "currently" disabled for SMS
+			
+			default:
 				break;
 		}
 			
@@ -192,10 +184,10 @@ class MsgWiz_method extends WizStep {
 
 	//returns true if this step is enabled
 	function isEnabled($postdata, $step) {
-		if (isset($postdata["/start"]["messagetype"]) && $postdata["/start"]["messagetype"] == "sendsms")
-			return false;
+		if (isset($postdata["/start"]["messagetype"]) && $postdata["/start"]["messagetype"] == "sendphone")
+			return true;
 		
-		return true;
+		return false;
 	}
 }
 
@@ -206,16 +198,20 @@ class MsgWiz_language extends WizStep {
 		
 		$langs = array();
 		// alpha sorted, but with english as the first entry
-		$langs["en"] = _L("Create the <b>Default/English</b> message");
+		$langs["en"] = _L("Create the <b>English</b> message");
+		
+		// only allow auto translation on "write" messages when the user can send multi lingual
+		$sendphone = (isset($postdata["/start"]["messagetype"]) && $postdata["/start"]["messagetype"] == "sendphone");
+		$phonemethod = (isset($postdata["/method"]["method"])?$postdata["/method"]["method"]:false);
+		$sendemail = (isset($postdata["/start"]["messagetype"]) && $postdata["/start"]["messagetype"] == "sendemail");
+		if ($USER->authorize('sendmulti') && 
+				($sendemail || ($sendphone && ($phonemethod == "advanced" || $phonemethod == "write")))) {
+			$langs["autotranslate"] = "Automatically <b>Translate</b> from English to other languages";
+		}
+		
 		foreach (Language::getLanguageMap() as $key => $lang) {
 			if ($lang != "English")
 				$langs[$key] = _L("Create the <b>%s</b> message", $lang);
-		}
-		
-		// only allow auto translation on "write" messages when the user can send multi lingual
-		if ($USER->authorize('sendmulti') 
-				&& isset($postdata["/method"]["method"]) && $postdata["/method"]["method"] == "write") {
-			$langs["autotranslate"] = "Automatically translate to other languages";
 		}
 		
 		$formdata = array(
@@ -258,8 +254,6 @@ class MsgWiz_phoneText extends WizStep {
 		// Form Fields.
 		$helpsteps = array(_L("Enter your message text in the provided text area. Be sure to introduce yourself and give detailed information, including call back information if appropriate."));
 
-		// TODO: Note here on auto-translate that this message should be in English and it will be used to generate the other languages
-		
 		$formdata = array($this->title);
 		
 		// if auto-translate, give the user a hint that this is the ENGLISH version from which translations will be created.
@@ -296,31 +290,6 @@ class MsgWiz_phoneText extends WizStep {
 	function isEnabled($postdata, $step) {
 		if (isset($postdata["/start"]["messagetype"]) && $postdata["/start"]["messagetype"] == "sendphone"
 				&& isset($postdata["/method"]["method"]) && $postdata["/method"]["method"] == "write")
-			return true;
-		
-		return false;
-	}
-}
-
-
-class MsgWiz_phoneTranslate extends WizStep {
-
-	function getForm($postdata, $curstep) {
-		$msgdata = isset($postdata['/create/phonetext']['message'])?json_decode($postdata['/create/phonetext']['message']):json_decode('{"gender": "female", "text": ""}');
-		$existingtranslations = isset($postdata["/create/phonetranslate"])?$postdata["/create/phonetranslate"]:array();
-		
-		return new AutoTranslateForm("phoneTranslate", $this->title, $existingtranslations, $msgdata->text, $msgdata->gender, "phone");
-	}
-
-	//returns true if this step is enabled
-	function isEnabled($postdata, $step) {
-		global $USER;
-		if (!$USER->authorize("sendphone") || !$USER->authorize("sendmulti"))
-			return false;
-		
-		if (isset($postdata["/start"]["messagetype"]) && $postdata["/start"]["messagetype"] == "sendphone"
-				&& isset($postdata["/method"]["method"]) && $postdata["/method"]["method"] == "write"
-				&& isset($postdata["/create/language"]["language"]) && $postdata["/create/language"]["language"] == "autotranslate")
 			return true;
 		
 		return false;
@@ -377,10 +346,77 @@ class MsgWiz_phoneEasyCall extends WizStep {
 }
 
 
+class MsgWiz_phoneAdvanced extends WizStep {
+
+	function getForm($postdata, $curstep) {
+		
+		// get the language code we are createing a message for
+		$langcode = "en";
+		if (isset($postdata["/create/language"]["language"])) {
+			if ($postdata["/create/language"]["language"] != "autotranslate")
+				$langcode = $postdata["/create/language"]["language"];
+		}
+		
+		$messagegroup = new MessageGroup($_SESSION['wizard_message']['mgid']);
+		$language = Language::getName($langcode);
+		
+		// upload audio needs this session data
+		$_SESSION['messagegroupid'] = $messagegroup->id;
+		
+		$formdata = array(
+			$messagegroup->name. " (". $language. ")",
+			"message" => array(
+				"label" => _L("Advanced Message"),
+				"value" => "",
+				"validators" => array(array("ValRequired")),
+				"control" => array("PhoneMessageEditor", "langcode" => $langcode, "messagegroupid" => $messagegroup->id),
+				"helpstep" => 1
+			),
+			"gender" => array(
+				"label" => _L("Gender"),
+				"value" => "",
+				"validators" => array(array("ValRequired")),
+				"control" => array("RadioButton", "values" => array("female" => _L("Female"), "male" => _L("Male"))),
+				"helpstep" => 2
+			),
+			"preview" => array(
+				"label" => "",
+				"value" => "",
+				"validators" => array(),
+				"control" => array("InpageSubmitButton", "name" => "preview", "icon" => "fugue/control"),
+				"helpstep" => 3
+			)
+		);
+		
+		$helpsteps = array(_L("TODO: Help me!"),
+						_L("TODO: Help me!"),
+						_L("TODO: Help me!"));
+		
+		return new Form("phoneAdvanced",$formdata,$helpsteps,null,"vertical");
+	}
+
+	//returns true if this step is enabled
+	function isEnabled($postdata, $step) {
+		global $USER;
+		if (!$USER->authorize("sendphone"))
+			return false;
+		
+		if (isset($postdata["/start"]["messagetype"]) && $postdata["/start"]["messagetype"] == "sendphone"
+				&& isset($postdata["/method"]["method"]) && $postdata["/method"]["method"] == "advanced")
+			return true;
+		
+		return false;
+	}
+}
+
+
 class MsgWiz_emailText extends WizStep {
 	function getForm($postdata, $curstep) {
 		global $USER;
 		$msgdata = isset($postdata['/message/phone/text']['message'])?json_decode($postdata['/message/phone/text']['message']):json_decode('{"text": ""}');
+		
+		$messagegroup = new MessageGroup($_SESSION['wizard_message']['mgid']);
+		
 		// Form Fields.
 		$formdata = array($this->title);
 
@@ -430,7 +466,7 @@ class MsgWiz_emailText extends WizStep {
 		$formdata["subject"] = array(
 			"label" => _L("Subject"),
 			"fieldhelp" => _L('The Subject will appear as the subject line of the email.'),
-			"value" => "", // TODO: message group name
+			"value" => $messagegroup->name,
 			"validators" => array(
 				array("ValRequired"),
 				array("ValLength","max" => 255)
@@ -458,17 +494,16 @@ class MsgWiz_emailText extends WizStep {
 				array("ValRequired"),
 				array("ValMessageBody")
 			),
-			"control" => array("HtmlTextArea","rows"=>10),
+			"control" => array("EmailMessageEditor"),
 			"helpstep" => 5
 		);
-
+		
 		return new Form("emailText",$formdata,$helpsteps);
 	}
 
 	//returns true if this step is enabled
 	function isEnabled($postdata, $step) {
-		if (isset($postdata["/start"]["messagetype"]) && $postdata["/start"]["messagetype"] == "sendemail"
-				&& isset($postdata["/method"]["method"]) && $postdata["/method"]["method"] == "write")
+		if (isset($postdata["/start"]["messagetype"]) && $postdata["/start"]["messagetype"] == "sendemail")
 			return true;
 		
 		return false;
@@ -476,23 +511,43 @@ class MsgWiz_emailText extends WizStep {
 }
 
 
-class MsgWiz_emailTranslate extends WizStep {
+class MsgWiz_translatePreview extends WizStep {
 	function getForm($postdata, $curstep) {
-		$existingtranslations = isset($postdata["/create/emailtranslate"])?$postdata["/create/emailtranslate"]:array();
+		// msgdata from phone or email
+		switch ($postdata["/start"]["messagetype"]) {
+			case "sendphone":
+				if (isset($postdata["/method"]["method"]) && $postdata["/method"]["method"] == "write") {
+					$msg = json_decode($postdata['/create/phonetext']['message']);
+					$msgdata = $msg->message;
+				} else {
+					$msgdata = $postdata['/create/phoneadvanced']['message'];
+				}
+				$msgtype = "phone";
+				break;
+			case "sendemail":
+				$msgdata = $postdata['/create/emailtext']['message'];
+				$msgtype = "email";
+				break;
+				
+			default:
+				$msgtype = "";
+		}
 		
-		return new AutoTranslateForm("emailTranslate", $this->title, $existingtranslations, $postdata['/create/emailtext']['message'], false, "email");
+		return new AutoTranslateForm("translatePreview", $this->title, $msgdata, $msgtype);
 	}
 
 	//returns true if this step is enabled
 	function isEnabled($postdata, $step) {
 		global $USER;
-		if (!$USER->authorize("sendemail") || !$USER->authorize("sendmulti"))
-			return false;
-		
-		if (isset($postdata["/start"]["messagetype"]) && $postdata["/start"]["messagetype"] == "sendemail"
-				&& isset($postdata["/method"]["method"]) && $postdata["/method"]["method"] == "write"
-				&& isset($postdata["/create/language"]["language"]) && $postdata["/create/language"]["language"] == "autotranslate")
+			// only allow auto translation on "write" messages when the user can send multi lingual
+		$sendphone = (isset($postdata["/start"]["messagetype"]) && $postdata["/start"]["messagetype"] == "sendphone");
+		$phonemethod = (isset($postdata["/method"]["method"])?$postdata["/method"]["method"]:false);
+		$sendemail = (isset($postdata["/start"]["messagetype"]) && $postdata["/start"]["messagetype"] == "sendemail");
+		if ($USER->authorize('sendmulti') && 
+				isset($postdata["/create/language"]["language"]) && $postdata["/create/language"]["language"] == "autotranslate" &&
+				($sendemail || ($sendphone && ($phonemethod == "advanced" || $phonemethod == "write")))) {
 			return true;
+		}
 		
 		return false;
 	}
@@ -574,7 +629,7 @@ class FinishMessageWizard extends WizFinish {
 		// start a transaction
 		QuickQuery("BEGIN");
 		
-		// TODO: is the messagegroup id still valid?
+		// TODO: is the messagegroup id still valid? do we even care?
 		$messagegroup = new MessageGroup($_SESSION['wizard_message']['mgid']);
 		
 		// get the language code from postdata
@@ -632,7 +687,7 @@ class FinishMessageWizard extends WizFinish {
 		
 		// #################################################################
 		// Text based messages
-		// (phone,email,sms) -> write
+		// (phone,email,sms)
 		
 		// keep track of the message data we are going to create messages for
 		// format msgArray(typeArray(translateflagArray(data)))
@@ -642,34 +697,34 @@ class FinishMessageWizard extends WizFinish {
 			'sms' => array());
 		
 		// phone message
-		if (MsgWiz_phoneText::isEnabled($postdata, false)) {
-			$sourcemessage = json_decode($postdata["/create/phonetext"]["message"]);
+		if (MsgWiz_phoneText::isEnabled($postdata, false) || MsgWiz_phoneAdvanced::isEnabled($postdata, false)) {
 			
-			// this is the default 'en' message so it's autotranslate value is 'none'
-			$messages['phone'][$sourcelangcode][$autotrans]['text'] = $sourcemessage->text;
-			$messages['phone'][$sourcelangcode][$autotrans]['gender'] = $sourcemessage->gender;
+			if (MsgWiz_phoneText::isEnabled($postdata, false)) {
+				$sourcemessage = json_decode($postdata["/create/phonetext"]["message"]);
+				$text = $sourcemessage->text;
+				$gender = $sourcemessage->gender;
+			} else {
+				$text = $postdata["/create/phoneadvanced"]["message"];
+				$gender = $postdata["/create/phoneadvanced"]["gender"];
+			}
+			
+			// if this is the default 'en' message, it's autotranslate value is 'none'
+			$messages['phone'][$sourcelangcode][$autotrans]['text'] = $text;
+			$messages['phone'][$sourcelangcode][$autotrans]['gender'] = $gender;
 			
 			//also set the messagegroup preferred gender
-			$messagegroup->preferredgender = $sourcemessage->gender;
+			$messagegroup->preferredgender = $gender;
 			$messagegroup->stuffHeaders();
 			$messagegroup->update(array("data"));
-			
+		
 			// check for and retrieve translations
-			if (MsgWiz_phoneTranslate::isEnabled($postdata, false) && $langcode == "autotranslate") {
-				foreach ($postdata["/create/phonetranslate"] as $translatedlangcode => $msgdata) {
-					$translatedmessage =json_decode($msgdata);
-					// if this translation message is enabled
-					if ($translatedmessage->enabled) {
-						// if the translation text is overridden, don't attach a source message
-						// it isn't applicable since we have no way to know what they changed the text to.
-						if ($translatedmessage->override) {
-							$messages['phone'][$translatedlangcode]['overridden']['text'] = $translatedmessage->text;
-							$messages['phone'][$translatedlangcode]['overridden']['gender'] = $translatedmessage->gender;
-						} else {
-							$messages['phone'][$translatedlangcode]['translated']['text'] = $translatedmessage->text;
-							$messages['phone'][$translatedlangcode]['translated']['gender'] = $translatedmessage->gender;
-							$messages['phone'][$translatedlangcode]['source'] = $messages['phone']['en']['none'];
-						}
+			if (MsgWiz_translatePreview::isEnabled($postdata, false) && $langcode == "autotranslate") {
+				foreach ($postdata["/create/translatepreview"] as $translatedlangcode => $enabled) {
+					// when the message is created, the modify date will be set in the past and retranslation will
+					// get called before attaching to the message group
+					if ($enabled) {
+						$messages['phone'][$translatedlangcode]['translated'] = $messages['phone']['en']['none'];
+						$messages['phone'][$translatedlangcode]['source'] = $messages['phone']['en']['none'];
 					}
 				}
 			}
@@ -686,10 +741,9 @@ class FinishMessageWizard extends WizFinish {
 				$messages['email'][$sourcelangcode][$autotrans]['attachments'] = array();
 			
 			// check for and retrieve translations
-			if (MsgWiz_emailTranslate::isEnabled($postdata, false) && $langcode == "autotranslate") {
-				foreach ($postdata["/create/emailtranslate"] as $translatedlangcode => $enabled) {
-					// emails don't have any actual translation text in session data other than the source message
-					// when the message group is created. the modify date will be set in the past and retranslation will
+			if (MsgWiz_translatePreview::isEnabled($postdata, false) && $langcode == "autotranslate") {
+				foreach ($postdata["/create/translatepreview"] as $translatedlangcode => $enabled) {
+					// when the message is created, the modify date will be set in the past and retranslation will
 					// get called before attaching to the message group
 					if ($enabled) {
 						$messages['email'][$translatedlangcode]['translated'] = $messages['email']['en']['none'];
@@ -713,10 +767,9 @@ class FinishMessageWizard extends WizFinish {
 				// for each autotranslate value
 				foreach ($autotranslatevalues as $autotranslate => $data) {
 					// check for an existing message with this language code for this message group 
-					$message = DBFind("Message", "from message where messagegroupid = ? and type = ? and languagecode = ?", false, array($messagegroup->id, $type, $langcode));
+					$message = DBFind("Message", "from message where messagegroupid = ? and type = ? and languagecode = ? and autotranslate = ?", false, array($messagegroup->id, $type, $langcode, $autotranslate));
 					
-					error_log($message->id);
-					
+					error_log("working on ". $type. ", ". $langcode. ", ". $autotranslate);
 					// no message in the db? create a new one.
 					if (!$message->id)
 						$message = new Message();
@@ -740,9 +793,9 @@ class FinishMessageWizard extends WizFinish {
 					$message->description = Language::getName($langcode);
 					$message->userid = $USER->id;
 					
-					// if this is an autotranslated message and an email. set the modify date in the past
+					// if this is an autotranslated message. set the modify date in the past
 					// this way re-translate will populate the message parts for us
-					if ($autotranslate == 'translated' && $type == 'email')
+					if ($autotranslate == 'translated')
 						$message->modifydate = date("Y-m-d H:i:s", '1');
 					else
 						$message->modifydate = date("Y-m-d H:i:s");
@@ -761,7 +814,9 @@ class FinishMessageWizard extends WizFinish {
 						$message->create();
 					else
 						$message->update();
-						
+					
+					error_log("created/updated message: ". $message->id. " for languagecode: ". $langcode. " and autotranslate: ". $autotranslate);
+					
 					// create the message parts
 					$message->recreateParts($data['text'], null, isset($data['gender'])?$data['gender']:false);
 					
