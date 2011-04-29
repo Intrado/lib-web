@@ -15,11 +15,13 @@ class Form {
 	var $serialnum = "";
 	var $validationresults = null;
 	var $ajaxsubmit = true;
+	var $rendermode = "normal";
 
-	function Form ($name, $formdata, $helpsteps = null, $buttons = null) {
+	function Form ($name, $formdata, $helpsteps = null, $buttons = null, $rendermode = "normal") {
 		$this->name = $name;
 		$this->formdata = $formdata;
 		$this->helpsteps = $helpsteps;
+		$this->rendermode = $rendermode;
 
 		if (isset($buttons))
 			$this->buttons = $buttons;
@@ -195,6 +197,7 @@ class Form {
 		$lasthelpstep = false;
 		$str = '';
 		foreach ($this->formdata as $name => $itemdata) {
+			// TODO: these options should be on the form and not the form item
 			$showicon = (isset($itemdata['renderoptions']) && isset($itemdata['renderoptions']['icon'])) ? $itemdata['renderoptions']['icon'] : true;
 			$showlabel = (isset($itemdata['renderoptions']) && isset($itemdata['renderoptions']['label'])) ? $itemdata['renderoptions']['label'] : true;
 			$showerrormessage = (isset($itemdata['renderoptions']) && isset($itemdata['renderoptions']['errormessage'])) ? $itemdata['renderoptions']['errormessage'] : true;
@@ -245,13 +248,33 @@ class Form {
 			$l = $itemdata['label'];
 
 			if ($formclass == "FormHtml") {
-				$str.= '
-				<tr>
-					' . ($showlabel ? '<th class="formtableheader"><label class="formlabel" for="'.$n.'" >'.$l.'</label></th>' : '') . '
-					' . ($showicon ? '<td class="formtableicon"></td>' : '') . '
-					<td class="formtablecontrol"'.((!$showlabel || !$showicon) ? ' colspan="3"' : '').'>'.$item->render('').'</td>
-				</tr>
-				';
+				switch ($this->rendermode) {
+					case "vertical":
+						$str.= '
+							<tr>
+								<td>
+									<table class="formcontenttable" width=100%>
+										<tr><th class="formtableheader" style="text-align:left" colspan=2><label class="formlabel" for="'.$n.'" >'.$l.'</label></th></tr>
+										<tr>
+											<td class="formtableicon"></td>
+											<td class="formtablecontrol">'.$item->render($value).'</td>
+										</tr>
+									</table>
+								</td>
+							</tr>
+							';
+						break;
+					case "normal":
+					default:
+						$str.= '
+							<tr>
+								' . ($showlabel ? '<th class="formtableheader"><label class="formlabel" for="'.$n.'" >'.$l.'</label></th>' : '') . '
+								' . ($showicon ? '<td class="formtableicon"></td>' : '') . '
+								<td class="formtablecontrol"'.((!$showlabel || !$showicon) ? ' colspan="3"' : '').'>'.$item->render('').'</td>
+							</tr>
+							';
+				}
+				
 				unset($this->formdata[$name]); //hide these from showing up in data sent to form_load
 			} else {
 				$value = $itemdata['value'];
@@ -293,17 +316,41 @@ class Form {
 					$alt = "Required Field";
 					$style = 'style="background: rgb(255,255,220);"' ;
 				}
-
-				$str.= '
-				<tr id="'.$n.'_fieldarea" '.$style.'>
-					'.($showlabel ? '<th class="formtableheader"><label class="formlabel" for="'.$n.'" tabindex="'.$t.'" >'.$l.'</label></th>' : '').'
-					'.($showicon ? '<td class="formtableicon"><img alt="'.$alt.'" title="'.$alt.'" id="'.$n.'_icon" src="'.$i.'" /></td>' : '').'
-					<td class="formtablecontrol">
-						'.$item->render($value).'
-						'.($showerrormessage ? '<div id="'.$n.'_msg" class="underneathmsg">'.($msg ? $msg : "").'</div>' : '').'
-					</td>
-				</tr>
-				';
+			
+				switch ($this->rendermode) {
+					case "vertical":
+						$str.= '
+							<tr id="'.$n.'_fieldarea" '.$style.'>
+								<td>
+									<table class="formcontenttable" width=100%>
+										<tr><th class="formtableheader" style="text-align:left" colspan=2><label class="formlabel" for="'.$n.'" >'.$l.'</label></th></tr>
+										<tr>
+											<td class="formtableicon"><img alt="'.$alt.'" title="'.$alt.'" id="'.$n.'_icon" src="'.$i.'" /></td>
+											<td class="formtablecontrol">
+												'.$item->render($value).'
+												<div id="'.$n.'_msg" class="underneathmsg">'.($msg ? $msg : "").'</div>
+											</td>
+										</tr>
+									</table>
+								</td>
+							</tr>
+							';
+						break;
+						
+					case "normal":
+					default:
+						$str.= '
+						<tr id="'.$n.'_fieldarea" '.$style.'>
+							'.($showlabel ? '<th class="formtableheader"><label class="formlabel" for="'.$n.'" tabindex="'.$t.'" >'.$l.'</label></th>' : '').'
+							'.($showicon ? '<td class="formtableicon"><img alt="'.$alt.'" title="'.$alt.'" id="'.$n.'_icon" src="'.$i.'" /></td>' : '').'
+							<td class="formtablecontrol">
+								'.$item->render($value).'
+								'.($showerrormessage ? '<div id="'.$n.'_msg" class="underneathmsg">'.($msg ? $msg : "").'</div>' : '').'
+							</td>
+						</tr>
+						';
+				}
+				
 			}
 		} //foreach
 
