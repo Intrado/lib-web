@@ -25,6 +25,7 @@
 class PhoneMessageEditor extends FormItem {
 	
 	function render ($value) {
+		global $USER;
 		
 		$n = $this->form->name."_".$this->name;
 		
@@ -78,7 +79,6 @@ class PhoneMessageEditor extends FormItem {
 				.maincontainerright {
 					float:left; width:45%; 
 					margin-left:10px; 
-					margin-top:15px; 
 					padding:6px; 
 					border: 1px solid #'.$_SESSION['colorscheme']['_brandtheme2'].';
 				}
@@ -94,7 +94,6 @@ class PhoneMessageEditor extends FormItem {
 		// textarea for message bits
 		$textarea = '
 			<div class="controlcontainer">
-				<div>'._L("Phone Message").'</div>
 				<textarea id="'.$n.'" name="'.$n.'" class="messagearea"/>'.escapehtml($value).'</textarea>
 			</div>';
 		
@@ -169,7 +168,7 @@ class PhoneMessageEditor extends FormItem {
 					'.$seperator.'
 				</div>
 				<div class="maincontainerright">
-					'.$voicerecorder.'
+					'.($USER->authorize('starteasy')?$voicerecorder:"").'
 					'.$audioupload.'
 					'.$audiolibrary.'
 					'.$datafieldinsert.'
