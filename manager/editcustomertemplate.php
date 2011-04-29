@@ -338,7 +338,7 @@ if ($showheaders) {
 ?>
 	<tr>
 		<td>Subject:</td>
-		<td><? NewFormItem($f, $s, "subject_" . $defaultcode, "text", 40); ?></td>
+		<td><? NewFormItem($f, $s, "subject_" . $defaultcode, "text", 80); ?></td>
 	</tr>
 <?
 }
@@ -366,7 +366,7 @@ if ($showheaders) {
 ?>
 	<tr>
 		<td>Subject:</td>
-		<td><? NewFormItem($f, $s, "subject_" . $langcode, "text", 40); ?></td>
+		<td><? NewFormItem($f, $s, "subject_" . $langcode, "text", 80); ?></td>
 	</tr>
 <?
 }
