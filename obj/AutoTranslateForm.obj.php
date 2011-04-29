@@ -1,62 +1,12 @@
 <?
 class AutoTranslateForm extends Form {
-	var $msgtype = false;
-
-	// generates form items based on supplied parameters.
-	function getTranslationDataArray($label, $languagecode, $text, $gender = "female", $transient = true, $englishText = false) {
-		switch ($this->msgtype) {
-			case "email":
-				return array(
-					"label" => _L($label),
-					"fieldhelp" => _L('Check this box to automatically translate your message using Google Translate.'),
-					"value" => 1,
-					"validators" => array(),
-					"control" => array("CheckBoxWithHtmlPreview", "checkedhtml" => $text, "uncheckedhtml" => addslashes(_L("People tagged with this language will receive the English version."))),
-					"helpstep" => 2
-				);
-				break;
-				
-			default:
-				return array(
-					"label" => ucfirst($label),
-					"value" => json_encode(array(
-						"enabled" => true,
-						"text" => $text,
-						"override" => false,
-						"gender" => $gender,
-						"englishText" => $englishText
-					)),
-					"validators" => array(array("ValTranslation")),
-					"control" => array("TranslationItem",
-						"phone" => true,
-						"language" => $languagecode
-					),
-					"transient" => $transient,
-					"helpstep" => 2
-				);
-		}
+	function escapeFieldInserts($text) {
+		return str_replace(">>", "&#062;&#062;", str_replace("<<", "&#060;&#060;", $text));
 	}
-
-	// transient messages are ones that are enabled, are are not overriden with custom text
-	function isTransient ($existingtranslations, $language) {
-		switch ($this->msgtype) {
-			case "phone":
-				if (isset($existingtranslations[$language])) {
-					$postmsgdata = json_decode($existingtranslations[$language]);
-					if ($postmsgdata)
-						return !(!$postmsgdata->enabled || $postmsgdata->override);
-				}
-				break;
-				
-			default:
-				return true;
-		}
-	}
-
+	
 	// generate the form
-	function AutoTranslateForm($name, $title, $existingtranslations, $sourcetext, $gender, $msgtype) {
+	function AutoTranslateForm($name, $title, $sourcetext, $msgtype) {
 		global $TRANSLATIONLANGUAGECODES;
-		$this->msgtype = $msgtype;
 		
 		static $translations = false;
 		static $translationlanguages = false;
@@ -67,7 +17,7 @@ class AutoTranslateForm extends Form {
 		}
 
 		//Get available languages
-		switch ($this->msgtype) {
+		switch ($msgtype) {
 			case "phone":
 				$translationlanguages = Voice::getTTSLanguageMap();
 				$voices = Voice::getTTSVoices();
@@ -94,11 +44,11 @@ class AutoTranslateForm extends Form {
 
 		$formdata["englishtext"] = array(
 			"label" => _L("English"),
-			"control" => array("FormHtml","html"=>'<div style="font-size: medium;">'.$sourcetext.'</div><br>'),
+			"control" => array("FormHtml","html"=>'<div style="font-size: medium;">'.$this->escapeFieldInserts($sourcetext).'</div><br>'),
 			"helpstep" => 1
 		);
 
-		//$translations = false; // Debug output when no translation is available
+		// Debug output when no translation is available
 		if(!$translations) {
 			$formdata["Translationinfo"] = array(
 				"label" => _L("Info"),
@@ -109,31 +59,27 @@ class AutoTranslateForm extends Form {
 			if(is_array($translations)){
 				foreach($translations as $obj){
 					$languagecode = array_shift($translationlanguagecodes);
-
-					if(!isset($voices[$languagecode.":".$gender]))
-						$gender = ($gender == "male")?"female":"male";
-					else
-						$gender = $gender;
-					$transient = $this->isTransient($existingtranslations, $languagecode);
-
-					$formdata[$languagecode] = $this->getTranslationDataArray(
-														$translationlanguages[$languagecode], 
-														$languagecode, 
-														$obj->responseData->translatedText, 
-														$gender, 
-														$transient, 
-														($transient?"":$sourcetext));
+					$formdata[] = Language::getName($languagecode);
+					$formdata[$languagecode] = array(
+						"label" => _L("Enabled"),
+						"fieldhelp" => _L('Check this box to automatically translate your message using Google Translate.'),
+						"value" => 1,
+						"validators" => array(),
+						"control" => array("CheckBoxWithHtmlPreview", "checkedhtml" => $this->escapeFieldInserts($obj->responseData->translatedText), "uncheckedhtml" => addslashes(_L("People tagged with this language will receive the English version."))),
+						"helpstep" => 2
+					);
 				}
 			} else {
 				$languagecode = reset($translationlanguagecodes);
-				$transient = $this->isTransient($existingtranslations, $languagecode);
-				$formdata[$languagecode] = $this->getTranslationDataArray(
-													$translationlanguages[$languagecode], 
-													$languagecode, 
-													$translations->translatedText, 
-													$gender, 
-													$transient, 
-													($transient?"":$sourcetext));
+					$formdata[] = Language::getName($languagecode);
+				$formdata[$languagecode] = array(
+						"label" => _L("Enabled"),
+						"fieldhelp" => _L('Check this box to automatically translate your message using Google Translate.'),
+						"value" => 1,
+						"validators" => array(),
+						"control" => array("CheckBoxWithHtmlPreview", "checkedhtml" => $this->escapeFieldInserts($translations->translatedText), "uncheckedhtml" => addslashes(_L("People tagged with this language will receive the English version."))),
+						"helpstep" => 2
+					);
 			}
 		}
 		if(!isset($formdata["Translationinfo"])) {
