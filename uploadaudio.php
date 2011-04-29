@@ -66,7 +66,7 @@ if (!empty($_POST) && empty($_FILES['audio'])) {
 			if($res2 || !file_exists($dest)) {
 				$errormessage = _L("There was an error reading your audio file.\nPlease try another file.\nSupported formats include: .wav, .aiff, .au, and .mp3");
 				unlink($source);
-				unlink($dest);
+				@unlink($dest);
 			} else {
 				$contentid = contentPut($dest,"audio/wav");
 
