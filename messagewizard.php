@@ -33,7 +33,6 @@ require_once("obj/EmailAttach.val.php");
 require_once("obj/HtmlTextArea.fi.php");
 require_once("obj/ValMessageBody.val.php");
 require_once("obj/traslationitem.obj.php");
-require_once("obj/AutoTranslateForm.obj.php");
 require_once("obj/CheckBoxWithHtmlPreview.fi.php");
 require_once("obj/PhoneMessageEditor.fi.php");
 require_once("obj/EmailMessageEditor.fi.php");
@@ -45,7 +44,9 @@ require_once("inc/messagewizard.inc.php");
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization
 ////////////////////////////////////////////////////////////////////////////////
-// TODO: message sending auth check
+global $USER;
+if (!$USER->authorize("sendphone") || !$USER->authorize("sendemail") || !$USER->authorize("sendsms"))
+		redirect('unauthorized.php');
 
 ////////////////////////////////////////////////////////////////////////////////
 // Passed parameter checking
@@ -78,7 +79,7 @@ $wizdata = array(
 );
 
 $wizard = new Wizard("wizard_message",$wizdata, new FinishMessageWizard("Finish"));
-$wizard->doneurl = "start.php";
+$wizard->doneurl = "mgeditor.php";
 $wizard->handlerequest();
 
 // After reload check session data for job type information
