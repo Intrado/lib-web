@@ -156,7 +156,7 @@ if($isajax === true) {
 			$types .= $item["email"] > 0?"," . _L("email"):"";
 			$types .= $item["sms"] > 0?"," . _L("sms"):"";
 			$title = escapehtml($item["name"]);
-			$defaultlink = "messagegroup.php?id=$itemid";
+			$defaultlink = "mgeditor.php?id=$itemid";
 			$publishaction = $item['publishaction'];
 			$publishid = $item['publishid'];
 			
@@ -170,7 +170,7 @@ if($isajax === true) {
 			// tell the user it's a subscription. change the href to view instead of edit
 			if ($publishaction == 'subscribe') {
 				$publishmessage = _L('You are subscribed to this message. Owner: (%s)', $item['owner']);
-				$defaultlink = "messagegroupview.php?id=$itemid";
+				$defaultlink = "mgeditor.php?id=$itemid";
 			}
 			
 			// Users with published messages or subscribed messages will get a special action item
@@ -196,7 +196,7 @@ if($isajax === true) {
 					$publishactionlink);
 			else
 				$tools = action_links (
-					action_link("Edit", "pencil", 'messagegroup.php?id=' . $itemid),
+					action_link("Edit", "pencil", 'mgeditor.php?id=' . $itemid),
 					$publishactionlink,
 					action_link("Delete", "cross", 'messages.php?delete=' . $itemid, "return confirmDelete();")
 				);
@@ -261,7 +261,7 @@ startWindow(_L('My Messages'), 'padding: 3px;', false, true);
 <tr>
 	<td style="width: 180px;vertical-align: top;font-size: 12px;" >
 		<div class="feedbuttoncontainer">
-			<?= icon_button(_L('Create a Message'),"add","location.href='messagegroup.php?id=new'") ?>
+			<?= icon_button(_L('Create a Message'),"add","location.href='mgeditor.php?id=new'") ?>
 			<div style="clear:both;"></div>
 		</div>
 		<?=(($USER->authorize('subscribe') && userCanSubscribe('messagegroup'))?icon_button(_L('Subscribe to a Message'),"fugue/star", "document.location='messagegroupsubscribe.php'"):'') ?>
