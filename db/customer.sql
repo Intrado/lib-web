@@ -1518,3 +1518,12 @@ $$$
 update setting set value='7.8/6' where name='_dbversion'
 $$$
 -- END REV 7.8/6
+
+-- $rev 7
+
+ALTER TABLE `reportperson` DROP `messageid`
+$$$
+
+update setting set value='7.8/7' where name='_dbversion'
+$$$
+-- END REV 7.8/7

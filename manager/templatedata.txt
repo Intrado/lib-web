@@ -1,0 +1,444 @@
+Comments to throw away, index [0]
+TODO need nicer way to determine templatetype-language-emailsubtype
+Order of template data is:
+
+[1]notification english html
+[2]notification english plain
+[3]notification spanish html
+[4]notification spanish plain
+
+[5]emergency english html
+[6]emergency english plain
+[7]emergency spanish html
+[8]emergency spanish plain
+
+[9]messagelink english html
+[10]messagelink english plain
+[11]messagelink spanish html
+[12]messagelink spanish plain
+
+[13]subscriber english html
+[14]subscriber english plain
+[15]subscriber spanish html
+[16]subscriber spanish plain
+
+[17]survey english html
+[18]survey english plain
+
+
+$$$
+${body}<br><br><hr />
+
+<p style="font-family:verdana; color:#6B6B6B; font-size:75%">
+${displayname} would like to continue connecting with you via email.  If you prefer to be removed from our list, please contact ${displayname} directly.  To stop receiving all email messages distributed through our ${productname} service, follow this link and confirm: <a href= "${unsubscribelink}">Unsubscribe</a>
+</p>
+<p style="font-family:verdana; color:#6B6B6B; font-size:75%">
+${productname} is a notification service used by the nation's leading school systems to connect with parents, students and staff through voice, SMS text, email, and social media.
+</p>
+
+$$$
+${body}
+
+
+
+-----
+${displayname} would like to continue connecting with you via email.  If you prefer to be removed from our list, please contact ${displayname} directly.  To stop receiving all email messages distributed through our ${productname} service, follow this link and confirm: ${unsubscribelink}
+
+${productname} is a notification service used by the nation's leading school systems to connect with parents, students and staff through voice, SMS text, email, and social media.
+
+$$$
+${body}<br><br><hr/>
+
+<p style="font-family:verdana; color:#6B6B6B; font-size:75%">
+				${displayname} le gustaria contiunuar comunicandoce con usted por medio de correo electr&oacute;nico.  Si usted prefiere ser borrado de nuestra lista, por favor contacte ${displayname} directamente.  Para dejar de recibir todos los mensajes de correo electr&oacute;nico distribuidos por nuestro servicio de ${productname}, siga este enlace: <a href= "${unsubscribelink}">Unsubscribe</a>
+				</p>
+				<p style="font-family:verdana; color:#6B6B6B; font-size:75%">
+				${productname} es un servicio de notificaci&oacute;n usado por los sistemas escolares mas importantes de la naci&oacute;n para comunicarse con padres, estudiantes, y personal por medio de voz, texto, correo electr&oacute;nico y medios de comunicaci&oacute;n social.
+				</p>
+
+$$$
+${body}
+
+
+------
+${displayname} le gustaria contiunuar comunicandoce con usted por medio de correo electrónico.  Si usted prefiere ser borrado de nuestra lista, por favor contacte ${displayname} directamente.  Para dejar de recibir todos los mensajes de correo electrónico distribuidos por nuestro servicio de ${productname}, siga este enlace:${unsubscribelink}
+ 
+${productname} es un servicio de notificación usado por los sistemas escolares mas importantes de la nación para comunicarse con padres, estudiantes, y personal por medio de voz, texto, correo electrónico y medios de comunicación social.
+
+$$$
+${body}<br><br><hr />
+
+<p style="font-family:verdana; color:#6B6B6B; font-size:75%">
+${displayname} would like to continue connecting with you via email.  If you prefer to be removed from our list, please contact ${displayname} directly.  To stop receiving all email messages distributed through our ${productname} service, follow this link and confirm: <a href= "${unsubscribelink}">Unsubscribe</a>
+</p>
+<p style="font-family:verdana; color:#6B6B6B; font-size:75%">
+${productname} is a notification service used by the nation's leading school systems to connect with parents, students, and staff through voice, SMS text, email, and social media.
+</p>
+
+
+$$$
+${body}
+
+
+
+-----
+${displayname} would like to continue connecting with you via email.  If you prefer to be removed from our list, please contact ${displayname} directly.  To stop receiving all email messages distributed through our ${productname} service, follow this link and confirm: ${unsubscribelink}
+
+${productname} is a notification service used by the nation's leading school systems to connect with parents, students, and staff through voice, SMS text, email, and social media.
+
+$$$
+${body}<br><br><hr/>
+
+<p style="font-family:verdana; color:#6B6B6B; font-size:75%">
+				${displayname} le gustaria contiunuar comunicandoce con usted por medio de correo electr&oacute;nico.  Si usted prefiere ser borrado de nuestra lista, por favor contacte ${displayname} directamente.  Para dejar de recibir todos los mensajes de correo electr&oacute;nico distribuidos por nuestro servicio de ${productname}, siga este enlace: <a href= "${unsubscribelink}">Unsubscribe</a>
+				</p>
+				<p style="font-family:verdana; color:#6B6B6B; font-size:75%">
+				${productname} es un servicio de notificaci&oacute;n usado por los sistemas escolares mas importantes de la naci&oacute;n para comunicarse con padres, estudiantes, y personal por medio de voz, texto, correo electr&oacute;nico y medios de comunicaci&oacute;n social.
+				</p>
+
+$$$
+${body}
+
+
+------
+${displayname} le gustaria contiunuar comunicandoce con usted por medio de correo electrónico.  Si usted prefiere ser borrado de nuestra lista, por favor contacte ${displayname} directamente.  Para dejar de recibir todos los mensajes de correo electrónico distribuidos por nuestro servicio de ${productname}, siga este enlace:${unsubscribelink}
+ 
+${productname} es un servicio de notificación usado por los sistemas escolares mas importantes de la nación para comunicarse con padres, estudiantes, y personal por medio de voz, texto, correo electrónico y medios de comunicación social.
+
+$$$
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<title>
+		${displayname} sent a new message!
+	</title>
+	<meta http-equiv="content-type"
+		content="text/html;charset=utf-8" />
+
+</head>
+<body style="background: #FFFFFF; font-family:verdana; color:#666666;">
+	<table width="100%" cellpadding="10" cellspacing="0" class="backgroundTable" style="background-color: #FFFFFF; border:1px solid #A5A5A5;">
+		<tr>
+			<td valign="top" align="left" style="border-bottom: 1px solid #A5A5A5; padding:0px; background-color:#FFFFFF;">
+				<p style="font-size:26px; color:#669900;">${displayname}</p>
+			</td>
+		</tr>
+		<tr>
+			<td valign="top" align="left" >
+				<p>
+				You are receiving this message because your contact information is associated with <b>${f01} ${f02}</b>.
+				</p><p>
+				A new message from ${displayname} was sent to you using the ${productname} notification service.
+				</p><p>
+				Please click below to listen to your message:
+				</p><p style="text-align: center;">
+				<br/><a href="${messagelink}">
+				<img src="http://asp.schoolmessenger.com/i/img/largeicons/phonetalking.jpg" alt="Click here to listen to your message." style="border:none;"/><br/>
+				Listen to your message</a>
+				</p><p>
+				Thank you,<br />${displayname}
+				</p>
+			</td>
+		</tr>
+		<tr>
+			<td valign="top" align="left" style="border-bottom: 1px solid #9A9A9A; padding:0px; background-color:#FFFFFF;">
+			</td>
+		</tr>
+		<tr>
+			<td valign="top" align="left" style="padding:5px; background-color:#FFFFFF;">
+
+				<p style="font-family:verdana; color:#6B6B6B; font-size:75%">
+				${displayname} would like to continue connecting with you via email.  If you prefer to be removed from our list, please contact ${displayname} directly.  To stop receiving all email messages distributed through our ${productname} service, follow this link and confirm: <a href= "${unsubscribelink}">Unsubscribe</a>
+				</p>
+				<p style="font-family:verdana; color:#6B6B6B; font-size:75%">
+				${productname} is a notification service used by the nation's leading school systems to connect with parents, students and staff through voice, SMS text, email, and social media.
+				</p>
+			</td>
+		</tr>
+	</table>
+
+</body>
+</html>
+
+$$$
+You are receiving this message because your contact information is associated with <b>${f01} ${f02}</b>.
+
+A new message from ${displayname} was sent to you using the ${productname} notification service.
+
+Follow the link below to play the message.
+
+${messagelink}
+
+Thank you,
+${displayname}
+
+
+-------
+${displayname} would like to continue connecting with you via email.  If you prefer to be removed from our list, please contact ${displayname} directly.  To stop receiving all email messages distributed through our ${productname} service, follow this link: ${unsubscribelink}
+
+${productname} is a notification service used by the nation's leading school systems to connect with parents, students, and staff through voice, SMS text, email, and social media.
+${logoclickurl}
+
+
+$$$
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<title>
+		¡${displayname} le envió un mensaje nuevo!
+	</title>
+	<meta http-equiv="content-type"
+		content="text/html;charset=utf-8" />
+
+</head>
+<body style="background: #FFFFFF; font-family:verdana; color:#666666;">
+	<table width="100%" cellpadding="10" cellspacing="0" class="backgroundTable" style="background-color: #FFFFFF; border:1px solid #A5A5A5;">
+		<tr>
+			<td valign="top" align="left" style="border-bottom: 1px solid #A5A5A5; padding:0px; background-color:#FFFFFF;">
+				<p style="font-size:26px; color:#669900;">${displayname}</p>
+			</td>
+		</tr>
+
+		<tr>
+			<td valign="top" align="left" >
+				<p>
+				Usted esta recibiendo este mensaje porque su informaci&oacute;n de contacto esta asociada con <b>${f01} ${f02}</b>.
+				</p><p>
+				Un nuevo mensaje ${displayname} de le fue enviado usando el ${productname} serv&iacute;cio de notificaci&oacute;n.
+				</p><p>
+				Escuche este mensaje navegando al siguiente enlace:
+				</p><p style="text-align: center;">
+				<br/><a href="${messagelink}">
+				<img src="http://asp.schoolmessenger.com/i/img/largeicons/phonetalking.jpg" alt="Escuche este mensaje." style="border:none;"/><br/>
+				Escuche este mensaje</a>
+				</p><p>
+				Gracias,<br />${displayname}
+				</p>
+			</td>
+		</tr>
+		<tr>
+
+		</tr>
+		<tr>
+			<td valign="top" align="left" style="border-bottom: 1px solid #9A9A9A; padding:0px; background-color:#FFFFFF;">
+			</td>
+		</tr>
+		<tr>
+			<td valign="top" align="left" style="padding:5px; background-color:#FFFFFF;">
+
+				<p style="font-family:verdana; color:#6B6B6B; font-size:75%">
+				${displayname} le gustaria contiunuar comunicandoce con usted por medio de correo electr&oacute;nico.  Si usted prefiere ser borrado de nuestra lista, por favor contacte ${displayname} directamente.  Para dejar de recibir todos los mensajes de correo electr&oacute;nico distribuidos por nuestro servicio de ${productname}, siga este enlace: <a href= "${unsubscribelink}">Unsubscribe</a>
+				</p>
+				<p style="font-family:verdana; color:#6B6B6B; font-size:75%">
+				${productname} es un servicio de notificaci&oacute;n usado por los sistemas escolares mas importantes de la naci&oacute;n para comunicarse con padres, estudiantes, y personal por medio de voz, texto, correo electr&oacute;nico y medios de comunicaci&oacute;n social.
+				</p>
+			</td>
+		</tr>
+	</table>
+
+</body>
+</html>
+
+$$$
+Usted esta recibiendo este mensaje porque su información de contacto esta asociada con ${f01} ${f02}.
+ 
+Un nuevo mensaje ${displayname} de le fue enviado usando el ${productname} servício de notificación.
+ 
+Escuche este mensaje navegando al siguiente enlace:
+ 
+${messagelink}
+ 
+Gracias,
+${displayname}
+
+
+------
+${displayname} le gustaria contiunuar comunicandoce con usted por medio de correo electrónico.  Si usted prefiere ser borrado de nuestra lista, por favor contacte ${displayname} directamente.  Para dejar de recibir todos los mensajes de correo electrónico distribuidos por nuestro servicio de ${productname}, siga este enlace:${unsubscribelink}
+ 
+${productname} es un servicio de notificación usado por los sistemas escolares mas importantes de la nación para comunicarse con padres, estudiantes, y personal por medio de voz, texto, correo electrónico y medios de comunicación social.
+
+$$$
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<title>
+		Reminder: ${displayname} ${productname} Account Termination Warning
+	</title>
+	<meta http-equiv="content-type"
+		content="text/html;charset=utf-8" />
+
+</head>
+<body style="background: #FFFFFF; font-family:verdana; color:#666666;">
+	<table width="100%" cellpadding="10" cellspacing="0" class="backgroundTable" style="background-color: #FFFFFF; border:1px solid #A5A5A5;">
+		<tr>
+			<td valign="top" align="left" style="border-bottom: 1px solid #A5A5A5; padding:0px; background-color:#FFFFFF;">
+				<p style="font-size:26px; color:#669900;">${displayname}</p>
+			</td>
+		</tr>
+
+		<tr>
+			<td valign="top" align="left"">
+				<p>
+				The ${productname} account you created to manage your contact preferences for ${displayname} has not been logged into recently. Your account will be automatically disabled in ${daystotermination} days if you do not log into it.
+				</p><p>
+				To keep your account active please login.
+				</p><p>
+				Click the link below to sign in, or simply enter the address below into your browser.
+				</p><p>
+				<a href=${loginurl}>${loginurl}</a>
+				<p>
+				This is an automatically generated email. Please <b>DO NOT</b> reply.
+				</p>
+				</p><p>
+				Thank you,<br />
+				${displayname}
+				</p>
+			</td>
+		</tr>
+
+		<tr>
+			<td valign="top" align="left" style="border-bottom: 1px solid #9A9A9A; padding:0px; background-color:#FFFFFF;">
+			</td>
+		</tr>
+		<tr>
+			<td valign="top" align="left" style="padding:5px; background-color:#FFFFFF;">
+
+				<p style="font-family:verdana; color:#6B6B6B; font-size:75%">
+				${displayname} would like to continue connecting with you via email.  If you prefer to be removed from our list, please contact ${displayname} directly.  To stop receiving all email messages distributed through our ${productname} service, follow this link and confirm: <a href= "${unsubscribelink}">Unsubscribe</a>
+				</p>
+				<p style="font-family:verdana; color:#6B6B6B; font-size:75%">
+				${productname} is a notification service used by the nation's leading school systems to connect with parents, students and staff through voice, SMS text, email, and social media.
+				</p>
+			</td>
+		</tr>
+	</table>
+
+</body>
+</html>
+
+$$$
+The ${productname} account you created to manage your contact preferences for ${displayname} has not been logged into recently. Your account will be automatically disabled in ${daystotermination} days if you do not log into it.
+
+To keep your account active please login.
+
+Click the link below to sign in, or simply enter the address below into your browser.
+
+${loginurl}
+
+This is an automatically generated email. Please DO NOT reply.
+
+Thank you,
+${displayname}
+
+
+------
+${displayname} would like to continue connecting with you via email. If you prefer to be removed from our list, please contact ${displayname} directly. To stop receiving all email messages distributed through our ${productname} service, follow this link and confirm: ${unsubscribelink}
+
+${productname} is a notification service used by the nation's leading school systems to connect with parents, students and staff through voice, SMS text, email, and social media.
+
+$$$
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<title>
+		Recordatorio: ${displayname} ${productname} Advertencia Cancelaci&oacute;n de cuenta
+	</title>
+	<meta http-equiv="content-type"
+		content="text/html;charset=utf-8" />
+
+</head>
+<body style="background: #FFFFFF; font-family:verdana; color:#666666;">
+	<table width="100%" cellpadding="10" cellspacing="0" class="backgroundTable" style="background-color: #FFFFFF; border:1px solid #A5A5A5;">
+		<tr>
+			<td valign="top" align="left" style="border-bottom: 1px solid #A5A5A5; padding:0px; background-color:#FFFFFF;">
+				<p style="font-size:26px; color:#669900;">${displayname}</p>
+			</td>
+		</tr>
+		<tr>
+			<td valign="top" align="left"">
+				<p>
+				La cuenta de ${productname} que usted cre&oacute; para administrar sus preferencias de contacto para ${displayname} no ha sido ingresada recientemente.  Su cuenta sera inabilitada automaticamente en ${daystotermination} si usted no ingresa.
+				</p><p>
+				Para mantener su cuenta activa por favor entre a su cuenta.
+				</p><p>
+				Haga clic en el enlace para entrar, o simplemente escriba la direcci&oacute;n abajo en su navegador.
+				</p><p>
+				<a href=${loginurl}>${loginurl}</a>
+				<p>
+				Este es un mensaje generado autom&aacute;ticamente. Por favor, <b>NO</b> responde.
+				</p>
+				</p><p>
+				Gracias,<br />
+				${displayname}
+				</p>
+			</td>
+		</tr>
+		<tr>
+			<td valign="top" align="left" style="border-bottom: 1px solid #9A9A9A; padding:0px; background-color:#FFFFFF;">
+			</td>
+		</tr>
+		<tr>
+			<td valign="top" align="left" style="padding:5px; background-color:#FFFFFF;">
+
+				<p style="font-family:verdana; color:#6B6B6B; font-size:75%">
+					${displayname} le gustaria contiunuar comunicandoce con usted por medio de correo electr&oacute;nico.  Si usted prefiere ser borrado de nuestra lista, por favor contacte ${displayname} directamente.  Para dejar de recibir todos los mensajes de correo electr&oacute;nico distribuidos por nuestro servicio de ${productname}, siga este enlace:${unsubscribelink} <a href= "${unsubscribelink}">Unsubscribe</a>
+					</p>
+					<p style="font-family:verdana; color:#6B6B6B; font-size:75%">
+					${productname} es un servicio de notificaci&oacute;n usado por los sistemas escolares mas importantes de la naci&oacute;n para comunicarse con padres, estudiantes, y personal por medio de voz, texto, correo electr&oacute;nico y medios de comunicaci&oacute;n social.
+				</p>
+			</td>
+		</tr>
+	</table>
+
+</body>
+</html>
+
+$$$
+La cuenta de ${productname} que usted creó para administrar sus preferencias de contacto para ${displayname} no ha sido ingresada recientemente. Su cuenta sera inabilitada automaticamente en ${daystotermination} si usted no ingresa.
+
+Para mantener su cuenta activa por favor entre a su cuenta.
+
+Haga clic en el enlace para entrar, o simplemente escriba la dirección abajo en su navegador.
+
+${loginurl}
+
+Este es un mensaje generado automáticamente. Por favor, NO responde.
+
+Gracias,
+${displayname}
+
+
+------
+${displayname} le gustaria contiunuar comunicandoce con usted por medio de correo electrónico.  Si usted prefiere ser borrado de nuestra lista, por favor contacte ${displayname} directamente.  Para dejar de recibir todos los mensajes de correo electrónico distribuidos por nuestro servicio de ${productname}, siga este enlace:${unsubscribelink}
+ 
+${productname} es un servicio de notificación usado por los sistemas escolares mas importantes de la nación para comunicarse con padres, estudiantes, y personal por medio de voz, texto, correo electrónico y medios de comunicación social.
+
+$$$
+${body}<br><br>${surveylink}
+<br><br><hr />
+<p style="font-family:verdana; color:#6B6B6B; font-size:75%">
+${displayname} would like to continue connecting with you via email.  If you prefer to be removed from our list, please contact ${displayname} directly.  To stop receiving all email messages distributed through our ${productname} service, follow this link and confirm: <a href= "${unsubscribelink}">Unsubscribe</a>
+</p>
+<p style="font-family:verdana; color:#6B6B6B; font-size:75%">
+${productname} is a notification service used by the nation's leading school systems to connect with parents, students, and staff through voice, SMS text, email, and social media.
+</p>
+
+$$$
+${body}
+
+${surveylink}
+
+
+------
+${displayname} would like to continue connecting with you via email.  If you prefer to be removed from our list, please contact ${displayname} directly.  To stop receiving all email messages distributed through our ${productname} service, follow this link and confirm: ${unsubscribelink}
+
+${productname} is a notification service used by the nation's leading school systems to connect with parents, students, and staff through voice, SMS text, email, and social media.
+
+
+$$$
+
+
