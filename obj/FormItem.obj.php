@@ -126,14 +126,18 @@ class RadioButton extends FormItem {
 		$counter = 1;
 		$autoselect = count($this->args['values']) == 1; //if there is only one value, autoselect it
 		foreach ($this->args['values'] as $radiovalue => $radioname) {
-			$id = $n.'-'.$counter;
-			$str .= '<input id="'.$id.'" name="'.$n.'" type="radio" value="'.escapehtml($radiovalue).'" '.($value == $radiovalue || $autoselect ? 'checked' : '').' /><label id="'.$id.'-label" for="'.$id.'">'.($ishtml?$radioname:escapehtml($radioname)).'</label><br />
-			';
-			if (isset($this->args['hover'])) {
-				$hoverdata[$id] = $this->args['hover'][$radiovalue];
-				$hoverdata[$id.'-label'] = $this->args['hover'][$radiovalue];
+			if ($radioname == "#-#") {
+				$str .= "<hr />\n";
+			} else {
+				$id = $n.'-'.$counter;
+				$str .= '<input id="'.$id.'" name="'.$n.'" type="radio" value="'.escapehtml($radiovalue).'" '.($value == $radiovalue || $autoselect ? 'checked' : '').' /><label id="'.$id.'-label" for="'.$id.'">'.($ishtml?$radioname:escapehtml($radioname)).'</label><br />
+				';
+				if (isset($this->args['hover'])) {
+					$hoverdata[$id] = $this->args['hover'][$radiovalue];
+					$hoverdata[$id.'-label'] = $this->args['hover'][$radiovalue];
+				}
+				$counter++;
 			}
-			$counter++;
 		}
 		$str .= '</div>
 		';

@@ -136,6 +136,12 @@ form.newform {
 	border: 1px dotted gray;
 }
 
+.newform .radiobox hr {
+	border-top: 1px dotted gray;
+	border-bottom: none;
+}
+
+
 .newform .msgbody {
 	clear: both;
 	font-style: normal;
