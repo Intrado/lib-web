@@ -1963,7 +1963,7 @@ class SMAPI {
 		$list->deleted = 0;
 		if (!$list->create()) {
 			$result['resultcode'] = 'failure';
-			$result["resultdescription"] =  "Unable to create list.";
+			$result["resultdescription"] =  "Unable to create the list.";
 			return $result;
 		}
 		$result['listid'] = $list->id;
@@ -2013,7 +2013,7 @@ class SMAPI {
 		$list = new PeopleList($listid);
 		if (!$list->softDelete()) {
 			$result['resultcode'] = 'failure';
-			$result["resultdescription"] =  "Unable to delete list.";
+			$result["resultdescription"] =  "Unable to delete the list.";
 			return $result;
 		}
 		
@@ -2146,7 +2146,7 @@ class SMAPI {
 		
 		$import = new Import($importid);
 		// validate importid
-		if ($import->id != $importid || $import->type != "automatic") {
+		if ($import->id != $importid) {
 			$result['resultcode'] = 'invalidparam';
 			$result["resultdescription"] =  "Invalid Parameter : importid";
 			return $result;
@@ -2189,7 +2189,7 @@ class SMAPI {
 		
 		$import = new Import($importid);
 		// validate importid
-		if ($import->id != $importid || $import->type != "automatic") {
+		if ($import->id != $importid) {
 			$result['resultcode'] = 'invalidparam';
 			$result["resultdescription"] =  "Invalid Parameter : importid";
 			return $result;
