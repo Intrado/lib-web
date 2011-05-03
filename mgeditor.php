@@ -219,11 +219,11 @@ function makeMessageGrid($messagegroup) {
 					// Phone message will need a more custom menu
 					if ($type == "phone") {
 						$actions[] = action_link("Play","fugue/control",null,"preview(\'$type\',\'$subtype\',\'$languagecode\'); return false;");
-						$actions[] = action_link("Re-Record","diagona/16/151","recordmessage.php?id=$message->id");
-						$actions[] = action_link("Edit Advanced","pencil","writemessage.php?id=$message->id");
+						$actions[] = action_link("Re-Record","diagona/16/151","editmessage.php?id=new&type=record&languagecode=$languagecode&mgid=".$messagegroup->id);
+						$actions[] = action_link("Edit Advanced","pencil","editmessage.php?id=$message->id");
 					} else {
 						$actions[] = action_link("Preview","email_open",null,"preview(\'$type\',\'$subtype\',\'$languagecode\'); return false;");
-						$actions[] = action_link("Edit","pencil","writemessage.php?id=$message->id");
+						$actions[] = action_link("Edit","pencil","editmessage.php?id=$message->id");
 					}
 					$actions[] = action_link("Delete","cross","mgeditor.php?action=delete&messageid=$message->id");
 				} else {
@@ -231,11 +231,14 @@ function makeMessageGrid($messagegroup) {
 					
 					// Phone message will need a more custom menu
 					if ($type == "phone") {
-						$actions[] = action_link("Record","diagona/16/151","recordmessage.php?id=new");
-						$actions[] = action_link("New Advanced","pencil_add","writemessage.php?id=new");
-					} else {
-						$actions[] = action_link("Edit","pencil_add","writemessage.php?id=new");
+						$actions[] = action_link("Record","diagona/16/151","editmessage.php?id=new&type=record&languagecode=$languagecode&mgid=".$messagegroup->id);
+						$actions[] = action_link("New Advanced","pencil_add","editmessage.php?id=new&type=phone&languagecode=$languagecode&mgid=".$messagegroup->id);
+					} else if ($type == "email") {
+						$actions[] = action_link("New","pencil_add","editmessage.php?id=new&type=email&subtype=$subtype&languagecode=$languagecode&mgid=".$messagegroup->id);
+					} else if ($type == "sms") {
+						$actions[] = action_link("New","pencil_add","editmessage.php?id=new&type=sms&languagecode=$languagecode&mgid=".$messagegroup->id);
 					}
+					// unknown types have no actions
 				}
 				
 				$link->title = _L("%s Message in %s",$destination,$languagename);
