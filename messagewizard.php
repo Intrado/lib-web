@@ -46,7 +46,7 @@ require_once("inc/messagewizard.inc.php");
 ////////////////////////////////////////////////////////////////////////////////
 global $USER;
 if (!$USER->authorize("sendphone") || !$USER->authorize("sendemail") || !$USER->authorize("sendsms"))
-		redirect('unauthorized.php');
+	redirect('unauthorized.php');
 
 ////////////////////////////////////////////////////////////////////////////////
 // Passed parameter checking
