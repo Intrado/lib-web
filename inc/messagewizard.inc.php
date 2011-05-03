@@ -1,8 +1,7 @@
 <?
 /* TODO: See below items...
- * 	Translation is stripping out field and audio file inserts
- * 	Email messages, do they need a plain version stored also?
- * 	Should we undelete deleted messages and modify them or create new ones?
+ * 	Email messages, do they need a plain version stored also? (Yes, in progress)
+ * 	Should we undelete deleted messages and modify them or create new ones? (Yes, in progress)
  */
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -77,7 +76,9 @@ class MsgWiz_start extends WizStep {
 				"helpstep" => 1)
 		);
 		
-		return new Form("start",$formdata,array(_L("TODO: guide?")));
+		$helpsteps = array(_L("TODO: guide?"));
+		
+		return new Form("start",$formdata,$helpsteps);
 	}
 }
 
@@ -179,7 +180,9 @@ class MsgWiz_method extends WizStep {
 				"helpstep" => 1)
 		);
 		
-		return new Form("method",$formdata,array(_L("TODO: guide?")));
+		$helpsteps = array(_L("TODO: guide?"));
+		
+		return new Form("method",$formdata,$helpsteps);
 	}
 
 	//returns true if this step is enabled
@@ -228,7 +231,9 @@ class MsgWiz_language extends WizStep {
 				"helpstep" => 1)
 		);
 		
-		return new Form("start",$formdata,array(_L("TODO: guide?")));
+		$helpsteps = array(_L("TODO: guide?"));
+		
+		return new Form("start",$formdata,$helpsteps);
 	}
 
 	//returns true if this step is enabled
@@ -252,7 +257,6 @@ class MsgWiz_phoneText extends WizStep {
 	function getForm($postdata, $curstep) {
 		global $USER;
 		// Form Fields.
-		$helpsteps = array(_L("Enter your message text in the provided text area. Be sure to introduce yourself and give detailed information, including call back information if appropriate."));
 
 		$formdata = array($this->title);
 		
@@ -282,7 +286,9 @@ class MsgWiz_phoneText extends WizStep {
 			"control" => array("TextAreaPhone","width"=>"80%","rows"=>10,"language"=>"en","voice"=>"female"),
 			"helpstep" => 1
 		);
-
+		
+		$helpsteps = array(_L("Enter your message text in the provided text area. Be sure to introduce yourself and give detailed information, including call back information if appropriate."));
+		
 		return new Form("phoneText",$formdata,$helpsteps);
 	}
 
@@ -332,9 +338,10 @@ class MsgWiz_phoneEasyCall extends WizStep {
 			"control" => array( "PhoneMessageRecorder", "phone" => $USER->phone, "name" => $language),
 			"helpstep" => 1
 		);
-		$helpsteps[] = _L("The system will call you at the number you enter in this form and guide you through a series of prompts to record your message. The default message is always required and will be sent to any recipients who do not have a language specified.<br><br>
+		
+		$helpsteps = array(_L("The system will call you at the number you enter in this form and guide you through a series of prompts to record your message. The default message is always required and will be sent to any recipients who do not have a language specified.<br><br>
 		Choose which language you will be recording in and enter the phone number where the system can reach you. Then click \"Call Me to Record\" to get started. Listen carefully to the prompts when you receive the call. You may record as many different langauges as you need.
-		");
+		"));
 
 		return new Form("phoneEasyCall",$formdata,$helpsteps);
 	}
@@ -444,7 +451,6 @@ class MsgWiz_emailText extends WizStep {
 			);
 		}
 		
-		$helpsteps = array(_L("Enter the name for the email account."));
 		$formdata["fromname"] = array(
 			"label" => _L('From Name'),
 			"fieldhelp" => _L('Recipients will see this name as the sender of the email.'),
@@ -457,7 +463,6 @@ class MsgWiz_emailText extends WizStep {
 			"helpstep" => 1
 		);
 
-		$helpsteps[] = array(_L("Enter the address where you would like to receive replies."));
 		$formdata["from"] = array(
 			"label" => _L("From Email"),
 			"fieldhelp" => _L('This is the address the email is coming from. Recipients will also be able to reply to this address.'),
@@ -471,7 +476,6 @@ class MsgWiz_emailText extends WizStep {
 			"helpstep" => 2
 		);
 
-		$helpsteps[] = _L("Enter the subject of the email here.");
 		$formdata["subject"] = array(
 			"label" => _L("Subject"),
 			"fieldhelp" => _L('The Subject will appear as the subject line of the email.'),
@@ -484,7 +488,6 @@ class MsgWiz_emailText extends WizStep {
 			"helpstep" => 3
 		);
 
-		$helpsteps[] = _L("You may attach up to three files that are up to 2MB each. For greater security, only certain types of files are accepted.<br><br><b>Note:</b> Some email accounts may not accept attachments above a certain size and may reject your message.");
 		$formdata["attachments"] = array(
 			"label" => _L('Attachments'),
 			"fieldhelp" => _L("You may attach up to three files that are up to 2MB each. For greater security, certain file types are not permitted. Be aware that some email accounts may not accept attachments above a certain size and may reject your message."),
@@ -494,7 +497,6 @@ class MsgWiz_emailText extends WizStep {
 			"helpstep" => 4
 		);
 
-		$helpsteps[] = _L("Email message body text goes here. Be sure to introduce yourself and give detailed information. For helpful message tips and ideas, click the Help link in the upper right corner of the screen.");
 		$formdata["message"] = array(
 			"label" => _L("Email Message"),
 			"fieldhelp" => _L('Enter the message you would like to send. Helpful tips for successful messages can be found at the Help link in the upper right corner.'),
@@ -505,6 +507,13 @@ class MsgWiz_emailText extends WizStep {
 			),
 			"control" => array("EmailMessageEditor"),
 			"helpstep" => 5
+		);
+		
+		$helpsteps = array(_L("Enter the name for the email account."),
+					_L("Enter the address where you would like to receive replies."),
+					_L("Enter the subject of the email here."),
+					_L("You may attach up to three files that are up to 2MB each. For greater security, only certain types of files are accepted.<br><br><b>Note:</b> Some email accounts may not accept attachments above a certain size and may reject your message."),
+					_L("Email message body text goes here. Be sure to introduce yourself and give detailed information. For helpful message tips and ideas, click the Help link in the upper right corner of the screen.")
 		);
 		
 		return new Form("emailText",$formdata,$helpsteps);
@@ -673,7 +682,6 @@ class MsgWiz_smsText extends WizStep {
 	function getForm($postdata, $curstep) {
 		// Form Fields.
 		$formdata = array($this->title);
-		$helpsteps = array(_L("Enter the message you wish to deliver via SMS Text."));
 		$formdata["message"] = array(
 			"label" => _L("SMS Text"),
 			"value" => "",
@@ -686,7 +694,9 @@ class MsgWiz_smsText extends WizStep {
 			"helpstep" => 1
 		);
 		
-		return new Form("smsText",$formdata,array());
+		$helpsteps = array(_L("Enter the message you wish to deliver via SMS Text."));
+		
+		return new Form("smsText",$formdata,$helpsteps);
 		
 	}
 
@@ -726,7 +736,9 @@ class MsgWiz_submitConfirm extends WizStep {
 			"helpstep" => 1
 		);
 		
-		return new Form("submitConfirm",$formdata,array());
+		$helpsteps = ("TODO: guide data");
+		
+		return new Form("submitConfirm",$formdata,$helpsteps);
 		
 	}
 
@@ -775,9 +787,13 @@ class FinishMessageWizard extends WizFinish {
 			// check for an existing message with this language code for this message group 
 			$message = DBFind("Message", "from message where messagegroupid = ? and type = 'phone' and languagecode = ?", false, array($messagegroup->id, $sourcelangcode));
 			
-			// no message in the db? create a new one.
-			if (!$message->id)
+			// if there is an existing message in the DB, must remove it's parts
+			if ($message) {
+				QuickUpdate("delete from messagepart where messageid = ?", false, array($message->id));
+			} else {
+				// no message, create a new one!
 				$message = new Message();
+			}
 				
 			$message->messagegroupid = $messagegroup->id;
 			$message->type = 'phone';
@@ -887,11 +903,14 @@ class FinishMessageWizard extends WizFinish {
 				foreach ($autotranslatevalues as $autotranslate => $data) {
 					// check for an existing message with this language code for this message group 
 					$message = DBFind("Message", "from message where messagegroupid = ? and type = ? and languagecode = ? and autotranslate = ?", false, array($messagegroup->id, $type, $langcode, $autotranslate));
-					
-					error_log("working on ". $type. ", ". $langcode. ", ". $autotranslate);
-					// no message in the db? create a new one.
-					if (!$message->id)
+				
+					// if there is an existing message in the DB, must remove it's parts
+					if ($message) {
+						QuickUpdate("delete from messagepart where messageid = ?", false, array($message->id));
+					} else {
+						// no message, create a new one!
 						$message = new Message();
+					}
 					
 					$message->messagegroupid = $messagegroup->id;
 					$message->type = $type;
