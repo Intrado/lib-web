@@ -6,6 +6,8 @@ class EmailAttach extends FormItem {
 			$value = json_encode($value);
 		}
 		
+		// value is json encoded 
+		// { <contentid>: {"name": <filename>, "size": <filesize>} }
 		$str = '
 			<input id="' . $n . '" name="' . $n . '" type="hidden" value="' . escapehtml($value) . '"/>
 			<div id="uploadedfiles" style="display: none;"></div>
