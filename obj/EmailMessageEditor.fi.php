@@ -26,6 +26,10 @@ class EmailMessageEditor extends FormItem {
 					margin-bottom: 10px;
 					white-space: nowrap;
 				}
+				.controlcontainer .messagearea {
+					height: 205px; 
+					width: 100%
+				}
 				.controlcontainer .datafields {
 					font-size: 9px;
 					float: left;
@@ -58,7 +62,7 @@ class EmailMessageEditor extends FormItem {
 		$textarea = '
 			<div class="controlcontainer">
 				<div>'._L("Email Message").'</div>
-				<textarea id="'.$n.'" name="'.$n.'"/>'.escapehtml($value).'</textarea>
+				<textarea id="'.$n.'" name="'.$n.'" class="messagearea"/>'.escapehtml($value).'</textarea>
 				<div id="'.$n.'-htmleditor"></div>
 			</div>';
 		
@@ -123,7 +127,12 @@ class EmailMessageEditor extends FormItem {
 		$str = '
 				document.observe("dom:loaded", setupHtmlTextArea("'.$n.'"));';
 		
-		return $str;
+		// subtype tells us if it's a plain or html email message
+		$subtype = "html";
+		if (isset($this->args['subtype']))
+			$subtype = $this->args['subtype'];
+			
+		return ($subtype != "plain")?$str:"";
 	}
 	
 	function renderJavascriptLibraries() {
