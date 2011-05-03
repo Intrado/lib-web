@@ -37,11 +37,11 @@ $_dbcon = $custdb; // set global database connection
 
 $templatetype = QuickQuery("select type from template where messagegroupid = ?", $custdb, array($messagegroupid));
 
-// find all html email messages, per language - read headers used for subject
+// find all email messages, per language - read headers used for subject
 $messagesbylangcode = array();
 $messagegroup = DBFind("MessageGroup", "from messagegroup where id = ?", false, array($messagegroupid));
 if ($messagegroup) {
-	$messages = DBFindMany("Message", "from message where messagegroupid = ? and type = 'email' and subtype = 'html'", false, array($messagegroupid));
+	$messages = DBFindMany("Message", "from message where messagegroupid = ? and type = 'email'", false, array($messagegroupid));
 	if ($messages) {
 		foreach ($messages as $id => $message) {
 			$messagesbylangcode[$message->languagecode] = $message;
