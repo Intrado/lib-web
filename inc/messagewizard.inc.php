@@ -201,7 +201,6 @@ class MsgWiz_language extends WizStep {
 		
 		$langs = array();
 		// alpha sorted, but with english as the first entry
-		$langs["en"] = _L("Create the <b>English</b> message");
 		
 		// only allow auto translation on "write" messages when the user can send multi lingual
 		$sendphone = (isset($postdata["/start"]["messagetype"]) && $postdata["/start"]["messagetype"] == "sendphone");
@@ -210,7 +209,10 @@ class MsgWiz_language extends WizStep {
 		if ($USER->authorize('sendmulti') && 
 				($sendemail || ($sendphone && ($phonemethod == "advanced" || $phonemethod == "write")))) {
 			$langs["autotranslate"] = "Automatically <b>Translate</b> from English to other languages";
+			$langs[] = "#-#"; //insert an <hr>
 		}
+		
+		$langs["en"] = _L("Create the <b>English</b> message");
 		
 		foreach (Language::getLanguageMap() as $key => $lang) {
 			if ($lang != "English")
