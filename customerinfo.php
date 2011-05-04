@@ -102,8 +102,6 @@ $formdata["emaildomain"] = array(
 	"label" => _L("Email Domain"),
 	"fieldhelp" => _L('All user emails must come from this domain.'),
 	"value" => getSystemSetting('emaildomain'),
-	"validators" => array(
-	),
 	"control" => array("FormHtml","html"=>"<div>".$emaildomain."</div>"),
 	"helpstep" => $helpstepnum
 );
