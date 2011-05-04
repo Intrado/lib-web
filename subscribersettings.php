@@ -30,11 +30,109 @@ if (!$USER->authorize('managesystem') || !getSystemSetting("_hasselfsignup", fal
 // Form Data
 ////////////////////////////////////////////////////////////////////////////////
 
+class SubscriberExpirationField extends FormItem {
+	// @param $valueJSON = [reminder1:,reminder2:,reminder3:,expiredays]
+	function render ($valueJSON) {
+		$n = $this->form->name."_".$this->name;
+		
+		$data = json_decode($valueJSON, true);
+		if (!is_array($data) || empty($data)) {
+			$data = array('reminder1' => '30', 'reminder2' => '15', 'reminder3' => '2', 'expiredays' => '180');
+		}
+
+		// Hidden input item to store values in
+		$str  = '<input id="'.$n.'" name="'.$n.'" type="hidden" value="'.escapehtml($valueJSON).'" />';
+		// GUI table
+		$str .= "<table>";
+		$str .= "<tr><td>Automatic Close After</td><td>";
+		$str .= '<input id="'.$n.'expiredays" name="'.$n.'expiredays" type="text" value="'.$data['expiredays'].'" size="5" onchange="storeValue();" />';
+		$str .= "days since last login</td></tr>";
+		$str .= "<tr><td>First Reminder</td><td>";
+		$str .= '<input id="'.$n.'reminder1" name="'.$n.'reminder1" type="text" value="'.$data['reminder1'].'" size="5" onchange="storeValue();" />';
+		$str .= "days before automatic closure</td></tr>";
+		$str .= "<tr><td>Second Reminder</td><td>";
+		$str .= '<input id="'.$n.'reminder2" name="'.$n.'reminder2" type="text" value="'.$data['reminder2'].'" size="5" onchange="storeValue();" />';
+		$str .= "days before automatic closure</td></tr>";
+		$str .= "<tr><td>Final Reminder</td><td>";
+		$str .= '<input id="'.$n.'reminder3" name="'.$n.'reminder3" type="text" value="'.$data['reminder3'].'" size="5" onchange="storeValue();" />';
+		$str .= "days before automatic closure</td></tr>";
+		$str .= "</table>";
+		// javascript
+		$str .= '<script type="text/javascript">
+			themeformname = "'.$this->form->name.'";
+			themeformitem = "'.$n.'";
+
+			// Save changes in the hidden field
+			function storeValue() {
+				$(themeformitem).value = Object.toJSON({
+					"expiredays": $(themeformitem+"expiredays").value,
+					"reminder1": $(themeformitem+"reminder1").value,
+					"reminder2": $(themeformitem+"reminder2").value,
+					"reminder3": $(themeformitem+"reminder3").value
+				});
+				form_do_validation($(themeformname), $(themeformitem));
+			}
+			</script>';
+					
+		
+		return $str;
+	}
+}
+
+class ValSubscriberExpiration extends Validator {
+	function validate ($value, $args) {
+		$checkval = json_decode($value);
+		$errortext = "";
+			
+		// validate values are in range
+		if (!is_numeric($checkval->expiredays) || $checkval->expiredays < 0 || $checkval->expiredays > 365)
+			$errortext .= " " . _L("Automatic Close After days must be between 0 and 365.");
+		if (!is_numeric($checkval->reminder1) || $checkval->reminder1 < 0 || $checkval->reminder1 > 60)
+			$errortext .= " " . _L("First Reminder days must be between 0 and 365.");
+		if (!is_numeric($checkval->reminder2) || $checkval->reminder2 < 0 || $checkval->reminder2 > 60)
+			$errortext .= " " . _L("Second Reminder days must be between 0 and 365.");
+		if (!is_numeric($checkval->reminder3) || $checkval->reminder3 < 0 || $checkval->reminder3 > 60)
+			$errortext .= " " . _L("Final Reminder days must be between 0 and 365.");
+		// validate values are valid relative to one another !!!! this is the entire purpose of the custom formitem
+		if ($checkval->expiredays > 0) {
+			if ($checkval->reminder1 != 0 && $checkval->expiredays <= $checkval->reminder1)
+				$errortext .= " " . _L("First Reminder must be less than Automatic Close After.");
+			if ($checkval->reminder2 != 0 && $checkval->reminder1 <= $checkval->reminder2)
+				$errortext .= " " . _L("Second Reminder must be less than First Reminder.");
+			if ($checkval->reminder3 != 0 && $checkval->reminder2 <= $checkval->reminder3)
+				$errortext .= " " . _L("Final Reminder must be less than Second Reminder.");
+		}
+		
+		if ($errortext)
+			return $this->label . $errortext;
+		else
+			return true;
+	}
+/*	
+	function getJSValidator () {
+		return 
+			'function (name, label, value, args) {
+				vals = value.evalJSON();
+				var errortext = "";
+				if (errortext)
+					return label + errortext;
+				else
+					return true;
+			}';
+	}
+*/
+}
+
 $emaildomain = getSystemSetting('emaildomain');
 if ($emaildomain == "")
 	$emaildomain = "(no domain configured)";
-	
-	
+
+$accountexpirationdata = array();
+$accountexpirationdata['expiredays'] = getSystemSetting("subscriber.expiredays", "180");
+$accountexpirationdata['reminder1'] = getSystemSetting("subscriber.reminder.1", "30");
+$accountexpirationdata['reminder2'] = getSystemSetting("subscriber.reminder.2", "15");
+$accountexpirationdata['reminder3'] = getSystemSetting("subscriber.reminder.3", "2");
+
 $formdata = array();
 
 $formdata['signupsection'] = _L('Account Creation');
@@ -52,7 +150,7 @@ $formdata["domain"] = array(
         "label" => _L("Email Domain"),
         "fieldhelp" => _L('Displays the permitted email domains for new subscribers.  Subdomains are also allowed.'),
         "value" => "",
-        "validators" => array(    
+        "validators" => array(
         ),
         "control" => array("FormHtml","html"=>"<div>".$emaildomain."</div>"),
         "helpstep" => 1
@@ -78,6 +176,17 @@ $formdata["sitecode"] = array(
     );
 
 $formdata['accountwarningoptions'] = _L('Account Expiration');
+$formdata["expirationdata"] = array(
+        "label" => _L("Expiration Settings"),
+        "fieldhelp" => _L('Settings to configure how to expire accounts that have not been logged in to for some time.'),
+        "value" => json_encode($accountexpirationdata),
+        "validators" => array(
+            array("ValSubscriberExpiration")
+        ),
+        "control" => array("SubscriberExpirationField"),
+        "helpstep" => 2
+    );
+/*
 $formdata["reminder1"] = array(
         "label" => _L("First Reminder"),
         "fieldhelp" => _L('Subscribers who have not logged in will receive their first email warning this many days prior to account expiration. Entering 0 disables this feature.'),
@@ -118,12 +227,17 @@ $formdata["expiredays"] = array(
         "control" => array("TextField","maxlength" => 5),
         "helpstep" => 2
     );
+*/
 
+$helpsteps = array (
+	_L('Step 1.'),
+	_L('Step 2.')
+);
 
 $buttons = array(submit_button("Done","submit","accept"),
                 icon_button("Cancel","cross",null,"settings.php"));
-                
-$form = new Form("subscriberoptions",$formdata,null,$buttons);
+
+$form = new Form("subscriberoptions",$formdata,$helpsteps,$buttons);
 
 ////////////////////////////////////////////////////////////////////////////////
 // Form Data Handling
@@ -149,10 +263,11 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		$postdata['requiresitecode'] ? setSystemSetting("subscriberauthcode", "1") : setSystemSetting("subscriberauthcode", "0");
 		setSystemSetting("subscribersitecode", $postdata['sitecode']);
 		// account expiration settings
-		setSystemSetting("subscriber.reminder.1", $postdata['reminder1']);
-		setSystemSetting("subscriber.reminder.2", $postdata['reminder2']);
-		setSystemSetting("subscriber.reminder.3", $postdata['reminder3']);
-		setSystemSetting("subscriber.expiredays", $postdata['expiredays']);
+		$expirationdata = json_decode($postdata['expirationdata']);
+		setSystemSetting("subscriber.reminder.1", $expirationdata->reminder1);
+		setSystemSetting("subscriber.reminder.2", $expirationdata->reminder2);
+		setSystemSetting("subscriber.reminder.3", $expirationdata->reminder3);
+		setSystemSetting("subscriber.expiredays", $expirationdata->expiredays);
 		
 		// return to settings page
         if ($ajax)
@@ -171,6 +286,12 @@ $PAGE = "admin:settings";
 $TITLE = _L('Self-Signup Settings');
 
 include_once("nav.inc.php");
+
+?>
+<script type="text/javascript">
+<? Validator::load_validators(array("ValLength", "ValSubscriberExpiration")); ?>
+</script>
+<?
 
 startWindow(_L('Subscriber Options'));
 echo $form->render();
