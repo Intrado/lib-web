@@ -28,7 +28,7 @@ class API_Import {
 		$this->lastrun = $import->lastrun;
 		$this->filedate = $import->datamodifiedtime;
 		if ($import->datamodifiedtime)
-			$this->filesize = QuickQuery("select length(data) from import where id = ?", null, array($import->id));
+			$this->filesize = QuickQuery("select length(data) from import where id = ?", null, array($import->id)) + 0;
 		else
 			$this->filesize = 0;
 		$this->automatic = ($import->type == "automatic") ? true : false;
