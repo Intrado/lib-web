@@ -66,7 +66,7 @@ $language = Language::getName($languagecode);
 $formdata = array($messagegroup->name. " (". $language. ")");
 
 $formdata["message"] = array(
-	"label" => _L("Voice Recordings"),
+	"label" => _L("Voice Recording"),
 	"fieldhelp" => _L("TODO: field help"),
 	"value" => "",
 	"validators" => array(
