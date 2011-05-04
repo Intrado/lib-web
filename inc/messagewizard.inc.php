@@ -743,7 +743,7 @@ class MsgWiz_submitConfirm extends WizStep {
 		if ($srclanguagecode == "autotranslate") {
 			$languagecodes[] = "en";
 			foreach ($postdata['/create/translatepreview'] as $langcode => $enabled) {
-				if ($enabled)
+				if ($enabled === "true")
 					$languagecodes[] = $langcode;
 			}
 		} else {
@@ -819,7 +819,7 @@ class MsgWiz_submitConfirm extends WizStep {
 					// autotranslate always overwrites the english message
 					$args[] = "en";
 					foreach ($postdata['/create/translatepreview'] as $langcode => $enabled) {
-						if ($enabled)
+						if ($enabled === "true")
 							$args[] = $langcode;
 					}
 				}
@@ -892,11 +892,22 @@ class FinishMessageWizard extends WizFinish {
 			$audiofileid = $audiofileidmap->af;
 			
 			// check for an existing message with this language code for this message group 
-			$message = DBFind("Message", "from message where messagegroupid = ? and type = 'phone' and languagecode = ?", false, array($messagegroup->id, $sourcelangcode));
+			// get either the 'none', 'overridden' or 'translated' message for overwriting
+			$message = DBFind("Message", 
+					"from message 
+					where messagegroupid = ? 
+					and autotranslate in ('overridden', 'none', 'translated')
+					and type = 'phone' 
+					and languagecode = ?", false, array($messagegroup->id, $sourcelangcode));
 			
 			// if there is an existing message in the DB, must remove it's parts
 			if ($message) {
 				QuickUpdate("delete from messagepart where messageid = ?", false, array($message->id));
+				// delete existing messages
+				QuickUpdate("update message set deleted = 1 
+						where messagegroupid = ?
+						and type = 'phone'
+						and languagecode = ?", false, array($messagegroup->id, $sourcelangcode));
 			} else {
 				// no message, create a new one!
 				$message = new Message();
@@ -913,7 +924,7 @@ class FinishMessageWizard extends WizFinish {
 			$message->modifydate = date("Y-m-d H:i:s");
 			$message->languagecode = $sourcelangcode;
 			$message->deleted = 0;
-			$message->stuffHeaders();
+			
 			if (!$message->id)
 				$message->create();
 			else
@@ -966,7 +977,7 @@ class FinishMessageWizard extends WizFinish {
 				foreach ($postdata["/create/translatepreview"] as $translatedlangcode => $enabled) {
 					// when the message is created, the modify date will be set in the past and retranslation will
 					// get called before attaching to the message group
-					if ($enabled) {
+					if ($enabled === "true") {
 						$messages['phone'][$translatedlangcode]['translated'] = $messages['phone']['en']['none'];
 						$messages['phone'][$translatedlangcode]['source'] = $messages['phone']['en']['none'];
 					}
@@ -989,7 +1000,7 @@ class FinishMessageWizard extends WizFinish {
 				foreach ($postdata["/create/translatepreview"] as $translatedlangcode => $enabled) {
 					// when the message is created, the modify date will be set in the past and retranslation will
 					// get called before attaching to the message group
-					if ($enabled) {
+					if ($enabled === "true") {
 						$messages['email'][$translatedlangcode]['translated'] = $messages['email']['en']['none'];
 						$messages['email'][$translatedlangcode]['source'] = $messages['email']['en']['none'];
 					}
@@ -1008,6 +1019,11 @@ class FinishMessageWizard extends WizFinish {
 		foreach ($messages as $type => $msgdata) {
 			// for each language code
 			foreach ($msgdata as $langcode => $autotranslatevalues) {
+				// delete existing messages for this language code and type
+				QuickUpdate("update message set deleted = 1 
+						where messagegroupid = ?
+						and type = ?
+						and languagecode = ?", false, array($messagegroup->id, $type, $langcode));
 				// for each autotranslate value
 				foreach ($autotranslatevalues as $autotranslate => $data) {
 					// get subtype
@@ -1032,10 +1048,7 @@ class FinishMessageWizard extends WizFinish {
 						and languagecode = ? 
 						and autotranslate = ?", false, array($messagegroup->id, $type, $subtype, $langcode, $autotranslate));
 				
-					// if there is an existing message in the DB, must remove it's parts
-					if ($message) {
-						QuickUpdate("delete from messagepart where messageid = ?", false, array($message->id));
-					} else {
+					if (!$message) {
 						// no message, create a new one!
 						$message = new Message();
 					}
