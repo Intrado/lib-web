@@ -178,7 +178,7 @@ $formdata["sitecode"] = array(
 $formdata['accountwarningoptions'] = _L('Account Expiration');
 $formdata["expirationdata"] = array(
         "label" => _L("Expiration Settings"),
-        "fieldhelp" => _L('Settings to configure how to expire accounts that have not been logged in to for some time.'),
+        "fieldhelp" => _L('These settings control how long a subscriber account may be inactive before the account automatically expires. Login reminder emails may also be sent at the intervals specified here.'),
         "value" => json_encode($accountexpirationdata),
         "validators" => array(
             array("ValSubscriberExpiration")
@@ -230,8 +230,10 @@ $formdata["expiredays"] = array(
 */
 
 $helpsteps = array (
-	_L('Step 1.'),
-	_L('Step 2.')
+	_L('If you would like to restrict subscribers to only using email addresses from a specific domain, check the Restrict to Domain option. To add a domain, please contact technical support.
+	<br><br>A site code is a special code new subscribers would need to enter when creating their account. If you would like to use this option, simply check the Require Site Code checkbox and enter a code in the field below.'),
+	_L('These settings control how long a subscriber\'s account may remain inactive before expiring. <br><br>The first field controls the length of time before expiration and the reminder fields control when an automatically generated
+	reminder email will be sent to the account owner. The values in the reminder fields are relative to the number of days prior to account expiration. For example, a value of 2 in the \'Final Reminder\' field would send an email two days prior to account expiration.' )
 );
 
 $buttons = array(submit_button("Done","submit","accept"),
