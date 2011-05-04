@@ -2196,7 +2196,7 @@ class SMAPI {
 		}
 
 		// fill the log entries
-		$logentries = DBFind("ImportLogEntry", "from importlogentry where importid = ?", false, array($importid));
+		$logentries = DBFindMany("ImportLogEntry", "from importlogentry where importid = ?", false, array($importid));
 		if ($logentries != false) {
 			foreach ($logentries as $logentry) {
 				$result['logentries'][] = new API_ImportLogEntry($logentry);
