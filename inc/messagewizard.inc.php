@@ -133,7 +133,22 @@ class MsgWiz_method extends WizStep {
 				break;
 				
 			case "sendemail":
-				// This step is "currently" disabled for email
+				
+				$methoddetails["write"]["enabled"] = true;
+				$methoddetails["advanced"]["enabled"] = true;
+				
+				$methoddetails["write"]["label"] = _L("Simple");
+				$methoddetails["write"]["description"] = 
+					'<ol>
+						<li class="wizbuttonlist">'.escapehtml(_L("Write a plain text email message")).'</li>
+						'.($USER->authorize('sendmulti')?'<li class="wizbuttonlist">'.escapehtml(_L("Auto-translate available")).'</li>':'').'
+					</ol>';
+				$methoddetails["advanced"]["label"] = _L("Html");
+				$methoddetails["advanced"]["description"] = 
+					'<ol>
+						<li class="wizbuttonlist">'.escapehtml(_L("Write an HTML email message")).'</li>
+						'.($USER->authorize('sendmulti')?'<li class="wizbuttonlist">'.escapehtml(_L("Auto-translate available")).'</li>':'').'
+					</ol>';
 				
 			case "sendsms":
 				// This step is "currently" disabled for SMS
@@ -187,7 +202,8 @@ class MsgWiz_method extends WizStep {
 
 	//returns true if this step is enabled
 	function isEnabled($postdata, $step) {
-		if (isset($postdata["/start"]["messagetype"]) && $postdata["/start"]["messagetype"] == "sendphone")
+		if (isset($postdata["/start"]["messagetype"]) && 
+				($postdata["/start"]["messagetype"] == "sendphone" || $postdata["/start"]["messagetype"] == "sendemail"))
 			return true;
 		
 		return false;
@@ -435,6 +451,8 @@ class MsgWiz_emailText extends WizStep {
 		
 		$messagegroup = new MessageGroup($_SESSION['wizard_message']['mgid']);
 		
+		$subtype = ($postdata['/method']['method'] == "write")?"plain":"html";
+		
 		// Form Fields.
 		$formdata = array($this->title);
 
@@ -507,7 +525,7 @@ class MsgWiz_emailText extends WizStep {
 				array("ValRequired"),
 				array("ValMessageBody")
 			),
-			"control" => array("EmailMessageEditor"),
+			"control" => array("EmailMessageEditor", "subtype" => $subtype),
 			"helpstep" => 5
 		);
 		
@@ -548,7 +566,7 @@ class MsgWiz_translatePreview extends WizStep {
 			case "sendphone":
 				if (isset($postdata["/method"]["method"]) && $postdata["/method"]["method"] == "write") {
 					$msg = json_decode($postdata['/create/phonetext']['message']);
-					$sourcetext = $msg->message;
+					$sourcetext = $msg->text;
 				} else {
 					$sourcetext = $postdata['/create/phoneadvanced']['message'];
 				}
@@ -719,22 +737,46 @@ class MsgWiz_smsText extends WizStep {
 class MsgWiz_submitConfirm extends WizStep {
 	function getForm($postdata, $curstep) {
 		
+		list($srclanguagecode, $type, $subtype) = $this->getMessageAttibutes($postdata);
+		
+		$languagecodes = array();
+		if ($srclanguagecode == "autotranslate") {
+			$languagecodes[] = "en";
+			foreach ($postdata['/create/translatepreview'] as $langcode => $enabled) {
+				if ($enabled)
+					$languagecodes[] = $langcode;
+			}
+		} else {
+			$languagecodes[] = $srclanguagecode;
+		}
+		
+		// get the message group we are modifying
+		$messagegroup = new MessageGroup($_SESSION['wizard_message']['mgid']);
+			
+		$html = '<div>'._L('The following messages will be overwritten').'</div>
+				<table class="list">
+					<tr class="listHeader">
+						<th>'. _L("Language"). '&nbsp;&nbsp;</th>
+						<th>'. _L("Type"). '&nbsp;&nbsp;</th>
+					</tr>';
+		$count = 0;
+		foreach ($languagecodes as $languagecode) {
+			if ($messagegroup->hasMessage($type, $subtype, $languagecode)) {
+				$html .= '
+					<tr '. (($count % 2)?'class="listAlt"':''). '>
+						<td>'. Language::getName($languagecode).'</td>
+						<td>'. ucfirst($type). ($type == "phone"?"":' / '.$subtype). '</td>
+					</tr>';
+				$count++;
+			}
+		}
+		$html .= '</table>';
+		
 		$formdata = array($this->title);
 		
 		$formdata["info"] = array(
-			"label" => _L("Message Info"),
-			"control" => array("FormHtml", "html" => "TODO: Confirm message"),
-			"helpstep" => 1
-		);
-		
-		$formdata["confirm"] = array(
-			"label" => _L("Confirm"),
-			"value" => "",
-			"validators" => array(
-				array("ValRequired")
-			),
-			"control" => array("CheckBox"),
-			"transient" => true,
+			"label" => _L("Overwritten Messages"),
+			"control" => array("FormHtml", "html" => $html),
 			"helpstep" => 1
 		);
 		
@@ -744,18 +786,81 @@ class MsgWiz_submitConfirm extends WizStep {
 		
 	}
 
+	function getMessageAttibutes($postdata) {
+		// infer the languagecode, type and subtype from the wizard data
+		if (MsgWiz_phoneText::isEnabled($postdata, false) || MsgWiz_phoneEasyCall::isEnabled($postdata, false)) {
+			$languagecode = $postdata['/create/language']['language'];
+			$type = 'phone';
+			$subtype = 'voice';
+		} else if (MsgWiz_emailText::isEnabled($postdata, false)) {
+			$languagecode = $postdata['/create/language']['language'];
+			$type = 'email';
+			$subtype = ($postdata['/method']['method'] == "write")?"plain":"html";
+		} else if (MsgWiz_smsText::isEnabled($postdata, false)) {
+			$languagecode = "en";
+			$type = 'sms';
+			$subtype = 'plain';
+		}		
+		return array($languagecode, $type, $subtype);
+	}
+	
 	//returns true if this step is enabled
 	function isEnabled($postdata, $step) {
-		return true;
+		// only show the confirm step if the creation of this message will overwrite an existing message
+		if (isset($postdata['/create/language']['language']) || MsgWiz_smsText::isEnabled($postdata, false)) {
+			
+			list($languagecode, $type, $subtype) = $this->getMessageAttibutes($postdata);
+			$args = array();
+			
+			// if it's an auto translate, we have to look up each of the trasnlated languages and english
+			if ($languagecode == "autotranslate") {
+				// need the translated step's session data to get the enabled languages
+				if (isset($postdata['/create/translatepreview'])) {
+					// autotranslate always overwrites the english message
+					$args[] = "en";
+					foreach ($postdata['/create/translatepreview'] as $langcode => $enabled) {
+						if ($enabled)
+							$args[] = $langcode;
+					}
+				}
+			} else {
+				// not auto translate so...
+				// query the messages to see if a message exists already for this language code
+				$args[] = $languagecode;
+			}
+			
+			// no languages to look up?
+			if (!$args)
+				return false;
+			
+			// need a list of ? for each language code we are going to look up to put in the query
+			$queryargs = repeatWithSeparator("?",",",count($args));
+			
+			// add additional query arguments
+			$args[] = $_SESSION['wizard_message']['mgid'];
+			$args[] = $type;
+			$args[] = $subtype;
+			
+			// query for any messages matching one of these language codes
+			$hasmessage = QuickQuery(
+				"select 1 from message 
+				where languagecode in (".$queryargs.") 
+				and messagegroupid = ? 
+				and type = ? 
+				and subtype = ? 
+				and autotranslate in ('none', 'translated', 'overridden') 
+				and not deleted", false, $args);
+			
+			if ($hasmessage)
+				return true;
+		}
+		
+		return false;
 	}
 }
 
 class FinishMessageWizard extends WizFinish {
 	function finish ($postdata) {
-		// If the message has not ben confirmed, don't try to process the data.
-		if (!isset($postdata["/submit/confirm"]["confirm"])  || !$postdata["/submit/confirm"]["confirm"] )
-			return false;
-		
 		global $USER;
 		global $ACCESS;
 		
@@ -833,6 +938,8 @@ class FinishMessageWizard extends WizFinish {
 			'email' => array(),
 			'sms' => array());
 		
+		$emailsubtype = ($postdata['/method']['method'] == "write")?"plain":"html";
+		
 		// phone message
 		if (MsgWiz_phoneText::isEnabled($postdata, false) || MsgWiz_phoneAdvanced::isEnabled($postdata, false)) {
 			
@@ -903,8 +1010,27 @@ class FinishMessageWizard extends WizFinish {
 			foreach ($msgdata as $langcode => $autotranslatevalues) {
 				// for each autotranslate value
 				foreach ($autotranslatevalues as $autotranslate => $data) {
+					// get subtype
+					switch($type) {
+						case 'phone':
+							$subtype = 'voice';
+							break;
+						case 'email':
+							$subtype = $emailsubtype;
+							break;
+						default:
+							$subtype = 'plain';
+							break;
+					}
+					
 					// check for an existing message with this language code for this message group 
-					$message = DBFind("Message", "from message where messagegroupid = ? and type = ? and languagecode = ? and autotranslate = ?", false, array($messagegroup->id, $type, $langcode, $autotranslate));
+					$message = DBFind("Message", 
+						"from message 
+						where messagegroupid = ? 
+						and type = ? 
+						and subtype = ? 
+						and languagecode = ? 
+						and autotranslate = ?", false, array($messagegroup->id, $type, $subtype, $langcode, $autotranslate));
 				
 					// if there is an existing message in the DB, must remove it's parts
 					if ($message) {
@@ -916,18 +1042,7 @@ class FinishMessageWizard extends WizFinish {
 					
 					$message->messagegroupid = $messagegroup->id;
 					$message->type = $type;
-					switch($type) {
-						case 'phone':
-							$message->subtype = 'voice';
-							break;
-						case 'email':
-							$message->subtype = 'html';
-							break;
-						default:
-							$message->subtype = 'plain';
-							break;
-					}
-					
+					$message->subtype = $subtype;
 					$message->autotranslate = $autotranslate;
 					$message->name = $messagegroup->name;
 					$message->description = Language::getName($langcode);
@@ -955,14 +1070,22 @@ class FinishMessageWizard extends WizFinish {
 					else
 						$message->update();
 					
-					error_log("created/updated message: ". $message->id. " for languagecode: ". $langcode. " and autotranslate: ". $autotranslate);
-					
 					// create the message parts
 					$message->recreateParts($data['text'], null, isset($data['gender'])?$data['gender']:false);
 					
+					// check for existing attachments
+					$existingattachmentstokeep = array();
+					$existingattachments = DBFindMany("MessageAttachment", "from messageattachment where messageid = ? and not deleted", false, array($message->id));
 					// if there are message attachments, attach them
 					if (isset($data['attachments']) && $data['attachments']) {
 						foreach ($data['attachments'] as $cid => $details) {
+							// check if this is already attached.
+							foreach ($existingattachments as $existingattachment) {
+								if ($existingattachment->cid == $cid) {
+									$existingattachmentstokeep[$existingattachment->id] = true;
+									continue;
+								}
+							}
 							$msgattachment = new MessageAttachment();
 							$msgattachment->messageid = $message->id;
 							$msgattachment->contentid = $cid;
@@ -970,6 +1093,13 @@ class FinishMessageWizard extends WizFinish {
 							$msgattachment->size = $details->size;
 							$msgattachment->deleted = 0;
 							$msgattachment->create();
+						}
+					}
+					// remove attachments that are no longer attached
+					foreach ($existingattachments as $existingattachment) {
+						if (!isset($existingattachmentstokeep[$existingattachment->id])) {
+							$existingattachment->deleted = 1;
+							$existingattachment->update(); 
 						}
 					}
 				}
@@ -984,6 +1114,9 @@ class FinishMessageWizard extends WizFinish {
 	}
 	
 	function getFinishPage ($postdata) {
+		// remove this wizard's session data
+		unset($_SESSION['wizard_message']);
+		
 		$html = '<h3>Success! Your message has been saved</h3>';
 		return $html;
 	}

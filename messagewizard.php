@@ -19,6 +19,7 @@ require_once("inc/translate.inc.php");
 require_once("obj/Sms.obj.php");
 require_once("obj/MessageGroup.obj.php");
 require_once("obj/FieldMap.obj.php");
+require_once("obj/MessageAttachment.obj.php");
 
 // form items
 require_once("obj/FormItem.obj.php");
@@ -74,7 +75,7 @@ $wizdata = array(
 		"smstext" => new MsgWiz_smsText(_L("SMS Text"))
 	)),
 	"submit" => new WizSection ("Confirm",array(
-		"confirm" => new MsgWiz_submitConfirm(_L("Review and Confirm"))
+		"confirm" => new MsgWiz_submitConfirm(_L("To be Overwriten"))
 	))
 );
 
