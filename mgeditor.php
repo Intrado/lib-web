@@ -126,11 +126,11 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 function showActionGrid ($columnlabels, $rowlabels, $links) {
 	
 	// Top left cell is an empty cell
-	echo "<table><tr><th></th>";
+	echo "<table style='vertical-padding: 20px;'><tr><th></th>";
 	
 	// Create column labels
 	foreach ($columnlabels as $label) {
-		echo "<th>$label</th>";
+		echo "<th style='text-align: center;padding: 0 15px 10px 15px;'>$label</th>";
 	}
 	echo "</tr>";
 	
@@ -139,21 +139,24 @@ function showActionGrid ($columnlabels, $rowlabels, $links) {
 	
 	// Print status icons with row labels 
 	for ($row = 0; $row < count($rowlabels); $row++) {
-		echo "<tr><th>$rowlabels[$row]</th>";
+		echo "<tr><th style='text-align: right;'>$rowlabels[$row]</th>";
 		$rowlinks = $links[$row];
 		for ($col = 0;$col < count($rowlinks);$col++) {
 			$link = $rowlinks[$col];
-			echo "<td class='StatusIcon'>
-					<img class='StatusIcon' 
-						id='gridmenu-$row-$col'src='img/icons/{$link->icon}.gif'
-						title='{$link->title}'
-						alt='{$link->title}'
-					/>
-				</td>";
-			
-			// Attach action menu script for this item
-			if (isset($link->actions)) {
-				$actionmenues[] = "createactionmenu('gridmenu-$row-$col','" . implode("<br />",$link->actions) . "');";
+			if ($link !== false) {
+				echo "<td style='text-align: center;'>
+						<img id='gridmenu-$row-$col'src='img/icons/{$link["icon"]}.gif'
+							title='{$link["title"]}'
+							alt='{$link["title"]}'
+						/>
+					</td>";
+				
+				// Attach action menu script for this item
+				if (isset($link["actions"])) {
+					$actionmenues[] = "createactionmenu('gridmenu-$row-$col','" . implode("<br />",$link["actions"]) . "');";
+				}
+			} else {
+				echo "<td style='text-align: center;'>-</td>";
 			}
 		}
 		echo "</tr>";
@@ -172,27 +175,25 @@ function showActionGrid ($columnlabels, $rowlabels, $links) {
 function makeMessageGrid($messagegroup) {
 	global $USER;
 	
-	if ($USER->authorize('sendmulti'))
+	if ($USER->authorize('sendmulti')) {
 		$customerlanguages = Language::getLanguageMap();
-	else
+		unset($customerlanguages["en"]);
+		$customerlanguages = array_merge(array("en" => "English"),$customerlanguages);
+	} else {
 		$customerlanguages = array(Language::getDefaultLanguageCode() => Language::getName(Language::getDefaultLanguageCode()));
-	
+	}
 	// Setup destination types according to permissions
-	$destinations = array();
 	$columnlabels = array();
 	
 	if ($USER->authorize('sendphone')) {
-		$destinations['phone'] = array('voice');
 		$columnlabels[] = "Phone";
 	}
 	
 	if (getSystemSetting('_hassms', false) && $USER->authorize('sendsms')) {
-		$destinations['sms'] = array('plain');
 		$columnlabels[] = "SMS";
 	}
 	
 	if ($USER->authorize('sendemail')) {
-		$destinations['email'] = array('html', 'plain');
 		$columnlabels[] = "Email/HTML";
 		$columnlabels[] = "Email/Text";
 	}
@@ -201,57 +202,80 @@ function makeMessageGrid($messagegroup) {
 	$links = array(); 
 	$ttslanguages = Voice::getTTSLanguageMap();
 	foreach ($customerlanguages as $languagecode => $languagename) {
-		$linkrows = array();
-		foreach ($destinations as $type => $subtypes) {
-			foreach ($subtypes as $subtype) {
-				$link = null;
-				
-				// Only attach action menues to applicable icons
-				if ($type != 'sms' || $languagecode == 'en') {
-					$message = $messagegroup->getMessage($type, $subtype, $languagecode);
-					$actions = array();
-					
-					// Set menues for icons with and without message
-					if ($message) {
-						$link->icon = "accept";
-						
-						// Phone message will need a more custom menu
-						if ($type == "phone") {
-							$actions[] = action_link("Play","fugue/control",null,"popup(\'previewmessage.php?id=$message->id\', 800, 500); return false;");
-							$actions[] = action_link("Re-Record","diagona/16/151","editmessage.php?id=new&type=record&languagecode=$languagecode&mgid=".$messagegroup->id);
-							if (isset($ttslanguages[$languagecode]))
-								$actions[] = action_link("Edit Advanced","pencil","editmessage.php?id=$message->id");
-						} else {
-							$actions[] = action_link("Preview","email_open",null,"popup(\'previewmessage.php?id=$message->id\', 800, 500); return false;");
-							$actions[] = action_link("Edit","pencil","editmessage.php?id=$message->id");
-						}
-						$actions[] = action_link("Delete","cross","mgeditor.php?action=delete&messageid=$message->id");
-					} else {
-						$link->icon = "diagona/16/160";
-						
-						// Phone message will need a more custom menu
-						if ($type == "phone") {
-							$actions[] = action_link("Record","diagona/16/151","editmessage.php?id=new&type=record&languagecode=$languagecode&mgid=".$messagegroup->id);
-							if (isset($ttslanguages[$languagecode]))
-								$actions[] = action_link("New Advanced","pencil_add","editmessage.php?id=new&type=phone&languagecode=$languagecode&mgid=".$messagegroup->id);
-						} else if ($type == "email") {
-							$actions[] = action_link("New","pencil_add","editmessage.php?id=new&type=email&subtype=$subtype&languagecode=$languagecode&mgid=".$messagegroup->id);
-						} else if ($type == "sms") {
-							$actions[] = action_link("New","pencil_add","editmessage.php?id=new&type=sms&languagecode=$languagecode&mgid=".$messagegroup->id);
-						}
-						// unknown types have no actions
-					}
-					
-					$link->title = _L("%s Message in %s",ucfirst($type),$languagename);
-					$link->actions = $actions;
+		$linkrow = array();
+		
+		// Print phone message actions if phone is available 
+		if ($USER->authorize('sendphone')) {
+			$link =
+			$message = $messagegroup->getMessage('phone', 'voice', $languagecode);
+			$actions = array();
+			if ($message) {
+				$icon = "accept";
+				$actions[] = action_link("Play","fugue/control",null,"popup(\'messageviewer.php?id=$message->id\', 800, 500); return false;");
+				$actions[] = action_link("Re-Record","diagona/16/151","editmessagerecord.php?id=new&languagecode=$languagecode&mgid=".$messagegroup->id);
+				if (isset($ttslanguages[$languagecode]))
+					$actions[] = action_link("Edit Advanced","pencil","editmessagephone.php?id=$message->id");
+			} else {
+				$icon = "diagona/16/160";
+				$actions[] = action_link("Record","diagona/16/151","editmessagerecord.php?id=new&languagecode=$languagecode&mgid=".$messagegroup->id);
+				if (isset($ttslanguages[$languagecode]))
+					$actions[] = action_link("New Advanced","pencil_add","editmessagephone.php?id=new&languagecode=$languagecode&mgid=".$messagegroup->id);
+			}
+			$linkrow[] = array('icon' => $icon,'title' => _L("Phone Message in %s",$languagename), 'actions' => $actions);
+		}
+		
+		// Print SMS message actions if SMS is available 
+		if (getSystemSetting('_hassms', false) && $USER->authorize('sendsms')) {
+			if ($languagecode == 'en') {
+				$actions = array();
+				$message = $messagegroup->getMessage('sms', 'plain', $languagecode);
+				if ($message) {
+					$icon = "accept";
+					$actions[] = action_link("Play","fugue/control",null,"popup(\'messageviewer.php?id=$message->id\', 800, 500); return false;");
+					$actions[] = action_link("Re-Record","diagona/16/151","editmessagerecord.php?id=new&languagecode=$languagecode&mgid=".$messagegroup->id);
+					if (isset($ttslanguages[$languagecode]))
+						$actions[] = action_link("Edit Advanced","pencil","editmessagephone.php?id=$message->id");
 				} else {
-					$link->icon = "fugue/slash_disabled";
-					$link->title = _L("%s %s is Not Applicable",$languagename,ucfirst($type));
+					$icon = "diagona/16/160";
+					$actions[] = action_link("Record","diagona/16/151","editmessagerecord.php?id=new&languagecode=$languagecode&mgid=".$messagegroup->id);
+					if (isset($ttslanguages[$languagecode]))
+						$actions[] = action_link("New Advanced","pencil_add","editmessagephone.php?id=new&languagecode=$languagecode&mgid=".$messagegroup->id);
 				}
-				$linkrows[] = $link;
+				$linkrow[] = array('icon' => $icon,'title' => _L("SMS Message in %s",$languagename), 'actions' => $actions);
+			} else {
+				$linkrow[] = false;
 			}
 		}
-		$links[] = $linkrows;
+
+		// Print email message actions if email is available 
+		if ($USER->authorize('sendemail')) {
+			$actions = array();
+			$message = $messagegroup->getMessage('email', 'html', $languagecode);
+			
+			if ($message) {
+				$icon = "accept";
+				$actions[] = action_link("Preview","email_open",null,"popup(\'messageviewer.php?id=$message->id\', 800, 500); return false;");
+				$actions[] = action_link("Edit","pencil","editmessageemail.php?id=$message->id");
+			} else {
+				$icon = "diagona/16/160";
+				$actions[] = action_link("New","pencil_add","editmessageemail.php?id=new&subtype=html&languagecode=$languagecode&mgid=".$messagegroup->id);
+			}
+			$linkrow[] = array('icon' => $icon,'title' => _L("HTML Email Message in %s",$languagename), 'actions' => $actions);
+
+			$actions = array();
+			$message = $messagegroup->getMessage('email', 'plain', $languagecode);
+			if ($message) {
+				$icon = "accept";
+				$actions[] = action_link("Preview","email_open",null,"popup(\'messageviewer.php?id=$message->id\', 800, 500); return false;");
+				$actions[] = action_link("Edit","pencil","editmessageemail.php?id=$message->id");
+			} else {
+				$icon = "diagona/16/160";
+				$actions[] = action_link("New","pencil_add","editmessageemail.php?id=new&subtype=plain&languagecode=$languagecode&mgid=".$messagegroup->id);
+			}
+			$linkrow[] = array('icon' => $icon,'title' => _L("Text Email Message in %s",$languagename), 'actions' => $actions);
+		}
+		
+		$links[] = $linkrow;
 	}
 	
 	showActionGrid($columnlabels,array_values($customerlanguages),$links);
