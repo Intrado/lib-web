@@ -1,4 +1,10 @@
 <?
+// Needs some GET request arguments. Either:
+//	 id, where id is the message id to be edited
+// or:
+//   mgid, where mgid is the messagegroup that will own this message
+//   languagecode, where languagecode is the language of the message to be created
+
 ////////////////////////////////////////////////////////////////////////////////
 // Includes
 ////////////////////////////////////////////////////////////////////////////////
