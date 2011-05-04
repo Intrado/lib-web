@@ -88,11 +88,11 @@ class ValSubscriberExpiration extends Validator {
 		if (!is_numeric($checkval->expiredays) || $checkval->expiredays < 0 || $checkval->expiredays > 365)
 			$errortext .= " " . _L("Automatic Close After days must be between 0 and 365.");
 		if (!is_numeric($checkval->reminder1) || $checkval->reminder1 < 0 || $checkval->reminder1 > 60)
-			$errortext .= " " . _L("First Reminder days must be between 0 and 365.");
+			$errortext .= " " . _L("First Reminder days must be between 0 and 60.");
 		if (!is_numeric($checkval->reminder2) || $checkval->reminder2 < 0 || $checkval->reminder2 > 60)
-			$errortext .= " " . _L("Second Reminder days must be between 0 and 365.");
+			$errortext .= " " . _L("Second Reminder days must be between 0 and 60.");
 		if (!is_numeric($checkval->reminder3) || $checkval->reminder3 < 0 || $checkval->reminder3 > 60)
-			$errortext .= " " . _L("Final Reminder days must be between 0 and 365.");
+			$errortext .= " " . _L("Final Reminder days must be between 0 and 60.");
 		// validate values are valid relative to one another !!!! this is the entire purpose of the custom formitem
 		if ($checkval->expiredays > 0) {
 			if ($checkval->reminder1 != 0 && $checkval->expiredays <= $checkval->reminder1)
@@ -108,19 +108,52 @@ class ValSubscriberExpiration extends Validator {
 		else
 			return true;
 	}
-/*	
+
 	function getJSValidator () {
 		return 
 			'function (name, label, value, args) {
 				vals = value.evalJSON();
 				var errortext = "";
+				
+				var re = /^[0-9]*$/;
+
+				// verify numeric
+				if (!re.test(vals.expiredays))
+					errortext += " "+ "'.addslashes(_L("Automatic Close After must be between 0 and 365.")).'";
+				if (!re.test(vals.reminder1))
+					errortext += " "+ "'.addslashes(_L("Reminder must be between 0 and 60.")).'";
+				if (!re.test(vals.reminder2))
+					errortext += " "+ "'.addslashes(_L("Reminder must be between 0 and 60.")).'";
+				if (!re.test(vals.reminder3))
+					errortext += " "+ "'.addslashes(_L("Reminder must be between 0 and 60.")).'";
+					
+				// number within range
+				if (parseFloat(vals.expiredays) === false || parseFloat(vals.expiredays) > 365 || parseFloat(vals.expiredays) < 0)
+					errortext += " "+ "'.addslashes(_L("Automatic Close After must be between 0 and 365.")).'";
+				if (parseFloat(vals.reminder1) === false || parseFloat(vals.reminder1) > 60 || parseFloat(vals.reminder1) < 0)
+					errortext += " "+ "'.addslashes(_L("Reminder must be between 0 and 60.")).'";
+				if (parseFloat(vals.reminder2) === false || parseFloat(vals.reminder2) > 60 || parseFloat(vals.reminder2) < 0)
+					errortext += " "+ "'.addslashes(_L("Reminder must be between 0 and 60.")).'";
+				if (parseFloat(vals.reminder3) === false || parseFloat(vals.reminder3) > 60 || parseFloat(vals.reminder3) < 0)
+					errortext += " "+ "'.addslashes(_L("Reminder must be between 0 and 60.")).'";
+				
+				// r1>r2>r3
+				if (parseFloat(vals.expiredays) > 0) {
+					if (parseFloat(vals.reminder1) > 0 && parseFloat(vals.expiredays) <= parseFloat(vals.reminder1))
+						errortext += " " + "'.addslashes(_L("First Reminder must be less than Automatic Close After.")).'";
+					if (parseFloat(vals.reminder2) > 0 && parseFloat(vals.reminder1) <= parseFloat(vals.reminder2))
+						errortext += " " + "'.addslashes(_L("Second Reminder must be less than First Reminder.")).'";
+					if (parseFloat(vals.reminder3) > 0 && parseFloat(vals.reminder2) <= parseFloat(vals.reminder3))
+						errortext += " " + "'.addslashes(_L("Final Reminder must be less than Second Reminder.")).'";
+				}
+				
 				if (errortext)
 					return label + errortext;
 				else
 					return true;
 			}';
 	}
-*/
+
 }
 
 $emaildomain = getSystemSetting('emaildomain');
@@ -149,9 +182,6 @@ $formdata["restrictdomain"] = array(
 $formdata["domain"] = array(
         "label" => _L("Email Domain"),
         "fieldhelp" => _L('Displays the permitted email domains for new subscribers.  Subdomains are also allowed.'),
-        "value" => "",
-        "validators" => array(
-        ),
         "control" => array("FormHtml","html"=>"<div>".$emaildomain."</div>"),
         "helpstep" => 1
     );
@@ -162,7 +192,7 @@ $formdata["requiresitecode"] = array(
         "validators" => array(    
         ),
         "control" => array("CheckBox"),
-        "helpstep" => 1
+        "helpstep" => 2
     );
 $formdata["sitecode"] = array(
         "label" => _L("Site Access Code"),
@@ -172,7 +202,7 @@ $formdata["sitecode"] = array(
             array("ValLength","min" => 3,"max" => 255)
         ),
         "control" => array("TextField","maxlength" => 255),
-        "helpstep" => 1
+        "helpstep" => 2
     );
 
 $formdata['accountwarningoptions'] = _L('Account Expiration');
@@ -184,56 +214,15 @@ $formdata["expirationdata"] = array(
             array("ValSubscriberExpiration")
         ),
         "control" => array("SubscriberExpirationField"),
-        "helpstep" => 2
+        "helpstep" => 3
     );
-/*
-$formdata["reminder1"] = array(
-        "label" => _L("First Reminder"),
-        "fieldhelp" => _L('Subscribers who have not logged in will receive their first email warning this many days prior to account expiration. Entering 0 disables this feature.'),
-        "value" => getSystemSetting("subscriber.reminder.1", "30"),
-        "validators" => array(
-            array("ValNumber","min" => 0,"max" => 60)
-        ),
-        "control" => array("TextField","maxlength" => 5),
-        "helpstep" => 2
-    );
-$formdata["reminder2"] = array(
-        "label" => _L("Second Reminder"),
-        "fieldhelp" => _L('Subscribers who have not logged in will receive their second email warning this many days prior to account expiration. Entering 0 disables this feature.'),
-        "value" => getSystemSetting("subscriber.reminder.2", "15"),
-        "validators" => array(
-            array("ValNumber","min" => 0,"max" => 60)
-        ),
-        "control" => array("TextField","maxlength" => 5),
-        "helpstep" => 2
-    );
-$formdata["reminder3"] = array(
-        "label" => _L("Final Reminder"),
-        "fieldhelp" => _L('Subscribers who have not logged in will receive their final email warning this many days prior to account expiration. Entering 0 disables this feature.'),
-        "value" => getSystemSetting("subscriber.reminder.3", "2"),
-        "validators" => array(
-            array("ValNumber","min" => 0,"max" => 60)
-        ),
-        "control" => array("TextField","maxlength" => 5),
-        "helpstep" => 2
-    );
-$formdata["expiredays"] = array(
-        "label" => _L("Automatic Close After"),
-        "fieldhelp" => _L('A subscriber\'s account will automatically expire after not logging in for this many days. Entering 0 disables this feature.'),
-        "value" => getSystemSetting("subscriber.expiredays", "180"),
-        "validators" => array(
-            array("ValNumber","min" => 0,"max" => 365)
-        ),
-        "control" => array("TextField","maxlength" => 5),
-        "helpstep" => 2
-    );
-*/
 
 $helpsteps = array (
-	_L('If you would like to restrict subscribers to only using email addresses from a specific domain, check the Restrict to Domain option. To add a domain, please contact technical support.
-	<br><br>A site code is a special code new subscribers would need to enter when creating their account. If you would like to use this option, simply check the Require Site Code checkbox and enter a code in the field below.'),
-	_L('These settings control how long a subscriber\'s account may remain inactive before expiring. <br><br>The first field controls the length of time before expiration and the reminder fields control when an automatically generated
-	reminder email will be sent to the account owner. The values in the reminder fields are relative to the number of days prior to account expiration. For example, a value of 2 in the \'Final Reminder\' field would send an email two days prior to account expiration.' )
+	_L('If you would like to restrict subscribers to only using email addresses from a specific domain, check the Restrict to Domain option. To add a domain, please contact technical support.'),
+	_L('A site code is a special code new subscribers would need to enter when creating their account. If you would like to use this option, simply check the Require Site Code checkbox and enter a code in the field below.'),
+	_L('These settings control how long a subscriber\'s account may remain inactive before expiring. <br><br>The first field controls the length of time before expiration, a setting of zero will disable automatic account expiration, or set between 1 and 365 days.
+	<br><br>The reminder fields control when an automatically generated	reminder email will be sent to the account owner. The values in the reminder fields are relative to the number of days prior to account expiration, and must be between 0 and 60. For example, a value of 2 in the \'Final Reminder\' field would send an email two days prior to account expiration.
+	<br><br>Reminders are optional, to disable one or more set them to zero. For example you may want only one reminder a week before, set First Reminder to 7, Second to 0, Final to 0.' )
 );
 
 $buttons = array(submit_button("Done","submit","accept"),
