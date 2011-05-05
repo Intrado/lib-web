@@ -1930,6 +1930,12 @@ class SMAPI {
 			return $result;
 		}
 		
+		// name is required
+		if (strlen($name) == 0) {
+			$result['resultcode'] = 'invalidparam';
+			$result["resultdescription"] =  "Name is required";
+			return $result;
+		}
 		// validate name length
 		if (strlen($name) > 50) {
 			$result['resultcode'] = 'invalidparam';
@@ -1975,8 +1981,10 @@ class SMAPI {
 		// success if all people added, else warning
 		if ($numpeople == count($pkeys))
 			$result["resultcode"] = "success";
-		else
+		else {
 			$result["resultcode"] = "warning"; // somple people skipped, not added to list
+			$result["resultdescription"] = "Some people may have been skipped.";
+		}
 		return $result;
 	}
 	
@@ -2093,14 +2101,14 @@ class SMAPI {
 			return $result;
 		}
 		
-		$import = new Import($importid);
+		$import = DBFind("Import", "from import where id = ?", false, array($importid));
 		// validate importid
-		if ($import->id != $importid) {
+		if (!$import) {
 			$result['resultcode'] = 'invalidparam';
 			$result["resultdescription"] =  "Invalid Parameter : importid";
 			return $result;
 		}
-		
+				
 		// store data, but decode first
 		if ($import->upload(base64_decode($base64data)) === false) {
 			$result['resultcode'] = 'failure';
@@ -2144,14 +2152,14 @@ class SMAPI {
 			return $result;
 		}
 		
-		$import = new Import($importid);
+		$import = DBFind("Import", "from import where id = ?", false, array($importid));
 		// validate importid
-		if ($import->id != $importid) {
+		if (!$import) {
 			$result['resultcode'] = 'invalidparam';
 			$result["resultdescription"] =  "Invalid Parameter : importid";
 			return $result;
 		}
-		
+				
 		// run the import
 		$import->runNow();
 		
@@ -2162,7 +2170,7 @@ class SMAPI {
 
 	function getImportDetail($sessionid, $importid) {
 		global $USER, $ACCESS;
-		$result = array("resultcode" => "failure", "resultdescription" => "", "import" => false, "logentries" => array());
+		$result = array("resultcode" => "failure", "resultdescription" => "", "import" => new API_Import(), "logentries" => array());
 
 		// validate session
 		if (!APISession($sessionid)) {
@@ -2187,9 +2195,9 @@ class SMAPI {
 			return $result;
 		}
 		
-		$import = new Import($importid);
+		$import = DBFind("Import", "from import where id = ?", false, array($importid));
 		// validate importid
-		if ($import->id != $importid) {
+		if (!$import) {
 			$result['resultcode'] = 'invalidparam';
 			$result["resultdescription"] =  "Invalid Parameter : importid";
 			return $result;
