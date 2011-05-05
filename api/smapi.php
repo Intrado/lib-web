@@ -2170,7 +2170,7 @@ class SMAPI {
 
 	function getImportDetail($sessionid, $importid) {
 		global $USER, $ACCESS;
-		$result = array("resultcode" => "failure", "resultdescription" => "", "import" => new API_Import(), "logentries" => array());
+		$result = array("resultcode" => "failure", "resultdescription" => "", "import" => new API_Import(null), "logentries" => array());
 
 		// validate session
 		if (!APISession($sessionid)) {

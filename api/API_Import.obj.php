@@ -17,6 +17,8 @@ class API_Import {
 	
 	// param import must be Import DBMO
 	function API_Import($import) {
+		if ($import == null)
+			return; // empty object
 		$this->id = $import->id;
 		$this->name = $import->name;
 		$this->description = $import->description;
