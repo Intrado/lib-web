@@ -1,9 +1,4 @@
 <?
-/* TODO: See below items...
- * 	Email messages, do they need a plain version stored also? (Yes, in progress)
- * 	Should we undelete deleted messages and modify them or create new ones? (Yes, in progress)
- */
-
 ////////////////////////////////////////////////////////////////////////////////
 // Form Items
 ////////////////////////////////////////////////////////////////////////////////
@@ -346,7 +341,7 @@ class MsgWiz_phoneEasyCall extends WizStep {
 				"helpstep" => 1
 			);
 		$formdata["message"] = array(
-			"label" => _L("Voice Recordings"),
+			"label" => _L("Voice Recording"),
 			"fieldhelp" => _L("TODO: field help"),
 			"value" => "",
 			"validators" => array(
@@ -867,8 +862,10 @@ class FinishMessageWizard extends WizFinish {
 		// start a transaction
 		QuickQuery("BEGIN");
 		
-		// TODO: is the messagegroup id still valid? do we even care?
+		// is the messagegroup id still valid?
 		$messagegroup = new MessageGroup($_SESSION['wizard_message']['mgid']);
+		if (!userOwns("messagegroup", $messagegroup->id) || $messagegroup->deleted)
+			redirect('unauthorized.php');
 		
 		// get the language code from postdata
 		$langcode = (isset($postdata["/create/language"]["language"])?$postdata["/create/language"]["language"]:"en");

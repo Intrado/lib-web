@@ -87,6 +87,11 @@ $wizard->handlerequest();
 if (isset($_SESSION['wizard_message_mgid'])) {
 	$_SESSION['wizard_message']['mgid'] = $_SESSION['wizard_message_mgid'];
 	unset($_SESSION['wizard_message_mgid']);
+	
+	// check that this is a valid message group
+	$messagegroup = new MessageGroup($_SESSION['wizard_message']['mgid']);
+	if (!userOwns("messagegroup", $messagegroup->id) || $messagegroup->deleted)
+		redirect('unauthorized.php');
 }
 
 // if the message group id isn't set in session data, redirect to unauth
