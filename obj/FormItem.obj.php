@@ -230,6 +230,7 @@ class MultiCheckBox extends FormItem {
 }
 
 // allows ad-hoc html
+// DO NOT SET 'validators' on this formitem, do not set to empty array, it will cause an error popup "domain TypeError: formvars.jsgetvalue[targetname] is not a function"
 class FormHtml extends FormItem {
 	function render ($value) {
 		return $this->args['html'];
