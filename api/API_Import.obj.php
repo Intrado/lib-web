@@ -19,7 +19,7 @@ class API_Import {
 	function API_Import($import) {
 		if ($import == null)
 			return; // empty object
-		$this->id = $import->id;
+		$this->id = $import->id + 0;
 		$this->name = $import->name;
 		$this->description = $import->description;
 		$this->notes = $import->notes;
@@ -34,7 +34,7 @@ class API_Import {
 		else
 			$this->filesize = 0;
 		$this->automatic = ($import->type == "automatic") ? true : false;
-		$this->skipheaderlines = $import->skipheaderlines;
+		$this->skipheaderlines = $import->skipheaderlines + 0;
 	}
 }
 
