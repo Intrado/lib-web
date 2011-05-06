@@ -94,7 +94,7 @@ $query="select SQL_CALC_FOUND_ROWS
 			rp.pkey,
 			rp." . $firstname . " as firstname,
 			rp." . $lastname . " as lastname,
-			m.name as messagename,
+			mg.name as messagename,
 			rc.phone,
 			rc.numattempts,
 			from_unixtime(rc.starttime/1000) as lastattempt,
@@ -102,8 +102,8 @@ $query="select SQL_CALC_FOUND_ROWS
 			from reportperson rp
 			inner join job j on (rp.jobid = j.id)
 			left join	reportcontact rc on (rc.jobid = rp.jobid and rc.type = rp.type and rc.personid = rp.personid)
-			left join	message m on
-							(m.id = rp.messageid)
+			left join	messagegroup mg on
+							(mg.id = j.messagegroupid)
 			where 1
 			and rp.jobid in ('" . $jobidlist . "')
 			and date(from_unixtime(rc.starttime/1000)) >= $startdate
