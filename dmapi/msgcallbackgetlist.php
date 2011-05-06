@@ -64,7 +64,7 @@ if ($REQUEST_TYPE == "new") {
 			$reportpersonfields = QuickQueryRow($query, true,false,array($row[0],$row[3]));
 			
 			$messagegroup = DBFind('MessageGroup', 'from messagegroup where id = ?', false, array($msg['messagegroupid']));
-			$messageforperson = $messagegroup->getMessageOrDefault("phone", "voice", $reportpersonfields['f03'], false);
+			$messageforperson = $messagegroup->getMessageOrDefault("phone", "voice", $reportpersonfields['f03']);
 			
 			$msg['messageid'] = $messageforperson->id;
 			$msg['messageparts'] = DBFindMany("MessagePart", "from messagepart where messageid=? order by sequence",false,array($messageforperson->id));

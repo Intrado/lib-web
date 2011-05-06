@@ -150,13 +150,27 @@ class MessageGroup extends DBMappedObject {
 		return null;
 	}
 	
-	function getMessageOrDefault($type, $subtype, $languagecode, $autotranslate = false) {
-		$message = $this->getMessage($type, $subtype, $languagecode, $autotranslate);
-		if ($message == null)
-			$message = $this->getMessage($type, $subtype, $this->defaultlanguagecode, $autotranslate);
-		return $message;
+	// get message, but not 'source' for any translations, there should only be one other
+	function getMessageNotSource($type, $subtype, $languagecode) {
+		foreach ($this->getMessages() as $message) {
+			if ($message->type == $type &&
+				$message->subtype == $subtype &&
+				$message->languagecode == $languagecode &&
+				($message->autotranslate != 'source'))
+						return $message;
+		}
+		
+		return null;
 	}
 	
+	// helper to find a message for the language (not 'source') or default, used to playback message for a person via dmapi
+	function getMessageOrDefault($type, $subtype, $languagecode) {
+		$message = $this->getMessageNotSource($type, $subtype, $languagecode);
+		if ($message == null)
+			$message = $this->getMessageNotSource($type, $subtype, $this->defaultlanguagecode);
+		return $message;
+	}
+		
 	static function getSummary($messagegroupid) {
 		global $USER;
 		
