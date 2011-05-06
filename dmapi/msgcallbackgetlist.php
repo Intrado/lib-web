@@ -1,6 +1,7 @@
 <?
 include_once("inboundutils.inc.php");
 
+include_once("../obj/MessageGroup.obj.php");
 include_once("../obj/Message.obj.php");
 include_once("../obj/MessagePart.obj.php");
 include_once("../obj/Voice.obj.php");
@@ -30,7 +31,7 @@ if ($REQUEST_TYPE == "new") {
 } else if ($REQUEST_TYPE == "continue") {
 
 	if (isset($_SESSION['contactphone'])) {
-		$query = "select j.id, j.userid, rp.messageid, rc.personid, rc.sequence, rc.starttime
+		$query = "select j.id, j.userid, j.messagegroupid, rc.personid, rc.sequence, rc.starttime
 			from job j
 			left join phone ph on 
 				(ph.phone=?)
@@ -57,11 +58,17 @@ if ($REQUEST_TYPE == "new") {
 			$msg = array();
 			$msg['jobid'] = $row[0];
 			$msg['userid'] = $row[1];
-			$msg['messageid'] = $row[2];
-			$msg['messageparts'] = DBFindMany("MessagePart", "from messagepart where messageid=?",false,array($row[2]));
+			$msg['messagegroupid'] = $row[2];
 			$query = "select f01, f02, f03, f04, f05, f06, f07, f08, f09, f10,f11, f12, f13, f14, f15, f16, f17, f18, f19, f20 from reportperson " 
 					."where jobid=? and personid=? and type='phone'";
 			$reportpersonfields = QuickQueryRow($query, true,false,array($row[0],$row[3]));
+			
+			$messagegroup = DBFind('MessageGroup', 'from messagegroup where id = ?', false, array($msg['messagegroupid']));
+			$messageforperson = $messagegroup->getMessageOrDefault("phone", "voice", $reportpersonfields['f03'], false);
+			
+			$msg['messageid'] = $messageforperson->id;
+			$msg['messageparts'] = DBFindMany("MessagePart", "from messagepart where messageid=? order by sequence",false,array($messageforperson->id));
+
 			$msg['personid'] = $row[3];
 			$msg['personfields'] = $reportpersonfields;
 			$msg['sequence'] = $row[4];

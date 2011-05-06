@@ -44,9 +44,8 @@ function endoflist() {
 
 function renderMessageParts($messagedata) {
 	$customerid = $_SESSION['customerid'];
-	$msgid = $messagedata['messageid'];
 	$fields = $messagedata['personfields'];
-	$parts = DBFindMany('MessagePart', 'from messagepart where messageid=? order by sequence', false, array($msgid));
+	$parts = $messagedata['messageparts'];
 
 	$renderedparts = Message::renderPhoneParts($parts, $fields);
 	$voices = DBFindMany("Voice","from ttsvoice");
