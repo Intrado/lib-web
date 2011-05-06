@@ -1972,11 +1972,11 @@ class SMAPI {
 			$result["resultdescription"] =  "Unable to create the list.";
 			return $result;
 		}
-		$result['listid'] = $list->id;
+		$result['listid'] = $list->id + 0;
 		
 		// add the people
 		$numpeople = $list->updateManualAddByPkeys($pkeys);
-		$result['numpeople'] = $numpeople;
+		$result['numpeople'] = $numpeople + 0;
 		
 		// success if all people added, else warning
 		if ($numpeople == count($pkeys))
