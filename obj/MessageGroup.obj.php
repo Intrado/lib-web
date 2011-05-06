@@ -53,7 +53,7 @@ class MessageGroup extends DBMappedObject {
 			return array();
 		
 		if ($this->messages === false)  {
-			$this->messages = DBFindMany("Message", "from message where messagegroupid=? and autotranslate != 'source' order by id", false, array($this->id));
+			$this->messages = DBFindMany("Message", "from message where messagegroupid=? and deleted=0 and autotranslate != 'source' order by id", false, array($this->id));
 		}
 		
 		return $this->messages;

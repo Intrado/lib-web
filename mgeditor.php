@@ -130,15 +130,18 @@ function showActionGrid ($columnlabels, $rowlabels, $links) {
 	
 	// Create column labels
 	foreach ($columnlabels as $label) {
-		echo "<th style='text-align: center;padding: 0 15px 10px 15px;'>$label</th>";
+		echo "<th style='text-align: center;padding: 0 15px 3px 15px;'>$label</th>";
 	}
 	echo "</tr>";
 	
 	// Array containing javascript code for each icon to enable the action menues.
 	$actionmenues = array();
+	//$alt = 1;
 	
 	// Print status icons with row labels 
 	for ($row = 0; $row < count($rowlabels); $row++) {
+		
+		//echo ++$alt % 2 ? '<tr>' : '<tr class="listAlt">';
 		echo "<tr><th style='text-align: right;'>$rowlabels[$row]</th>";
 		$rowlinks = $links[$row];
 		for ($col = 0;$col < count($rowlinks);$col++) {
@@ -146,14 +149,14 @@ function showActionGrid ($columnlabels, $rowlabels, $links) {
 			if ($link !== false) {
 				echo "<td style='text-align: center;'>
 						<img id='gridmenu-$row-$col'src='img/icons/{$link["icon"]}.gif'
-							title='{$link["title"]}'
+							title=''
 							alt='{$link["title"]}'
 						/>
 					</td>";
 				
 				// Attach action menu script for this item
 				if (isset($link["actions"])) {
-					$actionmenues[] = "createactionmenu('gridmenu-$row-$col','" . implode("<br />",$link["actions"]) . "');";
+					$actionmenues[] = "createactionmenu('gridmenu-$row-$col','" . implode("<br />",$link["actions"]) . "','{$link["title"]}');";
 				}
 			} else {
 				echo "<td style='text-align: center;'>-</td>";
@@ -211,17 +214,18 @@ function makeMessageGrid($messagegroup) {
 			$actions = array();
 			if ($message) {
 				$icon = "accept";
-				$actions[] = action_link("Play","fugue/control",null,"popup(\'messageviewer.php?id=$message->id\', 800, 500); return false;");
+				$actions[] = action_link("Play","fugue/control",null,"popup(\'messageviewer.php?id=$message->id\', 400, 400); return false;");
 				$actions[] = action_link("Re-Record","diagona/16/151","editmessagerecord.php?id=new&languagecode=$languagecode&mgid=".$messagegroup->id);
 				if (isset($ttslanguages[$languagecode]))
 					$actions[] = action_link("Edit Advanced","pencil","editmessagephone.php?id=$message->id");
+				$actions[] = action_link("Delete","cross","mgeditor.php?action=delete&messageid=$message->id");
 			} else {
 				$icon = "diagona/16/160";
 				$actions[] = action_link("Record","diagona/16/151","editmessagerecord.php?id=new&languagecode=$languagecode&mgid=".$messagegroup->id);
 				if (isset($ttslanguages[$languagecode]))
 					$actions[] = action_link("New Advanced","pencil_add","editmessagephone.php?id=new&languagecode=$languagecode&mgid=".$messagegroup->id);
 			}
-			$linkrow[] = array('icon' => $icon,'title' => _L("Phone Message in %s",$languagename), 'actions' => $actions);
+			$linkrow[] = array('icon' => $icon,'title' => _L(" %s Phone Message",$languagename), 'actions' => $actions);
 		}
 		
 		// Print SMS message actions if SMS is available 
@@ -231,17 +235,17 @@ function makeMessageGrid($messagegroup) {
 				$message = $messagegroup->getMessage('sms', 'plain', $languagecode);
 				if ($message) {
 					$icon = "accept";
-					$actions[] = action_link("Play","fugue/control",null,"popup(\'messageviewer.php?id=$message->id\', 800, 500); return false;");
-					$actions[] = action_link("Re-Record","diagona/16/151","editmessagerecord.php?id=new&languagecode=$languagecode&mgid=".$messagegroup->id);
+					$actions[] = action_link("Preview","email_open",null,"popup(\'messageviewer.php?id=$message->id\', 400, 400); return false;");
 					if (isset($ttslanguages[$languagecode]))
-						$actions[] = action_link("Edit Advanced","pencil","editmessagephone.php?id=$message->id");
+						$actions[] = action_link("Edit Advanced","pencil","editmessagesms.php?id=$message->id");
+					$actions[] = action_link("Delete","cross","mgeditor.php?action=delete&messageid=$message->id");
 				} else {
 					$icon = "diagona/16/160";
 					$actions[] = action_link("Record","diagona/16/151","editmessagerecord.php?id=new&languagecode=$languagecode&mgid=".$messagegroup->id);
 					if (isset($ttslanguages[$languagecode]))
 						$actions[] = action_link("New Advanced","pencil_add","editmessagephone.php?id=new&languagecode=$languagecode&mgid=".$messagegroup->id);
 				}
-				$linkrow[] = array('icon' => $icon,'title' => _L("SMS Message in %s",$languagename), 'actions' => $actions);
+				$linkrow[] = array('icon' => $icon,'title' => _L("%s SMS Message",$languagename), 'actions' => $actions);
 			} else {
 				$linkrow[] = false;
 			}
@@ -256,11 +260,12 @@ function makeMessageGrid($messagegroup) {
 				$icon = "accept";
 				$actions[] = action_link("Preview","email_open",null,"popup(\'messageviewer.php?id=$message->id\', 800, 500); return false;");
 				$actions[] = action_link("Edit","pencil","editmessageemail.php?id=$message->id");
+				$actions[] = action_link("Delete","cross","mgeditor.php?action=delete&messageid=$message->id");
 			} else {
 				$icon = "diagona/16/160";
 				$actions[] = action_link("New","pencil_add","editmessageemail.php?id=new&subtype=html&languagecode=$languagecode&mgid=".$messagegroup->id);
 			}
-			$linkrow[] = array('icon' => $icon,'title' => _L("HTML Email Message in %s",$languagename), 'actions' => $actions);
+			$linkrow[] = array('icon' => $icon,'title' => _L("%s HTML Email Message",$languagename), 'actions' => $actions);
 
 			$actions = array();
 			$message = $messagegroup->getMessage('email', 'plain', $languagecode);
@@ -268,11 +273,12 @@ function makeMessageGrid($messagegroup) {
 				$icon = "accept";
 				$actions[] = action_link("Preview","email_open",null,"popup(\'messageviewer.php?id=$message->id\', 800, 500); return false;");
 				$actions[] = action_link("Edit","pencil","editmessageemail.php?id=$message->id");
+				$actions[] = action_link("Delete","cross","mgeditor.php?action=delete&messageid=$message->id");
 			} else {
 				$icon = "diagona/16/160";
 				$actions[] = action_link("New","pencil_add","editmessageemail.php?id=new&subtype=plain&languagecode=$languagecode&mgid=".$messagegroup->id);
 			}
-			$linkrow[] = array('icon' => $icon,'title' => _L("Text Email Message in %s",$languagename), 'actions' => $actions);
+			$linkrow[] = array('icon' => $icon,'title' => _L("%s Text Email Message",$languagename), 'actions' => $actions);
 		}
 		
 		$links[] = $linkrow;
@@ -292,14 +298,15 @@ include_once("nav.inc.php");
 ?>
 <script type="text/javascript">
 <? Validator::load_validators(array("ValDuplicateNameCheck"));?>
-function createactionmenu(id, content) {
+function createactionmenu(id, content,title) {
 	new Tip($(id), content, {
+		title: title,
 		style: 'protogrey',
 		radius: 4,
 		border: 4,
 		hideOn: false,
 		hideAfter: 0.2,
-		delay: 0.5,
+		delay: 0.2,
 		stem: 'leftTop',
 		hook: {  target: 'leftMiddle', tip: 'topLeft'  },
 		width: '110px',

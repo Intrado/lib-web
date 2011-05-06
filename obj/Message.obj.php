@@ -164,7 +164,7 @@ class Message extends DBMappedObject {
 		return $parts;
 	}
 	
-	function parse ($data, &$errors = NULL, $defaultvoiceid=null, $audiofileids = null) {
+	static function parse ($data, &$errors = NULL, $defaultvoiceid=null, $audiofileids = null) {
 		global $USER;
 
 		if ($errors == NULL)

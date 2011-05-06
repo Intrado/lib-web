@@ -132,7 +132,7 @@ $formdata = array(
 		"label" => "",
 		"value" => "",
 		"validators" => array(),
-		"control" => array("InpageSubmitButton", "name" => "preview", "icon" => "fugue/control"),
+		"control" => array("InpageSubmitButton", "name" => "Preview", "icon" => "fugue/control"),
 		"helpstep" => 3
 	)
 );
@@ -163,6 +163,14 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		$datachange = true;
 	} else if (($errors = $form->validate()) === false) { //checks all of the items in this form
 		$postdata = $form->getData(); //gets assoc array of all values {name:value,...}
+		
+		if ($button == 'inpagesubmit') {
+			$_SESSION['ttstext'] = $postdata["message"];
+			$_SESSION['ttslanguage'] = $languagecode;
+			$_SESSION['ttsgender'] = $postdata["gender"];
+			$form->modifyElement("previewcontainer", "<script>popup('messageviewer.php', 400, 400);</script>");
+			exit();
+		}
 		
 		// if they didn't change anything, don't do anything
 		if ($postdata['message'] == $text && $postdata['gender'] == $gender) {
@@ -227,6 +235,7 @@ include_once("nav.inc.php");
 <script type="text/javascript">
 <? Validator::load_validators(array("ValMessageBody")); ?>
 </script>
+<div id='previewcontainer'></div>
 <?
 
 startWindow($messagegroup->name);

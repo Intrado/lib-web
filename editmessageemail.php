@@ -30,6 +30,7 @@ require_once("obj/EmailAttach.val.php");
 require_once("obj/EmailAttach.fi.php");
 require_once("obj/ValMessageBody.val.php");
 require_once("obj/EmailMessageEditor.fi.php");
+require_once("obj/InpageSubmitButton.fi.php");
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -199,6 +200,14 @@ $formdata["message"] = array(
 	"helpstep" => 5
 );
 
+$formdata["preview"] = array(
+	"label" => "",
+	"value" => "",
+	"validators" => array(),
+	"control" => array("InpageSubmitButton", "name" => "Preview with email template", "icon" => "email_open"),
+	"helpstep" => 3
+);
+
 $buttons = array(submit_button(_L('Save'),"submit","tick"),
 				icon_button(_L('Cancel'),"cross",null,"mgeditor.php?id=".$messagegroup->id));
 $form = new Form("emaileedit",$formdata,$helpsteps,$buttons);
@@ -222,6 +231,11 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 	} else if (($errors = $form->validate()) === false) { //checks all of the items in this form
 		$postdata = $form->getData(); //gets assoc array of all values {name:value,...}
 		
+		if ($button == 'inpagesubmit') {
+			$form->modifyElement("previewcontainer", "<script>popup('messageviewer.php', 800, 500);</script>");
+			exit();
+		}
+		
 		// if they didn't change anything, don't do anything
 		if ($postdata['fromname'] == $fromname && 
 				$postdata['from'] == $fromemail &&
@@ -238,7 +252,8 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 				QuickUpdate("update message set deleted = 1 
 						where messagegroupid = ?
 						and type = 'email'
-						and languagecode = ?", false, array($messagegroup->id, $languagecode));
+						and subtype = ?
+						and languagecode = ?", false, array($messagegroup->id, $subtype, $languagecode));
 			} else {
 				// new message
 				$message = new Message();
@@ -332,6 +347,7 @@ include_once("nav.inc.php");
 <script type="text/javascript">
 <? Validator::load_validators(array("ValMessageBody", "ValEmailAttach")); ?>
 </script>
+<div id='previewcontainer'></div>
 <?
 
 startWindow($messagegroup->name);
