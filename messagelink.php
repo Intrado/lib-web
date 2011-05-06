@@ -47,7 +47,7 @@ while(true) {
 			$messageinfo = $client->getInfo($code);
 		} catch (messagelink_MessageLinkCodeNotFoundException $e) {
 			$badcode = true;
-			error_log("Unable to find the messagelinkcode: " . $code);
+			error_log("Unable to find the messagelinkcode: " . urlencode($code));
 		}
 		$appservertransport->close();
 		break;
@@ -106,7 +106,7 @@ if ($appservererror || $badcode) {
 		<tr>
 			<td>
 				<div style="padding-left:10px; padding-bottom:10px">
-					<img src="messagelinklogo.img.php?code=<?=$code?>" />
+					<img src="messagelinklogo.img.php?code=<?=escapehtml($code)?>" />
 				</div>
 			</td>
 			<td>
@@ -126,7 +126,7 @@ if ($appservererror) {
 ?>
 	<div>
 		<h1></h1>
-		<p>An error occured while trying to retrieve your message. Please try again.</p>
+		<p>An error occurred while trying to retrieve your message. Please try again.</p>
 	</div>
 <?
 } else if($badcode){
@@ -149,9 +149,9 @@ if ($appservererror) {
 		<script type="text/javascript" language="javascript" src="script/prototype.js"></script>	
 		<script type="text/javascript" language="javascript" src="script/niftyplayer.js.php"></script>
 		<script language="JavaScript" type="text/javascript">
-	 		embedPlayer("messagelinkaudio.mp3.php?code=<?=$code?>","player",<?= $messageinfo->nummessageparts ?>);
+	 		embedPlayer("messagelinkaudio.mp3.php?code=<?=escapehtml($code)?>","player",<?= $messageinfo->nummessageparts ?>);
 		</script>
-		<br><a href="messagelinkaudio.mp3.php?code=<?=$code?>">Click here to download</a>
+		<br><a href="messagelinkaudio.mp3.php?code=<?=escapehtml($code)?>">Click here to download</a>
 	</div>
 <?
 }
