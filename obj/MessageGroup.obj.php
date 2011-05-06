@@ -150,6 +150,13 @@ class MessageGroup extends DBMappedObject {
 		return null;
 	}
 	
+	function getMessageOrDefault($type, $subtype, $languagecode, $autotranslate = false) {
+		$message = $this->getMessage($type, $subtype, $languagecode, $autotranslate);
+		if ($message == null)
+			$message = $this->getMessage($type, $subtype, $this->defaultlanguagecode, $autotranslate);
+		return $message;
+	}
+	
 	static function getSummary($messagegroupid) {
 		global $USER;
 		
