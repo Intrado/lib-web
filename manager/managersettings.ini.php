@@ -40,6 +40,7 @@ tmp_dir="/tmp"
 has_ssl=true
 force_ssl=true
 should_grant_local=false
+query_trace=true
 
 ; server to redirect customer link to
 customer_url_prefix=https://localhost
