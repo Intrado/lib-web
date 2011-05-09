@@ -147,8 +147,7 @@ class MsgWiz_method extends WizStep {
 						'.($USER->authorize('sendmulti')?'<li class="wizbuttonlist">'.escapehtml(_L("Auto-translate available")).'</li>':'').'
 					</ol>';
 				$helpsteps = array(_L("Select the method you wish to use to create your email message. 
-				Simple will create a plain text message. If you would like to create a formatted message using our HTML editor or entering your own HTML, choose the HTML option.
-				You may elect to allow the system to automatically generate the plain text version of your HTML formatted email when using this message."));
+				Simple will create a plain text message. If you would like to create a formatted message using our HTML editor or by entering your own HTML, choose the HTML option."));
 			case "sendsms":
 				// This step is "currently" disabled for SMS
 			
@@ -184,7 +183,7 @@ class MsgWiz_method extends WizStep {
 			$this->title,
 			"method" => array(
 				"label" => _L("Method"),
-				"fieldhelp" => _L("Choose the type of email you want to create. HTML creates formatted messages with our HTML editor. Plain text is for unformatted simple emails."),
+				"fieldhelp" => _L("Choose the type of email you want to create. HTML creates formatted messages with our HTML editor. Simple is for plain text emails."),
 				"validators" => array(
 					array("ValRequired"),
 					array("ValInArray", "values" => array_keys($methods))
