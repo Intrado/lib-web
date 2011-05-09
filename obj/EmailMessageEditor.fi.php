@@ -61,7 +61,6 @@ class EmailMessageEditor extends FormItem {
 		// textarea for message bits
 		$textarea = '
 			<div class="controlcontainer">
-				<div>'._L("Email Message").'</div>
 				<textarea id="'.$n.'" name="'.$n.'" class="messagearea"/>'.escapehtml($value).'</textarea>
 				<div id="'.$n.'-htmleditor"></div>
 			</div>';
