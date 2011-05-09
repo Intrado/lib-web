@@ -180,7 +180,7 @@ if(!$success){
 			</tr>
 			<tr>
 				<td><?=_L("Mobile Phone for SMS Text")?>:</td>
-				<td><input type="text" name="sms" id="smsbox" value="<?=Phone::format($sms)?>" size="20" maxlength="20" <?=$notifysms ? "" : "disabled=\"true\"" ?>/></td>
+				<td><input type="text" name="sms" id="smsbox" value="<?=escapehtml(Phone::format($sms))?>" size="20" maxlength="20" <?=$notifysms ? "" : "disabled=\"true\"" ?>/></td>
 			</tr>
 			<tr>
 				<td colspan="2"><div style="overflow:scroll; height:250px; width:525px;"><?=$tos ?></div></td>
