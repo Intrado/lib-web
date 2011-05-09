@@ -239,7 +239,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		if ($postdata['fromname'] == $fromname && 
 				$postdata['from'] == $fromemail &&
 				$postdata['subject'] == $subject &&
-				$postdata['attachments'] == ($attachments?json_encode($attachments):"{}") &&
+				json_decode($postdata['attachments'], true) == $attachments &&
 				$postdata['message'] == $text) {
 			// DO NOT UPDATE MESSAGE!
 		} else {
@@ -248,11 +248,12 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 			// if this is an edit for an existing message
 			if ($message) {
 				// delete existing messages
-				QuickUpdate("update message set deleted = 1 
+				QuickUpdate("delete from message 
 						where messagegroupid = ?
 						and type = 'email'
 						and subtype = ?
-						and languagecode = ?", false, array($messagegroup->id, $subtype, $languagecode));
+						and languagecode = ?
+						and id != ?", false, array($messagegroup->id, $subtype, $languagecode, $message->id));
 			} else {
 				// new message
 				$message = new Message();
@@ -283,37 +284,37 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 			$message->recreateParts($postdata['message'], null, false);
 			
 			// check for existing attachments
-			$existingattachmentstokeep = array();
-			$existingattachments = DBFindMany("MessageAttachment", "from messageattachment where messageid = ? and not deleted", false, array($message->id));
+			$existingattachments = QuickQueryList("select contentid, id from messageattachment where messageid = ? and not deleted", true, false, array($message->id));
 			
 			// if there are message attachments, attach them
 			$attachments = json_decode($postdata['attachments']);
 			if ($attachments == null) 
 				$attachments = array();
 	
+			$existingattachmentstokeep = array();
 			if ($attachments) {
 				foreach ($attachments as $cid => $details) {
 					// check if this is already attached.
-					foreach ($existingattachments as $existingattachment) {
-						if ($existingattachment->contentid == $cid) {
-							$existingattachmentstokeep[$existingattachment->id] = true;
-							continue;
-						}
+					if (isset($existingattachments[$cid])) {
+						$existingattachmentstokeep[$existingattachments[$cid]] = true;
+						continue;
+					} else {
+						$msgattachment = new MessageAttachment();
+						$msgattachment->messageid = $message->id;
+						$msgattachment->contentid = $cid;
+						$msgattachment->filename = $details->name;
+						$msgattachment->size = $details->size;
+						$msgattachment->deleted = 0;
+						$msgattachment->create();
 					}
-					$msgattachment = new MessageAttachment();
-					$msgattachment->messageid = $message->id;
-					$msgattachment->contentid = $cid;
-					$msgattachment->filename = $details->name;
-					$msgattachment->size = $details->size;
-					$msgattachment->deleted = 0;
-					$msgattachment->create();
 				}
 			}
 			// remove attachments that are no longer attached
-			foreach ($existingattachments as $existingattachment) {
-				if (!isset($existingattachmentstokeep[$existingattachment->id])) {
-					$existingattachment->deleted = 1;
-					$existingattachment->update(); 
+			foreach ($existingattachments as $cid => $attachmentid) {
+				if (!isset($existingattachmentstokeep[$attachmentid])) {
+					$attachment = new MessageAttachment($attachmentid);
+					$attachment->deleted = 1;
+					$attachment->update(); 
 				}
 			}	
 			

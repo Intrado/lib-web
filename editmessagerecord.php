@@ -120,10 +120,11 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		if ($message) {
 			QuickUpdate("delete from messagepart where messageid = ?", false, array($message->id));
 			// delete existing messages
-			QuickUpdate("update message set deleted = 1 
+			QuickUpdate("delete from message 
 						where messagegroupid = ?
 						and type = 'phone'
-						and languagecode = ?", false, array($messagegroup->id, $languagecode));
+						and languagecode = ?
+						and id != ?", false, array($messagegroup->id, $languagecode, $message->id));
 			
 		} else {
 			// no message, create a new one!

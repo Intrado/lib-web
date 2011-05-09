@@ -180,10 +180,11 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 			// if this is an edit for an existing message
 			if ($message) {
 				// delete existing messages
-				QuickUpdate("update message set deleted = 1 
+				QuickUpdate("delete from message 
 						where messagegroupid = ?
 						and type = 'phone'
-						and languagecode = ?", false, array($messagegroup->id, $languagecode));
+						and languagecode = ?
+						and id != ?", false, array($messagegroup->id, $languagecode, $message->id));
 			} else {
 				// new message
 				$message = new Message();
