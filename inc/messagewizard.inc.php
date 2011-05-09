@@ -61,7 +61,7 @@ class MsgWiz_start extends WizStep {
 			$this->title,
 			"messagetype" => array(
 				"label" => _L("Message Type"),
-				"fieldhelp" => _L("Choose a message type."),
+				"fieldhelp" => _L("Choose the type of message you wish to create."),
 				"validators" => array(
 					array("ValRequired"),
 					array("ValInArray", "values" => array_keys($messagetypes))
@@ -71,7 +71,8 @@ class MsgWiz_start extends WizStep {
 				"helpstep" => 1)
 		);
 		
-		$helpsteps = array(_L("TODO: guide?"));
+		$helpsteps = array(_L("Select the type of message component you would like to create. <br><br>You may use this system to create each message component individually.
+		 For example, selecting 'Phone' will let you create the phone component. If you want to create an email, run the wizard again, but select 'Email'."));
 		
 		return new Form("start",$formdata,$helpsteps);
 	}
@@ -125,6 +126,7 @@ class MsgWiz_method extends WizStep {
 						<li class="wizbuttonlist">'.escapehtml(_L("Wav, Mp3, Au Format Support")).'</li>
 						<li class="wizbuttonlist">'.escapehtml(_L("Use advanced features like field inserts")).'</li>
 					</ol>';
+				$helpsteps = array(_L("Select the method you wish to use to create your phone message. Please note that automatic translation is only available for written messages."));
 				break;
 				
 			case "sendemail":
@@ -138,13 +140,15 @@ class MsgWiz_method extends WizStep {
 						<li class="wizbuttonlist">'.escapehtml(_L("Write a plain text email message")).'</li>
 						'.($USER->authorize('sendmulti')?'<li class="wizbuttonlist">'.escapehtml(_L("Auto-translate available")).'</li>':'').'
 					</ol>';
-				$methoddetails["advanced"]["label"] = _L("Html");
+				$methoddetails["advanced"]["label"] = _L("HTML");
 				$methoddetails["advanced"]["description"] = 
 					'<ol>
 						<li class="wizbuttonlist">'.escapehtml(_L("Write an HTML email message")).'</li>
 						'.($USER->authorize('sendmulti')?'<li class="wizbuttonlist">'.escapehtml(_L("Auto-translate available")).'</li>':'').'
 					</ol>';
-				
+				$helpsteps = array(_L("Select the method you wish to use to create your email message. 
+				Simple will create a plain text message. If you would like to create a formatted message using our HTML editor or entering your own HTML, choose the HTML option.
+				You may elect to allow the system to automatically generate the plain text version of your HTML formatted email when using this message."));
 			case "sendsms":
 				// This step is "currently" disabled for SMS
 			
@@ -180,7 +184,7 @@ class MsgWiz_method extends WizStep {
 			$this->title,
 			"method" => array(
 				"label" => _L("Method"),
-				"fieldhelp" => _L("Choose a method."),
+				"fieldhelp" => _L("Choose the type of email you want to create. HTML creates formatted messages with our HTML editor. Plain text is for unformatted simple emails."),
 				"validators" => array(
 					array("ValRequired"),
 					array("ValInArray", "values" => array_keys($methods))
@@ -190,7 +194,7 @@ class MsgWiz_method extends WizStep {
 				"helpstep" => 1)
 		);
 		
-		$helpsteps = array(_L("TODO: guide?"));
+		
 		
 		return new Form("method",$formdata,$helpsteps);
 	}
@@ -244,7 +248,8 @@ class MsgWiz_language extends WizStep {
 				"helpstep" => 1)
 		);
 		
-		$helpsteps = array(_L("TODO: guide?"));
+		$helpsteps = array(_L("Select whether or not you would like to automatically translate your message using Google Translate. If you prefer to write your own translations, leave this option unchecked.<br><br>
+		Next, select the language of the message you're creating."));
 		
 		return new Form("start",$formdata,$helpsteps);
 	}
@@ -342,7 +347,7 @@ class MsgWiz_phoneEasyCall extends WizStep {
 			);
 		$formdata["message"] = array(
 			"label" => _L("Voice Recording"),
-			"fieldhelp" => _L("TODO: field help"),
+			"fieldhelp" => _L("Enter the 10-digit phone number where you can be reached."),
 			"value" => "",
 			"validators" => array(
 				array("ValRequired"),
@@ -353,7 +358,7 @@ class MsgWiz_phoneEasyCall extends WizStep {
 		);
 		
 		$helpsteps = array(_L("The system will call you at the number you enter in this form and guide you through a series of prompts to record your message. The default message is always required and will be sent to any recipients who do not have a language specified.<br><br>
-		Choose which language you will be recording in and enter the phone number where the system can reach you. Then click \"Call Me to Record\" to get started. Listen carefully to the prompts when you receive the call. You may record as many different langauges as you need.
+		Enter the phone number where the system can reach you. Then click \"Call Me to Record\" to get started. Listen carefully to the prompts when you receive the call. You may record as many different langauges as you need.
 		"));
 
 		return new Form("phoneEasyCall",$formdata,$helpsteps);
@@ -524,12 +529,20 @@ class MsgWiz_emailText extends WizStep {
 			"helpstep" => 5
 		);
 		
-		$helpsteps = array(_L("Enter the name for the email account."),
-					_L("Enter the address where you would like to receive replies."),
-					_L("Enter the subject of the email here."),
-					_L("You may attach up to three files that are up to 2MB each. For greater security, only certain types of files are accepted.<br><br><b>Note:</b> Some email accounts may not accept attachments above a certain size and may reject your message."),
-					_L("Email message body text goes here. Be sure to introduce yourself and give detailed information. For helpful message tips and ideas, click the Help link in the upper right corner of the screen.")
-		);
+		$helpsteps = array();
+		$helpsteps[] = _L("Enter the name for the email account.");
+		$helpsteps[] = _L("Enter the address where you would like to receive replies.");
+		$helpsteps[] = _L("Enter the subject of the email here.");
+		$helpsteps[] =	_L("You may attach up to three files that are up to 2MB each. For greater security, only certain types of files are accepted.<br><br><b>Note:</b> Some email accounts may not accept attachments above a certain size and may reject your message.");
+		if ($subtype == "html"){
+			$helpsteps[] = 	_L("Enter your HTML email in this field. You may use the HTML editing tools to format your email. 
+			<br><br>Be sure to introduce yourself and give detailed information. 
+			For helpful message tips and ideas, click the Help link in the upper right corner of the screen.");
+		} else {
+			$helpsteps[] = 	_L("Enter your plain text version of your email in this field. 
+			<br><br>Be sure to introduce yourself and give detailed information. 
+			For helpful message tips and ideas, click the Help link in the upper right corner of the screen.");
+		}
 		
 		return new Form("emailText",$formdata,$helpsteps);
 	}
