@@ -99,8 +99,7 @@ $formdata["message"] = array(
 
 $helpsteps = array(_L("Enter the message you wish to deliver via SMS Text."));
 
-$buttons = array(submit_button(_L('Save'),"submit","tick"),
-				icon_button(_L('Cancel'),"cross",null,"mgeditor.php?id=".$messagegroup->id));
+$buttons = array(submit_button(_L('Done'),"submit","tick"));
 $form = new Form("phonerecord",$formdata,$helpsteps,$buttons);
 
 ////////////////////////////////////////////////////////////////////////////////

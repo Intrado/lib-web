@@ -141,8 +141,7 @@ $helpsteps = array(_L("TODO: Help me!"),
 				_L("TODO: Help me!"),
 				_L("TODO: Help me!"));
 		
-$buttons = array(submit_button(_L('Save'),"submit","tick"),
-				icon_button(_L('Cancel'),"cross",null,"mgeditor.php?id=".$messagegroup->id));
+$buttons = array(submit_button(_L('Done'),"submit","tick"));
 $form = new Form("phoneadvanced",$formdata,$helpsteps,$buttons,"vertical");
 
 ////////////////////////////////////////////////////////////////////////////////
