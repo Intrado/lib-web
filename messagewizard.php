@@ -75,7 +75,7 @@ $wizdata = array(
 		"smstext" => new MsgWiz_smsText(_L("SMS Text"))
 	)),
 	"submit" => new WizSection ("Confirm",array(
-		"confirm" => new MsgWiz_submitConfirm(_L("To be Overwriten"))
+		"confirm" => new MsgWiz_submitConfirm(_L("To be Overwritten"))
 	))
 );
 
