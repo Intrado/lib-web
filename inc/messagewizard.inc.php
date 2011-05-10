@@ -222,9 +222,11 @@ class MsgWiz_language extends WizStep {
 		$sendemail = (isset($postdata["/start"]["messagetype"]) && $postdata["/start"]["messagetype"] == "sendemail");
 		if ($USER->authorize('sendmulti') && 
 				($sendemail || ($sendphone && ($phonemethod == "advanced" || $phonemethod == "write")))) {
-			$langs["autotranslate"] = "Automatically <b>Translate</b> from English to other languages";
+			$langs["autotranslate"] = _L("Automatically <b>Translate</b> from English to other languages");
 			$langs[] = "#-#"; //insert an <hr>
 		}
+		
+		// TODO: Default language needs to be handled here... 
 		
 		$langs["en"] = _L("Create the <b>English</b> message");
 		
