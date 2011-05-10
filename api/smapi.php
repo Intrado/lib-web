@@ -15,21 +15,33 @@ $CUSTOMERURL = strtolower(substr($CUSTOMERURL,0,strpos($CUSTOMERURL,"/")));
 
 apache_note("CS_CUST",urlencode($CUSTOMERURL)); //for logging
 
-if(isset($_GET['wsdl'])){
-
+if (isset($_GET['wsdl'])) {
+	
 	$wsdl = file_get_contents("smapi.wsdl");
 
 	//keyword stored in wsdl for service url is smapiurl
-	$wsdl = preg_replace("[smapiurl]", 'https://' . $_SERVER["SERVER_NAME"] .'/' . $CUSTOMERURL . '/api/',$wsdl);
+	$wsdl = preg_replace("[smapiurl]", 'https://' . $_SERVER["SERVER_NAME"] .'/' . $CUSTOMERURL . '/api/', $wsdl);
 
-	header("Pragma: private");
-	header("Cache-Control: private");
-	header("Content-disposition: attachment; filename=smapi.wsdl");
-	header("Content-type: text");
+	if (isset($_GET['doc'])) { // display the documentation
+		// replace comment with stylesheet
+		$comment = '[<!-- stylesheet goes here -->]';
+		$stylesheet = '<?xml-stylesheet type="text/xsl" href="wsdl-viewer.xsl"?>';
+		$wsdl = preg_replace($comment, $stylesheet, $wsdl);
 
-	echo $wsdl;
-	exit();
+		header("Content-type: text/xml");
+		echo $wsdl;
+		exit();
+		
+	} else { // download the wsdl file
+		header("Pragma: private");
+		header("Cache-Control: private");
+		header("Content-disposition: attachment; filename=smapi.wsdl");
+		header("Content-type: text");
+		echo $wsdl;
+		exit();
+	}
 }
+
 
 
 
