@@ -1290,7 +1290,7 @@ class JobWiz_messageEmailText extends WizStep {
 		$formdata["subject"] = array(
 			"label" => _L("Subject"),
 			"fieldhelp" => _L('The Subject will appear as the subject line of the email.'),
-			"value" => $postdata['/start']['name'],
+			"value" => "",
 			"validators" => array(
 				array("ValRequired"),
 				array("ValLength","max" => 255)

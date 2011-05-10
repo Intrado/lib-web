@@ -117,7 +117,7 @@ if (!$USER->authorize("sendmulti") && $languagecode != Language::getDefaultLangu
 // relys on including form having a $message and $messagegroup object already created.
 $fromname = $USER->firstname . " " . $USER->lastname;
 $fromemail = $USER->email;
-$subject = $messagegroup->name;
+$subject = "";
 $attachments = array();
 $text = "";
 if ($message) {
