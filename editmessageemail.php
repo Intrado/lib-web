@@ -105,6 +105,10 @@ if (!userOwns("messagegroup", $messagegroup->id))
 if (!in_array($languagecode, array_keys(Language::getLanguageMap())))
 	redirect('unauthorized.php');
 
+// no multi lingual and not default language code
+if (!$USER->authorize("sendmulti") && $languagecode != Language::getDefaultLanguageCode())
+	redirect('unauthorized.php');
+	
 ////////////////////////////////////////////////////////////////////////////////
 // Form Data
 ////////////////////////////////////////////////////////////////////////////////
