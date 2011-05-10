@@ -180,6 +180,7 @@ class PhoneMessageEditor extends FormItem {
 	}
 
 	function renderJavascript($value) {
+		global $USER;
 		$n = $this->form->name."_".$this->name;
 		
 		// langcode and messagegroupid should be passed as args
@@ -188,11 +189,11 @@ class PhoneMessageEditor extends FormItem {
 		$language = Language::getName($langcode);
 		
 		// set up the controls in the form and initialize any event listeners
-		$str = '
-			var audiolibrarywidget = setupAudioLibrary("'.$n.'", "'.$messagegroupid.'");
-			setupVoiceRecorder("'.$n.'", "'.$language.'", "'.$messagegroupid.'", audiolibrarywidget);
+		$str = 'var audiolibrarywidget = setupAudioLibrary("'.$n.'", "'.$messagegroupid.'");
 			setupAudioUpload("'.$n.'", audiolibrarywidget);
 			';
+		if ($USER->authorize('starteasy'))
+			$str .= 'setupVoiceRecorder("'.$n.'", "'.$language.'", "'.$messagegroupid.'", audiolibrarywidget);';
 		
 		return $str;
 	}
