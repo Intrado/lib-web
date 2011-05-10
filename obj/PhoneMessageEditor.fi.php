@@ -105,9 +105,10 @@ class PhoneMessageEditor extends FormItem {
 		
 		// Voice recorder
 		$voicerecorder = '
-			<div class="controlcontainer">
+			<div id="'.$n.'-voicerecorder_fieldarea" name="'.$n.'-voicerecorder_fieldarea" class="controlcontainer">
 				<div>'._L("Voice Recording").'</div>
 				<div id="'.$n.'-voicerecorder" name="'.$n.'-voicerecorder"></div>
+				<div id="'.$n.'-voicerecorder_msg" name="'.$n.'-voicerecorder_msg"></div>
 			</div>';
 		
 		// Audio upload control
@@ -202,7 +203,60 @@ class PhoneMessageEditor extends FormItem {
 			<script type="text/javascript" src="script/easycall.js.php"></script>
 			<script type="text/javascript" src="script/audiolibrarywidget.js.php"></script>
 			<script type="text/javascript">
-			
+				// Extend easycall class to use inner form item validator
+				var VoiceRecorder = Class.create(EasyCall,{
+					// update page based on ended tasks or validation errors
+					handleStatus: function(type, msg) {
+						var needsretry = false;
+						// make sure the periodical executor is stopped
+						if (this.pe)
+							this.pe.stop();
+				
+						switch(type) {
+							case "done":
+								// complete the session
+								this.completeSession();
+								return;
+				
+							// clears form validation
+							case "noerror":
+								form_validation_display(this.containerid, "valid", "");
+								break;
+				
+							case "notask":
+								needsretry = true;
+								form_validation_display(this.containerid, "error", "'.addslashes(_L('No valid request was found')).'");
+								break;
+				
+							case "callended":
+								needsretry = true;
+								form_validation_display(this.containerid, "error", "'.addslashes(_L('Call ended early')).'");
+								break;
+				
+							case "starterror":
+								needsretry = true;
+								form_validation_display(this.containerid, "error", "'.addslashes(_L('Couldn\'t initiate request')).'");
+								break;
+				
+							case "saveerror":
+								needsretry = true;
+								form_validation_display(this.containerid, "error", "'.addslashes(_L('There was a problem saving your audio')).'");
+								break;
+				
+							case "badphone":
+								form_validation_display(this.containerid, "error", "'.addslashes(_L('Phone Number is invalid.')).'");
+								break;
+				
+							default:
+								form_validation_display(this.formitemname, "error", "Unknown end request:" + type + ", with message:" + msg);
+						}
+						// if we need a retry button
+						if (needsretry)
+							$(this.containerid).update(this.getRetryButton());
+					}					
+					
+				});
+				
 				// Audio upload bits
 				function startAudioUpload(itemname) {
 					$(itemname + "uploaderror").update();
@@ -256,7 +310,7 @@ class PhoneMessageEditor extends FormItem {
 					var library = $(e.id+"-library");
 					var messagearea = e;
 					
-					new EasyCall(e, recorder, "'.Phone::format($USER->phone).'", name+" - "+curDate());
+					new VoiceRecorder(e, recorder, "'.Phone::format($USER->phone).'", name+" - "+curDate());
 		
 					// listen for any new recordings so we can insert them into the message, attach them to the message group and reload the library
 					recorder.observe("EasyCall:update", function(event) {
@@ -282,7 +336,7 @@ class PhoneMessageEditor extends FormItem {
 								"messagegroupid": messagegroupid
 							},
 							"onFailure": function() {
-								alert("There was a problem assigning this audiofile to message group: "+messagegroupid);
+								alert("There was a problem assigning this audiofile to this message group");
 							}
 						});
 						
