@@ -258,6 +258,10 @@ var EasyCall = Class.create({
 			var e = event.element();
 			this.keytimer = window.setTimeout(
 				function () {
+					if (e.value == this.nophonemessage) {
+						this.handleStatus("noerror");
+						return;
+					}
 					var val = this.easycallPhoneValidate(e.value)
 					if (val === true)
 						this.handleStatus("noerror");
