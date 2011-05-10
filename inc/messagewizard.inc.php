@@ -797,16 +797,18 @@ class MsgWiz_submitConfirm extends WizStep {
 
 	function getMessageAttibutes($postdata) {
 		// infer the languagecode, type and subtype from the wizard data
+		// TODO: default language instead of en?
+		$languagecode = isset($postdata['/create/language']['language'])?$postdata['/create/language']['language']:"en";
+		$type = "";
+		$subtype = "";
 		if (MsgWiz_phoneText::isEnabled($postdata, false) || MsgWiz_phoneEasyCall::isEnabled($postdata, false)) {
-			$languagecode = $postdata['/create/language']['language'];
 			$type = 'phone';
 			$subtype = 'voice';
 		} else if (MsgWiz_emailText::isEnabled($postdata, false)) {
-			$languagecode = $postdata['/create/language']['language'];
 			$type = 'email';
-			$subtype = ($postdata['/method']['method'] == "write")?"plain":"html";
+			if (isset($postdata['/method']['method']))
+				$subtype = ($postdata['/method']['method'] == "write")?"plain":"html";
 		} else if (MsgWiz_smsText::isEnabled($postdata, false)) {
-			$languagecode = "en";
 			$type = 'sms';
 			$subtype = 'plain';
 		}		
@@ -816,53 +818,50 @@ class MsgWiz_submitConfirm extends WizStep {
 	//returns true if this step is enabled
 	function isEnabled($postdata, $step) {
 		// only show the confirm step if the creation of this message will overwrite an existing message
-		if (isset($postdata['/create/language']['language']) || MsgWiz_smsText::isEnabled($postdata, false)) {
-			
-			list($languagecode, $type, $subtype) = $this->getMessageAttibutes($postdata);
-			$args = array();
-			
-			// if it's an auto translate, we have to look up each of the trasnlated languages and english
-			if ($languagecode == "autotranslate") {
-				// need the translated step's session data to get the enabled languages
-				if (isset($postdata['/create/translatepreview'])) {
-					// autotranslate always overwrites the english message
-					$args[] = "en";
-					foreach ($postdata['/create/translatepreview'] as $langcode => $enabled) {
-						if ($enabled === "true")
-							$args[] = $langcode;
-					}
+		list($languagecode, $type, $subtype) = $this->getMessageAttibutes($postdata);
+		$args = array();
+		
+		// if it's an auto translate, we have to look up each of the trasnlated languages and english
+		if ($languagecode == "autotranslate") {
+			// need the translated step's session data to get the enabled languages
+			if (isset($postdata['/create/translatepreview'])) {
+				// autotranslate always overwrites the english message
+				$args[] = "en";
+				foreach ($postdata['/create/translatepreview'] as $langcode => $enabled) {
+					if ($enabled === "true")
+						$args[] = $langcode;
 				}
-			} else {
-				// not auto translate so...
-				// query the messages to see if a message exists already for this language code
-				$args[] = $languagecode;
 			}
-			
-			// no languages to look up?
-			if (!$args)
-				return false;
-			
-			// need a list of ? for each language code we are going to look up to put in the query
-			$queryargs = repeatWithSeparator("?",",",count($args));
-			
-			// add additional query arguments
-			$args[] = $_SESSION['wizard_message']['mgid'];
-			$args[] = $type;
-			$args[] = $subtype;
-			
-			// query for any messages matching one of these language codes
-			$hasmessage = QuickQuery(
-				"select 1 from message 
-				where languagecode in (".$queryargs.") 
-				and messagegroupid = ? 
-				and type = ? 
-				and subtype = ? 
-				and autotranslate in ('none', 'translated', 'overridden') 
-				and not deleted", false, $args);
-			
-			if ($hasmessage)
-				return true;
+		} else {
+			// not auto translate so...
+			// query the messages to see if a message exists already for this language code
+			$args[] = $languagecode;
 		}
+		
+		// not enough data to look up messages?
+		if (!$type || !$subtype)
+			return false;
+		
+		// need a list of ? for each language code we are going to look up to put in the query
+		$queryargs = repeatWithSeparator("?",",",count($args));
+		
+		// add additional query arguments
+		$args[] = $_SESSION['wizard_message']['mgid'];
+		$args[] = $type;
+		$args[] = $subtype;
+		
+		// query for any messages matching one of these language codes
+		$hasmessage = QuickQuery(
+			"select 1 from message 
+			where languagecode in (".$queryargs.") 
+			and messagegroupid = ? 
+			and type = ? 
+			and subtype = ? 
+			and autotranslate in ('none', 'translated', 'overridden') 
+			and not deleted", false, $args);
+		
+		if ($hasmessage)
+			return true;
 		
 		return false;
 	}
@@ -1098,7 +1097,7 @@ class FinishMessageWizard extends WizFinish {
 					
 					// if there are message attachments, attach them
 					$existingattachmentstokeep = array();
-					if ($data['attachments']) {
+					if (isset($data['attachments']) && $data['attachments']) {
 						foreach ($data['attachments'] as $cid => $details) {
 							// check if this is already attached.
 							if (isset($existingattachments[$cid])) {
