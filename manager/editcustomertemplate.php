@@ -208,9 +208,9 @@ if (CheckFormSubmit($f, "Save")) {
 					if (strlen(trim($body)) == 0) {
 						if ($message != null) {
 							// cleanup parts
-							$message->recreateParts($body, null, null);
+							QuickUpdate("delete from messagepart where messageid = ?", false, array($message->id));
 							// cleanup message
-							$message->destroy(true);
+							$message->destroy();
 						}
 					} else {
 						// create or recreate message from body text
