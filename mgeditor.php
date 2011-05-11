@@ -40,6 +40,10 @@ if($messagegroup->type != 'notification') {
 	redirect('unauthorized.php');
 }
 
+
+if (isset($_GET['delete'])) {
+	QuickUpdate("update message set deleted=1 where id=? and messagegroupid=?",false,array($_GET['delete'],$messagegroup->id));
+}
 ////////////////////////////////////////////////////////////////////////////////
 // Optional Form Items And Validators
 ////////////////////////////////////////////////////////////////////////////////
@@ -78,7 +82,6 @@ if ($messagegroup->id) {
 	$buttons = array(submit_button(_L('Save'),"submit","tick"));
 } else {
 	$buttons = array(submit_button(_L('Next'),"submit","tick"));
-	$buttons[] = icon_button(_L('Cancel'),"cross",null,(isset($_SESSION['origin']) && ($_SESSION['origin'] == 'start')?"start.php":"messages.php"));
 }
 
 
@@ -217,7 +220,7 @@ function makeMessageGrid($messagegroup) {
 				$actions[] = action_link("Re-Record","diagona/16/151","editmessagerecord.php?id=new&languagecode=$languagecode&mgid=".$messagegroup->id);
 				if (isset($ttslanguages[$languagecode]))
 					$actions[] = action_link("Edit Advanced","pencil","editmessagephone.php?id=$message->id");
-				$actions[] = action_link("Delete","cross","mgeditor.php?action=delete&messageid=$message->id");
+				$actions[] = action_link("Delete","cross","mgeditor.php?delete=$message->id","return confirmDelete();");
 			} else {
 				$icon = "diagona/16/160";
 				$actions[] = action_link("Record","diagona/16/151","editmessagerecord.php?id=new&languagecode=$languagecode&mgid=".$messagegroup->id);
@@ -236,10 +239,10 @@ function makeMessageGrid($messagegroup) {
 					$icon = "accept";
 					$actions[] = action_link("Preview","email_open",null,"popup(\'messageviewer.php?id=$message->id\', 400, 400); return false;");
 					$actions[] = action_link("Edit","pencil","editmessagesms.php?id=$message->id");
-					$actions[] = action_link("Delete","cross","mgeditor.php?action=delete&messageid=$message->id");
+					$actions[] = action_link("Delete","cross","mgeditor.php?delete=$message->id","return confirmDelete();");
 				} else {
 					$icon = "diagona/16/160";
-					$actions[] = action_link("Edit","pencil_add","editmessagesms.php?id=new");
+					$actions[] = action_link("New","pencil_add","editmessagesms.php?id=new&mgid=$messagegroup->id");
 				}
 				$linkrow[] = array('icon' => $icon,'title' => _L("%s SMS Message",$languagename), 'actions' => $actions);
 			} else {
@@ -256,7 +259,7 @@ function makeMessageGrid($messagegroup) {
 				$icon = "accept";
 				$actions[] = action_link("Preview","email_open",null,"popup(\'messageviewer.php?id=$message->id\', 800, 500); return false;");
 				$actions[] = action_link("Edit","pencil","editmessageemail.php?id=$message->id");
-				$actions[] = action_link("Delete","cross","mgeditor.php?action=delete&messageid=$message->id");
+				$actions[] = action_link("Delete","cross","mgeditor.php?delete=$message->id","return confirmDelete();");
 			} else {
 				$icon = "diagona/16/160";
 				$actions[] = action_link("New","pencil_add","editmessageemail.php?id=new&subtype=html&languagecode=$languagecode&mgid=".$messagegroup->id);
@@ -269,7 +272,7 @@ function makeMessageGrid($messagegroup) {
 				$icon = "accept";
 				$actions[] = action_link("Preview","email_open",null,"popup(\'messageviewer.php?id=$message->id\', 800, 500); return false;");
 				$actions[] = action_link("Edit","pencil","editmessageemail.php?id=$message->id");
-				$actions[] = action_link("Delete","cross","mgeditor.php?action=delete&messageid=$message->id");
+				$actions[] = action_link("Delete","cross","mgeditor.php?delete=$message->id","return confirmDelete();");
 			} else {
 				$icon = "diagona/16/160";
 				$actions[] = action_link("New","pencil_add","editmessageemail.php?id=new&subtype=plain&languagecode=$languagecode&mgid=".$messagegroup->id);
@@ -323,16 +326,19 @@ function preview(type,subtype,languagecode) {
 </script>
 <link href="css/messagegroup.css" type="text/css" rel="stylesheet">
 <?
+
+if ($messagegroup->id) {
+	buttons(icon_button(_L('Done'),"tick",null,(isset($_SESSION['origin']) && ($_SESSION['origin'] == 'start')?"start.php":"messages.php")));
+}
 startWindow(_L('Message Settings'));
 echo $form->render();
 endWindow();
-startWindow(_L('Message Content'));
 if ($messagegroup->id) {
+	startWindow(_L('Message Content'));
 	echo "<br />" . icon_button(_L('Add Content Wizard'),"add",null,"messagewizard.php?new&mgid=$messagegroup->id") . "<br /><br />";
 	makeMessageGrid($messagegroup);
-	echo icon_button(_L('Done'),"tick",null,(isset($_SESSION['origin']) && ($_SESSION['origin'] == 'start')?"start.php":"messages.php"));
+	endWindow();
 }
-endWindow();
 
 include_once("navbottom.inc.php");
 ?>
