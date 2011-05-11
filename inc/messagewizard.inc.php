@@ -851,10 +851,10 @@ class MsgWiz_submitConfirm extends WizStep {
 		
 		// if it's an auto translate, we have to look up each of the trasnlated languages and english
 		if ($languagecode == "autotranslate") {
+			// autotranslate always overwrites the english message
+			$args[] = "en";
 			// need the translated step's session data to get the enabled languages
 			if (isset($postdata['/create/translatepreview'])) {
-				// autotranslate always overwrites the english message
-				$args[] = "en";
 				foreach ($postdata['/create/translatepreview'] as $langcode => $enabled) {
 					if ($enabled === "true")
 						$args[] = $langcode;
