@@ -218,10 +218,10 @@ class MsgWiz_language extends WizStep {
 		
 		// only allow auto translation on "write" messages when the user can send multi lingual
 		$sendphone = (isset($postdata["/start"]["messagetype"]) && $postdata["/start"]["messagetype"] == "sendphone");
-		$phonemethod = (isset($postdata["/method"]["method"])?$postdata["/method"]["method"]:false);
+		$method = (isset($postdata["/method"]["method"])?$postdata["/method"]["method"]:false);
 		$sendemail = (isset($postdata["/start"]["messagetype"]) && $postdata["/start"]["messagetype"] == "sendemail");
 		if ($USER->authorize('sendmulti') && 
-				($sendemail || ($sendphone && ($phonemethod == "advanced" || $phonemethod == "write")))) {
+				($sendemail || ($sendphone && ($method == "advanced" || $method == "write")))) {
 			$langs["autotranslate"] = _L("Automatically <b>Translate</b> from English to other languages");
 			$langs[] = "#-#"; //insert an <hr>
 		}
@@ -230,9 +230,20 @@ class MsgWiz_language extends WizStep {
 		
 		$langs["en"] = _L("Create the <b>English</b> message");
 		
-		foreach (Language::getLanguageMap() as $key => $lang) {
-			if ($lang != "English")
-				$langs[$key] = _L("Create the <b>%s</b> message", $lang);
+		// If the method chosen will be rendered via TTS, we should only allow the user to select TTSable languages
+		$ttslanguages = Voice::getTTSLanguageMap();
+		$alllanguages = Language::getLanguageMap();
+		if ($sendphone && ($method == "advanced" || $method == "write")) {
+			$excludedlanguages = array_diff_key($alllanguages, $ttslanguages);
+			$languages = $ttslanguages;
+		} else {
+			$excludedlanguages = array();
+			$languages = $alllanguages;
+		}
+		
+		foreach ($languages as $key => $lang) {
+			if ($key != "en")
+				$langs[$key] = _L("Create the <b>%s</b> message", ucfirst($lang));
 		}
 		
 		$formdata = array(
@@ -252,6 +263,23 @@ class MsgWiz_language extends WizStep {
 		$helpsteps = array(_L("Select whether or not you would like to automatically translate your message using Google Translate. If you prefer to write your own translations, leave this option unchecked.<br><br>
 		Next, select the language of the message you're creating."));
 		
+		// if there are excluded languages, show them
+		if ($excludedlanguages) {
+			$html = '<div>'. _L('The following languages cannot be spoken via Text to Speech.'). '
+				<ul>';
+			$count = 0;
+			foreach ($excludedlanguages as $code => $language)
+				$html .= "<li>$language</li>";
+			$html .= "</ul></div>";
+			
+			$formdata["excludes"] = array(
+				"label" => _L("Non-TTS Languages"),
+				"control" => array("FormHtml", "html" => $html),
+				"helpstep" => 2
+			);
+			
+			$helpsteps[] = "These languages are not available for Text-to-Speech messaging. To create a message for one of these Languages, click Previous and choose Record";
+		}		
 		return new Form("start",$formdata,$helpsteps);
 	}
 
