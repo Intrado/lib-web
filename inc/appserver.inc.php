@@ -27,7 +27,7 @@ function messageViewForJobPerson($messageid, $jobid, $personid) {
 			// Open up the connection
 			$appserverCommsuiteTransport->open();
 			try {
-				$result = $client->messageViewForJobPerson(session_id(), $messageid, $jobid, $personid);
+				$result = $client->emailMessageViewForJobPerson(session_id(), $messageid, $jobid, $personid);
 			} catch (commsuite_CommSuite_MessageRendererException $e) {
 				error_log("Unable to render messageid=".$messageid." jobid=".$jobid." personid=".$personid);
 				return false;
@@ -71,7 +71,7 @@ function messagePreviewForPriority($messageid, $jobpriority) {
 			// Open up the connection
 			$appserverCommsuiteTransport->open();
 			try {
-				$result = $client->messagePreviewForPriority(session_id(), $messageid, $jobpriority);
+				$result = $client->emailMessagePreviewForPriority(session_id(), $messageid, $jobpriority);
 			} catch (commsuite_CommSuite_MessageRendererException $e) {
 				error_log("Unable to render messageid=".$messageid." jobpriority=".$jobpriority);
 				return false;

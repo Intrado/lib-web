@@ -7,7 +7,7 @@
 include_once $GLOBALS['THRIFT_ROOT'].'/Thrift.php';
 
 
-class commsuite_MessageView {
+class commsuite_EmailMessageView {
   static $_TSPEC;
 
   public $type = null;
@@ -17,8 +17,6 @@ class commsuite_MessageView {
   public $emailfromname = null;
   public $emailfromaddress = null;
   public $emailcontentids = null;
-  public $phonetodo = null;
-  public $smsbody = null;
 
   public function __construct($vals=null) {
     if (!isset(self::$_TSPEC)) {
@@ -55,14 +53,6 @@ class commsuite_MessageView {
             'type' => TType::I64,
             ),
           ),
-        8 => array(
-          'var' => 'phonetodo',
-          'type' => TType::STRING,
-          ),
-        9 => array(
-          'var' => 'smsbody',
-          'type' => TType::STRING,
-          ),
         );
     }
     if (is_array($vals)) {
@@ -87,17 +77,11 @@ class commsuite_MessageView {
       if (isset($vals['emailcontentids'])) {
         $this->emailcontentids = $vals['emailcontentids'];
       }
-      if (isset($vals['phonetodo'])) {
-        $this->phonetodo = $vals['phonetodo'];
-      }
-      if (isset($vals['smsbody'])) {
-        $this->smsbody = $vals['smsbody'];
-      }
     }
   }
 
   public function getName() {
-    return 'MessageView';
+    return 'EmailMessageView';
   }
 
   public function read($input)
@@ -174,20 +158,6 @@ class commsuite_MessageView {
             $xfer += $input->skip($ftype);
           }
           break;
-        case 8:
-          if ($ftype == TType::STRING) {
-            $xfer += $input->readString($this->phonetodo);
-          } else {
-            $xfer += $input->skip($ftype);
-          }
-          break;
-        case 9:
-          if ($ftype == TType::STRING) {
-            $xfer += $input->readString($this->smsbody);
-          } else {
-            $xfer += $input->skip($ftype);
-          }
-          break;
         default:
           $xfer += $input->skip($ftype);
           break;
@@ -200,7 +170,7 @@ class commsuite_MessageView {
 
   public function write($output) {
     $xfer = 0;
-    $xfer += $output->writeStructBegin('MessageView');
+    $xfer += $output->writeStructBegin('EmailMessageView');
     if ($this->type !== null) {
       $xfer += $output->writeFieldBegin('type', TType::STRING, 1);
       $xfer += $output->writeString($this->type);
@@ -248,14 +218,96 @@ class commsuite_MessageView {
       }
       $xfer += $output->writeFieldEnd();
     }
-    if ($this->phonetodo !== null) {
-      $xfer += $output->writeFieldBegin('phonetodo', TType::STRING, 8);
-      $xfer += $output->writeString($this->phonetodo);
+    $xfer += $output->writeFieldStop();
+    $xfer += $output->writeStructEnd();
+    return $xfer;
+  }
+
+}
+
+class commsuite_FileData {
+  static $_TSPEC;
+
+  public $contenttype = null;
+  public $data = null;
+
+  public function __construct($vals=null) {
+    if (!isset(self::$_TSPEC)) {
+      self::$_TSPEC = array(
+        1 => array(
+          'var' => 'contenttype',
+          'type' => TType::STRING,
+          ),
+        2 => array(
+          'var' => 'data',
+          'type' => TType::STRING,
+          ),
+        );
+    }
+    if (is_array($vals)) {
+      if (isset($vals['contenttype'])) {
+        $this->contenttype = $vals['contenttype'];
+      }
+      if (isset($vals['data'])) {
+        $this->data = $vals['data'];
+      }
+    }
+  }
+
+  public function getName() {
+    return 'FileData';
+  }
+
+  public function read($input)
+  {
+    $xfer = 0;
+    $fname = null;
+    $ftype = 0;
+    $fid = 0;
+    $xfer += $input->readStructBegin($fname);
+    while (true)
+    {
+      $xfer += $input->readFieldBegin($fname, $ftype, $fid);
+      if ($ftype == TType::STOP) {
+        break;
+      }
+      switch ($fid)
+      {
+        case 1:
+          if ($ftype == TType::STRING) {
+            $xfer += $input->readString($this->contenttype);
+          } else {
+            $xfer += $input->skip($ftype);
+          }
+          break;
+        case 2:
+          if ($ftype == TType::STRING) {
+            $xfer += $input->readString($this->data);
+          } else {
+            $xfer += $input->skip($ftype);
+          }
+          break;
+        default:
+          $xfer += $input->skip($ftype);
+          break;
+      }
+      $xfer += $input->readFieldEnd();
+    }
+    $xfer += $input->readStructEnd();
+    return $xfer;
+  }
+
+  public function write($output) {
+    $xfer = 0;
+    $xfer += $output->writeStructBegin('FileData');
+    if ($this->contenttype !== null) {
+      $xfer += $output->writeFieldBegin('contenttype', TType::STRING, 1);
+      $xfer += $output->writeString($this->contenttype);
       $xfer += $output->writeFieldEnd();
     }
-    if ($this->smsbody !== null) {
-      $xfer += $output->writeFieldBegin('smsbody', TType::STRING, 9);
-      $xfer += $output->writeString($this->smsbody);
+    if ($this->data !== null) {
+      $xfer += $output->writeFieldBegin('data', TType::STRING, 2);
+      $xfer += $output->writeString($this->data);
       $xfer += $output->writeFieldEnd();
     }
     $xfer += $output->writeFieldStop();
