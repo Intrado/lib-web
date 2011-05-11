@@ -50,7 +50,6 @@ $formdata = array();
 $helpsteps[] = _L("Enter a name for your Message. " .
 					"Using a descriptive name that indicates the message content will make it easier to find the message later. " .
 					"You may also optionally enter a description of the the message.");
-$formdata[] = "Message Info";
 $formdata["name"] = array(
 	"label" => _L('Message Name'),
 	"fieldhelp" => _L('Enter a name for your message.'),
@@ -236,14 +235,11 @@ function makeMessageGrid($messagegroup) {
 				if ($message) {
 					$icon = "accept";
 					$actions[] = action_link("Preview","email_open",null,"popup(\'messageviewer.php?id=$message->id\', 400, 400); return false;");
-					if (isset($ttslanguages[$languagecode]))
-						$actions[] = action_link("Edit Advanced","pencil","editmessagesms.php?id=$message->id");
+					$actions[] = action_link("Edit","pencil","editmessagesms.php?id=$message->id");
 					$actions[] = action_link("Delete","cross","mgeditor.php?action=delete&messageid=$message->id");
 				} else {
 					$icon = "diagona/16/160";
-					$actions[] = action_link("Record","diagona/16/151","editmessagerecord.php?id=new&languagecode=$languagecode&mgid=".$messagegroup->id);
-					if (isset($ttslanguages[$languagecode]))
-						$actions[] = action_link("New Advanced","pencil_add","editmessagephone.php?id=new&languagecode=$languagecode&mgid=".$messagegroup->id);
+					$actions[] = action_link("Edit","pencil_add","editmessagesms.php?id=new");
 				}
 				$linkrow[] = array('icon' => $icon,'title' => _L("%s SMS Message",$languagename), 'actions' => $actions);
 			} else {
@@ -329,10 +325,10 @@ function preview(type,subtype,languagecode) {
 <?
 startWindow(_L('Message Settings'));
 echo $form->render();
+endWindow();
+startWindow(_L('Message Content'));
 if ($messagegroup->id) {
-	echo "<h2>Message Content</h2>";
-	echo icon_button(_L('Add Content Wizard'),"add",null,"messagewizard.php?new&mgid=$messagegroup->id");
-	echo "<br /><br />";
+	echo "<br />" . icon_button(_L('Add Content Wizard'),"add",null,"messagewizard.php?new&mgid=$messagegroup->id") . "<br /><br />";
 	makeMessageGrid($messagegroup);
 	echo icon_button(_L('Done'),"tick",null,(isset($_SESSION['origin']) && ($_SESSION['origin'] == 'start')?"start.php":"messages.php"));
 }
