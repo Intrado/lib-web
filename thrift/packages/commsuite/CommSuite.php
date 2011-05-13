@@ -12,7 +12,8 @@ interface CommSuiteIf {
   public function emailMessagePreviewForPriority($sessionid, $messageid, $jobpriority);
   public function emailMessageViewForJobPerson($sessionid, $messageid, $jobid, $personid);
   public function audioFileGetForFormat($sessionid, $contentid, $format);
-  public function ttsGetForTextLanguageGenderFormat($sessionid, $text, $language, $gender, $format);
+  public function ttsGetForTextLanguageGenderFormat($text, $language, $gender, $format);
+  public function phoneMessageGetMp3AudioFile($sessionid, $parts);
 }
 
 class CommSuiteClient implements CommSuiteIf {
@@ -76,6 +77,9 @@ class CommSuiteClient implements CommSuiteIf {
     if ($result->success !== null) {
       return $result->success;
     }
+    if ($result->sie !== null) {
+      throw $result->sie;
+    }
     throw new Exception("emailMessagePreviewForPriority failed: unknown result");
   }
 
@@ -130,6 +134,9 @@ class CommSuiteClient implements CommSuiteIf {
     if ($result->success !== null) {
       return $result->success;
     }
+    if ($result->sie !== null) {
+      throw $result->sie;
+    }
     throw new Exception("emailMessageViewForJobPerson failed: unknown result");
   }
 
@@ -183,19 +190,24 @@ class CommSuiteClient implements CommSuiteIf {
     if ($result->success !== null) {
       return $result->success;
     }
+    if ($result->sie !== null) {
+      throw $result->sie;
+    }
+    if ($result->nfe !== null) {
+      throw $result->nfe;
+    }
     throw new Exception("audioFileGetForFormat failed: unknown result");
   }
 
-  public function ttsGetForTextLanguageGenderFormat($sessionid, $text, $language, $gender, $format)
+  public function ttsGetForTextLanguageGenderFormat($text, $language, $gender, $format)
   {
-    $this->send_ttsGetForTextLanguageGenderFormat($sessionid, $text, $language, $gender, $format);
+    $this->send_ttsGetForTextLanguageGenderFormat($text, $language, $gender, $format);
     return $this->recv_ttsGetForTextLanguageGenderFormat();
   }
 
-  public function send_ttsGetForTextLanguageGenderFormat($sessionid, $text, $language, $gender, $format)
+  public function send_ttsGetForTextLanguageGenderFormat($text, $language, $gender, $format)
   {
     $args = new commsuite_CommSuite_ttsGetForTextLanguageGenderFormat_args();
-    $args->sessionid = $sessionid;
     $args->text = $text;
     $args->language = $language;
     $args->gender = $gender;
@@ -238,7 +250,68 @@ class CommSuiteClient implements CommSuiteIf {
     if ($result->success !== null) {
       return $result->success;
     }
+    if ($result->nfe !== null) {
+      throw $result->nfe;
+    }
     throw new Exception("ttsGetForTextLanguageGenderFormat failed: unknown result");
+  }
+
+  public function phoneMessageGetMp3AudioFile($sessionid, $parts)
+  {
+    $this->send_phoneMessageGetMp3AudioFile($sessionid, $parts);
+    return $this->recv_phoneMessageGetMp3AudioFile();
+  }
+
+  public function send_phoneMessageGetMp3AudioFile($sessionid, $parts)
+  {
+    $args = new commsuite_CommSuite_phoneMessageGetMp3AudioFile_args();
+    $args->sessionid = $sessionid;
+    $args->parts = $parts;
+    $bin_accel = ($this->output_ instanceof TProtocol::$TBINARYPROTOCOLACCELERATED) && function_exists('thrift_protocol_write_binary');
+    if ($bin_accel)
+    {
+      thrift_protocol_write_binary($this->output_, 'phoneMessageGetMp3AudioFile', TMessageType::CALL, $args, $this->seqid_, $this->output_->isStrictWrite());
+    }
+    else
+    {
+      $this->output_->writeMessageBegin('phoneMessageGetMp3AudioFile', TMessageType::CALL, $this->seqid_);
+      $args->write($this->output_);
+      $this->output_->writeMessageEnd();
+      $this->output_->getTransport()->flush();
+    }
+  }
+
+  public function recv_phoneMessageGetMp3AudioFile()
+  {
+    $bin_accel = ($this->input_ instanceof TProtocol::$TBINARYPROTOCOLACCELERATED) && function_exists('thrift_protocol_read_binary');
+    if ($bin_accel) $result = thrift_protocol_read_binary($this->input_, 'commsuite_CommSuite_phoneMessageGetMp3AudioFile_result', $this->input_->isStrictRead());
+    else
+    {
+      $rseqid = 0;
+      $fname = null;
+      $mtype = 0;
+
+      $this->input_->readMessageBegin($fname, $mtype, $rseqid);
+      if ($mtype == TMessageType::EXCEPTION) {
+        $x = new TApplicationException();
+        $x->read($this->input_);
+        $this->input_->readMessageEnd();
+        throw $x;
+      }
+      $result = new commsuite_CommSuite_phoneMessageGetMp3AudioFile_result();
+      $result->read($this->input_);
+      $this->input_->readMessageEnd();
+    }
+    if ($result->success !== null) {
+      return $result->success;
+    }
+    if ($result->sie !== null) {
+      throw $result->sie;
+    }
+    if ($result->nfe !== null) {
+      throw $result->nfe;
+    }
+    throw new Exception("phoneMessageGetMp3AudioFile failed: unknown result");
   }
 
 }
@@ -361,6 +434,7 @@ class commsuite_CommSuite_emailMessagePreviewForPriority_result {
   static $_TSPEC;
 
   public $success = null;
+  public $sie = null;
 
   public function __construct($vals=null) {
     if (!isset(self::$_TSPEC)) {
@@ -370,11 +444,19 @@ class commsuite_CommSuite_emailMessagePreviewForPriority_result {
           'type' => TType::STRUCT,
           'class' => 'commsuite_EmailMessageView',
           ),
+        1 => array(
+          'var' => 'sie',
+          'type' => TType::STRUCT,
+          'class' => 'commsuite_SessionInvalidException',
+          ),
         );
     }
     if (is_array($vals)) {
       if (isset($vals['success'])) {
         $this->success = $vals['success'];
+      }
+      if (isset($vals['sie'])) {
+        $this->sie = $vals['sie'];
       }
     }
   }
@@ -406,6 +488,14 @@ class commsuite_CommSuite_emailMessagePreviewForPriority_result {
             $xfer += $input->skip($ftype);
           }
           break;
+        case 1:
+          if ($ftype == TType::STRUCT) {
+            $this->sie = new commsuite_SessionInvalidException();
+            $xfer += $this->sie->read($input);
+          } else {
+            $xfer += $input->skip($ftype);
+          }
+          break;
         default:
           $xfer += $input->skip($ftype);
           break;
@@ -425,6 +515,11 @@ class commsuite_CommSuite_emailMessagePreviewForPriority_result {
       }
       $xfer += $output->writeFieldBegin('success', TType::STRUCT, 0);
       $xfer += $this->success->write($output);
+      $xfer += $output->writeFieldEnd();
+    }
+    if ($this->sie !== null) {
+      $xfer += $output->writeFieldBegin('sie', TType::STRUCT, 1);
+      $xfer += $this->sie->write($output);
       $xfer += $output->writeFieldEnd();
     }
     $xfer += $output->writeFieldStop();
@@ -570,6 +665,7 @@ class commsuite_CommSuite_emailMessageViewForJobPerson_result {
   static $_TSPEC;
 
   public $success = null;
+  public $sie = null;
 
   public function __construct($vals=null) {
     if (!isset(self::$_TSPEC)) {
@@ -579,11 +675,19 @@ class commsuite_CommSuite_emailMessageViewForJobPerson_result {
           'type' => TType::STRUCT,
           'class' => 'commsuite_EmailMessageView',
           ),
+        1 => array(
+          'var' => 'sie',
+          'type' => TType::STRUCT,
+          'class' => 'commsuite_SessionInvalidException',
+          ),
         );
     }
     if (is_array($vals)) {
       if (isset($vals['success'])) {
         $this->success = $vals['success'];
+      }
+      if (isset($vals['sie'])) {
+        $this->sie = $vals['sie'];
       }
     }
   }
@@ -615,6 +719,14 @@ class commsuite_CommSuite_emailMessageViewForJobPerson_result {
             $xfer += $input->skip($ftype);
           }
           break;
+        case 1:
+          if ($ftype == TType::STRUCT) {
+            $this->sie = new commsuite_SessionInvalidException();
+            $xfer += $this->sie->read($input);
+          } else {
+            $xfer += $input->skip($ftype);
+          }
+          break;
         default:
           $xfer += $input->skip($ftype);
           break;
@@ -634,6 +746,11 @@ class commsuite_CommSuite_emailMessageViewForJobPerson_result {
       }
       $xfer += $output->writeFieldBegin('success', TType::STRUCT, 0);
       $xfer += $this->success->write($output);
+      $xfer += $output->writeFieldEnd();
+    }
+    if ($this->sie !== null) {
+      $xfer += $output->writeFieldBegin('sie', TType::STRUCT, 1);
+      $xfer += $this->sie->write($output);
       $xfer += $output->writeFieldEnd();
     }
     $xfer += $output->writeFieldStop();
@@ -759,6 +876,8 @@ class commsuite_CommSuite_audioFileGetForFormat_result {
   static $_TSPEC;
 
   public $success = null;
+  public $sie = null;
+  public $nfe = null;
 
   public function __construct($vals=null) {
     if (!isset(self::$_TSPEC)) {
@@ -768,11 +887,27 @@ class commsuite_CommSuite_audioFileGetForFormat_result {
           'type' => TType::STRUCT,
           'class' => 'commsuite_FileData',
           ),
+        1 => array(
+          'var' => 'sie',
+          'type' => TType::STRUCT,
+          'class' => 'commsuite_SessionInvalidException',
+          ),
+        2 => array(
+          'var' => 'nfe',
+          'type' => TType::STRUCT,
+          'class' => 'commsuite_NotFoundException',
+          ),
         );
     }
     if (is_array($vals)) {
       if (isset($vals['success'])) {
         $this->success = $vals['success'];
+      }
+      if (isset($vals['sie'])) {
+        $this->sie = $vals['sie'];
+      }
+      if (isset($vals['nfe'])) {
+        $this->nfe = $vals['nfe'];
       }
     }
   }
@@ -804,6 +939,22 @@ class commsuite_CommSuite_audioFileGetForFormat_result {
             $xfer += $input->skip($ftype);
           }
           break;
+        case 1:
+          if ($ftype == TType::STRUCT) {
+            $this->sie = new commsuite_SessionInvalidException();
+            $xfer += $this->sie->read($input);
+          } else {
+            $xfer += $input->skip($ftype);
+          }
+          break;
+        case 2:
+          if ($ftype == TType::STRUCT) {
+            $this->nfe = new commsuite_NotFoundException();
+            $xfer += $this->nfe->read($input);
+          } else {
+            $xfer += $input->skip($ftype);
+          }
+          break;
         default:
           $xfer += $input->skip($ftype);
           break;
@@ -825,6 +976,16 @@ class commsuite_CommSuite_audioFileGetForFormat_result {
       $xfer += $this->success->write($output);
       $xfer += $output->writeFieldEnd();
     }
+    if ($this->sie !== null) {
+      $xfer += $output->writeFieldBegin('sie', TType::STRUCT, 1);
+      $xfer += $this->sie->write($output);
+      $xfer += $output->writeFieldEnd();
+    }
+    if ($this->nfe !== null) {
+      $xfer += $output->writeFieldBegin('nfe', TType::STRUCT, 2);
+      $xfer += $this->nfe->write($output);
+      $xfer += $output->writeFieldEnd();
+    }
     $xfer += $output->writeFieldStop();
     $xfer += $output->writeStructEnd();
     return $xfer;
@@ -835,7 +996,6 @@ class commsuite_CommSuite_audioFileGetForFormat_result {
 class commsuite_CommSuite_ttsGetForTextLanguageGenderFormat_args {
   static $_TSPEC;
 
-  public $sessionid = null;
   public $text = null;
   public $language = null;
   public $gender = null;
@@ -845,31 +1005,24 @@ class commsuite_CommSuite_ttsGetForTextLanguageGenderFormat_args {
     if (!isset(self::$_TSPEC)) {
       self::$_TSPEC = array(
         1 => array(
-          'var' => 'sessionid',
-          'type' => TType::STRING,
-          ),
-        2 => array(
           'var' => 'text',
           'type' => TType::STRING,
           ),
-        3 => array(
+        2 => array(
           'var' => 'language',
           'type' => TType::STRING,
           ),
-        4 => array(
+        3 => array(
           'var' => 'gender',
           'type' => TType::STRING,
           ),
-        5 => array(
+        4 => array(
           'var' => 'format',
           'type' => TType::STRING,
           ),
         );
     }
     if (is_array($vals)) {
-      if (isset($vals['sessionid'])) {
-        $this->sessionid = $vals['sessionid'];
-      }
       if (isset($vals['text'])) {
         $this->text = $vals['text'];
       }
@@ -906,33 +1059,26 @@ class commsuite_CommSuite_ttsGetForTextLanguageGenderFormat_args {
       {
         case 1:
           if ($ftype == TType::STRING) {
-            $xfer += $input->readString($this->sessionid);
+            $xfer += $input->readString($this->text);
           } else {
             $xfer += $input->skip($ftype);
           }
           break;
         case 2:
           if ($ftype == TType::STRING) {
-            $xfer += $input->readString($this->text);
+            $xfer += $input->readString($this->language);
           } else {
             $xfer += $input->skip($ftype);
           }
           break;
         case 3:
           if ($ftype == TType::STRING) {
-            $xfer += $input->readString($this->language);
-          } else {
-            $xfer += $input->skip($ftype);
-          }
-          break;
-        case 4:
-          if ($ftype == TType::STRING) {
             $xfer += $input->readString($this->gender);
           } else {
             $xfer += $input->skip($ftype);
           }
           break;
-        case 5:
+        case 4:
           if ($ftype == TType::STRING) {
             $xfer += $input->readString($this->format);
           } else {
@@ -952,28 +1098,23 @@ class commsuite_CommSuite_ttsGetForTextLanguageGenderFormat_args {
   public function write($output) {
     $xfer = 0;
     $xfer += $output->writeStructBegin('CommSuite_ttsGetForTextLanguageGenderFormat_args');
-    if ($this->sessionid !== null) {
-      $xfer += $output->writeFieldBegin('sessionid', TType::STRING, 1);
-      $xfer += $output->writeString($this->sessionid);
-      $xfer += $output->writeFieldEnd();
-    }
     if ($this->text !== null) {
-      $xfer += $output->writeFieldBegin('text', TType::STRING, 2);
+      $xfer += $output->writeFieldBegin('text', TType::STRING, 1);
       $xfer += $output->writeString($this->text);
       $xfer += $output->writeFieldEnd();
     }
     if ($this->language !== null) {
-      $xfer += $output->writeFieldBegin('language', TType::STRING, 3);
+      $xfer += $output->writeFieldBegin('language', TType::STRING, 2);
       $xfer += $output->writeString($this->language);
       $xfer += $output->writeFieldEnd();
     }
     if ($this->gender !== null) {
-      $xfer += $output->writeFieldBegin('gender', TType::STRING, 4);
+      $xfer += $output->writeFieldBegin('gender', TType::STRING, 3);
       $xfer += $output->writeString($this->gender);
       $xfer += $output->writeFieldEnd();
     }
     if ($this->format !== null) {
-      $xfer += $output->writeFieldBegin('format', TType::STRING, 5);
+      $xfer += $output->writeFieldBegin('format', TType::STRING, 4);
       $xfer += $output->writeString($this->format);
       $xfer += $output->writeFieldEnd();
     }
@@ -988,6 +1129,7 @@ class commsuite_CommSuite_ttsGetForTextLanguageGenderFormat_result {
   static $_TSPEC;
 
   public $success = null;
+  public $nfe = null;
 
   public function __construct($vals=null) {
     if (!isset(self::$_TSPEC)) {
@@ -997,11 +1139,19 @@ class commsuite_CommSuite_ttsGetForTextLanguageGenderFormat_result {
           'type' => TType::STRUCT,
           'class' => 'commsuite_FileData',
           ),
+        1 => array(
+          'var' => 'nfe',
+          'type' => TType::STRUCT,
+          'class' => 'commsuite_NotFoundException',
+          ),
         );
     }
     if (is_array($vals)) {
       if (isset($vals['success'])) {
         $this->success = $vals['success'];
+      }
+      if (isset($vals['nfe'])) {
+        $this->nfe = $vals['nfe'];
       }
     }
   }
@@ -1033,6 +1183,14 @@ class commsuite_CommSuite_ttsGetForTextLanguageGenderFormat_result {
             $xfer += $input->skip($ftype);
           }
           break;
+        case 1:
+          if ($ftype == TType::STRUCT) {
+            $this->nfe = new commsuite_NotFoundException();
+            $xfer += $this->nfe->read($input);
+          } else {
+            $xfer += $input->skip($ftype);
+          }
+          break;
         default:
           $xfer += $input->skip($ftype);
           break;
@@ -1052,6 +1210,252 @@ class commsuite_CommSuite_ttsGetForTextLanguageGenderFormat_result {
       }
       $xfer += $output->writeFieldBegin('success', TType::STRUCT, 0);
       $xfer += $this->success->write($output);
+      $xfer += $output->writeFieldEnd();
+    }
+    if ($this->nfe !== null) {
+      $xfer += $output->writeFieldBegin('nfe', TType::STRUCT, 1);
+      $xfer += $this->nfe->write($output);
+      $xfer += $output->writeFieldEnd();
+    }
+    $xfer += $output->writeFieldStop();
+    $xfer += $output->writeStructEnd();
+    return $xfer;
+  }
+
+}
+
+class commsuite_CommSuite_phoneMessageGetMp3AudioFile_args {
+  static $_TSPEC;
+
+  public $sessionid = null;
+  public $parts = null;
+
+  public function __construct($vals=null) {
+    if (!isset(self::$_TSPEC)) {
+      self::$_TSPEC = array(
+        1 => array(
+          'var' => 'sessionid',
+          'type' => TType::STRING,
+          ),
+        2 => array(
+          'var' => 'parts',
+          'type' => TType::LST,
+          'etype' => TType::STRUCT,
+          'elem' => array(
+            'type' => TType::STRUCT,
+            'class' => 'commsuite_MessagePart',
+            ),
+          ),
+        );
+    }
+    if (is_array($vals)) {
+      if (isset($vals['sessionid'])) {
+        $this->sessionid = $vals['sessionid'];
+      }
+      if (isset($vals['parts'])) {
+        $this->parts = $vals['parts'];
+      }
+    }
+  }
+
+  public function getName() {
+    return 'CommSuite_phoneMessageGetMp3AudioFile_args';
+  }
+
+  public function read($input)
+  {
+    $xfer = 0;
+    $fname = null;
+    $ftype = 0;
+    $fid = 0;
+    $xfer += $input->readStructBegin($fname);
+    while (true)
+    {
+      $xfer += $input->readFieldBegin($fname, $ftype, $fid);
+      if ($ftype == TType::STOP) {
+        break;
+      }
+      switch ($fid)
+      {
+        case 1:
+          if ($ftype == TType::STRING) {
+            $xfer += $input->readString($this->sessionid);
+          } else {
+            $xfer += $input->skip($ftype);
+          }
+          break;
+        case 2:
+          if ($ftype == TType::LST) {
+            $this->parts = array();
+            $_size7 = 0;
+            $_etype10 = 0;
+            $xfer += $input->readListBegin($_etype10, $_size7);
+            for ($_i11 = 0; $_i11 < $_size7; ++$_i11)
+            {
+              $elem12 = null;
+              $elem12 = new commsuite_MessagePart();
+              $xfer += $elem12->read($input);
+              $this->parts []= $elem12;
+            }
+            $xfer += $input->readListEnd();
+          } else {
+            $xfer += $input->skip($ftype);
+          }
+          break;
+        default:
+          $xfer += $input->skip($ftype);
+          break;
+      }
+      $xfer += $input->readFieldEnd();
+    }
+    $xfer += $input->readStructEnd();
+    return $xfer;
+  }
+
+  public function write($output) {
+    $xfer = 0;
+    $xfer += $output->writeStructBegin('CommSuite_phoneMessageGetMp3AudioFile_args');
+    if ($this->sessionid !== null) {
+      $xfer += $output->writeFieldBegin('sessionid', TType::STRING, 1);
+      $xfer += $output->writeString($this->sessionid);
+      $xfer += $output->writeFieldEnd();
+    }
+    if ($this->parts !== null) {
+      if (!is_array($this->parts)) {
+        throw new TProtocolException('Bad type in structure.', TProtocolException::INVALID_DATA);
+      }
+      $xfer += $output->writeFieldBegin('parts', TType::LST, 2);
+      {
+        $output->writeListBegin(TType::STRUCT, count($this->parts));
+        {
+          foreach ($this->parts as $iter13)
+          {
+            $xfer += $iter13->write($output);
+          }
+        }
+        $output->writeListEnd();
+      }
+      $xfer += $output->writeFieldEnd();
+    }
+    $xfer += $output->writeFieldStop();
+    $xfer += $output->writeStructEnd();
+    return $xfer;
+  }
+
+}
+
+class commsuite_CommSuite_phoneMessageGetMp3AudioFile_result {
+  static $_TSPEC;
+
+  public $success = null;
+  public $sie = null;
+  public $nfe = null;
+
+  public function __construct($vals=null) {
+    if (!isset(self::$_TSPEC)) {
+      self::$_TSPEC = array(
+        0 => array(
+          'var' => 'success',
+          'type' => TType::STRUCT,
+          'class' => 'commsuite_FileData',
+          ),
+        1 => array(
+          'var' => 'sie',
+          'type' => TType::STRUCT,
+          'class' => 'commsuite_SessionInvalidException',
+          ),
+        2 => array(
+          'var' => 'nfe',
+          'type' => TType::STRUCT,
+          'class' => 'commsuite_NotFoundException',
+          ),
+        );
+    }
+    if (is_array($vals)) {
+      if (isset($vals['success'])) {
+        $this->success = $vals['success'];
+      }
+      if (isset($vals['sie'])) {
+        $this->sie = $vals['sie'];
+      }
+      if (isset($vals['nfe'])) {
+        $this->nfe = $vals['nfe'];
+      }
+    }
+  }
+
+  public function getName() {
+    return 'CommSuite_phoneMessageGetMp3AudioFile_result';
+  }
+
+  public function read($input)
+  {
+    $xfer = 0;
+    $fname = null;
+    $ftype = 0;
+    $fid = 0;
+    $xfer += $input->readStructBegin($fname);
+    while (true)
+    {
+      $xfer += $input->readFieldBegin($fname, $ftype, $fid);
+      if ($ftype == TType::STOP) {
+        break;
+      }
+      switch ($fid)
+      {
+        case 0:
+          if ($ftype == TType::STRUCT) {
+            $this->success = new commsuite_FileData();
+            $xfer += $this->success->read($input);
+          } else {
+            $xfer += $input->skip($ftype);
+          }
+          break;
+        case 1:
+          if ($ftype == TType::STRUCT) {
+            $this->sie = new commsuite_SessionInvalidException();
+            $xfer += $this->sie->read($input);
+          } else {
+            $xfer += $input->skip($ftype);
+          }
+          break;
+        case 2:
+          if ($ftype == TType::STRUCT) {
+            $this->nfe = new commsuite_NotFoundException();
+            $xfer += $this->nfe->read($input);
+          } else {
+            $xfer += $input->skip($ftype);
+          }
+          break;
+        default:
+          $xfer += $input->skip($ftype);
+          break;
+      }
+      $xfer += $input->readFieldEnd();
+    }
+    $xfer += $input->readStructEnd();
+    return $xfer;
+  }
+
+  public function write($output) {
+    $xfer = 0;
+    $xfer += $output->writeStructBegin('CommSuite_phoneMessageGetMp3AudioFile_result');
+    if ($this->success !== null) {
+      if (!is_object($this->success)) {
+        throw new TProtocolException('Bad type in structure.', TProtocolException::INVALID_DATA);
+      }
+      $xfer += $output->writeFieldBegin('success', TType::STRUCT, 0);
+      $xfer += $this->success->write($output);
+      $xfer += $output->writeFieldEnd();
+    }
+    if ($this->sie !== null) {
+      $xfer += $output->writeFieldBegin('sie', TType::STRUCT, 1);
+      $xfer += $this->sie->write($output);
+      $xfer += $output->writeFieldEnd();
+    }
+    if ($this->nfe !== null) {
+      $xfer += $output->writeFieldBegin('nfe', TType::STRUCT, 2);
+      $xfer += $this->nfe->write($output);
       $xfer += $output->writeFieldEnd();
     }
     $xfer += $output->writeFieldStop();

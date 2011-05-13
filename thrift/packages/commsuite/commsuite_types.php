@@ -7,11 +7,29 @@
 include_once $GLOBALS['THRIFT_ROOT'].'/Thrift.php';
 
 
+$GLOBALS['commsuite_E_MessagePartType'] = array(
+  'A' => 0,
+  'T' => 1,
+  'V' => 2,
+  'I' => 3,
+);
+
+final class commsuite_MessagePartType {
+  const A = 0;
+  const T = 1;
+  const V = 2;
+  const I = 3;
+  static public $__names = array(
+    0 => 'A',
+    1 => 'T',
+    2 => 'V',
+    3 => 'I',
+  );
+}
+
 class commsuite_EmailMessageView {
   static $_TSPEC;
 
-  public $type = null;
-  public $subtype = null;
   public $emailbody = null;
   public $emailsubject = null;
   public $emailfromname = null;
@@ -22,30 +40,22 @@ class commsuite_EmailMessageView {
     if (!isset(self::$_TSPEC)) {
       self::$_TSPEC = array(
         1 => array(
-          'var' => 'type',
-          'type' => TType::STRING,
-          ),
-        2 => array(
-          'var' => 'subtype',
-          'type' => TType::STRING,
-          ),
-        3 => array(
           'var' => 'emailbody',
           'type' => TType::STRING,
           ),
-        4 => array(
+        2 => array(
           'var' => 'emailsubject',
           'type' => TType::STRING,
           ),
-        5 => array(
+        3 => array(
           'var' => 'emailfromname',
           'type' => TType::STRING,
           ),
-        6 => array(
+        4 => array(
           'var' => 'emailfromaddress',
           'type' => TType::STRING,
           ),
-        7 => array(
+        5 => array(
           'var' => 'emailcontentids',
           'type' => TType::LST,
           'etype' => TType::I64,
@@ -56,12 +66,6 @@ class commsuite_EmailMessageView {
         );
     }
     if (is_array($vals)) {
-      if (isset($vals['type'])) {
-        $this->type = $vals['type'];
-      }
-      if (isset($vals['subtype'])) {
-        $this->subtype = $vals['subtype'];
-      }
       if (isset($vals['emailbody'])) {
         $this->emailbody = $vals['emailbody'];
       }
@@ -101,47 +105,33 @@ class commsuite_EmailMessageView {
       {
         case 1:
           if ($ftype == TType::STRING) {
-            $xfer += $input->readString($this->type);
+            $xfer += $input->readString($this->emailbody);
           } else {
             $xfer += $input->skip($ftype);
           }
           break;
         case 2:
           if ($ftype == TType::STRING) {
-            $xfer += $input->readString($this->subtype);
+            $xfer += $input->readString($this->emailsubject);
           } else {
             $xfer += $input->skip($ftype);
           }
           break;
         case 3:
           if ($ftype == TType::STRING) {
-            $xfer += $input->readString($this->emailbody);
+            $xfer += $input->readString($this->emailfromname);
           } else {
             $xfer += $input->skip($ftype);
           }
           break;
         case 4:
           if ($ftype == TType::STRING) {
-            $xfer += $input->readString($this->emailsubject);
-          } else {
-            $xfer += $input->skip($ftype);
-          }
-          break;
-        case 5:
-          if ($ftype == TType::STRING) {
-            $xfer += $input->readString($this->emailfromname);
-          } else {
-            $xfer += $input->skip($ftype);
-          }
-          break;
-        case 6:
-          if ($ftype == TType::STRING) {
             $xfer += $input->readString($this->emailfromaddress);
           } else {
             $xfer += $input->skip($ftype);
           }
           break;
-        case 7:
+        case 5:
           if ($ftype == TType::LST) {
             $this->emailcontentids = array();
             $_size0 = 0;
@@ -171,33 +161,23 @@ class commsuite_EmailMessageView {
   public function write($output) {
     $xfer = 0;
     $xfer += $output->writeStructBegin('EmailMessageView');
-    if ($this->type !== null) {
-      $xfer += $output->writeFieldBegin('type', TType::STRING, 1);
-      $xfer += $output->writeString($this->type);
-      $xfer += $output->writeFieldEnd();
-    }
-    if ($this->subtype !== null) {
-      $xfer += $output->writeFieldBegin('subtype', TType::STRING, 2);
-      $xfer += $output->writeString($this->subtype);
-      $xfer += $output->writeFieldEnd();
-    }
     if ($this->emailbody !== null) {
-      $xfer += $output->writeFieldBegin('emailbody', TType::STRING, 3);
+      $xfer += $output->writeFieldBegin('emailbody', TType::STRING, 1);
       $xfer += $output->writeString($this->emailbody);
       $xfer += $output->writeFieldEnd();
     }
     if ($this->emailsubject !== null) {
-      $xfer += $output->writeFieldBegin('emailsubject', TType::STRING, 4);
+      $xfer += $output->writeFieldBegin('emailsubject', TType::STRING, 2);
       $xfer += $output->writeString($this->emailsubject);
       $xfer += $output->writeFieldEnd();
     }
     if ($this->emailfromname !== null) {
-      $xfer += $output->writeFieldBegin('emailfromname', TType::STRING, 5);
+      $xfer += $output->writeFieldBegin('emailfromname', TType::STRING, 3);
       $xfer += $output->writeString($this->emailfromname);
       $xfer += $output->writeFieldEnd();
     }
     if ($this->emailfromaddress !== null) {
-      $xfer += $output->writeFieldBegin('emailfromaddress', TType::STRING, 6);
+      $xfer += $output->writeFieldBegin('emailfromaddress', TType::STRING, 4);
       $xfer += $output->writeString($this->emailfromaddress);
       $xfer += $output->writeFieldEnd();
     }
@@ -205,7 +185,7 @@ class commsuite_EmailMessageView {
       if (!is_array($this->emailcontentids)) {
         throw new TProtocolException('Bad type in structure.', TProtocolException::INVALID_DATA);
       }
-      $xfer += $output->writeFieldBegin('emailcontentids', TType::LST, 7);
+      $xfer += $output->writeFieldBegin('emailcontentids', TType::LST, 5);
       {
         $output->writeListBegin(TType::I64, count($this->emailcontentids));
         {
@@ -216,6 +196,350 @@ class commsuite_EmailMessageView {
         }
         $output->writeListEnd();
       }
+      $xfer += $output->writeFieldEnd();
+    }
+    $xfer += $output->writeFieldStop();
+    $xfer += $output->writeStructEnd();
+    return $xfer;
+  }
+
+}
+
+class commsuite_Message {
+  static $_TSPEC;
+
+  public $type = null;
+  public $subtype = null;
+  public $data = null;
+  public $languagecode = null;
+
+  public function __construct($vals=null) {
+    if (!isset(self::$_TSPEC)) {
+      self::$_TSPEC = array(
+        6 => array(
+          'var' => 'type',
+          'type' => TType::STRING,
+          ),
+        7 => array(
+          'var' => 'subtype',
+          'type' => TType::STRING,
+          ),
+        8 => array(
+          'var' => 'data',
+          'type' => TType::STRING,
+          ),
+        12 => array(
+          'var' => 'languagecode',
+          'type' => TType::STRING,
+          ),
+        );
+    }
+    if (is_array($vals)) {
+      if (isset($vals['type'])) {
+        $this->type = $vals['type'];
+      }
+      if (isset($vals['subtype'])) {
+        $this->subtype = $vals['subtype'];
+      }
+      if (isset($vals['data'])) {
+        $this->data = $vals['data'];
+      }
+      if (isset($vals['languagecode'])) {
+        $this->languagecode = $vals['languagecode'];
+      }
+    }
+  }
+
+  public function getName() {
+    return 'Message';
+  }
+
+  public function read($input)
+  {
+    $xfer = 0;
+    $fname = null;
+    $ftype = 0;
+    $fid = 0;
+    $xfer += $input->readStructBegin($fname);
+    while (true)
+    {
+      $xfer += $input->readFieldBegin($fname, $ftype, $fid);
+      if ($ftype == TType::STOP) {
+        break;
+      }
+      switch ($fid)
+      {
+        case 6:
+          if ($ftype == TType::STRING) {
+            $xfer += $input->readString($this->type);
+          } else {
+            $xfer += $input->skip($ftype);
+          }
+          break;
+        case 7:
+          if ($ftype == TType::STRING) {
+            $xfer += $input->readString($this->subtype);
+          } else {
+            $xfer += $input->skip($ftype);
+          }
+          break;
+        case 8:
+          if ($ftype == TType::STRING) {
+            $xfer += $input->readString($this->data);
+          } else {
+            $xfer += $input->skip($ftype);
+          }
+          break;
+        case 12:
+          if ($ftype == TType::STRING) {
+            $xfer += $input->readString($this->languagecode);
+          } else {
+            $xfer += $input->skip($ftype);
+          }
+          break;
+        default:
+          $xfer += $input->skip($ftype);
+          break;
+      }
+      $xfer += $input->readFieldEnd();
+    }
+    $xfer += $input->readStructEnd();
+    return $xfer;
+  }
+
+  public function write($output) {
+    $xfer = 0;
+    $xfer += $output->writeStructBegin('Message');
+    if ($this->type !== null) {
+      $xfer += $output->writeFieldBegin('type', TType::STRING, 6);
+      $xfer += $output->writeString($this->type);
+      $xfer += $output->writeFieldEnd();
+    }
+    if ($this->subtype !== null) {
+      $xfer += $output->writeFieldBegin('subtype', TType::STRING, 7);
+      $xfer += $output->writeString($this->subtype);
+      $xfer += $output->writeFieldEnd();
+    }
+    if ($this->data !== null) {
+      $xfer += $output->writeFieldBegin('data', TType::STRING, 8);
+      $xfer += $output->writeString($this->data);
+      $xfer += $output->writeFieldEnd();
+    }
+    if ($this->languagecode !== null) {
+      $xfer += $output->writeFieldBegin('languagecode', TType::STRING, 12);
+      $xfer += $output->writeString($this->languagecode);
+      $xfer += $output->writeFieldEnd();
+    }
+    $xfer += $output->writeFieldStop();
+    $xfer += $output->writeStructEnd();
+    return $xfer;
+  }
+
+}
+
+class commsuite_MessagePart {
+  static $_TSPEC;
+
+  public $messageid = null;
+  public $type = null;
+  public $contentid = null;
+  public $txt = null;
+  public $languagecode = null;
+  public $gender = null;
+  public $imagecontentid = null;
+  public $defaultvalue = null;
+
+  public function __construct($vals=null) {
+    if (!isset(self::$_TSPEC)) {
+      self::$_TSPEC = array(
+        1 => array(
+          'var' => 'messageid',
+          'type' => TType::STRING,
+          ),
+        2 => array(
+          'var' => 'type',
+          'type' => TType::I32,
+          ),
+        3 => array(
+          'var' => 'contentid',
+          'type' => TType::I64,
+          ),
+        4 => array(
+          'var' => 'txt',
+          'type' => TType::STRING,
+          ),
+        6 => array(
+          'var' => 'languagecode',
+          'type' => TType::STRING,
+          ),
+        7 => array(
+          'var' => 'gender',
+          'type' => TType::STRING,
+          ),
+        8 => array(
+          'var' => 'imagecontentid',
+          'type' => TType::I64,
+          ),
+        9 => array(
+          'var' => 'defaultvalue',
+          'type' => TType::STRING,
+          ),
+        );
+    }
+    if (is_array($vals)) {
+      if (isset($vals['messageid'])) {
+        $this->messageid = $vals['messageid'];
+      }
+      if (isset($vals['type'])) {
+        $this->type = $vals['type'];
+      }
+      if (isset($vals['contentid'])) {
+        $this->contentid = $vals['contentid'];
+      }
+      if (isset($vals['txt'])) {
+        $this->txt = $vals['txt'];
+      }
+      if (isset($vals['languagecode'])) {
+        $this->languagecode = $vals['languagecode'];
+      }
+      if (isset($vals['gender'])) {
+        $this->gender = $vals['gender'];
+      }
+      if (isset($vals['imagecontentid'])) {
+        $this->imagecontentid = $vals['imagecontentid'];
+      }
+      if (isset($vals['defaultvalue'])) {
+        $this->defaultvalue = $vals['defaultvalue'];
+      }
+    }
+  }
+
+  public function getName() {
+    return 'MessagePart';
+  }
+
+  public function read($input)
+  {
+    $xfer = 0;
+    $fname = null;
+    $ftype = 0;
+    $fid = 0;
+    $xfer += $input->readStructBegin($fname);
+    while (true)
+    {
+      $xfer += $input->readFieldBegin($fname, $ftype, $fid);
+      if ($ftype == TType::STOP) {
+        break;
+      }
+      switch ($fid)
+      {
+        case 1:
+          if ($ftype == TType::STRING) {
+            $xfer += $input->readString($this->messageid);
+          } else {
+            $xfer += $input->skip($ftype);
+          }
+          break;
+        case 2:
+          if ($ftype == TType::I32) {
+            $xfer += $input->readI32($this->type);
+          } else {
+            $xfer += $input->skip($ftype);
+          }
+          break;
+        case 3:
+          if ($ftype == TType::I64) {
+            $xfer += $input->readI64($this->contentid);
+          } else {
+            $xfer += $input->skip($ftype);
+          }
+          break;
+        case 4:
+          if ($ftype == TType::STRING) {
+            $xfer += $input->readString($this->txt);
+          } else {
+            $xfer += $input->skip($ftype);
+          }
+          break;
+        case 6:
+          if ($ftype == TType::STRING) {
+            $xfer += $input->readString($this->languagecode);
+          } else {
+            $xfer += $input->skip($ftype);
+          }
+          break;
+        case 7:
+          if ($ftype == TType::STRING) {
+            $xfer += $input->readString($this->gender);
+          } else {
+            $xfer += $input->skip($ftype);
+          }
+          break;
+        case 8:
+          if ($ftype == TType::I64) {
+            $xfer += $input->readI64($this->imagecontentid);
+          } else {
+            $xfer += $input->skip($ftype);
+          }
+          break;
+        case 9:
+          if ($ftype == TType::STRING) {
+            $xfer += $input->readString($this->defaultvalue);
+          } else {
+            $xfer += $input->skip($ftype);
+          }
+          break;
+        default:
+          $xfer += $input->skip($ftype);
+          break;
+      }
+      $xfer += $input->readFieldEnd();
+    }
+    $xfer += $input->readStructEnd();
+    return $xfer;
+  }
+
+  public function write($output) {
+    $xfer = 0;
+    $xfer += $output->writeStructBegin('MessagePart');
+    if ($this->messageid !== null) {
+      $xfer += $output->writeFieldBegin('messageid', TType::STRING, 1);
+      $xfer += $output->writeString($this->messageid);
+      $xfer += $output->writeFieldEnd();
+    }
+    if ($this->type !== null) {
+      $xfer += $output->writeFieldBegin('type', TType::I32, 2);
+      $xfer += $output->writeI32($this->type);
+      $xfer += $output->writeFieldEnd();
+    }
+    if ($this->contentid !== null) {
+      $xfer += $output->writeFieldBegin('contentid', TType::I64, 3);
+      $xfer += $output->writeI64($this->contentid);
+      $xfer += $output->writeFieldEnd();
+    }
+    if ($this->txt !== null) {
+      $xfer += $output->writeFieldBegin('txt', TType::STRING, 4);
+      $xfer += $output->writeString($this->txt);
+      $xfer += $output->writeFieldEnd();
+    }
+    if ($this->languagecode !== null) {
+      $xfer += $output->writeFieldBegin('languagecode', TType::STRING, 6);
+      $xfer += $output->writeString($this->languagecode);
+      $xfer += $output->writeFieldEnd();
+    }
+    if ($this->gender !== null) {
+      $xfer += $output->writeFieldBegin('gender', TType::STRING, 7);
+      $xfer += $output->writeString($this->gender);
+      $xfer += $output->writeFieldEnd();
+    }
+    if ($this->imagecontentid !== null) {
+      $xfer += $output->writeFieldBegin('imagecontentid', TType::I64, 8);
+      $xfer += $output->writeI64($this->imagecontentid);
+      $xfer += $output->writeFieldEnd();
+    }
+    if ($this->defaultvalue !== null) {
+      $xfer += $output->writeFieldBegin('defaultvalue', TType::STRING, 9);
+      $xfer += $output->writeString($this->defaultvalue);
       $xfer += $output->writeFieldEnd();
     }
     $xfer += $output->writeFieldStop();
@@ -310,6 +634,106 @@ class commsuite_FileData {
       $xfer += $output->writeString($this->data);
       $xfer += $output->writeFieldEnd();
     }
+    $xfer += $output->writeFieldStop();
+    $xfer += $output->writeStructEnd();
+    return $xfer;
+  }
+
+}
+
+class commsuite_SessionInvalidException extends TException {
+  static $_TSPEC;
+
+
+  public function __construct() {
+    if (!isset(self::$_TSPEC)) {
+      self::$_TSPEC = array(
+        );
+    }
+  }
+
+  public function getName() {
+    return 'SessionInvalidException';
+  }
+
+  public function read($input)
+  {
+    $xfer = 0;
+    $fname = null;
+    $ftype = 0;
+    $fid = 0;
+    $xfer += $input->readStructBegin($fname);
+    while (true)
+    {
+      $xfer += $input->readFieldBegin($fname, $ftype, $fid);
+      if ($ftype == TType::STOP) {
+        break;
+      }
+      switch ($fid)
+      {
+        default:
+          $xfer += $input->skip($ftype);
+          break;
+      }
+      $xfer += $input->readFieldEnd();
+    }
+    $xfer += $input->readStructEnd();
+    return $xfer;
+  }
+
+  public function write($output) {
+    $xfer = 0;
+    $xfer += $output->writeStructBegin('SessionInvalidException');
+    $xfer += $output->writeFieldStop();
+    $xfer += $output->writeStructEnd();
+    return $xfer;
+  }
+
+}
+
+class commsuite_NotFoundException extends TException {
+  static $_TSPEC;
+
+
+  public function __construct() {
+    if (!isset(self::$_TSPEC)) {
+      self::$_TSPEC = array(
+        );
+    }
+  }
+
+  public function getName() {
+    return 'NotFoundException';
+  }
+
+  public function read($input)
+  {
+    $xfer = 0;
+    $fname = null;
+    $ftype = 0;
+    $fid = 0;
+    $xfer += $input->readStructBegin($fname);
+    while (true)
+    {
+      $xfer += $input->readFieldBegin($fname, $ftype, $fid);
+      if ($ftype == TType::STOP) {
+        break;
+      }
+      switch ($fid)
+      {
+        default:
+          $xfer += $input->skip($ftype);
+          break;
+      }
+      $xfer += $input->readFieldEnd();
+    }
+    $xfer += $input->readStructEnd();
+    return $xfer;
+  }
+
+  public function write($output) {
+    $xfer = 0;
+    $xfer += $output->writeStructBegin('NotFoundException');
     $xfer += $output->writeFieldStop();
     $xfer += $output->writeStructEnd();
     return $xfer;
