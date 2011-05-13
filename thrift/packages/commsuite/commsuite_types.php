@@ -7,14 +7,14 @@
 include_once $GLOBALS['THRIFT_ROOT'].'/Thrift.php';
 
 
-$GLOBALS['commsuite_E_MessagePartType'] = array(
+$GLOBALS['commsuite_E_MessagePartTypeDTO'] = array(
   'A' => 0,
   'T' => 1,
   'V' => 2,
   'I' => 3,
 );
 
-final class commsuite_MessagePartType {
+final class commsuite_MessagePartTypeDTO {
   const A = 0;
   const T = 1;
   const V = 2;
@@ -205,7 +205,7 @@ class commsuite_EmailMessageView {
 
 }
 
-class commsuite_Message {
+class commsuite_MessageDTO {
   static $_TSPEC;
 
   public $type = null;
@@ -216,19 +216,19 @@ class commsuite_Message {
   public function __construct($vals=null) {
     if (!isset(self::$_TSPEC)) {
       self::$_TSPEC = array(
-        6 => array(
+        1 => array(
           'var' => 'type',
           'type' => TType::STRING,
           ),
-        7 => array(
+        2 => array(
           'var' => 'subtype',
           'type' => TType::STRING,
           ),
-        8 => array(
+        3 => array(
           'var' => 'data',
           'type' => TType::STRING,
           ),
-        12 => array(
+        4 => array(
           'var' => 'languagecode',
           'type' => TType::STRING,
           ),
@@ -251,7 +251,7 @@ class commsuite_Message {
   }
 
   public function getName() {
-    return 'Message';
+    return 'MessageDTO';
   }
 
   public function read($input)
@@ -269,28 +269,28 @@ class commsuite_Message {
       }
       switch ($fid)
       {
-        case 6:
+        case 1:
           if ($ftype == TType::STRING) {
             $xfer += $input->readString($this->type);
           } else {
             $xfer += $input->skip($ftype);
           }
           break;
-        case 7:
+        case 2:
           if ($ftype == TType::STRING) {
             $xfer += $input->readString($this->subtype);
           } else {
             $xfer += $input->skip($ftype);
           }
           break;
-        case 8:
+        case 3:
           if ($ftype == TType::STRING) {
             $xfer += $input->readString($this->data);
           } else {
             $xfer += $input->skip($ftype);
           }
           break;
-        case 12:
+        case 4:
           if ($ftype == TType::STRING) {
             $xfer += $input->readString($this->languagecode);
           } else {
@@ -309,24 +309,24 @@ class commsuite_Message {
 
   public function write($output) {
     $xfer = 0;
-    $xfer += $output->writeStructBegin('Message');
+    $xfer += $output->writeStructBegin('MessageDTO');
     if ($this->type !== null) {
-      $xfer += $output->writeFieldBegin('type', TType::STRING, 6);
+      $xfer += $output->writeFieldBegin('type', TType::STRING, 1);
       $xfer += $output->writeString($this->type);
       $xfer += $output->writeFieldEnd();
     }
     if ($this->subtype !== null) {
-      $xfer += $output->writeFieldBegin('subtype', TType::STRING, 7);
+      $xfer += $output->writeFieldBegin('subtype', TType::STRING, 2);
       $xfer += $output->writeString($this->subtype);
       $xfer += $output->writeFieldEnd();
     }
     if ($this->data !== null) {
-      $xfer += $output->writeFieldBegin('data', TType::STRING, 8);
+      $xfer += $output->writeFieldBegin('data', TType::STRING, 3);
       $xfer += $output->writeString($this->data);
       $xfer += $output->writeFieldEnd();
     }
     if ($this->languagecode !== null) {
-      $xfer += $output->writeFieldBegin('languagecode', TType::STRING, 12);
+      $xfer += $output->writeFieldBegin('languagecode', TType::STRING, 4);
       $xfer += $output->writeString($this->languagecode);
       $xfer += $output->writeFieldEnd();
     }
@@ -337,17 +337,17 @@ class commsuite_Message {
 
 }
 
-class commsuite_MessagePart {
+class commsuite_MessagePartDTO {
   static $_TSPEC;
 
   public $messageid = null;
   public $type = null;
   public $contentid = null;
   public $txt = null;
+  public $fieldnum = null;
+  public $defaultvalue = null;
   public $languagecode = null;
   public $gender = null;
-  public $imagecontentid = null;
-  public $defaultvalue = null;
 
   public function __construct($vals=null) {
     if (!isset(self::$_TSPEC)) {
@@ -369,19 +369,19 @@ class commsuite_MessagePart {
           'type' => TType::STRING,
           ),
         6 => array(
-          'var' => 'languagecode',
+          'var' => 'fieldnum',
           'type' => TType::STRING,
           ),
         7 => array(
-          'var' => 'gender',
+          'var' => 'defaultvalue',
           'type' => TType::STRING,
           ),
         8 => array(
-          'var' => 'imagecontentid',
-          'type' => TType::I64,
+          'var' => 'languagecode',
+          'type' => TType::STRING,
           ),
         9 => array(
-          'var' => 'defaultvalue',
+          'var' => 'gender',
           'type' => TType::STRING,
           ),
         );
@@ -399,23 +399,23 @@ class commsuite_MessagePart {
       if (isset($vals['txt'])) {
         $this->txt = $vals['txt'];
       }
+      if (isset($vals['fieldnum'])) {
+        $this->fieldnum = $vals['fieldnum'];
+      }
+      if (isset($vals['defaultvalue'])) {
+        $this->defaultvalue = $vals['defaultvalue'];
+      }
       if (isset($vals['languagecode'])) {
         $this->languagecode = $vals['languagecode'];
       }
       if (isset($vals['gender'])) {
         $this->gender = $vals['gender'];
       }
-      if (isset($vals['imagecontentid'])) {
-        $this->imagecontentid = $vals['imagecontentid'];
-      }
-      if (isset($vals['defaultvalue'])) {
-        $this->defaultvalue = $vals['defaultvalue'];
-      }
     }
   }
 
   public function getName() {
-    return 'MessagePart';
+    return 'MessagePartDTO';
   }
 
   public function read($input)
@@ -463,28 +463,28 @@ class commsuite_MessagePart {
           break;
         case 6:
           if ($ftype == TType::STRING) {
-            $xfer += $input->readString($this->languagecode);
+            $xfer += $input->readString($this->fieldnum);
           } else {
             $xfer += $input->skip($ftype);
           }
           break;
         case 7:
           if ($ftype == TType::STRING) {
-            $xfer += $input->readString($this->gender);
+            $xfer += $input->readString($this->defaultvalue);
           } else {
             $xfer += $input->skip($ftype);
           }
           break;
         case 8:
-          if ($ftype == TType::I64) {
-            $xfer += $input->readI64($this->imagecontentid);
+          if ($ftype == TType::STRING) {
+            $xfer += $input->readString($this->languagecode);
           } else {
             $xfer += $input->skip($ftype);
           }
           break;
         case 9:
           if ($ftype == TType::STRING) {
-            $xfer += $input->readString($this->defaultvalue);
+            $xfer += $input->readString($this->gender);
           } else {
             $xfer += $input->skip($ftype);
           }
@@ -501,7 +501,7 @@ class commsuite_MessagePart {
 
   public function write($output) {
     $xfer = 0;
-    $xfer += $output->writeStructBegin('MessagePart');
+    $xfer += $output->writeStructBegin('MessagePartDTO');
     if ($this->messageid !== null) {
       $xfer += $output->writeFieldBegin('messageid', TType::STRING, 1);
       $xfer += $output->writeString($this->messageid);
@@ -522,24 +522,24 @@ class commsuite_MessagePart {
       $xfer += $output->writeString($this->txt);
       $xfer += $output->writeFieldEnd();
     }
+    if ($this->fieldnum !== null) {
+      $xfer += $output->writeFieldBegin('fieldnum', TType::STRING, 6);
+      $xfer += $output->writeString($this->fieldnum);
+      $xfer += $output->writeFieldEnd();
+    }
+    if ($this->defaultvalue !== null) {
+      $xfer += $output->writeFieldBegin('defaultvalue', TType::STRING, 7);
+      $xfer += $output->writeString($this->defaultvalue);
+      $xfer += $output->writeFieldEnd();
+    }
     if ($this->languagecode !== null) {
-      $xfer += $output->writeFieldBegin('languagecode', TType::STRING, 6);
+      $xfer += $output->writeFieldBegin('languagecode', TType::STRING, 8);
       $xfer += $output->writeString($this->languagecode);
       $xfer += $output->writeFieldEnd();
     }
     if ($this->gender !== null) {
-      $xfer += $output->writeFieldBegin('gender', TType::STRING, 7);
+      $xfer += $output->writeFieldBegin('gender', TType::STRING, 9);
       $xfer += $output->writeString($this->gender);
-      $xfer += $output->writeFieldEnd();
-    }
-    if ($this->imagecontentid !== null) {
-      $xfer += $output->writeFieldBegin('imagecontentid', TType::I64, 8);
-      $xfer += $output->writeI64($this->imagecontentid);
-      $xfer += $output->writeFieldEnd();
-    }
-    if ($this->defaultvalue !== null) {
-      $xfer += $output->writeFieldBegin('defaultvalue', TType::STRING, 9);
-      $xfer += $output->writeString($this->defaultvalue);
       $xfer += $output->writeFieldEnd();
     }
     $xfer += $output->writeFieldStop();
