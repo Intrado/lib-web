@@ -21,42 +21,18 @@ require_once("obj/EmailAttach.fi.php");
 require_once($GLOBALS['THRIFT_ROOT'].'/packages/commsuite/CommSuite.php');
 
 
-// Generate a phone item from either message id or session data
-function playFormItem($hasdata, $messageid = false) {
-	$requestvaiables = ($messageid)?"id=$messageid":(isset($_SESSION['ttstext'])?"usetext=true":"blank=true");	
-	return array(
-		"label" => "",
-		"control" => array("FormHtml","html" =>
-			($hasdata?submit_button(_L('Play with Field(s)'),"submit","fugue/control"):'') . '
-			<div id="messageresultdiv" name="messageresultdiv"></div>
-			<div id="messagepreviewdiv" name="messagepreviewdiv">
-				<div align="center" style="clear:left">
-					<div id="player"></div>' .
-					($hasdata?'':'<script language="JavaScript" type="text/javascript">
-										embedPlayer("preview.wav.php/embed_preview.wav?' . $requestvaiables . '","player");
-									</script>') .
-					'<div id="download">' . ($hasdata?'':'<a href="preview.wav.php/download_preview.wav?' . $requestvaiables . '&download=true" onclick="sessiondata=false;">' . _L("Click here to download") . '</a>') .
-					'</div>
-				</div>
-			</div>
-		'),
-		"fieldhelp" => "",
-		"renderoptions" => array("icon" => false, "label" => false, "errormessage" => false),
-		"helpstep" => 1
-	);
-}
-
 if (isset($_GET['unloadsession'])) {
-	unset($_SESSION['ttstext']);
-	unset($_SESSION['ttsgender']);
-	unset($_SESSION['ttslanguage']);
+	unset($_SESSION["previewmessage"]);
 	exit();
 }
 
 
 $messageformdata = array();
 $message = null;
-
+$fields = array();
+$parts = null;
+$hasdata = false;
+$msgtype = "";
 if (isset($_GET['id'])) {	
 	$message = new Message($_GET['id']);
 	// Make sure that the user is autherized to view this message
@@ -66,6 +42,8 @@ if (isset($_GET['id'])) {
 		redirect('unauthorized.php');
 		exit();
 	}
+	
+	$msgtype = $message->type;
 	$parts = DBFindMany('MessagePart', 'from messagepart where messageid=? order by sequence', false, array($message->id));
 	//$messageformdata = array();
 	$messagetext = "";
@@ -117,7 +95,12 @@ if (isset($_GET['id'])) {
 			
 			$messageformdata += getpreviewformdata($fields,$fielddata,$fielddefaults,"phone");
 			$hasdata = count($messageformdata) > 0;
-			$messageformdata[] = playFormItem($hasdata,$message->id);
+			
+			if (!$hasdata) {
+				$uid = uniqid();
+				//error_log(json_encode(array_values(cleanObjects($parts))));
+				$_SESSION["previewmessage"] = array("uid" => $uid, "parts" => array_values($parts));
+			}
 		}
 		
 		if ($message->type == 'translated') {
@@ -132,79 +115,51 @@ if (isset($_GET['id'])) {
 			);
 		}
 	}
-} else if($_SESSION['ttstext']) {
-		//load all audiofileids for this messagegroup, should be OK since only way to preview via text parse is inside MG editor
-	$audiofileids = null;
-	if (isset($_SESSION['messagegroupid']))
-		$audiofileids = MessageGroup::getReferencedAudioFileIDs($_SESSION['messagegroupid']);
-	else
-		error_log("ERROR: preview.wav.php called on text with no messagegroupid");
-	
-	$parts = Message::parse($_SESSION['ttstext'],$errors,1,$audiofileids);
-	$fieldnums = array();
-	$fielddefaults = array();
-	
-	foreach($parts as $part) {
-		if(isset($part->fieldnum)) {
-			$fieldnums[] = $part->fieldnum;
-			$fielddefaults[$part->fieldnum] = $part->defaultvalue;
-		}
-	}	
-	
-	$messagefields = DBFindMany("FieldMap", "from fieldmap where fieldnum in ('" . implode("','",$fieldnums) .  "')");
-	
-	$fields = array();
-	$fielddata = array();
-	
-	foreach ($messagefields as $fieldmap) {		
-		$fields[$fieldmap->fieldnum] = $fieldmap;
-		if ($fieldmap->isOptionEnabled("multisearch")) {
-			$limit = DBFind('Rule', "from rule r inner join userassociation ua on r.id = ua.ruleid where ua.userid=? and type = 'rule' and r.fieldnum=?", "r", array($USER->id, $fieldmap->fieldnum));
-			$limitsql = $limit ? $limit->toSQL(false, 'value', false, true) : '';
-			$fielddata[$fieldmap->fieldnum] = QuickQueryList("select value,value from persondatavalues where fieldnum=? $limitsql order by value limit 5000", true, false, array($fieldmap->fieldnum));
-		}
-	}
-	
-	$messageformdata += getpreviewformdata($fields,$fielddata,$fielddefaults,"phone");
-	$hasdata = count($messageformdata) > 0;
-	$messageformdata[] = playFormItem($hasdata);
-} else {
+} 
+//else if($_SESSION['ttstext']) {
+//		//load all audiofileids for this messagegroup, should be OK since only way to preview via text parse is inside MG editor
+//	$audiofileids = null;
+//	if (isset($_SESSION['messagegroupid']))
+//		$audiofileids = MessageGroup::getReferencedAudioFileIDs($_SESSION['messagegroupid']);
+//	else
+//		error_log("ERROR: preview.wav.php called on text with no messagegroupid");
+//	
+//	$parts = Message::parse($_SESSION['ttstext'],$errors,1,$audiofileids);
+//	$fieldnums = array();
+//	$fielddefaults = array();
+//	
+//	foreach($parts as $part) {
+//		if(isset($part->fieldnum)) {
+//			$fieldnums[] = $part->fieldnum;
+//			$fielddefaults[$part->fieldnum] = $part->defaultvalue;
+//		}
+//	}	
+//	
+//	$messagefields = DBFindMany("FieldMap", "from fieldmap where fieldnum in ('" . implode("','",$fieldnums) .  "')");
+//	
+//	$fielddata = array();
+//	
+//	foreach ($messagefields as $fieldmap) {
+//		$fields[$fieldmap->fieldnum] = $fieldmap;
+//		if ($fieldmap->isOptionEnabled("multisearch")) {
+//			$limit = DBFind('Rule', "from rule r inner join userassociation ua on r.id = ua.ruleid where ua.userid=? and type = 'rule' and r.fieldnum=?", "r", array($USER->id, $fieldmap->fieldnum));
+//			$limitsql = $limit ? $limit->toSQL(false, 'value', false, true) : '';
+//			$fielddata[$fieldmap->fieldnum] = QuickQueryList("select value,value from persondatavalues where fieldnum=? $limitsql order by value limit 5000", true, false, array($fieldmap->fieldnum));
+//		}
+//	}
+//	
+//	$messageformdata += getpreviewformdata($fields,$fielddata,$fielddefaults,"phone");
+//	$hasdata = count($messageformdata) > 0;
+//} 
+else {
 	redirect('unauthorized.php');
 }
 
 
-$form = new Form("messagegroupedit",$messageformdata,null,array(""));
+$form = new Form("messagefields",$messageformdata,null,array(""));
 ////////////////////////////////////////////////////////////////////////////////
 // Form Data Handling
 ////////////////////////////////////////////////////////////////////////////////
-
-//check and handle an ajax request (will exit early)
-//or merge in related post data
-$form->handleRequest();
-//check for form submission
-
-if ($button = $form->getSubmit()) {
-	$ajax = $form->isAjaxSubmit();
-	if (!$form->checkForDataChange() && $form->validate() === false) {
-		$postdata = $form->getData();
-		$previewdata = "";
-		foreach ($postdata as $field => $value) {
-			$previewdata .= "&$field=" . urlencode($value);
-		}
-		
-		$requestvaiables = (isset($_GET['id']))?"id=$message->id":(isset($_SESSION['ttstext'])?"usetext=true":"blank=true");	
-		
-		$form->modifyElement("messageresultdiv", '
-				<script language="JavaScript" type="text/javascript">
-					embedPlayer("preview.wav.php/embed_preview.wav?' . $requestvaiables . $previewdata. '","player");
-					$("download").update(\'<a href="preview.wav.php/download_preview.wav?'  . $requestvaiables .  $previewdata . '&download=true" onclick="sessiondata=false;">' . _L("Click here to download") . '</a>\');
-				</script>');
-		return;
-	}
-}
-
-
-
 
 $PAGE = "notifications:messages";
 $TITLE = _L('Message Viewer');
@@ -215,6 +170,33 @@ echo '<br/>';
 
 ?>
 <script type="text/javascript" language="javascript" src="script/niftyplayer.js.php"></script>
+<script>
+function scrapeform() {
+	var parts = $A(<?= json_encode(array_values(cleanObjects($parts)))?>);
+	parts.each(function(part) {
+		if (part.type == "V") {
+			part.type = "T";
+			var id = 'messagefields_' + part.fieldnum;
+			if ($(id) && $(id).value)
+				part.txt = $(id).value;
+			else
+				part.txt = part.defaultvalue;
+			part.fieldnum = null;
+		}
+	});
+	new Ajax.Request("ajaxpreviewmessage.php", {
+		method:"post",
+		parameters: {message: parts.toJSON()},
+		onSuccess: function(transport) {
+			var uid = transport.responseJSON;
+			if(uid == false) {
+				return;
+			}
+			embedPlayer("previewaudio.mp3.php?uid=" + uid,"player",<?= count($parts)?>);
+		}
+	});
+}
+</script>
 
 <?
 
@@ -226,6 +208,16 @@ if ($message) {
 }
 startWindow($windowtitle);
 echo $form->render();
+
+if ($msgtype == "phone") {
+	echo "<div id='player'></div>";
+	if ($hasdata) {
+		echo icon_button(_L('Play with Field(s)'), "fugue/control","scrapeform()", null);
+	} else {
+		echo "<script>embedPlayer('previewaudio.mp3.php?uid=$uid','player'," . count($parts) . ");</script>";
+	}
+	
+}
 endWindow();
 
 
