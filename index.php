@@ -171,7 +171,7 @@ if ($IS_COMMSUITE) {
 <? }  ?>
 		
 		<label class="indexform"><?=_L("Login:")?><br>
-		<input type="text" name="login" size="20" id="logintext">
+		<input type="text" name="login" size="20" maxlength="20" id="logintext">
 		</label>
 		
 		<br>
