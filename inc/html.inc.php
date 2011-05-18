@@ -44,7 +44,7 @@ function action_link ($title, $icon, $href = "#", $onclick = null) {
 	$onclick = $onclick == null ? "" : 'onclick="'.$onclick.'"';
 	$str = '<a href="'.$href.'" '.$onclick.' class="actionlink" title="'.escapehtml($title).'">';
 	if ($actionlinkmode == "both" || $actionlinkmode == "icons")
-		$str .= '<img src="img/icons/'.$icon.'.gif" alt="'.escapehtml($title).'">';
+		$str .= '<img src="img/icons/'.$icon.'.png" alt="'.escapehtml($title).'">';
 	if ($actionlinkmode == "both" || $actionlinkmode == "text")
 		$str .= escapehtml($title);
 	$str .= '</a>';
