@@ -40,7 +40,6 @@ require_once("obj/ListEntry.obj.php");
 require_once("obj/Sms.obj.php");
 require_once("obj/Content.obj.php");
 require_once("inc/reportgeneratorutils.inc.php");
-require_once("inc/auth.inc.php");
 require_once("obj/MessageGroup.obj.php");
 require_once("obj/MessageGroupSelectMenu.fi.php");
 require_once("obj/ValLists.val.php");
