@@ -16,6 +16,7 @@ apache_note("CS_CUST",urlencode($CUSTOMERURL)); //for logging
 
 require_once("XML/RPC.php");
 require_once("inc/auth.inc.php");
+require_once("inc/utils.inc.php");
 
 
 $map = getCustomerLoginPicture($CUSTOMERURL);
