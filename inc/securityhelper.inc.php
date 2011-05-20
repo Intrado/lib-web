@@ -1,4 +1,26 @@
 <?
+//same algorithm used in authserver
+function calculatePasswordHash($rawPassword,$salt) {
+	$hash_iterations = 5000;
+	
+	//we assume the password and salt are in utf-8 format
+	$ctx = hash_init('sha256');
+	
+	hash_update($ctx, $rawPassword);
+	hash_update($ctx, $salt);
+	
+	$hash = hash_final($ctx, true);
+	
+	//perform any additional iterations
+	for ($i = 1; $i < $hash_iterations; $i++) {
+		$ctx = hash_init('sha256');
+		hash_update($ctx, $hash);
+		$hash = hash_final($ctx, true);
+	}
+	
+	return base64_encode($hash);	
+}
+
 
 //most functions require DBSafe first!
 
