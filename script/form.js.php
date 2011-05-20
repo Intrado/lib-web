@@ -606,6 +606,9 @@ function form_handle_submit(form,event) {
 					window.location=formvars.scriptname;
 				}
 			} else if ("success" == res.status) {
+				//fire off a AjaxForm:SubmitSuccess event, and if it isn't stopped, go to the nexturl
+				//a form could return a res with no nexturl, and listen for the event to do something unusual
+				//FIXME this should be res.status == "fireevent" or something (with some user data)
 				if (!form.fire('AjaxForm:SubmitSuccess', res).stopped && res.nexturl)
 					window.location=res.nexturl;
 			} else if ("modify" == res.status) {
