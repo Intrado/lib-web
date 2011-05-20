@@ -1743,7 +1743,7 @@ returns:
     		<wsdl:output message="sm:getImportsResponse"></wsdl:output>
     	</wsdl:operation>
     	<wsdl:operation name="uploadImport">
-    		<wsdl:documentation>Uploads the base64 encoded data to the specified import. If the import is set to automatically run, it will.</wsdl:documentation>
+    		<wsdl:documentation>Uploads the base64 encoded data to the specified import.</wsdl:documentation>
     		<wsdl:input message="sm:uploadImportRequest"></wsdl:input>
     		<wsdl:output message="sm:uploadImportResponse"></wsdl:output>
     	</wsdl:operation>
