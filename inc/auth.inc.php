@@ -23,6 +23,7 @@ function pearxmlrpc($method, $params, $returndata = false) {
 			return $data;
 		} else if ($data['result'] == "warning") {
 			// warning we do not log, but handle like failure
+			error_log($method . " " .$data['result']);
 		} else {
 			// error
 			error_log($method . " " .$data['result']);
@@ -165,6 +166,8 @@ function getSessionData($id) {
 		// success
 		$sess_data = base64url_decode($result['sessionData']);
 		if (doDBConnect($result)) return $sess_data;
+	} else {
+		error_log_helper("ERROR trying to getSessionData for '$id'");
 	}
 	return "";
 }
@@ -175,8 +178,12 @@ function putSessionData($id, $sess_data) {
 	$params = array(new XML_RPC_Value($id, 'string'), new XML_RPC_Value($sess_data, 'string'));
 	$method = "AuthServer.putSessionData";
 	$result = pearxmlrpc($method, $params);
-	if ($result !== false) return true;
-	return false;
+	if ($result === false) { 
+		error_log_helper("ERROR trying to putSessionData for '$id'");
+		return false;
+	} else {
+		return true;
+	}
 }
 
 function doStartSession() {
