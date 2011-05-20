@@ -169,11 +169,11 @@ function getJobList($startdate, $enddate, $jobtypes = "", $surveyonly = "", $del
 	$deliveryquery = " ";
 	$surveydeliveryquery = "";
 	if("phone" == $deliverymethod){
-		$deliveryquery = " and (m.type='phone' OR sq.hasphone != '0' )";
+		$deliveryquery = " and (exists (select * from message m where m.messagegroupid = j.messagegroupid and m.type='phone') OR exists (select * from surveyquestionnaire sq where sq.id = j.questionnaireid and sq.hasphone != '0')) ";
 	} else if("email" == $deliverymethod) {
-		$deliveryquery = " and (m.type='email' OR sq.hasweb != '0' )";
+		$deliveryquery = " and (exists (select * from message m where m.messagegroupid = j.messagegroupid and m.type='email') OR exists (select * from surveyquestionnaire sq where sq.id = j.questionnaireid and sq.hasweb != '0')) ";
 	} else if("sms" == $deliverymethod) {
-		$deliveryquery = " and (m.type='sms' )";
+		$deliveryquery = " and (exists (select * from message m where m.messagegroupid = j.messagegroupid and m.type='sms')) ";
 	}
 	$surveyfilter = "";
 	if($surveyonly == "true"){
@@ -187,9 +187,7 @@ function getJobList($startdate, $enddate, $jobtypes = "", $surveyonly = "", $del
 	if($jobtypes != ""){
 		$jobtypequery = " and j.jobtypeid in ('" . $jobtypes . "') ";
 	}
-	$joblist = QuickQueryList("select j.id from job j
-							left join surveyquestionnaire sq on (sq.id = j.questionnaireid)
-							left join message m on (m.messagegroupid = j.messagegroupid)
+	$query = "select j.id from job j
 							where ( (j.startdate >= '$startdate' and j.startdate < date_add('$enddate',interval 1 day) )
 							or j.starttime = null) and ifnull(j.finishdate, j.enddate) >= '$startdate' and j.startdate <= date_add('$enddate',interval 1 day)
 							and j.status in ('active', 'complete', 'cancelled')
@@ -197,7 +195,9 @@ function getJobList($startdate, $enddate, $jobtypes = "", $surveyonly = "", $del
 							$surveyfilter
 							$deliveryquery
 							$surveydeliveryquery
-							$jobtypequery");
+							$jobtypequery";
+	//error_log("reportutil     " . $query);
+	$joblist = QuickQueryList($query);
 	return $joblist;
 }
 
