@@ -1,4 +1,32 @@
 <?
+
+/**
+ * appends user@customer and stack trace to the error message before calling error_log
+ * @param string $msg
+ */
+function error_log_helper ($msg) {
+	global $CUSTOMERURL, $USER;
+	//the first frame is the original caller
+	$trace = debug_backtrace();
+	
+	array_shift($trace); //remove this fn call
+	
+	$user = isset($USER->login) ? $USER->login : "-";
+	$customer = isset($CUSTOMERURL) ? $CUSTOMERURL : "-";
+	$debug = " --- " . $user  . "@" . $customer . " [";
+	foreach ($trace as $frame) {
+		$file = isset($frame['file']) ? str_replace("/usr/commsuite/www/", "", $frame['file']) : "-";
+		$line = isset($frame['line']) ? $frame['line'] : "-";
+		$fn = isset($frame['function']) ? $frame['function'] : "-";
+		
+		$debug .= "{" . $file . ":" . $line . "::" . $fn . "} ";
+	}
+
+	$debug .= "]";
+	
+	error_log($msg . $debug);
+}
+
 //quick utf8 aware replacement for htmlentities
 function escapehtml($var) {
 	return htmlentities($var, ENT_COMPAT, 'UTF-8') ;
