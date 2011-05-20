@@ -1,10 +1,12 @@
 <?
 // phone inbound, login prompt and authentication
 
+//FIXME remove includes already included with request.php, the parent php file
 include_once("../obj/User.obj.php");
 include_once("../obj/Access.obj.php");
 include_once("../obj/Permission.obj.php");
 require_once("../inc/auth.inc.php");
+require_once("../inc/utils.inc.php");
 include_once("inboundutils.inc.php");
 
 global $BFXML_VARS;
