@@ -534,7 +534,7 @@ class MsgWiz_emailText extends WizStep {
 		$formdata["subject"] = array(
 			"label" => _L("Subject"),
 			"fieldhelp" => _L('The Subject will appear as the subject line of the email.'),
-			"value" => $messagegroup->name,
+			"value" => "",
 			"validators" => array(
 				array("ValRequired"),
 				array("ValLength","max" => 255)
@@ -835,7 +835,7 @@ class MsgWiz_submitConfirm extends WizStep {
 		$languagecode = isset($postdata['/create/language']['language'])?$postdata['/create/language']['language']:"en";
 		$type = "";
 		$subtype = "";
-		if (MsgWiz_phoneText::isEnabled($postdata, false) || MsgWiz_phoneEasyCall::isEnabled($postdata, false)) {
+		if (MsgWiz_phoneText::isEnabled($postdata, false) || MsgWiz_phoneEasyCall::isEnabled($postdata, false) || MsgWiz_phoneAdvanced::isEnabled($postdata, false)) {
 			$type = 'phone';
 			$subtype = 'voice';
 		} else if (MsgWiz_emailText::isEnabled($postdata, false)) {
