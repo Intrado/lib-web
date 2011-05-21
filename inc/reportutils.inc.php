@@ -167,7 +167,6 @@ function getJobList($startdate, $enddate, $jobtypes = "", $surveyonly = "", $del
 		$userJoin = "";
 	}
 	$deliveryquery = " ";
-	$surveydeliveryquery = "";
 	if("phone" == $deliverymethod){
 		$deliveryquery = " and (exists (select * from message m where m.messagegroupid = j.messagegroupid and m.type='phone') OR exists (select * from surveyquestionnaire sq where sq.id = j.questionnaireid and sq.hasphone != '0')) ";
 	} else if("email" == $deliverymethod) {
@@ -194,7 +193,6 @@ function getJobList($startdate, $enddate, $jobtypes = "", $surveyonly = "", $del
 							$userJoin
 							$surveyfilter
 							$deliveryquery
-							$surveydeliveryquery
 							$jobtypequery";
 	//error_log("reportutil     " . $query);
 	$joblist = QuickQueryList($query);
