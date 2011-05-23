@@ -29,35 +29,63 @@ if(isset($_SESSION['customerid']) && $_SESSION['customerid']){
 		$allData[$personid] = array();
 	}
 
-	$result = Query("select j.id, j.startdate, j.name, j.type, u.firstname, u.lastname, rp.personid
-		from job j
-		left join jobsetting js on (js.jobid=j.id and js.name='translationexpire')
-		left join reportperson rp on (rp.jobid = j.id)
-		inner join user u on (u.id = j.userid)
-		where
-		j.startdate <= curdate() and j.startdate >= date_sub(curdate(),interval 30 day)
-		and rp.personid in ('" . $contactListString . "')
-		and j.status in ('active', 'complete')
-		and j.type = 'notification'
-		and (js.value is null or js.value >= curdate())
-		group by j.id, rp.personid
-		order by j.startdate desc, j.starttime, j.id desc");
-	while ($row = DBGetRow($result)) {
-			array_splice($row, 0, 0, $contactCount[$row[6]]);
-			$allData[$row[7]][] = $row;
-			$contactCount[$row[7]]++;
+	// find all jobids for these persons
+	$jobids = array(); // key jobid, value array of personids
+	$types = array('phone', 'email', 'sms');
+	foreach ($types as $type) {
+		$query = "select j.id, rp.personid from
+						job j
+						inner join reportperson rp on (rp.jobid=j.id)
+						where
+						j.startdate <= curdate() and j.startdate >= date_sub(curdate(),interval 30 day)
+						and j.type = 'notification'
+						and not exists (select * from jobsetting js where js.jobid = j.id and js.name='translationexpire' and js.value < curdate())
+						and rp.type='" . $type . "'
+						and rp.personid in ('" . $contactListString . "')";
+		$result = Query($query);
+		while ($row = DBGetRow($result)) {
+			// index the person array with the personid to make unique set
+			$jobids[$row[0]][$row[1]] = $row[1];
+		}
 	}
+	$jobListString = implode("','", array_keys($jobids));
+
+	$query = "select j.id, j.startdate, j.name, j.messagegroupid, u.firstname, u.lastname
+				from job j
+				inner join user u on (u.id = j.userid)
+				where
+				j.id in ('" . $jobListString . "')
+				order by j.startdate desc, j.starttime, j.id desc";
+	$result = Query($query);
+	while ($row = DBGetRow($result)) {
+		foreach ($jobids[$row[0]] as $personid) {
+			// create new array for personrow, otherwise adds elements to $row for all persons
+			$personrow = array();
+			// start with an incremental id
+			$personrow[] = $contactCount[$personid];
+			// copy row values
+			foreach ($row as $v) {
+				$personrow[] = $v;
+			}
+			// append personid
+			$personrow[] = $personid;
+			
+			// store data for display by person
+			$allData[$personid][] = $personrow;
+			$contactCount[$personid]++;
+		}
+	}
+	
+	
 	$titles = array("0" => "##",
 					"2" => _L("Date"),
 					"3" => "#" . _L("Job Name"),
 					"SentBy" => "#" . _L("Sent By"),
-					//"4" => "#" . _L("Delivery Type"),
 					"Actions" => _L("Actions")
 				);
 
 	$formatters = array("2" => "format_date",
 						"SentBy" => "sender",
-						"4" => "fmt_delivery_type_list",
 						"Actions" => "message_action"
 					);
 } else {
@@ -76,12 +104,10 @@ if(isset($_SESSION['customerid']) && $_SESSION['customerid']){
 
 function message_action($row, $index){
 	//index 1 is job id
+	//index 4 is messagegroup id
 	//index 7 is person id
 
-	// TODO seems inefficient
-	// select exists message where type = 'phone' and messagegroupid = (select messagegroupid from job where id = ?)
-	$messagegroupid = QuickQuery("select messagegroupid from job where id = ?", false, array($row[1]));
-	$messagegroup = new MessageGroup($messagegroupid);
+	$messagegroup = new MessageGroup($row[4]);
 
 	if ($messagegroup->hasMessage("phone")) {
 		$buttons[] = button(_L("Play"), "popup('previewmessage.php?jobid=" . $row[1] . "&personid=" . $row[7] . "&type=phone', 400, 500,'preview');",null);
@@ -101,13 +127,12 @@ function format_date($row, $index){
 }
 
 function sender($row, $index){
-	//index 1 is jobid
+	//index 4 is messagegroupid
 	//index 5 is first name
 	//index 6 is last name
-	//index 7 is personid
 	
 	// all email messages have same sent from data, so it does not matter if this is plain or html
-	$emailmsgid = QuickQuery("select id from message where messagegroupid = (select messagegroupid from job where id = ?) and type = 'email'", false, array($row[1]));
+	$emailmsgid = QuickQuery("select id from message where messagegroupid = ? and type = 'email'", false, array($row[4]));
 	if (isset($emailmsgid) && $emailmsgid != 0) {
 		$message = DBFind("Message", "from message where id=?", false, array($emailmsgid));
 		$messagedata = sane_parsestr($message->data);
