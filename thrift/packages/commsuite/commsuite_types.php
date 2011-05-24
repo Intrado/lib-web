@@ -340,7 +340,6 @@ class commsuite_MessageDTO {
 class commsuite_MessagePartDTO {
   static $_TSPEC;
 
-  public $messageid = null;
   public $type = null;
   public $contentid = null;
   public $txt = null;
@@ -353,43 +352,36 @@ class commsuite_MessagePartDTO {
     if (!isset(self::$_TSPEC)) {
       self::$_TSPEC = array(
         1 => array(
-          'var' => 'messageid',
-          'type' => TType::STRING,
-          ),
-        2 => array(
           'var' => 'type',
           'type' => TType::I32,
           ),
-        3 => array(
+        2 => array(
           'var' => 'contentid',
           'type' => TType::I64,
           ),
-        4 => array(
+        3 => array(
           'var' => 'txt',
           'type' => TType::STRING,
           ),
-        6 => array(
+        4 => array(
           'var' => 'fieldnum',
           'type' => TType::STRING,
           ),
-        7 => array(
+        5 => array(
           'var' => 'defaultvalue',
           'type' => TType::STRING,
           ),
-        8 => array(
+        6 => array(
           'var' => 'languagecode',
           'type' => TType::STRING,
           ),
-        9 => array(
+        7 => array(
           'var' => 'gender',
           'type' => TType::STRING,
           ),
         );
     }
     if (is_array($vals)) {
-      if (isset($vals['messageid'])) {
-        $this->messageid = $vals['messageid'];
-      }
       if (isset($vals['type'])) {
         $this->type = $vals['type'];
       }
@@ -434,55 +426,48 @@ class commsuite_MessagePartDTO {
       switch ($fid)
       {
         case 1:
-          if ($ftype == TType::STRING) {
-            $xfer += $input->readString($this->messageid);
-          } else {
-            $xfer += $input->skip($ftype);
-          }
-          break;
-        case 2:
           if ($ftype == TType::I32) {
             $xfer += $input->readI32($this->type);
           } else {
             $xfer += $input->skip($ftype);
           }
           break;
-        case 3:
+        case 2:
           if ($ftype == TType::I64) {
             $xfer += $input->readI64($this->contentid);
           } else {
             $xfer += $input->skip($ftype);
           }
           break;
-        case 4:
+        case 3:
           if ($ftype == TType::STRING) {
             $xfer += $input->readString($this->txt);
           } else {
             $xfer += $input->skip($ftype);
           }
           break;
-        case 6:
+        case 4:
           if ($ftype == TType::STRING) {
             $xfer += $input->readString($this->fieldnum);
           } else {
             $xfer += $input->skip($ftype);
           }
           break;
-        case 7:
+        case 5:
           if ($ftype == TType::STRING) {
             $xfer += $input->readString($this->defaultvalue);
           } else {
             $xfer += $input->skip($ftype);
           }
           break;
-        case 8:
+        case 6:
           if ($ftype == TType::STRING) {
             $xfer += $input->readString($this->languagecode);
           } else {
             $xfer += $input->skip($ftype);
           }
           break;
-        case 9:
+        case 7:
           if ($ftype == TType::STRING) {
             $xfer += $input->readString($this->gender);
           } else {
@@ -502,43 +487,38 @@ class commsuite_MessagePartDTO {
   public function write($output) {
     $xfer = 0;
     $xfer += $output->writeStructBegin('MessagePartDTO');
-    if ($this->messageid !== null) {
-      $xfer += $output->writeFieldBegin('messageid', TType::STRING, 1);
-      $xfer += $output->writeString($this->messageid);
-      $xfer += $output->writeFieldEnd();
-    }
     if ($this->type !== null) {
-      $xfer += $output->writeFieldBegin('type', TType::I32, 2);
+      $xfer += $output->writeFieldBegin('type', TType::I32, 1);
       $xfer += $output->writeI32($this->type);
       $xfer += $output->writeFieldEnd();
     }
     if ($this->contentid !== null) {
-      $xfer += $output->writeFieldBegin('contentid', TType::I64, 3);
+      $xfer += $output->writeFieldBegin('contentid', TType::I64, 2);
       $xfer += $output->writeI64($this->contentid);
       $xfer += $output->writeFieldEnd();
     }
     if ($this->txt !== null) {
-      $xfer += $output->writeFieldBegin('txt', TType::STRING, 4);
+      $xfer += $output->writeFieldBegin('txt', TType::STRING, 3);
       $xfer += $output->writeString($this->txt);
       $xfer += $output->writeFieldEnd();
     }
     if ($this->fieldnum !== null) {
-      $xfer += $output->writeFieldBegin('fieldnum', TType::STRING, 6);
+      $xfer += $output->writeFieldBegin('fieldnum', TType::STRING, 4);
       $xfer += $output->writeString($this->fieldnum);
       $xfer += $output->writeFieldEnd();
     }
     if ($this->defaultvalue !== null) {
-      $xfer += $output->writeFieldBegin('defaultvalue', TType::STRING, 7);
+      $xfer += $output->writeFieldBegin('defaultvalue', TType::STRING, 5);
       $xfer += $output->writeString($this->defaultvalue);
       $xfer += $output->writeFieldEnd();
     }
     if ($this->languagecode !== null) {
-      $xfer += $output->writeFieldBegin('languagecode', TType::STRING, 8);
+      $xfer += $output->writeFieldBegin('languagecode', TType::STRING, 6);
       $xfer += $output->writeString($this->languagecode);
       $xfer += $output->writeFieldEnd();
     }
     if ($this->gender !== null) {
-      $xfer += $output->writeFieldBegin('gender', TType::STRING, 9);
+      $xfer += $output->writeFieldBegin('gender', TType::STRING, 7);
       $xfer += $output->writeString($this->gender);
       $xfer += $output->writeFieldEnd();
     }
