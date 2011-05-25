@@ -45,7 +45,9 @@ function DBQueryWrapper($dbcon, $query, $args=false) {
 						."Line: {$frame['line']}\t"
 						."Function: {$frame['function']}\t"
 						."Customer: {$CUSTOMERURL}\t"
-						."Username: " . str_replace(array("*/","\t","\n","\0"), "", @$USER->login)
+						//php PDO module parses sql differently than usual, and will explode if a single quote is inside a comment ie /* ' */
+						//just get paranoid here until we can do some extensive tests
+						."Username: " . str_replace(array("*","/","\t","\n","\0","'"), "", urlencode(@$USER->login))
 						."*/";
 		//TODO add more debug vars
 		//ie:
