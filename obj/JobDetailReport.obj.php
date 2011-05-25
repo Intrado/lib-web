@@ -334,7 +334,7 @@ class JobDetailReport extends ReportGenerator{
 
 		endWindow();
 		?>
-		<script langauge="javascript">
+		<script type="text/javascript">
 			var reportdetailstable = new getObj("reportdetails").obj;
 		</script>
 		<?

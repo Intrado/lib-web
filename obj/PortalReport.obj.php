@@ -146,7 +146,7 @@ class PortalReport extends ReportGenerator{
 		showPageMenu($this->reporttotal,$pagestart,$max);
 		endWindow();
 ?>
-		<script langauge="javascript">
+		<script type="text/javascript">
 			var portalresultstable = new getObj("portalresults").obj;
 		</script>
 <?

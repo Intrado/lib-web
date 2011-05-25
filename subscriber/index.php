@@ -189,7 +189,7 @@ require_once("logintop.inc.php");
 
 require_once("loginbottom.inc.php");
 ?>
-<script langauge="javascript">
+<script type="text/javascript">
 document.getElementById('logintext').focus();
 
 function capslockCheck(e){

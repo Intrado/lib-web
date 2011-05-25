@@ -270,7 +270,7 @@ class CallsReport extends ReportGenerator{
 		endWindow();
 
 		?>
-		<script langauge="javascript">
+		<script type="text/javascript">
 			var searchresultstable = new getObj("searchresults").obj;
 		<?
 			$count=1;

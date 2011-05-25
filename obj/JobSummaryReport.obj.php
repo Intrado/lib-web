@@ -361,14 +361,14 @@ class JobSummaryReport extends ReportGenerator{
 											}
 ?>
 										<tr>
-											<td><div class="floatingreportdata"><u><a href="reportjobdetails.php<?=$urltext?>&type=phone"/><?=$value?>:</a><u></div></td>
+											<td><div class="floatingreportdata"><u><a href="reportjobdetails.php<?=$urltext?>&type=phone"><?=$value?>:</a></u></div></td>
 											<td><?=$jobstats["phone"][$index]?></td>
 										</tr>
 <?
 										}
 ?>
 										<tr>
-											<td><div class="floatingreportdata"><u><a href="reportjobdetails.php?type=phone"/a>Total:</a><u></div></td>
+											<td><div class="floatingreportdata"><u><a href="reportjobdetails.php?type=phone">Total:</a></u></div></td>
 											<td><?=$jobstats["phone"]['totalcalls']?></td>
 										</tr>
 									</table>
@@ -391,9 +391,9 @@ class JobSummaryReport extends ReportGenerator{
 							<tr>
 								<td>
 									<table>
-										<tr><td><div class="floatingreportdata"><u><a href="reportjobdetails.php?result=confirmed&type=phone"/a>Yes (Pressed 1):</a.</td><td><?=$confirmedinfo[0]+0?></td></tr>
-										<tr><td><div class="floatingreportdata"><u><a href="reportjobdetails.php?result=notconfirmed&type=phone"/a>No (Pressed 2):</a></td><td><?=$confirmedinfo[1]+0?></td></tr>
-										<tr><td><div class="floatingreportdata"><u><a href="reportjobdetails.php?result=noconfirmation&type=phone"/a>No Confirmation:</a></td><td><?=$confirmedinfo[2]+0?></td></tr>
+										<tr><td><div class="floatingreportdata"><u><a href="reportjobdetails.php?result=confirmed&type=phone">Yes (Pressed 1):</a></u></div></td><td><?=$confirmedinfo[0]+0?></td></tr>
+										<tr><td><div class="floatingreportdata"><u><a href="reportjobdetails.php?result=notconfirmed&type=phone">No (Pressed 2):</a></u></div></td><td><?=$confirmedinfo[1]+0?></td></tr>
+										<tr><td><div class="floatingreportdata"><u><a href="reportjobdetails.php?result=noconfirmation&type=phone">No Confirmation:</a></u></div></td><td><?=$confirmedinfo[2]+0?></td></tr>
 									</table>
 								<td>
 							</tr>

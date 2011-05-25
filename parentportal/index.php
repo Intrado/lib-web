@@ -172,7 +172,7 @@ include_once("cmlogintop.inc.php");
 <?
 include("cmloginbottom.inc.php");
 ?>
-<script langauge="javascript">
+<script type="text/javascript">
 document.getElementById('logintext').focus();
 
 function capslockCheck(e){

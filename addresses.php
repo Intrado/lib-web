@@ -80,7 +80,7 @@ include_once("nav.inc.php");
 
 
 ?>
-<script langauge="javascript">
+<script type="text/javascript">
 
 function dolistbox (img, init, id) {
 	if (!img.toggleset) {

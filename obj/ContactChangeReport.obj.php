@@ -236,7 +236,7 @@ class ContactChangeReport extends ReportGenerator {
 			showTable($data, $titles, $formatters, array("5", "6", "9"), 0);
 		?>
 			</table>
-			<script langauge="javascript">
+			<script type="text/javascript">
 			var searchresultstable = new getObj("searchresults").obj;
 			</script>
 		<?

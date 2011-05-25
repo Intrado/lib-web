@@ -109,7 +109,7 @@ if (file_exists($logofilename) ) {
 
 	</style>
 	
-<script langauge="javascript">
+<script type="text/javascript">
 
 function capslockCheck(e){
 	var keypressed;

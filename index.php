@@ -202,7 +202,7 @@ if ($IS_COMMSUITE) {
 
 if (!($custname === false)) { 
 ?>
-	<script langauge="javascript">
+	<script type="text/javascript">
 
 	new getObj('logintext').obj.focus();
 
