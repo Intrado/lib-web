@@ -14,7 +14,6 @@ require_once("obj/ValDuplicateNameCheck.val.php");
 require_once("obj/Message.obj.php");
 require_once("obj/Voice.obj.php");
 
-
 ///////////////////////////////////////////////////////////////////////////////
 // Authorization:/
 //////////////////////////////////////////////////////////////////////////////
@@ -216,7 +215,7 @@ function makeMessageGrid($messagegroup) {
 			$actions = array();
 			if ($message) {
 				$icon = "accept";
-				$actions[] = action_link("Play","fugue/control",null,"popup(\'messageviewer.php?id=$message->id\', 400, 400); return false;");
+				$actions[] = action_link("Play","fugue/control","mgeditor.php?preview=$message->id");
 				$actions[] = action_link("Re-Record","diagona/16/151","editmessagerecord.php?id=new&languagecode=$languagecode&mgid=".$messagegroup->id);
 				if (isset($ttslanguages[$languagecode]))
 					$actions[] = action_link("Edit Advanced","pencil","editmessagephone.php?id=$message->id");
@@ -286,6 +285,11 @@ function makeMessageGrid($messagegroup) {
 	showActionGrid($columnlabels,array_values($customerlanguages),$links);
 }
 
+if (isset($_GET['preview'])) {
+	$preview = PreviewModal::CreateModalForMessageId($_GET['preview']);
+	if ($preview)
+		$preview->handleRequest();
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 // Display
@@ -338,6 +342,9 @@ if ($messagegroup->id) {
 	echo "<br />" . icon_button(_L('Add Content Wizard'),"add",null,"messagewizard.php?new&mgid=$messagegroup->id") . "<br /><br />";
 	makeMessageGrid($messagegroup);
 	endWindow();
+}
+if (isset($_GET['preview']) && $preview) {
+	echo $preview->includeModal();
 }
 
 include_once("navbottom.inc.php");

@@ -30,6 +30,10 @@ require_once("obj/ValMessageBody.val.php");
 require_once("obj/PhoneMessageEditor.fi.php");
 require_once("obj/InpageSubmitButton.fi.php");
 
+
+
+require_once("inc/previewfields.inc.php");
+require_once("obj/PreviewModal.obj.php");
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization
 ////////////////////////////////////////////////////////////////////////////////
@@ -173,14 +177,6 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 	} else if (($errors = $form->validate()) === false) { //checks all of the items in this form
 		$postdata = $form->getData(); //gets assoc array of all values {name:value,...}
 		
-		if ($button == 'inpagesubmit') {
-			$_SESSION['ttstext'] = $postdata["message"];
-			$_SESSION['ttslanguage'] = $languagecode;
-			$_SESSION['ttsgender'] = $postdata["gender"];
-			$form->modifyElement("previewcontainer", "<script>popup('messageviewer.php', 400, 400);</script>");
-			exit();
-		}
-		
 		// if they didn't change anything, don't do anything
 		if ($postdata['message'] == $text && $postdata['gender'] == $gender) {
 			// DO NOT UPDATE MESSAGE!
@@ -222,6 +218,12 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 			Query("COMMIT");
 		}
 		
+		if ($button == 'inpagesubmit') {
+			$modal = PreviewModal::CreateModalForMessageText($messagegroup->id,"phone",$postdata['message'],$languagecode, $postdata['gender']);
+			$form->modifyElement("previewcontainer", $modal->includeModal());
+		}
+		
+		
 		// remove the editors session data
 		unset($_SESSION['editmessage']);
 		
@@ -231,6 +233,11 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 			redirect("mgeditor.php?id=".$messagegroup->id);
 	}
 }
+
+
+$modal = PreviewModal::CreateModalForMessageText($messagegroup->id,"phone");
+$modal->handleRequest();
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // Display
@@ -245,6 +252,10 @@ include_once("nav.inc.php");
 <script type="text/javascript">
 <? Validator::load_validators(array("ValMessageBody")); ?>
 </script>
+<script src="script/livepipe/livepipe.js" type="text/javascript"></script>
+<script src="script/livepipe/window.js" type="text/javascript"></script>
+<script type="text/javascript" language="javascript" src="script/niftyplayer.js.php"></script>
+
 <div id='previewcontainer'></div>
 <?
 

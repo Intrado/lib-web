@@ -507,6 +507,14 @@ class Form {
 		echo json_encode($result);
 		exit();
 	}
+	
+	// fire observable event on client side.
+	function fireEvent ($memo) {
+		$result = array("status" => "callback", "memo" => $memo);
+		header("Content-Type: application/json");
+		echo json_encode($result);
+		exit();
+	}
 
 	//Send an element outside the form some new content
 	function modifyElement ($elementname, $htmlcontent) {

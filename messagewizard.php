@@ -20,6 +20,8 @@ require_once("obj/Sms.obj.php");
 require_once("obj/MessageGroup.obj.php");
 require_once("obj/FieldMap.obj.php");
 require_once("obj/MessageAttachment.obj.php");
+require_once("inc/previewfields.inc.php");
+require_once("obj/PreviewModal.obj.php");
 
 // form items
 require_once("obj/FormItem.obj.php");

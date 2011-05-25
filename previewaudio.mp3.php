@@ -25,13 +25,13 @@ if(!isset($_GET['uid']) && !isset($_SESSION["previewmessage"])) {
 if(isset($partnum)) {
 	$part = $_SESSION["previewmessage"]["parts"][$partnum];
 	
-	switch($part->type) {
+	switch($part["type"]) {
 		case "T":
-			$voice = new Voice($part->voiceid);
-			$audiopart = ttsGetForTextLanguageGenderFormat($part->txt, $voice->language, $voice->gender, "mp3");
+			$voice = new Voice($part["voiceid"]);
+			$audiopart = ttsGetForTextLanguageGenderFormat($part["txt"], $voice->language, $voice->gender, "mp3");
 			break;
 		case "A":
-			$contentid = QuickQuery("select contentid from audiofile where id=? and userid=?",false,array($part->audiofileid,$USER->id));
+			$contentid = QuickQuery("select contentid from audiofile where id=? and userid=?",false,array($part["audiofileid"],$USER->id));
 			$audiopart = audioFileGetForFormat($contentid, "mp3");
 			break;
 	}
@@ -44,7 +44,21 @@ if(isset($partnum)) {
 	header("Connection: close");
 	echo $audiopart->data;
 } else {
-	$audiopart = phoneMessageGetMp3AudioFile($_SESSION["previewmessage"]["parts"]);
+	$messagepartdtos = array();
+	$parts = $_SESSION["previewmessage"]["parts"];
+	foreach ($parts as $part) {
+		$messagepartdto = new commsuite_MessagePartDTO();
+		$messagepartdto->contentid = $part["contentid"];
+		$messagepartdto->type = $part["type"];
+		$messagepartdto->defaultvalue = $part["defaultvalue"];
+		$messagepartdto->fieldnum = $part["fieldnum"];
+		$messagepartdto->gender = $part["gender"];
+		$messagepartdto->languagecode = $part["languagecode"];
+		$messagepartdto->txt = $part["txt"];
+		$messagepartdtos[] = $messagepartdto;
+	}
+	
+	$audiopart = phoneMessageGetMp3AudioFile($messagepartdto);
 	
 	header("HTTP/1.0 200 OK");
 	if (isset($_GET['download']))

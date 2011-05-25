@@ -86,4 +86,35 @@ function getpreviewfieldmapdata($messageid) {
 }
 
 
+//Get the fields and values for the message parts
+function getpreviewfieldmapdatafromparts($parts) {
+	global $USER;
+	$fields = array();
+	$fielddata = array();
+	$fielddefaults = array();
+
+	$fieldnums = array();
+	$fielddefaults = array();
+	foreach($parts as $part) {
+		if(isset($part->fieldnum)) {
+			$fieldnums[] = $part->fieldnum;
+			$fielddefaults[$part->fieldnum] = $part->defaultvalue;
+		}
+	}	
+	
+	$messagefields = DBFindMany("FieldMap", "from fieldmap where fieldnum in ('" . implode("','",$fieldnums) .  "')");
+	if (count($messagefields) > 0) {
+		foreach ($messagefields as $fieldmap) {
+			$fields[$fieldmap->fieldnum] = $fieldmap;
+			if (!$fieldmap->isOptionEnabled("language") && $fieldmap->isOptionEnabled("multisearch")) {
+				$limit = DBFind('Rule', "from rule r inner join userassociation ua on r.id = ua.ruleid where ua.userid=? and type = 'rule' and r.fieldnum=?", "r", array($USER->id, $fieldmap->fieldnum));
+				$limitsql = $limit ? $limit->toSQL(false, 'value', false, true) : '';
+				$fielddata[$fieldmap->fieldnum] = QuickQueryList("select value,value from persondatavalues where fieldnum=? $limitsql order by value limit 5000", true, false, array($fieldmap->fieldnum));
+			}
+		}
+	}
+	return array($fields,$fielddata,$fielddefaults);
+}
+
+
 ?>

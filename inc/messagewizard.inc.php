@@ -3,6 +3,17 @@
 // Form Items
 ////////////////////////////////////////////////////////////////////////////////
 
+class PreviewButton extends FormItem {
+	function render ($value) {
+		$n = $this->form->name."_".$this->name;
+		$str = '<input id="'.$n.'" name="'.$n.'" type="hidden" value="" />'; //always blank out value
+		$str .= icon_button( _L('Preview'),"fugue/control", "$('$n').value='true'; form_submit(event,'samestep');");
+
+		return $str;
+	}
+}
+
+
 class MsgWiz_start extends WizStep {
 	function getForm($postdata, $curstep) {
 		global $USER;
@@ -334,6 +345,34 @@ class MsgWiz_phoneText extends WizStep {
 			"helpstep" => 1
 		);
 		
+		$formdata["preview"] = array(
+			"label" => "",
+			"value" => "",
+			"transient" => true,
+			"validators" => array(),
+			"control" => array("PreviewButton"),
+			"helpstep" => 1
+		);
+		
+		//preview
+		if (@$postdata['/create/phonetext']['preview'] == "true") {
+			$sourcemessage = json_decode($postdata["/create/phonetext"]["message"]);
+			$text = $sourcemessage->text;
+			$gender = $sourcemessage->gender;
+	
+			$modal = PreviewModal::CreateModalForMessageText($_SESSION['wizard_message']['mgid'],"phone",
+									$text,
+									$postdata["/create/language"]["language"],
+									$gender);
+			
+			$formdata["previewcontainer"] = array(
+				"label" => "",
+				"control" => array("FormHtml","html"=>$modal->includeModal()),
+				"helpstep" => 1
+			);
+			
+			unset($postdata['/create/phonetext']['preview']);
+		}
 		$helpsteps = array(_L("Enter your message text in the provided text area. Be sure to introduce yourself and give detailed information, including call back information if appropriate."));
 		
 		return new Form("phoneText",$formdata,$helpsteps);
