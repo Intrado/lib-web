@@ -64,8 +64,7 @@ class PreviewModal {
 		} else if (isset($_SESSION["previewmessagesource"])) {
 			$modal->uid = $_SESSION["previewmessagesource"]["uid"];
 		} else {
-			error_log("Calling preview without text source");
-			return;
+			return $modal;
 		}
 		
 		// Parse the source text into parts
