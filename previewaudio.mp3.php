@@ -58,7 +58,7 @@ if(isset($partnum)) {
 		$messagepartdtos[] = $messagepartdto;
 	}
 	
-	$audiopart = phoneMessageGetMp3AudioFile($messagepartdto);
+	$audiofull = phoneMessageGetMp3AudioFile($messagepartdto);
 	
 	header("HTTP/1.0 200 OK");
 	if (isset($_GET['download']))

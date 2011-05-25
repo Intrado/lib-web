@@ -14,6 +14,15 @@ require_once("obj/ValDuplicateNameCheck.val.php");
 require_once("obj/Message.obj.php");
 require_once("obj/Voice.obj.php");
 
+
+require_once("obj/MessagePart.obj.php");
+require_once("obj/FieldMap.obj.php");
+require_once("inc/previewfields.inc.php");
+require_once("obj/PreviewModal.obj.php");
+require_once("inc/appserver.inc.php");
+require_once("inc/thrift.inc.php");
+require_once $GLOBALS['THRIFT_ROOT'].'/packages/commsuite/CommSuite.php';
+
 ///////////////////////////////////////////////////////////////////////////////
 // Authorization:/
 //////////////////////////////////////////////////////////////////////////////
@@ -236,7 +245,7 @@ function makeMessageGrid($messagegroup) {
 				$message = $messagegroup->getMessage('sms', 'plain', $languagecode);
 				if ($message) {
 					$icon = "accept";
-					$actions[] = action_link("Preview","email_open",null,"popup(\'messageviewer.php?id=$message->id\', 400, 400); return false;");
+					$actions[] = action_link("Preview","email_open","mgeditor.php?preview=$message->id");
 					$actions[] = action_link("Edit","pencil","editmessagesms.php?id=$message->id");
 					$actions[] = action_link("Delete","cross","mgeditor.php?delete=$message->id","return confirmDelete();");
 				} else {
@@ -256,7 +265,7 @@ function makeMessageGrid($messagegroup) {
 			
 			if ($message) {
 				$icon = "accept";
-				$actions[] = action_link("Preview","email_open",null,"popup(\'messageviewer.php?id=$message->id\', 800, 500); return false;");
+				$actions[] = action_link("Preview","email_open","mgeditor.php?preview=$message->id");
 				$actions[] = action_link("Edit","pencil","editmessageemail.php?id=$message->id");
 				$actions[] = action_link("Delete","cross","mgeditor.php?delete=$message->id","return confirmDelete();");
 			} else {
@@ -269,7 +278,7 @@ function makeMessageGrid($messagegroup) {
 			$message = $messagegroup->getMessage('email', 'plain', $languagecode);
 			if ($message) {
 				$icon = "accept";
-				$actions[] = action_link("Preview","email_open",null,"popup(\'messageviewer.php?id=$message->id\', 800, 500); return false;");
+				$actions[] = action_link("Preview","email_open","mgeditor.php?preview=$message->id");
 				$actions[] = action_link("Edit","pencil","editmessageemail.php?id=$message->id");
 				$actions[] = action_link("Delete","cross","mgeditor.php?delete=$message->id","return confirmDelete();");
 			} else {

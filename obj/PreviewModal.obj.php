@@ -11,6 +11,7 @@
 class PreviewModal {
 	var $form;
 	var $type;
+	var $text;
 	var $parts;
 	var $valueparts;
 	
@@ -33,11 +34,21 @@ class PreviewModal {
 		$message = new Message($messageid);
 		$modal = new PreviewModal($message->type);
 		if ($messageid) {
-			// Get message parts and save to session
-			$modal->uid = uniqid();
-			$modal->parts = DBFindMany('MessagePart', 'from messagepart where messageid=? order by sequence', false, array($message->id));
-			
-			$modal->initializeContent();
+			switch($message->type) {
+				case "phone":
+					// Get message parts and save to session
+					$modal->uid = uniqid();
+					$modal->parts = DBFindMany('MessagePart', 'from messagepart where messageid=? order by sequence', false, array($message->id));
+					$modal->initializeContent();
+					break;
+				case "email":
+					$modal->text = $message->renderEmailWithTemplate();
+					break;
+				case "sms":
+					$parts = DBFindMany('MessagePart', 'from messagepart where messageid=? order by sequence', false, array($message->id));
+					$modal->text = $message->renderSmsParts($parts);
+					break;
+			}
 		}
 		return $modal;
 	}
@@ -73,10 +84,20 @@ class PreviewModal {
 	function includeModal() {
 		// TODO only phone is implemented continue with email 
 		$modalcontent = "";
-		
-		// Insert fields if they exists
-		if ($this->hasfieldinserts) {
-			$modalcontent = $this->form->render();
+		$playercontent = "";
+		if ($this->type != "phone") {
+			$modalcontent = $this->text;
+		} else {
+			// Insert fields if they exists
+			if ($this->hasfieldinserts) {
+				$modalcontent = $this->form->render();
+				$playercontent = "$('previewmessagefields').observe('Form:Submitted',function(e){
+									embedPlayer('previewaudio.mp3.php?uid=' + e.memo,'player'," . count($this->parts) . ");
+								});";
+			} else {
+				$playercontent = "embedPlayer('previewaudio.mp3.php?uid={$this->uid}','player'," . count($this->parts) . ");";
+			}
+			
 		}
 		// TODO move css and javascript includes out
 		return "<div id='modalcontent' style='display:none;'>$modalcontent</div>
@@ -101,14 +122,7 @@ class PreviewModal {
 					width: 300,
 					afterOpen: function(){
 						$('modalcontent').update('');
-						" . 
-						($this->hasfieldinserts ? 
-							"$('previewmessagefields').observe('Form:Submitted',function(e){
-								embedPlayer('previewaudio.mp3.php?uid=' + e.memo,'player'," . count($this->parts) . ");
-							});" 
-							:
-							"embedPlayer('previewaudio.mp3.php?uid={$this->uid}','player'," . count($this->parts) . ");")
-						. "
+						$playercontent
 					},
 					afterClose: function(){
 						this.destroy();

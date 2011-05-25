@@ -613,6 +613,8 @@ function form_handle_submit(form,event) {
 					window.location=res.nexturl;
 			} else if ("modify" == res.status) {
 				$(res.name).update(res.content);
+			} else if ("callback" == res.status) {
+				form.fire("Form:Submitted", res.memo);
 			}
 			} catch (e) { alert(e.message + "\n" + response.responseText)}
 			formvars.submitting = false;
