@@ -106,7 +106,18 @@ function emailMessageViewForMessageParts($message,$parts,$jobpriority) {
 	foreach($parts as $part) {
 		if ($part->type == "T" || $part->type == "V" || $part->type == "I" ) {
 			$partdto = new commsuite_MessagePartDTO();
-			$partdto->type = $part->type;
+			switch ($part->type) {
+				case "T":
+					$partdto->type = commsuite_MessagePartTypeDTO::T;
+					break;
+				case "V":
+					$partdto->type = commsuite_MessagePartTypeDTO::V;
+					break;
+				case "I":
+					$partdto->type = commsuite_MessagePartTypeDTO::I;
+					break;
+			}
+			
 			$partdto->txt = $part->txt;
 			$partdto->languagecode = "en";
 			$partdto->gender = "female";

@@ -32,6 +32,7 @@ require_once("obj/ValMessageBody.val.php");
 require_once("obj/EmailMessageEditor.fi.php");
 require_once("obj/InpageSubmitButton.fi.php");
 
+require_once("obj/PreviewModal.obj.php");
 
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization
@@ -235,10 +236,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 	} else if (($errors = $form->validate()) === false) { //checks all of the items in this form
 		$postdata = $form->getData(); //gets assoc array of all values {name:value,...}
 		
-		if ($button == 'inpagesubmit') {
-			$form->modifyElement("previewcontainer", "<script>popup('messageviewer.php', 800, 500);</script>");
-			exit();
-		}
+
 		
 		// if they didn't change anything, don't do anything
 		if ($postdata['fromname'] == $fromname && 
@@ -325,7 +323,11 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 			
 			Query("COMMIT");
 		}
-		
+		if ($button == 'inpagesubmit') {
+			$modal = PreviewModal::CreateModalForEmailMessage($postdata['fromname'],$postdata['from'],$postdata['subject'],$postdata['message']);
+			$form->modifyElement("previewcontainer", $modal->includeModal());
+			//$form->modifyElement("previewcontainer", "<script>popup('messageviewer.php?id=$message->id', 800, 500);</script>");
+		}
 		// remove the editors session data
 		unset($_SESSION['editmessage']);
 		
@@ -352,6 +354,9 @@ include_once("nav.inc.php");
 <script type="text/javascript">
 <? Validator::load_validators(array("ValMessageBody", "ValEmailAttach")); ?>
 </script>
+<script src="script/livepipe/livepipe.js" type="text/javascript"></script>
+<script src="script/livepipe/window.js" type="text/javascript"></script>
+
 <div id='previewcontainer'></div>
 <?
 

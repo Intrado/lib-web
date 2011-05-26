@@ -35,6 +35,8 @@ require_once("obj/CheckBoxWithHtmlPreview.fi.php");
 require_once("obj/EmailMessageEditor.fi.php");
 require_once("obj/InpageSubmitButton.fi.php");
 
+require_once("obj/PreviewButton.fi.php");
+require_once("obj/PreviewModal.obj.php");
 
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization
@@ -199,6 +201,15 @@ class MsgWiz_emailText extends WizStep {
 				array("ValMessageBody", "messagegroupid" => $_SESSION['wizard_message_mgid'])),
 			"control" => array("EmailMessageEditor", "subtype" => $subtype),
 			"helpstep" => 5
+		);
+		
+		$formdata["preview"] = array(
+			"label" => "",
+			"value" => "",
+			"transient" => true,
+			"validators" => array(),
+			"control" => array("PreviewButton"),
+			"helpstep" => 1
 		);
 		
 		$helpsteps = array();
@@ -673,6 +684,19 @@ require_once("nav.inc.php");
 startWindow(_L("Add Email Message Wizard"));
 echo $wizard->render();
 endWindow();
+
+// Include preview
+if (isset($_SESSION[$wizard->name]['data']['/create/email']) &&
+	 $_SESSION[$wizard->name]['data']['/create/email']['preview'] == "true") {
+	$postdata = $_SESSION[$wizard->name]['data'];
+	$modal = PreviewModal::CreateModalForEmailMessage($postdata["/create/email"]["fromname"],
+							$postdata["/create/email"]["from"],
+							$postdata["/create/email"]["subject"],
+							$postdata["/create/email"]["message"]);
+	echo $modal->includeModal();
+	unset($postdata['/create/phoneadvanced']['preview']);
+}
+
 if (isset($_SESSION['wizard_message']['debug']) && $_SESSION['wizard_message']['debug']) {
 	startWindow("Wizard Data");
 	echo "<pre>";

@@ -45,7 +45,8 @@ class PreviewModal {
 					$modal->initializeContent();
 					break;
 				case "email":
-					$modal->text = $message->renderEmailWithTemplate();
+					$email = messagePreviewForPriority($message->id, 3); // returns commsuite_EmailMessageView object
+					$modal->text = $modal->formatEmail($email);
 					break;
 				case "sms":
 					$parts = DBFindMany('MessagePart', 'from messagepart where messageid=? order by sequence', false, array($message->id));
@@ -89,12 +90,13 @@ class PreviewModal {
 		$message->type = "email";
 		$message->subtype = "html";
 		$message->fromname = $fromname;
-		$message->fromaddress = $fromaddress;
+		$message->fromemail = $fromaddress;
 		$message->subject = $subject;
 		$message->languagecode = "en";
 		$message->stuffHeaders();
 		$parts = Message::parse($text);
-		$modal->text = emailMessageViewForMessageParts($message,$parts,3);
+		$email = emailMessageViewForMessageParts($message,$parts,3);
+		$modal->text = $modal->formatEmail($email);
 		return $modal;
 		
 	}
@@ -137,8 +139,7 @@ class PreviewModal {
 				var modal = new Control.Modal($('modalcontent').innerHTML,{
 					overlayOpacity: 0.75,
 					className: 'modal',
-					fade: true,
-					width: 300,
+					fade: false,
 					afterOpen: function(){
 						$('modalcontent').update('');
 						$playercontent
@@ -216,6 +217,11 @@ class PreviewModal {
 				unset($_SESSION["previewmessage"]);
 			}
 		}
+	}
+	
+	//formates a commsuite_EmailMessageView object to html
+	private function formatEmail($email) {
+		return "<b>From:</b> $email->emailfromname &lt;$email->emailfromaddress&gt;<br /><b>Subject:</b> $email->emailsubject<br /><hr /> $email->emailbody";
 	}
 }
 
