@@ -127,6 +127,11 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		} else {
 			Query("BEGIN");
 			
+			// get an existing message to overwrite, if one exists
+			$message = DBFind("Message", "from message
+					where messagegroupid = ?
+					and type = 'sms'", false, array($messagegroup->id));
+		
 			// if this is an edit for an existing message
 			if (!$message) {
 				// new message
