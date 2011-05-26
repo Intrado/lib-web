@@ -125,7 +125,9 @@ $formdata = array(
 	"message" => array(
 		"label" => _L("Advanced Message"),
 		"value" => $text,
-		"validators" => array(array("ValRequired")),
+		"validators" => array(
+			array("ValRequired"),
+			array("ValMessageBody", "messagegroupid" => $messagegroup->id)),
 		"control" => array("PhoneMessageEditor", "langcode" => $languagecode, "messagegroupid" => $messagegroup->id),
 		"helpstep" => 1
 	),
@@ -145,14 +147,8 @@ $formdata = array(
 	)
 );
 
-$helpsteps = array(_L("<p>You can use a variety of techniques to build your message in this screen, but ideally you should use this to assemble snippets of audio with 
-dynamic data field inserts. You can use 'Call me to Record' to create your audio snippets or upload pre-recorded audio from your computer. To record multiple 
-audio snippets, you can use 'Call me to Record' for each snippet. </p><p>To insert data fields, 
-set the cursor where the data should appear. Be careful to not delete any of the brackets that appear around audio snippets or other data fields. Select the data field you 
-wish to insert and enter a default value which will display if a recipient does not have data in the chosen field. Click the 'Insert' button to add the data field to your message.
-</p>"),
-				_L("If your message contains pieces that will be read by a text-to-speech voice, such as data fields or other text, select the gender of the text-to-speech voice.
-				For best results, it's a good idea to select the same gender as the speaker in the audio files."),
+$helpsteps = array(_L("<p>You can use a variety of techniques to build your message in this screen, but ideally you should use this to assemble snippets of audio with dynamic data field inserts. You can use 'Call me to Record' to create your audio snippets or upload pre-recorded audio from your computer. To record multiple audio snippets, you can use 'Call me to Record' for each snippet. </p><p>To insert data fields, set the cursor where the data should appear. Be careful to not delete any of the brackets that appear around audio snippets or other data fields. Select the data field you wish to insert and enter a default value which will display if a recipient does not have data in the chosen field. Click the 'Insert' button to add the data field to your message.</p>"),
+				_L("If your message contains pieces that will be read by a text-to-speech voice, such as data fields or other text, select the gender of the text-to-speech voice. For best results, it's a good idea to select the same gender as the speaker in the audio files."),
 				_L("Click the preview button to hear a preview of your message."));
 		
 $buttons = array(submit_button(_L('Done'),"submit","tick"));

@@ -191,27 +191,26 @@ $formdata["attachments"] = array(
 	"helpstep" => 4
 );
 
-$helpsteps[] = _L("Email message body text goes here. Be sure to introduce yourself and give detailed information. For helpful message tips and ideas, click the Help link in the upper right corner of the screen.
-<br><br>If you would like to insert dynamic data fields, such as the recipient's name, move the cursor to the location where the data should be inserted, select the data field, and click 'Insert'.
-It's a good idea to enter a default value in the Default Value field for each insert. This value will be displayed in the event of a recipient having no data in your chosen field.");
+$helpsteps[] = _L("Email message body text goes here. Be sure to introduce yourself and give detailed information. For helpful message tips and ideas, click the Help link in the upper right corner of the screen.<br><br>If you would like to insert dynamic data fields, such as the recipient's name, move the cursor to the location where the data should be inserted, select the data field, and click 'Insert'. It's a good idea to enter a default value in the Default Value field for each insert. This value will be displayed in the event of a recipient having no data in your chosen field.");
 $formdata["message"] = array(
 	"label" => _L("Email Message"),
 	"fieldhelp" => _L('Enter the message you would like to send. Helpful tips for successful messages can be found at the Help link in the upper right corner.'),
 	"value" => $text,
 	"validators" => array(
 		array("ValRequired"),
-		array("ValMessageBody")
+		array("ValMessageBody", "messagegroupid" => $messagegroup->id)
 	),
 	"control" => array("EmailMessageEditor", "subtype" => $subtype),
 	"helpstep" => 5
 );
 
+$helpsteps[] = _L("TODO: help me");
 $formdata["preview"] = array(
 	"label" => "",
 	"value" => "",
 	"validators" => array(),
 	"control" => array("InpageSubmitButton", "name" => "Preview with email template", "icon" => "email_open"),
-	"helpstep" => 3
+	"helpstep" => 6
 );
 
 $buttons = array(submit_button(_L('Done'),"submit","tick"));
