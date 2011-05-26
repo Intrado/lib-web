@@ -18,7 +18,6 @@ require_once("obj/Voice.obj.php");
 require_once("inc/translate.inc.php");
 require_once("obj/MessageGroup.obj.php");
 require_once("obj/FieldMap.obj.php");
-require_once("obj/MessageAttachment.obj.php");
 require_once("inc/previewfields.inc.php");
 require_once("obj/PreviewModal.obj.php");
 
@@ -28,9 +27,6 @@ require_once("obj/Validator.obj.php");
 require_once("obj/HtmlRadioButtonBigCheck.fi.php");
 require_once("obj/PhoneMessageRecorder.fi.php");
 require_once("obj/PhoneMessageRecorder.val.php");
-require_once("obj/TextAreaPhone.fi.php");
-require_once("obj/TextAreaPhone.val.php");
-require_once("obj/HtmlTextArea.fi.php");
 require_once("obj/ValMessageBody.val.php");
 require_once("obj/traslationitem.obj.php");
 require_once("obj/CheckBoxWithHtmlPreview.fi.php");
@@ -83,13 +79,13 @@ class MsgWiz_method extends WizStep {
 		$methoddetails['write'] = array(
 			"icon" => "img/write.gif",
 			"label" => _L("Write"),
-				"description" =>
-					'<ol>
-						<li class="wizbuttonlist">'.escapehtml(_L("Text-to-speech")).'</li>
-						<li class="wizbuttonlist">'.escapehtml(_L("Upload Pre-recorded Audio")).'</li>
-						<li class="wizbuttonlist">'.escapehtml(_L("Use advanced features like field inserts")).'</li>'.
-						($USER->authorize('sendmulti')?'<li class="wizbuttonlist">'.escapehtml(_L("Auto-translate available")).'</li>':'').'
-					</ol>');
+			"description" =>
+				'<ol>
+					<li class="wizbuttonlist">'.escapehtml(_L("Text-to-speech")).'</li>
+					<li class="wizbuttonlist">'.escapehtml(_L("Upload Pre-recorded Audio")).'</li>
+					<li class="wizbuttonlist">'.escapehtml(_L("Use advanced features like field inserts")).'</li>'.
+					($USER->authorize('sendmulti')?'<li class="wizbuttonlist">'.escapehtml(_L("Auto-translate available")).'</li>':'').'
+				</ol>');
 					
 		$methods = array();
 		$values = array();
@@ -306,7 +302,9 @@ class MsgWiz_phoneAdvanced extends WizStep {
 		$formdata["message"] = array(
 				"label" => _L("Advanced Message"),
 				"value" => "",
-				"validators" => array(array("ValRequired")),
+				"validators" => array(
+					array("ValRequired"),
+					array("ValMessageBody", "messagegroupid" => $_SESSION['wizard_message']['mgid'])),
 				"control" => array("PhoneMessageEditor", "langcode" => $langcode, "messagegroupid" => $messagegroup->id),
 				"helpstep" => $helpstep++);
 		$formdata["gender"] = array(
@@ -363,7 +361,6 @@ class MsgWiz_translatePreview extends WizStep {
 
 		//Get available languages
 		$translationlanguages = Voice::getTTSLanguageMap();
-		$voices = Voice::getTTSVoices();
 		
 		unset($translationlanguages['en']);
 		$translationlanguagecodes = array_keys($translationlanguages);
@@ -410,13 +407,13 @@ class MsgWiz_translatePreview extends WizStep {
 				$languagecode = reset($translationlanguagecodes);
 					$formdata[] = Language::getName($languagecode);
 				$formdata[$languagecode] = array(
-						"label" => _L("Enabled"),
-						"fieldhelp" => _L('Check this box to automatically translate your message using Google Translate.'),
-						"value" => 1,
-						"validators" => array(),
-						"control" => array("CheckBoxWithHtmlPreview", "checkedhtml" => $this->escapeFieldInserts($translations->translatedText), "uncheckedhtml" => addslashes(_L("People tagged with this language will receive the English version."))),
-						"helpstep" => 2
-					);
+					"label" => _L("Enabled"),
+					"fieldhelp" => _L('Check this box to automatically translate your message using Google Translate.'),
+					"value" => 1,
+					"validators" => array(),
+					"control" => array("CheckBoxWithHtmlPreview", "checkedhtml" => $this->escapeFieldInserts($translations->translatedText), "uncheckedhtml" => addslashes(_L("People tagged with this language will receive the English version."))),
+					"helpstep" => 2
+				);
 			}
 		}
 		if(!isset($formdata["Translationinfo"])) {
@@ -516,7 +513,7 @@ class MsgWiz_submitConfirm extends WizStep {
 		global $USER;
 		
 		// if the method isnt chosen
-		if (!isset($postdata['/method']))
+		if (!isset($postdata['/method']['method']))
 			return false;
 		
 		// if the user has multilingual but hasn't selected a language
@@ -820,7 +817,7 @@ require_once("nav.inc.php");
 
 ?>
 <script type="text/javascript">
-<?	Validator::load_validators(array("PhoneMessageRecorderValidator", "ValTextAreaPhone", "ValMessageBody"));?>
+<?	Validator::load_validators(array("PhoneMessageRecorderValidator", "ValMessageBody"));?>
 </script>
 <?
 
