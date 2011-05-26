@@ -304,8 +304,8 @@ function makeMessageGrid($messagegroup) {
 	if ($USER->authorize("sendsms"))
 		$buttons[] = array("button" => button("New SMS", "", "editmessagesms.php?new&mgid=".$messagegroup->id));
 	if ($USER->authorize("sendemail")) {
-		$buttons[] = array("button" => button("New Email", "", "messagewizardemail.php?new&mgid=".$messagegroup->id));
-		$buttons[] = false;
+		$buttons[] = array("button" => button("New Html", "", "messagewizardemail.php?new&subtype=html&mgid=".$messagegroup->id));
+		$buttons[] = array("button" => button("New Plain", "", "messagewizardemail.php?new&subtype=plain&mgid=".$messagegroup->id));
 	}
 	
 	$links[] = $buttons;
