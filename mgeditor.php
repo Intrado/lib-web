@@ -157,16 +157,22 @@ function showActionGrid ($columnlabels, $rowlabels, $links) {
 		for ($col = 0;$col < count($rowlinks);$col++) {
 			$link = $rowlinks[$col];
 			if ($link !== false) {
-				echo "<td style='text-align: center;'>
-						<img id='gridmenu-$row-$col'src='img/icons/{$link["icon"]}.gif'
-							title=''
-							alt='{$link["title"]}'
-						/>
-					</td>";
-				
-				// Attach action menu script for this item
-				if (isset($link["actions"])) {
-					$actionmenues[] = "createactionmenu('gridmenu-$row-$col','" . implode("<br />",$link["actions"]) . "','{$link["title"]}');";
+				if (isset($link['icon'])) {
+					echo "<td style='text-align: center;'>
+							<img id='gridmenu-$row-$col'src='img/icons/{$link["icon"]}.gif'
+								title=''
+								alt='{$link["title"]}'
+							/>
+						</td>";
+					
+					// Attach action menu script for this item
+					if (isset($link["actions"])) {
+						$actionmenues[] = "createactionmenu('gridmenu-$row-$col','" . implode("<br />",$link["actions"]) . "','{$link["title"]}');";
+					}
+				} elseif (isset($link['button'])) {
+					echo "<td style='text-align: center;'>
+							{$link['button']}
+						</td>";
 				}
 			} else {
 				echo "<td style='text-align: center;'>-</td>";
@@ -291,7 +297,23 @@ function makeMessageGrid($messagegroup) {
 		$links[] = $linkrow;
 	}
 	
-	showActionGrid($columnlabels,array_values($customerlanguages),$links);
+	// add wizard/editor buttons
+	$buttons = array();
+	if ($USER->authorize("sendphone"))
+		$buttons[] = array("button" => button("New Phone", "", "messagewizardphone.php?new&mgid=".$messagegroup->id));
+	if ($USER->authorize("sendsms"))
+		$buttons[] = array("button" => button("New SMS", "", "editmessagesms.php?new&mgid=".$messagegroup->id));
+	if ($USER->authorize("sendemail")) {
+		$buttons[] = array("button" => button("New Email", "", "messagewizardemail.php?new&mgid=".$messagegroup->id));
+		$buttons[] = false;
+	}
+	
+	$links[] = $buttons;
+	
+	$rowlabels = array_values($customerlanguages);
+	$rowlabels[] = "";
+	
+	showActionGrid($columnlabels,$rowlabels,$links);
 }
 
 if (isset($_GET['preview'])) {
@@ -348,7 +370,6 @@ echo $form->render();
 endWindow();
 if ($messagegroup->id) {
 	startWindow(_L('Message Content'));
-	echo "<br />" . icon_button(_L('Add Content Wizard'),"add",null,"messagewizard.php?new&mgid=$messagegroup->id") . "<br /><br />";
 	makeMessageGrid($messagegroup);
 	endWindow();
 }
