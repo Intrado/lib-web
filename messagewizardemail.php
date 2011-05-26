@@ -122,9 +122,9 @@ class MsgWiz_emailText extends WizStep {
 		global $USER;
 		$msgdata = isset($postdata['/message/phone/text']['message'])?json_decode($postdata['/message/phone/text']['message']):json_decode('{"text": ""}');
 		
-		$messagegroup = new MessageGroup($_SESSION['wizard_message']['mgid']);
+		$messagegroup = new MessageGroup($_SESSION['wizard_message_mgid']);
 		
-		$subtype = $_SESSION['wizard_message']['subtype'];
+		$subtype = $_SESSION['wizard_message_subtype'];
 		
 		// Form Fields.
 		$formdata = array($this->title);
@@ -196,7 +196,7 @@ class MsgWiz_emailText extends WizStep {
 			"value" => $msgdata->text,
 			"validators" => array(
 				array("ValRequired"),
-				array("ValMessageBody", "messagegroupid" => $_SESSION['wizard_message']['mgid'])),
+				array("ValMessageBody", "messagegroupid" => $_SESSION['wizard_message_mgid'])),
 			"control" => array("EmailMessageEditor", "subtype" => $subtype),
 			"helpstep" => 5
 		);
@@ -212,7 +212,7 @@ class MsgWiz_emailText extends WizStep {
 			$helpsteps[] = 	_L("Enter your plain text version of your email in this field. <br><br>Be sure to introduce yourself and give detailed information. For helpful message tips and ideas, click the Help link in the upper right corner of the screen.");
 		}
 		
-		return new Form("emailText",$formdata,$helpsteps, false, "vertical");
+		return new Form("emailText",$formdata,$helpsteps);
 	}
 
 	//returns true if this step is enabled
@@ -341,7 +341,7 @@ class MsgWiz_submitConfirm extends WizStep {
 		if ($USER->authorize('sendmulti'))
 			$srclanguagecode = isset($postdata['/create/language']['language'])?$postdata['/create/language']['language']:"en";
 				
-		$subtype = $_SESSION['wizard_message']['subtype'];
+		$subtype = $_SESSION['wizard_message_subtype'];
 		
 		$languagecodes = array();
 		if ($srclanguagecode == "autotranslate") {
@@ -355,7 +355,7 @@ class MsgWiz_submitConfirm extends WizStep {
 		}
 		
 		// get the message group we are modifying
-		$messagegroup = new MessageGroup($_SESSION['wizard_message']['mgid']);
+		$messagegroup = new MessageGroup($_SESSION['wizard_message_mgid']);
 			
 		$html = '<div>'._L('The following messages will be overwritten').'</div>
 				<table class="list">
@@ -394,8 +394,8 @@ class MsgWiz_submitConfirm extends WizStep {
 	function isEnabled($postdata, $step) {
 		global $USER;
 		
-		if (isset($_SESSION['wizard_message']['subtype']))
-			$subtype = $_SESSION['wizard_message']['subtype'];
+		if (isset($_SESSION['wizard_message_subtype']))
+			$subtype = $_SESSION['wizard_message_subtype'];
 		else
 			return false;
 		
@@ -429,7 +429,7 @@ class MsgWiz_submitConfirm extends WizStep {
 		$langqueryargs = repeatWithSeparator("?",",",count($args));
 		
 		// add additional query arguments
-		$args[] = $_SESSION['wizard_message']['mgid'];
+		$args[] = $_SESSION['wizard_message_mgid'];
 		$args[] = $subtype;
 		
 		// query for any messages matching one of these language codes
@@ -457,7 +457,7 @@ class FinishMessageWizard extends WizFinish {
 		QuickQuery("BEGIN");
 		
 		// is the messagegroup id still valid?
-		$messagegroup = new MessageGroup($_SESSION['wizard_message']['mgid']);
+		$messagegroup = new MessageGroup($_SESSION['wizard_message_mgid']);
 		if (!userOwns("messagegroup", $messagegroup->id) || $messagegroup->deleted)
 			redirect('unauthorized.php');
 		
@@ -479,7 +479,7 @@ class FinishMessageWizard extends WizFinish {
 		// keep track of the message data we are going to create messages for
 		$messages = array();
 		
-		$subtype = $_SESSION['wizard_message']['subtype'];
+		$subtype = $_SESSION['wizard_message_subtype'];
 		
 		// email message
 		if (MsgWiz_emailText::isEnabled($postdata, false)) {
@@ -626,6 +626,8 @@ class FinishMessageWizard extends WizFinish {
 	function getFinishPage ($postdata) {
 		// remove this wizard's session data
 		unset($_SESSION['wizard_message']);
+		unset($_SESSION['wizard_message_mgid']);
+		unset($_SESSION['wizard_message_subtype']);
 		
 		$html = '<h3>Success! Your message has been saved</h3>';
 		return $html;
@@ -647,28 +649,10 @@ $wizard = new Wizard("wizard_message",$wizdata, new FinishMessageWizard("Finish"
 $wizard->doneurl = "mgeditor.php";
 $wizard->handlerequest();
 
-// After reload check session data for messagegroup information
-if (isset($_SESSION['wizard_message_mgid'])) {
-	
-	// check that this is a valid message group
-	$messagegroup = new MessageGroup($_SESSION['wizard_message_mgid']);
-	if (!userOwns("messagegroup", $messagegroup->id) || $messagegroup->deleted) {
-		unset($_SESSION['wizard_message_mgid']);
-		redirect('unauthorized.php');
-	}
-	
-	$_SESSION['wizard_message']['mgid'] = $_SESSION['wizard_message_mgid'];
-	unset($_SESSION['wizard_message_mgid']);
-}
-if (isset($_SESSION['wizard_message_subtype'])) {
-	$_SESSION['wizard_message']['subtype'] = $_SESSION['wizard_message_subtype'];
-	unset($_SESSION['wizard_message_subtype']);
-}
-
 // if the message group id or subtype isn't set in session data, redirect to unauth
-if (!isset($_SESSION['wizard_message']['mgid']))
+if (!isset($_SESSION['wizard_message_mgid']))
 	redirect('unauthorized.php');
-if (!isset($_SESSION['wizard_message']['subtype']))
+if (!isset($_SESSION['wizard_message_subtype']))
 	redirect('unauthorized.php');
 	
 ////////////////////////////////////////////////////////////////////////////////
