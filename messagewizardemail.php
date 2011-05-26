@@ -53,84 +53,19 @@ if (isset($_GET['mgid']) && $_GET['mgid']) {
 	$_SESSION['wizard_message_mgid'] = ($_GET['mgid'] + 0);		
 }
 
+if (isset($_GET['subtype']) && $_GET['subtype']) {
+	if (!in_array($_GET['subtype'], array("plain", "html")))
+		redirect('unauthorized.php');
+	
+	$_SESSION['wizard_message_subtype'] = $_GET['subtype'];		
+}
+
 if (isset($_GET['debug']))
 	$_SESSION['wizard_message']['debug'] = true;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Wizard step data
 ////////////////////////////////////////////////////////////////////////////////
-
-class MsgWiz_method extends WizStep {
-	function getForm($postdata, $curstep) {
-		global $USER;
-
-		// message icon button details
-		$methoddetails = array ();
-		
-		$methoddetails['plain'] = array(
-			"icon" => "img/write.gif",
-			"label" => _L("Plain"),
-			"description" =>
-				'<ol>
-					<li class="wizbuttonlist">'.escapehtml(_L("Write a plain text email message")).'</li>
-					'.($USER->authorize('sendmulti')?'<li class="wizbuttonlist">'.escapehtml(_L("Auto-translate available")).'</li>':'').'
-				</ol>');
-
-		$methoddetails["html"] = array(
-			"icon" => "img/record.gif",
-			"label" => _L("Html"),
-			"description" => 
-				'<ol>
-					<li class="wizbuttonlist">'.escapehtml(_L("Write an HTML email message")).'</li>
-					'.($USER->authorize('sendmulti')?'<li class="wizbuttonlist">'.escapehtml(_L("Auto-translate available")).'</li>':'').'
-				</ol>');
-		
-		$methods = array();
-		$values = array();
-		foreach ($methoddetails as $type => $details) {
-			$values[] = $type;
-			$methods[$type] ='
-				<table align="left" style="border: 0px; margin: 0px; padding: 0px">
-					<tr>
-						<td style="border: 0px; margin: 0px; padding: 0px" align="center" valign="center">
-							<div style="width: 94px; height: 88px; background: url('.$details['icon'].') no-repeat;">
-								<div style="position: relative; top: 67px; width: 100%; font-size: 10px">
-									'.escapehtml($details['label']).'
-								</div>
-							</div>
-						</td>
-						<td style="border: 0px; margin: 0px; padding: 0px;" align="left" valign="center">
-							'.$details["description"].'
-						</td>
-					</tr>
-				</table>';
-		}
-		
-
-		$formdata = array(
-			$this->title,
-			"method" => array(
-				"label" => _L("Method"),
-				"fieldhelp" => _L("TODO: fieldhelp"),
-				"validators" => array(
-					array("ValRequired"),
-					array("ValInArray", "values" => array_keys($methods))
-				),
-				"value" => (($USER->authorize("starteasy"))?"":"write"),
-				"control" => array("HtmlRadioButtonBigCheck", "values" => $methods),
-				"helpstep" => 1)
-		);
-		
-		$helpsteps = array(_L("Select the method you wish to use to create your email message. Simple will create a plain text message. If you would like to create a formatted message using our HTML editor or by entering your own HTML, choose the HTML option."));
-				
-		return new Form("method",$formdata,$helpsteps);
-	}
-
-	//returns true if this step is enabled
-	function isEnabled($postdata, $step) {
-		return true;
-	}
-}
 
 class MsgWiz_language extends WizStep {
 	function getForm($postdata, $curstep) {
@@ -189,7 +124,7 @@ class MsgWiz_emailText extends WizStep {
 		
 		$messagegroup = new MessageGroup($_SESSION['wizard_message']['mgid']);
 		
-		$subtype = ($postdata['/method']['method'] == "plain")?"plain":"html";
+		$subtype = $_SESSION['wizard_message']['subtype'];
 		
 		// Form Fields.
 		$formdata = array($this->title);
@@ -249,7 +184,7 @@ class MsgWiz_emailText extends WizStep {
 		$formdata["attachments"] = array(
 			"label" => _L('Attachments'),
 			"fieldhelp" => _L("You may attach up to three files that are up to 2MB each. For greater security, certain file types are not permitted. Be aware that some email accounts may not accept attachments above a certain size and may reject your message."),
-			"value" => "",
+			"value" => "{}",
 			"validators" => array(array("ValEmailAttach")),
 			"control" => array("EmailAttach"),
 			"helpstep" => 4
@@ -277,7 +212,7 @@ class MsgWiz_emailText extends WizStep {
 			$helpsteps[] = 	_L("Enter your plain text version of your email in this field. <br><br>Be sure to introduce yourself and give detailed information. For helpful message tips and ideas, click the Help link in the upper right corner of the screen.");
 		}
 		
-		return new Form("emailText",$formdata,$helpsteps, "vertical");
+		return new Form("emailText",$formdata,$helpsteps, false, "vertical");
 	}
 
 	//returns true if this step is enabled
@@ -406,7 +341,7 @@ class MsgWiz_submitConfirm extends WizStep {
 		if ($USER->authorize('sendmulti'))
 			$srclanguagecode = isset($postdata['/create/language']['language'])?$postdata['/create/language']['language']:"en";
 				
-		$subtype = ($postdata['/method']['method'] == "plain")?"plain":"html";
+		$subtype = $_SESSION['wizard_message']['subtype'];
 		
 		$languagecodes = array();
 		if ($srclanguagecode == "autotranslate") {
@@ -459,11 +394,10 @@ class MsgWiz_submitConfirm extends WizStep {
 	function isEnabled($postdata, $step) {
 		global $USER;
 		
-		// if the method isnt chosen
-		if (!isset($postdata['/method']['method']))
+		if (isset($_SESSION['wizard_message']['subtype']))
+			$subtype = $_SESSION['wizard_message']['subtype'];
+		else
 			return false;
-			
-		$subtype = ($postdata['/method']['method'] == "plain")?"plain":"html";
 		
 		// if the user has multilingual but hasn't selected a language
 		if  ($USER->authorize('sendmulti') && !isset($postdata['/create/language']['language']))
@@ -543,10 +477,9 @@ class FinishMessageWizard extends WizFinish {
 		// Text based messages
 		
 		// keep track of the message data we are going to create messages for
-		// format msgArray(typeArray(translateflagArray(data)))
 		$messages = array();
 		
-		$subtype = ($postdata['/method']['method'] == "plain")?"plain":"html";
+		$subtype = $_SESSION['wizard_message']['subtype'];
 		
 		// email message
 		if (MsgWiz_emailText::isEnabled($postdata, false)) {
@@ -700,7 +633,6 @@ class FinishMessageWizard extends WizFinish {
 }
 
 $wizdata = array(
-	"method" => new MsgWiz_method(_L("Method")),
 	"create" => new WizSection ("Create",array(
 		"language" => new MsgWiz_language(_L("Language")),
 		"email" => new MsgWiz_emailText(_L("Compose Email")),
@@ -728,11 +660,17 @@ if (isset($_SESSION['wizard_message_mgid'])) {
 	$_SESSION['wizard_message']['mgid'] = $_SESSION['wizard_message_mgid'];
 	unset($_SESSION['wizard_message_mgid']);
 }
+if (isset($_SESSION['wizard_message_subtype'])) {
+	$_SESSION['wizard_message']['subtype'] = $_SESSION['wizard_message_subtype'];
+	unset($_SESSION['wizard_message_subtype']);
+}
 
-// if the message group id isn't set in session data, redirect to unauth
+// if the message group id or subtype isn't set in session data, redirect to unauth
 if (!isset($_SESSION['wizard_message']['mgid']))
 	redirect('unauthorized.php');
-
+if (!isset($_SESSION['wizard_message']['subtype']))
+	redirect('unauthorized.php');
+	
 ////////////////////////////////////////////////////////////////////////////////
 // Display
 ////////////////////////////////////////////////////////////////////////////////
@@ -744,7 +682,7 @@ require_once("nav.inc.php");
 
 ?>
 <script type="text/javascript">
-<?	Validator::load_validators(array("ValMessageBody"));?>
+<?	Validator::load_validators(array("ValMessageBody", "ValEmailAttach"));?>
 </script>
 <?
 
