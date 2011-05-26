@@ -257,7 +257,7 @@ class Form {
 										<tr><th class="formtableheader" style="text-align:left" colspan=2><label class="formlabel" for="'.$n.'" >'.$l.'</label></th></tr>
 										<tr>
 											<td class="formtableicon"></td>
-											<td class="formtablecontrol">'.$item->render($value).'</td>
+											<td class="formtablecontrol">'.$item->render("").'</td>
 										</tr>
 									</table>
 								</td>
