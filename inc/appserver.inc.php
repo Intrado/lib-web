@@ -92,6 +92,61 @@ function messagePreviewForPriority($messageid, $jobpriority) {
 	return $result;
 }
 
+function emailMessageViewForMessageParts($message,$parts,$jobpriority) {
+	global $appserverCommsuiteSocket;
+	global $appserverCommsuiteTransport;
+	global $appserverCommsuiteProtocol;
+	
+	$messagedto = new commsuite_MessageDTO();
+	$messagedto->type = $message->type;
+	$messagedto->subtype = $message->subtype;
+	$messagedto->data = $message->data;
+	$messagedto->languagecode = $message->languagecode;
+	$partdtos = array();
+	foreach($parts as $part) {
+		if ($part->type == "T" || $part->type == "V" || $part->type == "I" ) {
+			$partdto = new commsuite_MessagePartDTO();
+			$partdto->type = $part->type;
+			$partdto->txt = $part->txt;
+			$partdto->languagecode = "en";
+			$partdto->gender = "female";
+			$partdto->fieldnum = $part->fieldnum;
+			$partdto->defaultvalue = $part->defaultvalue;
+			$partdto->contentid = $part->imagecontentid;
+			$partdtos[] = $partdto;
+		}
+	}
+	
+	$attempts = 0;
+	while (true) {
+		try {
+			$client = new CommSuiteClient($appserverCommsuiteProtocol);
+		
+			// Open up the connection
+			$appserverCommsuiteTransport->open();
+			try {
+				$result = $client->emailMessageViewForMessageParts(session_id(), $messagedto,$partdtos, $jobpriority);
+			} catch (emailMessageViewForMessageParts $e) {
+				error_log("phoneMessageGetMp3AudioFile: Invalid Sessionid");
+				return false;
+			}
+			$appserverCommsuiteTransport->close();
+			break;
+		} catch (TException $tx) {
+			$attempts++;
+			// a general thrift exception, like no such server
+			error_log("emailMessageViewForMessageParts: Exception Connection to AppServer (" . $tx->getMessage() . ")");
+			$appserverCommsuiteTransport->close();
+			if ($attempts > 2) {
+				error_log("emailMessageViewForMessageParts: Failed 3 times to get content from appserver");
+				return false;
+			}
+		}
+	}
+	return $result;
+}
+
+
 function ttsGetForTextLanguageGenderFormat($text, $language, $gender, $format) {
 	global $appserverCommsuiteSocket;
 	global $appserverCommsuiteTransport;

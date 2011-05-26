@@ -2,6 +2,9 @@
 
 // Requires previewfields.inc.php
 
+require_once("inc/appserver.inc.php");
+require_once("inc/thrift.inc.php");
+require_once $GLOBALS['THRIFT_ROOT'].'/packages/commsuite/CommSuite.php';
 
 // Preview modal canbe used with a messageid or raw text to produce a modal window for preview
 // Each page that uses the modal will need to include the content with the includeModal() function 
@@ -77,6 +80,23 @@ class PreviewModal {
 		
 		$modal->initializeContent();
 		return $modal;
+	}
+	
+	
+	static function CreateModalForEmailMessage($fromname,$fromaddress,$subject,$text) {
+		$modal = new PreviewModal("email");
+		$message = new Message();
+		$message->type = "email";
+		$message->subtype = "html";
+		$message->fromname = $fromname;
+		$message->fromaddress = $fromaddress;
+		$message->subject = $subject;
+		$message->languagecode = "en";
+		$message->stuffHeaders();
+		$parts = Message::parse($text);
+		$modal->text = emailMessageViewForMessageParts($message,$parts,3);
+		return $modal;
+		
 	}
 	
 	// Includeds the javascript necessary to open the modal and renderes the form if there are any field insters
