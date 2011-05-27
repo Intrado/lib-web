@@ -164,7 +164,18 @@ var AudioLibraryWidget = Class.create({
 	},
 	
 	onClickPlay: function(event, audiofile) {
-		popup('previewaudio.php?close=1&id=' + audiofile.id, 400, 400);
+			var modal = new Control.Modal('<div id="player"></div>',{
+				overlayOpacity: 0.75,
+				className: 'modal',
+				fade: false,
+				afterOpen: function(){
+					embedPlayer('audio.wav.php/mediaplayer_preview.wav?id=' + audiofile.id,'player')
+				},
+				afterClose: function(){
+					this.destroy();
+				}
+			});
+			modal.open();
 	},
 	
 	onClickInsert: function(event, audiofile) {

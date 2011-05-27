@@ -828,6 +828,14 @@ div.autocomplete ul li {
   cursor:pointer;
 }
 
+#control_overlay {
+	background-color:#000;
+}
+.modal {
+	background-color:#fff;
+	padding:10px;
+	border:10px solid #333;
+} 
 
 <? if ($theme == "classroom") { /* TODO move this to theme based css includes */ ?>
 

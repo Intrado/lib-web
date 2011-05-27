@@ -120,21 +120,7 @@ class PreviewModal {
 			}
 			
 		}
-		// TODO move css and javascript includes out
 		return "<div id='modalcontent' style='display:none;'>$modalcontent</div>
-			<style type='text/css'>
-			#control_overlay {
-				background-color:#000;
-			}
-			.modal {
-				background-color:#fff;
-				padding:10px;
-				border:10px solid #333;
-			} 
-			</style>
-			<script src=\"script/livepipe/livepipe.js\" type=\"text/javascript\"></script>
-			<script src=\"script/livepipe/window.js\" type=\"text/javascript\"></script>
-			<script src=\"script/niftyplayer.js.php\" type=\"text/javascript\"></script>
 			<script>
 				var modal = new Control.Modal($('modalcontent').innerHTML,{
 					overlayOpacity: 0.75,

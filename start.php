@@ -499,11 +499,11 @@ function activityfeed($mergeditems,$ajax = false) {
 
 					$title = _L('Message %1$s with %2$s Content',escapehtml($title),typestring(substr($types,1)));
 
-					$defaultlink = "messagegroup.php?id=$itemid";
+					$defaultlink = "mgeditor.php?id=$itemid";
 					$content = '<a href="' . $defaultlink . '" ' . $defaultonclick . '>' . $time .  ' - <b>' .  escapehtml($item["name"]) . "</b>" . ($item["description"] != ""?" - " . escapehtml($item["description"]):"") . '</a>';
 
 					$icon = 'largeicons/letter.jpg';
-					$tools = action_links (action_link("Edit", "pencil", 'messagegroup.php?id=' . $itemid));
+					$tools = action_links (action_link("Edit", "pencil", 'mgeditor.php?id=' . $itemid));
 				} else if($item["type"] == "report" ) {
 					$title = "Report " . escapehtml($title);
 					$content = '<a href="' . $defaultlink . '" ' . $defaultonclick . '>' .
