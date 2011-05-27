@@ -679,6 +679,8 @@ require_once("nav.inc.php");
 <script type="text/javascript">
 <?	Validator::load_validators(array("ValMessageBody", "ValEmailAttach"));?>
 </script>
+<script src="script/livepipe/livepipe.js" type="text/javascript"></script>
+<script src="script/livepipe/window.js" type="text/javascript"></script>
 <?
 
 startWindow(_L("Add Email Message Wizard"));
