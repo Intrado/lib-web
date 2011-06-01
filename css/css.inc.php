@@ -835,7 +835,51 @@ div.autocomplete ul li {
 	background-color:#fff;
 	padding:10px;
 	border:10px solid #333;
+}
+
+.modalwindow {  
+	background-color:#fff;
+	border:10px solid #333;
+	
+	background-position:top left;
+	-moz-border-radius: 10px;
+	-webkit-border-radius: 10px;
 } 
+
+.modalwindow .window_contents {
+	margin-top:0px;
+	width:100%;
+	padding: 1%;
+	width: 98%;
+}
+
+.modalwindow .window_header {
+	background-color:#333;
+	text-align:center;  
+}
+
+.modalwindow .window_title {  
+	background-color:graytext;
+	-moz-border-radius-topleft: 5px;
+	-webkit-border-top-left-radius: 5px;
+	-moz-border-radius-topright: 5px;
+	-webkit-border-top-right-radius: 5px;
+	padding: 2px;
+	font-size: 16px;
+	color: #fff;
+}
+
+.modalwindow .window_close {  
+	display:block;  
+	position:absolute;  
+	top:4px;  
+	right:5px;  
+	height:13px;  
+	width:13px;  
+	background-image:url("img/modalwindowclose.gif");  
+	cursor:pointer;  
+	cursor:hand;  
+}
 
 <? if ($theme == "classroom") { /* TODO move this to theme based css includes */ ?>
 

@@ -12,17 +12,17 @@ if(!isset($_GET['uid']) && !isset($_SESSION["previewmessage"])) {
 	exit();
 } else {
 	$uid = $_GET['uid'];
-	$partnum = $_GET['partnum'] - 1;
 	
 	$hascorrectuid = isset($_SESSION["previewmessage"]["uid"]) && $_SESSION["previewmessage"]["uid"] == $uid;
-	$ismissingpart = isset($partnum) && !isset($_SESSION["previewmessage"]["parts"][$partnum]);
+	$ismissingpart = isset($_GET['partnum']) && !isset($_SESSION["previewmessage"]["parts"][$_GET['partnum'] - 1]);
 	
 	if (!$hascorrectuid || $ismissingpart) {
 		exit();
 	}
 }
 
-if(isset($partnum)) {
+if(isset($_GET['partnum'])) {
+	$partnum = $_GET['partnum'] - 1;
 	$part = $_SESSION["previewmessage"]["parts"][$partnum];
 	
 	switch($part["type"]) {
@@ -46,19 +46,32 @@ if(isset($partnum)) {
 } else {
 	$messagepartdtos = array();
 	$parts = $_SESSION["previewmessage"]["parts"];
+	
 	foreach ($parts as $part) {
 		$messagepartdto = new commsuite_MessagePartDTO();
-		$messagepartdto->contentid = $part["contentid"];
-		$messagepartdto->type = $part["type"];
-		$messagepartdto->defaultvalue = $part["defaultvalue"];
-		$messagepartdto->fieldnum = $part["fieldnum"];
-		$messagepartdto->gender = $part["gender"];
-		$messagepartdto->languagecode = $part["languagecode"];
-		$messagepartdto->txt = $part["txt"];
+		
+		switch($part["type"]) {
+			case "T":
+				$messagepartdto->type = commsuite_MessagePartTypeDTO::T;
+				$voice = new Voice($part["voiceid"]);
+				$messagepartdto->gender = $voice->gender;
+				$messagepartdto->languagecode = $voice->languagecode;
+				$messagepartdto->txt = $part["txt"];
+				break;
+			case "A":
+				$messagepartdto->type = commsuite_MessagePartTypeDTO::A;
+				$messagepartdto->contentid = QuickQuery("select contentid from audiofile where id=? and userid=?",false,array($part["audiofileid"],$USER->id)) + 0;
+				break;
+		}
+		
+		$messagepartdto->defaultvalue = "";
+		$messagepartdto->fieldnum = "";
+		
+		error_log(json_encode($messagepartdto));
 		$messagepartdtos[] = $messagepartdto;
 	}
 	
-	$audiofull = phoneMessageGetMp3AudioFile($messagepartdto);
+	$audiofull = phoneMessageGetMp3AudioFile($messagepartdtos);
 	
 	header("HTTP/1.0 200 OK");
 	if (isset($_GET['download']))

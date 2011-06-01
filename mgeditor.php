@@ -50,7 +50,7 @@ if($messagegroup->type != 'notification') {
 
 
 if (isset($_GET['delete'])) {
-	QuickUpdate("update message set deleted=1 where id=? and messagegroupid=?",false,array($_GET['delete'],$messagegroup->id));
+	QuickUpdate("delete from message where id=? and messagegroupid=?",false,array($_GET['delete'],$messagegroup->id));
 }
 ////////////////////////////////////////////////////////////////////////////////
 // Optional Form Items And Validators
@@ -304,8 +304,8 @@ function makeMessageGrid($messagegroup) {
 	if ($USER->authorize("sendsms"))
 		$buttons[] = array("button" => button("New SMS", "", "editmessagesms.php?new&mgid=".$messagegroup->id));
 	if ($USER->authorize("sendemail")) {
-		$buttons[] = array("button" => button("New Html", "", "messagewizardemail.php?new&subtype=html&mgid=".$messagegroup->id));
-		$buttons[] = array("button" => button("New Plain", "", "messagewizardemail.php?new&subtype=plain&mgid=".$messagegroup->id));
+		$buttons[] = array("button" => button("New Html Email", "", "messagewizardemail.php?new&subtype=html&mgid=".$messagegroup->id));
+		$buttons[] = array("button" => button("New Plain Email", "", "messagewizardemail.php?new&subtype=plain&mgid=".$messagegroup->id));
 	}
 	
 	$links[] = $buttons;
@@ -343,7 +343,7 @@ function createactionmenu(id, content,title) {
 		delay: 0.2,
 		stem: 'leftTop',
 		hook: {  target: 'leftMiddle', tip: 'topLeft'  },
-		width: '110px',
+		width: '220px',
 		offset: { x: 16, y: 0 }
 	});
 //	$(id).observe('click', function(event) {

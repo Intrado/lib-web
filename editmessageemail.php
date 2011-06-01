@@ -324,7 +324,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 			Query("COMMIT");
 		}
 		if ($button == 'inpagesubmit') {
-			$modal = PreviewModal::CreateModalForEmailMessage($postdata['fromname'],$postdata['from'],$postdata['subject'],$postdata['message']);
+			$modal = PreviewModal::CreateModalForEmailMessage($languagecode,$subtype,$postdata['fromname'],$postdata['from'],$postdata['subject'],$postdata['message']);
 			$form->modifyElement("previewcontainer", $modal->includeModal());
 			//$form->modifyElement("previewcontainer", "<script>popup('messageviewer.php?id=$message->id', 800, 500);</script>");
 		}

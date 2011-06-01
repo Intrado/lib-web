@@ -17,6 +17,7 @@ class PreviewModal {
 	var $text;
 	var $parts;
 	var $valueparts;
+	var $title;
 	
 	var $hasfieldinserts = false;
 	var $uid;
@@ -43,14 +44,24 @@ class PreviewModal {
 					$modal->uid = uniqid();
 					$modal->parts = DBFindMany('MessagePart', 'from messagepart where messageid=? order by sequence', false, array($message->id));
 					$modal->initializeContent();
+					$modal->title = _L("%s Phone Message" , Language::getName($message->languagecode));
 					break;
 				case "email":
 					$email = messagePreviewForPriority($message->id, 3); // returns commsuite_EmailMessageView object
 					$modal->text = $modal->formatEmail($email);
+					switch ($message->subtype) {
+						case "html":
+							$modal->title = _L("%s HTML Email Message" , Language::getName($message->languagecode));
+							break;
+						case "plain":
+							$modal->title = _L("%s Plain Email Message" , Language::getName($message->languagecode));
+							break;
+					}
 					break;
 				case "sms":
 					$parts = DBFindMany('MessagePart', 'from messagepart where messageid=? order by sequence', false, array($message->id));
 					$modal->text = $message->renderSmsParts($parts);
+					$modal->title = _L("%s SMS Message" , Language::getName($message->languagecode));
 					break;
 			}
 		}
@@ -80,23 +91,33 @@ class PreviewModal {
 		}
 		
 		$modal->initializeContent();
+		$modal->title = _L("%s Phone Message", Language::getName($languagecode));
 		return $modal;
 	}
 	
 	
-	static function CreateModalForEmailMessage($fromname,$fromaddress,$subject,$text) {
+	static function CreateModalForEmailMessage($languagecode,$subtype,$fromname,$fromaddress,$subject,$text) {
 		$modal = new PreviewModal("email");
 		$message = new Message();
 		$message->type = "email";
-		$message->subtype = "html";
+		$message->subtype = $subtype;
 		$message->fromname = $fromname;
 		$message->fromemail = $fromaddress;
 		$message->subject = $subject;
-		$message->languagecode = "en";
+		$message->languagecode = $languagecode;
 		$message->stuffHeaders();
 		$parts = Message::parse($text);
 		$email = emailMessageViewForMessageParts($message,$parts,3);
 		$modal->text = $modal->formatEmail($email);
+		switch ($subtype) {
+			case "html":
+				$modal->title = _L("%s HTML Email Message", Language::getName($message->languagecode));
+				break;
+			case "plain":
+				$modal->title = _L("%s Plain Email Message", Language::getName($message->languagecode));
+				break;
+		}
+		
 		return $modal;
 		
 	}
@@ -114,27 +135,62 @@ class PreviewModal {
 				$modalcontent = $this->form->render();
 				$playercontent = "$('previewmessagefields').observe('Form:Submitted',function(e){
 									embedPlayer('previewaudio.mp3.php?uid=' + e.memo,'player'," . count($this->parts) . ");
+									$('download').update('<a href=\'previewaudio.mp3.php?download=true&uid=' + e.memo +'\'>" . _L("Click here to download") . "</a>');
 								});";
 			} else {
-				$playercontent = "embedPlayer('previewaudio.mp3.php?uid={$this->uid}','player'," . count($this->parts) . ");";
-			}
+				$playercontent = "embedPlayer('previewaudio.mp3.php?uid={$this->uid}','player'," . count($this->parts) . ");
+									$('download').update('<a href=\'previewaudio.mp3.php?download=true&uid={$this->uid}\'>" . _L("Click here to download") . "</a>');";
+							}
 			
 		}
 		return "<div id='modalcontent' style='display:none;'>$modalcontent</div>
 			<script>
-				var modal = new Control.Modal($('modalcontent').innerHTML,{
-					overlayOpacity: 0.75,
-					className: 'modal',
-					fade: false,
-					afterOpen: function(){
-						$('modalcontent').update('');
-						$playercontent
-					},
-					afterClose: function(){
-						this.destroy();
-					}
-				});
-				modal.container.insert('<div id=\'player\'></div>');  
+				var window_factory = function(options){
+					var window_header = new Element('div',{
+					className: 'window_header'
+					});
+					var window_title = new Element('div',{
+					className: 'window_title'
+					});
+					var window_close = new Element('div',{
+					className: 'window_close'
+					});
+					var window_contents = new Element('div',{
+						className: 'window_contents'
+					});
+					window_contents.update($('modalcontent').innerHTML)
+					var w = new Control.Modal(null,Object.extend({
+						className: 'modalwindow',
+						overlayOpacity: 0.75,
+						fade: false,
+						width: 750,
+						afterOpen: function(){
+							window_title.update('$this->title')
+							$('modalcontent').update('');
+							$playercontent
+						},
+						afterClose: function(){
+							this.destroy();
+						}
+					},options || {}));
+
+
+					
+					w.container.insert(window_header);
+					window_header.insert(window_title);
+					window_header.insert(window_close);
+					w.container.insert(window_contents);
+					w.container.insert('<div style=\'text-align:center;\' id=\'player\'></div>');
+					w.container.insert('<div style=\'text-align:center;padding-bottom:10px;\' id=\'download\'></div>');
+					
+					window_close.observe('click', function(event,modal) {
+						modal.close();
+					}.bindAsEventListener(this,w));
+					return w;
+				};
+				
+				var modal = window_factory(); 
+
 				modal.open();
 			</script>";
 	}
