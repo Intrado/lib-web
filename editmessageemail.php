@@ -245,7 +245,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 				json_decode($postdata['attachments'], true) == $attachments &&
 				$postdata['message'] == $text) {
 			// DO NOT UPDATE MESSAGE!
-		} else {
+		} else if ($button != 'inpagesubmit') {
 			Query("BEGIN");
 			
 			// if this is an edit for an existing message

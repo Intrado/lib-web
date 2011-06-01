@@ -202,7 +202,7 @@ if($isajax === true) {
 				);
 
 
-			$content = '<a href="' . $defaultlink . '" >' . $time .  ($item["description"] != ""?" - " . escapehtml($item["description"]):"") . ' - <b>' .  _L('%1$s Content',typestring(substr($types,1))). '</b>' . '</a>';
+			$content = '<a href="' . $defaultlink . '" >' . $time .  ($item["description"] != ""?" - " . escapehtml($item["description"]):"") . ' - <b>' . ($types==""?_L("Empty Message"):_L('%1$s Content',typestring(substr($types,1)))) . '</b>' . '</a>';
 			
 			$data->list[] = array("itemid" => $itemid,
 										"defaultlink" => $defaultlink,

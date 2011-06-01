@@ -176,7 +176,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		// if they didn't change anything, don't do anything
 		if ($postdata['message'] == $text && $postdata['gender'] == $gender) {
 			// DO NOT UPDATE MESSAGE!
-		} else {
+		} else if ($button != 'inpagesubmit'){
 			Query("BEGIN");
 			
 			// if this is an edit for an existing message
