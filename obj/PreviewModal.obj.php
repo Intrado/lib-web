@@ -43,7 +43,7 @@ class PreviewModal {
 					// Get message parts and save to session
 					$modal->uid = uniqid();
 					$modal->parts = DBFindMany('MessagePart', 'from messagepart where messageid=? order by sequence', false, array($message->id));
-					$modal->initializeContent();
+					$modal->initializePhoneFieldContent();
 					$modal->title = _L("%s Phone Message" , Language::getName($message->languagecode));
 					break;
 				case "email":
@@ -69,19 +69,20 @@ class PreviewModal {
 	}
 	
 	// Constructs and returns a PreviewModal object besed on sourcetext from agument or located in session.
-	static function CreateModalForMessageText($messagegroupid,$type,$sourcetext = false,$languagecode = "en", $preferredgender = "female") {
-		$modal = new PreviewModal($type);
-		if ($sourcetext) {
+	static function HandlePhoneMessageText($messagegroupid,$languagecode) {
+		$modal = new PreviewModal('phone');
+		$showmodal = false;
+		if (isset($_REQUEST["previewmodal"]) && isset($_REQUEST["text"]) && isset($_REQUEST["gender"])) {
+			$showmodal = true;
 			// save to session
 			$modal->uid = uniqid();
-			$voiceid = Voice::getPreferredVoice($languagecode, $preferredgender);
-			$_SESSION["previewmessagesource"] = array("uid" => $modal->uid, "source" => $sourcetext, "voiceid" => $voiceid);
+			$voiceid = Voice::getPreferredVoice($languagecode, $_REQUEST["gender"]);
+			$_SESSION["previewmessagesource"] = array("uid" => $modal->uid, "source" => $_REQUEST["text"], "voiceid" => $voiceid);
 		} else if (isset($_SESSION["previewmessagesource"])) {
 			$modal->uid = $_SESSION["previewmessagesource"]["uid"];
 		} else {
-			return $modal;
+			return;
 		}
-		
 		// Parse the source text into parts
 		$errors = array();
 		$audiofileids = MessageGroup::getReferencedAudioFileIDs($messagegroupid);
@@ -90,23 +91,37 @@ class PreviewModal {
 			error_log("Error parsing message source");
 		}
 		
-		$modal->initializeContent();
+		$modal->initializePhoneFieldContent();
+		
 		$modal->title = _L("%s Phone Message", Language::getName($languagecode));
-		return $modal;
+		if ($showmodal) {
+			$modal->includeModal();
+			exit();
+		} else {
+			$modal->handleRequest();
+		}
+		return;
 	}
 	
 	
-	static function CreateModalForEmailMessage($languagecode,$subtype,$fromname,$fromaddress,$subject,$text) {
+	static function HandleEmailMessageText($languagecode,$subtype) {
+		if (!isset($_REQUEST["previewmodal"]) || 
+			!isset($_REQUEST["fromname"]) || 
+			!isset($_REQUEST["fromaddress"]) || 
+			!isset($_REQUEST["subject"]) || 
+			!isset($_REQUEST["text"]))
+			return;
+		
 		$modal = new PreviewModal("email");
 		$message = new Message();
 		$message->type = "email";
 		$message->subtype = $subtype;
-		$message->fromname = $fromname;
-		$message->fromemail = $fromaddress;
-		$message->subject = $subject;
+		$message->fromname = $_REQUEST["fromname"];
+		$message->fromemail = $_REQUEST["fromaddress"];
+		$message->subject = $_REQUEST["subject"];
 		$message->languagecode = $languagecode;
 		$message->stuffHeaders();
-		$parts = Message::parse($text);
+		$parts = Message::parse($_REQUEST["text"]);
 		$email = emailMessageViewForMessageParts($message,$parts,3);
 		$modal->text = $modal->formatEmail($email);
 		switch ($subtype) {
@@ -118,81 +133,39 @@ class PreviewModal {
 				break;
 		}
 		
-		return $modal;
-		
+		$modal->includeModal();
+		return ;
 	}
+	
+	function getPreviewFormButton($languagecode,$textfieldid,$genderfieldid) {
+		return array(
+					"label" => "",
+					"value" => "",
+					"validators" => array(),
+					"control" => array("FormHtml", "html" => icon_button("Ajax Preview", "fugue/control","
+					var t=$('$textfieldid').value;
+					var l='$languagecode';
+					var g=$('$genderfieldid').descendants().find(function(el) { return el.checked });
+					g = g ? g.value : '';
+					showPreview(t,l,g);return false;","editmessagephone.php","id='previewbutton'")),
+					"helpstep" => 3
+				);
+	}
+	
+	
 	
 	// Includeds the javascript necessary to open the modal and renderes the form if there are any field insters
 	function includeModal() {
-		// TODO only phone is implemented continue with email 
 		$modalcontent = "";
 		$playercontent = "";
 		if ($this->type != "phone") {
 			$modalcontent = $this->text;
-		} else {
-			// Insert fields if they exists
-			if ($this->hasfieldinserts) {
-				$modalcontent = $this->form->render();
-				$playercontent = "$('previewmessagefields').observe('Form:Submitted',function(e){
-									embedPlayer('previewaudio.mp3.php?uid=' + e.memo,'player'," . count($this->parts) . ");
-									$('download').update('<a href=\'previewaudio.mp3.php?download=true&uid=' + e.memo +'\'>" . _L("Click here to download") . "</a>');
-								});";
-			} else {
-				$playercontent = "embedPlayer('previewaudio.mp3.php?uid={$this->uid}','player'," . count($this->parts) . ");
-									$('download').update('<a href=\'previewaudio.mp3.php?download=true&uid={$this->uid}\'>" . _L("Click here to download") . "</a>');";
-							}
-			
+		} else if ($this->hasfieldinserts) {
+			$modalcontent = $this->form->render();
 		}
-		return "<div id='modalcontent' style='display:none;'>$modalcontent</div>
-			<script>
-				var window_factory = function(options){
-					var window_header = new Element('div',{
-					className: 'window_header'
-					});
-					var window_title = new Element('div',{
-					className: 'window_title'
-					});
-					var window_close = new Element('div',{
-					className: 'window_close'
-					});
-					var window_contents = new Element('div',{
-						className: 'window_contents'
-					});
-					window_contents.update($('modalcontent').innerHTML)
-					var w = new Control.Modal(null,Object.extend({
-						className: 'modalwindow',
-						overlayOpacity: 0.75,
-						fade: false,
-						width: 750,
-						afterOpen: function(){
-							window_title.update('$this->title')
-							$('modalcontent').update('');
-							$playercontent
-						},
-						afterClose: function(){
-							this.destroy();
-						}
-					},options || {}));
-
-
-					
-					w.container.insert(window_header);
-					window_header.insert(window_title);
-					window_header.insert(window_close);
-					w.container.insert(window_contents);
-					w.container.insert('<div style=\'text-align:center;\' id=\'player\'></div>');
-					w.container.insert('<div style=\'text-align:center;padding-bottom:10px;\' id=\'download\'></div>');
-					
-					window_close.observe('click', function(event,modal) {
-						modal.close();
-					}.bindAsEventListener(this,w));
-					return w;
-				};
-				
-				var modal = window_factory(); 
-
-				modal.open();
-			</script>";
+		sleep(2);
+		header('Content-Type: application/json');
+		echo json_encode(array("type" => $this->type,"title" => $this->title, "hasinserts" => $this->hasfieldinserts, "form" => $modalcontent, "uid" => $this->uid, "partscount" => count($this->parts)));
 	}
 	
 	// Creates the messageparts and saves them in session for the messages contains field instersts 
@@ -222,12 +195,10 @@ class PreviewModal {
 									$previewpart["txt"] = $part->defaultvalue;
 								}
 							}
-						
 							$previewparts[] = $previewpart;
 						}
 						
 						$_SESSION["previewmessage"] = array("uid" => $this->uid, "parts" => $previewparts);
-						
 						$this->form->fireEvent($this->uid);
 					}
 				}
@@ -237,7 +208,7 @@ class PreviewModal {
 	
 	
 	// Private helper function to create from for field inserts or set the session to play intantly
-	private function initializeContent() {
+	private function initializePhoneFieldContent() {
 		if ($this->parts) {
 			// Get preview fields
 			list($fields,$fielddata,$fielddefaults) = getpreviewfieldmapdatafromparts($this->parts);
@@ -264,6 +235,86 @@ class PreviewModal {
 	//formates a commsuite_EmailMessageView object to html
 	private function formatEmail($email) {
 		return "<b>From:</b> $email->emailfromname &lt;$email->emailfromaddress&gt;<br /><b>Subject:</b> $email->emailsubject<br /><hr /> $email->emailbody";
+	}
+	
+	
+	
+	static function includePreviewScript($requestpage) {
+		?>
+		<script type='text/javascript' language='javascript'>
+		var showPreview = function(text,gender,language){
+			var window_header = new Element('div',{
+			className: 'window_header'
+			});
+			var window_title = new Element('div',{
+			className: 'window_title'
+			}).update("Loading...");
+			var window_close = new Element('div',{
+			className: 'window_close'
+			});
+			var window_contents = new Element('div',{
+				className: 'window_contents'
+			});
+			var loader = new Element('a',{
+				href: 'img/ajax-loader.gif'
+			});
+			var w = new Control.Modal(loader,Object.extend({
+				className: 'modalwindow',
+				overlayOpacity: 0.75,
+				fade: false,
+				width: 750,
+				indicator:loader,
+				insertRemoteContentAt:window_contents,
+				afterOpen: function(){
+					
+				},
+				afterClose: function(){
+					this.destroy();
+					window_contents.remove(); // remove since the player and download uses ids that is reused whe reopened
+				}
+			},{}));
+			
+			new Ajax.Request('<?=$requestpage?>', {
+				'method': 'post',
+				'parameters': {previewmodal:'true',text:text,gender:gender,language:language},
+				'onSuccess': function(response) {
+					if (response.responseJSON) {
+						var result = response.responseJSON;
+						window_title.update(result.title);
+						window_contents.update(result.form + '<div style=\'text-align:center;\' id=\'player\'></div><div style=\'text-align:center;\' id=\'download\'></div>');
+						if (result.hasinserts ==  false) {
+							$('download').update('<a href=\'previewaudio.mp3.php?download=true&uid=' + result.uid + '\'>Click here to download</a>');
+							embedPlayer('previewaudio.mp3.php?uid=' + result.uid,'player',result.partscount);
+						} else {
+							$('previewmessagefields').observe('Form:Submitted',function(e){
+								embedPlayer('previewaudio.mp3.php?uid=' + e.memo,'player',result.partscount);
+								$('download').update('<a href=\'previewaudio.mp3.php?download=true&uid=' + e.memo +'\'>Click here to download</a>');
+							});
+						}
+					} else {
+						window_contents.update('Unable to preview this message');
+					}
+				},
+				
+				'onFailure': function() {
+					window_contents.update('Unable to preview this message');
+				}
+			});
+			
+			w.container.insert(window_header);
+			window_header.insert(window_title);
+			window_header.insert(window_close);
+			w.container.insert(window_contents);
+			
+			window_close.observe('click', function(event,modal) {
+				modal.close();
+			}.bindAsEventListener(this,w));
+			
+			w.open();
+			return w;
+		};
+			</script>
+		<?
 	}
 }
 
