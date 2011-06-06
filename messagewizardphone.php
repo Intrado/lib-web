@@ -28,7 +28,7 @@ require_once("obj/HtmlRadioButtonBigCheck.fi.php");
 require_once("obj/PhoneMessageRecorder.fi.php");
 require_once("obj/PhoneMessageRecorder.val.php");
 require_once("obj/ValMessageBody.val.php");
-require_once("obj/traslationitem.obj.php");
+require_once("obj/RetranslationItem.fi.php");
 require_once("obj/CheckBoxWithHtmlPreview.fi.php");
 require_once("obj/PhoneMessageEditor.fi.php");
 require_once("obj/InpageSubmitButton.fi.php");
@@ -346,9 +346,6 @@ class MsgWiz_phoneAdvanced extends WizStep {
 }
 
 class MsgWiz_translatePreview extends WizStep {
-	function escapeFieldInserts($text) {
-		return str_replace(">>", "&#062;&#062;", str_replace("<<", "&#060;&#060;", $text));
-	}
 	
 	function getForm($postdata, $curstep) {
 		global $TRANSLATIONLANGUAGECODES;
@@ -383,7 +380,7 @@ class MsgWiz_translatePreview extends WizStep {
 
 		$formdata["englishtext"] = array(
 			"label" => _L("English"),
-			"control" => array("FormHtml","html"=>'<div style="font-size: medium;">'.$this->escapeFieldInserts($sourcetext).'</div><br>'),
+			"control" => array("FormHtml","html"=>'<div style="font-size: medium;">'.escapehtml($sourcetext).'</div><br>'),
 			"helpstep" => 1
 		);
 
@@ -402,9 +399,12 @@ class MsgWiz_translatePreview extends WizStep {
 					$formdata[$languagecode] = array(
 						"label" => _L("Enabled"),
 						"fieldhelp" => _L('Check this box to automatically translate your message using Google Translate.'),
-						"value" => 1,
+						"value" => true,
 						"validators" => array(),
-						"control" => array("CheckBoxWithHtmlPreview", "checkedhtml" => $this->escapeFieldInserts($obj->responseData->translatedText), "uncheckedhtml" => addslashes(_L("People tagged with this language will receive the English version."))),
+						"control" => array("RetranslationItem",
+							"langcode" => $languagecode,
+							"message" => $obj->responseData->translatedText,
+							"disabledmessage" => _L("People tagged with this language will receive the English version.")),
 						"helpstep" => 2
 					);
 				}
@@ -414,9 +414,12 @@ class MsgWiz_translatePreview extends WizStep {
 				$formdata[$languagecode] = array(
 					"label" => _L("Enabled"),
 					"fieldhelp" => _L('Check this box to automatically translate your message using Google Translate.'),
-					"value" => 1,
+					"value" => true,
 					"validators" => array(),
-					"control" => array("CheckBoxWithHtmlPreview", "checkedhtml" => $this->escapeFieldInserts($translations->translatedText), "uncheckedhtml" => addslashes(_L("People tagged with this language will receive the English version."))),
+					"control" => array("RetranslationItem",
+						"langcode" => $languagecode,
+						"message" => $translations->translatedText,
+						"disabledmessage" => _L("People tagged with this language will receive the English version.")),
 					"helpstep" => 2
 				);
 			}
@@ -675,7 +678,7 @@ class FinishMessageWizard extends WizFinish {
 				foreach ($postdata["/create/translatepreview"] as $translatedlangcode => $enabled) {
 					// when the message is created, the modify date will be set in the past and retranslation will
 					// get called before attaching to the message group
-					if ($enabled === "true") {
+					if ($enabled) {
 						$messages[$translatedlangcode]['translated'] = $messages['en']['none'];
 						$messages[$translatedlangcode]['source'] = $messages['en']['none'];
 					}
@@ -811,9 +814,9 @@ if (isset($_SESSION['wizard_message_mgid'])) {
 if (!isset($_SESSION['wizard_message']['mgid']))
 	redirect('unauthorized.php');
 
-
-$modal = PreviewModal::CreateModalForMessageText($_SESSION['wizard_message']['mgid'],"phone");
-$modal->handleRequest();
+// TODO: Page wont load with below uncommented
+//$modal = PreviewModal::CreateModalForMessageText($_SESSION['wizard_message']['mgid'],"phone");
+//$modal->handleRequest();
 
 ////////////////////////////////////////////////////////////////////////////////
 // Display
