@@ -1,5 +1,8 @@
 <?
 class CheckBoxWithHtmlPreview extends FormItem {
+	var $clearonsubmit = true;
+	var $clearvalue = false;
+	
 	function render ($value) {
 		$n = $this->form->name."_".$this->name;
 		$str = '<input id="'.$n.'" name="'.$n.'" type="checkbox" value="true" '. ($value ? 'checked' : '').'
