@@ -1,7 +1,6 @@
 <?
 
 $SETTINGS = parse_ini_file("parentportalsettings.ini.php",true);
-$IS_COMMSUITE = $SETTINGS['feature']['is_commsuite'];
 $INBOUND_ACTIVATION = false; // set only when customer allows phone activation (bypass activation codes for contact associations)
 $INBOUND_MSGCALLBACK = false; // set only when customer has callback feature
 

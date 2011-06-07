@@ -49,9 +49,8 @@ class Phone extends DBMappedObject {
 	}
 
 	static function validateEasyCall($phone) {
-		global $IS_COMMSUITE;
 
-		if ($IS_COMMSUITE || getSystemSetting('_dmmethod') != 'asp') {
+		if (getSystemSetting('_dmmethod') != 'asp') {
 			$min = getSystemSetting('easycallmin', 10);
 			$max = getSystemSetting('easycallmax', 10);
 		} else {

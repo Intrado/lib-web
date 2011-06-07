@@ -31,7 +31,7 @@ if((isset($_COOKIE['embeddedpage']) && $_COOKIE['embeddedpage']) || isset($_GET[
 					<tr>
 						<td><img src="img/sm_white.gif" /></td>
 						<td>
-						<? /*CSDELETEMARKER_START*/ if (!$IS_COMMSUITE && isset($_SERVER["HTTPS"])) { ?>
+						<? if (isset($_SERVER["HTTPS"])) { ?>
 									<div style="float:right">
 										<table width="135" border="0" cellpadding="2" cellspacing="0" title="<?=_L("Click to Verify - This site chose VeriSign SSL for secure e-commerce and confidential communications.")?>">
 											<tr>
@@ -40,7 +40,7 @@ if((isset($_COOKIE['embeddedpage']) && $_COOKIE['embeddedpage']) || isset($_GET[
 											</tr>
 										</table>
 									</div>
-						<? } /*CSDELETEMARKER_END*/ ?>
+						<? } ?>
 						</td>
 						</tr>
 				</table>

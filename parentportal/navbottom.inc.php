@@ -2,10 +2,8 @@
 </div>
 
 <div id="termsinfo">
-<? /*CSDELETEMARKER_START*/ if (!$IS_COMMSUITE) { ?>
 <?=_L('Use of this system is subject to the %1$s and %2$s', '<a href="locale/' . $LOCALE . '/privacy.html" target="_blank">' . _L("Privacy Policy") . "</a>", '<a href="locale/' . $LOCALE . '/terms.html" target="_blank">' . _L("Terms of Service") . "</a>")?>
 <br>
-<? } /*CSDELETEMARKER_END*/ ?>
 &copy; 1999-2011 Reliance Communications, Inc. <?=_L("All Rights Reserved.")?>
 
 </div>
