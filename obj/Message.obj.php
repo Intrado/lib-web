@@ -150,7 +150,7 @@ class Message extends DBMappedObject {
 		if (is_array($parts)) {
 			foreach ($parts as $part) {
 				// VoiceID Sanity Check
-				if ($this->type == 'phone' && $part->voiceid == null) {
+				if (($part->type == "T" || $part->type == "V") && $this->type == 'phone' && $part->voiceid == null) {
 					error_log("ERROR: Fund phone message part with voiceid null");
 					if ($preferredgender == null) 
 						$preferredgender = "female";
