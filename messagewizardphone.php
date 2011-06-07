@@ -220,7 +220,7 @@ class MsgWiz_phoneEasyCall extends WizStep {
 		global $USER;
 		
 		// Phone message recorder will store the audiofile with this name
-		$language = Language::getName(isset($postdata["/language"]["language"])?$postdata["/language"]["language"]:"en");
+		$language = Language::getName(isset($postdata["/create/language"]["language"])?$postdata["/create/language"]["language"]:Language::getDefaultLanguageCode());
 		
 		$formdata = array($this->title);
 		$formdata['tips'] = array(
@@ -650,10 +650,15 @@ class FinishMessageWizard extends WizFinish {
 			else
 				$message->update();
 			
+			// assign this audiofile to the message group
+			$audiofile = new AudioFile($audiofileid);
+			$audiofile->messagegroupid = $messagegroup->id;
+			$audiofile->update();
+			
 			$part = new MessagePart();
 			$part->messageid = $message->id;
 			$part->type = "A";
-			$part->audiofileid = $audiofileid;
+			$part->audiofileid = $audiofile->id;
 			$part->sequence = 0;
 			$part->create();
 		} else {
@@ -669,6 +674,9 @@ class FinishMessageWizard extends WizFinish {
 			// if this is the default 'en' message, it's autotranslate value is 'none'
 			$messages[$sourcelangcode][$autotrans]['text'] = $text;
 			$messages[$sourcelangcode][$autotrans]['gender'] = $gender;
+			
+			// update usersetting for default gender
+			$USER->setSetting('defaultgender', $gender);
 			
 			//also set the messagegroup preferred gender
 			$messagegroup->preferredgender = $gender;

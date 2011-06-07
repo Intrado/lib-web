@@ -108,7 +108,7 @@ PreviewModal::HandlePhoneMessageText($messagegroup->id,$languagecode);
 
 
 $text = "";
-$gender = "";
+$gender = $messagegroup->preferredgender;
 if ($message) {
 	$parts = DBFindMany("MessagePart", "from messagepart where messageid = ? order by sequence", false, array($message->id));
 	$text = Message::format($parts);
@@ -123,6 +123,10 @@ if ($message) {
 }
 
 $language = Language::getName($languagecode);
+
+// get user default gender selection if none assigned
+if (!$gender)
+	$gender = $USER->getSetting('defaultgender', "female");
 
 $formdata = array($messagegroup->name. " (". $language. ")");
 
@@ -191,6 +195,12 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 			// DO NOT UPDATE MESSAGE!
 		} else if ($button != 'inpagesubmit'){
 			Query("BEGIN");
+			
+			// update usersetting and message group for default gender
+			$USER->setSetting('defaultgender', $gender);
+			$messagegroup->preferredgender = $postdata['gender'];
+			$messagegroup->stuffHeaders();
+			$messagegroup->update(array("data"));
 			
 			// if this is an edit for an existing message
 			if ($message) {
