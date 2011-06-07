@@ -4,6 +4,14 @@ require_once("obj/Voice.obj.php");
 require_once("inc/securityhelper.inc.php");
 require_once("obj/MessagePart.obj.php");
 require_once("inc/appserver.inc.php");
+require_once("obj/Language.obj.php");
+
+
+require_once('thrift/Thrift.php');
+require_once $GLOBALS['THRIFT_ROOT'].'/protocol/TBinaryProtocol.php';
+require_once $GLOBALS['THRIFT_ROOT'].'/transport/TSocket.php';
+require_once $GLOBALS['THRIFT_ROOT'].'/transport/TBufferedTransport.php';
+require_once $GLOBALS['THRIFT_ROOT'].'/transport/TFramedTransport.php';
 require_once("inc/thrift.inc.php");
 require_once $GLOBALS['THRIFT_ROOT'].'/packages/commsuite/CommSuite.php';
 
@@ -55,7 +63,7 @@ if(isset($_GET['partnum'])) {
 				$messagepartdto->type = commsuite_MessagePartTypeDTO::T;
 				$voice = new Voice($part["voiceid"]);
 				$messagepartdto->gender = $voice->gender;
-				$messagepartdto->languagecode = $voice->languagecode;
+				$messagepartdto->languagecode = $voice->language;
 				$messagepartdto->txt = $part["txt"];
 				break;
 			case "A":
@@ -67,7 +75,6 @@ if(isset($_GET['partnum'])) {
 		$messagepartdto->defaultvalue = "";
 		$messagepartdto->fieldnum = "";
 		
-		error_log(json_encode($messagepartdto));
 		$messagepartdtos[] = $messagepartdto;
 	}
 	

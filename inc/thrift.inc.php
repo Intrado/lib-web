@@ -1,14 +1,5 @@
 <? 
 
-// TODO move globals to better location
-$GLOBALS['THRIFT_ROOT'] = 'thrift';
-// Load up all the thrift stuff
-require_once $GLOBALS['THRIFT_ROOT'].'/Thrift.php';
-require_once $GLOBALS['THRIFT_ROOT'].'/protocol/TBinaryProtocol.php';
-require_once $GLOBALS['THRIFT_ROOT'].'/transport/TSocket.php';
-require_once $GLOBALS['THRIFT_ROOT'].'/transport/TBufferedTransport.php';
-require_once $GLOBALS['THRIFT_ROOT'].'/transport/TFramedTransport.php';
-
 /////////////////////////////////////
 // AppServer MessageLink service
 

@@ -6,6 +6,11 @@ $SETTINGS = parse_ini_file("inc/settings.ini.php",true);
 
 apache_note("CS_APP","ml"); //for logging
 
+require_once('thrift/Thrift.php');
+require_once $GLOBALS['THRIFT_ROOT'].'/protocol/TBinaryProtocol.php';
+require_once $GLOBALS['THRIFT_ROOT'].'/transport/TSocket.php';
+require_once $GLOBALS['THRIFT_ROOT'].'/transport/TBufferedTransport.php';
+require_once $GLOBALS['THRIFT_ROOT'].'/transport/TFramedTransport.php';
 require_once("inc/thrift.inc.php");
 require_once($GLOBALS['THRIFT_ROOT'].'/packages/messagelink/MessageLink.php');
 require_once("inc/utils.inc.php");
