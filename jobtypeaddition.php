@@ -56,9 +56,7 @@ if(CheckFormSubmit($f,$s))
 			$type->name = GetFormData($f, $s, "jobtypename");
 			$type->info = GetFormData($f, $s, "jobtypedesc");
 			$type->systempriority = 3;
-			if($IS_COMMSUITE){
-				$type->systempriority = GetFormData($f, $s, "systempriority");
-			}
+
 			$type->issurvey = GetFormData($f, $s, "issurvey");
 			if($type->issurvey && $type->systempriority != 3){
 				error("Survey job types can only have a system priority of General");
@@ -90,9 +88,7 @@ if($reloadform){
 	ClearFormData($f);
 	PutFormData($f, $s, "jobtypename", "", "text", 0, 50, true);
 	PutFormData($f, $s, "jobtypedesc", "", "text", 0, 255, true);
-	if($IS_COMMSUITE){
-		PutFormData($f, $s, "systempriority", "3", "number");
-	}
+
 	PutFormData($f, $s, "issurvey", (bool)0, "bool", 0, 1);
 	foreach($max as $index => $maxvalue){
 		for($i=0; $i<$maxvalue; $i++){
@@ -134,18 +130,7 @@ startWindow("Add a Job Type");
 				</tr>
 				<tr>
 					<td width="30%">System Priority</td>
-					<td>
-<?
-						if($IS_COMMSUITE){
-								NewFormItem($f, $s, "systempriority", "selectstart");
-								NewFormItem($f, $s, "systempriority", "selectoption", "High Priority", "2");
-								NewFormItem($f, $s, "systempriority", "selectoption", "General", "3");
-								NewFormItem($f, $s, "systempriority", "selectend");
-						} else {
-							echo "General";
-						}
-?>
-					</td>
+					<td>General</td>
 				</tr>
 
 <? if (getSystemSetting('_hassurvey', true)) { ?>
@@ -176,7 +161,6 @@ startWindow("Add a Job Type");
 							</tr>
 <?
 							foreach($max as $index => $maxvalue){
-								if($IS_COMMSUITE && $index == 'sms') continue;
 								if($index == 'sms' && !getSystemSetting('_hassms', false)) continue;
 ?>
 								<tr>

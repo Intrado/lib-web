@@ -77,7 +77,7 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f, "add") || CheckFormSubmit($f, "
 				foreach($types[$index] as $type){
 					if(CheckFormSubmit($f, 'delete') !== false &&
 						CheckFormSubmit($f, 'delete') == $type->id){
-						if(($type->systempriority == 2 && $IS_COMMSUITE) || $type->systempriority == 3) {
+						if($type->systempriority == 3) {
 							$type->deleted = 1;
 							$type->update();
 						}
@@ -228,7 +228,6 @@ function getJobTypePrefs(){
 }
 
 function putJobtypeForm($f, $s, $type, $maxphones, $maxemails, $maxsms, $jobtypeprefs){
-	global $IS_COMMSUITE;
 	PutFormData($f, $s, "jobtypename" . $type->id, $type->name, "text", 0, 50, true);
 	PutFormData($f, $s, "jobtypedesc" . $type->id, $type->info, "text", 0, 255, true);
 	for($i=0; $i<$maxphones; $i++){
@@ -237,7 +236,7 @@ function putJobtypeForm($f, $s, $type, $maxphones, $maxemails, $maxsms, $jobtype
 	for($i=0; $i<$maxemails; $i++){
 		PutFormData($f, $s, "jobtype" . $type->id . "email" . $i, isset($jobtypeprefs[$type->id]["email"][$i]) ? $jobtypeprefs[$type->id]["email"][$i] : 0, "bool", 0, 1);
 	}
-	if(!$IS_COMMSUITE && getSystemSetting("_hassms")){
+	if(getSystemSetting("_hassms")){
 		if(!$type->issurvey){
 			for($i=0; $i<$maxsms; $i++){
 				PutFormData($f, $s, "jobtype" . $type->id . "sms" . $i, isset($jobtypeprefs[$type->id]["sms"][$i]) ? $jobtypeprefs[$type->id]["sms"][$i] :0 , "bool", 0, 1);
@@ -248,7 +247,6 @@ function putJobtypeForm($f, $s, $type, $maxphones, $maxemails, $maxsms, $jobtype
 }
 
 function getJobtypeForm($f, $s, $type, $maxphones, $maxemails, $maxsms){
-	global $IS_COMMSUITE;
 	if($type->name != "Emergency"){
 		$type->name = GetFormData($f, $s, "jobtypename" . $type->id);
 	}
@@ -265,7 +263,7 @@ function getJobtypeForm($f, $s, $type, $maxphones, $maxemails, $maxsms){
 		$values[] = "('" . $type->id . "','email','" . $i . "','"
 					. DBSafe(GetFormData($f, $s, "jobtype" . $type->id . "email" . $i)) . "')";
 	}
-	if(!$IS_COMMSUITE && getSystemSetting("_hassms")){
+	if(getSystemSetting("_hassms")){
 		if(!$type->issurvey){
 			for($i=0; $i<$maxsms; $i++){
 				$values[] = "('" . $type->id . "','sms','" . $i . "','"
@@ -279,7 +277,6 @@ function getJobtypeForm($f, $s, $type, $maxphones, $maxemails, $maxsms){
 }
 
 function displayJobtypeForm($f, $s, $jobtypeid, $maxphones, $maxemails, $maxsms){
-	global $IS_COMMSUITE;
 	$maxcolumns = max($maxphones, $maxemails, $maxsms);
 ?>
 	<tr>
@@ -338,7 +335,7 @@ function displayJobtypeForm($f, $s, $jobtypeid, $maxphones, $maxemails, $maxsms)
 ?>
 				</tr>
 <?
-				if(!$IS_COMMSUITE && getSystemSetting("_hassms")){
+				if(getSystemSetting("_hassms")){
 					if(!((isset($type) && $type->issurvey) || $jobtypeid == "_newsurvey_")){
 ?>
 					<tr>
@@ -362,7 +359,7 @@ function displayJobtypeForm($f, $s, $jobtypeid, $maxphones, $maxemails, $maxsms)
 			</table>
 		</td>
 <?
-		if(($type->systempriority == 2 && $IS_COMMSUITE) || $type->systempriority == 3) {
+		if($type->systempriority == 3) {
 			?><td colspan=100 class="bottomBorder" ><?=button("Delete", "if(confirmDelete()) submitForm('" . $f . "','delete','" . $jobtypeid. "');")?></td><?
 		} else {
 			?><td colspan=100 class="bottomBorder" >&nbsp;</td><?

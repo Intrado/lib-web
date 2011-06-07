@@ -42,34 +42,7 @@ if (!isset($scheme['_supportphone']))
 
 header('Content-type: text/html; charset=UTF-8') ;
 
-if ($IS_COMMSUITE) {
-?>
-<html>
-<head>
-	<meta http-equiv="Content-type" value="text/html; charset=UTF-8" />
-	<title>SchoolMessenger <?=$TITLE?></title>
-	<script src='script/utils.js'></script>
-	<script src='script/nav.js'></script>
-	<link href='css/style_print.css' type='text/css' rel='stylesheet' media='print'>	
-</head>
-<body style='padding: 0; margin: 0px; font-family: "Lucida Grande", verdana, arial, helvetica, sans-serif; background-color: #f0f0f0; color: #595959;'>
-<?
-$logofilename = "img/customlogo.gif";
-if (file_exists($logofilename) ) {
-?>
-<img style="margin: 15px; border: solid 15px  white;" src="<?= $logofilename ?>">
-<? } else { ?>
-<br><br><br><br>
-<? } ?>
-<table align="center" cellpadding="8" cellspacing="0" style="border: 7px solid #9B9B9B; background-color: white;">
-	<tr>
-		<td bgcolor="#365F8D"><img style="margin-left: 10px; margin-top: 5px; margin-bottom: 5px; display: inline;" src='img/school_messenger.gif' /></td>
-		<td bgcolor="#365F8D" align="center"><div style='margin-top: 3px; margin-right: 10px; font-size: large; display: inline; float: right; color: white;'><?= escapehtml($custname) ?></div></td>
-	</tr>
-	<tr>
-		<td colspan="2">
-<?
-} /*CSDELETEMARKER_START*/ else {
+
 ?>
 <html>
 <head>
@@ -184,8 +157,3 @@ function getObj(name)
 			  <tr>
 				  <td valign="top"><img style="float: left; margin-top: 10px;" src="loginpicture.img.php" alt=""></td>
 				  <td width="100%" valign="top">
-
-
-<?
-} /*CSDELETEMARKER_END*/
-?>

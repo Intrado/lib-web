@@ -45,7 +45,7 @@ if (getSystemSetting('_hascallback', false)) {
 	);
 }
 
-if($IS_COMMSUITE || getSystemSetting('_dmmethod', 'asp') != 'asp'){
+if(getSystemSetting('_dmmethod', 'asp') != 'asp'){
 
 	$helpsteps[$helpstepnum++] = _L("If you use a SmartCall appliance or have a licensed solution, enter the minimum and maximum length of extensions on your local network. For example, to have the system call  four digit extensions on your local network, set these values to 4.");
 	$formdata["easycallmin"] = array(
@@ -96,7 +96,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		if (isset($postdata['callerid']))
 			setSystemSetting('callerid', Phone::parse($postdata['callerid']));
 
-		if($IS_COMMSUITE || getSystemSetting('_dmmethod', 'asp') != 'asp'){
+		if(getSystemSetting('_dmmethod', 'asp') != 'asp'){
 			setSystemSetting('easycallmin', $postdata['easycallmin']);
 			setSystemSetting('easycallmax', $postdata['easycallmax']);
 		}

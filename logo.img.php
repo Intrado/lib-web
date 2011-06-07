@@ -1,19 +1,11 @@
 <?
 
 $SETTINGS = parse_ini_file("inc/settings.ini.php",true);
-$IS_COMMSUITE = $SETTINGS['feature']['is_commsuite'];
 
 //get the customer URL
-if ($IS_COMMSUITE) {
-	$CUSTOMERURL = "default";
-} /*CSDELETEMARKER_START*/ else {
-	$CUSTOMERURL = substr($_SERVER["SCRIPT_NAME"],1);
-	$CUSTOMERURL = strtolower(substr($CUSTOMERURL,0,strpos($CUSTOMERURL,"/")));
-} /*CSDELETEMARKER_END*/
+$CUSTOMERURL = substr($_SERVER["SCRIPT_NAME"],1);
+$CUSTOMERURL = strtolower(substr($CUSTOMERURL,0,strpos($CUSTOMERURL,"/")));
 
-if (isset($_GET['urlcomponent'])) {
-	$CUSTOMERURL = $_GET['urlcomponent'];
-}
 apache_note("CS_APP","cs"); //for logging
 apache_note("CS_CUST",urlencode($CUSTOMERURL)); //for logging
 

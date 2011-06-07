@@ -586,12 +586,10 @@ include_once("nav.inc.php");
 </script>
 <?
 
-/*CSDELETEMARKER_START*/
-if($USER->authorize('loginphone') && !$IS_COMMSUITE) {
+if($USER->authorize('loginphone')) {
 	$tollfree = Phone::format(getSystemSetting("inboundnumber"));
 	echo '<br>Your toll free number is: <b>' . $tollfree . '</b><br><br>';
 }
-/*CSDELETEMARKER_END*/
 
 startWindow(_L("User Information"));
 echo $form->render();

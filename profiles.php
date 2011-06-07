@@ -65,12 +65,7 @@ $titles = array(	"name" => "Name",
 					"Actions" => "Actions"
 					);
 
-if($IS_COMMSUITE)
-	$data = DBFindMany("Access","from access order by name");
-/*CSDELETEMARKER_START*/
-else
-	$data = DBFindMany("Access","from access where name != 'SchoolMessenger Admin' order by name");
-/*CSDELETEMARKER_END*/
+$data = DBFindMany("Access","from access where name != 'SchoolMessenger Admin' order by name");
 
 startWindow('Profile List ' . help('Security_ProfileList'), 'padding: 3px;');
 

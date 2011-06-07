@@ -19,13 +19,11 @@ if (!$USER->authorize('manageprofile')) {
 	redirect('unauthorized.php');
 }
 
-/*CSDELETEMARKER_START*/
 if(isset($_GET['id'])){
 	if(QuickQuery("select count(*) from access where name = 'SchoolMessenger Admin' and id = ?",false,array($_GET['id']))){
 		redirect('unauthorized.php');
 	}
 }
-/*CSDELETEMARKER_END*/
 
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -135,7 +135,7 @@ startWindow("Options", 'padding: 3px;');
 					}
 					if ($USER->authorize('managesystem') && getSystemSetting('_dmmethod', "")!='asp') {
 ?>
-						<tr><td><a href='dms.php'><?=($IS_COMMSUITE)?_L("Telephony Settings"):_L("SmartCall Appliance")?></a></td></tr>
+						<tr><td><a href='dms.php'><?=_L("SmartCall Appliance")?></a></td></tr>
 <?
 					}
 					if (getSystemSetting('_hastargetedmessage', false) && $USER->authorize('manageclassroommessaging')) {

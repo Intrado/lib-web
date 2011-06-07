@@ -8,12 +8,8 @@ require_once("inc/table.inc.php");
 
 
 if ($SETTINGS['feature']['has_ssl']) {
-	if ($IS_COMMSUITE)
-		$secureurl = "https://" . $_SERVER["SERVER_NAME"] . "/forgotpassword.php";
-	/*CSDELETEMARKER_START*/
-	else
-		$secureurl = "https://" . $_SERVER["SERVER_NAME"] . "/$CUSTOMERURL/forgotpassword.php";
-	/*CSDELETEMARKER_END*/
+
+	$secureurl = "https://" . $_SERVER["SERVER_NAME"] . "/$CUSTOMERURL/forgotpassword.php";
 
 	if ($SETTINGS['feature']['force_ssl'] && !isset($_SERVER["HTTPS"])) {
 		redirect($secureurl);

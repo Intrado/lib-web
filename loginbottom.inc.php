@@ -1,13 +1,4 @@
-<?
-if ($IS_COMMSUITE) {
-?>
-			</td>
-		</tr>
-	</table>
-<?
 
-} /*CSDELETEMARKER_START*/ else {
-?>
 			</td>
 			  </tr>
 				  </table>
@@ -34,8 +25,6 @@ if ($IS_COMMSUITE) {
 
 <?
 
-
-}/*CSDELETEMARKER_END*/
 
 if(isset($ERRORS) && is_array($ERRORS)) {
 	foreach($ERRORS as $key => $value) {
