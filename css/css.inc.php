@@ -842,8 +842,6 @@ div.autocomplete ul li {
 	border:10px solid #333;
 	
 	background-position:top left;
-	-moz-border-radius: 10px; /* FIXME */
-	-webkit-border-radius: 10px; /* FIXME */
 } 
 
 .modalwindow .window_contents {
@@ -860,10 +858,6 @@ div.autocomplete ul li {
 
 .modalwindow .window_title {  
 	background-color:graytext;
-	-moz-border-radius-topleft: 5px; /* FIXME */
-	-webkit-border-top-left-radius: 5px; /* FIXME */
-	-moz-border-radius-topright: 5px; /* FIXME */
-	-webkit-border-top-right-radius: 5px; /* FIXME */
 	padding: 2px;
 	font-size: 16px;
 	color: #fff;
