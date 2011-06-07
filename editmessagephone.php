@@ -34,6 +34,11 @@ require_once("obj/InpageSubmitButton.fi.php");
 
 require_once("inc/previewfields.inc.php");
 require_once("obj/PreviewModal.obj.php");
+require_once("obj/PreviewButton.fi.php");
+require_once("inc/appserver.inc.php");
+require_once("inc/thrift.inc.php");
+require_once $GLOBALS['THRIFT_ROOT'].'/packages/commsuite/CommSuite.php';
+
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization
 ////////////////////////////////////////////////////////////////////////////////
@@ -142,7 +147,17 @@ $formdata = array(
 		"control" => array("RadioButton", "values" => array("female" => _L("Female"), "male" => _L("Male"))),
 		"helpstep" => 2
 	),
-	"ajaxpreview" => PreviewModal::getPreviewFormButton($languagecode,'phoneadvanced_message','phoneadvanced_gender'),
+	"preview" => array(
+		"label" => null,
+		"value" => "",
+		"validators" => array(),
+		"control" => array("PreviewButton",
+			"language" => $language,
+			"texttarget" => "message",
+			"gendertarget" => "gender",
+		),
+		"helpstep" => 3
+	),
 );
 
 $helpsteps = array(_L("<p>You can use a variety of techniques to build your message in this screen, but ideally you should use this to assemble snippets of audio with dynamic data field inserts. You can use 'Call me to Record' to create your audio snippets or upload pre-recorded audio from your computer. To record multiple audio snippets, you can use 'Call me to Record' for each snippet. </p><p>To insert data fields, set the cursor where the data should appear. Be careful to not delete any of the brackets that appear around audio snippets or other data fields. Select the data field you wish to insert and enter a default value which will display if a recipient does not have data in the chosen field. Click the 'Insert' button to add the data field to your message.</p>"),
@@ -243,7 +258,7 @@ include_once("nav.inc.php");
 <script type="text/javascript" language="javascript" src="script/niftyplayer.js.php"></script>
 
 <?
-PreviewModal::includePreviewScript('editmessagephone.php');
+PreviewModal::includePreviewScript();
 
 startWindow($messagegroup->name);
 echo $form->render();

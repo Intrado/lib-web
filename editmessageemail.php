@@ -33,7 +33,11 @@ require_once("obj/EmailMessageEditor.fi.php");
 require_once("obj/InpageSubmitButton.fi.php");
 
 require_once("obj/PreviewModal.obj.php");
+require_once("obj/PreviewButton.fi.php");
 
+require_once("inc/appserver.inc.php");
+require_once("inc/thrift.inc.php");
+require_once $GLOBALS['THRIFT_ROOT'].'/packages/commsuite/CommSuite.php';
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization
 ////////////////////////////////////////////////////////////////////////////////
@@ -109,6 +113,9 @@ if (!in_array($languagecode, array_keys(Language::getLanguageMap())))
 // no multi lingual and not default language code
 if (!$USER->authorize("sendmulti") && $languagecode != Language::getDefaultLanguageCode())
 	redirect('unauthorized.php');
+
+
+PreviewModal::HandleEmailMessageText($languagecode,$subtype);
 	
 ////////////////////////////////////////////////////////////////////////////////
 // Form Data
@@ -206,13 +213,21 @@ $formdata["message"] = array(
 );
 
 $helpsteps[] = _L("TODO: help me");
+
 $formdata["preview"] = array(
-	"label" => "",
+	"label" => null,
 	"value" => "",
 	"validators" => array(),
-	"control" => array("InpageSubmitButton", "name" => "Preview with email template", "icon" => "email_open"),
-	"helpstep" => 6
+	"control" => array("PreviewButton",
+		"language" => $language,
+		"fromnametarget" => "fromname",
+		"fromtarget" => "from",
+		"subjecttarget" => "subject",
+		"texttarget" => "message",
+	),
+	"helpstep" => 3
 );
+
 
 $buttons = array(submit_button(_L('Done'),"submit","tick"));
 $form = new Form("emaileedit",$formdata,$helpsteps,$buttons);
@@ -323,11 +338,6 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 			
 			Query("COMMIT");
 		}
-		if ($button == 'inpagesubmit') {
-			$modal = PreviewModal::CreateModalForEmailMessage($languagecode,$subtype,$postdata['fromname'],$postdata['from'],$postdata['subject'],$postdata['message']);
-			$form->modifyElement("previewcontainer", $modal->includeModal());
-			//$form->modifyElement("previewcontainer", "<script>popup('messageviewer.php?id=$message->id', 800, 500);</script>");
-		}
 		// remove the editors session data
 		unset($_SESSION['editmessage']);
 		
@@ -357,8 +367,8 @@ include_once("nav.inc.php");
 <script src="script/livepipe/livepipe.js" type="text/javascript"></script>
 <script src="script/livepipe/window.js" type="text/javascript"></script>
 
-<div id='previewcontainer'></div>
 <?
+PreviewModal::includePreviewScript();
 
 startWindow($messagegroup->name);
 echo $form->render();

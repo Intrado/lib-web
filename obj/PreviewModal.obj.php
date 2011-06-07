@@ -2,9 +2,7 @@
 
 // Requires previewfields.inc.php
 
-require_once("inc/appserver.inc.php");
-require_once("inc/thrift.inc.php");
-require_once $GLOBALS['THRIFT_ROOT'].'/packages/commsuite/CommSuite.php';
+
 
 // Preview modal canbe used with a messageid or raw text to produce a modal window for preview
 // Each page that uses the modal will need to include the content with the includeModal() function 
@@ -28,44 +26,52 @@ class PreviewModal {
 	}
 	
 	// Cunstructs and returns a PreviewModal object based on the parts from messageid
-	static function CreateModalForMessageId($messageid) {
+	static function HandlePhoneMessageId() {
 		global $USER;
 		
+		if (!isset($_REQUEST["previewmodal"]) ||
+			!isset($_REQUEST["previewid"]) ) {
+				return;
+		}
+		
 		// TODO make sure the user can preview subscribed messages
-		if (!userOwns("message", $messageid)) {
-			return null;
+		if (!userOwns("message", $_REQUEST["previewid"])) {
+			return;
 		}
-		$message = new Message($messageid);
+		$message = new Message($_REQUEST["previewid"]);
 		$modal = new PreviewModal($message->type);
-		if ($messageid) {
-			switch($message->type) {
-				case "phone":
-					// Get message parts and save to session
-					$modal->uid = uniqid();
-					$modal->parts = DBFindMany('MessagePart', 'from messagepart where messageid=? order by sequence', false, array($message->id));
-					$modal->initializePhoneFieldContent();
-					$modal->title = _L("%s Phone Message" , Language::getName($message->languagecode));
-					break;
-				case "email":
-					$email = messagePreviewForPriority($message->id, 3); // returns commsuite_EmailMessageView object
-					$modal->text = $modal->formatEmail($email);
-					switch ($message->subtype) {
-						case "html":
-							$modal->title = _L("%s HTML Email Message" , Language::getName($message->languagecode));
-							break;
-						case "plain":
-							$modal->title = _L("%s Plain Email Message" , Language::getName($message->languagecode));
-							break;
-					}
-					break;
-				case "sms":
-					$parts = DBFindMany('MessagePart', 'from messagepart where messageid=? order by sequence', false, array($message->id));
-					$modal->text = $message->renderSmsParts($parts);
-					$modal->title = _L("%s SMS Message" , Language::getName($message->languagecode));
-					break;
-			}
+		switch($message->type) {
+			case "phone":
+				// Get message parts and save to session
+				$modal->uid = uniqid();
+				$modal->parts = DBFindMany('MessagePart', 'from messagepart where messageid=? order by sequence', false, array($message->id));
+				$modal->initializePhoneFieldContent();
+				$modal->title = _L("%s Phone Message" , Language::getName($message->languagecode));
+				break;
+			case "email":
+				$email = messagePreviewForPriority($message->id, 3); // returns commsuite_EmailMessageView object
+				$modal->text = $modal->formatEmail($email);
+				switch ($message->subtype) {
+					case "html":
+						$modal->title = _L("%s HTML Email Message" , Language::getName($message->languagecode));
+						break;
+					case "plain":
+						$modal->title = _L("%s Plain Email Message" , Language::getName($message->languagecode));
+						break;
+				}
+				break;
+			case "sms":
+				$parts = DBFindMany('MessagePart', 'from messagepart where messageid=? order by sequence', false, array($message->id));
+				$modal->text = $message->renderSmsParts($parts);
+				$modal->title = _L("%s SMS Message" , Language::getName($message->languagecode));
+				break;
+			default:
+				return;
 		}
-		return $modal;
+		
+		$modal->handleRequest();
+		$modal->includeModal();
+		exit();
 	}
 	
 	// Constructs and returns a PreviewModal object besed on sourcetext from agument or located in session.
@@ -96,7 +102,6 @@ class PreviewModal {
 		$modal->title = _L("%s Phone Message", Language::getName($languagecode));
 		if ($showmodal) {
 			$modal->includeModal();
-			exit();
 		} else {
 			$modal->handleRequest();
 		}
@@ -107,20 +112,21 @@ class PreviewModal {
 	static function HandleEmailMessageText($languagecode,$subtype) {
 		if (!isset($_REQUEST["previewmodal"]) || 
 			!isset($_REQUEST["fromname"]) || 
-			!isset($_REQUEST["fromaddress"]) || 
+			!isset($_REQUEST["from"]) || 
 			!isset($_REQUEST["subject"]) || 
 			!isset($_REQUEST["text"]))
 			return;
-		
+			
 		$modal = new PreviewModal("email");
 		$message = new Message();
 		$message->type = "email";
 		$message->subtype = $subtype;
 		$message->fromname = $_REQUEST["fromname"];
-		$message->fromemail = $_REQUEST["fromaddress"];
+		$message->fromemail = $_REQUEST["from"];
 		$message->subject = $_REQUEST["subject"];
 		$message->languagecode = $languagecode;
 		$message->stuffHeaders();
+		
 		$parts = Message::parse($_REQUEST["text"]);
 		$email = emailMessageViewForMessageParts($message,$parts,3);
 		$modal->text = $modal->formatEmail($email);
@@ -134,22 +140,6 @@ class PreviewModal {
 		}
 		
 		$modal->includeModal();
-		return ;
-	}
-	
-	function getPreviewFormButton($languagecode,$textfieldid,$genderfieldid) {
-		return array(
-					"label" => "",
-					"value" => "",
-					"validators" => array(),
-					"control" => array("FormHtml", "html" => icon_button("Ajax Preview", "fugue/control","
-					var t=$('$textfieldid').value;
-					var l='$languagecode';
-					var g=$('$genderfieldid').descendants().find(function(el) { return el.checked });
-					g = g ? g.value : '';
-					showPreview(t,l,g);return false;","editmessagephone.php","id='previewbutton'")),
-					"helpstep" => 3
-				);
 	}
 	
 	
@@ -163,9 +153,9 @@ class PreviewModal {
 		} else if ($this->hasfieldinserts) {
 			$modalcontent = $this->form->render();
 		}
-		sleep(2);
 		header('Content-Type: application/json');
 		echo json_encode(array("type" => $this->type,"title" => $this->title, "hasinserts" => $this->hasfieldinserts, "form" => $modalcontent, "uid" => $this->uid, "partscount" => count($this->parts)));
+		exit();
 	}
 	
 	// Creates the messageparts and saves them in session for the messages contains field instersts 
@@ -239,10 +229,13 @@ class PreviewModal {
 	
 	
 	
-	static function includePreviewScript($requestpage) {
+	static function includePreviewScript() {
+		$posturl = $_SERVER['REQUEST_URI'];
+		$posturl .= mb_strpos($posturl,"?") !== false ? "&" : "?";
+		$posturl .= "previewmodal=true";
 		?>
 		<script type='text/javascript' language='javascript'>
-		var showPreview = function(text,gender,language){
+		var showPreview = function(post_parameters,get_parameters){
 			var window_header = new Element('div',{
 			className: 'window_header'
 			});
@@ -273,30 +266,35 @@ class PreviewModal {
 					window_contents.remove(); // remove since the player and download uses ids that is reused whe reopened
 				}
 			},{}));
-			
-			new Ajax.Request('<?=$requestpage?>', {
+			new Ajax.Request('<?= $posturl?>' + (get_parameters?'&' + get_parameters:''), {
 				'method': 'post',
-				'parameters': {previewmodal:'true',text:text,gender:gender,language:language},
+				'parameters': post_parameters,
 				'onSuccess': function(response) {
 					if (response.responseJSON) {
 						var result = response.responseJSON;
 						window_title.update(result.title);
-						window_contents.update(result.form + '<div style=\'text-align:center;\' id=\'player\'></div><div style=\'text-align:center;\' id=\'download\'></div>');
-						if (result.hasinserts ==  false) {
-							$('download').update('<a href=\'previewaudio.mp3.php?download=true&uid=' + result.uid + '\'>Click here to download</a>');
-							embedPlayer('previewaudio.mp3.php?uid=' + result.uid,'player',result.partscount);
+						if (result.type == "phone") {
+							window_contents.update(result.form + '<div style=\'text-align:center;\' id=\'player\'></div><div style=\'text-align:center;\' id=\'download\'></div>');
+							if (result.hasinserts ==  false) {
+								$('download').update('<a href=\'previewaudio.mp3.php?download=true&uid=' + result.uid + '\'>Click here to download</a>');
+								embedPlayer('previewaudio.mp3.php?uid=' + result.uid,'player',result.partscount);
+							} else {
+								$('previewmessagefields').observe('Form:Submitted',function(e){
+									embedPlayer('previewaudio.mp3.php?uid=' + e.memo,'player',result.partscount);
+									$('download').update('<a href=\'previewaudio.mp3.php?download=true&uid=' + e.memo +'\'>Click here to download</a>');
+								});
+							}
 						} else {
-							$('previewmessagefields').observe('Form:Submitted',function(e){
-								embedPlayer('previewaudio.mp3.php?uid=' + e.memo,'player',result.partscount);
-								$('download').update('<a href=\'previewaudio.mp3.php?download=true&uid=' + e.memo +'\'>Click here to download</a>');
-							});
+							window_contents.update(result.form);
 						}
 					} else {
+						window_title.update('Error');
 						window_contents.update('Unable to preview this message');
 					}
 				},
 				
 				'onFailure': function() {
+					window_title.update('Error');
 					window_contents.update('Unable to preview this message');
 				}
 			});

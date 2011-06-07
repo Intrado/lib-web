@@ -38,6 +38,9 @@ require_once("obj/InpageSubmitButton.fi.php");
 require_once("obj/PreviewButton.fi.php");
 require_once("obj/PreviewModal.obj.php");
 
+require_once("inc/appserver.inc.php");
+require_once("inc/thrift.inc.php");
+require_once $GLOBALS['THRIFT_ROOT'].'/packages/commsuite/CommSuite.php';
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization
 ////////////////////////////////////////////////////////////////////////////////
@@ -204,12 +207,16 @@ class MsgWiz_emailText extends WizStep {
 		);
 		
 		$formdata["preview"] = array(
-			"label" => "",
+			"label" => null,
 			"value" => "",
-			"transient" => true,
 			"validators" => array(),
-			"control" => array("PreviewButton"),
-			"helpstep" => 1
+			"control" => array("PreviewButton",
+				"fromnametarget" => "fromname",
+				"fromtarget" => "from",
+				"subjecttarget" => "subject",
+				"texttarget" => "message",
+			),
+			"helpstep" => 3
 		);
 		
 		$helpsteps = array();
@@ -676,7 +683,12 @@ if (!isset($_SESSION['wizard_message_mgid']))
 	redirect('unauthorized.php');
 if (!isset($_SESSION['wizard_message_subtype']))
 	redirect('unauthorized.php');
-	
+
+$langcode = (isset($postdata["/create/language"]["language"])?$postdata["/create/language"]["language"]:Language::getDefaultLanguageCode());
+if ($langcode == "autotranslate")
+	$langcode = "en";
+PreviewModal::HandleEmailMessageText($langcode, $_SESSION['wizard_message_subtype']);
+
 ////////////////////////////////////////////////////////////////////////////////
 // Display
 ////////////////////////////////////////////////////////////////////////////////
@@ -693,22 +705,12 @@ require_once("nav.inc.php");
 <script src="script/livepipe/livepipe.js" type="text/javascript"></script>
 <script src="script/livepipe/window.js" type="text/javascript"></script>
 <?
+PreviewModal::includePreviewScript();
+
 
 startWindow(_L("Add Email Message Wizard"));
 echo $wizard->render();
 endWindow();
-
-// Include preview
-if (isset($_SESSION[$wizard->name]['data']['/create/email']) &&
-	 $_SESSION[$wizard->name]['data']['/create/email']['preview'] == "true") {
-	$postdata = $_SESSION[$wizard->name]['data'];
-	$modal = PreviewModal::CreateModalForEmailMessage($postdata["/create/email"]["fromname"],
-							$postdata["/create/email"]["from"],
-							$postdata["/create/email"]["subject"],
-							$postdata["/create/email"]["message"]);
-	echo $modal->includeModal();
-	unset($postdata['/create/phoneadvanced']['preview']);
-}
 
 if (isset($_SESSION['wizard_message']['debug']) && $_SESSION['wizard_message']['debug']) {
 	startWindow("Wizard Data");

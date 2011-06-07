@@ -52,6 +52,8 @@ if($messagegroup->type != 'notification') {
 if (isset($_GET['delete'])) {
 	QuickUpdate("delete from message where id=? and messagegroupid=?",false,array($_GET['delete'],$messagegroup->id));
 }
+
+PreviewModal::HandlePhoneMessageId();
 ////////////////////////////////////////////////////////////////////////////////
 // Optional Form Items And Validators
 ////////////////////////////////////////////////////////////////////////////////
@@ -230,7 +232,7 @@ function makeMessageGrid($messagegroup) {
 			$actions = array();
 			if ($message) {
 				$icon = "accept";
-				$actions[] = action_link("Play","fugue/control","mgeditor.php?preview=$message->id");
+				$actions[] = action_link("Play","fugue/control",null,"showPreview(null,\'previewid=$message->id\');return false;");
 				$actions[] = action_link("Re-Record","diagona/16/151","editmessagerecord.php?id=new&languagecode=$languagecode&mgid=".$messagegroup->id);
 				if (isset($ttslanguages[$languagecode]))
 					$actions[] = action_link("Edit Advanced","pencil","editmessagephone.php?id=$message->id");
@@ -251,7 +253,7 @@ function makeMessageGrid($messagegroup) {
 				$message = $messagegroup->getMessage('sms', 'plain', $languagecode);
 				if ($message) {
 					$icon = "accept";
-					$actions[] = action_link("Preview","email_open","mgeditor.php?preview=$message->id");
+					$actions[] = action_link("Preview","email_open",null,"showPreview(null,\'previewid=$message->id\');return false;");
 					$actions[] = action_link("Edit","pencil","editmessagesms.php?id=$message->id");
 					$actions[] = action_link("Delete","cross","mgeditor.php?delete=$message->id","return confirmDelete();");
 				} else {
@@ -271,7 +273,7 @@ function makeMessageGrid($messagegroup) {
 			
 			if ($message) {
 				$icon = "accept";
-				$actions[] = action_link("Preview","email_open","mgeditor.php?preview=$message->id");
+				$actions[] = action_link("Preview","email_open",null,"showPreview(null,\'previewid=$message->id\');return false;");
 				$actions[] = action_link("Edit","pencil","editmessageemail.php?id=$message->id");
 				$actions[] = action_link("Delete","cross","mgeditor.php?delete=$message->id","return confirmDelete();");
 			} else {
@@ -284,7 +286,7 @@ function makeMessageGrid($messagegroup) {
 			$message = $messagegroup->getMessage('email', 'plain', $languagecode);
 			if ($message) {
 				$icon = "accept";
-				$actions[] = action_link("Preview","email_open","mgeditor.php?preview=$message->id");
+				$actions[] = action_link("Preview","email_open",null,"showPreview(null,\'previewid=$message->id\');return false;");
 				$actions[] = action_link("Edit","pencil","editmessageemail.php?id=$message->id");
 				$actions[] = action_link("Delete","cross","mgeditor.php?delete=$message->id","return confirmDelete();");
 			} else {
@@ -314,12 +316,6 @@ function makeMessageGrid($messagegroup) {
 	$rowlabels[] = "";
 	
 	showActionGrid($columnlabels,$rowlabels,$links);
-}
-
-if (isset($_GET['preview'])) {
-	$preview = PreviewModal::CreateModalForMessageId($_GET['preview']);
-	if ($preview)
-		$preview->handleRequest();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -352,18 +348,14 @@ function createactionmenu(id, content,title) {
 //	});
 }
 
-function preview(type,subtype,languagecode) {
-	<? if ($messagegroup) { ?>
-	
-	popup('messagegroupviewpopup.php?id=' + <?= $messagegroup->id ?> + '&type=' + type + '&subtype=' + subtype + '&languagecode=' + languagecode, 800, 500);
-	<? }?>
-}
 </script>
 <script src="script/livepipe/livepipe.js" type="text/javascript"></script>
 <script src="script/livepipe/window.js" type="text/javascript"></script>
 <script src="script/niftyplayer.js.php" type="text/javascript"></script>
 <link href="css/messagegroup.css" type="text/css" rel="stylesheet">
 <?
+PreviewModal::includePreviewScript();
+
 
 if ($messagegroup->id) {
 	buttons(icon_button(_L('Done'),"tick",null,(isset($_SESSION['origin']) && ($_SESSION['origin'] == 'start')?"start.php":"messages.php")));
