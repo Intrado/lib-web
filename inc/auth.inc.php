@@ -243,7 +243,6 @@ function doDBConnect($result) {
 	return false;
 }
 
-/*CSDELETEMARKER_START*/
 function asptokenLogin($asptoken, $url) {
 	$params = array(new XML_RPC_Value($asptoken, 'string'), new XML_RPC_Value($url, 'string'));
 	$method = "AuthServer.asptokenLogin";
@@ -254,7 +253,6 @@ function asptokenLogin($asptoken, $url) {
 		return $result['userID'];
 	}
 }
-/*CSDELETEMARKER_END*/
 
 function getCustomerData($url){
 

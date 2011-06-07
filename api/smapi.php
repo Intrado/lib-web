@@ -132,7 +132,6 @@ class SMAPI {
 		*/
 
 	function getCustomerURL ($oem, $oemid) {
-		global $IS_COMMSUITE;
 		$result = array("resultcode" => "failure", "resultdescription" => "", "customerurl" => "");
 
 		if(trim($oem) == ""){
@@ -2237,17 +2236,13 @@ class SMAPI {
 
 function systemLogin($loginname, $password, $CUSTOMERURL=null){
 
-	global $IS_COMMSUITE;
 	$result = array("resultcode" => "failure", "resultdescription" => "", "sessionid" => "");
 
 	if($CUSTOMERURL === null){
 		//get the customer URL
-		if ($IS_COMMSUITE) {
-			$CUSTOMERURL = "default";
-		} /*CSDELETEMARKER_START*/ else {
-			$CUSTOMERURL = substr($_SERVER["SCRIPT_NAME"],1);
-			$CUSTOMERURL = strtolower(substr($CUSTOMERURL,0,strpos($CUSTOMERURL,"/")));
-		} /*CSDELETEMARKER_END*/
+
+		$CUSTOMERURL = substr($_SERVER["SCRIPT_NAME"],1);
+		$CUSTOMERURL = strtolower(substr($CUSTOMERURL,0,strpos($CUSTOMERURL,"/")));
 	} else {
 		//make sure customer url is alphanumeric
 		if(!ereg("^[a-zA-Z0-9]*$", $CUSTOMERURL)) {
@@ -2379,7 +2374,6 @@ function getJobData($jobid=0){
 // Server Code
 ////////////////////////////////////////////////////////////////////////////////
 $SETTINGS = parse_ini_file("../inc/settings.ini.php",true);
-$IS_COMMSUITE = $SETTINGS['feature']['is_commsuite'];
 
 require_once("XML/RPC.php");
 require_once("../inc/auth.inc.php");

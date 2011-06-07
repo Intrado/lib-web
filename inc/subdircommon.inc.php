@@ -1,19 +1,14 @@
 <?
 
 setlocale(LC_ALL, 'en_US.UTF-8');
+mb_internal_encoding('UTF-8');
 
 $SETTINGS = parse_ini_file("../inc/settings.ini.php",true);
-$IS_COMMSUITE = $SETTINGS['feature']['is_commsuite'];
 
 //get the customer URL
-if ($IS_COMMSUITE) {
-	$CUSTOMERURL = "default";
-	$BASEURL = "";
-} /*CSDELETEMARKER_START*/ else {
-	$CUSTOMERURL = substr($_SERVER["SCRIPT_NAME"],1);
-	$CUSTOMERURL = strtolower(substr($CUSTOMERURL,0,strpos($CUSTOMERURL,"/")));
-	$BASEURL = "/$CUSTOMERURL";
-} /*CSDELETEMARKER_END*/
+$CUSTOMERURL = substr($_SERVER["SCRIPT_NAME"],1);
+$CUSTOMERURL = strtolower(substr($CUSTOMERURL,0,strpos($CUSTOMERURL,"/")));
+$BASEURL = "/$CUSTOMERURL";
 
 apache_note("CS_APP","cs"); //for logging
 apache_note("CS_CUST",urlencode($CUSTOMERURL)); //for logging

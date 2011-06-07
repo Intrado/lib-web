@@ -2,7 +2,6 @@
 $time = microtime(true);
 
 $SETTINGS = parse_ini_file("../inc/settings.ini.php",true);
-$IS_COMMSUITE = $SETTINGS['feature']['is_commsuite'];
 
 require_once("XML/RPC.php");
 require_once("XML/RPC/Server.php");
