@@ -54,7 +54,6 @@ if (isset($_GET['download'])) {
 }
 
 
-/*CSDELETEMARKER_START*/
 $usercount = QuickQuery("select count(*) from user where enabled = 1 and login != 'schoolmessenger'");
 $maxusers = getSystemSetting("_maxusers","unlimited");
 
@@ -63,7 +62,6 @@ $maxreached = $maxusers != "unlimited" && $usercount >= $maxusers;
 function is_sm_user($id) {
 	return QuickQuery("select count(*) from user where login='schoolmessenger' and id=?",false,array($id));
 }
-/*CSDELETEMARKER_END*/
 
 $hasldap = getSystemSetting('_hasldap', '0');
 
@@ -81,14 +79,12 @@ if (isset($_GET['resetpass'])) {
 		redirect();
 	}
 	
-	/*CSDELETEMARKER_START*/
 	if (is_sm_user($id))
 		redirect(); // NOTE: Deliberately not show a notice() about the hidden schoolmessenger user?
 
 	if ($maxreached && !$usr->enabled) {
 		redirect("?maxusers");
 	}
-	/*CSDELETEMARKER_END*/
 
 	$usr->enabled = 1;
 	$usr->update();
@@ -100,10 +96,8 @@ if (isset($_GET['resetpass'])) {
 
 if (isset($_GET['delete'])) {
 	$deleteid = 0 + $_GET['delete'];
-	/*CSDELETEMARKER_START*/
 	if (is_sm_user($deleteid))
 		redirect(); // NOTE: Deliberately not show a notice() about the hidden schoolmessenger user?
-	/*CSDELETEMARKER_END*/
 
 	if (isset($_SESSION['userid']) && $_SESSION['userid'] == $deleteid)
 		$_SESSION['userid'] = NULL;
@@ -124,10 +118,8 @@ if (isset($_GET['disable'])) {
 	$id = 0 + $_GET['disable'];
 	$usr = new User($id);
 
-	/*CSDELETEMARKER_START*/
 	if (is_sm_user($id))
 		redirect(); // NOTE: Deliberately not show a notice() about the hidden schoolmessenger user?
-	/*CSDELETEMARKER_END*/
 
 	$usr->enabled = 0;
 	$usr->update();
@@ -140,13 +132,11 @@ if (isset($_GET['enable'])) {
 	$id = 0 + $_GET['enable'];
 	$usr = new User($id);
 
-	/*CSDELETEMARKER_START*/
 	if (is_sm_user($id))
 		redirect(); // NOTE: Deliberately not show a notice() about the hidden schoolmessenger user?
 	if($maxreached && !$usr->enabled) {
 		redirect("?maxusers");
 	}
-	/*CSDELETEMARKER_END*/
 
 	$usr->enabled = 1;
 	$usr->update();
@@ -225,7 +215,6 @@ if (isset($_GET['containerID']) && isset($_GET['ajax'])) {
 }
 
 function show_user_table($containerID) {
-	global $IS_COMMSUITE;
 
 	$perpage = 20;
 
@@ -254,13 +243,8 @@ function show_user_table($containerID) {
 	if ($containerID == 'inactiveUsersContainer') {
 		$criteriaSQL = "not enabled and deleted=0";
 		$formatters["Actions"] = "fmt_actions_disabled_account";
-	} else {
-		if($IS_COMMSUITE)
-			$criteriaSQL = "enabled and deleted=0";
-/*CSDELETEMARKER_START*/
-		else
-			$criteriaSQL = "enabled and deleted=0 and login != 'schoolmessenger'";
-/*CSDELETEMARKER_END*/
+	} else {		
+		$criteriaSQL = "enabled and deleted=0 and login != 'schoolmessenger'";
 		$formatters["Actions"] = "fmt_actions_enabled_account";
 	}
 
@@ -327,11 +311,9 @@ function show_user_table($containerID) {
 $PAGE = "admin:users";
 $TITLE = "User List";
 
-/*CSDELETEMARKER_START*/
 $DESCRIPTION = "Active Users: $usercount";
 if($maxusers != "unlimited")
 	$DESCRIPTION .= ", Maximum Allowed: $maxusers";
-/*CSDELETEMARKER_END*/
 $DESCRIPTION .= ',&nbsp;&nbsp;<a href="users.php?download">'._L("user details csv").'</a>';
 
 include_once("nav.inc.php");

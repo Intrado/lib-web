@@ -1,5 +1,4 @@
 <?
-/*CSDELETEMARKER_START*/
 echo "TXTREPLY";
 
 // Air2Web or 3ci
@@ -78,5 +77,4 @@ else {
 	error_log("Unable to log SMS message ".$httpdata." in $tmplogfile");
 }
 
-/*CSDELETEMARKER_END*/
 ?>

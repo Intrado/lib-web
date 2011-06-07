@@ -29,8 +29,7 @@ if (!$USER->authorize('manageaccount')) {
 $id = isset($_GET['id']) ? ($_GET['id']+0) : 0;
 $makeNewUser = !$id;
 
-/*CSDELETEMARKER_START*/
-if (!$IS_COMMSUITE && !$makeNewUser)
+if (!$makeNewUser)
 	if (QuickQuery("select count(*) from user where login = 'schoolmessenger' and id =?", false, array($id)))
 		redirect('unauthorized.php');
 
@@ -41,7 +40,6 @@ if ($makeNewUser) {
 		redirect("users.php?maxusers");
 	}
 }
-/*CSDELETEMARKER_END*/
 
 ////////////////////////////////////////////////////////////////////////////////
 // Data Handling
@@ -56,13 +54,7 @@ $hasenrollment = getSystemSetting('_hasenrollment', false);
 
 $hasstaffid = ($edituser->staffpkey) ? true : false;
 
-if($IS_COMMSUITE) {
-	$accessprofiles = QuickQueryList("select id, name from access order by name", true);
-}
-/*CSDELETEMARKER_START*/
-else
-	$accessprofiles = QuickQueryList("select id, name from access where name != 'SchoolMessenger Admin' order by name", true);
-/*CSDELETEMARKER_END*/
+$accessprofiles = QuickQueryList("select id, name from access where name != 'SchoolMessenger Admin' order by name", true);
 
 if (!count($accessprofiles)) {
 	redirect("users.php?noprofiles");
