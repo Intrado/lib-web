@@ -118,12 +118,16 @@ class Job extends DBMappedObject {
 			}			 
 		}
 
-
 		//copy all the job lists
 		QuickUpdate("insert into joblist (jobid,listid)
 			select ?, listid
 			from joblist where jobid=?", false, array($newjob->id, $this->id));
 
+		//copy all the job posts, reset posted=0
+		QuickUpdate("insert into jobpost (jobid, type, destination, posted)
+			select ?, type, destination, 0
+			from jobpost where jobid=?", false, array($newjob->id, $this->id));
+		
 		// do not need to copy jobsetting, these are handled by the job object
 		// remove the 'translationexpire' jobsetting to force retranslation
 		QuickUpdate("delete from jobsetting where jobid=? and name='translationexpire'", false, array($newjob->id));
