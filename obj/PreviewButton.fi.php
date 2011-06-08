@@ -8,12 +8,11 @@ class PreviewButton extends FormItem {
 		// there are two permutation 
 		// - x and xtarget
 		$parameters = array("id","language","gender","text","fromname","from","subject");
-		
-		$str = icon_button("Preview", "fugue/control","
+		$str = '<input id="'.$n.'" name="'.$n.'" type="hidden" value=""/>';
+		$str .= icon_button("Preview", "fugue/control","
 					var form = event.findElement('form');
 					var parameters = " . $this->formatParameters($parameters) . ";
-					showPreview(parameters);return false;",null,"id='previewbutton'");
-		
+					showPreview(parameters);return false;");
 		return $str;
 	}
 	

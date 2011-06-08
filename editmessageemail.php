@@ -218,10 +218,10 @@ $formdata["message"] = array(
 	"helpstep" => 5
 );
 
-$helpsteps[] = _L("TODO: help me");
+$helpsteps[] = _L("Click the preview button to view of your message.");
 
 $formdata["preview"] = array(
-	"label" => null,
+	"label" => "",
 	"value" => "",
 	"validators" => array(),
 	"control" => array("PreviewButton",
@@ -231,7 +231,7 @@ $formdata["preview"] = array(
 		"subjecttarget" => "subject",
 		"texttarget" => "message",
 	),
-	"helpstep" => 3
+	"helpstep" => 6
 );
 
 
