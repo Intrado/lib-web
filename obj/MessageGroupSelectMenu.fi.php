@@ -42,26 +42,26 @@ class MessageGroupSelectMenu extends FormItem {
 						if(data.size() > 0) {
 							var headers = \$H(response.headers);
 
-							var str = '<table style=\'vertical-padding: 20px;\'>';
+							var str = '<table class=\'messagegrid\'>';
 							headers.each(function(title) {
-								str += '<th style=\'text-align: center;padding: 0 15px 3px 15px;\'>' + title.value + '</th>';
+								str += '<th class=\'messagegridheader\'>' + title.value + '</th>';
 							});
 
 							data.each(function(item) {
 								str += '<tr>';
-									str += '<th class=\'Language\' style=\'text-align: right;\'>' + item.value.languagename + '</th>';
+									str += '<th class=\'messagegridlanguage\'>' + item.value.languagename + '</th>';
 								if(response.headers['voicephone'])
-									str += '<td style=\'text-align: center;\'>' + (item.value.voicephone?'<a href=\"#\" onclick=\"showPreview(null,\'jobpriority=$jobpriority&previewid=' + item.value.voicephone + '\'); return false;\"><img src=\'img/icons/accept.gif\' /></a>':'<img src=\'img/icons/diagona/16/160.gif\' />') + '</td>';
+									str += '<td>' + (item.value.voicephone?'<a href=\"#\" onclick=\"showPreview(null,\'jobpriority=$jobpriority&previewid=' + item.value.voicephone + '\'); return false;\"><img src=\'img/icons/accept.gif\' /></a>':'<img src=\'img/icons/diagona/16/160.gif\' />') + '</td>';
 								if(response.headers['plainsms']) {
 									if(item.key == 'en')
-										str += '<td style=\'text-align: center;\'>' + (item.value.plainsms?'<a href=\"#\" onclick=\"showPreview(null,\'jobpriority=$jobpriority&previewid=' + item.value.plainsms + '\'); return false;\"><img src=\'img/icons/accept.gif\' /></a>':'<img src=\'img/icons/diagona/16/160.gif\' />') + '</td>';
+										str += '<td>' + (item.value.plainsms?'<a href=\"#\" onclick=\"showPreview(null,\'jobpriority=$jobpriority&previewid=' + item.value.plainsms + '\'); return false;\"><img src=\'img/icons/accept.gif\' /></a>':'<img src=\'img/icons/diagona/16/160.gif\' />') + '</td>';
 									else
-										str += '<td style=\'text-align: center;\'>-</td>';
+										str += '<td>-</td>';
 								}
 								if(response.headers['htmlemail'])
-									str += '<td style=\'text-align: center;\'>' + (item.value.htmlemail?'<a href=\"#\" onclick=\"showPreview(null,\'jobpriority=$jobpriority&previewid=' + item.value.htmlemail + '\'); return false;\"><img src=\'img/icons/accept.gif\' /></a>':'<img src=\'img/icons/diagona/16/160.gif\' />') + '</td>';
+									str += '<td>' + (item.value.htmlemail?'<a href=\"#\" onclick=\"showPreview(null,\'jobpriority=$jobpriority&previewid=' + item.value.htmlemail + '\'); return false;\"><img src=\'img/icons/accept.gif\' /></a>':'<img src=\'img/icons/diagona/16/160.gif\' />') + '</td>';
 								if(response.headers['plainemail'])
-									str += '<td style=\'text-align: center;\'>' + (item.value.plainemail?'<a href=\"#\" onclick=\"showPreview(null,\'jobpriority=$jobpriority&previewid=' + item.value.plainemail + '\'); return false;\"><img src=\'img/icons/accept.gif\' /></a>':'<img src=\'img/icons/diagona/16/160.gif\' />') + '</td>';
+									str += '<td>' + (item.value.plainemail?'<a href=\"#\" onclick=\"showPreview(null,\'jobpriority=$jobpriority&previewid=' + item.value.plainemail + '\'); return false;\"><img src=\'img/icons/accept.gif\' /></a>':'<img src=\'img/icons/diagona/16/160.gif\' />') + '</td>';
 
 								str += '</tr>';
 							});

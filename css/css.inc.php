@@ -875,6 +875,17 @@ div.autocomplete ul li {
 	cursor:hand;  
 }
 
+.messagegrid {
+	vertical-padding: 20px;
+	text-align: center;
+}
+.messagegrid .messagegridheader{
+	padding: 0 15px 3px 15px;
+}
+.messagegrid .messagegridlanguage{
+	text-align: right;
+}
+
 <? if ($theme == "classroom") { /* TODO move this to theme based css includes */ ?>
 
 .navmenuspacer {

@@ -144,11 +144,11 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 function showActionGrid ($columnlabels, $rowlabels, $links) {
 	
 	// Top left cell is an empty cell
-	echo "<table style='vertical-padding: 20px;'><tr><th></th>";
+	echo "<table class='messagegrid'><tr><th></th>";
 	
 	// Create column labels
 	foreach ($columnlabels as $label) {
-		echo "<th style='text-align: center;padding: 0 15px 3px 15px;'>$label</th>";
+		echo "<th class='messagegridheader'>$label</th>";
 	}
 	echo "</tr>";
 	
@@ -160,7 +160,7 @@ function showActionGrid ($columnlabels, $rowlabels, $links) {
 	for ($row = 0; $row < count($rowlabels); $row++) {
 		
 		//echo ++$alt % 2 ? '<tr>' : '<tr class="listAlt">';
-		echo "<tr><th style='text-align: right;'>$rowlabels[$row]</th>";
+		echo "<tr><th class='messagegridlanguage'>$rowlabels[$row]</th>";
 		$rowlinks = $links[$row];
 		for ($col = 0;$col < count($rowlinks);$col++) {
 			$link = $rowlinks[$col];
