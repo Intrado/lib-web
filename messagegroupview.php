@@ -9,8 +9,6 @@ require_once("inc/html.inc.php");
 require_once("inc/utils.inc.php");
 require_once("inc/date.inc.php");
 require_once("obj/Form.obj.php");
-require_once("obj/FormTabber.obj.php");
-require_once("obj/FormSplitter.obj.php");
 require_once("obj/FormItem.obj.php");
 require_once("obj/Phone.obj.php");
 require_once("obj/Message.obj.php");
@@ -23,7 +21,6 @@ require_once("obj/Validator.obj.php");
 require_once("obj/MessageGroup.obj.php");
 require_once("obj/MessageAttachment.obj.php");
 require_once("obj/Language.obj.php");
-require_once("inc/messagegroup.inc.php");
 require_once("inc/previewfields.inc.php");
 require_once("inc/appserver.inc.php");
 
@@ -37,9 +34,6 @@ require_once($GLOBALS['THRIFT_ROOT'].'/packages/commsuite/CommSuite.php');
 require_once("obj/PreviewModal.obj.php");
 
 
-//$popup = false;
-//include_once('messagegroupview.inc.php');
-//exit();
 ///////////////////////////////////////////////////////////////////////////////
 // Authorization:
 ///////////////////////////////////////////////////////////////////////////////
@@ -76,11 +70,25 @@ include_once("nav.inc.php");
 <script src="script/livepipe/livepipe.js" type="text/javascript"></script>
 <script src="script/livepipe/window.js" type="text/javascript"></script>
 <script src="script/niftyplayer.js.php" type="text/javascript"></script>
-<link href="css/messagegroup.css" type="text/css" rel="stylesheet">
 <?
 PreviewModal::includePreviewScript();
+startWindow(_L('Message Settings'));
+?>
+<table>
+	<tr>
+		<th style="text-align: right;padding-right: 15px;"><?=_L("Message Name") ?></th>
+		<td><?=$messagegroup->name?></td>
+	</tr>
+	<tr>
+		<th style="text-align: right;padding-right: 15px;"><?=_L("Description") ?></th>
+		<td><?=$messagegroup->description?></td>
+	</tr>
+</table>
+<? 
 
-startWindow(_L('Message Viewer'));
+endWindow();
+
+startWindow(_L('Message Content'));
 
 
 if ($USER->authorize('sendmulti')) {
@@ -115,7 +123,7 @@ foreach ($customerlanguages as $languagecode => $languagename) {
 		$message = $messagegroup->getMessage('phone', 'voice', $languagecode);
 		echo "<td>";
 		if ($message)
-			echo "<a href=\"#\" onclick=\"showPreview(null,'jobpriority=$jobpriority&previewid=$message->id'); return false;\"><img src='img/icons/accept.gif' /></a>";
+			echo "<a href=\"#\" onclick=\"showPreview(null,'previewid=$message->id'); return false;\"><img src='img/icons/accept.gif' /></a>";
 		else
 			echo "<img src='img/icons/diagona/16/160.gif' />";
 		echo "</td>";
@@ -126,7 +134,7 @@ foreach ($customerlanguages as $languagecode => $languagename) {
 			$message = $messagegroup->getMessage('sms', 'plain', $languagecode);
 			echo "<td>";
 			if ($message) 
-				echo "<a href=\"#\" onclick=\"showPreview(null,'jobpriority=$jobpriority&previewid=$message->id'); return false;\"><img src='img/icons/accept.gif' /></a>";
+				echo "<a href=\"#\" onclick=\"showPreview(null,'previewid=$message->id'); return false;\"><img src='img/icons/accept.gif' /></a>";
 			else 
 				echo "<img src='img/icons/diagona/16/160.gif' />";
 			echo "</td>";
@@ -140,7 +148,7 @@ foreach ($customerlanguages as $languagecode => $languagename) {
 		$message = $messagegroup->getMessage('email', 'html', $languagecode);
 		echo "<td>";
 		if ($message) 
-			echo "<a href=\"#\" onclick=\"showPreview(null,'jobpriority=$jobpriority&previewid=$message->id'); return false;\"><img src='img/icons/accept.gif' /></a>";
+			echo "<a href=\"#\" onclick=\"showPreview(null,'previewid=$message->id'); return false;\"><img src='img/icons/accept.gif' /></a>";
 		else 
 			echo "<img src='img/icons/diagona/16/160.gif' />";
 		echo "</td>";
@@ -148,7 +156,7 @@ foreach ($customerlanguages as $languagecode => $languagename) {
 		$message = $messagegroup->getMessage('email', 'plain', $languagecode);
 		echo "<td>";
 		if ($message) 
-			echo "<a href=\"#\" onclick=\"showPreview(null,'jobpriority=$jobpriority&previewid=$message->id'); return false;\"><img src='img/icons/accept.gif' /></a>";
+			echo "<a href=\"#\" onclick=\"showPreview(null,'previewid=$message->id'); return false;\"><img src='img/icons/accept.gif' /></a>";
 		else 
 			echo "<img src='img/icons/diagona/16/160.gif' />";
 		echo "</td>";
@@ -156,7 +164,8 @@ foreach ($customerlanguages as $languagecode => $languagename) {
 	echo "</tr>";
 }
 echo "</table>";
-//echo icon_button(_L("Done"),"tick", null, "messages.php");
+$fallbackUrl = "messages.php";
+echo icon_button(_L("Done"),"tick","location.href='" . (isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : $fallbackUrl) . "'");
 endWindow();
 include_once("navbottom.inc.php");
 
