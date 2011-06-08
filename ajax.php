@@ -391,12 +391,12 @@ function handleRequest() {
 			}
 			if($hasvoicephone)
 				$result->headers['voicephone'] = "Phone";
+			if($hasplainsms)
+				$result->headers['plainsms'] = "SMS";
 			if($hashtmlemail)
 				$result->headers['htmlemail'] = "Email (HTML)";
 			if($hasplainemail)
 				$result->headers['plainemail'] = "Email (Plain)";
-			if($hasplainsms)
-				$result->headers['plainsms'] = "SMS";
 		return $result;
 		default:
 			error_log("No AJAX API for type=$type");

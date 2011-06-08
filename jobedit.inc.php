@@ -38,6 +38,19 @@ require_once("inc/date.inc.php");
 require_once("obj/ValListSelection.val.php");
 
 
+// Includes that are required for preview to work
+require_once("obj/Language.obj.php");
+require_once("inc/previewfields.inc.php");
+require_once("inc/appserver.inc.php");
+require_once('thrift/Thrift.php');
+require_once $GLOBALS['THRIFT_ROOT'].'/protocol/TBinaryProtocol.php';
+require_once $GLOBALS['THRIFT_ROOT'].'/transport/TSocket.php';
+require_once $GLOBALS['THRIFT_ROOT'].'/transport/TBufferedTransport.php';
+require_once $GLOBALS['THRIFT_ROOT'].'/transport/TFramedTransport.php';
+require_once("inc/thrift.inc.php");
+require_once $GLOBALS['THRIFT_ROOT'].'/packages/commsuite/CommSuite.php';
+require_once("obj/PreviewModal.obj.php");
+
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization
 ////////////////////////////////////////////////////////////////////////////////
@@ -52,6 +65,9 @@ if ($JOBTYPE != "normal" && !$cansendrepeatingjob)
 ////////////////////////////////////////////////////////////////////////////////
 // Action/Request Processing
 ////////////////////////////////////////////////////////////////////////////////
+PreviewModal::HandlePhoneMessageId();
+
+
 $job = null;
 if (isset($_GET['id'])) {
 	if ($_GET['id'] !== "new" && !userOwns("job",$_GET['id']))
@@ -63,6 +79,8 @@ if (isset($_GET['id'])) {
 if (isset($_GET['origin'])) {
 	$_SESSION['origin'] = trim($_GET['origin']);
 }
+
+
 
 // Flag indicating that a job is complete or cancelled so only allow editing of name and description.
 $completedmode = false; 
@@ -760,7 +778,11 @@ Validator::load_validators(array("ValDuplicateNameCheck",
 								"ValNonEmptyMessage"));
 ?>
 </script>
+<script src="script/livepipe/livepipe.js" type="text/javascript"></script>
+<script src="script/livepipe/window.js" type="text/javascript"></script>
+<script src="script/niftyplayer.js.php" type="text/javascript"></script>
 <?
+PreviewModal::includePreviewScript();
 
 startWindow(_L('Job Information'));
 if ($JOBTYPE == "repeating" && getSystemSetting("disablerepeat") ) {

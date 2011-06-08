@@ -42,26 +42,27 @@ class MessageGroupSelectMenu extends FormItem {
 						if(data.size() > 0) {
 							var headers = \$H(response.headers);
 
-							var str = '<table style=\'border-spacing: 15px 5px;\'>';
+							var str = '<table style=\'vertical-padding: 20px;\'>';
 							headers.each(function(title) {
-								str += '<th class=\'Destination\'>' + title.value + '</th>';
+								str += '<th style=\'text-align: center;padding: 0 15px 3px 15px;\'>' + title.value + '</th>';
 							});
 
 							data.each(function(item) {
 								str += '<tr>';
-									str += '<th class=\'Language\'>' + item.value.languagename + '</th>';
+									str += '<th class=\'Language\' style=\'text-align: right;\'>' + item.value.languagename + '</th>';
 								if(response.headers['voicephone'])
-									str += '<td>' + (item.value.voicephone?'<a href=\"#\" onclick=\"popup(\'messagegroupviewpopup.php?jobpriority=$jobpriority&type=phone&subtype=voice&languagecode=' + item.key + '&id=' + id + '\', 800, 500); return false;\"><img src=\'img/icons/accept.gif\' /></a>':'<img src=\'img/icons/diagona/16/160.gif\' />') + '</td>';
-								if(response.headers['htmlemail'])
-									str += '<td>' + (item.value.htmlemail?'<a href=\"#\" onclick=\"popup(\'messagegroupviewpopup.php?jobpriority=$jobpriority&type=email&subtype=html&languagecode=' + item.key + '&id=' + id  + '\', 800, 500); return false;\"><img src=\'img/icons/accept.gif\' /></a>':'<img src=\'img/icons/diagona/16/160.gif\' />') + '</td>';
-								if(response.headers['plainemail'])
-									str += '<td>' + (item.value.plainemail?'<a href=\"#\" onclick=\"popup(\'messagegroupviewpopup.php?jobpriority=$jobpriority&type=email&subtype=plain&languagecode=' + item.key + '&id=' + id +  '\', 800, 500); return false;\"><img src=\'img/icons/accept.gif\' /></a>':'<img src=\'img/icons/diagona/16/160.gif\' />') + '</td>';
+									str += '<td style=\'text-align: center;\'>' + (item.value.voicephone?'<a href=\"#\" onclick=\"showPreview(null,\'jobpriority=$jobpriority&previewid=' + item.value.voicephone + '\'); return false;\"><img src=\'img/icons/accept.gif\' /></a>':'<img src=\'img/icons/diagona/16/160.gif\' />') + '</td>';
 								if(response.headers['plainsms']) {
 									if(item.key == 'en')
-										str += '<td>' + (item.value.plainsms?'<a href=\"#\" onclick=\"popup(\'messagegroupviewpopup.php?jobpriority=$jobpriority&type=sms&subtype=plain&languagecode=en&id=' + id  + '\', 500, 500); return false;\"><img src=\'img/icons/accept.gif\' /></a>':'<img src=\'img/icons/diagona/16/160.gif\' />') + '</td>';
+										str += '<td style=\'text-align: center;\'>' + (item.value.plainsms?'<a href=\"#\" onclick=\"showPreview(null,\'jobpriority=$jobpriority&previewid=' + item.value.plainsms + '\'); return false;\"><img src=\'img/icons/accept.gif\' /></a>':'<img src=\'img/icons/diagona/16/160.gif\' />') + '</td>';
 									else
-										str += '<td>" . _L("N/A") . "</td>';
+										str += '<td style=\'text-align: center;\'>-</td>';
 								}
+								if(response.headers['htmlemail'])
+									str += '<td style=\'text-align: center;\'>' + (item.value.htmlemail?'<a href=\"#\" onclick=\"showPreview(null,\'jobpriority=$jobpriority&previewid=' + item.value.htmlemail + '\'); return false;\"><img src=\'img/icons/accept.gif\' /></a>':'<img src=\'img/icons/diagona/16/160.gif\' />') + '</td>';
+								if(response.headers['plainemail'])
+									str += '<td style=\'text-align: center;\'>' + (item.value.plainemail?'<a href=\"#\" onclick=\"showPreview(null,\'jobpriority=$jobpriority&previewid=' + item.value.plainemail + '\'); return false;\"><img src=\'img/icons/accept.gif\' /></a>':'<img src=\'img/icons/diagona/16/160.gif\' />') + '</td>';
+
 								str += '</tr>';
 							});
 							str += '</table>';

@@ -62,6 +62,19 @@ require_once("obj/TextAreaPhone.val.php");
 require_once("obj/HtmlTextArea.fi.php");
 require_once("obj/CheckBoxWithHtmlPreview.fi.php");
 
+// Includes that are required for preview to work
+require_once("inc/previewfields.inc.php");
+require_once("inc/appserver.inc.php");
+require_once('thrift/Thrift.php');
+require_once $GLOBALS['THRIFT_ROOT'].'/protocol/TBinaryProtocol.php';
+require_once $GLOBALS['THRIFT_ROOT'].'/transport/TSocket.php';
+require_once $GLOBALS['THRIFT_ROOT'].'/transport/TBufferedTransport.php';
+require_once $GLOBALS['THRIFT_ROOT'].'/transport/TFramedTransport.php';
+require_once("inc/thrift.inc.php");
+require_once $GLOBALS['THRIFT_ROOT'].'/packages/commsuite/CommSuite.php';
+require_once("obj/PreviewModal.obj.php");
+
+
 // Job step form data
 require_once("inc/jobwizard.inc.php");
 
@@ -72,6 +85,10 @@ if (!$USER->authorize('sendphone') && !$USER->authorize('sendemail') && !$USER->
 	redirect('unauthorized.php');
 }
 
+////////////////////////////////////////////////////////////////////////////////
+// Process Preview Request
+////////////////////////////////////////////////////////////////////////////////
+PreviewModal::HandlePhoneMessageId();
 ////////////////////////////////////////////////////////////////////////////////
 // Passed parameter checking
 ////////////////////////////////////////////////////////////////////////////////
@@ -601,7 +618,11 @@ require_once("nav.inc.php");
 <script type="text/javascript">
 <? Validator::load_validators(array("ValInArray", "ValJobName", "ValHasMessage", "ValTextAreaPhone","ValEasycall","ValLists","ValTranslation","ValEmailAttach", "ValTimeWindowCallLate", "ValTimeWindowCallEarly","ValRegExp", "valPhone", "ValMessageBody","ValNonEmptyMessage","ValFacebookPost"));// Included in jobwizard.inc.php ?>
 </script>
+<script src="script/livepipe/livepipe.js" type="text/javascript"></script>
+<script src="script/livepipe/window.js" type="text/javascript"></script>
+<script src="script/niftyplayer.js.php" type="text/javascript"></script>
 <?
+PreviewModal::includePreviewScript();
 
 startWindow("MessageSender");
 echo $wizard->render();

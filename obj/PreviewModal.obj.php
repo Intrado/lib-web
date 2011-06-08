@@ -33,12 +33,15 @@ class PreviewModal {
 			!isset($_REQUEST["previewid"]) ) {
 				return;
 		}
+		$jobpriority = isset($_REQUEST["jobpriority"])?$_REQUEST["jobpriority"]:3; // Set jobpriority to be able to preview email with the appropriate template on the jobedit page
 		
-		// TODO make sure the user can preview subscribed messages
-		if (!userOwns("message", $_REQUEST["previewid"])) {
+		$id = $_REQUEST["previewid"] + 0;
+		$message = DBFind("Message", "from message where id = ?", false, array($id));
+		$canviewmessage = $message && (userOwns("message", $id) || $USER->authorize('managesystem') || (isPublished("messagegroup", $message->messagegroupid) && userCanSubscribe("messagegroup", $message->messagegroupid)));
+		if(!$canviewmessage) {
 			return;
 		}
-		$message = new Message($_REQUEST["previewid"]);
+		
 		$modal = new PreviewModal($message->type);
 		switch($message->type) {
 			case "phone":
@@ -49,7 +52,7 @@ class PreviewModal {
 				$modal->title = _L("%s Phone Message" , Language::getName($message->languagecode));
 				break;
 			case "email":
-				$email = messagePreviewForPriority($message->id, 3); // returns commsuite_EmailMessageView object
+				$email = messagePreviewForPriority($message->id, $jobpriority); // returns commsuite_EmailMessageView object
 				$modal->text = $modal->formatEmail($email);
 				switch ($message->subtype) {
 					case "html":

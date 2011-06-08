@@ -221,8 +221,8 @@ function makeMessageGrid($messagegroup) {
 	}
 	
 	if ($USER->authorize('sendemail')) {
-		$columnlabels[] = "Email/HTML";
-		$columnlabels[] = "Email/Text";
+		$columnlabels[] = "Email (HTML)";
+		$columnlabels[] = "Email (Text)";
 	}
 	
 	// set action usr link	
