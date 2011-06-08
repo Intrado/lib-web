@@ -242,4 +242,30 @@ function getCurrentUser() {
 	return $_SESSION['userid'];
 }
 
+// get currently authorized facebook pages
+function getFbAuthorizedPages() {
+	$dbdata = QuickQueryMultiRow("select value from setting where name like 'fbauthorizedpage%'");
+	$pages = array();
+	foreach ($dbdata as $row)
+		$pages[] = $row[0];
+	return $pages;
+}
+
+// store facebook authorized pages
+function setFbAuthorizedPages($pages) {
+	// clear existing autorized pages
+	QuickUpdate("delete from setting where name like 'fbauthorizedpage%'");
+	
+	// batch insert the new pages
+	$args = array();
+	$count = 0;
+	foreach ($pages as $page) {
+		$args[] = "fbauthorizedpage" . $count++;
+		$args[] = $page;
+	}
+	
+	$query = "insert into setting (name,value) values " . repeatWithSeparator("(?,?)", ",", count($pages));
+	QuickUpdate($query, false, $args);
+}
+
 ?>
