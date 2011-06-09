@@ -166,11 +166,13 @@ function showActionGrid ($columnlabels, $rowlabels, $links) {
 			$link = $rowlinks[$col];
 			if ($link !== false) {
 				if (isset($link['icon'])) {
-					echo "<td style='text-align: center;'>
-							<img id='gridmenu-$row-$col'src='img/icons/{$link["icon"]}.gif'
+					echo "<td>
+							<div id='gridmenu-$row-$col' class='tinybutton'>
+							<img src='img/icons/{$link["icon"]}.png'
 								title=''
 								alt='{$link["title"]}'
 							/>
+							</div>
 						</td>";
 					
 					// Attach action menu script for this item
@@ -178,12 +180,12 @@ function showActionGrid ($columnlabels, $rowlabels, $links) {
 						$actionmenues[] = "createactionmenu('gridmenu-$row-$col','" . implode("<br />",$link["actions"]) . "','{$link["title"]}');";
 					}
 				} elseif (isset($link['button'])) {
-					echo "<td style='text-align: center;'>
+					echo "<td>
 							{$link['button']}
 						</td>";
 				}
 			} else {
-				echo "<td style='text-align: center;'>-</td>";
+				echo "<td>-</td>";
 			}
 		}
 		echo "</tr>";
@@ -340,18 +342,13 @@ function createactionmenu(id, content,title) {
 		style: 'protogrey',
 		radius: 4,
 		border: 4,
+		showOn: 'click',
 		hideOn: false,
-		hideAfter: 0.2,
-		delay: 0.2,
-		stem: 'leftTop',
-		hook: {  target: 'leftMiddle', tip: 'topLeft'  },
+		hideAfter: 0.5,
+		stem: 'leftMiddle',
+		hook: {  target: 'rightMiddle', tip: 'leftMiddle' },
 		width: '220px',
-		offset: { x: 16, y: 0 }
 	});
-//	$(id).observe('click', function(event) {
-//		var e = event.element();
-//		e.prototip.show();
-//	});
 }
 
 </script>

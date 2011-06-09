@@ -885,6 +885,15 @@ div.autocomplete ul li {
 .messagegrid .messagegridlanguage{
 	text-align: right;
 }
+.messagegrid .tinybutton{
+	margin:0 auto;
+	text-align:left;
+	padding-top:1px;
+	padding-left:3px;
+	width:30px;
+	height:19px;
+	background:url('img/contextbutton_blank.png');
+}
 
 <? if ($theme == "classroom") { /* TODO move this to theme based css includes */ ?>
 
