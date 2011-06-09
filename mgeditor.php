@@ -60,9 +60,31 @@ if (isset($_GET['delete'])) {
 }
 
 PreviewModal::HandlePhoneMessageId();
+
 ////////////////////////////////////////////////////////////////////////////////
-// Optional Form Items And Validators
+// Form Data
 ////////////////////////////////////////////////////////////////////////////////
+
+// find out if we need to update the default language code or if we need to give them an option to choose one
+// if the messagegroup has any instance of phone or email for the system default language, set it to that. 
+// if not, and there are only messages for one other language, set it to that.
+// if there are multiple languages, none of which are the system default language, present the user with a selection. Prepopulated with the current setting
+// if no languages at all, set to empty string
+$showDefaultLanguageSelector = false;
+$currentlangs = $messagegroup->getMessageLanguages();
+if (isset($currentlangs[Language::getDefaultLanguageCode()])) {
+	$messagegroup->defaultlanguagecode = Language::getDefaultLanguageCode();
+	$messagegroup->update();
+} else if (count($currentlangs) == 1) {
+	foreach ($currentlangs as $langcode => $lang)
+		$messagegroup->defaultlanguagecode = $langcode;
+	$messagegroup->update();
+} else if (count($currentlangs) > 1) {
+	$showDefaultLanguageSelector = true;
+} else {
+	$messagegroup->defaultlanguagecode = "";
+	$messagegroup->update();
+}
 
 $helpsteps = array();
 $formdata = array();
@@ -93,14 +115,27 @@ $formdata["description"] = array(
 	"helpstep" => 1
 );
 
+if ($showDefaultLanguageSelector) {
+	$formdata["defaultlanguage"] = array(
+		"label" => _L('Select Default Language'),
+		"fieldhelp" => _L('Choose the language to use as the default.'),
+		"value" => $messagegroup->defaultlanguagecode,
+		"validators" => array(
+			array("ValRequired"),
+			array("ValInArray","values" => array_keys($currentlangs))
+		),
+		"control" => array("SelectMenu", "values" => array_merge(array("" => _L("- Select One -")), $currentlangs)),
+		"helpstep" => 2
+	);
+	$helpsteps[] = _L("Select the default message language.");
+}
+
 
 if ($messagegroup->id) {
 	$buttons = array(submit_button(_L('Save'),"submit","tick"));
 } else {
 	$buttons = array(submit_button(_L('Next'),"submit","tick"));
 }
-
-
 
 $form = new Form("messagegroupedit",$formdata,$helpsteps,$buttons);
 
@@ -120,9 +155,12 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 	} else if (($errors = $form->validate()) === false) { //checks all of the items in this form
 		$postdata = $form->getData(); //gets assoc array of all values {name:value,...}
 		Query("BEGIN");
+		
+		if (isset($postdata['defaultlanguage']))
+			$messagegroup->defaultlanguagecode = $postdata['defaultlanguage'];
+		
 		$messagegroup->name = $postdata['name'];
 		$messagegroup->description = $postdata['description'];
-		$messagegroup->defaultlanguagecode = Language::getDefaultLanguageCode();
 		$messagegroup->userid = $USER->id;
 		$messagegroup->modified = date("Y-m-d H:i:s", time());
 		$messagegroup->update();

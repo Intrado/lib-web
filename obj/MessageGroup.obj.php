@@ -256,6 +256,30 @@ class MessageGroup extends DBMappedObject {
 			}
 		}
 	}
+	
+	// Get the current languages used in this message group (phone and email only)
+	function getMessageLanguages() {
+		global $USER;
+		
+		// if this isn't a stored message group yet, just bail
+		if (!$this->id)
+			return array();
+		
+		$messagelangcodes = QuickQueryMultiRow(
+			"select distinct languagecode 
+			from message 
+			where messagegroupid = ? 
+			and userid = ? 
+			and type in ('email','phone')",
+			false, false,
+			array($this->id, $USER->id));
+		
+		$languages = array();
+		foreach ($messagelangcodes as $row)
+			$languages[$row[0]] = Language::getName($row[0]);
+		
+		return $languages;
+	}
 }
 
 ?>
