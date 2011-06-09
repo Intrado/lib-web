@@ -257,15 +257,17 @@ function setFbAuthorizedPages($pages) {
 	QuickUpdate("delete from setting where name like 'fbauthorizedpage%'");
 	
 	// batch insert the new pages
-	$args = array();
-	$count = 0;
-	foreach ($pages as $page) {
-		$args[] = "fbauthorizedpage" . $count++;
-		$args[] = $page;
+	if ($pages) {
+		$args = array();
+		$count = 0;
+		foreach ($pages as $page) {
+			$args[] = "fbauthorizedpage" . $count++;
+			$args[] = $page;
+		}
+		
+		$query = "insert into setting (name,value) values " . repeatWithSeparator("(?,?)", ",", count($pages));
+		QuickUpdate($query, false, $args);
 	}
-	
-	$query = "insert into setting (name,value) values " . repeatWithSeparator("(?,?)", ",", count($pages));
-	QuickUpdate($query, false, $args);
 }
 
 ?>
