@@ -837,7 +837,7 @@ class JobWiz_messageGroupChoose extends WizStep {
 			"validators" => array(
 				array("ValRequired"),
 				array("ValInArray","values"=>array_keys($messages)),
-				array("ValNonEmptyMessage")
+				array("ValMessageGroup")
 			),
 			"control" => array("MessageGroupSelectMenu","width"=>"80%", "values"=>$messages, "jobpriority"=>$jobpriority),
 			"helpstep" => 1

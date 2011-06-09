@@ -46,7 +46,7 @@ require_once("obj/ValLists.val.php");
 require_once("obj/ValTimeWindowCallEarly.val.php");
 require_once("obj/ValTimeWindowCallLate.val.php");
 require_once("obj/ValMessageBody.val.php");
-require_once("obj/ValNonEmptyMessage.val.php");
+require_once("obj/ValMessageGroup.val.php");
 require_once("inc/facebook.php");
 require_once("inc/facebook.inc.php");
 require_once("obj/FacebookPost.fi.php");
@@ -616,7 +616,7 @@ require_once("nav.inc.php");
 
 ?>
 <script type="text/javascript">
-<? Validator::load_validators(array("ValInArray", "ValJobName", "ValHasMessage", "ValTextAreaPhone","ValEasycall","ValLists","ValTranslation","ValEmailAttach", "ValTimeWindowCallLate", "ValTimeWindowCallEarly","ValRegExp", "valPhone", "ValMessageBody","ValNonEmptyMessage","ValFacebookPost"));// Included in jobwizard.inc.php ?>
+<? Validator::load_validators(array("ValInArray", "ValJobName", "ValHasMessage", "ValTextAreaPhone","ValEasycall","ValLists","ValTranslation","ValEmailAttach", "ValTimeWindowCallLate", "ValTimeWindowCallEarly","ValRegExp", "valPhone", "ValMessageBody","ValMessageGroup","ValFacebookPost"));// Included in jobwizard.inc.php ?>
 </script>
 <script src="script/livepipe/livepipe.js" type="text/javascript"></script>
 <script src="script/livepipe/window.js" type="text/javascript"></script>

@@ -280,6 +280,59 @@ class MessageGroup extends DBMappedObject {
 		
 		return $languages;
 	}
+	
+	// is this message group valid? It is if the following is true
+	function isValid() {
+		global $USER;
+		
+		// is this even a real message group yet?
+		if (!$this->id)
+			return false;
+		
+		// no message can contain email or phone when the default doesn't
+		$messages = QuickQueryMultiRow(
+			"select languagecode, type
+			from message
+			where messagegroupid = ?
+			and userid = ?
+			and type in ('email','phone')",
+			false,false,
+			array($this->id, $USER->id));
+		
+		// map the language to phone, email, both
+		$languagemap = array();
+		foreach ($messages as $row) {
+			if (isset($languagemap[$row[0]])) {
+				if ($languagemap[$row[0]] !== $row[1])
+					$languagemap[$row[0]] = "both";
+			} else {
+				$languagemap[$row[0]] = $row[1];
+			}
+		}
+		
+		// get the the default language code messages type calculated above. "phone", "email", "both"
+		$default = isset($languagemap[$this->defaultlanguagecode])?$languagemap[$this->defaultlanguagecode]:"";
+		
+		switch ($default) {
+			case "both":
+				// cool. everything is fine here
+				break;
+			case "phone":
+				// no other message can have email, or both
+				if (in_array("email", array_values($languagemap)) || in_array("both", array_values($languagemap)))
+					return false;
+				break;
+			case "email":
+				// no other message can have phone, or both
+				if (in_array("phone", array_values($languagemap)) || in_array("both", array_values($languagemap)))
+					return false;
+				break;
+			default:
+				// the default language message is missing both phone and email...
+				return false;
+		}
+		return true;
+	}
 }
 
 ?>

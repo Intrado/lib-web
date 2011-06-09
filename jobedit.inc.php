@@ -27,7 +27,7 @@ require_once("obj/WeekRepeat.val.php");
 require_once("obj/ValLists.val.php");
 require_once("obj/ValTimeWindowCallEarly.val.php");
 require_once("obj/ValTimeWindowCallLate.val.php");
-require_once("obj/ValNonEmptyMessage.val.php");
+require_once("obj/ValMessageGroup.val.php");
 require_once("obj/MessageGroup.obj.php");
 require_once("obj/Message.obj.php");
 require_once("obj/MessagePart.obj.php");
@@ -518,7 +518,7 @@ $helpsteps[] = _L("Enter a name for your job. " .
 		$messagevalidators = array(
 				array("ValRequired"),
 				array("ValInArray","values"=>array_keys($messages)),
-				array("ValNonEmptyMessage")
+				array("ValMessageGroup")
 				);
 		if ($JOBTYPE == "repeating") {
 			$messagevalidators[] = array("ValIsTranslated");
@@ -775,7 +775,7 @@ Validator::load_validators(array("ValDuplicateNameCheck",
 								"ValTimeWindowCallLate",
 								"ValFormListSelect",
 								"ValIsTranslated",
-								"ValNonEmptyMessage"));
+								"ValMessageGroup"));
 ?>
 </script>
 <script src="script/livepipe/livepipe.js" type="text/javascript"></script>

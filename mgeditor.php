@@ -71,24 +71,31 @@ PreviewModal::HandlePhoneMessageId();
 // if there are multiple languages, none of which are the system default language, present the user with a selection. Prepopulated with the current setting
 // if no languages at all, set to empty string
 $showDefaultLanguageSelector = false;
-$currentlangs = $messagegroup->getMessageLanguages();
-if (isset($currentlangs[Language::getDefaultLanguageCode()])) {
-	$messagegroup->defaultlanguagecode = Language::getDefaultLanguageCode();
-	$messagegroup->update();
-} else if (count($currentlangs) == 1) {
-	foreach ($currentlangs as $langcode => $lang)
-		$messagegroup->defaultlanguagecode = $langcode;
-	$messagegroup->update();
-} else if (count($currentlangs) > 1) {
-	$showDefaultLanguageSelector = true;
-} else {
-	$messagegroup->defaultlanguagecode = "";
-	$messagegroup->update();
+$showInvalidMessageWarning = false;
+if ($messagegroup->id) {
+	$currentlangs = $messagegroup->getMessageLanguages();
+	if (isset($currentlangs[Language::getDefaultLanguageCode()])) {
+		$messagegroup->defaultlanguagecode = Language::getDefaultLanguageCode();
+		$messagegroup->update();
+	} else if (count($currentlangs) == 1) {
+		foreach ($currentlangs as $langcode => $lang)
+			$messagegroup->defaultlanguagecode = $langcode;
+		$messagegroup->update();
+	} else if (count($currentlangs) > 1) {
+		$showDefaultLanguageSelector = true;
+	} else {
+		$messagegroup->defaultlanguagecode = "";
+		$messagegroup->update();
+	}
+	
+	// is this message group valid?
+	if (!$messagegroup->isValid())
+		$showInvalidMessageWarning = true;
 }
 
 $helpsteps = array();
 $formdata = array();
-
+$helpstepnum = 1;
 $helpsteps[] = _L("Enter a name for your Message. " .
 					"Using a descriptive name that indicates the message content will make it easier to find the message later. " .
 					"You may also optionally enter a description of the the message.");
@@ -112,7 +119,7 @@ $formdata["description"] = array(
 		array("ValLength","min" => 0,"max" => 50)
 	),
 	"control" => array("TextField","size" => 30, "maxlength" => 50),
-	"helpstep" => 1
+	"helpstep" => $helpstepnum++
 );
 
 if ($showDefaultLanguageSelector) {
@@ -125,11 +132,18 @@ if ($showDefaultLanguageSelector) {
 			array("ValInArray","values" => array_keys($currentlangs))
 		),
 		"control" => array("SelectMenu", "values" => array_merge(array("" => _L("- Select One -")), $currentlangs)),
-		"helpstep" => 2
+		"helpstep" => $helpstepnum++
 	);
 	$helpsteps[] = _L("Select the default message language.");
 }
-
+if ($showInvalidMessageWarning) {
+	$formdata["invalidmessagetip"] = array(
+		"label" => _L('Message Is Currently Invalid'),
+		"control" => array("FormHtml", "html" => '<div style="border: 2px solid red;padding: 4px;">'. _L("Your default language, %s, is missing either phone or email.", Language::getName($messagegroup->defaultlanguagecode)) .'</div>'),
+		"helpstep" => $helpstepnum++
+	);
+	$helpsteps[] = _L("TODO: Help.");
+}
 
 if ($messagegroup->id) {
 	$buttons = array(submit_button(_L('Save'),"submit","tick"));
