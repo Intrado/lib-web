@@ -46,7 +46,7 @@ function fmt_actions ($row, $index) {
 	global $SUBSCRIBETYPE;
 	$actionlinks = array();
 	if ($SUBSCRIBETYPE == 'messagegroup')
-		$actionlinks[] = action_link("Preview", "fugue/control", "messagegroupview.php?id=" . $row[$index]);
+		$actionlinks[] = action_link("View", "fugue/magnifier", "messagegroupview.php?id=" . $row[$index]);
 	if (isset($subscribed[$row['id']]))
 		$actionlinks[] = action_link("Un-Subscribe", "fugue/star__minus", $SUBSCRIBETYPE."subscribe.php?id=". $subscribed[$row[$index]] ."&remove&pagestart=$start");
 	else

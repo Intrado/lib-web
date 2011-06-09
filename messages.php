@@ -170,7 +170,7 @@ if($isajax === true) {
 			// tell the user it's a subscription. change the href to view instead of edit
 			if ($publishaction == 'subscribe') {
 				$publishmessage = _L('You are subscribed to this message. Owner: (%s)', $item['owner']);
-				$defaultlink = "mgeditor.php?id=$itemid";
+				$defaultlink = "messagegroupview.php?id=$itemid";
 			}
 			
 			// Users with published messages or subscribed messages will get a special action item
@@ -192,7 +192,7 @@ if($isajax === true) {
 			// if the user is only subscribed to this message group, they can't edit, delete
 			if ($publishaction == 'subscribe')
 				$tools = action_links (
-					action_link("Preview", "fugue/control", 'messagegroupview.php?id=' . $itemid),
+					action_link("View", "fugue/magnifier", 'messagegroupview.php?id=' . $itemid),
 					$publishactionlink);
 			else
 				$tools = action_links (
