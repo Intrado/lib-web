@@ -18,14 +18,6 @@ if (!getSystemSetting("_hasfacebook") || !$USER->authorize('managesystem')) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-// Action/Request Processing
-////////////////////////////////////////////////////////////////////////////////
-
-if (isset($_GET['deleteid'])) {
-	// delete an authorized page
-}
-
-////////////////////////////////////////////////////////////////////////////////
 // Custom Form Items And Validators
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -45,23 +37,26 @@ class FacebookAuthPages extends FormItem {
 		$str .= '
 			<style>
 				.fbpagelist {
+					width: 50%;
 					border: 1px dotted gray;
 					padding: 3px;
 					margin-bottom: 10px;
 				}
-				.fbpageimg {
-					border: 1px solid gray;
-					width: 48;
-					height: 48;
+				.fbauth .fbname {
+					font-weight: bold;
+				}
+				.fbnoauth {
+					color: gray;
 				}
 			</style>
 			<div>
 				<div id="fb-root"></div>
-				<input id="'. $n. 'fballowallcheck" type="checkbox" '. ($haspages?"":"checked") .'>'. _L("Allow all pages") .'</input>
 				<div id="'. $n. 'fbnoauthpages" class="fbpagelist" style="'. ($haspages?"display:none;":"display:block;") .'">
 					'. _L("There are currently no authorized Facebook pages. Your authorized users will be able to post to any page they are an administrator of.") .'
 				</div>
-				<table id="'. $n. 'fbauthpages" class="fbpagelist" style="'. ($haspages?"display:block":"display:none") .'"><tbody></tbody></table>
+				<table id="'. $n. 'fbauthpages" class="fbpagelist" style="'. ($haspages?"display:block":"display:none") .'"><tbody>
+					<tr><th colspan=3>'. _L("Authorized Pages") .'<th></tr>
+				</tbody></table>
 				<div id="'. $n. 'fbdisconnected">
 					<div style="clear:both;">'. _L("Connect to a Facebook account to add more authorized pages") .'</div>
 					'. icon_button("Connect to Facebook", "facebook", 
@@ -127,7 +122,7 @@ class FacebookAuthPages extends FormItem {
 					$(e + "fbnonewpages").hide();
 					$(e + "fbhasnewpages").show();
 					var addbutton = icon_button("Add","add",e + "add-" + accountid);
-					addFbPageElement(e, $(e + "fbnewpages"), accountid, addbutton, addFbPage.curry(accountid, e));
+					addFbPageElement(e, $(e + "fbnewpages"), accountid, addbutton, addFbPage.curry(accountid, e), "fbnoauth");
 					
 					// if there are no more accounts authorized
 					currentpages = $(e).value.evalJSON();
@@ -160,7 +155,7 @@ class FacebookAuthPages extends FormItem {
 					
 					// dont reload everything, just add the new account into the auth section
 					var removebutton = icon_button("Remove","cross",e + "remove-" + accountid);
-					addFbPageElement(e, fbauthpages, accountid, removebutton, removeFbPage.curry(accountid, e));
+					addFbPageElement(e, fbauthpages, accountid, removebutton, removeFbPage.curry(accountid, e), "fbauth");
 				}
 				
 				// load facebook page info from list of account ids
@@ -175,10 +170,9 @@ class FacebookAuthPages extends FormItem {
 						fbnoauthpages.hide();
 						fbauthpages.show();
 						
-						fbauthpages.update();
 						accountlist.each(function(accountid) {
 							var removebutton = icon_button("Remove","cross",e + "remove-" + accountid);
-							addFbPageElement(e, fbauthpages, accountid, removebutton, removeFbPage.curry(accountid, e));
+							addFbPageElement(e, fbauthpages, accountid, removebutton, removeFbPage.curry(accountid, e), "fbauth");
 						});
 					} else {
 						fbnoauthpages.show();
@@ -227,7 +221,7 @@ class FacebookAuthPages extends FormItem {
 								if (currentpages.indexOf(account.id) == -1) {
 									hasnewpages = true;
 									var addbutton = icon_button("Add","add",e + "add-" + account.id);
-									addFbPageElement(e, fbnewpages, account.id, addbutton, addFbPage.curry(account.id, e));
+									addFbPageElement(e, fbnewpages, account.id, addbutton, addFbPage.curry(account.id, e), "fbnoauth");
 								}
 							});
 							
@@ -242,7 +236,7 @@ class FacebookAuthPages extends FormItem {
 				}
 				
 				// get an account element with all the facebook page info and an attached button
-				function addFbPageElement(e, container, accountid, button, onclick) {
+				function addFbPageElement(e, container, accountid, button, onclick, cssclass) {
 					// temporarily create a loading element
 					var containerbody = $(container).down("tbody");
 					if (containerbody == undefined) {
@@ -260,15 +254,13 @@ class FacebookAuthPages extends FormItem {
 							// remove the temporary loading image
 							$(e + accountid).remove();
 							var accountelement = new Element("tr", { id: e + accountid }).insert(
-									new Element("td").insert(
-										new Element("img", { 
-											"src": "https://graph.facebook.com/"+ accountid +"/picture?type=square",
-											"class": "fbpageimg" }))
+									new Element("td", { "class": "fbimg" }).insert(
+										new Element("img", { "src": "https://graph.facebook.com/"+ accountid +"/picture?type=square" }))
 								).insert(
-									new Element("td").insert(
-										new Element("div").setStyle({ "fontWeight": "bold" }).update(r.name.escapeHTML())
+									new Element("td", { "class": cssclass }).insert(
+										new Element("div", { "class": "fbname" }).update(r.name.escapeHTML())
 									).insert(
-										new Element("div").update(r.category.escapeHTML()))
+										new Element("div", { "class": "fbcategory" }).update(r.category.escapeHTML()))
 								).insert(new Element("td").insert(button));
 								
 							containerbody.insert(accountelement);
@@ -283,11 +275,15 @@ class FacebookAuthPages extends FormItem {
 	
 }
 
+// TODO: ValFacebookAuthPages
+
+
 ////////////////////////////////////////////////////////////////////////////////
 // Data processing
 ////////////////////////////////////////////////////////////////////////////////
 // get currently authorized pages from the db
 $pages = getFbAuthorizedPages();
+$authorizewall = getSystemSetting("fbauthorizewall");
 
 ////////////////////////////////////////////////////////////////////////////////
 // Form Data
@@ -296,6 +292,7 @@ $pages = getFbAuthorizedPages();
 $formdata = array(
 	'tips' => array(
 		"label" => _L('Tips'),
+		"fieldhelp" => _L("TODO: Help me!"),
 		"control" => array("FormHtml", "html" => '
 			<ul>
 				<li class="wizbuttonlist">'._L('Below you will see which Facebook pages your users are restricted to.').'</li>
@@ -305,15 +302,24 @@ $formdata = array(
 			'),
 		"helpstep" => 1),
 	"authorizedpages" => array(
-		"label" => _L('Authorized Pages'),
+		"label" => _L('Authorize Pages'),
 		"value" => json_encode($pages),
 		"validators" => array(),
 		"control" => array("FacebookAuthPages"),
 		"helpstep" => 1
+	),
+	"authorizewall" => array(
+		"label" => _L('Authorize User Wall'),
+		"fieldhelp" => _L("TODO: Help me!"),
+		"value" => $authorizewall,
+		"validators" => array(),
+		"control" => array("CheckBox", "label" => _L("Allow users to post to their wall")),
+		"helpstep" => 2
 	)
 );
 
 $helpsteps = array (
+	_L('TODO: Help me'),
 	_L('TODO: Help me')
 );
 
@@ -340,10 +346,16 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		$postdata = $form->getData(); //gets assoc array of all values {name:value,...}
 		
 		$pages = json_decode($postdata['authorizedpages']);
+		$authorizewall = $postdata['authorizewall'];
 		
 		Query("BEGIN");
 		
 		setFbAuthorizedPages($pages);
+		
+		if ($authorizewall)
+			setSystemSetting("fbauthorizewall", 1);
+		else
+			setSystemSetting("fbauthorizewall", "");
 		
 		Query("COMMIT");
 		if ($ajax)
