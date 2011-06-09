@@ -1687,6 +1687,8 @@ class JobWiz_socialMedia extends WizStep {
 		$helpstepnum = 1;
 		$helpsteps = array();
 		
+		$authpages = getFbAuthorizedPages();
+		$authwall = getSystemSetting("fbauthorizewall");
 		// Facebook
 		if (isset($postdata['/start']['facebook']) && 
 				$postdata['/start']['facebook'] && 
@@ -1701,8 +1703,8 @@ class JobWiz_socialMedia extends WizStep {
 				"value" => "",
 				"validators" => array(
 					array("ValRequired"),
-					array("ValFacebookPost")),
-				"control" => array("FacebookPost", "message" => $fbtext, "access_token" => $USER->getSetting("fb_access_token", false)),
+					array("ValFacebookPost", "authpages" => $authpages, "authwall" => $authwall)),
+				"control" => array("FacebookPost", "authpages" => $authpages, "authwall" => $authwall, "message" => $fbtext, "access_token" => $USER->getSetting("fb_access_token", false)),
 				"helpstep" => $helpstepnum++
 			);
 		}

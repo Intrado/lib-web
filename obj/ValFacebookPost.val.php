@@ -1,6 +1,7 @@
 <?
 
 class ValFacebookPost extends Validator {
+	var $onlyserverside = true;
 	
 	function validate ($value, $args) {
 		global $USER;
@@ -9,11 +10,23 @@ class ValFacebookPost extends Validator {
 		
 		$fbdata = json_decode($value);
 		
+		// get the authorized pages
+		$authpages = array();
+		$authwall = false;
+		if (isset($args['authpages']))
+			$authpages = $args['authpages'];
+		if (isset($args['authwall']))
+			$authwall = $args['authwall'];
+		
 		// check to see if any pages are selected
 		$haspage = false;
 		foreach ($fbdata->page as $pageid => $token) {
 			$haspage = true;
-			break;
+			// check authorized pages to see if the ones selected are allowed
+			if ($pageid == "me" && !$authwall)
+				return $this->label. " ". _L("has an invalid selection. Personal wall posting is disabled.");
+			else if ($authpages && !in_array($pageid, $authpages))
+				return $this->label. " ". _L("has an invalid posting location selected. Page is not authorized.");
 		}
 		if (!$haspage)
 			return $this->label. " ". _L("must have one or more pages to post to.");
@@ -27,28 +40,6 @@ class ValFacebookPost extends Validator {
 		
 		return true;
 	}
-
-	function getJSValidator () {
-		return
-			'function (name, label, value) {
-				var fbdata = value.evalJSON();
-				
-				// check if any pages are selected
-				var haspage = false;
-				$H(fbdata.page).each(function(page) {
-					haspage = true;
-				});
-				if (!haspage)
-					return label + " '. _L("must have one or more pages to post to."). '";
-				
-				if (!fbdata.message || fbdata.message.length < 1)
-					return label + " '. _L("needs a message to post to your Facebook pages."). '";
-				
-				if (fbdata.message.length > 420)
-					return label + " '. _L("message may not excede 420 characters."). '";
-				
-				return true;
-			}';
-	}
+	// TODO: javascript validator
 }
 ?>
