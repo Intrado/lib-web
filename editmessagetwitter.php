@@ -101,7 +101,7 @@ $formdata = array(
 $helpsteps = array(_L("TODO: Help with facebook."));
 		
 $buttons = array(submit_button(_L('Done'),"submit","tick"));
-$form = new Form("phoneadvanced",$formdata,$helpsteps,$buttons);
+$form = new Form("twittermessage",$formdata,$helpsteps,$buttons);
 
 ////////////////////////////////////////////////////////////////////////////////
 // Form Data Handling
@@ -134,7 +134,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 				
 				// if this is not an edit of an existing message
 				if (!$message) {
-					// does there already exist a facebook message? if so, edit it
+					// does there already exist a twitter message? if so, edit it
 					$message = $messagegroup->getMessage("post", "twitter", Language::getDefaultLanguageCode());
 					// doesn't exist? create a new message
 					if (!$message)
@@ -156,9 +156,15 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 					$message->update();
 				else
 					$message->create();
-							
-				// create the message parts
-				$message->recreateParts($postdata['message'], null, $messagegroup->preferredgender);
+				
+				// create the message part
+				QuickUpdate("delete from messagepart where messageid = ?", false, array($message->id));
+				$messagepart = new MessagePart();
+				$messagepart->messageid = $message->id;
+				$messagepart->type = "T";
+				$messagepart->txt = $postdata['message'];
+				$messagepart->sequence = 0;
+				$messagepart->create();
 				
 				Query("COMMIT");
 			}
