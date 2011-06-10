@@ -82,8 +82,8 @@ $language = Language::getName(Language::getDefaultLanguageCode());
 
 $formdata = array($messagegroup->name. " (". $language. ")");
 
-// TODO: need to reserve some characters for the link url.
-$reservedchars = mb_strlen(getSystemSetting("tinyurl", "http://somesmallurl.com")) + 6;
+// need to reserve some characters for the link url and the six byte code. (http://smalldomain.com/<code>)
+$reservedchars = mb_strlen("http://". getSystemSetting("tinydomain")) + 6;
 
 $formdata = array(
 	$messagegroup->name. " (". $language. ")",

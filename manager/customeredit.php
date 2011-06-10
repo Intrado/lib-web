@@ -155,6 +155,7 @@ if(CheckFormSubmit($f,"Save") || CheckFormSubmit($f, "Return")) {
 			$hasfacebook = GetFormData($f, $s, 'hasfacebook');
 			$hastwitter = GetFormData($f, $s, 'hastwitter');
 			$hassmapi = GetFormData($f, $s, 'hassmapi');
+			$tinydomain = GetFormData($f, $s, 'tinydomain');
 			$emaildomain = trim(GetFormData($f, $s, 'emaildomain'));
 			$emaildomainerror = validateDomainList($emaildomain);
 			$fileerror = false;
@@ -380,6 +381,8 @@ if(CheckFormSubmit($f,"Save") || CheckFormSubmit($f, "Return")) {
 
 				setCustomerSystemSetting('emaildomain', DBSafe($emaildomain), $custdb);
 
+				setCustomerSystemSetting('tinydomain', GetFormData($f, $s, 'tinydomain'), $custdb);
+				
 				if(getCustomerSystemSetting('_dmmethod', '', true, $custdb)!='asp' && GetFormData($f, $s, "_dmmethod") == 'asp'){
 					$aspquery = QuickQueryRow("select s.dbhost, s.dbusername, s.dbpassword from customer c inner join shard s on (c.shardid = s.id) where c.id = '$currentid'");
 					$aspsharddb = DBConnect($aspquery[0], $aspquery[1], $aspquery[2], "aspshard");
@@ -495,6 +498,8 @@ if( $reloadform ) {
 	PutFormData($f, $s, "_supportphone", Phone::format(getCustomerSystemSetting('_supportphone', "", true, $custdb)), "phone", 10, 10, true);
 
 	PutFormData($f, $s, "emaildomain", getCustomerSystemSetting('emaildomain', "", true, $custdb), "text", 0, 255);
+	
+	PutFormData($f, $s, "tinydomain", getCustomerSystemSetting('tinydomain', "", true, $custdb));
 
 	PutFormData($f, $s, "_dmmethod", getCustomerSystemSetting('_dmmethod', "", true, $custdb), "array", array('asp','hybrid','cs'), null, true);
 
@@ -716,6 +721,18 @@ foreach($languages as $language){
 <tr>
 	<td>Email Domain:</td>
 	<td><? NewFormItem($f, $s, "emaildomain", "text", 30, 255); ?></td>
+</tr>
+
+<tr>
+	<td>Tiny Domain:</td>
+	<td>
+<?
+	NewFormItem($f, $s, "tinydomain", "selectstart");
+	foreach ($SETTINGS['feature']['tinydomain'] as $tinydomain)
+		NewFormItem($f,$s,'tinydomain','selectoption',$tinydomain,$tinydomain);
+	NewFormItem($f,$s,'tinydomain','selectend');
+?>
+	</td>
 </tr>
 
 <tr>

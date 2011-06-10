@@ -45,6 +45,11 @@ query_trace=true
 ; server to redirect customer link to
 customer_url_prefix=https://localhost
 
+; list of tiny domains to choose from in the manager
+tinydomain[]="tiny.com"
+tinydomain[]="small.com"
+tinydomain[]="itsy.com"
+
 [content]
 tts="10.25.25.232,8080,/ttsserver/tts"
 
