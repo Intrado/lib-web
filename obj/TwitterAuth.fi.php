@@ -25,7 +25,7 @@ class TwitterAuth extends FormItem {
 		$str .= '<div id="'. $n. 'twuser"></div>';
 		
 		// button to remove access_token
-		$str .= icon_button("Disconnect this Twitter Account", "twitter" ,"twClearValue('".$n."')");
+		$str .= icon_button("Disconnect this Twitter Account", "custom/twitter" ,"twClearValue('".$n."')");
 		
 		$str .= '<div style="clear: both"></div></div>';
 		
@@ -34,10 +34,10 @@ class TwitterAuth extends FormItem {
 		
 		// Do twitter login to get good auth token
 		if (isset($this->args["submit"])) {
-			$str .= submit_button(_L("Connect to Twitter"), "twitterauth", "twitter");
+			$str .= submit_button(_L("Connect to Twitter"), "twitterauth", "custom/twitter");
 		} else {
 			$thispage = substr($_SERVER["SCRIPT_NAME"], strrpos($_SERVER["SCRIPT_NAME"], "/") + 1);
-			$str .= icon_button(_L("Connect to Twitter"), "twitter", "", "twitterauth.php/$thispage");
+			$str .= icon_button(_L("Connect to Twitter"), "custom/twitter", "", "twitterauth.php/$thispage");
 		}
 		
 		$str .= '<div style="clear: both"></div></div></div>';
