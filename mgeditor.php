@@ -476,7 +476,7 @@ function createactionmenu(id, content,title) {
 		hideAfter: 0.5,
 		stem: 'leftMiddle',
 		hook: {  target: 'rightMiddle', tip: 'leftMiddle' },
-		width: '220px',
+		width: '220px'
 	});
 }
 
