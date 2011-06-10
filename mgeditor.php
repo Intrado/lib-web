@@ -279,6 +279,15 @@ function makeMessageGrid($messagegroup) {
 		$columnlabels[] = "Email (Text)";
 	}
 	
+	if ($USER->authorize('facebookpost'))
+		$columnlabels[] = "Facebook";
+	
+	if ($USER->authorize('twitterpost'))
+		$columnlabels[] = "Twitter";
+	
+	if ($USER->authorize('twitterpost', 'facebookpost'))
+		$columnlabels[] = "Page";
+		
 	// set action usr link	
 	$links = array(); 
 	$ttslanguages = Voice::getTTSLanguageMap();
@@ -308,7 +317,7 @@ function makeMessageGrid($messagegroup) {
 		
 		// Print SMS message actions if SMS is available 
 		if (getSystemSetting('_hassms', false) && $USER->authorize('sendsms')) {
-			if ($languagecode == 'en') {
+			if ($languagecode == Language::getDefaultLanguageCode()) {
 				$actions = array();
 				$message = $messagegroup->getMessage('sms', 'plain', $languagecode);
 				if ($message) {
@@ -356,20 +365,88 @@ function makeMessageGrid($messagegroup) {
 			$linkrow[] = array('icon' => $icon,'title' => _L("%s Text Email Message",$languagename), 'actions' => $actions);
 		}
 		
+		// Facebook actions
+		if (getSystemSetting('_hasfacebook', false) && $USER->authorize('facebookpost')) {
+			if ($languagecode == Language::getDefaultLanguageCode()) {
+				$actions = array();
+				$message = $messagegroup->getMessage('post', 'facebook', $languagecode);
+				
+				if ($message) {
+					$icon = "accept";
+					$actions[] = action_link("Preview","custom/facebook",null,"showPreview(null,\'previewid=$message->id\');return false;");
+					$actions[] = action_link("Edit","pencil","editmessagefacebook.php?id=$message->id");
+					$actions[] = action_link("Delete","cross","mgeditor.php?delete=$message->id","return confirmDelete();");
+				} else {
+					$icon = "diagona/16/160";
+					$actions[] = action_link("New","pencil_add","editmessagefacebook.php?id=new&mgid=".$messagegroup->id);
+				}
+				$linkrow[] = array('icon' => $icon,'title' => _L("%s Facebook Message",$languagename), 'actions' => $actions);
+			} else {
+				$linkrow[] = false;
+			}
+		}
+		
+		// Twitter actions
+		if (getSystemSetting('_hastwitter', false) && $USER->authorize('twitterpost')) {
+			if ($languagecode == Language::getDefaultLanguageCode()) {
+				$actions = array();
+				$message = $messagegroup->getMessage('post', 'twitter', $languagecode);
+				
+				if ($message) {
+					$icon = "accept";
+					$actions[] = action_link("Preview","custom/twitter",null,"showPreview(null,\'previewid=$message->id\');return false;");
+					$actions[] = action_link("Edit","pencil","editmessagetwitter.php?id=$message->id");
+					$actions[] = action_link("Delete","cross","mgeditor.php?delete=$message->id","return confirmDelete();");
+				} else {
+					$icon = "diagona/16/160";
+					$actions[] = action_link("New","pencil_add","editmessagetwitter.php?id=new&mgid=".$messagegroup->id);
+				}
+				$linkrow[] = array('icon' => $icon,'title' => _L("%s Twitter Message",$languagename), 'actions' => $actions);
+			} else {
+				$linkrow[] = false;
+			}
+		}
+		// Page posting is allowed if EITHER twitter or facebook are allowed, currently
+		if ((getSystemSetting('_hasfacebook', false) && $USER->authorize('facebookpost')) ||
+				(getSystemSetting('_hastwitter', false) && $USER->authorize('twitterpost'))) {
+			if ($languagecode == Language::getDefaultLanguageCode()) {
+				$actions = array();
+				$message = $messagegroup->getMessage('post', 'page', $languagecode);
+				
+				if ($message) {
+					$icon = "accept";
+					$actions[] = action_link("Preview","layout_sidebar",null,"showPreview(null,\'previewid=$message->id\');return false;");
+					$actions[] = action_link("Edit","pencil","editmessagepage.php?id=$message->id");
+					$actions[] = action_link("Delete","cross","mgeditor.php?delete=$message->id","return confirmDelete();");
+				} else {
+					$icon = "diagona/16/160";
+					$actions[] = action_link("New","pencil_add","editmessagepage.php?id=new&mgid=".$messagegroup->id);
+				}
+				$linkrow[] = array('icon' => $icon,'title' => _L("%s Page Message",$languagename), 'actions' => $actions);
+			} else {
+				$linkrow[] = false;
+			}
+		}
 		$links[] = $linkrow;
 	}
 	
 	// add wizard/editor buttons
 	$buttons = array();
 	if ($USER->authorize("sendphone"))
-		$buttons[] = array("button" => button("New Phone", "", "messagewizardphone.php?new&mgid=".$messagegroup->id));
+		$buttons[] = array("button" => icon_button("New Phone", "telephone", "", "messagewizardphone.php?new&mgid=".$messagegroup->id));
 	if ($USER->authorize("sendsms"))
-		$buttons[] = array("button" => button("New SMS", "", "editmessagesms.php?new&mgid=".$messagegroup->id));
+		$buttons[] = array("button" => icon_button("New SMS", "fugue/mobile_phone", "", "editmessagesms.php?new&mgid=".$messagegroup->id));
 	if ($USER->authorize("sendemail")) {
-		$buttons[] = array("button" => button("New Html Email", "", "messagewizardemail.php?new&subtype=html&mgid=".$messagegroup->id));
-		$buttons[] = array("button" => button("New Plain Email", "", "messagewizardemail.php?new&subtype=plain&mgid=".$messagegroup->id));
+		$buttons[] = array("button" => icon_button("New Html Email", "email", "", "messagewizardemail.php?new&subtype=html&mgid=".$messagegroup->id));
+		$buttons[] = array("button" => icon_button("New Plain Email", "html", "", "messagewizardemail.php?new&subtype=plain&mgid=".$messagegroup->id));
 	}
-	
+	if ($USER->authorize('facebookpost'))
+		$buttons[] = array("button" => icon_button("New Facebook", "custom/facebook", "", "editmessagefacebook.php?new&mgid=".$messagegroup->id));
+	if ($USER->authorize('twitterpost'))
+		$buttons[] = array("button" => icon_button("New Twitter", "custom/twitter", "", "editmessagetwitter.php?new&mgid=".$messagegroup->id));
+	if ($USER->authorize('twitterpost', 'facebookpost'))
+		$buttons[] = array("button" => icon_button("New Page", "layout_sidebar", "", "editmessagepage.php?new&mgid=".$messagegroup->id));
+		
 	$links[] = $buttons;
 	
 	$rowlabels = array_values($customerlanguages);
