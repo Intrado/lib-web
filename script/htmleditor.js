@@ -179,7 +179,7 @@ function applyHtmlEditor(textarea, dontwait,target) {
 				'customConfig': '', // Prevent ckeditor from trying to load an external configuration file, should improve startup time.
 				'removePlugins': 'wsc,scayt,smiley,showblocks,flash,elementspath,save',
 				'toolbar': [
-					['Preview','Print','Source'],
+					['Print','Source'],
 					['Undo','Redo','-','SelectAll','PasteFromWord','Find','Replace'],
 					'/',
 					['Styles','Format'],
