@@ -59,7 +59,7 @@ class FacebookAuthPages extends FormItem {
 				</tbody></table>
 				<div id="'. $n. 'fbdisconnected">
 					<div style="clear:both;">'. _L("Connect to a Facebook account to add more authorized pages") .'</div>
-					'. icon_button("Connect to Facebook", "facebook", 
+					'. icon_button("Connect to Facebook", "custom/facebook", 
 						"try { 
 							FB.login(loadFbPagesFromAuthResponse.curry('$n'), {perms: '$perms'});
 						} catch (e) { 
@@ -74,7 +74,7 @@ class FacebookAuthPages extends FormItem {
 						'. _L("Add one or more of the following pages to the list of authorized pages"). '
 					</div>
 					<table id="'. $n. 'fbnewpages" class="fbpagelist"><tbody></tbody></table>
-					'. icon_button(_L("Disconnect from Facebook"), "facebook", "$('".$n."fbconnected').hide(); $('".$n."fbdisconnected').show();") .'
+					'. icon_button(_L("Disconnect from Facebook"), "custom/facebook", "$('".$n."fbconnected').hide(); $('".$n."fbdisconnected').show();") .'
 				</div>
 			</div>
 			';
