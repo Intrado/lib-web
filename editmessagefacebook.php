@@ -86,6 +86,7 @@ $formdata = array(
 	$messagegroup->name. " (". $language. ")",
 	"message" => array(
 		"label" => _L("Facebook Message"),
+		"fieldhelp" => _L("TODO: field help"),
 		"value" => $text,
 		"validators" => array(
 			array("ValRequired"),

@@ -195,20 +195,27 @@ $formdata["subject"] = array(
 	"helpstep" => 3
 );
 
-$helpsteps[] = _L("You may attach up to three files that are up to 2MB each. For greater security, only certain types of files are accepted.<br><br><b>Note:</b> Some email accounts may not accept attachments above a certain size and may reject your message.");
+$helpsteps[] = _L("You may attach up to three files that are up to 2MB each. For greater security, only certain types ".
+	"of files are accepted.<br><br><b>Note:</b> Some email accounts may not accept attachments above a certain size and may reject your message.");
 $formdata["attachments"] = array(
 	"label" => _L('Attachments'),
-	"fieldhelp" => _L("You may attach up to three files that are up to 2MB each. For greater security, certain file types are not permitted. Be aware that some email accounts may not accept attachments above a certain size and may reject your message."),
+	"fieldhelp" => _L("You may attach up to three files that are up to 2MB each. For greater security, certain file ".
+		"types are not permitted. Be aware that some email accounts may not accept attachments above a certain size and may reject your message."),
 	"value" => ($attachments?json_encode($attachments):"{}"),
 	"validators" => array(array("ValEmailAttach")),
 	"control" => array("EmailAttach"),
 	"helpstep" => 4
 );
 
-$helpsteps[] = _L("Email message body text goes here. Be sure to introduce yourself and give detailed information. For helpful message tips and ideas, click the Help link in the upper right corner of the screen.<br><br>If you would like to insert dynamic data fields, such as the recipient's name, move the cursor to the location where the data should be inserted, select the data field, and click 'Insert'. It's a good idea to enter a default value in the Default Value field for each insert. This value will be displayed in the event of a recipient having no data in your chosen field.");
+$helpsteps[] = _L("Email message body text goes here. Be sure to introduce yourself and give detailed information. For ".
+	"helpful message tips and ideas, click the Help link in the upper right corner of the screen.<br><br>If you would ".
+	"like to insert dynamic data fields, such as the recipient's name, move the cursor to the location where the data ".
+	"should be inserted, select the data field, and click 'Insert'. It's a good idea to enter a default value in the ".
+	"Default Value field for each insert. This value will be displayed in the event of a recipient having no data in your chosen field.");
 $formdata["message"] = array(
 	"label" => _L("Email Message"),
-	"fieldhelp" => _L('Enter the message you would like to send. Helpful tips for successful messages can be found at the Help link in the upper right corner.'),
+	"fieldhelp" => _L('Enter the message you would like to send. Helpful tips for successful messages can be found at ".
+		"the Help link in the upper right corner.'),
 	"value" => $text,
 	"validators" => array(
 		array("ValRequired"),
@@ -217,7 +224,6 @@ $formdata["message"] = array(
 	"control" => array("EmailMessageEditor", "subtype" => $subtype),
 	"helpstep" => 5
 );
-
 $helpsteps[] = _L("Click the preview button to view of your message.");
 
 $formdata["preview"] = array(

@@ -87,6 +87,7 @@ $formdata = array($messagegroup->name);
 
 $formdata["message"] = array(
 	"label" => _L("SMS Text"),
+	"fieldhelp" => _L("TODO: field help"),
 	"value" => $text,
 	"validators" => array(
 		array("ValRequired"),

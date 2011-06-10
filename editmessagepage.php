@@ -161,6 +161,7 @@ $formdata = array(
 	$messagegroup->name. " (". $language. ")",
 	"message" => array(
 		"label" => _L("Page Message"),
+		"fieldhelp" => _L("TODO: field help"),
 		"value" => $text,
 		"validators" => array(
 			array("ValRequired"),
@@ -170,7 +171,8 @@ $formdata = array(
 	),
 	"attachments" => array(
 		"label" => _L('Attachments'),
-		"fieldhelp" => _L("You may attach up to three files that are up to 2MB each. For greater security, certain file types are not permitted. Be aware that some email accounts may not accept attachments above a certain size and may reject your message."),
+		"fieldhelp" => _L("You may attach up to three files that are up to 2MB each. For greater security, certain file types ".
+			"are not permitted. Be aware that some email accounts may not accept attachments above a certain size and may reject your message."),
 		"value" => ($attachments?json_encode($attachments):"{}"),
 		"validators" => array(array("ValEmailAttach")),
 		"control" => array("EmailAttach"),

@@ -84,7 +84,11 @@ $formdata["message"] = array(
 	"helpstep" => 1
 );
 
-$helpsteps[] = _L("The system will call you at the number you enter in this form and guide you through a series of prompts to record your message. The default message is always required and will be sent to any recipients who do not have a language specified.<br><br>Choose which language you will be recording in and enter the phone number where the system can reach you. Then click \"Call Me to Record\" to get started. Listen carefully to the prompts when you receive the call. You may record as many different langauges as you need.");
+$helpsteps[] = _L("The system will call you at the number you enter in this form and guide you through a series of ".
+	"prompts to record your message. The default message is always required and will be sent to any recipients who ".
+	"do not have a language specified.<br><br>Choose which language you will be recording in and enter the phone ".
+	"number where the system can reach you. Then click \"Call Me to Record\" to get started. Listen carefully to ".
+	"the prompts when you receive the call. You may record as many different langauges as you need.");
 
 $buttons = array(submit_button(_L('Done'),"submit","tick"));
 $form = new Form("phonerecord",$formdata,$helpsteps,$buttons);
