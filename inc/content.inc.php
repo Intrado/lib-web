@@ -137,7 +137,7 @@ function handleFileUpload($formitemname, $maxfilesizebytes, $unsafeext = null, $
 		} else if ((is_array($allowedext) && !in_array($ext, $allowedext)) || (is_array($unsafeext) && array_search(strtolower($ext),$unsafeext) !== false)) {
 			$errormessage .= _L('The file you uploaded may pose a security risk and is not allowed. Unsafe file types include: .ade, .adp, .app, .asx, .bas, .bat, .chm, .cmd, .com, .cpl, .crt, .dbx, .dmg, .exe, .hlp,  .hta, .inf, .ins, .isp, .js, .jse, .lnk, .mda, .mdb, .mde, .mdt, .mdw, .mdz, .mht, .msc, .msi, .msp, .mst, .nch, .ops, .pcd, .pif, .prf, .reg, .scf, .scr, .sct, .shb, .shs, .url, .vb, .vbe, .vbs, .wms, .wsc, .wsf, .wsh, and .zip.');
 		} else if ($_FILES[$formitemname]['size'] >= $maxfilesizebytes) {
-			$errormessage .= _L('The file you uploaded exceeds the maximum email attachment limit of %s.', ($maxfilesizebytes / 1024) . 'K');
+			$errormessage .= _L('The file you uploaded exceeds the maximum limit of %s.', ($maxfilesizebytes / 1024) . 'K');
 		} else if ($_FILES[$formitemname]['size'] <= 0) {
 			$errormessage .= _L('The file you uploaded appears to be empty. Please check the file and try again');
 		} else {

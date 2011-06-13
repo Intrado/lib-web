@@ -11,9 +11,11 @@ if (!isset($_GET['CKEditorFuncNum'])) {
 $imgsrc = ''; // This $imgsrc will be set if the file upload is successful.
 $errormessage = '';
 
-// User must be able to send email because this is only used for email messages.
+// User must be able to send email or post to facebook or twitter
 $formitemname = 'upload'; // NOTE: CKEditor is hard coded to use 'upload' as the form item's name.
-if ($USER->authorize("sendemail") && isset($_FILES['upload'])) {
+if (((getSystemSetting('_hasfacebook', false) && $USER->authorize('facebookpost')) ||
+		(getSystemSetting('_hastwitter', false) && $USER->authorize('twitterpost')) ||
+		$USER->authorize("sendemail")) && isset($_FILES['upload'])) {
 	$maxfilesize = 1024 * 750; // 750kb.
 	$allowedext = array('.jpeg', '.jpg', '.png', '.gif', '.bmp');
 	
