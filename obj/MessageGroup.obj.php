@@ -327,6 +327,10 @@ class MessageGroup extends DBMappedObject {
 				if (in_array("phone", array_values($languagemap)) || in_array("both", array_values($languagemap)))
 					return false;
 				break;
+			case "":
+				// this message has no phone or email messages, It's still valid if it has an sms message
+				if ($this->hasMessage("sms"))
+					return true;
 			default:
 				// the default language message is missing both phone and email...
 				return false;
