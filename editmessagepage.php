@@ -288,7 +288,7 @@ include_once("nav.inc.php");
 // Optional Load Custom Form Validators
 ?>
 <script type="text/javascript">
-<? Validator::load_validators(array("ValMessageBody")); ?>
+<? Validator::load_validators(array("ValMessageBody", "ValEmailAttach")); ?>
 </script>
 <?
 
