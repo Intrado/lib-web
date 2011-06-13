@@ -88,8 +88,9 @@ if ($messagegroup->id) {
 		$messagegroup->update();
 	}
 	
-	// is this message group valid?
-	if (!$messagegroup->isValid())
+	// is this message group valid? if not, does it have any messages?
+	$messages = $messagegroup->getMessages();
+	if (!$messagegroup->isValid() && count($messages))
 		$showInvalidMessageWarning = true;
 }
 
