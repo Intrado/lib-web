@@ -46,9 +46,14 @@ class FacebookAuth extends FormItem {
 			
 		$str .= '<div style="clear: both"></div></div></div>';
 		
-		$str .= '<script type="text/javascript">
+		return $str;
+	}
+	
+	function renderJavascript() {
+		$n = $this->form->name."_".$this->name;
+		global $SETTINGS;
 		
-				// Facebook javascript API initialization, pulled from facebook documentation
+		$str = '// Facebook javascript API initialization, pulled from facebook documentation
 				window.fbAsyncInit = function() {
 					FB.init({appId: "'. $SETTINGS['facebook']['appid']. '", status: true, cookie: false, xfbml: true});
 					
@@ -61,8 +66,12 @@ class FacebookAuth extends FormItem {
 					e.async = true;
 					e.src = document.location.protocol + "//connect.facebook.net/en_US/all.js";
 					document.getElementById("fb-root").appendChild(e);
-				}());
-				
+				}());';
+		return $str;
+	}
+	
+	function renderJavascriptLibraries() {
+		$str = '<script type="text/javascript">
 				// handle updateing information when the user allows or disallows the facebook application
 				function handleFbLoginAuthResponse(formitem, res) {
 					var access_token = "";
