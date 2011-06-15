@@ -23,10 +23,10 @@ function pearxmlrpc($method, $params, $returndata = false) {
 			return $data;
 		} else if ($data['result'] == "warning") {
 			// warning we do not log, but handle like failure
-			error_log($method . " " .$data['result']);
+			error_log($method . " " .$data['result'] . " " . $data['resultdetail']);
 		} else {
 			// error
-			error_log($method . " " .$data['result']);
+			error_log($method . " " .$data['result'] . " " . $data['resultdetail']);
 		}
 		if ($returndata) return $data;
 	}
