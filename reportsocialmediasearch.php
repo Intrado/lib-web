@@ -267,11 +267,16 @@ if ($showreport) {
 					} else {
 						try {
 							$accountinfo = $facebookapi->api("/$row[4]", 'GET', array());
-							$fbaccountnames[$row[4]] = $accountinfo["name"];
-							$row[4] = $accountinfo["name"];
+							if ($accountinfo) {
+								$fbaccountnames[$row[4]] = $accountinfo["name"];
+								$row[4] = $accountinfo["name"];
+							} else {
+								$fbaccountnames[$row[4]] = _L("Not Available");
+								$row[4] =  _L("Not Available");
+							}
 						} catch (FacebookApiException $e) {
-							$fbaccountnames[$row[4]] = "Not Available";
-							$row[4] = "Not Available";
+							$fbaccountnames[$row[4]] =  _L("Not Available");
+							$row[4] =  _L("Not Available");
 							error_log($e);
 							return false;
 						}
