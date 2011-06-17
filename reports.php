@@ -93,6 +93,10 @@ startWindow("Select a Template"  . help('Reports_SelectATemplate'), 'padding: 3p
 ?>
 					<tr><td><a href='reportjobdetailsearch.php?clear=1&type=sms' >SMS Log</a></td></tr>
 <?	}
+	if((getSystemSetting('_hasfacebook', false) || getSystemSetting('_hastwitter', false) && ($USER->authorize('viewsystemreports') || $USER->authorize("facebookpost") || $USER->authorize("twitterpost")))) {
+?>
+					<tr><td><a href='reportsocialmediasearch.php?clear=1' >Social Media Log</a></td></tr>
+<?	}
 	if(getSystemSetting('_hassurvey', true) && ($USER->authorize('viewsystemreports') || $USER->authorize("survey"))){ ?>
 					<tr><td><a href='reportsurvey.php?clear=1' >Survey Results</a></td></tr>
 <?	}
