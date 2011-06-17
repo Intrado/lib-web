@@ -51,7 +51,9 @@ require_once("inc/facebook.php");
 require_once("inc/facebook.inc.php");
 require_once("obj/FacebookPost.fi.php");
 require_once("obj/FacebookAuth.fi.php");
+require_once("obj/FacebookPage.fi.php");
 require_once("obj/ValFacebookPost.val.php");
+require_once("obj/ValFacebookPage.val.php");
 require_once("obj/TwitterAuth.fi.php");
 require_once("inc/twitteroauth/OAuth.php");
 require_once("inc/twitteroauth/twitteroauth.php");
@@ -122,7 +124,8 @@ $wizdata = array(
 		)),
 		"facebookauth" => new JobWiz_facebookAuth(_L("Connect to Facebook")),
 		"twitterauth" => new JobWiz_twitterAuth(_L("Connect to Twitter")),
-		"socialmedia" => new JobWiz_socialMedia(_L("Social Media"))
+		"socialmedia" => new JobWiz_socialMedia(_L("Social Media")),
+		"facebookpage" => new JobWiz_facebookPage(_L("Facebook Page"))
 	)),
 	"schedule" => new WizSection ("Options",array(
 		"options" => new JobWiz_scheduleOptions(_L("Job Options")),
@@ -616,7 +619,14 @@ require_once("nav.inc.php");
 
 ?>
 <script type="text/javascript">
-<? Validator::load_validators(array("ValInArray", "ValJobName", "ValHasMessage", "ValTextAreaPhone","ValEasycall","ValLists","ValTranslation","ValEmailAttach", "ValTimeWindowCallLate", "ValTimeWindowCallEarly","ValRegExp", "valPhone", "ValMessageBody","ValMessageGroup","ValFacebookPost"));// Included in jobwizard.inc.php ?>
+<?
+// Some of these are defined in jobwizard.inc.php 
+Validator::load_validators(array("ValInArray", "ValJobName", "ValHasMessage",
+	"ValTextAreaPhone", "ValEasycall", "ValLists", "ValTranslation", "ValEmailAttach",
+	"ValTimeWindowCallLate", "ValTimeWindowCallEarly", "ValRegExp", "valPhone",
+	"ValMessageBody", "ValMessageGroup", "ValFacebookPost", "ValMessageTypeSelect",
+	"ValFacebookPage"));
+?>
 </script>
 <script src="script/livepipe/livepipe.js" type="text/javascript"></script>
 <script src="script/livepipe/window.js" type="text/javascript"></script>

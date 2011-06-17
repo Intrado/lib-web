@@ -278,6 +278,50 @@ function someListsAreNew ($postdata) {
 	return QuickQuery($query, false, $joblists); 
 }
 
+function facebookEnabled($postdata) {
+	global $USER;
+	$facebookEnabled = false;
+	// if they are allowed to post
+	if (getSystemSetting("_hasfacebook") && $USER->authorize("facebookpost")) {
+	
+		// this user's accesstoken validity
+		$isvalidtoken = (isset($_SESSION['wiz_facebookauth']) && $_SESSION['wiz_facebookauth']);
+		
+		// if we started with a valid token
+		if ($isvalidtoken)
+			$facebookEnabled = true;
+
+		// if we had invalid access token but authed it later
+		if (!$isvalidtoken && 
+				isset($postdata['/message/facebookauth']['facebookauth']) && 
+				$postdata['/message/facebookauth']['facebookauth'])
+			$facebookEnabled = true;
+	}
+	return $facebookEnabled;
+}
+
+function twitterEnabled($postdata) {
+	global $USER;
+	$twitterEnabled = false;
+	// if they are allowed to post
+	if (getSystemSetting("_hastwitter") && $USER->authorize("twitterpost")) {
+	
+		// this user's accesstoken validity
+		$isvalidtoken = (isset($_SESSION['wiz_twitterauth']) && $_SESSION['wiz_twitterauth']);
+		
+		// if we started with a valid token
+		if ($isvalidtoken)
+			$twitterEnabled = true;
+
+		// if we had invalid access token but authed it later
+		if (!$isvalidtoken && 
+				isset($postdata['/message/twitterauth']['twitterauth']) && 
+				$postdata['/message/twitterauth']['twitterauth'])
+			$twitterEnabled = true;
+	}
+	return $twitterEnabled;
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 // Custom Form Item Definitions
 ////////////////////////////////////////////////////////////////////////////////
@@ -519,6 +563,31 @@ class ValHasMessage extends Validator {
 	}
 }
 
+class ValMessageTypeSelect extends Validator {
+
+	function validate ($value, $args) {
+		// MUST contain one of phone, email or sms
+		if (!array_intersect(array('phone','email','sms'), $value))
+			return "$this->label ". _L('requires one message of type Phone, Email or SMS Text.');
+		return true;
+	}
+
+	function getJSValidator () {
+		return '
+			function (name, label, value, args) {
+				var isvalid = false;
+				$A(value).each(function (val) {
+					if (val == "phone" || val == "email" || val == "sms")
+						isvalid = true;
+				});
+				if (!isvalid)
+					return label + " '. _L("requires one message of type Phone, Email or SMS Text.") .'";
+				return true;
+			}
+		';
+	}
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 // Form Items
 ////////////////////////////////////////////////////////////////////////////////
@@ -703,41 +772,12 @@ class JobWiz_start extends WizStep {
 			<b>Note:</b> Email and SMS text messaging are optional features and may not be enabled for some user accounts.")
 		);
 		
-		if ((getSystemSetting('_hastwitter', false) && $USER->authorize('twitterpost'))) {
-			
-			// check twitter access token for validity
-			$twitter = new Twitter($USER->getSetting("tw_access_token", false));
-			$_SESSION['wiz_twitterauth'] = $twitter->hasValidAccessToken();
-			
-			$formdata["twitter"] = array(
-				"label" => _L("Post to Twitter"),
-				"fieldhelp" => _L("Post to your Twitter status."),
-				"value" => false,
-				"control" => array("CheckBox", "label" => '&nbsp;<img src="img/icons/custom/twitter.gif" />'),
-				"validators" => array(),
-				"helpstep" => $helpstepnum++
-			);	
-			
-			$helpsteps[] = _L("Post your message to your Twitter status.");
-			
-		}
-		
-		if ((getSystemSetting('_hasfacebook', false) && $USER->authorize('facebookpost'))) {
-			
-			// check facebook access token for validity
+		// cache user facebook and twitter auth status so we don't have to check it on every single page load
+		if (getSystemSetting("_hasfacebook") && $USER->authorize("facebookpost"))
 			$_SESSION['wiz_facebookauth'] = fb_hasValidAccessToken();
-			
-			$formdata["facebook"] = array(
-				"label" => _L("Post to Facebook"),
-				"fieldhelp" => _L("Post your message to Facebook pages."),
-				"value" => false,
-				"control" => array("CheckBox", "label" => '&nbsp;<img src="img/icons/custom/facebook.gif" />'),
-				"validators" => array(),
-				"helpstep" => $helpstepnum++
-			);	
-			
-			$helpsteps[] = _L("Post your message to Facebook pages you administrate.");
-			
+		if (getSystemSetting("_hastwitter") && $USER->authorize("twitterpost")) {
+			$tw = new Twitter($USER->getSetting("tw_access_token", false));
+			$_SESSION['wiz_twitterauth'] = $tw->hasValidAccessToken();
 		}
 		
 		return new Form("start",$formdata,$helpsteps);
@@ -871,16 +911,16 @@ class JobWiz_messageType extends WizStep {
 		// Form Fields.
 		$values = array();
 		global $USER;
-		$deliverytypes = array(
-			'phone'=>array('sendphone', _L("Phone Call")),
-			'email'=>array('sendemail', _L("Email")),
-			'sms'=>array('sendsms', _L("SMS Text")));
-		foreach ($deliverytypes as $checkvalue => $checkname)
-			if ($USER->authorize($checkname[0]))
-				$values[$checkvalue] = $checkname[1];
-
-		if (isset($values['sms']) && !getSystemSetting('_hassms'))
-			unset($values['sms']);
+		
+		if ($USER->authorize('sendphone'))
+			$values['phone'] = _L("Phone Call");
+		if ($USER->authorize('sendemail'))
+			$values['email'] = _L("Email");
+		if (getSystemSetting('_hassms') && $USER->authorize('sendsms'))
+			$values['sms'] = _L("SMS Text");
+		if ((getSystemSetting('_hasfacebook', false) && $USER->authorize('facebookpost')) ||
+				(getSystemSetting('_hastwitter', false) && $USER->authorize('twitterpost')))
+			$values['post'] = _L("Social Media/Page post");
 
 		$formdata[] = $this->title;
 		$helpsteps = array(_L("Choose how you you like your message to be delivered."));
@@ -889,7 +929,8 @@ class JobWiz_messageType extends WizStep {
 			"fieldhelp" => _L("Choose the message options you would like to configure."),
 			"value" => "",
 			"validators" => array(
-				array("ValRequired")
+				array("ValRequired"),
+				array("ValMessageTypeSelect")
 			),
 			"control" => array("MultiCheckBox", "values"=>$values),
 			"helpstep" => 1
@@ -1566,7 +1607,6 @@ class JobWiz_messageSmsText extends WizStep {
 class JobWiz_facebookAuth extends WizStep {
 	function getForm($postdata, $curstep) {
 	
-		
 		// FB auth note
 		$html = "<div>". escapehtml(_L("You must authorize a Facebook account before you can post to Facebook.")). "</div>";
 		
@@ -1595,13 +1635,23 @@ class JobWiz_facebookAuth extends WizStep {
 	function isEnabled($postdata, $step) {
 		global $USER;
 		
-		if ($USER->authorize("facebookpost") && 
-				isset($postdata['/start']['facebook']) && 
-				$postdata['/start']['facebook'] && 
-				isset($_SESSION['wiz_facebookauth']) && 
-				!$_SESSION['wiz_facebookauth']) {
+		// if they are allowed to post
+		if (!(getSystemSetting("_hasfacebook") && $USER->authorize("facebookpost")))
+			return false;
+		
+		// this user's accesstoken validity
+		$isvalidtoken = (isset($_SESSION['wiz_facebookauth']) && $_SESSION['wiz_facebookauth']);
+		
+		// if this is a custom package and social media is enabled but the user's token is invalid
+		if (isset($postdata['/start']['package']) && $postdata['/start']['package'] == "custom" && 
+				isset($postdata['/message/pick']['type']) && in_array('post', $postdata['/message/pick']['type']) &&
+				!$isvalidtoken)
 			return true;
-		}
+		
+		// any package other than custom, but with an invalid token
+		if (isset($postdata['/start']['package']) && $postdata['/start']['package'] !== "custom" && !$isvalidtoken)
+			return true;
+		
 		return false;
 	}
 }
@@ -1638,13 +1688,23 @@ class JobWiz_twitterAuth extends WizStep {
 	function isEnabled($postdata, $step) {
 		global $USER;
 		
-		if ($USER->authorize("twitterpost") && 
-				isset($postdata['/start']['twitter']) && 
-				$postdata['/start']['twitter'] && 
-				isset($_SESSION['wiz_twitterauth']) && 
-				!$_SESSION['wiz_twitterauth']) {
+		// if they are allowed to post
+		if (!(getSystemSetting("_hastwitter") && $USER->authorize("twitterpost")))
+			return false;
+		
+		// this user's accesstoken validity
+		$isvalidtoken = (isset($_SESSION['wiz_twitterauth']) && $_SESSION['wiz_twitterauth']);
+		
+		// if this is a custom package and social media is enabled but the user's token is invalid
+		if (isset($postdata['/start']['package']) && $postdata['/start']['package'] == "custom" && 
+				isset($postdata['/message/pick']['type']) && in_array('post', $postdata['/message/pick']['type']) &&
+				!$isvalidtoken)
 			return true;
-		}
+		
+		// any package other than custom, but with an invalid token
+		if (isset($postdata['/start']['package']) && $postdata['/start']['package'] !== "custom" && !$isvalidtoken)
+			return true;
+		
 		return false;
 	}
 }
@@ -1687,103 +1747,105 @@ class JobWiz_socialMedia extends WizStep {
 		$helpstepnum = 1;
 		$helpsteps = array();
 		
-		$authpages = getFbAuthorizedPages();
-		$authwall = getSystemSetting("fbauthorizewall");
 		// Facebook
-		if (isset($postdata['/start']['facebook']) && 
-				$postdata['/start']['facebook'] && 
-				getSystemSetting('_hasfacebook', false) && 
-				$USER->authorize('facebookpost') && 
-				fb_hasValidAccessToken()) {
-					
+		if (facebookEnabled($postdata)) {
 			$helpsteps[] = _L("Select one or more pages and enter the message you wish to deliver via Facebook.");
 			$formdata["fbdata"] = array(
 				"label" => _L('Facebook'),
 				"fieldhelp" => _L("Select which pages to post to."),
 				"value" => "",
 				"validators" => array(
-					array("ValRequired"),
-					array("ValFacebookPost", "authpages" => $authpages, "authwall" => $authwall)),
-				"control" => array("FacebookPost", "authpages" => $authpages, "authwall" => $authwall, "message" => $fbtext, "access_token" => $USER->getSetting("fb_access_token", false)),
+					array("ValFacebookPost", "maxchars" => 420, "authpages" => getFbAuthorizedPages(), "authwall" => getSystemSetting("fbauthorizewall"))),
+				"control" => array("FacebookPost", "maxchars" => 420, "message" => $fbtext, "access_token" => $USER->getSetting("fb_access_token", false)),
 				"helpstep" => $helpstepnum++
 			);
 		}
 		
 		// Twitter
-		if (isset($postdata['/start']['twitter']) && 
-				$postdata['/start']['twitter'] && 
-				getSystemSetting('_hastwitter', false) && 
-				$USER->authorize('twitterpost')) {
-		
-			$twitter = new Twitter($USER->getSetting("tw_access_token", false));
+		if (twitterEnabled($postdata)) {
+			$helpsteps[] = _L("Enter the message you wish to deliver via Twitter.");
+			$formdata["twdata"] = array(
+				"label" => _L("Twitter"),
+				"fieldhelp" => _L("Select what text to use as a status update."),
+				"value" => $twtext,
+				"validators" => array(
+					array("ValRequired"),
+					array("ValLength","max"=>140)),
+				"control" => array("TextArea","rows"=>5,"cols"=>50,"counter"=>140),
+				"helpstep" => $helpstepnum++
 			
-			// if this is a good twitter access token, we can display a text box
-			if ($twitter->hasValidAccessToken()) {
-				$helpsteps[] = _L("Enter the message you wish to deliver via Twitter.");
-				$formdata["twdata"] = array(
-					"label" => _L("Twitter"),
-					"fieldhelp" => _L("Select what text to use as a status update."),
-					"value" => $twtext,
-					"validators" => array(
-						array("ValRequired"),
-						array("ValLength","max"=>140)),
-					"control" => array("TextArea","rows"=>5,"cols"=>50,"counter"=>140),
-					"helpstep" => $helpstepnum++
-				
-				);
-			}
+			);
 		}
 		
 		return new Form("socialMedia",$formdata,$helpsteps);
 	}
-
+	
 	//returns true if this step is enabled
 	function isEnabled($postdata, $step) {
+
+		$package = isset($postdata['/start']['package'])?$postdata['/start']['package']:false;
+		
+		if (!$package)
+			return false;
+		
+		if ($package == "custom") {
+			$customtype = isset($postdata['/message/options']['options'])?$postdata['/message/options']['options']:false;
+			$msgtypes = isset($postdata['/message/pick']['type'])?$postdata['/message/pick']['type']:array();
+			if ($customtype !== "create" || !in_array("post", $msgtypes))
+				return false;
+		}
+		
+		if (facebookEnabled($postdata) || twitterEnabled($postdata))
+			return true;
+		
+		return false;
+	}
+}
+
+class JobWiz_facebookPage extends WizStep {
+	function getForm($postdata, $curstep) {
 		global $USER;
 		
-		// check if facebook is enabled
-		$facebookEnabled = false;
-		if ($USER->authorize("facebookpost") && 
-				isset($postdata['/start']['facebook']) && 
-				$postdata['/start']['facebook']) {
+		$formdata = array (
+			"fbpage" => array(
+				"label" => _L('Facebook Page(s)'),
+				"fieldhelp" => _L("Select which pages to post to."),
+				"value" => "",
+				"validators" => array(
+					array("ValRequired"),
+					array("ValFacebookPage", "authpages" => getFbAuthorizedPages(), "authwall" => getSystemSetting("fbauthorizewall"))),
+				"control" => array("FacebookPage", "access_token" => $USER->getSetting("fb_access_token", false)),
+				"helpstep" => 1)
+		);
+		
+		$helpsteps = array(_L("TODO: help"));
+		
+		return new Form("facebookPage",$formdata,$helpsteps);
+	}
+	
+	//returns true if this step is enabled
+	function isEnabled($postdata, $step) {
+
+		$package = isset($postdata['/start']['package'])?$postdata['/start']['package']:false;
+		
+		if (!$package)
+			return false;
+		
+		if ($package == "custom") {
+			$customtype = isset($postdata['/message/options']['options'])?$postdata['/message/options']['options']:false;
+			$mgid = isset($postdata['/message/pickmessage']['messagegroup'])?$postdata['/message/pickmessage']['messagegroup']:false;
+			if ($mgid)
+				$mg = new MessageGroup($mgid);
+			else
+				return false;
 			
-			// if we started the wizard with valid facebook access token
-			if (isset($_SESSION['wiz_facebookauth']) && 
-					$_SESSION['wiz_facebookauth'])
-				$facebookEnabled = true;
-					
-			// if we had invalid access token but authed it later
-			if (isset($_SESSION['wiz_facebookauth']) && 
-					!$_SESSION['wiz_facebookauth'] && 
-					isset($postdata['/message/facebookauth']['facebookauth']) && 
-					$postdata['/message/facebookauth']['facebookauth'])
-				$facebookEnabled = true;
-			
+			if ($customtype !== "pick" || !$mg->hasMessage("post","facebook"))
+				return false;
 		}
 		
-		// check if twitter is enabled
-		$twitterEnabled = false;
-		if ($USER->authorize("twitterpost") && 
-				isset($postdata['/start']['twitter']) && 
-				$postdata['/start']['twitter']) {
-			
-			// if we started the wizard with valid facebook access token
-			if (isset($_SESSION['wiz_twitterauth']) && 
-					$_SESSION['wiz_twitterauth'])
-				$twitterEnabled = true;
-					
-			// if we had invalid access token but authed it later
-			if (isset($_SESSION['wiz_twitterauth']) && 
-					!$_SESSION['wiz_twitterauth'] && 
-					isset($postdata['/message/twitterauth']['twitterauth']) && 
-					$postdata['/message/twitterauth']['twitterauth'])
-				$twitterEnabled = true;
-			
-		}
-		
-		if ($facebookEnabled || $twitterEnabled) {
+		if (facebookEnabled($postdata))
 			return true;
-		}
+		
 		return false;
 	}
 }
