@@ -1,12 +1,6 @@
 <?
 class MessageGroupSelectMenu extends FormItem {
 	function render ($value) {
-
-		// jobtype.systempriority used for email message preview
-		if (isset($this->args['jobpriority']))
-			$jobpriority = $this->args['jobpriority'];
-		else
-			$jobpriority = 3; // general
 		
 		$n = $this->form->name."_".$this->name;
 		$size = isset($this->args['size']) ? 'size="'.$this->args['size'].'"' : "";
@@ -19,61 +13,95 @@ class MessageGroupSelectMenu extends FormItem {
 		$str .= '</select>';
 
 		$issurveytemplate = isset($this->args['surveytemplate']) && $this->args['surveytemplate'] == true;
-		if (!$issurveytemplate) {
-			$nn = $n."_preview";
-			$str .= "
-			<div id=\"$nn\"></div>
-			<script type=\"text/javascript\">
-				document.observe('dom:loaded', function() {
-					" . ($isstatic?"":"$('$n').observe('change', load_messageinfo);") . "
-					load_messageinfo();
-				});
-				function load_messageinfo() {
-					var id = " . ($isstatic?"$value":"$('$n').value;") . ";
-					if(id == '') {
-						$('$nn').update('');
-						return;
-					}
-
-					var request = 'ajax.php?ajax&type=messagegrid&id=' + id;
+		if (!$issurveytemplate)
+			$str .= '<div id="'.$n.'_preview"></div>';
+		
+		return $str;
+	}
+		
+	function renderJavascript($value) {
+		$n = $this->form->name."_".$this->name;
+		// jobtype.systempriority used for email message preview
+		if (isset($this->args['jobpriority']))
+			$jobpriority = $this->args['jobpriority'];
+		else
+			$jobpriority = 3; // general
+		$str = '
+			$("'.$n.'").observe("change", loadMessageGroupPreview.curry("'.$n.'",'.$jobpriority.'));
+			loadMessageGroupPreview("'.$n.'",'.$jobpriority.',null);
+		';
+		return $str;
+		
+	}
+		
+	function renderJavascriptLibraries() {
+		$str = '
+			<script type="text/javascript">
+				function loadMessageGroupPreview(formitem, priority, event) {
+					container = $(formitem + "_preview");
+					formitem = $(formitem);
+					
+					// insert ajax loader icon
+					container.update(new Element("img", { "src": "img/ajax-loader.gif" }));
+					
+					// ajaxrequest for messagegrid data
+					var request = "ajax.php?ajax&type=messagegrid&id=" + formitem.value;
 					cachedAjaxGet(request,function(result) {
 						var response = result.responseJSON;
-						var data = \$H(response.data);
+						var data = $H(response.data);
+						var headers = $H(response.headers);
+						var defaultlang = response.defaultlang;
+						
 						if(data.size() > 0) {
-							var headers = \$H(response.headers);
-
-							var str = '<table class=\'messagegrid\'>';
-							headers.each(function(title) {
-								str += '<th class=\'messagegridheader\'>' + title.value + '</th>';
+							// add the table to the form
+							var table = new Element("tbody");
+							container.update(new Element("table", { "class": "messagegrid" }).insert(table));
+							
+							// add all the headers to the table
+							var row = new Element("tr");
+							row.insert(new Element("th").insert("&nbsp;"));
+							headers.each(function(header) {
+								row.insert(new Element("th", { "class": "messagegridheader" }).insert(header.value));
 							});
-
+							table.insert(row);
+							
 							data.each(function(item) {
-								str += '<tr>';
-									str += '<th class=\'messagegridlanguage\'>' + item.value.languagename + '</th>';
-								if(response.headers['voicephone'])
-									str += '<td>' + (item.value.voicephone?'<a href=\"#\" onclick=\"showPreview(null,\'jobpriority=$jobpriority&previewid=' + item.value.voicephone + '\'); return false;\"><img src=\'img/icons/accept.gif\' /></a>':'<img src=\'img/icons/diagona/16/160.gif\' />') + '</td>';
-								if(response.headers['plainsms']) {
-									if(item.key == 'en')
-										str += '<td>' + (item.value.plainsms?'<a href=\"#\" onclick=\"showPreview(null,\'jobpriority=$jobpriority&previewid=' + item.value.plainsms + '\'); return false;\"><img src=\'img/icons/accept.gif\' /></a>':'<img src=\'img/icons/diagona/16/160.gif\' />') + '</td>';
-									else
-										str += '<td>-</td>';
-								}
-								if(response.headers['htmlemail'])
-									str += '<td>' + (item.value.htmlemail?'<a href=\"#\" onclick=\"showPreview(null,\'jobpriority=$jobpriority&previewid=' + item.value.htmlemail + '\'); return false;\"><img src=\'img/icons/accept.gif\' /></a>':'<img src=\'img/icons/diagona/16/160.gif\' />') + '</td>';
-								if(response.headers['plainemail'])
-									str += '<td>' + (item.value.plainemail?'<a href=\"#\" onclick=\"showPreview(null,\'jobpriority=$jobpriority&previewid=' + item.value.plainemail + '\'); return false;\"><img src=\'img/icons/accept.gif\' /></a>':'<img src=\'img/icons/diagona/16/160.gif\' />') + '</td>';
-
-								str += '</tr>';
+								var row = new Element("tr");
+								// item key is language, value is the message type to id map
+								row.insert(new Element("td", { "class": "messagegridlanguage" }).insert(item.key));
+								
+								// for each header type, get the message id
+								headers.each(function(header) {
+									// if the header key (type and subtype) is set
+									var hasMessage = false;
+									if (item.value[header.key]) {
+										hasMessage = true;
+										var icon = new Element("img", { "src": "img/icons/accept.png" });
+									} else {
+										// sms, fb, tw and page are a special case, we show - instead of an empty bulb
+										if (item.key !== defaultlang && ["smsplain","postfacebook","posttwitter","postpage"].indexOf(header.key) != -1)
+											var icon = "-";
+										else
+											var icon = new Element("img", { "src": "img/icons/diagona/16/160.png" });
+									}
+									row.insert(new Element("td").insert(icon));
+									
+									// observe clicks for preview
+									if (hasMessage) {
+										icon.observe("click", function (event) {
+											showPreview(null,"jobpriority=" + priority + "&previewid=" + item.value[header.key]);
+											return false;
+										});
+									}
+								});
+								table.insert(row);
 							});
-							str += '</table>';
-							$('$nn').update(str);
 						} else {
-							$('$nn').update('');
+							container.update();
 						}
 					});
 				}
-			</script>";
-		}
+			</script>';
 		return $str;
 	}
 }

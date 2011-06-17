@@ -338,7 +338,6 @@ function handleRequest() {
 			);
 
 		case 'messagegrid':
-			// TODO lookup default language code
 			// Check if has messagegroupid
 			if (!isset($_GET['id']))
 				return false;
@@ -351,52 +350,33 @@ function handleRequest() {
 				return false;
 			}
 			
-			$cansendphone = $USER->authorize('sendphone');
-			$cansendemail = $USER->authorize('sendemail');
-			$cansendsms = getSystemSetting('_hassms', false) && $USER->authorize('sendsms');
-			$cansendmultilingual = $USER->authorize('sendmulti');
-			$deflanguagecode = 'en';//Language::getDefaultLanguageCode();
+			$result->defaultlang = Language::getName(Language::getDefaultLanguageCode());
+			$result->headers = array(
+				'phonevoice' => _L("Phone"),
+				'smsplain' => _L("SMS"),
+				'emailhtml' => _L("Email (HTML)"),
+				'emailplain' => _L("Email (Plain)"),
+				'postfacebook' => _L("Facebook"),
+				'posttwitter' => _L("Twitter"),
+				'postpage' => _L("Page")
+			);
 
-			$result->headers = array();
-			$result->headers['language'] = "&nbsp;";
-
-			$query = "select l.code,l.name, m.id, m.type, m.subtype from language l
-						inner join message m on (l.code = m.languagecode and m.messagegroupid = ?)";
+			$query = "select l.name, m.id, m.type, m.subtype from language l
+						inner join message m on (l.code = m.languagecode and m.messagegroupid = ?)
+						order by l.name";
 			$rows = QuickQueryMultiRow($query,true,false,array($_GET['id']));
 
-			$hasvoicephone = false;
-			$hashtmlemail = false;
-			$hasplainemail = false;
-			$hasplainsms = false;
-
-			if($rows) {
-				foreach($rows as $row) {
-					$result->data[$row['code']][$row['subtype'] . $row['type']] = $row['id'];
-					$result->data[$row['code']]['languagename'] = $row['name'];
-					switch($row['subtype'] . $row['type']) {
-						case 'voicephone':
-							$hasvoicephone = true;
-							break;
-						case 'htmlemail':
-							$hashtmlemail = true;
-							break;
-						case 'plainemail':
-							$hasplainemail = true;
-							break;
-						case 'plainsms':
-							$hasplainsms = true;
-							break;
-					}
+			// get the default language row out, it goes on top always
+			foreach($rows as $id => $row) {
+				if ($row['name'] == Language::getName(Language::getDefaultLanguageCode())) {
+					$result->data[$row['name']][$row['type'] . $row['subtype']] = $row['id'];
+					unset($rows[$id]);
 				}
 			}
-			if($hasvoicephone)
-				$result->headers['voicephone'] = "Phone";
-			if($hasplainsms)
-				$result->headers['plainsms'] = "SMS";
-			if($hashtmlemail)
-				$result->headers['htmlemail'] = "Email (HTML)";
-			if($hasplainemail)
-				$result->headers['plainemail'] = "Email (Plain)";
+			// now get the other languages
+			foreach($rows as $id => $row)
+				$result->data[$row['name']][$row['type'] . $row['subtype']] = $row['id'];
+				
 		return $result;
 		default:
 			error_log("No AJAX API for type=$type");
