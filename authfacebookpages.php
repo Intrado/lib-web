@@ -369,7 +369,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 // Display
 ////////////////////////////////////////////////////////////////////////////////
 $PAGE = "admin:settings";
-$TITLE = _L('Authorized Facebook Pages');
+$TITLE = _L('Facebook Authorized Pages');
 
 include_once("nav.inc.php");
 

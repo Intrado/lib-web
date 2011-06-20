@@ -45,7 +45,8 @@ startWindow("Options", 'padding: 3px;');
 			if ((getSystemSetting('_hasportal', false) && $USER->authorize('portalaccess') && $USER->authorize('managesystem')) ||
 				(getSystemSetting('_hasselfsignup', false) && ($USER->authorize('metadata') || $USER->authorize('managesystem'))) ||
 				($USER->authorize('managesystem') && getSystemSetting('_dmmethod', "")!='asp') ||
-				($USER->authorize('manageclassroommessaging') && getSystemSetting('_hastargetedmessage'))) {
+				($USER->authorize('manageclassroommessaging') && getSystemSetting('_hastargetedmessage')) ||
+				($USER->authorize('managesystem') && getSystemSetting("_hasfacebook"))) {
 ?>
 				<th align="left" class="nosort">Features</th>
 <?
@@ -96,9 +97,6 @@ startWindow("Options", 'padding: 3px;');
 					<tr><td><a href='jobsettings.php'>Job Settings</a></td></tr>
 					<tr><td><a href='jobtypemanagement.php'>Job Types</a></td></tr>
 					<tr><td><a href='messageintro.php'>Message Intro</a></td></tr>
-<?			if (getSystemSetting("_hasfacebook")) { ?>
-					<tr><td><a href='authfacebookpages.php'>Authorize Facebook Pages</a></td></tr>
-<?			} ?>
 				</table>
 			</td>
 			<td>
@@ -116,7 +114,8 @@ startWindow("Options", 'padding: 3px;');
 		if ((getSystemSetting('_hasportal', false) && $USER->authorize('portalaccess') && $USER->authorize('managesystem')) ||
 			(getSystemSetting('_hasselfsignup', false) && ($USER->authorize('metadata') || $USER->authorize('managesystem'))) ||
 			($USER->authorize('managesystem') && getSystemSetting('_dmmethod', "")!='asp') ||
-			($USER->authorize('manageclassroommessaging') && getSystemSetting('_hastargetedmessage'))) {
+			($USER->authorize('manageclassroommessaging') && getSystemSetting('_hastargetedmessage')) ||
+			($USER->authorize('managesystem') && getSystemSetting("_hasfacebook"))) {
 ?>
 			<td>
 				<table>
@@ -147,7 +146,12 @@ startWindow("Options", 'padding: 3px;');
 							<tr><td><a href='classroommessagetemplate.php'>Classroom Messaging Template</a></td></tr>
 <?
 					}
+					if (getSystemSetting("_hasfacebook")) {
 ?>
+						<tr><td><a href='authfacebookpages.php'>Facebook Authorized Pages</a></td></tr>
+<?					}
+?>
+
 				</table>
 			</td>
 <?
