@@ -4,9 +4,11 @@
  * needed to create a message using all the features
  * they may need for constructed messaging.
  * 
- * Note: You MUST pass langcode and messagegroupid 
- * 	arguments!
- * 
+ * Possible args
+ *  langcode - Language code this message is being created for
+ *  messagegroupid - message group id this message belongs to
+ *  enablefieldinserts - enable or disable field inserts (defaults to enabled)
+ *  
  * Supporting the following feature set
  * 	Record audio
  * 	Upload audo files
@@ -33,6 +35,8 @@ class PhoneMessageEditor extends FormItem {
 		$enableFieldInserts = true;
 		if (isset($this->args['enablefieldinserts']) && !$this->args['enablefieldinserts'])
 			$enableFieldInserts = false;
+		
+		$messagegroupid = (isset($this->args['messagegroupid'])?$this->args['messagegroupid']:false);
 		
 		// style 
 		$str = '
@@ -88,13 +92,6 @@ class PhoneMessageEditor extends FormItem {
 					border: 1px solid #'.$_SESSION['colorscheme']['_brandtheme2'].';
 				}
 			</style>';
-		
-		// langcode and messagegroupid must be passed as args, this form item won't work w/o them!
-		if (!isset($this->args['langcode']) || !isset($this->args['messagegroupid']))
-			return $str .= "<div class='controlcontainer'><div class='error'>". _L("Some required information is missing! To use this function, please contact your system administrator."). "</div></div>";
-		
-		$langcode = $this->args['langcode'];
-		$messagegroupid = $this->args['messagegroupid'];
 		
 		// textarea for message bits
 		$textarea = '
@@ -165,6 +162,8 @@ class PhoneMessageEditor extends FormItem {
 			</div>';
 		
 		// main containers
+		// NOTE: audio library and uploadaudio only work when a messagegroup id is provided
+		// TODO: the right side container could end up empty and look very strange
 		$str .= '
 			<div>
 				<div class="maincontainerleft">
@@ -175,8 +174,8 @@ class PhoneMessageEditor extends FormItem {
 				</div>
 				<div class="maincontainerright">
 					'.($USER->authorize('starteasy')?$voicerecorder:"").'
-					'.$audioupload.'
-					'.$audiolibrary.'
+					'.($messagegroupid?$audioupload:"").'
+					'.($messagegroupid?$audiolibrary:"").'
 					'.($enableFieldInserts?$datafieldinsert:"").'
 				</div>
 			</div>';
@@ -189,16 +188,21 @@ class PhoneMessageEditor extends FormItem {
 		$n = $this->form->name."_".$this->name;
 		
 		// langcode and messagegroupid should be passed as args
-		$langcode = $this->args['langcode'];
-		$messagegroupid = $this->args['messagegroupid'];
+		$langcode = (isset($this->args['langcode'])?$this->args['langcode']:Language::getDefaultLanguageCode());
+		$messagegroupid = (isset($this->args['messagegroupid'])?$this->args['messagegroupid']:false);
 		$language = Language::getName($langcode);
 		
 		// set up the controls in the form and initialize any event listeners
-		$str = 'var audiolibrarywidget = setupAudioLibrary("'.$n.'", "'.$messagegroupid.'");
-			setupAudioUpload("'.$n.'", audiolibrarywidget);
-			';
-		if ($USER->authorize('starteasy'))
-			$str .= 'setupVoiceRecorder("'.$n.'", "'.$language.'", "'.$messagegroupid.'", audiolibrarywidget);';
+		// NOTE: the audio upload and audio library require a messagegroup id be set
+		if ($messagegroupid) {
+			$str = 'var audiolibrarywidget = setupAudioLibrary("'.$n.'", "'.$messagegroupid.'");
+				setupAudioUpload("'.$n.'", audiolibrarywidget);
+				';
+			if ($USER->authorize('starteasy'))
+				$str .= 'setupVoiceRecorder("'.$n.'", "'.$language.'", '.$messagegroupid.', audiolibrarywidget);';
+		} else {
+			$str = 'setupVoiceRecorder("'.$n.'", "'.$language.'", false, null);';
+		}
 		
 		return $str;
 	}
@@ -334,20 +338,21 @@ class PhoneMessageEditor extends FormItem {
 						setupVoiceRecorder(e, name);
 						
 						// assign the audiofile to this message group
-						new Ajax.Request("ajaxaudiolibrary.php", {
-							"method": "post",
-							"parameters": {
-								"action": "assignaudiofile",
-								"id": audiofileid,
-								"messagegroupid": messagegroupid
-							},
-							"onFailure": function() {
-								alert("There was a problem assigning this audiofile to this message group");
-							}
-						});
-						
-						// reload the audio library
-						audiolibrarywidget.reload();
+						if (messagegroupid && audiolibrarywidge) {
+							new Ajax.Request("ajaxaudiolibrary.php", {
+								"method": "post",
+								"parameters": {
+									"action": "assignaudiofile",
+									"id": audiofileid,
+									"messagegroupid": messagegroupid
+								},
+								"onFailure": function() {
+									alert("There was a problem assigning this audiofile to this message group");
+								}
+							});
+							// reload the audio library
+							audiolibrarywidget.reload();
+						}
 					});
 				}
 				
