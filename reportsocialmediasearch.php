@@ -237,17 +237,24 @@ if ($showreport) {
 	
 	endWindow();
 	startWindow(_L('Report Details:'));
-	$titles = array(0 => "Job Name",
-					5 => "Submitted by",
-					3 => "Post Date",
-					1 => "Type",
-					4 => "Destination",
-					2 => "Content"
+	
+	
+	$titles = array(0 => _L("Job Name"),
+					5 => _L("Submitted by"),
+					3 => _L("Post Date"),
 					);
-
-	$formatters = array(
-						2 => "fmt_limit_25",
-						3 => "fmt_date");
+					
+	$formatters = array(3 => "fmt_date");
+	if (getSystemSetting('_hasfacebook', false)) {
+		$titles[6] = _L("Facebook Destination");
+		$titles[7] = _L("Facebook Content");
+		$formatters[7] = "fmt_limit_25";
+	}
+	if (getSystemSetting('_hastwitter', false)) {
+		$titles[8] = _L("Twitter Handle");
+		$titles[9] = _L("Twitter Content");
+		$formatters[9] = "fmt_limit_25";
+	}
 
 	echo '<table class="list" cellpadding="3" cellspacing="1" width="100%">';
 	$data = array();
@@ -281,13 +288,24 @@ if ($showreport) {
 							return false;
 						}
 					}
+					$row[6] = $row[4];
+					$row[7] = $row[2];
+					$row[8] = "";
+					$row[9] = "";
 					break;
 				case "twitter":
+					$row[6] = "";
+					$row[7] = "";
+					$row[8] = $row[4];
+					$row[9] = $row[2];
 					// Do not modify, Just print the handle 
 					break;
 				default:
 					// output blank rather than output the destination field directly if unknown type
-					$row[4] = "";
+					$row[6] = "";
+					$row[7] = "";
+					$row[8] = "";
+					$row[9] = "";
 			} 
 			
 			$data[] = $row;
