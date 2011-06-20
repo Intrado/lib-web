@@ -54,7 +54,7 @@ class FacebookPost extends FormItem {
 			</style>
 			<input id="'.$n.'" name="'.$n.'" type="hidden" value="'.escapehtml($value).'" />
 			<input id="'.$n.'authpages" name="'.$n.'authpages" type="hidden" value="'.escapehtml(json_encode($pages)).'" />
-			<input id="'.$n.'fbenable" name="'.$n.'fbenable" type="checkbox" '. ($hidedetails?"":"checked") .'><label for="'.$n.'fbenable">'. _L("Post a message to Facebook") .'</label>
+			<input id="'.$n.'fbenable" name="'.$n.'fbenable" type="checkbox" '. ($hidedetails?"":"checked") .' /><label for="'.$n.'fbenable">'. _L("Post a message to Facebook") .'</label>
 			<div id="'. $n. 'fbdetails" style="display:'. ($hidedetails?"none":"block") .'">
 				<div id="fb-root"></div>
 				<div id="'.$n.'fbmessage" class="fbtextarea">
