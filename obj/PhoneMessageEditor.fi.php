@@ -29,6 +29,11 @@ class PhoneMessageEditor extends FormItem {
 		
 		$n = $this->form->name."_".$this->name;
 		
+		// data fields may be disabled, but default to enabled
+		$enableFieldInserts = true;
+		if (isset($this->args['enablefieldinserts']) && !$this->args['enablefieldinserts'])
+			$enableFieldInserts = false;
+		
 		// style 
 		$str = '
 			<style>
@@ -172,7 +177,7 @@ class PhoneMessageEditor extends FormItem {
 					'.($USER->authorize('starteasy')?$voicerecorder:"").'
 					'.$audioupload.'
 					'.$audiolibrary.'
-					'.$datafieldinsert.'
+					'.($enableFieldInserts?$datafieldinsert:"").'
 				</div>
 			</div>';
 		
