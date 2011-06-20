@@ -154,7 +154,9 @@ $formdata = array(
 		"label" => _L("Gender"),
 		"fieldhelp" => _L("TODO: field help"),
 		"value" => $gender,
-		"validators" => array(array("ValRequired")),
+		"validators" => array(
+			array("ValRequired"),
+			array("ValInArray", "values" => array("female", "male"))),
 		"control" => array("RadioButton", "values" => array("female" => _L("Female"), "male" => _L("Male"))),
 		"helpstep" => 2
 	),
@@ -168,7 +170,7 @@ $formdata = array(
 			"gendertarget" => "gender",
 		),
 		"helpstep" => 3
-	),
+	)
 );
 
 $helpsteps = array(_L("<p>You can use a variety of techniques to build your message in this screen, but ideally you should ".

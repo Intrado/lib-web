@@ -93,7 +93,7 @@ $formdata = array(
 		"value" => $text,
 		"validators" => array(
 			array("ValRequired"),
-			array("ValMessageBody", "messagegroupid" => $messagegroup->id)),
+			array("ValLength","max"=>(140 - $reservedchars))),
 		"control" => array("TextArea","rows"=>10,"cols"=>50,"counter"=>(140 - $reservedchars)),
 		"helpstep" => 1
 	)
