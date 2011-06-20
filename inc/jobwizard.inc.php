@@ -293,8 +293,8 @@ function facebookEnabled($postdata) {
 
 		// if we had invalid access token but authed it later
 		if (!$isvalidtoken && 
-				isset($postdata['/message/facebookauth']['facebookauth']) && 
-				$postdata['/message/facebookauth']['facebookauth'])
+				isset($postdata['/message/post/facebookauth']['facebookauth']) && 
+				$postdata['/message/post/facebookauth']['facebookauth'])
 			$facebookEnabled = true;
 	}
 	return $facebookEnabled;
@@ -315,8 +315,8 @@ function twitterEnabled($postdata) {
 
 		// if we had invalid access token but authed it later
 		if (!$isvalidtoken && 
-				isset($postdata['/message/twitterauth']['twitterauth']) && 
-				$postdata['/message/twitterauth']['twitterauth'])
+				isset($postdata['/message/post/twitterauth']['twitterauth']) && 
+				$postdata['/message/post/twitterauth']['twitterauth'])
 			$twitterEnabled = true;
 	}
 	return $twitterEnabled;
@@ -1639,19 +1639,37 @@ class JobWiz_facebookAuth extends WizStep {
 		if (!(getSystemSetting("_hasfacebook") && $USER->authorize("facebookpost")))
 			return false;
 		
-		// this user's accesstoken validity
+		// this user's accesstoken validity. if their token is good, we don't need this step
 		$isvalidtoken = (isset($_SESSION['wiz_facebookauth']) && $_SESSION['wiz_facebookauth']);
+		if ($isvalidtoken)
+			return false;
 		
-		// if this is a custom package and social media is enabled but the user's token is invalid
-		if (isset($postdata['/start']['package']) && $postdata['/start']['package'] == "custom" && 
-				isset($postdata['/message/pick']['type']) && in_array('post', $postdata['/message/pick']['type']) &&
-				!$isvalidtoken)
+		$package = isset($postdata['/start']['package'])?$postdata['/start']['package']:false;
+		if (!$package)
+			return false;
+		
+		if ($package == "custom") {
+			$customtype = isset($postdata['/message/options']['options'])?$postdata['/message/options']['options']:false;
+			$msgtypes = isset($postdata['/message/pick']['type'])?$postdata['/message/pick']['type']:array();
+			// auth is enabled for custom package in one of two ways
+			// type is create and post is selected
+			// type is pick and the message group has facebook content
+			if ($customtype == "create" && in_array("post", $msgtypes))
+				return true;
+			
+			$mgid = isset($postdata['/message/pickmessage']['messagegroup'])?$postdata['/message/pickmessage']['messagegroup']:false;
+			if ($mgid)
+				$mg = new MessageGroup($mgid);
+			else
+				$mg = new MessageGroup();
+			
+			// picked a message group that has a facebook message
+			if ($customtype == "pick" && $mg->hasMessage("post","facebook"))
+					return true;
+		} else {
+			// any other package, it's enabled.
 			return true;
-		
-		// any package other than custom, but with an invalid token
-		if (isset($postdata['/start']['package']) && $postdata['/start']['package'] !== "custom" && !$isvalidtoken)
-			return true;
-		
+		}
 		return false;
 	}
 }
@@ -1692,19 +1710,37 @@ class JobWiz_twitterAuth extends WizStep {
 		if (!(getSystemSetting("_hastwitter") && $USER->authorize("twitterpost")))
 			return false;
 		
-		// this user's accesstoken validity
+		// this user's accesstoken validity. if their token is good, we don't need this step
 		$isvalidtoken = (isset($_SESSION['wiz_twitterauth']) && $_SESSION['wiz_twitterauth']);
+		if ($isvalidtoken)
+			return false;
 		
-		// if this is a custom package and social media is enabled but the user's token is invalid
-		if (isset($postdata['/start']['package']) && $postdata['/start']['package'] == "custom" && 
-				isset($postdata['/message/pick']['type']) && in_array('post', $postdata['/message/pick']['type']) &&
-				!$isvalidtoken)
+		$package = isset($postdata['/start']['package'])?$postdata['/start']['package']:false;
+		if (!$package)
+			return false;
+		
+		if ($package == "custom") {
+			$customtype = isset($postdata['/message/options']['options'])?$postdata['/message/options']['options']:false;
+			$msgtypes = isset($postdata['/message/pick']['type'])?$postdata['/message/pick']['type']:array();
+			// auth is enabled for custom package in one of two ways
+			// type is create and post is selected
+			// type is pick and the message group has facebook content
+			if ($customtype == "create" && in_array("post", $msgtypes))
+				return true;
+			
+			$mgid = isset($postdata['/message/pickmessage']['messagegroup'])?$postdata['/message/pickmessage']['messagegroup']:false;
+			if ($mgid)
+				$mg = new MessageGroup($mgid);
+			else
+				$mg = new MessageGroup();
+			
+			// picked a message group that has a twitter message
+			if ($customtype == "pick" && $mg->hasMessage("post","twitter"))
+					return true;
+		} else {
+			// any other package, it's enabled.
 			return true;
-		
-		// any package other than custom, but with an invalid token
-		if (isset($postdata['/start']['package']) && $postdata['/start']['package'] !== "custom" && !$isvalidtoken)
-			return true;
-		
+		}
 		return false;
 	}
 }
@@ -1726,7 +1762,7 @@ class JobWiz_socialMedia extends WizStep {
 			if (isset($postdata['/message/sms/text']['message']))
 				$fbtext = $postdata['/message/sms/text']['message'];
 		} else
-			$fbtext = "";
+			$fbtext = "We have sent out a new message, you can preview it here.";
 
 		// for twitter text, check sms, then email, then phone
 		if (isset($postdata['/message/sms/text'])) {
@@ -1741,7 +1777,7 @@ class JobWiz_socialMedia extends WizStep {
 				$twtext = $msgdata->text;
 			}
 		} else 
-			$twtext = "";
+			$twtext = "We have sent out a new message, you can preview it here.";
 		
 		$formdata = array($this->title);
 		$helpstepnum = 1;
@@ -1749,29 +1785,30 @@ class JobWiz_socialMedia extends WizStep {
 		
 		// Facebook
 		if (facebookEnabled($postdata)) {
-			$helpsteps[] = _L("Select one or more pages and enter the message you wish to deliver via Facebook.");
+			$helpsteps[] = _L("Enter the message you wish to deliver via Facebook.");
 			$formdata["fbdata"] = array(
 				"label" => _L('Facebook'),
-				"fieldhelp" => _L("Select which pages to post to."),
-				"value" => "",
+				"fieldhelp" => _L("Create your Facebook posting text here."),
+				"value" => $fbtext,
 				"validators" => array(
-					array("ValFacebookPost", "maxchars" => 420, "authpages" => getFbAuthorizedPages(), "authwall" => getSystemSetting("fbauthorizewall"))),
-				"control" => array("FacebookPost", "maxchars" => 420, "message" => $fbtext, "access_token" => $USER->getSetting("fb_access_token", false)),
+					array("ValLength","max"=>420)),
+				"control" => array("TextAreaWithEnableCheckbox","rows"=>10,"cols"=>50,"counter"=>420),
 				"helpstep" => $helpstepnum++
 			);
 		}
 		
 		// Twitter
 		if (twitterEnabled($postdata)) {
+			// need to reserve some characters for the link url and the six byte code. (http://smalldomain.com/<code>)
+			$reservedchars = mb_strlen("http://". getSystemSetting("tinydomain")) + 6;
 			$helpsteps[] = _L("Enter the message you wish to deliver via Twitter.");
 			$formdata["twdata"] = array(
 				"label" => _L("Twitter"),
 				"fieldhelp" => _L("Select what text to use as a status update."),
 				"value" => $twtext,
 				"validators" => array(
-					array("ValRequired"),
-					array("ValLength","max"=>140)),
-				"control" => array("TextArea","rows"=>5,"cols"=>50,"counter"=>140),
+					array("ValLength","max"=>(140 - $reservedchars))),
+				"control" => array("TextAreaWithEnableCheckbox","rows"=>5,"cols"=>50,"counter"=>(140 - $reservedchars)),
 				"helpstep" => $helpstepnum++
 			
 			);
@@ -1802,6 +1839,85 @@ class JobWiz_socialMedia extends WizStep {
 	}
 }
 
+class JobWiz_postVoice extends WizStep {
+	function getForm($postdata, $curstep) {
+		global $USER;
+		
+		$formdata = array($this->title);
+		
+		$formdata["message"] = array(
+			"label" => _L('Voice Message Post'),
+			"fieldhelp" => _L("Create a voice message to post to your social media locations"),
+			"value" => "",
+			"validators" => array(
+				array("ValRequired"),
+				array("ValMessageBody")),
+			"control" => array("PhoneMessageEditor", "enablefieldinserts" => false),
+			"helpstep" => 1
+		);
+		$formdata["gender"] = array(
+			"label" => _L("Gender"),
+			"fieldhelp" => _L("TODO: field help"),
+			"value" => "",
+			"validators" => array(
+				array("ValRequired"),
+				array("ValInArray", "values" => array("female", "male"))),
+			"control" => array("RadioButton", "values" => array("female" => _L("Female"), "male" => _L("Male"))),
+			"helpstep" => 2
+		);
+		$formdata["preview"] = array(
+			"label" => null,
+			"value" => "",
+			"validators" => array(),
+			"control" => array("PreviewButton",
+				"language" => Language::getName(Language::getDefaultLanguageCode()),
+				"texttarget" => "message",
+				"gendertarget" => "gender",
+			),
+			"helpstep" => 3
+		);
+		
+		$helpsteps = array(_L("TODO: help"), _L("TODO: help"), _L("TODO: help"));
+		
+		return new Form("postVoice",$formdata,$helpsteps,null,"vertical");
+	}
+	
+	//returns true if this step is enabled
+	function isEnabled($postdata, $step) {
+		global $USER;
+		// this step is only enabled when using custom, create and no phone message is created.
+		
+		$package = isset($postdata['/start']['package'])?$postdata['/start']['package']:false;
+		
+		if (!$package)
+			return false;
+		
+		if ($package == "custom") {
+			$customtype = isset($postdata['/message/options']['options'])?$postdata['/message/options']['options']:false;
+			$msgtypes = isset($postdata['/message/pick']['type'])?$postdata['/message/pick']['type']:array();
+			// must have selected "create"
+			if ($customtype !== "create")
+				return false;
+			// must have chosen to create a post type message
+			if (!in_array("post", $msgtypes))
+				return false;
+			// must NOT have chosen to create a phone type message
+			if (in_array("phone", $msgtypes))
+				return false;
+		} else {
+			return false;
+		}
+		
+		// voice posting requires either facebook OR twitter be enabled
+		// they don't have to actualy be authorized or create content though
+		if ((getSystemSetting("_hasfacebook") && $USER->authorize("facebookpost")) ||
+				(getSystemSetting("_hastwitter") && $USER->authorize("twitterpost")))
+			return true;
+		
+		return false;
+	}
+}
+
 class JobWiz_facebookPage extends WizStep {
 	function getForm($postdata, $curstep) {
 		global $USER;
@@ -1825,8 +1941,12 @@ class JobWiz_facebookPage extends WizStep {
 	
 	//returns true if this step is enabled
 	function isEnabled($postdata, $step) {
-
+		// you need to select a page to post your facebook message to if...
+		// this is a custom message and you picked a message with facebook
+		// or, there is a facebook message created
+		
 		$package = isset($postdata['/start']['package'])?$postdata['/start']['package']:false;
+		$fbdata = (isset($postdata['/message/post/socialmedia']['fbdata'])?$postdata['/message/post/socialmedia']['fbdata']:false);
 		
 		if (!$package)
 			return false;
@@ -1837,10 +1957,18 @@ class JobWiz_facebookPage extends WizStep {
 			if ($mgid)
 				$mg = new MessageGroup($mgid);
 			else
-				return false;
+				$mg = new MessageGroup();
 			
-			if ($customtype !== "pick" || !$mg->hasMessage("post","facebook"))
-				return false;
+			// picked a message group that doesn't have a facebook message
+			if ($customtype == "pick") {
+				if (!$mg->hasMessage("post","facebook"))
+					return false;
+			} else {
+				if (!$fbdata)
+					return false;
+			}
+		} else if (!$fbdata) {
+			return false;
 		}
 		
 		if (facebookEnabled($postdata))
@@ -1970,8 +2098,6 @@ class JobWiz_scheduleOptions extends WizStep {
 				"helpstep" => ++$helpstepnum
 			);
 		}
-		
-		
 
 		return new Form("scheduleOptions",$formdata,$helpsteps);
 	}
@@ -2207,24 +2333,6 @@ class JobWiz_submitConfirm extends WizStep {
 			"control" => array("FormHtml", "html" => $html),
 			"helpstep" => 1
 		);
-		
-		// indicate with a note that social media posts can not be scheduled or saved
-		if (($postdata["/schedule/options"]["schedule"] == "template" || $postdata["/schedule/options"]["schedule"] == "schedule") && 
-				((isset($postdata['/start']['facebook']) && $postdata['/start']['facebook']) ||
-				(isset($postdata['/start']['twitter']) && $postdata['/start']['twitter']))) {
-			
-			if ($postdata["/schedule/options"]["schedule"] == "template")
-				$html = "<div>". escapehtml(_L("Messages for social media sites must be posted immediately. These posts will be discarded after confirmation.")). "</div>";
-			
-			if ($postdata["/schedule/options"]["schedule"] == "schedule")
-				$html = "<div>". escapehtml(_L("Messages for social media sites must be posted immediately. These posts will be delivered after confirmation.")). "</div>";
-			
-			$formdata["socialmedianote"] = array(
-				"label" => _L("Social Media"),
-				"control" => array("FormHtml","html" => $html),
-				"helpstep" => 1
-			);
-		}
 		
 		$formdata["jobconfirm"] = array(
 			"label" => _L("Confirm"),

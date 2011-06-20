@@ -60,9 +60,12 @@ require_once("inc/twitteroauth/twitteroauth.php");
 require_once("obj/Twitter.obj.php");
 require_once("obj/HtmlRadioButtonBigCheck.fi.php");
 require_once("obj/TextAreaPhone.fi.php");
+require_once("obj/PhoneMessageEditor.fi.php");
 require_once("obj/TextAreaPhone.val.php");
 require_once("obj/HtmlTextArea.fi.php");
 require_once("obj/CheckBoxWithHtmlPreview.fi.php");
+require_once("obj/TextAreaWithEnableCheckbox.fi.php");
+require_once("obj/PreviewButton.fi.php");
 
 // Includes that are required for preview to work
 require_once("inc/previewfields.inc.php");
@@ -91,6 +94,7 @@ if (!$USER->authorize('sendphone') && !$USER->authorize('sendemail') && !$USER->
 // Process Preview Request
 ////////////////////////////////////////////////////////////////////////////////
 PreviewModal::HandlePhoneMessageId();
+PreviewModal::HandlePhoneMessageText(null);
 ////////////////////////////////////////////////////////////////////////////////
 // Passed parameter checking
 ////////////////////////////////////////////////////////////////////////////////
@@ -122,10 +126,13 @@ $wizdata = array(
 		"sms" => new WizSection ("SMS",array(
 			"text" => new JobWiz_messageSmsText(_L("SMS Text"))
 		)),
-		"facebookauth" => new JobWiz_facebookAuth(_L("Connect to Facebook")),
-		"twitterauth" => new JobWiz_twitterAuth(_L("Connect to Twitter")),
-		"socialmedia" => new JobWiz_socialMedia(_L("Social Media")),
-		"facebookpage" => new JobWiz_facebookPage(_L("Facebook Page"))
+		"post" => new WizSection("Social Media", array(
+			"facebookauth" => new JobWiz_facebookAuth(_L("Connect Facebook")),
+			"twitterauth" => new JobWiz_twitterAuth(_L("Connect Twitter")),
+			"socialmedia" => new JobWiz_socialMedia(_L("Text Post")),
+			"postvoice" => new JobWiz_postVoice(_L("Voice Post")),
+			"facebookpage" => new JobWiz_facebookPage(_L("Facebook Page(s)"))
+		))
 	)),
 	"schedule" => new WizSection ("Options",array(
 		"options" => new JobWiz_scheduleOptions(_L("Job Options")),
@@ -489,8 +496,8 @@ class FinishJobWizard extends WizFinish {
 		
 		// check for and evaluate facebook data
 		$fbdata = false;
-		if ($USER->authorize("facebookpost") && isset($postdata["/message/socialmedia"]["fbdata"]))
-			$fbdata = json_decode($postdata["/message/socialmedia"]["fbdata"]);
+		if ($USER->authorize("facebookpost") && isset($postdata["/message/post/socialmedia"]["fbdata"]))
+			$fbdata = json_decode($postdata["/message/post/socialmedia"]["fbdata"]);
 		
 		if ($schedule['date']) {
 			// run the job if it's scheduled
@@ -522,9 +529,9 @@ class FinishJobWizard extends WizFinish {
 			}
 			
 			// do twitter tweeting
-			if ($USER->authorize("twitterpost") && isset($postdata["/message/socialmedia"]["twdata"])) {
+			if ($USER->authorize("twitterpost") && isset($postdata["/message/post/socialmedia"]["twdata"])) {
 				$twitter = new Twitter($USER->getSetting("tw_access_token", false));
-				$posted = $twitter->tweet($postdata["/message/socialmedia"]["twdata"]);
+				$posted = $twitter->tweet($postdata["/message/post/socialmedia"]["twdata"]);
 				
 				// write to twitter log
 				$f = fopen('/usr/commsuite/logs/twitterposting.csv', 'a');
@@ -534,7 +541,7 @@ class FinishJobWizard extends WizFinish {
 				// timestamp, customerurl, userlogin, successful, message
 				fwrite($f, date('Y-m-d H:i:s') . "," . $CUSTOMERURL . "," . $USER->login . "," . 
 						($posted?"true":"false") . ',"' . 
-						str_replace(array("\r\n", "\n", "\r"), " ", $postdata["/message/socialmedia"]["twdata"]) . "\"\n");
+						str_replace(array("\r\n", "\n", "\r"), " ", $postdata["/message/post/socialmedia"]["twdata"]) . "\"\n");
 				
 				fclose($f);
 				
