@@ -178,6 +178,10 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		$messagegroup->description = $postdata['description'];
 		$messagegroup->userid = $USER->id;
 		$messagegroup->modified = date("Y-m-d H:i:s", time());
+		
+		// messages created via the message group editor are always permanent
+		$messagegroup->permanent = 1;
+		
 		$messagegroup->update();
 		Query("COMMIT");
 		$_SESSION['messagegroupid'] = $messagegroup->id;
