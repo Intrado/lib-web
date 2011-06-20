@@ -16,11 +16,10 @@ class FacebookPage extends FormItem {
 		$str = '
 			<style>
 				.fbpagelist {
-					width: 100%;
+					width: 98%;
 					border: 1px dotted gray;
 					padding: 3px;
-					float: left;
-					max-height: 350px;
+					max-height: 250px;
 					overflow: auto;
 				}
 				.fbname {
@@ -90,6 +89,13 @@ class FacebookPage extends FormItem {
 					
 					$(container).update();
 					
+					// add a loading indicator
+					$(container).insert(
+						new Element("div", { id: formitem + "-pageloading" }).insert(
+							new Element("img", { "src": "img/ajax-loader.gif", "alt": "Loading" })
+						)
+					);
+					
 					// get users info if wall posting is allowed
 					if (authpages.wall) {
 						FB.api("/me", { access_token: access_token }, function (res) {
@@ -127,6 +133,8 @@ class FacebookPage extends FormItem {
 								new Element("div").setStyle({padding: "5px"}).update(
 									"'. escapehtml(_L('Error encountered trying to get administered pages')). '"));
 						}
+						// remove the loading icon
+						$(formitem + "-pageloading").remove();
 					});
 				}
 			}
