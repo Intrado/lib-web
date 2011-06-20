@@ -163,12 +163,14 @@ class PhoneMessageEditor extends FormItem {
 		
 		// main containers
 		// NOTE: audio library and uploadaudio only work when a messagegroup id is provided
-		// TODO: the right side container could end up empty and look very strange
 		$str .= '
 			<div>
 				<div class="maincontainerleft">
 					'.$textarea.'
-				</div>
+				</div>';
+		// if there are additional tools available, show them to the right
+		if ($USER->authorize('starteasy') || $messagegroupid || $enableFieldInserts) {
+			$str .= '
 				<div class="maincontainerseperator">
 					'.$seperator.'
 				</div>
@@ -177,7 +179,9 @@ class PhoneMessageEditor extends FormItem {
 					'.($messagegroupid?$audioupload:"").'
 					'.($messagegroupid?$audiolibrary:"").'
 					'.($enableFieldInserts?$datafieldinsert:"").'
-				</div>
+				</div>';
+		}
+		$str .= '
 			</div>';
 		
 		return $str;
@@ -200,8 +204,10 @@ class PhoneMessageEditor extends FormItem {
 				';
 			if ($USER->authorize('starteasy'))
 				$str .= 'setupVoiceRecorder("'.$n.'", "'.$language.'", '.$messagegroupid.', audiolibrarywidget);';
-		} else {
+		} else if ($USER->authorize('starteasy')) {
 			$str = 'setupVoiceRecorder("'.$n.'", "'.$language.'", false, null);';
+		} else {
+			$str = "";
 		}
 		
 		return $str;
