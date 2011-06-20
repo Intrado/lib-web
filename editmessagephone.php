@@ -109,7 +109,7 @@ if (!$USER->authorize("sendmulti") && $languagecode != Language::getDefaultLangu
 	redirect('unauthorized.php');
 
 
-PreviewModal::HandlePhoneMessageText($messagegroup->id,$languagecode);
+PreviewModal::HandlePhoneMessageText($messagegroup->id);
 
 
 $text = "";

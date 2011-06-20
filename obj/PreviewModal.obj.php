@@ -78,14 +78,14 @@ class PreviewModal {
 	}
 	
 	// Constructs and returns a PreviewModal object besed on sourcetext from agument or located in session.
-	static function HandlePhoneMessageText($messagegroupid,$languagecode) {
+	static function HandlePhoneMessageText($messagegroupid = false) {
 		$modal = new PreviewModal('phone');
 		$showmodal = false;
-		if (isset($_REQUEST["previewmodal"]) && isset($_REQUEST["text"]) && isset($_REQUEST["gender"])) {
+		if (isset($_REQUEST["previewmodal"]) && isset($_REQUEST["text"])  && isset($_REQUEST["language"]) && isset($_REQUEST["gender"])) {
 			$showmodal = true;
 			// save to session
 			$modal->uid = uniqid();
-			$voiceid = Voice::getPreferredVoice($languagecode, $_REQUEST["gender"]);
+			$voiceid = Voice::getPreferredVoice($_REQUEST["language"], $_REQUEST["gender"]);
 			$_SESSION["previewmessagesource"] = array("uid" => $modal->uid, "source" => $_REQUEST["text"], "voiceid" => $voiceid);
 		} else if (isset($_SESSION["previewmessagesource"])) {
 			$modal->uid = $_SESSION["previewmessagesource"]["uid"];
@@ -94,7 +94,10 @@ class PreviewModal {
 		}
 		// Parse the source text into parts
 		$errors = array();
-		$audiofileids = MessageGroup::getReferencedAudioFileIDs($messagegroupid);
+		if ($messagegroupid)
+			$audiofileids = MessageGroup::getReferencedAudioFileIDs($messagegroupid);
+		else
+			$audiofileids = false;
 		$modal->parts = Message::parse($_SESSION["previewmessagesource"]["source"],$errors,$_SESSION["previewmessagesource"]["voiceid"],$audiofileids);
 		if (count($errors) != 0) {
 			error_log("Error parsing message source");
@@ -102,7 +105,8 @@ class PreviewModal {
 		
 		$modal->initializePhoneFieldContent();
 		
-		$modal->title = _L("%s Phone Message", Language::getName($languagecode));
+		$voice = new Voice($_SESSION["previewmessagesource"]["voiceid"]);
+		$modal->title = _L("%s Phone Message", Language::getName($voice->languagecode));
 		if ($showmodal) {
 			$modal->includeModal();
 		} else {

@@ -824,10 +824,7 @@ if (isset($_SESSION['wizard_message_mgid'])) {
 if (!isset($_SESSION['wizard_message']['mgid']))
 	redirect('unauthorized.php');
 
-$langcode = (isset($postdata["/create/language"]["language"])?$postdata["/create/language"]["language"]:Language::getDefaultLanguageCode());
-if ($langcode == "autotranslate")
-	$langcode = "en";
-PreviewModal::HandlePhoneMessageText($_SESSION['wizard_message']['mgid'], $langcode);
+PreviewModal::HandlePhoneMessageText($_SESSION['wizard_message']['mgid']);
 
 ////////////////////////////////////////////////////////////////////////////////
 // Display
