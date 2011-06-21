@@ -372,8 +372,7 @@ class MsgWiz_submitConfirm extends WizStep {
 	function getForm($postdata, $curstep) {
 		global $USER;
 		
-		if ($USER->authorize('sendmulti'))
-			$srclanguagecode = isset($postdata['/create/language']['language'])?$postdata['/create/language']['language']:"en";
+		$srclanguagecode = isset($postdata['/create/language']['language'])?$postdata['/create/language']['language']:Language::getDefaultLanguageCode();
 				
 		$subtype = $_SESSION['wizard_message_subtype'];
 		
@@ -403,7 +402,7 @@ class MsgWiz_submitConfirm extends WizStep {
 				$html .= '
 					<tr '. (($count % 2)?'class="listAlt"':''). '>
 						<td>'. Language::getName($languagecode).'</td>
-						<td>'. escapehtml(_L("Phone/voice")). '</td>
+						<td>'. escapehtml(_L("Email/%s", $subtype)). '</td>
 					</tr>';
 				$count++;
 			}
@@ -680,7 +679,7 @@ $wizdata = array(
 );
 
 $wizard = new Wizard("wizard_message",$wizdata, new FinishMessageWizard("Finish"));
-$wizard->doneurl = "mgeditor.php";
+$wizard->doneurl = "mgeditor.php?id=".$_SESSION['wizard_message_mgid'];
 $wizard->handlerequest();
 
 // if the message group id or subtype isn't set in session data, redirect to unauth

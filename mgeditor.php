@@ -71,7 +71,7 @@ PreviewModal::HandlePhoneMessageId();
 // if there are multiple languages, none of which are the system default language, present the user with a selection. Prepopulated with the current setting
 // if no languages at all, set to empty string
 $showDefaultLanguageSelector = false;
-$showInvalidMessageWarning = false;
+$invalidMessageWarning = false;
 if ($messagegroup->id) {
 	$currentlangs = $messagegroup->getMessageLanguages();
 	if (isset($currentlangs[Language::getDefaultLanguageCode()])) {
@@ -90,8 +90,12 @@ if ($messagegroup->id) {
 	
 	// is this message group valid? if not, does it have any messages?
 	$messages = $messagegroup->getMessages();
-	if (!$messagegroup->isValid() && count($messages))
-		$showInvalidMessageWarning = true;
+	if (!$messagegroup->isValid() && count($messages)) {
+		if ($messagegroup->defaultlanguagecode)
+			$invalidMessageWarning = _L("Your default language, %s, is missing either phone or email.", Language::getName($messagegroup->defaultlanguagecode));
+		else
+			$invalidMessageWarning = _L("Your message must contain at least one of phone, sms or email.");
+	}
 }
 
 $helpsteps = array();
@@ -137,10 +141,10 @@ if ($showDefaultLanguageSelector) {
 	);
 	$helpsteps[] = _L("Select the default message language.");
 }
-if ($showInvalidMessageWarning) {
+if ($invalidMessageWarning) {
 	$formdata["invalidmessagetip"] = array(
 		"label" => _L('Message Is Currently Invalid'),
-		"control" => array("FormHtml", "html" => '<div style="border: 2px solid red;padding: 4px;">'. _L("Your default language, %s, is missing either phone or email.", Language::getName($messagegroup->defaultlanguagecode)) .'</div>'),
+		"control" => array("FormHtml", "html" => '<div style="border: 2px solid red;padding: 4px;">'. $invalidMessageWarning .'</div>'),
 		"helpstep" => $helpstepnum++
 	);
 	$helpsteps[] = _L("The default language for your message is missing a component which has been included in an alternate language. You must ensure that there is a version available for your default language for your receipients who do not receive messages in an alternate language.");
@@ -273,34 +277,34 @@ function makeMessageGrid($messagegroup) {
 	$buttons = array();
 
 	if ($USER->authorize('sendphone')) {
-		$buttons[] = array("button" => icon_button("New Phone", "telephone", "", "messagewizardphone.php?new&mgid=".$messagegroup->id));
+		$buttons[] = array("button" => icon_button("Phone", "telephone", "", "messagewizardphone.php?new&mgid=".$messagegroup->id));
 		$columnlabels[] = "Phone";
 	}
 	
 	if (getSystemSetting('_hassms', false) && $USER->authorize('sendsms')) {
-		$buttons[] = array("button" => icon_button("New SMS", "fugue/mobile_phone", "", "editmessagesms.php?new&mgid=".$messagegroup->id));
+		$buttons[] = array("button" => icon_button("SMS", "fugue/mobile_phone", "", "editmessagesms.php?new&mgid=".$messagegroup->id));
 		$columnlabels[] = "SMS";
 	}
 	
 	if ($USER->authorize('sendemail')) {
-		$buttons[] = array("button" => icon_button("New Html Email", "email", "", "messagewizardemail.php?new&subtype=html&mgid=".$messagegroup->id));
-		$buttons[] = array("button" => icon_button("New Plain Email", "html", "", "messagewizardemail.php?new&subtype=plain&mgid=".$messagegroup->id));
+		$buttons[] = array("button" => icon_button("Html Email", "html", "", "messagewizardemail.php?new&subtype=html&mgid=".$messagegroup->id));
+		$buttons[] = array("button" => icon_button("Plain Email", "email", "", "messagewizardemail.php?new&subtype=plain&mgid=".$messagegroup->id));
 		$columnlabels[] = "Email (HTML)";
 		$columnlabels[] = "Email (Text)";
 	}
 	
 	if (getSystemSetting('_hasfacebook', false) && $USER->authorize('facebookpost')) {
-		$buttons[] = array("button" => icon_button("New Facebook", "custom/facebook", "", "editmessagefacebook.php?new&mgid=".$messagegroup->id));
+		$buttons[] = array("button" => icon_button("Facebook", "custom/facebook", "", "editmessagefacebook.php?new&mgid=".$messagegroup->id));
 		$columnlabels[] = "Facebook";
 	}
 	
 	if (getSystemSetting('_hastwitter', false) && $USER->authorize('twitterpost')) {
-		$buttons[] = array("button" => icon_button("New Twitter", "custom/twitter", "", "editmessagetwitter.php?new&mgid=".$messagegroup->id));
+		$buttons[] = array("button" => icon_button("Twitter", "custom/twitter", "", "editmessagetwitter.php?new&mgid=".$messagegroup->id));
 		$columnlabels[] = "Twitter";
 	}
 	
 	if ((getSystemSetting('_hasfacebook', false) || getSystemSetting('_hastwitter', false)) && $USER->authorize('twitterpost', 'facebookpost')) {
-		$buttons[] = array("button" => icon_button("New Page", "layout_sidebar", "", "editmessagepage.php?new&mgid=".$messagegroup->id));
+		$buttons[] = array("button" => icon_button("Page", "layout_sidebar", "", "editmessagepage.php?new&mgid=".$messagegroup->id));
 		$columnlabels[] = "Page";
 	}
 	
