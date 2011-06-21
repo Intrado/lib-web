@@ -104,17 +104,10 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		$showreport = true;
 		$readonlyDB = readonlyDBConnect();
 		
-		$jobquery = "select distinct j.name,jt.name, u.login,
-					j.startdate,j.enddate,j.starttime,j.endtime
-					from
-					job j inner join jobpost jp on (jp.jobid = j.id) 
-					inner join jobtype jt on (jt.id = j.jobtypeid)
-					inner join user u on (j.userid = u.id) where jp.posted=1 ";
-		
-		$messagequery = "select j.name,jp.type,mp.txt,ADDTIME(j.startdate, j.starttime),jp.destination,u.login
+		$messagequery = "select j.id, j.name,jp.type,mp.txt,ADDTIME(j.startdate, j.starttime),jp.destination,u.login
 										from
 							job j inner join jobpost jp on (jp.jobid = j.id)
-							inner join message m on (j.messagegroupid = m.messagegroupid)
+							inner join message m on (j.messagegroupid = m.messagegroupid and m.subtype = jp.type)
 							inner join messagepart mp on (m.id = mp.messageid)
 							inner join jobtype jt on (jt.id = j.jobtypeid)
 							inner join user u on (j.userid = u.id) 
@@ -130,24 +123,18 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 					list($startdate, $enddate) = getStartEndDate($dateOptions['reldate'], $dateOptions);
 					$desc = " From: " . date("m/d/Y", $startdate) . " To: " . date("m/d/Y", $enddate);
 					$extrasql = "and j.finishdate between ? and ? + interval 1 day";
-					$jobquery .= $extrasql;
 					$messagequery .= $extrasql;
-					$reportjobs = Query($jobquery,$readonlyDB, array(date("Y-m-d", $startdate),date("Y-m-d", $enddate)));
 					$reportmessages = Query($messagequery,$readonlyDB, array(date("Y-m-d", $startdate),date("Y-m-d", $enddate)));
 				}
 				break;
 			case "job":
 				$extrasql = "and j.id = ?";
-				$jobquery .= $extrasql;
 				$messagequery .= $extrasql;
-				$reportjobs = Query($jobquery,$readonlyDB,array($postdata["jobid"]));
 				$reportmessages = Query($messagequery,$readonlyDB,array($postdata["jobid"]));
 				break;
 			case "archivedjob":
 				$extrasql = "and j.id = ?";
-				$jobquery .= $extrasql;
 				$messagequery .= $extrasql;
-				$reportjobs = Query($jobquery,$readonlyDB,array($postdata["archivedjobid"]));
 				$reportmessages = Query($messagequery,$readonlyDB,array($postdata["archivedjobid"]));
 				break;
 		}
@@ -215,45 +202,26 @@ if ($showreport) {
 		$authwall = getSystemSetting("fbauthorizewall");
 		$accesstoken = $USER->getSetting("fb_access_token", false);
 	}
-	$titles = array(0 => "Job Name",
-					1 => "Job Type",
-					2 => "Submitted by",
-					3 => "Scheduled Date",
-					5 => "Scheduled Time");
 
-	$formatters = array(3 => "fmt_scheduled_date",5 => "fmt_scheduled_time");
-	startWindow(_L('Summary: ' . $desc));
-	
-	echo '<table class="list" cellpadding="3" cellspacing="1" width="100%">';
-		
-	$data = array();
-	if ($reportjobs) {
-		while ($row = DBGetRow($reportjobs)) {
-			$data[] = $row;
-		}
-	}
-	showTable($data, $titles, $formatters);
-	echo '</table>';
-	
-	endWindow();
 	startWindow(_L('Report Details:'));
 	
 	
-	$titles = array(0 => _L("Job Name"),
-					5 => _L("Submitted by"),
-					3 => _L("Post Date"),
+	$titles = array(
+					1 => _L("Job Name"),
+					6 => _L("Submitted by"),
+					4 => _L("Post Date"),
 					);
 					
-	$formatters = array(3 => "fmt_date");
+	$formatters = array(4 => "fmt_date");
 	if (getSystemSetting('_hasfacebook', false)) {
-		$titles[6] = _L("Facebook Destination");
-		$titles[7] = _L("Facebook Content");
-		$formatters[7] = "fmt_limit_25";
+		$titles[7] = _L("Facebook Destination");
+		$titles[8] = _L("Facebook Content");
+		$formatters[8] = "fmt_limit_25";
 	}
 	if (getSystemSetting('_hastwitter', false)) {
-		$titles[8] = _L("Twitter Handle");
-		$titles[9] = _L("Twitter Content");
-		$formatters[9] = "fmt_limit_25";
+		$titles[9] = _L("Twitter Handle");
+		$titles[10] = _L("Twitter Content");
+		$formatters[10] = "fmt_limit_25";
 	}
 
 	echo '<table class="list" cellpadding="3" cellspacing="1" width="100%">';
@@ -264,51 +232,50 @@ if ($showreport) {
 		// store facebook account names to avoid contacting facebook for each individual post if the pageid is the same
 		$fbaccountnames = array();
 		while ($row = DBGetRow($reportmessages)) {
-			switch($row[1]) {
+			if (isset($data[$row[0]])) {
+				$post = $data[$row[0]];
+			}else {
+				$post = $row;
+				$post[7] = "";
+				
+			}
+			
+			switch($row[2]) {
 				case "facebook":
-					if ($row[4] == "wall")
-						break;
-					// Look up account page id in cache or if not there fetch from fb 
-					if (isset($fbaccountnames[$row[4]])) {
-						$row[4] = $fbaccountnames[$row[4]];
+					$post[7] .= $post[7] != ""?", ":"";
+					
+					$post[8] = $row[3];
+					if ($row[5] == "wall") {
+						$post[7] .= $row[5];
+					} else if (isset($fbaccountnames[$row[5]])) {
+						// Look up account page id in cache or if not there fetch from fb 
+						$post[7] .= $fbaccountnames[$row[5]];
 					} else {
 						try {
-							$accountinfo = $facebookapi->api("/$row[4]", 'GET', array());
+							$accountinfo = $facebookapi->api("/$row[5]", 'GET', array());
 							if ($accountinfo) {
-								$fbaccountnames[$row[4]] = $accountinfo["name"];
-								$row[4] = $accountinfo["name"];
+								$fbaccountnames[$row[5]] = $accountinfo["name"];
+								$post[7] .= $accountinfo["name"];
 							} else {
-								$fbaccountnames[$row[4]] = _L("Not Available");
-								$row[4] =  _L("Not Available");
+								$fbaccountnames[$row[5]] = $row[5];//_L("Not Available");
+								$post[7] .= $row[5]; //_L("Not Available");
 							}
 						} catch (FacebookApiException $e) {
-							$fbaccountnames[$row[4]] =  _L("Not Available");
-							$row[4] =  _L("Not Available");
+							$fbaccountnames[$row[5]] = $row[5];// _L("Not Available");
+							$post[7] = $row[5];// _L("Not Available");
 							error_log($e);
 							return false;
 						}
 					}
-					$row[6] = $row[4];
-					$row[7] = $row[2];
-					$row[8] = "";
-					$row[9] = "";
 					break;
 				case "twitter":
-					$row[6] = "";
-					$row[7] = "";
-					$row[8] = $row[4];
-					$row[9] = $row[2];
+					$post[9] = $row[5];
+					$post[10] = $row[3];
 					// Do not modify, Just print the handle 
 					break;
-				default:
-					// output blank rather than output the destination field directly if unknown type
-					$row[6] = "";
-					$row[7] = "";
-					$row[8] = "";
-					$row[9] = "";
 			} 
 			
-			$data[] = $row;
+			$data[$row[0]] = $post;
 		}
 	}
 	showTable($data, $titles, $formatters);
