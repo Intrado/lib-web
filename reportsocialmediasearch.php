@@ -111,7 +111,16 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 							inner join messagepart mp on (m.id = mp.messageid)
 							inner join jobtype jt on (jt.id = j.jobtypeid)
 							inner join user u on (j.userid = u.id) 
-							where m.type = 'post' and jp.posted=1 ";
+							where m.type = 'post' and jp.posted=1 and jp.type in ";
+		$types = array();
+		if (getSystemSetting('_hasfacebook', false)) {
+			$types[] = "facebook";
+		}
+		if (getSystemSetting('_hastwitter', false)) {
+			$types[] = "twitter";
+		}
+
+		$messagequery .= "('" . implode("','",$types) . "') ";
 		
 		switch($postdata["searchby"]) {
 			case "date":
