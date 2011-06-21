@@ -179,7 +179,7 @@ $formdata = array(
 	)
 );
 
-$helpsteps = array(_L("<p>Your page will contain an HTML message which can be linked to via a short link. The link can be appended to your Twitter post or posted to Facebook.</p><p>If your message was created with only phone audio, a media player will appear on the Page allowing your recipients to listen to the audio message."),
+$helpsteps = array(_L("<p>Your page will contain an HTML message which can be linked to via a short link. The link can be appended to your Twitter post or posted to Facebook.</p><p>If your message was created with only phone audio, a media player will appear on the Page allowing your recipients to listen to the audio message.</p>"),
 	_L("You may attach up to three files, such as PDFs, to your Page for recipients to download. Files may not exceed 2MB in size."));
 		
 $buttons = array(submit_button(_L('Done'),"submit","tick"));
