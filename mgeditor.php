@@ -268,31 +268,42 @@ function makeMessageGrid($messagegroup) {
 	} else {
 		$customerlanguages = array(Language::getDefaultLanguageCode() => Language::getName(Language::getDefaultLanguageCode()));
 	}
-	// Setup destination types according to permissions
+	// Setup destination and wizard/editor buttons types according to permissions
 	$columnlabels = array();
-	
+	$buttons = array();
+
 	if ($USER->authorize('sendphone')) {
+		$buttons[] = array("button" => icon_button("New Phone", "telephone", "", "messagewizardphone.php?new&mgid=".$messagegroup->id));
 		$columnlabels[] = "Phone";
 	}
 	
 	if (getSystemSetting('_hassms', false) && $USER->authorize('sendsms')) {
+		$buttons[] = array("button" => icon_button("New SMS", "fugue/mobile_phone", "", "editmessagesms.php?new&mgid=".$messagegroup->id));
 		$columnlabels[] = "SMS";
 	}
 	
 	if ($USER->authorize('sendemail')) {
+		$buttons[] = array("button" => icon_button("New Html Email", "email", "", "messagewizardemail.php?new&subtype=html&mgid=".$messagegroup->id));
+		$buttons[] = array("button" => icon_button("New Plain Email", "html", "", "messagewizardemail.php?new&subtype=plain&mgid=".$messagegroup->id));
 		$columnlabels[] = "Email (HTML)";
 		$columnlabels[] = "Email (Text)";
 	}
 	
-	if ($USER->authorize('facebookpost'))
+	if (getSystemSetting('_hasfacebook', false) && $USER->authorize('facebookpost')) {
+		$buttons[] = array("button" => icon_button("New Facebook", "custom/facebook", "", "editmessagefacebook.php?new&mgid=".$messagegroup->id));
 		$columnlabels[] = "Facebook";
+	}
 	
-	if ($USER->authorize('twitterpost'))
+	if (getSystemSetting('_hastwitter', false) && $USER->authorize('twitterpost')) {
+		$buttons[] = array("button" => icon_button("New Twitter", "custom/twitter", "", "editmessagetwitter.php?new&mgid=".$messagegroup->id));
 		$columnlabels[] = "Twitter";
+	}
 	
-	if ($USER->authorize('twitterpost', 'facebookpost'))
+	if ((getSystemSetting('_hasfacebook', false) || getSystemSetting('_hastwitter', false)) && $USER->authorize('twitterpost', 'facebookpost')) {
+		$buttons[] = array("button" => icon_button("New Page", "layout_sidebar", "", "editmessagepage.php?new&mgid=".$messagegroup->id));
 		$columnlabels[] = "Page";
-		
+	}
+	
 	// set action usr link	
 	$links = array(); 
 	$ttslanguages = Voice::getTTSLanguageMap();
@@ -435,22 +446,7 @@ function makeMessageGrid($messagegroup) {
 		$links[] = $linkrow;
 	}
 	
-	// add wizard/editor buttons
-	$buttons = array();
-	if ($USER->authorize("sendphone"))
-		$buttons[] = array("button" => icon_button("New Phone", "telephone", "", "messagewizardphone.php?new&mgid=".$messagegroup->id));
-	if ($USER->authorize("sendsms"))
-		$buttons[] = array("button" => icon_button("New SMS", "fugue/mobile_phone", "", "editmessagesms.php?new&mgid=".$messagegroup->id));
-	if ($USER->authorize("sendemail")) {
-		$buttons[] = array("button" => icon_button("New Html Email", "email", "", "messagewizardemail.php?new&subtype=html&mgid=".$messagegroup->id));
-		$buttons[] = array("button" => icon_button("New Plain Email", "html", "", "messagewizardemail.php?new&subtype=plain&mgid=".$messagegroup->id));
-	}
-	if ($USER->authorize('facebookpost'))
-		$buttons[] = array("button" => icon_button("New Facebook", "custom/facebook", "", "editmessagefacebook.php?new&mgid=".$messagegroup->id));
-	if ($USER->authorize('twitterpost'))
-		$buttons[] = array("button" => icon_button("New Twitter", "custom/twitter", "", "editmessagetwitter.php?new&mgid=".$messagegroup->id));
-	if ($USER->authorize('twitterpost', 'facebookpost'))
-		$buttons[] = array("button" => icon_button("New Page", "layout_sidebar", "", "editmessagepage.php?new&mgid=".$messagegroup->id));
+
 		
 	$links[] = $buttons;
 	
