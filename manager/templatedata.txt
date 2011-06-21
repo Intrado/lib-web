@@ -307,7 +307,7 @@ $$$
 			<td valign="top" align="left" style="padding:5px; background-color:#FFFFFF;">
 
 				<p style="font-family:verdana; color:#6B6B6B; font-size:75%">
-				${displayname} would like to continue connecting with you via email.  If you prefer to be removed from our list, please contact ${displayname} directly.  To stop receiving all email messages distributed through our ${productname} service, follow this link and confirm: <a href= "${unsubscribelink}">Unsubscribe</a>
+				${displayname} would like to continue connecting with you through ${productname}.  If you prefer to no longer receive messages, please log in and close your account.
 				</p>
 				<p style="font-family:verdana; color:#6B6B6B; font-size:75%">
 				${productname} is a notification service used by the nation's leading school systems to connect with parents, students and staff through voice, SMS text, email, and social media.
@@ -335,7 +335,7 @@ ${displayname}
 
 
 ------
-${displayname} would like to continue connecting with you via email. If you prefer to be removed from our list, please contact ${displayname} directly. To stop receiving all email messages distributed through our ${productname} service, follow this link and confirm: ${unsubscribelink}
+${displayname} would like to continue connecting with you through ${productname}.  If you prefer to no longer receive messages, please log in and close your account.
 
 ${productname} is a notification service used by the nation's leading school systems to connect with parents, students and staff through voice, SMS text, email, and social media.
 
@@ -385,7 +385,7 @@ $$$
 			<td valign="top" align="left" style="padding:5px; background-color:#FFFFFF;">
 
 				<p style="font-family:verdana; color:#6B6B6B; font-size:75%">
-					${displayname} le gustaria contiunuar comunicandoce con usted por medio de correo electr&oacute;nico.  Si usted prefiere ser borrado de nuestra lista, por favor contacte ${displayname} directamente.  Para dejar de recibir todos los mensajes de correo electr&oacute;nico distribuidos por nuestro servicio de ${productname}, siga este enlace:${unsubscribelink} <a href= "${unsubscribelink}">Unsubscribe</a>
+					${displayname} le gustaria contiunuar comunicandoce con usted por medio de ${productname}. Si usted prefiere no recibir mensajes, por favor entre al sitio y cierre su cuenta.
 					</p>
 					<p style="font-family:verdana; color:#6B6B6B; font-size:75%">
 					${productname} es un servicio de notificaci&oacute;n usado por los sistemas escolares mas importantes de la naci&oacute;n para comunicarse con padres, estudiantes, y personal por medio de voz, texto, correo electr&oacute;nico y medios de comunicaci&oacute;n social.
@@ -413,7 +413,7 @@ ${displayname}
 
 
 ------
-${displayname} le gustaria contiunuar comunicandoce con usted por medio de correo electrónico.  Si usted prefiere ser borrado de nuestra lista, por favor contacte ${displayname} directamente.  Para dejar de recibir todos los mensajes de correo electrónico distribuidos por nuestro servicio de ${productname}, siga este enlace:${unsubscribelink}
+${displayname} le gustaria contiunuar comunicandoce con usted por medio de ${productname}. Si usted prefiere no recibir mensajes, por favor entre al sitio y cierre su cuenta.
  
 ${productname} es un servicio de notificación usado por los sistemas escolares mas importantes de la nación para comunicarse con padres, estudiantes, y personal por medio de voz, texto, correo electrónico y medios de comunicación social.
 
