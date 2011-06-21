@@ -87,7 +87,7 @@ $formdata = array($messagegroup->name);
 
 $formdata["message"] = array(
 	"label" => _L("SMS Text"),
-	"fieldhelp" => _L("TODO: field help"),
+	"fieldhelp" => _L("Enter your SMS message in this field. Keep in mind that an SMS must be less than 160 characters long."),
 	"value" => $text,
 	"validators" => array(
 		array("ValRequired"),

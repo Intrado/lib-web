@@ -75,7 +75,7 @@ $formdata = array($messagegroup->name. " (". $language. ")");
 
 $formdata["message"] = array(
 	"label" => _L("Voice Recording"),
-	"fieldhelp" => _L("TODO: field help"),
+	"fieldhelp" => _L("Enter the 10-digit phone number that the system should call to record your message."),
 	"value" => "",
 	"validators" => array(
 		array("ValRequired"),

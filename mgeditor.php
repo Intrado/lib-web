@@ -143,7 +143,7 @@ if ($showInvalidMessageWarning) {
 		"control" => array("FormHtml", "html" => '<div style="border: 2px solid red;padding: 4px;">'. _L("Your default language, %s, is missing either phone or email.", Language::getName($messagegroup->defaultlanguagecode)) .'</div>'),
 		"helpstep" => $helpstepnum++
 	);
-	$helpsteps[] = _L("TODO: Help.");
+	$helpsteps[] = _L("The default language for your message is missing a component which has been included in an alternate language. You must ensure that there is a version available for your default language for your receipients who do not receive messages in an alternate language.");
 }
 
 if ($messagegroup->id) {

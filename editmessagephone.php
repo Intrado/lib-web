@@ -142,7 +142,7 @@ $formdata = array(
 	$messagegroup->name. " (". $language. ")",
 	"message" => array(
 		"label" => _L("Advanced Message"),
-		"fieldhelp" => _L("TODO: field help"),
+		"fieldhelp" => _L("Enter your phone message in this field. Click on the 'Guide' button for help with the different options which are available to you."),
 		"value" => $text,
 		"validators" => array(
 			array("ValRequired"),
@@ -152,7 +152,7 @@ $formdata = array(
 	),
 	"gender" => array(
 		"label" => _L("Gender"),
-		"fieldhelp" => _L("TODO: field help"),
+		"fieldhelp" => _L("Select the gender of the text-to-speech voice."),
 		"value" => $gender,
 		"validators" => array(
 			array("ValRequired"),

@@ -86,7 +86,7 @@ $formdata = array(
 	$messagegroup->name. " (". $language. ")",
 	"message" => array(
 		"label" => _L("Facebook Message"),
-		"fieldhelp" => _L("TODO: field help"),
+		"fieldhelp" => _L("Enter your message for Facebook here. Messages for Facebook must be less than 420 characters in length."),
 		"value" => $text,
 		"validators" => array(
 			array("ValRequired"),
@@ -96,7 +96,7 @@ $formdata = array(
 	)
 );
 
-$helpsteps = array(_L("TODO: Help with facebook."));
+$helpsteps = array(_L("Enter the message as you would like it to appear on your Facebook page. Messages are limited to 420 characters in length."));
 		
 $buttons = array(submit_button(_L('Done'),"submit","tick"));
 $form = new Form("facebookmessage",$formdata,$helpsteps,$buttons);

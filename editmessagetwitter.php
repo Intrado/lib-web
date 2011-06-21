@@ -89,7 +89,7 @@ $formdata = array(
 	$messagegroup->name. " (". $language. ")",
 	"message" => array(
 		"label" => _L("Twitter Message"),
-		"fieldhelp" => _L("TODO: field help"),
+		"fieldhelp" => _L("Enter your Twitter message here. Twitter messages must be 140 characters or less."),
 		"value" => $text,
 		"validators" => array(
 			array("ValRequired"),
@@ -99,7 +99,7 @@ $formdata = array(
 	)
 );
 
-$helpsteps = array(_L("TODO: Help with facebook."));
+$helpsteps = array(_L("The message you enter here will appear on your associated Twitter account. Twitter posts must be less than 140 characters long."));
 		
 $buttons = array(submit_button(_L('Done'),"submit","tick"));
 $form = new Form("twittermessage",$formdata,$helpsteps,$buttons);

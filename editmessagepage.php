@@ -161,7 +161,7 @@ $formdata = array(
 	$messagegroup->name. " (". $language. ")",
 	"message" => array(
 		"label" => _L("Page Message"),
-		"fieldhelp" => _L("TODO: field help"),
+		"fieldhelp" => _L("Enter the message that you would like to have appear on the web page."),
 		"value" => $text,
 		"validators" => array(
 			array("ValRequired"),
@@ -171,8 +171,7 @@ $formdata = array(
 	),
 	"attachments" => array(
 		"label" => _L('Attachments'),
-		"fieldhelp" => _L("You may attach up to three files that are up to 2MB each. For greater security, certain file types ".
-			"are not permitted. Be aware that some email accounts may not accept attachments above a certain size and may reject your message."),
+		"fieldhelp" => _L("You may attach up to three files that are up to 2MB each. For greater security, certain file types are not permitted."),
 		"value" => ($attachments?json_encode($attachments):"{}"),
 		"validators" => array(array("ValEmailAttach")),
 		"control" => array("EmailAttach"),
@@ -180,8 +179,8 @@ $formdata = array(
 	)
 );
 
-$helpsteps = array(_L("TODO: Help with page message."),
-	_L("TODO: Help with page message."));
+$helpsteps = array(_L("<p>Your page will contain an HTML message which can be linked to via a short link. The link can be appended to your Twitter post or posted to Facebook.</p><p>If your message was created with only phone audio, a media player will appear on the Page allowing your recipients to listen to the audio message."),
+	_L("You may attach up to three files, such as PDFs, to your Page for recipients to download. Files may not exceed 2MB in size."));
 		
 $buttons = array(submit_button(_L('Done'),"submit","tick"));
 $form = new Form("pagemessage",$formdata,$helpsteps,$buttons,"vertical");

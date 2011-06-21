@@ -115,7 +115,7 @@ class MsgWiz_method extends WizStep {
 			$this->title,
 			"method" => array(
 				"label" => _L("Method"),
-				"fieldhelp" => _L("TODO: fieldhelp"),
+				"fieldhelp" => _L("Select how you would like to create your phone message."),
 				"validators" => array(
 					array("ValRequired"),
 					array("ValInArray", "values" => array_keys($methods))
@@ -298,11 +298,12 @@ class MsgWiz_phoneAdvanced extends WizStep {
 					</ul>
 					'),
 				"helpstep" => $helpstep++);
-			$helpsteps[] = "TODO: Help me!";
+			$helpsteps[] = "You will create the English version of your message here. Your automatically translated messages will be created afterwards and you will be able to review and edit them.";
 		}
 		
 		$formdata["message"] = array(
 				"label" => _L("Advanced Message"),
+				"fieldhelp" => _L("Enter your phone message in this field. Click on the 'Guide' button for help with the different options which are available to you."),
 				"value" => "",
 				"validators" => array(
 					array("ValRequired"),
@@ -311,6 +312,7 @@ class MsgWiz_phoneAdvanced extends WizStep {
 				"helpstep" => $helpstep++);
 		$formdata["gender"] = array(
 				"label" => _L("Gender"),
+				"fieldhelp" => _L("Select the gender of the text-to-speech voice."),
 				"value" => "",
 				"validators" => array(array("ValRequired")),
 				"control" => array("RadioButton", "values" => array("female" => _L("Female"), "male" => _L("Male"))),
@@ -400,7 +402,7 @@ class MsgWiz_translatePreview extends WizStep {
 					$formdata[] = Language::getName($languagecode);
 					$formdata[$languagecode] = array(
 						"label" => _L("Enabled"),
-						"fieldhelp" => _L('Check this box to automatically translate your message using Google Translate.'),
+						"fieldhelp" => _L('This translated message is currently enabled. Users with this language preference will receive this message.'),
 						"value" => true,
 						"validators" => array(),
 						"control" => array("RetranslationItem",
