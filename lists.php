@@ -117,7 +117,7 @@ if (isset($_GET['ajax'])) {
 
 		while(!empty($mergeditems) && $limit > 0) {
 			$item = array_shift($mergeditems);
-			$time = date("M j, g:i a",strtotime($item["date"]));
+			$time = date("M j, Y g:i a",strtotime($item["date"]));
 			$title = $item["status"];
 			$itemid = $item["id"];
 			$title = escapehtml($item["name"]);

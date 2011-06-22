@@ -66,9 +66,12 @@ if($isajax === true) {
 		case "messages":
 			$mergeditems = array_merge($mergeditems,QuickQueryMultiRow("
 				select 'message' as type, 'Saved' as status, mg.id as id, mg.name as name,mg.description,mg.modified as date, mg.deleted as deleted,
-					sum(m.type='phone') as phone, sum(m.type='email') as email,sum(m.type='sms') as sms
+					sum(m.type='phone') as phone,sum(m.type='email') as email,sum(m.type='sms') as sms,
+					sum(m.type='post' and m.subtype='facebook') as facebook, 
+					sum(m.type='post' and m.subtype='twitter') as twitter,
+					sum(m.type='post' and m.subtype='page') as page
 				from messagegroup mg
-					inner join message m on
+					left join message m on
 						(m.messagegroupid = mg.id)
 				where mg.userid=? and not mg.deleted and mg.modified is not null and mg.type = 'notification'
 				group by mg.id
@@ -200,9 +203,12 @@ if($isajax === true) {
 				limit 10",true,false,array($USER->id)));
 			$mergeditems = array_merge($mergeditems,QuickQueryMultiRow("
 				select 'message' as type, 'Saved' as status, mg.id as id, mg.name as name,mg.description, mg.modified as date, mg.deleted as deleted,
-					sum(m.type='phone') as phone, sum(m.type='email') as email, sum(m.type='sms') as sms
+					sum(m.type='phone') as phone, sum(m.type='email') as email, sum(m.type='sms') as sms,
+					sum(m.type='post' and m.subtype='facebook') as facebook, 
+					sum(m.type='post' and m.subtype='twitter') as twitter,
+					sum(m.type='post' and m.subtype='page') as page
 				from messagegroup mg
-					inner join message m on
+					left join message m on
 						(m.messagegroupid = mg.id)
 				where mg.userid = ? and not mg.deleted and mg.modified is not null and mg.type = 'notification'
 				group by mg.id
@@ -384,7 +390,7 @@ function activityfeed($mergeditems,$ajax = false) {
 		} else {
 			while(!empty($mergeditems) && $limit > 0) {
 				$item = array_shift($mergeditems);
-				$time = date("M j, g:i a",strtotime($item["date"]));
+				$time = date("M j, Y g:i a",strtotime($item["date"]));
 				$title = $item["status"];
 				$content = "";
 				$tools = "";
@@ -493,11 +499,17 @@ function activityfeed($mergeditems,$ajax = false) {
 					$tools = str_replace("&nbsp;|&nbsp;","<br />",$tools);
 					$icon = 'largeicons/addrbook.jpg';
 				} else if($item["type"] == "message") {
-					$types = $item["phone"] > 0?"," . _L("phone"):"";
-					$types .= $item["email"] > 0?"," . _L("email"):"";
-					$types .= $item["sms"] > 0?"," . _L("sms"):"";
+//					$types = $item["phone"] > 0?"," . _L("phone"):"";
+//					$types .= $item["email"] > 0?"," . _L("email"):"";
+//					$types .= $item["sms"] > 0?"," . _L("sms"):"";
+					$types = $item["phone"] > 0?'<img src="img/icons/telephone.gif" alt="Phone" title="Phone">':"";
+					$types .= $item["email"] > 0?' <img src="img/icons/email.gif" alt="Email" title="Email">':"";
+					$types .= $item["sms"] > 0?' <img src="img/icons/fugue/mobile_phone.gif" alt="SMS" title="SMS">':"";
+					$types .= $item["facebook"] > 0?' <img src="img/icons/custom/facebook.gif" alt="Facebook" title="Facebook">':"";
+					$types .= $item["twitter"] > 0?' <img src="img/icons/custom/twitter.gif" alt="Twitter" title="Twitter">':"";
+					$types .= $item["facebook"] > 0?' <img src="img/icons/layout_sidebar.gif" alt="Page" title="Page">':"";
 
-					$title = _L('Message %1$s with %2$s Content',escapehtml($title),typestring(substr($types,1)));
+					$title = _L('Message %1$s - ',escapehtml($title)) . ($types==""?_L("Empty Message"):$types);
 
 					$defaultlink = "mgeditor.php?id=$itemid";
 					$content = '<a href="' . $defaultlink . '" ' . $defaultonclick . '>' . $time .  ' - <b>' .  escapehtml($item["name"]) . "</b>" . ($item["description"] != ""?" - " . escapehtml($item["description"]):"") . '</a>';

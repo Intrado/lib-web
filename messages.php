@@ -115,7 +115,12 @@ if($isajax === true) {
 		$mergeditems = QuickQueryMultiRow(
 			"select 'message' as type,'Saved' as status, 
 				mg.id as id, mg.name as name,mg.description, mg.modified as date, mg.deleted as deleted,
-				sum(m.type='phone') as phone, sum(m.type='email') as email, sum(m.type='sms') as sms,
+				sum(m.type='phone') as phone,
+				sum(m.type='email') as email, 
+				sum(m.type='sms') as sms, 
+				sum(m.type='post' and m.subtype='facebook') as facebook, 
+				sum(m.type='post' and m.subtype='twitter') as twitter,
+				sum(m.type='post' and m.subtype='page') as page,
 				p.action as publishaction, p.id as publishid, u.login as owner, (mg.name +0) as digitsfirst
 			from messagegroup mg
 			left join message m on
@@ -150,11 +155,15 @@ if($isajax === true) {
 		
 		while(!empty($mergeditems)) {
 			$item = array_shift($mergeditems);
-			$time = date("M j, g:i a",strtotime($item["date"]));
+			$time = date("M j, Y g:i a",strtotime($item["date"]));
 			$itemid = $item["id"];
-			$types = $item["phone"] > 0?"," . _L("phone"):"";
-			$types .= $item["email"] > 0?"," . _L("email"):"";
-			$types .= $item["sms"] > 0?"," . _L("sms"):"";
+			$types = $item["phone"] > 0?'<img src="img/icons/telephone.gif" alt="Phone" title="Phone">':"";
+			$types .= $item["email"] > 0?' <img src="img/icons/email.gif" alt="Email" title="Email">':"";
+			$types .= $item["sms"] > 0?' <img src="img/icons/fugue/mobile_phone.gif" alt="SMS" title="SMS">':"";
+			$types .= $item["facebook"] > 0?' <img src="img/icons/custom/facebook.gif" alt="Facebook" title="Facebook">':"";
+			$types .= $item["twitter"] > 0?' <img src="img/icons/custom/twitter.gif" alt="Twitter" title="Twitter">':"";
+			$types .= $item["facebook"] > 0?' <img src="img/icons/layout_sidebar.gif" alt="Page" title="Page">':"";
+			
 			$title = escapehtml($item["name"]);
 			$defaultlink = "mgeditor.php?id=$itemid";
 			$publishaction = $item['publishaction'];
@@ -202,7 +211,7 @@ if($isajax === true) {
 				);
 
 
-			$content = '<a href="' . $defaultlink . '" >' . $time .  ($item["description"] != ""?" - " . escapehtml($item["description"]):"") . ' - <b>' . ($types==""?_L("Empty Message"):_L('%1$s Content',typestring(substr($types,1)))) . '</b>' . '</a>';
+			$content = '<a href="' . $defaultlink . '" >' . $time .  ($item["description"] != ""?" - " . escapehtml($item["description"]):"") . ' - <b>' . ($types==""?_L("Empty Message"):$types) . '</b>' . '</a>';
 			
 			$data->list[] = array("itemid" => $itemid,
 										"defaultlink" => $defaultlink,
