@@ -74,11 +74,9 @@ $formdata["archivedjobid"] = array(
 );
 
 
-$helpsteps = array (
-	_L('TODO')
-);
+$helpsteps = array ();
 
-$buttons = array(submit_button(_L('View Report'),"submit","tick"));
+$buttons = array(submit_button(_L('View Report'),"view","fugue/magnifier"),submit_button(_L('Download CSV Report'),"download","fugue/arrow_270"));
 $form = new Form("socialmediareport",$formdata,$helpsteps,$buttons);
 $form->ajaxsubmit = false;
 ////////////////////////////////////////////////////////////////////////////////
@@ -92,6 +90,7 @@ $form->handleRequest();
 $datachange = false;
 $errors = false;
 $showreport = false;
+$downloadreport = false;
 $desc = "";
 //check for form submission
 if ($button = $form->getSubmit()) { //checks for submit and merges in post data	
@@ -101,7 +100,11 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		$postdata = $form->getData(); //gets assoc array of all values {name:value,...}
 		$reportjobs = array();
 		$reportmessages = array();
-		$showreport = true;
+		if ($button == "download") {
+			$downloadreport = true;
+		} else {
+			$showreport = true;
+		}
 		$readonlyDB = readonlyDBConnect();
 		
 		$messagequery = "select j.id, j.name,jp.type,mp.txt,ADDTIME(j.startdate, j.starttime),jp.destination,u.login
@@ -151,9 +154,128 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+// Prepare Report Data
+////////////////////////////////////////////////////////////////////////////////
+$data = array();
+if ($showreport || $downloadreport) {
+	
+	if (getSystemSetting('_hasfacebook', false) && $USER->authorize("facebookpost")  && fb_hasValidAccessToken()) {
+		$authpages = getFbAuthorizedPages();
+		$authwall = getSystemSetting("fbauthorizewall");
+		$accesstoken = $USER->getSetting("fb_access_token", false);
+	}
+
+	if ($reportmessages) {
+		
+		// store facebook account names to avoid contacting facebook for each individual post if the pageid is the same
+		$fbaccountnames = array();
+		
+		// Prepare and merge the post items
+		while ($row = DBGetRow($reportmessages)) {
+			
+			// Merge Facebook and Twitter posts into one report post item 
+			if (isset($data[$row[0]])) {
+				$post = $data[$row[0]];
+			}else {
+				$post["jobname"] = $row[1];
+				$post["user"] = $row[6];
+				$post["date"] = $row[4];
+				$post["fbdest"] = "";
+				$post["fbcontent"] = "";
+				$post["twhandle"] = "";
+				$post["twcontent"] = "";
+			}
+			
+			switch($row[2]) {
+				case "facebook":
+					$post["fbdest"] .= $post["fbdest"] != ""?", ":"";
+					
+					$post["fbcontent"] = $row[3];
+					if ($row[5] == "wall") {
+						$post["fbdest"] .= _L('Wall');
+					} else if (isset($fbaccountnames[$row[5]])) {
+						// Look up account page id in cache or if not there fetch from fb 
+						$post["fbdest"] .= $fbaccountnames[$row[5]];
+					} else {
+						try {
+							$accountinfo = $facebookapi->api("/$row[5]", 'GET', array());
+							if ($accountinfo) {
+								$fbaccountnames[$row[5]] = $accountinfo["name"];
+								$post["fbdest"] .= $accountinfo["name"];
+							} else {
+								$fbaccountnames[$row[5]] = $row[5];//_L("Not Available");
+								$post["fbdest"] .= $row[5]; //_L("Not Available");
+							}
+						} catch (FacebookApiException $e) {
+							$fbaccountnames[$row[5]] = $row[5];// _L("Not Available");
+							$post["fbdest"] = $row[5];// _L("Not Available");
+							error_log($e);
+						}
+					}
+					break;
+				case "twitter":
+					$post["twhandle"] = $row[5];
+					$post["twcontent"] = $row[3];
+					// Do not modify, Just print the handle 
+					break;
+			} 
+			
+			$data[$row[0]] = $post;
+		}
+	}
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Generate CSV Report
+////////////////////////////////////////////////////////////////////////////////
+
+if ($downloadreport) {
+	header("Pragma: private");
+	header("Cache-Control: private");
+	header("Content-disposition: attachment; filename=report.csv");
+	header("Content-type: application/vnd.ms-excel");
+
+	//generate the CSV header
+	echo _L("Job Name") . ',' . _L("Submitted by") . ',' . _L("Post Date");
+	if (getSystemSetting('_hasfacebook', false)) {
+		echo ',' . _L("Facebook Destination") . ',' . _L("Facebook Content");
+	}
+	if (getSystemSetting('_hastwitter', false)) {
+		echo ',' . _L("Twitter Handle") . ',' . _L("Twitter Content");
+	}
+	
+	echo "\r\n";
+	
+	foreach ($data as $post) {
+		
+		$count = 0;
+		foreach ($post as $key => $item) {
+			echo ($count > 0 ?',':'') . '"' . addslashes($item) . '"';
+			$count++;
+		}
+		echo "\r\n";
+	}
+	exit();
+}
+
+
+////////////////////////////////////////////////////////////////////////////////
 // Display Functions
 ////////////////////////////////////////////////////////////////////////////////
 
+// Save ids in $tipids for posts that are too long to fit In the table to be able to create a tooltip
+$tipsids = array();
+function ConditionalContentLink($id,$content) {
+	global $tipsids;
+	$contentlength = 25;
+	if(strlen($content) > $contentlength) {
+		$tipsids[] = $id;
+		// For posts that are too long a hidden div is created with the full text to show in a tooltip
+		return "<div id=\"{$id}\">" . escapehtml(substr($content,0,$contentlength-3) . "...") . "</div><div id='{$id}_long' style='display:none'>" . escapehtml($content) . "</div>";
+	} else {
+		return escapehtml($content);
+	}
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 // Display
@@ -187,13 +309,13 @@ var displaySearchItem = function() {
 	}
 }
 
-
 document.observe('dom:loaded', function() {
 	var radio = $(formname + '_searchby').select('input');
 	displaySearchItem();
 	radio.invoke('observe', 'click', function(event) {
 		displaySearchItem();
 	});
+	
 });
 </script>
 
@@ -205,93 +327,51 @@ echo $form->render();
 endWindow();
 
 if ($showreport) {
-	
-	if (getSystemSetting('_hasfacebook', false) && $USER->authorize("facebookpost")  && fb_hasValidAccessToken()) {
-		$authpages = getFbAuthorizedPages();
-		$authwall = getSystemSetting("fbauthorizewall");
-		$accesstoken = $USER->getSetting("fb_access_token", false);
-	}
-
 	startWindow(_L('Report Details:'));
-	
-	
-	$titles = array(
-					1 => _L("Job Name"),
-					6 => _L("Submitted by"),
-					4 => _L("Post Date"),
-					);
-					
-	$formatters = array(4 => "fmt_date");
+	echo '<table class="list" style="width:100%;text-align:left;" cellpadding="3" cellspacing="1">';
+	echo '<tr class="listHeader"><th>Job Name</th><th>Submitted by</th><th>Post Date</th>';
 	if (getSystemSetting('_hasfacebook', false)) {
-		$titles[7] = _L("Facebook Destination");
-		$titles[8] = _L("Facebook Content");
-		$formatters[8] = "fmt_limit_25";
+		echo '<th>' . _L("Facebook Destination") . '</th><th>' . _L("Facebook Content") . '</th>';
 	}
 	if (getSystemSetting('_hastwitter', false)) {
-		$titles[9] = _L("Twitter Handle");
-		$titles[10] = _L("Twitter Content");
-		$formatters[10] = "fmt_limit_25";
+		echo '<th>' . _L("Twitter Handle") . '</th><th>' . _L("Twitter Content") . '</th>';
 	}
-
-	echo '<table class="list" cellpadding="3" cellspacing="1" width="100%">';
-	$data = array();
-	
-	if ($reportmessages) {
+	echo '</tr>';
+	$alt = 0;
+	foreach ($data as $post) {
+		$alt++;
+		echo $alt % 2 ? '<tr>' : '<tr class="listAlt">';
+		echo "<td>" . escapehtml($post["jobname"]) . "</td><td>" . escapehtml($post["user"]) . "</td><td>" . escapehtml($post["date"]) . "</td>";
 		
-		// store facebook account names to avoid contacting facebook for each individual post if the pageid is the same
-		$fbaccountnames = array();
-		while ($row = DBGetRow($reportmessages)) {
-			if (isset($data[$row[0]])) {
-				$post = $data[$row[0]];
-			}else {
-				$post = $row;
-				$post[7] = "";
-				
-			}
-			
-			switch($row[2]) {
-				case "facebook":
-					$post[7] .= $post[7] != ""?", ":"";
-					
-					$post[8] = $row[3];
-					if ($row[5] == "wall") {
-						$post[7] .= $row[5];
-					} else if (isset($fbaccountnames[$row[5]])) {
-						// Look up account page id in cache or if not there fetch from fb 
-						$post[7] .= $fbaccountnames[$row[5]];
-					} else {
-						try {
-							$accountinfo = $facebookapi->api("/$row[5]", 'GET', array());
-							if ($accountinfo) {
-								$fbaccountnames[$row[5]] = $accountinfo["name"];
-								$post[7] .= $accountinfo["name"];
-							} else {
-								$fbaccountnames[$row[5]] = $row[5];//_L("Not Available");
-								$post[7] .= $row[5]; //_L("Not Available");
-							}
-						} catch (FacebookApiException $e) {
-							$fbaccountnames[$row[5]] = $row[5];// _L("Not Available");
-							$post[7] = $row[5];// _L("Not Available");
-							error_log($e);
-							return false;
-						}
-					}
-					break;
-				case "twitter":
-					$post[9] = $row[5];
-					$post[10] = $row[3];
-					// Do not modify, Just print the handle 
-					break;
-			} 
-			
-			$data[$row[0]] = $post;
+		if (getSystemSetting('_hasfacebook', false)) {
+			echo "<td>" . escapehtml($post["fbdest"]) . "</td><td>" . ConditionalContentLink("fb_$alt", $post["fbcontent"]) . "</td>";
 		}
+		if (getSystemSetting('_hastwitter', false)) {
+			echo "<td>" . escapehtml($post["twhandle"]) . "</td><td>" . ConditionalContentLink("tw_$alt", $post["twcontent"]) . "</td>";
+		}
+		echo '</tr>';
 	}
-	showTable($data, $titles, $formatters);
 	echo '</table>';
 	
 	endWindow();
 }
 buttons();
+?>
+<script type="text/javascript">
+document.observe('dom:loaded', function() {
+	var tipids = [<?= (count($tipsids) > 0 ? "'" . implode("','",$tipsids) . "'" : "") ?>];
+	tipids.each(function(id) {
+		new Tip($(id), $(id + '_long').innerHTML, {
+			style: 'protogrey',
+			radius: 4,
+			border: 4,
+			hideAfter: 0.5,
+			stem: 'rightMiddle',
+			hook: {  target: 'leftMiddle', tip: 'rightMiddle' }
+		});
+	})
+});
+</script>
+<?
 include_once("navbottom.inc.php");
 ?>
