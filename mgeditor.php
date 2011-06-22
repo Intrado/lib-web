@@ -303,7 +303,7 @@ function makeMessageGrid($messagegroup) {
 		$columnlabels[] = "Twitter";
 	}
 	
-	if ((getSystemSetting('_hasfacebook', false) || getSystemSetting('_hastwitter', false)) && $USER->authorize('twitterpost', 'facebookpost')) {
+	if ((getSystemSetting('_hasfacebook', false) && $USER->authorize('facebookpost')) || (getSystemSetting('_hastwitter', false) && $USER->authorize('twitterpost'))) {
 		$buttons[] = array("button" => icon_button("Page", "layout_sidebar", "", "editmessagepage.php?new&mgid=".$messagegroup->id));
 		$columnlabels[] = "Page";
 	}
