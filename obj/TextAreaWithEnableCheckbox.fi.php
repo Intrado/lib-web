@@ -8,6 +8,8 @@
  *  cols - number of columns for the text area to display
  *  enabletext - label to use on the enable/disable checkbox
  *  counter - creates a decrementing counter indicating the maximum text length
+ *  defaultvalue - can be used to set a default value to populate the text area
+ *     useful if your inital value is disabled, but you want to populate on enable
  *  
  * Supporting the following feature set
  * 	Inputing text with a visual clue (checkbox) that it's optional
@@ -23,9 +25,10 @@ class TextAreaWithEnableCheckbox extends FormItem {
 		$cols = isset($this->args['cols']) ? 'cols="'.$this->args['cols'].'"' : "";
 		
 		$enabletext = (isset($this->args['enabletext'])?$this->args['enabletext']:_L("Enabled"));
+		$defaultvalue = (isset($this->args['defaultvalue'])?$this->args['defaultvalue']:_L("Enabled"));
 		$str = '
 			<input id="'.$n.'-enable" name="'.$n.'-enable" type="checkbox" '.($value?"checked":"").' /><label for="'.$n.'-enable">'. $enabletext .'</label>
-			<input id="'.$n.'-oldtext" type="hidden" value="'.escapehtml($value).'" />
+			<input id="'.$n.'-oldtext" type="hidden" value="'.escapehtml($defaultvalue).'" />
 			<div id="'.$n.'-textareadiv" style="display:'.($value?"block":"none").'">
 				<textarea id="'.$n.'" name="'.$n.'" '.$rows.' '.$cols.'>'.escapehtml($value).'</textarea>';
 		if(isset($this->args['counter']))
