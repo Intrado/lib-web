@@ -130,7 +130,6 @@ $wizdata = array(
 			"facebookauth" => new JobWiz_facebookAuth(_L("Connect Facebook")),
 			"twitterauth" => new JobWiz_twitterAuth(_L("Connect Twitter")),
 			"socialmedia" => new JobWiz_socialMedia(_L("Text Post")),
-			"postvoice" => new JobWiz_postVoice(_L("Voice Post")),
 			"facebookpage" => new JobWiz_facebookPage(_L("Facebook Page(s)"))
 		))
 	)),
