@@ -68,6 +68,11 @@ class PreviewModal {
 				$modal->text = $message->renderSmsParts($parts);
 				$modal->title = _L("%s SMS Message" , Language::getName($message->languagecode));
 				break;
+			case "post":
+				$part = DBFind('MessagePart', 'from messagepart where messageid=? and sequence = 0', false, array($message->id));
+				$modal->text = $part->txt;
+				$modal->title = _L("%s %s Message" , Language::getName($message->languagecode), ucfirst($message->subtype));
+				break;
 			default:
 				return;
 		}
