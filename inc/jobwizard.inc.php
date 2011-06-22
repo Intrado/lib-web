@@ -4,196 +4,55 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 // Check the whole of the wizard post data and include user authorization to figure out if this wizard has an assigned message group
-function wizHasMessageGroup($postdata) {
+function wizHasMessageGroup($wiz) {
 	global $USER;
-
-	// user has to be able to send some kind of message
-	if (!$USER->authorize("sendphone") && !$USER->authorize("sendemail") && !($USER->authorize("sendsms") && getSystemSetting("_hassms")))
-		return false;
-
-	$package = isset($postdata["/start"]["package"])?$postdata["/start"]["package"]:false;
-	$messageoptions = isset($postdata["/message/options"]["options"])?$postdata["/message/options"]["options"]:false;
-
-	// if it's custom and pick message and there is a message group selected
-	if($package == "custom" && $messageoptions == "pick" && isset($postdata["/message/pickmessage"]["messagegroup"]))
+	if ($wiz->dataHelper("/message/pickmessage:messagegroup"))
 		return true;
-
 	return false;
 }
 
-// Check the whole of the wizard post data and include user authorization to figure out if this wizard has an assigned phone message
-function wizHasPhone($postdata) {
-	global $USER;
-
-	if (!$USER->authorize("sendphone"))
-		return false;
-
-	$package = isset($postdata["/start"]["package"])?$postdata["/start"]["package"]:false;
-	$callme = isset($postdata["/message/phone/callme"]["message"])?json_decode($postdata["/message/phone/callme"]["message"]):false;
-
-	// if it's an easycall and message has been recorded
-	if ($package == 'easycall' && $callme)
+// Check the wizard to figure out if this wizard has an assigned message
+function wizHasMessage($wiz, $messagetype) {
+	if ($messagetype == "phone") {
+		if ($wiz->dataHelper("/message/phone/callme:message"))
+			return true;
+	}
+	if ($wiz->dataHelper("/message/$messagetype/text:message"))
 		return true;
-
-	$phonetext = isset($postdata["/message/phone/text"]["message"])?$postdata["/message/phone/text"]["message"]:false;
-
-	// if it's express and message text entered
-	if ($package == 'express' && $phonetext)
-		return true;
-
-	// if it's personalized and message recorded
-	if ($package == 'personalized' && $callme)
-		return true;
-
-	$messageoptions = isset($postdata["/message/options"]["options"])?$postdata["/message/options"]["options"]:false;
-	$messagepick = isset($postdata["/message/pick"]["type"])?$postdata["/message/pick"]["type"]:array();
-	$messageselectphone = isset($postdata["/message/select"]["phone"])?$postdata["/message/select"]["phone"]:false;
-
-	// if custom and create message and phone selected and record requested and message recorded
-	if ($package == 'custom' && $messageoptions == 'create' && in_array('phone', $messagepick) && $messageselectphone == 'record' && $callme)
-		return true;
-
-	// if custom and create message and phone selected and text requested and message text entered
-	if ($package == 'custom' && $messageoptions == 'create' && in_array('phone', $messagepick) && $messageselectphone == 'text' && $phonetext)
-		return true;
-
-	$messagegroupid = isset($postdata["/message/pickmessage"]["messagegroup"])?$postdata["/message/pickmessage"]["messagegroup"]:false;
-	$messagegroup = DBFind("MessageGroup", "from messagegroup where id = ?", false, array($messagegroupid));
-
-	// if custom and select saved and selected message group has a phone message
-	if ($package == 'custom' && $messageoptions == 'pick' && $messagegroup && $messagegroup->hasMessage('phone'))
-		return true;
-
+	if ($wiz->dataHelper("/message/pickmessage:messagegroup")) {
+		$mg = new MessageGroup($wiz->dataHelper("/message/pickmessage:messagegroup"));
+		return $mg->hasMessage($messagetype);
+	}
 	return false;
-}
-
-// Check the whole of the wizard post data and include user authorization to figure out if this wizard has an assigned email message
-function wizHasEmail($postdata) {
-	global $USER;
-
-	if (!$USER->authorize("sendemail"))
-		return false;
-
-	$package = isset($postdata["/start"]["package"])?$postdata["/start"]["package"]:false;
-
-	// easycall never attaches an email message
-	if ($package == 'easycall')
-		return false;
-
-	$emailtext = isset($postdata["/message/email/text"]["message"])?$postdata["/message/email/text"]["message"]:false;
-
-	// express and email text entered
-	if ($package == 'express' && $emailtext)
-		return true;
-
-	// personalized and email text entered
-	if ($package == 'personalized' && $emailtext)
-		return true;
-
-	$messageoptions = isset($postdata["/message/options"]["options"])?$postdata["/message/options"]["options"]:false;
-	$messagepick = isset($postdata["/message/pick"]["type"])?$postdata["/message/pick"]["type"]:array();
-
-	// if custom and create message and email selected and email text entered
-	if ($package == 'custom' && $messageoptions == 'create' && in_array('email', $messagepick) && $emailtext)
-		return true;
-
-	$messagegroupid = isset($postdata["/message/pickmessage"]["messagegroup"])?$postdata["/message/pickmessage"]["messagegroup"]:false;
-	$messagegroup = DBFind("MessageGroup", "from messagegroup where id = ?", false, array($messagegroupid));
-
-	// if custom and select saved and selected message group has an email message
-	if ($package == 'custom' && $messageoptions == 'pick' && $messagegroup && $messagegroup->hasMessage('email'))
-		return true;
-
-	return false;
-}
-
-// Check the whole of the wizard post data and include user authorization to figure out if this wizard has an assigned sms message
-function wizHasSms($postdata) {
-	global $USER;
-
-	if (!$USER->authorize("sendsms") || !getSystemSetting("_hassms"))
-		return false;
-
-	$package = isset($postdata["/start"]["package"])?$postdata["/start"]["package"]:false;
-
-	// easycall never attaches an sms message
-	if ($package == 'easycall')
-		return false;
-
-	$smstext = isset($postdata["/message/sms/text"]["message"])?$postdata["/message/sms/text"]["message"]:false;
-
-	// express and sms text entered
-	if ($package == 'express' && $smstext)
-		return true;
-
-	// personalized and sms text entered
-	if ($package == 'personalized' && $smstext)
-		return true;
-
-	$messageoptions = isset($postdata["/message/options"]["options"])?$postdata["/message/options"]["options"]:false;
-	$messagepick = isset($postdata["/message/pick"]["type"])?$postdata["/message/pick"]["type"]:array();
-
-	// if custom and create message and sms selected and sms text entered
-	if ($package == 'custom' && $messageoptions == 'create' && in_array('sms', $messagepick) && $smstext)
-		return true;
-
-	$messagegroupid = isset($postdata["/message/pickmessage"]["messagegroup"])?$postdata["/message/pickmessage"]["messagegroup"]:false;
-	$messagegroup = DBFind("MessageGroup", "from messagegroup where id = ?", false, array($messagegroupid));
-
-	// if custom and select saved and selected message group has an sms message
-	if ($package == 'custom' && $messageoptions == 'pick' && $messagegroup && $messagegroup->hasMessage('sms'))
-		return true;
-
-	return false;
+	
 }
 
 // checks postdata to see if any auto translations are requested
-function wizHasTranslation($postdata) {
-	if (isset($postdata["/start"]["package"])) {
-		$package = $postdata["/start"]["package"];
-		if(isset($postdata['/message/email/text']['translate']) && $postdata['/message/email/text']['translate']) {
-			if($package == 'express' || $package == 'personalized') {
-				return true;
-			}
-			if($package == 'custom' &&
-			   isset($postdata["/message/options"]["options"])  &&
-			   $postdata["/message/options"]["options"] == "create" && // Need to take create Path
-			   isset($postdata['/message/pick']['type']) &&
-			   in_array('email', $postdata['/message/pick']['type'])
-			   ) {
-				return true;
-			}
-		}
-		if(isset($postdata['/message/phone/text']['translate']) && $postdata['/message/phone/text']['translate']) {
-			if($package == 'express' || $package == 'personalized') {
-				return true;
-			}
-			if($package == 'custom' &&
-			   isset($postdata["/message/options"]["options"])  &&
-			   $postdata["/message/options"]["options"] == "create" && // Need to take create Path
-			   isset($postdata['/message/pick']['type']) &&
-			   in_array('phone', $postdata['/message/pick']['type'])
-			   ) {
-				return true;
-			}
-		}
-		if($package == "custom" && isset($postdata['/message/options']["options"]) &&
-			$postdata["/message/options"]["options"] == "pick" &&
-			isset($postdata['/message/pickmessage']["messagegroup"]) &&
-				QuickQuery("select 1 from message where messagegroupid = ? and autotranslate = 'translated' limit 1", false, array($postdata['/message/pickmessage']["messagegroup"]))) {
-				return true;
+function wizHasTranslation($wiz) {
+	if ($wiz->dataHelper('/message/email/text:translate'))
+		return true;
+	if ($wiz->dataHelper('/message/phone/text:translate'))
+		return true;
+	if ($wiz->dataHelper('/message/pickmessage:messagegroup')) {
+		if (QuickQuery("select 1 from message where messagegroupid = ? 
+						and autotranslate = 'translated' limit 1", 
+						false, array($wiz->dataHelper('/message/pickmessage:messagegroup')))) {
+			return true;
 		}
 	}
 	return false;
 }
 
 // get the user requested schedule out of postdata
-function getSchedule($postdata) {
+function getSchedule($wiz) {
 	global $ACCESS;
 	global $USER;
 	$schedule = array();
 
-	$scheduleoptions = isset($postdata["/schedule/options"]["schedule"])?$postdata["/schedule/options"]["schedule"]:false;
+	$scheduleoptions = $wiz->dataHelper("/schedule/options:schedule");
+	$maxjobdays = $wiz->dataHelper("/schedule/advanced:maxjobdays");
+	if (!$maxjobdays)
+		$maxjobdays = 1;
 	switch ($scheduleoptions) {
 		case "now":
 
@@ -225,9 +84,8 @@ function getSchedule($postdata) {
 			
 			$calllate = date("g:i a", $calllatesec);
 			
-
 			$schedule = array(
-				"maxjobdays" => isset($postdata["/schedule/advanced"]["maxjobdays"])?$postdata["/schedule/advanced"]["maxjobdays"]:1,
+				"maxjobdays" => $maxjobdays,
 				"date" => date('m/d/Y'),
 				"callearly" => $callearly,
 				"calllate" => $calllate
@@ -235,15 +93,15 @@ function getSchedule($postdata) {
 			break;
 		case "schedule":
 			$schedule = array(
-				"maxjobdays" => isset($postdata["/schedule/advanced"]["maxjobdays"])?$postdata["/schedule/advanced"]["maxjobdays"]:1,
-				"date" => date('m/d/Y', strtotime($postdata["/schedule/date"]["date"])),
-				"callearly" => $postdata["/schedule/date"]["callearly"],
-				"calllate" => $postdata["/schedule/date"]["calllate"]
+				"maxjobdays" => $maxjobdays,
+				"date" => date('m/d/Y', strtotime($wiz->dataHelper("/schedule/date:date"))),
+				"callearly" => $wiz->dataHelper("/schedule/date:callearly"),
+				"calllate" => $wiz->dataHelper("/schedule/date:calllate")
 			);
 			break;
 		case "template":
 			$schedule = array(
-				"maxjobdays" => isset($postdata["/schedule/advanced"]["maxjobdays"])?$postdata["/schedule/advanced"]["maxjobdays"]:1,
+				"maxjobdays" => $maxjobdays,
 				"date" => false,
 				"callearly" => false,
 				"calllate" => false
@@ -255,9 +113,9 @@ function getSchedule($postdata) {
 	return $schedule;
 }
 
-function parseLists ($postdata) {
+function parseLists ($wiz) {
 	// get the list or lists
-	$joblists = json_decode($postdata["/list"]["listids"]);
+	$joblists = $wiz->dataHelper("/list:listids", true);
 	// Remove temporary 'addme' token from listids. (not a valid listid, obviously)
 	if (($i = array_search('addme', $joblists)) !== false)
 		unset($joblists[$i]);
@@ -266,60 +124,38 @@ function parseLists ($postdata) {
 }
 
 //returns true if some of the lists were created in the wizard
-function someListsAreNew ($postdata) {
-	$joblists = parseLists($postdata);
-		
+function someListsAreNew ($wiz) {
+	$joblists = parseLists($wiz);
 	if (count($joblists) == 0)
 		return false;
-	
 	//see if any of the lists are softdeleted, which means they must have been created in the wizard (can't select them otherwise)
 	$query = "select 1 from list where deleted and id in (" . DBParamListString(count($joblists)). ") limit 1";
 	
 	return QuickQuery($query, false, $joblists); 
 }
 
-function facebookEnabled($postdata) {
+function facebookAuthorized($wiz) {
 	global $USER;
-	$facebookEnabled = false;
-	// if they are allowed to post
 	if (getSystemSetting("_hasfacebook") && $USER->authorize("facebookpost")) {
-	
 		// this user's accesstoken validity
 		$isvalidtoken = (isset($_SESSION['wiz_facebookauth']) && $_SESSION['wiz_facebookauth']);
-		
-		// if we started with a valid token
-		if ($isvalidtoken)
-			$facebookEnabled = true;
-
-		// if we had invalid access token but authed it later
-		if (!$isvalidtoken && 
-				isset($postdata['/message/post/facebookauth']['facebookauth']) && 
-				$postdata['/message/post/facebookauth']['facebookauth'])
-			$facebookEnabled = true;
+		// if we started with a valid token or added one later
+		if ($isvalidtoken || $wiz->dataHelper('/message/post/facebookauth:facebookauth'))
+			return true;
 	}
-	return $facebookEnabled;
+	return false;
 }
 
-function twitterEnabled($postdata) {
+function twitterAuthorized($wiz) {
 	global $USER;
-	$twitterEnabled = false;
-	// if they are allowed to post
 	if (getSystemSetting("_hastwitter") && $USER->authorize("twitterpost")) {
-	
 		// this user's accesstoken validity
 		$isvalidtoken = (isset($_SESSION['wiz_twitterauth']) && $_SESSION['wiz_twitterauth']);
-		
-		// if we started with a valid token
-		if ($isvalidtoken)
-			$twitterEnabled = true;
-
-		// if we had invalid access token but authed it later
-		if (!$isvalidtoken && 
-				isset($postdata['/message/post/twitterauth']['twitterauth']) && 
-				$postdata['/message/post/twitterauth']['twitterauth'])
-			$twitterEnabled = true;
+		// if we started with a valid token or added one later
+		if ($isvalidtoken || $wiz->dataHelper('/message/post/twitterauth:twitterauth'))
+			return true;
 	}
-	return $twitterEnabled;
+	return false;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -820,12 +656,9 @@ class JobWiz_messageOptions extends WizStep {
 
 	//returns true if this step is enabled
 	function isEnabled($postdata, $step) {
-		if (isset($postdata['/start']['package']) &&
-			$postdata['/start']['package'] == "custom") {
+		if ($this->parent->dataHelper('/start:package') == "custom")
 			return true;
-		} else {
-			return false;
-		}
+		return false;
 	}
 }
 
@@ -888,15 +721,10 @@ class JobWiz_messageGroupChoose extends WizStep {
 	//returns true if this step is enabled
 	function isEnabled($postdata, $step) {
 		global $USER;
-
 		if (!$USER->authorize("sendphone") && !$USER->authorize("sendemail") && !($USER->authorize("sendsms") && getSystemSetting("_hassms")))
 			return false;
-
-		$package = isset($postdata["/start"]["package"])?$postdata["/start"]["package"]:false;
-		$messageoptions = isset($postdata["/message/options"]["options"])?$postdata["/message/options"]["options"]:false;
-
 		// if custom and pick message selected
-		if ($package == 'custom' && $messageoptions == "pick")
+		if ($this->parent->dataHelper("/message/options:options") == "pick")
 			return true;
 
 		return false;
@@ -940,12 +768,9 @@ class JobWiz_messageType extends WizStep {
 
 	//returns true if this step is enabled
 	function isEnabled($postdata, $step) {
-		if (isset($postdata['/start']['package']) && $postdata['/start']['package'] == "custom"
-			&& isset($postdata['/message/options']['options']) && $postdata['/message/options']['options'] == "create") {
+		if ($this->parent->dataHelper("/message/options:options") == "create")
 			return true;
-		} else {
-			return false;
-		}
+		return false;
 	}
 }
 
@@ -982,13 +807,9 @@ class JobWiz_messageSelect extends WizStep {
 
 	//returns true if this step is enabled
 	function isEnabled($postdata, $step) {
-		if (isset($postdata['/start']['package']) && $postdata['/start']['package'] == "custom" &&
-			isset($postdata['/message/options']['options']) && $postdata['/message/options']['options'] == "create" &&
-			isset($postdata['/message/pick']['type']) && in_array('phone',$postdata['/message/pick']['type'])) {
+		if (in_array('phone',$this->parent->dataHelper('/message/pick:type', false, array())))
 			return true;
-		} else {
-			return false;
-		}
+		return false;
 	}
 }
 
@@ -1019,7 +840,7 @@ class JobWiz_messagePhoneText extends WizStep {
 			$formdata["translate"] = array(
 				"label" => _L("Translate"),
 				"fieldhelp" => _L('Check here if you would like to use automatic translation. Remember automatic translation is improving all the time, but it\'s not perfect yet. Be sure to preview and try reverse translation in the next screen.'),
-				"value" => ($postdata['/start']['package'] == "express")?true:false,
+				"value" => ($this->parent->dataHelper('/start:package') == "express")?true:false,
 				"validators" => array(),
 				"control" => array("CheckBox"),
 				"helpstep" => 2
@@ -1035,28 +856,12 @@ class JobWiz_messagePhoneText extends WizStep {
 		if (!$USER->authorize("sendphone"))
 			return false;
 
-		$package = false;
-		if (isset($postdata['/start']['package']))
-			$package = $postdata['/start']['package'];
-
 		// if its express, you have to enter phone text
-		if ($package == "express")
+		if ($this->parent->dataHelper('/start:package') == "express")
 			return true;
 
-		$messageoption = false;
-		if (isset($postdata['/message/options']["options"]))
-			$messageoption = $postdata['/message/options']["options"];
-
-		$messagepick = array();
-		if (isset($postdata['/message/pick']['type']))
-			$messagepick = $postdata['/message/pick']['type'];
-
-		$messageselectphone = false;
-		if (isset($postdata["/message/select"]["phone"]))
-			$messageselectphone = $postdata["/message/select"]["phone"];
-
 		// if it's custom and type create and phone is selected and you chose text, you must enter phone text
-		if ($package == 'custom' && $messageoption == 'create' && in_array('phone',$messagepick) && $messageselectphone == 'text')
+		if ($this->parent->dataHelper('/message/select:phone') == "text")
 			return true;
 
 		return false;
@@ -1098,7 +903,7 @@ class JobWiz_messagePhoneTranslate extends WizStep {
 		static $translations = false;
 		static $translationlanguages = false;
 
-		$msgdata = isset($postdata['/message/phone/text']['message'])?json_decode($postdata['/message/phone/text']['message']):json_decode('{"gender": "female", "text": ""}');
+		$msgdata = $this->parent->dataHelper("/message/phone/text:message", true, '{"gender": "female", "text": ""}');
 
 		$warning = "";
 		if(mb_strlen($msgdata->text) > 4000) {
@@ -1181,30 +986,8 @@ class JobWiz_messagePhoneTranslate extends WizStep {
 		if (!$USER->authorize("sendphone") || !$USER->authorize("sendmulti"))
 			return false;
 
-		$package = false;
-		if (isset($postdata['/start']['package']))
-			$package = $postdata['/start']['package'];
-
-		$translate = (isset($postdata["/message/phone/text"]["translate"])?$postdata["/message/phone/text"]["translate"]:false);
-
-		// if its express and phone translation requested
-		if ($package == "express" && $translate)
-			return true;
-
-		$messageoption = false;
-		if (isset($postdata['/message/options']["options"]))
-			$messageoption = $postdata['/message/options']["options"];
-
-		$messagepick = array();
-		if (isset($postdata['/message/pick']['type']))
-			$messagepick = $postdata['/message/pick']['type'];
-
-		$messageselectphone = false;
-		if (isset($postdata["/message/select"]["phone"]))
-			$messageselectphone = $postdata["/message/select"]["phone"];
-
-		// if it's custom and type create and phone is selected and you chose text and translation requested
-		if ($package == 'custom' && $messageoption == 'create' && in_array('phone',$messagepick) && $messageselectphone == 'text' && $translate)
+		// if phone translation requested
+		if ($this->parent->dataHelper("/message/phone/text:translate"))
 			return true;
 
 		return false;
@@ -1264,28 +1047,13 @@ class JobWiz_messagePhoneEasyCall extends WizStep {
 		if (!$USER->authorize("sendphone"))
 			return false;
 
-		$package = false;
-		if (isset($postdata['/start']['package']))
-			$package = $postdata['/start']['package'];
-
 		// if its easycall or personalized, you have to record
+		$package = $this->parent->dataHelper('/start:package');
 		if ($package == "easycall" || $package == "personalized")
 			return true;
-
-		$messageoption = false;
-		if (isset($postdata['/message/options']["options"]))
-			$messageoption = $postdata['/message/options']["options"];
-
-		$messagepick = array();
-		if (isset($postdata['/message/pick']['type']))
-			$messagepick = $postdata['/message/pick']['type'];
-
-		$messageselectphone = false;
-		if (isset($postdata["/message/select"]["phone"]))
-			$messageselectphone = $postdata["/message/select"]["phone"];
-
+			
 		// if it's custom and type create and phone is selected and you chose record, you must record
-		if ($package == 'custom' && $messageoption == 'create' && in_array('phone',$messagepick) && $messageselectphone == 'record')
+		if ($this->parent->dataHelper("/message/select:phone") == 'record')
 			return true;
 
 		return false;
@@ -1296,7 +1064,8 @@ class JobWiz_messagePhoneEasyCall extends WizStep {
 class JobWiz_messageEmailText extends WizStep {
 	function getForm($postdata, $curstep) {
 		global $USER;
-		$msgdata = isset($postdata['/message/phone/text']['message'])?json_decode($postdata['/message/phone/text']['message']):json_decode('{"text": ""}');
+		$msgdata = $this->parent->dataHelper("/message/phone/text:message", true, '{"gender": "female", "text": ""}');
+		
 		// Form Fields.
 		$formdata = array($this->title);
 
@@ -1384,24 +1153,13 @@ class JobWiz_messageEmailText extends WizStep {
 		if (!$USER->authorize("sendemail"))
 			return false;
 
-		$package = false;
-		if (isset($postdata['/start']['package']))
-			$package = $postdata['/start']['package'];
-
 		// if its express or personalized, you have to enter email text
+		$package = $this->parent->dataHelper('/start:package');
 		if ($package == "express" || $package == "personalized")
 			return true;
-
-		$messageoption = false;
-		if (isset($postdata['/message/options']["options"]))
-			$messageoption = $postdata['/message/options']["options"];
-
-		$messagepick = array();
-		if (isset($postdata['/message/pick']['type']))
-			$messagepick = $postdata['/message/pick']['type'];
-
+		
 		// if it's custom and type create and email is selected, you must enter email text
-		if ($package == 'custom' && $messageoption == 'create' && in_array('email',$messagepick))
+		if (in_array('email',$this->parent->dataHelper('/message/pick:type', false, array())))
 			return true;
 
 		return false;
@@ -1416,7 +1174,7 @@ class JobWiz_messageEmailTranslate extends WizStep {
 		static $translations = false;
 		static $translationlanguages = false;
 
-		$englishtext = isset($postdata['/message/email/text']['message'])?$postdata['/message/email/text']['message']:"";
+		$englishtext = $this->parent->dataHelper('/message/email/text:message', false, "");
 
 		$warning = "";
 		if(mb_strlen($englishtext) > 4000) {
@@ -1511,28 +1269,10 @@ class JobWiz_messageEmailTranslate extends WizStep {
 		if (!$USER->authorize("sendemail") || !$USER->authorize("sendmulti"))
 			return false;
 
-		$package = false;
-		if (isset($postdata['/start']['package']))
-			$package = $postdata['/start']['package'];
-
-		$translate = (isset($postdata["/message/email/text"]["translate"])?$postdata["/message/email/text"]["translate"]:false);
-
-		// if its express or personalized and email translation requested
-		if (($package == "express" || $package == "personalized") && $translate)
+		// if email translation requested
+		if ($this->parent->dataHelper("/message/email/text:translate"))
 			return true;
-
-		$messageoption = false;
-		if (isset($postdata['/message/options']["options"]))
-			$messageoption = $postdata['/message/options']["options"];
-
-		$messagepick = array();
-		if (isset($postdata['/message/pick']['type']))
-			$messagepick = $postdata['/message/pick']['type'];
-
-		// if it's custom and type create and email is selected and translation requested
-		if ($package == 'custom' && $messageoption == 'create' && in_array('email',$messagepick) && $translate)
-			return true;
-
+		
 		return false;
 	}
 }
@@ -1573,33 +1313,19 @@ class JobWiz_messageSmsText extends WizStep {
 	function isEnabled($postdata, $step) {
 		global $USER;
 		
-		// if the customer doesn't have sms
-		if (!getSystemSetting('_hassms'))
-			return false;
-		
-		if (!$USER->authorize("sendsms"))
+		// if the customer/user doesn't have sms
+		if (!getSystemSetting('_hassms') || !$USER->authorize("sendsms"))
 			return false;
 
-		$package = false;
-		if (isset($postdata['/start']['package']))
-			$package = $postdata['/start']['package'];
-
-		// if its express or personalized, you have to enter sms text
+		// if its express or personalized, you have to enter email text
+		$package = $this->parent->dataHelper('/start:package');
 		if ($package == "express" || $package == "personalized")
 			return true;
-
-		$messageoption = false;
-		if (isset($postdata['/message/options']["options"]))
-			$messageoption = $postdata['/message/options']["options"];
-
-		$messagepick = array();
-		if (isset($postdata['/message/pick']['type']))
-			$messagepick = $postdata['/message/pick']['type'];
-
-		// if it's custom and type create and sms is selected, you must enter sms text
-		if ($package == 'custom' && $messageoption == 'create' && in_array('sms',$messagepick))
+		
+		// if it's custom and type create and sms is selected, you must enter email text
+		if (in_array('sms',$this->parent->dataHelper('/message/pick:type', false, array())))
 			return true;
-
+		
 		return false;
 	}
 }
@@ -1608,7 +1334,7 @@ class JobWiz_facebookAuth extends WizStep {
 	function getForm($postdata, $curstep) {
 	
 		// FB auth note
-		$html = "<div>". escapehtml(_L("You must authorize a Facebook account before you can post to Facebook.")). "</div>";
+		$html = "<div>". escapehtml(_L("If you would like to create a message on Facebook, connect to a facebook account now.")). "</div>";
 		
 		// Form Fields.
 		$formdata = array(
@@ -1640,32 +1366,24 @@ class JobWiz_facebookAuth extends WizStep {
 			return false;
 		
 		// this user's accesstoken validity. if their token is good, we don't need this step
-		$isvalidtoken = (isset($_SESSION['wiz_facebookauth']) && $_SESSION['wiz_facebookauth']);
-		if ($isvalidtoken)
+		if (isset($_SESSION['wiz_facebookauth']) && $_SESSION['wiz_facebookauth'])
 			return false;
 		
-		$package = isset($postdata['/start']['package'])?$postdata['/start']['package']:false;
-		if (!$package)
-			return false;
-		
-		if ($package == "custom") {
-			$customtype = isset($postdata['/message/options']['options'])?$postdata['/message/options']['options']:false;
-			$msgtypes = isset($postdata['/message/pick']['type'])?$postdata['/message/pick']['type']:array();
-			// auth is enabled for custom package in one of two ways
-			// type is create and post is selected
-			// type is pick and the message group has facebook content
-			if ($customtype == "create" && in_array("post", $msgtypes))
+		// if it's custom and type create and post is selected, you can authorize facebook
+		if ($this->parent->dataHelper('/start:package') == "custom") {
+			// selected post type
+			if (in_array('post',$this->parent->dataHelper('/message/pick:type', false, array())))
 				return true;
 			
-			$mgid = isset($postdata['/message/pickmessage']['messagegroup'])?$postdata['/message/pickmessage']['messagegroup']:false;
+			// if type is pick and the message group has facebook content
+			$mgid = $this->parent->dataHelper('/message/pickmessage:messagegroup');
 			if ($mgid)
 				$mg = new MessageGroup($mgid);
 			else
 				$mg = new MessageGroup();
 			
-			// picked a message group that has a facebook message
-			if ($customtype == "pick" && $mg->hasMessage("post","facebook"))
-					return true;
+			if ($mg->hasMessage("post","facebook"))
+				return true;
 		} else {
 			// any other package, it's enabled.
 			return true;
@@ -1679,7 +1397,7 @@ class JobWiz_twitterAuth extends WizStep {
 		global $USER;
 		
 		// Twitter auth note
-		$html = "<div>". escapehtml(_L("You must authorize a Twitter account before you can post to Twitter.")). "</div>";
+		$html = "<div>". escapehtml(_L("If you would like to create a message on Twitter, connect to a facebook account now.")). "</div>";
 		
 		// Form Fields.
 		$formdata = array(
@@ -1711,32 +1429,24 @@ class JobWiz_twitterAuth extends WizStep {
 			return false;
 		
 		// this user's accesstoken validity. if their token is good, we don't need this step
-		$isvalidtoken = (isset($_SESSION['wiz_twitterauth']) && $_SESSION['wiz_twitterauth']);
-		if ($isvalidtoken)
+		if (isset($_SESSION['wiz_twitterauth']) && $_SESSION['wiz_twitterauth'])
 			return false;
 		
-		$package = isset($postdata['/start']['package'])?$postdata['/start']['package']:false;
-		if (!$package)
-			return false;
-		
-		if ($package == "custom") {
-			$customtype = isset($postdata['/message/options']['options'])?$postdata['/message/options']['options']:false;
-			$msgtypes = isset($postdata['/message/pick']['type'])?$postdata['/message/pick']['type']:array();
-			// auth is enabled for custom package in one of two ways
-			// type is create and post is selected
-			// type is pick and the message group has facebook content
-			if ($customtype == "create" && in_array("post", $msgtypes))
+		// if it's custom and type create and post is selected, you can authorize twitter
+		if ($this->parent->dataHelper('/start:package') == "custom") {
+			// selected post type
+			if (in_array('post',$this->parent->dataHelper('/message/pick:type', false, array())))
 				return true;
 			
-			$mgid = isset($postdata['/message/pickmessage']['messagegroup'])?$postdata['/message/pickmessage']['messagegroup']:false;
+			// if type is pick and the message group has twitter content
+			$mgid = $this->parent->dataHelper('/message/pickmessage:messagegroup');
 			if ($mgid)
 				$mg = new MessageGroup($mgid);
 			else
 				$mg = new MessageGroup();
 			
-			// picked a message group that has a twitter message
-			if ($customtype == "pick" && $mg->hasMessage("post","twitter"))
-					return true;
+			if ($mg->hasMessage("post","twitter"))
+				return true;
 		} else {
 			// any other package, it's enabled.
 			return true;
@@ -1749,66 +1459,63 @@ class JobWiz_socialMedia extends WizStep {
 	function getForm($postdata, $curstep) {
 		global $USER;
 		
+		// only enabled by default on custom
+		$smEnable = false;
+		$package = isset($postdata['/start']['package'])?$postdata['/start']['package']:false;
+		$customtype = isset($postdata['/message/options']['options'])?$postdata['/message/options']['options']:false;
+		if ($package == "custom" && $customtype == "create")
+			$smEnable = true;
+		
+		$defaulttext = _L("We have sent out a new message, you can preview it here.");
+		
 		// for facebook text, check email, then phone, then sms
- 		if (isset($postdata['/message/email/text'])) {
-			if (isset($postdata['/message/email/text']['message']))
-				$fbtext = html_to_plain($postdata['/message/email/text']['message']);
-		} else if (isset($postdata['/message/phone/text'])) {
-			if (isset($postdata['/message/phone/text']['message'])) {
-				$msgdata = json_decode($postdata['/message/phone/text']['message']);
-				$fbtext = $msgdata->text;
-			}
-		} else if (isset($postdata['/message/sms/text'])) {
-			if (isset($postdata['/message/sms/text']['message']))
-				$fbtext = $postdata['/message/sms/text']['message'];
-		} else
-			$fbtext = "We have sent out a new message, you can preview it here.";
-
+		$fbtext = html_to_plain($this->parent->dataHelper('/message/email/text:message'));
+		if (!$fbtext )
+			$fbtext = $this->parent->dataHelper('/message/phone/text:message', true, '{"gender": "female", "text": ""}')->text;
+		if (!$fbtext)
+			$fbtext = $this->parent->dataHelper('/message/sms/text:message');
+		if (!$fbtext)
+			$fbtext = $defaulttext;
+		
 		// for twitter text, check sms, then email, then phone
-		if (isset($postdata['/message/sms/text'])) {
-			if (isset($postdata['/message/sms/text']['message']))
-				$twtext = $postdata['/message/sms/text']['message'];
-		} else if (isset($postdata['/message/email/text'])) {
-			if (isset($postdata['/message/email/text']['message']))
-				$twtext = html_to_plain($postdata['/message/email/text']['message']);
-		} else if (isset($postdata['/message/phone/text'])) {
-			if (isset($postdata['/message/phone/text']['message'])) {
-				$msgdata = json_decode($postdata['/message/phone/text']['message']);
-				$twtext = $msgdata->text;
-			}
-		} else 
-			$twtext = "We have sent out a new message, you can preview it here.";
+		$twtext = $this->parent->dataHelper('/message/sms/text:message');
+		if (!$twtext)
+			$twtext = html_to_plain($this->parent->dataHelper('/message/email/text:message'));
+		if (!$twtext)
+			$twtext = $this->parent->dataHelper('/message/phone/text:message', true, '{"gender": "female", "text": ""}')->text;
+		if (!$twtext)
+			$twtext = $defaulttext;
 		
 		$formdata = array($this->title);
 		$helpstepnum = 1;
 		$helpsteps = array();
 		
 		// Facebook
-		if (facebookEnabled($postdata)) {
+		if (facebookAuthorized($this->parent)) {
 			$helpsteps[] = _L("Enter the message you wish to deliver via Facebook.");
 			$formdata["fbdata"] = array(
 				"label" => _L('Facebook'),
 				"fieldhelp" => _L("Create your Facebook posting text here."),
-				"value" => $fbtext,
+				"value" => ($smEnable?$fbtext:""),
 				"validators" => array(
 					array("ValLength","max"=>420)),
-				"control" => array("TextAreaWithEnableCheckbox","rows"=>10,"cols"=>50,"counter"=>420),
+				"control" => array("TextAreaWithEnableCheckbox", "defaultvalue" => $fbtext, "rows"=>10,"cols"=>50,"counter"=>420),
 				"helpstep" => $helpstepnum++
 			);
 		}
 		
 		// Twitter
-		if (twitterEnabled($postdata)) {
+		if (twitterAuthorized($this->parent)) {
 			// need to reserve some characters for the link url and the six byte code. (http://smalldomain.com/<code>)
-			$reservedchars = mb_strlen("http://". getSystemSetting("tinydomain")) + 6;
+			$reservedchars = mb_strlen(" http://". getSystemSetting("tinydomain"). "/") + 6;
 			$helpsteps[] = _L("Enter the message you wish to deliver via Twitter.");
 			$formdata["twdata"] = array(
 				"label" => _L("Twitter"),
 				"fieldhelp" => _L("Select what text to use as a status update."),
-				"value" => $twtext,
+				"value" => ($smEnable?$twtext:""),
 				"validators" => array(
 					array("ValLength","max"=>(140 - $reservedchars))),
-				"control" => array("TextAreaWithEnableCheckbox","rows"=>5,"cols"=>50,"counter"=>(140 - $reservedchars)),
+				"control" => array("TextAreaWithEnableCheckbox", "defaultvalue" => $twtext, "rows"=>5,"cols"=>50,"counter"=>(140 - $reservedchars)),
 				"helpstep" => $helpstepnum++
 			
 			);
@@ -1819,22 +1526,16 @@ class JobWiz_socialMedia extends WizStep {
 	
 	//returns true if this step is enabled
 	function isEnabled($postdata, $step) {
-
-		$package = isset($postdata['/start']['package'])?$postdata['/start']['package']:false;
 		
-		if (!$package)
-			return false;
-		
-		if ($package == "custom") {
-			$customtype = isset($postdata['/message/options']['options'])?$postdata['/message/options']['options']:false;
-			$msgtypes = isset($postdata['/message/pick']['type'])?$postdata['/message/pick']['type']:array();
-			if ($customtype !== "create" || !in_array("post", $msgtypes))
-				return false;
+		if (facebookAuthorized($this->parent) || twitterAuthorized($this->parent)) {
+			// everything but custom enables this step outright
+			if ($this->parent->dataHelper('/start:package') !== "custom")
+				return true;
+			// if it's a create message and has post type
+			$msgtypes = $this->parent->dataHelper('/message/pick:type', false, array());
+			if ($msgtypes && in_array("post", $msgtypes))
+				return true;
 		}
-		
-		if (facebookEnabled($postdata) || twitterEnabled($postdata))
-			return true;
-		
 		return false;
 	}
 }
@@ -1862,37 +1563,18 @@ class JobWiz_facebookPage extends WizStep {
 	
 	//returns true if this step is enabled
 	function isEnabled($postdata, $step) {
-		// you need to select a page to post your facebook message to if...
-		// this is a custom message and you picked a message with facebook
+		// if type is pick and the message group has facebook content
+		$mgid = $this->parent->dataHelper('/message/pickmessage:messagegroup');
+		if ($mgid)
+			$mg = new MessageGroup($mgid);
+		else
+			$mg = new MessageGroup();
+		
+		if ($mg->hasMessage("post","facebook") && facebookAuthorized($this->parent))
+			return true;
+		
 		// or, there is a facebook message created
-		
-		$package = isset($postdata['/start']['package'])?$postdata['/start']['package']:false;
-		$fbdata = (isset($postdata['/message/post/socialmedia']['fbdata'])?$postdata['/message/post/socialmedia']['fbdata']:false);
-		
-		if (!$package)
-			return false;
-		
-		if ($package == "custom") {
-			$customtype = isset($postdata['/message/options']['options'])?$postdata['/message/options']['options']:false;
-			$mgid = isset($postdata['/message/pickmessage']['messagegroup'])?$postdata['/message/pickmessage']['messagegroup']:false;
-			if ($mgid)
-				$mg = new MessageGroup($mgid);
-			else
-				$mg = new MessageGroup();
-			
-			// picked a message group that doesn't have a facebook message
-			if ($customtype == "pick") {
-				if (!$mg->hasMessage("post","facebook"))
-					return false;
-			} else {
-				if (!$fbdata)
-					return false;
-			}
-		} else if (!$fbdata) {
-			return false;
-		}
-		
-		if (facebookEnabled($postdata))
+		if ($this->parent->dataHelper('/message/post/socialmedia:fbdata') && facebookAuthorized($this->parent))
 			return true;
 		
 		return false;
@@ -1903,8 +1585,8 @@ class JobWiz_scheduleOptions extends WizStep {
 	function getForm($postdata, $curstep) {
 		global $USER;
 		global $ACCESS;
-		$wizHasPhoneMsg = wizHasPhone($postdata);
-		$wizHasEmailMsg= wizHasEmail($postdata);
+		$wizHasPhoneMsg = wizHasMessage($this->parent, "phone");
+		$wizHasEmailMsg= wizHasMessage($this->parent, "email");
 		
 		$helpstepnum = 1;
 		
@@ -1974,9 +1656,9 @@ class JobWiz_scheduleOptions extends WizStep {
 		}
 		
 		//add checkbox for reviewing and saving lists if some lists were created in the wizard
-		if (someListsAreNew($postdata)) {
+		if (someListsAreNew($this->parent)) {
 			
-			$joblists = parseLists($postdata);
+			$joblists = parseLists($this->parent);
 			$lists = DBFindMany("PeopleList", "from list where deleted and id in (" . DBParamListString(count($joblists)). ")", false, $joblists);
 			
 			
@@ -2008,7 +1690,7 @@ class JobWiz_scheduleOptions extends WizStep {
 		}
 		
 		//add checkbox for reviewing and saving the message, only show message checkbox if they created the message
-		if (!wizHasMessageGroup($postdata)) {
+		if (!wizHasMessageGroup($this->parent)) {
 			$helpsteps[] = _L("You may save the message you've created in MessageSender so that it is available for future jobs. Your message will be viewable in the Message Builder, found under the Notifications tab.");
 			$formdata["savemessage"] = array(
 				"label" => _L("Save Message"),
@@ -2030,7 +1712,7 @@ class JobWiz_scheduleDate extends WizStep {
 		global $ACCESS;
 
 		// Check to see if translation is used anywhere in the wizard. If it is, the job cannot be scheduled out more than 7 days.
-		$translated = wizHasTranslation($postdata);
+		$translated = wizHasTranslation($this->parent);
 
 		// Form Fields.
 		$formdata = array($this->title);
@@ -2090,21 +1772,17 @@ class JobWiz_scheduleDate extends WizStep {
 
 	//returns true if this step is enabled
 	function isEnabled($postdata, $step) {
-		if (isset($postdata['/schedule/options']['schedule']) &&
-			$postdata['/schedule/options']['schedule'] == "schedule"
-		) {
+		if ($this->parent->dataHelper('/schedule/options:schedule') == "schedule")
 			return true;
-		} else {
-			return false;
-		}
+		return false;
 	}
 }
 class JobWiz_scheduleAdvanced extends WizStep {
 	function getForm($postdata, $curstep) {
 		global $USER;
 		global $ACCESS;
-		$wizHasPhoneMsg = wizHasPhone($postdata);
-		$wizHasEmailMsg= wizHasEmail($postdata);
+		$wizHasPhoneMsg = wizHasMessage($this->parent, "phone");
+		$wizHasEmailMsg= wizHasMessage($this->parent, "email");
 		$helpstepnum = 1;
 
 		$helpsteps = array();
@@ -2188,9 +1866,7 @@ class JobWiz_scheduleAdvanced extends WizStep {
 
 	//returns true if this step is enabled
 	function isEnabled($postdata, $step) {
-		$wizHasPhoneMsg = wizHasPhone($postdata);
-		$wizHasEmailMsg= wizHasEmail($postdata);
-		if (isset($postdata['/schedule/options']['advanced']) && $postdata['/schedule/options']['advanced'] && ($wizHasEmailMsg || $wizHasPhoneMsg))
+		if ($this->parent->dataHelper('/schedule/options:advanced'))
 			return true;
 		return false;
 	}
@@ -2198,10 +1874,10 @@ class JobWiz_scheduleAdvanced extends WizStep {
 
 class JobWiz_submitConfirm extends WizStep {
 	function getForm($postdata, $curstep) {
-		$wizHasPhoneMsg = wizHasPhone($postdata);
-		$wizHasEmailMsg= wizHasEmail($postdata);
-		$wizHasSmsMsg= wizHasSms($postdata);
-		$wizHasMessageGroup= wizHasMessageGroup($postdata);
+		$wizHasPhoneMsg = wizHasMessage($this->parent, "phone");
+		$wizHasEmailMsg= wizHasMessage($this->parent, "email");
+		$wizHasSmsMsg= wizHasMessage($this->parent, "sms");
+		$wizHasMessageGroup= wizHasMessageGroup($this->parent);
 
 		// if something is missing from post data send to unauthorized... NOTE THE NOT SYMBOL !!!
 		if (!(($wizHasPhoneMsg ||$wizHasEmailMsg || $wizHasSmsMsg || $wizHasMessageGroup) &&
@@ -2214,9 +1890,9 @@ class JobWiz_submitConfirm extends WizStep {
 			redirect('unauthorized.php');
 
 		// Built/Existing Lists
-		$lists = json_decode($postdata["/list"]["listids"]);
+		$lists = $this->parent->dataHelper("/list:listids", true);
 		unset($lists['addme']);
-		$calctotal = $postdata["/list"]["addme"] ? 1 : 0;
+		$calctotal = $this->parent->dataHelper("/list:addme")? 1 : 0;
 		foreach ($lists as $id) {
 			if (!userOwns('list', $id) && !isSubscribed("list", $id))
 				continue;
@@ -2229,7 +1905,7 @@ class JobWiz_submitConfirm extends WizStep {
 
 		$formdata = array($this->title);
 
-		$schedule = getSchedule($postdata);
+		$schedule = getSchedule($this->parent);
 		if ($schedule && $schedule['maxjobdays'] == 1 && $schedule['callearly'] && $schedule['calllate'] && ((strtotime($schedule['calllate']) - 3600) < strtotime($schedule['callearly']))) {
 			$html = '<div style="font-size: medium; color: red">' . escapehtml(_L('Your call window for this job appears to be less than one hour. It may not be able to retry all undelivered messages.'));
 			$formdata["warning"] = array(

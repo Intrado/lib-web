@@ -51,6 +51,7 @@ class Wizard {
 			$tail = substr($curstep,$pos+1);
 			return $this->_getStepData($wizdata[$first]->children,$tail);
 		} else {
+			$wizdata[$curstep]->parent = $this;
 			return $wizdata[$curstep];
 		}
 	}
@@ -129,6 +130,7 @@ class Wizard {
 				if (count($substeps) > 0)
 					$newwizdata[$wizstep] = new WizSection($wizstepdata->title,$substeps);
 			} else if ($wizstepdata instanceof WizStep) {
+				$wizstepdata->parent = $this;
 				if (isset($_SESSION[$this->name]['data']) && $wizstepdata->isEnabled($_SESSION[$this->name]['data'],$curstep . "/" . $wizstep))
 					$newwizdata[$wizstep] = $wizstepdata;
 			}
@@ -320,10 +322,43 @@ class Wizard {
 	function dataChange() {
 		return $this->datachange;
 	}
+	
+	// request data from the wizard postdata
+	// can request an individual step "/start" and it will return an array of the fields and values
+	// or, request a step with a field "/start:package" and it will return the value of that field
+	function dataHelper($stepOrField, $jsondecode = false, $defaultvalue = null) {
+		if (strpos($stepOrField, ":")) {
+			list($step, $field) = explode(":", $stepOrField);
+		} else { 
+			$step = $stepOrField;
+			$field = false;
+		}
+		
+		// get the step data out of session data
+		$stepdata = isset($_SESSION[$this->name]['data'][$step])?$_SESSION[$this->name]['data'][$step]:null;
+		
+		// is this step enabled? if not... return null
+		if ($stepdata === null || !$this->getStepData($step)->isEnabled($_SESSION[$this->name]['data'], $step))
+			return ($jsondecode?json_decode($defaultvalue):$defaultvalue);
+		
+		// if data for an individual field was requested, pull it out of the step data
+		if ($field) {
+			$fielddata = isset($_SESSION[$this->name]['data'][$step][$field])?$_SESSION[$this->name]['data'][$step][$field]:$defaultvalue;
+			return ($jsondecode?json_decode($fielddata):$fielddata);
+		}
+		
+		// jsondecode the step data?
+		if ($jsondecode) {
+			foreach ($stepdata as $field => $data)
+				$stepdata[$field] = json_decode($data);
+		}
+		return $stepdata;
+	}
 }
 
 abstract class WizStep {
 	var $title;
+	var $parent;
 	
 	function WizStep($title) {
 		$this->title = $title;
