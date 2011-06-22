@@ -3,10 +3,15 @@
 /////////////////////////////////////
 // AppServer MessageLink service
 
+
+//FIXME global keyword in a global context
+
 global $appserversocket;
 global $appservertransport;
 global $appserverprotocol;
 
+
+//FIXME this should only be executed if we need to use thrift, wrap in an init function or something. causes connections to appserver on each page load?
 try {
 	if (isset($SETTINGS['appserver']) && isset($SETTINGS['appserver']['host'])) {
 		$appserverhost = explode(":",$SETTINGS['appserver']['host']);
@@ -33,10 +38,13 @@ try {
 //////////////////////////////////////////////////////////
 // AppServer CommSuite service
 
+//FIXME global keyword in a global context
+
 global $appserverCommsuiteSocket;
 global $appserverCommsuiteTransport;
 global $appserverCommsuiteProtocol;
 
+//FIXME this should only be executed if we need to use thrift, wrap in an init function or something. causes connections to appserver on each page load?
 try {
 	if (isset($SETTINGS['appserver_commsuite']) && isset($SETTINGS['appserver_commsuite']['host'])) {
 		$appserverhost = explode(":",$SETTINGS['appserver_commsuite']['host']);
