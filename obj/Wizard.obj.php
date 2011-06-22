@@ -19,6 +19,7 @@ class Wizard {
 
 		$this->filteredwizdata = $this->filter();
 		//add finisher
+		$finish->parent = $this;
 		$this->wizdata['finish'] = $finish;
 		$this->filteredwizdata['finish'] = $finish;
 		
@@ -384,6 +385,7 @@ class WizSection {
 
 abstract class WizFinish {
 	var $title;
+	var $parent;
 	
 	function WizFinish ($title) {
 		$this->title = $title;
