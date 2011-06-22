@@ -275,6 +275,8 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		} else if ($button != 'inpagesubmit') {
 			Query("BEGIN");
 			
+			$messagegroup->modified = date("Y-m-d H:i:s", time());
+			$messagegroup->update(array("modified"));
 			// if this is an edit for an existing message
 			if ($message) {
 				// delete existing messages

@@ -201,7 +201,10 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		$postdata = $form->getData(); //gets assoc array of all values {name:value,...}
 		
 		Query("BEGIN");
-				
+		
+		$messagegroup->modified = date("Y-m-d H:i:s", time());
+		$messagegroup->update(array("modified"));
+		
 		// if this is not an edit of an existing message
 		if (!$message) {
 			// does there already exist a page message? if so, edit it

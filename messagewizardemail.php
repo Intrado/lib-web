@@ -494,6 +494,9 @@ class FinishMessageWizard extends WizFinish {
 		if (!userOwns("messagegroup", $messagegroup->id) || $messagegroup->deleted)
 			redirect('unauthorized.php');
 		
+		$messagegroup->modified = date("Y-m-d H:i:s", time());
+		$messagegroup->update(array("modified"));
+		
 		// get the language code from postdata
 		$langcode = (isset($postdata["/create/language"]["language"])?$postdata["/create/language"]["language"]:Language::getDefaultLanguageCode());
 		

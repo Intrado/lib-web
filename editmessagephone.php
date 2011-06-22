@@ -216,7 +216,8 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 			$USER->setSetting('defaultgender', $gender);
 			$messagegroup->preferredgender = $postdata['gender'];
 			$messagegroup->stuffHeaders();
-			$messagegroup->update(array("data"));
+			$messagegroup->modified = date("Y-m-d H:i:s", time());
+			$messagegroup->update(array("data","modified"));
 			
 			// if this is an edit for an existing message
 			if ($message) {

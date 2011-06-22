@@ -114,6 +114,9 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		
 		Query("BEGIN");
 		
+		$messagegroup->modified = date("Y-m-d H:i:s", time());
+		$messagegroup->update(array("modified"));
+			
 		// get an existing message to overwrite, if one exists
 		$message = DBFind("Message", "from message
 									where messagegroupid = ?

@@ -130,6 +130,9 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 			} else {
 				Query("BEGIN");
 				
+				$messagegroup->modified = date("Y-m-d H:i:s", time());
+				$messagegroup->update(array("modified"));
+			
 				// if this is not an edit of an existing message
 				if (!$message) {
 					// does there already exist a facebook message? if so, edit it

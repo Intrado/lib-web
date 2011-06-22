@@ -683,7 +683,8 @@ class FinishMessageWizard extends WizFinish {
 			//also set the messagegroup preferred gender
 			$messagegroup->preferredgender = $gender;
 			$messagegroup->stuffHeaders();
-			$messagegroup->update(array("data"));
+			$messagegroup->modified = date("Y-m-d H:i:s", time());
+			$messagegroup->update(array("data","modified"));
 		
 			// check for and retrieve translations
 			if (MsgWiz_translatePreview::isEnabled($postdata, false) && $langcode == "autotranslate") {

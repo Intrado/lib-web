@@ -13,6 +13,7 @@ class PreviewButton extends FormItem {
 					var form = event.findElement('form');
 					var parameters = " . $this->formatParameters($parameters) . ";
 					showPreview(parameters);return false;");
+		$str .= '<br /><br />';
 		return $str;
 	}
 	

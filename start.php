@@ -499,9 +499,6 @@ function activityfeed($mergeditems,$ajax = false) {
 					$tools = str_replace("&nbsp;|&nbsp;","<br />",$tools);
 					$icon = 'largeicons/addrbook.jpg';
 				} else if($item["type"] == "message") {
-//					$types = $item["phone"] > 0?"," . _L("phone"):"";
-//					$types .= $item["email"] > 0?"," . _L("email"):"";
-//					$types .= $item["sms"] > 0?"," . _L("sms"):"";
 					$types = $item["phone"] > 0?'<img src="img/icons/telephone.gif" alt="Phone" title="Phone">':"";
 					$types .= $item["email"] > 0?' <img src="img/icons/email.gif" alt="Email" title="Email">':"";
 					$types .= $item["sms"] > 0?' <img src="img/icons/fugue/mobile_phone.gif" alt="SMS" title="SMS">':"";
