@@ -136,7 +136,7 @@ function embedPlayer(target, code, numparts) {
 		'<param name=movie value="pp.swf?code=' + encodeURIComponent(code) + '&as=0&nump=' + numparts + '&files=bar">' + 
 		'<param name=quality value=high>' + 
 		'<param name=bgcolor value=#FFFFFF>' + 
-		'<embed src="pp.swf?code=' + encodeURIComponent(code) + '&as=0&nump=' + numparts + '&files=foo" quality=high bgcolor=#FFFFFF width="165" height="38" name="niftyPlayer1" align="" type="application/x-shockwave-flash" pluginspage="<?= isset($_SERVER['HTTPS'])?"https":"http" ?>://get.adobe.com/flashplayer">' +
+		'<embed src="pp.swf?code=' + encodeURIComponent(code) + '&as=0&nump=' + numparts" quality=high bgcolor=#FFFFFF width="165" height="38" name="niftyPlayer1" align="" type="application/x-shockwave-flash" pluginspage="<?= isset($_SERVER['HTTPS'])?"https":"http" ?>://get.adobe.com/flashplayer">' +
 		'</embed>' + 
 		'</object>';	
 	
