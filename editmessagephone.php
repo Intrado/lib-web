@@ -165,7 +165,7 @@ $formdata = array(
 		"value" => "",
 		"validators" => array(),
 		"control" => array("PreviewButton",
-			"language" => $language,
+			"language" => $languagecode,
 			"texttarget" => "message",
 			"gendertarget" => "gender",
 		),
