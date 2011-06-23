@@ -23,6 +23,11 @@ switch ($type) {
 			$USER->setSetting("fb_access_token", (($_POST['access_token'] == "false")?false:$_POST['access_token']));
 		break;
 	
+	case "store_user_id":
+		if (isset($_POST['fb_user_id']))
+			$USER->setSetting("fb_user_id", (($_POST['fb_user_id'] == "false")?false:$_POST['fb_user_id']));
+		break;
+		
 	default:
 		echo false;
 }

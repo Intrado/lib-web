@@ -87,23 +87,43 @@ class FacebookAuth extends FormItem {
 					val = access_token;
 					$(formitem).value = val;
 					
-					// ajax request to store it in the db
+					// ajax request to store data in the db
 					new Ajax.Request("ajaxfacebook.php", {
 						method:"post",
 						parameters: {
 							"type": "store_access_token",
 							"access_token": access_token}});
 					
-					// if we have an access token. display the pages selection
+					// if we have an access token. show the appropriate user information
 					if (access_token) {
 						$(formitem + "fbconnected").setStyle({display: "block"});
 						$(formitem + "fbdisconnected").setStyle({display: "none"});
 						fbLoadUserData(formitem);
+						// do a request to get the userid and store it in our db
+						FB.api("/me", { access_token: access_token }, function(r) {
+							if (r && !r.error) {
+								// store the current userid in the db
+								new Ajax.Request("ajaxfacebook.php", {
+									method:"post",
+									parameters: {
+										"type": "store_user_id",
+										"fb_user_id": r.id}
+								});
+							}
+						}); // end facebook api call
 					} else {
 						// no access token, show the connect button
 						$(formitem + "fbconnected").setStyle({display: "none"});
 						$(formitem + "fbdisconnected").setStyle({display: "block"});
+						// remove the current userid from the db
+						new Ajax.Request("ajaxfacebook.php", {
+							method:"post",
+							parameters: {
+								"type": "store_user_id",
+								"fb_user_id": ""}
+						});
 					}
+					
 					
 				}
 			
