@@ -242,7 +242,7 @@ function showActionGrid ($columnlabels, $rowlabels, $links) {
 					}
 				} elseif (isset($link['button'])) {
 					echo "<td>
-							{$link['button']}
+							<div style='width:100%'>{$link['button']}</div>
 						</td>";
 				}
 			} else {
