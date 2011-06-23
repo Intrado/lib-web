@@ -497,22 +497,29 @@ class FinishJobWizard extends WizFinish {
 			QuickUpdate("insert into joblist (jobid,listid) values (?,?)", false, array($job->id, $listid));
 
 		// store the jobpost messages
+		$createdpostpage = false;
 		foreach ($jobpostmessage as $subtype) {
-			$createdpage = false;
 			switch ($subtype) {
 				case "facebook":
-					// get the destinations for facebook
-					foreach ($this->parent->dataHelper("/message/post/facebookpage:fbpage", true, "[]") as $pageid)
-						QuickUpdate("insert into jobpost values (?,?,?,0)", false, array($job->id, $subtype, $pageid));
+					if (facebookAuthorized($this->parent)) {
+						// get the destinations for facebook
+						foreach ($this->parent->dataHelper("/message/post/facebookpage:fbpage", true, "[]") as $pageid) {
+							if ($pageid == "me")
+								$pageid = $USER->getSetting("fb_user_id");
+							QuickUpdate("insert into jobpost values (?,?,?,0)", false, array($job->id, $subtype, $pageid));
+						}
+					}
 					break;
 				case "twitter":
-					$twitterauth = json_decode($USER->getSetting("tw_access_token"));
-					QuickUpdate("insert into jobpost values (?,?,?,0)", false, array($job->id, $subtype, $twitterauth->user_id));
+					if (twitterAuthorized($this->parent)) {
+						$twitterauth = json_decode($USER->getSetting("tw_access_token"));
+						QuickUpdate("insert into jobpost values (?,?,?,0)", false, array($job->id, $subtype, $twitterauth->user_id));
+					}
 					break;
 				case "page":
 				case "voice":
-					if (!$createdpage) {
-						$createdpage = true;
+					if (!$createdpostpage && (facebookAuthorized($this->parent) || twitterAuthorized($this->parent))) {
+						$createdpostpage = true;
 						QuickUpdate("insert into jobpost values (?,?,'',0)", false, array($job->id, "page"));
 					}
 			}
