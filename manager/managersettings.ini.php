@@ -46,9 +46,17 @@ query_trace=true
 customer_url_prefix=https://localhost
 
 ; list of tiny domains to choose from in the manager
-tinydomain[]="tiny.com"
-tinydomain[]="small.com"
-tinydomain[]="itsy.com"
+tinydomain[]="ALRT4.ME"
+tinydomain[]="AM4.ME"
+tinydomain[]="2INFOR.ME"
+tinydomain[]="2411.ME"
+tinydomain[]="ALERTFOR.ME"
+tinydomain[]="MSNGR.ME"
+tinydomain[]="ALERT-4.ME"
+tinydomain[]="SMFOR.ME"
+tinydomain[]="2TEL.ME"
+tinydomain[]="4MES.GS"
+tinydomain[]="4MSG.ES"
 
 [content]
 tts="10.25.25.232,8080,/ttsserver/tts"
