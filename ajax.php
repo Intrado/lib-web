@@ -358,7 +358,8 @@ function handleRequest() {
 				'emailplain' => _L("Email (Plain)"),
 				'postfacebook' => _L("Facebook"),
 				'posttwitter' => _L("Twitter"),
-				'postpage' => _L("Page")
+				'postpage' => _L("Page"),
+				'postvoice' => _L("Voice")
 			);
 
 			$query = "select l.name, m.id, m.type, m.subtype from language l

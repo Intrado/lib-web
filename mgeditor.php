@@ -306,6 +306,8 @@ function makeMessageGrid($messagegroup) {
 	if ((getSystemSetting('_hasfacebook', false) && $USER->authorize('facebookpost')) || (getSystemSetting('_hastwitter', false) && $USER->authorize('twitterpost'))) {
 		$buttons[] = array("button" => icon_button("Page", "layout_sidebar", "", "editmessagepage.php?new&mgid=".$messagegroup->id));
 		$columnlabels[] = "Page";
+		$buttons[] = array("button" => icon_button("Voice", "fugue/microphone", "", "editmessagepostvoice.php?new&mgid=".$messagegroup->id));
+		$columnlabels[] = "Voice";
 	}
 	
 	// set action usr link	
@@ -426,7 +428,7 @@ function makeMessageGrid($messagegroup) {
 				$linkrow[] = false;
 			}
 		}
-		// Page posting is allowed if EITHER twitter or facebook are allowed, currently
+		// Page/Voice posting is allowed if EITHER twitter or facebook are allowed, currently
 		if ((getSystemSetting('_hasfacebook', false) && $USER->authorize('facebookpost')) ||
 				(getSystemSetting('_hastwitter', false) && $USER->authorize('twitterpost'))) {
 			if ($languagecode == Language::getDefaultLanguageCode()) {
@@ -443,14 +445,28 @@ function makeMessageGrid($messagegroup) {
 					$actions[] = action_link("New","pencil_add","editmessagepage.php?id=new&mgid=".$messagegroup->id);
 				}
 				$linkrow[] = array('icon' => $icon,'title' => _L("%s Page Message",$languagename), 'actions' => $actions);
+				
+				$actions = array();
+				$message = $messagegroup->getMessage('post', 'voice', $languagecode);
+				
+				if ($message) {
+					$icon = "accept";
+					$actions[] = action_link("Preview","layout_sidebar",null,"showPreview(null,\'previewid=$message->id\');return false;");
+					$actions[] = action_link("Edit","pencil","editmessagepostvoice.php?id=$message->id");
+					$actions[] = action_link("Delete","cross","mgeditor.php?delete=$message->id","return confirmDelete();");
+				} else {
+					$icon = "diagona/16/160";
+					$actions[] = action_link("New","pencil_add","editmessagepostvoice.php?id=new&mgid=".$messagegroup->id);
+				}
+				$linkrow[] = array('icon' => $icon,'title' => _L("%s Post Voice Message",$languagename), 'actions' => $actions);
+				
 			} else {
+				$linkrow[] = false;
 				$linkrow[] = false;
 			}
 		}
 		$links[] = $linkrow;
 	}
-	
-
 		
 	$links[] = $buttons;
 	
