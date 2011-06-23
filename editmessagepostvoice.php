@@ -139,7 +139,7 @@ $formdata = array(
 		"value" => "",
 		"validators" => array(),
 		"control" => array("PreviewButton",
-			"language" => Language::getName(Language::getDefaultLanguageCode()),
+			"language" => Language::getDefaultLanguageCode(),
 			"texttarget" => "message",
 			"gendertarget" => "gender",
 		),
