@@ -191,17 +191,17 @@ if ($showreport || $downloadreport) {
 					$post["fbdest"] .= $post["fbdest"] != ""?", ":"";
 					
 					$post["fbcontent"] = $row[3];
-					if ($row[5] == "wall") {
-						$post["fbdest"] .= _L('Wall');
-					} else if (isset($fbaccountnames[$row[5]])) {
+					if (isset($fbaccountnames[$row[5]])) {
 						// Look up account page id in cache or if not there fetch from fb 
 						$post["fbdest"] .= $fbaccountnames[$row[5]];
 					} else {
 						try {
 							$accountinfo = $facebookapi->api("/$row[5]", 'GET', array());
 							if ($accountinfo) {
-								$fbaccountnames[$row[5]] = $accountinfo["name"];
-								$post["fbdest"] .= $accountinfo["name"];
+								// using first name to check if it is a person or a standalone page.
+								$name = isset($accountinfo["first_name"]) ? $accountinfo["name"] . "'s wall":$accountinfo["name"];
+								$fbaccountnames[$row[5]] = $name;
+								$post["fbdest"] .= $name;
 							} else {
 								$fbaccountnames[$row[5]] = $row[5];//_L("Not Available");
 								$post["fbdest"] .= $row[5]; //_L("Not Available");
