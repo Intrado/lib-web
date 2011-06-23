@@ -15,3 +15,19 @@ INDEX pagecode(destination)
 )
 $$$
 
+-- $rev 2
+
+-- add default tiny domain
+INSERT ignore INTO `setting` (
+`id` ,
+`name` ,
+`value`
+)
+VALUES (
+NULL , 'tinydomain', 'alrt4.me'
+)
+$$$
+
+-- remove existing facebook auth tokens
+delete from usersetting where name = 'fb_access_token'
+$$$
