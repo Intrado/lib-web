@@ -121,7 +121,7 @@ if (!$USER->authorize("sendmulti") && $languagecode != Language::getDefaultLangu
 	redirect('unauthorized.php');
 
 
-PreviewModal::HandleEmailMessageText($languagecode,$subtype);
+PreviewModal::HandleEmailMessageText();
 	
 ////////////////////////////////////////////////////////////////////////////////
 // Form Data
@@ -231,6 +231,7 @@ $formdata["preview"] = array(
 	"value" => "",
 	"validators" => array(),
 	"control" => array("PreviewButton",
+		"subtype" => $subtype,
 		"language" => $language,
 		"fromnametarget" => "fromname",
 		"fromtarget" => "from",

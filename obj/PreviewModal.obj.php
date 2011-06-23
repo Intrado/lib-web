@@ -121,8 +121,10 @@ class PreviewModal {
 	}
 	
 	
-	static function HandleEmailMessageText($languagecode,$subtype) {
+	static function HandleEmailMessageText() {
 		if (!isset($_REQUEST["previewmodal"]) || 
+			!isset($_REQUEST["language"]) || 
+			!isset($_REQUEST["subtype"]) || 
 			!isset($_REQUEST["fromname"]) || 
 			!isset($_REQUEST["from"]) || 
 			!isset($_REQUEST["subject"]) || 
@@ -132,17 +134,17 @@ class PreviewModal {
 		$modal = new PreviewModal("email");
 		$message = new Message();
 		$message->type = "email";
-		$message->subtype = $subtype;
+		$message->subtype = $_REQUEST["subtype"];
 		$message->fromname = $_REQUEST["fromname"];
 		$message->fromemail = $_REQUEST["from"];
 		$message->subject = $_REQUEST["subject"];
-		$message->languagecode = $languagecode;
+		$message->languagecode = $_REQUEST["language"];
 		$message->stuffHeaders();
 		
 		$parts = Message::parse($_REQUEST["text"]);
 		$email = emailMessageViewForMessageParts($message,$parts,3);
 		$modal->text = $modal->formatEmail($email);
-		switch ($subtype) {
+		switch ($_REQUEST["subtype"]) {
 			case "html":
 				$modal->title = _L("%s HTML Email Message", Language::getName($message->languagecode));
 				break;

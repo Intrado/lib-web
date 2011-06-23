@@ -19,7 +19,7 @@ class TextAreaPhone extends FormItem {
 					var val = $("'.$n.'-textarea").value;
 					var gender = ($("'.$n.'-female").checked?"female":"male");
 					if (val) {
-						popup(\'previewmessage.php?parentfield='.$n.'-textarea&language='.urlencode($this->args['language']).'&gender=\'+ gender, 400, 400,\'preview\');
+						showPreview({gender:gender,text:val,language:"'.urlencode($this->args['language']).'"});
 					}
 				});
 

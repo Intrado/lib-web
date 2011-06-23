@@ -832,7 +832,20 @@ class JobWiz_messagePhoneText extends WizStep {
 				),
 				"control" => array("TextAreaPhone","width"=>"80%","rows"=>10,"language"=>"en","voice"=>"female"),
 				"helpstep" => 1
-			)
+			),
+			
+// TODO Split message and gender up into two form items like everywhere else and use the preview button for item to playy the message
+//			"preview" => array(
+//				"label" => null,
+//				"value" => "",
+//				"validators" => array(),
+//				"control" => array("PreviewButton",
+//					"language" => "en",
+//					"texttarget" => "message",
+//					"gendertarget" => "gender",
+//				),
+//				"helpstep" => 3
+//			)
 		);
 
 		if ($USER->authorize('sendmulti')) {
@@ -1132,6 +1145,21 @@ class JobWiz_messageEmailText extends WizStep {
 			"helpstep" => 5
 		);
 
+		$formdata["preview"] = array(
+			"label" => "",
+			"value" => "",
+			"validators" => array(),
+			"control" => array("PreviewButton",
+				"language" => "en",
+				"subtype" => "html",
+				"fromnametarget" => "fromname",
+				"fromtarget" => "from",
+				"subjecttarget" => "subject",
+				"texttarget" => "message",
+			),
+			"helpstep" => 5
+		);
+		
 		if ($USER->authorize('sendmulti')) {
 			$helpsteps[] = _L("Automatically translate into alternate languages. Please note that automatic translation is always improving, but is not perfect yet. Try reverse translating your message for a preview of how well it translated.");
 			$formdata["translate"] = array(

@@ -7,7 +7,7 @@ class PreviewButton extends FormItem {
 		// Check if any of these parameters are set
 		// there are two permutation 
 		// - x and xtarget
-		$parameters = array("id","language","gender","text","fromname","from","subject");
+		$parameters = array("id","language","subtype","gender","text","fromname","from","subject");
 		$str = '<input id="'.$n.'" name="'.$n.'" type="hidden" value=""/>';
 		$str .= icon_button("Preview", "fugue/control","
 					var form = event.findElement('form');

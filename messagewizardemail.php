@@ -211,11 +211,16 @@ class MsgWiz_emailText extends WizStep {
 			"helpstep" => 5
 		);
 		
+		$langcode = (isset($postdata["/create/language"]["language"])?$postdata["/create/language"]["language"]:Language::getDefaultLanguageCode());
+		if ($langcode == "autotranslate")
+			$langcode = "en";
 		$formdata["preview"] = array(
 			"label" => null,
 			"value" => "",
 			"validators" => array(),
 			"control" => array("PreviewButton",
+				"language" => $langcode,
+				"subtype" => $_SESSION['wizard_message_subtype'],
 				"fromnametarget" => "fromname",
 				"fromtarget" => "from",
 				"subjecttarget" => "subject",
@@ -691,10 +696,7 @@ if (!isset($_SESSION['wizard_message_mgid']))
 if (!isset($_SESSION['wizard_message_subtype']))
 	redirect('unauthorized.php');
 
-$langcode = (isset($postdata["/create/language"]["language"])?$postdata["/create/language"]["language"]:Language::getDefaultLanguageCode());
-if ($langcode == "autotranslate")
-	$langcode = "en";
-PreviewModal::HandleEmailMessageText($langcode, $_SESSION['wizard_message_subtype']);
+PreviewModal::HandleEmailMessageText();
 
 ////////////////////////////////////////////////////////////////////////////////
 // Display
