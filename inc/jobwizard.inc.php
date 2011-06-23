@@ -1549,6 +1549,20 @@ class JobWiz_socialMedia extends WizStep {
 			);
 		}
 		
+		// if there is a phone message, ask if it can be used in posts
+		if ($this->parent->dataHelper("/message/phone/text:message") || $this->parent->dataHelper("/message/phone/callme:message")) {
+			$helpsteps[] = _L("If you have selected a message be delivered to one or more social media destinations, enabling this option will create a voice posting. ".
+				"The source of this audio is taken from the phone message created earlier.");
+			$formdata["createpostvoice"] = array(
+				"label" => _L("Create Voice Post"),
+				"fieldhelp" => _L('You can use your phone message as a voice post to socialmedia destinations.'),
+				"value" => true,
+				"validators" => array(),
+				"control" => array("CheckBox"),
+				"helpstep" => $helpstepnum++
+			);
+		}
+		
 		return new Form("socialMedia",$formdata,$helpsteps);
 	}
 	
