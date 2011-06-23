@@ -315,7 +315,7 @@ class FinishJobWizard extends WizFinish {
 					$part->create();
 				}
 				// create a post voice message (if it's enabled)
-				if ($this->parent->dataHelper('/message/post/socialmedia:createpostvoice') && JobWiz_messagePhoneText::isEnabled($postdata, false)) {
+				if ($this->parent->dataHelper('/message/post/socialmedia:createpostvoice')) {
 					$message = new Message();
 					$message->messagegroupid = $messagegroup->id;
 					$message->type = 'post';
@@ -369,7 +369,7 @@ class FinishJobWizard extends WizFinish {
 				
 				
 				// check for and retrieve translations
-				foreach ($this->parent->dataHelper("/message/phone/translate", true) as $langcode => $translatedmessage) {
+				foreach ($this->parent->dataHelper("/message/phone/translate", true, "[]") as $langcode => $translatedmessage) {
 					// if this translation message is enabled
 					if ($translatedmessage->enabled) {
 						// if the translation text is overridden, don't attach a source message
@@ -394,9 +394,14 @@ class FinishJobWizard extends WizFinish {
 				$messages['email']['html']['en']['none']["from"] = $this->parent->dataHelper("/message/email/text:from");
 				$messages['email']['html']['en']['none']["subject"] = $this->parent->dataHelper("/message/email/text:subject");
 				$messages['email']['html']['en']['none']['attachments'] = $this->parent->dataHelper("/message/email/text:attachments", true, "[]");
+			
+				// create a post voice (provided that's enabled)
+				if ($this->parent->dataHelper('/message/post/socialmedia:createpostvoice')) {
+					$messages['post']['voice']['en']['none']['text'] = $messages['phone']['voice']['en']['none'];
+				}
 				
 				// check for and retrieve translations
-				foreach ($this->parent->dataHelper("/message/email/translate") as $langcode => $enabled) {
+				foreach ($this->parent->dataHelper("/message/email/translate", false, array()) as $langcode => $enabled) {
 					// emails don't have any actual translation text in session data other than the source message
 					// when the message group is created. the modify date will be set in the past and retranslation will
 					// get called before attaching to the job
@@ -415,10 +420,6 @@ class FinishJobWizard extends WizFinish {
 			if (JobWiz_socialMedia::isEnabled($postdata,false)) {
 				$messages['post']['facebook']['en']['none']['text'] = $this->parent->dataHelper('/message/post/socialmedia:fbdata');
 				$messages['post']['twitter']['en']['none']['text'] = $this->parent->dataHelper('/message/post/socialmedia:twdata');
-				// find the phone message so we can create a post voice (provided that's enabled)
-				if ($this->parent->dataHelper('/message/post/socialmedia:createpostvoice') && JobWiz_messagePhoneText::isEnabled($postdata, false)) {
-					$messages['post']['voice']['en']['none']['text'] = $messages['phone']['voice']['en']['none'];
-				}
 			}
 			
 			// #################################################################
@@ -496,16 +497,24 @@ class FinishJobWizard extends WizFinish {
 			QuickUpdate("insert into joblist (jobid,listid) values (?,?)", false, array($job->id, $listid));
 
 		// store the jobpost messages
-		error_log(json_encode($jobpostmessage));
 		foreach ($jobpostmessage as $subtype) {
+			$createdpage = false;
 			switch ($subtype) {
 				case "facebook":
 					// get the destinations for facebook
 					foreach ($this->parent->dataHelper("/message/post/facebookpage:fbpage", true, "[]") as $pageid)
 						QuickUpdate("insert into jobpost values (?,?,?,0)", false, array($job->id, $subtype, $pageid));
 					break;
-				default:
-					QuickUpdate("insert into jobpost values (?,?,'',0)", false, array($job->id, $subtype));
+				case "twitter":
+					$twitterauth = json_decode($USER->getSetting("tw_access_token"));
+					QuickUpdate("insert into jobpost values (?,?,?,0)", false, array($job->id, $subtype, $twitterauth->user_id));
+					break;
+				case "page":
+				case "voice":
+					if (!$createdpage) {
+						$createdpage = true;
+						QuickUpdate("insert into jobpost values (?,?,'',0)", false, array($job->id, "page"));
+					}
 			}
 		}
 		
