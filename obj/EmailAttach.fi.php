@@ -5,7 +5,11 @@ class EmailAttach extends FormItem {
 		if(is_array($value)) {
 			$value = json_encode($value);
 		}
-		
+		$maxattachmentsize = 2 * 1024 * 1024; //2m default
+		if (isset($this->args['maxattachmentsize']))
+			$maxattachmentsize = $this->args['maxattachmentsize'];
+		$_SESSION['maxattachmentsize'] = $maxattachmentsize;
+				
 		// value is json encoded 
 		// { <contentid>: {"name": <filename>, "size": <filesize>} }
 		$str = '

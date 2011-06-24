@@ -28,6 +28,10 @@ if(isset($_GET["name"]) && isset($_GET["id"])) {
 //get any uploaded file and put in session queue (use session in case there is a form error)
 
 $maxattachmentsize = 2 * 1024 * 1024; //2m
+if (isset($_SESSION['maxattachmentsize'])) {
+	$maxattachmentsize = $_SESSION['maxattachmentsize'];
+}
+
 $unsafeext = array(".ade",".adp",".asx",".bas",".bat",".chm",".cmd",".com",".cpl",
 	".crt",".dbx",".exe",".hlp",".hta",".inf",".ins",".isp",".js",".jse",".lnk",
 	".mda",".mdb",".mde",".mdt",".mdw",".mdz",".mht",".msc",".msi",".msp",".mst",

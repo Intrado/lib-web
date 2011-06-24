@@ -171,10 +171,10 @@ $formdata = array(
 	),
 	"attachments" => array(
 		"label" => _L('Attachments'),
-		"fieldhelp" => _L("You may attach up to three files that are up to 2MB each. For greater security, certain file types are not permitted."),
+		"fieldhelp" => _L("You may attach up to five files that are up to 50MB each. For greater security, certain file types are not permitted."),
 		"value" => ($attachments?json_encode($attachments):"{}"),
-		"validators" => array(array("ValEmailAttach")),
-		"control" => array("EmailAttach"),
+		"validators" => array(array("ValEmailAttach", "maxattachments" => 5)),
+		"control" => array("EmailAttach", "maxattachmentsize" => 50*1024*1024),
 		"helpstep" => 2
 	)
 );
