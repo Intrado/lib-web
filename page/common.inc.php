@@ -65,7 +65,7 @@ if (strrpos($CODE,"/") !== false)
 	$CODE = substr($CODE,1 + strrpos($CODE, "/"));
 	
 //sanity check, don't bother passing tons of unknown data to appserver
-if (strlen($CODE) > 10 || !preg_match("/^[-_a-zA-Z]+$/", $CODE))
+if (strlen($CODE) > 10 || !preg_match("/^[-_a-zA-Z0-9]+$/", $CODE))
 	do404();
 
 apache_note("CS_USER", urlencode($CODE));
