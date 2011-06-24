@@ -78,7 +78,7 @@ function fadecolor($primary, $fade, $ratio){
 		<tr>
 			<td>
 				<div style="padding-left:10px; padding-bottom:10px">
-					<img src="img.php?code=<?= escapehtml($CODE) ?>&id=<?= $messageinfo->logocontentid ?></img>" />
+					<img src="content.php?code=<?= escapehtml($CODE) ?>&id=<?= $messageinfo->logocontentid ?></img>" />
 				</div>
 			</td>
 			<td>
