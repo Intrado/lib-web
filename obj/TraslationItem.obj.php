@@ -158,8 +158,9 @@ class TranslationItem extends FormItem {
 													gender = 'female'
 											}
 										}
-																
-										popup('previewmessage.php?parentfield={$n}text&language=$language&gender='+gender, 400, 400,'preview');
+										
+										var parameters = {text: content,language:'$language',gender: gender};
+										showPreview(parameters);
 									}
 								")
 								: ""
