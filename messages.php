@@ -162,7 +162,7 @@ if($isajax === true) {
 			$types .= $item["sms"] > 0?' <img src="img/icons/fugue/mobile_phone.gif" alt="SMS" title="SMS">':"";
 			$types .= $item["facebook"] > 0?' <img src="img/icons/custom/facebook.gif" alt="Facebook" title="Facebook">':"";
 			$types .= $item["twitter"] > 0?' <img src="img/icons/custom/twitter.gif" alt="Twitter" title="Twitter">':"";
-			$types .= $item["facebook"] > 0?' <img src="img/icons/layout_sidebar.gif" alt="Page" title="Page">':"";
+			$types .= $item["page"] > 0?' <img src="img/icons/layout_sidebar.gif" alt="Page" title="Page">':"";
 			
 			$title = escapehtml($item["name"]);
 			$defaultlink = "mgeditor.php?id=$itemid";
