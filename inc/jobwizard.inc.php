@@ -748,7 +748,7 @@ class JobWiz_messageType extends WizStep {
 			$values['sms'] = _L("SMS Text");
 		if ((getSystemSetting('_hasfacebook', false) && $USER->authorize('facebookpost')) ||
 				(getSystemSetting('_hastwitter', false) && $USER->authorize('twitterpost')))
-			$values['post'] = _L("Social Media/Page post");
+			$values['post'] = _L("Social Media");
 
 		$formdata[] = $this->title;
 		$helpsteps = array(_L("Choose how you you like your message to be delivered."));
@@ -1554,8 +1554,8 @@ class JobWiz_socialMedia extends WizStep {
 			$helpsteps[] = _L("If you have selected a message be delivered to one or more social media destinations, enabling this option will create a voice posting. ".
 				"The source of this audio is taken from the phone message created earlier.");
 			$formdata["createpostvoice"] = array(
-				"label" => _L("Create Voice Post"),
-				"fieldhelp" => _L('You can use your phone message as a voice post to socialmedia destinations.'),
+				"label" => _L("Post my phone message"),
+				"fieldhelp" => _L('You can use your phone message as a voice post to social media destinations.'),
 				"value" => true,
 				"validators" => array(),
 				"control" => array("CheckBox"),
