@@ -252,13 +252,13 @@ if(CheckFormSubmit($f,"Save") || CheckFormSubmit($f, "Return")) {
 				setCustomerSystemSetting("inboundnumber", $inboundnumber, $custdb);
 				setCustomerSystemSetting("timezone", $timezone, $custdb);
 
-				update_jobtypeprefs(getCustomerSystemSetting('maxphones', 1, true, $custdb), $maxphones, "phone", $custdb);
+				update_jobtypeprefs(1, $maxphones, "phone", $custdb);
 				setCustomerSystemSetting("maxphones", $maxphones, $custdb);
 
-				update_jobtypeprefs(getCustomerSystemSetting('maxemails', 1, true, $custdb),$maxemails, "email", $custdb);
+				update_jobtypeprefs(1, $maxemails, "email", $custdb);
 				setCustomerSystemSetting("maxemails", $maxemails, $custdb);
 
-				update_jobtypeprefs(getCustomerSystemSetting('maxsms', 1, true, $custdb), $maxsms, "sms", $custdb);
+				update_jobtypeprefs(1, $maxsms, "sms", $custdb);
 				setCustomerSystemSetting('maxsms', $maxsms, $custdb);
 
 				setCustomerSystemSetting('callerid', Phone::parse($callerid), $custdb);
