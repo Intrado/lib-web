@@ -261,12 +261,6 @@ if($isajax === true) {
 // Display Functions
 ////////////////////////////////////////////////////////////////////////////////
 
-function fmt_surveyactions ($obj,$name) {
-	return '<a href="surveytemplate.php?id=' . $obj->id . '">Edit</a>&nbsp;|&nbsp;'
-			. '<a href="survey.php?scheduletemplate=' . $obj->id . '">Schedule</a>&nbsp;|&nbsp;'
-			. '<a href="surveys.php?deletetemplate=' . $obj->id . '">Delete</a>';
-}
-
 function job_responses ($obj,$name) {
 		$played = QuickQuery("Select count(*) from voicereply where jobid = '$obj->id' and listened = '0'");
 		$total = QuickQuery("Select count(*) from voicereply where jobid = '$obj->id'");
