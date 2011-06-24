@@ -952,7 +952,7 @@ class SMAPI {
 
 			//Generate missing contact fields that do not yet exist
 			if(count($contactdata["phone"]) != getSystemSetting("maxphones",1)){
-				for($i = 0; $i < getSystemSetting("maxphones"); $i++){
+				for($i = 0; $i < getSystemSetting("maxphones",1); $i++){
 					if(!isset($contactdata["phone"][$i])){
 						$newphone=new Phone();
 						$newphone->personid = $personid;
@@ -962,7 +962,7 @@ class SMAPI {
 				}
 			}
 			if(count($contactdata["email"]) != getSystemSetting("maxemails",1)){
-				for($i=0; $i < getSystemSetting("maxemails"); $i++){
+				for($i=0; $i < getSystemSetting("maxemails",1); $i++){
 					if(!isset($contactdata["email"][$i])){
 						$newemail=new Email();
 						$newemail->personid = $personid;
@@ -972,7 +972,7 @@ class SMAPI {
 				}
 			}
 			if(count($contactdata["sms"]) != getSystemSetting("maxsms",1)){
-				for($i=0; $i < getSystemSetting("maxsms"); $i++){
+				for($i=0; $i < getSystemSetting("maxsms",1); $i++){
 					if(!isset($contactdata["sms"][$i])){
 						$newsms=new Sms();
 						$newsms->personid = $personid;
@@ -997,7 +997,7 @@ class SMAPI {
 					$contactpreferences = array();
 					if(isset($contactprefs[$type][$object->sequence])){
 						$pref = $contactprefs[$type][$object->sequence];
-					} else {
+					} elseif (isset($defaultcontactprefs[$type][$object->sequence])) {
 						$pref = $defaultcontactprefs[$type][$object->sequence];
 					}
 					if(isset($pref)){   // if has sms is not set in manager the pref is not set 
