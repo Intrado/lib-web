@@ -98,7 +98,7 @@ function handleFileUpload($formitemname, $maxfilesizebytes, $unsafeext = null, $
 		switch($_FILES[$formitemname]['error']) {
 		case UPLOAD_ERR_INI_SIZE:
 		case UPLOAD_ERR_FORM_SIZE:
-			$errormessage .= $foremailattachment ? _L('The file you uploaded exceeds the maximum email attachment limit of 2048K') : _L('The file you uploaded exceeds the maximum size limit'); // TODO: Should not hard code 2048K for email attachment's error message.
+			$errormessage .= $foremailattachment ? _L('The file you uploaded exceeds the maximum attachment limit of %s.', ($maxfilesizebytes / 1024) . 'K') : _L('The file you uploaded exceeds the maximum size limit');
 			$uploaderror = true;
 			break;
 		case UPLOAD_ERR_PARTIAL:
