@@ -70,6 +70,7 @@ include_once("nav.inc.php");
 <script src="script/livepipe/livepipe.js" type="text/javascript"></script>
 <script src="script/livepipe/window.js" type="text/javascript"></script>
 <script src="script/niftyplayer.js.php" type="text/javascript"></script>
+<script type="text/javascript" src="script/getMessageGroupPreviewGrid.js.php"></script>
 <?
 PreviewModal::includePreviewScript();
 startWindow(_L('Message Settings'));
@@ -89,81 +90,14 @@ startWindow(_L('Message Settings'));
 endWindow();
 
 startWindow(_L('Message Content'));
-
-
-if ($USER->authorize('sendmulti')) {
-	$customerlanguages = Language::getLanguageMap();
-	unset($customerlanguages["en"]);
-	$customerlanguages = array_merge(array("en" => "English"),$customerlanguages);
-} else {
-	$customerlanguages = array(Language::getDefaultLanguageCode() => Language::getName(Language::getDefaultLanguageCode()));
-}
-// Setup destination types according to permissions
-$columnlabels = array();
-
-echo  "<table class='messagegrid'><tr><th></th>";
-
-if ($USER->authorize('sendphone')) {
-	echo "<th class='messagegridheader'>Phone</th>";
-}
-
-if (getSystemSetting('_hassms', false) && $USER->authorize('sendsms')) {
-	echo "<th class='messagegridheader'>SMS</th>";
-}
-
-if ($USER->authorize('sendemail')) {
-	echo "<th class='messagegridheader'>Email (HTML)</th>";
-	echo "<th class='messagegridheader'>Email (Text)</th>";
-}
-echo  "</tr>";
-foreach ($customerlanguages as $languagecode => $languagename) {
-	echo "<tr><th class='messagegridlanguage'>$languagename</th>";
-
-	if ($USER->authorize('sendphone')) {
-		$message = $messagegroup->getMessage('phone', 'voice', $languagecode);
-		echo "<td>";
-		if ($message)
-			echo "<a href=\"#\" onclick=\"showPreview(null,'previewid=$message->id'); return false;\"><img src='img/icons/accept.gif' /></a>";
-		else
-			echo "<img src='img/icons/diagona/16/160.gif' />";
-		echo "</td>";
-	}
-	
-	if (getSystemSetting('_hassms', false) && $USER->authorize('sendsms')) {
-		if ($languagecode == 'en') {
-			$message = $messagegroup->getMessage('sms', 'plain', $languagecode);
-			echo "<td>";
-			if ($message) 
-				echo "<a href=\"#\" onclick=\"showPreview(null,'previewid=$message->id'); return false;\"><img src='img/icons/accept.gif' /></a>";
-			else 
-				echo "<img src='img/icons/diagona/16/160.gif' />";
-			echo "</td>";
-		} else {
-			echo "<td>-</td>";
-		}
-		
-	}
-	
-	if ($USER->authorize('sendemail')) {
-		$message = $messagegroup->getMessage('email', 'html', $languagecode);
-		echo "<td>";
-		if ($message) 
-			echo "<a href=\"#\" onclick=\"showPreview(null,'previewid=$message->id'); return false;\"><img src='img/icons/accept.gif' /></a>";
-		else 
-			echo "<img src='img/icons/diagona/16/160.gif' />";
-		echo "</td>";
-		
-		$message = $messagegroup->getMessage('email', 'plain', $languagecode);
-		echo "<td>";
-		if ($message) 
-			echo "<a href=\"#\" onclick=\"showPreview(null,'previewid=$message->id'); return false;\"><img src='img/icons/accept.gif' /></a>";
-		else 
-			echo "<img src='img/icons/diagona/16/160.gif' />";
-		echo "</td>";
-	}
-	echo "</tr>";
-}
-echo "</table>";
+?>
+	<div id="preview"></div>
+	<script type="text/javascript">
+		document.observe('dom:loaded', function() {
+			getMessageGroupPreviewGrid(<?=$messagegroup->id?>, 'preview', null);
+		});
+	</script>
+<?
 $fallbackUrl = "messages.php";
 echo icon_button(_L("Done"),"tick","location.href='" . (isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : $fallbackUrl) . "'");
 endWindow();
