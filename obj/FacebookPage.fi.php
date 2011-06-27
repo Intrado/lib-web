@@ -11,6 +11,7 @@ class FacebookPage extends FormItem {
 		
 		// keeping track of the authorized pages
 		$pages = array("pages" => getFbAuthorizedPages(), "wall" => getSystemSetting("fbauthorizewall"));
+		$showconnectbutton = ($this->args['access_token']?false:true);
 		
 		// main details div
 		$str = '
@@ -33,7 +34,15 @@ class FacebookPage extends FormItem {
 			<input id="'.$n.'" name="'.$n.'" type="hidden" value="'.escapehtml($value).'" />
 			<input id="'.$n.'authpages" name="'.$n.'authpages" type="hidden" value="'.escapehtml(json_encode($pages)).'" />
 			<div id="fb-root"></div>
-			<div id="'. $n. 'fbpages" class="fbpagelist">
+			<div id="'. $n. 'connect" style="display:'. ($showconnectbutton?"block":"none"). '">
+				'. icon_button(_L("Connect to Facebook"), "custom/facebook", "popup('popupfacebookauth.php', 600, 300)").'
+			</div>
+			<div id="'.$n.'actionlinks" style="display:'. ($showconnectbutton?"none":"block"). '">
+				<a id="'. $n. 'all" class="actionlink">'._L("Select All").'</a>
+				&nbsp;|&nbsp;
+				<a id="'. $n. 'none" class="actionlink">'._L("Remove All").'</a>
+			</div>
+			<div id="'. $n. 'fbpages" class="fbpagelist" style="display:'. ($showconnectbutton?"none":"block"). '">
 				<img src="img/ajax-loader.gif" alt="'. escapehtml(_L("Loading")). '"/>
 			</div>';
 		
@@ -57,13 +66,29 @@ class FacebookPage extends FormItem {
 					e.async = true;
 					e.src = document.location.protocol + "//connect.facebook.net/en_US/all.js";
 					document.getElementById("fb-root").appendChild(e);
-				}());';
+				}());
+				// Observe an authentication update on the document (the auth popup fires this event)
+				document.observe("FbAuth:update", function (res) {
+					updateFbPages(res.memo.access_token, "'.$n.'", "'.$n.'fbpages");
+				});
+				// Observe a click on the action links
+				$("'. $n. 'all").observe("click", handleActionLink.curry("'.$n.'", true));
+				$("'. $n. 'none").observe("click", handleActionLink.curry("'.$n.'", false));
+				';
 		return $str;
 	}
 	
 	function renderJavascriptLibraries() {
 		$str = '<script type="text/javascript">
 	
+			// action link all clicked
+			function handleActionLink(formitem, checkval, event) {
+				$$("#" + formitem + "fbpages input").each(function (checkbox) {
+					checkbox.checked = checkval;
+				});
+				handleFbPageChange(formitem, null);
+			}
+			
 			// when a facebook page is checked/unchecked, update the pageid and access_token used to post to it
 			function handleFbPageChange(formitem, event) {
 				// get the value of the checked boxs and store in the hidden form item
@@ -81,13 +106,20 @@ class FacebookPage extends FormItem {
 			function updateFbPages(access_token, formitem, container) {
 				
 				var pages = $(formitem).value.evalJSON();
+				container = $(container);
+				connectdiv = $(formitem + "connect");
+				actionlinks = $(formitem + "actionlinks");
 				
 				if (access_token) {
 				
+					container.show();
+					actionlinks.show();
+					connectdiv.hide();
+					
 					// get the authorized pages
 					var authpages = $(formitem + "authpages").value.evalJSON();
 					
-					$(container).update();
+					container.update();
 					
 					// add a loading indicator
 					$(container).insert(
@@ -107,7 +139,7 @@ class FacebookPage extends FormItem {
 									checkbox.checked = true;
 							} else {
 								// no data returned
-								$(container).update(
+								container.update(
 									new Element("div").setStyle({padding: "5px"}).update(
 										"'. escapehtml(_L('Error encountered trying to get administered pages')). '"));
 							}
@@ -129,13 +161,17 @@ class FacebookPage extends FormItem {
 							});
 						} else {
 							// no data returned
-							$(container).update(
+							container.update(
 								new Element("div").setStyle({padding: "5px"}).update(
 									"'. escapehtml(_L('Error encountered trying to get administered pages')). '"));
 						}
 						// remove the loading icon
 						$(formitem + "-pageloading").remove();
 					});
+				} else {
+					container.hide();
+					actionlinks.hide();
+					connectdiv.show();
 				}
 			}
 
