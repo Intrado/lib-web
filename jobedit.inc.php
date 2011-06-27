@@ -232,8 +232,8 @@ $helpsteps[] = _L("Enter a name for your job. " .
 
 
 	if ($submittedmode || $completedmode) {
-		$helpsteps[] = _L("Select the option that best describes the type of notification you are sending. 
-							The category you select will determine which introduction your recipients will hear.");
+		$helpsteps[] = _L("Select the option that best describes the type of notification you are sending. ".
+							"The category you select will determine which introduction your recipients will hear.");
 		$formdata["jobtype"] = array(
 			"label" => _L("Type/Category"),
 			"fieldhelp" => _L("The option that best describes the type of notification you are sending."),
@@ -241,12 +241,12 @@ $helpsteps[] = _L("Enter a name for your job. " .
 			"helpstep" => 2
 		);
 	} else {
-		$helpsteps[] = _L("Select the option that best describes the type of notification you are sending.
-							 The category you select will determine which introduction your recipients will hear.");
+		$helpsteps[] = _L("Select the option that best describes the type of notification you are sending. ".
+							"The category you select will determine which introduction your recipients will hear.");
 		$formdata["jobtype"] = array(
 			"label" => _L("Type/Category"),
-			"fieldhelp" => _L("Select the option that best describes the type of notification you are sending. 
-								The category you select will determine which introduction your recipients will hear."),
+			"fieldhelp" => _L("Select the option that best describes the type of notification you are sending. ".
+								"The category you select will determine which introduction your recipients will hear."),
 			"value" => isset($job->jobtypeid)?$job->jobtypeid:"",
 			"validators" => array(
 				array("ValRequired"),
@@ -275,15 +275,15 @@ $helpsteps[] = _L("Enter a name for your job. " .
 			$repeatvalues[] = isset($scheduledows[$x]);
 		}
 		$repeatvalues[7] = date("g:i a", strtotime($schedule->time));
-
-		$helpsteps[] = _L("The options in this section create a delivery window for your job.
-							It's important that you leave enough time for the system to contact everyone in your list. 
-							The options are: 
-								<ul>
-									<li>Start Date - This is the day the job will start running. 
-									<li>Days to Run - The number of days the job should run within the times you select.
-									<li>Start Time and End Time - These represent the time the job should start and stop.
-								</ul>");
+	
+		$helpsteps[] = _L("The options in this section create a delivery window for your job. ".
+							"It's important that you leave enough time for the system to contact everyone in your list. ".
+							"The options are:".
+								"<ul>".
+									"<li>Start Date - This is the day the job will start running.".
+									"<li>Days to Run - The number of days the job should run within the times you select.".
+									"<li>Start Time and End Time - These represent the time the job should start and stop.".
+								"</ul>");
 		$timevalues = newform_time_select(NULL, $ACCESS->getValue('callearly'), $ACCESS->getValue('calllate'), $USER->getCallLate());
 		$formdata["repeat"] = array(
 			"label" => _L("Repeat"),
@@ -300,8 +300,8 @@ $helpsteps[] = _L("Enter a name for your job. " .
 			"helpstep" => 3
 		);
 	} else {
-		$helpsteps[] = _L("The Delivery Window designates the earliest call time and the latest call time allowed for notification delivery.<br><br>
-		<b>Note:</b> You may send a job up until one minute before the cutoff time specified in your Access Profile. You should set the job to run for two days to ensure all calls are made.");
+		$helpsteps[] = _L("The Delivery Window designates the earliest call time and the latest call time allowed for notification delivery.<br><br> ".
+		"<b>Note:</b> You may send a job up until one minute before the cutoff time specified in your Access Profile. You should set the job to run for two days to ensure all calls are made.");
 		if ($completedmode) {
 			$formdata["date"] = array(
 				"label" => _L("Start Date"),
@@ -393,26 +393,26 @@ $helpsteps[] = _L("Enter a name for your job. " .
 			$formdata["calllate"]["requires"][] = "date";
 		}
 	}
-
-	$helpsteps[] = _L("Select an existing list to use. If you do not see the list you need,
-						 you can make one by clicking the Lists subtab above. <br><br>
-						 You may also opt to skip duplicates. Skip Duplicates is for calling 
-						 each number once, so if, for example, two recipients have the same 
-						 number, they will only be called once.");
-	$helpsteps[] = _L("Select an existing message to use. If you do not see the message
-						 you need, you can make a new message by clicking the Messages subtab above.");
-	$helpsteps[] = _L("<ul><li>Auto Report - Selecting this option causes the system to email
-						 a report to the email address associated with your account when the job 
-						 is finished.<li>Max Attempts - This option lets you select the maximum
-						 number of times the system should try to contact a recipient.
-						 <li>Allow Reply - Check this if you want recipients to be able to
-						 record responses.<br><br><b>Note:</b>You will need to include instructions
-						 to press '0' to record a response in your message.<br><br>
-						 <li>Allow Confirmation - Select this option if you would like recipients
-						 to give a 'yes' or 'no' response to your message.<br><br>
-						 <b>Note:</b>You will need to include instructions 
-						 to press '1' for 'yes' and '2' for 'no' in your message.</ul>");
-
+	
+	$helpsteps[] = _L("Select an existing list to use. If you do not see the list you need, ".
+						"you can make one by clicking the Lists subtab above. <br><br> ".
+						"You may also opt to skip duplicates. Skip Duplicates is for calling ".
+						"each number once, so if, for example, two recipients have the same ".
+						"number, they will only be called once.");
+	$helpsteps[] = _L("Select an existing message to use. If you do not see the message ".
+						"you need, you can make a new message by clicking the Messages subtab above.");
+	$helpsteps[] = _L("<ul><li>Auto Report - Selecting this option causes the system to email ".
+						"a report to the email address associated with your account when the job ".
+						"is finished.<li>Max Attempts - This option lets you select the maximum ".
+						"number of times the system should try to contact a recipient. ".
+						"<li>Allow Reply - Check this if you want recipients to be able to ".
+						"record responses.<br><br><b>Note:</b>You will need to include instructions ".
+						"to press '0' to record a response in your message.<br><br> ".
+						"<li>Allow Confirmation - Select this option if you would like recipients ".
+						"to give a 'yes' or 'no' response to your message.<br><br> ".
+						"<b>Note:</b>You will need to include instructions ".
+						"to press '1' for 'yes' and '2' for 'no' in your message.</ul>");
+	
 	if ($submittedmode || $completedmode) {
 		$formdata[] = _L('List(s)');
 		$query = "select name from list where id in (" . repeatWithSeparator("?", ",", count($selectedlists)) . ")";
@@ -473,8 +473,8 @@ $helpsteps[] = _L("Enter a name for your job. " .
 		if ($USER->authorize('leavemessage')) {
 			$formdata["replyoption"] = array(
 				"label" => _L('Allow Reply'),
-				"fieldhelp" => _L("Select this option if recipients should be able to record replies. 
-									Make sure that the message instructs recipients to press '0' to record a response."),
+				"fieldhelp" => _L("Select this option if recipients should be able to record replies. ".
+									"Make sure that the message instructs recipients to press '0' to record a response."),
 				"control" => array(
 					"FormHtml",
 					"html" => "<input type='checkbox' " . ($job->isOption("leavemessage")?"checked":"") . " disabled />"),
@@ -484,9 +484,9 @@ $helpsteps[] = _L("Enter a name for your job. " .
 		if ($USER->authorize('messageconfirmation')) { 
 			$formdata["confirmoption"] = array(
 				"label" => _L('Allow Confirmation'),
-				"fieldhelp" => _L("Select this option if you would like recipients to be able to respond to your message 
-									by pressing 1' for 'yes' or '2' for 'no'. 
-									You will need to instruct recipients to do this in your message."),
+				"fieldhelp" => _L("Select this option if you would like recipients to be able to respond to your message ".
+									"by pressing 1' for 'yes' or '2' for 'no'. ".
+									"You will need to instruct recipients to do this in your message."),
 				"control" => array(
 					"FormHtml",
 					"html" => "<input type='checkbox' " . ($job->isOption("messageconfirmation")?"checked":"") . " disabled />"),
@@ -579,8 +579,8 @@ $helpsteps[] = _L("Enter a name for your job. " .
 		if ($USER->authorize('leavemessage')) { 
 			$formdata["replyoption"] = array(
 				"label" => _L('Allow Reply'),
-				"fieldhelp" => _L("Select this option if recipients should be able to record replies. 
-									Make sure that the message instructs recipients to press '0' to record a response."),
+				"fieldhelp" => _L("Select this option if recipients should be able to record replies. ".
+									"Make sure that the message instructs recipients to press '0' to record a response."),
 				"value" => $job->isOption("leavemessage"),
 				"validators" => array(),
 				"control" => array("CheckBox"),
@@ -590,9 +590,9 @@ $helpsteps[] = _L("Enter a name for your job. " .
 		if ($USER->authorize('messageconfirmation')) { 
 			$formdata["confirmoption"] = array(
 				"label" => _L('Allow Confirmation'),
-				"fieldhelp" => _L("Select this option if you would like recipients to be able to respond to your message 
-									by pressing 1' for 'yes' or '2' for 'no'. You will need to instruct recipients to do
-								    this in your message."),
+				"fieldhelp" => _L("Select this option if you would like recipients to be able to respond to your message ".
+									"by pressing 1' for 'yes' or '2' for 'no'. You will need to instruct recipients to do ".
+									"this in your message."),
 				"value" => $job->isOption("messageconfirmation"),
 				"validators" => array(),
 				"control" => array("CheckBox"),
@@ -789,11 +789,11 @@ if ($JOBTYPE == "repeating" && getSystemSetting("disablerepeat") ) {
 ?>
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
 	<tr>
-		<td align="center" >
-		<div class='alertmessage noprint'>The System Administrator has
-		disabled all Repeating Jobs. <br>
-		No Repeating Jobs can be run while this setting remains in effect.</div>
-		</td>
+		<td align="center">
+			<div class='alertmessage noprint'>
+				The System Administrator has disabled all Repeating Jobs. <br>
+				No Repeating Jobs can be run while this setting remains in effect.
+			</div></td>
 	</tr>
 </table>
 <?
