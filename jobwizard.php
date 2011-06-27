@@ -107,7 +107,7 @@ if (isset($_GET['debug']))
 	$_SESSION['wizard_job']['debug'] = true;
 
 $wizdata = array(
-	"start" => new JobWiz_start(_L("Job Type")),
+	"start" => new JobWiz_start(_L("Getting Started")),
 	"list" => new JobWiz_listChoose(_L("List")),
 	"message" => new WizSection("Message",array(
 		"options" => new JobWiz_messageOptions(_L("Message Options")),

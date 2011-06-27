@@ -585,7 +585,7 @@ class JobWiz_start extends WizStep {
 		);
 
 		$formdata["package"] = array(
-			"label" => _L("Notification Method"),
+			"label" => _L("Creation Method"),
 			"fieldhelp" => _L("Choose a notification method. Click the \"Guide\" button to the right for a detailed description of each method.<br><br>
 			<i><b>Note:</b> Email and SMS text messaging are optional features and may not be enabled.</i>"),
 			"validators" => array(
