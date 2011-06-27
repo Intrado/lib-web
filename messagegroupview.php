@@ -57,7 +57,7 @@ if (!userOwns("messagegroup", $messagegroup->id) && $messagegroup->originalmessa
 	redirect('unauthorized.php');
 }
 
-PreviewModal::HandlePhoneMessageId();
+PreviewModal::HandleRequestWithId();
 
 ////////////////////////////////////////////////////////////////////////////////
 // Display

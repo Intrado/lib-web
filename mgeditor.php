@@ -59,7 +59,7 @@ if (isset($_GET['delete'])) {
 	QuickUpdate("delete from message where id=? and messagegroupid=?",false,array($_GET['delete'],$messagegroup->id));
 }
 
-PreviewModal::HandlePhoneMessageId();
+PreviewModal::HandleRequestWithId();
 
 ////////////////////////////////////////////////////////////////////////////////
 // Form Data
@@ -451,7 +451,7 @@ function makeMessageGrid($messagegroup) {
 				
 				if ($message) {
 					$icon = "accept";
-					$actions[] = action_link("Preview","layout_sidebar",null,"showPreview(null,\'previewid=$message->id\');return false;");
+					$actions[] = action_link("Preview","fugue/control",null,"showPreview(null,\'previewid=$message->id\');return false;");
 					$actions[] = action_link("Edit","pencil","editmessagepostvoice.php?id=$message->id");
 					$actions[] = action_link("Delete","cross","mgeditor.php?delete=$message->id","return confirmDelete();");
 				} else {

@@ -121,7 +121,7 @@ if (!$USER->authorize("sendmulti") && $languagecode != Language::getDefaultLangu
 	redirect('unauthorized.php');
 
 
-PreviewModal::HandleEmailMessageText();
+PreviewModal::HandleRequestWithEmailText();
 	
 ////////////////////////////////////////////////////////////////////////////////
 // Form Data

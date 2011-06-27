@@ -11,7 +11,7 @@
 
 class PreviewModal {
 	var $form;
-	var $type;
+	var $playable = false;
 	var $text;
 	var $parts;
 	var $valueparts;
@@ -21,12 +21,10 @@ class PreviewModal {
 	var $uid;
 
 	// private constructor to create modal object
-	private function PreviewModal($type) {
-		$this->type = $type;
-	}
+	private function PreviewModal() {}
 	
 	// Cunstructs and returns a PreviewModal object based on the parts from messageid
-	static function HandlePhoneMessageId() {
+	static function HandleRequestWithId() {
 		global $USER;
 		
 		if (!isset($_REQUEST["previewmodal"]) ||
@@ -42,14 +40,15 @@ class PreviewModal {
 			return;
 		}
 		
-		$modal = new PreviewModal($message->type);
+		$modal = new PreviewModal();
 		switch($message->type) {
 			case "phone":
 				// Get message parts and save to session
 				$modal->uid = uniqid();
 				$modal->parts = DBFindMany('MessagePart', 'from messagepart where messageid=? order by sequence', false, array($message->id));
-				$modal->initializePhoneFieldContent();
+				$modal->initializeFieldContent("phone");
 				$modal->title = _L("%s Phone Message" , Language::getName($message->languagecode));
+				$modal->playable = true;
 				break;
 			case "email":
 				$email = messagePreviewForPriority($message->id, $jobpriority); // returns commsuite_EmailMessageView object
@@ -69,8 +68,23 @@ class PreviewModal {
 				$modal->title = _L("%s SMS Message" , Language::getName($message->languagecode));
 				break;
 			case "post":
-				$part = DBFind('MessagePart', 'from messagepart where messageid=? and sequence = 0', false, array($message->id));
-				$modal->text = $part->txt;
+				$modal->parts = DBFindMany('MessagePart', 'from messagepart where messageid=? order by sequence', false, array($message->id));
+				switch ($message->subtype) {
+					case "page":
+						// Page preview is can use the same as the non templated html rendered message 
+						$modal->text = $message->renderEmailHtmlParts($modal->parts);
+						break;
+					case "voice":
+						$modal->playable = true;
+						$modal->uid = uniqid();
+						$modal->initializeFieldContent($message->type);
+						break;
+					default:
+						// Other posts will only need first part, same as sms
+						$modal->text = $message->renderSmsParts($modal->parts);
+						break;
+				}
+				
 				$modal->title = _L("%s %s Message" , Language::getName($message->languagecode), ucfirst($message->subtype));
 				break;
 			default:
@@ -83,8 +97,9 @@ class PreviewModal {
 	}
 	
 	// Constructs and returns a PreviewModal object besed on sourcetext from agument or located in session.
-	static function HandlePhoneMessageText($messagegroupid = false) {
-		$modal = new PreviewModal('phone');
+	static function HandleRequestWithPhoneText($messagegroupid = false) {
+		$modal = new PreviewModal();
+		$this->playable = true;
 		$showmodal = false;
 		if (isset($_REQUEST["previewmodal"]) && isset($_REQUEST["text"])  && isset($_REQUEST["language"]) && isset($_REQUEST["gender"])) {
 			$showmodal = true;
@@ -108,7 +123,7 @@ class PreviewModal {
 			error_log("Error parsing message source");
 		}
 		
-		$modal->initializePhoneFieldContent();
+		$modal->initializeFieldContent("phone");
 		
 		$voice = new Voice($_SESSION["previewmessagesource"]["voiceid"]);
 		$modal->title = _L("%s Phone Message", Language::getName($voice->languagecode));
@@ -121,7 +136,7 @@ class PreviewModal {
 	}
 	
 	
-	static function HandleEmailMessageText() {
+	static function HandleRequestWithEmailText() {
 		if (!isset($_REQUEST["previewmodal"]) || 
 			!isset($_REQUEST["language"]) || 
 			!isset($_REQUEST["subtype"]) || 
@@ -131,7 +146,7 @@ class PreviewModal {
 			!isset($_REQUEST["text"]))
 			return;
 			
-		$modal = new PreviewModal("email");
+		$modal = new PreviewModal();
 		$message = new Message();
 		$message->type = "email";
 		$message->subtype = $_REQUEST["subtype"];
@@ -162,13 +177,13 @@ class PreviewModal {
 	function includeModal() {
 		$modalcontent = "";
 		$playercontent = "";
-		if ($this->type != "phone") {
+		if (!$this->playable) {
 			$modalcontent = $this->text;
 		} else if ($this->hasfieldinserts) {
 			$modalcontent = $this->form->render();
 		}
 		header('Content-Type: application/json');
-		echo json_encode(array("type" => $this->type,"title" => $this->title, "hasinserts" => $this->hasfieldinserts, "form" => $modalcontent, "uid" => $this->uid, "partscount" => count($this->parts)));
+		echo json_encode(array("playable" => $this->playable,"title" => $this->title, "hasinserts" => $this->hasfieldinserts, "form" => $modalcontent, "uid" => $this->uid, "partscount" => count($this->parts)));
 		exit();
 	}
 	
@@ -212,12 +227,12 @@ class PreviewModal {
 	
 	
 	// Private helper function to create from for field inserts or set the session to play intantly
-	private function initializePhoneFieldContent() {
+	private function initializeFieldContent($type) {
 		if ($this->parts) {
 			// Get preview fields
 			list($fields,$fielddata,$fielddefaults) = getpreviewfieldmapdatafromparts($this->parts);
 			
-			$messageformdata = getpreviewformdata($fields,$fielddata,$fielddefaults,$this->type);
+			$messageformdata = getpreviewformdata($fields,$fielddata,$fielddefaults,$type);
 			$buttons =  array(submit_button(_L('Play with Field(s)'),"submit","fugue/control"));
 			$this->form = new Form("previewmessagefields",$messageformdata,null,$buttons);
 			$this->hasfieldinserts = count($messageformdata) > 0;
@@ -226,6 +241,7 @@ class PreviewModal {
 			if (!$this->hasfieldinserts) {
 				$previewparts = array();
 				foreach ($this->parts as $part) {
+					
 					$previewpart = array("type" => $part->type,"txt" => $part->txt,"audiofileid" => $part->audiofileid, "voiceid" => $part->voiceid);
 					$previewparts[] = $previewpart;
 				}
@@ -287,7 +303,7 @@ class PreviewModal {
 					if (response.responseJSON) {
 						var result = response.responseJSON;
 						window_title.update(result.title);
-						if (result.type == "phone") {
+						if (result.playable == true) {
 							window_contents.update(result.form + '<div style=\'text-align:center;\' id=\'player\'></div><div style=\'text-align:center;\' id=\'download\'></div>');
 							if (result.hasinserts ==  false) {
 								$('download').update('<a href=\'previewaudio.mp3.php?download=true&uid=' + result.uid + '\'>Click here to download</a>');

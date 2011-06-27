@@ -827,7 +827,7 @@ if (isset($_SESSION['wizard_message_mgid'])) {
 if (!isset($_SESSION['wizard_message']['mgid']))
 	redirect('unauthorized.php');
 
-PreviewModal::HandlePhoneMessageText($_SESSION['wizard_message']['mgid']);
+PreviewModal::HandleRequestWithPhoneText($_SESSION['wizard_message']['mgid']);
 
 ////////////////////////////////////////////////////////////////////////////////
 // Display

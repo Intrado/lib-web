@@ -696,7 +696,7 @@ if (!isset($_SESSION['wizard_message_mgid']))
 if (!isset($_SESSION['wizard_message_subtype']))
 	redirect('unauthorized.php');
 
-PreviewModal::HandleEmailMessageText();
+PreviewModal::HandleRequestWithEmailText();
 
 ////////////////////////////////////////////////////////////////////////////////
 // Display
