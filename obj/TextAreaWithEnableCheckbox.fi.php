@@ -25,14 +25,14 @@ class TextAreaWithEnableCheckbox extends FormItem {
 		$cols = isset($this->args['cols']) ? 'cols="'.$this->args['cols'].'"' : "";
 		
 		$enabletext = (isset($this->args['enabletext'])?$this->args['enabletext']:_L("Enabled"));
-		$defaultvalue = (isset($this->args['defaultvalue'])?$this->args['defaultvalue']:_L("Enabled"));
+		$defaultvalue = (isset($this->args['defaultvalue'])?$this->args['defaultvalue']:$value);
 		$str = '
 			<input id="'.$n.'-enable" name="'.$n.'-enable" type="checkbox" '.($value?"checked":"").' /><label for="'.$n.'-enable">'. $enabletext .'</label>
 			<input id="'.$n.'-oldtext" type="hidden" value="'.escapehtml($defaultvalue).'" />
 			<div id="'.$n.'-textareadiv" style="display:'.($value?"block":"none").'">
 				<textarea id="'.$n.'" name="'.$n.'" '.$rows.' '.$cols.'>'.escapehtml($value).'</textarea>';
 		if(isset($this->args['counter']))
-			$str .= '<div id="' . $n . 'charsleft">'._L('Characters remaining'). ':&nbsp;'. ( $this->args['counter'] - mb_strlen($value)). '</div>';
+			$str .= '<div id="' . $n . 'charsleft">'._L('Characters remaining'). ':&nbsp;'. ( $this->args['counter'] - mb_strlen(($value?$value:$defaultvalue)) ). '</div>';
 		$str .= '</div>';
 		
 		return $str;
