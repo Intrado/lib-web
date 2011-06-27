@@ -28,7 +28,7 @@ if(!(getSystemSetting('_hasfacebook', false) || getSystemSetting('_hastwitter', 
 // Form Data
 ////////////////////////////////////////////////////////////////////////////////
 
-$jobs = DBFindMany("Job", "from jobpost jp inner join job j on (jp.jobid = j.id) where deleted = 0 and status in ('active','complete','cancelled','cancelling') and j.questionnaireid is null order by id desc limit 500","j");
+$jobs = DBFindMany("Job", "from jobpost jp inner join job j on (jp.jobid = j.id) where deleted = 0 and status in ('complete','cancelled') group by j.id order by id desc limit 500","j");
 
 $joblist = array();
 foreach ($jobs as $job) {
@@ -36,7 +36,7 @@ foreach ($jobs as $job) {
 }
 
 $archivedjoblist = array();
-$archivedjobs = DBFindMany("Job","from jobpost jp inner join job j on (jp.jobid = j.id)  where deleted = 2 and status!='repeating' and j.questionnaireid is null order by id desc limit 500","j");
+$archivedjobs = DBFindMany("Job","from jobpost jp inner join job j on (jp.jobid = j.id)  where deleted = 2 and status!='repeating' group by j.id order by id desc limit 500","j");
 foreach ($archivedjobs as $job) {
 	$archivedjoblist[$job->id] = $job->name;
 }
@@ -107,14 +107,14 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		}
 		$readonlyDB = readonlyDBConnect();
 		
-		$messagequery = "select j.id, j.name,jp.type,mp.txt,ADDTIME(j.startdate, j.starttime),jp.destination,u.login
+		$messagequery = "select j.id, j.name,jp.type,mp.txt,ADDTIME(j.startdate, j.starttime),jp.destination,u.login, jp.posted
 										from
 							job j inner join jobpost jp on (jp.jobid = j.id)
 							inner join message m on (j.messagegroupid = m.messagegroupid and m.subtype = jp.type)
 							inner join messagepart mp on (m.id = mp.messageid)
 							inner join jobtype jt on (jt.id = j.jobtypeid)
 							inner join user u on (j.userid = u.id) 
-							where m.type = 'post' and jp.posted=1 and jp.type in ";
+							where m.type = 'post' and j.status in ('complete','cancelled') and jp.type in ";
 		$types = array();
 		if (getSystemSetting('_hasfacebook', false)) {
 			$types[] = "facebook";
@@ -181,14 +181,20 @@ if ($showreport || $downloadreport) {
 				$post["user"] = $row[6];
 				$post["date"] = $row[4];
 				$post["fbdest"] = "";
+				$post["fbstatus"] = "";
 				$post["fbcontent"] = "";
 				$post["twhandle"] = "";
+				$post["twstatus"] = "";
 				$post["twcontent"] = "";
 			}
 			
 			switch($row[2]) {
 				case "facebook":
 					$post["fbdest"] .= $post["fbdest"] != ""?", ":"";
+					$status = $row[7] == "1"?"Posted":"Failed";
+					if ($status != $post["fbstatus"]) {
+						$post["fbstatus"] .= $post["fbstatus"] != ""?", $status":$status;
+					}
 					
 					$post["fbcontent"] = $row[3];
 					if (isset($fbaccountnames[$row[5]])) {
@@ -215,6 +221,7 @@ if ($showreport || $downloadreport) {
 					break;
 				case "twitter":
 					$post["twhandle"] = $row[5];
+					$post["twstatus"] = $row[7] == "1"?"Posted":"Failed";
 					$post["twcontent"] = $row[3];
 					// Do not modify, Just print the handle 
 					break;
@@ -238,10 +245,10 @@ if ($downloadreport) {
 	//generate the CSV header
 	echo _L("Job Name") . ',' . _L("Submitted by") . ',' . _L("Post Date");
 	if (getSystemSetting('_hasfacebook', false)) {
-		echo ',' . _L("Facebook Destination") . ',' . _L("Facebook Content");
+		echo ',' . _L("Facebook Destination") . ',' . _L("Facebook Status") . ',' . _L("Facebook Content");
 	}
 	if (getSystemSetting('_hastwitter', false)) {
-		echo ',' . _L("Twitter Handle") . ',' . _L("Twitter Content");
+		echo ',' . _L("Twitter Handle") . ',' . _L("Twitter Status") . ',' . _L("Twitter Content");
 	}
 	
 	echo "\r\n";
@@ -331,10 +338,10 @@ if ($showreport) {
 	echo '<table class="list" style="width:100%;text-align:left;" cellpadding="3" cellspacing="1">';
 	echo '<tr class="listHeader"><th>Job Name</th><th>Submitted by</th><th>Post Date</th>';
 	if (getSystemSetting('_hasfacebook', false)) {
-		echo '<th>' . _L("Facebook Destination") . '</th><th>' . _L("Facebook Content") . '</th>';
+		echo '<th>' . _L("Facebook Destination") . '</th><th>' . _L("Facebook Status") . '</th><th>' . _L("Facebook Content") . '</th>';
 	}
 	if (getSystemSetting('_hastwitter', false)) {
-		echo '<th>' . _L("Twitter Handle") . '</th><th>' . _L("Twitter Content") . '</th>';
+		echo '<th>' . _L("Twitter Handle") . '</th><th>' . _L("Twitter Status") . '</th><th>' . _L("Twitter Content") . '</th>';
 	}
 	echo '</tr>';
 	$alt = 0;
@@ -344,10 +351,10 @@ if ($showreport) {
 		echo "<td>" . escapehtml($post["jobname"]) . "</td><td>" . escapehtml($post["user"]) . "</td><td>" . escapehtml($post["date"]) . "</td>";
 		
 		if (getSystemSetting('_hasfacebook', false)) {
-			echo "<td>" . escapehtml($post["fbdest"]) . "</td><td>" . ConditionalContentLink("fb_$alt", $post["fbcontent"]) . "</td>";
+			echo "<td>" . escapehtml($post["fbdest"]) . "</td><td>" . escapehtml($post["fbstatus"]) . "</td><td>" . ConditionalContentLink("fb_$alt", $post["fbcontent"]) . "</td>";
 		}
 		if (getSystemSetting('_hastwitter', false)) {
-			echo "<td>" . escapehtml($post["twhandle"]) . "</td><td>" . ConditionalContentLink("tw_$alt", $post["twcontent"]) . "</td>";
+			echo "<td>" . escapehtml($post["twhandle"]) . "</td><td>" . escapehtml($post["twstatus"]) . "</td><td>" . ConditionalContentLink("tw_$alt", $post["twcontent"]) . "</td>";
 		}
 		echo '</tr>';
 	}
