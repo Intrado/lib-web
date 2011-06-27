@@ -36,6 +36,7 @@ require_once("inc/translate.inc.php");
 require_once("obj/FormListSelect.fi.php");
 require_once("inc/date.inc.php");
 require_once("obj/ValListSelection.val.php");
+require_once("obj/FacebookPage.fi.php");
 
 
 // Includes that are required for preview to work
@@ -109,6 +110,125 @@ if ($_SESSION['jobid'] == NULL) {
 ////////////////////////////////////////////////////////////////////////////////
 // Optional Form Items And Validators
 ////////////////////////////////////////////////////////////////////////////////
+class ReadOnlyFacebookPage extends FormItem {
+	function render ($value) {
+		global $SETTINGS;
+		
+		$n = $this->form->name."_".$this->name;
+		
+		// [ <pageid>, <pageid>, ... ]
+		if (!$value)
+			$value = json_encode(array());
+		
+		// main details div
+		$str = '
+			<style>
+				.fbpagelist {
+					width: 98%;
+					border: 1px dotted gray;
+					padding: 3px;
+					max-height: 250px;
+					overflow: auto;
+				}
+				.fbname {
+					font-weight: bold;
+				}
+				.fbimg {
+					padding: 3px;
+					float: left;
+				}
+			</style>
+			<input id="'.$n.'" name="'.$n.'" type="hidden" value="'.escapehtml($value).'" />
+			<div id="fb-root"></div>
+			<div id="'. $n. 'fbpages" class="fbpagelist">
+				<img src="img/ajax-loader.gif" alt="'. escapehtml(_L("Loading")). '"/>
+			</div>';
+		
+		return $str;
+	}
+	
+	function renderJavascript($value) {
+		global $SETTINGS;
+		$n = $this->form->name."_".$this->name;
+		
+		$str = '// Facebook javascript API initialization, pulled from facebook documentation
+				window.fbAsyncInit = function() {
+					FB.init({appId: "'. $SETTINGS['facebook']['appid']. '", status: true, cookie: false, xfbml: true});
+					
+					// load the initial list of pages if possible
+					updateFbPagesRo("'.$n.'", "'.$n.'fbpages");
+				};
+				(function() {
+					var e = document.createElement("script");
+					e.type = "text/javascript";
+					e.async = true;
+					e.src = document.location.protocol + "//connect.facebook.net/en_US/all.js";
+					document.getElementById("fb-root").appendChild(e);
+				}());
+				';
+		return $str;
+	}
+	
+	function renderJavascriptLibraries() {
+		$str = '<script type="text/javascript">
+			
+			function updateFbPagesRo(formitem, container) {
+				
+				var pages = $(formitem).value.evalJSON();
+				container = $(container);
+				
+				container.update();
+				
+				// add a loading indicator
+				$(container).insert(
+					new Element("div", { id: formitem + "-pageloading" }).insert(
+						new Element("img", { "src": "img/ajax-loader.gif", "alt": "Loading" })
+					)
+				);
+				
+				$A(pages).each(function (pageid) {
+					FB.api("/" + pageid, function(res) {
+						if (res && !res.error) {
+							addFbPageElementRo(formitem, container, res);
+						} else {
+							// no data returned
+							container.update(
+								new Element("div").setStyle({padding: "5px"}).update(
+									"'. escapehtml(_L('Error encountered trying to get pages')). '"));
+						}
+					});
+				});
+				
+				// remove the loading icon
+				$(formitem + "-pageloading").remove();
+			}
+			
+			// get an account element with all the facebook page info, returns the checkbox
+			function addFbPageElementRo(e, container, account) {
+				if (account.category == undefined)
+					var category = "Wall Posting";
+				else
+					var category = account.category.escapeHTML();
+					
+				var name = account.name.escapeHTML();
+				var id = account.id;
+				
+				var pageimage = new Element("img", { "class": "fbimg", "src": "https://graph.facebook.com/"+ account.id +"/picture?type=square" });
+				var accountitem = new Element("div").insert(
+						pageimage
+					).insert(
+						new Element("div").insert(
+							new Element("div", { "class": "fbname" }).update(name)
+						).insert(
+							new Element("div", { "class": "fbcategory" }).update(category))
+					);
+				$(container).insert(accountitem);
+				$(container).insert(new Element("div").setStyle({ "clear": "both"}));
+			}
+			</script>';
+		return $str;
+	}
+}
 
 class ValTranslationExpirationDate extends Validator {
 	var $onlyserverside = true;
@@ -145,6 +265,45 @@ class ValIsTranslated extends Validator {
 			return _L("Can not select a message that is auto-translated with a repeating job");
 		}
 		return true;
+	}
+}
+
+// requires the message form item and validates that there are valid pages selected... but only if the message has facebook
+class ValFacebookPageWithMessage extends Validator {
+	var $onlyserverside = true;
+	function validate ($value, $args, $requiredvalues) {
+		global $USER;
+		$mg = new MessageGroup($requiredvalues['message']);
+		// if the message group doesn't have facebook, we don't care if they choose a page or not
+		if (!$mg->hasMessage("post", "facebook"))
+			return true;
+		
+		if (!$USER->authorize('facebookpost'))
+			return $this->label. " ". _L("current user is not authorized to post messages.");
+		
+		$fbdata = json_decode($value);
+		
+		// get the authorized pages
+		// don't trust args, look up the authorized pages
+		$authpages = getFbAuthorizedPages();
+		$authwall = getSystemSetting("fbauthorizewall");
+		
+		// check to see if any pages are selected
+		$haspage = false;
+		foreach ($fbdata as $pageid) {
+			$haspage = true;
+			// check authorized pages to see if the ones selected are allowed
+			if ($pageid == "me") {
+				if (!$authwall)
+					return $this->label. " ". _L("has an invalid selection. Personal wall posting is disabled.");
+			} else if ($authpages && !in_array($pageid, $authpages)) {
+				return $this->label. " ". _L("has an invalid posting location selected. Page is not authorized.");
+			}
+		}
+		if (!$haspage)
+			return $this->label. " ". _L("must have one or more pages to post to.");
+		
+		return true;		
 	}
 }
 
@@ -198,6 +357,11 @@ if ($job->messagegroupid != null) {
 		$messages[$deletedmessage[0]] = $deletedmessage[1];
 	}
 }
+
+// get the facebook pages this job is using (if any)
+$fbpages = array();
+if ($job)
+	$fbpages = QuickQueryList("select destination from jobpost where type = 'facebook' and jobid = ?", false, false, array($job->id));
 
 $helpsteps = array();
 $helpstepnum = 1;
@@ -448,6 +612,19 @@ if ($submittedmode || $completedmode) {
 		"helpstep" => ++$helpstepnum
 	);
 
+	// readonly facebook page list
+	if ($fbpages) {
+		$helpsteps[] = _L("TODO: readonly facbook page list");
+		$formdata["fbpages"] = array(
+			"label" => _L('Facbook Page(s)'),
+			"fieldhelp" => _L(''),
+			"value" => json_encode($fbpages),
+			"validators" => array(),
+			"control" => array("ReadOnlyFacebookPage"),
+			"helpstep" => ++$helpstepnum
+		);
+	}
+	
 	$formdata[] = _L('Advanced Options ');
 	$formdata["report"] = array(
 		"label" => _L('Auto Report'),
@@ -543,6 +720,21 @@ if ($submittedmode || $completedmode) {
 		$formdata["message"]["requires"] = array("date");
 	}
 
+	// if the account may post to facebook. show facebook page selection formitem
+	if (getSystemSetting("_hasfacebook") && $USER->authorize("facebookpost")) {
+		$helpsteps[] = _L("TODO: facebook page selection");
+		$formdata["fbpage"] = array(
+			"label" => _L('Facebook Page(s)'),
+			"fieldhelp" => _L("Select which pages to post to."),
+			"value" => json_encode($fbpages),
+			"validators" => array(
+				array("ValRequired"),
+				array("ValFacebookPageWithMessage", "authpages" => getFbAuthorizedPages(), "authwall" => getSystemSetting("fbauthorizewall"))),
+			"control" => array("FacebookPage", "access_token" => $USER->getSetting("fb_access_token", false)),
+			"requires" => array("message"),
+			"helpstep" => ++$helpstepnum);
+	}
+	
 	$formdata[] = _L('Advanced Options ');
 	$formdata["report"] = array(
 		"label" => _L('Auto Report'),
@@ -691,12 +883,11 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 				$job->setOption("skipduplicates",$postdata['skipduplicates']?1:0);
 				$job->setOption("skipemailduplicates",$postdata['skipduplicates']?1:0);
 
-				if ($JOBTYPE != "repeating") {
-					$messagegroup = new MessageGroup($postdata['message']);
+				$messagegroup = new MessageGroup($postdata['message']);
+				if ($JOBTYPE != "repeating")
 					$messagegroup->reTranslate();
-				}
 				
-				$job->messagegroupid = $postdata['message'];
+				$job->messagegroupid = $messagegroup->id;
 
 				// set jobsetting 'callerid' blank for jobprocessor to lookup the current default at job start
 				if ($USER->authorize('setcallerid') && !getSystemSetting('_hascallback', false)) {
@@ -711,7 +902,6 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 
 				if ($USER->authorize("messageconfirmation"))
 					$job->setOption("messageconfirmation", $postdata['confirmoption']?1:0);
-
 
 				$job->setOption("sendreport",$postdata['report']?1:0);
 				$job->setOptionValue("maxcallattempts", $postdata['attempts']);
@@ -737,6 +927,19 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 					if ($batchsql) {
 						$sql = "INSERT INTO joblist (jobid,listid) VALUES " . trim($batchsql,",");
 						QuickUpdate($sql,false,$batchargs);
+					}
+					// insert facebook pages, (if the user can and the message group has a facebook message)
+					if (getSystemSetting("_hasfacebook") && $USER->authorize("facebookpost") && $messagegroup->hasMessage("post", "facebook")) {
+						$batchsql = "";
+						$batchargs = array();
+						foreach (json_decode($postdata['fbpage']) as $fbpageid) {
+							$batchsql .= "(?,'facebook',?),";
+							if ($fbpageid == "me")
+								$fbpageid = $USER->getSetting("fb_user_id");
+							$batchargs[] = $job->id;
+							$batchargs[] = $fbpageid;
+						}
+						QuickUpdate("insert into jobpost (jobid, type, destination) values ". trim($batchsql,","), false, $batchargs);
 					}
 				}
 			}
@@ -782,7 +985,8 @@ Validator::load_validators(array("ValDuplicateNameCheck",
 								"ValTimeWindowCallLate",
 								"ValFormListSelect",
 								"ValIsTranslated",
-								"ValMessageGroup"));
+								"ValMessageGroup",
+								"ValFacebookPageWithMessage"));
 ?>
 </script>
 <script src="script/livepipe/livepipe.js" type="text/javascript"></script>
