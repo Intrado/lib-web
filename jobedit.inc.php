@@ -200,6 +200,7 @@ if ($job->messagegroupid != null) {
 }
 
 $helpsteps = array();
+$helpstepnum = 1;
 $formdata = array();
 
 $formdata[] = _L('Job');
@@ -217,7 +218,7 @@ $formdata["name"] = array(
 		array("ValLength","max" => ($JOBTYPE == "repeating")?30:50)
 	),
 	"control" => array("TextField","size" => 30, "maxlength" => 50),
-	"helpstep" => 1
+	"helpstep" => $helpstepnum
 );
 $formdata["description"] = array(
 	"label" => _L('Description'),
@@ -227,22 +228,20 @@ $formdata["description"] = array(
 		array("ValLength","min" => 0,"max" => 50)
 	),
 	"control" => array("TextField","size" => 30, "maxlength" => 50),
-	"helpstep" => 1
+	"helpstep" => $helpstepnum
 );
 
 
+$helpsteps[] = _L("Select the option that best describes the type of notification you are sending. ".
+					"The category you select will determine which introduction your recipients will hear.");
 if ($submittedmode || $completedmode) {
-	$helpsteps[] = _L("Select the option that best describes the type of notification you are sending. ".
-						"The category you select will determine which introduction your recipients will hear.");
 	$formdata["jobtype"] = array(
 		"label" => _L("Type/Category"),
 		"fieldhelp" => _L("The option that best describes the type of notification you are sending."),
 		"control" => array("FormHtml","html" => escapehtml($jobtypes[$job->jobtypeid])),
-		"helpstep" => 2
+		"helpstep" => ++$helpstepnum
 	);
 } else {
-	$helpsteps[] = _L("Select the option that best describes the type of notification you are sending. ".
-						"The category you select will determine which introduction your recipients will hear.");
 	$formdata["jobtype"] = array(
 		"label" => _L("Type/Category"),
 		"fieldhelp" => _L("Select the option that best describes the type of notification you are sending. ".
@@ -253,7 +252,7 @@ if ($submittedmode || $completedmode) {
 			array("ValInArray", "values" => array_keys($jobtypes))
 		),
 		"control" => array("RadioButton", "values" => $jobtypes, "hover" => $jobtips),
-		"helpstep" => 2
+		"helpstep" => ++$helpstepnum
 	);
 }
 
@@ -276,15 +275,16 @@ if ($JOBTYPE == "repeating") {
 	}
 	$repeatvalues[7] = date("g:i a", strtotime($schedule->time));
 
+	$timevalues = newform_time_select(NULL, $ACCESS->getValue('callearly'), $ACCESS->getValue('calllate'), $USER->getCallLate());
+
 	$helpsteps[] = _L("The options in this section create a delivery window for your job. ".
 						"It's important that you leave enough time for the system to contact everyone in your list. ".
 						"The options are:".
 							"<ul>".
-								"<li>Start Date - This is the day the job will start running.".
+								"<li>Repeat - This is the day(s) of the week and the time of day the job will start running.".
 								"<li>Days to Run - The number of days the job should run within the times you select.".
 								"<li>Start Time and End Time - These represent the time the job should start and stop.".
 							"</ul>");
-	$timevalues = newform_time_select(NULL, $ACCESS->getValue('callearly'), $ACCESS->getValue('calllate'), $USER->getCallLate());
 	$formdata["repeat"] = array(
 		"label" => _L("Repeat"),
 		"fieldhelp" => _L("Select which days this job should run."),
@@ -297,17 +297,23 @@ if ($JOBTYPE == "repeating") {
 			"WeekRepeatItem",
 			"timevalues" => $timevalues
 			),
-		"helpstep" => 3
+		"helpstep" => ++$helpstepnum
 	);
 } else {
-	$helpsteps[] = _L("The Delivery Window designates the earliest call time and the latest call time allowed for notification delivery.<br><br> ".
-	"<b>Note:</b> You may send a job up until one minute before the cutoff time specified in your Access Profile. You should set the job to run for two days to ensure all calls are made.");
+	$helpsteps[] = _L("The options in this section create a delivery window for your job. ".
+						"It's important that you leave enough time for the system to contact everyone in your list. ".
+						"The options are:".
+							"<ul>".
+								"<li>Start Date - This is the day the job will start running.".
+								"<li>Days to Run - The number of days the job should run within the times you select.".
+								"<li>Start Time and End Time - These represent the time the job should start and stop.".
+							"</ul>");
 	if ($completedmode) {
 		$formdata["date"] = array(
 			"label" => _L("Start Date"),
 			"fieldhelp" => _L("Notification will begin on the selected date."),
 			"control" => array("FormHtml","html" => date("m/d/Y", strtotime($job->startdate))),
-			"helpstep" => 3
+			"helpstep" => ++$helpstepnum
 		);
 	} else {
 		$formdata["date"] = array(
@@ -320,30 +326,31 @@ if ($JOBTYPE == "repeating") {
 				,array("ValTranslationExpirationDate")
 			),
 			"control" => array("TextDate", "size"=>12, "nodatesbefore" => $dayoffset),
-			"helpstep" => 3
+			"helpstep" => ++$helpstepnum
 		);
 		if (!$submittedmode)
 			$formdata["date"]["requires"] = array("message");
 	}
 }
+
 if ($completedmode) {
 	$formdata["days"] = array(
 		"label" => _L("Days to Run"),
 		"fieldhelp" => _L("Select the number of days this job should run."),
 		"control" => array("FormHtml","html" => (86400 + strtotime($job->enddate) - strtotime($job->startdate) ) / 86400),
-		"helpstep" => 3
+		"helpstep" => $helpstepnum
 	);
 	$formdata["callearly"] = array(
 		"label" => _L("Start Time"),
 		"fieldhelp" => ("This is the earliest time to send calls. This is also determined by your security profile."),
 		"control" => array("FormHtml","html" => date("g:i a", strtotime($job->starttime))),
-		"helpstep" => 3
+		"helpstep" => $helpstepnum
 	);
 	$formdata["calllate"] = array(
 		"label" => _L("End Time"),
 		"fieldhelp" => ("This is the latest time to send calls. This is also determined by your security profile."),
 		"control" => array("FormHtml","html" => date("g:i a", strtotime($job->endtime))),
-		"helpstep" => 3
+		"helpstep" => $helpstepnum
 	);
 } else {
 	// Prepare the the "Number of Days to run" data
@@ -358,7 +365,7 @@ if ($completedmode) {
 			array("ValDate", "min" => 1, "max" => ($ACCESS->getValue('maxjobdays') != null ? $ACCESS->getValue('maxjobdays') : "7"))
 		),
 		"control" => array("SelectMenu", "values" => $numdays),
-		"helpstep" => 3
+		"helpstep" => $helpstepnum
 	);
 
 	$formdata["callearly"] = array(
@@ -372,7 +379,7 @@ if ($completedmode) {
 		),
 		"requires" => array("calllate"),// is only required for non repeating jobs
 		"control" => array("SelectMenu", "values"=>$startvalues),
-		"helpstep" => 3
+		"helpstep" => $helpstepnum
 	);
 
 	$formdata["calllate"] = array(
@@ -386,7 +393,7 @@ if ($completedmode) {
 		),
 		"requires" => array("callearly"), // is only required for non repeating jobs
 		"control" => array("SelectMenu", "values"=>$endvalues),
-		"helpstep" => 3
+		"helpstep" => $helpstepnum
 	);
 
 	if ($JOBTYPE != "repeating") {// is only required for non repeating jobs
@@ -421,7 +428,7 @@ if ($submittedmode || $completedmode) {
 		"label" => _L('Lists'),
 		"fieldhelp" => _L('Select a list from your existing lists.'),
 		"control" => array("FormHtml","html" => $listhtml),
-		"helpstep" => 4
+		"helpstep" => ++$helpstepnum
 	);
 	$formdata["skipduplicates"] = array(
 		"label" => _L('Skip Duplicates'),
@@ -429,7 +436,7 @@ if ($submittedmode || $completedmode) {
 		"control" => array(
 			"FormHtml",
 			"html" => "<input type='checkbox' " . ($job->isOption("skipduplicates")?"checked":"") . " disabled />"),
-		"helpstep" => 4
+		"helpstep" => $helpstepnum
 	);
 	$formdata[] = _L('Message');
 	$formdata["message"] = array(
@@ -438,7 +445,7 @@ if ($submittedmode || $completedmode) {
 		"value" => (((isset($job->messagegroupid) && $job->messagegroupid))?$job->messagegroupid:""),
 		"validators" => array(),
 		"control" => array("MessageGroupSelectMenu", "values" => $messages, "static" => true),
-		"helpstep" => 5
+		"helpstep" => ++$helpstepnum
 	);
 
 	$formdata[] = _L('Advanced Options ');
@@ -448,7 +455,7 @@ if ($submittedmode || $completedmode) {
 		"control" => array(
 			"FormHtml",
 			"html" => "<input type='checkbox' " . ($job->isOption("sendreport")?"checked":"") . " disabled />"),
-		"helpstep" => 6
+		"helpstep" => ++$helpstepnum
 	);
 
 	if ($USER->authorize('setcallerid') && !getSystemSetting('_hascallback', false)) {
@@ -456,7 +463,7 @@ if ($submittedmode || $completedmode) {
 			"label" => _L("Personal Caller ID"),
 			"fieldhelp" => ("This features allows you to override the number that will display on recipient's Caller IDs."),
 			"control" => array("FormHtml","html" => Phone::format($job->getSetting("callerid",getDefaultCallerID()))),
-			"helpstep" => 6
+			"helpstep" => $helpstepnum
 		);
 	}
 
@@ -468,7 +475,7 @@ if ($submittedmode || $completedmode) {
 		"label" => _L('Max Attempts'),
 		"fieldhelp" => _L("Select the maximum number of times the system should try to contact an individual."),
 		"control" => array("FormHtml","html" => $job->getOptionValue("maxcallattempts")),
-		"helpstep" => 6
+		"helpstep" => $helpstepnum
 	);
 	if ($USER->authorize('leavemessage')) {
 		$formdata["replyoption"] = array(
@@ -478,7 +485,7 @@ if ($submittedmode || $completedmode) {
 			"control" => array(
 				"FormHtml",
 				"html" => "<input type='checkbox' " . ($job->isOption("leavemessage")?"checked":"") . " disabled />"),
-			"helpstep" => 6
+			"helpstep" => $helpstepnum
 		);
 	}
 	if ($USER->authorize('messageconfirmation')) { 
@@ -490,7 +497,7 @@ if ($submittedmode || $completedmode) {
 			"control" => array(
 				"FormHtml",
 				"html" => "<input type='checkbox' " . ($job->isOption("messageconfirmation")?"checked":"") . " disabled />"),
-			"helpstep" => 6
+			"helpstep" => $helpstepnum
 		);
 	}
 } else {
@@ -504,7 +511,7 @@ if ($submittedmode || $completedmode) {
 			array("ValFormListSelect")
 		),
 		"control" => array("FormListSelect","jobid" => $job->id),
-		"helpstep" => 4
+		"helpstep" => ++$helpstepnum
 	);
 	$formdata["skipduplicates"] = array(
 		"label" => _L('Skip Duplicates'),
@@ -512,7 +519,7 @@ if ($submittedmode || $completedmode) {
 		"value" => $job->isOption("skipduplicates"),
 		"validators" => array(),
 		"control" => array("CheckBox"),
-		"helpstep" => 4
+		"helpstep" => $helpstepnum
 	);
 	$formdata[] = _L('Message');
 	$messagevalidators = array(
@@ -529,7 +536,7 @@ if ($submittedmode || $completedmode) {
 		"value" => (((isset($job->messagegroupid) && $job->messagegroupid))?$job->messagegroupid:""),
 		"validators" => $messagevalidators,
 		"control" => array("MessageGroupSelectMenu", "values" => $messages),
-		"helpstep" => 5
+		"helpstep" => ++$helpstepnum
 	);
 
 	if ($JOBTYPE != "repeating") {
@@ -543,7 +550,7 @@ if ($submittedmode || $completedmode) {
 		"value" => $job->isOption("sendreport"),
 		"validators" => array(),
 		"control" => array("CheckBox"),
-		"helpstep" => 6
+		"helpstep" => ++$helpstepnum
 	);
 
 	if ($USER->authorize('setcallerid') && !getSystemSetting('_hascallback', false)) {
@@ -556,7 +563,7 @@ if ($submittedmode || $completedmode) {
 				array("ValPhone")
 			),
 			"control" => array("TextField","maxlength" => 20, "size" => 15),
-			"helpstep" => 6
+			"helpstep" => $helpstepnum
 		);
 	}
 	
@@ -574,7 +581,7 @@ if ($submittedmode || $completedmode) {
 			array("ValNumber", "min" => 1, "max" => $maxattempts)
 		),
 		"control" => array("SelectMenu", "values" => $attempts),
-		"helpstep" => 6
+		"helpstep" => $helpstepnum
 	);
 	if ($USER->authorize('leavemessage')) { 
 		$formdata["replyoption"] = array(
@@ -584,7 +591,7 @@ if ($submittedmode || $completedmode) {
 			"value" => $job->isOption("leavemessage"),
 			"validators" => array(),
 			"control" => array("CheckBox"),
-			"helpstep" => 6
+			"helpstep" => $helpstepnum
 		);
 	}
 	if ($USER->authorize('messageconfirmation')) { 
@@ -596,7 +603,7 @@ if ($submittedmode || $completedmode) {
 			"value" => $job->isOption("messageconfirmation"),
 			"validators" => array(),
 			"control" => array("CheckBox"),
-			"helpstep" => 6
+			"helpstep" => $helpstepnum
 		);
 	}
 }
