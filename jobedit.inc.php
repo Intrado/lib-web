@@ -207,399 +207,399 @@ $formdata[] = _L('Job');
 $helpsteps[] = _L("Enter a name for your job. " .
 					"Using a descriptive name that indicates the message content will make it easier to find the job later. " .
 					"You may also optionally enter a description of the the job.");
-	$formdata["name"] = array(
-		"label" => _L('Name'),
-		"fieldhelp" => _L('Enter a name for your job.'),
-		"value" => isset($job->name)?$job->name:"",
+$formdata["name"] = array(
+	"label" => _L('Name'),
+	"fieldhelp" => _L('Enter a name for your job.'),
+	"value" => isset($job->name)?$job->name:"",
+	"validators" => array(
+		array("ValRequired"),
+		array("ValDuplicateNameCheck","type" => "job"),
+		array("ValLength","max" => ($JOBTYPE == "repeating")?30:50)
+	),
+	"control" => array("TextField","size" => 30, "maxlength" => 50),
+	"helpstep" => 1
+);
+$formdata["description"] = array(
+	"label" => _L('Description'),
+	"fieldhelp" => _L('Enter a description of the job. This is optional, but can help identify the job later.'),
+	"value" => isset($job->description)?$job->description:"",
+	"validators" => array(
+		array("ValLength","min" => 0,"max" => 50)
+	),
+	"control" => array("TextField","size" => 30, "maxlength" => 50),
+	"helpstep" => 1
+);
+
+
+if ($submittedmode || $completedmode) {
+	$helpsteps[] = _L("Select the option that best describes the type of notification you are sending. ".
+						"The category you select will determine which introduction your recipients will hear.");
+	$formdata["jobtype"] = array(
+		"label" => _L("Type/Category"),
+		"fieldhelp" => _L("The option that best describes the type of notification you are sending."),
+		"control" => array("FormHtml","html" => escapehtml($jobtypes[$job->jobtypeid])),
+		"helpstep" => 2
+	);
+} else {
+	$helpsteps[] = _L("Select the option that best describes the type of notification you are sending. ".
+						"The category you select will determine which introduction your recipients will hear.");
+	$formdata["jobtype"] = array(
+		"label" => _L("Type/Category"),
+		"fieldhelp" => _L("Select the option that best describes the type of notification you are sending. ".
+							"The category you select will determine which introduction your recipients will hear."),
+		"value" => isset($job->jobtypeid)?$job->jobtypeid:"",
 		"validators" => array(
 			array("ValRequired"),
-			array("ValDuplicateNameCheck","type" => "job"),
-			array("ValLength","max" => ($JOBTYPE == "repeating")?30:50)
+			array("ValInArray", "values" => array_keys($jobtypes))
 		),
-		"control" => array("TextField","size" => 30, "maxlength" => 50),
-		"helpstep" => 1
+		"control" => array("RadioButton", "values" => $jobtypes, "hover" => $jobtips),
+		"helpstep" => 2
 	);
-	$formdata["description"] = array(
-		"label" => _L('Description'),
-		"fieldhelp" => _L('Enter a description of the job. This is optional, but can help identify the job later.'),
-		"value" => isset($job->description)?$job->description:"",
+}
+
+if ($JOBTYPE == "repeating") {
+	$schedule = new Schedule($job->scheduleid);
+
+	$scheduledows = array();
+	if ($schedule->id == NULL) {
+		$schedule->time = $USER->getCallEarly();
+	} else {
+		$data = explode(",", $schedule->daysofweek);
+		for ($x = 1; $x < 8; $x++){
+			if (in_array($x,$data))
+				$scheduledows[$x-1] = true;
+		}
+	}
+	$repeatvalues = array();
+	for ($x = 0; $x < 7; $x++) {
+		$repeatvalues[] = isset($scheduledows[$x]);
+	}
+	$repeatvalues[7] = date("g:i a", strtotime($schedule->time));
+
+	$helpsteps[] = _L("The options in this section create a delivery window for your job. ".
+						"It's important that you leave enough time for the system to contact everyone in your list. ".
+						"The options are:".
+							"<ul>".
+								"<li>Start Date - This is the day the job will start running.".
+								"<li>Days to Run - The number of days the job should run within the times you select.".
+								"<li>Start Time and End Time - These represent the time the job should start and stop.".
+							"</ul>");
+	$timevalues = newform_time_select(NULL, $ACCESS->getValue('callearly'), $ACCESS->getValue('calllate'), $USER->getCallLate());
+	$formdata["repeat"] = array(
+		"label" => _L("Repeat"),
+		"fieldhelp" => _L("Select which days this job should run."),
+		"value" => $repeatvalues,
 		"validators" => array(
-			array("ValLength","min" => 0,"max" => 50)
+			array("ValRequired"),
+			array("ValWeekRepeatItem")
 		),
-		"control" => array("TextField","size" => 30, "maxlength" => 50),
-		"helpstep" => 1
+		"control" => array(
+			"WeekRepeatItem",
+			"timevalues" => $timevalues
+			),
+		"helpstep" => 3
+	);
+} else {
+	$helpsteps[] = _L("The Delivery Window designates the earliest call time and the latest call time allowed for notification delivery.<br><br> ".
+	"<b>Note:</b> You may send a job up until one minute before the cutoff time specified in your Access Profile. You should set the job to run for two days to ensure all calls are made.");
+	if ($completedmode) {
+		$formdata["date"] = array(
+			"label" => _L("Start Date"),
+			"fieldhelp" => _L("Notification will begin on the selected date."),
+			"control" => array("FormHtml","html" => date("m/d/Y", strtotime($job->startdate))),
+			"helpstep" => 3
+		);
+	} else {
+		$formdata["date"] = array(
+			"label" => _L("Start Date"),
+			"fieldhelp" => _L("Notification will begin on the selected date."),
+			"value" => isset($job->startdate)?$job->startdate:"now + $dayoffset days",
+			"validators" => array(
+				array("ValRequired"),
+				array("ValDate", "min" => date("m/d/Y", strtotime("now + $dayoffset days")))
+				,array("ValTranslationExpirationDate")
+			),
+			"control" => array("TextDate", "size"=>12, "nodatesbefore" => $dayoffset),
+			"helpstep" => 3
+		);
+		if (!$submittedmode)
+			$formdata["date"]["requires"] = array("message");
+	}
+}
+if ($completedmode) {
+	$formdata["days"] = array(
+		"label" => _L("Days to Run"),
+		"fieldhelp" => _L("Select the number of days this job should run."),
+		"control" => array("FormHtml","html" => (86400 + strtotime($job->enddate) - strtotime($job->startdate) ) / 86400),
+		"helpstep" => 3
+	);
+	$formdata["callearly"] = array(
+		"label" => _L("Start Time"),
+		"fieldhelp" => ("This is the earliest time to send calls. This is also determined by your security profile."),
+		"control" => array("FormHtml","html" => date("g:i a", strtotime($job->starttime))),
+		"helpstep" => 3
+	);
+	$formdata["calllate"] = array(
+		"label" => _L("End Time"),
+		"fieldhelp" => ("This is the latest time to send calls. This is also determined by your security profile."),
+		"control" => array("FormHtml","html" => date("g:i a", strtotime($job->endtime))),
+		"helpstep" => 3
+	);
+} else {
+	// Prepare the the "Number of Days to run" data
+	$maxdays = first($ACCESS->getValue('maxjobdays'), 7);
+	$numdays = array_combine(range(1,$maxdays),range(1,$maxdays));
+	$formdata["days"] = array(
+		"label" => _L("Days to Run"),
+		"fieldhelp" => _L("Select the number of days this job should run."),
+		"value" => (86400 + strtotime($job->enddate) - strtotime($job->startdate) ) / 86400,
+		"validators" => array(
+			array("ValRequired"),
+			array("ValDate", "min" => 1, "max" => ($ACCESS->getValue('maxjobdays') != null ? $ACCESS->getValue('maxjobdays') : "7"))
+		),
+		"control" => array("SelectMenu", "values" => $numdays),
+		"helpstep" => 3
 	);
 
-
-	if ($submittedmode || $completedmode) {
-		$helpsteps[] = _L("Select the option that best describes the type of notification you are sending. ".
-							"The category you select will determine which introduction your recipients will hear.");
-		$formdata["jobtype"] = array(
-			"label" => _L("Type/Category"),
-			"fieldhelp" => _L("The option that best describes the type of notification you are sending."),
-			"control" => array("FormHtml","html" => escapehtml($jobtypes[$job->jobtypeid])),
-			"helpstep" => 2
-		);
-	} else {
-		$helpsteps[] = _L("Select the option that best describes the type of notification you are sending. ".
-							"The category you select will determine which introduction your recipients will hear.");
-		$formdata["jobtype"] = array(
-			"label" => _L("Type/Category"),
-			"fieldhelp" => _L("Select the option that best describes the type of notification you are sending. ".
-								"The category you select will determine which introduction your recipients will hear."),
-			"value" => isset($job->jobtypeid)?$job->jobtypeid:"",
-			"validators" => array(
-				array("ValRequired"),
-				array("ValInArray", "values" => array_keys($jobtypes))
-			),
-			"control" => array("RadioButton", "values" => $jobtypes, "hover" => $jobtips),
-			"helpstep" => 2
-		);
-	}
-	
-	if ($JOBTYPE == "repeating") {
-		$schedule = new Schedule($job->scheduleid);
-
-		$scheduledows = array();
-		if ($schedule->id == NULL) {
-			$schedule->time = $USER->getCallEarly();
-		} else {
-			$data = explode(",", $schedule->daysofweek);
-			for ($x = 1; $x < 8; $x++){
-				if (in_array($x,$data))
-					$scheduledows[$x-1] = true;
-			}
-		}
-		$repeatvalues = array();
-		for ($x = 0; $x < 7; $x++) {
-			$repeatvalues[] = isset($scheduledows[$x]);
-		}
-		$repeatvalues[7] = date("g:i a", strtotime($schedule->time));
-	
-		$helpsteps[] = _L("The options in this section create a delivery window for your job. ".
-							"It's important that you leave enough time for the system to contact everyone in your list. ".
-							"The options are:".
-								"<ul>".
-									"<li>Start Date - This is the day the job will start running.".
-									"<li>Days to Run - The number of days the job should run within the times you select.".
-									"<li>Start Time and End Time - These represent the time the job should start and stop.".
-								"</ul>");
-		$timevalues = newform_time_select(NULL, $ACCESS->getValue('callearly'), $ACCESS->getValue('calllate'), $USER->getCallLate());
-		$formdata["repeat"] = array(
-			"label" => _L("Repeat"),
-			"fieldhelp" => _L("Select which days this job should run."),
-			"value" => $repeatvalues,
-			"validators" => array(
-				array("ValRequired"),
-				array("ValWeekRepeatItem")
-			),
-			"control" => array(
-				"WeekRepeatItem",
-				"timevalues" => $timevalues
-				),
-			"helpstep" => 3
-		);
-	} else {
-		$helpsteps[] = _L("The Delivery Window designates the earliest call time and the latest call time allowed for notification delivery.<br><br> ".
-		"<b>Note:</b> You may send a job up until one minute before the cutoff time specified in your Access Profile. You should set the job to run for two days to ensure all calls are made.");
-		if ($completedmode) {
-			$formdata["date"] = array(
-				"label" => _L("Start Date"),
-				"fieldhelp" => _L("Notification will begin on the selected date."),
-				"control" => array("FormHtml","html" => date("m/d/Y", strtotime($job->startdate))),
-				"helpstep" => 3
-			);
-		} else {
-			$formdata["date"] = array(
-				"label" => _L("Start Date"),
-				"fieldhelp" => _L("Notification will begin on the selected date."),
-				"value" => isset($job->startdate)?$job->startdate:"now + $dayoffset days",
-				"validators" => array(
+	$formdata["callearly"] = array(
+		"label" => _L("Start Time"),
+		"fieldhelp" => ("This is the earliest time to send calls. This is also determined by your security profile."),
+		"value" => date("g:i a", strtotime($job->starttime)),
+		"validators" => array(
 					array("ValRequired"),
-					array("ValDate", "min" => date("m/d/Y", strtotime("now + $dayoffset days")))
-					,array("ValTranslationExpirationDate")
-				),
-				"control" => array("TextDate", "size"=>12, "nodatesbefore" => $dayoffset),
-				"helpstep" => 3
-			);
-			if (!$submittedmode)
-				$formdata["date"]["requires"] = array("message");
-		}
+					array("ValTimeCheck", "min" => $ACCESS->getValue('callearly'), "max" => $ACCESS->getValue('calllate')),
+					array("ValTimeWindowCallEarly")
+		),
+		"requires" => array("calllate"),// is only required for non repeating jobs
+		"control" => array("SelectMenu", "values"=>$startvalues),
+		"helpstep" => 3
+	);
+
+	$formdata["calllate"] = array(
+		"label" => _L("End Time"),
+		"fieldhelp" => ("This is the latest time to send calls. This is also determined by your security profile."),
+		"value" => date("g:i a", strtotime($job->endtime)),
+		"validators" => array(
+					array("ValRequired"),
+					array("ValTimeCheck", "min" => $ACCESS->getValue('callearly'), "max" => $ACCESS->getValue('calllate')),
+					array("ValTimeWindowCallLate")
+		),
+		"requires" => array("callearly"), // is only required for non repeating jobs
+		"control" => array("SelectMenu", "values"=>$endvalues),
+		"helpstep" => 3
+	);
+
+	if ($JOBTYPE != "repeating") {// is only required for non repeating jobs
+		$formdata["calllate"]["requires"][] = "date";
 	}
-	if ($completedmode) {
-		$formdata["days"] = array(
-			"label" => _L("Days to Run"),
-			"fieldhelp" => _L("Select the number of days this job should run."),
-			"control" => array("FormHtml","html" => (86400 + strtotime($job->enddate) - strtotime($job->startdate) ) / 86400),
-			"helpstep" => 3
-		);
-		$formdata["callearly"] = array(
-			"label" => _L("Start Time"),
-			"fieldhelp" => ("This is the earliest time to send calls. This is also determined by your security profile."),
-			"control" => array("FormHtml","html" => date("g:i a", strtotime($job->starttime))),
-			"helpstep" => 3
-		);
-		$formdata["calllate"] = array(
-			"label" => _L("End Time"),
-			"fieldhelp" => ("This is the latest time to send calls. This is also determined by your security profile."),
-			"control" => array("FormHtml","html" => date("g:i a", strtotime($job->endtime))),
-			"helpstep" => 3
-		);
-	} else {
-		// Prepare the the "Number of Days to run" data
-		$maxdays = first($ACCESS->getValue('maxjobdays'), 7);
-		$numdays = array_combine(range(1,$maxdays),range(1,$maxdays));
-		$formdata["days"] = array(
-			"label" => _L("Days to Run"),
-			"fieldhelp" => _L("Select the number of days this job should run."),
-			"value" => (86400 + strtotime($job->enddate) - strtotime($job->startdate) ) / 86400,
-			"validators" => array(
-				array("ValRequired"),
-				array("ValDate", "min" => 1, "max" => ($ACCESS->getValue('maxjobdays') != null ? $ACCESS->getValue('maxjobdays') : "7"))
-			),
-			"control" => array("SelectMenu", "values" => $numdays),
-			"helpstep" => 3
-		);
+}
 
-		$formdata["callearly"] = array(
-			"label" => _L("Start Time"),
-			"fieldhelp" => ("This is the earliest time to send calls. This is also determined by your security profile."),
-			"value" => date("g:i a", strtotime($job->starttime)),
-			"validators" => array(
-						array("ValRequired"),
-						array("ValTimeCheck", "min" => $ACCESS->getValue('callearly'), "max" => $ACCESS->getValue('calllate')),
-						array("ValTimeWindowCallEarly")
-			),
-			"requires" => array("calllate"),// is only required for non repeating jobs
-			"control" => array("SelectMenu", "values"=>$startvalues),
-			"helpstep" => 3
-		);
+$helpsteps[] = _L("Select an existing list to use. If you do not see the list you need, ".
+					"you can make one by clicking the Lists subtab above. <br><br> ".
+					"You may also opt to skip duplicates. Skip Duplicates is for calling ".
+					"each number once, so if, for example, two recipients have the same ".
+					"number, they will only be called once.");
+$helpsteps[] = _L("Select an existing message to use. If you do not see the message ".
+					"you need, you can make a new message by clicking the Messages subtab above.");
+$helpsteps[] = _L("<ul><li>Auto Report - Selecting this option causes the system to email ".
+					"a report to the email address associated with your account when the job ".
+					"is finished.<li>Max Attempts - This option lets you select the maximum ".
+					"number of times the system should try to contact a recipient. ".
+					"<li>Allow Reply - Check this if you want recipients to be able to ".
+					"record responses.<br><br><b>Note:</b>You will need to include instructions ".
+					"to press '0' to record a response in your message.<br><br> ".
+					"<li>Allow Confirmation - Select this option if you would like recipients ".
+					"to give a 'yes' or 'no' response to your message.<br><br> ".
+					"<b>Note:</b>You will need to include instructions ".
+					"to press '1' for 'yes' and '2' for 'no' in your message.</ul>");
 
-		$formdata["calllate"] = array(
-			"label" => _L("End Time"),
-			"fieldhelp" => ("This is the latest time to send calls. This is also determined by your security profile."),
-			"value" => date("g:i a", strtotime($job->endtime)),
-			"validators" => array(
-						array("ValRequired"),
-						array("ValTimeCheck", "min" => $ACCESS->getValue('callearly'), "max" => $ACCESS->getValue('calllate')),
-						array("ValTimeWindowCallLate")
-			),
-			"requires" => array("callearly"), // is only required for non repeating jobs
-			"control" => array("SelectMenu", "values"=>$endvalues),
-			"helpstep" => 3
-		);
+if ($submittedmode || $completedmode) {
+	$formdata[] = _L('List(s)');
+	$query = "select name from list where id in (" . repeatWithSeparator("?", ",", count($selectedlists)) . ")";
+	$listhtml = implode("<br/>",QuickQueryList($query,false,false,$selectedlists));
+	$formdata["lists"] = array(
+		"label" => _L('Lists'),
+		"fieldhelp" => _L('Select a list from your existing lists.'),
+		"control" => array("FormHtml","html" => $listhtml),
+		"helpstep" => 4
+	);
+	$formdata["skipduplicates"] = array(
+		"label" => _L('Skip Duplicates'),
+		"fieldhelp" => _L('Skip Duplicates if you would like to only contact recipients who share contact information once.'),
+		"control" => array(
+			"FormHtml",
+			"html" => "<input type='checkbox' " . ($job->isOption("skipduplicates")?"checked":"") . " disabled />"),
+		"helpstep" => 4
+	);
+	$formdata[] = _L('Message');
+	$formdata["message"] = array(
+		"label" => _L('Message'),
+		"fieldhelp" => _L('Select an existing message to use from the menu.'),
+		"value" => (((isset($job->messagegroupid) && $job->messagegroupid))?$job->messagegroupid:""),
+		"validators" => array(),
+		"control" => array("MessageGroupSelectMenu", "values" => $messages, "static" => true),
+		"helpstep" => 5
+	);
 
-		if ($JOBTYPE != "repeating") {// is only required for non repeating jobs
-			$formdata["calllate"]["requires"][] = "date";
-		}
-	}
-	
-	$helpsteps[] = _L("Select an existing list to use. If you do not see the list you need, ".
-						"you can make one by clicking the Lists subtab above. <br><br> ".
-						"You may also opt to skip duplicates. Skip Duplicates is for calling ".
-						"each number once, so if, for example, two recipients have the same ".
-						"number, they will only be called once.");
-	$helpsteps[] = _L("Select an existing message to use. If you do not see the message ".
-						"you need, you can make a new message by clicking the Messages subtab above.");
-	$helpsteps[] = _L("<ul><li>Auto Report - Selecting this option causes the system to email ".
-						"a report to the email address associated with your account when the job ".
-						"is finished.<li>Max Attempts - This option lets you select the maximum ".
-						"number of times the system should try to contact a recipient. ".
-						"<li>Allow Reply - Check this if you want recipients to be able to ".
-						"record responses.<br><br><b>Note:</b>You will need to include instructions ".
-						"to press '0' to record a response in your message.<br><br> ".
-						"<li>Allow Confirmation - Select this option if you would like recipients ".
-						"to give a 'yes' or 'no' response to your message.<br><br> ".
-						"<b>Note:</b>You will need to include instructions ".
-						"to press '1' for 'yes' and '2' for 'no' in your message.</ul>");
-	
-	if ($submittedmode || $completedmode) {
-		$formdata[] = _L('List(s)');
-		$query = "select name from list where id in (" . repeatWithSeparator("?", ",", count($selectedlists)) . ")";
-		$listhtml = implode("<br/>",QuickQueryList($query,false,false,$selectedlists));
-		$formdata["lists"] = array(
-			"label" => _L('Lists'),
-			"fieldhelp" => _L('Select a list from your existing lists.'),
-			"control" => array("FormHtml","html" => $listhtml),
-			"helpstep" => 4
-		);
-		$formdata["skipduplicates"] = array(
-			"label" => _L('Skip Duplicates'),
-			"fieldhelp" => _L('Skip Duplicates if you would like to only contact recipients who share contact information once.'),
-			"control" => array(
-				"FormHtml",
-				"html" => "<input type='checkbox' " . ($job->isOption("skipduplicates")?"checked":"") . " disabled />"),
-			"helpstep" => 4
-		);
-		$formdata[] = _L('Message');
-		$formdata["message"] = array(
-			"label" => _L('Message'),
-			"fieldhelp" => _L('Select an existing message to use from the menu.'),
-			"value" => (((isset($job->messagegroupid) && $job->messagegroupid))?$job->messagegroupid:""),
-			"validators" => array(),
-			"control" => array("MessageGroupSelectMenu", "values" => $messages, "static" => true),
-			"helpstep" => 5
-		);
+	$formdata[] = _L('Advanced Options ');
+	$formdata["report"] = array(
+		"label" => _L('Auto Report'),
+		"fieldhelp" => _L("Select this option if you would like the system to email you when the job has finished running."),
+		"control" => array(
+			"FormHtml",
+			"html" => "<input type='checkbox' " . ($job->isOption("sendreport")?"checked":"") . " disabled />"),
+		"helpstep" => 6
+	);
 
-		$formdata[] = _L('Advanced Options ');
-		$formdata["report"] = array(
-			"label" => _L('Auto Report'),
-			"fieldhelp" => _L("Select this option if you would like the system to email you when the job has finished running."),
-			"control" => array(
-				"FormHtml",
-				"html" => "<input type='checkbox' " . ($job->isOption("sendreport")?"checked":"") . " disabled />"),
+	if ($USER->authorize('setcallerid') && !getSystemSetting('_hascallback', false)) {
+		$formdata["callerid"] = array(
+			"label" => _L("Personal Caller ID"),
+			"fieldhelp" => ("This features allows you to override the number that will display on recipient's Caller IDs."),
+			"control" => array("FormHtml","html" => Phone::format($job->getSetting("callerid",getDefaultCallerID()))),
 			"helpstep" => 6
 		);
+	}
 
-		if ($USER->authorize('setcallerid') && !getSystemSetting('_hascallback', false)) {
-			$formdata["callerid"] = array(
-				"label" => _L("Personal Caller ID"),
-				"fieldhelp" => ("This features allows you to override the number that will display on recipient's Caller IDs."),
-				"control" => array("FormHtml","html" => Phone::format($job->getSetting("callerid",getDefaultCallerID()))),
-				"helpstep" => 6
-			);
-		}
+	// Prepare attempt data
+	$maxattempts = first($ACCESS->getValue('callmax'), 1);
+	$attempts = array_combine(range(1,$maxattempts),range(1,$maxattempts));
 
-		// Prepare attempt data
-		$maxattempts = first($ACCESS->getValue('callmax'), 1);
-		$attempts = array_combine(range(1,$maxattempts),range(1,$maxattempts));
-
-		$formdata["attempts"] = array(
-			"label" => _L('Max Attempts'),
-			"fieldhelp" => _L("Select the maximum number of times the system should try to contact an individual."),
-			"control" => array("FormHtml","html" => $job->getOptionValue("maxcallattempts")),
+	$formdata["attempts"] = array(
+		"label" => _L('Max Attempts'),
+		"fieldhelp" => _L("Select the maximum number of times the system should try to contact an individual."),
+		"control" => array("FormHtml","html" => $job->getOptionValue("maxcallattempts")),
+		"helpstep" => 6
+	);
+	if ($USER->authorize('leavemessage')) {
+		$formdata["replyoption"] = array(
+			"label" => _L('Allow Reply'),
+			"fieldhelp" => _L("Select this option if recipients should be able to record replies. ".
+								"Make sure that the message instructs recipients to press '0' to record a response."),
+			"control" => array(
+				"FormHtml",
+				"html" => "<input type='checkbox' " . ($job->isOption("leavemessage")?"checked":"") . " disabled />"),
 			"helpstep" => 6
 		);
-		if ($USER->authorize('leavemessage')) {
-			$formdata["replyoption"] = array(
-				"label" => _L('Allow Reply'),
-				"fieldhelp" => _L("Select this option if recipients should be able to record replies. ".
-									"Make sure that the message instructs recipients to press '0' to record a response."),
-				"control" => array(
-					"FormHtml",
-					"html" => "<input type='checkbox' " . ($job->isOption("leavemessage")?"checked":"") . " disabled />"),
-				"helpstep" => 6
+	}
+	if ($USER->authorize('messageconfirmation')) { 
+		$formdata["confirmoption"] = array(
+			"label" => _L('Allow Confirmation'),
+			"fieldhelp" => _L("Select this option if you would like recipients to be able to respond to your message ".
+								"by pressing 1' for 'yes' or '2' for 'no'. ".
+								"You will need to instruct recipients to do this in your message."),
+			"control" => array(
+				"FormHtml",
+				"html" => "<input type='checkbox' " . ($job->isOption("messageconfirmation")?"checked":"") . " disabled />"),
+			"helpstep" => 6
+		);
+	}
+} else {
+	$formdata[] = _L('List(s)');
+	$formdata["lists"] = array(
+		"label" => _L('Lists'),
+		"fieldhelp" => _L('Select a list from your existing lists.'),
+		"value" => ($selectedlists)?$selectedlists:array(),
+		"validators" => array(
+			array("ValRequired"),
+			array("ValFormListSelect")
+		),
+		"control" => array("FormListSelect","jobid" => $job->id),
+		"helpstep" => 4
+	);
+	$formdata["skipduplicates"] = array(
+		"label" => _L('Skip Duplicates'),
+		"fieldhelp" => ("Skip Duplicates if you would like to only contact recipients who share contact information once."),
+		"value" => $job->isOption("skipduplicates"),
+		"validators" => array(),
+		"control" => array("CheckBox"),
+		"helpstep" => 4
+	);
+	$formdata[] = _L('Message');
+	$messagevalidators = array(
+			array("ValRequired"),
+			array("ValInArray","values"=>array_keys($messages)),
+			array("ValMessageGroup")
 			);
-		}
-		if ($USER->authorize('messageconfirmation')) { 
-			$formdata["confirmoption"] = array(
-				"label" => _L('Allow Confirmation'),
-				"fieldhelp" => _L("Select this option if you would like recipients to be able to respond to your message ".
-									"by pressing 1' for 'yes' or '2' for 'no'. ".
-									"You will need to instruct recipients to do this in your message."),
-				"control" => array(
-					"FormHtml",
-					"html" => "<input type='checkbox' " . ($job->isOption("messageconfirmation")?"checked":"") . " disabled />"),
-				"helpstep" => 6
-			);
-		}
-	} else {
-		$formdata[] = _L('List(s)');
-		$formdata["lists"] = array(
-			"label" => _L('Lists'),
-			"fieldhelp" => _L('Select a list from your existing lists.'),
-			"value" => ($selectedlists)?$selectedlists:array(),
+	if ($JOBTYPE == "repeating") {
+		$messagevalidators[] = array("ValIsTranslated");
+	}
+	$formdata["message"] = array(
+		"label" => _L('Message'),
+		"fieldhelp" => _L('Select a message from your existing messages.'),
+		"value" => (((isset($job->messagegroupid) && $job->messagegroupid))?$job->messagegroupid:""),
+		"validators" => $messagevalidators,
+		"control" => array("MessageGroupSelectMenu", "values" => $messages),
+		"helpstep" => 5
+	);
+
+	if ($JOBTYPE != "repeating") {
+		$formdata["message"]["requires"] = array("date");
+	}
+
+	$formdata[] = _L('Advanced Options ');
+	$formdata["report"] = array(
+		"label" => _L('Auto Report'),
+		"fieldhelp" => _L("Select this option if you would like the system to email you when the job has finished running."),
+		"value" => $job->isOption("sendreport"),
+		"validators" => array(),
+		"control" => array("CheckBox"),
+		"helpstep" => 6
+	);
+
+	if ($USER->authorize('setcallerid') && !getSystemSetting('_hascallback', false)) {
+		$formdata["callerid"] = array(
+			"label" => _L("Personal Caller ID"),
+			"fieldhelp" => _L("This features allows you to override the number that will display on recipient's Caller IDs."),
+			"value" => Phone::format($job->getSetting("callerid",getDefaultCallerID())),
 			"validators" => array(
-				array("ValRequired"),
-				array("ValFormListSelect")
+				array("ValLength","min" => 3,"max" => 20),
+				array("ValPhone")
 			),
-			"control" => array("FormListSelect","jobid" => $job->id),
-			"helpstep" => 4
+			"control" => array("TextField","maxlength" => 20, "size" => 15),
+			"helpstep" => 6
 		);
-		$formdata["skipduplicates"] = array(
-			"label" => _L('Skip Duplicates'),
-			"fieldhelp" => ("Skip Duplicates if you would like to only contact recipients who share contact information once."),
-			"value" => $job->isOption("skipduplicates"),
-			"validators" => array(),
-			"control" => array("CheckBox"),
-			"helpstep" => 4
-		);
-		$formdata[] = _L('Message');
-		$messagevalidators = array(
-				array("ValRequired"),
-				array("ValInArray","values"=>array_keys($messages)),
-				array("ValMessageGroup")
-				);
-		if ($JOBTYPE == "repeating") {
-			$messagevalidators[] = array("ValIsTranslated");
-		}
-		$formdata["message"] = array(
-			"label" => _L('Message'),
-			"fieldhelp" => _L('Select a message from your existing messages.'),
-			"value" => (((isset($job->messagegroupid) && $job->messagegroupid))?$job->messagegroupid:""),
-			"validators" => $messagevalidators,
-			"control" => array("MessageGroupSelectMenu", "values" => $messages),
-			"helpstep" => 5
-		);
+	}
+	
+	// Prepare attempt data
+	$maxattempts = first($ACCESS->getValue('callmax'), 1);
+	$attempts = array_combine(range(1,$maxattempts),range(1,$maxattempts));
 
-		if ($JOBTYPE != "repeating") {
-			$formdata["message"]["requires"] = array("date");
-		}
-
-		$formdata[] = _L('Advanced Options ');
-		$formdata["report"] = array(
-			"label" => _L('Auto Report'),
-			"fieldhelp" => _L("Select this option if you would like the system to email you when the job has finished running."),
-			"value" => $job->isOption("sendreport"),
+	$formdata["attempts"] = array(
+		"label" => _L('Max Attempts'),
+		"fieldhelp" => ("Select the maximum number of times the system should try to contact an individual."),
+		"value" => $job->getOptionValue("maxcallattempts"),
+		"validators" => array(
+			array("ValRequired"),
+			array("ValNumeric"),
+			array("ValNumber", "min" => 1, "max" => $maxattempts)
+		),
+		"control" => array("SelectMenu", "values" => $attempts),
+		"helpstep" => 6
+	);
+	if ($USER->authorize('leavemessage')) { 
+		$formdata["replyoption"] = array(
+			"label" => _L('Allow Reply'),
+			"fieldhelp" => _L("Select this option if recipients should be able to record replies. ".
+								"Make sure that the message instructs recipients to press '0' to record a response."),
+			"value" => $job->isOption("leavemessage"),
 			"validators" => array(),
 			"control" => array("CheckBox"),
 			"helpstep" => 6
 		);
-
-		if ($USER->authorize('setcallerid') && !getSystemSetting('_hascallback', false)) {
-			$formdata["callerid"] = array(
-				"label" => _L("Personal Caller ID"),
-				"fieldhelp" => _L("This features allows you to override the number that will display on recipient's Caller IDs."),
-				"value" => Phone::format($job->getSetting("callerid",getDefaultCallerID())),
-				"validators" => array(
-					array("ValLength","min" => 3,"max" => 20),
-					array("ValPhone")
-				),
-				"control" => array("TextField","maxlength" => 20, "size" => 15),
-				"helpstep" => 6
-			);
-		}
-		
-		// Prepare attempt data
-		$maxattempts = first($ACCESS->getValue('callmax'), 1);
-		$attempts = array_combine(range(1,$maxattempts),range(1,$maxattempts));
-
-		$formdata["attempts"] = array(
-			"label" => _L('Max Attempts'),
-			"fieldhelp" => ("Select the maximum number of times the system should try to contact an individual."),
-			"value" => $job->getOptionValue("maxcallattempts"),
-			"validators" => array(
-				array("ValRequired"),
-				array("ValNumeric"),
-				array("ValNumber", "min" => 1, "max" => $maxattempts)
-			),
-			"control" => array("SelectMenu", "values" => $attempts),
+	}
+	if ($USER->authorize('messageconfirmation')) { 
+		$formdata["confirmoption"] = array(
+			"label" => _L('Allow Confirmation'),
+			"fieldhelp" => _L("Select this option if you would like recipients to be able to respond to your message ".
+								"by pressing 1' for 'yes' or '2' for 'no'. You will need to instruct recipients to do ".
+								"this in your message."),
+			"value" => $job->isOption("messageconfirmation"),
+			"validators" => array(),
+			"control" => array("CheckBox"),
 			"helpstep" => 6
 		);
-		if ($USER->authorize('leavemessage')) { 
-			$formdata["replyoption"] = array(
-				"label" => _L('Allow Reply'),
-				"fieldhelp" => _L("Select this option if recipients should be able to record replies. ".
-									"Make sure that the message instructs recipients to press '0' to record a response."),
-				"value" => $job->isOption("leavemessage"),
-				"validators" => array(),
-				"control" => array("CheckBox"),
-				"helpstep" => 6
-			);
-		}
-		if ($USER->authorize('messageconfirmation')) { 
-			$formdata["confirmoption"] = array(
-				"label" => _L('Allow Confirmation'),
-				"fieldhelp" => _L("Select this option if you would like recipients to be able to respond to your message ".
-									"by pressing 1' for 'yes' or '2' for 'no'. You will need to instruct recipients to do ".
-									"this in your message."),
-				"value" => $job->isOption("messageconfirmation"),
-				"validators" => array(),
-				"control" => array("CheckBox"),
-				"helpstep" => 6
-			);
-		}
 	}
+}
 
 
 
