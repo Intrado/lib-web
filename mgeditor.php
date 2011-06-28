@@ -460,7 +460,6 @@ function makeMessageGrid($messagegroup) {
 	
 	
 	$rowlabels = array_values($customerlanguages);
-	$rowlabels[] = "";
 	
 	showActionGrid($columnlabels,$rowlabels,$links);
 }
