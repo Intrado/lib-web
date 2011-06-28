@@ -35,7 +35,7 @@ class FacebookPage extends FormItem {
 			<input id="'.$n.'authpages" name="'.$n.'authpages" type="hidden" value="'.escapehtml(json_encode($pages)).'" />
 			<div id="fb-root"></div>
 			<div id="'. $n. 'connect" style="display:'. ($showconnectbutton?"block":"none"). '">
-				'. icon_button(_L("Connect to Facebook"), "custom/facebook", "popup('popupfacebookauth.php', 600, 300)").'
+				'. icon_button(_L("Add Facebook Account"), "custom/facebook", "popup('popupfacebookauth.php', 600, 300)").'
 			</div>
 			<div id="'.$n.'actionlinks" style="display:'. ($showconnectbutton?"none":"block"). '">
 				<a id="'. $n. 'all" class="actionlink">'._L("Select All").'</a>
