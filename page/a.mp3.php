@@ -36,4 +36,8 @@ header('Cache-Control: no-cache'); //keep ie from breaking itself. files wouldn'
 header("Content-Type: " . $filedata->contenttype);
 header("Content-Length: " . strlen($filedata->data));
 
+if (isset($_GET['dl'])) {
+	header("Content-disposition: attachment; filename=message.mp3");
+}
+
 echo $filedata->data;

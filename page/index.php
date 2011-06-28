@@ -140,7 +140,7 @@ if ($hasMedia) {
 
 		<div style="width: 165px;">
 			<div id="player"></div>
-			<a style="float: right;" href="a.mp3.php?code=<?= escapehtml($CODE) ?>&full">Download</a>		
+			<a style="float: right;" href="a.mp3.php?code=<?= escapehtml($CODE) ?>&full&dl">Download</a>		
 		</div>
 		
 		<script language="JavaScript" type="text/javascript">
