@@ -268,6 +268,7 @@ class TwitterAccountPopup extends FormItem {
 						connectdiv.show();
 						autheddiv.hide();
 					}
+					form_do_validation($("'.$n.'").up("form"), $("'.$n.'"));
 				});
 				';
 		return $str;
@@ -796,7 +797,7 @@ if ($submittedmode || $completedmode) {
 		$formdata["fbpage"] = array(
 			"label" => _L('Facebook Page(s)'),
 			"fieldhelp" => _L("Select which pages to post to."),
-			"value" => json_encode($fbpages),
+			"value" => ($fbpages?json_encode($fbpages):""),
 			"validators" => array(
 				array("ValRequired"),
 				array("ValFacebookPageWithMessage", "authpages" => getFbAuthorizedPages(), "authwall" => getSystemSetting("fbauthorizewall"))),
@@ -813,12 +814,14 @@ if ($submittedmode || $completedmode) {
 		$formdata["twitter"] = array(
 			"label" => _L('Twitter Authorization'),
 			"fieldhelp" => _L("TODO: twitter connection required if message group has twitter message"),
-			"value" => "junk",
+			"value" => "",
 			"validators" => array(
 				array("ValTwitterAccountWithMessage")),
 			"control" => array("TwitterAccountPopup", "hasvalidtoken" => $tw->hasValidAccessToken()),
 			"requires" => array("message"),
 			"helpstep" => ++$helpstepnum);
+		if (!$tw->hasValidAccessToken())
+			$formdata["twitter"]['validators'][] = array("ValRequired");
 	}
 	
 	$formdata[] = _L('Advanced Options ');
