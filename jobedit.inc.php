@@ -37,6 +37,10 @@ require_once("obj/FormListSelect.fi.php");
 require_once("inc/date.inc.php");
 require_once("obj/ValListSelection.val.php");
 require_once("obj/FacebookPage.fi.php");
+require_once("obj/TwitterAuth.fi.php");
+require_once("inc/twitteroauth/OAuth.php");
+require_once("inc/twitteroauth/twitteroauth.php");
+require_once("obj/Twitter.obj.php");
 
 
 // Includes that are required for preview to work
@@ -125,7 +129,6 @@ class ReadOnlyFacebookPage extends FormItem {
 			<style>
 				.fbpagelist {
 					width: 98%;
-					border: 1px dotted gray;
 					padding: 3px;
 					max-height: 250px;
 					overflow: auto;
@@ -227,6 +230,67 @@ class ReadOnlyFacebookPage extends FormItem {
 			}
 			</script>';
 		return $str;
+	}
+}
+
+class TwitterAccountPopup extends FormItem {
+	function render ($value) {
+		
+		$n = $this->form->name."_".$this->name;
+		$validtoken = ($this->args['hasvalidtoken']);
+		
+		$str = '
+			<input id="'.$n.'" name="'.$n.'" type="hidden" value="'.($validtoken?"authed":"noauth").'" />
+			<div id="'. $n. 'connect" style="display:'. ($validtoken?"none":"block"). '">
+				'. icon_button(_L("Add Twitter Account"), "custom/twitter", "popup('popuptwitterauth.php', 600, 300)").'
+			</div>
+			<div id="'. $n. 'authed" style="display:'. ($validtoken?"block":"none"). '">
+				'. _L("Your twitter account is connected."). '
+			</div>';
+		
+		return $str;
+	}
+	
+	function renderJavascript($value) {
+		$n = $this->form->name."_".$this->name;
+		
+		$str = '// Observe an authentication update on the document (the auth popup fires this event)
+				document.observe("TwAuth:update", function (res) {
+					var formitem = $("'. $n. '");
+					var connectdiv = $("'. $n. 'connect");
+					var autheddiv = $("'. $n. 'authed");
+					if (res.memo.access_token) {
+						formitem.value = "authed";
+						connectdiv.hide();
+						autheddiv.show();
+					} else {
+						formitem.value = "noauth";
+						connectdiv.show();
+						autheddiv.hide();
+					}
+				});
+				';
+		return $str;
+	}
+}
+
+class ValTwitterAccountWithMessage extends Validator {
+	var $onlyserverside = true;
+	function validate ($value, $args, $requiredvalues) {
+		global $USER;
+		$mg = new MessageGroup($requiredvalues['message']);
+		// if the message group doesn't have twitter, we don't care if they auth an account or not
+		if (!$mg->hasMessage("post", "twitter"))
+			return true;
+		
+		if (!$USER->authorize('twitterpost'))
+			return $this->label. " ". _L("current user is not authorized to post messages.");
+		
+		// access token not stored?
+		if ($value == "noauth")
+			return $this->label. " ". _L("current user is not authorized to post messages.");
+			
+		return true;
 	}
 }
 
@@ -720,6 +784,12 @@ if ($submittedmode || $completedmode) {
 		$formdata["message"]["requires"] = array("date");
 	}
 
+	// Social Media options
+	if ((getSystemSetting('_hastwitter', false) && $USER->authorize('twitterpost')) || 
+			(getSystemSetting('_hasfacebook', false) && $USER->authorize('facebookpost'))) {
+		$formdata[] = _L('Social Media Options');
+	}
+	
 	// if the account may post to facebook. show facebook page selection formitem
 	if (getSystemSetting("_hasfacebook") && $USER->authorize("facebookpost")) {
 		$helpsteps[] = _L("TODO: facebook page selection");
@@ -731,6 +801,22 @@ if ($submittedmode || $completedmode) {
 				array("ValRequired"),
 				array("ValFacebookPageWithMessage", "authpages" => getFbAuthorizedPages(), "authwall" => getSystemSetting("fbauthorizewall"))),
 			"control" => array("FacebookPage", "access_token" => $USER->getSetting("fb_access_token", false)),
+			"requires" => array("message"),
+			"helpstep" => ++$helpstepnum);
+	}
+	
+	// if the user account may post to twitter, but has no valid twitter access token
+	if (getSystemSetting("_hastwitter") && $USER->authorize("twitterpost")) {
+		// get this here so twitter failures only effect users with twitter access
+		$tw = new Twitter($USER->getSetting("tw_access_token"));
+		$helpsteps[] = _L("TODO: twitter connection required if message group has twitter message");
+		$formdata["twitter"] = array(
+			"label" => _L('Twitter Authorization'),
+			"fieldhelp" => _L("TODO: twitter connection required if message group has twitter message"),
+			"value" => "junk",
+			"validators" => array(
+				array("ValTwitterAccountWithMessage")),
+			"control" => array("TwitterAccountPopup", "hasvalidtoken" => $tw->hasValidAccessToken()),
 			"requires" => array("message"),
 			"helpstep" => ++$helpstepnum);
 	}
@@ -928,8 +1014,13 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 						$sql = "INSERT INTO joblist (jobid,listid) VALUES " . trim($batchsql,",");
 						QuickUpdate($sql,false,$batchargs);
 					}
+					// clear existing jobpost entries
+					QuickUpdate("DELETE FROM jobpost WHERE jobid=?",false,array($job->id));
+					// only create a page post if facebook or twitter
+					$createpagepost = false;
 					// insert facebook pages, (if the user can and the message group has a facebook message)
 					if (getSystemSetting("_hasfacebook") && $USER->authorize("facebookpost") && $messagegroup->hasMessage("post", "facebook")) {
+						$createpagepost = true;
 						$batchsql = "";
 						$batchargs = array();
 						foreach (json_decode($postdata['fbpage']) as $fbpageid) {
@@ -940,6 +1031,17 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 							$batchargs[] = $fbpageid;
 						}
 						QuickUpdate("insert into jobpost (jobid, type, destination) values ". trim($batchsql,","), false, $batchargs);
+					}
+					// insert facebook pages, (if the user can and the message group has a facebook message)
+					if (getSystemSetting("_hastwitter") && $USER->authorize("twitterpost") && $messagegroup->hasMessage("post", "twitter")) {
+						$createpagepost = true;
+						// get the twitter user's id
+						$twdata = json_decode($USER->getSetting("tw_access_token"));
+						QuickUpdate("insert into jobpost (jobid, type, destination) values (?,'twitter',?)", false, array($job->id, $twdata->user_id));
+					}
+					// pagepost needed?
+					if ($createpagepost) {
+						QuickUpdate("insert into jobpost (jobid, type, destination) values (?,'page','')", false, array($job->id));
 					}
 				}
 			}
@@ -986,7 +1088,8 @@ Validator::load_validators(array("ValDuplicateNameCheck",
 								"ValFormListSelect",
 								"ValIsTranslated",
 								"ValMessageGroup",
-								"ValFacebookPageWithMessage"));
+								"ValFacebookPageWithMessage",
+								"ValTwitterAccountWithMessage"));
 ?>
 </script>
 <script src="script/livepipe/livepipe.js" type="text/javascript"></script>
