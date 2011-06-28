@@ -679,6 +679,7 @@ if ($submittedmode || $completedmode) {
 
 	// readonly facebook page list
 	if ($fbpages) {
+		$formdata[] = _L('Social Media Options');
 		$helpsteps[] = _L("TODO: readonly facbook page list");
 		$formdata["fbpages"] = array(
 			"label" => _L('Facbook Page(s)'),
