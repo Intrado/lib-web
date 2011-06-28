@@ -99,7 +99,7 @@ class PreviewModal {
 	// Constructs and returns a PreviewModal object besed on sourcetext from agument or located in session.
 	static function HandleRequestWithPhoneText($messagegroupid = false) {
 		$modal = new PreviewModal();
-		$this->playable = true;
+		$modal->playable = true;
 		$showmodal = false;
 		if (isset($_REQUEST["previewmodal"]) && isset($_REQUEST["text"])  && isset($_REQUEST["language"]) && isset($_REQUEST["gender"])) {
 			$showmodal = true;
