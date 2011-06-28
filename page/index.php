@@ -107,8 +107,8 @@ function fadecolor($primary, $fade, $ratio){
 <body>
 	<table border=0 cellspacing=0 cellpadding=0 width="100%">
 		<tr>
-			<td>
-				<div style="padding-left:10px; padding-bottom:10px">
+			<td bgcolor="white">
+				<div style="padding-left:10px;">
 					<img src="content.php?code=<?= escapehtml($CODE) ?>&id=<?= $messageinfo->logocontentid ?></img>" />
 				</div>
 			</td>
