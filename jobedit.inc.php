@@ -637,17 +637,6 @@ $helpsteps[] = _L("Select an existing list to use. If you do not see the list yo
 					"number, they will only be called once.");
 $helpsteps[] = _L("Select an existing message to use. If you do not see the message ".
 					"you need, you can make a new message by clicking the Messages subtab above.");
-$helpsteps[] = _L("<ul><li>Auto Report - Selecting this option causes the system to email ".
-					"a report to the email address associated with your account when the job ".
-					"is finished.<li>Max Attempts - This option lets you select the maximum ".
-					"number of times the system should try to contact a recipient. ".
-					"<li>Allow Reply - Check this if you want recipients to be able to ".
-					"record responses.<br><br><b>Note:</b>You will need to include instructions ".
-					"to press '0' to record a response in your message.<br><br> ".
-					"<li>Allow Confirmation - Select this option if you would like recipients ".
-					"to give a 'yes' or 'no' response to your message.<br><br> ".
-					"<b>Note:</b>You will need to include instructions ".
-					"to press '1' for 'yes' and '2' for 'no' in your message.</ul>");
 
 if ($submittedmode || $completedmode) {
 	$formdata[] = _L('List(s)');
@@ -690,6 +679,17 @@ if ($submittedmode || $completedmode) {
 			"helpstep" => ++$helpstepnum
 		);
 	}
+	$helpsteps[] = _L("<ul><li>Auto Report - Selecting this option causes the system to email ".
+					"a report to the email address associated with your account when the job ".
+					"is finished.<li>Max Attempts - This option lets you select the maximum ".
+					"number of times the system should try to contact a recipient. ".
+					"<li>Allow Reply - Check this if you want recipients to be able to ".
+					"record responses.<br><br><b>Note:</b>You will need to include instructions ".
+					"to press '0' to record a response in your message.<br><br> ".
+					"<li>Allow Confirmation - Select this option if you would like recipients ".
+					"to give a 'yes' or 'no' response to your message.<br><br> ".
+					"<b>Note:</b>You will need to include instructions ".
+					"to press '1' for 'yes' and '2' for 'no' in your message.</ul>");
 	
 	$formdata[] = _L('Advanced Options ');
 	$formdata["report"] = array(
@@ -825,6 +825,17 @@ if ($submittedmode || $completedmode) {
 			$formdata["twitter"]['validators'][] = array("ValRequired");
 	}
 	
+	$helpsteps[] = _L("<ul><li>Auto Report - Selecting this option causes the system to email ".
+					"a report to the email address associated with your account when the job ".
+					"is finished.<li>Max Attempts - This option lets you select the maximum ".
+					"number of times the system should try to contact a recipient. ".
+					"<li>Allow Reply - Check this if you want recipients to be able to ".
+					"record responses.<br><br><b>Note:</b>You will need to include instructions ".
+					"to press '0' to record a response in your message.<br><br> ".
+					"<li>Allow Confirmation - Select this option if you would like recipients ".
+					"to give a 'yes' or 'no' response to your message.<br><br> ".
+					"<b>Note:</b>You will need to include instructions ".
+					"to press '1' for 'yes' and '2' for 'no' in your message.</ul>");
 	$formdata[] = _L('Advanced Options ');
 	$formdata["report"] = array(
 		"label" => _L('Auto Report'),
