@@ -102,7 +102,7 @@ function fadecolor($primary, $fade, $ratio){
 		
 	</style>
 	<title><?=$TITLE?></title>
-	<script type="text/javascript" src="page.js.php"></script>
+	<script type="text/javascript" src="page.js"></script>
 </head>
 <body>
 	<table border=0 cellspacing=0 cellpadding=0 width="100%">

@@ -32,12 +32,8 @@ $filedata = reliablePageLinkCall("postAudioPartGetForCode", array($partnum));
 // Display
 ////////////////////////////////////////////////////////////////////////////////
 
-header("HTTP/1.0 200 OK");
-header("Cache-Control: max-age=3600, public");
+header('Cache-Control: no-cache'); //keep ie from breaking itself. files wouldn't play 2nd time
 header("Content-Type: " . $filedata->contenttype);
-//header("Content-disposition: attachment; filename=message.mp3");
-//header('Pragma: private');
-//header('Cache-control: private, must-revalidate');
 header("Content-Length: " . strlen($filedata->data));
-header("Connection: close");
+
 echo $filedata->data;

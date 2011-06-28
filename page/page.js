@@ -1,10 +1,3 @@
-<?
-//set expire time to + 24 hour so browsers cache this file
-header("Expires: " . gmdate('D, d M Y H:i:s', time() + 60*60*24) . " GMT"); 
-header("Content-Type: text/javascript");
-header("Cache-Control: private");
-?>
-
 function getObj(name) {
   if (document.getElementById) {
   	this.obj = document.getElementById(name);
@@ -133,10 +126,10 @@ function embedPlayer(target, code, numparts) {
 	var e = new getObj(target);
 	//first try to embed the flash player
 	e.obj.innerHTML = '<object classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000" codebase="http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=6,0,0,0" width="165" height="38" id="niftyPlayer1" align="">' +
-		'<param name=movie value="pp.swf?code=' + encodeURIComponent(code) + '&as=0&nump=' + numparts + '&files=bar">' + 
+		'<param name=movie value="pp.swf?code=' + encodeURIComponent(code) + '&as=0&nump=' + numparts + '&bu=%2F">' + 
 		'<param name=quality value=high>' + 
 		'<param name=bgcolor value=#FFFFFF>' + 
-		'<embed src="pp.swf?code=' + encodeURIComponent(code) + '&as=0&nump=' + numparts + '" quality=high bgcolor=#FFFFFF width="165" height="38" name="niftyPlayer1" align="" type="application/x-shockwave-flash" pluginspage="<?= isset($_SERVER['HTTPS'])?"https":"http" ?>://get.adobe.com/flashplayer">' +
+		'<embed src="pp.swf?code=' + encodeURIComponent(code) + '&as=0&nump=' + numparts + '&bu=%2F" quality=high bgcolor=#FFFFFF width="165" height="38" name="niftyPlayer1" align="" type="application/x-shockwave-flash" pluginspage="http://get.adobe.com/flashplayer">' +
 		'</embed>' + 
 		'</object>';	
 	
