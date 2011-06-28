@@ -31,3 +31,20 @@ $$$
 -- remove existing facebook auth tokens
 delete from usersetting where name = 'fb_access_token'
 $$$
+
+-- $rev 3
+
+-- remove all system messages
+delete from systemmessages
+$$$
+
+-- insert general new user system message
+INSERT INTO systemmessages (message, icon, modifydate)
+VALUES (
+'<div style="color:#3e693f;font-size: 20px;font-weight: bold;">Welcome New User</div>
+  <ul>
+  <li>See the Getting Started Guide: <a href="#" onclick="window.open(\'help/index.php\', \'_blank\', \'width=750,height=500,location=no,menubar=yes,resizable=yes,scrollbars=yes,status=no,titlebar=no,toolbar=yes\');"><img src="img/icons/page_white_acrobat.gif" /> Getting Started</a> 
+  </ul>', 'largeicons/news.jpg', '2000-01-01 01:02:34'
+)
+$$$
+

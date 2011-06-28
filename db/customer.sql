@@ -1408,16 +1408,6 @@ $$$
 
 -- START REV 7.5/12
 
-INSERT INTO systemmessages (message, icon, modifydate)
-VALUES (
-'<div style="color:#3e693f;font-size: 20px;font-weight: bold;">New Spring 2010 Release!</div>
-  <ul>
-  <li>See what is new in the Spring 2010 Release: <a href="help/html/New_in_Spring_2010_Release.pdf" target="new"><img src="img/icons/page_white_acrobat.gif" /> New in Spring 2010</a> 
-  <li>Be sure to check out the overview of features: <a href="javascript: popup(''help/flash/overview_7-5.html'',650,480);"><img src="img/icons/control_play_blue.gif" /> Play Overview</a>
-  </ul>', 'largeicons/news.jpg', NOW()
-)
-$$$
-
 update setting set value='7.5/12' where name='_dbversion'
 $$$
 -- END REV 7.5/12
@@ -1550,3 +1540,19 @@ update setting set value='8.0/1' where name='_dbversion'
 $$$
 -- END REV 8.0/1
 
+-- woops forgot 8.0/2
+-- start 8.0/3
+
+INSERT INTO systemmessages (message, icon, modifydate)
+VALUES (
+'<div style="color:#3e693f;font-size: 20px;font-weight: bold;">Welcome New User</div>
+  <ul>
+  <li>See the Getting Started Guide: <a href="#" onclick="window.open(\'help/index.php\', \'_blank\', \'width=750,height=500,location=no,menubar=yes,resizable=yes,scrollbars=yes,status=no,titlebar=no,toolbar=yes\');"><img src="img/icons/page_white_acrobat.gif" /> Getting Started</a> 
+  </ul>', 'largeicons/news.jpg', '2000-01-01 01:02:34'
+)
+$$$
+
+update setting set value='8.0/3' where name='_dbversion'
+$$$
+
+-- END REV 8.0/3

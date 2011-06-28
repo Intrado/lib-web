@@ -9,7 +9,10 @@ function upgrade_8_0 ($rev, $shardid, $customerid, $db) {
 		case 1:
 			echo "|";
 			apply_sql("upgrades/db_8-0_pre.sql", $customerid, $db, 2);
-	
+		case 2:
+			echo "|";
+			apply_sql("upgrades/db_8-0_pre.sql", $customerid, $db, 3);
+			
 	}
 	
 	apply_sql("../db/update_SMAdmin_access.sql", $customerid, $db);
