@@ -59,6 +59,41 @@ if (isset($_GET['delete'])) {
 	QuickUpdate("delete from message where id=? and messagegroupid=?",false,array($_GET['delete'],$messagegroup->id));
 }
 
+if (isset($_GET['copyphonetovoice'])) {
+	// does the phone (english) message have field inserts?
+	$phonemessage = $messagegroup->getMessage("phone", "voice", Language::getDefaultLanguageCode());
+	if ($phonemessage) {
+		$parts = DBFindMany("MessagePart", "from messagepart where messageid=?", false, array($phonemessage->id));
+		$hasfieldinsert = false;
+		foreach ($parts as $part) {
+			// is this a field insert?
+			if ($part->type == "V") {
+				$hasfieldinsert = true;
+				break;
+			}
+		}
+		if ($hasfieldinsert) {
+			notice(_L("Operation failed. Cannot copy a phone message with field inserts."));
+		} else {
+			// remove existing post voice message
+			$existingmessage = $messagegroup->getMessage("post", "voice", Language::getDefaultLanguageCode());
+			if ($existingmessage) {
+				QuickUpdate("delete from message where id = ?", false, array($existingmessage->id));
+				QuickUpdate("delete from messagepart where messageid = ?", false, array($existingmessage->id));
+			}
+			// copy phone message
+			$newmessage = $phonemessage->copy($messagegroup->id);
+			$newmessage->type = "post";
+			$newmessage->subtype = "voice";
+			$newmessage->update();
+			notice(_L("Copy of phone message to voice message completed successfully."));
+		}
+	} else {
+		notice(_L("Operation failed. Phone message for language %s does not exist.", Language::getName(Language::getDefaultLanguageCode())));
+	}
+	redirect();
+}
+
 PreviewModal::HandleRequestWithId();
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -443,10 +478,12 @@ function makeMessageGrid($messagegroup) {
 					$icon = "tinybutton-ACCEPT";
 					$actions[] = action_link("Preview","fugue/control",null,"showPreview(null,\'previewid=$message->id\');return false;");
 					$actions[] = action_link("Edit","pencil","editmessagepostvoice.php?id=$message->id");
+					$actions[] = action_link("Copy Phone Message","page_copy","mgeditor.php?copyphonetovoice");
 					$actions[] = action_link("Delete","cross","mgeditor.php?delete=$message->id","return confirmDelete();");
 				} else {
 					$icon = "tinybutton-EMPTY";
 					$actions[] = action_link("New","pencil_add","editmessagepostvoice.php?id=new&mgid=".$messagegroup->id);
+					$actions[] = action_link("Copy Phone Message","page_copy","mgeditor.php?copyphonetovoice");
 				}
 				$linkrow[] = array('icon' => $icon,'title' => _L("%s Post Voice Message",$languagename), 'actions' => $actions);
 				
