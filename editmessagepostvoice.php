@@ -258,6 +258,7 @@ include_once("nav.inc.php");
 </script>
 <script src="script/livepipe/livepipe.js" type="text/javascript"></script>
 <script src="script/livepipe/window.js" type="text/javascript"></script>
+<script src="script/modalwrapper.js" type="text/javascript"></script>
 <script type="text/javascript" language="javascript" src="script/niftyplayer.js.php"></script>
 
 <?

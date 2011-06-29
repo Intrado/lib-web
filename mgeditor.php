@@ -283,7 +283,7 @@ function makeMessageGrid($messagegroup) {
 	}
 	
 	if ($USER->authorize('sendemail')) {
-		$columnlabels[] = 'HTML Email <a href="messagewizardemail.php?new&subtype=html&mgid' . $messagegroup->id . '"><img src="img/icons/add.png" alt="Add" title="Add New HTML Email Message"/></a>';
+		$columnlabels[] = 'HTML Email <a href="messagewizardemail.php?new&subtype=html&mgid=' . $messagegroup->id . '"><img src="img/icons/add.png" alt="Add" title="Add New HTML Email Message"/></a>';
 		$columnlabels[] = 'Plain Email <a href="messagewizardemail.php?new&subtype=plain&mgid=' .$messagegroup->id . '"><img src="img/icons/add.png" alt="Add" title="Add New Plain Email Message" /></a>';
 	}
 	
@@ -297,7 +297,7 @@ function makeMessageGrid($messagegroup) {
 	
 	if ((getSystemSetting('_hasfacebook', false) && $USER->authorize('facebookpost')) || (getSystemSetting('_hastwitter', false) && $USER->authorize('twitterpost'))) {
 		$columnlabels[] = 'Page <a href="editmessagepage.php?new&mgid=' .$messagegroup->id . '"><img src="img/icons/add.png" alt="Add" title="Add New Page Post" /></a>';
-		$columnlabels[] = 'Voice <a href="editmessagepostvoice.php?new&mgid=' .$messagegroup->id . '"><img src="img/icons/add.png" alt="Add" title="Add New Voice Post" /></a>';
+		$columnlabels[] = 'Page Media <a href="editmessagepostvoice.php?new&mgid=' .$messagegroup->id . '"><img src="img/icons/add.png" alt="Add" title="Add New Voice Post" /></a>';
 	}
 	
 	// set action usr link	
@@ -493,6 +493,7 @@ function createactionmenu(id, content,title) {
 <script src="script/livepipe/livepipe.js" type="text/javascript"></script>
 <script src="script/livepipe/window.js" type="text/javascript"></script>
 <script src="script/niftyplayer.js.php" type="text/javascript"></script>
+<script src="script/modalwrapper.js" type="text/javascript"></script>
 <link href="css/messagegroup.css" type="text/css" rel="stylesheet">
 <?
 PreviewModal::includePreviewScript();

@@ -266,45 +266,18 @@ class PreviewModal {
 		?>
 		<script type='text/javascript' language='javascript'>
 		var showPreview = function(post_parameters,get_parameters){
-			var window_header = new Element('div',{
-			className: 'window_header'
-			});
-			var window_title = new Element('div',{
-			className: 'window_title'
-			}).update("Loading...");
-			var window_close = new Element('div',{
-			className: 'window_close'
-			});
-			var window_contents = new Element('div',{
-				className: 'window_contents'
-			});
-			var loader = new Element('a',{
-				href: 'img/ajax-loader.gif'
-			});
-			var w = new Control.Modal(loader,Object.extend({
-				className: 'modalwindow',
-				overlayOpacity: 0.75,
-				fade: false,
-				width: 750,
-				indicator:loader,
-				insertRemoteContentAt:window_contents,
-				afterOpen: function(){
-					
-				},
-				afterClose: function(){
-					this.destroy();
-					window_contents.remove(); // remove since the player and download uses ids that is reused whe reopened
-				}
-			},{}));
+			var modal = new ModalWrapper("Loading...",false,false);
+			modal.open();
+			
 			new Ajax.Request('<?= $posturl?>' + (get_parameters?'&' + get_parameters:''), {
 				'method': 'post',
 				'parameters': post_parameters,
 				'onSuccess': function(response) {
 					if (response.responseJSON) {
 						var result = response.responseJSON;
-						window_title.update(result.title);
+						modal.window_title.update(result.title);
 						if (result.playable == true) {
-							window_contents.update(result.form + '<div style=\'text-align:center;\' id=\'player\'></div><div style=\'text-align:center;\' id=\'download\'></div>');
+							modal.window_contents.update(result.form + '<div style=\'text-align:center;\' id=\'player\'></div><div style=\'text-align:center;\' id=\'download\'></div>');
 							if (result.hasinserts ==  false) {
 								$('download').update('<a href=\'previewaudio.mp3.php?download=true&uid=' + result.uid + '\'>Click here to download</a>');
 								embedPlayer('previewaudio.mp3.php?uid=' + result.uid,'player',result.partscount);
@@ -315,31 +288,20 @@ class PreviewModal {
 								});
 							}
 						} else {
-							window_contents.update(result.form);
+							modal.window_contents.update(result.form);
 						}
 					} else {
-						window_title.update('Error');
-						window_contents.update('Unable to preview this message');
+						modal.window_title.update('Error');
+						modal.window_contents.update('Unable to preview this message');
 					}
 				},
 				
 				'onFailure': function() {
-					window_title.update('Error');
-					window_contents.update('Unable to preview this message');
+					modal.window_title.update('Error');
+					modal.window_contents.update('Unable to preview this message');
 				}
 			});
 			
-			w.container.insert(window_header);
-			window_header.insert(window_title);
-			window_header.insert(window_close);
-			w.container.insert(window_contents);
-			
-			window_close.observe('click', function(event,modal) {
-				modal.close();
-			}.bindAsEventListener(this,w));
-			
-			w.open();
-			return w;
 		};
 			</script>
 		<?

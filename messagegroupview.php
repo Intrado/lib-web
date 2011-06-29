@@ -70,6 +70,7 @@ include_once("nav.inc.php");
 <script src="script/livepipe/livepipe.js" type="text/javascript"></script>
 <script src="script/livepipe/window.js" type="text/javascript"></script>
 <script src="script/niftyplayer.js.php" type="text/javascript"></script>
+<script src="script/modalwrapper.js" type="text/javascript"></script>
 <script type="text/javascript" src="script/getMessageGroupPreviewGrid.js.php"></script>
 <?
 PreviewModal::includePreviewScript();

@@ -164,46 +164,15 @@ var AudioLibraryWidget = Class.create({
 	},
 	
 	onClickPlay: function(event, audiofile) {
-			var window_header = new Element('div',{
-			className: 'window_header'
-			});
-			var window_title = new Element('div',{
-			className: 'window_title'
-			}).update("Audio Preview");
-			var window_close = new Element('div',{
-			className: 'window_close'
-			});
-			var window_contents = new Element('div',{
-				className: 'window_contents',
-				id: 'player',
+			var content = new Element('div',{
+				id: 'modal_player',
 				style: 'text-align: center;'
 			});
-			var loader = new Element('a',{
-				href: 'img/ajax-loader.gif'
-			});
-			var modal = new Control.Modal(loader,Object.extend({
-				className: 'modalwindow',
-				overlayOpacity: 0.75,
-				fade: false,
-				width: 250,
-				insertRemoteContentAt:window_contents,
-				afterOpen: function(){
-					embedPlayer('audio.wav.php/mediaplayer_preview.wav?id=' + audiofile.id,'player')
-				},
-				afterClose: function(){
-					this.destroy();
-					window_contents.remove(); // remove since the player and download uses ids that is reused whe reopened
-				}
-			},{}));
-			modal.container.insert(window_header);
-			window_header.insert(window_title);
-			window_header.insert(window_close);
-			modal.container.insert(window_contents);
-			
-			window_close.observe('click', function(event,modal) {
-				modal.close();
-			}.bindAsEventListener(this,modal));
-			modal.open();
+			var afterOpen = function(){
+				embedPlayer('audio.wav.php/mediaplayer_preview.wav?id=' + audiofile.id,'modal_player');
+			};
+			var modalWrapper = new ModalWrapper("Audio Preview",content, afterOpen);
+			modalWrapper.open();
 	},
 	
 	onClickInsert: function(event, audiofile) {
