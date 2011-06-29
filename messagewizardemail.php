@@ -272,7 +272,7 @@ class MsgWiz_translatePreview extends WizStep {
 		}
 
 		//Get available languages
-		$translationlanguages = Voice::getTTSLanguageMap();
+		$translationlanguages = array_intersect_key(Language::getLanguageMap(), array_flip($TRANSLATIONLANGUAGECODES));
 		
 		unset($translationlanguages['en']);
 		$translationlanguagecodes = array_keys($translationlanguages);
