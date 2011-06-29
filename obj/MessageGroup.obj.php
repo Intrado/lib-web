@@ -270,7 +270,8 @@ class MessageGroup extends DBMappedObject {
 			from message 
 			where messagegroupid = ? 
 			and userid = ? 
-			and type in ('email','phone')",
+			and type in ('email','phone')
+			and autotraslate != 'source'",
 			false, false,
 			array($this->id, $USER->id));
 		
