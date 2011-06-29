@@ -155,6 +155,7 @@ class Message extends DBMappedObject {
 					if ($preferredgender == null) 
 						$preferredgender = "female";
 					$voiceid = Voice::getPreferredVoice($this->languagecode, $preferredgender);
+					$part->voiceid = $voiceid;
 				}
 				$part->messageid = $this->id;
 				$part->create();
