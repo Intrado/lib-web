@@ -275,10 +275,12 @@ function showActionGrid ($columnlabels, $rowlabels, $links) {
 			if ($link !== false) {
 				if (isset($link['icon'])) {
 					echo "<td>
-							<img id='gridmenu-$row-$col' src='img/{$link["icon"]}.png'
+							<div id='gridmenu-$row-$col' class='tinybutton'>
+							<img src='img/icons/{$link["icon"]}.png'
 								title=''
 								alt='{$link["title"]}'
 							/>
+							</div>
 						</td>";
 					
 					// Attach action menu script for this item
@@ -359,14 +361,14 @@ function makeMessageGrid($messagegroup) {
 			$message = $messagegroup->getMessage('phone', 'voice', $languagecode);
 			$actions = array();
 			if ($message) {
-				$icon = "tinybutton-ACCEPT";
+				$icon = "accept";
 				$actions[] = action_link("Play","fugue/control",null,"showPreview(null,\'previewid=$message->id\');return false;");
 				$actions[] = action_link("Re-Record","diagona/16/151","editmessagerecord.php?id=new&languagecode=$languagecode&mgid=".$messagegroup->id);
 				if (isset($ttslanguages[$languagecode]))
 					$actions[] = action_link("Edit Advanced","pencil","editmessagephone.php?id=$message->id");
 				$actions[] = action_link("Delete","cross","mgeditor.php?delete=$message->id","return confirmDelete();");
 			} else {
-				$icon = "tinybutton-EMPTY";
+				$icon = "diagona/16/160";
 				$actions[] = action_link("Record","diagona/16/151","editmessagerecord.php?id=new&languagecode=$languagecode&mgid=".$messagegroup->id);
 				if (isset($ttslanguages[$languagecode]))
 					$actions[] = action_link("New Advanced","pencil_add","editmessagephone.php?id=new&languagecode=$languagecode&mgid=".$messagegroup->id);
@@ -380,12 +382,12 @@ function makeMessageGrid($messagegroup) {
 				$actions = array();
 				$message = $messagegroup->getMessage('sms', 'plain', $languagecode);
 				if ($message) {
-					$icon = "tinybutton-ACCEPT";
+					$icon = "accept";
 					$actions[] = action_link("Preview","email_open",null,"showPreview(null,\'previewid=$message->id\');return false;");
 					$actions[] = action_link("Edit","pencil","editmessagesms.php?id=$message->id");
 					$actions[] = action_link("Delete","cross","mgeditor.php?delete=$message->id","return confirmDelete();");
 				} else {
-					$icon = "tinybutton-EMPTY";
+					$icon = "diagona/16/160";
 					$actions[] = action_link("New","pencil_add","editmessagesms.php?id=new&mgid=$messagegroup->id");
 				}
 				$linkrow[] = array('icon' => $icon,'title' => _L("%s SMS Message",$languagename), 'actions' => $actions);
@@ -400,12 +402,12 @@ function makeMessageGrid($messagegroup) {
 			$message = $messagegroup->getMessage('email', 'html', $languagecode);
 			
 			if ($message) {
-				$icon = "tinybutton-ACCEPT";
+				$icon = "accept";
 				$actions[] = action_link("Preview","email_open",null,"showPreview(null,\'previewid=$message->id\');return false;");
 				$actions[] = action_link("Edit","pencil","editmessageemail.php?id=$message->id");
 				$actions[] = action_link("Delete","cross","mgeditor.php?delete=$message->id","return confirmDelete();");
 			} else {
-				$icon = "tinybutton-EMPTY";
+				$icon = "diagona/16/160";
 				$actions[] = action_link("New","pencil_add","editmessageemail.php?id=new&subtype=html&languagecode=$languagecode&mgid=".$messagegroup->id);
 			}
 			$linkrow[] = array('icon' => $icon,'title' => _L("%s HTML Email Message",$languagename), 'actions' => $actions);
@@ -413,12 +415,12 @@ function makeMessageGrid($messagegroup) {
 			$actions = array();
 			$message = $messagegroup->getMessage('email', 'plain', $languagecode);
 			if ($message) {
-				$icon = "tinybutton-ACCEPT";
+				$icon = "accept";
 				$actions[] = action_link("Preview","email_open",null,"showPreview(null,\'previewid=$message->id\');return false;");
 				$actions[] = action_link("Edit","pencil","editmessageemail.php?id=$message->id");
 				$actions[] = action_link("Delete","cross","mgeditor.php?delete=$message->id","return confirmDelete();");
 			} else {
-				$icon = "tinybutton-EMPTY";
+				$icon = "diagona/16/160";
 				$actions[] = action_link("New","pencil_add","editmessageemail.php?id=new&subtype=plain&languagecode=$languagecode&mgid=".$messagegroup->id);
 			}
 			$linkrow[] = array('icon' => $icon,'title' => _L("%s Text Email Message",$languagename), 'actions' => $actions);
@@ -431,12 +433,12 @@ function makeMessageGrid($messagegroup) {
 				$message = $messagegroup->getMessage('post', 'facebook', $languagecode);
 				
 				if ($message) {
-					$icon = "tinybutton-ACCEPT";
+					$icon = "accept";
 					$actions[] = action_link("Preview","custom/facebook",null,"showPreview(null,\'previewid=$message->id\');return false;");
 					$actions[] = action_link("Edit","pencil","editmessagefacebook.php?id=$message->id");
 					$actions[] = action_link("Delete","cross","mgeditor.php?delete=$message->id","return confirmDelete();");
 				} else {
-					$icon = "tinybutton-EMPTY";
+					$icon = "diagona/16/160";
 					$actions[] = action_link("New","pencil_add","editmessagefacebook.php?id=new&mgid=".$messagegroup->id);
 				}
 				$linkrow[] = array('icon' => $icon,'title' => _L("%s Facebook Message",$languagename), 'actions' => $actions);
@@ -452,12 +454,12 @@ function makeMessageGrid($messagegroup) {
 				$message = $messagegroup->getMessage('post', 'twitter', $languagecode);
 				
 				if ($message) {
-					$icon = "tinybutton-ACCEPT";
+					$icon = "accept";
 					$actions[] = action_link("Preview","custom/twitter",null,"showPreview(null,\'previewid=$message->id\');return false;");
 					$actions[] = action_link("Edit","pencil","editmessagetwitter.php?id=$message->id");
 					$actions[] = action_link("Delete","cross","mgeditor.php?delete=$message->id","return confirmDelete();");
 				} else {
-					$icon = "tinybutton-EMPTY";
+					$icon = "diagona/16/160";
 					$actions[] = action_link("New","pencil_add","editmessagetwitter.php?id=new&mgid=".$messagegroup->id);
 				}
 				$linkrow[] = array('icon' => $icon,'title' => _L("%s Twitter Message",$languagename), 'actions' => $actions);
@@ -473,12 +475,12 @@ function makeMessageGrid($messagegroup) {
 				$message = $messagegroup->getMessage('post', 'page', $languagecode);
 				
 				if ($message) {
-					$icon = "tinybutton-ACCEPT";
+					$icon = "accept";
 					$actions[] = action_link("Preview","layout_sidebar",null,"showPreview(null,\'previewid=$message->id\');return false;");
 					$actions[] = action_link("Edit","pencil","editmessagepage.php?id=$message->id");
 					$actions[] = action_link("Delete","cross","mgeditor.php?delete=$message->id","return confirmDelete();");
 				} else {
-					$icon = "tinybutton-EMPTY";
+					$icon = "diagona/16/160";
 					$actions[] = action_link("New","pencil_add","editmessagepage.php?id=new&mgid=".$messagegroup->id);
 				}
 				$linkrow[] = array('icon' => $icon,'title' => _L("%s Page Message",$languagename), 'actions' => $actions);
@@ -487,13 +489,13 @@ function makeMessageGrid($messagegroup) {
 				$message = $messagegroup->getMessage('post', 'voice', $languagecode);
 				
 				if ($message) {
-					$icon = "tinybutton-ACCEPT";
+					$icon = "accept";
 					$actions[] = action_link("Preview","fugue/control",null,"showPreview(null,\'previewid=$message->id\');return false;");
 					$actions[] = action_link("Edit","pencil","editmessagepostvoice.php?id=$message->id");
 					$actions[] = action_link("Copy From Phone Message","page_copy","mgeditor.php?copyphonetovoice");
 					$actions[] = action_link("Delete","cross","mgeditor.php?delete=$message->id","return confirmDelete();");
 				} else {
-					$icon = "tinybutton-EMPTY";
+					$icon = "diagona/16/160";
 					$actions[] = action_link("New","pencil_add","editmessagepostvoice.php?id=new&mgid=".$messagegroup->id);
 					$actions[] = action_link("Copy From Phone Message","page_copy","mgeditor.php?copyphonetovoice");
 				}

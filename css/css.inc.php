@@ -883,10 +883,22 @@ div.autocomplete ul li {
 	padding: 0 15px 3px 15px;
 	white-space: nowrap;
 }
+.messagegrid .messagegridheader img{
+	margin-bottom: -3px;
+}
 .messagegrid .messagegridlanguage{
 	text-align: right;
 }
 
+.messagegrid .tinybutton{
+	margin:0 auto;
+	text-align:left;
+	padding-top:3px;
+	width:33px;
+	height:19px;
+	cursor: pointer;
+	background:url('img/tinybutton.png') no-repeat right center;
+}
 <? if ($theme == "classroom") { /* TODO move this to theme based css includes */ ?>
 
 .navmenuspacer {
