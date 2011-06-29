@@ -86,7 +86,7 @@ if (isset($_GET['copyphonetovoice'])) {
 			$newmessage->type = "post";
 			$newmessage->subtype = "voice";
 			$newmessage->update();
-			notice(_L("Copy of phone message to voice message completed successfully."));
+			notice(_L("Copy of phone message to page media message completed successfully."));
 		}
 	} else {
 		notice(_L("Operation failed. Phone message for language %s does not exist.", Language::getName(Language::getDefaultLanguageCode())));
@@ -478,14 +478,14 @@ function makeMessageGrid($messagegroup) {
 					$icon = "tinybutton-ACCEPT";
 					$actions[] = action_link("Preview","fugue/control",null,"showPreview(null,\'previewid=$message->id\');return false;");
 					$actions[] = action_link("Edit","pencil","editmessagepostvoice.php?id=$message->id");
-					$actions[] = action_link("Copy Phone Message","page_copy","mgeditor.php?copyphonetovoice");
+					$actions[] = action_link("Copy From Phone Message","page_copy","mgeditor.php?copyphonetovoice");
 					$actions[] = action_link("Delete","cross","mgeditor.php?delete=$message->id","return confirmDelete();");
 				} else {
 					$icon = "tinybutton-EMPTY";
 					$actions[] = action_link("New","pencil_add","editmessagepostvoice.php?id=new&mgid=".$messagegroup->id);
-					$actions[] = action_link("Copy Phone Message","page_copy","mgeditor.php?copyphonetovoice");
+					$actions[] = action_link("Copy From Phone Message","page_copy","mgeditor.php?copyphonetovoice");
 				}
-				$linkrow[] = array('icon' => $icon,'title' => _L("%s Post Voice Message",$languagename), 'actions' => $actions);
+				$linkrow[] = array('icon' => $icon,'title' => _L("%s Page Media Message",$languagename), 'actions' => $actions);
 				
 			} else {
 				$linkrow[] = false;
