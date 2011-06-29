@@ -109,7 +109,7 @@ function fadecolor($primary, $fade, $ratio){
 		<tr>
 			<td bgcolor="white">
 				<div style="padding-left:10px;">
-					<img src="content.php?code=<?= escapehtml($CODE) ?>&id=<?= $messageinfo->logocontentid ?></img>" />
+					<img src="content.php?code=<?= escapehtml($CODE) ?>&id=<?= $messageinfo->logocontentid ?>" />
 				</div>
 			</td>
 			<td>
