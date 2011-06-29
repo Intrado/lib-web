@@ -330,7 +330,7 @@ class MsgWiz_translatePreview extends WizStep {
 					"control" => array("RetranslationItem",
 						"ishtml" => $ishtml,
 						"langcode" => $languagecode,
-						"message" => $obj->responseData->translatedText,
+						"message" => $translations->translatedText,
 						"disabledmessage" => _L("People tagged with this language will receive the English version.")),
 					"helpstep" => 2
 				);
