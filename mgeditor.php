@@ -78,8 +78,10 @@ if (isset($_GET['copyphonetovoice'])) {
 			// remove existing post voice message
 			$existingmessage = $messagegroup->getMessage("post", "voice", Language::getDefaultLanguageCode());
 			if ($existingmessage) {
+				Query("BEGIN");
 				QuickUpdate("delete from message where id = ?", false, array($existingmessage->id));
 				QuickUpdate("delete from messagepart where messageid = ?", false, array($existingmessage->id));
+				Query("COMMIT");
 			}
 			// copy phone message
 			$newmessage = $phonemessage->copy($messagegroup->id);
