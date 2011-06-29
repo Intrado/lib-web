@@ -66,3 +66,15 @@ var ModalWrapper = Class.create({
 		this.modal.open();
 	}
 });
+
+var audioPreviewModal = function(audiofileid) {
+	var content = new Element('div',{
+		id: 'modal_player',
+		style: 'text-align: center;'
+	});
+	var afterOpen = function(){
+		embedPlayer('audio.wav.php/mediaplayer_preview.wav?id=' + audiofileid,'modal_player');
+	};
+	var modalWrapper = new ModalWrapper("Audio Preview",content, afterOpen);
+	modalWrapper.open();
+}
