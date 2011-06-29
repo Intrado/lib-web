@@ -30,7 +30,8 @@ if (!$messageinfo) {
 	$primary = $messageinfo->brandinfo["primary"];
 	$theme1 = $messageinfo->brandinfo["theme1"];
 	$theme2 = $messageinfo->brandinfo["theme2"];
-	$TITLE = escapehtml($messageinfo->customerdisplayname) . " - " . escapehtml($messageinfo->jobname);
+	//title is used by facebook to the link name
+	$TITLE = escapehtml($messageinfo->jobname) . " - " . escapehtml($messageinfo->customerdisplayname);
 	$urlcomponent = $messageinfo->urlcomponent;
 	apache_note("CS_CUST",urlencode($messageinfo->urlcomponent)); //for logging
 }
