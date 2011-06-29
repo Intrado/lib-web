@@ -164,15 +164,7 @@ var AudioLibraryWidget = Class.create({
 	},
 	
 	onClickPlay: function(event, audiofile) {
-			var content = new Element('div',{
-				id: 'modal_player',
-				style: 'text-align: center;'
-			});
-			var afterOpen = function(){
-				embedPlayer('audio.wav.php/mediaplayer_preview.wav?id=' + audiofile.id,'modal_player');
-			};
-			var modalWrapper = new ModalWrapper("Audio Preview",content, afterOpen);
-			modalWrapper.open();
+			audioPreviewModal(audiofile.id);
 	},
 	
 	onClickInsert: function(event, audiofile) {
