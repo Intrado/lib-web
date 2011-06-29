@@ -279,6 +279,12 @@ class MsgWiz_phoneAdvanced extends WizStep {
 		
 		$messagegroup = new MessageGroup($_SESSION['wizard_message']['mgid']);
 		$language = Language::getName($langcode);
+
+		$gender = $messagegroup->preferredgender;
+		
+		// get user default gender selection if none assigned
+		if (!$gender)
+			$gender = $USER->getSetting('defaultgender', "female");
 		
 		// upload audio needs this session data
 		$_SESSION['messagegroupid'] = $messagegroup->id;
@@ -313,7 +319,7 @@ class MsgWiz_phoneAdvanced extends WizStep {
 		$formdata["gender"] = array(
 				"label" => _L("Gender"),
 				"fieldhelp" => _L("Select the gender of the text-to-speech voice."),
-				"value" => "",
+				"value" => $gender,
 				"validators" => array(array("ValRequired")),
 				"control" => array("RadioButton", "values" => array("female" => _L("Female"), "male" => _L("Male"))),
 				"helpstep" => $helpstep++);
