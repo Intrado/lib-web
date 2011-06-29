@@ -196,6 +196,10 @@ include_once("nav.inc.php");
 <script type="text/javascript">
 <? Validator::load_validators(array("PhoneMessageRecorderValidator")); ?>
 </script>
+<script src="script/livepipe/livepipe.js" type="text/javascript"></script>
+<script src="script/livepipe/window.js" type="text/javascript"></script>
+<script src="script/modalwrapper.js" type="text/javascript"></script>
+<script src="script/niftyplayer.js.php" type="text/javascript"></script>
 <?
 
 startWindow($messagegroup->name);

@@ -73,7 +73,7 @@ class PhoneMessageRecorder extends FormItem {
 					if (value.m)
 						popup("previewmessage.php?id=" + value.m, 400, 400);
 					else if (value.af)
-						popup("previewaudio.php?close=1&id="+value.af, 400, 500);
+						audioPreviewModal(value.af);
 				});
 
 				function curry (fn,obj) {
