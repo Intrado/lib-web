@@ -50,14 +50,14 @@ function fadecolor($primary, $fade, $ratio){
 ////////////////////////////////////////////////////////////////////////////////
 // Display
 ////////////////////////////////////////////////////////////////////////////////
-
+header('Content-type: text/html; charset=UTF-8') ;
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html>
 <head>
-	<meta http-equiv="Content-type" value="text/html; charset=UTF-8" />
+	<meta http-equiv="Content-type" content="text/html; charset=UTF-8" />
 	<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7" />
-	<style>
+	<style type="text/css">
 		.navband1 {
 			height: 6px; 
 			background: #<?=$primary ?>;
@@ -105,30 +105,30 @@ function fadecolor($primary, $fade, $ratio){
 	<script type="text/javascript" src="page.js"></script>
 </head>
 <body>
-	<table border=0 cellspacing=0 cellpadding=0 width="100%">
+	<table border="0" cellspacing="0" cellpadding="0" width="100%">
 		<tr>
 			<td bgcolor="white">
 				<div style="padding-left:10px;">
-					<img src="content.php?code=<?= escapehtml($CODE) ?>&id=<?= $messageinfo->logocontentid ?>" />
+					<img src="content.php?code=<?= escapehtml($CODE) ?>&id=<?= $messageinfo->logocontentid ?>" alt=""/>
 				</div>
 			</td>
 			<td>
 				<div class="swooshbg">
-					<img src="img/shwoosh.gif" />
+					<img src="img/shwoosh.gif" alt=""/>
 				</div>
 			</td>
 			<td width="100%" class="swooshbg"></td>
 		</tr>
 	</table>
-	<div class="navband1"><img src="img/pixel.gif"></div>
-	<div class="navband2"><img src="img/pixel.gif"></div>
+	<div class="navband1"><img src="img/pixel.gif" alt=""/></div>
+	<div class="navband2"><img src="img/pixel.gif" alt=""/></div>
 	<div style="margin: 15px;">
 
 	<h1><?=escapehtml($messageinfo->customerdisplayname)?></h1>
 	<div style="color: gray; float: right;">Sent: <?=date('M j, Y g:i a', $messageinfo->jobstarttime)?></div>
 	<h2><?=escapehtml($messageinfo->jobname)?></h2>
 
-	<div style="clear: both; border-top: 1px solid #BFBFBF; margin-bottom: 15px;" ><img src="img/pixel.gif"></img></div>
+	<div style="clear: both; border-top: 1px solid #BFBFBF; margin-bottom: 15px;" ><img src="img/pixel.gif" alt=""/></div>
 
 <?
 if ($hasMedia) {
@@ -177,7 +177,7 @@ if ($hasFiles) {
 //if we had either extras, need to clear floats and add another line
 if ($hasMedia || $hasFiles) {
 ?>
-<div style="clear: both; border-top: 1px solid #BFBFBF; margin-bottom: 15px;" ><img src="img/pixel.gif"></img></div>
+<div style="clear: both; border-top: 1px solid #BFBFBF; margin-bottom: 15px;" ><img src="img/pixel.gif" alt=""/></div>
 <?
 }
 
