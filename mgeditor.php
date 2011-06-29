@@ -56,7 +56,17 @@ if($messagegroup->type != 'notification') {
 
 
 if (isset($_GET['delete'])) {
-	QuickUpdate("delete from message where id=? and messagegroupid=?",false,array($_GET['delete'],$messagegroup->id));
+	$message = new Message($_GET['delete']);
+	if ($message->messagegroupid == $messagegroup->id) {
+		// Delete all messages and messageparts related to the delete request
+		QuickUpdate("delete m.* ,mp.* 
+						from message m,messagepart mp
+						where 
+						m.messagegroupid=? and m.languagecode = ? and 
+						m.type =? and m.subtype=? and m.id = mp.messageid",
+						false,
+						array($messagegroup->id,$message->languagecode,$message->type,$message->subtype));
+	}
 }
 
 if (isset($_GET['copyphonetovoice'])) {
