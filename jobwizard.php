@@ -365,7 +365,11 @@ class FinishJobWizard extends WizFinish {
 				$messagegroup->stuffHeaders();
 				$messagegroup->update(array("data"));
 				
-				
+				// create a post voice (provided that's enabled)
+				if ($this->parent->dataHelper('/message/post/socialmedia:createpostvoice')) {
+					$messages['post']['voice']['en']['none'] = $messages['phone']['voice']['en']['none'];
+				}
+					
 				// check for and retrieve translations
 				foreach ($this->parent->dataHelper("/message/phone/translate", true, "[]") as $langcode => $translatedmessage) {
 					// if this translation message is enabled
@@ -392,11 +396,6 @@ class FinishJobWizard extends WizFinish {
 				$messages['email']['html']['en']['none']["from"] = $this->parent->dataHelper("/message/email/text:from");
 				$messages['email']['html']['en']['none']["subject"] = $this->parent->dataHelper("/message/email/text:subject");
 				$messages['email']['html']['en']['none']['attachments'] = $this->parent->dataHelper("/message/email/text:attachments", true, "[]");
-			
-				// create a post voice (provided that's enabled)
-				if ($this->parent->dataHelper('/message/post/socialmedia:createpostvoice')) {
-					$messages['post']['voice']['en']['none']['text'] = $messages['phone']['voice']['en']['none'];
-				}
 				
 				// check for and retrieve translations
 				foreach ($this->parent->dataHelper("/message/email/translate", false, array()) as $langcode => $enabled) {
