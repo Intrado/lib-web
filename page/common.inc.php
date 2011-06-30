@@ -63,7 +63,13 @@ $PLS = new PageLinkService();
 $CODE = isset($_GET['code']) ? $_GET['code'] : $_SERVER['REQUEST_URI'];
 if (strrpos($CODE,"/") !== false)
 	$CODE = substr($CODE,1 + strrpos($CODE, "/"));
-	
+
+//if no code is found in GET args, and not passed in via the aliasmatch, redirect them somewhere useful
+if (strlen($CODE) == 0) {
+	header("Location: " . $SETTINGS['feature']['redirect_url']);
+	exit();	
+}
+
 //sanity check, don't bother passing tons of unknown data to appserver
 if (strlen($CODE) > 10 || !preg_match("/^[-_a-zA-Z0-9]+$/", $CODE))
 	do404();
