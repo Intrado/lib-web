@@ -344,7 +344,7 @@ class PhoneMessageEditor extends FormItem {
 						setupVoiceRecorder(e, name);
 						
 						// assign the audiofile to this message group
-						if (messagegroupid && audiolibrarywidge) {
+						if (messagegroupid && audiolibrarywidget) {
 							new Ajax.Request("ajaxaudiolibrary.php", {
 								"method": "post",
 								"parameters": {
