@@ -152,7 +152,7 @@ $formdata = array(
 	),
 	"gender" => array(
 		"label" => _L("Gender"),
-		"fieldhelp" => _L("Select the gender of the text-to-speech voice."),
+		"fieldhelp" => _L("Select the gender of the text-to-speech voice. Some languages are only available in one gender. In those cases, selecting a different gender will result in the same message playback."),
 		"value" => $gender,
 		"validators" => array(
 			array("ValRequired"),
@@ -181,7 +181,8 @@ $helpsteps = array(_L("<p>You can use a variety of techniques to build your mess
 	"insert and enter a default value which will display if a recipient does not have data in the chosen field. Click the ".
 	"'Insert' button to add the data field to your message.</p>"),
 	_L("If your message contains pieces that will be read by a text-to-speech voice, such as data fields or other text, select ".
-	"the gender of the text-to-speech voice. For best results, it's a good idea to select the same gender as the speaker in the audio files."),
+	"the gender of the text-to-speech voice. For best results, it's a good idea to select the same gender as the speaker in the audio files.".
+	"<br><br><i><b>Note:</b> Some languages are only available in one gender. In those cases, selecting a different gender will result in the same message playback.</i>"),
 	_L("Click the preview button to hear a preview of your message."));
 		
 $buttons = array(submit_button(_L('Done'),"submit","tick"));

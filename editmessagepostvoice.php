@@ -113,10 +113,10 @@ if (!$gender)
 $_SESSION['messagegroupid'] = $messagegroup->id;
 
 $formdata = array(
-	$messagegroup->name. " (". _L("Voice Post"). ")",
+	$messagegroup->name. " (". _L("Page Media"). ")",
 	"message" => array(
 		"label" => _L("Advanced Message"),
-		"fieldhelp" => _L("Enter your voice message in this field. Click on the 'Guide' button for help with the different options which are available to you."),
+		"fieldhelp" => _L("Enter your voice message in this field or choose from the recording options to the right. Click on the 'Guide' button for help with the different options which are available to you and an explanation of this feature."),
 		"value" => $text,
 		"validators" => array(
 			array("ValRequired"),
@@ -126,7 +126,7 @@ $formdata = array(
 	),
 	"gender" => array(
 		"label" => _L("Gender"),
-		"fieldhelp" => _L("Select the gender of the text-to-speech voice."),
+		"fieldhelp" => _L("Select the gender of the text-to-speech voice. Some languages are only available in one gender. In those cases, selecting a different gender will result in the same message playback."),
 		"value" => $gender,
 		"validators" => array(
 			array("ValRequired"),
@@ -147,12 +147,13 @@ $formdata = array(
 	)
 );
 
-$helpsteps = array(_L("<p>You can use a variety of techniques to build your message in this screen, but ideally you should ".
-	"use this to assemble snippets of audio with dynamic data field inserts. You can use 'Call me to Record' to create your ".
-	"audio snippets or upload pre-recorded audio from your computer. To record multiple audio snippets, you can use 'Call me ".
-	"to Record' for each snippet. </p>"),
+$helpsteps = array(_L("<p>Page Media messages allow you to post audio messages to social media sites. </p><p>Your media message will appear on a web page".
+	" which will be linked to your social media pages. People viewing your social media page may click the link to a special web page containing".
+	" a media player with your audio as well as your HTML message (created in the Page Editor).</p><p>Page Media messages, like Page messages, are viewable ".
+	"by anyone who can view your social media pages. For that reason, these messages may not include dynamic data fields.</p>"),
 	_L("If your message contains pieces that will be read by a text-to-speech voice, such as data fields or other text, select ".
-	"the gender of the text-to-speech voice. For best results, it's a good idea to select the same gender as the speaker in the audio files."),
+	"the gender of the text-to-speech voice. For best results, it's a good idea to select the same gender as the speaker in the audio files.".
+	"<br><br><i><b>Note:</b> Some languages are only available in one gender. In those cases, selecting a different gender will result in the same message playback.</i>"),
 	_L("Click the preview button to hear a preview of your message."));
 		
 $buttons = array(submit_button(_L('Done'),"submit","tick"));
@@ -247,7 +248,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 // Display
 ////////////////////////////////////////////////////////////////////////////////
 $PAGE = "notifications:messages";
-$TITLE = "Advanced Phone Message Editor";
+$TITLE = "Page Media Editor";
 
 include_once("nav.inc.php");
 
