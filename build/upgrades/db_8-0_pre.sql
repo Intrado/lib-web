@@ -48,3 +48,16 @@ VALUES (
 )
 $$$
 
+-- $rev 4
+
+-- add default tiny domain
+INSERT ignore INTO `setting` (
+`id` ,
+`name` ,
+`value`
+)
+VALUES (
+NULL , 'fbauthorizewall', '1'
+)
+$$$
+

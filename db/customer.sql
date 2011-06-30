@@ -1556,3 +1556,18 @@ update setting set value='8.0/3' where name='_dbversion'
 $$$
 
 -- END REV 8.0/3
+
+-- start 8.0/4
+INSERT ignore INTO `setting` (
+`id` ,
+`name` ,
+`value`
+)
+VALUES (
+NULL , 'fbauthorizewall', '1'
+)
+$$$
+
+update setting set value='8.0/4' where name='_dbversion'
+$$$
+-- END REV 8.0/4
