@@ -151,7 +151,7 @@ $helpsteps = array(_L("<p>Page Media messages allow you to post audio messages t
 	" which will be linked to your social media pages. People viewing your social media page may click the link to a special web page containing".
 	" a media player with your audio as well as your HTML message (created in the Page Editor).</p><p>Page Media messages, like Page messages, are viewable ".
 	"by anyone who can view your social media pages. For that reason, these messages may not include dynamic data fields.</p>"),
-	_L("If your message contains pieces that will be read by a text-to-speech voice, such as data fields or other text, select ".
+	_L("If your message contains pieces that will be read by a text-to-speech voice, such as text, select ".
 	"the gender of the text-to-speech voice. For best results, it's a good idea to select the same gender as the speaker in the audio files.".
 	"<br><br><i><b>Note:</b> Some languages are only available in one gender. In those cases, selecting a different gender will result in the same message playback.</i>"),
 	_L("Click the preview button to hear a preview of your message."));

@@ -183,9 +183,9 @@ $helpsteps = array(_L("<p>Page messages allow you to share messages which are to
 	" a web page with your message and then post a link to the web page on your social media pages.".
 	"</p><p>Page messages may be viewed by anyone who can view your social media pages. For that reason, dynamic data fields may not be included.".
 	" You may include audio in your Page message by adding Page Media from the Message Editor."),
-	_L("<p>You may attach up to three files, such as PDFs, to your Page for recipients to download.".
+	_L("<p>You may attach up to five files, such as PDFs, to your Page for recipients to download.".
 	" People who view your page will be able to download these files from links that are automatically ".
-	"generated in the Page.</p><p>Files may not exceed 2MB in size.</p>"));
+	"generated in the Page.</p><p>Files may not exceed 50MB in size.</p>"));
 		
 $buttons = array(submit_button(_L('Done'),"submit","tick"));
 $form = new Form("pagemessage",$formdata,$helpsteps,$buttons,"vertical");
