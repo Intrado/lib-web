@@ -355,12 +355,20 @@ function handleRequest() {
 				'phonevoice' => _L("Phone"),
 				'smsplain' => _L("SMS"),
 				'emailhtml' => _L("Email (HTML)"),
-				'emailplain' => _L("Email (Plain)"),
-				'postfacebook' => _L("Facebook"),
-				'posttwitter' => _L("Twitter"),
-				'postpage' => _L("Page"),
-				'postvoice' => _L("Voice")
+				'emailplain' => _L("Email (Plain)")
 			);
+			// facebook?
+			if (getSystemSetting("_hasfacebook"))
+				$result->headers["postfacebook"] = _L("Facebook");
+			// twitter?
+			if (getSystemSetting("_hastwitter"))
+				$result->headers["posttwitter"] = _L("Twitter");
+			
+			// only add post type if the system has facebook or twitter
+			if (isset($result->headers["postfacebook"]) || isset($result->headers["posttwitter"])) {
+				$result->headers['postpage'] = _L("Page");
+				$result->headers['postvoice'] = _L("Page Media");
+			}
 
 			$query = "select l.name, m.id, m.type, m.subtype from language l
 						inner join message m on (l.code = m.languagecode and m.messagegroupid = ?)
@@ -370,14 +378,17 @@ function handleRequest() {
 			// get the default language row out, it goes on top always
 			foreach($rows as $id => $row) {
 				if ($row['name'] == Language::getName(Language::getDefaultLanguageCode())) {
-					$result->data[$row['name']][$row['type'] . $row['subtype']] = $row['id'];
+					if (isset($result->headers[$row['type'] . $row['subtype']]))
+						$result->data[$row['name']][$row['type'] . $row['subtype']] = $row['id'];
 					unset($rows[$id]);
 				}
 			}
 			// now get the other languages
-			foreach($rows as $id => $row)
-				$result->data[$row['name']][$row['type'] . $row['subtype']] = $row['id'];
-				
+			foreach($rows as $id => $row) {
+				if (isset($result->headers[$row['type'] . $row['subtype']]))
+					$result->data[$row['name']][$row['type'] . $row['subtype']] = $row['id'];
+			}
+			
 		return $result;
 		default:
 			error_log("No AJAX API for type=$type");
