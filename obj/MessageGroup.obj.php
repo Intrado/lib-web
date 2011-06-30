@@ -296,7 +296,8 @@ class MessageGroup extends DBMappedObject {
 			from message
 			where messagegroupid = ?
 			and userid = ?
-			and type in ('email','phone')",
+			and type in ('email','phone')
+			and autotranslate != 'source'",
 			false,false,
 			array($this->id, $USER->id));
 		
@@ -312,7 +313,8 @@ class MessageGroup extends DBMappedObject {
 		}
 		
 		// get the the default language code messages type calculated above. "phone", "email", "both"
-		$default = isset($languagemap[$this->defaultlanguagecode])?$languagemap[$this->defaultlanguagecode]:"";
+		$defaultlang = ($this->defaultlanguagecode?$this->defaultlanguagecode:Language::getDefaultLanguageCode());
+		$default = isset($languagemap[$defaultlang])?$languagemap[$defaultlang]:"";
 		
 		switch ($default) {
 			case "both":
