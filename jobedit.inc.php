@@ -800,11 +800,13 @@ if ($submittedmode || $completedmode) {
 			"fieldhelp" => _L("Select which pages to post to."),
 			"value" => ($fbpages?json_encode($fbpages):""),
 			"validators" => array(
-				array("ValRequired"),
 				array("ValFacebookPageWithMessage", "authpages" => getFbAuthorizedPages(), "authwall" => getSystemSetting("fbauthorizewall"))),
 			"control" => array("FacebookPage", "access_token" => $USER->getSetting("fb_access_token", false)),
 			"requires" => array("message"),
 			"helpstep" => ++$helpstepnum);
+		if (!$job->messagegroupid)
+			$formdata["fbpage"]["validators"][] = array("ValRequired");
+			
 	}
 	
 	// if the user account may post to twitter, but has no valid twitter access token
@@ -821,7 +823,7 @@ if ($submittedmode || $completedmode) {
 			"control" => array("TwitterAccountPopup", "hasvalidtoken" => $tw->hasValidAccessToken()),
 			"requires" => array("message"),
 			"helpstep" => ++$helpstepnum);
-		if (!$tw->hasValidAccessToken())
+		if (!$tw->hasValidAccessToken() && !$job->messagegroupid)
 			$formdata["twitter"]['validators'][] = array("ValRequired");
 	}
 	
