@@ -194,7 +194,7 @@ header('Content-type: text/html; charset=UTF-8') ;
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html>
 <head>
-	<meta http-equiv="Content-type" value="text/html; charset=UTF-8" />
+	<meta http-equiv="Content-type" content="text/html; charset=UTF-8" />
 	<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7" />
 	<title><?= getBrand();?>: <?= $PAGETITLE ?></title>
 
@@ -237,7 +237,7 @@ header('Content-type: text/html; charset=UTF-8') ;
 			<div class="custname"><?= escapehtml($_SESSION['custname']); ?></div>
 			<table border=0 cellspacing=0 cellpadding=0 class="noprint">
 				<tr>
-					<td><img src="img/accountlinksbg_left.gif"></td>
+					<td><img src="img/accountlinksbg_left.gif" alt="" ></td>
 					<td background="img/accountlinksbg_mid.gif">
 						<div class="applinks hoverlinks">
 							<a href="addresses.php?origin=nav">Address Book</a> |
@@ -252,20 +252,20 @@ if($USER->authorize('managemyaccount')){
 							<a href="index.php?logout=1">Logout</a>
 						</div>
 					</td>
-					<td><img src="img/accountlinksbg_right.gif"></td>
+					<td><img src="img/accountlinksbg_right.gif" alt="" ></td>
 				</tr>
 			</table>
 		</td>
 	</tr>
 </table>
-<div class="navband1"><img src="img/pixel.gif"></div>
-<div class="navband2"><img src="img/pixel.gif"></div>
+<div class="navband1"><img src="img/pixel.gif" alt="" ></div>
+<div class="navband2"><img src="img/pixel.gif" alt="" ></div>
 
 <!-- =================================================== -->
 <div class="navmenuspacer">
 <div class="navmenu">
 <? 	if ($USER->authorize("startshort")) { ?>
-	<div id="shortcutmenu" class="shortcutmenu"><img src="img/arrow_down.gif" style="margin-right: 5px; margin-left: 5px; float: right;">Shortcuts</div>
+	<div id="shortcutmenu" class="shortcutmenu"><img src="img/arrow_down.gif" style="margin-right: 5px; margin-left: 5px; float: right;" alt="" >Shortcuts</div>
 	<div class="shortcuts hoverlinks" id="shortcuts" style="display: none;">
 		<? doShortcuts($SHORTCUTS) ?>
 	</div>
