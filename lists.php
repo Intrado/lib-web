@@ -160,7 +160,7 @@ if (isset($_GET['ajax'])) {
 			}
 			$content .= '<br />';
 			if(isset($item["lastused"]))
-				$content .= 'This list was last used: <i>' . date("M j, g:i a",strtotime($item["lastused"])) . "</i>";
+				$content .= 'This list was last used: <i>' . date("M j, Y g:i a",strtotime($item["lastused"])) . "</i>";
 			else
 				$content .= 'This list has never been used';
 			$content .= '</a>';

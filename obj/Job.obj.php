@@ -69,7 +69,7 @@ class Job extends DBMappedObject {
 		$newjob = new Job($this->id);
 		$newjob->id = NULL;
 		if ($isrepeatingrunnow || $newjob->status == "repeating") {
-			$tmpDate = date("M j, g:i a");
+			$tmpDate = date("M j, Y g:i a");
 			$newjob->name = substr($newjob->name,0,47 - strlen($tmpDate)) . " - $tmpDate";
 		} else {
 			$tmpJobName = $newjob->name;
