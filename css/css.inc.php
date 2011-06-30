@@ -846,9 +846,9 @@ div.autocomplete ul li {
 
 .modalwindow .window_contents {
 	margin-top:0px;
-	width:100%;
 	padding: 4%;
 	width: 92%;
+	min-height: 200px;
 }
 
 .modalwindow .window_header {
