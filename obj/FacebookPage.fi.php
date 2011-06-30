@@ -74,6 +74,16 @@ class FacebookPage extends FormItem {
 				// Observe a click on the action links
 				$("'. $n. 'all").observe("click", handleActionLink.curry("'.$n.'", true));
 				$("'. $n. 'none").observe("click", handleActionLink.curry("'.$n.'", false));
+				// Observe event indicating page loading has completed
+				$("'. $n. '").observe("FbPages:update", function (res) {
+					if (res.memo.pagesloaded == 0) {
+						$("'.$n.'fbpages").update("'._L("There were no authorized posting locations found!<br>Contact your system administrator for assistance.").'");
+						$("'.$n.'actionlinks").hide();
+					} else {
+						$("'.$n.'actionlinks").show();
+					}
+				});
+				
 				';
 		return $str;
 	}
@@ -128,30 +138,14 @@ class FacebookPage extends FormItem {
 						)
 					);
 					
-					// get users info if wall posting is allowed
-					if (authpages.wall) {
-						FB.api("/me", { access_token: access_token }, function (res) {
-							if (res !== undefined) {
-								var checkbox = addFbPageElement(formitem, container, res, true);
-									
-								// if the pageid is in our currently selected list of pages, check its checkbox
-								if (pages.indexOf("me") !== -1)
-									checkbox.checked = true;
-							} else {
-								// no data returned
-								container.update(
-									new Element("div").setStyle({padding: "5px"}).update(
-										"'. escapehtml(_L('Error encountered trying to get administered pages')). '"));
-							}
-						}); // end fbapi call
-					}
 					// get user pages
 					FB.api("/me/accounts", { access_token: access_token, type: "page" }, function(res) {
+						var availablepages = 0;
 						if (res.data !== undefined) {
 							
 							res.data.each(function(account) {
 								if (authpages.pages.size() == 0 || (authpages.pages.size() > 0 && authpages.pages.indexOf(account.id) !== -1)) {
-								
+									availablepages++;
 									var checkbox = addFbPageElement(formitem, container, account, false);
 									
 									// if the pageid is in our currently selected list of pages, check its checkbox
@@ -165,8 +159,32 @@ class FacebookPage extends FormItem {
 								new Element("div").setStyle({padding: "5px"}).update(
 									"'. escapehtml(_L('Error encountered trying to get administered pages')). '"));
 						}
-						// remove the loading icon
-						$(formitem + "-pageloading").remove();
+						
+						// get users info if wall posting is allowed
+						if (authpages.wall) {
+							FB.api("/me", { access_token: access_token }, function (res) {
+								if (res !== undefined) {
+									availablepages++;
+									var checkbox = addFbPageElement(formitem, container, res, true);
+										
+									// if the pageid is in our currently selected list of pages, check its checkbox
+									if (pages.indexOf("me") !== -1)
+										checkbox.checked = true;
+								} else {
+									// no data returned
+									container.update(
+										new Element("div").setStyle({padding: "5px"}).update(
+											"'. escapehtml(_L('Error encountered trying to get administered pages')). '"));
+								}
+								// remove the loading icon
+								$(formitem + "-pageloading").remove();
+								$(formitem).fire("FbPages:update", { pagesloaded: availablepages });
+							}); // end fbapi call
+						} else {
+							// remove the loading icon
+							$(formitem + "-pageloading").remove();
+							$(formitem).fire("FbPages:update", { pagesloaded: availablepages });
+						}
 					});
 				} else {
 					container.hide();
