@@ -16,7 +16,7 @@ class PreviewModal {
 	var $parts;
 	var $valueparts;
 	var $title;
-	
+	var $errors = array();
 	var $hasfieldinserts = false;
 	var $uid;
 
@@ -113,23 +113,20 @@ class PreviewModal {
 			return;
 		}
 		// Parse the source text into parts
-		$errors = array();
 		if ($messagegroupid)
 			$audiofileids = MessageGroup::getReferencedAudioFileIDs($messagegroupid);
 		else
 			$audiofileids = false;
-		$modal->parts = Message::parse($_SESSION["previewmessagesource"]["source"],$errors,$_SESSION["previewmessagesource"]["voiceid"],$audiofileids);
-		if (count($errors) != 0) {
-			error_log("Error parsing message source");
+		$modal->parts = Message::parse($_SESSION["previewmessagesource"]["source"],$modal->errors,$_SESSION["previewmessagesource"]["voiceid"],$audiofileids);
+		if (count($modal->errors) == 0) {
+			$modal->initializeFieldContent("phone");
 		}
-		
-		$modal->initializeFieldContent("phone");
 		
 		$voice = new Voice($_SESSION["previewmessagesource"]["voiceid"]);
 		$modal->title = _L("%s Phone Message", Language::getName($voice->languagecode));
 		if ($showmodal) {
 			$modal->includeModal();
-		} else {
+		} else if (count($modal->errors) == 0) {
 			$modal->handleRequest();
 		}
 		return;
@@ -156,9 +153,11 @@ class PreviewModal {
 		$message->languagecode = $_REQUEST["language"];
 		$message->stuffHeaders();
 		
-		$parts = Message::parse($_REQUEST["text"]);
-		$email = emailMessageViewForMessageParts($message,$parts,3);
-		$modal->text = $modal->formatEmail($email);
+		$parts = Message::parse($_REQUEST["text"],$modal->errors);
+		if (count($modal->errors) == 0) {
+			$email = emailMessageViewForMessageParts($message,$parts,3);
+			$modal->text = $modal->formatEmail($email);
+		}
 		switch ($_REQUEST["subtype"]) {
 			case "html":
 				$modal->title = _L("%s HTML Email Message", Language::getName($message->languagecode));
@@ -183,7 +182,7 @@ class PreviewModal {
 			$modalcontent = $this->form->render();
 		}
 		header('Content-Type: application/json');
-		echo json_encode(array("playable" => $this->playable,"title" => $this->title, "hasinserts" => $this->hasfieldinserts, "form" => $modalcontent, "uid" => $this->uid, "partscount" => count($this->parts)));
+		echo json_encode(array("playable" => $this->playable,"title" => $this->title, "hasinserts" => $this->hasfieldinserts, "errors" => $this->errors, "form" => $modalcontent, "uid" => $this->uid, "partscount" => count($this->parts)));
 		exit();
 	}
 	
@@ -267,24 +266,56 @@ class PreviewModal {
 		<script type='text/javascript' language='javascript'>
 		var showPreview = function(post_parameters,get_parameters){
 			var modal = new ModalWrapper("Loading...",false,false);
+			modal.window_contents.update(new Element('img',{src: 'img/ajax-loader.gif'}));
 			modal.open();
 			
 			new Ajax.Request('<?= $posturl?>' + (get_parameters?'&' + get_parameters:''), {
 				'method': 'post',
 				'parameters': post_parameters,
 				'onSuccess': function(response) {
+					modal.window_title.update("");
 					if (response.responseJSON) {
 						var result = response.responseJSON;
 						modal.window_title.update(result.title);
-						if (result.playable == true) {
-							modal.window_contents.update(result.form + '<div style=\'text-align:center;\' id=\'player\'></div><div style=\'text-align:center;\' id=\'download\'></div>');
+						
+						if (result.errors != undefined && result.errors.size() > 0) {
+							modal.window_title.update('Unable to Preview');
+							
+							modal.window_contents.update("The following error(s) occured:");
+							var list = new Element('ul');
+							result.errors.each(function(error) {
+								list.insert(new Element('li').update(error));
+							});
+							modal.window_contents.insert(list);
+						} else if (result.playable == true) {
+							modal.window_contents.update(result.form);
+							
+							var player = new Element('div',{
+								id: 'player',
+								style: 'text-align:center;'
+							});
+							var download = new Element('div',{
+								id: 'download',
+								style: 'text-align:center;'
+							});
+							modal.window_contents.insert(player);
+							modal.window_contents.insert(download);
+							
+							
 							if (result.hasinserts ==  false) {
-								$('download').update('<a href=\'previewaudio.mp3.php?download=true&uid=' + result.uid + '\'>Click here to download</a>');
+								var downloadlink = new Element('a',{
+									href: 'previewaudio.mp3.php?download=true&uid=' + result.uid
+								}).update('Click here to download');
+								
+								$('download').update(downloadlink);
 								embedPlayer('previewaudio.mp3.php?uid=' + result.uid,'player',result.partscount);
 							} else {
 								$('previewmessagefields').observe('Form:Submitted',function(e){
 									embedPlayer('previewaudio.mp3.php?uid=' + e.memo,'player',result.partscount);
-									$('download').update('<a href=\'previewaudio.mp3.php?download=true&uid=' + e.memo +'\'>Click here to download</a>');
+									var download = new Element('a',{
+										href: 'previewaudio.mp3.php?download=true&uid=' + e.memo
+									}).update('Click here to download');
+									$('download').update(download);
 								});
 							}
 						} else {

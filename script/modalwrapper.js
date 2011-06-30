@@ -16,11 +16,6 @@ var ModalWrapper = Class.create({
 		});
 		if (content) {
 			this.window_contents.update(content);
-			this.loader = false;
-		} else {
-			this.loader = new Element('a',{
-				href: 'img/ajax-loader.gif'
-			});
 		}
 		this.getTopOffset = function(){
 			var viewport = document.viewport.getDimensions();
@@ -32,13 +27,12 @@ var ModalWrapper = Class.create({
 			var viewport = document.viewport.getDimensions();
 			return Math.floor(viewport.width/2);};
 		
-		this.modal = new Control.Modal(this.loader,Object.extend({
+		this.modal = new Control.Modal(false,Object.extend({
 			className: 'modalwindow',
 			overlayOpacity: 0.75,
-			position: [this.getLeftOffset(),this.getTopOffset()],
+			//position: [this.getLeftOffset(),this.getTopOffset()],
 			fade: false,
 			width: this.getModalWidth(),
-			indicator:this.loader,
 			insertRemoteContentAt:this.window_contents,
 			afterOpen: afterOpen,
 			afterClose: function(){
