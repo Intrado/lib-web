@@ -351,21 +351,32 @@ function handleRequest() {
 			}
 			
 			$result->defaultlang = Language::getName(Language::getDefaultLanguageCode());
-			$result->headers = array(
-				'phonevoice' => _L("Phone"),
-				'smsplain' => _L("SMS"),
-				'emailhtml' => _L("Email (HTML)"),
-				'emailplain' => _L("Email (Plain)")
-			);
+			$result->headers = array();
+			
+			if ($USER->authorize('sendphone')) {
+				$result->headers['phonevoice'] = _L("Phone");
+			}
+			
+			if (getSystemSetting('_hassms', false) && $USER->authorize('sendsms')) {
+				$result->headers['smsplain'] = _L("SMS");
+			}
+			
+			if ($USER->authorize('sendemail')) {
+				$result->headers['emailhtml'] = _L("HTML Email");
+				$result->headers['emailplain'] = _L("Plain Email");
+			}
+			
 			// facebook?
-			if (getSystemSetting("_hasfacebook"))
+			if (getSystemSetting('_hasfacebook', false) && $USER->authorize('facebookpost')) {
 				$result->headers["postfacebook"] = _L("Facebook");
+			}
 			// twitter?
-			if (getSystemSetting("_hastwitter"))
+			if (getSystemSetting('_hastwitter', false) && $USER->authorize('twitterpost')) {
 				$result->headers["posttwitter"] = _L("Twitter");
+			}
 			
 			// only add post type if the system has facebook or twitter
-			if (isset($result->headers["postfacebook"]) || isset($result->headers["posttwitter"])) {
+			if ((getSystemSetting('_hasfacebook', false) && $USER->authorize('facebookpost')) || (getSystemSetting('_hastwitter', false) && $USER->authorize('twitterpost'))) {
 				$result->headers['postpage'] = _L("Page");
 				$result->headers['postvoice'] = _L("Page Media");
 			}
