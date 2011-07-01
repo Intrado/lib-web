@@ -510,7 +510,7 @@ class Form {
 	
 	// fire observable event on client side.
 	function fireEvent ($memo) {
-		$result = array("status" => "callback", "memo" => $memo);
+		$result = array("status" => "fireevent", "memo" => $memo);
 		header("Content-Type: application/json");
 		echo json_encode($result);
 		exit();
