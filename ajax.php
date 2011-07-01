@@ -357,8 +357,8 @@ function handleRequest() {
 				$result->headers['phonevoice'] = _L("Phone");
 			}
 			
-			// Show SMS to non authenticated SMS users if the messagegroup is subscribed
-			if (getSystemSetting('_hassms', false) && ($messagegroup->userid != $USER->id || $USER->authorize('sendsms'))) {
+			// Show SMS column to users even if they are not authenicated if the messagegroup contains SMS.
+			if (getSystemSetting('_hassms', false) && ($messagegroup->hasMessage("sms") || $USER->authorize('sendsms'))) {
 				$result->headers['smsplain'] = _L("SMS");
 			}
 			
@@ -368,14 +368,14 @@ function handleRequest() {
 			}
 			
 			// facebook?
-			// Show Facebook to non authenticated Facebook users if the messagegroup is subscribed
-			$showfacebook = getSystemSetting('_hasfacebook', false) && ($messagegroup->userid != $USER->id || $USER->authorize('facebookpost'));
+			// Show Facebook column to users even if they are not authenicated if the messagegroup contains Facebook.
+			$showfacebook = getSystemSetting('_hasfacebook', false) && ($messagegroup->hasMessage("post","facebook") || $USER->authorize('facebookpost'));
 			if ($showfacebook) {
 				$result->headers["postfacebook"] = _L("Facebook");
 			}
 			// twitter?
-			// Show Twitter to non authenticated Twitter users if the messagegroup is subscribed
-			$showtwitter = getSystemSetting('_hastwitter', false) && ($messagegroup->userid != $USER->id || $USER->authorize('twitterpost'));
+			// Show Twitter column to users even if they are not authenicated if the messagegroup contains Twitter.
+			$showtwitter = getSystemSetting('_hastwitter', false) && ($messagegroup->hasMessage("post","facebook") || $USER->authorize('twitterpost'));
 			if ($showtwitter) {
 				$result->headers["posttwitter"] = _L("Twitter");
 			}
