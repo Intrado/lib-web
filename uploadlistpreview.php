@@ -18,7 +18,6 @@ include_once("obj/Person.obj.php");
 include_once("obj/Phone.obj.php");
 include_once("obj/Email.obj.php");
 include_once("obj/FieldMap.obj.php");
-require_once("inc/ftpfile.inc.php");
 
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization
