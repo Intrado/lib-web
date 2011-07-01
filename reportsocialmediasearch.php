@@ -52,7 +52,7 @@ $formdata["searchby"] = array(
 );
 $formdata["dateoptions"] = array(
 	"label" => _L("Date Options"),
-	"value" => "today",
+	"value" => '{"reldate":"today"}',
 	"control" => array("ReldateOptions"),
 	"validators" => array(array("ValReldate")),
 	"helpstep" => 1
@@ -243,22 +243,24 @@ if ($downloadreport) {
 	header("Content-type: application/vnd.ms-excel");
 
 	//generate the CSV header
-	echo _L("Job Name") . ',' . _L("Submitted by") . ',' . _L("Post Date");
+	echo '"' . _L("Job Name") . '","' . _L("Submitted by") . '","' . _L("Post Date") . '"';
 	if (getSystemSetting('_hasfacebook', false)) {
-		echo ',' . _L("Facebook Destination") . ',' . _L("Facebook Status") . ',' . _L("Facebook Content");
+		echo ',"' . _L("Facebook Destination") . '","' . _L("Facebook Status") . '","' . _L("Facebook Content") . '"';
 	}
 	if (getSystemSetting('_hastwitter', false)) {
-		echo ',' . _L("Twitter Handle") . ',' . _L("Twitter Status") . ',' . _L("Twitter Content");
+		echo ',"' . _L("Twitter Handle") . '","' . _L("Twitter Status") . '","' . _L("Twitter Content") . '"';
 	}
 	
 	echo "\r\n";
 	
 	foreach ($data as $post) {
+		echo '"' . addslashes($post["jobname"]) . '","' . addslashes($post["user"]) . '","' . date("M j, Y g:i a",strtotime($post["date"])) . '"';
 		
-		$count = 0;
-		foreach ($post as $key => $item) {
-			echo ($count > 0 ?',':'') . '"' . addslashes($item) . '"';
-			$count++;
+		if (getSystemSetting('_hasfacebook', false)) {
+			echo ',"' . addslashes($post["fbdest"]) . '","' . addslashes($post["fbstatus"]) . '","' . addslashes($post["fbcontent"]) . '"';
+		}
+		if (getSystemSetting('_hastwitter', false)) {
+			echo ',"' . addslashes($post["twhandle"]) . '","' . addslashes($post["twstatus"]) . '","' . addslashes($post["twcontent"]) . '"';
 		}
 		echo "\r\n";
 	}
@@ -348,7 +350,7 @@ if ($showreport) {
 	foreach ($data as $post) {
 		$alt++;
 		echo $alt % 2 ? '<tr>' : '<tr class="listAlt">';
-		echo "<td>" . escapehtml($post["jobname"]) . "</td><td>" . escapehtml($post["user"]) . "</td><td>" . escapehtml($post["date"]) . "</td>";
+		echo "<td>" . escapehtml($post["jobname"]) . "</td><td>" . escapehtml($post["user"]) . "</td><td>" . date("M j, Y g:i a",strtotime($post["date"])) . "</td>";
 		
 		if (getSystemSetting('_hasfacebook', false)) {
 			echo "<td>" . escapehtml($post["fbdest"]) . "</td><td>" . escapehtml($post["fbstatus"]) . "</td><td>" . ConditionalContentLink("fb_$alt", $post["fbcontent"]) . "</td>";
