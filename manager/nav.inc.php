@@ -29,6 +29,7 @@ if (isset($_GET['monitor'])) {
 
 	<script src="../script/prototype.js" type="text/javascript"></script>
 	<script src="../script/scriptaculous.js" type="text/javascript"></script>
+	<link rel="SHORTCUT ICON" href="img/manager_favicon.ico" />
 </head>
 <body>
 <image src="manager.png">
