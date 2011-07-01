@@ -48,6 +48,7 @@ if(isset($_POST["submit"])) {
 <html>
 <head>
 	<title>Manager Login</title>
+	<link rel="SHORTCUT ICON" href="img/manager_favicon.ico" />
 </head>
 <body onload="
 var p = document.forms[0].password;
