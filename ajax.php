@@ -357,7 +357,8 @@ function handleRequest() {
 				$result->headers['phonevoice'] = _L("Phone");
 			}
 			
-			if (getSystemSetting('_hassms', false) && $USER->authorize('sendsms')) {
+			// Show SMS to non authenticated SMS users if the messagegroup is subscribed
+			if (getSystemSetting('_hassms', false) && ($messagegroup->userid != $USER->id || $USER->authorize('sendsms'))) {
 				$result->headers['smsplain'] = _L("SMS");
 			}
 			
@@ -367,16 +368,20 @@ function handleRequest() {
 			}
 			
 			// facebook?
-			if (getSystemSetting('_hasfacebook', false) && $USER->authorize('facebookpost')) {
+			// Show Facebook to non authenticated Facebook users if the messagegroup is subscribed
+			$showfacebook = getSystemSetting('_hasfacebook', false) && ($messagegroup->userid != $USER->id || $USER->authorize('facebookpost'));
+			if ($showfacebook) {
 				$result->headers["postfacebook"] = _L("Facebook");
 			}
 			// twitter?
-			if (getSystemSetting('_hastwitter', false) && $USER->authorize('twitterpost')) {
+			// Show Twitter to non authenticated Twitter users if the messagegroup is subscribed
+			$showtwitter = getSystemSetting('_hastwitter', false) && ($messagegroup->userid != $USER->id || $USER->authorize('twitterpost'));
+			if ($showtwitter) {
 				$result->headers["posttwitter"] = _L("Twitter");
 			}
 			
-			// only add post type if the system has facebook or twitter
-			if ((getSystemSetting('_hasfacebook', false) && $USER->authorize('facebookpost')) || (getSystemSetting('_hastwitter', false) && $USER->authorize('twitterpost'))) {
+			// only add post type if facebook or twitter is available
+			if ($showfacebook || $showtwitter) {
 				$result->headers['postpage'] = _L("Page");
 				$result->headers['postvoice'] = _L("Page Media");
 			}
