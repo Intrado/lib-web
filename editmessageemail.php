@@ -30,7 +30,6 @@ require_once("obj/EmailAttach.val.php");
 require_once("obj/EmailAttach.fi.php");
 require_once("obj/ValMessageBody.val.php");
 require_once("obj/EmailMessageEditor.fi.php");
-require_once("obj/InpageSubmitButton.fi.php");
 
 require_once("obj/PreviewModal.obj.php");
 require_once("obj/PreviewButton.fi.php");

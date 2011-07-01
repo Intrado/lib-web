@@ -28,9 +28,6 @@ require_once("obj/FormItem.obj.php");
 require_once("obj/Validator.obj.php");
 require_once("obj/ValMessageBody.val.php");
 require_once("obj/PhoneMessageEditor.fi.php");
-require_once("obj/InpageSubmitButton.fi.php");
-
-
 
 require_once("inc/previewfields.inc.php");
 require_once("obj/PreviewModal.obj.php");
