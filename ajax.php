@@ -385,27 +385,54 @@ function handleRequest() {
 				$result->headers['postpage'] = _L("Page");
 				$result->headers['postvoice'] = _L("Page Media");
 			}
-
-			$query = "select l.name, m.id, m.type, m.subtype from language l
-						inner join message m on (l.code = m.languagecode and m.messagegroupid = ?)
-						order by l.name";
-			$rows = QuickQueryMultiRow($query,true,false,array($_GET['id']));
-
-			// get the default language row out, it goes on top always
-			foreach($rows as $id => $row) {
-				if ($row['name'] == Language::getName(Language::getDefaultLanguageCode())) {
-					if (isset($result->headers[$row['type'] . $row['subtype']]))
-						$result->data[$row['name']][$row['type'] . $row['subtype']] = $row['id'];
-					unset($rows[$id]);
+			
+			
+			// Since it is possible to subscribe to messages we can not restrict based on $USER->authorize('sendmulti') here
+			// instead check if each language contains a message 
+			$customerlanguages = Language::getLanguageMap();
+			unset($customerlanguages["en"]);
+			$customerlanguages = array_merge(array("en" => "English"),$customerlanguages);
+			foreach ($customerlanguages as $languagecode => $languagename) {
+				if ($USER->authorize('sendphone')) {
+					$message = $messagegroup->getMessage('phone', 'voice', $languagecode);
+					
+					// Only show languages if allowed or it contains content
+					if ($USER->authorize('sendmulti') || $message)
+						$result->data[$languagename]['phonevoice'] = $message?$message->id:false;
+				}
+				if ($USER->authorize('sendemail')) {
+					$message = $messagegroup->getMessage('email', 'html', $languagecode);
+					
+					// Only show languages if allowed or it contains content
+					if ($USER->authorize('sendmulti') || $message)
+						$result->data[$languagename]['emailhtml'] = $message?$message->id:false;
+						
+					$message = $messagegroup->getMessage('email', 'plain', $languagecode);
+					
+					// Only show languages if allowed or it contains content
+					if ($USER->authorize('sendmulti') || $message)
+						$result->data[$languagename]['emailplain'] = $message?$message->id:false;
 				}
 			}
-			// now get the other languages
-			foreach($rows as $id => $row) {
-				if (isset($result->headers[$row['type'] . $row['subtype']]))
-					$result->data[$row['name']][$row['type'] . $row['subtype']] = $row['id'];
+			if (getSystemSetting('_hassms', false) && ($messagegroup->hasMessage("sms") || $USER->authorize('sendsms'))) {
+				$message = $messagegroup->getMessage('sms', 'plain', 'en');
+				$result->data['English']['smsplain'] = $message?$message->id:false;
 			}
-			
-		return $result;
+			if ($showfacebook) {
+				$message = $messagegroup->getMessage('post', 'facebook', 'en');
+				$result->data["English"]['postfacebook'] = $message?$message->id:false;
+			}
+			if ($showtwitter) {
+				$message = $messagegroup->getMessage('post', 'twitter', 'en');
+				$result->data["English"]['posttwitter'] = $message?$message->id:false;
+			}
+			if ($showfacebook || $showtwitter) {
+				$message = $messagegroup->getMessage('post', 'page', 'en');
+				$result->data["English"]['postpage'] = $message?$message->id:false;
+				$message = $messagegroup->getMessage('post', 'voice', 'en');
+				$result->data["English"]['postvoice'] = $message?$message->id:false;
+			}
+			return $result;
 		default:
 			error_log("No AJAX API for type=$type");
 			return false;
