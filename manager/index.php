@@ -51,13 +51,7 @@ if(isset($_POST["submit"])) {
 	<link rel="SHORTCUT ICON" href="img/manager_favicon.ico" />
 </head>
 <body onload="
-var p = document.forms[0].password;
 var l = document.forms[0].login;
-if(p.value || l.value) {
-		alert('You have saved your username and/or password in your browser. This is a security risk, and you should delete them immediately.');
-};
-p.value='';
-l.value='';
 l.focus();">
 
 <?
