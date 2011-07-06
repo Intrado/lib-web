@@ -99,7 +99,7 @@ if ($appservererror || $badcode) {
 		}
 		.navband2 {
 			height: 2px; 
-			background: #<?=$theme1 ?>;
+			background: #<?=$theme2 ?>;
 			margin-bottom: 3px;
 		}
 		.swooshbg {
