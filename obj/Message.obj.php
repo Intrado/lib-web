@@ -138,7 +138,7 @@ class Message extends DBMappedObject {
 				$errors = array();
 				// VoiceID Sanity Check
 				if ($this->type == 'phone' && $voiceid == null) {
-					error_log("ERROR: Fund phone message with voiceid null");
+					error_log("ERROR: found phone message with voiceid null");
 					if ($preferredgender == null) 
 						$preferredgender = "female";
 					$voiceid = Voice::getPreferredVoice($this->languagecode, $preferredgender);
@@ -151,7 +151,7 @@ class Message extends DBMappedObject {
 			foreach ($parts as $part) {
 				// VoiceID Sanity Check
 				if (($part->type == "T" || $part->type == "V") && $this->type == 'phone' && $part->voiceid == null) {
-					error_log("ERROR: Fund phone message part with voiceid null");
+					error_log("ERROR: found phone message part with voiceid null");
 					if ($preferredgender == null) 
 						$preferredgender = "female";
 					$voiceid = Voice::getPreferredVoice($this->languagecode, $preferredgender);
