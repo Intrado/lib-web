@@ -112,7 +112,7 @@ if ($appservererror || $badcode) {
 	<table border=0 cellspacing=0 cellpadding=0 width="100%">
 		<tr>
 			<td>
-				<div style="padding-left:10px; padding-bottom:10px">
+				<div style="padding-left:10px;">
 					<img src="messagelinklogo.img.php?code=<?=escapehtml($code)?>" alt="" />
 				</div>
 			</td>
