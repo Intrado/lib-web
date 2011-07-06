@@ -138,7 +138,7 @@ function startWindow($title, $style = "", $minimize = false, $usestate = true) {
 <div class="window">
 <table class="windowtable" width="100%" border=0 cellpadding=0 cellspacing=0>
 	<tr>
-		<td><img src="img/themes/<?=$theme?>/win_tl.gif" alt="" class="noprint"></td>
+		<td><img src="img/themes/<?=$theme?>/win_tl.gif" alt="" class="noprint" /></td>
 		<td background="img/themes/<?=$theme?>/win_t.gif" width="100%">
 			<div class="windowbar">
 <?	if ($minimize) { ?>
@@ -147,7 +147,7 @@ function startWindow($title, $style = "", $minimize = false, $usestate = true) {
 				<div class="windowtitle"><?= $title ?></div>
 			</div>
 		</td>
-		<td><img src="img/themes/<?=$theme?>/win_tr.gif" alt="" class="noprint"></td>
+		<td><img src="img/themes/<?=$theme?>/win_tr.gif" alt="" class="noprint" /></td>
 	</tr>
 	<tr>
 		<td background="img/themes/<?=$theme?>/win_l.gif"></td>
@@ -163,11 +163,12 @@ function endWindow() {
 		<td background="img/themes/<?=$theme?>/win_r.gif"></td>
 	</tr>
 	<tr>
-		<td><img src="img/themes/<?=$theme?>/win_bl.gif" alt="" class="noprint"></td>
+		<td><img src="img/themes/<?=$theme?>/win_bl.gif" alt="" class="noprint" /></td>
 		<td background="img/themes/<?=$theme?>/win_b.gif"></td>
-		<td><img src="img/themes/<?=$theme?>/win_br.gif" alt="" class="noprint"></td>
+		<td><img src="img/themes/<?=$theme?>/win_br.gif" alt="" class="noprint" /></td>
 	</tr>
 </table>
+</div>
 <?
 }
 
