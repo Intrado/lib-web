@@ -13,6 +13,7 @@ include_once("../obj/PeopleList.obj.php");
 include_once("../obj/RenderedList.obj.php");
 include_once("../obj/FieldMap.obj.php");
 include_once("inboundutils.inc.php");
+require_once("../inc/date.inc.php");
 
 
 global $BFXML_VARS;
