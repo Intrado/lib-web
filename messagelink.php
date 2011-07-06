@@ -87,10 +87,12 @@ if ($appservererror || $badcode) {
 
 
 ?>
-<html>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-	<meta http-equiv="Content-type" value="text/html; charset=UTF-8" />
-	<style>
+	<meta http-equiv="Content-type" content="text/html; charset=UTF-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7" />
+	<style type="text/css">
 		.navband1 {
 			height: 6px; 
 			background: #<?=$theme1 ?>;
@@ -111,19 +113,19 @@ if ($appservererror || $badcode) {
 		<tr>
 			<td>
 				<div style="padding-left:10px; padding-bottom:10px">
-					<img src="messagelinklogo.img.php?code=<?=escapehtml($code)?>" />
+					<img src="messagelinklogo.img.php?code=<?=escapehtml($code)?>" alt="" />
 				</div>
 			</td>
 			<td>
 				<div class="swooshbg">
-					<img src="img/shwoosh.gif" />
+					<img src="img/shwoosh.gif" alt="" />
 				</div>
 			</td>
 			<td width="100%" class="swooshbg"></td>
 		</tr>
 	</table>
-	<div class="navband1"><img src="img/pixel.gif"></div>
-	<div class="navband2"><img src="img/pixel.gif"></div>
+	<div class="navband1"><img src="img/pixel.gif" alt="" /></div>
+	<div class="navband2"><img src="img/pixel.gif" alt="" /></div>
 	<div style="margin: 15px">
 <?
 startWindow("Message Preview", false, false, false);
@@ -144,7 +146,7 @@ if ($appservererror) {
 } else {
 ?>
 	<div style="margin: 10px; margin-top: 15px; padding: 5px; float: left; border: 1px solid #3e693f">
-		Phone Message: <?=date('M j, Y g:i a', $messageinfo->jobstarttime)?><br>
+		Phone Message: <?=date('M j, Y g:i a', $messageinfo->jobstarttime)?><br />
 		<div style="font-size: 20px; margin-bottom: 5px"><?=escapehtml($messageinfo->customerdisplayname)?></div>
 		<div style="font-size: 16px; margin-bottom: 2px"><?=escapehtml($messageinfo->jobname)?></div>
 		<div style="font-size: 12px">&nbsp;&nbsp;<?=escapehtml($messageinfo->jobdescription)?></div>
@@ -156,7 +158,7 @@ if ($appservererror) {
 		<script language="JavaScript" type="text/javascript">
 	 		embedPlayer("messagelinkaudio.mp3.php?code=<?=escapehtml($code)?>","player",<?= $messageinfo->nummessageparts ?>);
 		</script>
-		<br><a href="messagelinkaudio.mp3.php?code=<?=escapehtml($code)?>">Click here to download</a>
+		<br /><a href="messagelinkaudio.mp3.php?code=<?=escapehtml($code)?>">Click here to download</a>
 	</div>
 <?
 }
