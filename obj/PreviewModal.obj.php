@@ -52,13 +52,15 @@ class PreviewModal {
 				break;
 			case "email":
 				$email = messagePreviewForPriority($message->id, $jobpriority); // returns commsuite_EmailMessageView object
-				$modal->text = $modal->formatEmail($email);
+				$modal->text = $modal->formatEmailHeader($email);
 				switch ($message->subtype) {
 					case "html":
 						$modal->title = _L("%s HTML Email Message" , Language::getName($message->languagecode));
+						$modal->text .= $email->emailbody;
 						break;
 					case "plain":
 						$modal->title = _L("%s Plain Email Message" , Language::getName($message->languagecode));
+						$modal->text .= nl2br(escapehtml($email->emailbody));
 						break;
 				}
 				break;
@@ -156,14 +158,16 @@ class PreviewModal {
 		$parts = Message::parse($_REQUEST["text"],$modal->errors);
 		if (count($modal->errors) == 0) {
 			$email = emailMessageViewForMessageParts($message,$parts,3);
-			$modal->text = $modal->formatEmail($email);
+			$modal->text = $modal->formatEmailHeader($email);
 		}
 		switch ($_REQUEST["subtype"]) {
 			case "html":
 				$modal->title = _L("%s HTML Email Message", Language::getName($message->languagecode));
+				$modal->text .= $email->emailbody;
 				break;
 			case "plain":
 				$modal->title = _L("%s Plain Email Message", Language::getName($message->languagecode));
+				$modal->text .= nl2br(escapehtml($email->emailbody));
 				break;
 		}
 		
@@ -252,8 +256,8 @@ class PreviewModal {
 	}
 	
 	//formates a commsuite_EmailMessageView object to html
-	private function formatEmail($email) {
-		return "<b>From:</b> $email->emailfromname &lt;$email->emailfromaddress&gt;<br /><b>Subject:</b> $email->emailsubject<br /><hr /> $email->emailbody";
+	private function formatEmailHeader($email) {
+		return "<b>From:</b> $email->emailfromname &lt;$email->emailfromaddress&gt;<br /><b>Subject:</b> $email->emailsubject<br /><hr />";
 	}
 	
 	
