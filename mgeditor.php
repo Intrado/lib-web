@@ -337,16 +337,16 @@ function makeMessageGrid($messagegroup) {
 	}
 	
 	if (getSystemSetting('_hasfacebook', false) && $USER->authorize('facebookpost')) {
-		$columnlabels[] = 'Facebook <a href="editmessagefacebook.php?new&mgid=' . $messagegroup->id . '"><img src="img/icons/add.png" alt="Add" title="Add New Facebook Post" /></a>';
+		$columnlabels[] = 'Facebook <a href="editmessagefacebook.php?new&mgid=' . $messagegroup->id . '"><img src="img/icons/add.png" alt="Add" title="Add New Facebook Message" /></a>';
 	}
 	
 	if (getSystemSetting('_hastwitter', false) && $USER->authorize('twitterpost')) {
-		$columnlabels[] = 'Twitter <a href="editmessagetwitter.php?new&mgid=' .$messagegroup->id . '"><img src="img/icons/add.png" alt="Add" title="Add New Facebook Post" /></a>';
+		$columnlabels[] = 'Twitter <a href="editmessagetwitter.php?new&mgid=' .$messagegroup->id . '"><img src="img/icons/add.png" alt="Add" title="Add New Twitter Message" /></a>';
 	}
 	
 	if ((getSystemSetting('_hasfacebook', false) && $USER->authorize('facebookpost')) || (getSystemSetting('_hastwitter', false) && $USER->authorize('twitterpost'))) {
-		$columnlabels[] = 'Page <a href="editmessagepage.php?new&mgid=' .$messagegroup->id . '"><img src="img/icons/add.png" alt="Add" title="Add New Page Post" /></a>';
-		$columnlabels[] = 'Page Media <a href="editmessagepostvoice.php?new&mgid=' .$messagegroup->id . '"><img src="img/icons/add.png" alt="Add" title="Add New Voice Post" /></a>';
+		$columnlabels[] = 'Page <a href="editmessagepage.php?new&mgid=' .$messagegroup->id . '"><img src="img/icons/add.png" alt="Add" title="Add New Page Message" /></a>';
+		$columnlabels[] = 'Page Media <a href="editmessagepostvoice.php?new&mgid=' .$messagegroup->id . '"><img src="img/icons/add.png" alt="Add" title="Add New Page Media Message" /></a>';
 	}
 	
 	// set action usr link	
@@ -423,7 +423,7 @@ function makeMessageGrid($messagegroup) {
 				$icon = "diagona/16/160";
 				$actions[] = action_link("New","pencil_add","editmessageemail.php?id=new&subtype=plain&languagecode=$languagecode&mgid=".$messagegroup->id);
 			}
-			$linkrow[] = array('icon' => $icon,'title' => _L("%s Text Email Message",$languagename), 'actions' => $actions);
+			$linkrow[] = array('icon' => $icon,'title' => _L("%s Plain Email Message",$languagename), 'actions' => $actions);
 		}
 		
 		// Facebook actions
