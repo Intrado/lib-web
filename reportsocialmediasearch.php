@@ -254,13 +254,13 @@ if ($downloadreport) {
 	echo "\r\n";
 	
 	foreach ($data as $post) {
-		echo '"' . addslashes($post["jobname"]) . '","' . addslashes($post["user"]) . '","' . date("M j, Y g:i a",strtotime($post["date"])) . '"';
+		echo '"' . str_replace('"', '\\"',$post["jobname"]) . '","' . str_replace('"', '\\"',$post["user"]) . '","' . date("M j, Y g:i a",strtotime($post["date"])) . '"';
 		
 		if (getSystemSetting('_hasfacebook', false)) {
-			echo ',"' . addslashes($post["fbdest"]) . '","' . addslashes($post["fbstatus"]) . '","' . addslashes($post["fbcontent"]) . '"';
+			echo ',"' . str_replace('"', '\\"',$post["fbdest"]) . '","' . str_replace('"', '\\"',$post["fbstatus"]) . '","' . str_replace('"', '\\"',$post["fbcontent"]) . '"';
 		}
 		if (getSystemSetting('_hastwitter', false)) {
-			echo ',"' . addslashes($post["twhandle"]) . '","' . addslashes($post["twstatus"]) . '","' . addslashes($post["twcontent"]) . '"';
+			echo ',"' . str_replace('"', '\\"',$post["twhandle"]) . '","' . str_replace('"', '\\"',$post["twstatus"]) . '","' . str_replace('"', '\\"',$post["twcontent"]) . '"';
 		}
 		echo "\r\n";
 	}
