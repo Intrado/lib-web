@@ -353,7 +353,7 @@ function handleRequest() {
 			$result->defaultlang = Language::getName(Language::getDefaultLanguageCode());
 			$result->headers = array();
 			
-			if ($USER->authorize('sendphone')) {
+			if ($messagegroup->hasMessage("phone") || $USER->authorize('sendphone')) {
 				$result->headers['phonevoice'] = _L("Phone");
 			}
 			
@@ -362,7 +362,7 @@ function handleRequest() {
 				$result->headers['smsplain'] = _L("SMS");
 			}
 			
-			if ($USER->authorize('sendemail')) {
+			if ($messagegroup->hasMessage("email") || $USER->authorize('sendemail')) {
 				$result->headers['emailhtml'] = _L("HTML Email");
 				$result->headers['emailplain'] = _L("Plain Email");
 			}
@@ -393,14 +393,14 @@ function handleRequest() {
 			unset($customerlanguages["en"]);
 			$customerlanguages = array_merge(array("en" => "English"),$customerlanguages);
 			foreach ($customerlanguages as $languagecode => $languagename) {
-				if ($USER->authorize('sendphone')) {
+				if ($messagegroup->hasMessage("phone") || $USER->authorize('sendphone')) {
 					$message = $messagegroup->getMessage('phone', 'voice', $languagecode);
 					
 					// Only show languages if allowed or it contains content
 					if ($USER->authorize('sendmulti') || $message)
 						$result->data[$languagename]['phonevoice'] = $message?$message->id:false;
 				}
-				if ($USER->authorize('sendemail')) {
+				if ($messagegroup->hasMessage("email") || $USER->authorize('sendemail')) {
 					$message = $messagegroup->getMessage('email', 'html', $languagecode);
 					
 					// Only show languages if allowed or it contains content
