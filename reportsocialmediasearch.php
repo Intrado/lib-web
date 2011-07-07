@@ -254,7 +254,9 @@ if ($downloadreport) {
 	echo "\r\n";
 	
 	foreach ($data as $post) {
-		echo '"' . str_replace('"', '""',$post["jobname"]) . '","' . str_replace('"', '""',$post["user"]) . '","' . date("M j, Y g:i a",strtotime($post["date"])) . '"';
+		// Note: Post date time could be inaccurate since it is job starttime. Time could be before the accurate post time so until this is fixed show only the date
+		// TODO find a way to add a accurate timestamp for postdate
+		echo '"' . str_replace('"', '""',$post["jobname"]) . '","' . str_replace('"', '""',$post["user"]) . '","' . date("M j, Y",strtotime($post["date"])) . '"';
 		
 		if (getSystemSetting('_hasfacebook', false)) {
 			echo ',"' . str_replace('"', '""',$post["fbdest"]) . '","' . str_replace('"', '""',$post["fbstatus"]) . '","' . str_replace('"', '""',$post["fbcontent"]) . '"';
@@ -350,7 +352,9 @@ if ($showreport) {
 	foreach ($data as $post) {
 		$alt++;
 		echo $alt % 2 ? '<tr>' : '<tr class="listAlt">';
-		echo "<td>" . escapehtml($post["jobname"]) . "</td><td>" . escapehtml($post["user"]) . "</td><td>" . date("M j, Y g:i a",strtotime($post["date"])) . "</td>";
+		// Note: Post date time could be inaccurate since it is job starttime. Time could be before the accurate post time so until this is fixed show only the date
+		// TODO find a way to add a accurate timestamp for postdate
+		echo "<td>" . escapehtml($post["jobname"]) . "</td><td>" . escapehtml($post["user"]) . "</td><td>" . date("M j, Y",strtotime($post["date"])) . "</td>";
 		
 		if (getSystemSetting('_hasfacebook', false)) {
 			echo "<td>" . escapehtml($post["fbdest"]) . "</td><td>" . escapehtml($post["fbstatus"]) . "</td><td>" . ConditionalContentLink("fb_$alt", $post["fbcontent"]) . "</td>";
