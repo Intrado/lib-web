@@ -57,11 +57,6 @@ if(isset($_GET['jobid']) && isset($_GET['personid'])){
 	redirect();
 }
 
-if ($appserverCommsuiteProtocol == null || $appserverCommsuiteTransport == null) {
-	error_log("Can not use AppServer");
-	$appservererror = true;
-}
-
 
 $jobid = isset($_SESSION['previewmessage_jobid']) ? $_SESSION['previewmessage_jobid'] : 0;
 $messagegroupid = isset($_SESSION['previewmessagegroupid']) ? $_SESSION['previewmessagegroupid'] : 0;

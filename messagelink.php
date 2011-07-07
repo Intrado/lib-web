@@ -36,35 +36,36 @@ function fadecolor($primary, $fade, $ratio){
 $appservererror = false;
 $badcode = false;
 
+list($appserverprotocol, $appservertransport) = initMessageLinkApp();
+
 if($appserverprotocol == null || $appservertransport == null) {
 	error_log("Can not use AppServer");
 	$appservererror = true;
-}
-
-$attempts = 0;
-while(true) {
-	try {
-		$client = new MessageLinkClient($appserverprotocol);
-		
-		// Open up the connection
-		$appservertransport->open();
+} else {
+	$attempts = 0;
+	while(true) {
 		try {
-			$messageinfo = $client->getInfo($code);
-		} catch (messagelink_MessageLinkCodeNotFoundException $e) {
-			$badcode = true;
-			error_log("Unable to find the messagelinkcode: " . urlencode($code));
-		}
-		$appservertransport->close();
-		break;
-	} catch (TException $tx) {
-		$attempts++;
-		// a general thrift exception, like no such server
-		error_log("getInfo: Exception Connection to AppServer (" . $tx->getMessage() . ")");
-		$appservertransport->close();
-		if($attempts > 2) {
-			error_log("getInfo: Failed 3 times to get content from appserver");
-			$appservererror = true;
+			$client = new MessageLinkClient($appserverprotocol);
+			// Open up the connection
+			$appservertransport->open();
+			try {
+				$messageinfo = $client->getInfo($code);
+			} catch (messagelink_MessageLinkCodeNotFoundException $e) {
+				$badcode = true;
+				error_log("Unable to find the messagelinkcode: " . urlencode($code));
+			}
+			$appservertransport->close();
 			break;
+		} catch (TException $tx) {
+			$attempts++;
+			// a general thrift exception, like no such server
+			error_log("getInfo: Exception Connection to AppServer (" . $tx->getMessage() . ")");
+			$appservertransport->close();
+			if($attempts > 2) {
+				error_log("getInfo: Failed 3 times to get content from appserver");
+				$appservererror = true;
+				break;
+			}
 		}
 	}
 }

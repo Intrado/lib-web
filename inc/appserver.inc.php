@@ -13,12 +13,11 @@
 //		returns both plain and html email bodies.
 // Used by Contact Manager and Subscriber message viewer
 function messageViewForJobPerson($messageid, $jobid, $personid) {
-	global $appserverCommsuiteSocket;
-	global $appserverCommsuiteTransport;
-	global $appserverCommsuiteProtocol;
-	
-//	error_log("messageViewForJobPerson messageid=".$messageid." jobid=".$jobid." personid=".$personid);
-	
+	list($appserverCommsuiteProtocol,$appserverCommsuiteTransport) = initCommsuiteApp();
+	if ($appserverCommsuiteProtocol == null || $appserverCommsuiteTransport == null) {
+		error_log("Can not use AppServer");
+		return null;
+	}
 	$attempts = 0;
 	while (true) {
 		try {
@@ -57,12 +56,11 @@ function messageViewForJobPerson($messageid, $jobid, $personid) {
 //		returns both plain and html email bodies.
 // Used by job message preview
 function messagePreviewForPriority($messageid, $jobpriority) {
-	global $appserverCommsuiteSocket;
-	global $appserverCommsuiteTransport;
-	global $appserverCommsuiteProtocol;
-	
-//	error_log("messagePreviewForPriority messageid=".$messageid." jobpriority=".$jobpriority);
-	
+	list($appserverCommsuiteProtocol,$appserverCommsuiteTransport) = initCommsuiteApp();
+	if ($appserverCommsuiteProtocol == null || $appserverCommsuiteTransport == null) {
+		error_log("Can not use AppServer");
+		return null;
+	}
 	$attempts = 0;
 	while (true) {
 		try {
@@ -93,9 +91,12 @@ function messagePreviewForPriority($messageid, $jobpriority) {
 }
 
 function emailMessageViewForMessageParts($message,$parts,$jobpriority) {
-	global $appserverCommsuiteSocket;
-	global $appserverCommsuiteTransport;
-	global $appserverCommsuiteProtocol;
+	list($appserverCommsuiteProtocol,$appserverCommsuiteTransport) = initCommsuiteApp();
+	
+	if ($appserverCommsuiteProtocol == null || $appserverCommsuiteTransport == null) {
+		error_log("Can not use AppServer");
+		return null;
+	} 
 	
 	$messagedto = new commsuite_MessageDTO();
 	$messagedto->type = $message->type;
@@ -159,9 +160,12 @@ function emailMessageViewForMessageParts($message,$parts,$jobpriority) {
 
 
 function ttsGetForTextLanguageGenderFormat($text, $language, $gender, $format) {
-	global $appserverCommsuiteSocket;
-	global $appserverCommsuiteTransport;
-	global $appserverCommsuiteProtocol;
+	list($appserverCommsuiteProtocol,$appserverCommsuiteTransport) = initCommsuiteApp();
+	
+	if ($appserverCommsuiteProtocol == null || $appserverCommsuiteTransport == null) {
+		error_log("Can not use AppServer");
+		return null;
+	} 
 		
 	$attempts = 0;
 	while (true) {
@@ -193,9 +197,12 @@ function ttsGetForTextLanguageGenderFormat($text, $language, $gender, $format) {
 }
 
 function audioFileGetForFormat($contentid, $format) {
-	global $appserverCommsuiteSocket;
-	global $appserverCommsuiteTransport;
-	global $appserverCommsuiteProtocol;
+	list($appserverCommsuiteProtocol,$appserverCommsuiteTransport) = initCommsuiteApp();
+	
+	if ($appserverCommsuiteProtocol == null || $appserverCommsuiteTransport == null) {
+		error_log("Can not use AppServer");
+		return null;
+	} 
 		
 	$attempts = 0;
 	while (true) {
@@ -230,9 +237,12 @@ function audioFileGetForFormat($contentid, $format) {
 }
 
 function phoneMessageGetMp3AudioFile($parts) {
-	global $appserverCommsuiteSocket;
-	global $appserverCommsuiteTransport;
-	global $appserverCommsuiteProtocol;
+	list($appserverCommsuiteProtocol,$appserverCommsuiteTransport) = initCommsuiteApp();
+	
+	if ($appserverCommsuiteProtocol == null || $appserverCommsuiteTransport == null) {
+		error_log("Can not use AppServer");
+		return null;
+	} 
 	
 	$attempts = 0;
 	while (true) {

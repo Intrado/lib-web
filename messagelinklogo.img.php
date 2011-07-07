@@ -17,6 +17,7 @@ if (isset($_GET['code'])) {
 	$code = $_GET['code'];
 }
 
+list($appserverprotocol, $appservertransport) = initMessageLinkApp();
 if($appserverprotocol == null || $appservertransport == null) {
 	error_log("Can not use AppServer");
 	exit(0);

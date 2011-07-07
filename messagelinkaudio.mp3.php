@@ -14,6 +14,7 @@ require_once $GLOBALS['THRIFT_ROOT'].'/transport/TFramedTransport.php';
 require_once("inc/thrift.inc.php");
 require_once $GLOBALS['THRIFT_ROOT'].'/packages/messagelink/MessageLink.php';
 
+list($appserverprotocol, $appservertransport) = initMessageLinkApp();
 if($appserverprotocol == null || $appservertransport == null) {
 	error_log("Can not use AppServer");
 	exit();
