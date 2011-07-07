@@ -72,14 +72,25 @@ if($appserverprotocol == null || $appservertransport == null) {
 
 if ($appservererror || $badcode) {
 	$theme = "classroom";
+	$primary = "3e693f";
 	$theme1 = "3e693f";
 	$theme2 = "b47727";
+	$globalratio = ".2";
 	$TITLE = "School Messenger";
 	$urlcomponent = "m";
 } else {
 	$theme = $messageinfo->brandinfo["theme"];
+	$primary = $messageinfo->brandinfo["primary"];
 	$theme1 = $messageinfo->brandinfo["theme1"];
 	$theme2 = $messageinfo->brandinfo["theme2"];
+	$globalratio = $messageinfo->brandinfo['globalratio'];
+	
+	// Set the session. Used for the window
+	$_SESSION['colorscheme'] = array("_brandtheme" => $theme,
+										"_brandprimary" => $primary,
+										"_brandtheme1" => $theme1,
+										"_brandtheme2" => $theme2,
+										"_brandratio" => $globalratio);
 	$TITLE = escapehtml($messageinfo->customerdisplayname);
 	$urlcomponent = $messageinfo->urlcomponent;
 	apache_note("CS_CUST",urlencode($messageinfo->urlcomponent)); //for logging
@@ -96,7 +107,7 @@ if ($appservererror || $badcode) {
 	<style type="text/css">
 		.navband1 {
 			height: 6px; 
-			background: #<?=$theme1 ?>;
+			background: #<?=$primary ?>;
 		}
 		.navband2 {
 			height: 2px; 
@@ -104,7 +115,25 @@ if ($appservererror || $badcode) {
 			margin-bottom: 3px;
 		}
 		.swooshbg {
-			background: <?=fadecolor($theme2, "FFFFFF", .1)?>
+			background: <?=fadecolor($theme2, "FFFFFF", $globalratio/2)?>
+		}
+		.menucollapse {
+			float: right;
+			margin-top: 4px;
+			margin-right: 5px;
+			border: 2px outset white;
+			width: 10px;
+			height: 10px;
+		}
+		.window {
+			width: 100%;
+		}
+		.windowtitle {
+			font-size: 12px;
+			font-weight: bold;
+			padding-left: 5px;
+			padding-top: 2px;
+			color: #<?=$primary?>;
 		}
 	</style>
 	<title><?=$TITLE?></title>
@@ -164,6 +193,8 @@ if ($appservererror) {
 <?
 }
 endWindow();
+// Do not need the session past window
+unset($_SESSION);
 ?>
 	</div>
 </body>
