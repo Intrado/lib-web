@@ -23,6 +23,7 @@ if (!$messageinfo) {
 	$primary = "3e693f";
 	$theme1 = "3e693f";
 	$theme2 = "b47727";
+	$globalratio = ".2";
 	$TITLE = "School Messenger";
 	$urlcomponent = "m";
 } else {
@@ -30,6 +31,7 @@ if (!$messageinfo) {
 	$primary = $messageinfo->brandinfo["primary"];
 	$theme1 = $messageinfo->brandinfo["theme1"];
 	$theme2 = $messageinfo->brandinfo["theme2"];
+	$globalratio = $messageinfo->brandinfo['globalratio'];
 	//title is used by facebook to the link name
 	$TITLE = escapehtml($messageinfo->jobname) . " - " . escapehtml($messageinfo->customerdisplayname);
 	$urlcomponent = $messageinfo->urlcomponent;
@@ -69,7 +71,7 @@ header('Content-type: text/html; charset=UTF-8') ;
 			margin-bottom: 3px;
 		}
 		.swooshbg {
-			background: <?=fadecolor($theme2, "FFFFFF", .1)?>
+			background: <?=fadecolor($theme2, "FFFFFF", $globalratio/2)?>
 		}
 		body {
 			padding: 0; margin: 0px;font-family: "Lucida Grande", verdana, arial, helvetica, sans-serif;
@@ -126,7 +128,7 @@ header('Content-type: text/html; charset=UTF-8') ;
 	<div style="margin: 15px;">
 
 	<h1><?=escapehtml($messageinfo->customerdisplayname)?></h1>
-	<div style="color: gray; float: right;">Sent: <?=date('M j, Y g:i a', $messageinfo->jobstarttime)?></div>
+	<div style="color: gray; float: right;">Sent: <?=date('M j, Y', $messageinfo->jobstarttime)?></div>
 	<h2><?=escapehtml($messageinfo->jobname)?></h2>
 
 	<div style="clear: both; border-top: 1px solid #BFBFBF; margin-bottom: 15px;" ><img src="img/pixel.gif" alt=""/></div>
