@@ -191,7 +191,7 @@ if ($showreport || $downloadreport) {
 			switch($row[2]) {
 				case "facebook":
 					$post["fbdest"] .= $post["fbdest"] != ""?", ":"";
-					$status = $row[7] == "1"?"Posted":"Failed";
+					$status = $row[7] == "1"?"Posted":"Not Posted";
 					if ($status != $post["fbstatus"]) {
 						$post["fbstatus"] .= $post["fbstatus"] != ""?", $status":$status;
 					}
@@ -221,7 +221,7 @@ if ($showreport || $downloadreport) {
 					break;
 				case "twitter":
 					$post["twhandle"] = $row[5];
-					$post["twstatus"] = $row[7] == "1"?"Posted":"Failed";
+					$post["twstatus"] = $row[7] == "1"?"Posted":"Not Posted";
 					$post["twcontent"] = $row[3];
 					// Do not modify, Just print the handle 
 					break;
