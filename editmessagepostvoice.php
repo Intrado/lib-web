@@ -37,7 +37,6 @@ require_once $GLOBALS['THRIFT_ROOT'].'/protocol/TBinaryProtocol.php';
 require_once $GLOBALS['THRIFT_ROOT'].'/transport/TSocket.php';
 require_once $GLOBALS['THRIFT_ROOT'].'/transport/TBufferedTransport.php';
 require_once $GLOBALS['THRIFT_ROOT'].'/transport/TFramedTransport.php';
-require_once("inc/thrift.inc.php");
 require_once $GLOBALS['THRIFT_ROOT'].'/packages/commsuite/CommSuite.php';
 
 ////////////////////////////////////////////////////////////////////////////////
