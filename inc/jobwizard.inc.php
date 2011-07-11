@@ -751,7 +751,7 @@ class JobWiz_messageType extends WizStep {
 			$values['post'] = _L("Social Media");
 
 		$formdata[] = $this->title;
-		$helpsteps = array(_L("Choose how you you like your message to be delivered."));
+		$helpsteps = array(_L("Choose the methods you'd like to use to deliver your message."));
 		$formdata["type"] = array(
 			"label" => _L("Message Type"),
 			"fieldhelp" => _L("Choose the message options you would like to configure."),
@@ -787,11 +787,11 @@ class JobWiz_messageSelect extends WizStep {
 		//$values["pick"] =_L("Select Saved Message");
 
 		$formdata[] = $this->title;
-		$helpsteps = array(_L("Select the desired content source for the message delivery options listed."));
+		$helpsteps = array(_L("You may use Call Me to Record to call yourself or a colleague to record your phone message. Type a Message to enter a message which will be read by a text-to-speech voice. "));
 		if ($USER->authorize("sendphone") && in_array('phone', $postdata['/message/pick']['type'])) {
 			$formdata["phone"] = array(
 				"label" => _L("Phone Message"),
-				"fieldhelp" => _L("Contains the different ways you can create or reuse a phone message."),
+				"fieldhelp" => _L("Select how you would like to create your phone message."),
 				"value" => "",
 				"validators" => array(
 					array("ValRequired"),
@@ -819,7 +819,7 @@ class JobWiz_messagePhoneText extends WizStep {
 	function getForm($postdata, $curstep) {
 		global $USER;
 		// Form Fields.
-		$helpsteps = array(_L("Enter your message text in the provided text area. Be sure to introduce yourself and give detailed information, including call back information if appropriate."));
+		$helpsteps = array(_L("<p>Enter your message text in the provided text area. Be sure to introduce yourself and give detailed information, including call back information if appropriate.</p><p>Please note that some languages do not have text-to-speech support for both genders. In this situation, the system will use the available gender for your message.</p>"));
 		$formdata = array(
 			$this->title,
 			"message" => array(
@@ -1164,7 +1164,7 @@ class JobWiz_messageEmailText extends WizStep {
 			$helpsteps[] = _L("Automatically translate into alternate languages. Please note that automatic translation is always improving, but is not perfect yet. Try reverse translating your message for a preview of how well it translated.");
 			$formdata["translate"] = array(
 				"label" => _L("Translate"),
-				"fieldhelp" => _L('Check this box to automatically translate your message using Google Translate.'),
+				"fieldhelp" => _L('Check this box to automatically translate your message using Google Translate. Remember automatic translation is improving all the time, but it\'s not perfect yet. Be sure to preview and try reverse translation in the next screen.'),
 				"value" => ($postdata['/start']['package'] == "express")?true:false,
 				"validators" => array(),
 				"control" => array("CheckBox"),
@@ -1321,10 +1321,11 @@ class JobWiz_messageSmsText extends WizStep {
 
 		// Form Fields.
 		$formdata = array($this->title);
-		$helpsteps = array(_L("Enter the message you wish to deliver via SMS Text."));
+		$helpsteps = array(_L("Enter the message you wish to deliver via SMS Text. Due to the limits of SMS messaging technology, SMS messages may not exceed 160 characters."));
 		$formdata["message"] = array(
 			"label" => _L("SMS Text"),
 			"value" => $text,
+			"fieldhelp" => _L("Enter your SMS Text message here. SMS messages may not exceed 160 characters."),
 			"validators" => array(
 				array("ValRequired"),
 				array("ValLength","max"=>160),
