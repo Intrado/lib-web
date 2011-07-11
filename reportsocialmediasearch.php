@@ -91,23 +91,22 @@ $datachange = false;
 $errors = false;
 $showreport = false;
 $downloadreport = false;
+$queryresult = false;
+
 $desc = "";
 //check for form submission
 if ($button = $form->getSubmit()) { //checks for submit and merges in post data	
 	if ($form->checkForDataChange()) {
 		$datachange = true;
 	} else if (($errors = $form->validate()) === false) { //checks all of the items in this form
-		$postdata = $form->getData(); //gets assoc array of all values {name:value,...}
-		$reportjobs = array();
-		$reportmessages = array();
+		$postdata = $form->getData(); //gets assoc array of all values {name:value,...}		
 		if ($button == "download") {
 			$downloadreport = true;
 		} else {
 			$showreport = true;
 		}
 		$readonlyDB = readonlyDBConnect();
-		
-		$messagequery = "select j.id, j.name,jp.type,mp.txt,ADDTIME(j.startdate, j.starttime),jp.destination,u.login, jp.posted
+		$query = "select j.id, j.name,jp.type,mp.txt,ADDTIME(j.startdate, j.starttime),jp.destination,u.login, jp.posted
 										from
 							job j inner join jobpost jp on (jp.jobid = j.id)
 							inner join message m on (j.messagegroupid = m.messagegroupid and m.subtype = jp.type)
@@ -123,7 +122,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 			$types[] = "twitter";
 		}
 
-		$messagequery .= "('" . implode("','",$types) . "') ";
+		$query .= "('" . implode("','",$types) . "') ";
 		
 		switch($postdata["searchby"]) {
 			case "date":
@@ -135,19 +134,19 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 					list($startdate, $enddate) = getStartEndDate($dateOptions['reldate'], $dateOptions);
 					$desc = " From: " . date("m/d/Y", $startdate) . " To: " . date("m/d/Y", $enddate);
 					$extrasql = "and j.finishdate between ? and ? + interval 1 day";
-					$messagequery .= $extrasql;
-					$reportmessages = Query($messagequery,$readonlyDB, array(date("Y-m-d", $startdate),date("Y-m-d", $enddate)));
+					$query .= $extrasql;
+					$queryresult = Query($query,$readonlyDB, array(date("Y-m-d", $startdate),date("Y-m-d", $enddate)));
 				}
 				break;
 			case "job":
 				$extrasql = "and j.id = ?";
-				$messagequery .= $extrasql;
-				$reportmessages = Query($messagequery,$readonlyDB,array($postdata["jobid"]));
+				$query .= $extrasql;
+				$queryresult = Query($query,$readonlyDB,array($postdata["jobid"]));
 				break;
 			case "archivedjob":
 				$extrasql = "and j.id = ?";
-				$messagequery .= $extrasql;
-				$reportmessages = Query($messagequery,$readonlyDB,array($postdata["archivedjobid"]));
+				$query .= $extrasql;
+				$queryresult = Query($query,$readonlyDB,array($postdata["archivedjobid"]));
 				break;
 		}
 	}
@@ -156,7 +155,30 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 ////////////////////////////////////////////////////////////////////////////////
 // Prepare Report Data
 ////////////////////////////////////////////////////////////////////////////////
+$titles = array(
+	"jobname" => _L("Job Name"),
+	"user" =>  _L("Submitted by"),
+	"date" => _L("Post Date")
+);
+
+if (getSystemSetting('_hasfacebook', false)) {
+	$titles["fbdest"] = _L("Facebook Destination");
+	$titles["fbstatus"] = _L("Facebook Status");
+	$titles["fbcontent"] = _L("Facebook Content");
+}
+
+if (getSystemSetting('_hastwitter', false)) {
+	$titles["twhandle"] =  _L("Twitter Handle");
+	$titles["twstatus"] = _L("Twitter Status");
+	$titles["twcontent"] = _L("Twitter Content");
+}
+
+$formatters = array (
+	"date" => "fmt_txt_date"
+);
+
 $data = array();
+
 if ($showreport || $downloadreport) {
 	
 	if (getSystemSetting('_hasfacebook', false) && $USER->authorize("facebookpost")  && fb_hasValidAccessToken()) {
@@ -165,13 +187,13 @@ if ($showreport || $downloadreport) {
 		$accesstoken = $USER->getSetting("fb_access_token", false);
 	}
 
-	if ($reportmessages) {
+	if ($queryresult) {
 		
 		// store facebook account names to avoid contacting facebook for each individual post if the pageid is the same
 		$fbaccountnames = array();
 		
 		// Prepare and merge the post items
-		while ($row = DBGetRow($reportmessages)) {
+		while ($row = DBGetRow($queryresult)) {
 			
 			// Merge Facebook and Twitter posts into one report post item 
 			if (isset($data[$row[0]])) {
@@ -231,6 +253,64 @@ if ($showreport || $downloadreport) {
 		}
 	}
 }
+////////////////////////////////////////////////////////////////////////////////
+// Display Functions
+////////////////////////////////////////////////////////////////////////////////
+
+// Save ids in $tipids for posts that are too long to fit In the table to be able to create a tooltip
+$tipsids = array();
+function fmt_socialcontent($row,$index) {
+	global $tipsids;
+	$id = "hvc_" . count($tipsids);
+	$contentlength = 25;
+	$content = $row[$index];
+	if(strlen($content) > $contentlength) {
+		$tipsids[] = $id;
+		// For posts that are too long a hidden div is created with the full text to show in a tooltip
+		return "<div id=\"{$id}\">" . escapehtml(substr($content,0,$contentlength-3) . "...") . "</div><div id='{$id}_long' style='display:none'>" . escapehtml($content) . "</div>";
+	}
+	return escapehtml($content);
+}
+
+// Note: Post date time could be inaccurate since it is job starttime. Time could be before the accurate post time so until this is fixed show only the date
+// TODO find a way to add a accurate timestamp for postdate
+function fmt_txt_date ($row,$index) {
+	if (isset($row[$index])) {
+		$time = strtotime($row[$index]);
+		if ($time !== -1 && $time !== false)
+		return date("M j, Y",$time);
+	}
+	return "&nbsp;";
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// CSV Functions
+////////////////////////////////////////////////////////////////////////////////
+
+function escape_csvfield ($value) {
+	//TODO conditionally wrap with doublequotes only when needed
+	return '"' . str_replace('"', '""',$value) . '"';
+}
+function array_to_csv($arr) {
+	return implode(",",array_map("escape_csvfield",$arr));
+}
+function showCsvData ($data, $titles, $formatters = array()) {
+	echo array_to_csv($titles) . "\r\n";
+	foreach ($data as $row) {
+		//only show cells with titles
+		$filteredrow = array();
+		foreach ($titles as $index => $title) {
+			if (isset($formatters[$index])) {
+				$fn = $formatters[$index];
+				$cell = $fn($row,$index);
+			} else {
+				$cell = $row[$index]; //no default formatter
+			}
+			$filteredrow[] = $cell;
+		}
+		echo array_to_csv($filteredrow) . "\r\n";
+	}
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 // Generate CSV Report
@@ -241,51 +321,8 @@ if ($downloadreport) {
 	header("Cache-Control: private");
 	header("Content-disposition: attachment; filename=report.csv");
 	header("Content-type: application/vnd.ms-excel");
-
-	//generate the CSV header
-	echo '"' . _L("Job Name") . '","' . _L("Submitted by") . '","' . _L("Post Date") . '"';
-	if (getSystemSetting('_hasfacebook', false)) {
-		echo ',"' . _L("Facebook Destination") . '","' . _L("Facebook Status") . '","' . _L("Facebook Content") . '"';
-	}
-	if (getSystemSetting('_hastwitter', false)) {
-		echo ',"' . _L("Twitter Handle") . '","' . _L("Twitter Status") . '","' . _L("Twitter Content") . '"';
-	}
-	
-	echo "\r\n";
-	
-	foreach ($data as $post) {
-		// Note: Post date time could be inaccurate since it is job starttime. Time could be before the accurate post time so until this is fixed show only the date
-		// TODO find a way to add a accurate timestamp for postdate
-		echo '"' . str_replace('"', '""',$post["jobname"]) . '","' . str_replace('"', '""',$post["user"]) . '","' . date("M j, Y",strtotime($post["date"])) . '"';
-		
-		if (getSystemSetting('_hasfacebook', false)) {
-			echo ',"' . str_replace('"', '""',$post["fbdest"]) . '","' . str_replace('"', '""',$post["fbstatus"]) . '","' . str_replace('"', '""',$post["fbcontent"]) . '"';
-		}
-		if (getSystemSetting('_hastwitter', false)) {
-			echo ',"' . str_replace('"', '""',$post["twhandle"]) . '","' . str_replace('"', '""',$post["twstatus"]) . '","' . str_replace('"', '""',$post["twcontent"]) . '"';
-		}
-		echo "\r\n";
-	}
+	showCsvData($data, $titles,$formatters);
 	exit();
-}
-
-
-////////////////////////////////////////////////////////////////////////////////
-// Display Functions
-////////////////////////////////////////////////////////////////////////////////
-
-// Save ids in $tipids for posts that are too long to fit In the table to be able to create a tooltip
-$tipsids = array();
-function ConditionalContentLink($id,$content) {
-	global $tipsids;
-	$contentlength = 25;
-	if(strlen($content) > $contentlength) {
-		$tipsids[] = $id;
-		// For posts that are too long a hidden div is created with the full text to show in a tooltip
-		return "<div id=\"{$id}\">" . escapehtml(substr($content,0,$contentlength-3) . "...") . "</div><div id='{$id}_long' style='display:none'>" . escapehtml($content) . "</div>";
-	} else {
-		return escapehtml($content);
-	}
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -337,33 +374,14 @@ startWindow(_L('Options'));
 echo $form->render();
 endWindow();
 
+
+$formatters["fbcontent"] ="fmt_socialcontent";
+$formatters["twcontent"] = "fmt_socialcontent";
+
 if ($showreport) {
 	startWindow(_L('Report Details:'));
-	echo '<table class="list" style="width:100%;text-align:left;" cellpadding="3" cellspacing="1">';
-	echo '<tr class="listHeader"><th>Job Name</th><th>Submitted by</th><th>Post Date</th>';
-	if (getSystemSetting('_hasfacebook', false)) {
-		echo '<th>' . _L("Facebook Destination") . '</th><th>' . _L("Facebook Status") . '</th><th>' . _L("Facebook Content") . '</th>';
-	}
-	if (getSystemSetting('_hastwitter', false)) {
-		echo '<th>' . _L("Twitter Handle") . '</th><th>' . _L("Twitter Status") . '</th><th>' . _L("Twitter Content") . '</th>';
-	}
-	echo '</tr>';
-	$alt = 0;
-	foreach ($data as $post) {
-		$alt++;
-		echo $alt % 2 ? '<tr>' : '<tr class="listAlt">';
-		// Note: Post date time could be inaccurate since it is job starttime. Time could be before the accurate post time so until this is fixed show only the date
-		// TODO find a way to add a accurate timestamp for postdate
-		echo "<td>" . escapehtml($post["jobname"]) . "</td><td>" . escapehtml($post["user"]) . "</td><td>" . date("M j, Y",strtotime($post["date"])) . "</td>";
-		
-		if (getSystemSetting('_hasfacebook', false)) {
-			echo "<td>" . escapehtml($post["fbdest"]) . "</td><td>" . escapehtml($post["fbstatus"]) . "</td><td>" . ConditionalContentLink("fb_$alt", $post["fbcontent"]) . "</td>";
-		}
-		if (getSystemSetting('_hastwitter', false)) {
-			echo "<td>" . escapehtml($post["twhandle"]) . "</td><td>" . escapehtml($post["twstatus"]) . "</td><td>" . ConditionalContentLink("tw_$alt", $post["twcontent"]) . "</td>";
-		}
-		echo '</tr>';
-	}
+	echo '<table width="100%" cellpadding="3" cellspacing="1" class="list">';
+	showTable($data, $titles,$formatters);
 	echo '</table>';
 	
 	endWindow();
