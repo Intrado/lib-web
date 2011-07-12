@@ -80,7 +80,7 @@ if (isset($cid) && $cid) {
 			<tr <?= $counter++ % 2 == 1 ? 'class="listAlt"' : ''?>>
 			<td><?=escapehtml($managerquery->name)?></td>
 			<td><div style="overflow: hidden; white-space:nowrap;"><?=escapehtml($managerquery->notes)?></div></td>
-			<td><a href="queryrun.php?id=<?="$id"?>" title="Run"><img src="img/application_go.png" border=0></a></td>
+			<td><a href="queryrun.php?id=<?="$id".($cid?"&cid=$cid":"")?>" title="Run"><img src="img/application_go.png" border=0></a></td>
 			</tr>
 <?
 		}
