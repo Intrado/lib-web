@@ -1032,11 +1032,14 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 					}
 					// clear existing jobpost entries
 					QuickUpdate("DELETE FROM jobpost WHERE jobid=?",false,array($job->id));
-					// only create a page post if facebook or twitter
+					// only create a page post if facebook or twitter and there is a post page or voice
 					$createpagepost = false;
+					if (((getSystemSetting("_hasfacebook") && $USER->authorize("facebookpost")) || (getSystemSetting("_hastwitter") && $USER->authorize("twitterpost"))) && 
+								($messagegroup->hasMessage("post", "page") || $messagegroup->hasMessage("post", "voice"))) {
+						QuickUpdate("insert into jobpost (jobid, type, destination) values (?,'page','')", false, array($job->id));
+					}
 					// insert facebook pages, (if the user can and the message group has a facebook message)
 					if (getSystemSetting("_hasfacebook") && $USER->authorize("facebookpost") && $messagegroup->hasMessage("post", "facebook")) {
-						$createpagepost = true;
 						$batchsql = "";
 						$batchargs = array();
 						foreach (json_decode($postdata['fbpage']) as $fbpageid) {
@@ -1050,14 +1053,9 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 					}
 					// insert facebook pages, (if the user can and the message group has a facebook message)
 					if (getSystemSetting("_hastwitter") && $USER->authorize("twitterpost") && $messagegroup->hasMessage("post", "twitter")) {
-						$createpagepost = true;
 						// get the twitter user's id
 						$twdata = json_decode($USER->getSetting("tw_access_token"));
 						QuickUpdate("insert into jobpost (jobid, type, destination) values (?,'twitter',?)", false, array($job->id, $twdata->user_id));
-					}
-					// pagepost needed?
-					if ($createpagepost) {
-						QuickUpdate("insert into jobpost (jobid, type, destination) values (?,'page','')", false, array($job->id));
 					}
 				}
 			}
