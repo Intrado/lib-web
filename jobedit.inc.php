@@ -427,6 +427,12 @@ $fbpages = array();
 if ($job)
 	$fbpages = QuickQueryList("select destination from jobpost where type = 'facebook' and jobid = ?", false, false, array($job->id));
 
+// see if any of the pages are the user's wall
+foreach ($fbpages as $index => $fbpageid) {
+	if ($fbpageid == $USER->getSetting("fb_user_id"))
+		$fbpages[$index] = "me";
+}
+
 $helpsteps = array();
 $helpstepnum = 1;
 $formdata = array();
