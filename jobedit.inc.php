@@ -71,7 +71,6 @@ if ($JOBTYPE != "normal" && !$cansendrepeatingjob)
 ////////////////////////////////////////////////////////////////////////////////
 PreviewModal::HandleRequestWithId();
 
-
 $job = null;
 if (isset($_GET['id'])) {
 	if ($_GET['id'] !== "new" && !userOwns("job",$_GET['id']))
@@ -83,8 +82,6 @@ if (isset($_GET['id'])) {
 if (isset($_GET['origin'])) {
 	$_SESSION['origin'] = trim($_GET['origin']);
 }
-
-
 
 // Flag indicating that a job is complete or cancelled so only allow editing of name and description.
 $completedmode = false; 
@@ -190,14 +187,7 @@ class ReadOnlyFacebookPage extends FormItem {
 				
 				$A(pages).each(function (pageid) {
 					FB.api("/" + pageid, function(res) {
-						if (res && !res.error) {
-							addFbPageElementRo(formitem, container, res);
-						} else {
-							// no data returned
-							container.update(
-								new Element("div").setStyle({padding: "5px"}).update(
-									"'. escapehtml(_L('Error encountered trying to get pages')). '"));
-						}
+						addFbPageElementRo(formitem, container, res);
 					});
 				});
 				
@@ -207,15 +197,20 @@ class ReadOnlyFacebookPage extends FormItem {
 			
 			// get an account element with all the facebook page info, returns the checkbox
 			function addFbPageElementRo(e, container, account) {
-				if (account.category == undefined)
-					var category = "Wall Posting";
-				else
-					var category = account.category.escapeHTML();
+				if (account && !account.error) {
+					var id = account.id;
+					var name = account.name.escapeHTML();
+					if (account.category == undefined)
+						var category = "Wall Posting";
+					else
+						var category = account.category.escapeHTML();
 					
-				var name = account.name.escapeHTML();
-				var id = account.id;
-				
-				var pageimage = new Element("img", { "class": "fbimg", "src": "https://graph.facebook.com/"+ account.id +"/picture?type=square" });
+				} else {
+					var id = "none";
+					var name = "'. escapehtml(_L("Page name not available")). '";
+					var category = "'. escapehtml(_L('This page may not be public')). '";
+				}
+				var pageimage = new Element("img", { "class": "fbimg", "src": "https://graph.facebook.com/"+ id +"/picture?type=square" });
 				var accountitem = new Element("div").insert(
 						pageimage
 					).insert(
@@ -391,7 +386,6 @@ if (isset($job->id)) {
 }
 
 // Prepare Scheduling data
-
 $dayoffset = (strtotime("now") > (strtotime(($ACCESS->getValue("calllate")?$ACCESS->getValue("calllate"):"11:59 pm"))))?1:0;
 
 $customstarttime = isset($job->id)? date("g:i a", strtotime($job->starttime)) : $USER->getCallEarly();
@@ -426,12 +420,6 @@ if ($job->messagegroupid != null) {
 $fbpages = array();
 if ($job)
 	$fbpages = QuickQueryList("select destination from jobpost where type = 'facebook' and jobid = ?", false, false, array($job->id));
-
-// see if any of the pages are the user's wall
-foreach ($fbpages as $index => $fbpageid) {
-	if ($fbpageid == $USER->getSetting("fb_user_id"))
-		$fbpages[$index] = "me";
-}
 
 $helpsteps = array();
 $helpstepnum = 1;
@@ -799,6 +787,13 @@ if ($submittedmode || $completedmode) {
 	
 	// if the account may post to facebook. show facebook page selection formitem
 	if (getSystemSetting("_hasfacebook") && $USER->authorize("facebookpost")) {
+		
+		// see if any of the pages are the user's wall
+		foreach ($fbpages as $index => $fbpageid) {
+			if ($fbpageid == $USER->getSetting("fb_user_id"))
+				$fbpages[$index] = "me";
+		}
+		
 		$helpsteps[] = _L("TODO: facebook page selection");
 		$formdata["fbpage"] = array(
 			"label" => _L('Facebook Page(s)'),
