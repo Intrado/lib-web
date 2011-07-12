@@ -239,7 +239,7 @@ class TwitterAccountPopup extends FormItem {
 				'. icon_button(_L("Add Twitter Account"), "custom/twitter", "popup('popuptwitterauth.php', 600, 300)").'
 			</div>
 			<div id="'. $n. 'authed" style="display:'. ($validtoken?"block":"none"). '">
-				'. _L("Your twitter account is connected."). '
+				'. _L("Your Twitter account is connected."). '
 			</div>';
 		
 		return $str;
@@ -813,10 +813,10 @@ if ($submittedmode || $completedmode) {
 	if (getSystemSetting("_hastwitter") && $USER->authorize("twitterpost")) {
 		// get this here so twitter failures only effect users with twitter access
 		$tw = new Twitter($USER->getSetting("tw_access_token"));
-		$helpsteps[] = _L("TODO: twitter connection required if message group has twitter message");
+		$helpsteps[] = _L("TODO: Twitter connection required if message group has twitter message");
 		$formdata["twitter"] = array(
 			"label" => _L('Twitter Authorization'),
-			"fieldhelp" => _L("TODO: twitter connection required if message group has twitter message"),
+			"fieldhelp" => _L("TODO: Twitter connection required if message group has twitter message"),
 			"value" => "",
 			"validators" => array(
 				array("ValTwitterAccountWithMessage")),

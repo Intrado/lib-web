@@ -1363,7 +1363,7 @@ class JobWiz_facebookAuth extends WizStep {
 	function getForm($postdata, $curstep) {
 	
 		// FB auth note
-		$html = "<div>". escapehtml(_L("If you would like to create a message on Facebook, connect to a facebook account now.")). "</div>";
+		$html = "<div>". escapehtml(_L("If you would like to create a message on Facebook, connect to a Facebook account now.")). "</div>";
 		
 		// Form Fields.
 		$formdata = array(
@@ -1426,7 +1426,7 @@ class JobWiz_twitterAuth extends WizStep {
 		global $USER;
 		
 		// Twitter auth note
-		$html = "<div>". escapehtml(_L("If you would like to create a message on Twitter, connect to a twitter account now.")). "</div>";
+		$html = "<div>". escapehtml(_L("If you would like to create a message on Twitter, connect to a Twitter account now.")). "</div>";
 		
 		// Form Fields.
 		$formdata = array(
