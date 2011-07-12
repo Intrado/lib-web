@@ -173,10 +173,6 @@ if (getSystemSetting('_hastwitter', false)) {
 	$titles["twcontent"] = _L("Twitter Content");
 }
 
-$formatters = array (
-	"date" => "fmt_txt_date"
-);
-
 $data = array();
 
 if ($showreport || $downloadreport) {
@@ -272,46 +268,6 @@ function fmt_socialcontent($row,$index) {
 	return escapehtml($content);
 }
 
-// Note: Post date time could be inaccurate since it is job starttime. Time could be before the accurate post time so until this is fixed show only the date
-// TODO find a way to add a accurate timestamp for postdate
-function fmt_txt_date ($row,$index) {
-	if (isset($row[$index])) {
-		$time = strtotime($row[$index]);
-		if ($time !== -1 && $time !== false)
-		return date("M j, Y",$time);
-	}
-	return "&nbsp;";
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// CSV Functions
-////////////////////////////////////////////////////////////////////////////////
-
-function escape_csvfield ($value) {
-	//TODO conditionally wrap with doublequotes only when needed
-	return '"' . str_replace('"', '""',$value) . '"';
-}
-function array_to_csv($arr) {
-	return implode(",",array_map("escape_csvfield",$arr));
-}
-function showCsvData ($data, $titles, $formatters = array()) {
-	echo array_to_csv($titles) . "\r\n";
-	foreach ($data as $row) {
-		//only show cells with titles
-		$filteredrow = array();
-		foreach ($titles as $index => $title) {
-			if (isset($formatters[$index])) {
-				$fn = $formatters[$index];
-				$cell = $fn($row,$index);
-			} else {
-				$cell = $row[$index]; //no default formatter
-			}
-			$filteredrow[] = $cell;
-		}
-		echo array_to_csv($filteredrow) . "\r\n";
-	}
-}
-
 ////////////////////////////////////////////////////////////////////////////////
 // Generate CSV Report
 ////////////////////////////////////////////////////////////////////////////////
@@ -321,7 +277,10 @@ if ($downloadreport) {
 	header("Cache-Control: private");
 	header("Content-disposition: attachment; filename=report.csv");
 	header("Content-type: application/vnd.ms-excel");
-	showCsvData($data, $titles,$formatters);
+	// Note: Post date time could be inaccurate since it is job starttime. Time could be before the accurate post time so until this is fixed show only the date
+	// TODO find a way to add a accurate timestamp for postdate
+	$csvformatters = array ("date" => "fmt_txt_date");
+	showCsvData($data, $titles,$csvformatters);
 	exit();
 }
 
@@ -375,13 +334,18 @@ echo $form->render();
 endWindow();
 
 
-$formatters["fbcontent"] ="fmt_socialcontent";
-$formatters["twcontent"] = "fmt_socialcontent";
-
 if ($showreport) {
 	startWindow(_L('Report Details:'));
 	echo '<table width="100%" cellpadding="3" cellspacing="1" class="list">';
-	showTable($data, $titles,$formatters);
+	// Note: Post date time could be inaccurate since it is job starttime. Time could be before the accurate post time so until this is fixed show only the date
+	// TODO find a way to add a accurate timestamp for postdate
+	$htmlformatters = array (
+		"date" => "fmt_txt_date",
+		"fbcontent" => "fmt_socialcontent",
+		"twcontent" => "fmt_socialcontent"
+	);
+	
+	showTable($data, $titles,$htmlformatters);
 	echo '</table>';
 	
 	endWindow();

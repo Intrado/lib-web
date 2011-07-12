@@ -123,6 +123,24 @@ function showTable ($data, $titles, $formatters = array(), $repeatedColumns = ar
 	}
 }
 
+function showCsvData ($data, $titles, $formatters = array()) {
+	echo array_to_csv($titles) . "\r\n";
+	foreach ($data as $row) {
+		//only show cells with titles
+		$filteredrow = array();
+		foreach ($titles as $index => $title) {
+			if (isset($formatters[$index])) {
+				$fn = $formatters[$index];
+				$cell = $fn($row,$index);
+			} else {
+				$cell = $row[$index]; //no default formatter
+			}
+			$filteredrow[] = $cell;
+		}
+		echo array_to_csv($filteredrow) . "\r\n";
+	}
+}
+
 function startWindow($title, $style = "", $minimize = false, $usestate = true) {
 	static $id = 0;
 	$id++;

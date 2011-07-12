@@ -736,4 +736,13 @@ function makeUrlDataString($headers) {
 	return implode('&', $data);
 }
 
+function escape_csvfield ($value) {
+	//TODO conditionally wrap with doublequotes only when needed
+	return '"' . str_replace('"', '""',$value) . '"';
+}
+
+function array_to_csv($arr) {
+	return implode(",",array_map("escape_csvfield",$arr));
+}
+
 ?>

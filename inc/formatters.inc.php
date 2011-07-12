@@ -18,6 +18,11 @@ function fmt_date ($row,$index) {
 	return "&nbsp;";
 }
 
+// Requires a not null value
+function fmt_txt_date ($row, $index) {
+	return date("M j, Y",strtotime($row[$index]));
+}
+
 function fmt_number ($row,$index) {
 	if (isset($row[$index])) {
 		return number_format($row[$index]);
