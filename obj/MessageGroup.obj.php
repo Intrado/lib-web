@@ -284,8 +284,6 @@ class MessageGroup extends DBMappedObject {
 	
 	// is this message group valid? It is if the following is true
 	function isValid() {
-		global $USER;
-		
 		// is this even a real message group yet?
 		if (!$this->id)
 			return false;
@@ -299,7 +297,7 @@ class MessageGroup extends DBMappedObject {
 			and type in ('email','phone')
 			and autotranslate != 'source'",
 			false,false,
-			array($this->id, $USER->id));
+			array($this->id, $this->userid));
 		
 		// map the language to phone, email, both
 		$languagemap = array();
