@@ -405,7 +405,7 @@ class MsgWiz_translatePreview extends WizStep {
 					$formdata[] = Language::getName($languagecode);
 					$formdata[$languagecode] = array(
 						"label" => _L("Enabled"),
-						"fieldhelp" => _L('This translated message is currently enabled. Users with this language preference will receive this message.'),
+						"fieldhelp" => _L('Check this box to automatically translate your message into %s.', Language::getName($languagecode)),
 						"value" => true,
 						"validators" => array(),
 						"control" => array("RetranslationItem",
@@ -420,7 +420,7 @@ class MsgWiz_translatePreview extends WizStep {
 					$formdata[] = Language::getName($languagecode);
 				$formdata[$languagecode] = array(
 					"label" => _L("Enabled"),
-					"fieldhelp" => _L('Check this box to automatically translate your message using Google Translate.'),
+					"fieldhelp" => _L('Check this box to automatically translate your message into %s.', Language::getName($languagecode)),
 					"value" => true,
 					"validators" => array(),
 					"control" => array("RetranslationItem",
