@@ -4,6 +4,20 @@
  * Shows the translated text, giving the user the ability to disable the language and preview a re-translated
  * english version
  * 
+ * Possible args
+ *  langcode - Language code this message is being created for (REQUIRED)
+ *  type - phone, voice, email?
+ *  ishtml - is the source text html?
+ *  gender - if this is audio, what gender should tts render in?
+ *  subject - if it's an email. this is the subject
+ *  fromname - if it's an email. this is the from address
+ *  from - if it's an email. this is the name of who it is from
+ *  
+ * Supporting the following feature set
+ *  view translated text
+ *  view above text translated back into english
+ *  preview formatted translated text (audio or email)
+ * 
  * - Nickolas
  */
 
@@ -33,6 +47,21 @@ class RetranslationItem extends FormItem {
 		// What text to display if the selected language is disabled
 		$disabledmessage = $this->args['disabledmessage'];
 		
+		// the type controls how preview works
+		switch ($this->args['type']) {
+			case "voice":
+			case "phone":
+				$previewname = escapehtml(_L("Play"));
+				$previewicon = "fugue/control";
+				break;
+			case "email":
+				$previewname = escapehtml(_L("Preview"));
+				$previewicon = "email_open";
+				break;
+			default:
+				$previewname = false;
+		}
+
 		$theme2 = "#". $_SESSION['colorscheme']['_brandtheme2'];
 		$str = '
 			<style type="text/css">
@@ -41,6 +70,7 @@ class RetranslationItem extends FormItem {
 				.retranslateitems .message {
 					border: 1px solid '. $theme2 .';
 					overflow: auto;
+					width: 70%
 					max-height: 150px;
 					padding: 6px;
 				}
@@ -48,6 +78,7 @@ class RetranslationItem extends FormItem {
 					border: 1px solid gray;
 					color: gray;
 					overflow: auto;
+					width: 70%
 					max-height: 150px;
 					padding: 6px;
 				}
@@ -59,7 +90,10 @@ class RetranslationItem extends FormItem {
 				<div id="'.$n.'-message" class="message">
 					'. $message .'
 				</div>
-				<div id="'.$n.'-retranslate" style="display:none; margin-top:6px">
+				'. icon_button(_L("Show in English"), "fugue/magnifier", "toEnglishButton('$n', '$langcode', ". ($ishtml?"true":"false") .")", null, 'id="'. $n . '-toenglishbutton"') .'
+				'. ($previewname? 
+					icon_button($previewname, $previewicon, null, null, 'id="'. $n . '-previewbutton"'): ""). '
+				<div id="'.$n.'-retranslate" style="clear:both; display:none; margin-top:6px">
 					<div>
 						Re-translated English value:
 					</div>
@@ -68,7 +102,6 @@ class RetranslationItem extends FormItem {
 						<img src="img/ajax-loader.gif" />
 					</div>
 				</div>
-				'. icon_button(_L("Show in English"), "fugue/magnifier", "toEnglishButton('$n', '$langcode', ". ($ishtml?"true":"false") .")", null, 'id="'. $n . '-toenglishbutton"') .'
 				
 			</div>
 			<div id="'.$n.'-unchecked" name="'.$n.'" style="display: '. ($value ? 'none' : 'block') .'">
@@ -76,6 +109,39 @@ class RetranslationItem extends FormItem {
 			</div>';
 		
 		return $str;
+	}
+	
+	function renderJavascript() {
+		$n = $this->form->name."_".$this->name;
+	
+		// the type controls how preview works
+		switch ($this->args['type']) {
+			case "voice":
+			case "phone":
+				$parameters = json_encode(array(
+					"language" => $this->args['langcode'], 
+					"gender" => $this->args['gender'], 
+					"text" => addslashes($this->args['message'])));
+				break;
+			case "email":
+				$parameters = json_encode(array(
+					"fromname" => $this->args['fromname'], 
+					"from" => $this->args['from'], 
+					"subject" => $this->args['subject'], 
+					"language" => $this->args['langcode'], 
+					"subtype" => ($this->args['ishtml']?"html":"plain"), 
+					"text" => addslashes($this->args['message'])));
+				break;
+			default:
+				$parameters = false;
+		}
+		
+		if ($parameters) {
+			return '
+				$("'. $n . '-previewbutton").observe("click", function (event) {
+					showPreview('.$parameters.');
+				});';
+		}
 	}
 	
 	function renderJavascriptLibraries() {
