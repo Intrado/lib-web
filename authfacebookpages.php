@@ -52,13 +52,13 @@ class FacebookAuthPages extends FormItem {
 			<div>
 				<div id="fb-root"></div>
 				<div id="'. $n. 'fbnoauthpages" class="fbpagelist" style="'. ($haspages?"display:none;":"display:block;") .'">
-					'. _L("There are currently no authorized Facebook pages. Your authorized users will be able to post to any page they are an administrator of.") .'
+					'. _L("Select Authorized Pages to restrict which Facebook Pages users may post to.") .'
 				</div>
 				<table id="'. $n. 'fbauthpages" class="fbpagelist" style="'. ($haspages?"display:block":"display:none") .'"><tbody>
 					<tr><th colspan=3>'. _L("Authorized Pages") .'<th></tr>
 				</tbody></table>
 				<div id="'. $n. 'fbdisconnected">
-					<div style="clear:both;">'. _L("Connect to a Facebook account to add more authorized pages") .'</div>
+					<div style="clear:both;">'. _L("Connect to a Facebook account to authorize additional Pages.") .'</div>
 					'. icon_button("Connect to Facebook", "custom/facebook", 
 						"try { 
 							FB.login(loadFbPagesFromAuthResponse.curry('$n'), {perms: '$perms'});
@@ -68,10 +68,10 @@ class FacebookAuthPages extends FormItem {
 				</div>
 				<div id="'. $n. 'fbconnected" style="display:none">
 					<div id="'. $n. 'fbnonewpages" style="display:none">
-						'. _L("You either administrate no pages, or all your administered pages are already authorized.") .'
+						'. _L("You are either not an administrator of a Facebook Page, or all of your administered Pages are already authorized.") .'
 					</div>
 					<div id="'. $n. 'fbhasnewpages" style="clear:both">
-						'. _L("Add one or more of the following pages to the list of authorized pages"). '
+						'. _L("You may authorize one or more of the following Pages."). '
 					</div>
 					<table id="'. $n. 'fbnewpages" class="fbpagelist"><tbody></tbody></table>
 					'. icon_button(_L("Disconnect from Facebook"), "custom/facebook", "$('".$n."fbconnected').hide(); $('".$n."fbdisconnected').show();") .'
@@ -292,17 +292,18 @@ $authorizewall = getSystemSetting("fbauthorizewall");
 $formdata = array(
 	'tips' => array(
 		"label" => _L('Tips'),
-		"fieldhelp" => _L("TODO: Help me!"),
+		"fieldhelp" => _L("Please click on the Guide button for more information about administering Facebook pages."),
 		"control" => array("FormHtml", "html" => '
 			<ul>
-				<li class="wizbuttonlist">'._L('Below you will see which Facebook pages your users are restricted to.').'</li>
-				<li class="wizbuttonlist">'._L('Connect to Facebook and add pages you administrate.').'</li>
-				<li class="wizbuttonlist">'._L('Authorized pages may be posted to by SchoolMessenger users.').'</li>
+				<li class="wizbuttonlist">'._L('This page allows you to restrict users to posting on authorized Facebook Pages.').'</li>
+				<li class="wizbuttonlist">'._L('Connect to Facebook to add Pages you administrate.').'</li>
+				<li class="wizbuttonlist">'._L('If no Pages are authorized, users may post to any Facebook Page they administrate.').'</li>
 			</ul>
 			'),
 		"helpstep" => 1),
 	"authorizedpages" => array(
 		"label" => _L('Authorize Pages'),
+		"fieldhelp" => _L("This section contains the Pages which you have authorized. Users may post to these Pages."),
 		"value" => json_encode($pages),
 		"validators" => array(),
 		"control" => array("FacebookAuthPages"),
@@ -310,17 +311,17 @@ $formdata = array(
 	),
 	"authorizewall" => array(
 		"label" => _L('Authorize User Wall'),
-		"fieldhelp" => _L("TODO: Help me!"),
+		"fieldhelp" => _L("Select this to give users the option of posting to their Facebook Wall."),
 		"value" => $authorizewall,
 		"validators" => array(),
-		"control" => array("CheckBox", "label" => _L("Allow users to post to their wall")),
+		"control" => array("CheckBox", "label" => _L("Allow users to post to their Wall")),
 		"helpstep" => 2
 	)
 );
 
 $helpsteps = array (
-	_L('TODO: Help me'),
-	_L('TODO: Help me')
+	_L('You may restrict users to posting to certain Facebook Pages by creating a list of authorized Pages. You will need to be an administrator on the Pages you wish to authorize. Additionally, users who may post to these Pages must have permission set on Facebook.'),
+	_L('This option allows users to have the option of posting to their Facebook Wall in addition to, or instead of, your authorized Pages.')
 );
 
 $buttons = array(submit_button(_L('Save'),"submit","tick"), icon_button(_L('Cancel'),"cross",null,"settings.php"));
