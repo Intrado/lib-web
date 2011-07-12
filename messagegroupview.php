@@ -46,13 +46,12 @@ $messagegroup = new MessageGroup($_GET['id'] + 0);
 // check publication and subscription restrictions on this message (or original if it is a copy)
 // if the user owns this message, they can preview it. Otherwise, check the original message group id
 if (!userOwns("messagegroup", $messagegroup->id) && $messagegroup->originalmessagegroupid) {
-	if(!userOwns('messagegroup',$messagegroup->originalmessagegroupid) && 
-			!isSubscribed("messagegroup",$messagegroup->originalmessagegroupid)) {
+	if(!userOwns('messagegroup',$messagegroup->originalmessagegroupid) &&
+		!userCanSubscribe("messagegroup",$messagegroup->originalmessagegroupid)) {
 		redirect('unauthorized.php');
 	}
-} else if (!userOwns('messagegroup',$_GET['id'] + 0) && 
-		!isPublished('messagegroup', $_GET['id']) && 
-		!userCanSubscribe('messagegroup', $_GET['id'])) {
+} else if (!userOwns('messagegroup',$messagegroup->id) && 
+		!userCanSubscribe('messagegroup', $messagegroup->id)) {
 	redirect('unauthorized.php');
 }
 

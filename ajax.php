@@ -344,11 +344,18 @@ function handleRequest() {
 			
 			// check if the user owns the message, they subscribe to the message or they subscribe to the original message
 			$messagegroup = new MessageGroup($_GET['id']);
-			if(!userOwns('messagegroup',$_GET['id']) && 
-					!isSubscribed("messagegroup",$_GET['id']) && 
-					!isSubscribed("messagegroup", $messagegroup->originalmessagegroupid)) {
-				return false;
-			}
+			
+			// Can not check permissions because of some corner cases:
+			// 1 - User A publish a message
+			// 2 - User B subscribes to the message and sends a job
+			// 3 - User A unsubcribes the message
+			// 4 - User B views the sent job 
+			
+// 			if(!userOwns('messagegroup',$_GET['id']) && 
+// 					!userCanSubscribe("messagegroup",$_GET['id']) && 
+// 					!userCanSubscribe("messagegroup", $messagegroup->originalmessagegroupid)) {
+// 				return false;
+// 			}
 			
 			$result->defaultlang = Language::getName(Language::getDefaultLanguageCode());
 			$result->headers = array();

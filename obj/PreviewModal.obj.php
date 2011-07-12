@@ -35,7 +35,7 @@ class PreviewModal {
 		
 		$id = $_REQUEST["previewid"] + 0;
 		$message = DBFind("Message", "from message where id = ?", false, array($id));
-		$canviewmessage = $message && (userOwns("message", $id) || $USER->authorize('managesystem') || (isPublished("messagegroup", $message->messagegroupid) && userCanSubscribe("messagegroup", $message->messagegroupid)));
+		$canviewmessage = $message && (userOwns("message", $id) || (isPublished("messagegroup", $message->messagegroupid) && userCanSubscribe("messagegroup", $message->messagegroupid)));
 		if(!$canviewmessage) {
 			return;
 		}
