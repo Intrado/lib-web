@@ -31,9 +31,7 @@ require_once("obj/ValMessageBody.val.php");
 require_once("obj/RetranslationItem.fi.php");
 require_once("obj/CheckBoxWithHtmlPreview.fi.php");
 require_once("obj/PhoneMessageEditor.fi.php");
-
 require_once("obj/PreviewButton.fi.php");
-require_once("obj/PreviewModal.obj.php");
 
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization

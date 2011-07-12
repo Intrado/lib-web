@@ -33,10 +33,9 @@ require_once("obj/ValMessageBody.val.php");
 require_once("obj/RetranslationItem.fi.php");
 require_once("obj/CheckBoxWithHtmlPreview.fi.php");
 require_once("obj/EmailMessageEditor.fi.php");
-
 require_once("obj/PreviewButton.fi.php");
-require_once("obj/PreviewModal.obj.php");
 
+// appserver and thrift includes
 require_once("inc/appserver.inc.php");
 require_once('thrift/Thrift.php');
 require_once $GLOBALS['THRIFT_ROOT'].'/protocol/TBinaryProtocol.php';

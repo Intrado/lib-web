@@ -21,16 +21,17 @@ require_once("obj/Language.obj.php");
 require_once("obj/Voice.obj.php");
 require_once("obj/AudioFile.obj.php");
 require_once("obj/Phone.obj.php");
+require_once("inc/previewfields.inc.php");
+require_once("obj/PreviewModal.obj.php");
 
 // form items/validators
 require_once("obj/FormItem.obj.php");
 require_once("obj/Validator.obj.php");
 require_once("obj/ValMessageBody.val.php");
 require_once("obj/PhoneMessageEditor.fi.php");
-
-require_once("inc/previewfields.inc.php");
-require_once("obj/PreviewModal.obj.php");
 require_once("obj/PreviewButton.fi.php");
+
+// appserver and thrift includes
 require_once("inc/appserver.inc.php");
 require_once('thrift/Thrift.php');
 require_once $GLOBALS['THRIFT_ROOT'].'/protocol/TBinaryProtocol.php';
