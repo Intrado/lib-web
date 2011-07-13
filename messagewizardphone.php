@@ -594,7 +594,7 @@ class FinishMessageWizard extends WizFinish {
 		// is the messagegroup id still valid?
 		$messagegroup = new MessageGroup($_SESSION['wizard_message']['mgid']);
 		if (!userOwns("messagegroup", $messagegroup->id) || $messagegroup->deleted)
-			redirect('unauthorized.php');
+			return;
 		
 		// get the language code from postdata
 		$langcode = (isset($postdata["/create/language"]["language"])?$postdata["/create/language"]["language"]:Language::getDefaultLanguageCode());
@@ -791,9 +791,6 @@ class FinishMessageWizard extends WizFinish {
 	}
 	
 	function getFinishPage ($postdata) {
-		// remove this wizard's session data
-		unset($_SESSION['wizard_message']);
-		
 		$html = '<h3>Success! Your message has been saved</h3>';
 		return $html;
 	}
