@@ -7,6 +7,10 @@ header("Content-Type: text/javascript");
 header("Cache-Control: private");
 ?>
 function getMessageGroupPreviewGrid(mgid, container, priority) {
+	// Avoid sending ajax request if nothing is selected
+	if (!mgid)
+		return;
+
 	container = $(container);
 	
 	// insert ajax loader icon

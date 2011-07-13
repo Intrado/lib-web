@@ -339,7 +339,7 @@ function handleRequest() {
 
 		case 'messagegrid':
 			// Check if has messagegroupid
-			if (!isset($_GET['id']))
+			if (!isset($_GET['id']) || !$_GET['id'])
 				return false;
 			
 			// check if the user owns the message, they subscribe to the message or they subscribe to the original message
