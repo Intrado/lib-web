@@ -427,7 +427,7 @@ class MsgWiz_submitConfirm extends WizStep {
 			"helpstep" => 1
 		);
 		
-		$helpsteps = ("TODO: guide data");
+		$helpsteps = ("These older messages will be overwritten with the messages you've just created in the wizard. Clicking Next will replace the old messages with the new ones.");
 		
 		return new Form("submitConfirm",$formdata,$helpsteps);
 		
