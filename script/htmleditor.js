@@ -80,8 +80,13 @@ function saveHtmlEditorContent(existinghtmleditorobject) {
 		var html = cleanFieldInserts(tempdiv.innerHTML).replace(/&lt;&lt;/g, '<<').replace(/&gt;&gt;/g, '>>');
 
 		// CKEditor inserts blank tags even if the user has deleted everything.
-		if (html.stripTags().strip().replace(/&nbsp;/g, '') == '')
-			html = '';
+		// check if there is an image or href tag... if not, strip the tags and see if there is any text
+		if (!html.match(/[img,href]/)) {
+			// strips all html tags, then strips whitespace. If there is nothing left... set the html to an empty string
+			if (html.stripTags().strip().replace(/[&nbsp;,\n,\r,\t]/g, '') == '')
+				html = '';
+		}
+		
 		textarea.value = html;
 		textarea.fire('HtmlEditor:SavedContent');
 	}
