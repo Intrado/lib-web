@@ -137,10 +137,14 @@ if ($messagegroup->id) {
 	// is this message group valid? if not, does it have any messages?
 	$messages = $messagegroup->getMessages();
 	if (!$messagegroup->isValid() && count($messages)) {
-		if ($messagegroup->defaultlanguagecode)
+		if ($messagegroup->defaultlanguagecode) {
 			$invalidMessageWarning = _L("Your default language, %s, is missing either phone or email.", Language::getName($messagegroup->defaultlanguagecode));
-		else
-			$invalidMessageWarning = _L("Your message must contain at least one of phone, sms or email.");
+		} else {
+			if (getSystemSetting("_hassms") && $USER->getSetting("sendsms"))
+				$invalidMessageWarning = _L("Your message must contain at least one of phone, sms or email.");
+			else
+				$invalidMessageWarning = _L("Your message must contain at least one of phone or email.");
+		}
 	}
 }
 

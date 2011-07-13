@@ -329,8 +329,8 @@ class MessageGroup extends DBMappedObject {
 					return false;
 				break;
 			case "":
-				// this message has no phone or email messages, It's still valid if it has an sms message
-				if ($this->hasMessage("sms"))
+				// this message has no phone or email messages, It's still valid if it has an sms message (provided the customer has sms)
+				if (getSystemSetting("_hassms") && $this->hasMessage("sms"))
 					return true;
 			default:
 				// the default language message is missing both phone and email...
