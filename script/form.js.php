@@ -536,7 +536,12 @@ function form_handle_submit(form,event) {
 	if (formvars.submitting)
 		return;
 	formvars.submitting = true;
-
+	
+	//stop any pending validations from occuring
+	if (formvars.keyuptimer) {
+		window.clearTimeout(formvars.keyuptimer);
+	}
+	
 	//prep an ajax call with entire form contents and post back to server
 	//server side will validate
 	//if successful, results with have some action to take and/or code
