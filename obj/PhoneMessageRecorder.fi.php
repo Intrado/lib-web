@@ -102,7 +102,7 @@ class PhoneMessageRecorder extends FormItem {
 
 			content.observe("EasyCall:update", function(event) {
 				e.value = "{\"af\":" + event.memo.audiofileid + "}";
-				setupMessageRecorderButtons(e);
+				setupMessageRecorderButtons(e, name);
 				Event.stopObserving(content,"EasyCall:update");
 			});
 		}
