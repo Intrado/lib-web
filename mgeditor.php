@@ -199,7 +199,7 @@ if ($invalidMessageWarning) {
 if ($messagegroup->id) {
 	$buttons = array(submit_button(_L('Save'),"submit","tick"));
 } else {
-	$buttons = array(submit_button(_L('Next'),"submit","tick"));
+	$buttons = array(submit_button(_L('Next'),"submit","arrow_right"));
 }
 
 $form = new Form("messagegroupedit",$formdata,$helpsteps,$buttons);
