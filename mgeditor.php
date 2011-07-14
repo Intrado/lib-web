@@ -140,7 +140,7 @@ if ($messagegroup->id) {
 		if ($messagegroup->defaultlanguagecode) {
 			$invalidMessageWarning = _L("Your default language, %s, is missing either phone or email.", Language::getName($messagegroup->defaultlanguagecode));
 		} else {
-			if (getSystemSetting("_hassms") && $USER->getSetting("sendsms"))
+			if (getSystemSetting("_hassms") && $ACCESS->getValue("sendsms"))
 				$invalidMessageWarning = _L("Your message must contain at least one of phone, sms or email.");
 			else
 				$invalidMessageWarning = _L("Your message must contain at least one of phone or email.");
