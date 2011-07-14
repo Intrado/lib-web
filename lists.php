@@ -145,9 +145,8 @@ if (isset($_GET['ajax'])) {
 						$publishactionlink = action_link(_L("Modify Publication"), "fugue/star__pencil", "publisheditorwiz.php?id=$itemid&type=list");
 					break;
 				case 'subscribe':
-					// this list is subscribed to, allow unsubscribe if they have subscription priv
-					if ($USER->authorize("subscribe") && userCanSubscribe('list'))
-						$publishactionlink = action_link("Un-Subscribe", "fugue/star__minus", "lists.php?id=$publishid&remove");
+					// this list is subscribed to, allow unsubscribe always!
+					$publishactionlink = action_link("Un-Subscribe", "fugue/star__minus", "lists.php?id=$publishid&remove");
 					break;
 				default:
 					// if the user can publish lists and they are authorized for atleast one org (or the customer has no orgs)

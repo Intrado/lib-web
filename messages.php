@@ -191,9 +191,8 @@ if($isajax === true) {
 						$publishactionlink = action_link(_L("Modify Publication"), "fugue/star__pencil", "publisheditorwiz.php?id=$itemid&type=messagegroup");
 					break;
 				case 'subscribe':
-					// this message is subscribed to, allow unsubscribe if they have subscription priv
-					if ($USER->authorize("subscribe") && userCanSubscribe('messagegroup'))
-						$publishactionlink = action_link("Un-Subscribe", "fugue/star__minus", "messages.php?id=$publishid&remove");
+					// this message is subscribed to, allow unsubscribe always!
+					$publishactionlink = action_link("Un-Subscribe", "fugue/star__minus", "messages.php?id=$publishid&remove");
 					break;
 				default:
 					// if the user can publish message groups and they are authorized for atleast one org (or the customer has no orgs)
