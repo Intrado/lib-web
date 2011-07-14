@@ -18,7 +18,7 @@ class Voice extends DBMappedObject {
 	static function getTTSVoices() {
 		static $voices = false;	
 		if ($voices === false) {
-			$tmp = DBFindMany("Voice","from ttsvoice t join language l on (t.languagecode = l.code) order by t.id", "t");
+			$tmp = DBFindMany("Voice","from ttsvoice t join language l on (t.languagecode = l.code) order by t.language", "t");
 			$voices = array();
 			foreach ($tmp as $voice) {
 				$voices[$voice->languagecode.":".$voice->gender] = $voice;
