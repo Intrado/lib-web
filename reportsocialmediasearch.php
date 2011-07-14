@@ -176,14 +176,9 @@ if (getSystemSetting('_hastwitter', false)) {
 $data = array();
 
 if ($showreport || $downloadreport) {
-	
-	if (getSystemSetting('_hasfacebook', false) && $USER->authorize("facebookpost")  && fb_hasValidAccessToken()) {
-		$authpages = getFbAuthorizedPages();
-		$authwall = getSystemSetting("fbauthorizewall");
-		$accesstoken = $USER->getSetting("fb_access_token", false);
-	}
-
 	if ($queryresult) {
+		$twitterids = array();
+		$facebookids = array();
 		
 		// store facebook account names to avoid contacting facebook for each individual post if the pageid is the same
 		$fbaccountnames = array();
@@ -219,34 +214,85 @@ if ($showreport || $downloadreport) {
 						// Look up account page id in cache or if not there fetch from fb 
 						$post["fbdest"] .= $fbaccountnames[$row[5]];
 					} else {
-						try {
-							$accountinfo = $facebookapi->api("/$row[5]", 'GET', array());
-							if ($accountinfo) {
-								// using first name to check if it is a person or a standalone page.
-								$name = isset($accountinfo["first_name"]) ? $accountinfo["name"] . "'s wall":$accountinfo["name"];
-								$fbaccountnames[$row[5]] = $name;
-								$post["fbdest"] .= $name;
-							} else {
-								$fbaccountnames[$row[5]] = $row[5];//_L("Not Available");
-								$post["fbdest"] .= $row[5]; //_L("Not Available");
+						$fbaccountnames[$row[5]] = $row[5];
+						$attempts = 3;
+						while($attempts) {
+							try {
+								$accountinfo = $facebookapi->api("/$row[5]", 'GET', array());
+								if ($accountinfo) {
+									// using first name to check if it is a person or a standalone page.
+									$name = isset($accountinfo["first_name"]) ? $accountinfo["name"] . "'s wall":$accountinfo["name"];
+									$fbaccountnames[$row[5]] = $name;
+									$post["fbdest"] .= $name;
+									break;
+								} else {
+									$attempts--;
+								}
+							} catch (FacebookApiException $e) {
+								error_log($e);
+								$attempts--;
 							}
-						} catch (FacebookApiException $e) {
-							$fbaccountnames[$row[5]] = $row[5];// _L("Not Available");
-							$post["fbdest"] = $row[5];// _L("Not Available");
-							error_log($e);
-						}
+						} 
+						// Fill in pageid if failed to connect to fb
+						if ($attempts == 0)
+							$post["fbdest"] .= $row[5];
+						
 					}
 					break;
 				case "twitter":
-					$post["twhandle"] = $row[5];
+					$post["twhandle"] = $row[5]; // Set id here to be able to map to twitter response
+					if (!isset($twitterids[$row[5]])) 
+						$twitterids[$row[5]] = $row[5]; // Set id to be able to identify id if twitter can not get the screen_name
 					$post["twstatus"] = $row[7] == "1"?"Posted":"Not Posted";
 					$post["twcontent"] = $row[3];
 					// Do not modify, Just print the handle 
 					break;
 			} 
-			
 			$data[$row[0]] = $post;
-		}
+		}	
+		
+		// Get twitter screennames in batch since twitter has a request limit of 150 request per hour for each ip for unathenticated requests
+		// Since twitter supports batch lookup of users the report will only have to do one request to twitter.
+		// https://dev.twitter.com/docs/rate-limiting
+		if(count($twitterids) > 0) {
+			if (count($twitterids) > 100) {
+				$twitterids = array_slice($twitterids,100);
+				error_log("Limiting request for twitter to 100 userids. Report with " . count($twitterids) . "twitter ids?");
+			}
+			
+			$referer = $_SERVER["HTTP_REFERER"];
+			if (!$referer) {
+				$referer = (isset($SETTINGS['translation']['referer']) && $SETTINGS['translation']['referer'])?$SETTINGS['translation']['referer']:"http://asp.schoolmessenger.com";
+			}
+			$url = "http://api.twitter.com/1/users/lookup.json?user_id=" . implode(",",array_keys($twitterids));
+			$context_options = array ('http' => array ('method' => 'GET','header'=> "Referer: $referer"));
+			$context = stream_context_create($context_options);
+			$attempts = 3;
+			while($attempts) {
+				$fp = @fopen($url, 'rb', false, $context);
+				if ($fp) {
+					$response = @stream_get_contents($fp);
+					if ($response) {
+						$result = json_decode($response);
+						foreach($result as $user) {
+							$twitterids[$user->id] = $user->screen_name;
+						}
+						foreach($data as $jobid => $post) {
+							if ($post["twhandle"] != "") {							
+								$data[$jobid]["twhandle"] = $twitterids[$post["twhandle"]];	
+							}					
+						}
+						break;
+					} else {
+						$attempts--;
+						error_log("Unable to read from $url");
+					}
+				} else {
+					$attempts--;
+					error_log("Unable to send user lookup request to $url");
+				}
+			}
+		} 
 	}
 }
 ////////////////////////////////////////////////////////////////////////////////
