@@ -138,20 +138,36 @@ if (isset($_GET['ajax'])) {
 			
 			// Users with published or subscribed lists will get a special action item
 			$publishactionlink = "";
-			// if the user can publish lists and they are authorized for atleast one org (or the customer has no orgs)
-			if ($USER->authorize("publish") && userCanPublish('list') && ($authorizedorgs || !Organization::custHasOrgs())) {
-				// this list is published, else allow it to be
-				if ($publishaction == 'publish')
-					$publishactionlink = action_link(_L("Modify Publication"), "fugue/star__pencil", "publisheditorwiz.php?id=$itemid&type=list");
-				else
-					$publishactionlink = action_link(_L("Publish"), "fugue/star__plus", "publisheditorwiz.php?id=$itemid&type=list");
+					switch ($publishaction) {
+				case 'publish':
+					// if the user has published this message groups and they are authorized for atleast one org (or the customer has no orgs)
+					if ($USER->authorize("publish") && userCanPublish('list') && ($authorizedorgs || !Organization::custHasOrgs()))
+						$publishactionlink = action_link(_L("Modify Publication"), "fugue/star__pencil", "publisheditorwiz.php?id=$itemid&type=list");
+					break;
+				case 'subscribe':
+					// this list is subscribed to, allow unsubscribe if they have subscription priv
+					if ($USER->authorize("subscribe") && userCanSubscribe('list'))
+						$publishactionlink = action_link("Un-Subscribe", "fugue/star__minus", "lists.php?id=$publishid&remove");
+					break;
+				default:
+					// if the user can publish lists and they are authorized for atleast one org (or the customer has no orgs)
+					if ($USER->authorize("publish") && userCanPublish('list') && ($authorizedorgs || !Organization::custHasOrgs()))
+						$publishactionlink = action_link(_L("Publish"), "fugue/star__plus", "publisheditorwiz.php?id=$itemid&type=list");
 			}
-			if ($USER->authorize("subscribe") && userCanSubscribe('list')) {
-				// this list is subscribed to
-				if ($publishaction == 'subscribe')
-					$publishactionlink = action_link("Un-Subscribe", "fugue/star__minus", "lists.php?id=$publishid&remove");
+			
+			// if the user owns this list, they can edit, delete
+			if (userOwns("list", $itemid)) {
+				$tools = action_links (
+					action_link("Edit", "pencil", "list.php?id=$itemid"),
+					action_link("Preview", "application_view_list", "showlist.php?id=$itemid"),
+					$publishactionlink,
+					action_link("Delete", "cross", "lists.php?delete=$itemid", "return confirmDelete();")
+				);
+			} else {
+				$tools = action_links (
+					action_link("Preview", "application_view_list", "showlist.php?id=$itemid"),
+					$publishactionlink);
 			}
-
 
 			$content = '<a href="' . $defaultlink . '">' . ($item["date"]!== null?$time:"");
 
@@ -165,23 +181,6 @@ if (isset($_GET['ajax'])) {
 				$content .= 'This list has never been used';
 			$content .= '</a>';
 			
-			
-			
-			
-			// if the user is only subscribed to this list, they can't edit or delete
-			if ($publishaction == 'subscribe') {
-				$tools = action_links (
-					action_link("Preview", "application_view_list", "showlist.php?id=$itemid"),
-					$publishactionlink);
-			} else if ($USER->authorize('createlist')) {
-				$tools = action_links (
-					action_link("Edit", "pencil", "list.php?id=$itemid"),
-					action_link("Preview", "application_view_list", "showlist.php?id=$itemid"),
-					$publishactionlink,
-					action_link("Delete", "cross", "lists.php?delete=$itemid", "return confirmDelete();"));
-			} else {
-				$tools = action_links(action_link("Preview", "application_view_list", "showlist.php?id=$itemid"));
-			}
 			$icon = 'largeicons/addrbook.jpg';
 
 			$data->list[] = array("itemid" => $itemid,

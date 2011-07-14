@@ -184,32 +184,35 @@ if($isajax === true) {
 			
 			// Users with published messages or subscribed messages will get a special action item
 			$publishactionlink = "";
-			// if the user can publish message groups and they are authorized for atleast one org (or the customer has no orgs)
-			if ($USER->authorize("publish") && userCanPublish('messagegroup') && ($authorizedorgs || !Organization::custHasOrgs())) {
-				// this message is published, else allow it to be
-				if ($publishaction == 'publish')
-					$publishactionlink = action_link(_L("Modify Publication"), "fugue/star__pencil", "publisheditorwiz.php?id=$itemid&type=messagegroup");
-				else
-					$publishactionlink = action_link(_L("Publish"), "fugue/star__plus", "publisheditorwiz.php?id=$itemid&type=messagegroup");
-			}
-			if ($USER->authorize("subscribe") && userCanSubscribe('messagegroup')) {
-				// this message is subscribed to
-				if ($publishaction == 'subscribe')
-					$publishactionlink = action_link("Un-Subscribe", "fugue/star__minus", "messages.php?id=$publishid&remove");
+			switch ($publishaction) {
+				case 'publish':
+					// if the user has published this message groups and they are authorized for atleast one org (or the customer has no orgs)
+					if ($USER->authorize("publish") && userCanPublish('messagegroup') && ($authorizedorgs || !Organization::custHasOrgs()))
+						$publishactionlink = action_link(_L("Modify Publication"), "fugue/star__pencil", "publisheditorwiz.php?id=$itemid&type=messagegroup");
+					break;
+				case 'subscribe':
+					// this message is subscribed to, allow unsubscribe if they have subscription priv
+					if ($USER->authorize("subscribe") && userCanSubscribe('messagegroup'))
+						$publishactionlink = action_link("Un-Subscribe", "fugue/star__minus", "messages.php?id=$publishid&remove");
+					break;
+				default:
+					// if the user can publish message groups and they are authorized for atleast one org (or the customer has no orgs)
+					if ($USER->authorize("publish") && userCanPublish('messagegroup') && ($authorizedorgs || !Organization::custHasOrgs()))
+						$publishactionlink = action_link(_L("Publish"), "fugue/star__plus", "publisheditorwiz.php?id=$itemid&type=messagegroup");
 			}
 			
-			// if the user is only subscribed to this message group, they can't edit, delete
-			if ($publishaction == 'subscribe')
-				$tools = action_links (
-					action_link("View", "fugue/magnifier", 'messagegroupview.php?id=' . $itemid),
-					$publishactionlink);
-			else
+			// if the user owns this message group, they can edit, delete
+			if (userOwns("messagegroup", $itemid)) {
 				$tools = action_links (
 					action_link("Edit", "pencil", 'mgeditor.php?id=' . $itemid),
 					$publishactionlink,
 					action_link("Delete", "cross", 'messages.php?delete=' . $itemid, "return confirmDelete();")
 				);
-
+			} else {
+				$tools = action_links (
+					action_link("View", "fugue/magnifier", 'messagegroupview.php?id=' . $itemid),
+					$publishactionlink);
+			}
 
 			$content = '<a href="' . $defaultlink . '" >' . $time .  ($item["description"] != ""?" - " . escapehtml($item["description"]):"") . ' - <b>' . ($types==""?_L("Empty Message"):$types) . '</b>' . '</a>';
 			
