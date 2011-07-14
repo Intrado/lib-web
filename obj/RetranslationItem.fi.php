@@ -121,7 +121,7 @@ class RetranslationItem extends FormItem {
 				$parameters = json_encode(array(
 					"language" => $this->args['langcode'], 
 					"gender" => $this->args['gender'], 
-					"text" => addslashes($this->args['message'])));
+					"text" => $this->args['message']));
 				break;
 			case "email":
 				$parameters = json_encode(array(
@@ -130,7 +130,7 @@ class RetranslationItem extends FormItem {
 					"subject" => $this->args['subject'], 
 					"language" => $this->args['langcode'], 
 					"subtype" => ($this->args['ishtml']?"html":"plain"), 
-					"text" => addslashes($this->args['message'])));
+					"text" => $this->args['message']));
 				break;
 			default:
 				$parameters = false;
