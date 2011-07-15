@@ -168,17 +168,19 @@ if (getSystemSetting('_hasfacebook', false)) {
 }
 
 if (getSystemSetting('_hastwitter', false)) {
-	$titles["twhandle"] =  _L("Twitter Handle");
+	$titles["twhandle"] =  _L("Twitter User");
 	$titles["twstatus"] = _L("Twitter Status");
 	$titles["twcontent"] = _L("Twitter Content");
 }
 
 $data = array();
+$twitterids = array();
+$facebookids = array();
+
 
 if ($showreport || $downloadreport) {
 	if ($queryresult) {
-		$twitterids = array();
-		$facebookids = array();
+
 		
 		// store facebook account names to avoid contacting facebook for each individual post if the pageid is the same
 		$fbaccountnames = array();
@@ -193,7 +195,7 @@ if ($showreport || $downloadreport) {
 				$post["jobname"] = $row[1];
 				$post["user"] = $row[6];
 				$post["date"] = $row[4];
-				$post["fbdest"] = "";
+				$post["fbdest"] = array();
 				$post["fbstatus"] = "";
 				$post["fbcontent"] = "";
 				$post["twhandle"] = "";
@@ -203,46 +205,20 @@ if ($showreport || $downloadreport) {
 			
 			switch($row[2]) {
 				case "facebook":
-					$post["fbdest"] .= $post["fbdest"] != ""?", ":"";
+					$facebookids[$row[5]] = $row[5];
+					$post["fbdest"][] = $row[5];
+					//$post["fbdest"] .= $post["fbdest"] != ""?", ":"";
 					$status = $row[7] == "1"?"Posted":"Not Posted";
 					if ($status != $post["fbstatus"]) {
 						$post["fbstatus"] .= $post["fbstatus"] != ""?", $status":$status;
 					}
 					
 					$post["fbcontent"] = $row[3];
-					if (isset($fbaccountnames[$row[5]])) {
-						// Look up account page id in cache or if not there fetch from fb 
-						$post["fbdest"] .= $fbaccountnames[$row[5]];
-					} else {
-						$fbaccountnames[$row[5]] = $row[5];
-						$attempts = 3;
-						while($attempts) {
-							try {
-								$accountinfo = $facebookapi->api("/$row[5]", 'GET', array());
-								if ($accountinfo) {
-									// using first name to check if it is a person or a standalone page.
-									$name = isset($accountinfo["first_name"]) ? $accountinfo["name"] . "'s wall":$accountinfo["name"];
-									$fbaccountnames[$row[5]] = $name;
-									$post["fbdest"] .= $name;
-									break;
-								} else {
-									$attempts--;
-								}
-							} catch (FacebookApiException $e) {
-								error_log($e);
-								$attempts--;
-							}
-						} 
-						// Fill in pageid if failed to connect to fb
-						if ($attempts == 0)
-							$post["fbdest"] .= $row[5];
-						
-					}
 					break;
 				case "twitter":
-					$post["twhandle"] = $row[5]; // Set id here to be able to map to twitter response
-					if (!isset($twitterids[$row[5]])) 
-						$twitterids[$row[5]] = $row[5]; // Set id to be able to identify id if twitter can not get the screen_name
+ 					$post["twhandle"] = $row[5]; // Set id here to be able to map to twitter response
+ 					if (!isset($twitterids[$row[5]])) 
+ 						$twitterids[$row[5]] = $row[5]; // Set id to be able to identify id if twitter can not get the screen_name
 					$post["twstatus"] = $row[7] == "1"?"Posted":"Not Posted";
 					$post["twcontent"] = $row[3];
 					// Do not modify, Just print the handle 
@@ -250,49 +226,7 @@ if ($showreport || $downloadreport) {
 			} 
 			$data[$row[0]] = $post;
 		}	
-		
-		// Get twitter screennames in batch since twitter has a request limit of 150 request per hour for each ip for unathenticated requests
-		// Since twitter supports batch lookup of users the report will only have to do one request to twitter.
-		// https://dev.twitter.com/docs/rate-limiting
-		if(count($twitterids) > 0) {
-			if (count($twitterids) > 100) {
-				$twitterids = array_slice($twitterids,100);
-				error_log("Limiting request for twitter to 100 userids. Report with " . count($twitterids) . "twitter ids?");
-			}
-			
-			$referer = $_SERVER["HTTP_REFERER"];
-			if (!$referer) {
-				$referer = (isset($SETTINGS['translation']['referer']) && $SETTINGS['translation']['referer'])?$SETTINGS['translation']['referer']:"http://asp.schoolmessenger.com";
-			}
-			$url = "http://api.twitter.com/1/users/lookup.json?user_id=" . implode(",",array_keys($twitterids));
-			$context_options = array ('http' => array ('method' => 'GET','header'=> "Referer: $referer"));
-			$context = stream_context_create($context_options);
-			$attempts = 3;
-			while($attempts) {
-				$fp = @fopen($url, 'rb', false, $context);
-				if ($fp) {
-					$response = @stream_get_contents($fp);
-					if ($response) {
-						$result = json_decode($response);
-						foreach($result as $user) {
-							$twitterids[$user->id] = $user->screen_name;
-						}
-						foreach($data as $jobid => $post) {
-							if ($post["twhandle"] != "") {							
-								$data[$jobid]["twhandle"] = $twitterids[$post["twhandle"]];	
-							}					
-						}
-						break;
-					} else {
-						$attempts--;
-						error_log("Unable to read from $url");
-					}
-				} else {
-					$attempts--;
-					error_log("Unable to send user lookup request to $url");
-				}
-			}
-		} 
+
 	}
 }
 ////////////////////////////////////////////////////////////////////////////////
@@ -312,6 +246,26 @@ function fmt_socialcontent($row,$index) {
 		return "<div id=\"{$id}\">" . escapehtml(substr($content,0,$contentlength-3) . "...") . "</div><div id='{$id}_long' style='display:none'>" . escapehtml($content) . "</div>";
 	}
 	return escapehtml($content);
+}
+
+$fbdestinations = array();
+function fmt_fbdestination($row,$index) {
+	global $fbdestinations;
+	$destinations = $row[$index];
+	// Store facebook destination ids for javascript handling 
+	$id = "fbd_" . count($fbdestinations);
+	$fbdestinations[$id] = $destinations;
+	return "<div id=\"{$id}\"><img src=\"img/ajax-loader.gif\" alt=\"\"> Loading Facebook Destinations</div>";
+}
+
+$twdestinations = array();
+function fmt_twdestination($row,$index) {
+	global $twdestinations;
+	$destinations = $row[$index];
+	// Store facebook destination ids for javascript handling
+	$id = "twd_" . count($twdestinations);
+	$twdestinations[$id] = $destinations;
+	return "<div id=\"{$id}\"><img src=\"img/ajax-loader.gif\" alt=\"\"> Loading Twitter User</div>";
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -387,7 +341,9 @@ if ($showreport) {
 	// TODO find a way to add a accurate timestamp for postdate
 	$htmlformatters = array (
 		"date" => "fmt_txt_date",
+		"fbdest" => "fmt_fbdestination",
 		"fbcontent" => "fmt_socialcontent",
+		"twhandle" => "fmt_twdestination",
 		"twcontent" => "fmt_socialcontent"
 	);
 	
@@ -397,6 +353,91 @@ if ($showreport) {
 	endWindow();
 }
 buttons();
+
+
+// Include Twitter user name lookup i report contians twitter
+if (count($twitterids)) {
+?>
+<script type="text/javascript">
+var twcache = $H();
+function showTwitter(response) {
+    var names = '';
+    response.each(function(itm) {
+    	twcache.set(itm.id,itm.screen_name);
+    });
+    var twdestinations = $H(<?= json_encode($twdestinations); ?>);
+	if (twdestinations.size() > 0) {
+		twdestinations.each(function(itm) {
+			var name = twcache.get(itm.value);
+			$(itm.key).update(name?name:itm.value);
+		});
+	}
+}
+</script>
+<script type="text/javascript" src="https://api.twitter.com/1/users/lookup.json?user_id=<?= implode(",",array_keys($twitterids))?>&callback=showTwitter"></script>
+<?
+}
+
+// Include Facebook user name lookup i report contians facebook
+if (count($facebookids)) {
+?>
+<div id="fb-root"></div>
+<script type="text/javascript">
+document.observe('dom:loaded', function() {
+	window.fbAsyncInit = function() {
+		FB.init({appId: "<?= $SETTINGS['facebook']['appid'] ?>", status: true, cookie: false, xfbml: true});
+
+		fill_fb_cache(uniquefacebookids);		
+	};
+	(function() {
+		var e = document.createElement("script");
+		e.type = "text/javascript";
+		e.async = true;
+		e.src = document.location.protocol + "//connect.facebook.net/en_US/all.js";
+		document.getElementById("fb-root").appendChild(e);
+	}());
+});
+var fbcache = $H();
+var fbattemps = 3;
+var uniquefacebookids = $A(<?= json_encode(array_keys($facebookids)); ?>);
+
+function fill_fb_cache() {	
+	// Cache should be full if uniquefacebookids is empty. Then display names 
+	if (uniquefacebookids.size() <= 0) {
+		diplayfacebookinfo();
+		return;
+	}
+	var id = uniquefacebookids.last();
+	FB.api('/' + id, function(response) {
+		if (response && response.id && response.name) {
+		    fbcache.set(response.id,response.name);
+	    	uniquefacebookids = uniquefacebookids.without(response.id);
+	    	fbattemps = 3;
+		} else {
+			fbattemps--;
+			if (!fbattemps)
+	    		uniquefacebookids = uniquefacebookids.without(uniquefacebookids.last());	
+		}
+	    fill_fb_cache();
+	});
+}
+
+function diplayfacebookinfo(){
+	var fbdestinations = $H(<?= json_encode($fbdestinations); ?>);
+	if (fbdestinations.size() > 0) {
+		fbdestinations.each(function(itm) {
+			var destinations = '';
+			itm.value.each(function(id) {
+				var name = fbcache.get(id);
+				destinations += ", " + (name?name:id);
+			});
+			$(itm.key).update(destinations.sub(", ",""));
+		});
+	}
+}
+</script>
+<?
+}
 ?>
 <script type="text/javascript">
 document.observe('dom:loaded', function() {
@@ -410,9 +451,10 @@ document.observe('dom:loaded', function() {
 			stem: 'rightMiddle',
 			hook: {  target: 'leftMiddle', tip: 'rightMiddle' }
 		});
-	})
+	});
 });
 </script>
+	
 <?
 include_once("navbottom.inc.php");
 ?>
