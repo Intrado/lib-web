@@ -36,7 +36,7 @@ $formdata = array(
 );
 
 $helpsteps = array (
-	_L('TODO: help')
+	_L('<p>To be able to post to Facebook, you must connect to the appropriate Facebook account and allow the SchoolMessenger App.</p>')
 );
 
 $buttons = array(submit_button(_L('Save'),"submit","tick"));

@@ -36,7 +36,7 @@ $formdata = array(
 		"helpstep" => 1));
 
 $helpsteps = array (
-	_L('TODO: help')
+	_L('To post to Twitter, you must connect to the appropriate Twitter account and authorize the SchoolMessenger App.')
 );
 
 $buttons = array(submit_button(_L('Save'),"submit","tick"));

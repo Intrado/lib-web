@@ -662,10 +662,10 @@ if ($submittedmode || $completedmode) {
 	// readonly facebook page list
 	if ($fbpages) {
 		$formdata[] = _L('Social Media Options');
-		$helpsteps[] = _L("TODO: readonly facbook page list");
+		$helpsteps[] = _L("This section contains a list of the Facebook Pages which are associated with this job.");
 		$formdata["fbpages"] = array(
-			"label" => _L('Facbook Page(s)'),
-			"fieldhelp" => _L(''),
+			"label" => _L('Facebook Page(s)'),
+			"fieldhelp" => _L('This is a list of the Facebook Pages associated with this job.'),
 			"value" => json_encode($fbpages),
 			"validators" => array(),
 			"control" => array("ReadOnlyFacebookPage"),
@@ -794,10 +794,10 @@ if ($submittedmode || $completedmode) {
 				$fbpages[$index] = "me";
 		}
 		
-		$helpsteps[] = _L("TODO: facebook page selection");
+		$helpsteps[] = _L("<p>If you haven't connected a Facebook account, click the Connect to Facebook button. You'll be able to log into Facebook through a pop up window. Once you're connected, click the Save button.</p><p>After connecting your Facebook account, you will see a list of Facebook Pages where you are an administrator and a My Wall option which lets you post to your account's Wall. You may select any combination of options for your job.</p><p>If your system administrator has restricted users to posting only to authorized Facebook Pages, you may not see as many Pages or the option of posting to your Wall. Check with your system administrator if you are unsure of your district's social media policies. Additionally, please note that your account must also have permission within Facebook to post to authorized Pages.</p>");
 		$formdata["fbpage"] = array(
 			"label" => _L('Facebook Page(s)'),
-			"fieldhelp" => _L("Select which pages to post to."),
+			"fieldhelp" => _L("Select which Pages to post to. Please click the Guide button for more information about posting to Facebook."),
 			"value" => ($fbpages?json_encode($fbpages):""),
 			"validators" => array(
 				array("ValFacebookPageWithMessage", "authpages" => getFbAuthorizedPages(), "authwall" => getSystemSetting("fbauthorizewall"))),
@@ -813,10 +813,10 @@ if ($submittedmode || $completedmode) {
 	if (getSystemSetting("_hastwitter") && $USER->authorize("twitterpost")) {
 		// get this here so twitter failures only effect users with twitter access
 		$tw = new Twitter($USER->getSetting("tw_access_token"));
-		$helpsteps[] = _L("TODO: Twitter connection required if message group has twitter message");
+		$helpsteps[] = _L("If your message group contains a Twitter post, you must be connected to a Twitter account. If you haven't already added your Twitter account, click the Add Twitter Account button and log in through the pop up window.");
 		$formdata["twitter"] = array(
 			"label" => _L('Twitter Authorization'),
-			"fieldhelp" => _L("TODO: Twitter connection required if message group has twitter message"),
+			"fieldhelp" => _L("You must have a Twitter account if your message group contains a Twitter post."),
 			"value" => "",
 			"validators" => array(
 				array("ValTwitterAccountWithMessage")),
