@@ -11,7 +11,6 @@ host="localhost:7912"
 timeout=5500
 
 [feature]
-is_commsuite=false
 has_ssl=true
 force_ssl=false
 log_dir="/usr/commsuite/logs/"
