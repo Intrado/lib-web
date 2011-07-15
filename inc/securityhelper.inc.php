@@ -49,6 +49,36 @@ function userOwns ($type,$id) {
 	}
 }
 
+// can the user "see" this object? Used when previewing items
+// TODO: add more useful methods beyond just message and messagegroup
+function userCanSee ($type,$id) {
+	global $USER;
+	switch($type) {
+		case "message":
+			// vieable if:
+			//   it's message group matches below
+			$messagegroupid = QuickQuery("select messagegroupid from message where id=?", false, array($id));
+		case "messagegroup":
+			if (!isset($messagegroupid))
+				$messagegroupid = $id;
+			// viewable if:
+			// User owns it... obviously they can see it
+			if (userOwns("messagegroup", $messagegroupid))
+				return true;
+			// User could subscribe to it...
+			if (userCanSubscribe("messagegroup", $messagegroupid))
+				return true;
+			// This message group has been used by a job this user owns...
+			$query = "select 1
+				from  messagegroup mg
+				inner join job j on (j.messagegroupid = mg.id)
+				where mg.id = ?
+				and j.userid = ?";
+			return QuickQuery($query, false, array($messagegroupid, $USER->id));
+		default:
+			return false;
+	}
+}
 function isSubscribed ($type,$id) {
 	global $USER;
 	switch($type) {

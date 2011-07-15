@@ -40,20 +40,12 @@ require_once("obj/PreviewModal.obj.php");
 
 if (!isset($_GET['id']))
 	redirect('unauthorized.php');
-	
-$messagegroup = new MessageGroup($_GET['id'] + 0);
 
-// check publication and subscription restrictions on this message (or original if it is a copy)
-// if the user owns this message, they can preview it. Otherwise, check the original message group id
-if (!userOwns("messagegroup", $messagegroup->id) && $messagegroup->originalmessagegroupid) {
-	if(!userOwns('messagegroup',$messagegroup->originalmessagegroupid) &&
-		!userCanSubscribe("messagegroup",$messagegroup->originalmessagegroupid)) {
-		redirect('unauthorized.php');
-	}
-} else if (!userOwns('messagegroup',$messagegroup->id) && 
-		!userCanSubscribe('messagegroup', $messagegroup->id)) {
-	redirect('unauthorized.php');
-}
+// check if the user can view this message group
+if (!userCanSee("messagegroup", $_GET['id']));
+	redirect("unauthorized.php");
+
+$messagegroup = new MessageGroup($_GET['id'] + 0);
 
 PreviewModal::HandleRequestWithId();
 
