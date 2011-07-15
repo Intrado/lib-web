@@ -89,7 +89,7 @@ $formdata = array(
 	$messagegroup->name. " (". $language. ")",
 	"message" => array(
 		"label" => _L("Twitter Message"),
-		"fieldhelp" => _L("Enter your Twitter message here. Twitter messages must be 140 characters or less."),
+		"fieldhelp" => _L("Enter your Twitter message here."),
 		"value" => $text,
 		"validators" => array(
 			array("ValRequired"),
@@ -99,7 +99,7 @@ $formdata = array(
 	)
 );
 
-$helpsteps = array(_L("The message you enter here will appear on your associated Twitter account. Twitter posts must be less than 140 characters long."));
+$helpsteps = array(_L("The message you enter here will be posted to your associated Twitter account. A short link to longer Page message content will be automatically attached to your Twitter post. If you have not created a Page, space for the link is still reserved. For this reason, Twitter posts are slightly shorter than the typical 140 character limit."));
 		
 $buttons = array(submit_button(_L('Done'),"submit","tick"));
 $form = new Form("twittermessage",$formdata,$helpsteps,$buttons);
