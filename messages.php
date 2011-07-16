@@ -121,6 +121,7 @@ if($isajax === true) {
 				sum(m.type='post' and m.subtype='facebook') as facebook, 
 				sum(m.type='post' and m.subtype='twitter') as twitter,
 				sum(m.type='post' and m.subtype='page') as page,
+				sum(m.type='post' and m.subtype='voice') as pagemedia,
 				p.action as publishaction, p.id as publishid, u.login as owner, (mg.name +0) as digitsfirst
 			from messagegroup mg
 			left join message m on
@@ -157,13 +158,13 @@ if($isajax === true) {
 			$item = array_shift($mergeditems);
 			$time = date("M j, Y g:i a",strtotime($item["date"]));
 			$itemid = $item["id"];
-			$types = $item["phone"] > 0?'<img src="img/icons/telephone.gif" alt="Phone" title="Phone">':"";
-			$types .= $item["email"] > 0?' <img src="img/icons/email.gif" alt="Email" title="Email">':"";
-			$types .= $item["sms"] > 0?' <img src="img/icons/fugue/mobile_phone.gif" alt="SMS" title="SMS">':"";
-			$types .= $item["facebook"] > 0?' <img src="img/icons/custom/facebook.gif" alt="Facebook" title="Facebook">':"";
-			$types .= $item["twitter"] > 0?' <img src="img/icons/custom/twitter.gif" alt="Twitter" title="Twitter">':"";
-			$types .= $item["page"] > 0?' <img src="img/icons/layout_sidebar.gif" alt="Page" title="Page">':"";
-			
+			$types = $item["phone"] > 0?'<img src="img/icons/telephone.png" alt="Phone" title="Phone">':"";
+			$types .= $item["email"] > 0?' <img src="img/icons/email.png" alt="Email" title="Email">':"";
+			$types .= $item["sms"] > 0?' <img src="img/icons/fugue/mobile_phone.png" alt="SMS" title="SMS">':"";
+			$types .= $item["facebook"] > 0?' <img src="img/icons/custom/facebook.png" alt="Facebook" title="Facebook">':"";
+			$types .= $item["twitter"] > 0?' <img src="img/icons/custom/twitter.png" alt="Twitter" title="Twitter">':"";
+			$types .= $item["page"] > 0?' <img src="img/icons/layout_sidebar.png" alt="Page" title="Page">':"";
+			$types .= $item["pagemedia"] > 0?' <img src="img/icons/fugue/microphone.png" alt="Page Media" title="Page Media">':"";
 			$title = escapehtml($item["name"]);
 			$defaultlink = "mgeditor.php?id=$itemid";
 			$publishaction = $item['publishaction'];
