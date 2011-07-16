@@ -16,7 +16,7 @@ require_once $GLOBALS['THRIFT_ROOT'].'/packages/messagelink/MessageLink.php';
 
 list($appserverprotocol, $appservertransport) = initMessageLinkApp();
 if($appserverprotocol == null || $appservertransport == null) {
-	error_log("Can not use AppServer");
+	error_log("Cannot use AppServer");
 	exit();
 }
 $attempts = 0;

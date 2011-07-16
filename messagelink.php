@@ -39,7 +39,7 @@ $badcode = false;
 list($appserverprotocol, $appservertransport) = initMessageLinkApp();
 
 if($appserverprotocol == null || $appservertransport == null) {
-	error_log("Can not use AppServer");
+	error_log("Cannot use AppServer");
 	$appservererror = true;
 } else {
 	$attempts = 0;

@@ -385,7 +385,7 @@ function handleRequest() {
 			}
 			
 			
-			// Since it is possible to subscribe to messages we can not restrict based on $USER->authorize('sendmulti') here
+			// Since it is possible to subscribe to messages we cannot restrict based on $USER->authorize('sendmulti') here
 			// instead check if each language contains a message 
 			$customerlanguages = Language::getLanguageMap();
 			unset($customerlanguages["en"]);

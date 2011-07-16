@@ -218,7 +218,7 @@ if ($showreport || $downloadreport) {
 				case "twitter":
  					$post["twhandle"] = $row[5]; // Set id here to be able to map to twitter response
  					if (!isset($twitterids[$row[5]])) 
- 						$twitterids[$row[5]] = $row[5]; // Set id to be able to identify id if twitter can not get the screen_name
+ 						$twitterids[$row[5]] = $row[5]; // Set id to be able to identify id if twitter cannot get the screen_name
 					$post["twstatus"] = $row[7] == "1"?"Posted":"Not Posted";
 					$post["twcontent"] = $row[3];
 					// Do not modify, Just print the handle 

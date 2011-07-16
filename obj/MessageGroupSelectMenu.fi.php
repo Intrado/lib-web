@@ -59,7 +59,7 @@ class ValMessageTranslationExpiration extends Validator {
 			if(strtotime("today") - strtotime($modifydate) > (7*86400))
 				return _L('The selected message contains auto-translated content older than 7 days. Regenerate translations to schedule a start date');
 			if(strtotime($requiredvalues['date']) - strtotime($modifydate) > (7*86400))
-				return _L("Can not schedule the job with a message containing auto-translated content older than 7 days from the Start Date");
+				return _L("Cannot schedule the job with a message containing auto-translated content older than 7 days from the Start Date");
 		}
 		return true;
 	}

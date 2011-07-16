@@ -208,7 +208,7 @@ if (isset($_GET['parentfield'])) {
 	<script language="JavaScript" type="text/javascript">
 				function unloadsession(){
 					if(sessiondata == true){
-						window.location = 'previewmessage.php?unloadsession=true'; // sends a request to unload session. can not use ajax during unload
+						window.location = 'previewmessage.php?unloadsession=true'; // sends a request to unload session. cannot use ajax during unload
 					}
 					sessiondata = true;
 				}
@@ -216,7 +216,7 @@ if (isset($_GET['parentfield'])) {
 				var gender = "<?=$gender ?>";
 				var language = "<?=$language ?>";					
 				var parentfield = '<?= $parentfield?>';
-				var textobj = null; // Can not get prototype element accross window opener 
+				var textobj = null; // Cannot get prototype element accross window opener 
 				if (window.opener.document.getElementById) {
 					textobj = window.opener.document.getElementById(parentfield);
 				} else if (window.opener.document.all) {

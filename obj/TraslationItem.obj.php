@@ -524,7 +524,7 @@ class ValTranslation extends Validator {
 		if (!isset($value["enabled"]))
 			return _L('Validation error. Please check or uncheck ') . $this->label;
 		if($value["enabled"] == true && (!isset($value["text"]) || trim($value["text"] == ""))) {
-			return $this->label . " " . _L('message can not be empty if translation checkbox is checked');
+			return $this->label . " " . _L('message cannot be empty if translation checkbox is checked');
 		}else
 			return true;
 
@@ -533,10 +533,10 @@ class ValTranslation extends Validator {
 		return
 			'function (name, label, value, args) {
 				if (value.strip() == "")
-					return label + " " + "' . _L('message can not be empty if translation checkbox is checked') . '";
+					return label + " " + "' . _L('message cannot be empty if translation checkbox is checked') . '";
 				checkval = value.evalJSON();
 				if (checkval.enabled == true && (checkval.text == undefined || checkval.text.strip() == ""))
-					return label + " " + "' . _L('message can not be empty if translation checkbox is checked') . '";
+					return label + " " + "' . _L('message cannot be empty if translation checkbox is checked') . '";
 				return true;
 			}';
 	}

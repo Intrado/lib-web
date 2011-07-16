@@ -84,7 +84,7 @@ function initCommsuiteApp() {
 function messageViewForJobPerson($messageid, $jobid, $personid) {
 	list($appserverCommsuiteProtocol,$appserverCommsuiteTransport) = initCommsuiteApp();
 	if ($appserverCommsuiteProtocol == null || $appserverCommsuiteTransport == null) {
-		error_log("Can not use AppServer");
+		error_log("Cannot use AppServer");
 		return null;
 	}
 	$attempts = 0;
@@ -127,7 +127,7 @@ function messageViewForJobPerson($messageid, $jobid, $personid) {
 function messagePreviewForPriority($messageid, $jobpriority) {
 	list($appserverCommsuiteProtocol,$appserverCommsuiteTransport) = initCommsuiteApp();
 	if ($appserverCommsuiteProtocol == null || $appserverCommsuiteTransport == null) {
-		error_log("Can not use AppServer");
+		error_log("Cannot use AppServer");
 		return null;
 	}
 	$attempts = 0;
@@ -163,7 +163,7 @@ function emailMessageViewForMessageParts($message,$parts,$jobpriority) {
 	list($appserverCommsuiteProtocol,$appserverCommsuiteTransport) = initCommsuiteApp();
 	
 	if ($appserverCommsuiteProtocol == null || $appserverCommsuiteTransport == null) {
-		error_log("Can not use AppServer");
+		error_log("Cannot use AppServer");
 		return null;
 	} 
 	
@@ -232,7 +232,7 @@ function ttsGetForTextLanguageGenderFormat($text, $language, $gender, $format) {
 	list($appserverCommsuiteProtocol,$appserverCommsuiteTransport) = initCommsuiteApp();
 	
 	if ($appserverCommsuiteProtocol == null || $appserverCommsuiteTransport == null) {
-		error_log("Can not use AppServer");
+		error_log("Cannot use AppServer");
 		return null;
 	} 
 		
@@ -269,7 +269,7 @@ function audioFileGetForFormat($contentid, $format) {
 	list($appserverCommsuiteProtocol,$appserverCommsuiteTransport) = initCommsuiteApp();
 	
 	if ($appserverCommsuiteProtocol == null || $appserverCommsuiteTransport == null) {
-		error_log("Can not use AppServer");
+		error_log("Cannot use AppServer");
 		return null;
 	} 
 		
@@ -309,7 +309,7 @@ function phoneMessageGetMp3AudioFile($parts) {
 	list($appserverCommsuiteProtocol,$appserverCommsuiteTransport) = initCommsuiteApp();
 	
 	if ($appserverCommsuiteProtocol == null || $appserverCommsuiteTransport == null) {
-		error_log("Can not use AppServer");
+		error_log("Cannot use AppServer");
 		return null;
 	} 
 	
