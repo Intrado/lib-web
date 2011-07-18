@@ -42,7 +42,7 @@ if (!isset($_GET['id']))
 	redirect('unauthorized.php');
 
 // check if the user can view this message group
-if (!userCanSee("messagegroup", $_GET['id']));
+if (!userCanSee("messagegroup", $_GET['id']))
 	redirect("unauthorized.php");
 
 $messagegroup = new MessageGroup($_GET['id'] + 0);
