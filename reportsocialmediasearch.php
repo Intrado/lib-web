@@ -358,24 +358,27 @@ buttons();
 // Include Twitter user name lookup i report contians twitter
 if (count($twitterids)) {
 ?>
-<script type="text/javascript">
-var twcache = $H();
-function showTwitter(response) {
-    var names = '';
-    response.each(function(itm) {
-    	twcache.set(itm.id,itm.screen_name);
-    });
-    var twdestinations = $H(<?= json_encode($twdestinations); ?>);
-	if (twdestinations.size() > 0) {
-		twdestinations.each(function(itm) {
-			var name = twcache.get(itm.value);
-			$(itm.key).update(name?name:itm.value);
-		});
+	<script type="text/javascript">
+	var twcache = $H();
+	function showTwitter(response) {
+	    var names = '';
+	    response.each(function(itm) {
+	    	twcache.set(itm.id,itm.screen_name);
+	    });
+	    var twdestinations = $H(<?= json_encode($twdestinations); ?>);
+		if (twdestinations.size() > 0) {
+			twdestinations.each(function(itm) {
+				var name = twcache.get(itm.value);
+				$(itm.key).update(name?name:itm.value);
+			});
+		}
 	}
-}
-</script>
-<script type="text/javascript" src="https://api.twitter.com/1/users/lookup.json?user_id=<?= implode(",",array_keys($twitterids))?>&callback=showTwitter"></script>
-<?
+	</script>
+	<? 
+	$twitteridchunks = array_chunk(array_keys($twitterids), 100);
+	foreach($twitteridchunks as $twidchunk) {
+		echo '<script type="text/javascript" src="https://api.twitter.com/1/users/lookup.json?user_id=' . implode(",",$twidchunk) . '&callback=showTwitter"></script>';
+	}
 }
 
 // Include Facebook user name lookup i report contians facebook
