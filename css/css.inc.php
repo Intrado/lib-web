@@ -317,6 +317,11 @@ a:hover {
 }
 
 .windowtable {
+	width: 100%;
+	border-collapse: collapse;
+}
+.windowtable td{
+	padding : 0;
 }
 
 /* **** button **** */

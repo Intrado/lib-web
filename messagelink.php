@@ -114,8 +114,13 @@ if ($appservererror || $badcode) {
 			background: #<?=$theme2 ?>;
 			margin-bottom: 3px;
 		}
-		.swooshbg {
-			background: <?=fadecolor($theme2, "FFFFFF", $globalratio/2)?>
+		.navlogoarea {
+			background: <?=fadecolor($theme2, "FFFFFF", $globalratio/2)?>;
+			width: 100%;
+			border-collapse: collapse;
+		}
+		.navlogoarea td{
+			padding : 0;
 		}
 		.menucollapse {
 			float: right;
@@ -135,23 +140,22 @@ if ($appservererror || $badcode) {
 			padding-top: 2px;
 			color: #<?=$primary?>;
 		}
+		.windowtable {
+			width: 100%;
+			border-collapse: collapse;
+		}
+		.windowtable td{
+			padding : 0;
+		}
 	</style>
 	<title><?=$TITLE?></title>
 </head>
 <body style='padding: 0; margin: 0px;font-family: "Lucida Grande", verdana, arial, helvetica, sans-serif;'>
-	<table border=0 cellspacing=0 cellpadding=0 width="100%">
+	<table class="navlogoarea">
 		<tr>
-			<td>
-				<div style="padding-left:10px;">
-					<img src="messagelinklogo.img.php?code=<?=escapehtml($code)?>" alt="" />
-				</div>
-			</td>
-			<td>
-				<div class="swooshbg">
-					<img src="img/shwoosh.gif" alt="" />
-				</div>
-			</td>
-			<td width="100%" class="swooshbg"></td>
+			<td bgcolor="white"><div style="padding-left:10px;"><img src="messagelinklogo.img.php?code=<?=escapehtml($code)?>" alt=""/></div></td>
+			<td><img src="img/shwoosh.gif" alt=""/></td>
+			<td width="100%"></td>
 		</tr>
 	</table>
 	<div class="navband1"><img src="img/pixel.gif" alt="" /></div>
