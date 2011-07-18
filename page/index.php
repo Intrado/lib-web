@@ -70,7 +70,7 @@ header('Content-type: text/html; charset=UTF-8') ;
 			background: #<?=$theme2 ?>;
 			margin-bottom: 3px;
 		}
-		.swooshbg {
+		.navlogoarea {
 			background: <?=fadecolor($theme2, "FFFFFF", $globalratio/2)?>
 		}
 		body {
@@ -108,19 +108,15 @@ header('Content-type: text/html; charset=UTF-8') ;
 	<script type="text/javascript" src="page.js"></script>
 </head>
 <body>
-	<table border="0" cellspacing="0" cellpadding="0" width="100%">
+	<table class="navlogoarea" border="0" cellspacing="0" cellpadding="0" width="100%">
 		<tr>
 			<td bgcolor="white">
 				<div style="padding-left:10px;">
 					<img src="content.php?code=<?= escapehtml($CODE) ?>&id=<?= $messageinfo->logocontentid ?>" alt=""/>
 				</div>
 			</td>
-			<td>
-				<div class="swooshbg">
-					<img src="img/shwoosh.gif" alt=""/>
-				</div>
-			</td>
-			<td width="100%" class="swooshbg"></td>
+			<td><img src="img/shwoosh.gif" alt=""/></td>
+			<td width="100%"></td>
 		</tr>
 	</table>
 	<div class="navband1"><img src="img/pixel.gif" alt=""/></div>
