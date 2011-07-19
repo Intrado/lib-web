@@ -3,17 +3,21 @@
 <style>
 
 img {
+	text-align: center;
 	border: 0px;
 	margin: 3px;
 }
 
-span {
+.entry {
 	float: left;
 	position: relative;
-	display: block;
+	margin-right: 0.1%;
+}
+
+.entry .name {
 	font-size: 6pt;
-	width: 22px;
-	overflow: auto;
+	overflow: hidden;
+	display: none;
 }
 
 .clear {
@@ -27,9 +31,34 @@ h1 {
 }
 
 </style>
+
+<script>
+
+function setNamesVisibility(visible) {
+	if(document.styleSheets) {
+		var sheet = document.styleSheets[0];
+		if (sheet) {
+			var ssRules = sheet.cssRules || sheet.rules;
+			if (ssRules) {
+				var result = null;
+				for (var c = 0; c < ssRules.length;c++) {
+					if(ssRules[c].selectorText == ".entry .name") {
+						ssRules[c].style.display = visible ? "block" : "none";
+					}
+					if(ssRules[c].selectorText == ".entry") {
+						ssRules[c].style.width = visible ? "4.85%" : "auto";
+					}
+				}
+			}
+		}
+	}
+}
+
+</script>
 </head>
 <body>
 
+show names:<input type="checkbox" onclick="setNamesVisibility(this.checked);" /><br>
 
 background color:
 <select onchange="body.style.backgroundColor=this.value;">
@@ -52,6 +81,7 @@ $folders = array(
 	"icons/diagona/16",
 	"icons/diagona/10",
 	".",
+	"themes/classroom",
 	"themes/3dblue",
 	"themes/cherrybubblegum",
 	"themes/chrome",
@@ -115,7 +145,7 @@ foreach ($folders as $folder) {
 	$count = 0;
 	foreach ($icons as $entry) {
 		
-		echo '<img Title="'.$entry.'" src="'.$folder.DIRECTORY_SEPARATOR.$entry.'">'; //<span>'.$entry.'</span>
+		echo '<div class="entry"><img Title="'.$entry.'" src="'.$folder.DIRECTORY_SEPARATOR.$entry.'"><div class="name">'.$entry.'</div></div>';
 		
 		if (++$count % 20 == 0)
 			echo '<div class="clear"></div>';
