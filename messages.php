@@ -164,7 +164,7 @@ if($isajax === true) {
 			$types .= $item["facebook"] > 0?' <img src="img/icons/custom/facebook.png" alt="Facebook" title="Facebook">':"";
 			$types .= $item["twitter"] > 0?' <img src="img/icons/custom/twitter.png" alt="Twitter" title="Twitter">':"";
 			$types .= $item["page"] > 0?' <img src="img/icons/layout_sidebar.png" alt="Page" title="Page">':"";
-			$types .= $item["pagemedia"] > 0?' <img src="img/icons/fugue/microphone.png" alt="Page Media" title="Page Media">':"";
+			$types .= $item["pagemedia"] > 0?' <img src="img/nifty_play.png" alt="Page Media" title="Page Media">':"";
 			$title = escapehtml($item["name"]);
 			$defaultlink = "mgeditor.php?id=$itemid";
 			$publishaction = $item['publishaction'];
