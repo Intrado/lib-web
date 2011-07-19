@@ -69,7 +69,8 @@ if($isajax === true) {
 					sum(m.type='phone') as phone,sum(m.type='email') as email,sum(m.type='sms') as sms,
 					sum(m.type='post' and m.subtype='facebook') as facebook, 
 					sum(m.type='post' and m.subtype='twitter') as twitter,
-					sum(m.type='post' and m.subtype='page') as page
+					sum(m.type='post' and m.subtype='page') as page,
+					sum(m.type='post' and m.subtype='voice') as pagemedia
 				from messagegroup mg
 					left join message m on
 						(m.messagegroupid = mg.id)
@@ -206,7 +207,8 @@ if($isajax === true) {
 					sum(m.type='phone') as phone, sum(m.type='email') as email, sum(m.type='sms') as sms,
 					sum(m.type='post' and m.subtype='facebook') as facebook, 
 					sum(m.type='post' and m.subtype='twitter') as twitter,
-					sum(m.type='post' and m.subtype='page') as page
+					sum(m.type='post' and m.subtype='page') as page,
+					sum(m.type='post' and m.subtype='voice') as pagemedia
 				from messagegroup mg
 					left join message m on
 						(m.messagegroupid = mg.id)
@@ -498,8 +500,9 @@ function activityfeed($mergeditems,$ajax = false) {
 					$types .= $item["sms"] > 0?' <img src="img/icons/fugue/mobile_phone.gif" alt="SMS" title="SMS">':"";
 					$types .= $item["facebook"] > 0?' <img src="img/icons/custom/facebook.gif" alt="Facebook" title="Facebook">':"";
 					$types .= $item["twitter"] > 0?' <img src="img/icons/custom/twitter.gif" alt="Twitter" title="Twitter">':"";
-					$types .= $item["facebook"] > 0?' <img src="img/icons/layout_sidebar.gif" alt="Page" title="Page">':"";
-
+					$types .= $item["page"] > 0?' <img src="img/icons/layout_sidebar.gif" alt="Page" title="Page">':"";
+					$types .= $item["pagemedia"] > 0?' <img src="img/nifty_play.png" alt="Page Media" title="Page Media">':"";
+					
 					$title = _L('Message %1$s - ',escapehtml($title)) . ($types==""?_L("Empty Message"):$types);
 
 					$defaultlink = "mgeditor.php?id=$itemid";
