@@ -40,7 +40,6 @@ if (CheckFormSubmit($f,$s)) {
 		//HACK work around workaround for sticky checkboxes
 		//checkbox values get reset in NewFormItem, which happens to late for us to use the value
 		PutFormData($f, $s, "savecsv",false,"bool", 0, 1);
-		PutFormData($f, $s, "enabledcustomersonly",false,"bool", 0, 1);
 		
 		MergeSectionFormData($f, $s);
 		//do check
@@ -50,7 +49,7 @@ if (CheckFormSubmit($f,$s)) {
 			
 			
 			$savecsv = GetFormData($f, $s, "savecsv");
-			$enabledonly = GetFormData($f, $s, "enabledcustomersonly");
+			$enabledmode = GetFormData($f, $s, "customerenabledmode");
 			
 			if ($savecsv) {
 				// Begin output to csv
@@ -65,8 +64,11 @@ if (CheckFormSubmit($f,$s)) {
 			$limit = "";
 			$args = array();
 			// if only enabled customers requested
-			if ($enabledonly)
+			if ($enabledmode == "enabled")
 				$limit .= " and c.enabled";
+			else if ($enabledmode == "disabled")
+				$limit .= " and not c.enabled";
+			//don't add anything if $enabledmode == "all"
 			
 			if ($cid) {
 				$limit .= " and c.id = ?";
@@ -192,7 +194,9 @@ if( $reloadform ) {
 	}
 	
 	PutFormData($f, $s, "savecsv",false,"bool", 0, 1);
-	PutFormData($f, $s, "enabledcustomersonly",false,"bool", 0, 1);
+	
+	PutFormData($f, $s, "customerenabledmode","enabled","array", array("all","disabled","enabled"));
+	
 	
 }
 include_once("nav.inc.php");
@@ -231,8 +235,8 @@ if ($cid) {
 	if (!$cid) {
 ?>
 	<tr <?= $counter++ % 2 == 1 ? 'class="listAlt"' : ''?>>
-		<th class="listHeader" align="left">Enabled&nbsp;Customers&nbsp;Only</th>
-		<td><? NewFormItem($f, $s, "enabledcustomersonly", "checkbox");?></td>
+		<th class="listHeader" align="left">Enabled&nbsp;Customers&nbsp;Search&nbsp;Mode</th>
+		<td><? NewFormSelect($f, $s, "customerenabledmode", array("all" => "All","disabled" => "Disabled","enabled" => "Enabled"));?></td>
 	</tr>
 <?	}?>
 	<tr <?= $counter++ % 2 == 1 ? 'class="listAlt"' : ''?>>
