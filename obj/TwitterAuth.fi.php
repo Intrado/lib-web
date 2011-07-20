@@ -75,15 +75,11 @@ class TwitterAuth extends FormItem {
 					},
 					onSuccess: function(r) {
 						var data = r.responseJSON;
-						
-						// TODO: image url is http not https, need to convert it
-						// NOTE: https profile image is NOT currently supported by twitter
-						
 						if (data) {
 							var e = new Element("div").insert(
 									new Element("div").setStyle({ float: "left" }).insert(
 										new Element("img", { 
-											src: data.profile_image_url,
+											src: data.profile_image_url_https,
 											width: "48",
 											height: "48" })
 									)
