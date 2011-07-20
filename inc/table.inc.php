@@ -154,7 +154,7 @@ function startWindow($title, $style = "", $minimize = false, $usestate = true) {
 
 ?>
 <div class="window">
-<table class="windowtable">
+<table class="windowtable" width="100%" border="0" cellpadding="0" cellspacing="0">
 	<tr>
 		<td><img src="img/themes/<?=$theme?>/win_tl.gif" alt="" class="noprint" /></td>
 		<td background="img/themes/<?=$theme?>/win_t.gif" width="100%">

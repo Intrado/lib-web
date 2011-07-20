@@ -72,11 +72,6 @@ header('Content-type: text/html; charset=UTF-8') ;
 		}
 		.navlogoarea {
 			background: <?=fadecolor($theme2, "FFFFFF", $globalratio/2)?>;
-			width: 100%;
-			border-collapse: collapse;
-		}
-		.navlogoarea td{
-			padding : 0;
 		}
 		body {
 			padding: 0; margin: 0px;font-family: "Lucida Grande", verdana, arial, helvetica, sans-serif;
@@ -114,7 +109,7 @@ header('Content-type: text/html; charset=UTF-8') ;
 </head>
 <body>
 
-	<table class="navlogoarea">
+	<table class="navlogoarea" border="0" cellspacing="0" cellpadding="0" width="100%">
 		<tr>
 			<td bgcolor="white"><div style="padding-left:10px;"><img src="content.php?code=<?= escapehtml($CODE) ?>&id=<?= $messageinfo->logocontentid ?>" alt=""/></div></td>
 			<td><img src="img/shwoosh.gif" alt=""/></td>
