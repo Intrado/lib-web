@@ -13,17 +13,38 @@ if (navigator.appName !="Netscape")
 <style type="text/css">
 <!--
 img_whs1 { border:none; width:20px; height:20px; float:none; border-style:none; }
-p.whs2 { font-style:normal; font-weight:bold; }
+p.whs2 { font-style:normal; font-weight:bold; font-size:12pt; }
 p.whs3 { font-style:normal; }
 p.whs4 { font-style:italic; }
 img_whs5 { border:none; width:331px; height:120px; float:none; border-style:none; }
-p.whs6 { font-weight:bold; }
-p.whs7 { font-weight:normal; }
-img_whs8 { border:none; width:400px; height:301px; float:none; }
-img_whs9 { border:none; width:400px; height:219px; float:none; border-style:none; }
-div.whs10 { width:100%; }
+p.whs6 { font-style:normal; font-weight:bold; }
+p.whs7 { font-style:normal; font-weight:normal; }
+ol.whs8 { list-style:decimal; }
+p.whs9 { font-style:italic; margin-left:40px; }
+p.whs10 { font-weight:bold; font-size:12pt; }
+p.whs11 { font-weight:normal; }
+div.whs12 { width:100%; }
 -->
-</style><script type="text/javascript" language="JavaScript" title="WebHelpInlineScript">
+</style><script type="text/javascript" language="JavaScript">
+<!--
+function ehlp_showtip(current,e,text)
+{
+  if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == 'Netscape'))
+  {
+    document.tooltip.document.write("<layer bgColor='yellow' style='border:1px solid black;font-size:12px;'>"+ text + "</layer>");
+    document.tooltip.document.close();
+    document.tooltip.left=e.pageX+5;
+    document.tooltip.top=e.pageY+5;
+    document.tooltip.visibility="show";
+  }
+}
+function ehlp_hidetip()
+{
+  document.tooltip.visibility="hidden";
+}
+//-->
+</script>
+<script type="text/javascript" language="JavaScript" title="WebHelpInlineScript">
 <!--
 function reDo() {
   if (innerWidth != origWidth || innerHeight != origHeight)
@@ -54,7 +75,7 @@ if (window.gbWhTopic)
 {
 	if (window.addTocInfo)
 	{
-	addTocInfo("Social Media\nTwitter");
+	addTocInfo("Social Media\nTwitter\nTwitter");
 addButton("show",BTN_TEXT,"Show","","","","",0,0,"","","");
 
 	}
@@ -68,7 +89,7 @@ addButton("show",BTN_TEXT,"Show","","","","",0,0,"","","");
 	{
 	document.write("<p style=\"text-align:right\"> ");
 AddMasterBreadcrumbs("../CommSuite_User_Guide.htm", "", ">", "Home", "../Getting_Started/Welcome.htm");
-document.write("<a href=\"Facebook.htm\">Social Media</a> > Twitter</p>");
+document.write("<a href=\"Managing_Pages.htm\">Social Media</a> > <a href=\"Twitter.htm\">Twitter</a> > Twitter</p>");
 
 	}
 
@@ -93,8 +114,8 @@ else
  feature. Social Media is a new feature from SchoolMessenger that allows 
  you to leverage the power of social media to deliver your message. For 
  more information regarding the Social Media feature, please call 1-800-920-3897.</I></span></p>
-<p class="whs2">Connecting a Twitter 
- Account</p>
+<p class="whs2">Connecting 
+ a Twitter Account</p>
 <p class="whs3">You will need to allow the SchoolMessenger 
  Twitter app to have access to your account before you can post. You can 
  do this from the Account link at the top of any page. You may also access 
@@ -115,35 +136,79 @@ else
  account, please log out before you click &quot;Connect to Twitter&quot;. 
  If you've already connected to the account and it is incorrect, please 
  read the section on &quot;Changing Twitter Accounts&quot;.</I></span></p>
-<p class="whs6">Posting to Twitter</p>
-<p class="whs7">To access the social media posting options 
- in MessageSender, simply check the Twitter option at the bottom of the 
- Job Type step, shown in the following image.</p>
-<p class="whs7"><img src="../MessageSenderJobTypewithSOC.gif" alt="Job Type with Social Media options checked." x-maintain-ratio="TRUE" width="400px" height="301px" border="0" class="img_whs8"></p>
-<p class="whs7">Once your Twitter account has been authorized, 
- posting is very simple. Just enter your Twitter message in the Social 
- Media step in MessageSender. The image below shows a message being created 
- for Facebook and Twitter. </p>
-<p class="whs2"><span style="font-style: normal; font-weight: bold;"><B><img src="../MessageSenderSocialMedia.gif" alt="Posting social media messages." x-maintain-ratio="TRUE" width="400px" height="219px" border="0" class="img_whs9"></B></span></p>
-<p class="whs6">Removing a Twitter Account</p>
-<p class="whs7">To remove a Twitter account, go to the 
+<p class="whs2"><span 
+ style="font-style: normal; font-weight: bold; font-size: 12pt;"><font size=3 style="font-size:12pt;"><B>Posting 
+ to Twitter</B></font></span></p>
+<p class="whs6">The Quick and Simple 
+ Post</p>
+<p class="whs7">Posting to Facebook 
+ can be as simple as any other step in MessageSender. Just click the blue 
+ EasyStart button, choose how you'd like to create your messages, just 
+ as before. Then prior to sending your job, you'll find new steps for Facebook 
+ and Twitter. Entering text for posting on these sites is exactly like 
+ writing your own SMS message. </p>
+<p class="whs6">Advanced Posting</p>
+<p class="whs7">Alternatively, if you 
+ would like to use the Message Editor to create your social media posts, 
+ you may use more advanced features, such as the Page message type with 
+ embedded Page Media.</p>
+<ol type="1" class="whs8">
+	<li style=" font-style: normal; font-weight: normal; " class=p><p class="whs7">Navigate 
+ to the Message Builder by clicking the Notifications tab followed by the 
+ Messages subtab.</p></li>
+	<li style=" font-style: normal; font-weight: normal; " class=p><p class="whs7">Click 
+ &quot;Create a Message&quot; to create a new Message Group.</p></li>
+	<li style=" font-style: normal; font-weight: normal; " class=p><p class="whs7">Enter 
+ a name for your Message Group and click &quot;Next&quot;.</p></li>
+	<li style=" font-style: normal; font-weight: normal; " class=p><p class="whs7">You 
+ will be taken to the Message Editor where you will see a grid of Message 
+ Content types. The green plus icon next to each of the column headings 
+ will take you to a wizard for creating content of that type. Click the 
+ &quot;Guide&quot; button from within any of the wizards for instructions 
+ for creating content for that content type. This help topic will focus 
+ solely on posting to Twitter.</p></li>
+	<li style=" font-style: normal; font-weight: normal; " class=p><p class="whs7">Click 
+ the green plus icon next to Twitter to create a new Twitter post. If you 
+ know you will be creating <a title="Click here to learn more about creating Pages." href="Creating_Pages.htm" onmouseover="if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == 'Netscape')) ehlp_showtip(this,event,'Click here to learn more about creating Pages.');" onmouseout="if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == 'Netscape')) ehlp_hidetip();">Page message content</a>, you may want to discuss 
+ what will be found at the link attached to your Twitter post. Pages allow 
+ you to create a web page with a lot more information than will fit in 
+ a simple Twitter post, including audio and file downloads.</p></li>
+</ol>
+<p class="whs9"><span style="font-weight: bold;"><B>Note:</B></span> 
+ A short link to longer Page message content will be automatically attached 
+ to your Twitter post when you create a Page. If you have not created a 
+ Page, space for the link is still reserved. For this reason, Twitter posts 
+ are slightly shorter than the typical 140 character limit.</p>
+<ol type="1" class="whs8">
+	<li style=" font-style: normal; font-weight: normal; " class=p><p class="whs7">Click 
+ &quot;Done&quot; once you've finished your Twitter post. It will be saved 
+ to your message group to be used any time you create a job using a saved 
+ message.</p></li>
+</ol>
+<p class="whs10">Removing a Twitter Account</p>
+<p class="whs11">To remove a Twitter account, go to the 
  Account link in the upper right corner. Click on the &quot;Disconnect 
  from Twitter&quot; button. This disconnects the system from your account. 
  To completely deauthorize our application, you will need to log into your 
  Twitter account and remove the application from your Settings page on 
  Twitter's web site.</p>
-<p class="whs6">Changing Twitter Accounts</p>
+<p class="whs10">Changing Twitter Accounts</p>
 <p>If you would like to change which Twitter account you will post to, 
  simply follow the instructions to remove a Twitter account. After the 
  account is removed, you will see the &quot;Connect to Twitter&quot; button 
  again. Make sure you are logged out of the Twitter account, then click 
  the &quot;Connect to Twitter&quot; button. Just log into the correct account 
  and grant permission to post.</p>
-<div placeholder id="footer" class="whs10">
+<div placeholder id="footer" class="whs12">
  <p>&nbsp;<span style="font-size: xx-small;"><font size=1 style="font-size: xx-small;">©1999-2011 
  Reliance Communications, Inc.</font></span> </p>
 </div>
-<script type="text/javascript" language="javascript1.2">
+<script type="text/javascript" language="JavaScript">
+<!--
+ if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == 'Netscape'))
+  document.write("<div id='tooltip' class='WebHelpPopupMenu'></div>");
+//-->
+</script><script type="text/javascript" language="javascript1.2">
 <!--
 highlightSearch();
 if (window.writeIntopicBar)
@@ -152,7 +217,7 @@ if(0)
 {
 document.write("<p style=\"text-align:right\"> ");
 AddMasterBreadcrumbs("../CommSuite_User_Guide.htm", "", ">", "Home", "../Getting_Started/Welcome.htm");
-document.write("<a href=\"Facebook.htm\">Social Media</a> > Twitter</p>");
+document.write("<a href=\"Managing_Pages.htm\">Social Media</a> > <a href=\"Twitter.htm\">Twitter</a> > Twitter</p>");
 
 }
 //-->

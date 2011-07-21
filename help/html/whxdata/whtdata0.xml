@@ -31,6 +31,7 @@
   <item name="Phone Logs" url="Reports/Understanding_Call_Logs.htm" />
   <item name="Email Logs" url="Reports/Email_Logs.htm" />
   <item name="SMS Logs" url="Reports/SMS_Logs.htm" />
+  <item name="Social Media Logs" url="Reports/Social_Media_Logs.htm" />
   <item name="Contact History Report" url="Reports/Contact_History_Report.htm" />
   <item name="Survey Reports" url="Reports/Survey_Job_Reports.htm" />
   <item name="Saving and Scheduling Reports" url="Reports/Saving_and_Scheduling_Reports.htm" />
@@ -43,8 +44,16 @@
   <item name="Viewing and Editing Contact Details" url="Systemwide_Reports_and_Contacts/Viewing_and_Editing_Contact_Details.htm" />
 </book>
 <book name="Social Media" >
-  <item name="Facebook" url="Social_Media/Facebook.htm" />
-  <item name="Twitter" url="Social_Media/Twitter.htm" />
+  <book name="Facebook" >
+    <item name="Managing Pages" url="Social_Media/Managing_Pages.htm" />
+    <item name="Facebook" url="Social_Media/Facebook.htm" />
+  </book>
+  <book name="Twitter" >
+    <item name="Twitter" url="Social_Media/Twitter.htm" />
+  </book>
+  <book name="Pages" >
+    <item name="Creating Pages" url="Social_Media/Creating_Pages.htm" />
+  </book>
 </book>
 <book name="SMS Messaging" >
   <item name="Before Sending SMS Messages" url="SMS_Messaging/Before_You_Send_an_SMS.htm" />
