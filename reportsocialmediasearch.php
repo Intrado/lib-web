@@ -252,20 +252,28 @@ $fbdestinations = array();
 function fmt_fbdestination($row,$index) {
 	global $fbdestinations;
 	$destinations = $row[$index];
-	// Store facebook destination ids for javascript handling 
-	$id = "fbd_" . count($fbdestinations);
-	$fbdestinations[$id] = $destinations;
-	return "<div id=\"{$id}\"><img src=\"img/ajax-loader.gif\" alt=\"\"> Loading Facebook Destinations</div>";
+	if ($destinations) {
+		// Store facebook destination ids for javascript handling 
+		$id = "fbd_" . count($fbdestinations);
+		$fbdestinations[$id] = $destinations;
+		return "<div id=\"{$id}\"><img src=\"img/ajax-loader.gif\" alt=\"\"> Loading Facebook Destinations</div>";
+	} else {
+		return "";
+	}
 }
 
 $twdestinations = array();
 function fmt_twdestination($row,$index) {
 	global $twdestinations;
-	$destinations = $row[$index];
-	// Store facebook destination ids for javascript handling
-	$id = "twd_" . count($twdestinations);
-	$twdestinations[$id] = $destinations;
-	return "<div id=\"{$id}\"><img src=\"img/ajax-loader.gif\" alt=\"\"> Loading Twitter User</div>";
+	$destination = $row[$index];
+	if ($destination) {
+		// Store twitter destination ids for javascript handling
+		$id = "twd_" . count($twdestinations);
+		$twdestinations[$id] = $destination;
+		return "<div id=\"{$id}\"><img src=\"img/ajax-loader.gif\" alt=\"\"> Loading Twitter User</div>";
+	} else {
+		return "";
+	}
 }
 
 ////////////////////////////////////////////////////////////////////////////////
