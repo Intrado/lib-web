@@ -244,8 +244,14 @@ class PreviewModal {
 			if (!$this->hasfieldinserts) {
 				$previewparts = array();
 				foreach ($this->parts as $part) {
-					
 					$previewpart = array("type" => $part->type,"txt" => $part->txt,"audiofileid" => $part->audiofileid, "voiceid" => $part->voiceid);
+					//Date field is not working with modal replace date with todays date
+					if ($part->type == 'V' &&  $type == 'phone') {
+						if (isset($fields[$part->fieldnum]) && $fields[$part->fieldnum]->isOptionEnabled("reldate")) {
+							$previewpart["type"] = "T";
+							$previewpart["txt"] = date("m/d/Y", strtotime("now"));
+						}
+					}
 					$previewparts[] = $previewpart;
 				}
 				$_SESSION["previewmessage"] = array("uid" => $this->uid, "parts" => $previewparts);
