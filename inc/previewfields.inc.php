@@ -40,7 +40,7 @@ function getpreviewformdata($fields,$fielddata,$fielddefaults,$msgType) {
  			} else if ($fieldmap->isOptionEnabled("reldate")) {
 				$formdata[$field] = array (
 					"label" => $fieldmap->name,
-					"value" => $fielddefaults[$field]?$fielddefaults[$field]:date("m/d/Y", strtotime("now")),
+					"value" => $fielddefaults[$field]?$fielddefaults[$field]:date("m/d/Y",time()),
 					"validators" => array(),
 					"control" => array("TextDate", "size"=>12),
 					"helpstep" => 1
