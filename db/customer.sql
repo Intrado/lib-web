@@ -1571,3 +1571,21 @@ $$$
 update setting set value='8.0/4' where name='_dbversion'
 $$$
 -- END REV 8.0/4
+
+-- $rev 5
+
+-- fix password to allow NULL
+ALTER TABLE `subscriber` CHANGE `password` `password` VARCHAR( 50 ) CHARACTER SET utf8 COLLATE utf8_general_ci NULL,
+CHANGE `salt` `salt` VARCHAR( 29 ) CHARACTER SET utf8 COLLATE utf8_bin NULL,
+CHANGE `passwordversion` `passwordversion` TINYINT( 4 ) NOT NULL DEFAULT '0'
+$$$
+
+-- fix password to allow NULL
+ALTER TABLE `user` CHANGE `password` `password` VARCHAR( 50 ) CHARACTER SET utf8 COLLATE utf8_general_ci NULL,
+CHANGE `salt` `salt` VARCHAR( 29 ) CHARACTER SET utf8 COLLATE utf8_bin NULL,
+CHANGE `passwordversion` `passwordversion` TINYINT( 4 ) NOT NULL DEFAULT '0',
+CHANGE `pincode` `pincode` VARCHAR( 50 ) CHARACTER SET utf8 COLLATE utf8_general_ci NULL
+$$$
+
+-- END REV 8.0/5
+

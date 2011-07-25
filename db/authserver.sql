@@ -367,7 +367,9 @@ update portaluser set passwordversion = 1 where length(password) > 16 ;
 ALTER TABLE `aspadminquery` ADD `options` TEXT NOT NULL;
 
 
+-- START REV 8.0/5
 
-
-
-
+-- fix password to allow NULL
+ALTER TABLE `portaluser` CHANGE `password` `password` VARCHAR( 64 ) CHARACTER SET utf8 COLLATE utf8_general_ci NULL,
+CHANGE `salt` `salt` VARCHAR( 29 ) CHARACTER SET utf8 COLLATE utf8_bin NULL,
+CHANGE `passwordversion` `passwordversion` TINYINT( 4 ) NOT NULL DEFAULT '0' ;
