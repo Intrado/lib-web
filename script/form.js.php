@@ -183,6 +183,11 @@ function form_validation_display(element,style, msgtext) {
 		name = e.id;
 
 	var fieldarea = $(name + "_fieldarea");
+	
+	// If field is in a modal it may not exist after closeing. if element does not exist, exit validation
+	if(!fieldarea)
+		return;
+
 	var icon = $(name + "_icon");
 	var msg = $(name + "_msg");
 	var css = 'background: rgb(255,255,255);';

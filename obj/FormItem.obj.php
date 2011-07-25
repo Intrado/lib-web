@@ -278,7 +278,8 @@ class TextDate extends FormItem {
 				keepFieldEmpty:true,
 				language:"'.substr($LOCALE,0,2).'",
 				enableCloseOnBlur:1,
-				topOffset:20
+				topOffset:20,
+				zindex: 99999
 				'.(($dateFilter)?',dateFilter:'.$dateFilter:'').'
 				});
 			</script>';

@@ -442,8 +442,7 @@ DatePicker.prototype    = {
 				body.appendChild(this._div);
 			}
 			if ( this._relativePosition ) {
-				var a_pos = Element.cumulativeOffset($(this._relative));
-				this.setPosition(a_pos[1], a_pos[0]);
+				this._scrollRePostition();
 			} else {
 				if (this._setPositionTop || this._setPositionLeft)
 					this.setPosition(this._setPositionTop, this._setPositionLeft);
@@ -474,19 +473,35 @@ DatePicker.prototype    = {
 	visible: function () {
 		return $(this._id_datepicker).visible();
 	},
+	
+	_scrollRePostition: function () {
+		  /* position the datepicker relatively to element */
+		if ($(this._relative)) {
+			//Due to a bug in prototype don't use cumulativeOffset with stuff that has borders
+			//var a_lt = Element.cumulativeOffset($(this._relative));
+			element = $(this._relative);
+			var valueT = 0, valueL = 0;
+			do {
+			  // add border width, if available (just works for pixel units)
+				valueT += (element.offsetTop  || 0) + (parseInt(Element.getStyle(element, "border-top-width")) || 0);
+				valueL += (element.offsetLeft || 0) + (parseInt(Element.getStyle(element, "border-left-width")) || 0);
+				element = element.offsetParent;
+			} while (element);
+		
+			$(this._id_datepicker).setStyle({
+				'left': Number(valueL+this._leftOffset)+'px',
+				'top': Number(valueT+this._topOffset)+'px'
+			});
+			this._isPositionned = true;
+		}
+	},
 
 	click: function () {
 		/* init the datepicker if it doesn't exists */
 		if ( $(this._id_datepicker) == null ) this.load();
-		if (!this._isPositionned && this._relativePosition) {
-		  /* position the datepicker relatively to element */
-		  var a_lt = Element.positionedOffset($(this._relative));
-		  $(this._id_datepicker).setStyle({
-			  'left': Number(a_lt[0]+this._leftOffset)+'px',
-				'top': Number(a_lt[1]+this._topOffset)+'px'
-				});
-		  this._isPositionned       = true;
-		}
+	
+		Event.observe(window, 'scroll', this._scrollRePostition.bindAsEventListener(this));
+		  
 		if (!this.visible()) {
 			this._initCurrentDate();
 		 	this._redrawCalendar();
@@ -503,6 +518,8 @@ DatePicker.prototype    = {
 	},
 
 	close: function () {
+		Event.stopObserving(window, 'scroll',this._scrollRePostition);
+		
 		if ( this._enableCloseEffect ) {
 			switch(this._closeEffect) {
 				case 'puff':

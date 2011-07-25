@@ -38,14 +38,13 @@ function getpreviewformdata($fields,$fielddata,$fielddefaults,$msgType) {
 					"helpstep" => 1
 				);
  			} else if ($fieldmap->isOptionEnabled("reldate")) {
-//			Date field is not working with modal
-// 				$formdata[$field] = array (
-// 					"label" => $fieldmap->name,
-// 					"value" => $fielddefaults[$field]?$fielddefaults[$field]:date("m/d/Y", strtotime("now")),
-// 					"validators" => array(),
-// 					"control" => array("TextDate", "size"=>12),
-// 					"helpstep" => 1
-// 				);
+				$formdata[$field] = array (
+					"label" => $fieldmap->name,
+					"value" => $fielddefaults[$field]?$fielddefaults[$field]:date("m/d/Y", strtotime("now")),
+					"validators" => array(),
+					"control" => array("TextDate", "size"=>12),
+					"helpstep" => 1
+				);
 			} else {
 				$formdata[$field] = array (
 					"label" => $fieldmap->name,
