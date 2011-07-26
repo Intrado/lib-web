@@ -33,15 +33,12 @@ var ModalWrapper = Class.create({
 			//position: [this.getLeftOffset(),this.getTopOffset()],
 			fade: false,
 			width: this.getModalWidth(),
-			insertRemoteContentAt:this.window_contents,
 			afterOpen: afterOpen,
 			afterClose: function(){
-				this.destroy();
 				this.parent.window_contents.remove();// remove since the player and download uses ids that is reused whe reopened
+				this.destroy();
 			}
 		},{}));
-		this.modal.afterOpen = function() {alert("opened");};
-		
 		this.modal.parent = this;
 
 		this.modal.container.insert(this.window_header);
