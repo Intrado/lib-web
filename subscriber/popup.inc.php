@@ -2,6 +2,12 @@
 header('Content-type: text/html; charset=UTF-8') ;
 
 $pagetitle = preg_replace('/\\<.+>/','',(isset($TITLE) ? $TITLE : ""));
+
+
+function doLogo () {
+	$logohash = crc32("cid".getSystemSetting("_logocontentid"));
+	echo '<img src="logo.img.php?hash=' . $logohash .'" alt="">';
+}
 ?>
 <script>
 	var _brandtheme = "<?=getBrandTheme();?>";
@@ -21,16 +27,7 @@ $pagetitle = preg_replace('/\\<.+>/','',(isset($TITLE) ? $TITLE : ""));
 <body onload="try {UpdateTimer();} catch (e) {}" style="margin: 0px; background-color: white;">
 	<IFRAME src="blank.html" id="blocker" style="DISPLAY: none; LEFT: 0px; POSITION: absolute; TOP: 0px" frameBorder="0" scrolling="no"></IFRAME>
 
-
-
-<div>
-	<table width="100%" border=0 cellpadding=0 cellspacing=0 background="img/header_bg.gif">
-	<tr>
-	<td><img src="img/logo.gif"></td>
-	</tr>
-	</table>
-</div>
-
+<div style="padding-left:10px; "><? doLogo() ?></div>
 <div class="pagetitle"><? if(isset($ICON)) print '<img src="img/icon_' . $ICON . '" align="absmiddle">'; ?> <?= (isset($TITLE) ? $TITLE : "") ?></div>
 <div class="pagetitlesubtext"><?= (isset($DESCRIPTION) ? $DESCRIPTION : "") ?></div>
 

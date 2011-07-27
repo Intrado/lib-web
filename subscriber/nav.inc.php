@@ -70,9 +70,9 @@ function doLogo () {
 	$logohash = crc32("cid".getSystemSetting("_logocontentid"));
 	$clickurl = getSystemSetting("_logoclickurl");
 	if($clickurl != "" && $clickurl != "http://")
-		echo '<a href="' . $clickurl . '" target="_blank" title="Logo"><img src="logo.img.php?hash=' . $logohash .'></a>';
+		echo '<a href="' . $clickurl . '" target="_blank" title="Logo"><img src="logo.img.php?hash=' . $logohash .'" /></a>';
 	else
-		echo '<img src="logo.img.php?hash=' . $logohash .'" alt="">';
+		echo '<img src="logo.img.php?hash=' . $logohash .'" alt="" />';
 }
 
 doNavTabs($NAVTREE);
