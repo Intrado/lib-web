@@ -147,6 +147,18 @@ if ($message) {
 	$msgattachments = DBFindMany("MessageAttachment", "from messageattachment where not deleted and messageid = ?", false, array($message->id));
 	foreach ($msgattachments as $msgattachment)
 		$attachments[$msgattachment->contentid] = array("name" => $msgattachment->filename, "size" => $msgattachment->size);
+} else {
+	$message2 = $messagegroup->getMessage("email", $subtype=="html"?"plain":"html", $languagecode);
+	// Sync with other message subtype if it exists
+	if ($message2) {
+		$message2->readHeaders();
+		$fromname = $message2->fromname;
+		$fromemail = $message2->fromemail;
+		$subject = $message2->subject;
+		$msgattachments = DBFindMany("MessageAttachment", "from messageattachment where not deleted and messageid = ?", false, array($message2->id));
+		foreach ($msgattachments as $msgattachment)
+			$attachments[$msgattachment->contentid] = array("name" => $msgattachment->filename, "size" => $msgattachment->size);
+	}
 }
 
 $language = Language::getName($languagecode);
@@ -314,41 +326,24 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 			// create the message parts
 			$message->recreateParts($postdata['message'], null, false);
 			
-			// check for existing attachments
-			$existingattachments = QuickQueryList("select contentid, id from messageattachment where messageid = ? and not deleted", true, false, array($message->id));
-			
 			// if there are message attachments, attach them
 			$attachments = json_decode($postdata['attachments']);
-			if ($attachments == null) 
+			if ($attachments == null)
 				$attachments = array();
-	
-			$existingattachmentstokeep = array();
-			if ($attachments) {
-				foreach ($attachments as $cid => $details) {
-					// check if this is already attached.
-					if (isset($existingattachments[$cid])) {
-						$existingattachmentstokeep[$existingattachments[$cid]] = true;
-						continue;
-					} else {
-						$msgattachment = new MessageAttachment();
-						$msgattachment->messageid = $message->id;
-						$msgattachment->contentid = $cid;
-						$msgattachment->filename = $details->name;
-						$msgattachment->size = $details->size;
-						$msgattachment->deleted = 0;
-						$msgattachment->create();
-					}
-				}
-			}
-			// remove attachments that are no longer attached
-			foreach ($existingattachments as $cid => $attachmentid) {
-				if (!isset($existingattachmentstokeep[$attachmentid])) {
-					$attachment = new MessageAttachment($attachmentid);
-					$attachment->deleted = 1;
-					$attachment->update(); 
-				}
-			}	
 			
+			savaAttachments($attachments,$message);
+			
+			// Sync with other message subtype if it exists
+			$message2 = $messagegroup->getMessage("email", $subtype=="html"?"plain":"html", $languagecode);
+			if ($message2) {
+				$message2->subject = $message->subject;
+				$message2->fromname = $message->fromname;
+				$message2->fromemail = $message->fromemail;
+				$message2->stuffHeaders();
+				$message2->update();
+				
+				savaAttachments($attachments,$message2);
+			}
 			Query("COMMIT");
 		}
 		// remove the editors session data
@@ -358,6 +353,37 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 			$form->sendTo("mgeditor.php?id=".$messagegroup->id);
 		else
 			redirect("mgeditor.php?id=".$messagegroup->id);
+	}
+}
+
+function savaAttachments($attachments,$message) {
+	// check for existing attachments
+	$existingattachments = QuickQueryList("select contentid, id from messageattachment where messageid = ? and not deleted", true, false, array($message->id));
+	$existingattachmentstokeep = array();
+	if ($attachments) {
+		foreach ($attachments as $cid => $details) {
+			// check if this is already attached.
+			if (isset($existingattachments[$cid])) {
+				$existingattachmentstokeep[$existingattachments[$cid]] = true;
+				continue;
+			} else {
+				$msgattachment = new MessageAttachment();
+				$msgattachment->messageid = $message->id;
+				$msgattachment->contentid = $cid;
+				$msgattachment->filename = $details->name;
+				$msgattachment->size = $details->size;
+				$msgattachment->deleted = 0;
+				$msgattachment->create();
+			}
+		}
+	}
+	// remove attachments that are no longer attached
+	foreach ($existingattachments as $cid => $attachmentid) {
+		if (!isset($existingattachmentstokeep[$attachmentid])) {
+			$attachment = new MessageAttachment($attachmentid);
+			$attachment->deleted = 1;
+			$attachment->update();
+		}
 	}
 }
 
