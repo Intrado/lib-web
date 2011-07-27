@@ -135,9 +135,23 @@ $formdata = array($messagegroup->name. " (". $language. ")");
 // upload audio needs this session data
 $_SESSION['messagegroupid'] = $messagegroup->id;
 
-$formdata = array(
-	$messagegroup->name. " (". $language. ")",
-	"message" => array(
+
+$formdata = array($messagegroup->name. " (". $language. ")");
+	
+$ttslanguages = Voice::getTTSLanguageMap();
+if (!isset($ttslanguages[$languagecode])) {
+	$html = _L('<ul>
+				<li>This language does not support <i>Text To Speech</i>.</li>
+				<li>Any text items inserted will be spoken in an <b>English</b> voice.</li>
+				</ul>');
+	$formdata["note"] = array(
+		"label" => _L("Language Note"),
+		"fieldhelp" => _L("This language does not support Text To Speech."),
+		"control" => array("FormHtml", "html" => $html),
+		"helpstep" => 1);
+}
+
+$formdata["message"] = array(
 		"label" => _L("Advanced Message"),
 		"fieldhelp" => _L("Enter your phone message in this field. Click on the 'Guide' button for help with the different options which are available to you."),
 		"value" => $text,
@@ -145,9 +159,8 @@ $formdata = array(
 			array("ValRequired"),
 			array("ValMessageBody", "messagegroupid" => $messagegroup->id)),
 		"control" => array("PhoneMessageEditor", "langcode" => $languagecode, "messagegroupid" => $messagegroup->id),
-		"helpstep" => 1
-	),
-	"gender" => array(
+		"helpstep" => 1);
+$formdata["gender"] = array(
 		"label" => _L("Gender"),
 		"fieldhelp" => _L("Select the gender of the text-to-speech voice. Some languages are only available in one gender. In those cases, selecting a different gender will result in the same message playback."),
 		"value" => $gender,
@@ -155,20 +168,17 @@ $formdata = array(
 			array("ValRequired"),
 			array("ValInArray", "values" => array("female", "male"))),
 		"control" => array("RadioButton", "values" => array("female" => _L("Female"), "male" => _L("Male"))),
-		"helpstep" => 2
-	),
-	"preview" => array(
+		"helpstep" => 2);
+$formdata["preview"] = array(
 		"label" => null,
 		"value" => "",
 		"validators" => array(),
 		"control" => array("PreviewButton",
-			"language" => $languagecode,
+			"language" => "en",
 			"texttarget" => "message",
 			"gendertarget" => "gender",
 		),
-		"helpstep" => 3
-	)
-);
+		"helpstep" => 3);
 
 $helpsteps = array(_L("<p>You can use a variety of techniques to build your message in this screen, but ideally you should ".
 	"use this to assemble snippets of audio with dynamic data field inserts. You can use 'Call me to Record' to create your ".

@@ -354,7 +354,6 @@ function makeMessageGrid($messagegroup) {
 	
 	// set action usr link	
 	$links = array(); 
-	$ttslanguages = Voice::getTTSLanguageMap();
 	foreach ($customerlanguages as $languagecode => $languagename) {
 		$linkrow = array();
 		
@@ -367,14 +366,12 @@ function makeMessageGrid($messagegroup) {
 				$icon = "accept";
 				$actions[] = action_link("Play","fugue/control",null,"showPreview(null,\'previewid=$message->id\');return false;");
 				$actions[] = action_link("Record","diagona/16/151","editmessagerecord.php?id=new&languagecode=$languagecode&mgid=".$messagegroup->id);
-				if (isset($ttslanguages[$languagecode]))
-					$actions[] = action_link("Edit","pencil","editmessagephone.php?id=$message->id");
+				$actions[] = action_link("Edit","pencil","editmessagephone.php?id=$message->id");
 				$actions[] = action_link("Delete","cross","mgeditor.php?delete=$message->id","return confirmDelete();");
 			} else {
 				$icon = "diagona/16/160";
 				$actions[] = action_link("Record","diagona/16/151","editmessagerecord.php?id=new&languagecode=$languagecode&mgid=".$messagegroup->id);
-				if (isset($ttslanguages[$languagecode]))
-					$actions[] = action_link("Write","pencil_add","editmessagephone.php?id=new&languagecode=$languagecode&mgid=".$messagegroup->id);
+				$actions[] = action_link("Write","pencil_add","editmessagephone.php?id=new&languagecode=$languagecode&mgid=".$messagegroup->id);
 			}
 			$linkrow[] = array('icon' => $icon,'title' => _L(" %s Phone Message",$languagename), 'actions' => $actions);
 		}
