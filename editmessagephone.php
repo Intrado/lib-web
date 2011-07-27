@@ -258,7 +258,17 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 						
 			// create the message parts
 			$message->recreateParts($postdata['message'], null, $postdata['gender']);
-					
+			
+			// Hack to correct the voice id for non tts languages
+			if (!isset($ttslanguages[$languagecode])) {
+				// get all T and V message parts, update the voiceid to represent the selected gender
+				$parts = DBFindMany("MessagePart", "from messagepart where messageid = ? and type in ('V','T')", false, array($message->id));
+				foreach ($parts as $part) {
+					$part->voiceid = Voice::getPreferredVoice("en", $postdata['gender']);
+					$part->update();
+				}
+			}
+			
 			Query("COMMIT");
 		}
 		
