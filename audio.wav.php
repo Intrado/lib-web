@@ -25,7 +25,14 @@ if(isset($_GET['id'])) {
 			
 			if (!$res2 && file_exists($outname)) {
 				$data = file_get_contents ($outname); //readfile seems to cause problems
-				setContentHeader("audio/mpeg",strlen($data),isset($_GET['download']),"audiopreview");
+				header("HTTP/1.0 200 OK");
+				header("Content-Type: audio/mpeg");
+				if ($download)
+					header("Content-disposition: attachment; filename=audiopreview.mp3");
+				header('Pragma: private');
+				header('Cache-control: private, must-revalidate');
+				header("Content-Length: " . strlen($data));
+				header("Connection: close");
 				echo $data;
 			} else {
 				echo _L("An error occurred trying to generate the audio file. Please try again.");

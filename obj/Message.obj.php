@@ -544,7 +544,14 @@ class Message extends DBMappedObject {
 				$result = exec($cmd, $res1, $res2);
 				if (!$res2 && file_exists($outname)) {
 					$data = file_get_contents ($outnamemp3); //readfile seems to cause problems
-					setContentHeader("audio/mpeg",strlen($data),isset($_GET['download']),"message");
+					header("HTTP/1.0 200 OK");
+					header("Content-Type: audio/mpeg");
+					if (isset($_GET['download'])) 
+						header("Content-disposition: attachment; filename=message.mp3");
+					header('Pragma: private');
+					header('Cache-control: private, must-revalidate');
+					header("Content-Length: " . strlen($data));
+					header("Connection: close");
 					echo $data;
 				} else {
 					echo _L("An error occurred trying to generate the preview file. Please try again.");
@@ -552,7 +559,14 @@ class Message extends DBMappedObject {
 				@unlink($outnamemp3);
 			} else {
 				$data = file_get_contents ($outname); // readfile seems to cause problems
-				setContentHeader("audio/wav",strlen($data),isset($_GET['download']),"message");
+				header("HTTP/1.0 200 OK");
+				header("Content-Type: audio/wav");
+				if (isset($_GET['download']))
+					header("Content-disposition: attachment; filename=message.wav");
+				header('Pragma: private');
+				header('Cache-control: private, must-revalidate');
+				header("Content-Length: " . strlen($data));
+				header("Connection: close");
 				echo $data;
 			}
 		} else {

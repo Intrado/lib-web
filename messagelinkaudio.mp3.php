@@ -6,7 +6,6 @@ if(!isset($_GET['code'])) {
 
 $SETTINGS = parse_ini_file("inc/settings.ini.php",true);
 
-require_once("inc/utils.inc.php");
 require_once("inc/appserver.inc.php");
 require_once('thrift/Thrift.php');
 require_once $GLOBALS['THRIFT_ROOT'].'/protocol/TBinaryProtocol.php';
@@ -33,7 +32,15 @@ while(true) {
 		try {
 			// Get either the part or the full message
 			$audio = isset($_GET['partnum'])?$client->getAudioPart($code,$_GET['partnum']):$client->getAudioFull($code);
-			setContentHeader($audio->contenttype,strlen($audio->data),isset($_GET['download']),"message");
+			header("HTTP/1.0 200 OK");
+			header("Content-Type: $audio->contenttype");
+			if (isset($_GET['download'])) {
+				header("Content-disposition: attachment; filename=message.mp3");
+			}
+			header('Pragma: private');
+			header('Cache-control: private, must-revalidate');
+			header("Content-Length: " . strlen($audio->data));
+			header("Connection: close");
 			echo $audio->data;
 		} catch (messagelink_MessageLinkCodeNotFoundException $e) {
 			echo "The requested information was not found. The message you are looking for does not exist or has expired.";

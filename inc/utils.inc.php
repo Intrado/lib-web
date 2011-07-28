@@ -745,24 +745,4 @@ function array_to_csv($arr) {
 	return implode(",",array_map("escape_csvfield",$arr));
 }
 
-function setContentHeader($type,$length,$download=false,$filename="download") {
-	header("HTTP/1.0 200 OK");
-	header("Content-Type: $type");
-	if ($download) {
-		switch($type) {
-			case "audio/wav":
-				$filename .= ".wav";
-				break;
-			case "audio/mpeg":
-				$filename .= ".mp3";
-				break;
-		}
-		header("Content-disposition: attachment; filename=$filename");
-	}
-	header('Pragma: private');
-	header('Cache-control: private, must-revalidate');
-	header("Content-Length: " . $length);
-	header("Connection: close");
-}
-
 ?>
