@@ -18,13 +18,12 @@ loadManagerConnectionData();
 
 // Clear password will unconditionally wipe the password
 if (isset($_GET["action"]) && $_GET["action"] == "clearpassword") {
-	global $CUSTOMERINFO;
 	header('Content-Type: application/json');
-	if (!isset($_GET["customerid"]) || !isset($CUSTOMERINFO[$_GET["customerid"]])) {
+	if (!isset($_GET["customerid"])) {
 		echo "false";
 		exit();
 	}
-	$custdb = getPooledCustomerConnection($_GET["customerid"],true);
+	$custdb = getPooledCustomerConnection($_GET["customerid"]);
 	QuickUpdate("update user set password='', salt='', passwordversion=2 where login=?",$custdb,array($_GET["username"]));
 	echo "true";
 	exit();
@@ -44,7 +43,7 @@ if (isset($_GET["action"]) && $_GET["action"] == "resetpassword") {
 	$result = pearxmlrpc($method, $params, true);
 	
 	if ($result && $result['result'] == "") {
-		$custdb = getPooledCustomerConnection($_GET["customerid"],true);
+		$custdb = getPooledCustomerConnection($_GET["customerid"]);
 		QuickUpdate("update user set password='', salt='', passwordversion=2 where login=?",$custdb,array($_GET["username"]));
 		echo "true";
 	} else {
@@ -66,8 +65,8 @@ function fmt_custurl($row, $index){
 }
 function fmt_actions($row, $index){
 	global $CUSTOMERINFO;
-	$str = "<a href='passwordcheck.php?action=clearpassword&customerid=" . $row[0] ."&username=" . $row[2] ."' onclick='clearpassword(\"" . $row[0] ."\",\"" . $row[2] ."\");this.setStyle({color: \"black\"});return false;' target=\"_blank\">clear</a>";
-	$str .= ",<a href='passwordcheck.php?action=resetpassword&customerid=" . $row[0] ."&username=" . $row[2] ."' onclick='resetpassword(\"" . $row[0] ."\",\"" . $row[2] ."\");this.setStyle({color: \"black\"});return false;' target=\"_blank\">reset</a>";
+	$str = "<a href='#' onclick='clearpassword(\"" . $row[0] ."\",\"" . $row[2] ."\");this.setStyle({color: \"black\"});return false;' target=\"_blank\">clear</a>";
+	$str .= ",<a href='#' onclick='resetpassword(\"" . $row[0] ."\",\"" . $row[2] ."\");this.setStyle({color: \"black\"});return false;' target=\"_blank\">reset</a>";
 	return $str;
 }
 
@@ -166,8 +165,7 @@ function clearpassword(customerid,username) {
 		onSuccess: function (response) {
 			var result = response.responseJSON;
 			if(!result) {
-			} else {
-				
+				alert("Failed to clear/reset password");
 			}
 		},
 		onFailure: function(){
