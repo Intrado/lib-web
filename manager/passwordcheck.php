@@ -65,8 +65,15 @@ function fmt_custurl($row, $index){
 }
 function fmt_actions($row, $index){
 	global $CUSTOMERINFO;
-	$str = "<a href='#' onclick='clearpassword(\"" . $row[0] ."\",\"" . $row[2] ."\");this.setStyle({color: \"black\"});return false;' target=\"_blank\">clear</a>";
-	$str .= ",<a href='#' onclick='resetpassword(\"" . $row[0] ."\",\"" . $row[2] ."\");this.setStyle({color: \"black\"});return false;' target=\"_blank\">reset</a>";
+	$userid = $row[2];
+	
+	// Remove extra tag if disabled user
+	$length = strlen($userid);
+	if ($length > 11 && substr($userid, -11) == " (disabled)") {
+		$userid = substr ($userid,0,$length-11);
+	}
+	$str = "<a href='#' onclick='clearpassword(\"" . $row[0] ."\",\"" . $userid ."\");this.setStyle({color: \"black\"});return false;' target=\"_blank\">clear</a>";
+	$str .= ",<a href='#' onclick='resetpassword(\"" . $row[0] ."\",\"" . $userid ."\");this.setStyle({color: \"black\"});return false;' target=\"_blank\">reset</a>";
 	return $str;
 }
 
