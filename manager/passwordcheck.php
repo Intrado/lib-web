@@ -17,20 +17,20 @@ if (!$MANAGERUSER->authorized("passwordcheck"))
 loadManagerConnectionData();
 
 // Clear password will unconditionally wipe the password
-if (isset($_GET["action"]) && $_GET["action"] == "clearpassword") {
+if (isset($_GET["action"]) && $_GET["action"] == "clearpassword" && isset($_GET["userid"])) {
 	header('Content-Type: application/json');
 	if (!isset($_GET["customerid"])) {
 		echo "false";
 		exit();
 	}
 	$custdb = getPooledCustomerConnection($_GET["customerid"]);
-	QuickUpdate("update user set password='', salt='', passwordversion=2 where login=?",$custdb,array($_GET["username"]));
+	QuickUpdate("update user set password='', salt='', passwordversion=2 where id=?",$custdb,array($_GET["userid"]));
 	echo "true";
 	exit();
 }
 
 // Reset password will send a email to the user to reset the password
-if (isset($_GET["action"]) && $_GET["action"] == "resetpassword") {
+if (isset($_GET["action"]) && $_GET["action"] == "resetpassword" && isset($_GET["userid"])) {
 	global $CUSTOMERINFO;
 	header('Content-Type: application/json');
 	if (!isset($_GET["customerid"]) || !isset($CUSTOMERINFO[$_GET["customerid"]])) {
@@ -38,17 +38,20 @@ if (isset($_GET["action"]) && $_GET["action"] == "resetpassword") {
 		exit();
 	}
 	
-	$params = array(new XML_RPC_Value($_GET["username"], 'string'), new XML_RPC_Value($CUSTOMERINFO[$_GET["customerid"]]['urlcomponent'], 'string'));
-	$method = "AuthServer.forgotPassword";
-	$result = pearxmlrpc($method, $params, true);
-	
-	if ($result && $result['result'] == "") {
-		$custdb = getPooledCustomerConnection($_GET["customerid"]);
-		QuickUpdate("update user set password='', salt='', passwordversion=2 where login=?",$custdb,array($_GET["username"]));
-		echo "true";
-	} else {
-		echo "false";
+	$custdb = getPooledCustomerConnection($_GET["customerid"]);
+	$query = "select login from user where id = ?";
+	$username = QuickQuery($query,$custdb,array($_GET["userid"]));
+	if ($username) {
+		$params = array(new XML_RPC_Value($username, 'string'), new XML_RPC_Value($CUSTOMERINFO[$_GET["customerid"]]['urlcomponent'], 'string'));
+		$method = "AuthServer.forgotPassword";
+		$result = pearxmlrpc($method, $params, true);
+		if ($result && $result['result'] == "") {
+			QuickUpdate("update user set password='', salt='', passwordversion=2 where id=?",$custdb,array($_GET["userid"]));
+			echo "true";
+			exit();
+		}
 	}
+	echo "false";
 	exit();	
 }
 
@@ -64,16 +67,8 @@ function fmt_custurl($row, $index){
 		return escapehtml(escapehtml($CUSTOMERINFO[$row[0]]['urlcomponent']));
 }
 function fmt_actions($row, $index){
-	global $CUSTOMERINFO;
-	$userid = $row[2];
-	
-	// Remove extra tag if disabled user
-	$length = strlen($userid);
-	if ($length > 11 && substr($userid, -11) == " (disabled)") {
-		$userid = substr ($userid,0,$length-11);
-	}
-	$str = "<a href='#' onclick='clearpassword(\"" . $row[0] ."\",\"" . $userid ."\");this.setStyle({color: \"black\"});return false;' target=\"_blank\">clear</a>";
-	$str .= ",<a href='#' onclick='resetpassword(\"" . $row[0] ."\",\"" . $userid ."\");this.setStyle({color: \"black\"});return false;' target=\"_blank\">reset</a>";
+	$str = "<a href='#' onclick='clearpassword(\"" . $row[0] ."\",\"" . $row[1] ."\");this.setStyle({color: \"black\"});return false;' target=\"_blank\">clear</a>";
+	$str .= ",<a href='#' onclick='resetpassword(\"" . $row[0] ."\",\"" . $row[1] ."\");this.setStyle({color: \"black\"});return false;' target=\"_blank\">reset</a>";
 	return $str;
 }
 
@@ -165,10 +160,10 @@ echo '</table>';
 ?>
 
 <script>
-function clearpassword(customerid,username) {
+function clearpassword(customerid,userid) {
 	new Ajax.Request('passwordcheck.php', {
 		method:'get',
-		parameters: {action: 'clearpassword', customerid: customerid, username: username},
+		parameters: {action: 'clearpassword', customerid: customerid, userid: userid},
 		onSuccess: function (response) {
 			var result = response.responseJSON;
 			if(!result) {
@@ -182,14 +177,14 @@ function clearpassword(customerid,username) {
 	return false;
 }
 
-function resetpassword(customerid,username) {
+function resetpassword(customerid,userid) {
 	new Ajax.Request('passwordcheck.php', {
 		method:'get',
-		parameters: {action: 'resetpassword', customerid: customerid, username: username},
+		parameters: {action: 'resetpassword', customerid: customerid, userid: userid},
 		onSuccess: function (response) {
 			var result = response.responseJSON;
 			if(!result) {
-				alert("Unable to clear/reset password, Most likely because the user do not have a email assigned to the account");
+				alert("Unable to clear/reset password, Most likely because the user do not have a email assigned to the account or the account is Not enabled");
 			}
 		},
 		onFailure: function(){
