@@ -453,6 +453,10 @@ class SMAPI {
 				$fileext = ".mp3";
 			} if ($mimetype == 'audio/x-caf') {
 				$fileext = ".caf";
+			} else if ($mimetype == 'audio/3gpp') {
+				$fileext = ".3gp";
+			} else if ($mimetype == 'audio/3gpp2') {
+				$fileext = ".3g2";
 			} else {
 				$fileext = ".wav";
 			}
@@ -477,7 +481,7 @@ class SMAPI {
 				return $result;
 			}
 			
-			if ($mimetype == 'audio/x-caf') {
+			if ($mimetype == 'audio/x-caf' || $mimetype == 'audio/3gpp' || $mimetype == 'audio/3gpp2') {
 				$cmd = "ffmpeg -i \"$origtempfile\" -ar 8000 -ac 1 \"$cleanedtempfile\" 2>/dev/null"; //  the 2>/dev/null is to make ffmpeg silent, there Is no other way of making it silent with a flag. 
 				$ffmpegresult = exec($cmd, $res1,$res2);
 			} else {
