@@ -64,6 +64,10 @@ $CODE = isset($_GET['code']) ? $_GET['code'] : $_SERVER['REQUEST_URI'];
 if (strrpos($CODE,"/") !== false)
 	$CODE = substr($CODE,1 + strrpos($CODE, "/"));
 
+//strip any trailing query params
+if (strpos($CODE,"?") !== false)
+	$CODE = substr($CODE,0,strpos($CODE,"?"));
+
 //if no code is found in GET args, and not passed in via the aliasmatch, redirect them somewhere useful
 if (strlen($CODE) == 0) {
 	header("Location: " . $SETTINGS['feature']['redirect_url']);
