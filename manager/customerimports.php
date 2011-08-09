@@ -23,7 +23,7 @@ function fmt_custid($row, $index){
 	global $favcustomers;
 
 	if (isset($favcustomers[$row[$index]]))
-		return "<img style='margin-right: 4px;' src='img/fav.png' border=0/>" . $row[$index];
+		return "<img style='margin-right: 4px;' src='mimg/fav.png' border=0/>" . $row[$index];
 	else
 		return $row[$index];
 }
@@ -119,7 +119,7 @@ function fmt_filesize($row, $index){
 //index 0 is customer id
 //index 3 is import id
 function fmt_importalerts($row, $index){
-	$url = '<a href="importalerts.php?cid=' . $row[0] . '&importid=' . $row[4] . '" title="Configure Alerts"><img src="img/s-config.png" border=0></a>';
+	$url = '<a href="importalerts.php?cid=' . $row[0] . '&importid=' . $row[4] . '" title="Configure Alerts"><img src="mimg/s-config.png" border=0></a>';
 	if(isset($row[14]) && $row[14] != null && $row[14] != ""){
 		$url = '<div style="background-color: #3cff00">' . $url . "</div>";
 	}
@@ -420,7 +420,7 @@ include("nav.inc.php");
 if ((!isset($_GET["showall"]) && !empty($favcustomers)) && !isset($_GET["search"]))
 	print "<a href='customerimports.php?showall'>Show All Customers</a>";
 else
-	print "<a href='customerimports.php'> <img src='img/fav.png' border=0/>Show Favorites</a>";
+	print "<a href='customerimports.php'> <img src='mimg/fav.png' border=0/>Show Favorites</a>";
 ?>
 </form>
 <?

@@ -280,16 +280,16 @@ function toggleHiddenField(i){
 
 //variable _brandtheme needs to be declared externally of this file.
 function btn_rollover(obj) {
-	modifyMarkedNodes(obj,'buttonrollover','left',function(obj) {obj.src='img/themes/' + _brandtheme + '/button_left_over.gif';});
-	modifyMarkedNodes(obj,'buttonrollover','right',function(obj) {obj.src='img/themes/' + _brandtheme + '/button_right_over.gif';});
-	modifyMarkedNodes(obj,'buttonrollover','middle',function(obj) {obj.style.background = "url('img/themes/" + _brandtheme + "/button_mid_over.gif') repeat-x";});
+	modifyMarkedNodes(obj,'buttonrollover','left',function(obj) {obj.src='mimg/themes/' + _brandtheme + '/button_left_over.gif';});
+	modifyMarkedNodes(obj,'buttonrollover','right',function(obj) {obj.src='mimg/themes/' + _brandtheme + '/button_right_over.gif';});
+	modifyMarkedNodes(obj,'buttonrollover','middle',function(obj) {obj.style.background = "url('mimg/themes/" + _brandtheme + "/button_mid_over.gif') repeat-x";});
 }
 
 //variable _brandtheme needs to be declared externally of this file.
 function btn_rollout(obj) {
-	modifyMarkedNodes(obj,'buttonrollover','left',function(obj) {obj.src='img/themes/' + _brandtheme + '/button_left.gif';});
-	modifyMarkedNodes(obj,'buttonrollover','right',function(obj) {obj.src='img/themes/' + _brandtheme + '/button_right.gif';});
-	modifyMarkedNodes(obj,'buttonrollover','middle',function(obj) {obj.style.background = "url('img/themes/" + _brandtheme + "/button_mid.gif') repeat-x";});
+	modifyMarkedNodes(obj,'buttonrollover','left',function(obj) {obj.src='mimg/themes/' + _brandtheme + '/button_left.gif';});
+	modifyMarkedNodes(obj,'buttonrollover','right',function(obj) {obj.src='mimg/themes/' + _brandtheme + '/button_right.gif';});
+	modifyMarkedNodes(obj,'buttonrollover','middle',function(obj) {obj.style.background = "url('mimg/themes/" + _brandtheme + "/button_mid.gif') repeat-x";});
 }
 
 function windowHide(windowid) {
@@ -300,10 +300,10 @@ function windowHide(windowid) {
 	
 	if (vis) {
 		windowbody.style.display =  "none" ;
-		collapseicon.obj.src = "img/arrow_right.gif";
+		collapseicon.obj.src = "mimg/arrow_right.gif";
 	} else {
 		windowbody.style.display =  "block" ;
-		collapseicon.obj.src = "img/arrow_down.gif";
+		collapseicon.obj.src = "mimg/arrow_down.gif";
 	}
 	
 	setState('window_' + windowid, vis ? "closed" : "open");
@@ -350,49 +350,5 @@ function ajax(url, vars, callbackFunction, args)
 	request.send(vars);
 }
 
-function serialize(someForm) {
-	var serialized = [];
-	for (var i=0; i < someForm.elements.length; i++) {
-		var el = someForm.elements[i];
-		if (el.disabled || !el.name)
-			continue;
-			
-		switch (el.tagName.toLowerCase()) {
-		case "input":
-			switch (el.type.toLowerCase()) {
-				case "radio":
-				case "checkbox":
-					if (el.checked)
-						serialized.push(encodeURIComponent(el.name) + "=" + encodeURIComponent(el.value));
-					break;
-				case "file": // don't do anything
-					break;
-				default:
-					serialized.push(encodeURIComponent(el.name) + "=" + encodeURIComponent(el.value));
-					break;
-			}
-			break;
-		case "select":
-			for (var j=0; j < el.options.length; j++)
-				if (el.options[j].selected)
-					serialized.push(encodeURIComponent(el.name) + "=" + encodeURIComponent(el.options[j].value));
-			break;
-		case "textarea":
-		case "button":
-		default:
-			serialized.push(encodeURIComponent(el.name) + "=" + encodeURIComponent(el.value));
-			break;
-		}
-	}
-	return serialized.join("&");
-}
 
-function keyuptimer (e, t, ignoreenterkey, fn, args) {
-	if (this.timeoutid)
-		clearTimeout(this.timeoutid);
-	var e=window.event || e;
-	var keyunicode=e.charCode || e.keyCode;
-	if (keyunicode != 13 || !ignoreenterkey)
-		this.timeoutid = setTimeout(fn,t,args);
-}
 

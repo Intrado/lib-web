@@ -32,7 +32,7 @@ function fmt_hasdm ($row,$index) {
 function fmt_play_link($row, $index){
 	$url = "";
 	if (isset($row[0]) && $row[0] != "" && isset($row[7]) && $row[7] != "")
-		$url = "<a onclick='popup(\"customerplaymessage.php?customerid=" . $row[0] . "&jobid=" . $row[7] . "\", 400, 500); return false;' href=\"#\" title='Play Message'><img src='img/s-play.png' border=0></a>";
+		$url = "<a onclick='popup(\"customerplaymessage.php?customerid=" . $row[0] . "&jobid=" . $row[7] . "\", 400, 500); return false;' href=\"#\" title='Play Message'><img src='mimg/s-play.png' border=0></a>";
 	return $url;
 }
 

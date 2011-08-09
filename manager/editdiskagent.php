@@ -156,7 +156,7 @@ function fmt_authentication($row, $index) {
 // index 0 is agentid
 function fmt_editdiskagent_actions($row, $index) {
 	global $agentid;
-	$url =  '<a href="editdiskagent.php?delete&agentid=' . $agentid . '&cid=' . $row[0]. '" title="Delete"><img src="img/cross.png" border=0></a>&nbsp;' ;
+	$url =  '<a href="editdiskagent.php?delete&agentid=' . $agentid . '&cid=' . $row[0]. '" title="Delete"><img src="mimg/cross.png" border=0></a>&nbsp;' ;
 	return $url;
 }
 

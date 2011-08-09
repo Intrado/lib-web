@@ -24,7 +24,7 @@ if (!$custdb) {
 // index 1 is messagegroupid
 function fmt_actions($row, $index) {
 	global $currentid;
-	$url =  '<a href="editcustomertemplate.php?cid=' . $currentid . '&id=' . $row[1] . '" title="Edit"><img src="img/s-edit.png" border=0></a>&nbsp;' ;
+	$url =  '<a href="editcustomertemplate.php?cid=' . $currentid . '&id=' . $row[1] . '" title="Edit"><img src="mimg/s-edit.png" border=0></a>&nbsp;' ;
 	return $url;
 }
 

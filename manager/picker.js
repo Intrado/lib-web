@@ -22,7 +22,7 @@ function TCPopup(field) {
 }
 
 function TCBuildCell (R, G, B, w, h) {
-	return '<td style="border:0px solid red; " bgcolor="#' + this.dec2hex((R << 16) + (G << 8) + B) + '"><a style="border: 0px solid green;" href="javascript:P.S(\'' + this.dec2hex((R << 16) + (G << 8) + B) + '\')" onmouseover="P.P(\'' + this.dec2hex((R << 16) + (G << 8) + B) + '\')"><img style="border: 0px solid black;" src="img/pixel.gif" width="' + w + '" height="' + h + '" border="0"></a></td>';
+	return '<td style="border:0px solid red; " bgcolor="#' + this.dec2hex((R << 16) + (G << 8) + B) + '"><a style="border: 0px solid green;" href="javascript:P.S(\'' + this.dec2hex((R << 16) + (G << 8) + B) + '\')" onmouseover="P.P(\'' + this.dec2hex((R << 16) + (G << 8) + B) + '\')"><img style="border: 0px solid black;" src="mimg/pixel.gif" width="' + w + '" height="' + h + '" border="0"></a></td>';
 }
 
 function TCSelect(c) {

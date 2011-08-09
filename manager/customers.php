@@ -22,9 +22,9 @@ function fmt_custid($row, $index){
 	$urlget = "customers.php" . (isset($urlget) ? "$urlget&" : "?");
 
 	if ($MANAGERUSER->preference("favcustomers") && in_array($row[0],$MANAGERUSER->preference("favcustomers")))
-		return "<a title='Remove Favorite' href='$urlget" . "removefavorites={$row[0]}'><img style='margin-right: 4px;' src='img/removefav.png' border=0/></a>" . $row[0];
+		return "<a title='Remove Favorite' href='$urlget" . "removefavorites={$row[0]}'><img style='margin-right: 4px;' src='mimg/removefav.png' border=0/></a>" . $row[0];
 	else
-		return "<a title='Add Favorite' href='$urlget" . "addfavorites={$row[0]}'><img style='margin-right: 4px;' src='img/addfav.png' border=0/></a>" . $row[0];
+		return "<a title='Add Favorite' href='$urlget" . "addfavorites={$row[0]}'><img style='margin-right: 4px;' src='mimg/addfav.png' border=0/></a>" . $row[0];
 }
 
 function fmt_hasdm($row, $index) {
@@ -76,19 +76,19 @@ function fmt_actions($row, $index) {
 	global $MANAGERUSER;
 	$actions = "";
 	if ($MANAGERUSER->authorized("editcustomer"))
-		$actions .= '<a href="customeredit.php?id=' . $row[0] .'" title="Edit"><img src="img/s-edit.png" border=0></a>&nbsp;';
+		$actions .= '<a href="customeredit.php?id=' . $row[0] .'" title="Edit"><img src="mimg/s-edit.png" border=0></a>&nbsp;';
 	if ($MANAGERUSER->authorized("users"))
-		$actions .= '<a href="userlist.php?customer=' . $row[0] . '" title="Users"><img src="img/s-users.png" border=0></a>&nbsp;';
+		$actions .= '<a href="userlist.php?customer=' . $row[0] . '" title="Users"><img src="mimg/s-users.png" border=0></a>&nbsp;';
 	if ($MANAGERUSER->authorized("imports"))
-		$actions .= '<a href="customerimports.php?customer=' . $row[0] . '" title="Imports"><img src="img/s-imports.png" border=0></a>&nbsp;';
+		$actions .= '<a href="customerimports.php?customer=' . $row[0] . '" title="Imports"><img src="mimg/s-imports.png" border=0></a>&nbsp;';
 	if ($MANAGERUSER->authorized("activejobs"))
-		$actions .= '<a href="customeractivejobs.php?' . $dmmethod . '&cid=' . $row[0] . '" title="Jobs"><img src="img/s-jobs.png" border=0></a>&nbsp;';
+		$actions .= '<a href="customeractivejobs.php?' . $dmmethod . '&cid=' . $row[0] . '" title="Jobs"><img src="mimg/s-jobs.png" border=0></a>&nbsp;';
 	if ($MANAGERUSER->authorized("editpriorities"))
-		$actions .= '<a href="customerpriorities.php?id=' . $row[0] . '" title="Priorities"><img src="img/s-priorities.png" border=0></a>&nbsp;';
+		$actions .= '<a href="customerpriorities.php?id=' . $row[0] . '" title="Priorities"><img src="mimg/s-priorities.png" border=0></a>&nbsp;';
 	if($row[11] != "asp" && $MANAGERUSER->authorized("editdm"))
-		$actions .= '<a href="customerdms.php?cid=' . $row[0] . '" title="DMs"><img src="img/s-rdms.png" border=0></a>&nbsp;';
+		$actions .= '<a href="customerdms.php?cid=' . $row[0] . '" title="DMs"><img src="mimg/s-rdms.png" border=0></a>&nbsp;';
 	if ($MANAGERUSER->authorizedAny(array("ffield2gfield","billablecalls","edittemplate","runqueries")))
-		$actions .= '<a href="advancedcustomeractions.php?cid=' . $row[0] . '" title="Advanced Actions"><img src="img/s-config.png" border=0></a>&nbsp;';
+		$actions .= '<a href="advancedcustomeractions.php?cid=' . $row[0] . '" title="Advanced Actions"><img src="mimg/s-config.png" border=0></a>&nbsp;';
 
 	return $actions;
 }
@@ -309,7 +309,8 @@ include_once("nav.inc.php");
 //clear error flag
 //on timeout 250
 
-function setcontent (html, obj) {
+function setcontent (response, obj) {
+	var html = response.responseText;
 	// no search results
 	if (html == " ") { 
 		obj.innerHTML = "";
@@ -324,11 +325,23 @@ function setcontent (html, obj) {
 
 function submitform (name) {
 	// if blank, don't submit.
-	if (document.getElementById('searchvalue').value.replace(/^[ ]+/, '') == '') {
-		document.getElementById('searchpreview').innerHTML = "";
+	if ($('searchvalue').value.replace(/^[ ]+/, '') == '') {
+		$('searchpreview').innerHTML = "";
 		return;
 	}
-	ajax('customers.php?ajax=true&' + serialize(document.getElementById(name)),null,setcontent, document.getElementById('searchpreview'));
+	var request = 'customers.php?ajax=true&search=' + $('searchvalue').value;
+	cachedAjaxGet(request,setcontent,$('searchpreview'));
+	
+	//ajax('customers.php?ajax=true&' + serialize(document.getElementById(name)),null,setcontent, document.getElementById('searchpreview'));
+}
+
+function keyuptimer (e, t, ignoreenterkey, fn, args) {
+	if (this.timeoutid)
+		clearTimeout(this.timeoutid);
+	var e=window.event || e;
+	var keyunicode=e.charCode || e.keyCode;
+	if (keyunicode != 13 || !ignoreenterkey)
+		this.timeoutid = setTimeout(fn,t,args);
 }
 </script>
 
@@ -336,7 +349,7 @@ function submitform (name) {
 	<? if (isset($_GET["showdisabled"]))
 		print "<input type='hidden' name='showdisabled' value='1'/>";
 	?>
-	<input id="searchvalue" name="search" type="text" onkeyup="keyuptimer(event, 300, true, submitform, 'search');" size="30" value="<?=isset($_GET["search"]) ? escapehtml($_GET["search"]) : ""?>"/><button type="submit">Search</button> Search ID, URL Path Name, or Inbound Number
+	<input id="searchvalue" name="search" type="text" onkeyup="keyuptimer(event, 300, true, submitform, 'searchvalue');" size="30" value="<?=isset($_GET["search"]) ? escapehtml($_GET["search"]) : ""?>"/><button type="submit">Search</button> Search ID, URL Path Name, or Inbound Number
 	<div id="searchpreview">
 	</div>
 </form>
@@ -348,7 +361,7 @@ function submitform (name) {
 if (!isset($_GET["showall"]))
 	print "<a href='customers.php?showall'>Show All Customers</a> ";
 else if ($MANAGERUSER->preference("favcustomers")) {
-	echo "<a href='customers.php'> <img src='img/fav.png' border=0/>Show Favorites</a>";
+	echo "<a href='customers.php'> <img src='mimg/fav.png' border=0/>Show Favorites</a>";
 	echo "<a style='margin-left: 4px' href='?clearfavorites'><i>Clear Favorites</i></a>";
 }
 

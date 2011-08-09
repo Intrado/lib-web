@@ -76,7 +76,7 @@ function fmt_custurl($row, $index){
 function fmt_play_link($row, $index){
 	$url = "";
 	if($row[2])
-		$url = "<a onclick='popup(\"customerplaymessage.php?customerid=" . $row[14] . "&jobid=" . $row[2] . "\", 400, 500); return false;' href=\"#\" title='Play Message'><img src='img/s-play.png' border=0></a>";
+		$url = "<a onclick='popup(\"customerplaymessage.php?customerid=" . $row[14] . "&jobid=" . $row[2] . "\", 400, 500); return false;' href=\"#\" title='Play Message'><img src='mimg/s-play.png' border=0></a>";
 	return $url;
 }
 

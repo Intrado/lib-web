@@ -23,6 +23,7 @@ require_once("../inc/DBRelationMap.php");
 require_once("../inc/utils.inc.php");
 require_once("managerutils.inc.php");
 require_once("AspAdminUser.obj.php");
+require_once("../inc/locale.inc.php");
 
 session_start();
 if(!isset($isasplogin)){

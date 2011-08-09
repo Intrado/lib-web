@@ -48,9 +48,9 @@ if(isset($_GET['showall'])) {
 
 // index 0 is dmid
 function fmt_DMActions($row, $index){
-	$url =  '<a href="editdm.php?dmid=' . $row[0] . '" title="Edit"><img src="img/s-edit.png" border=0></a>&nbsp;' .
-			'<a href="dmstatus.php?dmid=' . $row[0] . '" title="Status"><img src="img/s-rdms.png" border=0></a>&nbsp;' .
-			'<a href="#" onclick="if(confirm(\'Are you sure you want to reset DM ' . addslashes($row[3]) . '?\')) window.location=\'systemdms.php?resetDM=' . $row[0] . '\'" title="Reset"><img src="img/s-restart.png" border=0></a>&nbsp;';
+	$url =  '<a href="editdm.php?dmid=' . $row[0] . '" title="Edit"><img src="mimg/s-edit.png" border=0></a>&nbsp;' .
+			'<a href="dmstatus.php?dmid=' . $row[0] . '" title="Status"><img src="mimg/s-rdms.png" border=0></a>&nbsp;' .
+			'<a href="#" onclick="if(confirm(\'Are you sure you want to reset DM ' . addslashes($row[3]) . '?\')) window.location=\'systemdms.php?resetDM=' . $row[0] . '\'" title="Reset"><img src="mimg/s-restart.png" border=0></a>&nbsp;';
 	return $url;
 }
 

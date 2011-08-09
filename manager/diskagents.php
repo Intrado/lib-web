@@ -132,8 +132,8 @@ function fmt_customerUrls($row, $index){
 // index 0 is agentid
 // index 7 is uuid
 function fmt_DMActions($row, $index){
-	$url =  '<a href="editdiskagent.php?agentid=' . $row[0] . '" title="Edit"><img src="img/s-edit.png" border=0></a>&nbsp;' ;
-	$url .= '<a href="#" onclick="if(confirm(\'Are you sure you want to reset SwiftSync ' . addslashes($row[3]) . '?\')) window.location=\'diskagents.php?reset=' . $row[7] . '\'" title="Reset"><img src="img/s-restart.png" border=0></a>&nbsp;';
+	$url =  '<a href="editdiskagent.php?agentid=' . $row[0] . '" title="Edit"><img src="mimg/s-edit.png" border=0></a>&nbsp;' ;
+	$url .= '<a href="#" onclick="if(confirm(\'Are you sure you want to reset SwiftSync ' . addslashes($row[3]) . '?\')) window.location=\'diskagents.php?reset=' . $row[7] . '\'" title="Reset"><img src="mimg/s-restart.png" border=0></a>&nbsp;';
 	return $url;
 }
 
