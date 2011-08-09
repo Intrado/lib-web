@@ -270,7 +270,7 @@ class TextDate extends FormItem {
 		}
 		$n = $this->form->name."_".$this->name;
 		$size = isset($this->args['size']) ? 'size="'.$this->args['size'].'"' : "";
-		$str = '<input id="'.$n.'" name="'.$n.'" type="text" value="'.date("m/d/Y", strtotime($value)).'" maxlength="12" '.$size.'/>';
+		$str = '<input id="'.$n.'" name="'.$n.'" type="text" value="'.($value?date("m/d/Y", strtotime($value)):'').'" maxlength="12" '.$size.'/>';
 		$str .= '<script type="text/javascript" src="script/datepicker.js"></script>
 			<script type="text/javascript">
 				var dpck_fieldname = new DatePicker({
