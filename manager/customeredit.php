@@ -1,44 +1,68 @@
 <?
+////////////////////////////////////////////////////////////////////////////////
+// Includes
+////////////////////////////////////////////////////////////////////////////////
 require_once("common.inc.php");
-require_once("../inc/form.inc.php");
+require_once("../inc/table.inc.php");
 require_once("../inc/html.inc.php");
 require_once("../inc/utils.inc.php");
 require_once("../obj/Phone.obj.php");
+require_once("../obj/Validator.obj.php");
+require_once("../obj/Form.obj.php");
+require_once("../obj/FormItem.obj.php");
+require_once("../obj/MessageGroup.obj.php");
+require_once("../obj/Message.obj.php");
+require_once("../obj/MessagePart.obj.php");
+require_once("createtemplates.php");
 require_once("../inc/themes.inc.php");
+require_once("../obj/FormBrandTheme.obj.php");
 require_once("XML/RPC.php");
 require_once("authclient.inc.php");
-require_once("../obj/Language.obj.php");
-
-
-if (!$MANAGERUSER->authorized("editcustomer"))
-	exit("Not Authorized");
+////////////////////////////////////////////////////////////////////////////////
+// Authorization
+////////////////////////////////////////////////////////////////////////////////
 
 if (isset($_GET['id'])) {
-	$_SESSION['currentid']= $_GET['id']+0;
-	redirect();
-}
-if (isset($_SESSION['currentid'])) {
-	$currentid = $_SESSION['currentid'];
-	$custinfo = QuickQueryRow("select s.dbhost, c.dbusername, c.dbpassword, c.urlcomponent, c.enabled, c.oem, c.oemid, c.nsid, c.notes from customer c inner join shard s on (c.shardid = s.id) where c.id = '$currentid'");
-	$custdb = DBConnect($custinfo[0], $custinfo[1], $custinfo[2], "c_$currentid");
-	if (!$custdb) {
-		exit("Connection failed for customer: $custinfo[0], db: c_$currentid");
+	if ($_GET['id'] === "new") {
+		$_SESSION['customerid'] = null;
+	} else {
+		$_SESSION['customerid']= $_GET['id']+0;	
 	}
+	redirect();	
 }
 
+
+if (!isset($_SESSION['customerid']) && !$MANAGERUSER->authorized("newcustomer"))
+	exit("Not Authorized");
+
+if (!$MANAGERUSER->authorized("editcustomer")) {
+	unset($_SESSION['customerid']);
+	exit("Not Authorized");
+}
+
+
+
+
+
 ////////////////////////////////////////////////////////////////////////////////
-// Functions
+// Action/Request Processing
+////////////////////////////////////////////////////////////////////////////////
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+// Helper Functions
 ////////////////////////////////////////////////////////////////////////////////
 
 function update_jobtypeprefs($min, $max, $type, $custdb){
 	$runquery = false;
-	
+
 	$emergencyjobtypeids = QuickQueryList("select id from jobtype where systempriority = 1 and not deleted",false, $custdb);
-	if(!$emergencyjobtypeids) 
-		return;
-	
+	if(!$emergencyjobtypeids)
+	return;
+
 	$currentprefs = QuickQueryList("select jobtypeid,max(sequence) from jobtypepref where jobtypeid in (" . implode($emergencyjobtypeids,",") . ") and type = '" . $type . "' group by jobtypeid",true, $custdb);
-		
+
 	$query = "insert into jobtypepref (jobtypeid,type, sequence,enabled)
 						values ";
 	$values = array();
@@ -58,44 +82,191 @@ function update_jobtypeprefs($min, $max, $type, $custdb){
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-// Data Handling
+// Form Items And Validators
 ////////////////////////////////////////////////////////////////////////////////
-$f = "customer";
-$s = "edit";
 
-$googlangs = array(	"ar" => "Arabic",
-					"bg" => "Bulgarian",
-					"ca" => "Catalan",
-					"zh" => "Chinese",
-					"hr" => "Croatian",
-					"cs" => "Czech",
-					"da" => "Danish",
-					"nl" => "Dutch",
-					"fil" => "Filipino",
-					"fi" => "Finnish",
-					"fr" => "French",
-					"de" => "German",
-					"el" => "Greek",
-					"he" => "Hebrew",   //or iw
-					"hi" => "Hindi",
-					"id" => "Indonesian", // or in
-					"it" => "Italian",
-					"ja" => "Japanese",
-					"ko" => "Korean",
-					"lv" => "Latvian",
-					"lt" => "Lithuanian",
-					"no" => "Norwegian",
-					"pl" => "Polish",
-					"pt" => "Portuguese",
-					"ro" => "Romanian",
-					"ru" => "Russian",
-					"sr" => "Serbian",
-					"sk" => "Slovak",
-					"sl" => "Slovenian",
-					"es" => "Spanish",
-					"sv" => "Swedish",
-					"uk" => "Ukrainian",
-					"vi" => "Vietnamese");
+class LogoRadioButton extends FormItem {
+	function render ($value) {
+		$n = $this->form->name."_".$this->name;
+		$str = '<div id='.$n.' class="radiobox"><table>';
+		$counter = 1;
+		foreach ($this->args['values'] as $radiovalue => $radiohtml) {
+			$id = $n.'-'.$counter;
+			$str .= '<tr><td><input id="'.$id.'" name="'.$n.'" type="radio" value="'.escapehtml($radiovalue).'" '.($value == $radiovalue ? 'checked' : '').' /></td><td><label for="'.$id.'"><div style="width: 100%; border: 2px outset; background-color: white; color: black; margin-left: 0px;">'.($radiohtml).'</div></label></td></tr>
+				';
+			$counter++;
+		}
+		$str .= '</table></div>';
+		return $str;
+	}
+}
+
+class LanguagesItem extends FormItem {
+	function render ($value) {
+		$n = $this->form->name."_".$this->name;
+		$googlangs = array(	"ar" => "Arabic",
+							"bg" => "Bulgarian",
+							"ca" => "Catalan",
+							"zh" => "Chinese",
+							"hr" => "Croatian",
+							"cs" => "Czech",
+							"da" => "Danish",
+							"nl" => "Dutch",
+							"fil" => "Filipino",
+							"fi" => "Finnish",
+							"fr" => "French",
+							"de" => "German",
+							"el" => "Greek",
+							"he" => "Hebrew",   //or iw
+							"hi" => "Hindi",
+							"id" => "Indonesian", // or in
+							"it" => "Italian",
+							"ja" => "Japanese",
+							"ko" => "Korean",
+							"lv" => "Latvian",
+							"lt" => "Lithuanian",
+							"no" => "Norwegian",
+							"pl" => "Polish",
+							"pt" => "Portuguese",
+							"ro" => "Romanian",
+							"ru" => "Russian",
+							"sr" => "Serbian",
+							"sk" => "Slovak",
+							"sl" => "Slovenian",
+							"es" => "Spanish",
+							"sv" => "Swedish",
+							"uk" => "Ukrainian",
+							"vi" => "Vietnamese");
+		//<textarea id='$n' name='$n' rows=2 cols=100 />$value</textarea>
+		$str = "
+				<input id='$n' name='$n' type='hidden' value='$value' />
+				<div id='langdisp'>$value</div>
+				<table>";
+
+		
+		$str .= "<td style=\"border: 1px solid black;\">
+				Language Lookup:<br />
+				<table><tr><td>
+				<select id='newlanginputselect' onchange='languageselect();'>
+				<option value=0> -- Select Common Language -- </option>";
+				foreach ($googlangs as $code => $googlang) {
+					$ttsLangSup = '';
+					if (isset($this->args['ttslangs'][strtolower($googlang)]))
+						$ttsLangSup .= " (TTS Support)";
+					$str .= "<option value='" . str_pad($code,3) . " $googlang' >$googlang $ttsLangSup</option>";
+				}
+				$str .= '
+				</select>
+				</td><td>&nbsp;&nbsp;&nbsp;or&nbsp;&nbsp;&nbsp;</td><td><input id="searchbox" type="text" size="30" /></td><td>' . icon_button("Search", "magnifier","searchlanguages();") . '</td></tr></table>
+				<table id="searchresult" style=""><tr><td></td></tr></table>
+				<table style="display:inline;"><tr><td>Code: 
+				<div style="display:inline;font-weight: bold;" id="newlangcodedisp">N/A</div> Name: 
+				<input id="newlangcode" type="hidden" maxlength="50" size="25" />
+				<input id="newlanginput" type="text" maxlength="50" size="25" />
+				</td><td>' . icon_button("Add/Change", "add","changelanguage('$n',false)") . icon_button("Remove", "delete","changelanguage('$n',true)") . '</td></tr></table>
+				</td></tr>
+				</table>
+				';
+		return $str;
+	}
+}
+
+class ValInboundNumber extends Validator {
+	var $onlyserverside = true;
+	function validate ($value, $args) {
+		$query = "select count(*) from customer where inboundnumber=?";
+		if (($args["customerid"] && QuickQuery($query . " and id!=?",false,array($value,$args["customerid"]))) ||
+			(!$args["customerid"] && QuickQuery($query,false,array($value)))) {		
+			return 'Number is already in use for ' . $this->label;
+		}
+		return true;
+	}
+}
+class ValUrlComponent extends Validator {
+	var $onlyserverside = true;
+	function validate ($value, $args) {		
+		// Allow legacy urlcomponents to be sorter than 5 characters but all new ones should be 5 or more
+		if (($args["urlcomponent"] && strlen($args["urlcomponent"]) >= 5 && strlen($value) < 5) ||
+			(!$args["urlcomponent"] && strlen($value) < 5)) {
+			return 'URL path must be 5 or more characters';
+		}		
+		
+		$query = "select count(*) from customer where urlcomponent=?";
+		if (($args["customerid"] && QuickQuery($query . " and id!=?",false,array($value,$args["customerid"]))) ||
+		(!$args["customerid"] && QuickQuery($query,false,array($value)))) {
+			return 'URL path is already in use';
+		}
+		return true;
+	}
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Form Data
+////////////////////////////////////////////////////////////////////////////////
+// default settings
+$settings = array(
+					'_dmmethod' => '',
+					'timezone' => '',
+					'displayname' => '',
+					'organizationfieldname' => 'School',
+					'urlcomponent' => '',
+					'_logocontentid' => '',
+					'_logoclickurl' => '',
+					'_productname' => '',
+					'_supportemail' => '',
+					'_supportphone' => '',
+					'callerid' => '',
+					'areacode' => '',
+					'inboundnumber' => '',
+					'maxphones' => '1',
+					'maxemails' => '1',
+					'emaildomain' => '',
+					'tinydomain' => '',
+					'softdeletemonths' => '6',
+					'harddeletemonths' => '24',
+					'disablerepeat' => '0',
+					'_hassurvey' => '0',
+					'surveyurl' => '',
+					'_hassms' => '0',
+					'maxsms' => '1',
+					'smscustomername' => '',
+					'enablesmsoptin' => '0',
+					'_hassmapi' => '0',
+					'_hascallback' => '0',
+					'callbackdefault' => 'inboundnumber',
+					'_hasldap' => '0',
+					'_hasenrollment' => '0',
+					'_hastargetedmessage' => '0',
+					'_hasselfsignup' => '',
+					'_hasportal' => '',
+					'_hasfacebook' => '0',
+					'_hastwitter' => '0',
+					'autoreport_replyname' => '',
+					'autoreport_replyemail' => '',
+					'_renewaldate' => '',
+					'_callspurchased' => '',
+					'_maxusers' => '',
+					'_timeslice' => '450',
+					'loginlockoutattempts' => '5',
+					'logindisableattempts' => '0',
+					'loginlockouttime' => '5',
+					'_brandtheme' => 'classroom',
+					'_brandprimary' => '3e693f',
+					'_brandratio' => '.2');
+
+$customerid = null;
+if (isset($_SESSION['customerid'])) {
+	$customerid = $_SESSION['customerid'];
+	$query = "select s.dbhost, c.dbusername, c.dbpassword, c.urlcomponent, c.enabled, c.oem, c.oemid, c.nsid, c.notes from customer c inner join shard s on (c.shardid = s.id) where c.id = '$customerid'";
+	$custinfo = QuickQueryRow($query,true);
+	$custdb = DBConnect($custinfo["dbhost"], $custinfo["dbusername"], $custinfo["dbpassword"], "c_$customerid");
+	if (!$custdb) {
+		exit("Connection failed for customer: {$custinfo["dbhost"]}, db: c_$customerid");
+	}
+
+	$query = "select name,value from setting";
+	$settings = array_merge($settings, QuickQueryList($query,true,$custdb));
+}
 
 $timezones = array(	"US/Alaska",
 					"US/Aleutian",
@@ -109,750 +280,1015 @@ $timezones = array(	"US/Alaska",
 					"US/Mountain",
 					"US/Pacific",
 					"US/Samoa"	);
-$reloadform = 0;
 
-$refresh = 0;
-$languages = DBFindMany("Language","from language order by id", false,false, $custdb);
-$ttslangs = QuickQueryList("select id, language from ttsvoice", true, $custdb);
-$ttslangs = array_flip($ttslangs);
+$logos = array(); 
+if ($customerid && $settings['_logocontentid'] != '') {
+	$logos = array( "Saved" => 'No change - Preview: <div style="display:inline;"><img src="customerlogo.img.php?id=' . $customerid .'" width="70px" alt="" /></div>');
+}
+// Content for logo selector
+$logos += array( 	"AutoMessenger" => '<img src="mimg/auto_messenger.jpg" alt="AutoMessenger" title="AutoMessenger" />',
+					"SchoolMessenger" => '<img src="mimg/logo_small.gif" alt="SchoolMessenger" title="SchoolMessenger" />',
+					"Skylert" => '<img src="mimg/sky_alert.jpg" alt="Skylert" title="Skylert" />');
 
-if(CheckFormSubmit($f,"Save") || CheckFormSubmit($f, "Return")) {
-	if(CheckFormInvalid($f))
-	{
-		error('Form was edited in another window, reloading data');
-		$reloadform = 1;
-	}
-	else
-	{
-		MergeSectionFormData($f, $s);
+// Locations and mimetype for default logos
+$defaultlogos = array(
+					"AutoMessenger" => array("filelocation" => "mimg/auto_messenger.jpg",
+											"filetype" => "image/jpg"),
+					"SchoolMessenger" => array("filelocation" => "mimg/logo_small.gif",
+											"filetype" => "image/gif"),
+					"Skylert" => array("filelocation" => "mimg/sky_alert.jpg",
+										"filetype" => "image/jpg")
+);
 
-		if( CheckFormSection($f, $s) ) {
-			error('There was a problem trying to save your changes', 'Please verify that all required field information has been entered properly');
-		} else {
 
-			$displayname = GetFormData($f,$s,"name");
-			$timezone = GetFormData($f, $s, "timezone");
-			$hostname = GetFormData($f, $s, "hostname");
-			$inboundnumber  = GetFormData($f, $s, "inboundnumber");
-			$maxphones = GetFormData($f, $s, "maxphones");
-			$maxemails = GetFormData($f, $s, "maxemails");
-			$callerid = GetFormData($f, $s, "callerid");
-			$areacode = GetFormData($f, $s, "areacode");
-			$autoname = GetFormData($f, $s, 'autoname');
-			$autoemail = GetFormData($f, $s, 'autoemail');
-			$renewaldate = GetFormData($f, $s, 'renewaldate');
-			$callspurchased = ereg_replace("[^0-9]*","",GetFormData($f, $s, 'callspurchased'));
-			$surveyurl = GetFormData($f, $s, 'surveyurl');
-			$maxusers = GetFormData($f, $s, 'maxusers');
-			$managernote = GetFormData($f, $s, 'managernote');
-			$hasldap = GetFormData($f, $s, 'hasldap');
-			$hassms = GetFormData($f, $s, 'hassms');
-			$enablesmsoptin = GetFormData($f, $s, "enablesmsoptin");
-			$smscustomername = trim(GetFormData($f, $s, "smscustomername"));
-			$maxsms = GetFormData($f, $s, 'maxsms');
-			$hasportal = GetFormData($f, $s, 'hasportal');
-			$hasselfsignup = GetFormData($f, $s, 'hasselfsignup');
-			$hasfacebook = GetFormData($f, $s, 'hasfacebook');
-			$hastwitter = GetFormData($f, $s, 'hastwitter');
-			$hassmapi = GetFormData($f, $s, 'hassmapi');
-			$tinydomain = GetFormData($f, $s, 'tinydomain');
-			$emaildomain = trim(GetFormData($f, $s, 'emaildomain'));
-			$emaildomainerror = validateDomainList($emaildomain);
-			$fileerror = false;
-			$logoname = "";
-			$loginpicturename ="";
-			if(isset($_FILES['uploadlogo']) && $_FILES['uploadlogo']['tmp_name']) {
+$shards = QuickQueryList("select id, name from shard where not isfull order by id",true);
 
-				$logoname = secure_tmpname("uploadlogo",".img");
-				if(!move_uploaded_file($_FILES['uploadlogo']['tmp_name'],$logoname)) {
-					$fileerror=true;
-				} else if (!is_file($logoname) || !is_readable($logoname)) {
-					$fileerror=true;
+$dmmeathod = array('' => '--Choose a Method--', 'asp' => 'CommSuite (fully hosted)','hybrid' => 'CS + SmartCall + Emergency','cs' => 'CS + SmartCall (data only)');
+
+$helpstepnum = 1;
+$helpsteps = array("TODO");
+$formdata = array(_L('Basics'));
+
+$formdata["enabled"] = array(
+						"label" => _L('Enabled'),
+						"value" => isset($custinfo)?$custinfo["enabled"]:"",
+						"validators" => array(),
+						"control" => array("CheckBox"),
+						"helpstep" => $helpstepnum
+);
+
+//Unable to change shard on this form
+if (!$customerid) {
+	$formdata["shard"] = array(
+							"label" => _L('Shard'),
+							"value" => "",
+							"validators" => array(
+								array("ValRequired"),
+								array("ValInArray", "values" => array_keys($shards))
+								),
+							"control" => array("SelectMenu", "values" => array("" =>_L("-- Select a Shard --")) + $shards),
+							"helpstep" => $helpstepnum
+	);
+}
+
+$formdata["dmmethod"] = array(
+						"label" => _L('DM Method'),
+						"value" => $settings['_dmmethod'],
+						"validators" => array(
+							array("ValRequired"),
+							array("ValInArray", "values" => array_keys($dmmeathod))
+							),
+						"control" => array("SelectMenu", "values" => array("" =>_L("-- Select a Method --")) + $dmmeathod),
+						"helpstep" => $helpstepnum
+);
+$formdata["timezone"] = array(
+						"label" => _L('Time zone'),
+						"value" => $settings['timezone'],
+						"validators" => array(
+							array("ValRequired"),
+							array("ValInArray", "values" => $timezones)
+						),
+						"control" => array("SelectMenu", "values" => array_merge(array("" =>_L("-- Select a Timezone --")),array_combine($timezones,$timezones))),
+						"helpstep" => $helpstepnum
+);
+
+$formdata["displayname"] = array(
+						"label" => _L('Display Name'),
+						"value" => $settings['displayname'],
+						"validators" => array(
+							array("ValRequired"),
+							array("ValLength","min" => 3,"max" => 50)
+						),
+						"control" => array("TextField","size" => 30, "maxlength" => 51),
+						"helpstep" => $helpstepnum
+					);
+
+$formdata["organizationfieldname"] = array(
+						"label" => _L("'Organization' Display Name"),
+						"value" => $settings['organizationfieldname'],
+						"validators" => array(
+							array("ValLength","min" => 3,"max" => 50)
+						),
+						"control" => array("TextField","size" => 30, "maxlength" => 51),
+						"helpstep" => $helpstepnum
+);
+
+$formdata["urlcomponent"] =	array(
+						"label" => _L('URL Path'),
+						"value" => $settings['urlcomponent'],
+						"validators" => array(
+							array("ValRequired"),
+							array("ValLength","max" => 30),
+							array("ValUrlComponent", "customerid" => $customerid, "urlcomponent" => $settings['urlcomponent'])
+						),
+						"control" => array("TextField","size" => 30, "maxlength" => 51),
+						"helpstep" => $helpstepnum
+					);
+
+$formdata["logo"] = array(
+						"label" => _L('Logo'),
+						"value" => ($customerid && $settings['_logocontentid'] != '')?"Saved":'',
+						"validators" => array(
+							array("ValRequired"),
+							array("ValInArray", "values" => array_keys($logos))
+							),
+						"control" => array("LogoRadioButton", "values" => $logos),
+						"helpstep" => $helpstepnum
+					);
+$formdata["logoclickurl"] = array(
+						"label" => _L('Logo Click URL'),
+						"value" => $settings['_logoclickurl'],
+						"validators" => array(
+							array("ValRequired"),
+							array("ValLength","min" => 3,"max" => 50)
+						),
+						"control" => array("TextField","size" => 30, "maxlength" => 51),
+						"helpstep" => $helpstepnum
+);
+$formdata["productname"] = array(
+						"label" => _L('Brand'),
+						"value" => $settings['_productname'],
+						"validators" => array(
+							array("ValRequired"),
+							array("ValLength","min" => 3,"max" => 50)
+						),
+						"control" => array("TextField","size" => 30, "maxlength" => 51),
+						"helpstep" => $helpstepnum
+					);
+
+$formdata["supportemail"] = array(
+						"label" => _L('Support Email'),
+						"value" => $settings['_supportemail'],
+						"validators" => array(
+							array("ValRequired"),
+							array("ValLength","max" => 255),
+							array("ValEmail")
+						),
+						"control" => array("TextField","maxlength"=>255,"min"=>3,"size"=>35),
+						"helpstep" => $helpstepnum
+);
+$formdata["supportphone"] = array(
+						"label" => _L('Support Phone'),
+						"value" => $settings['_supportphone'],
+						"validators" => array(
+							array("ValRequired"),
+							array("ValPhone")
+						),
+						"control" => array("TextField","size" => 15, "maxlength" => 20),
+						"helpstep" => $helpstepnum
+);
+
+$formdata["callerid"] = array(
+						"label" => _L('Default Caller ID'),
+						"value" => $settings['callerid'],
+						"validators" => array(
+							array("ValRequired"),
+							array("ValPhone")
+						),
+						"control" => array("TextField","size" => 15, "maxlength" => 20),
+						"helpstep" => $helpstepnum
+);
+
+$formdata["areacode"] = array(
+						"label" => _L('Default Area Code'),
+						"value" => $settings['areacode'],
+						"validators" => array(
+							array('ValNumber')
+						),
+						"control" => array("TextField","size" => 3, "maxlength" => 3),
+						"helpstep" => $helpstepnum
+);
+
+$formdata["inboundnumber"] = array(
+						"label" => _L('800 Inbound number'),
+						"value" => $settings['inboundnumber'],
+						"validators" => array(
+							array("ValPhone"),
+							array("ValInboundNumber", "customerid" => $customerid)
+						),
+						"control" => array("TextField","size" => 15, "maxlength" => 20),
+						"helpstep" => $helpstepnum
+);
+
+$formdata["maxphones"] = array(
+						"label" => _L('Max Phones'),
+						"value" => $settings['maxphones'],
+						"validators" => array(
+							array('ValNumber')
+						),
+						"control" => array("TextField","size" => 4, "maxlength" => 4),
+						"helpstep" => $helpstepnum
+);
+
+$formdata["maxemails"] = array(
+						"label" => _L('Max Emails'),
+						"value" => $settings['maxemails'],
+						"validators" => array(
+							array('ValNumber')
+						),
+						"control" => array("TextField","size" => 4, "maxlength" => 4),
+						"helpstep" => $helpstepnum
+);
+
+
+
+$formdata["autoreportreplyname"] = array(
+						"label" => _L('AutoReport Name'),
+						"value" => $settings['autoreport_replyname'],
+						"validators" => array(),
+						"control" => array("TextField","maxlength"=>255,"min"=>3,"size"=>35),
+						"helpstep" => $helpstepnum
+);
+
+$formdata["autoreportreplyemail"] = array(
+						"label" => _L('AutoReport Email'),
+						"value" => $settings['autoreport_replyemail'],
+						"validators" => array(
+							array("ValLength","max" => 255),
+							array("ValEmail")
+						),
+						"control" => array("TextField","maxlength"=>255,"min"=>3,"size"=>35),
+						"helpstep" => $helpstepnum
+);
+
+$formdata["emaildomain"] = array(
+						"label" => _L('Email Domain'),
+						"value" => $settings['emaildomain'],
+						"validators" => array(
+							array("ValLength","max" => 255),
+							array("ValDomainList")
+						),
+						"control" => array("TextField","maxlength"=>255,"min"=>3,"size"=>35),
+						"helpstep" => $helpstepnum
+);
+
+$tinydomains = $SETTINGS['feature']['tinydomain'];
+$formdata["tinydomain"] = array(
+						"label" => _L('Tiny Domain'),
+						"value" => $settings['tinydomain'],
+						"validators" => array(
+							array("ValInArray", "values" => $tinydomains)
+						),
+						"control" => array("SelectMenu", "values" => array("" =>_L("-- Select a Domain --")) + array_combine($tinydomains, $tinydomains)),
+						"helpstep" => $helpstepnum
+);
+
+$automessageexpire = array(
+	"0" => "Disabled",
+	"6" => "6 Months",
+	"12" => "12 Months",
+	"18" => "18 Months");
+
+$formdata["softdeletemonths"] = array(
+						"label" => _L('Auto Message Expire (soft delete)'),
+						"value" => $settings['softdeletemonths'],
+						"validators" => array(
+							array("ValInArray", "values" => array_keys($automessageexpire))
+						),
+						"control" => array("SelectMenu", "values" => $automessageexpire),
+						"helpstep" => $helpstepnum
+);
+
+$autoreportexpire = array(
+	"0" => "Disabled",
+	"6" => "6 Months",
+	"12" => "12 Months",
+	"18" => "18 Months",
+	"24" => "24 Months",
+	"36" => "36 Months",
+	"48" => "48 Months");
+
+$formdata["harddeletemonths"] = array(
+						"label" => _L('Auto Report Expire (HARD delete)'),
+						"value" => $settings['harddeletemonths'],
+						"validators" => array(
+							array("ValInArray", "values" => array_keys($autoreportexpire))
+						),
+						"control" => array("SelectMenu", "values" => $autoreportexpire),
+						"helpstep" => $helpstepnum
+);
+
+
+$formdata["notes"] = array(
+						"label" => _L('Notes'),
+						"value" => isset($custinfo)?$custinfo["notes"]:"",
+						"validators" => array(),
+						"control" => array("TextArea", "rows" => 3, "cols" => 100),
+						"helpstep" => $helpstepnum
+);
+
+$formdata[] = _L("Languages");
+
+$languages = $customerid?QuickQueryList("select code, name from language",true,$custdb):array("en" => "English", "es" => "Spanish");
+$formdata["languages"] = array(
+						"label" => _L('Languages'),
+						"value" => json_encode($languages),
+						"validators" => array(),
+						"control" => array("LanguagesItem", 
+							"ttslangs" => $customerid?QuickQueryList("select language,id from ttsvoice", true, $custdb):array()),
+						"helpstep" => $helpstepnum
+);
+
+$formdata[] = _L("SMS");
+$formdata["hassms"] = array(
+						"label" => _L('Has SMS'),
+						"value" => $settings['_hassms'],
+						"validators" => array(),
+						"control" => array("CheckBox"),
+						"helpstep" => $helpstepnum
+);
+$formdata["maxsms"] = array(
+						"label" => _L('Max SMS'),
+						"value" => $settings['maxsms'],
+						"validators" => array(
+							array('ValNumber')
+						),
+						"control" => array("TextField","size" => 4, "maxlength" => 4),
+						"helpstep" => $helpstepnum
+);
+$formdata["enablesmsoptin"] = array(
+						"label" => _L('SMS - Enable Opt-in'),
+						"value" => $settings['enablesmsoptin'],
+						"validators" => array(),
+						"control" => array("CheckBox"),
+						"helpstep" => $helpstepnum
+);
+
+
+$formdata["smscustomername"] = array(
+						"label" => _L('SMS Customer Name'),
+						"value" => $settings['smscustomername'],
+						"validators" => array(
+							array("ValLength","max" => 50),
+							array("ValRegExp","pattern" => getSmsRegExp())
+						),
+						"control" => array("TextField","maxlength"=>50,"size"=>25),
+						"helpstep" => $helpstepnum
+);
+$formdata[] = _L("API");
+$formdata["hassmapi"] = array(
+						"label" => _L('Has SMAPI'),
+						"value" => $settings['_hassmapi'],
+						"validators" => array(),
+						"control" => array("CheckBox"),
+						"helpstep" => $helpstepnum
+);
+$formdata["oem"] = array(
+						"label" => _L('OEM'),
+						"value" => isset($custinfo)?$custinfo["oem"]:"",
+						"validators" => array(
+							array('ValNumber'),
+							array("ValLength","max" => 50)
+						),
+						"control" => array("TextField","maxlength"=>50,"size"=>4),
+						"helpstep" => $helpstepnum
+);
+$formdata["oemid"] = array(
+						"label" => _L('OEM id'),
+						"value" => isset($custinfo)?$custinfo["oemid"]:"",
+						"validators" => array(
+							array('ValNumber'),
+							array("ValLength","max" => 50)
+						),
+						"control" => array("TextField","maxlength"=>50,"size"=>4),
+						"helpstep" => $helpstepnum
+);
+$formdata["nsid"] = array(
+						"label" => _L('NetSuite ID'),
+						"value" => isset($custinfo)?$custinfo["nsid"]:"",
+						"validators" => array(
+							array('ValNumber'),
+							array("ValLength","max" => 50)
+						),
+						"control" => array("TextField","maxlength"=>50,"size"=>4),
+						"helpstep" => $helpstepnum
+);
+
+
+$formdata[] = _L("Callback");
+
+$formdata["hascallback"] = array(
+						"label" => _L('Has Callback'),
+						"value" => $settings['_hascallback'],
+						"validators" => array(),
+						"control" => array("CheckBox"),
+						"helpstep" => $helpstepnum
+);
+
+$formdata["callbackdefault"] = array(
+						"label" => _L('Callback Default'),
+						"value" => $settings['callbackdefault'],
+						"validators" => array(
+							array("ValInArray", "values" => array("inboundnumber","callerid"))
+						),
+						"control" => array("SelectMenu", "values" => array("inboundnumber" => "Inbound Number","callerid" => "Default CallerID")),
+						"helpstep" => $helpstepnum
+);
+$formdata[] = _L("Additional Features");
+
+$formdata["portal"] = array(
+						"label" => _L('Portal'),
+						"value" => $settings['_hasportal']?"contactmanager":($settings['_hasselfsignup']?"selfsignup":"none"),
+						"validators" => array(),
+						"control" => array("RadioButton","values" => array("none" => "None", "contactmanager" => "Contact Manager", "selfsignup" => "Self-Signup")),
+						"helpstep" => $helpstepnum
+);
+
+$formdata["hassurvey"] = array(
+						"label" => _L('Has Survey'),
+						"value" => $settings['_hassurvey'],
+						"validators" => array(),
+						"control" => array("CheckBox"),
+						"helpstep" => $helpstepnum
+);
+$formdata["hasldap"] = array(
+						"label" => _L('Has LDAP'),
+						"value" => $settings['_hasldap'],
+						"validators" => array(),
+						"control" => array("CheckBox"),
+						"helpstep" => $helpstepnum
+);
+
+$formdata["hasenrollment"] = array(
+						"label" => _L('Has Enrollment'),
+						"value" => $settings['_hasenrollment'],
+						"validators" => array(),
+						"control" => array("CheckBox"),
+						"helpstep" => $helpstepnum
+);
+
+$formdata["hasclassroom"] = array(
+						"label" => _L('Has Classroom Comments'),
+						"value" => $settings['_hastargetedmessage'],
+						"validators" => array(),
+						"control" => array("CheckBox"),
+						"helpstep" => $helpstepnum
+);
+
+$formdata["hasfacebook"] = array(
+						"label" => _L('Has Facebook'),
+						"value" => $settings['_hasfacebook'],
+						"validators" => array(),
+						"control" => array("CheckBox"),
+						"helpstep" => $helpstepnum
+);
+$formdata["hastwitter"] = array(
+						"label" => _L('Has Facebook'),
+						"value" => $settings['_hastwitter'],
+						"validators" => array(),
+						"control" => array("CheckBox"),
+						"helpstep" => $helpstepnum
+);
+
+$formdata[] = _L("Misc. Settings");
+$formdata["renewaldate"] = array(
+						"label" => _L('Renewal Date'),
+						"value" => $settings['_renewaldate'],
+						"validators" => array(
+							array('ValDate', "min" => date("m/d/Y", time()))
+						),
+						"control" => array("TextDate", "size"=>12),
+						"helpstep" => $helpstepnum
+);
+$formdata["callspurchased"] = array(
+						"label" => _L('Calls Purchased'),
+						"value" => $settings['_callspurchased'],
+						"validators" => array(
+							array('ValNumber')
+						),
+						"control" => array("TextField","size"=>4),
+						"helpstep" => $helpstepnum
+);
+$formdata["maxusers"] = array(
+						"label" => _L('Users Purchased'),
+						"value" => $settings['_maxusers']!="unlimited"?$settings['_maxusers']:"",
+						"validators" => array(
+							array('ValNumber')
+						),
+						"control" => array("TextField","size"=>4),
+						"helpstep" => $helpstepnum
+);
+
+$formdata["timeslice"] = array(
+						"label" => _L('Timeslice'),
+						"value" => $settings['_timeslice'],
+						"validators" => array(
+							array("ValRequired"),
+							array('ValNumber', "min" => 60, "max" => 1800)
+						),
+						"control" => array("TextField","size"=>4),
+						"helpstep" => $helpstepnum
+);
+$formdata["loginlockoutattempts"] = array(
+						"label" => _L('Failed login attempts to cause lockout'),
+						"value" => $settings['loginlockoutattempts'],
+						"validators" => array(
+							array('ValNumber', "min" => 0, "max" => 15)
+						),
+						"control" => array("SelectMenu", "values" => array(0 => "Disable") + array_combine(range(1, 15),range(1, 15))),
+						"helpstep" => $helpstepnum
+);
+$formdata["logindisableattempts"] = array(
+						"label" => _L('Failed login attempts before account disable'),
+						"value" => $settings['logindisableattempts'],
+						"validators" => array(
+							array('ValNumber', "min" => 0, "max" => 15)
+						),
+						"control" => array("SelectMenu", "values" => array(0 => "Disable") + array_combine(range(1, 15),range(1, 15))),
+						"helpstep" => $helpstepnum
+);
+$formdata["loginlockouttime"] = array(
+						"label" => _L('Number of minutes for login lockout'),
+						"value" => $settings['loginlockouttime'],
+						"validators" => array(
+							array('ValNumber', "min" => 1, "max" => 60)
+						),
+						"control" => array("SelectMenu", "values" => array_combine(range(1, 60),range(1, 60))),
+						"helpstep" => $helpstepnum
+);
+
+$helpsteps[$helpstepnum++] = _L("Choose a theme for the user interface.<br><br>Additionally, you can select a color which will be blended into the grey parts of certain interface components. The amount of tint is determined by the shader ratio.<br><br> Setting the theme will reset the color and ratio options to the theme defaults.");
+$formdata["brandtheme"] = array(
+						"label" => _L("Default Theme"),
+						"fieldhelp" => _L("Use this to select a different theme for the user interface. Themes can be customized with alternate primary colors (in hex) and primary to background color ratio settings."),
+						"value" => json_encode(array(
+							"theme"=>$settings['_brandtheme'],
+							"color"=>$settings['_brandprimary'],
+							"ratio"=>$settings['_brandratio'],
+							"customize"=>true
+						)),
+						"validators" => array(
+							array("ValRequired"),
+							array("ValBrandTheme", "values" => array_keys($COLORSCHEMES))),
+						"control" => array("BrandTheme","values"=>$COLORSCHEMES,"toggle"=>false),
+						"helpstep" => $helpstepnum
+);
+
+$buttons = array(submit_button(_L("Save"),"save","tick"),submit_button(_L("Save and Return"),"done","tick"),
+				icon_button(_L('Cancel'),"cross",null,"customers.php"));
+$form = new Form("newcustomer",$formdata,$helpsteps,$buttons);
+////////////////////////////////////////////////////////////////////////////////
+// Form Data Handling
+////////////////////////////////////////////////////////////////////////////////
+
+//check and handle an ajax request (will exit early)
+//or merge in related post data
+$form->handleRequest();
+
+$datachange = false;
+$errors = false;
+//check for form submission
+if ($button = $form->getSubmit()) { //checks for submit and merges in post data
+	$ajax = $form->isAjaxSubmit(); //whether or not this requires an ajax response	
+	
+	if ($form->checkForDataChange()) {
+		$datachange = true;
+	} else if (($errors = $form->validate()) === false) { //checks all of the items in this form
+		$postdata = $form->getData(); //gets assoc array of all values {name:value,...}
+		Query("BEGIN");
+		// Craete new customer if It does not exist 
+		if (!$customerid) {			
+			//choose shard info based on selection
+			$shardinfo = QuickQueryRow("select id, dbhost, dbusername, dbpassword from shard where id = ?", true,false,array($postdata["shard"]));
+			$shardid = $shardinfo['id'];
+			$shardhost = $shardinfo['dbhost'];
+			$sharduser = $shardinfo['dbusername'];
+			$shardpass = $shardinfo['dbpassword'];
+			
+			$dbpassword = genpassword();
+			$limitedpassword = genpassword();
+			QuickUpdate("insert into customer (urlcomponent, shardid, dbpassword, limitedpassword, enabled)
+															values (?, ?, ?, ?, '1')", false, array($postdata["urlcomponent"], $shardid, $dbpassword, $limitedpassword) )
+			or dieWithError("failed to insert customer into auth server", $_dbcon);
+			
+			$customerid = $_dbcon->lastInsertId();
+			$custdbname = "c_$customerid";
+			$limitedusername = "c_".$customerid."_limited";
+			QuickUpdate("update customer set dbusername = '" . $custdbname . "', limitedusername = '" . $limitedusername . "' where id = '" . $customerid . "'");
+			
+			$custdb = DBConnect($shardhost, $sharduser, $shardpass, "aspshard");
+			QuickUpdate("create database $custdbname DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci",$custdb)
+			or dieWithError("Failed to create new DB ".$custdbname, $custdb);
+			$custdb->query("use ".$custdbname)
+			or dieWithError("Failed to connect to DB ".$custdbname, $custdb);
+			
+			// customer db user
+			$grantedhost = '%';
+			if (isset($SETTINGS['feature']['should_grant_local']) && $SETTINGS['feature']['should_grant_local']) {
+				$grantedhost = 'localhost';
+			}
+			QuickUpdate("drop user '$custdbname'@'$grantedhost'", $custdb); //ensure mysql credentials match our records, which it won't if create user fails because the user already exists
+			QuickUpdate("create user '$custdbname'@'$grantedhost' identified by '$dbpassword'", $custdb);
+			QuickUpdate("grant select, insert, update, delete, create temporary tables, execute on $custdbname . * to '$custdbname'@'$grantedhost'", $custdb);
+			
+			// create customer tables
+			$tablequeries = explode("$$$",file_get_contents("../db/customer.sql"));
+			$tablequeries = array_merge($tablequeries, explode("$$$",file_get_contents("../db/createtriggers.sql")));
+			$tablequeries = array_merge($tablequeries, explode("$$$",file_get_contents("../db/targetedmessages.sql")));
+			foreach ($tablequeries as $tablequery) {
+				if (trim($tablequery)) {
+					$tablequery = str_replace('_$CUSTOMERID_', $customerid, $tablequery);
+					Query($tablequery,$custdb)
+					or dieWithError("Failed to execute statement \n$tablequery\n\nfor $custdbname", $custdb);
 				}
 			}
-			if(isset($_FILES['uploadloginpicture']) && $_FILES['uploadloginpicture']['tmp_name']) {
-
-				$loginpicturename = secure_tmpname("uploadloginpicture",".img");
-				if(!move_uploaded_file($_FILES['uploadloginpicture']['tmp_name'],$loginpicturename)) {
-					$fileerror=true;
-				} else if (!is_file($loginpicturename) || !is_readable($loginpicturename)) {
-					$fileerror=true;
-				}
-			}
-			$subscriberloginpicturename = "";
-			if (isset($_FILES['uploadsubscriberloginpicture']) && $_FILES['uploadsubscriberloginpicture']['tmp_name']) {
-
-				$subscriberloginpicturename = secure_tmpname("uploadsubscriberloginpicture",".img");
-				if (!move_uploaded_file($_FILES['uploadsubscriberloginpicture']['tmp_name'], $subscriberloginpicturename)) {
-					$fileerror = true;
-				} else if (!is_file($subscriberloginpicturename) || !is_readable($subscriberloginpicturename)) {
-					$fileerror = true;
-				}
-			}
-
-			if (($inboundnumber != "") && QuickQuery("SELECT COUNT(*) FROM customer WHERE inboundnumber ='" . DBSafe($inboundnumber) . "' and id != '" . $currentid . "'")) {
-				error('Entered 800 Number Already being used', 'Please Enter Another');
-			} else if (QuickQuery("SELECT COUNT(*) FROM customer WHERE urlcomponent='" . DBSafe($hostname) ."' AND id != $currentid")) {
-				error('URL Path Already exists', 'Please Enter Another');
-			} else if (strlen($inboundnumber) > 0 && !ereg("[0-9]{10}",$inboundnumber)) {
-				error('Bad Toll Free Number Format, Try Again');
-			} else if ((strlen($custinfo[3]) >= 5) && (strlen($hostname) < 5)){
-				error('Customer URL\'s cannot be shorter than 5 unless their account was already made');
-			} else if(GetFormData($f, $s, "timeslice") == ""){
-				error("Timeslice cannot be blank");
-			} else if(!eregi("[0-9A-F]{6}", GetFormData($f, $s, "_brandprimary"))){
-				error("That is not a valid 'Primary Color'");
-			} else if(GetFormData($f, $s, "_brandratio") < 0 || GetFormData($f, $s, "_brandratio") > .5){
-				error("The ratio can only be between 0 and .5(50%)");
-			} else if($fileerror){
-				error('Unable to complete file upload. Please try again');
-			} else if ($hasportal && $hasselfsignup) {
-				error("Customer cannot have both Contact Manager and Self-Signup features, please select only one");
-			} else if ($emaildomainerror !== true) {
-				error($emaildomainerror);
-			} else if ($smscustomername == "") {
-				error('SMS Customer Name cannot be blank');
-			} else if (strlen($smscustomername) > 50) {
-				error('SMS Customer Name cannot exceed 50 characters');
-			} else if (!ereg(getSmsRegExp(),$smscustomername)) {
-				error('SMS Customer Name has invalid characters');
-			} else {
-
-				QuickUpdate("update customer set
-						urlcomponent = '" . DBSafe($hostname) ."',
-						inboundnumber = '" . DBSafe($inboundnumber) ."',
-						enabled=" . (GetFormData($f,$s,"enabled") + 0) .",
-						oem='" . DBSafe(strtolower(GetFormData($f, $s, "oem"))) . "',
-						oemid='" . DBSafe(GetFormData($f, $s,"oemid")) . "',
-						nsid='" . DBSafe(GetFormData($f, $s, "nsid")) . "',
-						notes='" . DBSafe($managernote) . "'
-						where id = '$currentid'");
-
-				// notify authserver to refresh the customer cache
-				refreshCustomer($currentid);
-
-				// if timezone changed (rare occurance, but we must update scheduled jobs and report records on the shard database)
-				if ($timezone != getCustomerSystemSetting('timezone', false, true, $custdb)) {
-					$currentid = $_SESSION['currentid'];
-					$shardinfo = QuickQueryRow("select s.dbhost, s.dbusername, s.dbpassword from shard s inner join customer c on (c.shardid = s.id) where c.id = '$currentid'");
-					$sharddb = DBConnect($shardinfo[0], $shardinfo[1], $shardinfo[2], "aspshard");
-					if(!$sharddb) {
-						exit("Connection failed for customer: $currentid, shardhost: $shardinfo[0]");
-					}
-					QuickUpdate("update qjob set timezone='".$timezone."' where customerid=".$currentid, $sharddb);
-					QuickUpdate("update qschedule set timezone='".$timezone."' where customerid=".$currentid, $sharddb);
-					QuickUpdate("update qreportsubscription set timezone='".$timezone."' where customerid=".$currentid, $sharddb);
-				}
-
-				if (!GetFormData($f,$s,"enabled"))
-					setCustomerSystemSetting("disablerepeat", "1", $custdb);
-
-				setCustomerSystemSetting("urlcomponent", $hostname, $custdb);
-				setCustomerSystemSetting("displayname", $displayname, $custdb);
-				setCustomerSystemSetting("inboundnumber", $inboundnumber, $custdb);
-				setCustomerSystemSetting("timezone", $timezone, $custdb);
-
-				update_jobtypeprefs(1, $maxphones, "phone", $custdb);
-				setCustomerSystemSetting("maxphones", $maxphones, $custdb);
-
-				update_jobtypeprefs(1, $maxemails, "email", $custdb);
-				setCustomerSystemSetting("maxemails", $maxemails, $custdb);
-
-				update_jobtypeprefs(1, $maxsms, "sms", $custdb);
-				setCustomerSystemSetting('maxsms', $maxsms, $custdb);
-
-				setCustomerSystemSetting('callerid', Phone::parse($callerid), $custdb);
-				setCustomerSystemSetting('defaultareacode', $areacode, $custdb);
-				setCustomerSystemSetting('autoreport_replyname', $autoname, $custdb);
-				setCustomerSystemSetting('autoreport_replyemail', $autoemail, $custdb);
-				setCustomerSystemSetting('surveyurl', $surveyurl, $custdb);
-
-				if($renewaldate != "" || $renewaldate != NULL){
-					if($renewaldate = strtotime($renewaldate)) {
-						$renewaldate = date("Y-m-d", $renewaldate);
-					}
-				}
-
-				setCustomerSystemSetting('_renewaldate', $renewaldate, $custdb);
-				setCustomerSystemSetting('_callspurchased', $callspurchased, $custdb);
-				if($maxusers == "")
-					$maxusers = "unlimited";
-				setCustomerSystemSetting('_maxusers', $maxusers, $custdb);
-				setCustomerSystemSetting('_hasldap', $hasldap, $custdb);
-				setCustomerSystemSetting('_hassms', $hassms, $custdb);
-				setCustomerSystemSetting('enablesmsoptin', $enablesmsoptin, $custdb);
-				setCustomerSystemSetting('smscustomername', $smscustomername, $custdb);
-
-				setCustomerSystemSetting('_hasportal', $hasportal, $custdb);
-				setCustomerSystemSetting('_hassurvey', GetFormData($f, $s, 'hassurvey'), $custdb);
-				setCustomerSystemSetting('_hascallback', GetFormData($f, $s, 'hascallback'), $custdb);
-				setCustomerSystemSetting('callbackdefault', GetFormData($f, $s, 'callbackdefault'), $custdb);
-				setCustomerSystemSetting('_hasenrollment', GetFormData($f, $s, 'hasenrollment'), $custdb);
-				setCustomerSystemSetting('_hastargetedmessage', GetFormData($f, $s, 'hastargetedmessage'), $custdb);
-				setCustomerSystemSetting('_hasselfsignup', $hasselfsignup, $custdb);
-				setCustomerSystemSetting('_hasfacebook', $hasfacebook, $custdb);
-				setCustomerSystemSetting('_hastwitter', $hastwitter, $custdb);
-				setCustomerSystemSetting('_hassmapi', $hassmapi, $custdb);
-				setCustomerSystemSetting('_timeslice', GetFormData($f, $s, 'timeslice'), $custdb);
-				setCustomerSystemSetting('organizationfieldname', GetFormData($f, $s, 'organizationfieldname'), $custdb);
-
-				setCustomerSystemSetting('loginlockoutattempts', GetFormData($f, $s, 'loginlockoutattempts'), $custdb);
-				setCustomerSystemSetting('logindisableattempts', GetFormData($f, $s, 'logindisableattempts'), $custdb);
-				setCustomerSystemSetting('loginlockouttime', GetFormData($f, $s, 'loginlockouttime'), $custdb);
-
-				// this is a hack - subscriber languages English and Spanish are hardcoded - language needs redo post 7.0 release
-				QuickUpdate("update persondatavalues set editlock=0 where fieldnum='f03'", $custdb);
-				if ($hasselfsignup) {
-					// English
-					if (QuickQuery("select count(*) from persondatavalues where fieldnum='f03' and value='en'", $custdb)) {
-						QuickUpdate("update persondatavalues set editlock=1 where fieldnum='f03' and value='en'", $custdb);
-					} else {
-						QuickUpdate("insert into persondatavalues (fieldnum, value, refcount, editlock) values ('f03','en',0,1)", $custdb);
-					}
-					// Spanish
-					if (QuickQuery("select count(*) from persondatavalues where fieldnum='f03' and value='es'", $custdb)) {
-						QuickUpdate("update persondatavalues set editlock=1 where fieldnum='f03' and value='es'", $custdb);
-					} else {
-						QuickUpdate("insert into persondatavalues (fieldnum, value, refcount, editlock) values ('f03','es',0,1)", $custdb);
-					}
-				}
-
-				$oldlanguages = GetFormData($f, $s, "oldlanguages");
-				foreach($oldlanguages as $oldlanguage){
-					$lang = "Language" . $oldlanguage;
-					if ($oldlanguage != 1) {
-						if(GetFormData($f, $s, $lang) === "") {
-							QuickUpdate("delete from language where id = $oldlanguage", $custdb);
-						} else {
-							QuickUpdate("update language set name='" . GetFormData($f, $s, $lang) . "' where id = '" . $oldlanguage . "'", $custdb);
-						}
-					}
-				}
-
-				if(GetFormData($f,$s, "newlang")!="" && GetFormData($f,$s, "newlangcode")!=""){
-					QuickUpdate("insert into language(name,code) values ('" . trim(GetFormData($f, $s, "newlang")) . "','" . trim(GetFormData($f, $s, "newlangcode")) . "')", $custdb);
-				}
-
-				//Logo
-				if($logoname){
-					$newlogofile = file_get_contents($logoname);
-					if($newlogofile){
-						QuickUpdate("INSERT INTO content (contenttype, data) values
-									('" . $_FILES['uploadlogo']['type'] . "', '" . base64_encode($newlogofile) . "')", $custdb);
-						$logocontentid = $custdb->lastInsertId();
-						setCustomerSystemSetting('_logocontentid', $logocontentid, $custdb);
-					}
-				}
-
-				// Login image
-				if($loginpicturename){
-					$newloginpicturefile = file_get_contents($loginpicturename);
-					if($newloginpicturefile){
-						QuickUpdate("INSERT INTO content (contenttype, data) values
-									('" . $_FILES['uploadloginpicture']['type'] . "', '" . base64_encode($newloginpicturefile) . "')", $custdb);
-						$loginpicturecontentid = $custdb->lastInsertId();
-						setCustomerSystemSetting('_loginpicturecontentid', $loginpicturecontentid, $custdb);
-					}
-				}
-
-				// Subscriber Login image
-				if ($subscriberloginpicturename) {
-					$newsubscriberloginpicturefile = file_get_contents($subscriberloginpicturename);
-					if($newsubscriberloginpicturefile){
-						QuickUpdate("INSERT INTO content (contenttype, data) values
-									('" . $_FILES['uploadsubscriberloginpicture']['type'] . "', '" . base64_encode($newsubscriberloginpicturefile) . "')", $custdb);
-						$subscriberloginpicturecontentid = $custdb->lastInsertId();
-						setCustomerSystemSetting('_subscriberloginpicturecontentid', $subscriberloginpicturecontentid, $custdb);
-					}
-				}
-
-				setCustomerSystemSetting('_productname', GetFormData($f, $s, 'productname'), $custdb);
-				$theme = DBSafe(GetFormData($f, $s, 'theme'));
-				setCustomerSystemSetting('_brandtheme', $theme, $custdb);
-				setCustomerSystemSetting('_brandprimary', GetFormData($f, $s, '_brandprimary') ? GetFormData($f, $s, '_brandprimary') : $COLORSCHEMES[$theme]['_brandprimary'], $custdb);
-				setCustomerSystemSetting('_brandtheme1', $COLORSCHEMES[$theme]['_brandtheme1'], $custdb);
-				setCustomerSystemSetting('_brandtheme2', $COLORSCHEMES[$theme]['_brandtheme2'], $custdb);
-				setCustomerSystemSetting('_brandratio', GetFormData($f, $s, '_brandratio') ? GetFormData($f, $s, '_brandratio') : $COLORSCHEMES[$theme]['_brandratio'], $custdb);
-
-				setCustomerSystemSetting('_logoclickurl', TrimFormData($f, $s, "_logoclickurl"), $custdb);
-
-				setCustomerSystemSetting('_supportemail', DBSafe(GetFormData($f, $s, "_supportemail")), $custdb);
-				setCustomerSystemSetting('_supportphone', Phone::parse(GetFormData($f, $s, "_supportphone")), $custdb);
-
-				setCustomerSystemSetting('emaildomain', DBSafe($emaildomain), $custdb);
-
-				setCustomerSystemSetting('tinydomain', GetFormData($f, $s, 'tinydomain'), $custdb);
+			
+			// subscriber db user
+			createLimitedUser($limitedusername, $limitedpassword, $custdbname, $custdb, $grantedhost);
+			
+			// 'schoolmessenger' user
+			createSMUserProfile($custdb, $custdbname);
+			
+			$query = "INSERT INTO `fieldmap` (`fieldnum`, `name`, `options`) VALUES
+										('f01', 'First Name', 'searchable,text,firstname,subscribe,dynamic'),
+										('f02', 'Last Name', 'searchable,text,lastname,subscribe,dynamic'),
+										('f03', 'Language', 'searchable,multisearch,language,subscribe,static')";
+			QuickUpdate($query, $custdb) or dieWithError("SQL:" . $query, $custdb);
+			
+			$query = "INSERT INTO `language` (`name`,`code`) VALUES
+										('English','en'),
+										('Spanish','es')";
+			QuickUpdate($query, $custdb) or dieWithError("SQL:" . $query, $custdb);
+			
+			$query = "INSERT INTO `jobtype` (`name`, `systempriority`, `info`, `issurvey`, `deleted`) VALUES
+										('Emergency', 1, 'Emergencies Only', 0, 0),
+										('Attendance', 2, 'Attendance', 0, 0),
+										('General', 3, 'General Announcements', 0, 0),
+										('Survey', 3, 'Surveys', 1, 0)";
+			
+			QuickUpdate($query, $custdb) or dieWithError(" SQL:" . $query, $custdb);
+			
+			$query = "INSERT INTO `jobtypepref` (`jobtypeid`,`type`,`sequence`,`enabled`) VALUES
+										(1,'phone',0,1),
+										(1,'email',0,1),
+										(1,'sms',0,1),
+										(2,'phone',0,1),
+										(2,'email',0,1),
+										(2,'sms',0,1),
+										(3,'phone',0,1),
+										(3,'email',0,1),
+										(3,'sms',0,1),
+										(4,'phone',0,1),
+										(4,'email',0,1),
+										(4,'sms',0,0)";
+			
+			QuickUpdate($query, $custdb) or dieWithError(" SQL:" . $query, $custdb);
+			
+			// Login Picture
+			QuickUpdate("INSERT INTO content (contenttype, data) values
+										('image/gif', '" . base64_encode(file_get_contents("mimg/classroom_girl.jpg")) . "')",$custdb);
+			$loginpicturecontentid = $custdb->lastInsertId();
+			
+			$query = "INSERT INTO `setting` (`name`, `value`) VALUES
+										('_loginpicturecontentid', '" . $loginpicturecontentid . "')";
+			QuickUpdate($query, $custdb) or dieWithError(" SQL: " . $query, $custdb);
+			
+			// Subscriber Login Picture
+			QuickUpdate("INSERT INTO content (contenttype, data) values
+										('image/gif', '" . base64_encode(file_get_contents("mimg/header_highered3.gif")) . "')",$custdb);
+			$subscriberloginpicturecontentid = $custdb->lastInsertId();
+			
+			$query = "INSERT INTO `setting` (`name`, `value`) VALUES
+										('_subscriberloginpicturecontentid', '" . $subscriberloginpicturecontentid . "')";
+			QuickUpdate($query, $custdb) or dieWithError(" SQL: " . $query, $custdb);
+			
+			// Classroom Message Category
+			$query = "INSERT INTO `targetedmessagecategory` (`id`, `name`, `deleted`, `image`) VALUES
+										(1, 'Default', 0, 'blue dot')";
+			QuickUpdate($query, $custdb) or dieWithError(" SQL: " . $query, $custdb);
+			
+			// set global to customer db, restore after this section
+			global $_dbcon;
+			$savedbcon = $_dbcon;
+			$_dbcon = $custdb;
 				
-				if(getCustomerSystemSetting('_dmmethod', '', true, $custdb)!='asp' && GetFormData($f, $s, "_dmmethod") == 'asp'){
-					$aspquery = QuickQueryRow("select s.dbhost, s.dbusername, s.dbpassword from customer c inner join shard s on (c.shardid = s.id) where c.id = '$currentid'");
-					$aspsharddb = DBConnect($aspquery[0], $aspquery[1], $aspquery[2], "aspshard");
-					QuickUpdate("delete from specialtaskqueue where customerid = " . $currentid, $aspsharddb);
-					QuickUpdate("update qjob set dispatchtype = 'system' where customerid = " . $currentid . " and status = 'active'", $aspsharddb);
-				}
+			// Default Email Templates
+			if (!createDefaultTemplates_7_8())
+				return false;
+				
+			// restore global db connection
+			$_dbcon = $savedbcon;
+		}
 
-				setCustomerSystemSetting('_dmmethod', DBSafe(GetFormData($f, $s, "_dmmethod")), $custdb);
-
-				setCustomerSystemSetting('softdeletemonths', DBSafe(GetFormData($f, $s, "softdeletemonths")), $custdb);
-				setCustomerSystemSetting('harddeletemonths', DBSafe(GetFormData($f, $s, "harddeletemonths")), $custdb);
-
-				if(CheckFormSubmit($f, "Return")){
-					redirect("customers.php");
-				} else {
-					redirect(); //the annoying custinfo above needs to be reloaded
-				}
+		
+		$query = "update customer set
+								urlcomponent = ?,
+								inboundnumber = ?,
+								enabled=?,
+								oem=?,
+								oemid=?,
+								nsid=?,
+								notes=?
+								where id = ?";
+				
+		QuickUpdate($query,false,array(
+			$postdata["urlcomponent"],
+			$postdata["inboundnumber"],
+			$postdata["enabled"]?1:0,
+			$postdata["oem"],
+			$postdata["oemid"],
+			$postdata["nsid"],
+			$postdata["notes"],
+			$customerid
+		));
+		
+		// notify authserver to refresh the customer cache
+		refreshCustomer($customerid);
+		
+		// if timezone changed (rare occurance, but we must update scheduled jobs and report records on the shard database)
+		if ($postdata["timezone"] != getCustomerSystemSetting('timezone', false, true, $custdb)) {
+			$currentid = $_SESSION['currentid'];
+			$shardinfo = QuickQueryRow("select s.dbhost, s.dbusername, s.dbpassword from shard s inner join customer c on (c.shardid = s.id) where c.id = ?", true,false,array($customerid));				
+			$sharddb = DBConnect($shardinfo["dbhost"], $shardinfo["dbusername"], $shardinfo["dbpassword"], "aspshard");
+			if(!$sharddb) {
+				exit("Connection failed for customer: $customerid, shardhost: {$shardinfo["dbhost"]}");
+			}
+			QuickUpdate("update qjob set timezone=? where customerid=?", $sharddb, array($postdata["timezone"],$customerid));
+			QuickUpdate("update qschedule set timezone=? where customerid=?", $sharddb,array($postdata["timezone"],$customerid));
+			QuickUpdate("update qreportsubscription set timezone=? where customerid=?", $sharddb,array($postdata["timezone"],$customerid));
+		}
+		
+		if (!$postdata["enabled"])
+		setCustomerSystemSetting("disablerepeat", "1", $custdb);
+		
+		
+		if(getCustomerSystemSetting('_dmmethod', '', true, $custdb)!='asp' && $postdata["dmmethod"] == 'asp'){
+			$aspquery = QuickQueryRow("select s.dbhost, s.dbusername, s.dbpassword from customer c inner join shard s on (c.shardid = s.id) where c.id = '$currentid'");
+			$aspsharddb = DBConnect($aspquery[0], $aspquery[1], $aspquery[2], "aspshard");
+			QuickUpdate("delete from specialtaskqueue where customerid = " . $currentid, $aspsharddb);
+			QuickUpdate("update qjob set dispatchtype = 'system' where customerid = " . $currentid . " and status = 'active'", $aspsharddb);
+		}
+		setCustomerSystemSetting('_dmmethod', $postdata["dmmethod"], $custdb);
+		setCustomerSystemSetting('timezone', $postdata["timezone"], $custdb);
+		setCustomerSystemSetting('displayname', $postdata["displayname"], $custdb);
+		setCustomerSystemSetting('organizationfieldname', $postdata['organizationfieldname'], $custdb);
+		
+		setCustomerSystemSetting('urlcomponent', $postdata["urlcomponent"], $custdb);
+		setCustomerSystemSetting('surveyurl', $SETTINGS['feature']['customer_url_prefix'] . "/" . $postdata["urlcomponent"] . "/survey/", $custdb);
+		
+		// Logo Picture
+		$logo = $postdata["logo"];
+		if (isset($defaultlogos[$logo])) {
+			$logofile = @file_get_contents($defaultlogos[$logo]['filelocation']);
+			if($logofile) {
+				$query = "INSERT INTO `content` (`contenttype`, `data`) VALUES
+										('" . $defaultlogos[$logo]["filetype"] . "', '" . base64_encode($logofile) . "');";
+				QuickUpdate($query, $custdb);
+				$logocontentid = $custdb->lastInsertId();
+				setCustomerSystemSetting('_logocontentid', $logocontentid, $custdb);			
 			}
 		}
+
+		setCustomerSystemSetting('_logoclickurl', $postdata["logoclickurl"], $custdb);
+		setCustomerSystemSetting('_productname',  $postdata["productname"],$custdb);
+		setCustomerSystemSetting('_supportemail', $postdata["supportemail"], $custdb);
+		setCustomerSystemSetting('_supportphone', $postdata["supportphone"], $custdb);
+		setCustomerSystemSetting('callerid', $postdata["callerid"], $custdb);
+		setCustomerSystemSetting('areacode', $postdata["areacode"], $custdb);
+		setCustomerSystemSetting("inboundnumber", $postdata["inboundnumber"], $custdb);
+		
+		update_jobtypeprefs(1, $postdata["maxphones"], "phone", $custdb);
+		setCustomerSystemSetting('maxphones', $postdata["maxphones"], $custdb);
+		
+		update_jobtypeprefs(1, $postdata["maxemails"], "email", $custdb);
+		setCustomerSystemSetting('maxemails', $postdata["maxemails"], $custdb);
+		setCustomerSystemSetting('autoreport_replyname', $postdata["autoreportreplyname"], $custdb);
+		setCustomerSystemSetting('autoreport_replyemail', $postdata["autoreportreplyemail"], $custdb);
+		setCustomerSystemSetting('emaildomain', $postdata["emaildomain"], $custdb);
+		setCustomerSystemSetting('tinydomain', $postdata["tinydomain"], $custdb);
+		setCustomerSystemSetting('softdeletemonths', $postdata["softdeletemonths"], $custdb);
+		setCustomerSystemSetting('harddeletemonths', $postdata["harddeletemonths"], $custdb);
+		
+		// Add/Remove Languages
+		$submittedlanguages = json_decode($postdata["languages"],true);
+		foreach($submittedlanguages as $code => $name) {
+			if (isset($languages[$code])) {
+				if ($code != 'en' && $languages[$code] != $name) {
+					// Name changed for this language
+					QuickUpdate("update language set name=? where code=?",$custdb,array($name,$code));
+				}
+				unset($languages[$code]);
+			} else {
+				// Add Language since it did not exist already
+				QuickUpdate("insert into language (code, name) values (?, ?)", $custdb, array($code, $name));
+			}
+		}
+		foreach($languages as $code => $name) {
+			// Remove all unwanted languages except English
+			if ($code != 'en') {
+				QuickUpdate("delete from language where code=?", $custdb, array($code));
+			}
+		}
+		
+		// this is a hack - subscriber languages English and Spanish are hardcoded - language needs redo post 7.0 release
+		QuickUpdate("update persondatavalues set editlock=0 where fieldnum='f03'", $custdb);
+		if ($postdata["portal"] == "selfsignup") {
+			// English
+			if (QuickQuery("select count(*) from persondatavalues where fieldnum='f03' and value='en'", $custdb)) {
+				QuickUpdate("update persondatavalues set editlock=1 where fieldnum='f03' and value='en'", $custdb);
+			} else {
+				QuickUpdate("insert into persondatavalues (fieldnum, value, refcount, editlock) values ('f03','en',0,1)", $custdb);
+			}
+			// Spanish
+			if (QuickQuery("select count(*) from persondatavalues where fieldnum='f03' and value='es'", $custdb)) {
+				QuickUpdate("update persondatavalues set editlock=1 where fieldnum='f03' and value='es'", $custdb);
+			} else {
+				QuickUpdate("insert into persondatavalues (fieldnum, value, refcount, editlock) values ('f03','es',0,1)", $custdb);
+			}
+		}
+		
+		setCustomerSystemSetting('_hassms', $postdata["hassms"], $custdb);
+		
+		update_jobtypeprefs(1, $postdata["maxsms"], "sms", $custdb);
+		setCustomerSystemSetting('maxsms', $postdata["maxsms"], $custdb);
+		setCustomerSystemSetting('enablesmsoptin', $postdata["enablesmsoptin"], $custdb);
+		setCustomerSystemSetting('smscustomername', $postdata["smscustomername"], $custdb);
+
+		setCustomerSystemSetting('_hassmapi', $postdata["hassmapi"], $custdb);
+		// Set oem,oemid and nsid in authserver customer table
+		
+		setCustomerSystemSetting('_hascallback', $postdata["hascallback"], $custdb);
+		setCustomerSystemSetting('callbackdefault', $postdata["callbackdefault"], $custdb);
+		
+		switch($postdata["portal"] ) {
+			case "contactmanager": 
+				setCustomerSystemSetting('_hasportal', 1, $custdb);
+				setCustomerSystemSetting('selfsignup', 0, $custdb);
+				break;
+			case "selfsignup":
+				setCustomerSystemSetting('_hasportal', 1, $custdb);
+				setCustomerSystemSetting('selfsignup', 0, $custdb);
+				break;
+			default:
+				setCustomerSystemSetting('_hasportal', 0, $custdb);
+				setCustomerSystemSetting('selfsignup', 0, $custdb);
+		}
+		
+		setCustomerSystemSetting('_hassurvey', $postdata["hassurvey"], $custdb);
+		setCustomerSystemSetting('_hasldap', $postdata["hasldap"], $custdb);
+		setCustomerSystemSetting('_hasenrollment', $postdata["hasenrollment"], $custdb);
+		setCustomerSystemSetting('_hastargetedmessage', $postdata["hasclassroom"], $custdb);
+		setCustomerSystemSetting('_hasfacebook', $postdata["hasfacebook"], $custdb);
+		setCustomerSystemSetting('_hastwitter', $postdata["hastwitter"], $custdb);
+
+	
+		setCustomerSystemSetting('_renewaldate', ($postdata['renewaldate']!=""?date("Y-m-d", strtotime($postdata['renewaldate'])):""), $custdb);
+		setCustomerSystemSetting('_callspurchased', $postdata['callspurchased'], $custdb);
+		setCustomerSystemSetting('_maxusers', ($postdata['maxusers']!=""?$postdata['maxusers']:"unlimited"), $custdb);
+		
+		setCustomerSystemSetting('_timeslice', $postdata['timeslice'], $custdb);
+		setCustomerSystemSetting('loginlockoutattempts', $postdata['loginlockoutattempts'], $custdb);
+		setCustomerSystemSetting('logindisableattempts', $postdata['logindisableattempts'], $custdb);
+		setCustomerSystemSetting('loginlockouttime', $postdata['loginlockouttime'], $custdb);
+				
+		$newTheme = json_decode($postdata["brandtheme"]);
+		setCustomerSystemSetting('_brandtheme', $newTheme->theme,$custdb);
+		setCustomerSystemSetting('_brandprimary', $newTheme->color,$custdb);
+		setCustomerSystemSetting('_brandratio', $newTheme->ratio,$custdb);
+		setCustomerSystemSetting('_brandtheme1', $COLORSCHEMES[$newTheme->theme]["_brandtheme1"],$custdb);
+		setCustomerSystemSetting('_brandtheme2', $COLORSCHEMES[$newTheme->theme]["_brandtheme2"],$custdb);
+		
+		
+		
+		Query("COMMIT");
+		if($button == "done") {
+			if ($ajax)
+				$form->sendTo("customers.php");
+			else
+				redirect("customers.php");
+		} else {
+			if ($ajax)
+				$form->sendTo("customeredit.php");
+			else
+				redirect("customeredit.php");
+		}
 	}
-} else {
-	$reloadform = 1;
 }
 
-if( $reloadform ) {
-
-	ClearFormData($f);
-	if($refresh){
-		$languages = DBFindMany("Language","from language order by id", false,false, $custdb);
-	}
-	PutFormData($f,$s,'name',getCustomerSystemSetting('displayname', "", true, $custdb),"text",1,50,true);
-	PutFormData($f,$s,'hostname',$custinfo[3],"text",1,255,true);
-	PutFormData($f,$s,'inboundnumber',getCustomerSystemSetting('inboundnumber', false, true, $custdb),"phone",10,10);
-	PutFormData($f,$s,'timezone', getCustomerSystemSetting('timezone', false, true, $custdb), "text", 1, 255);
-
-	PutFormData($f,$s,'callerid', Phone::format(getCustomerSystemSetting('callerid', false, true, $custdb)),"phone",10,10, true);
-	PutFormData($f,$s,'areacode', getCustomerSystemSetting('defaultareacode', false, true, $custdb),"text", 3, 3);
-
-	$currentmaxphone = getCustomerSystemSetting('maxphones', 1, true, $custdb);
-	PutFormData($f,$s,'maxphones',$currentmaxphone,"number",$currentmaxphone,"nomax",true);
-	$currentmaxemail = getCustomerSystemSetting('maxemails', 1, true, $custdb);
-	PutFormData($f,$s,'maxemails',$currentmaxemail,"number",$currentmaxemail,"nomax",true);
-	$currentmaxsms = getCustomerSystemSetting('maxsms', 1, true, $custdb);
-	PutFormData($f,$s,'maxsms',$currentmaxsms,"number",$currentmaxsms,"nomax",true);
-
-	PutFormData($f,$s,'autoname', getCustomerSystemSetting('autoreport_replyname', false, true, $custdb),"text",1,255);
-	PutFormData($f,$s,'autoemail', getCustomerSystemSetting('autoreport_replyemail', false, true, $custdb),"email",1,255);
-
-	PutFormData($f,$s,'renewaldate', getCustomerSystemSetting('_renewaldate', false, true, $custdb), "text", 1, 255);
-	PutFormData($f,$s,'callspurchased', getCustomerSystemSetting('_callspurchased', false, true, $custdb), "text");
-
-	PutFormData($f,$s,"surveyurl", getCustomerSystemSetting('surveyurl', false, true, $custdb), "text", 0, 100);
-	$maxusers = getCustomerSystemSetting('_maxusers', false, true, $custdb);
-	if($maxusers == "unlimited")
-		$maxusers = "";
-	PutFormData($f,$s,"maxusers", $maxusers, "number", 0);
-	PutFormData($f,$s,"managernote", $custinfo[8], "text", 0, 255);
-
-	// LDAP
-	PutFormData($f,$s,"hasldap", getCustomerSystemSetting('_hasldap', false, true, $custdb), "bool", 0, 1);
-	// TODO pick a disk agent, store in 'authdiskuuid'
-	
-	// SMS
-	PutFormData($f,$s,"hassms", getCustomerSystemSetting('_hassms', false, true, $custdb), "bool", 0, 1);
-	PutFormData($f, $s, "enablesmsoptin", getCustomerSystemSetting('enablesmsoptin', true, true, $custdb), "bool", 0, 1);
-	PutFormData($f, $s, "smscustomername", getCustomerSystemSetting('smscustomername', "SchoolMessenger", false, $custdb));
-
-	PutFormData($f,$s,"hassurvey", getCustomerSystemSetting('_hassurvey', true, true, $custdb), "bool", 0, 1);
-	PutFormData($f,$s,"hasportal", getCustomerSystemSetting('_hasportal', false, true, $custdb), "bool", 0, 1);
-	PutFormData($f,$s,"hasselfsignup", getCustomerSystemSetting('_hasselfsignup', false, true, $custdb), "bool", 0, 1);
-	PutFormData($f,$s,"hascallback", getCustomerSystemSetting('_hascallback', false, true, $custdb), "bool", 0, 1);
-	PutFormData($f,$s,'callbackdefault', getCustomerSystemSetting('callbackdefault', 'inboundnumber', true, $custdb), null, null, null);
-	PutFormData($f,$s,"hasenrollment", getCustomerSystemSetting('_hasenrollment', false, true, $custdb), "bool", 0, 1);
-	PutFormData($f,$s,"hastargetedmessage", getCustomerSystemSetting('_hastargetedmessage', false, true, $custdb), "bool", 0, 1);
-	PutFormData($f,$s,"hasfacebook", getCustomerSystemSetting('_hasfacebook', false, true, $custdb), "bool", 0, 1);
-	PutFormData($f,$s,"hastwitter", getCustomerSystemSetting('_hastwitter', false, true, $custdb), "bool", 0, 1);
-	PutFormData($f,$s,"hassmapi", getCustomerSystemSetting('_hassmapi', false, true, $custdb), "bool", 0, 1);
-	PutFormData($f,$s,"organizationfieldname", getCustomerSystemSetting('organizationfieldname', "School", true, $custdb), "text", 0, 255, true);
-	PutFormData($f,$s,"timeslice", getCustomerSystemSetting('_timeslice', 450, true, $custdb), "number", 60, 1800);
-	PutFormData($f, $s, "loginlockoutattempts", getCustomerSystemSetting('loginlockoutattempts', 5, true, $custdb), "number", 0);
-	PutFormData($f, $s, "logindisableattempts", getCustomerSystemSetting('logindisableattempts', 0, true, $custdb), "number", 0);
-	PutFormData($f, $s, "loginlockouttime", getCustomerSystemSetting('loginlockouttime', 5, true, $custdb), "number", 0);
-
-	$oldlanguages = array();
-	foreach($languages as $language){
-		$oldlanguages[] = $language->id;
-		$lang = "Language" . $language->id;
-		// only allow language changes to non english languages
-		if ($language->id > 1) 
-			PutFormData($f, $s, $lang, $language->name, "text");
-	}
-	PutFormData($f, $s, "oldlanguages", $oldlanguages);
-	PutFormData($f, $s, "newlangcode", "", "text");
-	PutFormData($f, $s, "newlang", "", "text");
-
-	PutFormData($f,$s,"enabled",$custinfo[4], "bool",0,1);
-
-	PutFormData($f,$s,'productname', getCustomerSystemSetting('_productname', "", true, $custdb), "text", 0, 255, true);
-
-
-
-	PutFormData($f,"Save","Save", "");
-	PutFormData($f,"Return","Save and Return", "");
-	PutFormData($f,"Save","Add", "");
-
-	//Color Scheme stuff
-	PutFormData($f, $s, "theme", getCustomerSystemSetting('_brandtheme', "Classroom", true, $custdb), "text", "nomin", "nomax", true);
-	PutFormData($f, $s, "_brandratio", getCustomerSystemSetting('_brandratio', ".2", true, $custdb), "text", true);
-	PutFormData($f, $s, "_brandprimary", getCustomerSystemSetting('_brandprimary', "3e693f", true, $custdb), "text", true);
-	PutFormData($f, $s, "_logoclickurl", getCustomerSystemSetting('_logoclickurl', "", true, $custdb), "text", "nomin", "nomax", true);
-
-	PutFormData($f, $s, "_supportemail", getCustomerSystemSetting('_supportemail', "", true, $custdb), "email", "nomin", "nomax", true);
-	PutFormData($f, $s, "_supportphone", Phone::format(getCustomerSystemSetting('_supportphone', "", true, $custdb)), "phone", 10, 10, true);
-
-	PutFormData($f, $s, "emaildomain", getCustomerSystemSetting('emaildomain', "", true, $custdb), "text", 0, 255);
-	
-	PutFormData($f, $s, "tinydomain", getCustomerSystemSetting('tinydomain', "", true, $custdb));
-
-	PutFormData($f, $s, "_dmmethod", getCustomerSystemSetting('_dmmethod', "", true, $custdb), "array", array('asp','hybrid','cs'), null, true);
-
-	PutFormData($f, $s, "oem", $custinfo[5], "text");
-	PutFormData($f, $s, "oemid", $custinfo[6], "text");
-	PutFormData($f, $s, "nsid", $custinfo[7], "text");
-
-	PutFormData($f, $s, "softdeletemonths", getCustomerSystemSetting('softdeletemonths', "6", false, $custdb));
-	PutFormData($f, $s, "harddeletemonths", getCustomerSystemSetting('harddeletemonths', "24", false, $custdb));
-}
+////////////////////////////////////////////////////////////////////////////////
+// Display Functions
+////////////////////////////////////////////////////////////////////////////////
 
 
 ////////////////////////////////////////////////////////////////////////////////
 // Display
 ////////////////////////////////////////////////////////////////////////////////
+$TITLE = $customerid?_L('Edit Customer'):_L('New Customer');
 
 include_once("nav.inc.php");
-?><script src="picker.js?<?=rand()?>"></script><?
 
-//custom newform declaration to catch if manager password is submitted
-NewForm($f);
-
+// Optional Load Custom Form Validators
 ?>
-<br>
-<table>
-<tr>
-	<td><? NewFormItem($f, "Save","Save", 'submit');?>
-	<? NewFormItem($f, "Return","Save and Return", 'submit');?></td>
-</tr>
-<tr><td> <b style="color: red;">ENABLED</b> </td><td><? NewFormItem($f, $s, 'enabled', 'checkbox', 40,'',"onchange='if (this.checked == 0) confirm(\"Are you sure you want to DISABLE this customer?\")? this.checked = false : this.checked = true;'") ?>Unchecking this box will disable this customer!  All repeating jobs will be stopped.  All scheduled jobs must be canceled manually.</td></tr>
-<tr><td> Delivery Mechanism Method </td>
-	<td><?
-			NewFormItem($f, $s, '_dmmethod', 'selectstart');
-			NewFormItem($f, $s, '_dmmethod', 'selectoption', '--Choose a Method--', '');
-			NewFormItem($f, $s, '_dmmethod', 'selectoption', 'CommSuite (fully hosted)', 'asp');
-			NewFormItem($f, $s, '_dmmethod', 'selectoption', 'CS + SmartCall + Emergency', 'hybrid');
-			NewFormItem($f, $s, '_dmmethod', 'selectoption', 'CS + SmartCall (data only)', 'cs');
-			NewFormItem($f, $s, '_dmmethod', 'selectend');
-		?>
-		<span>
-			<?= in_array(getCustomerSystemSetting('_dmmethod', "", true, $custdb), array('hybrid','cs')) ? '<b style="color: red;">Changing this to "CommSuite" will cause jobs to go out on the system!</b>' : "" ?>
-		</span>
-	</td>
-</tr><tr><td>Customer display name: </td><td> <? NewFormItem($f, $s, 'name', 'text', 25, 50); ?></td></tr>
-<tr><td>URL path name: </td><td><? NewFormItem($f, $s, 'hostname', 'text', 25, 255); ?> (Must be 5 or more characters)</td></tr>
-<tr><td>800 inbound number: </td><td><? NewFormItem($f, $s, 'inboundnumber', 'text', 10, 10); ?></td></tr>
-<tr><td>Timezone: </td><td>
-<?
-	NewFormItem($f, $s, 'timezone', "selectstart");
-	foreach($timezones as $timezone) {
-		NewFormItem($f, $s, 'timezone', "selectoption", $timezone, $timezone);
+
+<script type="text/javascript">
+
+function languageselect() {
+	var s = $('newlanginputselect');
+	if (s.selectedIndex !== 0) {
+		var value = s.options[s.selectedIndex].value;
+		$('newlanginput').value = value.substring(4);
+		$('newlangcode').value = value.substring(0,3);
+		$('newlangcodedisp').update(value.substring(0,3));
 	}
-	NewFormItem($f, $s, 'timezone', "selectend");
-?>
-</td></tr>
-<tr><td>Default Caller ID: </td><td> <? NewFormItem($f, $s, 'callerid', 'text', 25, 255) ?></td></tr>
-<tr><td>Default Area Code: </td><td> <? NewFormItem($f, $s, 'areacode', 'text', 25, 255) ?></td></tr>
-<tr><td>AutoReport Name: </td><td><? NewFormItem($f,$s,'autoname','text',25,50); ?></td></tr>
-<tr><td>AutoReport Email: </td><td><? NewFormItem($f,$s,'autoemail','text',25,255); ?></td></tr>
-<tr><td>Survey URL: </td><td><? NewFormItem($f, $s, 'surveyurl', 'text', 30, 100); ?></td></tr>
-<tr><td>Max Phones: </td><td> <? NewFormItem($f, $s, 'maxphones', 'text', 3) ?></td></tr>
-<tr><td>Max E-mails: </td><td> <? NewFormItem($f, $s, 'maxemails', 'text', 3) ?></td></tr>
-<tr><td>Max SMS: </td><td> <? NewFormItem($f, $s, 'maxsms', 'text', 3) ?></td></tr>
-<tr><td>Timeslice(between 60-1800): </td><td> <? NewFormItem($f, $s, 'timeslice', 'text', 3) ?> This is multiplied by 2 to get the number of seconds per job. timelice of 450 = 900 seconds = 15 minutes.</td></tr>
-<tr><td>Renewal Date: </td><td><? NewFormItem($f, $s, 'renewaldate', 'text', 25, 255) ?></td></tr>
-<tr><td>Calls Purchased: </td><td><? NewFormItem($f, $s, 'callspurchased', 'text', 25, 255) ?></td></tr>
-<tr><td>Users Purchased: </td><td><? NewFormItem($f, $s, 'maxusers', 'text', 25, 255) ?></td></tr>
-<tr><td width="30%">Failed login attempts to cause lockout:</td><td><? NewFormItem($f,$s,'loginlockoutattempts','text', 2) ?> 1 - 15 attempts, or 0 to disable</td></tr>
-<tr><td>Failed login attempts before account disable:</td><td><? NewFormItem($f,$s,'logindisableattempts','text', 2) ?> 1 - 15 attempts, or 0 to disable</td></tr>
-<tr><td>Number of minutes for login lockout:</td><td><? NewFormItem($f,$s,'loginlockouttime','text', 2) ?> 1 - 60 minutes</td></tr>
-<tr><td></td><th align="left">Language:/ Google and TTS Support:</th>
-<?
-foreach($languages as $language){
-	$lang = "Language" . $language->id;
-	?><tr><td><?=$lang?></td><td><div style="display:inline"><?=str_pad($language->code,3)?></div>
-	<?
-	if ($language->id > 1) {
-		NewFormItem($f, $s, $lang, 'text', 25, 50, "id='$lang' onkeyup=\"var s = new getObj('$lang"."_select'); s.obj.selectedIndex = 0;\" onchange=\"var sel = new getObj('$lang"."_select');	for (var i in sel.obj.options) if (this.value == sel.obj.options[i].value) sel.obj.selectedIndex = i;\"");
-		?>
-		<select disabled id='<?="$lang"."_select"?>' onchange="if (this.selectedIndex != 0) {var o = new getObj('<?=$lang?>'); o.obj.value = this.options[this.selectedIndex].value;}">
-		<option value=0> -- No Translation Support -- </option>
-		<?foreach ($googlangs as $code => $googlang) {
-			$ttsLangSup = '';
-			if (isset($ttslangs[strtolower($googlang)]))
-				$ttsLangSup .= " (TTS Support)";
-			?>
-			<option value="<?= str_pad($code,3) . " " . $googlang?>" <?=($code == $language->code)?"selected":""?>><?=$googlang . $ttsLangSup?></option>
-		<?}?>
-		</select>
-	<?} else {
-		echo $language->name;
-		//This Language should always be set to English 
-	}?>
-	</td></tr><?
 }
-?>
-<tr ><td>New Language: </td><td style="border: 1px solid black;">
-		To add a new language, select a commonly used language or use the search box.<br>
-		<select id='newlanginputselect' onchange="var o = new getObj('newlanginput');var h = new getObj('newlangcode');if (this.selectedIndex !== 0) { var value = this.options[this.selectedIndex].value; o.obj.value = value.substring(4); h.obj.value = value.substring(0,3); $('newlangcodedisp').update(value.substring(0,3));}">
-		<option value=0> -- Select Common Language -- </option>
-		<?foreach ($googlangs as $code => $googlang) {
-			$ttsLangSup = '';
-			if (isset($ttslangs[strtolower($googlang)]))
-				$ttsLangSup .= " (TTS Support)";
-			?>
-
-			<option value="<?= str_pad($code,3) . " " . $googlang?>" ><?=$googlang . $ttsLangSup?></option>
-		<?}?>
-		</select>
-		<div>
-		Search: <input id="searchbox" type="text" size="15" /> (type search term and press ENTER)
-		</div>
-		<table id="searchresult" style=""><tr><td></td></tr></table>
-		
-		<div style="display:inline" id="newlangcodedisp">___</div><?
-		NewFormItem($f, $s, 'newlangcode', 'hidden', 25, 50, "id='newlangcode'");
-		NewFormItem($f, $s, 'newlang', 'text', 25, 50, "id='newlanginput' onkeyup=\"var s = new getObj('newlanginputselect'); s.obj.selectedIndex = 0;\"")?>
-		<? NewFormItem($f, "Save","Add", 'submit');?>
-</td></tr>
-
-<tr><td> Has LDAP </td><td><? NewFormItem($f, $s, 'hasldap', 'checkbox') ?> LDAP</td></tr>
-
-<tr><td> Has SMS </td><td><? NewFormItem($f, $s, 'hassms', 'checkbox') ?> SMS</td></tr>
-<tr><td> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Enable SMS Opt-in </td><td><? NewFormItem($f, $s, 'enablesmsoptin', 'checkbox') ?> Opt-in</td></tr>
-<tr><td> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SMS Customer Name: </td><td><? NewFormitem($f, $s, 'smscustomername', 'text', 25, 50) ?></td></tr>
-
-<tr><td> Has Survey </td><td><? NewFormItem($f, $s, 'hassurvey', 'checkbox') ?> Survey</td></tr>
-<tr><td> Has Contact Manager </td><td><? NewFormItem($f, $s, 'hasportal', 'checkbox') ?> Contact Manager</td></tr>
-<tr><td> Has Self-Signup </td><td><? NewFormItem($f, $s, 'hasselfsignup', 'checkbox') ?> Self-Signup</td></tr>
-<tr><td> Has Callback </td><td><? NewFormItem($f, $s, 'hascallback', 'checkbox') ?> Callback</td></tr>
-<tr><td> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Callback CallerID </td><td>
-<?
-	NewFormItem($f,$s,'callbackdefault','selectstart');
-		NewFormItem($f,$s,'callbackdefault','selectoption','Inbound Number','inboundnumber');
-		NewFormItem($f,$s,'callbackdefault','selectoption','Default CallerID','callerid');
-	NewFormItem($f,$s,'callbackdefault','selectend');
-?>
-</td></tr>
-<tr><td> Has Enrollment </td><td><? NewFormItem($f, $s, 'hasenrollment', 'checkbox') ?> Enrollment </td></tr>
-<tr><td> Has Classroom Comments </td><td><? NewFormItem($f, $s, 'hastargetedmessage', 'checkbox') ?> Classroom Comments</td></tr>
-<tr><td> Has Facebook </td><td><? NewFormItem($f, $s, 'hasfacebook', 'checkbox') ?> Facebook</td></tr>
-<tr><td> Has Twitter </td><td><? NewFormItem($f, $s, 'hastwitter', 'checkbox') ?> Twitter</td></tr>
-<tr><td> Has SMAPI </td><td><? NewFormItem($f, $s, 'hassmapi', 'checkbox') ?> SMAPI</td></tr>
-<tr><td>Notes: </td><td><? NewFormitem($f, $s, 'managernote', 'textarea', 30) ?></td></tr>
-<tr><td>OEM: </td><td><? NewFormitem($f, $s, 'oem', 'text', 10, 50) ?></td></tr>
-<tr><td>OEM ID: </td><td><? NewFormitem($f, $s, 'oemid', 'text', 10, 50) ?></td></tr>
-<tr><td>NetSuite ID: </td><td><? NewFormitem($f, $s, 'nsid', 'text', 10, 50) ?></td></tr>
-
-<tr>
-	<td>Logo:</td>
-	<td><img src='customerlogo.img.php?id=<?=$currentid?>'></td>
-</tr>
-<tr>
-	<td>New Logo:</td>
-	<td><input type='file' name='uploadlogo' size='30'></td>
-</tr>
-
-<tr><td> 'Organization' Display Name: </td><td><? NewFormItem($f, $s, 'organizationfieldname', 'text', 10, 50) ?></td></tr>
-
-<tr>
-	<td>ProductName:</td>
-	<td><? NewFormItem($f,$s,'productname', 'text', 30, 255)?></td>
-</tr>
-<tr>
-	<td>Theme:</td>
-	<td>
-		<?
-			NewFormItem($f, $s, "theme", "selectstart", null, null, "onchange='resetPrimaryAndRatio(this.value)'");
-			if(count($COLORSCHEMES)){
-				foreach($COLORSCHEMES as $index => $scheme){
-					NewFormItem($f, $s, "theme", "selectoption", $scheme['displayname'], $index);
-				}
-			}
-			NewFormItem($f, $s, "theme", "selectend");
-		?>
-	</td>
-</tr>
-<tr>
-	<td>Primary Color(in hex):</td>
-	<td><? NewFormItem($f, $s, "_brandprimary", "text", 0, 10, "id='brandprimary'") ?><img src="img/sel.gif" onclick="TCP.popup(new getObj('brandprimary').obj)"/></td>
-</tr>
-<tr>
-	<td>Ratio of Primary to Background</td>
-	<td><? NewFormItem($f, $s, "_brandratio", "text", 0, 3, "id='brandratio'") ?></td>
-</tr>
-<tr>
-	<td>Logo Click URL</td>
-	<td><? NewFormItem($f, $s, "_logoclickurl", "text", 30, 255); ?></td>
-</tr>
-
-<tr>
-	<td>Login Picture:</td>
-	<td><img width="100px" src='customerloginpicture.img.php?id=<?=$currentid?>'></td>
-</tr>
-<tr>
-	<td>New Login Picture:</td>
-	<td><input type='file' name='uploadloginpicture' size='30'></td>
-</tr>
-
-<tr>
-	<td>Subscriber Login Picture:</td>
-	<td><img width="100px" src='customerloginpicture.img.php?subscriber&id=<?=$currentid?>'></td>
-</tr>
-<tr>
-	<td>New Subscriber Login Picture:</td>
-	<td><input type='file' name='uploadsubscriberloginpicture' size='30'></td>
-</tr>
-
-<tr>
-	<td>Support Email:</td>
-	<td><? NewFormItem($f, $s, "_supportemail", "text", 30, 100); ?></td>
-</tr>
-
-<tr>
-	<td>Support Phone:</td>
-	<td><? NewFormItem($f, $s, "_supportphone", "text", 14); ?></td>
-</tr>
-
-<tr>
-	<td>Email Domain:</td>
-	<td><? NewFormItem($f, $s, "emaildomain", "text", 30, 255); ?></td>
-</tr>
-
-<tr>
-	<td>Tiny Domain:</td>
-	<td>
-<?
-	NewFormItem($f, $s, "tinydomain", "selectstart");
-	foreach ($SETTINGS['feature']['tinydomain'] as $tinydomain)
-		NewFormItem($f,$s,'tinydomain','selectoption',$tinydomain,$tinydomain);
-	NewFormItem($f,$s,'tinydomain','selectend');
-?>
-	</td>
-</tr>
-
-<tr>
-	<td>Auto Message Expire (soft delete)</td>
-	<td>
-<?
-	NewFormItem($f,$s,'softdeletemonths','selectstart');
-		NewFormItem($f,$s,'softdeletemonths','selectoption','Disabled','0');
-		NewFormItem($f,$s,'softdeletemonths','selectoption','6 Months','6');
-		NewFormItem($f,$s,'softdeletemonths','selectoption','12 Months','12');
-		NewFormItem($f,$s,'softdeletemonths','selectoption','18 Months','18');
-	NewFormItem($f,$s,'softdeletemonths','selectend');
-?>
-	</td>
-</tr>
-
-<tr>
-	<td>Auto Report Expire (<font style="color: red">HARD</font> delete)</td>
-	<td>
-<?
-	NewFormItem($f,$s,'harddeletemonths','selectstart');
-		NewFormItem($f,$s,'harddeletemonths','selectoption','Disabled','0');
-		NewFormItem($f,$s,'harddeletemonths','selectoption','6 Months','6');
-		NewFormItem($f,$s,'harddeletemonths','selectoption','12 Months','12');
-		NewFormItem($f,$s,'harddeletemonths','selectoption','18 Months','18');
-		NewFormItem($f,$s,'harddeletemonths','selectoption','24 Months','24');
-		NewFormItem($f,$s,'harddeletemonths','selectoption','36 Months','36');
-		NewFormItem($f,$s,'harddeletemonths','selectoption','48 Months','48');
-	NewFormItem($f,$s,'harddeletemonths','selectend');
-?>
-	</td>
-</tr>
-
-<tr>
-	<td><? NewFormItem($f, "Save","Save", 'submit');?>
-	<? NewFormItem($f, "Return","Save and Return", 'submit');?></td>
-</tr>
-
-</table>
-
-<?
-
-EndForm();
-include_once("navbottom.inc.php");
-
-?>
-<script>
-
-	var colorscheme = new Array();
-
-<?
-	//Make js array of colorschemes
-	foreach($COLORSCHEMES as $index => $properties){
-?>
-		colorscheme['<?=$index?>'] = new Array();
-		colorscheme['<?=$index?>']['_brandprimary'] = '<?=$properties['_brandprimary']?>';
-		colorscheme['<?=$index?>']['_brandratio'] = '<?=$properties['_brandratio']?>';
-<?
-	}
-?>
-
-	function resetPrimaryAndRatio(value){
-
-		new getObj('brandprimary').obj.value = colorscheme[value]['_brandprimary'];
-		new getObj('brandratio').obj.value = colorscheme[value]['_brandratio'];
-	}
-
 
 function addlang(code,name) {
 	$('newlangcode').value = code;
 	$('newlanginput').value = name;
-	var s = new getObj('newlanginputselect'); s.obj.selectedIndex = 0;
+	$('newlanginputselect').selectedIndex = 0;
 	$('searchresult').update('');
 	$('newlangcodedisp').update(code);
+
+
+	
 }
 
-function search(event) {
-	if (Event.KEY_RETURN == event.keyCode) {
-		event.stop();
-		var searchtxt = event.target.getValue();
+function changelanguage(formitemid,remove){
+	var code = $('newlangcode').value;
+	var language = $('newlanginput').value;
+	if (code && language) {
+		var langs = $H($(formitemid).value.evalJSON(true));
+		if(remove)
+			langs.unset(code.strip());
+		else
+			langs.set(code.strip(),language.strip());
+		$(formitemid).value = langs.toJSON();
+		$('langdisp').update($(formitemid).value);
+	}
+	$('newlanginputselect').selectedIndex = 0;
+	$('searchresult').update('');
+	$('newlangcodedisp').update('N/A');
+	$('newlangcode').value = '';
+	$('newlanginput').value = '';
+}
 
-		new Ajax.Request('languagesearch.php',
-		{
-			method:'get',
-			parameters: {searchtxt: searchtxt},
-			onSuccess: function(response){
-				var result = response.responseJSON;
-				var items = new Element('tbody',{width:'100%'});
-				var header = new Element('tr').addClassName("listHeader");
 
-				if(result) {
-					header.insert(new Element('th').update('Code'));
-					header.insert(new Element('th',{align:'left'}).update('Language'));
+function searchlanguages() {
+	var searchtxt = $('searchbox').value;
+	new Ajax.Request('languagesearch.php',
+	{
+		method:'get',
+		parameters: {searchtxt: searchtxt},
+		onSuccess: function(response){
+			var result = response.responseJSON;
+			var items = new Element('tbody',{width:'100%'});
+			var header = new Element('tr').addClassName("listHeader");
 
-					items.insert(header);
-					var i = 0;
-					$H(result).each(function(itm) {
-						var row = new Element('tr');
-						if(i%2)
-							row.addClassName("listAlt");
-						row.insert(new Element('td',{align:"right"}).update(itm.key));
-						row.insert(new Element('td').update('<a href="#" onclick="addlang(\'' + itm.key + '\',\'' + itm.value + '\');return false;">' + itm.value + '</a>'));
-						items.insert(row);
-						i++;
-					});
-				} else {
-					header.insert(new Element('th').update('No Language Found containing the search sting "' + searchtxt + '"'));
-					items.insert(header);
+			if(result) {
+				header.insert(new Element('th').update('Code'));
+				header.insert(new Element('th',{align:'left'}).update('Language'));
 
-				}
-				$('searchresult').update(items);
+				items.insert(header);
+				var i = 0;
+				$H(result).each(function(itm) {
+					var row = new Element('tr');
+					if(i%2)
+						row.addClassName("listAlt");
+					row.insert(new Element('td',{align:"right"}).update(itm.key));
+					row.insert(new Element('td').update('<a href="#" onclick="addlang(\'' + itm.key + '\',\'' + itm.value + '\');return false;">' + itm.value + '</a>'));
+					items.insert(row);
+					i++;
+				});
+			} else {
+				header.insert(new Element('th').update('No Language Found containing the search sting "' + searchtxt + '"'));
+				items.insert(header);
 
 			}
-		});
-	}
+			$('searchresult').update(items);
+
+		}
+	});
 }
 
-
-document.observe("dom:loaded", function() {
-	var searchBox = $('searchbox');
-	searchBox.observe('keypress', search);
+document.observe('dom:loaded', function() {
+	$('newcustomer_logo').observe("change", function (event) {
+		var e = event.element();
+		var savedname = '<?= $settings['_productname'] ?>';
+		$('newcustomer_productname').value = (e.value && e.type == "radio" && e.value != "Other" && e.value != "Saved")?e.value:savedname;
+	});
+	
+	$('newcustomer_displayname').observe("change", function (event) {
+		var e = event.element();
+		if ($('newcustomer_hassms').checked) {
+			$('newcustomer_smscustomername').value = e.value;
+		}
+	});
+	$('newcustomer_hassms').observe("change", function (event) {
+		if ($('newcustomer_hassms').checked) {
+			$('newcustomer_enablesmsoptin').checked = 1;
+			$('newcustomer_smscustomername').value = $('newcustomer_displayname').value;
+		} else {
+			$('newcustomer_enablesmsoptin').checked = 0;
+			$('newcustomer_smscustomername').value = '';
+		}
+	});
 });
+<? Validator::load_validators(array("ValBrandTheme","ValInboundNumber","ValUrlComponent","ValRegExp"));?>
 </script>
+<?
+
+startWindow($customerid?_L('Edit Customer'):_L('New Customer'));
+echo $form->render();
+endWindow();
+include_once("navbottom.inc.php");
+?>
