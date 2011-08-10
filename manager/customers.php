@@ -77,6 +77,7 @@ function fmt_actions($row, $index) {
 	$actions = "";
 	if ($MANAGERUSER->authorized("editcustomer"))
 		$actions .= '<a href="customeredit.php?id=' . $row[0] .'" title="Edit"><img src="mimg/s-edit.png" border=0></a>&nbsp;';
+		$actions .= '<a href="customerimages.php?id=' . $row[0] .'" alt="images" title="images"><img src="img/icons/image_edit.png" border=0></a>&nbsp;';
 	if ($MANAGERUSER->authorized("users"))
 		$actions .= '<a href="userlist.php?customer=' . $row[0] . '" title="Users"><img src="mimg/s-users.png" border=0></a>&nbsp;';
 	if ($MANAGERUSER->authorized("imports"))
