@@ -114,7 +114,7 @@ if (isset($_GET['copy'])) {
 				$newjob = $job->copyNew();
 			Query('COMMIT');
 
-			notice(_L("A copy of the job, %s, is made.", escapehtml($job->name)));
+			notice(_L("%s has been copied.", escapehtml($job->name)));
 			redirect('job.php?id='.$newjob->id);
 		} else {
 			notice(_L("You do not have permission to copy this job."));
