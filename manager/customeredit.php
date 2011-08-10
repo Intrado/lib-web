@@ -857,8 +857,8 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 			
 			$dbpassword = genpassword();
 			$limitedpassword = genpassword();
-			QuickUpdate("insert into customer (urlcomponent, shardid, dbpassword, limitedpassword, enabled)
-															values (?, ?, ?, ?, '1')", false, array($postdata["urlcomponent"], $shardid, $dbpassword, $limitedpassword) )
+			QuickUpdate("insert into customer (urlcomponent, shardid, dbpassword, limitedpassword)
+															values (?, ?, ?, ?)", false, array($postdata["urlcomponent"], $shardid, $dbpassword, $limitedpassword) )
 			or dieWithError("failed to insert customer into auth server", $_dbcon);
 			
 			$customerid = $_dbcon->lastInsertId();
@@ -903,11 +903,6 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 										('f01', 'First Name', 'searchable,text,firstname,subscribe,dynamic'),
 										('f02', 'Last Name', 'searchable,text,lastname,subscribe,dynamic'),
 										('f03', 'Language', 'searchable,multisearch,language,subscribe,static')";
-			QuickUpdate($query, $custdb) or dieWithError("SQL:" . $query, $custdb);
-			
-			$query = "INSERT INTO `language` (`name`,`code`) VALUES
-										('English','en'),
-										('Spanish','es')";
 			QuickUpdate($query, $custdb) or dieWithError("SQL:" . $query, $custdb);
 			
 			$query = "INSERT INTO `jobtype` (`name`, `systempriority`, `info`, `issurvey`, `deleted`) VALUES
@@ -968,6 +963,9 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 				
 			// restore global db connection
 			$_dbcon = $savedbcon;
+			
+			// Set Session to make the save button stay on the page 
+			$_SESSION['customerid']= $customerid;
 		}
 
 		
