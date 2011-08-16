@@ -23,8 +23,7 @@ if(isset($_GET['dmid'])){
 	redirect();
 } else {
 	$dmid = $_SESSION['dmid'];
-	$dmType = QuickQuery("select type from dm where id = ?", false, array($dmid));
-	$dmName = QuickQuery("select name from dm where id = ?", false, array($dmid));
+	list($dmType,$dmName,$notes) = QuickQueryRow("select type,name,notes from dm where id=?",false,false,array($dmid));
 }
 
 if ($dmType == "customer") {
@@ -55,9 +54,13 @@ include_once("nav.inc.php");
 
 ?>
 <script type='text/javascript' src='../script/dmstatus.js'></script>
-<?
 
-echo "Current Status for: " . $dmName . "<BR>";
+Current Status for:
+<table>
+	<tr><td>Name:</td><td><?= escapehtml($dmName)?></td></tr>
+	<tr><td>Notes:</td><td><?= escapehtml($notes) ?></td></tr>
+</table>
+<?
 
 if ($status == NULL) {
 	echo "There is no status available at this time.";
@@ -89,6 +92,5 @@ echo "<div id='completedresources'></div>";
 </td></tr></table>
 <?
 } // end else status is not null
-
 include_once("navbottom.inc.php");
 ?>

@@ -18,7 +18,7 @@ if(!isset($_SESSION['dmid'])){
 	exit();
 }
 
-$dmname = QuickQuery("select name from dm where id = " . $_SESSION['dmid']);
+list($dmname,$notes) = QuickQueryRow("select name,notes from dm where id=?",false,false,array($_SESSION['dmid']));
 
 $f="dmupload";
 $s="main";
@@ -84,14 +84,16 @@ if($reloadform){
 
 include_once("nav.inc.php");
 ?>
-<div>Upload File for DM: <?=$dmname?></div>
+<div>Upload File for:
+<table><tr><td>Name: </td><td><?=$dmname?></td></tr><tr><td>Notes: </td><td><?=$notes?></td></tr></table>
+</div>
 <?
 NewForm($f);
 ?>
 <table>
 
 	<tr>
-		<td>Notes:</td>
+		<td>Upload Notes:</td>
 		<td><? NewFormItem($f, $s, "notes", "textarea", 40, 3) ?></td>
 	</tr>
 	<tr>

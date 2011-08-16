@@ -26,7 +26,7 @@ if(!isset($_SESSION['dmid'])){
 	exit();
 }
 
-$dmname = QuickQuery("select name from dm where id = " . $_SESSION['dmid']);
+list($dmname,$notes) = QuickQueryRow("select name,notes from dm where id=?",false,false,array($_SESSION['dmid']));
 
 $res = Query("select id, uploaddate, notes, dmid from dmdatfile where dmid = " . $_SESSION['dmid'] . " order by id ASC");
 $data= array();
@@ -54,7 +54,9 @@ function dm_actions($row, $index){
 
 include_once("nav.inc.php");
 ?>
-<div>Dat File History for: <?=$dmname?></div>
+<div>Dat File History for: 
+<table><tr><td>Name: </td><td><?=$dmname?></td></tr><tr><td>Notes: </td><td><?=$notes?></td></tr></table>
+</div>
 <table class="list">
 <?
 	showTable($data, $titles, $functions);

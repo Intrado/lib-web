@@ -193,7 +193,7 @@ $dms = array();
 $query = "select dm.id, dm.customerid, c.urlcomponent, dm.name, dm.authorizedip, dm.lastip,
 			dm.enablestate, dm.lastseen, dm.version, dm.dmuuid, dm.command, s_telco_calls_sec.value as telco_calls_sec, 
 			s_telco_type.value as telco_type, s_delmech_resource_count.value as delmech_resource_count,
-			s_telco_inboundtoken.value as telco_inboundtoken, c.shardid, dm.poststatus
+			s_telco_inboundtoken.value as telco_inboundtoken, c.shardid, dm.poststatus, dm.notes
 			from dm dm
 			left join customer c on (c.id = dm.customerid)
 			left join dmsetting s_telco_calls_sec on 
@@ -266,6 +266,7 @@ $titles[13] = "Resources";
 $titles[14] = "@#Inbound";
 $titles[9] = "@#DM UUID";
 $titles[10] = "@#Cmd";
+$titles[17] = "@#Notes";
 $titles["actions"] = "Actions";
 
 // Do not provide a checkbox to hide these columns.

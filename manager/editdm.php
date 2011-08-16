@@ -44,7 +44,7 @@ if(isset($_GET['dmid'])){
 //Fetch dm settings from dmsettings table
 
 $telco_types = array("Test", "Asterisk");
-$dm = QuickQueryRow("select name, lastip, lastseen, customerid, enablestate, type, authorizedip, lastip from dm where id = '" . DBSafe($dmid) . "'", true);
+$dm = QuickQueryRow("select name, lastip, lastseen, customerid, enablestate, type, authorizedip, lastip, notes from dm where id = '" . DBSafe($dmid) . "'", true);
 
 
 $f = "dmedit";
@@ -125,10 +125,13 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f, "authorize") || CheckFormSubmit
 							('" . DBSafe($dmid) . "', 'disable_congestion_throttle', '" . DBSafe(GetFormData($f, $s, 'disable_congestion_throttle')) . "')
 							");
 				$newcustomerid = GetFormData($f, $s, "customerid") +0;
-				QuickUpdate("update dm set
-							authorizedip = '" . DBSafe($authorizedip) . "',
-							customerid = " . $newcustomerid . "
-							where id = '" . DBSafe($dmid) . "'");
+				$notes = TrimFormData($f, $s, "notes");
+				QuickUpdate("update dm set	authorizedip=?,
+											customerid=?,
+											notes=?
+											where id=?",false,
+											array($authorizedip,$newcustomerid,$notes,$dmid));
+							
 				if ($dmType == 'customer') {
 					if($dm['customerid'] != null && $newcustomerid != $dm['customerid']){
 						$custinfo = QuickQueryRow("select s.dbhost, s.dbusername, s.dbpassword from shard s inner join customer c on (c.shardid = s.id)
@@ -143,13 +146,11 @@ if(CheckFormSubmit($f,$s) || CheckFormSubmit($f, "authorize") || CheckFormSubmit
 												where c.id = " . $newcustomerid);
 					$custdb = DBConnect($custinfo[0], $custinfo[1], $custinfo[2], "c_" . $newcustomerid);
 					if(!QuickQuery("select count(*) from custdm where dmid = " . $dmid, $custdb)){
-						QuickUpdate("insert into custdm (dmid, name, enablestate, telco_type) values
-									(" . $dmid . ", '" . DBSafe($dm['name']) . "', '" . DBSafe($enablestate) . "', '" . DBSafe(GetFormData($f, $s, 'telco_type')) . "')
-									", $custdb);
+						QuickUpdate("insert into custdm (dmid, name, enablestate, telco_type,notes) values (?,?,?,?)", $custdb,
+										array($dmid,$dm['name'],$enablestate,GetFormData($f, $s, 'telco_type'),$notes));
 					} else {
-						QuickUpdate("update custdm set enablestate = '" . DBSafe($enablestate) . "',
-									telco_type = '" . DBSafe(GetFormData($f, $s, 'telco_type')) . "'
-									where dmid = " . $dmid, $custdb);
+						QuickUpdate("update custdm set enablestate=?,telco_type=?,notes=? where dmid=?",$custdb,
+										array($enablestate,GetFormData($f, $s, 'telco_type'),$notes,$dmid));
 					}
 				}
 
@@ -191,6 +192,7 @@ if( $reloadform )
 	PutFormData($f, $s, "disable_congestion_throttle", getDMSetting($dmid, "disable_congestion_throttle"), "bool", 0, 1);
 
 	PutFormData($f, $s, "testweightedresults", getDMSetting($dmid, "testweightedresults"), "text");
+	PutFormData($f, $s, "notes", $dm['notes'], "text");
 }
 
 
@@ -292,7 +294,10 @@ if ($dmType == 'customer') {?>
 		</em>
 		</td>
 	</tr>
-
+	<tr>
+		<td>Notes:</td>
+		<td><? NewFormItem($f, $s, "notes", "textarea");?></td>
+	</tr>
 	<tr>
 		<td colspan="3">
 <?

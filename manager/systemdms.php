@@ -147,7 +147,8 @@ $query = "select dm.id, dm.name, dm.authorizedip, dm.lastip,
 			dm.enablestate, dm.lastseen, dm.version, dm.dmuuid, dm.command, s_telco_calls_sec.value as telco_calls_sec, 
 			s_telco_type.value as telco_type, s_delmech_resource_count.value as delmech_resource_count,
 			s_telco_inboundtoken.value as telco_inboundtoken,
-			poststatus
+			poststatus,
+			dm.notes
 			from dm dm
 			left join dmsetting s_telco_calls_sec on 
 					(dm.id = s_telco_calls_sec.dmid 
@@ -202,6 +203,7 @@ $titles[11] = "Resources";
 $titles[12] = "@#Inbound";
 $titles[7] = "@#DM UUID";
 $titles[8] = "@#Cmd";
+$titles[14] = "@#Notes";
 $titles["actions"] = "Actions";
 
 // Do not provide a checkbox to hide these columns.
