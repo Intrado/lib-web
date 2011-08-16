@@ -373,3 +373,9 @@ ALTER TABLE `aspadminquery` ADD `options` TEXT NOT NULL;
 ALTER TABLE `portaluser` CHANGE `password` `password` VARCHAR( 64 ) CHARACTER SET utf8 COLLATE utf8_general_ci NULL,
 CHANGE `salt` `salt` VARCHAR( 29 ) CHARACTER SET utf8 COLLATE utf8_bin NULL,
 CHANGE `passwordversion` `passwordversion` TINYINT( 4 ) NOT NULL DEFAULT '0' ;
+
+
+-- START REV 8.1/1
+
+-- add dm notes
+ALTER TABLE `dm` ADD `notes` TEXT;
