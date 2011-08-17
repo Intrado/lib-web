@@ -1104,7 +1104,7 @@ class SMAPI {
 				}
 
 				$obj->personid = $personid;
-				$obj->editlock = 1;
+				$obj->editlock = 1; // NOTE if editlock is ever 0, must optin the number (bug 4128)
 				$obj->sequence = ($contact->sequence + 0);
 				$obj->create();
 			} else {
@@ -1867,6 +1867,10 @@ class SMAPI {
 			$destrecord->editlockdate = null;
 		}
 		$destrecord->$type = $destination;
+		// if sms, optin via authserver (minor hack to insert into global optin list so jobs will send to these sms numbers)
+		if ("sms" == $type && !$editlock) {
+			blocksms($destination, "optin", "Automated optin via SMAPI");
+		}
 		
 		// update/create all destination records
 		foreach ($destinations as $dest) {
