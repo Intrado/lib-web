@@ -158,6 +158,17 @@ function authorizeSpecialTask($shardid, $taskuuid) {
 	return false;
 }
 
+function blocksms($sms, $action, $notes) {
+	$params = array(new XML_RPC_Value($sms, 'string'), new XML_RPC_Value($action, 'string'), new XML_RPC_Value($notes, 'string'));
+	$method = "AuthServer.updateBlockedNumber";
+	$result = pearxmlrpc($method, $params);
+	if ($result !== false) {
+		// success
+		return $result['result'];
+	}
+	return false;
+}
+
 function getSessionData($id) {
 	$params = array(new XML_RPC_Value($id, 'string'));
 	$method = "AuthServer.getSessionData";
