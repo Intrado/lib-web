@@ -217,7 +217,7 @@ $query = "select dm.id, dm.customerid, c.urlcomponent, dm.name, dm.authorizedip,
 $result = Query($query);
 $data = array();
 while($row = DBGetRow($result))
-	$data[] = $row;
+	$data[$row[0]] = $row;
 
 if ($data) {
 	// First, get a list of every shard, $shardinfo[], indexed by ID, storing dbhost, dbusername, and dbpassword.
@@ -229,7 +229,7 @@ if ($data) {
 	
 	// Connect to each customer's shard and retrieve dmmethod
 	$custdb;
-	foreach($data as $dataPos => $cust) {
+	foreach($data as $dmid => $cust) {
 		if ($cust[1] + 0 > 0) {
 			try {
 				$dsn = 'mysql:dbname=c_'.$cust[1].';host='.$shardinfo[$cust[15]][0];
@@ -239,11 +239,21 @@ if ($data) {
 				die("Could not connect to customer database: ".$e->getMessage());
 			}
 			Query("use c_" . $cust[1], $custdb);
-			$query = "select value from setting where name = '_dmmethod' limit 1";
-			if ($custdb)
-				$data[$dataPos]['dmmethod'] = QuickQuery($query, $custdb);
+			if ($custdb) {
+				$query = "select value from setting where name = '_dmmethod' limit 1";
+				$data[$dmid]['dmmethod'] = QuickQuery($query, $custdb);
+				
+				$query = "select dmid,name,telco_type,poststatus,notes from custdm where dmid = ?";
+				$custdminfo = QuickQueryRow($query,true,$custdb, array($dmid));
+				if ($custdminfo) {
+					$data[$dmid][3] = $custdminfo["name"];
+					$data[$dmid][12] = $custdminfo["telco_type"];
+					$data[$dmid][16] = $custdminfo["poststatus"];
+					$data[$dmid][17] = $custdminfo["notes"];
+				}
+			}
 		} else {
-			$data[$dataPos]['dmmethod'] = '';
+			$data[$dmid]['dmmethod'] = '';
 		}
 		
 	}
