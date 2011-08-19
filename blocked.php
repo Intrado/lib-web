@@ -25,8 +25,8 @@ require_once("nav.inc.php");
 startWindow("Blocked Destination Types");
 	?>
 	<div style="padding: 8px">
-		<a href="blockedphone.php">Phone Calls / Text Messages</a><br>
-		<a href="blockedemail.php">Email Addresses</a>
+		<a href="blockedphone.php?clear">Phone Calls / Text Messages</a><br>
+		<a href="blockedemail.php?clear">Email Addresses</a>
 	</div>
 	<?
 endWindow();

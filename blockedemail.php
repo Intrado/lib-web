@@ -3,18 +3,35 @@
 // Includes
 ////////////////////////////////////////////////////////////////////////////////
 require_once("inc/common.inc.php");
-require_once("inc/form.inc.php");
 require_once("inc/html.inc.php");
 require_once("inc/table.inc.php");
 require_once("inc/utils.inc.php");
 require_once("inc/securityhelper.inc.php");
 require_once("inc/formatters.inc.php");
 
+require_once("obj/Validator.obj.php");
+require_once("obj/Form.obj.php");
+require_once("obj/FormItem.obj.php");
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization
 ////////////////////////////////////////////////////////////////////////////////
 if (!$USER->authorize('blocknumbers')) {
 	redirect('unauthorized.php');
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Validators
+////////////////////////////////////////////////////////////////////////////////
+
+class ValBlockedEmailExists extends Validator {
+	var $onlyserverside = true;
+	function validate ($value, $args) {
+		$exists = QuickQuery("select count(id) from blockeddestination where type = 'email' and blockmethod = 'manual' and destination = ?", false, array($value));
+		if ($exists) {
+			return _L('That email is already blocked');
+		}
+		return true;
+	}
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -33,84 +50,113 @@ if (isset($_GET['delete'])) {
 	redirect();
 }
 
-// should add columns to display contact details?
+// clear display options
+if (isset($_GET['clear'])) {
+	unset($_SESSION['blockedemailoptions']);
+	redirect();
+}
+
+// Default display options
+$settings = array(
+	"displaycontact" => false,
+	"downloadcsv" => false,
+	"searchtext" => ""
+);
+
+// Check options
+if (isset($_SESSION['blockedemailoptions'])) {
+	$settings = json_decode($_SESSION['blockedemailoptions'],true);
+}
+
 if (isset($_GET['displaycontact'])) {
-	if ($_GET['displaycontact'] == 'true')
-		$_SESSION['shouldblockeddisplaycontact'] = true;
-	else
-		$_SESSION['shouldblockeddisplaycontact'] = false;
-} else if (isset($_SESSION['shouldblockeddisplaycontact']) && $_SESSION['shouldblockeddisplaycontact'] == true)
-	$_SESSION['shouldblockeddisplaycontact'] = true;
-else
-	$_SESSION['shouldblockeddisplaycontact'] = false;
+	$settings["displaycontact"] = $_GET['displaycontact'] == 'true'?true:false;
+}
+if (isset($_REQUEST["searchtext"])) {
+	$settings["searchtext"] = $_REQUEST['searchtext'];
+}
+if(isset($_GET['displaycontact']) || isset($_REQUEST["searchtext"])) {
+	$_SESSION['blockedemailoptions'] = json_encode($settings);
+	redirect();
+}
 
 // if csv download, else html
-if (isset($_GET['csv']))
-	$csv = true;
-else
-	$csv = false;
+$settings["downloadcsv"] = isset($_GET['csv'])?true:false;
+$_SESSION['blockedemailoptions'] = json_encode($settings);
 
-	
-$form = "blockedemail";
-$section = "main";
-$reloadform = false;
 
-if(CheckFormSubmit($form, $section))
-{
-	//check to see if formdata is valid
-	if(CheckFormInvalid($form))
-	{
-		error('Form was edited in another window, reloading data');
-		$reloadform = true;
-	}
-	else
-	{
-		MergeSectionFormData($form, $section);
 
-		//do check
-		if( CheckFormSection($form, $section) ) {
-			error('There was a problem trying to save your changes', 'Please verify that all required field information has been entered properly');
-		} else if ($ACCESS->getValue('callblockingperms') == 'editall' || $ACCESS->getValue('callblockingperms') == 'addonly') {
-			$email = TrimFormData($form, $section, 'email');
-			if (strlen($email) > 200) {
-				error('The email address cannot be more than 200 characters in length.');
-			} else if (!validEmail($email)) {
-				error(_L('The email address is not valid'));
-			} else {
-				QuickQuery("BEGIN");
-				// Check to see if the email already exists
-				$exists = QuickQuery("select count(id) from blockeddestination where type = 'email' and blockmethod = 'manual' and destination = ?", false, array($email));
-				if ($exists) {
-					error(_L('That email is already blocked'));
-				} else {
-					$description = TrimFormData($form, $section, 'reason');
-					$result = QuickUpdate("insert into blockeddestination(userid, description, destination, type, createdate, blockmethod)
-								values (?, ?, ?, 'email', now(), 'manual') on duplicate key update userid = ?, description = ?, createdate = now(), failattempts = null, blockmethod = 'manual'",
-								false, array($USER->id, $description, $email, $USER->id, $description));
-					QuickQuery("COMMIT");
-					if ($result) {
-						$reloadform = true;
-						notice(_L("Emails for %s are now blocked.", escapehtml($email)));
-					} else {
-						error("An error occurred when saving the email address");
-					}
-				}
-			}
-		} else {
-			error("You are not authorized to perform this operation");
+$helpstepnum = 1;
+$helpsteps = array("TODO");
+$formdata = array();
+
+
+$formdata["email"] = array(
+	"label" => _L('Email'),
+	"value" => '',
+	"validators" => array(
+		array("ValRequired"),
+		array("ValLength","max" => 200),
+		array("ValEmail"),
+		array("ValBlockedEmailExists")
+	),
+	"control" => array("TextField","size"=>35),
+	"helpstep" => $helpstepnum
+);
+$formdata["reason"] = array(
+	"label" => _L('Reason'),
+	"value" => '',
+	"validators" => array(
+		array("ValRequired"),
+		array("ValLength","max" => 200)
+	),
+	"control" => array("TextField","size"=>35),
+	"helpstep" => $helpstepnum
+);
+
+$buttons = array(submit_button(_L("Add"),"add","add"));
+$form = new Form("blockedlist",$formdata,false,$buttons);
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+// Form Data Handling
+////////////////////////////////////////////////////////////////////////////////
+
+//check and handle an ajax request (will exit early)
+//or merge in related post data
+$form->handleRequest();
+
+$datachange = false;
+$errors = false;
+//check for form submission
+if ($button = $form->getSubmit()) {
+	//checks for submit and merges in post data
+	$ajax = $form->isAjaxSubmit(); //whether or not this requires an ajax response
+
+	if ($form->checkForDataChange()) {
+		$datachange = true;
+	} else if (($errors = $form->validate()) === false) {
+		//checks all of the items in this form
+		$postdata = $form->getData(); //gets assoc array of all values {name:value,...}
+		Query("BEGIN");
+		$query = "insert into blockeddestination(userid, description, destination, type, createdate, blockmethod)
+						values 
+						(?, ?, ?, 'email', now(), 'manual')
+						 on duplicate key update userid = ?, description = ?, createdate = now(), failattempts = null, blockmethod = 'manual'";
+		
+		$result = QuickUpdate($query,false, array($USER->id, $postdata["reason"], $postdata["email"], $USER->id, $postdata["reason"]));
+		if ($result) {
+			notice(_L("Emails for %s are now blocked.", escapehtml($postdata["email"])));
 		}
+		
+		Query("COMMIT");
+		if ($ajax)
+			$form->sendTo("blockedemail.php");
+		else
+			redirect("blockedemail.php");
 	}
-} else {
-	$reloadform = true;
 }
-
-if( $reloadform )
-{
-	ClearFormData($form);
-	PutFormData($form, $section,"email", "", "text", 1, 200, true);
-	PutFormData($form, $section,"reason", "", "text", 1, 100, true);
-}
-
 
 $titles = array(
 			"4" => '#Email Address',
@@ -130,8 +176,17 @@ $formatters = array(
 
 $start = 0 + (isset($_GET['pagestart']) ? $_GET['pagestart'] : 0);
 $limit = 500;
+$extrasql = "";
+$dataqueryargs = array();
+if ($settings["searchtext"] != "") {
+	$extrasql .= " and b.destination like ? or b.description like ?";
+	$dataqueryargs[] = "%{$settings["searchtext"]}%";
+	$dataqueryargs[] = "%{$settings["searchtext"]}%";
+}
 
-if ($_SESSION['shouldblockeddisplaycontact']) {
+
+
+if ($settings["displaycontact"]) {
 	$personfields = array(
 		"1" => _L("ID #"),
 		"2" => _L("First Name"),
@@ -148,7 +203,9 @@ if ($_SESSION['shouldblockeddisplaycontact']) {
 		left join person p on (p.id = e.personid)
 		where b.type = 'email'
 		and b.blockmethod in ('autoblock', 'manual')
+		$extrasql
 		order by createdate desc";
+	
 			
 } else {
 	// must stub in dummy contact details for pid and pkey index order, if we do the same query with person details we get duplicate rows when multiple people share a phone
@@ -158,9 +215,10 @@ if ($_SESSION['shouldblockeddisplaycontact']) {
 			left join user u on (b.userid = u.id)
 			where b.type = 'email'
 			and b.blockmethod in ('autoblock', 'manual')
+			$extrasql
 			order by createdate desc";
 }
-
+//$settings["searchtext"]
 
 ///////////////////////////////
 // Functions
@@ -192,7 +250,7 @@ function fmt_blockedby($row, $index) {
 ////////////////////////////////////////////////////////////////////////////////
 // Display
 ////////////////////////////////////////////////////////////////////////////////
-if ($csv) {
+if ($settings["downloadcsv"]) {
 	
 	$titles = array(
 			"4" => 'Email Address',
@@ -200,7 +258,7 @@ if ($csv) {
 			"6" => 'Blocked by',
 			"11" => 'Blocked on');
 
-	if ($_SESSION['shouldblockeddisplaycontact']) {
+	if ($settings["displaycontact"]) {
 		$personfields = array(
 			"1" => _L("ID #"),
 			"2" => _L("First Name"),
@@ -221,7 +279,7 @@ if ($csv) {
 
 	$limit = 1000;
 	$start = 0;
-	$data = QuickQueryMultiRow($dataquery .  " limit $start, $limit");
+	$data = QuickQueryMultiRow($dataquery .  " limit $start, $limit",false,false,$dataqueryargs);
 	
 	while (count($data) > 0) {
 	
@@ -235,7 +293,7 @@ if ($csv) {
 			else
 				$row[6] = "Recipient";
 		
-			if ($_SESSION['shouldblockeddisplaycontact'])
+			if ($settings["displaycontact"])
 				$displaydata = array($row[1], $row[2], $row[3], $row[4], $row[5], $row[6], $row[11]);
 			else
 				$displaydata = array($row[4], $row[5], $row[6], $row[11]);
@@ -245,61 +303,72 @@ if ($csv) {
 		}
 				
 		$start += $limit;
-		$data = QuickQueryMultiRow($dataquery .  " limit $start, $limit");
+		$data = QuickQueryMultiRow($dataquery .  " limit $start, $limit",false,false,$dataqueryargs);
 	}
+	exit();
+}
 	
-} else { // HTML view
-	
-$data = QuickQueryMultiRow($dataquery .  " limit $start, $limit");
+$data = QuickQueryMultiRow($dataquery .  " limit $start, $limit",false,false,$dataqueryargs);
 $total = QuickQuery("select FOUND_ROWS()");
 	
 $PAGE = "system:blocked";
-$TITLE = "Blocked List";
+$TITLE = _L('Systemwide Blocked Emails');
 
 include_once("nav.inc.php");
-
-NewForm($form);
-startWindow(_L('Systemwide Blocked Email') , 'padding: 3px;', false, true);
+// Optional Load Custom Form Validators
 ?>
-	<table style="margin-top: 5px;" border="0" cellpadding="0" cellspacing="0">
+<script type="text/javascript">
+<? Validator::load_validators(array("ValBlockedEmailExists")); ?>
+</script>
 <?
+
+
 if ($ACCESS->getValue('callblockingperms') == 'addonly' || $ACCESS->getValue('callblockingperms') == 'editall') {
-?>
-		<tr>
-			<td>Email: <? NewFormItem($form, $section, 'email', 'text',20,200); ?>&nbsp;&nbsp;</td>
-			<td>Reason: <? NewFormItem($form, $section, 'reason', 'text',30,100); ?>&nbsp;&nbsp;</td>
-			<td><?= submit($form, $section, 'Add'); ?></td>
-		</tr>
-<? 
+	startWindow(_L('Add Email Address') , 'padding: 3px;', false, true);
+	echo $form->render();
+
+	endWindow();
 }
+
+startWindow(_L('Blocked Emails') , 'padding: 3px;', false, true);
 ?>
-		<tr>
-			<td>
-			<input type='checkbox' id='checkboxDisplayContact' onclick='location.href="?displaycontact=" + this.checked + "&pagestart=" + "<? echo($start); ?>"' <?=$_SESSION['shouldblockeddisplaycontact'] ? 'checked' : ''?>><label for='checkboxDisplayContact'><?=_L('Display Contacts')?></label> 
-			</td>
-<?
-if (!($ACCESS->getValue('callblockingperms') == 'addonly' || $ACCESS->getValue('callblockingperms') == 'editall')) {
-?>
-			<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
-<? 
-}
-?>
-			<td>
+<table style="margin-top: 5px;" border="0" cellpadding="5" cellspacing="5">
+	<tr>
+		<td>
+			<form id="searchform">
+			<input style='float:left;' id='searchtext' size="75" value='<?= $settings["searchtext"] ?>'><?= icon_button(_L("Search"),"magnifier","if($('searchtext').getStyle('color') != 'gray') {window.location='?searchtext=' + encodeURIComponent($('searchtext').value);} else {window.location='?searchtext='}"); ?>
+			</form>
+		</td>
+		<td>
+			<input type='checkbox' id='checkboxDisplayContact' onclick='location.href="?displaycontact=" + this.checked + "&pagestart=" + "<? echo($start); ?>"' <?=$settings["displaycontact"] ? 'checked' : ''?>><label for='checkboxDisplayContact'><?=_L('Display Contacts')?></label> 
+		</td>
+		<td>
 			<a href='blockedemail.php?csv'><?= _L("CSV Download"); ?></a>
-			</td>
-		</tr>
-	</table>
+		</td>
+	</tr>
+</table>
 <?
-
-showPageMenu($total, $start, $limit);
-echo '<table width="100%" cellpadding="3" cellspacing="1" class="list sortable" id="blocked_numbers">';
-showTable($data, $titles, $formatters);
-echo "\n</table>";
-showPageMenu($total, $start, $limit);
-
+if(count($data) > 0) {
+	showPageMenu($total, $start, $limit);
+	echo '<table width="100%" cellpadding="3" cellspacing="1" class="list sortable" id="blocked_numbers">';
+	showTable($data, $titles, $formatters);
+	echo "\n</table>";
+	showPageMenu($total, $start, $limit);
+} else {
+	echo "<div class='destlabel'><img src='img/largeicons/information.jpg' align='middle'> " . _L("No blocked emails found") . "<div>";
+}
 endWindow();
-EndForm();
+
+
+?>
+<script type="text/javascript">
+	var searchBox = $('searchtext');
+	blankFieldValue('searchtext', 'Search email and/or block reasons');
+	searchBox.focus();
+	searchBox.blur();
+</script>
+<?
 
 include_once("navbottom.inc.php");
-}
+
 ?>

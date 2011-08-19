@@ -4,19 +4,39 @@
 ////////////////////////////////////////////////////////////////////////////////
 require_once("inc/common.inc.php");
 require_once("obj/Phone.obj.php");
-require_once("inc/form.inc.php");
 require_once("inc/html.inc.php");
 require_once("inc/table.inc.php");
 require_once("inc/utils.inc.php");
 require_once("inc/securityhelper.inc.php");
 require_once("inc/formatters.inc.php");
 
-
+require_once("obj/Validator.obj.php");
+require_once("obj/Form.obj.php");
+require_once("obj/FormItem.obj.php");
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization
 ////////////////////////////////////////////////////////////////////////////////
 if (!$USER->authorize('blocknumbers')) {
 	redirect('unauthorized.php');
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Validators
+////////////////////////////////////////////////////////////////////////////////
+
+class ValBlockedPhoneExists extends Validator {
+	var $onlyserverside = true;
+	function validate ($value, $args,$requiredvalues) {
+		$type = $requiredvalues[$args['field']];;
+		$phonevalue = Phone::parse($value);
+		$exists = QuickQueryList("select type from blockeddestination where  destination = ?", false, false, array($phonevalue));
+		if ($exists && ($type == 'both' || $type == 'phone') && in_array('phone', $exists)) {
+			return _L('That number is already blocked from receiving phone calls');
+		} else if($exists && ($type == 'both' || $type == 'sms') && in_array('sms', $exists)) {
+			return _L('That number is already blocked from receiving text messages');
+		} 
+		return true;
+	}
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -35,94 +55,129 @@ if (isset($_GET['delete'])) {
 	redirect();
 }
 
-// should add columns to display contact details?
+// clear display options
+if (isset($_GET['clear'])) {
+	unset($_SESSION['blockedphoneoptions']);
+	redirect();
+}
+
+// Default display options
+$settings = array(
+	"displaycontact" => false,
+	"downloadcsv" => false,
+	"searchtext" => ""
+);
+
+// Check options
+if (isset($_SESSION['blockedphoneoptions'])) {
+	$settings = json_decode($_SESSION['blockedphoneoptions'],true);
+}
 if (isset($_GET['displaycontact'])) {
-	if ($_GET['displaycontact'] == 'true')
-		$_SESSION['shouldblockeddisplaycontact'] = true;
-	else
-		$_SESSION['shouldblockeddisplaycontact'] = false;
-} else if (isset($_SESSION['shouldblockeddisplaycontact']) && $_SESSION['shouldblockeddisplaycontact'] == true)
-	$_SESSION['shouldblockeddisplaycontact'] = true;
-else
-	$_SESSION['shouldblockeddisplaycontact'] = false;
+	$settings["displaycontact"] = $_GET['displaycontact'] == 'true'?true:false;
+}
+if (isset($_REQUEST["searchtext"])) {
+	$settings["searchtext"] = $_REQUEST['searchtext'];
+}
+if(isset($_GET['displaycontact']) || isset($_REQUEST["searchtext"])) {
+	$_SESSION['blockedphoneoptions'] = json_encode($settings);
+	redirect();
+}
 
 // if csv download, else html
-if (isset($_GET['csv']))
-	$csv = true;
-else
-	$csv = false;
+$settings["downloadcsv"] = isset($_GET['csv'])?true:false;
+$_SESSION['blockedphoneoptions'] = json_encode($settings);
 
 
-$form = "blockednumbers";
-$section = "main";
-$reloadform = false;
 
-if(CheckFormSubmit($form, $section))
-{
-	//check to see if formdata is valid
-	if(CheckFormInvalid($form))
-	{
-		error('Form was edited in another window, reloading data');
-		$reloadform = true;
-	}
-	else
-	{
-		MergeSectionFormData($form, $section);
+$helpstepnum = 1;
+$helpsteps = array("TODO");
+$formdata = array();
 
-		//do check
-		if( CheckFormSection($form, $section) ) {
-			error('There was a problem trying to save your changes', 'Please verify that all required field information has been entered properly');
-		} else if ($ACCESS->getValue('callblockingperms') == 'editall' || $ACCESS->getValue('callblockingperms') == 'addonly') {
-			$phone = Phone::parse(GetFormData($form, $section, 'number'));
-			if (strlen($phone) != 10) {
-				error('The phone number must be exactly 10 digits long (including area code)','You do not need to include a 1 for long distance');
-			} else {
-				$blocktype = GetFormData($form, $section, 'type');
-				// check to see if this number already exists
-				$exists = QuickQueryList("select type from blockeddestination where  destination = ?", false, false, array($phone));
-				if ($exists && ($blocktype == 'both' || $blocktype == 'phone') && in_array('phone', $exists)) {
-					error(_L('That number is already blocked from receiving phone calls'));
-				} else if($exists && ($blocktype == 'both' || $blocktype == 'sms') && in_array('sms', $exists)) {
-					error(_L('That number is already blocked from receiving text messages'));
-				} else {
-					QuickQuery("BEGIN");
-					if($blocktype == 'both' || $blocktype == 'phone')
-						$result = QuickUpdate("insert into blockeddestination (userid, description, destination, type, createdate)
-									values (?, ?, ?, 'phone', now())", false, array($USER->id, TrimFormData($form, $section, 'reason'), $phone));
-					if($blocktype == 'both' || $blocktype == 'sms')
-						$result = QuickUpdate("insert into blockeddestination (userid, description, destination, type, createdate)
-									values (?, ?, ?, 'sms', now())", false, array($USER->id, TrimFormData($form, $section, 'reason'), $phone));
-
-					QuickQuery("COMMIT");
-
-					if ($result) {
-						$reloadform = true;
-						if ($blocktype == 'both') {
-							notice(_L("Both phone calls and text messages for %s are now blocked.", escapehtml(Phone::format($phone))));
-						} else {
-							notice(_L("%1s for %2s are now blocked.", $blocktype == 'phone' ? escapehtml(_L('Phone calls')) : escapehtml(_L('Text messages')), escapehtml(Phone::format($phone))));
-						}
-					} else {
-						error("An error occurred when saving the phone number");
-					}
-				}
-			}
-		} else {
-			error("You are not authorized to perform this operation");
-		}
-	}
+if(getSystemSetting("_hassms", false)){
+	$types = array("both" => "Block Calls and Text Messages", "sms" => "Block Text Messages only","phone" => "Block Calls only");
 } else {
-	$reloadform = true;
+	$types = array("both" => "Block Calls");
 }
+$formdata["type"] = array(
+	"label" => _L('Block Type'),
+	"value" => '',
+	"validators" => array(
+		array("ValRequired"),
+		array("ValInArray", "values" => array_keys($types))
+	),
+	"control" => array("SelectMenu", "values" => $types),
+	"helpstep" => $helpstepnum
+);
+$formdata["phone"] = array(
+	"label" => _L('Phone'),
+	"value" => '',
+	"validators" => array(
+		array("ValRequired"),
+		array("ValPhone"),
+		array("ValBlockedPhoneExists","field" => "type")
+	),
+	"control" => array("TextField","size"=>35),
+	"requires" => array("type"),
+	"helpstep" => $helpstepnum
+);
 
-if( $reloadform )
-{
-	ClearFormData($form);
-	PutFormData($form, $section,"number", "", "text", 1, 20, true);
-	PutFormData($form, $section,"reason", "", "text", 1, 100, true);
-	PutFormData($form, $section,"type", "both", "text");
+$formdata["reason"] = array(
+	"label" => _L('Reason'),
+	"value" => '',
+	"validators" => array(
+		array("ValRequired"),
+		array("ValLength","max" => 200)
+	),
+	"control" => array("TextField","size"=>35),
+	"helpstep" => $helpstepnum
+);
+
+$buttons = array(submit_button(_L("Add"),"add","add"));
+$form = new Form("blockedlist",$formdata,false,$buttons);
+
+////////////////////////////////////////////////////////////////////////////////
+// Form Data Handling
+////////////////////////////////////////////////////////////////////////////////
+
+//check and handle an ajax request (will exit early)
+//or merge in related post data
+$form->handleRequest();
+
+$datachange = false;
+$errors = false;
+//check for form submission
+if ($button = $form->getSubmit()) {
+	//checks for submit and merges in post data
+	$ajax = $form->isAjaxSubmit(); //whether or not this requires an ajax response
+
+	if ($form->checkForDataChange()) {
+		$datachange = true;
+	} else if (($errors = $form->validate()) === false) {
+		//checks all of the items in this form
+		$postdata = $form->getData(); //gets assoc array of all values {name:value,...}
+		Query("BEGIN");
+		$phone = Phone::parse($postdata["phone"]);
+		if($postdata["type"] == 'both' || $postdata["type"] == 'phone')
+			$result = QuickUpdate("insert into blockeddestination (userid, description, destination, type, createdate)
+						values (?, ?, ?, 'phone', now())", false, array($USER->id, $postdata["reason"], $phone));
+		if($postdata["type"] == 'both' || $postdata["type"] == 'sms')
+			$result = QuickUpdate("insert into blockeddestination (userid, description, destination, type, createdate)
+						values (?, ?, ?, 'sms', now())", false, array($USER->id, $postdata["reason"], $phone));
+		if ($result) {
+			if ($postdata["type"] == 'both') {
+				notice(_L("Both phone calls and text messages for %s are now blocked.", escapehtml(Phone::format($phone))));
+			} else {
+				notice(_L("%1s for %2s are now blocked.", $postdata["type"] == 'phone' ? escapehtml(_L('Phone calls')) : escapehtml(_L('Text messages')), escapehtml(Phone::format($phone))));
+			}
+		}
+
+		Query("COMMIT");
+		if ($ajax)
+		$form->sendTo("blockedphone.php");
+		else
+		redirect("blockedphone.php");
+	}
 }
-
 	
 $formatters = array(
 	"10" => "fmt_bntype",
@@ -144,7 +199,29 @@ if ($ACCESS->getValue('callblockingperms') == 'editall' || $ACCESS->getValue('ca
 	$titles = $titles + array("7" => 'Actions');
 }
 
-if ($_SESSION['shouldblockeddisplaycontact']) {
+$extrasql = "";
+$dataqueryargs = array();
+if ($settings["searchtext"] != "") {
+	$extrasql .= " and (b.destination like ? or b.description like ?";
+	$dataqueryargs[] = "%{$settings["searchtext"]}%";
+	$dataqueryargs[] = "%{$settings["searchtext"]}%";
+	
+	/*
+	If phone number is formatted like  (831) 342-2322
+	then do an extra search of the parsed phone number.
+	Since it is formatted, it does not make sense
+	to search an extra search unless there are more than 2 digits
+	*/
+	$phoneseach = Phone::parse($settings["searchtext"]);
+	if (strlen($phoneseach) > 2) {
+		$extrasql .= " or b.destination like ?";
+		$dataqueryargs[] = "%$phoneseach%";
+	}
+	
+	$extrasql .= ")";
+}
+
+if ($settings["displaycontact"]) {
 	$personfields = array(
 		"1" => _L("ID #"),
 		"2" => _L("First Name"),
@@ -160,6 +237,7 @@ if ($_SESSION['shouldblockeddisplaycontact']) {
 		left join phone ph on (ph.phone = b.destination)
 		left join person p on (p.id = ph.personid)
 		where b.userid = u.id and b.type = 'phone'
+		$extrasql
 		)
 		union
 		(select p.id, p.pkey, p.f01, p.f02,
@@ -170,9 +248,12 @@ if ($_SESSION['shouldblockeddisplaycontact']) {
 		left join sms s on (s.sms = b.destination)
 		left join person p on (p.id = s.personid)
 		where b.userid = u.id and b.type = 'sms'
+		$extrasql
 		)
 		order by createdate desc, type";
 	
+	// duplicate search arguments because the union in this query
+	$dataqueryargs = array_merge($dataqueryargs,$dataqueryargs);
 } else {
 	// must stub in dummy contact details for pid and pkey index order, if we do the same query with person details we get duplicate rows when multiple people share a phone
 	$dataquery = "select SQL_CALC_FOUND_ROWS 'pid', 'pkey', 'f01', 'f02', b.destination, b.description, CONCAT(u.firstname, ' ', u.lastname) as fullname, b.id, b.userid, '" .
@@ -180,9 +261,9 @@ if ($_SESSION['shouldblockeddisplaycontact']) {
 			from blockeddestination b
 			join user u on (u.id = b.userid) 
 			where b.userid = u.id and b.type in ('phone', 'sms')
+			$extrasql
 			order by createdate desc, type";
 }
-
 //////////////////////////////////
 // Functions
 /////////////////////////////////
@@ -212,7 +293,7 @@ function fmt_bntype ($row, $index) {
 ////////////////////////////////////////////////////////////////////////////////
 // Display
 ////////////////////////////////////////////////////////////////////////////////
-if ($csv) {
+if ($settings["downloadcsv"]) {
 
 	$titles = array(
 		"4" => 'Phone Number',
@@ -221,7 +302,7 @@ if ($csv) {
 		"6" => 'Blocked by',
 		"11" => 'Blocked on');
 	
-	if ($_SESSION['shouldblockeddisplaycontact']) {
+	if ($settings["displaycontact"]) {
 		$personfields = array(
 			"1" => _L("ID #"),
 			"2" => _L("First Name"),
@@ -242,7 +323,7 @@ if ($csv) {
 
 	$limit = 1000;
 	$start = 0;
-	$data = QuickQueryMultiRow($dataquery .  " limit $start, $limit");
+	$data = QuickQueryMultiRow($dataquery .  " limit $start, $limit",false,false,$dataqueryargs);
 	
 	while (count($data) > 0) {
 	
@@ -260,7 +341,7 @@ if ($csv) {
 				$row[4] = Phone::format($row[4]);
 			}
 		
-			if ($_SESSION['shouldblockeddisplaycontact'])
+			if ($settings["displaycontact"])
 				$displaydata = array($row[1], $row[2], $row[3], $row[4], $row[10], $row[5], $row[6], $row[11]);
 					else
 				$displaydata = array($row[4], $row[10], $row[5], $row[6], $row[11]);
@@ -270,80 +351,73 @@ if ($csv) {
 		}
 		
 		$start += $limit;
-		$data = QuickQueryMultiRow($dataquery .  " limit $start, $limit");
+		$data = QuickQueryMultiRow($dataquery .  " limit $start, $limit",false,false,$dataqueryargs);
 	}
-	
-} else { // HTML view
+	exit();
+}
 
-$data = QuickQueryMultiRow($dataquery .  " limit $start, $limit");
+$data = QuickQueryMultiRow($dataquery .  " limit $start, $limit",false,false,$dataqueryargs);
 $total = QuickQuery("select FOUND_ROWS()");
 	
 $PAGE = "system:blocked";
-$TITLE = "Blocked List";
+$TITLE = _L('Systemwide Blocked Phone Numbers');
 
 include_once("nav.inc.php");
 
-NewForm($form);
-startWindow(_L('Systemwide Blocked Phone') . help('Blocked_SystemwideBlocked'), 'padding: 3px;', false, true);
+// Optional Load Custom Form Validators
 ?>
-	<table style="margin-top: 5px;" border="0" cellpadding="0" cellspacing="0">
+<script type="text/javascript">
+<? Validator::load_validators(array("ValBlockedPhoneExists")); ?>
+</script>
 <?
+
+
 if ($ACCESS->getValue('callblockingperms') == 'addonly' || $ACCESS->getValue('callblockingperms') == 'editall') {
-?>
-		<tr>
-			<td>Phone: <? NewFormItem($form, $section, 'number', 'text',20,20); ?>&nbsp;&nbsp;</td>
-			<td>
-<?
-				NewFormItem($form, $section,"type","selectstart");
-				if(getSystemSetting("_hassms", false)){
-					NewFormItem($form, $section,"type","selectoption","Block Calls and Text Messages","both");
-					NewFormItem($form, $section,"type","selectoption","Block Text Messages only","sms");
-					NewFormItem($form, $section,"type","selectoption","Block Calls only","phone");
-				} else {
-					NewFormItem($form, $section,"type","selectoption","Block Calls","both");
-				}
-				NewFormItem($form, $section,"type","selectend");
-
-?>
-			&nbsp;
-			</td>
-			<td>Reason: <? NewFormItem($form, $section, 'reason', 'text',30,100); ?>&nbsp;&nbsp;</td>
-			<td><?= submit($form, $section, 'Add'); ?></td>
-			<td><? print help('Blocked_Add', 'style="margin-left: 5px;"'); ?></td>
-		</tr>
-<? 
+	startWindow(_L('Add Phone Number') , 'padding: 3px;', false, true);
+	echo $form->render();
+	endWindow();
 }
-?>
 
-		<tr>
-			<td>
-			<input type='checkbox' id='checkboxDisplayContact' onclick='location.href="?displaycontact=" + this.checked + "&pagestart=" + "<? echo($start); ?>"' <?=$_SESSION['shouldblockeddisplaycontact'] ? 'checked' : ''?>><label for='checkboxDisplayContact'><?=_L('Display Contacts')?></label> 
-			</td>
-<?
-if (!($ACCESS->getValue('callblockingperms') == 'addonly' || $ACCESS->getValue('callblockingperms') == 'editall')) {
+
+startWindow(_L('Blocked Phones') . help('Blocked_SystemwideBlocked'), 'padding: 3px;', false, true);
 ?>
-			<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
-<? 
+<table style="margin-top: 5px;" border="0" cellpadding="5" cellspacing="5">
+	<tr>
+		<td>
+		<form id="searchform">
+		<input style='float:left;' id='searchtext' size="75" value='<?= $settings["searchtext"] ?>'><?= icon_button(_L("Search"),"magnifier","if($('searchtext').getStyle('color') != 'gray') {window.location='?searchtext=' + encodeURIComponent($('searchtext').value);} else {window.location='?searchtext='}"); ?>
+		</form>
+		</td>
+		<td>
+		<input type='checkbox' id='checkboxDisplayContact' onclick='location.href="?displaycontact=" + this.checked + "&pagestart=" + "<? echo($start); ?>"' <?=$settings["displaycontact"] ? 'checked' : ''?>><label for='checkboxDisplayContact'><?=_L('Display Contacts')?></label> 
+		</td>
+		<td>
+		<a href='blockedphone.php?csv'><?= _L("CSV Download"); ?></a>
+		</td>
+	</tr>
+</table>
+
+<?
+if(count($data) > 0) {
+	showPageMenu($total, $start, $limit);
+	echo '<table width="100%" cellpadding="3" cellspacing="1" class="list sortable" id="blocked_numbers">';
+	showTable($data, $titles, $formatters);
+	echo "\n</table>";
+	showPageMenu($total, $start, $limit);
+} else {
+	echo "<div class='destlabel'><img src='img/largeicons/information.jpg' align='middle'> " . _L("No blocked phones found") . "<div>";
 }
-?>
-			<td>
-			<a href='blockedphone.php?csv'><?= _L("CSV Download"); ?></a>
-			</td>
-		</tr>
-	</table>
-<?
-
-showPageMenu($total, $start, $limit);
-echo '<table width="100%" cellpadding="3" cellspacing="1" class="list sortable" id="blocked_numbers">';
-showTable($data, $titles, $formatters);
-echo "\n</table>";
-showPageMenu($total, $start, $limit);
-
 endWindow();
-EndForm();
 
+?>
+<script type="text/javascript">
+	var searchBox = $('searchtext');
+	blankFieldValue('searchtext', 'Search phone numbers and/or block reasons');
+	searchBox.focus();
+	searchBox.blur();
+</script>
+<?
 include_once("navbottom.inc.php");
-}
 
 
 ?>
