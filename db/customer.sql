@@ -1587,5 +1587,15 @@ CHANGE `passwordversion` `passwordversion` TINYINT( 4 ) NOT NULL DEFAULT '0',
 CHANGE `pincode` `pincode` VARCHAR( 50 ) CHARACTER SET utf8 COLLATE utf8_general_ci NULL
 $$$
 
+update setting set value='8.0/5' where name='_dbversion'
+$$$
 -- END REV 8.0/5
 
+-- start 8.1/1
+-- add dm notes
+ALTER TABLE `custdm` ADD `notes` TEXT;
+$$$
+
+update setting set value='8.1/1' where name='_dbversion'
+$$$
+-- END REV 8.1/1
