@@ -137,14 +137,11 @@ class LanguagesItem extends FormItem {
 							"sv" => "Swedish",
 							"uk" => "Ukrainian",
 							"vi" => "Vietnamese");
-		//<textarea id='$n' name='$n' rows=2 cols=100 />$value</textarea>
 		$str = "
 				<input id='$n' name='$n' type='hidden' value='$value' />
-				<div id='langdisp'>$value</div>
-				<table>";
-
-		
-		$str .= "<td style=\"border: 1px solid black;\">
+				<div id='$n-removelang' style='display:none'>" . icon_button("Remove", "delete") . "</div>
+				<div id='$n-disp'></div>
+				<table><td style=\"border: 1px solid black;\">
 				Language Lookup:<br />
 				<table><tr><td>
 				<select id='newlanginputselect' onchange='languageselect();'>
@@ -163,11 +160,150 @@ class LanguagesItem extends FormItem {
 				<div style="display:inline;font-weight: bold;" id="newlangcodedisp">N/A</div> Name: 
 				<input id="newlangcode" type="hidden" maxlength="50" size="25" />
 				<input id="newlanginput" type="text" maxlength="50" size="25" />
-				</td><td>' . icon_button("Add/Change", "add","changelanguage('$n',false)") . icon_button("Remove", "delete","changelanguage('$n',true)") . '</td></tr></table>
+				</td><td>' . icon_button("Add", "add","changelanguage('$n')") . '</td></tr></table>
 				</td></tr>
 				</table>
 				';
 		return $str;
+	}
+	function renderJavascript() {
+		$n = $this->form->name."_".$this->name;
+		$str = "
+			function updatelanguage(code,name) {
+				var langs = \$H($('$n').value.evalJSON(true));
+				langs.set(code.strip(),name.strip());
+				$('$n').value = langs.toJSON();		
+			}
+			function removelanguage(code) {
+				var langs = \$H($('$n').value.evalJSON(true));
+				langs.unset(code.strip());
+				$('$n').value = langs.toJSON();
+				renderlanguages();
+			}
+			function renderlanguages() {
+				var langs = \$H($('$n').value.evalJSON(true));
+				var table = new Element('table');
+				langs.each(function(lang) {
+
+					var tablecontent = new Element('tr');
+					var input = new Element('input', { 'type': 'text', 'value': lang.value});
+					
+					if (lang.key != 'en') {
+						input.observe('change',function(e) {
+							updatelanguage(lang.key,e.element().getValue());
+						});
+					} else {
+						input.disabled = true;
+					}
+					tablecontent.insert(new Element('td').insert(input));
+
+					if (lang.key != 'en') {
+						var removebutton = new Element('div').update($('$n-removelang').innerHTML);
+						removebutton.observe('click',function(e) {
+							removelanguage(lang.key);
+						});
+						tablecontent.insert(new Element('td').insert(removebutton));		
+					}
+					table.insert(tablecontent);
+				});	
+				$('$n-disp').update(table);		
+				form_do_validation($('{$this->form->name}'), $('$n'));
+			}
+			
+			document.observe('dom:loaded', renderlanguages);
+				
+			function languageselect() {
+				var s = $('newlanginputselect');
+				if (s.selectedIndex !== 0) {
+					var value = s.options[s.selectedIndex].value;
+					$('newlanginput').value = value.substring(4);
+					$('newlangcode').value = value.substring(0,3);
+					$('newlangcodedisp').update(value.substring(0,3));
+				}
+			}
+			
+			function addlang(code,name) {
+				$('newlangcode').value = code;
+				$('newlanginput').value = name;
+				$('newlanginputselect').selectedIndex = 0;
+				$('searchresult').update('');
+				$('newlangcodedisp').update(code);
+			}
+			
+			function changelanguage(formitemid){
+				var code = $('newlangcode').value;
+				var language = $('newlanginput').value;
+				if (code && language) {
+					var langs = \$H($(formitemid).value.evalJSON(true));
+					langs.set(code.strip(),language.strip());
+					$(formitemid).value = langs.toJSON();
+				}
+				$('newlanginputselect').selectedIndex = 0;
+				$('searchresult').update('');
+				$('newlangcodedisp').update('N/A');
+				$('newlangcode').value = '';
+				$('newlanginput').value = '';
+				renderlanguages();
+			}	
+	
+			function searchlanguages() {
+				var searchtxt = $('searchbox').value;
+				new Ajax.Request('languagesearch.php',
+				{
+					method:'get',
+					parameters: {searchtxt: searchtxt},
+					onSuccess: function(response){
+						var result = response.responseJSON;
+						var items = new Element('tbody',{width:'100%'});
+						var header = new Element('tr').addClassName('listHeader');
+			
+						if(result) {
+							header.insert(new Element('th').update('Code'));
+							header.insert(new Element('th',{align:'left'}).update('Language'));
+			
+							items.insert(header);
+							var i = 0;
+							\$H(result).each(function(itm) {
+								var row = new Element('tr');
+								if(i%2)
+									row.addClassName('listAlt');
+								row.insert(new Element('td',{align:'right'}).update(itm.key));
+								row.insert(new Element('td').update('<a href=\"#\" onclick=\"addlang(\'' + itm.key + '\',\'' + itm.value + '\');return false;\">' + itm.value + '</a>'));
+								items.insert(row);
+								i++;
+							});
+						} else {
+							header.insert(new Element('th').update('No Language Found containing the search sting \"' + searchtxt + '\"'));
+							items.insert(header);
+			
+						}
+						$('searchresult').update(items);
+					}
+				});
+			}";
+		return $str;
+	}
+}
+
+class ValLanguages extends Validator {
+	function validate ($value) {
+		$languages = json_decode($value,true);
+		if(!is_array($languages) || !isset($languages['en'])) {
+			return 'English is required for ' . $this->label;
+		}
+		return true;
+	}
+	function getJSValidator () {
+		return
+		'function (name, label, value, args) {
+			var langs = $H(value.evalJSON(true));
+			if (langs.length == 0)
+				return label + " is required";
+			if (!langs.get("en"))
+				return "English is required for " + label;
+
+			return true;
+		}';
 	}
 }
 
@@ -583,7 +719,9 @@ $languages = $customerid?QuickQueryList("select code, name from language",true,$
 $formdata["languages"] = array(
 						"label" => _L('Languages'),
 						"value" => json_encode($languages),
-						"validators" => array(),
+						"validators" => array(
+							array("ValRequired"),
+							array("ValLanguages")),
 						"control" => array("LanguagesItem", 
 							"ttslangs" => $customerid?QuickQueryList("select language,id from ttsvoice", true, $custdb):array()),
 						"helpstep" => $helpstepnum
@@ -653,16 +791,7 @@ $formdata["oemid"] = array(
 						"control" => array("TextField","maxlength"=>50,"size"=>4),
 						"helpstep" => $helpstepnum
 );
-$formdata["nsid"] = array(
-						"label" => _L('NetSuite ID'),
-						"value" => isset($custinfo)?$custinfo["nsid"]:"",
-						"validators" => array(
-							array('ValNumber'),
-							array("ValLength","max" => 50)
-						),
-						"control" => array("TextField","maxlength"=>50,"size"=>4),
-						"helpstep" => $helpstepnum
-);
+
 
 
 $formdata[] = _L("Callback");
@@ -733,7 +862,7 @@ $formdata["hasfacebook"] = array(
 						"helpstep" => $helpstepnum
 );
 $formdata["hastwitter"] = array(
-						"label" => _L('Has Facebook'),
+						"label" => _L('Has Twitter'),
 						"value" => $settings['_hastwitter'],
 						"validators" => array(),
 						"control" => array("CheckBox"),
@@ -741,6 +870,17 @@ $formdata["hastwitter"] = array(
 );
 
 $formdata[] = _L("Misc. Settings");
+$formdata["nsid"] = array(
+						"label" => _L('NetSuite ID'),
+						"value" => isset($custinfo)?$custinfo["nsid"]:"",
+						"validators" => array(
+							array('ValNumber'),
+							array("ValLength","max" => 50)
+						),
+						"control" => array("TextField","maxlength"=>50,"size"=>4),
+						"helpstep" => $helpstepnum
+);
+
 $formdata["renewaldate"] = array(
 						"label" => _L('Renewal Date'),
 						"value" => $settings['_renewaldate'],
@@ -1180,83 +1320,7 @@ include_once("nav.inc.php");
 
 <script type="text/javascript">
 
-function languageselect() {
-	var s = $('newlanginputselect');
-	if (s.selectedIndex !== 0) {
-		var value = s.options[s.selectedIndex].value;
-		$('newlanginput').value = value.substring(4);
-		$('newlangcode').value = value.substring(0,3);
-		$('newlangcodedisp').update(value.substring(0,3));
-	}
-}
 
-function addlang(code,name) {
-	$('newlangcode').value = code;
-	$('newlanginput').value = name;
-	$('newlanginputselect').selectedIndex = 0;
-	$('searchresult').update('');
-	$('newlangcodedisp').update(code);
-
-
-	
-}
-
-function changelanguage(formitemid,remove){
-	var code = $('newlangcode').value;
-	var language = $('newlanginput').value;
-	if (code && language) {
-		var langs = $H($(formitemid).value.evalJSON(true));
-		if(remove)
-			langs.unset(code.strip());
-		else
-			langs.set(code.strip(),language.strip());
-		$(formitemid).value = langs.toJSON();
-		$('langdisp').update($(formitemid).value);
-	}
-	$('newlanginputselect').selectedIndex = 0;
-	$('searchresult').update('');
-	$('newlangcodedisp').update('N/A');
-	$('newlangcode').value = '';
-	$('newlanginput').value = '';
-}
-
-
-function searchlanguages() {
-	var searchtxt = $('searchbox').value;
-	new Ajax.Request('languagesearch.php',
-	{
-		method:'get',
-		parameters: {searchtxt: searchtxt},
-		onSuccess: function(response){
-			var result = response.responseJSON;
-			var items = new Element('tbody',{width:'100%'});
-			var header = new Element('tr').addClassName("listHeader");
-
-			if(result) {
-				header.insert(new Element('th').update('Code'));
-				header.insert(new Element('th',{align:'left'}).update('Language'));
-
-				items.insert(header);
-				var i = 0;
-				$H(result).each(function(itm) {
-					var row = new Element('tr');
-					if(i%2)
-						row.addClassName("listAlt");
-					row.insert(new Element('td',{align:"right"}).update(itm.key));
-					row.insert(new Element('td').update('<a href="#" onclick="addlang(\'' + itm.key + '\',\'' + itm.value + '\');return false;">' + itm.value + '</a>'));
-					items.insert(row);
-					i++;
-				});
-			} else {
-				header.insert(new Element('th').update('No Language Found containing the search sting "' + searchtxt + '"'));
-				items.insert(header);
-
-			}
-			$('searchresult').update(items);
-
-		}
-	});
-}
 
 document.observe('dom:loaded', function() {
 	$('newcustomer_logo').observe("change", function (event) {
@@ -1281,7 +1345,7 @@ document.observe('dom:loaded', function() {
 		}
 	});
 });
-<? Validator::load_validators(array("ValBrandTheme","ValInboundNumber","ValUrlComponent","ValRegExp"));?>
+<? Validator::load_validators(array("ValBrandTheme","ValInboundNumber","ValUrlComponent","ValRegExp","ValLanguages"));?>
 </script>
 <?
 
