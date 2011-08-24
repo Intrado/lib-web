@@ -32,7 +32,8 @@ if (isset($_GET["clear"])) {
 $settings = array(
 	"dispatchtype" => 'system',
 	"priorities" => array(1,2,3),
-	"jobstatus" => "active"
+	"jobstatus" => "active",
+	"destinationtype" => "phone"
 );
 if (isset($_SESSION["customeractivejobsfiler"])) {
 	$settings = array_merge($settings,json_decode($_SESSION["customeractivejobsfiler"],true));
@@ -62,6 +63,18 @@ $formdata["priorities"] = array(
 	"control" => array("MultiCheckBox", "values" => $prinames),
 	"helpstep" => $helpstepnum
 );
+$destinationtypes = array('phone' => 'Phone','sms' => 'SMS','email' => 'Email');
+$formdata["destinationtype"] = array(
+	"label" => _L('Destination Type'),
+	"value" => $settings['destinationtype'],
+	"validators" => array(
+		array("ValRequired"),
+		array("ValInArray", "values" => array_keys($destinationtypes))
+	),
+	"control" => array("SelectMenu", "values" => $destinationtypes),
+	"helpstep" => $helpstepnum
+);
+
 
 if (isset($_SESSION['customeractivejobsfiler'])) {
 	$buttons = array(submit_button(_L('Refresh'),"submit","arrow_refresh"));
@@ -111,6 +124,7 @@ if (isset($_SESSION['customeractivejobsfiler'])) {
 	$calldata = array();
 	$activejobs = array();
 	$extrasql = "";
+	$extraargs = array();
 
 	if(isset($_GET['cid'])){
 		$customerid = $_GET['cid'] + 0;
@@ -125,7 +139,10 @@ if (isset($_SESSION['customeractivejobsfiler'])) {
 	} else {
 		$extrasql .= " and j.dispatchtype = 'system' ";
 	}
-
+	
+	$extrasql .= " and jt.type = ? ";
+	$extraargs[] = $settings['destinationtype'];
+	
 	foreach ($shards as $shardid => $sharddb) {
 		Query("use aspshard", $sharddb);
 		$query = "select j.systempriority, j.customerid, j.id, jt.type, jt.attempts, jt.sequence,
@@ -136,7 +153,7 @@ if (isset($_SESSION['customeractivejobsfiler'])) {
 				group by jt.status, jt.customerid, jt.jobid, jt.type, jt.attempts, jt.sequence
 				order by j.systempriority, j.customerid, j.id, jt.type, jt.attempts, jt.sequence
 				";
-		$res = Query($query,$sharddb);
+		$res = Query($query,$sharddb,$extraargs);
 		while ($row = DBGetRow($res)) {
 
 			$calldata[$row[0]][$row[1]][$row[2]][$row[3]][$row[4]][$row[5]][$row[6]] = $row[9];
