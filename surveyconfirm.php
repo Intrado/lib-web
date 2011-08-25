@@ -83,7 +83,10 @@ if ($totalpersons == 0) {
 	$blocksubmit = true;
 	error("The list you've selected does not have any people in it","Click Cancel to return to the Job configuration page");
 }
-
+if ((strtotime($job->enddate) <= strtotime("today")) && (strtotime($job->endtime) < strtotime("now"))) {
+	$blocksubmit = true;
+	error("The end time has passed","Click 'Modify Survey Settings' to return to the survey configuration page");
+}
 if (count($questions) == 0) {
 	$blocksubmit = true;
 	error("The questionnaire you've selected does not contain any questions","Click Cancel to return to the Survey configuration page");
