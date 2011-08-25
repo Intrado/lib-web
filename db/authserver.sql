@@ -379,3 +379,6 @@ CHANGE `passwordversion` `passwordversion` TINYINT( 4 ) NOT NULL DEFAULT '0' ;
 
 -- add dm notes
 ALTER TABLE `dm` ADD `notes` TEXT;
+
+-- add soft delete feture for dat files
+ALTER TABLE `dmdatfile` ADD `deleted` tinyint(4) NOT NULL default '0';
