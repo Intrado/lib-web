@@ -1,34 +1,28 @@
 <?
-/*
-	DM Settings Manager
-	List of settings:
-		// remote properties
-		 String dmType; // Test, Asterisk
-		 boolean dmEnabled;
-		 int resourceCount;
-		 int inboundCount;
-		 int callsPerSecond;
-		 String callerID;
+////////////////////////////////////////////////////////////////////////////////
+// Includes
+////////////////////////////////////////////////////////////////////////////////
+require_once("common.inc.php");
+require_once("../inc/table.inc.php");
+require_once("../inc/html.inc.php");
+require_once("../inc/utils.inc.php");
+require_once("../obj/Validator.obj.php");
+require_once("../obj/Form.obj.php");
+require_once("../obj/FormItem.obj.php");
+require_once("../obj/Phone.obj.php");
+////////////////////////////////////////////////////////////////////////////////
+// Authorization
+////////////////////////////////////////////////////////////////////////////////
 
-		// test voice
-		 boolean testDelay; // remote
-
-*/
-
-include_once("common.inc.php");
-include_once("../inc/form.inc.php");
-include_once("../inc/table.inc.php");
-include_once("../obj/Phone.obj.php");
-include_once("../inc/html.inc.php");
 $dmType = '';
 
 if (!$MANAGERUSER->authorized("editdm") && !$MANAGERUSER->authorized("systemdm"))
 	exit("Not Authorized");
 
 if(isset($_GET['dmid'])){
-	$dmid = $_GET['dmid']+0;
-	$dmType = QuickQuery("select type from dm where id = " . $dmid);
-	if(!QuickQuery("select count(*) from dm where id = " . $dmid) || 
+	$dmid = $_GET['dmid'] +0;
+	$dmType = QuickQuery("select type from dm where id=?",false,array($dmid));
+	if(!QuickQuery("select count(*) from dm where id = ?",false,array($dmid)) || 
 			!(($MANAGERUSER->authorized("editdm") && $dmType == "customer") ||
 			($MANAGERUSER->authorized("systemdm") && $dmType == "system"))){
 		echo "Invalid DM, or not authorized to edit this DM.";
@@ -37,325 +31,353 @@ if(isset($_GET['dmid'])){
 	$_SESSION['dmid'] = $dmid;
 	redirect();
 } else {
+	if (!isset($_SESSION['dmid'])) {
+		exit("Not Authorized");
+	}
 	$dmid = $_SESSION['dmid'];
-	$dmType = QuickQuery("select type from dm where id = " . $dmid);
+	$dmType = QuickQuery("select type from dm where id=?",false,array($dmid));
 }
 
-//Fetch dm settings from dmsettings table
+////////////////////////////////////////////////////////////////////////////////
+// Action/Request Processing
+////////////////////////////////////////////////////////////////////////////////
 
-$telco_types = array("Test", "Asterisk");
-$dm = QuickQueryRow("select name, lastip, lastseen, customerid, enablestate, type, authorizedip, lastip, notes from dm where id = '" . DBSafe($dmid) . "'", true);
-
-
-$f = "dmedit";
-$s = "main";
-$reloadform = 0;
-$refreshdm = false;
-
-if(CheckFormSubmit($f,$s) || CheckFormSubmit($f, "authorize") || CheckFormSubmit($f, "unauthorize"))
-{
-	//check to see if formdata is valid
-	if(CheckFormInvalid($f))
-	{
-		error('Form was edited in another window, reloading data');
-		$reloadform = 1;
+////////////////////////////////////////////////////////////////////////////////
+// Custom Form Items and Validators
+////////////////////////////////////////////////////////////////////////////////
+class TestWeightField extends FormItem {
+	function render ($value) {
+		$n = $this->form->name."_".$this->name;
+		return '<input id="'.$n.'" name="'.$n.'" type="text" value="'.escapehtml($value).'" /> ' . 
+		"Example: A=3&M=3&B=2&N=2&X=1&F=1" .
+		' <a href="#" onclick="$(\'editdm_testweightedresults\').value=\'3&M=3&B=2&N=2&X=1&F=1\';
+			form_do_validation($(\'editdm\'), $(\'editdm_testweightedresults\')); return false;">Copy example test weight</a>';
 	}
-	else
-	{
-		MergeSectionFormData($f, $s);
+}
 
-		TrimFormData($f, $s, "customerid");
-		TrimFormData($f, $s, "telco_inboundtoken");
-		TrimFormData($f, $s, "telco_calls_sec");
-		TrimFormData($f, $s, "delmech_resource_count");
-		TrimFormData($f, $s, "testweightedresults");
-		//do check
+class ValCustomerId extends Validator {
+	var $onlyserverside = true;
+	function validate ($value, $args) {
+		if ($args["dmtype"] == 'customer' && !QuickQuery("select count(*) from customer where id = ?",false,array($value))){
+			return _L("There is no customer this id");
+		}
+		return true;
+	}
+}
 
-		if( CheckFormSection($f, $s) ) {
-			error('There was a problem trying to save your changes', 'Please verify that all required field information has been entered properly');
-		} else {
-			$callerid = Phone::parse(GetFormData($f, $s, "telco_caller_id"));
+class ValIp extends Validator {
+	var $onlyserverside = true;
+	function validate ($value) {
+		$ip_pattern = "^([0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3})$";
+		$slaship_pattern = "^([0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3})/([0-9]{1,2})$";
+		$netmask_pattern = "^([0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}) ([0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3})$";
 			
-			$ip_pattern = "^([0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3})$";
-			$slaship_pattern = "^([0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3})/([0-9]{1,2})$";
-			$netmask_pattern = "^([0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}) ([0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3})$";
-			
-			$authorizedip = TrimFormData($f, $s, "authorizedip");
-			$authorizedippatternok = ereg($ip_pattern,$authorizedip) || ereg($slaship_pattern,$authorizedip) || ereg($netmask_pattern,$authorizedip);
+		$authorizedippatternok = ereg($ip_pattern,$value) || ereg($slaship_pattern,$value) || ereg($netmask_pattern,$value);
+		if (!$authorizedippatternok) {
+			return _L("Accepts either single IP format (11.22.33.44)<br />\n
+						network slash notation (11.22.33.0/24)<br />\n
+						or netmask notation (11.22.33.0 255.255.255.0)");
+		}
+		return true;
+	}
+}
 
-			if (!ereg("[0-9]{10}",$callerid)) {
-				error('Bad Caller ID, Try Again');
-			} else if ($dmType == 'customer' && GetFormData($f, $s, "customerid") && !QuickQuery("select count(*) from customer where id = " . GetFormData($f, $s, "customerid"))){
-				error('Invalid Customer ID');
-			} else if (GetFormData($f, $s, "telco_inboundtoken") > GetFormData($f, $s, "delmech_resource_count")){
-				error('Number of inbound tokens cannot exceed the max number of resources');
-			} else if(GetFormData($f, $s, 'telco_calls_sec') && !ereg("^[0-9]*\.?[0-9]*$", GetFormData($f, $s, 'telco_calls_sec'))){
-				error("Calls per second must be a positive number");
-			} else if (!$authorizedippatternok) {
-				error("Authorized IP must be in one of the 3 listed formats");
+
+////////////////////////////////////////////////////////////////////////////////
+// Form Data
+////////////////////////////////////////////////////////////////////////////////
+
+// DM settings defaults 
+$dmsettings = array(
+	"dm_enabled" => 0,
+	"telco_type" => "asterisk",
+	"test_has_delays" => '',
+	"testweightedresults" => 'A=3&M=3&B=2&N=2&X=1&F=1',
+	"telco_caller_id" => '',
+	"telco_calls_sec" => '',
+	"delmech_resource_count" => '',
+	"telco_inboundtoken" => '',
+	"telco_dial_timeout" => false,
+	"disable_congestion_throttle" => ''
+
+);
+$dmsettings = array_merge($dmsettings,QuickQueryList("select name,value from dmsetting where dmid=?",true,false,array($dmid)));
+$dminfo = QuickQueryRow("select name, lastip, lastseen, customerid, enablestate, type, authorizedip, lastip, notes from dm where id=?", true,false,array($dmid));
+
+$helpstepnum = 1;
+
+$helpsteps = array("TODO: Enable and Authorized");
+$formdata["enabled"] = array(
+	"label" => _L('Enabled'),
+	"value" => $dmsettings["dm_enabled"],
+	"validators" => array(),
+	"control" => array("CheckBox"),
+	"helpstep" => $helpstepnum
+);
+
+$formdata["authorized"] = array(
+	"label" => _L('Authorized'),
+	"value" => $dminfo["enablestate"]=="active"?1:0,
+	"validators" => array(),
+	"control" => array("CheckBox"),
+	"helpstep" => $helpstepnum
+);
+if ($dmType == 'customer') {
+	$helpstepnum++;
+	$helpsteps[] = "TODO: Customerid";
+	$formdata["customerid"] = array(
+		"label" => _L('Customer ID'),
+		"value" => $dminfo['customerid'],
+		"validators" => array(
+			array("ValRequired"),
+			array("ValNumber"),
+			array("ValCustomerId", "dmtype" => $dmType)
+		),
+		"control" => array("TextField","size" => 5, "maxlength" => 51),
+		"helpstep" => $helpstepnum
+	);
+}
+$helpstepnum++;
+$helpsteps[] = "TODO: DM Testmode ";
+$types = array("Test" => "Test", "Asterisk" => "Asterisk");
+$formdata["type"] = array(
+	"label" => _L('Type'),
+	"value" => $dmsettings['telco_type'],
+	"validators" => array(
+		array("ValRequired"),
+		array("ValInArray", "values" => array_keys($types))
+	),
+	"control" => array("SelectMenu", "values" => $types),
+	"helpstep" => $helpstepnum
+);
+$formdata["testhasdelays"] = array(
+	"label" => _L('Test Has Delays'),
+	"value" => $dmsettings['test_has_delays'],
+	"validators" => array(),
+	"control" => array("CheckBox"),
+	"helpstep" => $helpstepnum
+);
+$formdata["testweightedresults"] = array(
+	"label" => _L('Test Weighted Results'),
+	"value" => $dmsettings['testweightedresults'],
+	"validators" => array(),
+	"control" => array("TestWeightField"),
+	"helpstep" => $helpstepnum
+);
+$helpstepnum++;
+$helpsteps[] = "TODO: Callerid";
+$formdata["callerid"] = array(
+	"label" => _L('Caller ID'),
+	"value" => $dmsettings['telco_caller_id'],
+	"validators" => array(
+		array("ValRequired"),
+		array("ValPhone")
+	),
+	"control" => array("TextField","size" => 15, "maxlength" => 20),
+	"helpstep" => $helpstepnum
+);
+$helpstepnum++;
+$helpsteps[] = "TODO: Resouces";
+$formdata["callspersecond"] = array(
+	"label" => _L('Calls per Second'),
+	"value" => $dmsettings['telco_calls_sec'],
+	"validators" => array(
+		array("ValRequired"),
+		array("ValNumber")
+	),
+	"control" => array("TextField","size" => 15, "maxlength" => 20),
+	"helpstep" => $helpstepnum
+);
+$formdata["numberofresources"] = array(
+	"label" => _L('Number of Resources'),
+	"value" => $dmsettings['delmech_resource_count'],
+	"validators" => array(
+		array("ValRequired"),
+		array("ValNumber")
+	),
+	"control" => array("TextField","size" => 15, "maxlength" => 20),
+	"helpstep" => $helpstepnum
+);
+$formdata["inboundresouces"] = array(
+	"label" => _L('Inbound Resouces'),
+	"value" => $dmsettings['telco_inboundtoken'],
+	"validators" => array(
+		array("ValRequired"),
+		array("ValNumber")
+	),
+	"control" => array("TextField","size" => 15, "maxlength" => 20),
+	"helpstep" => $helpstepnum
+);
+$formdata["disablethrottle"] = array(
+	"label" => _L('Disable Congestion Throttle'),
+	"value" => $dmsettings["disable_congestion_throttle"],
+	"validators" => array(),
+	"control" => array("CheckBox"),
+	"helpstep" => $helpstepnum
+);
+$helpstepnum++;
+$helpsteps[] = "TODO: Authorized IP";
+$formdata["lastip"] = array(
+	"label" => _L("Last IP"),
+	"control" => array("FormHtml","html"=> escapehtml($dminfo["lastip"]) .
+		' <a href="#" onclick="$(\'editdm_authorizedip\').value=\'' . $dminfo["lastip"] . 
+		'\';form_do_validation($(\'editdm\'), $(\'editdm_authorizedip\')); return false;">Copy to authorized ip</a>'),	
+	"helpstep" => $helpstepnum
+);
+$formdata["authorizedip"] = array(
+	"label" => _L('Authorized IP'),
+	"value" => $dminfo['authorizedip'],
+	"validators" => array(
+		array("ValRequired"),
+		array("ValIp")
+	),
+	"control" => array("TextField","size" => 15, "maxlength" => 20),
+	"helpstep" => $helpstepnum
+);
+$helpstepnum++;
+$helpsteps[] = "TODO: Notes";
+$formdata["notes"] = array(
+	"label" => _L('Notes'),
+	"value" => $dminfo['notes'],
+	"validators" => array(),
+	"control" => array("TextArea", "rows" => 3, "cols" => 40),
+	"helpstep" => $helpstepnum
+);
+
+$buttons = array(submit_button(_L('Save'),"submit","tick"),
+				icon_button(_L('Cancel'),"cross",null,($dmType == 'customer'?"customerdms.php":"systemdms.php")));
+$form = new Form("editdm",$formdata,$helpsteps,$buttons);
+
+////////////////////////////////////////////////////////////////////////////////
+// Form Data Handling
+////////////////////////////////////////////////////////////////////////////////
+
+//check and handle an ajax request (will exit early)
+//or merge in related post data
+$form->handleRequest();
+
+$datachange = false;
+$errors = false;
+//check for form submission
+if ($button = $form->getSubmit()) { //checks for submit and merges in post data
+	$ajax = $form->isAjaxSubmit(); //whether or not this requires an ajax response	
+	
+	if ($form->checkForDataChange()) {
+		$datachange = true;
+	} else if (($errors = $form->validate()) === false) { //checks all of the items in this form
+		$postdata = $form->getData(); //gets assoc array of all values {name:value,...}
+		Query("BEGIN");
+		
+		$enablestate = $dminfo['enablestate'];
+		if($postdata["authorized"]){
+			QuickUpdate("update dm set enablestate = 'active' where id=?",false,array($dmid));
+			$enablestate = "active";
+		} else if($enablestate != "new"){
+			QuickUpdate("update dm set enablestate = 'disabled' where id=?",false,array($dmid));
+			$enablestate = "disabled";
+		}
+		$dialtimeout = $dmsettings["telco_dial_timeout"];
+		if($dialtimeout == false){
+			$dialtimeout = 45000;
+		}
+
+		QuickUpdate("delete from dmsetting where dmid=?",false,array($dmid));
+		QuickUpdate("insert into dmsetting (dmid, name, value) values 
+					(?,'dm_enabled',?),
+					(?,'telco_type',?),
+					(?,'test_has_delays',?),
+					(?,'testweightedresults',?),
+					(?,'telco_caller_id',?),
+					(?,'telco_calls_sec',?),
+					(?,'delmech_resource_count',?),
+					(?,'telco_inboundtoken',?),
+					(?,'telco_dial_timeout',?),
+					(?,'disable_congestion_throttle',?)
+					",
+				false,
+				array(
+					$dmid,$postdata["enabled"]?1:0,
+					$dmid,$postdata["type"],
+					$dmid,$postdata["testhasdelays"]?1:0,
+					$dmid,$postdata["testweightedresults"],
+					$dmid,Phone::parse($postdata["callerid"]),
+					$dmid,$postdata["callspersecond"],
+					$dmid,$postdata["numberofresources"],
+					$dmid,$postdata["inboundresouces"],
+					$dmid,$dialtimeout,
+					$dmid,$postdata["disablethrottle"]?1:0)
+		);
+
+		$newcustomerid = $postdata["customerid"] + 0;
+		QuickUpdate("update dm set	authorizedip=?,
+									customerid=?,
+									notes=?
+									where id=?",false,
+									array($postdata["authorizedip"],$newcustomerid,$postdata["notes"],$dmid));
+		if ($dmType == 'customer') {
+			if($dminfo['customerid'] != null && $newcustomerid != $dminfo['customerid']){
+				$custinfo = QuickQueryRow("select s.dbhost, s.dbusername, s.dbpassword from shard s inner join customer c on (c.shardid = s.id)
+																where c.id = ?",false,false,array($dminfo['customerid']));				
+				$custdb = DBConnect($custinfo[0], $custinfo[1], $custinfo[2], "c_" . $dminfo['customerid']);
+				if(QuickQuery("select count(*) from custdm where dmid=?", $custdb,array($dmid))){
+					QuickUpdate("delete from custdm where dmid=?", $custdb,array($dmid));
+				}
+			}				
+			$custinfo = QuickQueryRow("select s.dbhost, s.dbusername, s.dbpassword from shard s inner join customer c on (c.shardid = s.id)
+										where c.id=?",false,false,array($newcustomerid));
+			$custdb = DBConnect($custinfo[0], $custinfo[1], $custinfo[2], "c_" . $newcustomerid);
+			
+			if(!QuickQuery("select count(*) from custdm where dmid = " . $dmid, $custdb)){
+				QuickUpdate("insert into custdm (dmid, name, enablestate, telco_type,notes) values (?,?,?,?)", $custdb,
+								array($dmid,$dm['name'],$enablestate,$postdata["type"],$postdata["notes"]));
 			} else {
-				QuickUpdate("Begin");
-
-				$enablestate = $dm['enablestate'];
-
-				if(CheckFormSubmit($f, "authorize")){
-					QuickUpdate("update dm set enablestate = 'active' where id = " . $dmid);
-					$enablestate = "active";
-				} else if(CheckFormSubmit($f, "unauthorize")){
-					QuickUpdate("update dm set enablestate = 'disabled' where id = " . $dmid);
-					$enablestate = "disabled";
-				}
-
-				$dialtimeout = getDMSetting($dmid, "telco_dial_timeout");
-								if($dialtimeout == false){
-									$dialtimeout = 45000;
-				}
-
-				QuickUpdate("delete from dmsetting where dmid = '" . DBSafe($dmid) . "'");
-				QuickUpdate("insert into dmsetting (dmid, name, value) values
-							('" . DBSafe($dmid) . "', 'telco_calls_sec', '" . DBSafe(GetFormData($f, $s, 'telco_calls_sec')) . "'),
-							('" . DBSafe($dmid) . "', 'delmech_resource_count', '" . DBSafe(GetFormData($f, $s, 'delmech_resource_count')) . "'),
-							('" . DBSafe($dmid) . "', 'telco_dial_timeout', '" . $dialtimeout . "'),
-							('" . DBSafe($dmid) . "', 'telco_caller_id', '" . Phone::parse($callerid) . "'),
-							('" . DBSafe($dmid) . "', 'telco_inboundtoken', '" . DBSafe(GetFormData($f, $s, 'telco_inboundtoken')) . "'),
-							('" . DBSafe($dmid) . "', 'telco_type', '" . DBSafe(GetFormData($f, $s, 'telco_type')) . "'),
-							('" . DBSafe($dmid) . "', 'dm_enabled', '" . DBSafe(GetFormData($f, $s, 'dm_enabled')) . "'),
-							('" . DBSafe($dmid) . "', 'test_has_delays', '" . DBSafe(GetFormData($f, $s, 'test_has_delays')) . "'),
-							('" . DBSafe($dmid) . "', 'testweightedresults','" . DBSafe(GetFormData($f, $s, 'testweightedresults'))."'),
-							('" . DBSafe($dmid) . "', 'disable_congestion_throttle', '" . DBSafe(GetFormData($f, $s, 'disable_congestion_throttle')) . "')
-							");
-				$newcustomerid = GetFormData($f, $s, "customerid") +0;
-				$notes = TrimFormData($f, $s, "notes");
-				QuickUpdate("update dm set	authorizedip=?,
-											customerid=?,
-											notes=?
-											where id=?",false,
-											array($authorizedip,$newcustomerid,$notes,$dmid));
-							
-				if ($dmType == 'customer') {
-					if($dm['customerid'] != null && $newcustomerid != $dm['customerid']){
-						$custinfo = QuickQueryRow("select s.dbhost, s.dbusername, s.dbpassword from shard s inner join customer c on (c.shardid = s.id)
-																		where c.id = " . $dm['customerid']);
-						$custdb = DBConnect($custinfo[0], $custinfo[1], $custinfo[2], "c_" . $dm['customerid']);
-						if(QuickQuery("select count(*) from custdm where dmid = " . $dmid, $custdb)){
-							QuickUpdate("delete from custdm where dmid = " . $dmid, $custdb);
-						}
-					}
-
-					$custinfo = QuickQueryRow("select s.dbhost, s.dbusername, s.dbpassword from shard s inner join customer c on (c.shardid = s.id)
-												where c.id = " . $newcustomerid);
-					$custdb = DBConnect($custinfo[0], $custinfo[1], $custinfo[2], "c_" . $newcustomerid);
-					if(!QuickQuery("select count(*) from custdm where dmid = " . $dmid, $custdb)){
-						QuickUpdate("insert into custdm (dmid, name, enablestate, telco_type,notes) values (?,?,?,?)", $custdb,
-										array($dmid,$dm['name'],$enablestate,GetFormData($f, $s, 'telco_type'),$notes));
-					} else {
-						QuickUpdate("update custdm set enablestate=?,telco_type=?,notes=? where dmid=?",$custdb,
-										array($enablestate,GetFormData($f, $s, 'telco_type'),$notes,$dmid));
-					}
-				}
-
-				QuickUpdate("commit");
-				if ($dmType == 'customer')
-					redirect("customerdms.php");
-				else
-					redirect("systemdms.php");
+				QuickUpdate("update custdm set enablestate=?,telco_type=?,notes=? where dmid=?",$custdb,
+								array($enablestate,$postdata["type"],$postdata["notes"],$dmid));
 			}
 		}
+
+		
+		Query("COMMIT");
+		if ($ajax)
+			$dmType == 'customer'?$form->sendTo("customerdms.php"):$form->sendTo("systemdms.php");
+		else
+			$dmType == 'customer'?$redirect("customerdms.php"):redirect("systemdms.php");
 	}
-} else {
-	$reloadform = 1;
-}
-
-if( $reloadform )
-{
-	ClearFormData($f);
-	PutFormData($f, $s, "Submit", "");
-	PutFormData($f, "authorize", "Authorize", "");
-	PutFormData($f, "unauthorize", "Un-authorize", "");
-	
-	PutFormData($f,$s,"authorizedip",$dm['authorizedip'],"text","7","31",true);
-	
-	PutFormData($f, $s, "telco_calls_sec", getDMSetting($dmid, "telco_calls_sec"), "text", "nomin", "nomax", true);
-	PutFormData($f, $s, "delmech_resource_count", getDMSetting($dmid, "delmech_resource_count"), "number", "nomin", "nomax", true);
-
-	PutFormData($f, $s, "telco_caller_id", Phone::format(getDMSetting($dmid, "telco_caller_id")), "phone", "10", "10", true);
-	PutFormData($f, $s, "telco_inboundtoken", getDMSetting($dmid, "telco_inboundtoken"), "number", "nomin", "nomax", true);
-	if ($dmType == 'customer')
-		PutFormData($f, $s, "customerid", $dm['customerid'], "number", "1", "nomax", true);
-	
-	PutFormData($f, $s, "telco_type", getDMSetting($dmid, "telco_type"), "array", $telco_types, "nomax", true);
-	PutFormData($f, $s, "dm_enabled", getDMSetting($dmid, "dm_enabled"), "bool", 0, 1);
-
-	PutFormData($f, $s, "test_has_delays", getDMSetting($dmid, "test_has_delays"), "bool", 0, 1);
-
-	// throttle capacity on trunkbusy call result
-	PutFormData($f, $s, "disable_congestion_throttle", getDMSetting($dmid, "disable_congestion_throttle"), "bool", 0, 1);
-
-	PutFormData($f, $s, "testweightedresults", getDMSetting($dmid, "testweightedresults"), "text");
-	PutFormData($f, $s, "notes", $dm['notes'], "text");
 }
 
 
-function getDMSetting($dmid, $setting){
-	return QuickQuery("select value from dmsetting where name = '" . $setting . "' and dmid = '" . $dmid . "'");
-}
+////////////////////////////////////////////////////////////////////////////////
+// Display
+////////////////////////////////////////////////////////////////////////////////
+$TITLE = _L('DM Settings');
 
 include_once("nav.inc.php");
 
-//custom newform declaration to catch if manager password is submitted
-NewForm($f);
 ?>
-<div>Settings for <?=$dm['name']?></div>
-<table>
-<?
+<script type="text/javascript">
+<? Validator::load_validators(array("ValCustomerId","ValIp")); ?>
 
-?>
-	<tr>
-		<td>Enable DM: </td>
-		<td><? NewFormItem($f, $s, "dm_enabled", "checkbox"); ?></td>
-	</tr>
-<?
-if ($dmType == 'customer') {?>
-	<tr>
-		<td>Customer ID: </td>
-		<td><? NewFormItem($f, $s, "customerid", "text", "5"); ?></td>
-	</tr>
-<?}
-?>
-	<tr>
-		<td>Authorized: </td>
-		<td><?
-
-		switch ($dm['enablestate']) {
-		case "active":
-			echo "Authorized";
-			break;
-		case "new":
-			echo "New";
-			break;
-		case "disabled":
-			echo "Unauthorized";
-			break;
-		}
-
-		?></td>
-	</tr>
-	<tr>
-		<td>Type: </td>
-		<td>
-			<?
-				NewFormItem($f, $s, "telco_type", "selectstart", null, null, "id='telco_type' onchange='if(this.value==\"Test\"){ $(\"weightedresult1\").show(); $(\"weightedresult2\").show(); $(\"hasdelay1\").show(); $(\"hasdelay2\").show(); } else { $(\"weightedresult1\").hide(); $(\"weightedresult2\").hide(); $(\"hasdelay1\").hide(); $(\"hasdelay2\").hide(); }'" );
-				foreach($telco_types as $telco_type){
-					NewFormItem($f, $s, "telco_type", "selectoption", $telco_type, $telco_type);
-				}
-				NewFormItem($f, $s, "telco_type", "selectend");
-			?>
-		</td>
-	</tr>
-	<tr>
-		<td><div id='weightedresult1' style='display:none'>Test Weighted Results:</span></td>
-		<td><div id='weightedresult2' style='display:none'><?=NewFormItem($f, $s, "testweightedresults", "text", 30, 250)?>  A=3&M=3&B=2&N=2&X=1&F=1</span></td>
-	</tr>
-	<tr>
-		<td>Caller ID:</td>
-		<td><? NewFormItem($f, $s, "telco_caller_id", "text", "14");?></td>
-	</tr>
-	<tr>
-		<td>Calls per Second: </td>
-		<td><? NewFormItem($f, $s, "telco_calls_sec", "text", "5");?></td>
-	</tr>
-	<tr>
-		<td># of Resources:</td>
-		<td><? NewFormItem($f, $s, "delmech_resource_count", "text", "5");?></td>
-	</tr>
-	<tr>
-		<td>Inbound Resources:</td>
-		<td><? NewFormItem($f, $s, "telco_inboundtoken", "text", "5");?></td>
-	</tr>
-	<tr>
-		<td><div id='hasdelay1' style='display:none'>Test Has Delays: </span></td>
-		<td><div id='hasdelay2' style='display:none'><? NewFormItem($f, $s, "test_has_delays", "checkbox", null, null, "id='test_has_delays'"); ?></span></td>
-	</tr>
-	<tr>
-		<td>Disable Congestion Throttle: </td>
-		<td><? NewFormItem($f, $s, "disable_congestion_throttle", "checkbox", null, null, "id='disable_congestion_throttle'"); ?></td>
-	</tr>
-
-	<tr>
-		<td>Last IP: </td>
-		<td><?=$dm['lastip']?> <a href="#" onclick="var field = new getObj('authorizedip'); field.obj.value = '<?=$dm['lastip']?>'; return false;" >Copy to authorized ip</a></td>
-	</tr>
-	<tr>
-		<td valign=top>Authorized IP:</td>
-		<td><? NewFormItem($f,$s,"authorizedip","text",31,31,'id="authorizedip"'); ?> <br>
-		<em>Accepts either single IP format (11.22.33.44)<br>
-		network slash notation (11.22.33.0/24)<br> 
-		or netmask notation (11.22.33.0 255.255.255.0)<br>
-		</em>
-		</td>
-	</tr>
-	<tr>
-		<td>Notes:</td>
-		<td><? NewFormItem($f, $s, "notes", "textarea");?></td>
-	</tr>
-	<tr>
-		<td colspan="3">
-<?
-			NewFormItem($f, $s, "Submit", "submit");
-			NewFormItem($f, "authorize", "Authorize", "submit");
-			NewFormItem($f, "unauthorize", "Un-authorize", "submit");
-?>
-		</td>
-	</tr>
-</table>
-<?
-EndForm();
-?>
-<br>
-<a href="dmdatfiles.php?dmid=<?=$_SESSION['dmid']?>">Dat File History</a>
-<?
-include_once("navbottom.inc.php");
-?>
-<script>
-if(new getObj('telco_type').obj.value == 'Test'){
-	show('weightedresult1');
-	show('weightedresult2');
-	show('hasdelay1');
-	show('hasdelay2');
+function displaytestitems() {
+	var type = $('editdm_type').getValue();
+	if (type == 'Asterisk') {
+		$('editdm_testhasdelays_fieldarea').hide();
+		$('editdm_testweightedresults_fieldarea').hide();
+	} else {
+		$('editdm_testhasdelays_fieldarea').show();
+		$('editdm_testweightedresults_fieldarea').show()
+	}
 }
 
-
-function getObj(name)
-{
-  if (document.getElementById)
-  {
-  	this.obj = document.getElementById(name);
-  }
-  else if (document.all)
-  {
-	this.obj = document.all[name];
-  }
-  else if (document.layers)
-  {
-   	this.obj = document.layers[name];
-  }
-  if(this.obj)
-	this.style = this.obj.style;
-}
-
-function show(name)
-{
-	var x = new getObj(name);
-	if (x.style)
-		x.style.display = "block";
-}
-
-function hide(name)
-{
-	var x = new getObj(name);
-	if (x.style)
-		x.style.display =  "none";
-}
-
+document.observe('dom:loaded', function() {
+	displaytestitems();
+	$('editdm_type').observe('change', displaytestitems);
+});
 
 </script>
+<?
+
+startWindow(_L('DM Settings: %s', escapehtml($dminfo["name"])) . ($dminfo["enablestate"]=="new"?_L(" (New)"):''));
+echo $form->render();
+endWindow();
+include_once("navbottom.inc.php");
+?>
