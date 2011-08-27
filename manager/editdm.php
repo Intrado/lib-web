@@ -308,7 +308,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 					$dmid,$postdata["disablethrottle"]?1:0)
 		);
 
-		$newcustomerid = $postdata["customerid"] + 0;
+		$newcustomerid = isset($postdata["customerid"])?$postdata["customerid"] + 0:0;
 		QuickUpdate("update dm set	authorizedip=?,
 									customerid=?,
 									notes=?
@@ -327,9 +327,9 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 										where c.id=?",false,false,array($newcustomerid));
 			$custdb = DBConnect($custinfo[0], $custinfo[1], $custinfo[2], "c_" . $newcustomerid);
 			
-			if(!QuickQuery("select count(*) from custdm where dmid = " . $dmid, $custdb)){
-				QuickUpdate("insert into custdm (dmid, name, enablestate, telco_type,notes) values (?,?,?,?)", $custdb,
-								array($dmid,$dm['name'],$enablestate,$postdata["type"],$postdata["notes"]));
+			if(!QuickQuery("select count(*) from custdm where dmid=?", $custdb,array($dmid))){
+				QuickUpdate("insert into custdm (dmid, name, enablestate, telco_type,notes) values (?,?,?,?,?)", $custdb,
+								array($dmid,$dminfo['name'],$enablestate,$postdata["type"],$postdata["notes"]));
 			} else {
 				QuickUpdate("update custdm set enablestate=?,telco_type=?,notes=? where dmid=?",$custdb,
 								array($enablestate,$postdata["type"],$postdata["notes"],$dmid));
