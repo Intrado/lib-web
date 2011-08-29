@@ -30,12 +30,8 @@ include_once("nav.inc.php");
 <li><a href="emergencyjobs.php">List of Recent Jobs</a></li>
 <? } ?>
 
-<? if ($MANAGERUSER->authorized("runqueries")) { ?>
-<li><a href="querylist.php">Run Queries</a></li>
-<? } ?>
-
-<? if ($MANAGERUSER->authorized("editqueries")) { ?>
-<li><a href="queryedit.php">Edit/Add Queries</a></li>
+<? if ($MANAGERUSER->authorized("runqueries") || $MANAGERUSER->authorized("editqueries")) { ?>
+<li><a href="querylist.php">Customer Queries</a></li>
 <? } ?>
 
 <? if ($MANAGERUSER->authorized("superuser")) { ?>

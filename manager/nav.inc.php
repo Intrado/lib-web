@@ -121,3 +121,12 @@ table {
 	</tr>
 </table>
 <div class="maincontent">
+
+	<?
+		if (!empty($_SESSION['confirmnotice'])) {
+			echo "<div class='confirmnoticecontainer noprint'><div class='confirmnoticecontent noprint'>";
+				echo implode("<hr />", $_SESSION['confirmnotice']);
+			echo "</div></div>";
+		}
+		unset($_SESSION['confirmnotice']);
+	?>
