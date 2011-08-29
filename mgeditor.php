@@ -66,6 +66,7 @@ if (isset($_GET['delete'])) {
 						false,
 						array($messagegroup->id,$message->languagecode,$message->type,$message->subtype));
 	}
+	$messagegroup->updateDefaultLanguageCode();
 }
 
 if (isset($_GET['copyphonetovoice'])) {
@@ -112,26 +113,13 @@ PreviewModal::HandleRequestWithId();
 ////////////////////////////////////////////////////////////////////////////////
 
 // find out if we need to update the default language code or if we need to give them an option to choose one
-// if the messagegroup has any instance of phone or email for the system default language, set it to that. 
-// if not, and there are only messages for one other language, set it to that.
 // if there are multiple languages, none of which are the system default language, present the user with a selection. Prepopulated with the current setting
-// if no languages at all, set to empty string
 $showDefaultLanguageSelector = false;
 $invalidMessageWarning = false;
 if ($messagegroup->id) {
 	$currentlangs = $messagegroup->getMessageLanguages();
-	if (isset($currentlangs[Language::getDefaultLanguageCode()])) {
-		$messagegroup->defaultlanguagecode = Language::getDefaultLanguageCode();
-		$messagegroup->update();
-	} else if (count($currentlangs) == 1) {
-		foreach ($currentlangs as $langcode => $lang)
-			$messagegroup->defaultlanguagecode = $langcode;
-		$messagegroup->update();
-	} else if (count($currentlangs) > 1) {
+	if (!isset($currentlangs[Language::getDefaultLanguageCode()]) && count($currentlangs) > 1) {
 		$showDefaultLanguageSelector = true;
-	} else {
-		$messagegroup->defaultlanguagecode = "";
-		$messagegroup->update();
 	}
 	
 	// is this message group valid? if not, does it have any messages?

@@ -167,6 +167,8 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 				$messagepart->sequence = 0;
 				$messagepart->create();
 				
+				$messagegroup->updateDefaultLanguageCode();
+				
 				Query("COMMIT");
 			}
 		}

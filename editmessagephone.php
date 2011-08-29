@@ -105,9 +105,7 @@ if (!in_array($languagecode, array_keys(Language::getLanguageMap())))
 if (!$USER->authorize("sendmulti") && $languagecode != Language::getDefaultLanguageCode())
 	redirect('unauthorized.php');
 
-
 PreviewModal::HandleRequestWithPhoneText($messagegroup->id);
-
 
 $text = "";
 $gender = $messagegroup->preferredgender;
@@ -268,6 +266,8 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 					$part->update();
 				}
 			}
+			
+			$messagegroup->updateDefaultLanguageCode();
 			
 			Query("COMMIT");
 		}

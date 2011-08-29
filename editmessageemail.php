@@ -344,6 +344,9 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 				
 				savaAttachments($attachments,$message2);
 			}
+			
+			$messagegroup->updateDefaultLanguageCode();
+			
 			Query("COMMIT");
 		}
 		// remove the editors session data

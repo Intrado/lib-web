@@ -338,6 +338,24 @@ class MessageGroup extends DBMappedObject {
 		}
 		return true;
 	}
+	
+	// set the default language to the system default if any messages exist for that language
+	// otherwise, if there is only one message, set it to that language.
+	// Don't update it in any other circumstances so as to preserve the user's selection.
+	// These are the only cases where altering the default language code is valid behavior.
+	function updateDefaultLanguageCode() {
+		// must be created first.
+		if ($this->id) {
+			$currentlangs = $this->getMessageLanguages();
+			if (isset($currentlangs[Language::getDefaultLanguageCode()])) {
+				$this->defaultlanguagecode = Language::getDefaultLanguageCode();
+				$this->update(array("defaultlanguagecode"));
+			} else if (count($currentlangs) == 1) {
+				$this->defaultlanguagecode = key($currentlangs);
+				$this->update(array("defaultlanguagecode"));
+			}
+		}
+	}
 }
 
 ?>

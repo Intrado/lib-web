@@ -226,7 +226,9 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 						
 			// create the message parts
 			$message->recreateParts($postdata['message'], null, $postdata['gender']);
-					
+			
+			$messagegroup->updateDefaultLanguageCode();
+			
 			Query("COMMIT");
 		}
 		

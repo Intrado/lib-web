@@ -171,6 +171,8 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		$part->sequence = 0;
 		$part->create();
 		
+		$messagegroup->updateDefaultLanguageCode();
+		
 		Query("COMMIT");
 		
 		// remove the editors session data

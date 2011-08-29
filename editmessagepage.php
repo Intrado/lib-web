@@ -272,6 +272,9 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 				$attachment->update(); 
 			}
 		}
+		
+		$messagegroup->updateDefaultLanguageCode();
+		
 		Query("COMMIT");
 		
 		// remove the editors session data
