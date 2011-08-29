@@ -1044,6 +1044,11 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 										('f02', 'Last Name', 'searchable,text,lastname,subscribe,dynamic'),
 										('f03', 'Language', 'searchable,multisearch,language,subscribe,static')";
 			QuickUpdate($query, $custdb) or dieWithError("SQL:" . $query, $custdb);
+
+			$query = "INSERT INTO `language` (`name`,`code`) VALUES
+													('English','en'),
+													('Spanish','es')";
+			QuickUpdate($query, $custdb) or dieWithError("SQL:" . $query, $custdb);
 			
 			$query = "INSERT INTO `jobtype` (`name`, `systempriority`, `info`, `issurvey`, `deleted`) VALUES
 										('Emergency', 1, 'Emergencies Only', 0, 0),
@@ -1135,7 +1140,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		
 		// if timezone changed (rare occurance, but we must update scheduled jobs and report records on the shard database)
 		if ($postdata["timezone"] != getCustomerSystemSetting('timezone', false, true, $custdb)) {
-			$currentid = $_SESSION['currentid'];
+			$customerid = $_SESSION['customerid'];
 			$shardinfo = QuickQueryRow("select s.dbhost, s.dbusername, s.dbpassword from shard s inner join customer c on (c.shardid = s.id) where c.id = ?", true,false,array($customerid));				
 			$sharddb = DBConnect($shardinfo["dbhost"], $shardinfo["dbusername"], $shardinfo["dbpassword"], "aspshard");
 			if(!$sharddb) {
@@ -1151,10 +1156,10 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		
 		
 		if(getCustomerSystemSetting('_dmmethod', '', true, $custdb)!='asp' && $postdata["dmmethod"] == 'asp'){
-			$aspquery = QuickQueryRow("select s.dbhost, s.dbusername, s.dbpassword from customer c inner join shard s on (c.shardid = s.id) where c.id = '$currentid'");
+			$aspquery = QuickQueryRow("select s.dbhost, s.dbusername, s.dbpassword from customer c inner join shard s on (c.shardid = s.id) where c.id = '$customerid'");
 			$aspsharddb = DBConnect($aspquery[0], $aspquery[1], $aspquery[2], "aspshard");
-			QuickUpdate("delete from specialtaskqueue where customerid = " . $currentid, $aspsharddb);
-			QuickUpdate("update qjob set dispatchtype = 'system' where customerid = " . $currentid . " and status = 'active'", $aspsharddb);
+			QuickUpdate("delete from specialtaskqueue where customerid = " . $customerid, $aspsharddb);
+			QuickUpdate("update qjob set dispatchtype = 'system' where customerid = " . $customerid . " and status = 'active'", $aspsharddb);
 		}
 		setCustomerSystemSetting('_dmmethod', $postdata["dmmethod"], $custdb);
 		setCustomerSystemSetting('timezone', $postdata["timezone"], $custdb);
