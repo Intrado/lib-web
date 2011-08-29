@@ -341,7 +341,7 @@ class PhoneMessageEditor extends FormItem {
 						textInsert("{{" + audiofilename + "}}", messagearea);
 						
 						// create a new recorder
-						setupVoiceRecorder(e, name);
+						setupVoiceRecorder(e, name, messagegroupid, audiolibrarywidget);
 						
 						// assign the audiofile to this message group
 						if (messagegroupid && audiolibrarywidget) {
