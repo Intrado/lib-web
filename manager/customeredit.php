@@ -1256,15 +1256,15 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		switch($postdata["portal"] ) {
 			case "contactmanager": 
 				setCustomerSystemSetting('_hasportal', 1, $custdb);
-				setCustomerSystemSetting('selfsignup', 0, $custdb);
+				setCustomerSystemSetting('_hasselfsignup', 0, $custdb);
 				break;
 			case "selfsignup":
-				setCustomerSystemSetting('_hasportal', 1, $custdb);
-				setCustomerSystemSetting('selfsignup', 0, $custdb);
+				setCustomerSystemSetting('_hasportal', 0, $custdb);
+				setCustomerSystemSetting('_hasselfsignup', 1, $custdb);
 				break;
 			default:
 				setCustomerSystemSetting('_hasportal', 0, $custdb);
-				setCustomerSystemSetting('selfsignup', 0, $custdb);
+				setCustomerSystemSetting('_hasselfsignup', 0, $custdb);
 		}
 		
 		setCustomerSystemSetting('_hassurvey', $postdata["hassurvey"], $custdb);
