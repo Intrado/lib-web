@@ -57,7 +57,7 @@ function fmt_query_actions ($obj, $name) {
 		$actionlinks[] = action_link("Delete", "application_delete","querylist.php?delete=$obj->id","return confirmDelete();");
 	}
 	if ($MANAGERUSER->authorized("runqueries")) {
-		$actionlinks[] = action_link("Run", "application_go","queryrun.php?id={$obj->id}");
+		$actionlinks[] = action_link("Run", "application_go","queryrun.php?id={$obj->id}" . ($cid?"&cid=$cid":""));
 	}
 	return action_links($actionlinks);
 }
