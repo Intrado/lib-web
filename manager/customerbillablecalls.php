@@ -29,9 +29,10 @@ function fmt_dollars ($row,$index) {
 
 
 include_once("nav.inc.php");
+$custurl = QuickQuery("select c.urlcomponent from customer c where c.id = ?", false, array($cid));
 ?>
 
-<h2>Billable calls report for <?=$cid?></h2>
+<h2>Billable calls report for: <?=$custurl ?></h2>
 
 <form method=post>
 <label>Start date:<input type=text name=startdate value="<?=date("Y-m-d",time() - 30*24*60*60)?>"></label>
