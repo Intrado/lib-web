@@ -115,11 +115,18 @@ $formdata["enabled"] = array(
 	"helpstep" => $helpstepnum
 );
 
+$enablestates = array("new" => "New", "active" => "Authorized","disabled" => "Unathorized");
+if ($dminfo["enablestate"] != "new")
+	unset($enablestates["new"]);
+
 $formdata["authorized"] = array(
-	"label" => _L('Authorized'),
-	"value" => $dminfo["enablestate"]=="active"?1:0,
-	"validators" => array(),
-	"control" => array("CheckBox"),
+	"label" => _L('State'),
+	"value" => $dminfo["enablestate"],
+	"validators" => array(
+		array("ValRequired"),
+		array("ValInArray", "values" => array_keys($enablestates))
+	),
+	"control" => array("SelectMenu", "values" => $enablestates),
 	"helpstep" => $helpstepnum
 );
 if ($dmType == 'customer') {
@@ -268,14 +275,9 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		$postdata = $form->getData(); //gets assoc array of all values {name:value,...}
 		Query("BEGIN");
 		
-		$enablestate = $dminfo['enablestate'];
-		if($postdata["authorized"]){
-			QuickUpdate("update dm set enablestate = 'active' where id=?",false,array($dmid));
-			$enablestate = "active";
-		} else if($enablestate != "new"){
-			QuickUpdate("update dm set enablestate = 'disabled' where id=?",false,array($dmid));
-			$enablestate = "disabled";
-		}
+		QuickUpdate("update dm set enablestate=? where id=?",false,array($postdata["authorized"],$dmid));
+		$enablestate = $postdata["authorized"];
+		
 		$dialtimeout = $dmsettings["telco_dial_timeout"];
 		if($dialtimeout == false){
 			$dialtimeout = 45000;
