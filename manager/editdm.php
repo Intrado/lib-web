@@ -82,6 +82,14 @@ class ValIp extends Validator {
 	}
 }
 
+class ValInbound extends Validator {
+	var $onlyserverside = true;
+	function validate ($value, $args, $requiredvalues) {
+		if ($requiredvalues[$args['field']] < $value)
+			return "$this->label must be less or equal to the number of resources.";
+		return true;
+	}
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 // Form Data
@@ -210,8 +218,10 @@ $formdata["inboundresouces"] = array(
 	"value" => $dmsettings['telco_inboundtoken'],
 	"validators" => array(
 		array("ValRequired"),
-		array("ValNumber")
+		array("ValNumber"),
+		array("ValInbound", "field" => "numberofresources")
 	),
+	"requires" => array("numberofresources"),
 	"control" => array("TextField","size" => 15, "maxlength" => 20),
 	"helpstep" => $helpstepnum
 );
@@ -357,7 +367,7 @@ include_once("nav.inc.php");
 
 ?>
 <script type="text/javascript">
-<? Validator::load_validators(array("ValCustomerId","ValIp")); ?>
+<? Validator::load_validators(array("ValCustomerId","ValIp","ValInbound")); ?>
 
 function displaytestitems() {
 	var type = $('editdm_type').getValue();
