@@ -332,6 +332,9 @@ if($error || $reportgenerator->format == "html"){
 	include_once("nav.inc.php");
 	NewForm($f);
 
+	$csvbutton = button("CSV", null, "reportjobdetails.php/report.csv?csv=true");
+	$pdfbutton = button("PDF", null, "reportjobdetails.php/report.pdf?pdf=true");
+	
 	//check to see if referer came from summary page.  if so, go to history instead of referer
 	if(isset($_SESSION['report']['jobdetail']) || $error || $submit || $pagestartflag)
 		$back = button("Back", "window.history.go(-1)");
@@ -350,14 +353,9 @@ if($error || $reportgenerator->format == "html"){
 	?>
 			</td>
 		</tr>
-		<tr valign="top"><th align="right" class="windowRowHeader bottomBorder">Sort By:</th>
-			<td class="bottomBorder" >
-<?
-				selectOrderBy($f, $s, $ordercount, $ordering);
-?>
-			</td>
+		
 		<tr><th align="right" class="windowRowHeader bottomBorder">Output Format:</th>
-			<td class="bottomBorder"><a href="reportjobdetails.php/report.csv?csv=true">CSV</a>&nbsp;|&nbsp;<a href="reportjobdetails.php/report.pdf?pdf=true">PDF</a></td>
+			<td class="bottomBorder">  <? echo $csvbutton ?> <? echo $pdfbutton ?>  </td>
 		</tr>
 <?
 		if(isset($_SESSION['report']['options']['reporttype']) && $_SESSION['report']['options']['reporttype'] == "notcontacted"){
@@ -371,9 +369,6 @@ if($error || $reportgenerator->format == "html"){
 	</table>
 	<?
 	endWindow();
-	?>
-	<br>
-	<?
 
 	if(isset($reportgenerator)){
 		$reportgenerator->runHtml();

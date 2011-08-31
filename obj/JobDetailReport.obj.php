@@ -6,7 +6,7 @@ class JobDetailReport extends ReportGenerator{
 		global $USER;
 		$this->params = $this->reportinstance->getParameters();
 		$this->reporttype = $this->params['reporttype'];
-		$orderquery = getOrderSql($this->params);
+		$orderquery = ""; // remove sorting to improve performance (bug 4461)
 		$rulesql = getRuleSql($this->params, "rp");
 		$orgsql = getOrgSql($this->params);
 		
@@ -300,7 +300,7 @@ class JobDetailReport extends ReportGenerator{
 			?><br><?
 		}
 
-		displayJobSummary($this->params['joblist'], $this->_readonlyDB);
+		//displayJobSummary($this->params['joblist'], $this->_readonlyDB);
 
 		?><br><?
 		startWindow("Report Details ".help("JobDetailReport_ReportDetails"), 'padding: 3px;', false);

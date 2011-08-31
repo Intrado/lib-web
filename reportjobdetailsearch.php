@@ -368,15 +368,6 @@ $formdata["displayoptions"] = array(
 	"helpstep" => 1
 );
 
-$formdata["multipleorderby"] = array(
-	"label" => _L('Sort By'),
-	"fieldhelp" => _L("Choose which field you would like to sort the results by."),
-	"value" => $preselectedorderby,
-	"control" => array("MultipleOrderBy", "count" => 3, "values" => $validOrdering),
-	"validators" => array(),
-	"helpstep" => 1
-);
-
 $buttons = array(
 	icon_button(_L('Back'), 'tick', null, 'reports.php'),
 	submit_button(_L("View Report"),"view","arrow_refresh"),
