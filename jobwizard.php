@@ -472,7 +472,6 @@ class FinishJobWizard extends WizFinish {
 										$msgattachment->contentid = $cid;
 										$msgattachment->filename = $details->name;
 										$msgattachment->size = $details->size;
-										$msgattachment->deleted = 0;
 										$msgattachment->create();
 									}
 								} // end if there are attachments

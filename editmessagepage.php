@@ -148,7 +148,7 @@ if ($message) {
 	$parts = DBFindMany("MessagePart", "from messagepart where messageid = ? order by sequence", false, array($message->id));
 	$text = Message::format($parts);
 	// get the attachments
-	$msgattachments = DBFindMany("MessageAttachment", "from messageattachment where not deleted and messageid = ?", false, array($message->id));
+	$msgattachments = DBFindMany("MessageAttachment", "from messageattachment where messageid = ?", false, array($message->id));
 	foreach ($msgattachments as $msgattachment)
 		$attachments[$msgattachment->contentid] = array("name" => $msgattachment->filename, "size" => $msgattachment->size);
 }
@@ -239,7 +239,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		$message->recreateParts($postdata['message'], null, null);
 		
 		// check for existing attachments
-		$existingattachments = QuickQueryList("select contentid, id from messageattachment where messageid = ? and not deleted", true, false, array($message->id));
+		$existingattachments = QuickQueryList("select contentid, id from messageattachment where messageid = ?", true, false, array($message->id));
 		
 		// if there are message attachments, attach them
 		$attachments = json_decode($postdata['attachments']);
@@ -259,7 +259,6 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 					$msgattachment->contentid = $cid;
 					$msgattachment->filename = $details->name;
 					$msgattachment->size = $details->size;
-					$msgattachment->deleted = 0;
 					$msgattachment->create();
 				}
 			}
@@ -268,8 +267,8 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		foreach ($existingattachments as $cid => $attachmentid) {
 			if (!isset($existingattachmentstokeep[$attachmentid])) {
 				$attachment = new MessageAttachment($attachmentid);
-				$attachment->deleted = 1;
-				$attachment->update(); 
+				if ($attachment)
+					QuickUpdate("delete from messageattachment where id = ?", false, array($attachment->id));
 			}
 		}
 		

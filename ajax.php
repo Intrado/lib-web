@@ -319,7 +319,7 @@ function handleRequest() {
 				return false;
 			$message->readHeaders();
 			$parts = DBFindMany("MessagePart","from messagepart where messageid=? order by sequence", false, array($_GET['id']));
-			$attachments = DBFindMany("MessageAttachment","from messageattachment where not deleted and messageid=?", false, array($_GET['id']));
+			$attachments = DBFindMany("MessageAttachment","from messageattachment where messageid=?", false, array($_GET['id']));
 			$simple = false;
 			if (count($parts) == 1)
 				foreach ($parts as $id => $part)

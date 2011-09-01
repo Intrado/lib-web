@@ -144,7 +144,7 @@ if ($message) {
 	$subject = $message->subject;
 	
 	// get the attachments
-	$msgattachments = DBFindMany("MessageAttachment", "from messageattachment where not deleted and messageid = ?", false, array($message->id));
+	$msgattachments = DBFindMany("MessageAttachment", "from messageattachment where messageid = ?", false, array($message->id));
 	foreach ($msgattachments as $msgattachment)
 		$attachments[$msgattachment->contentid] = array("name" => $msgattachment->filename, "size" => $msgattachment->size);
 } else {
@@ -155,7 +155,7 @@ if ($message) {
 		$fromname = $message2->fromname;
 		$fromemail = $message2->fromemail;
 		$subject = $message2->subject;
-		$msgattachments = DBFindMany("MessageAttachment", "from messageattachment where not deleted and messageid = ?", false, array($message2->id));
+		$msgattachments = DBFindMany("MessageAttachment", "from messageattachment where messageid = ?", false, array($message2->id));
 		foreach ($msgattachments as $msgattachment)
 			$attachments[$msgattachment->contentid] = array("name" => $msgattachment->filename, "size" => $msgattachment->size);
 	}
@@ -361,7 +361,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 
 function savaAttachments($attachments,$message) {
 	// check for existing attachments
-	$existingattachments = QuickQueryList("select contentid, id from messageattachment where messageid = ? and not deleted", true, false, array($message->id));
+	$existingattachments = QuickQueryList("select contentid, id from messageattachment where messageid = ?", true, false, array($message->id));
 	$existingattachmentstokeep = array();
 	if ($attachments) {
 		foreach ($attachments as $cid => $details) {
@@ -375,7 +375,6 @@ function savaAttachments($attachments,$message) {
 				$msgattachment->contentid = $cid;
 				$msgattachment->filename = $details->name;
 				$msgattachment->size = $details->size;
-				$msgattachment->deleted = 0;
 				$msgattachment->create();
 			}
 		}
@@ -384,8 +383,8 @@ function savaAttachments($attachments,$message) {
 	foreach ($existingattachments as $cid => $attachmentid) {
 		if (!isset($existingattachmentstokeep[$attachmentid])) {
 			$attachment = new MessageAttachment($attachmentid);
-			$attachment->deleted = 1;
-			$attachment->update();
+			if ($attachment)
+				QuickUpdate("delete from messageattachment where id = ?", false, array($attachment->id));
 		}
 	}
 }

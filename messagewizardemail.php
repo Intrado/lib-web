@@ -604,7 +604,7 @@ class FinishMessageWizard extends WizFinish {
 				$message->recreateParts($data['text'], null, isset($data['gender'])?$data['gender']:false);
 				
 				// check for existing attachments
-				$existingattachments = QuickQueryList("select contentid, id from messageattachment where messageid = ? and not deleted", true, false, array($message->id));
+				$existingattachments = QuickQueryList("select contentid, id from messageattachment where messageid = ?", true, false, array($message->id));
 				
 				// if there are message attachments, attach them
 				$existingattachmentstokeep = array();
@@ -620,7 +620,6 @@ class FinishMessageWizard extends WizFinish {
 							$msgattachment->contentid = $cid;
 							$msgattachment->filename = $details->name;
 							$msgattachment->size = $details->size;
-							$msgattachment->deleted = 0;
 							$msgattachment->create();
 						}
 					}
@@ -629,8 +628,8 @@ class FinishMessageWizard extends WizFinish {
 				foreach ($existingattachments as $cid => $attachmentid) {
 					if (!isset($existingattachmentstokeep[$attachmentid])) {
 						$attachment = new MessageAttachment($attachmentid);
-						$attachment->deleted = 1;
-						$attachment->update(); 
+						if ($attachment)
+							QuickUpdate("delete from messageattachment where id = ?", false, array($attachment->id));
 					}
 				}
 				
