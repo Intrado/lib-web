@@ -152,20 +152,15 @@ if($reload)
 ////////////////////////////////////////////////////////////////////////////////
 
 if($generator->format != "html"){
-	if($generator->format == "pdf"){
-		$name = secure_tmpname("report", ".pdf");
-		$params = createPdfParams($name);
-		session_write_close();
-
-		header("Pragma: private");
-		header("Cache-Control: private");
-		header("Content-disposition: attachment; filename=report.pdf");
-		header("Content-type: application/pdf");
-		$result = $generator->generate($params);
-		@readfile($name, "r");
-		unlink($name);
+	if($reportgenerator->format == "pdf"){
+		if($result = $reportgenerator->testSize()){
+			error($result);
+			$error = true;
+		} else {
+			$reportgenerator->generate();
+		}
 	} else {
-		$generator->generate();
+		$reportgenerator->generate();
 	}
 } else {
 

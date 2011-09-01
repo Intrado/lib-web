@@ -29,7 +29,7 @@ class ReportGenerator {
 		return $result;
 	}
 
-	function generate($options = null){
+	function generate($options = false){
 		$result = "success";
 		$hackPDF = false; // used for Gfields display
 		if ($this->format == "pdf") $hackPDF = true;
@@ -44,14 +44,14 @@ class ReportGenerator {
 				break;
 			case 'pdf':
 				$this->setReportFile();
-				$result = $this->runPDF($options);
+				$this->runPDF($options);
 				break;
 		}
 		
 		return $result;
 	}
 
-	function runPDF($options){
+	function runPDF($options = false) {
 		global $_DBHOST, $_DBNAME, $_DBUSER, $_DBPASS;
 		$instance = $this->reportinstance;
 		$xmlparams = array();
@@ -84,13 +84,28 @@ class ReportGenerator {
 
 		$xmlparams[] = new XML_RPC_Value($active, 'struct');
 
-		$xmlparams[] = new XML_RPC_Value($options['filename'], 'string');
 		$method = "Resizer.render";
 		$result = $this->reportxmlrpc($method, $xmlparams);
-
-		return $result;
-
+		
+		if (isset($options['filename'])) {
+			// save to local file
+			$fp = fopen($options['filename'], "w");
+			if (!$fp)
+				return;
+			fwrite($fp, $result);
+			fclose($fp);
+		} else {
+		
+			// stream back the file
+			header("Pragma: private");
+			header("Cache-Control: private");
+			header("Content-disposition: attachment; filename=report.pdf");
+			header("Content-type: application/pdf");
+			session_write_close();
+			echo $result;
+		}
 	}
+	
 	function generateXmlParams(){
 		global $USER;
 		$params = array();
@@ -160,14 +175,9 @@ class ReportGenerator {
 		} else {
 			$val = $resp->value();
 	    	$data = XML_RPC_decode($val);
-			if ($data != "success") {
-				error_log($method . " " . print_r($data, true));
-			} else {
-				// success;
-				return $data;
-			}
+	    	return $data;
 		}
-		return "failure";
+		return ""; // failure
 	}
 
 	//setOptions

@@ -277,23 +277,12 @@ if($reload){
 
 $error = false;
 if($reportgenerator->format != "html"){
-
 	if($reportgenerator->format == "pdf"){
 		if($result = $reportgenerator->testSize()){
 			error($result);
 			$error = true;
 		} else {
-			$name = secure_tmpname("report", ".pdf");
-			$params = createPdfParams($name);
-
-			header("Pragma: private");
-			header("Cache-Control: private");
-			header("Content-disposition: attachment; filename=report.pdf");
-			header("Content-type: application/pdf");
-			session_write_close();
-			$reportgenerator->generate($params);
-			@readfile($name);
-			unlink($name);
+			$reportgenerator->generate();
 		}
 	} else {
 		$reportgenerator->generate();
@@ -332,8 +321,8 @@ if($error || $reportgenerator->format == "html"){
 	include_once("nav.inc.php");
 	NewForm($f);
 
-	$csvbutton = button("CSV", null, "reportjobdetails.php/report.csv?csv=true");
-	$pdfbutton = button("PDF", null, "reportjobdetails.php/report.pdf?pdf=true");
+	$csvbutton = icon_button("Download CSV", "page_white_excel", null, "reportjobdetails.php/report.csv?csv=true");
+	$pdfbutton = icon_button("Download PDF", "page_white_acrobat", null, "reportjobdetails.php/report.pdf?pdf=true");
 	
 	//check to see if referer came from summary page.  if so, go to history instead of referer
 	if(isset($_SESSION['report']['jobdetail']) || $error || $submit || $pagestartflag)

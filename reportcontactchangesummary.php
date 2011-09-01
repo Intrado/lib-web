@@ -276,17 +276,7 @@ if($reportgenerator->format != "html"){
 			error($result);
 			$error = true;
 		} else {
-			$name = secure_tmpname("report", ".pdf");
-			$params = createPdfParams($name);
-
-			header("Pragma: private");
-			header("Cache-Control: private");
-			header("Content-disposition: attachment; filename=report.pdf");
-			header("Content-type: application/pdf");
-			session_write_close();
-			$reportgenerator->generate($params);
-			@readfile($name);
-			unlink($name);
+			$reportgenerator->generate();
 		}
 	} else {
 		$reportgenerator->generate();
