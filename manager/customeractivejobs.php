@@ -337,11 +337,11 @@ if (isset($_SESSION['customeractivejobsfiler'])) {
 			7 => "fmt_number",
 			8 => "fmt_number"
 		);
-		echo "<h2 style=\"border: 3px solid black;\">";
-		echo "Active Jobs Summary: <table>";
+		echo "<div style=\"margin-top:10px;border: 3px solid black;\">";
+		echo "<h2>Active Jobs Summary: </h2><table>";
 		showTable($summarydata, $titles, $formatters);
 		echo "</table>";
-		echo "</h2>";
+		echo "</div>";
 		
 		$titles = array(
 			"Customer id",
@@ -374,11 +374,11 @@ if (isset($_SESSION['customeractivejobsfiler'])) {
 			14 => "fmt_play_activejobs"
 		);
 		foreach($data as $pri => $pridata) {
-			echo "<h2 style=\"border: 3px solid $pricolors[$pri];\">$prinames[$pri]<hr />";
+			echo "<div style=\"margin-top:10px;border: 3px solid $pricolors[$pri];\"><h2>$prinames[$pri]</h2><hr />";
 			echo "Active Jobs: <table>";
 			showTable($pridata, $titles, $formatters);
 			echo "</table>";
-			echo "</h2>";
+			echo "</div>";
 		}
 	}
 	
