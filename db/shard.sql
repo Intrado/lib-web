@@ -342,3 +342,19 @@ ALTER TABLE `qjob` DROP `messagegroupid`,
  ALTER TABLE `renderedmessage` CHANGE `renderedmessage` `renderedmessage` MEDIUMTEXT CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL ;
  
  
+-- ---------------------------
+-- start here for release 8.1
+
+CREATE TABLE `importalert` (
+	`customerid` INT NOT NULL,
+	`importalertruleid` INT NOT NULL,
+	`name` varchar(50) NOT NULL,
+    `operation` enum('eq','ne','gt','lt') NOT NULL,
+	`testvalue` INT NOT NULL,
+    `actualvalue` INT NOT NULL,
+	`alerttime` datetime default NULL,
+	`notified` datetime default NULL,
+	PRIMARY KEY ( `customerid` , `importalertruleid` ) 
+) ENGINE = InnoDB;
+ 
+ 
