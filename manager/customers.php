@@ -39,7 +39,7 @@ function fmt_custurl($row, $index){
 //index 1 is url
 //index 2 is display name
 	if (!$row[22])
-		return '<span style="color: gray;">' . escapehtml($row[1]) . '</span>';
+		return '<span style="color: gray;">' . escapehtml($row[2]) . ' (' . escapehtml($row[1])  .')</span>';
 	if (isset($_GET["ajax"]))
 		return escapehtml($row[1]);
 	
