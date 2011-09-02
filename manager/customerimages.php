@@ -39,73 +39,52 @@ if (!$customerid) {
 ////////////////////////////////////////////////////////////////////////////////
 if(isset($_POST['submit'])) {
 	$fileerror = false;
-	$logoname = "";
-	$loginpicturename ="";
-	if(isset($_FILES['uploadlogo']) && $_FILES['uploadlogo']['tmp_name']) {
-
-		$logoname = secure_tmpname("uploadlogo",".img");
-		if(!move_uploaded_file($_FILES['uploadlogo']['tmp_name'],$logoname)) {
-			$fileerror=true;
-		} else if (!is_file($logoname) || !is_readable($logoname)) {
-			$fileerror=true;
+	
+	$imagesettings = array(
+		"uploadlogo" => "_logocontentid",
+		"uploadloginpicture" => "_loginpicturecontentid",
+		"uploadsubscriberloginpicture" => "_subscriberloginpicturecontentid"
+	);
+	$imagetypes = array("image/jpeg","image/gif","image/png"); // list of allowed image types
+	$imagenames = array(); // store temp file names
+	
+	
+	// Get image contents and check for errors
+	foreach($imagesettings as $imagekey => $setting) {
+		if(!$fileerror && isset($_FILES[$imagekey]) && $_FILES[$imagekey]['tmp_name']) {
+			if (!in_array($_FILES[$imagekey]['type'], $imagetypes)) {
+				$fileerror=true;
+				error("Unknown file type " . $_FILES[$imagekey]['type'] . ". Accepted types: jpg, gif and png");
+				break;
+			}
+			
+			$imagename = secure_tmpname($imagekey,".img");
+			if(!move_uploaded_file($_FILES[$imagekey]['tmp_name'],$imagename)) {
+				error('Unable to complete file upload. Please try again');
+				$fileerror=true;
+				break;
+			} else if (!is_file($imagename) || !is_readable($imagename)) {
+				error('Unable to complete file upload. Please try again');
+				$fileerror=true;
+				break;
+			}
+			$imagenames[$imagekey] = $imagename;
 		}
 	}
-	if(isset($_FILES['uploadloginpicture']) && $_FILES['uploadloginpicture']['tmp_name']) {
 
-		$loginpicturename = secure_tmpname("uploadloginpicture",".img");
-		if(!move_uploaded_file($_FILES['uploadloginpicture']['tmp_name'],$loginpicturename)) {
-			$fileerror=true;
-		} else if (!is_file($loginpicturename) || !is_readable($loginpicturename)) {
-			$fileerror=true;
-		}
-	}
-	$subscriberloginpicturename = "";
-	if (isset($_FILES['uploadsubscriberloginpicture']) && $_FILES['uploadsubscriberloginpicture']['tmp_name']) {
-
-		$subscriberloginpicturename = secure_tmpname("uploadsubscriberloginpicture",".img");
-		if (!move_uploaded_file($_FILES['uploadsubscriberloginpicture']['tmp_name'], $subscriberloginpicturename)) {
-			$fileerror = true;
-		} else if (!is_file($subscriberloginpicturename) || !is_readable($subscriberloginpicturename)) {
-			$fileerror = true;
-		}
-	}
-
-	if($fileerror){
-		error('Unable to complete file upload. Please try again');
-	} else {
-		//Logo
-		if($logoname){
-			$newlogofile = file_get_contents($logoname);
-			if($newlogofile){
-				QuickUpdate("INSERT INTO content (contenttype, data) values
-							('" . $_FILES['uploadlogo']['type'] . "', '" . base64_encode($newlogofile) . "')", $custdb);
-				$logocontentid = $custdb->lastInsertId();
-				setCustomerSystemSetting('_logocontentid', $logocontentid, $custdb);
+	
+	// Insert content id and associate with image settings
+	if (!$fileerror) {
+		foreach($imagenames as $imagekey => $imagename) {
+			$file = file_get_contents($imagename);
+			if($file){
+				QuickUpdate("INSERT INTO content (contenttype, data) values	(?,?)",
+					 $custdb,array($_FILES[$imagekey]['type'],base64_encode($file)));
+				$contentid = $custdb->lastInsertId();
+				setCustomerSystemSetting($imagesettings[$imagekey], $contentid, $custdb);
 			}
 		}
-
-		// Login image
-		if($loginpicturename){
-			$newloginpicturefile = file_get_contents($loginpicturename);
-			if($newloginpicturefile){
-				QuickUpdate("INSERT INTO content (contenttype, data) values
-							('" . $_FILES['uploadloginpicture']['type'] . "', '" . base64_encode($newloginpicturefile) . "')", $custdb);
-				$loginpicturecontentid = $custdb->lastInsertId();
-				setCustomerSystemSetting('_loginpicturecontentid', $loginpicturecontentid, $custdb);
-			}
-		}
-
-		// Subscriber Login image
-		if ($subscriberloginpicturename) {
-			$newsubscriberloginpicturefile = file_get_contents($subscriberloginpicturename);
-			if($newsubscriberloginpicturefile){
-				QuickUpdate("INSERT INTO content (contenttype, data) values
-							('" . $_FILES['uploadsubscriberloginpicture']['type'] . "', '" . base64_encode($newsubscriberloginpicturefile) . "')", $custdb);
-				$subscriberloginpicturecontentid = $custdb->lastInsertId();
-				setCustomerSystemSetting('_subscriberloginpicturecontentid', $subscriberloginpicturecontentid, $custdb);
-			}
-		}
-
+		
 		if($_POST['submit'] == "done"){
 			redirect("customers.php");
 		} else {
@@ -120,7 +99,9 @@ if(isset($_POST['submit'])) {
 ////////////////////////////////////////////////////////////////////////////////
 
 include_once("nav.inc.php");
-startWindow(_L('Upload Customer Images'));
+
+$custurl = QuickQueryRow("select urlcomponent from customer where id = ?", false,false, array($customerid));	
+startWindow(_L('Upload Customer Images: %s',escapehtml($custurl)));
 ?>
 <form name="fileupload" method="post" action="<?= $_SERVER["REQUEST_URI"]?>" enctype="multipart/form-data">
 <table>
@@ -150,11 +131,8 @@ startWindow(_L('Upload Customer Images'));
 	<td>New Subscriber Login Picture:</td>
 	<td><input type='file' name='uploadsubscriberloginpicture' size='30'></td>
 </tr>
-<tr>
-	<td><?=submit_button(_L("Save"),"save","tick") . submit_button(_L("Save and Return"),"done","tick") ?></td>
-</tr>
-
 </table>
+<? buttons(submit_button(_L("Save"),"save","tick"),submit_button(_L("Save and Return"),"done","tick"),icon_button(_L("Cancel"),"cross",false,"customers.php")) ?>
 </form>
 <?
 endWindow();
