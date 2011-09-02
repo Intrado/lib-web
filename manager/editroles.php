@@ -33,6 +33,7 @@ $roles = array(
 	"bouncedemailsearch" => "ADVANCED - Bounced email search",
 	"passwordcheck" => "ADVANCED - Check for bad/similar passwords",
 	"emergencyjobs" => "ADVANCED - List of Recent Emergency Jobs",
+	"tollfreenumbers" => "ADVANCED - Add Toll Free Numbers",
 
 	"editqueries" => "SUPER - Edit/Add Queries (arbitrary sql)",
 	"systemdm" => "SUPER - Manage System DMs",

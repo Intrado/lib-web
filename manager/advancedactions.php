@@ -34,6 +34,10 @@ include_once("nav.inc.php");
 <li><a href="querylist.php">Customer Queries</a></li>
 <? } ?>
 
+<? if ($MANAGERUSER->authorized("tollfreenumbers")) { ?>
+<li><a href="tollfreenumbers.php">Add Toll Free Numbers</a></li>
+<? } ?>
+
 <? if ($MANAGERUSER->authorized("superuser")) { ?>
 <li><a href="editroles.php">Edit Manager User Roles</a></li>
 <? } ?>

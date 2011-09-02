@@ -595,16 +595,25 @@ $formdata["areacode"] = array(
 						"helpstep" => $helpstepnum
 );
 
+$availablenumbers = QuickQueryList("select phone from tollfreenumbers");
+$tollfreenumbers = array();
+foreach ($availablenumbers as $number) {
+	$tollfreenumbers[$number] = Phone::format($number);
+}
+if ($settings['inboundnumber'] != "")
+	$tollfreenumbers = array($settings['inboundnumber'] => $settings['inboundnumber']) + $tollfreenumbers;
+
 $formdata["inboundnumber"] = array(
 						"label" => _L('800 Inbound number'),
 						"value" => $settings['inboundnumber'],
 						"validators" => array(
 							array("ValPhone"),
-							array("ValInboundNumber", "customerid" => $customerid)
+							array("ValInArray", "values" => array_keys($tollfreenumbers))
 						),
-						"control" => array("TextField","size" => 15, "maxlength" => 20),
+						"control" => array("SelectMenu", "values" => array("" =>_L("-- Select a Toll Free Number --")) + $tollfreenumbers),
 						"helpstep" => $helpstepnum
 );
+
 
 $formdata["maxphones"] = array(
 						"label" => _L('Max Phones'),
@@ -1188,7 +1197,19 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		setCustomerSystemSetting('_supportphone', $postdata["supportphone"], $custdb);
 		setCustomerSystemSetting('callerid', $postdata["callerid"], $custdb);
 		setCustomerSystemSetting('areacode', $postdata["areacode"], $custdb);
-		setCustomerSystemSetting("inboundnumber", $postdata["inboundnumber"], $custdb);
+		
+		// if inbound changed
+		if ($postdata["inboundnumber"] != $settings['inboundnumber']){
+			// Remove phone from available toll free Numbers			
+			if ($postdata["inboundnumber"] != "") {
+				QuickUpdate("delete from tollfreenumbers where phone=?",false,array($postdata["inboundnumber"]));
+			} 
+			// Put back unused phone to available toll free Numbers
+			if ($settings["inboundnumber"] != "") {
+				QuickUpdate("insert into tollfreenumbers (phone) values (?)",false,array($settings['inboundnumber']));
+			}
+			setCustomerSystemSetting("inboundnumber", $postdata["inboundnumber"], $custdb);
+		}
 		
 		update_jobtypeprefs(1, $postdata["maxphones"], "phone", $custdb);
 		setCustomerSystemSetting('maxphones', $postdata["maxphones"], $custdb);
