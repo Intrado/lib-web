@@ -1,6 +1,6 @@
 <?
 header("Expires: " . gmdate('D, d M Y H:i:s', time() + 60*60) . " GMT"); //exire in 1 hour
-header("Content-Type: text/css");
+header("Content-Type: text/javascript");
 header("Cache-Control: private");
 
 ?>
