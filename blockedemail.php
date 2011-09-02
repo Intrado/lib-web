@@ -72,7 +72,7 @@ if (isset($_GET['displaycontact'])) {
 	$settings["displaycontact"] = $_GET['displaycontact'] == 'true'?true:false;
 }
 if (isset($_REQUEST["searchtext"])) {
-	$settings["searchtext"] = $_REQUEST['searchtext'];
+	$settings["searchtext"] = trim($_REQUEST['searchtext']);
 }
 if(isset($_GET['displaycontact']) || isset($_REQUEST["searchtext"])) {
 	$_SESSION['blockedemailoptions'] = json_encode($settings);
@@ -363,7 +363,7 @@ endWindow();
 ?>
 <script type="text/javascript">
 	var searchBox = $('searchtext');
-	blankFieldValue('searchtext', 'Search email and/or block reasons');
+	blankFieldValue('searchtext', 'Search email or block reasons');
 	searchBox.focus();
 	searchBox.blur();
 </script>
