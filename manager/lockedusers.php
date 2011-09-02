@@ -9,84 +9,57 @@ if (!$MANAGERUSER->authorized("lockedusers"))
 	exit("Not Authorized");
 
 ////////////////////////////////////////////////////////////////////////////////
+// Action Handling
+////////////////////////////////////////////////////////////////////////////////
+
+if (isset($_GET["cid"]) && isset($_GET["enable"])) {
+	$userinfo = QuickQueryRow("select customerid, login, status from loginattempt where status != 'enabled' and customerid=? and login=?",true,false,array($_GET["cid"],$_GET["enable"]));
+	$haserror = false;
+	switch($userinfo["status"]) {
+		case "lockout":
+			QuickUpdate("update loginattempt set status = 'enabled', attempts = 0 where login=?",false,array($_GET["enable"]));
+			notice("User " .  escapehtml($_GET["enable"]) . " is now unlocked");
+			break;
+		case "disabled":
+			$customerinfo = QuickQueryRow("select c.id as customerid, s.dbhost, s.dbusername, s.dbpassword from shard s inner join customer c on (c.shardid = s.id) where c.id=?",true,false,array($userinfo["customerid"]));
+			if ($customerinfo) {
+				$cust_db = DBConnect($customerinfo["dbhost"], $customerinfo["dbusername"], $customerinfo["dbpassword"],"c_" . $userinfo["customerid"]);
+				QuickUpdate("update loginattempt set status = 'enabled', attempts=0 where login=?",false,array($_GET["enable"]));
+				QuickUpdate("update user set enabled = 1 where login=?", $cust_db,array($_GET["enable"]));
+				notice("User " .  escapehtml($_GET["enable"]) . " is now enabled");
+			} else {
+				$haserror = true;
+			}
+			break;
+		default:
+			notice("Unable to perform request");
+	}
+	
+	if (!haserror) {
+		notice("Unable to perform request");
+	}
+}
+
+////////////////////////////////////////////////////////////////////////////////
 // Data Handling
 ////////////////////////////////////////////////////////////////////////////////
 
-$lockedusers = array();
-
-$result = Query("select customerid, login, ipaddress, attempts, lastattempt, status from loginattempt where status != 'enabled'");
-while($row = DBGetRow($result)){
-	$lockedusers[] = $row;
-}
+$lockedusers = QuickQueryMultiRow("select l.customerid,c.urlcomponent, l.login, l.ipaddress, l.attempts, l.lastattempt, l.status from loginattempt l left join customer c on (c.id = l.customerid) where l.status != 'enabled'");
 
 $titles = array("0" => "Customer ID",
-				"1" => "Login",
-				"2" => "IP Address",
-				"3" => "Attempts",
-				"4" => "Last Attempt",
-				"5" => "Status",
+				"1" => "Customer URL",
+				"2" => "Login",
+				"3" => "IP Address",
+				"4" => "Attempts",
+				"5" => "Last Attempt",
+				"6" => "Status",
 				"Actions" => "Actions");
 
-$formatters = array("4" => "fmt_date",
+$formatters = array("1" => "fmt_customerUrl",
+					"4" => "fmt_date",
 					"5" => "fmt_locked_status",
 					"Actions" => "lockeduser_actions");
 
-$f="lockedusers";
-$s="main";
-$reloadform = 0;
-$submitteduser = null;
-
-$checkformsubmit = false;
-foreach($lockedusers as $lockeduser){
-	if(CheckFormSubmit($f, $lockeduser[1])){
-		$checkformsubmit = true;
-		$submitteduser = $lockeduser;
-		break;
-	}
-}
-
-if($checkformsubmit){
-	//check to see if formdata is valid
-	if(CheckFormInvalid($f))
-	{
-		error('Form was edited in another window, reloading data');
-		$reloadform = 1;
-	}
-	else
-	{
-		MergeSectionFormData($f, $s);
-
-		//do check
-
-		if( CheckFormSection($f, $s) ) {
-			error('There was a problem trying to save your changes', 'Please verify that all required field information has been entered properly');
-		} else {
-			$customerinfo = QuickQueryRow("select s.dbhost, s.dbusername, s.dbpassword from shard s inner join customer c on (c.shardid = s.id) where c.id = $submitteduser[0]");
-			$cust_db = DBConnect($customerinfo[0], $customerinfo[1], $customerinfo[2],"c_" . $submitteduser[0]);
-			if($submitteduser[5] == "disabled"){
-				QuickUpdate("update loginattempt set status = 'enabled', attempts = 0 where login = '" . $submitteduser[1] . "'");
-				QuickUpdate("update user set enabled = 1 where login = '" . $submitteduser[1] . "'", $cust_db);
-			} else if($submitteduser[5] == "lockout"){
-				QuickUpdate("update loginattempt set status = 'enabled', attempts = 0 where login = '" . $submitteduser[1] . "'");
-			}
-			redirect();
-		}
-	}
-} else {
-	$reloadform = 1;
-}
-
-if($reloadform){
-	ClearFormData($f);
-	foreach($lockedusers as $lockeduser){
-		if($lockeduser[5] == "disabled"){
-			$actions = PutFormData($f,$lockeduser[1], "Enable");
-		}
-		if($lockeduser[5] == "lockout"){
-			$actions = PutFormData($f,$lockeduser[1], "Unlock");
-		}
-	}
-}
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -95,15 +68,16 @@ if($reloadform){
 
 //index 5 is status
 function lockeduser_actions($row, $index){
-	global $f, $s;
-	$actions = "";
-	if($row[5] == "disabled"){
-		$actions = NewFormItem($f,$row[1], "Enable", "submit");
+	$actionlinks = array();
+	switch($row[6]) {
+		case "disabled":
+			$actionlinks[] = action_link("Enable", "key_go","lockedusers.php?cid=" . $row[0] . "&enable=" . urlencode($row[2]));
+			break;
+		case "lockout":
+			$actionlinks[] = action_link("Unlock", "lock_open","lockedusers.php?cid=" . $row[0] . "&enable=" . urlencode($row[2]));
+			break;
 	}
-	if($row[5] == "lockout"){
-		$actions = NewFormItem($f,$row[1], "Unlock", "submit");
-	}
-	return $actions;
+	return action_links($actionlinks);
 }
 
 function fmt_locked_status($row,$index){
@@ -115,21 +89,24 @@ function fmt_locked_status($row,$index){
 		return ucfirst($row[$index]);
 	}
 }
+function fmt_customerUrl($row, $index){
+	$url = "";
+	if($row[1])
+		$url = "<a href=\"customerlink.php?id=" . $row[0] ."\" target=\"_blank\">" . $row[1] . "</a>";
+	return $url;
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 // Display
 ////////////////////////////////////////////////////////////////////////////////
 include("nav.inc.php");
 
-NewForm($f);
 ?>
 <table class=list>
 <?
 showTable($lockedusers, $titles, $formatters);
 ?>
 </table>
-
 <?
-EndForm($f);
 include("navbottom.inc.php");
 ?>
