@@ -382,3 +382,15 @@ ALTER TABLE `dm` ADD `notes` TEXT;
 
 -- add soft delete feture for dat files
 ALTER TABLE `dmdatfile` ADD `deleted` tinyint(4) NOT NULL default '0';
+
+-- START REV 8.1/2
+
+-- add soft delete for dm 
+ALTER TABLE `dm` CHANGE `enablestate` `enablestate` enum('new','active','disabled','deleted') NOT NULL default 'new';
+
+-- add table to keep track of unassigned tolll free numbers
+CREATE TABLE `tollfreenumbers` (
+ 	`phone` VARCHAR( 20 ) NOT NULL,
+ 	 UNIQUE KEY `phone` (`phone`)
+) ENGINE = InnoDB;
+
