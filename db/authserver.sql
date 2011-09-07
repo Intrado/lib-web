@@ -394,3 +394,11 @@ CREATE TABLE `tollfreenumbers` (
  	 UNIQUE KEY `phone` (`phone`)
 ) ENGINE = InnoDB;
 
+CREATE TABLE `dmgroup` (
+`id` INT NOT NULL AUTO_INCREMENT PRIMARY KEY ,
+`carrier` varchar(50) NOT NULL ,
+`state` CHAR( 2 ) CHARACTER SET latin1 COLLATE latin1_bin NOT NULL
+) ENGINE = InnoDB;
+
+ALTER TABLE `dm` ADD `dmgroupid` INT NULL AFTER `dmuuid`;
+
