@@ -190,8 +190,6 @@ class PortalReport extends ReportGenerator{
 		header("Content-disposition: attachment; filename=report.csv");
 		header("Content-type: application/vnd.ms-excel");
 
-		session_write_close();//WARNING: we don't keep a lock on the session file, any changes to session data are ignored past this point
-
 		echo '"' . implode('","', $titles) . '"';
 		echo "\r\n";
 

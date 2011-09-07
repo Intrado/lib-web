@@ -101,7 +101,6 @@ class ReportGenerator {
 			header("Cache-Control: private");
 			header("Content-disposition: attachment; filename=report.pdf");
 			header("Content-type: application/pdf");
-			session_write_close();
 			echo $result;
 		}
 	}
