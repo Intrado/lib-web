@@ -402,3 +402,6 @@ CREATE TABLE `dmgroup` (
 
 ALTER TABLE `dm` ADD `dmgroupid` INT NULL AFTER `dmuuid`;
 
+ALTER TABLE tollfreenumbers DROP INDEX phone;
+ALTER TABLE `tollfreenumbers` CHANGE  `phone` `phone` VARCHAR( 20 ) CHARACTER SET latin1 COLLATE latin1_bin NOT NULL PRIMARY KEY;
+
