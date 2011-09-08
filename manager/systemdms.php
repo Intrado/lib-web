@@ -8,50 +8,66 @@ require_once("../inc/formatters.inc.php");
 if (!$MANAGERUSER->authorized("systemdm"))
 	exit("Not Authorized");
 
-$custtxt = "";
 
-if(isset($_GET['resetDM']) || isset($_GET['update'])){
-	if(isset($_GET['resetDM'])){
-		$dmid = $_GET['resetDM'] + 0;
-		$command = "reset";
-	} else if(isset($_GET['update'])){
-		$dmid = $_GET['update'] + 0;
-		$command = "update";
+// Action Handlers 
+if (isset($_GET['resetDM'])) {
+	if (!QuickQuery("select command from dm where id=?", false,array($_GET['resetDM']))) {
+		notice(_L('DM already had a command queued.  New command queued instead.'));
 	}
-	$dmrow = QuickQueryRow("select name, command from dm where id = " . $dmid);
-	if($dmrow[1] != ""){
-?>
-	<script>
-		window.alert('That DM already had a command queued.  New command queued instead.');
-		window.location="systemdms.php";
-	</script>
-<?
+	QuickUpdate("update dm set command='reset' where id=?", false,array($_GET['resetDM']));
+	notice(_L("Reset queued"));
+	redirect();
+} else if (isset($_GET['delete'])) {
+	$enablestate = QuickQuery("select enablestate from dm where id=?",false,array($_GET['delete']));
+	if ($enablestate != "disabled") {
+		notice(_L("Unable to delete dm"));
+		redirect();
 	}
-	QuickUpdate("update dm set command = '" . $command ."' where id = " . $dmid);
+	QuickUpdate("update dm set enablestate='deleted' where id=?",false,array($_GET['delete']));
+	notice(_L("Deleted DM"));
 	redirect();
 }
 
+
 $queryextra = "";
-
-if(isset($_GET['showdisabled'])) {
-	$showingDisabledDMs = true;
-	$queryextra .= " and s_dm_enabled.value = '0' ";
+$viewoptions = 'all';
+if (isset($_POST['submit']) && $_POST['submit'] == "showmatch") {
+	if(isset($_POST['view'])) {
+		$viewoptions = $_POST['view'];
+		switch($viewoptions) {
+			case "enabled":
+				$queryextra .= " and (s_dm_enabled.value = '1' or s_dm_enabled.value is null) ";
+				break;
+			case "disabled":
+				$queryextra .= " and s_dm_enabled.value = '0' and dm.enablestate != 'deleted'";
+				break;
+			case "deleted":
+				$queryextra .= " and dm.enablestate = 'deleted'";
+				break;
+			case "all":
+			default:
+				$queryextra .= " and dm.enablestate != 'deleted'";
+				$viewoptions = 'all';
+				break;
+		}
+	}
 } else {
-	$showingDisabledDMs = false;
-	$queryextra .= " and s_dm_enabled.value = '1' ";
+	$queryextra .= " and dm.enablestate != 'deleted'";
 }
 
-if(isset($_GET['showall'])) {
-	$showingDisabledDMs = false;
-	$queryextra = "";
-}
 
 // index 0 is dmid
 function fmt_DMActions($row, $index){
-	$url =  '<a href="editdm.php?dmid=' . $row[0] . '" title="Edit"><img src="mimg/s-edit.png" border=0></a>&nbsp;' .
-			'<a href="dmstatus.php?dmid=' . $row[0] . '" title="Status"><img src="mimg/s-rdms.png" border=0></a>&nbsp;' .
-			'<a href="#" onclick="if(confirm(\'Are you sure you want to reset DM ' . addslashes($row[3]) . '?\')) window.location=\'systemdms.php?resetDM=' . $row[0] . '\'" title="Reset"><img src="mimg/s-restart.png" border=0></a>&nbsp;';
-	return $url;
+	$actions = array();
+	$dmid = $row[0];
+	$actions[] = action_link("Edit", "pencil","editdm.php?dmid=" . $dmid);
+	$actions[] = action_link("Status", "fugue/globe","dmstatus.php?dmid=" . $dmid);
+	$actions[] = action_link("Reset", "fugue/burn","customerdms.php?resetDM=" . $dmid, "return confirm('Are you sure you want to reset DM " . addslashes($row[3]) . "?');");
+	if ($row[4] == "disabled") {
+		$actions[] = action_link("Delete", "cross","customerdms.php?delete=" . $dmid,"return confirm('Are you sure you want to delete DM " . addslashes($row[3]) . "?');");
+	}
+	return "<div id='actions_$dmid' style='display:none;'>" .  str_replace("&nbsp;|&nbsp;","<br />",action_links($actions)) . "</div>
+				<img id='actionlink_$dmid' src='img/icons/fugue/gear.png' alt='tools' />";
 }
 
 function fmt_state($row, $index){
@@ -174,11 +190,10 @@ $restotal = 0;
 $resactout = 0;
 $resactin = 0;
 while($row = DBGetRow($result)){
-	$data[] = $row;
+	$data[$row[0]] = $row;
 	
 	$poststatus = json_decode($row[13]);
 	$poststatus = $poststatus[0];
-	
 	$restotal += $poststatus->restotal;
 	$resactout += $poststatus->resactout;
 	$resactin += $poststatus->resactin;
@@ -225,60 +240,85 @@ $filterFormatters = array("status" => "fmt_dmstatus_nohtml",4 => "fmt_state");
 include_once("nav.inc.php");
 
 ?>
-<form method="POST" action="systemdms.php">
-<?
-// show the row data filters
-show_row_filter('customer_dm_table', $data, $titles, $filterTitles, $filterFormatters);
-
-?>
-
-<a href='systemdms.php?showall=1'>Show All DMs</a> 
-<? 
-if($showingDisabledDMs) {
-	?><a href='systemdms.php'>Show Enabled DMs</a><? 
-} else {
-	?><a href='systemdms.php?showdisabled=1'>Show Disabled DMs</a><?
-}
-?>
-</form>
-<?
-
-// Show the column data hide/select check boxes.
-show_column_selector('customer_dm_table', $titles, $lockedTitles);
-
-?>
-
-<div style="float: left;">Total resources: <?= ($resactin + $resactout) ?>/<?= $restotal?></div>
-<div style="float: left; margin-left: 10px; width: 100px; height: 16px; border: 1px solid black;">
-	<div style="float: left; width: <?=$respctout?>px; height: 16px; background: #00BBFF;"></div>
-	<div style="float: left; width: <?=$respctin?>px; height: 16px; background: #FF00BB;"></div>
-</div>
-
-
-<table class="list sortable" id="customer_dm_table" width="100%">
-<?
-	showTable($data, $titles, $formatters);
-?>
+<form id="viewoptions" method="POST" action="systemdms.php">
+<table>
+<tr>
+	<td>
+	<select name="view" id='view'>
+		<option value='all' <?=($viewoptions=='all')?"selected":""?>>Show All</option>
+		<option value='enabled' <?=($viewoptions=='enabled')?"selected":""?>>Enabled</option>
+		<option value='disabled' <?=($viewoptions=='disabled')?"selected":""?>>Disabled</option>
+		<option value='deleted' <?=($viewoptions=='deleted')?"selected":""?>>Deleted</option>
+	</select>
+	</td><td><div id="searchbutton">
+	<?= submit_button("View","showmatch","magnifier")?>
+	</div>
+	</td>	
+</tr>
 </table>
-<script language="javascript">
-	var table = new getObj('customer_dm_table').obj;
-	var trows = table.rows;
-	for (var i = 0, length = trows.length; i < length; i++) {
-		trows[i].id = 'row'+i;
-	}
-</script>
+</form>
+
+<hr />
 <?
-if(file_exists("dmbuild.txt")){
-?>
-	<div>Latest Version: <?=file_get_contents("dmbuild.txt");?></div>
-<?
+if (count($data)) {
+	?>
+	<table>
+	<tr><td>
+	<?
+	// show the row data filters
+	show_row_filter('customer_dm_table', $data, $titles, $filterTitles, $filterFormatters);
+	?></td><td valign="top"><?
+	// Show the column data hide/select check boxes.
+	show_column_selector('customer_dm_table', $titles, $lockedTitles);
+	
+	?>
+	<div style="margin: 10px;">Total resources: <?= ($resactin + $resactout) ?>/<?= $restotal?>
+	&nbsp;&nbsp;|&nbsp;&nbsp;
+	Resource legend:
+		<span style="background: #00BBFF;">outbound</span>
+		<span style="background: #FF00BB;">inbound</span>
+	</div>
+	<div style="margin-left:10px;float: left; width: 300px; height: 30px; border: 1px solid black;">
+			<div style="float: left; width: <?=$respctout * 3?>px; height: 30px; background: #00BBFF;"></div>
+			<div style="float: left; width: <?=$respctin * 3?>px; height: 30px; background: #FF00BB;"></div>
+	</div>
+	</td>
+	</tr>
+	</table>
+	<table class="list sortable" id="customer_dm_table">
+	<?
+		showTable($data, $titles, $formatters);
+	?>
+	</table>
+	<script type="text/javascript">
+		document.observe('dom:loaded', function() {
+			// Append id to make javascript filter work
+			var table = $('customer_dm_table');
+			var trows = table.rows;
+			for (var i = 0, length = trows.length; i < length; i++) {
+				trows[i].id = 'row'+i;
+			}
+
+			// Add tooltips
+			var dmids = <?= json_encode(array_keys($data))?>;
+			dmids.each(function (dmid) {				
+				$('actionlink_' + dmid).tip = new Tip('actionlink_' + dmid, $('actions_' + dmid).innerHTML, {
+					style: 'protogrey',
+					radius: 4,
+					border: 4,
+					hideOn: false,
+					hideAfter: 0.5,
+					stem: 'topRight',
+					hook: {  target: 'bottomLeft', tip: 'topRight'  },
+					width: 'auto',
+					offset: { x: 3, y: -3 }
+				});
+			});
+		});
+	</script>
+	<?
+} else {
+	echo "<div class='destlabel'><img src='img/largeicons/information.jpg' align='middle'> " . _L("No Records Found") . "<div>";
 }
-?>
-
-Resource legend:
-<span style="background: #00BBFF;">outbound</span>
-<span style="background: #FF00BB;">inbound</span>
-
-<?
 include_once("navbottom.inc.php");
 ?>
