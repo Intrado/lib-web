@@ -399,4 +399,15 @@ CREATE TABLE `smsjobtask` (
   KEY `personid` (`personid`),
   KEY `expired` (`status`,`leasetime`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
- 
+
+CREATE TABLE `emailrenderedmessage` (
+  `id` BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY ,
+  `renderedmessage` MEDIUMTEXT CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL
+) ENGINE = InnoDB CHARACTER SET utf8 COLLATE utf8_general_ci ;
+
+CREATE TABLE `smsrenderedmessage` (
+  `id` BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY ,
+  `renderedmessage` varchar(160) NOT NULL
+) ENGINE = InnoDB CHARACTER SET utf8 COLLATE utf8_general_ci ;
+
+
