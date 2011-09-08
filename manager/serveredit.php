@@ -26,7 +26,6 @@ if (isset($_GET['id']))
 ////////////////////////////////////////////////////////////////////////////////
 // Optional Form Items And Validators
 ////////////////////////////////////////////////////////////////////////////////
-// Example of a custom form Validator
 class ValServerExists extends Validator {
 	var $onlyserverside = true;
 	function validate ($value, $args) {
@@ -50,13 +49,14 @@ class ValServerExists extends Validator {
 // Form Data
 ////////////////////////////////////////////////////////////////////////////////
 $name = $notes = "";
-$production = $hasCommSuite = false;
+$production = false;
+$commsuitejmxport = 3100;
 $server = new Server($serverid);
 if ($server->id) {
 	$name = $server->name;
 	$notes = $server->notes;
 	$production = $server->production;
-	$hasCommSuite = $server->getSetting("hascommsuite");
+	$commsuitejmxport = $server->getSetting("commsuitejmxport");
 }
 
 // Form Items
@@ -69,7 +69,9 @@ $formdata[] = $pagetitle;
 $formdata["name"] = array( 
 		"label" => _L('Host Name'),
 		"value" => $name,
-		"validators" => array(array("ValRequired"),array("ValServerExists", "thisid"=>$serverid)),
+		"validators" => array(
+			array("ValRequired"),
+			array("ValServerExists", "thisid"=>$serverid)),
 		"control" => array("TextField", "maxlength"=>50),
 		"helpstep" => 1
 	);
@@ -87,11 +89,12 @@ $formdata["production"] = array(
 		"control" => array("CheckBox"),
 		"helpstep" => 1
 	);
-$formdata["hascommsuite"] = array( 
-		"label" => _L('Has CommSuite Service'),
-		"value" => $hasCommSuite,
-		"validators" => array(),
-		"control" => array("CheckBox"),
+$formdata["commsuitejmxport"] = array( 
+		"label" => _L('CommSuite Service JMX port'),
+		"value" => $commsuitejmxport,
+		"validators" => array(
+			array("ValNumber", "min"=>1000, "max"=>65000)),
+		"control" => array("TextField", "maxlength"=>5),
 		"helpstep" => 1
 	);
 
@@ -131,8 +134,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 			$server->create();
 		
 		// add/remove settings
-		$server->setSetting("hascommsuite", $postdata['hascommsuite']);
-		$server->setSetting("commsuitejmxport", 3100);
+		$server->setSetting("commsuitejmxport", $postdata['commsuitejmxport']);
 		
 		Query("COMMIT");
 		if ($ajax)
