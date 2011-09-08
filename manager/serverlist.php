@@ -26,7 +26,23 @@ if (isset($_GET['id']) && isset($_GET['delete'])) {
 }
 
 if (isset($_GET['id']) && isset($_GET['csrestart'])) {
-	//TODO: call jmx restart on wrapper for commsuite service on remote server
+	$jolokiaProxy = "http://localhost:8085/jolokia";
+	$server = new Server($_GET['id']);
+	if ($server->id) {
+		$name = escapeshellarg($server->name);
+		$port = escapeshellarg($server->getSetting("commsuitejmxport",3100));
+		$cmd = "jmx4perl $jolokiaProxy --target service:jmx:rmi://$name:$port/jndi/rmi://$name:$port/jmxrmi ".
+			"exec org.tanukisoftware.wrapper:type=WrapperManager restart 2>&1";
+		$shelloutput = exec($cmd, $cmdoutput, $cmdretval);
+		$_SESSION['csrestart'] = array();
+		$_SESSION['csrestart'][] = array(
+			'name' => $name,
+			'cmd' => $cmd,
+			'retval' => $cmdretval,
+			'shelloutput' => $shelloutput,
+			'output' => $cmdoutput);
+		redirect();
+	}
 }
 ////////////////////////////////////////////////////////////////////////////////
 // Formatters
@@ -55,6 +71,20 @@ function fmt_actions($row,$index) {
 	return action_links($actionlinks);
 }
 
+function fmt_retval($row, $index) {
+	if ($row[$index] == 0)
+		return '<div style="color:green;">Successful!</div>';
+	else
+		return '<div style="color:red;">Failed!</div>';
+}
+
+function fmt_cmdoutput($row, $index) {
+	$html = '<div style="max-height:70px; overflow:auto;">';
+	foreach ($row[$index] as $output)
+		$html .= $output;
+	$html .= '</div>';
+	return $html;
+}
 ////////////////////////////////////////////////////////////////////////////////
 // Data
 ////////////////////////////////////////////////////////////////////////////////
@@ -71,15 +101,32 @@ $formatters = array("2" => "fmt_notes",
 
 $data = QuickQueryMultiRow("
 	select s.id, s.name, s.notes, s.production,
-		(select value from serversetting where serverid = s.id and name = 'hascommsuite') as hascommsuite
+		(select value from serversetting where serverid = s.id and name = 'commsuitejmxport') as hascommsuite
 	from server s",
 	false, false, array());
+
+$cmdtitles = array("name" => "Name",
+		"retval" => "Status",
+		"output" => "Output");
+
+$cmdformatters = array("retval" => "fmt_retval",
+		"output" => "fmt_cmdoutput");
 
 ////////////////////////////////////////////////////////////////////////////////
 // Display
 ////////////////////////////////////////////////////////////////////////////////
 include_once("nav.inc.php");
 
+if (isset($_SESSION['csrestart'])) {
+	startWindow(_L('Command Status'));
+	?><table>
+	<?
+	showTable($_SESSION['csrestart'], $cmdtitles, $cmdformatters);
+	?></table>
+	<?
+	endWindow();
+	unset($_SESSION['csrestart']);
+}
 startWindow(_L('Server List'));
 ?><table>
 <?
@@ -87,7 +134,7 @@ showTable($data, $titles, $formatters);
 ?></table>
 <?
 endWindow();
-startWindow(_L('Global Actions'));
+startWindow(_L('Actions'));
 echo icon_button("New Server", "add", null, "serveredit.php");
 endWindow();
 include_once("navbottom.inc.php");
