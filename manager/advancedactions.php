@@ -38,6 +38,10 @@ include_once("nav.inc.php");
 <li><a href="tollfreenumbers.php">Add Toll Free Numbers</a></li>
 <? } ?>
 
+<? if ($MANAGERUSER->authorized("manageserver")) { ?>
+<li><a href="serverlist.php">Manage Servers</a></li>
+<? } ?>
+
 <? if ($MANAGERUSER->authorized("superuser")) { ?>
 <li><a href="editroles.php">Edit Manager User Roles</a></li>
 <? } ?>

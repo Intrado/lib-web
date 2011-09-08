@@ -37,6 +37,7 @@ $roles = array(
 
 	"editqueries" => "SUPER - Edit/Add Queries (arbitrary sql)",
 	"systemdm" => "SUPER - Manage System DMs",
+	"manageserver" => "SUPER - Manage Server list, restart commsuite",
 	"superuser" => "SUPER - Edit Manager Roles (this page)"
 );
 

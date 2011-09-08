@@ -405,3 +405,21 @@ ALTER TABLE `dm` ADD `dmgroupid` INT NULL AFTER `dmuuid`;
 ALTER TABLE tollfreenumbers DROP INDEX phone;
 ALTER TABLE `tollfreenumbers` CHANGE  `phone` `phone` VARCHAR( 20 ) CHARACTER SET latin1 COLLATE latin1_bin NOT NULL PRIMARY KEY;
 
+-- create a table to hold server names/notes
+CREATE TABLE IF NOT EXISTS `server` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(50) NOT NULL,
+  `notes` text NOT NULL,
+  `production` tinyint(4) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `id` (`id`),
+  KEY `name` (`name`),
+  KEY `production` (`production`)
+) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS `serversetting` (
+  `serverid` int(11) NOT NULL,
+  `name` varchar(255) CHARACTER SET utf8 NOT NULL,
+  `value` varchar(255) CHARACTER SET utf8 NOT NULL,
+  PRIMARY KEY (`serverid`,`name`)
+) ENGINE=InnoDB;
