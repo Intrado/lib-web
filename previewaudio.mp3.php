@@ -38,7 +38,7 @@ if(isset($_GET['partnum'])) {
 			$audiopart = ttsGetForTextLanguageGenderFormat($part["txt"], $voice->language, $voice->gender, "mp3");
 			break;
 		case "A":
-			$contentid = QuickQuery("select contentid from audiofile where id=? and userid=?",false,array($part["audiofileid"],$USER->id));
+			$contentid = QuickQuery("select contentid from audiofile where id=?",false,array($part["audiofileid"]));
 			$audiopart = audioFileGetForFormat($contentid, "mp3");
 			break;
 	}
@@ -66,7 +66,7 @@ if(isset($_GET['partnum'])) {
 				break;
 			case "A":
 				$messagepartdto->type = commsuite_MessagePartTypeDTO::A;
-				$messagepartdto->contentid = QuickQuery("select contentid from audiofile where id=? and userid=?",false,array($part["audiofileid"],$USER->id)) + 0;
+				$messagepartdto->contentid = QuickQuery("select contentid from audiofile where id=?",false,array($part["audiofileid"])) + 0;
 				break;
 		}
 		
