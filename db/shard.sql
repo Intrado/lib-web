@@ -356,5 +356,47 @@ CREATE TABLE `importalert` (
 	`notified` datetime default NULL,
 	PRIMARY KEY ( `customerid` , `importalertruleid` ) 
 ) ENGINE = InnoDB;
- 
+
+CREATE TABLE `emailjobtask` (
+  `customerid` int(11) NOT NULL default '0',
+  `jobid` int(11) NOT NULL default '0',
+  `personid` int(11) NOT NULL default '0',
+  `sequence` tinyint(4) NOT NULL default '0',
+  `contactsequence` tinyint(4) NOT NULL default '0',
+  `status` enum('active','assigned','progress') NOT NULL,
+  `renderedmessageid` BIGINT NULL,
+  `lastresult` enum('sent','unsent') default 'unsent',
+  `lastattempttime` bigint(20) default NULL,
+  `nextattempttime` bigint(20) default NULL,
+  `leasetime` bigint(20) default NULL,
+  `uuid` BIGINT( 20 ) UNSIGNED NOT NULL,
+  PRIMARY KEY `uuid` (`uuid`),
+  KEY `id` (`customerid`,`jobid`,`personid`,`sequence`),
+  KEY `progresshandler` (`status`,`lastattempttime`),
+  KEY `dispatch` (`status`,`nextattempttime`),
+  KEY `personid` (`personid`),
+  KEY `expired` (`status`,`leasetime`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE `smsjobtask` (
+  `customerid` int(11) NOT NULL default '0',
+  `jobid` int(11) NOT NULL default '0',
+  `personid` int(11) NOT NULL default '0',
+  `sequence` tinyint(4) NOT NULL default '0',
+  `contactsequence` tinyint(4) NOT NULL default '0',
+  `status` enum('active','assigned','progress') NOT NULL,
+  `renderedmessageid` BIGINT NULL,
+  `lastresult` enum('sent','unsent') default 'unsent',
+  `lastattempttime` bigint(20) default NULL,
+  `nextattempttime` bigint(20) default NULL,
+  `leasetime` bigint(20) default NULL,
+  `uuid` BIGINT( 20 ) UNSIGNED NOT NULL,
+  `phone` varchar(20) default NULL,
+  PRIMARY KEY `uuid` (`uuid`),
+  KEY `id` (`customerid`,`jobid`,`personid`,`sequence`),
+  KEY `progresshandler` (`status`,`lastattempttime`),
+  KEY `dispatch` (`status`,`nextattempttime`),
+  KEY `personid` (`personid`),
+  KEY `expired` (`status`,`leasetime`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
  
