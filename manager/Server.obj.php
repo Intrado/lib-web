@@ -1,15 +1,14 @@
 <?
 class Server extends DBMappedObject{
-
-	var $name = "";
+	var $hostname = "";
 	var $notes = "";
-	var $production = "";
+	var $runmode = "";
 	var $settingsarray = false;
 
 	function Server($id = NULL){
 		$this->_allownulls = false;
 		$this->_tablename = "server";
-		$this->_fieldlist = array("name","notes","production");
+		$this->_fieldlist = array("hostname","notes","runmode");
 
 		//call super's constructor
 		DBMappedObject::DBMappedObject($id);
@@ -28,6 +27,10 @@ class Server extends DBMappedObject{
 	function setSetting($name, $value) {
 		QuickUpdate("insert into serversetting (serverid, name, value) values (?,?,?) on duplicate key update value = ?", false, array($this->id, $name, $value, $value));
 		$this->settingsarray[$name] = $value;
+	}
+	
+	static function getRunModes() {
+		return array('active'=>'Active','standby'=>'Standby','testing'=>'Testing');
 	}
 }
 

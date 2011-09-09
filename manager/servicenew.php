@@ -10,6 +10,7 @@ require_once("../obj/Validator.obj.php");
 require_once("../obj/Form.obj.php");
 require_once("../obj/FormItem.obj.php");
 require_once("Server.obj.php");
+require_once("Service.obj.php");
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization
 ////////////////////////////////////////////////////////////////////////////////
@@ -20,89 +21,51 @@ if (!$MANAGERUSER->authorized("manageserver"))
 // Action/Request Processing
 ////////////////////////////////////////////////////////////////////////////////
 $serverid = false;
-if (isset($_GET['id'])) {
-	$_SESSION['serveredit'] = array();
-	$_SESSION['serveredit']['serverid'] = $_GET['id'] + 0;
-	redirect();
-}
+if (isset($_GET['serverid'])) 
+	$serverid = $_GET['serverid'] + 0;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Optional Form Items And Validators
 ////////////////////////////////////////////////////////////////////////////////
-class ValServerExists extends Validator {
-	var $onlyserverside = true;
-	function validate ($value, $args) {
-		// check that dns can resolve this hostname
-		if (gethostbyname($value) == $value)
-			return "Unknown host, is it resolvable?";
-		// check that it isn't already in the database
-		$querylimit="";
-		$queryargs = array($value);
-		if ($args['thisid']) {
-			$querylimit = " and id != ? ";
-			$queryargs[] = $args['thisid'];
-		}
-		if (QuickQuery("select 1 from server where hostname = ? ". $querylimit, false, $queryargs))
-			return "Server already exists!";
-		return true;
-	}
-}
 
 ////////////////////////////////////////////////////////////////////////////////
 // Form Data
 ////////////////////////////////////////////////////////////////////////////////
-if (isset($_SESSION['serveredit']['serverid']))
-	$serverid = $_SESSION['serveredit']['serverid'];
-else
-	$serverid = false;
-
-$name = $notes = "";
-$runmode = 'testing';
-$commsuitejmxport = 3100;
 $server = new Server($serverid);
-if ($server->hostname) {
-	$name = $server->hostname;
-	$notes = $server->notes;
-	$runmode = $server->runmode;
-}
+if (!$server->hostname)
+	exit("Missing/Invalid server id!");
 
 // Form Items
-$formdata = array();
-if ($server->hostname)
-	$pagetitle = "Edit existing server entry";
-else
-	$pagetitle = "Create new server entry";
-$formdata[] = $pagetitle;
-$formdata["name"] = array( 
-		"label" => _L('Host Name'),
-		"value" => $name,
+$formdata = array(_L("%s New Service", $server->hostname));
+$formdata["type"] = array( 
+		"label" => _L('Service Type'),
+		"value" => "",
 		"validators" => array(
-			array("ValRequired"),
-			array("ValServerExists", "thisid"=>$serverid)),
-		"control" => array("TextField", "maxlength"=>50),
+			array("ValInArray", 'values' => array_keys(Service::getTypes()))),
+		"control" => array("SelectMenu", 'values' => Service::getTypes()),
 		"helpstep" => 1
 	);
 $formdata["notes"] = array( 
 		"label" => _L('Notes'),
-		"value" => $notes,
+		"value" => "",
 		"validators" => array(array("ValRequired")),
 		"control" => array("TextArea", "cols"=>55),
 		"helpstep" => 1
 	);
 $formdata["runmode"] = array( 
 		"label" => _L('Server run mode'),
-		"value" => $runmode,
+		"value" => "",
 		"validators" => array(
-			array("ValInArray", 'values' => array_keys(Server::getRunModes()))),
-		"control" => array("SelectMenu", 'values' => Server::getRunModes()),
+			array("ValInArray", 'values' => array_keys(Service::getRunModes()))),
+		"control" => array("SelectMenu", 'values' => Service::getRunModes()),
 		"helpstep" => 1
 	);
 
 $helpsteps = array ();
 
 $buttons = array(submit_button(_L('Save'),"submit","tick"),
-				icon_button(_L('Cancel'),"cross",null,"serverlist.php"));
-$form = new Form("servereditform",$formdata,$helpsteps,$buttons);
+				icon_button(_L('Cancel'),"cross",null,"servicelist.php?serverid=". $server->id));
+$form = new Form("servicenewform",$formdata,$helpsteps,$buttons);
 
 ////////////////////////////////////////////////////////////////////////////////
 // Form Data Handling
@@ -122,43 +85,33 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		$datachange = true;
 	} else if (($errors = $form->validate()) === false) { //checks all of the items in this form
 		$postdata = $form->getData(); //gets assoc array of all values {name:value,...}
-		
-		unset($_SESSION['serveredit']['serverid']);
 		Query("BEGIN");
 		
-		// update/create a server entry
-		$server->hostname = $postdata['name'];
-		$server->notes = $postdata['notes'];
-		$server->runmode = $postdata['runmode'];
-		if ($server->id)
-			$server->update();
-		else
-			$server->create();
+		// create a service entry
+		$service = new Service();
+		$service->serverid = $server->id;
+		$service->type = $postdata['type'];
+		$service->notes = $postdata['notes'];
+		$service->runmode = $postdata['runmode'];
+		$service->create();
 		
 		Query("COMMIT");
 		if ($ajax)
-			$form->sendTo("serverlist.php");
+			$form->sendTo("servicelist.php?serverid=". $server->id);
 		else
-			redirect("serverlist.php");
+			redirect("servicelist.php?serverid=". $server->id);
 	}
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Display
 ////////////////////////////////////////////////////////////////////////////////
-$PAGE = "server:edit";
-$TITLE = _L('Create/Edit Server');
+$PAGE = "service:new";
+$TITLE = _L('Create Service');
 
 include_once("nav.inc.php");
 
-// Optional Load Custom Form Validators
-?>
-<script type="text/javascript">
-<? Validator::load_validators(array("ValServerExists")); ?>
-</script>
-<?
-
-startWindow(_L('Individual Server'));
+startWindow(_L('New Service'));
 echo $form->render();
 endWindow();
 include_once("navbottom.inc.php");

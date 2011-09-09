@@ -20,89 +20,80 @@ if (!$MANAGERUSER->authorized("manageserver"))
 // Action/Request Processing
 ////////////////////////////////////////////////////////////////////////////////
 $serverid = false;
-if (isset($_GET['id'])) {
-	$_SESSION['serveredit'] = array();
-	$_SESSION['serveredit']['serverid'] = $_GET['id'] + 0;
-	redirect();
-}
+if (isset($_GET['id'])) 
+	$serverid = $_GET['id'];
 
 ////////////////////////////////////////////////////////////////////////////////
-// Optional Form Items And Validators
+// Functions, Form Items And Validators
 ////////////////////////////////////////////////////////////////////////////////
-class ValServerExists extends Validator {
-	var $onlyserverside = true;
-	function validate ($value, $args) {
-		// check that dns can resolve this hostname
-		if (gethostbyname($value) == $value)
-			return "Unknown host, is it resolvable?";
-		// check that it isn't already in the database
-		$querylimit="";
-		$queryargs = array($value);
-		if ($args['thisid']) {
-			$querylimit = " and id != ? ";
-			$queryargs[] = $args['thisid'];
+function parseCommSuiteProperties($filepath) {
+	$props = array();
+	$f = fopen($filepath, "r");
+	while ($line = fgets($f)) {
+		// TODO: parse out special comments that provide validators or a list of values
+		if (trim($line) && substr($line, 0, 1) != "#") {
+			$equalspos = strpos($line,"=");
+			$name = substr($line, 0, $equalspos);
+			$value = substr($line, $equalspos + 1);
+			
+			$dotpos = strpos($line,".");
+			$section = substr($line, 0, $dotpos);
+			
+			if (!isset($props[$section]))
+				$props[$section] = array();
+			
+			$props[$section][$name] = $value;
 		}
-		if (QuickQuery("select 1 from server where hostname = ? ". $querylimit, false, $queryargs))
-			return "Server already exists!";
-		return true;
 	}
+	return $props;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Form Data
 ////////////////////////////////////////////////////////////////////////////////
-if (isset($_SESSION['serveredit']['serverid']))
-	$serverid = $_SESSION['serveredit']['serverid'];
-else
-	$serverid = false;
-
 $name = $notes = "";
-$runmode = 'testing';
+$production = false;
 $commsuitejmxport = 3100;
 $server = new Server($serverid);
-if ($server->hostname) {
+if ($server->id) {
 	$name = $server->hostname;
 	$notes = $server->notes;
-	$runmode = $server->runmode;
+	$production = $server->production;
+	$commsuitejmxport = $server->getSetting("commsuitejmxport");
+} else {
+	exit("Missing/Invalid Server ID");
 }
+
+// load default props file.
+// TODO: check this out from somewhere
+$defaultprops = parseCommSuiteProperties("/tmp/commsuite.properties");
+
+// TODO: check out this server's existing props file
+$currentprops = array();
+
+// merge the two, so new props show up.
+$props = array_merge($defaultprops, $currentprops);
 
 // Form Items
 $formdata = array();
-if ($server->hostname)
-	$pagetitle = "Edit existing server entry";
-else
-	$pagetitle = "Create new server entry";
-$formdata[] = $pagetitle;
-$formdata["name"] = array( 
-		"label" => _L('Host Name'),
-		"value" => $name,
-		"validators" => array(
-			array("ValRequired"),
-			array("ValServerExists", "thisid"=>$serverid)),
-		"control" => array("TextField", "maxlength"=>50),
-		"helpstep" => 1
-	);
-$formdata["notes"] = array( 
-		"label" => _L('Notes'),
-		"value" => $notes,
-		"validators" => array(array("ValRequired")),
-		"control" => array("TextArea", "cols"=>55),
-		"helpstep" => 1
-	);
-$formdata["runmode"] = array( 
-		"label" => _L('Server run mode'),
-		"value" => $runmode,
-		"validators" => array(
-			array("ValInArray", 'values' => array_keys(Server::getRunModes()))),
-		"control" => array("SelectMenu", 'values' => Server::getRunModes()),
-		"helpstep" => 1
-	);
+foreach ($props as $section => $sectionprops) {
+	$formdata[] = $section;
+	foreach ($sectionprops as $name => $value) {
+		$formdata[$name] = array(
+				"label" => $name,
+				"value" => $value,
+				"validators" => array(),
+				"control" => array("TextField"),
+				"helpstep" => 1
+			);
+	}
+}
 
 $helpsteps = array ();
 
 $buttons = array(submit_button(_L('Save'),"submit","tick"),
 				icon_button(_L('Cancel'),"cross",null,"serverlist.php"));
-$form = new Form("servereditform",$formdata,$helpsteps,$buttons);
+$form = new Form("serverpropertiesform",$formdata,$helpsteps,$buttons,"vertical");
 
 ////////////////////////////////////////////////////////////////////////////////
 // Form Data Handling
@@ -123,19 +114,8 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 	} else if (($errors = $form->validate()) === false) { //checks all of the items in this form
 		$postdata = $form->getData(); //gets assoc array of all values {name:value,...}
 		
-		unset($_SESSION['serveredit']['serverid']);
-		Query("BEGIN");
+		// TODO: commit the new props file
 		
-		// update/create a server entry
-		$server->hostname = $postdata['name'];
-		$server->notes = $postdata['notes'];
-		$server->runmode = $postdata['runmode'];
-		if ($server->id)
-			$server->update();
-		else
-			$server->create();
-		
-		Query("COMMIT");
 		if ($ajax)
 			$form->sendTo("serverlist.php");
 		else
@@ -147,19 +127,20 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 // Display
 ////////////////////////////////////////////////////////////////////////////////
 $PAGE = "server:edit";
-$TITLE = _L('Create/Edit Server');
+$TITLE = _L('Create/Edit Properties');
 
 include_once("nav.inc.php");
 
 // Optional Load Custom Form Validators
 ?>
 <script type="text/javascript">
-<? Validator::load_validators(array("ValServerExists")); ?>
+<? Validator::load_validators(); ?>
 </script>
 <?
 
-startWindow(_L('Individual Server'));
+startWindow(_L('CommSuite Properties'));
 echo $form->render();
 endWindow();
 include_once("navbottom.inc.php");
+
 ?>

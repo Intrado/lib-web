@@ -423,3 +423,29 @@ CREATE TABLE IF NOT EXISTS `serversetting` (
   `value` varchar(255) CHARACTER SET utf8 NOT NULL,
   PRIMARY KEY (`serverid`,`name`)
 ) ENGINE=InnoDB;
+
+ALTER TABLE `server` DROP INDEX `id` ;
+ALTER TABLE `server` CHANGE `name` `hostname` VARCHAR( 50 ) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL ;
+ALTER TABLE `server` CHANGE `production` `runmode` ENUM( 'active', 'standby', 'testing' ) NOT NULL ;
+ALTER TABLE `server` CHANGE `notes` `notes` TEXT CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL;
+
+DROP TABLE `serversetting`;
+
+CREATE TABLE `service` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `serverid` int(11) NOT NULL,
+  `type` enum('commsuite','kona') NOT NULL,
+  `runmode` enum('all','active','standby') NOT NULL,
+  `notes` text CHARACTER SET utf8 NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `serverid` (`serverid`,`type`,`runmode`)
+) ENGINE=InnoDB;
+
+CREATE TABLE `serviceattribute` (
+  `serviceid` int(11) NOT NULL,
+  `name` varchar(255) CHARACTER SET utf8 NOT NULL,
+  `value` varchar(255) CHARACTER SET utf8 NOT NULL,
+  PRIMARY KEY (`serviceid`,`name`)
+) ENGINE=InnoDB;
+
+
