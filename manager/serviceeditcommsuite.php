@@ -1,28 +1,9 @@
 <?
 ////////////////////////////////////////////////////////////////////////////////
-// Includes
-////////////////////////////////////////////////////////////////////////////////
-require_once("common.inc.php");
-require_once("../inc/table.inc.php");
-require_once("../inc/html.inc.php");
-require_once("../inc/utils.inc.php");
-require_once("../obj/Validator.obj.php");
-require_once("../obj/Form.obj.php");
-require_once("../obj/FormItem.obj.php");
-require_once("Server.obj.php");
-require_once("Service.obj.php");
-////////////////////////////////////////////////////////////////////////////////
 // Authorization
 ////////////////////////////////////////////////////////////////////////////////
-if (!$MANAGERUSER->authorized("manageserver"))
+if (!isset($_SESSION['serviceedit']['serviceid']))
 	exit("Not Authorized");
-
-////////////////////////////////////////////////////////////////////////////////
-// Action/Request Processing
-////////////////////////////////////////////////////////////////////////////////
-$serverid = false;
-if (isset($_GET['serverid'])) 
-	$serverid = $_GET['serverid'] + 0;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Optional Form Items And Validators
@@ -31,33 +12,43 @@ if (isset($_GET['serverid']))
 ////////////////////////////////////////////////////////////////////////////////
 // Form Data
 ////////////////////////////////////////////////////////////////////////////////
-$server = new Server($serverid);
+if (isset($_SESSION['serviceedit']['serviceid']))
+	$serviceid = $_SESSION['serviceedit']['serviceid'];
+else
+	$serviceid = false;
+	
+$service = new Service($serviceid);
+
+if (!$service->type)
+	exit("Not Authorized");
+
+$server = new Server($service->serverid);
 if (!$server->hostname)
 	exit("Missing/Invalid server id!");
 
 // Form Items
-$formdata = array(_L("%s New Service", $server->hostname));
-$formdata["type"] = array( 
-		"label" => _L('Service Type'),
-		"value" => "",
-		"validators" => array(
-			array("ValInArray", 'values' => array_keys(Service::getTypes()))),
-		"control" => array("SelectMenu", 'values' => Service::getTypes()),
-		"helpstep" => 1
-	);
-$formdata["notes"] = array( 
-		"label" => _L('Notes'),
-		"value" => "",
+$formdata = array();
+$formdata["jmxproxy"] = array( 
+		"label" => _L('JMX Proxy Host'),
+		"value" => $service->getAttribute("jmxproxy", $SETTINGS['servermanagement']['defaultjmxproxy']),
 		"validators" => array(array("ValRequired")),
-		"control" => array("TextArea", "cols"=>55),
+		"control" => array("TextField", "maxlength"=>255, "size"=>50),
 		"helpstep" => 1
 	);
-$formdata["runmode"] = array( 
-		"label" => _L('Server run mode'),
-		"value" => "",
+$formdata["jmxport"] = array( 
+		"label" => _L('JMX Port'),
+		"value" => $service->getAttribute("jmxport", "3123"),
 		"validators" => array(
-			array("ValInArray", 'values' => array_keys(Service::getRunModes()))),
-		"control" => array("SelectMenu", 'values' => Service::getRunModes()),
+			array("ValRequired"),
+			array("ValNumber", "min"=>1000, "max"=>65000)),
+		"control" => array("TextField", "maxlength"=>255, "size"=>10),
+		"helpstep" => 1
+	);
+$formdata["jmxrestartcmd"] = array( 
+		"label" => _L('JMX Restart Command'),
+		"value" => $service->getAttribute("jmxrestartcmd", "org.tanukisoftware.wrapper:type=WrapperManager restart"),
+		"validators" => array(array("ValRequired")),
+		"control" => array("TextField", "maxlength"=>255, "size"=>50),
 		"helpstep" => 1
 	);
 
@@ -65,7 +56,7 @@ $helpsteps = array ();
 
 $buttons = array(submit_button(_L('Save'),"submit","tick"),
 				icon_button(_L('Cancel'),"cross",null,"servicelist.php?serverid=". $server->id));
-$form = new Form("servicenewform",$formdata,$helpsteps,$buttons);
+$form = new Form("serviceeditform",$formdata,$helpsteps,$buttons);
 
 ////////////////////////////////////////////////////////////////////////////////
 // Form Data Handling
@@ -87,19 +78,15 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		$postdata = $form->getData(); //gets assoc array of all values {name:value,...}
 		Query("BEGIN");
 		
-		// create a service entry
-		$service = new Service();
-		$service->serverid = $server->id;
-		$service->type = $postdata['type'];
-		$service->notes = $postdata['notes'];
-		$service->runmode = $postdata['runmode'];
-		$service->create();
+		$service->setAttribute("jmxproxy", $postdata['jmxproxy']);
+		$service->setAttribute("jmxport", $postdata['jmxport']);
+		$service->setAttribute("jmxrestartcmd", $postdata['jmxrestartcmd']);
 		
 		Query("COMMIT");
 		if ($ajax)
-			$form->sendTo("serviceedit.php?id=". $service->id);
+			$form->sendTo("servicelist.php?serverid=". $server->id);
 		else
-			redirect("serviceedit.php?id=". $service->id);
+			redirect("servicelist.php?serverid=". $server->id);
 	}
 }
 
@@ -107,11 +94,11 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 // Display
 ////////////////////////////////////////////////////////////////////////////////
 $PAGE = "service:new";
-$TITLE = _L('Create Service');
+$TITLE = _L('Edit Service');
 
 include_once("nav.inc.php");
 
-startWindow(_L('New Service'));
+startWindow(_L('Host: %1$s Service: %2$s Mode: %3$s', $server->hostname, $service->type, $service->runmode));
 echo $form->render();
 endWindow();
 include_once("navbottom.inc.php");

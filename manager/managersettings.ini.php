@@ -61,4 +61,7 @@ tinydomain[]="4msg.es"
 [content]
 tts="10.25.25.232,8080,/ttsserver/tts"
 
+[servermanagement]
+defaultjmxproxy="http://localhost:8085/jolokia"
+
 ;*/?>

@@ -34,25 +34,23 @@ if (isset($_GET['id']) && isset($_GET['delete'])) {
 }
 
 if (isset($_GET['id']) && isset($_GET['restart'])) {
-	/*
-	$jolokiaProxy = $SETTINGS['servermanagement']['jmxproxy'];
-	$server = new Server($_GET['id']);
-	if ($server->id) {
-		$name = escapeshellarg($server->hostname);
-		$port = escapeshellarg($server->getSetting("commsuitejmxport",3100));
-		$cmd = "jmx4perl $jolokiaProxy --target service:jmx:rmi://$name:$port/jndi/rmi://$name:$port/jmxrmi ".
-			"exec org.tanukisoftware.wrapper:type=WrapperManager restart 2>&1";
-		$shelloutput = exec($cmd, $cmdoutput, $cmdretval);
-		$_SESSION['csrestart'] = array();
-		$_SESSION['csrestart'][] = array(
-			'name' => $name,
-			'cmd' => $cmd,
-			'retval' => $cmdretval,
-			'shelloutput' => $shelloutput,
-			'output' => $cmdoutput);
-		redirect();
-	}
-	*/
+	$service = new Service($_GET['id'] + 0);
+	$server = new Server($service->serverid);
+	
+	$jmxproxy = escapeshellarg($service->getAttribute("jmxproxy"));
+	$hostname = escapeshellarg($server->hostname);
+	$port = escapeshellarg($service->getAttribute("jmxport"));
+	$restartcmd = $service->getAttribute("jmxrestartcmd");
+	$cmd = "jmx4perl $jmxproxy --target service:jmx:rmi://$hostname:$port/jndi/rmi://$hostname:$port/jmxrmi exec $restartcmd 2>&1";
+	$shelloutput = exec($cmd, $cmdoutput, $cmdretval);
+	$_SESSION['servicelist']['restart'] = array();
+	$_SESSION['servicelist']['restart'][] = array(
+		'hostname' => $hostname,
+		'cmd' => $cmd,
+		'retval' => $cmdretval,
+		'shelloutput' => $shelloutput,
+		'output' => $cmdoutput);
+	redirect();
 }
 ////////////////////////////////////////////////////////////////////////////////
 // Formatters
@@ -79,10 +77,14 @@ function fmt_runmode($row,$index) {
 }
 
 function fmt_actions($row,$index) {
+	$service = new Service($row[0]);
 	$actionlinks = array();
 	$actionlinks[] = action_link("Edit", "application_edit","serviceedit.php?id=$row[0]");
 	$actionlinks[] = action_link("Delete", "application_delete","servicelist.php?id=$row[0]&delete","return confirmDelete();");
-	$actionlinks[] = action_link("Restart", "application_key","servicelist.php?id=$row[0]");
+	$actionlinks[] = action_link("Props", "application_key","serviceprops.php?id=$row[0]");
+	if (in_array($service->type, array("commsuite")))
+		$actionlinks[] = action_link("Restart", "application_lightning","servicelist.php?id=$row[0]&restart");
+		
 	return action_links($actionlinks);
 }
 
@@ -126,7 +128,7 @@ $formatters = array("1" => "fmt_type",
 
 $data = QuickQueryMultiRow("select id, type, runmode, notes from service where serverid = ?", false, false, array($server->id));
 
-$cmdtitles = array("name" => "Hostname",
+$cmdtitles = array("hostname" => "Hostname",
 		"retval" => "Status",
 		"output" => "Output");
 
@@ -140,11 +142,9 @@ include_once("nav.inc.php");
 
 if (isset($_SESSION['servicelist']['restart'])) {
 	startWindow(_L('Command Status'));
-	?><table>
-	<?
+	?><table><?
 	showTable($_SESSION['servicelist']['restart'], $cmdtitles, $cmdformatters);
-	?></table>
-	<?
+	?></table><?
 	endWindow();
 	unset($_SESSION['servicelist']['restart']);
 }
