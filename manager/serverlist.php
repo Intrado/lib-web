@@ -91,6 +91,7 @@ function fmt_cmdoutput($row, $index) {
 // TODO: commsuite service status field
 $titles = array("1" => "Hostname",
 		"3" => "Mode",
+		"4" => "Services",
 		"actions" => "Actions",
 		"2" => "Notes");
 
@@ -98,7 +99,11 @@ $formatters = array("2" => "fmt_notes",
 		"3" => "fmt_runmode",
 		"actions" => "fmt_actions");
 
-$data = QuickQueryMultiRow("select s.id, s.hostname, s.notes, s.runmode from server s", false, false, array());
+$data = QuickQueryMultiRow("select s.id, s.hostname, s.notes, s.runmode, 
+		(select group_concat(distinct type separator ', ') 
+			from service 
+			where s.runmode != 'testing' and serverid = s.id and (runmode = s.runmode || runmode = 'all')) as services 
+		from server s", false, false, array());
 
 $cmdtitles = array("name" => "Hostname",
 		"retval" => "Status",
