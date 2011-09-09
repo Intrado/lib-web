@@ -88,6 +88,11 @@ function fmt_actions($row,$index) {
 	return action_links($actionlinks);
 }
 
+function fmt_status($row, $index) {
+	// TODO: ajax request status via appropriate method depending on service type
+	return "TODO!";
+}
+
 function fmt_retval($row, $index) {
 	if ($row[$index] == 0)
 		return '<div style="color:green;">Successful!</div>';
@@ -118,15 +123,20 @@ if (!$server->hostname)
 // TODO: commsuite service status field
 $titles = array("1" => "Type",
 		"2" => "Mode",
+		"status" => "Status",
+		"4" => "@Version",
 		"actions" => "Actions",
 		"3" => "Notes");
 
 $formatters = array("1" => "fmt_type",
 		"2" => "fmt_runmode",
 		"3" => "fmt_notes",
+		"status" => "fmt_status",
 		"actions" => "fmt_actions");
 
-$data = QuickQueryMultiRow("select id, type, runmode, notes from service where serverid = ?", false, false, array($server->id));
+$data = QuickQueryMultiRow("select s.id, s.type, s.runmode, s.notes, 
+		(select value from serviceattribute where serviceid = s.id and name = 'version') as version 
+		from service s where s.serverid = ?", false, false, array($server->id));
 
 $cmdtitles = array("hostname" => "Hostname",
 		"retval" => "Status",
