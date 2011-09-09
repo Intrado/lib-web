@@ -51,6 +51,13 @@ $formdata["jmxrestartcmd"] = array(
 		"control" => array("TextField", "maxlength"=>255, "size"=>50),
 		"helpstep" => 1
 	);
+$formdata["notes"] = array( 
+		"label" => _L('Notes'),
+		"value" => $service->notes,
+		"validators" => array(array("ValRequired")),
+		"control" => array("TextArea", "cols"=>55),
+		"helpstep" => 1
+	);
 
 $helpsteps = array ();
 
@@ -78,6 +85,8 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		$postdata = $form->getData(); //gets assoc array of all values {name:value,...}
 		Query("BEGIN");
 		
+		$service->notes = $postdata['notes'];
+		$service->update(array("notes"));
 		$service->setAttribute("jmxproxy", $postdata['jmxproxy']);
 		$service->setAttribute("jmxport", $postdata['jmxport']);
 		$service->setAttribute("jmxrestartcmd", $postdata['jmxrestartcmd']);

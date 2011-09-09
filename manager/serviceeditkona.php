@@ -35,6 +35,13 @@ $formdata["todo"] = array(
 		"control" => array("TextField", "maxlength"=>255, "size"=>50),
 		"helpstep" => 1
 	);
+$formdata["notes"] = array( 
+		"label" => _L('Notes'),
+		"value" => $service->notes,
+		"validators" => array(array("ValRequired")),
+		"control" => array("TextArea", "cols"=>55),
+		"helpstep" => 1
+	);
 
 $helpsteps = array ();
 
@@ -61,6 +68,9 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 	} else if (($errors = $form->validate()) === false) { //checks all of the items in this form
 		$postdata = $form->getData(); //gets assoc array of all values {name:value,...}
 		Query("BEGIN");
+		
+		$service->notes = $postdata['notes'];
+		$service->update(array("notes"));
 		
 		Query("COMMIT");
 		if ($ajax)
