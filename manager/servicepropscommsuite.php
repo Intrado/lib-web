@@ -34,12 +34,23 @@ function parseCommSuiteProperties($filepath) {
 ////////////////////////////////////////////////////////////////////////////////
 // Form Data
 ////////////////////////////////////////////////////////////////////////////////
-// load default props file.
-// TODO: check this out from somewhere
-$defaultprops = parseCommSuiteProperties("/tmp/commsuite.properties");
+$server = new Server($service->serverid);
 
-// TODO: check out this server's existing props file
-$currentprops = array();
+$cvs = new CvsServer($SETTINGS['servermanagement']['cvsurl']);
+
+// check out this server's existing props file
+$file = $cvs->co("{$server->hostname}/{$service->runmode}/commsuite/commsuite.properties");
+if ($file) {
+	$currentprops = parseCommSuiteProperties($file);
+} else {
+	// server doesn't have a props file, copy the default and import it 
+	$cvs->copyDefault($server->hostname);
+	$currentprops = array();
+}
+
+// load default props file.
+$file = $cvs->co("default/{$service->runmode}/commsuite/commsuite.properties");
+$defaultprops = parseCommSuiteProperties($file);
 
 // merge the two, so new props show up.
 $props = array_merge($defaultprops, $currentprops);
