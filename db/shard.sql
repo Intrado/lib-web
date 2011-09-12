@@ -410,6 +410,5 @@ CREATE TABLE `smsrenderedmessage` (
   `renderedmessage` varchar(160) NOT NULL
 ) ENGINE = InnoDB CHARACTER SET utf8 COLLATE utf8_general_ci ;
 
- ALTER TABLE `emailrenderedmessage` CHANGE `renderedmessage` `renderedmessage` BLOB NOT NULL ;
- 
- 
+ALTER TABLE `emailrenderedmessage` CHANGE `renderedmessage` `renderedmessage` MEDIUMBLOB NOT NULL ;
+
