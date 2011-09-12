@@ -39,7 +39,7 @@ $server = new Server($service->serverid);
 $cvs = new CvsServer($SETTINGS['servermanagement']['cvsurl']);
 
 // check out this server's existing props file
-$file = $cvs->co("{$server->hostname}/{$service->runmode}/commsuite/commsuite.properties");
+$file = $cvs->co("{$server->hostname}/{$service->runmode}/commsuite/service.properties");
 if ($file) {
 	$currentprops = parseCommSuiteProperties($file);
 } else {
@@ -49,7 +49,7 @@ if ($file) {
 }
 
 // load default props file.
-$file = $cvs->co("default/{$service->runmode}/commsuite/commsuite.properties");
+$file = $cvs->co("default/{$service->runmode}/commsuite/service.properties");
 $defaultprops = parseCommSuiteProperties($file);
 
 // merge the two, so new props show up.
