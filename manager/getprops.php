@@ -62,5 +62,11 @@ if (!$serverid || !$serviceid) {
 
 $cvs = new CvsServer($SETTINGS['servermanagement']['cvsurl']);
 $file = $cvs->co("{$server->hostname}/{$server->runmode}/{$service->type}/service.properties");
-readfile($file);
+if ($file) {
+	readfile($file);
+} else {
+	header("HTTP/1.0 404 Not Found");
+	echo "<h1>Requested properties file was not found.</h1>";
+	exit;	
+}
 ?>
