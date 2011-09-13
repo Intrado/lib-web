@@ -91,7 +91,7 @@ table {
 		<td><a href="customerimports.php<?=$favcid?>" title="Customer&nbsp;Imports"><img src="mimg/custimports.png" border=0><div>Customer&nbsp;Imports</div></a></td>
 	<? } ?>
 	<? if ($MANAGERUSER->authorized("activejobs")) { ?>
-		<td><a href="customeractivejobs.php?clear" title="Active&nbsp;Jobs"><img src="mimg/activejobs.png" border=0><div>Active&nbsp;Jobs</div></a></td>
+		<td><a href="customeractivejobs.php" title="Active&nbsp;Jobs"><img src="mimg/activejobs.png" border=0><div>Active&nbsp;Jobs</div></a></td>
 	<? } ?>
 	<? if ($MANAGERUSER->authorized("newcustomer")) { ?>
 		<td><a href="customeredit.php?id=new" title="New&nbsp;Customer"><img src="mimg/newcustomer.png" border=0><div>New&nbsp;Customer</div></a></td>
