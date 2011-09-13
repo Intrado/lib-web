@@ -218,7 +218,7 @@ $titles[11] = "Resources";
 $titles[12] = "@#Inbound";
 $titles[7] = "@#DM UUID";
 $titles[8] = "@#Cmd";
-$titles[14] = "@#Notes";
+$titles[14] = "#Notes";
 $titles["actions"] = "Actions";
 
 // Do not provide a checkbox to hide these columns.
