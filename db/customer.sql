@@ -1635,3 +1635,17 @@ $$$
 update setting set value='8.1/2' where name='_dbversion'
 $$$
 -- END REV 8.1/2
+-- start 8.1/3
+-- Add notes data length field to avoid calling length(data) on import reports
+ALTER TABLE `import` ADD `datalength` int(11) NOT NULL DEFAULT 0 AFTER `data` 
+$$$
+
+INSERT INTO `importalertcategory` (`name`) VALUES
+	('manager'),
+	('customer')
+$$$
+
+update setting set value='8.1/3' where name='_dbversion'
+$$$
+-- END REV 8.1/3
+

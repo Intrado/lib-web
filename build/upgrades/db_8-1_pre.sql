@@ -35,3 +35,15 @@ $$$
 -- Add notes field that is not visible to the customer 
 ALTER TABLE `import` ADD `managernotes` TEXT;
 $$$
+
+-- $rev 3
+
+-- Add notes data length field to avoid calling length(data) on import reports
+ALTER TABLE `import` ADD `datalength` int(11) NOT NULL DEFAULT 0 AFTER `data` 
+$$$
+
+INSERT INTO `importalertcategory` (`name`) VALUES
+	('manager'),
+	('customer')
+$$$
+
