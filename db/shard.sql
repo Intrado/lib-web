@@ -412,3 +412,21 @@ CREATE TABLE `smsrenderedmessage` (
 
 ALTER TABLE `emailrenderedmessage` CHANGE `renderedmessage` `renderedmessage` MEDIUMBLOB NOT NULL ;
 
+ALTER TABLE `smsjobtask` ADD `attempts` tinyint(4) NOT NULL default '0' after `status`,
+    CHANGE `status` `status` enum('active','assigned','progress','waiting') NOT NULL ;
+
+CREATE TABLE `emailleasetask` (
+  `taskuuid` bigint NOT NULL,
+  `leasetime` bigint(20) NOT NULL,
+  PRIMARY KEY  (`taskuuid`),
+  KEY `leasetime` (`leasetime`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+CREATE TABLE `smsleasetask` (
+  `taskuuid` bigint NOT NULL,
+  `leasetime` bigint(20) NOT NULL,
+  PRIMARY KEY  (`taskuuid`),
+  KEY `leasetime` (`leasetime`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+
