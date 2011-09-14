@@ -88,7 +88,7 @@ table {
 	<tr>
 		<td><a href="customers.php" title="Customer&nbsp;List"><img src="mimg/custlist.png" border=0><div>Customer&nbsp;List</div></a></td>
 	<? if ($MANAGERUSER->authorized("imports")) { ?>
-		<td><a href="customerimports.php<?=$favcid?>" title="Customer&nbsp;Imports"><img src="mimg/custimports.png" border=0><div>Customer&nbsp;Imports</div></a></td>
+		<td><a href="importalerts.php" title="Import&nbsp;Alerts"><img src="mimg/custimports.png" border=0><div>Import&nbsp;Alerts</div></a></td>
 	<? } ?>
 	<? if ($MANAGERUSER->authorized("activejobs")) { ?>
 		<td><a href="customeractivejobs.php" title="Active&nbsp;Jobs"><img src="mimg/activejobs.png" border=0><div>Active&nbsp;Jobs</div></a></td>
