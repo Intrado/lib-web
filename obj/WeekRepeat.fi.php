@@ -2,6 +2,8 @@
 class WeekRepeatItem extends FormItem {
 	function render ($value) {
 		$n = $this->form->name."_".$this->name;
+		$hastime = count($value) > 7;
+		
 		$str = '
 				<input id="'.$n.'" name="'.$n.'" type="hidden" value="' . escapehtml(json_encode($value)) . '"/>
 				<table border="0" cellpadding="2" cellspacing="1" class="list">
@@ -13,7 +15,7 @@ class WeekRepeatItem extends FormItem {
 						<th>Th</th>
 						<th>F</th>
 						<th>Sa</th>
-						<th>Time</th>
+						' . ($hastime?'<th>Time</th>':'') . '
 					</tr>
 					<tr>
 						<td><input id="itm0_'.$n.'" type="checkbox" '. ($value[0] ? 'checked' : '').' /></td>
@@ -23,17 +25,18 @@ class WeekRepeatItem extends FormItem {
 						<td><input id="itm4_'.$n.'" type="checkbox" '. ($value[4] ? 'checked' : '').' /></td>
 						<td><input id="itm5_'.$n.'" type="checkbox" '. ($value[5] ? 'checked' : '').' /></td>
 						<td><input id="itm6_'.$n.'" type="checkbox" '. ($value[6] ? 'checked' : '').' /></td>
-					<td>';
-
-		$str .= '<select id="itm7_'.$n.'">';
-		foreach ($this->args['timevalues'] as $selectvalue => $selectname) {
-			$checked = $value[7] == $selectvalue;
-			$str .= '<option value="'.escapehtml($selectvalue).'" '.($checked ? 'selected' : '').' >'.escapehtml($selectname).'</option>
-				';
+					';
+		
+		if ($hastime) {
+			$str .= '<td><select id="itm7_'.$n.'">';
+			foreach ($this->args['timevalues'] as $selectvalue => $selectname) {
+				$checked = $value[7] == $selectvalue;
+				$str .= '<option value="'.escapehtml($selectvalue).'" '.($checked ? 'selected' : '').' >'.escapehtml($selectname).'</option>
+					';
+			}
+			$str .= '</select></td>';
 		}
-		$str .= '</select>';
-
-		$str .=		'</td>
+		$str .=		'
 					</tr>
 				</table>
 				<script type="text/javascript" language="javascript">
@@ -42,14 +45,14 @@ class WeekRepeatItem extends FormItem {
 						var values = Array();
 						for(var i=0;i < 7;i++) {
 							values.push($("itm" + i + "_" +  n).checked);
-						}
-						values.push($("itm7_" +  n).getValue());
-						$(n).value = values.toJSON();
+						}' .
+						($hastime?'values.push($("itm7_" +  n).getValue());':'') .
+						'$(n).value = values.toJSON();
 						form_do_validation($("' . $this->form->name . '"), $("' . $n . '"));
 					}
 					document.observe("dom:loaded", function() {
 						var n = "' .$n. '";
-						for(var i=0;i < 8;i++) {
+						for(var i=0;i < ' . ($hastime?'8':'7') . ';i++) {
 							$("itm" + i + "_"+ n).observe("change",makerepeat);
 						}
 					});
