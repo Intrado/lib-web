@@ -15,12 +15,13 @@ class Import extends DBMappedObject {
 	var $updatemethod;
 	var $lastrun;
 	var $datamodifiedtime;
+	var $datalength;
 	var $skipheaderlines = 0;
 
 	function Import ($id = NULL) {
 		$this->_allownulls = true;
 		$this->_tablename = "import";
-		$this->_fieldlist = array("uploadkey","userid", "listid", "name", "description", "notes", "status", "type","datatype","ownertype", "updatemethod", "lastrun","datamodifiedtime","skipheaderlines");
+		$this->_fieldlist = array("uploadkey","userid", "listid", "name", "description", "notes", "status", "type","datatype","ownertype", "updatemethod", "lastrun","datamodifiedtime","datalength","skipheaderlines");
 		//call super's constructor
 		DBMappedObject::DBMappedObject($id);
 	}
@@ -35,7 +36,9 @@ class Import extends DBMappedObject {
 
 
 	function upload ($data) {
-		return QuickUpdate("update import set data=?, datamodifiedtime=now() where id=?", false, array($data, $this->id));
+		$this->datalength = strlen($data);
+		error_log("Data Length " . $this->datalength);
+		return QuickUpdate("update import set data=?,datalength=?,datamodifiedtime=now() where id=?", false, array($data,$this->datalength,$this->id));
 	}
 
 	function download () {
