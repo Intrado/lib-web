@@ -28,16 +28,9 @@ if (!$server->hostname)
 
 // Form Items
 $formdata = array();
-$formdata["jmxproxy"] = array( 
-		"label" => _L('JMX Proxy Host'),
-		"value" => $service->getAttribute("jmxproxy", $SETTINGS['servermanagement']['defaultjmxproxy']),
-		"validators" => array(array("ValRequired")),
-		"control" => array("TextField", "maxlength"=>255, "size"=>50),
-		"helpstep" => 1
-	);
-$formdata["jmxport"] = array( 
-		"label" => _L('JMX Port'),
-		"value" => $service->getAttribute("jmxport", "3123"),
+$formdata["jettyport"] = array( 
+		"label" => _L('Jetty Port'),
+		"value" => $service->getAttribute("jettyport", "8086"),
 		"validators" => array(
 			array("ValRequired"),
 			array("ValNumber", "min"=>1000, "max"=>65000)),
@@ -87,8 +80,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		
 		$service->notes = $postdata['notes'];
 		$service->update(array("notes"));
-		$service->setAttribute("jmxproxy", $postdata['jmxproxy']);
-		$service->setAttribute("jmxport", $postdata['jmxport']);
+		$service->setAttribute("jettyport", $postdata['jettyport']);
 		$service->setAttribute("jmxrestartcmd", $postdata['jmxrestartcmd']);
 		
 		Query("COMMIT");

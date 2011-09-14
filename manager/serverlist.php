@@ -27,25 +27,6 @@ if (isset($_GET['id']) && isset($_GET['delete'])) {
 	redirect();
 }
 
-if (isset($_GET['id']) && isset($_GET['csrestart'])) {
-	$jolokiaProxy = $SETTINGS['servermanagement']['jmxproxy'];
-	$server = new Server($_GET['id'] + 0);
-	if ($server->id) {
-		$name = escapeshellarg($server->hostname);
-		$port = escapeshellarg($server->getSetting("commsuitejmxport",3100));
-		$cmd = "jmx4perl $jolokiaProxy --target service:jmx:rmi://$name:$port/jndi/rmi://$name:$port/jmxrmi ".
-			"exec org.tanukisoftware.wrapper:type=WrapperManager restart 2>&1";
-		$shelloutput = exec($cmd, $cmdoutput, $cmdretval);
-		$_SESSION['csrestart'] = array();
-		$_SESSION['csrestart'][] = array(
-			'name' => $name,
-			'cmd' => $cmd,
-			'retval' => $cmdretval,
-			'shelloutput' => $shelloutput,
-			'output' => $cmdoutput);
-		redirect();
-	}
-}
 ////////////////////////////////////////////////////////////////////////////////
 // Formatters
 ////////////////////////////////////////////////////////////////////////////////

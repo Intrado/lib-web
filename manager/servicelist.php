@@ -9,6 +9,7 @@ require_once("../inc/utils.inc.php");
 require_once("../inc/table.inc.php");
 require_once("Server.obj.php");
 require_once("Service.obj.php");
+require_once("JmxClient.obj.php");
 
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization
@@ -37,19 +38,22 @@ if (isset($_GET['id']) && isset($_GET['restart'])) {
 	$service = new Service($_GET['id'] + 0);
 	$server = new Server($service->serverid);
 	
-	$jmxproxy = escapeshellarg($service->getAttribute("jmxproxy"));
-	$hostname = escapeshellarg($server->hostname);
-	$port = escapeshellarg($service->getAttribute("jmxport"));
-	$restartcmd = $service->getAttribute("jmxrestartcmd");
-	$cmd = "jmx4perl $jmxproxy --target service:jmx:rmi://$hostname:$port/jndi/rmi://$hostname:$port/jmxrmi exec $restartcmd 2>&1";
+	$jettyport = $service->getAttribute("jettyport");
+	$hostname = $server->hostname;
+	$restartcmd = explode(" ", $service->getAttribute("jmxrestartcmd"));
+	
+	$jmxclient = new JmxClient("http://$hostname:$jettyport");
+	
+	$response = $jmxclient->exec(array_shift($restartcmd), array_shift($restartcmd), $restartcmd);
+	
+	$cmd = "jmx4perl http://$hostname:$jettyport/jolokia exec $restartcmd 2>&1";
 	$shelloutput = exec($cmd, $cmdoutput, $cmdretval);
-	$_SESSION['servicelist']['restart'] = array();
-	$_SESSION['servicelist']['restart'][] = array(
+	$_SESSION['servicelist']['restart'] = array(
+		array(
 		'hostname' => $hostname,
-		'cmd' => $cmd,
+		'cmd' => $service->getAttribute("jmxrestartcmd"),
 		'retval' => $cmdretval,
-		'shelloutput' => $shelloutput,
-		'output' => $cmdoutput);
+		'output' => json_encode($response)));
 	redirect();
 }
 ////////////////////////////////////////////////////////////////////////////////
@@ -88,9 +92,20 @@ function fmt_actions($row,$index) {
 	return action_links($actionlinks);
 }
 
-function fmt_status($row, $index) {
-	// TODO: ajax request status via appropriate method depending on service type
-	return "TODO!";
+function fmt_version($row, $index) {
+	$service = new Service($row[0]);
+	$server = new Server($service->serverid);
+	if ($service->type == 'commsuite') {
+		$jmxclient = new JmxClient("http://{$server->hostname}:{$service->getAttribute("jettyport", 8086)}");
+		$response = $jmxclient->read("commsuite:name=version");
+		if ($response) {
+			$tag = $response['build.tag'];
+			$date = $response['build.date'];
+			return "$tag, $date";
+		} else {
+			return "<div style='background:red'>ERROR</div>";
+		}
+	}
 }
 
 function fmt_retval($row, $index) {
@@ -123,27 +138,24 @@ if (!$server->hostname)
 // TODO: commsuite service status field
 $titles = array("1" => "Type",
 		"2" => "Mode",
-		"status" => "Status",
-		"4" => "@Version",
+		"version" => "Version",
 		"actions" => "Actions",
 		"3" => "Notes");
 
 $formatters = array("1" => "fmt_type",
 		"2" => "fmt_runmode",
 		"3" => "fmt_notes",
-		"status" => "fmt_status",
+		"version" => "fmt_version",
 		"actions" => "fmt_actions");
 
-$data = QuickQueryMultiRow("select s.id, s.type, s.runmode, s.notes, 
-		(select value from serviceattribute where serviceid = s.id and name = 'version') as version 
+$data = QuickQueryMultiRow("select s.id, s.type, s.runmode, s.notes 
 		from service s where s.serverid = ?", false, false, array($server->id));
 
 $cmdtitles = array("hostname" => "Hostname",
 		"retval" => "Status",
 		"output" => "Output");
 
-$cmdformatters = array("retval" => "fmt_retval",
-		"output" => "fmt_cmdoutput");
+$cmdformatters = array("retval" => "fmt_retval");
 
 ////////////////////////////////////////////////////////////////////////////////
 // Display
