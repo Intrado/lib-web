@@ -31,7 +31,7 @@ class Service extends DBMappedObject{
 	}
 	
 	static function getRunModes() {
-		return array('all'=>'All','active'=>'Active','standby'=>'Standby','testing'=>'Testing');
+		return array('all'=>'All','active'=>'Active','standby'=>'Standby');
 	}
 	
 	static function getTypes() {
