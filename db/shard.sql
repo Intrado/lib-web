@@ -429,4 +429,5 @@ CREATE TABLE `smsleasetask` (
   KEY `leasetime` (`leasetime`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
+ALTER TABLE `smsjobtask` CHANGE `lastresult` `lastresult` enum('sent','unsent','fail','tempfail') default 'unsent' ;
 
