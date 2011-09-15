@@ -64,6 +64,7 @@ $cvs = new CvsServer($SETTINGS['servermanagement']['cvsurl']);
 $file = $cvs->co("{$server->hostname}/{$server->runmode}/{$service->type}/service.properties");
 if ($file) {
 	readfile($file);
+	$cvs->cleanupTempFiles();
 } else {
 	header("HTTP/1.0 404 Not Found");
 	echo "<h1>Requested properties file was not found.</h1>";
