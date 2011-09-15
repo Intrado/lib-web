@@ -28,9 +28,9 @@ if (!$server->hostname)
 
 // Form Items
 $formdata = array();
-$formdata["todo"] = array( 
-		"label" => _L('TODO'),
-		"value" => "",
+$formdata["versionurl"] = array( 
+		"label" => _L('Version Url'),
+		"value" => $service->getAttribute("versionurl", ""),
 		"validators" => array(array("ValRequired")),
 		"control" => array("TextField", "maxlength"=>255, "size"=>50),
 		"helpstep" => 1
@@ -69,6 +69,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		$postdata = $form->getData(); //gets assoc array of all values {name:value,...}
 		Query("BEGIN");
 		
+		$service->setAttribute("versionurl", $postdata['versionurl']);
 		$service->notes = $postdata['notes'];
 		$service->update(array("notes"));
 		

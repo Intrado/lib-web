@@ -51,7 +51,7 @@ if (isset($_GET['id']) && isset($_GET['restart'])) {
 		'hostname' => $hostname,
 		'cmd' => $service->getAttribute("jmxrestartcmd"),
 		'retval' => isset($response['error']),
-		'output' => isset($response['value'])?$response['value']:$response['error']));
+		'output' => isset($response['error'])?$response['error']:$response['value']));
 	redirect();
 }
 ////////////////////////////////////////////////////////////////////////////////
@@ -82,27 +82,48 @@ function fmt_actions($row,$index) {
 	$actionlinks = array();
 	$actionlinks[] = action_link("Edit", "application_edit","serviceedit.php?id=$row[0]");
 	$actionlinks[] = action_link("Delete", "application_delete","servicelist.php?id=$row[0]&delete","return confirmDelete();");
-	$actionlinks[] = action_link("Props", "application_key","serviceprops.php?id=$row[0]");
-	if (in_array($service->type, array("commsuite")))
+	if (in_array($service->type, array("commsuite"))) {
+		$actionlinks[] = action_link("Props", "application_key","serviceprops.php?id=$row[0]");
 		$actionlinks[] = action_link("Restart", "application_lightning","servicelist.php?id=$row[0]&restart");
-		
+	}
 	return action_links($actionlinks);
 }
 
 function fmt_version($row, $index) {
 	$service = new Service($row[0]);
 	$server = new Server($service->serverid);
-	if ($service->type == 'commsuite') {
-		$jmxclient = new JmxClient("http://{$server->hostname}:{$service->getAttribute("jettyport", 8086)}");
-		$response = $jmxclient->read("commsuite:name=version");
-		if (!isset($response['error']) && isset($response['value'])) {
-			$tag = $response['value']['build.tag'];
-			$date = $response['value']['build.date'];
-			return "$tag, $date";
-		} else {
-			// TODO: mouseover show error
-			return "<div style='background:red'>ERROR</div>";
-		}
+	switch ($service->type) {
+		case 'commsuite':
+			$jmxclient = new JmxClient("http://{$server->hostname}:{$service->getAttribute("jettyport", 8086)}");
+			$response = $jmxclient->read("commsuite:name=version");
+			if (!isset($response['error']) && isset($response['value'])) {
+				$tag = $response['value']['build.tag'];
+				$date = $response['value']['build.date'];
+				return "$tag, $date";
+			} else {
+				// TODO: mouseover show error
+				return "<div style='background:red'>ERROR</div>";
+			}
+		
+		case 'kona':
+			$fp = @fopen($service->getAttribute('versionurl'), 'r');
+			if ($fp) {
+				$tag = $date = "";
+				while ($line = fgets($fp)) {
+					$data = explode("=", $line);
+					if ($data[0] == 'build.tag')
+						$tag = $data[1];
+					if ($data[0] == 'build.date')
+						$date = $data[1];
+				}
+				fclose($fp);
+				return "$tag, $date";
+			} else {
+				// TODO: mouseover show error
+				return "<div style='background:red'>ERROR</div>";
+			}
+		default:
+			return "";
 	}
 }
 
