@@ -46,21 +46,18 @@ if (isset($_GET['id']) && isset($_GET['restart'])) {
 	
 	$response = $jmxclient->exec(array_shift($restartcmd), array_shift($restartcmd), $restartcmd);
 	
-	$cmd = "jmx4perl http://$hostname:$jettyport/jolokia exec $restartcmd 2>&1";
-	$shelloutput = exec($cmd, $cmdoutput, $cmdretval);
 	$_SESSION['servicelist']['restart'] = array(
 		array(
 		'hostname' => $hostname,
 		'cmd' => $service->getAttribute("jmxrestartcmd"),
-		'retval' => $cmdretval,
-		'output' => json_encode($response)));
+		'retval' => isset($response['error']),
+		'output' => isset($response['value'])?$response['value']:$response['error']));
 	redirect();
 }
 ////////////////////////////////////////////////////////////////////////////////
 // Formatters
 ////////////////////////////////////////////////////////////////////////////////
 function fmt_notes($row, $index){
-	// TODO: mouse over display
 	return '<div style="max-height:70px; overflow:auto;">'. escapehtml($row[$index]). '</div>';
 }
 
@@ -98,11 +95,12 @@ function fmt_version($row, $index) {
 	if ($service->type == 'commsuite') {
 		$jmxclient = new JmxClient("http://{$server->hostname}:{$service->getAttribute("jettyport", 8086)}");
 		$response = $jmxclient->read("commsuite:name=version");
-		if ($response) {
-			$tag = $response['build.tag'];
-			$date = $response['build.date'];
+		if (!isset($response['error']) && isset($response['value'])) {
+			$tag = $response['value']['build.tag'];
+			$date = $response['value']['build.date'];
 			return "$tag, $date";
 		} else {
+			// TODO: mouseover show error
 			return "<div style='background:red'>ERROR</div>";
 		}
 	}
