@@ -68,9 +68,9 @@ if ($server->hostname) {
 // Form Items
 $formdata = array();
 if ($server->hostname)
-	$pagetitle = "Edit existing server entry";
+	$pagetitle = _L("Edit server %s", $server->hostname);
 else
-	$pagetitle = "Create new server entry";
+	$pagetitle = "Create new server";
 $formdata[] = $pagetitle;
 $formdata["name"] = array( 
 		"label" => _L('Host Name'),
@@ -157,7 +157,7 @@ include_once("nav.inc.php");
 </script>
 <?
 
-startWindow(_L('Individual Server'));
+startWindow(_L('Server'));
 echo $form->render();
 endWindow();
 include_once("navbottom.inc.php");

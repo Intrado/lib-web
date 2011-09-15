@@ -27,7 +27,7 @@ if (!$server->hostname)
 	exit("Missing/Invalid server id!");
 
 // Form Items
-$formdata = array();
+$formdata = array(_L('Host: %1$s, Service: %2$s, Mode: %3$s', $server->hostname, $service->type, $service->runmode));
 $formdata["versionurl"] = array( 
 		"label" => _L('Version Url'),
 		"value" => $service->getAttribute("versionurl", ""),
@@ -84,12 +84,12 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 ////////////////////////////////////////////////////////////////////////////////
 // Display
 ////////////////////////////////////////////////////////////////////////////////
-$PAGE = "service:new";
+$PAGE = "service:edit";
 $TITLE = _L('Edit Service');
 
 include_once("nav.inc.php");
 
-startWindow(_L('Host: %1$s Service: %2$s Mode: %3$s', $server->hostname, $service->type, $service->runmode));
+startWindow(_L("Edit Service Profile"));
 echo $form->render();
 endWindow();
 include_once("navbottom.inc.php");

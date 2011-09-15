@@ -21,7 +21,7 @@ if (!$propsfile) {
 }
 
 // Form Items
-$formdata = array();
+$formdata = array(_L('Host: %1$s, Service: %2$s, Mode: %3$s', $server->hostname, $service->type, $service->runmode));
 $formdata["propsfile"] = array(
 	"label" => "Properties",
 	"value" => file_get_contents($propsfile),

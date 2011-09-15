@@ -182,7 +182,7 @@ if (isset($_SESSION['servicelist']['restart'])) {
 	endWindow();
 	unset($_SESSION['servicelist']['restart']);
 }
-startWindow(_L('%s Service List', $server->hostname));
+startWindow(_L('%s Service Profile List', $server->hostname));
 ?><table>
 <?
 showTable($data, $titles, $formatters);
@@ -191,7 +191,7 @@ showTable($data, $titles, $formatters);
 endWindow();
 startWindow(_L('Actions'));
 button_bar(
-	icon_button("New Service", "add", null, "servicenew.php?serverid=". $server->id),
+	icon_button("New Service Profile", "add", null, "servicenew.php?serverid=". $server->id),
 	icon_button("Server List", "arrow_undo", null, "serverlist.php"));
 endWindow();
 include_once("navbottom.inc.php");

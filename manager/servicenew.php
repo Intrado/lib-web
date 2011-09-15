@@ -36,7 +36,7 @@ if (!$server->hostname)
 	exit("Missing/Invalid server id!");
 
 // Form Items
-$formdata = array(_L("%s New Service", $server->hostname));
+$formdata = array(_L("%s New Service Profile", $server->hostname));
 $formdata["type"] = array( 
 		"label" => _L('Service Type'),
 		"value" => "",
@@ -107,11 +107,11 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 // Display
 ////////////////////////////////////////////////////////////////////////////////
 $PAGE = "service:new";
-$TITLE = _L('Create Service');
+$TITLE = _L('Create Service Profile');
 
 include_once("nav.inc.php");
 
-startWindow(_L('New Service'));
+startWindow(_L('New Service Profile'));
 echo $form->render();
 endWindow();
 include_once("navbottom.inc.php");
