@@ -6,32 +6,6 @@ if (!$MANAGERUSER->authorized("manageserver"))
 	exit("Not Authorized");
 
 ////////////////////////////////////////////////////////////////////////////////
-// Functions, Form Items And Validators
-////////////////////////////////////////////////////////////////////////////////
-function parseCommSuiteProperties($filepath) {
-	$props = array();
-	$f = fopen($filepath, "r");
-	while ($line = fgets($f)) {
-		// TODO: parse out special comments that provide validators or a list of values
-		if (trim($line) && substr($line, 0, 1) != "#") {
-			$equalspos = strpos($line,"=");
-			$name = substr($line, 0, $equalspos);
-			$value = substr($line, $equalspos + 1);
-			
-			$dotpos = strpos($name,".");
-			$section = substr($name, 0, $dotpos);
-			$shortname = substr($name, $dotpos + 1);
-			
-			if (!isset($props[$section]))
-				$props[$section] = array();
-			
-			$props[$section][$shortname] = $value;
-		}
-	}
-	return $props;
-}
-
-////////////////////////////////////////////////////////////////////////////////
 // Form Data
 ////////////////////////////////////////////////////////////////////////////////
 $server = new Server($service->serverid);
@@ -39,36 +13,24 @@ $server = new Server($service->serverid);
 $cvs = new CvsServer($SETTINGS['servermanagement']['cvsurl']);
 
 // check out this server's existing props file
-$file = $cvs->co("{$server->hostname}/{$service->runmode}/commsuite/service.properties");
-if ($file) {
-	$currentprops = parseCommSuiteProperties($file);
-} else {
+$propsfile = $cvs->co("{$server->hostname}/{$service->runmode}/commsuite/service.properties");
+if (!$propsfile) {
 	// server doesn't have a props file, copy the default and import it 
 	$cvs->copyDefault($server->hostname);
-	$currentprops = array();
+	$propsfile = $cvs->co("default/{$service->runmode}/commsuite/service.properties");
 }
-
-// load default props file.
-$file = $cvs->co("default/{$service->runmode}/commsuite/service.properties");
-$defaultprops = parseCommSuiteProperties($file);
-
-// merge the two, so new props show up.
-$props = array_merge($defaultprops, $currentprops);
 
 // Form Items
 $formdata = array();
-foreach ($props as $section => $sectionprops) {
-	$formdata[] = $section;
-	foreach ($sectionprops as $name => $value) {
-		$formdata["$section.$name"] = array(
-				"label" => $name,
-				"value" => $value,
-				"validators" => array(),
-				"control" => array("TextField"),
-				"helpstep" => 1
-			);
-	}
-}
+$formdata["propsfile"] = array(
+	"label" => "Properties",
+	"value" => file_get_contents($propsfile),
+	"validators" => array(),
+	"control" => array("TextArea", "cols"=> "120", "rows"=>"40"),
+	"helpstep" => 1
+);
+
+$cvs->cleanupTempFiles();
 
 $helpsteps = array ();
 
@@ -95,7 +57,14 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 	} else if (($errors = $form->validate()) === false) { //checks all of the items in this form
 		$postdata = $form->getData(); //gets assoc array of all values {name:value,...}
 		
-		// TODO: commit the new props file
+		// check out file, overwrite with formdata, commit file
+		$propsfile = $cvs->co("{$server->hostname}/{$service->runmode}/commsuite/service.properties");
+		$fp = fopen($propsfile, "w");
+		fwrite($fp, $postdata['propsfile']);
+		fclose($fp);
+		
+		$cvs->commit("{$server->hostname}/{$service->runmode}/commsuite/service.properties");
+		$cvs->cleanupTempFiles();
 		
 		if ($ajax)
 			$form->sendTo("servicelist.php");
