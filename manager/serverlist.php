@@ -58,13 +58,6 @@ function fmt_retval($row, $index) {
 		return '<div style="color:red;">Failed!</div>';
 }
 
-function fmt_cmdoutput($row, $index) {
-	$html = '<div style="max-height:70px; overflow:auto;">';
-	foreach ($row[$index] as $output)
-		$html .= escapehtml($output). "<br>";
-	$html .= '</div>';
-	return $html;
-}
 ////////////////////////////////////////////////////////////////////////////////
 // Data
 ////////////////////////////////////////////////////////////////////////////////
@@ -86,27 +79,26 @@ $data = QuickQueryMultiRow("select s.id, s.hostname, s.notes, s.runmode,
 			where s.runmode != 'testing' and serverid = s.id and (runmode = s.runmode || runmode = 'all')) as services 
 		from server s", false, false, array());
 
-$cmdtitles = array("name" => "Hostname",
+$cmdtitles = array("hostname" => "Hostname",
 		"retval" => "Status",
 		"output" => "Output");
 
-$cmdformatters = array("retval" => "fmt_retval",
-		"output" => "fmt_cmdoutput");
+$cmdformatters = array("retval" => "fmt_retval");
 
 ////////////////////////////////////////////////////////////////////////////////
 // Display
 ////////////////////////////////////////////////////////////////////////////////
 include_once("nav.inc.php");
 
-if (isset($_SESSION['csrestart'])) {
+if (isset($_SESSION['servicebulkrestart'])) {
 	startWindow(_L('Command Status'));
 	?><table>
 	<?
-	showTable($_SESSION['csrestart'], $cmdtitles, $cmdformatters);
+	showTable($_SESSION['servicebulkrestart'], $cmdtitles, $cmdformatters);
 	?></table>
 	<?
 	endWindow();
-	unset($_SESSION['csrestart']);
+	unset($_SESSION['servicebulkrestart']);
 }
 startWindow(_L('Server List'));
 ?><table>
