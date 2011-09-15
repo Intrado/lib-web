@@ -134,13 +134,6 @@ function fmt_retval($row, $index) {
 		return '<div style="color:red;">Failed!</div>';
 }
 
-function fmt_cmdoutput($row, $index) {
-	$html = '<div style="max-height:70px; overflow:auto;">';
-	foreach ($row[$index] as $output)
-		$html .= escapehtml($output). "<br>";
-	$html .= '</div>';
-	return $html;
-}
 ////////////////////////////////////////////////////////////////////////////////
 // Data
 ////////////////////////////////////////////////////////////////////////////////
