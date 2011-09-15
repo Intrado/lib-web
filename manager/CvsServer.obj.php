@@ -41,10 +41,11 @@ class CvsServer {
 	
 	// copy default project into new project
 	function copyDefault($project) {
+		global $MANAGERUSER;
 		$tmpdir = $this->getTempDir();
 		$cmd = $this->getEnvironment(). " && ".
-			" cd $tmpdir && cvs -Q export -rHEAD -d $project default && ".
-			" cd $project && cvs -Q import -m \"$MANAGERUSER : initial\" $project cvs initial 2>&1";
+			" cd $tmpdir && cvs -Q export -rHEAD -d $project default 2>&1 && ".
+			" cd $project && cvs -Q import -m \"{$MANAGERUSER->login} : initial\" $project cvs initial 2>&1";
 		
 		exec($cmd, $output, $retval);
 		
