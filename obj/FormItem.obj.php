@@ -154,7 +154,8 @@ class TextArea extends FormItem {
 		$n = $this->form->name."_".$this->name;
 		$rows = isset($this->args['rows']) ? 'rows="'.$this->args['rows'].'"' : "";
 		$cols = isset($this->args['cols']) ? 'cols="'.$this->args['cols'].'"' : "";
-		$str = '<textarea id="'.$n.'" name="'.$n.'" '.$rows.' '.$cols.'/>'.escapehtml($value).'</textarea>';
+		$spellcheck = (isset($this->args['spellcheck']) && $this->args['spellcheck'] == false) ? 'spellcheck="false"' : "";
+		$str = '<textarea id="'.$n.'" name="'.$n.'" '.$rows.' '.$cols.' '.$spellcheck.'/>'.escapehtml($value).'</textarea>';
 		if(isset($this->args['counter'])) {
 			$str .= '<div id="' . $n . 'charsleft">'._L('Characters remaining'). ':&nbsp;'. ( $this->args['counter'] - mb_strlen($value)). '</div>
 				<script>

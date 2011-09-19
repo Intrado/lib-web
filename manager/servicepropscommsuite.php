@@ -26,7 +26,7 @@ $formdata["propsfile"] = array(
 	"label" => "Properties",
 	"value" => file_get_contents($propsfile),
 	"validators" => array(),
-	"control" => array("TextArea", "cols"=> "120", "rows"=>"40"),
+	"control" => array("TextArea", "cols"=> "120", "rows"=>"40", "spellcheck"=>false),
 	"helpstep" => 1
 );
 
