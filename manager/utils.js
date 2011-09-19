@@ -242,14 +242,6 @@ function setDependentVisibility (parent,marker,visability) {
 	modifyMarkedNodes(parent,'dependson',marker,setvisability);
 }
 
-function setColVisability (table,col,visability) {
-	//visible table cells use "" for display property, not "block"
-	var newdisplay = visability ? "" : "none";
-	var rows = table.rows;
-	for (var i = 0, length = rows.length; i < length ; i++) {
-		rows[i].cells[col].style.display = newdisplay;
-	}
-}
 
 function modifyMarkedNodes (parent,attribute,marker,callback) {
 	var children = parent.childNodes;
@@ -274,7 +266,7 @@ function dofieldbox (img, init, field, saved) {
 }
 
 function toggleHiddenField(i){
-	var checkbox = new getObj("hiddenfield".concat(i)).obj;
+	var checkbox = $("hiddenfield".concat(i));
 	checkbox.checked = !checkbox.checked;
 }
 
