@@ -269,7 +269,7 @@ if (count($data)) {
 	show_row_filter('customer_dm_table', $data, $titles, $filterTitles, $filterFormatters);
 	?></td><td valign="top"><?
 	// Show the column data hide/select check boxes.
-	show_column_selector('customer_dm_table', $titles, $lockedTitles);
+	show_column_selector('customer_dm_table', $titles, $lockedTitles,"systemdms");
 	
 	?>
 	<div style="margin: 10px;">Total resources: <?= ($resactin + $resactout) ?>/<?= $restotal?>
@@ -287,7 +287,7 @@ if (count($data)) {
 	</table>
 	<table class="list sortable" id="customer_dm_table">
 	<?
-		showTable($data, $titles, $formatters);
+		showTable($data, $titles, $formatters,array(),null,"systemdms");
 	?>
 	</table>
 	<script type="text/javascript">

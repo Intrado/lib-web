@@ -337,12 +337,12 @@ if (count($data)) {
 	// show the row data filters
 	show_row_filter('customer_dm_table', $data, $titles, $filterTitles, $filterFormatters);
 	// Show the column data hide/select check boxes.
-	show_column_selector('customer_dm_table', $titles, $lockedTitles);
+	show_column_selector('customer_dm_table', $titles, $lockedTitles,"customerdms");
 	
 	?>
 	<table class="list sortable" id="customer_dm_table">
 	<?
-	showTable($data, $titles, $formatters);
+	showTable($data, $titles, $formatters,array(),null,"customerdms");
 	?>
 	</table>
 	

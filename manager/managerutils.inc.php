@@ -77,7 +77,7 @@ function createLimitedUser($limitedusername, $limitedpassword, $custdbname, $sha
 	}
 }
 
-function show_column_selector($tablename=null, $fields, $lockedFields=array()){
+function show_column_selector($tablename=null, $fields, $lockedFields=array(),$pagename = null){
 ?>
 	<table border="0" cellpadding="2" cellspacing="1" class="list">
 		<tr class="listHeader" align="left" valign="bottom">
@@ -98,6 +98,11 @@ function show_column_selector($tablename=null, $fields, $lockedFields=array()){
 					$displaytitle = $field;
 					$showFields[$id] = array($fieldnum, true);
 				}
+				if($pagename && isset($_SESSION['fieldview']) &&
+					 isset($_SESSION['fieldview']["$pagename:$field"])) {
+					$showFields[$id] = array($fieldnum, $_SESSION['fieldview']["$pagename:$field"]);
+				}
+				
 				if (!in_array($id, $lockedFields, true)) {
 					?><td><?=$displaytitle;?></td><?
 				}
@@ -115,26 +120,25 @@ function show_column_selector($tablename=null, $fields, $lockedFields=array()){
 					<?
 						if ($display) {
 							$result = "<img src=\"mimg/checkbox-rule.png\" " .
-									"onclick=\"var x = new getObj('hiddenfield$fieldnum'); " .
-									"if(x.obj.checked){this.src='mimg/checkbox-clear.png'}else{this.src='mimg/checkbox-rule.png'};";
+									"onclick=\"" .
+									"if($('hiddenfield$fieldnum').checked){this.src='mimg/checkbox-clear.png'}else{this.src='mimg/checkbox-rule.png'};";
 							$checked = "checked>";
 						} else {
 							$result = "<img src=\"mimg/checkbox-clear.png\" " .
-									"onclick=\"var x = new getObj('hiddenfield$fieldnum'); " .
-									"if(x.obj.checked){this.src='mimg/checkbox-clear.png'}else{this.src='mimg/checkbox-rule.png'};";
+									"onclick=\"" .
+									"if($('hiddenfield$fieldnum').checked){this.src='mimg/checkbox-clear.png'}else{this.src='mimg/checkbox-rule.png'};";
 							$checked = ">";
 						}
-
 						if($tablename == null){
 							$result .= "\">";
 						} else {
-							$result .= "toggleHiddenField('$fieldnum');" .
-									" try { setColVisability(new getObj('$tablename').obj, $fieldnum, new getObj('hiddenfield$fieldnum').obj.checked); } catch (e) {}; \">";
+							$result .= "toggleHiddenField('$fieldnum');try { setColVisability($('$tablename'), $fieldnum, $('hiddenfield$fieldnum').checked,'" . ($pagename?$pagename:"") . "','" . $fields[$id] . "'); } catch (e) {alert('exce' + e)}; \">";
 						}
 						echo $result;
 						echo "<input style='display: none;' type='checkbox' id='hiddenfield$fieldnum' " . $checked;
 					?>
-					</div></td><?
+					</div></td>
+					<?
 				}
 			}
 ?>
@@ -185,10 +189,6 @@ function show_row_filter($tablename, $data, $fields, $filterFields, $formatters)
 			}
 		}
 ?>
-		<script language="javascript">
-			var optionToDataAssociation = <?=json_encode($filterVals)?>;
-		</script>
-
 		<tr>
 <?
 
@@ -205,13 +205,15 @@ function show_row_filter($tablename, $data, $fields, $filterFields, $formatters)
 ?>
 		</tr>
 		<tr>
-			<td colspan="2"><input type="button" class="button" name="filterRows" value="Apply Filters" onclick="displayRows(new getObj('<?=$tablename?>').obj);" /></td>
+			<td colspan="2">
+			<?=icon_button("Apply Filters", "magnifier","displayRows($('$tablename'));")?>
+			</td>
 
 		</tr>
 	</table>
 
-	<script language="javascript">
-
+	<script type="text/javascript">
+	var optionToDataAssociation = <?=json_encode($filterVals)?>;
 	function displayRows(table) {
 		var filters = 0;
 		var trows = table.rows;

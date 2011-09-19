@@ -47,15 +47,22 @@ function showObjects ($data, $titles, $formatters = array(), $scrolling = false,
 	return $tableid;
 }
 
-function showTable ($data, $titles, $formatters = array(), $repeatedColumns = array(), $groupby = null) {
+function showTable ($data, $titles, $formatters = array(), $repeatedColumns = array(), $groupby = null,$pagename = null) {
 	//use sparse array to use isset later
 	$hiddencolumns = array();
 	echo '<tr class="listHeader">';
 	foreach ($titles as $index => $title) {
 
 		echo '<th align="left" ';
+		
+		// Allow sticky show/hide between page reloads column selector will set session data for the page/field value
+		$fieldview = null;
+		if ($pagename && isset($_SESSION['fieldview']) && isset($_SESSION['fieldview']["$pagename:$title"])) {
+			$fieldview = $_SESSION['fieldview']["$pagename:$title"];
+		}
+		
 		// make column hidden
-		if(strpos($title,"@") !== false){
+		if($fieldview === null && strpos($title,"@") !== false || $fieldview === false){
 			echo ' style="display:none" ';
 			$hiddencolumns[$index] = true;
 		}
