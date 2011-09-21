@@ -15,7 +15,7 @@ class Import extends DBMappedObject {
 	var $updatemethod;
 	var $lastrun;
 	var $datamodifiedtime;
-	var $datalength;
+	var $datalength = 0;
 	var $skipheaderlines = 0;
 
 	function Import ($id = NULL) {
@@ -37,7 +37,6 @@ class Import extends DBMappedObject {
 
 	function upload ($data) {
 		$this->datalength = strlen($data);
-		error_log("Data Length " . $this->datalength);
 		return QuickUpdate("update import set data=?,datalength=?,datamodifiedtime=now() where id=?", false, array($data,$this->datalength,$this->id));
 	}
 
