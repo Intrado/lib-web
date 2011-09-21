@@ -98,10 +98,6 @@ function show_column_selector($tablename=null, $fields, $lockedFields=array(),$p
 					$displaytitle = $field;
 					$showFields[$id] = array($fieldnum, true);
 				}
-				if($pagename && isset($_SESSION['fieldview']) &&
-					 isset($_SESSION['fieldview']["$pagename:$field"])) {
-					$showFields[$id] = array($fieldnum, $_SESSION['fieldview']["$pagename:$field"]);
-				}
 				
 				if (!in_array($id, $lockedFields, true)) {
 					?><td><?=$displaytitle;?></td><?
@@ -146,6 +142,21 @@ function show_column_selector($tablename=null, $fields, $lockedFields=array(),$p
 	</table>
 <?
 }
+
+// Check session for sticky columns and set prefix on titles array
+function setStickyColumns(&$titles,$pagename) {
+	foreach($titles as $key => $title ) {
+		$displaytitle = ltrim($title,"@#");
+		if (isset($_SESSION['fieldview']) && isset($_SESSION['fieldview']["$pagename:$displaytitle"])) {
+			if ($_SESSION['fieldview']["$pagename:$displaytitle"] && strpos($title,"@") === 0){
+				$titles[$key] = substr($title,1);
+			} else if (!$_SESSION['fieldview']["$pagename:$displaytitle"] && strpos($title,"@") !== 0) {
+				$titles[$key] = "@$title";
+			}
+		}
+	}
+}
+
 
 function show_row_filter($tablename, $data, $fields, $filterFields, $formatters) {
 ?>

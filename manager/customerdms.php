@@ -291,6 +291,9 @@ $titles[10] = "@#Cmd";
 $titles[17] = "#Notes";
 $titles["actions"] = "Actions";
 
+// Set hidden prefix from sticky session variable
+setStickyColumns($titles,"customerdms");
+
 // Do not provide a checkbox to hide these columns.
 $lockedTitles = array(0, "status", "actions", 2, 3);
 
@@ -342,7 +345,7 @@ if (count($data)) {
 	?>
 	<table class="list sortable" id="customer_dm_table">
 	<?
-	showTable($data, $titles, $formatters,array(),null,"customerdms");
+	showTable($data, $titles, $formatters);
 	?>
 	</table>
 	
