@@ -225,12 +225,15 @@ function setDependentVisibility (parent,marker,visability) {
 	modifyMarkedNodes(parent,'dependson',marker,setvisability);
 }
 
-function setColVisability (table,col,visability) {
+function setColVisability (table,col,visability,page,field) {
 	//visible table cells use "" for display property, not "block"
 	var newdisplay = visability ? "" : "none";
 	var rows = table.rows;
 	for (var i = 0, length = rows.length; i < length ; i++) {
 		rows[i].cells[col].style.display = newdisplay;
+	}
+	if (page != undefined && page != "" && field != undefined && field != "") {
+		new Ajax.Request('ajax.php',{method:'post',parameters:{type: 'setfieldview',page:page,field:field,value:visability}});
 	}
 }
 
