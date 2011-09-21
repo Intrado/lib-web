@@ -1,4 +1,6 @@
 <?
+global $SESSION_READONLY;
+$SESSION_READONLY = true;
 
 $SETTINGS = parse_ini_file("inc/settings.ini.php",true);
 

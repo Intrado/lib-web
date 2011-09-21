@@ -169,8 +169,22 @@ function blocksms($sms, $action, $notes) {
 	return false;
 }
 
+function getSessionDataReadOnly($id) {
+	$params = array(new XML_RPC_Value($id, 'string'), new XML_RPC_Value(true, 'boolean'));
+	$method = "AuthServer.getSessionData";
+	$result = pearxmlrpc($method, $params);
+	if ($result !== false) {
+		// success
+		$sess_data = base64url_decode($result['sessionData']);
+		if (doDBConnect($result)) return $sess_data;
+	} else {
+		error_log_helper("ERROR trying to getSessionDataReadOnly for '$id'");
+	}
+	return "";
+}
+
 function getSessionData($id) {
-	$params = array(new XML_RPC_Value($id, 'string'));
+	$params = array(new XML_RPC_Value($id, 'string'), new XML_RPC_Value(false, 'boolean'));
 	$method = "AuthServer.getSessionData";
 	$result = pearxmlrpc($method, $params);
 	if ($result !== false) {

@@ -12,12 +12,20 @@ function sess_close()
 
 function sess_read($id)
 {
-  return (string) getSessionData($id);
+  global $SESSION_READONLY;
+  if ($SESSION_READONLY === true)
+    return (string) getSessionDataReadOnly($id);
+  else
+    return (string) getSessionData($id);
 }
 
 function sess_write($id, $sess_data)
 {
-  return putSessionData($id, $sess_data);
+  global $SESSION_READONLY;
+  if ($SESSION_READONLY == true)
+    return true;
+  else
+    return putSessionData($id, $sess_data);
 }
 
 function sess_destroy($id)
