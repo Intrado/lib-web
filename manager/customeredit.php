@@ -1160,8 +1160,12 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 			QuickUpdate("update qreportsubscription set timezone=? where customerid=?", $sharddb,array($postdata["timezone"],$customerid));
 		}
 		
-		if (!$postdata["enabled"])
-		setCustomerSystemSetting("disablerepeat", "1", $custdb);
+		if (!$postdata["enabled"]) {
+			setCustomerSystemSetting("disablerepeat", "1", $custdb);
+			setCustomerSystemSetting("_customerenabled", "0", $custdb);
+		} else {
+			setCustomerSystemSetting("_customerenabled", "1", $custdb);
+		}
 		
 		
 		if(getCustomerSystemSetting('_dmmethod', '', true, $custdb)!='asp' && $postdata["dmmethod"] == 'asp'){
