@@ -20,9 +20,10 @@ if (!$MANAGERUSER->authorized("manageserver"))
 ////////////////////////////////////////////////////////////////////////////////
 // Action/Request Processing
 ////////////////////////////////////////////////////////////////////////////////
-$serverid = false;
-if (isset($_GET['serverid'])) 
-	$serverid = $_GET['serverid'] + 0;
+if (isset($_GET['serverid'])) {
+	$_SESSION['servicenew'] = $_GET['serverid'] + 0;
+	redirect();
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 // Optional Form Items And Validators
@@ -31,7 +32,12 @@ if (isset($_GET['serverid']))
 ////////////////////////////////////////////////////////////////////////////////
 // Form Data
 ////////////////////////////////////////////////////////////////////////////////
+$serverid = false;
+if (isset($_SESSION['servicenew']))
+	$serverid = $_SESSION['servicenew'];
+
 $server = new Server($serverid);
+
 if (!$server->hostname)
 	exit("Missing/Invalid server id!");
 
@@ -96,6 +102,9 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		$service->create();
 		
 		Query("COMMIT");
+		
+		unset($_SESSION['servicenew']);
+		
 		if ($ajax)
 			$form->sendTo("serviceedit.php?id=". $service->id);
 		else
