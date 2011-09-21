@@ -114,12 +114,12 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 ////////////////////////////////////////////////////////////////////////////////
 // Display
 ////////////////////////////////////////////////////////////////////////////////
-$PAGE = "service:new";
-$TITLE = _L('Create Service');
+$PAGE = "service:bulkrestart";
+$TITLE = _L('Bulk Service Restart');
 
 include_once("nav.inc.php");
 
-startWindow(_L('New Service'));
+startWindow(_L('Bulk Restart Services'));
 echo $form->render();
 endWindow();
 include_once("navbottom.inc.php");
