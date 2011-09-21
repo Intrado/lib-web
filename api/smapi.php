@@ -448,19 +448,18 @@ class SMAPI {
 				return $result;
 			}
 			
-			// default is wav unless mpeg specifically sent
-			if ($mimetype == 'audio/mpeg') {
-				$fileext = ".mp3";
-			} if ($mimetype == 'audio/x-caf') {
-				$fileext = ".caf";
-			} else if ($mimetype == 'audio/3gpp') {
-				$fileext = ".3gp";
-			} else if ($mimetype == 'audio/3gpp2') {
-				$fileext = ".3g2";
-			} else {
-				$fileext = ".wav";
-			}
-
+			// Supported mimetypes and file extensions
+			$supportedmimetypes = array(
+				"audio/wav" => ".wav",
+				"audio/mpeg" => ".mp3",
+				"audio/x-caf" => ".caf",
+				"audio/3gpp" => ".3gp",
+				"audio/3gpp2" => ".3g2"
+			);
+			
+			// Check mimetype against supported mimetypes, default to wav file extension
+			$fileext = isset($supportedmimetypes[$mimetype])?$supportedmimetypes[$mimetype]:".wav";
+			
 			//generate 2 temp files
 			//write audio data to first file then run through sox to clean audio and output to second file
 			//read second file and base64 encode it for the DB
