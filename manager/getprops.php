@@ -22,7 +22,7 @@ $hostname = ($_GET['host']?$_GET['host']:false);
 $servicename = ($_GET['service']?$_GET['service']:false);
 
 // remote ip must resolve to the same hostname in the request
-if (!$hostname || gethostbyaddr($_SERVER['REMOTE_ADDR']) != $hostname) {
+if (!$hostname || gethostbyname($hostname) != $_SERVER['REMOTE_ADDR']) {
 	header("HTTP/1.0 404 Not Found");
 	echo "<h1>This client is not authorized to view requested content.</h1>";
 	exit;
