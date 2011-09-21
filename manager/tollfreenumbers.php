@@ -59,11 +59,12 @@ class ValMultiplePhones extends Validator {
 // Form Data
 ////////////////////////////////////////////////////////////////////////////////
 $helpstepnum = 1;
-$helpsteps = array("TODO");
+$helpsteps = array(_L('Multiple numbers can be added when seperated by comma'));
 
 $formdata["numbers"] = array(
 	"label" => _L('Phone Numbers'),
 	"value" => '',
+	"fieldhelp" => _L('Multiple numbers can be added when seperated by comma'),
 	"validators" => array(
 		array("ValRequired"),
 		array("ValMultiplePhones")
@@ -73,7 +74,7 @@ $formdata["numbers"] = array(
 );
 
 $buttons = array(submit_button(_L('Add'),"submit","add"));
-$form = new Form("tollfreenumbers",$formdata,false,$buttons);
+$form = new Form("tollfreenumbers",$formdata,$helpsteps,$buttons);
 
 ////////////////////////////////////////////////////////////////////////////////
 // Form Data Handling
@@ -97,7 +98,13 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		
 		//save data here	
  		$numbers = explode(",",$postdata["numbers"]);
-		QuickUpdate("insert into tollfreenumbers (phone) values " . repeatWithSeparator("(?)",",",count($numbers)),false,$numbers);	
+ 		
+ 		$parsednumbers = array();
+ 		foreach ($numbers as $number) {
+ 			$parsednumbers[] = Phone::parse($number);
+ 		}
+ 		
+		QuickUpdate("insert into tollfreenumbers (phone) values " . repeatWithSeparator("(?)",",",count($parsednumbers)),false,$parsednumbers);	
 
 		Query("COMMIT");
 		if ($ajax)
