@@ -73,8 +73,11 @@ if (isset($_GET['delete'])) {
 		}
 
 		//delete mappings
-		QuickUpdate("delete from importfield where importid=$id");
-
+		QuickUpdate("delete from importfield where importid=?",false,array($id));
+		
+		// delete any import alert rules
+		QuickUpdate("delete from importalertrule where importid=?",false,array($id));
+		
 		//delete import
 		$import->destroy();
 	Query("COMMIT");
