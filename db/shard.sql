@@ -431,3 +431,4 @@ CREATE TABLE `smsleasetask` (
 
 ALTER TABLE `smsjobtask` CHANGE `lastresult` `lastresult` enum('sent','unsent','fail','tempfail') default 'unsent' ;
 
+ALTER TABLE `importalert` ADD `importname` varchar(50) NOT NULL default '' after `importalertruleid`;
