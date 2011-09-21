@@ -110,7 +110,7 @@ $dmsettings = array(
 
 );
 $dmsettings = array_merge($dmsettings,QuickQueryList("select name,value from dmsetting where dmid=?",true,false,array($dmid)));
-$dminfo = QuickQueryRow("select name, lastip, lastseen, customerid, enablestate, type, authorizedip, lastip, notes from dm where id=?", true,false,array($dmid));
+$dminfo = QuickQueryRow("select name,dmgroupid, lastip, lastseen, customerid, enablestate, type, authorizedip, lastip, notes from dm where id=?", true,false,array($dmid));
 
 $helpstepnum = 1;
 
@@ -179,6 +179,19 @@ $formdata["testweightedresults"] = array(
 	"control" => array("TestWeightField"),
 	"helpstep" => $helpstepnum
 );
+
+if ($dmType == 'system') {
+	$dmgroups = QuickQueryList("select id, concat(carrier,' - ',state) from dmgroup",true);
+	$formdata["dmgroup"] = array(
+		"label" => _L('DM Group'),
+		"value" => $dminfo["dmgroupid"],
+		"validators" => array(
+			array("ValInArray", "values" => array_keys($dmgroups))
+		),
+		"control" => array("SelectMenu", "values" => array('' => "None") + $dmgroups),
+		"helpstep" => $helpstepnum
+	);
+}
 $helpstepnum++;
 $helpsteps[] = "TODO: Callerid";
 $formdata["callerid"] = array(
@@ -321,11 +334,13 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		);
 
 		$newcustomerid = isset($postdata["customerid"])?$postdata["customerid"] + 0:0;
+		$dmgroupid = isset($postdata["dmgroup"]) && $postdata["dmgroup"]!=''?$postdata["dmgroup"]:null;
 		QuickUpdate("update dm set	authorizedip=?,
 									customerid=?,
+									dmgroupid=?,
 									notes=?
 									where id=?",false,
-									array($postdata["authorizedip"],$newcustomerid,$postdata["notes"],$dmid));
+									array($postdata["authorizedip"],$newcustomerid,$dmgroupid,$postdata["notes"],$dmid));
 		if ($dmType == 'customer') {
 			if($dminfo['customerid'] != null && $newcustomerid != $dminfo['customerid']){
 				$custinfo = QuickQueryRow("select s.dbhost, s.dbusername, s.dbpassword from shard s inner join customer c on (c.shardid = s.id)
