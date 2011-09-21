@@ -61,7 +61,7 @@ if (!$serverid || !$serviceid) {
 }
 
 $cvs = new CvsServer($SETTINGS['servermanagement']['cvsurl']);
-$file = $cvs->co("{$server->hostname}/{$server->runmode}/{$service->type}/service.properties");
+$file = $cvs->co("{$server->hostname}/{$service->runmode}/{$service->type}/service.properties");
 if ($file) {
 	readfile($file);
 } else {
