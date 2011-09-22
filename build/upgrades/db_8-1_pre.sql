@@ -47,3 +47,14 @@ INSERT INTO `importalertcategory` (`name`) VALUES
 	('customer')
 $$$
 
+-- $rev 4
+
+-- case insensitive user logins
+ALTER TABLE `user` CHANGE `login` `login` VARCHAR( 20 ) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL 
+$$$
+
+-- fix myisam jobpost tables
+ALTER TABLE `jobpost` ENGINE = InnoDB
+$$$
+
+
