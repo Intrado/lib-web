@@ -25,6 +25,9 @@ $servicename = ($_GET['service']?$_GET['service']:false);
 if (!$hostname || gethostbyname($hostname) != $_SERVER['REMOTE_ADDR']) {
 	header("HTTP/1.0 404 Not Found");
 	echo "<h1>This client is not authorized to view requested content.</h1>";
+	
+	error_log("getprops refusing to serve client " . $_SERVER['REMOTE_ADDR'] . " expected " . gethostbyname($hostname) . " ($hostname)");
+	
 	exit;
 }
 
