@@ -182,6 +182,8 @@ function applyHtmlEditor(textarea, dontwait,target) {
 
 			CKEDITOR.replace(reusableckeditor, {
 				'customConfig': '', // Prevent ckeditor from trying to load an external configuration file, should improve startup time.
+				'disableNativeSpellChecker': false,
+				'browserContextMenuOnCtrl': true,
 				'removePlugins': 'wsc,scayt,smiley,showblocks,flash,elementspath,save',
 				'toolbar': [
 					['Print','Source'],
