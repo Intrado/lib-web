@@ -57,4 +57,6 @@ $$$
 ALTER TABLE `jobpost` ENGINE = InnoDB
 $$$
 
+-- $rev 5
+-- empty rev - use php to set _customerenabled setting
 

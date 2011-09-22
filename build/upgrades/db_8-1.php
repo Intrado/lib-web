@@ -1,5 +1,6 @@
 <?
 function upgrade_8_1 ($rev, $shardid, $customerid, $db) {
+	global $authdb;
 	
 	switch($rev) {
 		default:
@@ -14,7 +15,13 @@ function upgrade_8_1 ($rev, $shardid, $customerid, $db) {
 			apply_sql("upgrades/db_8-1_pre.sql", $customerid, $db, 3);
 		case 3:
 			echo "|";
-			apply_sql("upgrades/db_8-1_pre.sql", $customerid, $db, 4);	}
+			apply_sql("upgrades/db_8-1_pre.sql", $customerid, $db, 4);
+		case 4:
+			echo "|";
+			$customerenabled = QuickQuery("select enabled from customer where id = ?", $authdb, array($customerid));
+			QuickUpdate("insert into setting (name, value) values ('_customerenabled', ?)", $db, array($customerenabled));
+			apply_sql("upgrades/db_8-1_pre.sql", $customerid, $db, 5);	
+	}
 	
 	return true;	
 }

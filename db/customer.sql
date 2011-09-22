@@ -1663,4 +1663,9 @@ $$$
 
 -- END REV 8.1/4
 
+-- 8.1/5 inserted customer.setting _customerenabled which is set in customeredit.php for new customers
+update setting set value='8.1/5' where name='_dbversion'
+$$$
+
+-- END REV 8.1/5
 
