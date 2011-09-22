@@ -1533,7 +1533,7 @@ destination varchar(255) NOT NULL,
 posted tinyint(1) NOT NULL DEFAULT 0,
 PRIMARY KEY(jobid, type, destination),
 INDEX pagecode(destination)
-)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8
 $$$
 
 update setting set value='8.0/1' where name='_dbversion'
@@ -1648,4 +1648,19 @@ $$$
 update setting set value='8.1/3' where name='_dbversion'
 $$$
 -- END REV 8.1/3
+
+
+-- START 8.1/4
+
+-- case insensitive user logins
+ALTER TABLE `user` CHANGE `login` `login` VARCHAR( 20 ) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL 
+$$$
+
+update setting set value='8.1/4' where name='_dbversion'
+$$$
+
+-- engine for jobpost corrected above
+
+-- END REV 8.1/4
+
 
