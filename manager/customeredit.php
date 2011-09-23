@@ -377,8 +377,8 @@ $settings = array(
 					'_hasportal' => '',
 					'_hasfacebook' => '0',
 					'_hastwitter' => '0',
-					'autoreport_replyname' => '',
-					'autoreport_replyemail' => '',
+					'autoreport_replyname' => 'SchoolMessenger',
+					'autoreport_replyemail' => 'autoreport@schoolmessenger.com',
 					'_renewaldate' => '',
 					'_callspurchased' => '',
 					'_maxusers' => '',
@@ -640,7 +640,9 @@ $formdata["maxemails"] = array(
 $formdata["autoreportreplyname"] = array(
 						"label" => _L('AutoReport Name'),
 						"value" => $settings['autoreport_replyname'],
-						"validators" => array(),
+						"validators" => array(
+							array("ValRequired")
+						),
 						"control" => array("TextField","maxlength"=>255,"min"=>3,"size"=>35),
 						"helpstep" => $helpstepnum
 );
@@ -649,6 +651,7 @@ $formdata["autoreportreplyemail"] = array(
 						"label" => _L('AutoReport Email'),
 						"value" => $settings['autoreport_replyemail'],
 						"validators" => array(
+							array("ValRequired"),
 							array("ValLength","max" => 255),
 							array("ValEmail")
 						),
