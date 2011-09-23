@@ -46,7 +46,10 @@ class RestrictedValues extends FormItem {
 	
 	function render ($value) {
 		$n = $this->form->name."_".$this->name;
-
+		if (count($this->args['values']) == 0) {
+			return '<img src="img/icons/information.png" alt="Information" /> ' . _L("No Restrictable Fields");
+		}
+		
 		$label = (isset($this->args['label']) && $this->args['label'])? $this->args['label']: _L('Restrict to these fields:');
 		$restrictchecked = count($value) > 0 ? "checked" : "";
 		$str = '<input type="checkbox" id="'.$n.'-restrict" '.$restrictchecked .' onclick="restrictcheck(\''.$n.'-restrict\', \''.$n.'\')"><label for="'.$n.'-restrict">'.$label.'</label>';
@@ -132,7 +135,15 @@ $calltimes = array_merge(array("" => _L("No Restriction")),$calltimes); //prepen
 
 $FIELDMAP = array_merge(FieldMap::getMapNamesLike('f'), FieldMap::getMapNamesLike('g'), FieldMap::getMapNamesLike('c'));
 
+// Remove name and language from restricted fields
+unset($FIELDMAP["f01"]);
+unset($FIELDMAP["f02"]);
+unset($FIELDMAP["f03"]);
+
 $datafields = $obj->getValue('datafields') ? explode('|',$obj->getValue('datafields')) : array();
+
+// remove restrictions on first name,lastname and language if they exist
+$datafields = array_diff($datafields, array("f01","f02","f03")); 
 
 $published = $obj->getValue('publish') ? explode('|',$obj->getValue('publish')) : array();
 $subscribed = $obj->getValue('subscribe') ? explode('|',$obj->getValue('subscribe')) : array();
