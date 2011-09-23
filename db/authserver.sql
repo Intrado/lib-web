@@ -448,4 +448,5 @@ CREATE TABLE `serviceattribute` (
   PRIMARY KEY (`serviceid`,`name`)
 ) ENGINE=InnoDB;
 
+ALTER TABLE `aspadminuser` ADD `deleted` tinyint(4) NOT NULL default '0';
 
