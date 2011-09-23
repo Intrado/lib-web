@@ -201,45 +201,6 @@ function passwordcheck($password){
 
 	return false;
 }
-/**
-	returns false if password is complex
-	returns msg string if password is not complex
-	Php.ini setup:
-		extension=php_crack.dll must not be commented out
-		To add default crack library, add this line to php.ini:
-			crack.default_dictionary = "/usr/share/cracklib"
-		The location of the cracklib directory may differ.
-*/
-function isNotComplexPass($pass) {
-
-	// Perform password check
-	$check = crack_check($pass);
-	if($check) {
-		return false;
-	} else {
-		$diag = crack_getlastmessage();
-		switch($diag){
-			case "it is based on a dictionary word":
-				return("The password is based on a word from the dictionary");
-			case "it is based on a (reversed) dictionary word":
-				return("The password is based on a reversed word from the dictionary");
-			case "it is too simplistic/systematic":
-				return("The password is too simplistic/systematic");
-			case "it is all whitespace":
-				return("The password cannot contain spaces");
-			case "it does not contain enough DIFFERENT characters":
-				return("The password needs more different characters");
-			case "it is too short":
-				return("The password needs to be at least 6 characters long");
-			case "it's WAY too short":
-				return("The password needs to be at least 6 characters long");
-			case "it looks like a National Insurance number.":
-				return false;
-			default:
-				return("Password is too weak");
-		}
-	}
-}
 
 function isSequential($number){
 	$isseq = 0;

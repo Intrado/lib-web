@@ -136,10 +136,6 @@ class ValPassword extends Validator {
 		if (!$this->passwordcheck($value))
 			return "$this->label ". _L("is invalid.") ." " . _L("Must contain a letter and a number or symbol.");
 		
-		$validateComplexPassword = isset($args['complex']) && $args['complex'] === true;
-		if ($validateComplexPassword && ($detail = isNotComplexPass($value)) && !ereg("^0*$", $value))
-			return "$this->label ". _L("is invalid") ." ".$detail;
-
 		return true;
 	}
 }
