@@ -131,6 +131,7 @@ if ($ldapuser || $readonly) {
 if (!$ldapuser) {
 	$pass = $USER->id ? 'nopasswordchange' : '';
 	$passlength = getSystemSetting("passwordlength", 5);
+	$validateComplexPassword = (getSystemSetting("checkpassword")==0) ? getSystemSetting("checkpassword") : 1;
 	if ($readonly) {
 		$formdata["password"] = array(
 			"label" => _L("Password"),
@@ -139,7 +140,7 @@ if (!$ldapuser) {
 			"validators" => array(
 				array("ValRequired"),
 				array("ValLength","min" => $passlength,"max" => 20),
-				array("ValPassword", "login" => $USER->login, "firstname" => $USER->firstname, "lastname" => $USER->lastname)
+				array("ValPassword", "login" => $USER->login, "firstname" => $USER->firstname, "lastname" => $USER->lastname, "complex" => $validateComplexPassword)
 			),
 			"control" => array("TextPasswordStrength","maxlength" => 20, "size" => 25, "minlength" => $passlength),
 			"helpstep" => 1
@@ -152,7 +153,7 @@ if (!$ldapuser) {
 			"validators" => array(
 				array("ValRequired"),
 				array("ValLength","min" => $passlength,"max" => 20),
-				array("ValPassword", "login" => $USER->login, "firstname" => $USER->firstname, "lastname" => $USER->lastname)
+				array("ValPassword", "login" => $USER->login, "firstname" => $USER->firstname, "lastname" => $USER->lastname, "complex" => $validateComplexPassword)
 			),
 			"requires" => array("firstname", "lastname", "login"),
 			"control" => array("TextPasswordStrength","maxlength" => 20, "size" => 25, "minlength" => $passlength),

@@ -7,6 +7,8 @@ class TextPasswordStrength extends FormItem {
 		$n = $this->form->name."_".$this->name;
 		$max = isset($this->args['maxlength']) ? 'maxlength="'.$this->args['maxlength'].'"' : "";
 		$size = isset($this->args['size']) ? 'size="'.$this->args['size'].'"' : "";
+		$generator = isset($this->args['generator']) && $this->args['generator'] === true;
+		
 		$str = '<table style="border-width:0px; border-spacing:0px; padding:0px;">
 					<tr>
 						<td style="padding:0px"><input id="'.$n.'" name="'.$n.'" type="password" value="'.escapehtml($value).'" '.$max.' '.$size.'/></td>
@@ -22,6 +24,8 @@ class TextPasswordStrength extends FormItem {
 								</tr>
 							</table>
 						</td>
+						' . ($generator?'<td>' . icon_button("Generate", "key","generatePassword();") . '</td>':'') . '
+						
 					</tr>
 				</table>
 				<script type="text/javascript">
@@ -56,7 +60,20 @@ class TextPasswordStrength extends FormItem {
 								$("'.$n.'"+ (i.toString())).setStyle({backgroundColor: "lightgrey"});
 						}
 					}
-					$("'.$n.'").observe("keyup", checkPasswordStrength);
+					
+					' . ($generator?'
+					function generatePassword() {
+						var password = "";
+						for (var i = 0; i < 6; i++) {
+							//get random number from 33 to 127 (character ! to ?) and convert it to a character
+							password += String.fromCharCode((parseInt(Math.random() * 1000) % 94) + 33);
+						}
+						$("'.$n.'").value = password;
+						alert("Generated Password: " + password);
+						checkPasswordStrength();
+					}':'') . 
+					
+					'$("'.$n.'").observe("keyup", checkPasswordStrength);
 				</script>';
 		return $str;
 	}
@@ -118,8 +135,9 @@ class ValPassword extends Validator {
 			return "$this->label ". _L("is invalid") ." ".$detail;
 		if (!$this->passwordcheck($value))
 			return "$this->label ". _L("is invalid.") ." " . _L("Must contain a letter and a number or symbol.");
-		$checkpassword = (getSystemSetting("checkpassword")==0) ? getSystemSetting("checkpassword") : 1;
-		if ($checkpassword && ($detail = isNotComplexPass($value)) && !ereg("^0*$", $value))
+		
+		$validateComplexPassword = isset($args['complex']) && $args['complex'] === true;
+		if ($validateComplexPassword && ($detail = isNotComplexPass($value)) && !ereg("^0*$", $value))
 			return "$this->label ". _L("is invalid") ." ".$detail;
 
 		return true;

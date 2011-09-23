@@ -297,6 +297,7 @@ if($IS_LDAP){
 
 $pass = (!$makeNewUser) ? 'nopasswordchange' : '';
 $passlength = getSystemSetting("passwordlength", 5);
+$validateComplexPassword = (getSystemSetting("checkpassword")==0) ? getSystemSetting("checkpassword") : 1;
 $formdata["password"] = array(
 	"label" => _L("Password"),
 	"fieldhelp" => _L('The password is used to log into the web interface.'),
@@ -304,7 +305,7 @@ $formdata["password"] = array(
 	"validators" => array(
 		array("ValRequired"),
 		array("ValLength","min" => $passlength,"max" => 20),
-		array("ValPassword", "login" => $edituser->login, "firstname" => $edituser->firstname, "lastname" => $edituser->lastname)
+		array("ValPassword", "login" => $edituser->login, "firstname" => $edituser->firstname, "lastname" => $edituser->lastname, "complex" => $validateComplexPassword)
 	),
 	"requires" => array("firstname", "lastname", "login"),
 	"control" => array("TextPasswordStrength","maxlength" => 20, "size" => 25, "minlength" => $passlength),
