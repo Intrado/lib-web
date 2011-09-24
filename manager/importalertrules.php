@@ -334,13 +334,8 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		
 		if ($postdata["timewindow"]) {
 			$timewindow = json_decode($postdata["timewindow"],true);
-			error_log($postdata["timewindow"]);
-			error_log(json_encode($timewindow));
 			if (isset($timewindow["importtime"]) && isset($timewindow["timewindow"])) {
-				error_log($postdata["timewindow"]);
-					
 				$importtime = strtotime($timewindow["importtime"]);
-				error_log(date("Y-m-d H:i:s",$importtime));
 				$mintime = $importtime - $midnight_today - $timewindow["timewindow"] * 60;
 				$maxtime = $importtime - $midnight_today + $timewindow["timewindow"] * 60;
 				setRule($mintimewindow,"importtime","lt",$mintime,$categoryid,$postdata["daysofweek"]);
