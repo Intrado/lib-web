@@ -89,6 +89,8 @@ function fmt_importalerts($row, $index){
 	$actions = array();
 	$actions[] = action_link("Manager Alert", "eye",'importalertrules.php?cid=' . $customerid . '&importid=' . $row[0] . '&categoryid=1');
 	$actions[] = action_link("Customer Alert", "transmit_error",'importalertrules.php?cid=' . $customerid . '&importid=' . $row[0] . '&categoryid=2');
+	$actions[] = action_link("Edit", "pencil",'editimport.php?cid=' . $customerid . '&importid=' . $row[0] . '');
+	
 	return action_links($actions);
 }
 
@@ -174,7 +176,7 @@ if (!$custdb) {
 $currhost="";
 $data = array();
 
-$query = "SELECT id, name,description, status, type, updatemethod,datamodifiedtime,lastrun,datalength,datatype,notes
+$query = "SELECT id, name,description, status, type, updatemethod,datamodifiedtime,lastrun,datalength,datatype,notes, nsticketid,managernotes 
 			FROM import
 			where type in ('automatic', 'manual') and ownertype = 'system'
 			order by id";
@@ -197,8 +199,13 @@ $titles = array(
 	"8" => "#File Size in Bytes",
 	"9" => "@#Data Type",
 	"10" => "@#Notes",
+	"11" => "NSTicketid",
+	"12" => "Manager Notes",
 	"actions" => "Actions"
 );
+
+setStickyColumns($titles,"customerimports");
+
 
 $formatters = array(
 	"alert" => "fmt_alert",
@@ -223,8 +230,7 @@ $displayname = getCustomerSystemSetting('displayname', false, true, $custdb);
 startWindow(_L('Imports for: %s',$displayname));
 
 // Show the column data hide/select check boxes.
-show_column_selector('customer_imports_table', $titles);
-
+show_column_selector('customer_imports_table', $titles,null,"customerimports");
 ?>
 <table class="list sortable" id="customer_imports_table">
 <?
