@@ -230,7 +230,7 @@ $displayname = getCustomerSystemSetting('displayname', false, true, $custdb);
 startWindow(_L('Imports for: %s',$displayname));
 
 // Show the column data hide/select check boxes.
-show_column_selector('customer_imports_table', $titles,null,"customerimports");
+show_column_selector('customer_imports_table', $titles,array(),"customerimports");
 ?>
 <table class="list sortable" id="customer_imports_table">
 <?
