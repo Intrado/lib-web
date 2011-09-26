@@ -66,8 +66,7 @@ function fmt_DMActions($row, $index){
 	if ($row[4] == "disabled") {
 		$actions[] = action_link("Delete", "cross","customerdms.php?delete=" . $dmid,"return confirm('Are you sure you want to delete DM " . addslashes($row[3]) . "?');");
 	}
-	return "<div id='actions_$dmid' style='display:none;'>" .  str_replace("&nbsp;|&nbsp;","<br />",action_links($actions)) . "</div>
-				<img id='actionlink_$dmid' src='img/icons/fugue/gear.png' alt='tools' />";
+	return action_links($actions);
 }
 
 function fmt_state($row, $index){
@@ -301,22 +300,6 @@ if (count($data)) {
 			for (var i = 0, length = trows.length; i < length; i++) {
 				trows[i].id = 'row'+i;
 			}
-
-			// Add tooltips
-			var dmids = <?= json_encode(array_keys($data))?>;
-			dmids.each(function (dmid) {				
-				$('actionlink_' + dmid).tip = new Tip('actionlink_' + dmid, $('actions_' + dmid).innerHTML, {
-					style: 'protogrey',
-					radius: 4,
-					border: 4,
-					hideOn: false,
-					hideAfter: 0.5,
-					stem: 'topRight',
-					hook: {  target: 'bottomLeft', tip: 'topRight'  },
-					width: 'auto',
-					offset: { x: 3, y: -3 }
-				});
-			});
 		});
 	</script>
 	<?
