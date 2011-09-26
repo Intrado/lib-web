@@ -13,11 +13,12 @@ class AspAdminUser extends DBMappedObject{
 	var $permsarray = false;
 	var $queryarray = false;
 	
-
+	var $deleted = 0;
+	
 	function AspAdminUser($id = NULL){
 		$this->_allownulls = true;
 		$this->_tablename = "aspadminuser";
-		$this->_fieldlist = array("firstname","lastname", "email", "login","preferences","permissions","queries");
+		$this->_fieldlist = array("firstname","lastname", "email", "login","preferences","permissions","queries","deleted");
 
 		//call super's constructor
 		DBMappedObject::DBMappedObject($id);
