@@ -44,6 +44,57 @@ if (isset($_GET['id'])) {
 	if ($_GET['id'] !== "new" && !userOwns("messagegroup",$_GET['id']))
 		redirect('unauthorized.php');
 	setCurrentMessageGroup($_GET['id']);
+	
+	if (isset($_GET["redirect"])) {
+		$messagegroup = new MessageGroup(getCurrentMessageGroup());
+		if($messagegroup->type != 'notification') {
+			unset($_SESSION['messagegroupid']);
+			redirect('unauthorized.php');
+		}
+		
+		switch($_GET["redirect"]) {
+			case "phone":
+				$message = $messagegroup->getMessage("phone", "voice", $messagegroup->defaultlanguagecode);
+				if ($USER->authorize('sendphone') && $message)
+					redirect("editmessagephone.php?id=" . $message->id);
+				break;
+			case "sms":
+				$message = $messagegroup->getMessage("sms", "plain", "en");
+				if (getSystemSetting('_hassms', false) && $USER->authorize('sendsms') && $message)
+					redirect("editmessagesms.php?id=" . $message->id);
+				break;
+			case "email":
+				$message = $messagegroup->getMessage("email", "html", $messagegroup->defaultlanguagecode);
+				if ($USER->authorize('sendemail') && $message)
+					redirect("editmessageemail.php?id=" . $message->id);
+				$message = $messagegroup->getMessage("email", "plain", $messagegroup->defaultlanguagecode);
+				if ($message)
+					redirect("editmessageemail.php?id=" . $message->id);
+				break;
+			case "facebook":
+				$message = $messagegroup->getMessage("post", "facebook", "en");
+				if (getSystemSetting('_hasfacebook', false) && $USER->authorize('facebookpost') && $message)
+					redirect("editmessagefacebook.php?id=" . $message->id);
+				break;
+			case "twitter":
+				$message = $messagegroup->getMessage("post", "twitter", "en");
+				if (getSystemSetting('_hastwitter', false) && $USER->authorize('twitterpost') && $message)
+					redirect("editmessagetwitter.php?id=" . $message->id);
+				break;
+			case "page":
+				$message = $messagegroup->getMessage("post", "page", "en");
+				if ((getSystemSetting('_hasfacebook', false) && $USER->authorize('facebookpost')) || (getSystemSetting('_hastwitter', false) && $USER->authorize('twitterpost')) &&
+					$message)
+					redirect("editmessagepage.php?id=" . $message->id);
+				break;
+			case "voice":
+				$message = $messagegroup->getMessage("post", "voice", "en");
+				if ((getSystemSetting('_hasfacebook', false) && $USER->authorize('facebookpost')) || (getSystemSetting('_hastwitter', false) && $USER->authorize('twitterpost')) &&
+					$message)
+					redirect("editmessagepostvoice.php?id=" . $message->id);
+				break;
+		}
+	}
 	redirect();
 }
 

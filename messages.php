@@ -158,15 +158,15 @@ if($isajax === true) {
 			$item = array_shift($mergeditems);
 			$time = date("M j, Y g:i a",strtotime($item["date"]));
 			$itemid = $item["id"];
-			$types = $item["phone"] > 0?'<img src="img/icons/telephone.png" alt="Phone" title="Phone">':"";
-			$types .= $item["email"] > 0?' <img src="img/icons/email.png" alt="Email" title="Email">':"";
-			$types .= $item["sms"] > 0?' <img src="img/icons/fugue/mobile_phone.png" alt="SMS" title="SMS">':"";
-			$types .= $item["facebook"] > 0?' <img src="img/icons/custom/facebook.png" alt="Facebook" title="Facebook">':"";
-			$types .= $item["twitter"] > 0?' <img src="img/icons/custom/twitter.png" alt="Twitter" title="Twitter">':"";
-			$types .= $item["page"] > 0?' <img src="img/icons/layout_sidebar.png" alt="Page" title="Page">':"";
-			$types .= $item["pagemedia"] > 0?' <img src="img/nifty_play.png" alt="Page Media" title="Page Media">':"";
-			$title = escapehtml($item["name"]);
 			$defaultlink = "mgeditor.php?id=$itemid";
+			$types = $item["phone"] > 0?'<a href="' . $defaultlink . '&redirect=phone"><img src="img/icons/telephone.png" alt="Phone" title="Phone"></a>':"";
+			$types .= $item["email"] > 0?' <a href="' . $defaultlink . '&redirect=email"><img src="img/icons/email.png" alt="Email" title="Email"></a>':"";
+			$types .= $item["sms"] > 0?' <a href="' . $defaultlink . '&redirect=sms"><img src="img/icons/fugue/mobile_phone.png" alt="SMS" title="SMS"></a>':"";
+			$types .= $item["facebook"] > 0?' <a href="' . $defaultlink . '&redirect=facebook"><img src="img/icons/custom/facebook.png" alt="Facebook" title="Facebook"></a>':"";
+			$types .= $item["twitter"] > 0?' <a href="' . $defaultlink . '&redirect=twitter"><img src="img/icons/custom/twitter.png" alt="Twitter" title="Twitter"></a>':"";
+			$types .= $item["page"] > 0?' <a href="' . $defaultlink . '&redirect=page"><img src="img/icons/layout_sidebar.png" alt="Page" title="Page"></a>':"";
+			$types .= $item["pagemedia"] > 0?' <a href="' . $defaultlink . '&redirect=voice"><img src="img/nifty_play.png" alt="Page Media" title="Page Media"></a>':"";
+			$title = escapehtml($item["name"]);
 			$publishaction = $item['publishaction'];
 			$publishid = $item['publishid'];
 			
@@ -214,7 +214,7 @@ if($isajax === true) {
 					$publishactionlink);
 			}
 
-			$content = '<a href="' . $defaultlink . '" >' . $time .  ($item["description"] != ""?" - " . escapehtml($item["description"]):"") . ' - <b>' . ($types==""?_L("Empty Message"):$types) . '</b>' . '</a>';
+			$content = '<a href="' . $defaultlink . '" >' . $time .  ($item["description"] != ""?" - " . escapehtml($item["description"]):"") . '</a> - <b>' . ($types==""?_L("Empty Message"):$types) . '</b>';
 			
 			$data->list[] = array("itemid" => $itemid,
 										"defaultlink" => $defaultlink,
