@@ -68,20 +68,42 @@ $settings = array(
 	"searchtext" => ""
 );
 
-// Check options
+// Check view options (searchtext,display contacts,sorting)
 if (isset($_SESSION['blockedphoneoptions'])) {
 	$settings = json_decode($_SESSION['blockedphoneoptions'],true);
 }
+
+$reload = false;
 if (isset($_GET['displaycontact'])) {
 	$settings["displaycontact"] = $_GET['displaycontact'] == 'true'?true:false;
+	$reload = true;
 }
 if (isset($_REQUEST["searchtext"])) {
 	$settings["searchtext"] = trim($_REQUEST['searchtext']);
+	$reload = true;
 }
-if(isset($_GET['displaycontact']) || isset($_REQUEST["searchtext"])) {
+for($x = 0; $x < 3;$x++) {
+	if (isset($_REQUEST["sort$x"])) {
+		if ($_REQUEST["sort$x"] !== "")
+		$settings["sort$x"] = $_REQUEST["sort$x"];
+		else
+		unset($settings["sort$x"]);
+		$reload = true;
+	}
+	if (isset($_REQUEST["desc$x"])) {
+		if ($_REQUEST["desc$x"] === "true")
+		$settings["desc$x"] = $_REQUEST["desc$x"];
+		else
+		unset($settings["desc$x"]);
+		$reload = true;
+	}
+}
+
+if($reload) {
 	$_SESSION['blockedphoneoptions'] = json_encode($settings);
 	redirect();
 }
+
 
 // if csv download, else html
 $settings["downloadcsv"] = isset($_GET['csv'])?true:false;
@@ -189,10 +211,10 @@ $start = 0 + (isset($_GET['pagestart']) ? $_GET['pagestart'] : 0);
 $limit = 500;
 
 $titles = array(
-	"4" => '#Phone Number',
-	"10" => "#Type",
-	"5" => '#Reason for Blocking',
-	"6" => '#Blocked by',
+	"4" => 'Phone Number',
+	"10" => "Type",
+	"5" => 'Reason for Blocking',
+	"6" => 'Blocked by',
 	"11" => 'Blocked on');
 
 if ($ACCESS->getValue('callblockingperms') == 'editall' || $ACCESS->getValue('callblockingperms') == 'addonly') {
@@ -219,6 +241,31 @@ if ($settings["searchtext"] != "") {
 	}
 	
 	$extrasql .= ")";
+}
+
+$sortfields = array("createdate" => "Blocked Date","destination" => "Phone","type" => "Type","description" => "Blocked Reason","fullname" => "Blocked by");
+$ordering = array(array("createdate", false));
+for ($x = 0; $x < 3; $x++) {
+	if (!isset($settings["sort$x"])) {
+		continue;
+	}
+	if ($settings["sort$x"] == "") {
+		unset($ordering[$x]);
+	} else if (isset($sortfields[$settings["sort$x"]])) {
+		$ordering[$x] = array($settings["sort$x"],isset($settings["desc$x"]));
+	}
+}
+$ordering = array_values($ordering); //remove gaps
+$ordersql = "";
+if (count($ordering) > 0) {
+	$orderbits = array();
+	foreach ($ordering as $orderopts) {
+		list($field,$desc) = $orderopts;
+		$orderbits[] = $field . ($desc ? " desc " : " ");
+	}
+	$ordersql = "order by " . implode(",",$orderbits);
+} else {
+	$ordersql = "order by createdate desc, type";
 }
 
 if ($settings["displaycontact"]) {
@@ -250,7 +297,7 @@ if ($settings["displaycontact"]) {
 		where b.userid = u.id and b.type = 'sms'
 		$extrasql
 		)
-		order by createdate desc, type";
+		$ordersql";
 	
 	// duplicate search arguments because the union in this query
 	$dataqueryargs = array_merge($dataqueryargs,$dataqueryargs);
@@ -262,7 +309,7 @@ if ($settings["displaycontact"]) {
 			join user u on (u.id = b.userid) 
 			where b.userid = u.id and b.type in ('phone', 'sms')
 			$extrasql
-			order by createdate desc, type";
+			$ordersql";
 }
 //////////////////////////////////
 // Functions
@@ -399,6 +446,9 @@ startWindow(_L('Blocked Phones') . help('Blocked_SystemwideBlocked'), 'padding: 
 
 <?
 if(count($data) > 0) {
+	echo '<div style="padding-left:10px;">';
+	showSortMenu($sortfields,$ordering);
+	echo '</div>';
 	showPageMenu($total, $start, $limit);
 	echo '<table width="100%" cellpadding="3" cellspacing="1" class="list sortable" id="blocked_numbers">';
 	showTable($data, $titles, $formatters);

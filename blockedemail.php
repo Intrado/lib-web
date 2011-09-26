@@ -63,18 +63,38 @@ $settings = array(
 	"searchtext" => ""
 );
 
-// Check options
+// Check view options (searchtext,display contacts,sorting)
 if (isset($_SESSION['blockedemailoptions'])) {
 	$settings = json_decode($_SESSION['blockedemailoptions'],true);
 }
 
+$reload = false;
 if (isset($_GET['displaycontact'])) {
 	$settings["displaycontact"] = $_GET['displaycontact'] == 'true'?true:false;
+	$reload = true;
 }
 if (isset($_REQUEST["searchtext"])) {
 	$settings["searchtext"] = trim($_REQUEST['searchtext']);
+	$reload = true;
 }
-if(isset($_GET['displaycontact']) || isset($_REQUEST["searchtext"])) {
+for($x = 0; $x < 3;$x++) {
+	if (isset($_REQUEST["sort$x"])) {
+		if ($_REQUEST["sort$x"] !== "")
+			$settings["sort$x"] = $_REQUEST["sort$x"];
+		else
+			unset($settings["sort$x"]);
+		$reload = true;
+	}
+	if (isset($_REQUEST["desc$x"])) {
+		if ($_REQUEST["desc$x"] === "true")
+			$settings["desc$x"] = $_REQUEST["desc$x"];
+		else
+			unset($settings["desc$x"]);
+		$reload = true;
+	}
+}
+
+if($reload) {
 	$_SESSION['blockedemailoptions'] = json_encode($settings);
 	redirect();
 }
@@ -159,9 +179,9 @@ if ($button = $form->getSubmit()) {
 }
 
 $titles = array(
-			"4" => '#Email Address',
-			"5" => '#Reason for Blocking',
-			"6" => '#Blocked by',
+			"4" => 'Email Address',
+			"5" => 'Reason for Blocking',
+			"6" => 'Blocked by',
 			"11" => 'Blocked on'); // date sort does not work with paging
 
 if ($ACCESS->getValue('callblockingperms') == 'editall' || $ACCESS->getValue('callblockingperms') == 'addonly') {
@@ -184,6 +204,30 @@ if ($settings["searchtext"] != "") {
 	$dataqueryargs[] = "%{$settings["searchtext"]}%";
 }
 
+$sortfields = array("createdate" => "Blocked Date","destination" => "Email","description" => "Blocked Reason","fullname" => "Blocked by");
+$ordering = array(array("createdate", false));
+for ($x = 0; $x < 3; $x++) {
+	if (!isset($settings["sort$x"])) {
+		continue;
+	} 
+	if ($settings["sort$x"] == "") {
+		unset($ordering[$x]);
+	} else if (isset($sortfields[$settings["sort$x"]])) {
+		$ordering[$x] = array($settings["sort$x"],isset($settings["desc$x"]));
+	}
+}
+$ordering = array_values($ordering); //remove gaps
+$ordersql = "";
+if (count($ordering) > 0) {
+	$orderbits = array();
+	foreach ($ordering as $orderopts) {
+		list($field,$desc) = $orderopts;
+		$orderbits[] = $field . ($desc ? " desc " : " ");
+	}
+	$ordersql = "order by " . implode(",",$orderbits);
+} else {
+	$ordersql = "order by createdate desc";
+}
 
 
 if ($settings["displaycontact"]) {
@@ -204,9 +248,7 @@ if ($settings["displaycontact"]) {
 		where b.type = 'email'
 		and b.blockmethod in ('autoblock', 'manual')
 		$extrasql
-		order by createdate desc";
-	
-			
+		$ordersql";
 } else {
 	// must stub in dummy contact details for pid and pkey index order, if we do the same query with person details we get duplicate rows when multiple people share a phone
 	$dataquery = "select SQL_CALC_FOUND_ROWS 'pid', 'pkey', 'f01', 'f02', b.destination, b.description, CONCAT(u.firstname, ' ', u.lastname) as fullname, b.id, b.userid, '" .
@@ -216,7 +258,7 @@ if ($settings["displaycontact"]) {
 			where b.type = 'email'
 			and b.blockmethod in ('autoblock', 'manual')
 			$extrasql
-			order by createdate desc";
+			$ordersql";
 }
 //$settings["searchtext"]
 
@@ -349,6 +391,9 @@ startWindow(_L('Blocked Emails') , 'padding: 3px;', false, true);
 </table>
 <?
 if(count($data) > 0) {
+	echo '<div style="padding-left:10px;">';
+	showSortMenu($sortfields,$ordering);
+	echo '</div>';
 	showPageMenu($total, $start, $limit);
 	echo '<table width="100%" cellpadding="3" cellspacing="1" class="list sortable" id="blocked_numbers">';
 	showTable($data, $titles, $formatters);
