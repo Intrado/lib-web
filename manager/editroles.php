@@ -5,7 +5,7 @@ require_once("../inc/form.inc.php");
 require_once("../inc/table.inc.php");
 require_once("../obj/Phone.obj.php");
 require_once("../inc/html.inc.php");
-require_once("AspAdminQuery.obj.php");
+require_once("dbmo/authserver/AspAdminQuery.obj.php");
 
 
 if (!$MANAGERUSER->authorized("superuser"))

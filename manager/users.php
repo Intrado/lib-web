@@ -6,7 +6,7 @@ require_once("../inc/utils.inc.php");
 require_once("../obj/Phone.obj.php");
 require_once("../inc/themes.inc.php");
 require_once("../inc/table.inc.php");
-require_once("dbmo/auth/AspAdminUser.obj.php");
+require_once("dbmo/authserver/AspAdminUser.obj.php");
 
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization
@@ -19,7 +19,7 @@ if (!$MANAGERUSER->authorized("edituser"))
 ////////////////////////////////////////////////////////////////////////////////'
 if (isset($_GET['delete'])) {
 	QuickUpdate("update aspadminuser set deleted=1 where id=?",false,array($_GET['delete']));
-	notice(_L("Query deleted"));
+	notice(_L("User deleted"));
 }
 
 

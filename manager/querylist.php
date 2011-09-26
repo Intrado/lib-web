@@ -6,7 +6,7 @@ require_once("../inc/utils.inc.php");
 require_once("../obj/Phone.obj.php");
 require_once("../inc/themes.inc.php");
 require_once("../inc/table.inc.php");
-require_once("AspAdminQuery.obj.php");
+require_once("dbmo/authserver/AspAdminQuery.obj.php");
 
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization
