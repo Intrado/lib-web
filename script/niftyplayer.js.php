@@ -131,7 +131,7 @@ function embedPlayer(url,target,parts) {
 			requestfiles = url + '&partnum=1';
 		}
 	} 
-	$(target).update('<object classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000" codebase="<?= isset($_SERVER['HTTPS'])?"https":"http" ?>://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=6,0,0,0" width="165" height="38" id="niftyPlayer1" align="">' +
+	$(target).update('<object classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000" codebase="<?= isset($_SERVER['HTTPS'])?"https":"http" ?>://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=8,0,0,0" width="165" height="38" id="niftyPlayer1" align="">' +
 		'<param name=movie value="media/niftyplayer.swf?file=' + encodeURIComponent(requestfiles)  + '&as=1">' + 
 		'<param name=quality value=high>' + 
 		'<param name=bgcolor value=#FFFFFF>' + 
@@ -147,14 +147,7 @@ if($android) {
 ?>
 	$(target).update("Unable to play message. Please install Flash for Android 2.2 or higher or click the link to download the message.");
 <? } else { ?>
-	$(target).update("<object classid='clsid:22D6F312-B0F6-11D0-94AB-0080C74C7E95' width='280' height='45'>"+
-		"<param name='type' value='audio/mpeg'>"+
-		"<param name='src' value='" + url + "'>"+
-		"<param name='autostart' value='1'>"+
-		"<param name='showcontrols' value='1'>"+
-		"<param name='showstatusbar' value='0'>"+
-		"<embed src ='" + url + "' type='audio/mpeg' autoplay='true' autostart='1' width='280' height='45' controller='1' showstatusbar='0' bgcolor='#ffffff'></embed>"+ 
-		"</object>");
+	$(target).update('<a href="http://get.adobe.com/flashplayer/">Click here to upgrade your flash player</a>');
 <? } ?>
 	}
 }
