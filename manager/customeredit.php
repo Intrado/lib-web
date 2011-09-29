@@ -1139,7 +1139,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		QuickUpdate($query,false,array(
 			$postdata["urlcomponent"],
 			$postdata["inboundnumber"],
-			$postdata["enabled"]?1:0,
+			$postdata["enabled"]?'1':'0',
 			$postdata["oem"],
 			$postdata["oemid"],
 			$postdata["nsid"],
@@ -1268,17 +1268,17 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 			}
 		}
 		
-		setCustomerSystemSetting('_hassms', $postdata["hassms"], $custdb);
+		setCustomerSystemSetting('_hassms', $postdata["hassms"]?'1':'0', $custdb);
 		
 		update_jobtypeprefs(1, $postdata["maxsms"], "sms", $custdb);
 		setCustomerSystemSetting('maxsms', $postdata["maxsms"], $custdb);
-		setCustomerSystemSetting('enablesmsoptin', $postdata["enablesmsoptin"], $custdb);
+		setCustomerSystemSetting('enablesmsoptin', $postdata["enablesmsoptin"]?'1':'0', $custdb);
 		setCustomerSystemSetting('smscustomername', $postdata["smscustomername"], $custdb);
 
-		setCustomerSystemSetting('_hassmapi', $postdata["hassmapi"], $custdb);
+		setCustomerSystemSetting('_hassmapi', $postdata["hassmapi"]?'1':'0', $custdb);
 		// Set oem,oemid and nsid in authserver customer table
 		
-		setCustomerSystemSetting('_hascallback', $postdata["hascallback"], $custdb);
+		setCustomerSystemSetting('_hascallback', $postdata["hascallback"]?'1':'0', $custdb);
 		setCustomerSystemSetting('callbackdefault', $postdata["callbackdefault"], $custdb);
 		
 		switch($postdata["portal"] ) {
@@ -1295,12 +1295,12 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 				setCustomerSystemSetting('_hasselfsignup', 0, $custdb);
 		}
 		
-		setCustomerSystemSetting('_hassurvey', $postdata["hassurvey"], $custdb);
-		setCustomerSystemSetting('_hasldap', $postdata["hasldap"], $custdb);
-		setCustomerSystemSetting('_hasenrollment', $postdata["hasenrollment"], $custdb);
-		setCustomerSystemSetting('_hastargetedmessage', $postdata["hasclassroom"], $custdb);
-		setCustomerSystemSetting('_hasfacebook', $postdata["hasfacebook"], $custdb);
-		setCustomerSystemSetting('_hastwitter', $postdata["hastwitter"], $custdb);
+		setCustomerSystemSetting('_hassurvey', $postdata["hassurvey"]?'1':'0', $custdb);
+		setCustomerSystemSetting('_hasldap', $postdata["hasldap"]?'1':'0', $custdb);
+		setCustomerSystemSetting('_hasenrollment', $postdata["hasenrollment"]?'1':'0', $custdb);
+		setCustomerSystemSetting('_hastargetedmessage', $postdata["hasclassroom"]?'1':'0', $custdb);
+		setCustomerSystemSetting('_hasfacebook', $postdata["hasfacebook"]?'1':'0', $custdb);
+		setCustomerSystemSetting('_hastwitter', $postdata["hastwitter"]?'1':'0', $custdb);
 
 	
 		setCustomerSystemSetting('_renewaldate', ($postdata['renewaldate']!=""?date("Y-m-d", strtotime($postdata['renewaldate'])):""), $custdb);
