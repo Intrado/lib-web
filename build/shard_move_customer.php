@@ -165,7 +165,10 @@ foreach ($customerids as $customerid) {
 
 	echo "Check tables: ";
 	$anyerrors = 0;
+	$skipchecktables = array("custdm");
 	foreach ($customertables as $t) {
+		if (in_array($t, $skipchecktables))
+			continue;
 		echo "$t ";
 		if (verify_table($srcsharddb,$destsharddb,$t)) {
 			 echo "OK, ";
