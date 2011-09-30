@@ -450,3 +450,79 @@ CREATE TABLE `serviceattribute` (
 
 ALTER TABLE `aspadminuser` ADD `deleted` tinyint(4) NOT NULL default '0';
 
+-- new column authserver.customer.shortcodegroupid
+ALTER TABLE `customer` ADD `shortcodegroupid` INT NOT NULL DEFAULT '1' ;
+ 
+ 
+CREATE TABLE `shortcodegroup` (
+ `id` int(11) NOT NULL AUTO_INCREMENT,
+ `description` varchar(255) NOT NULL,
+ `queuecapacity` int(11) NOT NULL,
+ `numthreads` int(11) NOT NULL,
+ PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 ;
+ 
+ 
+CREATE TABLE `smsaggregator` (
+ `id` int(11) NOT NULL AUTO_INCREMENT,
+ `name` varchar(20) NOT NULL,
+ PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 ;
+ 
+ 
+CREATE TABLE `shortcode` (
+ `shortcode` varchar(10) NOT NULL,
+ `smsaggregatorid` int(11) NOT NULL,
+ `shortcodegroupid` int(11) NOT NULL,
+ PRIMARY KEY (`shortcode`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 ;
+ 
+ 
+CREATE TABLE `shortcodeareacode` (
+ `shortcode` varchar(10) NOT NULL,
+ `areacode` VARCHAR( 3 ) NULL DEFAULT NULL,
+ PRIMARY KEY (`shortcode`,`areacode`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 ;
+ 
+CREATE TABLE `shortcodetext` (
+ `shortcode` varchar(10) NOT NULL,
+ `messagetype` varchar(20) NOT NULL,
+ `text` varchar(200) NOT NULL,
+ PRIMARY KEY (`shortcode`,`messagetype`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 ;
+ 
+
+INSERT INTO `smsaggregator` (`name`) VALUES ('air2web') ;
+
+INSERT INTO `shortcodegroup` (`description`, `queuecapacity`, `numthreads`) VALUES ('SchoolMessenger', 100, 2) ;
+
+INSERT INTO `shortcode` (`shortcode` ,`smsaggregatorid` ,`shortcodegroupid`) VALUES
+('68453', 1, 1),
+('724665', 1, 1) ;
+
+INSERT INTO `shortcodeareacode` (`shortcode`, `areacode`) VALUES
+('68453', ''),
+('724665', '204'),
+('724665', '289'),
+('724665', '306'),
+('724665', '403'),
+('724665', '416'),
+('724665', '418'),
+('724665', '450'),
+('724665', '506'),
+('724665', '514'),
+('724665', '519'),
+('724665', '604'),
+('724665', '613'),
+('724665', '647'),
+('724665', '705'),
+('724665', '709'),
+('724665', '778'),
+('724665', '780'),
+('724665', '807'),
+('724665', '819'),
+('724665', '867'),
+('724665', '902'),
+('724665', '905') ;
+
+
