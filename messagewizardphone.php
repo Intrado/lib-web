@@ -256,7 +256,7 @@ class MsgWiz_phoneEasyCall extends WizStep {
 		if (!$USER->authorize("sendphone") || !$USER->authorize("starteasy"))
 			return false;
 			
-		if (isset($postdata["/method"]["method"]) && $postdata["/method"]["method"] == "record")
+		if ($this->parent->dataHelper("/method:method") == "record")
 			return true;
 		
 		return false;
@@ -345,7 +345,7 @@ class MsgWiz_phoneAdvanced extends WizStep {
 		if (!$USER->authorize("sendphone"))
 			return false;
 		
-		if (isset($postdata["/method"]["method"]) && $postdata["/method"]["method"] == "write")
+		if ($this->parent->dataHelper("/method:method") == "write")
 			return true;
 		
 		return false;
@@ -463,9 +463,8 @@ class MsgWiz_translatePreview extends WizStep {
 	function isEnabled($postdata, $step) {
 		global $USER;
 			// only allow auto translation on "write" messages when the user can send multi lingual
-		if ($USER->authorize('sendmulti') && 
-				isset($postdata["/create/language"]["language"]) && $postdata["/create/language"]["language"] == "autotranslate" &&
-				isset($postdata["/method"]["method"]) && $postdata["/method"]["method"] == "write") {
+		if ($USER->authorize('sendmulti') && $this->parent->dataHelper("/create/language:language") == "autotranslate" &&
+				$this->parent->dataHelper("/method:method") == "write") {
 			return true;
 		}
 		
@@ -478,12 +477,12 @@ class MsgWiz_submitConfirm extends WizStep {
 		global $USER;
 		
 		if ($USER->authorize('sendmulti'))
-			$srclanguagecode = isset($postdata['/create/language']['language'])?$postdata['/create/language']['language']:"en";
+			$srclanguagecode = $this->parent->dataHelper("/create/language:language",false,Language::getDefaultLanguageCode());
 				
 		$languagecodes = array();
 		if ($srclanguagecode == "autotranslate") {
 			$languagecodes[] = "en";
-			foreach ($postdata['/create/translatepreview'] as $langcode => $enabled) {
+			foreach ($this->parent->dataHelper('/create/translatepreview',false,array()) as $langcode => $enabled) {
 				if ($enabled === "true")
 					$languagecodes[] = $langcode;
 			}
@@ -531,16 +530,23 @@ class MsgWiz_submitConfirm extends WizStep {
 	function isEnabled($postdata, $step) {
 		global $USER;
 		
-		// if the method isnt chosen
-		if (!isset($postdata['/method']['method']))
+		// if we are on the finish step, its only important to see if it actually overwrote anything
+		if (isset($_SESSION['wizard_message']['finish'])) {
+			if (isset($_SESSION['wizard_message']['didOverwrite']))
+				return true;
+			else
+				return false;
+		}
+	
+		if (!$this->parent->dataHelper('/method:method'))
 			return false;
 		
 		// if the user has multilingual but hasn't selected a language
-		if  ($USER->authorize('sendmulti') && !isset($postdata['/create/language']['language']))
+		if ($USER->authorize('sendmulti') && !$this->parent->dataHelper('/create/language:language'))
 			return false;
 		
 		// only show the confirm step if the creation of this message will overwrite an existing message
-		$languagecode = isset($postdata['/create/language']['language'])?$postdata['/create/language']['language']:Language::getDefaultLanguageCode();
+		$languagecode = $this->parent->dataHelper('/create/language:language', false, Language::getDefaultLanguageCode());
 		
 		$args = array();
 		
@@ -549,11 +555,9 @@ class MsgWiz_submitConfirm extends WizStep {
 			// autotranslate always overwrites the english message
 			$args[] = "en";
 			// need the translated step's session data to get the enabled languages
-			if (isset($postdata['/create/translatepreview'])) {
-				foreach ($postdata['/create/translatepreview'] as $langcode => $enabled) {
-					if ($enabled === "true")
-						$args[] = $langcode;
-				}
+			foreach ($this->parent->dataHelper('/create/translatepreview', false,array()) as $langcode => $enabled) {
+				if ($enabled === "true")
+					$args[] = $langcode;
 			}
 		} else {
 			// not auto translate so...
@@ -588,6 +592,8 @@ class FinishMessageWizard extends WizFinish {
 	function finish ($postdata) {
 		global $USER;
 		
+		$_SESSION['wizard_message']['finish'] = true;
+		
 		// start a transaction
 		QuickQuery("BEGIN");
 		
@@ -597,7 +603,7 @@ class FinishMessageWizard extends WizFinish {
 			return;
 		
 		// get the language code from postdata
-		$langcode = (isset($postdata["/create/language"]["language"])?$postdata["/create/language"]["language"]:Language::getDefaultLanguageCode());
+		$langcode = $this->parent->dataHelper("/create/language:language",false,Language::getDefaultLanguageCode());
 		
 		// auto translations and english need the source stored as english. everything else stores as an overridden autotranslation 
 		if ($langcode == "autotranslate" || $langcode == "en") {
@@ -614,7 +620,7 @@ class FinishMessageWizard extends WizFinish {
 		
 		if (MsgWiz_phoneEasyCall::isEnabled($postdata, false)) {
 			// pull the audiofileid from post data
-			$audiofileidmap = json_decode($postdata["/create/callme"]["message"]);
+			$audiofileidmap = $this->parent->dataHelper("/create/callme:message",true);
 			$audiofileid = $audiofileidmap->af;
 			
 			// check for an existing message with this language code for this message group 
@@ -629,6 +635,7 @@ class FinishMessageWizard extends WizFinish {
 			
 			// if there is an existing message in the DB, must remove it's parts
 			if ($message) {
+				$_SESSION['wizard_message']['didOverwrite'] = true;
 				QuickUpdate("delete from messagepart where messageid = ?", false, array($message->id));
 				// delete existing messages
 				QuickUpdate("delete from message 
@@ -675,8 +682,8 @@ class FinishMessageWizard extends WizFinish {
 			// #################################################################
 			// Text based messages
 			
-			$text = $postdata["/create/phoneadvanced"]["message"];
-			$gender = $postdata["/create/phoneadvanced"]["gender"];
+			$text = $this->parent->dataHelper("/create/phoneadvanced:message");
+			$gender = $this->parent->dataHelper("/create/phoneadvanced:gender");
 			
 			$messages = array();
 			
@@ -695,7 +702,7 @@ class FinishMessageWizard extends WizFinish {
 		
 			// check for and retrieve translations
 			if (MsgWiz_translatePreview::isEnabled($postdata, false) && $langcode == "autotranslate") {
-				foreach ($postdata["/create/translatepreview"] as $translatedlangcode => $enabled) {
+				foreach ($this->parent->dataHelper("/create/translatepreview",false,array()) as $translatedlangcode => $enabled) {
 					// when the message is created, the modify date will be set in the past and retranslation will
 					// get called before attaching to the message group
 					if ($enabled) {
@@ -725,6 +732,8 @@ class FinishMessageWizard extends WizFinish {
 					if (!$message) {
 						// no message, create a new one!
 						$message = new Message();
+					} else {
+						$_SESSION['wizard_message']['didOverwrite'] = true;
 					}
 					
 					$message->messagegroupid = $messagegroup->id;
