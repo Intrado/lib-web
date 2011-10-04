@@ -1669,3 +1669,13 @@ $$$
 
 -- END REV 8.1/5
 
+-- START 8.1/6
+ALTER TABLE `message` DROP `deleted`
+$$$
+
+ALTER TABLE `messageattachment` DROP `deleted`
+$$$
+
+update setting set value='8.1/6' where name='_dbversion'
+$$$
+-- END REV 8.1/6
