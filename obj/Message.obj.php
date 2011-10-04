@@ -11,7 +11,6 @@ class Message extends DBMappedObject {
 	var $autotranslate; // 'none', 'source', 'translated', 'overridden'
 	var $modifydate;
 	var $languagecode;
-	var $deleted = 0;
 
 	// For 'print' header data.
 	var $header1;
@@ -28,7 +27,7 @@ class Message extends DBMappedObject {
 	function Message ($id = NULL) {
 		$this->_allownulls = true;
 		$this->_tablename = "message";
-		$this->_fieldlist = array("userid", "messagegroupid", "name", "languagecode", "description", "type", "subtype", "data", "deleted","modifydate", "autotranslate");
+		$this->_fieldlist = array("userid", "messagegroupid", "name", "languagecode", "description", "type", "subtype", "data","modifydate", "autotranslate");
 		//call super's constructor
 		DBMappedObject::DBMappedObject($id);
 	}
@@ -58,15 +57,12 @@ class Message extends DBMappedObject {
 		}
 	}
 	
-	// If $forcedeleted is true, sets $newmessage->deleted = 1; otherwise, does not explicitly set $newmessage->deleted.
-	function copy($messagegroupid = null, $forcedeleted = false) {
+	function copy($messagegroupid = null) {
 		//copy the messages
 		$newmessage = new Message($this->id);
 		$newmessage->id = null;
 		if (!is_null($messagegroupid))
 			$newmessage->messagegroupid = $messagegroupid;
-		if ($forcedeleted)
-			$newmessage->deleted = 1;
 		$newmessage->create();
 
 		// copy the parts
@@ -77,8 +73,8 @@ class Message extends DBMappedObject {
 			$part->create();
 		}
 		// copy the attachments
-		QuickUpdate("insert into messageattachment (messageid,contentid,filename,size,deleted) " .
-		"select $newmessage->id, ma.contentid, ma.filename, ma.size, 1 as deleted " .
+		QuickUpdate("insert into messageattachment (messageid,contentid,filename,size) " .
+		"select $newmessage->id, ma.contentid, ma.filename, ma.size " .
 		"from messageattachment ma where ma.messageid=$this->id");
 		
 		return $newmessage;

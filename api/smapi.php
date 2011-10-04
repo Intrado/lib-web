@@ -1528,12 +1528,12 @@ class SMAPI {
 				$phonemessage = new Message($phonemsgid);
 				if ($phonemessage->userid == $USER->id && $phonemessage->type == 'phone') {
 					// NOTE: $phonemessage->copy() already calls $duplicatephonemessage->create();
-					$duplicatephonemessage = $phonemessage->copy($messagegroup->id, true);
+					$duplicatephonemessage = $phonemessage->copy($messagegroup->id);
 					if ($duplicatephonemessage->id) {
 						// If the message is auto-translated, then copy its source message also, in case we need to refresh the translation.
 						if ($phonemessage->autotranslate == 'translated') {
 							$sourcephonemessage = DBFind('Message', 'from message where messagegroupid=? and type="phone" and subtype=? and languagecode=? and autotranslate="source"', false, array($phonemessage->messagegroupid, $phonemessage->subtype, $phonemessage->languagecode));
-							$duplicatesourcephonemessage = $sourcephonemessage->copy($messagegroup->id, true);
+							$duplicatesourcephonemessage = $sourcephonemessage->copy($messagegroup->id);
 							
 							if ($duplicatesourcephonemessage->id)
 								$job->sendphone = true;
@@ -1547,12 +1547,12 @@ class SMAPI {
 				$emailmessage = new Message($emailmsgid);
 				if ($emailmessage->userid == $USER->id && $emailmessage->type == 'email') {
 					// NOTE: $emailmessage->copy() already calls $duplicateemailmessage->create();
-					$duplicateemailmessage = $emailmessage->copy($messagegroup->id, true);
+					$duplicateemailmessage = $emailmessage->copy($messagegroup->id);
 					if ($duplicateemailmessage->id) {
 						// If the message is auto-translated, then copy its source message also, in case we need to refresh the translation.
 						if ($emailmessage->autotranslate == 'translated') {
 							$sourceemailmessage = DBFind('Message', 'from message where messagegroupid=? and type="email" and subtype=? and languagecode=? and autotranslate="source"', false, array($emailmessage->messagegroupid, $emailmessage->subtype, $emailmessage->languagecode));
-							$duplicatesourceemailmessage = $sourceemailmessage->copy($messagegroup->id, true);
+							$duplicatesourceemailmessage = $sourceemailmessage->copy($messagegroup->id);
 							
 							if ($duplicatesourceemailmessage->id)
 								$job->sendemail = true;
@@ -1566,7 +1566,7 @@ class SMAPI {
 				$smsmessage = new Message($smsmsgid);
 				if ($smsmessage->userid == $USER->id && $smsmessage->type == 'sms') {
 					// NOTE: $smsmessage->copy() already calls $duplicatesmsmessage->create();
-					$duplicatesmsmessage = $smsmessage->copy($messagegroup->id, true);
+					$duplicatesmsmessage = $smsmessage->copy($messagegroup->id);
 					if ($duplicatesmsmessage->id)
 						$job->sendsms = true;
 				}

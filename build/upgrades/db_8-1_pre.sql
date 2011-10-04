@@ -60,3 +60,10 @@ $$$
 -- $rev 5
 -- empty rev - use php to set _customerenabled setting
 
+-- $rev 6
+-- remove deleted flags from message and messageattachment
+ALTER TABLE `message` DROP `deleted`
+$$$
+
+ALTER TABLE `messageattachment` DROP `deleted`
+$$$
