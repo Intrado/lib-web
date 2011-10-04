@@ -17,7 +17,7 @@ class Import extends DBMappedObject {
 	var $datamodifiedtime;
 	var $datalength = 0;
 	var $skipheaderlines = 0;
-	var $nsticketid;
+	var $nsticketid = "";
 	var $managernotes;
 	
 
