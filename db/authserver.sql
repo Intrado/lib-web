@@ -525,4 +525,5 @@ INSERT INTO `shortcodeareacode` (`shortcode`, `areacode`) VALUES
 ('724665', '902'),
 ('724665', '905') ;
 
+UPDATE aspadminuser set deleted=1 where password='disabled' and queries='';
 
