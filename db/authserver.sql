@@ -525,5 +525,18 @@ INSERT INTO `shortcodeareacode` (`shortcode`, `areacode`) VALUES
 ('724665', '902'),
 ('724665', '905') ;
 
+INSERT INTO `shortcodetext` (`shortcode` ,`messagetype` ,`text`) VALUES
+('68453',  'OPTIN',   'You are registered to receive aprox 3 msgs/mo. Txt STOP to quit, HELP for help. Msg&data rates may apply. schoolmessenger.com/tm'),
+('724665', 'OPTIN',   'You are registered to receive aprox 3 msgs/mo. Txt STOP to quit, HELP for help. Std msg/data rates apply. schoolmessenger.com/tm'),
+('68453',  'OPTOUT',  'You are unsubscribed. Reply Y to re-subscribe for aprox 3 msgs/mo. HELP for help. Msg&data rates may apply. schoolmessenger.com/tm'),
+('724665', 'OPTOUT',  'You are unsubscribed. Reply Y to re-subscribe for aprox 3 msgs/mo. HELP for help. Std msg/data rates apply. schoolmessenger.com/tm'),
+('68453',  'HELP',    'Text messages by SchoolMessenger. Reply Y for aprox 3 msgs/mo. Text STOP to quit. Msg&data rates may apply. schoolmessenger.com/tm'),
+('724665', 'HELP',    'Text messages by SchoolMessenger. Reply Y for aprox 3 msgs/mo. Text STOP to quit. Std msg/data rates apply. schoolmessenger.com/tm'),
+('68453',  'INFO',    'Unknown response. Reply Y to subscribe for aprox 3 msgs/mo. Text STOP to quit. For more information reply HELP.'),
+('724665', 'INFO',    'Unknown response. Reply Y to subscribe for aprox 3 msgs/mo. Text STOP to quit. For more information reply HELP.'),
+('68453',  'PENDINGOPTIN', '%s messages. Reply Y for aprx 3 msgs/mo. Txt HELP 4 info. Msg&data rates may apply. See schoolmessenger.com/tm'),
+('724665', 'PENDINGOPTIN', '%s messages. Reply Y for aprx 3 msgs/mo. Txt HELP 4 info. Std msg/data rates apply. See schoolmessenger.com/tm') ;
+
+
 UPDATE aspadminuser set deleted=1 where password='disabled' and queries='';
 
