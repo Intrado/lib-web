@@ -1,6 +1,5 @@
 <?
 class MessageGroup extends DBMappedObject {
-	var $originalmessagegroupid;
 	var $userid;
 	var $type = 'notification'; // enum('notification','targetedmessage','classroomtemplate')
 	var $defaultlanguagecode = 'en';
@@ -20,7 +19,6 @@ class MessageGroup extends DBMappedObject {
 		$this->_allownulls = true;
 		$this->_tablename = "messagegroup";
 		$this->_fieldlist = array(
-			"originalmessagegroupid",
 			"userid",
 			"type",
 			"defaultlanguagecode",

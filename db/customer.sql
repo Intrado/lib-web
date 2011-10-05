@@ -1679,3 +1679,11 @@ $$$
 update setting set value='8.1/6' where name='_dbversion'
 $$$
 -- END REV 8.1/6
+
+-- START 8.1/7
+ALTER TABLE `messagegroup` DROP `originalmessagegroupid`
+$$$
+
+update setting set value='8.1/7' where name='_dbversion'
+$$$
+-- END REV 8.1/7

@@ -67,3 +67,8 @@ $$$
 
 ALTER TABLE `messageattachment` DROP `deleted`
 $$$
+
+-- $rev 7
+-- remove originalmessagegroupid field from messagegroup table (No loner used anywhere)
+ALTER TABLE `messagegroup` DROP `originalmessagegroupid`
+$$$

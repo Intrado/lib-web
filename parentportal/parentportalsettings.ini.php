@@ -15,7 +15,7 @@ has_ssl=true
 force_ssl=false
 log_dir="/usr/commsuite/logs/"
 log_db_errors=true
-log_db_queries=true
+log_db_queries=false
 tmp_dir="/tmp"
 query_trace=true
 
