@@ -1,4 +1,4 @@
-<? 
+<?
 
 //do version check before any auth/session/etc
 if ($_GET['requesttype'] == "checkversion") {
@@ -215,6 +215,24 @@ function handleRequest() {
 
 header('Content-Type: application/json');
 $data = handleRequest();
+
+if (isset($SETTINGS['feature']['log_mobile_api']) && $SETTINGS['feature']['log_mobile_api']) {
+	$logfilename = $SETTINGS['feature']['log_dir'] . "mobileapi.log";
+	$postdata = file_get_contents("php://input");
+	
+	$fp = fopen($logfilename, "a");
+	flock($fp,LOCK_EX);
+	fseek($fp,0,SEEK_END);
+
+	fwrite($fp, "--- " . date("Y-m-d H:i:s") . "---\n");
+	fwrite($fp, urldecode($postdata));
+	fwrite($fp, "--->\n" . $data . "---\n");
+	
+	flock($fp,LOCK_UN);
+	fclose($fp);
+}
+
+
 echo json_encode(!empty($data) ? $data : false);
 
 
