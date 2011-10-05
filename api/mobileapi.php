@@ -225,7 +225,7 @@ if (isset($SETTINGS['feature']['log_mobile_api']) && $SETTINGS['feature']['log_m
 	fseek($fp,0,SEEK_END);
 
 	fwrite($fp, "--- " . date("Y-m-d H:i:s") . "---\n");
-	fwrite($fp, urldecode($postdata));
+	fwrite($fp, $postdata); //Probably a security risk, debug code should not ever be enabled in production.
 	fwrite($fp, "--->\n" . $data . "---\n");
 	
 	flock($fp,LOCK_UN);
