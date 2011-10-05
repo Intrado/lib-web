@@ -16,7 +16,6 @@ host="localhost:7912"
 timeout=5500
 
 [feature]
-is_commsuite=false
 has_ssl=true
 force_ssl=true
 log_dir="/usr/commsuite/logs/"
@@ -26,6 +25,7 @@ log_dmapi=false
 query_trace=true
 has_print=false
 tmp_dir="/tmp"
+log_mobile_api=false
 
 ;if not set, warn_earliest is set to "7:00 am"
 ;and warn_latest is set to "9:00 pm"
