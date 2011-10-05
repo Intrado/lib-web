@@ -49,6 +49,8 @@ if (!isset($isindexpage) || !$isindexpage) {
 		$ACCESS->loadPermissions(true);
 
 		if (!$USER->enabled || $USER->deleted || !$USER->authorize('loginweb')) {
+			error_log("Invalid session in subdircommon.inc.php");
+			header("HTTP/1.1 400 Invalid Session");
 			exit();
 		}
 	}
