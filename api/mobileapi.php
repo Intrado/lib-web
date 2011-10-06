@@ -215,24 +215,25 @@ function handleRequest() {
 
 header('Content-Type: application/json');
 $data = handleRequest();
+$json_encoded_data = json_encode(!empty($data) ? $data : false);
 
 if (isset($SETTINGS['feature']['log_mobile_api']) && $SETTINGS['feature']['log_mobile_api']) {
 	$logfilename = $SETTINGS['feature']['log_dir'] . "mobileapi.log";
-	$postdata = file_get_contents("php://input");
+	$getdata = print_r($_GET, true);
 	
 	$fp = fopen($logfilename, "a");
 	flock($fp,LOCK_EX);
 
 	fwrite($fp, "--- " . date("Y-m-d H:i:s") . "---\n");
-	fwrite($fp, $postdata); //Probably a security risk, debug code should not ever be enabled in production.
-	fwrite($fp, "--->\n" . $data . "---\n");
+	fwrite($fp, $getdata); //Probably a security risk, debug code should not ever be enabled in production.
+	fwrite($fp, "--->\n" . $json_encoded_data . "\n---\n");
 	
 	flock($fp,LOCK_UN);
 	fclose($fp);
 }
 
 
-echo json_encode(!empty($data) ? $data : false);
+echo $json_encoded_data;
 
 
 ?>
