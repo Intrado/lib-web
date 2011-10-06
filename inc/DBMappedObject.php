@@ -333,12 +333,12 @@ function _DBFindPDO($isMany, $classname, $query, $alias=false, $args=false, $dbc
 }
 
 function cleanObjects ($obj) {
-	if (!get_class($obj) && !is_array($obj))
+	if (!is_object($obj) && !is_array($obj))
 		return $obj;
 	$simpleObj = array();
-	if (get_class($obj)) {
+	if (is_object($obj)) {
 		foreach ($obj->_fieldlist as $field) {
-			if (get_class($obj->$field))
+			if (is_object($obj->$field))
 				$simpleObj[$field] = cleanObjects($obj->$field);
 			else
 				$simpleObj[$field] = $obj->$field;
