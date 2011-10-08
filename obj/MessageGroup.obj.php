@@ -242,11 +242,10 @@ class MessageGroup extends DBMappedObject {
 					$gender = isset($voicemap[$firstpart->voiceid])?$voicemap[$firstpart->voiceid]:'female';
 					
 					// get translated text from google
-					$translated = translate_fromenglish(makeTranslatableString($sourcebody), array($message->languagecode));
-					
+					$translations = translate_fromenglish(makeTranslatableString($sourcebody), array($message->languagecode));
 					// refresh the message with the new data
 					Query("BEGIN");
-					$message->recreateParts($translated->translatedText, null, $gender);
+					$message->recreateParts(isset($translations[0])?$translations[0]:'', null, $gender);
 					$message->modifydate = date("Y-m-d H:i:s");
 					$message->update();
 					Query("COMMIT");

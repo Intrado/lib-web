@@ -954,22 +954,18 @@ class JobWiz_messagePhoneTranslate extends WizStep {
 				"helpstep" => 2
 			);
 		} else {
-			if(is_array($translations)){
-				foreach($translations as $obj){
+			foreach($translations as $translation){
+				if ($translation !== false) {
 					$languagecode = array_shift($translationlanguagecodes);
-
+					
 					if(!isset($voices[$languagecode.":".$msgdata->gender]))
 						$gender = ($msgdata->gender == "male")?"female":"male";
 					else
 						$gender = $msgdata->gender;
 					$transient = $this->isTransient($postdata, $languagecode);
-
-					$formdata[$languagecode] = $this->getTranslationDataArray($translationlanguages[$languagecode], $languagecode, $obj->responseData->translatedText, $gender, $transient, ($transient?"":$msgdata->text));
+					
+					$formdata[$languagecode] = $this->getTranslationDataArray($translationlanguages[$languagecode], $languagecode, $translation, $gender, $transient, ($transient?"":$msgdata->text));
 				}
-			} else {
-				$languagecode = reset($translationlanguagecodes);
-				$transient = $this->isTransient($postdata, $languagecode);
-				$formdata[$languagecode] = $this->getTranslationDataArray($translationlanguages[$languagecode], $languagecode, $translations->translatedText, $msgdata->gender, $transient, ($transient?"":$msgdata->text));
 			}
 		}
 		if(!isset($formdata["Translationinfo"])) {
@@ -1245,8 +1241,8 @@ class JobWiz_messageEmailTranslate extends WizStep {
 				"helpstep" => 1
 			);
 			
-			if(is_array($translations)) {
-				foreach($translations as $obj){
+			foreach($translations as $translation){
+				if ($translation !== false) {
 					$languagecode = array_shift($translationlanguagecodes);
 					$formdata[] = Language::getName($languagecode);
 					$formdata[$languagecode] = array(
@@ -1258,17 +1254,6 @@ class JobWiz_messageEmailTranslate extends WizStep {
 						"helpstep" => 1
 					);
 				}
-			} else {
-				$languagecode = reset($translationlanguagecodes);
-				$formdata[] = Language::getName($languagecode);
-				$formdata[$languagecode] = array(
-					"label" => _L("Enabled"),
-					"fieldhelp" => _L('Check this box to automatically translate your message using Google Translate.'),
-					"value" => 1,
-					"validators" => array(),
-					"control" => array("CheckBoxWithHtmlPreview", "checkedhtml" => $translations->translatedText, "uncheckedhtml" => addslashes(_L("People tagged with this language will receive the English version."))),
-					"helpstep" => 1
-				);
 			}
 		}
 

@@ -399,27 +399,12 @@ class MsgWiz_translatePreview extends WizStep {
 				"helpstep" => 2
 			);
 		} else {
-			if(is_array($translations)){
-				foreach($translations as $obj){
-					$languagecode = array_shift($translationlanguagecodes);
-					$formdata[] = Language::getName($languagecode);
-					$formdata[$languagecode] = array(
-						"label" => _L("Enabled"),
-						"fieldhelp" => _L('Check this box to automatically translate your message into %s.', Language::getName($languagecode)),
-						"value" => true,
-						"validators" => array(),
-						"control" => array("RetranslationItem",
-							"type" => "voice",
-							"gender" => $this->parent->dataHelper("/create/phoneadvanced:gender"),
-							"langcode" => $languagecode,
-							"message" => $obj->responseData->translatedText,
-							"disabledmessage" => _L("People tagged with this language will receive the English version.")),
-						"helpstep" => 2
-					);
-				}
-			} else {
-				$languagecode = reset($translationlanguagecodes);
-					$formdata[] = Language::getName($languagecode);
+			foreach($translations as $translation){
+				if ($translation === false)
+					continue;
+				
+				$languagecode = array_shift($translationlanguagecodes);
+				$formdata[] = Language::getName($languagecode);
 				$formdata[$languagecode] = array(
 					"label" => _L("Enabled"),
 					"fieldhelp" => _L('Check this box to automatically translate your message into %s.', Language::getName($languagecode)),
@@ -429,7 +414,7 @@ class MsgWiz_translatePreview extends WizStep {
 						"type" => "voice",
 						"gender" => $this->parent->dataHelper("/create/phoneadvanced:gender"),
 						"langcode" => $languagecode,
-						"message" => $translations->translatedText,
+						"message" => $translation,
 						"disabledmessage" => _L("People tagged with this language will receive the English version.")),
 					"helpstep" => 2
 				);

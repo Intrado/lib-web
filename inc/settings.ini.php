@@ -37,7 +37,7 @@ tts="10.25.25.66,8080,/tts/ttsserver"
 
 
 [translation]
-apikey="ABQIAAAAsHD6V_IqbLuYzx5sdmQ-TxQg47NEwCDk0BAJwz_RiAOR27B3BhRP2lCFovHb2pUntvaPoLjZtfK4gQ"
+apikey=""
 referer="http://asp.schoolmessenger.com"
 disableAutoTranslate=false
 
