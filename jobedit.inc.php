@@ -289,43 +289,6 @@ class ValTwitterAccountWithMessage extends Validator {
 	}
 }
 
-class ValTranslationExpirationDate extends Validator {
-	var $onlyserverside = true;
-	function validate ($value, $args,$requiredvalues) {
-		global $USER;	
-		global $submittedmode;
-		if ($submittedmode) {
-			global $job;
-			$query = "select 1 from message where messagegroupid = ? and autotranslate = 'translated' limit 1";
-			$hastranslated = QuickQuery($query, false, array($job->messagegroupid));
-		} else {
-			if ($requiredvalues['message'] == "")
-				return true;
-			$query = "select 1 from message where messagegroupid = ? and autotranslate = 'translated' limit 1";
-			$hastranslated = QuickQuery($query, false, array($requiredvalues['message']));
-		}
-
-		if ($hastranslated != false) {
-			if (strtotime($value) > strtotime("today") + (7*86400))
-				return _L("Cannot schedule the job with a message containing
-							 auto-translated content older than 7 days from the Start Date");
-		}
-		return true;
-	}
-}
-
-// ValIsTranslated is used to prevent a repeating job to contain a translated message
-class ValIsTranslated extends Validator {
-	var $onlyserverside = true;
-	function validate ($value) {
-		$query = "select 1 from message where messagegroupid = ? and autotranslate = 'translated' limit 1";
-		$istranslated = QuickQuery($query, false, array($value));
-		if ($istranslated > 0) {
-			return _L("Auto-translated messages cannot be used in a repeating job.");
-		}
-		return true;
-	}
-}
 
 // requires the message form item and validates that there are valid pages selected... but only if the message has facebook
 class ValFacebookPageWithMessage extends Validator {
@@ -545,7 +508,6 @@ if ($JOBTYPE == "repeating") {
 			"validators" => array(
 				array("ValRequired"),
 				array("ValDate", "min" => date("m/d/Y", strtotime("now + $dayoffset days")))
-				,array("ValTranslationExpirationDate")
 			),
 			"control" => array("TextDate", "size"=>12, "nodatesbefore" => $dayoffset),
 			"helpstep" => ++$helpstepnum
@@ -758,19 +720,15 @@ if ($submittedmode || $completedmode) {
 		"helpstep" => $helpstepnum
 	);
 	$formdata[] = _L('Message');
-	$messagevalidators = array(
-			array("ValRequired"),
-			array("ValInArray","values"=>array_keys($messages)),
-			array("ValMessageGroup")
-			);
-	if ($JOBTYPE == "repeating") {
-		$messagevalidators[] = array("ValIsTranslated");
-	}
 	$formdata["message"] = array(
 		"label" => _L('Message'),
 		"fieldhelp" => _L('Select a message from your existing messages.'),
 		"value" => (((isset($job->messagegroupid) && $job->messagegroupid))?$job->messagegroupid:""),
-		"validators" => $messagevalidators,
+		"validators" => array(
+			array("ValRequired"),
+			array("ValInArray","values"=>array_keys($messages)),
+			array("ValMessageGroup")
+		),
 		"control" => array("MessageGroupSelectMenu", "values" => $messages),
 		"helpstep" => ++$helpstepnum
 	);
@@ -1096,12 +1054,10 @@ include_once("nav.inc.php");
 <script type="text/javascript">
 <? 
 Validator::load_validators(array("ValDuplicateNameCheck",
-								"ValTranslationExpirationDate",
 								"ValWeekRepeatItem",
 								"ValTimeWindowCallEarly",
 								"ValTimeWindowCallLate",
 								"ValFormListSelect",
-								"ValIsTranslated",
 								"ValMessageGroup",
 								"ValFacebookPageWithMessage",
 								"ValTwitterAccountWithMessage"));
