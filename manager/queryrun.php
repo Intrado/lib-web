@@ -102,34 +102,34 @@ if (CheckFormSubmit($f,$s)) {
 				for ($x = 0; $x < $managerquery->numargs; $x++) {
 					$sqlquery = str_replace('_$'.($x+1).'_', "'".DBSafe(GetFormData($f, $s, "arg_$x"))."'", $sqlquery);
 				}
-
-	
+				
+				
 				$sqlquery = str_replace('_$CUSTOMERID_', $customer[0], $sqlquery);
 				$res = mysql_query($sqlquery,$custdb)
 					or die ("Failed to execute sql: " . mysql_error($custdb));
-	
+				
+				$displayinfo = mysql_query("select value from setting where name = 'displayname'",$custdb)
+					or die ("Failed to execute sql: " . mysql_error($custdb));
+				$displayname = mysql_fetch_row($displayinfo);
+				
 				if ($savecsv) {
-	
 					//write field header
-	
 					if (!$wroteheaders) {
 						$wroteheaders = true;
-						echo '"customerid"';
+						echo '"customername","customerid"';
 						for ($i = 0; $i < mysql_num_fields($res); $i++) {
 							$field = mysql_fetch_field($res, $i);
 							echo ',"' . $field->name . '"';
 						}
 						echo "\n";
 					}
-	
+					
 					while ($row = mysql_fetch_row($res)) {
-						echo '"' . $customer[0] . '","' . implode('","',$row) . '"' . "\n";
+						echo escape_csvfield($displayname[0]) . ',' . escape_csvfield($customer[0]) . ',' . array_to_csv($row) . "\n";
 					}
 				} else {
-	
-	
 					$numfields = @mysql_num_fields($res);
-	
+					
 					if (!$numfields) {
 						$obj = new Foo123;
 						$obj->name = "affected rows";
@@ -141,8 +141,7 @@ if (CheckFormSubmit($f,$s)) {
 						for ($i = 0; $i < $numfields; $i++) {
 							$fields[] = mysql_fetch_field($res, $i);
 						}
-	
-	
+						
 						$sizes = array();
 						$data = array();
 						while ($row = mysql_fetch_row($res)) {
@@ -153,13 +152,13 @@ if (CheckFormSubmit($f,$s)) {
 					}
 					
 					if (count($data) > 0) { //don't show headers and stuff if there is no data
-						$queryoutput .= '<tr class="listHeader"><th style="border-top: 1px solid black;" colspan=' . count($fields) . '>Customer ' . $customer[0] . '</th></tr>';
-		
+						$queryoutput .= '<tr class="listHeader"><th style="border-top: 1px solid black;" colspan=' . count($fields) . '>Customer: ' . escapehtml($displayname[0]) . ' (ID: ' . $customer[0] . ')</th></tr>';
+						
 						$line = '<tr class="listHeader">';
 						foreach ($fields as $index => $field)
-								$line .= '<th align="left">' . escapehtml($field->name) . '</th>';
+							$line .= '<th align="left">' . escapehtml($field->name) . '</th>';
 						$queryoutput .= $line . "</tr>\n";	
-		
+						
 						$counter = 0;
 						foreach ($data as $row) {
 							$line = '<tr '. ($counter++ % 2 == 1 ? 'class="listAlt"' : '') .'>';
