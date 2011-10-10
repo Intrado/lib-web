@@ -919,8 +919,8 @@ class JobWiz_messagePhoneTranslate extends WizStep {
 		$msgdata = $this->parent->dataHelper("/message/phone/text:message", true, '{"gender": "female", "text": ""}');
 
 		$warning = "";
-		if(mb_strlen($msgdata->text) > 4000) {
-			$warning = _L('Warning. Only the first 4000 characters are translated.');
+		if(mb_strlen($msgdata->text) > 5000) {
+			$warning = _L('Warning. Only the first 5000 characters are translated.');
 		}
 
 		//Get available languages
@@ -1201,8 +1201,8 @@ class JobWiz_messageEmailTranslate extends WizStep {
 		$englishtext = $this->parent->dataHelper('/message/email/text:message', false, "");
 
 		$warning = "";
-		if(mb_strlen($englishtext) > 4000) {
-			$warning = _L('Warning. Only the first 4000 characters are translated.');
+		if(mb_strlen($englishtext) > 5000) {
+			$warning = _L('Warning. Only the first 5000 characters are translated.');
 		}
 
 		if(!$translations) {
@@ -1250,7 +1250,7 @@ class JobWiz_messageEmailTranslate extends WizStep {
 						"fieldhelp" => _L('Check this box to automatically translate your message using Google Translate.'),
 						"value" => 1,
 						"validators" => array(),
-						"control" => array("CheckBoxWithHtmlPreview", "checkedhtml" => $obj->responseData->translatedText, "uncheckedhtml" => addslashes(_L("People tagged with this language will receive the English version."))),
+						"control" => array("CheckBoxWithHtmlPreview", "checkedhtml" => $translation, "uncheckedhtml" => addslashes(_L("People tagged with this language will receive the English version."))),
 						"helpstep" => 1
 					);
 				}
