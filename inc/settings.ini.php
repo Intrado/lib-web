@@ -54,4 +54,15 @@ appsecret="3cf7cbf09b579450f5761e46c14a655c"
 consumerkey="TrOii2FpUUlCoyvgnbohnQ"
 consumersecret="L4RtNiOENkkbrsLdDOSAkE2O08aChqJ52e8McoFfJ4"
 
+[memcache]
+use_memcache_sessions=false
+memcache_session_expire_mins=30
+; configure one or more memcached_url entries. Rememebr to use square brackets to denote an array!
+; ie tcp://host1:11211?persistent=1&weight=1&timeoutms=1000&retry_interval=15
+; This is the same format as documented for memcache session support, and is also parsed and used for
+; other memcache calls.
+; if no urls are defined, memache support is disabled
+memcached_url[]="tcp://127.0.0.1:11211?persistent=1&timeoutms=1000"
+
+
 ;*/?>

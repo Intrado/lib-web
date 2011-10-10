@@ -211,16 +211,41 @@ function putSessionData($id, $sess_data) {
 	}
 }
 
+//fires up the session, sets timezone, and connects to the db
 function doStartSession() {
 //	if (session_id() != "") return; // session was already started
 	global $CUSTOMERURL;
+	global $_DBHOST;
+	global $_DBNAME;
+	global $_DBUSER;
+	global $_DBPASS;
+	
 	session_name($CUSTOMERURL . "_session");
 	session_start();
 
+	//this code is to work around the differences in memcache sessions and authserver sessions
+	//normal case for page loads, global is unset, but data is in session
+	if (!isset($_DBHOST) && isset($_SESSION['_DBHOST'])) {
+		$_DBHOST = $_SESSION['_DBHOST'];
+		$_DBNAME = $_SESSION['_DBNAME'];
+		$_DBUSER = $_SESSION['_DBUSER'];
+		$_DBPASS = $_SESSION['_DBPASS'];
+		doDBConnect();
+	}
+	//for new logins, session data will be missing. getSessionDataReadOnly() has side-effect of settings globals
+	if (!isset($_SESSION['_DBHOST'])) {
+		getSessionDataReadOnly(session_id()); //also calls doDBConnect()
+		$_SESSION['_DBHOST'] = $_DBHOST;
+		$_SESSION['_DBNAME'] = $_DBNAME;
+		$_SESSION['_DBUSER'] = $_DBUSER;
+		$_SESSION['_DBPASS'] = $_DBPASS;
+	}
+	
 	if (isset($_SESSION['timezone'])) {
 		@date_default_timezone_set($_SESSION['timezone']);
 		QuickUpdate("set time_zone='" . $_SESSION['timezone'] . "'");
 	}
+	
 }
 
 function loadCredentials ($userid) {
@@ -236,18 +261,25 @@ function loadCredentials ($userid) {
 	}
 }
 
-function doDBConnect($result) {
+function doDBConnect($authresult = false) {
+	global $_dbcon;
 	global $_DBHOST;
 	global $_DBNAME;
 	global $_DBUSER;
 	global $_DBPASS;
+	
+	//if we're being called with an authresult, parse it into globals
+	if ($authresult !== false) {
+		$_DBHOST = $authresult['dbhost'];
+		$_DBUSER = $authresult['dbuser'];
+		$_DBPASS = $authresult['dbpass'];
+		$_DBNAME = $authresult['dbname'];
+	}
 
-	$_DBHOST = $result['dbhost'];
-	$_DBUSER = $result['dbuser'];
-	$_DBPASS = $result['dbpass'];
-	$_DBNAME = $result['dbname'];
-
-	global $_dbcon;
+	//don't bother connecting to the db twice (caused by some strange legacy authserver methods)
+	if (isset($_dbcon))
+		return true;
+	
 	try {
 		$dsn = 'mysql:dbname='.$_DBNAME.';host='.$_DBHOST;
 		$_dbcon = new PDO($dsn, $_DBUSER, $_DBPASS);
