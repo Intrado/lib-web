@@ -217,9 +217,6 @@ class Form {
 
 			if (isset($itemdata['control'])) {
 				$control = $itemdata['control'];
-			} else {
-				//set a hidden field
-				$control = array("HiddenField");
 			}
 
 			$formclass = $control[0];
