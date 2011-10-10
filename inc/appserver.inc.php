@@ -345,4 +345,34 @@ function phoneMessageGetMp3AudioFile($parts) {
 	return $result;
 }
 
+function processIncomingSms($smsParams) {
+	list($appserverCommsuiteProtocol,$appserverCommsuiteTransport) = initCommsuiteApp();
+	
+	if ($appserverCommsuiteProtocol == null || $appserverCommsuiteTransport == null) {
+		error_log("Cannot use AppServer");
+		return null;
+	}
+	
+	$attempts = 0;
+	while (true) {
+		try {
+			$client = new CommSuiteClient($appserverCommsuiteProtocol);
+			$appserverCommsuiteTransport->open();
+				
+			// Connect and be sure to catch and log all exceptions
+			$client->processIncomingSms($smsParams);
+			return true;
+		} catch (TException $tx) {
+			$attempts++;
+			// a general thrift exception, like no such server
+			error_log("processIncomingSms: Exception Connection to AppServer (" . $tx->getMessage() . ")");
+			$appserverCommsuiteTransport->close();
+			if ($attempts > 2) {
+				error_log("processIncomingSms: Failed 3 times to send sms to appserver");
+				return false;
+			}
+		}
+	}
+}
+
 ?>

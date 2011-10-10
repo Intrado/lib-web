@@ -1,57 +1,39 @@
 <?
 echo "TXTREPLY";
 
-// Air2Web or 3ci
-$is3ci = true;
-if (!isset($_GET['DestAddr']) && isset($_POST['inbound_address'])) {
-	$is3ci = false; // isAir2Web
-}
+require_once("inc/appserver.inc.php");
+require_once('thrift/Thrift.php');
+require_once $GLOBALS['THRIFT_ROOT'].'/protocol/TBinaryProtocol.php';
+require_once $GLOBALS['THRIFT_ROOT'].'/transport/TSocket.php';
+require_once $GLOBALS['THRIFT_ROOT'].'/transport/TBufferedTransport.php';
+require_once $GLOBALS['THRIFT_ROOT'].'/transport/TFramedTransport.php';
+require_once($GLOBALS['THRIFT_ROOT'].'/packages/commsuite/CommSuite.php');
 
-// Air2Web postback status
-if (!$is3ci && !isset($_POST['message'])) {
-	error_log("unexpected postback status from air2web");
-	exit();
-}
-
-//----------------------------------------------------------------------
 $SETTINGS = parse_ini_file("inc/settings.ini.php",true);
 
-// log files
-$tmplogfile = isset($SETTINGS['txtreply']['txt_datfile']) ? $SETTINGS['txtreply']['txt_datfile'] : "/usr/commsuite/cache/txtreply.dat";
-//----------------------------------------------------------------------
-
-// additional params sent from air2web
+$sourceaddress = "";
+$inboundshortcode = "";
+$message = "";
+$message_id = "";
+$message_orig = "";
 $carrier = "";
 $channel = "";
 $router = "";
-$message_id = "none";
-$message_orig = "";
 
-if ($is3ci) { // 3ci
-	$sourceaddress = trim($_GET['SourceAddr']);
-	$inboundshortcode = trim($_GET['DestAddr']);
-	$message = strtolower($_GET['MessageText']);
-} else { // air2web
-	$sourceaddress = $_POST['device_address'];
-	$inboundshortcode = $_POST['inbound_address'];
-	$message = strtolower($_POST['message']);
-	$message_id = $_POST['message_id'];
-	$message_orig = $_POST['message_orig'];
-	$carrier = $_POST['carrier'];
-	$channel = $_POST['channel'];
-	$router = $_POST['router'];
-}
+// params sent from air2web
+$sourceaddress = $_POST['device_address'];
+$inboundshortcode = $_POST['inbound_address'];
+$message = strtolower($_POST['message']);
+$message_id = $_POST['message_id'];
+$message_orig = $_POST['message_orig'];
+$carrier = $_POST['carrier'];
+$channel = $_POST['channel'];
+$router = $_POST['router'];
 
-if ($inboundshortcode != "45305" && // 3ci
-	$inboundshortcode != "68453" && // air2web US
-	$inboundshortcode != "724665") { // air2web Canada
-	error_log("unexpected incoming shortcode ".$inboundshortcode);
-}
-
-apache_note("CS_APP","txtreply"); //for logging
+// for logging
+apache_note("CS_APP","txtreply");
 apache_note("CS_CUST", $sourceaddress);
 apache_note("CS_USER", $message_id);
-
 
 // build up name-value pairs
 $data = array();
@@ -65,16 +47,7 @@ $data['carrier'] = $carrier;
 $data['channel'] = $channel;
 $data['router'] = $router;
 
-$httpdata = http_build_query($data);
-
-// write to log file	
-$fp = fopen($tmplogfile,"a");
-if ($fp) {
-	fwrite($fp, $httpdata ."\n");
-	fclose($fp);
-}
-else {
-	error_log("Unable to log SMS message ".$httpdata." in $tmplogfile");
-}
+// call appserver
+processIncomingSms($data);
 
 ?>
