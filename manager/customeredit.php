@@ -886,7 +886,6 @@ $formdata["nsid"] = array(
 						"label" => _L('NetSuite ID'),
 						"value" => isset($custinfo)?$custinfo["nsid"]:"",
 						"validators" => array(
-							array('ValNumber'),
 							array("ValLength","max" => 50)
 						),
 						"control" => array("TextField","maxlength"=>50,"size"=>4),
