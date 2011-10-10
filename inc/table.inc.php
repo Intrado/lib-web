@@ -141,16 +141,8 @@ function showCsvData ($data, $titles, $formatters = array()) {
 	}
 }
 
-function startWindow($title, $style = "", $minimize = false, $usestate = true) {
-	static $id = 0;
-	$id++;
-
+function startWindow($title) {
 	$theme = getBrandTheme();
-
-	$visible = !$usestate || state("window_$id") != "closed";
-
-	if (!$visible)
-		$style .= "; display: none";
 
 ?>
 <div class="window">
@@ -159,9 +151,7 @@ function startWindow($title, $style = "", $minimize = false, $usestate = true) {
 		<td><img src="img/themes/<?=$theme?>/win_tl.gif" alt="" class="noprint" /></td>
 		<td background="img/themes/<?=$theme?>/win_t.gif" width="100%">
 			<div class="windowbar">
-<?	if ($minimize) { ?>
-				<div class="menucollapse" onclick="windowHide(<?=$id?>);" ><img alt="expand or collapse window" id="window_colapseimg_<?= $id ?>" src="img/arrow_<?=  $visible ? "down" : "right" ?>.gif"></div>
-<? } ?>
+
 				<div class="windowtitle"><?= $title ?></div>
 			</div>
 		</td>
@@ -169,7 +159,7 @@ function startWindow($title, $style = "", $minimize = false, $usestate = true) {
 	</tr>
 	<tr>
 		<td background="img/themes/<?=$theme?>/win_l.gif"></td>
-		<td><div id="window_<?= $id ?>" class="windowbody" style="<?=$style?>"><div style="width: 100%;">
+		<td><div class="windowbody"><div style="width: 100%;">
 <?
 }
 
