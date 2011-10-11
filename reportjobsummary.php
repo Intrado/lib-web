@@ -152,15 +152,15 @@ if($reload)
 ////////////////////////////////////////////////////////////////////////////////
 
 if($generator->format != "html"){
-	if($reportgenerator->format == "pdf"){
-		if($result = $reportgenerator->testSize()){
+	if($generator->format == "pdf"){
+		if($result = $generator->testSize()){
 			error($result);
 			$error = true;
 		} else {
-			$reportgenerator->generate();
+			$generator->generate();
 		}
 	} else {
-		$reportgenerator->generate();
+		$generator->generate();
 	}
 } else {
 
