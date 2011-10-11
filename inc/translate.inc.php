@@ -109,13 +109,12 @@ function googleTranslateV2($text, $sourcelanguage, $targetlanguages) {
 			while(!feof($fp)) {
 				$result .= fgets($fp, 128);
 			}
-		}
-		else {
+			fclose($fp);
+		} else {
 			error_log("Unable to send translation request: (From: $sourcelanguage to $targetlanguage) Truncated text: " . substr($text,0, 20));
 			$translations[] = false;
+			continue;
 		}
-		
-		fclose($fp);
 		
 		$result = explode("\r\n\r\n", $result, 2);
 		$header = isset($result[0]) ? $result[0] : '';
