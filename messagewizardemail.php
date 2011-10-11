@@ -264,8 +264,8 @@ class MsgWiz_translatePreview extends WizStep {
 		static $translationlanguages = false;
 
 		$warning = "";
-		if(mb_strlen($sourcetext) > 4000) {
-			$warning = _L('Warning. Only the first 4000 characters are translated.');
+		if(mb_strlen($sourcetext) > 5000) {
+			$warning = _L('Warning. Only the first 5000 characters are translated.');
 		}
 
 		//Get available languages

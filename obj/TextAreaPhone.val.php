@@ -6,8 +6,8 @@ class ValTextAreaPhone extends Validator {
 		$textlength = mb_strlen($msgdata->text);
 		if (!$textlength)
 			return $this->label." "._L("cannot be blank.");
-		else if ($textlength > 4000) {
-			return $this->label." "._L("cannot be more than 4000 characters.");
+		else if ($textlength > 5000) {
+			return $this->label." "._L("cannot be more than 5000 characters.");
 		}
 		return true;
 	}
@@ -19,8 +19,8 @@ class ValTextAreaPhone extends Validator {
 				var textlength = msgdata.text.length;
 				if (!textlength)
 					return label + " '.addslashes(_L('cannot be blank.')).'";
-				else if(textlength > 4000)
-					return label + " '.addslashes(_L('cannot be more than 4000 characters.')).'";
+				else if(textlength > 5000)
+					return label + " '.addslashes(_L('cannot be more than 5000 characters.')).'";
 				return true;
 			}';
 	}

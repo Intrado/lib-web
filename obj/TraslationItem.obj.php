@@ -270,9 +270,9 @@ class TranslationItem extends FormItem {
 						saveHtmlEditorContent();
 					var englishText = $(section+"englishText");
 					var sourcetext = "";
-					if(englishText.value.length > 4000) {
-						alert("This message will be truncated to 4000 characters.");
-						sourcetext = englishText.value.strip().substring(0,4000);
+					if(englishText.value.length > 5000) {
+						alert("This message will be truncated to 5000 characters.");
+						sourcetext = englishText.value.strip().substring(0,5000);
 					} else {
 						sourcetext = englishText.value.strip();
 					}

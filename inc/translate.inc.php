@@ -89,8 +89,8 @@ function googleTranslateV2($text, $sourcelanguage, $targetlanguages) {
 		
 		$data = http_build_query($post_data);
 		
-		// TODO timeout is currently 30 seconds
-		$fp = fsockopen("ssl://" . $host, 443, $errno, $errstr, 30);
+		// TODO timeout is currently 5 seconds
+		$fp = fsockopen("ssl://" . $host, 443, $errno, $errstr, 5);
 		
 		if ($fp){
 			// send the request headers:
@@ -111,15 +111,19 @@ function googleTranslateV2($text, $sourcelanguage, $targetlanguages) {
 			}
 		}
 		else {
+			error_log("Unable to send translation request: (From: $sourcelanguage to $targetlanguage) Truncated text: " . substr($text,0, 20));
 			$translations[] = false;
 		}
 		
 		fclose($fp);
 		
-		//TODO Check header, currently only reading content, on error content wikl be blank
 		$result = explode("\r\n\r\n", $result, 2);
 		$header = isset($result[0]) ? $result[0] : '';
 		$content = isset($result[1]) ? $result[1] : '';
+		
+		$statuscode = substr($header, 9, 3);
+		if ($statuscode !== "200")
+			error_log("Google Translation Error: $content");
 		
 		$obj = json_decode($content);
 		if(isset($obj->data->translations[0]->translatedText)) {
