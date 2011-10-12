@@ -877,7 +877,6 @@ div.autocomplete ul li {
 }
 
 .messagegrid {
-	vertical-padding: 20px;
 	text-align: center;
 }
 .messagegrid .messagegridheader{
