@@ -170,9 +170,15 @@ class RetranslationItem extends FormItem {
 					button.hide();
 					retranslate.show();
 					
+					var text = makeTranslatableString(message.innerHTML);
+					if(text != text.substring(0, 5000)){
+						text = text.substring(0, 5000);
+						alert("' . _L('The message is too long. Only the first 5000 characters are submitted for translation.') . '");
+					}
+					
 					new Ajax.Request("translate.php", {
 						method:"post",
-						parameters: {"text": makeTranslatableString(message.innerHTML), "language": langcode},
+						parameters: {"text": text, "language": langcode},
 						onSuccess: function(result) {
 								var data = result.responseJSON;
 								if(data.responseStatus != 200 || data.responseData.translatedText == undefined)

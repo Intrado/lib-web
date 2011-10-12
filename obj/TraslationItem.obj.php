@@ -238,9 +238,9 @@ class TranslationItem extends FormItem {
 					var text = $(srcbox).getValue().strip();
 					if(text == "")
 						return;
-					if(text != text.substring(0, 2000)){
-						text = text.substring(0, 2000);
-						alert("' . _L('The message is too long. Only the first 2000 characters are submitted for translation.') . '");
+					if(text != text.substring(0, 5000)){
+						text = text.substring(0, 5000);
+						alert("' . _L('The message is too long. Only the first 5000 characters are submitted for translation.') . '");
 					}
 					$(section + "retranslationtext").innerHTML = "<img src=\"img/ajax-loader.gif\" />";
 					new Ajax.Request("translate.php", {

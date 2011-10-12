@@ -8,8 +8,8 @@ $responseObj = false;
 $translationObj = false;
 
 if(isset($_REQUEST['text']) && isset($_REQUEST['language'])){
-	if(strlen($_REQUEST['text']) > 5000){
-		error_log("Request is too large to send to Google");
+	if(mb_strlen($_REQUEST['text']) > 5000){
+		error_log("Request is too large to send to Google. Text length: " . mb_strlen($_REQUEST['text']));
 		$responseObj->responseData = "";
 		$responseObj->responseDetails = NULL;
 		$responseObj->responseStatus = 503;
