@@ -34,6 +34,7 @@ require_once("obj/RetranslationItem.fi.php");
 require_once("obj/CheckBoxWithHtmlPreview.fi.php");
 require_once("obj/EmailMessageEditor.fi.php");
 require_once("obj/PreviewButton.fi.php");
+require_once("obj/ValTranslationLength.val.php");
 
 // appserver and thrift includes
 require_once("inc/appserver.inc.php");
@@ -135,7 +136,10 @@ class MsgWiz_emailText extends WizStep {
 		
 		// Form Fields.
 		$formdata = array($this->title);
-
+		$messagevalidators = array(
+			array("ValRequired"),
+			array("ValMessageBody", "messagegroupid" => $_SESSION['wizard_message_mgid'])
+		);
 		// if auto-translate, give the user a hint that this is the ENGLISH version from which translations will be created.
 		if (isset($postdata["/create/language"]["language"]) && $postdata["/create/language"]["language"] == "autotranslate") {
 			$formdata['tips'] = array(
@@ -149,6 +153,7 @@ class MsgWiz_emailText extends WizStep {
 					'),
 				"helpstep" => 1
 			);
+			$messagevalidators[] = array("ValTranslationLength");
 		}
 		
 		$formdata["fromname"] = array(
@@ -201,9 +206,7 @@ class MsgWiz_emailText extends WizStep {
 			"label" => _L("Email Message"),
 			"fieldhelp" => _L('Enter the message you would like to send. Helpful tips for successful messages can be found at the Help link in the upper right corner.'),
 			"value" => $msgdata->text,
-			"validators" => array(
-				array("ValRequired"),
-				array("ValMessageBody", "messagegroupid" => $_SESSION['wizard_message_mgid'])),
+			"validators" => $messagevalidators,
 			"control" => array("EmailMessageEditor", "subtype" => $subtype),
 			"helpstep" => 5
 		);
@@ -699,7 +702,7 @@ require_once("nav.inc.php");
 
 ?>
 <script type="text/javascript">
-<?	Validator::load_validators(array("ValMessageBody", "ValEmailAttach"));?>
+<?	Validator::load_validators(array("ValMessageBody", "ValEmailAttach","ValTranslationLength"));?>
 </script>
 <script src="script/livepipe/livepipe.js" type="text/javascript"></script>
 <script src="script/livepipe/window.js" type="text/javascript"></script>

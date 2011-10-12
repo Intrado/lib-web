@@ -32,6 +32,7 @@ require_once("obj/RetranslationItem.fi.php");
 require_once("obj/CheckBoxWithHtmlPreview.fi.php");
 require_once("obj/PhoneMessageEditor.fi.php");
 require_once("obj/PreviewButton.fi.php");
+require_once("obj/ValTranslationLength.val.php");
 
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization
@@ -289,6 +290,12 @@ class MsgWiz_phoneAdvanced extends WizStep {
 		$formdata = array($messagegroup->name. " (". $language. ")");
 		$helpsteps = array();
 		$helpstep = 1;
+		
+		$messagevalidators = array(
+					array("ValRequired"),
+					array("ValMessageBody", "messagegroupid" => $_SESSION['wizard_message']['mgid'])
+		);
+		
 		// if auto-translate, give the user a hint that this is the ENGLISH version from which translations will be created.
 		if (isset($postdata["/create/language"]["language"]) && $postdata["/create/language"]["language"] == "autotranslate") {
 			$formdata['tips'] = array(
@@ -302,15 +309,14 @@ class MsgWiz_phoneAdvanced extends WizStep {
 					'),
 				"helpstep" => $helpstep++);
 			$helpsteps[] = "You will create the English version of your message here. Your automatically translated messages will be created afterwards and you will be able to review and edit them.";
+			$messagevalidators[] = array("ValTranslationLength");
 		}
 		
 		$formdata["message"] = array(
 				"label" => _L("Advanced Message"),
 				"fieldhelp" => _L("Enter your phone message in this field. Click on the 'Guide' button for help with the different options which are available to you."),
 				"value" => "",
-				"validators" => array(
-					array("ValRequired"),
-					array("ValMessageBody", "messagegroupid" => $_SESSION['wizard_message']['mgid'])),
+				"validators" => $messagevalidators,
 				"control" => array("PhoneMessageEditor", "langcode" => $langcode, "messagegroupid" => $messagegroup->id),
 				"helpstep" => $helpstep++);
 		$formdata["gender"] = array(
@@ -838,7 +844,7 @@ require_once("nav.inc.php");
 
 ?>
 <script type="text/javascript">
-<?	Validator::load_validators(array("PhoneMessageRecorderValidator", "ValMessageBody"));?>
+<?	Validator::load_validators(array("PhoneMessageRecorderValidator", "ValMessageBody","ValTranslationLength"));?>
 </script>
 <script src="script/livepipe/livepipe.js" type="text/javascript"></script>
 <script src="script/livepipe/window.js" type="text/javascript"></script>
