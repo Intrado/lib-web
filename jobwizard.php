@@ -635,7 +635,7 @@ require_once("nav.inc.php");
 Validator::load_validators(array("ValInArray", "ValJobName", "ValHasMessage",
 	"ValTextAreaPhone", "ValEasycall", "ValLists", "ValTranslation", "ValEmailAttach",
 	"ValTimeWindowCallLate", "ValTimeWindowCallEarly", "ValRegExp", "valPhone",
-	"ValMessageBody", "ValMessageGroup", "ValMessageTypeSelect", "ValFacebookPage"));
+	"ValMessageBody", "ValMessageGroup", "ValMessageTypeSelect", "ValFacebookPage","ValTranslationCharacterLimit"));
 ?>
 </script>
 <script src="script/livepipe/livepipe.js" type="text/javascript"></script>

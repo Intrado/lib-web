@@ -424,6 +424,27 @@ class ValMessageTypeSelect extends Validator {
 	}
 }
 
+
+class ValTranslationCharacterLimit extends Validator {
+	function validate ($value, $args, $requiredvalues) {
+		$textlength = strlen($requiredvalues[$args['field']]);
+		if ($textlength > 5000)
+			return "$this->label is unavalable if the message is more than 5000 characters. The message is currently $textlength characters.";
+		return true;
+	}
+	function getJSValidator () {
+	return
+	'function (name, label, value, args, requiredvalues) {
+				//alert("valLength");
+				var textlength = requiredvalues[args["field"]].length;
+				if (textlength > 5000)
+					return this.label +" is unavalable if the message is more than 5000 characters. The message is currently " + textlength + " characters.";
+				return true;
+			}';
+	}
+}
+
+	
 ////////////////////////////////////////////////////////////////////////////////
 // Form Items
 ////////////////////////////////////////////////////////////////////////////////
@@ -854,8 +875,11 @@ class JobWiz_messagePhoneText extends WizStep {
 				"label" => _L("Translate"),
 				"fieldhelp" => _L('Check here if you would like to use automatic translation. Remember automatic translation is improving all the time, but it\'s not perfect yet. Be sure to preview and try reverse translation in the next screen.'),
 				"value" => ($this->parent->dataHelper('/start:package') == "express")?true:false,
-				"validators" => array(),
+				"validators" => array(
+					array("ValTranslationCharacterLimit", "field" => "message")
+				),
 				"control" => array("CheckBox"),
+				"requires" => array("message"),
 				"helpstep" => 2
 			);
 		}
@@ -1162,8 +1186,11 @@ class JobWiz_messageEmailText extends WizStep {
 				"label" => _L("Translate"),
 				"fieldhelp" => _L('Check this box to automatically translate your message using Google Translate. Remember automatic translation is improving all the time, but it\'s not perfect yet. Be sure to preview and try reverse translation in the next screen.'),
 				"value" => ($postdata['/start']['package'] == "express")?true:false,
-				"validators" => array(),
+				"validators" => array(
+					array("ValTranslationCharacterLimit", "field" => "message")
+				),
 				"control" => array("CheckBox"),
+				"requires" => array("message"),
 				"helpstep" => 6
 			);
 		}
