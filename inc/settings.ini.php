@@ -57,6 +57,8 @@ consumersecret="L4RtNiOENkkbrsLdDOSAkE2O08aChqJ52e8McoFfJ4"
 [memcache]
 use_memcache_sessions=false
 memcache_session_expire_mins=30
+memcache_session_lock_seconds=60
+memcache_session_lock_retry_us=50000
 ; configure one or more memcached_url entries. Rememebr to use square brackets to denote an array!
 ; ie tcp://host1:11211?persistent=1&weight=1&timeoutms=1000&retry_interval=15
 ; This is the same format as documented for memcache session support, and is also parsed and used for
