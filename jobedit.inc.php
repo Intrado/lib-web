@@ -945,8 +945,6 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 				$job->setOption("skipemailduplicates",$postdata['skipduplicates']?1:0);
 
 				$messagegroup = new MessageGroup($postdata['message']);
-				if ($JOBTYPE != "repeating")
-					$messagegroup->reTranslate();
 				
 				$job->messagegroupid = $messagegroup->id;
 

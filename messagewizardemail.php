@@ -655,9 +655,6 @@ class FinishMessageWizard extends WizFinish {
 			}
 		}
 		
-		// refresh any stale auto translations
-		$messagegroup->reTranslate();
-		
 		// end the transaction
 		QuickQuery("COMMIT");
 	}

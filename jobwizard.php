@@ -482,8 +482,6 @@ class FinishJobWizard extends WizFinish {
 			} // for each message type
 		} // end if creating a message group
 		
-		// refresh any stale auto translations
-		$messagegroup->reTranslate();
 		
 		$job->messagegroupid = $messagegroup->id;
 
