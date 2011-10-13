@@ -17,6 +17,8 @@ if(isset($_GET['f'])){
 
 if (isset($_GET['logout'])) {
 	doStartSession(); // start the session to get the id
+	
+	//FIXME fix session_destroy then we don't need to write empty string
 	putSessionData(session_id(), ""); // write empty data to flush the user
 
 	@session_destroy();
@@ -78,9 +80,8 @@ if (isset($_GET['login'])) {
 	$sessionstarted = true;
 
 	if (isset($_SESSION['user'])) {
-		$redirpage = isset($_SESSION['lasturi']) ? $_SESSION['lasturi'] : 'start.php';
-		unset($_SESSION['lasturi']);
-		redirect($redirpage);
+		$redirpage = isset($_GET['last']) ? $_GET['last'] : 'start.php';
+		redirect(urlencode($redirpage));
 	}
 }
 

@@ -37,8 +37,8 @@ if (!isset($isindexpage) || !$isindexpage) {
 	}
 
 	if (!isset($_SESSION['user']) || !isset($_SESSION['access'])) {
-		$_SESSION['lasturi'] = $_SERVER['REQUEST_URI'];
-		redirect("$BASEURL/index.php?logout=1");
+		//probably a session expired or temp unavail, redirect to login, and give login a chance to bounce back somewhere
+		redirect("$BASEURL/index.php?last=" . urlencode($_SERVER['REQUEST_URI']));
 	} else {
 		$USER = &$_SESSION['user'];
 		$USER->refresh();
