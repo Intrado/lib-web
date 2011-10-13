@@ -2,6 +2,8 @@
 
 $SETTINGS = parse_ini_file("managersettings.ini.php",true);
 
+date_default_timezone_set("US/Pacific"); //to keep php from complaining. TODO move to manager settings.
+
 apache_note("CS_APP","manager"); //for logging
 apache_note("CS_CUST","_Manager_"); //for logging
 
