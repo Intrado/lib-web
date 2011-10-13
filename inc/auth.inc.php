@@ -248,6 +248,7 @@ function doStartSession() {
 	
 }
 
+//this is aparently only used in first login by login entry points (index.php, api, reset password)
 function loadCredentials ($userid) {
 	global $USER, $ACCESS;
 
