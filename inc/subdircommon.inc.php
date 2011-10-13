@@ -36,7 +36,6 @@ if (!isset($isindexpage) || !$isindexpage) {
 	}
 
 	if (!isset($_SESSION['user']) || !isset($_SESSION['access'])) {
-		$_SESSION['lasturi'] = $_SERVER['REQUEST_URI'];
 		exit();
 	} else {
 		$USER = &$_SESSION['user'];
