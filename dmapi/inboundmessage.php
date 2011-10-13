@@ -321,7 +321,6 @@ if($REQUEST_TYPE == "new"){
 			foreach ($languages as $code => $name) {
 				$i++;
 				if ($i == $selectedLang) {
-					error_log("found it");
 					$langindex = $code;
 					break;
 				}
