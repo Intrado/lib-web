@@ -439,7 +439,13 @@ $defaultlogos = array(
 
 $shards = QuickQueryList("select id, name from shard where not isfull order by id",true);
 
-$dmmeathod = array('' => '--Choose a Method--', 'asp' => 'CommSuite (fully hosted)','hybrid' => 'CS + SmartCall + Emergency','cs' => 'CS + SmartCall (data only)');
+$dmmethod = array('' => '--Choose a Method--', 'asp' => 'CommSuite (fully hosted)','hybrid' => 'CS + SmartCall + Emergency','cs' => 'CS + SmartCall (data only)');
+
+if ($customerid)
+	$shortcodegroupname = QuickQuery("select description from shortcodegroup where id = (select shortcodegroupid from customer where id = ?)", null, array($customerid));
+else
+	$shortcodegroupname = QuickQuery("select description from shortcodegroup where id = 1"); // hardcoded id=1 is the default group for new customers
+
 
 $helpstepnum = 1;
 $helpsteps = array("TODO");
@@ -472,9 +478,9 @@ $formdata["dmmethod"] = array(
 						"value" => $settings['_dmmethod'],
 						"validators" => array(
 							array("ValRequired"),
-							array("ValInArray", "values" => array_keys($dmmeathod))
+							array("ValInArray", "values" => array_keys($dmmethod))
 							),
-						"control" => array("SelectMenu", "values" => array("" =>_L("-- Select a Method --")) + $dmmeathod),
+						"control" => array("SelectMenu", "values" => array("" =>_L("-- Select a Method --")) + $dmmethod),
 						"helpstep" => $helpstepnum
 );
 $formdata["timezone"] = array(
@@ -763,8 +769,6 @@ $formdata["enablesmsoptin"] = array(
 						"control" => array("CheckBox"),
 						"helpstep" => $helpstepnum
 );
-
-
 $formdata["smscustomername"] = array(
 						"label" => _L('SMS Customer Name'),
 						"value" => $settings['smscustomername'],
@@ -775,6 +779,14 @@ $formdata["smscustomername"] = array(
 						"control" => array("TextField","maxlength"=>50,"size"=>25),
 						"helpstep" => $helpstepnum
 );
+$formdata["shortcodegroupname"] = array(
+						"label" => _L("Shortcode Group"),
+						"value" => $shortcodegroupname,
+						"validators" => array(),
+						"control" => array("FormHtml","html"=>"<div>".$shortcodegroupname."</div>"),
+						"helpstep" => $helpstepnum
+);
+
 $formdata[] = _L("API");
 $formdata["hassmapi"] = array(
 						"label" => _L('Has SMAPI'),
