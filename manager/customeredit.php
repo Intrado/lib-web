@@ -104,39 +104,60 @@ class LogoRadioButton extends FormItem {
 class LanguagesItem extends FormItem {
 	function render ($value) {
 		$n = $this->form->name."_".$this->name;
-		$googlangs = array(	"ar" => "Arabic",
+		$googlangs = array(	"af" => "Afrikaans",
+							"ar" => "Arabic",
+							"be" => "Belarusian",
 							"bg" => "Bulgarian",
 							"ca" => "Catalan",
-							"zh" => "Chinese",
-							"hr" => "Croatian",
 							"cs" => "Czech",
+							"cy" => "Welsh",
 							"da" => "Danish",
-							"nl" => "Dutch",
-							"fil" => "Filipino",
-							"fi" => "Finnish",
-							"fr" => "French",
 							"de" => "German",
 							"el" => "Greek",
-							"he" => "Hebrew",   //or iw
+							"en" => "English",
+							"es" => "Spanish",
+							"et" => "Estonian",
+							"fa" => "Persian",
+							"fi" => "Finnish",
+							"fr" => "French",
+							"ga" => "Irish",
+							"gl" => "Galician",
 							"hi" => "Hindi",
-							"id" => "Indonesian", // or in
+							"hr" => "Croatian",
+							"ht" => "Haitian",
+							"hu" => "Hungarian",
+							"id" => "Indonesian",
+							"is" => "Icelandic",
 							"it" => "Italian",
+							"iw" => "Hebrew",
 							"ja" => "Japanese",
 							"ko" => "Korean",
-							"lv" => "Latvian",
 							"lt" => "Lithuanian",
+							"lv" => "Latvian",
+							"mk" => "Macedonian",
+							"ms" => "Malay",
+							"mt" => "Maltese",
+							"nl" => "Dutch",
 							"no" => "Norwegian",
 							"pl" => "Polish",
 							"pt" => "Portuguese",
 							"ro" => "Romanian",
 							"ru" => "Russian",
-							"sr" => "Serbian",
 							"sk" => "Slovak",
 							"sl" => "Slovenian",
-							"es" => "Spanish",
+							"sq" => "Albanian",
+							"sr" => "Serbian",
 							"sv" => "Swedish",
+							"sw" => "Swahili",
+							"th" => "Thai",
+							"fil" => "Filipino", // translated to "tl" before sent to google
+							"tr" => "Turkish",
 							"uk" => "Ukrainian",
-							"vi" => "Vietnamese");
+							"vi" => "Vietnamese",
+							"yi" => "Yiddish",
+							"zh" => "Chinese");
+		asort($googlangs); // Sort by value and not by country code
+		
 		$str = "
 				<input id='$n' name='$n' type='hidden' value='$value' />
 				<div id='$n-removelang' style='display:none'>" . icon_button("Remove", "delete") . "</div>

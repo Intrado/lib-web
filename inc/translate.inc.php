@@ -2,39 +2,57 @@
 
 // TODO Move array of supported languages out of here and update with the most current list of supported languages
 $TRANSLATIONLANGUAGECODES = array(
+	"af",
 	"ar",
+	"be",
 	"bg",
 	"ca",
 	"cs",
+	"cy",
 	"da",
 	"de",
 	"el",
 	"en",
 	"es",
+	"et",
+	"fa",
 	"fi",
 	"fr",
+	"ga",
+	"gl",
 	"hi",
 	"hr",
+	"ht",
+	"hu",
 	"id",
+	"is",
 	"it",
 	"iw",
 	"ja",
 	"ko",
 	"lt",
 	"lv",
+	"mk",
+	"ms",
+	"mt",
 	"nl",
 	"no",
 	"pl",
-	"pt", // NOTE: Check for pt-PT before sending to google.
+	"pt",
 	"ro",
 	"ru",
 	"sk",
 	"sl",
+	"sq",
 	"sr",
 	"sv",
+	"sw",
+	"th",
 	"tl",
+	"tr",
 	"uk",
 	"vi",
+	"yi",
 	"zh"
 );
 
@@ -50,6 +68,15 @@ function googleTranslateV2($text, $sourcelanguage, $targetlanguages) {
 	
 	if (!isset($text) || !isset($sourcelanguage) || !isset($targetlanguages)) {
 		error_log("Illigal argument(s) for googleTranslateV2");
+		return $translations;
+	}
+	
+	$codeconvertions = array("he" => "iw","fil" => "tl");
+	if (isset($codeconvertions[$sourcelanguage]))
+		$sourcelanguage = $codeconvertions[$sourcelanguage];
+	
+	if(!in_array($sourcelanguage,$TRANSLATIONLANGUAGECODES)){
+		error_log("Illigal source language: $sourcelanguage for googleTranslateV2");
 		return $translations;
 	}
 	
@@ -73,11 +100,10 @@ function googleTranslateV2($text, $sourcelanguage, $targetlanguages) {
 		$text = mb_substr($text,0,5000);
 	}
 	
-
-	if ($sourcelanguage == "pt") // Google uses "pt-PT" for Portuguese.
-		$sourcelanguage = "pt-PT";
-
 	foreach ($targetlanguages as $targetlanguage) {
+		if (isset($codeconvertions[$targetlanguage]))
+			$targetlanguage = $codeconvertions[$targetlanguage];
+		
 		if(!in_array($targetlanguage,$TRANSLATIONLANGUAGECODES)){
 			$translations[] = false;
 			continue;
@@ -88,9 +114,6 @@ function googleTranslateV2($text, $sourcelanguage, $targetlanguages) {
 			$translations[] = $_SESSION["translationcache"][$key];
 			continue;
 		}
-		
-		if ($targetlanguage == "pt") // Google uses "pt-PT" for Portuguese.
-			$targetlanguage = "pt-PT";
 		
 		$post_data = array(
 			'key' => $apiKey,
