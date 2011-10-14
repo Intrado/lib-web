@@ -40,14 +40,11 @@ $TRANSLATIONLANGUAGECODES = array(
 
 
 function googleTranslateV2($text, $sourcelanguage, $targetlanguages) {
-	static $cache = false;
 	global $TRANSLATIONLANGUAGECODES, $SETTINGS;
 	
-	// Look for translations in cache
-	$key = md5($text . $sourcelanguage . implode("", $targetlanguages));
-	if (isset($cache[$key])) {
-		return $cache[$key];
-	}
+	//Initialize session translation cache if necessary 
+	if (!isset($_SESSION["translationcache"]))
+		$_SESSION["translationcache"] = array();
 	
 	$translations = array();
 	
@@ -85,6 +82,13 @@ function googleTranslateV2($text, $sourcelanguage, $targetlanguages) {
 			$translations[] = false;
 			continue;
 		}
+		// Look for translations in cache
+		$key = md5($text . $sourcelanguage . $targetlanguage);
+		if (isset($_SESSION["translationcache"][$key])) {
+			$translations[] = $_SESSION["translationcache"][$key];
+			continue;
+		}
+		
 		if ($targetlanguage == "pt") // Google uses "pt-PT" for Portuguese.
 			$targetlanguage = "pt-PT";
 		
@@ -139,10 +143,10 @@ function googleTranslateV2($text, $sourcelanguage, $targetlanguages) {
 			$translation = false;
 		}
 		
+		$_SESSION["translationcache"][$key] = $translation;
 		$translations[] = $translation;
 	}
 	
-	$cache[$key] = $translations;
 	return $translations;
 }
 
