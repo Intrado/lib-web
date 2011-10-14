@@ -40,7 +40,15 @@ $TRANSLATIONLANGUAGECODES = array(
 
 
 function googleTranslateV2($text, $sourcelanguage, $targetlanguages) {
+	static $cache = false;
 	global $TRANSLATIONLANGUAGECODES, $SETTINGS;
+	
+	// Look for translations in cache
+	$key = md5($text . $sourcelanguage . implode("", $targetlanguages));
+	if (isset($cache[$key])) {
+		return $cache[$key];
+	}
+	
 	$translations = array();
 	
 	if (!isset($text) || !isset($sourcelanguage) || !isset($targetlanguages)) {
@@ -133,6 +141,8 @@ function googleTranslateV2($text, $sourcelanguage, $targetlanguages) {
 		
 		$translations[] = $translation;
 	}
+	
+	$cache[$key] = $translations;
 	return $translations;
 }
 
