@@ -540,3 +540,18 @@ INSERT INTO `shortcodetext` (`shortcode` ,`messagetype` ,`text`) VALUES
 
 UPDATE aspadminuser set deleted=1 where password='disabled' and queries='';
 
+CREATE TABLE `smsinbound` (
+ `id` int(11) NOT NULL AUTO_INCREMENT,
+ `datereceived` varchar(20) NOT NULL,
+ `shortcode` varchar(10) NOT NULL,
+ `smsnumber` varchar(20) NOT NULL,
+ `message_id` varchar(20) NOT NULL,
+ `message` varchar(160) NOT NULL,
+ `message_orig` varchar(160) NOT NULL,
+ `carrier` varchar(20) NOT NULL,
+ `channel` varchar(20) NOT NULL,
+ `router` varchar(20) NOT NULL,
+ `action` ENUM( 'SKIP', 'INFO', 'HELP', 'OPTIN', 'OPTOUT' ) NOT NULL,
+ PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 ;
+

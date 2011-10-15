@@ -206,7 +206,12 @@ if($number){
 EndForm();
 ?>
 
-<a href="smsblock.php?download">Download csv of blocked sms</a>
+<br>
+<a href="smsblock.php?download">Download CSV of Blocked SMS</a>
+<br><br>
+<a href="smsinbound.php">View Inbound SMS Audit Log</a>
+<br>
+<br>
 
 <?
 include_once("navbottom.inc.php");
