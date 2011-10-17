@@ -24,8 +24,12 @@ require_once("../inc/db.inc.php");
 // OK for autoreport to use read/write dbcon because the job just completed and reportdata may not all be synced to the db slave
 
 global $_dbcon;
-$_dbcon = DBConnect($_DBHOST, $_DBUSER, $_DBPASS, $_DBNAME)
-	or die("Could not connect to database: ".$_DBNAME);
+$_dbcon = DBConnect($_DBHOST, $_DBUSER, $_DBPASS, $_DBNAME);
+// or die() returns with exit code 0 so the calling java program does not detect any error
+if ($_dbcon == false) {
+	echo("Could not connect to database: ".$_DBNAME);
+	exit(-2);
+}
 
 require_once("../inc/auth.inc.php");
 require_once("../inc/DBMappedObject.php");
