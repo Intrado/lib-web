@@ -17,14 +17,13 @@ class Import extends DBMappedObject {
 	var $datamodifiedtime;
 	var $datalength = 0;
 	var $skipheaderlines = 0;
-	var $nsticketid = "";
 	var $managernotes;
 	
 
 	function Import ($id = NULL) {
 		$this->_allownulls = true;
 		$this->_tablename = "import";
-		$this->_fieldlist = array("uploadkey","userid", "listid", "name", "description", "notes", "status", "type","datatype","ownertype", "updatemethod", "lastrun","datamodifiedtime","datalength","skipheaderlines","nsticketid","managernotes");
+		$this->_fieldlist = array("uploadkey","userid", "listid", "name", "description", "notes", "status", "type","datatype","ownertype", "updatemethod", "lastrun","datamodifiedtime","datalength","skipheaderlines","managernotes");
 		//call super's constructor
 		DBMappedObject::DBMappedObject($id);
 	}

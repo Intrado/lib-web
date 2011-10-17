@@ -176,7 +176,7 @@ if (!$custdb) {
 $currhost="";
 $data = array();
 
-$query = "SELECT id, name,description, status, type, updatemethod,datamodifiedtime,lastrun,datalength,datatype,notes, nsticketid,managernotes 
+$query = "SELECT id, name,description, status, type, updatemethod,datamodifiedtime,lastrun,datalength,datatype,notes,managernotes 
 			FROM import
 			where type in ('automatic', 'manual') and ownertype = 'system'
 			order by id";
@@ -199,8 +199,7 @@ $titles = array(
 	"8" => "#File Size in Bytes",
 	"9" => "@#Data Type",
 	"10" => "@#Notes",
-	"11" => "NSTicketid",
-	"12" => "Manager Notes",
+	"11" => "Manager Notes",
 	"actions" => "Actions"
 );
 

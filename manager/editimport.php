@@ -66,14 +66,6 @@ if (!$import) {
 $helpstepnum = 1;
 $helpsteps = array("TODO");
 
-$formdata["nsticketid"] = array(
-	"label" => _L('NS Ticket ID'),
-	"value" => $import->nsticketid,
-	"validators" => array(),
-	"control" => array("TextField","size" => 30, "maxlength" => 51),
-	"helpstep" => $helpstepnum
-);
-
 $formdata["managernotes"] = array(
 	"label" => _L('Manager Notes'),
 	"value" => $import->managernotes,
@@ -112,7 +104,6 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		Query("BEGIN");
 		
 		//save data here	
-		$import->nsticketid = $postdata["nsticketid"];
 		$import->managernotes = $postdata["managernotes"];
 		$import->update();
 
