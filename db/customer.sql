@@ -1687,3 +1687,12 @@ $$$
 update setting set value='8.1/7' where name='_dbversion'
 $$$
 -- END REV 8.1/7
+
+-- START 8.1/8
+ALTER TABLE `import` DROP `nsticketid`
+$$$
+
+update setting set value='8.1/8' where name='_dbversion'
+$$$
+-- END REV 8.1/8
+

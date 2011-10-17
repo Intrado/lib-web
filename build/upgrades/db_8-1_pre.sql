@@ -72,3 +72,7 @@ $$$
 -- remove originalmessagegroupid field from messagegroup table (No loner used anywhere)
 ALTER TABLE `messagegroup` DROP `originalmessagegroupid`
 $$$
+
+-- $rev 8
+ALTER TABLE `import` DROP `nsticketid`
+$$$
