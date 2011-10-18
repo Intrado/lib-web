@@ -65,7 +65,7 @@ if(CheckFormSubmit($f,$s))
 
 		$lableerror = false;
 		for($i = 0; $i < $max; $i++){
-			if(ereg("[#@]+", GetFormData($f, $s, $type . $i . "other"))) {
+			if(preg_match("/[#@]+/", GetFormData($f, $s, $type . $i . "other"))) {
 				$lableerror = true;
 			}
 		}
@@ -85,7 +85,7 @@ if(CheckFormSubmit($f,$s))
 				if($label == "other"){
 					$label = trim(GetFormData($f, $s, $type . $i . "other"));
 				}
-				if(ereg("[0-9\)\(]+", $label) || strripos($label,"phone") || strripos($label, "email") || strripos($label, "sms")){
+				if(preg_match("/[0-9\)\(]+/", $label) || strripos($label,"phone") || strripos($label, "email") || strripos($label, "sms")){
 					$warning = true;
 				}
 				QuickUpdate("insert into destlabel (type, sequence, label, notes) values

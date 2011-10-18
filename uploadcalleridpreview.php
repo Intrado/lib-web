@@ -45,7 +45,7 @@ if($curfilename && !$errormsg){
 					} else {
 						$row[0] = $callerid;
 					}
-					if(!ereg("^[0-9]*$", $row[1])){
+					if(!preg_match("/^[0-9]*$/", $row[1])){
 						$row[1]= "Invalid";
 					}
 					if(!CheckFormSubmit($f, "save")){
@@ -72,7 +72,7 @@ if(CheckFormSubmit($f, "save")  && !$errormsg){
 		if(strlen($row[0]) != 10){
 			continue;
 		}
-		if(!ereg("^[0-9]*$", $row[1])){
+		if(!preg_match("/^[0-9]*$/", $row[1])){
 			continue;
 		}
 		if(isset($calleridroutes[$row[0]])){

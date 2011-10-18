@@ -794,7 +794,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		}
 
 		// If the pincode is all 0 characters then it was a default form value, so ignore it
-		if (!ereg("^0*$", $postdata['pin']))
+		if (!preg_match("/^0*$/", $postdata['pin']))
 			$edituser->setPincode($postdata['pin']);
 			
 		// add user associations for sections

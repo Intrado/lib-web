@@ -503,7 +503,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 
 		// If the pincode is all 0 characters then it was a default form value, so ignore it
 		$newpin = $postdata['pin'];
-		if (!ereg("^0*$", $newpin))
+		if (!preg_match("/^0*$/", $newpin))
 			$USER->setPincode($newpin);
 
 		$USER->setSetting("callearly", $postdata['callearly']);

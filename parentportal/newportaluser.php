@@ -59,7 +59,7 @@ if ((strtolower($_SERVER['REQUEST_METHOD']) == 'post') ) {
 		error(_L("The emails you have entered do not match"));
 	} else if(!validEmail($login)){
 		error(_L("That is not a valid email format"));
-	} else if(!ereg("^[0-9]*$",$zipcode)){
+	} else if(!preg_match("/^[0-9]*$/",$zipcode)){
 		error(_L("Zip code must be a 5 digit number"));
 	} else if(strlen($zipcode) != 5){
 		error(_L("Zip code must be a 5 digit number"));
