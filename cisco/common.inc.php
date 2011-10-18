@@ -91,7 +91,7 @@ function doesSupport ($feature) {
 	if (strpos($_SERVER['HTTP_X_CISCOIPPHONEMODELNAME'],"Communicator") !== false)
 		$model = "IP Communicator";
 	else
-		$model = ereg_replace("[^0-9]","",$_SERVER['HTTP_X_CISCOIPPHONEMODELNAME']);
+		$model = preg_replace("/[^0-9]/","",$_SERVER['HTTP_X_CISCOIPPHONEMODELNAME']);
 
 	return $PHONE_FEATURES[$feature][$model];
 }

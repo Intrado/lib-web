@@ -38,19 +38,19 @@ if($curfilename && !$errormsg){
 				//strip must be a number
 				//keep track of the original match so that different invalid entries are no combined
 				$match = $row[0];
-				if(ereg_replace("[^0-9]*", "", $row[0]) == ""){
+				if(preg_replace("/[^0-9]*/", "", $row[0]) == ""){
 					$row[0] = "Invalid";
 				} else {
-					$row[0] = ereg_replace("[^0-9]*", "", $row[0]);
+					$row[0] = preg_replace("/[^0-9]*/", "", $row[0]);
 					$match = $row[0];
 				}
-				if(!ereg("^[0-9]+$", $row[1])){
+				if(!preg_match("/^[0-9]+$/", $row[1])){
 					$row[1] = "Invalid";
 				}
-				if(isset($row[2]) && !ereg("^[0-9]*$", $row[2])){
+				if(isset($row[2]) && !preg_match("/^[0-9]*$/", $row[2])){
 					$row[2] = "Invalid";
 				}
-				if(isset($row[3]) && !ereg("^[0-9]*$", $row[3])){
+				if(isset($row[3]) && !preg_match("/^[0-9]*$/", $row[3])){
 					$row[3] = "Invalid";
 				}
 				if(!CheckFormSubmit($f, "save")){
@@ -77,18 +77,18 @@ if(CheckFormSubmit($f, "save")  && !$errormsg){
 		//validate each item in the row.
 		//match, prefix, and suffix should be numbers
 		//strip must be a number
-		if(ereg_replace("[^0-9]*", "", $row[0]) == ""){
+		if(preg_replace("/[^0-9]*/", "", $row[0]) == ""){
 			continue;
 		} else {
-			$row[0] = ereg_replace("[^0-9]*", "", $row[0]);
+			$row[0] = preg_replace("/[^0-9]*/", "", $row[0]);
 		}
-		if(!ereg("^[0-9]+$", $row[1])){
+		if(!preg_match("/^[0-9]+$/", $row[1])){
 			continue;
 		}
-		if(isset($row[2]) && !ereg("^[0-9]*$", $row[2])){
+		if(isset($row[2]) && !preg_match("/^[0-9]*$/", $row[2])){
 			continue;
 		}
-		if(isset($row[3]) && !ereg("^[0-9]*$", $row[3])){
+		if(isset($row[3]) && !preg_match("/^[0-9]*$/", $row[3])){
 			continue;
 		}
 		if(!isset($row[2]))

@@ -111,17 +111,7 @@ class ValPassword extends Validator {
 		if($password == 'nopasswordchange'){
 			return true;
 		}
-		if(ereg("[0-9]", $password))
-			$tally++;
-		if(ereg("[a-zA-Z]", $password))
-			$tally++;
-		if(ereg("[\!\@\#\$\%\^\&\*]", $password))
-			$tally++;
-
-		if($tally >= 2)
-			return true;
-
-		return false;
+		return passwordcheck($password);
 	}
 	function validate ($value, $args, $requiredvalues) {
 		if ($value == 'nopasswordchange')
@@ -144,7 +134,7 @@ class ValPin extends Validator {
 	function validate ($value, $args, $requiredvalues) {
 		if ($value === "00000")
 			return true;
-		$pin = ereg_replace("[^0-9]*","",$value);
+		$pin = preg_replace("/[^0-9]*/","",$value);
 		$accesscode = isset($requiredvalues['accesscode'])? $requiredvalues['accesscode']: $args['accesscode'];
 		if (!$accesscode)
 			return "$this->label ". _L("cannot have a PIN without a Phone User ID.");

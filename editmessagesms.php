@@ -24,6 +24,7 @@ require_once("obj/FieldMap.obj.php");
 require_once("obj/FormItem.obj.php");
 require_once("obj/Validator.obj.php");
 require_once("obj/ValMessageBody.val.php");
+require_once("obj/ValSmsText.val.php");
 
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization
@@ -92,7 +93,7 @@ $formdata["message"] = array(
 	"validators" => array(
 		array("ValRequired"),
 		array("ValLength","max"=>160),
-		array("ValRegExp","pattern" => getSmsRegExp())
+		array("ValSmsText")
 	),
 	"control" => array("TextArea","rows"=>5,"cols"=>35,"counter"=>160),
 	"helpstep" => 1
@@ -186,7 +187,7 @@ include_once("nav.inc.php");
 // Optional Load Custom Form Validators
 ?>
 <script type="text/javascript">
-<? Validator::load_validators(array("ValRegExp")); ?>
+<? Validator::load_validators(array("ValSmsText")); ?>
 </script>
 <?
 

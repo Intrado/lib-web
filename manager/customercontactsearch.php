@@ -34,7 +34,7 @@ if(CheckFormSubmit($f,$s))
 		if( CheckFormSection($f, $s) ) {
 			error('There was a problem trying to use your selections', 'Please verify that all required field information has been entered properly');
 		} else {
-			$number = ereg_replace("[^0-9]*","",GetFormData($f, $s, "number"));
+			$number = preg_replace("/[^0-9]*/","",GetFormData($f, $s, "number"));
 
 			$res = Query("select id, dbhost, dbusername, dbpassword from shard order by id");
 			$shardinfo = array();

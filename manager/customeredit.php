@@ -16,6 +16,7 @@ require_once("../obj/MessagePart.obj.php");
 require_once("createtemplates.php");
 require_once("../inc/themes.inc.php");
 require_once("../obj/FormBrandTheme.obj.php");
+require_once("../obj/ValSmsText.val.php");
 require_once("XML/RPC.php");
 require_once("authclient.inc.php");
 ////////////////////////////////////////////////////////////////////////////////
@@ -795,7 +796,7 @@ $formdata["smscustomername"] = array(
 						"value" => $settings['smscustomername'],
 						"validators" => array(
 							array("ValLength","max" => 50),
-							array("ValRegExp","pattern" => getSmsRegExp())
+							array("ValSmsText")
 						),
 						"control" => array("TextField","maxlength"=>50,"size"=>25),
 						"helpstep" => $helpstepnum
@@ -1410,7 +1411,7 @@ document.observe('dom:loaded', function() {
 		}
 	});
 });
-<? Validator::load_validators(array("ValBrandTheme","ValInboundNumber","ValUrlComponent","ValRegExp","ValLanguages"));?>
+<? Validator::load_validators(array("ValBrandTheme","ValInboundNumber","ValUrlComponent","ValSmsText","ValLanguages"));?>
 </script>
 <?
 

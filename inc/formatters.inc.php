@@ -76,7 +76,7 @@ function fmt_editlocked_destination($row, $index) {
 
 function fmt_destination ($row,$index) {
 	if (isset($row[$index])) {
-		if (ereg("[0-9]{10}", $row[$index])) {
+		if (preg_match("/[0-9]{10}/", $row[$index])) {
 			return fmt_phone($row,$index);
 		} else {
 			return $row[$index];

@@ -539,7 +539,7 @@ foreach ($fieldmaps as $map) {
 		// sort sections by c01 (period) strip non-numerics, second sort by id
 		$assocdata = array();
 		foreach ($sections as $row) {
-			$index = ereg_replace('[^0-9]+','',$row['c01']) . $row['id'];
+			$index = preg_replace('/[^0-9]+/','',$row['c01']) . $row['id'];
 			$assocdata[$index] = $row;
 		}
 		ksort($assocdata);

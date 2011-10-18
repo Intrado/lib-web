@@ -251,7 +251,7 @@ function editSettings() {
 
 	$value = $callerid;
 	echo "\nCaller ID: [".$value."] ";
-	$callerid = ereg_replace("[^0-9]*","",trim(fread(STDIN, 1024)));
+	$callerid = preg_replace("/[^0-9]*/","",trim(fread(STDIN, 1024)));
 	if ($callerid == "") $callerid = $value;
 
 	$value = $callsec;

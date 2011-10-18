@@ -189,11 +189,11 @@ function passwordcheck($password){
 	if($password == 'nopasswordchange'){
 		return true;
 	}
-	if(ereg("[0-9]", $password))
+	if(preg_match("/[0-9]/", $password))
 		$tally++;
-	if(ereg("[a-zA-Z]", $password))
+	if(preg_match("/[a-zA-Z]/", $password))
 		$tally++;
-	if(ereg("[\!\@\#\$\%\^\&\*]", $password))
+	if(preg_match("/[\!\@\#\$\%\^\&\*]/", $password))
 		$tally++;
 
 	if($tally >= 2)
@@ -243,10 +243,6 @@ function base64url_decode($string) {
         $data .= substr('====', $mod4);
     }
     return base64_decode($data);
-}
-
-function getSmsRegExp() {
-	return "^[a-zA-Z0-9\x20\x09\x0a\x0b\x0C\x0d\x2a\<\>\?\,\.\/\|\!\@\#\$\%\&\(\)\_\+\'\"\:\;\=\-]*$";
 }
 
 function getDomainRegExp() {
@@ -461,9 +457,9 @@ function ip4CalcNetmaskFromBits ($bitcount) {
 
 function ip4HostIsInNetwork($host,$network) {
 	
-	$ip_pattern = "^([0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3})$";
-	$slaship_pattern = "^([0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3})/([0-9]{1,2})$";
-	$netmask_pattern = "^([0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}) ([0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3})$";
+	$ip_pattern = "/(^[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}$)/";
+	$slaship_pattern = "/(^[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3})\/([0-9]{1,2}$)/";
+	$netmask_pattern = "/(^[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}) ([0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}$)/";
 	
 	if ($host == $network)
 		return true; //assumes at least one of the arguments is properly formatted, would return true if both are blank or something
@@ -471,13 +467,13 @@ function ip4HostIsInNetwork($host,$network) {
 	$srcaddr = ip2long($host);
 	
 	$regs = array();
-	if (ereg($ip_pattern,$network,$regs)) {
+	if (preg_match($ip_pattern,$network,$regs)) {
 		$allowaddr = ip2long($regs[1]);
 		$allowmask = ip2long("255.255.255.255");
-	} else if (ereg($slaship_pattern,$network,$regs)) {
+	} else if (preg_match($slaship_pattern,$network,$regs)) {
 		$allowaddr = ip2long($regs[1]);
 		$allowmask = ip4CalcNetmaskFromBits($regs[2]);
-	} else if (ereg($netmask_pattern,$network,$regs)) {
+	} else if (preg_match($netmask_pattern,$network,$regs)) {
 		$allowaddr = ip2long($regs[1]);
 		$allowmask = ip2long($regs[2]);
 	} else {

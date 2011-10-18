@@ -181,10 +181,10 @@ class Message extends DBMappedObject {
 			// get imageupload tags
 			$matches = array();
 			$uploadimageurl = "";
-			if (eregi("(\<img src\=\"[^\=]*viewimage\.php\?id\=)", $data, $matches) !== false) {
-				// we only care about the first match, index 1 has this info
+			if (preg_match("/(\<img src\=\"[^\=]*viewimage\.php\?id\=)/", strtolower($data), $matches)) {
+				// we only care about the first match
 				$uploadimageurl = $matches[1];
-				$pos_i = strpos($data, $uploadimageurl);
+				$pos_i = stripos($data, $uploadimageurl);
 			} else {
 				$pos_i = false;
 			}

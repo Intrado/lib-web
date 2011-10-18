@@ -155,7 +155,7 @@ class ValNumber extends Validator {
 		if ($hasmax)
 			$max = $args['max']+0;
 
-		if (!ereg("^-?[0-9]*\.?[0-9]+$",$value))
+		if (!preg_match("/^-?[0-9]*\.?[0-9]+$/",$value))
 			return "$this->label must be a number";
 
 		if ($hasmin && $value < $min)
@@ -196,7 +196,7 @@ class ValNumeric extends Validator {
 		if ($hasmax)
 			$max = $args['max']+0;
 
-		if (!ereg("^[0-9]*$",$value))
+		if (!preg_match("/^[0-9]*$/",$value))
 			return "$this->label must be numeric";
 
 		if ($hasmin && mb_strlen($value) < $min)
@@ -609,26 +609,6 @@ class ValReldate extends Validator {
 		return true;
 	}
 }
-
-class ValRegExp extends Validator {
-	function validate ($value, $args) {
-		if (!ereg($args["pattern"], $value))
-			return _L("Invalid character in ")." ".$this->label;
-		return true;
-	}
-
-	function getJSValidator () {
-		return
-			'function (name, label, value, args) {
-				var reg = new RegExp(args["pattern"]);
-				if (reg.exec(value) == null)
-					return "' . _L("Invalid character in ")  . '" + label ;
-				return true;
-			}';
-	}
-}
-
-
 
 //alpha
 //alphanumeric

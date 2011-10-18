@@ -2252,7 +2252,7 @@ function systemLogin($loginname, $password, $CUSTOMERURL=null){
 		$CUSTOMERURL = strtolower(substr($CUSTOMERURL,0,strpos($CUSTOMERURL,"/")));
 	} else {
 		//make sure customer url is alphanumeric
-		if(!ereg("^[a-zA-Z0-9]*$", $CUSTOMERURL)) {
+		if(!preg_match("/^[a-zA-Z0-9]*$/", $CUSTOMERURL)) {
 			$result['resultdescription'] = "Invalid Customer URL";
 			return $result;
 		} else if ($CUSTOMERURL === ""){

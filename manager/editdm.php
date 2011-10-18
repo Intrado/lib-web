@@ -68,11 +68,11 @@ class ValCustomerId extends Validator {
 class ValIp extends Validator {
 	var $onlyserverside = true;
 	function validate ($value) {
-		$ip_pattern = "^([0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3})$";
-		$slaship_pattern = "^([0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3})/([0-9]{1,2})$";
-		$netmask_pattern = "^([0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}) ([0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3})$";
+		$ip_pattern = "/^[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}$/";
+		$slaship_pattern = "/^[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\/[0-9]{1,2}$/";
+		$netmask_pattern = "/^[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3} [0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}$/";
 			
-		$authorizedippatternok = ereg($ip_pattern,$value) || ereg($slaship_pattern,$value) || ereg($netmask_pattern,$value);
+		$authorizedippatternok = preg_match($ip_pattern,$value) || preg_match($slaship_pattern,$value) || preg_match($netmask_pattern,$value);
 		if (!$authorizedippatternok) {
 			return _L("Accepts either single IP format (11.22.33.44)<br />\n
 						network slash notation (11.22.33.0/24)<br />\n
@@ -261,7 +261,7 @@ $formdata["authorizedip"] = array(
 		array("ValRequired"),
 		array("ValIp")
 	),
-	"control" => array("TextField","size" => 15, "maxlength" => 20),
+	"control" => array("TextField","size" => 32, "maxlength" => 32),
 	"helpstep" => $helpstepnum
 );
 $helpstepnum++;

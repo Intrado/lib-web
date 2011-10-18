@@ -45,7 +45,7 @@ class Phone extends DBMappedObject {
 	}
 
 	static function parse ($phone) {
-		return ereg_replace("[^0-9]*","",$phone);
+		return preg_replace("/[^0-9]*/","",$phone);
 	}
 
 	static function validateEasyCall($phone) {

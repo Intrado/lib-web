@@ -348,17 +348,17 @@ function CheckFormItem($form, $section, $item) {
 
 	//### start textish types ###
 	case "alpha":
-		if(!ereg("^[a-zA-Z]*$", $theitem['value'])) {
+		if(!preg_match("/^[a-zA-Z]*$/", $theitem['value'])) {
 			return "type";
 		}
 		//###overflow to next (will match if this matched)
 	case "alphanumeric":
-		if(!ereg("^[a-zA-Z0-9]*$", $theitem['value'])) {
+		if(!preg_match("/^[a-zA-Z0-9]*$/", $theitem['value'])) {
 			return "type";
 		}
 		//###overflow to next (will match if this matched)
 	case "xalphanumeric":
-		if(!ereg("^[a-zA-Z0-9\.\_\-]*$", $theitem['value'])) {
+		if(!preg_match("/^[a-zA-Z0-9\.\_\-]*$/", $theitem['value'])) {
 			return "type";
 		}
 		//###overflow to next (will match if this matched)
@@ -445,12 +445,12 @@ function CheckFormItem($form, $section, $item) {
 		break;
 	//### start number types ###
 	case "number":
-		if(!ereg("^[0-9]*$", $theitem['value'])) {
+		if(!preg_match("/^[0-9]*$/", $theitem['value'])) {
 			return "type";
 		}
 		//###overflow to next (will match if this matched)
 	case "float":
-		if(!ereg("^[0-9\.]*$", $theitem['value'])) {
+		if(!preg_match("/^[0-9\.]*$/", $theitem['value'])) {
 			return "type";
 		}
 
@@ -468,7 +468,7 @@ function CheckFormItem($form, $section, $item) {
 		break;
 	//### start network types ###
 	case "ipaddr":
-		if(!ereg("^([0-9]{1,3})\.([0-9]{1,3})\.([0-9]{1,3})\.([0-9]{1,3})$",
+		if(!preg_match("/^([0-9]{1,3})\.([0-9]{1,3})\.([0-9]{1,3})\.([0-9]{1,3})$/",
 						$theitem['value'],
 						$regs_array)) {
 			return "type";

@@ -68,9 +68,9 @@ if(CheckFormSubmit($f, "search") || CheckFormSubmit($f, "operate"))
 			error("Please select an action");
 		} else {
 			if(CheckFormSubmit($f, "operate")){
-				$number = ereg_replace("[^0-9]*","",CheckFormSubmit($f, "operate"));
+				$number = preg_replace("/[^0-9]*/","",CheckFormSubmit($f, "operate"));
 			} else {
-				$number = ereg_replace("[^0-9]*","",GetFormData($f, $s, "number"));
+				$number = preg_replace("/[^0-9]*/","",GetFormData($f, $s, "number"));
 			}
 			if(strlen($number) != 10){
 				error("Invalid phone number");
