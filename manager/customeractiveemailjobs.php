@@ -10,7 +10,6 @@ require_once("../obj/Validator.obj.php");
 require_once("../obj/Form.obj.php");
 require_once("../obj/FormItem.obj.php");
 require_once("obj/JobFilter.obj.php");
-
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization
 ////////////////////////////////////////////////////////////////////////////////
@@ -19,11 +18,7 @@ if (!$MANAGERUSER->authorized("activejobs"))
 	exit("Not Authorized");
 
 
-if (isset($_GET["clear"])) {
-	unset($_SESSION["customeractivejobsfiler"]);
-}
-
-$jobfilter = new JobFilter("phone");
+$jobfilter = new JobFilter("email");
 $jobfilter-> handleChages();
 
 if (isset($_SESSION['customeractivejobsfiler'])) {
@@ -57,29 +52,20 @@ if (isset($_SESSION['customeractivejobsfiler'])) {
 		$extrasql .= " and j.dispatchtype = 'system' ";
 	}
 	
-	$extrasql .= " and jt.type = ? ";
-	$extraargs[] = $jobfilter->settings['destinationtype'];
-	
 	foreach ($shards as $shardid => $sharddb) {
 		Query("use aspshard", $sharddb);
-		$query = "select j.systempriority, j.customerid, j.id, jt.type, jt.attempts, jt.sequence,
-						jt.status, j.phonetaskcount, j.timeslices, count(*)
-				from qjobtask jt
+		$query = "select j.systempriority, j.customerid, j.id,
+				jt.sequence, jt.status, count(*) as tasks
+				from emailjobtask jt
 				straight_join qjob j on (j.id = jt.jobid and j.customerid = jt.customerid)
 				where 1 $extrasql
-				group by jt.status, jt.customerid, jt.jobid, jt.type, jt.attempts, jt.sequence
-				order by j.systempriority, j.customerid, j.id, jt.type, jt.attempts, jt.sequence
+				group by jt.status, jt.customerid, jt.jobid, jt.sequence
+				order by j.systempriority, j.customerid, j.id, jt.sequence
 				";
 		$res = Query($query,$sharddb,$extraargs);
-		while ($row = DBGetRow($res)) {
-
-			$calldata[$row[0]][$row[1]][$row[2]][$row[3]][$row[4]][$row[5]][$row[6]] = $row[9];
-
-			$activejobs[$row[1]][$row[2]]["phonetaskcount"] = $row[7];
-			@$activejobs[$row[1]][$row[2]]["phonetaskremaining"] += $row[9];
-
-
-			$activejobs[$row[1]][$row[2]]["timeslices"] = $row[8];
+		while ($row = DBGetRow($res,true)) {
+			$calldata[$row["systempriority"]][$row["customerid"]][$row["id"]][$row["sequence"]][$row["status"]] = $row["tasks"];
+			@$activejobs[$row["customerid"]][$row["id"]]["taskcount"] += $row["tasks"];
 		}
 	}
 }
@@ -106,18 +92,10 @@ function fmt_custurl($row, $index){
 	return $url;
 }
 
-//index 2 is jobid
-function fmt_play_activejobs($row, $index){
-	$url = "";
-	if($row[2])
-		$url = "<a onclick='popup(\"customerplaymessage.php?customerid=" . $row[14] . "&jobid=" . $row[2] . "\", 400, 500); return false;' href=\"#\" alt='' title='Play Message'><img src='mimg/s-play.png' border=0></a>";
-	return $url;
-}
-
 ////////////////////////////////////////////////////////////////////////////////
 // Display
 ////////////////////////////////////////////////////////////////////////////////
-$TITLE = _L('Customer Jobs');
+$TITLE = _L('Customer Email Jobs');
 
 include_once("nav.inc.php");
 
@@ -150,52 +128,28 @@ if (isset($_SESSION['customeractivejobsfiler'])) {
 				$showcust = true;
 				foreach ($custcalldata as $jobid => $jobcalldata) {
 					$showjob = true;
-		
-					@$pritotals["phonetaskremaining"] += $activejobs[$customerid][$jobid]["phonetaskremaining"];
-					@$pritotals["phonetaskcount"] += $activejobs[$customerid][$jobid]["phonetaskcount"];
-		
-					$slicesize = $activejobs[$customerid][$jobid]["timeslices"];
-					if ($slicesize) {
-						$slicesize = (int) max(2,($activejobs[$customerid][$jobid]["phonetaskcount"] / $slicesize));
-						@$pritotals["slicesize"] += $slicesize;
-					} else {
-						$slicesize = "&#8734;";
-					}
-		
-					foreach ($jobcalldata as $type => $typecalldata) {
-						$showtype = true;
-						foreach ($typecalldata as $attempt => $attemptcalldata) {
-							$showattempt = true;
-							foreach ($attemptcalldata as $sequence => $sequencecalldata) {
-								$row = @array(
-										$showcust ? $customerid : "",
-										$showcust ? $customers[$customerid] : "",
-										$showjob ? $jobid : "",
-										$showjob ? $activejobs[$customerid][$jobid]["phonetaskremaining"] : "",
-										$showjob ? $activejobs[$customerid][$jobid]["phonetaskcount"] : "",
-										$showjob ? $slicesize : "",
-										$showtype ? $type : "",
-										$showattempt ? $attempt : "",
-										$sequence,
-										$sequencecalldata['active'],
-										$sequencecalldata['assigned'],
-										$sequencecalldata['progress'],
-										$sequencecalldata['pending'],
-										$sequencecalldata['waiting'],
-										$customerid
-									);
-								$pridata[] = $row;
-		
-		
-								@$pritotals["active"] += $sequencecalldata['active'];
-								@$pritotals["assigned"] += $sequencecalldata['assigned'];
-								@$pritotals["progress"] += $sequencecalldata['progress'];
-								@$pritotals["pending"] += $sequencecalldata['pending'];
-								@$pritotals["waiting"] += $sequencecalldata['waiting'];
-		
-								$showcust = $showjob = $showtype = $showattempt = false;
-							}
-						}
+					
+					@$pritotals["taskcount"] += $activejobs[$customerid][$jobid]["taskcount"];
+					
+					
+					foreach ($jobcalldata as $sequence => $sequencecalldata) {
+						$row = @array(
+								$showcust ? $customerid : "",
+								$showcust ? $customers[$customerid] : "",
+								$showjob ? $jobid : "",
+								$showjob ? $activejobs[$customerid][$jobid]["taskcount"] : "",
+								$sequence,
+								$sequencecalldata['active'],
+								$sequencecalldata['assigned'],
+								$sequencecalldata['progress'],
+								$customerid
+							);
+						$pridata[] = $row;
+						@$pritotals["active"] += $sequencecalldata['active'];
+						@$pritotals["assigned"] += $sequencecalldata['assigned'];
+						@$pritotals["progress"] += $sequencecalldata['progress'];
+						
+						$showcust = $showjob = false;
 					}
 				}
 			}
@@ -203,58 +157,44 @@ if (isset($_SESSION['customeractivejobsfiler'])) {
 				"<b>Total</b>",
 				"",
 				"",
-				$pritotals["phonetaskremaining"],
-				$pritotals["phonetaskcount"],
-				$pritotals["slicesize"] ? $pritotals["slicesize"] : "&#8734;",
-				"",
-				"",
+				$pritotals["taskcount"],
 				"",
 				$pritotals["active"],
 				$pritotals["assigned"],
-				$pritotals["progress"],
-				$pritotals["pending"],
-				$pritotals["waiting"]
+				$pritotals["progress"]
 			);
 			$pridata[] = $totalsrow;
 			$data[$pri] = $pridata;
 			$summarydata[] = array (
 				"<b>$prinames[$pri] Total</b>",
-				$pritotals["phonetaskremaining"],
-				$pritotals["phonetaskcount"],
-				$pritotals["slicesize"] ? $pritotals["slicesize"] : "&#8734;",
+				$pritotals["taskcount"],
 				$pritotals["active"],
 				$pritotals["assigned"],
-				$pritotals["progress"],
-				$pritotals["pending"],
-				$pritotals["waiting"]
+				$pritotals["progress"]
 			);
 		}
 	}
+	
+	
+	
 	if (count($data)) {
 		$titles = array(
 			"Priority",
-			"job ph remain",
-			"job ph total",
-			"job throttle",
+			"Total",
 			"Active",
 			"Assigned",
-			"Progress",
-			"Pending",
-			"Waiting",
+			"Progress"
 		);
+		
 		$formatters = array (
 			0 => "fmt_html",
 			1 => "fmt_number",
 			2 => "fmt_number",
 			3 => "fmt_number",
-			4 => "fmt_number",
-			5 => "fmt_number",
-			6 => "fmt_number",
-			7 => "fmt_number",
-			8 => "fmt_number"
+			4 => "fmt_number"
 		);
 		echo "<div style=\"margin-top:10px;border: 3px solid black;\">";
-		echo "<h2>Active Jobs Summary: </h2><table>";
+		echo "<h2>Active Email Jobs Summary: </h2><table>";
 		showTable($summarydata, $titles, $formatters);
 		echo "</table>";
 		echo "</div>";
@@ -263,35 +203,26 @@ if (isset($_SESSION['customeractivejobsfiler'])) {
 			"Customer id",
 			"Customer url",
 			"Job id",
-			"job ph remain",
-			"job ph total",
-			"job throttle",
-			"Type",
-			"attempt",
-			"sequence",
+			"Remaining",
+			"Sequence",
 			"Active",
 			"Assigned",
-			"Progress",
-			"Pending",
-			"Waiting",
-			"Play Message"
+			"Progress"
 		);
 		$formatters = array (
 			0 => "fmt_html",
 			1 => "fmt_custurl",
+			2 => "fmt_number",
 			3 => "fmt_number",
-			4 => "fmt_number",
-			5 => "fmt_html",
-			9 => "fmt_number",
-			10 => "fmt_number",
-			11 => "fmt_number",
-			12 => "fmt_number",
-			13 => "fmt_number",
-			14 => "fmt_play_activejobs"
+			4 => "fmt_html",
+			5 => "fmt_number",
+			6 => "fmt_number",
+			7 => "fmt_number"
 		);
+		
 		foreach($data as $pri => $pridata) {
 			echo "<div style=\"margin-top:10px;border: 3px solid $pricolors[$pri];\"><h2>$prinames[$pri]</h2><hr />";
-			echo "Active Jobs: <table>";
+			echo "Active Email Jobs: <table>";
 			showTable($pridata, $titles, $formatters);
 			echo "</table>";
 			echo "</div>";
