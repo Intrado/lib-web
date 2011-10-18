@@ -3,7 +3,7 @@
 function init_memcache() {
 	global $mcache, $SETTINGS;
 	
-	if (class_exists("MemcachePool") && !isset($SETTINGS['memcache']) || !isset($SETTINGS['memcache']['memcached_url']))
+	if (!class_exists("MemcachePool") || !isset($SETTINGS['memcache']) || !isset($SETTINGS['memcache']['memcached_url']))
 		return;
 	
 	$mcache = new MemcachePool();
