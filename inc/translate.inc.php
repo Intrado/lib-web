@@ -17,9 +17,11 @@ $TRANSLATIONLANGUAGECODES = array(
 	"et",
 	"fa",
 	"fi",
+	"fil",
 	"fr",
 	"ga",
 	"gl",
+	"he",
 	"hi",
 	"hr",
 	"ht",
@@ -71,10 +73,6 @@ function googleTranslateV2($text, $sourcelanguage, $targetlanguages) {
 		return $translations;
 	}
 	
-	$codeconvertions = array("he" => "iw","fil" => "tl");
-	if (isset($codeconvertions[$sourcelanguage]))
-		$sourcelanguage = $codeconvertions[$sourcelanguage];
-	
 	if(!in_array($sourcelanguage,$TRANSLATIONLANGUAGECODES)){
 		error_log("Illigal source language: $sourcelanguage for googleTranslateV2");
 		return $translations;
@@ -101,9 +99,6 @@ function googleTranslateV2($text, $sourcelanguage, $targetlanguages) {
 	}
 	
 	foreach ($targetlanguages as $targetlanguage) {
-		if (isset($codeconvertions[$targetlanguage]))
-			$targetlanguage = $codeconvertions[$targetlanguage];
-		
 		if(!in_array($targetlanguage,$TRANSLATIONLANGUAGECODES)){
 			$translations[] = false;
 			continue;
