@@ -1,13 +1,9 @@
 <?
 
-function log_memcache_error($host, $port) {
-	error_log_helper("Problem connecting to memcache on $host:$port");	
-}
-
 function init_memcache() {
 	global $mcache, $SETTINGS;
 	
-	if (!isset($SETTINGS['memcache']) || !isset($SETTINGS['memcache']['memcached_url']))
+	if (class_exists("MemcachePool") && !isset($SETTINGS['memcache']) || !isset($SETTINGS['memcache']['memcached_url']))
 		return;
 	
 	$mcache = new MemcachePool();
