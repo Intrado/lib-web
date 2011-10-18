@@ -434,3 +434,5 @@ ALTER TABLE `smsjobtask` CHANGE `lastresult` `lastresult` enum('sent','unsent','
 ALTER TABLE `importalert` ADD `importname` varchar(50) NOT NULL default '' after `importalertruleid`;
 
 ALTER TABLE `importalert` ADD `notes` TEXT;
+
+ALTER TABLE `importalert` ADD `acknowledged` tinyint(4) NOT NULL default '0';

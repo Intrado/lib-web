@@ -4,43 +4,39 @@ require_once("../inc/html.inc.php");
 require_once("../inc/formatters.inc.php");
 require_once("../inc/form.inc.php");
 require_once("../inc/table.inc.php");
+require_once("inc/importalert.inc.php");
 
 if (!$MANAGERUSER->authorized("imports"))
 	exit("Not Authorized");
 
-if(isset($_REQUEST["delete"])) {
-	if (isset($_GET["customerid"]) && isset($_GET["ruleid"])) {
-		list($shardid,$dbhost,$dbusername,$dbpassword) = QuickQueryRow("select s.id, s.dbhost, s.dbusername, s.dbpassword from customer c inner join shard s on (c.shardid = s.id) where c.id=?",false,false,array($_GET["customerid"]));
+if (isset($_REQUEST["showacknowledged"])) {
+	$_SESSION["showacknowledgedalerts"] = $_REQUEST["showacknowledged"]=="true";
+	redirect();
+}
+
+if (!isset($_SESSION["showacknowledgedalerts"])) {
+	$_SESSION["showacknowledgedalerts"] = false;
+}
+
+if(isset($_REQUEST["acknowledge"])) {
+	header('Content-Type: application/json');
+	
+	if (isset($_REQUEST["customerid"]) && isset($_REQUEST["importalertruleid"])) {
+		list($shardid,$dbhost,$dbusername,$dbpassword) = QuickQueryRow("select s.id, s.dbhost, s.dbusername, s.dbpassword from customer c inner join shard s on (c.shardid = s.id) where c.id=?",false,false,array($_REQUEST["customerid"]));
 		$dsn = 'mysql:dbname=aspshard;host='.$dbhost;
 		$sharddb = new PDO($dsn, $dbusername, $dbpassword);
 		$sharddb->setAttribute(PDO::ATTR_EMULATE_PREPARES, true);
-		
+
 		Query("use aspshard", $sharddb);
-		QuickUpdate("delete from importalert where customerid=? and importalertruleid=?",$sharddb,array($_GET["customerid"],$_GET["ruleid"]));
+		
+		QuickUpdate("update importalert set acknowledged=? where customerid=? and importalertruleid=?",$sharddb,array(($_REQUEST["acknowledge"]=="true"?1:0),$_REQUEST["customerid"],$_REQUEST["importalertruleid"]));
 
-		notice("Deleted Alert");
-		redirect();
-	} else {
-		$deletekeys = json_decode($_REQUEST["delete"],true);
-		
-		foreach($deletekeys as $keys) {
-			list($shardid,$dbhost,$dbusername,$dbpassword) = QuickQueryRow("select s.id, s.dbhost, s.dbusername, s.dbpassword from customer c inner join shard s on (c.shardid = s.id) where c.id=?",false,false,array($keys["customerid"]));
-			$dsn = 'mysql:dbname=aspshard;host='.$dbhost;
-			$sharddb = new PDO($dsn, $dbusername, $dbpassword);
-			$sharddb->setAttribute(PDO::ATTR_EMULATE_PREPARES, true);
-			
-			Query("use aspshard", $sharddb);
-			QuickUpdate("delete from importalert where customerid=? and importalertruleid=?",$sharddb,array($keys["customerid"],$keys["importalertruleid"]));
-		}
-		header('Content-Type: application/json');
-		
 		echo "true";
-		exit();
+	} else {
+		echo "false";
 	}
+	exit();
 }
-
-
-
 
 ////////////////////////////////////////////////////////////////////////////////
 // Data Handling
@@ -58,8 +54,8 @@ while ($shardinfo = DBGetRow($shardresult)) {
 	$sharddb->setAttribute(PDO::ATTR_EMULATE_PREPARES, true);
 	
 	Query("use aspshard", $sharddb);
-	$query = "select customerid,importalertruleid,importname,name,operation,testvalue,actualvalue,alerttime,notified from importalert";
-	$result = Query($query,$sharddb);
+	$query = "select customerid,importalertruleid,importname,name,operation,testvalue,actualvalue,alerttime,notified,notes,acknowledged from importalert where acknowledged=?";
+	$result = Query($query,$sharddb,array($_SESSION["showacknowledgedalerts"]?1:0));
 	
 	
 	while ($row = DBGetRow($result,true)) {
@@ -69,12 +65,13 @@ while ($shardinfo = DBGetRow($shardresult)) {
 }
 
 $titles = array(
-		"checkmark" => "",
+		"checkmark" => "Acknowledged",
 		"urlcomponent" => "#Cust Name",
 		"importname" => "Import",
 		"alert" => "Alert",
 		"alerttime" => "#Alert Time",
 		"notified" => "#Notified Time",
+		"notes" => "Alert Notes",
 		"actions" => "Actions"
 );
 
@@ -89,7 +86,7 @@ $formatters = array(
 ////////////////////////////////////////////////////////////////////////////////
 
 function fmt_check($row, $index){
-	return '<input class="importmulticheck" id="' . $row["customerid"] . ':' . $row["importalertruleid"] . '" name="deletecheck" type="checkbox" value="true" />';
+	return '<input id="' . $row["customerid"] . ':' . $row["importalertruleid"] . '" class="importmulticheck" name="hide" type="checkbox" value="true" ' . ($row["acknowledged"]?'checked':'') .  ' onclick="acknowledgeAlert(this.id,this.checked)"/>';
 }
 
 function fmt_custurl($row, $index){
@@ -103,29 +100,13 @@ function fmt_custurl($row, $index){
 }
 
 function fmt_alert($row, $index){
-	switch($row["name"]) {
-		case "daysold":
-			$str = "Import is delayed. Expected import within {$row["testvalue"]} days. Triggered at {$row["actualvalue"]} days";
-			break;
-		case "size":
-			$str = "File size is too " . ($row["operation"]=="gt"?"big":"small") .
-					 ". Expected " . ($row["operation"]=="gt"?"less":"more") . " than {$row["testvalue"]} bytes. Actual size: {$row["actualvalue"]} bytes";
-			break;
-		case "importtime":
-			$midnight_today = mktime(0,0,0);
-			$testvalue = date("g:i a",$midnight_today + $row["testvalue"]);
-			$actualvalue = date("g:i a",$midnight_today + $row["actualvalue"]);			
-			$str = "Imported too " . ($row["operation"]=="gt"?"late":"early") . 
-			". Expected import " . ($row["operation"]=="gt"?"before":"after") . " $testvalue. Imported at: $actualvalue";
-			break;
-	}
-	return $str;
+	return formatAlert($row["name"],$row["operation"],$row["testvalue"],$row["actualvalue"]);
 }
 function fmt_actions($row, $index){
 	$str = "";
 	$actions = array();
+	$actions[] = action_link("Edit Notes", "pencil","editalert.php?customerid={$row["customerid"]}&importalertruleid={$row["importalertruleid"]}");
 	$actions[] = action_link("View", "magnifier","customerimports.php?customer={$row["customerid"]}");
-	$actions[] = action_link("Delete", "cross","importalerts.php?delete&customerid={$row["customerid"]}&ruleid={$row["importalertruleid"]}","return confirmDelete();");
 	return action_links($actions);
 }
 
@@ -135,6 +116,11 @@ function fmt_actions($row, $index){
 
 include("nav.inc.php");
 startWindow(_L('Import Alerts'));
+
+if ($_SESSION["showacknowledgedalerts"])
+	echo '<a href="importalerts.php?showacknowledged=false">Show Non Acknowledged</a>';
+else
+	echo '<a href="importalerts.php?showacknowledged=true">Show Acknowledged</a>';
 if (count($data)) {
 ?>
 <table class="list sortable" id="customer_imports_table">
@@ -142,31 +128,20 @@ if (count($data)) {
 showTable($data, $titles, $formatters);
 ?>
 </table>
-<div style="padding: 10px;"><img src="img/icons/fugue/arrow_turn_090.png" alt="" style="float:left;"/><?= icon_button("Delete All Marked", "cross","deletemarked()");?></div>
 <script type="text/javascript">
-function deletemarked() {
-	if (!confirmDelete())
-		return;
-	
-	var values = "";
-	var deletekeys = new Array();
-	
-	var index = 0
-	$$('input.importmulticheck').each(function (val) {
-		if (val.checked) {
-			var ids = val.id.split(':');
-			var keys = new Hash();
-			keys.set("customerid",ids[0]);
-			keys.set("importalertruleid",ids[1]);
-			deletekeys[index++] = keys;
+
+function acknowledgeAlert(id, acknowledged) {
+	var ids = id.split(':');
+	$(id).checked = !acknowledged;
+	new Ajax.Request('importalerts.php',{method:'post',parameters:{"acknowledge":acknowledged,"customerid":ids[0],"importalertruleid": ids[1]},
+		onSuccess: function(response){
+			var result = response.responseJSON;
+			if (result == true) {
+				$(id).checked = acknowledged;
+			}
 		}
 	});
-	var parameters = new Hash();
-	parameters.set("delete",deletekeys);
-	new Ajax.Request('importalerts.php',{method:'post',parameters:{"delete":deletekeys.toJSON()}});
-	window.location="importalerts.php";
 }
-
 </script>
 <?
 
