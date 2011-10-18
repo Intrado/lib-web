@@ -136,8 +136,9 @@ class ReportGenerator {
 				$params[$index] = new XML_RPC_VALUE($value, 'string');
 			}
 		}
-		$params["SUBREPORT_DIR"] = new XML_RPC_VALUE("", 'string');
-		$params["iconLocation"] = new XML_RPC_VALUE("images/", 'string');
+		// these are set within Resizer.java
+		//$params["SUBREPORT_DIR"] = new XML_RPC_VALUE("res/jasper/reportserver/", 'string');
+		//$params["iconLocation"] = new XML_RPC_VALUE("res/images/reportserver/", 'string');
 		$reportname = report_name($this->params['reporttype']);
 
 		$subname = isset($this->params['subname']) ? $this->params['subname'] : "";
