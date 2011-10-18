@@ -693,13 +693,17 @@ class FinishMessageWizard extends WizFinish {
 		
 			// check for and retrieve translations
 			if (MsgWiz_translatePreview::isEnabled($postdata, false) && $langcode == "autotranslate") {
-				foreach ($this->parent->dataHelper("/create/translatepreview",false,array()) as $translatedlangcode => $enabled) {
-					// when the message is created, the modify date will be set in the past and retranslation will
-					// get called before attaching to the message group
+				$translationselections = $this->parent->dataHelper("/create/translatepreview",false,array());
+				$translations = translate_fromenglish($messages['en']['none']["text"],array_keys($translationselections));
+				$translationsindex = 0;
+				foreach ($translationselections as $translatedlangcode => $enabled) {
 					if ($enabled) {
-						$messages[$translatedlangcode]['translated'] = $messages['en']['none'];
 						$messages[$translatedlangcode]['source'] = $messages['en']['none'];
+						$messages[$translatedlangcode]['translated'] = $messages['en']['none'];
+						if ($translations[$translationsindex] !== false)
+							$messages[$translatedlangcode]['translated']['text'] = $translations[$translationsindex];
 					}
+					$translationsindex++;
 				}
 			}
 			
@@ -734,14 +738,7 @@ class FinishMessageWizard extends WizFinish {
 					$message->name = $messagegroup->name;
 					$message->description = Language::getName($langcode);
 					$message->userid = $USER->id;
-					
-					// if this is an autotranslated message. set the modify date in the past
-					// this way re-translate will populate the message parts for us
-					if ($autotranslate == 'translated')
-						$message->modifydate = date("Y-m-d H:i:s", '1');
-					else
-						$message->modifydate = date("Y-m-d H:i:s");
-					
+					$message->modifydate = date("Y-m-d H:i:s");
 					$message->languagecode = $langcode;
 					$message->deleted = 0;
 					
