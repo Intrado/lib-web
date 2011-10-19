@@ -81,7 +81,7 @@ if (isset($_GET['login'])) {
 
 	if (isset($_SESSION['user'])) {
 		$redirpage = isset($_GET['last']) ? $_GET['last'] : 'start.php';
-		redirect(urlencode($redirpage));
+		redirect($redirpage);
 	}
 }
 
