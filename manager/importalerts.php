@@ -54,7 +54,7 @@ while ($shardinfo = DBGetRow($shardresult)) {
 	$sharddb->setAttribute(PDO::ATTR_EMULATE_PREPARES, true);
 	
 	Query("use aspshard", $sharddb);
-	$query = "select customerid,importalertruleid,importname,name,operation,testvalue,actualvalue,alerttime,notified,notes,acknowledged from importalert where acknowledged=?";
+	$query = "select customerid,importalertruleid,importname,name,operation,testvalue,actualvalue,alerttime,notified,notes,acknowledged from importalert where type='manager' and acknowledged=?";
 	$result = Query($query,$sharddb,array($_SESSION["showacknowledgedalerts"]?1:0));
 	
 	

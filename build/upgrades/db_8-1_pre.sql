@@ -76,3 +76,7 @@ $$$
 -- $rev 8
 ALTER TABLE `import` DROP `nsticketid`
 $$$
+
+-- $rev 9
+ALTER TABLE `importalertcategory` CHANGE `name` `type` ENUM( 'manager', 'customer' ) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL
+$$$

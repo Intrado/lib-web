@@ -436,3 +436,5 @@ ALTER TABLE `importalert` ADD `importname` varchar(50) NOT NULL default '' after
 ALTER TABLE `importalert` ADD `notes` TEXT;
 
 ALTER TABLE `importalert` ADD `acknowledged` tinyint(4) NOT NULL default '0';
+
+ALTER TABLE `importalert` ADD `type` ENUM( 'manager', 'customer' ) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL after `importalertruleid`;

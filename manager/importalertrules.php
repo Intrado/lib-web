@@ -380,9 +380,9 @@ include_once("nav.inc.php");
 </script>
 <?
 
-$categoryname = QuickQuery("select name from importalertcategory where id=?",$custdb,array($categoryid));
+$categorytype = QuickQuery("select type from importalertcategory where id=?",$custdb,array($categoryid));
 
-startWindow(_L('%s Import Alert Rules', ucfirst($categoryname)));
+startWindow(_L('%s Import Alert Rules', ucfirst($categorytype)));
 echo $form->render();
 endWindow();
 include_once("navbottom.inc.php");

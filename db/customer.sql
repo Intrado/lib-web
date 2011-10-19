@@ -1696,3 +1696,10 @@ update setting set value='8.1/8' where name='_dbversion'
 $$$
 -- END REV 8.1/8
 
+-- START 8.1/9
+ALTER TABLE `importalertcategory` CHANGE `name` `type` ENUM( 'customer', 'manager' ) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL
+$$$
+
+update setting set value='8.1/9' where name='_dbversion'
+$$$
+-- END REV 8.1/9
