@@ -104,6 +104,7 @@ if ($appservererror || $badcode) {
 <head>
 	<meta http-equiv="Content-type" content="text/html; charset=UTF-8" />
 	<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7" />
+	<meta name="viewport" content="width=device-width" />
 	<style type="text/css">
 		.navband1 {
 			height: 6px; 
