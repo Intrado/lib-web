@@ -398,14 +398,19 @@ class FinishJobWizard extends WizFinish {
 				$messages['email']['html']['en']['none']['attachments'] = $this->parent->dataHelper("/message/email/text:attachments", true, "[]");
 				
 				// check for and retrieve translations
-				foreach ($this->parent->dataHelper("/message/email/translate", false, array()) as $langcode => $enabled) {
-					// emails don't have any actual translation text in session data other than the source message
-					// when the message group is created. the modify date will be set in the past and retranslation will
-					// get called before attaching to the job
+				$translationselections = $this->parent->dataHelper("/message/email/translate",false,array());
+				$translations = translate_fromenglish($messages['email']['html']['en']['none']['text'],array_keys($translationselections));
+				$translationsindex = 0;
+				
+				foreach ($translationselections as $langcode => $enabled) {
 					if ($enabled) {
-						$messages['email']['html'][$langcode]['translated'] = $messages['email']['html']['en']['none'];
 						$messages['email']['html'][$langcode]['source'] = $messages['email']['html']['en']['none'];
+						$messages['email']['html'][$langcode]['translated'] = $messages['email']['html']['en']['none'];
+						if ($translations[$translationsindex] !== false)
+							$messages['email']['html'][$langcode]['translated']['text'] = $translations[$translationsindex];
+						
 					}
+					$translationsindex++;
 				}
 			}
 			
