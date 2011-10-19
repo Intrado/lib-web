@@ -50,7 +50,6 @@ $TRANSLATIONLANGUAGECODES = array(
 	"sv",
 	"sw",
 	"th",
-	"tl",
 	"tr",
 	"uk",
 	"vi",
@@ -72,6 +71,10 @@ function googleTranslateV2($text, $sourcelanguage, $targetlanguages) {
 		error_log("Illigal argument(s) for googleTranslateV2");
 		return $translations;
 	}
+	
+	$codeconvertions = array("he" => "iw");
+	if (isset($codeconvertions[$sourcelanguage]))
+		$sourcelanguage = $codeconvertions[$sourcelanguage];
 	
 	if(!in_array($sourcelanguage,$TRANSLATIONLANGUAGECODES)){
 		error_log("Illigal source language: $sourcelanguage for googleTranslateV2");
@@ -99,6 +102,9 @@ function googleTranslateV2($text, $sourcelanguage, $targetlanguages) {
 	}
 	
 	foreach ($targetlanguages as $targetlanguage) {
+		if (isset($codeconvertions[$targetlanguage]))
+			$targetlanguage = $codeconvertions[$targetlanguage];
+		
 		if(!in_array($targetlanguage,$TRANSLATIONLANGUAGECODES)){
 			$translations[] = false;
 			continue;

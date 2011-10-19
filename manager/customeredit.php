@@ -130,7 +130,7 @@ class LanguagesItem extends FormItem {
 							"id" => "Indonesian",
 							"is" => "Icelandic",
 							"it" => "Italian",
-							"iw" => "Hebrew",
+							"he" => "Hebrew",
 							"ja" => "Japanese",
 							"ko" => "Korean",
 							"lt" => "Lithuanian",
