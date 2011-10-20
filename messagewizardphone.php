@@ -694,7 +694,7 @@ class FinishMessageWizard extends WizFinish {
 			// check for and retrieve translations
 			if (MsgWiz_translatePreview::isEnabled($postdata, false) && $langcode == "autotranslate") {
 				$translationselections = $this->parent->dataHelper("/create/translatepreview",false,array());
-				$translations = translate_fromenglish($messages['en']['none']["text"],array_keys($translationselections));
+				$translations = translate_fromenglish(makeTranslatableString($messages['en']['none']["text"]),array_keys($translationselections));
 				$translationsindex = 0;
 				foreach ($translationselections as $translatedlangcode => $enabled) {
 					if ($enabled) {
