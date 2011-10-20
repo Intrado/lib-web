@@ -170,7 +170,7 @@ class LanguagesItem extends FormItem {
 				<option value=0> -- Select Common Language -- </option>";
 				foreach ($googlangs as $code => $googlang) {
 					$ttsLangSup = '';
-					if (isset($this->args['ttslangs'][strtolower($googlang)]))
+					if (in_array($code, $this->args['ttslangs']))
 						$ttsLangSup .= " (TTS Support)";
 					$str .= "<option value='" . str_pad($code,3) . " $googlang' >$googlang $ttsLangSup</option>";
 				}
@@ -203,8 +203,14 @@ class LanguagesItem extends FormItem {
 				renderlanguages();
 			}
 			function renderlanguages() {
+				var ttslangs = " . json_encode($this->args['ttslangs']) . ";
 				var langs = \$H($('$n').value.evalJSON(true));
-				var table = new Element('table');
+				var table = new Element('table',{'style':'text-align:left;'});
+				var tableheader = new Element('tr');
+				tableheader.insert(new Element('th').insert('Code'));
+				tableheader.insert(new Element('th',{'style':'border-left: 1px dashed black;border-right: 1px dashed black;'}).insert('TTS'));
+				tableheader.insert(new Element('th').insert('Name'));
+				table.insert(tableheader);
 				langs.each(function(lang) {
 
 					var tablecontent = new Element('tr');
@@ -217,6 +223,11 @@ class LanguagesItem extends FormItem {
 					} else {
 						input.disabled = true;
 					}
+					tablecontent.insert(new Element('td',{'style':'text-align:right;'}).insert(lang.key));
+					var tts = new Element('td',{'style':'text-align:center;border-left: 1px dashed black;border-right: 1px dashed black;'});
+					if (ttslangs.indexOf(lang.key) != -1)
+						tts.insert(new Element('img', {'src':'img/icons/accept.png'}));
+					tablecontent.insert(tts);
 					tablecontent.insert(new Element('td').insert(input));
 
 					if (lang.key != 'en') {
@@ -763,7 +774,7 @@ $formdata["languages"] = array(
 							array("ValRequired"),
 							array("ValLanguages")),
 						"control" => array("LanguagesItem", 
-							"ttslangs" => $customerid?QuickQueryList("select language,id from ttsvoice", true, $custdb):array()),
+							"ttslangs" => $customerid?QuickQueryList("select languagecode from ttsvoice", false, $custdb):array()),
 						"helpstep" => $helpstepnum
 );
 
