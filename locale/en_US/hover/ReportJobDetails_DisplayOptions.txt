@@ -1,2 +1,2 @@
 @help/schoolmessenger_help.htm#reports/understanding_call_logs.htm
-The topmost part of the Phone Log contains options for viewing the report.<br>Display Fields: Select any additional fields you would like to display.<br>Sort By: Use the drop down menus to sort the report by certain fields.<br>Output Format: Click the CSV link to download the report as a CSV file. Click the PDF link to download the report as a PDF file.
+The topmost part of the Phone Log contains options for viewing the report.<br>Display Fields: Select any additional fields you would like to display.<br>Output Format: Click the CSV link to download the report as a CSV file. Click the PDF link to download the report as a PDF file.
