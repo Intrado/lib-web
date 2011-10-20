@@ -110,7 +110,7 @@ if(CheckFormSubmit($f,$s)) {
 
 //load relavent data
 
-$users = DBFindMany("AspAdminUser", "from aspadminuser");
+$users = DBFindMany("AspAdminUser", "from aspadminuser where deleted=0");
 
 $logins = array();
 foreach ($users as $id => $u)
