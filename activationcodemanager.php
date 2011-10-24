@@ -182,7 +182,6 @@ if ($personsql != "") {
 // this needs to be after the rules for renderedlist are loaded, etc. cannot go up top with the usual GET handlers
 // check if generating tokens
 if ($generateBulkTokens && isset($_GET['generate'])) {
-	
 	$totalgenerated = 0;
 	$pageoffset = 0;
 	$renderedlist->setPageOffset($pageoffset);
@@ -195,7 +194,10 @@ if ($generateBulkTokens && isset($_GET['generate'])) {
 		else
 			$count = 0; // failure
 		
-		$pageoffset += $pagelimit;
+		if (isset($_SESSION['hideactivecodes']) && $_SESSION['hideactivecodes'])
+			$pageoffset = 0; // resultset changes as new personportaltoken get generated, always fetch first page of updated results
+		else
+			$pageoffset += $pagelimit;
 		$renderedlist->setPageOffset($pageoffset);
 		$personsql = $renderedlist->getPersonSql(true);
 		$personids = QuickQueryList($personsql);
