@@ -105,59 +105,6 @@ class LogoRadioButton extends FormItem {
 class LanguagesItem extends FormItem {
 	function render ($value) {
 		$n = $this->form->name."_".$this->name;
-		$googlangs = array(	"af" => "Afrikaans",
-							"ar" => "Arabic",
-							"be" => "Belarusian",
-							"bg" => "Bulgarian",
-							"ca" => "Catalan",
-							"cs" => "Czech",
-							"cy" => "Welsh",
-							"da" => "Danish",
-							"de" => "German",
-							"el" => "Greek",
-							"en" => "English",
-							"es" => "Spanish",
-							"et" => "Estonian",
-							"fa" => "Persian",
-							"fi" => "Finnish",
-							"fr" => "French",
-							"ga" => "Irish",
-							"gl" => "Galician",
-							"hi" => "Hindi",
-							"hr" => "Croatian",
-							"ht" => "Haitian",
-							"hu" => "Hungarian",
-							"id" => "Indonesian",
-							"is" => "Icelandic",
-							"it" => "Italian",
-							"he" => "Hebrew",
-							"ja" => "Japanese",
-							"ko" => "Korean",
-							"lt" => "Lithuanian",
-							"lv" => "Latvian",
-							"mk" => "Macedonian",
-							"ms" => "Malay",
-							"mt" => "Maltese",
-							"nl" => "Dutch",
-							"no" => "Norwegian",
-							"pl" => "Polish",
-							"pt" => "Portuguese",
-							"ro" => "Romanian",
-							"ru" => "Russian",
-							"sk" => "Slovak",
-							"sl" => "Slovenian",
-							"sq" => "Albanian",
-							"sr" => "Serbian",
-							"sv" => "Swedish",
-							"sw" => "Swahili",
-							"th" => "Thai",
-							"fil" => "Filipino", // translated to "tl" before sent to google
-							"tr" => "Turkish",
-							"uk" => "Ukrainian",
-							"vi" => "Vietnamese",
-							"yi" => "Yiddish",
-							"zh" => "Chinese");
-		asort($googlangs); // Sort by value and not by country code
 		
 		$str = "
 				<input id='$n' name='$n' type='hidden' value='$value' />
@@ -168,7 +115,7 @@ class LanguagesItem extends FormItem {
 				<table><tr><td>
 				<select id='newlanginputselect' onchange='languageselect();'>
 				<option value=0> -- Select Common Language -- </option>";
-				foreach ($googlangs as $code => $googlang) {
+				foreach ($this->args['googlelangs'] as $code => $googlang) {
 					$ttsLangSup = '';
 					if (in_array($code, $this->args['ttslangs']))
 						$ttsLangSup .= " (TTS Support)";
@@ -204,11 +151,13 @@ class LanguagesItem extends FormItem {
 			}
 			function renderlanguages() {
 				var ttslangs = " . json_encode($this->args['ttslangs']) . ";
+				var googlelangs = " . json_encode(array_keys($this->args['googlelangs'])) . ";
 				var langs = \$H($('$n').value.evalJSON(true));
 				var table = new Element('table',{'style':'text-align:left;'});
 				var tableheader = new Element('tr');
 				tableheader.insert(new Element('th').insert('Code'));
 				tableheader.insert(new Element('th',{'style':'border-left: 1px dashed black;border-right: 1px dashed black;'}).insert('TTS'));
+				tableheader.insert(new Element('th',{'style':'border-right: 1px dashed black;'}).insert('Translatable'));
 				tableheader.insert(new Element('th').insert('Name'));
 				table.insert(tableheader);
 				langs.each(function(lang) {
@@ -228,6 +177,10 @@ class LanguagesItem extends FormItem {
 					if (ttslangs.indexOf(lang.key) != -1)
 						tts.insert(new Element('img', {'src':'img/icons/accept.png'}));
 					tablecontent.insert(tts);
+					var translatable = new Element('td',{'style':'text-align:center;border-right: 1px dashed black;'});
+					if (googlelangs.indexOf(lang.key) != -1)
+						translatable.insert(new Element('img', {'src':'img/icons/accept.png'}));
+					tablecontent.insert(translatable);
 					tablecontent.insert(new Element('td').insert(input));
 
 					if (lang.key != 'en') {
@@ -372,6 +325,78 @@ class ValUrlComponent extends Validator {
 ////////////////////////////////////////////////////////////////////////////////
 // Form Data
 ////////////////////////////////////////////////////////////////////////////////
+$googlangs = array(
+	"af" => "Afrikaans",
+	"ar" => "Arabic",
+	"be" => "Belarusian",
+	"bg" => "Bulgarian",
+	"ca" => "Catalan",
+	"cs" => "Czech",
+	"cy" => "Welsh",
+	"da" => "Danish",
+	"de" => "German",
+	"el" => "Greek",
+	"en" => "English",
+	"es" => "Spanish",
+	"et" => "Estonian",
+	"fa" => "Persian",
+	"fi" => "Finnish",
+	"fr" => "French",
+	"ga" => "Irish",
+	"gl" => "Galician",
+	"hi" => "Hindi",
+	"hr" => "Croatian",
+	"ht" => "Haitian",
+	"hu" => "Hungarian",
+	"id" => "Indonesian",
+	"is" => "Icelandic",
+	"it" => "Italian",
+	"he" => "Hebrew",
+	"ja" => "Japanese",
+	"ko" => "Korean",
+	"lt" => "Lithuanian",
+	"lv" => "Latvian",
+	"mk" => "Macedonian",
+	"ms" => "Malay",
+	"mt" => "Maltese",
+	"nl" => "Dutch",
+	"no" => "Norwegian",
+	"pl" => "Polish",
+	"pt" => "Portuguese",
+	"ro" => "Romanian",
+	"ru" => "Russian",
+	"sk" => "Slovak",
+	"sl" => "Slovenian",
+	"sq" => "Albanian",
+	"sr" => "Serbian",
+	"sv" => "Swedish",
+	"sw" => "Swahili",
+	"th" => "Thai",
+	"fil" => "Filipino",
+	"tr" => "Turkish",
+	"uk" => "Ukrainian",
+	"vi" => "Vietnamese",
+	"yi" => "Yiddish",
+	"zh" => "Chinese");
+asort($googlangs); // Sort by value and not by country code
+
+$ttslangs = array(
+	'en' => 'english',
+	'es' => 'spanish',
+	'ca' => 'catalan',
+	'zh' => 'chinese',
+	'nl' => 'dutch',
+	'fi' => 'finnish',
+	'fr' => 'french',
+	'de' => 'german',
+	'el' => 'greek',
+	'it' => 'italian',
+	'pl' => 'polish',
+	'pt' => 'portuguese',
+	'ru' => 'russian',
+	'sv' => 'swedish'
+);
+
 // default settings
 $settings = array(
 					'_dmmethod' => '',
@@ -774,7 +799,8 @@ $formdata["languages"] = array(
 							array("ValRequired"),
 							array("ValLanguages")),
 						"control" => array("LanguagesItem", 
-							"ttslangs" => $customerid?QuickQueryList("select languagecode from ttsvoice", false, $custdb):array()),
+							"ttslangs" => $customerid?QuickQueryList("select languagecode from ttsvoice", false, $custdb):array_keys($ttslangs),
+							"googlelangs" => $googlangs),
 						"helpstep" => $helpstepnum
 );
 
