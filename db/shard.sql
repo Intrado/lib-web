@@ -438,3 +438,10 @@ ALTER TABLE `importalert` ADD `notes` TEXT;
 ALTER TABLE `importalert` ADD `acknowledged` tinyint(4) NOT NULL default '0';
 
 ALTER TABLE `importalert` ADD `type` ENUM( 'manager', 'customer' ) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL after `importalertruleid`;
+
+ALTER TABLE `emailjobtask` ADD `attempts` TINYINT( 4 ) NOT NULL default '0' AFTER `status` ;
+
+ALTER TABLE `smsjobtask` CHANGE `lastresult` `lastresult` ENUM( 'sent', 'unsent', 'fail', 'tempfail', 'cancelling', 'endoflife' ) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT 'unsent';
+
+ALTER TABLE `emailjobtask` CHANGE `lastresult` `lastresult` ENUM( 'sent', 'unsent', 'cancelling', 'endoflife' ) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT 'unsent' ;
+

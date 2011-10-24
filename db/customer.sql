@@ -1703,3 +1703,19 @@ $$$
 update setting set value='8.1/9' where name='_dbversion'
 $$$
 -- END REV 8.1/9
+
+-- START 8.1/10
+ALTER TABLE `job` ADD `activedate` DATETIME default NULL AFTER `modifydate` 
+$$$
+
+CREATE TABLE `jobstats` (
+ `jobid` int(11) NOT NULL,
+ `name` varchar(255) NOT NULL,
+ `value` int(11) NOT NULL,
+ PRIMARY KEY (`jobid`,`name`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8
+$$$
+
+update setting set value='8.1/10' where name='_dbversion'
+$$$
+-- END REV 8.1/10

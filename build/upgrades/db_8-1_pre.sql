@@ -75,8 +75,18 @@ $$$
 
 -- $rev 8
 ALTER TABLE `import` DROP `nsticketid`
-$$$
 
 -- $rev 9
 ALTER TABLE `importalertcategory` CHANGE `name` `type` ENUM( 'manager', 'customer' ) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL
+
+-- $rev 10
+ALTER TABLE `job` ADD `activedate` DATETIME default NULL AFTER `modifydate` 
+$$$
+
+CREATE TABLE `jobstats` (
+ `jobid` int(11) NOT NULL,
+ `name` varchar(255) NOT NULL,
+ `value` int(11) NOT NULL,
+ PRIMARY KEY (`jobid`,`name`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8
 $$$
