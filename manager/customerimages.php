@@ -99,9 +99,9 @@ if(isset($_POST['submit'])) {
 ////////////////////////////////////////////////////////////////////////////////
 
 include_once("nav.inc.php");
-
-$custurl = QuickQueryRow("select urlcomponent from customer where id = ?", false,false, array($customerid));	
-startWindow(_L('Upload Customer Images: %s',escapehtml($custurl)));
+$displayname = getCustomerSystemSetting('displayname', false, true, $custdb);
+$custurl = QuickQuery("select urlcomponent from customer where id = ?", false, array($customerid));	
+startWindow(_L('Upload Customer Images: %s (%s)',$displayname,escapehtml($custurl)));
 ?>
 <form name="fileupload" method="post" action="<?= $_SERVER["REQUEST_URI"]?>" enctype="multipart/form-data">
 <table>
