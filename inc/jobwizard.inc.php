@@ -27,21 +27,6 @@ function wizHasMessage($wiz, $messagetype) {
 	
 }
 
-// checks postdata to see if any auto translations are requested
-function wizHasTranslation($wiz) {
-	if ($wiz->dataHelper('/message/email/text:translate'))
-		return true;
-	if ($wiz->dataHelper('/message/phone/text:translate'))
-		return true;
-	if ($wiz->dataHelper('/message/pickmessage:messagegroup')) {
-		if (QuickQuery("select 1 from message where messagegroupid = ? 
-						and autotranslate = 'translated' limit 1", 
-						false, array($wiz->dataHelper('/message/pickmessage:messagegroup')))) {
-			return true;
-		}
-	}
-	return false;
-}
 
 // get the user requested schedule out of postdata
 function getSchedule($wiz) {
@@ -1765,10 +1750,7 @@ class JobWiz_scheduleDate extends WizStep {
 	function getForm($postdata, $curstep) {
 		global $USER;
 		global $ACCESS;
-
-		// Check to see if translation is used anywhere in the wizard. If it is, the job cannot be scheduled out more than 7 days.
-		$translated = wizHasTranslation($this->parent);
-
+		
 		// Form Fields.
 		$formdata = array($this->title);
 
@@ -1786,12 +1768,7 @@ class JobWiz_scheduleDate extends WizStep {
 			"control" => array("TextDate", "size"=>12, "nodatesbefore" => $dayoffset),
 			"helpstep" => 1
 		);
-		// If translation is used. don't show any dates in the calendar past 7 days from now.
-		if ($translated) {
-			$formdata["date"]["control"]["nodatesafter"] = 7;
-			$formdata["date"]["validators"][1]["max"] = date("m/d/Y", strtotime("+ 7 days"));
-		}
-
+		
 		$helpsteps[] = _L("The Delivery Window designates the earliest call time and the latest call time allowed for notification delivery.");
 		
 		$formdata["callearly"] = array(
