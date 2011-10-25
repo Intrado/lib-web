@@ -136,12 +136,22 @@ switch ($job->status) {
 
 $destinationresults = array();
 if ($job->hasPhone()) {
+	// find jobstats for job
+	global $JOB_STATS;
+	$JOB_STATS = array();
+	$query = "select jobid, name, value from jobstats where jobid = ? and name = 'complete-seconds-phone-attempt-0-sequence-0'";
+	$jobstats_objects = QuickQueryMultiRow($query, false, null, array($job->id));
+	foreach ($jobstats_objects as $obj) {
+		$JOB_STATS[$obj[0]][$obj[1]] = $obj[2];
+	}
+	
 		$phoneinfo = JobSummaryReport::getPhoneInfo($job->id, $readonlyconn);
 		$destinationresults['phone'] = array(
 			'recipients' => $phoneinfo[0]+0,
 			'completed' => $phoneinfo[1]+0,
 			'remaining' => $phoneinfo[2]+0,
 			'attempts' => $phoneinfo[6]+0,
+			'firstpass' => fmt_obj_job_first_pass($job, 'activedate'),
 			'percentcontacted' => sprintf("%0.2f", isset($phoneinfo[8]) ? $phoneinfo[8] : "") . '%'
 		);
 }
@@ -222,6 +232,7 @@ if ($job->hasPhone()) { ?>
 							<th>Completed</th>
 							<th>Remaining</th>
 							<th>Total Attempts</th>
+							<th>First Pass Completed</th>
 							<th>% Contacted</th>
 						</tr>
 						<tr>
@@ -229,6 +240,7 @@ if ($job->hasPhone()) { ?>
 							<td id='completedphone'><?=$destinationresults['phone']['completed']?></td>
 							<td id='remainingphone'><?=$destinationresults['phone']['remaining']?></td>
 							<td id='attemptsphone'><?=$destinationresults['phone']['attempts']?></td>
+							<td id='firstpassphone'><?=$destinationresults['phone']['firstpass']?></td>
 							<td id='percentcontactedphone'><?=$destinationresults['phone']['percentcontacted']?></td>
 						</tr>
 					</table>

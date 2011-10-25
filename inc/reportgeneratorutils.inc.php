@@ -65,6 +65,7 @@ function getJobSummary($joblist, $readonlyDB = false){
 	global $USER;
 
 	$jobinfoquery = "Select
+							j.id,
 							j.name,
 							jt.name,
 							u.login,
@@ -72,6 +73,7 @@ function getJobSummary($joblist, $readonlyDB = false){
 							j.enddate,
 							j.starttime,
 							j.endtime,
+							j.activedate,
 							j.status,
 							count(distinct rp.personid) as pcount,
 							coalesce(sum(rc.type='phone'), 0),
@@ -88,9 +90,18 @@ function getJobSummary($joblist, $readonlyDB = false){
 	$jobinfo = array();
 	while($row = DBGetRow($jobinforesult)){
 		//combine start date and start time for formatter to output correctly
-		$row[4] = $row[4] . " " . $row[5];
+		$row[5] = $row[5] . " " . $row[6];
 		$jobinfo[] = $row;
 	}
+	
+	global $JOB_STATS;
+	$JOB_STATS = array();
+	$query = "select jobid, name, value from jobstats where jobid in ('" . $joblist . "') and name = 'complete-seconds-phone-attempt-0-sequence-0'";
+	$jobstats_objects = QuickQueryMultiRow($query);
+	foreach ($jobstats_objects as $obj) {
+		$JOB_STATS[$obj[0]][$obj[1]] = $obj[2];
+	}
+	
 	return $jobinfo;
 }
 
@@ -114,6 +125,7 @@ function displayJobSummary($joblist, $readonlyDB = false){
 								<th>Submitted by</th>
 								<th>Scheduled Date</th>
 								<th>Scheduled Time</th>
+								<th>First Pass Completed</th>
 								<th>Status</th>
 								<th>Recipients</th>
 								<th># of Phones</th>
@@ -128,17 +140,18 @@ function displayJobSummary($joblist, $readonlyDB = false){
 								echo ++$alt % 2 ? '<tr>' : '<tr class="listAlt">';
 ?>
 
-									<td><?=escapehtml($job[0])?></td>
 									<td><?=escapehtml($job[1])?></td>
 									<td><?=escapehtml($job[2])?></td>
-									<td><?=fmt_scheduled_date($job,3)?></td>
-									<td><?=fmt_scheduled_time($job,5)?></td>
-									<td><?=ucfirst($job[7])?></td>
-									<td><?=$job[8]?></td>
-									<td><?=$job[9]?></td>
+									<td><?=escapehtml($job[3])?></td>
+									<td><?=fmt_scheduled_date($job,4)?></td>
+									<td><?=fmt_scheduled_time($job,6)?></td>
+									<td><?=fmt_job_first_pass($job, 8)?></td>
+									<td><?=ucfirst($job[9])?></td>
 									<td><?=$job[10]?></td>
-<? if($hassms) { ?>
 									<td><?=$job[11]?></td>
+									<td><?=$job[12]?></td>
+<? if($hassms) { ?>
+									<td><?=$job[13]?></td>
 <? } ?>
 								</tr>
 <?

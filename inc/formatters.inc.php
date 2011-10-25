@@ -296,6 +296,42 @@ function fmt_job_startdate ($obj,$name) {
 	return date("M j, Y g:i a",strtotime($obj->startdate . " " . $obj->starttime));
 }
 
+// assumes $row[0] is jobid
+// $row[$index] is activedate
+function fmt_job_first_pass($row, $index) {
+	global $JOB_STATS; // [jobid][jobstatname]=value
+	$statname = "complete-seconds-phone-attempt-0-sequence-0";
+
+	// find jobid
+	if (isset($JOB_STATS[$row[0]])) {
+		// find stat
+		if (isset($JOB_STATS[$row[0]][$statname])) {
+			// job activedate as base to compute 'first pass' display
+			$activedate = strtotime($row[$index]);
+			$startsecs = mktime(date("H", $activedate),
+								date("i", $activedate),
+								date("s", $activedate),
+								date("n", $activedate),
+								date("j", $activedate),
+								date("Y", $activedate)
+						);
+			// add the seconds of first pass
+			$startsecs += $JOB_STATS[$row[0]][$statname];
+			// format the date time
+			return date("M j, Y g:i a", $startsecs);
+		}
+		// else not found
+	}
+	return _L("Not Available");
+}
+
+function fmt_obj_job_first_pass($obj, $name) {
+	$row = array();
+	$row[0] = $obj->id;
+	$row[1] = $obj->activedate;
+	return fmt_job_first_pass($row, 1);
+}
+
 function fmt_status($obj, $name) {
 	global $USER;
 	if ($obj->status == 'new') {

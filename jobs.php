@@ -138,16 +138,34 @@ include_once("nav.inc.php");
 
 // Active Jobs
 $data = DBFindMany("Job","from job where userid=$USER->id and (status='new' or status='scheduled' or status='procactive' or status='processing' or status='active' or status='cancelling') and type != 'survey' and deleted=0 order by id desc");
+// find jobids to use in later query
+$jobids = array();
+foreach ($data as $job) {
+	$jobids[] = $job->id;
+}
+// find jobstats for all jobs
+global $JOB_STATS;
+$JOB_STATS = array();
+if (count($jobids) > 0) {
+	$query = "select jobid, name, value from jobstats where jobid in (" . implode(",", $jobids)  .") and name = 'complete-seconds-phone-attempt-0-sequence-0'";
+	$jobstats_objects = QuickQueryMultiRow($query);
+	foreach ($jobstats_objects as $obj) {
+		$JOB_STATS[$obj[0]][$obj[1]] = $obj[2];
+	}
+}
+
 $titles = array(	"name" => "#Job Name",
 					"description" => "#Description",
 					"type" => "#Type",
-					"startdate" => "Start date",
+					"startdate" => "Start Date",
+					"firstpass" => "First Pass",
 					"Status" => "#Status",
 					"responses" => "Responses (Unplayed/Total)",
 					"Actions" => "Actions"
 					);
 $formatters = array("Actions" => "fmt_jobs_actions",
 					'Status' => 'fmt_status',
+					"firstpass" => "fmt_obj_job_first_pass",
 					"type" => "fmt_obj_delivery_type_list",
 					"responses" => "fmt_response_count",
 					"startdate" => "fmt_job_startdate");
@@ -204,11 +222,28 @@ if ($USER->authorize('createrepeat')) {
 // Completed Jobs
 $query = "from job where userid=$USER->id and (status='complete' or status='cancelled') and type != 'survey' and deleted = 0";
 $totalcompletedjobs = QuickQuery("select count(*) " . $query);
-$data = DBFindMany("Job", $query . " order by finishdate desc limit 100");
+$data = DBFindMany("Job", $query . " order by finishdate desc limit 10"); // TODO 100
+// find jobids to use in later query
+$jobids = array();
+foreach ($data as $job) {
+	$jobids[] = $job->id;
+}
+// find jobstats for all jobs
+global $JOB_STATS;
+$JOB_STATS = array();
+if (count($jobids) > 0) {
+	$query = "select jobid, name, value from jobstats where jobid in (" . implode(",", $jobids)  .") and name = 'complete-seconds-phone-attempt-0-sequence-0'";
+	$jobstats_objects = QuickQueryMultiRow($query);
+	foreach ($jobstats_objects as $obj) {
+		$JOB_STATS[$obj[0]][$obj[1]] = $obj[2];
+	}
+}
+
 $titles = array(	"name" => "#Job Name",
 					"description" => "#Description",
 					"type" => "#Type",
 					"startdate" => "Start Date",
+					"firstpass" => "First Pass",
 					"Status" => "#Status",
 					"enddate" => "End Date",
 					"responses" => "Responses (Unplayed/Total)",
@@ -217,6 +252,7 @@ $titles = array(	"name" => "#Job Name",
 $formatters = array("Actions" => "fmt_jobs_actions",
 					'Status' => 'fmt_status',
 					"startdate" => "fmt_job_startdate",
+					"firstpass" => "fmt_obj_job_first_pass",
 					"enddate" => "fmt_job_enddate",
 					"type" => "fmt_obj_delivery_type_list",
 					"responses" => "fmt_response_count");
