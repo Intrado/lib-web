@@ -222,7 +222,7 @@ if ($USER->authorize('createrepeat')) {
 // Completed Jobs
 $query = "from job where userid=$USER->id and (status='complete' or status='cancelled') and type != 'survey' and deleted = 0";
 $totalcompletedjobs = QuickQuery("select count(*) " . $query);
-$data = DBFindMany("Job", $query . " order by finishdate desc limit 10"); // TODO 100
+$data = DBFindMany("Job", $query . " order by finishdate desc limit 100");
 // find jobids to use in later query
 $jobids = array();
 foreach ($data as $job) {
