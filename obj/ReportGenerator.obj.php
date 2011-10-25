@@ -18,6 +18,7 @@ class ReportGenerator {
 	
 	function testSize(){
 		$result = "";
+		$count = 0;
 		$this->generateQuery();
 		if($this->testquery != ""){
 			$count = QuickQuery($this->testquery, $this->_readonlyDB);
