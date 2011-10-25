@@ -429,6 +429,15 @@ class ValTranslationCharacterLimit extends Validator {
 	}
 }
 
+class ValTimePassed extends Validator {
+	var $onlyserverside = true;
+	function validate ($value, $args, $requiredvalues) {
+		$timediff = (time() - strtotime($requiredvalues[$args['field']] . " " . $value));
+		if ($timediff > 0)
+			return "$this->label: ". _L('Must be in the future.');
+		return true;
+	}
+}
 	
 ////////////////////////////////////////////////////////////////////////////////
 // Form Items
@@ -1792,7 +1801,8 @@ class JobWiz_scheduleDate extends WizStep {
 			"validators" => array(
 				array("ValRequired"),
 				array("ValTimeCheck", "min" => $ACCESS->getValue('callearly'), "max" => $ACCESS->getValue('calllate')),
-				array("ValTimeWindowCallLate")
+				array("ValTimeWindowCallLate"),
+				array("ValTimePassed", "field" => "date")
 			),
 			"requires" => array("callearly", "date"),
 			"control" => array("TimeSelectMenu"),
