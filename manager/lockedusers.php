@@ -35,7 +35,7 @@ if (isset($_GET["cid"]) && isset($_GET["enable"])) {
 			notice("Unable to perform request");
 	}
 	
-	if (!haserror) {
+	if (!$haserror) {
 		notice("Unable to perform request");
 	}
 }
