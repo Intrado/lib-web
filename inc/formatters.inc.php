@@ -308,6 +308,7 @@ function fmt_job_first_pass($row, $index) {
 		if (isset($JOB_STATS[$row[0]][$statname])) {
 			// job activedate as base to compute 'first pass' display
 			$activedate = strtotime($row[$index]);
+			// get the seconds in unix time of job activedate, use to add the jobstat seconds onto
 			$startsecs = mktime(date("H", $activedate),
 								date("i", $activedate),
 								date("s", $activedate),
