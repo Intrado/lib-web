@@ -18,7 +18,7 @@ require_once("obj/Language.obj.php");
 require_once("obj/SpecialTask.obj.php");
 require_once("obj/ListForm.obj.php");
 require_once("inc/translate.inc.php");
-require_once("obj/TraslationItem.obj.php");
+require_once("obj/TraslationItem.fi.php");
 require_once("obj/EmailAttach.fi.php");
 require_once("obj/EmailAttach.val.php");
 require_once("obj/Voice.obj.php");
