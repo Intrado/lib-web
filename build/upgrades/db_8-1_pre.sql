@@ -80,6 +80,7 @@ ALTER TABLE `import` DROP `nsticketid`
 ALTER TABLE `importalertcategory` CHANGE `name` `type` ENUM( 'manager', 'customer' ) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL
 
 -- $rev 10
+-- note, rev 10 may be skipped if 8.0/6 was applied
 ALTER TABLE `job` ADD `activedate` DATETIME default NULL AFTER `modifydate` 
 $$$
 

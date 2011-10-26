@@ -35,7 +35,12 @@ function upgrade_8_1 ($rev, $shardid, $customerid, $db) {
 			apply_sql("upgrades/db_8-1_pre.sql", $customerid, $db, 9);
 		case 9:
 			echo "|";
-			apply_sql("upgrades/db_8-1_pre.sql", $customerid, $db, 10);
+			// check if job.activedate already applied by 8.0/6
+			$hasActivedate = QuickQuery("select 1 from information_schema.columns where table_schema = 'c_" . $customerid . "' and table_name = 'job' and column_name = 'activedate'");
+			if (!$hasActivedate) {
+				apply_sql("upgrades/db_8-1_pre.sql", $customerid, $db, 10);
+			}
+			
 	}
 	
 	return true;	
