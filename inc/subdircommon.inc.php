@@ -13,14 +13,15 @@ $BASEURL = "/$CUSTOMERURL";
 apache_note("CS_APP","cs"); //for logging
 apache_note("CS_CUST",urlencode($CUSTOMERURL)); //for logging
 
+require_once("../inc/utils.inc.php");
 require_once("../inc/db.inc.php");
+require_once("../inc/memcache.inc.php");
 require_once("../inc/DBMappedObject.php");
 require_once("../inc/DBRelationMap.php");
 require_once("XML/RPC.php");
 require_once("../inc/auth.inc.php");
 require_once("../inc/sessionhandler.inc.php");
 
-require_once("../inc/utils.inc.php");
 require_once("../obj/User.obj.php");
 require_once("../obj/Access.obj.php");
 require_once("../obj/Permission.obj.php");
