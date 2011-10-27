@@ -36,7 +36,7 @@ class MessageGroupSelectMenu extends FormItem {
 		
 	function renderJavascriptLibraries() {
 		$str = '
-			<script type="text/javascript" src="script/getMessageGroupPreviewGrid.js.php"></script>
+			<script type="text/javascript" src="script/getMessageGroupPreviewGrid.js"></script>
 			<script type="text/javascript">
 				function loadMessageGroupPreview(priority, event) {
 					var formitem = event.element();

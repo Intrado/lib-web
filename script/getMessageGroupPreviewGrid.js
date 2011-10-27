@@ -1,11 +1,4 @@
-<?
-require_once("../inc/subdircommon.inc.php");
 
-//set expire time to + 1 hour so browsers cache this file
-header("Expires: " . gmdate('D, d M Y H:i:s', time() + 60*60) . " GMT"); //exire in 1 hour, but if theme changes so will hash pointing to this file
-header("Content-Type: text/javascript");
-header("Cache-Control: private");
-?>
 function getMessageGroupPreviewGrid(mgid, container, priority) {
 	// Avoid sending ajax request if nothing is selected
 	if (!mgid)
