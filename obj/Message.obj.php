@@ -216,10 +216,16 @@ class Message extends DBMappedObject {
 
 			//make a text part up to the pos of the field
 			$txt = substr($data,0,$pos);
-			if (strlen($txt) > 0) {
+			while (strlen($txt) > 0) {
 				$part = new MessagePart();
 				$part->type="T";
-				$part->txt = $txt;
+				if (strlen($txt) <= 65535) {
+					$part->txt = $txt;
+					$txt = "";
+				} else {
+					$part->txt = substr($txt,0,65535);
+					$txt = substr($txt,65535);
+				}
 				//$part->messageid = $this->id; // assign ID afterwards so ID is set
 				$part->sequence = $partcount++;
 				if($currvoiceid !== null)
@@ -345,10 +351,17 @@ class Message extends DBMappedObject {
 		}
 
 		//get trailing txt part;
-		if (strlen($data) > 0) {
+		while (strlen($data) > 0) {
 			$part = new MessagePart();
 			$part->type="T";
-			$part->txt = $data;
+			
+			if (strlen($data) <= 65535) {
+				$part->txt = $data;
+				$data = "";
+			} else {
+				$part->txt = substr($data,0,65535);
+				$data = substr($data,65535);
+			}
 
 			$part->sequence = $partcount++;
 			if($currvoiceid !== null)
