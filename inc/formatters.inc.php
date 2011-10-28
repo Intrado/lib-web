@@ -296,6 +296,54 @@ function fmt_job_startdate ($obj,$name) {
 	return date("M j, Y g:i a",strtotime($obj->startdate . " " . $obj->starttime));
 }
 
+function secondsToDayHourMinArray($secs)
+{
+	$units = array(
+                "days"    =>   24*3600,
+                "hours"   =>      3600,
+                "minutes" =>        60,
+                "seconds" =>         1,
+	);
+
+	foreach ( $units as &$unit ) {
+		$quot  = intval($secs / $unit);
+		$secs -= $quot * $unit;
+		$unit  = $quot;
+	}
+
+	return $units;
+}
+
+// return string in format "Nd HH:MM" where N=number of days, HH hours, MM minutes
+function secondsToDayHourMin($seconds) {
+	// if less than one minute, return 0
+	if ($seconds < 60)
+	return "00:00";
+
+	$v = secondsToDayHourMinArray($seconds);
+
+	if ($v["days"] == 0) {
+		$days = ""; // nothing to print
+	} else {
+		$days = $v["days"] . "d "; // pad with trailing space
+	}
+
+	if ($v["hours"] > 9) {
+		$hours = $v["hours"]; // double digit
+	} else {
+		$hours = "0" . $v["hours"]; // pad the tens column
+	}
+
+	if ($v["minutes"] > 9) {
+		$minutes = $v["minutes"]; // double digit
+	} else {
+		$minutes = "0" . $v["minutes"]; // pad the tens column
+	}
+
+	return $days . $hours . ":" . $minutes;
+}
+
+
 // assumes $row[0] is jobid
 // $row[$index] is activedate
 function fmt_job_first_pass($row, $index) {
@@ -306,16 +354,19 @@ function fmt_job_first_pass($row, $index) {
 	if (isset($JOB_STATS[$row[0]])) {
 		// find stat
 		if (isset($JOB_STATS[$row[0]][$statname])) {
+			/*
 			// job activedate as base to compute 'first pass' display
 			$activedate = strtotime($row[$index]); // unix timestamp in seconds
 			// add the seconds of first pass
 			$startsecs = $activedate + $JOB_STATS[$row[0]][$statname];
 			// format the date time
 			return date("M j, Y g:i a", $startsecs);
-		}
+			*/
+			return secondsToDayHourMin($JOB_STATS[$row[0]][$statname]);
+	    }
 		// else not found
 	}
-	return _L("Not Available");
+	return _L("N/A");
 }
 
 function fmt_obj_job_first_pass($obj, $name) {
