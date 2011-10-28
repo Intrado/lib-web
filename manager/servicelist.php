@@ -111,10 +111,10 @@ function fmt_version($row, $index) {
 				$tag = $date = "";
 				while ($line = fgets($fp)) {
 					$data = explode("=", $line);
-					if ($data[0] == 'build.tag')
-						$tag = $data[1];
-					if ($data[0] == 'build.date')
-						$date = $data[1];
+					if (trim($data[0]) == 'build.tag')
+						$tag = trim($data[1]);
+					if (trim($data[0]) == 'build.date')
+						$date = trim($data[1]);
 				}
 				fclose($fp);
 				return "$tag, $date";
