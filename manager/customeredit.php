@@ -226,7 +226,7 @@ class LanguagesItem extends FormItem {
 				}
 				$('newlanginputselect').selectedIndex = 0;
 				$('searchresult').update('');
-				$('newlangcodedisp').update('N/A');
+				$('newlangcodedisp').update('');
 				$('newlangcode').value = '';
 				$('newlanginput').value = '';
 				renderlanguages();
@@ -511,6 +511,7 @@ $formdata = array(_L('Basics'));
 
 $formdata["enabled"] = array(
 						"label" => _L('Enabled'),
+						"fieldhelp" => "Unchecking this box will disable this customer!  All repeating jobs will be stopped.  All scheduled jobs must be canceled manually.",
 						"value" => isset($custinfo)?$custinfo["enabled"]:"",
 						"validators" => array(),
 						"control" => array("CheckBox"),
@@ -1446,6 +1447,12 @@ document.observe('dom:loaded', function() {
 			$('newcustomer_enablesmsoptin').checked = 0;
 			$('newcustomer_smscustomername').value = '';
 		}
+	});
+	$('newcustomer_enabled').observe("change", function (event) {
+		//var checkbox = event.Element();
+		var checkbox = $('newcustomer_enabled');
+		if (checkbox.checked == 0) 
+			checkbox.checked = !confirm("Are you sure you want to DISABLE this customer?");
 	});
 });
 <? Validator::load_validators(array("ValBrandTheme","ValInboundNumber","ValUrlComponent","ValSmsText","ValLanguages"));?>
