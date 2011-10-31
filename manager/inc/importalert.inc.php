@@ -16,6 +16,9 @@ function formatAlert($name, $operation, $testvalue, $actualvalue) {
 			$str = "Imported too " . ($operation=="gt"?"late":"early") .
 				". Expected import " . ($operation=="gt"?"before":"after") . " $testvalue. Imported at: $actualvalue";
 			break;
+		case "unconfigured":
+			$str = "Customer is not configured with any rules";
+			break;
 	}
 	return $str;
 }

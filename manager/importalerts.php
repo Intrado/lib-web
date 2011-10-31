@@ -9,13 +9,29 @@ require_once("inc/importalert.inc.php");
 if (!$MANAGERUSER->authorized("imports"))
 	exit("Not Authorized");
 
-if (isset($_REQUEST["showacknowledged"])) {
-	$_SESSION["showacknowledgedalerts"] = $_REQUEST["showacknowledged"]=="true";
-	redirect();
-}
 
-if (!isset($_SESSION["showacknowledgedalerts"])) {
-	$_SESSION["showacknowledgedalerts"] = false;
+$displaysettings = array(
+	"acknowledged" => 0,
+	"unconfigured" => 0
+);
+
+// Map display settings labels to all possible values in display settings
+$displaylabels = array(
+	"acknowledged" => array(
+		0 => "Show Non Acknowledged",
+		1 => "Show Acknowledged"
+	),
+	"unconfigured" => array(
+		0 => "Show Configured",
+		1 => "Show Unconfigured"
+	)
+);
+
+foreach($displaylabels as $key => $values) {
+	$value = $_REQUEST[$key] + 0;
+	if (isset($_REQUEST[$key]) && in_array($value, array_keys($values))) {
+		$displaysettings[$key] = $_REQUEST[$key] + 0;
+	}
 }
 
 if(isset($_REQUEST["acknowledge"])) {
@@ -55,7 +71,13 @@ while ($shardinfo = DBGetRow($shardresult)) {
 	
 	Query("use aspshard", $sharddb);
 	$query = "select customerid,importalertruleid,importname,name,operation,testvalue,actualvalue,alerttime,notified,notes,acknowledged from importalert where type='manager' and acknowledged=?";
-	$result = Query($query,$sharddb,array($_SESSION["showacknowledgedalerts"]?1:0));
+	
+	if ($displaysettings["unconfigured"])
+		$query .= " and name='unconfigured'";
+	else
+		$query .= " and name!='unconfigured'";
+	
+	$result = Query($query,$sharddb,array($displaysettings["acknowledged"]));
 	
 	
 	while ($row = DBGetRow($result,true)) {
@@ -74,6 +96,11 @@ $titles = array(
 		"notes" => "Alert Notes",
 		"actions" => "Actions"
 );
+
+if ($displaysettings["unconfigured"]) {
+	unset($titles["importname"]);
+	unset($titles["notified"]);
+}
 
 $formatters = array(
 	"checkmark" => "fmt_check",
@@ -115,12 +142,22 @@ function fmt_actions($row, $index){
 /////////////////////////////
 
 include("nav.inc.php");
-startWindow(_L('Import Alerts'));
 
-if ($_SESSION["showacknowledgedalerts"])
-	echo '<a href="importalerts.php?showacknowledged=false">Show Non Acknowledged</a>';
-else
-	echo '<a href="importalerts.php?showacknowledged=true">Show Acknowledged</a>';
+echo "<ul>";
+foreach($displaylabels as $key => $labels) {
+	$displaymodify = $displaysettings;
+	foreach($labels as $value => $label) {
+		if ($displaysettings[$key] != $value) {
+			$displaymodify[$key] = $value;
+			echo '<li><a href="importalerts.php?' . http_build_query($displaymodify) . '">' . $label . '</a> ';
+		}
+	}
+}
+echo "</ul>";
+
+
+startWindow( ($displaysettings["acknowledged"]?"Acknowledged ":"") . 'Import Alerts ' . ($displaysettings["unconfigured"]?" for Unconfigured Customers":""));
+
 if (count($data)) {
 ?>
 <table class="list sortable" id="customer_imports_table">
