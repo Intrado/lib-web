@@ -28,8 +28,7 @@ $displaylabels = array(
 );
 
 foreach($displaylabels as $key => $values) {
-	$value = $_REQUEST[$key] + 0;
-	if (isset($_REQUEST[$key]) && in_array($value, array_keys($values))) {
+	if (isset($_REQUEST[$key]) && in_array($_REQUEST[$key] + 0, array_keys($values))) {
 		$displaysettings[$key] = $_REQUEST[$key] + 0;
 	}
 }

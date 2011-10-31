@@ -5,9 +5,6 @@ class JobFilter {
 	var $form;
 	var $settings;
 	function JobFilter($defaulttype) {
-		if (isset($_GET["clear"])) {
-			unset($_SESSION["customeractivejobsfiler"]);
-		}
 		
 		// default settings
 		$this->settings = array(
@@ -16,12 +13,15 @@ class JobFilter {
 			"jobstatus" => "active",
 			"destinationtype" => $defaulttype
 		);
-		if (isset($_SESSION["customeractivejobsfiler"])) {
-			$this->settings = array_merge($this->settings,json_decode($_SESSION["customeractivejobsfiler"],true));
+		
+		foreach($this->settings as $key => $values) {
+			if (isset($_REQUEST[$key])) {
+				$this->settings[$key] = $_REQUEST[$key];
+			}
 		}
 		
 		$helpstepnum = 1;
-		$dispatchtypes = array('customer' => 'Customer','system' => 'System');
+		$dispatchtypes = array('customer' => 'SmartCall','system' => 'ASP');
 		$formdata["dispatchtype"] = array(
 			"label" => _L('Dispatch Type'),
 			"value" => $this->settings['dispatchtype'],
@@ -56,11 +56,8 @@ class JobFilter {
 			"helpstep" => $helpstepnum
 		);
 		
-		if (isset($_SESSION['customeractivejobsfiler'])) {
-			$buttons = array(submit_button(_L('Refresh'),"submit","arrow_refresh"));
-		} else {
-			$buttons = array(submit_button(_L('Show Jobs'),"submit","magnifier"));
-		}
+		$buttons = array(submit_button(_L('Refresh'),"submit","arrow_refresh"));
+
 		$this->form = new Form("activeemailjobs",$formdata,false,$buttons);
 		
 	}	
@@ -82,22 +79,28 @@ class JobFilter {
 			} else if (($errors = $this->form->validate()) === false) {
 				//checks all of the items in this form
 				$postdata = $this->form->getData(); //gets assoc array of all values {name:value,...}
-				$_SESSION['customeractivejobsfiler'] = json_encode($postdata);
+				
+				foreach($this->settings as $key => $values) {
+					if (isset($postdata[$key])) {
+						$this->settings[$key] = $postdata[$key];
+					}
+				}
+				
 				switch ($postdata['destinationtype']) {
 					case 'email':
-						$url = "customeractiveemailjobs.php";
+						$url = "customeractiveemailjobs.php?" .  http_build_query($this->settings);
 						break;
 					case 'sms':
-						$url = "customeractivesmsjobs.php";
+						$url = "customeractivesmsjobs.php?" .  http_build_query($this->settings);
 						break;
 					case 'phone':
 					default:
-						$url = "customeractivejobs.php";
+						$url = "customeractivejobs.php?" .  http_build_query($this->settings);
 				}
 				if ($ajax)
-				$this->form->sendTo($url);
+					$this->form->sendTo($url);
 				else
-				redirect($url);
+					redirect($url);
 			}
 		}
 	}
