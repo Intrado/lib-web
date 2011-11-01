@@ -4,7 +4,7 @@
 
 $authhost = "127.0.0.1";
 $authuser = "root";
-$authpass = "asp123";
+$authpass = "";
 
 
 $usage = "
@@ -120,137 +120,152 @@ function update_customer($db, $customerid, $shardid) {
 		return;
 	}
 	
-	$maxphones = QuickQuery("select value from setting where name = 'maxphones'");
-	$maxemails = QuickQuery("select value from setting where name = 'maxemails'");
-	$maxsms = QuickQuery("select value from setting where name = 'maxsms'");
+	// gather a settings for max phone/email/sms and timezone
+	$settings = QuickQueryList("select name, value from setting where name in ('maxphones', 'maxemails', 'maxsms', 'timezone')", true);
+	if (isset($settings['maxphones']))
+		$maxphones = $settings['maxphones'];
+	else
+		$maxphones = 1;
+	if (isset($settings['maxemails']))
+		$maxemails = $settings['maxemails'];
+	else
+		$maxemails = 1;
+	if (isset($settings['maxsms']))
+		$maxsms = $settings['maxsms'];
+	else
+		$maxsms = 1;
 	
+	$timezone = $settings['timezone'];
+	
+	// loop until all jobs are prefilled
 	$loopcount = 1;
 	//while ($loopcount <= 100) {
 	while (true) {
 		$loopcount++;
 		// only backfill completed jobs, too complex to worry about active or cancelled
-		$jobid = QuickQuery("select id from job where status = 'complete' and activedate is null limit 1");
-		if (!$jobid)
-			break;
+		$jobids = QuickQueryList("select id from job where status = 'complete' and activedate is null limit 100");
+		if (count($jobids) == 0)
+			break; // no more, break from while true loop
 		
-		echo $jobid . ", ";
+		foreach ($jobids as $jobid) {
+			echo $jobid . ", ";
 		
-		$jobstats = array(); // key=name, value=value to fill jobstats table with jobid
+			$jobstats = array(); // key=name, value=value to fill jobstats table with jobid
 		
-		// for each job, single transaction
-		Query("begin",$db);
+			// for each job, single transaction
+			Query("begin",$db);
+			
+			QuickUpdate("set time_zone = ?", null, array($timezone));
 	
-		///////////////////
-		//phone
-		$maxcallattempts = QuickQuery("select value from jobsetting where name = 'maxcallattempts' and jobid = ?", null, array($jobid));
+			///////////////////
+			//phone
+			$maxcallattempts = QuickQuery("select value from jobsetting where name = 'maxcallattempts' and jobid = ?", null, array($jobid));
 		
-		$phonetimes = array(); // [attempt 0, 1, 2, ][sequence 0,1,2. ]['min'|'max'] = starttime
+			$phonetimes = array(); // [attempt 0, 1, 2, ][sequence 0,1,2. ]['min'|'max'] = starttime
 		
-		$phoneattemptdata = QuickQueryMultiRow("select personid, sequence, attemptdata from reportcontact where jobid = ? and type = 'phone' and attemptdata is not null group by personid order by sequence", true, null, array($jobid));
-		$workingPersonid = 0; // current personid working through their sequences
-		$workingSequence = 0;
-		foreach ($phoneattemptdata as $row) {
-			if ($workingPersonid != $row['personid']) {
-				$workingPersonid  = $row['personid'];
-				$workingSequence = 0;
+			$phoneattemptdata = QuickQueryMultiRow("select personid, sequence, attemptdata from reportcontact where jobid = ? and type = 'phone' and attemptdata is not null group by personid order by sequence", true, null, array($jobid));
+			$workingPersonid = 0; // current personid working through their sequences
+			$workingSequence = 0;
+			foreach ($phoneattemptdata as $row) {
+				if ($workingPersonid != $row['personid']) {
+					$workingPersonid  = $row['personid'];
+					$workingSequence = 0;
+				} else {
+					$workingSequence++;
+				}
+				for ($workingAttempt = 0; $workingAttempt < $maxcallattempts; $workingAttempt++) {
+					$starttime = substr($row['attemptdata'], ($workingAttempt * 16), 13); // 16 chars per attempt, 13 chars length of starttime
+					if (!$starttime)
+						break; // no more attempts for this sequence
+					updatePhonetimesForAttemptSequence($workingAttempt, $workingSequence, $starttime, $phonetimes);
+				}
+			}
+		
+			if (isset($phonetimes[0][0]['min']))
+				$minstartphone = $phonetimes[0][0]['min']; // starting time of attempt=0, sequence=0
+			else
+				$minstartphone = null;
+		
+			foreach ($phonetimes as $attempt => $seqarray) {
+				foreach ($seqarray as $seq => $minmaxarray) {
+					$duration = ($minmaxarray['max'] - $minstartphone) / 1000;
+					$jobstats["complete-seconds-phone-attempt-".$attempt."-sequence-".$seq] = $duration;
+				}
+			}
+		
+			///////////////////
+			// email
+			$minmax = QuickQueryRow("select min(starttime), max(starttime) from reportcontact where jobid = ? and type = 'email' and starttime is not null", false, null, array($jobid));
+			$minstartemail = $minmax[0];
+			$maxstartemail = $minmax[1];
+	
+			// if there is a min and max, then there was a complete first pass
+			if ($minstartemail && $maxstartemail) {
+				$duration = ($maxstartemail - $minstartemail) / 1000;
+				for ($i=0; $i < $maxemails; $i++) {
+					$jobstats["complete-seconds-email-attempt-0-sequence-" . $i] = $duration;
+				}
+			}
+	
+			////////////////
+			// sms
+			$minmax = QuickQueryRow("select min(starttime), max(starttime) from reportcontact where jobid = ? and type = 'sms' and starttime is not null", false, null, array($jobid));
+			$minstartsms = $minmax[0];
+			$maxstartsms = $minmax[1];
+		
+			// if there is a min and max, then there was a complete first pass
+			if ($minstartsms && $maxstartsms) {
+				$duration = ($maxstartsms - $minstartsms) / 1000;
+				for ($i=0; $i < $maxsms; $i++) {
+					$jobstats["complete-seconds-sms-attempt-0-sequence-" . $i] = $duration;
+				}
+			}
+		
+			/////////////////
+			// activedate
+		
+			// create array of possible activedate, do not include null
+			$a = array();
+			if ($minstartphone != null)
+				$a[] = $minstartphone;
+			if ($minstartemail != null)
+				$a[] = $minstartemail;
+			if ($minstartsms != null)
+				$a[] = $minstartsms;
+		
+			if (count($a) == 0) {
+				// no starttime data, set to job startdate/time
+				if (!QuickUpdate("update job set activedate = greatest(timestamp(startdate, starttime), createdate, modifydate) where id = ?", null, array($jobid))) {
+					echo "\nFailed to update job.activedate\n";
+					return;
+				}
 			} else {
-				$workingSequence++;
+				$activedate = min($a) / 1000; // convert millis to secs
+				if (!QuickUpdate("update job set activedate = from_unixtime(?) where id = ?", null, array($activedate, $jobid))) {
+					echo "\nFailed to update job.activedate\n";
+					return;
+				}
 			}
-			for ($workingAttempt = 0; $workingAttempt < $maxcallattempts; $workingAttempt++) {
-				$starttime = substr($row['attemptdata'], ($workingAttempt * 16), 13); // 16 chars per attempt, 13 chars length of starttime
-				if (!$starttime)
-					break; // no more attempts for this sequence
-				updatePhonetimesForAttemptSequence($workingAttempt, $workingSequence, $starttime, $phonetimes);
-			}
-		}
 		
-		if (isset($phonetimes[0][0]['min']))
-			$minstartphone = $phonetimes[0][0]['min']; // starting time of attempt=0, sequence=0
-		else
-			$minstartphone = null;
+			// insert bulk jobstats
+			$args = array();
+			$query = "insert into jobstats (jobid, name, value) values ";
+			foreach ($jobstats as $name => $value) {
+				$query .= "(" . $jobid . ",?,?),";
+				$args[] = $name;
+				$args[] = $value;
+			}
+			$query = substr($query, 0, strlen($query)-1); // chop trailing comma
+			if (count($args) > 0) {
+				if (!QuickUpdate($query, null, $args)) {
+					echo "\nFailed to insert jobstats\n";
+					return;
+				}
+			}
 		
-		foreach ($phonetimes as $attempt => $seqarray) {
-			foreach ($seqarray as $seq => $minmaxarray) {
-				$duration = ($minmaxarray['max'] - $minstartphone) / 1000;
-				$jobstats["complete-seconds-phone-attempt-".$attempt."-sequence-".$seq] = $duration;
-			}
-		}
-		
-		
-		
-		///////////////////
-		// email
-		$minmax = QuickQueryRow("select min(starttime), max(starttime) from reportcontact where jobid = ? and type = 'email' and starttime is not null", false, null, array($jobid));
-		$minstartemail = $minmax[0];
-		$maxstartemail = $minmax[1];
-	
-		// if there is a min and max, then there was a complete first pass
-		if ($minstartemail && $maxstartemail) {
-			$duration = ($maxstartemail - $minstartemail) / 1000;
-			for ($i=0; $i < $maxemails; $i++) {
-				$jobstats["complete-seconds-email-attempt-0-sequence-" . $i] = $duration;
-			}
-		}
-	
-		////////////////
-		// sms
-		$minmax = QuickQueryRow("select min(starttime), max(starttime) from reportcontact where jobid = ? and type = 'sms' and starttime is not null", false, null, array($jobid));
-		$minstartsms = $minmax[0];
-		$maxstartsms = $minmax[1];
-	
-		// if there is a min and max, then there was a complete first pass
-		if ($minstartsms && $maxstartsms) {
-			$duration = ($maxstartsms - $minstartsms) / 1000;
-			for ($i=0; $i < $maxsms; $i++) {
-				$jobstats["complete-seconds-sms-attempt-0-sequence-" . $i] = $duration;
-			}
-		}
-	
-		/////////////////
-		// activedate
-	
-		// create array of possible activedate, do not include null
-		$a = array();
-		if ($minstartphone != null)
-			$a[] = $minstartphone;
-		if ($minstartemail != null)
-			$a[] = $minstartemail;
-		if ($minstartsms != null)
-			$a[] = $minstartsms;
-	
-		if (count($a) == 0) {
-			// no starttime data, set to job startdate/time
-			if (!QuickUpdate("update job set activedate = timestamp(startdate, starttime) where id = ?", null, array($jobid))) {
-				echo "\nFailed to update job.activedate\n";
-				return;
-			}
-		} else {
-			$activedate = min($a) / 1000; // convert millis to secs
-			// TODO timezone	
-			if (!QuickUpdate("update job set activedate = from_unixtime(?) where id = ?", null, array($activedate, $jobid))) {
-				echo "\nFailed to update job.activedate\n";
-				return;
-			}
-		}
-	
-		// insert bulk jobstats
-		$args = array();
-		$query = "insert into jobstats (jobid, name, value) values ";
-		foreach ($jobstats as $name => $value) {
-			$query .= "(" . $jobid . ",?,?),";
-			$args[] = $name;
-			$args[] = $value;
-		}
-		$query = substr($query, 0, strlen($query)-1); // chop trailing comma
-		if (count($args) > 0) {
-			if (!QuickUpdate($query, null, $args)) {
-				echo $query ."\nFailed to insert jobstats\n";
-				return;
-			}
-		}
-	
-		// commit this job
-		Query("commit",$db);
+			// commit this job
+			Query("commit",$db);
+		} // end for jobid
 	} // end while loop
 	
 	// remove progress lock
