@@ -232,7 +232,7 @@ if ($job->hasPhone()) { ?>
 							<th>Completed</th>
 							<th>Remaining</th>
 							<th>Total Attempts</th>
-							<th>First Pass Completed</th>
+							<th>First Pass</th>
 							<th>% Contacted</th>
 						</tr>
 						<tr>

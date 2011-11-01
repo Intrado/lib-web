@@ -125,7 +125,7 @@ function displayJobSummary($joblist, $readonlyDB = false){
 								<th>Submitted by</th>
 								<th>Scheduled Date</th>
 								<th>Scheduled Time</th>
-								<th>First Pass Completed</th>
+								<th>First Pass</th>
 								<th>Status</th>
 								<th>Recipients</th>
 								<th># of Phones</th>
