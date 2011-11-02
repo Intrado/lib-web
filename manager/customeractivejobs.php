@@ -122,7 +122,6 @@ include_once("nav.inc.php");
 <script type="text/javascript">
 <? Validator::load_validators(array()); ?>
 </script>
-<ul><li><a href="customersubmittedjobs.php?clear">View Scheduled and Processing Jobs</a></li></ul>
 <?
 
 $jobfilter->render();

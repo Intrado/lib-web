@@ -4,8 +4,9 @@
 class JobFilter {
 	var $form;
 	var $settings;
+	var $type;
 	function JobFilter($defaulttype) {
-		
+		$this->type = $defaulttype;
 		// default settings
 		$this->settings = array(
 			"dispatchtype" => 'system',
@@ -44,18 +45,6 @@ class JobFilter {
 			"helpstep" => $helpstepnum
 		);
 		
-		$destinationtypes = array('phone' => 'Phone','sms' => 'SMS','email' => 'Email');
-		$formdata["destinationtype"] = array(
-			"label" => _L('Destination Type'),
-			"value" => $this->settings['destinationtype'],
-			"validators" => array(
-				array("ValRequired"),
-				array("ValInArray", "values" => array_keys($destinationtypes))
-			),
-			"control" => array("SelectMenu", "values" => $destinationtypes),
-			"helpstep" => $helpstepnum
-		);
-		
 		$buttons = array(submit_button(_L('Refresh'),"submit","arrow_refresh"));
 
 		$this->form = new Form("activeemailjobs",$formdata,false,$buttons);
@@ -85,8 +74,7 @@ class JobFilter {
 						$this->settings[$key] = $postdata[$key];
 					}
 				}
-				
-				switch ($postdata['destinationtype']) {
+				switch ($this->type) {
 					case 'email':
 						$url = "customeractiveemailjobs.php?" .  http_build_query($this->settings);
 						break;
@@ -106,6 +94,25 @@ class JobFilter {
 	}
 
 	function render() {
+		$destinationtypes = array('phone' => 'Phone','sms' => 'SMS','email' => 'Email');
+		echo "<div style='padding:5px;'>";
+		$tmpsetting = $this->settings;
+		foreach($destinationtypes as $key => $label) {
+			$tmpsetting['destinationtype'] = $key;
+			switch ($key) {
+				case 'email':
+					$url = "customeractiveemailjobs.php?" .  http_build_query($tmpsetting);
+					break;
+				case 'sms':
+					$url = "customeractivesmsjobs.php?" .  http_build_query($tmpsetting);
+					break;
+				case 'phone':
+				default:
+					$url = "customeractivejobs.php?" .  http_build_query($tmpsetting);
+			}
+			echo "<a href='$url' style='" . ($this->type==$key?"color:black":"") . "' >$label</a>&nbsp;|&nbsp;";
+		}
+		echo '<a href="customersubmittedjobs.php">Scheduled/Processing</a></div>';
 		startWindow(_L('Active Jobs Filter'));
 		echo $this->form->render();
 		endWindow();

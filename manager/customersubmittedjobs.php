@@ -164,8 +164,11 @@ include_once("nav.inc.php");
 <script type="text/javascript">
 <? Validator::load_validators(array()); ?>
 </script>
+<div style='padding:5px;'>
+<a href='customeractivejobs.php' >Phone</a>&nbsp;|&nbsp;<a href='customeractivesmsjobs.php' >SMS</a>&nbsp;|&nbsp;<a href='customeractiveemailjobs.php' >Email</a>&nbsp;|&nbsp;
+<a href="customersubmittedjobs.php?clear" style="color:black">Scheduled/Processing</a>
+</div>
 <?
-
 startWindow(_L('Scheduled/Processing Jobs Filter'));
 echo $form->render();
 endWindow();
