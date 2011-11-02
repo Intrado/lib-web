@@ -19,70 +19,66 @@ if (!$MANAGERUSER->authorized("activejobs"))
 	exit("Not Authorized");
 
 
-if (isset($_GET["clear"])) {
-	unset($_SESSION["customeractivejobsfiler"]);
-}
 
 $jobfilter = new JobFilter("phone");
 $jobfilter-> handleChages();
 
-if (isset($_SESSION['customeractivejobsfiler'])) {
-	$customers = QuickQueryList("select id, urlcomponent from customer",true);
+$customers = QuickQueryList("select id, urlcomponent from customer",true);
 
-	$res = Query("select id, dbhost, dbusername, dbpassword from shard order by id");
-	$shards = array();
-	while($row = DBGetRow($res)){
-		$dsn = 'mysql:dbname=aspshard;host='.$row[1];
-		$db = new PDO($dsn, $row[2], $row[3]);
-		$db->setAttribute(PDO::ATTR_EMULATE_PREPARES, true);
-		$shards[$row[0]] = $db;
-	}
+$res = Query("select id, dbhost, dbusername, dbpassword from shard order by id");
+$shards = array();
+while($row = DBGetRow($res)){
+	$dsn = 'mysql:dbname=aspshard;host='.$row[1];
+	$db = new PDO($dsn, $row[2], $row[3]);
+	$db->setAttribute(PDO::ATTR_EMULATE_PREPARES, true);
+	$shards[$row[0]] = $db;
+}
 
-	$calldata = array();
-	$activejobs = array();
-	$extrasql = "";
-	$extraargs = array();
+$calldata = array();
+$activejobs = array();
+$extrasql = "";
+$extraargs = array();
 
-	if(isset($_GET['cid'])){
-		$customerid = $_GET['cid'] + 0;
-		$extrasql .= " and j.customerid = $customerid ";
-		if(isset($_GET['user'])){
-			$userid = $_GET['user'] + 0;
-			$extrasql .= " and j.userid = $userid ";
-		}
-	}
-	if ($jobfilter->settings['dispatchtype'] == 'customer'){
-		$extrasql .= " and j.dispatchtype = 'customer' ";
-	} else {
-		$extrasql .= " and j.dispatchtype = 'system' ";
-	}
-	
-	$extrasql .= " and jt.type = ? ";
-	$extraargs[] = $jobfilter->settings['destinationtype'];
-	
-	foreach ($shards as $shardid => $sharddb) {
-		Query("use aspshard", $sharddb);
-		$query = "select j.systempriority, j.customerid, j.id, jt.type, jt.attempts, jt.sequence,
-						jt.status, j.phonetaskcount, j.timeslices, count(*)
-				from qjobtask jt
-				straight_join qjob j on (j.id = jt.jobid and j.customerid = jt.customerid)
-				where 1 $extrasql
-				group by jt.status, jt.customerid, jt.jobid, jt.type, jt.attempts, jt.sequence
-				order by j.systempriority, j.customerid, j.id, jt.type, jt.attempts, jt.sequence
-				";
-		$res = Query($query,$sharddb,$extraargs);
-		while ($row = DBGetRow($res)) {
-
-			$calldata[$row[0]][$row[1]][$row[2]][$row[3]][$row[4]][$row[5]][$row[6]] = $row[9];
-
-			$activejobs[$row[1]][$row[2]]["phonetaskcount"] = $row[7];
-			@$activejobs[$row[1]][$row[2]]["phonetaskremaining"] += $row[9];
-
-
-			$activejobs[$row[1]][$row[2]]["timeslices"] = $row[8];
-		}
+if(isset($_GET['cid'])){
+	$customerid = $_GET['cid'] + 0;
+	$extrasql .= " and j.customerid = $customerid ";
+	if(isset($_GET['user'])){
+		$userid = $_GET['user'] + 0;
+		$extrasql .= " and j.userid = $userid ";
 	}
 }
+if ($jobfilter->settings['dispatchtype'] == 'customer'){
+	$extrasql .= " and j.dispatchtype = 'customer' ";
+} else {
+	$extrasql .= " and j.dispatchtype = 'system' ";
+}
+
+$extrasql .= " and jt.type = ? ";
+$extraargs[] = $jobfilter->settings['destinationtype'];
+
+foreach ($shards as $shardid => $sharddb) {
+	Query("use aspshard", $sharddb);
+	$query = "select j.systempriority, j.customerid, j.id, jt.type, jt.attempts, jt.sequence,
+					jt.status, j.phonetaskcount, j.timeslices, count(*)
+			from qjobtask jt
+			straight_join qjob j on (j.id = jt.jobid and j.customerid = jt.customerid)
+			where 1 $extrasql
+			group by jt.status, jt.customerid, jt.jobid, jt.type, jt.attempts, jt.sequence
+			order by j.systempriority, j.customerid, j.id, jt.type, jt.attempts, jt.sequence
+			";
+	$res = Query($query,$sharddb,$extraargs);
+	while ($row = DBGetRow($res)) {
+
+		$calldata[$row[0]][$row[1]][$row[2]][$row[3]][$row[4]][$row[5]][$row[6]] = $row[9];
+
+		$activejobs[$row[1]][$row[2]]["phonetaskcount"] = $row[7];
+		@$activejobs[$row[1]][$row[2]]["phonetaskremaining"] += $row[9];
+
+
+		$activejobs[$row[1]][$row[2]]["timeslices"] = $row[8];
+	}
+}
+
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -132,177 +128,175 @@ include_once("nav.inc.php");
 $jobfilter->render();
 
 $foundjobs = false;
-if (isset($_SESSION['customeractivejobsfiler'])) {
-	startWindow(_L('Jobs'));
-	$prinames = array (1 => "Emergency", 2 => "High", 3 => "General");
-	$pricolors = array (1 => "#ff0000", 2 => "#ffff00", 3 => "#0000ff");
+startWindow(_L('Jobs'));
+$prinames = array (1 => "Emergency", 2 => "High", 3 => "General");
+$pricolors = array (1 => "#ff0000", 2 => "#ffff00", 3 => "#0000ff");
+
+$data = array();
+$summarydata = array();
+
+foreach($jobfilter->settings['priorities'] as $pri) {
+	if (isset($calldata[$pri])) {
+		$foundjobs = true;
+		$pricalldata = $calldata[$pri];
+		$pridata = array();
+		$pritotals = array();
+		foreach ($pricalldata as $customerid => $custcalldata) {
+			$showcust = true;
+			foreach ($custcalldata as $jobid => $jobcalldata) {
+				$showjob = true;
 	
-	$data = array();
-	$summarydata = array();
+				@$pritotals["phonetaskremaining"] += $activejobs[$customerid][$jobid]["phonetaskremaining"];
+				@$pritotals["phonetaskcount"] += $activejobs[$customerid][$jobid]["phonetaskcount"];
 	
-	foreach($jobfilter->settings['priorities'] as $pri) {
-		if (isset($calldata[$pri])) {
-			$foundjobs = true;
-			$pricalldata = $calldata[$pri];
-			$pridata = array();
-			$pritotals = array();
-			foreach ($pricalldata as $customerid => $custcalldata) {
-				$showcust = true;
-				foreach ($custcalldata as $jobid => $jobcalldata) {
-					$showjob = true;
-		
-					@$pritotals["phonetaskremaining"] += $activejobs[$customerid][$jobid]["phonetaskremaining"];
-					@$pritotals["phonetaskcount"] += $activejobs[$customerid][$jobid]["phonetaskcount"];
-		
-					$slicesize = $activejobs[$customerid][$jobid]["timeslices"];
-					if ($slicesize) {
-						$slicesize = (int) max(2,($activejobs[$customerid][$jobid]["phonetaskcount"] / $slicesize));
-						@$pritotals["slicesize"] += $slicesize;
-					} else {
-						$slicesize = "&#8734;";
-					}
-		
-					foreach ($jobcalldata as $type => $typecalldata) {
-						$showtype = true;
-						foreach ($typecalldata as $attempt => $attemptcalldata) {
-							$showattempt = true;
-							foreach ($attemptcalldata as $sequence => $sequencecalldata) {
-								$row = @array(
-										$showcust ? $customerid : "",
-										$showcust ? $customers[$customerid] : "",
-										$showjob ? $jobid : "",
-										$showjob ? $activejobs[$customerid][$jobid]["phonetaskremaining"] : "",
-										$showjob ? $activejobs[$customerid][$jobid]["phonetaskcount"] : "",
-										$showjob ? $slicesize : "",
-										$showtype ? $type : "",
-										$showattempt ? $attempt : "",
-										$sequence,
-										$sequencecalldata['active'],
-										$sequencecalldata['assigned'],
-										$sequencecalldata['progress'],
-										$sequencecalldata['pending'],
-										$sequencecalldata['waiting'],
-										$customerid
-									);
-								$pridata[] = $row;
-		
-		
-								@$pritotals["active"] += $sequencecalldata['active'];
-								@$pritotals["assigned"] += $sequencecalldata['assigned'];
-								@$pritotals["progress"] += $sequencecalldata['progress'];
-								@$pritotals["pending"] += $sequencecalldata['pending'];
-								@$pritotals["waiting"] += $sequencecalldata['waiting'];
-		
-								$showcust = $showjob = $showtype = $showattempt = false;
-							}
+				$slicesize = $activejobs[$customerid][$jobid]["timeslices"];
+				if ($slicesize) {
+					$slicesize = (int) max(2,($activejobs[$customerid][$jobid]["phonetaskcount"] / $slicesize));
+					@$pritotals["slicesize"] += $slicesize;
+				} else {
+					$slicesize = "&#8734;";
+				}
+	
+				foreach ($jobcalldata as $type => $typecalldata) {
+					$showtype = true;
+					foreach ($typecalldata as $attempt => $attemptcalldata) {
+						$showattempt = true;
+						foreach ($attemptcalldata as $sequence => $sequencecalldata) {
+							$row = @array(
+									$showcust ? $customerid : "",
+									$showcust ? $customers[$customerid] : "",
+									$showjob ? $jobid : "",
+									$showjob ? $activejobs[$customerid][$jobid]["phonetaskremaining"] : "",
+									$showjob ? $activejobs[$customerid][$jobid]["phonetaskcount"] : "",
+									$showjob ? $slicesize : "",
+									$showtype ? $type : "",
+									$showattempt ? $attempt : "",
+									$sequence,
+									$sequencecalldata['active'],
+									$sequencecalldata['assigned'],
+									$sequencecalldata['progress'],
+									$sequencecalldata['pending'],
+									$sequencecalldata['waiting'],
+									$customerid
+								);
+							$pridata[] = $row;
+	
+	
+							@$pritotals["active"] += $sequencecalldata['active'];
+							@$pritotals["assigned"] += $sequencecalldata['assigned'];
+							@$pritotals["progress"] += $sequencecalldata['progress'];
+							@$pritotals["pending"] += $sequencecalldata['pending'];
+							@$pritotals["waiting"] += $sequencecalldata['waiting'];
+	
+							$showcust = $showjob = $showtype = $showattempt = false;
 						}
 					}
 				}
 			}
-			$totalsrow = array (
-				"<b>Total</b>",
-				"",
-				"",
-				$pritotals["phonetaskremaining"],
-				$pritotals["phonetaskcount"],
-				$pritotals["slicesize"] ? $pritotals["slicesize"] : "&#8734;",
-				"",
-				"",
-				"",
-				$pritotals["active"],
-				$pritotals["assigned"],
-				$pritotals["progress"],
-				$pritotals["pending"],
-				$pritotals["waiting"]
-			);
-			$pridata[] = $totalsrow;
-			$data[$pri] = $pridata;
-			$summarydata[] = array (
-				"<b>$prinames[$pri] Total</b>",
-				$pritotals["phonetaskremaining"],
-				$pritotals["phonetaskcount"],
-				$pritotals["slicesize"] ? $pritotals["slicesize"] : "&#8734;",
-				$pritotals["active"],
-				$pritotals["assigned"],
-				$pritotals["progress"],
-				$pritotals["pending"],
-				$pritotals["waiting"]
-			);
 		}
+		$totalsrow = array (
+			"<b>Total</b>",
+			"",
+			"",
+			$pritotals["phonetaskremaining"],
+			$pritotals["phonetaskcount"],
+			$pritotals["slicesize"] ? $pritotals["slicesize"] : "&#8734;",
+			"",
+			"",
+			"",
+			$pritotals["active"],
+			$pritotals["assigned"],
+			$pritotals["progress"],
+			$pritotals["pending"],
+			$pritotals["waiting"]
+		);
+		$pridata[] = $totalsrow;
+		$data[$pri] = $pridata;
+		$summarydata[] = array (
+			"<b>$prinames[$pri] Total</b>",
+			$pritotals["phonetaskremaining"],
+			$pritotals["phonetaskcount"],
+			$pritotals["slicesize"] ? $pritotals["slicesize"] : "&#8734;",
+			$pritotals["active"],
+			$pritotals["assigned"],
+			$pritotals["progress"],
+			$pritotals["pending"],
+			$pritotals["waiting"]
+		);
 	}
-	if (count($data)) {
-		$titles = array(
-			"Priority",
-			"job ph remain",
-			"job ph total",
-			"job throttle",
-			"Active",
-			"Assigned",
-			"Progress",
-			"Pending",
-			"Waiting",
-		);
-		$formatters = array (
-			0 => "fmt_html",
-			1 => "fmt_number",
-			2 => "fmt_number",
-			3 => "fmt_number",
-			4 => "fmt_number",
-			5 => "fmt_number",
-			6 => "fmt_number",
-			7 => "fmt_number",
-			8 => "fmt_number"
-		);
-		echo "<div style=\"margin-top:10px;border: 3px solid black;\">";
-		echo "<h2>Active Jobs Summary: </h2><table>";
-		showTable($summarydata, $titles, $formatters);
+}
+if (count($data)) {
+	$titles = array(
+		"Priority",
+		"job ph remain",
+		"job ph total",
+		"job throttle",
+		"Active",
+		"Assigned",
+		"Progress",
+		"Pending",
+		"Waiting",
+	);
+	$formatters = array (
+		0 => "fmt_html",
+		1 => "fmt_number",
+		2 => "fmt_number",
+		3 => "fmt_number",
+		4 => "fmt_number",
+		5 => "fmt_number",
+		6 => "fmt_number",
+		7 => "fmt_number",
+		8 => "fmt_number"
+	);
+	echo "<div style=\"margin-top:10px;border: 3px solid black;\">";
+	echo "<h2>Active Jobs Summary: </h2><table>";
+	showTable($summarydata, $titles, $formatters);
+	echo "</table>";
+	echo "</div>";
+	
+	$titles = array(
+		"Customer id",
+		"Customer url",
+		"Job id",
+		"job ph remain",
+		"job ph total",
+		"job throttle",
+		"Type",
+		"attempt",
+		"sequence",
+		"Active",
+		"Assigned",
+		"Progress",
+		"Pending",
+		"Waiting",
+		"Play Message"
+	);
+	$formatters = array (
+		0 => "fmt_html",
+		1 => "fmt_custurl",
+		3 => "fmt_number",
+		4 => "fmt_number",
+		5 => "fmt_html",
+		9 => "fmt_number",
+		10 => "fmt_number",
+		11 => "fmt_number",
+		12 => "fmt_number",
+		13 => "fmt_number",
+		14 => "fmt_play_activejobs"
+	);
+	foreach($data as $pri => $pridata) {
+		echo "<div style=\"margin-top:10px;border: 3px solid $pricolors[$pri];\"><h2>$prinames[$pri]</h2><hr />";
+		echo "Active Jobs: <table>";
+		showTable($pridata, $titles, $formatters);
 		echo "</table>";
 		echo "</div>";
-		
-		$titles = array(
-			"Customer id",
-			"Customer url",
-			"Job id",
-			"job ph remain",
-			"job ph total",
-			"job throttle",
-			"Type",
-			"attempt",
-			"sequence",
-			"Active",
-			"Assigned",
-			"Progress",
-			"Pending",
-			"Waiting",
-			"Play Message"
-		);
-		$formatters = array (
-			0 => "fmt_html",
-			1 => "fmt_custurl",
-			3 => "fmt_number",
-			4 => "fmt_number",
-			5 => "fmt_html",
-			9 => "fmt_number",
-			10 => "fmt_number",
-			11 => "fmt_number",
-			12 => "fmt_number",
-			13 => "fmt_number",
-			14 => "fmt_play_activejobs"
-		);
-		foreach($data as $pri => $pridata) {
-			echo "<div style=\"margin-top:10px;border: 3px solid $pricolors[$pri];\"><h2>$prinames[$pri]</h2><hr />";
-			echo "Active Jobs: <table>";
-			showTable($pridata, $titles, $formatters);
-			echo "</table>";
-			echo "</div>";
-		}
 	}
-	
-	if (!$foundjobs) {
-		echo "<div class='destlabel'><img src='img/largeicons/information.jpg' align='middle'> " . _L("No jobs found for the current filter settings") . "<div>";
-	}
-	endWindow();
 }
+
+if (!$foundjobs) {
+	echo "<div class='destlabel'><img src='img/largeicons/information.jpg' align='middle'> " . _L("No jobs found for the current filter settings") . "<div>";
+}
+endWindow();
 
 include_once("navbottom.inc.php");
 ?>
