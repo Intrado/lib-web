@@ -546,7 +546,7 @@ $userorgs = QuickQueryList("select organizationid from userassociation where use
 // if there are no orgs. don't show the form item
 if ($orgs) {
 	$formdata["organizationids"] = array(
-		"label" => _L('Additional %s',getSystemSetting("organizationfieldname","Organization")),
+		"label" => getSystemSetting("organizationfieldname","Organization"),
 		"fieldhelp" => _L('Add or remove user organization associations'),
 		"value" => $userorgs,
 		"validators" => array(
