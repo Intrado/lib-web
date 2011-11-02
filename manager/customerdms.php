@@ -14,14 +14,14 @@ if(isset($_GET['clear'])){
 	unset($_SESSION['customerid']);
 	redirect();
 } else if (isset($_GET['resetDM'])) {
-	if (!QuickQuery("select command from dm where id=?", false,array($_GET['resetDM']))) {
+	if (null != QuickQuery("select command from dm where id=?", false,array($_GET['resetDM']))) {
 		notice(_L('DM already had a command queued.  New command queued instead.'));
 	}
 	QuickUpdate("update dm set command='reset' where id=?", false,array($_GET['resetDM']));
 	notice(_L("Reset queued"));
 	redirect();
 } else if (isset($_GET['update'])) {
-	if (!QuickQuery("select command from dm where id=?", false,array($_GET['update']))) {
+	if (null != QuickQuery("select command from dm where id=?", false,array($_GET['update']))) {
 		notice(_L('DM already had a command queued.  New command queued instead.'));
 	}
 	QuickUpdate("update dm set command='update' where id=?", false,array($_GET['update']));

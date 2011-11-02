@@ -11,7 +11,7 @@ if (!$MANAGERUSER->authorized("systemdm"))
 
 // Action Handlers 
 if (isset($_GET['resetDM'])) {
-	if (!QuickQuery("select command from dm where id=?", false,array($_GET['resetDM']))) {
+	if (null != QuickQuery("select command from dm where id=?", false,array($_GET['resetDM']))) {
 		notice(_L('DM already had a command queued.  New command queued instead.'));
 	}
 	QuickUpdate("update dm set command='reset' where id=?", false,array($_GET['resetDM']));
@@ -62,9 +62,9 @@ function fmt_DMActions($row, $index){
 	$dmid = $row[0];
 	$actions[] = action_link("Edit", "pencil","editdm.php?dmid=" . $dmid);
 	$actions[] = action_link("Status", "fugue/globe","dmstatus.php?dmid=" . $dmid);
-	$actions[] = action_link("Reset", "fugue/burn","customerdms.php?resetDM=" . $dmid, "return confirm('Are you sure you want to reset DM " . addslashes($row[3]) . "?');");
+	$actions[] = action_link("Reset", "fugue/burn","systemdms.php?resetDM=" . $dmid, "return confirm('Are you sure you want to reset DM " . addslashes($row[3]) . "?');");
 	if ($row[4] == "disabled") {
-		$actions[] = action_link("Delete", "cross","customerdms.php?delete=" . $dmid,"return confirm('Are you sure you want to delete DM " . addslashes($row[3]) . "?');");
+		$actions[] = action_link("Delete", "cross","systemdms.php?delete=" . $dmid,"return confirm('Are you sure you want to delete DM " . addslashes($row[3]) . "?');");
 	}
 	return action_links($actions);
 }
