@@ -11,13 +11,14 @@ require_once("../obj/Form.obj.php");
 require_once("../obj/FormItem.obj.php");
 require_once("dbmo/authserver/AspAdminUser.obj.php");
 require_once("../obj/FormUserItems.obj.php");
+require_once("dbmo/authserver/AspAdminQuery.obj.php");
 
 
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization
 ////////////////////////////////////////////////////////////////////////////////
 
-if (!$MANAGERUSER->authorized("edituser"))
+if (!$MANAGERUSER->authorized("superuser"))
 	exit("Not Authorized");
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -40,16 +41,114 @@ $edituserid = isset($_SESSION['edituserid'])?$_SESSION['edituserid']:false;
 ////////////////////////////////////////////////////////////////////////////////
 
 
+class QueriesItem extends FormItem {
+
+	function render ($value) {
+		$n = $this->form->name."_".$this->name;
+		$str = '<input type="hidden" id="'.$n.'" name="'.$n.'" value="' . escapehtml(json_encode($value)) . '" />';
+		
+		$unrestrictchecked = $value == "unrestricted" ? "checked" : "";
+		$str .= '<input type="checkbox" id="'.$n.'-restrict" '.$unrestrictchecked .' onclick="unrestrictcheck(\''.$n.'-restrict\', \'checks\')"><label for="'.$n.'-restrict">Unrestricted</label>';
+		$str .= '<div id="checks" class="radiobox" style="margin-left: 1em;">';
+		$counter = 1;
+		foreach ($this->args['values'] as $checkvalue => $checkname) {
+			$id = 'checks-'.$counter;
+			$checked = $value == $checkvalue || (is_array($value) && in_array($checkvalue, $value));
+			$str .= '<input id="'.$id.'" type="checkbox" value="'.escapehtml($checkvalue).'" '.($checked ? 'checked' : '').'  onclick="datafieldcheck(\''.$id.'\', \''.$n.'-restrict\')"/><label id="'.$id.'-label" for="'.$id.'">'.escapehtml($checkname).'</label><br />';
+			$counter++;
+		}
+		
+		$str .= '</div>';
+		return $str;
+		
+	}
+	function renderJavascript($value) {
+		$n = $this->form->name."_".$this->name;
+		return '
+			//if we check the restrict box, uncheck each field
+			function unrestrictcheck(restrictcheckbox, checkboxdiv) {
+				restrictcheckbox = $(restrictcheckbox);
+				checkboxdiv = $(checkboxdiv);
+				if (restrictcheckbox.checked) {
+					checkboxdiv.descendants().each(function(e) {
+						e.checked = false;
+					});
+					$("'.$n.'").value = "\"unrestricted\"";
+				} else {
+					$("'.$n.'").value = "[]";
+				}
+			}
+	
+			// if a data field is checked. Uncheck the unrestrict box
+			function datafieldcheck(checkbox, restrictcheckbox) {
+				checkbox = $(checkbox);
+				restrictcheckbox = $(restrictcheckbox);
+				if (checkbox.checked)
+						restrictcheckbox.checked = false;
+				var checks = new Array();
+				$("checks").descendants().each(function(e) {
+					if (e.checked)
+						checks.push(e.value);
+				});		
+				$("'.$n.'").value = checks.toJSON();
+			}';
+	}
+}
+
+
 ////////////////////////////////////////////////////////////////////////////////
 // Form Data
 ////////////////////////////////////////////////////////////////////////////////
 
+$basicroles = array(
+	"logincustomer" => "Log in to customer account",
+	"newcustomer" => "Create customers",
+	"editcustomer" => "Edit existing customers",
+	"edittemplate" => "Edit customer templates",
+	"editpriorities" => "Manage customer job types",
+	"customercontacts" => "Search customer contacts",
+	"users" => "View Customer users",
+	"imports" => "View Imports",
+	"editimportalerts" => "Edit import alerts",
+	"lockedusers" => "Manage locked users",
+	"smsblock" => "Manage SMS blocked numbers",
+	"activejobs" => "View active jobs",
+	"editdm" => "Edit SmartCall Appliances",
+	"diskagent" => "Manage SwiftSync Agents"
+);
+
+$advancedroles = array(
+	"runqueries" => "Run custom queries",
+	"ffield2gfield" => "F field to G field migration",
+	"billablecalls" => "Billable call information",
+	"bouncedemailsearch" => "Bounced email search",
+	"passwordcheck" => "Check for bad/similar passwords",
+	"emergencyjobs" => "List of Recent Emergency Jobs",
+	"tollfreenumbers" => "Add Toll Free Numbers"
+);
+
+$superroles = array(
+	"editqueries" => "Edit/Add Queries (arbitrary sql)",
+	"systemdm" => "Manage System DMs",
+	"manageserver" => "Manage Server list, restart commsuite",
+	"superuser" => "Edit Users (this page)",
+);
+
+$activeroles = array();
+
 if ($edituserid) {
 	$edituser = DBFind("AspAdminUser", "from aspadminuser where id=?",false,array($edituserid));
+	$activeroles = explode(",",$edituser->permissions);
+	//if ($edituser->queries == "unrestricted")
 } else {
 	$edituser = new AspAdminUser();
 }
 
+$managerqueries = DBFindMany("AspAdminQuery", "from aspadminquery order by name");
+$querymap = array();
+foreach ($managerqueries as $managerquery) {
+	$querymap[$managerquery->id] = $managerquery->name;
+}
 
 
 $helpstepnum = 1;
@@ -124,6 +223,51 @@ $formdata["email"] = array(
 	"helpstep" => $helpstepnum
 );
 
+$formdata[] = "Basic Permissions";
+
+foreach($basicroles as $role => $description) {
+	$formdata[$role] = array(
+		"label" => $description,
+		"value" => in_array($role,$activeroles) ? 1 : 0,
+		"validators" => array(),
+		"control" => array("CheckBox"),
+		"helpstep" => $helpstepnum
+	);
+}
+
+$formdata[] = "Advanced Permissions";
+
+foreach($advancedroles as $role => $description) {
+	$formdata[$role] = array(
+		"label" => $description,
+		"value" => in_array($role,$activeroles) ? 1 : 0,
+		"validators" => array(),
+		"control" => array("CheckBox"),
+		"helpstep" => $helpstepnum
+	);
+}
+
+$formdata[] = "Super Permissions";
+
+foreach($superroles as $role => $description) {
+	$formdata[$role] = array(
+		"label" => $description,
+		"value" => in_array($role,$activeroles) ? 1 : 0,
+		"validators" => array(),
+		"control" => array("CheckBox"),
+		"helpstep" => $helpstepnum
+	);
+}
+
+$formdata[] = "Query Restrictions";
+
+$formdata["queries"] = array(
+		"label" => _L('User Queries'),
+		"value" => ($edituser->queries!="unrestricted"?explode(",",$edituser->queries):"unrestricted"),
+		"validators" => array(),
+		"control" => array("QueriesItem", "values" => $querymap),
+		"helpstep" => $helpstepnum
+);
 
 $buttons = array(submit_button(_L('Save'),"submit","tick"),
 				icon_button(_L('Cancel'),"cross",null,"users.php"));
@@ -155,6 +299,32 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		$edituser->lastname = $postdata["lastname"];
 		$edituser->email = $postdata["email"];
 		
+		$permissions = array();
+		foreach ($basicroles as $role => $description) {
+			if ($postdata[$role])
+				$permissions[] = $role;
+		}
+		
+		foreach ($advancedroles as $role => $description) {
+			if ($postdata[$role])
+			$permissions[] = $role;
+		}
+		
+		foreach ($superroles as $role => $description) {
+			if ($postdata[$role])
+			$permissions[] = $role;
+		}
+		
+		$edituser->permissions = implode(",",$permissions);
+
+		$queries = json_decode($postdata["queries"],true);
+		if ($queries == "unrestricted") {
+			$queriesval = "unrestricted";
+		} else {
+			$queriesval = implode(",",is_array($queries) ? $queries : array());
+		}
+		
+		$edituser->queries = $queriesval;
 		
 		if ($edituserid)
 			$edituser->update();

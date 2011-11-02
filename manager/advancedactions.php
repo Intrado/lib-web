@@ -43,10 +43,6 @@ include_once("nav.inc.php");
 <? } ?>
 
 <? if ($MANAGERUSER->authorized("superuser")) { ?>
-<li><a href="editroles.php">Edit Manager User Roles</a></li>
-<? } ?>
-
-<? if ($MANAGERUSER->authorized("edituser")) { ?>
 <li><a href="users.php">Edit Users</a></li>
 <? } ?>
 
