@@ -22,17 +22,21 @@ class JobFilter {
 		}
 		
 		$helpstepnum = 1;
-		$dispatchtypes = array('customer' => 'SmartCall','system' => 'ASP');
-		$formdata["dispatchtype"] = array(
-			"label" => _L('Dispatch Type'),
-			"value" => $this->settings['dispatchtype'],
-			"validators" => array(
-				array("ValRequired"),
-				array("ValInArray", "values" => array_keys($dispatchtypes))
-			),
-			"control" => array("SelectMenu", "values" => $dispatchtypes),
-			"helpstep" => $helpstepnum
-		);
+		
+		if ($this->type == "phone") {
+			$dispatchtypes = array('customer' => 'SmartCall','system' => 'ASP');
+			$formdata["dispatchtype"] = array(
+				"label" => _L('Dispatch Type'),
+				"value" => $this->settings['dispatchtype'],
+				"validators" => array(
+					array("ValRequired"),
+					array("ValInArray", "values" => array_keys($dispatchtypes))
+				),
+				"control" => array("SelectMenu", "values" => $dispatchtypes),
+				"helpstep" => $helpstepnum
+			);
+		}
+		
 		$prinames = array (1 => "Emergency", 2 => "High", 3 => "General");
 		$formdata["priorities"] = array(
 			"label" => _L('Priority'),

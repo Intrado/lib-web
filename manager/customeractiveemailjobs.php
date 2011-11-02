@@ -45,11 +45,6 @@ if(isset($_GET['cid'])){
 		$extrasql .= " and j.userid = $userid ";
 	}
 }
-if ($jobfilter->settings['dispatchtype'] == 'customer'){
-	$extrasql .= " and j.dispatchtype = 'customer' ";
-} else {
-	$extrasql .= " and j.dispatchtype = 'system' ";
-}
 
 foreach ($shards as $shardid => $sharddb) {
 	Query("use aspshard", $sharddb);
