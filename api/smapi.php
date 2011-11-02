@@ -2259,6 +2259,7 @@ function systemLogin($loginname, $password, $CUSTOMERURL=null){
 			$result['resultdescription'] = "Invalid Customer URL";
 			return $result;
 		}
+		$CUSTOMERURL = strtolower($CUSTOMERURL);
 	}
 
 	$userid = doLogin($loginname, $password, $CUSTOMERURL, $_SERVER['REMOTE_ADDR']);
