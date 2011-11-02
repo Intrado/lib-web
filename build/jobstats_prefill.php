@@ -11,17 +11,20 @@ $usage = "
 Description:
 This script will compute jobstats for customers or entire shards databases
 Usage:
-php jobstats_prefill.php -a 
-php jobstats_prefill.php -c <customerid> [<customerid> ...] 
-php jobstats_prefill.php -s <shardid> [<shardid> ...] 
+php jobstats_prefill.php -a [-m <minutes>]
+php jobstats_prefill.php -c <customerid> [<customerid> ...] [-m <minutes>]
+php jobstats_prefill.php -s <shardid> [<shardid> ...] [-m <minutes>]
 
 -a : run on everything
 -s : shard mode, specific shards
 -c : customer mode, specific customers
+-m : minutes to run (optional)
 ";
 
 $opts = array();
 $mode = false;
+$minutestorun = false;
+$isMinutesArg = false;
 $ids = array();
 array_shift($argv); //ignore this script
 foreach ($argv as $arg) {
@@ -37,13 +40,21 @@ foreach ($argv as $arg) {
 				case "c":
 					$mode = "customer";
 					break;
+				case "m":
+					$isMinutesArg = true; // set to grab next arg as minutes param, and not an id
+					break;
 				default:
 					echo "Unknown option " . $arg[$x] . "\n";
 				exit($usage);
 			}
 		}
 	} else {
-		$ids[] = $arg + 0;
+		if ($isMinutesArg) {
+			$minutestorun = $arg + 0;
+			$isMinutesArg = false;
+		} else {
+			$ids[] = $arg + 0;
+		}
 	}
 }
 
@@ -51,6 +62,17 @@ if (!$mode)
 exit("No mode specified\n$usage");
 if ($mode != "csimport" && $mode != "all" && count($ids) == 0)
 exit("No IDs specified\n$usage");
+
+date_default_timezone_set("America/Los_Angeles");
+
+$timetostop = false; // time to stop running script
+if ($minutestorun) {
+	echo "Minutes to Run = " . $minutestorun . "\n";
+	$timetostop = new DateTime();
+	date_add($timetostop, date_interval_create_from_date_string($minutestorun . " minutes"));
+	echo "Stopping at " . date_format($timetostop, "Y-m-d H:i") . "\n";
+	$timetostop = strtotime(date_format($timetostop, "Y-m-d H:i")); // convert to unixtime for easy compare with now date()
+}
 
 
 $SETTINGS = parse_ini_file("../inc/settings.ini.php",true);
@@ -60,8 +82,6 @@ require_once("../inc/DBMappedObject.php");
 require_once("../inc/DBRelationMap.php");
 require_once("../inc/utils.inc.php");
 
-
-date_default_timezone_set("America/Los_Angeles");
 
 $updater = mt_rand();
 echo "Updater id: $updater\n";
@@ -90,13 +110,19 @@ echo "Updater id: $updater\n";
 	$customers[$row['id']] = $row;
 
 	foreach ($customers as  $customerid => $customer) {
+		// check if time to stop
+		if (!hasTimeToContinue()) {
+			break;
+		}
+		
 		echo "customer $customerid - jobids ";
 		$_dbcon = $db = $shards[$customer['shardid']];
 		QuickUpdate("use c_$customerid",$db);
 		update_customer($db, $customerid, $customer['shardid']);
 	}
 
-
+// end of script
+////////////////////////////////////////////////
 
 function updatePhonetimesForAttemptSequence($attempt, $sequence, $starttime, &$phonetimes) {
 	if (!isset($phonetimes[$attempt]))
@@ -108,9 +134,21 @@ function updatePhonetimesForAttemptSequence($attempt, $sequence, $starttime, &$p
 	if (!isset($phonetimes[$attempt][$sequence]['max']) || $starttime > $phonetimes[$attempt][$sequence]['max'])
 		$phonetimes[$attempt][$sequence]['max'] = $starttime;
 }
+
+function hasTimeToContinue() {
+	global $timetostop;
+	
+	if (!$timetostop)
+		return true;
+	
+	$now = strtotime(date_format(new DateTime(), "Y-m-d H:i"));
+	
+	return $timetostop > $now;
+}
 	
 function update_customer($db, $customerid, $shardid) {
 	global $updater;
+	global $timetostop;
 	
 	//only allow one instance of the updater per customer to run at a time
 	//try to insert our updater code, it should either error out due to duplicate key, or return 1
@@ -137,17 +175,21 @@ function update_customer($db, $customerid, $shardid) {
 	
 	$timezone = $settings['timezone'];
 	
-	// loop until all jobs are prefilled
-	$loopcount = 1;
-	//while ($loopcount <= 100) {
-	while (true) {
-		$loopcount++;
+	// loop until all jobs are prefilled, or time to stop
+	while (true && hasTimeToContinue()) {
 		// only backfill completed jobs, too complex to worry about active or cancelled
 		$jobids = QuickQueryList("select id from job where status = 'complete' and activedate is null limit 100");
 		if (count($jobids) == 0)
 			break; // no more, break from while true loop
 		
 		foreach ($jobids as $jobid) {
+			// check if time to stop
+			if (!hasTimeToContinue()) {
+				break;
+			}
+			
+			$timerstart = strtotime(date_format(new DateTime(), "Y-m-d H:i:s"));
+				
 			echo $jobid . ", ";
 		
 			$jobstats = array(); // key=name, value=value to fill jobstats table with jobid
@@ -265,6 +307,11 @@ function update_customer($db, $customerid, $shardid) {
 		
 			// commit this job
 			Query("commit",$db);
+			
+			$timerstop = strtotime(date_format(new DateTime(), "Y-m-d H:i:s"));
+			$timediff = $timerstop - $timerstart;
+			echo " (" . count($phoneattemptdata) . " took " . $timediff . ") ";
+				
 		} // end for jobid
 	} // end while loop
 	
