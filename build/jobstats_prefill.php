@@ -68,10 +68,8 @@ date_default_timezone_set("America/Los_Angeles");
 $timetostop = false; // time to stop running script
 if ($minutestorun) {
 	echo "Minutes to Run = " . $minutestorun . "\n";
-	$timetostop = new DateTime();
-	date_add($timetostop, date_interval_create_from_date_string($minutestorun . " minutes"));
-	echo "Stopping at " . date_format($timetostop, "Y-m-d H:i") . "\n";
-	$timetostop = strtotime(date_format($timetostop, "Y-m-d H:i")); // convert to unixtime for easy compare with now date()
+	$timetostop = strtotime(date("Y-m-d H:i:s"));
+	$timetostop = $timetostop + ($minutestorun * 60);
 }
 
 
@@ -141,7 +139,7 @@ function hasTimeToContinue() {
 	if (!$timetostop)
 		return true;
 	
-	$now = strtotime(date_format(new DateTime(), "Y-m-d H:i"));
+	$now = strtotime(date("Y-m-d H:i:s"));
 	
 	return $timetostop > $now;
 }
