@@ -205,7 +205,7 @@ function update_customer($db, $customerid, $shardid) {
 		
 			$phonetimes = array(); // [attempt 0, 1, 2, ][sequence 0,1,2. ]['min'|'max'] = starttime
 		
-			$phoneattemptdata = QuickQueryMultiRow("select personid, sequence, attemptdata from reportcontact where jobid = ? and type = 'phone' and attemptdata is not null group by personid order by sequence", true, null, array($jobid));
+			$phoneattemptdata = QuickQueryMultiRow("select personid, sequence, attemptdata from reportcontact where jobid = ? and type = 'phone' and attemptdata is not null order by personid, sequence", true, null, array($jobid));
 			$workingPersonid = 0; // current personid working through their sequences
 			$workingSequence = 0;
 			foreach ($phoneattemptdata as $row) {
@@ -310,7 +310,7 @@ function update_customer($db, $customerid, $shardid) {
 			
 			$timerstop = strtotime(date_format(new DateTime(), "Y-m-d H:i:s"));
 			$timediff = $timerstop - $timerstart;
-			echo " (" . count($phoneattemptdata) . " took " . $timediff . ") ";
+		//echo " (" . count($phoneattemptdata) . " took " . $timediff . ") ";
 				
 		} // end for jobid
 	} // end while loop
