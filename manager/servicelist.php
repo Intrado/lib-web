@@ -101,7 +101,7 @@ function fmt_version($row, $index) {
 				$date = $response['value']['build.date'];
 				return "$tag, $date";
 			} else {
-				return '<div title="'. str_replace('"', '\"', json_encode($response)). '" style="background:red">ERROR</div>';
+				return '<div title="'. escapehtml(json_encode($response)). '" style="background:red">ERROR</div>';
 			}
 		
 		case 'kona':
