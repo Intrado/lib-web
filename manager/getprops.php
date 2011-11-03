@@ -31,6 +31,10 @@ if (!$hostname || gethostbyname($hostname) != $_SERVER['REMOTE_ADDR']) {
 	exit;
 }
 
+// strip off the FQDN
+if (strpos($hostname, "."))
+	$hostname = substr($hostname, 0, strpos($hostname, "."));
+
 $SETTINGS = parse_ini_file("managersettings.ini.php",true);
 
 global $_dbcon;
