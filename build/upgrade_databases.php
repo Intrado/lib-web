@@ -1,9 +1,12 @@
 <?
 
 // NOTE in 'csimport' mode these must be set to the host info with the 'csimport' database
-$authhost = "127.0.0.1";
-$authuser = "root";
+$authhost = "";
+$authuser = "";
 $authpass = "";
+
+if (!$authhost || !$authuser || !$authpass)
+	exit("ERROR: This script is not properly configured, please add connection info\n");
 
 /*
  * Starting in 7.5, we will use a customer setting "_dbversion" to indicate what version
