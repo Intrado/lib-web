@@ -224,6 +224,11 @@ $formdata["email"] = array(
 );
 
 $formdata[] = "Basic Permissions";
+$formdata["enablebasic"] = array (
+		"label" => "",
+		"control" => array("FormHtml", "html" => icon_button(_L('Enable All Basic Permissions'),"group",'checkAllCheckboxes(\'basic\');')),
+		"helpstep" => 1
+);
 
 foreach($basicroles as $role => $description) {
 	$formdata[$role] = array(
@@ -237,6 +242,12 @@ foreach($basicroles as $role => $description) {
 
 $formdata[] = "Advanced Permissions";
 
+$formdata["enableadvanced"] = array (
+		"label" => "",
+		"control" => array("FormHtml", "html" => icon_button(_L('Enable All Advanced Permissions'),"group",'checkAllCheckboxes(\'advanced\');')),
+		"helpstep" => 1
+);
+
 foreach($advancedroles as $role => $description) {
 	$formdata[$role] = array(
 		"label" => $description,
@@ -248,6 +259,12 @@ foreach($advancedroles as $role => $description) {
 }
 
 $formdata[] = "Super Permissions";
+
+$formdata["enablesuper"] = array (
+		"label" => "",
+		"control" => array("FormHtml", "html" => icon_button(_L('Enable All Super Permissions'),"group",'checkAllCheckboxes(\'super\');')),
+		"helpstep" => 1
+);
 
 foreach($superroles as $role => $description) {
 	$formdata[$role] = array(
@@ -361,5 +378,29 @@ include_once("nav.inc.php");
 startWindow(_L('Edit User'));
 echo $form->render();
 endWindow();
+
+?>
+<script type="text/javascript">
+function checkAllCheckboxes(type) {
+	
+	var roles;
+	if (type=="basic") {
+		roles = $A(<?=json_encode(array_keys($basicroles));?>);
+	} else if (type=="advanced") {
+		roles = $A(<?=json_encode(array_keys($advancedroles));?>);
+	} else if (type=="super") {
+		roles = $A(<?=json_encode(array_keys($superroles));?>);
+	}
+
+	roles.each(function(id) {
+		var itemid = "useredit_" + id;
+		$("useredit_" + id).checked = true;
+	});
+}
+</script>
+
+
+<?
+
 include_once("navbottom.inc.php");
 ?>
