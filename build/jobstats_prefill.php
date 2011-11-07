@@ -274,17 +274,22 @@ function update_customer($db, $customerid, $shardid) {
 				$a[] = $minstartsms;
 		
 			if (count($a) == 0) {
-				// no starttime data, set to job startdate/time
-				if (!QuickUpdate("update job set activedate = greatest(timestamp(startdate, starttime), createdate, modifydate) where id = ?", null, array($jobid))) {
-					echo "\nFailed to update job.activedate\n";
-					return;
-				}
+				// no starttime data, set to job max of (startdate/time, createdate, modifydate)
+				$jobtimes = QuickQueryRow("select createdate, modifydate, timestamp(startdate, starttime) as startdatetime from job where id = ?", true, null, array($jobid));
+				$activedate = 0;
+				if (strtotime($jobtimes['createdate']) > $activedate)
+					$activedate = strtotime($jobtimes['createdate']);
+				if (strtotime($jobtimes['modifydate']) > $activedate)
+					$activedate = strtotime($jobtimes['modifydate']);
+				if (strtotime($jobtimes['startdatetime']) > $activedate)
+					$activedate = strtotime($jobtimes['startdatetime']);
 			} else {
 				$activedate = min($a) / 1000; // convert millis to secs
-				if (!QuickUpdate("update job set activedate = from_unixtime(?) where id = ?", null, array($activedate, $jobid))) {
-					echo "\nFailed to update job.activedate\n";
-					return;
-				}
+			}
+				
+			if (!QuickUpdate("update job set activedate = from_unixtime(?) where id = ?", null, array($activedate, $jobid))) {
+				echo "\nFailed to update job.activedate\n";
+				return;
 			}
 		
 			// insert bulk jobstats
