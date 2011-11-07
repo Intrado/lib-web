@@ -277,9 +277,11 @@ function update_customer($db, $customerid, $shardid) {
 				// no starttime data, set to job max of (startdate/time, createdate, modifydate)
 				$jobtimes = QuickQueryRow("select createdate, modifydate, timestamp(startdate, starttime) as startdatetime from job where id = ?", true, null, array($jobid));
 				$activedate = 0;
+				// createdate, startdate, starttime can never be null in the db, however modifydate may be null
 				if (strtotime($jobtimes['createdate']) > $activedate)
 					$activedate = strtotime($jobtimes['createdate']);
-				if (strtotime($jobtimes['modifydate']) > $activedate)
+				// strtotime() returns false if invalid param entered, check for null first
+				if ($jobtimes['modifydate'] != null && strtotime($jobtimes['modifydate']) > $activedate)
 					$activedate = strtotime($jobtimes['modifydate']);
 				if (strtotime($jobtimes['startdatetime']) > $activedate)
 					$activedate = strtotime($jobtimes['startdatetime']);
