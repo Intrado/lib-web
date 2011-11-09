@@ -9,10 +9,22 @@ function pearxmlrpc($method, $params, $returndata = false) {
 
 	$cli = new XML_RPC_Client('/xmlrpc', $authhost);
 
-	$resp = $cli->send($msg, 90);
-
+	$isAlive = false;
+	$timetostop = time() + 30; // 30 seconds from now
+	
+	// retry authserver for a while, maybe mid-restart
+	while (!$isAlive && $timetostop > time()) {
+		$resp = $cli->send($msg, 90);
+		if (!$resp) {
+			error_log($method . ' communication error: ' . $cli->errstr);
+			usleep(100000);
+		} else {
+			$isAlive = true;
+		}
+	}
+	
 	if (!$resp) {
-    	error_log($method . ' communication error: ' . $cli->errstr);
+		exit(); // authserver down, exit now
 	} else if ($resp->faultCode()) {
 		error_log($method . ' Fault Code: ' . $resp->faultCode() . ' Fault Reason: ' . $resp->faultString());
 	} else {
