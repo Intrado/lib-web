@@ -119,6 +119,12 @@ class PreviewModal {
 			$audiofileids = MessageGroup::getReferencedAudioFileIDs($messagegroupid);
 		else
 			$audiofileids = false;
+		
+		// Prevent preview of long sequences of digits
+		if (preg_match("/[0-9]{100,}/",$_SESSION["previewmessagesource"]["source"])) {
+			return;
+		}
+		
 		$modal->parts = Message::parse($_SESSION["previewmessagesource"]["source"],$modal->errors,$_SESSION["previewmessagesource"]["voiceid"],$audiofileids);
 		if (count($modal->errors) == 0) {
 			$modal->initializeFieldContent("phone");

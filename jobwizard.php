@@ -65,6 +65,7 @@ require_once("obj/CheckBoxWithHtmlPreview.fi.php");
 require_once("obj/TextAreaWithEnableCheckbox.fi.php");
 require_once("obj/PreviewButton.fi.php");
 require_once("obj/ValSmsText.val.php");
+require_once("obj/ValTtsText.val.php");
 
 // Includes that are required for preview to work
 require_once("inc/previewfields.inc.php");
@@ -639,7 +640,7 @@ require_once("nav.inc.php");
 Validator::load_validators(array("ValInArray", "ValJobName", "ValHasMessage",
 	"ValTextAreaPhone", "ValEasycall", "ValLists", "ValTranslation", "ValEmailAttach",
 	"ValTimeWindowCallLate", "ValTimeWindowCallEarly", "ValSmsText", "valPhone",
-	"ValMessageBody", "ValMessageGroup", "ValMessageTypeSelect", "ValFacebookPage","ValTranslationCharacterLimit","ValTimePassed"));
+	"ValMessageBody", "ValMessageGroup", "ValMessageTypeSelect", "ValFacebookPage","ValTranslationCharacterLimit","ValTimePassed","ValTtsText"));
 ?>
 </script>
 <script src="script/livepipe/livepipe.js" type="text/javascript"></script>

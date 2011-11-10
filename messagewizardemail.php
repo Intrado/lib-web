@@ -138,7 +138,8 @@ class MsgWiz_emailText extends WizStep {
 		$formdata = array($this->title);
 		$messagevalidators = array(
 			array("ValRequired"),
-			array("ValMessageBody", "messagegroupid" => $_SESSION['wizard_message_mgid'])
+			array("ValMessageBody", "messagegroupid" => $_SESSION['wizard_message_mgid']),
+			array("ValLength","max" => 256000)
 		);
 		// if auto-translate, give the user a hint that this is the ENGLISH version from which translations will be created.
 		if (isset($postdata["/create/language"]["language"]) && $postdata["/create/language"]["language"] == "autotranslate") {

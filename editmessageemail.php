@@ -229,7 +229,8 @@ $formdata["message"] = array(
 	"value" => $text,
 	"validators" => array(
 		array("ValRequired"),
-		array("ValMessageBody", "messagegroupid" => $messagegroup->id)
+		array("ValMessageBody", "messagegroupid" => $messagegroup->id),
+		array("ValLength","max" => 256000)
 	),
 	"control" => array("EmailMessageEditor", "subtype" => $subtype),
 	"helpstep" => 5

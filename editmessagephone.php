@@ -31,6 +31,7 @@ require_once("obj/Validator.obj.php");
 require_once("obj/ValMessageBody.val.php");
 require_once("obj/PhoneMessageEditor.fi.php");
 require_once("obj/PreviewButton.fi.php");
+require_once("obj/ValTtsText.val.php");
 
 // appserver and thrift includes
 require_once("inc/appserver.inc.php");
@@ -155,7 +156,10 @@ $formdata["message"] = array(
 		"value" => $text,
 		"validators" => array(
 			array("ValRequired"),
-			array("ValMessageBody", "messagegroupid" => $messagegroup->id)),
+			array("ValMessageBody", "messagegroupid" => $messagegroup->id),
+			array("ValLength","max" => 10000), // 10000 Characters is about 40 minutes of tts, considered to be more than enough
+			array("ValTtsText")
+		),
 		"control" => array("PhoneMessageEditor", "langcode" => $languagecode, "messagegroupid" => $messagegroup->id),
 		"helpstep" => 1);
 $formdata["gender"] = array(
@@ -296,7 +300,7 @@ include_once("nav.inc.php");
 // Optional Load Custom Form Validators
 ?>
 <script type="text/javascript">
-<? Validator::load_validators(array("ValMessageBody")); ?>
+<? Validator::load_validators(array("ValMessageBody","ValTtsText")); ?>
 </script>
 <script src="script/livepipe/livepipe.js" type="text/javascript"></script>
 <script src="script/livepipe/window.js" type="text/javascript"></script>

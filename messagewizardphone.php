@@ -33,6 +33,7 @@ require_once("obj/CheckBoxWithHtmlPreview.fi.php");
 require_once("obj/PhoneMessageEditor.fi.php");
 require_once("obj/PreviewButton.fi.php");
 require_once("obj/ValTranslationLength.val.php");
+require_once("obj/ValTtsText.val.php");
 
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization
@@ -293,7 +294,9 @@ class MsgWiz_phoneAdvanced extends WizStep {
 		
 		$messagevalidators = array(
 					array("ValRequired"),
-					array("ValMessageBody", "messagegroupid" => $_SESSION['wizard_message']['mgid'])
+					array("ValMessageBody", "messagegroupid" => $_SESSION['wizard_message']['mgid']),
+					array("ValLength","max" => 10000), // 10000 Characters is about 40 minutes of tts, considered to be more than enough
+					array("ValTtsText")
 		);
 		
 		// if auto-translate, give the user a hint that this is the ENGLISH version from which translations will be created.
@@ -839,7 +842,7 @@ require_once("nav.inc.php");
 
 ?>
 <script type="text/javascript">
-<?	Validator::load_validators(array("PhoneMessageRecorderValidator", "ValMessageBody","ValTranslationLength"));?>
+<?	Validator::load_validators(array("PhoneMessageRecorderValidator", "ValMessageBody","ValTranslationLength","ValTtsText"));?>
 </script>
 <script src="script/livepipe/livepipe.js" type="text/javascript"></script>
 <script src="script/livepipe/window.js" type="text/javascript"></script>
