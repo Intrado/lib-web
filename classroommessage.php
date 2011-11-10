@@ -214,7 +214,7 @@ if (isset($_GET['search'])) {
 }
 
 
-$sections = DBFindMany("Section", "from section s join userassociation ua on (ua.sectionid = s.id) where ua.userid = ?","s",array($USER->id));
+$sections = DBFindMany("Section", "from section s join userassociation ua on (ua.sectionid = s.id) where ua.userid = ? order by skey","s",array($USER->id));
 
 $categories = QuickQueryMultiRow("select id, name, image from targetedmessagecategory where deleted = 0",true);
 $categoriesjson = array();
