@@ -23,7 +23,7 @@ function pearxmlrpc($method, $params) {
 	}
 	
 	if (!$resp) {
-		exit(); // authserver down, exit now
+		redirect("serviceunavailable.php"); // authserver down, exit now
 	} else if ($resp->faultCode()) {
 		error_log($method . ' Fault Code: ' . $resp->faultCode() . ' Fault Reason: ' . $resp->faultString());
 	} else {
