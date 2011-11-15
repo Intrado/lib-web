@@ -445,3 +445,13 @@ ALTER TABLE `smsjobtask` CHANGE `lastresult` `lastresult` ENUM( 'sent', 'unsent'
 
 ALTER TABLE `emailjobtask` CHANGE `lastresult` `lastresult` ENUM( 'sent', 'unsent', 'cancelling', 'endoflife' ) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT 'unsent' ;
 
+ALTER TABLE `qjobtask` DROP INDEX `emailer` ;
+
+ALTER TABLE `emailjobtask` DROP INDEX `dispatch` ;
+
+ALTER TABLE `smsjobtask` DROP INDEX `dispatch` ;
+
+ALTER TABLE `emailjobtask` ADD INDEX `waiting` ( `status` , `nextattempttime` ) ;
+
+ALTER TABLE `smsjobtask` ADD INDEX `waiting` ( `status` , `nextattempttime` ) ;
+
