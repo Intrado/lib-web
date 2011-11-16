@@ -833,9 +833,11 @@ $formdata["smscustomername"] = array(
 						"label" => _L('SMS Customer Name'),
 						"value" => $settings['smscustomername'],
 						"validators" => array(
+							array("ValConditionallyRequired", "field" => "hassms"),
 							array("ValLength","max" => 50),
 							array("ValSmsText")
 						),
+						"requires" => array("hassms"),
 						"control" => array("TextField","maxlength"=>50,"size"=>25),
 						"helpstep" => $helpstepnum
 );
