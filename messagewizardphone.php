@@ -572,8 +572,7 @@ class MsgWiz_submitConfirm extends WizStep {
 			and messagegroupid = ? 
 			and type = 'phone' 
 			and subtype = 'voice' 
-			and autotranslate in ('none', 'translated', 'overridden') 
-			and not deleted", false, $args);
+			and autotranslate in ('none', 'translated', 'overridden')", false, $args);
 		
 		if ($hasmessage)
 			return true;
@@ -653,7 +652,6 @@ class FinishMessageWizard extends WizFinish {
 			$message->userid = $USER->id;
 			$message->modifydate = date("Y-m-d H:i:s");
 			$message->languagecode = $sourcelangcode;
-			$message->deleted = 0;
 			
 			if (!$message->id)
 				$message->create();
