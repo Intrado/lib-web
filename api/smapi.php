@@ -1387,9 +1387,9 @@ class SMAPI {
 				$result['resultcode'] = 'invalidparam';
 				$result["resultdescription"] = "Invalid Run Days.  Must be between 1 and " . $ACCESS->getValue('maxjobdays', '7');
 				return $result;
-			} else if (!$maxcallattempts) {
+			} else if ($maxcallattempts < 1 || $maxcallattempts > $ACCESS->getValue('callmax', '10')) {
 				$result['resultcode'] = 'invalidparam';
-				$result["resultdescription"] = "Invalid Max Call Attempts";
+				$result["resultdescription"] = "Invalid Max Call Attempts. Must be between 1 and " . $ACCESS->getValue('callmax', '10');
 				return $result;
 			} else if ($USER->authorize('sendphone') && $phonemsgid && !userOwns("message", $phonemsgid)) {
 				$result['resultcode'] = 'unauthorized';
@@ -1412,6 +1412,8 @@ class SMAPI {
 				$result["resultdescription"] = "Name must be set";
 				return $result;
 			}
+			
+			// validate jobtype
 			$jobtypeok = false;
 			$userjobtypes = JobType::getUserJobTypes();
 			foreach ($userjobtypes as $userjobtype) {
@@ -1434,7 +1436,19 @@ class SMAPI {
 					return $result;
 				}
 			}
-						
+			
+			// validate call window
+			if ($ACCESS->getValue('callearly') && strtotime($starttime) < strtotime($ACCESS->getValue('callearly'))) {
+				$result['resultcode'] = 'unauthorized';
+				$result["resultdescription"] =  "Invalid start time, must be after " . $ACCESS->getValue('callearly');
+				return $result;
+			}
+			if ($ACCESS->getValue('calllate') && strtotime($endtime) > strtotime($ACCESS->getValue('calllate'))) {
+				$result['resultcode'] = 'unauthorized';
+				$result["resultdescription"] =  "Invalid end time, must be before " . $ACCESS->getValue('calllate');
+				return $result;
+			}
+
 			// all valid, continue to create and submit job
 			$job = Job::jobWithDefaults();
 			// prep the job options into a name-value array
