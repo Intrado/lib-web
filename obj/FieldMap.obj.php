@@ -57,10 +57,6 @@ class FieldMap extends DBMappedObject {
 		
 		return $default;
 	}
-	
-	static function getMapNames () {
-		return FieldMap::getMapNamesLike('f');
-	}
 
 	static function getMapNamesLike ($firstletter, $authorized = false) {
 		global $USER;
@@ -77,9 +73,15 @@ class FieldMap extends DBMappedObject {
 		}
 		return $map;
 	}
+	
+	//returns array of names available for use in data field inserts in messages, both authorized and non authorized
+	static function getFieldInsertNames () {
+		return array_merge(FieldMap::getMapNamesLike('f'), FieldMap::getMapNamesLike('$'));
+	}
 
-	static function getAuthorizedMapNames () {
-		return FieldMap::getAuthorizedMapNamesLike('f');
+	//returns array of authorized names available for use in data field inserts in messages
+	static function getAuthorizeFieldInsertNames () {
+		return array_merge(FieldMap::getAuthorizedMapNamesLike('f'), FieldMap::getMapNamesLike('$'));
 	}
 
 	// Returns Associative Array of fieldnum => name
@@ -161,6 +163,19 @@ class FieldMap extends DBMappedObject {
 		
 		return $fieldmapscache;
 	}
+	
+	
+	static function getSystemVarValue($fieldnum) {
+		switch ($fieldnum) {
+			case "\$d01":
+				return date("m/d/Y");
+			case "\$d02":
+				return date("m/d/Y", strtotime("tomorrow"));
+			case "\$d03":
+				return date("m/d/Y", strtotime("yesterday"));
+		}
+	}
+	
 	
 	function updatePersonDataValues () {
 

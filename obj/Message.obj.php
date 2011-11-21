@@ -166,7 +166,12 @@ class Message extends DBMappedObject {
 
 		if ($errors == NULL)
 			$errors = array();
-
+		
+		//make all fieldnames lower case so we can do a case-insensitive search later
+		//FIXME manager assumes that there is no authorization checking (and $USER is not set) when editing templates
+		//FIXME old version would not check authorization on parse, due to manager bug we dont use FieldMap::getAuthorizedFieldInsertNames()
+		$insertfields = array_map("strtolower", FieldMap::getFieldInsertNames());
+		
 		$txtpart = "";
 		$parts = array();
 		$partcount = 0;
@@ -299,9 +304,9 @@ class Message extends DBMappedObject {
 							$fieldname = $token;
 							$defvalue = "";
 						}
-						$query = "select fieldnum from fieldmap where name=? and fieldnum like 'f%'";
-
-						$fieldnum = QuickQuery($query, false, array($fieldname));
+						
+						//do case insensitive search for fieldname in field inserts array
+						$fieldnum = array_search(strtolower($fieldname), $insertfields);
 
 						if ($fieldnum !== false) {
 							$part->fieldnum = $fieldnum;
@@ -375,7 +380,7 @@ class Message extends DBMappedObject {
 	
 	// used to prepare parts to display in editor (use renderXXX methods for preview)
 	static function format ($parts) {
-		$map = FieldMap::getMapNames();
+		$map = FieldMap::getFieldInsertNames();
 		$data = "";
 		$voices = DBFindMany("Voice", "from ttsvoice");
 		$currvoiceid=null;
@@ -398,7 +403,9 @@ class Message extends DBMappedObject {
 				$partstr .= $part->txt;
 				break;
 			case 'V':
-				$partstr .= "<<" . $map[$part->fieldnum];
+				$partstr .= "<<";
+				//special field
+				$partstr .= $map[$part->fieldnum];
 				if ($part->defaultvalue !== null && strlen($part->defaultvalue) > 0)
 					$partstr .= ":" . $part->defaultvalue;
 				$partstr .= ">>";
@@ -427,36 +434,7 @@ class Message extends DBMappedObject {
 		return nl2br(escapehtml($message));
 	}
 	
-	// preview email message, call appserver to use common rendering logic to support custom templates
-	function renderEmailWithTemplate($jobpriority = 3) {
-		$view = messagePreviewForPriority($this->id, $jobpriority);
-		foreach ($view->emailcontentids as $contentid) {
-			permitContent($contentid);
-		}	
-		return $view->emailbody;
-	}
-	
-	// preview plain email message
-	static function renderEmailPlainParts($parts, $fields = array()) {
-		$message = "";	
-		foreach ($parts as $part) {
-			switch ($part->type) {
-			case 'T':
-				$message .= $part->txt;
-				break;
-			case 'V':
-				if (isset($fields[$part->fieldnum]))
-					$d = $fields[$part->fieldnum];
-				else
-					$d = $part->defaultvalue;
-				$message .= $d;			
-				break;
-			}
-		}
-	
-		return nl2br(escapehtml($message));
-	}
-	
+
 	// preview html email message
 	static function renderEmailHtmlParts($parts, $fields = array()) {
 		$message = "";	

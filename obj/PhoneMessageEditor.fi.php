@@ -145,7 +145,7 @@ class PhoneMessageEditor extends FormItem {
 						Data&nbsp;Field:<br />
 						<select id="'.$n.'datafield">
 							<option value="">-- Select a Field --</option>';								
-		foreach(FieldMap::getAuthorizedMapNames() as $field) {
+		foreach(FieldMap::getAuthorizeFieldInsertNames() as $field) {
 			$datafieldinsert .= '<option value="' . $field . '">' . $field . '</option>';
 		}
 		$datafieldinsert .=	'</select>
