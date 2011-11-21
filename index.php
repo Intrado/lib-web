@@ -145,7 +145,7 @@ include_once("logintop.inc.php");
 
 
 
-		<div style="margin-left: 50px; font-size: 9px; font-style: italic;"><?=_L("Usernames and passwords are case-sensitive.")?></div>
+		<div style="margin-left: 50px; font-size: 9px; font-style: italic;"><?=_L("Passwords are case-sensitive.")?></div>
 
 		<br><div style="font-size: 10pt;"><a href="forgotpassword.php"><?=_L("Forgot your password? Click Here")?></a><br></div>
 	</div>
