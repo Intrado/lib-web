@@ -4,11 +4,12 @@
 function pearxmlrpc($method, $params, $returndata = false) {
 	global $SETTINGS;
 	$authhost = $SETTINGS['authserver']['host'];
-
+	$authpath = $SETTINGS['authserver']['path'];
+	
 	$msg = new XML_RPC_Message($method, $params);
 
-	$cli = new XML_RPC_Client('/xmlrpc', $authhost);
-
+	$cli = new XML_RPC_Client($authpath, $authhost);
+	
 	$isAlive = false;
 	$timetostop = time() + 30; // 30 seconds from now
 	

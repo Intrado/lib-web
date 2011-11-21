@@ -15,6 +15,11 @@ timeout=5500
 host="localhost:7912"
 timeout=5500
 
+;report server connection information
+[reportserver]
+host="localhost:8089"
+path="/xmlrpc"
+
 [feature]
 has_ssl=true
 force_ssl=true

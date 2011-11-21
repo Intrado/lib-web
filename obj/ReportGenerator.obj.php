@@ -163,10 +163,20 @@ class ReportGenerator {
 	}
 
 	function reportxmlrpc($method, $xmlparams){
+		global $SETTINGS;
+		if (isset($SETTINGS['reportserver']['host']))
+			$reporthost = $SETTINGS['reportserver']['host'];
+		else
+			$reporthost = "localhost:8089";
+		if (isset($SETTINGS['reportserver']['path']))
+			$reportpath = $SETTINGS['reportserver']['path'];
+		else
+			$reportpath = "/xmlrpc";
+		
 		$msg = new XML_RPC_Message($method, $xmlparams);
 		$msg->setSendEncoding("UTF-8");
-		$cli = new XML_RPC_Client('/xmlrpc', 'localhost:8089');
-
+		$cli = new XML_RPC_Client($reportpath, $reporthost);
+		
 		$resp = $cli->send($msg, 600);
 
 		if (!$resp) {
