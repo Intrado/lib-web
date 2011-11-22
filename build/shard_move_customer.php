@@ -2,9 +2,12 @@
 //settings
 
 //authserver db info
-$authhost = "10.25.25.68";
-$authuser = "root";
+$authhost = "";
+$authuser = "";
 $authpass = "";
+
+if (!$authhost || !$authuser || !$authpass)
+	exit("ERROR: This script is not properly configured, please add connection info\n");
 
 // interupt file, stops execution. Will wait till current move operation completes
 // go to working directory and execute: touch <stopfilename>
@@ -122,6 +125,27 @@ foreach ($customerids as $customerid) {
 			$query = "insert ignore into messagelink (`customerid`,`jobid`,`personid`,`createtime`,`code`) values (".$row['customerid'].",".$row['jobid'].",".$row['personid'].",'".$row['createtime']."','".$row['code']."');\n";
 			if (!fwrite($fp, $query))
 				dieerror("Failed to write to transfer file : $query\n");
+		}
+	}
+
+	// dump all importalert for this customer into the transfer file
+	echo "adding all importalert records to transfer file\n";
+	
+	if (!$fp = fopen($backupfilename, 'a'))
+	dieerror("Unable to open transfer file for writing: $backupfilename\n");
+	
+	$query = "select * from importalert where customerid=?";
+	if ($res = Query($query, $srcsharddb, array($customerid))) {
+		while ($row = $res->fetch(PDO::FETCH_ASSOC)) {
+			// set nullable fields to null and not empty string
+			$valalerttime = ($row['alerttime'] === null) ? "null" : "'" . $row['alerttime'] . "'";
+			$valnotified = ($row['notified'] === null) ? "null" : "'" . $row['notified'] . "'";
+			$valnotes = ($row['notes'] === null) ? "null" : "'" . $row['notes'] . "'";
+			
+			$query = "insert ignore into importalert (`customerid`, `importalertruleid`, `type`, `importname`, `name`, `operation`, `testvalue`, `actualvalue`, `alerttime`, `notified`, `notes`, `acknowledged`) 
+				values (".$row['customerid'].",".$row['importalertruleid'].",'".$row['type']."','".$row['importname']."','".$row['name']."','".$row['operation']."',".$row['testvalue'].",".$row['actualvalue']."," . $valalerttime . "," . $valnotified . "," . $valnotes . ",".$row['acknowledged'].");\n";
+			if (!fwrite($fp, $query))
+			dieerror("Failed to write to transfer file : $query\n");
 		}
 	}
 	
@@ -260,7 +284,7 @@ foreach ($customerids as $customerid) {
 
 	//remove this customer's shard data from old shard
 	echo "deleting old shard records:";
-	$tablearray = array("importqueue", "qjobperson", "qjobtask", "specialtaskqueue", "qreportsubscription", "qschedule", "qjob", "messagelink");
+	$tablearray = array("importalert", "importqueue", "qjobperson", "smsjobtask", "emailjobtask", "qjobtask", "specialtaskqueue", "qreportsubscription", "qschedule", "qjob", "messagelink");
 	foreach ($tablearray as $t) {
 		echo ".";
 		$query = "delete from ".$t." where customerid=$customerid";
