@@ -15,7 +15,7 @@
 // authserver connection information (only read access required)
 $authhost="localhost:3306";
 $authuser="root";
-$authpass="asp123";
+$authpass="";
 $authdb="authserver";
 
 // destination for extracted content files
