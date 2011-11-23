@@ -10,6 +10,15 @@ require_once("../inc/html.inc.php");
 require_once("../inc/table.inc.php");
 require_once("../obj/FieldMap.obj.php");
 
+// force ssl
+if ($SETTINGS['feature']['has_ssl'] && $SETTINGS['feature']['force_ssl'] && !isset($_SERVER["HTTPS"])) {
+	$secureurl = "https://" . $_SERVER["SERVER_NAME"] . "/$CUSTOMERURL/subscriber/activate.php";
+	// forward all params
+	if (count($_GET) > 0)
+		$secureurl .= "?" . http_build_query($_GET);
+	redirect($secureurl);
+}
+
 $token = "";
 if (isset($_GET['t'])) {
 	$token = $_GET['t'];

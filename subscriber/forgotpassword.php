@@ -8,6 +8,15 @@ require_once("common.inc.php");
 require_once("../inc/html.inc.php");
 require_once("../inc/table.inc.php");
 
+// force ssl
+if ($SETTINGS['feature']['has_ssl'] && $SETTINGS['feature']['force_ssl'] && !isset($_SERVER["HTTPS"])) {
+	$secureurl = "https://" . $_SERVER["SERVER_NAME"] . "/$CUSTOMERURL/subscriber/forgotpassword.php";
+	// forward all params
+	if (count($_GET) > 0)
+		$secureurl .= "?" . http_build_query($_GET);
+	redirect($secureurl);
+}
+
 if (isset($_GET['locale'])) {
 	setcookie('locale', $_GET['locale']);
 	redirect();

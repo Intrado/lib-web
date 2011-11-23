@@ -51,12 +51,18 @@ if (isset($_GET['deletelocale'])) {
 	redirect();
 }
 
-if ($SETTINGS['feature']['has_ssl']) {
-	if ($SETTINGS['feature']['force_ssl'] && !isset($_SERVER["HTTPS"])){
-		redirect("https://" . $_SERVER["SERVER_NAME"] . "/index.php".$appendcustomerurl);
+// force ssl
+if ($SETTINGS['feature']['has_ssl'] && $SETTINGS['feature']['force_ssl'] && !isset($_SERVER["HTTPS"])) {
+	$secureurl = "https://" . $_SERVER["SERVER_NAME"] . "/index.php".$appendcustomerurl;
+	// forward all params
+	if (count($_GET) > 0) {
+		if ($appendcustomerurl == "")
+			$secureurl .= "?" . http_build_query($_GET);
+		else
+			$secureurl .= "&" . http_build_query($_GET);
 	}
+	redirect($secureurl);
 }
-
 
 $login="";
 $badlogin=false;

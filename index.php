@@ -24,13 +24,13 @@ if (isset($_GET['logout'])) {
 	@session_destroy();
 }
 
-if ($SETTINGS['feature']['has_ssl']) {
-	
+// force ssl
+if ($SETTINGS['feature']['has_ssl'] && $SETTINGS['feature']['force_ssl'] && !isset($_SERVER["HTTPS"])) {
 	$secureurl = "https://" . $_SERVER["SERVER_NAME"] . "/$CUSTOMERURL/index.php";
-
-	if ($SETTINGS['feature']['force_ssl'] && !isset($_SERVER["HTTPS"])) {
-		redirect($secureurl);
-	}
+	// forward all params
+	if (count($_GET) > 0)
+		$secureurl .= "?" . http_build_query($_GET);
+	redirect($secureurl);
 }
 
 //check various ways to log in

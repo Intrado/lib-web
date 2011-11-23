@@ -6,6 +6,19 @@ require_once("../inc/table.inc.php");
 
 $appendcustomerurl = getAppendCustomerUrl();
 
+// force ssl
+if ($SETTINGS['feature']['has_ssl'] && $SETTINGS['feature']['force_ssl'] && !isset($_SERVER["HTTPS"])) {
+	$secureurl = "https://" . $_SERVER["SERVER_NAME"] . "/activate.php".$appendcustomerurl;
+	// forward all params
+	if (count($_GET) > 0) {
+		if ($appendcustomerurl == "")
+			$secureurl .= "?" . http_build_query($_GET);
+		else
+			$secureurl .= "&" . http_build_query($_GET);
+	}
+	redirect($secureurl);
+}
+
 $form = true;
 $forgotsuccess = false;
 $newusersuccess = false;
