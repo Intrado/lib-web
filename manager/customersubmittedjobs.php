@@ -100,14 +100,15 @@ foreach ($shards as $shardid => $sharddb) {
 	QuickUpdate("set time_zone='GMT'",$sharddb);
 	$args=array($settings['jobstatus']);
 	if ($settings['jobstatus'] == "processing") {
-		$extrasql .= " and status='procactive' or";
+		$extrasqlinloop = $extrasql . " and (status='procactive' or";
 	} else {
-		$extrasql .= " and";
+		$extrasqlinloop = $extrasql . " and (";
 	}
 	$query = "select systempriority, customerid, id, startdate, starttime, timezone,
 			convert_tz(addtime(startdate,starttime),timezone,'SYSTEM') systemstarttime
-			from qjob j where 1 $extrasql status=? 
+			from qjob j where 1 $extrasqlinloop status=?) 
 			order by systemstarttime , systempriority, customerid, id";				
+	
 	$res = Query($query,$sharddb, array($settings['jobstatus']));
 	while ($row = DBGetRow($res)) {
 		$secondstostart = strtotime($row[6]) - time();
