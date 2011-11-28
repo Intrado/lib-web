@@ -16,10 +16,14 @@
 class EmailMessageEditor extends FormItem {
 	
 	function render ($value) {
-		
 		$n = $this->form->name."_".$this->name;
+				// subtype tells us if it's a plain or html email message
 		
-		// style 
+		$subtype = "html";
+		if (isset($this->args['subtype']))
+			$subtype = $this->args['subtype'];
+		
+			// style 
 		$str = '
 			<style>
 				.controlcontainer {
@@ -63,7 +67,11 @@ class EmailMessageEditor extends FormItem {
 			<div class="controlcontainer">
 				<textarea id="'.$n.'" name="'.$n.'" class="messagearea"/>'.escapehtml($value).'</textarea>
 				<div id="'.$n.'-htmleditor"></div>
-			</div>';
+		';
+		if ($subtype == "plain") {
+			$textarea .= '<div>' . action_link(_L("Spell Check"), "spellcheck", null, '(new spellChecker($(\''.$n.'\')) ).openChecker();') . '</div>';
+		}
+		$textarea .= '</div>';
 		
 		// this is the vertical seperator
 		$seperator = '
@@ -121,21 +129,31 @@ class EmailMessageEditor extends FormItem {
 
 	function renderJavascript($value) {
 		$n = $this->form->name."_".$this->name;
-		
-		// set up the controls in the form and initialize any event listeners
-		$str = '
-				document.observe("dom:loaded", setupHtmlTextArea("'.$n.'"));';
+		$js = "";
 		
 		// subtype tells us if it's a plain or html email message
 		$subtype = "html";
 		if (isset($this->args['subtype']))
 			$subtype = $this->args['subtype'];
-			
-		return ($subtype != "plain")?$str:"";
+		
+		if ($subtype == "html") {
+			// set up the controls in the form and initialize any event listeners
+			$js .= '
+					document.observe("dom:loaded", setupHtmlTextArea("'.$n.'"));';
+		} else if ($subtype == "plain") {
+			//plain
+		}
+		
+		return $js;
 	}
 	
 	function renderJavascriptLibraries() {
 		global $USER;
+		
+		$subtype = "html";
+		if (isset($this->args['subtype']))
+			$subtype = $this->args['subtype'];
+		
 		$str = '
 			<script type="text/javascript" src="script/ckeditor/ckeditor_basic.js"></script>
 			<script type="text/javascript" src="script/htmleditor.js"></script>
@@ -158,6 +176,10 @@ class EmailMessageEditor extends FormItem {
 					});
 				}
 			</script>';
+		
+		if ($subtype == "plain") {
+			$str .= '<script src="script/speller/spellChecker.js"></script>';
+		}
 		
 		return $str;
 	}

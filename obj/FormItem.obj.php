@@ -47,20 +47,26 @@ class TextField extends FormItem {
 		$n = $this->form->name."_".$this->name;
 		$max = isset($this->args['maxlength']) ? 'maxlength="'.$this->args['maxlength'].'"' : "";
 		$size = isset($this->args['size']) ? 'size="'.$this->args['size'].'"' : "";
+		$spellcheck = isset($this->args['spellcheck']) && $this->args['spellcheck'];
 		
 		$str = '<input id="'.$n.'" name="'.$n.'" type="text" value="'.escapehtml($value).'" '.$max.' '.$size.'/>';
+		
+		if ($spellcheck) {
+			$str .= action_link(_L("Spell Check"), "spellcheck", null, '(new spellChecker($(\''.$n.'\')) ).openChecker();');
+		}
 				
 		if (isset($this->args['autocomplete'])) {
 			$str .= '<span id="'.$n.'_autocomplete_indicator" style="display: none"><img src="img/ajax-loader.gif" alt="Working..." /></span>';	
 			$str .= '<div id="'.$n.'_autocomplete_choices" class="autocomplete"></div>';
 		}
-		
+
 		return $str;
 	}
 	
 	function renderJavascript($value) {
 		$n = $this->form->name."_".$this->name;
 		$js = "";
+		
 		//autocomplete using scriptaculous and autocomplete.php as the back-end
 		//set arg autocomplete=myautocompletename and add a handler for it in autocomplete.php
 		if (isset($this->args['autocomplete'])) {
@@ -85,6 +91,17 @@ class TextField extends FormItem {
 		return $js;
 	}
 	
+	function renderJavascriptLibraries() {
+		$n = $this->form->name."_".$this->name;
+		$spellcheck = isset($this->args['spellcheck']) && $this->args['spellcheck'];
+		$js = "";
+		
+		if ($spellcheck) {
+			$js .= '<script src="script/speller/spellChecker.js"></script>';
+		}
+		return $js;
+	}
+			
 	
 }
 
@@ -154,8 +171,16 @@ class TextArea extends FormItem {
 		$n = $this->form->name."_".$this->name;
 		$rows = isset($this->args['rows']) ? 'rows="'.$this->args['rows'].'"' : "";
 		$cols = isset($this->args['cols']) ? 'cols="'.$this->args['cols'].'"' : "";
-		$spellcheck = (isset($this->args['spellcheck']) && $this->args['spellcheck'] == false) ? 'spellcheck="false"' : "";
-		$str = '<textarea id="'.$n.'" name="'.$n.'" '.$rows.' '.$cols.' '.$spellcheck.'/>'.escapehtml($value).'</textarea>';
+		$disablebrowserspellcheck = isset($this->args['disablebrowserspellcheck']) && $this->args['disablebrowserspellcheck'] ? 'spellcheck="false"' : "";
+		$spellcheck = isset($this->args['spellcheck']) && $this->args['spellcheck'];
+		
+		$str = '<textarea id="'.$n.'" name="'.$n.'" '.$rows.' '.$cols.' '.$disablebrowserspellcheck.'/>'.escapehtml($value).'</textarea>';
+		
+		if ($spellcheck) {
+			$str .= '<div>' . action_link(_L("Spell Check"), "spellcheck", null, '(new spellChecker($(\''.$n.'\')) ).openChecker();') . '</div>';
+		}
+		
+		//FIXME this belongs in renderJavaScript()
 		if(isset($this->args['counter'])) {
 			$str .= '<div id="' . $n . 'charsleft">'._L('Characters remaining'). ':&nbsp;'. ( $this->args['counter'] - mb_strlen($value)). '</div>
 				<script>
@@ -163,6 +188,17 @@ class TextArea extends FormItem {
 				</script>';
 		}
 		return $str;
+	}
+	
+	function renderJavascriptLibraries() {
+		$n = $this->form->name."_".$this->name;
+		$spellcheck = isset($this->args['spellcheck']) && $this->args['spellcheck'];
+		$js = "";
+		
+		if ($spellcheck) {
+			$js .= '<script src="script/speller/spellChecker.js"></script>';
+		}
+		return $js;
 	}
 }
 
