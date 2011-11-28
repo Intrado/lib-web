@@ -91,7 +91,7 @@ $formdata = array(
 		"validators" => array(
 			array("ValRequired"),
 			array("ValMessageBody", "messagegroupid" => $messagegroup->id)),
-		"control" => array("TextArea","rows"=>10,"cols"=>50,"counter"=>420),
+		"control" => array("TextArea","rows"=>10,"cols"=>50,"counter"=>420,"spellcheck" => true),
 		"helpstep" => 1
 	)
 );

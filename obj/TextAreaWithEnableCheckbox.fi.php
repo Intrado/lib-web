@@ -23,6 +23,7 @@ class TextAreaWithEnableCheckbox extends FormItem {
 		$n = $this->form->name."_".$this->name;
 		$rows = isset($this->args['rows']) ? 'rows="'.$this->args['rows'].'"' : "";
 		$cols = isset($this->args['cols']) ? 'cols="'.$this->args['cols'].'"' : "";
+		$spellcheck = isset($this->args['spellcheck']) && $this->args['spellcheck'];
 		
 		$enabletext = (isset($this->args['enabletext'])?$this->args['enabletext']:_L("Enabled"));
 		$defaultvalue = (isset($this->args['defaultvalue'])?$this->args['defaultvalue']:$value);
@@ -31,8 +32,14 @@ class TextAreaWithEnableCheckbox extends FormItem {
 			<input id="'.$n.'-oldtext" type="hidden" value="'.escapehtml($defaultvalue).'" />
 			<div id="'.$n.'-textareadiv" style="display:'.($value?"block":"none").'">
 				<textarea id="'.$n.'" name="'.$n.'" '.$rows.' '.$cols.'>'.escapehtml($value).'</textarea>';
+		
 		if(isset($this->args['counter']))
 			$str .= '<div id="' . $n . 'charsleft">'._L('Characters remaining'). ':&nbsp;'. ( $this->args['counter'] - mb_strlen(($value?$value:$defaultvalue)) ). '</div>';
+
+		if ($spellcheck) {
+			$str .= '<div>' . action_link(_L("Spell Check"), "spellcheck", null, '(new spellChecker($(\''.$n.'\')) ).openChecker();') . '</div>';
+		}
+		
 		$str .= '</div>';
 		
 		return $str;
@@ -49,8 +56,9 @@ class TextAreaWithEnableCheckbox extends FormItem {
 		return $str;
 	}
 	
-	function renderJavascriptLibraries() {
-		
+	function renderJavascriptLibraries() {	
+		$spellcheck = isset($this->args['spellcheck']) && $this->args['spellcheck'];
+
 		$str = '<script type="text/javascript">
 			function textAreaEnable(formitem, event) {
 				var textareadiv = $(formitem + "-textareadiv");
@@ -70,6 +78,11 @@ class TextAreaWithEnableCheckbox extends FormItem {
 				}
 			}
 			</script>';
+		
+		if ($spellcheck) {
+			$str .= '<script src="script/speller/spellChecker.js"></script>';
+		}
+		
 		return $str;
 	}
 }

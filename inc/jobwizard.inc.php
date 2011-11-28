@@ -1340,7 +1340,7 @@ class JobWiz_messageSmsText extends WizStep {
 				array("ValLength","max"=>160),
 				array("ValSmsText")
 			),
-			"control" => array("TextArea","rows"=>5,"cols"=>35,"counter"=>160),
+			"control" => array("TextArea","rows"=>5,"cols"=>35,"counter"=>160,"spellcheck"=>true),
 			"helpstep" => 1
 		);
 
@@ -1537,7 +1537,7 @@ class JobWiz_socialMedia extends WizStep {
 				"value" => ($smEnable?$fbtext:""),
 				"validators" => array(
 					array("ValLength","max"=>420)),
-				"control" => array("TextAreaWithEnableCheckbox", "defaultvalue" => $fbtext, "rows"=>10,"cols"=>50,"counter"=>420),
+				"control" => array("TextAreaWithEnableCheckbox", "defaultvalue" => $fbtext, "rows"=>10,"cols"=>50,"counter"=>420, "spellcheck" => true),
 				"helpstep" => $helpstepnum++
 			);
 		}
@@ -1553,7 +1553,7 @@ class JobWiz_socialMedia extends WizStep {
 				"value" => ($smEnable?$twtext:""),
 				"validators" => array(
 					array("ValLength","max"=>(140 - $reservedchars))),
-				"control" => array("TextAreaWithEnableCheckbox", "defaultvalue" => $twtext, "rows"=>5,"cols"=>50,"counter"=>(140 - $reservedchars)),
+				"control" => array("TextAreaWithEnableCheckbox", "defaultvalue" => $twtext, "rows"=>5,"cols"=>50,"counter"=>(140 - $reservedchars), "spellcheck" => true),
 				"helpstep" => $helpstepnum++
 			
 			);

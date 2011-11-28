@@ -94,7 +94,7 @@ $formdata = array(
 		"validators" => array(
 			array("ValRequired"),
 			array("ValLength","max"=>(140 - $reservedchars))),
-		"control" => array("TextArea","rows"=>10,"cols"=>50,"counter"=>(140 - $reservedchars)),
+		"control" => array("TextArea","rows"=>10,"cols"=>50,"counter"=>(140 - $reservedchars),"spellcheck" => true),
 		"helpstep" => 1
 	)
 );

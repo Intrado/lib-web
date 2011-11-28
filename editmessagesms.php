@@ -95,7 +95,7 @@ $formdata["message"] = array(
 		array("ValLength","max"=>160),
 		array("ValSmsText")
 	),
-	"control" => array("TextArea","rows"=>5,"cols"=>35,"counter"=>160),
+	"control" => array("TextArea","rows"=>5,"cols"=>35,"counter"=>160,"spellcheck" => true),
 	"helpstep" => 1
 );
 

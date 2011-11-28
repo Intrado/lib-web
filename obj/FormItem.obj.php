@@ -176,10 +176,6 @@ class TextArea extends FormItem {
 		
 		$str = '<textarea id="'.$n.'" name="'.$n.'" '.$rows.' '.$cols.' '.$disablebrowserspellcheck.'/>'.escapehtml($value).'</textarea>';
 		
-		if ($spellcheck) {
-			$str .= '<div>' . action_link(_L("Spell Check"), "spellcheck", null, '(new spellChecker($(\''.$n.'\')) ).openChecker();') . '</div>';
-		}
-		
 		//FIXME this belongs in renderJavaScript()
 		if(isset($this->args['counter'])) {
 			$str .= '<div id="' . $n . 'charsleft">'._L('Characters remaining'). ':&nbsp;'. ( $this->args['counter'] - mb_strlen($value)). '</div>
@@ -187,6 +183,11 @@ class TextArea extends FormItem {
 					Event.observe(\'' . $n . '\', \'keyup\', form_count_field_characters.curry(' . $this->args['counter'] . ',\''  . $n . 'charsleft\'));
 				</script>';
 		}
+
+		if ($spellcheck) {
+			$str .= '<div>' . action_link(_L("Spell Check"), "spellcheck", null, '(new spellChecker($(\''.$n.'\')) ).openChecker();') . '</div>';
+		}
+		
 		return $str;
 	}
 	
