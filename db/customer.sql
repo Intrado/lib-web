@@ -1728,4 +1728,6 @@ INSERT INTO fieldmap (id, fieldnum, name, options) VALUES
 	(NULL , '$d02', '%Tomorrow\'s Date%', 'text,systemvar'),
 	(NULL , '$d03', '%Yesterday\'s Date%', 'text,systemvar')
 $$$
+update setting set value='8.2/1' where name='_dbversion'
+$$$
 -- END 8.2/1
