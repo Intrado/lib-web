@@ -60,7 +60,7 @@ $formdata["notes"] = array(
 	);
 $formdata["runmode"] = array( 
 		"label" => _L('Server run mode'),
-		"value" => "",
+		"value" => "active",
 		"validators" => array(
 			array("ValInArray", 'values' => array_keys(Service::getRunModes()))),
 		"control" => array("SelectMenu", 'values' => Service::getRunModes()),

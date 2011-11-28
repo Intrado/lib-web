@@ -18,8 +18,9 @@ require_once("Service.obj.php");
 require_once("CvsServer.obj.php");
 
 // client request MUST contain a hostname and service name
-$hostname = ($_GET['host']?$_GET['host']:false);
-$servicename = ($_GET['service']?$_GET['service']:false);
+$hostname = (isset($_GET['host'])?$_GET['host']:false);
+$servicename = (isset($_GET['service'])?$_GET['service']:false);
+$runmode = (isset($_GET['mode'])?$_GET['mode']:false);
 
 // remote ip must resolve to the same hostname in the request
 if (!$hostname || gethostbyname($hostname) != $_SERVER['REMOTE_ADDR']) {
@@ -50,18 +51,24 @@ try {
 
 // get the current runmode and the service definintion for it
 $serverid = QuickQuery("select id from server where hostname = ?", false, array($hostname));
-$serviceid = false;
+$service = false;
 if ($serverid) {
 	$server = new Server($serverid);
 	if ($server->runmode != 'testing') {
+		$serviceid = false;
 		// look up most specific service definition first. otherwise check for an "all" run mode
-		$serviceid = QuickQuery("select id from service where serverid = ? and type = ? and runmode = ?", false, array($server->id, $servicename, $server->runmode));
+		if ($runmode)
+			$serviceid = QuickQuery("select id from service where serverid = ? and type = ? and runmode = ?", false, array($server->id, $servicename, $runmode));
 		if (!$serviceid)
 			$serviceid = QuickQuery("select id from service where serverid = ? and type = ? and runmode = 'all'", false, array($server->id, $servicename));
 		$service = new Service($serviceid);
+	} else {
+		header("HTTP/1.0 404 Not Found");
+		echo "<h1>This server is set to 'Testing'. Change this in the manager.</h1>";
+		exit;
 	}
 }
-if (!$serverid || !$serviceid) {
+if (!$serverid || !$service) {
 	header("HTTP/1.0 404 Not Found");
 	echo "<h1>Failed to find server/service definition for this client request.</h1>";
 	exit;

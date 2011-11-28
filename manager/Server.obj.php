@@ -30,7 +30,7 @@ class Server extends DBMappedObject{
 	}
 	
 	static function getRunModes() {
-		return array('active'=>'Active','standby'=>'Standby','testing'=>'Testing');
+		return array('active'=>'Active','testing'=>'Testing');
 	}
 }
 
