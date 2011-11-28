@@ -62,6 +62,7 @@ tinydomain[]="4msg.es"
 tts="10.25.25.232,8080,/ttsserver/tts"
 
 [servermanagement]
-cvsurl=":pserver:cvs@10.25.25.181:/usr/local/cvsroot/";
+manageservers=true
+cvsurl=":pserver:cvs@10.25.25.181:/usr/local/cvsroot/"
 
 ;*/?>
