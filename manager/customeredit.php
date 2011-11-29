@@ -410,7 +410,7 @@ $settings = array(
 					'_supportemail' => '',
 					'_supportphone' => '',
 					'callerid' => '',
-					'areacode' => '',
+					'defaultareacode' => '',
 					'inboundnumber' => '',
 					'maxphones' => '1',
 					'maxemails' => '1',
@@ -650,9 +650,9 @@ $formdata["callerid"] = array(
 						"helpstep" => $helpstepnum
 );
 
-$formdata["areacode"] = array(
+$formdata["defaultareacode"] = array(
 						"label" => _L('Default Area Code'),
-						"value" => $settings['areacode'],
+						"value" => $settings['defaultareacode'],
 						"validators" => array(
 							array('ValNumber')
 						),
@@ -1276,7 +1276,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		setCustomerSystemSetting('_supportemail', $postdata["supportemail"], $custdb);
 		setCustomerSystemSetting('_supportphone', $postdata["supportphone"], $custdb);
 		setCustomerSystemSetting('callerid', $postdata["callerid"], $custdb);
-		setCustomerSystemSetting('areacode', $postdata["areacode"], $custdb);
+		setCustomerSystemSetting('defaultareacode', $postdata["defaultareacode"], $custdb);
 		
 		// if inbound changed
 		if ($postdata["inboundnumber"] != $settings['inboundnumber']){
