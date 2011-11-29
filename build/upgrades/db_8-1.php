@@ -40,7 +40,9 @@ function upgrade_8_1 ($rev, $shardid, $customerid, $db) {
 			if (!$hasActivedate) {
 				apply_sql("upgrades/db_8-1_pre.sql", $customerid, $db, 10);
 			}
-			
+		case 10:
+			echo "|";
+			apply_sql("upgrades/db_8-1_pre.sql", $customerid, $db, 11);
 	}
 	
 	return true;	

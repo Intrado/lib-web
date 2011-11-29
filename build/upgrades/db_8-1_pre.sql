@@ -91,3 +91,7 @@ CREATE TABLE `jobstats` (
  PRIMARY KEY (`jobid`,`name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8
 $$$
+
+-- $rev 11
+UPDATE import SET datalength=length(data)
+$$$
