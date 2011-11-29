@@ -15,22 +15,13 @@ $displaysettings = array(
 	"unconfigured" => 0
 );
 
-// Map display settings labels to all possible values in display settings
-$displaylabels = array(
-	"acknowledged" => array(
-		0 => "Show Non Acknowledged",
-		1 => "Show Acknowledged"
-	),
-	"unconfigured" => array(
-		0 => "Show Configured",
-		1 => "Show Unconfigured"
-	)
-);
+if (isset($_REQUEST["acknowledged"])) {
+	$displaysettings["acknowledged"] = $_REQUEST["acknowledged"] + 0;
+}
 
-foreach($displaylabels as $key => $values) {
-	if (isset($_REQUEST[$key]) && in_array($_REQUEST[$key] + 0, array_keys($values))) {
-		$displaysettings[$key] = $_REQUEST[$key] + 0;
-	}
+if (isset($_REQUEST["unconfigured"])) {
+	$displaysettings["acknowledged"] = 0;
+	$displaysettings["unconfigured"] = $_REQUEST["unconfigured"] + 0;
 }
 
 if(isset($_REQUEST["acknowledge"])) {
@@ -97,6 +88,7 @@ $titles = array(
 );
 
 if ($displaysettings["unconfigured"]) {
+	unset($titles["checkmark"]);
 	unset($titles["importname"]);
 	unset($titles["notified"]);
 }
@@ -143,15 +135,15 @@ function fmt_actions($row, $index){
 include("nav.inc.php");
 
 echo "<ul>";
-foreach($displaylabels as $key => $labels) {
-	$displaymodify = $displaysettings;
-	foreach($labels as $value => $label) {
-		if ($displaysettings[$key] != $value) {
-			$displaymodify[$key] = $value;
-			echo '<li><a href="importalerts.php?' . http_build_query($displaymodify) . '">' . $label . '</a> ';
-		}
-	}
-}
+if ($displaysettings["acknowledged"])
+	echo '<li><a href="importalerts.php?acknowledged=0">Show Non Acknowledged</a> ';
+else
+	echo '<li><a href="importalerts.php?acknowledged=1">Show Acknowledged</a> ';
+
+if ($displaysettings["unconfigured"])
+	echo '<li><a href="importalerts.php?acknowledged=0">Show Non Acknowledged</a> ';
+else
+	echo '<li><a href="importalerts.php?unconfigured=1">Show Unconfigured</a> ';
 echo "</ul>";
 
 
