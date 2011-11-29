@@ -455,3 +455,8 @@ ALTER TABLE `emailjobtask` ADD INDEX `waiting` ( `status` , `nextattempttime` ) 
 
 ALTER TABLE `smsjobtask` ADD INDEX `waiting` ( `status` , `nextattempttime` ) ;
 
+ALTER TABLE `emailjobtask` ADD INDEX `jobstats` ( `customerid` , `jobid` , `attempts` , `sequence` ) ;
+
+ALTER TABLE `qjobtask` ADD INDEX `jobstats` ( `customerid` , `jobid` , `attempts` , `sequence` ) ;
+
+ALTER TABLE `smsjobtask` ADD INDEX `jobstats` ( `customerid` , `jobid` , `attempts` , `sequence` ) ;
