@@ -43,6 +43,7 @@ function userOwns ($type,$id) {
 		case "voicereply":
 		case "message":
 		case "messagegroup":
+		case "monitor";
 			return QuickQuery("select count(*) from $type where userid=? and id=?", false, array($USER->id, $id));
 		default:
 			return false;
@@ -75,6 +76,10 @@ function userCanSee ($type,$id) {
 				where mg.id = ?
 				and j.userid = ?";
 			return QuickQuery($query, false, array($messagegroupid, $USER->id));
+		case "job":
+			// TODO add restrictions
+			return true;
+			
 		default:
 			return false;
 	}

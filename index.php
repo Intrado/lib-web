@@ -100,7 +100,9 @@ if ($userid && $userid != -1) {
 			$USER->update(array("lastlogin"));
 		}
 		loadDisplaySettings();
-		redirect("start.php");
+		
+		$redirpage = isset($_GET['last']) ? $_GET['last'] : 'start.php';
+		redirect($redirpage);
 	}
 }
 
@@ -112,7 +114,7 @@ include_once("logintop.inc.php");
 
 
 ?>
-	<form action="index.php" method="POST">
+	<form action="index.php<?= (isset($_GET['last']) ? "?last=" . $_GET['last'] : '') ?>" method="POST">
 
 <? if ($custname) { ?>
 
