@@ -18,12 +18,6 @@ if (!$_SESSION['customerid']) {
 }
 $customerid = $_SESSION['customerid'];
 
-
-$staledataleewayhours = 1;
-$defaultwindowminutes = 10;
-define('SECONDSPERHOUR', 3600);
-define('SECONDSPERMINUTE', 60);
-define('HOURSPERDAY', 24);
 define('SECONDSPERDAY', 86400);
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -40,45 +34,16 @@ function fmt_import_date($row,$index) {
 	return "&nbsp;";
 }
 
-function fmt_alert_timestamp($row, $index) {
-	global $staledataleewayhours;
+function fmt_timestamp($row, $index) {
 	$timestamp = strtotime($row[$index]);
 	if ($timestamp === false) {
-		return "<div style='background-color: #ff0000'>- Never -</div>";
-	} else {
-		if ($timestamp + ($staledataleewayhours * SECONDSPERHOUR) < strtotime($row[6]))
-			return "<div style='background-color: #ff0000'>" . fmt_import_date($row, $index) . "</div>";
+		return "<div>- Never -</div>";
 	}
-
 	return fmt_import_date($row, $index);
 }
 
-function fmt_last_modified($row, $index) {
-	global $staledataleewayhours;
-	global $defaultwindowminutes;
-	$timestamp = strtotime($row[$index]);
-	if ($timestamp === false) {
-		return "<div style='background-color: #ff0000'>- Never -</div>";
-	} else {
-		return fmt_import_date($row, $index);
-	}
-}
-
-
-function fmt_import_status($row, $index){
-
-	if($row[$index] == 'error')
-		return "<div style=\"background-color: red;\">" . $row[$index] . "</div>";
-	else
-		return $row[$index];
-}
-
-
 function fmt_filesize($row, $index){
-	if($row[$index] == 0)
-	 	return "<div style=\"background-color: #FF0000; width:100%; text-align:right;\">" . number_format($row[$index]) . "</div>";
-	else
-	 	return "<div style=\"width:100%; text-align:right;\">" . number_format($row[$index]) . "</div>";
+	return "<div style=\"width:100%; text-align:right;\">" . number_format($row[$index]) . "</div>";
 }
 
 
@@ -99,7 +64,7 @@ function fmt_daysold($row, $index) {
 	if (isset($row[6]) && $row[6]) {
 		return intval((strtotime(date("Y-m-d G:i:s")) - strtotime($row[6])) / SECONDSPERDAY);
 	} else {
-		return '<div style="background-color: #ff0000">99999</div>';
+		return '<div>99999</div>';
 	}
 }
 
@@ -120,44 +85,8 @@ function fmt_updatemethod($row, $index) {
 }
 
 function fmt_alert($row, $index) {
-	/*
-	global $staledataleewayhours;
-	global $defaultwindowminutes;
-	$timestamp = strtotime($row[10]);
-	if (isset($row[14]['daysold']) && $row[14]['daysold']) {
-		$timediffallowed = ($row[14]['daysold'] * HOURSPERDAY * SECONDSPERHOUR) + ($staledataleewayhours * SECONDSPERHOUR);
-		$timediff = time() - $timestamp;
-		if ($timediff > $timediffallowed)
-			return "Alert";
-	// Scheduled Days
-	} else if(isset($row[14]['dow'])) {
-		if (!isset($row[14]['scheduledwindowminutes']))
-			$row[14]['scheduledwindowminutes'] = $defaultwindowminutes;
-		$daytocheck =  date('w', time() - ($row[14]['scheduledwindowminutes']*SECONDSPERMINUTE));
-
-		// ['dow'] is a string of possibly more than one days
-		if (strpos($row[14]['dow'], $daytocheck) !== false) {
-			$timestampforscheduledday = strtotime($row[14]['time'] . ":00 " . date("F d, Y", time() - ($row[14]['scheduledwindowminutes']*SECONDSPERMINUTE)));
-			$lowerbound = $timestampforscheduledday - ($row[14]['scheduledwindowminutes']*SECONDSPERMINUTE);
-			// Check for the alert only if the current time is past the scheduled time window
-			if ($lowerbound <= time() - 2*($row[14]['scheduledwindowminutes']*SECONDSPERMINUTE)) {
-				$diffuploadtime = $timestamp - $lowerbound;
-				if ($diffuploadtime < 0 || $diffuploadtime > 2*($row[14]['scheduledwindowminutes']*SECONDSPERMINUTE))
-					return "Alert";
-			}
-		}
-	} else if (strtotime($row[9]) + ($staledataleewayhours * SECONDSPERHOUR) < $timestamp) {
-		return "Alert";
-	} else if ((isset($row[14]['minsize']) && $row[11] < $row[14]['minsize']) || (isset($row[14]['maxsize']) && $row[11] > $row[14]['maxsize'])) {
-		return "Alert";
-	} else if(!isset($row[14]['minsize']) && !isset($row[14]['maxsize']) && $row[11] < 10 && $row[11] > 0) {
-		return "Alert";
-	} else if($row[11] == 0) {
-		return "Alert";
-	} else {
-		return "None";
-	}
-	*/
+	if ($row[12])
+		return "Configured";
 	return "None";
 }
 
@@ -173,20 +102,20 @@ if (!$custdb) {
 	exit("Connection failed for customer: {$custinfo["dbhost"]}, db: c_$customerid");
 }
 
-$currhost="";
 $data = array();
 
-$query = "SELECT id, name,description, status, type, updatemethod,datamodifiedtime,lastrun,datalength,datatype,notes,managernotes 
-			FROM import
-			where type in ('automatic', 'manual') and ownertype = 'system'
-			order by id";
+$query = "SELECT i.id, i.name,i.description, i.status, i.type, i.updatemethod,i.datamodifiedtime,i.lastrun,i.datalength,i.datatype,i.notes,i.managernotes, count(ir.id) as alertrules
+			FROM import i left join importalertrule ir on (i.id = ir.importid)
+			where i.type in ('automatic', 'manual') and i.ownertype = 'system'
+			group by i.id
+			order by i.id";
 $data = QuickQueryMultiRow($query,false,$custdb);
 $timezone = getCustomerSystemSetting('timezone', false, true, $custdb);
 date_default_timezone_set($timezone);
 
 
 $titles = array(
-	"alert" => "#Alert",
+	"alert" => "#Alerts",
 	"0" => "@#Imp ID ",
 	"1" => "#Imp Name",
 	"2" => "@#Description",
@@ -205,13 +134,11 @@ $titles = array(
 
 setStickyColumns($titles,"customerimports");
 
-
 $formatters = array(
 	"alert" => "fmt_alert",
-	"3" => "fmt_import_status",
 	"5" => "fmt_updatemethod",
-	"6" => "fmt_last_modified",
-	"7" => "fmt_alert_timestamp",
+	"6" => "fmt_timestamp",
+	"7" => "fmt_timestamp",
 	"8" => "fmt_filesize",
 	"actions" => "fmt_importalerts",
 	"daysold" => "fmt_daysold",
@@ -245,39 +172,7 @@ showTable($data, $titles, $formatters);
 		trows[i].id = 'row'+i;
 	}
 </script>
-
-<div> Automatic jobs have the "Import when uploaded" checkbox checked, manual jobs do not.  Both are from imports page.</div>
 <div> All time stamps are in customer time. </div>
-<table class="list">
-	<tr>
-		<th align="left" class="listheader">&nbsp;</th>
-		<th align="left" class="listheader">Last Run</th>
-		<th align="left" class="listheader">File Date</th>
-		<th align="left" class="listheader">File Size</th>
-		<th align="left" class="listheader">Days Old</th>
-	</tr>
-	<tr>
-		<th class="listheader">No Alert</th>
-		<td><span style="background-color: #FFFF00">Yellow</span> if older than Last Modified</td>
-		<td><span style="background-color: #FFFF00"></span></td>
-		<td><span style="background-color: #FFFF00">Yellow</span> if data size less than 10 bytes</td>
-		<td><span style="background-color: #FFFF00"></span></td>
-	</tr>
-	<tr>
-		<th class="listheader">With Alerts</th>
-		<td><span style="background-color: #FFCCCC">Light Red</span> based on import alert</td>
-		<td><span style="background-color: #FFCCCC">Light Red</span> based on import alert</td>
-		<td><span style="background-color: #FFCCCC">Light Red</span> based on import alert</td>
-		<td><span style="background-color: #FFCCCC">Light Red</span> based on import alert</td>
-	</tr>
-	<tr>
-		<th class="listheader"></th>
-		<td><span style="background-color: #FF0000">Red</span> if older than File Date</td>
-		<td><span style="background-color: #FF0000">Red</span> if does not exist</td>
-		<td><span style="background-color: #FF0000">Red</span> if does not exist</td>
-		<td><span style="background-color: #FF0000">Red</span> if does not exist</td>
-	</tr>
-</table>
 <?
 endWindow();
 
