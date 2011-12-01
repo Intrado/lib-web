@@ -581,6 +581,8 @@ function activityfeed($mergeditems,$ajax = false) {
 										if(item.tools) {
 											html += '<td valign=\"middle\" width=\"100px\"><div id=\"actionlink_' + actionids + '\" style=\"cursor:pointer\" ><img src=\"img/largeicons/tiny20x20/tools.jpg\"/>&nbsp;Tools</div><div id=\"actions_' + actionids + '\" style=\"display:none;\">' + item.tools + '</div></td>';
 											actionids++;
+										} else {
+											html += '<td width=\"100px\">&nbsp;</td>'
 										}
 										html += '</tr>';
 									}
