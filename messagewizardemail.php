@@ -651,6 +651,8 @@ class FinishMessageWizard extends WizFinish {
 			}
 		}
 		
+		$messagegroup->updateDefaultLanguageCode();
+		
 		// end the transaction
 		QuickQuery("COMMIT");
 	}
