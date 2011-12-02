@@ -88,7 +88,6 @@ $titles = array(
 );
 
 if ($displaysettings["unconfigured"]) {
-	unset($titles["checkmark"]);
 	unset($titles["importname"]);
 	unset($titles["notified"]);
 }
