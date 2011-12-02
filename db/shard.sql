@@ -460,3 +460,11 @@ ALTER TABLE `emailjobtask` ADD INDEX `jobstats` ( `customerid` , `jobid` , `atte
 ALTER TABLE `qjobtask` ADD INDEX `jobstats` ( `customerid` , `jobid` , `attempts` , `sequence` ) ;
 
 ALTER TABLE `smsjobtask` ADD INDEX `jobstats` ( `customerid` , `jobid` , `attempts` , `sequence` ) ;
+
+
+ALTER VIEW `qjobtask_dispatchview` AS
+select `customerid`, `jobid`, `personid`, `sequence`, `contactsequence`, `status`, `attempts`, `renderedmessage`, `leasetime`, `phone`, `uuid`
+from qjobtask left join renderedmessage on (qjobtask.renderedmessageid = renderedmessage.id);
+
+ALTER TABLE `qjobtask` DROP `type` ;
+
