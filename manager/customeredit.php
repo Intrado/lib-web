@@ -861,7 +861,6 @@ $formdata["oem"] = array(
 						"label" => _L('OEM'),
 						"value" => isset($custinfo)?$custinfo["oem"]:"",
 						"validators" => array(
-							array('ValNumber'),
 							array("ValLength","max" => 50)
 						),
 						"control" => array("TextField","maxlength"=>50,"size"=>4),
@@ -871,7 +870,6 @@ $formdata["oemid"] = array(
 						"label" => _L('OEM id'),
 						"value" => isset($custinfo)?$custinfo["oemid"]:"",
 						"validators" => array(
-							array('ValNumber'),
 							array("ValLength","max" => 50)
 						),
 						"control" => array("TextField","maxlength"=>50,"size"=>4),
