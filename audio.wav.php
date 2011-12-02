@@ -27,7 +27,7 @@ if(isset($_GET['id'])) {
 				$data = file_get_contents ($outname); //readfile seems to cause problems
 				header("HTTP/1.0 200 OK");
 				header("Content-Type: audio/mpeg");
-				if ($download)
+				if (isset($_GET['download']))
 					header("Content-disposition: attachment; filename=audiopreview.mp3");
 				header('Pragma: private');
 				header('Cache-control: private, must-revalidate');
