@@ -306,7 +306,12 @@ class ValInboundNumber extends Validator {
 }
 class ValUrlComponent extends Validator {
 	var $onlyserverside = true;
-	function validate ($value, $args) {		
+	function validate ($value, $args) {
+		// Check alphanumeric
+		if(!preg_match("/^[a-zA-Z0-9]*$/", $value)) {
+			return 'Can only use letters and numbers';
+		}
+		
 		// Allow legacy urlcomponents to be sorter than 5 characters but all new ones should be 5 or more
 		if (($args["urlcomponent"] && strlen($args["urlcomponent"]) >= 5 && strlen($value) < 5) ||
 			(!$args["urlcomponent"] && strlen($value) < 5)) {
