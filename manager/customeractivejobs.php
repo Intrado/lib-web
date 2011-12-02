@@ -53,18 +53,16 @@ if ($jobfilter->settings['dispatchtype'] == 'customer'){
 	$extrasql .= " and j.dispatchtype = 'system' ";
 }
 
-$extrasql .= " and jt.type = ? ";
-$extraargs[] = $jobfilter->settings['destinationtype'];
-
 foreach ($shards as $shardid => $sharddb) {
 	Query("use aspshard", $sharddb);
-	$query = "select j.systempriority, j.customerid, j.id, jt.type, jt.attempts, jt.sequence,
+	// TODO remove 'phone' leftover from qjobtask.type field
+	$query = "select j.systempriority, j.customerid, j.id, 'phone', jt.attempts, jt.sequence,
 					jt.status, j.phonetaskcount, j.timeslices, count(*)
 			from qjobtask jt
 			straight_join qjob j on (j.id = jt.jobid and j.customerid = jt.customerid)
 			where 1 $extrasql
-			group by jt.status, jt.customerid, jt.jobid, jt.type, jt.attempts, jt.sequence
-			order by j.systempriority, j.customerid, j.id, jt.type, jt.attempts, jt.sequence
+			group by jt.status, jt.customerid, jt.jobid, jt.attempts, jt.sequence
+			order by j.systempriority, j.customerid, j.id, jt.attempts, jt.sequence
 			";
 	$res = Query($query,$sharddb,$extraargs);
 	while ($row = DBGetRow($res)) {
