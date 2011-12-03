@@ -64,14 +64,16 @@ function fmt_retval($row, $index) {
 
 // TODO: commsuite service status field
 $titles = array("1" => "Hostname",
-		"3" => "Service Props",
+		"2" => "Run Mode",
+		"4" => "Service Props",
 		"actions" => "Actions",
-		"2" => "Notes");
+		"3" => "Notes");
 
-$formatters = array("2" => "fmt_notes",
+$formatters = array("2" => "fmt_runmode",
+		"3" => "fmt_notes",
 		"actions" => "fmt_actions");
 
-$data = QuickQueryMultiRow("select s.id, s.hostname, s.notes, 
+$data = QuickQueryMultiRow("select s.id, s.hostname, s.runmode, s.notes, 
 		(select group_concat(runmode, ':', type separator ', ') 
 			from service 
 			where serverid = s.id) as services 
