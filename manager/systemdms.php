@@ -4,6 +4,7 @@ require_once("../inc/form.inc.php");
 require_once("../inc/html.inc.php");
 require_once("../inc/table.inc.php");
 require_once("../inc/formatters.inc.php");
+require_once("dbmo//authserver/DmGroup.obj.php");
 
 if (!$MANAGERUSER->authorized("systemdm"))
 	exit("Not Authorized");
@@ -154,8 +155,24 @@ function fmt_resources ($row,$index) {
 	
 	return $str;
 }
+function fmt_routetype($row, $index){
+	$routetypes = array("firstcall" => "Firstcall","lastcall" => "Lastcall","" => "Other");
+	$routetype = $row[$index];
+	return isset($routetypes[$routetype])?$routetypes[$routetype]:"Unknown";
+}
 
+function fmt_dmgroupcarrier($row, $index){
+	global $dmgroups;
+	$dmgroupid = $row[15];
+	return isset($dmgroups[$dmgroupid])?$dmgroups[$dmgroupid]->carrier:"";
+}
+function fmt_dmgroupstate($row, $index){
+	global $dmgroups;
+	$dmgroupid = $row[15];
+	return isset($dmgroups[$dmgroupid])?$dmgroups[$dmgroupid]->state:"";
+}
 
+$dmgroups = DBFindMany("DmGroup", "from dmgroup");
 
 $dms = array();
 $query = "select dm.id, dm.name, dm.authorizedip, dm.lastip,
@@ -163,6 +180,8 @@ $query = "select dm.id, dm.name, dm.authorizedip, dm.lastip,
 			s_telco_type.value as telco_type, s_delmech_resource_count.value as delmech_resource_count,
 			s_telco_inboundtoken.value as telco_inboundtoken,
 			poststatus,
+			dm.routetype,
+			dm.dmgroupid,
 			dm.notes
 			from dm dm
 			left join dmsetting s_telco_calls_sec on 
@@ -217,7 +236,10 @@ $titles[11] = "Resources";
 $titles[12] = "@#Inbound";
 $titles[7] = "@#DM UUID";
 $titles[8] = "@#Cmd";
-$titles[14] = "#Notes";
+$titles[14] = "#Route Type";
+$titles["carrier"] = "#Carrier";
+$titles["state"] = "#State";
+$titles[16] = "#Notes";
 $titles["actions"] = "Actions";
 
 // Set hidden prefix from sticky session variable
@@ -232,7 +254,10 @@ $formatters = array("actions" => "fmt_DMActions",
 					"status" => "fmt_dmstatus",
 					5 => "fmt_lastseen",
 					4 => "fmt_state",
-					11 => "fmt_resources");
+					11 => "fmt_resources",
+					14 => "fmt_routetype",
+					"carrier" => "fmt_dmgroupcarrier",
+					"state" => "fmt_dmgroupstate");
 
 $filterFormatters = array("status" => "fmt_dmstatus_nohtml",4 => "fmt_state");
 /////////////////////////////

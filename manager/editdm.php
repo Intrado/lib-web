@@ -110,7 +110,7 @@ $dmsettings = array(
 
 );
 $dmsettings = array_merge($dmsettings,QuickQueryList("select name,value from dmsetting where dmid=?",true,false,array($dmid)));
-$dminfo = QuickQueryRow("select name,dmgroupid, lastip, lastseen, customerid, enablestate, type, authorizedip, lastip, notes from dm where id=?", true,false,array($dmid));
+$dminfo = QuickQueryRow("select name,dmgroupid, lastip, lastseen, customerid, enablestate, type, authorizedip, lastip,routetype, notes from dm where id=?", true,false,array($dmid));
 
 $helpstepnum = 1;
 
@@ -190,6 +190,16 @@ if ($dmType == 'system') {
 		),
 		"control" => array("SelectMenu", "values" => array('' => "None") + $dmgroups),
 		"helpstep" => $helpstepnum
+	);
+	$routetypes = array("firstcall" => "Firstcall","lastcall" => "Lastcall","" => "Other");
+	$formdata["routetype"] = array(
+			"label" => _L('Route Type'),
+			"value" => $dminfo["routetype"],
+			"validators" => array(
+				array("ValInArray", "values" => array_keys($routetypes))
+			),
+			"control" => array("SelectMenu", "values" => $routetypes),
+			"helpstep" => $helpstepnum
 	);
 }
 $helpstepnum++;
@@ -335,12 +345,16 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 
 		$newcustomerid = isset($postdata["customerid"])?$postdata["customerid"] + 0:0;
 		$dmgroupid = isset($postdata["dmgroup"]) && $postdata["dmgroup"]!=''?$postdata["dmgroup"]:null;
+		$routetype = isset($postdata["routetype"]) && $postdata["routetype"] != ''?$postdata["routetype"]:null;
+
 		QuickUpdate("update dm set	authorizedip=?,
 									customerid=?,
 									dmgroupid=?,
+									routetype=?,
 									notes=?
 									where id=?",false,
-									array($postdata["authorizedip"],$newcustomerid,$dmgroupid,$postdata["notes"],$dmid));
+									array($postdata["authorizedip"],$newcustomerid,$dmgroupid,$routetype,$postdata["notes"],$dmid));
+		
 		if ($dmType == 'customer') {
 			if($dminfo['customerid'] != null && $newcustomerid != $dminfo['customerid']){
 				$custinfo = QuickQueryRow("select s.dbhost, s.dbusername, s.dbpassword from shard s inner join customer c on (c.shardid = s.id)
