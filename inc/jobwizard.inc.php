@@ -708,11 +708,6 @@ class JobWiz_messageGroupChoose extends WizStep {
 
 		// used to preview email message with correct template (emergency, or notification)
 		$wizJobType = isset($_SESSION['wizard_job']['jobtype'])?$_SESSION['wizard_job']['jobtype']:"all";
-		// TODO fix hack, should really get the jobtype.systempriority value
-		if ($wizJobType == "emergency")
-			$jobpriority = 1;
-		else
-			$jobpriority = 3;
 		
 		$formdata = array();
 
@@ -727,7 +722,7 @@ class JobWiz_messageGroupChoose extends WizStep {
 				array("ValInArray","values"=>array_keys($messages)),
 				array("ValMessageGroup")
 			),
-			"control" => array("MessageGroupSelectMenu","width"=>"80%", "values"=>$messages, "jobpriority"=>$jobpriority),
+			"control" => array("MessageGroupSelectMenu","width"=>"80%", "values"=>$messages, "jobtypeid"=>$this->parent->dataHelper("/start:jobtype")),
 			"helpstep" => 1
 		);
 		return new Form("messageGroupChoose",$formdata,$helpsteps);
@@ -1340,7 +1335,7 @@ class JobWiz_messageSmsText extends WizStep {
 				array("ValLength","max"=>160),
 				array("ValSmsText")
 			),
-			"control" => array("TextArea","rows"=>5,"cols"=>35,"counter"=>160,"spellcheck"=>true),
+			"control" => array("TextArea","rows"=>5,"cols"=>35,"counter"=>160),
 			"helpstep" => 1
 		);
 
@@ -1537,7 +1532,7 @@ class JobWiz_socialMedia extends WizStep {
 				"value" => ($smEnable?$fbtext:""),
 				"validators" => array(
 					array("ValLength","max"=>420)),
-				"control" => array("TextAreaWithEnableCheckbox", "defaultvalue" => $fbtext, "rows"=>10,"cols"=>50,"counter"=>420, "spellcheck" => true),
+				"control" => array("TextAreaWithEnableCheckbox", "defaultvalue" => $fbtext, "rows"=>10,"cols"=>50,"counter"=>420),
 				"helpstep" => $helpstepnum++
 			);
 		}
@@ -1553,7 +1548,7 @@ class JobWiz_socialMedia extends WizStep {
 				"value" => ($smEnable?$twtext:""),
 				"validators" => array(
 					array("ValLength","max"=>(140 - $reservedchars))),
-				"control" => array("TextAreaWithEnableCheckbox", "defaultvalue" => $twtext, "rows"=>5,"cols"=>50,"counter"=>(140 - $reservedchars), "spellcheck" => true),
+				"control" => array("TextAreaWithEnableCheckbox", "defaultvalue" => $twtext, "rows"=>5,"cols"=>50,"counter"=>(140 - $reservedchars)),
 				"helpstep" => $helpstepnum++
 			
 			);
