@@ -468,3 +468,18 @@ from qjobtask left join renderedmessage on (qjobtask.renderedmessageid = rendere
 
 ALTER TABLE `qjobtask` DROP `type` ;
 
+
+ALTER TABLE `emailjobtask` DROP INDEX `expired` ;
+
+ALTER TABLE `emailjobtask` DROP INDEX `personid` ;
+
+ALTER TABLE `smsjobtask` DROP INDEX `expired` ;
+
+ALTER TABLE `smsjobtask` DROP INDEX `personid` ;
+
+ALTER TABLE `qjobtask` DROP INDEX `expired` ;
+
+ALTER TABLE `qjobtask` DROP INDEX `personid` ;
+
+ALTER TABLE `smsjobtask` ADD INDEX `dispatch` ( `customerid` , `status` , `nextattempttime` ) ;
+
