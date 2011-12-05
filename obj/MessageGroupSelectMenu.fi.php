@@ -22,14 +22,27 @@ class MessageGroupSelectMenu extends FormItem {
 	function renderJavascript($value) {
 		$n = $this->form->name."_".$this->name;
 		// jobtype.systempriority used for email message preview
-		if (isset($this->args['jobpriority']))
-			$jobpriority = $this->args['jobpriority'];
+		if (isset($this->args['jobtypeid']))
+			$jobtypeid = $this->args['jobtypeid'];
 		else
-			$jobpriority = 3; // general
+			$jobtypeid = 0;
+		
+		
 		$str = '
-			$("'.$n.'").observe("change", loadMessageGroupPreview.curry('.$jobpriority.'));
-			getMessageGroupPreviewGrid($("'.$n.'").value, $("'.$n.'_preview"), '.$jobpriority.');
+			$("'.$n.'").observe("change", loadMessageGroupPreview.curry('.$jobtypeid.'));
+			getMessageGroupPreviewGrid($("'.$n.'").value, $("'.$n.'_preview"), '.$jobtypeid.');
 		';
+		
+		if (isset($this->args["jobtypeidtarget"])) {
+			$str .= "
+			var form = $('" . $this->form->name . "');
+			$(form.name + '_{$this->args["jobtypeidtarget"]}').observe('change', function(event) {
+				var jobtypeid = form_get_value(form, form.name + '_{$this->args["jobtypeidtarget"]}');
+				$('".$n."').observe('change', loadMessageGroupPreview.curry(jobtypeid));
+				getMessageGroupPreviewGrid($('".$n."').value, $('".$n."_preview'), jobtypeid);
+			});
+			";
+		}
 		return $str;
 		
 	}
@@ -38,10 +51,10 @@ class MessageGroupSelectMenu extends FormItem {
 		$str = '
 			<script type="text/javascript" src="script/getMessageGroupPreviewGrid.js"></script>
 			<script type="text/javascript">
-				function loadMessageGroupPreview(priority, event) {
+				function loadMessageGroupPreview(jobtypeid, event) {
 					var formitem = event.element();
 					container = $(formitem.id + "_preview");
-					getMessageGroupPreviewGrid(formitem.value, container, priority);
+					getMessageGroupPreviewGrid(formitem.value, container, jobtypeid);
 				}
 			</script>';
 		return $str;

@@ -1,5 +1,5 @@
 
-function getMessageGroupPreviewGrid(mgid, container, priority) {
+function getMessageGroupPreviewGrid(mgid, container, jobtypeid) {
 	// Avoid sending ajax request if nothing is selected
 	if (!mgid)
 		return;
@@ -54,7 +54,7 @@ function getMessageGroupPreviewGrid(mgid, container, priority) {
 					// observe clicks for preview
 					if (hasMessage) {
 						icon.observe("click", function (event) {
-							showPreview(null,"jobpriority=" + priority + "&previewid=" + item.value[header.key]);
+							showPreview(null,"jobtypeid=" + jobtypeid + "&previewid=" + item.value[header.key]);
 							return false;
 						});
 					}

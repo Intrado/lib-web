@@ -612,13 +612,12 @@ if ($submittedmode || $completedmode) {
 		"helpstep" => $helpstepnum
 	);
 	$formdata[] = _L('Message');
-	$selectedjobtype = new JobType($job->jobtypeid);
 	$formdata["message"] = array(
 		"label" => _L('Message'),
 		"fieldhelp" => _L('Select an existing message to use from the menu.'),
 		"value" => (((isset($job->messagegroupid) && $job->messagegroupid))?$job->messagegroupid:""),
 		"validators" => array(),
-		"control" => array("MessageGroupSelectMenu", "values" => $messages, "static" => true,"jobpriority"=>$selectedjobtype->systempriority),
+		"control" => array("MessageGroupSelectMenu", "values" => $messages, "static" => true,"jobtypeid"=>$job->jobtypeid),
 		"helpstep" => ++$helpstepnum
 	);
 
@@ -730,7 +729,7 @@ if ($submittedmode || $completedmode) {
 			array("ValInArray","values"=>array_keys($messages)),
 			array("ValMessageGroup")
 		),
-		"control" => array("MessageGroupSelectMenu", "values" => $messages),
+		"control" => array("MessageGroupSelectMenu", "values" => $messages,"jobtypeidtarget" => "jobtype"),
 		"helpstep" => ++$helpstepnum
 	);
 
