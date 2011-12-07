@@ -3,7 +3,8 @@
 INSERT INTO fieldmap (id, fieldnum, name, options) VALUES 
 	(NULL , '$d01', '%Date%', 'text,systemvar'),
 	(NULL , '$d02', '%Tomorrow\'s Date%', 'text,systemvar'),
-	(NULL , '$d03', '%Yesterday\'s Date%', 'text,systemvar');
+	(NULL , '$d03', '%Yesterday\'s Date%', 'text,systemvar')
+$$$
 	
 	
 -- $rev 2
@@ -15,7 +16,8 @@ CREATE TABLE `monitor` (
 	`action` enum('email') NOT NULL DEFAULT 'email',
 	PRIMARY KEY (`id`),
 	KEY `type` (`type`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=8;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=8
+$$$
 
 
 CREATE TABLE `monitorfilter` (
@@ -25,4 +27,13 @@ CREATE TABLE `monitorfilter` (
 	`val` text,
 	PRIMARY KEY (`id`),
 	KEY `monitorid` (`monitorid`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1
+$$$
+
+-- $rev 3
+
+ALTER TABLE `surveyquestion` CHANGE `questionnumber` `questionnumber` INT NOT NULL 
+$$$
+
+ALTER TABLE `surveyresponse` CHANGE `questionnumber` `questionnumber` INT NOT NULL 
+$$$

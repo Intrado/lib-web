@@ -1757,3 +1757,12 @@ $$$
 update setting set value='8.2/2' where name='_dbversion'
 $$$
 -- END 8.2/2
+
+-- START 8.2/3
+ALTER TABLE `surveyquestion` CHANGE `questionnumber` `questionnumber` INT NOT NULL 
+$$$
+ALTER TABLE `surveyresponse` CHANGE `questionnumber` `questionnumber` INT NOT NULL 
+$$$
+update setting set value='8.2/3' where name='_dbversion'
+$$$
+-- END 8.2/3
