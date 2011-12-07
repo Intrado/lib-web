@@ -261,7 +261,7 @@ ALTER TABLE `specialtaskqueue` ADD INDEX `leasecheck` ( `status` , `leasetime` )
 ALTER TABLE `qjobtask` CHANGE `lastresultdata` `lastresultdata` VARCHAR( 255 ) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL;
 
 -- table to move renderedmessage out of qjobtask
- CREATE TABLE `aspshard`.`renderedmessage` (
+ CREATE TABLE `renderedmessage` (
 `id` BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY ,
 `renderedmessage` TEXT NOT NULL
 ) ENGINE = InnoDB CHARACTER SET utf8 COLLATE utf8_general_ci ;
@@ -274,7 +274,7 @@ create sql security invoker view qjobtask_dispatchview as
 select `customerid`, `jobid`, `type`, `personid`, `sequence`, `contactsequence`, `status`, `attempts`, `renderedmessage`, `leasetime`, `phone`, `uuid`
 from qjobtask left join renderedmessage on (qjobtask.renderedmessageid = renderedmessage.id);
 
-CREATE TABLE `aspshard`.`messagelink` (
+CREATE TABLE `messagelink` (
 `customerid` INT NOT NULL ,
 `jobid` INT NOT NULL ,
 `personid` INT NOT NULL ,
@@ -294,7 +294,7 @@ ALTER TABLE `smsblock` ADD `timezone` VARCHAR( 50 ) CHARACTER SET utf8 COLLATE u
 
 ALTER TABLE `smsblock` ADD `customerid` INT DEFAULT NULL FIRST ;
 
-CREATE TABLE `aspshard`.`replicationcheck` (
+CREATE TABLE `replicationcheck` (
 `id` TINYINT NOT NULL AUTO_INCREMENT PRIMARY KEY ,
 `currenttime` BIGINT NOT NULL
 ) ENGINE = InnoDB ;
@@ -462,6 +462,38 @@ ALTER TABLE `qjobtask` ADD INDEX `jobstats` ( `customerid` , `jobid` , `attempts
 ALTER TABLE `smsjobtask` ADD INDEX `jobstats` ( `customerid` , `jobid` , `attempts` , `sequence` ) ;
 
 
+-- move any jobtasks into email or sms tables, prior to removal of qjobtask.type column
+
+-- copy email tasks
+INSERT INTO emailjobtask (customerid, jobid, personid, sequence, contactsequence, STATUS, renderedmessageid, lastresult, lastattempttime, nextattempttime, leasetime, uuid) 
+  SELECT customerid, jobid, personid, sequence, contactsequence, STATUS, renderedmessageid, lastresult, lastattempttime, nextattempttime, leasetime, uuid FROM qjobtask WHERE type='email' ;
+ 
+-- copy email leases
+INSERT INTO emailleasetask (taskuuid, leasetime) 
+  SELECT lt.taskuuid, lt.leasetime FROM leasetask lt JOIN qjobtask qjt ON lt.taskuuid = qjt.uuid WHERE qjt.type = 'email' ;
+ 
+-- copy email message
+INSERT INTO emailrenderedmessage (id, renderedmessage)
+  SELECT id, renderedmessage FROM renderedmessage rm JOIN qjobtask qjt ON rm.id = qjt.renderedmessageid WHERE qjt.type = 'email' ;
+ 
+ 
+-- cleanup any 'assigned' sms tasks, there is no lease in place for them to be cleaned up - not expected to have any after redialer shutdown
+DELETE jt, rm FROM qjobtask jt LEFT JOIN renderedmessage rm ON (rm.id = jt.renderedmessageid) WHERE jt.type='sms' AND jt.STATUS='assigned' ;
+ 
+-- copy sms tasks
+INSERT INTO smsjobtask (customerid, jobid, personid, sequence, contactsequence, STATUS, renderedmessageid, lastresult, lastattempttime, nextattempttime, leasetime, uuid) 
+  SELECT customerid, jobid, personid, sequence, contactsequence, STATUS, renderedmessageid, lastresult, lastattempttime, nextattempttime, leasetime, uuid FROM qjobtask WHERE type='sms' ;
+ 
+-- copy sms rendered messages
+INSERT INTO smsrenderedmessage (id, renderedmessage)
+  SELECT id, renderedmessage FROM renderedmessage rm JOIN qjobtask qjt ON rm.id = qjt.renderedmessageid WHERE qjt.type = 'sms' ;
+ 
+ 
+-- cleanup moved tasks and their moved renderedmessages
+DELETE jt, rm FROM qjobtask jt LEFT JOIN renderedmessage rm ON (rm.id = jt.renderedmessageid) WHERE jt.type IN ('email', 'sms') ;
+
+
+-- drop type column
 ALTER VIEW `qjobtask_dispatchview` AS
 select `customerid`, `jobid`, `personid`, `sequence`, `contactsequence`, `status`, `attempts`, `renderedmessage`, `leasetime`, `phone`, `uuid`
 from qjobtask left join renderedmessage on (qjobtask.renderedmessageid = renderedmessage.id);
@@ -469,6 +501,7 @@ from qjobtask left join renderedmessage on (qjobtask.renderedmessageid = rendere
 ALTER TABLE `qjobtask` DROP `type` ;
 
 
+-- index audit
 ALTER TABLE `emailjobtask` DROP INDEX `expired` ;
 
 ALTER TABLE `emailjobtask` DROP INDEX `personid` ;
