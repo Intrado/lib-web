@@ -201,7 +201,7 @@ $query = "select dm.id, dm.name, dm.authorizedip, dm.lastip,
 					and s_dm_enabled.name = 'dm_enabled')			
 			where dm.type = 'system'
 			" . $queryextra . "
-			order by order by dm.dmgroupid, lpad(dm.name,50,' ')";
+			order by dm.dmgroupid, lpad(dm.name,50,' ')";
 $result = Query($query);
 $data = array();
 $restotal = 0;
