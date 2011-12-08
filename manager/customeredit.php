@@ -1054,7 +1054,7 @@ $formdata["brandtheme"] = array(
 
 $buttons = array(submit_button(_L("Save"),"save","tick"),submit_button(_L("Save and Return"),"done","tick"),
 				icon_button(_L('Cancel'),"cross",null,"customers.php"));
-$form = new Form("newcustomer",$formdata,$helpsteps,$buttons);
+$form = new Form("newcustomer",$formdata,null,$buttons);
 ////////////////////////////////////////////////////////////////////////////////
 // Form Data Handling
 ////////////////////////////////////////////////////////////////////////////////
