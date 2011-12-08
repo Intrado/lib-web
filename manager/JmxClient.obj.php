@@ -1,5 +1,5 @@
 <?
-/* Serve Jmx read/write/execute requests
+/* Serve Jmx read/execute requests
  * Uses Jolokia servlet running in jetty on target
  * 
  * - Nickolas Heckman
