@@ -74,7 +74,9 @@ if (isset($_GET['listsearchmode'])) {
 if (isset($_GET['id'])) {
 	setCurrentList($_GET['id']);
 	
-	$_SESSION['listreferer'] = $_SERVER['HTTP_REFERER'];
+	// NOTE: maintaing previous behavior while removing errors from httpd log files. See bug:4605
+	$referer = (isset($_SERVER['HTTP_REFERER'])?$_SERVER['HTTP_REFERER']:NULL);
+	$_SESSION['listreferer'] = $referer;
 	redirect();
 }
 
