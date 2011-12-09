@@ -207,6 +207,4 @@ if ($SETTINGS['feature']['log_dmapi']) {
 	fclose($fp);
 }
 
-xmlrpc_server_destroy($xmlrpc_server);
-
 ?>
