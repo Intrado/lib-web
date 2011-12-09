@@ -37,6 +37,7 @@ if (isset($_SESSION['listuploadfiles'][$list->id])) {
 	$type = $_SESSION['listuploadfiles']['type'];
 } else {
 	$curfilename = false;
+	$type = false;
 	$errormsg = "Please upload a file";
 }
 
@@ -52,6 +53,7 @@ $reloadform = 0;
 
 
 //load preview data
+$count = 0;
 $listpreviewdata = array();
 $notfound = 0;
 $notfounddata = array();
