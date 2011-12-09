@@ -1226,14 +1226,14 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		// notify authserver to refresh the customer cache
 		refreshCustomer($customerid);
 		
+		$shardinfo = QuickQueryRow("select s.dbhost, s.dbusername, s.dbpassword from shard s inner join customer c on (c.shardid = s.id) where c.id = ?", true,false,array($customerid));
+		$sharddb = DBConnect($shardinfo["dbhost"], $shardinfo["dbusername"], $shardinfo["dbpassword"], "aspshard");
+		if(!$sharddb) {
+			exit("Connection failed for customer: $customerid, shardhost: {$shardinfo["dbhost"]}");
+		}
+		
 		// if timezone changed (rare occurance, but we must update scheduled jobs and report records on the shard database)
 		if ($postdata["timezone"] != getCustomerSystemSetting('timezone', false, true, $custdb)) {
-			$customerid = $_SESSION['customerid'];
-			$shardinfo = QuickQueryRow("select s.dbhost, s.dbusername, s.dbpassword from shard s inner join customer c on (c.shardid = s.id) where c.id = ?", true,false,array($customerid));				
-			$sharddb = DBConnect($shardinfo["dbhost"], $shardinfo["dbusername"], $shardinfo["dbpassword"], "aspshard");
-			if(!$sharddb) {
-				exit("Connection failed for customer: $customerid, shardhost: {$shardinfo["dbhost"]}");
-			}
 			QuickUpdate("update qjob set timezone=? where customerid=?", $sharddb, array($postdata["timezone"],$customerid));
 			QuickUpdate("update qschedule set timezone=? where customerid=?", $sharddb,array($postdata["timezone"],$customerid));
 			QuickUpdate("update qreportsubscription set timezone=? where customerid=?", $sharddb,array($postdata["timezone"],$customerid));
@@ -1242,6 +1242,8 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		if (!$postdata["enabled"]) {
 			setCustomerSystemSetting("disablerepeat", "1", $custdb);
 			setCustomerSystemSetting("_customerenabled", "0", $custdb);
+			// Remove active import alerts but leave the alert rules since they will not trigger for disabled customers
+			QuickUpdate("delete from importalert where customerid=?", $sharddb, array($customerid));
 		} else {
 			setCustomerSystemSetting("_customerenabled", "1", $custdb);
 		}
