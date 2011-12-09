@@ -123,7 +123,8 @@ function createaudiofile($id, $name = "") {
 // behavior.
 //////////////////////////////////////////////////////////
 
-switch ($_REQUEST['action']) {
+$action = (isset($_REQUEST['action'])?$_REQUEST['action']:false);
+switch ($action) {
 	// create a new easycall request, returns new specialtask id
 	/* request should include the following:
 	 * phone: phone number to call. should be valid */
