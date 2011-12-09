@@ -155,37 +155,6 @@ $helpsteps = array("TODO");
 $formdata = array();
 
 
-
-// New backend implementation store the days of week to run in the rule
-// the frontend still has one field for all rules
-$dows = array_merge(
-	explode(',',$daysold->daysofweek),
-	explode(',',$minsize->daysofweek),
-	explode(',',$maxsize->daysofweek),
-	explode(',',$mintimewindow->daysofweek),
-	explode(',',$maxtimewindow->daysofweek)
-);
-
-$days = array();
-for ($x = 0; $x < 7; $x++) {
-
-	$days[] = in_array($x+1,$dows);
-}
-$timevalues = newform_time_select(NULL,NULL,NULL);
-$formdata["daysofweek"] = array(
-	"label" => _L("Days to Run"),
-	"value" => $days,
-	"validators" => array(
-		array("ValRequired"),
-		array("ValWeekDays")
-	),
-	"control" => array(
-		"WeekRepeatItem",
-		"timevalues" => $timevalues
-	),
-	"helpstep" => ++$helpstepnum
-);
-
 $sizeoptions = "";
 for($i=10;$i<=100;$i+=10) {
 	$sizeoptions .= "<option value='$i'>$i%</option>";
@@ -234,6 +203,34 @@ $formdata["daysold"] = array(
 	"helpstep" => $helpstepnum
 );
 
+$formdata[] = "Scheduled Time Window";
+// New backend implementation store the days of week to run in the rule
+// the frontend still has one field for all rules
+$dows = array_merge(
+	explode(',',$mintimewindow->daysofweek),
+	explode(',',$maxtimewindow->daysofweek)
+);
+
+$days = array();
+for ($x = 0; $x < 7; $x++) {
+
+	$days[] = in_array($x+1,$dows);
+}
+$timevalues = newform_time_select(NULL,NULL,NULL);
+$formdata["daysofweek"] = array(
+	"label" => _L("Days to Run"),
+	"value" => $days,
+	"validators" => array(
+array("ValRequired"),
+array("ValWeekDays")
+),
+	"control" => array(
+		"WeekRepeatItem",
+		"timevalues" => $timevalues
+),
+	"helpstep" => ++$helpstepnum
+);
+
 $midnight_today = mktime(0,0,0);
 $timewindowvalue = array();
 if ($mintimewindow->id && $maxtimewindow->id) {
@@ -251,6 +248,13 @@ $formdata["timewindow"] = array(
 	"validators" => array(),
 	"control" => array("TimeWindow"),
 	"helpstep" => $helpstepnum
+);
+
+$formdata[] = "Alert Notification";
+$formdata["emailinfo"] = array(
+		"label" => " ",
+		"control" => array("FormHtml","html" => '<img src="img/icons/information.png" alt="" />Emails are the shared for all alerts'),
+		"helpstep" => $helpstepnum
 );
 $emails = QuickQuery("select emails from importalertcategory where id=?",$custdb,array($categoryid));
 $formdata["emails"] = array(
@@ -279,16 +283,7 @@ function setRule($rule,$name,$operation,$value,$category,$daysofweek) {
 	$rule->operation = $operation;
 	$rule->testvalue = $value;
 	$rule->daysofweek = $daysofweek;
-	$repeatdata = json_decode($daysofweek,true);
-	$dow = array();
-	for ($x = 0; $x < 7; $x++) {
-		if ($repeatdata[$x] === true) {
-			$dow[$x] = $x+1;
-		}
-	}
-	$rule->daysofweek = implode(",",$dow);
 	
-
 	if ($rule->id)
 		$rule->update();
 	else
@@ -311,26 +306,48 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 	} else if (($errors = $form->validate()) === false) { //checks all of the items in this form
 		$postdata = $form->getData(); //gets assoc array of all values {name:value,...}
 		
+		$repeatdata = json_decode($postdata["daysofweek"],true);
+		$dow = array();
+		for ($x = 0; $x < 7; $x++) {
+			if ($repeatdata[$x] === true) {
+				$dow[$x] = $x+1;
+			}
+		}
+		$daysofweek = implode(",",$dow);
+		
+		$shardinfo = QuickQueryRow("select s.dbhost, s.dbusername, s.dbpassword from shard s inner join customer c on (c.shardid = s.id) where c.id = ?", true,false,array($customerid));
+		$sharddb = DBConnect($shardinfo["dbhost"], $shardinfo["dbusername"], $shardinfo["dbpassword"], "aspshard");
+		if(!$sharddb) {
+			exit("Connection failed for customer: $customerid, shardhost: {$shardinfo["dbhost"]}");
+		}
+		
 		global $_dbcon;
 		$savedbcon = $_dbcon;
 		$_dbcon = $custdb;
 		
+		
+		
 		Query("BEGIN");
-
-		if ($postdata["minsize"])
-			setRule($minsize,"size","lt",$postdata["minsize"],$categoryid,$postdata["daysofweek"]);
-		else
+		if ($postdata["minsize"]) {
+			setRule($minsize,"size","lt",$postdata["minsize"],$categoryid,"1,2,3,4,5,6,7");
+		} else {
+			QuickUpdate("delete from importalert where customerid=? and importalertruleid=?", $sharddb, array($customerid,$minsize->id));
 			$minsize->destroy();
+		}
 		
-		if ($postdata["maxsize"])
-			setRule($maxsize,"size","gt",$postdata["maxsize"],$categoryid,$postdata["daysofweek"]);
-		else
+		if ($postdata["maxsize"]) {
+			setRule($maxsize,"size","gt",$postdata["maxsize"],$categoryid,"1,2,3,4,5,6,7");
+		} else {
+			QuickUpdate("delete from importalert where customerid=? and importalertruleid=?", $sharddb, array($customerid,$maxsize->id));
 			$maxsize->destroy();
+		}
 		
-		if ($postdata["daysold"])
-			setRule($daysold,"daysold","gt",$postdata["daysold"],$categoryid,$postdata["daysofweek"]);
-		else 
+		if ($postdata["daysold"]) {
+			setRule($daysold,"daysold","gt",$postdata["daysold"],$categoryid,"1,2,3,4,5,6,7");
+		} else {
+			QuickUpdate("delete from importalert where customerid=? and importalertruleid=?", $sharddb, array($customerid,$daysold->id));
 			$daysold->destroy();
+		}
 		
 		if ($postdata["timewindow"]) {
 			$timewindow = json_decode($postdata["timewindow"],true);
@@ -338,10 +355,11 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 				$importtime = strtotime($timewindow["importtime"]);
 				$mintime = $importtime - $midnight_today - $timewindow["timewindow"] * 60;
 				$maxtime = $importtime - $midnight_today + $timewindow["timewindow"] * 60;
-				setRule($mintimewindow,"importtime","lt",$mintime,$categoryid,$postdata["daysofweek"]);
-				setRule($maxtimewindow,"importtime","gt",$maxtime,$categoryid,$postdata["daysofweek"]);
+				setRule($mintimewindow,"importtime","lt",$mintime,$categoryid,$daysofweek);
+				setRule($maxtimewindow,"importtime","gt",$maxtime,$categoryid,$daysofweek);
 			}
 		} else {
+			QuickUpdate("delete from importalert where customerid=? and importalertruleid=? or importalertruleid=?", $sharddb, array($customerid,$mintimewindow->id,$maxtimewindow->id));
 			$mintimewindow->destroy();
 			$maxtimewindow->destroy();
 		}

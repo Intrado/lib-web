@@ -54,7 +54,7 @@ function fmt_importalerts($row, $index){
 	$actions = array();
 	$actions[] = action_link("Manager Alert", "eye",'importalertrules.php?cid=' . $customerid . '&importid=' . $row[0] . '&categoryid=1');
 	$actions[] = action_link("Customer Alert", "transmit_error",'importalertrules.php?cid=' . $customerid . '&importid=' . $row[0] . '&categoryid=2');
-	$actions[] = action_link("Edit", "pencil",'editimport.php?cid=' . $customerid . '&importid=' . $row[0] . '');
+	$actions[] = action_link("Edit Notes", "pencil",'editimport.php?cid=' . $customerid . '&importid=' . $row[0] . '');
 	
 	return action_links($actions);
 }
