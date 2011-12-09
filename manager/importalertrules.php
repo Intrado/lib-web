@@ -253,7 +253,7 @@ $formdata["timewindow"] = array(
 $formdata[] = "Alert Notification";
 $formdata["emailinfo"] = array(
 		"label" => " ",
-		"control" => array("FormHtml","html" => '<img src="img/icons/information.png" alt="" />Emails are the shared for all alerts'),
+		"control" => array("FormHtml","html" => '<img src="img/icons/information.png" alt="" />Emails are shared between all alerts in this category'),
 		"helpstep" => $helpstepnum
 );
 $emails = QuickQuery("select emails from importalertcategory where id=?",$custdb,array($categoryid));
