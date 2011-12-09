@@ -42,7 +42,9 @@ class Form {
 		
 		if (isset($_REQUEST['ajaxvalidator'])) {
 
-			$jsondata = json_decode($_REQUEST['json'],true);
+			// NOTE: maintaing previous behavior while removing errors from httpd log files. See bug:4606
+			$requestjson = (isset($_REQUEST['json'])?$_REQUEST['json']:NULL);
+			$jsondata = json_decode($requestjson,true);
 
 			$result = array();
 
