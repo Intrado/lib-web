@@ -10,18 +10,11 @@ if (!$MANAGERUSER->authorized("imports"))
 	exit("Not Authorized");
 
 
-$displaysettings = array(
-	"acknowledged" => 0,
-	"unconfigured" => 0
-);
+$displaysetting = "acknowledged";
 
-if (isset($_REQUEST["acknowledged"])) {
-	$displaysettings["acknowledged"] = $_REQUEST["acknowledged"] + 0;
-}
-
-if (isset($_REQUEST["unconfigured"])) {
-	$displaysettings["acknowledged"] = 0;
-	$displaysettings["unconfigured"] = $_REQUEST["unconfigured"] + 0;
+if (isset($_REQUEST["view"]) && 
+	in_array($_REQUEST["view"],array("acknowledged","unacknowledged","unconfigured"))) {
+	$displaysetting = $_REQUEST["view"];
 }
 
 if(isset($_REQUEST["acknowledge"])) {
@@ -62,12 +55,12 @@ while ($shardinfo = DBGetRow($shardresult)) {
 	Query("use aspshard", $sharddb);
 	$query = "select customerid,importalertruleid,importname,name,operation,testvalue,actualvalue,alerttime,notified,notes,acknowledged from importalert where type='manager' and acknowledged=?";
 	
-	if ($displaysettings["unconfigured"])
+	if ($displaysetting == "unconfigured")
 		$query .= " and name='unconfigured'";
 	else
 		$query .= " and name!='unconfigured'";
 	
-	$result = Query($query,$sharddb,array($displaysettings["acknowledged"]));
+	$result = Query($query,$sharddb,array($displaysetting == "acknowledged"?1:0));
 	
 	
 	while ($row = DBGetRow($result,true)) {
@@ -87,7 +80,7 @@ $titles = array(
 		"actions" => "Actions"
 );
 
-if ($displaysettings["unconfigured"]) {
+if ($displaysetting == "unconfigured") {
 	unset($titles["importname"]);
 	unset($titles["notified"]);
 }
@@ -133,20 +126,28 @@ function fmt_actions($row, $index){
 
 include("nav.inc.php");
 
-echo "<ul>";
-if ($displaysettings["acknowledged"])
-	echo '<li><a href="importalerts.php?acknowledged=0">Show Non Acknowledged</a> ';
-else
-	echo '<li><a href="importalerts.php?acknowledged=1">Show Acknowledged</a> ';
 
-if ($displaysettings["unconfigured"])
-	echo '<li><a href="importalerts.php?acknowledged=0">Show Non Acknowledged</a> ';
-else
-	echo '<li><a href="importalerts.php?unconfigured=1">Show Unconfigured</a> ';
-echo "</ul>";
+?>
+<form id="viewoptions" method="GET" action="importalerts.php" onchange="this.submit()">
+
+<table>
+<tr>
+	<td>
+	Displaying: 
+	</td>
+	<td>
+	<select name="view" id='view'>
+		<option value='acknowledged' <?=($displaysetting=='acknowledged')?"selected":""?>>Acknowledged</option>
+		<option value='unacknowledged' <?=($displaysetting=='unacknowledged')?"selected":""?>>Non Acknowledged</option>
+		<option value='unconfigured' <?=($displaysetting=='unconfigured')?"selected":""?>>Unconfigured</option>
+	</select>
+	</td>
+</tr>
+</table>
+<?
 
 
-startWindow( ($displaysettings["acknowledged"]?"Acknowledged ":"") . 'Import Alerts ' . ($displaysettings["unconfigured"]?" for Unconfigured Customers":""));
+startWindow("Import Alerts");
 
 if (count($data)) {
 ?>
@@ -156,6 +157,8 @@ showTable($data, $titles, $formatters);
 ?>
 </table>
 <script type="text/javascript">
+
+
 
 function acknowledgeAlert(id, acknowledged) {
 	var ids = id.split(':');
