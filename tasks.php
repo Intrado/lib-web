@@ -75,8 +75,7 @@ if (isset($_GET['delete'])) {
 		//delete mappings
 		QuickUpdate("delete from importfield where importid=?",false,array($id));
 		
-		// delete any import alert rules
-		QuickUpdate("delete from importalertrule where importid=?",false,array($id));
+		// import alert rules will be deleted when checked. 
 		
 		//delete import
 		$import->destroy();
