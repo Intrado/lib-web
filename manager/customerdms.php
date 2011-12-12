@@ -51,30 +51,29 @@ if (isset($_GET['cid'])) {
 }
 
 $custtxt = "";
-$viewoptions = 'all';
-if (isset($_POST['submit']) && $_POST['submit'] == "showmatch") {
-	if (isset($_POST['custtxt']) && trim($_POST['custtxt'])) {
-		$custtxt = escapehtml(trim($_POST['custtxt']));
-		$queryextra = " and c.urlcomponent like '%" . DBSafe(trim($_POST['custtxt'])) . "%'";
-	}
-	if(isset($_POST['view'])) {
-		$viewoptions = $_POST['view'];
-		switch($viewoptions) {
-			case "enabled":
-				$queryextra .= " and (s_dm_enabled.value = '1' or s_dm_enabled.value is null) ";
-				break;
-			case "disabled":
-				$queryextra .= " and s_dm_enabled.value = '0' and dm.enablestate != 'deleted'";
-				break;
-			case "deleted":
-				$queryextra .= " and dm.enablestate = 'deleted'";
-				break;
-			case "all":
-			default:
-				$queryextra .= " and dm.enablestate != 'deleted'";
-				$viewoptions = 'all';
-				break;
-		}
+$viewoption = 'enabled';
+
+if (isset($_REQUEST['custtxt']) && trim($_REQUEST['custtxt'])) {
+	$custtxt = escapehtml(trim($_REQUEST['custtxt']));
+	$queryextra = " and c.urlcomponent like '%" . DBSafe(trim($_REQUEST['custtxt'])) . "%'";
+}
+if(isset($_REQUEST['view'])) {
+	$viewoption = $_REQUEST['view'];
+	switch($viewoption) {
+		case "enabled":
+			$queryextra .= " and (s_dm_enabled.value = '1' or s_dm_enabled.value is null) ";
+			break;
+		case "disabled":
+			$queryextra .= " and s_dm_enabled.value = '0' and dm.enablestate != 'deleted'";
+			break;
+		case "deleted":
+			$queryextra .= " and dm.enablestate = 'deleted'";
+			break;
+		case "all":
+		default:
+			$queryextra .= " and dm.enablestate != 'deleted'";
+			$viewoption = 'all';
+			break;
 	}
 } else {
 	$queryextra .= " and dm.enablestate != 'deleted'";
@@ -314,22 +313,23 @@ $filterFormatters = array("status" => "fmt_dmstatus_nohtml",6 => "fmt_state");
 include_once("nav.inc.php");
 
 ?>
-<form method="POST" action="customerdms.php">
+<form method="GET" name="viewoptions" id="viewoptions" action="customerdms.php">
 <table>
 <tr>
 	<td>
-	<select name="view" id='view'>
-		<option value='all' <?=($viewoptions=='all')?"selected":""?>>Show All</option>
-		<option value='enabled' <?=($viewoptions=='enabled')?"selected":""?>>Enabled</option>
-		<option value='disabled' <?=($viewoptions=='disabled')?"selected":""?>>Disabled</option>
-		<option value='deleted' <?=($viewoptions=='deleted')?"selected":""?>>Deleted</option>
+	Displaying: 
+	</td>
+	<td>
+	<select name="view" id='view' onchange="blankFieldSubmit();this.form.submit();">
+		<option value='all' <?=($viewoption=='all')?"selected":""?>>Show All</option>
+		<option value='enabled' <?=($viewoption=='enabled')?"selected":""?>>Enabled</option>
+		<option value='disabled' <?=($viewoption=='disabled')?"selected":""?>>Disabled</option>
+		<option value='deleted' <?=($viewoption=='deleted')?"selected":""?>>Deleted</option>
 	</select>
-	
+	</td>
+	<td>
 	<input type="text" name="custtxt" id="custtxt" value="<?=$custtxt?>" size="40" maxlength="50" />
-	</td><td><div id="searchbutton">
-	<?= submit_button("View","showmatch","magnifier")?>
-	</div>
-	</td>	
+	</td>
 </tr>
 </table>
 </form>
@@ -370,11 +370,12 @@ if (count($data)) {
 ?>
 <script type="text/javascript">
 	blankFieldValue('custtxt', 'Search Customer URL');
-	$("searchbutton").observe('click', function() {
+
+	function blankFieldSubmit() {
 		if ($('custtxt').getStyle('color') == 'gray') {
 			$('custtxt').value = "";
 		}
-	});	
+	}
 </script>
 
 <?

@@ -31,26 +31,24 @@ if (isset($_GET['resetDM'])) {
 
 
 $queryextra = "";
-$viewoptions = 'all';
-if (isset($_POST['submit']) && $_POST['submit'] == "showmatch") {
-	if(isset($_POST['view'])) {
-		$viewoptions = $_POST['view'];
-		switch($viewoptions) {
-			case "enabled":
-				$queryextra .= " and (s_dm_enabled.value = '1' or s_dm_enabled.value is null) ";
-				break;
-			case "disabled":
-				$queryextra .= " and s_dm_enabled.value = '0' and dm.enablestate != 'deleted'";
-				break;
-			case "deleted":
-				$queryextra .= " and dm.enablestate = 'deleted'";
-				break;
-			case "all":
-			default:
-				$queryextra .= " and dm.enablestate != 'deleted'";
-				$viewoptions = 'all';
-				break;
-		}
+$viewoptions = 'enabled';
+if(isset($_REQUEST['view'])) {
+	$viewoptions = $_REQUEST['view'];
+	switch($viewoptions) {
+		case "enabled":
+			$queryextra .= " and (s_dm_enabled.value = '1' or s_dm_enabled.value is null) ";
+			break;
+		case "disabled":
+			$queryextra .= " and s_dm_enabled.value = '0' and dm.enablestate != 'deleted'";
+			break;
+		case "deleted":
+			$queryextra .= " and dm.enablestate = 'deleted'";
+			break;
+		case "all":
+		default:
+			$queryextra .= " and dm.enablestate != 'deleted'";
+			$viewoptions = 'all';
+			break;
 	}
 } else {
 	$queryextra .= " and dm.enablestate != 'deleted'";
@@ -267,9 +265,12 @@ $filterFormatters = array("status" => "fmt_dmstatus_nohtml",4 => "fmt_state");
 include_once("nav.inc.php");
 
 ?>
-<form id="viewoptions" method="POST" action="systemdms.php">
+<form id="viewoptions" method="GET" action="systemdms.php" onchange="this.submit()">
 <table>
 <tr>
+	<td>
+	Displaying: 
+	</td>
 	<td>
 	<select name="view" id='view'>
 		<option value='all' <?=($viewoptions=='all')?"selected":""?>>Show All</option>
@@ -277,10 +278,6 @@ include_once("nav.inc.php");
 		<option value='disabled' <?=($viewoptions=='disabled')?"selected":""?>>Disabled</option>
 		<option value='deleted' <?=($viewoptions=='deleted')?"selected":""?>>Deleted</option>
 	</select>
-	</td><td><div id="searchbutton">
-	<?= submit_button("View","showmatch","magnifier")?>
-	</div>
-	</td>	
 </tr>
 </table>
 </form>
