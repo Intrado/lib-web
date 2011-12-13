@@ -4,6 +4,8 @@ setlocale(LC_ALL, 'en_US.UTF-8');
 mb_internal_encoding('UTF-8');
 $SETTINGS = parse_ini_file("inc/settings.ini.php",true);
 
+date_default_timezone_set("US/Pacific");  //to keep php from complaining
+
 apache_note("CS_APP","ml"); //for logging
 
 require_once("inc/appserver.inc.php");
@@ -181,7 +183,7 @@ if ($appservererror) {
 		<script type="text/javascript" language="javascript" src="script/prototype.js"></script>	
 		<script type="text/javascript" language="javascript" src="script/niftyplayer.js.php"></script>
 		<script language="JavaScript" type="text/javascript">
-	 		embedPlayer("messagelinkaudio.mp3.php?code=<?=escapehtml($code)?>","player",<?= $messageinfo->nummessageparts ?>);
+	 		embedPlayer("<?= (isset($_SERVER["HTTPS"])?"https://":"http://") . $_SERVER['HTTP_HOST'] ?>/m/messagelinkaudio.mp3.php?code=<?=escapehtml($code)?>","player",<?= $messageinfo->nummessageparts ?>);
 		</script>
 		<br /><a href="messagelinkaudio.mp3.php?code=<?=escapehtml($code)?>">Click here to download</a>
 	</div>
