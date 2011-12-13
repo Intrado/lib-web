@@ -113,7 +113,8 @@ function niftyplayer(name)
  */
 
 function hasFlashPlayer(){
-	return (typeof(FlashHelper.getMovie('niftyPlayer1')) != 'undefined' && typeof(FlashHelper.getMovie('niftyPlayer1').PercentLoaded) != 'undefined');
+	var ischrome = navigator.userAgent.toLowerCase().indexOf('chrome') > -1;
+	return ischrome || (typeof(FlashHelper.getMovie('niftyPlayer1')) != 'undefined' && typeof(FlashHelper.getMovie('niftyPlayer1').PercentLoaded) != 'undefined');
 }
 
 function embedPlayer(url,target,parts) {
@@ -147,7 +148,14 @@ if($android) {
 ?>
 	$(target).update("Unable to play message. Please install Flash for Android 2.2 or higher or click the link to download the message.");
 <? } else { ?>
-	$(target).update('<a href="http://get.adobe.com/flashplayer/">Click here to upgrade your flash player</a>');
+	$(target).update("<object classid='clsid:22D6F312-B0F6-11D0-94AB-0080C74C7E95' width='280' height='45'>"+
+		"<param name='type' value='audio/mpeg'>"+
+		"<param name='src' value='" + url + "'>"+
+		"<param name='autostart' value='1'>"+
+		"<param name='showcontrols' value='1'>"+
+		"<param name='showstatusbar' value='0'>"+
+		"<embed src ='" + url + "' type='audio/mpeg' autoplay='true' autostart='1' width='280' height='45' controller='1' showstatusbar='0' bgcolor='#ffffff'></embed>"+ 
+		"</object><br /><a href='http://get.adobe.com/flashplayer/'>Click here to install or upgrade your flash player</a>");
 <? } ?>
 	}
 }
