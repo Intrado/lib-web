@@ -1,0 +1,208 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+ <meta name="generator" content="Adobe RoboHelp 9" />
+<title>SMS Logs</title>
+<link rel="StyleSheet" href="../help.css" type="text/css" />
+<script type="text/javascript" language="JavaScript">
+//<![CDATA[
+function reDo() {
+  if (innerWidth != origWidth || innerHeight != origHeight)
+     location.reload();
+}
+if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == "Netscape")) {
+	origWidth = innerWidth;
+	origHeight = innerHeight;
+	onresize = reDo;
+}
+onerror = null; 
+//]]>
+</script>
+<style type="text/css">
+<!--
+div.WebHelpPopupMenu { position:absolute;
+left:0px;
+top:0px;
+z-index:4;
+visibility:hidden; }
+-->
+</style>
+<script type="text/javascript" language="javascript1.2" src="../whmsg.js"></script>
+<script type="text/javascript" language="javascript" src="../whver.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../whproxy.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../whutils.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../whlang.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../whtopic.js"></script>
+
+</head>
+<body><script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.gbWhTopic)
+{
+	var strUrl = document.location.href;
+	var bc = 0;
+	var n = strUrl.toLowerCase().indexOf("bc-");
+	if(n != -1)
+	{
+		document.location.href = strUrl.substring(0, n);
+		bc = strUrl.substring(n+3);
+	}
+
+	if (window.addTocInfo)
+	{
+	addTocInfo("Reports\nSMS Logs");
+addButton("show",BTN_TEXT,"Show","","","","",0,0,"","","");
+
+	}
+	if (window.writeBtnStyle)
+		writeBtnStyle();
+
+	if (window.writeIntopicBar)
+		writeIntopicBar(1);
+
+	
+	document.write("<p style=\"text-align:right\"> ");
+AddMasterBreadcrumbs("../CommSuite_User_Guide.htm", "", ">", "Home", "../Getting_Started/Welcome.htm");
+document.write("<a href=\"Reports.htm\">Reports<\/a> > SMS Logs<\/p>");
+
+
+	if (window.setRelStartPage)
+	{
+	setRelStartPage("../CommSuite_User_Guide.htm");
+
+		autoSync(0);
+		sendSyncInfo();
+		sendAveInfoOut();
+	}
+}
+else
+	if (window.gbIE4)
+		document.location.reload();
+
+//-->
+//]]></script>
+<div style="width: 100%; position: relative;" id="header">
+ <p><a href="javascript:top.window.close()">Exit Help</a></p>
+</div>
+<h1>SMS Logs</h1>
+<p style="line-height: Normal; margin-left: 0px; font-weight: bold;"><span style="font-weight: normal;">This section contains information to help you interpret SMS Log reports.</span></p>
+<p style="line-height: Normal; margin-left: 0px; font-weight: bold;"></p>
+<p><span style="font-weight: bold;"><b>Display Options</b></span></p>
+<div style="
+padding:5px;
+background-repeat:Repeat-X;
+background-color:#cce0f2;
+margin-left:4px;
+margin-right:4px;
+margin-top:4px;
+margin-bottom:4px;
+float:right;
+width:50%;">
+<p style="font-weight: bold; text-align: center; font-size: 12pt;">Guide to Report Results</p>
+<p style="text-align: center; font-weight: normal;">This guide contains possible values which can be found in the Results section of the SMS Log report.</p>
+<p style="line-height: Normal; margin-left: 0px;"><span style="line-height: Normal;"><span style="font-weight: bold;"><b>Sent:</b></span> The SMS was sent to the recipient's cell phone.</span></p>
+<p style="line-height: Normal; margin-left: 0px;"><span style="font-weight: bold;"><b>Unsent:</b></span> The SMS hasn't been sent to the recipient yet.</p>
+<p style="line-height: Normal; margin-left: 0px;"><span style="font-weight: bold;"><b>No SMS:</b></span> There is no SMS cell phone in the database for the recipient.</p>
+</div>
+<p>The topmost part of the Phone Log contains options for viewing the report.</p>
+<ul type="disc">
+<li class="p">
+<p><span style="font-weight: bold;"><b>Display Fields:</b></span> Select any additional fields you would like to display.</p>
+</li>
+<li class="p">
+<p><span style="font-weight: bold;"><b>Sort By:</b></span> Use the drop down menus to sort the report by certain fields.</p>
+</li>
+<li class="p">
+<p><span style="font-weight: bold;"><b>Output Format:</b></span> Click the CSV link to download the report as a CSV file. Click the PDF link to download the report as a PDF file.</p>
+</li>
+</ul>
+<p style="font-weight: bold;">&#160;</p>
+<p style="font-weight: bold;">Filter By</p>
+<p>This section will display any filtering options you used to get to the report.</p>
+<p style="font-weight: bold;">&#160;</p>
+<p style="font-weight: bold;">Report Summary</p>
+<p>The top portion of the report displays the Report Summary which contains the results broken down by notification type as follows:</p>
+<ul type="disc">
+<li class="p">
+<p style="line-height: Normal;"><span style="font-weight: bold;"><b>Job Name:</b></span> The name of the job associated with the report.</p>
+</li>
+<li class="p">
+<p style="line-height: Normal;"><span style="font-weight: bold;"><b>Type:</b></span> The priority level set for the job.</p>
+</li>
+<li class="p">
+<p style="line-height: Normal;"><span style="font-weight: bold;"><b>Submitted By:</b></span> The user who sent the job.</p>
+</li>
+<li class="p">
+<p style="line-height: Normal;"><span style="font-weight: bold;"><b>Start Date:</b></span> &#160;The date and time the job was scheduled to run.</p>
+</li>
+<li class="p">
+<p style="line-height: Normal;"><span style="font-weight: bold;"><b>End Date:</b></span> The date and time that the job was scheduled to end.</p>
+</li>
+<li class="p">
+<p style="line-height: Normal;"><span style="font-weight: bold;"><b>Status:</b></span> The current status of the job. For example, if the job is running currently, its status is "Active."</p>
+</li>
+<li class="p">
+<p style="line-height: Normal;"><span style="font-weight: bold;"><b>Ind's on List:</b></span> The number of individual recipients on the list for this job.</p>
+</li>
+<li class="p">
+<p style="line-height: Normal;"><span style="font-weight: bold;"><b># of Phones:</b></span> The number of phone numbers associated with this report.</p>
+</li>
+<li class="p">
+<p style="line-height: Normal;"><span style="font-weight: bold;"><b># of Emails:</b></span> The number of email address associated with this report.</p>
+</li>
+<li class="p">
+<p style="line-height: Normal;"><span style="font-weight: bold;"><b># of SMS:</b></span> The number of SMS numbers associated with this report.</p>
+</li>
+</ul>
+<p style="line-height: Normal;">&#160;</p>
+<p style="line-height: Normal; font-weight: bold;">Report Details</p>
+<p style="line-height: Normal;">The lower half of the report contains the Report Details which shows each recipient called and the results of the call. It's sections include:</p>
+<ul type="disc">
+<li class="p">
+<p style="line-height: Normal;"><span style="font-weight: bold;"><b>Job:</b></span> The job that the recipient is associated with.</p>
+</li>
+<li class="p">
+<p style="line-height: Normal;"><span style="font-weight: bold;"><b>Submitted by:</b></span> The user who submitted the job associated with the recipient.</p>
+</li>
+<li class="p">
+<p style="line-height: Normal;"><span style="font-weight: bold;"><b>ID#:</b></span> <span>The ID number of the recipient in the database.</span></p>
+</li>
+<li class="p">
+<p style="line-height: Normal;"><span style="font-weight: bold;"><b>First Name:</b></span> The recipient's first name.</p>
+</li>
+<li class="p">
+<p style="line-height: Normal;"><span style="font-weight: bold;"><b>Last Name:</b></span> The recipient's last name.</p>
+</li>
+<li class="p">
+<p style="line-height: Normal;"><span style="font-weight: bold;"><b>Message:</b></span> The name of the message the recipient received. The icon next to the message displays the type of message sent; phone, email, or SMS.</p>
+</li>
+<li class="p">
+<p style="line-height: Normal;"><span style="font-weight: bold;"><b>Destination:</b></span> The cell phone number that was used to reach the recipient.</p>
+</li>
+<li class="p">
+<p style="line-height: Normal;"><span style="font-weight: bold;"><b>Attempts:</b></span> The number of attempts to reach this recipient.</p>
+</li>
+<li class="p">
+<p style="line-height: Normal;"><span style="font-weight: bold;"><b>Last Attempt:</b></span> <span>The last time that the system tried to contact the recipient.</span></p>
+</li>
+<li class="p">
+<p style="line-height: Normal;"><span style="font-weight: bold;"><b>Last Result:</b></span> Shows the result of the delivery attempt. Results are explained in the Guide to Report Results in the blue box on this page.</p>
+</li>
+</ul>
+<p style="line-height: Normal; margin-left: 80px;">&#160;</p>
+<div style="width: 100%; position: relative;" id="footer">&#160;&#160;<span style="font-size: xx-small;"><font size="1" style="font-size: xx-small;">©1999 - 2011 Reliance Communications, Inc.</font></span> 
+</div>
+<script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.writeIntopicBar)
+	writeIntopicBar(0);
+
+
+highlightSearch();
+//-->
+//]]></script>
+</body>
+</html>

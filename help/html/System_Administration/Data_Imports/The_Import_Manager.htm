@@ -1,0 +1,266 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="Adobe RoboHelp 9" />
+<title>The Import Manager</title>
+<link rel="StyleSheet" href="../../help.css" type="text/css" />
+<script type="text/javascript" language="JavaScript">
+//<![CDATA[
+function ehlp_showtip(current,e,text)
+{
+  if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == 'Netscape'))
+  {
+    document.tooltip.document.write("<layer bgColor='yellow' style='border:1px solid black;font-size:12px;'>"+ text + "</layer>");
+    document.tooltip.document.close();
+    document.tooltip.left=e.pageX+5;
+    document.tooltip.top=e.pageY+5;
+    document.tooltip.visibility="show";
+  }
+}
+function ehlp_hidetip()
+{
+  document.tooltip.visibility="hidden";
+}
+//]]>
+</script>
+<script type="text/javascript" language="JavaScript">
+//<![CDATA[
+function reDo() {
+  if (innerWidth != origWidth || innerHeight != origHeight)
+     location.reload();
+}
+if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == "Netscape")) {
+	origWidth = innerWidth;
+	origHeight = innerHeight;
+	onresize = reDo;
+}
+onerror = null; 
+//]]>
+</script>
+<style type="text/css">
+<!--
+div.WebHelpPopupMenu { position:absolute;
+left:0px;
+top:0px;
+z-index:4;
+visibility:hidden; }
+-->
+</style>
+<script type="text/javascript" language="javascript1.2" src="../../whmsg.js"></script>
+<script type="text/javascript" language="javascript" src="../../whver.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whproxy.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whutils.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whlang.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whtopic.js"></script>
+
+</head>
+<body><script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.gbWhTopic)
+{
+	var strUrl = document.location.href;
+	var bc = 0;
+	var n = strUrl.toLowerCase().indexOf("bc-");
+	if(n != -1)
+	{
+		document.location.href = strUrl.substring(0, n);
+		bc = strUrl.substring(n+3);
+	}
+
+	if (window.addTocInfo)
+	{
+	addTocInfo("System Administration\nData Imports\nThe Import Manager");
+addButton("show",BTN_TEXT,"Show","","","","",0,0,"","","");
+
+	}
+	if (window.writeBtnStyle)
+		writeBtnStyle();
+
+	if (window.writeIntopicBar)
+		writeIntopicBar(1);
+
+	
+	document.write("<p style=\"text-align:right\"> ");
+AddMasterBreadcrumbs("../../CommSuite_User_Guide.htm", "", ">", "Home", "../../Getting_Started/Welcome.htm");
+document.write("<a href=\"../User_Management/Managing_User_Accounts.htm\">System Administration<\/a> > <a href=\"The_Import_Manager.htm\">Data Imports<\/a> > The Import Manager<\/p>");
+
+
+	if (window.setRelStartPage)
+	{
+	setRelStartPage("../../CommSuite_User_Guide.htm");
+
+		autoSync(0);
+		sendSyncInfo();
+		sendAveInfoOut();
+	}
+}
+else
+	if (window.gbIE4)
+		document.location.reload();
+
+//-->
+//]]></script>
+<div style="width: 100%; position: relative;" id="header">
+ <p><a href="javascript:top.window.close()">Exit Help</a></p>
+</div>
+<h1>The Import Manager</h1>
+<p><span style="font-weight: bold;"><b><img src="../../important.gif" style="border: none;" alt="important.gif" width="20" height="20" border="0" /> Important:</b></span> <span style="font-style: italic;"><i>Modifying data field definitions after users have begun using your system can cause unexpected results. Please contact support services for assistance before modifying your field definitions. Call 800-920-3897.</i></span></p>
+<p><span style="font-weight: bold;"><b><img src="../../important.gif" style="border: none;" alt="important.gif" width="20" height="20" border="0" /> Important:</b></span> <span style="font-style: italic;"><i>Only those features that you have been granted access to will display. For access to additional features contact your system administrator.</i></span></p>
+<p>The Import Manager is a powerful tool which allows you to configure new data imports for the system. This page can be accessed by clicking the Admin tab followed by the Imports tab.</p>
+<p>Before you configure a new data import, you should assign fields for all metadata you plan to use, including group fields and enrollment fields.</p>
+<p style="font-weight: bold;">Creating a New Data Import</p>
+<p>There are three basic steps to setting up a new data import in the system.</p>
+<ol type="1">
+<li class="p">
+<p>Create a CSV (Comma Separated Value) file of the data to be imported and upload the file to the system's server.</p>
+</li>
+<li class="p">
+<p>Add a new import to the Import Manager and schedule it in the Import Editor.</p>
+</li>
+<li class="p">
+<p>Edit the field mapping on the Data Import Mapping screen.</p>
+</li>
+</ol>
+<p>Each of these steps contains several configuration options that you will need to use in order to successfully import your data. The following sections will explain these options, screen by screen, in detail.</p>
+<p style="font-weight: bold;">The Import Manager Screen</p>
+<p style="font-weight: bold;"><span style="font-weight: normal;">The Import Manager screen shown in the image below, contains a list of data imports that are currently saved in the system. It also serves as the starting point for adding new data imports to the system.</span></p>
+<p><img src="../../DataImportManager.gif" alt="The Data Import Manager" title="The Data Import Manager" style="border: none;" width="400" height="141" border="0" /></p>
+<p>The various parts of the Import Manager screen are as follows:</p>
+<p style="margin-left: 80px;"><span style="font-weight: bold;"><b>Add New Import</b></span> - Click this button to begin adding a new import to the system. You will be taken to the <a title="Click to go to the Import Editor section of this page." href="#The_Import_Editor_Screen" onmouseover="if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == 'Netscape')) ehlp_showtip(this,event,'Click to go to the Import Editor section of this page.');" onmouseout="if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == 'Netscape')) ehlp_hidetip();">Import Editor</a> screen where you can configure the new import.</p>
+<p style="margin-left: 80px;"><span style="font-weight: bold;"><b>Name</b></span> - This is the name that was assigned to the import in the Import Editor.</p>
+<p style="margin-left: 80px;"><span style="font-weight: bold;"><b>Description</b></span> - This is the description that was assigned to the import in the Import Editor.</p>
+<p style="margin-left: 80px;"><span style="font-weight: bold;"><b>Type</b></span> - This is the type of data import that has been assigned in the Import Editor.</p>
+<p style="margin-left: 80px;"><span style="font-weight: bold;"><b>Method</b></span> - This is the method used to with the import. For example, "Update, Create, Delete" will add and remove records when the import is run, synchronizing the system with your current data.</p>
+<p style="margin-left: 80px;"><span style="font-weight: bold;"><b>Status</b></span> - This shows whether the import is running, idle, or if there was an error.</p>
+<p style="margin-left: 80px;"><span style="font-weight: bold;"><b>Last Run -</b></span> <span>The date of the last time this import was run.</span></p>
+<p style="margin-left: 80px;"><span style="font-weight: bold;"><b>File Date</b></span> - This is the date of the last file upload.</p>
+<p style="margin-left: 80px;"><span style="font-weight: bold;"><b>Upload</b></span> <span>- Allows you to manually browse your computer for a CSV file to upload.</span></p>
+<p style="margin-left: 80px;"><span style="font-weight: bold;"><b>Edit</b></span> - This will take you to the Import Editor screen where you can rename or reschedule the import.</p>
+<p style="margin-left: 80px;"><span style="font-weight: bold;"><b>Delete</b></span> - The Delete link removes the import from the system.</p>
+<p style="margin-left: 40px;">&#160;</p>
+<p style="font-weight: bold;"><a name="The_Import_Editor_Screen" id="The_Import_Editor_Screen">The Import Editor Screen</a></p>
+<p style="font-weight: normal;">The Import Editor screen, shown in the image below, is used to configure data imports.</p>
+<p style="font-weight: normal;">Clicking the Add New Import button from the Import Manager will take you to the Import Editor: New Import screen, shown below.</p>
+<p style="font-weight: normal;"><img src="../../ImportEditorNewImport.gif" alt="Adding a new import." title="Adding a new import." style="border: none;" width="400" height="114" border="0" /></p>
+<p style="font-weight: bold;">Settings:</p>
+<p style="margin-left: 40px;"><span style="font-weight: bold;"><b>Data</b></span> - Select the type of data you are importing from the dropdown menu.</p>
+<ul type="disc">
+<li class="p">
+<p style="margin-left: 40px;">Person - This option is for contact, for example, students in a district.</p>
+</li>
+<li class="p">
+<p style="margin-left: 40px;">User - This option is for uploading users to the system.</p>
+</li>
+<li class="p">
+<p style="margin-left: 40px;">Enrollment - This data type is for associating students to staff. For example, all students taking Geometry with Mrs. Smith would be marked with Mrs. Smith's Staff ID. The association from this data would allow Mrs. Smith to easily send messages to her class without manually building a list of students. <span style="font-style: italic; font-weight: bold;"><i><b>Note:</b></i></span> <span style="font-style: italic;"><i>There may be only one enrollment import and this option will disappear from the dropdown menu once an enrollment import has been created.</i></span></p>
+</li>
+</ul>
+<p style="margin-left: 40px;"><span style="font-weight: bold;"><b>Name</b></span> - Enter a name for the import.</p>
+<p style="margin-left: 40px;"><span style="font-weight: bold;"><b>Description</b></span> - Enter an optional description for the import.</p>
+<p style="font-weight: normal;">When this is complete, click the Submit button to proceed to the next screen, shown below.</p>
+<p><img src="../../ImportEditor.gif" alt="The Import Editor" title="The Import Editor" style="border: none;" width="400" height="263" border="0" /></p>
+<p>There are a few parts to the Import Editor. The first part is the Settings area which contains:</p>
+<p style="margin-left: 40px;"><span style="font-weight: bold;"><b>Data</b></span> - Displays the type of data in the import.</p>
+<p style="margin-left: 40px;"><span style="font-weight: bold;"><b>Upload Key</b></span> - This is the unique code associated with the import in the system.</p>
+<p style="margin-left: 40px;"><span style="font-weight: bold;"><b>Description</b></span> - Enter a description of the type of data being imported here.</p>
+<p style="margin-left: 40px;"><span style="font-weight: bold;"><b>Notes</b></span> - Enter any notes you have about the import.</p>
+<p style="margin-left: 40px;"><span style="font-weight: bold;"><b>Update Method</b></span> - The values in this dropdown menu will change based on the Data Type you selected when creating the import.</p>
+<p style="margin-left: 80px; font-weight: bold;">Options with Person Data</p>
+<ul type="disc">
+<li class="p">
+<p style="margin-left: 80px;">Update only - This will update existing information for people already in the system's database. If there are new people in the import or people missing from the import, they will not be added or removed from the system's database. Nothing new is created and only existing information is updated.</p>
+</li>
+<li class="p">
+<p style="margin-left: 80px;">Update &amp; create - This will update existing information for people already in the system's database and add any new people from your import to the system's database. If people are not in your import, but exist in the system's database, they will not be deleted.</p>
+</li>
+<li class="p">
+<p style="margin-left: 80px;">Update, create, delete -This will completely synchronize the database with the data in your import. If there are people in the system's database who are not in the import's CSV file when the import is run, they will be deleted from the database. If there are new people in the most recent import they will be added to the system's database.</p>
+</li>
+</ul>
+<p style="margin-left: 80px; font-weight: bold;">Options with User Data</p>
+<ul type="disc">
+<li class="p">
+<p style="margin-left: 80px;">Full Synchronization - This will completely synchronize the database with the data from your import. Users whose accounts were created by a particular import must be included in that import each time it is run. If they are not included in the import, their accounts will be disabled. If there are new users in the most recent import, accounts will be created for them. Using this option will cause the data to be read-only, but the password and PIN code may be changed. Information like the user's name or phone number may only be updated by updating the data in the user import and running it again.</p>
+</li>
+<li class="p">
+<p style="margin-left: 80px;">Create Only - This will create any new accounts included in your data, but will not affect any accounts that already exist in the system. If there are accounts in the system which are not in the import's data, they will not be disabled.</p>
+</li>
+</ul>
+<p style="margin-left: 80px; font-weight: bold;">Options with Enrollment Data</p>
+<ul type="disc">
+<li class="p">
+<p style="margin-left: 80px;">This dropdown is not available when creating an Enrollment import. The import is automatically set to Full Synchronization.</p>
+</li>
+</ul>
+<p style="margin-left: 40px;"><span style="font-weight: bold;"><b>Skip Header Lines</b></span> <span>- Specify the number of records at the top of your import file to be skipped.</span></p>
+<p style="margin-left: 40px;"><span style="font-weight: bold;"><b>Automated Upload</b></span> - Check this box if you use the SchoolMessenger upload utility and would like the data to be automatically imported into the system's database when the latest CSV file is uploaded.</p>
+<p style="margin-left: 40px;"><span style="font-weight: bold;"><b>Associated Jobs</b></span> - Select any repeating jobs that you wish to have triggered after the data has finished being imported into the system's database. This section is only displayed for imports with the Person data type.</p>
+<p style="margin-left: 0px; font-weight: bold;">The Import Field Mapping Screen</p>
+<p style="margin-left: 0px; font-weight: normal;">The Import Field Mapping screen allows you to map the data from your data import to the corresponding fields in the system's database. After uploading a CSV file, you will be directed to the Import Field Mapping page, shown below.</p>
+<p style="margin-left: 0px; font-weight: normal;"><img src="../../ImportFieldMapping.gif" alt="Import Field Mapping" title="Import Field Mapping" style="border: none;" width="400" height="256" border="0" /></p>
+<p style="margin-left: 0px; font-weight: normal;">To map the data from your data import to the fields in the system:</p>
+<ol type="1">
+<li style="font-weight: normal;" class="p">
+<p style="margin-left: 0px; font-weight: normal;">Select the field to map, for example "School", from the drop down menu.</p>
+</li>
+<li style="font-weight: normal;" class="p">
+<p style="margin-left: 0px; font-weight: normal;">Specify the appropriate translator for the data type that you are importing and enter the import format from the source data file in the Translator options field. For example, if your data includes the date in yyyy/MM/dd format, specify this in the options for the Date translator which can then transform the data into MM/dd/yyyy format, which is the format the system requires.</p>
+</li>
+<li style="font-weight: normal;" class="p">
+<p style="margin-left: 0px; font-weight: normal;">Select the field in the CSV corresponding to the field you selected in the first column. You will see an automatic preview of the data in that column to confirm your selection.</p>
+</li>
+<li style="font-weight: normal;" class="p">
+<p style="margin-left: 0px; font-weight: normal;">If the data looks correct, click the Add button to proceed to the next field.</p>
+</li>
+<li style="font-weight: normal;" class="p">
+<p style="margin-left: 0px; font-weight: normal;">After all of the data fields have been mapped, click the Submit button to save your changes.</p>
+</li>
+</ol>
+<p style="margin-left: 0px; font-weight: normal;">Your settings will be saved for future imports and only need to be changed if your source file layout changes.</p>
+<p style="margin-left: 0px; font-weight: bold;">Translator Types</p>
+<ul type="disc">
+<li class="p">
+<p style="margin-left: 0px; font-weight: normal;">Copy - Maps the exact value from the import file into the database without modifying the data.</p>
+</li>
+<li class="p">
+<p style="margin-left: 0px; font-weight: normal;">Static Value - Maps the specified value into the database for every contact record. For example, you may want to specify a contact type "Student" for all student records.</p>
+</li>
+<li class="p">
+<p style="margin-left: 0px; font-weight: normal;">Current Date - Automatically inserts the current date for every record.</p>
+</li>
+<li class="p">
+<p style="margin-left: 0px; font-weight: normal;">Currency - Automatically converts numbers into standard currency format. For example $05.27 would be converted into $5.27.</p>
+</li>
+<li class="p">
+<p style="margin-left: 0px; font-weight: normal;">Date - Converts common date formats into MM/DD/YYYY format.</p>
+</li>
+<li class="p">
+<p style="margin-left: 0px; font-weight: normal;">Data Lookup - Maps specific input values to specified output values. For example, converting school numeric codes into descriptions such as 027=Springfield HS.</p>
+</li>
+</ul>
+<p style="margin-left: 40px;">&#160;</p>
+<p style="margin-left: 40px;">&#160;</p>
+<p style="margin-left: 0px;">&#160;</p>
+<p>&#160;</p>
+<div style="width: 100%; position: relative;" id="footer">
+ <p>&#160;&#160;<span style="font-size: xx-small;"><font size="1" style="font-size: xx-small;">©1999 - 2011 Reliance Communications, Inc.</font></span></p>
+</div>
+<script type="text/javascript" language="JavaScript">
+//<![CDATA[
+ if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == 'Netscape'))
+  document.write("<div id='tooltip' class='WebHelpPopupMenu'></div>");
+//]]>
+</script><script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.writeIntopicBar)
+	writeIntopicBar(0);
+
+
+highlightSearch();
+//-->
+//]]></script>
+</body>
+</html>

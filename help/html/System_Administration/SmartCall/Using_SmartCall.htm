@@ -1,0 +1,149 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+ <meta name="generator" content="Adobe RoboHelp 9" />
+<title>Using SmartCall</title>
+<link rel="StyleSheet" href="../../main.css" type="text/css" />
+<script type="text/javascript" language="JavaScript">
+//<![CDATA[
+function reDo() {
+  if (innerWidth != origWidth || innerHeight != origHeight)
+     location.reload();
+}
+if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == "Netscape")) {
+	origWidth = innerWidth;
+	origHeight = innerHeight;
+	onresize = reDo;
+}
+onerror = null; 
+//]]>
+</script>
+<style type="text/css">
+<!--
+div.WebHelpPopupMenu { position:absolute;
+left:0px;
+top:0px;
+z-index:4;
+visibility:hidden; }
+-->
+</style>
+<script type="text/javascript" language="javascript1.2" src="../../whmsg.js"></script>
+<script type="text/javascript" language="javascript" src="../../whver.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whproxy.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whutils.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whlang.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whtopic.js"></script>
+
+</head>
+<body><script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.gbWhTopic)
+{
+	var strUrl = document.location.href;
+	var bc = 0;
+	var n = strUrl.toLowerCase().indexOf("bc-");
+	if(n != -1)
+	{
+		document.location.href = strUrl.substring(0, n);
+		bc = strUrl.substring(n+3);
+	}
+
+	if (window.addTocInfo)
+	{
+	addTocInfo("System Administration\nSmartCall\nUsing SmartCall");
+addButton("show",BTN_TEXT,"Show","","","","",0,0,"","","");
+
+	}
+	if (window.writeBtnStyle)
+		writeBtnStyle();
+
+	if (window.writeIntopicBar)
+		writeIntopicBar(1);
+
+	
+	document.write("<p style=\"text-align:right\"> ");
+AddMasterBreadcrumbs("../../CommSuite_User_Guide.htm", "", ">", "Home", "../../Getting_Started/Welcome.htm");
+document.write("<a href=\"../User_Management/Managing_User_Accounts.htm\">System Administration<\/a> > <a href=\"Using_SmartCall.htm\">SmartCall<\/a> > Using SmartCall<\/p>");
+
+
+	if (window.setRelStartPage)
+	{
+	setRelStartPage("../../CommSuite_User_Guide.htm");
+
+		autoSync(0);
+		sendSyncInfo();
+		sendAveInfoOut();
+	}
+}
+else
+	if (window.gbIE4)
+		document.location.reload();
+
+//-->
+//]]></script>
+<h1>Using SmartCall</h1>
+<p>This feature allows you to use your own phone system for day to day calling, but take advantage of the high-volume ASP phone system in the event of an emergency. Additionally, your database will be hosted on the ASP, thereby eliminating the need for an additional server and simplifying maintenance.</p>
+<p><span style="font-weight: bold;"><b><img src="../../important.gif" style="border: none;" alt="important.gif" width="20" height="20" border="0" /></b></span> <span style="font-weight: bold; font-style: italic;"><i><b>Note:</b></i></span> <span style="font-style: italic;"><i>This feature is for customers with SmartCall only.</i></span></p>
+<p style="font-weight: bold;">Configuring SmartCall:</p>
+<p><img src="../../smartCallSettings.gif" alt="The Settings screen with the SmartCall option." title="The Settings screen with the SmartCall option." style="border: none;" width="400" height="162" border="0" /></p>
+<ol type="1">
+<li class="p">
+<p>Click the Admin tab followed by the Settings subtab.</p>
+</li>
+<li class="p">
+<p>Click the SmartCall link in the System section. You will be taken to the SmartCall Manager, shown below.</p>
+</li>
+</ol>
+<p><img src="../../SmartCallManager.gif" alt="The Flex Appliance Manager." title="The Flex Appliance Manager." style="border: none;" width="400" height="105" border="0" /></p>
+<p style="font-weight: bold;">Status</p>
+<p style="font-weight: normal;">The Status link will take you to a page, shown below, where you can see the current state of the SmartCall appliance.</p>
+<p style="font-weight: normal;"><img src="../../SmartCallStatus.gif" alt="SmartCall Status" title="SmartCall Status" style="border: none;" width="400" height="830" border="0" /></p>
+<p style="font-weight: bold;">Resource Schedule:</p>
+<p style="font-weight: bold;"><span style="font-weight: normal;">Clicking the Resource Schedule Link in the SmartCall Manager will take you to a screen where you can limit the amount of local calling resources SmartCall can use. This allows other telephones to share the same resource as SmartCall.</span></p>
+<p><img src="../../SmartCallResourceSched.gif" alt="SmartCall Resource Schedule Manager" title="SmartCall Resource Schedule Manager" style="border: none;" width="400" height="100" border="0" /></p>
+<p style="font-weight: bold;">Route Plan:</p>
+<p>This section is used for configuring custom routes. Some systems my require additional digits for certain prefixes. It can also be used to transform phone numbers or block numbers completely. The Route Plan Manager contains the following features:</p>
+<p><img src="../../SmartCallRoutePlan.gif" alt="The Route Plan Manager" title="The Route Plan Manager" style="border: none;" width="400" height="253" border="0" /></p>
+<p style="font-weight: normal;">At the top of the Route Plan Manager you will find an Upload Routes button which will allow you to upload a CSV file of your custom routes. The file should be formatted like the following:</p>
+<p style="font-weight: normal;">[Match],[Strip],[Prefix],[Suffix (Optional)]</p>
+<p style="font-weight: normal;">The Delete All button will clear all custom routes.</p>
+<p><span style="font-weight: bold;"><b><img src="../../important.gif" style="border: none;" alt="important.gif" width="20" height="20" border="0" /> Important:</b></span> <span style="font-style: italic;"><i>Deleting is permanent.</i></span></p>
+<p style="font-weight: bold; margin-left: 40px;">Default Route Plan</p>
+<p style="margin-left: 40px;">This section contains the default route plan for all numbers which do not match a custom route.</p>
+<p style="font-weight: bold; margin-left: 40px;">Custom Route Plans</p>
+<ul type="disc">
+<li style="list-style:none;display: inline">
+<ul type="disc">
+<li class="p">
+<p><span style="font-weight: bold;"><b>Match-</b></span> This is the number that is being routed. It can be a whole phone number including the area code, just an area code, or an area code with prefix.</p>
+</li>
+<li class="p">
+<p><span style="font-weight: bold;"><b>Strip-</b></span> This field represents the number of additional characters the system should remove when it encounters the number in the Match field. The system can strip up to 99 characters.</p>
+</li>
+<li class="p">
+<p><span style="font-weight: bold;"><b>Prefix -</b></span> If certain digits need to be added to the beginning of certain phone numbers, they should be entered here.</p>
+</li>
+<li class="p">
+<p><span style="font-weight: bold;"><b>Suffix -</b></span> If certain digits need to be added to the end of certain phone numbers, they should be entered here.</p>
+</li>
+</ul>
+</li>
+</ul>
+<p style="font-weight: normal;">&#160;</p>
+<p style="font-weight: bold;">Reset:</p>
+<p>Once you have configured your custom routes, click the reset button to restart SmartCall. Your new settings will take effect after the appliance has restarted.</p>
+<p>&#160;</p>
+<script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.writeIntopicBar)
+	writeIntopicBar(0);
+
+
+highlightSearch();
+//-->
+//]]></script>
+</body>
+</html>
