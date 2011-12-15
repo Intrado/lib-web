@@ -265,14 +265,14 @@ $filterFormatters = array("status" => "fmt_dmstatus_nohtml",4 => "fmt_state");
 include_once("nav.inc.php");
 
 ?>
-<form id="viewoptions" method="GET" action="systemdms.php" onchange="this.submit()">
+<form id="viewoptions" method="GET" action="systemdms.php">
 <table>
 <tr>
 	<td>
 	Displaying: 
 	</td>
 	<td>
-	<select name="view" id='view'>
+	<select name="view" id='view' onchange="this.form.submit();">
 		<option value='all' <?=($viewoptions=='all')?"selected":""?>>Show All</option>
 		<option value='enabled' <?=($viewoptions=='enabled')?"selected":""?>>Enabled</option>
 		<option value='disabled' <?=($viewoptions=='disabled')?"selected":""?>>Disabled</option>

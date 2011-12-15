@@ -128,7 +128,7 @@ include("nav.inc.php");
 
 
 ?>
-<form id="viewoptions" method="GET" action="importalerts.php" onchange="this.submit()">
+<form id="viewoptions" method="GET" action="importalerts.php">
 
 <table>
 <tr>
@@ -136,7 +136,7 @@ include("nav.inc.php");
 	Displaying: 
 	</td>
 	<td>
-	<select name="view" id='view'>
+	<select name="view" id='view' onchange="this.form.submit();">
 		<option value='acknowledged' <?=($displaysetting=='acknowledged')?"selected":""?>>Acknowledged</option>
 		<option value='unacknowledged' <?=($displaysetting=='unacknowledged')?"selected":""?>>Non Acknowledged</option>
 		<option value='unconfigured' <?=($displaysetting=='unconfigured')?"selected":""?>>Unconfigured</option>
@@ -144,6 +144,7 @@ include("nav.inc.php");
 	</td>
 </tr>
 </table>
+</form>
 <?
 
 
