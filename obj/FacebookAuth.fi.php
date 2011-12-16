@@ -39,9 +39,9 @@ class FacebookAuth extends FormItem {
 		$perms = "publish_stream,offline_access,manage_pages";
 		$str .= icon_button("Connect to Facebook", "custom/facebook", 
 			"try { 
-				FB.login(handleFbLoginAuthResponse.curry('$n'), {perms: '$perms'});
+				FB.login(handleFbLoginAuthResponse.curry('$n'), {scope: '$perms'});
 			} catch (e) { 
-				alert('". _L("Could not connect to Facebook")."'); 
+				alert('". _L("Could not connect to Facebook:")."' + e); 
 			}");
 			
 		$str .= '<div style="clear: both"></div></div></div>';
@@ -55,18 +55,27 @@ class FacebookAuth extends FormItem {
 		
 		$str = '// Facebook javascript API initialization, pulled from facebook documentation
 				window.fbAsyncInit = function() {
-					FB.init({appId: "'. $SETTINGS['facebook']['appid']. '", status: true, cookie: false, xfbml: true});
+					FB.init({appId: "'. $SETTINGS['facebook']['appid']. '", 
+							status: true, 
+							cookie: false, 
+							xfbml: true
+					});
 					
 					// after init, load the user data
 					fbLoadUserData("'.$n.'");
 				};
+   
 				(function() {
 					var e = document.createElement("script");
+					e.id=\'facebook-jssdk\';
 					e.type = "text/javascript";
 					e.async = true;
 					e.src = document.location.protocol + "//connect.facebook.net/en_US/all.js";
 					document.getElementById("fb-root").appendChild(e);
 				}());';
+		
+		
+		
 		return $str;
 	}
 	
@@ -75,11 +84,8 @@ class FacebookAuth extends FormItem {
 				// handle updateing information when the user allows or disallows the facebook application
 				function handleFbLoginAuthResponse(formitem, res) {
 					var access_token = "";
-					if (res != null && res.session) {
-						if (res.perms) {
-							// user is logged in and granted some permissions.
-							access_token = res.session.access_token;
-						}
+					if (res != null && res.authResponse) {
+						access_token = res.authResponse.accessToken;
 					}
 					
 					// store access_token value
@@ -157,7 +163,7 @@ class FacebookAuth extends FormItem {
 					// set a timeout (5 sec) to expire the loader gif if the callback never happened
 					setTimeout(function(){
 						if (loader) {
-							loader.remove();
+							$(loader).remove();
 							loader = false;
 						}
 					}, 5000);

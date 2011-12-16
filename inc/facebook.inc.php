@@ -8,7 +8,8 @@ $facebookapi = new Facebook(array (
 ));
 
 // get a session
-$facebookapi->getSession();
+//$facebookapi->getSession();
+$fbuser = $facebookapi->getUser();
 
 // test the user's access token
 function fb_hasValidAccessToken($accessToken = false) {

@@ -61,7 +61,7 @@ class FacebookAuthPages extends FormItem {
 					<div style="clear:both;">'. _L("Connect to a Facebook account to authorize additional Pages.") .'</div>
 					'. icon_button("Connect to Facebook", "custom/facebook", 
 						"try { 
-							FB.login(loadFbPagesFromAuthResponse.curry('$n'), {perms: '$perms'});
+							FB.login(loadFbPagesFromAuthResponse.curry('$n'), {scope: '$perms'});
 						} catch (e) { 
 							alert('". _L("Could not connect to Facebook")."'); 
 						}"). '
@@ -183,11 +183,9 @@ class FacebookAuthPages extends FormItem {
 				// handle updateing information when the user allows or disallows the facebook application
 				function loadFbPagesFromAuthResponse(e, res) {
 					var access_token = "";
-					if (res != null && res.session) {
-						if (res.perms) {
-							// user is logged in and granted some permissions.
-							access_token = res.session.access_token;
-						}
+					console.log(res);
+					if (res != null && res.authResponse) {
+						access_token = res.authResponse.accessToken;
 					}
 					
 					// if we have an access token. display the pages selection
