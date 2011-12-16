@@ -494,7 +494,7 @@ CREATE TABLE `shortcodetext` (
 
 INSERT INTO `smsaggregator` (`name`) VALUES ('air2web') ;
 
-INSERT INTO `shortcodegroup` (`description`, `queuecapacity`, `numthreads`) VALUES ('SchoolMessenger', 100, 2) ;
+INSERT INTO `shortcodegroup` (`description`, `queuecapacity`, `numthreads`) VALUES ('SchoolMessenger', 10000, 1) ;
 
 INSERT INTO `shortcode` (`shortcode` ,`smsaggregatorid` ,`shortcodegroupid`) VALUES
 ('68453', 1, 1),
