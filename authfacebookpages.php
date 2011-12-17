@@ -183,7 +183,6 @@ class FacebookAuthPages extends FormItem {
 				// handle updateing information when the user allows or disallows the facebook application
 				function loadFbPagesFromAuthResponse(e, res) {
 					var access_token = "";
-					console.log(res);
 					if (res != null && res.authResponse) {
 						access_token = res.authResponse.accessToken;
 					}
