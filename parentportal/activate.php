@@ -30,6 +30,17 @@ if(isset($_GET['t'])){
 	$token = $_GET['t'];
 }
 
+$forgot = false;
+if (isset($_GET['f'])) {
+	$forgot = true;
+}
+
+$changeuser = false;
+if (isset($_GET['c'])) {
+	$changeuser = true;
+}
+
+
 if ((strtolower($_SERVER['REQUEST_METHOD']) == 'post') ) {
 
 	$token = get_magic_quotes_gpc() ? stripslashes($_POST['token']) : $_POST['token'];
