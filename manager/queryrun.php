@@ -56,7 +56,7 @@ if (CheckFormSubmit($f,$s)) {
 				header("Pragma: private");
 				header("Cache-Control: private");
 				header("Content-disposition: attachment; filename=report.csv");
-				header("Content-type: application/vnd.ms-excel");
+				header("Content-type: application/vnd.ms-excel; charset=UTF-8");
 			} else {
 				$queryoutput .= '<table class=list width="100%">';
 			}
@@ -96,6 +96,10 @@ if (CheckFormSubmit($f,$s)) {
 					$custdb = mysql_connect($customer[2], $customer[3], $customer[4]);
 				}
 				mysql_select_db("c_$customer[0]", $custdb);
+				
+				//set charset for utf8
+				$setcharset = "SET character_set_results = 'utf8', character_set_client = 'utf8', character_set_connection = 'utf8', character_set_database = 'utf8', character_set_server = 'utf8'";
+				mysql_query($setcharset, $custdb);				
 			
 				$sqlquery = $managerquery->query;
 				

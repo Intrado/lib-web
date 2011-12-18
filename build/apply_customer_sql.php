@@ -60,7 +60,10 @@ foreach($data as $customer){
 				or die("Could not connect to customer: " . mysql_error($custdb));
 	mysql_select_db("c_$customer[0]", $custdb)
 				or die("Could not select customer db: " . mysql_error($custdb));
-
+	
+	$setcharset = "SET character_set_results = 'utf8', character_set_client = 'utf8', character_set_connection = 'utf8', character_set_database = 'utf8', character_set_server = 'utf8'";
+	mysql_query($setcharset, $custdb);				
+	
 	printf("Doing % 5d: ",$customer[0]);
 
 	foreach ($sqlqueries as $sqlquery) {
