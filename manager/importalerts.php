@@ -10,7 +10,7 @@ if (!$MANAGERUSER->authorized("imports"))
 	exit("Not Authorized");
 
 
-$displaysetting = "acknowledged";
+$displaysetting = "unacknowledged";
 
 if (isset($_REQUEST["view"]) && 
 	in_array($_REQUEST["view"],array("acknowledged","unacknowledged","unconfigured"))) {
