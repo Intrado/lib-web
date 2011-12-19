@@ -28,7 +28,7 @@ if (isset($_GET['monitor'])) {
 	<script src="script/utils.js"></script>
 	<script src="script/sorttable.js"></script>
 	<script src="script/form.js.php" type="text/javascript"></script>
-	<link href="../css.php?hash=<?=crc32(serialize($favcid))?>&nocommoninc=1" type="text/css" rel="stylesheet" media="screen, print">
+	<link href="css.php" type="text/css" rel="stylesheet" media="screen, print">
 	<link href="css/form.css.php" type="text/css" rel="stylesheet">
 	<link href="css/datepicker.css.php" type="text/css" rel="stylesheet">
 	<link href="css/prototip.css.php" type="text/css" rel="stylesheet">
