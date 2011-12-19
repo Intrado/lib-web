@@ -286,7 +286,7 @@ $formdata["notes"] = array(
 
 $buttons = array(submit_button(_L('Save'),"submit","tick"),
 				icon_button(_L('Cancel'),"cross",null,($dmType == 'customer'?"customerdms.php":"systemdms.php")));
-$form = new Form("editdm",$formdata,$helpsteps,$buttons);
+$form = new Form("editdm",$formdata,null,$buttons);
 
 ////////////////////////////////////////////////////////////////////////////////
 // Form Data Handling
@@ -419,6 +419,10 @@ document.observe('dom:loaded', function() {
 
 startWindow(_L('DM Settings: %s', escapehtml($dminfo["name"])) . ($dminfo["enablestate"]=="new"?_L(" (New)"):''));
 echo $form->render();
+endWindow();
+
+startWindow(_L("DM Information"));
+echo "<ul><li><a href=\"dmdatfiles.php?dmid=$dmid\">Dat File History</a></li></ul>";
 endWindow();
 include_once("navbottom.inc.php");
 ?>
