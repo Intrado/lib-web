@@ -74,23 +74,24 @@ function fmt_actions($row, $index) {
 		$dmmethod = "customer";
 		
 	global $MANAGERUSER;
-	$actions = "";
+	$actions = '<div class="actionlinks">';
 	if ($MANAGERUSER->authorized("editcustomer"))
-		$actions .= '<a href="customeredit.php?id=' . $row[0] .'" title="Edit"><img src="mimg/s-edit.png" border=0></a>&nbsp;';
-		$actions .= '<a href="customerimages.php?id=' . $row[0] .'" alt="images" title="images"><img src="img/icons/image_edit.png" border=0></a>&nbsp;';
+		$actions .= '<a href="customeredit.php?id=' . $row[0] .'" title="Edit"><img src="mimg/s-edit.png" border=0></a>';
+		$actions .= '<a href="customerimages.php?id=' . $row[0] .'" alt="images" title="images"><img src="img/icons/image_edit.png" border=0></a>';
 	if ($MANAGERUSER->authorized("users"))
-		$actions .= '<a href="userlist.php?customer=' . $row[0] . '" title="Users"><img src="mimg/s-users.png" border=0></a>&nbsp;';
+		$actions .= '<a href="userlist.php?customer=' . $row[0] . '" title="Users"><img src="mimg/s-users.png" border=0></a>';
 	if ($MANAGERUSER->authorized("imports"))
-		$actions .= '<a href="customerimports.php?customer=' . $row[0] . '" title="Imports"><img src="mimg/s-imports.png" border=0></a>&nbsp;';
+		$actions .= '<a href="customerimports.php?customer=' . $row[0] . '" title="Imports"><img src="mimg/s-imports.png" border=0></a>';
 	if ($MANAGERUSER->authorized("activejobs"))
-		$actions .= '<a href="customeractivejobs.php?' . $dmmethod . '&cid=' . $row[0] . '" title="Jobs"><img src="mimg/s-jobs.png" border=0></a>&nbsp;';
+		$actions .= '<a href="customeractivejobs.php?' . $dmmethod . '&cid=' . $row[0] . '" title="Jobs"><img src="mimg/s-jobs.png" border=0></a>';
 	if ($MANAGERUSER->authorized("editpriorities"))
-		$actions .= '<a href="customerpriorities.php?id=' . $row[0] . '" title="Priorities"><img src="mimg/s-priorities.png" border=0></a>&nbsp;';
+		$actions .= '<a href="customerpriorities.php?id=' . $row[0] . '" title="Priorities"><img src="mimg/s-priorities.png" border=0></a>';
 	if($row[11] != "asp" && $MANAGERUSER->authorized("editdm"))
-		$actions .= '<a href="customerdms.php?cid=' . $row[0] . '" title="DMs"><img src="mimg/s-rdms.png" border=0></a>&nbsp;';
+		$actions .= '<a href="customerdms.php?cid=' . $row[0] . '" title="DMs"><img src="mimg/s-rdms.png" border=0></a>';
 	if ($MANAGERUSER->authorizedAny(array("ffield2gfield","billablecalls","edittemplate","runqueries")))
-		$actions .= '<a href="advancedcustomeractions.php?cid=' . $row[0] . '" title="Advanced Actions"><img src="mimg/s-config.png" border=0></a>&nbsp;';
+		$actions .= '<a href="advancedcustomeractions.php?cid=' . $row[0] . '" title="Advanced Actions"><img src="mimg/s-config.png" border=0></a>';
 
+	$actions .= '</div>';
 	return $actions;
 }
 
