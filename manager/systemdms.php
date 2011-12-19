@@ -32,28 +32,25 @@ if (isset($_GET['resetDM'])) {
 
 $queryextra = "";
 $viewoptions = 'enabled';
-if(isset($_REQUEST['view'])) {
+if(isset($_REQUEST['view']))
 	$viewoptions = $_REQUEST['view'];
-	switch($viewoptions) {
-		case "enabled":
-			$queryextra .= " and (s_dm_enabled.value = '1' or s_dm_enabled.value is null) ";
-			break;
-		case "disabled":
-			$queryextra .= " and s_dm_enabled.value = '0' and dm.enablestate != 'deleted'";
-			break;
-		case "deleted":
-			$queryextra .= " and dm.enablestate = 'deleted'";
-			break;
-		case "all":
-		default:
-			$queryextra .= " and dm.enablestate != 'deleted'";
-			$viewoptions = 'all';
-			break;
-	}
-} else {
-	$queryextra .= " and dm.enablestate != 'deleted'";
-}
 
+switch($viewoptions) {
+	case "enabled":
+		$queryextra .= " and (s_dm_enabled.value = '1' or s_dm_enabled.value is null) ";
+		break;
+	case "disabled":
+		$queryextra .= " and s_dm_enabled.value = '0' and dm.enablestate != 'deleted'";
+		break;
+	case "deleted":
+		$queryextra .= " and dm.enablestate = 'deleted'";
+		break;
+	case "all":
+	default:
+		$queryextra .= " and dm.enablestate != 'deleted'";
+		$viewoptions = 'all';
+		break;
+}
 
 // index 0 is dmid
 function fmt_DMActions($row, $index){

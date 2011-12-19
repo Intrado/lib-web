@@ -57,26 +57,24 @@ if (isset($_REQUEST['custtxt']) && trim($_REQUEST['custtxt'])) {
 	$custtxt = escapehtml(trim($_REQUEST['custtxt']));
 	$queryextra = " and c.urlcomponent like '%" . DBSafe(trim($_REQUEST['custtxt'])) . "%'";
 }
-if(isset($_REQUEST['view'])) {
+if(isset($_REQUEST['view']))
 	$viewoption = $_REQUEST['view'];
-	switch($viewoption) {
-		case "enabled":
-			$queryextra .= " and (s_dm_enabled.value = '1' or s_dm_enabled.value is null) ";
-			break;
-		case "disabled":
-			$queryextra .= " and s_dm_enabled.value = '0' and dm.enablestate != 'deleted'";
-			break;
-		case "deleted":
-			$queryextra .= " and dm.enablestate = 'deleted'";
-			break;
-		case "all":
-		default:
-			$queryextra .= " and dm.enablestate != 'deleted'";
-			$viewoption = 'all';
-			break;
-	}
-} else {
-	$queryextra .= " and dm.enablestate != 'deleted'";
+
+switch($viewoption) {
+	case "enabled":
+		$queryextra .= " and (s_dm_enabled.value = '1' or s_dm_enabled.value is null) ";
+		break;
+	case "disabled":
+		$queryextra .= " and s_dm_enabled.value = '0' and dm.enablestate != 'deleted'";
+		break;
+	case "deleted":
+		$queryextra .= " and dm.enablestate = 'deleted'";
+		break;
+	case "all":
+	default:
+		$queryextra .= " and dm.enablestate != 'deleted'";
+		$viewoption = 'all';
+		break;
 }
 
 //index 2 is customer id
