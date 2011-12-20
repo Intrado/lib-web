@@ -65,7 +65,7 @@ function displayRules($rules){
 
 function prepareRuleVal($type, $op, $values) {
 	if ($op == "num_range" && is_array($values) && count($values) == 2) { //if its a range, we need to get the other value too
-		return (preg_replace("/[^0-9\.-]*/","",$values[0]) + 0.0) . "|" . (preg_replace("[^0-9\.-]*","",$values[1]) + 0.0);
+		return (preg_replace("/[^0-9\.-]*/","",$values[0]) + 0.0) . "|" . (preg_replace("/[^0-9\.-]*/","",$values[1]) + 0.0);
 	} else if ($op == "date_range" && is_array($values) && count($values) == 2) { //if its a range, we need to get the other value too
 		$t1 = strtotime($values[0] == "" ? "today" : $values[0]);
 		$t2 = strtotime($values[1] == "" ? "today" : $values[1]);
