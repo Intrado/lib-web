@@ -37,3 +37,9 @@ $$$
 
 ALTER TABLE `surveyresponse` CHANGE `questionnumber` `questionnumber` INT NOT NULL 
 $$$
+
+-- $rev 4
+
+-- data is always base64, only need ascii. update to longtext for files > 16m
+ALTER TABLE `content` CHANGE `data` `data` LONGTEXT CHARACTER SET ascii COLLATE ascii_bin NOT NULL 
+$$$

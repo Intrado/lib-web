@@ -108,7 +108,7 @@ $$$
 CREATE TABLE `content` (
   `id` bigint(20) NOT NULL auto_increment,
   `contenttype` varchar(255) NOT NULL default '',
-  `data` mediumtext NOT NULL,
+  `data` LONGTEXT CHARACTER SET ascii COLLATE ascii_bin NOT NULL , -- 8.2/4  data is always base64, only need ascii. update to longtext for files > 16m
   PRIMARY KEY  (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 
 $$$
@@ -1766,3 +1766,10 @@ $$$
 update setting set value='8.2/3' where name='_dbversion'
 $$$
 -- END 8.2/3
+
+
+-- START 8.2/4
+-- change made inline, see content table
+update setting set value='8.2/4' where name='_dbversion'
+-- END 8.2/4
+
