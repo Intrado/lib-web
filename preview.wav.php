@@ -81,7 +81,7 @@ if (isset($_GET['usetext']) && isset($_SESSION['ttstext']) && isset($_SESSION['t
 	//session_write_close();//WARNING: we don't keep a lock on the session file, any changes to session data are ignored past this point
 	$message = new Message($_GET['id'] + 0);
 		
-	if (userCanSee("message",$message->id)) {
+	if (userCanSee("message",$message->id) || $USER->authorize('managesystem')) {
 		$fields=array();
 		$languagefield = FieldMap::getLanguageField();
 		for($i=1; $i <= 20; $i++){
