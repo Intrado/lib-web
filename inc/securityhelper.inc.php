@@ -54,6 +54,11 @@ function userOwns ($type,$id) {
 // TODO: add more useful methods beyond just message and messagegroup
 function userCanSee ($type,$id) {
 	global $USER;
+	
+	//basically a superset of userOwns functionality
+	if (userOwns($type,id))
+		return true;
+	
 	switch($type) {
 		case "message":
 			// vieable if:
