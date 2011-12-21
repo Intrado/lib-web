@@ -95,11 +95,12 @@ function handleRequest() {
 			$sqlargs = array($userid, $_GET['messagetype']);
 			$extrasql = '';
 			if(isset($_GET['languagecode'])) {
-				$extrasql = "and languagecode = ?";
+				$extrasql = "and m.languagecode = ?";
 				$sqlargs[] = $_GET['languagecode'];
 			}
-
-			return QuickQueryList("select id,name from message where deleted = 0 and autotranslate not in ('source','translated') and userid=? and type=? $extrasql order by id", true, false,$sqlargs);
+			
+			$query = "select m.id,mg.name from message m inner join messagegroup mg on (m.messagegroupid = mg.id) where mg.deleted = 0 and m.autotranslate not in ('source','translated') and mg.userid=? and m.type=? $extrasql order by id";
+			return QuickQueryList($query, true, false,$sqlargs);
 
 		//--------------------------- RPC -------------------------------
 		case 'messagegroupsummary':
