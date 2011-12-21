@@ -56,7 +56,7 @@ function userCanSee ($type,$id) {
 	global $USER;
 	
 	//basically a superset of userOwns functionality
-	if (userOwns($type,id))
+	if (userOwns($type,$id))
 		return true;
 	
 	switch($type) {
