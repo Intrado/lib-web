@@ -125,8 +125,9 @@ class FieldMap extends DBMappedObject {
 		global $USER;
 	
 		$fieldmaps = FieldMap::retrieveFieldMaps();
+		$alwaysauthorized = array("f01","f02","f03");
 		foreach($fieldmaps as $fieldnum => $fieldmap)
-			if (!$USER->authorizeField($fieldnum) || $fieldnum[0] !== $firstletter)
+			if ($fieldnum[0] !== $firstletter || (!in_array($fieldnum,$alwaysauthorized) && !$USER->authorizeField($fieldnum)))
 				unset($fieldmaps[$fieldnum]);
 		return $fieldmaps;
 	}
