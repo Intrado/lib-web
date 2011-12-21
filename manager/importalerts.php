@@ -75,6 +75,7 @@ $titles = array(
 		"importname" => "Import",
 		"alert" => "Alert",
 		"alerttime" => "#Alert Time",
+		"timezone" => "Timezone",
 		"notified" => "#Notified Time",
 		"notes" => "Alert Notes",
 		"actions" => "Actions"
@@ -89,6 +90,7 @@ $formatters = array(
 	"checkmark" => "fmt_check",
 	"urlcomponent" => "fmt_custurl",
 	"alert" => "fmt_alert",
+	"timezone" => "fmt_timezone",
 	"actions" => "fmt_actions");
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -112,6 +114,11 @@ function fmt_custurl($row, $index){
 function fmt_alert($row, $index){
 	return formatAlert($row["name"],$row["operation"],$row["testvalue"],$row["actualvalue"]);
 }
+
+function fmt_timezone($row, $index){
+	return "Customer Timezone";
+}
+
 function fmt_actions($row, $index){
 	$str = "";
 	$actions = array();
