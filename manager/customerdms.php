@@ -28,13 +28,12 @@ if(isset($_GET['clear'])){
 	notice(_L("Update queued"));
 	redirect();
 } else if (isset($_GET['delete'])) {
-	$enablestate = QuickQuery("select enablestate from dm where id=?",false,array($_GET['delete']));
-	if ($enablestate != "disabled") {
-		notice(_L("Unable to delete dm"));
-		redirect();
-	}
 	QuickUpdate("update dm set enablestate='deleted' where id=?",false,array($_GET['delete']));
 	notice(_L("Deleted DM"));
+	redirect();
+} else if (isset($_GET['undelete'])) {
+	QuickUpdate("update dm set enablestate='disabled' where id=?",false,array($_GET['undelete']));
+	notice(_L("Undeleted DM"));
 	redirect();
 }
 
@@ -57,25 +56,32 @@ if (isset($_REQUEST['custtxt']) && trim($_REQUEST['custtxt'])) {
 	$custtxt = escapehtml(trim($_REQUEST['custtxt']));
 	$queryextra = " and c.urlcomponent like '%" . DBSafe(trim($_REQUEST['custtxt'])) . "%'";
 }
-if(isset($_REQUEST['view']))
-	$viewoption = $_REQUEST['view'];
 
-switch($viewoption) {
-	case "enabled":
-		$queryextra .= " and (s_dm_enabled.value = '1' or s_dm_enabled.value is null) ";
-		break;
-	case "disabled":
-		$queryextra .= " and s_dm_enabled.value = '0' and dm.enablestate != 'deleted'";
-		break;
-	case "deleted":
-		$queryextra .= " and dm.enablestate = 'deleted'";
-		break;
-	case "all":
-	default:
-		$queryextra .= " and dm.enablestate != 'deleted'";
-		$viewoption = 'all';
-		break;
-}
+$viewoptions =  array(
+	"enablestate" => "active",
+	"enabled" => "true"
+);
+
+if(isset($_REQUEST['enablestate']))
+	$viewoptions["enablestate"] = $_REQUEST['enablestate'];
+
+if(isset($_REQUEST['enabled']))
+	$viewoptions["enabled"] = $_REQUEST['enabled'];
+
+
+$enablestates = array("all","new","active","disabled","deleted");
+if (!in_array($viewoptions["enablestate"],$enablestates))
+	$viewoptions["enablestate"] = 'active';
+
+$queryextra = "";
+if ($viewoptions["enablestate"] != "all")
+	$queryextra .= " and dm.enablestate = '{$viewoptions["enablestate"]}' ";
+
+if ($viewoptions["enabled"] == "false")
+	$queryextra .= " and s_dm_enabled.value = '0' ";
+else if ($viewoptions["enabled"] == "true")
+	$queryextra .= " and (s_dm_enabled.value = '1' or s_dm_enabled.value is null) ";
+
 
 //index 2 is customer id
 //index 1 is customer url
@@ -95,10 +101,11 @@ function fmt_DMActions($row, $index){
 	$actions[] = action_link("Reset", "fugue/burn","customerdms.php?resetDM=" . $dmid, "return confirm('Are you sure you want to reset DM " . addslashes($row[3]) . "?');");
 	$actions[] = action_link("Update", "application_go","customerdms.php?update=" . $dmid, "return confirm('Are you sure you want to update DM " . addslashes($row[3]) . "?');");
 	$actions[] = action_link("Upload", "folder","dmupload.php?dmid=" . $dmid);
-	if ($row[6] == "disabled") {
+	if ($row[6] != "deleted") {
 		$actions[] = action_link("Delete", "cross","customerdms.php?delete=" . $dmid,"return confirm('Are you sure you want to delete DM " . addslashes($row[3]) . "?');");
+	} else {
+		$actions[] = action_link("Undelete", "arrow_left","customerdms.php?undelete=" . $dmid,"return confirm('Are you sure you want to undelete DM " . addslashes($row[3]) . "?');");
 	}
-	
 	return action_links($actions);
 }
 
@@ -318,11 +325,17 @@ include_once("nav.inc.php");
 	Displaying: 
 	</td>
 	<td>
-	<select name="view" id='view' onchange="blankFieldSubmit();this.form.submit();">
-		<option value='all' <?=($viewoption=='all')?"selected":""?>>Show All</option>
-		<option value='enabled' <?=($viewoption=='enabled')?"selected":""?>>Enabled</option>
-		<option value='disabled' <?=($viewoption=='disabled')?"selected":""?>>Disabled</option>
-		<option value='deleted' <?=($viewoption=='deleted')?"selected":""?>>Deleted</option>
+	<select name="enablestate" id='enablestate' onchange="blankFieldSubmit();this.form.submit();">
+		<option value='all' <?=($viewoptions["enablestate"]=='all')?"selected":""?>>Show All</option>
+		<option value='new' <?=($viewoptions["enablestate"]=='new')?"selected":""?>>New</option>
+		<option value='active' <?=($viewoptions["enablestate"]=='active')?"selected":""?>>Active</option>
+		<option value='disabled' <?=($viewoptions["enablestate"]=='disabled')?"selected":""?>>Disabled</option>
+		<option value='deleted' <?=($viewoptions["enablestate"]=='deleted')?"selected":""?>>Deleted</option>
+	</select>
+	<select name="enabled" id='enabled' onchange="blankFieldSubmit();this.form.submit();">
+		<option value='all' <?=($viewoptions["enabled"]== "all")?"selected":""?>>All</option>
+		<option value='true' <?=($viewoptions["enabled"]=="true")?"selected":""?>>Enabled</option>
+		<option value='false' <?=($viewoptions["enabled"]=="false")?"selected":""?>>Disabled</option>
 	</select>
 	</td>
 	<td>

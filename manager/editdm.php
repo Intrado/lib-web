@@ -123,7 +123,7 @@ $formdata["enabled"] = array(
 	"helpstep" => $helpstepnum
 );
 
-$enablestates = array("new" => "New", "active" => "Authorized","disabled" => "Unathorized");
+$enablestates = array("new" => "New", "active" => "Authorized","disabled" => "Unathorized","deleted" => "Deleted");
 if ($dminfo["enablestate"] != "new")
 	unset($enablestates["new"]);
 

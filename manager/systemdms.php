@@ -19,38 +19,43 @@ if (isset($_GET['resetDM'])) {
 	notice(_L("Reset queued"));
 	redirect();
 } else if (isset($_GET['delete'])) {
-	$enablestate = QuickQuery("select enablestate from dm where id=?",false,array($_GET['delete']));
-	if ($enablestate != "disabled") {
-		notice(_L("Unable to delete dm"));
-		redirect();
-	}
 	QuickUpdate("update dm set enablestate='deleted' where id=?",false,array($_GET['delete']));
 	notice(_L("Deleted DM"));
+	redirect();
+} else if (isset($_GET['undelete'])) {
+	QuickUpdate("update dm set enablestate='disabled' where id=?",false,array($_GET['undelete']));
+	notice(_L("Undeleted DM"));
 	redirect();
 }
 
 
-$queryextra = "";
-$viewoptions = 'enabled';
-if(isset($_REQUEST['view']))
-	$viewoptions = $_REQUEST['view'];
 
-switch($viewoptions) {
-	case "enabled":
-		$queryextra .= " and (s_dm_enabled.value = '1' or s_dm_enabled.value is null) ";
-		break;
-	case "disabled":
-		$queryextra .= " and s_dm_enabled.value = '0' and dm.enablestate != 'deleted'";
-		break;
-	case "deleted":
-		$queryextra .= " and dm.enablestate = 'deleted'";
-		break;
-	case "all":
-	default:
-		$queryextra .= " and dm.enablestate != 'deleted'";
-		$viewoptions = 'all';
-		break;
-}
+$viewoptions =  array(
+	"enablestate" => "active",
+	"enabled" => "true"
+);
+
+
+if(isset($_REQUEST['enablestate']))
+	$viewoptions["enablestate"] = $_REQUEST['enablestate'];
+
+if(isset($_REQUEST['enabled']))
+	$viewoptions["enabled"] = $_REQUEST['enabled']=="true";
+
+
+$enablestates = array("all","new","active","disabled","deleted");
+if (!in_array($viewoptions["enablestate"],$enablestates))
+	$viewoptions["enablestate"] = 'active';
+
+$queryextra = "";
+if ($viewoptions["enablestate"] != "all")
+	$queryextra .= " and dm.enablestate = '{$viewoptions["enablestate"]}' ";
+
+if ($viewoptions["enabled"] == "false")
+	$queryextra .= " and s_dm_enabled.value = '0' ";
+else if ($viewoptions["enabled"] == "true")
+	$queryextra .= " and (s_dm_enabled.value = '1' or s_dm_enabled.value is null) ";
+
 
 // index 0 is dmid
 function fmt_DMActions($row, $index){
@@ -59,8 +64,10 @@ function fmt_DMActions($row, $index){
 	$actions[] = action_link("Edit", "pencil","editdm.php?dmid=" . $dmid);
 	$actions[] = action_link("Status", "fugue/globe","dmstatus.php?dmid=" . $dmid);
 	$actions[] = action_link("Reset", "fugue/burn","systemdms.php?resetDM=" . $dmid, "return confirm('Are you sure you want to reset DM " . addslashes($row[3]) . "?');");
-	if ($row[4] == "disabled") {
+	if ($row[4] != "deleted") {
 		$actions[] = action_link("Delete", "cross","systemdms.php?delete=" . $dmid,"return confirm('Are you sure you want to delete DM " . addslashes($row[3]) . "?');");
+	} else {
+		$actions[] = action_link("Undelete", "arrow_left","systemdms.php?undelete=" . $dmid,"return confirm('Are you sure you want to undelete DM " . addslashes($row[3]) . "?');");
 	}
 	return action_links($actions);
 }
@@ -269,11 +276,17 @@ include_once("nav.inc.php");
 	Displaying: 
 	</td>
 	<td>
-	<select name="view" id='view' onchange="this.form.submit();">
-		<option value='all' <?=($viewoptions=='all')?"selected":""?>>Show All</option>
-		<option value='enabled' <?=($viewoptions=='enabled')?"selected":""?>>Enabled</option>
-		<option value='disabled' <?=($viewoptions=='disabled')?"selected":""?>>Disabled</option>
-		<option value='deleted' <?=($viewoptions=='deleted')?"selected":""?>>Deleted</option>
+	<select name="enablestate" id='enablestate' onchange="this.form.submit();">
+		<option value='all' <?=($viewoptions["enablestate"]=='all')?"selected":""?>>Show All</option>
+		<option value='new' <?=($viewoptions["enablestate"]=='new')?"selected":""?>>New</option>
+		<option value='active' <?=($viewoptions["enablestate"]=='active')?"selected":""?>>Active</option>
+		<option value='disabled' <?=($viewoptions["enablestate"]=='disabled')?"selected":""?>>Disabled</option>
+		<option value='deleted' <?=($viewoptions["enablestate"]=='deleted')?"selected":""?>>Deleted</option>
+	</select>
+	<select name="enabled" id='enabled' onchange="this.form.submit();">
+		<option value='all' <?=($viewoptions["enabled"]== "all")?"selected":""?>>All</option>
+		<option value='true' <?=($viewoptions["enabled"]=="true")?"selected":""?>>Enabled</option>
+		<option value='false' <?=($viewoptions["enabled"]=="false")?"selected":""?>>Disabled</option>
 	</select>
 </tr>
 </table>
