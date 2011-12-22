@@ -73,7 +73,6 @@ $enablestates = array("all","new","active","disabled","deleted");
 if (!in_array($viewoptions["enablestate"],$enablestates))
 	$viewoptions["enablestate"] = 'active';
 
-$queryextra = "";
 if ($viewoptions["enablestate"] != "all")
 	$queryextra .= " and dm.enablestate = '{$viewoptions["enablestate"]}' ";
 
