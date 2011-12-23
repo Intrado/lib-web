@@ -352,6 +352,14 @@ _L('Messaging Options'),
 		"control" => array("CheckBox"),
 		"helpstep" => 4
 	),
+	"feedpost" => array(
+		"label" => _L('Post to Feed'),
+		"fieldhelp" => _L('Allow users to post messages to feed categories they have rights for'),
+		"value" => $obj->getValue("feedpost"),
+		"validators" => array(),
+		"control" => array("CheckBox"),
+		"helpstep" => 4
+	),
 _L('Advanced Job Options'),
 	"createrepeat" => array(
 		"label" => _L('Create Repeating Jobs'),
@@ -653,6 +661,9 @@ if (!getSystemSetting('_hasfacebook', false))
 if (!getSystemSetting('_hastwitter', false))
 	unset($formdata['twitterpost']);
 
+if (!getSystemSetting('_hasfeed', false))
+	unset($formdata['feedpost']);
+
 $helpsteps = array (
 	_L('Enter a name and optional description for this Access Profile.'),
 	_L('Choose how you want users with this profile to be able to access the system. Then select whether they should be able to edit their own account information or not.'),
@@ -752,8 +763,9 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 			$obj->setPermission("messageconfirmation", (bool)$postdata['messageconfirmation']);
 			$obj->setPermission("facebookpost", (bool)(isset($postdata['facebookpost'])?$postdata['facebookpost']:false));
 			$obj->setPermission("twitterpost", (bool)(isset($postdata['twitterpost'])?$postdata['twitterpost']:false));
-
-			if(getSystemSetting("_hasportal", false)) {
+			$obj->setPermission("feedpost", (bool)(isset($postdata['feedpost'])?$postdata['feedpost']:false));
+				
+			if (getSystemSetting("_hasportal", false)) {
 				$obj->setPermission("portalaccess", (bool)$postdata['portalaccess']);
 				$obj->setPermission("generatebulktokens", (bool)$postdata['generatebulktokens']);
 			}
