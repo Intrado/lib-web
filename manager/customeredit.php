@@ -440,6 +440,7 @@ $settings = array(
 					'_hasportal' => '',
 					'_hasfacebook' => '0',
 					'_hastwitter' => '0',
+					'_hasfeed' => '0',
 					'autoreport_replyname' => 'SchoolMessenger',
 					'autoreport_replyemail' => 'autoreport@schoolmessenger.com',
 					'_renewaldate' => '',
@@ -957,6 +958,13 @@ $formdata["hastwitter"] = array(
 						"control" => array("CheckBox"),
 						"helpstep" => $helpstepnum
 );
+$formdata["hasfeed"] = array(
+						"label" => _L('Has Feed'),
+						"value" => $settings['_hasfeed'],
+						"validators" => array(),
+						"control" => array("CheckBox"),
+						"helpstep" => $helpstepnum
+);
 
 $formdata[] = _L("Misc. Settings");
 $formdata["nsid"] = array(
@@ -1379,7 +1387,8 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		setCustomerSystemSetting('_hastargetedmessage', $postdata["hasclassroom"]?'1':'0', $custdb);
 		setCustomerSystemSetting('_hasfacebook', $postdata["hasfacebook"]?'1':'0', $custdb);
 		setCustomerSystemSetting('_hastwitter', $postdata["hastwitter"]?'1':'0', $custdb);
-
+		setCustomerSystemSetting('_hasfeed', $postdata["hasfeed"]?'1':'0', $custdb);
+		
 	
 		setCustomerSystemSetting('_renewaldate', ($postdata['renewaldate']!=""?date("Y-m-d", strtotime($postdata['renewaldate'])):""), $custdb);
 		setCustomerSystemSetting('_callspurchased', $postdata['callspurchased'], $custdb);
