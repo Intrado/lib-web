@@ -50,10 +50,10 @@ $$$
 ${body}<br><br><hr/>
 
 <p style="font-family:verdana; color:#6B6B6B; font-size:75%">
-				${displayname} le gustar&iacute;a continuar comunic&aacute;ndose con usted por medio de correo electr&oacute;nico.  Si usted prefiere ser borrado de nuestra lista, por favor contacte ${displayname} directamente.  Para dejar de recibir todos los mensajes de correo electr&oacute;nico distribuidos por nuestro servicio de ${productname}, siga este enlace: <a href= "${unsubscribelink}">Unsubscribe</a>
+				${displayname} le gustaría continuar comunicándose con usted por medio de correo electrónico.  Si usted prefiere ser borrado de nuestra lista, por favor contacte ${displayname} directamente.  Para dejar de recibir todos los mensajes de correo electrónico distribuidos por nuestro servicio de ${productname}, siga este enlace: <a href= "${unsubscribelink}">Unsubscribe</a>
 				</p>
 				<p style="font-family:verdana; color:#6B6B6B; font-size:75%">
-				${productname} es un servicio de notificaci&oacute;n usado por los sistemas escolares m&aacute;s importantes de la naci&oacute;n para comunicarse con padres, estudiantes, y personal por medio de voz, texto, correo electr&oacute;nico y medios de comunicaci&oacute;n social.
+				${productname} es un servicio de notificación usado por los sistemas escolares más importantes de la nación para comunicarse con padres, estudiantes, y personal por medio de voz, texto, correo electrónico y medios de comunicación social.
 				</p>
 
 $$$
@@ -90,10 +90,10 @@ $$$
 ${body}<br><br><hr/>
 
 <p style="font-family:verdana; color:#6B6B6B; font-size:75%">
-				${displayname} le gustar&iacute;a continuar comunic&aacute;ndose con usted por medio de correo electr&oacute;nico.  Si usted prefiere ser borrado de nuestra lista, por favor contacte ${displayname} directamente.  Para dejar de recibir todos los mensajes de correo electr&oacute;nico distribuidos por nuestro servicio de ${productname}, siga este enlace: <a href= "${unsubscribelink}">Unsubscribe</a>
+				${displayname} le gustaría continuar comunicándose con usted por medio de correo electrónico.  Si usted prefiere ser borrado de nuestra lista, por favor contacte ${displayname} directamente.  Para dejar de recibir todos los mensajes de correo electrónico distribuidos por nuestro servicio de ${productname}, siga este enlace: <a href= "${unsubscribelink}">Unsubscribe</a>
 				</p>
 				<p style="font-family:verdana; color:#6B6B6B; font-size:75%">
-				${productname} es un servicio de notificaci&oacute;n usado por los sistemas escolares m&aacute;s importantes de la naci&oacute;n para comunicarse con padres, estudiantes, y personal por medio de voz, texto, correo electr&oacute;nico y medios de comunicaci&oacute;n social.
+				${productname} es un servicio de notificación usado por los sistemas escolares más importantes de la nación para comunicarse con padres, estudiantes, y personal por medio de voz, texto, correo electrónico y medios de comunicación social.
 				</p>
 
 $$$
@@ -204,9 +204,9 @@ $$$
 		<tr>
 			<td valign="top" align="left" >
 				<p>
-				Usted esta recibiendo este mensaje porque su informaci&oacute;n de contacto esta asociada con <b>${f01} ${f02}</b>.
+				Usted esta recibiendo este mensaje porque su información de contacto esta asociada con <b>${f01} ${f02}</b>.
 				</p><p>
-				Un nuevo mensaje ${displayname} de le fue enviado usando el ${productname} serv&iacute;cio de notificaci&oacute;n.
+				Un nuevo mensaje ${displayname} de le fue enviado usando el ${productname} servício de notificación.
 				</p><p>
 				Escuche este mensaje navegando al siguiente enlace:
 				</p><p style="text-align: center;">
@@ -229,10 +229,10 @@ $$$
 			<td valign="top" align="left" style="padding:5px; background-color:#FFFFFF;">
 
 				<p style="font-family:verdana; color:#6B6B6B; font-size:75%">
-				${displayname} le gustar&iacute;a continuar comunic&aacute;ndose con usted por medio de correo electr&oacute;nico.  Si usted prefiere ser borrado de nuestra lista, por favor contacte ${displayname} directamente.  Para dejar de recibir todos los mensajes de correo electr&oacute;nico distribuidos por nuestro servicio de ${productname}, siga este enlace: <a href= "${unsubscribelink}">Unsubscribe</a>
+				${displayname} le gustaría continuar comunicándose con usted por medio de correo electrónico.  Si usted prefiere ser borrado de nuestra lista, por favor contacte ${displayname} directamente.  Para dejar de recibir todos los mensajes de correo electrónico distribuidos por nuestro servicio de ${productname}, siga este enlace: <a href= "${unsubscribelink}">Unsubscribe</a>
 				</p>
 				<p style="font-family:verdana; color:#6B6B6B; font-size:75%">
-				${productname} es un servicio de notificaci&oacute;n usado por los sistemas escolares m&aacute;s importantes de la naci&oacute;n para comunicarse con padres, estudiantes, y personal por medio de voz, texto, correo electr&oacute;nico y medios de comunicaci&oacute;n social.
+				${productname} es un servicio de notificación usado por los sistemas escolares más importantes de la nación para comunicarse con padres, estudiantes, y personal por medio de voz, texto, correo electrónico y medios de comunicación social.
 				</p>
 			</td>
 		</tr>
@@ -345,7 +345,7 @@ $$$
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 	<title>
-		Recordatorio: ${displayname} ${productname} Advertencia Cancelaci&oacute;n de cuenta
+		Recordatorio: ${displayname} ${productname} Advertencia Cancelación de cuenta
 	</title>
 	<meta http-equiv="content-type"
 		content="text/html;charset=utf-8" />
@@ -361,15 +361,15 @@ $$$
 		<tr>
 			<td valign="top" align="left"">
 				<p>
-				La cuenta de ${productname} que usted cre&oacute; para administrar sus preferencias de contacto para ${displayname} no ha sido ingresada recientemente.  Su cuenta sera inabilitada automaticamente en ${daystotermination} si usted no ingresa.
+				La cuenta de ${productname} que usted creó para administrar sus preferencias de contacto para ${displayname} no ha sido ingresada recientemente.  Su cuenta sera inabilitada automaticamente en ${daystotermination} si usted no ingresa.
 				</p><p>
 				Para mantener su cuenta activa por favor entre a su cuenta.
 				</p><p>
-				Haga clic en el enlace para entrar, o simplemente escriba la direcci&oacute;n abajo en su navegador.
+				Haga clic en el enlace para entrar, o simplemente escriba la dirección abajo en su navegador.
 				</p><p>
 				<a href=${loginurl}>${loginurl}</a>
 				<p>
-				Este es un mensaje generado autom&aacute;ticamente. Por favor, <b>NO</b> responde.
+				Este es un mensaje generado automáticamente. Por favor, <b>NO</b> responde.
 				</p>
 				</p><p>
 				Gracias,<br />
@@ -385,10 +385,10 @@ $$$
 			<td valign="top" align="left" style="padding:5px; background-color:#FFFFFF;">
 
 				<p style="font-family:verdana; color:#6B6B6B; font-size:75%">
-					${displayname} le gustar&iacute;a continuar comunic&aacute;ndose con usted por medio de ${productname}. Si usted prefiere no recibir mensajes, por favor entre al sitio y cierre su cuenta.
+					${displayname} le gustaría continuar comunicándose con usted por medio de ${productname}. Si usted prefiere no recibir mensajes, por favor entre al sitio y cierre su cuenta.
 					</p>
 					<p style="font-family:verdana; color:#6B6B6B; font-size:75%">
-					${productname} es un servicio de notificaci&oacute;n usado por los sistemas escolares m&aacute;s importantes de la naci&oacute;n para comunicarse con padres, estudiantes, y personal por medio de voz, texto, correo electr&oacute;nico y medios de comunicaci&oacute;n social.
+					${productname} es un servicio de notificación usado por los sistemas escolares más importantes de la nación para comunicarse con padres, estudiantes, y personal por medio de voz, texto, correo electrónico y medios de comunicación social.
 				</p>
 			</td>
 		</tr>

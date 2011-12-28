@@ -97,7 +97,7 @@ function createDefaultTemplates_7_8($useSmsMessagelinkInboundnumber = false) {
 					"&fromemail=" . urlencode("contactme@schoolmessenger.com");
 			QuickUpdate("update message set data = ? where messagegroupid = ? and type = 'email' and languagecode = 'en'", null, array($data, $messagegroupid));
 			// set spanish headers
-			$data = "subject=" . urlencode("\${displayname} \${productname} Advertencia Cancelaci&oacute;n de cuenta") . 
+			$data = "subject=" . urlencode("\${displayname} \${productname} Advertencia Cancelación de cuenta") . 
 					"&fromname=" . urlencode("\${productname}") . 
 					"&fromemail=" . urlencode("contactme@schoolmessenger.com");
 			QuickUpdate("update message set data = ? where messagegroupid = ? and type = 'email' and languagecode = 'es'", null, array($data, $messagegroupid));
