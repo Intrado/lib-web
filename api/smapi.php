@@ -490,22 +490,21 @@ class SMAPI {
 				//error_log("output " . $res1[0]);
 			}
 			
-			$content = null;
+			$contentid = false;
 			if ($res2 || !file_exists($cleanedtempfile)) {
 				$result["resultdescription"]= "There was an error reading your audio file. Please try another file, or ensure the mimetype is correct. Supported mimetypes include: 'audio/wav' for .wav, 'audio/mpeg' for .mp3, and 'audio/x-caf' for .caf files.";
 				unlink($origtempfile);
 				unlink($cleanedtempfile);
 				return $result;
 			} else {
-				$content = new Content();
-				$content->contenttype = "audio/wav"; // even if they upload .mp3 or .caf we store it as .wav
-				$content->data = base64_encode(file_get_contents($cleanedtempfile));
-				$content->create();
+				
+				// even if they upload .mp3 or .caf we store it as .wav
+				$contentid = contentPut($cleanedtempfile, "audio/wav");
 
 				unlink($origtempfile);
 				unlink($cleanedtempfile);
 			}
-			if($content == null || !$content->id){
+			if (!$contentid) {
 
 				$result["resultdescription"] = "Failed to create audio file record";
 				return $result;
@@ -518,7 +517,7 @@ class SMAPI {
 			}
 			$audiofile->description = "Upload Audio API";
 			$audiofile->recorddate = date("Y-m-d G:i:s");
-			$audiofile->contentid = $content->id;
+			$audiofile->contentid = $contentid;
 			$audiofile->userid = $USER->id;
 			$audiofile->create();
 
@@ -2406,6 +2405,7 @@ require_once("../inc/DBRelationMap.php");
 require_once("../inc/sessionhandler.inc.php");
 
 require_once("../inc/utils.inc.php");
+require_once('../inc/content.inc.php');
 require_once("../obj/User.obj.php");
 require_once("../obj/Access.obj.php");
 require_once("../obj/Permission.obj.php");
