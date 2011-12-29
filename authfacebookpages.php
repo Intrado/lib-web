@@ -240,28 +240,31 @@ class FacebookAuthPages extends FormItem {
 						containerbody = new Element("tbody");
 						$(container).insert(containerbody);
 					}
-					containerbody.insert(
-						new Element("tr", { id: e + accountid }).insert(
-							new Element("td").insert(
-								new Element("img", { src: "img/ajax-loader.gif" })))
-						);
+					// set up the table elements for the fb page data
+					var accountelement = new Element("tr", { id: e + accountid }).insert(
+							new Element("td", { "id": e + "pagepic" + accountid, "class": "fbimg" }).insert(
+								new Element("img", { src: "img/ajax-loader.gif" }))
+						).insert(
+							new Element("td", { "id": e + "pagedetail" + accountid, "class": cssclass }).insert(
+								"Loading...")
+						).insert(new Element("td").insert(button));
+						
+					containerbody.insert(accountelement);
+					button.observe("click", onclick);
 					
 					FB.api("/" + accountid, { }, function(r) {
 						if (r && !r.error) {
 							// remove the temporary loading image
-							$(e + accountid).remove();
-							var accountelement = new Element("tr", { id: e + accountid }).insert(
-									new Element("td", { "class": "fbimg" }).insert(
-										new Element("img", { "src": "https://graph.facebook.com/"+ accountid +"/picture?type=square" }))
-								).insert(
+							$(e + "pagepic" + accountid).update(
+								new Element("img", { "src": "https://graph.facebook.com/"+ accountid +"/picture?type=square" }));
+							// set the name an category
+							$(e + "pagedetail" + accountid).update();
+							$(e + "pagedetail" + accountid).insert(
 									new Element("td", { "class": cssclass }).insert(
 										new Element("div", { "class": "fbname" }).update(r.name.escapeHTML())
 									).insert(
 										new Element("div", { "class": "fbcategory" }).update(r.category.escapeHTML()))
-								).insert(new Element("td").insert(button));
-								
-							containerbody.insert(accountelement);
-							button.observe("click", onclick);
+								);
 						}
 					}); // end facebook api call
 				}
