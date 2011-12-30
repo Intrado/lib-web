@@ -272,6 +272,29 @@ function job_responses ($obj,$name) {
 			return '&nbsp;-<a style="display:inline;color: #000;" href="replies.php?jobid=' . $obj->id . '">&nbsp;' . $total . '&nbsp;Response' . ($total>1?'s':'') . '</a>';
 		}
 }
+
+//used in listcontacts as a callback for gen2cache
+function query_startpage_jobstats ($jobid) {
+	//FIXME this should use the slave
+	return QuickQueryRow("select 
+		sum(rc.type='phone') as total_phone,
+		sum(rc.type='email') as total_email,
+		sum(rc.type='sms') as total_sms,
+		100 * sum(rp.numcontacts and rp.status='success' and rp.type='phone') / (sum(rp.numcontacts and rp.status != 'duplicate' and rp.type='phone') +0.00) as success_rate_phone,
+		100 * sum(rp.numcontacts and rp.status='success' and rp.type='email') / (sum(rp.numcontacts and rp.status != 'duplicate' and rp.type='email') +0.00) as success_rate_email,
+		100 * sum(rp.numcontacts and rp.status='success' and rp.type='sms') / (sum(rp.numcontacts and rp.status != 'duplicate' and rp.type='sms') +0.00) as success_rate_sms
+		from reportperson rp
+		left join reportcontact rc on (rp.jobid = rc.jobid and rp.type = rc.type and rp.personid = rc.personid)
+		where rp.jobid = ?", true, false, array($jobid));
+}
+//used in listcontacts as a callback for gen2cache
+function calc_startpage_list_info ($listid) {
+	$list = new PeopleList($listid);
+	$renderedlist = new RenderedList2();
+	$renderedlist->initWithList($list);		
+	return $renderedlist->getTotal();
+}
+
 function listcontacts ($obj,$name) {
 	$lists = array();
 	if ($name == "job") {
@@ -316,16 +339,14 @@ function listcontacts ($obj,$name) {
 			return trim($content,", ");
 			
 		} else if(in_array($obj->status, array("cancelled","complete"))) {
-			$result = QuickQueryRow("select 
-				sum(rc.type='phone') as total_phone,
-				sum(rc.type='email') as total_email,
-				sum(rc.type='sms') as total_sms,
-				100 * sum(rp.numcontacts and rp.status='success' and rp.type='phone') / (sum(rp.numcontacts and rp.status != 'duplicate' and rp.type='phone') +0.00) as success_rate_phone,
-				100 * sum(rp.numcontacts and rp.status='success' and rp.type='email') / (sum(rp.numcontacts and rp.status != 'duplicate' and rp.type='email') +0.00) as success_rate_email,
-				100 * sum(rp.numcontacts and rp.status='success' and rp.type='sms') / (sum(rp.numcontacts and rp.status != 'duplicate' and rp.type='sms') +0.00) as success_rate_sms
-				from reportperson rp
-				left join reportcontact rc on (rp.jobid = rc.jobid and rp.type = rc.type and rp.personid = rc.personid)
-				where rp.jobid = ?", true, false, array($obj->id));
+			
+			//memcache exptime is in seconds up to 30 days, then becomes a timestamp of a date to expire.
+			//since completed jobs don't change, we can cache it for a really long time.
+			//we could have used "QuickQueryRow" as a callback directly, however the key would contain the sql
+			//which would be too long, and the jobid (the important part) would be lost in the tail hash of automatic key generation
+			//wrapping the large, static argument in a function shortens key length and increases readability
+			$result = gen2cache(time() + 60*60*24*365, null, null, "query_startpage_jobstats", $obj->id);
+			
 			$content = "";
 			if ($result["total_phone"] != 0)
 				$content .= $result["total_phone"] . " Phone" . ($result["total_phone"]!=1?"s":"") . " (" . sprintf("%0.2f",$result["success_rate_phone"]) . "% Contacted), ";
@@ -343,10 +364,10 @@ function listcontacts ($obj,$name) {
 	}
 	$calctotal = 0;
 	foreach ($lists as $id) {
+		//expect the list mod date hasnt changed when using cache
 		$list = new PeopleList($id);
-		$renderedlist = new RenderedList2();
-		$renderedlist->initWithList($list);		
-		$calctotal = $calctotal + $renderedlist->getTotal();
+		$expect = array("modifydate" => $list->modifydate);
+		$calctotal += gen2cache(300, $expect, null, "calc_startpage_list_info", $id);		
 	}
 	return "<b>" . $calctotal . ($calctotal!=1?"</b>&nbsp;contacts":"</b>&nbsp;contact");
 }
