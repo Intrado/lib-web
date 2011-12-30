@@ -493,11 +493,11 @@ $logos += array( 	"AutoMessenger" => '<img src="mimg/auto_messenger.jpg" alt="Au
 // Locations and mimetype for default logos
 $defaultlogos = array(
 					"AutoMessenger" => array("filelocation" => "mimg/auto_messenger.jpg",
-											"filetype" => "image/jpg"),
+											"filetype" => "image/jpeg"),
 					"SchoolMessenger" => array("filelocation" => "mimg/logo_small.gif",
 											"filetype" => "image/gif"),
 					"Skylert" => array("filelocation" => "mimg/sky_alert.jpg",
-										"filetype" => "image/jpg")
+										"filetype" => "image/jpeg")
 );
 
 
