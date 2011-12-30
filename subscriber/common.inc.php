@@ -16,6 +16,7 @@ require_once("authsubscriber.inc.php");
 require_once("subscribersessionhandler.inc.php");
 
 require_once("../inc/db.inc.php");
+require_once("../inc/memcache.inc.php");
 require_once("../inc/DBMappedObject.php");
 require_once("../inc/DBRelationMap.php");
 require_once("../inc/utils.inc.php");

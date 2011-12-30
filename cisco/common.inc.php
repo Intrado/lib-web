@@ -11,6 +11,7 @@ apache_note("CS_APP","cisco"); //for logging
 apache_note("CS_CUST",urlencode($CUSTOMERURL)); //for logging
 
 require_once("../inc/db.inc.php");
+require_once("../inc/memcache.inc.php");
 require_once("../inc/DBMappedObject.php");
 require_once("../inc/DBRelationMap.php");
 require_once("XML/RPC.php");

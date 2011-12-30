@@ -105,6 +105,7 @@ $SETTINGS = parse_ini_file("../inc/settings.ini.php",true);
 date_default_timezone_set("US/Pacific"); //to keep php from complaining. TODO move to manager settings.
 
 require_once("../inc/db.inc.php");
+require_once("../inc/memcache.inc.php");
 require_once("../inc/DBMappedObject.php");
 require_once("../inc/DBRelationMap.php");
 require_once("../inc/utils.inc.php");

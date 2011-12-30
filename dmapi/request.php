@@ -10,6 +10,7 @@ require_once("../inc/auth.inc.php");
 require_once("../inc/sessionhandler.inc.php");
 
 require_once("../inc/db.inc.php");
+require_once("../inc/memcache.inc.php");
 require_once("../inc/DBMappedObject.php");
 require_once("../inc/DBRelationMap.php");
 require_once("../inc/utils.inc.php");

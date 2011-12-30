@@ -9,6 +9,7 @@ $SETTINGS = parse_ini_file("inc/settings.ini.php",true);
 ////////////////////////////////////////////////////////////////////////////////
 require_once("XML/RPC.php");
 require_once("inc/db.inc.php");
+require_once("inc/memcache.inc.php");
 require_once("inc/auth.inc.php");
 require_once("inc/utils.inc.php");
 require_once("inc/table.inc.php");

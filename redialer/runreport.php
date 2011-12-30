@@ -31,6 +31,7 @@ if ($_dbcon == false) {
 	exit(-2);
 }
 
+require_once("../inc/memcache.inc.php");
 require_once("../inc/auth.inc.php");
 require_once("../inc/DBMappedObject.php");
 require_once("../inc/DBRelationMap.php");
