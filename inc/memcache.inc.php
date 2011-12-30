@@ -149,11 +149,12 @@ function gen2cache_invalidate($callback /*, arg1, arg2 */) {
  * Doesn't work with create_function() or closures as they can vary at run-time (wouldn't find cached items again).
  */
 function callback2cachekey ($callback, $args) {
+	global $CUSTOMERURL;
 	//handle object method callbacks, ie array('MyClass', 'myCallbackMethod')
 	if (is_array($callback))
 		$callback = implode("::", $callback);
 	
-	$key = "MemcachePoolExt_" . $callback . ":" . http_build_query($args, false, "&");
+	$key = "MemcachePool_" . $CUSTOMERURL . "_" . $callback . ":" . http_build_query($args, false, "&");
 	if (strlen($key) > 200) {
 		$hash = hash("sha256", $key);
 		$key = substr($key, 0, 133) . "---" . $hash;
