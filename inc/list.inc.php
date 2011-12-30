@@ -220,6 +220,11 @@ function handle_list_checkbox_ajax () {
 		
 		if (isset($_GET['addpersonid'])) {
 			$id = $_GET['addpersonid'];
+
+			$list = new PeopleList($_SESSION['listid']);
+			$list->modifydate = date("Y-m-d H:i:s");
+			$list->update();
+			
 			$existingtype = QuickQuery("select type from listentry where personid=? and listid=?", false, array($id, $_SESSION['listid']));
 			if ($existingtype == "negate") {
 				//must be a skip, so delete the skip entry
@@ -239,6 +244,11 @@ function handle_list_checkbox_ajax () {
 		
 		if (isset($_GET['removepersonid'])) {
 			$id = $_GET['removepersonid'];
+			
+			$list = new PeopleList($_SESSION['listid']);
+			$list->modifydate = date("Y-m-d H:i:s");
+			$list->update();
+			
 			$existingtype = QuickQuery("select type from listentry where personid=? and listid=?", false, array($id, $_SESSION['listid']));
 			if ($existingtype == "add") {
 				//must be an add, so delete the add entry
