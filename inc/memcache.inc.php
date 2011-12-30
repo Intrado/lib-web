@@ -77,20 +77,28 @@
  * If memcache is not available, just acts as a wrapper and returns data from the callback.
  * 
  * @param exptime the TTL for the cache item
- * @param key the key to use in the cache. If key is null, callback args are converted to strings and used instead.
- * 					If this is the case, args are converted to strings using http_build_query.
- * 					If generated key becomes too large, is it truncated and portions are replaced with a hash.
- * 					If key was specified, it must be <= 250 chars and conform to memcache key restrictions (no spaces, no control characters)
+ * @param expect a map of key-value pairs that act as a precondition of accepting cache data. 
+ * 				When cache data is saved, it is wrapped with this additional metadata. When cache data is retrieved, 
+ * 				it is compared agaist this data, and if there is a mismatch, it is invalidated and regenerated. 
+ * 				This is especially useful for checking the modified field of an object before relying on a cached calculation result. 
+ * @param key the key to use in the cache.
+ * 	<ul> 
+ * 				<li>If key is specified, it must be <= 250 chars and conform to memcache key restrictions (no spaces, no control characters)</li>
+ * 				<li>Keys must be unique across customers, or collisions will occur (read: data corruption)</li>
+ * 				<li>If key is null, callback, customerurl, and args are converted to strings and used instead.</li>
+ * 				<li>If this is the case, args are converted to strings using http_build_query.</li>
+ * 				<li>If generated key becomes too large, is it truncated and replaced with a hash.</li>
+ * </ul>
  * @param callback a callback function to generate the data
  * @param ... all remaining aguments are passed to callback
  * 
  * @return returns the results from the callback (possibly from prior invocations) 
  * 					or false if other processes held a lock to generate the item for more than 2 minutes.
  */
-function gen2cache ($exptime, $key = null, $callback /*, arg1, arg2 */) {
+function gen2cache ($exptime, $expect = null, $key = null, $callback /*, arg1, arg2 */) {
 	global $mcache;
 	$args = func_get_args();
-	$args = array_splice($args, 3); //just get callback args
+	$args = array_splice($args, 4); //just get callback args
 	
 	//if memcache is not available, just proxy to the callback
 	if (!isset($mcache))
@@ -108,12 +116,37 @@ function gen2cache ($exptime, $key = null, $callback /*, arg1, arg2 */) {
 	while (microtime(true) - $starttime < $max_lock_time) {
 		//try a get
 		if (($data = $mcache->get($key)) !== false) {
+			
+			//see if this is wrapped with expect
+			if ($expect != null || is_array($data) && isset($data['gen2cache_expect'])) {
+				//we could have used flags, but meh
+				if (is_array($data) && isset($data['gen2cache_expect'])) {
+					if ($expect == $data['gen2cache_expect'])
+						return $data["data"]; //data is good, unwrap
+				} else {
+					//invalid, expect was passed but entry is missing wrapped data
+					error_log_helper("gen2cache expected data to contain wrapped data, but was missing. possibly key overlap between calls using expect and not");
+				}
+				//if we haven't returned by now, data is invalid.
+				$mcache->delete($key);
+				continue;
+			}
+			//unwrapped data, just return it
 			return $data;
+			
 			//otherwise try a lock
 		} else if ($mcache->add($key.".lock", $lock_id, 0, $max_lock_time)) {
 			//if lock accuired, generate and put
 			$data = call_user_func_array($callback, $args);
-			$mcache->set($key, $data, 0, $exptime);
+			
+			//see if we need to wrap for expect
+			if ($expect != null) {
+				$cachedata = array("gen2cache_expect" => $expect, "data" => $data);
+			} else {
+				$cachedata = $data;
+			}
+			
+			$mcache->set($key, $cachedata, 0, $exptime);
 			//delete lock
 			$mcache->delete($key.".lock");
 			
@@ -137,6 +170,7 @@ function gen2cache_invalidate($callback /*, arg1, arg2 */) {
 	if (!isset($mcache))
 		return;
 	
+	//TODO set/check the lock so that race conditions between regenerating data can't occur.
 	$args = func_get_args();
 	$args = array_splice($args, 1); //just get callback args
 	$mcache->delete(callback2cachekey($callback, $args));
