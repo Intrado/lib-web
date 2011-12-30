@@ -45,6 +45,10 @@ class FacebookAuthPages extends FormItem {
 				.fbauth .fbname {
 					font-weight: bold;
 				}
+				.fbauth .fberror {
+					font-weight: bold;
+					color: red;
+				}
 				.fbnoauth {
 					color: gray;
 				}
@@ -253,19 +257,29 @@ class FacebookAuthPages extends FormItem {
 					button.observe("click", onclick);
 					
 					FB.api("/" + accountid, { }, function(r) {
+						var fbpagename;
+						var fbpagecategory;
+						var fbpagenameclass;
 						if (r && !r.error) {
-							// remove the temporary loading image
-							$(e + "pagepic" + accountid).update(
-								new Element("img", { "src": "https://graph.facebook.com/"+ accountid +"/picture?type=square" }));
-							// set the name an category
-							$(e + "pagedetail" + accountid).update();
-							$(e + "pagedetail" + accountid).insert(
-									new Element("td", { "class": cssclass }).insert(
-										new Element("div", { "class": "fbname" }).update(r.name.escapeHTML())
-									).insert(
-										new Element("div", { "class": "fbcategory" }).update(r.category.escapeHTML()))
-								);
+							fbpagename = r.name.escapeHTML();
+							fbpagecategory = r.category.escapeHTML();
+							fbpagenameclass = "fbname";
+						} else {
+							fbpagename = "'.escapehtml(_L("No data returned.")).'";
+							fbpagecategory = "'.escapehtml(_L("Page may no longer exist or is unpublished.")).'";
+							fbpagenameclass = "fberror";
 						}
+						// remove the temporary loading image
+						$(e + "pagepic" + accountid).update(
+							new Element("img", { "src": "https://graph.facebook.com/"+ accountid +"/picture?type=square" }));
+						// set the name and category
+						$(e + "pagedetail" + accountid).update();
+						$(e + "pagedetail" + accountid).insert(
+								new Element("td", { "class": cssclass }).insert(
+									new Element("div", { "class": fbpagenameclass }).update(fbpagename)
+								).insert(
+									new Element("div", { "class": "fbcategory" }).update(fbpagecategory))
+							);
 					}); // end facebook api call
 				}
 				
