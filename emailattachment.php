@@ -9,6 +9,7 @@ if ($USER->authorize("sendemail") === false) {
 }
 
 if(isset($_GET["name"]) && isset($_GET["id"])) {
+	//FIXME zero security checks
 	if ($c = contentGet($_GET["id"] + 0)){
 		list($contenttype,$data) = $c;
 		if($data) {
