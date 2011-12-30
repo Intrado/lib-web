@@ -145,7 +145,7 @@ function handleFileUpload($formitemname, $maxfilesizebytes, $unsafeext = null, $
 			if ($contentid) {
 				$uploaderror = false;
 			} else {
-				$errormessage .= _L('Unable to upload email attachment data, either the file was empty or there is a DB problem. ');
+				$errormessage .= _L('Unable to upload email attachment data');
 				$errormessage .= _L('Unable to complete file upload. Please try again');
 			}
 		}
