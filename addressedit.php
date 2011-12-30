@@ -19,6 +19,8 @@ require_once("obj/Language.obj.php");
 require_once("obj/ListEntry.obj.php");
 require_once("obj/Sms.obj.php");
 require_once("obj/JobType.obj.php");
+require_once("obj/PeopleList.obj.php");
+
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization
 ////////////////////////////////////////////////////////////////////////////////
@@ -487,6 +489,10 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 				$le->sequence = 0;
 				$le->personid = $person->id;
 				$le->create();
+				
+				$list = new PeopleList($_SESSION['listid']);
+				$list->modifydate = date("Y-m-d H:i:s");
+				$list->update(array("modifydate"));
 			}
 		}
 		

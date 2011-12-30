@@ -33,6 +33,10 @@ if (isset($_GET['delete'])) {
 		Query("BEGIN");
 			$person->deleted = 1;
 			$person->update();
+			
+			//update lists mod dates referencing this person
+			QuickUpdate("update list l inner join listentry le on (le.listid=l.id) set l.modifieddate = now() where le.personid='$id'");
+			//remove all listentries pointing to this person
 			QuickUpdate("delete from listentry where personid='$id'");
 		Query("COMMIT");
 		notice(_L("%s is now deleted from your address book.", escapehtml(Person::getFullName($person))));

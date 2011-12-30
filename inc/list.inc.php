@@ -223,7 +223,7 @@ function handle_list_checkbox_ajax () {
 
 			$list = new PeopleList($_SESSION['listid']);
 			$list->modifydate = date("Y-m-d H:i:s");
-			$list->update();
+			$list->update(array("modifydate"));
 			
 			$existingtype = QuickQuery("select type from listentry where personid=? and listid=?", false, array($id, $_SESSION['listid']));
 			if ($existingtype == "negate") {
@@ -247,7 +247,7 @@ function handle_list_checkbox_ajax () {
 			
 			$list = new PeopleList($_SESSION['listid']);
 			$list->modifydate = date("Y-m-d H:i:s");
-			$list->update();
+			$list->update(array("modifydate"));
 			
 			$existingtype = QuickQuery("select type from listentry where personid=? and listid=?", false, array($id, $_SESSION['listid']));
 			if ($existingtype == "add") {

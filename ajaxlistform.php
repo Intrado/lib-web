@@ -17,6 +17,7 @@ function summarizeListName($listid) {
 	global $RULE_OPERATORS;
 	
 	$list = new PeopleList($listid+0);
+	$list->modifydate = date("Y-m-d H:i:s");
 	
 	$summary = array();
 	
@@ -95,6 +96,7 @@ function handleRequest() {
 			
 			// CREATE list
 			$list = new PeopleList(null);
+			$list->modifydate = date("Y-m-d H:i:s");
 			$list->description = 'Created in MessageSender';
 			$list->userid = $USER->id;
 			$list->name = _L('Please Add Rules to This List');
@@ -162,7 +164,7 @@ function handleRequest() {
 					$le->type = "rule";
 					$le->ruleid = $rule->id;
 					$le->create();
-					summarizeListName($listid);
+					summarizeListName($listid); //update list name, etc
 				QuickUpdate('COMMIT');
 			}
 			
