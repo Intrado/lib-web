@@ -10,10 +10,10 @@ require_once("../inc/auth.inc.php");
 require_once("../inc/sessionhandler.inc.php");
 
 require_once("../inc/db.inc.php");
+require_once("../inc/utils.inc.php");
 require_once("../inc/memcache.inc.php");
 require_once("../inc/DBMappedObject.php");
 require_once("../inc/DBRelationMap.php");
-require_once("../inc/utils.inc.php");
 require_once("../obj/SpecialTask.obj.php");
 // need these objects for serialization of sessiondata used by inbound message callback
 require_once("../obj/Message.obj.php");

@@ -76,10 +76,10 @@ if ($minutestorun) {
 $SETTINGS = parse_ini_file("../inc/settings.ini.php",true);
 
 require_once("../inc/db.inc.php");
+require_once("../inc/utils.inc.php");
 require_once("../inc/memcache.inc.php");
 require_once("../inc/DBMappedObject.php");
 require_once("../inc/DBRelationMap.php");
-require_once("../inc/utils.inc.php");
 
 
 $updater = mt_rand();

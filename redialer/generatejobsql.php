@@ -4,10 +4,10 @@
 setlocale(LC_ALL, 'en_US.UTF-8');
 
 require_once("../inc/db.inc.php");
+require_once("../inc/utils.inc.php");
 require_once("../inc/memcache.inc.php");
 require_once("../inc/DBMappedObject.php");
 require_once("../inc/DBRelationMap.php");
-require_once("../inc/utils.inc.php");
 require_once("../inc/date.inc.php");
 require_once("../obj/User.obj.php");
 require_once("../obj/Access.obj.php");
