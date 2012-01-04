@@ -16,6 +16,7 @@ interface CommSuiteIf {
   public function ttsGetForTextLanguageGenderFormat($text, $language, $gender, $format);
   public function phoneMessageGetMp3AudioFile($sessionid, $parts);
   public function processIncomingSms($smsParams);
+  public function generateFeed($urlcomponent, $categories, $maxPost, $maxDays);
 }
 
 class CommSuiteClient implements CommSuiteIf {
@@ -419,6 +420,63 @@ class CommSuiteClient implements CommSuiteIf {
       $this->input_->readMessageEnd();
     }
     return;
+  }
+
+  public function generateFeed($urlcomponent, $categories, $maxPost, $maxDays)
+  {
+    $this->send_generateFeed($urlcomponent, $categories, $maxPost, $maxDays);
+    return $this->recv_generateFeed();
+  }
+
+  public function send_generateFeed($urlcomponent, $categories, $maxPost, $maxDays)
+  {
+    $args = new commsuite_CommSuite_generateFeed_args();
+    $args->urlcomponent = $urlcomponent;
+    $args->categories = $categories;
+    $args->maxPost = $maxPost;
+    $args->maxDays = $maxDays;
+    $bin_accel = ($this->output_ instanceof TProtocol::$TBINARYPROTOCOLACCELERATED) && function_exists('thrift_protocol_write_binary');
+    if ($bin_accel)
+    {
+      thrift_protocol_write_binary($this->output_, 'generateFeed', TMessageType::CALL, $args, $this->seqid_, $this->output_->isStrictWrite());
+    }
+    else
+    {
+      $this->output_->writeMessageBegin('generateFeed', TMessageType::CALL, $this->seqid_);
+      $args->write($this->output_);
+      $this->output_->writeMessageEnd();
+      $this->output_->getTransport()->flush();
+    }
+  }
+
+  public function recv_generateFeed()
+  {
+    $bin_accel = ($this->input_ instanceof TProtocol::$TBINARYPROTOCOLACCELERATED) && function_exists('thrift_protocol_read_binary');
+    if ($bin_accel) $result = thrift_protocol_read_binary($this->input_, 'commsuite_CommSuite_generateFeed_result', $this->input_->isStrictRead());
+    else
+    {
+      $rseqid = 0;
+      $fname = null;
+      $mtype = 0;
+
+      $this->input_->readMessageBegin($fname, $mtype, $rseqid);
+      if ($mtype == TMessageType::EXCEPTION) {
+        $x = new TApplicationException();
+        $x->read($this->input_);
+        $this->input_->readMessageEnd();
+        throw $x;
+      }
+      $result = new commsuite_CommSuite_generateFeed_result();
+      $result->read($this->input_);
+      $this->input_->readMessageEnd();
+    }
+    if ($result->success !== null) {
+      return $result->success;
+    }
+    if ($result->nfe !== null) {
+      throw $result->nfe;
+    }
+    throw new Exception("generateFeed failed: unknown result");
   }
 
 }
@@ -1985,6 +2043,258 @@ class commsuite_CommSuite_processIncomingSms_result {
   public function write($output) {
     $xfer = 0;
     $xfer += $output->writeStructBegin('CommSuite_processIncomingSms_result');
+    $xfer += $output->writeFieldStop();
+    $xfer += $output->writeStructEnd();
+    return $xfer;
+  }
+
+}
+
+class commsuite_CommSuite_generateFeed_args {
+  static $_TSPEC;
+
+  public $urlcomponent = null;
+  public $categories = null;
+  public $maxPost = null;
+  public $maxDays = null;
+
+  public function __construct($vals=null) {
+    if (!isset(self::$_TSPEC)) {
+      self::$_TSPEC = array(
+        1 => array(
+          'var' => 'urlcomponent',
+          'type' => TType::STRING,
+          ),
+        2 => array(
+          'var' => 'categories',
+          'type' => TType::LST,
+          'etype' => TType::STRING,
+          'elem' => array(
+            'type' => TType::STRING,
+            ),
+          ),
+        3 => array(
+          'var' => 'maxPost',
+          'type' => TType::I32,
+          ),
+        4 => array(
+          'var' => 'maxDays',
+          'type' => TType::I32,
+          ),
+        );
+    }
+    if (is_array($vals)) {
+      if (isset($vals['urlcomponent'])) {
+        $this->urlcomponent = $vals['urlcomponent'];
+      }
+      if (isset($vals['categories'])) {
+        $this->categories = $vals['categories'];
+      }
+      if (isset($vals['maxPost'])) {
+        $this->maxPost = $vals['maxPost'];
+      }
+      if (isset($vals['maxDays'])) {
+        $this->maxDays = $vals['maxDays'];
+      }
+    }
+  }
+
+  public function getName() {
+    return 'CommSuite_generateFeed_args';
+  }
+
+  public function read($input)
+  {
+    $xfer = 0;
+    $fname = null;
+    $ftype = 0;
+    $fid = 0;
+    $xfer += $input->readStructBegin($fname);
+    while (true)
+    {
+      $xfer += $input->readFieldBegin($fname, $ftype, $fid);
+      if ($ftype == TType::STOP) {
+        break;
+      }
+      switch ($fid)
+      {
+        case 1:
+          if ($ftype == TType::STRING) {
+            $xfer += $input->readString($this->urlcomponent);
+          } else {
+            $xfer += $input->skip($ftype);
+          }
+          break;
+        case 2:
+          if ($ftype == TType::LST) {
+            $this->categories = array();
+            $_size30 = 0;
+            $_etype33 = 0;
+            $xfer += $input->readListBegin($_etype33, $_size30);
+            for ($_i34 = 0; $_i34 < $_size30; ++$_i34)
+            {
+              $elem35 = null;
+              $xfer += $input->readString($elem35);
+              $this->categories []= $elem35;
+            }
+            $xfer += $input->readListEnd();
+          } else {
+            $xfer += $input->skip($ftype);
+          }
+          break;
+        case 3:
+          if ($ftype == TType::I32) {
+            $xfer += $input->readI32($this->maxPost);
+          } else {
+            $xfer += $input->skip($ftype);
+          }
+          break;
+        case 4:
+          if ($ftype == TType::I32) {
+            $xfer += $input->readI32($this->maxDays);
+          } else {
+            $xfer += $input->skip($ftype);
+          }
+          break;
+        default:
+          $xfer += $input->skip($ftype);
+          break;
+      }
+      $xfer += $input->readFieldEnd();
+    }
+    $xfer += $input->readStructEnd();
+    return $xfer;
+  }
+
+  public function write($output) {
+    $xfer = 0;
+    $xfer += $output->writeStructBegin('CommSuite_generateFeed_args');
+    if ($this->urlcomponent !== null) {
+      $xfer += $output->writeFieldBegin('urlcomponent', TType::STRING, 1);
+      $xfer += $output->writeString($this->urlcomponent);
+      $xfer += $output->writeFieldEnd();
+    }
+    if ($this->categories !== null) {
+      if (!is_array($this->categories)) {
+        throw new TProtocolException('Bad type in structure.', TProtocolException::INVALID_DATA);
+      }
+      $xfer += $output->writeFieldBegin('categories', TType::LST, 2);
+      {
+        $output->writeListBegin(TType::STRING, count($this->categories));
+        {
+          foreach ($this->categories as $iter36)
+          {
+            $xfer += $output->writeString($iter36);
+          }
+        }
+        $output->writeListEnd();
+      }
+      $xfer += $output->writeFieldEnd();
+    }
+    if ($this->maxPost !== null) {
+      $xfer += $output->writeFieldBegin('maxPost', TType::I32, 3);
+      $xfer += $output->writeI32($this->maxPost);
+      $xfer += $output->writeFieldEnd();
+    }
+    if ($this->maxDays !== null) {
+      $xfer += $output->writeFieldBegin('maxDays', TType::I32, 4);
+      $xfer += $output->writeI32($this->maxDays);
+      $xfer += $output->writeFieldEnd();
+    }
+    $xfer += $output->writeFieldStop();
+    $xfer += $output->writeStructEnd();
+    return $xfer;
+  }
+
+}
+
+class commsuite_CommSuite_generateFeed_result {
+  static $_TSPEC;
+
+  public $success = null;
+  public $nfe = null;
+
+  public function __construct($vals=null) {
+    if (!isset(self::$_TSPEC)) {
+      self::$_TSPEC = array(
+        0 => array(
+          'var' => 'success',
+          'type' => TType::STRING,
+          ),
+        1 => array(
+          'var' => 'nfe',
+          'type' => TType::STRUCT,
+          'class' => 'commsuite_NotFoundException',
+          ),
+        );
+    }
+    if (is_array($vals)) {
+      if (isset($vals['success'])) {
+        $this->success = $vals['success'];
+      }
+      if (isset($vals['nfe'])) {
+        $this->nfe = $vals['nfe'];
+      }
+    }
+  }
+
+  public function getName() {
+    return 'CommSuite_generateFeed_result';
+  }
+
+  public function read($input)
+  {
+    $xfer = 0;
+    $fname = null;
+    $ftype = 0;
+    $fid = 0;
+    $xfer += $input->readStructBegin($fname);
+    while (true)
+    {
+      $xfer += $input->readFieldBegin($fname, $ftype, $fid);
+      if ($ftype == TType::STOP) {
+        break;
+      }
+      switch ($fid)
+      {
+        case 0:
+          if ($ftype == TType::STRING) {
+            $xfer += $input->readString($this->success);
+          } else {
+            $xfer += $input->skip($ftype);
+          }
+          break;
+        case 1:
+          if ($ftype == TType::STRUCT) {
+            $this->nfe = new commsuite_NotFoundException();
+            $xfer += $this->nfe->read($input);
+          } else {
+            $xfer += $input->skip($ftype);
+          }
+          break;
+        default:
+          $xfer += $input->skip($ftype);
+          break;
+      }
+      $xfer += $input->readFieldEnd();
+    }
+    $xfer += $input->readStructEnd();
+    return $xfer;
+  }
+
+  public function write($output) {
+    $xfer = 0;
+    $xfer += $output->writeStructBegin('CommSuite_generateFeed_result');
+    if ($this->success !== null) {
+      $xfer += $output->writeFieldBegin('success', TType::STRING, 0);
+      $xfer += $output->writeString($this->success);
+      $xfer += $output->writeFieldEnd();
+    }
+    if ($this->nfe !== null) {
+      $xfer += $output->writeFieldBegin('nfe', TType::STRUCT, 1);
+      $xfer += $this->nfe->write($output);
+      $xfer += $output->writeFieldEnd();
+    }
     $xfer += $output->writeFieldStop();
     $xfer += $output->writeStructEnd();
     return $xfer;

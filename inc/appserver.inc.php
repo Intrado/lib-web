@@ -375,4 +375,35 @@ function processIncomingSms($smsParams) {
 	}
 }
 
+
+function generateFeed($urlcomponent, $categories, $maxPost, $maxDays) {
+	list($appserverCommsuiteProtocol,$appserverCommsuiteTransport) = initCommsuiteApp();
+
+	if ($appserverCommsuiteProtocol == null || $appserverCommsuiteTransport == null) {
+		error_log("Cannot use AppServer");
+		return null;
+	}
+
+	$attempts = 0;
+	while (true) {
+		try {
+			$client = new CommSuiteClient($appserverCommsuiteProtocol);
+			$appserverCommsuiteTransport->open();
+
+			// Connect and be sure to catch and log all exceptions
+			$result = $client->generateFeed($urlcomponent, $categories, $maxPost, $maxDays);
+			return $result;
+		} catch (TException $tx) {
+			$attempts++;
+			// a general thrift exception, like no such server
+			error_log("generateFeed: Exception Connection to AppServer (" . $tx->getMessage() . ")");
+			$appserverCommsuiteTransport->close();
+			if ($attempts > 2) {
+				error_log("generateFeed: Failed 3 times to send request to appserver. urlcomponent=".$urlcomponent);// TODO output categories and max params too?
+				return false;
+			}
+		}
+	}
+}
+
 ?>
