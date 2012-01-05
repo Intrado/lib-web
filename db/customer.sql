@@ -1771,5 +1771,33 @@ $$$
 -- START 8.2/4
 -- change made inline, see content table
 update setting set value='8.2/4' where name='_dbversion'
+$$$
 -- END 8.2/4
+
+-- START 8.2/5
+
+CREATE TABLE `feedcategory` (
+ `id` int(11) NOT NULL AUTO_INCREMENT,
+ `name` varchar(50) NOT NULL,
+ `description` TEXT NOT NULL,
+ `deleted` tinyint(4) NOT NULL DEFAULT '0',
+ PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8
+$$$
+
+CREATE TABLE `userfeedcategory` (
+ `userid` int(11) NOT NULL,
+ `feedcategoryid` int(11) NOT NULL,
+ PRIMARY KEY (`userid`,`feedcategoryid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8
+$$$
+
+ALTER TABLE `jobpost` CHANGE `type` `type` ENUM( 'facebook', 'twitter', 'page', 'feed' ) NOT NULL 
+$$$
+
+update setting set value='8.2/5' where name='_dbversion'
+$$$
+
+-- END 8.2/5
+
 

@@ -43,3 +43,25 @@ $$$
 -- data is always base64, only need ascii. update to longtext for files > 16m
 ALTER TABLE `content` CHANGE `data` `data` LONGTEXT CHARACTER SET ascii COLLATE ascii_bin NOT NULL 
 $$$
+
+-- $rev 5
+
+CREATE TABLE `feedcategory` (
+ `id` int(11) NOT NULL AUTO_INCREMENT,
+ `name` varchar(50) NOT NULL,
+ `description` TEXT NOT NULL,
+ `deleted` tinyint(4) NOT NULL DEFAULT '0',
+ PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8
+$$$
+
+CREATE TABLE `userfeedcategory` (
+ `userid` int(11) NOT NULL,
+ `feedcategoryid` int(11) NOT NULL,
+ PRIMARY KEY (`userid`,`feedcategoryid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8
+$$$
+
+ALTER TABLE `jobpost` CHANGE `type` `type` ENUM( 'facebook', 'twitter', 'page', 'feed' ) NOT NULL 
+$$$
+
