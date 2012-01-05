@@ -12,8 +12,8 @@ $SETTINGS = parse_ini_file("inc/settings.ini.php",true);
 
 // TODO parse params
 $categories = array();
-$categories[] = "catone";
-$categories[] = "cattwo";
+$categories[] = "12";
+$categories[] = "23";
 $maxPost = 30;
 $maxDays = 30;
 
@@ -21,16 +21,15 @@ $maxDays = 30;
 $CUSTOMERURL = substr($_SERVER["SCRIPT_NAME"],1);
 $CUSTOMERURL = strtolower(substr($CUSTOMERURL,0,strpos($CUSTOMERURL,"/")));
 
-apache_note("CS_APP","cs"); //for logging
+apache_note("CS_APP","feed"); //for logging
 apache_note("CS_CUST",urlencode($CUSTOMERURL)); //for logging
 
 
 // call appserver
-$xmlout = generateFeed($CUSTOMERURL, $categories, $maxPost, $maxDays);
-if ($xmlout) {
-	echo $xmlout;
-} else {
-	// TODO some graceful failure page
-}
+expireCategories($CUSTOMERURL, $categories); // TODO remove this test call
+
+// echo the xml doc, http error codes handled within method
+echo generateFeed($CUSTOMERURL, $categories, $maxPost, $maxDays);
+
 
 ?>

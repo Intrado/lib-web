@@ -393,6 +393,38 @@ function generateFeed($urlcomponent, $categories, $maxPost, $maxDays) {
 			// Connect and be sure to catch and log all exceptions
 			$result = $client->generateFeed($urlcomponent, $categories, $maxPost, $maxDays);
 			return $result;
+		} catch (commsuite_NotFoundException $tx) {
+			header('HTTP/1.1 404 Not Found');
+			echo "
+						<html>
+							<head>
+								<title>404 Not Found</title>
+							</head>
+							<body>
+								<h1>404 Service Temporarily Unavailable</h1>
+			
+								The server is temporarily unable to service your request. Please try again later.
+							</body>
+						</html>
+						";
+			exit();
+				
+		} catch (commsuite_NotAvailableException $tx) {
+			header('HTTP/1.1 403 Not Available');
+			echo "
+						<html>
+							<head>
+								<title>403 Not Available</title>
+							</head>
+							<body>
+								<h1>403 Service Temporarily Unavailable</h1>
+			
+								The server is temporarily unable to service your request. Please try again later.
+							</body>
+						</html>
+						";
+			exit();
+				
 		} catch (TException $tx) {
 			$attempts++;
 			// a general thrift exception, like no such server
@@ -400,10 +432,55 @@ function generateFeed($urlcomponent, $categories, $maxPost, $maxDays) {
 			$appserverCommsuiteTransport->close();
 			if ($attempts > 2) {
 				error_log("generateFeed: Failed 3 times to send request to appserver. urlcomponent=".$urlcomponent);// TODO output categories and max params too?
+				
+		header('HTTP/1.1 503 Service Temporarily Unavailable');
+		echo "
+			<html>
+				<head>
+					<title>503 Service Temporarily Unavailable</title>
+				</head>
+				<body>
+					<h1>Service Temporarily Unavailable</h1>
+
+					The server is temporarily unable to service your request. Please try again later.
+				</body>
+			</html>
+			";
+		exit();
+							}
+		}
+	}
+}
+
+function expireCategories($urlcomponent, $categories) {
+	list($appserverCommsuiteProtocol,$appserverCommsuiteTransport) = initCommsuiteApp();
+
+	if ($appserverCommsuiteProtocol == null || $appserverCommsuiteTransport == null) {
+		error_log("Cannot use AppServer");
+		return null;
+	}
+
+	$attempts = 0;
+	while (true) {
+		try {
+			$client = new CommSuiteClient($appserverCommsuiteProtocol);
+			$appserverCommsuiteTransport->open();
+
+			// Connect and be sure to catch and log all exceptions
+			$client->expireCategories($urlcomponent, $categories);
+			return true;
+		} catch (TException $tx) {
+			$attempts++;
+			// a general thrift exception, like no such server
+			error_log("expireCategories: Exception Connection to AppServer (" . $tx->getMessage() . ")");
+			$appserverCommsuiteTransport->close();
+			if ($attempts > 2) {
+				error_log("expireCategories: Failed 3 times to send request to appserver. urlcomponent=".$urlcomponent);
 				return false;
 			}
 		}
 	}
 }
+
 
 ?>

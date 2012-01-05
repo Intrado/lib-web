@@ -16,7 +16,8 @@ interface CommSuiteIf {
   public function ttsGetForTextLanguageGenderFormat($text, $language, $gender, $format);
   public function phoneMessageGetMp3AudioFile($sessionid, $parts);
   public function processIncomingSms($smsParams);
-  public function generateFeed($urlcomponent, $categories, $maxPost, $maxDays);
+  public function generateFeed($urlcomponent, $categoryIds, $maxPost, $maxDays);
+  public function expireCategories($urlcomponent, $categoryIds);
 }
 
 class CommSuiteClient implements CommSuiteIf {
@@ -422,17 +423,17 @@ class CommSuiteClient implements CommSuiteIf {
     return;
   }
 
-  public function generateFeed($urlcomponent, $categories, $maxPost, $maxDays)
+  public function generateFeed($urlcomponent, $categoryIds, $maxPost, $maxDays)
   {
-    $this->send_generateFeed($urlcomponent, $categories, $maxPost, $maxDays);
+    $this->send_generateFeed($urlcomponent, $categoryIds, $maxPost, $maxDays);
     return $this->recv_generateFeed();
   }
 
-  public function send_generateFeed($urlcomponent, $categories, $maxPost, $maxDays)
+  public function send_generateFeed($urlcomponent, $categoryIds, $maxPost, $maxDays)
   {
     $args = new commsuite_CommSuite_generateFeed_args();
     $args->urlcomponent = $urlcomponent;
-    $args->categories = $categories;
+    $args->categoryIds = $categoryIds;
     $args->maxPost = $maxPost;
     $args->maxDays = $maxDays;
     $bin_accel = ($this->output_ instanceof TProtocol::$TBINARYPROTOCOLACCELERATED) && function_exists('thrift_protocol_write_binary');
@@ -476,9 +477,35 @@ class CommSuiteClient implements CommSuiteIf {
     if ($result->nfe !== null) {
       throw $result->nfe;
     }
+    if ($result->nae !== null) {
+      throw $result->nae;
+    }
     throw new Exception("generateFeed failed: unknown result");
   }
 
+  public function expireCategories($urlcomponent, $categoryIds)
+  {
+    $this->send_expireCategories($urlcomponent, $categoryIds);
+  }
+
+  public function send_expireCategories($urlcomponent, $categoryIds)
+  {
+    $args = new commsuite_CommSuite_expireCategories_args();
+    $args->urlcomponent = $urlcomponent;
+    $args->categoryIds = $categoryIds;
+    $bin_accel = ($this->output_ instanceof TProtocol::$TBINARYPROTOCOLACCELERATED) && function_exists('thrift_protocol_write_binary');
+    if ($bin_accel)
+    {
+      thrift_protocol_write_binary($this->output_, 'expireCategories', TMessageType::CALL, $args, $this->seqid_, $this->output_->isStrictWrite());
+    }
+    else
+    {
+      $this->output_->writeMessageBegin('expireCategories', TMessageType::CALL, $this->seqid_);
+      $args->write($this->output_);
+      $this->output_->writeMessageEnd();
+      $this->output_->getTransport()->flush();
+    }
+  }
 }
 
 // HELPER FUNCTIONS AND STRUCTURES
@@ -2054,7 +2081,7 @@ class commsuite_CommSuite_generateFeed_args {
   static $_TSPEC;
 
   public $urlcomponent = null;
-  public $categories = null;
+  public $categoryIds = null;
   public $maxPost = null;
   public $maxDays = null;
 
@@ -2066,11 +2093,11 @@ class commsuite_CommSuite_generateFeed_args {
           'type' => TType::STRING,
           ),
         2 => array(
-          'var' => 'categories',
+          'var' => 'categoryIds',
           'type' => TType::LST,
-          'etype' => TType::STRING,
+          'etype' => TType::I32,
           'elem' => array(
-            'type' => TType::STRING,
+            'type' => TType::I32,
             ),
           ),
         3 => array(
@@ -2087,8 +2114,8 @@ class commsuite_CommSuite_generateFeed_args {
       if (isset($vals['urlcomponent'])) {
         $this->urlcomponent = $vals['urlcomponent'];
       }
-      if (isset($vals['categories'])) {
-        $this->categories = $vals['categories'];
+      if (isset($vals['categoryIds'])) {
+        $this->categoryIds = $vals['categoryIds'];
       }
       if (isset($vals['maxPost'])) {
         $this->maxPost = $vals['maxPost'];
@@ -2127,15 +2154,15 @@ class commsuite_CommSuite_generateFeed_args {
           break;
         case 2:
           if ($ftype == TType::LST) {
-            $this->categories = array();
+            $this->categoryIds = array();
             $_size30 = 0;
             $_etype33 = 0;
             $xfer += $input->readListBegin($_etype33, $_size30);
             for ($_i34 = 0; $_i34 < $_size30; ++$_i34)
             {
               $elem35 = null;
-              $xfer += $input->readString($elem35);
-              $this->categories []= $elem35;
+              $xfer += $input->readI32($elem35);
+              $this->categoryIds []= $elem35;
             }
             $xfer += $input->readListEnd();
           } else {
@@ -2174,17 +2201,17 @@ class commsuite_CommSuite_generateFeed_args {
       $xfer += $output->writeString($this->urlcomponent);
       $xfer += $output->writeFieldEnd();
     }
-    if ($this->categories !== null) {
-      if (!is_array($this->categories)) {
+    if ($this->categoryIds !== null) {
+      if (!is_array($this->categoryIds)) {
         throw new TProtocolException('Bad type in structure.', TProtocolException::INVALID_DATA);
       }
-      $xfer += $output->writeFieldBegin('categories', TType::LST, 2);
+      $xfer += $output->writeFieldBegin('categoryIds', TType::LST, 2);
       {
-        $output->writeListBegin(TType::STRING, count($this->categories));
+        $output->writeListBegin(TType::I32, count($this->categoryIds));
         {
-          foreach ($this->categories as $iter36)
+          foreach ($this->categoryIds as $iter36)
           {
-            $xfer += $output->writeString($iter36);
+            $xfer += $output->writeI32($iter36);
           }
         }
         $output->writeListEnd();
@@ -2213,6 +2240,7 @@ class commsuite_CommSuite_generateFeed_result {
 
   public $success = null;
   public $nfe = null;
+  public $nae = null;
 
   public function __construct($vals=null) {
     if (!isset(self::$_TSPEC)) {
@@ -2226,6 +2254,11 @@ class commsuite_CommSuite_generateFeed_result {
           'type' => TType::STRUCT,
           'class' => 'commsuite_NotFoundException',
           ),
+        2 => array(
+          'var' => 'nae',
+          'type' => TType::STRUCT,
+          'class' => 'commsuite_NotAvailableException',
+          ),
         );
     }
     if (is_array($vals)) {
@@ -2234,6 +2267,9 @@ class commsuite_CommSuite_generateFeed_result {
       }
       if (isset($vals['nfe'])) {
         $this->nfe = $vals['nfe'];
+      }
+      if (isset($vals['nae'])) {
+        $this->nae = $vals['nae'];
       }
     }
   }
@@ -2272,6 +2308,14 @@ class commsuite_CommSuite_generateFeed_result {
             $xfer += $input->skip($ftype);
           }
           break;
+        case 2:
+          if ($ftype == TType::STRUCT) {
+            $this->nae = new commsuite_NotAvailableException();
+            $xfer += $this->nae->read($input);
+          } else {
+            $xfer += $input->skip($ftype);
+          }
+          break;
         default:
           $xfer += $input->skip($ftype);
           break;
@@ -2293,6 +2337,129 @@ class commsuite_CommSuite_generateFeed_result {
     if ($this->nfe !== null) {
       $xfer += $output->writeFieldBegin('nfe', TType::STRUCT, 1);
       $xfer += $this->nfe->write($output);
+      $xfer += $output->writeFieldEnd();
+    }
+    if ($this->nae !== null) {
+      $xfer += $output->writeFieldBegin('nae', TType::STRUCT, 2);
+      $xfer += $this->nae->write($output);
+      $xfer += $output->writeFieldEnd();
+    }
+    $xfer += $output->writeFieldStop();
+    $xfer += $output->writeStructEnd();
+    return $xfer;
+  }
+
+}
+
+class commsuite_CommSuite_expireCategories_args {
+  static $_TSPEC;
+
+  public $urlcomponent = null;
+  public $categoryIds = null;
+
+  public function __construct($vals=null) {
+    if (!isset(self::$_TSPEC)) {
+      self::$_TSPEC = array(
+        1 => array(
+          'var' => 'urlcomponent',
+          'type' => TType::STRING,
+          ),
+        2 => array(
+          'var' => 'categoryIds',
+          'type' => TType::LST,
+          'etype' => TType::I32,
+          'elem' => array(
+            'type' => TType::I32,
+            ),
+          ),
+        );
+    }
+    if (is_array($vals)) {
+      if (isset($vals['urlcomponent'])) {
+        $this->urlcomponent = $vals['urlcomponent'];
+      }
+      if (isset($vals['categoryIds'])) {
+        $this->categoryIds = $vals['categoryIds'];
+      }
+    }
+  }
+
+  public function getName() {
+    return 'CommSuite_expireCategories_args';
+  }
+
+  public function read($input)
+  {
+    $xfer = 0;
+    $fname = null;
+    $ftype = 0;
+    $fid = 0;
+    $xfer += $input->readStructBegin($fname);
+    while (true)
+    {
+      $xfer += $input->readFieldBegin($fname, $ftype, $fid);
+      if ($ftype == TType::STOP) {
+        break;
+      }
+      switch ($fid)
+      {
+        case 1:
+          if ($ftype == TType::STRING) {
+            $xfer += $input->readString($this->urlcomponent);
+          } else {
+            $xfer += $input->skip($ftype);
+          }
+          break;
+        case 2:
+          if ($ftype == TType::LST) {
+            $this->categoryIds = array();
+            $_size37 = 0;
+            $_etype40 = 0;
+            $xfer += $input->readListBegin($_etype40, $_size37);
+            for ($_i41 = 0; $_i41 < $_size37; ++$_i41)
+            {
+              $elem42 = null;
+              $xfer += $input->readI32($elem42);
+              $this->categoryIds []= $elem42;
+            }
+            $xfer += $input->readListEnd();
+          } else {
+            $xfer += $input->skip($ftype);
+          }
+          break;
+        default:
+          $xfer += $input->skip($ftype);
+          break;
+      }
+      $xfer += $input->readFieldEnd();
+    }
+    $xfer += $input->readStructEnd();
+    return $xfer;
+  }
+
+  public function write($output) {
+    $xfer = 0;
+    $xfer += $output->writeStructBegin('CommSuite_expireCategories_args');
+    if ($this->urlcomponent !== null) {
+      $xfer += $output->writeFieldBegin('urlcomponent', TType::STRING, 1);
+      $xfer += $output->writeString($this->urlcomponent);
+      $xfer += $output->writeFieldEnd();
+    }
+    if ($this->categoryIds !== null) {
+      if (!is_array($this->categoryIds)) {
+        throw new TProtocolException('Bad type in structure.', TProtocolException::INVALID_DATA);
+      }
+      $xfer += $output->writeFieldBegin('categoryIds', TType::LST, 2);
+      {
+        $output->writeListBegin(TType::I32, count($this->categoryIds));
+        {
+          foreach ($this->categoryIds as $iter43)
+          {
+            $xfer += $output->writeI32($iter43);
+          }
+        }
+        $output->writeListEnd();
+      }
       $xfer += $output->writeFieldEnd();
     }
     $xfer += $output->writeFieldStop();
