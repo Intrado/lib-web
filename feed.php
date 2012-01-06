@@ -10,12 +10,19 @@ require_once($GLOBALS['THRIFT_ROOT'].'/packages/commsuite/CommSuite.php');
 
 $SETTINGS = parse_ini_file("inc/settings.ini.php",true);
 
-// TODO parse params
+// parse params
+$maxPost = 0;
+if (isset($_GET['items'])) {
+	$maxPost = $_GET['items'] +0;
+}
+$maxDays = 0;
+if (isset($_GET['age'])) {
+	$maxPost = $_GET['age'] +0;
+}
 $categories = array();
-$categories[] = "12";
-$categories[] = "23";
-$maxPost = 30;
-$maxDays = 30;
+if (isset($_GET['cat'])) {
+	$categories = explode(",", $_GET['cat']);
+}
 
 //get the customer URL
 $CUSTOMERURL = substr($_SERVER["SCRIPT_NAME"],1);
@@ -26,7 +33,7 @@ apache_note("CS_CUST",urlencode($CUSTOMERURL)); //for logging
 
 
 // call appserver
-expireCategories($CUSTOMERURL, $categories); // TODO remove this test call
+//expireCategories($CUSTOMERURL, $categories); // TODO remove this test call
 
 // echo the xml doc, http error codes handled within method
 echo generateFeed($CUSTOMERURL, $categories, $maxPost, $maxDays);
