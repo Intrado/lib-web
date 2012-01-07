@@ -31,57 +31,86 @@ if (!$USER->authorize('createlist') || !($USER->authorize('listuploadids') || $U
 
 $list = new PeopleList(getCurrentList());
 
-if (isset($_SESSION['listuploadfiles'][$list->id])) {
-	unlink($_SESSION['listuploadfiles'][$list->id]);
-	unset($_SESSION['listuploadfiles'][$list->id]);
-}
-
-$maxphones = GetSystemSetting("maxphones", 3);
-$maxemails = GetSystemSetting("maxemails", 2);
-
 $f = "list";
 $s = "upload";
 $reloadform = 0;
 
-//should we check for an upload?
-if(isset($_FILES['listcontents']) && $_FILES['listcontents']['tmp_name'])
-{
-	$newname = secure_tmpname("listupload",".csv");
-
-	if(!move_uploaded_file($_FILES['listcontents']['tmp_name'],$newname)) {
-		error('Unable to complete file upload. Please try again.');
-	} else {
-		if (is_file($newname) && is_readable($newname)) {
-			$_SESSION['listuploadfiles'][$list->id] =  $newname;
-			$_SESSION['listuploadfiles']['type'] = $_POST['type'];
-			if(CheckFormInvalid($f))
-			{
-				error('Form was edited in another window, reloading data');
-			}
-			else
-			{
-				MergeSectionFormData($f, $s);
-
-				//do check
-				if( CheckFormSection($f, $s) ) {
-					error('There was a problem trying to save your changes', 'Please verify that all required field information has been entered properly');
-				} else {
-					$_SESSION['listupload']['phonefield'] = DBSafe(GetFormData($f, $s, "phonefield"));
-					$_SESSION['listupload']['emailfield'] = DBSafe(GetFormData($f, $s, "emailfield"));
-					redirect("uploadlistpreview.php");
-				}
-			}
-		} else {
+//should we check for an upload? (clicking a submit button is assumed)
+if (isset($_FILES['listcontents']) && $_FILES['listcontents']['tmp_name']) {
+	if (CheckFormInvalid($f)) {
+		error('Form was edited in another window, reloading data');
+		$reloadform = 1;
+	} else { 
+		MergeSectionFormData($f, $s);
+		$newname = secure_tmpname("listupload",".csv");
+		if( CheckFormSection($f, $s) ) {
+			error('There was a problem trying to use your selections', 'Please verify that all required field information has been entered properly');
+			
+			//the next check performs several actions that are preconditions of the save, relying on || conditional evaluation
+		} else if (!move_uploaded_file($_FILES['listcontents']['tmp_name'],$newname) ||
+				!is_file($newname) || 
+				!is_readable($newname)) {
 			error('Unable to complete file upload. Please try again.');
+		} else {
+			
+			$type = GetFormData($f, $s, "type");
+			
+			//check for an import record or create one
+			$importid = QuickQuery("select id from import where listid='$list->id'");
+			if (!$importid) {
+				$import = new Import();
+				$import->userid = $USER->id;
+				$import->listid = $list->id;
+				$import->name = "User list import (" . $USER->login . ")";
+				$import->description = substr("list (" . $list->name . ")", 0,50);
+				$import->status = "idle";
+				$import->type = "list";
+				$import->datatype = "person";
+				$import->scheduleid = NULL;
+				$import->ownertype = "user";
+				$import->updatemethod = $type == "ids" ? "updateonly" : "full"; //protect ids upload from every accidentally creating people.
+				$import->create();
+			} else {
+				$import = new Import($importid);
+				$import->name = "User list import (" . $USER->login . ")";
+				$import->description = substr("list (" . $list->name . ")", 0,50);
+				$import->updatemethod = $type == "ids" ? "updateonly" : "full"; //protect ids upload from every accidentally creating people.
+				$import->update();
+			}
+			
+			//update the import data with new file 
+			$data = file_get_contents($newname);
+			unlink($newname);
+			if ($import->upload($data)) {
+				//everything looks good, move on to next step
+				if ($type == "contacts")
+					redirect("uploadlistmap.php");
+				else
+					redirect("uploadlistpreview.php");
+			} else {
+				error('Unable to complete file upload. Please try again.');
+				$reloadform = 1;
+			}
 		}
 	}
 } else if (CheckFormSubmit($f,'upload')) {
+	//clicked upload but no file is present
 	error("Please select a file to upload");
+} else {
+	$reloadform = 1;
 }
 
-ClearFormData($f);
-PutFormData($f, $s, "phonefield", "0", "number");
-PutFormData($f, $s, "emailfield", "0", "number");
+if ($reloadform) {	
+	ClearFormData($f);
+	
+	$validtypes = array();
+	if ($USER->authorize('listuploadcontacts'))
+		$validtypes[] = "contacts";
+	if ($USER->authorize('listuploadids'))
+		$validtypes[] = "ids";
+	
+	PutFormData($f, $s, "type", $validtypes[0], "array", $validtypes, "nomax", 1);
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 // Display
@@ -105,63 +134,19 @@ startWindow('Upload Call List File');
 		<td class="bottomBorder">
 			<table  border="0" cellpadding="3" cellspacing="0">
 <?
-	$ischecked = false;
 	if ($USER->authorize('listuploadcontacts')) {
-		$ischecked = true;
 ?>
 				<tr>
-					<td>Contact&nbsp;data:</td>
-					<td><input type="radio" name="type" size="30" value="contacts" checked onclick="if(this.checked){ $('mapping').show();}" ></td>
-					<td width="100%">
-						<table>
-							<tr>
-								<td>File format must be a Comma Separated Value (CSV) text file with the following field order:<br><code>First Name, Last Name, Phone w/ Area Code, Email Address (optional)</code></td>
-							</tr>
-							<tr>
-								<td>
-									<table id="mapping">
-										<tr>
-											<td>Phone Mapping:</td>
-											<td>
-<?
-												NewFormItem($f, $s, "phonefield", "selectstart");
-												for($i=0; $i<$maxphones; $i++){
-													NewFormItem($f, $s, "phonefield", "selectoption", destination_label("phone", $i), $i);
-												}
-												NewFormItem($f, $s, "phonefield", "selectend");
-?>
-											</td>
-										</tr>
-<?
-if($USER->authorize("sendemail")){
-?>
-										<tr>
-											<td>Email Mapping:</td>
-											<td>
-<?
-												NewFormItem($f, $s, "emailfield", "selectstart");
-												for($i=0; $i<$maxemails; $i++){
-													NewFormItem($f, $s, "emailfield", "selectoption", destination_label("email", $i), $i);
-												}
-												NewFormItem($f, $s, "emailfield", "selectend");
-?>
-											</td>
-										</tr>
-<?
-}
-?>
-									</table>
-								</td></td>
-							</tr>
-						</table>
+					<td><label><? NewFormItem($f, $s, "type", "radio", null, "contacts"); ?>Contact&nbsp;data:</label></td>
+					<td>
+						File format must be a Comma Separated Value (CSV) text file. Once uploaded, the files columns can be mapped to names, destinations, and insertable fields for use in messages.
 					</td>
 				<tr>
 <? } ?>
 <? if ($USER->authorize('listuploadids')) { ?>
 				<tr>
-					<td>ID#&nbsp;lookup:</td>
-					<td><input type="radio" name="type" size="30" value="ids" <?= $ischecked ? "" : "checked" ?> onclick="if(this.checked && $('mapping')){ $('mapping').hide(); }" ></td>
-					<td width="100%">File must be a list of ID#s only (one per line)</td>
+					<td><label><? NewFormItem($f, $s, "type", "radio", null, "ids"); ?>ID#&nbsp;lookup:</label></td>
+					<td>File must be a list of ID#s only (one per line)</td>
 				</tr>
 <? } ?>
 			</table>

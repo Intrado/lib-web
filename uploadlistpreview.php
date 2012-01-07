@@ -1,5 +1,7 @@
 <?
-
+/*
+ * This file handles ID based list uploads, see uploadlistmap.php for the contacts based list upload
+ */
 ////////////////////////////////////////////////////////////////////////////////
 // Includes
 ////////////////////////////////////////////////////////////////////////////////
@@ -31,197 +33,82 @@ if (!$USER->authorize('createlist') || !($USER->authorize('listuploadids') || $U
 ////////////////////////////////////////////////////////////////////////////////
 
 $list = new PeopleList(getCurrentList());
-if (isset($_SESSION['listuploadfiles'][$list->id])) {
-	$curfilename = $_SESSION['listuploadfiles'][$list->id];
-
-	$type = $_SESSION['listuploadfiles']['type'];
+$type = $_GET['type'] == "contacts" ? "contacts" : "ids";
+$importid = QuickQuery("select id from import where listid='$list->id'");
+if ($importid) {
+	$import = new Import($importid);
+	//we'd like to use fgetcsv without using temp files, so use a data uri instead. Uses more ram, but should be OK for list uploads
+	$datauri = "data:text/plain;base64," . base64_encode($import->download());
 } else {
-	$curfilename = false;
-	$type = false;
-	$errormsg = "Please upload a file";
+	$import = false;
+	$datauri = false;
 }
 
 $firstnameField = FieldMap::getFirstNameField();
 $lastnameField = FieldMap::getLastNameField();
 
-$phonefield = isset($_SESSION['listupload']['phonefield']) ? $_SESSION['listupload']['phonefield'] : 0;
-$emailfield = isset($_SESSION['listupload']['emailfield']) ? $_SESSION['listupload']['emailfield'] : 0;
 
 $f = "list";
 $s = "uploadpreview";
 $reloadform = 0;
-
 
 //load preview data
 $count = 0;
 $listpreviewdata = array();
 $notfound = 0;
 $notfounddata = array();
-$errormsg = false;
-$defaultareacode = getSystemSetting("defaultareacode");
 
-if ($curfilename && !(CheckFormSubmit($f,'save') && $type =="ids") ) {
+if ($datauri && !CheckFormSubmit($f,'save')) {
+	if ($fp = fopen($datauri, "r")) {
+		$count = 5000;
+		$total = 0;
+		while (($row = fgetcsv($fp,4096)) !== FALSE) {
+			$pkey = DBSafe(trim($row[0]));
+			if ($pkey == "")
+				continue;
 
-	if ($type == "contacts") {
-		if ($fp = @fopen($curfilename, "r")) {
-			$count = 5000;
-			$colcount = 0;
-			while (($row = fgetcsv($fp,4096)) !== FALSE && $count--) {
-				if (count($row) == 1 && $row[0] == "")
-					continue;
-				for ($x = 0; $x < 4; $x++)
-					$row[$x] = (isset($row[$x]) ? $row[$x] : null);
-				$phone = Phone::parse($row[2]);
-				if ($defaultareacode && strlen($phone) == 7)
-					$phone = Phone::parse($defaultareacode . $phone);
-				$errors = Phone::validate($phone);
-				$phone = count($errors) == 0 ? Phone::format($phone) : implode(". ",$errors);
-				$email = $row[3] && !validEmail(trim($row[3])) ? "Invalid" : trim($row[3]);
-				
-				$listpreviewdata[] = array($row[0],$row[1],$phone,$email) ;
-				$colcount = max($colcount,count($row));
+			$total++;
+			$count--;
+			$p = DBFind("Person","from person where pkey=?", false, array($pkey));
+			if ($p && $USER->canSeePerson($p->id)) {
+				// preview up to limit, but continue to parse to verify all pkeys found or not
+				if ($count > 0) {
+					$phone = DBFind("Phone","from phone where personid=?", false, array($p->id));
+					$email = DBFind("Email","from email where personid=?", false, array($p->id));
+					//check if the object isnt false else display empty string
+					$listpreviewdata[] = array($pkey,$p->$firstnameField,$p->$lastnameField, $phone ? Phone::format($phone->phone) : "", $email ? $email->email : "");
+				}
+			} else {
+				$notfound++;
+				$notfounddata[] = array($pkey, "### Not Found ###");
 			}
-			fclose($fp);
+		}
+		fclose($fp);
 
-			if ($colcount != 3 && $colcount != 4) {
-				$errormsg = "Invalid number of columns. There must be exactly 3 or 4 columns: First Name, Last Name, Phone Number, and optionally Email";
-			}
-		} else {
-			$errormsg = "Unable to open the file";
+		if ($notfound) {
+			error("Some contacts were not found. " . ($total - $notfound) ." of $total contacts matched");
 		}
 	} else {
-		if ($fp = fopen($curfilename, "r")) {
-			$count = 5000;
-			$total = 0;
-			while (($row = fgetcsv($fp,4096)) !== FALSE) {
-				$pkey = DBSafe(trim($row[0]));
-				if ($pkey == "")
-					continue;
-
-				$total++;
-				$count--;
-				$p = DBFind("Person","from person where pkey=?", false, array($pkey));
-				if ($p && $USER->canSeePerson($p->id)) {
-					// preview up to limit, but continue to parse to verify all pkeys found or not
-					if ($count > 0) {
-						$phone = DBFind("Phone","from phone where personid=?", false, array($p->id));
-						$email = DBFind("Email","from email where personid=?", false, array($p->id));
-						//check if the object isnt false else display empty string
-						$listpreviewdata[] = array($pkey,$p->$firstnameField,$p->$lastnameField, $phone ? Phone::format($phone->phone) : "", $email ? $email->email : "");
-					}
-				} else {
-					$notfound++;
-					$notfounddata[] = array($pkey, "### Not Found ###");
-				}
-			}
-			fclose($fp);
-
-			if ($notfound) {
-				error( "Some contacts were not found. " . ($total - $notfound) ." of $total contacts matched");
-			}
-		} else {
-			$errormsg = "Unable to open the file";
-		}
+		error("Unable to open the file");
 	}
 }
 
 
 //process the list?
-if (CheckFormSubmit($f,'save') && !$errormsg) {
+if (CheckFormSubmit($f,'save') && count($GLOBALS['ERRORS']) == 0) {
 
-
-	if ($type == "contacts") {
-
-		//check for an import record or create one
-		$importid = QuickQuery("select id from import where listid='$list->id'");
-
-		if (!$importid) {
-
-			$import = new Import();
-			$import->userid = $USER->id;
-			$import->listid = $list->id;
-			$import->name = "User list import (" . $USER->login . ")";
-			$import->description = substr("list (" . $list->name . ")", 0,50);
-			$import->status = "idle";
-			$import->type = "list";
-			$import->datatype = "person";
-			$import->scheduleid = NULL;
-			$import->ownertype = "user";
-			$import->updatemethod = "full";
-
-			$import->create();
-			$importid = $import->id;
-
-		} else {
-			$import = new Import($importid);
-			$import->name = "User list import (" . $USER->login . ")";
-			$import->description = substr("list (" . $list->name . ")", 0,50);
-			$import->update();
+	// read pkeys from file
+	if ($fp = fopen($datauri, "r")) {
+		$pkeys = array();
+		while ($row = fgetcsv($fp,4096)) {
+			$pkeys[] = DBSafe(trim($row[0]));
 		}
-
-		if($importid){
-			//Delete all importfield mappings and recreate, instead of trying to search and update
-			QuickUpdate("delete from importfield where importid = '" . $importid . "'");
-			$iffn = new ImportField();
-			$iffn->importid = $importid;
-			$iffn->mapto = "f01";
-			$iffn->mapfrom = 0;
-			$iffn->create();
-
-			$ifln = new ImportField();
-			$ifln->importid = $importid;
-			$ifln->mapto = "f02";
-			$ifln->mapfrom = 1;
-			$ifln->create();
-
-			$ifph = new ImportField();
-			$ifph->importid = $importid;
-			$ifph->mapto = "p" . $phonefield;
-			$ifph->mapfrom = 2;
-			$ifph->create();
-
-			$ife = new ImportField();
-			$ife->importid = $importid;
-			$ife->mapto = "e" . $emailfield;
-			$ife->mapfrom = 3;
-			$ife->create();
-		}
-
-
-		//upload or copy the file to the main import location
-		$data = file_get_contents($curfilename);
-		if ($import->upload($data)) {
-			$import->runNow();
-
-			$import->refresh();
-			while ($import->status == "queued" || $import->status == "running") {
-				sleep(1);
-				$import->refresh();
-			}
-
-		} else {
-			$errormsg = 'Unable to complete file upload. Please try again.';
-		}
-
+		fclose($fp);
+		// update the list of people
+		$list->updateManualAddByPkeys($pkeys);
 	} else {
-		// read pkeys from file
-		if ($fp = fopen($curfilename, "r")) {
-			$pkeys = array();
-			while ($row = fgetcsv($fp,4096)) {
-				$pkeys[] = DBSafe(trim($row[0]));
-			}
-			fclose($fp);
-			// update the list of people
-			$list->updateManualAddByPkeys($pkeys);
-		} else {
-			$errormsg = "Unable to open the file";
-		}
+		error("Unable to open the file");
 	}
-
-	//clean up the file and reset the session var
-
-	unlink($curfilename);
-	unset($_SESSION['listuploadfiles'][$list->id]);
 
 	redirect("list.php");
 }
@@ -232,8 +119,6 @@ if( $reloadform )
 	ClearFormData($f);
 }
 
-if ($errormsg)
-	error($errormsg);
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -271,27 +156,17 @@ if ($notfound > 0) {
 }
 
 
-startWindow(($type=="contacts" ? 'Upload Preview' : "Matched ID#s") . ($count <= 0 ? " - First 5000 Records" : ""));
-
+startWindow("Matched ID#s" . ($count <= 0 ? " - First 5000 Records" : ""));
 
 if ($errormsg) {
 	echo '<div align="center">    ' . $errormsg;
 } else {
 
-	if ($type == "contacts") {
-
-		$titles = array(0 => "First Name", 1 => "Last Name", 2 => "Phone Number");
-		if($USER->authorize('sendemail')){
-			$titles[3] = "Email";
-		}
-		$formatters = array(3 => "fmt_email");
-	} else {
-		$titles = array(0 => "ID#", 1=> "First Name", 2 => "Last Name", 3 => "Phone Number");
-		if($USER->authorize('sendemail')){
-			$titles[4] = "Email";
-		}
-		$formatters = array();
+	$titles = array(0 => "ID#", 1=> "First Name", 2 => "Last Name", 3 => "Phone Number");
+	if($USER->authorize('sendemail')){
+		$titles[4] = "Email";
 	}
+	$formatters = array();
 
 	if (count($listpreviewdata) >8) {
 		?><div class="scrollTableContainer"><?
