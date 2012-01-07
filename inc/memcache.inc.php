@@ -157,7 +157,7 @@ function gen2cache ($exptime, $expect = null, $key = null, $callback /*, arg1, a
 		}
 	}
 	
-	return false; //timed out
+	return call_user_func_array($callback, $args);; //timed out, just call callback
 }
 
 /**
