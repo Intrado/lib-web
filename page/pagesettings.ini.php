@@ -1,8 +1,13 @@
 ;<?/* this prevents browsers from seeing anything
 
-; commsuite appserver service
+; pagelink appserver service
 [appserver_pagelink]
 host="localhost:7913"
+timeout=5500
+
+; commsuite appserver service
+[appserver_commsuite]
+host="localhost:7912"
 timeout=5500
 
 [feature]

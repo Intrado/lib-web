@@ -1,14 +1,14 @@
 <?
 
-require_once("inc/appserver.inc.php");
-require_once('thrift/Thrift.php');
+require_once("../inc/appserver.inc.php");
+require_once('../thrift/Thrift.php');
 require_once $GLOBALS['THRIFT_ROOT'].'/protocol/TBinaryProtocol.php';
 require_once $GLOBALS['THRIFT_ROOT'].'/transport/TSocket.php';
 require_once $GLOBALS['THRIFT_ROOT'].'/transport/TBufferedTransport.php';
 require_once $GLOBALS['THRIFT_ROOT'].'/transport/TFramedTransport.php';
 require_once($GLOBALS['THRIFT_ROOT'].'/packages/commsuite/CommSuite.php');
 
-$SETTINGS = parse_ini_file("inc/settings.ini.php",true);
+$SETTINGS = parse_ini_file("pagesettings.ini.php",true);
 
 // parse params
 $maxPost = 0;
@@ -23,20 +23,20 @@ $categories = array();
 if (isset($_GET['cat'])) {
 	$categories = explode(",", $_GET['cat']);
 }
-
-//get the customer URL
-$CUSTOMERURL = substr($_SERVER["SCRIPT_NAME"],1);
-$CUSTOMERURL = strtolower(substr($CUSTOMERURL,0,strpos($CUSTOMERURL,"/")));
+$customer = "";
+if (isset($_GET['cust'])) {
+	$customer = $_GET['cust'];
+}
 
 apache_note("CS_APP","feed"); //for logging
-apache_note("CS_CUST",urlencode($CUSTOMERURL)); //for logging
+apache_note("CS_CUST",urlencode($customer)); //for logging
 
 
 // call appserver
-//expireCategories($CUSTOMERURL, $categories); // TODO remove this test call
+expireCategories($customer, $categories); // TODO remove this test call
 
 // echo the xml doc, http error codes handled within method
-echo generateFeed($CUSTOMERURL, $categories, $maxPost, $maxDays);
+echo generateFeed($customer, $categories, $maxPost, $maxDays);
 
 
 ?>
