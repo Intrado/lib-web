@@ -42,7 +42,8 @@ function action_link ($title, $icon, $href = "#", $onclick = null) {
 	}
 	$href = $href == null ? "#" : $href;
 	$onclick = $onclick == null ? "" : 'onclick="'.$onclick.'"';
-	$str = '<a href="'.$href.'" '.$onclick.' class="actionlink" title="'.escapehtml($title).'">';
+	$autoid = autoID("action_link", $title, $icon);	
+	$str = '<a id="' . $autoid . '" href="'.$href.'" '.$onclick.' class="actionlink" title="'.escapehtml($title).'">';
 	if ($actionlinkmode == "both" || $actionlinkmode == "icons")
 		$str .= '<img src="img/icons/'.$icon.'.png" alt="'.escapehtml($title).'">';
 	if ($actionlinkmode == "both" || $actionlinkmode == "text")
@@ -154,7 +155,8 @@ function submit_button($name, $value = "submit", $icon = null) {
 
 function icon_button($name,$icon,$onclick = NULL, $href = NULL, $extrahtml = NULL) {
 	$theme = getBrandTheme();
-	$btn = '<button class="button" type="button" onmouseover="btn_rollover(this);" onmouseout="btn_rollout(this);"';
+	$autoid = autoID("icon_button", $name, $icon);
+	$btn = '<button id="' . $autoid . '" class="button" type="button" onmouseover="btn_rollover(this);" onmouseout="btn_rollout(this);"';
 	if ($onclick)
 		$btn .= ' onclick="' . $onclick . ';" ';
 	else if ($href)
@@ -169,7 +171,8 @@ function icon_button($name,$icon,$onclick = NULL, $href = NULL, $extrahtml = NUL
 
 function button($name,$onclick = NULL, $href = NULL, $extrahtml = NULL) {
 	$theme = getBrandTheme();
-	$btn = '<button class="button" type="button" onmouseover="btn_rollover(this);" onmouseout="btn_rollout(this);"';
+	$autoid = autoID("button", $name);
+	$btn = '<button id="' . $autoid . '" class="button" type="button" onmouseover="btn_rollover(this);" onmouseout="btn_rollout(this);"';
 	if ($onclick)
 		$btn .= ' onclick="' . $onclick . ';" ';
 	else if ($href)
@@ -278,6 +281,21 @@ function html_to_plain($html) {
 	$plain = str_replace(array('&lt;&lt;','&gt;&gt;', '&nbsp;'), array('<<', '>>', ''), $plain);
 	
 	return trim($plain);
+}
+
+/**
+ * Generates an id usable in html based on arguments passed.
+ * If this is called twice with the same args it returns a new unique id by appending an incrementing suffix.
+ * The first arg, or prefix, is directly used in the id for readability.
+ */
+function autoID($prefix /*, arg1, arg2, ... */) {
+	static $usedcounters = array();
+	
+	$k = $prefix . crc32(implode(":", func_get_args()));
+	@$usedcounters[$k]++;
+	if ($usedcounters[$k] > 1)
+		$k .= "_" . $usedcounters[$k];
+	return $k;
 }
 
 ?>
