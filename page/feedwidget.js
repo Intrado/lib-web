@@ -1,7 +1,6 @@
 
 var feeddata;
 var vars = new Array();
-var hasflash = true; // TODO: detect this somehow
 
 function getVars() {
 	// pull the vars from the get request in the url.

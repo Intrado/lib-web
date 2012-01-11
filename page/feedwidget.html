@@ -8,6 +8,27 @@
 <script type="text/javascript" src="feedwidget.js"></script>
 </head>
 <body class="f">
+<script type="text/javascript">
+// borrowed and modified from http://www.kirupa.com/developer/mx/detection.htm
+var hasflash = false;
+var contentVersion = 6;
+var plugin = (navigator.mimeTypes && navigator.mimeTypes["application/x-shockwave-flash"]) ? navigator.mimeTypes["application/x-shockwave-flash"].enabledPlugin : 0;
+if (plugin) {
+	var words = navigator.plugins["Shockwave Flash"].description.split(" ");
+	for (var i = 0; i < words.length; ++i) {
+		if (isNaN(parseInt(words[i])))
+			continue;
+		var pluginVersion = words[i]; 
+	}
+	var hasflash = pluginVersion >= contentVersion;
+}
+else if (navigator.userAgent && navigator.userAgent.indexOf("MSIE")>=0 && (navigator.appVersion.indexOf("Win") != -1)) {
+	document.write('<SCR' + 'IPT LANGUAGE=VBScript\> \n'); //FS hide this from IE4.5 Mac by splitting the tag
+	document.write('on error resume next \n');
+	document.write('hasflash = ( IsObject(CreateObject("ShockwaveFlash.ShockwaveFlash." & contentVersion)))\n');
+	document.write('</SCR' + 'IPT\> \n');
+}
+</script>
 </body>
 </html>
 
