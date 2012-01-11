@@ -45,10 +45,10 @@ $txtsizes = array(
 	"24px" => "24px"
 );
 $bordersizes = array(
-	"0px" => "0px",
-	"1px" => "1px",
-	"2px" => "2px",
-	"3px" => "3px"
+	"0" => "0px",
+	"1" => "1px",
+	"2" => "2px",
+	"3" => "3px"
 );
 $borderstyles = array(
 	"none" => "None",
@@ -105,7 +105,7 @@ $formdata = array(
 	),
 	"bordersize" => array(
 		"label" => _L('Border size'),
-		"value" => "1px",
+		"value" => "1",
 		"validators" => array(
 			array("ValRequired"),
 			array("ValInArray", "values" => array_keys($bordersizes))),
@@ -228,9 +228,9 @@ $postdata = $form->getData();
 // replace any placeholders in the js with the form values
 $vars = str_replace('$TITLECOLOR', "#".$postdata["titlecolor"], $vars);
 $vars = str_replace('$BORDERSTYLE', $postdata["borderstyle"], $vars);
-$vars = str_replace('$BORDERSIZE', $postdata["bordersize"], $vars);
+$vars = str_replace('$BORDERSIZE', $postdata["bordersize"]."px", $vars);
 $vars = str_replace('$BORDERCOLOR', "#".$postdata["bordercolor"], $vars);
-$vars = str_replace('$IFRAMEHEIGHT', ($postdata["iframeheight"]-2)."px", $vars);
+$vars = str_replace('$IFRAMEHEIGHT', ($postdata["iframeheight"]-($postdata["bordersize"]*2))."px", $vars);
 $vars = str_replace('$HEADERSIZE', $postdata["headersize"], $vars);
 $vars = str_replace('$LISTSTYLE', $postdata["liststyle"], $vars);
 $vars = str_replace('$LISTPOSITION', $postdata["listposition"], $vars);
