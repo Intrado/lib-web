@@ -20,7 +20,7 @@ if (plugin) {
 			continue;
 		var pluginVersion = words[i]; 
 	}
-	var hasflash = pluginVersion >= contentVersion;
+	hasflash = pluginVersion >= contentVersion;
 }
 else if (navigator.userAgent && navigator.userAgent.indexOf("MSIE")>=0 && (navigator.appVersion.indexOf("Win") != -1)) {
 	document.write('<SCR' + 'IPT LANGUAGE=VBScript\> \n'); //FS hide this from IE4.5 Mac by splitting the tag
