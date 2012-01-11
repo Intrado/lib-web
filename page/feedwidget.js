@@ -1,33 +1,25 @@
 
 var feeddata;
-var feedstyles;
-var feedcategories;
+var vars = new Array();
 var hasflash = true; // TODO: detect this somehow
 
 function getVars() {
 	// pull the vars from the get request in the url.
-	feedvars = null;
-	feedcategories = null;
-	// split the vars off the end
-	var attrib = window.location.search.split("vars=");
-	if (attrib[1]) {
-		feedstyles = JSON.parse(unescape(attrib[1]));
+	var queryvars = window.location.search.substring(1).split("&");
+	for (var i = 0; i < queryvars.length; i++) {
+		var p = queryvars[i].split("=");
+		if (p[0] == "v")
+			vars[p[0]] = JSON.parse(unescape(p[1]));
+		else
+			vars[p[0]] = unescape(p[1]);
 	}
-	// next split off the categories
-	if (attrib[0]) {
-		var catattrib = attrib[0].split("c=");
-		if (catattrib[1]) {
-			feedcategories = catattrib[1];
-		}
-	}
-	// TODO: get the custurl and the num items
 }
 
 function genFeed() {
 	if ((feeddata.readyState === 4) || (feeddata.readyState === "complete")) {
 		// create the feed div in the body
 		var feeddiv = document.createElement("div");
-		feeddiv.setAttribute("style", feedstyles.div);
+		feeddiv.setAttribute("style", vars.v.div);
 		document.getElementsByTagName('body')[0].appendChild(feeddiv);
 		
 		// get the rss xml
@@ -35,13 +27,13 @@ function genFeed() {
 		
 		// find the main title and add it to the document
 		var feedtitle = document.createElement("h2");
-		feedtitle.setAttribute("style", feedstyles.h2);
+		feedtitle.setAttribute("style", vars.v.h2);
 		feedtitle.appendChild(document.createTextNode(feedxml.getElementsByTagName("title")[0].childNodes[0].nodeValue));
 		feeddiv.appendChild(feedtitle);
 		
 		// put the feed items in a list
 		var feedul = document.createElement("ul");
-		feedul.setAttribute("style", feedstyles.ul);
+		feedul.setAttribute("style", vars.v.ul);
 		feeddiv.appendChild(feedul);
 		
 		var feeditems = feedxml.getElementsByTagName('item');
@@ -87,7 +79,7 @@ function getFeedXml(onready) {
 	if (feeddata !== null) {
 		feeddata.onreadystatechange = onready;
 		// TODO: real feed xml
-		feeddata.open("GET", "testfeed.xml", true);
+		feeddata.open("GET", "testfeed.xml?c="+vars.c+"&cust="+vars.cust, true);
 		// sending out request
 		feeddata.send();
 	} else {

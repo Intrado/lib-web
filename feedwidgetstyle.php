@@ -222,7 +222,7 @@ $vars = array(
 	"div" => 'border:$BORDERSIZE $BORDERSTYLE $BORDERCOLOR;height:$IFRAMEHEIGHT;overflow:auto;',
 );
 $categories = "";
-$iframe = '<iframe height=$IFRAMEHEIGHT width=$IFRAMEWIDTH frameborder=0 marginwidth=0 marginheight=0 src="$TINYURL/feedwidget.html?c=$SMWIDGETCATEGORIES&vars=$SMWIDGETVARS"></iframe>';
+$iframe = '<iframe height=$IFRAMEHEIGHT width=$IFRAMEWIDTH frameborder=0 marginwidth=0 marginheight=0 src="$TINYURL/feedwidget.html?c=$SMWIDGETCATEGORIES&v=$SMWIDGETVARS"></iframe>';
 
 $postdata = $form->getData();
 // replace any placeholders in the js with the form values
