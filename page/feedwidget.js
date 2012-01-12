@@ -100,7 +100,7 @@ function getFeedXml(onready) {
 	}
 	if (feeddata !== null) {
 		feeddata.onreadystatechange = onready;
-		feeddata.open("GET", "feed.php?cat="+vars.c+"&cust="+vars.cust+"&items="+((vars.i)?vars.i:10), false);
+		feeddata.open("GET", "feed.php?cat="+vars.c+"&cust="+vars.cust+"&items="+((vars.i)?vars.i:10), true);
 		// sending out request
 		feeddata.send();
 	} else {
