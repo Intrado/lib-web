@@ -36,10 +36,12 @@ function genFeed() {
 		feeddiv.appendChild(feedul);
 		
 		var feeditems = feedxml.getElementsByTagName('item');
+		var feeditemlink;
 		var feeditemmediagroup;
 		var feeditemmedia;
 		var feeditemdescription;
 		var descdiv;
+		var linkhref;
 		var mediadiv = null;
 		var mediahref;
 		var mediabutton;
@@ -54,6 +56,17 @@ function genFeed() {
 			descdiv = document.createElement("div");
 			descdiv.setAttribute("style",vars.v.desc)
 			descdiv.appendChild(document.createTextNode(feeditems[i].getElementsByTagName("description")[0].firstChild.nodeValue));
+			// add link if there is one
+			var feeditemlink = feeditems[i].getElementsByTagName("link")[0];
+			if (feeditemlink.firstChild) {
+				linkhref = document.createElement("a");
+				linkhref.setAttribute("href",feeditemlink.firstChild.nodeValue);
+				linkhref.setAttribute("target","_blank");
+				linkhref.appendChild(document.createTextNode("More..."));
+				descdiv.appendChild(document.createTextNode("  "));
+				descdiv.appendChild(linkhref);
+			}
+				
 			itemli.appendChild(descdiv);
 			// find the media items
 			feeditemmediagroup = feeditems[i].getElementsByTagName("media:group")[0];
@@ -78,7 +91,7 @@ function genFeed() {
 				if (swfurl || mp3url ) {
 					itemli.appendChild(mediadiv);
 					// create a clickable to insert the player (IE7 won't evaluate onClick if you use js to insert the clickable, cause it's dumb)
-					mediadiv.innerHTML = '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="text-decoration:underline;color:blue;cursor:pointer;" onClick="insertPlayerObject(this.parentNode,\''+swfurl+'\',\''+mp3url+'\')">Get Audio</span>';
+					mediadiv.innerHTML = '<span style="'+vars.v.audio+'" onClick="insertPlayerObject(this.parentNode,\''+swfurl+'\',\''+mp3url+'\')">Get Audio</span>';
 				}
 			}
 			feedul.appendChild(itemli);
