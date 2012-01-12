@@ -18,7 +18,7 @@ function genFeed() {
 	if ((feeddata.readyState === 4) || (feeddata.readyState === "complete")) {
 		// create the feed div in the body
 		var feeddiv = document.createElement("div");
-		feeddiv.setAttribute("style", vars.v.div);
+		feeddiv.setAttribute("style", vars.v.box);
 		document.getElementsByTagName('body')[0].appendChild(feeddiv);
 		
 		// get the rss xml
@@ -26,37 +26,44 @@ function genFeed() {
 		
 		// find the main title and add it to the document
 		var feedtitle = document.createElement("h2");
-		feedtitle.setAttribute("style", vars.v.h2);
+		feedtitle.setAttribute("style", vars.v.head);
 		feedtitle.appendChild(document.createTextNode(feedxml.getElementsByTagName("title")[0].childNodes[0].nodeValue));
 		feeddiv.appendChild(feedtitle);
 		
 		// put the feed items in a list
 		var feedul = document.createElement("ul");
-		feedul.setAttribute("style", vars.v.ul);
+		feedul.setAttribute("style", vars.v.list);
 		feeddiv.appendChild(feedul);
 		
 		var feeditems = feedxml.getElementsByTagName('item');
-		var itemli;
-		var mediaspan = null;
 		var feeditemmedia;
+		var feeditemdescription;
+		var descdiv;
+		var mediadiv = null;
 		var mediahref;
 		var mediabutton;
 		var swfurl;
 		var mp3url;
+		var itemdiscription;
 		for (var i = 0; i < feeditems.length; i++) {
+			// add the label for the item
 			itemli = document.createElement("li");
 			itemli.appendChild(document.createTextNode(feeditems[i].getElementsByTagName("title")[0].firstChild.nodeValue));
+			// insert the description
+			descdiv = document.createElement("div");
+			descdiv.setAttribute("style",vars.v.desc)
+			descdiv.appendChild(document.createTextNode(feeditems[i].getElementsByTagName("description")[0].firstChild.nodeValue));
+			itemli.appendChild(descdiv);
 			// find the media items
 			feeditemmedia = feeditems[i].getElementsByTagName("media:content");
-			mediaspan = document.createElement("span");
+			mediadiv = document.createElement("div");
 			for (var m = 0; m < feeditemmedia.length; m++) {
-				itemli.appendChild(document.createElement("br"));
-				itemli.appendChild(mediaspan);
+				itemli.appendChild(mediadiv);
 				// create a button to insert the player (IE7 won't evaluate onClick if you use js to insert the button, cause it's dumb)
 				// TODO: get real media url info 
 				swfurl = "pp.swf?code=8&as=0&nump=1&bu=%2F";
 				mp3url = "a.mp3.php?code=8&full&dl";
-				mediaspan.innerHTML = '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="text-decoration:underline;color:blue;cursor:pointer;" onClick="insertPlayerObject(this.parentNode,\''+swfurl+'\',\''+mp3url+'\')">Get Audio</span>';
+				mediadiv.innerHTML = '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="text-decoration:underline;color:blue;cursor:pointer;" onClick="insertPlayerObject(this.parentNode,\''+swfurl+'\',\''+mp3url+'\')">Get Audio</span>';
 			}
 			feedul.appendChild(itemli);
 			

@@ -33,22 +33,24 @@ if (!$USER->authorize('managesystem')) {
 // Form Data
 ////////////////////////////////////////////////////////////////////////////////
 
-$txtsizes = array(
-	"8px" => "8px",
-	"10px" => "10px",
-	"12px" => "12px",
-	"14px" => "14px",
-	"16px" => "16px",
-	"18px" => "18px",
-	"20px" => "20px",
-	"22px" => "22px",
-	"24px" => "24px"
-);
-$bordersizes = array(
+$pxsizes = array(
 	"0" => "0px",
 	"1" => "1px",
 	"2" => "2px",
-	"3" => "3px"
+	"3" => "3px",
+	"4" => "4px",
+	"5" => "5px",
+	"6" => "6px",
+	"7" => "7px",
+	"8" => "8px",
+	"10" => "10px",
+	"12" => "12px",
+	"14" => "14px",
+	"16" => "16px",
+	"18" => "18px",
+	"20" => "20px",
+	"22" => "22px",
+	"24" => "24px"
 );
 $borderstyles = array(
 	"none" => "None",
@@ -78,7 +80,7 @@ $formdata = array(
 	_L('Global settings'),
 	"iframeheight" => array(
 		"label" => _L('Iframe height'),
-		"value" => 420,
+		"value" => 480,
 		"validators" => array(
 			array("ValRequired"),
 			array("ValNumber", "min" => 200, "max" => 2200)),
@@ -108,8 +110,8 @@ $formdata = array(
 		"value" => "1",
 		"validators" => array(
 			array("ValRequired"),
-			array("ValInArray", "values" => array_keys($bordersizes))),
-		"control" => array("SelectMenu", "values" => $bordersizes),
+			array("ValInArray", "values" => array_keys($pxsizes))),
+		"control" => array("SelectMenu", "values" => $pxsizes),
 		"helpstep" => 1
 	),
 	"bordercolor" => array(
@@ -132,11 +134,11 @@ $formdata = array(
 	_L('Header'),
 	"headersize" => array(
 		"label" => _L('Text size'),
-		"value" => "14px",
+		"value" => "14",
 		"validators" => array(
 			array("ValRequired"),
-			array("ValInArray", "values" => array_keys($txtsizes))),
-		"control" => array("SelectMenu", "values" => $txtsizes),
+			array("ValInArray", "values" => array_keys($pxsizes))),
+		"control" => array("SelectMenu", "values" => $pxsizes),
 		"helpstep" => 1
 	),
 	"titlecolor" => array(
@@ -176,11 +178,11 @@ $formdata = array(
 	),
 	"labelsize" => array(
 		"label" => _L('Label size'),
-		"value" => "12px",
+		"value" => "12",
 		"validators" => array(
 			array("ValRequired"),
-			array("ValInArray", "values" => array_keys($txtsizes))),
-		"control" => array("SelectMenu", "values" => $txtsizes),
+			array("ValInArray", "values" => array_keys($pxsizes))),
+		"control" => array("SelectMenu", "values" => $pxsizes),
 		"helpstep" => 1
 	),
 	"labelcolor" => array(
@@ -193,11 +195,11 @@ $formdata = array(
 	),
 	"descriptionsize" => array(
 		"label" => _L('Description size'),
-		"value" => "10px",
+		"value" => "10",
 		"validators" => array(
 			array("ValRequired"),
-			array("ValInArray", "values" => array_keys($txtsizes))),
-		"control" => array("SelectMenu", "values" => $txtsizes),
+			array("ValInArray", "values" => array_keys($pxsizes))),
+		"control" => array("SelectMenu", "values" => $pxsizes),
 		"helpstep" => 1
 	),
 	"descriptioncolor" => array(
@@ -207,7 +209,16 @@ $formdata = array(
 			array("ValRequired")),
 		"control" => array("ColorPicker", "size" => 7),
 		"helpstep" => 1
-	)
+	),
+	"descriptionpadding" => array(
+		"label" => _L('Description padding'),
+		"value" => "2",
+		"validators" => array(
+			array("ValRequired"),
+			array("ValInArray", "values" => array_keys($pxsizes))),
+		"control" => array("SelectMenu", "values" => $pxsizes),
+		"helpstep" => 1
+	),
 );
 
 $helpsteps = array (
@@ -226,9 +237,10 @@ $form = new Form("feedwidgetstyle",$formdata,$helpsteps,$buttons);
 $form->handleRequest();
 
 $vars = array(
-	"h2" => 'color:$TITLECOLOR;font-size:$HEADERSIZE;',
-	"ul" => 'list-style:$LISTSTYLE $LISTPOSITION;$LISTPADDING;color:$LABELCOLOR;font-size:$LABELSIZE;',
-	"div" => 'border:$BORDERSIZE $BORDERSTYLE $BORDERCOLOR;height:$IFRAMEHEIGHT;overflow:auto;',
+	"head" => 'color:$TITLECOLOR;font-size:$HEADERSIZE;',
+	"list" => 'list-style:$LISTSTYLE $LISTPOSITION;$LISTPADDING;color:$LABELCOLOR;font-size:$LABELSIZE;',
+	"box" => 'border:$BORDERSIZE $BORDERSTYLE $BORDERCOLOR;height:$IFRAMEHEIGHT;overflow:auto;',
+	"desc" => 'color:$DESCRIPTIONCOLOR;font-size:$DESCRIPTIONSIZE;padding-left:$DESCRIPTIONPADDING'
 );
 $categories = "1,2,3,4";
 $iframe = '<iframe height=$IFRAMEHEIGHT width=$IFRAMEWIDTH frameborder=0 marginwidth=0 marginheight=0 src="$TINYURL/feedwidget.html?cust=$CUSTURL&i=$ITEMSTODISPLAY&c=$SMWIDGETCATEGORIES&v=$SMWIDGETVARS"></iframe>';
@@ -240,14 +252,15 @@ $vars = str_replace('$BORDERSTYLE', $postdata["borderstyle"], $vars);
 $vars = str_replace('$BORDERSIZE', $postdata["bordersize"]."px", $vars);
 $vars = str_replace('$BORDERCOLOR', "#".$postdata["bordercolor"], $vars);
 $vars = str_replace('$IFRAMEHEIGHT', ($postdata["iframeheight"]-($postdata["bordersize"]*2))."px", $vars);
-$vars = str_replace('$HEADERSIZE', $postdata["headersize"], $vars);
+$vars = str_replace('$HEADERSIZE', $postdata["headersize"]."px", $vars);
 $vars = str_replace('$LISTSTYLE', $postdata["liststyle"], $vars);
 $vars = str_replace('$LISTPOSITION', $postdata["listposition"], $vars);
 $vars = str_replace('$LISTPADDING', ($postdata["listpadding"] !== "")?"padding-left:".$postdata["listpadding"]."px":"", $vars);
-$vars = str_replace('$LABELSIZE', $postdata["labelsize"], $vars);
+$vars = str_replace('$LABELSIZE', $postdata["labelsize"]."px", $vars);
 $vars = str_replace('$LABELCOLOR', "#".$postdata["labelcolor"], $vars);
-$vars = str_replace('$DESCRIPTIONSIZE', $postdata["descriptionsize"], $vars);
+$vars = str_replace('$DESCRIPTIONSIZE', $postdata["descriptionsize"]."px", $vars);
 $vars = str_replace('$DESCRIPTIONCOLOR', "#".$postdata["descriptioncolor"], $vars);
+$vars = str_replace('$DESCRIPTIONPADDING', $postdata["descriptionpadding"]."px", $vars);
 
 $iframe = str_replace('$IFRAMEHEIGHT', $postdata["iframeheight"], $iframe);
 $iframe = str_replace('$IFRAMEWIDTH', $postdata["iframewidth"], $iframe);
