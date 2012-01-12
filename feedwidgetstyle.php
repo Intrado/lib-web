@@ -239,7 +239,7 @@ $helpsteps = array (
 	_L('TODO: help me')
 );
 
-$buttons = array(submit_button(_L('Preview'),"submit","tick"), icon_button(_L('Cancel'),"cross",null,"start.php"));
+$buttons = array(submit_button(_L('Generate'),"submit","tick"), icon_button(_L('Cancel'),"cross",null,"start.php"));
 $form = new Form("feedwidgetstyle",$formdata,$helpsteps,$buttons);
 
 ////////////////////////////////////////////////////////////////////////////////
