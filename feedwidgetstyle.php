@@ -120,6 +120,15 @@ $formdata = array(
 		"control" => array("ColorPicker", "size" => 7),
 		"helpstep" => 1
 	),
+	"itemstodisplay" => array(
+		"label" => _L('Items to display'),
+		"value" => 10,
+		"validators" => array(
+			array("ValRequired"),
+			array("ValNumber", "min" => 5, "max" => 100)),
+		"control" => array("TextField", "size" => 5),
+		"helpstep" => 1
+	),
 	_L('Header'),
 	"headersize" => array(
 		"label" => _L('Text size'),
@@ -221,8 +230,8 @@ $vars = array(
 	"ul" => 'list-style:$LISTSTYLE $LISTPOSITION;$LISTPADDING;color:$LABELCOLOR;font-size:$LABELSIZE;',
 	"div" => 'border:$BORDERSIZE $BORDERSTYLE $BORDERCOLOR;height:$IFRAMEHEIGHT;overflow:auto;',
 );
-$categories = "";
-$iframe = '<iframe height=$IFRAMEHEIGHT width=$IFRAMEWIDTH frameborder=0 marginwidth=0 marginheight=0 src="$TINYURL/feedwidget.html?c=$SMWIDGETCATEGORIES&v=$SMWIDGETVARS"></iframe>';
+$categories = "1,2,3,4";
+$iframe = '<iframe height=$IFRAMEHEIGHT width=$IFRAMEWIDTH frameborder=0 marginwidth=0 marginheight=0 src="$TINYURL/feedwidget.html?cust=$CUSTURL&i=$ITEMSTODISPLAY&c=$SMWIDGETCATEGORIES&v=$SMWIDGETVARS"></iframe>';
 
 $postdata = $form->getData();
 // replace any placeholders in the js with the form values
@@ -242,8 +251,9 @@ $vars = str_replace('$DESCRIPTIONCOLOR', "#".$postdata["descriptioncolor"], $var
 
 $iframe = str_replace('$IFRAMEHEIGHT', $postdata["iframeheight"], $iframe);
 $iframe = str_replace('$IFRAMEWIDTH', $postdata["iframewidth"], $iframe);
-// TODO: real tinyurl, cust argument
-$iframe = str_replace('$TINYURL', "http://10.25.25.208:82", $iframe);
+$iframe = str_replace('$CUSTURL', getSystemSetting("urlcomponent"), $iframe);
+$iframe = str_replace('$ITEMSTODISPLAY', $postdata["itemstodisplay"], $iframe);
+$iframe = str_replace('$TINYURL', "http://".getSystemSetting("tinydomain","alrt4.me"), $iframe);
 
 //check for form submission
 if ($button = $form->getSubmit() && $form->isAjaxSubmit())
