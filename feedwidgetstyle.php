@@ -33,6 +33,11 @@ if (!$USER->authorize('managesystem')) {
 // Form Data
 ////////////////////////////////////////////////////////////////////////////////
 
+$fontfamilies = array(
+	'default' => "Browser default",
+	'"Times New Roman", Times, serif' => "Times New Roman, Times, serif",
+	'Arial, Helvetica, sans-serif' => "Arial, Helvetica, sans-serif"
+);
 $pxsizes = array(
 	"0" => "0px",
 	"1" => "1px",
@@ -78,6 +83,15 @@ $listpositions = array(
 );
 $formdata = array(
 	_L('Global settings'),
+	"fontfamily" => array(
+		"label" => _L('Font Family'),
+		"value" => "default",
+		"validators" => array(
+			array("ValRequired"),
+			array("ValInArray", "values" => array_keys($fontfamilies))),
+		"control" => array("SelectMenu", "values" => $fontfamilies),
+		"helpstep" => 1
+	),
 	"iframeheight" => array(
 		"label" => _L('Iframe height'),
 		"value" => 480,
@@ -239,7 +253,7 @@ $form->handleRequest();
 $vars = array(
 	"head" => 'color:$TITLECOLOR;font-size:$HEADERSIZE;padding-left:4px;',
 	"list" => 'list-style:$LISTSTYLE $LISTPOSITION;$LISTPADDING;color:$LABELCOLOR;font-size:$LABELSIZE;',
-	"box" => 'border:$BORDERSIZE $BORDERSTYLE $BORDERCOLOR;height:$IFRAMEHEIGHT;overflow:auto;',
+	"box" => '$FONTFAMILYborder:$BORDERSIZE $BORDERSTYLE $BORDERCOLOR;height:$IFRAMEHEIGHT;overflow:auto;',
 	"desc" => 'color:$DESCRIPTIONCOLOR;font-size:$DESCRIPTIONSIZE;padding-left:$DESCRIPTIONPADDING',
 	"audio" => 'font-size:$DESCRIPTIONSIZE;padding-left:$DESCRIPTIONPADDING;cursor:pointer;color:blue;text-decoration:underline;'
 );
@@ -248,6 +262,7 @@ $iframe = '<iframe height=$IFRAMEHEIGHT width=$IFRAMEWIDTH frameborder=0 marginw
 
 $postdata = $form->getData();
 // replace any placeholders in the js with the form values
+$vars = str_replace('$FONTFAMILY', "font-family:".$postdata["fontfamily"].";", $vars);
 $vars = str_replace('$TITLECOLOR', "#".$postdata["titlecolor"], $vars);
 $vars = str_replace('$BORDERSTYLE', $postdata["borderstyle"], $vars);
 $vars = str_replace('$BORDERSIZE', $postdata["bordersize"]."px", $vars);
