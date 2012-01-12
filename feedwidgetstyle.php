@@ -136,15 +136,6 @@ $formdata = array(
 		"control" => array("ColorPicker", "size" => 7),
 		"helpstep" => 1
 	),
-	"itemstodisplay" => array(
-		"label" => _L('Items to display'),
-		"value" => 10,
-		"validators" => array(
-			array("ValRequired"),
-			array("ValNumber", "min" => 5, "max" => 100)),
-		"control" => array("TextField", "size" => 5),
-		"helpstep" => 1
-	),
 	_L('Header'),
 	"headersize" => array(
 		"label" => _L('Text size'),
@@ -164,6 +155,15 @@ $formdata = array(
 		"helpstep" => 1
 	),
 	_L('Item List'),
+	"itemstodisplay" => array(
+		"label" => _L('Items to display'),
+		"value" => 10,
+		"validators" => array(
+			array("ValRequired"),
+			array("ValNumber", "min" => 5, "max" => 100)),
+		"control" => array("TextField", "size" => 5),
+		"helpstep" => 1
+	),
 	"liststyle" => array(
 		"label" => _L('List style'),
 		"value" => "circle",
