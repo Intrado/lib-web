@@ -29,8 +29,17 @@ function TCBuildCell (R, G, B, w, h) {
 function TCSelect(c) {
 	// Removed # from return value.  -JJL
 	this.field.value = c.toUpperCase();
-	// Write values to hidden field and validate. -NRH
-	storeTheme();
+	// Fire an event on the field. -NRH
+	if (document.createEventObject){
+		// dispatch for IE
+		var evt = document.createEventObject();
+		this.field.fireEvent('onchange',evt)
+	} else {
+		// dispatch for firefox + others
+		var evt = document.createEvent("HTMLEvents");
+		evt.initEvent("change", true, true ); // event type,bubbling,cancelable
+		this.field.dispatchEvent(evt);
+	}
 	this.win.close();
 }
 
