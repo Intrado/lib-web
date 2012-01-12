@@ -134,7 +134,7 @@ $formdata = array(
 	_L('Header'),
 	"headersize" => array(
 		"label" => _L('Text size'),
-		"value" => "14",
+		"value" => "18",
 		"validators" => array(
 			array("ValRequired"),
 			array("ValInArray", "values" => array_keys($pxsizes))),
@@ -170,7 +170,7 @@ $formdata = array(
 	),
 	"listpadding" => array(
 		"label" => _L('Left padding'),
-		"value" => "",
+		"value" => "25",
 		"validators" => array(
 			array("ValNumber", "min" => 0, "max" => 60)),
 		"control" => array("TextField", "size" => 5),
@@ -178,7 +178,7 @@ $formdata = array(
 	),
 	"labelsize" => array(
 		"label" => _L('Label size'),
-		"value" => "12",
+		"value" => "16",
 		"validators" => array(
 			array("ValRequired"),
 			array("ValInArray", "values" => array_keys($pxsizes))),
@@ -195,7 +195,7 @@ $formdata = array(
 	),
 	"descriptionsize" => array(
 		"label" => _L('Description size'),
-		"value" => "10",
+		"value" => "14",
 		"validators" => array(
 			array("ValRequired"),
 			array("ValInArray", "values" => array_keys($pxsizes))),
@@ -212,7 +212,7 @@ $formdata = array(
 	),
 	"descriptionpadding" => array(
 		"label" => _L('Description padding'),
-		"value" => "2",
+		"value" => "4",
 		"validators" => array(
 			array("ValRequired"),
 			array("ValInArray", "values" => array_keys($pxsizes))),
@@ -237,7 +237,7 @@ $form = new Form("feedwidgetstyle",$formdata,$helpsteps,$buttons);
 $form->handleRequest();
 
 $vars = array(
-	"head" => 'color:$TITLECOLOR;font-size:$HEADERSIZE;',
+	"head" => 'color:$TITLECOLOR;font-size:$HEADERSIZE;padding-left:4px;',
 	"list" => 'list-style:$LISTSTYLE $LISTPOSITION;$LISTPADDING;color:$LABELCOLOR;font-size:$LABELSIZE;',
 	"box" => 'border:$BORDERSIZE $BORDERSTYLE $BORDERCOLOR;height:$IFRAMEHEIGHT;overflow:auto;',
 	"desc" => 'color:$DESCRIPTIONCOLOR;font-size:$DESCRIPTIONSIZE;padding-left:$DESCRIPTIONPADDING',
