@@ -33,7 +33,7 @@ apache_note("CS_CUST",urlencode($customer)); //for logging
 
 
 // call appserver
-expireCategories($customer, $categories); // TODO remove this test call
+expireFeedCategory(1); // TODO remove this test call
 
 // echo the xml doc, http error codes handled within method
 header ("Content-Type:text/xml");

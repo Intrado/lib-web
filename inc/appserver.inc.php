@@ -452,7 +452,10 @@ function generateFeed($urlcomponent, $categories, $maxPost, $maxDays) {
 	}
 }
 
-function expireCategories($urlcomponent, $categories) {
+function expireFeedCategory($feedcategoryid) {
+	$customerid = $_SESSION['customerid'];
+	$customerid = 1; // TODO REmove
+	
 	list($appserverCommsuiteProtocol,$appserverCommsuiteTransport) = initCommsuiteApp();
 
 	if ($appserverCommsuiteProtocol == null || $appserverCommsuiteTransport == null) {
@@ -467,15 +470,15 @@ function expireCategories($urlcomponent, $categories) {
 			$appserverCommsuiteTransport->open();
 
 			// Connect and be sure to catch and log all exceptions
-			$client->expireCategories($urlcomponent, $categories);
+			$client->expireFeedCategory($customerid, $feedcategoryid);
 			return true;
 		} catch (TException $tx) {
 			$attempts++;
 			// a general thrift exception, like no such server
-			error_log("expireCategories: Exception Connection to AppServer (" . $tx->getMessage() . ")");
+			error_log("expireFeedCategory: Exception Connection to AppServer (" . $tx->getMessage() . ")");
 			$appserverCommsuiteTransport->close();
 			if ($attempts > 2) {
-				error_log("expireCategories: Failed 3 times to send request to appserver. urlcomponent=".$urlcomponent);
+				error_log("expireFeedCategory: Failed 3 times to send request to appserver. urlcomponent=".$urlcomponent);
 				return false;
 			}
 		}
