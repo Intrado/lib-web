@@ -57,14 +57,22 @@ function genFeed() {
 			// find the media items
 			feeditemmedia = feeditems[i].getElementsByTagName("media:content");
 			mediadiv = document.createElement("div");
+			// get the swf and mp3 urls
+			swfurl = null;
+			mp3url = null;
 			for (var m = 0; m < feeditemmedia.length; m++) {
+				if (feeditemmedia[m].attributes.getNamedItem("type").value == "audio/mpeg")
+					mp3url = feeditemmedia[m].attributes.getNamedItem("url").value;
+				else if (feeditemmedia[m].attributes.getNamedItem("type").value == "application/x-shockwave-flash")
+					swfurl = feeditemmedia[m].attributes.getNamedItem("url").value;
+			}
+			
+			if (swfurl || mp3url) {
 				itemli.appendChild(mediadiv);
-				// create a button to insert the player (IE7 won't evaluate onClick if you use js to insert the button, cause it's dumb)
-				// TODO: get real media url info 
-				swfurl = "pp.swf?code=8&as=0&nump=1&bu=%2F";
-				mp3url = "a.mp3.php?code=8&full&dl";
+				// create a clickable to insert the player (IE7 won't evaluate onClick if you use js to insert the clickable, cause it's dumb)
 				mediadiv.innerHTML = '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="text-decoration:underline;color:blue;cursor:pointer;" onClick="insertPlayerObject(this.parentNode,\''+swfurl+'\',\''+mp3url+'\')">Get Audio</span>';
 			}
+			
 			feedul.appendChild(itemli);
 			
 		}
@@ -95,9 +103,9 @@ function getFeedXml(onready) {
 
 // insert html representing the object necessary for media playback (IE doesn't let you insert objects with js for some stupid reason)
 function insertPlayerObject(container,swfurl,mp3url) {
-	if (hasflash) {
+	if (hasflash && swfurl) {
 		container.innerHTML = '<object classid="clsid:d27cdb6e-ae6d-11cf-96b8-444553540000" width="165" height="38"><param name="movie" value="'+swfurl+'" /><object type="application/x-shockwave-flash" data="'+swfurl+'" width="165" height="38"><param name="movie" value="'+swfurl+'"/></object></object>';
-	} else {
+	} else if (mp3url) {
 		container.innerHTML = '<object classid="clsid:22D6F312-B0F6-11D0-94AB-0080C74C7E95" width="165" height="45"><param name="type" value="audio/mpeg" /><param name="src" value="'+mp3url+'" /><param name="autostart" value="0" /><object type="audio/mpeg" data="'+mp3url+'" width="165" height="45" autoplay="false"></object></object>';
 	}
 }
