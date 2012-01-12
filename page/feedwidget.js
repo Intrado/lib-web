@@ -1,5 +1,5 @@
 
-var feeddata;
+var feeddata = null;
 var vars = new Array();
 
 function getVars() {
@@ -36,6 +36,7 @@ function genFeed() {
 		feeddiv.appendChild(feedul);
 		
 		var feeditems = feedxml.getElementsByTagName('item');
+		var feeditemmediagroup;
 		var feeditemmedia;
 		var feeditemdescription;
 		var descdiv;
@@ -55,24 +56,31 @@ function genFeed() {
 			descdiv.appendChild(document.createTextNode(feeditems[i].getElementsByTagName("description")[0].firstChild.nodeValue));
 			itemli.appendChild(descdiv);
 			// find the media items
-			feeditemmedia = feeditems[i].getElementsByTagName("media:content");
-			mediadiv = document.createElement("div");
-			// get the swf and mp3 urls
-			swfurl = null;
-			mp3url = null;
-			for (var m = 0; m < feeditemmedia.length; m++) {
-				if (feeditemmedia[m].attributes.getNamedItem("type").value == "audio/mpeg")
-					mp3url = feeditemmedia[m].attributes.getNamedItem("url").value;
-				else if (feeditemmedia[m].attributes.getNamedItem("type").value == "application/x-shockwave-flash")
-					swfurl = feeditemmedia[m].attributes.getNamedItem("url").value;
+			feeditemmediagroup = feeditems[i].getElementsByTagName("media:group")[0];
+			if (feeditemmediagroup == undefined) // WebKit, Gecko
+				feeditemmediagroup = feeditems[i].getElementsByTagName("group")[0];
+			if (feeditemmediagroup) {
+				feeditemmedia = feeditemmediagroup.getElementsByTagName("media:content");
+				if (feeditemmedia[0] == undefined) // WebKit, Gecko
+					feeditemmedia = feeditemmediagroup.getElementsByTagName("content");
+
+				mediadiv = document.createElement("div");
+				// get the swf and mp3 urls
+				swfurl = null;
+				mp3url = null;
+				for (var m = 0; m < feeditemmedia.length; m++) {
+					if (feeditemmedia[m].attributes.getNamedItem("type").value == "audio/mpeg")
+						mp3url = feeditemmedia[m].attributes.getNamedItem("url").value;
+					else if (feeditemmedia[m].attributes.getNamedItem("type").value == "application/x-shockwave-flash")
+						swfurl = feeditemmedia[m].attributes.getNamedItem("url").value;
+				}
+				
+				if (swfurl || mp3url ) {
+					itemli.appendChild(mediadiv);
+					// create a clickable to insert the player (IE7 won't evaluate onClick if you use js to insert the clickable, cause it's dumb)
+					mediadiv.innerHTML = '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="text-decoration:underline;color:blue;cursor:pointer;" onClick="insertPlayerObject(this.parentNode,\''+swfurl+'\',\''+mp3url+'\')">Get Audio</span>';
+				}
 			}
-			
-			if (swfurl || mp3url) {
-				itemli.appendChild(mediadiv);
-				// create a clickable to insert the player (IE7 won't evaluate onClick if you use js to insert the clickable, cause it's dumb)
-				mediadiv.innerHTML = '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="text-decoration:underline;color:blue;cursor:pointer;" onClick="insertPlayerObject(this.parentNode,\''+swfurl+'\',\''+mp3url+'\')">Get Audio</span>';
-			}
-			
 			feedul.appendChild(itemli);
 			
 		}
@@ -92,7 +100,7 @@ function getFeedXml(onready) {
 	}
 	if (feeddata !== null) {
 		feeddata.onreadystatechange = onready;
-		feeddata.open("GET", "feed.php?cat="+vars.c+"&cust="+vars.cust+"&items="+((vars.i)?vars.i:10), true);
+		feeddata.open("GET", "feed.php?cat="+vars.c+"&cust="+vars.cust+"&items="+((vars.i)?vars.i:10), false);
 		// sending out request
 		feeddata.send();
 	} else {
