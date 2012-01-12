@@ -1,7 +1,7 @@
 <?
 // NOTE assumes global $_dbcon already connected to customer database
 
-function createDefaultTemplates_7_8($useSmsMessagelinkInboundnumber = false) {
+function createDefaultTemplates($useSmsMessagelinkInboundnumber = false) {
 	
 	$templatedata = explode("$$$",file_get_contents("templatedata.txt"));
 	
@@ -111,6 +111,19 @@ function createDefaultTemplates_7_8($useSmsMessagelinkInboundnumber = false) {
 			
 			if (!createTemplate('survey', $survey_englishplain, $survey_englishhtml, $survey_spanishplain, $survey_spanishhtml))
 				return false;
+			
+			$monitor_englishhtml = $templatedata[19];
+			$monitor_englishplain = $templatedata[20];
+			
+			$messagegroupid = createTemplate('monitor', $monitor_englishplain, $monitor_englishhtml, $monitor_englishplain, $monitor_englishhtml);
+			if (!$messagegroupid)
+				return false;
+			
+			// set english and spanish headers, they are the same
+			$data = "subject=" . urlencode("Monitor Alert: \${monitoralert}") .
+								"&fromname=" . urlencode("\${productname}") . 
+								"&fromemail=" . urlencode("noreply@schoolmessenger.com");
+			QuickUpdate("update message set data = ? where messagegroupid = ? and type = 'email'", null, array($data, $messagegroupid));
 			
 			// SUCCESS	
 			return true;

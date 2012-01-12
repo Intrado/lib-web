@@ -25,6 +25,8 @@ Order of template data is:
 [17]survey english html
 [18]survey english plain
 
+[19]monitor english html
+[20]monitor english plain
 
 $$$
 ${body}<br><br><hr />
@@ -439,6 +441,136 @@ ${displayname} would like to continue connecting with you via email.  If you pre
 ${productname} is a notification service used by the nation's leading school systems to connect with parents, students, and staff through voice, SMS text, email, and social media.
 
 
+$$$
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Monitor Alert - ${monitoralert}</title>
+<meta http-equiv="content-type"content="text/html;charset=utf-8" />
+</head>
+<body style="background: #FFFFFF; font-family:verdana; color:#666666;">
+<div style="padding: 20px 20px 40px 20px;">
+<table width="500px" cellpadding="10" cellspacing="0" class="backgroundTable" style="background-color: #FFFFFF; border:1px solid #A5A5A5;" align="center">
+<tr>
+<td valign="top" align="left" style="border-bottom: 1px solid #A5A5A5; padding:0px;padding-left:10px; background-color:#FFFFFF;">
+<p style="margin:0px;margin-top:10px;font-size:26px; color:#669900;">
+<img src="https://asp.schoolmessenger.com/i/img/largeicons/bell.jpg" alt="" style="vertical-align:top;border:none;"/> Monitor Alert  </p>
+<p style="margin:10px;margin-top:-10px;padding-left:50px;font-size:20px; color:#6B6B6B">${monitoralert}</p></td></tr><tr><td valign="top" align="left" >
+
+<!-- $beginBlock job-active -->
+<p>
+Job from ${displayname}<br />
+</p>
+<table style="font-size:12px;border-collapse: collapse;margin-left:20px;">
+<tr><td align="right" style="font-weight:bold;">Submitted by:</td><td style="font-style:italic;">${firstname} ${lastname}</td></tr>
+<tr><td align="right" style="font-weight:bold;">Name:</td><td style="font-style:italic;">${name}</td></tr>
+<tr><td align="right" style="font-weight:bold;">Description:</td><td style="font-style:italic;">${description}</td></tr>
+<tr><td align="right" style="font-weight:bold;">Type:</td><td style="font-style:italic;">${type}</td></tr>
+<tr><td align="right" style="font-weight:bold;">Startdate:</td><td style="font-style:italic;">${startdate}</td></tr>
+<tr><td align="right" style="font-weight:bold;">Days to run:</td><td style="font-style:italic;">${daystorun}</td></tr>
+</table>
+<p>Follow link for additional details:</p><p style="text-align: center;"><br/>
+<a href="${monitorlink}">
+<img src="https://asp.schoolmessenger.com/i/img/largeicons/letter.jpg" alt="Click here to" style="border:none;"/><br/>View Details</a>
+</p>
+<!-- $endBlock job-active -->
+<!-- $beginBlock job-complete -->
+<p>
+Job from ${displayname}<br />
+</p>
+<table style="font-size:12px;border-collapse: collapse;margin-left:20px;">
+<tr><td align="right" style="font-weight:bold;">Submitted by:</td><td style="font-style:italic;">${firstname} ${lastname}</td></tr>
+<tr><td align="right" style="font-weight:bold;">Name:</td><td style="font-style:italic;">${name}</td></tr>
+<tr><td align="right" style="font-weight:bold;">Description:</td><td style="font-style:italic;">${description}</td></tr>
+<tr><td align="right" style="font-weight:bold;">Type:</td><td style="font-style:italic;">${type}</td></tr>
+<tr><td align="right" style="font-weight:bold;">Startdate:</td><td style="font-style:italic;">${startdate}</td></tr>
+<tr><td align="right" style="font-weight:bold;">Days to run:</td><td style="font-style:italic;">${daystorun}</td></tr>
+</table>
+<p>Follow link for additional details:</p><p style="text-align: center;"><br/>
+<a href="${monitorlink}">
+<img src="https://asp.schoolmessenger.com/i/img/largeicons/letter.jpg" alt="Click here to" style="border:none;"/><br/>View Details</a>
+</p>
+<!-- $endBlock job-complete -->
+<!-- $beginBlock job-firstpass -->
+<p>
+Job from ${displayname}<br />
+</p>
+<table style="font-size:12px;border-collapse: collapse;margin-left:20px;">
+<tr><td align="right" style="font-weight:bold;">Submitted by:</td><td style="font-style:italic;">${firstname} ${lastname}</td></tr>
+<tr><td align="right" style="font-weight:bold;">Name:</td><td style="font-style:italic;">${name}</td></tr>
+<tr><td align="right" style="font-weight:bold;">Description:</td><td style="font-style:italic;">${description}</td></tr>
+<tr><td align="right" style="font-weight:bold;">Type:</td><td style="font-style:italic;">${type}</td></tr>
+<tr><td align="right" style="font-weight:bold;">Startdate:</td><td style="font-style:italic;">${startdate}</td></tr>
+<tr><td align="right" style="font-weight:bold;">Days to run:</td><td style="font-style:italic;">${daystorun}</td></tr>
+</table>
+<p>Follow link for additional details:</p><p style="text-align: center;"><br/>
+<a href="${monitorlink}">
+<img src="https://asp.schoolmessenger.com/i/img/largeicons/letter.jpg" alt="Click here to" style="border:none;"/><br/>View Details</a>
+</p>
+<!-- $endBlock job-firstpass -->
+</td>
+</tr><tr>
+<td valign="top" align="left" style="padding:5px;border-top: 1px solid #A5A5A5; background-color:#FFFFFF;">
+<!-- $beginBlock monitor -->
+<p style="font-family:verdana; color:#6B6B6B; font-size:75%">
+You are receiving this email because the monitor feature is configured for your account. To disable or change the alerts, please log into your account and navigate to the System->Monitor tab.
+<br/>
+<br/>
+DO NOT REPLY: This is an automatically generated email. Please do not send a reply message.
+</p>
+<!-- $endBlock monitor -->
+</td></tr>
+</table>
+</div>
+</body>
+</html>
+$$$
+<!-- $beginBlock job-active -->
+Job from ${displayname}
+
+Submitted by: ${firstname} ${lastname}
+Name: ${name}
+Description: ${description}
+Type: ${type}
+Startdate: ${startdate}
+Days to run: ${daystorun}
+
+Follow link for additional details:
+${monitorlink}
+<!-- $endBlock job-active -->
+<!-- $beginBlock job-complete -->
+Job from ${displayname}
+
+Submitted by: ${firstname} ${lastname}
+Name: ${name}
+Description: ${description}
+Type: ${type}
+Startdate: ${startdate}
+Days to run: ${daystorun}
+
+Follow link for additional details:
+${monitorlink}
+<!-- $endBlock job-complete -->
+<!-- $beginBlock job-firstpass -->
+Job from ${displayname}
+
+Submitted by: ${firstname} ${lastname}
+Name: ${name}
+Description: ${description}
+Type: ${type}
+Startdate: ${startdate}
+Days to run: ${daystorun}
+
+Follow link for additional details:
+${monitorlink}
+<!-- $endBlock job-firstpass -->
+<!-- $beginBlock monitor -->
+-----
+
+You are receiving this email because the monitor feature is configured for your account. To disable or change the alerts, please log into your account and navigate to the System->Monitor tab.
+
+DO NOT REPLY: This is an automatically generated email. Please do not send a reply message.
+<!-- $endBlock monitor -->
 $$$
 
 

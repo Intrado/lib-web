@@ -1800,4 +1800,8 @@ $$$
 
 -- END 8.2/5
 
+-- START 8.2/6
 
+update setting set value='8.2/6' where name='_dbversion'
+$$$
+-- END 8.2/6

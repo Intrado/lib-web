@@ -65,3 +65,6 @@ $$$
 ALTER TABLE `jobpost` CHANGE `type` `type` ENUM( 'facebook', 'twitter', 'page', 'feed' ) NOT NULL 
 $$$
 
+-- $rev 6
+-- Creating monitor template with dbmo
+

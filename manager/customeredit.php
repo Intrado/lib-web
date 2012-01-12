@@ -1199,7 +1199,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 			$_dbcon = $custdb;
 				
 			// Default Email Templates
-			if (!createDefaultTemplates_7_8())
+			if (!createDefaultTemplates())
 				return false;
 				
 			// restore global db connection
