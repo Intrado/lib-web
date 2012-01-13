@@ -66,6 +66,9 @@ $jobtypes = QuickQueryList("select id, name from jobtype where not deleted and n
 $usersurveytypes = QuickQueryList("select id from jobtype where id in (select jobtypeid from userjobtypes where userid=?) and not deleted and issurvey order by systempriority, name asc", false, false, array($edituser->id));
 $surveytypes = QuickQueryList("select id, name from jobtype where not deleted and issurvey order by systempriority, name asc", true);
 
+$userfeedcategories = QuickQueryList("select id from feedcategory where id in (select feedcategoryid from userfeedcategory where userid=?) and not deleted", false, false, array($edituser->id));
+$feedcategories = QuickQueryList("select id, name from feedcategory where not deleted", true);
+
 $IS_LDAP = getSystemSetting('_hasldap', '0');
 
 $orgs = Organization::getAuthorizedOrgKeys();
@@ -452,6 +455,19 @@ if (getSystemSetting("_hassurvey", true)) {
 		"helpstep" => 2
 	);
 }
+if (getSystemSetting("_hasfeed", false)) {
+	
+	$formdata["feedcategories"] = array(
+		"label" => _L("Feed Category Restriction"),
+		"fieldhelp" => _L('If the user should only be able to send to specific feed categorie, check them here. Checking nothing will allow the user to send to any feed category.'),
+		"value" => $userfeedcategories,
+		"validators" => array(
+			array("ValInArray", "values" => array_keys($feedcategories))
+		),
+		"control" => array("MultiCheckBox", "values"=>$feedcategories),
+		"helpstep" => 2
+	);
+}
 
 $formdata[] = _L("Data View");
 
@@ -791,6 +807,24 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 			if (getSystemSetting("_hassurvey", true) && isset($postdata['surveytypes']) && count($postdata['surveytypes']))
 				foreach($postdata['surveytypes'] as $type)
 					QuickUpdate("insert into userjobtypes values (?, ?)", false, array($edituser->id, $type));
+			
+			// Feed Category settings
+			if (getSystemSetting("_hasfeed", false)) {
+				QuickUpdate("delete from userfeedcategory where userid =?", false, array($edituser->id));
+				if (isset($postdata['feedcategories']) && count($postdata['feedcategories'])) {
+					$fcargs = array();
+					$fcquery = "insert into userfeedcategory (userid, feedcategoryid) values ";
+					$fccount = 0;
+					foreach ($postdata['feedcategories'] as $fcid) {
+						if ($fccount++ > 0)
+							$fcquery .= ",";
+						$fcquery .= "(?,?)";
+						$fcargs[] = $edituser->id;
+						$fcargs[] = $fcid;
+					}
+					QuickUpdate($fcquery, false, $fcargs);
+				}
+			}
 		}
 
 		// If the pincode is all 0 characters then it was a default form value, so ignore it
