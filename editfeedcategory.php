@@ -28,7 +28,7 @@ $categories = DBFindMany("FeedCategory", "from feedcategory where not deleted or
 
 $formdata = array();
 foreach ($categories as $category) {
-	$formdata[] = _L('Feed Category %s', $category->name);
+	$formdata[] = _L('Category: %s', $category->name);
 	$formdata["feedcategoryname-".$category->id] = array(
 		"label" => _L('Name'),
 		"value" => $category->name,
@@ -52,7 +52,7 @@ foreach ($categories as $category) {
 		"label" => _L('Delete'),
 		"value" => "",
 		"validators" => array(),
-		"control" => array("InpageSubmitButton", "submitvalue" => "delete-".$category->id, "name" => _L("Remove Category %s",$category->id), "icon" => "cross"),
+		"control" => array("InpageSubmitButton", "submitvalue" => "delete-".$category->id, "name" => _L("Remove %s",$category->name), "icon" => "cross"),
 		"helpstep" => 1
 	);
 }
