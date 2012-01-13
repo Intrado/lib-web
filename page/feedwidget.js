@@ -7,10 +7,7 @@ function getVars() {
 	var queryvars = window.location.search.substring(1).split("&");
 	for (var i = 0; i < queryvars.length; i++) {
 		var p = queryvars[i].split("=");
-		if (p[0] == "v")
-			vars[p[0]] = JSON.parse(unescape(p[1]));
-		else
-			vars[p[0]] = unescape(p[1]);
+		vars[p[0]] = unescape(p[1]);
 	}
 }
 
@@ -18,7 +15,7 @@ function genFeed() {
 	if ((feeddata.readyState === 4) || (feeddata.readyState === "complete")) {
 		// create the feed div in the body
 		var feeddiv = document.createElement("div");
-		feeddiv.setAttribute("style", vars.v.box);
+		feeddiv.setAttribute("style", vars.box);
 		document.getElementsByTagName('body')[0].appendChild(feeddiv);
 		
 		// get the rss xml
@@ -26,13 +23,13 @@ function genFeed() {
 		
 		// find the main title and add it to the document
 		var feedtitle = document.createElement("h2");
-		feedtitle.setAttribute("style", vars.v.head);
+		feedtitle.setAttribute("style", vars.head);
 		feedtitle.appendChild(document.createTextNode(feedxml.getElementsByTagName("title")[0].childNodes[0].nodeValue));
 		feeddiv.appendChild(feedtitle);
 		
 		// put the feed items in a list
 		var feedul = document.createElement("ul");
-		feedul.setAttribute("style", vars.v.list);
+		feedul.setAttribute("style", vars.list);
 		feeddiv.appendChild(feedul);
 		
 		var feeditems = feedxml.getElementsByTagName('item');
@@ -54,10 +51,10 @@ function genFeed() {
 			itemli.appendChild(document.createTextNode(feeditems[i].getElementsByTagName("title")[0].firstChild.nodeValue));
 			// insert the description
 			descdiv = document.createElement("div");
-			descdiv.setAttribute("style",vars.v.desc)
+			descdiv.setAttribute("style",vars.desc)
 			descdiv.appendChild(document.createTextNode(feeditems[i].getElementsByTagName("description")[0].firstChild.nodeValue));
 			// add link if there is one
-			var feeditemlink = feeditems[i].getElementsByTagName("link")[0];
+			feeditemlink = feeditems[i].getElementsByTagName("link")[0];
 			if (feeditemlink.firstChild) {
 				linkhref = document.createElement("a");
 				linkhref.setAttribute("href",feeditemlink.firstChild.nodeValue);
@@ -91,7 +88,7 @@ function genFeed() {
 				if (swfurl || mp3url ) {
 					descdiv.appendChild(mediadiv);
 					// create a clickable to insert the player (IE7 won't evaluate onClick if you use js to insert the clickable, cause it's dumb)
-					mediadiv.innerHTML = '<span style="'+vars.v.audio+'" onClick="insertPlayerObject(this.parentNode,\''+swfurl+'\',\''+mp3url+'\')">Get Audio</span>';
+					mediadiv.innerHTML = '<span style="'+vars.audio+'" onClick="insertPlayerObject(this.parentNode,\''+swfurl+'\',\''+mp3url+'\')">Get Audio</span>';
 				}
 			}
 			feedul.appendChild(itemli);

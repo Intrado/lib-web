@@ -251,23 +251,28 @@ $form = new Form("feedwidgetstyle",$formdata,$helpsteps,$buttons);
 $form->handleRequest();
 
 $vars = array(
+	"iframe" => '<iframe height=$IFRAMEHEIGHT width=$IFRAMEWIDTH frameborder=0 marginwidth=0 marginheight=0 src="$TINYURL/feedwidget.html?cust=$CUSTURL&i=$ITEMSTODISPLAY&c=$SMWIDGETCATEGORIES&head=$SMWIDGETHEAD&list=$SMWIDGETLIST&box=$SMWIDGETBOX&desc=$SMWIDGETDESC&audio=$SMWIDGETAUDIO"></iframe>',
 	"head" => 'color:$TITLECOLOR;font-size:$HEADERSIZE;padding-left:4px;',
 	"list" => 'list-style:$LISTSTYLE $LISTPOSITION;$LISTPADDING;color:$LABELCOLOR;font-size:$LABELSIZE;',
-	"box" => '$FONTFAMILYborder:$BORDERSIZE $BORDERSTYLE $BORDERCOLOR;height:$IFRAMEHEIGHT;overflow:auto;',
+	"box" => '$FONTFAMILYborder:$BORDERSIZE $BORDERSTYLE $BORDERCOLOR;height:$BOXHEIGHT;overflow:auto;',
 	"desc" => 'color:$DESCRIPTIONCOLOR;font-size:$DESCRIPTIONSIZE;padding-left:$DESCRIPTIONPADDING;padding-bottom:4px;',
 	"audio" => 'font-size:$DESCRIPTIONSIZE;padding-left:$DESCRIPTIONPADDING;cursor:pointer;color:blue;text-decoration:underline;'
 );
 $categories = "1,2,3,4";
-$iframe = '<iframe height=$IFRAMEHEIGHT width=$IFRAMEWIDTH frameborder=0 marginwidth=0 marginheight=0 src="$TINYURL/feedwidget.html?cust=$CUSTURL&i=$ITEMSTODISPLAY&c=$SMWIDGETCATEGORIES&v=$SMWIDGETVARS"></iframe>';
 
 $postdata = $form->getData();
 // replace any placeholders in the js with the form values
-$vars = str_replace('$FONTFAMILY', "font-family:".$postdata["fontfamily"].";", $vars);
+$vars = str_replace('$IFRAMEHEIGHT', $postdata["iframeheight"], $vars);
+$vars = str_replace('$IFRAMEWIDTH', $postdata["iframewidth"], $vars);
+$vars = str_replace('$CUSTURL', getSystemSetting("urlcomponent"), $vars);
+$vars = str_replace('$ITEMSTODISPLAY', $postdata["itemstodisplay"], $vars);
+$vars = str_replace('$TINYURL', "http://".getSystemSetting("tinydomain","alrt4.me"), $vars);
+$vars = str_replace('$FONTFAMILY', (($postdata["fontfamily"] == "default")?"":"font-family:".$postdata["fontfamily"].";"), $vars);
 $vars = str_replace('$TITLECOLOR', "#".$postdata["titlecolor"], $vars);
 $vars = str_replace('$BORDERSTYLE', $postdata["borderstyle"], $vars);
 $vars = str_replace('$BORDERSIZE', $postdata["bordersize"]."px", $vars);
 $vars = str_replace('$BORDERCOLOR', "#".$postdata["bordercolor"], $vars);
-$vars = str_replace('$IFRAMEHEIGHT', ($postdata["iframeheight"]-($postdata["bordersize"]*2))."px", $vars);
+$vars = str_replace('$BOXHEIGHT', ($postdata["iframeheight"]-($postdata["bordersize"]*2))."px", $vars);
 $vars = str_replace('$HEADERSIZE', $postdata["headersize"]."px", $vars);
 $vars = str_replace('$LISTSTYLE', $postdata["liststyle"], $vars);
 $vars = str_replace('$LISTPOSITION', $postdata["listposition"], $vars);
@@ -278,25 +283,35 @@ $vars = str_replace('$DESCRIPTIONSIZE', $postdata["descriptionsize"]."px", $vars
 $vars = str_replace('$DESCRIPTIONCOLOR', "#".$postdata["descriptioncolor"], $vars);
 $vars = str_replace('$DESCRIPTIONPADDING', $postdata["descriptionpadding"]."px", $vars);
 
-$iframe = str_replace('$IFRAMEHEIGHT', $postdata["iframeheight"], $iframe);
-$iframe = str_replace('$IFRAMEWIDTH', $postdata["iframewidth"], $iframe);
-$iframe = str_replace('$CUSTURL', getSystemSetting("urlcomponent"), $iframe);
-$iframe = str_replace('$ITEMSTODISPLAY', $postdata["itemstodisplay"], $iframe);
-$iframe = str_replace('$TINYURL', "http://".getSystemSetting("tinydomain","alrt4.me"), $iframe);
-
 //check for form submission
 if ($button = $form->getSubmit() && $form->isAjaxSubmit())
-	$form->fireEvent(json_encode(array("vars" => $vars, "categories" => $categories, "iframe" => $iframe)));
+	$form->fireEvent(json_encode(array(
+		"head" => $vars['head'],
+		"list" => $vars['list'],
+		"box" => $vars['box'],
+		"desc" => $vars['desc'],
+		"audio" => $vars['audio'],
+		"categories" => $categories,
+		"iframe" => $vars['iframe']
+	)));
 
 // create the initial js
-$iframe = str_replace('$SMWIDGETCATEGORIES', "'+smcategories+'", $iframe);
-$iframe = str_replace('$SMWIDGETVARS', "'+encodeURIComponent(JSON.stringify(smwidgetvars))+'", $iframe);
+$vars = str_replace('$SMWIDGETHEAD', "'+encodeURIComponent(smwidgethead)+'", $vars);
+$vars = str_replace('$SMWIDGETLIST', "'+encodeURIComponent(smwidgetlist)+'", $vars);
+$vars = str_replace('$SMWIDGETBOX', "'+encodeURIComponent(smwidgetbox)+'", $vars);
+$vars = str_replace('$SMWIDGETDESC', "'+encodeURIComponent(smwidgetdesc)+'", $vars);
+$vars = str_replace('$SMWIDGETAUDIO', "'+encodeURIComponent(smwidgetaudio)+'", $vars);
+$vars = str_replace('$SMWIDGETCATEGORIES', "'+encodeURIComponent(smcategories)+'", $vars);
 
 $feedwidgetjs = "
 <script type=\"text/javascript\">
-	var smwidgetvars = ".json_encode($vars).";
-	var smcategories = \"$categories\";
-	document.write('$iframe');
+	var smwidgethead = \"".$vars['head']."\";
+	var smwidgetlist = \"".$vars['list']."\";
+	var smwidgetbox = \"".$vars['box']."\";
+	var smwidgetdesc = \"".$vars['desc']."\";
+	var smwidgetaudio = \"".$vars['audio']."\";
+	var smcategories = \"".$categories."\";
+	document.write('".$vars['iframe']."');
 </script>
 ";
 ////////////////////////////////////////////////////////////////////////////////
@@ -309,7 +324,6 @@ include_once("nav.inc.php");
 
 // Optional Load Custom Form Validators
 ?>
-<script type="text/javascript" src="script/json2.js"></script>
 <script type="text/javascript">
 <? Validator::load_validators(array()); ?>
 
@@ -320,15 +334,23 @@ document.observe("dom:loaded", function() {
 
 		// update the script box
 		var iframehtml = data.iframe;
-		iframehtml = iframehtml.replace("$SMWIDGETCATEGORIES","'+smcategories+'");
-		iframehtml = iframehtml.replace("$SMWIDGETVARS","'+encodeURIComponent(JSON.stringify(smwidgetvars))+'");
-		var feedjs = "<script type=\"text/javascript\">\n\tvar smwidgetvars = "+JSON.stringify(data.vars)+";\n\tvar smcategories = \""+data.categories+"\";\n\tdocument.write('"+iframehtml+"');\n<\/script>";
+		iframehtml = iframehtml.replace("$SMWIDGETHEAD","'+encodeURIComponent(smwidgethead)+'");
+		iframehtml = iframehtml.replace("$SMWIDGETLIST","'+encodeURIComponent(smwidgetlist)+'");
+		iframehtml = iframehtml.replace("$SMWIDGETBOX","'+encodeURIComponent(smwidgetbox)+'");
+		iframehtml = iframehtml.replace("$SMWIDGETDESC","'+encodeURIComponent(smwidgetdesc)+'");
+		iframehtml = iframehtml.replace("$SMWIDGETAUDIO","'+encodeURIComponent(smwidgetaudio)+'");
+		iframehtml = iframehtml.replace("$SMWIDGETCATEGORIES","'+encodeURIComponent(smcategories)+'");
+		var feedjs = "<script type=\"text/javascript\">\n\tvar smwidgethead = \""+data.head+"\";\n\tvar smwidgetlist = \""+data.list+"\";\n\tvar smwidgetbox = \""+data.box+"\";\n\tvar smwidgetdesc = \""+data.desc+"\";\n\tvar smwidgetaudio = \""+data.audio+"\";\n\tvar smcategories = \""+data.categories+"\";\n\tdocument.write('"+iframehtml+"');\n<\/script>";
 		$('feedjs').value = feedjs;
 
 		// update the preview window
 		iframehtml = data.iframe;
-		iframehtml = iframehtml.replace("$SMWIDGETCATEGORIES",data.categories);
-		iframehtml = iframehtml.replace("$SMWIDGETVARS",encodeURIComponent(JSON.stringify(data.vars)));
+		iframehtml = iframehtml.replace("$SMWIDGETHEAD",encodeURIComponent(data.head));
+		iframehtml = iframehtml.replace("$SMWIDGETLIST",encodeURIComponent(data.list));
+		iframehtml = iframehtml.replace("$SMWIDGETBOX",encodeURIComponent(data.box));
+		iframehtml = iframehtml.replace("$SMWIDGETDESC",encodeURIComponent(data.desc));
+		iframehtml = iframehtml.replace("$SMWIDGETAUDIO",encodeURIComponent(data.audio));
+		iframehtml = iframehtml.replace("$SMWIDGETCATEGORIES",encodeURIComponent(data.categories));
 		$('feedpreview').innerHTML = iframehtml;
 		
 	});
@@ -348,7 +370,7 @@ endWindow();
 startWindow(_L('Feed Widget Preview'));
 ?>
 		<div style="width:99%;">
-			<textarea id="feedjs" wrap="off" style="width:100%;height:100px;"><?=escapehtml($feedwidgetjs)?></textarea>
+			<textarea id="feedjs" wrap="off" style="width:100%;height:160px;"><?=escapehtml($feedwidgetjs)?></textarea>
 		</div>
 		<div id="feedpreview">
 <?=$feedwidgetjs?>
