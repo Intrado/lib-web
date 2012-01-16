@@ -17,7 +17,7 @@ if (isset($_GET['items'])) {
 }
 $maxDays = 0;
 if (isset($_GET['age'])) {
-	$maxPost = $_GET['age'] +0;
+	$maxDays = $_GET['age'] +0;
 }
 $categories = array();
 if (isset($_GET['cat'])) {
