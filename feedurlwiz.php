@@ -198,7 +198,7 @@ class FeedUrlWiz_feedwidgetstyle extends WizStep {
 			"inside" => "Inside"
 		);
 		$formdata = array(
-			_L('Global settings'),
+			_L('Container settings'),
 			"fontfamily" => array(
 				"label" => _L('Font Family'),
 				"fieldhelp" => _L('TODO: help me!'),
@@ -463,8 +463,7 @@ if ($wizard->curstep == "/feedwidgetstyle") {
 	var smwidgetaudio = \"".$vars['audio']."\";
 	var smfeedurl = \"".$feedurl."\";
 	document.write('".$vars['iframe']."');
-</script>
-";
+</script>";
 	
 	$_SESSION['wizard_feedurl']['feedwidgetjs'] = $feedwidgetjs;
 	
@@ -487,12 +486,11 @@ if ($wizard->curstep == "/feedwidgetstyle") {
 	// observe events fired in the feedwidgetstyle form on submit
 	document.observe("dom:loaded", function() {
 		$('feedurlwiz-feedwidgetstyle').observe('Form:Submitted',function(e){
-			var data = JSON.parse(e.memo);
+			var data = e.memo.evalJSON(true);
 
 			// update the width of the preview area
-			var preview_width = parseInt(data.preview_width) + 26;
-			$('widget_preview').setStyle({"float":"right","position":"relative","width":preview_width+"px"});
-			$('wizard_form').setStyle({"marginRight":preview_width+"px"});
+			var feedjswidth = parseInt(data.preview_width) - 5;
+			$('feedjs').setStyle({"width":feedjswidth+"px", "height":"12em"});
 			
 			// update the script box
 			var iframehtml = data.iframe;
@@ -519,21 +517,9 @@ if ($wizard->curstep == "/feedwidgetstyle") {
 	});
 </script>
 <div>
-	<div id="widget_preview" style="float:right;width:324px;position:relative;">
-<?
-	startWindow(_L('Feed Widget Preview'));
-?>
-		<div style="width:99%;">
-			<textarea id="feedjs" wrap="off" spellcheck="false" style="width:100%;height:145px;"><?=escapehtml($feedwidgetjs)?></textarea>
-		</div>
-		<div id="feedpreview">
-<?=$feedwidgetjs?>
-		</div>
-<?
-	endWindow();
-?>
-	</div>
-	<div id="wizard_form" style="margin-right:324px;">
+<table width="100%">
+	<tr>
+		<td valign="top" width="99%">
 <?
 }
 startWindow($wizard->getStepData()->title);
@@ -543,9 +529,24 @@ echo $wizard->render();
 endWindow();
 if ($wizard->curstep == "/feedwidgetstyle") {
 ?>
-	</div>
+		</td>
+		<td valign="top">
+<?
+	startWindow(_L('Feed Widget Preview'));
+?>
+			<div style="padding-bottom:5px">
+				<textarea id="feedjs" wrap="off" spellcheck="false" style="width:<?=($postdata["iframewidth"]-5)?>px;height:12em;"><?=escapehtml($feedwidgetjs)?></textarea>
+			</div>
+			<div id="feedpreview">
+<?=$feedwidgetjs?>
+			</div>
+<?
+	endWindow();
+?>
+		</td>
+	</tr>
+</table>
 </div>
-<div style="clear:both;"></div>
 <?
 }
 
