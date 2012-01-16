@@ -77,7 +77,7 @@ $formdata["feedcategorydesc-new"] = array(
 	"helpstep" => 1
 );
 $formdata["feedcategoryadd-new"] = array(
-	"label" => _L('Delete'),
+	"label" => _L('Add'),
 	"value" => "",
 	"validators" => array(),
 	"control" => array("InpageSubmitButton", "submitvalue" => "newcategory", "name" => _L("Add New Category"), "icon" => "add"),
