@@ -17,7 +17,7 @@ interface CommSuiteIf {
   public function phoneMessageGetMp3AudioFile($sessionid, $parts);
   public function processIncomingSms($smsParams);
   public function generateFeed($urlcomponent, $categoryIds, $maxPost, $maxDays);
-  public function expireFeedCategory($customerid, $feedcategoryid);
+  public function expireFeedCategories($urlcomponent, $categoryIds);
 }
 
 class CommSuiteClient implements CommSuiteIf {
@@ -483,24 +483,24 @@ class CommSuiteClient implements CommSuiteIf {
     throw new Exception("generateFeed failed: unknown result");
   }
 
-  public function expireFeedCategory($customerid, $feedcategoryid)
+  public function expireFeedCategories($urlcomponent, $categoryIds)
   {
-    $this->send_expireFeedCategory($customerid, $feedcategoryid);
+    $this->send_expireFeedCategories($urlcomponent, $categoryIds);
   }
 
-  public function send_expireFeedCategory($customerid, $feedcategoryid)
+  public function send_expireFeedCategories($urlcomponent, $categoryIds)
   {
-    $args = new commsuite_CommSuite_expireFeedCategory_args();
-    $args->customerid = $customerid;
-    $args->feedcategoryid = $feedcategoryid;
+    $args = new commsuite_CommSuite_expireFeedCategories_args();
+    $args->urlcomponent = $urlcomponent;
+    $args->categoryIds = $categoryIds;
     $bin_accel = ($this->output_ instanceof TProtocol::$TBINARYPROTOCOLACCELERATED) && function_exists('thrift_protocol_write_binary');
     if ($bin_accel)
     {
-      thrift_protocol_write_binary($this->output_, 'expireFeedCategory', TMessageType::CALL, $args, $this->seqid_, $this->output_->isStrictWrite());
+      thrift_protocol_write_binary($this->output_, 'expireFeedCategories', TMessageType::CALL, $args, $this->seqid_, $this->output_->isStrictWrite());
     }
     else
     {
-      $this->output_->writeMessageBegin('expireFeedCategory', TMessageType::CALL, $this->seqid_);
+      $this->output_->writeMessageBegin('expireFeedCategories', TMessageType::CALL, $this->seqid_);
       $args->write($this->output_);
       $this->output_->writeMessageEnd();
       $this->output_->getTransport()->flush();
@@ -2351,37 +2351,41 @@ class commsuite_CommSuite_generateFeed_result {
 
 }
 
-class commsuite_CommSuite_expireFeedCategory_args {
+class commsuite_CommSuite_expireFeedCategories_args {
   static $_TSPEC;
 
-  public $customerid = null;
-  public $feedcategoryid = null;
+  public $urlcomponent = null;
+  public $categoryIds = null;
 
   public function __construct($vals=null) {
     if (!isset(self::$_TSPEC)) {
       self::$_TSPEC = array(
         1 => array(
-          'var' => 'customerid',
-          'type' => TType::I32,
+          'var' => 'urlcomponent',
+          'type' => TType::STRING,
           ),
         2 => array(
-          'var' => 'feedcategoryid',
-          'type' => TType::I32,
+          'var' => 'categoryIds',
+          'type' => TType::LST,
+          'etype' => TType::I32,
+          'elem' => array(
+            'type' => TType::I32,
+            ),
           ),
         );
     }
     if (is_array($vals)) {
-      if (isset($vals['customerid'])) {
-        $this->customerid = $vals['customerid'];
+      if (isset($vals['urlcomponent'])) {
+        $this->urlcomponent = $vals['urlcomponent'];
       }
-      if (isset($vals['feedcategoryid'])) {
-        $this->feedcategoryid = $vals['feedcategoryid'];
+      if (isset($vals['categoryIds'])) {
+        $this->categoryIds = $vals['categoryIds'];
       }
     }
   }
 
   public function getName() {
-    return 'CommSuite_expireFeedCategory_args';
+    return 'CommSuite_expireFeedCategories_args';
   }
 
   public function read($input)
@@ -2400,15 +2404,25 @@ class commsuite_CommSuite_expireFeedCategory_args {
       switch ($fid)
       {
         case 1:
-          if ($ftype == TType::I32) {
-            $xfer += $input->readI32($this->customerid);
+          if ($ftype == TType::STRING) {
+            $xfer += $input->readString($this->urlcomponent);
           } else {
             $xfer += $input->skip($ftype);
           }
           break;
         case 2:
-          if ($ftype == TType::I32) {
-            $xfer += $input->readI32($this->feedcategoryid);
+          if ($ftype == TType::LST) {
+            $this->categoryIds = array();
+            $_size37 = 0;
+            $_etype40 = 0;
+            $xfer += $input->readListBegin($_etype40, $_size37);
+            for ($_i41 = 0; $_i41 < $_size37; ++$_i41)
+            {
+              $elem42 = null;
+              $xfer += $input->readI32($elem42);
+              $this->categoryIds []= $elem42;
+            }
+            $xfer += $input->readListEnd();
           } else {
             $xfer += $input->skip($ftype);
           }
@@ -2425,15 +2439,27 @@ class commsuite_CommSuite_expireFeedCategory_args {
 
   public function write($output) {
     $xfer = 0;
-    $xfer += $output->writeStructBegin('CommSuite_expireFeedCategory_args');
-    if ($this->customerid !== null) {
-      $xfer += $output->writeFieldBegin('customerid', TType::I32, 1);
-      $xfer += $output->writeI32($this->customerid);
+    $xfer += $output->writeStructBegin('CommSuite_expireFeedCategories_args');
+    if ($this->urlcomponent !== null) {
+      $xfer += $output->writeFieldBegin('urlcomponent', TType::STRING, 1);
+      $xfer += $output->writeString($this->urlcomponent);
       $xfer += $output->writeFieldEnd();
     }
-    if ($this->feedcategoryid !== null) {
-      $xfer += $output->writeFieldBegin('feedcategoryid', TType::I32, 2);
-      $xfer += $output->writeI32($this->feedcategoryid);
+    if ($this->categoryIds !== null) {
+      if (!is_array($this->categoryIds)) {
+        throw new TProtocolException('Bad type in structure.', TProtocolException::INVALID_DATA);
+      }
+      $xfer += $output->writeFieldBegin('categoryIds', TType::LST, 2);
+      {
+        $output->writeListBegin(TType::I32, count($this->categoryIds));
+        {
+          foreach ($this->categoryIds as $iter43)
+          {
+            $xfer += $output->writeI32($iter43);
+          }
+        }
+        $output->writeListEnd();
+      }
       $xfer += $output->writeFieldEnd();
     }
     $xfer += $output->writeFieldStop();
