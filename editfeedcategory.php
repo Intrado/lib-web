@@ -12,6 +12,13 @@ require_once("obj/Form.obj.php");
 require_once("obj/FormItem.obj.php");
 require_once("obj/FeedCategory.obj.php");
 require_once("obj/InpageSubmitButton.fi.php");
+require_once("inc/appserver.inc.php");
+require_once('thrift/Thrift.php');
+require_once $GLOBALS['THRIFT_ROOT'].'/protocol/TBinaryProtocol.php';
+require_once $GLOBALS['THRIFT_ROOT'].'/transport/TSocket.php';
+require_once $GLOBALS['THRIFT_ROOT'].'/transport/TBufferedTransport.php';
+require_once $GLOBALS['THRIFT_ROOT'].'/transport/TFramedTransport.php';
+require_once($GLOBALS['THRIFT_ROOT'].'/packages/commsuite/CommSuite.php');
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -90,8 +97,8 @@ $helpsteps = array (
 	_L('TODO: help me!')
 );
 
-$buttons = array(submit_button(_L('Save'),"submit","tick"),
-				icon_button(_L('Cancel'),"cross",null,"start.php"));
+$buttons = array(submit_button(_L('Save'),"submit","tick","settings.php"),
+				icon_button(_L('Cancel'),"cross",null,"settings.php"));
 $form = new Form("templateform",$formdata,$helpsteps,$buttons);
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -122,19 +129,25 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 			$nfc->create();
 		}
 		
+		$categoryids = array();
 		foreach ($categories as $category) {
 			// if the delete button was clicked for this one. set it to deleted.
 			if ($button == "delete-".$category->id) {
 				$category->deleted = 1;
 				notice(_L("Feed category %s has been deleted.", $category->name));
-				// TODO call appserver expireFeedCategories()
 			} else {
 				$category->name = $postdata['feedcategoryname-'.$category->id];
 				$category->description = $postdata['feedcategorydesc-'.$category->id];
 			}
 			$category->update();
+			$categoryids[] = $category->id;
 		}
+		
 		Query("COMMIT");
+
+		// appserver to expire feed cache
+		if (count($categoryids) > 0)
+			expireFeedCategories($CUSTOMERURL, $categoryids);
 		
 		if ($button == "newcategory")
 			notice(_L("New category %s created.", $nfc->name));
@@ -148,9 +161,9 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 			notice(_L("Feed category changes are now saved."));
 
 			if ($ajax)
-				$form->sendTo("start.php");
+				$form->sendTo("settings.php");
 			else
-				redirect("start.php");
+				redirect("settings.php");
 		}
 	}
 }
