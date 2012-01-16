@@ -77,7 +77,8 @@ $data = QuickQueryMultiRow("select s.id, s.hostname, s.runmode, s.notes,
 		(select group_concat(runmode, ':', type separator ', ') 
 			from service 
 			where serverid = s.id) as services 
-		from server s", false, false, array());
+		from server s
+		order by s.hostname", false, false, array());
 
 $cmdtitles = array("hostname" => "Hostname",
 		"retval" => "Status",
