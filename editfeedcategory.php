@@ -12,10 +12,12 @@ require_once("obj/Form.obj.php");
 require_once("obj/FormItem.obj.php");
 require_once("obj/FeedCategory.obj.php");
 require_once("obj/InpageSubmitButton.fi.php");
+
+
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization
 ////////////////////////////////////////////////////////////////////////////////
-if (!$USER->authorize('managesystem')) {
+if (!getSystemSetting("_hasfeed") || !$USER->authorize('managesystem')) {
 	redirect('unauthorized.php');
 }
 
@@ -125,6 +127,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 			if ($button == "delete-".$category->id) {
 				$category->deleted = 1;
 				notice(_L("Feed category %s has been deleted.", $category->name));
+				// TODO call appserver expireFeedCategories()
 			} else {
 				$category->name = $postdata['feedcategoryname-'.$category->id];
 				$category->description = $postdata['feedcategorydesc-'.$category->id];

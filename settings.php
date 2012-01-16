@@ -115,7 +115,8 @@ startWindow("Options", 'padding: 3px;');
 			(getSystemSetting('_hasselfsignup', false) && ($USER->authorize('metadata') || $USER->authorize('managesystem'))) ||
 			($USER->authorize('managesystem') && getSystemSetting('_dmmethod', "")!='asp') ||
 			($USER->authorize('manageclassroommessaging') && getSystemSetting('_hastargetedmessage')) ||
-			($USER->authorize('managesystem') && getSystemSetting("_hasfacebook"))) {
+			($USER->authorize('managesystem') && getSystemSetting("_hasfacebook")) ||
+			($USER->authorize('managesystem') && getSystemSetting("_hasfeed"))) {
 ?>
 			<td>
 				<table>
@@ -149,6 +150,10 @@ startWindow("Options", 'padding: 3px;');
 					if (getSystemSetting("_hasfacebook")) {
 ?>
 						<tr><td><a href='authfacebookpages.php'>Facebook Authorized Pages</a></td></tr>
+<?					}
+					if (getSystemSetting("_hasfeed")) {
+?>
+						<tr><td><a href='editfeedcategory.php'><?=_L("Feed Categories")?></a></td></tr>
 <?					}
 ?>
 
