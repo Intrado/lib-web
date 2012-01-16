@@ -37,6 +37,9 @@ if (isset($_GET['debug']))
 
 class FeedUrlWiz_feedoptions extends WizStep {
 	function getForm($postdata, $curstep) {
+		// browse back to the first page? remove the generated feed url from session data
+		unset($_SESSION['wizard_feedurl']["data"]["/feedurl"]["feedurl"]);
+		
 		global $USER;
 		$userfeedcategories = QuickQueryList("select id, name from feedcategory where id in (select feedcategoryid from userfeedcategory where userid=?) and not deleted", true, false, array($USER->id));
 		$args = array();
@@ -118,8 +121,8 @@ class FeedUrlWiz_feedurl extends WizStep {
 		$feedurl = "http://".getSystemSetting("tinydomain", "alrt4.me")."/feed.php?cust=".getSystemSetting("urlcomponent");
 		$feedurl .= "&cat=".implode(",", array_merge($this->parent->dataHelper("/feedoptions:userfeedcategories", false, array()), $this->parent->dataHelper("/feedoptions:otherfeedcategories", false, array())));
 		$feedurl .= "&items=".$this->parent->dataHelper("/feedoptions:itemcount","10");
-		if ($this->parent->dataHelper("/feedoptions:maxage",false))
-			$feedurl .= "&items=".$this->parent->dataHelper("/feedoptions:maxage");
+		if ($this->parent->dataHelper("/feedoptions:maxage",false, false) !== false)
+			$feedurl .= "&age=".$this->parent->dataHelper("/feedoptions:maxage");
 		
 		// TODO: text explaining that it's fine to cancel at this step, or continue and configure the widget
 		$formdata = array(
@@ -439,7 +442,8 @@ if ($wizard->curstep == "/feedwidgetstyle") {
 		"desc" => $vars['desc'],
 		"audio" => $vars['audio'],
 		"feedurl" => $feedurl,
-		"iframe" => $vars['iframe']
+		"iframe" => $vars['iframe'],
+		"preview_width" => $postdata["iframewidth"]
 	);
 	
 	// create the widget js and stuff it in session data to use on the finish step
@@ -485,6 +489,11 @@ if ($wizard->curstep == "/feedwidgetstyle") {
 		$('feedurlwiz-feedwidgetstyle').observe('Form:Submitted',function(e){
 			var data = JSON.parse(e.memo);
 
+			// update the width of the preview area
+			var preview_width = parseInt(data.preview_width) + 26;
+			$('widget_preview').setStyle({"float":"right","position":"relative","width":preview_width+"px"});
+			$('wizard_form').setStyle({"marginRight":preview_width+"px"});
+			
 			// update the script box
 			var iframehtml = data.iframe;
 			iframehtml = iframehtml.replace("$SMWIDGETHEAD","'+encodeURIComponent(smwidgethead)+'");
@@ -510,18 +519,7 @@ if ($wizard->curstep == "/feedwidgetstyle") {
 	});
 </script>
 <div>
-	<div style="float:left;width:68%;">
-<?
-}
-startWindow($wizard->getStepData()->title);
-
-echo $wizard->render();
-
-endWindow();
-if ($wizard->curstep == "/feedwidgetstyle") {
-?>
-	</div>
-	<div style="float:right;width:32%;">
+	<div id="widget_preview" style="float:right;width:324px;position:relative;">
 <?
 	startWindow(_L('Feed Widget Preview'));
 ?>
@@ -533,6 +531,17 @@ if ($wizard->curstep == "/feedwidgetstyle") {
 		</div>
 <?
 	endWindow();
+?>
+	</div>
+	<div id="wizard_form" style="margin-right:324px;">
+<?
+}
+startWindow($wizard->getStepData()->title);
+
+echo $wizard->render();
+
+endWindow();
+if ($wizard->curstep == "/feedwidgetstyle") {
 ?>
 	</div>
 </div>
