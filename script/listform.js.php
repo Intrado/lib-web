@@ -138,7 +138,12 @@ function listform_load(listformID, formData, postURL) {
 	ruleEditor = ruleWidget.ruleEditor;
 
 	var buildListFieldset = new Element('fieldset',{'style':'border: 0; margin:0px; margin-top:20px; padding:0px;'});
-	buildListFieldset.insert('<?=addslashes(icon_button(_L('Done Adding Rules To This List'),'accept',null,null, ' id="saveRulesButton" '))?>');
+	buildListFieldset.insert('<?=addslashes(icon_button(_L('Done Adding Rules To This List'),'accept'))?>');
+	
+	//hack/workaround to change the auto gererated ID from icon_button, lots of this code requires it has a specific id
+	var saveRulesButton = buildListFieldset.firstDescendant();
+	saveRulesButton.setAttribute('id','saveRulesButton');
+	
 	ruleWidget.container.insert(buildListFieldset);
 
 	ruleWidget.container.observe('RuleWidget:ChangeField', function(event) {
