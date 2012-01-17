@@ -77,7 +77,7 @@ class FeedUrlWiz_feedoptions extends WizStep {
 			"itemcount" => array(
 				"label" => _L('Items to display'),
 				"fieldhelp" => _L('Select the maximum number of items this feed should display.'),
-				"value" => "10",
+				"value" => "20",
 				"validators" => array(
 					array("ValRequired"),
 					array("ValNumber", "min" => 1, "max" => 100)),
@@ -87,9 +87,10 @@ class FeedUrlWiz_feedoptions extends WizStep {
 			"maxage" => array(
 				"label" => _L('Max age (days)'),
 				"fieldhelp" => _L('Choose the maximum age (in days) of messages displayed on this feed.'),
-				"value" => "",
+				"value" => "30",
 				"validators" => array(
-					array("ValNumber", "min" => 0, "max" => 365)),
+					array("ValRequired"),
+					array("ValNumber", "min" => 1, "max" => 90)),
 				"control" => array("TextField", "size" => 5),
 				"helpstep" => 1
 			)
