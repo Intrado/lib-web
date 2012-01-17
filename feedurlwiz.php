@@ -114,22 +114,20 @@ class FeedUrlWiz_feedurl extends WizStep {
 		if ($this->parent->dataHelper("/feedoptions:maxage"))
 			$feedurl .= "&age=".$this->parent->dataHelper("/feedoptions:maxage");
 		
-		// TODO: text explaining that it's fine to cancel at this step, or continue and configure the widget
+		// text explaining that it's fine to cancel at this step, or continue and configure the widget
 		$formdata = array(
-				_L('Feed URL'),
-				"helptext" => array(
-					"label" => "",
-					"control" => array("FormHtml", "html" => _L("<p>Use and share this URL with anyone who wishes to follow the feed selections on the previous page. If this is all you need, feel free to cancel now.</p><p>If you wish to generate a feed widget to include in a web page, click on the Next button.</p>")),
+			_L('Feed URL'),
+			"helptext" => array(
+					"label" => _L('URL'),
+					"control" => array("FormHtml", "html" => _L('
+						<p>Use and share this URL with anyone who wishes to follow the feed selections on the previous page. If this is all you need, feel free to cancel now.</p>
+						<input type="text" readonly value="'.escapehtml($feedurl).'" style="background-color:#ffffff;cursor:text;width:99%;"/>
+						<p>If you wish to generate a feed widget to include in a web page, click on the Next button.</p>')),
 					"helpstep" => 1
 				),
-				"feedurl" => array(
-				"label" => _L('URL'),
-				"fieldhelp" => _L('This is the URL you should use in your feed agregation software.'),
+			"feedurl" => array(
 				"value" => $feedurl,
-				"validators" => array(
-					array("ValRequired")),
-				"control" => array("TextField", "size" => "60"),
-				"helpstep" => 1
+				"control" => array("HiddenField")
 			)
 		);
 
@@ -503,24 +501,9 @@ if ($wizard->curstep == "/feedwidgetstyle") {
 	document.observe("dom:loaded", function() {
 		$('feedurlwiz-feedwidgetstyle').observe('Form:Submitted',function(e){
 			var data = e.memo.evalJSON(true);
-
-			// update the width of the preview area
-			var feedjswidth = parseInt(data.preview_width) - 5;
-			$('feedjs').setStyle({"width":feedjswidth+"px", "height":"12em"});
 			
-			// update the script box
-			var iframehtml = data.iframe;
-			iframehtml = iframehtml.replace("$SMWIDGETHEAD","'+encodeURIComponent(smwidgethead)+'");
-			iframehtml = iframehtml.replace("$SMWIDGETLIST","'+encodeURIComponent(smwidgetlist)+'");
-			iframehtml = iframehtml.replace("$SMWIDGETBOX","'+encodeURIComponent(smwidgetbox)+'");
-			iframehtml = iframehtml.replace("$SMWIDGETDESC","'+encodeURIComponent(smwidgetdesc)+'");
-			iframehtml = iframehtml.replace("$SMWIDGETAUDIO","'+encodeURIComponent(smwidgetaudio)+'");
-			iframehtml = iframehtml.replace("$SMFEEDURL","'+encodeURIComponent(smfeedurl)+'");
-			var feedjs = "<script type=\"text/javascript\">\n\tvar smwidgethead = \""+data.head+"\";\n\tvar smwidgetlist = \""+data.list+"\";\n\tvar smwidgetbox = \""+data.box+"\";\n\tvar smwidgetdesc = \""+data.desc+"\";\n\tvar smwidgetaudio = \""+data.audio+"\";\n\tvar smfeedurl = \""+data.feedurl+"\";\n\tdocument.write('"+iframehtml+"');\n<\/script>";
-			$('feedjs').value = feedjs;
-
 			// update the preview window
-			iframehtml = data.iframe;
+			var iframehtml = data.iframe;
 			iframehtml = iframehtml.replace("$SMWIDGETHEAD",encodeURIComponent(data.head));
 			iframehtml = iframehtml.replace("$SMWIDGETLIST",encodeURIComponent(data.list));
 			iframehtml = iframehtml.replace("$SMWIDGETBOX",encodeURIComponent(data.box));
@@ -550,10 +533,7 @@ if ($wizard->curstep == "/feedwidgetstyle") {
 <?
 	startWindow(_L('Feed Widget Preview'));
 ?>
-			<div style="padding-bottom:5px;padding-top:5px">
-				<textarea id="feedjs" wrap="off" spellcheck="false" style="width:<?=($postdata["iframewidth"]-5)?>px;height:12em;"><?=escapehtml($feedwidgetjs)?></textarea>
-			</div>
-			<div id="feedpreview">
+			<div id="feedpreview" style="padding-top:5px">
 <?=$feedwidgetjs?>
 			</div>
 <?
