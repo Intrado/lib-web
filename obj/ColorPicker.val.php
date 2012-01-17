@@ -1,4 +1,9 @@
 <?
+/* ValColorPicker validator
+ * 	Used to validate that the data in a text field is a color (hex representation)
+ * 
+ * Author: Nickolas Heckman
+ */
 
 class ValColorPicker extends Validator {
 	function validate ($value, $args) {

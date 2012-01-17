@@ -1,5 +1,9 @@
 <?
-// color selector form item
+/* ColorPicker form item
+ * 	Used to select a color (hex representation) from the colorpicker popup window
+ * 
+ * Author: Nickolas Heckman
+ */
 class ColorPicker extends FormItem {
 
 	function render ($value) {
