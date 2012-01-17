@@ -12,6 +12,7 @@ require_once("obj/Form.obj.php");
 require_once("obj/FormItem.obj.php");
 require_once("obj/Wizard.obj.php");
 require_once("obj/ColorPicker.fi.php");
+require_once("obj/ColorPicker.val.php");
 require_once("obj/InpageSubmitButton.fi.php");
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -126,7 +127,7 @@ class FeedUrlWiz_feedurl extends WizStep {
 				"value" => $feedurl,
 				"validators" => array(
 					array("ValRequired")),
-				"control" => array("TextField", "size" => 50),
+				"control" => array("TextField", "size" => "60"),
 				"helpstep" => 1
 			)
 		);
@@ -247,7 +248,8 @@ class FeedUrlWiz_feedwidgetstyle extends WizStep {
 				"fieldhelp" => _L('Color of the border on the container.'),
 				"value" => $_SESSION['colorscheme']['_brandtheme2'],
 				"validators" => array(
-					array("ValRequired")),
+					array("ValRequired"),
+					array("ValColorPicker")),
 				"control" => array("ColorPicker", "size" => 7),
 				"helpstep" => 1
 			),
@@ -267,7 +269,8 @@ class FeedUrlWiz_feedwidgetstyle extends WizStep {
 				"fieldhelp" => _L('Color of the font used when displaying the header.'),
 				"value" => $_SESSION['colorscheme']['_brandprimary'],
 				"validators" => array(
-					array("ValRequired")),
+					array("ValRequired"),
+					array("ValColorPicker")),
 				"control" => array("ColorPicker", "size" => 7),
 				"helpstep" => 2
 			),
@@ -316,7 +319,8 @@ class FeedUrlWiz_feedwidgetstyle extends WizStep {
 				"fieldhelp" => _L('Color of the font used when displaying the item labels.'),
 				"value" => $_SESSION['colorscheme']['_brandtheme1'],
 				"validators" => array(
-					array("ValRequired")),
+					array("ValRequired"),
+					array("ValColorPicker")),
 				"control" => array("ColorPicker", "size" => 7),
 				"helpstep" => 3
 			),
@@ -335,7 +339,8 @@ class FeedUrlWiz_feedwidgetstyle extends WizStep {
 				"fieldhelp" => _L('Color of the font used when displaying the item description.'),
 				"value" => $_SESSION['colorscheme']['_brandtheme2'],
 				"validators" => array(
-					array("ValRequired")),
+					array("ValRequired"),
+					array("ValColorPicker")),
 				"control" => array("ColorPicker", "size" => 7),
 				"helpstep" => 3
 			),
@@ -382,13 +387,15 @@ class FinishFeedUrlWiz extends WizFinish {
 	
 	function getFinishPage ($postdata) {
 		// TODO: instructions for use
-		$html = '<h2 style="padding:8px;color:#'.$_SESSION['colorscheme']['_brandprimary'].';">'._L("Your feed selections are complete!").'</h2>
+		$html = '
+		<h2 style="padding:8px;color:#'.$_SESSION['colorscheme']['_brandprimary'].';">'._L("Your feed selections are complete!").'</h2>
 		<ul style="color:#'.$_SESSION['colorscheme']['_brandprimary'].';">
-			<li><h2 style="font-size:14px;color:black;">'._L("Use the following url in a feed agregator or other feed display application. Share it with anyone who is interested in the information displayed on this feed.").'</h2>
-				<input type="text" value="'.escapehtml($this->parent->dataHelper("/feedurl:feedurl")).'" style="width:99%;"/>
+			<li>
+				<h2 style="font-size:14px;color:black;">'._L("Use the following url in a feed agregator or other feed display application. Share it with anyone who is interested in the information displayed on this feed.").'</h2>
+				<input type="text" readonly value="'.escapehtml($this->parent->dataHelper("/feedurl:feedurl")).'" style="background-color:#ffffff;cursor:text;width:99%;"/>
 			</li>
 			<li><h2 style="font-size:14px;color:black;">'._L("The following javascript snippet can be included in your web page to display the feed information described in the previous steps. Simply copy and paste it into your document where-ever you wish the feed to be displayed.").'</h2>
-				<textarea id="feedjs" wrap="off" spellcheck="false" style="width:100%;height:12em;">'.escapehtml($_SESSION['wizard_feedurl']['feedwidgetjs']).'</textarea>
+				<textarea readonly wrap="off" spellcheck="false" style="background-color:#ffffff;cursor:text;width:99%;height:12em;">'.escapehtml($_SESSION['wizard_feedurl']['feedwidgetjs']).'</textarea>
 			</li>
 		</ul>';
 		
@@ -490,6 +497,7 @@ require_once("nav.inc.php");
 if ($wizard->curstep == "/feedwidgetstyle") {
 ?>
 <script type="text/javascript">
+<?	Validator::load_validators(array("ValColorPicker"));?>
 	// observe events fired in the feedwidgetstyle form on submit
 	document.observe("dom:loaded", function() {
 		$('feedurlwiz-feedwidgetstyle').observe('Form:Submitted',function(e){
