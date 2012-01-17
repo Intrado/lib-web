@@ -42,26 +42,36 @@ class FeedUrlWiz_feedoptions extends WizStep {
 		unset($_SESSION['wizard_feedurl']["data"]["/feedurl"]["feedurl"]);
 		
 		global $USER;
-		$feedcategories = QuickQueryList("select id, name from feedcategory where id in (select feedcategoryid from userfeedcategory where userid=?) and not deleted order by name", true, false, array($USER->id));
+		$feedcategories = array("#-My Feed Categories-#");
+		$feeddescriptions = array();
+		$feedvalues = array();
+		$myfeedcategories = QuickQueryMultiRow("select id, name, description from feedcategory where id in (select feedcategoryid from userfeedcategory where userid=?) and not deleted order by name", true, false, array($USER->id));
 		$args = array();
-		$query = "select id, name from feedcategory where not deleted";
-		if (count($feedcategories)) {
+		$query = "select id, name, description from feedcategory where not deleted";
+		if (count($myfeedcategories)) {
 			$query .= " and id not in (";
 			$count = 0;
-			foreach ($feedcategories as $id => $name) {
+			foreach ($myfeedcategories as $category) {
 				if ($count++ > 0)
 					$query .= ",";
 				$query .= "?";
-				$args[] = $id;
+				$args[] = $category['id'];
+				$feedcategories[$category['id']] = $category['name'];
+				$feeddescriptions[$category['id']] = $category['description'];
+				$feedvalues[] = $category['id'];
 			}
 			$query .= ")";
 			$feedcategories[] = "#-#";
+			$feedcategories[] = "#-Other Feed Categories-#";
 		}
 		$query .= " order by name";
-		$otherfeedcategories = QuickQueryList($query, true, false, $args);
+		$otherfeedcategories = QuickQueryMultiRow($query, true, false, $args);
 		
-		foreach ($otherfeedcategories as $id => $name)
-			$feedcategories[$id] = $name;
+		foreach ($otherfeedcategories as $category) {
+			$feedcategories[$category['id']] = $category['name'];
+			$feeddescriptions[$category['id']] = $category['description'];
+			$feedvalues[] = $category['id'];
+		}
 		
 		$formdata = array(_L('Feed Settings'),
 			"feedcategories" => array(
@@ -70,8 +80,8 @@ class FeedUrlWiz_feedoptions extends WizStep {
 				"value" => "",
 				"validators" => array(
 					array("ValRequired"),
-					array("ValInArray", "values" => array_keys($feedcategories))),
-				"control" => array("MultiCheckBox", "values"=>$feedcategories),
+					array("ValInArray", "values" => $feedvalues)),
+				"control" => array("MultiCheckBox", "values"=>$feedcategories, "hover" => $feeddescriptions),
 				"helpstep" => 1
 			),
 			"itemcount" => array(
