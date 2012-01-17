@@ -41,72 +41,60 @@ class FeedUrlWiz_feedoptions extends WizStep {
 		unset($_SESSION['wizard_feedurl']["data"]["/feedurl"]["feedurl"]);
 		
 		global $USER;
-		$userfeedcategories = QuickQueryList("select id, name from feedcategory where id in (select feedcategoryid from userfeedcategory where userid=?) and not deleted", true, false, array($USER->id));
+		$feedcategories = QuickQueryList("select id, name from feedcategory where id in (select feedcategoryid from userfeedcategory where userid=?) and not deleted order by name", true, false, array($USER->id));
 		$args = array();
 		$query = "select id, name from feedcategory where not deleted";
-		if (count($userfeedcategories)) {
+		if (count($feedcategories)) {
 			$query .= " and id not in (";
 			$count = 0;
-			foreach ($userfeedcategories as $id => $name) {
+			foreach ($feedcategories as $id => $name) {
 				if ($count++ > 0)
 					$query .= ",";
 				$query .= "?";
 				$args[] = $id;
 			}
 			$query .= ")";
+			$feedcategories[] = "#-#";
 		}
+		$query .= " order by name";
 		$otherfeedcategories = QuickQueryList($query, true, false, $args);
 		
-		$formdata = array();
-		$formdata[] = _L('Feed Settings');
-		// User's associated feed categories
-		if (count($userfeedcategories)) {
-			$formdata["userfeedcategories"] = array(
-				"label" => _L("My feed categories"),
-				"fieldhelp" => _L('Select which categories you wish to include in this feed.'),
-				"value" => array_keys($userfeedcategories),
-				"validators" => array(
-					array("ValInArray", "values" => array_keys($userfeedcategories))),
-				"control" => array("MultiCheckBox", "values"=>$userfeedcategories),
-				"helpstep" => 1
-			);
-			$otherfeedslabel = _L("Other feed categories");
-		} else {
-			$otherfeedslabel = _L("Feed categories");
-		}
-		// other feed categories that arn't associated with the user
-		if (count($otherfeedcategories)) {
-			$formdata["otherfeedcategories"] = array(
-				"label" => $otherfeedslabel,
+		foreach ($otherfeedcategories as $id => $name)
+			$feedcategories[$id] = $name;
+		
+		$formdata = array(_L('Feed Settings'),
+			"feedcategories" => array(
+				"label" => _L("Feed categories"),
 				"fieldhelp" => _L('Select which categories you wish to include in this feed.'),
 				"value" => "",
 				"validators" => array(
-					array("ValInArray", "values" => array_keys($otherfeedcategories))),
-				"control" => array("MultiCheckBox", "values"=>$otherfeedcategories),
+					array("ValRequired"),
+					array("ValInArray", "values" => array_keys($feedcategories))),
+				"control" => array("MultiCheckBox", "values"=>$feedcategories),
 				"helpstep" => 1
-			);
-		}
-		$formdata["itemcount"] = array(
-			"label" => _L('Items to display'),
-			"fieldhelp" => _L('Select the maximum number of items this feed should display.'),
-			"value" => "10",
-			"validators" => array(
-				array("ValRequired"),
-				array("ValNumber", "min" => 1, "max" => 100)),
-			"control" => array("TextField", "size" => 5),
-			"helpstep" => 1
-		);
-		$formdata["maxage"] = array(
-			"label" => _L('Max age (days)'),
-			"fieldhelp" => _L('Choose the maximum age (in days) of messages displayed on this feed.'),
-			"value" => "",
-			"validators" => array(
-				array("ValNumber", "min" => 0, "max" => 365)),
-			"control" => array("TextField", "size" => 5),
-			"helpstep" => 1
+			),
+			"itemcount" => array(
+				"label" => _L('Items to display'),
+				"fieldhelp" => _L('Select the maximum number of items this feed should display.'),
+				"value" => "10",
+				"validators" => array(
+					array("ValRequired"),
+					array("ValNumber", "min" => 1, "max" => 100)),
+				"control" => array("TextField", "size" => 5),
+				"helpstep" => 1
+			),
+			"maxage" => array(
+				"label" => _L('Max age (days)'),
+				"fieldhelp" => _L('Choose the maximum age (in days) of messages displayed on this feed.'),
+				"value" => "",
+				"validators" => array(
+					array("ValNumber", "min" => 0, "max" => 365)),
+				"control" => array("TextField", "size" => 5),
+				"helpstep" => 1
+			)
 		);
 		
-		$helpsteps = array(_L("Select the appropriate options for the feed you wish to generate:<p>Categories: These are the categories of messages which will be displayed as content in the feed.</p><p>Items: The maximum number of items the feed will display.</p><p>Max age: How old the oldest displayed message can be.</p>"));
+		$helpsteps = array(_L("Select the appropriate options for the feed you wish to generate:<p>Categories: These are the categories of messages which will be displayed as content in the feed. The top selections are your associated feed categories. On the bottom are other available categories.</p><p>Items: The maximum number of items the feed will display.</p><p>Max age: How old the oldest displayed message can be.</p>"));
 		
 		return new Form("feedurlwiz-feedoptions",$formdata,$helpsteps);
 	}
@@ -119,9 +107,9 @@ class FeedUrlWiz_feedurl extends WizStep {
 	function getForm($postdata, $curstep) {
 		// construct feed url from form data on previous step
 		$feedurl = "http://".getSystemSetting("tinydomain", "alrt4.me")."/feed.php?cust=".getSystemSetting("urlcomponent");
-		$feedurl .= "&cat=".implode(",", array_merge($this->parent->dataHelper("/feedoptions:userfeedcategories", false, array()), $this->parent->dataHelper("/feedoptions:otherfeedcategories", false, array())));
+		$feedurl .= "&cat=".implode(",", $this->parent->dataHelper("/feedoptions:feedcategories", false, array()));
 		$feedurl .= "&items=".$this->parent->dataHelper("/feedoptions:itemcount","10");
-		if ($this->parent->dataHelper("/feedoptions:maxage",false, false) !== false)
+		if ($this->parent->dataHelper("/feedoptions:maxage"))
 			$feedurl .= "&age=".$this->parent->dataHelper("/feedoptions:maxage");
 		
 		// TODO: text explaining that it's fine to cancel at this step, or continue and configure the widget
@@ -396,10 +384,10 @@ class FinishFeedUrlWiz extends WizFinish {
 		// TODO: instructions for use
 		$html = '<h2 style="padding:8px;color:#'.$_SESSION['colorscheme']['_brandprimary'].';">'._L("Your feed selections are complete!").'</h2>
 		<ul style="color:#'.$_SESSION['colorscheme']['_brandprimary'].';">
-			<li><h2 style="font-size:14px">'._L("Use the following url in a feed agregator or other feed display application. Share it with anyone who is interested in the information displayed on this feed.").'</h2>
+			<li><h2 style="font-size:14px;color:black;">'._L("Use the following url in a feed agregator or other feed display application. Share it with anyone who is interested in the information displayed on this feed.").'</h2>
 				<input type="text" value="'.escapehtml($this->parent->dataHelper("/feedurl:feedurl")).'" style="width:99%;"/>
 			</li>
-			<li><h2 style="font-size:14px">'._L("The following java script snippet can be included in your web page to display the feed information described in the previous steps. Simply copy and paste it into your document where-ever you wish the feed to be displayed.").'</h2>
+			<li><h2 style="font-size:14px;color:black;">'._L("The following javascript snippet can be included in your web page to display the feed information described in the previous steps. Simply copy and paste it into your document where-ever you wish the feed to be displayed.").'</h2>
 				<textarea id="feedjs" wrap="off" spellcheck="false" style="width:100%;height:12em;">'.escapehtml($_SESSION['wizard_feedurl']['feedwidgetjs']).'</textarea>
 			</li>
 		</ul>';
