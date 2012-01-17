@@ -247,14 +247,16 @@ class MultiCheckBox extends FormItem {
 		$hoverdata = array();
 		$counter = 1;
 		foreach ($this->args['values'] as $checkvalue => $checkname) {
-			if ($checkname == "#-#") {
+			if (preg_match("/^#-[a-z,A-Z,0-9, ]*-#$/", $checkname)) {
+				$str .= '<div style="font-weight:bold;padding-left:22px;">'.substr($checkname, 2, strlen($checkname) - 4)."</div>";
+			} else if ($checkname == "#-#") {
 				$str .= "<hr />\n";
 			} else {
 				$id = $n.'-'.$counter;
 				$checked = $value == $checkvalue || (is_array($value) && in_array($checkvalue, $value));
 				$str .= '<input id="'.$id.'" name="'.$n.'[]" type="checkbox" value="'.escapehtml($checkvalue).'" '.($checked ? 'checked' : '').' /><label id="'.$id.'-label" for="'.$id.'">'.escapehtml($checkname).'</label><br />
 					';
-				if (isset($this->args['hover'])) {
+				if (isset($this->args['hover']) && $this->args['hover'][$checkvalue]) {
 					$hoverdata[$id] = $this->args['hover'][$checkvalue];
 					$hoverdata[$id.'-label'] = $this->args['hover'][$checkvalue];
 				}
