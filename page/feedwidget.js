@@ -115,7 +115,7 @@ function genFeed() {
 				if (swfurl || mp3url ) {
 					descdiv.appendChild(mediadiv);
 					// create a clickable to insert the player (IE7 won't evaluate onClick if you use js to insert the clickable, cause it's dumb)
-					mediadiv.innerHTML = '<span style="'+vars.audio+'" onClick="insertPlayerObject(this.parentNode,\''+swfurl+'\',\''+mp3url+'\')">Get Audio</span>';
+					mediadiv.innerHTML = '<span style="'+vars.audio+'" onClick="insertPlayerObject(this.parentNode,\''+swfurl+'\',\''+mp3url+'\')"><img src="img/nifty_play.png" /> Play audio</span>';
 				}
 			}
 			feedul.appendChild(itemli);
