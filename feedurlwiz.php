@@ -63,12 +63,12 @@ class FeedUrlWiz_feedoptions extends WizStep {
 		if (count($userfeedcategories)) {
 			$formdata["userfeedcategories"] = array(
 				"label" => _L("My feed categories"),
-				"fieldhelp" => _L('TODO: help me!'),
+				"fieldhelp" => _L('Select which categories you wish to include in this feed.'),
 				"value" => array_keys($userfeedcategories),
 				"validators" => array(
 					array("ValInArray", "values" => array_keys($userfeedcategories))),
 				"control" => array("MultiCheckBox", "values"=>$userfeedcategories),
-				"helpstep" => 2
+				"helpstep" => 1
 			);
 			$otherfeedslabel = _L("Other feed categories");
 		} else {
@@ -78,17 +78,17 @@ class FeedUrlWiz_feedoptions extends WizStep {
 		if (count($otherfeedcategories)) {
 			$formdata["otherfeedcategories"] = array(
 				"label" => $otherfeedslabel,
-				"fieldhelp" => _L('TODO: help me!'),
+				"fieldhelp" => _L('Select which categories you wish to include in this feed.'),
 				"value" => "",
 				"validators" => array(
 					array("ValInArray", "values" => array_keys($otherfeedcategories))),
 				"control" => array("MultiCheckBox", "values"=>$otherfeedcategories),
-				"helpstep" => 2
+				"helpstep" => 1
 			);
 		}
 		$formdata["itemcount"] = array(
 			"label" => _L('Items to display'),
-			"fieldhelp" => _L('TODO: help me!'),
+			"fieldhelp" => _L('Select the maximum number of items this feed should display.'),
 			"value" => "10",
 			"validators" => array(
 				array("ValRequired"),
@@ -98,7 +98,7 @@ class FeedUrlWiz_feedoptions extends WizStep {
 		);
 		$formdata["maxage"] = array(
 			"label" => _L('Max age (days)'),
-			"fieldhelp" => _L('TODO: help me!'),
+			"fieldhelp" => _L('Choose the maximum age (in days) of messages displayed on this feed.'),
 			"value" => "",
 			"validators" => array(
 				array("ValNumber", "min" => 0, "max" => 365)),
@@ -106,7 +106,7 @@ class FeedUrlWiz_feedoptions extends WizStep {
 			"helpstep" => 1
 		);
 		
-		$helpsteps = array(_L("TODO: help me!"));
+		$helpsteps = array(_L("Select the appropriate options for the feed you wish to generate:<p>Categories: These are the categories of messages which will be displayed as content in the feed.</p><p>Items: The maximum number of items the feed will display.</p><p>Max age: How old the oldest displayed message can be.</p>"));
 		
 		return new Form("feedurlwiz-feedoptions",$formdata,$helpsteps);
 	}
@@ -127,9 +127,14 @@ class FeedUrlWiz_feedurl extends WizStep {
 		// TODO: text explaining that it's fine to cancel at this step, or continue and configure the widget
 		$formdata = array(
 				_L('Feed URL'),
+				"helptext" => array(
+					"label" => "",
+					"control" => array("FormHtml", "html" => _L("<p>Use and share this URL with anyone who wishes to follow the feed selections on the previous page. If this is all you need, feel free to cancel now.</p><p>If you wish to generate a feed widget to include in a web page, click on the Next button.</p>")),
+					"helpstep" => 1
+				),
 				"feedurl" => array(
 				"label" => _L('URL'),
-				"fieldhelp" => _L('TODO: help me!'),
+				"fieldhelp" => _L('This is the URL you should use in your feed agregation software.'),
 				"value" => $feedurl,
 				"validators" => array(
 					array("ValRequired")),
@@ -138,7 +143,7 @@ class FeedUrlWiz_feedurl extends WizStep {
 			)
 		);
 
-		$helpsteps = array(_L("TODO: help me!"));
+		$helpsteps = array(_L("<p>Use and share this URL with anyone who wishes to follow the feed selections on the previous page. If this is all you need, feel free to cancel now.</p><p>If you wish to generate a feed widget to include in a web page, click on the Next button.</p>"));
 
 		return new Form("feedurlwiz-feedurl",$formdata,$helpsteps);
 	}
@@ -201,7 +206,7 @@ class FeedUrlWiz_feedwidgetstyle extends WizStep {
 			_L('Container settings'),
 			"fontfamily" => array(
 				"label" => _L('Font Family'),
-				"fieldhelp" => _L('TODO: help me!'),
+				"fieldhelp" => _L('Display font to use when displaying the feed.'),
 				"value" => "default",
 				"validators" => array(
 					array("ValRequired"),
@@ -211,7 +216,7 @@ class FeedUrlWiz_feedwidgetstyle extends WizStep {
 			),
 			"iframeheight" => array(
 				"label" => _L('Iframe height'),
-				"fieldhelp" => _L('TODO: help me!'),
+				"fieldhelp" => _L('Height of the containing iframe.'),
 				"value" => 480,
 				"validators" => array(
 					array("ValRequired"),
@@ -221,7 +226,7 @@ class FeedUrlWiz_feedwidgetstyle extends WizStep {
 			),
 			"iframewidth" => array(
 				"label" => _L('Iframe width'),
-				"fieldhelp" => _L('TODO: help me!'),
+				"fieldhelp" => _L('Width of the containing iframe.'),
 				"value" => 300,
 				"validators" => array(
 					array("ValRequired"),
@@ -231,7 +236,7 @@ class FeedUrlWiz_feedwidgetstyle extends WizStep {
 			),
 			"borderstyle" => array(
 				"label" => _L('Border style'),
-				"fieldhelp" => _L('TODO: help me!'),
+				"fieldhelp" => _L('Border style of the container.'),
 				"value" => "solid",
 				"validators" => array(
 					array("ValRequired"),
@@ -241,7 +246,7 @@ class FeedUrlWiz_feedwidgetstyle extends WizStep {
 			),
 			"bordersize" => array(
 				"label" => _L('Border size'),
-				"fieldhelp" => _L('TODO: help me!'),
+				"fieldhelp" => _L('Size of the border on the container.'),
 				"value" => "1",
 				"validators" => array(
 					array("ValRequired"),
@@ -251,7 +256,7 @@ class FeedUrlWiz_feedwidgetstyle extends WizStep {
 			),
 			"bordercolor" => array(
 				"label" => _L('Border color'),
-				"fieldhelp" => _L('TODO: help me!'),
+				"fieldhelp" => _L('Color of the border on the container.'),
 				"value" => $_SESSION['colorscheme']['_brandtheme2'],
 				"validators" => array(
 					array("ValRequired")),
@@ -261,111 +266,118 @@ class FeedUrlWiz_feedwidgetstyle extends WizStep {
 			_L('Header'),
 			"headersize" => array(
 				"label" => _L('Text size'),
-				"fieldhelp" => _L('TODO: help me!'),
+				"fieldhelp" => _L('Size of the font used when displaying the header.'),
 				"value" => "18",
 				"validators" => array(
 					array("ValRequired"),
 					array("ValInArray", "values" => array_keys($pxsizes))),
 				"control" => array("SelectMenu", "values" => $pxsizes),
-				"helpstep" => 1
+				"helpstep" => 2
 			),
 			"titlecolor" => array(
 				"label" => _L('Header color'),
-				"fieldhelp" => _L('TODO: help me!'),
+				"fieldhelp" => _L('Color of the font used when displaying the header.'),
 				"value" => $_SESSION['colorscheme']['_brandprimary'],
 				"validators" => array(
 					array("ValRequired")),
 				"control" => array("ColorPicker", "size" => 7),
-				"helpstep" => 1
+				"helpstep" => 2
 			),
 			_L('Item List'),
 			"liststyle" => array(
 				"label" => _L('List style'),
-				"fieldhelp" => _L('TODO: help me!'),
+				"fieldhelp" => _L('List style to use when displaying the feed items.'),
 				"value" => "circle",
 				"validators" => array(
 					array("ValRequired"),
 					array("ValInArray", "values" => array_keys($liststyletypes))),
 				"control" => array("SelectMenu", "values" => $liststyletypes),
-				"helpstep" => 1
+				"helpstep" => 3
 			),
 			"listposition" => array(
 				"label" => _L('List position'),
-				"fieldhelp" => _L('TODO: help me!'),
+				"fieldhelp" => _L('Position of the list style elements relative to the feed item data.'),
 				"value" => "outside",
 				"validators" => array(
 					array("ValRequired"),
 					array("ValInArray", "values" => array_keys($listpositions))),
 				"control" => array("SelectMenu", "values" => $listpositions),
-				"helpstep" => 1
+				"helpstep" => 3
 			),
 			"listpadding" => array(
 				"label" => _L('Left padding'),
-				"fieldhelp" => _L('TODO: help me!'),
+				"fieldhelp" => _L('Left padding of the list elements.'),
 				"value" => "25",
 				"validators" => array(
 					array("ValNumber", "min" => 0, "max" => 60)),
 				"control" => array("TextField", "size" => 5),
-				"helpstep" => 1
+				"helpstep" => 3
 			),
 			"labelsize" => array(
 				"label" => _L('Label size'),
-				"fieldhelp" => _L('TODO: help me!'),
+				"fieldhelp" => _L('Size of the font used when displaying the item labels.'),
 				"value" => "16",
 				"validators" => array(
 					array("ValRequired"),
 					array("ValInArray", "values" => array_keys($pxsizes))),
 				"control" => array("SelectMenu", "values" => $pxsizes),
-				"helpstep" => 1
+				"helpstep" => 3
 			),
 			"labelcolor" => array(
 				"label" => _L('Label color'),
+				"fieldhelp" => _L('Color of the font used when displaying the item labels.'),
 				"value" => $_SESSION['colorscheme']['_brandtheme1'],
 				"validators" => array(
 					array("ValRequired")),
 				"control" => array("ColorPicker", "size" => 7),
-				"helpstep" => 1
+				"helpstep" => 3
 			),
 			"descriptionsize" => array(
 				"label" => _L('Description size'),
-				"fieldhelp" => _L('TODO: help me!'),
+				"fieldhelp" => _L('Size of the font used when displaying the item description.'),
 				"value" => "14",
 				"validators" => array(
 					array("ValRequired"),
 					array("ValInArray", "values" => array_keys($pxsizes))),
 				"control" => array("SelectMenu", "values" => $pxsizes),
-				"helpstep" => 1
+				"helpstep" => 3
 			),
 			"descriptioncolor" => array(
 				"label" => _L('Description color'),
-				"fieldhelp" => _L('TODO: help me!'),
+				"fieldhelp" => _L('Color of the font used when displaying the item description.'),
 				"value" => $_SESSION['colorscheme']['_brandtheme2'],
 				"validators" => array(
 					array("ValRequired")),
 				"control" => array("ColorPicker", "size" => 7),
-				"helpstep" => 1
+				"helpstep" => 3
 			),
 			"descriptionpadding" => array(
 				"label" => _L('Description padding'),
-				"fieldhelp" => _L('TODO: help me!'),
+				"fieldhelp" => _L('Additional left padding to use when displaying the item description.'),
 				"value" => "4",
 				"validators" => array(
 					array("ValRequired"),
 					array("ValInArray", "values" => array_keys($pxsizes))),
 				"control" => array("SelectMenu", "values" => $pxsizes),
-				"helpstep" => 1
+				"helpstep" => 3
 			),
+			_L('Generate Preview'),
 			"preview" => array(
 				"label" => _L('Preview'),
-				"fieldhelp" => _L('TODO: help me!'),
+				"fieldhelp" => _L('Click here to generate a preview of the feed which would be generated useing the above options.'),
 				"value" => "",
 				"validators" => array(),
 				"control" => array("InpageSubmitButton", "submitvalue" => "preview", "name" => _L("Generate Preview"), "icon" => "tick"),
-				"helpstep" => 1
+				"helpstep" => 4
 			)
 		);
 		
-		$helpsteps = array(_L("TODO: help me!"));
+		$helpsteps = array(
+			_L("<p>Use these options to control the visual appearance of the container displaying your feed data.</p>"),
+			_L("<p>Use these options to control the visual appearance of the main feed header.</p>"),
+			_L("<p>Use these options to control the visual appearance of the news items displayed in your feed.</p>"),
+			_L("<p>Generating a preview will cause the right side pane to update with the settings you have provided above. This will let you see what the widget should look like once you embed it in your website.</p>")
+		);
 		
 		return new Form("feedurlwiz-feedwidgetstyle",$formdata,$helpsteps);
 	}
@@ -382,8 +394,15 @@ class FinishFeedUrlWiz extends WizFinish {
 	
 	function getFinishPage ($postdata) {
 		// TODO: instructions for use
-		$html = '<input type="text" value="'.escapehtml($this->parent->dataHelper("/feedurl:feedurl")).'" style="width:100%;"/>
-		<textarea id="feedjs" wrap="off" spellcheck="false" style="width:100%;height:145px;">'.escapehtml($_SESSION['wizard_feedurl']['feedwidgetjs']).'</textarea>';
+		$html = '<h2 style="padding:8px;color:#'.$_SESSION['colorscheme']['_brandprimary'].';">'._L("Your feed selections are complete!").'</h2>
+		<ul style="color:#'.$_SESSION['colorscheme']['_brandprimary'].';">
+			<li><h2 style="font-size:14px">'._L("Use the following url in a feed agregator or other feed display application. Share it with anyone who is interested in the information displayed on this feed.").'</h2>
+				<input type="text" value="'.escapehtml($this->parent->dataHelper("/feedurl:feedurl")).'" style="width:99%;"/>
+			</li>
+			<li><h2 style="font-size:14px">'._L("The following java script snippet can be included in your web page to display the feed information described in the previous steps. Simply copy and paste it into your document where-ever you wish the feed to be displayed.").'</h2>
+				<textarea id="feedjs" wrap="off" spellcheck="false" style="width:100%;height:12em;">'.escapehtml($_SESSION['wizard_feedurl']['feedwidgetjs']).'</textarea>
+			</li>
+		</ul>';
 		
 		return $html;
 	}
@@ -534,7 +553,7 @@ if ($wizard->curstep == "/feedwidgetstyle") {
 <?
 	startWindow(_L('Feed Widget Preview'));
 ?>
-			<div style="padding-bottom:5px">
+			<div style="padding-bottom:5px;padding-top:5px">
 				<textarea id="feedjs" wrap="off" spellcheck="false" style="width:<?=($postdata["iframewidth"]-5)?>px;height:12em;"><?=escapehtml($feedwidgetjs)?></textarea>
 			</div>
 			<div id="feedpreview">
