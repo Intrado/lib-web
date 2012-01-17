@@ -1287,8 +1287,8 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		setCustomerSystemSetting('_logoclickurl', $postdata["logoclickurl"], $custdb);
 		setCustomerSystemSetting('_productname',  $postdata["productname"],$custdb);
 		setCustomerSystemSetting('_supportemail', $postdata["supportemail"], $custdb);
-		setCustomerSystemSetting('_supportphone', $postdata["supportphone"], $custdb);
-		setCustomerSystemSetting('callerid', $postdata["callerid"], $custdb);
+		setCustomerSystemSetting('_supportphone', Phone::parse($postdata["supportphone"]), $custdb);
+		setCustomerSystemSetting('callerid', Phone::parse($postdata["callerid"]), $custdb);
 		setCustomerSystemSetting('defaultareacode', $postdata["defaultareacode"], $custdb);
 		
 		// if inbound changed
