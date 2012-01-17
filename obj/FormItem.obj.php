@@ -247,15 +247,19 @@ class MultiCheckBox extends FormItem {
 		$hoverdata = array();
 		$counter = 1;
 		foreach ($this->args['values'] as $checkvalue => $checkname) {
-			$id = $n.'-'.$counter;
-			$checked = $value == $checkvalue || (is_array($value) && in_array($checkvalue, $value));
-			$str .= '<input id="'.$id.'" name="'.$n.'[]" type="checkbox" value="'.escapehtml($checkvalue).'" '.($checked ? 'checked' : '').' /><label id="'.$id.'-label" for="'.$id.'">'.escapehtml($checkname).'</label><br />
-				';
-			if (isset($this->args['hover'])) {
-				$hoverdata[$id] = $this->args['hover'][$checkvalue];
-				$hoverdata[$id.'-label'] = $this->args['hover'][$checkvalue];
+			if ($checkname == "#-#") {
+				$str .= "<hr />\n";
+			} else {
+				$id = $n.'-'.$counter;
+				$checked = $value == $checkvalue || (is_array($value) && in_array($checkvalue, $value));
+				$str .= '<input id="'.$id.'" name="'.$n.'[]" type="checkbox" value="'.escapehtml($checkvalue).'" '.($checked ? 'checked' : '').' /><label id="'.$id.'-label" for="'.$id.'">'.escapehtml($checkname).'</label><br />
+					';
+				if (isset($this->args['hover'])) {
+					$hoverdata[$id] = $this->args['hover'][$checkvalue];
+					$hoverdata[$id.'-label'] = $this->args['hover'][$checkvalue];
+				}
+				$counter++;
 			}
-			$counter++;
 		}
 		$str .= '</div>
 		';
