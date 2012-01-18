@@ -310,4 +310,47 @@ function setFbAuthorizedPages($pages) {
 	}
 }
 
+
+// Returns True if callerid can be set to anything
+// Returns False if callerid can not be set
+function canSetCallerid($callerid) {
+	global $USER;
+	if (!getSystemSetting('_hascallback', false)) {
+		if ($USER->authorize('setcallerid')){
+			return true;
+		}
+		if (getSystemSetting("requireapprovedcallerid",false)) {
+			// Check to see if it is one of the approved callerids
+			if (QuickQuery("select 1 from authorizedcallerid where callerid=?",false,array($callerid))) {
+				// Check user restrictions
+				$userRestrictions = QuickQueryList("select callerid from authorizedusercallerid where userid=?",false,false,array($USER->id));
+				if (count($userRestrictions) > 0) {
+					if (in_array($callerid,$userRestrictions)) {
+						return true;
+					}
+				} else {
+					return true;
+				}
+			}
+		}
+	}
+	return false;
+}
+
+function getAuthorizedUserCallerIDs($userid) {
+	$callerids = array();
+	if (!getSystemSetting('_hascallback', false)) {
+		if (getSystemSetting("requireapprovedcallerid",false)) {
+			$userRestrictions = QuickQuery("select count(callerid) from authorizedusercallerid where userid=?",false,array($userid));
+			if ($userRestrictions > 0) {
+				$callerids = QuickQueryList("select c.callerid from authorizedcallerid c inner join authorizedusercallerid uc on (c.callerid = uc.callerid) where userid=?",false,false,array($userid));
+			} else {
+				$callerids = QuickQueryList("select callerid from authorizedcallerid");
+			}
+		}
+	}
+	return $callerids;
+}
+
+
 ?>
