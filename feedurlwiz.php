@@ -404,7 +404,7 @@ class FinishFeedUrlWiz extends WizFinish {
 				<input type="text" readonly value="'.escapehtml($this->parent->dataHelper("/feedurl:feedurl")).'" style="background-color:#ffffff;cursor:text;width:99%;"/>
 			</li>
 			<li><h2 style="font-size:14px;color:black;">'._L("The following javascript snippet can be included in your web page to display the feed information described in the previous steps. Simply copy and paste it into your document where-ever you wish the feed to be displayed.").'</h2>
-				<textarea readonly wrap="off" spellcheck="false" style="background-color:#ffffff;cursor:text;width:99%;height:12em;">'.escapehtml($_SESSION['wizard_feedurl']['feedwidgetjs']).'</textarea>
+				<textarea readonly wrap="off" spellcheck="false" style="background-color:#ffffff;cursor:text;width:99%;height:15em;">'.escapehtml(getFeedWidgetJs()).'</textarea>
 			</li>
 		</ul>';
 		
@@ -425,18 +425,63 @@ $wizard->handleRequest();
 
 // if we are working with the widget style form, do some work to get the form data and return it to the browser for previewing
 if ($wizard->curstep == "/feedwidgetstyle") {
-	// default js variables
+	//check for form submission
+	if ($button = $wizard->getForm()->getSubmit() && $wizard->getForm()->isAjaxSubmit()) {
+		$wizard->getForm()->fireEvent(json_encode(getFeedJsVars()));
+	}
+}
+
+function getFeedWidgetJs() {
+	$vars = getFeedJsVars();
+	
+	// finish setting the feed widget variables and return the javascript
+	$vars = str_replace('$SMWIDGETHEAD', "'+encodeURIComponent(smwidgethead)+'", $vars);
+	$vars = str_replace('$SMWIDGETLIST', "'+encodeURIComponent(smwidgetlist)+'", $vars);
+	$vars = str_replace('$SMWIDGETBOX', "'+encodeURIComponent(smwidgetbox)+'", $vars);
+	$vars = str_replace('$SMWIDGETDESC', "'+encodeURIComponent(smwidgetdesc)+'", $vars);
+	$vars = str_replace('$SMWIDGETAUDIO', "'+encodeURIComponent(smwidgetaudio)+'", $vars);
+	$vars = str_replace('$SMFEEDURL', "'+encodeURIComponent(smfeedurl)+'", $vars);
+	
+	$feedwidgetjs = "
+<!-- BEGIN - SchoolMessenger Feed Widget -->
+<script type=\"text/javascript\">
+	var smwidgethead = \"".$vars['head']."\";
+	var smwidgetlist = \"".$vars['list']."\";
+	var smwidgetbox = \"".$vars['box']."\";
+	var smwidgetdesc = \"".$vars['desc']."\";
+	var smwidgetaudio = \"".$vars['audio']."\";
+	var smfeedurl = \"".$vars['feedurl']."\";
+document.write('".$vars['iframe']."');
+</script>
+<!-- END - SchoolMessenger Feed Widget -->";
+	
+	return $feedwidgetjs;
+}
+
+function getFeedJsVars() {
+	global $wizard;
+	
+	// default feed variables
 	$vars = array(
 		"iframe" => '<iframe height=$IFRAMEHEIGHT width=$IFRAMEWIDTH frameborder=0 marginwidth=0 marginheight=0 src="$TINYURL/feedwidget.html?feedurl=$SMFEEDURL&head=$SMWIDGETHEAD&list=$SMWIDGETLIST&box=$SMWIDGETBOX&desc=$SMWIDGETDESC&audio=$SMWIDGETAUDIO"></iframe>',
 		"head" => 'color:$TITLECOLOR;font-size:$HEADERSIZE;padding-left:4px;',
 		"list" => 'list-style:$LISTSTYLE $LISTPOSITION;$LISTPADDING;color:$LABELCOLOR;font-size:$LABELSIZE;',
 		"box" => '$FONTFAMILYborder:$BORDERSIZE $BORDERSTYLE $BORDERCOLOR;height:$BOXHEIGHT;overflow:auto;',
 		"desc" => 'color:$DESCRIPTIONCOLOR;font-size:$DESCRIPTIONSIZE;padding-left:$DESCRIPTIONPADDING;padding-bottom:4px;',
-		"audio" => 'font-size:$DESCRIPTIONSIZE;padding-left:$DESCRIPTIONPADDING;cursor:pointer;color:blue;text-decoration:underline;'
+		"audio" => 'font-size:$DESCRIPTIONSIZE;padding-left:$DESCRIPTIONPADDING;cursor:pointer;color:blue;text-decoration:underline;',
+		"feedurl" => $wizard->dataHelper("/feedurl:feedurl")
 	);
-	$feedurl = $wizard->dataHelper("/feedurl:feedurl");
 	
-	$postdata = $wizard->getForm()->getData();
+	if ($wizard->curstep == "/feedwidgetstyle")
+		$postdata = $wizard->getForm()->getData();
+	else
+		$postdata = $wizard->dataHelper("/feedwidgetstyle");
+		
+	if (!is_array($postdata)) {
+		error_log("Something went wrong getting form data to generate feed vars.");
+		return $vars;
+	}
+	
 	// replace any placeholders in the js with the form values
 	$vars = str_replace('$IFRAMEHEIGHT', $postdata["iframeheight"], $vars);
 	$vars = str_replace('$IFRAMEWIDTH', $postdata["iframewidth"], $vars);
@@ -457,44 +502,9 @@ if ($wizard->curstep == "/feedwidgetstyle") {
 	$vars = str_replace('$DESCRIPTIONCOLOR', "#".$postdata["descriptioncolor"], $vars);
 	$vars = str_replace('$DESCRIPTIONPADDING', $postdata["descriptionpadding"]."px", $vars);
 	
-	//data to use when preview creates an event
-	$onsubmitdata = array(
-		"head" => $vars['head'],
-		"list" => $vars['list'],
-		"box" => $vars['box'],
-		"desc" => $vars['desc'],
-		"audio" => $vars['audio'],
-		"feedurl" => $feedurl,
-		"iframe" => $vars['iframe'],
-		"preview_width" => $postdata["iframewidth"]
-	);
-	
-	// create the widget js and stuff it in session data to use on the finish step
-	$vars = str_replace('$SMWIDGETHEAD', "'+encodeURIComponent(smwidgethead)+'", $vars);
-	$vars = str_replace('$SMWIDGETLIST', "'+encodeURIComponent(smwidgetlist)+'", $vars);
-	$vars = str_replace('$SMWIDGETBOX', "'+encodeURIComponent(smwidgetbox)+'", $vars);
-	$vars = str_replace('$SMWIDGETDESC', "'+encodeURIComponent(smwidgetdesc)+'", $vars);
-	$vars = str_replace('$SMWIDGETAUDIO', "'+encodeURIComponent(smwidgetaudio)+'", $vars);
-	$vars = str_replace('$SMFEEDURL', "'+encodeURIComponent(smfeedurl)+'", $vars);
-	
-	$feedwidgetjs = "
-<script type=\"text/javascript\">
-	var smwidgethead = \"".$vars['head']."\";
-	var smwidgetlist = \"".$vars['list']."\";
-	var smwidgetbox = \"".$vars['box']."\";
-	var smwidgetdesc = \"".$vars['desc']."\";
-	var smwidgetaudio = \"".$vars['audio']."\";
-	var smfeedurl = \"".$feedurl."\";
-	document.write('".$vars['iframe']."');
-</script>";
-	
-	$_SESSION['wizard_feedurl']['feedwidgetjs'] = $feedwidgetjs;
-	
-	//check for form submission
-	if ($button = $wizard->getForm()->getSubmit() && $wizard->getForm()->isAjaxSubmit()) {
-		$wizard->getForm()->fireEvent(json_encode($onsubmitdata));
-	}
+	return $vars;
 }
+
 ////////////////////////////////////////////////////////////////////////////////
 // Display
 ////////////////////////////////////////////////////////////////////////////////
@@ -544,7 +554,7 @@ if ($wizard->curstep == "/feedwidgetstyle") {
 	startWindow(_L('Feed Widget Preview'));
 ?>
 			<div id="feedpreview" style="padding-top:5px">
-<?=$feedwidgetjs?>
+<?=getFeedWidgetJs()?>
 			</div>
 <?
 	endWindow();
