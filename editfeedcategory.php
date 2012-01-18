@@ -29,6 +29,20 @@ if (!getSystemSetting("_hasfeed") || !$USER->authorize('managesystem')) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+// Optional Form Items And Validators
+////////////////////////////////////////////////////////////////////////////////
+class ValFeedName extends Validator {
+	var $onlyserverside = true;
+	function validate ($value, $args) {
+		$dupename = QuickQuery("select 1 from feedcategory where not deleted and name = ? and id != ? limit 1", false, array($value, $args['id']));
+		error_log($dupename);
+		if ($dupename)
+			return $this->label." "._L("already exists. Duplicate category names are not allowed.");
+		return true;
+	}
+}
+
+////////////////////////////////////////////////////////////////////////////////
 // Form Data
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -43,6 +57,7 @@ foreach ($categories as $category) {
 		"value" => $category->name,
 		"validators" => array(
 			array("ValRequired"),
+			array("ValFeedName", "id" => $category->id),
 			array("ValLength","min" => 1,"max" => 50)
 		),
 		"control" => array("TextField","size" => 30, "maxlength" => 50),
@@ -70,6 +85,7 @@ $formdata["feedcategoryname-new"] = array(
 	"label" => _L('Name'),
 	"value" => "",
 	"validators" => array(
+		array("ValFeedName", "id" => "new"),
 		array("ValLength","min" => 1,"max" => 50)
 	),
 	"control" => array("TextField","size" => 30, "maxlength" => 50),
@@ -175,6 +191,12 @@ $PAGE = "admin:settings";
 $TITLE = _L('Edit Feed Category');
 
 include_once("nav.inc.php");
+
+?>
+<script type="text/javascript">
+<?	Validator::load_validators(array("ValFeedName"));?>
+</script>
+<?
 
 startWindow(_L('Feed Categories'));
 echo $form->render();
