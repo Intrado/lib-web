@@ -2,30 +2,32 @@
 
 
 class CallerID extends FormItem {
-
+	var $includeSelectMenu;
+	var $includeInputBox;
+	
 	function render ($value) {
 		$n = $this->form->name."_".$this->name;
-		$includeSelectMenu = isset($this->args['selectvalues']) && count($this->args['selectvalues']);
-		$includeInputBox =  isset($this->args['allowedit']) && $this->args['allowedit'];
+		$this->includeSelectMenu = isset($this->args['selectvalues']) && count($this->args['selectvalues']);
+		$this->includeInputBox =  isset($this->args['allowedit']) && $this->args['allowedit'];
 		
 		$max = isset($this->args['maxlength']) ? 'maxlength="'.$this->args['maxlength'].'"' : "";
 		$size = isset($this->args['size']) ? 'size="'.$this->args['size'].'"' : "";
 		
 		$str = '<input id="'.$n.'" name="'.$n.'" type="hidden" value="'.escapehtml($value).'" '.$max.' '.$size.'/>';
-		$includeInputBoxBox = false;
-		if ($includeSelectMenu) {
-			if (!$includeInputBox && count($this->args['selectvalues']) == 1 && current($this->args['selectvalues']) == $value) {
+		$displayInputBox = false;
+		if ($this->includeSelectMenu) {
+			if (!$this->includeInputBox && count($this->args['selectvalues']) == 1 && current($this->args['selectvalues']) == $value) {
 				$str .= Phone::format($value);
-				$includeSelectMenu = false;
+				$this->includeSelectMenu = false;
 			} else {
 				$str .= '<select id="'.$n.'select" name="'.$n.'select">';
 				$str .= '<option value="" ' . ($value == ""?'selected':'') . ' > -- ' . _L('Select Caller ID') . ' -- </option>';
 				$notInList = !in_array($value, $this->args['selectvalues']);
-				if ($includeInputBox) {
-					$includeInputBoxBox = $notInList;
-					$str .= '<option value="other" ' . ($includeInputBoxBox?'selected':''). '>' . _L('Other') . '</option>';
+				if ($this->includeInputBox) {
+					$displayInputBox = $notInList;
+					$str .= '<option value="other" ' . ($displayInputBox?'selected':''). '>' . _L('Other') . '</option>';
 				} else {
-					if ($notInList) {
+					if ($notInList && $value != "") {
 						$str .= '<option value="' . $value . '" selected disabled>' . escapehtml(Phone::format($value)) . '</option>';
 					}
 				}
@@ -37,26 +39,20 @@ class CallerID extends FormItem {
 				$str .= '</select>';
 			}
 		} else {
-			$includeInputBoxBox = true;
+			$displayInputBox = true;
 		}
 		
-		if ($includeInputBox) {
-			$str .= '&nbsp;<input id="'.$n.'freeform" name="'.$n.'freeform" type="text" value="'. ($includeInputBoxBox?escapehtml(Phone::format($value)):'') .'" '.$max.' '.$size.' style="' . (!$includeInputBoxBox?'display:none':''). ';"/>';
+		if ($this->includeInputBox) {
+			$str .= '&nbsp;<input id="'.$n.'freeform" name="'.$n.'freeform" type="text" value="'. ($displayInputBox?escapehtml(Phone::format($value)):'') .'" '.$max.' '.$size.' style="' . (!$displayInputBox?'display:none':''). ';"/>';
 		}
 		return $str;
 	}
 
 	function renderJavascript($value) {
 		$n = $this->form->name."_".$this->name;
-		$includeSelectMenu = isset($this->args['selectvalues']) && count($this->args['selectvalues']);
-		$includeInputBox =  isset($this->args['allowedit']) && $this->args['allowedit'];
-		
-		// Remove select menu when only one item and no freeform is allowed
-		$includeSelectMenu = !(!$includeInputBox && count($this->args['selectvalues']) == 1 && current($this->args['selectvalues']) == $value);
-		
 		$str = '';
-		if ($includeSelectMenu) {
-			if ($includeInputBox) {
+		if ($this->includeSelectMenu) {
+			if ($this->includeInputBox) {
 				$str .= '
 					$(\''.$n.'select\').observe("change",function(event) {
 						if($(\''.$n.'select\').value==\'other\') {
@@ -76,7 +72,7 @@ class CallerID extends FormItem {
 			}
 		
 		}
-		if ($includeInputBox) {
+		if ($this->includeInputBox) {
 			$str .= '
 				$(\''.$n.'freeform\').observe("change",function(event) {
 					e = event.element();

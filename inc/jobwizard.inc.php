@@ -1831,17 +1831,22 @@ class JobWiz_scheduleAdvanced extends WizStep {
 
 		$formdata = array($this->title);
 		if ($wizHasPhoneMsg) {
-			if ($ACCESS->getPermission('setcallerid') && !getSystemSetting('_hascallback')) {
+			if (!getSystemSetting('_hascallback', false) && (getSystemSetting("requireapprovedcallerid",false) || $USER->authorize('setcallerid'))) {
+				$callerids = getAuthorizedUserCallerIDs($USER->id);
+				$callerid = $USER->getSetting("callerid", getSystemSetting("callerid"));
+				
 				$helpsteps[] = _L("This option will set the number displayed on the recipient's home or cellular phone.");
 				$formdata["callerid"] = array(
-					"label" => _L("Caller ID"),
-					"fieldhelp" => _L('This option will set the Caller ID when the person is called.'),
-					"value" => Phone::format($USER->getSetting("callerid", getSystemSetting("callerid"))),
-					"validators" => array(
-						array("ValPhone")
-					),
-					"control" => array("TextField","maxlength" => 20, "size" => 15),
-					"helpstep" => $helpstepnum++
+						"label" => _L("Caller ID"),
+						"fieldhelp" => ("This features allows you to override the number that will display on recipient's Caller IDs."),
+						"value" => (in_array($callerid, $callerids)?$callerid:""),
+						"validators" => array(
+							array("ValLength","min" => 0,"max" => 20),
+							array("ValPhone"),
+							array("ValCallerID")
+							),
+						"control" => array("CallerID","maxlength" => 20, "size" => 15,"selectvalues"=>$callerids, "allowedit" => $USER->authorize('setcallerid')),
+						"helpstep" => $helpstepnum++
 				);
 			}
 			$helpsteps[] = _L("Specify the number of days for which you would like your job to run before it stops.");
