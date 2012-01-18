@@ -18,6 +18,7 @@ require_once("obj/FieldMap.obj.php");
 require_once("obj/FormUserItems.obj.php");
 require_once("obj/FormRuleWidget.fi.php");
 require_once("obj/InpageSubmitButton.fi.php");
+require_once("obj/RestrictedValues.fi.php");
 
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization
@@ -417,6 +418,22 @@ if (!getSystemSetting('_hascallback', false)) {
 		"control" => array("TextField","maxlength" => 20, "size" => 15),
 		"helpstep" => 1
 	);
+	
+	if(getSystemSetting("requireapprovedcallerid",false)) {
+		$authorizedusercallerids = QuickQueryList("select callerid from authorizedusercallerid where userid=?",false,false,array($USER->id));
+		$authorizedcallerids = QuickQueryList("select callerid,callerid from authorizedcallerid",true);
+		foreach($authorizedcallerids as $calleridkey => $calleridvalue) {
+			$authorizedcallerids[$calleridkey] = Phone::format($calleridvalue);
+		}
+		$formdata["restrictcallerid"] = array(
+			"label" => _L("Restrict Caller ID"),
+			"fieldhelp" => _L(''),
+			"value" => $authorizedusercallerids,
+			"validators" => array(),
+			"control" => array("RestrictedValues", "values" => $authorizedcallerids, "label" => _L("Allow the following Caller IDs:")),
+			"helpstep" => 1
+		);
+	}
 }
 
 $formdata[] = _L("Account Restrictions");
@@ -739,6 +756,18 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 
 			if (isset($postdata['callerid']))
 				$edituser->setSetting("callerid",Phone::parse($postdata['callerid']));
+			
+			if (isset($postdata['restrictcallerid'])) {
+				if (count($postdata['restrictcallerid'])) {
+					if(count(array_diff($postdata['restrictcallerid'],$authorizedusercallerids)) > 0 || 
+						count(array_diff($authorizedusercallerids,$postdata['restrictcallerid'])) > 0) {
+						QuickUpdate("delete from authorizedusercallerid where userid=?",false,array($edituser->id));
+						QuickUpdate("insert into authorizedusercallerid (userid,callerid) values " . repeatWithSeparator("({$edituser->id},?)", ",", count($postdata['restrictcallerid'])),false,$postdata['restrictcallerid']);
+					}
+				} else {
+					QuickUpdate("delete from authorizedusercallerid where userid=?",false,array($edituser->id));
+				}
+			}
 
 			if (!$edituser->getSetting("maxjobdays", false))
 				$edituser->setSetting("maxjobdays", 1);
