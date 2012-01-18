@@ -18,7 +18,7 @@ require_once("obj/InpageSubmitButton.fi.php");
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization
 ////////////////////////////////////////////////////////////////////////////////
-if (!getSystemSetting("_hasfeed", false) || !$USER->authorize('managesystem')) {
+if (!getSystemSetting("_hasfeed", false)) {
 	redirect('unauthorized.php');
 }
 
@@ -354,9 +354,19 @@ class FeedUrlWiz_feedwidgetstyle extends WizStep {
 				"helpstep" => 3
 			),
 			"descriptionpadding" => array(
-				"label" => _L('Description padding'),
+				"label" => _L('Description indention'),
 				"fieldhelp" => _L('Additional left padding to use when displaying the item description.'),
 				"value" => "4",
+				"validators" => array(
+					array("ValRequired"),
+					array("ValInArray", "values" => array_keys($pxsizes))),
+				"control" => array("SelectMenu", "values" => $pxsizes),
+				"helpstep" => 3
+			),
+			"descriptionbottompadding" => array(
+				"label" => _L('List item spaceing'),
+				"fieldhelp" => _L('Spacing used between list items.'),
+				"value" => "5",
 				"validators" => array(
 					array("ValRequired"),
 					array("ValInArray", "values" => array_keys($pxsizes))),
@@ -395,16 +405,20 @@ class FinishFeedUrlWiz extends WizFinish {
 	}
 	
 	function getFinishPage ($postdata) {
-		// TODO: instructions for use
+		// instructions for use
 		$html = '
 		<h2 style="padding:8px;color:#'.$_SESSION['colorscheme']['_brandprimary'].';">'._L("Your feed selections are complete!").'</h2>
 		<ul style="color:#'.$_SESSION['colorscheme']['_brandprimary'].';">
-			<li>
-				<h2 style="font-size:14px;color:black;">'._L("Use the following url in a feed agregator or other feed display application. Share it with anyone who is interested in the information displayed on this feed.").'</h2>
+			<li style="padding-bottom:8px;">
+				<div style="font-size:14px;color:black;font-weight:bold;">'._L("Use the following url in a feed agregator or other feed display application. Share it with anyone who is interested in the information displayed on this feed.").'</div>
 				<input type="text" readonly value="'.escapehtml($this->parent->dataHelper("/feedurl:feedurl")).'" style="background-color:#ffffff;cursor:text;width:99%;"/>
 			</li>
-			<li><h2 style="font-size:14px;color:black;">'._L("The following javascript snippet can be included in your web page to display the feed information described in the previous steps. Simply copy and paste it into your document where-ever you wish the feed to be displayed.").'</h2>
+			<li style="padding-bottom:8px;">
+				<div style="font-size:14px;color:black;font-weight:bold;">'._L("The following javascript snippet can be included in your web page to display the feed information described in the previous steps. Simply copy and paste it into your document where-ever you wish the feed to be displayed.").'</div>
 				<textarea readonly wrap="off" spellcheck="false" style="background-color:#ffffff;cursor:text;width:99%;height:15em;">'.escapehtml(getFeedWidgetJs()).'</textarea>
+			</li>
+			<li style="padding-bottom:8px;">
+				<div style="color:#000000">NOTE: Above information is not saved anywhere. Please copy/paste it, or come back and re-generate it when it is needed.</div>
 			</li>
 		</ul>';
 		
@@ -467,7 +481,7 @@ function getFeedJsVars() {
 		"head" => 'color:$TITLECOLOR;font-size:$HEADERSIZE;padding-left:4px;',
 		"list" => 'list-style:$LISTSTYLE $LISTPOSITION;$LISTPADDING;color:$LABELCOLOR;font-size:$LABELSIZE;',
 		"box" => '$FONTFAMILYborder:$BORDERSIZE $BORDERSTYLE $BORDERCOLOR;height:$BOXHEIGHT;overflow:auto;',
-		"desc" => 'color:$DESCRIPTIONCOLOR;font-size:$DESCRIPTIONSIZE;padding-left:$DESCRIPTIONPADDING;padding-bottom:4px;',
+		"desc" => 'color:$DESCRIPTIONCOLOR;font-size:$DESCRIPTIONSIZE;padding-left:$DESCRIPTIONPADDING;padding-bottom:$DESCRIPTIONBOTTOMPADDING;',
 		"audio" => 'font-size:$DESCRIPTIONSIZE;padding-left:$DESCRIPTIONPADDING;cursor:pointer;color:blue;text-decoration:underline;',
 		"feedurl" => $wizard->dataHelper("/feedurl:feedurl")
 	);
@@ -501,6 +515,7 @@ function getFeedJsVars() {
 	$vars = str_replace('$DESCRIPTIONSIZE', $postdata["descriptionsize"]."px", $vars);
 	$vars = str_replace('$DESCRIPTIONCOLOR', "#".$postdata["descriptioncolor"], $vars);
 	$vars = str_replace('$DESCRIPTIONPADDING', $postdata["descriptionpadding"]."px", $vars);
+	$vars = str_replace('$DESCRIPTIONBOTTOMPADDING', $postdata["descriptionbottompadding"]."px", $vars);
 	
 	return $vars;
 }
