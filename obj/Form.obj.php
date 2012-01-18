@@ -382,10 +382,12 @@ class Form {
 		$str .= $this->renderFormItems();
 
 		//submit buttons
+		$str .= '<div style="padding-top:12px;">';
 		foreach ($this->buttons as $code) {
 			$str .= $code;
 		}
-
+		$str .= '</div>';
+		
 		$str .= '
 				<div id="'.$this->name.'_spinner" class="formspinner" style="display: none;"><img src="img/ajax-loader.gif" alt="Loading..."></div>
 				<!-- END FORM CONTENT -->
