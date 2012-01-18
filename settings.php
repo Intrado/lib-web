@@ -97,6 +97,9 @@ startWindow("Options", 'padding: 3px;');
 					<tr><td><a href='jobsettings.php'>Job Settings</a></td></tr>
 					<tr><td><a href='jobtypemanagement.php'>Job Types</a></td></tr>
 					<tr><td><a href='messageintro.php'>Message Intro</a></td></tr>
+					<? if (!getSystemSetting('_hascallback', false)) { ?>
+						<tr><td><a href='callerid.php'>Caller ID</a></td></tr>
+					<? } ?>
 				</table>
 			</td>
 			<td>
