@@ -22,6 +22,7 @@ require_once("obj/TwitterAuth.fi.php");
 require_once("inc/twitteroauth/OAuth.php");
 require_once("inc/twitteroauth/twitteroauth.php");
 require_once("obj/Twitter.obj.php");
+require_once("obj/CallerID.fi.php");
 
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization
@@ -362,8 +363,11 @@ $formdata["maxjobdays"] = array(
 	"helpstep" => 2
 );
 
-if ($USER->authorize('setcallerid') && !getSystemSetting('_hascallback', false)) {
-	if ($readonly) {
+if (!getSystemSetting('_hascallback', false)) {
+	$requireapprovedcallerid = getSystemSetting("requireapprovedcallerid",false);
+	$setcallerid = $USER->authorize('setcallerid');
+	
+	if ($readonly || (!$requireapprovedcallerid && !$setcallerid)) {
 		$formdata["callerid"] = array(
 			"label" => _L("Personal Caller ID"),
 			"fieldhelp" => ("Enter the Caller ID phone number to be associated with your jobs."),
@@ -371,15 +375,17 @@ if ($USER->authorize('setcallerid') && !getSystemSetting('_hascallback', false))
 			"helpstep" => 1
 		);
 	} else {
+		$callerids = getAuthorizedUserCallerIDs($USER->id);
 		$formdata["callerid"] = array(
 			"label" => _L("Personal Caller ID"),
 			"fieldhelp" => ("Enter the Caller ID phone number to be associated with your jobs."),
-			"value" => Phone::format($USER->getSetting("callerid","")),
+			"value" => $USER->getSetting("callerid",""),
 			"validators" => array(
 				array("ValLength","min" => 0,"max" => 20),
-				array("ValPhone")
+				array("ValPhone"),
+				array("ValCallerID")
 			),
-			"control" => array("TextField","maxlength" => 20, "size" => 15),
+			"control" => array("CallerID","maxlength" => 20, "size" => 15,"selectvalues"=>$callerids, "allowedit" => $setcallerid),
 			"helpstep" => 2
 		);
 	}
@@ -496,8 +502,12 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 			$USER->aremail = $postdata['aremail'];
 			$USER->phone = Phone::parse($postdata['phone']);
 			$USER->update();
-			if ($USER->authorize('setcallerid') && isset($postdata['callerid'])) {
-				$USER->setSetting("callerid",Phone::parse($postdata['callerid']));
+			
+			if (isset($postdata['callerid'])) {
+				$callerid = Phone::parse($postdata['callerid']);
+				if (canSetCallerid($callerid)) {
+					$USER->setSetting("callerid",$callerid);
+				}
 			}
 		}
 
@@ -582,7 +592,7 @@ include_once("nav.inc.php");
 
 ?>
 <script type="text/javascript">
-<? Validator::load_validators(array("ValLogin","ValPassword","ValBrandTheme", "ValAccesscode", "ValPin")); ?>
+<? Validator::load_validators(array("ValLogin","ValPassword","ValBrandTheme", "ValAccesscode", "ValPin","ValCallerID")); ?>
 </script>
 <?
 

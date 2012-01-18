@@ -41,7 +41,7 @@ require_once("obj/TwitterAuth.fi.php");
 require_once("inc/twitteroauth/OAuth.php");
 require_once("inc/twitteroauth/twitteroauth.php");
 require_once("obj/Twitter.obj.php");
-
+require_once("obj/CallerID.fi.php");
 
 // Includes that are required for preview to work
 require_once("obj/Language.obj.php");
@@ -656,7 +656,7 @@ if ($submittedmode || $completedmode) {
 		"helpstep" => ++$helpstepnum
 	);
 
-	if ($USER->authorize('setcallerid') && !getSystemSetting('_hascallback', false)) {
+	if (!getSystemSetting('_hascallback', false) && (getSystemSetting("requireapprovedcallerid",false) || $USER->authorize('setcallerid'))) {
 		$formdata["callerid"] = array(
 			"label" => _L("Personal Caller ID"),
 			"fieldhelp" => ("This features allows you to override the number that will display on recipient's Caller IDs."),
@@ -805,17 +805,19 @@ if ($submittedmode || $completedmode) {
 		"control" => array("CheckBox"),
 		"helpstep" => ++$helpstepnum
 	);
-
-	if ($USER->authorize('setcallerid') && !getSystemSetting('_hascallback', false)) {
+	
+	if (!getSystemSetting('_hascallback', false) && (getSystemSetting("requireapprovedcallerid",false) || $USER->authorize('setcallerid'))) {
+		$callerids = getAuthorizedUserCallerIDs($USER->id);
 		$formdata["callerid"] = array(
 			"label" => _L("Personal Caller ID"),
-			"fieldhelp" => _L("This features allows you to override the number that will display on recipient's Caller IDs."),
-			"value" => Phone::format($job->getSetting("callerid",getDefaultCallerID())),
+			"fieldhelp" => ("This features allows you to override the number that will display on recipient's Caller IDs."),
+			"value" => $job->getSetting("callerid",getDefaultCallerID()),
 			"validators" => array(
-				array("ValLength","min" => 3,"max" => 20),
-				array("ValPhone")
-			),
-			"control" => array("TextField","maxlength" => 20, "size" => 15),
+				array("ValLength","min" => 0,"max" => 20),
+				array("ValPhone"),
+				array("ValCallerID")
+				),
+			"control" => array("CallerID","maxlength" => 20, "size" => 15,"selectvalues"=>$callerids, "allowedit" => $USER->authorize('setcallerid')),
 			"helpstep" => $helpstepnum
 		);
 	}
@@ -949,9 +951,10 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 				$job->messagegroupid = $messagegroup->id;
 
 				// set jobsetting 'callerid' blank for jobprocessor to lookup the current default at job start
-				if ($USER->authorize('setcallerid') && !getSystemSetting('_hascallback', false)) {
-						// blank callerid is fine, save this setting and default will be looked up by job processor when job starts
-						$job->setOptionValue("callerid",Phone::parse($postdata['callerid']));
+				$callerid = isset($postdata['callerid'])?Phone::parse($postdata['callerid']):false;
+				if ($callerid && canSetCallerid($callerid)) {
+					// blank callerid is fine, save this setting and default will be looked up by job processor when job starts
+						$job->setOptionValue("callerid",$callerid);
 				} else {
 					$job->setOptionValue("callerid", getDefaultCallerID());
 				}
@@ -1058,7 +1061,8 @@ Validator::load_validators(array("ValDuplicateNameCheck",
 								"ValFormListSelect",
 								"ValMessageGroup",
 								"ValFacebookPageWithMessage",
-								"ValTwitterAccountWithMessage"));
+								"ValTwitterAccountWithMessage",
+								"ValCallerID"));
 ?>
 </script>
 <script src="script/livepipe/livepipe.js" type="text/javascript"></script>
