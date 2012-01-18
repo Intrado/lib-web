@@ -155,8 +155,8 @@ function submit_button($name, $value = "submit", $icon = null) {
 
 function icon_button($name,$icon,$onclick = NULL, $href = NULL, $extrahtml = NULL) {
 	$theme = getBrandTheme();
-	$autoid = autoID("icon_button", $name, $icon);
-	$btn = '<button id="' . $autoid . '" class="button" type="button" onmouseover="btn_rollover(this);" onmouseout="btn_rollout(this);"';
+	$autoid = $extrahtml == null ? ('id="' . autoID("icon_button", $name, $icon) . '"') : "";
+	$btn = '<button ' . $autoid . ' class="button" type="button" onmouseover="btn_rollover(this);" onmouseout="btn_rollout(this);"';
 	if ($onclick)
 		$btn .= ' onclick="' . $onclick . ';" ';
 	else if ($href)
@@ -171,8 +171,8 @@ function icon_button($name,$icon,$onclick = NULL, $href = NULL, $extrahtml = NUL
 
 function button($name,$onclick = NULL, $href = NULL, $extrahtml = NULL) {
 	$theme = getBrandTheme();
-	$autoid = autoID("button", $name);
-	$btn = '<button id="' . $autoid . '" class="button" type="button" onmouseover="btn_rollover(this);" onmouseout="btn_rollout(this);"';
+	$autoid = $extrahtml == null ? ('id="' . autoID("button", $name) . '"') : "";
+	$btn = '<button ' . $autoid . ' class="button" type="button" onmouseover="btn_rollover(this);" onmouseout="btn_rollout(this);"';
 	if ($onclick)
 		$btn .= ' onclick="' . $onclick . ';" ';
 	else if ($href)
