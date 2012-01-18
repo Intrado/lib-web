@@ -68,3 +68,16 @@ $$$
 -- $rev 6
 -- Creating monitor template with dbmo
 
+-- $rev 7
+CREATE TABLE `authorizedcallerid` (
+	`callerid` varchar(20),
+	PRIMARY KEY (`callerid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+$$$
+
+CREATE TABLE `authorizedusercallerid` (
+	`userid` int(11) NOT NULL,
+	`callerid` varchar(20) NOT NULL,
+	PRIMARY KEY (`userid`,`callerid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+$$$

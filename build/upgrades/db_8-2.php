@@ -36,6 +36,9 @@ function upgrade_8_2 ($rev, $shardid, $customerid, $db) {
 				
 			// restore global db connection
 			$_dbcon = $savedbcon;
+		case 6:
+			echo "|";
+			apply_sql("upgrades/db_8-2_pre.sql", $customerid, $db, 7);
 	
 	}
 	

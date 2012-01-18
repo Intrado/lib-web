@@ -1805,3 +1805,22 @@ $$$
 update setting set value='8.2/6' where name='_dbversion'
 $$$
 -- END 8.2/6
+
+-- START 8.2/7
+
+CREATE TABLE `authorizedcallerid` (
+	`callerid` varchar(20),
+	PRIMARY KEY (`callerid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+$$$
+
+CREATE TABLE `authorizedusercallerid` (
+	`userid` int(11) NOT NULL,
+	`callerid` varchar(20) NOT NULL,
+	PRIMARY KEY (`userid`,`callerid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+$$$
+
+update setting set value='8.2/7' where name='_dbversion'
+$$$
+-- END 8.2/7
