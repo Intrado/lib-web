@@ -19,6 +19,8 @@ require_once("obj/FormUserItems.obj.php");
 require_once("obj/FormRuleWidget.fi.php");
 require_once("obj/InpageSubmitButton.fi.php");
 require_once("obj/RestrictedValues.fi.php");
+require_once("obj/CallerID.fi.php");
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization
@@ -407,21 +409,33 @@ $formdata["phone"] = array(
 );
 
 if (!getSystemSetting('_hascallback', false)) {
+// 	$formdata["callerid"] = array(
+// 		"label" => _L("Caller ID"),
+// 		"fieldhelp" => _L('This is the default Caller ID phone number for jobs sent by the user.'),
+// 		"value" => ($edituser->id +0 > 0)?Phone::format($edituser->getSetting("callerid", "")):"",
+// 		"validators" => array(
+// 			array("ValLength","min" => 2,"max" => 20),
+// 			array("ValPhone")
+// 		),
+// 		"control" => array("TextField","maxlength" => 20, "size" => 15),
+// 		"helpstep" => 1
+// 	);
+	$authorizedcallerids = QuickQueryList("select callerid,callerid from authorizedcallerid",true);
 	$formdata["callerid"] = array(
-		"label" => _L("Caller ID"),
-		"fieldhelp" => _L('This is the default Caller ID phone number for jobs sent by the user.'),
-		"value" => ($edituser->id +0 > 0)?Phone::format($edituser->getSetting("callerid", "")):"",
-		"validators" => array(
-			array("ValLength","min" => 2,"max" => 20),
-			array("ValPhone")
-		),
-		"control" => array("TextField","maxlength" => 20, "size" => 15),
-		"helpstep" => 1
+				"label" => _L("Caller ID"),
+				"fieldhelp" => _L('This is the default Caller ID phone number for jobs sent by the user.'),
+				"value" => ($edituser->id +0 > 0)?$edituser->getSetting("callerid", ""):"",
+				"validators" => array(
+					array("ValLength","min" => 0,"max" => 20),
+					array("ValPhone")
+				),
+				"control" => array("CallerID","maxlength" => 20, "size" => 15,"selectvalues"=>$authorizedcallerids, "allowedit" => $USER->authorize('setcallerid')),
+				"helpstep" => 1
 	);
+	
 	
 	if(getSystemSetting("requireapprovedcallerid",false)) {
 		$authorizedusercallerids = QuickQueryList("select callerid from authorizedusercallerid where userid=?",false,false,array($USER->id));
-		$authorizedcallerids = QuickQueryList("select callerid,callerid from authorizedcallerid",true);
 		foreach($authorizedcallerids as $calleridkey => $calleridvalue) {
 			$authorizedcallerids[$calleridkey] = Phone::format($calleridvalue);
 		}
