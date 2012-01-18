@@ -35,7 +35,6 @@ class ValFeedName extends Validator {
 	var $onlyserverside = true;
 	function validate ($value, $args) {
 		$dupename = QuickQuery("select 1 from feedcategory where not deleted and name = ? and id != ? limit 1", false, array($value, $args['id']));
-		error_log($dupename);
 		if ($dupename)
 			return $this->label." "._L("already exists. Duplicate category names are not allowed.");
 		return true;
