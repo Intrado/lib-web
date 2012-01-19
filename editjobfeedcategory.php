@@ -10,6 +10,14 @@ require_once("inc/utils.inc.php");
 require_once("obj/Validator.obj.php");
 require_once("obj/Form.obj.php");
 require_once("obj/FormItem.obj.php");
+require_once("inc/appserver.inc.php");
+require_once('thrift/Thrift.php');
+require_once $GLOBALS['THRIFT_ROOT'].'/protocol/TBinaryProtocol.php';
+require_once $GLOBALS['THRIFT_ROOT'].'/transport/TSocket.php';
+require_once $GLOBALS['THRIFT_ROOT'].'/transport/TBufferedTransport.php';
+require_once $GLOBALS['THRIFT_ROOT'].'/transport/TFramedTransport.php';
+require_once($GLOBALS['THRIFT_ROOT'].'/packages/commsuite/CommSuite.php');
+
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization
 ////////////////////////////////////////////////////////////////////////////////
@@ -52,6 +60,7 @@ if (QuickQuery("select 1 from userfeedcategory where userid = ? limit 1", false,
 	$usercategorywhere = "id in (select feedcategoryid from userfeedcategory where userid=?) ";
 	
 	// the job may already have categories selected, make sure they are displayed as well.
+	$jobcategorywhere = "";
 	if (count($currentcategories)) {
 		foreach ($currentcategories as $id)
 		$args[] = $id;
@@ -138,7 +147,11 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 			
 			Query("COMMIT");
 			
-			// TODO: call update category API?
+			
+			// expire feed categories that changed
+			$categoryids = array_diff(array_merge($currentcategories,$postdata['feedcategories']), array_intersect($currentcategories, $postdata['feedcategories']));
+			if (count($categoryids))
+				expireFeedCategories($CUSTOMERURL, $categoryids);
 		}
 		if ($ajax)
 			$form->sendTo("posts.php");
