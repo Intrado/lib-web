@@ -101,23 +101,22 @@ if($isajax === true) {
 			$icon = 'img/largeicons/globe.jpg';
 			
 			// if the user owns this message group, they can edit, delete
-			if (userOwns("messagegroup", $post['messagegroupid'])) {
-				$actions = array();
-				$messagegroup = new MessageGroup($post['messagegroupid']);
+			$actions = array();
+			$messagegroup = new MessageGroup($post['messagegroupid']);
+			if (userOwns("messagegroup", $messagegroup->id)) {
 				if ($messagegroup->hasMessage("post","page"))
 					$actions[] = action_link("Page", "layout_sidebar", 'editmessagepage.php?postedit&id=' . $messagegroup->getMessage("post", "page", "en")->id);
 				if ($messagegroup->hasMessage("post","voice"))
 					$actions[] = action_link("Media", "../nifty_play", 'editmessagepostvoice.php?postedit&id=' . $messagegroup->getMessage("post", "voice", "en")->id);
-				if ($messagegroup->hasMessage("post","feed")) {
+				if ($messagegroup->hasMessage("post","feed"))
 					$actions[] = action_link("Feed", "rss", 'editmessagefeed.php?postedit&id=' . $messagegroup->getMessage("post", "feed", "en")->id);
-					$actions[] = action_link("Post Categories", "pencil", 'editjobfeedcategory.php?postedit&id=' . $post['jobid']);
-				}
-				$tools = action_links ($actions);
 			} else {
-				$tools = action_links (
-					action_link("View", "fugue/magnifier", 'messagegroupview.php?id=' . $mgid)
-				);
+				$actions[] = action_link("View", "fugue/magnifier", 'messagegroupview.php?id=' . $mgid);
 			}
+			if ($messagegroup->hasMessage("post","feed")) {
+				$actions[] = action_link("Post Categories", "pencil", 'editjobfeedcategory.php?postedit&id=' . $post['jobid']);
+			}
+			$tools = action_links ($actions);
 			
 			// get the job post feed categories
 			$categoryids = explode(",", $post["feeddestination"]);
