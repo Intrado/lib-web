@@ -68,6 +68,7 @@ $NAVTREE = array (
 		array("Lists","lists.php",array("createlist","subscribe"),$SUBTAB=="lists"),
 		array("Messages","messages.php",array('sendemail', 'sendphone', "sendsms","subscribe"),$SUBTAB=="messages"),
 		array("Jobs","jobs.php",array('sendemail', 'sendphone', "sendsms"),$SUBTAB=="jobs"),
+		array("Posts","posts.php",array("feedpost"),$SUBTAB=="post"),
 		array("Classroom","classroommessageoverview.php",getSystemSetting("_hastargetedmessage", false) ? "targetedmessage" : "dummy",$SUBTAB=="classroom"),
 		array("Surveys","surveys.php",getSystemSetting("_hassurvey", true) ? "survey" : "dummy",$SUBTAB=="survey"),
 		array("Responses","replies.php?reset=1","leavemessage",$SUBTAB=="responses")
