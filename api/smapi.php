@@ -329,7 +329,7 @@ class SMAPI {
 			}
 
 			$message = new Message($messageid);
-			if ($message->id && $message->userid != $USER->id || $message->deleted ) {
+			if ($message->id && $message->userid != $USER->id) {
 				$result["resultdescription"] = "Unauthorized access";
 				return $result;
 			}
@@ -1197,7 +1197,6 @@ class SMAPI {
 			$message->subtype = "voice";
 			$message->data = ""; // not used by phone
 			$message->modifydate = date("Y-m-d H:i:s", time());
-			$message->deleted = 0;
 			$message->autotranslate = "none";
 			$message->languagecode = "en"; // hardcoded English
 			$message->create();
@@ -1260,7 +1259,6 @@ class SMAPI {
 			$message->subtype = "plain";
 			$message->data = ""; // not used by phone
 			$message->modifydate = date("Y-m-d H:i:s", time());
-			$message->deleted = 0;
 			$message->autotranslate = "none";
 			$message->languagecode = "en"; // hardcoded English
 			$message->create();
@@ -1336,7 +1334,6 @@ class SMAPI {
 			$message->subtype = "plain";
 			$message->data = "subject=" . urlencode($subject) . "&fromname=" . urlencode($fromname) . "&fromemail=" . urlencode($fromemail) . "&overrideplaintext=1";
 			$message->modifydate = date("Y-m-d H:i:s", time());
-			$message->deleted = 0;
 			$message->autotranslate = "none";
 			$message->languagecode = "en"; // hardcoded English
 			$message->create();

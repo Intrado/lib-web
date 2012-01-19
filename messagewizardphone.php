@@ -741,7 +741,6 @@ class FinishMessageWizard extends WizFinish {
 					$message->userid = $USER->id;
 					$message->modifydate = date("Y-m-d H:i:s");
 					$message->languagecode = $langcode;
-					$message->deleted = 0;
 					
 					$message->stuffHeaders();
 					if (!$message->id)

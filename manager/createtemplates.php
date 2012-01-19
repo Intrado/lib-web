@@ -64,7 +64,6 @@ function createDefaultTemplates($useSmsMessagelinkInboundnumber = false) {
 			$message->subtype = "plain";
 			$message->data = "";
 			$message->modifydate = date('Y-m-d H:i:s');
-			$message->deleted = 0;
 			$message->autotranslate = "none";
 			$message->languagecode = "en";
 			if (!$message->create()) 
@@ -154,7 +153,6 @@ function createTemplate($templatetype, $englishplain, $englishhtml, $spanishplai
 	$message->subtype = "plain";
 	$message->data = "";
 	$message->modifydate = date('Y-m-d H:i:s');
-	$message->deleted = 0;
 	$message->autotranslate = "none";
 	$message->languagecode = "en";
 	if (!$message->create()) 
@@ -180,7 +178,6 @@ function createTemplate($templatetype, $englishplain, $englishhtml, $spanishplai
 	$message->subtype = "html";
 	$message->data = "";
 	$message->modifydate = date('Y-m-d H:i:s');
-	$message->deleted = 0;
 	$message->autotranslate = "none";
 	$message->languagecode = "en";
 	if (!$message->create()) 
@@ -206,7 +203,6 @@ function createTemplate($templatetype, $englishplain, $englishhtml, $spanishplai
 	$message->subtype = "plain";
 	$message->data = "";
 	$message->modifydate = date('Y-m-d H:i:s');
-	$message->deleted = 0;
 	$message->autotranslate = "none";
 	$message->languagecode = "es";
 	if (!$message->create()) 
@@ -232,7 +228,6 @@ function createTemplate($templatetype, $englishplain, $englishhtml, $spanishplai
 	$message->subtype = "html";
 	$message->data = "";
 	$message->modifydate = date('Y-m-d H:i:s');
-	$message->deleted = 0;
 	$message->autotranslate = "none";
 	$message->languagecode = "es";
 	if (!$message->create()) 

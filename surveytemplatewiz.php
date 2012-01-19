@@ -736,7 +736,6 @@ class FinishSurveyTemplateWizard extends WizFinish {
 				$emailmessage->subtype = "plain";
 				$emailmessage->autotranslate = "none";
 				$emailmessage->languagecode = Language::getDefaultLanguageCode();
-				$emailmessage->deleted = 0;
 			}
 
 			$emailmessage->subject = $postdata['/webfeatures']['subject'];

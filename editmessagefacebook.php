@@ -151,7 +151,6 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 				$message->userid = $USER->id;
 				$message->modifydate = date("Y-m-d H:i:s");
 				$message->languagecode = Language::getDefaultLanguageCode();
-				$message->deleted = 0;
 				
 				if ($message->id)
 					$message->update();

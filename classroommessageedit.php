@@ -187,7 +187,6 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 							$message->subtype = 'plain';
 							$message->data = '';
 							$message->modifydate = date("Y-m-d H:i:s", time());
-							$message->deleted = 1;
 							$message->autotranslate = 'none';
 							$message->languagecode = $code;
 							$message->create();

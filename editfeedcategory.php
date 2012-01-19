@@ -155,6 +155,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 				$category->description = $postdata['feedcategorydesc-'.$category->id];
 			}
 			$category->update();
+			// TODO: maybe only invalidate feed categories that changed?
 			$categoryids[] = $category->id;
 		}
 		

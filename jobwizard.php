@@ -303,7 +303,6 @@ class FinishJobWizard extends WizFinish {
 					$message->userid = $USER->id;
 					$message->modifydate = $messagegroup->modified;
 					$message->languagecode = $langcode;
-					$message->deleted = 0;
 					$message->stuffHeaders();
 					$message->create();
 					
@@ -327,7 +326,6 @@ class FinishJobWizard extends WizFinish {
 					$message->userid = $USER->id;
 					$message->modifydate = $messagegroup->modified;
 					$message->languagecode = "en";
-					$message->deleted = 0;
 					$message->stuffHeaders();
 					$message->create();
 					
@@ -454,7 +452,6 @@ class FinishJobWizard extends WizFinish {
 									$message->modifydate = $messagegroup->modified;
 								
 								$message->languagecode = $langcode;
-								$message->deleted = 0;
 								
 								if ($type == 'email') {
 									$message->subject = $data["subject"];
