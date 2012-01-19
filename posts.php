@@ -125,7 +125,10 @@ if($isajax === true) {
 			} else {
 				$categorynames = array();
 			}
-			$categories = implode(", ", $categorynames);
+			if (count($categorynames))
+				$categories = "Categories: ".implode(", ", $categorynames);
+			else
+				$categories = "";
 			
 			$defaultlink = "job.php?id=".$post["jobid"];
 			$content = '<a href="' . $defaultlink . '" >' . $time .  ($post["description"] != ""?" - " . escapehtml($post["description"]):"") . '</a>';
