@@ -69,7 +69,7 @@ if ($message) {
 }
 
 // if the user doesn't own the parent message group, unauthorized!
-if (!userOwns("messagegroup", $messagegroup->id))
+if (!userOwns("messagegroup", $messagegroup->id) || $messagegroup->deleted)
 	redirect('unauthorized.php');
 
 $text = "";
