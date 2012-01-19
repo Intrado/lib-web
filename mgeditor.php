@@ -100,7 +100,7 @@ if (isset($_GET['id'])) {
 }
 
 $messagegroup = new MessageGroup(getCurrentMessageGroup());
-if($messagegroup->type != 'notification') {
+if($messagegroup->type != 'notification' || $messagegroup->deleted) {
 	unset($_SESSION['messagegroupid']);
 	redirect('unauthorized.php');
 }
