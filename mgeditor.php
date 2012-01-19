@@ -36,6 +36,7 @@ $cansendemail = $USER->authorize('sendemail');
 $cansendsms = getSystemSetting('_hassms', false) && $USER->authorize('sendsms');
 
 // Only kick the user out if he does not have permission to create any message at all (neither phone, email, nor sms).
+// TODO: what about post only?
 if (!$cansendphone && !$cansendemail && !$cansendsms) {
 	redirect('unauthorized.php');
 } 
@@ -391,6 +392,10 @@ function makeMessageGrid($messagegroup) {
 		$columnlabels[] = 'Page Media <a href="editmessagepostvoice.php?new&mgid=' .$messagegroup->id . '"><img src="img/icons/add.png" alt="Add" title="Add New Page Media Message" /></a>';
 	}
 	
+	if (getSystemSetting('_hasfeed', false) && $USER->authorize('feedpost')) {
+		$columnlabels[] = 'Feed <a href="editmessagefeed.php?new&mgid=' .$messagegroup->id . '"><img src="img/icons/add.png" alt="Add" title="Add New Feed Message" /></a>';
+	}
+	
 	// set action usr link	
 	$links = array(); 
 	foreach ($customerlanguages as $languagecode => $languagename) {
@@ -542,6 +547,27 @@ function makeMessageGrid($messagegroup) {
 				
 			} else {
 				$linkrow[] = false;
+				$linkrow[] = false;
+			}
+		}
+		
+		// Feed actions
+		if (getSystemSetting('_hasfeed', false) && $USER->authorize('feedpost')) {
+			if ($languagecode == Language::getDefaultLanguageCode()) {
+				$actions = array();
+				$message = $messagegroup->getMessage('post', 'feed', $languagecode);
+				
+				if ($message) {
+					$icon = "accept";
+					$actions[] = action_link("Preview","rss",null,"showPreview(null,\'previewid=$message->id\');return false;");
+					$actions[] = action_link("Edit","pencil","editmessagefeed.php?id=$message->id");
+					$actions[] = action_link("Delete","cross","mgeditor.php?delete=$message->id","return confirmDelete();");
+				} else {
+					$icon = "diagona/16/160";
+					$actions[] = action_link("New","pencil_add","editmessagefeed.php?id=new&mgid=".$messagegroup->id);
+				}
+				$linkrow[] = array('icon' => $icon,'title' => _L("%s Feed Message",$languagename), 'actions' => $actions);
+			} else {
 				$linkrow[] = false;
 			}
 		}
