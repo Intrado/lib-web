@@ -182,7 +182,7 @@ $TITLE = "Posted Content";
 
 include_once("nav.inc.php");
 
-startWindow(_L('My Posts'), 'padding: 3px;', false, true);
+startWindow(_L('My Posts'));
 
 ?>
 <table width="100%" style="padding-top: 7px;">
@@ -205,15 +205,14 @@ startWindow(_L('My Posts'), 'padding: 3px;', false, true);
 	<td width="10px" style="border-left: 1px dotted gray;" >&nbsp;</td>
 	<td class="feed" valign="top" >
 		<div id="pagewrappertop"></div>
-
 		<table id="feeditems">
 			<tr>
 				<td valign='top' width='60px'><img src='img/ajax-loader.gif' /></td>
 				<td >
-						<div class='feedtitle'>
-							<a href=''>
-							<?= _L("Loading Posts") ?></a>
-						</div>
+					<div class='feedtitle'>
+						<a href=''>
+						<?= _L("Loading Posts") ?></a>
+					</div>
 				</td>
 			</tr>
 		</table>
