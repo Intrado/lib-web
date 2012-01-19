@@ -16,7 +16,7 @@ require_once("obj/MonitorFilter.obj.php");
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization
 ////////////////////////////////////////////////////////////////////////////////
-if (!$USER->authorize('viewsystemactive')) {
+if (!$USER->authorize('monitorevent')) {
 	redirect('unauthorized.php');
 }
 
@@ -119,28 +119,31 @@ $formdata["jobevent"] = array(
 		"helpstep" => $helpstepnum
 );
 
-// TODO add validators
 $jobtypes = QuickQueryList("select id,name from jobtype where deleted=0 and not issurvey order by name",true);
 $selectedjobtypes = $monitor->id?QuickQuery("select val from monitorfilter where type='jobtypeid' and monitorid=?",false,array($monitor->id)):'';
 $formdata["jobtypes"] = array(
 		"label" => _L('Job Types'),
 		"value" => $selectedjobtypes != ""?explode(",",$selectedjobtypes):array(),
-		"validators" => array(),
+		"validators" => array(
+			array("ValInArray", 'values'=>array_keys($jobtypes))
+		),
 		"control" => array("RestrictedValues", "values" => $jobtypes, "label" => _L("Limit to these job types:")),
 		"helpstep" => $helpstepnum
 );
 
-// TODO add validators
-$users = QuickQueryList("select id, concat(firstname,' ', lastname,' (',login,')') as name from user where enabled = 1 and login != 'schoolmessenger'",true);
-$selectedusers = $monitor->id?QuickQuery("select val from monitorfilter where type='userid' and monitorid=?",false,array($monitor->id)):'';
-$formdata["users"] = array(
-		"label" => _L('Users'),
-		"value" => $selectedusers != ""?explode(",",$selectedusers):array(),
-		"validators" => array(),
-		"control" => array("RestrictedValues", "values" => $users, "label" => _L("Limit to these users:")),
-		"helpstep" => $helpstepnum
-);
-
+if ($USER->authorize('monitorsystemwideevent')) {
+	$users = QuickQueryList("select id, concat(firstname,' ', lastname,' (',login,')') as name from user where enabled = 1 and login != 'schoolmessenger'",true);
+	$selectedusers = $monitor->id?QuickQuery("select val from monitorfilter where type='userid' and monitorid=?",false,array($monitor->id)):'';
+	$formdata["users"] = array(
+			"label" => _L('Users'),
+			"value" => $selectedusers != ""?explode(",",$selectedusers):array(),
+			"validators" => array(
+				array("ValInArray", 'values'=>array_keys($users))
+			),
+			"control" => array("RestrictedValues", "values" => $users, "label" => _L("Limit to these users:")),
+			"helpstep" => $helpstepnum
+	);
+}
 $buttons = array(submit_button(_L('Save'),"submit","tick"),
 				icon_button(_L('Cancel'),"cross",null,"monitors.php"));
 $form = new Form("monitor",$formdata,null,$buttons);
@@ -193,15 +196,25 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 			$jobtypefilter->update();
 		}
 		
-		if (count($postdata['users']) == 0 && $userfilter != false) {
-			QuickUpdate("delete from monitorfilter where type='userid' and monitorid=?",false,array($monitor->id));
-		} else if (count($postdata['users'])){
+		if ($USER->authorize('monitorsystemwideevent')) {
+			if (count($postdata['users']) == 0 && $userfilter != false) {
+				QuickUpdate("delete from monitorfilter where type='userid' and monitorid=?",false,array($monitor->id));
+			} else if (count($postdata['users'])){
+				if (!$userfilter) {
+					$userfilter = new MonitorFilter();
+					$userfilter->type = 'userid';
+					$userfilter->monitorid = $monitor->id;
+				}
+				$userfilter->val = implode(',',$postdata['users']);
+				$userfilter->update();
+			}
+		} else {
 			if (!$userfilter) {
 				$userfilter = new MonitorFilter();
 				$userfilter->type = 'userid';
 				$userfilter->monitorid = $monitor->id;
 			}
-			$userfilter->val = implode(',',$postdata['users']);
+			$userfilter->val = $USER->id;
 			$userfilter->update();
 		}
 		
@@ -222,7 +235,11 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 // Display
 ////////////////////////////////////////////////////////////////////////////////
 $PAGE = "system:monitors";
-$TITLE = _L('Edit Monitor');
+
+if ($monitor->id)
+	$TITLE = _L('Edit Monitor');
+else 
+	$TITLE = _L('Add Monitor');
 
 include_once("nav.inc.php");
 startWindow(_L('Job Monitor Settings'));

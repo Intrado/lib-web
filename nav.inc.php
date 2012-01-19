@@ -79,13 +79,13 @@ $NAVTREE = array (
 		array("Call Distribution","reportsystemdistribution.php","viewcalldistribution",$SUBTAB=="distribution")
 		)),
 	array("System",NULL,array('viewsystemactive', 'viewsystemcompleted',
-						'viewsystemrepeating','viewcontacts','blocknumbers'),$MAINTAB=="system",array(
+						'viewsystemrepeating','viewcontacts','blocknumbers','monitorevent'),$MAINTAB=="system",array(
 		array("Active Jobs","activejobs.php","viewsystemactive",$SUBTAB=="activejobs"),
 		array("Completed Jobs","completedjobs.php","viewsystemcompleted",$SUBTAB=="completedjobs"),
 		array("Repeating Jobs","repeatingjobs.php","viewsystemrepeating",$SUBTAB=="repeatingjobs"),
 		array("Contacts","contacts.php","viewcontacts",$SUBTAB=="contacts"),
 		array("Blocked Lists","blocked.php","blocknumbers",$SUBTAB=="blockednumbers"),
-		array("Monitors","monitors.php","viewsystemactive",$SUBTAB=="monitors")
+		array("Monitors","monitors.php","monitorevent",$SUBTAB=="monitors")
 		)),
 	array("Admin",NULL,array('manageaccount', 'manageprofile', 'managesystem',
 							'metadata', 'managetasks', 'manageclassroommessaging'),$MAINTAB=="admin",array(

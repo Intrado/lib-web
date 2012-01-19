@@ -450,7 +450,24 @@ _L('Report Options'),
 		"control" => array("CheckBox"),
 		"helpstep" => 9
 	),
-
+	
+_L('Monitoring'),
+	"monitorevent" => array(
+		"label" => _L('Event Monitoring'),
+		"fieldhelp" => _L('Allows users to monitor activity'),
+		"value" => $obj->getValue("monitorevent"),
+		"validators" => array(),
+		"control" => array("CheckBox"),
+		"helpstep" => 10
+	),
+	"monitorsystemwideevent" => array(
+		"label" => _L('Systemwide Event Monitoring'),
+		"fieldhelp" => _L('Allows users to monitor activity by other users in the system'),
+		"value" => $obj->getValue("monitorsystemwideevent"),
+		"validators" => array(),
+		"control" => array("CheckBox"),
+		"helpstep" => 10
+	),
 _L('Systemwide View Options'),
 	"viewsystemreports" => array(
 		"label" => _L('Systemwide Reports'),
@@ -458,7 +475,7 @@ _L('Systemwide View Options'),
 		"value" => $obj->getValue("viewsystemreports"),
 		"validators" => array(),
 		"control" => array("CheckBox"),
-		"helpstep" => 10
+		"helpstep" => 11
 	),
 	"viewusagestats" => array(
 		"label" => _L('Usage Stats'),
@@ -466,7 +483,7 @@ _L('Systemwide View Options'),
 		"value" => $obj->getValue("viewusagestats"),
 		"validators" => array(),
 		"control" => array("CheckBox"),
-		"helpstep" => 10
+		"helpstep" => 11
 	),
 	"viewcalldistribution" => array(
 		"label" => _L('Call Distribution'),
@@ -474,7 +491,7 @@ _L('Systemwide View Options'),
 		"value" => $obj->getValue("viewcalldistribution"),
 		"validators" => array(),
 		"control" => array("CheckBox"),
-		"helpstep" => 10
+		"helpstep" => 11
 	),
 	"viewsystemactive" => array(
 		"label" => _L('Active Jobs'),
@@ -482,7 +499,7 @@ _L('Systemwide View Options'),
 		"value" => $obj->getValue("viewsystemactive"),
 		"validators" => array(),
 		"control" => array("CheckBox"),
-		"helpstep" => 10
+		"helpstep" => 11
 	),
 	"viewsystemcompleted" => array(
 		"label" => _L('Completed Jobs'),
@@ -490,7 +507,7 @@ _L('Systemwide View Options'),
 		"value" => $obj->getValue("viewsystemcompleted"),
 		"validators" => array(),
 		"control" => array("CheckBox"),
-		"helpstep" => 10
+		"helpstep" => 11
 	),
 	"viewsystemrepeating" => array(
 		"label" => _L('Repeating Jobs'),
@@ -498,7 +515,7 @@ _L('Systemwide View Options'),
 		"value" => $obj->getValue("viewsystemrepeating"),
 		"validators" => array(),
 		"control" => array("CheckBox"),
-		"helpstep" => 10
+		"helpstep" => 11
 	),
 	"callblockingperms" => array(
 		"label" => _L('Blocked Destination Access'),
@@ -508,18 +525,18 @@ _L('Systemwide View Options'),
 			array("ValInArray","values" => array_keys($blockednumberoptions))
 		),
 		"control" => array("RadioButton", "values" => $blockednumberoptions),
-		"helpstep" => 10
+		"helpstep" => 11
 	),
 _L('Security & Administrator Controls'),
 	"securitywarning" => array (
 		"label" => _L('Security Notice'),
 		"control" => array("FormHtml", "html" => '<p style="border: 3px double red; font-weight: bold; width: 50%; padding: 5px;"><img src="img/icons/error.gif" alt="" style="vertical-align: top;">'._L('The following settings control top-level administration functions. Only top-level administrators should have these enabled.').'</p>'),
-		"helpstep" => 11
+		"helpstep" => 12
 	),
 	"enableadminoptions" => array (
 		"label" => _L('Enable All'),
 		"control" => array("FormHtml", "html" => icon_button(_L('Enable Administrator Options'),"key",'checkAllCheckboxes(true);')),
-		"helpstep" => 11
+		"helpstep" => 12
 	),
 	"manageaccount" => array(
 		"label" => _L('Manage Users'),
@@ -527,7 +544,7 @@ _L('Security & Administrator Controls'),
 		"value" => $obj->getValue("manageaccount"),
 		"validators" => array(),
 		"control" => array("CheckBox"),
-		"helpstep" => 11
+		"helpstep" => 12
 	),
 	"manageprofile" => array(
 		"label" => _L('Manage Profiles'),
@@ -535,7 +552,7 @@ _L('Security & Administrator Controls'),
 		"value" => $obj->getValue("manageprofile"),
 		"validators" => array(),
 		"control" => array("CheckBox"),
-		"helpstep" => 11
+		"helpstep" => 12
 	),
 	"managesystem" => array(
 		"label" => _L('Manage System Settings'),
@@ -543,7 +560,7 @@ _L('Security & Administrator Controls'),
 		"value" => $obj->getValue("managesystem"),
 		"validators" => array(),
 		"control" => array("CheckBox"),
-		"helpstep" => 11
+		"helpstep" => 12
 	),
 	"managesystemjobs" => array(
 		"label" => _L('Manage All Jobs'),
@@ -551,7 +568,7 @@ _L('Security & Administrator Controls'),
 		"value" => $obj->getValue("managesystemjobs"),
 		"validators" => array(),
 		"control" => array("CheckBox"),
-		"helpstep" => 11
+		"helpstep" => 12
 	),
 	"managetasks" => array(
 		"label" => _L('Manage Data Imports'),
@@ -559,7 +576,7 @@ _L('Security & Administrator Controls'),
 		"value" => $obj->getValue("managetasks"),
 		"validators" => array(),
 		"control" => array("CheckBox"),
-		"helpstep" => 11
+		"helpstep" => 12
 	),
 	"metadata" => array(
 		"label" => _L('Manage Field Definitions'),
@@ -567,7 +584,7 @@ _L('Security & Administrator Controls'),
 		"value" => $obj->getValue("metadata"),
 		"validators" => array(),
 		"control" => array("CheckBox"),
-		"helpstep" => 11
+		"helpstep" => 12
 	),
 	"manageclassroommessaging" => array(
 		"label" => _L('Manage Classroom Data'),
@@ -575,7 +592,7 @@ _L('Security & Administrator Controls'),
 		"value" => $obj->getValue("manageclassroommessaging"),
 		"validators" => array(),
 		"control" => array("CheckBox"),
-		"helpstep" => 11
+		"helpstep" => 12
 	)
 );
 
@@ -623,6 +640,7 @@ $helpsteps = array (
 	_L('Select the object types the user can subscribe to or publish.'),
 	_L('Select the fields users should be able to see. They can use these fields for lists, messages, and reports. Leave everything blank to allow unlimited access.').'<br><br>'._L('You may also use this section to allow access to the Contacts Tab and allow users to edit contact details.'),
 	_L('Choose whether the user can create reports or not.'),
+	_L('Choose whether the user can monitor events like job sent and/or completed'),
 	_L('The options in this section control views of all of the activity in the system.'),
 	_L('This section contains options for top-level administrative functions such as creating users and managing system settings. You should only enable these features for top-level administrators.')
 );
@@ -693,6 +711,8 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 			$obj->setPermission("blocknumbers", $postdata['callblockingperms'] != "none");
 			$obj->setPermission("callblockingperms", $postdata['callblockingperms']);
 			$obj->setPermission("createreport", (bool)$postdata['createreport']);
+			$obj->setPermission("monitorevent", (bool)$postdata['monitorevent']);
+			$obj->setPermission("monitorsystemwideevent", (bool)$postdata['monitorsystemwideevent']);
 			$obj->setPermission("viewsystemreports", (bool)$postdata['viewsystemreports']);
 			$obj->setPermission("viewusagestats", (bool)$postdata['viewusagestats']);
 			$obj->setPermission("viewcalldistribution", (bool)$postdata['viewcalldistribution']);
