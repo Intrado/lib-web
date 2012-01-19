@@ -31,16 +31,18 @@ if (!isset($_SESSION['editjobfeedcategoryjobid']))
 	redirect('unauthorized.php');
 
 $jobid = $_SESSION['editjobfeedcategoryjobid'];
-// get the job name, it's really just used in the display below
-$jobname = QuickQuery("select name from job where id = ?", false, array($jobid));
+// get the job name and userid
+$jobdetails = QuickQueryRow("select name, userid from job where id = ?", true, false, array($jobid));
+if (!count($jobdetails) || $jobdetails['userid'] != $USER->id)
+	redirect('unauthorized.php');
 
 $jobpostdestination = QuickQuery("select destination from jobpost where type = 'feed' and jobid = ?", false, array($jobid));
 
-if (!$jobpostdestination)
-	redirect('unauthorized.php');
-
 // get the current feed categories for the job
-$currentcategories = explode(",",$jobpostdestination);
+if ($jobpostdestination)
+	$currentcategories = explode(",",$jobpostdestination);
+else
+	$currentcategories = array();
 
 // get all the feed categories for the current user and those already associated with the job
 $args = array();
@@ -83,13 +85,12 @@ foreach ($possiblefeedcategories as $category) {
 	$feeddescriptions[$category['id']] = $category['description'];
 }
 $formdata = array(
-	$jobname,
+	$jobdetails["name"],
 	"feedcategories" => array(
 		"label" => _L("Feed categories"),
 		"fieldhelp" => _L('Select which categories you wish to include in this feed.'),
-		"value" => $currentcategories,
+		"value" => (count($currentcategories)?$currentcategories:""),
 		"validators" => array(
-			array("ValRequired"),
 			array("ValInArray", "values" => array_keys($feedcategories))),
 		"control" => array("MultiCheckBox", "values"=>$feedcategories, "hover" => $feeddescriptions),
 		"helpstep" => 1
@@ -124,13 +125,17 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		$postdata = $form->getData(); //gets assoc array of all values {name:value,...}
 		
 		// new job post feed category destinations
-		$newjobpostcategories = implode(",", $postdata['feedcategories']);
-		if ($newjobpostcategories) {
+		$newjobpostdestination = implode(",", $postdata['feedcategories']);
+		if ($jobpostdestination != $newjobpostdestination) {
 			Query("BEGIN");
+			
 			// delete existing
 			QuickUpdate("delete from jobpost where jobid = ? and type = 'feed'", false, array($jobid));
+			
 			// create new one
-			QuickUpdate("insert into jobpost values (?,'feed',?,1)", false, array($jobid, $newjobpostcategories));
+			if ($newjobpostdestination)
+				QuickUpdate("insert into jobpost values (?,'feed',?,1)", false, array($jobid, $newjobpostdestination));
+			
 			Query("COMMIT");
 			
 			// TODO: call update category API?
