@@ -65,15 +65,18 @@ if($isajax === true) {
 	
 	// get all the job data
 	if ($total) {
+		// jobpost page destination will be an empty string, but it atleast tells us we do have a page post
 		$postdata = QuickQueryMultiRow(
-			"select j.id as jobid, j.messagegroupid as messagegroupid, jpf.destination as feeddestination,
-				jpp.destination as pagedestination, j.activedate as date, j.name as name, j.description as description,
+			"select j.id as jobid, j.messagegroupid as messagegroupid, group_concat(jpf.destination SEPARATOR ',') as feeddestination,
+				jpp.posted as pageposted, j.activedate as date, j.name as name, j.description as description,
 				(j.name +0) as digitsfirst
 			from job j
-			left join jobpost jpf on (jpf.jobid = j.id and jpf.type = 'feed')
-			left join jobpost jpp on (jpp.jobid = j.id and jpp.type = 'page')
+			left join jobpost jpf on (jpf.jobid = j.id and jpf.type = 'feed' and jpf.posted)
+			left join jobpost jpp on (jpp.jobid = j.id and jpp.type = 'page' and jpp.posted)
 			where j.id in (".implode(",", $jobids).")
-			order by $orderby, j.id",
+			group by j.id
+			order by $orderby, j.id
+			limit $start, $limit",
 			true, false, array($USER->id));
 	} else {
 		$postdata = array();
@@ -95,6 +98,8 @@ if($isajax === true) {
 	} else {
 		foreach ($postdata as $post) {
 			$mgid = $post["messagegroupid"];
+			$jobid = $post['jobid'];
+			$pageposted = $post['pageposted'];
 			$time = date("M j, Y g:i a",strtotime($post["date"]));
 			$title = escapehtml($post["name"]);
 			
@@ -102,11 +107,11 @@ if($isajax === true) {
 			
 			// if the user owns this message group, they can edit, delete
 			$actions = array();
-			$messagegroup = new MessageGroup($post['messagegroupid']);
+			$messagegroup = new MessageGroup($mgid);
 			if (userOwns("messagegroup", $messagegroup->id)) {
-				if ($messagegroup->hasMessage("post","page"))
+				if ($messagegroup->hasMessage("post","page") && $pageposted)
 					$actions[] = action_link("Page", "layout_sidebar", 'editmessagepage.php?postedit&id=' . $messagegroup->getMessage("post", "page", "en")->id);
-				if ($messagegroup->hasMessage("post","voice"))
+				if ($messagegroup->hasMessage("post","voice") && $pageposted)
 					$actions[] = action_link("Media", "../nifty_play", 'editmessagepostvoice.php?postedit&id=' . $messagegroup->getMessage("post", "voice", "en")->id);
 				if ($messagegroup->hasMessage("post","feed"))
 					$actions[] = action_link("Feed", "rss", 'editmessagefeed.php?postedit&id=' . $messagegroup->getMessage("post", "feed", "en")->id);
@@ -114,7 +119,7 @@ if($isajax === true) {
 				$actions[] = action_link("View", "fugue/magnifier", 'messagegroupview.php?id=' . $mgid);
 			}
 			if ($messagegroup->hasMessage("post","feed")) {
-				$actions[] = action_link("Post Categories", "pencil", 'editjobfeedcategory.php?postedit&id=' . $post['jobid']);
+				$actions[] = action_link("Post Categories", "pencil", 'editjobfeedcategory.php?postedit&id=' . $jobid);
 			}
 			$tools = action_links ($actions);
 			
@@ -151,29 +156,6 @@ if($isajax === true) {
 	echo json_encode(!empty($data) ? $data : false);
 	exit();
 }
-
-
-////////////////////////////////////////////////////////////////////////////////
-// Display Functions
-////////////////////////////////////////////////////////////////////////////////
-
-function typestring($str) {
-		$jobtypes = explode(",",$str);
-		$typesstr = "";
-		foreach($jobtypes as $jobtype) {
-			if($jobtype == "sms")
-				$alt = strtoupper($jobtype);
-			else
-				$alt = escapehtml(ucfirst($jobtype));
-			$typesstr .= $alt . ", ";
-		}
-		$typesstr = trim($typesstr,', ');
-		$andpos = strrpos($typesstr,',');
-		if($andpos !== false)
-			return substr_replace($typesstr," and ",$andpos,1);
-		return $typesstr;
-}
-
 
 ////////////////////////////////////////////////////////////////////////////////
 // Display
