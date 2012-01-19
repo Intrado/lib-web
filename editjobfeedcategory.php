@@ -44,13 +44,7 @@ $jobdetails = QuickQueryRow("select name, userid from job where id = ?", true, f
 if (!count($jobdetails) || $jobdetails['userid'] != $USER->id)
 	redirect('unauthorized.php');
 
-$jobpostdestination = QuickQuery("select destination from jobpost where type = 'feed' and jobid = ?", false, array($jobid));
-
-// get the current feed categories for the job
-if ($jobpostdestination)
-	$currentcategories = explode(",",$jobpostdestination);
-else
-	$currentcategories = array();
+$currentcategories = QuickQueryList("select destination from jobpost where type = 'feed' and jobid = ? and posted", false, false, array($jobid));
 
 // get all the feed categories for the current user and those already associated with the job
 $args = array();
@@ -63,7 +57,7 @@ if (QuickQuery("select 1 from userfeedcategory where userid = ? limit 1", false,
 	$jobcategorywhere = "";
 	if (count($currentcategories)) {
 		foreach ($currentcategories as $id)
-		$args[] = $id;
+			$args[] = $id;
 		$jobcategorywhere = " id in (".repeatWithSeparator("?",",",count($currentcategories)).") ";
 	}
 	
@@ -134,24 +128,36 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		$postdata = $form->getData(); //gets assoc array of all values {name:value,...}
 		
 		// new job post feed category destinations
-		$newjobpostdestination = implode(",", $postdata['feedcategories']);
-		if ($jobpostdestination != $newjobpostdestination) {
+		$newcategories = $postdata['feedcategories'];
+		$diffcategoryids = array_diff(array_merge($currentcategories, $newcategories), array_intersect($currentcategories, $newcategories));
+		
+		if (count($diffcategoryids)) {
 			Query("BEGIN");
 			
 			// delete existing
 			QuickUpdate("delete from jobpost where jobid = ? and type = 'feed'", false, array($jobid));
 			
-			// create new one
-			if ($newjobpostdestination)
-				QuickUpdate("insert into jobpost values (?,'feed',?,1)", false, array($jobid, $newjobpostdestination));
+			// create new ones
+			if (count($newcategories)) {
+				$args = array();
+				$insertquery = "insert into jobpost values ";
+				$count = 0;
+				foreach ($newcategories as $id) {
+					if ($count++ != 0)
+						$insertquery .= ", ";
+					$insertquery .= "(?,'feed',?,1)";
+					$args[] = $jobid;
+					$args[] = $id;
+				}
+				QuickUpdate($insertquery, false, $args);
+			}
 			
 			Query("COMMIT");
 			
 			
 			// expire feed categories that changed
-			$categoryids = array_diff(array_merge($currentcategories,$postdata['feedcategories']), array_intersect($currentcategories, $postdata['feedcategories']));
-			if (count($categoryids))
-				expireFeedCategories($CUSTOMERURL, $categoryids);
+			if (count($diffcategoryids))
+				expireFeedCategories($CUSTOMERURL, $diffcategoryids);
 		}
 		if ($ajax)
 			$form->sendTo("posts.php");
