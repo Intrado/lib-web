@@ -67,31 +67,6 @@ $helpsteps = array(_L('Multiple numbers can be added when seperated by comma'));
 
 $numbers = QuickQueryList("select callerid,callerid from authorizedcallerid",true);
 
-$formdata[] = "Caller ID Settings";
-$helpsteps[$helpstepnum++] = _L("This specifies the default Caller ID to use for new Jobs. If a user has access rights, they may override this with a new setting.");
-
-$formdata["defaultcallerid"] = array(
-	"label" => _L("Default Caller ID Number"),
-	"fieldhelp" => _L("This is the default Caller ID for all jobs."),
-	"value" => Phone::format(getSystemSetting('callerid')),
-	"validators" => array(
-		array("ValRequired"),
-		array("ValLength","min" => 2,"max" => 20),
-		array("ValPhone")),
-	"control" => array("TextField","maxlength" => 20),
-	"helpstep" => $helpstepnum
-);
-
-$formdata["requireapprovedcallerid"] = array(
-	"label" => _L('Only Allow Approved Caller ID'),
-	"fieldhelp" => _L('Allows users to select Caller ID from a list of approved numbers'),
-	"value" => getSystemSetting("requireapprovedcallerid",false),
-	"validators" => array(),
-	"control" => array("CheckBox"),
-	"helpstep" => $helpstepnum
-);
-
-$formdata[] = "Caller ID Tools";
 $formdata["addnumbers"] = array(
 	"label" => _L('Manual Add'),
 	"value" => '',
@@ -131,20 +106,19 @@ if (count($importnumberdata) > 0) {
 		"validators" => array(
 			array("ValInArray", 'values' => array_keys($importnumberdata))
 		),
-		"control" => array("MultiCheckBox", "height" => "50px", "values" => $importnumberdata),
+		"control" => array("MultiCheckBox", "height" => "125px", "values" => $importnumberdata),
 		"helpstep" => $helpstepnum
 	);
 } else {
 	$formdata["importinfo"] = array(
 			"label" => _L('Import'),
 			"value" => '',
-			"control" => array("FormHtml", "html" => '<img src="img/icons/information.png" alt="Information" style="vertical-align:middle"/><span style="line-height:30px;"> ' . _L("No Caller IDs to import") . "</span>"),
+			"control" => array("FormHtml", "html" => '<div style="border:1px dotted gray;height:125px;"><img src="img/icons/information.png" alt="Information" style="vertical-align:middle"/><span style="line-height:30px;"> ' . _L("No Caller IDs to import") . "</span></div>"),
 			"helpstep" => $helpstepnum
 	);
-	
 }
 
-$buttons = array(submit_button(_L('Save'),"submit","tick"));
+$buttons = array(submit_button(_L('Add'),"submit","add"));
 $form = new Form("calleridmanagement",$formdata,$helpsteps,$buttons);
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -190,15 +164,6 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 			QuickUpdate($query,false,$parsednumbers);
 		}
 		
-		setSystemSetting('callerid', Phone::parse($postdata['defaultcallerid']));
-		
-		setSystemSetting('requireapprovedcallerid', $postdata['requireapprovedcallerid']==="true"?1:0);
-		
-		
-		if ($postdata['requireapprovedcallerid']==="true") {
-			QuickUpdate("insert ignore into authorizedusercallerid (userid,callerid) (select userid,value from usersetting where name='callerid')");
-		}
-		
 		Query("COMMIT");
 		if ($ajax)
 			$form->sendTo("callerid.php");
@@ -232,12 +197,13 @@ include_once("nav.inc.php");
 <? Validator::load_validators(array("ValMultiplePhones")); ?>
 </script>
 <?
-//buttons(icon_button("Done", "tick",false,"settings.php","style='margin-bottom:6px'"));
+buttons(icon_button("Done", "tick",false,"jobsettings.php","style='margin-bottom:6px'"));
+echo '<div style="width:65%;float:left;">';
 startWindow(_L('Caller ID Management'));
 echo $form->render();
 endWindow();
 
-
+echo '</div><div style="width:300px;float:left;">';
 $numbervalues = array();
 foreach ($numbers as $number => $value) {
 	$numbervalues[] = array($number);
@@ -245,15 +211,17 @@ foreach ($numbers as $number => $value) {
 
 startWindow(_L('Approved Caller IDs'));
 ?>
-<table class="list sortable" id="callerids">
+<div class="scrollTableContainer"><table class="list sortable" id="callerids" style="width:100%">
 <?
 	if (count($numbervalues))
 		showTable($numbervalues, array(0=>"Phone Numbers","actions" => "Actions"),array(0=>"fmt_phone","actions"=>"fmt_actions"));
 	else
 		echo "<div class='destlabel'><img src='img/largeicons/information.jpg' align='middle'> " . _L("No authorized caller ids.") . "<div>";
 ?>
-</table>
+</table></div>
 <?
 endWindow();
-//buttons();
+echo '</div>';
+
+buttons();
 include_once("navbottom.inc.php");

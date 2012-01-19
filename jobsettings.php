@@ -18,6 +18,20 @@ if (!$USER->authorize('managesystem')) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+// Form Items And Validators
+////////////////////////////////////////////////////////////////////////////////
+
+class ValRequireApprovedCallerID extends Validator {
+	var $onlyserverside = true;
+	function validate ($value, $args) {
+		if(QuickQuery("select count(callerid) from authorizedcallerid")+0 == 0)
+			return "List of Approved CallerIDs must contain at least one number";
+		return true;
+	}
+}
+
+
+////////////////////////////////////////////////////////////////////////////////
 // Data Handling
 ////////////////////////////////////////////////////////////////////////////////
 $formdata = array();
@@ -43,6 +57,29 @@ if (getSystemSetting('_hascallback', false)) {
 		"control" => array("TextField","maxlength" => 20),
 		"helpstep" => $helpstepnum
 	);
+	$formdata["requireapprovedcallerid"] = array(
+		"label" => _L('Only Allow Approved Caller&nbsp;ID'),
+		"fieldhelp" => _L('Allows users to select Caller ID from a list of approved numbers'),
+		"value" => getSystemSetting("requireapprovedcallerid",false),
+		"validators" => array(
+			array("ValRequireApprovedCallerID")
+		),
+		"control" => array("CheckBox"),
+		"helpstep" => $helpstepnum
+	);
+	
+	$approvedcallerids = QuickQueryList("select callerid from authorizedcallerid");
+	$formattedcallerids = array();
+	foreach($approvedcallerids as $callerid) {
+		$formattedcallerids[] = escapehtml(Phone::format($callerid));
+	}
+	
+	$formdata["approvedcallerids"] = array(
+		"label" => _L('Approved Caller&nbsp;IDs'),
+		"control" => array("FormHtml","html"=>'<div style="border:1px solid #CCCCCC;width:140px;height:150px;overflow:auto;float:left;">' . implode("<br />", $formattedcallerids) . '</div>' . icon_button("Edit Approved Caller IDs", "pencil",false,"callerid.php")),
+		"helpstep" => $helpstepnum
+	);
+	
 }
 
 if(getSystemSetting('_dmmethod', 'asp') != 'asp'){
@@ -93,9 +130,14 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 	} else if (($errors = $form->validate()) === false) { //checks all of the items in this form
 		$postdata = $form->getData(); //gets assoc array of all values {name:value,...}
 
-		if (isset($postdata['callerid']))
+		if (!getSystemSetting('_hascallback', false)) {
 			setSystemSetting('callerid', Phone::parse($postdata['callerid']));
-
+			
+			setSystemSetting('requireapprovedcallerid', $postdata['requireapprovedcallerid']==="true"?1:0);
+			if ($postdata['requireapprovedcallerid']==="true") {
+				QuickUpdate("insert ignore into authorizedusercallerid (userid,callerid) (select userid,value from usersetting where name='callerid')");
+			}
+		}
 		if(getSystemSetting('_dmmethod', 'asp') != 'asp'){
 			setSystemSetting('easycallmin', $postdata['easycallmin']);
 			setSystemSetting('easycallmax', $postdata['easycallmax']);
@@ -119,7 +161,8 @@ $TITLE = _L('Systemwide Job Settings');
 require_once("nav.inc.php");
 
 ?>
-<script>
+<script type="text/javascript">
+<? Validator::load_validators(array("ValRequireApprovedCallerID")); ?>
 <? if ($datachange) { ?>
 	alert("<?=_L("The data on this form has changed. You're changes cannot be saved.")?>")";
 	window.location = '<?= addcslashes($_SERVER['REQUEST_URI']) ?>';
