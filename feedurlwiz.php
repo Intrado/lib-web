@@ -18,7 +18,7 @@ require_once("obj/InpageSubmitButton.fi.php");
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization
 ////////////////////////////////////////////////////////////////////////////////
-if (!getSystemSetting("_hasfeed", false)) {
+if (!getSystemSetting("_hasfeed", false) && $USER->authorize("feedpost")) {
 	redirect('unauthorized.php');
 }
 
@@ -434,7 +434,7 @@ $wizdata = array(
 );
 
 $wizard = new Wizard("wizard_feedurl", $wizdata, new FinishFeedUrlWiz(_L("Finish")));
-$wizard->doneurl = "start.php";
+$wizard->doneurl = "posts.php";
 $wizard->handleRequest();
 
 // if we are working with the widget style form, do some work to get the form data and return it to the browser for previewing
