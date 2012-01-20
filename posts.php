@@ -68,7 +68,7 @@ if($isajax === true) {
 		// jobpost page destination will be an empty string, but it atleast tells us we do have a page post
 		$postdata = QuickQueryMultiRow(
 			"select j.id as jobid, j.messagegroupid as messagegroupid, group_concat(jpf.destination SEPARATOR ',') as feeddestination,
-				jpp.posted as pageposted, j.activedate as date, j.name as name, j.description as description,
+				jpp.posted as pageposted, j.modifydate as date, j.name as name, j.description as description,
 				(j.name +0) as digitsfirst
 			from job j
 			left join jobpost jpf on (jpf.jobid = j.id and jpf.type = 'feed' and jpf.posted)
