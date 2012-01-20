@@ -28,10 +28,12 @@ if (!getSystemSetting('_hasfeed', false) || !$USER->authorize('feedpost'))
 // Action/Request Processing
 ////////////////////////////////////////////////////////////////////////////////
 if (isset($_GET['id']) && $_GET['id'] != "new") {
+	$_SESSION['editmessagereferer'] = (isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : NULL);
 	// this is an edit for an existing message
 	$_SESSION['editmessage'] = array("messageid" => $_GET['id']);
 	redirect("editmessagefeed.php");
 } else if (isset($_GET['mgid'])) {
+	$_SESSION['editmessagereferer'] = (isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : NULL);
 	$_SESSION['editmessage'] = array("messagegroupid" => $_GET['mgid']);
 	redirect("editmessagefeed.php");
 }
@@ -112,8 +114,7 @@ $helpsteps = array (
 	_L('TODO: help me! 2')
 );
 
-$buttons = array(submit_button(_L('Save'),"submit","tick"),
-				icon_button(_L('Cancel'),"cross",null,"posts.php"));
+$buttons = array(submit_button(_L('Done'),"submit","tick"));
 $form = new Form("templateform",$formdata,$helpsteps,$buttons);
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -175,10 +176,24 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		
 		// TODO: expire feeds categories pointing at this message group.
 		
+		// where to send back to
+		if ($_SESSION['editmessagereferer']) {
+			$endscript = strpos($_SESSION['editmessagereferer'], "?");
+			if ($endscript > 0)
+				$sendto = substr($_SESSION['editmessagereferer'], 0, $endscript);
+			else
+				$sendto = $_SESSION['editmessagereferer'];
+		} else {
+			$sendto = "mgeditor.php";
+		}
+		// if we came from the message group editor (default) add the id into the url
+		if (strpos($sendto, "mgeditor.php") !== false)
+			$sendto .= "?id=".$messagegroup->id;
+		
 		if ($ajax)
-			$form->sendTo("start.php");
+			$form->sendTo($sendto);
 		else
-			redirect("start.php");
+			redirect($sendto);
 	}
 }
 
