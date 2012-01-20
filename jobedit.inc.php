@@ -42,6 +42,7 @@ require_once("inc/twitteroauth/OAuth.php");
 require_once("inc/twitteroauth/twitteroauth.php");
 require_once("obj/Twitter.obj.php");
 require_once("obj/CallerID.fi.php");
+require_once("obj/FeedCategory.obj.php");
 
 // Includes that are required for preview to work
 require_once("obj/Language.obj.php");
@@ -621,18 +622,42 @@ if ($submittedmode || $completedmode) {
 		"helpstep" => ++$helpstepnum
 	);
 
-	// readonly facebook page list
-	if ($fbpages) {
+	// post entries
+	if (count($job->getAllJobPosts())) {
 		$formdata[] = _L('Social Media Options');
-		$helpsteps[] = _L("This section contains a list of the Facebook Pages which are associated with this job.");
-		$formdata["fbpages"] = array(
-			"label" => _L('Facebook Page(s)'),
-			"fieldhelp" => _L('This is a list of the Facebook Pages associated with this job.'),
-			"value" => json_encode($fbpages),
-			"validators" => array(),
-			"control" => array("ReadOnlyFacebookPage"),
-			"helpstep" => ++$helpstepnum
-		);
+		// facebook (readonly)
+		if (count($job->getJobPosts("facebook"))) {
+			$helpsteps[] = _L("This section contains a list of the Facebook Pages which are associated with this job.");
+			$formdata["fbpages"] = array(
+				"label" => _L('Facebook Page(s)'),
+				"fieldhelp" => _L('This is a list of the Facebook Pages associated with this job.'),
+				"value" => json_encode(array_keys($job->getJobPosts("facebook"))),
+				"validators" => array(),
+				"control" => array("ReadOnlyFacebookPage"),
+				"helpstep" => ++$helpstepnum
+			);
+		}
+		
+		// twitter (readonly)
+		// TODO: show readonly twitter (probably just a disabled checkbox?
+		
+		// feed
+		// if the user can post to feeds, allow them to choose feed categories
+		if (getSystemSetting("_hasfeed") && $USER->authorize("feedpost")) {
+			$feedcategories = FeedCategory::getAllowedFeedCategories($jobid);
+			
+			$helpsteps[] = _L("If your message group contains a Feed post, this will allow you to select the categories the message will appear in.");
+					
+			$formdata["feedcategories"] = array(
+				"label" => _L("Feed categories"),
+				"fieldhelp" => _L('Select which categories you wish to include in this feed.'),
+				"value" => (count($job->getJobPosts("feed"))?array_keys($job->getJobPosts("feed")):""),
+				"validators" => array(
+					array("ValInArray", "values" => array_keys($feedcategories))),
+				"control" => array("MultiCheckBox", "values"=>$feedcategories, "hover" => FeedCategory::getFeedDescriptions()),
+				"helpstep" => ++$helpstepnum
+			);
+		}
 	}
 	$helpsteps[] = _L("<ul><li>Auto Report - Selecting this option causes the system to email ".
 					"a report to the email address associated with your account when the job ".
@@ -739,7 +764,8 @@ if ($submittedmode || $completedmode) {
 
 	// Social Media options
 	if ((getSystemSetting('_hastwitter', false) && $USER->authorize('twitterpost')) || 
-			(getSystemSetting('_hasfacebook', false) && $USER->authorize('facebookpost'))) {
+			(getSystemSetting('_hasfacebook', false) && $USER->authorize('facebookpost')) || 
+			(getSystemSetting("_hasfeed") && $USER->authorize("feedpost"))) {
 		$formdata[] = _L('Social Media Options');
 	}
 	
@@ -783,6 +809,25 @@ if ($submittedmode || $completedmode) {
 			"helpstep" => ++$helpstepnum);
 		if (!$tw->hasValidAccessToken() && !$job->messagegroupid)
 			$formdata["twitter"]['validators'][] = array("ValRequired");
+	}
+	
+	// if the user can post to feeds, allow them to choose feed categories
+	if (getSystemSetting("_hasfeed") && $USER->authorize("feedpost")) {
+		
+		$currentfeedcategories = QuickQueryList("select destination from jobpost where type = 'feed' and jobid = ?", false, false, array($jobid));
+		$feedcategories = FeedCategory::getAllowedFeedCategories($jobid);
+		
+		$helpsteps[] = _L("If your message group contains a Feed post, this will allow you to select the categories the message will appear in.");
+		
+		$formdata["feedcategories"] = array(
+			"label" => _L("Feed categories"),
+			"fieldhelp" => _L('Select which categories you wish to include in this feed.'),
+			"value" => (count($currentfeedcategories)?$currentfeedcategories:""),
+			"validators" => array(
+				array("ValInArray", "values" => array_keys($feedcategories))),
+			"control" => array("MultiCheckBox", "values"=>$feedcategories, "hover" => FeedCategory::getFeedDescriptions()),
+			"helpstep" => ++$helpstepnum
+		);
 	}
 	
 	$helpsteps[] = _L("<ul><li>Auto Report - Selecting this option causes the system to email ".
@@ -903,6 +948,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		if ($completedmode) {
 			$job->update();
 		} else {
+			
 			if ($JOBTYPE == "repeating") {
 				$repeatdata = json_decode($postdata['repeat'],true);
 
@@ -928,6 +974,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 				//	like dates before 1970, and using 0 makes windows think it's 12/31/69
 				$job->startdate = date("Y-m-d", 86400);
 				$job->enddate = date("Y-m-d", ($numdays * 86400));
+				
 			} else if ($JOBTYPE == 'normal') {
 				$numdays = $postdata['days'];
 				$job->startdate = date("Y-m-d", strtotime($postdata['date']));
@@ -990,13 +1037,13 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 						$sql = "INSERT INTO joblist (jobid,listid) VALUES " . trim($batchsql,",");
 						QuickUpdate($sql,false,$batchargs);
 					}
-					// clear existing jobpost entries
-					QuickUpdate("DELETE FROM jobpost WHERE jobid=?",false,array($job->id));
-					// only create a page post if facebook or twitter and there is a post page or voice
+					// only create a page post if feed, facebook or twitter and there is a post page or voice
 					$createpagepost = false;
-					if (((getSystemSetting("_hasfacebook") && $USER->authorize("facebookpost")) || (getSystemSetting("_hastwitter") && $USER->authorize("twitterpost"))) && 
-								($messagegroup->hasMessage("post", "page") || $messagegroup->hasMessage("post", "voice"))) {
-						QuickUpdate("insert into jobpost (jobid, type, destination) values (?,'page','')", false, array($job->id));
+					if (((getSystemSetting("_hasfacebook") && $USER->authorize("facebookpost")) || 
+								(getSystemSetting("_hastwitter") && $USER->authorize("twitterpost")) ||
+								(getSystemSetting("_hasfeed") && $USER->autorize("feedpost") && $messagegroup->hasMessage("post", "feed"))) && 
+							($messagegroup->hasMessage("post", "page") || $messagegroup->hasMessage("post", "voice"))) {
+						$job->updateJobPost("page", "");
 					}
 					// insert facebook pages, (if the user can and the message group has a facebook message)
 					if (getSystemSetting("_hasfacebook") && $USER->authorize("facebookpost") && $messagegroup->hasMessage("post", "facebook")) {
@@ -1020,6 +1067,28 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 				}
 			}
 		}
+		
+		// handle feed category updateing
+		// new feed categories
+		if (isset($postdata['feedcategories'])) {
+			$newfeedcategories = $postdata['feedcategories'];
+			// if the job would have already posted the feed message, update as posted and expire the related categories
+			if (in_array($job->status,array('active','procactive','processing','complete','cancelled','cancelling'))) {
+				$job->updateJobPost("feed", $newfeedcategories, 1);
+				// expire feed categories that changed
+				$currentfeedcategories = array_keys($job->getJobPosts("feed"));
+				if ($newfeedcategories !== false) {
+					$diffcategoryids = array_diff(array_merge($currentfeedcategories, $newfeedcategories), array_intersect($currentfeedcategories, $newfeedcategories));
+					
+					if (count($diffcategoryids))
+						expireFeedCategories($CUSTOMERURL, $diffcategoryids);
+				}
+			} else {
+				// hasn't posted yet, it's new or repeating
+				$job->updateJobPost("feed", $newfeedcategories, 0);
+			}
+		}
+		
 		Query("COMMIT");
 
 		if ($button=="send") {
