@@ -63,7 +63,7 @@ function output_pie_graph($data, $legend, $colors, $title, $w = 400, $h = 300) {
 	$p1->SetSize($size);
 	$p1->SetCenter(0.3);
 	$p1->SetLegends(($legend));
-	$p1->SetSliceColors(array_reverse($colors));
+	$p1->SetSliceColors($colors);
 
 	$graph->Add($p1);
 	$graph->Stroke();

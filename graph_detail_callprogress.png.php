@@ -83,23 +83,22 @@ else if ($type == 'sms') {
 	$resultcodes['declined'] = 'No SMS Selected';
 }
 
-$bars = array();
+$graphdata = array();
+$graphcolors = array();
 $labels = array();
-$count=0;
-foreach($resultcodes as $index => $code) {
-	$data = array_fill(0, count($colors), 0);
-	$count++;
-	$color = $colors[$index];
-	$data[$count-1] = $jobstats[$type][$index];
-	$labels[] = $code;
-
-	$bar = new BarPlot($data);
-	$bar->SetFillColor($color);
-	$bar->SetAlign('center');
-	$bar->value->Show();
-	$bar->value->SetFormat('%d');
-	$bars[] = $bar;
+foreach($resultcodes as $index => $label) {
+	$graphdata[] = $jobstats[$type][$index];
+	$graphcolors[] = $colors[$index];
+	$labels[] = $label;
 }
+
+$bars = array();
+$bar = new BarPlot($graphdata);
+$bar->SetFillColor($graphcolors);
+$bar->SetAlign('center');
+$bar->value->Show();
+$bar->value->SetFormat('%d');
+$bars[] = $bar;
 
 $scalex = isset($_GET['scalex']) ? $_GET['scalex'] + 0 : 1;
 $scaley = isset($_GET['scaley']) ? $_GET['scaley'] + 0 : 1;

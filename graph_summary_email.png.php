@@ -56,8 +56,8 @@ $p1->value->Show();
 $size = 0.4;
 $p1->SetSize($size);
 $p1->SetCenter(0.27);
-$p1->SetLegends(($legend));
-$p1->SetSliceColors(array_reverse($colors));
+$p1->SetLegends($legend);
+$p1->SetSliceColors($colors);
 
 $graph->Add($p1);
 $graph->Stroke();

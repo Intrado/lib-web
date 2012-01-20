@@ -32,26 +32,23 @@ $graph->SetFrame(false);
 
 $i = 0;
 $question=$jobstats['survey']['questions'][$question];
+$questiondata = $question['answers'];
 
-	$questiondata = $question['answers'];
-
-$count=0;
+$graphdata = array();
+$graphcolors = array();
 foreach ($questiondata as $index => $value) {
-	$data = array_fill(0, 9, 0);
-	$count++;
-	$data[$index-1] = $value;
-	
-	$barname = "bar" . $count;
-	$$barname = new BarPlot($data);
-	$$barname->SetFillColor($colorset[$index-1]);
-	$$barname->SetAlign('center');
-	$$barname->value->Show();
+	$graphdata[] = $value;
+	$graphcolors[] = $colorset[$index-1];
 }
-	
-for($i=1;$i<=$count;$i++){
-	$barname = "bar" . $i;
-	$graph->Add($$barname);
-}
+
+$bar = new BarPlot($graphdata);
+$bar->SetFillColor($graphcolors);
+$bar->SetAlign('center');
+$bar->value->Show();
+$bar->value->SetFormat('%d');
+
+$graph->Add($bar);
+
 $labels = array("#1", "#2", "#3", "#4", "#5", "#6", "#7", "#8", "#9");
 // Use a "text" X-scale
 $graph->SetScale("textlin");

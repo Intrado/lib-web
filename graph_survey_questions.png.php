@@ -110,7 +110,7 @@ foreach ($jobstats['survey']['questions'] as $question) {
 
 //	if ($i+1 == $cols)//only set on top right pie chart
 //		$p1->SetLegends(($legend));
-	$p1->SetSliceColors(array_reverse($colors));
+	$p1->SetSliceColors($colors);
 
 
 	$graph->Add($p1);
