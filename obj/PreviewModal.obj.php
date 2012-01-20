@@ -102,6 +102,10 @@ class PreviewModal {
 						$modal->uid = uniqid();
 						$modal->initializeFieldContent($message->type);
 						break;
+					case "feed":
+						$message->readHeaders();
+						$modal->text = "<b>Label:</b> $message->subject <hr />" . $message->renderSmsParts($modal->parts);
+						break;
 					default:
 						// Other posts will only need first part, same as sms
 						$modal->text = $message->renderSmsParts($modal->parts);
