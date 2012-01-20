@@ -10,6 +10,8 @@ require_once("inc/utils.inc.php");
 require_once("obj/Validator.obj.php");
 require_once("obj/Form.obj.php");
 require_once("obj/FormItem.obj.php");
+require_once("obj/FeedCategory.obj.php");
+require_once("obj/Job.obj.php");
 require_once("inc/appserver.inc.php");
 require_once('thrift/Thrift.php');
 require_once $GLOBALS['THRIFT_ROOT'].'/protocol/TBinaryProtocol.php';
@@ -46,47 +48,8 @@ if (!count($jobdetails) || $jobdetails['userid'] != $USER->id)
 
 $currentcategories = QuickQueryList("select destination from jobpost where type = 'feed' and jobid = ? and posted", false, false, array($jobid));
 
-// get all the feed categories for the current user and those already associated with the job
-$args = array();
-// if the user has feed restrictions...
-if (QuickQuery("select 1 from userfeedcategory where userid = ? limit 1", false, array($USER->id))) {
-	$args[] = $USER->id;
-	$usercategorywhere = "id in (select feedcategoryid from userfeedcategory where userid=?) ";
-	
-	// the job may already have categories selected, make sure they are displayed as well.
-	$jobcategorywhere = "";
-	if (count($currentcategories)) {
-		foreach ($currentcategories as $id)
-			$args[] = $id;
-		$jobcategorywhere = " id in (".repeatWithSeparator("?",",",count($currentcategories)).") ";
-	}
-	
-	// construct the where clause based off which restrictions (if any) exist
-	if ($usercategorywhere && $jobcategorywhere)
-		$categorywhere = " ($usercategorywhere or $jobcategorywhere) ";
-	else if ($usercategorywhere)
-		$categorywhere = $usercategorywhere;
-	else
-		$categorywhere = $jobcategorywhere;
-} else {
-	// user is unrestricted, just show them all categories
-	$categorywhere = "1";
-}
-$possiblefeedcategories = QuickQueryMultiRow(
-	"select id, name, description
-	from feedcategory 
-	where
-	$categorywhere
-	and not deleted
-	order by name",
-	true, false, $args);
+$feedcategories = FeedCategory::getAllowedFeedCategories($jobid);
 
-$feedcategories = array();
-$feeddescriptions = array();
-foreach ($possiblefeedcategories as $category) {
-	$feedcategories[$category['id']] = $category['name'];
-	$feeddescriptions[$category['id']] = $category['description'];
-}
 $formdata = array(
 	$jobdetails["name"],
 	"feedcategories" => array(
@@ -95,7 +58,7 @@ $formdata = array(
 		"value" => (count($currentcategories)?$currentcategories:""),
 		"validators" => array(
 			array("ValInArray", "values" => array_keys($feedcategories))),
-		"control" => array("MultiCheckBox", "values"=>$feedcategories, "hover" => $feeddescriptions),
+		"control" => array("MultiCheckBox", "values"=>$feedcategories, "hover" => FeedCategory::getFeedDescriptions()),
 		"helpstep" => 1
 	)
 );
@@ -134,26 +97,12 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		if (count($diffcategoryids)) {
 			Query("BEGIN");
 			
-			// delete existing
-			QuickUpdate("delete from jobpost where jobid = ? and type = 'feed'", false, array($jobid));
-			
-			// create new ones
-			if (count($newcategories)) {
-				$args = array();
-				$insertquery = "insert into jobpost values ";
-				$count = 0;
-				foreach ($newcategories as $id) {
-					if ($count++ != 0)
-						$insertquery .= ", ";
-					$insertquery .= "(?,'feed',?,1)";
-					$args[] = $jobid;
-					$args[] = $id;
-				}
-				QuickUpdate($insertquery, false, $args);
-			}
+			$job = new Job($jobid);
+			$job->modifydate = date("Y-m-d H:i:s", time());
+			$job->updateJobPost("feed", $newcategories, 1);
+			$job->update();
 			
 			Query("COMMIT");
-			
 			
 			// expire feed categories that changed
 			if (count($diffcategoryids))
