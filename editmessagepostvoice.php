@@ -52,10 +52,12 @@ if ((!getSystemSetting('_hastwitter', false) || !$USER->authorize("twitterpost")
 // Action/Request Processing
 ////////////////////////////////////////////////////////////////////////////////
 if (isset($_GET['id']) && $_GET['id'] != "new") {
+	$_SESSION['editmessagereferer'] = (isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : NULL);
 	// this is an edit for an existing message
 	$_SESSION['editmessage'] = array("messageid" => $_GET['id']);
 	redirect("editmessagepostvoice.php");
 } else if (isset($_GET['mgid'])) {
+	$_SESSION['editmessagereferer'] = (isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : NULL);
 	$_SESSION['editmessage'] = array("messagegroupid" => $_GET['mgid']);
 	redirect("editmessagepostvoice.php");
 }
@@ -234,10 +236,24 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		// remove the editors session data
 		unset($_SESSION['editmessage']);
 		
+		// where to send back to
+		if ($_SESSION['editmessagereferer']) {
+			$endscript = strpos($_SESSION['editmessagereferer'], "?");
+			if ($endscript > 0)
+				$sendto = substr($_SESSION['editmessagereferer'], 0, $endscript);
+			else
+				$sendto = $_SESSION['editmessagereferer'];
+		} else {
+			$sendto = "mgeditor.php";
+		}
+		// if we came from the message group editor (default) add the id into the url
+		if (strpos($sendto, "mgeditor.php") !== false)
+			$sendto .= "?id=".$messagegroup->id;
+		
 		if ($ajax)
-			$form->sendTo("mgeditor.php?id=".$messagegroup->id);
+			$form->sendTo($sendto);
 		else
-			redirect("mgeditor.php?id=".$messagegroup->id);
+			redirect($sendto);
 	}
 }
 
