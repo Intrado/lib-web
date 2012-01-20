@@ -28,10 +28,11 @@ function genFeed() {
 		
 		// get/set the link (if there is one)
 		var feedlink = feedxml.getElementsByTagName("link")[0];
-		if (feedlink.firstChild) {
+		if (feedlink != undefined && feedlink.firstChild) {
 			var href = document.createElement("a");
 			href.setAttribute("href",feedlink.firstChild.nodeValue);
 			href.setAttribute("target","_blank");
+			href.setAttribute("style","color:inherit;");
 			href.appendChild(title)
 			feedtitle.appendChild(href);
 		} else {
@@ -69,7 +70,7 @@ function genFeed() {
 			descdiv.appendChild(document.createTextNode(feeditems[i].getElementsByTagName("description")[0].firstChild.nodeValue));
 			// add link if there is one
 			feeditemlink = feeditems[i].getElementsByTagName("link")[0];
-			if (feeditemlink.firstChild) {
+			if (feeditemlink != undefined && feeditemlink.firstChild) {
 				// add a link to the label
 				itemlabel = document.createElement("a");
 				itemlabel.setAttribute("href",feeditemlink.firstChild.nodeValue);
