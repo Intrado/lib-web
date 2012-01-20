@@ -35,11 +35,25 @@ class PreviewModal {
 		
 		$id = $_REQUEST["previewid"] + 0;
 		$message = DBFind("Message", "from message where id = ?", false, array($id));
-		$canviewmessage = userCanSee("message", $id);
-		if(!$canviewmessage) {
-			return;
-		}
 		
+		if (!$message) 
+			return;
+		
+		// Allow preview of message if message is associated with a job that is viewable
+		if (isset($_REQUEST["jobid"])) {
+			$isAssociated = QuickQuery("select 1 from job j inner join messagegroup mg on (mg.id = j.messagegroupid) where j.id=? and mg.id=?",false,array($_REQUEST["jobid"],$message->messagegroupid));
+			if (!$isAssociated) {
+				return;
+			} else {
+				if(!userCanSee("job", $_REQUEST["jobid"])) {
+					return;
+				}
+			}
+		} else {
+			if(!userCanSee("message", $id)) {
+				return;
+			}
+		}
 		$modal = new PreviewModal();
 		switch($message->type) {
 			case "phone":

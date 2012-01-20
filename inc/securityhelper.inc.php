@@ -82,9 +82,19 @@ function userCanSee ($type,$id) {
 				and j.userid = ?";
 			return QuickQuery($query, false, array($messagegroupid, $USER->id));
 		case "job":
-			// TODO add restrictions
-			return true;
-			
+			$job = new Job($id);
+			$monitorids = QuickQueryList("select id from monitor where userid=? and type like 'job-%'",false,false,array($USER->id));
+			$monitorfilters = QuickQueryList("select m.id, mf.val from monitor m inner join monitorfilter mf on (mf.monitorid = m.id) where m.userid=? and m.type like 'job%' and mf.type='userid'",true,false, array($USER->id));
+			foreach($monitorids as $monitorid) {
+				if (isset($monitorfilters[$monitorid])) {
+					if (in_array($job->userid, explode(",",$monitorfilters[$monitorid]))) {
+						return true;
+					}
+				} else {
+					return true;
+				}
+			}
+			return false;
 		default:
 			return false;
 	}

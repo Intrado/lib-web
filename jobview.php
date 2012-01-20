@@ -102,7 +102,7 @@ startWindow(_L('Job Settings'));
 	$msg_grid = '<div id="preview"></div>
 					<script type="text/javascript">
 						document.observe(\'dom:loaded\', function() {
-							getMessageGroupPreviewGrid(' . $messagegroup->id . ', \'preview\', null);
+							getMessageGroupPreviewGrid(' . $messagegroup->id . ', \'preview\', null,\'' . $job->id . '\');
 						});
 				</script>';
 	ViewOnlyItem("",$msg_grid);

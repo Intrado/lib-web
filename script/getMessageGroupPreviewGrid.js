@@ -1,5 +1,5 @@
 
-function getMessageGroupPreviewGrid(mgid, container, jobtypeid) {
+function getMessageGroupPreviewGrid(mgid, container, jobtypeid,jobid) {
 	// Avoid sending ajax request if nothing is selected
 	if (!mgid)
 		return;
@@ -11,6 +11,10 @@ function getMessageGroupPreviewGrid(mgid, container, jobtypeid) {
 	
 	// ajaxrequest for messagegrid data
 	var request = "ajax.php?ajax&type=messagegrid&id=" + mgid;
+	
+	if (jobid != undefined)
+		request += "&jobid=" + jobid;
+	
 	cachedAjaxGet(request,function(result) {
 		var response = result.responseJSON;
 		var data = $H(response.data);
@@ -54,7 +58,11 @@ function getMessageGroupPreviewGrid(mgid, container, jobtypeid) {
 					// observe clicks for preview
 					if (hasMessage) {
 						icon.observe("click", function (event) {
-							showPreview(null,"jobtypeid=" + jobtypeid + "&previewid=" + item.value[header.key]);
+							if (jobid != undefined) {
+								showPreview(null,"jobtypeid=" + jobtypeid + "&previewid=" + item.value[header.key] + "&jobid=" + jobid);
+							} else {
+								showPreview(null,"jobtypeid=" + jobtypeid + "&previewid=" + item.value[header.key]);
+							}
 							return false;
 						});
 					}

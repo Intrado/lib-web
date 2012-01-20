@@ -18,6 +18,7 @@ require_once("obj/ListEntry.obj.php");
 require_once("obj/RenderedList.obj.php");
 require_once("inc/date.inc.php");
 require_once("inc/securityhelper.inc.php");
+require_once("obj/Job.obj.php");
 
 function handleRequest() {
 	if (!isset($_GET['type']) && !isset($_POST['type']))
@@ -343,9 +344,16 @@ function handleRequest() {
 			if (!isset($_GET['id']) || !$_GET['id'])
 				return false;
 			
-			// check if the user can view the message group
-			if (!userCanSee("messagegroup", $_GET['id']))
-				return false;
+			if (isset($_GET['jobid'])) {
+				// Check if job is assosiated with message and user can see job
+				$job = new Job($_GET['jobid']);
+				if ($job->messagegroupid != $_GET['id'] || !userCanSee("job", $_GET['jobid']))
+					return false;
+			} else {
+				// check if the user can view the message group
+				if (!userCanSee("messagegroup", $_GET['id']))
+					return false;
+			}
 			
 			$messagegroup = new MessageGroup($_GET['id']);
 			
