@@ -48,7 +48,6 @@ if (isset($_GET['delete'])) {
 	if (userOwns("messagegroup",$deleteid) && $message->type == 'notification') {
 		Query("BEGIN");
 		QuickUpdate("update messagegroup set deleted=1 where id=?",false,array($deleteid));
-		QuickUpdate("update message set deleted=1 where messagegroupid=?",false,array($deleteid));
 		QuickUpdate("delete from publish where type = 'messagegroup' and messagegroupid = ?", false, array($deleteid));
 		notice(_L("The message, %s, is now deleted.", escapehtml($message->name)));
 		// if there are any publish records for this messagegroup, remove them
