@@ -94,6 +94,11 @@ if (isset($_GET['id'])) {
 					$message)
 					redirect("editmessagepostvoice.php?id=" . $message->id);
 				break;
+			case "feed":
+				$message = $messagegroup->getMessage("post", "feed", "en");
+				if (getSystemSetting('_hasfeed', false) && $USER->authorize('feedpost'))
+					redirect("editmessagefeed.php?id=" . $message->id);
+				break;
 		}
 	}
 	redirect();
