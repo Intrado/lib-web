@@ -31,7 +31,8 @@ class Job extends DBMappedObject {
 
 	var $optionsarray = null; //options to update
 
-
+	var $jobposts = false; // jobpost records internal cache
+	
 	function Job ($id = NULL) {
 		$this->_allownulls = true;
 		$this->_tablename = "job";
@@ -433,7 +434,31 @@ class Job extends DBMappedObject {
 		$records = QuickUpdate($insertquery, false, $args);
 		return $records;
 	}
-
+	
+	function getAllJobPosts() {
+		if (!$this->id)
+			return array();
+		if ($this->jobposts === false) {
+			$posts = QuickQueryMultiRow("select type, destination, posted from jobpost where jobid = ?", true, false, array($this->id));
+			$this->jobposts = array();
+			foreach ($posts as $post) {
+				if (!isset($this->jobposts[$post['type']]))
+					$this->jobposts[$post['type']] = array();
+				
+				$this->jobposts[$post['type']][$post['destination']] = $post['posted'];
+			}
+		}
+		return $this->jobposts;
+	}
+	
+	// returns an array of destination => posted for the selected $type
+	function getJobPosts($type) {
+		$posts = $this->getAllJobPosts();
+		if (count($posts) && isset($posts[$type]))
+			return $posts[$type];
+		
+		return array();
+	}
 }
 
 ?>
