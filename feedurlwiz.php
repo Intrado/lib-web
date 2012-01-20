@@ -364,7 +364,7 @@ class FeedUrlWiz_feedwidgetstyle extends WizStep {
 				"helpstep" => 3
 			),
 			"descriptionbottompadding" => array(
-				"label" => _L('List item spaceing'),
+				"label" => _L('List item spacing'),
 				"fieldhelp" => _L('Spacing used between list items.'),
 				"value" => "5",
 				"validators" => array(
