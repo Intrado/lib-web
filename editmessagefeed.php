@@ -17,6 +17,13 @@ require_once("obj/MessagePart.obj.php");
 require_once("obj/Language.obj.php");
 require_once("obj/Voice.obj.php");
 require_once("obj/ValMessageBody.val.php");
+require_once("inc/appserver.inc.php");
+require_once('thrift/Thrift.php');
+require_once $GLOBALS['THRIFT_ROOT'].'/protocol/TBinaryProtocol.php';
+require_once $GLOBALS['THRIFT_ROOT'].'/transport/TSocket.php';
+require_once $GLOBALS['THRIFT_ROOT'].'/transport/TBufferedTransport.php';
+require_once $GLOBALS['THRIFT_ROOT'].'/transport/TFramedTransport.php';
+require_once($GLOBALS['THRIFT_ROOT'].'/packages/commsuite/CommSuite.php');
 
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization
@@ -174,7 +181,10 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		
 		Query("COMMIT");
 		
-		// TODO: expire feeds categories pointing at this message group.
+		// expire feeds categories pointing at this message group.
+		$categories = QuickQueryList("select destination from jobpost where type = 'feed' and jobid in (select id from job where messagegroupid = ?)", false, false, array($messagegroup->id));
+		if (count($categories))
+		expireFeedCategories($CUSTOMERURL, $categories);
 		
 		// where to send back to
 		if ($_SESSION['editmessagereferer']) {
