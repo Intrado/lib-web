@@ -393,6 +393,10 @@ function handleRequest() {
 				$result->headers['postvoice'] = _L("Page Media");
 			}
 			
+			if (getSystemSetting('_hasfeed', false) && $USER->authorize('feedpost')) {
+				$result->headers['postfeed'] = _L("Feed");
+			}
+			
 			
 			// Since it is possible to subscribe to messages we cannot restrict based on $USER->authorize('sendmulti') here
 			// instead check if each language contains a message 
@@ -438,6 +442,10 @@ function handleRequest() {
 				$result->data["English"]['postpage'] = $message?$message->id:false;
 				$message = $messagegroup->getMessage('post', 'voice', 'en');
 				$result->data["English"]['postvoice'] = $message?$message->id:false;
+			}
+			if (getSystemSetting('_hasfeed', false) && $USER->authorize('feedpost')) {
+				$message = $messagegroup->getMessage('post', 'feed', 'en');
+				$result->data["English"]['postfeed'] = $message?$message->id:false;
 			}
 			return $result;
 		default:
