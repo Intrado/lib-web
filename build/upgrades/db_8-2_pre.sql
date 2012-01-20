@@ -81,3 +81,6 @@ CREATE TABLE `authorizedusercallerid` (
 	PRIMARY KEY (`userid`,`callerid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 $$$
+
+-- $rev 8
+-- update SM access profile

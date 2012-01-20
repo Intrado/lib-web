@@ -51,6 +51,7 @@ INSERT INTO `permission` (accessid,name,value) VALUES
 						 (@smaccessid, 'facebookpost', '1'),
 						 (@smaccessid, 'twitterpost', '1'),
 						 (@smaccessid, 'feedpost', '1'),
-						 (@smaccessid, 'manageclassroommessaging', '1');
+						 (@smaccessid, 'monitorevent', '1'),
+						 (@smaccessid, 'monitorsystemwideevent', '1');
 $$$
 						

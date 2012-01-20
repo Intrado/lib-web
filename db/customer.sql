@@ -1824,3 +1824,9 @@ $$$
 update setting set value='8.2/7' where name='_dbversion'
 $$$
 -- END 8.2/7
+
+-- START 8.2/8
+
+update setting set value='8.2/8' where name='_dbversion'
+$$$
+-- END 8.2/8
