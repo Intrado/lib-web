@@ -223,6 +223,8 @@ foreach ($customers as $cust) {
 			$customerfeatures[] = "LDAP";
 		if (getCustomerSystemSetting('_hassms', false, true, $custdb))
 			$customerfeatures[] = "SMS";
+		if (getCustomerSystemSetting('_hassmapi', false, true, $custdb))
+			$customerfeatures[] = "SMAPI";
 		if (getCustomerSystemSetting('_hassurvey', true, true, $custdb))
 			$customerfeatures[] = "Survey";
 		if (getCustomerSystemSetting('_hascallback', false, true, $custdb))
@@ -233,6 +235,12 @@ foreach ($customers as $cust) {
 			$customerfeatures[] = "Enrollment";
 		if (getCustomerSystemSetting('_hastargetedmessage', false, true, $custdb))
 			$customerfeatures[] = "Classroom";
+		if (getCustomerSystemSetting('_hasfacebook', false, true, $custdb))
+			$customerfeatures[] = "Facbook";
+		if (getCustomerSystemSetting('_hastwitter', false, true, $custdb))
+			$customerfeatures[] = "Twitter";
+		if (getCustomerSystemSetting('_hasfeed', false, true, $custdb))
+			$customerfeatures[] = "Feed";
 
 		$row[10] = implode(", ", $customerfeatures);
 		$row[11] = getCustomerSystemSetting('_dmmethod', "", true, $custdb);
