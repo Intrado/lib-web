@@ -122,7 +122,7 @@ $helpsteps = array (
 );
 
 $buttons = array(submit_button(_L('Done'),"submit","tick"));
-$form = new Form("templateform",$formdata,$helpsteps,$buttons);
+$form = new Form("feedform",$formdata,$helpsteps,$buttons);
 
 ////////////////////////////////////////////////////////////////////////////////
 // Form Data Handling
@@ -211,15 +211,11 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 // Display Functions
 ////////////////////////////////////////////////////////////////////////////////
 
-function fmt_template ($obj, $field) {
-	return $obj->$field;
-}
-
 ////////////////////////////////////////////////////////////////////////////////
 // Display
 ////////////////////////////////////////////////////////////////////////////////
-$PAGE = "template:template";
-$TITLE = _L('template');
+$PAGE = "notifications:messages";
+$TITLE = _L("Feed Message Editor");
 
 include_once("nav.inc.php");
 
@@ -229,7 +225,7 @@ include_once("nav.inc.php");
 </script>
 <?
 
-startWindow(_L('template'));
+startWindow($messagegroup->name);
 echo $form->render();
 endWindow();
 
