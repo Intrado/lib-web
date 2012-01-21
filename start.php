@@ -70,7 +70,8 @@ if($isajax === true) {
 					sum(m.type='post' and m.subtype='facebook') as facebook, 
 					sum(m.type='post' and m.subtype='twitter') as twitter,
 					sum(m.type='post' and m.subtype='page') as page,
-					sum(m.type='post' and m.subtype='voice') as pagemedia
+					sum(m.type='post' and m.subtype='voice') as pagemedia,
+					sum(m.type='post' and m.subtype='feed') as feed
 				from messagegroup mg
 					left join message m on
 						(m.messagegroupid = mg.id)
@@ -208,7 +209,8 @@ if($isajax === true) {
 					sum(m.type='post' and m.subtype='facebook') as facebook, 
 					sum(m.type='post' and m.subtype='twitter') as twitter,
 					sum(m.type='post' and m.subtype='page') as page,
-					sum(m.type='post' and m.subtype='voice') as pagemedia
+					sum(m.type='post' and m.subtype='voice') as pagemedia,
+					sum(m.type='post' and m.subtype='feed') as feed
 				from messagegroup mg
 					left join message m on
 						(m.messagegroupid = mg.id)
@@ -524,6 +526,7 @@ function activityfeed($mergeditems,$ajax = false) {
 					$types .= $item["twitter"] > 0?' <a href="' . $defaultlink . '&redirect=twitter"><img src="img/icons/custom/twitter.png" alt="Twitter" title="Twitter"></a>':"";
 					$types .= $item["page"] > 0?' <a href="' . $defaultlink . '&redirect=page"><img src="img/icons/layout_sidebar.png" alt="Page" title="Page"></a>':"";
 					$types .= $item["pagemedia"] > 0?' <a href="' . $defaultlink . '&redirect=voice"><img src="img/nifty_play.png" alt="Page Media" title="Page Media"></a>':"";
+					$types .= $item["feed"] > 0?' <a href="' . $defaultlink . '&redirect=feed"><img src="img/icons/rss.png" alt="Feed" title="Feed"></a>':"";
 					$title = _L('Message %1$s - ',escapehtml($title)) . ($types==""?_L("Empty Message"):$types);
 					$content = '<a href="' . $defaultlink . '" ' . $defaultonclick . '>' . $time .  ' - <b>' .  escapehtml($item["name"]) . "</b>" . ($item["description"] != ""?" - " . escapehtml($item["description"]):"") . '</a>';
 					$icon = 'largeicons/letter.jpg';
