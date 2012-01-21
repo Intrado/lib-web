@@ -236,7 +236,7 @@ foreach ($customers as $cust) {
 		if (getCustomerSystemSetting('_hastargetedmessage', false, true, $custdb))
 			$customerfeatures[] = "Classroom";
 		if (getCustomerSystemSetting('_hasfacebook', false, true, $custdb))
-			$customerfeatures[] = "Facbook";
+			$customerfeatures[] = "Facebook";
 		if (getCustomerSystemSetting('_hastwitter', false, true, $custdb))
 			$customerfeatures[] = "Twitter";
 		if (getCustomerSystemSetting('_hasfeed', false, true, $custdb))
