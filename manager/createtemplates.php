@@ -3,57 +3,51 @@
 
 function createDefaultTemplates($useSmsMessagelinkInboundnumber = false) {
 	
-	$templatedata = explode("$$$",file_get_contents("templatedata.txt"));
-	
+	$templates = loadTemplateData($useSmsMessagelinkInboundnumber);
+			
 			////////////////////////
 			// general notification
-			$notification_englishhtml = $templatedata[1];
-			$notification_englishplain = $templatedata[2];
-			$notification_spanishhtml = $templatedata[3];
-			$notification_spanishplain = $templatedata[4];
+			$notification_englishhtml = $templates['notification']['en']['html']['body'];
+			$notification_englishplain = $templates['notification']['en']['plain']['body'];
+			$notification_spanishhtml = $templates['notification']['es']['html']['body'];
+			$notification_spanishplain = $templates['notification']['es']['plain']['body'];
 	
 			if (!createTemplate('notification', $notification_englishplain, $notification_englishhtml, $notification_spanishplain, $notification_spanishhtml))
 				return false;
 
 			////////////////////////
 			// emergency notification
-			$notification_englishhtml = $templatedata[5];
-			$notification_englishplain = $templatedata[6];
-			$notification_spanishhtml = $templatedata[7];
-			$notification_spanishplain = $templatedata[8];
+			$notification_englishhtml = $templates['emergency']['en']['html']['body'];
+			$notification_englishplain = $templates['emergency']['en']['plain']['body'];
+			$notification_spanishhtml = $templates['emergency']['es']['html']['body'];
+			$notification_spanishplain = $templates['emergency']['es']['plain']['body'];
 			
 			if (!createTemplate('emergency', $notification_englishplain, $notification_englishhtml, $notification_spanishplain, $notification_spanishhtml))
 				return false;
 				
 			///////////////////////
 			// messagelink
-			$messagelink_englishhtml = $templatedata[9];
-			$messagelink_englishplain = $templatedata[10];
-			
-			$messagelink_spanishhtml = $templatedata[11];
-			$messagelink_spanishplain = $templatedata[12];
+			$messagelink_englishhtml = $templates['messagelink']['en']['html']['body'];
+			$messagelink_englishplain = $templates['messagelink']['en']['plain']['body'];
+			$messagelink_spanishhtml = $templates['messagelink']['es']['html']['body'];
+			$messagelink_spanishplain = $templates['messagelink']['es']['plain']['body'];
 			
 			$messagegroupid = createTemplate('messagelink', $messagelink_englishplain, $messagelink_englishhtml, $messagelink_spanishplain, $messagelink_spanishhtml);
 			if (!$messagegroupid)
 				return false;
 				
 			// set english headers
-			$data = "subject=" . urlencode("\${displayname} sent a new message") . 
-					"&fromname=" . urlencode("\${productname}") . 
-					"&fromemail=" . urlencode("contactme@schoolmessenger.com");
+			$data = "subject=" . urlencode($templates['messagelink']['en']['html']['subject']) . 
+					"&fromname=" . urlencode($templates['messagelink']['en']['html']['fromname']) . 
+					"&fromemail=" . urlencode($templates['messagelink']['en']['html']['fromaddr']);
 			QuickUpdate("update message set data = ? where messagegroupid = ? and type = 'email' and languagecode = 'en'", null, array($data, $messagegroupid));
 			// set spanish headers
-			$data = "subject=" . urlencode("\${displayname} le envió un mensaje nuevo") . 
-					"&fromname=" . urlencode("\${productname}") . 
-					"&fromemail=" . urlencode("contactme@schoolmessenger.com");
+			$data = "subject=" . urlencode($templates['messagelink']['es']['html']['subject']) . 
+					"&fromname=" . urlencode($templates['messagelink']['es']['html']['fromname']) . 
+					"&fromemail=" . urlencode($templates['messagelink']['es']['html']['fromaddr']);
 			QuickUpdate("update message set data = ? where messagegroupid = ? and type = 'email' and languagecode = 'es'", null, array($data, $messagegroupid));
 			
 			//// SMS messagelink
-			if ($useSmsMessagelinkInboundnumber) {
-				$appendinbound = " or \${inboundnumber}.";
-			} else {
-				$appendinbound = "";
-			}
 			// create message
 			$message = new Message();
 			$message->messagegroupid = $messagegroupid;
@@ -64,6 +58,7 @@ function createDefaultTemplates($useSmsMessagelinkInboundnumber = false) {
 			$message->subtype = "plain";
 			$message->data = "";
 			$message->modifydate = date('Y-m-d H:i:s');
+			$message->deleted = 0;
 			$message->autotranslate = "none";
 			$message->languagecode = "en";
 			if (!$message->create()) 
@@ -73,7 +68,7 @@ function createDefaultTemplates($useSmsMessagelinkInboundnumber = false) {
 			$messagepart = new MessagePart();
 			$messagepart->messageid = $message->id;
 			$messagepart->type = "T";
-			$messagepart->txt = "\${displayname} sent a msg. To listen \${messagelink}" . $appendinbound . "\nFor info txt HELP";
+			$messagepart->txt = $templates['messagelink']['en']['sms']['body'];
 			$messagepart->sequence = 0;
 			if (!$messagepart->create())
 				return false;
@@ -81,47 +76,49 @@ function createDefaultTemplates($useSmsMessagelinkInboundnumber = false) {
 			
 			////////////////////////
 			// subscriber
-			$subscriber_englishhtml = $templatedata[13];
-			$subscriber_englishplain = $templatedata[14];
-			$subscriber_spanishhtml = $templatedata[15];
-			$subscriber_spanishplain = $templatedata[16];
+			$subscriber_englishhtml = $templates['subscriber']['en']['html']['body'];
+			$subscriber_englishplain = $templates['subscriber']['en']['plain']['body'];
+			$subscriber_spanishhtml = $templates['subscriber']['es']['html']['body'];
+			$subscriber_spanishplain = $templates['subscriber']['es']['plain']['body'];
 			
 			$messagegroupid = createTemplate('subscriber', $subscriber_englishplain, $subscriber_englishhtml, $subscriber_spanishplain, $subscriber_spanishhtml);
 			if (!$messagegroupid)
 				return false;
 				
 			// set english headers
-			$data = "subject=" . urlencode("\${displayname} \${productname} Account Termination Warning") . 
-					"&fromname=" . urlencode("\${productname}") . 
-					"&fromemail=" . urlencode("contactme@schoolmessenger.com");
+			$data = "subject=" . urlencode($templates['subscriber']['en']['html']['subject']) . 
+					"&fromname=" . urlencode($templates['subscriber']['en']['html']['fromname']) . 
+					"&fromemail=" . urlencode($templates['subscriber']['en']['html']['fromaddr']);
 			QuickUpdate("update message set data = ? where messagegroupid = ? and type = 'email' and languagecode = 'en'", null, array($data, $messagegroupid));
 			// set spanish headers
-			$data = "subject=" . urlencode("\${displayname} \${productname} Advertencia Cancelación de cuenta") . 
-					"&fromname=" . urlencode("\${productname}") . 
-					"&fromemail=" . urlencode("contactme@schoolmessenger.com");
+			$data = "subject=" . urlencode($templates['subscriber']['es']['html']['subject']) . 
+					"&fromname=" . urlencode($templates['subscriber']['es']['html']['fromname']) . 
+					"&fromemail=" . urlencode($templates['subscriber']['es']['html']['fromaddr']);
 			QuickUpdate("update message set data = ? where messagegroupid = ? and type = 'email' and languagecode = 'es'", null, array($data, $messagegroupid));
 				
 			////////////////////////
 			// survey
-			$survey_englishhtml = $templatedata[17];
-			$survey_englishplain = $templatedata[18];
-			$survey_spanishhtml = $templatedata[17]; // spanish is not used yet
-			$survey_spanishplain = $templatedata[18];
+			$survey_englishhtml = $templates['survey']['en']['html']['body'];
+			$survey_englishplain = $templates['survey']['en']['plain']['body'];
+			$survey_spanishhtml = $templates['survey']['en']['html']['body']; // spanish is not used yet
+			$survey_spanishplain = $templates['survey']['en']['plain']['body'];
 			
 			if (!createTemplate('survey', $survey_englishplain, $survey_englishhtml, $survey_spanishplain, $survey_spanishhtml))
 				return false;
 			
-			$monitor_englishhtml = $templatedata[19];
-			$monitor_englishplain = $templatedata[20];
+			////////////////////////
+			// monitor
+			$monitor_englishhtml = $templates['monitor']['en']['html']['body'];
+			$monitor_englishplain = $templates['monitor']['en']['plain']['body'];
 			
 			$messagegroupid = createTemplate('monitor', $monitor_englishplain, $monitor_englishhtml, $monitor_englishplain, $monitor_englishhtml);
 			if (!$messagegroupid)
 				return false;
 			
 			// set english and spanish headers, they are the same
-			$data = "subject=" . urlencode("Monitor Alert: \${monitoralert}") .
-								"&fromname=" . urlencode("\${productname}") . 
-								"&fromemail=" . urlencode("noreply@schoolmessenger.com");
+			$data = "subject=" . urlencode($templates['monitor']['en']['html']['subject']) .
+								"&fromname=" . urlencode($templates['monitor']['en']['html']['fromname']) . 
+								"&fromemail=" . urlencode($templates['monitor']['en']['html']['fromaddr']);
 			QuickUpdate("update message set data = ? where messagegroupid = ? and type = 'email'", null, array($data, $messagegroupid));
 			
 			// SUCCESS	

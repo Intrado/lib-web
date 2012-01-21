@@ -1826,7 +1826,13 @@ $$$
 -- END 8.2/7
 
 -- START 8.2/8
-
+-- smadmin monitor
 update setting set value='8.2/8' where name='_dbversion'
 $$$
 -- END 8.2/8
+
+-- START 8.2/9
+-- monitor template
+update setting set value='8.2/9' where name='_dbversion'
+$$$
+-- END 8.2/9

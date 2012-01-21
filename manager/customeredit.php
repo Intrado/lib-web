@@ -13,6 +13,7 @@ require_once("../obj/FormItem.obj.php");
 require_once("../obj/MessageGroup.obj.php");
 require_once("../obj/Message.obj.php");
 require_once("../obj/MessagePart.obj.php");
+require_once("loadtemplatedata.php");
 require_once("createtemplates.php");
 require_once("../inc/themes.inc.php");
 require_once("../obj/FormBrandTheme.obj.php");

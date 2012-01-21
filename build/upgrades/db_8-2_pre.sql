@@ -66,7 +66,7 @@ ALTER TABLE `jobpost` CHANGE `type` `type` ENUM( 'facebook', 'twitter', 'page', 
 $$$
 
 -- $rev 6
--- Creating monitor template with dbmo
+-- nothing, create monitor template moved to rev9
 
 -- $rev 7
 CREATE TABLE `authorizedcallerid` (
@@ -84,3 +84,6 @@ $$$
 
 -- $rev 8
 -- update SM access profile
+
+-- $rev 9
+-- create monitor template, and any missing templates from pre 7.8
