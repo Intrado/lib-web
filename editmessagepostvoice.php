@@ -44,8 +44,10 @@ require_once $GLOBALS['THRIFT_ROOT'].'/packages/commsuite/CommSuite.php';
 // Authorization
 ////////////////////////////////////////////////////////////////////////////////
 global $USER;
-if ((!getSystemSetting('_hastwitter', false) || !$USER->authorize("twitterpost")) &&
-		(!getSystemSetting('_hasfacebook', false) || !$USER->authorize("facebookpost")))
+// page posting is allowed if facebook, twitter or feed is allowed
+if (!(getSystemSetting('_hasfacebook', false) && $USER->authorize('facebookpost')) &&
+		!(getSystemSetting('_hastwitter', false) && $USER->authorize('twitterpost')) &&
+		!(getSystemSetting('_hasfeed', false) && $USER->authorize('feedpost')))
 	redirect('unauthorized.php');
 
 ////////////////////////////////////////////////////////////////////////////////

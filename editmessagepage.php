@@ -32,9 +32,10 @@ require_once("obj/EmailAttach.fi.php");
 // Authorization
 ////////////////////////////////////////////////////////////////////////////////
 global $USER;
-// page posting is allowed if either facebook OR twitter is allowed
+// page posting is allowed if facebook, twitter or feed is allowed
 if (!(getSystemSetting('_hasfacebook', false) && $USER->authorize('facebookpost')) &&
-		!(getSystemSetting('_hastwitter', false) && $USER->authorize('twitterpost')))
+		!(getSystemSetting('_hastwitter', false) && $USER->authorize('twitterpost')) &&
+		!(getSystemSetting('_hasfeed', false) && $USER->authorize('feedpost')))
 	redirect('unauthorized.php');
 
 ////////////////////////////////////////////////////////////////////////////////

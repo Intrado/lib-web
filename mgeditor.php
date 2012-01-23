@@ -392,7 +392,10 @@ function makeMessageGrid($messagegroup) {
 		$columnlabels[] = 'Twitter <a href="editmessagetwitter.php?new&mgid=' .$messagegroup->id . '"><img src="img/icons/add.png" alt="Add" title="Add New Twitter Message" /></a>';
 	}
 	
-	if ((getSystemSetting('_hasfacebook', false) && $USER->authorize('facebookpost')) || (getSystemSetting('_hastwitter', false) && $USER->authorize('twitterpost'))) {
+	// Page post items
+	if ((getSystemSetting('_hasfacebook', false) && $USER->authorize('facebookpost')) || 
+			(getSystemSetting('_hastwitter', false) && $USER->authorize('twitterpost')) || 
+			(getSystemSetting('_hasfeed', false) && $USER->authorize('feedpost'))) {
 		$columnlabels[] = 'Page <a href="editmessagepage.php?new&mgid=' .$messagegroup->id . '"><img src="img/icons/add.png" alt="Add" title="Add New Page Message" /></a>';
 		$columnlabels[] = 'Page Media <a href="editmessagepostvoice.php?new&mgid=' .$messagegroup->id . '"><img src="img/icons/add.png" alt="Add" title="Add New Page Media Message" /></a>';
 	}
@@ -516,9 +519,10 @@ function makeMessageGrid($messagegroup) {
 				$linkrow[] = false;
 			}
 		}
-		// Page/Voice posting is allowed if EITHER twitter or facebook are allowed, currently
+		// Page/Voice posting is allowed if twitter, facebook or feed are allowed, currently
 		if ((getSystemSetting('_hasfacebook', false) && $USER->authorize('facebookpost')) ||
-				(getSystemSetting('_hastwitter', false) && $USER->authorize('twitterpost'))) {
+				(getSystemSetting('_hastwitter', false) && $USER->authorize('twitterpost')) ||
+				(getSystemSetting('_hasfeed', false) && $USER->authorize('feedpost'))) {
 			if ($languagecode == Language::getDefaultLanguageCode()) {
 				$actions = array();
 				$message = $messagegroup->getMessage('post', 'page', $languagecode);
