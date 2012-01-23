@@ -47,7 +47,10 @@ function upgrade_8_2 ($rev, $shardid, $customerid, $db) {
 			
 			// restore global db connection
 			$_dbcon = $savedbcon;
-				
+		case 9:
+			echo "|";
+			apply_sql("upgrades/db_8-2_pre.sql", $customerid, $db, 10);
+					
 	}
 
 	// SM admin

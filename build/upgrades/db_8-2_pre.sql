@@ -87,3 +87,13 @@ $$$
 
 -- $rev 9
 -- create monitor template, and any missing templates from pre 7.8
+
+-- $rev 10
+
+ALTER TABLE `job` DROP INDEX `startdate`
+$$$
+
+-- index for feed generator
+ALTER TABLE `job` ADD INDEX `startdate` ( `startdate` , `starttime` ) 
+$$$
+

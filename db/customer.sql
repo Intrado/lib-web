@@ -1836,3 +1836,16 @@ $$$
 update setting set value='8.2/9' where name='_dbversion'
 $$$
 -- END 8.2/9
+
+-- START 8.2/10
+
+ALTER TABLE `job` DROP INDEX `startdate`
+$$$
+
+-- index for feed generator
+ALTER TABLE `job` ADD INDEX `startdate` ( `startdate` , `starttime` ) 
+$$$
+
+update setting set value='8.2/10' where name='_dbversion'
+$$$
+-- END 8.2/10
