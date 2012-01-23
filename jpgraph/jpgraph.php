@@ -18,7 +18,7 @@ require_once('jpgraph_legend.inc.php');
 require_once('gd_image.inc.php');
 
 // Version info
-define('JPG_VERSION','3.0.7');
+define('JPG_VERSION','3.1.7p');
 
 // Minimum required PHP version
 define('MIN_PHPVERSION','5.1.0');
