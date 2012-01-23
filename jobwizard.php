@@ -516,22 +516,25 @@ class FinishJobWizard extends WizFinish {
 						foreach ($this->parent->dataHelper("/message/post/facebookpage:fbpage", true, "[]") as $pageid) {
 							if ($pageid == "me")
 								$pageid = $USER->getSetting("fb_user_id");
-							QuickUpdate("insert into jobpost values (?,?,?,0)", false, array($job->id, $subtype, $pageid));
+							$job->updateJobPost("facebook", $pageid);
 						}
 					}
 					break;
 				case "twitter":
 					if (twitterAuthorized($this->parent)) {
 						$twitterauth = json_decode($USER->getSetting("tw_access_token"));
-						QuickUpdate("insert into jobpost values (?,?,?,0)", false, array($job->id, $subtype, $twitterauth->user_id));
+						$job->updateJobPost("twitter", $twitterauth->user_id);
 					}
 					break;
 				case "page":
 				case "voice":
 					if (!$createdpostpage && (facebookAuthorized($this->parent) || twitterAuthorized($this->parent))) {
 						$createdpostpage = true;
-						QuickUpdate("insert into jobpost values (?,?,'',0)", false, array($job->id, "page"));
+						$job->updateJobPost("page", "");
 					}
+				case "feed":
+					if (getSystemSetting("_hasfeed") && $USER->authorize("feedpost"))
+						$job->updateJobPost("feed", $this->parent->dataHelper("/message/post/facebookpage:feedcategories", false));
 			}
 		}
 		
