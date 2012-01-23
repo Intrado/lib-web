@@ -1041,7 +1041,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 					$createpagepost = false;
 					if (((getSystemSetting("_hasfacebook") && $USER->authorize("facebookpost")) || 
 								(getSystemSetting("_hastwitter") && $USER->authorize("twitterpost")) ||
-								(getSystemSetting("_hasfeed") && $USER->autorize("feedpost") && $messagegroup->hasMessage("post", "feed"))) && 
+								(getSystemSetting("_hasfeed") && $USER->authorize("feedpost") && $messagegroup->hasMessage("post", "feed"))) && 
 							($messagegroup->hasMessage("post", "page") || $messagegroup->hasMessage("post", "voice"))) {
 						$job->updateJobPost("page", "");
 					}
