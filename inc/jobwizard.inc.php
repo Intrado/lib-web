@@ -1554,6 +1554,23 @@ class JobWiz_socialMedia extends WizStep {
 			);
 		}
 		
+		// Feed
+		if (getSystemSetting("_hasfeed") && $USER->authorize("feedpost")) {
+			$helpsteps[] = _L("Enter the message you wish to deliver via Twitter.");
+			$formdata["feeddata"] = array(
+				"label" => _L("Feed Message"),
+				"fieldhelp" => _L("Select what text to include in your feed."),
+				"value" => ($smEnable?$fbtext:""),
+				"validators" => array(
+					array("ValLength","max"=>(140 - $reservedchars))),
+				"control" => array("TextAreaWithEnableCheckbox", 
+					"hassubject" => true, "subjectmax" => 50, "subjectsize" => 44, "defaultsubject" => $this->parent->dataHelper('/start:name'),
+					"defaultvalue" => $fbtext, "rows"=>5,"cols"=>50),
+				"helpstep" => $helpstepnum++
+			
+			);
+		}
+		
 		// if there is a phone message, ask if it can be used in posts
 		if ($this->parent->dataHelper("/message/phone/text:message") || $this->parent->dataHelper("/message/phone/callme:message")) {
 			$helpsteps[] = _L("If you have selected a message be delivered to one or more social media destinations, enabling this option will create a voice posting. ".
@@ -1588,11 +1605,57 @@ class JobWiz_socialMedia extends WizStep {
 }
 
 class JobWiz_facebookPage extends WizStep {
+	var $messagegroup = false;
+	function hasFbMessage() {
+		// if there is a facebook message created
+		if ($this->parent->dataHelper('/message/post/socialmedia:fbdata') && facebookAuthorized($this->parent))
+			return true;
+		// or type is pick and the message group has facebook content
+		if (!$this->messagegroup) {
+			$mgid = $this->parent->dataHelper('/message/pickmessage:messagegroup');
+			if ($mgid)
+				$this->messagegroup = new MessageGroup($mgid);
+			else
+				return false;
+		}
+		// facebook content
+		if ($this->messagegroup->hasMessage("post","facebook") && facebookAuthorized($this->parent))
+			return true;
+		
+		return false;
+	}
+	
+	function hasFeedMessage() {
+		global $USER;
+		// or there is a feed message created
+		if ($this->parent->dataHelper('/message/post/socialmedia:feeddata'))
+			return true;
+		// or type is pick and the message group has feed content
+		if (!$this->messagegroup) {
+			$mgid = $this->parent->dataHelper('/message/pickmessage:messagegroup');
+			if ($mgid)
+				$this->messagegroup = new MessageGroup($mgid);
+			else
+				return false;
+		}
+		
+		// feed content
+		if ($this->messagegroup->hasMessage("post", "feed") && getSystemSetting("_hasfeed") && $USER->autorize("feedpost"))
+			return true;
+		
+		return false;
+	}
+	
 	function getForm($postdata, $curstep) {
 		global $USER;
 		
-		$formdata = array (
-			"fbpage" => array(
+		$formdata = array ();
+		$helpstepsnum = 1;
+		$helpsteps = array();
+		
+		if ($this->hasFbMessage()) {
+			$formdata[] = _L("Facebook Page(s)");
+			$formdata["fbpage"] = array(
 				"label" => _L('Facebook Page(s)'),
 				"fieldhelp" => _L("Select which pages to post to."),
 				"value" => "",
@@ -1600,30 +1663,33 @@ class JobWiz_facebookPage extends WizStep {
 					array("ValRequired"),
 					array("ValFacebookPage", "authpages" => getFbAuthorizedPages(), "authwall" => getSystemSetting("fbauthorizewall"))),
 				"control" => array("FacebookPage", "access_token" => $USER->getSetting("fb_access_token", false)),
-				"helpstep" => 1)
-		);
+				"helpstep" => $helpstepsnum++);
+			$helpsteps = array(_L("TODO: help"));
+		}
 		
-		$helpsteps = array(_L("TODO: help"));
+		if ($this->hasFeedMessage()) {
+			$feedcategories = FeedCategory::getAllowedFeedCategories();
+			
+			$formdata[] = _L("Feed Category");
+			$formdata["feedcategories"] = array(
+				"label" => _L("Feed categories"),
+				"fieldhelp" => _L('Select which categories you wish to add the feed message to.'),
+				"value" => "",
+				"validators" => array(
+					array("ValRequired"),
+					array("ValInArray", "values" => array_keys($feedcategories))),
+				"control" => array("MultiCheckBox", "values"=>$feedcategories, "hover" => FeedCategory::getFeedDescriptions()),
+				"helpstep" => $helpstepsnum);
+			$helpsteps = array(_L("TODO: help"));
+		}
 		
 		return new Form("facebookPage",$formdata,$helpsteps);
 	}
 	
 	//returns true if this step is enabled
 	function isEnabled($postdata, $step) {
-		// if type is pick and the message group has facebook content
-		$mgid = $this->parent->dataHelper('/message/pickmessage:messagegroup');
-		if ($mgid)
-			$mg = new MessageGroup($mgid);
-		else
-			$mg = new MessageGroup();
-		
-		if ($mg->hasMessage("post","facebook") && facebookAuthorized($this->parent))
+		if ($this->hasFbMessage() || $this->hasFeedMessage())
 			return true;
-		
-		// or, there is a facebook message created
-		if ($this->parent->dataHelper('/message/post/socialmedia:fbdata') && facebookAuthorized($this->parent))
-			return true;
-		
 		return false;
 	}
 }
