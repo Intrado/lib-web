@@ -54,7 +54,7 @@ class Message extends DBMappedObject {
 				$this->data .= '&overrideplaintext=' . urlencode($this->overrideplaintext);
 		} elseif ($this->type == 'print') {
 			$this->data = 'header1=' . urlencode($this->header1) . '&header2=' .  urlencode($this->header2) . '&header3=' . urlencode($this->header3) . '&fromaddress=' . urlencode($this->fromaddress);
-		} elseif ($this->type == 'post') {
+		} elseif ($this->type == 'post' && $this->subtype == 'feed') {
 			$this->data = 'subject=' . urlencode($this->subject);
 		}
 	}
