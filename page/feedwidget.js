@@ -27,17 +27,17 @@ function genFeed() {
 		var title = document.createTextNode(feedxml.getElementsByTagName("title")[0].childNodes[0].nodeValue);
 		
 		// get/set the link (if there is one)
-		var feedlink = feedxml.getElementsByTagName("link")[0];
-		if (feedlink != undefined && feedlink.firstChild) {
-			var href = document.createElement("a");
-			href.setAttribute("href",feedlink.firstChild.nodeValue);
-			href.setAttribute("target","_blank");
-			href.setAttribute("style","color:inherit;");
-			href.appendChild(title)
-			feedtitle.appendChild(href);
-		} else {
+//		var feedlink = feedxml.getElementsByTagName("link")[0];
+//		if (feedlink != undefined && feedlink.firstChild) {
+//			var href = document.createElement("a");
+//			href.setAttribute("href",feedlink.firstChild.nodeValue);
+//			href.setAttribute("target","_blank");
+//			href.setAttribute("style","color:inherit;");
+//			href.appendChild(title)
+//			feedtitle.appendChild(href);
+//		} else {
 			feedtitle.appendChild(title);
-		}
+//		}
 		
 		feeddiv.appendChild(feedtitle);
 		
