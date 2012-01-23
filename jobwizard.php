@@ -41,6 +41,7 @@ require_once("obj/Sms.obj.php");
 require_once("obj/Content.obj.php");
 require_once("inc/reportgeneratorutils.inc.php");
 require_once("obj/MessageGroup.obj.php");
+require_once("obj/FeedCategory.obj.php");
 require_once("obj/MessageGroupSelectMenu.fi.php");
 require_once("obj/ValLists.val.php");
 require_once("obj/ValTimeWindowCallEarly.val.php");
@@ -420,8 +421,19 @@ class FinishJobWizard extends WizFinish {
 			
 			// social media
 			if (JobWiz_socialMedia::isEnabled($postdata,false)) {
-				$messages['post']['facebook']['en']['none']['text'] = $this->parent->dataHelper('/message/post/socialmedia:fbdata');
-				$messages['post']['twitter']['en']['none']['text'] = $this->parent->dataHelper('/message/post/socialmedia:twdata');
+				if ($this->parent->dataHelper('/message/post/socialmedia:fbdata')) {
+					$fbdata = $this->parent->dataHelper('/message/post/socialmedia:fbdata', true);
+					$messages['post']['facebook']['en']['none']['text'] = $fbdata->message;
+				}
+				if ($this->parent->dataHelper('/message/post/socialmedia:twdata')) {
+					$twdata = $this->parent->dataHelper('/message/post/socialmedia:twdata', true);
+					$messages['post']['twitter']['en']['none']['text'] = $twdata->message;
+				}
+				if ($this->parent->dataHelper('/message/post/socialmedia:feeddata')) {
+					$feeddata = $this->parent->dataHelper('/message/post/socialmedia:feeddata', true);
+					$messages['post']['feed']['en']['none']['subject'] = $feeddata->subject;
+					$messages['post']['feed']['en']['none']['text'] = $feeddata->message;
+				}
 			}
 			
 			// #################################################################
