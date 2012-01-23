@@ -47,6 +47,7 @@ function genFeed() {
 		feeddiv.appendChild(feedul);
 		
 		var feeditems = feedxml.getElementsByTagName('item');
+		var feeditemtitle;
 		var feeditemlink;
 		var feeditemmediagroup;
 		var feeditemmedia;
@@ -63,7 +64,12 @@ function genFeed() {
 		var itemdiscription;
 		for (var i = 0; i < feeditems.length; i++) {
 			// get the label for the item
-			itemtitle = document.createTextNode(feeditems[i].getElementsByTagName("title")[0].firstChild.nodeValue);
+			feeditemtitle = feeditems[i].getElementsByTagName("title")[0];
+			if (feeditemtitle.firstChild != null)
+				itemtitle = document.createTextNode(feeditemtitle.firstChild.nodeValue);
+			else
+				itemtitle = document.createTextNode("");
+				
 			// create the description
 			descdiv = document.createElement("div");
 			descdiv.setAttribute("style",vars.desc);
