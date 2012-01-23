@@ -54,7 +54,7 @@ $formdata = array(
 	$jobdetails["name"],
 	"feedcategories" => array(
 		"label" => _L("Feed categories"),
-		"fieldhelp" => _L('Select which categories you wish to include in this feed.'),
+		"fieldhelp" => _L('Select which categories you wish to add the feed message to.'),
 		"value" => (count($currentcategories)?$currentcategories:""),
 		"validators" => array(
 			array("ValInArray", "values" => array_keys($feedcategories))),
