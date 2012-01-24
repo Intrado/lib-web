@@ -328,6 +328,28 @@ class ValUrlComponent extends Validator {
 	}
 }
 
+class ValUrl extends Validator {
+	var $urlregexp = "(http|https)\://[a-zA-Z0-9\-]+\.[a-zA-Z]{2,3}(:[a-zA-Z0-9]*)?/?([a-zA-Z0-9\-\._\'/\\\+&amp;%\$#\=~])*";
+
+	function validate ($value, $args) {
+		if (!preg_match("!^{$this->urlregexp}$!", $value))
+		return "$this->label is not a valid url format";
+
+		return true;
+	}
+
+	function getJSValidator () {
+		return
+		'function (name, label, value, args) {
+			var urlregexp = "^' . addslashes($this->urlregexp) . '$";
+			var reg = new RegExp(urlregexp);
+			if (!reg.test(value))
+				return label + " is not a valid url format";
+			return true;
+		}';
+	}
+}
+	
 ////////////////////////////////////////////////////////////////////////////////
 // Form Data
 ////////////////////////////////////////////////////////////////////////////////
@@ -608,6 +630,7 @@ $formdata["logoclickurl"] = array(
 						"value" => $settings['_logoclickurl'],
 						"validators" => array(
 							array("ValRequired"),
+							array("ValUrl"),
 							array("ValLength","min" => 3,"max" => 50)
 						),
 						"control" => array("TextField","size" => 30, "maxlength" => 51),
@@ -1472,7 +1495,7 @@ document.observe('dom:loaded', function() {
 			checkbox.checked = !confirm("Are you sure you want to DISABLE this customer?");
 	});
 });
-<? Validator::load_validators(array("ValBrandTheme","ValInboundNumber","ValUrlComponent","ValSmsText","ValLanguages"));?>
+<? Validator::load_validators(array("ValBrandTheme","ValInboundNumber","ValUrlComponent","ValSmsText","ValLanguages","ValUrl"));?>
 </script>
 <?
 
