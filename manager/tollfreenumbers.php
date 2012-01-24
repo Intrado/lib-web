@@ -11,6 +11,7 @@ require_once("../obj/Form.obj.php");
 require_once("../obj/FormItem.obj.php");
 require_once("../obj/Phone.obj.php");
 require_once("../inc/formatters.inc.php");
+require_once("../obj/ValMultiplePhones.val.php");
 
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization
@@ -27,44 +28,17 @@ if (!$MANAGERUSER->authorized("tollfreenumbers"))
 ////////////////////////////////////////////////////////////////////////////////
 // Form Items And Validators
 ////////////////////////////////////////////////////////////////////////////////
-class ValMultiplePhones extends Validator {
-	var $onlyserverside = true;
-	function validate ($value, $args) {
-		$numbers = explode(",",$value);
-		if (!is_array($numbers)) {
-			return "invalid format. Please insert a comma seperated list of phone numbers";
-		} 
-		
-		$parsednumbers = array();
-		foreach ($numbers as $number) {
-			if ($err = Phone::validate($number)) {
-				$errmsg = "$this->label contains the invalid phone number: $number. ";
-				foreach ($err as $e) {
-					$errmsg .= $e . " ";
-				}
-				return $errmsg;
-			} else {
-				$parsednumbers[] = Phone::parse($number);
-			}
-		}
-		$existingnumbers = QuickQueryList("select phone from tollfreenumbers where phone in (" . DBParamListString(count($parsednumbers)) . ")",false,false,$parsednumbers);
-		if (count($existingnumbers)) {
-			return "The number(s): " . implode(",",$existingnumbers) . " already exist";
-		}
-		return true;
-	}
-}
 
 ////////////////////////////////////////////////////////////////////////////////
 // Form Data
 ////////////////////////////////////////////////////////////////////////////////
 $helpstepnum = 1;
-$helpsteps = array(_L('Multiple numbers can be added when seperated by comma'));
+$helpsteps = array(_L('Multiple numbers can be added when seperated with new line'));
 
 $formdata["numbers"] = array(
 	"label" => _L('Phone Numbers'),
 	"value" => '',
-	"fieldhelp" => _L('Multiple numbers can be added when seperated by comma'),
+	"fieldhelp" => _L('Multiple numbers can be added when seperated with new line'),
 	"validators" => array(
 		array("ValRequired"),
 		array("ValMultiplePhones")
@@ -97,7 +71,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		Query("BEGIN");
 		
 		//save data here	
- 		$numbers = explode(",",$postdata["numbers"]);
+ 		$numbers = explode("\n",$postdata["numbers"]);
  		
  		$parsednumbers = array();
  		foreach ($numbers as $number) {

@@ -12,6 +12,8 @@ require_once("obj/Form.obj.php");
 require_once("obj/FormItem.obj.php");
 require_once("obj/Phone.obj.php");
 require_once("inc/formatters.inc.php");
+require_once("obj/ValMultiplePhones.val.php");
+
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization
 ////////////////////////////////////////////////////////////////////////////////
@@ -35,42 +37,20 @@ if (isset($_REQUEST["delete"])) {
 // Form Items And Validators
 ////////////////////////////////////////////////////////////////////////////////
 
-class ValMultiplePhones extends Validator {
-	var $onlyserverside = true;
-	function validate ($value, $args) {
-		$numbers = explode("\n",$value);
-		if (!is_array($numbers)) {
-			return "invalid format. Please insert a comma seperated list of phone numbers";
-		} 
-		
-		$parsednumbers = array();
-		foreach ($numbers as $number) {
-			if ($err = Phone::validate($number)) {
-				$errmsg = "$this->label contains the invalid phone number: $number. ";
-				foreach ($err as $e) {
-					$errmsg .= $e . " ";
-				}
-				return $errmsg;
-			} else {
-				$parsednumbers[] = Phone::parse($number);
-			}
-		}
-		return true;
-	}
-}
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // Form Data
 ////////////////////////////////////////////////////////////////////////////////
 $helpstepnum = 1;
-$helpsteps = array(_L('Multiple numbers can be added when seperated by comma'));
+$helpsteps = array(_L('Multiple numbers can be added when seperated with new line'));
 
 $numbers = QuickQueryList("select callerid,callerid from authorizedcallerid",true);
 
 $formdata["addnumbers"] = array(
 	"label" => _L('Manual Add'),
 	"value" => '',
-	"fieldhelp" => _L('Multiple numbers can be added when seperated by comma'),
+	"fieldhelp" => _L('Multiple numbers can be added when seperated with new line'),
 	"validators" => array(
 		array("ValMultiplePhones")
 	),
