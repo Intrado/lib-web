@@ -1640,7 +1640,7 @@ class JobWiz_facebookPage extends WizStep {
 		}
 		
 		// feed content
-		if ($this->messagegroup->hasMessage("post", "feed") && getSystemSetting("_hasfeed") && $USER->autorize("feedpost"))
+		if ($this->messagegroup->hasMessage("post", "feed") && getSystemSetting("_hasfeed") && $USER->authorize("feedpost"))
 			return true;
 		
 		return false;
