@@ -623,7 +623,8 @@ if ($submittedmode || $completedmode) {
 	);
 
 	// post entries
-	if (count($job->getAllJobPosts())) {
+	if ((getSystemSetting("_hasfacebook") && $USER->authorize("facebookpost") && count($job->getJobPosts("facebook"))) || 
+			(getSystemSetting("_hasfeed") && $USER->authorize("feedpost"))) {
 		$formdata[] = _L('Social Media Options');
 		// facebook (readonly)
 		if (count($job->getJobPosts("facebook"))) {
