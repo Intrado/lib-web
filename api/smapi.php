@@ -2432,6 +2432,7 @@ require_once("../obj/Email.obj.php");
 require_once("../obj/Sms.obj.php");
 require_once("../obj/Import.obj.php");
 require_once("../obj/ImportLogEntry.obj.php");
+require_once("../obj/FieldMap.obj.php");
 
 // API Files
 require_once("API_List.obj.php");
