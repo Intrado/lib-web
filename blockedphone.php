@@ -406,7 +406,7 @@ if ($settings["downloadcsv"]) {
 $data = QuickQueryMultiRow($dataquery .  " limit $start, $limit",false,false,$dataqueryargs);
 $total = QuickQuery("select FOUND_ROWS()");
 	
-$PAGE = "system:blocked";
+$PAGE = "system:blocknumbers";
 $TITLE = _L('Systemwide Blocked Phone Numbers');
 
 include_once("nav.inc.php");

@@ -18,7 +18,7 @@ if (!$USER->authorize('blocknumbers')) {
 // Display
 ////////////////////////////////////////////////////////////////////////////////
 
-$PAGE = "system:blocked";
+$PAGE = "system:blocknumbers";
 $TITLE = "Blocked Lists";
 
 require_once("nav.inc.php");
