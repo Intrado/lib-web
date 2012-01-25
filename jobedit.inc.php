@@ -623,8 +623,9 @@ if ($submittedmode || $completedmode) {
 	);
 
 	// post entries
+	$messagegroup = new MessageGroup($job->messagegroupid);
 	if ((getSystemSetting("_hasfacebook") && $USER->authorize("facebookpost") && count($job->getJobPosts("facebook"))) || 
-			(getSystemSetting("_hasfeed") && $USER->authorize("feedpost"))) {
+			(getSystemSetting("_hasfeed") && $USER->authorize("feedpost") && $messagegroup->hasMessage("post","feed"))) {
 		$formdata[] = _L('Social Media Options');
 		// facebook (readonly)
 		if (count($job->getJobPosts("facebook"))) {
@@ -643,8 +644,8 @@ if ($submittedmode || $completedmode) {
 		// TODO: show readonly twitter (probably just a disabled checkbox?
 		
 		// feed
-		// if the user can post to feeds, allow them to choose feed categories
-		if (getSystemSetting("_hasfeed") && $USER->authorize("feedpost")) {
+		// if the user can post to feeds, allow them to choose feed categories (provided the message group has feed)
+		if (getSystemSetting("_hasfeed") && $USER->authorize("feedpost") && $messagegroup->hasMessage("post", "feed")) {
 			$feedcategories = FeedCategory::getAllowedFeedCategories($jobid);
 			
 			$helpsteps[] = _L("If your message group contains a Feed post, this will allow you to select the categories the message will appear in.");
