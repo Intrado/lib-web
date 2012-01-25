@@ -142,6 +142,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 			$nfc->name = $postdata['feedcategoryname-new'];
 			$nfc->description = $postdata['feedcategorydesc-new'];
 			$nfc->create();
+			notice(_L("New category %s created.", $nfc->name));
 		}
 		
 		$categoryids = array();
@@ -164,9 +165,6 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		// appserver to expire feed cache
 		if (count($categoryids) > 0)
 			expireFeedCategories($CUSTOMERURL, $categoryids);
-		
-		if ($button == "newcategory")
-			notice(_L("New category %s created.", $nfc->name));
 		
 		if (substr($button,0,7) == 'delete-' || $button == "newcategory") {
 			if ($ajax)
