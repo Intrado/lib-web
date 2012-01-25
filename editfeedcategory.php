@@ -75,7 +75,11 @@ foreach ($categories as $category) {
 		"label" => _L('Delete'),
 		"value" => "",
 		"validators" => array(),
-		"control" => array("InpageSubmitButton", "submitvalue" => "delete-".$category->id, "name" => _L("Remove %s",$category->name), "icon" => "cross"),
+		"control" => array("InpageSubmitButton",
+			"submitvalue" => "delete-".$category->id, 
+			"name" => _L("Remove %s",$category->name), 
+			"icon" => "cross",
+			"confirm" => _L("Are you sure you want to delete feed category: %s?",$category->name)),
 		"helpstep" => 1
 	);
 }
