@@ -46,7 +46,8 @@ startWindow("Options", 'padding: 3px;');
 				(getSystemSetting('_hasselfsignup', false) && ($USER->authorize('metadata') || $USER->authorize('managesystem'))) ||
 				($USER->authorize('managesystem') && getSystemSetting('_dmmethod', "")!='asp') ||
 				($USER->authorize('manageclassroommessaging') && getSystemSetting('_hastargetedmessage')) ||
-				($USER->authorize('managesystem') && getSystemSetting("_hasfacebook"))) {
+				($USER->authorize('managesystem') && getSystemSetting("_hasfacebook")) ||
+				($USER->authorize('managesystem') && getSystemSetting("_hasfeed"))) {
 ?>
 				<th align="left" class="nosort">Features</th>
 <?
