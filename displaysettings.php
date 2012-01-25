@@ -53,20 +53,6 @@ $formdata["brandtheme"] = array(
 	"helpstep" => $helpstepnum
 );
 
-// system setting 'organizationfieldname'
-$helpsteps[$helpstepnum++] = _L("A display name used on labels and rule selections for the organization field.  A common example is 'School', 'Site' or 'Organization'.");
-$formdata["organizationfieldname"] = array(
-	"label" => _L("Organization Display Name"),
-	"fieldhelp" => _L("Name displayed for your organization field.  May be 'School' or 'Organization' or your preference."),
-	"value" => getSystemSetting('organizationfieldname', 'School'),
-	"validators" => array(
-		array("ValRequired"),
-		array("ValLength","max" => 50)),
-	"control" => array("TextField","size" => 37, "maxlength" => 50),
-	"helpstep" => $helpstepnum
-);
-
-
 $buttons = array(submit_button(_L("Done"),"submit","accept"),
 				icon_button(_L("Cancel"),"cross",null,"settings.php"));
 
@@ -106,9 +92,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 			$_SESSION['colorscheme']['_brandtheme1'] = $COLORSCHEMES[$newTheme->theme]["_brandtheme1"];
 			$_SESSION['colorscheme']['_brandtheme2'] = $COLORSCHEMES[$newTheme->theme]["_brandtheme2"];
 		}
-		
-		setSystemSetting('organizationfieldname', $postdata['organizationfieldname']);
-		
+				
 		if ($ajax) {
 			$form->sendTo("settings.php");
 		} else
