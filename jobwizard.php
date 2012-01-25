@@ -275,6 +275,13 @@ class FinishJobWizard extends WizFinish {
 			$messagegroup = new MessageGroup($this->parent->dataHelper("/message/pickmessage:messagegroup"));
 			// pull post type messages out and keep track of their subtype
 			$jobpostmessage = QuickQueryList("select subtype from message where messagegroupid = ? and type = 'post'", false, false, array($messagegroup->id));
+			// if the user can't post to facebook, twitter or feed, remove any page post types
+			if (!(getSystemSetting("_hasfacebok") && $USER->authorize("facebookpost")) ||
+					!(getSystemSetting("_hastwitter") && $USER->authorize("twitterpost")) ||
+					!(getSystemSetting("_hasfeed") && $USER->authorize("feedpost"))) {
+				unset($jobpostmessage['page']);
+				unset($jobpostmessage['voice']);
+			}
 		// if not, create one
 		} else {
 
@@ -528,8 +535,14 @@ class FinishJobWizard extends WizFinish {
 					}
 					break;
 				case "page":
+					if (!$createdpostpage && (facebookAuthorized($this->parent) || twitterAuthorized($this->parent) || 
+							(getSystemSetting("_hasfeed") && $USER->authorize("feedpost")))) {
+						$createdpostpage = true;
+						$job->updateJobPost("page", "");
+					}
 				case "voice":
-					if (!$createdpostpage && (facebookAuthorized($this->parent) || twitterAuthorized($this->parent))) {
+					if (!$createdpostpage && (facebookAuthorized($this->parent) || twitterAuthorized($this->parent) || 
+							(getSystemSetting("_hasfeed") && $USER->authorize("feedpost")))) {
 						$createdpostpage = true;
 						$job->updateJobPost("page", "");
 					}
