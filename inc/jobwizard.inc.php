@@ -1530,10 +1530,11 @@ class JobWiz_socialMedia extends WizStep {
 			$formdata["fbdata"] = array(
 				"label" => _L('Facebook'),
 				"fieldhelp" => _L("Create your Facebook posting text here."),
-				"value" => ($smEnable?$fbtext:""),
+				"value" => ($smEnable?json_encode(array("message"=>$fbmessage)):""),
 				"validators" => array(
+					array("ValTextAreaWithEnableCheckbox"),
 					array("ValLength","max"=>420)),
-				"control" => array("TextAreaWithEnableCheckbox", "defaultvalue" => $fbtext, "rows"=>10,"cols"=>50,"counter"=>420),
+				"control" => array("TextAreaWithEnableCheckbox", "defaultmessage" => $fbtext, "rows"=>10,"cols"=>50,"counter"=>420),
 				"helpstep" => $helpstepnum++
 			);
 		}
@@ -1546,10 +1547,11 @@ class JobWiz_socialMedia extends WizStep {
 			$formdata["twdata"] = array(
 				"label" => _L("Twitter"),
 				"fieldhelp" => _L("Select what text to use as a status update."),
-				"value" => ($smEnable?$twtext:""),
+				"value" => ($smEnable?json_encode(array("message"=>$twtext)):""),
 				"validators" => array(
+					array("ValTextAreaWithEnableCheckbox"),
 					array("ValLength","max"=>(140 - $reservedchars))),
-				"control" => array("TextAreaWithEnableCheckbox", "defaultvalue" => $twtext, "rows"=>5,"cols"=>50,"counter"=>(140 - $reservedchars)),
+				"control" => array("TextAreaWithEnableCheckbox", "defaultmessage" => $twtext, "rows"=>5,"cols"=>50,"counter"=>(140 - $reservedchars)),
 				"helpstep" => $helpstepnum++
 			
 			);
@@ -1561,12 +1563,13 @@ class JobWiz_socialMedia extends WizStep {
 			$formdata["feeddata"] = array(
 				"label" => _L("Feed Message"),
 				"fieldhelp" => _L("Select what text to include in your feed."),
-				"value" => ($smEnable?$fbtext:""),
+				"value" => ($smEnable?json_encode(array("subject"=>$this->parent->dataHelper('/start:name'),"message"=>$fbmessage)):""),
 				"validators" => array(
+					array("ValTextAreaWithEnableCheckbox","requiresubject" => true),
 					array("ValLength","max"=>32000)),
 				"control" => array("TextAreaWithEnableCheckbox", 
 					"hassubject" => true, "subjectmax" => 50, "subjectsize" => 44, "defaultsubject" => $this->parent->dataHelper('/start:name'),
-					"defaultvalue" => $fbtext, "rows"=>5,"cols"=>50),
+					"defaultmessage" => $fbtext, "rows"=>5,"cols"=>50),
 				"helpstep" => $helpstepnum++
 			
 			);
