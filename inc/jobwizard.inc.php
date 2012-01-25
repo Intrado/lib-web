@@ -757,7 +757,8 @@ class JobWiz_messageType extends WizStep {
 		if (getSystemSetting('_hassms') && $USER->authorize('sendsms'))
 			$values['sms'] = _L("SMS Text");
 		if ((getSystemSetting('_hasfacebook', false) && $USER->authorize('facebookpost')) ||
-				(getSystemSetting('_hastwitter', false) && $USER->authorize('twitterpost')))
+				(getSystemSetting('_hastwitter', false) && $USER->authorize('twitterpost')) ||
+				(getSystemSetting('_hasfeed', false) && $USER->authorize('feedpost')))
 			$values['post'] = _L("Social Media");
 
 		$formdata[] = $this->title;
@@ -1562,7 +1563,7 @@ class JobWiz_socialMedia extends WizStep {
 				"fieldhelp" => _L("Select what text to include in your feed."),
 				"value" => ($smEnable?$fbtext:""),
 				"validators" => array(
-					array("ValLength","max"=>(140 - $reservedchars))),
+					array("ValLength","max"=>32000)),
 				"control" => array("TextAreaWithEnableCheckbox", 
 					"hassubject" => true, "subjectmax" => 50, "subjectsize" => 44, "defaultsubject" => $this->parent->dataHelper('/start:name'),
 					"defaultvalue" => $fbtext, "rows"=>5,"cols"=>50),
@@ -1590,8 +1591,10 @@ class JobWiz_socialMedia extends WizStep {
 	
 	//returns true if this step is enabled
 	function isEnabled($postdata, $step) {
-		
-		if (facebookAuthorized($this->parent) || twitterAuthorized($this->parent)) {
+		global $USER;
+		if (facebookAuthorized($this->parent) ||
+				twitterAuthorized($this->parent) ||
+				(getSystemSetting("_hasfeed") && $USER->authorize("feedpost"))) {
 			// everything but custom enables this step outright
 			if ($this->parent->dataHelper('/start:package') !== "custom")
 				return true;
