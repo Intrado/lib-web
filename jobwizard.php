@@ -465,7 +465,7 @@ class FinishJobWizard extends WizFinish {
 								
 								$message->languagecode = $langcode;
 								
-								if ($type == 'email' || $subtype = 'feed')
+								if ($type == 'email' || ($type == "post" && $subtype == 'feed'))
 									$message->subject = $data["subject"];
 								if ($type == 'email') {
 									$message->fromname = $data["fromname"];
