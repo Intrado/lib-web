@@ -8,7 +8,7 @@
  *  cols - number of columns for the text area to display
  *  enabletext - label to use on the enable/disable checkbox
  *  counter - creates a decrementing counter indicating the maximum text length
- *  defaultvalue - can be used to set a default value to populate the text area
+ *  defaultmessage - can be used to set a default message to populate the text area
  *     useful if your inital value is disabled, but you want to populate on enable
  *  hassubject - require a subject to be entered
  *  subjectmax - max subject length
@@ -42,23 +42,23 @@ class TextAreaWithEnableCheckbox extends FormItem {
 		else
 			$jsvalue = array("subject"=>"","message"=>"");
 		
-		$defaultsubject = (isset($this->args['defaultsubject'])?$this->args['defaultsubject']:$jsvalue["subject"]);
-		$defaultvalue = (isset($this->args['defaultvalue'])?$this->args['defaultvalue']:$jsvalue["message"]);
+		$defaultsubject = isset($this->args['defaultsubject'])?$this->args['defaultsubject']:"";
+		$defaultmessage = isset($this->args['defaultmessage'])?$this->args['defaultmessage']:"";
+		$subject = (isset($jsvalue['subject']) && $jsvalue['subject'])?$jsvalue['subject']:$defaultsubject;
+		$message = (isset($jsvalue['message']) && $jsvalue['message'])?$jsvalue['message']:$defaultmessage;
 		
 		$str = '
 			<input id="'.$n.'" name="'.$n.'" type="hidden" value="'.escapehtml($value).'" />
 			<input id="'.$n.'-enable" name="'.$n.'-enable" type="checkbox" '.($jsvalue["message"]?"checked":"").' /><label for="'.$n.'-enable">'. $enabletext .'</label>
-			<input id="'.$n.'-oldsubject" type="hidden" value="'.escapehtml($defaultsubject).'" />
-			<input id="'.$n.'-oldtext" type="hidden" value="'.escapehtml($defaultvalue).'" />
 			<div id="'.$n.'-textareadiv" style="display:'.($jsvalue["message"]?"block":"none").'">
-				<input id="'.$n.'-subject" style="display:'.($subjectshow?"block":"none").'" type="input" '.$subjectmax.' '.$subjectsize.' value="'.escapehtml($jsvalue["subject"]).'" /><div style="clear:both;"></div>
-				<textarea id="'.$n.'-message" '.$rows.' '.$cols.'>'.escapehtml($jsvalue["message"]).'</textarea>';
+				<input id="'.$n.'-subject" style="display:'.($subjectshow?"block":"none").'" type="input" '.$subjectmax.' '.$subjectsize.' value="'.escapehtml($subject).'" /><div style="clear:both;"></div>
+				<textarea id="'.$n.'-message" '.$rows.' '.$cols.'>'.escapehtml($message).'</textarea>';
 		
 		if(isset($this->args['counter']))
-			$str .= '<div id="' . $n . 'charsleft">'._L('Characters remaining'). ':&nbsp;'. ( $this->args['counter'] - mb_strlen(($jsvalue["message"]?$jsvalue["message"]:$defaultvalue)) ). '</div>';
+			$str .= '<div id="' . $n . 'charsleft">'._L('Characters remaining'). ':&nbsp;'. ( $this->args['counter'] - mb_strlen($message) ). '</div>';
 
 		if ($spellcheck) {
-			$str .= '<div>' . action_link(_L("Spell Check"), "spellcheck", null, '(new spellChecker($(\''.$n.'\')) ).openChecker();') . '</div>';
+			$str .= '<div>' . action_link(_L("Spell Check"), "spellcheck", null, '(new spellChecker($(\''.$n.'-message\')) ).openChecker();') . '</div>';
 		}
 		
 		$str .= '</div>';
@@ -72,17 +72,17 @@ class TextAreaWithEnableCheckbox extends FormItem {
 		$str = '
 			$("'.$n.'-enable").observe("change", textAreaEnable.curry("'.$n.'"));
 		
-			$("'.$n.'-subject").observe("change", textAreaSave.curry("'.$n.'"));
-			$("'.$n.'-subject").observe("blur", textAreaSave.curry("'.$n.'"));
-			$("'.$n.'-subject").observe("keyup", textAreaSave.curry("'.$n.'"));
-			$("'.$n.'-subject").observe("focus", textAreaSave.curry("'.$n.'"));
-			$("'.$n.'-subject").observe("click", textAreaSave.curry("'.$n.'"));
+			$("'.$n.'-subject").observe("change", setSaveTimer.curry("'.$n.'"));
+			$("'.$n.'-subject").observe("blur", setSaveTimer.curry("'.$n.'"));
+			$("'.$n.'-subject").observe("keyup", setSaveTimer.curry("'.$n.'"));
+			$("'.$n.'-subject").observe("focus", setSaveTimer.curry("'.$n.'"));
+			$("'.$n.'-subject").observe("click", setSaveTimer.curry("'.$n.'"));
 				
-			$("'.$n.'-message").observe("change", textAreaSave.curry("'.$n.'"));
-			$("'.$n.'-message").observe("blur", textAreaSave.curry("'.$n.'"));
-			$("'.$n.'-message").observe("keyup", textAreaSave.curry("'.$n.'"));
-			$("'.$n.'-message").observe("focus", textAreaSave.curry("'.$n.'"));
-			$("'.$n.'-message").observe("click", textAreaSave.curry("'.$n.'"));';
+			$("'.$n.'-message").observe("change", setSaveTimer.curry("'.$n.'"));
+			$("'.$n.'-message").observe("blur", setSaveTimer.curry("'.$n.'"));
+			$("'.$n.'-message").observe("keyup", setSaveTimer.curry("'.$n.'"));
+			$("'.$n.'-message").observe("focus", setSaveTimer.curry("'.$n.'"));
+			$("'.$n.'-message").observe("click", setSaveTimer.curry("'.$n.'"));';
 		
 		// if the counter is enabled, observe the keyup event on the text area
 		if(isset($this->args['counter']))
@@ -98,31 +98,41 @@ class TextAreaWithEnableCheckbox extends FormItem {
 			function textAreaEnable(formitem, event) {
 				formitem = $(formitem);
 				var textareadiv = $(formitem.id + "-textareadiv");
-				var hiddensubject = $(formitem.id + "-oldsubject");
-				var hiddentext = $(formitem.id + "-oldtext");
-				var subject = $(formitem.id + "-subject");
-				var message = $(formitem.id + "-message");
 				var checkbox = event.element();
 				
-				if (checkbox.checked) {
+				if (checkbox.checked)
 					textareadiv.show();
-					// copy the data from the hidden field into the text area
-					subject.value = hiddensubject.value;
-					message.value = hiddentext.value;
-					textAreaSave(formitem,event);
-				} else {
-					// save the current text in the hidden field
-					hiddensubject.value = subject.value;
-					hiddentext.value = message.value;
-					formitem.value = "";
+				else
 					textareadiv.hide();
-				}
+				
+				textAreaSave(formitem);
 			}
-			function textAreaSave(formitem, event) {
+			function setSaveTimer(formitem, event) {
 				formitem = $(formitem);
+				var form = event.findElement("form");
+				var formvars = document.formvars[form.name]
+				if (formvars[formitem.id + "_savetimer_"]) {
+					window.clearTimeout(formvars[formitem.id + "_savetimer_"]);
+				}
+				formvars[formitem.id + "_savetimer_"] = window.setTimeout(function () {
+						textAreaSave(formitem);
+					},
+					event.type == "keyup" ? 500 : 100
+				);
+			}
+			
+			function textAreaSave(formitem) {
+				formitem = $(formitem);
+				var checkbox = $(formitem.id + "-enable");
 				var subject = $(formitem.id + "-subject");
 				var message = $(formitem.id + "-message");
-				formitem.value = Object.toJSON({"subject":subject.value,"message":message.value});
+				
+				if (checkbox.checked)
+					formitem.value = Object.toJSON({"subject":subject.value,"message":message.value});
+				else
+					formitem.value = "";
+				
+				form_do_validation(formitem.form, formitem);
 			}
 			</script>';
 		
