@@ -114,9 +114,9 @@ ${productname} es un servicio de notificación usado por los sistemas escolares 
 
 // messagelink english sms
 if ($useSmsMessagelinkInboundnumber) {
-	$appendinbound = " or ${inboundnumber}.";
+	$appendinbound = ' or ${inboundnumber}.';
 } else {
-	$appendinbound = "";
+	$appendinbound = '';
 }
 $templates['messagelink']['en']['sms']['body'] = '${displayname} sent a msg. To listen ${messagelink}' . $appendinbound . '\nFor info txt HELP';
 
