@@ -34,7 +34,7 @@ if (isset($_REQUEST["delete"])) {
 }
 
 if (isset($_REQUEST["info"])) {
-	$limit = 1;//tip has limited size
+	$limit = 15;//tip has limited size
 	
 	$result = Query(
 		"select SQL_CALC_FOUND_ROWS u.login, u.firstname, u.lastname
