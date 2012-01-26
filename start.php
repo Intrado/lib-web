@@ -524,9 +524,9 @@ function activityfeed($mergeditems,$ajax = false) {
 					$types .= $item["sms"] > 0?' <a href="' . $defaultlink . '&redirect=sms"><img src="img/icons/fugue/mobile_phone.png" alt="SMS" title="SMS"></a>':"";
 					$types .= $item["facebook"] > 0?' <a href="' . $defaultlink . '&redirect=facebook"><img src="img/icons/custom/facebook.png" alt="Facebook" title="Facebook"></a>':"";
 					$types .= $item["twitter"] > 0?' <a href="' . $defaultlink . '&redirect=twitter"><img src="img/icons/custom/twitter.png" alt="Twitter" title="Twitter"></a>':"";
+					$types .= $item["feed"] > 0?' <a href="' . $defaultlink . '&redirect=feed"><img src="img/icons/rss.png" alt="Feed" title="Feed"></a>':"";
 					$types .= $item["page"] > 0?' <a href="' . $defaultlink . '&redirect=page"><img src="img/icons/layout_sidebar.png" alt="Page" title="Page"></a>':"";
 					$types .= $item["pagemedia"] > 0?' <a href="' . $defaultlink . '&redirect=voice"><img src="img/nifty_play.png" alt="Page Media" title="Page Media"></a>':"";
-					$types .= $item["feed"] > 0?' <a href="' . $defaultlink . '&redirect=feed"><img src="img/icons/rss.png" alt="Feed" title="Feed"></a>':"";
 					$title = _L('Message %1$s - ',escapehtml($title)) . ($types==""?_L("Empty Message"):$types);
 					$content = '<a href="' . $defaultlink . '" ' . $defaultonclick . '>' . $time .  ' - <b>' .  escapehtml($item["name"]) . "</b>" . ($item["description"] != ""?" - " . escapehtml($item["description"]):"") . '</a>';
 					$icon = 'largeicons/letter.jpg';
