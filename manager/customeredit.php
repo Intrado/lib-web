@@ -770,6 +770,7 @@ $formdata["tinydomain"] = array(
 						"label" => _L('Tiny Domain'),
 						"value" => $settings['tinydomain'],
 						"validators" => array(
+							array("ValRequired"),
 							array("ValInArray", "values" => $tinydomains)
 						),
 						"control" => array("SelectMenu", "values" => array("" =>_L("-- Select a Domain --")) + array_combine($tinydomains, $tinydomains)),
