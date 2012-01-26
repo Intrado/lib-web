@@ -33,12 +33,94 @@ if (isset($_REQUEST["delete"])) {
 	redirect();
 }
 
+if (isset($_REQUEST["info"])) {
+	$limit = 1;//tip has limited size
+	
+	$result = Query(
+		"select SQL_CALC_FOUND_ROWS u.login, u.firstname, u.lastname
+		from user u
+		left join usersetting us on (us.userid = u.id)
+		where us.name='callerid' and us.value=? and u.deleted=0 limit $limit",false,array($_REQUEST["info"]));
+	$total = QuickQuery("select FOUND_ROWS()");
+	
+	if ($total > 0) {
+		echo "<b>CallerID set for Users:</b><br />";
+		while ($row = DBGetRow($result)) {
+			echo "&nbsp;&nbsp;<b>". $row[0] . " - </b> " . $row[1] . " " . $row[2] . "<br />";
+		}
+		if ($total > $limit) {
+			echo _L("* And in %s additional user accounts.<br />", $total-$limit);
+		}
+		echo "<br />";
+	}
+	
+	$result = Query(
+				"select SQL_CALC_FOUND_ROWS u.login, j.name, j.description
+				from job j
+				left join user u on j.userid = u.id
+				left join jobsetting js on (js.jobid = j.id)
+				where js.name='callerid' and js.value=? and j.deleted=0 and u.deleted=0 limit $limit",false,array($_REQUEST["info"]));
+	$total = QuickQuery("select FOUND_ROWS()");
+	if ($total > 0) {
+		echo "<b>CallerID set for Jobs:</b><br />";
+		while ($row = DBGetRow($result)) {
+			echo "&nbsp;&nbsp;<b>" . $row[1] . " - </b> Sent by: " . $row[0];
+		}
+	}
+	if ($total > $limit) {
+		echo _L("* And in %s additional jobs.<br />", $total-$limit);
+	}
+	
+	exit();
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 // Form Items And Validators
 ////////////////////////////////////////////////////////////////////////////////
 
+class MultiImportBox extends FormItem {
+	var $clearonsubmit = true;
+	var $clearvalue = array();
 
+	function render ($value) {
+		$n = $this->form->name."_".$this->name;
+		$style = isset($this->args['height']) ? ('style="height: ' . $this->args['height'] . '; overflow: auto;"') : '';
 
+		$str = '<div id='.$n.' class="radiobox" '.$style.'>';
+		$hoverdata = array();
+		$counter = 1;
+		foreach ($this->args['values'] as $checkvalue => $checkname) {
+			$id = $n.'-'.$counter;
+			$checked = $value == $checkvalue || (is_array($value) && in_array($checkvalue, $value));
+			$str .= '<input id="'.$id.'" name="'.$n.'[]" type="checkbox" value="'.escapehtml($checkvalue).'" '.($checked ? 'checked' : '').' /><label id="'.$id.'-label" for="'.$id.'">'.escapehtml($checkname).'</label><br />';
+			$hoverdata[$id.'-label'] = $checkvalue;
+			$counter++;
+		}
+		$str .= '</div>';
+		$str .= '<script type="text/javascript">
+		document.observe("dom:loaded", function() {
+				var hover = $H(' . json_encode($hoverdata). ');
+				hover.each(function(val) {
+					new Tip(val.key, {
+						ajax: {
+							url: "callerid.php?info=" + val.value,
+							options: {
+								onSuccess: function(response){
+									var result = response.responseJSON;
+									//alert(result);
+								}
+							}
+						}
+						});
+				
+					//alert(val.key);
+				});
+		});
+		</script>';
+
+		return $str;
+	}
+}
 ////////////////////////////////////////////////////////////////////////////////
 // Form Data
 ////////////////////////////////////////////////////////////////////////////////
@@ -86,7 +168,7 @@ if (count($importnumberdata) > 0) {
 		"validators" => array(
 			array("ValInArray", 'values' => array_keys($importnumberdata))
 		),
-		"control" => array("MultiCheckBox", "height" => "125px", "values" => $importnumberdata),
+		"control" => array("MultiImportBox", "height" => "125px", "values" => $importnumberdata),
 		"helpstep" => $helpstepnum
 	);
 } else {
