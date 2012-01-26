@@ -236,27 +236,31 @@ if ($errormsg) {
 		foreach ($row as $mapfrom => $cel) {
 			$cel = trim($cel);
 			
-			//do some basic formatting and validation based on field type
-			$fieldnum = $datamap[$mapfrom];
-			$typechar = substr($fieldnum, 0, 1);
-			if ($typechar == "p") {
-				$phone = Phone::parse($cel);
-				if ($defaultareacode && strlen($phone) == 7)
-					$phone = Phone::parse($defaultareacode . $phone);
-				if (strlen($phone) == 10)
-					$cel = Phone::format($phone);
-				else
-					$cel = "<b>Invalid Phone</b>: $cel";
-			} else if ($typechar == "e") {
-				if (validEmail($cel)) {
-					$cel = escapehtml($cel);
-				} else {
-					$cel = "<b>Invalid Email</b>: " . escapehtml($cel);
-				}
+			//check for unmapped fields
+			if (!isset($datamap[$mapfrom])) {
+				 $cel = "";
 			} else {
-				$cel = escapehtml($cel);
+				//do some basic formatting and validation based on field type
+				$fieldnum = $datamap[$mapfrom];
+				$typechar = substr($fieldnum, 0, 1);
+				if ($typechar == "p") {
+					$phone = Phone::parse($cel);
+					if ($defaultareacode && strlen($phone) == 7)
+						$phone = Phone::parse($defaultareacode . $phone);
+					if (strlen($phone) == 10)
+						$cel = Phone::format($phone);
+					else
+						$cel = "<b>Invalid Phone</b>: $cel";
+				} else if ($typechar == "e") {
+					if (validEmail($cel)) {
+						$cel = escapehtml($cel);
+					} else {
+						$cel = "<b>Invalid Email</b>: " . escapehtml($cel);
+					}
+				} else {
+					$cel = escapehtml($cel);
+				}
 			}
-			
 			echo '<td>' . $cel. '</td>';
 		}
 		echo '</tr>';
