@@ -119,7 +119,7 @@ if($isajax === true) {
 				$actions[] = action_link("View", "fugue/magnifier", 'messagegroupview.php?id=' . $mgid);
 			}
 			if ($messagegroup->hasMessage("post","feed")) {
-				$actions[] = action_link("Post Categories", "pencil", 'editjobfeedcategory.php?postedit&id=' . $jobid);
+				$actions[] = action_link("Feed Categories", "pencil", 'editjobfeedcategory.php?postedit&id=' . $jobid);
 			}
 			$tools = action_links ($actions);
 			
