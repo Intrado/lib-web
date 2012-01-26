@@ -82,6 +82,11 @@ if (isset($_GET['id'])) {
 				if (getSystemSetting('_hastwitter', false) && $USER->authorize('twitterpost') && $message)
 					redirect("editmessagetwitter.php?id=" . $message->id);
 				break;
+			case "feed":
+				$message = $messagegroup->getMessage("post", "feed", "en");
+				if (getSystemSetting('_hasfeed', false) && $USER->authorize('feedpost'))
+				redirect("editmessagefeed.php?id=" . $message->id);
+					break;
 			case "page":
 				$message = $messagegroup->getMessage("post", "page", "en");
 				if ((getSystemSetting('_hasfacebook', false) && $USER->authorize('facebookpost')) || (getSystemSetting('_hastwitter', false) && $USER->authorize('twitterpost')) &&
@@ -93,11 +98,6 @@ if (isset($_GET['id'])) {
 				if ((getSystemSetting('_hasfacebook', false) && $USER->authorize('facebookpost')) || (getSystemSetting('_hastwitter', false) && $USER->authorize('twitterpost')) &&
 					$message)
 					redirect("editmessagepostvoice.php?id=" . $message->id);
-				break;
-			case "feed":
-				$message = $messagegroup->getMessage("post", "feed", "en");
-				if (getSystemSetting('_hasfeed', false) && $USER->authorize('feedpost'))
-					redirect("editmessagefeed.php?id=" . $message->id);
 				break;
 		}
 	}
@@ -392,16 +392,16 @@ function makeMessageGrid($messagegroup) {
 		$columnlabels[] = 'Twitter <a href="editmessagetwitter.php?new&mgid=' .$messagegroup->id . '"><img src="img/icons/add.png" alt="Add" title="Add New Twitter Message" /></a>';
 	}
 	
+	if (getSystemSetting('_hasfeed', false) && $USER->authorize('feedpost')) {
+		$columnlabels[] = 'Feed <a href="editmessagefeed.php?new&mgid=' .$messagegroup->id . '"><img src="img/icons/add.png" alt="Add" title="Add New Feed Message" /></a>';
+	}
+	
 	// Page post items
 	if ((getSystemSetting('_hasfacebook', false) && $USER->authorize('facebookpost')) || 
 			(getSystemSetting('_hastwitter', false) && $USER->authorize('twitterpost')) || 
 			(getSystemSetting('_hasfeed', false) && $USER->authorize('feedpost'))) {
 		$columnlabels[] = 'Page <a href="editmessagepage.php?new&mgid=' .$messagegroup->id . '"><img src="img/icons/add.png" alt="Add" title="Add New Page Message" /></a>';
 		$columnlabels[] = 'Page Media <a href="editmessagepostvoice.php?new&mgid=' .$messagegroup->id . '"><img src="img/icons/add.png" alt="Add" title="Add New Page Media Message" /></a>';
-	}
-	
-	if (getSystemSetting('_hasfeed', false) && $USER->authorize('feedpost')) {
-		$columnlabels[] = 'Feed <a href="editmessagefeed.php?new&mgid=' .$messagegroup->id . '"><img src="img/icons/add.png" alt="Add" title="Add New Feed Message" /></a>';
 	}
 	
 	// set action usr link	
