@@ -619,3 +619,47 @@ function curDate() {
    if (second < 10) { second = "0" + second; }
    return monthname + ' ' + monthday + ', ' + year + " " + hour + ':' + minute + ':' + second + " " + ap;
 }
+
+function sessionKeepAliveWarning(timeout) {
+	setTimeout(function() {
+		var keepalivemodal = new ModalWrapper("Automatic Logout",false,false);
+	
+		var content = new Element('div', {'class': 'keepalive'});
+		content.appendChild(new Element('img', {src:"img/icons/lock.png", alt: "Warning"}));
+		content.appendChild(new Element('span').update("Your session is about to close due to inactivity."));
+		content.appendChild(new Element('p').update(new Element('button')
+			.update("Refresh Session")
+			.observe("click", function() {
+				content.update(new Element('img', {src:"img/ajax-loader.gif", alt: "Refreshing Session"}));
+				new Ajax.Request('ajax.php',{
+					method:'post',
+					parameters:{type: 'keepalive'},
+					onSuccess: function (response) {
+						//HACK: check to see if we hit the login page (due to logout)
+						if (response.responseText.indexOf(" Login</title>") != -1) {
+							content.update();
+							content.appendChild(new Element('img', {src:"img/icons/error.png", alt: "Error"}));
+							content.appendChild(new Element('span')
+								.update("Your session was not refreshed because your session has expired or logged out."));
+						} else {
+							content.update();
+							content.appendChild(new Element('img', {src:"img/icons/accept.png", alt: "OK"}));
+							content.appendChild(new Element('span')
+								.update("Your session was refreshed successfully."));
+							setTimeout(function() {
+								keepalivemodal.modal.close();
+							}, 4000);
+							sessionKeepAliveWarning(timeout);
+						}
+					},
+					onFailure: function () {
+						content.update("An error occured trying to refresh your session.");
+					}
+				});
+			})
+		));
+	
+		keepalivemodal.window_contents.update(content);
+		keepalivemodal.open();
+	}, timeout);
+}

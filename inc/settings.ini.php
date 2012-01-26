@@ -31,6 +31,8 @@ query_trace=true
 has_print=false
 tmp_dir="/tmp"
 log_mobile_api=false
+; session_warning_time (in seconds) should be set less than authservers session expire time
+session_warning_time=1200
 
 ;if not set, warn_earliest is set to "7:00 am"
 ;and warn_latest is set to "9:00 pm"

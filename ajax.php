@@ -448,6 +448,9 @@ function handleRequest() {
 				$result->data["English"]['postfeed'] = $message?$message->id:false;
 			}
 			return $result;
+		case "keepalive":
+			//keeps the users session alive
+			return true;
 		default:
 			error_log("No AJAX API for type=$type");
 			return false;

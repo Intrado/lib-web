@@ -10,6 +10,9 @@ list($MAINTAB,$SUBTAB) = explode(":",$PAGE);
 $FIRSTACTIVETABLINK = "";
 $ACTIVEMAINTABTITLE = "";
 
+$SESSION_WARNING_TIME = isset($SETTINGS['feature']['session_warning_time']) ? 
+	$SETTINGS['feature']['session_warning_time']*1000 : 1200000;
+
 $SHORTCUTS = array();
 
 if (isset($_GET['timer']) || isset($_SESSION['timer'])) {
@@ -206,7 +209,10 @@ header('Content-type: text/html; charset=UTF-8') ;
 	<script src="script/utils.js"></script>
 	<script src="script/sorttable.js"></script>
 	<script src="script/form.js.php" type="text/javascript"></script>
-
+	<script src="script/livepipe/livepipe.js" type="text/javascript"></script>
+	<script src="script/livepipe/window.js" type="text/javascript"></script>
+	<script src="script/modalwrapper.js" type="text/javascript"></script>
+	
 	<link href="css.php?hash=<?=crc32(serialize($_SESSION['colorscheme']))?>" type="text/css" rel="stylesheet" media="screen, print">
 	<link href="css/form.css.php" type="text/css" rel="stylesheet">
 	<link href="css/datepicker.css.php" type="text/css" rel="stylesheet">
@@ -284,6 +290,8 @@ Event.observe(window, 'load', function() {
 		offset: { x: 6, y: 0 },
 		width: 'auto'
 	});
+	
+	sessionKeepAliveWarning(<?=$SESSION_WARNING_TIME?>);
 });
 </script>
 

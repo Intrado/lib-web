@@ -899,6 +899,11 @@ div.autocomplete ul li {
 	cursor: pointer;
 	background:url('img/tinybutton.png') no-repeat right center;
 }
+
+.keepalive img {
+	padding-right: 5px;
+}
+
 <? if ($theme == "classroom") { /* TODO move this to theme based css includes */ ?>
 
 .navmenuspacer {

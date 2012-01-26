@@ -615,10 +615,7 @@ function createactionmenu(id, content,title) {
 }
 
 </script>
-<script src="script/livepipe/livepipe.js" type="text/javascript"></script>
-<script src="script/livepipe/window.js" type="text/javascript"></script>
 <script src="script/niftyplayer.js.php" type="text/javascript"></script>
-<script src="script/modalwrapper.js" type="text/javascript"></script>
 <link href="css/messagegroup.css" type="text/css" rel="stylesheet">
 <?
 PreviewModal::includePreviewScript();
