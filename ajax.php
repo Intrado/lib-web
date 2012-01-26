@@ -387,14 +387,15 @@ function handleRequest() {
 				$result->headers["posttwitter"] = _L("Twitter");
 			}
 			
-			// only add post type if facebook or twitter is available
-			if ($showfacebook || $showtwitter) {
-				$result->headers['postpage'] = _L("Page");
-				$result->headers['postvoice'] = _L("Page Media");
+			$showfeed = getSystemSetting('_hasfeed', false) && $USER->authorize('feedpost');
+			if ($showfeed) {
+				$result->headers['postfeed'] = _L("Feed");
 			}
 			
-			if (getSystemSetting('_hasfeed', false) && $USER->authorize('feedpost')) {
-				$result->headers['postfeed'] = _L("Feed");
+			// only add post type if facebook or twitter is available
+			if ($showfacebook || $showtwitter || $showfeed) {
+				$result->headers['postpage'] = _L("Page");
+				$result->headers['postvoice'] = _L("Page Media");
 			}
 			
 			
@@ -437,15 +438,15 @@ function handleRequest() {
 				$message = $messagegroup->getMessage('post', 'twitter', 'en');
 				$result->data["English"]['posttwitter'] = $message?$message->id:false;
 			}
-			if ($showfacebook || $showtwitter) {
+			if ($showfeed) {
+				$message = $messagegroup->getMessage('post', 'feed', 'en');
+				$result->data["English"]['postfeed'] = $message?$message->id:false;
+			}
+			if ($showfacebook || $showtwitter || $showfeed) {
 				$message = $messagegroup->getMessage('post', 'page', 'en');
 				$result->data["English"]['postpage'] = $message?$message->id:false;
 				$message = $messagegroup->getMessage('post', 'voice', 'en');
 				$result->data["English"]['postvoice'] = $message?$message->id:false;
-			}
-			if (getSystemSetting('_hasfeed', false) && $USER->authorize('feedpost')) {
-				$message = $messagegroup->getMessage('post', 'feed', 'en');
-				$result->data["English"]['postfeed'] = $message?$message->id:false;
 			}
 			return $result;
 		case "keepalive":

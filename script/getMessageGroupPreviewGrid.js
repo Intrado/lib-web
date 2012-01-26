@@ -48,7 +48,7 @@ function getMessageGroupPreviewGrid(mgid, container, jobtypeid,jobid) {
 						var icon = new Element("img", { "src": "img/icons/accept.png" });
 					} else {
 						// sms, fb, tw and page are a special case, we show - instead of an empty bulb
-						if (item.key !== defaultlang && ["smsplain","postfacebook","posttwitter","postpage","postvoice"].indexOf(header.key) != -1)
+						if (item.key !== defaultlang && ["smsplain","postfacebook","posttwitter","postfeed","postpage","postvoice"].indexOf(header.key) != -1)
 							var icon = "-";
 						else
 							var icon = new Element("img", { "src": "img/icons/diagona/16/160.png" });
