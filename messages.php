@@ -119,9 +119,9 @@ if($isajax === true) {
 				sum(m.type='sms') as sms, 
 				sum(m.type='post' and m.subtype='facebook') as facebook, 
 				sum(m.type='post' and m.subtype='twitter') as twitter,
+				sum(m.type='post' and m.subtype='feed') as feed,
 				sum(m.type='post' and m.subtype='page') as page,
 				sum(m.type='post' and m.subtype='voice') as pagemedia,
-				sum(m.type='post' and m.subtype='feed') as feed,
 				p.action as publishaction, p.id as publishid, u.login as owner, (mg.name +0) as digitsfirst
 			from messagegroup mg
 			left join message m on
@@ -159,30 +159,31 @@ if($isajax === true) {
 			$time = date("M j, Y g:i a",strtotime($item["date"]));
 			$itemid = $item["id"];
 			$defaultlink = "mgeditor.php?id=$itemid";
-			$types = $item["phone"] > 0?'<a href="' . $defaultlink . '&redirect=phone"><img src="img/icons/telephone.png" alt="Phone" title="Phone"></a>':"";
-			$types .= $item["email"] > 0?' <a href="' . $defaultlink . '&redirect=email"><img src="img/icons/email.png" alt="Email" title="Email"></a>':"";
-			$types .= $item["sms"] > 0?' <a href="' . $defaultlink . '&redirect=sms"><img src="img/icons/fugue/mobile_phone.png" alt="SMS" title="SMS"></a>':"";
-			$types .= $item["facebook"] > 0?' <a href="' . $defaultlink . '&redirect=facebook"><img src="img/icons/custom/facebook.png" alt="Facebook" title="Facebook"></a>':"";
-			$types .= $item["twitter"] > 0?' <a href="' . $defaultlink . '&redirect=twitter"><img src="img/icons/custom/twitter.png" alt="Twitter" title="Twitter"></a>':"";
-			$types .= $item["page"] > 0?' <a href="' . $defaultlink . '&redirect=page"><img src="img/icons/layout_sidebar.png" alt="Page" title="Page"></a>':"";
-			$types .= $item["pagemedia"] > 0?' <a href="' . $defaultlink . '&redirect=voice"><img src="img/nifty_play.png" alt="Page Media" title="Page Media"></a>':"";
-			$types .= $item["feed"] > 0?' <a href="' . $defaultlink . '&redirect=feed"><img src="img/icons/rss.png" alt="Feed" title="Feed"></a>':"";
-			$title = escapehtml($item["name"]);
-			$publishaction = $item['publishaction'];
-			$publishid = $item['publishid'];
-			
-			$icon = 'img/largeicons/letter.jpg';
-			
+
 			// give the user some text
 			$publishmessage = '';
+			$publishaction = $item['publishaction'];
 			if ($publishaction == 'publish')
-				$publishmessage = _L('Changes to this message are published.');
-			
+			$publishmessage = _L('Changes to this message are published.');
+				
 			// tell the user it's a subscription. change the href to view instead of edit
 			if ($publishaction == 'subscribe') {
 				$publishmessage = _L('You are subscribed to this message. Owner: (%s)', $item['owner']);
 				$defaultlink = "messagegroupview.php?id=$itemid";
 			}
+			
+			$types = $item["phone"] > 0?'<a href="' . $defaultlink . '&redirect=phone"><img src="img/icons/telephone.png" alt="Phone" title="Phone"></a>':"";
+			$types .= $item["email"] > 0?' <a href="' . $defaultlink . '&redirect=email"><img src="img/icons/email.png" alt="Email" title="Email"></a>':"";
+			$types .= $item["sms"] > 0?' <a href="' . $defaultlink . '&redirect=sms"><img src="img/icons/fugue/mobile_phone.png" alt="SMS" title="SMS"></a>':"";
+			$types .= $item["facebook"] > 0?' <a href="' . $defaultlink . '&redirect=facebook"><img src="img/icons/custom/facebook.png" alt="Facebook" title="Facebook"></a>':"";
+			$types .= $item["twitter"] > 0?' <a href="' . $defaultlink . '&redirect=twitter"><img src="img/icons/custom/twitter.png" alt="Twitter" title="Twitter"></a>':"";
+			$types .= $item["feed"] > 0?' <a href="' . $defaultlink . '&redirect=feed"><img src="img/icons/rss.png" alt="Feed" title="Feed"></a>':"";
+			$types .= $item["page"] > 0?' <a href="' . $defaultlink . '&redirect=page"><img src="img/icons/layout_sidebar.png" alt="Page" title="Page"></a>':"";
+			$types .= $item["pagemedia"] > 0?' <a href="' . $defaultlink . '&redirect=voice"><img src="img/nifty_play.png" alt="Page Media" title="Page Media"></a>':"";
+			$title = escapehtml($item["name"]);
+			$publishid = $item['publishid'];
+			
+			$icon = 'img/largeicons/letter.jpg';
 			
 			// Users with published messages or subscribed messages will get a special action item
 			$publishactionlink = "";

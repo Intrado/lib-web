@@ -83,6 +83,39 @@ startWindow(_L('Message Content'));
 	<script type="text/javascript">
 		document.observe('dom:loaded', function() {
 			getMessageGroupPreviewGrid(<?=$messagegroup->id?>, 'preview', null);
+			<?if (isset($_GET['redirect'])) {
+				switch($_GET["redirect"]) {
+					case "phone":
+						$message = $messagegroup->getMessage("phone", "voice", $messagegroup->defaultlanguagecode);
+						break;
+					case "sms":
+						$message = $messagegroup->getMessage("sms", "plain", "en");
+						break;
+					case "email":
+						$message = $messagegroup->getMessage("email", "html", $messagegroup->defaultlanguagecode);
+						if (!$message)
+							$message = $messagegroup->getMessage("email", "plain", $messagegroup->defaultlanguagecode);
+						break;
+					case "facebook":
+						$message = $messagegroup->getMessage("post", "facebook", "en");
+						break;
+					case "twitter":
+						$message = $messagegroup->getMessage("post", "twitter", "en");
+						break;
+					case "feed":
+						$message = $messagegroup->getMessage("post", "feed", "en");
+						break;
+					case "page":
+						$message = $messagegroup->getMessage("post", "page", "en");
+						break;
+					case "voice":
+						$message = $messagegroup->getMessage("post", "voice", "en");
+						break;
+				}
+				if ($message)
+					echo "showPreview(null,'previewid=$message->id')";
+			}
+			?>
 		});
 	</script>
 <?
