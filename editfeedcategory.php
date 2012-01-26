@@ -53,6 +53,7 @@ foreach ($categories as $category) {
 	$formdata[] = _L('Category: %s', $category->name);
 	$formdata["feedcategoryname-".$category->id] = array(
 		"label" => _L('Name'),
+		"fieldhelp" => _L('This is the name of the feed category.'),
 		"value" => $category->name,
 		"validators" => array(
 			array("ValRequired"),
@@ -64,6 +65,7 @@ foreach ($categories as $category) {
 	);
 	$formdata["feedcategorydesc-".$category->id] = array(
 		"label" => _L('Description'),
+		"fieldhelp" => _L('This is a short description, describing the content appropriate to this feed category.'),
 		"value" => $category->description,
 		"validators" => array(
 			array("ValLength","min" => 0,"max" => 255)
@@ -72,7 +74,7 @@ foreach ($categories as $category) {
 		"helpstep" => 1
 	);
 	$formdata["feedcategorydelete-".$category->id] = array(
-		"label" => _L('Delete'),
+		"label" => "",
 		"value" => "",
 		"validators" => array(),
 		"control" => array("InpageSubmitButton",
@@ -86,6 +88,7 @@ foreach ($categories as $category) {
 $formdata[] = _L('New Feed Category');
 $formdata["feedcategoryname-new"] = array(
 	"label" => _L('Name'),
+	"fieldhelp" => _L('This is the name of the feed category.'),
 	"value" => "",
 	"validators" => array(
 		array("ValFeedName", "id" => "new"),
@@ -96,6 +99,7 @@ $formdata["feedcategoryname-new"] = array(
 );
 $formdata["feedcategorydesc-new"] = array(
 	"label" => _L('Description'),
+	"fieldhelp" => _L('This is a short description, describing the content appropriate to this feed category.'),
 	"value" => "",
 	"validators" => array(
 		array("ValLength","min" => 0,"max" => 255)
@@ -105,20 +109,16 @@ $formdata["feedcategorydesc-new"] = array(
 	"helpstep" => 1
 );
 $formdata["feedcategoryadd-new"] = array(
-	"label" => _L('Add'),
+	"label" => "",
 	"value" => "",
 	"validators" => array(),
 	"control" => array("InpageSubmitButton", "submitvalue" => "newcategory", "name" => _L("Add New Category"), "icon" => "add"),
 	"helpstep" => 1
 );
 
-$helpsteps = array (
-	_L('TODO: help me!')
-);
-
 $buttons = array(submit_button(_L('Save'),"submit","tick","settings.php"),
 				icon_button(_L('Cancel'),"cross",null,"settings.php"));
-$form = new Form("templateform",$formdata,$helpsteps,$buttons);
+$form = new Form("editfeedcategory",$formdata,null,$buttons);
 
 ////////////////////////////////////////////////////////////////////////////////
 // Form Data Handling
