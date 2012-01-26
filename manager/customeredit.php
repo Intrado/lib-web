@@ -873,8 +873,6 @@ $formdata["smscustomername"] = array(
 );
 $formdata["shortcodegroupname"] = array(
 						"label" => _L("Shortcode Group"),
-						"value" => $shortcodegroupname,
-						"validators" => array(),
 						"control" => array("FormHtml","html"=>"<div>".$shortcodegroupname."</div>"),
 						"helpstep" => $helpstepnum
 );
