@@ -519,6 +519,28 @@ function makeMessageGrid($messagegroup) {
 				$linkrow[] = false;
 			}
 		}
+		
+		// Feed actions
+		if (getSystemSetting('_hasfeed', false) && $USER->authorize('feedpost')) {
+			if ($languagecode == Language::getDefaultLanguageCode()) {
+				$actions = array();
+				$message = $messagegroup->getMessage('post', 'feed', $languagecode);
+		
+				if ($message) {
+					$icon = "accept";
+					$actions[] = action_link("Preview","rss",null,"showPreview(null,\'previewid=$message->id\');return false;");
+					$actions[] = action_link("Edit","pencil","editmessagefeed.php?id=$message->id");
+					$actions[] = action_link("Delete","cross","mgeditor.php?delete=$message->id","return confirmDelete();");
+				} else {
+					$icon = "diagona/16/160";
+					$actions[] = action_link("New","pencil_add","editmessagefeed.php?id=new&mgid=".$messagegroup->id);
+				}
+				$linkrow[] = array('icon' => $icon,'title' => _L("%s Feed Message",$languagename), 'actions' => $actions);
+			} else {
+				$linkrow[] = false;
+			}
+		}
+		
 		// Page/Voice posting is allowed if twitter, facebook or feed are allowed, currently
 		if ((getSystemSetting('_hasfacebook', false) && $USER->authorize('facebookpost')) ||
 				(getSystemSetting('_hastwitter', false) && $USER->authorize('twitterpost')) ||
@@ -560,26 +582,7 @@ function makeMessageGrid($messagegroup) {
 			}
 		}
 		
-		// Feed actions
-		if (getSystemSetting('_hasfeed', false) && $USER->authorize('feedpost')) {
-			if ($languagecode == Language::getDefaultLanguageCode()) {
-				$actions = array();
-				$message = $messagegroup->getMessage('post', 'feed', $languagecode);
-				
-				if ($message) {
-					$icon = "accept";
-					$actions[] = action_link("Preview","rss",null,"showPreview(null,\'previewid=$message->id\');return false;");
-					$actions[] = action_link("Edit","pencil","editmessagefeed.php?id=$message->id");
-					$actions[] = action_link("Delete","cross","mgeditor.php?delete=$message->id","return confirmDelete();");
-				} else {
-					$icon = "diagona/16/160";
-					$actions[] = action_link("New","pencil_add","editmessagefeed.php?id=new&mgid=".$messagegroup->id);
-				}
-				$linkrow[] = array('icon' => $icon,'title' => _L("%s Feed Message",$languagename), 'actions' => $actions);
-			} else {
-				$linkrow[] = false;
-			}
-		}
+
 		$links[] = $linkrow;
 	}
 	
