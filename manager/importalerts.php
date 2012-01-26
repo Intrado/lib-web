@@ -5,6 +5,7 @@ require_once("../inc/formatters.inc.php");
 require_once("../inc/form.inc.php");
 require_once("../inc/table.inc.php");
 require_once("inc/importalert.inc.php");
+require_once("../inc/memcache.inc.php");
 
 if (!$MANAGERUSER->authorized("imports"))
 	exit("Not Authorized");
@@ -41,6 +42,15 @@ if(isset($_REQUEST["acknowledge"])) {
 // Data Handling
 ////////////////////////////////////////////////////////////////////////////////
 
+function customerTimezone($customerid){
+	$query = "select c.id, s.dbhost, c.dbusername, c.dbpassword, c.urlcomponent from customer c inner join shard s on (c.shardid = s.id) where c.id=?";
+	$custinfo = QuickQueryRow($query,true,false,array($customerid));
+	$custdb = DBConnect($custinfo["dbhost"], $custinfo["dbusername"], $custinfo["dbpassword"], "c_{$custinfo["id"]}");
+	if (!$custdb) {
+		exit("Connection failed for customer: {$custinfo["dbhost"]}, db: c_{$custinfo["id"]}");
+	}
+	return getCustomerSystemSetting("timezone","",true,$custdb);
+}
 
 $shardresult = Query("select id, dbhost, dbusername, dbpassword from shard order by id");
 
@@ -84,6 +94,7 @@ $titles = array(
 if ($displaysetting == "unconfigured") {
 	unset($titles["importname"]);
 	unset($titles["notified"]);
+	unset($titles["timezone"]);
 }
 
 $formatters = array(
@@ -116,7 +127,8 @@ function fmt_alert($row, $index){
 }
 
 function fmt_timezone($row, $index){
-	return "Customer Timezone";
+	// 14400 seconds = 4 hours
+	return gen2cache(14400,null,null,'customerTimezone',$row["customerid"]);
 }
 
 function fmt_actions($row, $index){
