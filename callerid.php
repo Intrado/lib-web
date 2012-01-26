@@ -142,11 +142,11 @@ $formdata["addnumbers"] = array(
 
 
 if (count($numbers)) {
-	$usedjobnumbers = QuickQueryList("select value from jobsetting where name='callerid' and value not in (" . repeatWithSeparator("?",",",count($numbers)) .") group by value ",false,false,array_keys($numbers));
-	$usedusernumbers = QuickQueryList("select value from usersetting where name='callerid' and value not in (" . repeatWithSeparator("?",",",count($numbers)) .") group by value ",false,false,array_keys($numbers));
+	$usedjobnumbers = QuickQueryList("select value from jobsetting where name='callerid' and value not in (" . repeatWithSeparator("?",",",count($numbers)) .") and value != '' group by value ",false,false,array_keys($numbers));
+	$usedusernumbers = QuickQueryList("select value from usersetting where name='callerid' and value not in (" . repeatWithSeparator("?",",",count($numbers)) .") and value != '' group by value ",false,false,array_keys($numbers));
 } else {
-	$usedjobnumbers = QuickQueryList("select value from jobsetting where name='callerid'");
-	$usedusernumbers = QuickQueryList("select value from usersetting where name='callerid'");
+	$usedjobnumbers = QuickQueryList("select value from jobsetting where name='callerid' and value != ''");
+	$usedusernumbers = QuickQueryList("select value from usersetting where name='callerid' and value != ''");
 }
 $usednumbers = array_unique(array_merge($usedjobnumbers,$usedusernumbers));
 
@@ -215,7 +215,8 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		
 		if (isset($postdata["importnumbers"])) {
 			foreach ($postdata["importnumbers"] as $importnumber) {
-				$parsednumbers[$importnumber] = true;
+				if ($importnumber != "" && !in_array($importnumber, $numbers))
+					$parsednumbers[$importnumber] = true;
 			}
 		}
 		
