@@ -44,10 +44,11 @@ if (isset($_REQUEST["info"])) {
 	$total = QuickQuery("select FOUND_ROWS()");
 	
 	if ($total > 0) {
-		echo "<b>CallerID set for Users:</b><br />";
+		echo "<b>CallerID set for Users:</b><br /><div style='white-space: nowrap;'>";
 		while ($row = DBGetRow($result)) {
 			echo "&nbsp;&nbsp;<b>". $row[0] . " - </b> " . $row[1] . " " . $row[2] . "<br />";
 		}
+		echo "</div>";
 		if ($total > $limit) {
 			echo _L("* And in %s additional user accounts.<br />", $total-$limit);
 		}
@@ -62,10 +63,11 @@ if (isset($_REQUEST["info"])) {
 				where js.name='callerid' and js.value=? and j.deleted=0 and u.deleted=0 limit $limit",false,array($_REQUEST["info"]));
 	$total = QuickQuery("select FOUND_ROWS()");
 	if ($total > 0) {
-		echo "<b>CallerID set for Jobs:</b><br />";
+		echo "<b>CallerID set for Jobs:</b><br /><div style='white-space: nowrap;'>";
 		while ($row = DBGetRow($result)) {
-			echo "&nbsp;&nbsp;<b>" . $row[1] . " - </b> Sent by: " . $row[0];
+			echo "&nbsp;&nbsp;<b>" . $row[1] . " - </b> Sent by: " . $row[0] . "<br />";
 		}
+		echo "</div>";
 	}
 	if ($total > $limit) {
 		echo _L("* And in %s additional jobs.<br />", $total-$limit);
@@ -103,14 +105,16 @@ class MultiImportBox extends FormItem {
 				hover.each(function(val) {
 					new Tip(val.key, {
 						ajax: {
-							url: "callerid.php?info=" + val.value,
-							options: {
-								onSuccess: function(response){
-									var result = response.responseJSON;
-									//alert(result);
-								}
-							}
-						}
+							url: "callerid.php?info=" + val.value
+						},
+						style: \'protogrey\',
+						radius: 4,
+						border: 4,
+						hideOn: false,
+						hideAfter: 0.5,
+						stem: \'leftMiddle\',
+						hook: { tip: \'leftMiddle\', mouse: true },
+						width: \'auto\'
 						});
 				
 					//alert(val.key);
