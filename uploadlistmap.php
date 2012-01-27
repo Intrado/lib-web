@@ -147,24 +147,9 @@ if ($datauri && !CheckFormSubmit($f,'save')) {
 			//skip duplicate or blank lines (can be created by excel)
 			if ($lastrow == $row || (count($row) == 1 && $row[0] == ""))
 				continue;
-				
-			//TODO use maptop data and parse email/phone as appropriate. lang??
-//			
-//			for ($x = 0; $x < 4; $x++)
-//				$row[$x] = (isset($row[$x]) ? $row[$x] : null);
-//			$phone = Phone::parse($row[2]);
-//			if ($defaultareacode && strlen($phone) == 7)
-//				$phone = Phone::parse($defaultareacode . $phone);
-//			$errors = Phone::validate($phone);
-//			$phone = count($errors) == 0 ? Phone::format($phone) : implode(". ",$errors);
-//			$email = $row[3] && !validEmail(trim($row[3])) ? "Invalid" : trim($row[3]);
-//			
+
 			$listpreviewdata[] = $row;
-			
-			
-			
 			$colcount = max($colcount,count($row));
-			
 			$lastrow = $row;
 		}
 		fclose($fp);
