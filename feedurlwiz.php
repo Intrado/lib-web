@@ -128,13 +128,13 @@ class FeedUrlWiz_feedurl extends WizStep {
 		$formdata = array(
 			_L('Feed URL'),
 			"helptext" => array(
-					"label" => _L('URL'),
-					"control" => array("FormHtml", "html" => _L('
-						<p>Use and share this URL with anyone who wishes to follow the feed selections on the previous page. If this is all you need, feel free to cancel now.</p>
-						<input type="text" readonly value="'.escapehtml($feedurl).'" style="background-color:#ffffff;cursor:text;width:99%;"/>
-						<p>If you wish to generate a feed widget to include in a web page, click on the Next button.</p>')),
-					"helpstep" => 1
-				),
+				"label" => _L('URL'),
+				"control" => array("FormHtml", "html" => _L('
+					<p>Use and share this URL with anyone who wishes to follow the feed selections on the previous page. If this is all you need, feel free to cancel now.</p>
+					<input type="text" readonly value="'.escapehtml(($usessl?$sslfeedurl:$feedurl)).'" style="background-color:#ffffff;cursor:text;width:99%;"/>
+					<p>If you wish to generate a feed widget to include in a web page, click on the Next button.</p>')),
+				"helpstep" => 1
+			),
 			"feedurl" => array(
 				"value" => $feedurl,
 				"control" => array("HiddenField")
@@ -263,6 +263,14 @@ class FeedUrlWiz_feedwidgetstyle extends WizStep {
 				"helpstep" => 1
 			),
 			_L('Header'),
+			"showheader" => array(
+				"label" => _L('Display Header'),
+				"fieldhelp" => _L('Enable/disable the main feed header.'),
+				"value" => true,
+				"validators" => array(),
+				"control" => array("CheckBox"),
+				"helpstep" => 2
+			),
 			"headersize" => array(
 				"label" => _L('Text size'),
 				"fieldhelp" => _L('Size of the font used when displaying the header.'),
@@ -478,7 +486,7 @@ function getFeedJsVars() {
 	// default feed variables
 	$vars = array(
 		"iframe" => '<iframe height=$IFRAMEHEIGHT width=$IFRAMEWIDTH frameborder=0 marginwidth=0 marginheight=0 src="$TINYURL/feedwidget.html?feedurl=$SMFEEDURL&head=$SMWIDGETHEAD&list=$SMWIDGETLIST&box=$SMWIDGETBOX&desc=$SMWIDGETDESC&audio=$SMWIDGETAUDIO"></iframe>',
-		"head" => 'color:$TITLECOLOR;font-size:$HEADERSIZE;padding-left:4px;',
+		"head" => 'display:$SHOWHEADER;color:$TITLECOLOR;font-size:$HEADERSIZE;padding-left:4px;',
 		"list" => 'list-style:$LISTSTYLE $LISTPOSITION;$LISTPADDING;color:$LABELCOLOR;font-size:$LABELSIZE;',
 		"box" => '$FONTFAMILYborder:$BORDERSIZE $BORDERSTYLE $BORDERCOLOR;height:$BOXHEIGHT;overflow:auto;',
 		"desc" => 'color:$DESCRIPTIONCOLOR;font-size:$DESCRIPTIONSIZE;padding-left:$DESCRIPTIONPADDING;padding-bottom:$DESCRIPTIONBOTTOMPADDING;',
@@ -506,6 +514,7 @@ function getFeedJsVars() {
 	$vars = str_replace('$BORDERSIZE', $postdata["bordersize"]."px", $vars);
 	$vars = str_replace('$BORDERCOLOR', "#".$postdata["bordercolor"], $vars);
 	$vars = str_replace('$BOXHEIGHT', ($postdata["iframeheight"]-($postdata["bordersize"]*2))."px", $vars);
+	$vars = str_replace('$SHOWHEADER', ($postdata["showheader"]?"block":"none"), $vars);
 	$vars = str_replace('$HEADERSIZE', $postdata["headersize"]."px", $vars);
 	$vars = str_replace('$LISTSTYLE', $postdata["liststyle"], $vars);
 	$vars = str_replace('$LISTPOSITION', $postdata["listposition"], $vars);
