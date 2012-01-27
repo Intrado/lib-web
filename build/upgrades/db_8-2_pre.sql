@@ -89,11 +89,10 @@ $$$
 -- create monitor template, and any missing templates from pre 7.8
 
 -- $rev 10
+-- woops, remove job index startdate transform to startdate,starttime instead we use activedate in rev11
 
-ALTER TABLE `job` DROP INDEX `startdate`
-$$$
+-- $rev 11
 
 -- index for feed generator
-ALTER TABLE `job` ADD INDEX `startdate` ( `startdate` , `starttime` ) 
+ALTER TABLE `job` ADD INDEX `activedate` ( `activedate` ) 
 $$$
-

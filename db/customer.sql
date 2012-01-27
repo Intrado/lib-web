@@ -1839,13 +1839,18 @@ $$$
 
 -- START 8.2/10
 
-ALTER TABLE `job` DROP INDEX `startdate`
-$$$
-
--- index for feed generator
-ALTER TABLE `job` ADD INDEX `startdate` ( `startdate` , `starttime` ) 
-$$$
+-- woops, remove job index startdate transform to startdate,starttime instead we use activedate in rev11
 
 update setting set value='8.2/10' where name='_dbversion'
 $$$
 -- END 8.2/10
+
+-- START 8.2/11
+
+-- index for feed generator
+ALTER TABLE `job` ADD INDEX `activedate` ( `activedate` ) 
+$$$
+
+update setting set value='8.2/11' where name='_dbversion'
+$$$
+-- END 8.2/11

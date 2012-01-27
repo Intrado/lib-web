@@ -51,6 +51,26 @@ function upgrade_8_2 ($rev, $shardid, $customerid, $db) {
 			echo "|";
 			apply_sql("upgrades/db_8-2_pre.sql", $customerid, $db, 10);
 					
+		case 10:
+			echo "|";
+					
+			// set global to customer db, restore after this section
+			global $_dbcon;
+			$savedbcon = $_dbcon;
+			$_dbcon = $db;
+			// if job index startdate is not a single column, drop and recreate
+			// correcting mistake made in 8.2/10
+			$query = "select max(seq_in_index) from information_schema.STATISTICS where  table_name = 'job' and index_name = 'startdate'";
+			if (1 != QuickQuery($query)) {
+				$query = "ALTER TABLE `job` DROP INDEX `startdate`";
+				QuickUpdate($query);
+				$query = "ALTER TABLE `job` ADD INDEX `startdate` ( `startdate` )";
+				QuickUpdate($query);
+			}
+			// restore global db connection
+			$_dbcon = $savedbcon;
+			apply_sql("upgrades/db_8-2_pre.sql", $customerid, $db, 11);
+				
 	}
 
 	// SM admin
