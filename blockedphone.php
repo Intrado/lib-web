@@ -112,7 +112,7 @@ $_SESSION['blockedphoneoptions'] = json_encode($settings);
 
 
 $helpstepnum = 1;
-$helpsteps = array("TODO");
+$helpsteps = array("Phone numbers entered into this form will not be contacted by the system. You can select whether to block calls and/or SMS messages.");
 $formdata = array();
 
 if(getSystemSetting("_hassms", false)){
@@ -123,6 +123,7 @@ if(getSystemSetting("_hassms", false)){
 $formdata["type"] = array(
 	"label" => _L('Block Type'),
 	"value" => '',
+	"fieldhelp" => _L("Select which types of messages should be blocked for the phone number."),
 	"validators" => array(
 		array("ValRequired"),
 		array("ValInArray", "values" => array_keys($types))
@@ -133,6 +134,7 @@ $formdata["type"] = array(
 $formdata["phone"] = array(
 	"label" => _L('Phone'),
 	"value" => '',
+	"fieldhelp" => _L("Enter the phone number that you would like to block."),
 	"validators" => array(
 		array("ValRequired"),
 		array("ValPhone"),
@@ -146,6 +148,7 @@ $formdata["phone"] = array(
 $formdata["reason"] = array(
 	"label" => _L('Reason'),
 	"value" => '',
+	"fieldhelp" => _L("Enter a reason for blocking the phone number."),
 	"validators" => array(
 		array("ValRequired"),
 		array("ValLength","max" => 200)

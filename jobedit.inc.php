@@ -819,11 +819,11 @@ if ($submittedmode || $completedmode) {
 		$currentfeedcategories = QuickQueryList("select destination from jobpost where type = 'feed' and jobid = ?", false, false, array($jobid));
 		$feedcategories = FeedCategory::getAllowedFeedCategories($jobid);
 		
-		$helpsteps[] = _L("If your message group contains a Feed post, this will allow you to select the categories the message will appear in.");
+		$helpsteps[] = _L("If your message contains an RSS feed component, select which category best describes the content of your RSS feed message part.");
 		
 		$formdata["feedcategories"] = array(
 			"label" => _L("Feed categories"),
-			"fieldhelp" => _L('Select which categories you wish to include in this feed.'),
+			"fieldhelp" => _L("Select the most appropriate category for the RSS feed component of your message."),
 			"value" => (count($currentfeedcategories)?$currentfeedcategories:""),
 			"validators" => array(
 				array("ValInArray", "values" => array_keys($feedcategories))),

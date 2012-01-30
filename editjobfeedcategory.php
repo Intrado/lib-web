@@ -54,7 +54,7 @@ $formdata = array(
 	$jobdetails["name"],
 	"feedcategories" => array(
 		"label" => _L("Feed categories"),
-		"fieldhelp" => _L('Select which categories you wish to add the feed message to.'),
+		"fieldhelp" => _L('Select the most appropriate category for the RSS feed component of your message.'),
 		"value" => (count($currentcategories)?$currentcategories:""),
 		"validators" => array(
 			array("ValInArray", "values" => array_keys($feedcategories))),
@@ -64,7 +64,7 @@ $formdata = array(
 );
 
 $helpsteps = array (
-	_L('TODO: help me!')
+	_L('Select the most appropriate category for your RSS feed message.')
 );
 
 $buttons = array(submit_button(_L('Save'),"submit","tick"),

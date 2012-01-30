@@ -106,13 +106,14 @@ $_SESSION['blockedemailoptions'] = json_encode($settings);
 
 
 $helpstepnum = 1;
-$helpsteps = array("TODO");
+$helpsteps = array("The system will not contact email addresses entered into this form.");
 $formdata = array();
 
 
 $formdata["email"] = array(
 	"label" => _L('Email'),
 	"value" => '',
+	"fieldhelp" => _L("Enter the email address that should not be contacted by the system."),
 	"validators" => array(
 		array("ValRequired"),
 		array("ValLength","max" => 200),
@@ -125,6 +126,7 @@ $formdata["email"] = array(
 $formdata["reason"] = array(
 	"label" => _L('Reason'),
 	"value" => '',
+	"fieldhelp" => _L("Enter the reason for blocking the address."),
 	"validators" => array(
 		array("ValRequired"),
 		array("ValLength","max" => 200)
