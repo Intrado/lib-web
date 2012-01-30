@@ -421,11 +421,11 @@ class FinishFeedUrlWiz extends WizFinish {
 				<input type="text" readonly value="'.escapehtml($this->parent->dataHelper("/feedurl:feedurl")).'" style="background-color:#ffffff;cursor:text;width:99%;"/>
 			</li>
 			<li style="padding-bottom:8px;list-style-type:none;">
-				<div style="font-size:14px;color:black;">'._L("<p><b>Widget</b></p><p>The generated widget is a javascript snippet which can be pasted into your web page. It will automatically display the content of this RSS feed. Simply copy and paste it into your document wherever you wish the feed to be displayed.").'</div>
+				<div style="font-size:14px;color:black;">'._L("<p><b>Widget</b></p><p>The generated widget is a javascript snippet which can be pasted into your web page. It will automatically display the content of this RSS feed. Simply copy and paste it into your web page at the location where the feed should be displayed.").'</div>
 				<textarea readonly wrap="off" spellcheck="false" style="background-color:#ffffff;cursor:text;width:99%;height:15em;">'.escapehtml(getFeedWidgetJs()).'</textarea>
 			</li>
 			<li style="padding-bottom:8px;list-style-type:none;">
-				<div style="font-size:14px;color:black;">'._L("<b>NOTE:</b> The URL and widget are <i>not</i> saved anywhere. Please copy and paste them or regenerate them when they are needed.").'</div>
+				<div style="font-size:14px;color:black;">'._L("<b>NOTE:</b> The URL and widget are <i>not</i> saved after you leave this page. Please copy and paste them or regenerate them when they are needed.").'</div>
 			</li>
 		</ul>';
 		
