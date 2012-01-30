@@ -417,15 +417,15 @@ class FinishFeedUrlWiz extends WizFinish {
 		<h2 style="padding:8px;color:#'.$_SESSION['colorscheme']['_brandprimary'].';">'._L("Your feed selections are complete!").'</h2>
 		<ul style="color:#'.$_SESSION['colorscheme']['_brandprimary'].';">
 			<li style="padding-bottom:8px;list-style-type:none;">
-				<div style="font-size:14px;color:black;">'._L("<p>The URL should be used to subscribe to the RSS feed using an RSS reader application. It should be distributed to potential subscribers to this feed.</p>").'</div>
+				<div style="font-size:14px;color:black;">'._L("<p><b>Feed URL</b></p><p>The URL should be used to subscribe to the RSS feed using an RSS reader application. It should be distributed to potential subscribers to this feed.</p>").'</div>
 				<input type="text" readonly value="'.escapehtml($this->parent->dataHelper("/feedurl:feedurl")).'" style="background-color:#ffffff;cursor:text;width:99%;"/>
 			</li>
 			<li style="padding-bottom:8px;list-style-type:none;">
-				<div style="font-size:14px;color:black;">'._L("<p>The generated widget is a javascript snippet which can be pasted into your web page. It will automatically display the content of this RSS feed. Simply copy and paste it into your document wherever you wish the feed to be displayed.").'</div>
+				<div style="font-size:14px;color:black;">'._L("<p><b>Widget</b></p><p>The generated widget is a javascript snippet which can be pasted into your web page. It will automatically display the content of this RSS feed. Simply copy and paste it into your document wherever you wish the feed to be displayed.").'</div>
 				<textarea readonly wrap="off" spellcheck="false" style="background-color:#ffffff;cursor:text;width:99%;height:15em;">'.escapehtml(getFeedWidgetJs()).'</textarea>
 			</li>
 			<li style="padding-bottom:8px;list-style-type:none;">
-				<div style="font-size:14px;color:black;">'._L("<b>NOTE:</b> Above information is <i>not</i> saved anywhere. Please copy/paste it, or come back and re-generate it when it is needed.").'</div>
+				<div style="font-size:14px;color:black;">'._L("<b>NOTE:</b> The URL and widget are <i>not</i> saved anywhere. Please copy and paste them or regenerate them when they are needed.").'</div>
 			</li>
 		</ul>';
 		
