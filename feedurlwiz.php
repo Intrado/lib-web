@@ -140,7 +140,7 @@ class FeedUrlWiz_feedurl extends WizStep {
 			)
 		);
 
-		$helpsteps = array(_L("<p>The Feed URL needs to be distributed to anyone who may subscribe to this feed so they can enter it into their RSS reader.</p><p>If you would also like to generate a widget you can cut and paste into a web page, click Next. If you only needed a URL, click Cancel.</p>"));
+		$helpsteps = array(_L("<p>The Feed URL needs to be distributed to anyone who may subscribe to this feed so they can enter it into their RSS reader.</p><p>If you would also like to generate a widget that you can cut and paste into a web page, click Next. If you only needed a URL, click Cancel.</p>"));
 
 		return new Form("feedurlwiz-feedurl",$formdata,$helpsteps);
 	}
@@ -416,16 +416,16 @@ class FinishFeedUrlWiz extends WizFinish {
 		$html = '
 		<h2 style="padding:8px;color:#'.$_SESSION['colorscheme']['_brandprimary'].';">'._L("Your feed selections are complete!").'</h2>
 		<ul style="color:#'.$_SESSION['colorscheme']['_brandprimary'].';">
-			<li style="padding-bottom:8px;">
+			<li style="padding-bottom:8px;list-style-type:none;">
 				<div style="font-size:14px;color:black;">'._L("<p>The URL should be used to subscribe to the RSS feed using an RSS reader application. It should be distributed to potential subscribers to this feed.</p>").'</div>
 				<input type="text" readonly value="'.escapehtml($this->parent->dataHelper("/feedurl:feedurl")).'" style="background-color:#ffffff;cursor:text;width:99%;"/>
 			</li>
-			<li style="padding-bottom:8px;">
+			<li style="padding-bottom:8px;list-style-type:none;">
 				<div style="font-size:14px;color:black;">'._L("<p>The generated widget is a javascript snippet which can be pasted into your web page. It will automatically display the content of this RSS feed. Simply copy and paste it into your document wherever you wish the feed to be displayed.").'</div>
 				<textarea readonly wrap="off" spellcheck="false" style="background-color:#ffffff;cursor:text;width:99%;height:15em;">'.escapehtml(getFeedWidgetJs()).'</textarea>
 			</li>
-			<li style="padding-bottom:8px;">
-				<div style="color:#000000">NOTE: Above information is not saved anywhere. Please copy/paste it, or come back and re-generate it when it is needed.</div>
+			<li style="padding-bottom:8px;list-style-type:none;">
+				<div style="font-size:14px;color:black;">'._L("<b>NOTE:</b> Above information is <i>not</i> saved anywhere. Please copy/paste it, or come back and re-generate it when it is needed.").'</div>
 			</li>
 		</ul>';
 		
