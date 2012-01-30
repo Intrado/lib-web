@@ -1679,14 +1679,14 @@ class JobWiz_facebookPage extends WizStep {
 			$formdata[] = _L("Feed Category");
 			$formdata["feedcategories"] = array(
 				"label" => _L("Feed categories"),
-				"fieldhelp" => _L('Select which categories you wish to add the feed message to.'),
+				"fieldhelp" => _L('Select the category for the RSS feed message component.'),
 				"value" => "",
 				"validators" => array(
 					array("ValRequired"),
 					array("ValInArray", "values" => array_keys($feedcategories))),
 				"control" => array("MultiCheckBox", "values"=>$feedcategories, "hover" => FeedCategory::getFeedDescriptions()),
 				"helpstep" => $helpstepsnum);
-			$helpsteps = array(_L("TODO: help"));
+			$helpsteps = array(_L("Select the appropriate category for the RSS feed component of your message."));
 		}
 		
 		return new Form("facebookPage",$formdata,$helpsteps);
