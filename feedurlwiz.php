@@ -417,7 +417,7 @@ class FinishFeedUrlWiz extends WizFinish {
 		<h2 style="padding:8px;color:#'.$_SESSION['colorscheme']['_brandprimary'].';">'._L("Your feed selections are complete!").'</h2>
 		<ul style="color:#'.$_SESSION['colorscheme']['_brandprimary'].';">
 			<li style="padding-bottom:8px;list-style-type:none;">
-				<div style="font-size:14px;color:black;">'._L("<p><b>Feed URL</b></p><p>The URL should be used to subscribe to the RSS feed using an RSS reader application. It should be distributed to potential subscribers to this feed.</p>").'</div>
+				<div style="font-size:14px;color:black;">'._L("<p><b>Feed URL</b></p><p>The URL should be used to subscribe to the RSS feed using an RSS reader application. It should be distributed to potential subscribers.</p>").'</div>
 				<input type="text" readonly value="'.escapehtml($this->parent->dataHelper("/feedurl:feedurl")).'" style="background-color:#ffffff;cursor:text;width:99%;"/>
 			</li>
 			<li style="padding-bottom:8px;list-style-type:none;">
