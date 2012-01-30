@@ -129,8 +129,7 @@ class FeedUrlWiz_feedurl extends WizStep {
 			_L('Feed URL'),
 			"helptext" => array(
 				"label" => _L('URL'),
-				"control" => array("FormHtml", "html" => _L('
-					<p>This URL should be used to subscribe to your new RSS feed. Copy the URL and distribute it to your potential subscribers. </p><p>If this is all you need, feel free to cancel now. If you would like to generate an RSS feed widget for your web page, click Next to continue.</p>
+				"control" => array("FormHtml", "html" => _L('<p>This URL should be used to subscribe to your new RSS feed. Copy the URL and distribute it to your potential subscribers. </p><p>If this is all you need, feel free to click Cancel now. If you would like to generate an RSS feed widget for your web page, click Next to continue.</p>'
 					<input type="text" readonly value="'.escapehtml($feedurl).'" style="background-color:#ffffff;cursor:text;width:99%;"/>
 					)),
 				"helpstep" => 1
@@ -417,16 +416,16 @@ class FinishFeedUrlWiz extends WizFinish {
 		$html = '
 		<h2 style="padding:8px;color:#'.$_SESSION['colorscheme']['_brandprimary'].';">'._L("Your feed selections are complete!").'</h2>
 		<ul style="color:#'.$_SESSION['colorscheme']['_brandprimary'].';">
-			<li style="padding-bottom:8px;list-style-type:none;">
+			<li style="padding-bottom:8px;">
 				<div style="font-size:14px;color:black;">'._L("<p>The URL should be used to subscribe to the RSS feed using an RSS reader application. It should be distributed to potential subscribers to this feed.</p>").'</div>
 				<input type="text" readonly value="'.escapehtml($this->parent->dataHelper("/feedurl:feedurl")).'" style="background-color:#ffffff;cursor:text;width:99%;"/>
 			</li>
-			<li style="padding-bottom:8px;list-style-type:none;">
+			<li style="padding-bottom:8px;">
 				<div style="font-size:14px;color:black;">'._L("<p>The generated widget is a javascript snippet which can be pasted into your web page. It will automatically display the content of this RSS feed. Simply copy and paste it into your document wherever you wish the feed to be displayed.").'</div>
 				<textarea readonly wrap="off" spellcheck="false" style="background-color:#ffffff;cursor:text;width:99%;height:15em;">'.escapehtml(getFeedWidgetJs()).'</textarea>
 			</li>
-			<li style="padding-bottom:8px;list-style-type:none;">
-				<div style="color:#000000"><b>NOTE:</b> This information is not saved anywhere. Please copy and paste it or regenerate it when it is needed.</div>
+			<li style="padding-bottom:8px;">
+				<div style="color:#000000">NOTE: Above information is not saved anywhere. Please copy/paste it, or come back and re-generate it when it is needed.</div>
 			</li>
 		</ul>';
 		
