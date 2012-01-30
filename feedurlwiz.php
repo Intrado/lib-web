@@ -129,9 +129,9 @@ class FeedUrlWiz_feedurl extends WizStep {
 			_L('Feed URL'),
 			"helptext" => array(
 				"label" => _L('URL'),
-				"control" => array("FormHtml", "html" => _L('<p>This URL should be used to subscribe to your new RSS feed. Copy the URL and distribute it to your potential subscribers. </p><p>If this is all you need, feel free to click Cancel now. If you would like to generate an RSS feed widget for your web page, click Next to continue.</p>'
+				"control" => array("FormHtml", "html" => _L('<p>This URL should be used to subscribe to your new RSS feed. Copy the URL and distribute it to your potential subscribers. </p><p>If this is all you need, feel free to click Cancel now. If you would like to generate an RSS feed widget for your web page, click Next to continue.</p>
 					<input type="text" readonly value="'.escapehtml($feedurl).'" style="background-color:#ffffff;cursor:text;width:99%;"/>
-					)),
+					')),
 				"helpstep" => 1
 			),
 			"feedurl" => array(
