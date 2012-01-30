@@ -106,7 +106,7 @@ class FeedUrlWiz_feedoptions extends WizStep {
 			)
 		);
 		
-		$helpsteps = array(_L("Select the appropriate options for the feed you wish to generate:<p>Categories: These are the categories of messages which will be displayed as content in the feed. The top selections are your associated feed categories. On the bottom are other available categories.</p><p>Items: The maximum number of items the feed will display.</p><p>Max age: How old the oldest displayed message can be.</p>"));
+		$helpsteps = array(_L("<p>This wizard will guide you through the process of creating an RSS feed URL to share with subscribers and a widget for your website which will display feed items as they are syndicated.</p><p><b>Categories</b> - Select the categories of feed items that should be included in this RSS feed.</p><p><b>Items to display</b> - Enter the maximum number of feed items that should display at any time.</p><p><b>Max age</b> - Enter the maximum number of days a feed item should display. </p>"));
 		
 		return new Form("feedurlwiz-feedoptions",$formdata,$helpsteps);
 	}
@@ -130,9 +130,9 @@ class FeedUrlWiz_feedurl extends WizStep {
 			"helptext" => array(
 				"label" => _L('URL'),
 				"control" => array("FormHtml", "html" => _L('
-					<p>Use and share this URL with anyone who wishes to follow the feed selections on the previous page. If this is all you need, feel free to cancel now.</p>
+					<p>This URL should be used to subscribe to your new RSS feed. Copy the URL and distribute it to your potential subscribers. </p><p>If this is all you need, feel free to cancel now. If you would like to generate an RSS feed widget for your web page, click Next to continue.</p>
 					<input type="text" readonly value="'.escapehtml($feedurl).'" style="background-color:#ffffff;cursor:text;width:99%;"/>
-					<p>If you wish to generate a feed widget to include in a web page, click on the Next button.</p>')),
+					)),
 				"helpstep" => 1
 			),
 			"feedurl" => array(
@@ -141,7 +141,7 @@ class FeedUrlWiz_feedurl extends WizStep {
 			)
 		);
 
-		$helpsteps = array(_L("<p>Use and share this URL with anyone who wishes to follow the feed selections on the previous page. If this is all you need, feel free to cancel now.</p><p>If you wish to generate a feed widget to include in a web page, click on the Next button.</p>"));
+		$helpsteps = array(_L("<p>The Feed URL needs to be distributed to anyone who may subscribe to this feed so they can enter it into their RSS reader.</p><p>If you would also like to generate a widget you can cut and paste into a web page, click Next. If you only needed a URL, click Cancel.</p>"));
 
 		return new Form("feedurlwiz-feedurl",$formdata,$helpsteps);
 	}
@@ -204,7 +204,7 @@ class FeedUrlWiz_feedwidgetstyle extends WizStep {
 			_L('Container settings'),
 			"fontfamily" => array(
 				"label" => _L('Font Family'),
-				"fieldhelp" => _L('Display font to use when displaying the feed.'),
+				"fieldhelp" => _L('Display font for the RSS feed text.'),
 				"value" => "default",
 				"validators" => array(
 					array("ValRequired"),
@@ -214,7 +214,7 @@ class FeedUrlWiz_feedwidgetstyle extends WizStep {
 			),
 			"iframeheight" => array(
 				"label" => _L('Iframe height'),
-				"fieldhelp" => _L('Height of the containing iframe.'),
+				"fieldhelp" => _L('Height of the widget measured in pixels.'),
 				"value" => 480,
 				"validators" => array(
 					array("ValRequired"),
@@ -224,7 +224,7 @@ class FeedUrlWiz_feedwidgetstyle extends WizStep {
 			),
 			"iframewidth" => array(
 				"label" => _L('Iframe width'),
-				"fieldhelp" => _L('Width of the containing iframe.'),
+				"fieldhelp" => _L('Width of the widget measured in pixels.'),
 				"value" => 300,
 				"validators" => array(
 					array("ValRequired"),
@@ -265,7 +265,7 @@ class FeedUrlWiz_feedwidgetstyle extends WizStep {
 			_L('Header'),
 			"showheader" => array(
 				"label" => _L('Display Header'),
-				"fieldhelp" => _L('Enable/disable the main feed header.'),
+				"fieldhelp" => _L('Enable/disable the main feed header. The header is determined by the feed categories.'),
 				"value" => true,
 				"validators" => array(),
 				"control" => array("CheckBox"),
@@ -393,9 +393,9 @@ class FeedUrlWiz_feedwidgetstyle extends WizStep {
 		);
 		
 		$helpsteps = array(
-			_L("<p>Use these options to control the visual appearance of the container displaying your feed data.</p>"),
-			_L("<p>Use these options to control the visual appearance of the main feed header.</p>"),
-			_L("<p>Use these options to control the visual appearance of the news items displayed in your feed.</p>"),
+			_L("<p>Use these options to control the appearance of the widget container.</p>"),
+			_L("<p>Use these options to control the appearance of the main feed header. The feed header is determined by the categories of feed items which are included in the RSS feed.</p>"),
+			_L("<p>Use these options to control the appearance of the feed items.</p>"),
 			_L("<p>Generating a preview will cause the right side pane to update with the settings you have provided above. This will let you see what the widget should look like once you embed it in your website.</p>")
 		);
 		
@@ -417,16 +417,16 @@ class FinishFeedUrlWiz extends WizFinish {
 		$html = '
 		<h2 style="padding:8px;color:#'.$_SESSION['colorscheme']['_brandprimary'].';">'._L("Your feed selections are complete!").'</h2>
 		<ul style="color:#'.$_SESSION['colorscheme']['_brandprimary'].';">
-			<li style="padding-bottom:8px;">
-				<div style="font-size:14px;color:black;font-weight:bold;">'._L("Use the following url in a feed agregator or other feed display application. Share it with anyone who is interested in the information displayed on this feed.").'</div>
+			<li style="padding-bottom:8px;list-style-type:none;">
+				<div style="font-size:14px;color:black;">'._L("<p>The URL should be used to subscribe to the RSS feed using an RSS reader application. It should be distributed to potential subscribers to this feed.</p>").'</div>
 				<input type="text" readonly value="'.escapehtml($this->parent->dataHelper("/feedurl:feedurl")).'" style="background-color:#ffffff;cursor:text;width:99%;"/>
 			</li>
-			<li style="padding-bottom:8px;">
-				<div style="font-size:14px;color:black;font-weight:bold;">'._L("The following javascript snippet can be included in your web page to display the feed information described in the previous steps. Simply copy and paste it into your document where-ever you wish the feed to be displayed.").'</div>
+			<li style="padding-bottom:8px;list-style-type:none;">
+				<div style="font-size:14px;color:black;">'._L("<p>The generated widget is a javascript snippet which can be pasted into your web page. It will automatically display the content of this RSS feed. Simply copy and paste it into your document wherever you wish the feed to be displayed.").'</div>
 				<textarea readonly wrap="off" spellcheck="false" style="background-color:#ffffff;cursor:text;width:99%;height:15em;">'.escapehtml(getFeedWidgetJs()).'</textarea>
 			</li>
-			<li style="padding-bottom:8px;">
-				<div style="color:#000000">NOTE: Above information is not saved anywhere. Please copy/paste it, or come back and re-generate it when it is needed.</div>
+			<li style="padding-bottom:8px;list-style-type:none;">
+				<div style="color:#000000"><b>NOTE:</b> This information is not saved anywhere. Please copy and paste it or regenerate it when it is needed.</div>
 			</li>
 		</ul>';
 		

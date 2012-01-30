@@ -93,8 +93,8 @@ $language = Language::getName(Language::getDefaultLanguageCode());
 $formdata = array(
 	$messagegroup->name. " (". $language. ")",
 	"subject" => array(
-		"label" => _L("Label"),
-		"fieldhelp" => _L('This will appear as the label of the feed item.'),
+		"label" => _L("Headline"),
+		"fieldhelp" => _L('This will appear as the title of the feed item.'),
 		"value" => $subject,
 		"validators" => array(
 			array("ValRequired"),
@@ -104,7 +104,7 @@ $formdata = array(
 	),
 	"message" => array(
 		"label" => _L("Feed Message"),
-		"fieldhelp" => _L("Enter your message here. It will appear in the feed categories associated with any job using this message group."),
+		"fieldhelp" => _L("Enter the content of the feed item here."),
 		"value" => $text,
 		"validators" => array(
 			array("ValRequired"),
@@ -117,8 +117,8 @@ $formdata = array(
 
 
 $helpsteps = array (
-	_L('TODO: help me! 1'),
-	_L('TODO: help me! 2')
+	_L('The Headline will appear as the title of the feed item.'),
+	_L('The content of the feed item should be entered here.')
 );
 
 $buttons = array(submit_button(_L('Done'),"submit","tick"));
