@@ -5,6 +5,8 @@ abstract class Validator {
 	var $label;
 	var $onlyserverside = false; //set this if you don't have a JS validator
 	var $requiredfields = array();
+	var $isrequired = false;
+	var $conditionalrequired = false;
 
 	/*
 	 * spits out javascript required to install a validator in the form
@@ -41,12 +43,11 @@ abstract class Validator {
 
 		foreach ($validators as $validatordata) {
 			$validator = $validatordata[0];
-			//only validate non empty values (unless its the ValRequired validator)
-			if ($validator == "ValRequired" || $validator == "ValConditionallyRequired" || ((is_array($value) && count($value)) || (!is_array($value) && mb_strlen($value) > 0))) {
-				$obj = new $validator();
-				$obj->label = $formdata[$name]['label'];
-				$obj->name = $name;
-
+			$obj = new $validator();
+			$obj->label = $formdata[$name]['label'];
+			$obj->name = $name;
+			//only validate non empty values (unless its flaged as is required)
+			if ($obj->isrequired || $obj->conditionalrequired || ((is_array($value) && count($value)) || (!is_array($value) && mb_strlen($value) > 0))) {
 				$res = $obj->validate($value, $validatordata,$requiredvalues);
 
 				if ($res !== true)
@@ -75,6 +76,7 @@ abstract class Validator {
 }
 
 class ValRequired extends Validator {
+	var $isrequired = true;
 	function validate ($value, $args) {
 		if ((is_array($value) && !count($value)) || (!is_array($value) && mb_strlen($value) == 0))
 			return "$this->label is required";
@@ -93,6 +95,7 @@ class ValRequired extends Validator {
 
 // Is required if and only if the depended field is set
 class ValConditionallyRequired extends Validator {
+	var $conditionalrequired = true;
 	
 	function validate ($value, $args, $requiredvalues) {
 		$conditionvalue = $requiredvalues[$args['field']];

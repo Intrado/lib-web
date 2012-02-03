@@ -284,10 +284,11 @@ class Form {
 				$style = "";
 				$msg = false;
 
-				//see if valrequired is any of the validators
+				//see if isrequired on any of the validators
 				$isrequired = false;
 				foreach ($itemdata['validators'] as $v) {
-					if ($v[0] == "ValRequired") {
+					$validator = new $v[0]();
+					if ($validator->isrequired) {
 						$isrequired = true;
 						break;
 					}
