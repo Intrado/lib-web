@@ -272,6 +272,7 @@ class TwitterAccountPopup extends FormItem {
 
 class ValTwitterAccountWithMessage extends Validator {
 	var $onlyserverside = true;
+	var $conditionalrequired = true;
 	function validate ($value, $args, $requiredvalues) {
 		global $USER;
 		$mg = new MessageGroup($requiredvalues['message']);
@@ -294,6 +295,7 @@ class ValTwitterAccountWithMessage extends Validator {
 // requires the message form item and validates that there are valid pages selected... but only if the message has facebook
 class ValFacebookPageWithMessage extends Validator {
 	var $onlyserverside = true;
+	var $conditionalrequired = true;
 	function validate ($value, $args, $requiredvalues) {
 		global $USER;
 		$mg = new MessageGroup($requiredvalues['message']);
@@ -327,6 +329,29 @@ class ValFacebookPageWithMessage extends Validator {
 			return $this->label. " ". _L("must have one or more pages to post to.");
 		
 		return true;		
+	}
+}
+
+class ValFeedCategoryWithMessage extends Validator {
+	var $onlyserverside = true;
+	var $conditionalrequired = true;
+	function validate ($value, $args, $requiredvalues) {
+		$msg = _L("%s must be an item from the list of available choices.", $this->label);
+		$mg = new MessageGroup($requiredvalues['message']);
+		// if the message group has feed, a value must be selected
+		if ($mg->hasMessage("post", "feed")) {
+			if (!$value || count($value) == 0)
+				return $msg;
+			
+			if (is_array($value)) {
+				foreach ($value as $item) {
+					if (!in_array($item, $args['values']))
+						return $msg;
+				}
+			} else if (!in_array($value, $args['values']))
+				return $msg;
+		}
+		return true;
 	}
 }
 
@@ -645,8 +670,8 @@ if ($submittedmode || $completedmode) {
 		
 		// feed
 		// if the user can post to feeds, allow them to choose feed categories (provided the message group has feed)
-		if (getSystemSetting("_hasfeed") && $USER->authorize("feedpost") && $messagegroup->hasMessage("post", "feed")) {
-			$feedcategories = FeedCategory::getAllowedFeedCategories($jobid);
+		$feedcategories = FeedCategory::getAllowedFeedCategories($jobid);
+		if (count($feedcategories) && getSystemSetting("_hasfeed") && $USER->authorize("feedpost") && $messagegroup->hasMessage("post", "feed")) {
 			
 			$helpsteps[] = _L("If your message group contains a Feed post, this will allow you to select the categories the message will appear in.");
 					
@@ -765,9 +790,11 @@ if ($submittedmode || $completedmode) {
 	}
 
 	// Social Media options
+	// if the user can post to feeds, get the feed categories
+	$feedcategories = FeedCategory::getAllowedFeedCategories($jobid);
 	if ((getSystemSetting('_hastwitter', false) && $USER->authorize('twitterpost')) || 
 			(getSystemSetting('_hasfacebook', false) && $USER->authorize('facebookpost')) || 
-			(getSystemSetting("_hasfeed") && $USER->authorize("feedpost"))) {
+			(getSystemSetting("_hasfeed") && $USER->authorize("feedpost") && count($feedcategories))) {
 		$formdata[] = _L('Social Media Options');
 	}
 	
@@ -790,8 +817,6 @@ if ($submittedmode || $completedmode) {
 			"control" => array("FacebookPage", "access_token" => $USER->getSetting("fb_access_token", false)),
 			"requires" => array("message"),
 			"helpstep" => ++$helpstepnum);
-		if (!$job->messagegroupid)
-			$formdata["fbpage"]["validators"][] = array("ValRequired");
 			
 	}
 	
@@ -809,15 +834,11 @@ if ($submittedmode || $completedmode) {
 			"control" => array("TwitterAccountPopup", "hasvalidtoken" => $tw->hasValidAccessToken()),
 			"requires" => array("message"),
 			"helpstep" => ++$helpstepnum);
-		if (!$tw->hasValidAccessToken() && !$job->messagegroupid)
-			$formdata["twitter"]['validators'][] = array("ValRequired");
 	}
 	
-	// if the user can post to feeds, allow them to choose feed categories
-	if (getSystemSetting("_hasfeed") && $USER->authorize("feedpost")) {
+	if (count($feedcategories) && getSystemSetting("_hasfeed") && $USER->authorize("feedpost")) {
 		
 		$currentfeedcategories = QuickQueryList("select destination from jobpost where type = 'feed' and jobid = ?", false, false, array($jobid));
-		$feedcategories = FeedCategory::getAllowedFeedCategories($jobid);
 		
 		$helpsteps[] = _L("If your message contains an RSS feed component, select which category best describes the content of your RSS feed message part.");
 		
@@ -826,10 +847,10 @@ if ($submittedmode || $completedmode) {
 			"fieldhelp" => _L("Select the most appropriate category for the RSS feed component of your message."),
 			"value" => (count($currentfeedcategories)?$currentfeedcategories:""),
 			"validators" => array(
-				array("ValInArray", "values" => array_keys($feedcategories))),
+				array("ValFeedCategoryWithMessage", "values" => array_keys($feedcategories))),
 			"control" => array("MultiCheckBox", "values"=>$feedcategories, "hover" => FeedCategory::getFeedDescriptions()),
-			"helpstep" => ++$helpstepnum
-		);
+			"requires" => array("message"),
+			"helpstep" => ++$helpstepnum);
 	}
 	
 	$helpsteps[] = _L("<ul><li>Auto Report - Selecting this option causes the system to email ".
@@ -1133,7 +1154,8 @@ Validator::load_validators(array("ValDuplicateNameCheck",
 								"ValMessageGroup",
 								"ValFacebookPageWithMessage",
 								"ValTwitterAccountWithMessage",
-								"ValCallerID"));
+								"ValCallerID",
+								"ValFeedCategoryWithMessage"));
 ?>
 </script>
 <script src="script/niftyplayer.js.php" type="text/javascript"></script>
