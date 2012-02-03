@@ -555,3 +555,12 @@ CREATE TABLE `smsinbound` (
  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 ;
 
+CREATE TABLE `dmgroupblock` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `dmgroupid` int(11) NOT NULL,
+  `pattern` varchar(50) COLLATE utf8_bin NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 ;
+
+ALTER TABLE `dmgroupblock` ADD INDEX ( `dmgroupid` );
+

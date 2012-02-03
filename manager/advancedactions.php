@@ -42,6 +42,10 @@ include_once("nav.inc.php");
 <li><a href="serverlist.php">Manage Servers</a></li>
 <? } ?>
 
+<? if ($MANAGERUSER->authorized("systemdm")) { ?>
+<li><a href="dmgroupblock.php">DM Group Pattern Blocking</a></li>
+<? } ?>
+
 <? if ($MANAGERUSER->authorized("superuser")) { ?>
 <li><a href="users.php">Edit Users</a></li>
 <? } ?>
