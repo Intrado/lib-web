@@ -409,29 +409,31 @@ class Job extends DBMappedObject {
 	// update jobpost records with the new type and destinations specified
 	// NOTE: all existing jobpost records of $type will be removed prior to inserting of new destinations
 	function updateJobPost($type, $destination, $posted = 0) {
-		QuickUpdate("delete from jobpost where jobid = ? and type = ?", false, array($this->id, $type));
-		$insertquery = "insert into jobpost values ";
-		$values = "(?,?,?,?)";
-		$args = array();
-		if (is_array($destination)) {
-			$count = 0;
-			foreach ($destination as $d) {
-				if ($count++ != 0)
-					$insertquery .= ", ";
+		$records = QuickUpdate("delete from jobpost where jobid = ? and type = ?", false, array($this->id, $type));
+		if ($destination) {
+			$insertquery = "insert into jobpost values ";
+			$values = "(?,?,?,?)";
+			$args = array();
+			if (is_array($destination)) {
+				$count = 0;
+				foreach ($destination as $d) {
+					if ($count++ != 0)
+						$insertquery .= ", ";
+					$insertquery .= $values;
+					$args[] = $this->id;
+					$args[] = $type;
+					$args[] = $d;
+					$args[] = $posted;
+				}
+			} else {
 				$insertquery .= $values;
 				$args[] = $this->id;
 				$args[] = $type;
-				$args[] = $d;
+				$args[] = $destination;
 				$args[] = $posted;
 			}
-		} else {
-			$insertquery .= $values;
-			$args[] = $this->id;
-			$args[] = $type;
-			$args[] = $destination;
-			$args[] = $posted;
+			$records = QuickUpdate($insertquery, false, $args);
 		}
-		$records = QuickUpdate($insertquery, false, $args);
 		return $records;
 	}
 	
