@@ -2,6 +2,7 @@
 <tocdata>
 <book name="Getting Started" >
   <item name="Welcome" url="Getting_Started/Welcome.htm" />
+  <item name="Send a Basic Message" url="Getting_Started/Send_a_Basic_Message.htm" />
   <item name="Start Page" url="Getting_Started/Start_Page.htm" />
 </book>
 <book name="Printable PDFs" >
@@ -54,6 +55,10 @@
   <book name="Pages" >
     <item name="Creating Pages" url="Social_Media/Creating_Pages.htm" />
   </book>
+</book>
+<book name="RSS Feeds" >
+  <item name="Configuring Your RSS Feed" url="RSS_Syndication/Configuring_Your_RSS_Feed.htm" />
+  <item name="Posting to an RSS Feed" url="RSS_Syndication/Posting_to_an_RSS_Feed.htm" />
 </book>
 <book name="SMS Messaging" >
   <item name="Before Sending SMS Messages" url="SMS_Messaging/Before_You_Send_an_SMS.htm" />

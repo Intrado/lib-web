@@ -13,7 +13,7 @@ var gsRank="Rank";
 var gsCancel="Cancel";
 var gsCanceled="Canceled";
 
-var gsSubstrSrch=0;
+var gsSubstrSrch=1;
 var gsHideRankColumn=0;
 
 var g_RunesVowels="\x61\x65\x69\x6F\x75\x79";

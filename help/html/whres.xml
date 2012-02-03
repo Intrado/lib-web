@@ -94,6 +94,7 @@
 
   <panes show="0">
     <toc />
+    <fts />
   </panes>
 
   <stopwords>
