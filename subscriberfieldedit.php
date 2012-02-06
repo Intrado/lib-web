@@ -144,7 +144,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 				QuickUpdate($query, false, $datavalues);
 
 				// find all subscriber persons
-				$query = "select id from person where importid is null and type='system'";
+				$query = "select id from person where type='subscriber'";
 				$pids = QuickQueryList($query);
 				
 				if (count($pids) > 0) {
@@ -170,7 +170,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		// if static text field
 		if ($fieldmap->isOptionEnabled('text')) {
 			$value = trimStaticValue($postdata['values']);
-			QuickUpdate("update person set ".$fieldmap->fieldnum."=? where importid is null and type='system'", false, array($value));
+			QuickUpdate("update person set ".$fieldmap->fieldnum."=? where type='subscriber'", false, array($value));
 		}
 		// get values and trim
 		$datavalues = explode("\n", $postdata['values']);
@@ -182,16 +182,16 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		if ($fieldmap->isOptionEnabled('multisearch') && strpos($fieldmap->fieldnum, 'f') === 0) {
 			// single value, update all person subscribers with new value
 			if ($numvalues == 1) {
-				QuickUpdate("update person set ".$fieldmap->fieldnum."=? where importid is null and type='system'", false, array($datavalues[0]));
+				QuickUpdate("update person set ".$fieldmap->fieldnum."=? where type='subscriber'", false, array($datavalues[0]));
 			}
 			// no values, update all person subscribers with NULL
 			if ($numvalues == 0) {
-				QuickUpdate("update person set ".$fieldmap->fieldnum."=NULL where importid is null and type='system'");
+				QuickUpdate("update person set ".$fieldmap->fieldnum."=NULL where type='subscriber'");
 			}
 			// new values, update all person subscribers with invalid value to NULL
 			if ($numvalues > 1) {
 				$args = repeatWithSeparator("?", ",", $numvalues);
-				QuickUpdate("update person set ".$fieldmap->fieldnum."=NULL where importid is null and type='system' and ".$fieldmap->fieldnum." not in (".$args.")", false, $datavalues);
+				QuickUpdate("update person set ".$fieldmap->fieldnum."=NULL where type='subscriber' and ".$fieldmap->fieldnum." not in (".$args.")", false, $datavalues);
 			}
 		}
 		// Gfield, cleanup old values

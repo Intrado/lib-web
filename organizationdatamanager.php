@@ -68,7 +68,7 @@ if (isset($_GET["delete"]) && isset($_GET["orgid"])) {
 												from personassociation pa
 													inner join person p on
 														(pa.personid = p.id)
-												where not p.deleted and p.importid is null and pa.organizationid = o.id)",
+												where not p.deleted and p.type = 'subscriber' and pa.organizationid = o.id)",
 											false, array($org["id"]));
 		
 		if ($listentryorgid || $userassociationorgid || $persondatavaluesorgid || $personassociationorgid)
@@ -121,7 +121,7 @@ if (isset($_GET['deleteunassociated'])) {
 											from personassociation pa
 												inner join person p on
 													(pa.personid = p.id)
-											where not p.deleted and p.importid is null and p.type = 'system' and pa.type = 'organization'
+											where not p.deleted and p.type = 'subscriber' and pa.type = 'organization'
 											group by pa.organizationid",
 											false, false, array());
 	

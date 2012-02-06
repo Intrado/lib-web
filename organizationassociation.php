@@ -84,7 +84,7 @@ $associatedorgdata = QuickQueryMultiRow("(select SQL_CALC_FOUND_ROWS l.id as id,
 										from person p
 											inner join personassociation pa on
 												(p.id = pa.personid)
-										where not p.deleted and p.importid is null and pa.organizationid = ?)
+										where not p.deleted and p.type = 'subscriber' and pa.organizationid = ?)
 										order by login, type
 										limit $start, $limit",
 										true, false, array($orgid, $orgid, $orgid, $orgid));
