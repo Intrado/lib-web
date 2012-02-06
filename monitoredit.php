@@ -111,6 +111,7 @@ $helpstepnum = 1;
 $jobevents = array("job-active" => "Submitted","job-firstpass" => "First Attempt Completed", "job-complete" => "Completed");
 $formdata["jobevent"] = array(
 		"label" => _L('Job Event'),
+		"fieldhelp" => _L('The type of event which will trigger this monitor.'),
 		"value" => $monitor->id?$monitor->type:'',
 		"validators" => array(
 			array("ValInArray", "values" => array_keys($jobevents))
@@ -123,6 +124,7 @@ $jobtypes = QuickQueryList("select id,name from jobtype where deleted=0 and not 
 $selectedjobtypes = $monitor->id?QuickQuery("select val from monitorfilter where type='jobtypeid' and monitorid=?",false,array($monitor->id)):'';
 $formdata["jobtypes"] = array(
 		"label" => _L('Job Types'),
+		"fieldhelp" => _L('Optionally add a filter for certain types of jobs.'),
 		"value" => $selectedjobtypes != ""?explode(",",$selectedjobtypes):array(),
 		"validators" => array(
 			array("ValInArray", 'values'=>array_keys($jobtypes))
@@ -136,6 +138,7 @@ if ($USER->authorize('monitorsystemwideevent')) {
 	$selectedusers = $monitor->id?QuickQuery("select val from monitorfilter where type='userid' and monitorid=?",false,array($monitor->id)):'';
 	$formdata["users"] = array(
 			"label" => _L('Users'),
+			"fieldhelp" => _L('This filter allows you to restrict the monitor to monitoring only certain users.'),
 			"value" => $selectedusers != ""?explode(",",$selectedusers):array(),
 			"validators" => array(
 				array("ValInArray", 'values'=>array_keys($users))
