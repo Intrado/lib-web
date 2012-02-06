@@ -79,6 +79,9 @@
     <item name="Destination Labels" url="System_Administration/System_Settings/Destination_Labels.htm" />
     <item name="Managing Organizations" url="System_Administration/Organization_Management/Managing_Organizations.htm" />
   </book>
+  <book name="Monitoring" >
+    <item name="Notification Monitoring" url="System_Administration/Job_Monitoring/Notification_Monitoring.htm" />
+  </book>
   <book name="Intro Message Management" >
     <item name="Customizing Intro Messages" url="System_Administration/Intro_Messages/Customizing_Intro_Messages.htm" />
   </book>
