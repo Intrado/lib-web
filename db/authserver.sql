@@ -555,6 +555,8 @@ CREATE TABLE `smsinbound` (
  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 ;
 
+-- START REV 8.2/1
+
 CREATE TABLE `dmgroupblock` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `dmgroupid` int(11) NOT NULL,
