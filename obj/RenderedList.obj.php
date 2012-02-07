@@ -130,7 +130,7 @@ class RenderedList2 {
 							."	$joinsql \n"
 							."	left join listentry le on \n"
 							."		(p.id = le.personid and le.listid=" . $this->listid . ") \n" //skip anyone that is directly referenced, add or negate
-							."	where not p.deleted and p.userid is null and le.type is null \n"
+							."	where not p.deleted and p.type in ('system', 'subscriber') and le.type is null \n"
 							." $rulesql $this->extrawheresql) \n"
 							." UNION ALL \n"
 							."(select $fieldsql from person p \n"
@@ -154,7 +154,7 @@ class RenderedList2 {
 				
 				$query = "select $sqlflags distinct $fieldsql from person p \n"
 						."	$joinsql \n"
-						."	where not p.deleted and p.userid is null \n"
+						."	where not p.deleted and p.type in ('system', 'subscriber') \n"
 						." $rulesql $this->extrawheresql \n"
 						."$ordersql $limitsql ";
 				
@@ -192,7 +192,7 @@ class RenderedList2 {
 				$query = "select $sqlflags distinct $fieldsql from person p \n"
 						."	$joinsql \n"
 						."	$contactjoinsql "
-						."	where not p.deleted and p.userid is null \n"
+						."	where not p.deleted and p.type in ('system', 'subscriber') \n"
 						." $rulesql $this->extrawheresql $contactwheresql \n"
 						."$ordersql $limitsql ";
 				
@@ -221,7 +221,7 @@ class RenderedList2 {
 					
 					$query = "select $sqlflags distinct $fieldsql from person p \n"
 						."	$joinsql \n"
-						."	where not p.deleted and p.userid is null \n"
+						."	where not p.deleted and p.type in ('system', 'subscriber') \n"
 						." $rulesql $this->extrawheresql and $personfield like '$searchstring%' \n";
 					
 					$queries[] = $query;
@@ -246,7 +246,7 @@ class RenderedList2 {
 					
 					$query = "select distinct $fieldsql from person p \n"
 						."	$joinsql \n"
-						."	where not p.deleted and p.userid is null \n"
+						."	where not p.deleted and p.type in ('system', 'subscriber') \n"
 						." $rulesql $this->extrawheresql and p.f01 like '$word1%' and p.f02 like '$word2%'\n";
 					$queries[] = $query;
 				}
@@ -260,7 +260,7 @@ class RenderedList2 {
 						$query = "select distinct $fieldsql from person p \n"
 							."	$joinsql \n"
 							." inner join $type x on (x.personid = p.id) \n"
-							."	where not p.deleted and p.userid is null \n"
+							."	where not p.deleted and p.type in ('system', 'subscriber') \n"
 							." $rulesql $this->extrawheresql and x.$type like '$digits%' \n";
 						$queries[] = $query;
 					}
@@ -271,7 +271,7 @@ class RenderedList2 {
 					$query = "select distinct $fieldsql from person p \n"
 						."	$joinsql \n"
 						." inner join email x on (x.personid = p.id) \n"
-						."	where not p.deleted and p.userid is null \n"
+						."	where not p.deleted and p.type in ('system', 'subscriber') \n"
 						." $rulesql $this->extrawheresql and x.email like '$searchstring%' \n";
 					$queries[] = $query;
 				}
@@ -459,7 +459,7 @@ class RenderedList2 {
 					."	$joinsql \n"
 					."	left join listentry le on \n"
 					."		(p.id = le.personid and le.listid=" . $list->id . ") \n" //skip anyone that is directly referenced, add or negate
-					."	where not p.deleted and p.userid is null and le.type is null \n"
+					."	where not p.deleted and p.type in ('system', 'subscriber') and le.type is null \n"
 					."	and p.id in ($pagepidcsv) \n"
 					." $rulesql ) \n"
 					." UNION ALL \n"
