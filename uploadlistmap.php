@@ -223,7 +223,7 @@ if ($errormsg) {
 			
 			//check for unmapped fields
 			if (!isset($datamap[$mapfrom])) {
-				 $cel = "";
+				 $cel = escapehtml($cel);
 			} else {
 				//do some basic formatting and validation based on field type
 				$fieldnum = $datamap[$mapfrom];
