@@ -408,9 +408,9 @@ class Job extends DBMappedObject {
 	
 	// update jobpost records with the new type and destinations specified
 	// NOTE: all existing jobpost records of $type will be removed prior to inserting of new destinations
-	function updateJobPost($type, $destination, $posted = 0) {
+	function updateJobPost($type, $destination = null, $posted = 0) {
 		$records = QuickUpdate("delete from jobpost where jobid = ? and type = ?", false, array($this->id, $type));
-		if ($destination) {
+		if ($destination !== null) {
 			$insertquery = "insert into jobpost values ";
 			$values = "(?,?,?,?)";
 			$args = array();
