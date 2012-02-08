@@ -1875,3 +1875,13 @@ $$$
 update setting set value='8.3/1' where name='_dbversion'
 $$$
 -- END 8.3/1
+
+ALTER TABLE `person` ADD INDEX `type` ( `type` ) 
+$$$
+
+ALTER TABLE `personguardian` CHANGE `importid` `importid` INT( 11 ) NULL 
+$$$
+
+update setting set value='8.3/2' where name='_dbversion'
+$$$
+-- END 8.3/2

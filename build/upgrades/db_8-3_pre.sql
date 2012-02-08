@@ -1,4 +1,4 @@
--- $rev1
+-- $rev 1
 
 CREATE TABLE IF NOT EXISTS `personguardian` (
   `personid` int(11) NOT NULL,
@@ -15,5 +15,13 @@ ALTER TABLE `person` CHANGE `type` `type` ENUM( 'system', 'addressbook', 'manual
 $$$
 
 update person set type = 'subscriber' where type = 'system' and importid is null
+$$$
+
+-- $rev 2
+
+ALTER TABLE `person` ADD INDEX `type` ( `type` ) 
+$$$
+
+ALTER TABLE `personguardian` CHANGE `importid` `importid` INT( 11 ) NULL 
 $$$
 
