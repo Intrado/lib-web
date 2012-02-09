@@ -1092,12 +1092,18 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		}
 		
 		// handle feed category updateing
-		// new feed categories
 		if (isset($postdata['feedcategories'])) {
-			$newfeedcategories = $postdata['feedcategories'];
+			// if the messagegroup isn't evaluated yet (submitted or completed mode)
+			if (!isset($messagegroup))
+				$messagegroup = new MessageGroup($job->messagegroupid);
+			// if the message has feed, gete the newly selected categories
+			if ($messagegroup->hasMessage("post", "feed"))
+				$newfeedcategories = $postdata['feedcategories'];
+			else
+				$newfeedcategories = array();
 			// if the job would have already posted the feed message, update as posted and expire the related categories
 			if (in_array($job->status,array('active','procactive','processing','complete','cancelled','cancelling'))) {
-				$job->updateJobPost("feed", $newfeedcategories, 1);
+				$job->updateJobPost("feed", (count($newfeedcategories)?$newfeedcategories:null), 1);
 				// expire feed categories that changed
 				$currentfeedcategories = array_keys($job->getJobPosts("feed"));
 				if ($newfeedcategories !== false) {
@@ -1108,7 +1114,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 				}
 			} else {
 				// hasn't posted yet, it's new or repeating
-				$job->updateJobPost("feed", $newfeedcategories, 0);
+				$job->updateJobPost("feed", (count($newfeedcategories)?$newfeedcategories:null), 0);
 			}
 		}
 		
