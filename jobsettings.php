@@ -58,7 +58,7 @@ if (getSystemSetting('_hascallback', false)) {
 		"control" => array("TextField","maxlength" => 20),
 		"helpstep" => $helpstepnum
 	);
-		$helpsteps[$helpstepnum++] = _L("Select this option to restrict users to the following list of Caller ID numbers. If you do not check this box, but enter numbers below, users will not see the approved Caller ID numbers. <b>Note:</b> Users whose Access Profile allow them to override their Caller ID will still have the option to do so.");
+		$helpsteps[$helpstepnum++] = _L("Select this option to restrict users to the following list of Caller ID numbers. If you do not check this box, but enter numbers below, users will not see the approved Caller ID numbers.<br><br> <b>Note:</b><i> Users whose Access Profile allow them to override their Caller ID will still have the option to do so.</i>");
 	$formdata["requireapprovedcallerid"] = array(
 		"label" => _L('Only Allow Approved Caller&nbsp;ID'),
 		"fieldhelp" => _L('Restricts users to Caller ID numbers entered in the following field. Please click on the Guide help for more information.'),
@@ -75,7 +75,7 @@ if (getSystemSetting('_hascallback', false)) {
 	foreach($approvedcallerids as $callerid) {
 		$formattedcallerids[] = escapehtml(Phone::format($callerid));
 	}
-		$helpsteps[$helpstepnum++] = _L('Enter any Caller ID numbers users may select from for their jobs. Be sure to check the "Only allow approved Caller ID" checkbox if you enter numbers here.<b>Note:</b> Users whose Access Profile allow them to override their Caller ID will still have the option to do so.');
+		$helpsteps[$helpstepnum++] = _L('Enter any Caller ID numbers users may select from for their jobs. Be sure to check the "Only allow approved Caller ID" checkbox if you enter numbers here.<br><br><b>Note:</b> <i>Users whose Access Profile allow them to override their Caller ID will still have the option to do so.</i>');
 	$formdata["approvedcallerids"] = array(
 		"label" => _L('Approved Caller&nbsp;IDs'),
 		"fieldhelp" => _L('You may restrict users to Caller ID numbers entered here. Please click on the Guide help for more information.'),
