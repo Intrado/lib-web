@@ -129,14 +129,14 @@ class MultiImportBox extends FormItem {
 // Form Data
 ////////////////////////////////////////////////////////////////////////////////
 $helpstepnum = 1;
-$helpsteps = array(_L('Multiple numbers can be added when seperated with new line'));
+$helpsteps = array(_L('You may enter multiple Caller ID numbers, each on a new line. Click the "Add" button when you are done.'));
 
 $numbers = QuickQueryList("select callerid,callerid from authorizedcallerid",true);
 
 $formdata["addnumbers"] = array(
 	"label" => _L('Manual Add'),
 	"value" => '',
-	"fieldhelp" => _L('Multiple numbers can be added when seperated with new line'),
+	"fieldhelp" => _L('Enter one or more Caller ID numbers. Put each number on a new line. Click the "Add" button to add them to the approved Caller ID list.'),
 	"validators" => array(
 		array("ValMultiplePhones")
 	),
@@ -168,6 +168,7 @@ foreach ($usednumbers as $usednumber) {
 if (count($importnumberdata) > 0) {
 	$formdata["importnumbers"] = array(
 		"label" => _L('Import'),
+		"fieldhelp" => _L('Caller ID numbers listed here are currently associated with users or jobs. Check the box next to the number to add it to the Caller ID list.'),
 		"value" => '',
 		"validators" => array(
 			array("ValInArray", 'values' => array_keys($importnumberdata))
@@ -178,6 +179,7 @@ if (count($importnumberdata) > 0) {
 } else {
 	$formdata["importinfo"] = array(
 			"label" => _L('Import'),
+			"fieldhelp" => _L('Caller ID numbers listed here are currently associated with users or jobs.'),
 			"value" => '',
 			"control" => array("FormHtml", "html" => '<div style="border:1px dotted gray;height:125px;"><img src="img/icons/information.png" alt="Information" style="vertical-align:middle"/><span style="line-height:30px;"> ' . _L("No Caller IDs to import") . "</span></div>"),
 			"helpstep" => $helpstepnum

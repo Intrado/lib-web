@@ -236,7 +236,7 @@ class MsgWiz_emailText extends WizStep {
 		$helpsteps[] = _L("Enter the subject of the email here.");
 		$helpsteps[] =	_L("You may attach up to three files that are up to 2MB each. For greater security, only certain types of files are accepted.<br><br><b>Note:</b> Some email accounts may not accept attachments above a certain size and may reject your message.");
 		if ($subtype == "html"){
-			$helpsteps[] = 	_L("Enter your HTML email in this field. You may use the HTML editing tools to format your email. <br><br>Be sure to introduce yourself and give detailed information. For helpful message tips and ideas, click the Help link in the upper right corner of the screen.");
+			$helpsteps[] = 	_L("<p>Enter your HTML email in this field. You may use the HTML editing tools to format your email.</p> <p>To insert data fields, set the cursor where the data should appear. Be careful to not delete any of the brackets that appear around inserted data fields. Select the data field you wish to insert and enter a default value which will display if a recipient does not have data in the chosen field. Click the 'Insert' button to add the data field to your message.</p><p><b>Note:</b> <i>Date inserts will insert the date relative to when the job is sent. For example, if you insert 'Date' and send the message immediately, it will have today's date. However, if you send the message tomorrow, it would insert tomorrow's date.</i></p>");
 		} else {
 			$helpsteps[] = 	_L("Enter your plain text version of your email in this field. <br><br>Be sure to introduce yourself and give detailed information. For helpful message tips and ideas, click the Help link in the upper right corner of the screen.");
 		}
