@@ -1559,7 +1559,7 @@ class JobWiz_socialMedia extends WizStep {
 		
 		// Feed
 		if (getSystemSetting("_hasfeed") && $USER->authorize("feedpost")) {
-			$helpsteps[] = _L("Enter the message you wish to deliver via Twitter.");
+			$helpsteps[] = _L("Enter the message you wish to post to an RSS feed.");
 			$formdata["feeddata"] = array(
 				"label" => _L("Feed Message"),
 				"fieldhelp" => _L("Select what text to include in your feed."),
