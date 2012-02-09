@@ -46,7 +46,7 @@ if (getSystemSetting('_hascallback', false)) {
 		"helpstep" => $helpstepnum
 	);
 } else {
-	$helpsteps[$helpstepnum++] = _L("The default Caller ID number will be used in the following situations: <br><ul><li> There are no other Caller ID options. <li> The user has no selected a Caller ID from the optional Caller IDs. <li> The user's Access Profile allows him to overwrite the Caller ID.</ul>");
+
 	$formdata["callerid"] = array(
 		"label" => _L("Default Caller ID Number"),
 		"fieldhelp" => _L("The default Caller ID number is used in certain situations. Please click on the Guide help for more information."),
