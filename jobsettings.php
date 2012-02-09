@@ -37,18 +37,19 @@ class ValRequireApprovedCallerID extends Validator {
 $formdata = array();
 $helpstepnum = 0;
 
-$helpsteps[$helpstepnum++] = _L("This specifies the default Caller ID to use for new Jobs. If a user has access rights, they may override this with a new setting.");
+$helpsteps[$helpstepnum++] = _L("The default Caller ID number will be used in the following situations: <br><ul><li> There are no other Caller ID options. <li> The user has no selected a Caller ID from the optional Caller IDs. <li> The user's Access Profile allows him to overwrite the Caller ID.</ul>");
 if (getSystemSetting('_hascallback', false)) {
 	$formdata["callerid"] = array(
 		"label" => _L("Default Caller ID Number"),
-		"fieldhelp" => _L("This is the default Caller ID for all jobs."),
+		"fieldhelp" => _L("The default Caller ID number is used in certain situations. Please click on the Guide help for more information."),
 		"control" => array("FormHtml","html"=>Phone::format(getDefaultCallerID())),
 		"helpstep" => $helpstepnum
 	);
 } else {
+	$helpsteps[$helpstepnum++] = _L("The default Caller ID number will be used in the following situations: <br><ul><li> There are no other Caller ID options. <li> The user has no selected a Caller ID from the optional Caller IDs. <li> The user's Access Profile allows him to overwrite the Caller ID.</ul>");
 	$formdata["callerid"] = array(
 		"label" => _L("Default Caller ID Number"),
-		"fieldhelp" => _L("This is the default Caller ID for all jobs."),
+		"fieldhelp" => _L("The default Caller ID number is used in certain situations. Please click on the Guide help for more information."),
 		"value" => Phone::format(getSystemSetting('callerid')),
 		"validators" => array(
 			array("ValRequired"),
@@ -57,9 +58,10 @@ if (getSystemSetting('_hascallback', false)) {
 		"control" => array("TextField","maxlength" => 20),
 		"helpstep" => $helpstepnum
 	);
+		$helpsteps[$helpstepnum++] = _L("Select this option to restrict users to the following list of Caller ID numbers. If you do not check this box, but enter numbers below, users will not see the approved Caller ID numbers. <b>Note:</b> Users whose Access Profile allow them to override their Caller ID will still have the option to do so.");
 	$formdata["requireapprovedcallerid"] = array(
 		"label" => _L('Only Allow Approved Caller&nbsp;ID'),
-		"fieldhelp" => _L('Allows users to select Caller ID from a list of approved numbers'),
+		"fieldhelp" => _L('Restricts users to Caller ID numbers entered in the following field. Please click on the Guide help for more information.'),
 		"value" => getSystemSetting("requireapprovedcallerid",false),
 		"validators" => array(
 			array("ValRequireApprovedCallerID")
@@ -73,9 +75,10 @@ if (getSystemSetting('_hascallback', false)) {
 	foreach($approvedcallerids as $callerid) {
 		$formattedcallerids[] = escapehtml(Phone::format($callerid));
 	}
-	
+		$helpsteps[$helpstepnum++] = _L('Enter any Caller ID numbers users may select from for their jobs. Be sure to check the "Only allow approved Caller ID" checkbox if you enter numbers here.<b>Note:</b> Users whose Access Profile allow them to override their Caller ID will still have the option to do so.');
 	$formdata["approvedcallerids"] = array(
 		"label" => _L('Approved Caller&nbsp;IDs'),
+		"fieldhelp" => _L('You may restrict users to Caller ID numbers entered here. Please click on the Guide help for more information.'),
 		"control" => array("FormHtml","html"=>'<div style="border:1px solid #CCCCCC;width:140px;height:150px;overflow:auto;float:left;">' . implode("<br />", $formattedcallerids) . '</div>' . icon_button("Edit Approved Caller IDs", "pencil",false,"callerid.php")),
 		"helpstep" => $helpstepnum
 	);
@@ -164,7 +167,7 @@ require_once("nav.inc.php");
 <script type="text/javascript">
 <? Validator::load_validators(array("ValRequireApprovedCallerID")); ?>
 <? if ($datachange) { ?>
-	alert("<?=_L("The data on this form has changed. You're changes cannot be saved.")?>")";
+	alert("<?=_L("The data on this form has changed. Your changes cannot be saved.")?>")";
 	window.location = '<?= addcslashes($_SERVER['REQUEST_URI']) ?>';
 <? } ?>
 </script>
