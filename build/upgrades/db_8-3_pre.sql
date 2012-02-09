@@ -19,9 +19,22 @@ $$$
 
 -- $rev 2
 
-ALTER TABLE `person` ADD INDEX `type` ( `type` ) 
 $$$
 
 ALTER TABLE `personguardian` CHANGE `importid` `importid` INT( 11 ) NULL 
+$$$
+
+-- $rev 3
+
+-- no symbols in naming
+ALTER TABLE `person` CHANGE `type` `type` ENUM( 'system', 'addressbook', 'manualadd', 'upload', 'subscriber',  'guardianauto',  'guardiancm') CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT 'system'
+$$$
+
+-- need more chars for descriptive names
+ALTER TABLE `template` CHANGE `type` `type` VARCHAR( 50 ) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL
+$$$
+
+-- rename
+update template set type = 'subscriber-accountexpire' where type = 'subscriber'
 $$$
 

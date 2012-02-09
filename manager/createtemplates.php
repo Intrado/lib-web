@@ -76,24 +76,24 @@ function createDefaultTemplates($useSmsMessagelinkInboundnumber = false) {
 			
 			////////////////////////
 			// subscriber
-			$subscriber_englishhtml = $templates['subscriber']['en']['html']['body'];
-			$subscriber_englishplain = $templates['subscriber']['en']['plain']['body'];
-			$subscriber_spanishhtml = $templates['subscriber']['es']['html']['body'];
-			$subscriber_spanishplain = $templates['subscriber']['es']['plain']['body'];
+			$subscriber_englishhtml = $templates['subscriber-accountexpire']['en']['html']['body'];
+			$subscriber_englishplain = $templates['subscriber-accountexpire']['en']['plain']['body'];
+			$subscriber_spanishhtml = $templates['subscriber-accountexpire']['es']['html']['body'];
+			$subscriber_spanishplain = $templates['subscriber-accountexpire']['es']['plain']['body'];
 			
-			$messagegroupid = createTemplate('subscriber', $subscriber_englishplain, $subscriber_englishhtml, $subscriber_spanishplain, $subscriber_spanishhtml);
+			$messagegroupid = createTemplate('subscriber-accountexpire', $subscriber_englishplain, $subscriber_englishhtml, $subscriber_spanishplain, $subscriber_spanishhtml);
 			if (!$messagegroupid)
 				return false;
 				
 			// set english headers
-			$data = "subject=" . urlencode($templates['subscriber']['en']['html']['subject']) . 
-					"&fromname=" . urlencode($templates['subscriber']['en']['html']['fromname']) . 
-					"&fromemail=" . urlencode($templates['subscriber']['en']['html']['fromaddr']);
+			$data = "subject=" . urlencode($templates['subscriber-accountexpire']['en']['html']['subject']) . 
+					"&fromname=" . urlencode($templates['subscriber-accountexpire']['en']['html']['fromname']) . 
+					"&fromemail=" . urlencode($templates['subscriber-accountexpire']['en']['html']['fromaddr']);
 			QuickUpdate("update message set data = ? where messagegroupid = ? and type = 'email' and languagecode = 'en'", null, array($data, $messagegroupid));
 			// set spanish headers
-			$data = "subject=" . urlencode($templates['subscriber']['es']['html']['subject']) . 
-					"&fromname=" . urlencode($templates['subscriber']['es']['html']['fromname']) . 
-					"&fromemail=" . urlencode($templates['subscriber']['es']['html']['fromaddr']);
+			$data = "subject=" . urlencode($templates['subscriber-accountexpire']['es']['html']['subject']) . 
+					"&fromname=" . urlencode($templates['subscriber-accountexpire']['es']['html']['fromname']) . 
+					"&fromemail=" . urlencode($templates['subscriber-accountexpire']['es']['html']['fromaddr']);
 			QuickUpdate("update message set data = ? where messagegroupid = ? and type = 'email' and languagecode = 'es'", null, array($data, $messagegroupid));
 				
 			////////////////////////

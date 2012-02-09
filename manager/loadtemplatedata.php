@@ -301,10 +301,10 @@ ${productname} es un servicio de notificación usado por los sistemas escolares 
 ////////////////////////////
 
 // subscriber english html
-$templates['subscriber']['en']['html']['subject'] = '${displayname} ${productname} Account Termination Warning';
-$templates['subscriber']['en']['html']['fromname'] = '${productname}';
-$templates['subscriber']['en']['html']['fromaddr'] = 'contactme@schoolmessenger.com';
-$templates['subscriber']['en']['html']['body'] = '
+$templates['subscriber-accountexpire']['en']['html']['subject'] = '${displayname} ${productname} Account Termination Warning';
+$templates['subscriber-accountexpire']['en']['html']['fromname'] = '${productname}';
+$templates['subscriber-accountexpire']['en']['html']['fromaddr'] = 'contactme@schoolmessenger.com';
+$templates['subscriber-accountexpire']['en']['html']['body'] = '
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
         "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -366,10 +366,10 @@ $templates['subscriber']['en']['html']['body'] = '
 ';
 
 // subscriber english plain
-$templates['subscriber']['en']['plain']['subject'] = '${displayname} ${productname} Account Termination Warning';
-$templates['subscriber']['en']['plain']['fromname'] = '${productname}';
-$templates['subscriber']['en']['plain']['fromaddr'] = 'contactme@schoolmessenger.com';
-$templates['subscriber']['en']['plain']['body'] = '
+$templates['subscriber-accountexpire']['en']['plain']['subject'] = '${displayname} ${productname} Account Termination Warning';
+$templates['subscriber-accountexpire']['en']['plain']['fromname'] = '${productname}';
+$templates['subscriber-accountexpire']['en']['plain']['fromaddr'] = 'contactme@schoolmessenger.com';
+$templates['subscriber-accountexpire']['en']['plain']['body'] = '
 The ${productname} account you created to manage your contact preferences for ${displayname} has not been logged into recently. Your account will be automatically disabled in ${daystotermination} days if you do not log into it.
 
 To keep your account active please login.
@@ -391,10 +391,10 @@ ${productname} is a notification service used by the nation\'s leading school sy
 ';
 
 // subscriber spanish html
-$templates['subscriber']['es']['html']['subject'] = '${displayname} ${productname} Advertencia Cancelación de cuenta';
-$templates['subscriber']['es']['html']['fromname'] = '${productname}';
-$templates['subscriber']['es']['html']['fromaddr'] = 'contactme@schoolmessenger.com';
-$templates['subscriber']['es']['html']['body'] = '
+$templates['subscriber-accountexpire']['es']['html']['subject'] = '${displayname} ${productname} Advertencia Cancelación de cuenta';
+$templates['subscriber-accountexpire']['es']['html']['fromname'] = '${productname}';
+$templates['subscriber-accountexpire']['es']['html']['fromaddr'] = 'contactme@schoolmessenger.com';
+$templates['subscriber-accountexpire']['es']['html']['body'] = '
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
         "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -454,10 +454,10 @@ $templates['subscriber']['es']['html']['body'] = '
 ';
 
 // subscriber spanish plain
-$templates['subscriber']['es']['plain']['subject'] = '${displayname} ${productname} Advertencia Cancelación de cuenta';
-$templates['subscriber']['es']['plain']['fromname'] = '${productname}';
-$templates['subscriber']['es']['plain']['fromaddr'] = 'contactme@schoolmessenger.com';
-$templates['subscriber']['es']['plain']['body'] = '
+$templates['subscriber-accountexpire']['es']['plain']['subject'] = '${displayname} ${productname} Advertencia Cancelación de cuenta';
+$templates['subscriber-accountexpire']['es']['plain']['fromname'] = '${productname}';
+$templates['subscriber-accountexpire']['es']['plain']['fromaddr'] = 'contactme@schoolmessenger.com';
+$templates['subscriber-accountexpire']['es']['plain']['body'] = '
 La cuenta de ${productname} que usted creó para administrar sus preferencias de contacto para ${displayname} no ha sido ingresada recientemente. Su cuenta sera inabilitada automaticamente en ${daystotermination} si usted no ingresa.
 
 Para mantener su cuenta activa por favor entre a su cuenta.

@@ -57,7 +57,7 @@ if ($templatetype == "messagelink") {
 	$smsmessage = DBFind("Message", "from message where messagegroupid = ? and type = 'sms' and languagecode = 'en'", false, array($messagegroupid));
 	// only one part
 	$smsbody = QuickQuery("select txt from messagepart where messageid = ?", false, array($smsmessage->id));
-} else if ($templatetype == "subscriber" || $templatetype == "monitor") {
+} else if ($templatetype == "subscriber-accountexpire" || $templatetype == "monitor") {
 	$showheaders = true;
 } else {
 	$showheaders = false;
@@ -174,6 +174,18 @@ if (CheckFormSubmit($f, "Save")) {
 									$haserror = true;
 								}
 								break;
+							case "monitor":
+								if (!strstr($body, "\${monitoralert}")) {
+									error('Template must contain "${monitoralert}" variable. ' . $subtype . ' ' . $langcode);
+									$haserror = true;
+								}
+								// also requires a subject
+								$subject = GetFormData($f, $s, "subject_" . $langcode);
+								if (strlen(trim($subject)) == 0) {
+									error('Subject cannot be blank. ' . $langcode);
+									$haserror = true;
+								}
+								break;
 							case "survey":
 								if (!strstr($body, "\${body}")) {
 									error('Template must contain "${body}" variable. ' . $subtype . ' ' . $langcode);
@@ -184,7 +196,7 @@ if (CheckFormSubmit($f, "Save")) {
 									$haserror = true;
 								}
 								break;
-							case "subscriber":
+							case "subscriber-accountexpire":
 								if (!strstr($body, "\${daystotermination}")) {
 									error('Template must contain "${daystotermination}" variable. ' . $subtype . ' ' . $langcode);
 									$haserror = true;

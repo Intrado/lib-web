@@ -1885,3 +1885,15 @@ $$$
 update setting set value='8.3/2' where name='_dbversion'
 $$$
 -- END 8.3/2
+
+-- no symbols in naming
+ALTER TABLE `person` CHANGE `type` `type` ENUM( 'system', 'addressbook', 'manualadd', 'upload', 'subscriber',  'guardianauto',  'guardiancm') CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT 'system'
+$$$
+
+-- need more chars for descriptive names
+ALTER TABLE `template` CHANGE `type` `type` VARCHAR( 50 ) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL
+$$$
+
+update setting set value='8.3/3' where name='_dbversion'
+$$$
+-- END 8.3/3
