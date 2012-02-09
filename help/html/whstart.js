@@ -31,7 +31,7 @@ function delayReload()
 	}
 }
 
-var gsToolbarOrder = "toc|fts|blankblock";
+var gsToolbarOrder = "toc|fts|blankblock|searchform";
 var gsMinibarOrder = "blankblock|hide2|";
 
 var gsTopic = "Getting_Started/Welcome.htm";
