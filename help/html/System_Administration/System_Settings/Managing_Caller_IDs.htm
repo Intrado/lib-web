@@ -1,0 +1,163 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+ <meta name="generator" content="Adobe RoboHelp 9" />
+<title>Managing Caller IDs</title>
+<link rel="StyleSheet" href="../../help.css" type="text/css" />
+<script type="text/javascript" language="JavaScript">
+//<![CDATA[
+function ehlp_showtip(current,e,text)
+{
+  if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == 'Netscape'))
+  {
+    document.tooltip.document.write("<layer bgColor='yellow' style='border:1px solid black;font-size:12px;'>"+ text + "</layer>");
+    document.tooltip.document.close();
+    document.tooltip.left=e.pageX+5;
+    document.tooltip.top=e.pageY+5;
+    document.tooltip.visibility="show";
+  }
+}
+function ehlp_hidetip()
+{
+  document.tooltip.visibility="hidden";
+}
+//]]>
+</script>
+<script type="text/javascript" language="JavaScript">
+//<![CDATA[
+function reDo() {
+  if (innerWidth != origWidth || innerHeight != origHeight)
+     location.reload();
+}
+if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == "Netscape")) {
+	origWidth = innerWidth;
+	origHeight = innerHeight;
+	onresize = reDo;
+}
+onerror = null; 
+//]]>
+</script>
+<style type="text/css">
+<!--
+div.WebHelpPopupMenu { position:absolute;
+left:0px;
+top:0px;
+z-index:4;
+visibility:hidden; }
+-->
+</style>
+<script type="text/javascript" language="javascript1.2" src="../../whmsg.js"></script>
+<script type="text/javascript" language="javascript" src="../../whver.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whproxy.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whutils.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whlang.js"></script>
+<script type="text/javascript" language="javascript1.2" src="../../whtopic.js"></script>
+
+</head>
+
+<body><script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.gbWhTopic)
+{
+	var strUrl = document.location.href;
+	var bc = 0;
+	var n = strUrl.toLowerCase().indexOf("bc-");
+	if(n != -1)
+	{
+		document.location.href = strUrl.substring(0, n);
+		bc = strUrl.substring(n+3);
+	}
+
+	if (window.addTocInfo)
+	{
+	addTocInfo("System Administration\nSettings\nManaging Caller IDs");
+addButton("show",BTN_TEXT,"Show","","","","",0,0,"","","");
+
+	}
+	if (window.writeBtnStyle)
+		writeBtnStyle();
+
+	if (window.writeIntopicBar)
+		writeIntopicBar(1);
+
+	
+	document.write("<p style=\"text-align:right\"> ");
+AddMasterBreadcrumbs("../../CommSuite_User_Guide.htm", "", ">", "Home", "../../Getting_Started/Welcome.htm");
+document.write("<a href=\"../User_Management/Managing_User_Accounts.htm\">System Administration<\/a> > <a href=\"Job.htm\">Settings<\/a> > Managing Caller IDs<\/p>");
+
+
+	if (window.setRelStartPage)
+	{
+	setRelStartPage("../../CommSuite_User_Guide.htm");
+
+		autoSync(0);
+		sendSyncInfo();
+		sendAveInfoOut();
+	}
+}
+else
+	if (window.gbIE4)
+		document.location.reload();
+
+//-->
+//]]></script>
+<h1>Managing Caller IDs</h1>
+<p>The Caller ID numbers which users may associate with their respective 
+ accounts may be restricted to a specific list of approved numbers. </p>
+<p><span style="font-weight: bold;"><b>Note:</b></span> <span style="font-style: italic;"><i>If 
+ the user's <a title="Click to learn more about Access Profiles." href="../User_Management/Managing_Access_Profiles.htm" onmouseover="if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == 'Netscape')) ehlp_showtip(this,event,'Click to learn more about Access Profiles.');" onmouseout="if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == 'Netscape')) ehlp_hidetip();">Access 
+ Profile</a> allows him to enter a custom Caller ID, he will be able to 
+ see the list of approved Caller ID numbers, but choose between using one 
+ of the numbers or entering a custom value.</i></span></p>
+<p style="font-weight: bold;">Creating approved Caller ID numbers:</p>
+<ol type="1">
+	<li><p style="line-height: 150%;">Navigate to Admin&gt;Settings and 
+	 click on Job Settings.</p></li>
+	<li><p style="line-height: 150%;">If you would like to restrict users 
+	 to the approved Caller ID numbers, check the &quot;Approved Caller 
+	 IDs&quot; checkbox.</p></li>
+	<li><p style="line-height: 150%;">Click the &quot;Edit Approved Caller 
+	 IDs&quot; button to enter the Caller ID management screen.</p></li>
+	<li><p style="line-height: 150%;">You may manually add one or more 
+	 Caller ID numbers in the Manual Add field. Multiple Caller ID numbers 
+	 should each be placed on a new line.</p></li>
+	<li><p style="line-height: 150%;">If your users have other Caller ID 
+	 numbers associated with their account or with certain jobs, these 
+	 numbers will be displayed in the Import field. You may wish to add 
+	 these numbers to your approved Caller IDs list. Just check the box 
+	 next to any numbers you want to include.</p></li>
+	<li><p style="line-height: 150%;">Click the &quot;Add&quot; button 
+	 when you are finished adding and selecting Caller ID numbers. You 
+	 will see the numbers in the Approved Caller ID area to the right.</p></li>
+	<li><p style="line-height: 150%;">Click the &quot;Done&quot; button 
+	 to finish and leave the Caller ID management screen.</p></li>
+</ol>
+<p style="line-height: 150%;">&#160;</p>
+<p style="line-height: 150%; font-weight: bold;">Deleting approved Caller 
+ Id numbers:</p>
+<p style="line-height: 150%;">Simply navigate to the Caller ID management 
+ screen and click the &quot;Delete&quot; link next to the number in the 
+ Approved Caller ID are which you would like to remove.</p>
+<p>&#160;</p>
+<div style="width: 100%; position: relative;" id="footer">
+	<p>&#160;&#160;<span style="font-size: xx-small;"><font size="1" style="font-size: xx-small;">©1999 - 2012 Reliance 
+	 Communications, Inc.</font></span> </p>
+</div>
+<script type="text/javascript" language="JavaScript">
+//<![CDATA[
+ if ((parseInt(navigator.appVersion) == 4) && (navigator.appName == 'Netscape'))
+  document.write("<div id='tooltip' class='WebHelpPopupMenu'></div>");
+//]]>
+</script><script type="text/javascript" language="javascript1.2">//<![CDATA[
+<!--
+if (window.writeIntopicBar)
+	writeIntopicBar(0);
+
+
+highlightSearch();
+//-->
+//]]></script>
+</body>
+</html>
