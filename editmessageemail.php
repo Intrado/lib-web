@@ -145,8 +145,10 @@ if ($message) {
 	
 	// get the attachments
 	$msgattachments = DBFindMany("MessageAttachment", "from messageattachment where messageid = ?", false, array($message->id));
-	foreach ($msgattachments as $msgattachment)
+	foreach ($msgattachments as $msgattachment) {
+		permitContent($msgattachment->contentid);
 		$attachments[$msgattachment->contentid] = array("name" => $msgattachment->filename, "size" => $msgattachment->size);
+	}
 } else {
 	$message2 = $messagegroup->getMessage("email", $subtype=="html"?"plain":"html", $languagecode);
 	// Sync with other message subtype if it exists
@@ -156,8 +158,10 @@ if ($message) {
 		$fromemail = $message2->fromemail;
 		$subject = $message2->subject;
 		$msgattachments = DBFindMany("MessageAttachment", "from messageattachment where messageid = ?", false, array($message2->id));
-		foreach ($msgattachments as $msgattachment)
+		foreach ($msgattachments as $msgattachment) {
+			permitContent($msgattachment->contentid);
 			$attachments[$msgattachment->contentid] = array("name" => $msgattachment->filename, "size" => $msgattachment->size);
+		}
 	}
 }
 

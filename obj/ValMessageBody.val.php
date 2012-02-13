@@ -35,12 +35,15 @@ class ValMessageBody extends Validator {
 						return _L('Translation messages may not have audio parts.');
 				}
 			}
-		} else if (isset($args['maximages'])) {
+		} else {
 			$imagecount = 0;
 			foreach ($parts as $part) {
-				if ($part->type == 'I')
+				if ($part->type == 'I') {
+					if (!contentAllowed($part->imagecontentid))
+						return _L('Unknown image content');
 					$imagecount++;
-				if ($imagecount > $args['maximages'])
+				}
+				if (isset($args['maximages']) && $imagecount > $args['maximages'])
 					return _L('You may only include %s images.', $args['maximages']);
 			}
 		}

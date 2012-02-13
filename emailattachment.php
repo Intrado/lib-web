@@ -9,21 +9,23 @@ if ($USER->authorize("sendemail") === false) {
 }
 
 if(isset($_GET["name"]) && isset($_GET["id"])) {
-	//FIXME zero security checks
-	if ($c = contentGet($_GET["id"] + 0)){
-		list($contenttype,$data) = $c;
-		if($data) {
-			header("HTTP/1.0 200 OK");
-			header('Content-type: ' . $contenttype);
-			header("Pragma: private");
-			header("Cache-Control: private");
-			header("Content-disposition: attachment; filename=\"" . urldecode($_GET["name"]) . "\"");
-			header("Content-Length: " . strlen($data));
-			header("Connection: close");
-			echo $data;
+	if (contentAllowed($_GET['id'])) {
+		if ($c = contentGet($_GET["id"] + 0)){
+			list($contenttype,$data) = $c;
+			if($data) {
+				header("HTTP/1.0 200 OK");
+				header('Content-type: ' . $contenttype);
+				header("Pragma: private");
+				header("Cache-Control: private");
+				header("Content-disposition: attachment; filename=\"" . urldecode($_GET["name"]) . "\"");
+				header("Content-Length: " . strlen($data));
+				header("Connection: close");
+				echo $data;
+			}
 		}
+		exit();
 	}
-	exit();
+	redirect('unauthorized.php');
 }
 
 //get any uploaded file and put in session queue (use session in case there is a form error)
@@ -41,10 +43,18 @@ $unsafeext = array(".ade",".adp",".asx",".bas",".bat",".chm",".cmd",".com",".cpl
 
 $result = handleFileUpload('emailattachment', $maxattachmentsize, $unsafeext, null, true);
 
-$filename = is_array($result) ? $result['filename'] : '';
-$contentid = is_array($result) ? $result['contentid'] : '';
-$size = is_array($result) ? $result['sizebytes'] : 0;
-$errormessage = is_string($result) ? $result : '';
+
+if (is_array($result)) {
+	permitContent($result['contentid']);
+	$filename = $result['filename'];
+	$contentid = $result['contentid'];
+	$size = $result['sizebytes'];
+} else if (is_string($result)) {
+	$errormessage = $result;
+	$filename = '';
+	$contentid = '';
+	$size = 0;
+}
 ?>
 
 <html>
