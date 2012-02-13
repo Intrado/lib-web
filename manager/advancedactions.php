@@ -38,7 +38,7 @@ include_once("nav.inc.php");
 <li><a href="tollfreenumbers.php">Add Toll Free Numbers</a></li>
 <? } ?>
 
-<? if ($SETTINGS['servermanagement']['manageservers'] && $MANAGERUSER->authorized("manageserver")) { ?>
+<? if (isset($SETTINGS['servermanagement']['manageservers']) && $SETTINGS['servermanagement']['manageservers'] && $MANAGERUSER->authorized("manageserver")) { ?>
 <li><a href="serverlist.php">Manage Servers</a></li>
 <? } ?>
 
