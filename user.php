@@ -409,17 +409,6 @@ $formdata["phone"] = array(
 );
 
 if (!getSystemSetting('_hascallback', false)) {
-// 	$formdata["callerid"] = array(
-// 		"label" => _L("Caller ID"),
-// 		"fieldhelp" => _L('This is the default Caller ID phone number for jobs sent by the user.'),
-// 		"value" => ($edituser->id +0 > 0)?Phone::format($edituser->getSetting("callerid", "")):"",
-// 		"validators" => array(
-// 			array("ValLength","min" => 2,"max" => 20),
-// 			array("ValPhone")
-// 		),
-// 		"control" => array("TextField","maxlength" => 20, "size" => 15),
-// 		"helpstep" => 1
-// 	);
 	$authorizedcallerids = QuickQueryList("select callerid,callerid from authorizedcallerid",true);
 	$formdata["callerid"] = array(
 				"label" => _L("Caller ID"),
@@ -435,7 +424,7 @@ if (!getSystemSetting('_hascallback', false)) {
 	
 	
 	if(getSystemSetting("requireapprovedcallerid",false)) {
-		$authorizedusercallerids = QuickQueryList("select callerid from authorizedusercallerid where userid=?",false,false,array($USER->id));
+		$authorizedusercallerids = QuickQueryList("select callerid from authorizedusercallerid where userid=?",false,false,array($edituser->id));
 		foreach($authorizedcallerids as $calleridkey => $calleridvalue) {
 			$authorizedcallerids[$calleridkey] = Phone::format($calleridvalue);
 		}
@@ -772,13 +761,20 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 				$edituser->setSetting("callerid",Phone::parse($postdata['callerid']));
 			
 			if (isset($postdata['restrictcallerid'])) {
+				error_log("change callerid restriction 1");
 				if (count($postdata['restrictcallerid'])) {
+					error_log("change callerid restriction 2");
+						
 					if(count(array_diff($postdata['restrictcallerid'],$authorizedusercallerids)) > 0 || 
 						count(array_diff($authorizedusercallerids,$postdata['restrictcallerid'])) > 0) {
+						error_log("change callerid restriction 3");
+						
 						QuickUpdate("delete from authorizedusercallerid where userid=?",false,array($edituser->id));
 						QuickUpdate("insert into authorizedusercallerid (userid,callerid) values " . repeatWithSeparator("({$edituser->id},?)", ",", count($postdata['restrictcallerid'])),false,$postdata['restrictcallerid']);
 					}
 				} else {
+					error_log("delete callerid restriction");
+						
 					QuickUpdate("delete from authorizedusercallerid where userid=?",false,array($edituser->id));
 				}
 			}
