@@ -1,6 +1,6 @@
 <? 
-// MUST RUN BEFORE ASP_8-1 upgrade
-// Prefill customer jobstats table with best guess from reportcontact data, also fill job.activedate
+// (ASP_8-1) Prefill customer jobstats table with best guess from reportcontact data, also fill job.activedate
+// (ASP_8-2) fill job 'people' total count
 
 $authhost = "127.0.0.1";
 $authuser = "root";
@@ -114,7 +114,7 @@ echo "Updater id: $updater\n";
 			break;
 		}
 		
-		echo "customer $customerid - jobids ";
+		echo "customer $customerid - ";
 		$_dbcon = $db = $shards[$customer['shardid']];
 		QuickUpdate("use c_$customerid",$db);
 		update_customer($db, $customerid, $customer['shardid']);
@@ -157,20 +157,33 @@ function update_customer($db, $customerid, $shardid) {
 		return;
 	}
 	
+	jobstatsCompleteSeconds($db, $customerid, $shardid);
+	jobstatsPeopleCount($db, $customerid, $shardid);
+	
+	// remove progress lock
+	QuickUpdate("delete from setting where name='_dbjobstats_inprogress'",$db);
+	
+	echo "\n";
+	
+}
+
+function jobstatsCompleteSeconds($db, $customerid, $shardid) {
+	echo "\njobstats 'complete-seconds' on jobids ";
+	
 	// gather a settings for max phone/email/sms and timezone
 	$settings = QuickQueryList("select name, value from setting where name in ('maxphones', 'maxemails', 'maxsms', 'timezone')", true);
 	if (isset($settings['maxphones']))
-		$maxphones = $settings['maxphones'];
+	$maxphones = $settings['maxphones'];
 	else
-		$maxphones = 1;
+	$maxphones = 1;
 	if (isset($settings['maxemails']))
-		$maxemails = $settings['maxemails'];
+	$maxemails = $settings['maxemails'];
 	else
-		$maxemails = 1;
+	$maxemails = 1;
 	if (isset($settings['maxsms']))
-		$maxsms = $settings['maxsms'];
+	$maxsms = $settings['maxsms'];
 	else
-		$maxsms = 1;
+	$maxsms = 1;
 	
 	$timezone = $settings['timezone'];
 	
@@ -179,31 +192,31 @@ function update_customer($db, $customerid, $shardid) {
 		// only backfill completed jobs, too complex to worry about active or cancelled
 		$jobids = QuickQueryList("select id from job where status = 'complete' and activedate is null limit 100");
 		if (count($jobids) == 0)
-			break; // no more, break from while true loop
-		
+		break; // no more, break from while true loop
+	
 		foreach ($jobids as $jobid) {
 			// check if time to stop
 			if (!hasTimeToContinue()) {
 				break;
 			}
-			
-			$timerstart = strtotime(date_format(new DateTime(), "Y-m-d H:i:s"));
 				
+			$timerstart = strtotime(date_format(new DateTime(), "Y-m-d H:i:s"));
+	
 			echo $jobid . ", ";
-		
+	
 			$jobstats = array(); // key=name, value=value to fill jobstats table with jobid
-		
+	
 			// for each job, single transaction
 			Query("begin",$db);
-			
+				
 			QuickUpdate("set time_zone = ?", null, array($timezone));
 	
 			///////////////////
 			//phone
 			$maxcallattempts = QuickQuery("select value from jobsetting where name = 'maxcallattempts' and jobid = ?", null, array($jobid));
-		
+	
 			$phonetimes = array(); // [attempt 0, 1, 2, ][sequence 0,1,2. ]['min'|'max'] = starttime
-		
+	
 			$phoneattemptdata = QuickQueryMultiRow("select personid, sequence, attemptdata from reportcontact where jobid = ? and type = 'phone' and attemptdata is not null order by personid, sequence", true, null, array($jobid));
 			$workingPersonid = 0; // current personid working through their sequences
 			$workingSequence = 0;
@@ -217,23 +230,23 @@ function update_customer($db, $customerid, $shardid) {
 				for ($workingAttempt = 0; $workingAttempt < $maxcallattempts; $workingAttempt++) {
 					$starttime = substr($row['attemptdata'], ($workingAttempt * 16), 13); // 16 chars per attempt, 13 chars length of starttime
 					if (!$starttime)
-						break; // no more attempts for this sequence
+					break; // no more attempts for this sequence
 					updatePhonetimesForAttemptSequence($workingAttempt, $workingSequence, $starttime, $phonetimes);
 				}
 			}
-		
+	
 			if (isset($phonetimes[0][0]['min']))
-				$minstartphone = $phonetimes[0][0]['min']; // starting time of attempt=0, sequence=0
+			$minstartphone = $phonetimes[0][0]['min']; // starting time of attempt=0, sequence=0
 			else
-				$minstartphone = null;
-		
+			$minstartphone = null;
+	
 			foreach ($phonetimes as $attempt => $seqarray) {
 				foreach ($seqarray as $seq => $minmaxarray) {
 					$duration = ($minmaxarray['max'] - $minstartphone) / 1000;
 					$jobstats["complete-seconds-phone-attempt-".$attempt."-sequence-".$seq] = $duration;
 				}
 			}
-		
+	
 			///////////////////
 			// email
 			$minmax = QuickQueryRow("select min(starttime), max(starttime) from reportcontact where jobid = ? and type = 'email' and starttime is not null", false, null, array($jobid));
@@ -253,7 +266,7 @@ function update_customer($db, $customerid, $shardid) {
 			$minmax = QuickQueryRow("select min(starttime), max(starttime) from reportcontact where jobid = ? and type = 'sms' and starttime is not null", false, null, array($jobid));
 			$minstartsms = $minmax[0];
 			$maxstartsms = $minmax[1];
-		
+	
 			// if there is a min and max, then there was a complete first pass
 			if ($minstartsms && $maxstartsms) {
 				$duration = ($maxstartsms - $minstartsms) / 1000;
@@ -261,40 +274,40 @@ function update_customer($db, $customerid, $shardid) {
 					$jobstats["complete-seconds-sms-attempt-0-sequence-" . $i] = $duration;
 				}
 			}
-		
+	
 			/////////////////
 			// activedate
-		
+	
 			// create array of possible activedate, do not include null
 			$a = array();
 			if ($minstartphone != null)
-				$a[] = $minstartphone;
+			$a[] = $minstartphone;
 			if ($minstartemail != null)
-				$a[] = $minstartemail;
+			$a[] = $minstartemail;
 			if ($minstartsms != null)
-				$a[] = $minstartsms;
-		
+			$a[] = $minstartsms;
+	
 			if (count($a) == 0) {
 				// no starttime data, set to job max of (startdate/time, createdate, modifydate)
 				$jobtimes = QuickQueryRow("select createdate, modifydate, timestamp(startdate, starttime) as startdatetime from job where id = ?", true, null, array($jobid));
 				$activedate = 0;
 				// createdate, startdate, starttime can never be null in the db, however modifydate may be null
 				if (strtotime($jobtimes['createdate']) > $activedate)
-					$activedate = strtotime($jobtimes['createdate']);
+				$activedate = strtotime($jobtimes['createdate']);
 				// strtotime() returns false if invalid param entered, check for null first
 				if ($jobtimes['modifydate'] != null && strtotime($jobtimes['modifydate']) > $activedate)
-					$activedate = strtotime($jobtimes['modifydate']);
+				$activedate = strtotime($jobtimes['modifydate']);
 				if (strtotime($jobtimes['startdatetime']) > $activedate)
-					$activedate = strtotime($jobtimes['startdatetime']);
+				$activedate = strtotime($jobtimes['startdatetime']);
 			} else {
 				$activedate = min($a) / 1000; // convert millis to secs
 			}
-				
+	
 			if (!QuickUpdate("update job set activedate = from_unixtime(?) where id = ?", null, array($activedate, $jobid))) {
 				echo "\nFailed to update job.activedate\n";
 				return;
 			}
-		
+	
 			// insert bulk jobstats
 			$args = array();
 			$query = "insert into jobstats (jobid, name, value) values ";
@@ -310,22 +323,59 @@ function update_customer($db, $customerid, $shardid) {
 					return;
 				}
 			}
-		
+	
 			// commit this job
 			Query("commit",$db);
+				
+			$timerstop = strtotime(date_format(new DateTime(), "Y-m-d H:i:s"));
+			$timediff = $timerstop - $timerstart;
+			//echo " (" . count($phoneattemptdata) . " took " . $timediff . ") ";
+	
+		} // end for jobid
+	} // end while loop
+}
+
+function jobstatsPeopleCount($db, $customerid, $shardid) {
+	echo "\njobstats 'people' on jobids ";
+	
+	// NOTE assume all bogus stats nuked by a manager query (between 8.2 and 8.2.1 release calc bogus)
+		
+	// loop until all jobs are prefilled, or time to stop
+	while (true && hasTimeToContinue()) {
+		// backfill jobs that not yet have people calculated
+		$jobids = QuickQueryList("select distinct jobid from jobstats where jobid not in (select jobid from jobstats where name = 'people') limit 100");
+		if (count($jobids) == 0)
+			break; // no more, break from while true loop
+	
+		foreach ($jobids as $jobid) {
+			// check if time to stop
+			if (!hasTimeToContinue()) {
+				break;
+			}
+				
+			$timerstart = strtotime(date_format(new DateTime(), "Y-m-d H:i:s"));
+	
+			echo $jobid . ", ";
+	
+			// find count of persons from phone message, else email message, else sms (query in order of likely message type)
+			$totalJobPeopleCount = QuickQuery("select count(*) from reportperson where type = 'phone' and jobid = ?", null, array($jobid));
+			if (!$totalJobPeopleCount) {
+				$totalJobPeopleCount = QuickQuery("select count(*) from reportperson where type = 'email' and jobid = ?", null, array($jobid));
+				if (!$totalJobPeopleCount) {
+					$totalJobPeopleCount = QuickQuery("select count(*) from reportperson where type = 'sms' and jobid = ?", null, array($jobid));
+				}
+			}
+			
+			// insert or overwrite jobstats for 'people' total person count
+			$query = "insert into jobstats values (?, 'people', ?)  on duplicate key update value = ?";
+			QuickUpdate($query, null, array($jobid, $totalJobPeopleCount, $totalJobPeopleCount));
 			
 			$timerstop = strtotime(date_format(new DateTime(), "Y-m-d H:i:s"));
 			$timediff = $timerstop - $timerstart;
-		//echo " (" . count($phoneattemptdata) . " took " . $timediff . ") ";
-				
+			//echo " (" . $totalJobPeopleCount . " took " . $timediff . ") ";
+	
 		} // end for jobid
 	} // end while loop
-	
-	// remove progress lock
-	QuickUpdate("delete from setting where name='_dbjobstats_inprogress'",$db);
-	
-	echo "\n";
-	
 }
 
 ?>
