@@ -129,7 +129,7 @@ class MultiImportBox extends FormItem {
 // Form Data
 ////////////////////////////////////////////////////////////////////////////////
 $helpstepnum = 1;
-$helpsteps = array(_L('You may enter multiple Caller ID numbers, each on a new line. Click the "Add" button when you are done.'));
+$helpsteps = array(_L('Enter one or more Caller ID numbers. Put each number on a new line. Click the "Add" button to add them to the approved Caller ID list.'));
 
 $numbers = QuickQueryList("select callerid,callerid from authorizedcallerid",true);
 
@@ -164,7 +164,8 @@ foreach ($usednumbers as $usednumber) {
 	$importnumberdata[$usednumber] = Phone::format($usednumber) . " - " . _L("Used by ") . implode(_L(" and "),$desc);
 }
 
-
+$helpsteps[] = array(_L('These Caller ID numbers are currently associated with users or jobs. To add them as approved Caller IDs, check the box next to the numbers you wish to add. Click the \"Add\" button after making your selections.'));
+$helpstepnum++;
 if (count($importnumberdata) > 0) {
 	$formdata["importnumbers"] = array(
 		"label" => _L('Import'),
