@@ -632,7 +632,7 @@ function sessionKeepAliveWarning(timeout) {
 			.observe("click", function() {
 				content.update(new Element('img', {src:"img/ajax-loader.gif", alt: "Refreshing Session"}));
 				new Ajax.Request('ajax.php',{
-					method:'post',
+					method:'get',
 					parameters:{type: 'keepalive'},
 					onSuccess: function (response) {
 						//HACK: check to see if we hit the login page (due to logout)
