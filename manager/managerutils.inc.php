@@ -323,7 +323,7 @@ function getPooledCustomerConnection ($cid,$readonly=false) {
 	$sid = $CUSTOMERINFO[$cid]['shardid'];
 
 	if ($readonly && !isset($SETTINGS["db"]["readonly"][$sid-1])) {
-		error_log("WARNING: readonly connection requested, but not found in config");
+		error_log("WARNING: readonly connection requested, but not found in config for shard id: ". $sid);
 		$readonly = false;
 	}
 	
