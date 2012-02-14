@@ -36,37 +36,46 @@ function fadecolor($primary, $fade, $ratio){
 }
 
 $appservererror = false;
-$badcode = false;
 
-list($appserverprotocol, $appservertransport) = initMessageLinkApp();
-
-if($appserverprotocol == null || $appservertransport == null) {
-	error_log("Cannot use AppServer");
-	$appservererror = true;
+// does this code contain only valid characters? If not, it's bad
+if (!preg_match("/^[-_a-zA-Z0-9]+$/", $code)) {
+	error_log("Invalid messagelinkcode requested: '" . $code . "'");
+	$badcode = true;
 } else {
-	$attempts = 0;
-	while(true) {
-		try {
-			$client = new MessageLinkClient($appserverprotocol);
-			// Open up the connection
-			$appservertransport->open();
+	$badcode = false;
+}
+
+if (!$badcode) {
+	list($appserverprotocol, $appservertransport) = initMessageLinkApp();
+	
+	if($appserverprotocol == null || $appservertransport == null) {
+		error_log("Cannot use AppServer");
+		$appservererror = true;
+	} else {
+		$attempts = 0;
+		while(true) {
 			try {
-				$messageinfo = $client->getInfo($code);
-			} catch (messagelink_MessageLinkCodeNotFoundException $e) {
-				$badcode = true;
-				error_log("Unable to find the messagelinkcode: " . urlencode($code));
-			}
-			$appservertransport->close();
-			break;
-		} catch (TException $tx) {
-			$attempts++;
-			// a general thrift exception, like no such server
-			error_log("getInfo: Exception Connection to AppServer (" . $tx->getMessage() . ")");
-			$appservertransport->close();
-			if($attempts > 2) {
-				error_log("getInfo: Failed 3 times to get content from appserver");
-				$appservererror = true;
+				$client = new MessageLinkClient($appserverprotocol);
+				// Open up the connection
+				$appservertransport->open();
+				try {
+					$messageinfo = $client->getInfo($code);
+				} catch (messagelink_MessageLinkCodeNotFoundException $e) {
+					$badcode = true;
+					error_log("Unable to find the messagelinkcode: " . urlencode($code));
+				}
+				$appservertransport->close();
 				break;
+			} catch (TException $tx) {
+				$attempts++;
+				// a general thrift exception, like no such server
+				error_log("getInfo: Exception Connection to AppServer (" . $tx->getMessage() . ")");
+				$appservertransport->close();
+				if($attempts > 2) {
+					error_log("getInfo: Failed 3 times to get content from appserver");
+					$appservererror = true;
+					break;
+				}
 			}
 		}
 	}
@@ -80,6 +89,7 @@ if ($appservererror || $badcode) {
 	$globalratio = ".2";
 	$TITLE = "School Messenger";
 	$urlcomponent = "m";
+	$logosrc = "img/logo_small.gif";
 } else {
 	$theme = $messageinfo->brandinfo["theme"];
 	$primary = $messageinfo->brandinfo["primary"];
@@ -95,6 +105,7 @@ if ($appservererror || $badcode) {
 										"_brandratio" => $globalratio);
 	$TITLE = escapehtml($messageinfo->customerdisplayname);
 	$urlcomponent = $messageinfo->urlcomponent;
+	$logosrc = "messagelinklogo.img.php?code=". escapehtml($code);
 	apache_note("CS_CUST",urlencode($messageinfo->urlcomponent)); //for logging
 	
 }
@@ -146,7 +157,7 @@ if ($appservererror || $badcode) {
 <body style='padding: 0; margin: 0px;font-family: "Lucida Grande", verdana, arial, helvetica, sans-serif;'>
 	<table class="navlogoarea" border="0" cellspacing="0" cellpadding="0" width="100%">
 		<tr>
-			<td bgcolor="white"><div style="padding-left:10px;"><img src="messagelinklogo.img.php?code=<?=escapehtml($code)?>" alt=""/></div></td>
+			<td bgcolor="white"><div style="padding-left:10px;"><img src="<?=$logosrc?>" alt=""/></div></td>
 			<td><img src="img/shwoosh.gif" alt=""/></td>
 			<td width="100%"></td>
 		</tr>
