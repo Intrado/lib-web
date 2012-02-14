@@ -41,7 +41,7 @@ $usernamelength = getSystemSetting("usernamelength", 5);
 if ($USER->ldap)
 	$usernamelength = 1;
 
-$passwordlength = getSystemSetting("passwordlength", 5);
+$passwordlength = getSystemSetting("passwordlength", 5); // minimum password length, poor naming
 $checkpassword = (getSystemSetting("checkpassword")==0) ? getSystemSetting("checkpassword") : 1;
 if ($checkpassword) {
 	if ($passwordlength < 6) {
@@ -139,10 +139,10 @@ if (!$ldapuser) {
 			"value" => $pass,
 			"validators" => array(
 				array("ValRequired"),
-				array("ValLength","min" => $passlength,"max" => 20),
+				array("ValLength","min" => $passlength,"max" => 50),
 				array("ValPassword", "login" => $USER->login, "firstname" => $USER->firstname, "lastname" => $USER->lastname)
 			),
-			"control" => array("TextPasswordStrength","maxlength" => 20, "size" => 25, "minlength" => $passlength),
+			"control" => array("TextPasswordStrength","maxlength" => 50, "size" => 25, "minlength" => $passlength),
 			"helpstep" => 1
 		);
 	} else {
@@ -152,11 +152,11 @@ if (!$ldapuser) {
 			"value" => $pass,
 			"validators" => array(
 				array("ValRequired"),
-				array("ValLength","min" => $passlength,"max" => 20),
+				array("ValLength","min" => $passlength,"max" => 50),
 				array("ValPassword", "login" => $USER->login, "firstname" => $USER->firstname, "lastname" => $USER->lastname)
 			),
 			"requires" => array("firstname", "lastname", "login"),
-			"control" => array("TextPasswordStrength","maxlength" => 20, "size" => 25, "minlength" => $passlength),
+			"control" => array("TextPasswordStrength","maxlength" => 50, "size" => 25, "minlength" => $passlength),
 			"helpstep" => 1
 		);
 	}
@@ -167,11 +167,11 @@ if (!$ldapuser) {
 		"value" => $pass,
 		"validators" => array(
 			array("ValRequired"),
-			array("ValLength","min" => $passlength,"max" => 20),
+			array("ValLength","min" => $passlength,"max" => 50),
 			array("ValFieldConfirmation", "field" => "password")
 		),
 		"requires" => array("password"),
-		"control" => array("PasswordField","maxlength" => 20, "size" => 25),
+		"control" => array("PasswordField","maxlength" => 50, "size" => 25),
 		"helpstep" => 1
 	);
 }

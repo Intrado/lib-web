@@ -302,18 +302,18 @@ if($IS_LDAP){
 }
 
 $pass = (!$makeNewUser) ? 'nopasswordchange' : '';
-$passlength = getSystemSetting("passwordlength", 5);
+$passlength = getSystemSetting("passwordlength", 5); // minimum password length, poor naming
 $formdata["password"] = array(
 	"label" => _L("Password"),
 	"fieldhelp" => _L('The password is used to log into the web interface.'),
 	"value" => $pass,
 	"validators" => array(
 		array("ValRequired"),
-		array("ValLength","min" => $passlength,"max" => 20),
+		array("ValLength","min" => $passlength,"max" => 50),
 		array("ValPassword", "login" => $edituser->login, "firstname" => $edituser->firstname, "lastname" => $edituser->lastname)
 	),
 	"requires" => array("firstname", "lastname", "login"),
-	"control" => array("TextPasswordStrength","maxlength" => 20, "size" => 25, "minlength" => $passlength),
+	"control" => array("TextPasswordStrength","maxlength" => 50, "size" => 25, "minlength" => $passlength),
 	"helpstep" => 1
 );
 
@@ -323,11 +323,11 @@ $formdata["passwordconfirm"] = array(
 	"value" => $pass,
 	"validators" => array(
 		array("ValRequired"),
-		array("ValLength","min" => $passlength,"max" => 20),
+		array("ValLength","min" => $passlength,"max" => 50),
 		array("ValFieldConfirmation", "field" => "password")
 	),
 	"requires" => array("password"),
-	"control" => array("PasswordField","maxlength" => 20, "size" => 25),
+	"control" => array("PasswordField","maxlength" => 50, "size" => 25),
 	"helpstep" => 1
 );
 
