@@ -14,6 +14,7 @@ require_once("obj/Wizard.obj.php");
 require_once("obj/ColorPicker.fi.php");
 require_once("obj/ColorPicker.val.php");
 require_once("obj/InpageSubmitButton.fi.php");
+require_once("obj/FeedCategory.obj.php");
 
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization
