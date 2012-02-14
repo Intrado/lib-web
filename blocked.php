@@ -15,6 +15,14 @@ if (!$USER->authorize('blocknumbers')) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+// Data
+////////////////////////////////////////////////////////////////////////////////
+
+getSystemSetting("_hassms", false) ? $blockedphonetext = _L('Phone Calls / Text Messages') : $blockedphonetext = _L('Phone Calls');
+
+
+
+////////////////////////////////////////////////////////////////////////////////
 // Display
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -25,8 +33,8 @@ require_once("nav.inc.php");
 startWindow("Blocked Destination Types");
 	?>
 	<div style="padding: 8px">
-		<a href="blockedphone.php?clear">Phone Calls / Text Messages</a><br>
-		<a href="blockedemail.php?clear">Email Addresses</a>
+		<a href="blockedphone.php?clear"><?= $blockedphonetext ?></a><br>
+		<a href="blockedemail.php?clear"><?=  _L('Email Addresses') ?></a>
 	</div>
 	<?
 endWindow();

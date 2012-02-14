@@ -182,15 +182,19 @@ if ($button = $form->getSubmit()) {
 		$postdata = $form->getData(); //gets assoc array of all values {name:value,...}
 		Query("BEGIN");
 		$phone = Phone::parse($postdata["phone"]);
-		if($postdata["type"] == 'both' || $postdata["type"] == 'phone')
+		
+		if ($postdata["type"] == 'both' || $postdata["type"] == 'phone')
 			$result = QuickUpdate("insert into blockeddestination (userid, description, destination, type, createdate)
 						values (?, ?, ?, 'phone', now())", false, array($USER->id, $postdata["reason"], $phone));
-		if($postdata["type"] == 'both' || $postdata["type"] == 'sms')
+		if (($postdata["type"] == 'both' || $postdata["type"] == 'sms') && getSystemSetting("_hassms", false))
 			$result = QuickUpdate("insert into blockeddestination (userid, description, destination, type, createdate)
 						values (?, ?, ?, 'sms', now())", false, array($USER->id, $postdata["reason"], $phone));
 		if ($result) {
 			if ($postdata["type"] == 'both') {
-				notice(_L("Both phone calls and text messages for %s are now blocked.", escapehtml(Phone::format($phone))));
+				if (getSystemSetting("_hassms", false))
+					notice(_L("Both phone calls and text messages for %s are now blocked.", escapehtml(Phone::format($phone))));
+				else
+					notice(_L("Phone calls for %s are now blocked.", escapehtml(Phone::format($phone))));
 			} else {
 				notice(_L("%1s for %2s are now blocked.", $postdata["type"] == 'phone' ? escapehtml(_L('Phone calls')) : escapehtml(_L('Text messages')), escapehtml(Phone::format($phone))));
 			}
