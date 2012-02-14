@@ -1680,6 +1680,10 @@ class JobWiz_facebookPage extends WizStep {
 			foreach ($feedcategories as $category)
 				$categories[$category->id] = $category->name;
 			
+			// if there are no feed categories!
+			if (!count($categories))
+				$categories[] = "#-". _L("There are no feed categories!"). "-#";
+			
 			$formdata[] = _L("Feed Category");
 			$formdata["feedcategories"] = array(
 				"label" => _L("Feed categories"),

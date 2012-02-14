@@ -74,7 +74,9 @@ class FeedUrlWiz_feedoptions extends WizStep {
 			}
 		}
 		
-		// TODO: don't show empty feed category box!
+		// if there are no feed categories!
+		if (!count($feedcategories))
+			$feedcategories[] = "#-". _L("There are no feed categories!"). "-#";
 		
 		$formdata = array(_L('Feed Settings'),
 			"feedcategories" => array(
