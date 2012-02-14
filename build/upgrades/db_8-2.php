@@ -70,7 +70,13 @@ function upgrade_8_2 ($rev, $shardid, $customerid, $db) {
 			// restore global db connection
 			$_dbcon = $savedbcon;
 			apply_sql("upgrades/db_8-2_pre.sql", $customerid, $db, 11);
-				
+
+		case 11:
+			echo "|";
+			apply_sql("upgrades/db_8-2_pre.sql", $customerid, $db, 12);
+			
+			// now backfill jobstats 'people' since Feb 10 release date
+			patchJobStatsPeople($db);
 	}
 
 	// SM admin
@@ -182,24 +188,24 @@ function createDefaultTemplates_8_2() {
 	
 	// subscriber
 	if (!isset($existingTemplateTypes['subscriber'])) {
-		$subscriber_englishhtml = $templates['subscriber-accountexpire']['en']['html']['body'];
-		$subscriber_englishplain = $templates['subscriber-accountexpire']['en']['plain']['body'];
-		$subscriber_spanishhtml = $templates['subscriber-accountexpire']['es']['html']['body'];
-		$subscriber_spanishplain = $templates['subscriber-accountexpire']['es']['plain']['body'];
+		$subscriber_englishhtml = $templates['subscriber']['en']['html']['body'];
+		$subscriber_englishplain = $templates['subscriber']['en']['plain']['body'];
+		$subscriber_spanishhtml = $templates['subscriber']['es']['html']['body'];
+		$subscriber_spanishplain = $templates['subscriber']['es']['plain']['body'];
 			
 		$messagegroupid = createTemplate_8_2('subscriber', $subscriber_englishplain, $subscriber_englishhtml, $subscriber_spanishplain, $subscriber_spanishhtml);
 		if (!$messagegroupid)
 			return false;
 		
 		// set english headers
-		$data = "subject=" . urlencode($templates['subscriber-accountexpire']['en']['html']['subject']) .
-							"&fromname=" . urlencode($templates['subscriber-accountexpire']['en']['html']['fromname']) . 
-							"&fromemail=" . urlencode($templates['subscriber-accountexpire']['en']['html']['fromaddr']);
+		$data = "subject=" . urlencode($templates['subscriber']['en']['html']['subject']) .
+							"&fromname=" . urlencode($templates['subscriber']['en']['html']['fromname']) . 
+							"&fromemail=" . urlencode($templates['subscriber']['en']['html']['fromaddr']);
 		QuickUpdate("update message set data = ? where messagegroupid = ? and type = 'email' and languagecode = 'en'", null, array($data, $messagegroupid));
 		// set spanish headers
-		$data = "subject=" . urlencode($templates['subscriber-accountexpire']['es']['html']['subject']) .
-							"&fromname=" . urlencode($templates['subscriber-accountexpire']['es']['html']['fromname']) . 
-							"&fromemail=" . urlencode($templates['subscriber-accountexpire']['es']['html']['fromaddr']);
+		$data = "subject=" . urlencode($templates['subscriber']['es']['html']['subject']) .
+							"&fromname=" . urlencode($templates['subscriber']['es']['html']['fromname']) . 
+							"&fromemail=" . urlencode($templates['subscriber']['es']['html']['fromaddr']);
 		QuickUpdate("update message set data = ? where messagegroupid = ? and type = 'email' and languagecode = 'es'", null, array($data, $messagegroupid));
 	}
 	
@@ -351,4 +357,39 @@ function createTemplate_8_2($templatetype, $englishplain, $englishhtml, $spanish
 	// success
 	return $messagegroup->id;
 }
+
+function patchJobStatsPeople($db) {
+	// loop until all jobs are prefilled, or time to stop
+	while (true) {
+		// backfill jobs that not yet have people calculated - ONLY SINCE 8.2 release night! or this takes forever...
+		$jobids = QuickQueryList("select jobid from jobstats js where not exists (select 1 from jobstats js2 where js.jobid = js2.jobid and js2.name = 'people') and exists (select 1 from job j where js.jobid = j.id and j.startdate > '2012-02-09') group by js.jobid limit 100", false, $db);
+		if (count($jobids) == 0)
+			break; // no more, break from while true loop
+	
+		foreach ($jobids as $jobid) {
+			echo ($jobid . ",");
+			$timerstart = strtotime(date_format(new DateTime(), "Y-m-d H:i:s"));
+	
+			// find count of persons from phone message, else email message, else sms (query in order of likely message type)
+			$totalJobPeopleCount = QuickQuery("select count(*) from reportperson where type = 'phone' and jobid = ?", $db, array($jobid));
+			if (!$totalJobPeopleCount) {
+				$totalJobPeopleCount = QuickQuery("select count(*) from reportperson where type = 'email' and jobid = ?", $db, array($jobid));
+				if (!$totalJobPeopleCount) {
+					$totalJobPeopleCount = QuickQuery("select count(*) from reportperson where type = 'sms' and jobid = ?", $db, array($jobid));
+				}
+			}
+				
+			// insert or overwrite jobstats for 'people' total person count
+			$query = "insert into jobstats values (?, 'people', ?)  on duplicate key update value = ?";
+			QuickUpdate($query, $db, array($jobid, $totalJobPeopleCount, $totalJobPeopleCount));
+				
+			$timerstop = strtotime(date_format(new DateTime(), "Y-m-d H:i:s"));
+			$timediff = $timerstop - $timerstart;
+			//echo " (" . $totalJobPeopleCount . " took " . $timediff . ") ";
+	
+		} // end for jobid
+	} // end while loop
+}
+
+
 ?>

@@ -96,3 +96,9 @@ $$$
 -- index for feed generator
 ALTER TABLE `job` ADD INDEX `activedate` ( `activedate` ) 
 $$$
+
+-- $rev 12
+-- woops, correct jobstats for 'people' between ASP_8-2 and ASP_8-2-1
+delete from jobstats where name = 'people' and jobid in (select id from job where startdate > '2012-02-09')
+$$$
+

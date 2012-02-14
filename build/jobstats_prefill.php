@@ -343,7 +343,7 @@ function jobstatsPeopleCount($db, $customerid, $shardid) {
 	// loop until all jobs are prefilled, or time to stop
 	while (true && hasTimeToContinue()) {
 		// backfill jobs that not yet have people calculated
-		$jobids = QuickQueryList("select distinct jobid from jobstats where jobid not in (select jobid from jobstats where name = 'people') limit 100");
+		$jobids = QuickQueryList("select jobid from jobstats js where not exists (select 1 from jobstats js2 where js.jobid = js2.jobid and js2.name = 'people') group by js.jobid limit 100");
 		if (count($jobids) == 0)
 			break; // no more, break from while true loop
 	
