@@ -12,6 +12,12 @@ function formatAlert($name, $operation, $testvalue, $actualvalue) {
 		case "importtime":
 			$midnight_today = mktime(0,0,0);
 			$testvalue = date("g:i a",$midnight_today + $testvalue);
+			if ($actualvalue < 0) {
+				$str = "Imported too " . ($operation=="gt"?"late":"early") .
+						". Expected import " . ($operation=="gt"?"before":"after") . " $testvalue but never imported";
+				break;
+			}
+			
 			$actualvalue = date("g:i a",$midnight_today + $actualvalue);
 			$str = "Imported too " . ($operation=="gt"?"late":"early") .
 				". Expected import " . ($operation=="gt"?"before":"after") . " $testvalue. Imported at: $actualvalue";
