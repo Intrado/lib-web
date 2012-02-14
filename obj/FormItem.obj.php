@@ -247,7 +247,7 @@ class MultiCheckBox extends FormItem {
 		$hoverdata = array();
 		$counter = 1;
 		foreach ($this->args['values'] as $checkvalue => $checkname) {
-			if (preg_match("/^#-[a-z,A-Z,0-9, ]*-#$/", $checkname)) {
+			if (preg_match("/^#-.*-#$/", $checkname)) {
 				$str .= '<div style="font-weight:bold;padding-left:22px;">'.substr($checkname, 2, strlen($checkname) - 4)."</div>";
 			} else if ($checkname == "#-#") {
 				$str .= "<hr />\n";
