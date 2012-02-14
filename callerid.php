@@ -164,7 +164,7 @@ foreach ($usednumbers as $usednumber) {
 	$importnumberdata[$usednumber] = Phone::format($usednumber) . " - " . _L("Used by ") . implode(_L(" and "),$desc);
 }
 
-$helpsteps[] = array(_L('These Caller ID numbers are currently associated with users or jobs. To add them as approved Caller IDs, check the box next to the numbers you wish to add. Click the \"Add\" button after making your selections.'));
+$helpsteps[] = array(_L('These Caller ID numbers are currently associated with users or jobs. To add them as approved Caller IDs, check the box next to the numbers you wish to add. Click the "Add" button after making your selections.'));
 $helpstepnum++;
 if (count($importnumberdata) > 0) {
 	$formdata["importnumbers"] = array(
