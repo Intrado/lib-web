@@ -35,23 +35,21 @@ class FeedCategory extends DBMappedObject {
 		
 			// construct the where clause based off which restrictions (if any) exist
 			if ($usercategorywhere && $jobcategorywhere)
-			$categorywhere = " ($usercategorywhere or $jobcategorywhere) ";
+				$categorywhere = " ($usercategorywhere or $jobcategorywhere) ";
 			else if ($usercategorywhere)
-			$categorywhere = $usercategorywhere;
+				$categorywhere = $usercategorywhere;
 			else
-			$categorywhere = $jobcategorywhere;
+				$categorywhere = $jobcategorywhere;
 		} else {
 			// user is unrestricted, just show them all categories
 			$categorywhere = "1";
 		}
-		return QuickQueryList(
-			"select id, name
-			from feedcategory 
+		return DBFindMany("FeedCategory", 
+			"from feedcategory 
 			where
 			$categorywhere
 			and not deleted
-			order by name",
-			true, false, $args);
+			order by name", false, $args);
 	}
 	
 	static function getFeedDescriptions() {

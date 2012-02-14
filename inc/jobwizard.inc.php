@@ -1676,6 +1676,10 @@ class JobWiz_facebookPage extends WizStep {
 		if ($this->hasFeedMessage()) {
 			$feedcategories = FeedCategory::getAllowedFeedCategories();
 			
+			$categories = array();
+			foreach ($feedcategories as $category)
+				$categories[$category->id] = $category->name;
+			
 			$formdata[] = _L("Feed Category");
 			$formdata["feedcategories"] = array(
 				"label" => _L("Feed categories"),
@@ -1683,8 +1687,8 @@ class JobWiz_facebookPage extends WizStep {
 				"value" => "",
 				"validators" => array(
 					array("ValRequired"),
-					array("ValInArray", "values" => array_keys($feedcategories))),
-				"control" => array("MultiCheckBox", "values"=>$feedcategories, "hover" => FeedCategory::getFeedDescriptions()),
+					array("ValInArray", "values" => array_keys($categories))),
+				"control" => array("MultiCheckBox", "values"=>$categories, "hover" => FeedCategory::getFeedDescriptions()),
 				"helpstep" => $helpstepsnum);
 			$helpsteps = array(_L("Select the appropriate category for the RSS feed component of your message."));
 		}

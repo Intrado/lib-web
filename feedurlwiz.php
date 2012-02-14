@@ -42,36 +42,38 @@ class FeedUrlWiz_feedoptions extends WizStep {
 		unset($_SESSION['wizard_feedurl']["data"]["/feedurl"]["feedurl"]);
 		
 		global $USER;
-		$feedcategories = array("#-My Feed Categories-#");
-		$feeddescriptions = array();
-		$feedvalues = array();
-		$myfeedcategories = QuickQueryMultiRow("select id, name, description from feedcategory where id in (select feedcategoryid from userfeedcategory where userid=?) and not deleted order by name", true, false, array($USER->id));
-		$args = array();
-		$query = "select id, name, description from feedcategory where not deleted";
+		$feedcategories = array();
+		// get all the feed categories this user is restricted to (if any)
+		$myfeedcategories = FeedCategory::getAllowedFeedCategories();
+		$otherfeedcategories = DBFindMany("FeedCategory", 
+			"from feedcategory
+			where not deleted
+			and not exists (select 1 from userfeedcategory where userid = ? and feedcategoryid = feedcategory.id)
+			order by feedcategory.name",
+			false, array($USER->id));
+		
+		// display user feed categories under the "My Feed Categories" header
 		if (count($myfeedcategories)) {
-			$query .= " and id not in (";
-			$count = 0;
+			$feedcategories[] = "#-My Feed Categories-#";
 			foreach ($myfeedcategories as $category) {
-				if ($count++ > 0)
-					$query .= ",";
-				$query .= "?";
-				$args[] = $category['id'];
-				$feedcategories[$category['id']] = $category['name'];
-				$feeddescriptions[$category['id']] = $category['description'];
-				$feedvalues[] = $category['id'];
+				$feedcategories[$category->id] = $category->name;
 			}
-			$query .= ")";
+		}
+		
+		// if there are user and other feed categories, provide a seperator and a header for other
+		if (count($myfeedcategories) && count($otherfeedcategories)) {
 			$feedcategories[] = "#-#";
 			$feedcategories[] = "#-Other Feed Categories-#";
 		}
-		$query .= " order by name";
-		$otherfeedcategories = QuickQueryMultiRow($query, true, false, $args);
 		
-		foreach ($otherfeedcategories as $category) {
-			$feedcategories[$category['id']] = $category['name'];
-			$feeddescriptions[$category['id']] = $category['description'];
-			$feedvalues[] = $category['id'];
+		// add all other feed categories that do not match user restriction
+		if (count($otherfeedcategories)) {
+			foreach ($otherfeedcategories as $category) {
+				$feedcategories[$category->id] = $category->name;
+			}
 		}
+		
+		// TODO: don't show empty feed category box!
 		
 		$formdata = array(_L('Feed Settings'),
 			"feedcategories" => array(
@@ -80,8 +82,8 @@ class FeedUrlWiz_feedoptions extends WizStep {
 				"value" => "",
 				"validators" => array(
 					array("ValRequired"),
-					array("ValInArray", "values" => $feedvalues)),
-				"control" => array("MultiCheckBox", "values"=>$feedcategories, "hover" => $feeddescriptions),
+					array("ValInArray", "values" => array_keys($feedcategories))),
+				"control" => array("MultiCheckBox", "values"=>$feedcategories, "hover" => FeedCategory::getFeedDescriptions()),
 				"helpstep" => 1
 			),
 			"itemcount" => array(
