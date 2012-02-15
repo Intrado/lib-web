@@ -69,6 +69,9 @@ class User extends DBMappedObject {
 	}
 	
 	function authorizeField($field) {
+		$alwaysauthorized = array("f01","f02","f03");
+		if (in_array($field,$alwaysauthorized))
+			return true;
 		$fields = $_SESSION['access']->getValue('datafields');
 		return !$fields || in_array($field, explode('|', $_SESSION['access']->getValue('datafields')));
 	}
