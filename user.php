@@ -418,7 +418,7 @@ if (!getSystemSetting('_hascallback', false)) {
 					array("ValLength","min" => 0,"max" => 20),
 					array("ValPhone")
 				),
-				"control" => array("CallerID","maxlength" => 20, "size" => 15,"selectvalues"=>$authorizedcallerids, "allowedit" => $USER->authorize('setcallerid')),
+				"control" => array("CallerID","maxlength" => 20, "size" => 15,"selectvalues"=>$authorizedcallerids, "allowedit" => true),
 				"helpstep" => 1
 	);
 	
@@ -761,20 +761,13 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 				$edituser->setSetting("callerid",Phone::parse($postdata['callerid']));
 			
 			if (isset($postdata['restrictcallerid'])) {
-				error_log("change callerid restriction 1");
 				if (count($postdata['restrictcallerid'])) {
-					error_log("change callerid restriction 2");
-						
 					if(count(array_diff($postdata['restrictcallerid'],$authorizedusercallerids)) > 0 || 
 						count(array_diff($authorizedusercallerids,$postdata['restrictcallerid'])) > 0) {
-						error_log("change callerid restriction 3");
-						
 						QuickUpdate("delete from authorizedusercallerid where userid=?",false,array($edituser->id));
 						QuickUpdate("insert into authorizedusercallerid (userid,callerid) values " . repeatWithSeparator("({$edituser->id},?)", ",", count($postdata['restrictcallerid'])),false,$postdata['restrictcallerid']);
 					}
 				} else {
-					error_log("delete callerid restriction");
-						
 					QuickUpdate("delete from authorizedusercallerid where userid=?",false,array($edituser->id));
 				}
 			}
