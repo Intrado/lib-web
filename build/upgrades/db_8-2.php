@@ -359,17 +359,18 @@ function createTemplate_8_2($templatetype, $englishplain, $englishhtml, $spanish
 }
 
 function patchJobStatsPeople($db) {
-	// loop until all jobs are prefilled, or time to stop
+	// loop until all jobs are prefilled
 	while (true) {
 		// backfill jobs that not yet have people calculated - ONLY SINCE 8.2 release night! or this takes forever...
-		$jobids = QuickQueryList("select jobid from jobstats js where not exists (select 1 from jobstats js2 where js.jobid = js2.jobid and js2.name = 'people') and exists (select 1 from job j where js.jobid = j.id and j.startdate > '2012-02-09') group by js.jobid limit 100", false, $db);
+		$query = "select jobid from jobstats js 
+			where not exists (select 1 from jobstats js2 where js.jobid = js2.jobid and js2.name = 'people')
+			and exists (select 1 from job j where js.jobid = j.id and j.startdate > '2012-02-09') 
+			group by js.jobid limit 100";
+		$jobids = QuickQueryList($query, false, $db);
 		if (count($jobids) == 0)
 			break; // no more, break from while true loop
 	
 		foreach ($jobids as $jobid) {
-			echo ($jobid . ",");
-			$timerstart = strtotime(date_format(new DateTime(), "Y-m-d H:i:s"));
-	
 			// find count of persons from phone message, else email message, else sms (query in order of likely message type)
 			$totalJobPeopleCount = QuickQuery("select count(*) from reportperson where type = 'phone' and jobid = ?", $db, array($jobid));
 			if (!$totalJobPeopleCount) {
@@ -382,11 +383,6 @@ function patchJobStatsPeople($db) {
 			// insert or overwrite jobstats for 'people' total person count
 			$query = "insert into jobstats values (?, 'people', ?)  on duplicate key update value = ?";
 			QuickUpdate($query, $db, array($jobid, $totalJobPeopleCount, $totalJobPeopleCount));
-				
-			$timerstop = strtotime(date_format(new DateTime(), "Y-m-d H:i:s"));
-			$timediff = $timerstop - $timerstart;
-			//echo " (" . $totalJobPeopleCount . " took " . $timediff . ") ";
-	
 		} // end for jobid
 	} // end while loop
 }
