@@ -35,7 +35,7 @@ if (isset($_GET['delete'])) {
 			$person->update();
 			
 			//update lists mod dates referencing this person
-			QuickUpdate("update list l inner join listentry le on (le.listid=l.id) set l.modifieddate = now() where le.personid='$id'");
+			QuickUpdate("update list l inner join listentry le on (le.listid=l.id) set l.modifydate = now() where le.personid='$id'");
 			//remove all listentries pointing to this person
 			QuickUpdate("delete from listentry where personid='$id'");
 		Query("COMMIT");
