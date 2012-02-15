@@ -1336,7 +1336,7 @@ class JobWiz_messageSmsText extends WizStep {
 				array("ValLength","max"=>160),
 				array("ValSmsText")
 			),
-			"control" => array("TextArea","rows"=>5,"cols"=>35,"counter"=>160),
+			"control" => array("TextArea","rows"=>5,"cols"=>35,"counter"=>160, "spellcheck" => true),
 			"helpstep" => 1
 		);
 
@@ -1534,7 +1534,7 @@ class JobWiz_socialMedia extends WizStep {
 				"validators" => array(
 					array("ValTextAreaWithEnableCheckbox"),
 					array("ValLength","max"=>420)),
-				"control" => array("TextAreaWithEnableCheckbox", "defaultmessage" => $fbtext, "rows"=>10,"cols"=>50,"counter"=>420),
+				"control" => array("TextAreaWithEnableCheckbox", "defaultmessage" => $fbtext, "rows"=>10,"cols"=>50,"counter"=>420,"spellcheck" => true),
 				"helpstep" => $helpstepnum++
 			);
 		}
@@ -1551,7 +1551,7 @@ class JobWiz_socialMedia extends WizStep {
 				"validators" => array(
 					array("ValTextAreaWithEnableCheckbox"),
 					array("ValLength","max"=>(140 - $reservedchars))),
-				"control" => array("TextAreaWithEnableCheckbox", "defaultmessage" => $twtext, "rows"=>5,"cols"=>50,"counter"=>(140 - $reservedchars)),
+				"control" => array("TextAreaWithEnableCheckbox", "defaultmessage" => $twtext, "rows"=>5,"cols"=>50,"counter"=>(140 - $reservedchars), "spellcheck" => true),
 				"helpstep" => $helpstepnum++
 			
 			);
@@ -1568,8 +1568,13 @@ class JobWiz_socialMedia extends WizStep {
 					array("ValTextAreaWithEnableCheckbox","requiresubject" => true),
 					array("ValLength","max"=>32000)),
 				"control" => array("TextAreaWithEnableCheckbox", 
-					"hassubject" => true, "subjectmax" => 50, "subjectsize" => 44, "defaultsubject" => $this->parent->dataHelper('/start:name'),
-					"defaultmessage" => $fbtext, "rows"=>5,"cols"=>50),
+					"hassubject" => true, 
+					"subjectmax" => 50, 
+					"subjectsize" => 44, 
+					"defaultsubject" => $this->parent->dataHelper('/start:name'),
+					"defaultmessage" => $fbtext, "rows"=>5,
+					"cols" => 50,
+					"spellcheck" => true),
 				"helpstep" => $helpstepnum++
 			
 			);
