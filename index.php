@@ -89,6 +89,7 @@ if (isset($_GET['login'])) {
 if ($userid && $userid != -1) {
 	if (!$sessionstarted)
 		doStartSession();
+	$_SESSION = array(); //remove any previous session data
 	loadCredentials($userid);
 	if (!$USER->enabled || $USER->deleted | !$ACCESS->getValue('loginweb')) {
 		@session_destroy();
