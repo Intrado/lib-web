@@ -405,11 +405,6 @@ if ($job->messagegroupid != null) {
 	}
 }
 
-// get the facebook pages this job is using (if any)
-$fbpages = array();
-if ($job)
-	$fbpages = QuickQueryList("select destination from jobpost where type = 'facebook' and jobid = ?", false, false, array($job->id));
-
 $helpsteps = array();
 $helpstepnum = 1;
 $formdata = array();
@@ -808,9 +803,12 @@ if ($submittedmode || $completedmode) {
 	if (getSystemSetting("_hasfacebook") && $USER->authorize("facebookpost")) {
 		
 		// see if any of the pages are the user's wall
-		foreach ($fbpages as $index => $fbpageid) {
+		$fbpages = array();
+		foreach ($job->getJobPosts("facebook") as $fbpageid => $posted) {
 			if ($fbpageid == $USER->getSetting("fb_user_id"))
-				$fbpages[$index] = "me";
+				$fbpages[] = "me";
+			else
+				$fbpages[] = $fbpageid;
 		}
 		
 		$helpsteps[] = _L("<p>If you haven't connected a Facebook account, click the Connect to Facebook button. You'll be able to log into Facebook through a pop up window. Once you're connected, click the Save button.</p><p>After connecting your Facebook account, you will see a list of Facebook Pages where you are an administrator and a My Wall option which lets you post to your account's Wall. You may select any combination of options for your job.</p><p>If your system administrator has restricted users to posting only to authorized Facebook Pages, you may not see as many Pages or the option of posting to your Wall. Check with your system administrator if you are unsure of your district's social media policies. Additionally, please note that your account must also have permission within Facebook to post to authorized Pages.</p>");
@@ -843,9 +841,6 @@ if ($submittedmode || $completedmode) {
 	}
 	
 	if (count($feedcategories) && getSystemSetting("_hasfeed") && $USER->authorize("feedpost")) {
-		
-		$currentfeedcategories = QuickQueryList("select destination from jobpost where type = 'feed' and jobid = ?", false, false, array($jobid));
-		
 		$helpsteps[] = _L("If your message contains an RSS feed component, select which category best describes the content of your RSS feed message part.");
 		
 		$categories = array();
@@ -855,7 +850,7 @@ if ($submittedmode || $completedmode) {
 		$formdata["feedcategories"] = array(
 			"label" => _L("Feed categories"),
 			"fieldhelp" => _L("Select the most appropriate category for the RSS feed component of your message."),
-			"value" => (count($currentfeedcategories)?$currentfeedcategories:""),
+			"value" => (count($job->getJobPosts("feed"))?array_keys($job->getJobPosts("feed")):""),
 			"validators" => array(
 				array("ValFeedCategoryWithMessage", "values" => array_keys($categories))),
 			"control" => array("MultiCheckBox", "values"=>$categories, "hover" => FeedCategory::getFeedDescriptions()),
@@ -1080,22 +1075,20 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 					}
 					// insert facebook pages, (if the user can and the message group has a facebook message)
 					if (getSystemSetting("_hasfacebook") && $USER->authorize("facebookpost") && $messagegroup->hasMessage("post", "facebook")) {
-						$batchsql = "";
-						$batchargs = array();
+						$fbpages = array();
 						foreach (json_decode($postdata['fbpage']) as $fbpageid) {
-							$batchsql .= "(?,'facebook',?),";
 							if ($fbpageid == "me")
-								$fbpageid = $USER->getSetting("fb_user_id");
-							$batchargs[] = $job->id;
-							$batchargs[] = $fbpageid;
+								$fbpages[] = $USER->getSetting("fb_user_id");
+							else
+								$fbpages[] = $fbpageid;
 						}
-						QuickUpdate("insert into jobpost (jobid, type, destination) values ". trim($batchsql,","), false, $batchargs);
+						$job->updateJobPost("facebook", (count($fbpages)?$fbpages:null));
 					}
-					// insert facebook pages, (if the user can and the message group has a facebook message)
+					// insert twitter post, (if the user can and the message group has a twitter message)
 					if (getSystemSetting("_hastwitter") && $USER->authorize("twitterpost") && $messagegroup->hasMessage("post", "twitter")) {
 						// get the twitter user's id
 						$twdata = json_decode($USER->getSetting("tw_access_token"));
-						QuickUpdate("insert into jobpost (jobid, type, destination) values (?,'twitter',?)", false, array($job->id, $twdata->user_id));
+						$job->updateJobPost("twitter", ($twdata->user_id?$twdata->user_id:null));
 					}
 				}
 			}
