@@ -68,7 +68,7 @@ class EmailMessageEditor extends FormItem {
 				<textarea id="'.$n.'" name="'.$n.'" class="messagearea"/>'.escapehtml($value).'</textarea>
 				<div id="'.$n.'-htmleditor"></div>
 		';
-		if ($subtype == "plain") {
+		if ($subtype == "plain" && isset($this->args['spellcheck']) && $this->args['spellcheck']) {
 			$textarea .= '<div>' . action_link(_L("Spell Check"), "spellcheck", null, '(new spellChecker($(\''.$n.'\')) ).openChecker();') . '</div>';
 		}
 		$textarea .= '</div>';
@@ -177,7 +177,7 @@ class EmailMessageEditor extends FormItem {
 				}
 			</script>';
 		
-		if ($subtype == "plain") {
+		if ($subtype == "plain" && isset($this->args['spellcheck']) && $this->args['spellcheck']) {
 			$str .= '<script src="script/speller/spellChecker.js"></script>';
 		}
 		

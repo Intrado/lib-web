@@ -221,6 +221,11 @@ $formdata["attachments"] = array(
 	"helpstep" => 4
 );
 
+
+$messagecontrol = array("EmailMessageEditor", "subtype" => $subtype);
+if ($subtype == "plain" && $languagecode == "en")
+	$messagecontrol['spellcheck'] = true;
+
 $helpsteps[] = _L("Email message body text goes here. Be sure to introduce yourself and give detailed information. For ".
 	"helpful message tips and ideas, click the Help link in the upper right corner of the screen.<br><br>If you would ".
 	"like to insert dynamic data fields, such as the recipient's name, move the cursor to the location where the data ".
@@ -236,7 +241,7 @@ $formdata["message"] = array(
 		array("ValMessageBody", "messagegroupid" => $messagegroup->id),
 		array("ValLength","max" => 256000)
 	),
-	"control" => array("EmailMessageEditor", "subtype" => $subtype),
+	"control" => $messagecontrol,
 	"helpstep" => 5
 );
 $helpsteps[] = _L("Click the preview button to view of your message.");
