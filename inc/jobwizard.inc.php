@@ -1,4 +1,4 @@
-<?
+ <?
 ////////////////////////////////////////////////////////////////////////////////
 // global wizard functions
 ////////////////////////////////////////////////////////////////////////////////
@@ -1675,7 +1675,7 @@ class JobWiz_facebookPage extends WizStep {
 					array("ValFacebookPage", "authpages" => getFbAuthorizedPages(), "authwall" => getSystemSetting("fbauthorizewall"))),
 				"control" => array("FacebookPage", "access_token" => $USER->getSetting("fb_access_token", false)),
 				"helpstep" => $helpstepsnum++);
-			$helpsteps = array(_L("TODO: help"));
+			$helpsteps = array(_L("Select which Facebook pages you would like your message to be posted to."));
 		}
 		
 		if ($this->hasFeedMessage()) {
