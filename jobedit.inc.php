@@ -808,14 +808,14 @@ if ($submittedmode || $completedmode) {
 			if ($fbpageid == $USER->getSetting("fb_user_id"))
 				$fbpages[] = "me";
 			else
-				$fbpages[] = $fbpageid;
+				$fbpages[] = $fbpageid . ""; // make this a string
 		}
 		
 		$helpsteps[] = _L("<p>If you haven't connected a Facebook account, click the Connect to Facebook button. You'll be able to log into Facebook through a pop up window. Once you're connected, click the Save button.</p><p>After connecting your Facebook account, you will see a list of Facebook Pages where you are an administrator and a My Wall option which lets you post to your account's Wall. You may select any combination of options for your job.</p><p>If your system administrator has restricted users to posting only to authorized Facebook Pages, you may not see as many Pages or the option of posting to your Wall. Check with your system administrator if you are unsure of your district's social media policies. Additionally, please note that your account must also have permission within Facebook to post to authorized Pages.</p>");
 		$formdata["fbpage"] = array(
 			"label" => _L('Facebook Page(s)'),
 			"fieldhelp" => _L("Select which Pages to post to. Please click the Guide button for more information about posting to Facebook."),
-			"value" => ($fbpages?json_encode($fbpages):""),
+			"value" => (count($fbpages)?json_encode($fbpages):""),
 			"validators" => array(
 				array("ValFacebookPageWithMessage", "authpages" => getFbAuthorizedPages(), "authwall" => getSystemSetting("fbauthorizewall"))),
 			"control" => array("FacebookPage", "access_token" => $USER->getSetting("fb_access_token", false)),
