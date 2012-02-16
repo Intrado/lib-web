@@ -203,11 +203,6 @@ form.newform {
 	margin: 0px;
 }
 
-.newform .actionlink {
-	display: block;
-	margin-top: 3px;
-}
-
 .wiznav_disabled {
 	color: gray;
 }
