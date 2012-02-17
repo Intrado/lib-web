@@ -118,10 +118,11 @@ function gen2cache ($exptime, $expect = null, $key = null, $callback /*, arg1, a
 			}
 			//if we haven't returned by now, data is invalid.
 			$mcache->delete($key);
-			continue;
+			//continue, and generate data again
+		} else {
+			//unwrapped data, just return it
+			return $data;
 		}
-		//unwrapped data, just return it
-		return $data;
 	}
 		
 	//otherwise generate and put
