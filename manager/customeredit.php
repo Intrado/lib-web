@@ -989,7 +989,23 @@ $formdata["hasfeed"] = array(
 						"helpstep" => $helpstepnum
 );
 
+
+// Answering machine detection methods
+$amdtypes = array(
+	"ivr" => "Default / IVR Intro",
+	"ivrmessageasintro" => "Message as Intro",
+	"machinedetect" => "Voice / Beep Detect");
+
 $formdata[] = _L("Misc. Settings");
+$formdata["amdtype"] = array(
+						"label" => _L('AMD Type'),
+						"value" => ($settings['_amdtype']?$settings['_amdtype']:"ivr"),
+						"validators" => array(
+							array("ValInArray", "values" => array_keys($amdtypes))
+						),
+						"control" => array("SelectMenu", "values" => $amdtypes),
+						"helpstep" => $helpstepnum
+);
 $formdata["nsid"] = array(
 						"label" => _L('NetSuite ID'),
 						"value" => isset($custinfo)?$custinfo["nsid"]:"",
@@ -1412,6 +1428,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		setCustomerSystemSetting('_hastwitter', $postdata["hastwitter"]?'1':'0', $custdb);
 		setCustomerSystemSetting('_hasfeed', $postdata["hasfeed"]?'1':'0', $custdb);
 		
+		setCustomerSystemSetting('_amdtype', $postdata["amdtype"], $custdb);
 	
 		setCustomerSystemSetting('_renewaldate', ($postdata['renewaldate']!=""?date("Y-m-d", strtotime($postdata['renewaldate'])):""), $custdb);
 		setCustomerSystemSetting('_callspurchased', $postdata['callspurchased'], $custdb);
