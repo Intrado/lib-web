@@ -69,7 +69,8 @@ if ($datauri && !CheckFormSubmit($f,'save')) {
 
 			$total++;
 			$count--;
-			$p = DBFind("Person","from person where pkey=?", false, array($pkey));
+			// only system contacts to be uploaded into a list
+			$p = DBFind("Person","from person where pkey=? and type='system'", false, array($pkey));
 			if ($p && $USER->canSeePerson($p->id)) {
 				// preview up to limit, but continue to parse to verify all pkeys found or not
 				if ($count > 0) {
