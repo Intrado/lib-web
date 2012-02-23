@@ -21,7 +21,7 @@ require_once("obj/AudioFile.obj.php");
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization
 ////////////////////////////////////////////////////////////////////////////////
-if (!$USER->authorize('managesystem')) {
+if (!$USER->authorize('managesystem') || getSystemSetting("_amdtype","ivr") != "ivr") {
 	redirect('unauthorized.php');
 }
 
