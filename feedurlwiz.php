@@ -45,7 +45,11 @@ class FeedUrlWiz_feedoptions extends WizStep {
 		global $USER;
 		$feedcategories = array();
 		// get all the feed categories this user is restricted to (if any)
-		$myfeedcategories = FeedCategory::getAllowedFeedCategories();
+		if (QuickQuery("select 1 from userfeedcategory where userid = ? limit 1", false, array($USER->id)))
+			$myfeedcategories = FeedCategory::getAllowedFeedCategories();
+		else
+			$myfeedcategories = array();
+		
 		$otherfeedcategories = DBFindMany("FeedCategory", 
 			"from feedcategory
 			where not deleted
