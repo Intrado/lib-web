@@ -1530,7 +1530,7 @@ class JobWiz_socialMedia extends WizStep {
 			$formdata["fbdata"] = array(
 				"label" => _L('Facebook'),
 				"fieldhelp" => _L("Create your Facebook posting text here."),
-				"value" => ($smEnable?json_encode(array("message"=>$fbmessage)):""),
+				"value" => ($smEnable?json_encode(array("message"=>$fbtext)):""),
 				"validators" => array(
 					array("ValTextAreaWithEnableCheckbox"),
 					array("ValLength","max"=>420)),
@@ -1563,7 +1563,7 @@ class JobWiz_socialMedia extends WizStep {
 			$formdata["feeddata"] = array(
 				"label" => _L("Feed Message"),
 				"fieldhelp" => _L("Select what text to include in your feed."),
-				"value" => ($smEnable?json_encode(array("subject"=>$this->parent->dataHelper('/start:name'),"message"=>$fbmessage)):""),
+				"value" => ($smEnable?json_encode(array("subject"=>$this->parent->dataHelper('/start:name'),"message"=>$fbtext)):""),
 				"validators" => array(
 					array("ValTextAreaWithEnableCheckbox","requiresubject" => true),
 					array("ValLength","max"=>32000)),
