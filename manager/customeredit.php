@@ -440,6 +440,7 @@ $settings = array(
 					'callerid' => '',
 					'defaultareacode' => '',
 					'inboundnumber' => '',
+					'maxguardians' => '0',
 					'maxphones' => '1',
 					'maxemails' => '1',
 					'emaildomain' => '',
@@ -710,11 +711,21 @@ $formdata["inboundnumber"] = array(
 );
 
 
+$formdata["maxguardians"] = array(
+						"label" => _L('Max Guardians'),
+						"value" => $settings['maxguardians'],
+						"validators" => array(
+							array('ValNumber', 'min' => 0, 'max' => 99)
+						),
+						"control" => array("TextField","size" => 4, "maxlength" => 4),
+						"helpstep" => $helpstepnum
+);
+
 $formdata["maxphones"] = array(
 						"label" => _L('Max Phones'),
 						"value" => $settings['maxphones'],
 						"validators" => array(
-							array('ValNumber')
+							array('ValNumber', 'min' => 1, 'max' => 99)
 						),
 						"control" => array("TextField","size" => 4, "maxlength" => 4),
 						"helpstep" => $helpstepnum
@@ -724,7 +735,7 @@ $formdata["maxemails"] = array(
 						"label" => _L('Max Emails'),
 						"value" => $settings['maxemails'],
 						"validators" => array(
-							array('ValNumber')
+							array('ValNumber', 'min' => 1, 'max' => 99)
 						),
 						"control" => array("TextField","size" => 4, "maxlength" => 4),
 						"helpstep" => $helpstepnum
@@ -848,7 +859,7 @@ $formdata["maxsms"] = array(
 						"label" => _L('Max SMS'),
 						"value" => $settings['maxsms'],
 						"validators" => array(
-							array('ValNumber')
+							array('ValNumber', 'min' => 1, 'max' => 99)
 						),
 						"control" => array("TextField","size" => 4, "maxlength" => 4),
 						"helpstep" => $helpstepnum
@@ -1342,6 +1353,8 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 			}
 			setCustomerSystemSetting("inboundnumber", $postdata["inboundnumber"], $custdb);
 		}
+
+		setCustomerSystemSetting('maxguardians', $postdata["maxguardians"], $custdb);
 		
 		update_jobtypeprefs(1, $postdata["maxphones"], "phone", $custdb);
 		setCustomerSystemSetting('maxphones', $postdata["maxphones"], $custdb);
