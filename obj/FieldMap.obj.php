@@ -200,7 +200,7 @@ class FieldMap extends DBMappedObject {
 							. "p.$fieldnum as value, "
 							. "count(*) "
 							. "from person p "
-							. "where not p.deleted and p.type = 'system' "
+							. "where not p.deleted and p.type in ('system', 'subscriber') "
 							. "group by value";
 				if (count($existingvalues) > 0) {
 					$query = "insert into persondatavalues (fieldnum,value,refcount) "
@@ -208,12 +208,12 @@ class FieldMap extends DBMappedObject {
 							. "p.$fieldnum as value, "
 							. "count(*) "
 							. "from person p "
-							. "where p.$fieldnum not in ($args) and not p.deleted and p.type = 'system' "
+							. "where p.$fieldnum not in ($args) and not p.deleted and p.type in ('system', 'subscriber') "
 							. "group by value";
 					
 					$upquery = "update persondatavalues pdv "
 							. "set refcount = (select count(*) from person p where p.$fieldnum = pdv.value "
-							. "and not p.deleted and p.type = 'system') "
+							. "and not p.deleted and p.type in ('system', 'subscriber')) "
 							. "where pdv.fieldnum='$fieldnum' "
 							. "and pdv.value in ($args)";
 					QuickUpdate($upquery, false, $existingvalues);

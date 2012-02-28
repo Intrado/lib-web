@@ -62,7 +62,7 @@ class ContactsReport extends ReportGenerator {
 					from person p
 					left join address a on (a.personid = p.id)
 					where not p.deleted
-					and p.type='system'
+					and p.type in ('system', 'subscriber') 
 					$peoplequery
 					$personquery
 					$userorgsql

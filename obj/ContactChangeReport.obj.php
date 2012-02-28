@@ -63,7 +63,7 @@ class ContactChangeReport extends ReportGenerator {
 					left join language l on (l.code = p." . FieldMap::GetLanguageField() . ")
 					left join personassociation pa on (pa.personid = p.id)
 					where not p.deleted
-					and p.type='system'
+					and p.type in ('system', 'subscriber') 
 					$peoplequery
 					$orgsql
 					$orderquery
