@@ -35,6 +35,8 @@ if (isset($_GET['delete'])) {
 	Query("BEGIN");
 		switch ($import->datatype) {
 			case "person" :
+				// delete all personguardian with this importid
+				QuickUpdate("delete from personguardian where importid=?", false, array($id));
 				// delete all personassociation with this importid
 				QuickUpdate("delete from personassociation where importid=?", false, array($id));
 				// delete all groupdata with this importid
