@@ -105,7 +105,7 @@ $dmsettings = array(
 	"telco_calls_sec" => '',
 	"delmech_resource_count" => '',
 	"telco_inboundtoken" => '',
-	"telco_dial_timeout" => false,
+	"telco_dial_timeout" => 45000,
 	"disable_congestion_throttle" => ''
 
 );
@@ -226,6 +226,16 @@ $formdata["callspersecond"] = array(
 	"control" => array("TextField","size" => 15, "maxlength" => 20),
 	"helpstep" => $helpstepnum
 );
+$formdata["dialtimeout"] = array(
+	"label" => _L('Dial Timeout'),
+	"value" => $dmsettings["telco_dial_timeout"],
+	"validators" => array(
+		array("ValRequired"),
+		array("ValNumber", "min" => 1000, "max" => 600000)
+	),
+	"control" => array("TextField","size" => 15, "maxlength" => 20),
+	"helpstep" => $helpstepnum
+);
 $formdata["numberofresources"] = array(
 	"label" => _L('Number of Resources'),
 	"value" => $dmsettings['delmech_resource_count'],
@@ -311,11 +321,6 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		QuickUpdate("update dm set enablestate=? where id=?",false,array($postdata["authorized"],$dmid));
 		$enablestate = $postdata["authorized"];
 		
-		$dialtimeout = $dmsettings["telco_dial_timeout"];
-		if($dialtimeout == false){
-			$dialtimeout = 45000;
-		}
-
 		QuickUpdate("delete from dmsetting where dmid=?",false,array($dmid));
 		QuickUpdate("insert into dmsetting (dmid, name, value) values 
 					(?,'dm_enabled',?),
@@ -339,7 +344,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 					$dmid,$postdata["callspersecond"],
 					$dmid,$postdata["numberofresources"],
 					$dmid,$postdata["inboundresouces"],
-					$dmid,$dialtimeout,
+					$dmid,$postdata["dialtimeout"],
 					$dmid,$postdata["disablethrottle"]?1:0)
 		);
 
