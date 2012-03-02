@@ -44,7 +44,7 @@ while(true) {
 			echo $audio->data;
 		} catch (messagelink_MessageLinkCodeNotFoundException $e) {
 			echo "The requested information was not found. The message you are looking for does not exist or has expired.";
-			error_log("Unable to find the messagelinkcode: " . $code + " Attempt: " . $attempts);
+			error_log("Unable to find the messagelinkcode: " . $code . " Attempt: " . $attempts);
 		}
 		// And finally, we close the thrift connection
 		$appservertransport->close();
