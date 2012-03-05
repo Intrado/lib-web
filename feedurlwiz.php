@@ -59,7 +59,7 @@ class FeedUrlWiz_feedoptions extends WizStep {
 		
 		// display user feed categories under the "My Feed Categories" header
 		if (count($myfeedcategories)) {
-			$feedcategories[] = "#-My Feed Categories-#";
+			$feedcategories['my'] = "#-My Feed Categories-#";
 			foreach ($myfeedcategories as $category) {
 				$feedcategories[$category->id] = $category->name;
 			}
@@ -67,8 +67,8 @@ class FeedUrlWiz_feedoptions extends WizStep {
 		
 		// if there are user and other feed categories, provide a seperator and a header for other
 		if (count($myfeedcategories) && count($otherfeedcategories)) {
-			$feedcategories[] = "#-#";
-			$feedcategories[] = "#-Other Feed Categories-#";
+			$feedcategories['line'] = "#-#";
+			$feedcategories['other'] = "#-Other Feed Categories-#";
 		}
 		
 		// add all other feed categories that do not match user restriction
@@ -80,7 +80,7 @@ class FeedUrlWiz_feedoptions extends WizStep {
 		
 		// if there are no feed categories!
 		if (!count($feedcategories))
-			$feedcategories[] = "#-". _L("There are no feed categories!"). "-#";
+			$feedcategories['none'] = "#-". _L("There are no feed categories!"). "-#";
 		
 		$formdata = array(_L('Feed Settings'),
 			"feedcategories" => array(
