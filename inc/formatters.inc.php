@@ -183,7 +183,7 @@ function jobs_actionlinks ($obj) {
 
 	$archivebtn = action_link(_L("Archive"),"fugue/broom","jobs.php?archive=$id");
 
-	$runrepeatbtn = action_link(_L("Run Now"),"page_go","jobs.php?runrepeating=$id", "return confirm('Are you sure you want to run this job now?');");
+	$runrepeatbtn = action_link(_L("Run Now"),"page_go","jobs.php?runrepeating=$id&uuid=rr".uniqid(), "return confirm('Are you sure you want to run this job now?');");
 
 	$viewresponses = action_link(_L("Responses"),"comment","replies.php?jobid=$id");
 

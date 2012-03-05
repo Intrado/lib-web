@@ -85,21 +85,29 @@ if (isset($_GET['unarchive'])) {
 
 if (isset($_GET['runrepeating'])) {
 	$runnow = $_GET['runrepeating'] + 0;
-	if (userOwns("job",$runnow) || $USER->authorize('managesystemjobs')) {
-		$job = new Job($runnow);
-		if ($job->status != 'repeating') {
-			notice(_L("The job, %s, is not a repeating job.", escapehtml($job->name)));
-		} else {
-			Query('BEGIN');
-				$job->runNow();
-			Query('COMMIT');
-		
-			notice(_L("The repeating job, %s, will now run.", escapehtml($job->name)));
-		}
+	// don't re-run a repeating job from the same link
+	if (isset($_SESSION['lastrunrepeatingjob'][$runnow]) && $_GET['uuid'] == $_SESSION['lastrunrepeatingjob'][$runnow]) {
+		// Do nothing, this is a repeat request
+		error_log("Ignoring duplicate runrepeating request: runrepeating=$runnow");
 	} else {
-		notice(_L("You do not have permission to run this repeating job."));
+		if (userOwns("job",$runnow) || $USER->authorize('managesystemjobs')) {
+			$job = new Job($runnow);
+			if ($job->status != 'repeating') {
+				notice(_L("The job, %s, is not a repeating job.", escapehtml($job->name)));
+			} else {
+				Query('BEGIN');
+					$job->runNow();
+				Query('COMMIT');
+			
+				notice(_L("The repeating job, %s, will now run.", escapehtml($job->name)));
+				
+				// this repeating job has been run
+				$_SESSION['lastrunrepeatingjob'][$runnow] = $_GET['uuid'];
+			}
+		} else {
+			notice(_L("You do not have permission to run this repeating job."));
+		}
 	}
-
 	redirectToReferrer();
 }
 
