@@ -1468,6 +1468,7 @@ class SMAPI {
 			if ($maxcallattempts > 0 && $maxcallattempts <= $USER->getSetting('callmax', $ACCESS->getValue('callmax', '4'))) {
 				$job->setOptionValue("maxcallattempts", $maxcallattempts);
 			} else {
+				//FIXME dead code
 				$job->setOptionValue("maxcallattempts", $USER->getSetting('callmax', $ACCESS->getValue('callmax', '4')));
 			}
 			// if user is allowed to override callerid, then check that phone number is valid or error, otherwise we just ignore the option
