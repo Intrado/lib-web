@@ -470,7 +470,7 @@ function fmt_jobs_actions_customer($row, $index) {
 	}
 
 	if ($USER->authorize('managesystemjobs') || $USER->id == $jobownerid) {
-		$runrepeatLink = action_link(_L("Run Now"),"page_go","jobs.php?runrepeating=$id", "return confirm('Are you sure you want to run this job now?');");
+		$runrepeatLink = action_link(_L("Run Now"),"page_go","jobs.php?runrepeating=$id&uuid=".uniqid(), "return confirm('Are you sure you want to run this job now?');");
 	} else {
 		$runrepeatLink = "";
 	}
