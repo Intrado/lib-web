@@ -64,7 +64,8 @@ require_once("obj/TextAreaPhone.val.php");
 require_once("obj/HtmlTextArea.fi.php");
 require_once("obj/CheckBoxWithHtmlPreview.fi.php");
 require_once("obj/TextAreaWithEnableCheckbox.fi.php");
-require_once("obj/TextAreaWithEnableCheckbox.val.php");
+require_once("obj/TextAreaAndSubjectWithCheckbox.fi.php");
+require_once("obj/TextAreaAndSubjectWithCheckbox.val.php");
 require_once("obj/PreviewButton.fi.php");
 require_once("obj/ValSmsText.val.php");
 require_once("obj/ValTtsText.val.php");
@@ -430,12 +431,12 @@ class FinishJobWizard extends WizFinish {
 			// social media
 			if (JobWiz_socialMedia::isEnabled($postdata,false)) {
 				if ($this->parent->dataHelper('/message/post/socialmedia:fbdata')) {
-					$fbdata = $this->parent->dataHelper('/message/post/socialmedia:fbdata', true);
-					$messages['post']['facebook']['en']['none']['text'] = $fbdata->message;
+					$fbdata = $this->parent->dataHelper('/message/post/socialmedia:fbdata');
+					$messages['post']['facebook']['en']['none']['text'] = $fbdata;
 				}
 				if ($this->parent->dataHelper('/message/post/socialmedia:twdata')) {
-					$twdata = $this->parent->dataHelper('/message/post/socialmedia:twdata', true);
-					$messages['post']['twitter']['en']['none']['text'] = $twdata->message;
+					$twdata = $this->parent->dataHelper('/message/post/socialmedia:twdata');
+					$messages['post']['twitter']['en']['none']['text'] = $twdata;
 				}
 				if ($this->parent->dataHelper('/message/post/socialmedia:feeddata')) {
 					$feeddata = $this->parent->dataHelper('/message/post/socialmedia:feeddata', true);
@@ -670,7 +671,7 @@ Validator::load_validators(array("ValInArray", "ValJobName", "ValHasMessage",
 	"ValTimeWindowCallLate", "ValTimeWindowCallEarly", "ValSmsText", "valPhone",
 	"ValMessageBody", "ValMessageGroup", "ValMessageTypeSelect", "ValFacebookPage",
 	"ValTranslationCharacterLimit","ValTimePassed","ValTtsText","ValCallerID",
-	"ValTextAreaWithEnableCheckbox"));
+	"ValTextAreaAndSubjectWithCheckbox"));
 ?>
 </script>
 <script src="script/niftyplayer.js.php" type="text/javascript"></script>

@@ -1521,11 +1521,15 @@ class JobWiz_socialMedia extends WizStep {
 			$formdata["fbdata"] = array(
 				"label" => _L('Facebook'),
 				"fieldhelp" => _L("Create your Facebook posting text here."),
-				"value" => ($smEnable?json_encode(array("message"=>$fbtext)):""),
+				"value" => ($smEnable?$fbtext:""),
 				"validators" => array(
-					array("ValTextAreaWithEnableCheckbox"),
 					array("ValLength","max"=>420)),
-				"control" => array("TextAreaWithEnableCheckbox", "defaultmessage" => $fbtext, "rows"=>10,"cols"=>50,"counter"=>420,"spellcheck" => true),
+				"control" => array("TextAreaWithEnableCheckbox",
+					"defaultvalue" => $fbtext,
+					"rows"=>10,
+					"cols"=>50,
+					"counter"=>420,
+					"spellcheck" => true),
 				"helpstep" => $helpstepnum++
 			);
 		}
@@ -1538,11 +1542,15 @@ class JobWiz_socialMedia extends WizStep {
 			$formdata["twdata"] = array(
 				"label" => _L("Twitter"),
 				"fieldhelp" => _L("Select what text to use as a status update."),
-				"value" => ($smEnable?json_encode(array("message"=>$twtext)):""),
+				"value" => ($smEnable?$twtext:""),
 				"validators" => array(
-					array("ValTextAreaWithEnableCheckbox"),
 					array("ValLength","max"=>(140 - $reservedchars))),
-				"control" => array("TextAreaWithEnableCheckbox", "defaultmessage" => $twtext, "rows"=>5,"cols"=>50,"counter"=>(140 - $reservedchars), "spellcheck" => true),
+				"control" => array("TextAreaWithEnableCheckbox",
+					"defaultvalue" => $twtext,
+					"rows"=>5,
+					"cols"=>50,
+					"counter"=>(140 - $reservedchars),
+					"spellcheck" => true),
 				"helpstep" => $helpstepnum++
 			
 			);
@@ -1556,9 +1564,9 @@ class JobWiz_socialMedia extends WizStep {
 				"fieldhelp" => _L("Select what text to include in your feed."),
 				"value" => ($smEnable?json_encode(array("subject"=>$this->parent->dataHelper('/start:name'),"message"=>$fbtext)):""),
 				"validators" => array(
-					array("ValTextAreaWithEnableCheckbox","requiresubject" => true),
+					array("ValTextAreaAndSubjectWithCheckbox","requiresubject" => true),
 					array("ValLength","max"=>32000)),
-				"control" => array("TextAreaWithEnableCheckbox", 
+				"control" => array("TextAreaAndSubjectWithCheckbox", 
 					"hassubject" => true, 
 					"subjectmax" => 50, 
 					"subjectsize" => 44, 

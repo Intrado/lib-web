@@ -1,5 +1,5 @@
 <?
-/* Validator for TextAreaWithEnableCheckbox form item
+/* Validator for TextAreaAndSubjectWithCheckbox form item
  *  You can have an empty value and it will be valid
  *  non-empty value is of format:
  *    {"subject":<subject text>,"message":<message text>}
@@ -9,7 +9,7 @@
  *  
  * Nickolas Heckman
  */
-class ValTextAreaWithEnableCheckbox extends Validator {
+class ValTextAreaAndSubjectWithCheckbox extends Validator {
 	function validate ($value, $args) {
 		// if the value is blank, that's fine. ValRequired should prevent this when it's required.
 		if ($value == "")
