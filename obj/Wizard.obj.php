@@ -223,12 +223,8 @@ class Wizard {
 				$mainhtml .= icon_button(_L("Done"),"fugue/arrow_180",null, $this->doneurl);
 		}
 		
-		$res = '<table border="0" cellpadding="0" cellspacing="0" width="100%">
-					<tr>
-							<td valign="top" width="150px" style="border-right: 1px solid black;">'.$navhtml.'</td>
-							<td valign="top" width="auto" style="padding: 3px;">'.$mainhtml.'</td>
-					</tr>
-				</table>';
+		$res = '<div class="csec window_aside">'.$navhtml.'</div>
+							<div class="csec window_main">'.$mainhtml.'</div>';
 		
 		return $res;
 	}

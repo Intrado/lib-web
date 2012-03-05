@@ -179,66 +179,58 @@ if($forgotsuccess || $success || $newusersuccess){
 if($form){
 ?>
 	<form method="POST" action="<?=$action?>" name="activate">
-		<table  style="color: #365F8D;">
-			<tr>
-				<td colspan="2"><div style="font-size: 20px; font-weight: bold; text-align: left;"><?=$TITLE?></div></td>
-			</tr>
-			<tr>
-				<td colspan="2"><?=_L("You should have received an email containing a confirmation code.")?> <?=$text?>.<br></td>
-			</tr>
+		
+			<h3><?=$TITLE?></h3>
 
-			<tr>
-				<td><?=_L("Confirmation Code")?>: </td>
-				<td><input type="text" name="token" value="<?=escapehtml($token)?>" size="35" /></td>
-			</tr>
+			<p><?=_L("You should have received an email containing a confirmation code.")?> <?=$text?>.</p>
+
+			<fieldset>
+				<label for="form_code"><?=_L("Confirmation Code")?>: </label>
+				<input type="text" id="form_code" name="token" value="<?=escapehtml($token)?>" size="35" />
+			</fieldset>
 <?
 		if($forgot){
 ?>
-			<tr>
-				<td><?=_L("New Password")?>:</td>
-				<td><input type="password" name="password1"  size="35" maxlength="50" /></td>
-			</tr>
-			<tr>
-				<td><?=_L("Confirm Password")?>:</td>
-				<td><input type="password" name="password2"  size="35" maxlength="50" /></td>
-			</tr>
+			<fieldset>
+				<label for="form_new"><?=_L("New Password")?>:</label>
+				<input type="password" id="form_new" name="password1"  size="35" maxlength="50" />
+			</fieldset>
+			
+			<fieldset>
+				<label for="form_confirm"><?=_L("Confirm Password")?>:</label>
+				<input type="password" id="form_confirm" name="password2"  size="35" maxlength="50" />
+			</fieldset>
 <?
 		} else {
 ?>
-			<tr>
-				<td><?=_L("Password")?>:</td>
-				<td><input type="password" name="password"  size="35" maxlength="50"/></td>
-			</tr>
+			<fieldset>
+				<label for="form_pass"><?=_L("Password")?>:</label>
+				<input type="password" id="form_pass" name="password"  size="35" maxlength="50"/>
+			</fieldset>
 <?
 		}
 ?>
-		<tr>
-			<td>&nbsp;</td>
-			<td><div><input type="submit" name="submit" value="Submit"></div></td>
-		</tr>
-		<tr>
-			<td>&nbsp;</td>
-			<td>
+		<fieldset>
+			<input type="submit" name="submit" value="Submit"/>
+		</fieldset>
+		
+		
 <?
 		if ($error && $forgot){
 ?>
-			<div style="color: red;"><?=_L("That code is invalid or has expired.")?></div>
+			<div class="error"><?=_L("That code is invalid or has expired.")?></div>
 <?
 		} else if ($error){
 ?>
-			<div style="color: red;"><?=_L("That code is invalid or has expired or that is an incorrect password.")?></div>
+			<div class="error"><?=_L("That code is invalid or has expired or that is an incorrect password.")?></div>
 <?
 		} else {
 			echo "&nbsp;";
 		}
 ?>
-			</td>
-		</tr>
-		<tr>
-			<td>&nbsp;</td>
-			<td><a href="index.php<?echo $appendcustomerurl;?>"><?=_L("Return to Sign In")?></a></td>
-		</tr>
-		</table>
+
+			<p class="right"><a href="index.php<?echo $appendcustomerurl;?>"><?=_L("Return to Sign In")?></a></p>
+
 	</form>
 <?
 }

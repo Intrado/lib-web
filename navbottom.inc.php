@@ -1,8 +1,13 @@
+</div> <!--  .maincontent -->
 
 </div>
 
+</div><!-- content_wrap -->
+
+<div id="footer" class="cf">
+
 <div id="termsinfo">
-Service & Support:&nbsp;<a href="mailto:<?=$_SESSION['_supportemail']?>"><?=$_SESSION['_supportemail']?></a>&nbsp;|&nbsp;<?=substr($_SESSION['_supportphone'],0,3) . "." . substr($_SESSION['_supportphone'],3,3) . "." . substr($_SESSION['_supportphone'],6,4);?>
+Service &amp; Support:&nbsp;<a href="mailto:<?=$_SESSION['_supportemail']?>"><?=$_SESSION['_supportemail']?></a>&nbsp;|&nbsp;<?=substr($_SESSION['_supportphone'],0,3) . "." . substr($_SESSION['_supportphone'],3,3) . "." . substr($_SESSION['_supportphone'],6,4);?>
 <br>
 Use of this system is subject to the <a href="privacy.html" target="_blank">Privacy Policy</a> and <a href="terms.html" target="_blank">Terms of Service</a>
 <br>
@@ -11,9 +16,13 @@ Use of this system is subject to the <a href="privacy.html" target="_blank">Priv
 </div>
 <?
 print "<div id='logininfo' class='noprint' >Logged in as ".escapehtml($USER->firstname)." ".escapehtml($USER->lastname)." (".escapehtml($USER->login).")<br>Current system time is " . date("F jS, Y h:i a (e)") . "</div>";
-
 ?>
-<script language="javascript">
+
+</div><!-- #footer -->
+
+<!-- div class="branding"><? dologo() ?></div-->
+
+<script type="text/javascript">
 <?
 
 if(isset($ERRORS) && is_array($ERRORS)) {

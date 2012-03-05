@@ -49,43 +49,40 @@ $TITLE = "Password Assistance";
 include_once("logintop.inc.php");
 if(!$success){
 	?>
-		<div style="padding-top: 10px; padding-left: 25px; color: #<?=$primary?>">
-			<h1 style="font-size: 20px; "><?=$TITLE?></h1>
-			<p>To begin the password reset process, enter your username.</p>
+		
 			<form method="POST" action="forgotpassword.php" name="forgotpassword">
 			
-			<label class="indexform"><?=_L("Username:")?><br>
-			<input type="text" name="username1" size="20" alue="<?=escapehtml($username1)?>">
-			</label><br>
-
-			<label class="indexform"><?=_L("Confirm Username:")?><br>
-			<input type="text" name="username2" size="20" alue="<?=escapehtml($username2)?>">
-			</label><br>
-
-			<input type="submit" name="submit" value="Send Password Reset Email"><br>
+			<h3><?=$TITLE?></h3>
+			<p>To begin the password reset process, enter your username.</p>
 			
-			<br><a href="index.php">Return to Login Page</a>
+			<fieldset>
+				<label for="form_name"><?=_L("Username:")?></label>
+				<input type="text" id="form_name" name="username1" size="20" alue="<?=escapehtml($username1)?>"/>
+			</fieldset>
+
+			<fieldset>
+				<label for="form_confirm"><?=_L("Confirm Username:")?></label>
+				<input type="text" id="form_confirm" name="username2" size="20" alue="<?=escapehtml($username2)?>">
+			</fieldset>
+
+			<fieldset>
+				<input type="submit" name="submit" value="Send">
+			</fieldset>
+			
+			<p class="right"><a href="index.php">Return to Login Page</a></p>
 
 			</form>
-		</div>
+
 <?
 } else {
 ?>
-	<div style="margin-top: 50px; margin-left: 25px;">
 
-	<table  style="color: #365F8D;" >
-		<tr>
-			<td>&nbsp;</td>
-			<td>
-				<div style="margin:5px; font-size:12px">
-					You should receive an email containing a confirmation code shortly.  If you do not receive the email, please contact your System Administrator or call support for assistance.
-					<br>You will be redirected to the password assistance page in 10 seconds, or you can <a href="index.php?f">Click Here to continue.</a>
-				</div>
-				<meta http-equiv="refresh" content="10;url=index.php?f">
-			</td>
-		</tr>
-	</table>
-</div>
+			<div class="right">
+				<p>You should receive an email containing a confirmation code shortly.  If you do not receive the email, please contact your System Administrator or call support for assistance.</p>
+				<p>You will be redirected to the password assistance page in 10 seconds, or you can <a href="index.php?f">Click Here to continue.</a></p>
+			</div>
+			<meta http-equiv="refresh" content="10;url=index.php?f">
+
 <?
 }
 include_once("loginbottom.inc.php");

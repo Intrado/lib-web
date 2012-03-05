@@ -109,11 +109,8 @@ $TITLE= _L("Sign In");
 include_once("cmlogintop.inc.php");
 ?>
 <form method="POST" action="index.php<?echo $appendcustomerurl;?>" name="login">
-	<table style="color: #365F8D;" >
-		<tr>
-			<td colspan="3">
-				<div><div style="font-size: 20px; font-weight: bold; float: left">SchoolMessenger Contact Manager</div>
-				<div style="float:right;"> 
+
+				<span class="language"> 
 				<?
 					// if no customerurl, need to include the ?, otherwise append with &
 					$urlparams = (strlen($appendcustomerurl) == 0) ? "?locale=" : $appendcustomerurl . "&locale=";
@@ -123,58 +120,45 @@ include_once("cmlogintop.inc.php");
 					}
 					NewFormItem("login", "main", '_locale', 'selectend');
 				?>
-				</div></div>
-				<br>
-				<br>
-				<br>
-			</td>
-		</tr>
-		<tr>
-			<td colspan="3">
+				</span>
+
+
 				<noscript><p><?=_L("It looks like you don't have JavaScript enabled! You must have JavaScript enabled for full use of this system. Please enable JavaScript in your browser or contact your system administrator for assistance.")?></p></noscript>
 
 <?
 				if ($badlogin) {
 				?>
-					<div style="color: red;"><?=_L("Incorrect username/password. Please try again.")?></div><br>
+					<p style="color: red;"><?=_L("Incorrect username/password. Please try again.")?></p>
 				<?
 				}
 ?>
-			</td>
-		<tr>
-			<td><?=_L("Email")?>:</td>
-			<td><input type="text" id="logintext" name="login" size="30" maxlength="255" value="<?=escapehtml($login)?>"/></td>
-			<td>&nbsp;</td>
 
-		</tr>
-		<tr>
-			<td><?=str_replace(" ", "&nbsp;", _L("Password (case sensitive)"))?>:</td>
-			<td><input type="password" name="password" size = "30" maxlength="50" onkeypress="capslockCheck(event)"/></td>
-			<td align="left"><a href="forgotpassword.php<?echo $appendcustomerurl;?>"><?=_L("Forgot your password? Click Here")?></a></td>
-		</tr>
-		<tr>
-			<td>&nbsp;</td>
-			<td><br><div id="capslockwarning"  style="padding-left:3px; float:left; display:none; color:red;"><?=_L("Warning! Your Caps Lock key is on.")?></div></td>
-			<td>&nbsp;</td>
-		</tr>
-		<tr>
-			<td>&nbsp;</td>
-			<td align="right"><div style="text-align: right;"><input type="submit" name="signin" value="<?=_L("Sign In")?>"></div></td>
-			<td>&nbsp;</td>
-		</tr>
-		<tr>
-			<td colspan="3"><?=_L("First time accessing the SchoolMessenger Contact Manager?")?></td>
-		</tr>
-		<tr>
-			<td colspan="3"><a href="newportaluser.php<?echo $appendcustomerurl;?>"><b><?=_L("Sign up now")?></b></a></td>
-		</tr>
-	</table>
+			<fieldset>
+				<label for="form_email"><?=_L("Email")?>:</label>
+				<input type="text" id="form_email" name="login" size="30" maxlength="255" value="<?=escapehtml($login)?>"/>
+			</fieldset>
+
+			<fieldset>
+				<label for="form_pass"><?=str_replace(" ", "&nbsp;", _L("Password"))?>:</label>
+				<input type="password" id="form_pass" name="password" size = "30" maxlength="50" onkeypress="capslockCheck(event)"/>
+				<em>Passwords are case-sensitive.</em>
+			</fieldset>
+			
+			<div id="capslockwarning"  style="padding-left:3px; float:left; display:none; color:red;"><?=_L("Warning! Your Caps Lock key is on.")?></div>
+
+			<fieldset>
+				<input type="submit" name="signin" value="<?=_L("Sign In")?>">
+			</fieldset>
+			
+			<p class="right"><a href="forgotpassword.php<?echo $appendcustomerurl;?>"><?=_L("Forgot your password? Click Here")?></a></p>
+
+
+			<p><?=_L("First time accessing the SchoolMessenger Contact Manager?")?>	
+			<a href="newportaluser.php<?echo $appendcustomerurl;?>"><b><?=_L("Sign up now")?></b></a></p>
+
+
 </form>
-<br>
-<br>
-<br>
-<br>
-<br>
+
 <?
 include("cmloginbottom.inc.php");
 ?>

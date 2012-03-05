@@ -77,22 +77,6 @@ function enable(exc, obj, yes) {
 	}
 }
 
-function setIFrame(div) {
-	if(div == null) {
-		iframe.style.display = 'none';
-		iframe.style.top = 0;
-		iframe.style.left = 0;
-		iframe.style.width = 1;
-		iframe.style.height = 1;
-	} else {
-		iframe = new getObj('blocker').obj;
-		iframe.style.top = div.offsetTop;
-		iframe.style.left = div.offsetLeft;
-		iframe.style.width = div.offsetWidth;
-		iframe.style.height = div.offsetHeight;
-		iframe.style.display = 'block';
-	}
-}
 
 function popup(url, width, height, target) {
 	if(typeof(target) == 'undefined')
@@ -281,9 +265,9 @@ function btn_roll(obj,over) {
 	//parse one of the button images for the theme
 	var theme = parse_theme_from_url(leftimg.src);
 
-	leftimg.src='img/themes/' + theme + '/button_left' + over + '.gif';
-	rightimg.src='img/themes/' + theme + '/button_right' + over + '.gif';
-	midtb.style.background = "url('img/themes/" + theme + "/button_mid" + over + ".gif') repeat-x";
+	leftimg.src='themes/' + theme + '/button_left' + over + '.gif';
+	rightimg.src='themes/' + theme + '/button_right' + over + '.gif';
+	midtb.style.background = "url('themes/" + theme + "/button_mid" + over + ".gif') repeat-x";
 }
 
 function btn_rollover(obj) {

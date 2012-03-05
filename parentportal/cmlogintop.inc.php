@@ -6,18 +6,9 @@ header('Content-type: text/html; charset=UTF-8') ;
 <head>
 	<meta http-equiv="Content-type" value="text/html; charset=UTF-8" />
 	<title>Contact Manager<?=isset($TITLE) ? ": " . $TITLE : ""?></title>
-	
-	<script src='script/utils.js'></script>
-	<script src='script/sorttable.js'></script>
-	<script src="script/prototype.js" type="text/javascript"></script>
-	<script src="script/scriptaculous.js" type="text/javascript"></script>
-	<script src="script/prototip.js.php" type="text/javascript"></script>
-	<script src="script/form.js.php" type="text/javascript"></script>
     
-	<link href="css/form.css.php" type="text/css" rel="stylesheet">
-	<link href="css/prototip.css.php" type="text/css" rel="stylesheet">
-	<link href='css/style_print.css' type='text/css' rel='stylesheet' media='print'>
-	<link href='css.php?skipcommon' type='text/css' rel='stylesheet' media='screen'>
+	<link href='css/css.inc.php' type='text/css' rel='stylesheet' media='screen'>
+	<link href='css/login.css.php' type='text/css' rel='stylesheet' media='screen'>
 </head>
 
 <?
@@ -58,26 +49,23 @@ if((isset($_COOKIE['embeddedpage']) && $_COOKIE['embeddedpage']) || isset($_GET[
 <?
 } else {
 ?>
-<body style='font-family: "Lucida Grande", verdana, arial, helvetica, sans-serif; margin: 0px; background-color: #365F8D;'>
-	<table border=0 cellpadding=0 cellspacing=0 width="100%">
-	<tr style="background-color: #365F8D;">
-		<td colspan="2"><div style="padding-left:5px; padding-bottom:5px;"><img src="img/school_messenger.gif" /></div></td>
-	</tr>
-	<tr style="background-color: #666666;">
-		<td colspan="2">&nbsp;</td>
-	</tr>
-	<tr>
-		<td width="320" valign="top" style="background-color: #D4DDE2; color: #365F8D;"><img src="img/contactmanager_splash.jpg"></td>
-		<td style="background-color: #D4DDE2; color: #365F8D;">
-			<table>
-				<tr>
-					<td width="15px">&nbsp;</td>
-					<td width="80%">&nbsp;</td>
-					<td width="20%">&nbsp;</td>
-				</tr>
-				<tr>
-					<td>&nbsp;</td>
-					<td>
+
+<body>
+	
+	
+<div id="top_banner" class="banner cf">
+	<div class="banner_logo"><img src="img/logo_small.gif" /></div>
+</div><!-- end top_banner .banner -->
+	
+<div class="window cf">
+
+	<div class="window_body_wrap cf">
+	
+		<div id="window" class="window_body cf">
+			<h3 class="indexdisplayname">SchoolMessenger Contact Manager</h3>
+		
+			<div><img src="img/contactmanager_splash.jpg"></div>
+
 <?
 }
 ?>

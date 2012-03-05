@@ -229,10 +229,10 @@ NewForm($f);
 buttons(submit($f, $s, "Refresh"));
 startWindow("Display Options" . help("UsageStats_DisplayOptions"), "padding: 3px;");
 ?>
-	<table border="0" cellpadding="3" cellspacing="0" width="100%">
+	<table class="usagelist">
 		<tr>
-			<th align="right" class="windowRowHeader bottomBorder">Delivery Method</th>
-			<td class="bottomBorder">
+			<th align="right" class="windowRowHeader">Delivery Method</th>
+			<td>
 				<?
 					NewFormItem($f, $s, "type", "selectstart");
 					NewFormItem($f, $s, "type", "selectoption", "Phone", "phone");
@@ -245,8 +245,8 @@ if(getSystemSetting('_hassms', false)){
 			</td>
 		</tr>
 		<tr>
-			<th align="right" class="windowRowHeader bottomBorder">Date</th>
-			<td class="bottomBorder">
+			<th align="right" class="windowRowHeader">Date</th>
+			<td>
 <?
 				dateOptions($f, $s, "", true);
 ?>
@@ -254,8 +254,8 @@ if(getSystemSetting('_hassms', false)){
 		</tr>
 
 		<tr valign="top">
-			<th align="right" class="bottomBorder windowRowHeader">Group By:</th>
-			<td class="bottomBorder">
+			<th align="right" class="windowRowHeader">Group By:</th>
+			<td>
 				<?
 					NewFormItem($f, $s, "groupby", "selectstart");
 					NewFormItem($f, $s, "groupby", "selectoption", " -- System -- ", "");
@@ -268,8 +268,8 @@ if(getSystemSetting('_hassms', false)){
 			</td>
 		</tr>
 		<tr valign="top">
-			<th align="right" class="bottomBorder windowRowHeader">Show Users:</th>
-			<td class="bottomBorder">
+			<th align="right" class="windowRowHeader">Show Users:</th>
+			<td>
 				<?
 					NewFormItem($f, $s, "showusers", "checkbox");
 				?>
@@ -283,10 +283,10 @@ endWindow();
 ?><br><?
 startWindow("Total Messages Delivered", "padding: 3px;");
 ?>
-	<table border="0" cellpadding="2" cellspacing="1" class="list">
+	<table class="list">
 		<tr class="listHeader" >
-			<td colspan="<?=count($jobtypelist)+2?>">System Total</td>
-			<td><?=$systemtotal?></td>
+			<th colspan="<?=count($jobtypelist)+2?>">System Total</th>
+			<th><?=$systemtotal?></th>
 		</tr>
 		<tr class="listHeader" align="left" valign="bottom">
 			<td>&nbsp;</td>

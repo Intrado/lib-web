@@ -51,23 +51,24 @@ class FormListSelect extends FormItem {
 			}
 			</style>';
 		
-		$str .= '<div><div id='.$n.' class="radiobox" style="float: left;width:40%">';
+		$str .= '<div id='.$n.' class="radiobox">';
 		
 		// add a checkbox for every list this user can use and check ones already selected
 		foreach ($lists as $id => $name) {
 			$checked = isset($listdetails[$id]);
-			$str .= '<div><input id="'. "$n-$id" .'" name="'.$n.'[]" type=checkbox value="'. $id .'" '. ($checked?'checked':'') .' onclick="formlistselectcheck(this.id, \''.$n.'\')"/>
-			<label for="'. "$n-$id" .'">'. $name .'</label></div>';
+			$str .= '<input id="'. "$n-$id" .'" name="'.$n.'[]" type=checkbox value="'. $id .'" '. ($checked?'checked':'') .' onclick="formlistselectcheck(this.id, \''.$n.'\')"/>
+			<label for="'. "$n-$id" .'">'. $name .'</label>';
 		}
 		
+		$str .= '</div>';
+		
 		// create a table for the list details
-		$str .= '</div>
-			<div style="float:right;width:50%">
-				<table width="100%" cellspacing=1 cellpadding=3 class="list" style="table-layout:fixed; font-size:90%;">
+		$str .= '<div class="form_list_table">
+				<table class="list">
 					<thead>
 						<tr class="listHeader">
-							<th width="70%">'._L("List Name").'</th>
-							<th width="20%">'._L("Count").'</th>
+							<th class="tcol70">'._L("List Name").'</th>
+							<th width="tcol20">'._L("Count").'</th>
 						</tr>
 					</thead>
 					<tbody id="'. $n .'-displaybody">
@@ -96,7 +97,7 @@ class FormListSelect extends FormItem {
 						</tr>
 					</tfoot>
 				</table>
-			</div></div>';
+					</div>';
 		
 		return $str;
 	}

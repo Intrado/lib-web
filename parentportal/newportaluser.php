@@ -121,98 +121,99 @@ include_once("cmlogintop.inc.php");
 if(!$success){
 ?>
 	<form method="POST" action="newportaluser.php<?echo $appendcustomerurl;?>" name="newaccount" onsubmit='if(!(new getObj("tos").obj.checked)){ window.alert("You must accept the Terms of Service."); return false;}'>
-		<table width="100%" style="color: #365F8D;" >
-			<tr>
-				<td colspan="2">
-					<div style="font-size: 20px; font-weight: bold; text-align: left; float: left;"><?=$TITLE?></div>
-					<div style="float:right;"> 
-					<?
-						// if no customerurl, need to include the ?, otherwise append with &
-						$urlparams = (strlen($appendcustomerurl) == 0) ? "?locale=" : $appendcustomerurl . "&locale=";
-						NewFormItem("login", "main", '_locale', 'selectstart', null, null, "id='locale' onchange='window.location.href=\"newportaluser.php" . $urlparams . "\"+this.options[this.selectedIndex].value'");
-						foreach($LOCALES as $loc => $lang){
-							NewFormItem("login", "main", '_locale', 'selectoption', $lang, $loc);
-						}
-						NewFormItem("login", "main", '_locale', 'selectend');
-					?>
-					</div>
-				</td>
-			</tr>
-			<tr>
-				<td colspan="2"><?=_L("Please complete this form to create your Contact Manager account.  A confirmation code will be sent to activate your new account so a valid email address is required.  Your password must be at least 5 characters long and cannot be similar to your first name, last name, or email address.")?></td>
-			</tr>
-			<tr>
-				<td colspan="4">&nbsp;</td>
-			</tr>
-			<tr>
-				<td><?=str_replace(" ", "&nbsp;", _L("Email (this will be your login name)"))?>:</td>
-				<td><input type="text" name="login" value="<?=escapehtml($login)?>" size="50" maxlength="255"/> </td>
-			</tr>
-			<tr>
-				<td><?=_L("Confirm Email")?>:</td>
-				<td><input type="text" name="confirmlogin" value="<?=escapehtml($confirmlogin)?>" size="50" maxlength="255"/> </td>
-			</tr>
-			<tr>
-				<td><?=_L("Password")?>: </td>
-				<td><input type="password" name="password1"  size="35" maxlength="50"/> </td>
-			</tr>
-			<tr>
-				<td><?=_L("Confirm Password")?>: </td>
-				<td><input type="password" name="password2"  size="35" maxlength="50"/> </td>
-			</tr>
-			<tr>
-				<td><?=_L("First Name")?>:</td>
-				<td><input type="text" name="firstname" value="<?=escapehtml($firstname)?>" maxlength="100"/></td>
-			</tr>
-			<tr>
-				<td><?=_L("Last Name")?>:</td>
-				<td><input type="text" name="lastname" value="<?=escapehtml($lastname)?>" maxlength="100"/></td>
-			</tr>
-			<tr>
-				<td><?=_L("ZIP Code")?>:</td>
-				<td><input type="text" name="zipcode" value="<?=escapehtml($zipcode)?>" size="5" maxlength="5"/></td>
-			</tr>
-			<tr>
-				<td colspan="2"><input type="checkbox" name="notify" value="1" <?=$notify ? "checked" : "" ?>/>&nbsp;<?=_L("Email me when I have a new phone message.")?></td>
-			</tr>
-			<tr>
-				<td colspan="2"><input type="checkbox" name="notifysms" value="1" <?=$notifysms ? "checked" : "" ?> onclick="document.getElementById('smsbox').disabled=!this.checked"/>&nbsp;<?=_L("Text me when I have a new phone message.")?></td>
-			</tr>
-			<tr>
-				<td><?=_L("Mobile Phone for SMS Text")?>:</td>
-				<td><input type="text" name="sms" id="smsbox" value="<?=Phone::format($sms)?>" size="20" maxlength="20" <?=$notifysms ? "" : "disabled=\"true\"" ?>/></td>
-			</tr>
-			<tr>
-				<td colspan="2"><div style="overflow:scroll; height:250px; width:525px;"><?=$tos ?></div></td>
-			</tr>
-			<tr>
-				<td colspan="2"><input type="checkbox" name="acceptterms" id="tos"/> <?=_L("Accept Terms of Service")?></td>
-			</tr>
-			<tr>
-				<td colspan="2"><div><input type="submit" name="createaccount" value="<?=_L("Create Account")?>"></div></td>
-			</tr>
-			<tr>
-				<td colspan="2"><br><a href="index.php<?echo $appendcustomerurl;?>"><?=_L("Return to Sign In")?></a></td>
-			</tr>
-		</table>
+
+			<span class="language"> 
+			<?
+				// if no customerurl, need to include the ?, otherwise append with &
+				$urlparams = (strlen($appendcustomerurl) == 0) ? "?locale=" : $appendcustomerurl . "&locale=";
+				NewFormItem("login", "main", '_locale', 'selectstart', null, null, "id='locale' onchange='window.location.href=\"newportaluser.php" . $urlparams . "\"+this.options[this.selectedIndex].value'");
+				foreach($LOCALES as $loc => $lang){
+					NewFormItem("login", "main", '_locale', 'selectoption', $lang, $loc);
+				}
+				NewFormItem("login", "main", '_locale', 'selectend');
+			?>
+			</span>
+			<h3><?=$TITLE?></h3>
+					
+			<p><?=_L("Please complete this form to create your Contact Manager account.  A confirmation code will be sent to activate your new account so a valid email address is required.  Your password must be at least 5 characters long and cannot be similar to your first name, last name, or email address.")?></p>
+	
+			<fieldset>
+				<label for="form_user"><?=str_replace(" ", "&nbsp;", _L("Email"))?>:</label>
+				<input type="text" id="form_user" name="login" value="<?=escapehtml($login)?>" size="50" maxlength="255"/>
+			</fieldset>
+			
+			<fieldset>
+				<label for="form_email"><?=_L("Confirm Email")?>:</label>
+				<input type="text" id="form_email" name="confirmlogin" value="<?=escapehtml($confirmlogin)?>" size="50" maxlength="255"/>
+			</fieldset>
+			
+			<fieldset>
+				<label for="form_pass"><?=_L("Password")?>:</label>
+				<input type="password" id="form_pass" name="password1"  size="35" maxlength="50"/>
+			</fieldset>
+			
+			<fieldset>
+				<label for="form_confirm"><?=_L("Confirm Password")?>:</label>
+				<input type="password" id="form_confirm" name="password2"  size="35" maxlength="50"/>
+			</fieldset>
+			
+			<fieldset>
+				<label for="form_fname"><?=_L("First Name")?>:</label>
+				<input type="text" id="form_fname" name="firstname" value="<?=escapehtml($firstname)?>" maxlength="100"/>
+			</fieldset>
+			
+			<fieldset>
+				<label for="form_lname"><?=_L("Last Name")?>:</label>
+				<input type="text" id="form_lname" name="lastname" value="<?=escapehtml($lastname)?>" maxlength="100"/>
+			</fieldset>
+			
+			<fieldset>
+				<label for="form_zip"><?=_L("ZIP Code")?>:</label>
+				<input type="text" id="form_zip" name="zipcode" value="<?=escapehtml($zipcode)?>" size="5" maxlength="5"/>
+			</fieldset>
+			
+			<fieldset>
+				<input type="checkbox" id="form_emailme" name="notify" value="1" <?=$notify ? "checked" : "" ?>/>
+				<label for="form_emailme" class="check">&nbsp;<?=_L("Email me when I have a new phone message.")?></label>
+			</fieldset>
+			
+			<fieldset>
+				<input type="checkbox" id="form_textme" name="notifysms" value="1" <?=$notifysms ? "checked" : "" ?> onclick="document.getElementById('smsbox').disabled=!this.checked"/>
+				<label for="form_textme" class="check">&nbsp;<?=_L("Text me when I have a new phone message.")?></label>
+			</fieldset>
+			
+			<fieldset>
+				<label for="form_phone"><?=_L("Mobile Phone for SMS Text")?>:</label>
+				<input type="text" id="form_phone" name="sms" id="smsbox" value="<?=Phone::format($sms)?>" size="20" maxlength="20" <?=$notifysms ? "" : "disabled=\"true\"" ?>/>
+			</fieldset>
+			
+			<fieldset>
+				<div style="overflow:auto; height:250px; width:100%;"><?=$tos ?></div>
+			</fieldset>
+			
+			<fieldset>
+				<input type="checkbox" id="form_accept" name="acceptterms"/>
+				<label for="form_accept" class="check">&nbsp;<?=_L("Accept Terms of Service")?></label>
+			</fieldset>
+			
+			<fieldset>
+				<input type="submit" name="createaccount" value="<?=_L("Sign up")?>">
+			</fieldset>
+			
+			<p class="right"><a href="index.php<?echo $appendcustomerurl;?>"><?=_L("Return to Sign In")?></a></p>
+
 	</form>
 <?
 } else {
 ?>
-	<table style="color: #365F8D;">
-		<tr>
-			<td>&nbsp;</td>
-			<td>
-				<div style="margin:5px">
-					<?=_L("Thank you, Your account has been created.")?>
-					<br><?=_L("Please check your email to activate your account.")?>
-					<br><?=_L("You will be redirected to the activate page in 10 seconds.")?><br><a href="index.php<?echo $appendcustomerurl; if ($appendcustomerurl == "") echo "?n"; else echo "&n"; ?>"><?=_L("Click Here to redirect now.")?></a>
+
+				<div>
+					<p><?=_L("Thank you, Your account has been created.")?></p>
+					<p><?=_L("Please check your email to activate your account.")?></p>
+					<p><?=_L("You will be redirected to the activate page in 10 seconds.")?><br><a href="index.php<?echo $appendcustomerurl; if ($appendcustomerurl == "") echo "?n"; else echo "&n"; ?>"><?=_L("Click Here to redirect now.")?></a></p>
 				</div>
 				<meta http-equiv="refresh" content="10;url=index.php<?echo $appendcustomerurl; if ($appendcustomerurl == "") echo "?n"; else echo "&n"; ?>">
-			</td>
-			<td>&nbsp;</td>
-		</tr>
-	</table>
+
 <?
 }
 include_once("cmloginbottom.inc.php");

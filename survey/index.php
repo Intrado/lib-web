@@ -100,6 +100,15 @@ if (isset($_POST['Submit']) && $reason == 'ok') {
 $TITLE= isset($questionnaire->webpagetitle) ? $questionnaire->usehtml ? $questionnaire->webpagetitle : escapehtml($questionnaire->webpagetitle) : "";
 
 
+function doLogo () {
+	$logohash = crc32("cid".getSystemSetting("_logocontentid"));
+	$clickurl = getSystemSetting("_logoclickurl");
+	if($clickurl != "" && $clickurl != "http://")
+	echo '<a href="' . $clickurl . '" target="_blank"><img src="../logo.img.php?hash=' . $logohash .'" alt="Logo"></a>';
+	else
+	echo '<img src="../logo.img.php?hash=' . $logohash .'" alt="">';
+}
+
 //Do inpage CSS
 $theme = $scheme['_brandtheme'];
 $primary = $scheme['colors']['_brandprimary'];
@@ -137,140 +146,25 @@ header('Content-type: text/html; charset=UTF-8') ;
 	<meta http-equiv="Content-type" value="text/html; charset=UTF-8" />
 	<title><?= isset($questionnaire->webpagetitle) ? escapehtml($questionnaire->webpagetitle) : "Survey" ?></title>
 	<link href='../css/style_print.css' type='text/css' rel='stylesheet' media='print'>
+	<link href='../css/css.inc.php' type="text/css" rel="stylesheet" media="screen, print">
 </head>
-<style>
-
-body, table, form, select, input {
-	font-family: verdana, arial, helvetica;
-	font-size: 12px;
-}
-
-body {
-	margin: 0px;
-
-}
-.custname {
-	font-size: 12pt;
-	color:<?=$primary?>;
-	white-space: nowrap;
-	text-align: right;
-	margin: 10px;
-	margin-right: 25px;
-}
 
 
-/* **** content **** */
-
-.content {
-	margin-left: 15px;
-	margin-right: 15px;
-	margin-top: 5px;
-}
-
-.pagetitle {
-	margin-top: 10px;
-	margin-left: 15px;
-	font-size: 18px;
-	font-weight: bold;
-	color: <?=$primary?>;
-
-}
-
-.pagetitlesubtext {
-	margin-left: 15px;
-	font-size: 12px;
-	font-style: italic;
-	color: <?=$primary?>;
-}
-
-
-/* **** window **** */
-.window {
-	width: 100%;
-}
-
-
-.windowbar {
-	background: url('../img/themes/<?=$theme?>/chrome_light.png') repeat-x;
-	border-bottom: 1px solid <?=$theme2?> ;
-	height: 22px;
-}
-
-.windowborder {
-	border: 2px solid <?=$theme1?>;
-	border-top: 0px;
-	border-left: 1px solid <?=$theme1?>;
-}
-
-.windowtitle {
-	font-size: 12px;
-	font-weight: bold;
-	padding-left: 5px;
-	padding-top: 2px;
-	color: <?=$primary?>;
-}
-
-.windowbody {
-	display: block;
-}
-
-/* general styles */
-
-
-
-input.text, input , select, textarea, table.form  {
-	border: <?=$theme1?> 1px solid;
-}
-
-
-.windowRowHeader {
-	background-color: <?=$newfade1?>;
-	color: <?=$newfade3?>;
-	width: 85px;
-}
-
-.bottomBorder {
-	border-bottom: 1px solid <?=$theme2?>;
-}
-
-.border {
-	border: 1px solid <?=$theme2?>;
-}
-
-
-</style>
 <body>
 
+<div class="survey_banner cf">
+	
+	<div class="survey_logo"><? doLogo() ?></div>
+	<h2 class="survey_custname"><?= escapehtml($custdisplayname) ?></h2>
+	
+</div><!-- .survey_banner -->
 
-<div>
-	<table width="100%" border=0 cellpadding=0 cellspacing=0 background="../img/header_bg.gif" >
-		<tr><td style="font-size:8px;">&nbsp;</td></tr>
-	</table>
-</div>
-<div>
-	<table width="100%" border=0 cellpadding=0 cellspacing=0>
-	<tr>
-	<td><img src="../logo.img.php"></td>
-	<td><div class="custname"><?= escapehtml($custdisplayname) ?></div></td>
-	</tr>
-	</table>
-</div>
+<div class="survey_wrap cf">
 
-<div class="content">
+<h3 class="survey_title"><?= $TITLE ?></h3>
+				
 
 
-	<div class="pagetitle"> <?= $TITLE ?></div>
-<!-- startWindow() -->
-	<div class="window">
-	<table width="100%" border=0 cellpadding=0 cellspacing=0>
-	<tr>
-		<td width="100%">
-			<div class="windowborder">
-				<div class="windowbar">
-					<div class="windowtitle">Survey</div>
-				</div>
-				<div id="window_1" class="windowbody" style=""><div style="width: 100%;">
-<!-- startWindow() -->
 
 <?
 //if no survey found, display error page
@@ -287,7 +181,7 @@ if ($reason != 'ok' && $reason != 'prevresponse' && $reason != 'expired') {
 			echo $questionnaire->webexitmessage;
 			echo "<br><br>";
 		} else {
-			echo '<br><br><h3 style="margin-left: 15px;">';
+			echo '<br><br><h3>';
 			echo nl2br(escapehtml($questionnaire->webexitmessage));
 			echo "</h3><br><br>";
 		}
@@ -343,30 +237,33 @@ function validate_survey () {
 }
 </script>
 
-	<table border="0" cellpadding="3" cellspacing="0" width="100%">
+
 <?
 	$displaynumber = 1;
 	foreach ($questions as $question) {
 ?>
-		<tr valign="top">
-			<th align="right" class="windowRowHeader bottomBorder" rowspan="2">Question <?= $displaynumber ?></th>
-			<td><?= $questionnaire->usehtml ? $question->webmessage : nl2br(escapehtml($question->webmessage)) ?></td>
-		</tr>
-		<tr>
-			<td class="bottomBorder" style="vertical-align: middle;">
-<?
+		<div class="survey_question cf">
+			
+			<div class="question_num">Question <?= $displaynumber ?></div>
+			
+			<div class="question_choice">
+			<p><?= $questionnaire->usehtml ? $question->webmessage : nl2br(escapehtml($question->webmessage)) ?></p>
+			
+			<?
 		for ($x = 1; $x <= $question->validresponse; $x++)
 			{ ?><span onclick="this.firstChild.checked = true;"><input type="radio" name="q<?= $question->questionnumber ?>" value="<?= $x ?>"><b><?= $x ?></b>&nbsp;</span><? }
 ?>
-			</td>
-		</tr>
+			</div>
+			
+		</div>
+		
 <?
 		$displaynumber++;
 	}
 ?>
-	</table>
 
-	<input type="submit" name="Submit" value="Submit" style="margin: 5px;" alt="Submit" >
+
+	<input type="submit" name="Submit" value="Submit" class="submit_survey">
 	</form>
 
 
@@ -375,20 +272,9 @@ function validate_survey () {
 }
 ?>
 
-<!-- endWindow() -->
-				</div></div>
-			</div>
-		</td>
-		<td width="6" valign="top" background="../img/window_shadow_right.gif"><img src="../img/window_shadow_topright.gif"></td>
-	</tr>
-	<tr>
-		<td background="../img/window_shadow_bot.gif"><img src="../img/window_shadow_botleft.gif"></td>
-		<td><img src="../img/window_shadow_botright.gif"></td>
-	</table>
-</div>
-<!-- endWindow() -->
 
-</div>
-</div>
+
+</div><!-- .survey_wrap -->
+
 </body>
 </html>

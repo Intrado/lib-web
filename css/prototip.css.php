@@ -113,6 +113,16 @@ header("Cache-Control: private");
 	color: #808080;
 	padding: 5px;
 }
+
+
+/*----- fresh -----*/
+
+.prototip .fresh { width: 250px; color: #121212; border-top: 1px solid #fff; }
+.prototip .fresh .toolbar { background: #f3edc2; font-weight: bold; }
+.prototip .fresh .title { padding: 2px; }
+.prototip .fresh .content { background: #606060; }
+
+
 /* This is how to resize the close button for a style */
 .prototip .protogrey .toolbar .close {
 	width: 14px;

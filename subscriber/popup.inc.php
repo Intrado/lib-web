@@ -25,7 +25,6 @@ function doLogo () {
 	<script src="script/prototip.js.php" type="text/javascript"></script>
 </head>
 <body onload="try {UpdateTimer();} catch (e) {}" style="margin: 0px; background-color: white;">
-	<IFRAME src="blank.html" id="blocker" style="DISPLAY: none; LEFT: 0px; POSITION: absolute; TOP: 0px" frameBorder="0" scrolling="no"></IFRAME>
 
 <div style="padding-left:10px; "><? doLogo() ?></div>
 <div class="pagetitle"><? if(isset($ICON)) print '<img src="img/icon_' . $ICON . '" align="absmiddle">'; ?> <?= (isset($TITLE) ? $TITLE : "") ?></div>

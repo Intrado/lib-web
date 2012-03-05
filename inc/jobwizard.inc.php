@@ -559,18 +559,9 @@ class JobWiz_start extends WizStep {
 		foreach ($packageDetails as $package => $details) {
 			if ($details['enabled'])
 				$packages[$package] = '
-					<table align="left" style="border: 0px; margin: 0px; padding: 0px">
-						<tr>
-							<td style="border: 0px; margin: 0px; padding: 0px" align="center" valign="center"><div style="width: 94px; height: 88px; background: url('.$details['icon'].') no-repeat;"><div style="position: relative; top: 67px; width: 100%; font-size: 10px">'.escapehtml($details['label']).'</div></div></td>
-							<td style="border: 0px; margin: 0px; padding: 0px;" align="left" valign="center">
-								<ol>
-									'.(($details[0])?'<li style="list-style-type: circle; list-style-image: url(img/icons/bullet_blue.gif); list-style-position: outside;">'.escapehtml($details[0]).'</li>':'').'
-									'.(($details[1])?'<li style="list-style-type: circle; list-style-image: url(img/icons/bullet_blue.gif); list-style-position: outside;">'.escapehtml($details[1]).'</li>':'').'
-									'.(($details[2])?'<li style="list-style-type: circle; list-style-image: url(img/icons/bullet_blue.gif); list-style-position: outside;">'.escapehtml($details[2]).'</li>':'').'
-								</ol>
-							</td>
-						</tr>
-					</table>';
+					<div style="width: 94px; height: 88px; background: url('.$details['icon'].') no-repeat;">
+						<div style="position: relative; top: 67px; width: 100%; font-size: 10px">'.escapehtml($details['label']).'</div>
+					</div>';
 		}
 
 		$helpstepnum = 1;

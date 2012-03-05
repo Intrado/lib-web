@@ -166,7 +166,7 @@ buttons(button('Refresh',"window.location.reload()"),
 startWindow("Display Options" . help('Replies_DisplayOptions'), "padding: 3px;");
 ?>
 
-<table border="0" cellpadding="3" cellspacing="0" width="100%">
+<table class="usagelist">
 <tr>
 	<th align="right" class="windowRowHeader" valign="top" style="padding-top: 6px;">Job:</th>
 	<td>

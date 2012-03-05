@@ -118,10 +118,8 @@ include_once("nav.inc.php");
 startWindow(_L('My Classroom Messages'));
 
 ?>
-<table width="100%" style="padding-top: 7px;">
-<tr>
-	<td class="feed" style="width: 180px;vertical-align: top;font-size: 12px;" >
 
+	<div class="csec window_aside">
 
 		<?
 		$schedule = DBFind("Schedule","from job j inner join schedule s on (j.scheduleid = s.id) where j.type = 'alert' and j.status = 'repeating'","s");
@@ -133,23 +131,23 @@ startWindow(_L('My Classroom Messages'));
 
 		?>
 
-
 		<div style="clear:both;"></div>
-		<h1 id="view">View By:</h1>
+		<h3 id="view">View By:</h3>
 		<div id="alloptions" class="feedfilter">
 			<a href="classroommessageoverview.php?mode=contacts" style="font-weight:<?= $mode=='contacts'?'bold':'normal' ?>"><img src="img/largeicons/tiny20x20/addresscard.jpg" />&nbsp;Contacts</a><br />
 			<a href="classroommessageoverview.php?mode=comments" style="font-weight:<?= $mode=='comments'?'bold':'normal' ?>"><img src="img/largeicons/tiny20x20/clipboard.jpg" />&nbsp;Comments</a><br />
 		</div>
 		<br />
-		<h1 id="view">View</h1>
+		<h3 id="view">View</h3>
 		<div id="alloptions" class="feedfilter">
 			<a id="collapseall" href="#" onclick="collapseall();return false;" style="font-weight:bold"><img src="img/icons/magifier_zoom_out.gif" />&nbsp;Compact</a><br />
 			<a id="expandall" href="#" onclick="expandall();return false;" ><img src="img/icons/magnifier_zoom_in.gif" />&nbsp;Expanded</a><br />
 		</div>
 
-	</td>
-	<td width="10px" style="border-left: 1px dotted gray;" >&nbsp;</td>
-	<td class="feed" valign="top" >
+	</div><!-- .csec .window_aside -->
+	
+
+	<div class="csec window_main">
 		<? if($personcomments) { showPageMenu ($total,$start, $limit);} ?>
 		<table id="feeditems">
 			<?
@@ -233,13 +231,14 @@ startWindow(_L('My Classroom Messages'));
 
 			?>
 		</table>
+		
+		</div><!-- .csec .window_main -->
 		<br />
 
 		<? if($personcomments) { showPageMenu ($total,$start, $limit);} ?>
 
-	</td>
-</tr>
-</table>
+
+
 <script type="text/javascript" language="javascript">
 
 function togglecomments(id) {

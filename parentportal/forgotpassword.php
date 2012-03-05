@@ -70,10 +70,8 @@ if($generalerror){
 if(!$success){
 ?>
 <form method="POST" action="forgotpassword.php<?echo $appendcustomerurl;?>" name="forgotpassword">
-	<table width="100%" style="color: #365F8D;" >
-		<tr>
-			<td colspan="2""><div style="font-size: 20px; font-weight: bold; text-align: left;"><?=$TITLE?></div>
-					<div style="float:right;"> 
+
+					<span class="language"> 
 					<?
 						// if no customerurl, need to include the ?, otherwise append with &
 						$urlparams = (strlen($appendcustomerurl) == 0) ? "?locale=" : $appendcustomerurl . "&locale=";
@@ -83,29 +81,28 @@ if(!$success){
 						}
 						NewFormItem("login", "main", '_locale', 'selectend');
 					?>
-					</div>
-			</td>
-		</tr>
-		<tr>
-			<td colspan="2"><?=_L("To begin the password reset process, enter your email address.")?></td>
-		</tr>
-		<tr>
-			<td>Email:</td>
-			<td><input type="text" name="email1" size="50" maxlength="255" value="<?=escapehtml($email1)?>"></td>
-		</tr>
-		<tr>
-			<td>Confirm Email:</td>
-			<td><input type="text" name="email2" size="50" maxlength="255" value="<?=escapehtml($email2)?>"></td>
-		</tr>
-		<tr>
-			<td>&nbsp;</td>
-			<td><div><input type="submit" name="submit" value="<?=_L("Submit")?>"></div></td>
-		</tr>
-		<tr>
-			<td>&nbsp;</td>
-			<td><br><a href="index.php<?echo $appendcustomerurl;?>"><?=_L("Return to Sign In")?></a></td>
-		</tr>
-	</table>
+					</span>
+					
+			<h3><?=$TITLE?></h3>
+
+			<p><?=_L("To begin the password reset process, enter your email address.")?></p>
+
+			<fieldset>
+				<label for="form_email">Email:</label></td>
+				<input type="text" id="form_email" name="email1" size="50" maxlength="255" value="<?=escapehtml($email1)?>">
+			</fieldset>
+
+			<fieldset>
+				<label for="form_confirm">Confirm Email:</label></td>
+				<input type="text" id="form_confirm" name="email2" size="50" maxlength="255" value="<?=escapehtml($email2)?>">
+			</fieldset>
+
+			<fieldset>
+				<input type="submit" name="submit" value="<?=_L("Submit")?>">
+			</fieldset>
+
+			<p class="right"><a href="index.php<?echo $appendcustomerurl;?>"><?=_L("Return to Sign In")?></a></p>
+
 </form>
 
 <?

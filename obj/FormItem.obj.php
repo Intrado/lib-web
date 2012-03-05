@@ -147,7 +147,7 @@ class RadioButton extends FormItem {
 				$str .= "<hr />\n";
 			} else {
 				$id = $n.'-'.$counter;
-				$str .= '<input id="'.$id.'" name="'.$n.'" type="radio" value="'.escapehtml($radiovalue).'" '.($value == $radiovalue || $autoselect ? 'checked' : '').' /><label id="'.$id.'-label" for="'.$id.'">'.($ishtml?$radioname:escapehtml($radioname)).'</label><br />
+				$str .= '<input id="'.$id.'" name="'.$n.'" type="radio" value="'.escapehtml($radiovalue).'" '.($value == $radiovalue || $autoselect ? 'checked' : '').' /><label id="'.$id.'-label" for="'.$id.'">'.($ishtml?$radioname:escapehtml($radioname)).'</label>
 				';
 				if (isset($this->args['hover'])) {
 					$hoverdata[$id] = $this->args['hover'][$radiovalue];
@@ -254,7 +254,7 @@ class MultiCheckBox extends FormItem {
 			} else {
 				$id = $n.'-'.$counter;
 				$checked = $value == $checkvalue || (is_array($value) && in_array($checkvalue, $value));
-				$str .= '<input id="'.$id.'" name="'.$n.'[]" type="checkbox" value="'.escapehtml($checkvalue).'" '.($checked ? 'checked' : '').' /><label id="'.$id.'-label" for="'.$id.'">'.escapehtml($checkname).'</label><br />
+				$str .= '<input id="'.$id.'" name="'.$n.'[]" type="checkbox" value="'.escapehtml($checkvalue).'" '.($checked ? 'checked' : '').' /><label id="'.$id.'-label" for="'.$id.'">'.escapehtml($checkname).'</label>
 					';
 				if (isset($this->args['hover']) && $this->args['hover'][$checkvalue]) {
 					$hoverdata[$id] = $this->args['hover'][$checkvalue];
@@ -288,7 +288,7 @@ class HtmlRadioButton extends FormItem {
 		$counter = 1;
 		foreach ($this->args['values'] as $radiovalue => $radiohtml) {
 			$id = $n.'-'.$counter;
-			$str .= '<tr><td><input id="'.$id.'" name="'.$n.'" type="radio" value="'.escapehtml($radiovalue).'" '.($value == $radiovalue ? 'checked' : '').' /></td><td><label for="'.$id.'"><button type="button" class="regbutton" style=" width: 100%; border: 2px outset; background-color: white; color: black; margin-left: 0px;" onclick="$(\''.$id.'\').click();">'.($radiohtml).'</button></label></td></tr>
+			$str .= '<tr><td><input id="'.$id.'" name="'.$n.'" type="radio" value="'.escapehtml($radiovalue).'" '.($value == $radiovalue ? 'checked' : '').' /></td><td><label for="'.$id.'"><button type="button" class="regbutton htmlradiobutton" onclick="$(\''.$id.'\').click();">'.($radiohtml).'</button></label></td></tr>
 				';
 			$counter++;
 		}

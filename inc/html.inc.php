@@ -25,7 +25,7 @@ function help($title, $extrahtml = NULL, $style = NULL) {
 	$GLOBALS['TIPS'][] = array($tipid,$contents); //navbotom.inc will load these for us
 
 	$hover = '<span id="'.$tipid.'" class="hoverhelpicon ' . ($link != "" ? "helpclick" : "") . '" ' . $extrahtml . '>';
-	$hover .= '<img align="absmiddle" src="img/themes/' . $theme . '/helpcenter' . ($style ? '_' . $style : "") . '.gif"';
+	$hover .= '<img src="img/helpcenter' . ($style ? '_' . $style : "") . '.png"';
 	if ($link != "")
 		$hover .= " onclick=\"window.open('$link', '_blank', 'width=750,height=500,location=no,menubar=yes,resizable=yes,scrollbars=yes,status=no,titlebar=no,toolbar=yes');\"";
 	$hover .= '></span>';	
@@ -113,42 +113,41 @@ function buttons() {
 		$buttons = func_get_args();
 	}
 ?>
-		<div style="clear: left; height: 1px; margin-top: -1px;"><img src="img/pixel.gif" alt=""/></div>
+		<div class="cf"></div>
 <?
 		echo implode('', $buttons);
 ?>
-		<div style="clear: left; height: 1px; margin-top: -1px;"><img src="img/pixel.gif" alt=""/></div>
+		<div class="cf"></div>
 <?
 }
 
 function button_bar() {
 	$buttons = func_get_args();
 ?>
-		<div style="clear: both; height: 1px; margin-top: -1px;"><img src="img/pixel.gif" alt=""/></div>
+		<div class="cf"></div>
 <?
 		echo implode('', $buttons);
 ?>
-		<div style="clear: both; height: 1px; margin-top: -1px;"><img src="img/pixel.gif" alt=""/></div>
+		<div class="cf"></div>
 <?
 
 }
 
 
 function hidden_submit_button($value = "submit") {
-	$btn = '<input type="submit" name="submit" value="'.escapehtml($value).'" style="position: absolute; left: -1000px; top: -1000px;" onclick="return form_submit(event,\''.escapehtml($value).'\');"></button>';
+	$btn = '<input type="submit" class="btn_hide" name="submit" value="'.escapehtml($value).'" onclick="return form_submit(event,\''.escapehtml($value).'\');" />';
 	return $btn;
 }
 
 function submit_button($name, $value = "submit", $icon = null) {
 	$theme = getBrandTheme();
-	$btn = '<button class="button" type="submit" name="submit" value="'.escapehtml($value).'" onmouseover="btn_rollover(this);" onmouseout="btn_rollout(this);" onclick="return form_submit(event,\''.escapehtml($value).'\');"><table><tr><td><img class="left" src="img/themes/' . $theme. '/button_left.gif" alt=""></td><td class="middle">';
-
+	$btn = '<button class="btn" type="submit" name="submit" value="'.escapehtml($value).'" onclick="return form_submit(event,\''.escapehtml($value).'\');"><div class="btn_wrap cf"><span class="btn_left"></span><span class="btn_middle">';
+	
 	if ($icon == null)
 		$btn .= '<img src="img/pixel.gif" alt="" height="16" width="1">';		
 	else
 		$btn .= '<img src="img/icons/'.$icon.'.gif" alt="">';
-	
-	$btn .= escapehtml($name) . '</td><td><img class="right" src="img/themes/' . $theme . '/button_right.gif" alt=""></td></tr></table></button>';
+	$btn .= escapehtml($name) . '</span><span class="btn_right"></span></div></button>';
 	
 	return $btn;
 }
@@ -156,7 +155,7 @@ function submit_button($name, $value = "submit", $icon = null) {
 function icon_button($name,$icon,$onclick = NULL, $href = NULL, $extrahtml = NULL) {
 	$theme = getBrandTheme();
 	$autoid = $extrahtml == null ? ('id="' . autoID("icon_button", $name, $icon) . '"') : "";
-	$btn = '<button ' . $autoid . ' class="button" type="button" onmouseover="btn_rollover(this);" onmouseout="btn_rollout(this);"';
+	$btn = '<button ' . $autoid . ' class="btn" type="button"';
 	if ($onclick)
 		$btn .= ' onclick="' . $onclick . ';" ';
 	else if ($href)
@@ -164,15 +163,14 @@ function icon_button($name,$icon,$onclick = NULL, $href = NULL, $extrahtml = NUL
 
 	if ($extrahtml)
 		$btn .= $extrahtml;
-	$btn .= '><table><tr><td><img class="left" src="img/themes/' . $theme. '/button_left.gif" alt=""></td><td class="middle"><img src="img/icons/'.$icon.'.gif" alt="">' . escapehtml($name) . '</td><td><img class="right" src="img/themes/' . $theme . '/button_right.gif" alt=""></td></tr></table></button>';
-	
+	$btn .= '><div class="btn_wrap cf"><span class="btn_left"></span><span class="btn_middle"><img class="btn_middle_icon" src="img/icons/'.$icon.'.gif">' . escapehtml($name) .'</span><span class="btn_right"></span></div></button>';
 	return $btn;
 }
 
 function button($name,$onclick = NULL, $href = NULL, $extrahtml = NULL) {
 	$theme = getBrandTheme();
 	$autoid = $extrahtml == null ? ('id="' . autoID("button", $name) . '"') : "";
-	$btn = '<button ' . $autoid . ' class="button" type="button" onmouseover="btn_rollover(this);" onmouseout="btn_rollout(this);"';
+	$btn = '<button ' . $autoid . ' class="btn" type="button"';
 	if ($onclick)
 		$btn .= ' onclick="' . $onclick . ';" ';
 	else if ($href)
@@ -180,8 +178,7 @@ function button($name,$onclick = NULL, $href = NULL, $extrahtml = NULL) {
 
 	if ($extrahtml)
 		$btn .= $extrahtml;
-	$btn .= '><table><tr><td><img class="left" src="img/themes/' . $theme. '/button_left.gif" alt=""></td><td class="middle"><img src="img/pixel.gif" alt="" height="16" width="1">' . escapehtml($name) . '</td><td><img class="right" src="img/themes/' . $theme . '/button_right.gif" alt=""></td></tr></table></button>';
-	
+	$btn .= '><div class="btn_wrap cf"><span class="btn_left"></span><span class="btn_middle">' . escapehtml($name) .'</span><span class="btn_right"></span></div></button>';
 	return $btn;
 }
 
@@ -189,7 +186,7 @@ function button($name,$onclick = NULL, $href = NULL, $extrahtml = NULL) {
 function submit($form, $section, $name = 'Submit',$val = null) {
 	//ugly hack. in order for enter key to submit form, either we need to add JS to each text field, or there must be an actual submit button
 	//so we make a submit button and hide it off screen.
-	$ret = '<input type="submit" value="submit" name="submit[' . $form . '][' . $section . ']" style="position: absolute; left: -1000px; top: -1000px;">';
+	$ret = '<input class="btn_hide" type="submit" value="submit" name="submit[' . $form . '][' . $section . ']" />';
 
 	if ($val !== null) {
 		$ret .= button($name,"submitForm('$form','$section','$val');");

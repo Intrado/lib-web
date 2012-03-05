@@ -53,19 +53,18 @@ function listform_load(listformID, formData, postURL) {
 
 	// Accordion
 	accordion = new Accordion('accordionContainer');
-
-	accordion.add_section('buildlist', true);
+	accordion.add_section('buildlist');
 
 	accordion.update_section('buildlist', {
 		"title": "<?=addslashes(_L('Build List Using Rules'))?>",
 		"icon": "img/icons/application_form_edit.gif",
 		"content": $('buildListWindow').remove()
 	});
-		
+	
 	// SectionWidget
 	var sectionsWindow = $('chooseSectionsWindow');
 	if (sectionsWindow) {
-		accordion.add_section('choosesections', true);
+		accordion.add_section('choosesections');
 		
 		var button = icon_button('Create This List','accept');
 		
@@ -73,7 +72,7 @@ function listform_load(listformID, formData, postURL) {
 		
 		button.observe('click', function() {
 			var selectedcheckboxes = $('listChoose_sectionwidget_fieldarea').select('input:checked');
-		
+
 			if (selectedcheckboxes.length < 1) {
 				alert('Please choose a section.');
 				return;
@@ -117,7 +116,7 @@ function listform_load(listformID, formData, postURL) {
 		});
 	}
 	
-	accordion.add_section('chooselist', true);
+	accordion.add_section('chooselist');
 
 	accordion.update_section('chooselist', {
 		"title": "<?=addslashes(_L('Choose an Existing List'))?>",
@@ -667,17 +666,17 @@ function listform_reset_list_selectbox() {
 	}
 
 	if (datas.length > 0) {
-		multicheckbox = new Element('div', {'style': 'border: solid 1px gray; background: white; overflow:hidden;'});
+		multicheckbox = new Element('div');
 		var heightCSS = (datas.length > 8) ? 'height:200px;' : '';
-		var ul = new Element('ul', {'style': 'clear:both; margin:0; padding:0; list-style:none; overflow:auto; '+heightCSS+'; padding-right:4px'});
+		var ul = new Element('ul', {'class': 'exist_list cf'});
 		var max = datas.length;
 		for (var i = 0; i < max; ++i) {
 			var data = datas[i];
 			var text = data.text;
 			var value = data.value;
-			var checkbox = new Element('input', {'type':'checkbox', 'value':value, 'style':'font-size:90%'});
-			var label = new Element('label', {'style':'margin:0;padding:1px; font-size:90%;', 'for':checkbox.identify()}).update(text.escapeHTML());
-			var li = new Element('li', {'style':'white-space:nowrap; font-size:90%; margin:0;margin:1px;overflow: hidden; vertical-align:middle'}).insert(checkbox).insert(label);
+			var checkbox = new Element('input', {'type':'checkbox', 'value':value});
+			var label = new Element('label', {'for':checkbox.identify()}).update(text.escapeHTML());
+			var li = new Element('li').insert(checkbox).insert(label);
 			if (data.checked) {
 				checkbox.checked = true;
 				checkbox.setAttribute('defaultChecked', true); // Workaround for Internet Explorer.
@@ -729,7 +728,7 @@ function listform_set_rule_editor_status(addingRule) {
 function listform_clear_validation_error() {
 	$('listChoose_listids_icon').src = 'img/pixel.gif';
 	$('listChoose_listids_msg').update();
-	$('listChoose_listids_fieldarea').style.background = "rgb(255,255,255)";
+	$('listChoose_listids_fieldarea').style.background = "#ffffff";
 }
 
 function listform_refresh_addme() {
@@ -737,22 +736,27 @@ function listform_refresh_addme() {
 	var addmePhone = $('listChoose_addmePhone');
 	var addmeEmail = $('listChoose_addmeEmail');
 	var addmeSms = $('listChoose_addmeSms');
+	
+	var addmeUp = $('listChoose_addme_fieldarea');
+	var addmePhoneUp = $('listChoose_addmePhone_fieldarea');
+	var addmeEmailUp = $('listChoose_addmeEmail_fieldarea');
+	var addmeSmsUp = $('listChoose_addmeSms_fieldarea');
 
 	if (addme.checked) {
 		if (addmePhone) {
 			if (addmeOriginalValues.phone === false)
 				addmeOriginalValues.phone = addmePhone.value;
-			addmePhone.up('tr').show();
+			addmePhoneUp.show();
 		}
 		if (addmeEmail) {
 			if (addmeOriginalValues.email === false)
 				addmeOriginalValues.email = addmeEmail.value;
-			addmeEmail.up('tr').show();
+			addmeEmailUp.show();
 		}
 		if (addmeSms) {
 			if (addmeOriginalValues.sms === false)
 				addmeOriginalValues.sms = addmeSms.value;
-			addmeSms.up('tr').show();
+			addmeSmsUp.show();
 		}
 		$('listsTableMyself').show();
 		listform_add_list('addme');
@@ -761,17 +765,17 @@ function listform_refresh_addme() {
 		if (addmePhone) {
 			if (addmeOriginalValues.phone !== false)
 				addmePhone.value = addmeOriginalValues.phone;
-			addmePhone.up('tr').hide();
+			addmePhoneUp.hide();
 		}
 		if (addmeEmail) {
 			if (addmeOriginalValues.email !== false)
 				addmeEmail.value = addmeOriginalValues.email;
-			addmeEmail.up('tr').hide();
+			addmeEmailUp.hide();
 		}
 		if (addmeSms) {
 			if (addmeOriginalValues.sms !== false)
 				addmeSms.value = addmeOriginalValues.sms;
-			addmeSms.up('tr').hide();
+			addmeSmsUp.hide();
 		}
 		$('listsTableMyself').hide();
 		listform_remove_list(null, 'addme');

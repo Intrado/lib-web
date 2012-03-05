@@ -48,39 +48,8 @@ header('Content-type: text/html; charset=UTF-8') ;
 <head>
 	<meta http-equiv="Content-type" value="text/html; charset=UTF-8" />
 	<title><?=$CustomBrand?> <?=$TITLE?></title>
-	
-	<style>	
-.navband1 {
-	height: 6px; 
-	background: #<?=$primary?>;
-}
-
-.navband2 {
-	height: 2px; 
-	background: #<?=$theme2?>;
-}
-
-.navlogoarea {
-	background-color: <?=$topbg?>;
-}
-
-.indexdisplayname {
-	font-size: 175%;
-	padding-bottom: 10px;
-	color: #<?=$primary?>;
-}
-
-.indexform {
-	font-size: 110%;
-	color: #<?=$primary?>;
-}
-
-.indexform input {
-	font-size: 12pt;
-	color: #<?=$primary?>;
-}
-
-	</style>
+	<link href='css/css.inc.php' type='text/css' rel='stylesheet' media='screen'>
+	<link href='css/login.css.php' type='text/css' rel='stylesheet' media='screen'>
 	
 <script type="text/javascript">
 
@@ -129,31 +98,18 @@ function getObj(name)
 
 </script>
 </head>
-<body style='font-family: "Lucida Grande", verdana, arial, helvetica, sans-serif; margin: 0px; background-color:<?=$primary?>'>
+<body>
 
-<table class="navlogoarea" border=0 cellspacing=0 cellpadding=0 width="100%">
-	<tr>
-		<td bgcolor="white"><div style="padding-left:10px;"><img src="logo.img.php" /></div></td>
-		<td><img src="img/shwoosh.gif" alt=""></td>
-		<td width="100%" align="right" style="padding-right: 10px;"></td>
-	</tr>
-</table>
-<div class="navband1"><img src="img/pixel.gif"></div>
-<div class="navband2"><img src="img/pixel.gif"></div>
-<div style="background: url(img/header_bg.gif); height:10px;"><img src="img/pixel.gif"></div>
+<div id="top_banner" class="banner cf">
+	<div class="banner_logo"><img src="logo.img.php" /></div>
+</div><!-- end top_banner .banner -->
 
 
-<div style="background-color: white;">
+<div class="window cf">
 
-<table border="0" cellpadding="0" cellspacing="0" style="width: 79%; margin-left: 10%; margin-right: 10%; background-color: white;">
-	<tr>
-		<td><img src="img/themes/<?=$theme?>/win_tl.gif" alt=""></td>
-		<td width="100%" style="background: url(img/themes/<?=$theme?>/win_t.gif);"></td>
-		<td><img src="img/themes/<?=$theme?>/win_tr.gif" alt=""></td>
-	</tr>
-	<tr>
-		<td style="background: url(img/themes/<?=$theme?>/win_l.gif);"></td>
-		<td><table order="0" cellpadding="0" cellspacing="0">
-			  <tr>
-				  <td valign="top"><img style="float: left; margin-top: 10px;" src="loginpicture.img.php" alt=""></td>
-				  <td width="100%" valign="top">
+	<div class="window_body_wrap cf">
+
+		<div id="window" class="window_body cf">
+			<h3 class="indexdisplayname"><?=escapehtml($custname)?></h3>
+		
+			  <div><img src="loginpicture.img.php" alt=""></div>

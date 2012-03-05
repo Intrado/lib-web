@@ -6,12 +6,12 @@ function showObjects ($data, $titles, $formatters = array(), $scrolling = false,
 	$tableid = "tableid" . $tablecounter++;
 
 	echo '<div ' . ($scrolling ? 'class="scrollTableContainer"' : '') . '>';
-	echo '<table width="100%" cellpadding="3" cellspacing="1" class="list' . ($sorttable ? " sortable" : "")  . '" id="' . $tableid . '">';
+	echo '<table class="list' . ($sorttable ? " sortable" : "")  . '" id="' . $tableid . '">';
 	echo '<tr class="listHeader">';
 	foreach ($titles as $title) {
 		//make column sortable?
 		if (!$sorttable || strpos($title,"#") === false) {
-			echo '<th align="left" class="nosort">' ;
+			echo '<th class="nosort">' ;
 		} else {
 			echo '<th align="left">';
 		}
@@ -145,21 +145,15 @@ function startWindow($title) {
 	$theme = getBrandTheme();
 
 ?>
-<div class="window">
-<table class="windowtable" width="100%" border="0" cellpadding="0" cellspacing="0">
-	<tr>
-		<td><img src="img/themes/<?=$theme?>/win_tl.gif" alt="" class="noprint" /></td>
-		<td background="img/themes/<?=$theme?>/win_t.gif" width="100%">
-			<div class="windowbar">
-
-				<div class="windowtitle"><?= $title ?></div>
-			</div>
-		</td>
-		<td><img src="img/themes/<?=$theme?>/win_tr.gif" alt="" class="noprint" /></td>
-	</tr>
-	<tr>
-		<td background="img/themes/<?=$theme?>/win_l.gif"></td>
-		<td><div class="windowbody"><div style="width: 100%;">
+<div class="window cf">
+	<div class="window_title_wrap cf">
+		<div class="window_title_l"></div>
+		<h3 class="window_title"><?= $title ?></h3>
+		<div class="window_title_r"></div>
+	</div>
+	<div class="window_body_wrap cf">
+		<div class="window_body_l"></div>
+		<div id="window_<?= $id ?>" class="window_body cf">
 <?
 }
 
@@ -167,15 +161,14 @@ function endWindow() {
 	$theme = getBrandTheme();
 
 ?>
-		</div></div></td>
-		<td background="img/themes/<?=$theme?>/win_r.gif"></td>
-	</tr>
-	<tr>
-		<td><img src="img/themes/<?=$theme?>/win_bl.gif" alt="" class="noprint" /></td>
-		<td background="img/themes/<?=$theme?>/win_b.gif"></td>
-		<td><img src="img/themes/<?=$theme?>/win_br.gif" alt="" class="noprint" /></td>
-	</tr>
-</table>
+		</div>
+		<div class="window_body_r"></div>
+	</div>
+	<div class="window_foot_wrap">  
+		<div class="window_foot_l"></div>
+		<div class="window_foot"></div>
+		<div class="window_foot_r"></div>
+	</div>
 </div>
 <?
 }
@@ -209,25 +202,23 @@ function showPageMenu ($total, $start, $perpage) {
  */
 function showSortMenu ($fields, $sortdata) {
 ?>
-	<table border="0">
-		<tr>
-			<td>Sort By</td>
+	<div class="sort_menu">
+		<h3>Sort By</h3>
 <?
 			$count = min(count($fields),3);
 			for ($x = 0; $x < $count; $x++) {
 				list($selectedfield,$desc) = isset($sortdata[$x]) ? $sortdata[$x] : array(false,false);
-				echo '<td><select onchange="location.href=\'?sort'.$x.'=\' + this.value;" name="sort'.$x.'"><option value="">- None -</option>';
+				echo '<span><select onchange="location.href=\'?sort'.$x.'=\' + this.value;" name="sort'.$x.'"><option value="">- None -</option>';
 				foreach ($fields as $field => $name) {
 					$selected = $field == $selectedfield ? "selected" : "";
 					echo '<option value="'.escapehtml($field).'" '.$selected .'>'.escapehtml($name).'</option>';
 				}
-				echo '</select></td>';
+				echo '</select></span>';
 				
 				//TODO add asc/desc toggle
 			}
 ?>
-		</tr>
-	</table>
+	</div> <!-- /.sort_menu -->
 <?	
 }
 
@@ -308,9 +299,9 @@ function ajax_show_table ($containerID, $data, $titles, $formatters = array(), $
 	$headerHtml = '<tr class="listHeader">';
 
 	foreach ($titles as $index => $title) {
-		$headerHtml .= '<th align="left" ';
+		$headerHtml .= '<th ';
 
-		$style = ' white-space: nowrap; ';
+		$style = '';
 		// make column hidden
 		if (strpos($title,"@") !== false) {
 
@@ -402,7 +393,7 @@ function ajax_show_table ($containerID, $data, $titles, $formatters = array(), $
 		}
 	}
 
-	$togglersHtml = "<div><table class='list' cellspacing=1>";
+	$togglersHtml = "<div class='togglers'><table class='list'>";
 	if ($showColumnTogglers) {
 		// NOTE: javascript does not know about the noncontinuous $index that we use in $titles, so we have to treat $titles as an indexed array.
 		$column = 0;
@@ -419,8 +410,8 @@ function ajax_show_table ($containerID, $data, $titles, $formatters = array(), $
 				$checked = "";
 				if (isset($_SESSION["ajaxtabletogglers"][$containerID]) && !empty($_SESSION["ajaxtabletogglers"][$containerID][$index]))
 					$checked = "checked";
-				$togglerHeaderHtml .= "<th class='listHeader' style='' valign='top'><label style='padding: 2px; font-weight:normal;' for=\"$checkboxID\">$title</label></th>";
-				$togglerCheckboxesHtml .= "<td valign='top' style='text-align:center'><input type=\"checkbox\" id=\"$checkboxID\" $checked value=\"$index\" onclick=\"$onclick\"></td>";
+				$togglerHeaderHtml .= "<th class='listHeader'><label class='label' for=\"$checkboxID\">$title</label></th>";
+				$togglerCheckboxesHtml .= "<td><input type=\"checkbox\" id=\"$checkboxID\" $checked value=\"$index\" onclick=\"$onclick\"></td>";
 			}
 		}
 		$togglersHtml .= "<tr>$togglerHeaderHtml</tr><tr>$togglerCheckboxesHtml</tr>";
@@ -443,8 +434,8 @@ function ajax_show_table ($containerID, $data, $titles, $formatters = array(), $
 	$multisortHtml .= "</div>";
 
 	$scrollClass = (count($data) > 10 && $scroll) ? "class=\"scrollTableContainer\"" : "";
-	return "<div style='clear:both'>$togglersHtml $multisortHtml<div $scrollClass>"
-		. '<table width="99%"  cellpadding="3" cellspacing="1" class="list"><tbody>'
+	return "<div class='scrolltable'>$togglersHtml $multisortHtml<div $scrollClass>"
+		. '<table class="list"><tbody>'
 		. "$headerHtml $dataHtml </tbody></table></div></div>";
 }
 
@@ -461,8 +452,8 @@ function ajax_table_show_menu ($containerID, $total, $start, $perpage) {
 	$displaystart = ($total) ? $start +1 : 0;
 
 	$onchange = "ajax_table_update('$containerID', '?ajax=page&start='+this.value);";
-	$info = "<div style='float:right'>Showing $displaystart - $displayend of $total records<span class='noprint'> on $numpages pages</span>.&nbsp;&nbsp;</div>";
-	$selectbox = "<div style='float:right;padding:0;margin:0'><select class='noprint' onchange=\"$onchange\">";
+	$info = "<div class='pagenavinfo'>Showing $displaystart - $displayend of $total records<span class='noprint'> on $numpages pages</span>.&nbsp;&nbsp;</div>";
+	$selectbox = "<div class='pagenavselect'><select class='noprint' onchange=\"$onchange\">";
 	for ($x = 0; $x < $numpages; $x++) {
 		$offset = $x * $perpage;
 		$selected = ($curpage == $x+1) ? "selected" : "";
@@ -470,6 +461,6 @@ function ajax_table_show_menu ($containerID, $total, $start, $perpage) {
 		$selectbox .= "<option value='$offset' $selected>Page $page</option>";
 	}
 	$selectbox .= "</select></div>";
-	return "<div class='pagenav' style='padding-top:5px; padding-right:5px; text-align:right'>" .  $selectbox . $info . "<div id='{$containerID}_tableprogressbar' style='float:right; width:16px; height:16px; margin-right: 5px'>&nbsp</div>" . "</div>";
+	return "<div class='pagenav cf'>" .  $selectbox . $info . "<div id='{$containerID}_tableprogressbar' class='tableprogressbar'>&nbsp</div>" . "</div>";
 }
 ?>

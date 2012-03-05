@@ -83,11 +83,11 @@ $formdata = array(
 	_L('Template Section 1'), // Optional
 	"templatetextfield" => array(
 		"label" => _L('TextField'),
-		"value" => "",
+		"value" => "a",
 		"validators" => array(
 			array("ValLength","min" => 3,"max" => 50)
 		),
-		"control" => array("TextField","size" => 30, "maxlength" => 51),
+		"control" => array("TextField","size" => 30, "maxlength" => 51, "autocomplete" => "test"),
 		"helpstep" => 1
 	),
 	_L('Template Section 2'), // Optional
@@ -105,18 +105,19 @@ $formdata = array(
 		"value" => "",//array("left" => "true","right" => "false"),
 		"validators" => array(array("ValRequired"),array("ValTemplateItem")),
 		"control" => array("TemplateItem"),
-		"helpstep" => 2
+		"helpstep" => 3
 	)
 );
 
 $helpsteps = array (
 	_L('Templatehelpstep 1'),
-	_L('Templatehelpstep 2')
+	_L('Templatehelpstep 2'),
+	_L('Templatehelpstep 3')
 );
 
 $buttons = array(submit_button(_L('Save'),"submit","tick"),
 				icon_button(_L('Cancel'),"cross",null,"start.php"));
-$form = new Form("templateform",$formdata,$helpsteps,$buttons);
+$form = new Form("templateform",$formdata,$helpsteps,$buttons, "vertical");
 
 ////////////////////////////////////////////////////////////////////////////////
 // Form Data Handling
@@ -175,5 +176,6 @@ include_once("nav.inc.php");
 startWindow(_L('template'));
 echo $form->render();
 endWindow();
+
 include_once("navbottom.inc.php");
 ?>

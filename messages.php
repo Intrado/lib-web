@@ -182,7 +182,6 @@ if($isajax === true) {
 			$types .= $item["pagemedia"] > 0?' <a href="' . $defaultlink . '&redirect=voice"><img src="img/nifty_play.png" alt="Page Media" title="Page Media"></a>':"";
 			$title = escapehtml($item["name"]);
 			$publishid = $item['publishid'];
-			
 			$icon = 'img/largeicons/letter.jpg';
 			
 			// Users with published messages or subscribed messages will get a special action item
@@ -216,7 +215,7 @@ if($isajax === true) {
 					$publishactionlink);
 			}
 
-			$content = '<a href="' . $defaultlink . '" >' . $time .  ($item["description"] != ""?" - " . escapehtml($item["description"]):"") . '</a> - <b>' . ($types==""?_L("Empty Message"):$types) . '</b>';
+			$content = '<a href="' . $defaultlink . '" >' . $time .  ($item["description"] != ""?" - " . escapehtml($item["description"]):"") . ' - <b>' . ($types==""?_L("Empty Message"):$types) . '</b>' . '</a>';
 			
 			$data->list[] = array("itemid" => $itemid,
 										"defaultlink" => $defaultlink,
@@ -271,47 +270,45 @@ include_once("nav.inc.php");
 startWindow(_L('My Messages'), 'padding: 3px;', false, true);
 
 ?>
-<table width="100%" style="padding-top: 7px;">
-<tr>
-	<td style="width: 180px;vertical-align: top;font-size: 12px;" >
-		<div class="feedbuttoncontainer">
-			<?= icon_button(_L('Create a Message'),"add","location.href='mgeditor.php?id=new'") ?>
-			<div style="clear:both;"></div>
-		</div>
-		<?=(($USER->authorize('subscribe') && userCanSubscribe('messagegroup'))?icon_button(_L('Subscribe to a Message'),"fugue/star", "document.location='messagegroupsubscribe.php'"):'') ?>
-		<div style="clear:both;"></div>
-		<br />
-		<div class="feed">
-			<h1 id="filterby">Sort By:</h1>
-			<div id="allfilters" class="feedfilter">
-				<a id="namefilter" href="#" onclick="applyfilter('name'); return false;"><img src="img/largeicons/tiny20x20/pencil.jpg" />Name</a><br />
-				<a id="datefilter" href="#" onclick="applyfilter('date'); return false;"><img src="img/largeicons/tiny20x20/clock.jpg" />Modify Date</a><br />
-			</div>
-		</div>
-	</td>
-	<td width="10px" style="border-left: 1px dotted gray;" >&nbsp;</td>
-	<td class="feed" valign="top" >
-		<div id="pagewrappertop"></div>
 
-		<table id="feeditems">
-			<tr>
-				<td valign='top' width='60px'><img src='img/ajax-loader.gif' /></td>
-				<td >
+	<div class="feed_btn_wrap cf">
+	<?= icon_button(_L('Create a Message'),"add","location.href='mgeditor.php?id=new'") ?>
+	
+	<?=(($USER->authorize('subscribe') && userCanSubscribe('messagegroup'))?icon_button(_L('Subscribe to a Message'),"fugue/star", "document.location='messagegroupsubscribe.php'"):'') ?>
+	</div>
+
+
+<div class="csec window_aside">
+		<h3 id="filterby">Sort By:</h3>
+		<ul id="allfilters" class="feedfilter">
+			<li><a id="namefilter" href="#" onclick="applyfilter('name'); return false;"><img src="img/largeicons/tiny20x20/pencil.jpg" />Name</a></li>
+			<li><a id="datefilter" href="#" onclick="applyfilter('date'); return false;"><img src="img/largeicons/tiny20x20/clock.jpg" />Modify Date</a></li>
+		</ul>
+</div><!-- .cesc .window_aside -->
+	
+
+<div class="csec window_main">
+	
+	<div id="pagewrappertop" class="content_recordcount_top"></div>
+
+	<table id="feeditems" class="content_feed">
+			<tbody>
+				<tr>
+					<td class=""><img src='img/ajax-loader.gif' /></td>
+					<td>
 						<div class='feedtitle'>
-							<a href=''>
-							<?= _L("Loading Messages") ?></a>
+							<a href=''><?//= _L("Loading Lists") ?></a>
 						</div>
-				</td>
-			</tr>
+					</td>
+				</tr>
+			</tbody>
 		</table>
-		<br />
-		<div id="pagewrapperbottom"></div>
-	</td>
-</tr>
-</table>
+	<div id="pagewrapperbottom" class="content_recordcount_btm"></div>
+	
+</div><!-- .cesc .window_main -->
 
 
-<script type="text/javascript" language="javascript">
+<script type="text/javascript">
 var filtes = Array('date','name');
 var activepage = 0;
 var currentfilter = 'date';
@@ -328,72 +325,70 @@ function applyfilter(filter) {
 		onSuccess: function (response) {
 			var result = response.responseJSON;
 			if(result) {
-				$('feeditems').update(new Element('tbody'));
+				$('feeditems').update(new Element('div', {'class': 'content_feed cf'}));
 				var size = result.list.length;
 
 				for(var i=0;i<size;i++){
 					var item = result.list[i];
-					var msg = new Element('tr');
+					var msg = new Element('div', {'class': 'feed_item cf'});
 
 					// insert icon
 					msg.insert(
-							new Element('td', {'valign': 'top', width: '60px'}).insert(
-								new Element('a', {'href': item.defaultlink}).insert(
+								new Element('a', {'class': 'msg_icon', 'href': item.defaultlink}).insert(
 									new Element('img', {'src': item.icon})
 								)
-							)
 						);
+
+					var feedWrap = new Element('div', {'class': 'feed_wrap'});
+
+					
 					// insert title and content details
-					msg.insert(
-							new Element('td').insert(
-								new Element('div', {'class': 'feedtitle'}).insert(
-									new Element('a', {'href': item.defaultlink}).insert(
-										item.title
-									)
-								)
-							).insert(
-								((item.publishmessage)?
-									new Element('div', {'class': 'feedsubtitle'}).insert(
-										new Element('a', {'href': item.defaultlink}).insert(
-											new Element('img', {'src': 'img/icons/diagona/10/031.gif'})
-										).insert(
-											item.publishmessage
-										)
-									):
-									''
-								)
-							).insert(
-								new Element('div', {'style': 'clear: both'})
-							).insert(
-								new Element('div').insert(
-									item.content
-								)
+					feedWrap.insert(
+						new Element('a', {'class': 'feed_title', 'href': item.defaultlink}).insert(
+							item.title
 							)
 						);
+
+					feedWrap.insert(
+							new Element('div', {'class': 'feed_detail'}).insert(
+								item.content
+							)
+						);
+
+					feedWrap.insert(
+							((item.publishmessage)?
+									new Element('a', {'class': 'feed_subtitle', 'href': item.defaultlink}).insert(
+										new Element('img', {'src': 'img/icons/diagona/10/031.gif'})
+									).insert(
+										item.publishmessage
+									):
+								''
+							)
+						);
+
+					msg.insert(feedWrap);
+					
+
 					// insert tools (if there are any)
 					if (item.tools) {
 						msg.insert(
-							new Element('td', {'valign': 'middle', 'width': '100px'}).insert(
-								new Element('div').insert(
-									item.tools
-								)
-							)
+								item.tools
 						);
 					}
 					
-					$('feeditems').down('tbody').insert(msg);
+					$('feeditems').down('div').insert(msg);
 				}
 				
-				var pagetop = new Element('div',{style: 'float:right;'}).update(result.pageinfo[3]);
-				var pagebottom = new Element('div',{style: 'float:right;'}).update(result.pageinfo[3]);
+				var pagetop = new Element('div',{'class':'content_recordcount'}).update(result.pageinfo[3]);
+				var pagebottom = new Element('div',{'class':'content_recordcount'}).update(result.pageinfo[3]);
 
-				var selecttop = new Element('select', {id:'selecttop'});
-				var selectbottom = new Element('select', {id:'selectbottom'});
+				var selecttop = new Element('select', {'id':'selecttop'});
+				var selectbottom = new Element('select', {'id':'selectbottom'});
 				for (var x = 0; x < result.pageinfo[0]; x++) {
 					var offset = x * result.pageinfo[1];
 					var selected = (result.pageinfo[2] == x+1);
-					selecttop.insert(new Element('option', {value: offset,selected:selected}).update('Page ' + (x+1)));
-					selectbottom.insert(new Element('option', {value: offset,selected:selected}).update('Page ' + (x+1)));
+					selecttop.insert(new Element('option', {'value': offset,selected:selected}).update('Page ' + (x+1)));
+					selectbottom.insert(new Element('option', {'value': offset,selected:selected}).update('Page ' + (x+1)));
 				}
 				pagetop.insert(selecttop);
 				pagebottom.insert(selectbottom);

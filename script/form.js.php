@@ -465,15 +465,8 @@ function form_enable_helper(event) {
 		}
 	});
 
-	form.select("legend").map(function (e) {
-		e = $(e);
-		//e.style.display = "inline";
-	});
-
 	form.select("fieldset").map(function (e) {
 		e.style.border = "none";
-		//e.style.padding = "5px";
-		//e.style.marginBottom = "3px";
 	});
 }
 

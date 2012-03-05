@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]> <html class="no-js ie6 oldie" lang="en"> <![endif]-->
+<!--[if IE 7]>    <html class="no-js ie7 oldie" lang="en"> <![endif]-->
+<!--[if IE 8]>    <html class="no-js ie8 oldie" lang="en"> <![endif]-->
+<!--[if (gte IE 9)|!(IE)]><!--> 
+<html class="no-js" lang="en">
+<!--<![endif]-->
+<head>
+	<meta http-equiv="Content-type" content="text/html; charset=UTF-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7" />
+	<title>AutoMessenger: Welcome School Messenger</title>
+
+	<script src="script/prototype.js" type="text/javascript"></script>
+
+	<script src="script/scriptaculous.js" type="text/javascript"></script>
+	<script src="script/prototip.js.php" type="text/javascript"></script>
+	<script src="script/utils.js"></script>
+	<script src="script/sorttable.js"></script>
+	<script src="script/form.js.php" type="text/javascript"></script>
+
+	<link href="reset.css" type="text/css" rel="stylesheet" media="screen, print" />
+	<link href="style.css" type="text/css" rel="stylesheet" media="screen, print" />
+	
+	<!--[if gte IE 9]>
+	  <style type="text/css">
+	    .gradient {
+	       filter: none;
+	    }
+	  </style>
+	<![endif]-->
+
+</head>
+<body> 
+	<script>
+		var _brandtheme = "calmsky";
+	</script>
+
+<!-- ********************************************************************* -->
+
+<div class="banner cf"> 
+	
+	<h1>School Messenger Documentation</h1>
+	
+	<ul class="banner_links cf">
+			<li><a href="#navigation">Navigation</a></li>		
+			<li><a href="#buttons">Buttons</a></li>
+			<li><a href="#tables">Tables</a></li>
+			<li><a href="#forms">Forms</a></li>
+			<li><a href="#jobs-messages">Jobs &amp; Messages</a></li>
+	</ul>
+	
+</div> <!--  /#top_banner -->
+
+
+
+
+
+<div class="wrapper">
+		
+<div class="window">
+<h3>The window class</h3>
+<p>Each main section of the content can be given the class of 'window' (like this one has) this will help be able to group style each section of the layout. They can be styled to suit theme, these basic ones just have a border a slight bottom margin and some padding. These sections can be filled with elements of your choice, like forms, lists and suchlike.</p>
+</div>
+
+			
+<div id="navigation" class="window">
+<h3>Navigation set up</h3>
+<p>The navigation is best set up in unordered lists, below is a standard navigation bar used across all themes:</p>
+				
+<ul class="navtabs cf">
+	<li><a onfocus="blur()" href="start.php">Start</a></li>
+	<li><a onfocus="blur()" href="lists.php">Notifications</a></li>
+	<li><a onfocus="blur()" href="reports.php">Reports</a></li>
+	<li><a onfocus="blur()" href="activejobs.php">System</a></li>
+	<li><a onfocus="blur()" href="users.php">Admin</a></li>
+</ul>
+
+<p>And here is the html code and css used to build it</p>
+				
+<div class="cf">
+<textarea class="code left">
+/*---------- NAVIGATION CODE ----------*/
+<ul class="navtabs cf">
+	<li><a href="start.php">Start</a></li>
+	<li><a href="lists.php">Notifications</a></li>
+	<li><a href="reports.php">Reports</a></li>
+	<li><a href="activejobs.php">System</a></li>
+	<li><a href="users.php">Admin</a></li>
+</ul>
+</textarea>
+
+<textarea class="code left">
+/*---------- NAVIGATION STYLES ----------*/
+.navtabs { background: #f5b75e; margin: 0 0 5px 0; }
+.navtabs li { float: left; display: inline; width: 20%; }
+.navtabs a { display: block; padding: 11px 0; text-align: center; color: #fff; }
+.navtabs a:hover, 
+.navtabs a:active, 
+.navtabs .navtab_active a { background: rgba(255,255,255,0.2); }
+</textarea>
+</div>
+</div><!-- end window -->
+			
+
+<div id="buttons" class="window">
+<h3>Big shiny buttons</h3>
+<p>To create some buttons for new jobs and emergency jobs like these here:</p>
+<div class="cf">
+	<div class="newjob"><a href="newjob.html">Create new job</a></div>
+	<div class="emrjob"><a href="emergency.html">Emergency</a></div>
+</div>
+				
+<p>You would use the html and css as follows</p>
+
+<div class="cf">
+<textarea class="code left">
+/*---------- JOB BUTTONS CODE ----------*/
+<div class="newjob">
+	<a href="newjob.html">Create new job</a>
+</div>
+
+<div class="emrjob">
+	<a href="emergencyjob.html">Emergency</a>
+</div>
+</textarea>
+			
+<textarea class="code left">
+/*---------- JOB BUTTONS STYLES ----------*/
+.newjob a {
+  display: block; margin: 0 2px; padding: 10px 15px; 
+  font: bold 16px/100% Arial,Helvetica,sans-serif; text-decoration: none; color: #E8F0DE; text-align: center; 
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.5); border: 1px solid #538312; cursor: pointer; 
+  background-color: #7DB72F;
+  background-image: -webkit-gradient(linear, left top, left bottom, from(#7DB72F), to(#4E7D0E));
+  background-image: -webkit-linear-gradient(top, #7DB72F, #4E7D0E);
+  background-image: -moz-linear-gradient(top, #7DB72F, #4E7D0E);
+  background-image: -ms-linear-gradient(top, #7DB72F, #4E7D0E);
+  background-image: -o-linear-gradient(top, #7DB72F, #4E7D0E);
+  background-image: linear-gradient(to bottom, #7DB72F, #4E7D0E);
+   
+  -webkit-border-radius: 5px; -moz-border-radius: 5px; border-radius: 5px;
+	-moz-background-clip: padding; -webkit-background-clip: padding-box; background-clip: padding-box;
+  
+  -webkit-box-shadow: 0px 1px 2px 0px rgba(0, 0, 0, 0.2);
+  -moz-box-shadow: 0px 1px 2px 0px rgba(0, 0, 0, 0.2);
+  box-shadow: 0px 1px 2px 0px rgba(0, 0, 0, 0.2); }
+          
+.newjob a:hover {
+	background-color: #6B9D28;
+  background-image: -webkit-gradient(linear, left top, left bottom, from(#6B9D28), to(#436B0C));
+  background-image: -webkit-linear-gradient(top, #6B9D28, #436B0C);
+  background-image: -moz-linear-gradient(top, #6B9D28, #436B0C);
+  background-image: -ms-linear-gradient(top, #6B9D28, #436B0C);
+  background-image: -o-linear-gradient(top, #6B9D28, #436B0C);
+  background-image: linear-gradient(to bottom, #6B9D28, #436B0C); }
+          
+.emrjob a { 
+	display: block; margin: 0 2px; padding: 10px 15px; 
+	font: bold 16px/100% Arial,Helvetica,sans-serif; text-decoration: none; color: #E8F0DE; text-align: center; 
+	text-shadow: 0 1px 1px rgba(0, 0, 0, 0.5); border: 1px solid #980C10; cursor: pointer; 
+  background-color: #ED1C24;
+  background-image: -webkit-gradient(linear, left top, left bottom, from(#ED1C24), to(#AA1317));
+  background-image: -webkit-linear-gradient(top, #ED1C24, #AA1317);
+  background-image: -moz-linear-gradient(top, #ED1C24, #AA1317);
+  background-image: -ms-linear-gradient(top, #ED1C24, #AA1317);
+  background-image: -o-linear-gradient(top, #ED1C24, #AA1317);
+  background-image: linear-gradient(to bottom, #ED1C24, #AA1317);
+   
+  -webkit-border-radius: 20px; -moz-border-radius: 20px; border-radius: 20px;
+	-moz-background-clip: padding; -webkit-background-clip: padding-box; background-clip: padding-box;
+  
+  -webkit-box-shadow: 0px 1px 2px 0px rgba(0, 0, 0, 0.2);
+  -moz-box-shadow: 0px 1px 2px 0px rgba(0, 0, 0, 0.2);
+  box-shadow: 0px 1px 2px 0px rgba(0, 0, 0, 0.2); }
+         
+.emrjob a:hover { 
+	background-color: #C9151B;
+  background-image: -webkit-gradient(linear, left top, left bottom, from(#C9151B), to(#A11115));
+  background-image: -webkit-linear-gradient(top, #C9151B, #A11115);
+  background-image: -moz-linear-gradient(top, #C9151B, #A11115);
+  background-image: -ms-linear-gradient(top, #C9151B, #A11115);
+  background-image: -o-linear-gradient(top, #C9151B, #A11115);
+  background-image: linear-gradient(to bottom, #C9151B, #A11115); }
+</textarea>
+</div>
+</div><!-- end window -->
+			
+
+<div id="tables" class="window">
+<h3>Using a table</h3>
+<p>Tables can be used but use for data that is tabular and suits the content.</p>
+
+<table width="100%" cellpadding="0" cellspacing="0">
+	<thead>
+		<tr>
+		<th>Table head 1</th>
+		<th>Table head 2</th>
+		<th>Table head 3</th>
+		<th>Table head 4</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr>
+		<td>Column 1 data</td>
+		<td>Column 2 data</td>
+		<td>Column 3 data</td>
+		<td>Column 4 data</td>
+		</tr>
+		<tr>
+		<td>Column 5 data</td>
+		<td>Column 6 data</td>
+		<td>Column 7 data</td>
+		<td>Column 8 data</td>
+		</tr>
+		<tr>
+		<td>Column 9 data</td>
+		<td>Column 10 data</td>
+		<td>Column 11 data</td>
+		<td>Column 12 data</td>
+		</tr>
+		<tr>
+		<td>Column 13 data</td>
+		<td>Column 14 data</td>
+		<td>Column 15 data</td>
+		<td>Column 16 data</td>
+		</tr>
+	</tbody>
+</table>
+				
+<p>The code and css for the table, simple pseudo classes can be used on table rows to give a zebra striped effect for easier reading on larger tables. A hover effect can also be added to any table row you are trying to focus on.</p>
+<div class="cf">
+<textarea class="code left">
+/*---------- TABLE CODE ----------*/
+<table width="100%" cellpadding="0" cellspacing="0">
+	<thead>
+		<tr>
+		<th>Table head 1</th>
+		<th>Table head 2</th>
+		<th>Table head 3</th>
+		<th>Table head 4</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr>
+		<td>Column 1 data</td>
+		<td>Column 2 data</td>
+		<td>Column 3 data</td>
+		<td>Column 4 data</td>
+		</tr>
+		<tr>
+		<td>Column 5 data</td>
+		<td>Column 6 data</td>
+		<td>Column 7 data</td>
+		<td>Column 8 data</td>
+		</tr>
+		<tr>
+		<td>Column 9 data</td>
+		<td>Column 10 data</td>
+		<td>Column 11 data</td>
+		<td>Column 12 data</td>
+		</tr>
+		<tr>
+		<td>Column 13 data</td>
+		<td>Column 14 data</td>
+		<td>Column 15 data</td>
+		<td>Column 16 data</td>
+		</tr>
+	</tbody>
+</table>
+</textarea>
+
+<textarea class="code left">
+/*---------- TABLE STYLES ----------*/
+table { background: #fff; margin: 0 0 5px 0; border-top: 1px solid #ccc; border-left: 1px solid #ccc; }
+table thead { background: #bbb; }
+table th { font-weight: bold; }
+table th, table td { border-bottom: 1px solid #ccc; border-right: 1px solid #ccc; padding: 3px 5px; text-align: left; }
+table tbody tr:nth-of-type(even) { background: #f9f9f9; }
+table tbody tr:hover { background: #eee; }
+</textarea>
+</div>
+</div><!-- end window -->
+
+
+<div id="forms" class="window">
+<h3>Tidy Forms</h3>
+<p>Simple set up for any form across the site. All input fields need a label linked to them, fieldsets can be used to group elements together. Styles can be varied to adjust layout if standard layout is used, styles here are just a basic guideline.</p>
+<form>
+<fieldset>
+<label for="form_name">Name label:</label>
+<input name="name" id="form_name" type="text"/>
+</fieldset>
+
+<fieldset>
+<label for="form_phone">Phone label:</label>
+<input name="phone" id="form_phone" type="text"/>
+</fieldset>
+
+<fieldset>
+<label for="form_email">Email label:</label>
+<input name="email" id="form_email" type="text"/>
+</fieldset>
+
+<fieldset>
+<label for="form_radio_one">Radio one</label>
+<input name="set1" id="form_radio_one" type="radio"/>
+
+<label for="form_radio_two">Radio two</label>
+<input name="set1" id="form_radio_two" type="radio"/>
+</fieldset>
+
+<fieldset>
+<label for="form_checkbox_one">Checkbox one</label>
+<input name="set2" id="form_checkbox_one" type="checkbox"/>
+
+<label for="form_checkbox_two">Checkbox two</label>
+<input name="set2" id="form_checkbox_two" type="checkbox"/>
+</fieldset>
+
+<fieldset>
+<label for="form_select">Select label:</label>
+<select name="select" id="form_select">
+<option value="one">Option one</option>
+<option value="two">Option two</option>
+<option value="three">Option three</option>
+<option value="four">Option four</option>
+</select>
+</fieldset>
+
+<fieldset>
+<label for="form_message">Message label:</label>
+<textarea id="form_message"></textarea>
+</fieldset>
+</form>
+
+<div class="cf">
+<textarea class="code left">
+/*---------- FORM CODE ----------*/
+<form>
+<fieldset>
+<label for="form_name">Name label:</label>
+<input name="name" id="form_name" type="text"/>
+</fieldset>
+
+<fieldset>
+<label for="form_phone">Phone label:</label>
+<input name="phone" id="form_phone" type="text"/>
+</fieldset>
+
+<fieldset>
+<label for="form_email">Email label:</label>
+<input name="email" id="form_email" type="text"/>
+</fieldset>
+
+<fieldset>
+<label for="form_radio_one">Radio one</label>
+<input name="set1" id="form_radio_one" type="radio"/>
+
+<label for="form_radio_two">Radio two</label>
+<input name="set1" id="form_radio_two" type="radio"/>
+</fieldset>
+
+<fieldset>
+<label for="form_checkbox_one">Checkbox one</label>
+<input name="set2" id="form_checkbox_one" type="checkbox"/>
+
+<label for="form_checkbox_two">Checkbox two</label>
+<input name="set2" id="form_checkbox_two" type="checkbox"/>
+</fieldset>
+
+<fieldset>
+<label for="form_select">Select label:</label>
+<select name="select" id="form_select">
+<option value="one">Option one</option>
+<option value="two">Option two</option>
+<option value="three">Option three</option>
+<option value="four">Option four</option>
+</select>
+</fieldset>
+</form>
+</textarea>
+
+<textarea class="code left">
+/*---------- FORM STYLES ----------*/
+form fieldset { margin: 0 0 5px 0; }
+form label, form input { float: left; display: inline; }
+form label { width: 105px; text-align: right; margin: 0 8px 0 0; }
+form input[type="text"] { width: 200px; }
+form textarea { width: 300px; max-width: 300px; min-height: 100px; }
+</textarea>
+</div>
+</div><!-- end window -->
+
+
+<div id="jobs-messages" class="window">
+<h3>Jobs &amp; Messages</h3>
+<p>This could be how the lastest jobs and messages could be shown and built on the front page.</p>
+<div class="contain">
+<ul>
+<li class="activity_row">
+<a href="gotojob.html"><img class="activity_icon" src="../img/largeicons/folderandfiles.jpg" alt="job icon"/></a>
+<h4><a href="gotojob.html">Job Title</a></h4>
+<p>Some job info goes in here about what it is&hellip;</p>
+<p>Job saved <small> Mar 03, 2012 9.25am</small></p>
+<span>
+<a href="edit"><img src="../img/icons/pencil.png" alt="edit"/></a>
+<a href="copy"><img src="../img/icons/page_copy.png" alt="copy"/></a>
+<a href="del"><img src="../img/icons/stop.png" alt="copy"/></a>
+</span>
+</li>
+
+<li class="activity_row">
+<a href="gotomessage.html"><img class="activity_icon" src="../img/largeicons/letter.jpg" alt="message icon"/></a>
+<h4><a href="gotomessage.html">Message Title</a></h4>
+<p>Sent to <strong>Contact List</strong> Received: <strong>150</strong> Bounced: <strong>39</strong></p>
+<p>Message sent <small> Feb 27, 2012 3.40pm</small></p>
+<span>
+<a href="edit"><img src="../img/icons/pencil.png" alt="edit"/></a>
+<a href="copy"><img src="../img/icons/page_copy.png" alt="copy"/></a>
+<a href="del"><img src="../img/icons/stop.png" alt="copy"/></a>
+</span>
+</li>
+
+<li class="activity_row">
+<a href="gotosurvey.html"><img class="activity_icon" src="../img/largeicons/checklist.jpg" alt="survey icon"/></a>
+<h4><a href="gotosurvey.html">Survey Title</a></h4>
+<p>Sent to <strong>Contact List</strong> Received: <strong>150</strong> Bounced: <strong>39</strong></p>
+<p>Survey sent <small> Feb 13, 2012 8:30am</small></p>
+<span>
+<a href="copy"><img src="../img/icons/page_copy.png" alt="copy"/></a>
+</span>
+</li>
+
+<li class="activity_row">
+<a href="gotocontact.html"><img class="activity_icon" src="../img/largeicons/addrbook.jpg" alt="contact icon"/></a>
+<h4><a href="gotocontact.html">Contact List Title</a></h4>
+<p>No. of contacts: <strong>189</strong></p>
+<p>Contact list saved <small> Feb 11, 2012 2:15am</small></p>
+<span>
+<a href="edit"><img src="../img/icons/pencil.png" alt="edit"/></a>
+<a href="copy"><img src="../img/icons/page_copy.png" alt="copy"/></a>
+<a href="del"><img src="../img/icons/stop.png" alt="copy"/></a>
+</span>
+</li>
+</ul>
+</div>
+
+<div class="cf">
+<textarea class="code">
+/*---------- EXAMPLE CODE ----------*/
+<div class="contain">
+<ul>
+<li class="activity_row">
+<a href="gotojob.html"><img class="activity_icon" src="../img/largeicons/folderandfiles.jpg" alt="job icon"/></a>
+<h4><a href="gotojob.html">Job Title</a></h4>
+<p>Some job info goes in here about what it is&hellip;</p>
+<p>Job saved <small> Mar 03, 2012 9.25am</small></p>
+<span>
+<a href="edit"><img src="../img/icons/pencil.png" alt="edit"/></a>
+<a href="copy"><img src="../img/icons/page_copy.png" alt="copy"/></a>
+<a href="del"><img src="../img/icons/stop.png" alt="copy"/></a>
+</span>
+</li>
+
+<li class="activity_row">
+<a href="gotomessage.html"><img class="activity_icon" src="../img/largeicons/letter.jpg" alt="message icon"/></a>
+<h4><a href="gotomessage.html">Message Title</a></h4>
+<p>Sent to <strong>Contact List</strong> Received: <strong>150</strong> Bounced: <strong>39</strong></p>
+<p>Message sent <small> Feb 27, 2012 3.40pm</small></p>
+<span>
+<a href="edit"><img src="../img/icons/pencil.png" alt="edit"/></a>
+<a href="copy"><img src="../img/icons/page_copy.png" alt="copy"/></a>
+<a href="del"><img src="../img/icons/stop.png" alt="copy"/></a>
+</span>
+</li>
+
+<li class="activity_row">
+<a href="gotosurvey.html"><img class="activity_icon" src="../img/largeicons/checklist.jpg" alt="survey icon"/></a>
+<h4><a href="gotosurvey.html">Survey Title</a></h4>
+<p>Sent to <strong>Contact List</strong> Received: <strong>150</strong> Bounced: <strong>39</strong></p>
+<p>Survey sent <small> Feb 13, 2012 8:30am</small></p>
+<span>
+<a href="copy"><img src="../img/icons/page_copy.png" alt="copy"/></a>
+</span>
+</li>
+
+<li class="activity_row">
+<a href="gotocontact.html"><img class="activity_icon" src="../img/largeicons/addrbook.jpg" alt="contact icon"/></a>
+<h4><a href="gotocontact.html">Contact List Title</a></h4>
+<p>No. of contacts: <strong>189</strong></p>
+<p>Contact list saved <small> Feb 11, 2012 2:15am</small></p>
+<span>
+<a href="edit"><img src="../img/icons/pencil.png" alt="edit"/></a>
+<a href="copy"><img src="../img/icons/page_copy.png" alt="copy"/></a>
+<a href="del"><img src="../img/icons/stop.png" alt="copy"/></a>
+</span>
+</li>
+</ul>
+</div>
+</textarea>
+
+<textarea class="code left">
+/*---------- EXAMPLE STYLES ----------*/
+.contain { margin: 0 0 5px 0; border: 1px solid #ccc; }
+.activity_row { position: relative; background: #f9f9f9; padding: 10px; }
+.activity_row:nth-of-type(even) { background: #e9e9e9; padding: 10px; }
+.activity_icon { float: left; display: inline; margin: 0 10px 10px 0; }
+.activity_row strong { color: #333; font-weight: bold; }
+.activity_row small { font-size: 12px; color: #666; }
+.activity_row span { position: absolute; top: 10px; right: 10px; }
+</textarea>
+</div>
+</div><!-- end window -->
+
+
+<div class="window">
+<h3>Progress bar</h3>
+<p>An example of a progress style bar that could be used when sending out messages and surveys.</p>
+<div class="progress">
+<p>Sending Message<span style="width: 85%;">85%</span></p>
+</div>
+</div><!-- end window -->
+			
+		
+</div><!-- end wrapper -->	
+
+<div id="footer" class="cf">
+
+<div id="termsinfo">
+Service &amp; Support:&nbsp;<a href="mailto:simon@aw20.co.uk">simon@aw20.co.uk</a>
+</div>
+
+</div><!-- end footer -->
+
+</body>
+</html>

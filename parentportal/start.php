@@ -167,7 +167,7 @@ if(isset($contactList) && $contactList){
 		startWindow(escapehtml($person->$firstnameField) . " " . escapehtml($person->$lastnameField), 'padding: 3px;', true);
 		if (count($data) == 0) {
 ?>
-			<div><?=_L("No Messages")?></div>
+			<div id="feeditems"><?=_L("No Messages")?></div>
 <?
 		} else {
 			$scroll="";

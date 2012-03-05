@@ -4,9 +4,9 @@
 if (!isset($_SESSION['colorscheme'])) {
 	// TODO these should come from customer display data (still brand the login pages)
 	$theme = "classroom";
-	$primary = "3e693f";
-	$theme1 = "3e693f";
-	$theme2 = "b47727";
+	$primary = "484848";
+	$theme1 = "000000";
+	$theme2 = "444444";
 	$globalratio = ".2";
 } else {
 	$theme = $_SESSION['colorscheme']['_brandtheme'];
@@ -43,371 +43,302 @@ function fadecolor($primary, $fade, $ratio){
 }
 
 ?>
-body, table, form, select, input {
-	font-family: verdana, arial, helvetica;
-	font-size: 12px;
-}
-
-body {
-	margin: 0px;
 
-}
+/*----- Normalize - this resets default styles applied by browsers -----*/
+
+article, aside, details, figcaption, figure, footer, header, hgroup, nav, section { display: block; }
+audio, canvas, video { display: inline-block; *display: inline; *zoom: 1; }
+audio:not([controls]) { display: none; }
+[hidden] { display: none; }
+
+html { font-size: 100%; overflow-y: scroll; -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
+body { margin: 0; font-size: 0.75em; line-height: 1.231; }
+body, input, select, textarea, button { font-family: Verdana, "Helvetica Neue", helvetica,  Arial, sans-serif; color: #444 /* <?=$primary?> */ ; }
+
+a { color: <?=$primary?>; text-decoration: none; }
+a:visited { color: <?=$primary?>; }
+a:hover { color: <?=$theme1?>; }
+a:focus { outline: thin dotted; }
+a:hover, a:active { outline: 0; }
+
+b, strong { font-weight: bold; }
+blockquote { margin: 1em 40px; }
+dfn { font-style: italic; }
+hr { display: block; height: 1px; border: 0; border-top: 1px solid #ccc; margin: 1em 0; padding: 0; }
+ins { background: #ff9; color: #000; text-decoration: none; }
+mark { background: #ff0; color: #000; font-style: italic; font-weight: bold; }
+pre, code, kbd, samp { font-family: monospace, monospace; _font-family: 'courier new', monospace; font-size: 1em; }
+pre { white-space: pre; white-space: pre-wrap; word-wrap: break-word; }
+q { quotes: none; }
+q:before, q:after { content: ""; content: none; }
+small { font-size: 85%; }
+sub, sup { font-size: 75%; line-height: 0; position: relative; vertical-align: baseline; }
+sup { top: -0.5em; }
+sub { bottom: -0.25em; }
+ul, ol { margin: 1em 0; padding: 0 0 0 40px; }
+dd { margin: 0 0 0 40px; }
+nav ul, nav ol { list-style: none; list-style-image: none; margin: 0; padding: 0; }
+img { border: 0; -ms-interpolation-mode: bicubic; vertical-align: middle; }
+svg:not(:root) { overflow: hidden; }
+figure { margin: 0; }
+
+form { margin: 0; }
+fieldset { border: 0; margin: 0; padding: 0; }
+label { cursor: pointer; }
+legend { border: 0; *margin-left: -7px; padding: 0; }
+button, input, select, textarea { font-size: 100%; margin: 0; vertical-align: baseline; *vertical-align: middle;}
+button, input { line-height: normal; *overflow: visible; }
+table button, table input { *overflow: auto; }
+button, input[type="button"], input[type="reset"], input[type="submit"] { cursor: pointer; -webkit-appearance: button; }
+input[type="checkbox"], input[type="radio"] { box-sizing: border-box; }
+input[type="search"] { -webkit-appearance: textfield; -moz-box-sizing: content-box; -webkit-box-sizing: content-box; box-sizing: content-box; }
+input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; }
+button::-moz-focus-inner, input::-moz-focus-inner { border: 0; padding: 0; }
+textarea { overflow: auto; vertical-align: top; resize: vertical; }
+/*
+input:valid, textarea:valid {  }
+input:invalid, textarea:invalid { background-color: #f0dddd; }
+*/
+table { border-collapse: collapse; border-spacing: 0; }
+td, th { vertical-align: top; padding: .5em; }
+
+
+/*----- Basic stylesheet for all themes, each theme has it's own specific styles in the theme folder. See example.css for guide and ideas -----*/
+
+/*----- Banner -----*/
+
+/*-----
+banner_logo is always floated left across all themes
+banner_links_wrap is always floated right in each theme 
+banner_custname is positioned absolutely so it can be positioned for each theme
+link styles and active states for links are in the individual theme stylesheet
+-----*/
+
+.banner_logo { display: inline; float: left; }
+.banner_logo a { display: block; }
+.banner_links_wrap { display: inline; float: right; }
+.banner_custname { position: absolute; }
+
+.banner_links { list-style: none; margin: 0; padding: 0; } 
+.banner_links li { display: inline; float: left; }
+		
+.banner_links a:hover { text-decoration: underline; } 
+.ie6 .banner { height: 44px; }
+.ie6 .banner_links { height: 20px; }
+.ie6 .banner_logo_wrap { width: 360px; } 
+.ie6 .banner_links_wrap { width: 272px; } 
+.ie6 .banner_logo { height: 44px; } 
+
+
+/*----- Navigation -----*/
+
+/*-----
+primary_nav given basic default colour, this is overridden within specific theme folder
+navtabs are floated left and have had a reset of padding, margin and list-style-type for all themes
+navshortcut is floated right and has default styles for all themes, links inside have default styles across all themes
+-----*/
+
+.primary_nav { background: #ccc; }
+.navtabs { float: left; display: inline; list-style-type: none; margin: 0px; padding: 0px; }
+.navtabs li { float: left; display: inline; cursor: pointer; }
+
+.navshortcut { float: right; display: inline;  }
+.shortcuts { font-size: 12px; background: #fff; }
+.shortcuttitle { background: #d9d9d9; color: #212121; font-size: 13px; margin: 0 1px; padding: 5px 10px; border-bottom: 1px solid #fff; }
+.shortcuts a, .shortcuts a:visited { background: #f1f1f1; margin: 0 1px; padding: 5px 10px; display: block; color: #333; border-bottom: 1px solid #fff; }
+.shortcuts a:hover { background: #b3b3b3; color: #333; text-decoration: none; }
 
+/*-----
+subnavtabs have had a reset of padding, margin and list-style-type for all themes
+subnavtabs li and a have been set up to list horizontal for all themes with basic styling
+further colours for subnav links are in the specific theme folder
+-----*/
 
-img {
-	border: 0px;
-}
-
-
-a, a:link, a:active, a:visited {
-	color:<?=$primary?>;
-}
-
-a:hover {
-	color: <?=$primary?>;
-}
-
-
-.hoverlinks a {
-	text-decoration: none;
-}
-
-.hoverlinks a:hover {
-	text-decoration: underline;
-}
-
-.destlabel {
-	color: <?=$primary?>;
-}
-
-.custname {
-	font-size: 12px;
-	color:<?=$primary?>;
-	white-space: nowrap;
-	text-align: right;
-	margin: 0px;
-	padding: 0px;
-	margin-right: 5px;
-}
-
-/* **** main nav **** */
-
-.navmenuspacer {
-	margin-left: 10px;
-}
-
-.navmenu {
-	width: 100%;
-	height: 23px;
-}
-
-.navtab {
-	height: 23px;
-	position:relative;
-	float: left;
-	background: url('img/themes/<?=$theme?>/main_nav_tab_over.gif') no-repeat;
-}
-
-.navtab a {
-	width: 98px;
-	height: 23px;
-
-	font-size: 12px;
-	text-align: center;
-	text-decoration: none;
-	font-weight: bold;
+.subnavtabs { width: 100%; list-style-type: none; margin: 0px; padding: 0px; }
+.subnavtabs li { float: left; display: inline; font-size: 10px; margin-left: 10px; }
+.subnavtabs a { display: block; text-decoration: none; }
+.subnavtabs a:hover { text-decoration: underline; }
 
-	color:<?=$primary?>;
+.applinks { padding-top:2px; padding-left: 5px; padding-right: 5px; font-size: 10px; white-space: nowrap; }
 
-	overflow:hidden;
-	display: block;
-}
 
-.navtab a:link, .navtab a:active, .navtab a:visited {
-	color: <?=$primary?>;
-}
+/*----- global styles -----*/
 
-.navtab img {
-	width: 98px;
-	height: 23px;
-	border: 0px;
-}
+.hoverlinks a { text-decoration: none; }
+.hoverlinks a:hover { text-decoration: none; }
+.destlabel { color: <?=$primary?>; }
+.custname { font-size: 12px; color:<?=$primary?>; white-space: nowrap; text-align: right; margin: 0px; padding: 0px; margin-right: 5px; }
 
 
-.navtab a:hover img {
-	visibility:hidden;
-}
+/*----- Content sections -----*/
 
-.navtab span {
-	position: absolute;
-	left: 0px;
-	top: 3px;
-	text-align: center;
-	width: 98px;
-	margin: 0px;
-	padding: 0px;
-	cursor: pointer;
+/*-----
+content_wrap has a default padding to give it space across all themes
+csec is a default style for all content sections so that they can be floated to fit different theme layout
+secwindow is container for windows and table content set to fit screen width for fluid layout
+-----*/
 
-}
+.content_wrap { margin: 10px 1%; }
+.csec { float: left; display: inline; }
+.secwindow { width: 100%; }
 
+.pagetitle { margin-bottom: .5em; font-size: 21px; }
+.pagetitlesubtext { margin-left: 1em; margin-bottom: .5em; font-size: 1em; font-style: italic; color: <?=$primary?>; }
 
-.applinks {
-	padding-top:2px;
-	padding-left: 5px;
-	padding-right: 5px;
-	font-size: 10px;
-	white-space: nowrap;
-}
+.crumbs { float: right; font-size: 10px; margin-top: 5px; margin-right: 15px; }
+.crumbs img { vertical-align: bottom; }
 
-.navlogoarea {
-	background-color: <?=$topbg?>;
-}
+/*-----
+big_button_wrap is simple container for the two new job buttons
+further styles for buttons and links are defined in each specific theme within the relevant theme folder
+-----*/
 
-.navband1 {
-	height: 6px;
-	background: <?=$primary?>;
-}
+.big_button_wrap img { display: block; }
+.big_button_wrap img:hover { cursor: pointer; }
+.newjob a, .emrjob a { display: block; }
 
-.navband2 {
-	height: 2px;
-	background: <?=$theme2?>;
-	margin-bottom: 3px;
-}
+.regbutton				{ text-decoration: none;	float: left;	background-color: transparent;	border: 0px;	width: auto;	overflow: visible;	vertical-align: middle;	padding: 1px; }
+.htmlradiobutton	{	width: 100%; border: 2px outset; background-color: #fff; color: #000; margin-left: 0px; }
 
-/* **** subnav **** */
+.menucollapse { float: right; margin-top: 4px; margin-right: 5px; border: 2px outset white; width: 10px; height: 10px; }
 
-.subnavmenu {
-	height: 22px;
-	width: 100%;
-	background: url('img/themes/<?=$theme?>/chrome.png');
-}
+.window {	background-color: #ffffff; border: 1px solid #999; margin: 0 0 15px 0; }
+.window_title_wrap 	{ padding: 0; position: relative;} 
+.window_title_l, .window_title_r 	{ display: none; }
+			
+.window_body_wrap { position: relative; margin: 0; padding: 20px 1%; }
+.window_body_l, .window_body_r { display: none; } /* hide from newer browsers... */
+.window_body { position: relative; }
+table.window_body { width: 100%; }
+.window_foot_wrap { display: none; } /* hide from newer browsers... */
 
-.subnavmenu .subnavtab {
-	font-size: 10px;
-	color: <?=$primary?>;
-	margin-left: 10px;
-	padding-left: 10px;
-	padding-right: 10px;
-	height: 22px;
-	display: block;
-	float: left;
-}
+.window_aside { width: 18%; margin: 0 2% 0 0; }
+.window_main { width: 78%; margin: 0 0 0 2%; }
 
-.subnavmenu a:link, .subnavmenu a:active, .subnavmenu a:visited {
-	color: <?=$primary?>;
-}
-
-
-.subnavmenu a div {
-	padding-top: 4px;
-}
-
-.subnavmenu .active {
-	background: url('img/themes/<?=$theme?>/chrome_light.png');
-	border-left: 1px solid <?=$theme2?>;
-	border-right: 1px solid <?=$theme2?>;
-
-}
-
-
-/* **** shortcuts **** */
-
-
-
-.shortcutmenu {
-	float: right;
-	margin: 2px;
-	margin-right: 15px;
-	border: 1px outset;
-	width: 100px;
-
-	text-align: left;
-
-	font-size: 10px;
-}
-
-.shortcuts {
-	font-size: 9px;
-	background: white;
-}
-
-.shortcuts a , .shortcuts a:link, .shortcuts a:active, .shortcuts a:visited {
-	margin-left: 5px;
-	display: block;
-	color: <?=$primary?>;
-}
-
-.shortcuttitle {
-	background: <?=$newfade1?>;
-}
-
-
-
-/* **** content **** */
-
-.maincontent {
-	margin-left: 15px;
-	margin-right: 15px;
-	margin-top: 5px;
-}
-
-.crumbs {
-	float: right;
-	font-size: 10px;
-	margin-top: 5px;
-	margin-right: 15px;
-}
-.crumbs img {
-	vertical-align: bottom;
-}
-
-
-.pagetitle {
-	margin-top: 10px;
-	margin-left: 15px;
-	font-size: 18px;
-	font-weight: bold;
-	color: <?=$primary?>;
-
-}
-
-.pagetitlesubtext {
-	margin-left: 15px;
-	font-size: 12px;
-	font-style: italic;
-	color: <?=$primary?>;
-}
-
-
-/* **** window **** */
-
-
-
-.menucollapse {
-
-	float: right;
-	margin-top: 4px;
-	margin-right: 5px;
-
-	border: 2px outset white;
-
-	width: 10px;
-	height: 10px;
-
-}
-
-.window {
-	width: 100%;
-}
-
-.windowtitle {
-	font-size: 12px;
-	font-weight: bold;
-	padding-left: 5px;
-	padding-top: 2px;
-	color: <?=$primary?>;
-}
-
-.windowbody {
-}
-
-.windowtitle .hoverhelpicon {
-	display: inline;
-	float: none;
-}
-
-.windowtable {
-}
-
-/* **** button **** */
-
-
-.button {
-	text-decoration: none;
-	height: 24px;
-
-	float: left;
-	background-color: transparent;
-	border: 0px;
-	width: auto;
-	overflow: visible;
-	vertical-align: middle;
-	padding: 0 .25em 3px .25em;
-}
-
-.button .middle img {
-		vertical-align: -3px;
-		padding-right: 3px;
-}
-
-.button td {
-
-}
-
-.button a, .button td {
-	text-decoration: none;
-	color: <?=$primary?>;
-	font-size: 10px;
-	font-weight: bold;
-	cursor: pointer;
-}
-
-.button .middle {
-	white-space: nowrap;
-	padding-right: 3px;
-	background: url('img/themes/<?=$theme?>/button_mid.gif') repeat-x;
-}
-
-.button table {
-	border-collapse: collapse;
-	border-spacing: 0;
-}
-
-.button td {
-	padding: 0;
-}
-
-
-.regbutton {
-	text-decoration: none;
-	float: left;
-	background-color: transparent;
-	border: 0px;
-	width: auto;
-	overflow: visible;
-	vertical-align: middle;
-	padding: 1px;
-}
-
-
-/* *********************************************** */
-
-
-/* general styles */
-
-
+.feedfilter {	margin: 0; padding: 0; list-style: none; }
+.feedfilter li { line-height: 20px; padding-top: 5px; }
+.feedfilter li a img { margin-top: -5px; margin-right: 5px; }
+
+
+/*----- Buttons, for buttons within the windows and tables, further styling is in the specific theme file for each theme -----*/
+   
+button { color: <?=$primary?>; }
+.btn { margin: 2px 5px; padding: 0; border: none; background: transparent; font-weight: bold; cursor: pointer; }
+.btn_wrap { white-space: nowrap; position: relative; } 
+.btn_left, 
+.btn_right, 
+.btn_middle { padding-top: 4px; display: block; height: 19px; }
+.btn_left, 
+.btn_right { position: absolute; top: 0; }
+.btn_left { left: 0; background: url(themes/<?=$theme?>/button_left.gif) no-repeat center center; width: 9px; }
+.btn_right { right: 0; background: url(themes/<?=$theme?>/button_right.gif) repeat-x center center; width: 9px;}
+.btn_middle { margin: 0 9px; padding-right: 2px;  background: url(themes/<?=$theme?>/button_mid.gif) repeat-x center center;}
+			
+.btn_middle img { margin-top: -3px; padding: 0 3px 0 0; }
+
+.btn:hover .btn_left { background: url(themes/<?=$theme?>/button_left_over.gif) no-repeat center center; }
+.btn:hover .btn_middle { background: url(themes/<?=$theme?>/button_mid_over.gif) repeat-x center center; }
+.btn:hover .btn_right { background: url(themes/<?=$theme?>/button_right_over.gif) no-repeat center center; }
+
+.btn_hide { display: none !important; visibility: hidden; } /* for hidden buttons! */
+
+.import_file_data .btn { font-size: 10px; line-height: 12px; margin: 0 0 8px 6px; padding: 0; }
+.import_file_data .btn_middle { padding: 3px 5px 0 5px; height: 15px; }
+
+
+/*----- Start page -----*/
+
+.content_col, .content_col_side, .content_col_main { display: block; float: left; }
+.content_col_side { width: 15%; min-width: 180px;  }
+.content_col_main { width: 85%; }
+
+
+/*----- Timeline, effects the timeline on the homepage to try and keep it constant for all themes -----*/
+
+/*-----
+timeline_table is the container that will stretch to fit space available
+table_middle contains the timeline details set to 84% so it looks ok at 1024 width and will stretch for larger screens
+table_left and table_right have the arrow controls, set to 8% width for 1024 screens and will still look good on larger screens 
+-----*/
+
+.timeline_table { width: 100%; margin-bottom: 3em; }
+.timeline_table_middle { width: 84%; }
+.timeline_table_left, .timeline_table_right { width: 8%; }
+#_backward, #_forward { display: block; width: 51px; height: 53px; margin: 9px 0 0; }
+#_backward { background: url('img/timelinearrowleft.gif') no-repeat; }
+#_forward { background: url('img/timelinearrowright.gif') no-repeat; }
+
+/*----- actionlinks control the tooltip links found on recent activity next to the message -----*/
+
+.actionlink_tools { width: 100px; position: absolute; top: .5em; right: 0; }
+.actionlink_tools:hover { cursor: pointer; }
+
+.content_feed_notification { margin: 10px 10px 0 0; }
+.content_feed_left, .content_feed_right { display: block; float: left; }
+.content_feed_left { overflow: hidden; margin-right: 10px; }
+
+#t_refresh { float: left; display: inline; width: 25%; }
+#t_zoom { float: left; display: inline; width: 46%; margin: 0 2%; padding: 10px 0 0; text-align: center; }
+#t_legend { float: right; display: inline; width: 25%; padding: 7px 0 0; text-align: right; }
+
+
+/* +----------------------------------------------------------------+
+	 | window content                                                 |
+   +----------------------------------------------------------------+ */
+
+
+/* === feed / left panel === */
+
+.content_side {  margin: 0 1% .5% 0; padding: 0 1% .5% 0; width: 15%;  min-width: 180px; border-right: 1px dotted <?=$theme2?>; }
+.content_main { width: 80%; padding: 0 1% 0 1%; }
+.content_row { display: block; width: 100%; min-width: 600px; position: relative; margin: 0 auto; margin-bottom: 1em; }
+#feeditems .content_row { border-bottom: 1px solid #ccc; padding: 0 0 1em 0; }
+.content_col_1 { width: 16%; }
+.content_col_2 { width: 32%; }
+.content_col_3 { width: 48%; }
+.content_col_4 { width: 64%; }
+.content_col_5 { width: 80%; }
+.content_col_6 { width: 96%; }
+
+.start_page, db_fl { display: block; float: left; }
+
+.content_recordcount_top, 
+.content_recordcount_btm { display: block; float: right; padding-bottom: .5em; }
+.content_recordcount_top {  }
+.content_recordcount_btm { padding-top: .5em; }
+.content_recordcount { text-align: right; margin: 0;}
+
+.content_feed { position: relative; width: 100%; color: #444; }
+.content_feed { /*margin-bottom: 35px;*/  }
+.content_feed img {  } 
+.content_feed span, .feed_detail { display: block; padding: 0 0 5px 0; width: 100%; }
+.content_feed .msg_icon { float: left; display: inline; margin: 0 10px 0 0; }
+.content_feed .feed_wrap { float: left; display: inline; margin: 0; }
+.content_feed .actionlinks { display: block; float: right; }
+	
+.feed, .feedtitle, .feed_title, .feedtitle a { color: #444; /* <?=$primary?> */ }
+.feedtitle, .feed_title { font-size: 14px; font-weight: bold;  }
+.feed_icon { width: 48px; vertical-align: top; }
+.feed_actions { width: 100px; }
+.feedtitle a:hover, .feed_title:hover { text-decoration: underline; }	
+.feed_btn_wrap { 	border-bottom: 1px dashed #ccc;	margin: 0 0 10px 0;	padding: 0 0 10px 0; }
+.feed_item { border-bottom: 1px solid #ccc; padding: 1em 0.5em; }
+.feed_item td { padding: 1em 0.5em; }
+
+
+
+/* +----------------------------------------------------------------+
+	 | general styles                                                 |
+   +----------------------------------------------------------------+ */
 
 input.text, input , select, textarea, table.form  {
 	/*border: <?=$theme1?> 1px solid;*/
 }
 
-.windowRowHeader {
-	background-color: <?=$newfade1?>;
-	color: <?=$newfade3?>;
-	width: 85px;
-}
+.windowRowHeader { background-color: #d4d4d4; color: <?=$newfade3?>; width: 85px; }
 
-.chop {
-	text-align: left;
-	width: 100%;
-	white-space:nowrap;
-	overflow: hidden;
-	color: #666666;
-	border: 1px solid <?=$theme1?>;
-}
-div.gBranding {
-	display:inline;
-}
+.chop { text-align: left; width: 100%; white-space:nowrap; overflow: hidden; color: #666666; border: 1px solid <?=$theme1?>; }
+div.gBranding { display:inline; }
 
 /* Scrolling window style settings */
 div.scrollTableContainer {
@@ -416,61 +347,77 @@ div.scrollTableContainer {
 }
 /* End of scrolling window style settings */
 
-.list {
-	color: <?=$newfade3?>;
-	border: 1px solid <?=$theme2?>;
-}
 
-.listHeader {
-	color: white;
-	background-color: <?=$newfade2?>;
-}
+
+/*----- action links - used on prototip links on message tools -----*/
+
+.actionlink { border: 0px; white-space: nowrap; text-decoration: none; cursor: pointer; color: #484848; }
+.actionlink:hover { color: #000; }
+.actionlink img { border: 0px; padding: 0px; padding-top: 0.2em; padding-left: 3px; padding-right: 3px; margin: 0px; }
+.actionlinks { white-space: nowrap; }
+
+
+/* +----------------------------------------------------------------+
+	 | lists / tables                                                 |
+   +----------------------------------------------------------------+ */
 
 .listAlt {
 	background-color: <?=$newfade1?>;
 }
 
-.topBorder {
-	border-top: 1px solid <?=$theme2?>;
-}
+.topBorder { border-top: 1px solid <?=$theme2?>; }
+.bottomBorder { border-bottom: 1px solid <?=$theme2?>; }
+.border { border-top: 1px solid #ccc; }
 
-.bottomBorder {
-	border-bottom: 1px solid <?=$theme2?>;
-}
+#activeUsersContainer { margin: 10px 0 0; }
+.usersearch { float: left; display: inline; }
+.pagenavinfo { float:right; }
+.pagenavselect { float: right; height:16px; }
+.scrolltable { float: left; display: inline; width: 100%; margin: 10px 0 0; }
 
-.border {
-	border: 1px solid <?=$theme2?>;
-}
+.tableprogressbar { float:right; width:16px; height:16px; margin-right: 5px }
+.togglers {  } /* think this is for search criteria */
+ 
+/* +---------------------------------+
+	 | table overrides for list styles |
+   +---------------------------------+ */
 
+table.list { width: 98%; border-left: 1px solid #ccc; border-bottom: 1px solid #ccc; border-top: 1px solid #ccc; margin: 1%;  }
+table.list th, table.list td { text-align: left; border-right: 1px solid #ccc; color: #484848; }
+table.list td { background: #f8f8f8; padding: 5px; }
+table.list ul { list-style: none; padding: 0; margin: 0; }
+table.list ul li { padding: 6px 8px; }
+table.list ul li:nth-child(even) { background-color: #f1f1f1; }
 
-.hoverhelpicon {
-	margin-left: 5px;
-	margin-right: 5px;
-	display: block;
-	float: left;
-}
+table.usagelist { width: 100%; margin: 0; border: 1px solid #ccc; background-color: #f8f8f8;  }
+table.usagelist tr:nth-child(even) { background-color: #f1f1f1; }
 
+tr.listHeader 						{ background-color: #d4d4d4; vertical-align: top; }
+table > .listHeader > th 	{ text-align: left;  color: white; }
+tbody > tr.listAlt, 
+table > tr.listAlt 				{ background-color: #E1EDF8; }
+.listHeader > .label			{ padding: 2px; font-weight: normal; }
 
-.hovertitle {
-	font-weight: bold;
-}
+.form_table { width: 100%; }
 
+.tcol10		{ width: 10%; }
+.tcol20		{ width: 20%; }
+.tcol30		{ width: 30%; }
+.tcol40		{ width: 40%; }
+.tcol50		{ width: 50%; }
+.tcol60		{ width: 60%; }
+.tcol70		{ width: 70%; }
+.tcol80		{ width: 80%; }
+.tcol90		{ width: 90%; }
+.tcol100	{ width: 100%; }
 
-#logininfo {
-	margin-left: 15px;
-	text-align: left;
-	font-size: 9px;;
-	color: gray;
-}
+.hoverhelpicon { margin: 0 5px;	}
 
-#termsinfo {
-	margin-right: 20px;
-	padding-left: 20px;
-	float: right;
-	text-align: right;
-	font-size: 9px;;
-	color: gray;
-}
+.hovertitle { font-weight: bold; }
+
+#footer { padding: 15px 0; margin: 0 1%; }
+#logininfo { float: left; display: inline; text-align: left; font-size: 9px; color: gray; }
+#termsinfo { float: right; display: inline; text-align: right; font-size: 9px; color: gray; }
 
 .alertmessage {
 	margin-left: 25%;
@@ -479,61 +426,14 @@ div.scrollTableContainer {
 	border: 5px double red;
 }
 
-.confirmnoticecontainer {
-	margin: 5px;
-	margin-left: 25%;
-	width: 50%;
-	border: 3px solid <?=$theme1?>;
-}
-
-.confirmnoticecontent {
-	text-align: center;
-	margin: 0px;
-	border: 2px solid <?=$theme2?>;
-	background: <?=$topbg?>;
-}
+.confirmnoticecontainer { margin: 5px; margin-left: 25%; width: 50%; }
+.confirmnoticecontent { text-align: center; margin: 0px; padding: 10px; background: <?=$topbg?>; }
 
 .confirmnoticecontent hr {
 	border: solid 1px <?=$theme2?>;
 }
 
-.accordiontitlediv {
-	padding: 2px;
-	padding-left: 10px;
-	padding-top: 5px;
-	cursor: pointer;
-	color: <?=$primary?>;
-	letter-spacing: 1px;
-	background: <?=$topbg?> no-repeat;
-	background-position: 2px 6px;
-	border: solid 1px <?=$theme2?>;
-}
-.accordiontitlediv td.middle {
-	text-align: left;
-}
-.accordiontitlediv td.left, .accordiontitlediv td.right {
-	display: none;
-}
-.accordiontitledivexpanded {
-	background-image: url('img/arrow_down.gif');
-}
-.accordiontitledivcollapsed {
-	background-image: url('img/arrow_right.gif');
-}
-.accordiontitledivlocked {
-	color: rgb(180,180,180);
-}
-.accordiontitleicon {
-	margin-left: 5px;
-	margin-right: 5px;
-	vertical-align: middle;
-}
-.accordioncontentdiv {
-	border: 1px solid <?=$theme2?>;
-	padding: 5px;
-	padding-bottom: 25px;
-	margin-bottom: 1px;
-}
+
 .horizontaltabstabspane {
 	margin: 0;
 	border: 0;
@@ -725,86 +625,6 @@ td.SplitPane {
 
 
 
-.actionlink {
-	border: 0px;
-	white-space: nowrap;
-	text-decoration: none;
-	cursor: pointer;
-
-	color: <?=$primary?>;;
-}
-
-.actionlink:hover{
-	text-decoration: underline;
-}
-
-.actionlink img {
-	border: 0px;
-	padding: 0px;
-	padding-top: 0.2em;
-	padding-left: 3px;
-	padding-right: 3px;
-	margin: 0px;
-}
-
-.actionlinks {
-	white-space: nowrap;
-}
-
-.feed h1 {
-	margin-top: 3px;
-	margin-bottom: 4px;
-	font-size: 14px;
-	font-weight: bold;
-	color: <?=$primary?>;
-}
-.feed span {
-	font-size: 12px;
-	text-decoration: none;
-}
-.feedtitle a {
-	font-size: 14px;
-	font-weight: bold;
-	color: <?=$primary?>;
-}
-.feedsubtitle {
-	padding-top: 2px;
-	padding-left: 4px;
-	font-size: 10px;
-	font-style: italic;
-	color: <?=$primary?>;
-}
-.feedsubtitle img {
-	padding-right: 4px;
-}
-.feedfilter {
-	margin-left: 20px;
-}
-.feedfilter img {
-	position: relative;
-	top: 6px;
-	padding-right: 4px;
-}
-
-.feedbuttoncontainer {
-	border-bottom: 1px solid <?=$theme2?>;
-	padding-bottom: 5px;
-	margin-bottom: 5px;
-}
-
-.feed a {
-	text-decoration: none;
-}
-.feed table {
-	width: 100%;
-	border: none;
-	border-collapse: collapse;
-}
-.feed td {
-	padding-bottom:5px;
-	border-bottom: 1px solid <?=$theme2?>;
-}
-
 div.autocomplete {
   position:absolute;
   width:250px;
@@ -877,7 +697,8 @@ div.autocomplete ul li {
 }
 
 .messagegrid {
-	text-align: center;
+vertical-padding: 20px; /* FIXME */
+text-align: center;
 }
 .messagegrid .messagegridheader{
 	padding: 0 15px 3px 15px;
@@ -904,24 +725,119 @@ div.autocomplete ul li {
 	padding-right: 5px;
 }
 
-<? if ($theme == "classroom") { /* TODO move this to theme based css includes */ ?>
 
-.navmenuspacer {
-	margin-left: 0px;
-	padding-left: 10px;
-	background: url(img/themes/<?=$theme?>/main_nav_tab_bg.gif);
+
+/*----- New Job and Emergency job table styles -----*/
+
+.htmlradiobuttonbigcheck img { width: 34px; height: 34px; margin-left: -17px; padding: 0 0 0 50%; }
+.htmlradiobuttonbigcheck ol { list-style-type: none; margin: 0; padding: 0 0 0 5px; }
+.htmlradiobuttonbigcheck ol li { background: url(img/icons/bullet_blue.gif) center left no-repeat; padding: 0 0 0 20px; line-height: 21px; }
+
+.creation_method { float: left; display: inline; width: 94px; }
+
+
+/*----- Survey styles -----*/
+
+.survey_banner { margin: 20px 25px; }
+.survey_logo { float: left; display: inline; }
+.survey_custname { float: right; display: inline; }
+.survey_wrap { margin: 0 25px 20px; }
+
+.survey_title { background: #DBDBDB; padding: 15px; font: 18px/21px georgia, arial, sans-serif; text-shadow: 0 1px 0 #fff; 
+-webkit-border-radius: 5px; -moz-border-radius: 5px; border-radius: 5px; 
+-moz-background-clip: padding; -webkit-background-clip: padding-box; background-clip: padding-box; }
+
+.survey_question { background: #f1f1f1; margin: 0 0 10px 0; padding: 15px; font: 16px/21px georgia, arial, sans-serif; text-shadow: 0 1px 0 #fff; 
+-webkit-border-radius: 5px; -moz-border-radius: 5px; border-radius: 5px; 
+-moz-background-clip: padding; -webkit-background-clip: padding-box; background-clip: padding-box; }
+.survey_question p { margin: 0; padding: 0 0 10px 0; }
+.survey_question div { float: left; display: inline; }
+.question_num { color: #777; }
+.question_choice { border-left: 1px dashed #c2c2c2; margin: 0 0 0 12px; padding: 0 0 0 12px; }
+.question_choice span { margin: 0 10px 0 0; }
+.question_choice input { margin: 0 5px 0 0; }
+
+input.submit_survey { float: right; padding: 6px 13px; font-size: 16px; color: #e8f0de; border: solid 1px #538312;
+	background: #64991e;
+	background: -webkit-gradient(linear, left top, left bottom, from(#7db72f), to(#4e7d0e));
+	background: -moz-linear-gradient(top,  #7db72f,  #4e7d0e);
+	filter:  progid:DXImageTransform.Microsoft.gradient(startColorstr='#7db72f', endColorstr='#4e7d0e');
+	text-shadow: 0 1px 1px rgba(0,0,0,.3);
+	-webkit-border-radius: .5em; 
+	-moz-border-radius: .5em;
+	border-radius: .5em; }
+
+input.submit_survey:hover { 
+	-webkit-box-shadow: 0 1px 4px rgba(0,0,0,.8); -moz-box-shadow: 0 1px 4px rgba(0,0,0,.8); box-shadow: 0 1px 4px rgba(0,0,0,.8); }
+
+input.submit_survey:active {
+	background: #538018;
+	background: -webkit-gradient(linear, left top, left bottom, from(#6b9d28), to(#436b0c));
+	background: -moz-linear-gradient(top,  #6b9d28,  #436b0c);
+	filter:  progid:DXImageTransform.Microsoft.gradient(startColorstr='#6b9d28', endColorstr='#436b0c'); 
+	-webkit-box-shadow: inset 0 1px 2px rgba(0,0,0,.4); -moz-box-shadow: inset 0 1px 2px rgba(0,0,0,.4); box-shadow: inset 0 1px 2px rgba(0,0,0,.4); }
+
+
+/* +----------------------------------------------------------------+
+	 | non-semantic helper classes                                    |
+   +----------------------------------------------------------------+ */
+
+.ir { display: block; border: 0; text-indent: -999em; overflow: hidden; background-color: transparent; background-repeat: no-repeat; text-align: left; direction: ltr; }
+.ir br { display: none; }
+.hidden { display: none !important; visibility: hidden; }
+.visuallyhidden { border: 0; clip: rect(0 0 0 0); height: 1px; margin: -1px; overflow: hidden; padding: 0; position: absolute; width: 1px; }
+.visuallyhidden.focusable:active, .visuallyhidden.focusable:focus { clip: auto; height: auto; margin: 0; overflow: visible; position: static; width: auto; }
+.invisible { visibility: hidden; }
+
+/* === micro clearfix - http://nicolasgallagher.com/micro-clearfix-hack/ === */
+.cf:before, .cf:after { content: ""; display: table; }
+.cf:after { clear: both; }
+.cf { zoom: 1; }
+
+
+/*----- IE specific styles -----*/
+
+/*----- Scrolling window style settings -----*/
+.ie6 div.scrollTableContainer {	margin-right: 20px; }
+.ie7 div.scrollTableContainer {	overflow-x: hidden; }
+
+/*----- fixes the link wrapping in the banner -----*/
+.ie7 .banner_links_wrap { width: 50%; }
+.ie7 .banner_links { float: right; }
+
+/*----- fixes the column layout wrapping in main content window -----*/
+.ie7 .window_aside { margin: 0 1.8% 0 0; }
+
+
+/* +----------------------------------------------------------------+
+   | Theme include                                                  |
+   +----------------------------------------------------------------+ */
+   
+<?
+$themecssfilename = "themes/$theme/style.php"; //FIXME rename css files to themes/$theme/css.php - had to rename to style.php, css.php wasn't being included. sd. 
+if ( is_readable($themecssfilename) ) {
+	include_once($themecssfilename);
+} else {
+	include_once("themes/default/style.php"); //FIXME should be themes/default/css.php - had to rename to style.php, css.php wasn't being included. sd.
 }
+?>
 
-.subnavmenu .active {
-	background: white;
-	font-weight: bold;
-	border-left: 1px solid #CCCCCC;
-	border-right: 1px solid #CCCCCC;
+
+/* +----------------------------------------------------------------+
+   | Print styles                                                   |
+   +----------------------------------------------------------------+ */
+
+@media print {
+  * { background: transparent !important; color: black !important; text-shadow: none !important; filter:none !important; -ms-filter: none !important; } 
+  a, a:visited { text-decoration: underline; }
+  a[href]:after { content: " (" attr(href) ")"; }
+  abbr[title]:after { content: " (" attr(title) ")"; }
+  .ir a:after, a[href^="javascript:"]:after, a[href^="#"]:after { content: ""; } 
+  pre, blockquote { border: 1px solid #999; page-break-inside: avoid; }
+  thead { display: table-header-group; }
+  tr, img { page-break-inside: avoid; }
+  img { max-width: 100% !important; }
+  @page { margin: 0.5cm; }
+  p, h2, h3 { orphans: 3; widows: 3; }
+  h2, h3 { page-break-after: avoid; }
 }
-
-.navband2 {
-	margin-bottom: 0px;
-}
-
-
-<? } ?>

@@ -141,17 +141,15 @@ foreach($jobs as $job) {
 
 $minhight = $minhight * $jobhight + $minhight*$jobspacing ;
 ?>
-	<div id="maincanvas"  style="height:<? echo $minhight + 58 ?>px;">
-
-	<table>
+	<!-- div id="maincanvas"  style="height:<? echo $minhight + 58 ?>px;" --> <!-- don't think we need this? sd. -->
+	<div class="content_row">
+	<table class="timeline_table">
 		<tr>
-			<td width="80px">
-			<a id="_backward" href="start.php?timelineday=<?= ($day-($range>0?$range*2:1)) ?>">
-				<img style"align: right;" src="img/timelinearrowleft.gif"  alt="Backward" border="0"/>
-			</a>
+			<td class="timeline_table_left" align="right">
+			<a id="_backward" href="start.php?timelineday=<?= ($day-($range>0?$range*2:1)) ?>"></a>
 			</td>
 
-			<td width="100%">&nbsp;
+			<td class="timeline_table_middle" >
 
 		<div id="canvas" style="height:<? echo $minhight ?>px;">
 			<img class="canvasleft" src="img/timelineleft.gif"  alt=""  width="2%" height="100%"/>
@@ -183,38 +181,40 @@ $minhight = $minhight * $jobhight + $minhight*$jobspacing ;
 
 		</div>
 			</td>
-			<td width="80px">
-				<a id="_forward" href="start.php?timelineday=<?= ($day + ($range>0?$range*2:1)) ?>">
-					<img  src="img/timelinearrowright.gif"  alt="Forward" border="0"/>
-				</a>
+			<td class="timeline_table_right" align="left">
+				<a id="_forward" href="start.php?timelineday=<?= ($day + ($range>0?$range*2:1)) ?>"></a>
 			</td>
 		</tr>
 		</table>
 		</div>
-	</div>
-			<table width="100%" >
-				<tr>
-				<td style="width:33%;padding-left: 2%;">
-					<?=	icon_button(_L('Refresh'),"fugue/arrow_circle_double_135","window.location.reload()",null,'style="display:inline;"') ?>
-				<td>
-				<td style="width:33%;text-align:center;white-space:nowrap;">
-					<?
-					if($range > 0 ) {
-						echo '<a href="start.php?timelinerange=' .  ($range-1) . '" style="text-decoration: none;"><img src="img/icons/fugue/magnifier_zoom.gif"> Zoom in</a> |';
-					}
-					?>
-					<a href="start.php?timelinerange=1&timelineday=0" style="text-decoration: none;"><img src="img/icons/fugue/arrow_circle_225.gif"> Reset</a>
-					<?
-					if($range < 5 ) {
-						echo '| <a href="start.php?timelinerange=' .  ($range+1) . '" style="text-decoration: none;"><img src="img/icons/fugue/magnifier_zoom_out.gif"> Zoom out</a>';
-					}
-					?>
-				</td>
-				<td style="text-align:right;padding-right: 2%;text-decoration:none;">
-					<div id="t_legend" style="cursor:pointer;display:inline;" ><img src="img/largeicons/tiny20x20/flag.jpg" />&nbsp;Legend</div>
-				</td>
-				</tr>
-			</table>
+	<!-- /div -->
+	
+<div class="content_row cf" >
+
+		<div id="t_refresh">
+			<?=	icon_button(_L('Refresh'),"fugue/arrow_circle_double_135","window.location.reload()",null,'style="display:inline;"') ?>
+		</div>
+		
+		<div id="t_zoom">
+			<?
+			if($range > 0 ) {
+				echo '<a href="start.php?timelinerange=' .  ($range-1) . '" style="text-decoration: none;"><img src="img/icons/fugue/magnifier_zoom.gif"> Zoom in</a> |';
+			}
+			?>
+			<a href="start.php?timelinerange=1&timelineday=0" style="text-decoration: none;"><img src="img/icons/fugue/arrow_circle_225.gif"> Reset</a>
+			<?
+			if($range < 5 ) {
+				echo '| <a href="start.php?timelinerange=' .  ($range+1) . '" style="text-decoration: none;"><img src="img/icons/fugue/magnifier_zoom_out.gif"> Zoom out</a>';
+			}
+			?>
+		</div>
+
+		<div id="t_legend">
+			<span><img src="img/largeicons/tiny20x20/flag.jpg" />&nbsp;Legend</span>
+		</div>
+
+</div><!-- .content_row -->
+			
 			<div id="timelinelegend" style="display:none;width: 100px;">
 				<?
 				foreach($jobcolor as $name => $color) {

@@ -78,7 +78,7 @@ function showRenderedListTable($renderedlist, $list = false) {
 	$optionalfieldstart = $showinlist ? 6 : 5; //table col of last non optional field
 		
 ?>
-	<table border="0" width="100%">
+	<table>
 	<tr>
 		<td>
 <?
@@ -140,7 +140,7 @@ function show_field_visibility_selector ($tableid, $fields, $coloffset) {
 	
 ?>
 	<div style="display: none;" id="<?=$id?>">
-	<table border="0" cellpadding="2" cellspacing="1" class="list">
+	<table class="list">
 		<tr class="listHeader">
 <?
 	foreach ($fields as $field) {

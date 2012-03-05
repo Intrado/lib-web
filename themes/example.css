@@ -1,0 +1,70 @@
+/*----- 
+Styles below are an example only and just a basic guide to work from, they are based on the basic stylesheet css.inc.php in the css folder
+Colours, background and images can be included in this file for your theme, you can also override some basic default styles from the css.inc.php if needed
+Layout is fairly fixed in place but small changes can be made, the main content sections are floated so could be listed in a column view if required
+ -----*/
+
+/*----- basic colours for theme -----*/
+body { background: #ccc; /* used as main colour behind windows and the navigation */ }
+a, a:visited { color: #484848; /* used for basic links within the windows and also in the footer */ }
+a:hover { color: #666; }
+
+
+/*----- Banner -----*/
+
+.banner { background: #333; padding: 15px 20px; /* dark bg colour with padding to give container some space */ }
+.banner_logo { /* floated left in css.inc.php so remains in place across all themes */ }
+.banner_logo a { background: #fff; padding: 3px; /* images can be hardcropped a little extra padding with bg colour neatens them up */ }
+.banner_links_wrap { /* floated right in css.inc.php to remain in same place in all themes */ }
+.banner_links { margin: 22px 0 0; /* sets links near center of banner container*/ }
+.banner_links li { padding: 0 8px; border-right: 1px dashed #bdbdbd; /* gives links room to breathe and adds small spacer inbetween each link */ }
+.banner_links li.bl_last { border: none; /* removes spacer on last list item */ }
+.banner_links li.bl_left, .banner_links li.bl_right { padding: 0; /* shrinks the first and last list item that is not used in most themes */}
+.banner_links li a { color: #f8f8f8; /* light grey to sit well on dark grey banner colour */ }
+.banner_links li a:hover { color: #fff; text-decoration: none; /* removes the underline set in css.inc.php */ }
+.banner_custname { top: 30px; left: 275px; text-align: right; font-size: 21px; color: #f2f2f2; /* positioned to be next to banner_logo */ }
+
+
+/*----- Navigation -----*/
+
+.primary_nav { width: 100%; background-color: #f5b75e; /* width set to full screen for fluid layout, orange bg colour */ }
+
+.navshortcut { padding: 10px 0 0; /* set up to float right in css.inc.php, so could be changed or repositioned */ }
+.shortcutmenu { background: rgba(0,0,0,0.5); font-colour: #fff; padding: 5px 8px; /* background set transparent black, white text and padding for space */ }
+.shortcutmenu img { padding: 5px 0 0 5px; /* image is floated right in css.inc.php just needs a little padding to sit inline with text */ }
+	
+.navtabs { margin: 0 0 0 20px; /* floated left in css.inc.php for all themes, margin added so it sits inline with banner_logo */ }
+.navtabs li { margin-right: 15px; /* floated left in css.inc.php, margin gives them a little bit of space between each */ }
+.navtabs a { padding: 11px 15px; color: #fff; /* makes links big and easy to click upon */ }
+.navtabs a:hover, 
+.navtabs a:active, 
+.navtabs .navtab_active a { background: rgba(255,255,255,0.2); /* active or hover links change to have a transparent white background */ }
+
+.subnavtabs { background: #d9d9d9; padding: 10px 0; /* new bg colour to stand out from nav above, some padding to give room for links */ }
+.subnavtabs li { margin: 0 0 0 25px; /* give list items a bit of space, also floated in css.inc.php */ }
+.subnavtabs a { display: block; margin: 0; padding: 5px 11px; font: 13px Verdana, arial, sans-serif; color: #494949; /* colour and font size specified */ }
+.subnavtabs a:hover,
+.subnavtabs a:active,
+.subnavtabs .navtab_active a { color: #242424; /* active and hover colour changed */ }
+
+
+/*----- Content sections -----*/
+
+.content_wrap { margin-top: 15px; /* contains all main content windows, margin added to create gap between subnav and this content */ }
+.sectitle { width: 40%; /* will sit to the left of screen, extra class .csec in css.inc.php floats this left */ }
+.secbutton { width: 60%; /* will sit to the right of screen, extra class .csec in css.inc.php floats this left */ }
+.sectimeline { width: 100%; /* stretches timeline section to screen/window width.  NOTE: You can use this to target the whole timeline section, i.e. you could add display: none to hide it altogether */ }
+
+.pagetitle { font-family: Verdana, Arial, sans-serif; margin: 0.5em 0; color: #333; /* font chosen and colour darkened to stand out and match theme */ }
+
+.newjob, .emrjob { float: right; display: inline; margin: 0 0 15px 15px; /* these are floated right so they sit on far screen right, margin just spaces them out */ }
+
+.newjob a, .emrjob a { padding: 12px 10px; color: #fff; text-transform: uppercase; font: bold 14px sans-serif, Arial; background: #7f7f7f; /* adds a bg colour to button, text bolded and uppercased to standout as importnat call to action */ }
+  
+.newjob a:hover, .emrjob a:hover { background: #777; /* slight change to button bg when user hovers */ }
+
+.window {	border: 1px solid #dedede; /* border so that the windows are easily defined from background */ }
+
+.window_title { background: #f3f3f3; /* just helps it stand out from main window content */ }
+
+/* These are just some of the styles available to change, may more can be styled around your own theme to further tailor it - go crazy! */

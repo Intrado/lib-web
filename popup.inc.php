@@ -38,8 +38,6 @@ header('Content-type: text/html; charset=UTF-8') ;
 	<script>
 		var _brandtheme = "<?=getBrandTheme();?>";
 	</script>
-	<IFRAME src="blank.html" id="blocker" style="DISPLAY: none; LEFT: 0px; POSITION: absolute; TOP: 0px" frameBorder="0" scrolling="no"></IFRAME>
-
 
 <!-- ********************************************************************* -->
 

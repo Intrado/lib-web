@@ -493,18 +493,18 @@ function activityfeed($mergeditems,$ajax = false) {
 							$title = _L('Job %1$s',escapehtml(fmt_status($job,$item["name"])));
 							break;
 					}
-					$content = '<a href="' . $defaultlink . '" ' . $defaultonclick . '>' .
+					$content = '<div class="content_feed_row"><a href="' . $defaultlink . '" ' . $defaultonclick . '>' .
 											$time .  '&nbsp;-&nbsp;<b>' .  escapehtml($item["name"]) . '</b>&nbsp;';
 
-					$content .= '</a><div style="margin-right:10px;margin-top:10px;">
+					$content .= '</a><div class="content_feed_notification">
 								<a href="' . $defaultlink . '" ' . $defaultonclick . '>';
 					$content .= $jobcontent . '</a>';
 					$content .= job_responses($job,Null);
-					$content .= '</div>';
+					$content .= '</div></div>';
 				} else if($item["type"] == "list" ) {
 					$title = "Contact List " . escapehtml($title);
 					$defaultlink = "list.php?id=$itemid";
-					$content = '<a href="' . $defaultlink . '">' . $time . ' - <b>' . escapehtml($item["name"]) . "</b>";
+					$content = '<div class="content_feed_row"><a href="' . $defaultlink . '">' . $time . ' - <b>' . escapehtml($item["name"]) . "</b>";
 					if ($item["description"] != "") {
 						$content .= "&nbsp;-&nbsp;" . escapehtml($item["description"]) ;
 					}
@@ -513,7 +513,7 @@ function activityfeed($mergeditems,$ajax = false) {
 						$content .= 'This list was last used: <i>' . date("M j, Y g:i a",strtotime($item["lastused"])) . "</i>";
 					else
 						$content .= 'This list has never been used ';
-					$content .= " and has " . listcontacts($itemid,"list") . '</a>';
+					$content .= " and has " . listcontacts($itemid,"list") . '</a></div>';
 					$tools = action_links (action_link("Edit", "pencil", "list.php?id=$itemid"),action_link("Preview", "application_view_list", "showlist.php?id=$itemid"));
 					$tools = str_replace("&nbsp;|&nbsp;","<br />",$tools);
 					$icon = 'largeicons/addrbook.jpg';
@@ -528,13 +528,14 @@ function activityfeed($mergeditems,$ajax = false) {
 					$types .= $item["page"] > 0?' <a href="' . $defaultlink . '&redirect=page"><img src="img/icons/layout_sidebar.png" alt="Page" title="Page"></a>':"";
 					$types .= $item["pagemedia"] > 0?' <a href="' . $defaultlink . '&redirect=voice"><img src="img/nifty_play.png" alt="Page Media" title="Page Media"></a>':"";
 					$title = _L('Message %1$s - ',escapehtml($title)) . ($types==""?_L("Empty Message"):$types);
-					$content = '<a href="' . $defaultlink . '" ' . $defaultonclick . '>' . $time .  ' - <b>' .  escapehtml($item["name"]) . "</b>" . ($item["description"] != ""?" - " . escapehtml($item["description"]):"") . '</a>';
+					$content = '<div class="content_feed_row cf"><a href="' . $defaultlink . '" ' . $defaultonclick . '>' . $time .  ' - <b>' .  escapehtml($item["name"]) . "</b>" . ($item["description"] != ""?" - " . escapehtml($item["description"]):"") . '</a></div>';
+
 					$icon = 'largeicons/letter.jpg';
 					$tools = action_links (action_link("Edit", "pencil", 'mgeditor.php?id=' . $itemid));
 				} else if($item["type"] == "report" ) {
 					$title = "Report " . escapehtml($title);
-					$content = '<a href="' . $defaultlink . '" ' . $defaultonclick . '>' .
-									$time .  ' - ' .  escapehtml($item["name"]) . '</a>';
+					$content = '<div class="content_feed_row"><a href="' . $defaultlink . '" ' . $defaultonclick . '>' .
+									$time .  ' - ' .  escapehtml($item["name"]) . '</a></div>';
 					$icon = 'largeicons/savedreport.jpg';
 					$defaultlink = "reportjobsummary.php?id=$itemid";
 				} else if($item["type"] == "systemmessage" ) {
@@ -601,9 +602,9 @@ function activityfeed($mergeditems,$ajax = false) {
 									actionids = 0;
 									for(i=0;i<size;i++){
 										var item = result[i];
-										html += '<tr><td valign=\"top\" width=\"60px\"><a href=\"' + item.defaultlink + '\" ' + item.defaultonclick + '><img src=\"img/' + item.icon + '\" /></a></td><td ><div class=\"feedtitle\"><a href=\"' + item.defaultlink + '\" ' + item.defaultonclick + '>' + item.title + '</a></div><span>' + item.content + '</span></td>';
+										html += '<div class=\"content_row cf\"><div class=\"content_feed_left\"><a href=\"' + item.defaultlink + '\" ' + item.defaultonclick + '><img src=\"img/' + item.icon + '\" /></a></div><div class=\"content_feed_right\"><div class=\"feedtitle\"><a href=\"' + item.defaultlink + '\" ' + item.defaultonclick + '>' + item.title + '</a></div><div class=\"feed_content\">' + item.content + '</div></div>';
 										if(item.tools) {
-											html += '<td valign=\"middle\" width=\"100px\"><div id=\"actionlink_' + actionids + '\" style=\"cursor:pointer\" ><img src=\"img/largeicons/tiny20x20/tools.jpg\"/>&nbsp;Tools</div><div id=\"actions_' + actionids + '\" style=\"display:none;\">' + item.tools + '</div></td>';
+											html += '<div id=\"actionlink_' + actionids + '\" class=\"actionlink_tools\" ><img src=\"img/largeicons/tiny20x20/tools.jpg\"/>&nbsp;Tools</div><div id=\"actions_' + actionids + '\" class=\"hidden\">' + item.tools + '</div></div>';
 											actionids++;
 										} else {
 											html += '<td width=\"100px\">&nbsp;</td>'
@@ -660,18 +661,22 @@ if($USER->authorize("leavemessage")){
 include_once("nav.inc.php");
 
 ?>
+
 <link href='css/timeline.css' type='text/css' rel='stylesheet' media='screen'>
 
-<table border=0 cellpadding=0 cellspacing=5>
-	<tr>
-		<td>
+<div class="csec sectitle">
+<div class="pagetitle"><? if(isset($ICON)) print '<img src="img/themes/' .getBrandTheme() . '/icon_' . $ICON . '" align="absmiddle">'; ?> <?= $TITLE ?></div>
+			<div class="pagetitlesubtext"><?= (isset($DESCRIPTION) ? $DESCRIPTION : "") ?></div>
+		</div>
+	
+		<div class="csec secbutton">
 <?
 			if ($USER->authorize('sendphone') || $USER->authorize('sendemail') || $USER->authorize('sendsms')) {
 				$allowedjobtypes = QuickQueryRow("select sum(jt.systempriority = 1) as Emergency, sum(jt.systempriority != 1) as Other from jobtype jt where jt.deleted = 0 and jt.issurvey = 0",true);
 				$jobtypes = QuickQueryList("select jt.systempriority from jobtype jt,userjobtypes ujt where ujt.jobtypeid = jt.id and ujt.userid=? and jt.deleted=0 and jt.issurvey = 0",false,false,array($USER->id));
 				$jobtypescount = count($jobtypes);
 ?>
-			<div style="width:170px;top:0px;text-align:center;">
+			<div class="big_button_wrap">
 			<?
 				$hasnewjob = false;
 				if($allowedjobtypes["Other"] > 0) {
@@ -683,12 +688,9 @@ include_once("nav.inc.php");
 				}
 				if($hasnewjob) {
 ?>
-						<img style="cursor:pointer;" src="img/newjob.jpg" align="middle" alt="Start a new job" title="Create a new notification job"
-								onclick="window.location = 'jobwizard.php?new&jobtype=normal'"
-								onmouseover="this.src='img/newjob_over.jpg'"
-								onmouseout="this.src='img/newjob.jpg'" />
+						
+						<div class="newjob"><a href="jobwizard.php?new&jobtype=normal">Create new job</a></div>
 <?
-
 				}
 
 				$hasemergency = false;
@@ -701,73 +703,60 @@ include_once("nav.inc.php");
 				}
 				if($hasemergency) {
 			 ?>
-			<br />
-					<img style="cursor:pointer;" src="img/newemergency.jpg" align="middle" alt="Start a new emergency job" title="Create a new emergency notification job"
-							onclick="window.location = 'jobwizard.php?new&jobtype=emergency'"
-							onmouseover="this.src='img/newemergency_over.jpg'"
-							onmouseout="this.src='img/newemergency.jpg'" />
+			
+					<div class="emrjob"><a href="jobwizard.php?new&jobtype=emergency">Emergency</a></div>
+					
 			<? } ?>
-			</div>
+				</div> <!-- /.big_button_wrap -->
+			</div><!-- .csec .secbutton-->
 <?			}
 			if ($USER->authorize("startstats")) {
 ?>
-		</td>
-		<td width="100%" valign="middle">
+		<div class="csec sectimeline"> <? // NOTE: if the timeline isn't showing, check the style.php (css) for the theme to see if .sectimeline is set to display: none; ?>
 <?
 	startWindow(_L("Jobs Timeline"));
 		include_once("inc/timeline.inc.php");
 	endWindow();
 ?>
-		</td>
-	</tr>
-	<tr>
-	<td colspan="2">
-
+		</div><!-- .csec .sectimelime -->
+		<div class="csec secwindow"> <!-- contains recent activity -->
 <?
 			startWindow(_L('Recent Activity'));
 $activityfeed = '
-				<table width="100%" name="recentactivity" style="padding-top: 7px;">
-				<tr>
-					<td class="feed" style="width: 180px;vertical-align: top;font-size: 12px;" >
-						<div class="feedfilter">
-							<a id="nonefilter" href="start.php?filter=none" onclick="applyfilter(\'none\'); return false;"><img src="img/largeicons/tiny20x20/globe.jpg">Show&nbsp;All</a><br />
-						</div>
-						<br />
-						<h1 id="filterby">Filter By:</h1>
-						<div id="allfilters" class="feedfilter">
-							<a id="jobsfilter" href="start.php?filter=jobs" onclick="applyfilter(\'jobs\'); $(\'jobsubfilters\').toggle(); return false;"><img src="img/largeicons/tiny20x20/ping.jpg">Jobs</a><br />
-							<div id="jobsubfilters" style="' . (in_array($filter,array("savedjobs","scheduledjobs","activejobs","completedjobs","repeatingjobs"))?"display:block":"display:none") . ';padding-left:20px;">
-								<a id="savedjobsfilter" href="start.php?filter=savedjobs" onclick="applyfilter(\'savedjobs\'); return false;"><img src="img/largeicons/tiny20x20/folderandfiles.jpg">Saved</a><br />
-								<a id="scheduledjobsfilter" href="start.php?filter=scheduledjobs" onclick="applyfilter(\'scheduledjobs\'); return false;"><img src="img/largeicons/tiny20x20/clock.jpg">Scheduled</a><br />
-								<a id="activejobsfilter" href="start.php?filter=activejobs" onclick="applyfilter(\'activejobs\'); return false;"><img src="img/largeicons/tiny20x20/ping.jpg">Active</a><br />
-								<a id="completedjobsfilter" href="start.php?filter=completedjobs" onclick="applyfilter(\'completedjobs\'); return false;"><img src="img/largeicons/tiny20x20/checkedgreen.jpg">Completed</a><br />
-								<a id="repeatingjobsfilter" href="start.php?filter=repeatingjobs" onclick="applyfilter(\'repeatingjobs\'); return false;"><img src="img/largeicons/tiny20x20/calendar.jpg">Repeating</a><br />
-							</div>
-							<a id="messagesfilter" href="start.php?filter=messages" onclick="applyfilter(\'messages\'); return false;"><img src="img/largeicons/tiny20x20/letter.jpg">Messages</a><br />
-							<a id="listsfilter" href="start.php?filter=lists" onclick="applyfilter(\'lists\'); return false;"><img src="img/largeicons/tiny20x20/addrbook.jpg">Lists</a><br />
-							<a id="savedreportsfilter" href="start.php?filter=savedreports" onclick="applyfilter(\'savedreports\'); return false;"><img src="img/largeicons/tiny20x20/savedreport.jpg">Reports</a><br />
-							<a id="systemmessagesfilter" href="start.php?filter=systemmessages" onclick="applyfilter(\'systemmessages\'); return false;"><img src="img/largeicons/tiny20x20/news.jpg">System&nbsp;Messages</a><br />
-						</div>
-					</td>
-					<td width="10px" style="border-left: 1px dotted gray;" >&nbsp;</td>
-					<td class="feed" valign="top" >
-					<table id="feeditems">
+			<div class="csec window_aside" name="recentactivity"> 
+				<div class="feedfilter">
+					<a id="nonefilter" href="start.php?filter=none" onclick="applyfilter(\'none\'); return false;"><img src="img/largeicons/tiny20x20/globe.jpg">Show&nbsp;All</a><br />
+				</div>
+				<h3 id="filterby">Filter By:</h3>
+				<div id="allfilters" class="feedfilter">
+					<a id="jobsfilter" href="start.php?filter=jobs" onclick="applyfilter(\'jobs\'); $(\'jobsubfilters\').toggle(); return false;"><img src="img/largeicons/tiny20x20/ping.jpg">Jobs</a>
+					<div id="jobsubfilters" style="' . (in_array($filter,array("savedjobs","scheduledjobs","activejobs","completedjobs","repeatingjobs"))?"display:block":"display:none") . ';padding-left:20px;">
+						<a id="savedjobsfilter" href="start.php?filter=savedjobs" onclick="applyfilter(\'savedjobs\'); return false;"><img src="img/largeicons/tiny20x20/folderandfiles.jpg">Saved</a>
+						<a id="scheduledjobsfilter" href="start.php?filter=scheduledjobs" onclick="applyfilter(\'scheduledjobs\'); return false;"><img src="img/largeicons/tiny20x20/clock.jpg">Scheduled</a>
+						<a id="activejobsfilter" href="start.php?filter=activejobs" onclick="applyfilter(\'activejobs\'); return false;"><img src="img/largeicons/tiny20x20/ping.jpg">Active</a>
+						<a id="completedjobsfilter" href="start.php?filter=completedjobs" onclick="applyfilter(\'completedjobs\'); return false;"><img src="img/largeicons/tiny20x20/checkedgreen.jpg">Completed</a>
+						<a id="repeatingjobsfilter" href="start.php?filter=repeatingjobs" onclick="applyfilter(\'repeatingjobs\'); return false;"><img src="img/largeicons/tiny20x20/calendar.jpg">Repeating</a>
+					</div>
+					<a id="messagesfilter" href="start.php?filter=messages" onclick="applyfilter(\'messages\'); return false;"><img src="img/largeicons/tiny20x20/letter.jpg">Messages</a>
+					<a id="listsfilter" href="start.php?filter=lists" onclick="applyfilter(\'lists\'); return false;"><img src="img/largeicons/tiny20x20/addrbook.jpg">Lists</a>
+					<a id="savedreportsfilter" href="start.php?filter=savedreports" onclick="applyfilter(\'savedreports\'); return false;"><img src="img/largeicons/tiny20x20/savedreport.jpg">Reports</a>
+					<a id="systemmessagesfilter" href="start.php?filter=systemmessages" onclick="applyfilter(\'systemmessages\'); return false;"><img src="img/largeicons/tiny20x20/news.jpg">System&nbsp;Messages</a>
+				</div>
+			</div> <!-- .csec .window_aside -->
+			
+			<div id="feeditems" class="csec window_main">
 				';
 
 $activityfeed .= activityfeed($mergeditems,false);
-$activityfeed .= '</table>
-			</td>
-		</tr>
-	</table>';
+$activityfeed .= '</div> <!-- .csec .window_main -->';
 			echo $activityfeed;
 			endWindow();
 
 			?> <?
 			}
-
-	?></td>
-	</tr>
-</table><?
-
+	?>
+		</div><!-- .csec .secwindow -->
+	
+<?
 include_once("navbottom.inc.php");
 ?>

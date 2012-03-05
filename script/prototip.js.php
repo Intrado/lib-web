@@ -68,6 +68,14 @@ Prototip.Styles = {
     radius: 6,
     stem: { height: 12, width: 15 }
   },
+  
+  'fresh': {
+    className: 'fresh',
+    border: 4,
+    borderColor: '#606060',
+    radius: 4,
+    stem: { height: 12, width: 15 }
+  },
 
   'protogrey': {
     className: 'protogrey',

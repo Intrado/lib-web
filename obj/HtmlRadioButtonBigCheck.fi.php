@@ -4,16 +4,16 @@ class HtmlRadioButtonBigCheck extends FormItem {
 	function render ($value) {
 		$n = $this->form->name."_".$this->name;
 		$str = '<input id="'.$n.'" name="'.$n.'" type="hidden" value="'.escapehtml($value).'"/>
-			<div id="'.$n.'-container" class="htmlradiobuttonbigcheck"><table>';
+			<div id="'.$n.'-container" class="htmlradiobuttonbigcheck">';
 		$count = 0;
 		foreach ($this->args['values'] as $val => $html)  {
 			$id = $n.'-'.$count++;
-			$str .= '<tr>
-				<td><img id="'.$id.'" name="'.$id.'" class="htmlRadioButtonBigCheck_checkImg" src="'.(($value == $val)?'img/bigradiobutton_checked.gif':'img/bigradiobutton.gif').'" onclick="htmlRadioButtonBigCheck_doCheck(\''.$this->form->name.'\', \''.$n.'\',  \''.$id.'\', \''.$n.'-container\', \''.$val.'\')" /></td>
-				<td><label for="'.$id.'"><button type="button" style=" width: 100%;" onclick="htmlRadioButtonBigCheck_doCheck(\''.$this->form->name.'\', \''.$n.'\',  \''.$id.'\', \''.$n.'-container\', \''.$val.'\')">'.($html).'</button></label></td></tr>
-				';
+			$str .= '<div class="creation_method">
+				<label for="'.$id.'"><button type="button" style=" width: 100%;" onclick="htmlRadioButtonBigCheck_doCheck(\''.$this->form->name.'\', \''.$n.'\',  \''.$id.'\', \''.$n.'-container\', \''.$val.'\')">'.($html).'</button></label>
+				<img id="'.$id.'" name="'.$id.'" class="htmlRadioButtonBigCheck_checkImg" src="'.(($value == $val)?'img/bigradiobutton_checked.gif':'img/bigradiobutton.gif').'" onclick="htmlRadioButtonBigCheck_doCheck(\''.$this->form->name.'\', \''.$n.'\',  \''.$id.'\', \''.$n.'-container\', \''.$val.'\')" />
+				</div>';
 		}
-		$str .= '</table>
+		$str .= '
 			<script>
 				function htmlRadioButtonBigCheck_doCheck(form, formitem, checkimg, container, value) {
 					var form = $(form);

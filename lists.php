@@ -175,7 +175,7 @@ if (isset($_GET['ajax'])) {
 			}
 			$content .= '<br />';
 			if(isset($item["lastused"]))
-				$content .= 'This list was last used: <i>' . date("M j, Y g:i a",strtotime($item["lastused"])) . "</i>";
+				$content .= 'This list was last used: <em>' . date("M j, Y g:i a",strtotime($item["lastused"])) . "</em>";
 			else
 				$content .= 'This list has never been used';
 			$content .= '</a>';
@@ -217,59 +217,53 @@ include_once("nav.inc.php");
 startWindow('My Lists&nbsp;' . help('Lists_MyLists'));
 
 ?>
-<table width="100%" style="padding-top: 7px;">
-<tr>
-	<td style="width: 180px;vertical-align: top;font-size: 12px;" >
-		<!-- Create List buttons -->
-<? if ($USER->authorize('createlist')) { ?>
-		<div class="feedbuttoncontainer">
-			<?= icon_button(_L('Create a List'),"add","location.href='editlistrules.php?id=new'") ?>
-			<div style="clear:both;"></div>
-			<? if (getSystemSetting('_hasenrollment')) {
-				echo icon_button(_L('Create a List by Section'),"add","location.href='editlistsections.php?id=new'");
-				?><div style="clear:both;"></div><?
-			} ?>
+	
+	<? if ($USER->authorize('createlist')) { ?>
+		<div class="feed_btn_wrap cf">
+		<?= icon_button(_L('Create a List'),"add","location.href='editlistrules.php?id=new'") ?>
+		<? if (getSystemSetting('_hasenrollment')) {
+					echo icon_button(_L('Create a List by Section'),"add","location.href='editlistsections.php?id=new'");
+				} ?>
+				
+				<?=(($USER->authorize('subscribe') && userCanSubscribe('list'))?icon_button(_L('Subscribe to a List'),"fugue/star", "document.location='listsubscribe.php'"):'') ?>
 		</div>
-<? } ?>
+	<? } ?>
 
-		<div>
-			<?=(($USER->authorize('subscribe') && userCanSubscribe('list'))?icon_button(_L('Subscribe to a List'),"fugue/star", "document.location='listsubscribe.php'"):'') ?>
-		</div>
-		<div style="clear:both;"></div>
-		
-		
-		<br />
-		<div class="feed">
-			<h1 id="filterby">Sort By:</h1>
-			<div id="allfilters" class="feedfilter">
-				<a id="namefilter" href="#" onclick="applyfilter('name'); return false;"><img src="img/largeicons/tiny20x20/pencil.jpg" />Name</a><br />
-				<a id="datefilter" href="#" onclick="applyfilter('date'); return false;"><img src="img/largeicons/tiny20x20/clock.jpg" />Modify Date</a><br />
-			</div>
-		</div>
-	</td>
-	<td width="10px" style="border-left: 1px dotted gray;" >&nbsp;</td>
-	<td class="feed" valign="top" >
-		<div id="pagewrappertop"></div>
+	
+		<div class="csec window_aside">
+			
+			<h3 id="filterby">Sort By:</h3>
+			<ul id="allfilters" class="feedfilter">
+				<li><a id="namefilter" href="#" onclick="applyfilter('name'); return false;"><img src="img/largeicons/tiny20x20/pencil.jpg" />Name</a></li>
+				<li><a id="datefilter" href="#" onclick="applyfilter('date'); return false;"><img src="img/largeicons/tiny20x20/clock.jpg" />Modify Date</a></li>
+			</ul>
+			
+		</div><!-- .csec .window_aside -->
 
-		<table id="feeditems">
-			<tr>
-				<td valign='top' width='60px'><img src='img/ajax-loader.gif' /></td>
-				<td >
+		
+		<div class="csec window_main">
+		
+		<div id="pagewrappertop" class="content_recordcount_top"></div>
+
+		<table id="feeditems" class="content_feed">
+			<tbody>
+				<tr>
+					<td class=""><img src='img/ajax-loader.gif' /></td>
+					<td>
 					<div class='feedtitle'>
-						<a href=''>
-						<?= _L("Loading Lists") ?></a>
+					<a href=''><?= _L("Loading Lists") ?></a>
 					</div>
-				</td>
-			</tr>
+					</td>
+				</tr>
+			</tbody>
 		</table>
-		<br />
-		<div id="pagewrapperbottom"></div>
-	</td>
-</tr>
-</table>
+		<div id="pagewrapperbottom" class="content_recordcount_btm"></div>
+		
+		</div><!-- .csec .window_main -->
 
 
-<script type="text/javascript" language="javascript">
+
+<script type="text/javascript" >
 var filtes = Array('date','name');
 var activepage = 0;
 var currentfilter = 'date';
@@ -291,27 +285,27 @@ function applyfilter(filter) {
 					
 					for(i=0;i<size;i++){
 						var item = result.list[i];
-						html += '<tr><td valign=\"top\" width=\"60px\"><a href=\"' + item.defaultlink + '\"><img src=\"img/' + item.icon + '\" /></a></td><td ><div class=\"feedtitle\"><a href=\"' + item.defaultlink + '\">' + item.title + '</a></div>';
+						html += '<tr class=\"feed_item\"><td class=\"feed_icon\"><a href=\"' + item.defaultlink + '\"><img src=\"img/' + item.icon + '\" /></a></td><td ><div class=\"feedtitle\"><a href=\"' + item.defaultlink + '\">' + item.title + '</a></div>';
 						if(item.publishmessage) {
-							html += '<div class=\"feedsubtitle\"><a href=\"' + item.defaultlink + '\"><img src=\"img/icons/diagona/10/031.gif\" />' + item.publishmessage + '</div><div style=\"clear both;\"></div>';
+							html += '<div class=\"feedsubtitle cf\"><a href=\"' + item.defaultlink + '\"><img src=\"img/icons/diagona/10/031.gif\" />' + item.publishmessage + '</div>';
 						}
 						html += '<span>' + item.content + '</span></td>';
 						if(item.tools) {
-							html += '<td valign=\"middle\" width=\"100px\"><div>' + item.tools + '</div></td>';
+							html += '<td class=\"feed_actions\"><div>' + item.tools + '</div></td>';
 						}
 						html += '</tr>';
 					}
 					$('feeditems').update(html);
-					var pagetop = new Element('div',{style: 'float:right;'}).update(result.pageinfo[3]);
-					var pagebottom = new Element('div',{style: 'float:right;'}).update(result.pageinfo[3]);
+					var pagetop = new Element('div',{'class': 'content_recordcount'}).update(result.pageinfo[3]);
+					var pagebottom = new Element('div',{'class': 'content_recordcount'}).update(result.pageinfo[3]);
 
-					var selecttop = new Element('select', {id:'selecttop'});
-					var selectbottom = new Element('select', {id:'selectbottom'});
+					var selecttop = new Element('select', {'id':'selecttop'});
+					var selectbottom = new Element('select', {'id':'selectbottom'});
 					for (var x = 0; x < result.pageinfo[0]; x++) {
 						var offset = x * result.pageinfo[1];
 						var selected = (result.pageinfo[2] == x+1);
-						selecttop.insert(new Element('option', {value: offset,selected:selected}).update('Page ' + (x+1)));
-						selectbottom.insert(new Element('option', {value: offset,selected:selected}).update('Page ' + (x+1)));
+						selecttop.insert(new Element('option', {'value': offset,selected:selected}).update('Page ' + (x+1)));
+						selectbottom.insert(new Element('option', {'value': offset,selected:selected}).update('Page ' + (x+1)));
 					}
 					pagetop.insert(selecttop);
 					pagebottom.insert(selectbottom);

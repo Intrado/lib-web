@@ -27,7 +27,7 @@ include("nav.inc.php");
 
 startWindow("Options", 'padding: 3px;');
 ?>
-	<table border="1" width="100%" cellpadding="3" cellspacing="1" class="list" >
+	<table class="list" >
 		<tr class="listHeader">
 <?
 			if($USER->authorize('managesystem') || $USER->authorize('metadata')){
@@ -59,59 +59,74 @@ startWindow("Options", 'padding: 3px;');
 		if($USER->authorize('managesystem') || $USER->authorize('metadata')){
 ?>
 			<td>
-				<table>
+				<ul>
 <?
 					if($USER->authorize('managesystem')){
 ?>
-						<tr><td><a href='systemwidealertmessage.php'>Systemwide Alert Message</a></td></tr>
-						<tr><td><a href='customerinfo.php'>Customer Information</a></td></tr>
+						<li><a href='systemwidealertmessage.php'>Systemwide Alert Message</a></li>
+						<li><a href='customerinfo.php'>Customer Information</a></li>
 <?
 					}
 					if($USER->authorize('metadata')){
 ?>
-						<tr><td><a href='persondatamanager.php'>Field Definitions</a></td></tr>
-						<tr><td><a href='groupdatamanager.php'>Group Field Definitions</a></td></tr>
+						<li><a href='persondatamanager.php'>Field Definitions</a></li>
+						<li><a href='groupdatamanager.php'>Group Field Definitions</a></li>
 <? if (getSystemSetting('_hasenrollment', false)) { ?>
-						<tr><td><a href='scheduledatamanager.php'>Section Field Definitions</a></td></tr>
+						<li><a href='scheduledatamanager.php'>Section Field Definitions</a></li>
 <? } ?>
-						<tr><td><a href='organizationdatamanager.php'>Organization Manager</a></td></tr>
+						<li><a href='organizationdatamanager.php'>Organization Manager</a></li>
 <?
 					}
 
 					if($USER->authorize('managesystem')){
 ?>
-						<tr><td><a href='securitysettings.php'>Security</a></td></tr>
-						<tr><td><a href='displaysettings.php'>Display</a></td></tr>
+						<li><a href='securitysettings.php'>Security</a></li>
+						<li><a href='displaysettings.php'>Display</a></li>
 
 <?
 					}
 ?>
-				</table>
+				</ul>
 			</td>
 <?
 		}
 		if($USER->authorize('managesystem')){
 ?>
 			<td>
-				<table>
-					<tr><td><a href='disablerepeatingjobs.php'>Enable/Disable Repeating Jobs</a></td></tr>
-					<tr><td><a href='jobsettings.php'>Job Settings</a></td></tr>
-					<tr><td><a href='jobtypemanagement.php'>Job Types</a></td></tr>
+				<ul>
+					<li><a href='disablerepeatingjobs.php'>Enable/Disable Repeating Jobs</a></li>
+					<li><a href='jobsettings.php'>Job Settings</a></li>
+					<li><a href='jobtypemanagement.php'>Job Types</a></li>
 <?
 		if (getSystemSetting("_amdtype","ivr") == "ivr") {
-?>					<tr><td><a href='messageintro.php'>Message Intro</a></td></tr><?
+?>
+					<li><a href='messageintro.php'>Message Intro</a></li>
+<?
+		} else {
+?>
+					<li>&nbsp;</li>
+<?
 		}
 ?>
-				</table>
+					<li>&nbsp;</li>
+					<li>&nbsp;</li>
+					<li>&nbsp;</li>
+					<li>&nbsp;</li>
+				</ul>
 			</td>
 			<td>
-				<table>
-					<tr><td><a href='destinationlabel.php?type=phone'>Phone Labels</a></td></tr>
-					<tr><td><a href='destinationlabel.php?type=email'>Email Labels</a></td></tr>
+				<ul>
+					<li><a href='destinationlabel.php?type=phone'>Phone Labels</a></li>
+					<li><a href='destinationlabel.php?type=email'>Email Labels</a></li>
 <? if(getSystemSetting('_hassms', false)){ ?>
-					<tr><td><a href='destinationlabel.php?type=sms'>SMS Labels</a></td></tr>
+					<li><a href='destinationlabel.php?type=sms'>SMS Labels</a></li>
 <? } ?>
-				</table>
+					<li>&nbsp;</li>
+					<li>&nbsp;</li>
+					<li>&nbsp;</li>
+					<li>&nbsp;</li>
+					<li>&nbsp;</li>
+				</ul>
 			</td>
 <?
 		}
@@ -124,45 +139,50 @@ startWindow("Options", 'padding: 3px;');
 			($USER->authorize('managesystem') && getSystemSetting("_hasfeed"))) {
 ?>
 			<td>
-				<table>
+				<ul>
 <?
 					if (getSystemSetting('_hasportal', false) && $USER->authorize('portalaccess') && $USER->authorize('managesystem')) {
 ?>
-						<tr><td><a href='contactmanagersettings.php'>Contact Manager Settings</a></td></tr>
+					<li><a href='contactmanagersettings.php'>Contact Manager Settings</a></li>
 <?
 					}
 					if (getSystemSetting('_hasselfsignup', false)) {
 						if ($USER->authorize('managesystem')) {
 ?>
-							<tr><td><a href='subscribersettings.php'>Self-Signup Settings</a></td></tr>
+					<li><a href='subscribersettings.php'>Self-Signup Settings</a></li>
 <?						}
 						if ($USER->authorize('metadata')) {
 ?>
-							<tr><td><a href='subscriberfields.php'>Self-Signup Fields</a></td></tr>
+					<li><a href='subscriberfields.php'>Self-Signup Fields</a></li>
 <?						}
 					}
 					if ($USER->authorize('managesystem') && getSystemSetting('_dmmethod', "")!='asp') {
 ?>
-						<tr><td><a href='dms.php'><?=_L("SmartCall Appliance")?></a></td></tr>
+					<li><a href='dms.php'><?=_L("SmartCall Appliance")?></a></li>
 <?
 					}
 					if (getSystemSetting('_hastargetedmessage', false) && $USER->authorize('manageclassroommessaging')) {
 ?>
-							<tr><td><a href='classroommessagemanager.php'>Classroom Message Manager</a></td></tr>
-							<tr><td><a href='classroommessagetemplate.php'>Classroom Messaging Template</a></td></tr>
+					<li><a href='classroommessagemanager.php'>Classroom Message Manager</a></li>
+					<li><a href='classroommessagetemplate.php'>Classroom Messaging Template</a></li>
 <?
 					}
 					if (getSystemSetting("_hasfacebook")) {
 ?>
-						<tr><td><a href='authfacebookpages.php'>Facebook Authorized Pages</a></td></tr>
+					<li><a href='authfacebookpages.php'>Facebook Authorized Pages</a></li>
 <?					}
 					if (getSystemSetting("_hasfeed")) {
 ?>
 						<tr><td><a href='editfeedcategory.php'><?=_L("Feed Categories")?></a></td></tr>
 <?					}
 ?>
+					<li>&nbsp;</li>
+					<li>&nbsp;</li>
+					<li>&nbsp;</li>
+					<li>&nbsp;</li>
+					<li>&nbsp;</li>
 
-				</table>
+				</ul>
 			</td>
 <?
 		}

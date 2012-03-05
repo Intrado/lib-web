@@ -33,7 +33,7 @@ $NAVTREE = array (
 
 function navMainTab ($display, $hint, $accesskey, $link, $isselected) {
 	$theme = getBrandTheme();
-	return '<div class="navtab"><a accesskey="'.$accesskey.'" onfocus="blur()" href="' . $link . '" title="'.$hint.'"><img alt="" src="img/themes/' . $theme . '/main_nav_tab' . ($isselected ? "_active" : "") . '.gif"><span>' . $display . '</span></a></div>';
+	return '<li '. ($isselected ? 'class="navtab_active"' : "") .'><a accesskey="'.$accesskey.'" onfocus="blur()" href="' . $link . '" title="'.$hint.'"><img alt="" src="img/themes/' . $theme . '/main_nav_tab' . ($isselected ? "_active" : "") . '.gif"><span>' . $display . '</span></a></li>';
 }
 
 function navSubTab ($title, $link, $isselected) {
@@ -98,10 +98,10 @@ header('Content-type: text/html; charset=UTF-8') ;
 	<script src="script/prototip.js.php" type="text/javascript"></script>
 	<script src="script/form.js.php" type="text/javascript"></script>
 
+	<link href="../css.php?hash=<?=crc32(serialize($_SESSION['colorscheme']))?>" type="text/css" rel="stylesheet" media="screen, print">
 	<link href="css/form.css.php" type="text/css" rel="stylesheet">
 	<link href="css/prototip.css.php" type="text/css" rel="stylesheet">
 	<link href='css/style_print.css' type='text/css' rel='stylesheet' media='print'>
-	<link href="css.php?hash=<?=crc32(serialize($_SESSION['colorscheme']))?>" type="text/css" rel="stylesheet" media="screen, print">
 
 <!--[if lte IE 6]>
     <link href="css/ie6.css" type="text/css" rel="stylesheet"/>
@@ -117,46 +117,38 @@ header('Content-type: text/html; charset=UTF-8') ;
 		var _brandtheme = "<?=getBrandTheme();?>";
 	</script>
 
-	<IFRAME src="blank.html" id="blocker" style="DISPLAY: none; LEFT: 0px; POSITION: absolute; TOP: 0px" frameBorder="0" scrolling="no"></IFRAME>
-
 <!-- ********************************************************************* -->
 
-<table class="navlogoarea" border=0 cellspacing=0 cellpadding=0 width="100%">
-	<tr>
-		<td bgcolor="white"><div style="padding-left:10px;"><? doLogo() ?></div></td>
-		<td><img src="img/shwoosh.gif" alt="" class="noprint"></td>
-		<td width="100%" align="right" style="padding-right: 10px;">
-			<div class="custname"><?= escapehtml($_SESSION['custname']); ?></div>
-			<table border=0 cellspacing=0 cellpadding=0 class="noprint">
-				<tr>
-					<td><img src="img/accountlinksbg_left.gif" alt=""></td>
-					<td background="img/accountlinksbg_mid.gif">
-						<div class="applinks hoverlinks">
-							<a href="index.php?logout=1" title="<?=_L("Logout")?>"><?=_L("Logout")?></a>
-						</div>
-					</td>
-					<td><img src="img/accountlinksbg_right.gif" alt=""></td>				
-				</tr>		
-			</table>
-		</td>
-	</tr>
-</table>
-<div class="navband1"><img src="img/pixel.gif" alt=""></div>
-<div class="navband2"><img src="img/pixel.gif" alt=""></div>
+<div id="top_banner" class="banner cf">
 
-<!-- =================================================== -->
-<div class="navmenuspacer">
-<div class="navmenu">
-	<?= $MAINTABS ?>
-</div>
-</div>
+		<div class="banner_logo"><? doLogo() ?></div>
+		
+		<div class="banner_custname"><?= escapehtml($_SESSION['custname']); ?></div>
+			
+		<div class="banner_links_wrap">
+				<ul class="banner_links">
+						<li class="bl_left"></li>
+						<li class="bl_last"><a href="index.php?logout=1" title="<?=_L("Logout")?>"><?=_L("Logout")?></a></li>
+						<li class="bl_right"></li>		
+				</ul>		
+		</div>
+	
+</div><!-- #top_banner .banner -->
+
+
+<div class="primary_nav cf">
+		<ul class="navtabs">
+			<?= $MAINTABS ?>
+		</ul>
+</div><!-- .primary_nav -->
 
 
 <div class="subnavmenu hoverlinks">
 	<?= $SUBTABS ?>
 </div>
 
+
+<div class="content_wrap cf"><!-- starts main content section, tag is ended in navbottom.inc.php -->
+
 	<div class="pagetitle"><? if(isset($ICON)) print '<img alt="" src="img/themes/' .getBrandTheme() . '/icon_' . $ICON . '" align="absmiddle">'; ?> <?= $TITLE ?></div>
 	<div class="pagetitlesubtext"><?= (isset($DESCRIPTION) ? $DESCRIPTION : "") ?></div>
-
-	<div class="maincontent">

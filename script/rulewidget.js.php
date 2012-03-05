@@ -516,7 +516,7 @@ var RuleEditor = Class.create({
 			this.actionTD.update('<span style="cursor:help; font-style:italic; display:none; font-weight: bold;">&nbsp;</span>');
 		}
 
-		var fieldsetCSS = 'padding:3px; margin:0px; border: solid 3px rgb(150,150,255)';
+		var fieldsetCSS = 'padding:3px; margin:0px;';
 		var fieldsetDivOptions = {'style':''};
 		this.fieldTD.insert(new Element('div', {'class':'RuleWidgetColumnDiv'})).insert(new Element('fieldset', {'id':'AddRuleFieldmap', style:fieldsetCSS}).insert(new Element('div', fieldsetDivOptions)));
 		this.criteriaTD.insert(new Element('div', {'class':'RuleWidgetColumnDiv'})).insert(new Element('fieldset', {'id':'AddRuleCriteria', style:fieldsetCSS}).insert(new Element('div', fieldsetDivOptions)));

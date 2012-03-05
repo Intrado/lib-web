@@ -19,7 +19,6 @@ $pagetitle = preg_replace('/\\<.+>/','',(isset($TITLE) ? $TITLE : ""));
 	<script src="script/prototip.js.php" type="text/javascript"></script>
 </head>
 <body onload="try {UpdateTimer();} catch (e) {}" style="margin: 0px; background-color: white;">
-	<IFRAME src="blank.html" id="blocker" style="DISPLAY: none; LEFT: 0px; POSITION: absolute; TOP: 0px" frameBorder="0" scrolling="no"></IFRAME>
 
 
 

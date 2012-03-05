@@ -276,7 +276,7 @@ function show_user_table($containerID) {
 	$numUsers = QuickQuery("select FOUND_ROWS()");
 
 	$tooltip = addslashes(_L("Search by First Name, Last Name, Username, or Access Profile. Press ENTER to apply the search word."));
-	$html = "<div style='float:left; padding-top:5px'><input id='{$containerID}_search' size=20 value=''></div>";
+	$html = "<div class='usersearch'><input id='{$containerID}_search' size=20 value=''></div>";
 	$html .= ajax_table_show_menu($containerID, $numUsers, $limitstart, $perpage) . ajax_show_table($containerID, $data, $titles, $formatters, $sorting);
 	$html .= "
 		<script type='text/javascript'>
@@ -321,12 +321,10 @@ include_once("nav.inc.php");
 startWindow('Active Users ' . help('Users_ActiveUsersList'),null, true);
 	button_bar(button('Add New User', NULL,"user.php?id=new") . help('Users_UserAdd'));
 
-	echo '<div id="activeUsersContainer">';
+	echo '<div id="activeUsersContainer" class="cf">';
 		echo show_user_table('activeUsersContainer');
 	echo '</div>';
 endWindow();
-
-print '<br>';
 
 startWindow('Inactive Users ' . help('Users_InactiveUsersList'),null, true);
 	echo '<div id="inactiveUsersContainer">';

@@ -528,8 +528,10 @@ if ($noimportdata) { ?>
 
 		</td>
 		<td>
+		
 			<div id="filedata_<?=$count?>" style="<?= $show == "staticvalue" || $show == "curdate" ? "display: none;" : "" ?>">
-				<table border="0" cellpadding="3" cellspacing="0"><tr><td>
+				
+				<div class="import_file_data">
 <?
 				//file data map
 
@@ -545,14 +547,18 @@ if ($noimportdata) { ?>
 				}
 				NewFormItem($f,$s,"mapfrom_$count","selectend");
 ?>
-				</td><td>
+				
 					<?= button('Previous',"prevselect($count)") ?>
-				</td><td>
+				
 					<?= button('Next',"nextselect($count)") ?>
-				</td></tr></table>
+				
+				
+				</div><!-- .import_file_data -->
+				
 				<div id="selectordata<?=$count?>">
 				</div>
-				</div>
+				
+			</div><!-- .filedata -->
 
 		</td>
 		<td>

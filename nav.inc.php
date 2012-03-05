@@ -21,7 +21,7 @@ if (isset($_GET['timer']) || isset($_SESSION['timer'])) {
 }
 
 if ($USER->authorize(array('starteasy', 'sendemail', 'sendphone', 'sendsms'))) {
-	$SHORTCUTS['-- Jobs & Messages --'] = "false;";
+	$SHORTCUTS['<b>Jobs & Messages</b>'] = "false;";
 	if ($USER->authorize("starteasy")) {
 		$SHORTCUTS['EasyStart'] = "jobwizard.php?new";
 	}
@@ -37,7 +37,7 @@ if ($USER->authorize(array('starteasy', 'sendemail', 'sendphone', 'sendsms'))) {
 }
 
 if ($USER->authorize(array('createreport', 'viewsystemreports'))) {
-	$SHORTCUTS['-- Reports & Status --'] = "false;";
+	$SHORTCUTS['<b>Reports & Status</b>'] = "false;";
 	if ($USER->authorize('createreport') || $USER->authorize('viewsystemreports')) {
 		$SHORTCUTS['Create a Report'] = "reports.php";
 		$SHORTCUTS['View Job Summary'] = "reportjobsearch.php";
@@ -50,7 +50,7 @@ if ($USER->authorize(array('createreport', 'viewsystemreports'))) {
 	}
 }
 
-$SHORTCUTS['-- Lists & Contacts --'] = "false;";
+$SHORTCUTS['<b>Lists & Contacts</b>'] = "false;";
 if ($USER->authorize("createlist")) {
 	$SHORTCUTS['New List'] = "list.php?id=new";
 	$SHORTCUTS['My Lists'] = "lists.php";
@@ -58,7 +58,7 @@ if ($USER->authorize("createlist")) {
 $SHORTCUTS['My Address Book'] = "addresses.php?origin=nav";
 if ($USER->authorize("viewcontacts"))
 	$SHORTCUTS['System Contacts'] = "contacts.php";
-$SHORTCUTS['-- Help & Documentation --'] = "false;";
+$SHORTCUTS['<b>Help & Documentation</b>'] = "false;";
 $SHORTCUTS['Message Tips & Ideas'] = "javascript: popup('help/html/Tips_for_Effective_Communication/Messaging_Tips.htm',750,500);";
 $SHORTCUTS['Help'] = "javascript: popup('help/index.php',750,500);";
 
@@ -112,11 +112,11 @@ else
 
 function navMainTab ($title, $link, $isselected) {
 	$theme = getBrandTheme();
-	return '<div class="navtab"><a onfocus="blur()" href="' . $link . '"><img src="img/themes/' . $theme . '/main_nav_tab' . ($isselected ? "_active" : "") . '.gif"><span>' . $title . '</span></a></div>';
+	return '<li '. ($isselected ? 'class="navtab_active"' : "") .'><a onfocus="blur()" href="' . $link . '">' . $title . '</a></li>';
 }
 
 function navSubTab ($title, $link, $isselected) {
-	return '<a onfocus="blur()" class="subnavtab ' . ($isselected ? "active" : "") . '" href="' . $link . '"><div>' . $title . '</div></a>';
+	return '<li '. ($isselected ? 'class="navtab_active"' : "") .'><a onfocus="blur()" class="subnavtab" href="' . $link . '">' . $title . '</a></li>';
 }
 
 function doNavTabs ($navtree) {
@@ -154,7 +154,7 @@ function doShortcuts ($shortcuts) {
 	global $USER;
 	if ($USER->authorize("startshort")) {
 		foreach ($shortcuts as $name => $value) {
-			if (strpos($name,"--") === 0) {
+			if (strpos($name,"<b>") === 0) {
 				?><div class="shortcuttitle"><?= $name ?></div><?
 			} else {
 				?><a href="<?= escapehtml($value) ?>"><?= $name ?></a><?
@@ -196,8 +196,13 @@ doNavTabs($NAVTREE);
 //set the charset if we are spitting out html
 header('Content-type: text/html; charset=UTF-8') ;
 ?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html>
+<!DOCTYPE html>
+<!--[if lt IE 7]> <html class="no-js ie6 oldie" lang="en"> <![endif]-->
+<!--[if IE 7]>    <html class="no-js ie7 oldie" lang="en"> <![endif]-->
+<!--[if IE 8]>    <html class="no-js ie8 oldie" lang="en"> <![endif]-->
+<!--[if (gte IE 9)|!(IE)]><!--> 
+<html class="no-js" lang="en">
+<!--<![endif]-->
 <head>
 	<meta http-equiv="Content-type" content="text/html; charset=UTF-8" />
 	<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7" />
@@ -213,70 +218,47 @@ header('Content-type: text/html; charset=UTF-8') ;
 	<script src="script/livepipe/window.js" type="text/javascript"></script>
 	<script src="script/modalwrapper.js" type="text/javascript"></script>
 	
-	<link href="css.php?hash=<?=crc32(serialize($_SESSION['colorscheme']))?>" type="text/css" rel="stylesheet" media="screen, print">
-	<link href="css/form.css.php" type="text/css" rel="stylesheet">
-	<link href="css/datepicker.css.php" type="text/css" rel="stylesheet">
-	<link href="css/prototip.css.php" type="text/css" rel="stylesheet">
-	<link href="css/style_print.css" type="text/css" rel="stylesheet" media="print">
-
-<!--[if lte IE 6]>
-    <link href="css/ie6.css" type="text/css" rel="stylesheet"/>
-<![endif]-->
-
-<!--[if lte IE 7]>
-    <link href="css/ie7.css" type="text/css" rel="stylesheet"/>
-<![endif]-->
+	<link href="css.php?hash=<?=crc32(serialize($_SESSION['colorscheme']))?>" type="text/css" rel="stylesheet" media="screen, print" />
+	<link href="css/form.css.php" type="text/css" rel="stylesheet" />
+	<link href="css/datepicker.css.php" type="text/css" rel="stylesheet" />
+	<link href="css/prototip.css.php" type="text/css" rel="stylesheet" />
+	<link href="css/style_print.css" type="text/css" rel="stylesheet" media="print" />
+	
+	<!--[if gte IE 9]>
+	  <style type="text/css">
+	    .gradient {
+	       filter: none;
+	    }
+	  </style>
+	<![endif]-->
 
 </head>
-<body>
+<body> 
 	<script>
 		var _brandtheme = "<?=getBrandTheme();?>";
 	</script>
 
-	<IFRAME src="blank.html" id="blocker" style="DISPLAY: none; LEFT: 0px; POSITION: absolute; TOP: 0px" frameBorder="0" scrolling="no"></IFRAME>
-
 <!-- ********************************************************************* -->
 
-<table class="navlogoarea" border=0 cellspacing=0 cellpadding=0 width="100%">
-	<tr>
-		<td bgcolor="white"><div style="padding-left:10px;"><? doLogo() ?></div></td>
-		<td><img src="img/shwoosh.gif" alt="" class="noprint"></td>
-		<td width="100%" align="right" style="padding-right: 10px;">
-			<div class="custname"><?= escapehtml($_SESSION['custname']); ?></div>
-			<table border=0 cellspacing=0 cellpadding=0 class="noprint">
-				<tr>
-					<td><img src="img/accountlinksbg_left.gif" alt="" ></td>
-					<td background="img/accountlinksbg_mid.gif">
-						<div class="applinks hoverlinks">
-							<a href="addresses.php?origin=nav">Address Book</a> |
-<?
-if($USER->authorize('managemyaccount')){
-?>
-							<a href="account.php">Account</a> |
-<?
-}
-?>
-							<a href="#" onclick="window.open('help/index.php', '_blank', 'width=750,height=500,location=no,menubar=yes,resizable=yes,scrollbars=yes,status=no,titlebar=no,toolbar=yes');">Help</a> |
-							<a href="index.php?logout=1">Logout</a>
-						</div>
-					</td>
-					<td><img src="img/accountlinksbg_right.gif" alt="" ></td>
-				</tr>
-			</table>
-		</td>
-	</tr>
-</table>
-<div class="navband1"><img src="img/pixel.gif" alt="" ></div>
-<div class="navband2"><img src="img/pixel.gif" alt="" ></div>
+<div id="top_banner" class="banner cf">
 
-<!-- =================================================== -->
-<div class="navmenuspacer">
-<div class="navmenu">
-<? 	if ($USER->authorize("startshort")) { ?>
-	<div id="shortcutmenu" class="shortcutmenu"><img src="img/arrow_down.gif" style="margin-right: 5px; margin-left: 5px; float: right;" alt="" >Shortcuts</div>
-	<div class="shortcuts hoverlinks" id="shortcuts" style="display: none;">
-		<? doShortcuts($SHORTCUTS) ?>
+	<div class="banner_logo"><? doLogo() ?></div>  
+	
+	<div class="banner_custname"><?= escapehtml($_SESSION['custname']); ?></div>
+	
+	<div class="banner_links_wrap">
+		<ul class="banner_links cf">
+			<li class="bl_left"></li>
+			<li><a href="addresses.php?origin=nav">Address Book</a></li>
+<? if($USER->authorize('managemyaccount')){ ?>			
+			<li><a href="account.php">Account</a></li>
+<? } ?>
+			<li><a href="#" onclick="window.open('help/index.php', '_blank', 'width=750,height=500,location=no,menubar=yes,resizable=yes,scrollbars=yes,status=no,titlebar=no,toolbar=yes');">Help</a></li>
+			<li class="bl_last"><a href="index.php?logout=1">Logout</a></li>
+			<li class="bl_right"></li>
+		</ul>
 	</div>
+</div> <!--  /#top_banner -->
 <script type="text/javascript" language="javascript">
 Event.observe(window, 'load', function() {
 	new Tip('shortcutmenu', $('shortcuts'), {
@@ -295,20 +277,45 @@ Event.observe(window, 'load', function() {
 });
 </script>
 
+<div class="primary_nav cf">
+
+	<div class="navshortcut">
+	<? 	if ($USER->authorize("startshort")) { ?>
+		<div class="shortcuts hoverlinks" id="shortcuts" style="display: none;"><? doShortcuts($SHORTCUTS) ?></div>
+		
+		<div id="shortcutmenu" class="shortcutmenu">Shortcuts&nbsp;<img src="img/arrow_down.gif" alt=""></div>
+	
+		<script type="text/javascript">
+		Event.observe(window, 'load', function() {
+			new Tip('shortcutmenu', $('shortcuts'), {
+				style: 'fresh',
+				target: 'shortcutmenu',
+				hideOn: false,
+				hideAfter: 0.5,
+				hook: { target: 'bottomRight', tip: 'topRight' },
+				offset: { x: 0, y: 2 },
+				width: '250px'
+			});
+		});
+		</script>
+	
+	<? } ?>
+	</div>
+	
+	
+	<ul class="navtabs">
+	<?= $MAINTABS ?>
+	</ul>
+
+</div><!-- primary_nav -->
+
+<? if ($SUBTABS != "") { ?>
+<ul class="subnavtabs cf">
+	<?= $SUBTABS ?>
+</ul>
 <? } ?>
 
-	<?= $MAINTABS ?>
-</div>
-</div>
-
-<div class="subnavmenu hoverlinks">
-	<?= $SUBTABS ?>
-</div>
-
-<div class="pagetitle"><? if(isset($ICON)) print '<img src="img/themes/' .getBrandTheme() . '/icon_' . $ICON . '" align="absmiddle">'; ?> <?= $TITLE ?></div>
-<div class="pagetitlesubtext"><?= (isset($DESCRIPTION) ? $DESCRIPTION : "") ?></div>
-
-<div class="maincontent">
+<div class="content_wrap cf"><!-- tag ends in footer -->
 
 	<?= $SYSTEMALERT ?>
 

@@ -5,11 +5,10 @@ class ListForm extends Form {
 
 		if (getSystemSetting('_hasenrollment')) {
 			$formdata['sectionwidget'] = array(
-				'label' => _L('Choose Sections'),
+				'label' => _L('Sections'),
 				'value' => '',
 				'control' => array('SectionWidget'),
 				'validators' => array(),
-				'renderoptions' => array('label' => false, 'icon' => false, 'errormessage' => true),
 				'helpstep' => 0
 			);
 		}
@@ -122,7 +121,7 @@ class ListForm extends Form {
 					<table id='listFormWorkspace' width='100%' height='100%' style='clear:both; margin-bottom:25px'>
 						<tr>
 							<td colspan=100>
-								<h2 style=\"padding-left: 5px; background: repeat-x url('img/header_bg.gif')\">"._L('List')."</h2>
+								<h2 class=\"formsectionheader\">"._L('List')."</h2>
 							</td>
 						</tr>
 						<tr>
@@ -221,21 +220,26 @@ class ListForm extends Form {
 					var addmePhone = $('listChoose_addmePhone');
 					var addmeEmail = $('listChoose_addmeEmail');
 					var addmeSms = $('listChoose_addmeSms');
+					
+					var addmeUp = $('listChoose_addme_fieldarea');
+					var addmePhoneUp = $('listChoose_addmePhone_fieldarea');
+					var addmeEmailUp = $('listChoose_addmeEmail_fieldarea');
+					var addmeSmsUp = $('listChoose_addmeSms_fieldarea');
+					
 					var tbody = $('addMeWindow').down('tbody');
 					if (addme)
-						tbody.insert(addme.up('tr').remove());
+						tbody.insert(addmeUp.remove());
 					if (addmePhone)
-						tbody.insert(addmePhone.up('tr').remove());
+						tbody.insert(addmePhoneUp.remove());
 					if (addmeEmail)
-						tbody.insert(addmeEmail.up('tr').remove());
+						tbody.insert(addmeEmailUp.remove());
 					if (addmeSms)
-						tbody.insert(addmeSms.up('tr').remove());
+						tbody.insert(addmeSmsUp.remove());
 					// Show/Hide 'AddMe' textboxes, and register observers.
 					listform_refresh_addme();
 					$('{$this->name}_addme').observe('click', listform_refresh_addme);
-					if ($('listChoose_addme').checked)
+					if (addme.checked) 
 						accordion.show_section('addme');
-
 					ruleWidget.refresh_guide(true);
 					ruleWidget.startup();
 				});

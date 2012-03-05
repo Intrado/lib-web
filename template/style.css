@@ -1,0 +1,148 @@
+/*----- 
+The full page is reset using the reset.css to reduce browser inconsistencies in things like default line heights, margins and font sizes of headings, and so on.
+Note: the rgba colour values won't work in older IE so use hex values if you want to keep safe
+ -----*/
+
+/*----- basic colours for theme -----*/
+body { background: #ccc; font: 13px/21px "Lucida Sans", "Lucida Grande", sans-serif; }
+a, a:visited { color: #484848; /* used for basic links within the windows and also in the footer */ }
+a:hover { color: #666; }
+h1 { float: left; color: #f7f7f7; font-size: 24px; }
+h3 { font-size: 21px; padding: 0 0 10px 0; }
+h4 { font-size: 16px; }
+p { padding: 0 0 5px 0; }
+.wrapper { margin: 15px; /* contains all main content windows, margin added to keep inline with header */ }
+.left { float: left; display: inline; }
+.right { float: right; display: inline; }
+.window {	background: #fff; margin: 0 0 10px 0; padding: 15px; border: 1px solid #bababa; }
+
+/*----- Banner -----*/
+
+.banner { background: #333; padding: 15px; }
+.banner_links { float: right; display: inline; }
+.banner_links li { float: left; display: inline; padding: 0 8px; border-right: 1px dashed #bdbdbd; /* arranges nav horizontally, gives links room to breathe and adds small spacer inbetween each link */ }
+.banner_links li a { color: #f8f8f8; text-decoration: none; }
+.banner_links li a:hover { color: #bbb; }
+.banner_links li:last-of-type { border: none; }
+
+/*----- Navigation -----*/
+	
+.navtabs { background: #f5b75e; margin: 0 0 5px 0; }
+.navtabs li { float: left; display: inline; width: 20%; }
+.navtabs a { display: block; padding: 11px 0; text-align: center; color: #fff; }
+.navtabs a:hover, 
+.navtabs a:active, 
+.navtabs .navtab_active a { background: rgba(255,255,255,0.2); }
+
+/*----- Big shiny buttons -----*/
+
+.newjob,
+.emrjob { float: left; display: inline; margin: 4px 15px 4px 0; }
+
+/* Big green button with soft corners */
+.newjob a { display: block; margin: 0 2px; padding: 10px 15px; font: bold 16px/100% Arial,Helvetica,sans-serif; text-decoration: none;
+	color: #E8F0DE; text-align: center; text-shadow: 0 1px 1px rgba(0, 0, 0, 0.5); border: 1px solid #538312; cursor: pointer; 
+  background-color: #7DB72F;
+  background-image: -webkit-gradient(linear, left top, left bottom, from(#7DB72F), to(#4E7D0E));
+  background-image: -webkit-linear-gradient(top, #7DB72F, #4E7D0E);
+  background-image:    -moz-linear-gradient(top, #7DB72F, #4E7D0E);
+  background-image:     -ms-linear-gradient(top, #7DB72F, #4E7D0E);
+  background-image:      -o-linear-gradient(top, #7DB72F, #4E7D0E);
+  background-image:         linear-gradient(to bottom, #7DB72F, #4E7D0E);
+   
+  -webkit-border-radius: 5px; -moz-border-radius: 5px; border-radius: 5px;
+	-moz-background-clip: padding; -webkit-background-clip: padding-box; background-clip: padding-box;
+  
+  -webkit-box-shadow: 0px 1px 2px 0px rgba(0, 0, 0, 0.2);
+     -moz-box-shadow: 0px 1px 2px 0px rgba(0, 0, 0, 0.2);
+          box-shadow: 0px 1px 2px 0px rgba(0, 0, 0, 0.2); }
+
+/* Red button with fully rounded corners */
+.emrjob a { display: block; margin: 0 2px; padding: 10px 15px; font: bold 16px/100% Arial,Helvetica,sans-serif; text-decoration: none;
+	color: #E8F0DE; text-align: center; text-shadow: 0 1px 1px rgba(0, 0, 0, 0.5); border: 1px solid #980C10; cursor: pointer; 
+  background-color: #ED1C24;
+  background-image: -webkit-gradient(linear, left top, left bottom, from(#ED1C24), to(#AA1317));
+  background-image: -webkit-linear-gradient(top, #ED1C24, #AA1317);
+  background-image:    -moz-linear-gradient(top, #ED1C24, #AA1317);
+  background-image:     -ms-linear-gradient(top, #ED1C24, #AA1317);
+  background-image:      -o-linear-gradient(top, #ED1C24, #AA1317);
+  background-image:         linear-gradient(to bottom, #ED1C24, #AA1317);
+   
+  -webkit-border-radius: 20px; -moz-border-radius: 20px; border-radius: 20px;
+	-moz-background-clip: padding; -webkit-background-clip: padding-box; background-clip: padding-box;
+  
+  -webkit-box-shadow: 0px 1px 2px 0px rgba(0, 0, 0, 0.2);
+     -moz-box-shadow: 0px 1px 2px 0px rgba(0, 0, 0, 0.2);
+          box-shadow: 0px 1px 2px 0px rgba(0, 0, 0, 0.2); }
+
+.newjob a:hover {
+	background-color: #6B9D28;
+  background-image: -webkit-gradient(linear, left top, left bottom, from(#6B9D28), to(#436B0C));
+  background-image: -webkit-linear-gradient(top, #6B9D28, #436B0C);
+  background-image:    -moz-linear-gradient(top, #6B9D28, #436B0C);
+  background-image:     -ms-linear-gradient(top, #6B9D28, #436B0C);
+  background-image:      -o-linear-gradient(top, #6B9D28, #436B0C);
+  background-image:         linear-gradient(to bottom, #6B9D28, #436B0C); }
+  
+.emrjob a:hover { 
+	background-color: #C9151B;
+  background-image: -webkit-gradient(linear, left top, left bottom, from(#C9151B), to(#A11115));
+  background-image: -webkit-linear-gradient(top, #C9151B, #A11115);
+  background-image:    -moz-linear-gradient(top, #C9151B, #A11115);
+  background-image:     -ms-linear-gradient(top, #C9151B, #A11115);
+  background-image:      -o-linear-gradient(top, #C9151B, #A11115);
+  background-image:         linear-gradient(to bottom, #C9151B, #A11115); }
+
+
+/*----- Tables -----*/
+
+table { background: #fff; margin: 0 0 5px 0; border-top: 1px solid #ccc; border-left: 1px solid #ccc; }
+table thead { background: #bbb; }
+table th { font-weight: bold; }
+table th, table td { border-bottom: 1px solid #ccc; border-right: 1px solid #ccc; padding: 3px 5px; text-align: left; }
+table tbody tr:nth-of-type(even) { background: #f9f9f9; }
+table tbody tr:hover { background: #eee; }
+
+/*----- Forms -----*/
+
+form fieldset { margin: 0 0 5px 0; }
+form label, form input { float: left; display: inline; }
+form label { width: 105px; text-align: right; margin: 0 8px 0 0; }
+form input[type="text"] { width: 200px; }
+form textarea { width: 300px; max-width: 300px; min-height: 100px; }
+form input[type="submit"] { float: right; }
+
+/*----- Recent activity -----*/
+
+.contain { margin: 0 0 5px 0; border: 1px solid #ccc; }
+.activity_row { position: relative; background: #f9f9f9; padding: 10px; }
+.activity_row:nth-of-type(even) { background: #e9e9e9; padding: 10px; }
+.activity_icon { float: left; display: inline; margin: 0 10px 10px 0; }
+.activity_row strong { color: #333; font-weight: bold; }
+.activity_row small { font-size: 12px; color: #666; }
+.activity_row span { position: absolute; top: 10px; right: 10px; }
+
+/*----- Progress bar -----*/
+
+.progress { position: relative; border: 1px solid #444; }
+.progress p { position: relative; padding: 0; z-index: 99; }
+.progress span { position: absolute; top: 0; left: 0; background: #faad62; display: block; height: 100%; text-indent: -9999px; z-index: 1; }
+
+/*----- Footer -----*/
+
+#footer { margin: 10px 15px; /* margin keeps inline with content and header */ }
+
+/*----- micro clearfix -----*/
+
+.cf:before, .cf:after { content: ""; display: table; }
+.cf:after { clear: both; }
+.cf { zoom: 1; }
+
+/* code styling used for this documentation page only */
+
+.code { background: #e9f4f8; height: 300px; max-height: 300px; width: 48%; max-width: 48%; margin: 0 2% 0 0; padding: 5px; -moz-tab-size: 1; border: medium none;
+color: #3E4549; font-family: 12px/14px Monaco,monospace; outline: medium none; white-space: pre; text-align: left;
+-webkit-border-radius: 5px; -moz-border-radius: 5px; border-radius: 5px;
+-moz-background-clip: padding; -webkit-background-clip: padding-box; background-clip: padding-box; } 
+
+

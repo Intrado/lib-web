@@ -68,7 +68,8 @@ include("nav.inc.php");
 
 startWindow("Select a Template"  . help('Reports_SelectATemplate'), 'padding: 3px;');
 ?>
-	<table border="1" width="100%" cellpadding="3" cellspacing="1" class="list" >
+	<table class="list" >
+	<thead>
 		<tr class="listHeader">
 			<th align="left" class="nosort">Job and Date Range</th>
 			<th align="left" class="nosort">Individual</th>
@@ -76,55 +77,68 @@ startWindow("Select a Template"  . help('Reports_SelectATemplate'), 'padding: 3p
 			<th align="left" class="nosort">Other</th>
 <? } ?>
 		</tr>
+	</thead>
+	<tbody>
 		<tr align="left" valign="top">
 			<td>
-				<table>
-					<tr><td><a href='reportjobsearch.php?clear=1' >Notification Summary</a></td></tr>
+				<ul>
+					<li><a href='reportjobsearch.php?clear=1' >Notification Summary</a></li>
 <? if($USER->authorize('viewsystemreports') || $USER->authorize("sendphone")){ ?>
-					<tr><td><a href='reportjobdetailsearch.php?clear=1&type=phone' >Phone Log</a></td></tr>
+					<li><a href='reportjobdetailsearch.php?clear=1&type=phone' >Phone Log</a></li>
 <?
 	}
 	if($USER->authorize('viewsystemreports') || $USER->authorize("sendemail")){
 ?>
-					<tr><td><a href='reportjobdetailsearch.php?clear=1&type=email' >Email Log</a></td></tr>
+					<li><a href='reportjobdetailsearch.php?clear=1&type=email' >Email Log</a></li>
 <?
 	}
 	if(getSystemSetting('_hassms', false) && ($USER->authorize('viewsystemreports') || $USER->authorize("sendsms"))) {
 ?>
-					<tr><td><a href='reportjobdetailsearch.php?clear=1&type=sms' >SMS Log</a></td></tr>
+					<li><a href='reportjobdetailsearch.php?clear=1&type=sms' >SMS Log</a></li>
 <?	}
 	if((getSystemSetting('_hasfacebook', false) || getSystemSetting('_hastwitter', false) && ($USER->authorize('viewsystemreports') || $USER->authorize("facebookpost") || $USER->authorize("twitterpost")))) {
 ?>
-					<tr><td><a href='reportsocialmediasearch.php?clear=1' >Social Media Log</a></td></tr>
+					<li><a href='reportsocialmediasearch.php?clear=1' >Social Media Log</a></li>
 <?	}
 	if(getSystemSetting('_hassurvey', true) && ($USER->authorize('viewsystemreports') || $USER->authorize("survey"))){ ?>
-					<tr><td><a href='reportsurvey.php?clear=1' >Survey Results</a></td></tr>
+					<li><a href='reportsurvey.php?clear=1' >Survey Results</a></li>
 <?	}
 	if(getSystemSetting('_hastargetedmessage', false) && $USER->authorize('viewsystemreports')){ // Top level permission only
 ?>
-					<tr><td><a href='reportclassroomsearch.php?clear=1&type=organization'>Classroom Messaging Summary</a></td></tr>
+					<li><a href='reportclassroomsearch.php?clear=1&type=organization'>Classroom Messaging Summary</a></li>
 <? } ?>
-				</table>
+				</ul>
 			</td>
 			<td>
-				<table>
-					<tr><td><a href='reportcallssearch.php?clear=1' >Contact History</a></td></tr>
+				<ul>
+					<li><a href='reportcallssearch.php?clear=1' >Contact History</a></li>
 <?	
 	if(getSystemSetting('_hastargetedmessage', false) && $USER->authorize('viewsystemreports')){ // Top level permission only
 ?>
-					<tr><td><a href='reportclassroomsearch.php?clear=1&type=person' >Classroom Contact History</a></td></tr>
+					<li><a href='reportclassroomsearch.php?clear=1&type=person' >Classroom Contact History</a></li>
 <?  } ?>
-				</table>
+					<li>&nbsp;</li>
+					<li>&nbsp;</li>
+					<li>&nbsp;</li>
+					<li>&nbsp;</li>
+					<li>&nbsp;</li>
+				</ul>
 			</td>
 <? if ($USER->authorize('viewsystemreports')) { ?>
 			<td>
-				<table>
-					<tr><td><a href='reportarchive.php' >Systemwide Report Archive</a></td></tr>
-					<tr><td><a href='reportcontactchange.php?clear=1' >Contact Information Changes</a></td></tr>
-				</table>
+				<ul>
+					<li><a href='reportarchive.php' >Systemwide Report Archive</a></li>
+					<li><a href='reportcontactchange.php?clear=1' >Contact Information Changes</a></li>
+					<li>&nbsp;</li>
+					<li>&nbsp;</li>
+					<li>&nbsp;</li>
+					<li>&nbsp;</li>
+					<li>&nbsp;</li>
+				</ul>
 			</td>
 <? } ?>
 		</tr>
+	</tbody>
 	</table>
 <?
 endWindow();

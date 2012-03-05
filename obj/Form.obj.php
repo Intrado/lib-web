@@ -199,20 +199,15 @@ class Form {
 		$lasthelpstep = false;
 		$str = '';
 		foreach ($this->formdata as $name => $itemdata) {
-			// TODO: these options should be on the form and not the form item
-			$showicon = (isset($itemdata['renderoptions']) && isset($itemdata['renderoptions']['icon'])) ? $itemdata['renderoptions']['icon'] : true;
-			$showlabel = (isset($itemdata['renderoptions']) && isset($itemdata['renderoptions']['label'])) ? $itemdata['renderoptions']['label'] : true;
-			$showerrormessage = (isset($itemdata['renderoptions']) && isset($itemdata['renderoptions']['errormessage'])) ? $itemdata['renderoptions']['errormessage'] : true;
-
 			//check for section titles
 			if (is_string($itemdata)) {
 				if ($lasthelpstep) {
-					$str .= '</table></fieldset>';
+					$str .= '</fieldset>';
 					$lasthelpstep = false;
 				}
 
 				$str .= '
-					<h2>'.$itemdata.'</h2>';
+					<h2 class="formsectionheader">'.$itemdata.'</h2>';
 				unset($this->formdata[$name]); //hide these from showing up in data sent to form_load
 				continue;
 			}
@@ -235,44 +230,26 @@ class Form {
 
 			if ($lasthelpstep && $lasthelpstep != $itemdata['helpstep']) {
 				$str .= '
-			</table></fieldset>';
+			</fieldset>';
 			}
 
 			if ($lasthelpstep != $itemdata['helpstep']) {
 				$lasthelpstep = $itemdata['helpstep'];
-				$str .= '<fieldset id="'. $this->name . '_helpsection_'.$lasthelpstep.'"><table summary="" width="100%" cellspacing="0" table-layout="fixed" class="formcontenttable">';
+				$str .= '<fieldset id="'. $this->name . '_helpsection_'.$lasthelpstep.'">';
 			}
 
 			$n = $this->name."_".$item->name;
 			$l = $itemdata['label'];
 
 			if ($formclass == "FormHtml") {
-				switch ($this->rendermode) {
-					case "vertical":
-						$str.= '
-							<tr>
-								<td>
-									<table class="formcontenttable" width=100%>
-										<tr><th class="formtableheader" style="text-align:left" colspan=2><label class="formlabel" for="'.$n.'" >'.$l.'</label></th></tr>
-										<tr>
-											<td class="formtableicon"></td>
-											<td class="formtablecontrol">'.$item->render("").'</td>
-										</tr>
-									</table>
-								</td>
-							</tr>
-							';
-						break;
-					case "normal":
-					default:
-						$str.= '
-							<tr>
-								' . ($showlabel ? '<th class="formtableheader"><label class="formlabel" for="'.$n.'" >'.$l.'</label></th>' : '') . '
-								' . ($showicon ? '<td class="formtableicon"></td>' : '') . '
-								<td class="formtablecontrol"'.((!$showlabel || !$showicon) ? ' colspan="3"' : '').'>'.$item->render('').'</td>
-							</tr>
-							';
-				}
+
+				$str.= '
+						<div class="formfieldarea cf ' . $this->rendermode . '" id="'.$n.'_fieldarea" '.$style.'>
+							<!--div class="formlabel" -->'.$l.'<!--/div-->
+							<!--div class="formicon"></div-->
+							<!--div class="formcontrol"-->'.$item->render("").'<!--/div-->
+						</div>
+						';
 				
 				unset($this->formdata[$name]); //hide these from showing up in data sent to form_load
 			} else {
@@ -302,61 +279,38 @@ class Form {
 					if ($valresult === true) {
 						$i = "img/icons/accept.gif";
 						$alt = "Valid";
-						$style = 'style="background: rgb(255,255,255);"' ; //rgb(225,255,225)
+						$style = 'style="background: rgb(242,242,242);"' ; //rgb(225,255,225)
 						$msg = false;
 					} else {
 						list($validator,$msg) =  $valresult;
 						$i = "img/icons/exclamation.gif";
 						$alt = "Validation Error";
-						$style = 'style="background: rgb(255,200,200);"' ;
+						$style = 'style="background: rgb(242,242,242);"' ;
 					}
 				} else if (!$this->getSubmit() && $isblank && $isrequired) {
 					//show required highlight
 					$i = "img/icons/error.gif";
 					$alt = "Required Field";
-					$style = 'style="background: rgb(255,255,220);"' ;
+					$style = 'style="background: rgb(242,242,242);"' ;
 				}
 			
-				switch ($this->rendermode) {
-					case "vertical":
-						$str.= '
-							<tr id="'.$n.'_fieldarea" '.$style.'>
-								<td>
-									<table class="formcontenttable" width=100%>
-										<tr><th class="formtableheader" style="text-align:left" colspan=2><label class="formlabel" for="'.$n.'" >'.$l.'</label></th></tr>
-										<tr>
-											<td class="formtableicon"><img alt="'.$alt.'" title="'.$alt.'" id="'.$n.'_icon" src="'.$i.'" /></td>
-											<td class="formtablecontrol">
-												'.$item->render($value).'
-												<div id="'.$n.'_msg" class="underneathmsg">'.($msg ? $msg : "").'</div>
-											</td>
-										</tr>
-									</table>
-								</td>
-							</tr>
-							';
-						break;
-						
-					case "normal":
-					default:
-						$str.= '
-						<tr id="'.$n.'_fieldarea" '.$style.'>
-							'.($showlabel ? '<th class="formtableheader"><label class="formlabel" for="'.$n.'" tabindex="'.$t.'" >'.$l.'</label></th>' : '').'
-							'.($showicon ? '<td class="formtableicon"><img alt="'.$alt.'" title="'.$alt.'" id="'.$n.'_icon" src="'.$i.'" /></td>' : '').'
-							<td class="formtablecontrol">
-								'.$item->render($value).'
-								'.($showerrormessage ? '<div id="'.$n.'_msg" class="underneathmsg">'.($msg ? $msg : "").'</div>' : '').'
-							</td>
-						</tr>
-						';
-				}
+				$str.= '
+					<div class="formfieldarea cf ' . $this->rendermode . '" id="'.$n.'_fieldarea" '.$style.'>
+						<label class="formlabel" for="'.$n.'" >'.$l.'</label>
+						<img class="formicon" alt="'.$alt.'" title="'.$alt.'" id="'.$n.'_icon" src="'.$i.'" />
+						<!--div class="formcontrol"-->
+											'.$item->render($value).'
+						<!--/div-->
+						<div id="'.$n.'_msg" class="underneathmsg cf">'.($msg ? $msg : "").'</div>
+					</div>
+					';
 				
 			}
 		} //foreach
 
 		if ($lasthelpstep)
 			$str .= '
-			</table></fieldset>';
+			</fieldset>';
 
 		return $str;
 	}
@@ -374,11 +328,11 @@ class Form {
 			$str .= $this->renderJavascriptLibraries();
 		
 		$str .= '
-		<div class="newform_container">
-		' . (empty($this->parentform) ? '<form class="newform" id="'.$this->name.'" name="'.$this->name.'" method="POST" action="'.$posturl.'">
+		<div class="newform_container cf">
+		<form class="newform" id="'.$this->name.'" name="'.$this->name.'" method="POST" action="'.$posturl.'">
 		<!--[if IE]><input type="text" style="display: none;" disabled="disabled" size="1" /><![endif]-->
-		<input name="'.$this->name.'-formsnum" type="hidden" value="' . $this->serialnum . '">' : '') . '
-		<table summary="Form" width="100%" cellspacing="0" cellpadding="0" table-layout="fixed" ><tr><td valign="top"> <!-- FORM CONTENT -->';
+		<input name="'.$this->name.'-formsnum" type="hidden" value="' . $this->serialnum . '">
+		<table summary="Form" class="form_table" ><tr><td valign="top"> <!-- FORM CONTENT -->';
 
 		$str .= $this->renderFormItems();
 
@@ -409,15 +363,9 @@ class Form {
 				</td>
 			</tr>
 		</table>
-		
-		' . (empty($this->parentform) ? '</form>' : '') . '
-
-
-
+		</form>
 		</div>
-		<div style="clear: both;"></div>
-
-		' . (empty($this->parentform) ? '
+		
 		<script type="text/javascript">
 
 		form_load("'.$this->name.'",
@@ -427,11 +375,9 @@ class Form {
 			'.($this->ajaxsubmit ? "true" : "false").'
 		);
 		</script>
-		' : '');
+		';
 		
-		if (empty($this->parentform)) {
-			$str .= $this->renderJavascript();
-		}
+		$str .= $this->renderJavascript();
 		
 		return $str;
 	}

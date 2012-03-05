@@ -52,9 +52,7 @@ if (isset($_GET['monitor'])) {
 	<script>
 		var _brandtheme = "classroom";
 	</script>
-
-	<IFRAME src="blank.html" id="blocker" style="DISPLAY: none; LEFT: 0px; POSITION: absolute; TOP: 0px" frameBorder="0" scrolling="no"></IFRAME>
-
+	
 <!-- ********************************************************************* -->
 <image src="manager.png">
 

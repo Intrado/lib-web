@@ -119,42 +119,36 @@ include_once("logintop.inc.php");
 
 <? if ($custname) { ?>
 
-	<div style="margin-top: 25px; margin-left: 25px;">
-		<div class="indexdisplayname"><?=escapehtml($custname)?></div>
 		<noscript><p><?=_L("It looks like you don't have JavaScript enabled! You must have JavaScript enabled for full use of this system. Please enable JavaScript in your browser or contact your system administrator for assistance.")?></p></noscript>
 
 <? if ($badlogin) { ?>
-		<div style="font-size: 12px; font-weight: bold; color: red;"><?=_L("Incorrect username/password. Please try again.")?>
-		</div>
+		<p class="error"><?=_L("Incorrect username/password. Please try again.")?></p>
 <? } else if ($softlock) { ?>
-		<div style="font-size: 12px; font-weight: bold; color: red;"><?=_L("You are temporarily locked out of the system.  Please contact your System Administrator if you have forgotten your password and try again later.")?></div>
+		<p class="error"><?=_L("You are temporarily locked out of the system.  Please contact your System Administrator if you have forgotten your password and try again later.")?></p>
 <? }  ?>
 		
-		<label class="indexform"><?=_L("Login:")?><br>
-		<input type="text" name="login" size="20" maxlength="20" id="logintext">
-		</label>
+		<fieldset>
+		<label class="indexform" for="form_login"><?=_L("Login:")?></label>
+		<input type="text" name="login" id="form_login" size="20" maxlength="20" id="logintext" />
+		</fieldset>
+
+		<fieldset>
+		<label class="indexform" for="form_password"><?=_L("Password:")?></label>
+		<input type="password" name="password" id="form_password" size="20" onkeypress="capslockCheck(event)" />
+		<em><?=_L("Passwords are case-sensitive.")?></em>
+		</fieldset>
 		
-		<br>
-
-
-		<label class="indexform"><?=_L("Password:")?><br>
-		<input type="password" name="password" size="20" onkeypress="capslockCheck(event)">
-		</label>
 		<div id="capslockwarning"  style="padding-left:3px; display:none; color:red;"><?=_L("Warning! Your Caps Lock key is on.")?><br></div>
 
-		<br>
-		
+		<fieldset>
 		<input type="submit" name="Submit" value="Sign In">
+		</fieldset>
 
+		<p class="right"><a href="forgotpassword.php"><?=_L("Forgot your password? Click Here")?></a></p>
 
-
-		<div style="margin-left: 50px; font-size: 9px; font-style: italic;"><?=_L("Passwords are case-sensitive.")?></div>
-
-		<br><div style="font-size: 10pt;"><a href="forgotpassword.php"><?=_L("Forgot your password? Click Here")?></a><br></div>
-	</div>
 
 <? } else { ?>
-		<div width="100%" style="font-size: 16px; font-weight: bold; color: red;">&nbsp;&nbsp;<?=_L("Invalid customer URL. Please check the web address and try again.")?></div>
+		<p>&nbsp;&nbsp;<?=_L("Invalid customer URL. Please check the web address and try again.")?></p>
 <? }?>
 	</form>
 <?

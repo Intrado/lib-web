@@ -96,22 +96,6 @@ function enable(exc, obj, yes) {
 	}
 }
 
-function setIFrame(div) {
-	if(div == null) {
-		iframe.style.display = 'none';
-		iframe.style.top = 0;
-		iframe.style.left = 0;
-		iframe.style.width = 1;
-		iframe.style.height = 1;
-	} else {
-		iframe = new getObj('blocker').obj;
-		iframe.style.top = div.offsetTop;
-		iframe.style.left = div.offsetLeft;
-		iframe.style.width = div.offsetWidth;
-		iframe.style.height = div.offsetHeight;
-		iframe.style.display = 'block';
-	}
-}
 
 function popup(url, width, height) {
 	window.open(url, '_blank', 'width=' + width + ',height=' + height + 'location=no,menubar=no,resizable=yes,scrollbars=yes,status=no,titlebar=no,toolbar=no');
