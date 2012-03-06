@@ -1924,6 +1924,7 @@ class JobWiz_scheduleAdvanced extends WizStep {
 						"fieldhelp" => ("This features allows you to override the number that will display on recipient's Caller IDs."),
 						"value" => getDefaultCallerID(),
 						"validators" => array(
+							array("ValRequired"),
 							array("ValLength","min" => 0,"max" => 20),
 							array("ValPhone"),
 							array("ValCallerID")
