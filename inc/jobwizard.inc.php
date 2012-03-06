@@ -1917,13 +1917,12 @@ class JobWiz_scheduleAdvanced extends WizStep {
 		if ($wizHasPhoneMsg) {
 			if (!getSystemSetting('_hascallback', false) && (getSystemSetting("requireapprovedcallerid",false) || $USER->authorize('setcallerid'))) {
 				$callerids = getAuthorizedUserCallerIDs($USER->id);
-				$callerid = $USER->getSetting("callerid", getSystemSetting("callerid"));
 				
 				$helpsteps[] = _L("This option will set the number displayed on the recipient's home or cellular phone.");
 				$formdata["callerid"] = array(
 						"label" => _L("Caller ID"),
 						"fieldhelp" => ("This features allows you to override the number that will display on recipient's Caller IDs."),
-						"value" => (in_array($callerid, $callerids)?$callerid:""),
+						"value" => getDefaultCallerID(),
 						"validators" => array(
 							array("ValLength","min" => 0,"max" => 20),
 							array("ValPhone"),
