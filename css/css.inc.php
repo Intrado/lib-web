@@ -697,12 +697,10 @@ div.autocomplete ul li {
 }
 
 .messagegrid {
-vertical-padding: 20px; /* FIXME */
 text-align: center;
 }
-.messagegrid .messagegridheader{
-	padding: 0 15px 3px 15px;
-	white-space: nowrap;
+.messagegrid .messagegridheader {
+	padding: 2px;
 }
 .messagegrid .messagegridheader img{
 	margin-bottom: -3px;
