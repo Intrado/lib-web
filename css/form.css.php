@@ -86,10 +86,6 @@ form.newform {
 
 /* fieldset is a container for a set of field elements, typ associated with a help page */
 
-.newform fieldset { border: none; padding: 8px; background-color: #f1f1f1;
- -webkit-border-radius: 7px; -moz-border-radius: 7px; border-radius: 7px;
- -moz-background-clip: padding; -webkit-background-clip: padding-box; background-clip: padding-box; }
-
 .newform h2 {
 	margin-top: .5em; 
 	padding: 0.3125em 0.625em 0 ;
@@ -105,19 +101,29 @@ form.newform {
 /* ----------------------------- */
 /* -------- CSS redesign ------- */
 
+.newform fieldset { background: #f1f1f1; width: 650px; margin-bottom: 1em; padding: 8px; border: none;
+ -webkit-border-radius: 7px; -moz-border-radius: 7px; border-radius: 7px;
+ -moz-background-clip: padding; -webkit-background-clip: padding-box; background-clip: padding-box; }
+ 
+ .newform .formtitle { float: left; display: inline; width: 140px; }
+.newform .formcontrol { float: left; display: inline; width: 510px; }
+ 
 .newform select, .newform input { -webkit-transition: all 0.3s ease-out; -moz-transition: all 0.3s ease-out; -ms-transition: all 0.3s ease-out; -o-transition: all 0.3s ease-out; transition: all 0.3s ease-out; }
 
-.newform .formlabel { float: left; display: inline; width: 20%; padding: 6px 0 0; text-align: right; font-weight: bold; font-size: 1.1em; }
-.newform .formicon { float: left; display: inline; width: 16px; height: 16px; margin: 0 5px; padding: 6px 0 0; }
-.newform input[type="text"] { float: left; display: inline; width: 30%; margin: 3px 0; padding: 4px 6px; border: 1px solid #E7E7E7; 
+.newform .formlabel { float: left; display: inline; width: 110px; padding: 6px 0 0; text-align: right; font-weight: bold; font-size: 1.1em; }
+.newform .formicon { float: left; display: inline; width: 16px; height: 16px; margin: 0 7px; padding: 6px 0 0; }
+.newform input[type="text"] { float: left; display: inline; width: 240px; margin: 3px 0; padding: 4px 5px; border: 1px solid #E7E7E7; 
 -webkit-border-radius: 5px; -moz-border-radius: 5px; border-radius: 5px; 
 -moz-background-clip: padding; -webkit-background-clip: padding-box; background-clip: padding-box; }
-.newform .underneathmsg { background-color: none; float: left; display: inline; width: 75%; font-weight: bold; color: #cc0000; margin: 0 0 3px 20%; padding: 0 0 0 26px; }
 .newform input[type="checkbox"] { float: left; display: inline; margin: 0 5px 0 0; }
+.newform textarea { width: 300px; }
+.newform .underneathmsg { background-color: none; float: left; display: inline; width: 100%; padding: 0 0 3px 140px; font-weight: bold; color: #cc0000; 
+-moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box; }
 
-.newform .radiobox { float: left; display: inline; padding: 7px 0; }
-.newform .radiobox > input[type="radio"], .newform .radiobox > input[type="checkbox"] { float: left; display: inline; margin: 0 5px 0 0; }
-.newform .radiobox > label { float: left; display: inline; margin: 0 10px 0 0; }
+.newform .radiobox { float: left; display: inline; width: 250px; margin: 0; padding: 7px 0 0; list-style-type: none; }
+.newform .radiobox li { height: 25px; }
+.newform .radiobox input[type="radio"], .newform .radiobox input[type="checkbox"] { float: left; display: inline; margin: 0 5px 0 0; }
+.newform .radiobox label { float: left; display: inline; margin: 0 10px 0 0; }
 
 .newform select  { margin: 3px 0; padding: 4px 6px; border: 1px solid #E7E7E7; 
 -webkit-border-radius: 5px; -moz-border-radius: 5px; border-radius: 5px; 
@@ -125,7 +131,7 @@ form.newform {
 
 .newform input[type="checkbox"], .radiobox input[type="checkbox"] { margin: 5px 0 0; }
 
-.newform .form_list_table { float: left; display: inline; width: 75%; margin: 0 0 0 20%; padding: 0 0 0 26px; }
+.newform .form_list_table { float: left; display: inline; width: 250px; margin: 0; padding: 0; }
 .newform .list { width: 100%; margin: 0 0 5px 0; }
 
 #cke_reusableckeditor { float: left; }
@@ -136,12 +142,7 @@ form.newform {
 	margin-left: 2px;
 }
 
-
 .newform .vertical .formicon { float: none; display: inline; }
-
-.newform .formcontrol { float: left; display: inline; margin: 1em; border: none; }
-
-.newform /*.formcontrol >*/ select 							{ /*width: 261px;*/ }
 
 .newform /*.formcontrol >*/ input[type="text"]:focus, 
 .newform /*.formcontrol >*/ select:focus { 
@@ -163,8 +164,6 @@ form.newform {
 .newform .formfieldarea { clear: both;
 -webkit-border-radius: 5px; -moz-border-radius: 5px; border-radius: 5px;
  -moz-background-clip: padding; -webkit-background-clip: padding-box; background-clip: padding-box; }
-
-.newform fieldset { margin-bottom: 1em; }
 
 
 /* ----------------- Form Validation --------------------- */
@@ -273,7 +272,7 @@ li.wizbuttonlist {
 -moz-background-clip: padding; -webkit-background-clip: padding-box; background-clip: padding-box; }
 
 .accordioncontentdiv ul.exist_list { margin: 0; padding: 0; list-style-type: none; }
-.accordioncontentdiv ul.exist_list li { float: left; display: inline; margin: 0 10px 0 0; }
+.accordioncontentdiv ul.exist_list li { display: block; height: 25px; }
 .accordioncontentdiv ul.exist_list li input { margin: 0 5px 0 0; }
 
 table#addMeWindow { width: 100%; }
