@@ -516,12 +516,12 @@ var RuleEditor = Class.create({
 			this.actionTD.update('<span style="cursor:help; font-style:italic; display:none; font-weight: bold;">&nbsp;</span>');
 		}
 
-		var fieldsetCSS = 'padding:3px; margin:0px;';
-		var fieldsetDivOptions = {'style':''};
-		this.fieldTD.insert(new Element('div', {'class':'RuleWidgetColumnDiv'})).insert(new Element('fieldset', {'id':'AddRuleFieldmap', style:fieldsetCSS}).insert(new Element('div', fieldsetDivOptions)));
-		this.criteriaTD.insert(new Element('div', {'class':'RuleWidgetColumnDiv'})).insert(new Element('fieldset', {'id':'AddRuleCriteria', style:fieldsetCSS}).insert(new Element('div', fieldsetDivOptions)));
-		this.valueTD.insert(new Element('div', {'class':'RuleWidgetColumnDiv'})).insert(new Element('fieldset', {'id':'AddRuleValue', style:fieldsetCSS}).insert(new Element('div', fieldsetDivOptions)));
-		this.actionTD.insert(new Element('div', {'class':'RuleWidgetColumnDiv'})).insert(new Element('fieldset', {'id':'AddRuleAction', style:fieldsetCSS}).insert(new Element('div', fieldsetDivOptions)));
+		var fieldsetCSS = '';
+		var fieldsetDivOptions = {};
+		this.fieldTD.insert(new Element('div', {'class':'RuleWidgetColumnDiv'})).insert(new Element('fieldset', {'id':'AddRuleFieldmap'}).insert(new Element('div', fieldsetDivOptions)));
+		this.criteriaTD.insert(new Element('div', {'class':'RuleWidgetColumnDiv'})).insert(new Element('fieldset', {'id':'AddRuleCriteria'}).insert(new Element('div', fieldsetDivOptions)));
+		this.valueTD.insert(new Element('div', {'class':'RuleWidgetColumnDiv'})).insert(new Element('fieldset', {'id':'AddRuleValue'}).insert(new Element('div', fieldsetDivOptions)));
+		this.actionTD.insert(new Element('div', {'class':'RuleWidgetColumnDiv'})).insert(new Element('fieldset', {'id':'AddRuleAction'}).insert(new Element('div', fieldsetDivOptions)));
 
 		containerTR.insert(this.fieldTD).insert(this.criteriaTD).insert(this.valueTD).insert(this.actionTD);
 
@@ -917,14 +917,14 @@ var RuleEditor = Class.create({
 	// NOTE: If you want add a toolbar, do add_multicheckbox_toolbar(new Element('div').update(make_multicheckbox()));
 	// Returns a div element containing the values as checkboxes, or returns a select element with a single option if there's just one value.
 	make_multicheckbox: function(values) {
-		var multicheckbox = new Element('div', {
-			'style': 'overflow:auto; padding-right: 2em; padding-bottom: 1em',
+		var multicheckbox = new Element('ul', {
+			//'style': 'overflow:auto; padding-right: 2em; padding-bottom: 1em',
 			'class': 'MultiCheckbox'
 		});
 		
-		var labelstyle = 'margin:0;padding:1px; font-size:90%;';
-		var checkboxstyle = 'font-size:90%;';
-		var divstyle = 'white-space:nowrap;';
+		//var labelstyle = 'margin:0;padding:1px; font-size:90%;';
+		//var checkboxstyle = 'font-size:90%;';
+		//var divstyle = 'white-space:nowrap;';
 		
 		// Determine if values is an array or an object of value:title pairs.
 		if (typeof(values.join) != 'undefined') { // values is an array.
@@ -940,17 +940,15 @@ var RuleEditor = Class.create({
 				
 				var checkbox = new Element('input', {
 					'type': 'checkbox',
-					'value': value,
-					'style': checkboxstyle
+					'value': value
 				});
 				
 				var label = new Element('label', {
-					'for': checkbox.identify(),
-					'style': labelstyle
+					'for': checkbox.identify()
 				}).update(value.escapeHTML());
 				
 				multicheckbox.insert(
-					new Element('div', {'style': divstyle}).insert(checkbox).insert(label)
+					new Element('li').insert(checkbox).insert(label)
 				);
 			}
 		} else { // values is an object of value:title pairs.
@@ -963,17 +961,15 @@ var RuleEditor = Class.create({
 				
 				var checkbox = new Element('input', {
 					'type': 'checkbox',
-					'value': value,
-					'style': checkboxstyle
+					'value': value
 				});
 				
 				var label = new Element('label', {
-					'for': checkbox.identify(),
-					'style': labelstyle
+					'for': checkbox.identify()
 				}).update(title.escapeHTML());
 				
 				multicheckbox.insert(
-					new Element('div', {'style': divstyle}).insert(checkbox).insert(label)
+					new Element('li').insert(checkbox).insert(label)
 				);
 				
 				max++;
