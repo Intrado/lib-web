@@ -105,14 +105,16 @@ form.newform {
  -webkit-border-radius: 7px; -moz-border-radius: 7px; border-radius: 7px;
  -moz-background-clip: padding; -webkit-background-clip: padding-box; background-clip: padding-box; }
  
- .newform .formtitle { float: left; display: inline; width: 140px; }
+.newform .formtitle { float: left; display: inline; width: 140px; }
 .newform .formcontrol { float: left; display: inline; width: 510px; }
+
+.newform .formcontrol fieldset, .newform .accordioncontentdiv fieldset {  width: 125px; padding: 0; margin: 0; background: none; } 
  
 .newform select, .newform input { -webkit-transition: all 0.3s ease-out; -moz-transition: all 0.3s ease-out; -ms-transition: all 0.3s ease-out; -o-transition: all 0.3s ease-out; transition: all 0.3s ease-out; }
 
 .newform .formlabel { float: left; display: inline; width: 110px; padding: 6px 0 0; text-align: right; font-weight: bold; font-size: 1.1em; }
 .newform .formicon { float: left; display: inline; width: 16px; height: 16px; margin: 0 7px; padding: 6px 0 0; }
-.newform input[type="text"] { float: left; display: inline; width: 240px; margin: 3px 0; padding: 4px 5px; border: 1px solid #E7E7E7; 
+.newform input[type="text"] { float: left; display: inline; /*width: 240px;*/ margin: 3px 0; padding: 4px 5px; border: 1px solid #E7E7E7; 
 -webkit-border-radius: 5px; -moz-border-radius: 5px; border-radius: 5px; 
 -moz-background-clip: padding; -webkit-background-clip: padding-box; background-clip: padding-box; }
 .newform input[type="checkbox"] { float: left; display: inline; margin: 0 5px 0 0; }
@@ -124,6 +126,11 @@ form.newform {
 .newform .radiobox li { height: 25px; }
 .newform .radiobox input[type="radio"], .newform .radiobox input[type="checkbox"] { float: left; display: inline; margin: 0 5px 0 0; }
 .newform .radiobox label { float: left; display: inline; margin: 0 10px 0 0; }
+
+.newform .MultiCheckbox { float: left; display: inline; width: 250px; margin: 0; padding: 7px 0 0; list-style-type: none; }
+.newform .MultiCheckbox li { height: 25px; }
+.newform .MultiCheckbox input[type="checkbox"] { float: left; display: inline; margin: 0 5px 0 0; }
+.newform .list th.MultiCheckbox label { float: left; display: inline; margin: 0 10px 0 0; }
 
 .newform select  { margin: 3px 0; padding: 4px 6px; border: 1px solid #E7E7E7; 
 -webkit-border-radius: 5px; -moz-border-radius: 5px; border-radius: 5px; 
@@ -278,12 +285,107 @@ li.wizbuttonlist {
 table#addMeWindow { width: 100%; }
 table#addMeWindow input[type="checkbox"] { margin: 7px 0; }
 
+.RuleWidgetColumnDiv { width: 200px; }
+
+
+/* ----- advanced message sender css -------------------------------- */
+
+/* common 
+-----------------*/
+
+.controlcontainer {
+	margin-bottom: 10px;
+	white-space: nowrap;
+}
+.controlcontainer .messagearea {
+	height: 205px; 
+	width: 100%
+}
+
+.controlcontainer .datafields {
+	font-size: 9px;
+	float: left;
+}
+.controlcontainer .datafieldsinsert {
+	font-size: 9px;
+	float: left;
+	margin-top: 8px;
+}
+
+.maincontainerleft {
+	float:left; 
+	margin-right:10px;
+}
+
+.maincontainerseperator {
+	float:left; 
+	width:15px; 
+}
+
+.maincontainerright {
+	float:left;
+	margin-left:10px; 
+	padding:6px; 
+	border: 1px solid #'.$_SESSION['colorscheme']['_brandtheme2'].';
+}
+
+
+/* email messages 
+--------------------*/
+
+.email .maincontainerleft {
+	width:65%; 
+}
+
+.email .maincontainerseperator {
+	margin-top:50px;
+}
+
+.email .maincontainerright {
+	width:20%; 
+}
+
+/* phone messages 
+-------------------*/
+
+.controlcontainer .library {
+	padding: 2px;
+	border: 1px dotted gray;
+}
+
+.controlcontainer .error {
+	white-space: normal;
+	font-style: italic;
+	color: red;
+}
+
+.controlcontainer .uploadiframe {
+	overflow: hidden;
+	width: 100%;
+	border: 0;
+	margin: 0;
+	padding: 0;
+	height: 2em;
+}
+
+.phone .maincontainerleft {
+	width:45%; 
+}
+
+.phone .maincontainerseperator {
+	margin-top:80px;
+}
+
+.phone .maincontainerright {
+	width:45%; 
+}
+
 
 /* +----------------------------------------------------------------+
 	 | Form styles for UI redesign                                    |
    +----------------------------------------------------------------+ */
 		
-		.form_table 		{ table-layout: auto; text-align: left; width: 100%;}
+		.form_table 		{ table-layout: auto; text-align: left; 900px; }
 		 .form_table td { vertical-align: top; }
 		 		
 		.form_fields, 
