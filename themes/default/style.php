@@ -40,11 +40,10 @@
 
 .pagetitle { font-weight: bold; color: <?=$primary?>;  }
 
-.newjob a { background: url(img/newjob.jpg) left top no-repeat; display: block; width: 123px; height: 122px; text-indent: -9999px; }
-.emrjob a { background: url(img/newemergency.jpg) left top no-repeat; display: block; width: 123px; height: 45px; text-indent: -9999px; }
+.newjob a { background: url(img/newjob.jpg) center top no-repeat; display: block; width: 100%; height: 122px; text-indent: -9999px; }
+.emrjob a { background: url(img/newemergency.jpg) center top no-repeat; display: block; width: 100%; height: 45px; text-indent: -9999px; }
 
-.newjob a:hover { background-image: url(img/newjob_over.jpg) }
-.emrjob a:hover { background-image: url(img/newemergency_over.jpg) }
+.newjob a:hover, .emrjob a:hover { background-position: center bottom; }
 
 .window {	-webkit-border-radius: 8px; -moz-border-radius: 8px; border-radius: 8px; 
 -webkit-box-shadow: 0 2px 6px #999; -moz-box-shadow: 0 2px 6px #999; box-shadow: 0 2px 6px #999; }
