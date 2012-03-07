@@ -242,7 +242,7 @@ class MultiCheckBox extends FormItem {
 		$n = $this->form->name."_".$this->name;
 		$style = isset($this->args['height']) ? ('style="height: ' . $this->args['height'] . '; overflow: auto;"') : '';
 
-		$str = '<div id='.$n.' class="radiobox" '.$style.'>';
+		$str = '<ul id='.$n.' class="radiobox" '.$style.'>';
 
 		$hoverdata = array();
 		$counter = 1;
@@ -254,7 +254,7 @@ class MultiCheckBox extends FormItem {
 			} else {
 				$id = $n.'-'.$counter;
 				$checked = $value == $checkvalue || (is_array($value) && in_array($checkvalue, $value));
-				$str .= '<input id="'.$id.'" name="'.$n.'[]" type="checkbox" value="'.escapehtml($checkvalue).'" '.($checked ? 'checked' : '').' /><label id="'.$id.'-label" for="'.$id.'">'.escapehtml($checkname).'</label>
+				$str .= '<li><input id="'.$id.'" name="'.$n.'[]" type="checkbox" value="'.escapehtml($checkvalue).'" '.($checked ? 'checked' : '').' /><label id="'.$id.'-label" for="'.$id.'">'.escapehtml($checkname).'</label></li>
 					';
 				if (isset($this->args['hover']) && $this->args['hover'][$checkvalue]) {
 					$hoverdata[$id] = $this->args['hover'][$checkvalue];
@@ -263,7 +263,7 @@ class MultiCheckBox extends FormItem {
 				$counter++;
 			}
 		}
-		$str .= '</div>
+		$str .= '</ul>
 		';
 		if (isset($this->args['hover']))
 			$str .= '<script type="text/javascript">form_do_hover(' . json_encode($hoverdata) .');</script>
