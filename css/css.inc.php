@@ -382,9 +382,12 @@ div.scrollTableContainer {
 	 | table overrides for list styles |
    +---------------------------------+ */
 
-table.list { width: 98%; border-left: 1px solid #ccc; border-bottom: 1px solid #ccc; border-top: 1px solid #ccc; margin: 1%;  }
+table.list { width: 100%; border-left: 1px solid #ccc; border-bottom: 1px solid #ccc; border-top: 1px solid #ccc; }
+table.list tr { background-color: #fbfbfb; }
+table.list tr.listHeader { background-color: #d4d4d4; vertical-align: top; }
+table.list tr.listAlt { background-color: #f1f1f1; }
 table.list th, table.list td { text-align: left; border-right: 1px solid #ccc; color: #484848; }
-table.list td { background: #f8f8f8; padding: 5px; }
+table.list td { padding: 5px; }
 table.list ul { list-style: none; padding: 0; margin: 0; }
 table.list ul li { padding: 6px 8px; }
 table.list ul li:nth-child(even) { background-color: #f1f1f1; }
@@ -392,11 +395,8 @@ table.list ul li:nth-child(even) { background-color: #f1f1f1; }
 table.usagelist { width: 100%; margin: 0; border: 1px solid #ccc; background-color: #f8f8f8;  }
 table.usagelist tr:nth-child(even) { background-color: #f1f1f1; }
 
-tr.listHeader 						{ background-color: #d4d4d4; vertical-align: top; }
 table > .listHeader > th 	{ text-align: left;  color: white; }
-tbody > tr.listAlt, 
-table > tr.listAlt 				{ background-color: #E1EDF8; }
-.listHeader > .label			{ padding: 2px; font-weight: normal; }
+.listHeader > .label { padding: 2px; font-weight: normal; }
 
 .form_table { width: 100%; }
 
