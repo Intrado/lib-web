@@ -42,25 +42,16 @@ class FormListSelect extends FormItem {
 			}
 		}
 		
-		$str = '<style type="text/css">
-			.list th {
-				overflow: hidden; white-space: nowrap; text-align:left
-			}
-			.listfooter {
-				font-weight: bold;
-			}
-			</style>';
-		
-		$str .= '<div id='.$n.' class="radiobox">';
+		$str .= '<ul id='.$n.' class="radiobox">';
 		
 		// add a checkbox for every list this user can use and check ones already selected
 		foreach ($lists as $id => $name) {
 			$checked = isset($listdetails[$id]);
-			$str .= '<input id="'. "$n-$id" .'" name="'.$n.'[]" type=checkbox value="'. $id .'" '. ($checked?'checked':'') .' onclick="formlistselectcheck(this.id, \''.$n.'\')"/>
-			<label for="'. "$n-$id" .'">'. $name .'</label>';
+			$str .= '<li><input id="'. "$n-$id" .'" name="'.$n.'[]" type=checkbox value="'. $id .'" '. ($checked?'checked':'') .' onclick="formlistselectcheck(this.id, \''.$n.'\')"/>
+			<label for="'. "$n-$id" .'">'. $name .'</label></li>';
 		}
 		
-		$str .= '</div>';
+		$str .= '</ul>';
 		
 		// create a table for the list details
 		$str .= '<div class="form_list_table">
