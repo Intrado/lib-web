@@ -485,15 +485,15 @@ function form_disable_helper(event) {
 
 	helper.style.display = "none";
 
-	new Effect.Morph(form.id + "_helpercell", {style: "width: 100px",
+	new Effect.Morph(form.id + "_helpercell", {style: "width: 200px",
 		afterFinish: function () {
 			form.select("legend").map(function (e) {
 				e.style.display = "none";
 			});
 			form.select("fieldset").map(function (e) {
 				e.style.border = "0px";
-				e.style.padding = "0px";
-				e.style.marginBottom = "0px";
+				//e.style.padding = "0px";
+				//e.style.marginBottom = "0px";
 			});
 		}
 	});
