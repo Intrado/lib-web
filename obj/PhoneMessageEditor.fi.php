@@ -38,60 +38,7 @@ class PhoneMessageEditor extends FormItem {
 		
 		$messagegroupid = (isset($this->args['messagegroupid'])?$this->args['messagegroupid']:false);
 		
-		// style 
-		$str = '
-			<style>
-				.controlcontainer {
-					margin-bottom: 10px;
-					white-space: nowrap;
-				}
-				.controlcontainer .messagearea {
-					height: 205px; 
-					width: 100%
-				}
-				.controlcontainer .library {
-					padding: 2px;
-					border: 1px dotted gray;
-				}
-				.controlcontainer .datafields {
-					font-size: 9px;
-					float: left;
-				}
-				.controlcontainer .datafieldsinsert {
-					font-size: 9px;
-					float: left;
-					margin-top: 8px;
-				}
-				.controlcontainer .error {
-					white-space: normal;
-					font-style: italic;
-					color: red;
-				}
-				.controlcontainer .uploadiframe {
-					overflow: hidden;
-					width: 100%;
-					border: 0;
-					margin: 0;
-					padding: 0;
-					height: 2em;
-				}
-				.maincontainerleft {
-					float:left; 
-					width:45%; 
-					margin-right:10px;
-				}
-				.maincontainerseperator {
-					float:left; 
-					width:15px; 
-					margin-top:80px;
-				}
-				.maincontainerright {
-					float:left; width:45%; 
-					margin-left:10px; 
-					padding:6px; 
-					border: 1px solid #'.$_SESSION['colorscheme']['_brandtheme2'].';
-				}
-			</style>';
+		// style - added into form.css.php in advanced message editor section
 		
 		// textarea for message bits
 		$textarea = '
@@ -164,7 +111,7 @@ class PhoneMessageEditor extends FormItem {
 		// main containers
 		// NOTE: audio library and uploadaudio only work when a messagegroup id is provided
 		$str .= '
-			<div>
+			<div class="phone">
 				<div class="maincontainerleft">
 					'.$textarea.'
 				</div>';

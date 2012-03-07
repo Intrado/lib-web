@@ -23,44 +23,7 @@ class EmailMessageEditor extends FormItem {
 		if (isset($this->args['subtype']))
 			$subtype = $this->args['subtype'];
 		
-			// style 
-		$str = '
-			<style>
-				.controlcontainer {
-					margin-bottom: 10px;
-					white-space: nowrap;
-				}
-				.controlcontainer .messagearea {
-					height: 205px; 
-					width: 100%
-				}
-				.controlcontainer .datafields {
-					font-size: 9px;
-					float: left;
-				}
-				.controlcontainer .datafieldsinsert {
-					font-size: 9px;
-					float: left;
-					margin-top: 8px;
-				}
-				.maincontainerleft {
-					float:left; 
-					width:65%; 
-					margin-right:10px;
-				}
-				.maincontainerseperator {
-					float:left; 
-					width:15px; 
-					margin-top:50px;
-				}
-				.maincontainerright {
-					float:left; width:20%; 
-					margin-left:10px; 
-					margin-top:15px; 
-					padding:6px; 
-					border: 1px solid #'.$_SESSION['colorscheme']['_brandtheme2'].';
-				}
-			</style>';
+		// style - added into form.css.php in advanced message editor section
 			
 		// textarea for message bits
 		$textarea = '
@@ -112,7 +75,7 @@ class EmailMessageEditor extends FormItem {
 		
 		// main containers
 		$str .= '
-			<div>
+			<div class="email">
 				<div class="maincontainerleft">
 					'.$textarea.'
 				</div>
