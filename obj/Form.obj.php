@@ -245,9 +245,11 @@ class Form {
 
 				$str.= '
 						<div class="formfieldarea cf ' . $this->rendermode . '" id="'.$n.'_fieldarea" '.$style.'>
-							<!--div class="formlabel" -->'.$l.'<!--/div-->
+							<div class="formtitle">
+								<span class="formlabel">'.$l.'</span>
+							</div>
 							<!--div class="formicon"></div-->
-							<!--div class="formcontrol"-->'.$item->render("").'<!--/div-->
+							<div class="formcontrol">'.$item->render("").'</div>
 						</div>
 						';
 				
@@ -261,11 +263,10 @@ class Form {
 				$style = "";
 				$msg = false;
 
-				//see if isrequired on any of the validators
+				//see if valrequired is any of the validators
 				$isrequired = false;
 				foreach ($itemdata['validators'] as $v) {
-					$validator = new $v[0]();
-					if ($validator->isrequired) {
+					if ($v[0] == "ValRequired") {
 						$isrequired = true;
 						break;
 					}
@@ -296,11 +297,13 @@ class Form {
 			
 				$str.= '
 					<div class="formfieldarea cf ' . $this->rendermode . '" id="'.$n.'_fieldarea" '.$style.'>
-						<label class="formlabel" for="'.$n.'" >'.$l.'</label>
-						<img class="formicon" alt="'.$alt.'" title="'.$alt.'" id="'.$n.'_icon" src="'.$i.'" />
-						<!--div class="formcontrol"-->
+						<div class="formtitle">
+							<label class="formlabel" for="'.$n.'" >'.$l.'</label>
+							<img class="formicon" alt="'.$alt.'" title="'.$alt.'" id="'.$n.'_icon" src="'.$i.'" />
+						</div>
+						<div class="formcontrol">
 											'.$item->render($value).'
-						<!--/div-->
+						</div>
 						<div id="'.$n.'_msg" class="underneathmsg cf">'.($msg ? $msg : "").'</div>
 					</div>
 					';
@@ -337,12 +340,10 @@ class Form {
 		$str .= $this->renderFormItems();
 
 		//submit buttons
-		$str .= '<div style="padding-top:12px;">';
 		foreach ($this->buttons as $code) {
 			$str .= $code;
 		}
-		$str .= '</div>';
-		
+
 		$str .= '
 				<div id="'.$this->name.'_spinner" class="formspinner" style="display: none;"><img src="img/ajax-loader.gif" alt="Loading..."></div>
 				<!-- END FORM CONTENT -->
