@@ -834,7 +834,7 @@ class JobWiz_messagePhoneText extends WizStep {
 					array("ValTtsText"),
 					array("ValLength","max" => 10000) // 10000 Characters is about 40 minutes of tts, considered to be more than enough
 				),
-				"control" => array("TextAreaPhone","width"=>"80%","rows"=>10,"language"=>"en","voice"=>"female"),
+				"control" => array("TextAreaPhone","rows"=>10,"language"=>"en","voice"=>"female"),
 				"helpstep" => 1
 			),
 			
