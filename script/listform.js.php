@@ -136,7 +136,7 @@ function listform_load(listformID, formData, postURL) {
 	ruleWidget = new RuleWidget($('ruleWidgetContainer'));
 	ruleEditor = ruleWidget.ruleEditor;
 
-	var buildListFieldset = new Element('fieldset',{'style':'border: 0; margin:0px; margin-top:20px; padding:0px;'});
+	var buildListFieldset = new Element('fieldset');
 	buildListFieldset.insert('<?=addslashes(icon_button(_L('Done Adding Rules To This List'),'accept'))?>');
 	
 	//hack/workaround to change the auto gererated ID from icon_button, lots of this code requires it has a specific id
@@ -666,7 +666,7 @@ function listform_reset_list_selectbox() {
 	}
 
 	if (datas.length > 0) {
-		multicheckbox = new Element('div');
+		multicheckbox = new Element('div', {'class':'HELLOOOOOO'});
 		var heightCSS = (datas.length > 8) ? 'height:200px;' : '';
 		var ul = new Element('ul', {'class': 'exist_list cf'});
 		var max = datas.length;
