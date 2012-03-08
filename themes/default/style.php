@@ -2,7 +2,7 @@
 
 /*----- Banner, adds in the logo background and moves the client name to sit above the account navigation -----*/
 
-.banner { background: <?=$topbg?>; border-bottom: 6px solid #3E693F;  }
+.banner { background: <?=$topbg?>; border-bottom: 6px solid <?=$primary?>;  }
 .banner_logo { background: url(img/shwoosh.png) right center no-repeat; padding: 0 91px 0 0; }
 .banner_logo a { background: #fff; padding: 8px 5px; }
 .banner_links_wrap { padding: 20px 0 0; }
@@ -15,7 +15,7 @@
 
 /*----- Navigation, adds images for link hover and active styles as well as bg image for the primary and sub nav bars -----*/
 
-.primary_nav { background: url("themes/classroom/main_nav_tab_bg.gif") repeat scroll 0 0 transparent; padding: 0 1%; border-top: 2px solid #B47727; }
+.primary_nav { background: url("themes/classroom/main_nav_tab_bg.gif") repeat scroll 0 0 transparent; padding: 0 1%; border-top: 2px solid <?=$theme2?>; }
 .navtabs li { background: url(themes/<?=$theme?>/main_nav_tab.gif); text-align: center; width: 100px; height: 20px; }
 .navtabs li.navtab_active { background: url(themes/<?=$theme?>/main_nav_tab_active.gif); }
 .navtabs li:hover { background: url(themes/<?=$theme?>/main_nav_tab_over.gif); }
