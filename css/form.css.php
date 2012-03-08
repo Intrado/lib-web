@@ -108,7 +108,10 @@ form.newform {
 .newform .formtitle { float: left; display: inline; width: 140px; }
 .newform .formcontrol { float: left; display: inline; width: 510px; }
 
-.newform .formcontrol fieldset, .newform .accordioncontentdiv fieldset {  width: 125px; padding: 0; margin: 0; background: none; } 
+.newform fieldset#AddRuleFieldmap { width: 140px; padding: 0; margin: 0; background: none; }
+.newform fieldset#AddRuleCriteria { width: 75px; padding: 0; margin: 0; background: none; }
+.newform fieldset#AddRuleValue { width: 125px; padding: 0; margin: 0; background: none; }
+.newform fieldset#AddRuleAction { width: 75px; padding: 0; margin: 0; background: none; } 
  
 .newform select, .newform input { -webkit-transition: all 0.3s ease-out; -moz-transition: all 0.3s ease-out; -ms-transition: all 0.3s ease-out; -o-transition: all 0.3s ease-out; transition: all 0.3s ease-out; }
 
@@ -284,8 +287,6 @@ li.wizbuttonlist {
 
 table#addMeWindow { width: 100%; }
 table#addMeWindow input[type="checkbox"] { margin: 7px 0; }
-
-.RuleWidgetColumnDiv { width: 200px; }
 
 
 /* ----- advanced message sender css -------------------------------- */
