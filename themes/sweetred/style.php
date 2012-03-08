@@ -109,12 +109,14 @@ font: bold 14px 'Helvetica Neue',Helvetica,arial,sans-serif; text-shadow: 0 1px 
 
 /*----- Buttons -----*/
 
-.btn { padding: 7px 12px; border: 1px solid #000; color: #fff; text-transform: uppercase;
+.btn { margin: 0 5px 5px 0; padding: 7px 12px; border: 1px solid #000; color: #fff; text-transform: uppercase;
 font: bold 12px 'Helvetica Neue',Helvetica,arial,sans-serif; text-shadow: 0 1px 0 #222; background: #DF0B0B;
 -webkit-border-radius: 5px; -moz-border-radius: 5px; border-radius: 5px;
 -moz-background-clip: padding; -webkit-background-clip: padding-box; background-clip: padding-box; 
 -webkit-box-shadow: inset 0px 0px 4px #555; -moz-box-shadow: inset 0px 0px 4px #555; box-shadow: inset 0px 0px 4px #555; }
+
 .btn:hover { background: #960606; color: #f9f9f9; }
+
 .btn_middle, .btn_left, .btn_right { width: auto; height: auto; margin: 0; padding: 0; }
 
 
