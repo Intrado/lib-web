@@ -1674,7 +1674,7 @@ class JobWiz_facebookPage extends WizStep {
 					array("ValFacebookPage", "authpages" => getFbAuthorizedPages(), "authwall" => getSystemSetting("fbauthorizewall"))),
 				"control" => array("FacebookPage", "access_token" => $USER->getSetting("fb_access_token", false)),
 				"helpstep" => $helpstepsnum++);
-			$helpsteps = array(_L("Select which Facebook pages you would like your message to be posted to."));
+			$helpsteps[] = _L("Select which Facebook pages you would like your message to be posted to.");
 		}
 		
 		if ($this->hasFeedMessage()) {
@@ -1698,7 +1698,7 @@ class JobWiz_facebookPage extends WizStep {
 					array("ValInArray", "values" => array_keys($categories))),
 				"control" => array("MultiCheckBox", "values"=>$categories, "hover" => FeedCategory::getFeedDescriptions()),
 				"helpstep" => $helpstepsnum);
-			$helpsteps = array(_L("Select the appropriate category for the RSS feed component of your message."));
+			$helpsteps[] = _L("Select the appropriate category for the RSS feed component of your message.");
 		}
 		
 		return new Form("facebookPage",$formdata,$helpsteps);
