@@ -12,7 +12,8 @@
 /*----- Blue theme site, uses css.inc.php as basic layout example can be seen in example.css -----*/
 
 body { background: #e8e8e8; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; }
-a { color: #179aff; }
+a { color: #484848; }
+a:visited { color: #484848; }
 a:hover { color: #333; }
 
 
@@ -26,17 +27,14 @@ a:hover { color: #333; }
 										     -moz-border-radius: 5px; 
 										          border-radius: 5px;
 										   -moz-background-clip: padding; -webkit-background-clip: padding-box; background-clip: padding-box;
-										                opacity: .8; 
+										                 
 										             -webkit-transition: all 0.3s ease-out;  
 										     -moz-transition: all 0.3s ease-out;  
 										      -ms-transition: all 0.3s ease-out;  
 										       -o-transition: all 0.3s ease-out;  
 										          transition: all 0.3s ease-out;}
 										             
-.banner_logo img:hover {  opacity: 1;
-													-webkit-box-shadow: 0px 0px 12px #fff; 
-										        -moz-box-shadow: 0px 0px 12px #fff; 
-										             box-shadow: 0px 0px 12px #fff;  }					             
+.banner_logo img:hover { -webkit-box-shadow: 0px 0px 12px #fff; -moz-box-shadow: 0px 0px 12px #fff; box-shadow: 0px 0px 12px #fff;  }					             
 										          
 .banner_custname { top: 24px; left: 255px; color: #fff; font-size: 1.5em; font-weight: bold; }
 
@@ -133,6 +131,20 @@ a:hover { color: #333; }
 
 #t_zoom a, .feedtitle a:hover { color: #179AFF; }
 #t_zoom a:hover, .feedtitle a, .feed_content a, .feed_item a { color: #333; }
+
+
+/*----- Buttons, changes to the basic buttons featured across the site -----*/
+
+.btn { background: #c6c6c6; margin: 0 8px 5px 0; padding: 4px 0; border: none; color: #444; cursor: pointer; border: 1px solid #8a8a8a; 
+-webkit-border-radius: 5px; -moz-border-radius: 5px; border-radius: 5px; 
+-moz-background-clip: padding; -webkit-background-clip: padding-box; background-clip: padding-box; 
+-webkit-box-shadow: inset 0px 0px 2px #fff; -moz-box-shadow: inset 0px 0px 2px #fff; box-shadow: inset 0px 0px 2px #fff; }
+
+.btn:hover { background: #dbdbdb;
+-webkit-box-shadow: 0px 1px 3px #777; -moz-box-shadow: 0px 1px 3px #777; box-shadow: 0px 1px 3px #777; }
+
+.btn:focus { background: #b2b2b2; color: #333;
+-webkit-box-shadow: inset 0px 1px 3px #777; -moz-box-shadow: inset 0px 1px 3px #777; box-shadow: inset 0px 1px 3px #777; }
           
 
 /* +----------------------------------------------------------------+
