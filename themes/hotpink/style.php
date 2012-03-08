@@ -1,8 +1,8 @@
 /*----- Hotpink theme site, uses css.inc.php as basic layout example can be seen in example.css -----*/
 
 body { background: #424242; }
-a { color: #333; }
-a:hover { color: <?=$theme1?>; }
+a, a:visited { color: #333; }
+a:hover { color: #FF1493; }
 
 /*----- Banner, adds in the grey background and moves the client name to sit next to the logo image -----*/
 
@@ -71,7 +71,7 @@ a:hover { color: <?=$theme1?>; }
 .feedfilter a { display: block; padding: 5px 8px 5px 12px; border-bottom: 1px dashed #ccc; }
 .feedfilter img { margin: 0 8px 0 0; }
 
-.feed_item a { color: #333; }
+.feed_item a, .feed_content a:hover { color: #333; }
 .feedtitle a:hover, .actionlink:hover { color: #FF1493; }
 
 
