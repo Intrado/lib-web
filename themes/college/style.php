@@ -19,7 +19,7 @@
 
 body { background: #F2F0E4; }
 body, table, form, select, input { font-family: 'Helvetica Neue', Helvetica, arial, sans-serif;	/*font-size: 13px;*/ }
-a { color: #484848; }
+a, a:visited { color: #484848; }
 a:hover { color: #286FBE; }
 
 
@@ -164,7 +164,7 @@ background-image: -webkit-gradient(linear, left top, left bottom, from(#FCF4DC),
    
    
 button { border: none; background-color: transparent; }
-.btn { margin: .25em .5em; border: none; background: transparent; font-weight: bold; cursor: pointer; }*/
+.btn { margin: .25em .5em .25em 0; border: none; background: transparent; font-weight: bold; cursor: pointer; }*/
 .btn_wrap { white-space: nowrap; position: relative; } 
 .btn_hide { position: absolute; left: -9999px; top: -9999px; }
 
