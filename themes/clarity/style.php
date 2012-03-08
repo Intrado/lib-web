@@ -189,7 +189,7 @@ background: linear-gradient(top, #eae9e9 0%,#e1e0e0 50%,#d9d9d9 51%,#c4c4c4 100%
 /*----- Window buttons -----*/
    
 button { border: none; background-color: transparent; }
-.btn { margin: .25em .5em; border: none; background: transparent; font-weight: bold; cursor: pointer; }*/
+.btn { margin: .25em .5em .25em 0; border: none; background: transparent; font-weight: bold; cursor: pointer; }*/
 .btn_wrap { white-space: nowrap; position: relative; } 
 .btn_hide { position: absolute; left: -9999px; top: -9999px; }
 .btn_left, .btn_right { width: 0; height: 0; padding: 0; }
