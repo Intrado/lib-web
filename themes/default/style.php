@@ -1,5 +1,8 @@
 /*----- Default theme for site, uses css.inc.php as basic layout example can be seen in example.css -----*/
 
+a, a:visited { color: #484848; }
+a:hover { color: <?=$theme1?>; }
+
 /*----- Banner, adds in the logo background and moves the client name to sit above the account navigation -----*/
 
 .banner { background: <?=$topbg?>; border-bottom: 6px solid <?=$primary?>;  }
