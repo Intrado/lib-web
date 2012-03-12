@@ -291,8 +291,8 @@ startWindow(_L('My Messages'), 'padding: 3px;', false, true);
 	
 	<div id="pagewrappertop" class="content_recordcount_top"></div>
 
-	<table id="feeditems" class="content_feed">
-			<tbody>
+	<div id="feeditems" class="content_feed">
+			<table><tbody>
 				<tr>
 					<td class=""><img src='img/ajax-loader.gif' /></td>
 					<td>
@@ -301,8 +301,8 @@ startWindow(_L('My Messages'), 'padding: 3px;', false, true);
 						</div>
 					</td>
 				</tr>
-			</tbody>
-		</table>
+			</tbody></table>
+		</div>
 	<div id="pagewrapperbottom" class="content_recordcount_btm"></div>
 	
 </div><!-- .cesc .window_main -->
@@ -325,7 +325,7 @@ function applyfilter(filter) {
 		onSuccess: function (response) {
 			var result = response.responseJSON;
 			if(result) {
-				$('feeditems').update(new Element('div', {'class': 'content_feed cf'}));
+				$('feeditems').update(new Element('div', {'class': 'content_feed'}));
 				var size = result.list.length;
 
 				for(var i=0;i<size;i++){
