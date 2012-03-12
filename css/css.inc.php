@@ -303,7 +303,7 @@ table_left and table_right have the arrow controls, set to 8% width for 1024 scr
 .start_page, db_fl { display: block; float: left; }
 
 .content_recordcount_top, 
-.content_recordcount_btm { display: block; float: right; padding-bottom: .5em; }
+.content_recordcount_btm { display: block; padding-bottom: .5em; }
 .content_recordcount_top {  }
 .content_recordcount_btm { padding-top: .5em; }
 .content_recordcount { text-align: right; margin: 0;}
@@ -349,21 +349,30 @@ div.scrollTableContainer {
 
 
 
-/*----- action links - used on prototip links on message tools -----*/
+/*----- action links - edit, copy etc used througout site -----*/
 
-.actionlink { border: 0px; white-space: nowrap; text-decoration: none; cursor: pointer; color: #484848; }
-.actionlink:hover { color: #000; }
-.actionlink img { border: 0px; padding: 0px; padding-top: 0.2em; padding-left: 3px; padding-right: 3px; margin: 0px; }
-.actionlinks { white-space: nowrap; }
+ul.actionlinks { padding: 0; margin: 0; list-style-type: none; }
+ul.actionlinks li { float: left; display: inline; padding: 0 4px 0 0; border-right: 1px solid #aaa; }
+ul.actionlinks li:last-child { border: none; }
+ul.actionlinks li a { display: block; font-size: 11px; line-height: 18px; border: 0px; cursor: pointer; color: #484848; }
+ul.actionlinks li a:hover { color: #000; }
+ul.actionlinks li img { padding: 0 4px; }
+
+/*----- items need to appear in vertical list on homepage -----*/
+
+.tooltip ul.actionlinks li { float: none; display: block; border: none; }
+
+/*----- removed the padding and background colour set elsewhere -----*/
+
+table.list ul.actionlinks li { margin: 0 0 4px 0; padding: 0 4px 0 0; }
+table.list ul.actionlinks li:nth-child(2n) { background: transparent; }
 
 
 /* +----------------------------------------------------------------+
 	 | lists / tables                                                 |
    +----------------------------------------------------------------+ */
 
-.listAlt {
-	background-color: <?=$newfade1?>;
-}
+.listAlt { background-color: <?=$newfade1?>; }
 
 .topBorder { border-top: 1px solid <?=$theme2?>; }
 .bottomBorder { border-bottom: 1px solid <?=$theme2?>; }
