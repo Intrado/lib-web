@@ -245,8 +245,8 @@ startWindow('My Lists&nbsp;' . help('Lists_MyLists'));
 		
 		<div id="pagewrappertop" class="content_recordcount_top"></div>
 
-		<table id="feeditems" class="content_feed">
-			<tbody>
+		<div id="feeditems" class="content_feed">
+			<table><tbody>
 				<tr>
 					<td class=""><img src='img/ajax-loader.gif' /></td>
 					<td>
@@ -255,8 +255,8 @@ startWindow('My Lists&nbsp;' . help('Lists_MyLists'));
 					</div>
 					</td>
 				</tr>
-			</tbody>
-		</table>
+			</tbody></table>
+		</div>
 		<div id="pagewrapperbottom" class="content_recordcount_btm"></div>
 		
 		</div><!-- .csec .window_main -->
@@ -285,15 +285,15 @@ function applyfilter(filter) {
 					
 					for(i=0;i<size;i++){
 						var item = result.list[i];
-						html += '<tr class=\"feed_item\"><td class=\"feed_icon\"><a href=\"' + item.defaultlink + '\"><img src=\"img/' + item.icon + '\" /></a></td><td ><div class=\"feedtitle\"><a href=\"' + item.defaultlink + '\">' + item.title + '</a></div>';
+						html += '<div class=\"feed_item cf\"><a class=\"msg_icon\" href=\"' + item.defaultlink + '\"><img src=\"img/' + item.icon + '\" /></a><div class="feed_wrap"><a class=\"feedtitle\" href=\"' + item.defaultlink + '\">' + item.title + '</a>';
 						if(item.publishmessage) {
 							html += '<div class=\"feedsubtitle cf\"><a href=\"' + item.defaultlink + '\"><img src=\"img/icons/diagona/10/031.gif\" />' + item.publishmessage + '</div>';
 						}
-						html += '<span>' + item.content + '</span></td>';
+						html += '<div class=\"feed_detail\">' + item.content + '</div></div>';
 						if(item.tools) {
-							html += '<td class=\"feed_actions\"><div>' + item.tools + '</div></td>';
+							html += item.tools;
 						}
-						html += '</tr>';
+						html += '</div>';
 					}
 					$('feeditems').update(html);
 					var pagetop = new Element('div',{'class': 'content_recordcount'}).update(result.pageinfo[3]);
