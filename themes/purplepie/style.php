@@ -14,7 +14,7 @@
 
 body { background: #7259A4; }
 body, table, form, select, input { font-family: 'Helvetica Neue', Helvetica, arial, sans-serif;	/*font-size: 13px;*/ }
-a { color: #484848; }
+a, a:visited { color: #484848; }
 a:hover { color: #f78d1d; }
 
 
