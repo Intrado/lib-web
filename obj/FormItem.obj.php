@@ -185,7 +185,7 @@ class TextArea extends FormItem {
 		}
 
 		if ($spellcheck) {
-			$str .= '<div>' . action_link(_L("Spell Check"), "spellcheck", null, '(new spellChecker($(\''.$n.'\')) ).openChecker();') . '</div>';
+			$str .= '<ul class="actionlinks">' . action_link(_L("Spell Check"), "spellcheck", null, '(new spellChecker($(\''.$n.'\')) ).openChecker();') . '</ul>';
 		}
 		
 		return $str;

@@ -58,7 +58,7 @@ class TextAreaAndSubjectWithCheckbox extends FormItem {
 			$str .= '<div id="' . $n . 'charsleft">'._L('Characters remaining'). ':&nbsp;'. ( $this->args['counter'] - mb_strlen($message) ). '</div>';
 
 		if ($spellcheck) {
-			$str .= '<div>' . action_link(_L("Spell Check"), "spellcheck", null, '(new spellChecker($(\''.$n.'-message\')) ).openChecker();') . '</div>';
+			$str .= '<ul class="actionlinks">' . action_link(_L("Spell Check"), "spellcheck", null, '(new spellChecker($(\''.$n.'-message\')) ).openChecker();') . '</ul>';
 		}
 		
 		$str .= '</div>';
