@@ -286,6 +286,8 @@ li.wizbuttonlist {
 .accordioncontentdiv ul.exist_list li input { margin: 0 5px 0 0; }
 
 .accordioncontentdiv fieldset { width: inherit; }
+.accordioncontentdiv .formtitle { width: inherit; }
+.accordioncontentdiv .formcontrol { width: inherit; }
 
 table#addMeWindow { width: 100%; }
 table#addMeWindow input[type="checkbox"] { margin: 7px 0; }
