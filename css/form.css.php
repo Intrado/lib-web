@@ -109,7 +109,7 @@ form.newform {
 .newform .formcontrol { float: left; display: inline; width: 510px; }
 
 .newform fieldset#AddRuleFieldmap { width: 140px; padding: 0; margin: 0; background: none; }
-.newform fieldset#AddRuleCriteria { width: 75px; padding: 0; margin: 0; background: none; }
+.newform fieldset#AddRuleCriteria { width: 100px; padding: 0; margin: 0; background: none; }
 .newform fieldset#AddRuleValue { width: 125px; padding: 0; margin: 0; background: none; }
 .newform fieldset#AddRuleAction { width: 75px; padding: 0; margin: 0; background: none; } 
  
@@ -284,6 +284,8 @@ li.wizbuttonlist {
 .accordioncontentdiv ul.exist_list { margin: 0; padding: 0; list-style-type: none; }
 .accordioncontentdiv ul.exist_list li { display: block; height: 25px; }
 .accordioncontentdiv ul.exist_list li input { margin: 0 5px 0 0; }
+
+.accordioncontentdiv fieldset { width: inherit; }
 
 table#addMeWindow { width: 100%; }
 table#addMeWindow input[type="checkbox"] { margin: 7px 0; }

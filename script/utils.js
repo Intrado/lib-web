@@ -254,28 +254,32 @@ function parse_theme_from_url (url) {
 	return t.substring(0,t.indexOf("/"));
 }
 
+/*
+ * commented the code within the btn_roll, btn_rollover and btn_rollout functions 
+ * rather than removing the functions as they are called in many pages.
+ */
 function btn_roll(obj,over) {
-	obj = $(obj);
-	over = over ? "_over" : "";
+	//obj = $(obj);
+	//over = over ? "_over" : "";
 
-	var leftimg = obj.down('.left');
-	var rightimg = obj.down('.right');
-	var midtb = obj.down('.middle');
+	//var leftimg = obj.down('.left');
+	//var rightimg = obj.down('.right');
+	//var midtb = obj.down('.middle');
 
 	//parse one of the button images for the theme
-	var theme = parse_theme_from_url(leftimg.src);
+	//var theme = parse_theme_from_url(leftimg.src);
 
-	leftimg.src='themes/' + theme + '/button_left' + over + '.gif';
-	rightimg.src='themes/' + theme + '/button_right' + over + '.gif';
-	midtb.style.background = "url('themes/" + theme + "/button_mid" + over + ".gif') repeat-x";
+	//leftimg.src='themes/' + theme + '/button_left' + over + '.gif';
+	//rightimg.src='themes/' + theme + '/button_right' + over + '.gif';
+	//midtb.style.background = "url('themes/" + theme + "/button_mid" + over + ".gif') repeat-x";
 }
 
 function btn_rollover(obj) {
-	btn_roll(obj,true);
+	//btn_roll(obj,true);
 }
 
 function btn_rollout(obj) {
-	btn_roll(obj,false);
+	//btn_roll(obj,false);
 }
 
 function windowHide(windowid) {
@@ -492,15 +496,16 @@ function format_thousands_separator(num) {
 
 
 function icon_button(name,icon,id) {
-	var newbutton = new Element("button",{"class": "button", type: "button"});
+	var newbutton = new Element("button",{"class": "btn", type: "button"});
 	if (id)
 		newbutton.id = id;
 
-	var buttonface = new Element("td",{"class": "middle"}).insert(new Element("img",{src: "img/icons/"+icon+".gif"})).insert(name);
+	var buttonface = new Element("span",{"class":"btn_middle"}).insert(new Element("img",{src: "img/icons/"+icon+".gif", "class":"btn_middle_icon"})).insert(name);
 
-	var buttonrecord = new Element("tr", {}).insert(new Element("td",{}).insert(new Element("img",{"class": "left", src: "img/themes/"+_brandtheme+"/button_left.gif"}))).insert(buttonface).insert(new Element("td",{}).insert(new Element("img",{"class": "right", src: "img/themes/"+_brandtheme+"/button_right.gif"})));
+	var buttonrecord = new Element("span", {"class":"btn_left"}).insert(buttonface).insert(new Element("span",{"class":"btn_right"}));
 
-	var buttonbody = new Element("table",{}).insert(new Element("tbody",{}).insert(buttonrecord));
+	//var buttonbody = new Element("div",{"class":"btn_wrap cf"}).insert(buttonrecord);
+	var buttonbody = new Element("div",{"class":"btn_wrap cf"}).insert(new Element("span", {"class":"btn_left"})).insert(buttonface).insert(new Element("span",{"class":"btn_right"}));
 
 	newbutton.insert(buttonbody);
 
