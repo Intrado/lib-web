@@ -109,7 +109,7 @@ form.newform {
 .newform .formcontrol { float: left; display: inline; width: 510px; }
 
 .newform .formcontrol iframe { overflow: hidden; }
-.newform .formcontrol > label { margin: 5px; background: pink; }
+.newform .formcontrol > label { margin-left: 5px; line-height: 22px;}
 
 .newform fieldset#AddRuleFieldmap { width: 140px; padding: 0; margin: 0; background: none; }
 .newform fieldset#AddRuleCriteria { width: 100px; padding: 0; margin: 0; background: none; }
