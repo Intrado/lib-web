@@ -242,8 +242,8 @@ button { color: <?=$primary?>; }
 
 .btn_hide { display: none !important; visibility: hidden; } /* for hidden buttons! */
 
-.import_file_data .btn { font-size: 10px; line-height: 12px; margin: 0 0 8px 6px; padding: 0; }
-.import_file_data .btn_middle { padding: 3px 5px 0 5px; height: 15px; }
+.import_file_data .btn { font-size: 10px; line-height: 15px; margin: 0 0 8px 6px; padding: 0; }
+.import_file_data .btn_middle { padding: 3px 5px 0 5px; height: 20px; }
 
 
 /*----- Start page -----*/
