@@ -78,7 +78,7 @@ class SurveyReport extends ReportGenerator{
 		$query = "select sum(sw.status = 'web' and rp.status != 'nocontacts'),
 				sum(rp.status not in ('duplicate', 'blocked', 'nocontacts'))
 				from surveyweb sw
-				inner join reportperson rp on (rp.personid = sw.personid and rp.jobid = sw.jobid)
+				inner join reportperson rp on (rp.personid = sw.personid and rp.jobid = sw.jobid and rp.type='email')
 				where sw.jobid=$jobid";
 	
 		$result = QuickQueryRow($query, false, $this->_readonlyDB);
