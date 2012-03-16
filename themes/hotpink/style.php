@@ -71,8 +71,12 @@ a:hover { color: #FF1493; }
 .feedfilter a { display: block; padding: 5px 8px 5px 12px; border-bottom: 1px dashed #ccc; }
 .feedfilter img { margin: 0 8px 0 0; }
 
-.feed_item a, .feed_content a:hover { color: #333; }
-.feedtitle a:hover, .actionlink:hover { color: #FF1493; }
+.feedtitle a:hover, 
+ul.actionlinks li a:hover,
+.feed_title:hover { text-decoration: none; color: #FF1493; }
+
+.feed_detail a:hover,
+.content_feed_row a:hover { color: #333; }
 
 
 /*----- Buttons -----*/
