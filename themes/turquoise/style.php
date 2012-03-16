@@ -120,7 +120,7 @@ background-color: #FD5701;
 .feed_content a, .feed_item a { color: #484848;}
 
 .list a, a.actionlink { color: #484848; }
-.list a:hover, a.actionlink:hover { color: #FD5701; }
+.list a:hover, ul.actionlinks li a:hover { color: #FD5701; }
 
 
 /*----- Big buttons styling -----*/
