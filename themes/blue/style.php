@@ -124,13 +124,12 @@ a:hover { color: #333; }
 .big_button_wrap { margin: 2em 0 0 1.5em; }
 .newjob, .emrjob { text-indent: -9999px; }
 .newjob a, .emrjob a { display: block; width: 196px; height: 60px; margin: 0 0 0.5em 0; }
-.newjob a { background: url('../img/themes/blue/easystart.png'); }
-.emrjob a { background: url('../img/themes/blue/emergency.png'); }
-.newjob a:hover { background: url('../img/themes/blue/easystart_hover.png'); }
-.emrjob a:hover { background: url('../img/themes/blue/emergency_hover.png'); }
+.newjob a { background: url('../img/themes/blue/easystart.png') left top no-repeat; }
+.emrjob a { background: url('../img/themes/blue/emergency.png') left top no-repeat; }
+.newjob a:hover, .emrjob a:hover { background-position: bottom right; }
 
-#t_zoom a, .feedtitle a:hover { color: #179AFF; }
-#t_zoom a:hover, .feedtitle a, .feed_content a, .feed_item a { color: #333; }
+#t_zoom a:hover, .feedtitle a:hover, .feed_title:hover, ul.actionlinks li a:hover { color: #179AFF; }
+.feedtitle a, .feed_content a, .feed_item a { color: #333; }
 
 
 /*----- Buttons, changes to the basic buttons featured across the site -----*/
