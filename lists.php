@@ -285,7 +285,7 @@ function applyfilter(filter) {
 					
 					for(i=0;i<size;i++){
 						var item = result.list[i];
-						html += '<div class=\"feed_item cf\"><a class=\"msg_icon\" href=\"' + item.defaultlink + '\"><img src=\"img/' + item.icon + '\" /></a><div class="feed_wrap"><a class=\"feedtitle\" href=\"' + item.defaultlink + '\">' + item.title + '</a>';
+						html += '<div class=\"feed_item cf\"><a class=\"msg_icon\" href=\"' + item.defaultlink + '\"><img src=\"img/' + item.icon + '\" /></a><div class="feed_wrap"><a class=\"feed_title\" href=\"' + item.defaultlink + '\">' + item.title + '</a>';
 						if(item.publishmessage) {
 							html += '<div class=\"feedsubtitle cf\"><a href=\"' + item.defaultlink + '\"><img src=\"img/icons/diagona/10/031.gif\" />' + item.publishmessage + '</div>';
 						}
