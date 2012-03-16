@@ -29,7 +29,7 @@ a:hover { color: #286FBE; }
 .banner_logo a { background: #fff; display: block; padding: 6px; -webkit-border-radius: 5px; -moz-border-radius: 5px; border-radius: 5px; 
 -moz-background-clip: padding; -webkit-background-clip: padding-box; background-clip: padding-box; }
 
-.banner_logo a { padding: .5em; background-color: #fff; opacity: .8;
+.banner_logo a { padding: .5em; background-color: #fff;
 -webkit-border-radius: 5px; -moz-border-radius: 5px; border-radius: 5px;
 -moz-background-clip: padding; -webkit-background-clip: padding-box; background-clip: padding-box;
 -webkit-transition: all 0.3s ease-out; 
@@ -38,7 +38,7 @@ a:hover { color: #286FBE; }
 -o-transition: all 0.3s ease-out;  
 transition: all 0.3s ease-out; }
 										             
-.banner_logo a:hover {  opacity: 1;
+.banner_logo a:hover { 
 -webkit-box-shadow: 0px 0px 12px #fff; -moz-box-shadow: 0px 0px 12px #fff; box-shadow: 0px 0px 12px #fff;  }
 										             
 .banner_links li { padding: 0 8px; border-right: 1px solid #F3B329; }
