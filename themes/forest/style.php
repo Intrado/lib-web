@@ -124,7 +124,7 @@ border: 1px solid #494949; text-shadow: 0 1px 0 #333; opacity: 0.8;
 .feedfilter img { margin: 0 8px 0 0; }
 
 .feedtitle a, .feed_content a, .feed_item a, .actionlink  { color: #444; }
-.feedtitle a:hover, .actionlink:hover, .feed_title:hover { color: #13a545; }
+.feedtitle a:hover, .feed_title:hover, ul.actionlinks li a:hover { color: #13a545; }
 
 #logininfo, #termsinfo { line-height: 13px; }
 
