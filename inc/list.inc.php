@@ -78,18 +78,19 @@ function showRenderedListTable($renderedlist, $list = false) {
 	$optionalfieldstart = $showinlist ? 6 : 5; //table col of last non optional field
 		
 ?>
-	<table>
-	<tr>
-		<td>
+	<div class="table_controls cf">
+
+		<div class="sortby">
 <?
 		showSortMenu($validsortfields,$ordering);
 ?>		
-		</td>
-		<td>
+		</div>
+		
+		<div class="fieldvis">
 <?
 		show_field_visibility_selector($tableid, $optionalfields, $optionalfieldstart);
 ?>		
-		</td>
+		</div>
 <?
 
 	//now use session display prefs to set up titles and whatnot for the optional fields
@@ -105,13 +106,13 @@ function showRenderedListTable($renderedlist, $list = false) {
 			$titles[$i++] = "@" . $field->name;
 	}
 ?>
-		<td halign="right">
+		<div class="pagenavinfo">
 <?
 		showPageMenu($total,$pagestart,$renderedlist->pagelimit);
 ?>		
-		</td>
-	</tr>
-	</table>
+		</div>
+
+	</div><!-- end table_controls -->
 <?
 
 	echo '<table id="'.$tableid.'" width="100%" cellpadding="3" cellspacing="1" class="list">';
