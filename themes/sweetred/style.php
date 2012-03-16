@@ -98,7 +98,7 @@ font: bold 14px 'Helvetica Neue',Helvetica,arial,sans-serif; text-shadow: 0 1px 
 .feedfilter img { margin: 0 8px 0 0; }
 
 .feed_item a, .feed_content a, .actionlink { color: #444; }
-.feedtitle a:hover, .actionlink:hover, .feed_title:hover { color: #DF0B0B; }
+.feedtitle a:hover, .feed_title:hover, ul.actionlinks li a:hover { color: #DF0B0B; }
 
 
 /*----- Footer styling-----*/
