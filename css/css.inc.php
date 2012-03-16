@@ -386,6 +386,12 @@ table.list ul.actionlinks li:nth-child(2n) { background: transparent; }
 
 .tableprogressbar { float:right; width:16px; height:16px; margin-right: 5px }
 .togglers {  } /* think this is for search criteria */
+
+.table_controls { margin: 0 0 10px 0; }
+.table_controls .sortby { float: left; display: inline; }
+.table_controls .sortby h3 { margin: 0 0 5px 0; }
+.table_controls .pagenavinfo { float: right; display: inline; padding: 20px 0 0; }
+.table_controls .fieldvis { float: left; display: inline; padding: 24px 0 0 10px; }
  
 /* +---------------------------------+
 	 | table overrides for list styles |
