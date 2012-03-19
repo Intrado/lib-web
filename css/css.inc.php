@@ -441,8 +441,11 @@ table > .listHeader > th 	{ text-align: left;  color: white; }
 	border: 5px double red;
 }
 
-.confirmnoticecontainer { margin: 5px; margin-left: 25%; width: 50%; }
-.confirmnoticecontent { text-align: center; margin: 0px; padding: 10px; background: <?=$topbg?>; }
+.confirmnoticecontainer { margin: 5px 0 10px 25%; width: 50%; }
+.confirmnoticecontent { background: <?=$topbg?>; margin: 0px; padding: 10px; text-align: center; font-size: 1.2em; 
+-webkit-border-radius: 5px; -moz-border-radius: 5px; border-radius: 5px;
+-moz-background-clip: padding; -webkit-background-clip: padding-box; background-clip: padding-box; 
+-webkit-box-shadow: 0px 1px 2px 0px #999; -moz-box-shadow: 0px 1px 2px 0px #999; box-shadow: 0px 1px 2px 0px #999; }
 
 .confirmnoticecontent hr {
 	border: solid 1px <?=$theme2?>;
