@@ -245,7 +245,7 @@ class Form {
 
 				$str.= '
 						<div class="formfieldarea cf ' . $this->rendermode . '" id="'.$n.'_fieldarea" '.$style.'>
-							<div class="formtitle">
+							<div class="formtitle cf">
 								<span class="formlabel">'.$l.'</span>
 							</div>
 							<!--div class="formicon"></div-->
@@ -297,7 +297,7 @@ class Form {
 			
 				$str.= '
 					<div class="formfieldarea cf ' . $this->rendermode . '" id="'.$n.'_fieldarea" '.$style.'>
-						<div class="formtitle">
+						<div class="formtitle cf">
 							<label class="formlabel" for="'.$n.'" >'.$l.'</label>
 							<img class="formicon" alt="'.$alt.'" title="'.$alt.'" id="'.$n.'_icon" src="'.$i.'" />
 						</div>
@@ -348,7 +348,7 @@ class Form {
 				<div id="'.$this->name.'_spinner" class="formspinner" style="display: none;"><img src="img/ajax-loader.gif" alt="Loading..."></div>
 				<!-- END FORM CONTENT -->
 				</td>
-				<td id="'.$this->name.'_helpercell" valign="top" width="'.($this->helpsteps ? '100px' : '0px').'">
+				<td id="'.$this->name.'_helpercell" valign="top" width="'.($this->helpsteps ? '200px' : '0px').'">
 				<!-- HELPER -->
 				<div id="'.$this->name.'_startguide" style="float: right; padding-top: 3px;">'.($this->helpsteps ? icon_button("Guide","information","return form_enable_helper(event);") : "").'</div>
 				<div id="'.$this->name.'_helper" class="helper">
