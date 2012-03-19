@@ -168,7 +168,6 @@ $formdata["firstname"] = array(
 	"label" => _L('First Name'),
 	"value" => $edituser->firstname,
 	"validators" => array(
-		array("ValRequired"),
 	),
 	"control" => array("TextField","size" => 30, "maxlength" => 51),
 	"helpstep" => $helpstepnum
@@ -177,7 +176,6 @@ $formdata["lastname"] = array(
 	"label" => _L('Last Name'),
 	"value" => $edituser->lastname,
 	"validators" => array(
-		array("ValRequired"),
 	),
 	"control" => array("TextField","size" => 30, "maxlength" => 51),
 	"helpstep" => $helpstepnum
@@ -191,8 +189,6 @@ $formdata["password"] = array(
 	"value" => $pass,
 	"validators" => array(
 		array("ValRequired"),
-		array("ValLength","min" => $passlength,"max" => 20),
-		array("ValPassword", "login" => $edituser->login, "firstname" => $edituser->firstname, "lastname" => $edituser->lastname)
 	),
 	"requires" => array("firstname", "lastname", "login"),
 	"control" => array("TextPasswordStrength","maxlength" => 20, "size" => 25, "minlength" => $passlength, "generator" => true),
@@ -205,7 +201,6 @@ $formdata["passwordconfirm"] = array(
 	"value" => $pass,
 	"validators" => array(
 		array("ValRequired"),
-		array("ValLength","min" => $passlength,"max" => 20),
 		array("ValFieldConfirmation", "field" => "password")
 	),
 	"requires" => array("password"),
