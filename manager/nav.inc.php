@@ -112,7 +112,7 @@ table {
 	<? if ($MANAGERUSER->authorized("smsblock")) { ?>
 		<td><a href="smsblock.php" title="SMS Block"><img src="mimg/smsblock.png" border=0><div>SMS&nbsp;Block</div></a></td>
 	<? } ?>
-	<? if ($MANAGERUSER->authorizedAny(array("billablecalls","passwordcheck","bouncedemailsearch"))) { ?>
+	<? if ($MANAGERUSER->authorizedAny(array("billablecalls","bouncedemailsearch","passwordcheck", "emergencyjobs", "runqueries", "tollfreenumbers", "manageserver", "systemdm", "superuser"))) { ?>
 		<td><a href="advancedactions.php" title="Advanced Actions"><img src="mimg/config.png" border=0><div>Advanced</div></a></td>
 	<? } ?>	
 		<td><a href="./?logout=1&reason=request" title="Log&nbsp;Out"><img src="mimg/logout.png" border=0><div>Log&nbsp;Out</div></a></td>

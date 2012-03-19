@@ -6,7 +6,7 @@ require_once("../inc/utils.inc.php");
 require_once("../obj/Phone.obj.php");
 require_once("../inc/themes.inc.php");
 
-if (!$MANAGERUSER->authorizedAny(array("billablecalls","bouncedemailsearch","superuser")))
+if (!$MANAGERUSER->authorizedAny(array("billablecalls","bouncedemailsearch","passwordcheck", "emergencyjobs", "runqueries", "tollfreenumbers", "manageserver", "systemdm", "superuser")))
 	exit("Not Authorized");
 
 include_once("nav.inc.php");
