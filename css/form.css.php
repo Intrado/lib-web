@@ -98,15 +98,51 @@ form.newform {
   -moz-background-clip: padding; -webkit-background-clip: padding-box; background-clip: padding-box;
 }
 
-/* ----------------------------- */
+/*---------- New forms layout ----------*/
+
+.newform fieldset { background: #f1f1f1; width: 100%; margin-bottom: 1em; border: none; }
+ 
+.formfieldarea { padding: 8px 10px; }
+.formfieldarea .underneathmsg { padding: 4px 0 0; font-weight: bold; color: #cc0000; }
+
+.newform .formtitle { width: 100%; padding: 2px 0 5px 0; }
+.newform .formtitle .formlabel { float: left; font-weight: bold; font-size: 1.1em; line-height: 16px; text-align: left; }
+.newform .formtitle .formicon { float: left; padding: 0 5px; }
+
+.newform .formcontrol { width: 100%; }
+.newform .formcontrol input[type="text"] { width: 50%; padding: 4px 5px; border: 1px solid #E7E7E7; 
+-webkit-border-radius: 5px; -moz-border-radius: 5px; border-radius: 5px; 
+-moz-background-clip: padding; -webkit-background-clip: padding-box; background-clip: padding-box; }
+.newform .formcontrol input[type="radio"] { margin: 0 5px 5px 0; }
+.newform .formcontrol textarea { width: 65%; margin: 0 0 5px 0; padding: 4px 5px; border: 1px solid #E7E7E7; 
+-webkit-border-radius: 5px; -moz-border-radius: 5px; border-radius: 5px; 
+-moz-background-clip: padding; -webkit-background-clip: padding-box; background-clip: padding-box; }
+.newform .formcontrol input#account_brandthemecustomize { float: left; display: inline; margin: 0 5px 0 0; }
+
+.newform .formcontrol .translate { max-height: 150px; overflow: auto; }
+.newform .formcontrol .gBranding {}
+.newform .formcontrol .gBrandingText { font-size: 11px; }
+
+.newform .formcontrol .radiobox { list-style-type: none; padding: 0; margin: 0; }
+.newform .formcontrol .radiobox li { padding: 2px 0; }
+.newform .formcontrol .radiobox input[type="radio"],
+.newform .formcontrol .radiobox input[type="checkbox"] { margin: 0 5px 0 0; }
+
+.newform .formcontrol select  { margin: 0; padding: 4px 6px; border: 1px solid #E7E7E7; 
+-webkit-border-radius: 5px; -moz-border-radius: 5px; border-radius: 5px; 
+-moz-background-clip: padding; -webkit-background-clip: padding-box; background-clip: padding-box; }
+
+
 /* -------- CSS redesign ------- */
 
-.newform fieldset { background: #f1f1f1; width: 650px; margin-bottom: 1em; padding: 8px; border: none;
+/*--------
+.newform fieldset { background: #f1f1f1; width: 100%; margin-bottom: 1em; border: none;
  -webkit-border-radius: 7px; -moz-border-radius: 7px; border-radius: 7px;
  -moz-background-clip: padding; -webkit-background-clip: padding-box; background-clip: padding-box; }
  
 .newform .formtitle { float: left; display: inline; width: 140px; }
 .newform .formcontrol { float: left; display: inline; width: 510px; }
+----------*/
 
 .newform .formcontrol iframe { overflow: hidden; }
 .newform .formcontrol > label { margin-left: 5px; line-height: 22px;}
@@ -118,13 +154,13 @@ form.newform {
  
 .newform select, .newform input { -webkit-transition: all 0.3s ease-out; -moz-transition: all 0.3s ease-out; -ms-transition: all 0.3s ease-out; -o-transition: all 0.3s ease-out; transition: all 0.3s ease-out; }
 
+/*----------
 .newform .formlabel { float: left; display: inline; width: 110px; padding: 6px 0 0; text-align: right; font-weight: bold; font-size: 1.1em; }
 .newform .formicon { float: left; display: inline; width: 16px; height: 16px; margin: 0 7px; padding: 6px 0 0; }
-.newform input[type="text"] { float: left; display: inline; /*width: 240px;*/ margin: 3px 0; padding: 4px 5px; border: 1px solid #E7E7E7; 
--webkit-border-radius: 5px; -moz-border-radius: 5px; border-radius: 5px; 
--moz-background-clip: padding; -webkit-background-clip: padding-box; background-clip: padding-box; }
-.newform input[type="checkbox"] { float: left; display: inline; margin: 0 5px 0 0; }
+.newform input[type="text"] { float: left; display: inline; margin: 3px 0; padding: 4px 5px; border: 1px solid #E7E7E7; }
 .newform textarea { width: 300px; }
+.newform input[type="checkbox"] { float: left; display: inline; margin: 0 5px 0 0; }
+
 .newform .underneathmsg { background-color: none; float: left; display: inline; width: 100%; padding: 0 0 3px 140px; font-weight: bold; color: #cc0000; 
 -moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box; }
 
@@ -132,17 +168,19 @@ form.newform {
 .newform .radiobox li { height: 25px; }
 .newform .radiobox input[type="radio"], .newform .radiobox input[type="checkbox"] { float: left; display: inline; margin: 0 5px 0 0; }
 .newform .radiobox label { float: left; display: inline; margin: 0 10px 0 0; }
+---------*/
 
 .newform .MultiCheckbox { float: left; display: inline; width: 250px; margin: 0; padding: 7px 0 0; list-style-type: none; }
 .newform .MultiCheckbox li { height: 25px; }
 .newform .MultiCheckbox input[type="checkbox"] { float: left; display: inline; margin: 0 5px 0 0; }
 .newform .list th.MultiCheckbox label { float: left; display: inline; margin: 0 10px 0 0; }
 
+/*----------
 .newform select  { margin: 3px 0; padding: 4px 6px; border: 1px solid #E7E7E7; 
 -webkit-border-radius: 5px; -moz-border-radius: 5px; border-radius: 5px; 
 -moz-background-clip: padding; -webkit-background-clip: padding-box; background-clip: padding-box; }
-
 .newform input[type="checkbox"], .radiobox input[type="checkbox"] { margin: 5px 0 0; }
+----------*/
 
 .newform .form_list_table { float: left; display: inline; width: 250px; margin: 0; padding: 0; }
 .newform .list { width: 100%; margin: 0 0 5px 0; }
