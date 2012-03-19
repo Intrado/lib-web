@@ -1240,7 +1240,7 @@ class JobWiz_messageEmailTranslate extends WizStep {
 		if(!$translations) {
 			$formdata["Translationinfo"] = array(
 				"label" => _L("Info"),
-				"control" => array("FormHtml","html"=>'<div style="font-size: medium;">'._L('No Translations Available').'</div><br>'),
+				"control" => array("FormHtml","html"=>'<div class="translate">'._L('No Translations Available').'</div>'),
 				"helpstep" => 1
 			);
 		} else {
@@ -1248,7 +1248,7 @@ class JobWiz_messageEmailTranslate extends WizStep {
 			
 			$formdata["englishversion"] = array(
 				"label" => _L("Default"),
-				"control" => array("FormHtml","html" => '<div style="border: 1px solid gray; overflow: auto; padding: 4px; max-height: 150px;">'. $englishtext .'</div>'),
+				"control" => array("FormHtml","html" => '<div class="translate">'. $englishtext .'</div>'),
 				"helpstep" => 1
 			);
 			
@@ -1273,7 +1273,7 @@ class JobWiz_messageEmailTranslate extends WizStep {
 				"label" => " ",
 				"control" => array("FormHtml","html"=>'
 					<div id="branding">
-						<div style="color: rgb(103, 103, 103);float: right;" class="gBranding"><span style="vertical-align: middle; font-family: arial,sans-serif; font-size: 11px;" class="gBrandingText">'._L('Translation powered by').'<img style="padding-left: 1px; vertical-align: middle;" alt="Google" src="' . (isset($_SERVER['HTTPS'])?"https":"http") . '://www.google.com/uds/css/small-logo.png"></span></div>
+						<div class="gBranding"><span class="gBrandingText">'._L('Translation powered by').'<img style="padding-left: 1px; vertical-align: middle;" alt="Google" src="' . (isset($_SERVER['HTTPS'])?"https":"http") . '://www.google.com/uds/css/small-logo.png"></span></div>
 					</div>
 				'),
 				"helpstep" => 1
