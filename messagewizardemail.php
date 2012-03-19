@@ -291,7 +291,7 @@ class MsgWiz_translatePreview extends WizStep {
 
 		$formdata["englishtext"] = array(
 			"label" => _L("English"),
-			"control" => array("FormHtml","html"=>'<div style="font-size: medium;">'. ($ishtml?$this->escapeFieldInserts($sourcetext):escapehtml($sourcetext)) .'</div><br>'),
+			"control" => array("FormHtml","html"=>'<div class="translate">'. ($ishtml?$this->escapeFieldInserts($sourcetext):escapehtml($sourcetext)) .'</div>'),
 			"helpstep" => 1
 		);
 
@@ -332,8 +332,8 @@ class MsgWiz_translatePreview extends WizStep {
 				"label" => " ",
 				"control" => array("FormHtml","html"=>'
 					<div id="branding">
-						<div style="color: rgb(103, 103, 103);float: right;" class="gBranding">
-							<span style="vertical-align: middle; font-family: arial,sans-serif; font-size: 11px;" class="gBrandingText">
+						<div class="gBranding">
+							<span class="gBrandingText">
 								'._L('Translation powered by').'<img style="padding-left: 1px; vertical-align: middle;" alt="Google" src="' . (isset($_SERVER['HTTPS'])?"https":"http") . '://www.google.com/uds/css/small-logo.png">
 							</span>
 						</div>
