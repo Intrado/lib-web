@@ -476,7 +476,8 @@ $settings = array(
 					'loginlockouttime' => '5',
 					'_brandtheme' => 'classroom',
 					'_brandprimary' => '3e693f',
-					'_brandratio' => '.2');
+					'_brandratio' => '.2',
+					'_amdtype' => "ivr");
 
 $customerid = null;
 if (isset($_SESSION['customerid'])) {
