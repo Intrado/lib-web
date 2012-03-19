@@ -314,8 +314,8 @@ li.wizbuttonlist {
 
 .accordiontitlediv td.middle { text-align: left; }
 .accordiontitlediv td.left, .accordiontitlediv td.right { display: none; }
-.accordiontitledivexpanded { background-image: url('../img/arrow_down.gif'); }
-.accordiontitledivcollapsed { background-image: url('../img/arrow_right.gif'); }
+.accordiontitledivexpanded { background: #f1f1f1 url('../img/arrow_down.gif') 5px 11px no-repeat; }
+.accordiontitledivcollapsed { background: #f1f1f1 url('../img/arrow_right.gif') 5px 11px no-repeat; }
 .accordiontitledivlocked { color: rgb(180,180,180); }
 .accordiontitleicon { margin-left: 5px; margin-right: 5px; vertical-align: middle; }
 .accordioncontentdiv { background: #f1f1f1; margin: -10px 0 5px 0; padding: 5px; 
