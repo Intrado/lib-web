@@ -4,7 +4,7 @@ class HtmlRadioButtonBigCheck extends FormItem {
 	function render ($value) {
 		$n = $this->form->name."_".$this->name;
 		$str = '<input id="'.$n.'" name="'.$n.'" type="hidden" value="'.escapehtml($value).'"/>
-			<div id="'.$n.'-container" class="htmlradiobuttonbigcheck">';
+			<div id="'.$n.'-container" class="htmlradiobuttonbigcheck cf">';
 		$count = 0;
 		foreach ($this->args['values'] as $val => $html)  {
 			$id = $n.'-'.$count++;
