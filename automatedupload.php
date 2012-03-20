@@ -171,11 +171,14 @@ if (isset($_GET['authCode']) && isset($_GET['sessionId'])) {
 		$import = new Import($_SESSION['importid']);
 		$data = file_get_contents($_SESSION['filename']);
 		unlink($_SESSION['filename']);
+		QuickQuery("BEGIN");
 		if (!$data  || !$import->upload($data))
 			return array ("resumeLength" => 0,
 						"errorMsg" => "There was an error uploading the file",
 						"errorCode" => "UPLOAD_ERROR");
-
+		
+		QuickQuery("COMMIT");
+		
 		//should we kick off the import?
 		if ($import->type == "automatic") {
 			$import->runNow();

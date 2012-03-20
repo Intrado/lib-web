@@ -51,7 +51,9 @@ if(isset($_FILES['taskcontents']) && $_FILES['taskcontents']['tmp_name']) {
 	} else {
 		$data = file_get_contents($newname);
 		unlink($newname);
+		QuickQuery("BEGIN");
 		if ($import->upload($data)) {
+			QuickQuery("COMMIT");
 			redirect("taskmap.php?id=$import->id");
 		} else {
 			error_log("Unable to upload import data, either the file was empty or there is a DB problem.");
