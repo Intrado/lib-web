@@ -50,4 +50,17 @@ CREATE TABLE `personguardian` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8
 $$$
 
+-- $rev 5
+
+CREATE TABLE `importmicroupdate` (
+ `id` int(11) NOT NULL AUTO_INCREMENT,
+ `importid` int(11) NOT NULL,
+ `updatemethod` ENUM( 'update', 'delete' ) NOT NULL,
+ `data` blob NOT NULL,
+ `datalength` int(11) NOT NULL,
+ `datamodifiedtime` datetime NOT NULL,
+ PRIMARY KEY (`id`),
+ KEY `importid` (`importid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8
+$$$
 
