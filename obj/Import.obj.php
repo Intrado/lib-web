@@ -39,6 +39,7 @@ class Import extends DBMappedObject {
 
 	function upload ($data) {
 		$this->datalength = strlen($data);
+		QuickUpdate("delete from importmicroupdate where importid = ?", false, array($this->id));
 		return QuickUpdate("update import set data=?,datalength=?,datamodifiedtime=now() where id=?", false, array($data,$this->datalength,$this->id));
 	}
 
