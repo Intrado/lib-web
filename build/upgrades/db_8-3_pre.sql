@@ -24,8 +24,7 @@ $$$
 
 -- allow mapping guardian fields on person import
 ALTER TABLE `importfield`
-  ADD `guardiansequence` TINYINT( 4 ) NULL DEFAULT NULL AFTER `importid`,
-  ADD `guardiancategoryid` INT(11) NULL DEFAULT NULL AFTER `guardiansequence`
+  ADD `guardiansequence` TINYINT( 4 ) NULL DEFAULT NULL AFTER `importid`
 $$$
 
 CREATE TABLE `guardiancategory` (
