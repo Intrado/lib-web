@@ -71,6 +71,13 @@ foreach ($importfields as $importfield) {
 // find the data type of import
 $datatype = $import->datatype;
 if ($datatype == "person") {
+	//menu of guardian sequence
+	$guardiansequence = array();
+	$guardiansequence[0] = "Student";
+	$maxguardians = getSystemSetting("maxguardians", 0);
+	for ($i=1; $i<=$maxguardians; $i++) {
+		$guardiansequence[$i] = "Guardian $i";
+	}
 
 	//make a menu of all available fields
 	$fieldmaps  = DBFindMany("FieldMap","from fieldmap where fieldnum like 'f%' order by fieldnum");
@@ -79,6 +86,7 @@ if ($datatype == "person") {
 	$maptofields = array();
 	$maptofields[""] = "- Unmapped -";
 	$maptofields["key"] = "Unique ID";
+	$maptofields["-cat"] = "Guardian Category";
 	//F fields
 	foreach ($fieldmaps as $fieldmap)
 		$maptofields[$fieldmap->fieldnum] = $fieldmap->name;
@@ -366,6 +374,16 @@ if (CheckFormSubmit($f, $s) || CheckFormSubmit($f, 'run') || CheckFormSubmit($f,
 					if ($importfield->mapfrom == "")
 						$importfield->mapfrom = null;
 
+					// only person import has guardian sequence
+					if ($datatype == "person") {
+						$guardseq = GetFormData($f,$s,"guardseq_$count");
+						if ($guardseq > 0) {
+							$importfield->guardiansequence = $guardseq;
+						} else {
+							$importfield->guardiansequence = null;
+						}
+					}
+					
 					$importfield->update();
 				}
 
@@ -395,6 +413,14 @@ if ($reloadform) {
 	//add every existing importfield
 	$count = 0;
 	foreach ($importfields as $importfield) {
+		if ($datatype == "person") {
+			//guardiansequence
+			if ($importfield->guardiansequence == null) {
+				PutFormData($f,$s,"guardseq_$count",0,"array",array_keys($guardiansequence));
+			} else {
+				PutFormData($f,$s,"guardseq_$count",$importfield->guardiansequence,"array",array_keys($guardiansequence));
+			}
+		}
 		//mapto
 		PutFormData($f,$s,"mapto_$count",$importfield->mapto, "array",array_keys($maptofields));
 
@@ -474,6 +500,13 @@ if ($noimportdata) { ?>
 <div id="datamapping">
 <table width="100%" cellpadding="3" cellspacing="1" class="list">
 	<tr class="listHeader">
+<?
+		if ($datatype == "person") {
+?>
+		<th align="left">Person</th>
+<?
+		}
+?>
 		<th align="left">Field</th><th align="left">Translator</th><th align="left" >Translator&nbsp;Options</th><th align="left">Import File Data</th><th align="left">Actions</th>
 	</tr>
 <?
@@ -482,6 +515,21 @@ if ($noimportdata) { ?>
 	foreach ($importfields as $importfield) {
 
 		echo ++$alt % 2 ? '<tr>' : '<tr class="listAlt">';
+		
+		// only person type has extra guardian column to map
+		if ($datatype == "person") {
+?>
+		<td>
+<?
+			NewFormItem($f,$s,"guardseq_$count","selectstart");
+			foreach ($guardiansequence as $seqid => $name) {
+				NewFormItem($f,$s,"guardseq_$count","selectoption",$name,$seqid);
+			}
+			NewFormItem($f,$s,"guardseq_$count","selectend");
+?>
+		</td>
+<?
+		}
 ?>
 		<td>
 <?

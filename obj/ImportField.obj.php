@@ -3,6 +3,7 @@
 class ImportField extends DBMappedObject {
 
 	var $importid;
+	var $guardiansequence;
 	var $mapto;
 	var $action = "copy";
 	var $mapfrom;
@@ -11,7 +12,7 @@ class ImportField extends DBMappedObject {
 	function ImportField ($id = NULL) {
 		$this->_allownulls = true;
 		$this->_tablename = "importfield";
-		$this->_fieldlist = array("importid", "mapto", "action", "mapfrom", "val");
+		$this->_fieldlist = array("importid", "guardiansequence", "mapto", "action", "mapfrom", "val");
 		//call super's constructor
 		DBMappedObject::DBMappedObject($id);
 	}
