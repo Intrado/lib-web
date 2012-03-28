@@ -492,8 +492,9 @@ var RuleWidget = Class.create({
 
 	// Returns json-encoded array of rules.
 	// Example: [{fieldnum:"f01", type:"text", logical:"and", op:"eq", val:"Kee-Yip"}]
-	toJSON: function() {
-		return $H(this.appliedRules).values().toJSON();
+	toJSON: function(data) {
+		var jsondata = $H(this.appliedRules).values();
+		return Object.toJSON(jsondata);
 	}
 });
 
