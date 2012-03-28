@@ -208,7 +208,7 @@ header('Content-type: text/html; charset=UTF-8') ;
 	<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7" />
 	<title><?= getBrand();?>: <?= $PAGETITLE ?></title>
 
-	<script src="script/prototype.js" type="text/javascript"></script>
+	<script src="script/prototype.js" type="text/javascript"></script> <!-- updated to prototype 1.7 -->
 	<script src="script/scriptaculous.js" type="text/javascript"></script>
 	<script src="script/prototip.js.php" type="text/javascript"></script>
 	<script src="script/utils.js"></script>
