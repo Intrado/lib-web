@@ -171,7 +171,7 @@ function listform_load(listformID, formData, postURL) {
 		$('listsTableStatus').update('<img src="img/ajax-loader.gif"/>');
 		new Ajax.Request('ajaxlistform.php?type=addrule&listid=' + listformVars.pendingList, {
 			parameters: {
-				'ruledata': event.memo.ruledata.toJSON()
+				'ruledata': Object.toJSON(event.memo.ruledata)
 			},
 			method: 'post',
 			onSuccess: function(transport) {
@@ -344,7 +344,7 @@ function listform_load_cached_list() {
 			var listids = listformVars.listidsElement.value ? listformVars.listidsElement.value.evalJSON() : [];
 			if (listids.join && listids.length > 0) {
 				chosenLists = listids;
-				listform_load_lists(chosenLists.toJSON(), true);
+				listform_load_lists(Object.toJSON(chosenLists), true);
 			} else {
 				ruleWidget.refresh_guide(true);
 			}
@@ -372,17 +372,17 @@ function listform_add_list(listid) {
 		listids = [];
 	listids = listids.without(listid);
 	listids.push(listid);
-	listformVars.listidsElement.value = listids.toJSON();
+	listformVars.listidsElement.value = Object.toJSON(listids);
 
 	if (listid.indexOf('addme') < 0)
-		listform_load_lists([listid].toJSON());
+		listform_load_lists(Object.toJSON([listid]));
 
 	return true;
 }
 
 function listform_refresh_liststats(listID, ignoreCache) {
 	var doCache = ignoreCache ? false : true;
-	cachedAjaxGet('ajax.php?type=liststats&listids='+[listID].toJSON(),
+	cachedAjaxGet('ajax.php?type=liststats&listids='+Object.toJSON([listID]),
 		function(transport, listID) {
 			var stats = transport.responseJSON;
 			if (!stats) {
@@ -433,7 +433,7 @@ function listform_load_lists(listidsJSON, useCache) {
 	if (!listids.join || listids.length < 1)
 		return;
 	$('listsTableStatus').update('<img src="img/ajax-loader.gif"/>');
-	cachedAjaxGet('ajax.php?type=liststats&listids='+listids.toJSON(),
+	cachedAjaxGet('ajax.php?type=liststats&listids='+Object.toJSON(listids),
 		function(transport, resetExistingLists) {
 			$('listsTableStatus').update();
 			var stats = transport.responseJSON;
@@ -500,7 +500,7 @@ function listform_load_lists(listidsJSON, useCache) {
 
 var listformPreviewCache = {};
 function listform_refresh_preview (listid) {
-	cachedAjaxGet('ajax.php?type=listrules&listids='+[listid].toJSON(),
+	cachedAjaxGet('ajax.php?type=listrules&listids='+Object.toJSON([listid]),
 		function (transport, listid) {
 			var listRules = transport.responseJSON;
 			if (!listRules) {
@@ -560,7 +560,7 @@ function listform_hover_existing_list(label, listid, tr) {
 	});
 	targetElement.prototip.show();
 
-	var listuri = chosenLists.indexOf(listid.toString()) >= 0 ? chosenLists.toJSON() : [listid].toJSON();
+	var listuri = chosenLists.indexOf(listid.toString()) >= 0 ? Object.toJSON(chosenLists) : Object.toJSON([listid]);
 	cachedAjaxGet('ajax.php?type=liststats&listids='+ listuri, function(transport, listid, targetElement, hookPreference, stemPreference) {
 		Tips.hideAll();
 		if (hoverTimer === null)
@@ -640,10 +640,10 @@ function listform_remove_list(event, listid, doconfirm) {
 	var listids = listformVars.listidsElement.getValue() ? listformVars.listidsElement.getValue().evalJSON() : [];
 	if (listids.join) {
 		listids = listids.without(listid);
-		listformVars.listidsElement.value = listids.toJSON();
+		listformVars.listidsElement.value = Object.toJSON(listids);
 	} else {
 		// Somehow listids is not an array, which should never happen.
-		listformVars.listidsElement.value = [].toJSON();
+		listformVars.listidsElement.value = Object.toJSON([]);
 	}
 
 	if (!listaddme) {
@@ -722,7 +722,7 @@ function listform_set_rule_editor_status(addingRule) {
 	} else {
 		listform_clear_validation_error();
 	}
-	listformVars.listidsElement.setValue(listids.toJSON());
+	listformVars.listidsElement.setValue( Object.toJSON(listids) );
 }
 
 function listform_clear_validation_error() {
