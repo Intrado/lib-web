@@ -18,6 +18,11 @@ interface CommSuiteIf {
   public function processIncomingSms($smsParams);
   public function generateFeed($urlcomponent, $categoryIds, $maxPost, $maxDays);
   public function expireFeedCategories($urlcomponent, $categoryIds);
+  public function customerIdLookupForUrl($urlcomponent);
+  public function contentGet($sessionid, $contentId);
+  public function contentGetForCustomerId($customerid, $contentId);
+  public function contentPut($sessionid, $content);
+  public function contentPutForCustomerId($customerid, $content);
 }
 
 class CommSuiteClient implements CommSuiteIf {
@@ -506,6 +511,295 @@ class CommSuiteClient implements CommSuiteIf {
       $this->output_->getTransport()->flush();
     }
   }
+  public function customerIdLookupForUrl($urlcomponent)
+  {
+    $this->send_customerIdLookupForUrl($urlcomponent);
+    return $this->recv_customerIdLookupForUrl();
+  }
+
+  public function send_customerIdLookupForUrl($urlcomponent)
+  {
+    $args = new commsuite_CommSuite_customerIdLookupForUrl_args();
+    $args->urlcomponent = $urlcomponent;
+    $bin_accel = ($this->output_ instanceof TProtocol::$TBINARYPROTOCOLACCELERATED) && function_exists('thrift_protocol_write_binary');
+    if ($bin_accel)
+    {
+      thrift_protocol_write_binary($this->output_, 'customerIdLookupForUrl', TMessageType::CALL, $args, $this->seqid_, $this->output_->isStrictWrite());
+    }
+    else
+    {
+      $this->output_->writeMessageBegin('customerIdLookupForUrl', TMessageType::CALL, $this->seqid_);
+      $args->write($this->output_);
+      $this->output_->writeMessageEnd();
+      $this->output_->getTransport()->flush();
+    }
+  }
+
+  public function recv_customerIdLookupForUrl()
+  {
+    $bin_accel = ($this->input_ instanceof TProtocol::$TBINARYPROTOCOLACCELERATED) && function_exists('thrift_protocol_read_binary');
+    if ($bin_accel) $result = thrift_protocol_read_binary($this->input_, 'commsuite_CommSuite_customerIdLookupForUrl_result', $this->input_->isStrictRead());
+    else
+    {
+      $rseqid = 0;
+      $fname = null;
+      $mtype = 0;
+
+      $this->input_->readMessageBegin($fname, $mtype, $rseqid);
+      if ($mtype == TMessageType::EXCEPTION) {
+        $x = new TApplicationException();
+        $x->read($this->input_);
+        $this->input_->readMessageEnd();
+        throw $x;
+      }
+      $result = new commsuite_CommSuite_customerIdLookupForUrl_result();
+      $result->read($this->input_);
+      $this->input_->readMessageEnd();
+    }
+    if ($result->success !== null) {
+      return $result->success;
+    }
+    if ($result->nfe !== null) {
+      throw $result->nfe;
+    }
+    if ($result->nae !== null) {
+      throw $result->nae;
+    }
+    throw new Exception("customerIdLookupForUrl failed: unknown result");
+  }
+
+  public function contentGet($sessionid, $contentId)
+  {
+    $this->send_contentGet($sessionid, $contentId);
+    return $this->recv_contentGet();
+  }
+
+  public function send_contentGet($sessionid, $contentId)
+  {
+    $args = new commsuite_CommSuite_contentGet_args();
+    $args->sessionid = $sessionid;
+    $args->contentId = $contentId;
+    $bin_accel = ($this->output_ instanceof TProtocol::$TBINARYPROTOCOLACCELERATED) && function_exists('thrift_protocol_write_binary');
+    if ($bin_accel)
+    {
+      thrift_protocol_write_binary($this->output_, 'contentGet', TMessageType::CALL, $args, $this->seqid_, $this->output_->isStrictWrite());
+    }
+    else
+    {
+      $this->output_->writeMessageBegin('contentGet', TMessageType::CALL, $this->seqid_);
+      $args->write($this->output_);
+      $this->output_->writeMessageEnd();
+      $this->output_->getTransport()->flush();
+    }
+  }
+
+  public function recv_contentGet()
+  {
+    $bin_accel = ($this->input_ instanceof TProtocol::$TBINARYPROTOCOLACCELERATED) && function_exists('thrift_protocol_read_binary');
+    if ($bin_accel) $result = thrift_protocol_read_binary($this->input_, 'commsuite_CommSuite_contentGet_result', $this->input_->isStrictRead());
+    else
+    {
+      $rseqid = 0;
+      $fname = null;
+      $mtype = 0;
+
+      $this->input_->readMessageBegin($fname, $mtype, $rseqid);
+      if ($mtype == TMessageType::EXCEPTION) {
+        $x = new TApplicationException();
+        $x->read($this->input_);
+        $this->input_->readMessageEnd();
+        throw $x;
+      }
+      $result = new commsuite_CommSuite_contentGet_result();
+      $result->read($this->input_);
+      $this->input_->readMessageEnd();
+    }
+    if ($result->success !== null) {
+      return $result->success;
+    }
+    if ($result->nfe !== null) {
+      throw $result->nfe;
+    }
+    if ($result->nae !== null) {
+      throw $result->nae;
+    }
+    throw new Exception("contentGet failed: unknown result");
+  }
+
+  public function contentGetForCustomerId($customerid, $contentId)
+  {
+    $this->send_contentGetForCustomerId($customerid, $contentId);
+    return $this->recv_contentGetForCustomerId();
+  }
+
+  public function send_contentGetForCustomerId($customerid, $contentId)
+  {
+    $args = new commsuite_CommSuite_contentGetForCustomerId_args();
+    $args->customerid = $customerid;
+    $args->contentId = $contentId;
+    $bin_accel = ($this->output_ instanceof TProtocol::$TBINARYPROTOCOLACCELERATED) && function_exists('thrift_protocol_write_binary');
+    if ($bin_accel)
+    {
+      thrift_protocol_write_binary($this->output_, 'contentGetForCustomerId', TMessageType::CALL, $args, $this->seqid_, $this->output_->isStrictWrite());
+    }
+    else
+    {
+      $this->output_->writeMessageBegin('contentGetForCustomerId', TMessageType::CALL, $this->seqid_);
+      $args->write($this->output_);
+      $this->output_->writeMessageEnd();
+      $this->output_->getTransport()->flush();
+    }
+  }
+
+  public function recv_contentGetForCustomerId()
+  {
+    $bin_accel = ($this->input_ instanceof TProtocol::$TBINARYPROTOCOLACCELERATED) && function_exists('thrift_protocol_read_binary');
+    if ($bin_accel) $result = thrift_protocol_read_binary($this->input_, 'commsuite_CommSuite_contentGetForCustomerId_result', $this->input_->isStrictRead());
+    else
+    {
+      $rseqid = 0;
+      $fname = null;
+      $mtype = 0;
+
+      $this->input_->readMessageBegin($fname, $mtype, $rseqid);
+      if ($mtype == TMessageType::EXCEPTION) {
+        $x = new TApplicationException();
+        $x->read($this->input_);
+        $this->input_->readMessageEnd();
+        throw $x;
+      }
+      $result = new commsuite_CommSuite_contentGetForCustomerId_result();
+      $result->read($this->input_);
+      $this->input_->readMessageEnd();
+    }
+    if ($result->success !== null) {
+      return $result->success;
+    }
+    if ($result->nfe !== null) {
+      throw $result->nfe;
+    }
+    if ($result->nae !== null) {
+      throw $result->nae;
+    }
+    throw new Exception("contentGetForCustomerId failed: unknown result");
+  }
+
+  public function contentPut($sessionid, $content)
+  {
+    $this->send_contentPut($sessionid, $content);
+    return $this->recv_contentPut();
+  }
+
+  public function send_contentPut($sessionid, $content)
+  {
+    $args = new commsuite_CommSuite_contentPut_args();
+    $args->sessionid = $sessionid;
+    $args->content = $content;
+    $bin_accel = ($this->output_ instanceof TProtocol::$TBINARYPROTOCOLACCELERATED) && function_exists('thrift_protocol_write_binary');
+    if ($bin_accel)
+    {
+      thrift_protocol_write_binary($this->output_, 'contentPut', TMessageType::CALL, $args, $this->seqid_, $this->output_->isStrictWrite());
+    }
+    else
+    {
+      $this->output_->writeMessageBegin('contentPut', TMessageType::CALL, $this->seqid_);
+      $args->write($this->output_);
+      $this->output_->writeMessageEnd();
+      $this->output_->getTransport()->flush();
+    }
+  }
+
+  public function recv_contentPut()
+  {
+    $bin_accel = ($this->input_ instanceof TProtocol::$TBINARYPROTOCOLACCELERATED) && function_exists('thrift_protocol_read_binary');
+    if ($bin_accel) $result = thrift_protocol_read_binary($this->input_, 'commsuite_CommSuite_contentPut_result', $this->input_->isStrictRead());
+    else
+    {
+      $rseqid = 0;
+      $fname = null;
+      $mtype = 0;
+
+      $this->input_->readMessageBegin($fname, $mtype, $rseqid);
+      if ($mtype == TMessageType::EXCEPTION) {
+        $x = new TApplicationException();
+        $x->read($this->input_);
+        $this->input_->readMessageEnd();
+        throw $x;
+      }
+      $result = new commsuite_CommSuite_contentPut_result();
+      $result->read($this->input_);
+      $this->input_->readMessageEnd();
+    }
+    if ($result->success !== null) {
+      return $result->success;
+    }
+    if ($result->nfe !== null) {
+      throw $result->nfe;
+    }
+    if ($result->nae !== null) {
+      throw $result->nae;
+    }
+    throw new Exception("contentPut failed: unknown result");
+  }
+
+  public function contentPutForCustomerId($customerid, $content)
+  {
+    $this->send_contentPutForCustomerId($customerid, $content);
+    return $this->recv_contentPutForCustomerId();
+  }
+
+  public function send_contentPutForCustomerId($customerid, $content)
+  {
+    $args = new commsuite_CommSuite_contentPutForCustomerId_args();
+    $args->customerid = $customerid;
+    $args->content = $content;
+    $bin_accel = ($this->output_ instanceof TProtocol::$TBINARYPROTOCOLACCELERATED) && function_exists('thrift_protocol_write_binary');
+    if ($bin_accel)
+    {
+      thrift_protocol_write_binary($this->output_, 'contentPutForCustomerId', TMessageType::CALL, $args, $this->seqid_, $this->output_->isStrictWrite());
+    }
+    else
+    {
+      $this->output_->writeMessageBegin('contentPutForCustomerId', TMessageType::CALL, $this->seqid_);
+      $args->write($this->output_);
+      $this->output_->writeMessageEnd();
+      $this->output_->getTransport()->flush();
+    }
+  }
+
+  public function recv_contentPutForCustomerId()
+  {
+    $bin_accel = ($this->input_ instanceof TProtocol::$TBINARYPROTOCOLACCELERATED) && function_exists('thrift_protocol_read_binary');
+    if ($bin_accel) $result = thrift_protocol_read_binary($this->input_, 'commsuite_CommSuite_contentPutForCustomerId_result', $this->input_->isStrictRead());
+    else
+    {
+      $rseqid = 0;
+      $fname = null;
+      $mtype = 0;
+
+      $this->input_->readMessageBegin($fname, $mtype, $rseqid);
+      if ($mtype == TMessageType::EXCEPTION) {
+        $x = new TApplicationException();
+        $x->read($this->input_);
+        $this->input_->readMessageEnd();
+        throw $x;
+      }
+      $result = new commsuite_CommSuite_contentPutForCustomerId_result();
+      $result->read($this->input_);
+      $this->input_->readMessageEnd();
+    }
+    if ($result->success !== null) {
+      return $result->success;
+    }
+    if ($result->nfe !== null) {
+      throw $result->nfe;
+    }
+    if ($result->nae !== null) {
+      throw $result->nae;
+    }
+    throw new Exception("contentPutForCustomerId failed: unknown result");
+  }
+
 }
 
 // HELPER FUNCTIONS AND STRUCTURES
@@ -2460,6 +2754,1046 @@ class commsuite_CommSuite_expireFeedCategories_args {
         }
         $output->writeListEnd();
       }
+      $xfer += $output->writeFieldEnd();
+    }
+    $xfer += $output->writeFieldStop();
+    $xfer += $output->writeStructEnd();
+    return $xfer;
+  }
+
+}
+
+class commsuite_CommSuite_customerIdLookupForUrl_args {
+  static $_TSPEC;
+
+  public $urlcomponent = null;
+
+  public function __construct($vals=null) {
+    if (!isset(self::$_TSPEC)) {
+      self::$_TSPEC = array(
+        1 => array(
+          'var' => 'urlcomponent',
+          'type' => TType::STRING,
+          ),
+        );
+    }
+    if (is_array($vals)) {
+      if (isset($vals['urlcomponent'])) {
+        $this->urlcomponent = $vals['urlcomponent'];
+      }
+    }
+  }
+
+  public function getName() {
+    return 'CommSuite_customerIdLookupForUrl_args';
+  }
+
+  public function read($input)
+  {
+    $xfer = 0;
+    $fname = null;
+    $ftype = 0;
+    $fid = 0;
+    $xfer += $input->readStructBegin($fname);
+    while (true)
+    {
+      $xfer += $input->readFieldBegin($fname, $ftype, $fid);
+      if ($ftype == TType::STOP) {
+        break;
+      }
+      switch ($fid)
+      {
+        case 1:
+          if ($ftype == TType::STRING) {
+            $xfer += $input->readString($this->urlcomponent);
+          } else {
+            $xfer += $input->skip($ftype);
+          }
+          break;
+        default:
+          $xfer += $input->skip($ftype);
+          break;
+      }
+      $xfer += $input->readFieldEnd();
+    }
+    $xfer += $input->readStructEnd();
+    return $xfer;
+  }
+
+  public function write($output) {
+    $xfer = 0;
+    $xfer += $output->writeStructBegin('CommSuite_customerIdLookupForUrl_args');
+    if ($this->urlcomponent !== null) {
+      $xfer += $output->writeFieldBegin('urlcomponent', TType::STRING, 1);
+      $xfer += $output->writeString($this->urlcomponent);
+      $xfer += $output->writeFieldEnd();
+    }
+    $xfer += $output->writeFieldStop();
+    $xfer += $output->writeStructEnd();
+    return $xfer;
+  }
+
+}
+
+class commsuite_CommSuite_customerIdLookupForUrl_result {
+  static $_TSPEC;
+
+  public $success = null;
+  public $nfe = null;
+  public $nae = null;
+
+  public function __construct($vals=null) {
+    if (!isset(self::$_TSPEC)) {
+      self::$_TSPEC = array(
+        0 => array(
+          'var' => 'success',
+          'type' => TType::I32,
+          ),
+        1 => array(
+          'var' => 'nfe',
+          'type' => TType::STRUCT,
+          'class' => 'commsuite_NotFoundException',
+          ),
+        2 => array(
+          'var' => 'nae',
+          'type' => TType::STRUCT,
+          'class' => 'commsuite_NotAvailableException',
+          ),
+        );
+    }
+    if (is_array($vals)) {
+      if (isset($vals['success'])) {
+        $this->success = $vals['success'];
+      }
+      if (isset($vals['nfe'])) {
+        $this->nfe = $vals['nfe'];
+      }
+      if (isset($vals['nae'])) {
+        $this->nae = $vals['nae'];
+      }
+    }
+  }
+
+  public function getName() {
+    return 'CommSuite_customerIdLookupForUrl_result';
+  }
+
+  public function read($input)
+  {
+    $xfer = 0;
+    $fname = null;
+    $ftype = 0;
+    $fid = 0;
+    $xfer += $input->readStructBegin($fname);
+    while (true)
+    {
+      $xfer += $input->readFieldBegin($fname, $ftype, $fid);
+      if ($ftype == TType::STOP) {
+        break;
+      }
+      switch ($fid)
+      {
+        case 0:
+          if ($ftype == TType::I32) {
+            $xfer += $input->readI32($this->success);
+          } else {
+            $xfer += $input->skip($ftype);
+          }
+          break;
+        case 1:
+          if ($ftype == TType::STRUCT) {
+            $this->nfe = new commsuite_NotFoundException();
+            $xfer += $this->nfe->read($input);
+          } else {
+            $xfer += $input->skip($ftype);
+          }
+          break;
+        case 2:
+          if ($ftype == TType::STRUCT) {
+            $this->nae = new commsuite_NotAvailableException();
+            $xfer += $this->nae->read($input);
+          } else {
+            $xfer += $input->skip($ftype);
+          }
+          break;
+        default:
+          $xfer += $input->skip($ftype);
+          break;
+      }
+      $xfer += $input->readFieldEnd();
+    }
+    $xfer += $input->readStructEnd();
+    return $xfer;
+  }
+
+  public function write($output) {
+    $xfer = 0;
+    $xfer += $output->writeStructBegin('CommSuite_customerIdLookupForUrl_result');
+    if ($this->success !== null) {
+      $xfer += $output->writeFieldBegin('success', TType::I32, 0);
+      $xfer += $output->writeI32($this->success);
+      $xfer += $output->writeFieldEnd();
+    }
+    if ($this->nfe !== null) {
+      $xfer += $output->writeFieldBegin('nfe', TType::STRUCT, 1);
+      $xfer += $this->nfe->write($output);
+      $xfer += $output->writeFieldEnd();
+    }
+    if ($this->nae !== null) {
+      $xfer += $output->writeFieldBegin('nae', TType::STRUCT, 2);
+      $xfer += $this->nae->write($output);
+      $xfer += $output->writeFieldEnd();
+    }
+    $xfer += $output->writeFieldStop();
+    $xfer += $output->writeStructEnd();
+    return $xfer;
+  }
+
+}
+
+class commsuite_CommSuite_contentGet_args {
+  static $_TSPEC;
+
+  public $sessionid = null;
+  public $contentId = null;
+
+  public function __construct($vals=null) {
+    if (!isset(self::$_TSPEC)) {
+      self::$_TSPEC = array(
+        1 => array(
+          'var' => 'sessionid',
+          'type' => TType::STRING,
+          ),
+        2 => array(
+          'var' => 'contentId',
+          'type' => TType::I64,
+          ),
+        );
+    }
+    if (is_array($vals)) {
+      if (isset($vals['sessionid'])) {
+        $this->sessionid = $vals['sessionid'];
+      }
+      if (isset($vals['contentId'])) {
+        $this->contentId = $vals['contentId'];
+      }
+    }
+  }
+
+  public function getName() {
+    return 'CommSuite_contentGet_args';
+  }
+
+  public function read($input)
+  {
+    $xfer = 0;
+    $fname = null;
+    $ftype = 0;
+    $fid = 0;
+    $xfer += $input->readStructBegin($fname);
+    while (true)
+    {
+      $xfer += $input->readFieldBegin($fname, $ftype, $fid);
+      if ($ftype == TType::STOP) {
+        break;
+      }
+      switch ($fid)
+      {
+        case 1:
+          if ($ftype == TType::STRING) {
+            $xfer += $input->readString($this->sessionid);
+          } else {
+            $xfer += $input->skip($ftype);
+          }
+          break;
+        case 2:
+          if ($ftype == TType::I64) {
+            $xfer += $input->readI64($this->contentId);
+          } else {
+            $xfer += $input->skip($ftype);
+          }
+          break;
+        default:
+          $xfer += $input->skip($ftype);
+          break;
+      }
+      $xfer += $input->readFieldEnd();
+    }
+    $xfer += $input->readStructEnd();
+    return $xfer;
+  }
+
+  public function write($output) {
+    $xfer = 0;
+    $xfer += $output->writeStructBegin('CommSuite_contentGet_args');
+    if ($this->sessionid !== null) {
+      $xfer += $output->writeFieldBegin('sessionid', TType::STRING, 1);
+      $xfer += $output->writeString($this->sessionid);
+      $xfer += $output->writeFieldEnd();
+    }
+    if ($this->contentId !== null) {
+      $xfer += $output->writeFieldBegin('contentId', TType::I64, 2);
+      $xfer += $output->writeI64($this->contentId);
+      $xfer += $output->writeFieldEnd();
+    }
+    $xfer += $output->writeFieldStop();
+    $xfer += $output->writeStructEnd();
+    return $xfer;
+  }
+
+}
+
+class commsuite_CommSuite_contentGet_result {
+  static $_TSPEC;
+
+  public $success = null;
+  public $nfe = null;
+  public $nae = null;
+
+  public function __construct($vals=null) {
+    if (!isset(self::$_TSPEC)) {
+      self::$_TSPEC = array(
+        0 => array(
+          'var' => 'success',
+          'type' => TType::STRUCT,
+          'class' => 'commsuite_FileData',
+          ),
+        1 => array(
+          'var' => 'nfe',
+          'type' => TType::STRUCT,
+          'class' => 'commsuite_NotFoundException',
+          ),
+        2 => array(
+          'var' => 'nae',
+          'type' => TType::STRUCT,
+          'class' => 'commsuite_NotAvailableException',
+          ),
+        );
+    }
+    if (is_array($vals)) {
+      if (isset($vals['success'])) {
+        $this->success = $vals['success'];
+      }
+      if (isset($vals['nfe'])) {
+        $this->nfe = $vals['nfe'];
+      }
+      if (isset($vals['nae'])) {
+        $this->nae = $vals['nae'];
+      }
+    }
+  }
+
+  public function getName() {
+    return 'CommSuite_contentGet_result';
+  }
+
+  public function read($input)
+  {
+    $xfer = 0;
+    $fname = null;
+    $ftype = 0;
+    $fid = 0;
+    $xfer += $input->readStructBegin($fname);
+    while (true)
+    {
+      $xfer += $input->readFieldBegin($fname, $ftype, $fid);
+      if ($ftype == TType::STOP) {
+        break;
+      }
+      switch ($fid)
+      {
+        case 0:
+          if ($ftype == TType::STRUCT) {
+            $this->success = new commsuite_FileData();
+            $xfer += $this->success->read($input);
+          } else {
+            $xfer += $input->skip($ftype);
+          }
+          break;
+        case 1:
+          if ($ftype == TType::STRUCT) {
+            $this->nfe = new commsuite_NotFoundException();
+            $xfer += $this->nfe->read($input);
+          } else {
+            $xfer += $input->skip($ftype);
+          }
+          break;
+        case 2:
+          if ($ftype == TType::STRUCT) {
+            $this->nae = new commsuite_NotAvailableException();
+            $xfer += $this->nae->read($input);
+          } else {
+            $xfer += $input->skip($ftype);
+          }
+          break;
+        default:
+          $xfer += $input->skip($ftype);
+          break;
+      }
+      $xfer += $input->readFieldEnd();
+    }
+    $xfer += $input->readStructEnd();
+    return $xfer;
+  }
+
+  public function write($output) {
+    $xfer = 0;
+    $xfer += $output->writeStructBegin('CommSuite_contentGet_result');
+    if ($this->success !== null) {
+      if (!is_object($this->success)) {
+        throw new TProtocolException('Bad type in structure.', TProtocolException::INVALID_DATA);
+      }
+      $xfer += $output->writeFieldBegin('success', TType::STRUCT, 0);
+      $xfer += $this->success->write($output);
+      $xfer += $output->writeFieldEnd();
+    }
+    if ($this->nfe !== null) {
+      $xfer += $output->writeFieldBegin('nfe', TType::STRUCT, 1);
+      $xfer += $this->nfe->write($output);
+      $xfer += $output->writeFieldEnd();
+    }
+    if ($this->nae !== null) {
+      $xfer += $output->writeFieldBegin('nae', TType::STRUCT, 2);
+      $xfer += $this->nae->write($output);
+      $xfer += $output->writeFieldEnd();
+    }
+    $xfer += $output->writeFieldStop();
+    $xfer += $output->writeStructEnd();
+    return $xfer;
+  }
+
+}
+
+class commsuite_CommSuite_contentGetForCustomerId_args {
+  static $_TSPEC;
+
+  public $customerid = null;
+  public $contentId = null;
+
+  public function __construct($vals=null) {
+    if (!isset(self::$_TSPEC)) {
+      self::$_TSPEC = array(
+        1 => array(
+          'var' => 'customerid',
+          'type' => TType::I32,
+          ),
+        2 => array(
+          'var' => 'contentId',
+          'type' => TType::I64,
+          ),
+        );
+    }
+    if (is_array($vals)) {
+      if (isset($vals['customerid'])) {
+        $this->customerid = $vals['customerid'];
+      }
+      if (isset($vals['contentId'])) {
+        $this->contentId = $vals['contentId'];
+      }
+    }
+  }
+
+  public function getName() {
+    return 'CommSuite_contentGetForCustomerId_args';
+  }
+
+  public function read($input)
+  {
+    $xfer = 0;
+    $fname = null;
+    $ftype = 0;
+    $fid = 0;
+    $xfer += $input->readStructBegin($fname);
+    while (true)
+    {
+      $xfer += $input->readFieldBegin($fname, $ftype, $fid);
+      if ($ftype == TType::STOP) {
+        break;
+      }
+      switch ($fid)
+      {
+        case 1:
+          if ($ftype == TType::I32) {
+            $xfer += $input->readI32($this->customerid);
+          } else {
+            $xfer += $input->skip($ftype);
+          }
+          break;
+        case 2:
+          if ($ftype == TType::I64) {
+            $xfer += $input->readI64($this->contentId);
+          } else {
+            $xfer += $input->skip($ftype);
+          }
+          break;
+        default:
+          $xfer += $input->skip($ftype);
+          break;
+      }
+      $xfer += $input->readFieldEnd();
+    }
+    $xfer += $input->readStructEnd();
+    return $xfer;
+  }
+
+  public function write($output) {
+    $xfer = 0;
+    $xfer += $output->writeStructBegin('CommSuite_contentGetForCustomerId_args');
+    if ($this->customerid !== null) {
+      $xfer += $output->writeFieldBegin('customerid', TType::I32, 1);
+      $xfer += $output->writeI32($this->customerid);
+      $xfer += $output->writeFieldEnd();
+    }
+    if ($this->contentId !== null) {
+      $xfer += $output->writeFieldBegin('contentId', TType::I64, 2);
+      $xfer += $output->writeI64($this->contentId);
+      $xfer += $output->writeFieldEnd();
+    }
+    $xfer += $output->writeFieldStop();
+    $xfer += $output->writeStructEnd();
+    return $xfer;
+  }
+
+}
+
+class commsuite_CommSuite_contentGetForCustomerId_result {
+  static $_TSPEC;
+
+  public $success = null;
+  public $nfe = null;
+  public $nae = null;
+
+  public function __construct($vals=null) {
+    if (!isset(self::$_TSPEC)) {
+      self::$_TSPEC = array(
+        0 => array(
+          'var' => 'success',
+          'type' => TType::STRUCT,
+          'class' => 'commsuite_FileData',
+          ),
+        1 => array(
+          'var' => 'nfe',
+          'type' => TType::STRUCT,
+          'class' => 'commsuite_NotFoundException',
+          ),
+        2 => array(
+          'var' => 'nae',
+          'type' => TType::STRUCT,
+          'class' => 'commsuite_NotAvailableException',
+          ),
+        );
+    }
+    if (is_array($vals)) {
+      if (isset($vals['success'])) {
+        $this->success = $vals['success'];
+      }
+      if (isset($vals['nfe'])) {
+        $this->nfe = $vals['nfe'];
+      }
+      if (isset($vals['nae'])) {
+        $this->nae = $vals['nae'];
+      }
+    }
+  }
+
+  public function getName() {
+    return 'CommSuite_contentGetForCustomerId_result';
+  }
+
+  public function read($input)
+  {
+    $xfer = 0;
+    $fname = null;
+    $ftype = 0;
+    $fid = 0;
+    $xfer += $input->readStructBegin($fname);
+    while (true)
+    {
+      $xfer += $input->readFieldBegin($fname, $ftype, $fid);
+      if ($ftype == TType::STOP) {
+        break;
+      }
+      switch ($fid)
+      {
+        case 0:
+          if ($ftype == TType::STRUCT) {
+            $this->success = new commsuite_FileData();
+            $xfer += $this->success->read($input);
+          } else {
+            $xfer += $input->skip($ftype);
+          }
+          break;
+        case 1:
+          if ($ftype == TType::STRUCT) {
+            $this->nfe = new commsuite_NotFoundException();
+            $xfer += $this->nfe->read($input);
+          } else {
+            $xfer += $input->skip($ftype);
+          }
+          break;
+        case 2:
+          if ($ftype == TType::STRUCT) {
+            $this->nae = new commsuite_NotAvailableException();
+            $xfer += $this->nae->read($input);
+          } else {
+            $xfer += $input->skip($ftype);
+          }
+          break;
+        default:
+          $xfer += $input->skip($ftype);
+          break;
+      }
+      $xfer += $input->readFieldEnd();
+    }
+    $xfer += $input->readStructEnd();
+    return $xfer;
+  }
+
+  public function write($output) {
+    $xfer = 0;
+    $xfer += $output->writeStructBegin('CommSuite_contentGetForCustomerId_result');
+    if ($this->success !== null) {
+      if (!is_object($this->success)) {
+        throw new TProtocolException('Bad type in structure.', TProtocolException::INVALID_DATA);
+      }
+      $xfer += $output->writeFieldBegin('success', TType::STRUCT, 0);
+      $xfer += $this->success->write($output);
+      $xfer += $output->writeFieldEnd();
+    }
+    if ($this->nfe !== null) {
+      $xfer += $output->writeFieldBegin('nfe', TType::STRUCT, 1);
+      $xfer += $this->nfe->write($output);
+      $xfer += $output->writeFieldEnd();
+    }
+    if ($this->nae !== null) {
+      $xfer += $output->writeFieldBegin('nae', TType::STRUCT, 2);
+      $xfer += $this->nae->write($output);
+      $xfer += $output->writeFieldEnd();
+    }
+    $xfer += $output->writeFieldStop();
+    $xfer += $output->writeStructEnd();
+    return $xfer;
+  }
+
+}
+
+class commsuite_CommSuite_contentPut_args {
+  static $_TSPEC;
+
+  public $sessionid = null;
+  public $content = null;
+
+  public function __construct($vals=null) {
+    if (!isset(self::$_TSPEC)) {
+      self::$_TSPEC = array(
+        1 => array(
+          'var' => 'sessionid',
+          'type' => TType::STRING,
+          ),
+        2 => array(
+          'var' => 'content',
+          'type' => TType::STRUCT,
+          'class' => 'commsuite_FileData',
+          ),
+        );
+    }
+    if (is_array($vals)) {
+      if (isset($vals['sessionid'])) {
+        $this->sessionid = $vals['sessionid'];
+      }
+      if (isset($vals['content'])) {
+        $this->content = $vals['content'];
+      }
+    }
+  }
+
+  public function getName() {
+    return 'CommSuite_contentPut_args';
+  }
+
+  public function read($input)
+  {
+    $xfer = 0;
+    $fname = null;
+    $ftype = 0;
+    $fid = 0;
+    $xfer += $input->readStructBegin($fname);
+    while (true)
+    {
+      $xfer += $input->readFieldBegin($fname, $ftype, $fid);
+      if ($ftype == TType::STOP) {
+        break;
+      }
+      switch ($fid)
+      {
+        case 1:
+          if ($ftype == TType::STRING) {
+            $xfer += $input->readString($this->sessionid);
+          } else {
+            $xfer += $input->skip($ftype);
+          }
+          break;
+        case 2:
+          if ($ftype == TType::STRUCT) {
+            $this->content = new commsuite_FileData();
+            $xfer += $this->content->read($input);
+          } else {
+            $xfer += $input->skip($ftype);
+          }
+          break;
+        default:
+          $xfer += $input->skip($ftype);
+          break;
+      }
+      $xfer += $input->readFieldEnd();
+    }
+    $xfer += $input->readStructEnd();
+    return $xfer;
+  }
+
+  public function write($output) {
+    $xfer = 0;
+    $xfer += $output->writeStructBegin('CommSuite_contentPut_args');
+    if ($this->sessionid !== null) {
+      $xfer += $output->writeFieldBegin('sessionid', TType::STRING, 1);
+      $xfer += $output->writeString($this->sessionid);
+      $xfer += $output->writeFieldEnd();
+    }
+    if ($this->content !== null) {
+      if (!is_object($this->content)) {
+        throw new TProtocolException('Bad type in structure.', TProtocolException::INVALID_DATA);
+      }
+      $xfer += $output->writeFieldBegin('content', TType::STRUCT, 2);
+      $xfer += $this->content->write($output);
+      $xfer += $output->writeFieldEnd();
+    }
+    $xfer += $output->writeFieldStop();
+    $xfer += $output->writeStructEnd();
+    return $xfer;
+  }
+
+}
+
+class commsuite_CommSuite_contentPut_result {
+  static $_TSPEC;
+
+  public $success = null;
+  public $nfe = null;
+  public $nae = null;
+
+  public function __construct($vals=null) {
+    if (!isset(self::$_TSPEC)) {
+      self::$_TSPEC = array(
+        0 => array(
+          'var' => 'success',
+          'type' => TType::I64,
+          ),
+        1 => array(
+          'var' => 'nfe',
+          'type' => TType::STRUCT,
+          'class' => 'commsuite_NotFoundException',
+          ),
+        2 => array(
+          'var' => 'nae',
+          'type' => TType::STRUCT,
+          'class' => 'commsuite_NotAvailableException',
+          ),
+        );
+    }
+    if (is_array($vals)) {
+      if (isset($vals['success'])) {
+        $this->success = $vals['success'];
+      }
+      if (isset($vals['nfe'])) {
+        $this->nfe = $vals['nfe'];
+      }
+      if (isset($vals['nae'])) {
+        $this->nae = $vals['nae'];
+      }
+    }
+  }
+
+  public function getName() {
+    return 'CommSuite_contentPut_result';
+  }
+
+  public function read($input)
+  {
+    $xfer = 0;
+    $fname = null;
+    $ftype = 0;
+    $fid = 0;
+    $xfer += $input->readStructBegin($fname);
+    while (true)
+    {
+      $xfer += $input->readFieldBegin($fname, $ftype, $fid);
+      if ($ftype == TType::STOP) {
+        break;
+      }
+      switch ($fid)
+      {
+        case 0:
+          if ($ftype == TType::I64) {
+            $xfer += $input->readI64($this->success);
+          } else {
+            $xfer += $input->skip($ftype);
+          }
+          break;
+        case 1:
+          if ($ftype == TType::STRUCT) {
+            $this->nfe = new commsuite_NotFoundException();
+            $xfer += $this->nfe->read($input);
+          } else {
+            $xfer += $input->skip($ftype);
+          }
+          break;
+        case 2:
+          if ($ftype == TType::STRUCT) {
+            $this->nae = new commsuite_NotAvailableException();
+            $xfer += $this->nae->read($input);
+          } else {
+            $xfer += $input->skip($ftype);
+          }
+          break;
+        default:
+          $xfer += $input->skip($ftype);
+          break;
+      }
+      $xfer += $input->readFieldEnd();
+    }
+    $xfer += $input->readStructEnd();
+    return $xfer;
+  }
+
+  public function write($output) {
+    $xfer = 0;
+    $xfer += $output->writeStructBegin('CommSuite_contentPut_result');
+    if ($this->success !== null) {
+      $xfer += $output->writeFieldBegin('success', TType::I64, 0);
+      $xfer += $output->writeI64($this->success);
+      $xfer += $output->writeFieldEnd();
+    }
+    if ($this->nfe !== null) {
+      $xfer += $output->writeFieldBegin('nfe', TType::STRUCT, 1);
+      $xfer += $this->nfe->write($output);
+      $xfer += $output->writeFieldEnd();
+    }
+    if ($this->nae !== null) {
+      $xfer += $output->writeFieldBegin('nae', TType::STRUCT, 2);
+      $xfer += $this->nae->write($output);
+      $xfer += $output->writeFieldEnd();
+    }
+    $xfer += $output->writeFieldStop();
+    $xfer += $output->writeStructEnd();
+    return $xfer;
+  }
+
+}
+
+class commsuite_CommSuite_contentPutForCustomerId_args {
+  static $_TSPEC;
+
+  public $customerid = null;
+  public $content = null;
+
+  public function __construct($vals=null) {
+    if (!isset(self::$_TSPEC)) {
+      self::$_TSPEC = array(
+        1 => array(
+          'var' => 'customerid',
+          'type' => TType::I32,
+          ),
+        2 => array(
+          'var' => 'content',
+          'type' => TType::STRUCT,
+          'class' => 'commsuite_FileData',
+          ),
+        );
+    }
+    if (is_array($vals)) {
+      if (isset($vals['customerid'])) {
+        $this->customerid = $vals['customerid'];
+      }
+      if (isset($vals['content'])) {
+        $this->content = $vals['content'];
+      }
+    }
+  }
+
+  public function getName() {
+    return 'CommSuite_contentPutForCustomerId_args';
+  }
+
+  public function read($input)
+  {
+    $xfer = 0;
+    $fname = null;
+    $ftype = 0;
+    $fid = 0;
+    $xfer += $input->readStructBegin($fname);
+    while (true)
+    {
+      $xfer += $input->readFieldBegin($fname, $ftype, $fid);
+      if ($ftype == TType::STOP) {
+        break;
+      }
+      switch ($fid)
+      {
+        case 1:
+          if ($ftype == TType::I32) {
+            $xfer += $input->readI32($this->customerid);
+          } else {
+            $xfer += $input->skip($ftype);
+          }
+          break;
+        case 2:
+          if ($ftype == TType::STRUCT) {
+            $this->content = new commsuite_FileData();
+            $xfer += $this->content->read($input);
+          } else {
+            $xfer += $input->skip($ftype);
+          }
+          break;
+        default:
+          $xfer += $input->skip($ftype);
+          break;
+      }
+      $xfer += $input->readFieldEnd();
+    }
+    $xfer += $input->readStructEnd();
+    return $xfer;
+  }
+
+  public function write($output) {
+    $xfer = 0;
+    $xfer += $output->writeStructBegin('CommSuite_contentPutForCustomerId_args');
+    if ($this->customerid !== null) {
+      $xfer += $output->writeFieldBegin('customerid', TType::I32, 1);
+      $xfer += $output->writeI32($this->customerid);
+      $xfer += $output->writeFieldEnd();
+    }
+    if ($this->content !== null) {
+      if (!is_object($this->content)) {
+        throw new TProtocolException('Bad type in structure.', TProtocolException::INVALID_DATA);
+      }
+      $xfer += $output->writeFieldBegin('content', TType::STRUCT, 2);
+      $xfer += $this->content->write($output);
+      $xfer += $output->writeFieldEnd();
+    }
+    $xfer += $output->writeFieldStop();
+    $xfer += $output->writeStructEnd();
+    return $xfer;
+  }
+
+}
+
+class commsuite_CommSuite_contentPutForCustomerId_result {
+  static $_TSPEC;
+
+  public $success = null;
+  public $nfe = null;
+  public $nae = null;
+
+  public function __construct($vals=null) {
+    if (!isset(self::$_TSPEC)) {
+      self::$_TSPEC = array(
+        0 => array(
+          'var' => 'success',
+          'type' => TType::I64,
+          ),
+        1 => array(
+          'var' => 'nfe',
+          'type' => TType::STRUCT,
+          'class' => 'commsuite_NotFoundException',
+          ),
+        2 => array(
+          'var' => 'nae',
+          'type' => TType::STRUCT,
+          'class' => 'commsuite_NotAvailableException',
+          ),
+        );
+    }
+    if (is_array($vals)) {
+      if (isset($vals['success'])) {
+        $this->success = $vals['success'];
+      }
+      if (isset($vals['nfe'])) {
+        $this->nfe = $vals['nfe'];
+      }
+      if (isset($vals['nae'])) {
+        $this->nae = $vals['nae'];
+      }
+    }
+  }
+
+  public function getName() {
+    return 'CommSuite_contentPutForCustomerId_result';
+  }
+
+  public function read($input)
+  {
+    $xfer = 0;
+    $fname = null;
+    $ftype = 0;
+    $fid = 0;
+    $xfer += $input->readStructBegin($fname);
+    while (true)
+    {
+      $xfer += $input->readFieldBegin($fname, $ftype, $fid);
+      if ($ftype == TType::STOP) {
+        break;
+      }
+      switch ($fid)
+      {
+        case 0:
+          if ($ftype == TType::I64) {
+            $xfer += $input->readI64($this->success);
+          } else {
+            $xfer += $input->skip($ftype);
+          }
+          break;
+        case 1:
+          if ($ftype == TType::STRUCT) {
+            $this->nfe = new commsuite_NotFoundException();
+            $xfer += $this->nfe->read($input);
+          } else {
+            $xfer += $input->skip($ftype);
+          }
+          break;
+        case 2:
+          if ($ftype == TType::STRUCT) {
+            $this->nae = new commsuite_NotAvailableException();
+            $xfer += $this->nae->read($input);
+          } else {
+            $xfer += $input->skip($ftype);
+          }
+          break;
+        default:
+          $xfer += $input->skip($ftype);
+          break;
+      }
+      $xfer += $input->readFieldEnd();
+    }
+    $xfer += $input->readStructEnd();
+    return $xfer;
+  }
+
+  public function write($output) {
+    $xfer = 0;
+    $xfer += $output->writeStructBegin('CommSuite_contentPutForCustomerId_result');
+    if ($this->success !== null) {
+      $xfer += $output->writeFieldBegin('success', TType::I64, 0);
+      $xfer += $output->writeI64($this->success);
+      $xfer += $output->writeFieldEnd();
+    }
+    if ($this->nfe !== null) {
+      $xfer += $output->writeFieldBegin('nfe', TType::STRUCT, 1);
+      $xfer += $this->nfe->write($output);
+      $xfer += $output->writeFieldEnd();
+    }
+    if ($this->nae !== null) {
+      $xfer += $output->writeFieldBegin('nae', TType::STRUCT, 2);
+      $xfer += $this->nae->write($output);
       $xfer += $output->writeFieldEnd();
     }
     $xfer += $output->writeFieldStop();
