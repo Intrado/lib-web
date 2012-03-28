@@ -129,7 +129,7 @@ include_once("logintop.inc.php");
 		
 		<fieldset>
 		<label class="indexform" for="form_login"><?=_L("Login:")?></label>
-		<input type="text" name="login" id="form_login" size="20" maxlength="20" id="logintext" />
+		<input type="text" name="login" id="form_login" size="20" maxlength="20" />
 		</fieldset>
 
 		<fieldset>
@@ -157,7 +157,7 @@ if (!($custname === false)) {
 ?>
 	<script type="text/javascript">
 
-	new getObj('logintext').obj.focus();
+	new getObj('form_login').obj.focus();
 
 	</script>
 <?
