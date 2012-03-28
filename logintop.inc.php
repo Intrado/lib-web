@@ -38,18 +38,16 @@ if (!isset($scheme['_supportemail']))
 	
 if (!isset($scheme['_supportphone']))
 	$scheme['_supportphone'] = "8009203897";
-	
-
-header('Content-type: text/html; charset=UTF-8') ;
 
 
 ?>
+<!DOCTYPE html>
 <html>
 <head>
-	<meta http-equiv="Content-type" value="text/html; charset=UTF-8" />
+	<meta http-equiv="Content-type" content="text/html; charset=UTF-8" />
+	
 	<title><?=$CustomBrand?> <?=$TITLE?></title>
-	<link href='css/css.inc.php' type='text/css' rel='stylesheet' media='screen'>
-	<link href='css/login.css.php' type='text/css' rel='stylesheet' media='screen'>
+	<link href='css/login.css' rel='stylesheet'>
 	
 <script type="text/javascript">
 
@@ -101,7 +99,7 @@ function getObj(name)
 <body>
 
 <div id="top_banner" class="banner cf">
-	<div class="banner_logo"><img src="logo.img.php" /></div>
+	<div class="banner_logo"><img src="logo.img.php" alt="School Messenger"/></div>
 </div><!-- end top_banner .banner -->
 
 
