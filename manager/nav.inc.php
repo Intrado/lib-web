@@ -63,40 +63,41 @@ if (isset($_GET['monitor'])) {
 
 <table border="0" cellpadding="5" class="imagelink noprint">
 	<tr>
-		<td><a href="customers.php" title="Customer&nbsp;List"><img src="mimg/custlist.png" border=0><div>Customer&nbsp;List</div></a></td>
+		<td><a href="customers.php" title="Customer&nbsp;List"><img src="mimg/custlist.png" />Customer&nbsp;List</a></td>
 	<? if ($MANAGERUSER->authorized("imports")) { ?>
-		<td><a href="importalerts.php" title="Import&nbsp;Alerts"><img src="mimg/custimports.png" border=0><div>Import&nbsp;Alerts</div></a></td>
+		<td><a href="importalerts.php" title="Import&nbsp;Alerts"><img src="mimg/custimports.png" />Import&nbsp;Alerts</a></td>
 	<? } ?>
 	<? if ($MANAGERUSER->authorized("activejobs")) { ?>
-		<td><a href="customeractivejobs.php" title="Active&nbsp;Jobs"><img src="mimg/activejobs.png" border=0><div>Active&nbsp;Jobs</div></a></td>
+		<td><a href="customeractivejobs.php" title="Active&nbsp;Jobs"><img src="mimg/activejobs.png" />Active&nbsp;Jobs</a></td>
 	<? } ?>
 	<? if ($MANAGERUSER->authorized("newcustomer")) { ?>
-		<td><a href="customeredit.php?id=new" title="New&nbsp;Customer"><img src="mimg/newcustomer.png" border=0><div>New&nbsp;Customer</div></a></td>
+		<td><a href="customeredit.php?id=new" title="New&nbsp;Customer"><img src="mimg/newcustomer.png" />New&nbsp;Customer</a></td>
 	<? } ?>
 	<? if ($MANAGERUSER->authorized("lockedusers")) { ?>
-		<td><a href="lockedusers.php" title="Locked&nbsp;Users"><img src="mimg/lockedusers.png" border=0><div>Locked&nbsp;Users</div></a></td>
+		<td><a href="lockedusers.php" title="Locked&nbsp;Users"><img src="mimg/lockedusers.png" />Locked&nbsp;Users</a></td>
 	<? } ?>
 	<? if ($MANAGERUSER->authorized("editdm")) { ?>
-		<td><a href="customerdms.php?clear" title="SmartCall"><img src="mimg/rdms.png" border=0><div>SmartCall</div></a></td>
+		<td><a href="customerdms.php?clear" title="SmartCall"><img src="mimg/rdms.png" />SmartCall</a></td>
 	<? } ?>
 	<? if ($MANAGERUSER->authorized("systemdm")) { ?>
-		<td><a href="systemdms.php" title="System DMs"><img src="mimg/sysdm.png" border=0><div>System&nbsp;DMs</div></a></td>
+		<td><a href="systemdms.php" title="System DMs"><img src="mimg/sysdm.png" />System&nbsp;DMs</a></td>
 	<? } ?>
 	<? if ($MANAGERUSER->authorized("diskagent")) { ?>
-		<td><a href="diskagents.php" title="SwiftSync"><img src="mimg/diskagent.png" border=0><div>SwiftSync</div></a></td>
+		<td><a href="diskagents.php" title="SwiftSync"><img src="mimg/diskagent.png" />SwiftSync</a></td>
 	<? } ?>
 	<? if ($MANAGERUSER->authorized("customercontacts")) { ?>
-		<td><a href="customercontactsearch.php" title="Contact Search"><img src="mimg/search.png" border=0><div>Contact&nbsp;Search</div></a></td>
+		<td><a href="customercontactsearch.php" title="Contact Search"><img src="mimg/search.png" />Contact&nbsp;Search</a></td>
 	<? } ?>
 	<? if ($MANAGERUSER->authorized("smsblock")) { ?>
-		<td><a href="smsblock.php" title="SMS Block"><img src="mimg/smsblock.png" border=0><div>SMS&nbsp;Block</div></a></td>
+		<td><a href="smsblock.php" title="SMS Block"><img src="mimg/smsblock.png" />SMS&nbsp;Block</a></td>
 	<? } ?>
 	<? if ($MANAGERUSER->authorizedAny(array("billablecalls","bouncedemailsearch","passwordcheck", "emergencyjobs", "runqueries", "tollfreenumbers", "manageserver", "systemdm", "superuser"))) { ?>
-		<td><a href="advancedactions.php" title="Advanced Actions"><img src="mimg/config.png" border=0><div>Advanced</div></a></td>
+		<td><a href="advancedactions.php" title="Advanced Actions"><img src="mimg/config.png" />Advanced</a></td>
 	<? } ?>	
-		<td><a href="./?logout=1&reason=request" title="Log&nbsp;Out"><img src="mimg/logout.png" border=0><div>Log&nbsp;Out</div></a></td>
+		<td><a href="./?logout=1&reason=request" title="Log&nbsp;Out"><img src="mimg/logout.png" />Log&nbsp;Out</a></td>
 	</tr>
 </table>
+
 <div class="maincontent">
 
 	<?
