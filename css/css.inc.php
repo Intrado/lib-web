@@ -175,6 +175,9 @@ further colours for subnav links are in the specific theme folder
 .maincontent { margin: 0 1%; }
 form#search { margin: 10px 0; }
 
+table.imagelink td { text-align: center; font-size: 10px; }
+table.imagelink td a { display: block; }
+
 
 /*----- Content sections -----*/
 
