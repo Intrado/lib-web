@@ -118,7 +118,7 @@ class FormListSelect extends FormItem {
 					).insert(
 						new Element("td", {id: listcheckbox.id + "-total"}).update()
 					));
-				cachedAjaxGet("ajax.php?type=liststats&listids=" + [listcheckbox.value].toJSON(),
+				cachedAjaxGet("ajax.php?type=liststats&listids=" + Object.toJSON([listcheckbox.value]),
 					function (transport, listcheckboxid) {
 						var stats = transport.responseJSON;
 						var listid = $(listcheckboxid).value;
