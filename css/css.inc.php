@@ -169,6 +169,11 @@ further colours for subnav links are in the specific theme folder
 .destlabel { color: <?=$primary?>; }
 .custname { font-size: 12px; color:<?=$primary?>; white-space: nowrap; text-align: right; margin: 0px; padding: 0px; margin-right: 5px; }
 
+/*----- manager styles -----*/
+
+.maincontent { margin: 0 1%; }
+form#search { margin: 10px 0; }
+
 
 /*----- Content sections -----*/
 
