@@ -414,7 +414,6 @@ table.list th, table.list td { text-align: left; border-right: 1px solid #ccc; c
 table.list td { padding: 5px; }
 table.list ul { list-style: none; padding: 0; margin: 0; }
 table.list ul li { padding: 6px 8px; }
-table.list ul li:nth-child(even) { background-color: #f1f1f1; }
 
 table.usagelist { width: 100%; margin: 0; border: 1px solid #ccc; background-color: #f8f8f8;  }
 table.usagelist tr:nth-child(even) { background-color: #f1f1f1; }
