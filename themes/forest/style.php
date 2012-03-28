@@ -137,6 +137,7 @@ border: 1px solid #494949; text-shadow: 0 1px 0 #333; opacity: 0.8;
 -webkit-box-shadow: inset 0px 0px 2px #fff; -moz-box-shadow: inset 0px 0px 2px #fff; box-shadow: inset 0px 0px 2px #fff; }
 .btn:hover { background: #0d8336; color: #fff; border: 1px solid #053315; 
 -webkit-box-shadow: inset 0px 1px 3px #053315; -moz-box-shadow: inset 0px 1px 3px #053315; box-shadow: inset 0px 1px 3px #053315; }
+.btn_left, .btn_middle, .btn_right { background: none; }
 
 /*----- table overrides for list styles -----*/
 
