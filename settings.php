@@ -108,10 +108,7 @@ startWindow("Options", 'padding: 3px;');
 <?
 		}
 ?>
-					<li>&nbsp;</li>
-					<li>&nbsp;</li>
-					<li>&nbsp;</li>
-					<li>&nbsp;</li>
+
 				</ul>
 			</td>
 			<td>
@@ -121,11 +118,7 @@ startWindow("Options", 'padding: 3px;');
 <? if(getSystemSetting('_hassms', false)){ ?>
 					<li><a href='destinationlabel.php?type=sms'>SMS Labels</a></li>
 <? } ?>
-					<li>&nbsp;</li>
-					<li>&nbsp;</li>
-					<li>&nbsp;</li>
-					<li>&nbsp;</li>
-					<li>&nbsp;</li>
+
 				</ul>
 			</td>
 <?
@@ -173,14 +166,9 @@ startWindow("Options", 'padding: 3px;');
 <?					}
 					if (getSystemSetting("_hasfeed")) {
 ?>
-						<tr><td><a href='editfeedcategory.php'><?=_L("Feed Categories")?></a></td></tr>
+					<li><a href='editfeedcategory.php'><?=_L("Feed Categories")?></a></li>
 <?					}
 ?>
-					<li>&nbsp;</li>
-					<li>&nbsp;</li>
-					<li>&nbsp;</li>
-					<li>&nbsp;</li>
-					<li>&nbsp;</li>
 
 				</ul>
 			</td>
