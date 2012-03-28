@@ -9,7 +9,7 @@
 		print '<script language="javascript">window.alert(\'' . implode('.\n', $ERRORS) . '.\');</script>';
 	}
 
-	print "<div > Current system time is " . date("F jS, Y h:i a (e)") . "</div>";
+	print "<div id='footer'>Current system time is " . date("F jS, Y h:i a (e)") . "</div>";
 ?>
 </body>
 </html>
