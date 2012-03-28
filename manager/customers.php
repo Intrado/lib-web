@@ -377,7 +377,7 @@ else if ($MANAGERUSER->preference("favcustomers")) {
 
 show_column_selector('customers_table', $titles, $lockedTitles);
 ?>
-<hr>
+<hr />
 <table class="list sortable" id="customers_table">
 <?
 if ($shownone)
