@@ -67,17 +67,12 @@ include("logintop.inc.php");
 
 if($success){
 ?>
-	<table style="color: #365F8D;">
-		<tr>
-			<td>&nbsp;</td>
-			<td>
-				<div style="padding:5px">
-					Thank you, your account has been activated.
-					<br>You will be redirected to the main page in 10 seconds or <a href="index.php">Click Here.</a>
-				</div>
-			</td>
-		</tr>
-	</table>
+
+			<div class="rightblock">
+				<h3>Thank you, your account has been activated.</h3>
+				<p>You will be redirected to the main page in 10 seconds or <a href="index.php">Click Here.</a></p>
+			</div>
+
 	<meta http-equiv="refresh" content="10;url=index.php">
 <?
 }
@@ -85,36 +80,31 @@ if($success){
 if($form){
 ?>
 	<form method="POST" action="?f" name="activate">
-		<div><table width="100%" style="color: #<?=$primary?>; font-size: 12px;padding-left: 25px;" >
-			<tr>
-				<td colspan="2"><h1 style="font-size: 20px; "><?=$TITLE?></h1></td>
-			</tr>
-			<tr>
-				<td colspan="2">You should receive an email containing a confirmation code shortly.  Please enter the confirmation code below along with your new password.  Passwords cannot be similar to your first name, last name, or login.  If you do not receive the email, please contact your System Administrator or call support for assistance.<br><br></td>
-			</tr>
 
-			<tr>
-				<td>Confirmation Code: </td>
-				<td><input type="text" name="token" value="<?=escapehtml($token)?>" size="20" /></td>
-			</tr>
+			<h3><?=$TITLE?></h3>
+			<p>You should receive an email containing a confirmation code shortly.  Please enter the confirmation code below along with your new password.  Passwords cannot be similar to your first name, last name, or login.  If you do not receive the email, please contact your System Administrator or call support for assistance.</p>
 
-			<tr>
-				<td>New Password:</td>
-				<td><input type="password" name="password1"  size="20" maxlength="50" /></td>
-			</tr>
-			<tr>
-				<td>Confirm Password:</td>
-				<td><input type="password" name="password2"  size="20" maxlength="50" /></td>
-			</tr>
-			<tr>
-				<td>&nbsp;</td>
-				<td><div><input type="submit" name="submit" value="Continue"></div></td>
-			</tr>
-			<tr>
-				<td>&nbsp;</td>
-				<td><a href="index.php">Return to Sign In</a></td>
-			</tr>
-		</table></div>
+			<fieldset>
+				<label for="form_code">Confirmation Code:</label>
+				<input type="text" name="token" id="form_code" value="<?=escapehtml($token)?>" size="20" />
+			</fieldset>
+
+			<fieldset>
+				<label for="form_newpass">New Password:</label>
+				<input type="password" name="password1" id="form_newpass" size="20" maxlength="50" />
+			</fieldset>
+			
+			<fieldset>
+				<label for="form_confirmpass">Confirm Password:</label>
+				<input type="password" name="password2" id="form_confirmpass" size="20" maxlength="50" />
+			</fieldset>
+			
+			<fieldset>
+				<input type="submit" name="submit" value="Continue">
+			</fieldset>
+			
+			<p class="right"><a href="index.php">Return to Sign In</a></p>
+
 	</form>
 <?
 }
