@@ -54,33 +54,12 @@ if (isset($_GET['monitor'])) {
 	</script>
 	
 <!-- ********************************************************************* -->
-<image src="manager.png">
 
-<style>
+<div class="manager_logo">
+<image src="manager.png" alt="ASP Manager"/>
+</div>
 
-table {
-	font-size: 9pt;
-}
 
-.imagelink td {
-	text-align: center;
-	font-size: 7pt;
-}
-
-.listAlt {
-	background-color: #dddddd;
-}
-
-.listHeader {
-	color: white;
-	background-color: #999999;
-}
-
-.list {
-	border: 1px solid gray;
-}
-
-</style>
 
 <table border="0" cellpadding="5" class="imagelink noprint">
 	<tr>
