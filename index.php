@@ -138,7 +138,7 @@ include_once("logintop.inc.php");
 		<em><?=_L("Passwords are case-sensitive.")?></em>
 		</fieldset>
 		
-		<div id="capslockwarning"  style="padding-left:3px; display:none; color:red;"><?=_L("Warning! Your Caps Lock key is on.")?><br></div>
+		<div id="capslockwarning" style="display:none;"><?=_L("Warning! Your Caps Lock key is on.")?></div>
 
 		<fieldset>
 		<input type="submit" name="Submit" value="Sign In">
