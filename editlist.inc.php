@@ -530,7 +530,7 @@ endWindow();
 		if (typeof ruleWidget !== "undefined") {
 			ruleWidget.delayActions = true;
 			function list_add_rule(event) {
-				$('list_newrule').value = [event.memo.ruledata].toJSON();
+				$('list_newrule').value = Object.toJSON([event.memo.ruledata]);
 				form_submit(event, 'addrule');
 			}
 			function list_delete_rule(event) {
