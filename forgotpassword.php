@@ -77,7 +77,7 @@ if(!$success){
 } else {
 ?>
 
-			<div class="right">
+			<div class="rightblock">
 				<p>You should receive an email containing a confirmation code shortly.  If you do not receive the email, please contact your System Administrator or call support for assistance.</p>
 				<p>You will be redirected to the password assistance page in 10 seconds, or you can <a href="index.php?f">Click Here to continue.</a></p>
 			</div>

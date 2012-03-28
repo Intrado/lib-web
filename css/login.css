@@ -79,7 +79,7 @@ p { margin: 0 0 10px 0; font-size: 12px; line-height: 19px; }
 .window_body .section1 { width: 100%; }
 .window_body form { float: right; display: inline; width: 48%; }
 .window_body form fieldset { margin: 0 0 10px 0; }
-.window_body form label, .window_body form input { display: block; width: 100%; font-size: 14px; line-height: 23px; }
+.window_body form label, .window_body form input { display: block; width: 98%; font-size: 14px; line-height: 23px; }
 .window_body form label.check { float: left; display: inline; font-size: 12px; line-height: 17px; width: auto; }
 .window_body form input[type=submit] { float: right; width: 100px; }
 .window_body form input[type=checkbox] { float: left; width: 15px; }
@@ -87,6 +87,9 @@ p { margin: 0 0 10px 0; font-size: 12px; line-height: 19px; }
 .indexdisplayname { font-size: 1.6em; margin: 0; padding: 0 0 10px 0;  }
 .right { text-align: right; }
 .signup { display: block; width: 100%; }
+.window_body #capslockwarning { padding-left: 3px; color: red; }
+
+.window_body .rightblock { float: right; }
 
 #footer { width: 100%; max-width: 650px; margin: 0 auto; padding: 10px 0 0; }
 #footer p { color: #fff; }
