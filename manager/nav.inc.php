@@ -56,7 +56,7 @@ if (isset($_GET['monitor'])) {
 <!-- ********************************************************************* -->
 
 <div class="manager_logo">
-<image src="manager.png" alt="ASP Manager"/>
+	<image src="manager.png" alt="ASP Manager"/>
 </div>
 
 

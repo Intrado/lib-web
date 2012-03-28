@@ -171,6 +171,7 @@ further colours for subnav links are in the specific theme folder
 
 /*----- manager styles -----*/
 
+.manager_logo { margin: 10px 0; }
 .maincontent { margin: 0 1%; }
 form#search { margin: 10px 0; }
 
