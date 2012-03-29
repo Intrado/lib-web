@@ -689,7 +689,7 @@ include_once("nav.inc.php");
 				if($hasnewjob) {
 ?>
 						
-						<div class="newjob"><a href="jobwizard.php?new&jobtype=normal">Create new job</a></div>
+						<div class="newjob"><a href="jobwizard.php?new&jobtype=normal">New Notification</a></div>
 <?
 				}
 
