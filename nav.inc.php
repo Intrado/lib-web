@@ -262,6 +262,7 @@ header('Content-type: text/html; charset=UTF-8') ;
 		</ul>
 	</div>
 </div> <!--  /#top_banner -->
+
 <script type="text/javascript" language="javascript">
 Event.observe(window, 'load', function() {
 	new Tip('shortcutmenu', $('shortcuts'), {
@@ -312,11 +313,11 @@ Event.observe(window, 'load', function() {
 
 </div><!-- primary_nav -->
 
-<? if ($SUBTABS != "") { ?>
+
 <ul class="subnavtabs cf">
 	<?= $SUBTABS ?>
 </ul>
-<? } ?>
+
 
 <div class="content_wrap cf"><!-- tag ends in footer -->
 
