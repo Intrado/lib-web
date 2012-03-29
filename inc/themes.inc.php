@@ -54,9 +54,9 @@ $COLORSCHEMES =  array(
 											"_brandtheme2" => "392C53",
 											"_brandratio" => ".2"),
 					"newui" => array("displayname" => "Newui",
-											"_brandprimary" => "7259A4",
-											"_brandtheme1" => "634A94",
-											"_brandtheme2" => "392C53",
+											"_brandprimary" => "2a4470",
+											"_brandtheme1" => "346799",
+											"_brandtheme2" => "3399ff",
 											"_brandratio" => ".2"),
 											
 					//original themes
