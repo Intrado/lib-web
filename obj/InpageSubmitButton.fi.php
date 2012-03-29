@@ -25,14 +25,14 @@ class InpageSubmitButton extends FormItem {
 		if (isset($this->args['confirm']) && $this->args['confirm'])
 			$onclick = 'if (confirm(\''.escapehtml($this->args['confirm']).'\')) { '.$onclick.' } else { return false; }';
 			
-		$str .= '<button class="button" type="submit" name="submit" value="'.escapehtml($submitvalue).'" onmouseover="btn_rollover(this);" onmouseout="btn_rollout(this);" onclick="'.$onclick.'"><table><tr><td><img class="left" src="img/themes/' . $theme. '/button_left.gif" alt=""></td><td class="middle">';
+		$str .= '<button class="btn" type="submit" name="submit" value="'.escapehtml($submitvalue).'" onmouseover="btn_rollover(this);" onmouseout="btn_rollout(this);" onclick="'.$onclick.'"><div class="btn_wrap cf"><span class="btn_left"></span><span class="btn_middle">';
 		
 		if (isset($this->args['icon']) && $this->args['icon'])
 			$str .= '<img src="img/icons/'.$this->args['icon'].'.gif" alt="">';
 		else
 			$str .= '<img src="img/pixel.gif" alt="" height="16" width="1">';
 		
-		$str .= escapehtml($this->args['name']) . '</td><td><img class="right" src="img/themes/' . $theme . '/button_right.gif" alt=""></td></tr></table></button>';
+		$str .= escapehtml($this->args['name']) . '</span><span class="btn_right"></span></div></button>';
 		
 		return $str;
 	}
