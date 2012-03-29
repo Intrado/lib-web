@@ -8,38 +8,26 @@ a:hover { color: #13a545; }
 
 /*----- Banner, adds in the green background and moves the client name to sit next to the logo image -----*/
 
-.banner { padding: 0 25px 15px 25px; border-top: 4px solid #222; background-color: #0d8336; }
+.banner { background-color: #168cbd; padding: 0 25px 15px 25px; border-top: 4px solid #222; }
 .banner_logo { margin: 15px 0 0; }
 .banner_logo a { background: #fff; padding: 6px; -webkit-border-radius: 5px; -moz-border-radius: 5px; border-radius: 5px; 
 -moz-background-clip: padding; -webkit-background-clip: padding-box; background-clip: padding-box;}
-.banner_links { background: #363636; float: right; display: inline; padding: 5px 3px 8px 3px; list-style-type: none; 
--webkit-border-radius: 0 0 8px 8px; -moz-border-radius: 0 0 8px 8px; border-radius: 0 0 8px 8px; 
--moz-background-clip: padding; -webkit-background-clip: padding-box; background-clip: padding-box; }
-.banner_links li { padding: 0 8px; border-right: 1px dashed #bdbdbd; }
-.banner_links li.bl_last { border: none; }
+
+.banner_links_wrap { margin: 50px 0 0 0; }
+.banner_links { list-style-type: none; }
+.banner_links li { padding: 0 8px; border-right: 1px solid #e6e6e6; }
+.banner_links li.bl_last { border: none; padding: 0 0 0 8px; }
 .banner_links li.bl_left, .banner_links li.bl_right { padding: 0; border: 0; }
 .banner_links li a { color: #e6e6e6; }
-.banner_links li a:hover { color: #13a545; text-decoration: none; }
-.banner_custname { top: 40px; right: 25px; text-align: right; font-size: 21px; color: #f2f2f2; text-shadow: 0 1px 0 rgba(0,0,0,0.6); }
+.banner_links li a:hover { text-decoration: underline; }
+.banner_custname { top: 15px; right: 25px; text-align: right; font-size: 16px; font-weight: bold; color: #f2f2f2; text-shadow: 0 1px 0 rgba(0,0,0,0.6); }
 
 
-/*----- Navigation, adds orange bg colour and styles up the primary links and navshortcut dropdown -----*/
+/*----- Navigation -----*/
 
-.primary_nav { width: 100%; padding: 10px 0; background-color: #f5b75e;
-  background-image: -webkit-gradient(linear, left top, left bottom, from(#f5b75e), to(#da6c17)); 
-  background-image: -webkit-linear-gradient(top, #f5b75e, #da6c17); 
-  background-image:    -moz-linear-gradient(top, #f5b75e, #da6c17); 
-  background-image:     -ms-linear-gradient(top, #f5b75e, #da6c17); 
-  background-image:      -o-linear-gradient(top, #f5b75e, #da6c17); 
-  background-image:         linear-gradient(top, #f5b75e, #da6c17); 
-  -webkit-box-shadow: 0px 1px 4px #333; -moz-box-shadow: 0px 1px 4px #333; box-shadow: 0px 1px 4px #333; }
+.primary_nav { background-color: #168cbd; width: 100%; padding: 10px 0; }
   
-.navshortcut { background: #fac478; background: rgba(255,255,255,0.2); margin: 0 25px 0 0; color: #fff; font: 15px Verdana, arial, sans-serif; font-size: 13px; cursor: pointer;
--webkit-border-radius: 8px; -moz-border-radius: 8px; border-radius: 8px; 
--moz-background-clip: padding; -webkit-background-clip: padding-box; background-clip: padding-box; 
--webkit-box-shadow: 0px 0 2px #333; -moz-box-shadow: 0px 0 2px #333; box-shadow: 0px 0 2px #333; }
-.shortcutmenu { padding: 7px 10px; }
-.shortcutmenu img { padding: 0 0 0 5px; }
+.navshortcut { display: none; }
 	
 .navtabs { margin: 0 0 0 25px; }
 .navtabs li { margin-right: 15px;}
