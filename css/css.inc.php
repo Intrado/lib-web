@@ -115,6 +115,7 @@ link styles and active states for links are in the individual theme stylesheet
 -----*/
 
 .banner_logo { display: inline; float: left; }
+.banner_logo h1 { display: none; }
 .banner_logo a { display: block; }
 .banner_links_wrap { display: inline; float: right; }
 .banner_custname { position: absolute; }
