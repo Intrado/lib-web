@@ -280,19 +280,19 @@ class Form {
 					if ($valresult === true) {
 						$i = "img/icons/accept.gif";
 						$alt = "Valid";
-						$style = 'style="background: rgb(242,242,242);"' ; //rgb(225,255,225)
+						$style = 'style="background: transparent;"' ; //rgb(225,255,225)
 						$msg = false;
 					} else {
 						list($validator,$msg) =  $valresult;
 						$i = "img/icons/exclamation.gif";
 						$alt = "Validation Error";
-						$style = 'style="background: rgb(242,242,242);"' ;
+						$style = 'style="background: transparent;"' ;
 					}
 				} else if (!$this->getSubmit() && $isblank && $isrequired) {
 					//show required highlight
 					$i = "img/icons/error.gif";
 					$alt = "Required Field";
-					$style = 'style="background: rgb(242,242,242);"' ;
+					$style = 'style="background: transparent;"' ;
 				}
 			
 				$str.= '
