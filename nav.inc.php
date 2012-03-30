@@ -188,6 +188,11 @@ function doLogo () {
 		echo '<img src="logo.img.php?hash=' . $logohash .'" alt="">';
 }
 
+function setBodyClass () {
+	$theme = $_SESSION['colorscheme']['_brandtheme'];
+	echo 'class="' . $theme . '"';
+}
+
 doNavTabs($NAVTREE);
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -231,9 +236,8 @@ header('Content-type: text/html; charset=UTF-8') ;
 	    }
 	  </style>
 	<![endif]-->
-
 </head>
-<body> 
+<body <?=setBodyClass();?> >
 	<script>
 		var _brandtheme = "<?=getBrandTheme();?>";
 	</script>
