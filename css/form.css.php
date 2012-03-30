@@ -456,10 +456,46 @@ table#addMeWindow input[type="checkbox"] { margin: 7px 0; }
 				
 				.reqd_field 			{ background: rgb(255,255,220); } /* add this to the same element as form_row */
 				
-				.valid_true 	{ background: rgb(255,255,255) }
-				.valid_false 	{ background: rgb(255,200,200; }
+				.valid_true 	{ background: rgb(255,255,255); }
+				.valid_false 	{ background: rgb(255,200,200;) }
 				
 	.form_col.custom_btn_image img { padding-top: 20px; }
 
 
+/*---------- Newui theme form ----------*/
+
+.newui .newform fieldset { background: #fff; margin-bottom: 1em; border: none; }
+
+.newui .formsectionheader { margin: 5px 0 10px 0; padding: 0; font-size: 14px; line-height: 21px; font-weight: bold; color: #444; text-transform: uppercase; border-bottom: 1px dashed #999; }
+ 
+.newui .formfieldarea { padding: 8px 10px; }
+.newui .formfieldarea .underneathmsg { float: left; display: inline; margin: 5px 0 0 140px; padding: 0; font-size: 14px; font-weight: normal; color: #cc0000; }
+
+.newui .newform .formtitle { float: left; display: inline; width: 140px; margin: 0; padding: 0; }
+.newui .newform .formtitle .formlabel { float: none; display: block; padding: 5px 10px 5px 0; font-size: 14px; line-height: 18px; font-weight: normal; text-align: right; }
+.newui .newform .formtitle .formicon { display: none; }
+
+.newui .newform .formcontrol { float: left; display: inline; width: 325px; margin: 0; padding: 0; }
+.newui .newform .formcontrol input[type="text"] { display: block; width: 313px; padding: 4px 5px; font-size: 14px; line-height: 18px; border: 1px solid #E2E2E2; 
+-webkit-border-radius: 5px; -moz-border-radius: 5px; border-radius: 5px; 
+-moz-background-clip: padding; -webkit-background-clip: padding-box; background-clip: padding-box; }
+.newui .newform .formcontrol input[type="radio"] { margin: 0 5px 5px 0; }
+.newui .newform .formcontrol input[type="checkbox"] { margin: 5px 0 0; }
+.newui .newform .formcontrol textarea { display: block; width: 100%; margin: 0 0 5px 0; padding: 4px 5px; font-size: 14px; line-height: 18px; border: 1px solid #E2E2E2; 
+-webkit-border-radius: 5px; -moz-border-radius: 5px; border-radius: 5px; 
+-moz-background-clip: padding; -webkit-background-clip: padding-box; background-clip: padding-box; }
+.newui .newform .formcontrol input#account_brandthemecustomize { float: left; display: inline; margin: 0 5px 0 0; }
+
+.newui .newform .formcontrol .translate { max-height: 150px; overflow: auto; }
+.newui .newform .formcontrol .gBranding {}
+.newui .newform .formcontrol .gBrandingText { font-size: 11px; }
+
+.newui .newform .formcontrol .radiobox { list-style-type: none; padding: 0; margin: 0; }
+.newui .newform .formcontrol .radiobox li { padding: 5px 0; }
+.newui .newform .formcontrol .radiobox input[type="radio"],
+.newui .newform .formcontrol .radiobox input[type="checkbox"] { margin: 0 5px 0 0; }
+
+.newui .newform .formcontrol select  { margin: 0; padding: 4px 6px; border: 1px solid #E7E7E7; 
+-webkit-border-radius: 5px; -moz-border-radius: 5px; border-radius: 5px; 
+-moz-background-clip: padding; -webkit-background-clip: padding-box; background-clip: padding-box; }
 			
