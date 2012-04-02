@@ -147,9 +147,11 @@ form.newform {
 .newform .formcontrol iframe { overflow: hidden; }
 .newform .formcontrol > label { margin-left: 5px; line-height: 22px;}
 
-.newform fieldset#AddRuleFieldmap { width: 140px; padding: 0; margin: 0; background: none; }
+.newform fieldset#AddRuleFieldmap { width: 130px; padding: 0; margin: 0; background: none; }
+.newform fieldset#AddRuleFieldmap select { width: 120px; padding: 4px; }
 .newform fieldset#AddRuleCriteria { width: 100px; padding: 0; margin: 0; background: none; }
-.newform fieldset#AddRuleValue { width: 125px; padding: 0; margin: 0; background: none; }
+.newform fieldset#AddRuleValue { width: 60px; padding: 0; margin: 0; background: none; }
+.newform fieldset#AddRuleValue input { width: 50px; }
 .newform fieldset#AddRuleAction { width: 75px; padding: 0; margin: 0; background: none; } 
  
 .newform select, .newform input { -webkit-transition: all 0.3s ease-out; -moz-transition: all 0.3s ease-out; -ms-transition: all 0.3s ease-out; -o-transition: all 0.3s ease-out; transition: all 0.3s ease-out; }
