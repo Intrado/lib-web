@@ -140,9 +140,14 @@ form input[type="submit"] { float: right; }
 
 /* code styling used for this documentation page only */
 
-.code { background: #e9f4f8; height: 300px; max-height: 300px; width: 48%; max-width: 48%; margin: 0 2% 0 0; padding: 5px; -moz-tab-size: 1; border: medium none;
-color: #3E4549; font-family: 12px/14px Monaco,monospace; outline: medium none; white-space: pre; text-align: left;
+.code { background: #333; height: 300px; max-height: 300px; width: 48%; max-width: 48%; padding: 5px; -moz-tab-size: 1; border: medium none;
+color: #9fccf9; font-family: 12px/14px Monaco,monospace; outline: medium none; white-space: pre; text-align: left;
 -webkit-border-radius: 5px; -moz-border-radius: 5px; border-radius: 5px;
--moz-background-clip: padding; -webkit-background-clip: padding-box; background-clip: padding-box; } 
+-moz-background-clip: padding; -webkit-background-clip: padding-box; background-clip: padding-box; }
+
+.style { background: #333; height: 300px; max-height: 300px; width: 48%; max-width: 48%; padding: 5px; -moz-tab-size: 1; border: medium none;
+color: #f7c68c; font-family: 12px/14px Monaco,monospace; outline: medium none; white-space: pre; text-align: left;
+-webkit-border-radius: 5px; -moz-border-radius: 5px; border-radius: 5px;
+-moz-background-clip: padding; -webkit-background-clip: padding-box; background-clip: padding-box; }
 
 
