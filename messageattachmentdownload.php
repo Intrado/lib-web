@@ -12,6 +12,7 @@ require_once("inc/securityhelper.inc.php");
 require_once("inc/formatters.inc.php");
 require_once("obj/Message.obj.php");
 require_once("inc/content.inc.php");
+include_once("inc/appserver.inc.php");
 require_once("obj/Content.obj.php");
 require_once("obj/MessageAttachment.obj.php");
 

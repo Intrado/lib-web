@@ -482,4 +482,114 @@ function expireFeedCategories($urlcomponent, $categories) {
 	}
 }
 
+function commsuite_contentPut ($filename, $contenttype) {
+	list($appserverCommsuiteProtocol,$appserverCommsuiteTransport) = initCommsuiteApp();
+
+	if ($appserverCommsuiteProtocol == null || $appserverCommsuiteTransport == null) {
+		error_log("Cannot use AppServer");
+		return null;
+	}
+	
+	$filedata = new commsuite_FileData();
+	$filedata->contenttype = $contenttype;
+	$filedata->data = file_get_contents($filename);
+	
+	$attempts = 0;
+	while (true) {
+		try {
+			$client = new CommSuiteClient($appserverCommsuiteProtocol);
+			$appserverCommsuiteTransport->open();
+			
+			// Connect and be sure to catch and log all exceptions
+			return $client->contentPut(session_id(), $filedata);
+		} catch (commsuite_SessionInvalidException $e) {
+			error_log("contentPut: Invalid Sessionid");
+			return false;
+		} catch (commsuite_NotAvailableException $tx) {
+			error_log("contentPut: IOException occured while trying to put content");
+			return false;
+		} catch (TException $tx) {
+			$attempts++;
+			// a general thrift exception, like no such server
+			error_log("contentPut: Exception Connection to AppServer (" . $tx->getMessage() . ")");
+			$appserverCommsuiteTransport->close();
+			if ($attempts > 2) {
+				error_log("contentPut: Failed 3 times to send request to appserver. filename=".$filename);
+				return false;
+			}
+		}
+	}
+}
+
+function commsuite_contentGet ($contentid) {
+	list($appserverCommsuiteProtocol,$appserverCommsuiteTransport) = initCommsuiteApp();
+
+	if ($appserverCommsuiteProtocol == null || $appserverCommsuiteTransport == null) {
+		error_log("Cannot use AppServer");
+		return null;
+	}
+	
+	$attempts = 0;
+	while (true) {
+		try {
+			$client = new CommSuiteClient($appserverCommsuiteProtocol);
+			$appserverCommsuiteTransport->open();
+				
+			// Connect and be sure to catch and log all exceptions
+			return $client->contentGet(session_id(), $contentid);
+		} catch (commsuite_NotFoundException $tx) {
+			error_log("contentGet: requested contentid was not found");
+			return false;
+		} catch (commsuite_SessionInvalidException $e) {
+			error_log("contentGet: Invalid Sessionid");
+			return false;
+		} catch (commsuite_NotAvailableException $tx) {
+			error_log("contentGet: IOException occured while trying to get content");
+			return false;
+		} catch (TException $tx) {
+			$attempts++;
+			// a general thrift exception, like no such server
+			error_log("contentGet: Exception Connection to AppServer (" . $tx->getMessage() . ")");
+			$appserverCommsuiteTransport->close();
+			if ($attempts > 2) {
+				error_log("contentGet: Failed 3 times to send request to appserver. cmid=".$contentid);
+				return false;
+			}
+		}
+	}
+}
+
+function commsuite_contentDelete ($contentid) {
+	list($appserverCommsuiteProtocol,$appserverCommsuiteTransport) = initCommsuiteApp();
+
+	if ($appserverCommsuiteProtocol == null || $appserverCommsuiteTransport == null) {
+		error_log("Cannot use AppServer");
+		return null;
+	}
+	
+	$attempts = 0;
+	while (true) {
+		try {
+			$client = new CommSuiteClient($appserverCommsuiteProtocol);
+			$appserverCommsuiteTransport->open();
+			
+			$client->contentDelete(session_id(), $contentid);
+		} catch (commsuite_SessionInvalidException $e) {
+			error_log("contentDelete: Invalid Sessionid");
+			return false;
+		} catch (commsuite_NotAvailableException $tx) {
+			error_log("contentDelete: IOException occured while trying to get content");
+			return false;
+		} catch (TException $tx) {
+			$attempts++;
+			// a general thrift exception, like no such server
+			error_log("contentDelete: Exception Connection to AppServer (" . $tx->getMessage() . ")");
+			$appserverCommsuiteTransport->close();
+			if ($attempts > 2) {
+				error_log("contentDelete: Failed 3 times to send request to appserver. cmid=".$contentid);
+				return false;
+			}
+		}
+	}
+}
 ?>

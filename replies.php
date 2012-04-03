@@ -16,6 +16,8 @@ require_once("inc/table.inc.php");
 require_once("inc/utils.inc.php");
 require_once("inc/securityhelper.inc.php");
 require_once("inc/formatters.inc.php");
+require_once("inc/content.inc.php");
+require_once("inc/appserver.inc.php");
 
 
 
@@ -40,13 +42,12 @@ if(isset($_GET['delete'])){
 	$delete = $_GET['delete']+0;
 	if(userOwns("voicereply", $delete)){
 		$vr = new VoiceReply($delete);
-		$content = new Content($vr->contentid);
-
+		
+		contentDelete($vr->contentid);
 		Query("BEGIN");
-			$content->destroy();
-			$vr->destroy();
+		$vr->destroy();
 		Query("COMMIT");
-
+		
 		$job = new Job($vr->jobid);
 		notice(_L("The response from %1s for the job, %2s, is now deleted.", escapehtml(Person::getFullName($vr->personid)), escapehtml($job->name)));
 
@@ -100,7 +101,7 @@ if(isset($_GET['deleteplayed']) && $_GET['deleteplayed']){
 	Query("BEGIN");
 		foreach($voicereplies as $voicereply){
 			$content = new Content($voicereply->contentid);
-			$content->destroy();
+			contentDelete($vr->contentid);
 			$voicereply->destroy();
 		}
 	Query("COMMIT");

@@ -3,6 +3,7 @@
 include_once("inc/common.inc.php");
 include_once('inc/securityhelper.inc.php');
 include_once('inc/content.inc.php');
+include_once('inc/appserver.inc.php');
 include_once('obj/AudioFile.obj.php');
 include_once('obj/Content.obj.php');
 

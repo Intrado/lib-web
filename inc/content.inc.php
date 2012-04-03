@@ -33,20 +33,14 @@ function getHttpResponseContents ($fp) {
 }
 
 function contentGet ($cmid, $base64 = false) {
-	global $SETTINGS;
-	$c = new Content($cmid);
-	if (strlen($c->data) > 0) {
-		$contenttype = $c->contenttype;
-		if (!$base64)
-			$data = base64_decode($c->data);
-		else
-			$data = $c->data;
-		return array($contenttype,$data);
-	}
-
-	return false;
+	$filedata = commsuite_contentGet($cmid);
+	if ($base64)
+		return array($filedata->contenttype, base64_encode($filedata->data));
+	else
+		return array($filedata->contenttype, $filedata->data);
 }
 
+// TODO: refactor to use appserver API at some point
 function contentPut ($filename,$contenttype, $base64 = false) {
 	global $SETTINGS;
 	$result = false;
@@ -64,6 +58,10 @@ function contentPut ($filename,$contenttype, $base64 = false) {
 	}
 	
 	return $result;
+}
+
+function contentDelete($contentid) {
+	commsuite_contentDelete($contentid);
 }
 
 function renderTts ($text,$language,$gender) {

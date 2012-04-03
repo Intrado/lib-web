@@ -21,13 +21,6 @@ require_once("inc/previewfields.inc.php");
 require_once("obj/PreviewModal.obj.php");
 require_once("inc/appserver.inc.php");
 
-require_once('thrift/Thrift.php');
-require_once $GLOBALS['THRIFT_ROOT'].'/protocol/TBinaryProtocol.php';
-require_once $GLOBALS['THRIFT_ROOT'].'/transport/TSocket.php';
-require_once $GLOBALS['THRIFT_ROOT'].'/transport/TBufferedTransport.php';
-require_once $GLOBALS['THRIFT_ROOT'].'/transport/TFramedTransport.php';
-require_once $GLOBALS['THRIFT_ROOT'].'/packages/commsuite/CommSuite.php';
-
 ///////////////////////////////////////////////////////////////////////////////
 // Authorization:/
 //////////////////////////////////////////////////////////////////////////////
