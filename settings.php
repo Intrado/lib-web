@@ -27,39 +27,15 @@ include("nav.inc.php");
 
 startWindow("Options", 'padding: 3px;');
 ?>
-	<table class="list" >
-		<tr class="listHeader">
-<?
-			if($USER->authorize('managesystem') || $USER->authorize('metadata')){
-?>
-				<th align="left" class="nosort">System</th>
-<?
-			}
-			if($USER->authorize('managesystem')){
-?>
-				<th align="left" class="nosort">Job</th>
-				<th align="left" class="nosort">Destination Labels</th>
-<?
-			}
-			// features - if contact manager, or self-signup, or smartcall appliance, or classroom
-			if ((getSystemSetting('_hasportal', false) && $USER->authorize('portalaccess') && $USER->authorize('managesystem')) ||
-				(getSystemSetting('_hasselfsignup', false) && ($USER->authorize('metadata') || $USER->authorize('managesystem'))) ||
-				($USER->authorize('managesystem') && getSystemSetting('_dmmethod', "")!='asp') ||
-				($USER->authorize('manageclassroommessaging') && getSystemSetting('_hastargetedmessage')) ||
-				($USER->authorize('managesystem') && getSystemSetting("_hasfacebook")) ||
-				($USER->authorize('managesystem') && getSystemSetting("_hasfeed"))) {
-?>
-				<th align="left" class="nosort">Features</th>
-<?
-			}
-?>
-		</tr>
-		<tr align="left" valign="top">
+		
+
 <?
 		if($USER->authorize('managesystem') || $USER->authorize('metadata')){
 ?>
-			<td>
-				<ul>
+
+				<ul class="linkslist">
+				
+						<li class="heading">System</li>
 <?
 					if($USER->authorize('managesystem')){
 ?>
@@ -87,13 +63,16 @@ startWindow("Options", 'padding: 3px;');
 					}
 ?>
 				</ul>
-			</td>
+
 <?
 		}
 		if($USER->authorize('managesystem')){
 ?>
-			<td>
-				<ul>
+
+				<ul class="linkslist">
+				
+					<li class="heading">Job</li>
+				
 					<li><a href='disablerepeatingjobs.php'>Enable/Disable Repeating Jobs</a></li>
 					<li><a href='jobsettings.php'>Job Settings</a></li>
 					<li><a href='jobtypemanagement.php'>Job Types</a></li>
@@ -110,9 +89,11 @@ startWindow("Options", 'padding: 3px;');
 ?>
 
 				</ul>
-			</td>
-			<td>
-				<ul>
+
+				<ul class="linkslist">
+				
+					<li class="heading">Destination Labels</li>
+				
 					<li><a href='destinationlabel.php?type=phone'>Phone Labels</a></li>
 					<li><a href='destinationlabel.php?type=email'>Email Labels</a></li>
 <? if(getSystemSetting('_hassms', false)){ ?>
@@ -120,7 +101,7 @@ startWindow("Options", 'padding: 3px;');
 <? } ?>
 
 				</ul>
-			</td>
+
 <?
 		}
 		// features - if contact manager, or self-signup, or smartcall appliance, or Classroom
@@ -131,8 +112,10 @@ startWindow("Options", 'padding: 3px;');
 			($USER->authorize('managesystem') && getSystemSetting("_hasfacebook")) ||
 			($USER->authorize('managesystem') && getSystemSetting("_hasfeed"))) {
 ?>
-			<td>
-				<ul>
+
+				<ul class="linkslist">
+				
+					<li class="heading">Features</li>
 <?
 					if (getSystemSetting('_hasportal', false) && $USER->authorize('portalaccess') && $USER->authorize('managesystem')) {
 ?>
@@ -171,12 +154,11 @@ startWindow("Options", 'padding: 3px;');
 ?>
 
 				</ul>
-			</td>
+
 <?
 		}
 ?>
-		</tr>
-	</table>
+
 <?
 endWindow();
 
