@@ -801,7 +801,13 @@ input.submit_survey:active {
 	background: -moz-linear-gradient(top,  #6b9d28,  #436b0c);
 	filter:  progid:DXImageTransform.Microsoft.gradient(startColorstr='#6b9d28', endColorstr='#436b0c'); 
 	-webkit-box-shadow: inset 0 1px 2px rgba(0,0,0,.4); -moz-box-shadow: inset 0 1px 2px rgba(0,0,0,.4); box-shadow: inset 0 1px 2px rgba(0,0,0,.4); }
+	
+	
+/*----- Admin settings list styles -----*/
 
+.linkslist { float: left; display: inline; list-style-type: none; margin: 0; padding: 0 15px; }
+.linkslist li { font-size: 13px; padding: 5px 0; }
+.linkslist li.heading { font-size: 14px; font-weight: bold; border-bottom: 1px solid #ccc; }
 
 /* +----------------------------------------------------------------+
 	 | non-semantic helper classes                                    |
