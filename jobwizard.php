@@ -243,7 +243,7 @@ class FinishJobWizard extends WizFinish {
 		$job->userid = $USER->id;
 		$job->jobtypeid = $jobtype->id;
 		$job->name = $jobname;
-		$job->description = "";
+		$job->description = "Created with MessageSender";
 
 		$job->type = 'notification';
 		$job->modifydate = $job->createdate = date("Y-m-d H:i:s");
