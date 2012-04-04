@@ -486,7 +486,7 @@ function commsuite_contentPut ($filename, $contenttype) {
 	list($appserverCommsuiteProtocol,$appserverCommsuiteTransport) = initCommsuiteApp();
 
 	if ($appserverCommsuiteProtocol == null || $appserverCommsuiteTransport == null) {
-		error_log("Cannot use AppServer");
+		error_log("Cannot use AppServer, requested: commsuite_contentPut ($filename, $contenttype)");
 		return null;
 	}
 	
@@ -525,7 +525,7 @@ function commsuite_contentGet ($contentid) {
 	list($appserverCommsuiteProtocol,$appserverCommsuiteTransport) = initCommsuiteApp();
 
 	if ($appserverCommsuiteProtocol == null || $appserverCommsuiteTransport == null) {
-		error_log("Cannot use AppServer");
+		error_log("Cannot use AppServer, requested: commsuite_contentGet ($contentid)");
 		return null;
 	}
 	
@@ -559,11 +559,46 @@ function commsuite_contentGet ($contentid) {
 	}
 }
 
+function commsuite_contentGetForCustomerId ($customerid, $contentid) {
+	list($appserverCommsuiteProtocol,$appserverCommsuiteTransport) = initCommsuiteApp();
+
+	if ($appserverCommsuiteProtocol == null || $appserverCommsuiteTransport == null) {
+		error_log("Cannot use AppServer, requested: commsuite_contentGetForCustomerId($customerid, $contentid)");
+		return null;
+	}
+
+	$attempts = 0;
+	while (true) {
+		try {
+			$client = new CommSuiteClient($appserverCommsuiteProtocol);
+			$appserverCommsuiteTransport->open();
+
+			// Connect and be sure to catch and log all exceptions
+			return $client->contentGetForCustomerId($customerid, $contentid);
+		} catch (commsuite_NotFoundException $tx) {
+			error_log("contentGet: requested contentid was not found");
+			return false;
+		} catch (commsuite_NotAvailableException $tx) {
+			error_log("contentGet: IOException occured while trying to get content");
+			return false;
+		} catch (TException $tx) {
+			$attempts++;
+			// a general thrift exception, like no such server
+			error_log("contentGet: Exception Connection to AppServer (" . $tx->getMessage() . ")");
+			$appserverCommsuiteTransport->close();
+			if ($attempts > 2) {
+				error_log("contentGet: Failed 3 times to send request to appserver. cmid=".$contentid);
+				return false;
+			}
+		}
+	}
+}
+
 function commsuite_contentDelete ($contentid) {
 	list($appserverCommsuiteProtocol,$appserverCommsuiteTransport) = initCommsuiteApp();
 
 	if ($appserverCommsuiteProtocol == null || $appserverCommsuiteTransport == null) {
-		error_log("Cannot use AppServer");
+		error_log("Cannot use AppServer, requested: commsuite_contentDelete($contentid)");
 		return null;
 	}
 	

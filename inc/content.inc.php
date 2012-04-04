@@ -40,6 +40,11 @@ function contentGet ($cmid, $base64 = false) {
 		return array($filedata->contenttype, $filedata->data);
 }
 
+function contentGetForCustomerId ($customerid, $contentid) {
+	$filedata = commsuite_contentGetForCustomerId($customerid, $contentid);
+	return array($filedata->contenttype, $filedata->data);
+}
+
 // TODO: refactor to use appserver API at some point
 function contentPut ($filename,$contenttype, $base64 = false) {
 	global $SETTINGS;
