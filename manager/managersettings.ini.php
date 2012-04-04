@@ -5,6 +5,11 @@
 host="localhost:8088"
 path="/xmlrpc"
 
+; commsuite appserver service
+[appserver_commsuite]
+host="localhost:7912"
+timeout=5500
+
 ;authdb for manager use
 [db]
 persistent=true
