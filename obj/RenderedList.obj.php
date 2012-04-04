@@ -347,8 +347,40 @@ class RenderedList2 {
 		while ($row = DBGetRow($res)) {
 			$persondata[$row[0]] = $row;
 		}
+
+		//now we need to get all of the destination data for these people and their guardians (careful that guardiancm trumps guardianauto)
+		$query = "(select pg.personid, pg.guardianpersonid from personguardian pg 
+					left join person p on pg.guardianpersonid = p.id 
+					where pg.personid in ($pagepidcsv) 
+					and not p.deleted 
+					and p.type = 'guardiancm'
+					)
+					union
+					(select pg.personid, pg.guardianpersonid from personguardian pg 
+					left join person p on pg.guardianpersonid = p.id 
+					where pg.personid in ($pagepidcsv) 
+					and not p.deleted 
+					and p.type = 'guardianauto' and not exists (select * from personguardian pg2 where pg2.importid is null and pg2.personid = pg.personid) 
+					)";
+		$totalpids = array(); // all pids for persons and their guardians, used to lookup all destinations
+		foreach ($this->pagepersonids as $pid) {
+			$totalpids[$pid] = $pid;
+		}
+		$guardianOfPersonMap = array(); // key is guardianid, value is a list of ssytem pids
 		
-		//now we need to get all of the destination data for these people
+		$result = Query($query);
+		while ($row = DBGetRow($result)) {
+			$personid = $row[0];
+			$guardianid = $row[1];
+			$totalpids[$personid] = $personid;
+			$totalpids[$guardianid]= $guardianid;
+			if (!isset($guardianOfPersonMap[$guardianid]))
+				$guardianOfPersonMap[$guardianid] = array();
+			$mykids = $guardianOfPersonMap[$guardianid];
+			$mykids[$personid] = $personid;
+			$guardianOfPersonMap[$guardianid] = $mykids;
+		}
+		$totalpidcsv = implode(",", $totalpids);
 		
 		$destinationQuery =
 			"(select personid as pid,
@@ -359,7 +391,7 @@ class RenderedList2 {
 				'1' as ordering
 				from phone ph
 				where
-				personid in ($pagepidcsv)
+				personid in ($totalpidcsv)
 				)
 			union
 			(select personid as pid2,
@@ -370,7 +402,7 @@ class RenderedList2 {
 				'2' as ordering
 				from email
 				where
-				personid in ($pagepidcsv)
+				personid in ($totalpidcsv)
 				)";
 		if (getSystemSetting("_hassms", false)) {
 			$destinationQuery .= " union
@@ -382,42 +414,53 @@ class RenderedList2 {
 					'3' as ordering
 					from sms
 					where
-					personid in ($pagepidcsv)
+					personid in ($totalpidcsv)
 					) ";
 		}
 			
 		$result = Query($destinationQuery . " order by pid, ordering, sequence");
 		$destinationData = array();
 		while ($row = DBGetRow($result)) {
-			$personid = $row[0];
-			if (!isset($destinationData[$personid]))
-				$destinationData[$personid] = array();
-			$destinationData[$personid][] = $row;
+			$personid = $row[0]; // person of destination
+			// now find system persons of this guardian
+			if (isset($guardianOfPersonMap[$personid])) {
+				$systempersonpids = $guardianOfPersonMap[$personid];
+			} else {
+				// assume this is the system person
+				$systempersonpids = array();
+				$systempersonpids[$personid] = $personid;
+			}
+			// a guardian may have multiple system contacts
+			foreach ($systempersonpids as $systempid) {
+				if (!isset($destinationData[$systempid]))
+					$destinationData[$systempid] = array();
+				$destinationData[$systempid][] = $row;
+			}
 		}
 		
 
 		$this->pagedata = array();
 		foreach ($persondata as $id => $person) {
-			$allBlank = true;
+			$numphone = 0;
+			$numemail = 0;
+			$numsms = 0;
 			if (isset($destinationData[$id])) {
 				foreach($destinationData[$id] as $destination) {
 					if (!empty($destination[1])) {
-						$person[2] = $destination[2];
-						$person[3] = $destination[1];
-						$person[4] = $destination[3];
-						$person[5] = $destination[4];
-						$this->pagedata[] = $person;
-						$allBlank = false;
+						if ("phone" == $destination[3])
+							$numphone++;
+						else if ("email" == $destination[3])
+							$numemail++;
+						else if ("sms" == $destination[3])
+							$numsms++;
 					}
 				}
 			}
-			if ($allBlank) {
-				$person[2] = _L("--None--");
-				$person[3] = "";
-				$person[4] = "";
-				$person[5] = "";
-				$this->pagedata[] = $person;
-			}
+			$person[2] = _L("--None--");
+			$person[3] = $numphone;
+			$person[4] = $numemail;
+			$person[5] = $numsms;
+			$this->pagedata[] = $person;
 		}
 		return $this->pagedata;
 	}

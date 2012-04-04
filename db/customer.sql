@@ -1920,3 +1920,11 @@ $$$
 update setting set value='8.3/5' where name='_dbversion'
 $$$
 -- END 8.3/5
+
+ALTER table `guardiancategory`
+ADD `sequence` tinyint(4) NOT NULL
+$$$
+
+update setting set value='8.3/6' where name='_dbversion'
+$$$
+-- END 8.3/6

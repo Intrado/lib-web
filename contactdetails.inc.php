@@ -156,6 +156,14 @@ if (isset($personid)) {
 	$contacttypes = array("phone", "email");
 	if(getSystemSetting("_hassms", false))
 		$contacttypes[] = "sms";
+	
+	// check if viewing a guardian
+	if ($data->type == "guardianauto" || $data->type == "guardiancm") {
+		$isGuardian = true;
+	} else {
+		$isGuardian = false;
+	}
+	
 	$associateids = QuickQueryList("select portaluserid from portalperson where personid = '" . $personid . "' order by portaluserid");
 	$associates = getPortalUsers($associateids);
 	$tokendata = QuickQueryRow("select token, expirationdate, creationuserid from portalpersontoken where personid = '" . $personid . "'", true);
@@ -172,6 +180,22 @@ if (isset($personid)) {
 							"creationusername" => "",
 							"expirationdate" => "");
 	}
+	// if associates, assume guardiancm, else guardianauto
+	if (count($associates) > 0) {
+		// need to be sure guardiancm trumps guardianauto
+		$guardiandata = QuickQueryMultiRow("select pg.guardianpersonid, p." . FieldMap::GetFirstNameField() . ", p." . FieldMap::GetLastNameField() . ", gc.name
+				from personguardian pg 
+				left join person p on (p.id = pg.guardianpersonid) 
+				left join guardiancategory gc on (gc.id = pg.guardiancategoryid) 
+				where p.type = 'guardiancm' and not p.deleted and pg.personid = ? order by gc.sequence, p." . FieldMap::GetLastNameField(), true, false, array($personid));
+	} else {
+		$guardiandata = QuickQueryMultiRow("select pg.guardianpersonid, p." . FieldMap::GetFirstNameField() . ", p." . FieldMap::GetLastNameField() . ", gc.name
+				from personguardian pg
+				left join person p on (p.id = pg.guardianpersonid)
+				left join guardiancategory gc on (gc.id = pg.guardiancategoryid)
+				where p.type = 'guardianauto' and not p.deleted and pg.personid = ? order by gc.sequence, p." . FieldMap::GetLastNameField(), true, false, array($personid));
+	}
+	
 	if (getSystemSetting('_hassurvey', true))
 		$jobtypes = DBFindMany("JobType", "from jobtype where not deleted order by systempriority, issurvey, name");
 	else
@@ -365,6 +389,7 @@ if (!isset($_GET['ajax'])) {
 	</tr>
 <?
 
+if (!$isGuardian) {
 // Ffields
 $fieldmaps = FieldMap::getAuthorizedFieldMaps();
 foreach ($fieldmaps as $map) {
@@ -406,7 +431,9 @@ foreach ($fieldmaps as $map) {
 		<th align="right" class="windowRowHeader bottomBorder"><?=escapehtml(getSystemSetting("organizationfieldname","Organization"))?>:</th>
 		<td class="bottomBorder"><? displayValue($organization); ?></td>
 	</tr>
-	
+<? 
+} // end if not guardian
+?>	
 	<tr>
 		<th align="right" valign="top" class="windowRowHeader bottomBorder" style="padding-top: 10px;">Address:</th>
 		<td class="bottomBorder">
@@ -518,7 +545,7 @@ foreach ($fieldmaps as $map) {
 	</tr>
 
 <?
-	if (getSystemSetting('_hasenrollment', false)) {
+	if (getSystemSetting('_hasenrollment', false) && !$isGuardian) {
 ?>
 	<tr>
 		<th align="right" class="windowRowHeader bottomBorder">Enrollment Data:</th>
@@ -587,7 +614,37 @@ foreach ($fieldmaps as $map) {
 ?>
 
 <?
-	if(getSystemSetting("_hasportal", false) && $USER->authorize("portalaccess") && $associates){
+	if (getSystemSetting("maxguardians", 0) && count($guardiandata)) {
+?>
+	<tr>
+		<th align="right" class="windowRowHeader bottomBorder">Guardians:</th>
+		<td class="bottomBorder">
+			<table  cellpadding="2" cellspacing="1" >
+			<tr class="listheader">
+				<th align="left"><b>First Name<b></th>
+				<th align="left"><b>Last Name<b></th>
+				<th align="left"><b>Category<b></th>
+				<th align="left"><b>Actions<b></th>
+			</tr>
+<?
+			foreach ($guardiandata as $guardian) {
+?>
+			<tr>
+				<td class="bottomBorder"><?=escapehtml($guardian['f01'])?></td>
+				<td class="bottomBorder"><?=escapehtml($guardian['f02'])?></td>
+				<td class="bottomBorder"><?=escapehtml($guardian['name'])?></td>
+				<td class="bottomBorder"><a href="viewcontact.php?id=<?=$guardian['guardianpersonid']?>" />View</a></td>
+			</tr>
+<?
+			}
+?>
+			</table>
+		</td>
+	</tr>	
+<?		
+	} // end guardians
+	
+	if(getSystemSetting("_hasportal", false) && $USER->authorize("portalaccess") && $associates && !$isGuardian){
 ?>
 	<tr>
 		<th align="right" class="windowRowHeader bottomBorder">Associations:</th>
@@ -623,7 +680,7 @@ foreach ($fieldmaps as $map) {
 	</tr>
 <?
 	}
-	if(getSystemSetting("_hasportal", false) && $USER->authorize("portalaccess")){
+	if(getSystemSetting("_hasportal", false) && $USER->authorize("portalaccess") && !$isGuardian){
 ?>
 	<tr>
 		<th align="right" class="windowRowHeader">Activation Code Information:</th>

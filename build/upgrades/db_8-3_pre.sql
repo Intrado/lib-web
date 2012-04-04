@@ -63,3 +63,9 @@ CREATE TABLE `importmicroupdate` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8
 $$$
 
+-- $rev 6
+
+ALTER table `guardiancategory`
+ADD `sequence` tinyint(4) NOT NULL
+$$$
+

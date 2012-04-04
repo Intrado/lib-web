@@ -45,7 +45,7 @@ function showRenderedListTable($renderedlist, $list = false) {
 	
 	$titles = array();
 	$formatters = array();
-	$repeatedcolumns = array(2,3); //sequence, destination
+	$repeatedcolumns = array();
 	$groupby = 0; //personid
 	
 	//set up formatters and titles for the basic fields.
@@ -61,11 +61,8 @@ function showRenderedListTable($renderedlist, $list = false) {
 	$titles[7] = FieldMap::getName(FieldMap::getFirstNameField());
 	$titles[8] = FieldMap::getName(FieldMap::getLastNameField());
 	
-	$titles[2] = "Sequence";
-	$formatters[2] = "fmt_renderedlist_destination_sequence";
-	
-	$titles[3] = "Destination";
-	$formatters[3] = "fmt_editlocked_destination";
+	$titles[3] = "Destinations";
+	$formatters[3] = "fmt_renderedlist_destinations_link";
 	
 	$titles[6] = getSystemSetting("organizationfieldname","Organization");
 

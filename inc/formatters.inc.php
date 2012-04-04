@@ -96,6 +96,30 @@ function fmt_renderedlist_destination_sequence($row, $index){
 	}
 }
 
+// used by renderedlist to display a link to the person, summary of phone/email/sms count across multiple guardians
+function fmt_renderedlist_destinations_link($row, $index) {
+	if ($row[3] == 1) {
+		$destsummary = "1 phone, ";
+	} else {
+		$destsummary = $row[3] . " phones, ";
+	}
+	if ($row[4] == 1) {
+		$destsummary .= "1 email";
+	} else {
+		$destsummary .= $row[4] . " emails";
+	}
+	if (getSystemSetting("_hassms", false)) {
+		$destsummary .= ", $row[5] sms";
+	}
+	
+	$personid = $row[0];
+	
+	if ($personid == '')
+		return "";
+	else
+		return "<a href=\"viewcontact.php?id=$personid\" class=\"actionlink\">$destsummary</a>";
+}
+
 function fmt_languagecode ($row,$index) {
 	return escapehtml(Language::getName($row[$index]));
 }
