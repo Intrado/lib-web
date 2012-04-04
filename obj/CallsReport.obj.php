@@ -114,6 +114,7 @@ class CallsReport extends ReportGenerator{
 		while($row = DBGetRow($result)){
 			$tmp = explode(",",$row[6]);
 
+			$attemptnum = 0;
 			foreach($tmp as $attempt){
 				$line = array();
 				if($attempt == ""){
@@ -121,6 +122,9 @@ class CallsReport extends ReportGenerator{
 					$res = $row[7];
 				} else {
 					list($time, $res) = explode(":", $attempt);
+					//map all disconnect (X) and noanswer (N) to unknown (F)
+					if ($attemptnum < 2 && in_array($res, array("X","N")))
+						$res = "F";
 				}
 				$line[] = $row[0];
 				$line[] = $row[1];
@@ -138,6 +142,7 @@ class CallsReport extends ReportGenerator{
 					$line[] = $row[10+$i];
 				}
 				$data[] = $line;
+				$attemptnum++;
 			}
 		}
 		// Ordering done in php due to attempt data
