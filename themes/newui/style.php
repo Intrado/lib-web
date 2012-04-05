@@ -183,6 +183,82 @@ table.list { width: 100%; margin: 0; }
 .bottomBorder { border-bottom: 1px solid #ccc; }
 .windowRowHeader { color: #484848; width: 115px; }
 
+/*------ Message sender ----- */
+
+.messagescreen { width: 768px; }
+.messagescreen .show { display: block; }
+.messagescreen .hide { display: none; }
+
+.msg_steps { list-style-type: none; margin: 15px; padding: 0; }
+.msg_steps li { position: relative; float: left; display: inline; width: 240px; }
+.msg_steps li:first-child { width: 202px; }
+.msg_steps li a { display: block; background: #f1f1f1; height: 75px; padding: 8px 0 8px 50px; color: #999; font-size: 14px; text-shadow: 0 1px 0 #fdfdfd; 
+border-bottom: 1px solid #cbcbcb; border-top: 1px solid #cbcbcb; outline: 0px; }
+.msg_steps li:first-child a { padding-left: 11px; border-left: 1px solid #cbcbcb; }
+.msg_steps li:last-child a { border-right: 1px solid #cbcbcb; }
+.msg_steps li:first-child a:after,
+.msg_steps li:first-child a:before { display: none; }
+.msg_steps li a:after { content: ''; position: absolute; top: 50%; left: 0; display: block; margin-top: -38px; 
+border-color: transparent transparent transparent #f1f1f1; border-width: 38px; border-style: solid; }
+.msg_steps li a:before { content: ''; position: absolute; top: 50%; left: 0; display: block; margin-top: -39px; 
+border-color: transparent transparent transparent #cbcbcb; border-width: 39px; border-style: solid; }
+.msg_steps li.active + li a:after { content: ''; position: absolute; top: 50%; left: 0; display: block; margin-top: -38px; 
+border-color: transparent transparent transparent #fff; border-width: 38px; border-style: solid; }
+
+.msg_steps li.complete a { background: #C6EDB1; border-color: #6BD035; }
+.msg_steps li.active a { background: #fff; color: #333; border-color: #d9d9d9; }
+.msg_steps li a strong { display: block; font-size: 14px; text-transform: uppercase; }
+
+.msg_steps li.active:after { content: ''; position: absolute; bottom: -16px; left: 50%; display: block; margin-left: -12px; 
+border-color: transparent transparent #fff transparent; border-width: 12px; border-style: solid; }
+.msg_steps li.active:before { content: ''; position: absolute; bottom: -16px; left: 50%; display: block; margin-left: -13px; 
+border-color: transparent transparent #c8c8c8 transparent; border-width: 13px; border-style: solid; }
+
+.window_panel { padding: 22px 15px; font-size: 14px; }
+.window_panel a { color: #0088CC; }
+.window_panel a:hover { color: #005580; text-decoration: underline; }
+.window_panel .btn { display: inline-block; padding: 5px 10px; margin: 0; color: #333; }
+.window_panel .btn:hover { color: #222; text-decoration: none; }
+.window_panel .record { float: left; display: inline; line-height: 17px; margin: 0 0 0 5px; color: #fff; border: 1px solid #9f320f; 
+	background-color: #CF451A;
+	background-image: -webkit-gradient(linear, left top, left bottom, from(#E84F1F), to(#A93611)); 
+  background-image: -webkit-linear-gradient(top, #E84F1F, #A93611); 
+  background-image:    -moz-linear-gradient(top, #E84F1F, #A93611); 
+  background-image:     -ms-linear-gradient(top, #E84F1F, #A93611); 
+  background-image:      -o-linear-gradient(top, #E84F1F, #A93611); 
+  background-image:         linear-gradient(top, #E84F1F, #A93611); }
+.window_panel .record:hover { background: #a93611; color: #fff; }
+.window_panel .record:before { content: url(themes/newui/record.png); margin: 0 5px 0 0; vertical-align: middle; }
+.window_panel .audioleft { border-radius: 5px 0 0 5px; }
+.window_panel .audioright { border-radius: 0 5px 5px 0; margin-left: -1px; }
+
+h3.flag { background: #333; margin: 0 0 15px 0; padding: 4px 8px; color: #fff; font-size: 14px; text-transform: uppercase; }
+
+.add_recipients { margin: 0 0 20px 0; }
+.add_btn { margin: 0 0 20px 0; }
+
+table.recipient_lists { width: 100%; margin: 0 0 20px 0; border-bottom: 1px solid #ddd; border-left: 1px solid #ddd; }
+table.recipient_lists th, table.recipient_lists td { font-size: 14px; text-align: left; border-right: 1px solid #ddd; border-top: 1px solid #ddd; }
+table.recipient_lists tr:last-child td { background: #fafafa; font-weight: bold; }
+table.recipient_lists tr:hover td { background: #fafafa; }
+
+.msg_content_nav { list-style-type: none; margin: 15px 0; padding: 0; }
+.msg_content_nav li { position: relative; float: left; display: inline; margin: 0 10px 0 0; }
+.msg_content_nav li a { display: block; background: #f5f5f5; padding: 9px 14px; font-size: 18px; color: #888; border-radius: 5px; border: 1px solid #ccc; }
+.msg_content_nav li a:hover { background: #ededed; color: #888; text-decoration: none; }
+.msg_content_nav li a:before { content: '+'; margin: 0 5px 0 0; color: #444; font-weight: bold; }
+.msg_content_nav li a span { color: #444; font-weight: bold; }
+.msg_content_nav li.active a { background: #363636; color: #f9f9f9; }
+.msg_content_nav li.active a:after { content: ''; position: absolute; display: block; }
+
+.tab_content { margin: 0 0 20px 0; }
+.tab_panel { background: #fafafa; padding: 20px 15px 0 15px; border: 1px solid #ccc; border-radius: 8px; }
+
+.msg_confirm { background: #F9F8F6; margin: 0 -15px -22px -15px; padding: 22px 15px; text-align: right; border-radius: 0 0 5px 5px; border-top: 1px solid #DDDDDD; }
+.msg_confirm .btn { background: #bbb; color: #fff; border: 1px solid #919191; }
+.msg_confirm .btn:hover { background: #c2c2c2; color: #fff; }
+.msg_confirm .btn:active { background: #b5b5b5; color: #f4f4f4; }
+
 
 /*----- Prototip styles for shortcut menu, not actually used in this theme -----*/
 	

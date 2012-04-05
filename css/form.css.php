@@ -497,7 +497,30 @@ table#addMeWindow input[type="checkbox"] { margin: 7px 0; }
 .newui .newform .formcontrol .radiobox input[type="radio"],
 .newui .newform .formcontrol .radiobox input[type="checkbox"] { margin: 0 5px 0 0; }
 
-.newui .newform .formcontrol select  { margin: 0; padding: 4px 6px; border: 1px solid #E7E7E7; 
+.newui .newform .formcontrol select { margin: 0; padding: 4px 6px; border: 1px solid #E7E7E7; 
 -webkit-border-radius: 5px; -moz-border-radius: 5px; border-radius: 5px; 
 -moz-background-clip: padding; -webkit-background-clip: padding-box; background-clip: padding-box; }
+
+
+/*---------- Message sender form ----------*/
+
+.window_panel form { margin: 0 0 20px 0; }
+.window_panel form fieldset { margin: 0 0 15px 0; }
+.window_panel form fieldset.check { padding: 6px 0 15px 0px; border-bottom: 1px solid #ccc; }
+.window_panel form fieldset.checklast { margin: 0; padding: 6px 0 16px 0px; border-bottom: none; }
+.window_panel form input[type="text"],
+.window_panel form select,
+.window_panel form textarea { display: inline-block; width: 300px; padding: 5px; font-size: 14px; line-height: 18px; border: 1px solid #ccc; border-radius: 5px; }
+.window_panel form input[type="text"]:focus,
+.window_panel form select:focus,
+.window_panel form textarea:focus { border: 1px solid #58acef; outline: 0px; box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075) inset, 0 0 8px rgba(82, 168, 236, 0.6); }
+.window_panel form label { float: left; display: inline; width: 140px; margin: 0 10px 0 0; padding: 6px 0; font-size: 14px; text-align: right; }
+.window_panel form input.small { float: left; width: 135px; }
+.window_panel form textarea { max-width: 300px; min-width: 300px; min-height: 100px; }
+.window_panel form select { font-size: 14px; width: 310px; padding: 5px; }
+.window_panel form input[type="checkbox"] { margin: 5px 5px 5px 0; }
+.window_panel form .addme { float: left; display: inline; text-align: left; width: inherit; }
+.window_panel form p { margin: 0; padding: 4px 0; color: #888; }
+.window_panel form .controls { margin: 0 0 0 150px; }
+.window_panel form .form_actions { background: #ededed; margin: 0 -15px -20px -15px; padding: 15px; border-radius: 0 0 8px 8px; }
 			
