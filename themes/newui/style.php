@@ -320,6 +320,9 @@ border: 1px solid rgba(0, 0, 0, 0.3); border-radius: 6px 6px 6px 6px; box-shadow
 .modal .msg_confirm { margin: 0; padding: 15px; }
 
 .modal_content { padding: 15px; }
+.modal_content input[type="text"] { padding: 5px 8px; border-radius: 5px 0 0 5px; border: 1px solid #ccc; }
+.modal_content input[type="text"]:focus { border: 1px solid #58acef; outline: 0px; box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075) inset, 0 0 8px rgba(82, 168, 236, 0.6); }
+.modal_content input.btn { border-radius: 0 5px 5px 0; border-left: none; }
 
 
 /*----- Prototip styles for shortcut menu, not actually used in this theme -----*/

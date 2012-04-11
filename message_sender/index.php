@@ -108,7 +108,7 @@
 		<div id="saved_message" class="modal hide">
 			<h3>Load a Saved Message <a href="#" class="close" data-dismiss="modal">x</a></h3>
 			<div class="modal_content">
-			<input type="text"/><input type="submit" value="Search"/>
+			<input type="text"/><input class="btn" type="submit" value="Search"/>
 			<table class="messages">
 				<thead>
 					<tr>
