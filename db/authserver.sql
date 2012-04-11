@@ -588,4 +588,12 @@ INSERT INTO portaluseridentification (portaluserid, type, username, secret, crea
     SELECT id, 'local', username, concat('{ver:', passwordversion, ', hash:"', password, '"}'), unix_timestamp(), unix_timestamp() 
     FROM portaluser WHERE passwordversion != 2;
 
+-- remove obsolete fields, moved into portaluseridentfication
+ALTER TABLE `portaluser`
+  DROP `username`,
+  DROP `password`,
+  DROP `salt`,
+  DROP `passwordversion`;
 
+  
+  
