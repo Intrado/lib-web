@@ -39,6 +39,7 @@ if (isset($_GET['id']) && isset($_GET['customerid'])) {
 	
 	$parts = DBFindMany('MessagePart', 'from messagepart where messageid=? order by sequence', false, array($id));
 	$renderedparts = Message::renderPhoneParts($parts, $fields);
+	$voices = DBFindMany("Voice","from ttsvoice");
 	
 	// -- get the wav files --
 	$wavfiles = array();
