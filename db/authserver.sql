@@ -566,3 +566,26 @@ CREATE TABLE `dmgroupblock` (
 
 ALTER TABLE `dmgroupblock` ADD INDEX ( `dmgroupid` );
 
+
+-- START REV 8.3/1
+
+CREATE TABLE `portaluseridentification` (
+`portaluserid` INT NOT NULL ,
+`type` ENUM( 'local', 'facebook', 'twitter', 'google', 'yahoo' ) NOT NULL ,
+`username` VARCHAR( 255 ) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL ,
+`secret` VARCHAR( 120 ) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL ,
+`createdtimestamp` INT NOT NULL ,
+`modifiedtimestamp` INT NOT NULL ,
+PRIMARY KEY ( `portaluserid` , `type` )
+) ENGINE = InnoDB;
+ 
+-- move password into identification table
+INSERT INTO portaluseridentification (portaluserid, type, username, secret, createdtimestamp, modifiedtimestamp) 
+    SELECT id, 'local', username, concat('{ver:', passwordversion, ',salt:"', salt, '", hash:"', password, '"}'), unix_timestamp(), unix_timestamp() 
+    FROM portaluser WHERE passwordversion = 2;
+-- no salt on older versions
+INSERT INTO portaluseridentification (portaluserid, type, username, secret, createdtimestamp, modifiedtimestamp) 
+    SELECT id, 'local', username, concat('{ver:', passwordversion, ', hash:"', password, '"}'), unix_timestamp(), unix_timestamp() 
+    FROM portaluser WHERE passwordversion != 2;
+
+
