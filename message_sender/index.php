@@ -3,9 +3,9 @@
 	<div class="window_title_wrap">
 	<h3 class="window_title">New Notification</h3>
 	<ul class="msg_steps cf">
-	<li><a id="tab1" class="" href=""><strong>Subject &amp; Recipients</strong> Basic information and recipient lists.</a></li>
-	<li><a id="tab2" class="" href=""><strong>Message Content</strong> Choose existing or add Email, Phone, SMS or Social</a></li>
-	<li><a id="tab3" class="" href=""><strong>Review &amp; Send</strong> Send now, or schedule and send later</a></li>
+	<li><a id="tab1" class="" href=""><span class="icon">1</span> Subject &amp; Recipients</a></li>
+	<li><a id="tab2" class="" href=""><span class="icon">2</span> Message Content</a></li>
+	<li><a id="tab3" class="" href=""><span class="icon">3</span> Review &amp; Send</a></li>
 	</ul>
 	</div>
 	
@@ -39,9 +39,26 @@
 	
 	<div class="add_recipients">	
 		<div class="add_btn">
-		<a class="btn" href="">Pick from Existing Lists</a>
+		<a class="btn" href="#choose_list" data-toggle="modal">Pick from Existing Lists</a>
 		or
-		<a class="btn" href="">Build a List Using Rules</a>
+		<a class="btn" href="#build_list" data-toggle="modal">Build a List Using Rules</a>
+		</div>
+		
+		<div id="choose_list" class="modal hide">
+			<h3>Add existing list <a href="#" class="close" data-dismiss="modal">x</a></h3>
+			<ul>
+			<li><input type="checkbox"/><label>Grandparents</label></li>
+			<li><input type="checkbox"/><label>First Year Students</label></li>
+			<li><input type="checkbox"/><label>Second Year Students</label></li>
+			<li><input type="checkbox"/><label>Teachers</label></li>
+			</ul>
+			<div class="msg_confirm"><a class="btn" href="#" data-dismiss="modal">Cancel</a> <a class="btn btn_confirm" href="#">Add Lists</a></div>
+		</div>
+		
+		<div id="build_list" class="modal hide">
+			<h3>Add Recipients Using Rules <a href="#" class="close" data-dismiss="modal">x</a></h3>
+			<p>Use filters to match a group of entries in your Address Book</p>
+			<div class="msg_confirm"><a class="btn" href="#" data-dismiss="modal">Cancel</a> <a class="btn btn_confirm" href="#">Add Lists</a></div>
 		</div>
 	
 		<table class="recipient_lists">
@@ -53,12 +70,18 @@
 			</thead>
 			<tbody>
 				<tr>
-					<td>x</td>
+					<td>
+					<a class="removelist" href="" title="Remove List"></a>
+					<a class="savelist" href="" title="Save List"></a>
+					</td>
 					<td>List name goes here</td>
 					<td>1000</td>
 				</tr>
 				<tr>
-					<td>x</td>
+					<td>
+					<a class="removelist" href="" title="Remove List"></a>
+					<a class="savelist" href="" title="Save List"></a>
+					</td>
 					<td>List name goes here</td>
 					<td>1000</td>
 				</tr>
@@ -74,18 +97,65 @@
 		</form>
 	</div><!-- end add_recipients -->
 	
-	<div class="msg_confirm"><a class="btn" href="#">Continue</a></div>
+	<div class="msg_confirm"><a class="btn btn_confirm" href="#">Continue <span class="icon"></span></a></div>
 	
 	</div><!-- end window_panel -->
 	
 	
 	<div id="msg_section_2" class="window_panel">
-	<p>Create the content for this message, or <a href="">load a saved message</a></p>
+	<p>Create the content for this message, or <a href="#saved_message" data-toggle="modal">load a saved message</a></p>
+	
+		<div id="saved_message" class="modal hide">
+			<h3>Load a Saved Message <a href="#" class="close" data-dismiss="modal">x</a></h3>
+			<div class="modal_content">
+			<input type="text"/><input type="submit" value="Search"/>
+			<table class="messages">
+				<thead>
+					<tr>
+					<th>Title</th>
+					<th>Created</th>
+					<th><img src="themes/newui/phone.png" alt=""/></th>
+					<th><img src="themes/newui/email.png" alt=""/></th>
+					<th><img src="themes/newui/sms.png" alt=""/></th>
+					<th><img src="themes/newui/social.png" alt=""/></th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+					<td>Valentines Dance Cancelled</td>
+					<td>4/2/12</td>
+					<td></td>
+					<td>y</td>
+					<td>y</td>
+					<td></td>
+					</tr>
+					<tr>
+					<td>Xmas Holidays Announcement</td>
+					<td>13/11/11</td>
+					<td>y</td>
+					<td>y</td>
+					<td>y</td>
+					<td>y</td>
+					</tr>
+					<tr>
+					<td>Star Wars Day Fancy Dress</td>
+					<td>19/3/12</td>
+					<td></td>
+					<td>y</td>
+					<td>y</td>
+					<td>y</td>
+					</tr>
+				</tbody>
+			</table>
+			</div>
+			<div class="msg_confirm"><a class="btn" href="#" data-dismiss="modal">Cancel</a> <a class="btn btn_confirm" href="#">Load Selected Message</a></div>
+		</div>
+		
 	<ul class="msg_content_nav cf">
-	<li><a id="ctrl_phone" href="#">Add <span>Phone</span></a></li>
-	<li><a id="ctrl_email" href="#">Add <span>Email</span></a></li>
-	<li><a id="ctrl_sms" href="#">Add <span>SMS</span></a></li>
-	<li><a id="ctrl_social" href="#">Add <span>Social</span></a></li>
+	<li><a id="ctrl_phone" href="#"><span class="icon"></span> Add <span>Phone</span></a></li>
+	<li><a id="ctrl_email" href="#"><span class="icon"></span> Add <span>Email</span></a></li>
+	<li><a id="ctrl_sms" href="#"><span class="icon"></span> Add <span>SMS</span></a></li>
+	<li><a id="ctrl_social" href="#"><span class="icon"></span> Add <span>Social</span></a></li>
 	</ul>
 	
 	<div class="tab_content">
@@ -103,7 +173,7 @@
 			<label for="form_number">Number to Call</label>
 			<div class="controls">
 			<input class="small" type="text" id="form_number" name="form_number"/>
-			<a class="btn record" href="#">Call Now to Record</a>
+			<a class="btn record" href="#"><span class="icon"></span> Call Now to Record</a>
 			</div>
 		</fieldset>
 		
@@ -117,13 +187,43 @@
 		
 		<fieldset>
 			<div class="controls">
-			<a href="#">Advanced Options</a>
+			<a href="#">Advanced Options (caller ID, etc.)</a>
+			</div>
+		</fieldset>
+		
+		<fieldset>
+			<label for="form_callid">Caller ID</label>
+			<div class="controls">
+			<select id="form_callid" name="type">
+			<option value="general">(651) 323-2003</option>
+			</select>
+			</div>
+		</fieldset>
+		
+		<fieldset>
+			<label for="form_days">Days to Run</label>
+			<div class="controls">
+			<select id="form_days" name="type">
+			<option value="1">1</option>
+			<option value="2">2</option>
+			<option value="3">3</option>
+			<option value="4">4</option>
+			<option value="5">5</option>
+			</select>
+			</div>
+		</fieldset>
+		
+		<fieldset>
+			<div class="controls">
+			<div class="cf"><input class="addme" type="checkbox" /><label class="addme">Voice Response</label></div>
+			<div class="cf"><input class="addme" type="checkbox" /><label class="addme">Call Confirmation</label></div>
+			<div class="cf"><input class="addme" type="checkbox" /><label class="addme">Skip Duplicate Phones</label></div>
 			</div>
 		</fieldset>
 		
 		<fieldset class="form_actions">
 			<div class="controls">
-			<a class="btn" href="#">Save Phone Message</a>
+			<a class="btn btn_save" href="#">Save Phone Message</a>
 			<a class="btn" href="#">Cancel</a>
 			</div>
 		</fieldset>
@@ -169,7 +269,7 @@
 		
 		<fieldset class="form_actions">
 			<div class="controls">
-			<a class="btn" href="#">Save Email Message</a>
+			<a class="btn btn_save" href="#">Save Email Message</a>
 			<a class="btn" href="#">Cancel</a>
 			</div>
 		</fieldset>
@@ -189,7 +289,7 @@
 		
 		<fieldset class="form_actions">
 			<div class="controls">
-			<a class="btn" href="#">Save SMS Message</a>
+			<a class="btn btn_save" href="#">Save SMS Message</a>
 			<a class="btn" href="#">Cancel</a>
 			</div>
 		</fieldset>
@@ -229,7 +329,7 @@
 		
 		<fieldset class="form_actions">
 			<div class="controls">
-			<a class="btn" href="#">Save Social Messages</a>
+			<a class="btn btn_save" href="#">Save Social Messages</a>
 			<a class="btn" href="#">Cancel</a>
 			</div>
 		</fieldset>
@@ -237,7 +337,7 @@
 		</div>
 	</div><!-- end tab_content -->
 	
-	<div class="msg_confirm"><a class="btn" href="#">Continue</a></div>
+	<div class="msg_confirm"><a class="btn btn_confirm" href="#">Continue <span class="icon"></span></a></div>
 	
 	</div><!-- end window_panel -->
 	
@@ -247,57 +347,112 @@
 	<p><strong>Type</strong> General Annoucement</p>
 	<p><strong>Recipients 2000</strong></p>
 	
-	<div class="msg_confirm"><a href="#">save for later</a> or <a class="btn" href="#">Send Message</a></div>
+	<div class="msg_confirm"><a href="#">save for later</a> or <a class="btn btn_confirm" href="#">Send Message <span class="icon"></span></a></div>
 	</div><!-- end window_panel -->
 
 </div><!-- end window messagescreen-->
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+<script src="script/bootstrap-modal.js"></script>
 <script type="text/javascript">
-$(document).ready(function() {
-	$('#msg_section_2').hide();
-	$('#msg_section_3').hide();
-	$('#tab1').parent().addClass("active");
-
-	$('#tab1').click(function(){
-		$('ul.msg_steps').children().removeClass();
+jQuery.noConflict();
+(function($) { 
+  $(function() {
+		$(document).ready(function() {
+			
+		$('#msg_section_2').hide();
+		$('#msg_section_3').hide();
 		$('#tab1').parent().addClass("active");
-		
-		$('#msg_section_1').show();
-		$('#msg_section_2').hide();
-		$('#msg_section_3').hide();
-		return false;
+	
+		$('#tab1').click(function(){
+			$('ul.msg_steps').children().removeClass();
+			$('#tab1').parent().addClass("active");
+			
+			$('#msg_section_1').show();
+			$('#msg_section_2').hide();
+			$('#msg_section_3').hide();
+			return false;
+			});
+	
+		$('#tab2').click(function(){
+			$('ul.msg_steps').children().removeClass();
+			$('#tab2').parent().addClass("active");
+			
+			$('#msg_section_1').hide();
+			$('#msg_section_2').show();
+			$('#msg_section_3').hide();
+			return false;
+			});
+	
+		$('#tab3').click(function(){
+			$('ul.msg_steps').children().removeClass();
+			$('#tab3').parent().addClass("active");
+			
+			$('#msg_section_1').hide();
+			$('#msg_section_2').hide();
+			$('#msg_section_3').show();
+			return false;
+			});
+	
+		$('#tab_phone').hide();
+		$('#tab_email').hide();
+		$('#tab_sms').hide();
+		$('#tab_social').hide();
+	
+		$('#ctrl_phone').click(function(){
+			$('ul.msg_content_nav').children().removeClass();
+			$('#ctrl_phone').parent().addClass("active");
+			$('#tab_phone').show();
+			$('#tab_email').hide();
+			$('#tab_sms').hide();
+			$('#tab_social').hide();
+			return false;
 		});
-
-	$('#tab2').click(function(){
-		$('ul.msg_steps').children().removeClass();
-		$('#tab2').parent().addClass("active");
-		
-		$('#msg_section_1').hide();
-		$('#msg_section_2').show();
-		$('#msg_section_3').hide();
-		return false;
+	
+		$('#ctrl_email').click(function(){
+			$('ul.msg_content_nav').children().removeClass();
+			$('#ctrl_email').parent().addClass("active");
+			$('#tab_phone').hide();
+			$('#tab_email').show();
+			$('#tab_sms').hide();
+			$('#tab_social').hide();
+			return false;
 		});
-
-	$('#tab3').click(function(){
-		$('ul.msg_steps').children().removeClass();
-		$('#tab3').parent().addClass("active");
-		
-		$('#msg_section_1').hide();
-		$('#msg_section_2').hide();
-		$('#msg_section_3').show();
-		return false;
+	
+		$('#ctrl_sms').click(function(){
+			$('ul.msg_content_nav').children().removeClass();
+			$('#ctrl_sms').parent().addClass("active");
+			$('#tab_phone').hide();
+			$('#tab_email').hide();
+			$('#tab_sms').show();
+			$('#tab_social').hide();
+			return false;
 		});
+	
+		$('#ctrl_social').click(function(){
+			$('ul.msg_content_nav').children().removeClass();
+			$('#ctrl_social').parent().addClass("active");
+			$('#tab_phone').hide();
+			$('#tab_email').hide();
+			$('#tab_sms').hide();
+			$('#tab_social').show();
+			return false;
+		});
+	
+		$('#choose_list').modal({
+			show: false
+			})
 
-	$('#tab_phone').hide();
-	$('#tab_email').hide();
-	$('#tab_sms').hide();
-	$('#tab_social').hide();
+		$('#build_list').modal({
+			show: false
+			})
 
-	$('#ctrl_phone').click(function(){
-		$('#ctrl_phone').parent().addClass("active");
-		return false;
-	});
-});
+		$('#saved_message').modal({
+			show: false
+			})
+		
+		});
+  });
+}) (jQuery);
 </script>
 
