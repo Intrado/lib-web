@@ -85,6 +85,7 @@ function fmt_actions($row,$index) {
 	if (in_array($service->type, array("commsuite"))) {
 		$actionlinks[] = action_link("Props", "application_key","serviceprops.php?id=$row[0]");
 		$actionlinks[] = action_link("Restart", "application_lightning","servicelist.php?id=$row[0]&restart");
+		$actionlinks[] = action_link("JMX-Request", "cog_go","servicejmxrequest.php?id=$row[0]");
 	}
 	return action_links($actionlinks);
 }
