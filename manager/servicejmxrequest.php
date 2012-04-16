@@ -33,14 +33,14 @@ class JmxRequestFormItem extends FormItem {
 	function render ($value) {
 		$n = $this->form->name."_".$this->name;
 		$url = $this->args['url'];
-		$str .= '
+		$str = '
 		<style type="text/css">
-		pre {outline: 1px solid #ccc; padding: 5px; margin: 5px; }
-		.string { color: green; }
-		.number { color: darkorange; }
-		.boolean { color: blue; }
-		.null { color: magenta; }
-		.key { color: red; }
+			pre {outline: 1px solid #ccc; padding: 5px; margin: 5px; }
+			.string { color: green; }
+			.number { color: darkorange; }
+			.boolean { color: blue; }
+			.null { color: magenta; }
+			.key { color: red; }
 		</style>
 		<div>
 			<div style="font-weight:bold;float:left;">'._L("MBean").'</div>
@@ -116,7 +116,13 @@ class JmxRequestFormItem extends FormItem {
 					},
 					onSuccess: function(response) {
 						result.show();
-						$(result.id + "-data").update(new Element("pre").update(syntaxHighlight(response.responseJSON)));
+						$(result.id + "-data").update();
+						if (response.responseJSON.error) {
+							$(result.id + "-data").insert(
+								new Element("pre").update(syntaxHighlight(response.responseJSON.value)));
+						}
+						$(result.id + "-data").insert(
+							new Element("pre").update(syntaxHighlight(response.responseJSON.value)));
 					},
 					onFailure: function() {
 						result.show();

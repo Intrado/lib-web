@@ -14,8 +14,10 @@ switch ($_REQUEST["type"]) {
 		break;
 		
 	case "jmxrequest":
+		$result = array("error" => "", "value" => array());
 		if (!$SETTINGS['servermanagement']['manageservers'] || !$MANAGERUSER->authorized("manageserver")) {
-			$result = array("error" => "Not Authorized");
+			$result["error"] = "Not Authorized";
+			break;
 		}
 		if (isset($_REQUEST['url']) && isset($_REQUEST['mbean']) && isset($_REQUEST['jmxtype'])) {
 			$jmxClient = new JmxClient($_REQUEST['url']);
@@ -40,10 +42,10 @@ switch ($_REQUEST["type"]) {
 				default:
 					$jmxresult = array("error" => "Unknown request type");
 			}
+			$result = $jmxresult;
 		} else {
-			$result = array("error" => "bad/missing request parameters");
+			$result["error"] = "bad/missing request parameters";
 		}
-		$result = $jmxresult['value'];
 		break;
 	
 	default:
