@@ -462,15 +462,16 @@ table#addMeWindow input[type="checkbox"] { margin: 7px 0; }
 }
 
 @media only screen and (max-width: 800px) {
+	.newform .formtitle { float: none; display: block; width: inherit; text-align: left; }
+	.newform .formcontrol { float: none; display: block; margin: 0; }
+	
 	.newform .form_list_table { width: 195px; }
-	.formcontrol .messagegrid { width: 420px; }
-	.formcontrol .messagegrid th { font-size: 10px; }
-	.formcontrol .messagegrid td { padding: 0; }
-	.maincontainerleft { float: none; display: block; width: 260px; }
-	.maincontainerseperator { float: none; width: inherit; }
-	.email .maincontainerseperator { margin: 0; }
-	.maincontainerright { float: none; margin: 0; padding: 0; }
-	.newform .formcontrol textarea { width: 250px; margin: 0; }
+	.formcontrol .messagegrid { width: inherit; }
+	.formcontrol .messagegrid th { font-size: 11px; }
+	.formcontrol .messagegrid td { padding: 2px 0; }
+	.maincontainerleft { width: 290px; }
+	.maincontainerright { padding: 0; }
+	.newform .formcontrol textarea { width: 280px; margin: 0; }
 	.controlcontainer .datafields { float: none; }
 	.helper { width: 150px; }
 }
