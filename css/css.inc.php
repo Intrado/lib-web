@@ -723,12 +723,10 @@ div.autocomplete ul li {
 	cursor:hand;  
 }
 
-.messagegrid {
-text-align: center;
-}
-.messagegrid .messagegridheader {
-	padding: 2px;
-}
+.messagegrid { margin: 5px 0 0; }
+.messagegrid th { color: #484848; font-size: 12px; text-align: left; }
+.messagegrid td { color: #484848; text-align: center; }
+.messagegrid .messagegridheader { padding: 2px; }
 .messagegrid .messagegridheader img{
 	margin-bottom: -3px;
 }
