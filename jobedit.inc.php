@@ -43,6 +43,9 @@ require_once("inc/twitteroauth/twitteroauth.php");
 require_once("obj/Twitter.obj.php");
 require_once("obj/CallerID.fi.php");
 require_once("obj/FeedCategory.obj.php");
+require_once("inc/facebook.php");
+require_once("inc/facebookEnhanced.inc.php");
+require_once("inc/facebook.inc.php");
 
 // Includes that are required for preview to work
 require_once("obj/Language.obj.php");
