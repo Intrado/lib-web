@@ -16,6 +16,7 @@ require_once("obj/FormItem.obj.php");
 require_once("obj/FormBrandTheme.obj.php");
 require_once("obj/FormUserItems.obj.php");
 require_once("inc/facebook.php");
+require_once("inc/facebookEnhanced.inc.php");
 require_once("obj/FacebookAuth.fi.php");
 require_once("inc/facebook.inc.php");
 require_once("obj/TwitterAuth.fi.php");
@@ -36,6 +37,9 @@ if (!$USER->authorize('managemyaccount')) {
 ////////////////////////////////////////////////////////////////////////////////
 $readonly = $USER->importid != null;
 $ldapuser = $USER->ldap;
+
+// attempt to update the user's facebook access token
+fb_updateUserAccessToken();
 
 $usernamelength = getSystemSetting("usernamelength", 5);
 if ($USER->ldap)

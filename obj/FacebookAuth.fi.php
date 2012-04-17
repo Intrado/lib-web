@@ -36,7 +36,7 @@ class FacebookAuth extends FormItem {
 		$str .= '<div id="'. $n. 'fbdisconnected" style="'. (($validtoken)? "display:none;": ""). '">';
 		
 		// Do facebook login to get good auth token
-		$perms = "publish_stream,offline_access,manage_pages";
+		$perms = "publish_stream,manage_pages";
 		$str .= icon_button("Connect to Facebook", "custom/facebook", 
 			"try { 
 				FB.login(handleFbLoginAuthResponse.curry('$n'), {scope: '$perms'});
@@ -44,7 +44,10 @@ class FacebookAuth extends FormItem {
 				alert('". _L("Could not connect to Facebook:")."' + e); 
 			}");
 			
-		$str .= '<div style="clear: both"></div></div></div>';
+		$str .= '<div style="clear: both"></div>
+				</div>
+				<pre id="'. $n. 'fbdebugdata" style="display:none;"></pre>
+				</div>';
 		
 		return $str;
 	}
@@ -58,7 +61,8 @@ class FacebookAuth extends FormItem {
 					FB.init({appId: "'. $SETTINGS['facebook']['appid']. '", 
 							status: true, 
 							cookie: false, 
-							xfbml: true
+							xfbml: true,
+							oauth: true
 					});
 					
 					// after init, load the user data
@@ -83,9 +87,12 @@ class FacebookAuth extends FormItem {
 		$str = '<script type="text/javascript">
 				// handle updateing information when the user allows or disallows the facebook application
 				function handleFbLoginAuthResponse(formitem, res) {
+					//showDebugData(formitem, res);
 					var access_token = "";
+					var user_id = "";
 					if (res != null && res.authResponse) {
 						access_token = res.authResponse.accessToken;
+						user_id = res.authResponse.userID;
 					}
 					
 					// store access_token value
@@ -93,44 +100,31 @@ class FacebookAuth extends FormItem {
 					val = access_token;
 					$(formitem).value = val;
 					
-					// ajax request to store data in the db
-					new Ajax.Request("ajaxfacebook.php", {
-						method:"post",
-						parameters: {
-							"type": "store_access_token",
-							"access_token": access_token}});
-					
 					// if we have an access token. show the appropriate user information
 					if (access_token) {
 						$(formitem + "fbconnected").setStyle({display: "block"});
 						$(formitem + "fbdisconnected").setStyle({display: "none"});
 						fbLoadUserData(formitem);
-						// do a request to get the userid and store it in our db
-						FB.api("/me", { access_token: access_token }, function(r) {
-							if (r && !r.error) {
-								// store the current userid in the db
-								new Ajax.Request("ajaxfacebook.php", {
-									method:"post",
-									parameters: {
-										"type": "store_user_id",
-										"fb_user_id": r.id}
-								});
-							}
-						}); // end facebook api call
+						
+						// ajax request to store data in the db
+						new Ajax.Request("ajaxfacebook.php", {
+							method:"post",
+							parameters: {
+								"type": "save",
+								"access_token": access_token,
+								"fb_user_id": user_id}
+						});
 					} else {
 						// no access token, show the connect button
 						$(formitem + "fbconnected").setStyle({display: "none"});
 						$(formitem + "fbdisconnected").setStyle({display: "block"});
-						// remove the current userid from the db
+						
+						// remove the current user_id/access_token from the db
 						new Ajax.Request("ajaxfacebook.php", {
 							method:"post",
-							parameters: {
-								"type": "store_user_id",
-								"fb_user_id": ""}
+							parameters: {"type": "delete"}
 						});
 					}
-					
-					
 				}
 			
 				function fbLoadUserData(formitem) {
@@ -167,6 +161,11 @@ class FacebookAuth extends FormItem {
 							loader = false;
 						}
 					}, 5000);
+				}
+				
+				function showDebugData(formitem, data) {
+					$(formitem + "fbdebugdata").show();
+					$(formitem + "fbdebugdata").update(JSON.stringify(data, undefined, 4));
 				}
 				
 				</script>';

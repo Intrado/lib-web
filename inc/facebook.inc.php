@@ -1,7 +1,6 @@
 <?
-		
 // get a new instance of the facebook api
-$facebookapi = new Facebook(array (
+$facebookapi = new FacebookEnhanced(array (
 	'appId' => $SETTINGS['facebook']['appid'],
 	'cookie' => false,
 	'secret' => $SETTINGS['facebook']['appsecret']
@@ -58,6 +57,24 @@ function fb_post($pageid, $pageAccessToken, $text) {
 	}
 	
 	return true;
+}
+
+function fb_getExtendAccessToken($accessToken) {
+	global $facebookapi;
+	return $facebookapi->getExtendedAccessToken($accessToken);
+}
+
+function fb_updateUserAccessToken() {
+	global $facebookapi;
+	global $USER;
+	
+	$expiresOn = $USER->getSetting("fb_expires_on", 0);
+	// if it will expire within 30 days of now, renew it
+	//if ($expiresOn && strtotime("now") - $expiresOn < (30*24*60*60)) {
+		list($accessToken,$expiresIn) = fb_getExtendAccessToken($USER->getSetting("fb_access_token"));
+		$USER->setSetting("fb_access_token", $accessToken);
+		$USER->setSetting("fb_expires_on", strtotime("now") + $expiresIn);
+	//}
 }
 
 ?>

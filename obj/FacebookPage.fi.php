@@ -55,7 +55,12 @@ class FacebookPage extends FormItem {
 		
 		$str = '// Facebook javascript API initialization, pulled from facebook documentation
 				window.fbAsyncInit = function() {
-					FB.init({appId: "'. $SETTINGS['facebook']['appid']. '", status: true, cookie: false, xfbml: true});
+					FB.init({appId: "'. $SETTINGS['facebook']['appid']. '",
+							status: true,
+							cookie: false,
+							xfbml: true,
+							oauth: true
+					});
 					
 					// load the initial list of pages if possible
 					updateFbPages("'.$this->args['access_token'].'", "'.$n.'", "'.$n.'fbpages");
