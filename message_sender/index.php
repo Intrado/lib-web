@@ -352,7 +352,7 @@
 
 </div><!-- end window messagescreen-->
 
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+<script src="script/jquery.1.7.2.min.js"></script>
 <script src="script/bootstrap-modal.js"></script>
 <script type="text/javascript">
 jQuery.noConflict();
