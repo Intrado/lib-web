@@ -1411,7 +1411,7 @@ class JobWiz_facebookAuth extends WizStep {
 			
 			if ($mg->hasMessage("post","facebook"))
 				return true;
-		} else {
+		} else if ($this->parent->dataHelper('/start:package', false, false)) {
 			// any other package, it's enabled.
 			return true;
 		}
@@ -1474,7 +1474,7 @@ class JobWiz_twitterAuth extends WizStep {
 			
 			if ($mg->hasMessage("post","twitter"))
 				return true;
-		} else {
+		} else if ($this->parent->dataHelper('/start:package', false, false)) {
 			// any other package, it's enabled.
 			return true;
 		}
@@ -1605,7 +1605,7 @@ class JobWiz_socialMedia extends WizStep {
 				twitterAuthorized($this->parent) ||
 				(getSystemSetting("_hasfeed") && $USER->authorize("feedpost"))) {
 			// everything but custom enables this step outright
-			if ($this->parent->dataHelper('/start:package') !== "custom")
+			if ($this->parent->dataHelper('/start:package', false, false) && $this->parent->dataHelper('/start:package') !== "custom")
 				return true;
 			// if it's a create message and has post type
 			$msgtypes = $this->parent->dataHelper('/message/pick:type', false, array());
