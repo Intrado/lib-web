@@ -110,7 +110,7 @@ class FacebookApiException extends Exception
  * Provides access to the Facebook Platform.  This class provides
  * a majority of the functionality needed, but the class is abstract
  * because it is designed to be sub-classed.  The subclass must
- * implement the four abstract methods listed at the bottom of
+ * implement the three abstract methods listed at the bottom of
  * the file.
  *
  * @author Naitik Shah <naitik@facebook.com>
@@ -314,8 +314,7 @@ abstract class BaseFacebook
     // access token, in case we navigate to the /oauth/access_token
     // endpoint, where SOME access token is required.
     $this->setAccessToken($this->getApplicationAccessToken());
-    $user_access_token = $this->getUserAccessToken();
-    if ($user_access_token) {
+    if ($user_access_token = $this->getUserAccessToken()) {
       $this->setAccessToken($user_access_token);
     }
 
@@ -344,7 +343,7 @@ abstract class BaseFacebook
         $this->setPersistentData('access_token', $access_token);
         return $access_token;
       }
-
+      
       // the JS SDK puts a code in with the redirect_uri of ''
       if (array_key_exists('code', $signed_request)) {
         $code = $signed_request['code'];
@@ -706,12 +705,7 @@ abstract class BaseFacebook
 
     // results are returned, errors are thrown
     if (is_array($result) && isset($result['error_code'])) {
-      $this->throwAPIException($result);
-    }
-
-    if ($params['method'] === 'auth.expireSession' ||
-        $params['method'] === 'auth.revokeAuthorization') {
-      $this->destroySession();
+      throw new FacebookApiException($result);
     }
 
     return $result;
@@ -968,14 +962,9 @@ abstract class BaseFacebook
    * @return string The current URL
    */
   protected function getCurrentUrl() {
-    if (isset($_SERVER['HTTPS']) && ($_SERVER['HTTPS'] == 'on' || $_SERVER['HTTPS'] == 1)
-      || isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] == 'https'
-    ) {
-      $protocol = 'https://';
-    }
-    else {
-      $protocol = 'http://';
-    }
+    $protocol = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on'
+      ? 'https://'
+      : 'http://';
     $currentUrl = $protocol . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
     $parts = parse_url($currentUrl);
 
@@ -1042,8 +1031,6 @@ abstract class BaseFacebook
       case 'OAuthException':
         // OAuth 2.0 Draft 10 style
       case 'invalid_token':
-        // REST server errors are just Exceptions
-      case 'Exception':
         $message = $e->getMessage();
       if ((strpos($message, 'Error validating access token') !== false) ||
           (strpos($message, 'Invalid OAuth access token') !== false)) {
@@ -1085,16 +1072,40 @@ abstract class BaseFacebook
   protected static function base64UrlDecode($input) {
     return base64_decode(strtr($input, '-_', '+/'));
   }
-
-  /**
-   * Destroy the current session
-   */
-  public function destroySession() {
-    $this->setAccessToken(null);
-    $this->user = 0;
-    $this->clearAllPersistentData();
+  
+  public function getExtendedAccessToken(){
+  
+  	try {
+  		// need to circumvent json_decode by calling _oauthRequest
+  		// directly, since response isn't JSON format.
+  		$access_token_response =
+  		$this->_oauthRequest(
+  		$this->getUrl('graph', '/oauth/access_token'),
+                  $params = array(    'client_id' => $this->getAppId(),
+  		'client_secret' => $this->getAppSecret(),
+                                      'grant_type'=>'fb_exchange_token',
+                                      'fb_exchange_token'=>$this->getAccessToken(),
+                                ));
+  
+  	} catch (FacebookApiException $e) {
+  		// most likely that user very recently revoked authorization.
+  		// In any event, we don't have an access token, so say so.
+  			return false;
+  		}
+  
+  		if (empty($access_token_response)) {
+  		return false;
+  		}
+  
+  		$response_params = array();
+  		parse_str($access_token_response, $response_params);
+  		if (!isset($response_params['access_token'])) {
+  		return false;
   }
-
+  
+  		return $response_params['access_token'];
+  }
+  
   /**
    * Each of the following four methods should be overridden in
    * a concrete subclass, as they are in the provided Facebook class.
