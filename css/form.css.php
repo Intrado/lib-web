@@ -26,44 +26,14 @@ form.newform {
 	margin-left: 10px; 
 }
 
-.helper {
-	z-index: 99;
-	font-family: sans-serif;
-	overflow: hidden;
-	width: 200px;
-	margin: 0;
-	padding: 0;
-	background-color: white;
-	border: 4px solid rgb(150,150,255);
-	display: none;
-	-webkit-border-radius: 3px;
-}
-
-.helper .helpercontent {
-	font-size: 9pt;
-	font-family: sans-serif;
-	padding: 5px;
-	height: 150px;
-	overflow: auto;
-}
-
-.helper .helpercontent ul {
-	padding-left: 1.2em;
-	margin-left: 0px;
-}
-
-.helper .toolbar {
-	padding-bottom: 3px;
-	border-top: 1px solid #CCCCCC;
-	background-color: rgb(240,240,255);
-	height: 20px;
-}
-
-.helper .info {
-	padding-top: 4pt;
-	font-size: 8pt;
-	text-align: center;
-}
+.helper { background-color: #fff; width: 200px; margin: 0; padding: 0; font-family: sans-serif; overflow: hidden; border: 4px solid rgb(150,150,255);
+ display: none; z-index: 99; 
+ -webkit-border-radius: 3px; -moz-border-radius: 3px; border-radius: 3px;
+-moz-background-clip: padding; -webkit-background-clip: padding-box; background-clip: padding-box; }
+.helper .helpercontent { font-size: 9pt; font-family: sans-serif; padding: 5px; height: 150px; overflow: auto; }
+.helper .helpercontent ul { padding-left: 1.2em; margin-left: 0px; }
+.helper .toolbar { padding-bottom: 3px; border-top: 1px solid #CCCCCC; background-color: rgb(240,240,255); height: 20px; }
+.helper .info { padding-top: 4pt; font-size: 8pt; text-align: center; }
 
 .helper .title {
 	border-bottom: 1px solid #CCCCCC;
@@ -103,18 +73,18 @@ form.newform {
 .newform fieldset { background: #f1f1f1; width: 100%; margin-bottom: 1em; border: none; }
  
 .formfieldarea { padding: 8px 10px; }
-.formfieldarea .underneathmsg { padding: 4px 0 0; font-weight: bold; color: #cc0000; }
+.formfieldarea .underneathmsg { float: left; display: inline; margin: 5px 0 0 175px; padding: 0; font-weight: bold; color: #cc0000; }
 
-.newform .formtitle { width: 100%; padding: 2px 0 5px 0; }
-.newform .formtitle .formlabel { float: left; font-weight: bold; font-size: 1.1em; line-height: 16px; text-align: left; }
-.newform .formtitle .formicon { float: left; padding: 0 5px; }
+.newform .formtitle { float: left; display: inline; width: 165px; padding: 2px 0 5px 0; text-align: right; }
+.newform .formtitle .formlabel { font-weight: bold; font-size: 1.1em; line-height: 16px; }
+.newform .formtitle .formicon {  }
 
-.newform .formcontrol { width: 100%; }
-.newform .formcontrol input[type="text"] { width: 50%; padding: 4px 5px; border: 1px solid #E7E7E7; 
+.newform .formcontrol { float: left; display: inline; margin: 0 0 0 10px; }
+.newform .formcontrol input[type="text"] { width: 250px; padding: 4px 5px; border: 1px solid #E7E7E7; 
 -webkit-border-radius: 5px; -moz-border-radius: 5px; border-radius: 5px; 
 -moz-background-clip: padding; -webkit-background-clip: padding-box; background-clip: padding-box; }
 .newform .formcontrol input[type="radio"] { margin: 0 5px 5px 0; }
-.newform .formcontrol textarea { width: 65%; margin: 0 0 5px 0; padding: 4px 5px; border: 1px solid #E7E7E7; 
+.newform .formcontrol textarea { width: 425px; margin: 0 0 5px 0; padding: 4px 5px; border: 1px solid #E7E7E7; 
 -webkit-border-radius: 5px; -moz-border-radius: 5px; border-radius: 5px; 
 -moz-background-clip: padding; -webkit-background-clip: padding-box; background-clip: padding-box; }
 .newform .formcontrol input#account_brandthemecustomize { float: left; display: inline; margin: 0 5px 0 0; }
@@ -123,7 +93,7 @@ form.newform {
 .newform .formcontrol .gBranding {}
 .newform .formcontrol .gBrandingText { font-size: 11px; }
 
-.newform .formcontrol .radiobox { list-style-type: none; padding: 0; margin: 0; }
+.newform .formcontrol .radiobox { float: left; display: inline; list-style-type: none; padding: 0; margin: 0 20px 0 0; }
 .newform .formcontrol .radiobox li { padding: 2px 0; }
 .newform .formcontrol .radiobox input[type="radio"],
 .newform .formcontrol .radiobox input[type="checkbox"] { margin: 0 5px 0 0; }
@@ -131,6 +101,8 @@ form.newform {
 .newform .formcontrol select  { margin: 0; padding: 4px 6px; border: 1px solid #E7E7E7; 
 -webkit-border-radius: 5px; -moz-border-radius: 5px; border-radius: 5px; 
 -moz-background-clip: padding; -webkit-background-clip: padding-box; background-clip: padding-box; }
+
+.newform .formcontrol .datafields input { width: 140px; }
 
 
 /* -------- CSS redesign ------- */
@@ -360,73 +332,28 @@ table#addMeWindow input[type="checkbox"] { margin: 7px 0; }
 	margin-top: 8px;
 }
 
-.maincontainerleft {
-	float:left; 
-	margin-right:10px;
-}
-
-.maincontainerseperator {
-	float:left; 
-	width:15px; 
-}
-
-.maincontainerright {
-	float:left;
-	margin-left:10px; 
-	padding:6px; 
-	border: 1px solid #'.$_SESSION['colorscheme']['_brandtheme2'].';
-}
+.maincontainerleft { float: left; display: inline; margin-right: 10px; width: 438px; }
+.maincontainerseperator { float: left; width: 15px; }
+.maincontainerright { float: left; display: inline; width: 155px; margin-left: 10px; padding:6px; border: 1px solid #'.$_SESSION['colorscheme']['_brandtheme2'].'; }
 
 
 /* email messages 
 --------------------*/
 
-.email .maincontainerleft {
-	width:65%; 
-}
-
-.email .maincontainerseperator {
-	margin-top:50px;
-}
-
-.email .maincontainerright {
-	width:20%; 
-}
+.email .maincontainerleft {  }
+.email .maincontainerseperator { margin-top: 50px; }
+.email .maincontainerright {  }
 
 /* phone messages 
 -------------------*/
 
-.controlcontainer .library {
-	padding: 2px;
-	border: 1px dotted gray;
-}
+.controlcontainer .library { padding: 2px; border: 1px dotted gray; }
+.controlcontainer .error { white-space: normal; font-style: italic; color: red; }
+.controlcontainer .uploadiframe { overflow: hidden; width: 100%; border: 0; margin: 0; padding: 0; height: 2em; }
 
-.controlcontainer .error {
-	white-space: normal;
-	font-style: italic;
-	color: red;
-}
-
-.controlcontainer .uploadiframe {
-	overflow: hidden;
-	width: 100%;
-	border: 0;
-	margin: 0;
-	padding: 0;
-	height: 2em;
-}
-
-.phone .maincontainerleft {
-	width:45%; 
-}
-
-.phone .maincontainerseperator {
-	margin-top:80px;
-}
-
-.phone .maincontainerright {
-	width:45%; 
-}
+.phone .maincontainerleft { width: 45%; }
+.phone .maincontainerseperator { margin-top: 80px; }
+.phone .maincontainerright { width: 45%; }
 
 
 /* +----------------------------------------------------------------+
@@ -471,19 +398,19 @@ table#addMeWindow input[type="checkbox"] { margin: 7px 0; }
 .newui .formsectionheader { margin: 5px 0 10px 0; padding: 0; font-size: 14px; line-height: 21px; font-weight: bold; color: #444; text-transform: uppercase; border-bottom: 1px dashed #999; }
  
 .newui .formfieldarea { padding: 8px 10px; }
-.newui .formfieldarea .underneathmsg { float: left; display: inline; margin: 5px 0 0 140px; padding: 0; font-size: 14px; font-weight: normal; color: #cc0000; }
+.newui .formfieldarea .underneathmsg { display: block; margin: 32px 0 0 140px; padding: 0; font-size: 14px; font-weight: normal; color: #cc0000; }
 
 .newui .newform .formtitle { float: left; display: inline; width: 140px; margin: 0; padding: 0; }
 .newui .newform .formtitle .formlabel { float: none; display: block; padding: 5px 10px 5px 0; font-size: 14px; line-height: 18px; font-weight: normal; text-align: right; }
 .newui .newform .formtitle .formicon { display: none; }
 
-.newui .newform .formcontrol { float: left; display: inline; width: 325px; margin: 0; padding: 0; }
+.newui .newform .formcontrol { float: left; display: inline; margin: 0; padding: 0; }
 .newui .newform .formcontrol input[type="text"] { display: block; width: 313px; padding: 4px 5px; font-size: 14px; line-height: 18px; border: 1px solid #E2E2E2; 
 -webkit-border-radius: 5px; -moz-border-radius: 5px; border-radius: 5px; 
 -moz-background-clip: padding; -webkit-background-clip: padding-box; background-clip: padding-box; }
 .newui .newform .formcontrol input[type="radio"] { margin: 0 5px 5px 0; }
 .newui .newform .formcontrol input[type="checkbox"] { margin: 5px 0 0; }
-.newui .newform .formcontrol textarea { display: block; width: 100%; margin: 0 0 5px 0; padding: 4px 5px; font-size: 14px; line-height: 18px; border: 1px solid #E2E2E2; 
+.newui .newform .formcontrol textarea { display: block; margin: 0 0 5px 0; padding: 4px 5px; font-size: 14px; line-height: 18px; border: 1px solid #E2E2E2; 
 -webkit-border-radius: 5px; -moz-border-radius: 5px; border-radius: 5px; 
 -moz-background-clip: padding; -webkit-background-clip: padding-box; background-clip: padding-box; }
 .newui .newform .formcontrol input#account_brandthemecustomize { float: left; display: inline; margin: 0 5px 0 0; }
@@ -492,7 +419,6 @@ table#addMeWindow input[type="checkbox"] { margin: 7px 0; }
 .newui .newform .formcontrol .gBranding {}
 .newui .newform .formcontrol .gBrandingText { font-size: 11px; }
 
-.newui .newform .formcontrol .radiobox { list-style-type: none; padding: 0; margin: 0; }
 .newui .newform .formcontrol .radiobox li { padding: 5px 0; }
 .newui .newform .formcontrol .radiobox input[type="radio"],
 .newui .newform .formcontrol .radiobox input[type="checkbox"] { margin: 0 5px 0 0; }
@@ -500,6 +426,8 @@ table#addMeWindow input[type="checkbox"] { margin: 7px 0; }
 .newui .newform .formcontrol select { margin: 0; padding: 4px 6px; border: 1px solid #E7E7E7; 
 -webkit-border-radius: 5px; -moz-border-radius: 5px; border-radius: 5px; 
 -moz-background-clip: padding; -webkit-background-clip: padding-box; background-clip: padding-box; }
+
+.newui .newform .formcontrol .datafields input { width: 140px; }
 
 
 /*---------- Message sender form ----------*/
@@ -523,4 +451,27 @@ table#addMeWindow input[type="checkbox"] { margin: 7px 0; }
 .window_panel form p { margin: 0; padding: 4px 0; color: #888; }
 .window_panel form .controls { margin: 0 0 0 150px; }
 .window_panel form .form_actions { background: #ededed; margin: 0 -15px -20px -15px; padding: 15px; border-radius: 0 0 8px 8px; }
+
+
+/*---------- Media queries for form elements ----------*/
+
+@media only screen and (max-width: 1024px) {
+	.formcontrol .messagegrid { width: 520px; }
+	.maincontainerleft { width: 320px; }
+	.newform .formcontrol textarea { width: 308px; }
+}
+
+@media only screen and (max-width: 800px) {
+	.newform .form_list_table { width: 195px; }
+	.formcontrol .messagegrid { width: 420px; }
+	.formcontrol .messagegrid th { font-size: 10px; }
+	.formcontrol .messagegrid td { padding: 0; }
+	.maincontainerleft { float: none; display: block; width: 260px; }
+	.maincontainerseperator { float: none; width: inherit; }
+	.email .maincontainerseperator { margin: 0; }
+	.maincontainerright { float: none; margin: 0; padding: 0; }
+	.newform .formcontrol textarea { width: 250px; margin: 0; }
+	.controlcontainer .datafields { float: none; }
+	.helper { width: 150px; }
+}
 			
