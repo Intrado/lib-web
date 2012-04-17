@@ -70,11 +70,11 @@ function fb_updateUserAccessToken() {
 	
 	$expiresOn = $USER->getSetting("fb_expires_on", 0);
 	// if it will expire within 30 days of now, renew it
-	//if ($expiresOn && strtotime("now") - $expiresOn < (30*24*60*60)) {
+	if ($expiresOn && strtotime("now") - $expiresOn < (30*24*60*60)) {
 		list($accessToken,$expiresIn) = fb_getExtendAccessToken($USER->getSetting("fb_access_token"));
 		$USER->setSetting("fb_access_token", $accessToken);
 		$USER->setSetting("fb_expires_on", strtotime("now") + $expiresIn);
-	//}
+	}
 }
 
 ?>
