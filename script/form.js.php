@@ -428,8 +428,8 @@ function form_go_step (form, direction, specificstep) {
 			var helper_y = e.offsetTop;
 			var viewport_offset = Math.max(0, document.viewport.getHeight() - e.getHeight());
 
-			e.style.border = "4px solid rgb(0,0,255)";
-			new Effect.Morph(e, {style: 'border-color: rgb(150,150,255)', duration: 1.2, transition: Effect.Transitions.spring, queue: { scope: "helper"}});
+			e.style.border = "1px solid #ccc";
+			new Effect.Morph(e, {style: 'border-color: #ccc', duration: 1.2, transition: Effect.Transitions.spring, queue: { scope: "helper"}});
 
 			new Effect.Move(helper, { y:helper_y, mode:'absolute', duration: 0.8, queue: { scope: "helper"}});
 
@@ -458,7 +458,7 @@ function form_enable_helper(event) {
 
 	formvars.helperdisabled = false;
 
-	new Effect.Morph(form.id + "_helpercell", {style: "width: 200px",
+	new Effect.Morph(form.id + "_helpercell", {
 		afterFinish: function() {
 			helper.style.display = "block";
 			form_go_step(form,null,0);
@@ -485,7 +485,7 @@ function form_disable_helper(event) {
 
 	helper.style.display = "none";
 
-	new Effect.Morph(form.id + "_helpercell", {style: "width: 200px",
+	new Effect.Morph(form.id + "_helpercell", {
 		afterFinish: function () {
 			form.select("legend").map(function (e) {
 				e.style.display = "none";
