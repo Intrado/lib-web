@@ -1361,7 +1361,7 @@ class JobWiz_facebookAuth extends WizStep {
 	function getForm($postdata, $curstep) {
 	
 		// FB auth note
-		$html = "<div>". escapehtml(_L("If you would like to create a message on Facebook, connect to a Facebook account now.")). "</div>";
+		$html = "<p class='social_note'>". escapehtml(_L("If you would like to create a message on Facebook, connect to a Facebook account now.")). "</p>";
 		
 		// Form Fields.
 		$formdata = array(
@@ -1424,7 +1424,7 @@ class JobWiz_twitterAuth extends WizStep {
 		global $USER;
 		
 		// Twitter auth note
-		$html = "<div>". escapehtml(_L("If you would like to create a message on Twitter, connect to a Twitter account now.")). "</div>";
+		$html = "<p class='social_note'>". escapehtml(_L("If you would like to create a message on Twitter, connect to a Twitter account now.")). "</p>";
 		
 		// Form Fields.
 		$formdata = array(
@@ -2046,7 +2046,7 @@ class JobWiz_submitConfirm extends WizStep {
 			);
 		}
 
-		$html = '<div style="font-size: medium">';
+		$html = '<p class="confirm_note">';
 		if ($postdata['/schedule/options']['schedule'] == 'template')
 			$html .= escapehtml(_L('You are about to save a notification to be used at a later date.')). "<br>". escapehtml(_L('Confirm and click Next to save this notification.'));
 		else {
@@ -2055,7 +2055,7 @@ class JobWiz_submitConfirm extends WizStep {
 			else
 				$html .= escapehtml(_L('Confirm and click Next to send this notification to the %1$s people you selected.', $calctotal, count($lists)));
 		}
-		$html .= '</div>';
+		$html .= '</p>';
 		$formdata["jobinfo"] = array(
 			"label" => _L("Job Info"),
 			"control" => array("FormHtml", "html" => $html),
