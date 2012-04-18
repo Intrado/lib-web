@@ -814,7 +814,7 @@ if ($submittedmode || $completedmode) {
 			"value" => (count($fbpages)?json_encode($fbpages):""),
 			"validators" => array(
 				array("ValFacebookPageWithMessage", "authpages" => getFbAuthorizedPages(), "authwall" => getSystemSetting("fbauthorizewall"))),
-			"control" => array("FacebookPage", "access_token" => $USER->getSetting("fb_access_token", false)),
+			"control" => array("FacebookPage", "access_token" => $USER->getSetting("fb_access_token", false), "show_renew" => true),
 			"requires" => array("message"),
 			"helpstep" => ++$helpstepnum);
 			

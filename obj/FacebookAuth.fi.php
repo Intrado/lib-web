@@ -164,7 +164,7 @@ class FacebookAuth extends FormItem {
 									new Element("div").setStyle({ float: "left", padding: "7px" }).insert(
 										new Element("div").setStyle({ "fontWeight": "bold" }).update(r.name.escapeHTML())
 									).insert(
-										new Element("div", {"id": formitem + "expires"}).update(
+										new Element("div").setStyle({ color: "grey" }).update(
 											"'._L("Expires:").'&nbsp;" + expiresOn
 										)
 									)

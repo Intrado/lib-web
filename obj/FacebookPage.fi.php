@@ -35,7 +35,10 @@ class FacebookPage extends FormItem {
 			<input id="'.$n.'authpages" name="'.$n.'authpages" type="hidden" value="'.escapehtml(json_encode($pages)).'" />
 			<div id="fb-root"></div>
 			<div id="'. $n. 'connect" style="display:'. ($showconnectbutton?"block":"none"). '">
-				'. icon_button(_L("Add Facebook Account"), "custom/facebook", "popup('popupfacebookauth.php', 600, 300)").'
+				'. icon_button(_L("Add Facebook Account"), "custom/facebook", "popup('popupfacebookauth.php', 640, 400)").'
+			</div>
+			<div id="'. $n. 'renew" style="display:'. (!$showconnectbutton && $this->args['show_renew']?"block":"none"). '">
+				'. icon_button(_L("Renew Facebook Authorization"), "custom/facebook", "popup('popupfacebookauth.php', 640, 400)").'
 			</div>
 			<div id="'.$n.'actionlinks" style="display:'. ($showconnectbutton?"none":"block"). '">
 				<a id="'. $n. 'all" class="actionlink">'._L("Select All").'</a>
@@ -63,7 +66,7 @@ class FacebookPage extends FormItem {
 					});
 					
 					// load the initial list of pages if possible
-					updateFbPages("'.$this->args['access_token'].'", "'.$n.'", "'.$n.'fbpages");
+					updateFbPages("'.$this->args['access_token'].'", "'.$n.'", "'.$n.'fbpages", "'.$this->args['show_renew'].'");
 				};
 				(function() {
 					var e = document.createElement("script");
@@ -74,7 +77,7 @@ class FacebookPage extends FormItem {
 				}());
 				// Observe an authentication update on the document (the auth popup fires this event)
 				document.observe("FbAuth:update", function (res) {
-					updateFbPages(res.memo.access_token, "'.$n.'", "'.$n.'fbpages");
+					updateFbPages(res.memo.access_token, "'.$n.'", "'.$n.'fbpages", "'.$this->args['show_renew'].'");
 				});
 				// Observe a click on the action links
 				$("'. $n. 'all").observe("click", handleActionLink.curry("'.$n.'", true));
@@ -118,11 +121,12 @@ class FacebookPage extends FormItem {
 				form_do_validation($(formitem).up("form"), $(formitem));
 			}
 			
-			function updateFbPages(access_token, formitem, container) {
+			function updateFbPages(access_token, formitem, container, showrenew) {
 				
 				var pages = $(formitem).value.evalJSON();
 				container = $(container);
 				connectdiv = $(formitem + "connect");
+				renewdiv = $(formitem + "renew");
 				actionlinks = $(formitem + "actionlinks");
 				
 				if (access_token) {
@@ -130,6 +134,8 @@ class FacebookPage extends FormItem {
 					container.show();
 					actionlinks.show();
 					connectdiv.hide();
+					if (showrenew)
+						renewdiv.show();
 					
 					// get the authorized pages
 					var authpages = $(formitem + "authpages").value.evalJSON();

@@ -425,16 +425,16 @@ class FinishJobWizard extends WizFinish {
 			
 			// social media
 			if (JobWiz_socialMedia::isEnabled($postdata,false)) {
-				if ($this->parent->dataHelper('/message/post/socialmedia:fbdata')) {
-					$fbdata = $this->parent->dataHelper('/message/post/socialmedia:fbdata');
+				if ($this->parent->dataHelper('/message/post/socialmedia:facebook')) {
+					$fbdata = $this->parent->dataHelper('/message/post/socialmedia:facebook');
 					$messages['post']['facebook']['en']['none']['text'] = $fbdata;
 				}
-				if ($this->parent->dataHelper('/message/post/socialmedia:twdata')) {
-					$twdata = $this->parent->dataHelper('/message/post/socialmedia:twdata');
+				if ($this->parent->dataHelper('/message/post/socialmedia:twitter')) {
+					$twdata = $this->parent->dataHelper('/message/post/socialmedia:twitter');
 					$messages['post']['twitter']['en']['none']['text'] = $twdata;
 				}
-				if ($this->parent->dataHelper('/message/post/socialmedia:feeddata')) {
-					$feeddata = $this->parent->dataHelper('/message/post/socialmedia:feeddata', true);
+				if ($this->parent->dataHelper('/message/post/socialmedia:feed')) {
+					$feeddata = $this->parent->dataHelper('/message/post/socialmedia:feed', true);
 					$messages['post']['feed']['en']['none']['subject'] = $feeddata->subject;
 					$messages['post']['feed']['en']['none']['text'] = $feeddata->message;
 				}

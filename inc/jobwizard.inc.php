@@ -12,19 +12,22 @@ function wizHasMessageGroup($wiz) {
 }
 
 // Check the wizard to figure out if this wizard has an assigned message
-function wizHasMessage($wiz, $messagetype) {
+function wizHasMessage($wiz, $messagetype, $subtype = null) {
 	if ($messagetype == "phone") {
 		if ($wiz->dataHelper("/message/phone/callme:message"))
 			return true;
 	}
-	if ($wiz->dataHelper("/message/$messagetype/text:message"))
+	if ($messagetype == 'post') {
+		if ($wiz->dataHelper("/message/$messagetype/socialmedia:$subtype"))
+			return true;
+	} else if ($wiz->dataHelper("/message/$messagetype/text:message")) {
 		return true;
+	}
 	if ($wiz->dataHelper("/message/pickmessage:messagegroup")) {
 		$mg = new MessageGroup($wiz->dataHelper("/message/pickmessage:messagegroup"));
-		return $mg->hasMessage($messagetype);
+		return $mg->hasMessage($messagetype, $subtype);
 	}
 	return false;
-	
 }
 
 
@@ -1359,7 +1362,7 @@ class JobWiz_facebookAuth extends WizStep {
 	function getForm($postdata, $curstep) {
 	
 		// FB auth note
-		$html = "<p class='social_note'>". escapehtml(_L("If you would like to create a message on Facebook, connect to a Facebook account now.")). "</p>";
+		$html = "<p class='social_note'>". escapehtml(_L("To send messages with Facebook, Connect or Renew your authorization.")). "</p>";
 		
 		// Form Fields.
 		$formdata = array(
@@ -1378,7 +1381,7 @@ class JobWiz_facebookAuth extends WizStep {
 				"helpstep" => 1
 			)
 		);
-		$helpsteps = array(_L("Before you can post your message to Facebook, you must authorize this application. Click the Connect to Facebook button to get started. <br><br>If you are logged into Facebook already, make sure you are logged into the account you plan to use for messaging. If you authorize the wrong account, you can disconnect from Facebook on your Account page, accessible from the Account link in the upper right corner. Then log out of Facebook using Facebook's web site. When you attempt to connect to Facebook again, you will be able to log into the correct account.<br><br><b>Note:</b> Disconnecting from Facebook from within this application will not automatically remove authorization from your Facebook account. You will need to do that from your Facebook account."));
+		$helpsteps = array(_L("Before you can post your message to Facebook, you must authorize this application. Click the Connect to Facebook button to get started. <br><br>If you are logged into Facebook already, make sure you are logged into the account you plan to use for messaging. If you authorize the wrong account, you can disconnect from Facebook on your Account page, accessible from the Account link in the upper right corner. Then log out of Facebook using Facebook's web site. When you attempt to connect to Facebook again, you will be able to log into the correct account.<br><br><b>Note:</b> Disconnecting from Facebook from within this application will not automatically remove authorization from your Facebook account. You will need to do that from your Facebook account. If you choose to send a message via Facebook, it's delivery will be restricted by the expiration date shown below. To extend that date, please click the 'Renew this Facebook Authorization' button. Maximum extension is 60 days from now."));
 		return new Form("facebookauth",$formdata,$helpsteps);
 	}
 
@@ -1514,7 +1517,7 @@ class JobWiz_socialMedia extends WizStep {
 		// Facebook
 		if (facebookAuthorized($this->parent)) {
 			$helpsteps[] = _L("Enter the message you wish to deliver via Facebook.");
-			$formdata["fbdata"] = array(
+			$formdata["facebook"] = array(
 				"label" => _L('Facebook'),
 				"fieldhelp" => _L("Create your Facebook posting text here."),
 				"value" => ($smEnable?$fbtext:""),
@@ -1535,7 +1538,7 @@ class JobWiz_socialMedia extends WizStep {
 			// need to reserve some characters for the link url and the six byte code. (http://smalldomain.com/<code>)
 			$reservedchars = mb_strlen(" http://". getSystemSetting("tinydomain"). "/") + 6;
 			$helpsteps[] = _L("Enter the message you wish to deliver via Twitter.");
-			$formdata["twdata"] = array(
+			$formdata["twitter"] = array(
 				"label" => _L("Twitter"),
 				"fieldhelp" => _L("Select what text to use as a status update."),
 				"value" => ($smEnable?$twtext:""),
@@ -1555,7 +1558,7 @@ class JobWiz_socialMedia extends WizStep {
 		// Feed
 		if (getSystemSetting("_hasfeed") && $USER->authorize("feedpost")) {
 			$helpsteps[] = _L("Enter the message you wish to post to an RSS feed.");
-			$formdata["feeddata"] = array(
+			$formdata["feed"] = array(
 				"label" => _L("Feed Message"),
 				"fieldhelp" => _L("Select what text to include in your feed."),
 				"value" => ($smEnable?json_encode(array("subject"=>$this->parent->dataHelper('/start:name'),"message"=>$fbtext)):""),
@@ -1614,7 +1617,7 @@ class JobWiz_facebookPage extends WizStep {
 	var $messagegroup = false;
 	function hasFbMessage() {
 		// if there is a facebook message created
-		if ($this->parent->dataHelper('/message/post/socialmedia:fbdata') && facebookAuthorized($this->parent))
+		if ($this->parent->dataHelper('/message/post/socialmedia:facebook') && facebookAuthorized($this->parent))
 			return true;
 		// or type is pick and the message group has facebook content
 		if (!$this->messagegroup) {
@@ -1634,7 +1637,7 @@ class JobWiz_facebookPage extends WizStep {
 	function hasFeedMessage() {
 		global $USER;
 		// or there is a feed message created
-		if ($this->parent->dataHelper('/message/post/socialmedia:feeddata'))
+		if ($this->parent->dataHelper('/message/post/socialmedia:feed'))
 			return true;
 		// or type is pick and the message group has feed content
 		if (!$this->messagegroup) {
@@ -1843,18 +1846,30 @@ class JobWiz_scheduleDate extends WizStep {
 
 		// Make sure it's 30 minutes or more before the end of their allowed access call window
 		$dayoffset = (strtotime("now") > (strtotime(($ACCESS->getValue("calllate")?$ACCESS->getValue("calllate"):"11:59 pm"))))?1:0;
+		// if there is a facebook message attached, we have to obey the expiration date on the access token
+		if (facebookAuthorized($this->parent) && wizHasMessage($this->parent, "post", "facebook"))
+			$maxdays = floor(($USER->getSetting("fb_expires_on", 0) - strtotime("now")) / (24*60*60));
+		else
+			$maxdays = false;
 		$helpsteps = array(_L("Choose a date for this notification to be delivered."));
 		$formdata["date"] = array(
 			"label" => _L("Start Date"),
 			"fieldhelp" => _L("Notification will begin on the selected date."),
 			"value" => "now + $dayoffset days",
 			"validators" => array(
-				array("ValRequired"),
-				array("ValDate", "min" => date("m/d/Y", strtotime("now + $dayoffset days")))
+				array("ValRequired")
 			),
 			"control" => array("TextDate", "size"=>12, "nodatesbefore" => $dayoffset),
 			"helpstep" => 1
 		);
+		if ($maxdays) {
+			$formdata["date"]["validators"][] = 
+				array("ValDate", "min" => date("m/d/Y", strtotime("now + $dayoffset days")), "max" => date("m/d/Y", strtotime("now + $maxdays days")));
+			$formdata["date"]["control"]["nodatesafter"] = $maxdays;
+		} else {
+			$formdata["date"]["validators"][] =
+				array("ValDate", "min" => date("m/d/Y", strtotime("now + $dayoffset days")));
+		}
 		
 		$helpsteps[] = _L("The Delivery Window designates the earliest call time and the latest call time allowed for notification delivery.");
 		
