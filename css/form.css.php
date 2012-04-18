@@ -41,7 +41,18 @@ form.newform {
 #phoneadvanced_helpercell,
 #webfeatures_helpercell,
 #phonesurvey_helpercell,
-#messagegroupedit_helpercell { width: 200px; padding: 0.5em 0;  }
+#messagegroupedit_helpercell,
+#start_helpercell,
+#messagePhoneText_helpercell,
+#messagePhoneTranslate_helpercell,
+#messageEmailText_helpercell,
+#messageEmailTranslate_helpercell,
+#messageSmsText_helpercell,
+#facebookauth_helpercell,
+#twitterauth_helpercell,
+#socialMedia_helpercell,
+#scheduleOptions_helpercell,
+#scheduleAdvanced_helpercell { width: 200px; padding: 0.5em 0;  }
 
 .helper { width: 180px; margin: -6px 0 0; padding: 0 5px 0 10px; overflow: hidden; display: none; z-index: 99; }
 .helper:before { content: ''; position: absolute; top: 12px; left: -10px; display: block; width: 0; height: 0; 
@@ -97,6 +108,8 @@ border-top: 1px solid #ccc; border-right: 1px solid #ccc; border-bottom: none; b
 -webkit-border-radius: 5px; -moz-border-radius: 5px; border-radius: 5px; 
 -moz-background-clip: padding; -webkit-background-clip: padding-box; background-clip: padding-box; }
 .newform .formcontrol input#account_brandthemecustomize { float: left; display: inline; margin: 0 5px 0 0; }
+.newform .formcontrol .social_note { width: 350px; margin: 2px 0; font-size: 1.1em; line-height: 16px; }
+.newform .formcontrol .confirm_note { width: 430px; margin: 2px 0; font-size: 1.1em; line-height: 16px; }
 
 .newform .formcontrol .translate { max-height: 150px; overflow: auto; }
 .newform .formcontrol .gBranding {}
@@ -416,6 +429,8 @@ table#addMeWindow input[type="checkbox"] { margin: 7px 0; }
 	.formcontrol .messagegrid { width: 520px; }
 	.maincontainerleft { width: 320px; }
 	.newform .formcontrol textarea { width: 300px; }
+	.newform .htmlradiobuttonbigcheck { width: 320px; }
+	.newform .htmlradiobuttonbigcheck .creation_method { margin: 0 10px 5px 0; }
 	
 	#jobedit_helpercell,
 	#emaileedit_helpercell,
@@ -430,7 +445,18 @@ table#addMeWindow input[type="checkbox"] { margin: 7px 0; }
 	#phoneadvanced_helpercell,
 	#webfeatures_helpercell,
 	#phonesurvey_helpercell,
-	#messagegroupedit_helpercell { width: 175px; }
+	#messagegroupedit_helpercell,
+	#start_helpercell,
+	#messagePhoneText_helpercell,
+	#messagePhoneTranslate_helpercell,
+	#messageEmailText_helpercell,
+	#messageEmailTranslate_helpercell,
+	#messageSmsText_helpercell,
+	#facebookauth_helpercell,
+	#twitterauth_helpercell,
+	#socialMedia_helpercell,
+	#scheduleOptions_helpercell,
+	#scheduleAdvanced_helpercell { width: 175px; }
 	.helper { width: 155px; }
 }
 
