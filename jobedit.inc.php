@@ -104,9 +104,6 @@ if ($_SESSION['jobid'] == NULL) {
 	$submittedmode = ($completedmode || in_array($job->status,array('active','procactive','processing','scheduled')));
 }
 
-// attempt to update the user's facebook access token
-fb_updateUserAccessToken();
-
 ////////////////////////////////////////////////////////////////////////////////
 // Optional Form Items And Validators
 ////////////////////////////////////////////////////////////////////////////////

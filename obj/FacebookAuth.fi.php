@@ -16,37 +16,40 @@ class FacebookAuth extends FormItem {
 		// check that the auth token is any good
 		$validtoken = fb_hasValidAccessToken();
 		
-		// main details div
-		$str .= '<div id="'. $n. 'fbdetails">';
-		
-		// facebook js api loads into this div
-		$str .= '<div id="fb-root"></div>';
-		
-		// connected options div
-		$str .= '<div id="'. $n. 'fbconnected" style="border: 1px dotted grey; padding: 5px;'. (($validtoken)? "": "display:none;"). '">';
-		
-		$str .= '<div id="'. $n. 'fbuser"></div>';
-		
-		// button to remove access_token
-		$str .= icon_button("Disconnect this Facebook Account", "custom/facebook" ,"handleFbLoginAuthResponse('".$n."', null)");
-		
-		$str .= '<div style="clear: both"></div></div>';
-		
-		// disconnected options div
-		$str .= '<div id="'. $n. 'fbdisconnected" style="'. (($validtoken)? "display:none;": ""). '">';
-		
-		// Do facebook login to get good auth token
+		// These are the required permissions for the app
 		$perms = "publish_stream,manage_pages";
-		$str .= icon_button("Connect to Facebook", "custom/facebook", 
-			"try { 
-				FB.login(handleFbLoginAuthResponse.curry('$n'), {scope: '$perms'});
-			} catch (e) { 
-				alert('". _L("Could not connect to Facebook:")."' + e); 
-			}");
-			
-		$str .= '<div style="clear: both"></div>
-				</div>
-				<pre id="'. $n. 'fbdebugdata" style="display:none;"></pre>
+		
+		$str .= '<div id="'. $n. 'fbdetails">
+					<!-- Facebook JS api loads into this div -->
+					<div id="fb-root"></div>
+					<!-- When connected to facebook, show these options -->
+					<div id="'. $n. 'fbconnected" style="border: 1px dotted grey; padding: 5px;'. (($validtoken)? "": "display:none;"). '">
+						<div id="'. $n. 'fbuser" style="float:left;"></div>
+						<div style="float:left;">
+							<!-- Renew button will do a new login request, getting a newer access_token -->'.
+							icon_button("Renew this Facebook Authorization", "custom/facebook" ,
+								"try { 
+									FB.login(handleFbLoginAuthResponse.curry('$n'), {scope: '$perms'});
+								} catch (e) { 
+									alert('". _L("Could not connect to Facebook:")."' + e); 
+								}").
+							'<div style="clear: both"></div>
+							<!-- Disconnect button will delete the serverside access_token -->'.
+							icon_button("Disconnect this Facebook Account", "cross" ,"handleFbLoginAuthResponse('".$n."', null)").'
+						</div>
+						<div style="clear: both"></div>
+					</div>
+					<!-- When there is no valid access token, show these options -->
+					<div id="'. $n. 'fbdisconnected" style="'. (($validtoken)? "display:none;": ""). '">'.
+						icon_button("Connect to Facebook", "custom/facebook", 
+							"try { 
+								FB.login(handleFbLoginAuthResponse.curry('$n'), {scope: '$perms'});
+							} catch (e) { 
+								alert('". _L("Could not connect to Facebook:")."' + e); 
+							}").'
+						<div style="clear: both"></div>
+					</div>
+					<pre id="'. $n. 'fbdebugdata" style="display:none;"></pre>
 				</div>';
 		
 		return $str;
@@ -66,9 +69,19 @@ class FacebookAuth extends FormItem {
 					});
 					
 					// after init, load the user data
-					fbLoadUserData("'.$n.'");
+					// get current access token details
+					new Ajax.Request("ajaxfacebook.php", {
+						method:"post",
+						parameters: {
+							"type": "get",
+							"formatdate": "M, jS"},
+						onSuccess: function(response) {
+							//showDebugData("'.$n.'", response.responseJSON);
+							fbLoadUserData("'.$n.'", response.responseJSON.expires_on);
+						}
+					});
 				};
-   
+				
 				(function() {
 					var e = document.createElement("script");
 					e.id=\'facebook-jssdk\';
@@ -102,17 +115,20 @@ class FacebookAuth extends FormItem {
 					
 					// if we have an access token. show the appropriate user information
 					if (access_token) {
-						$(formitem + "fbconnected").setStyle({display: "block"});
-						$(formitem + "fbdisconnected").setStyle({display: "none"});
-						fbLoadUserData(formitem);
-						
 						// ajax request to store data in the db
 						new Ajax.Request("ajaxfacebook.php", {
 							method:"post",
 							parameters: {
 								"type": "save",
 								"access_token": access_token,
-								"fb_user_id": user_id}
+								"fb_user_id": user_id,
+								"formatdate": "M, jS"},
+							onSuccess: function(response) {
+								//showDebugData(formitem, response.responseJSON);
+								$(formitem + "fbconnected").setStyle({display: "block"});
+								$(formitem + "fbdisconnected").setStyle({display: "none"});
+								fbLoadUserData(formitem, response.responseJSON.expires_on);
+							}
 						});
 					} else {
 						// no access token, show the connect button
@@ -127,7 +143,7 @@ class FacebookAuth extends FormItem {
 					}
 				}
 			
-				function fbLoadUserData(formitem) {
+				function fbLoadUserData(formitem, expiresOn) {
 					element = $(formitem + "fbuser");
 					var access_token = $(formitem).value;
 					var loader = new Element("img", { src: "img/ajax-loader.gif" });
@@ -135,6 +151,7 @@ class FacebookAuth extends FormItem {
 					
 					// read user data from facebook api
 					FB.api("/me", { access_token: access_token }, function(r) {
+						//showDebugData(formitem, r);
 						if (r && !r.error) {
 							var e = new Element("div").insert(
 									new Element("div").setStyle({ float: "left" }).insert(
@@ -146,6 +163,10 @@ class FacebookAuth extends FormItem {
 								).insert(
 									new Element("div").setStyle({ float: "left", padding: "7px" }).insert(
 										new Element("div").setStyle({ "fontWeight": "bold" }).update(r.name.escapeHTML())
+									).insert(
+										new Element("div", {"id": formitem + "expires"}).update(
+											"'._L("Expires:").'&nbsp;" + expiresOn
+										)
 									)
 								);
 							

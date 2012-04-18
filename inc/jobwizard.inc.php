@@ -615,10 +615,8 @@ class JobWiz_start extends WizStep {
 		);
 		
 		// cache user facebook and twitter auth status so we don't have to check it on every single page load
-		if (getSystemSetting("_hasfacebook") && $USER->authorize("facebookpost")) {
-			fb_updateUserAccessToken();
+		if (getSystemSetting("_hasfacebook") && $USER->authorize("facebookpost"))
 			$_SESSION['wiz_facebookauth'] = fb_hasValidAccessToken();
-		}
 		if (getSystemSetting("_hastwitter") && $USER->authorize("twitterpost")) {
 			$tw = new Twitter($USER->getSetting("tw_access_token", false));
 			$_SESSION['wiz_twitterauth'] = $tw->hasValidAccessToken();
@@ -1390,10 +1388,6 @@ class JobWiz_facebookAuth extends WizStep {
 		
 		// if they are allowed to post
 		if (!(getSystemSetting("_hasfacebook") && $USER->authorize("facebookpost")))
-			return false;
-		
-		// this user's accesstoken validity. if their token is good, we don't need this step
-		if (isset($_SESSION['wiz_facebookauth']) && $_SESSION['wiz_facebookauth'])
 			return false;
 		
 		// if it's custom and type create and post is selected, you can authorize facebook

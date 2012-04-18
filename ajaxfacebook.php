@@ -27,6 +27,15 @@ switch ($type) {
 		}
 		if (isset($_POST['fb_user_id']))
 			$USER->setSetting("fb_user_id", (($_POST['fb_user_id'] == "false")?false:$_POST['fb_user_id']));
+		// falls through and returns result of "get" request
+	case "get":
+		$expiresOn = $USER->getSetting('fb_expires_on', false);
+		if (isset($_POST['formatdate']) && $expiresOn)
+			$expiresOn = date($_POST['formatdate'], $expiresOn);
+		echo json_encode(array(
+				'user_id' => $USER->getSetting('fb_user_id', false),
+				'access_token' => $USER->getSetting('fb_access_token', false),
+				'expires_on' => $expiresOn));
 		break;
 	
 	case "delete":

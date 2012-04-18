@@ -38,9 +38,6 @@ if (!$USER->authorize('managemyaccount')) {
 $readonly = $USER->importid != null;
 $ldapuser = $USER->ldap;
 
-// attempt to update the user's facebook access token
-fb_updateUserAccessToken();
-
 $usernamelength = getSystemSetting("usernamelength", 5);
 if ($USER->ldap)
 	$usernamelength = 1;
