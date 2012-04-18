@@ -40,7 +40,8 @@ form.newform {
 #pagemessage_helpercell,
 #phoneadvanced_helpercell,
 #webfeatures_helpercell,
-#phonesurvey_helpercell { width: 200px; padding: 0.5em 0;  }
+#phonesurvey_helpercell,
+#messagegroupedit_helpercell { width: 200px; padding: 0.5em 0;  }
 
 .helper { width: 180px; margin: -6px 0 0; padding: 0 5px 0 10px; overflow: hidden; display: none; z-index: 99; }
 .helper:before { content: ''; position: absolute; top: 12px; left: -10px; display: block; width: 0; height: 0; 
@@ -115,15 +116,6 @@ border-top: 1px solid #ccc; border-right: 1px solid #ccc; border-bottom: none; b
 
 /* -------- CSS redesign ------- */
 
-/*--------
-.newform fieldset { background: #f1f1f1; width: 100%; margin-bottom: 1em; border: none;
- -webkit-border-radius: 7px; -moz-border-radius: 7px; border-radius: 7px;
- -moz-background-clip: padding; -webkit-background-clip: padding-box; background-clip: padding-box; }
- 
-.newform .formtitle { float: left; display: inline; width: 140px; }
-.newform .formcontrol { float: left; display: inline; width: 510px; }
-----------*/
-
 .newform .formcontrol iframe { overflow: hidden; }
 .newform .formcontrol > label { margin-left: 5px; line-height: 22px;}
 
@@ -136,33 +128,10 @@ border-top: 1px solid #ccc; border-right: 1px solid #ccc; border-bottom: none; b
  
 .newform select, .newform input { -webkit-transition: all 0.3s ease-out; -moz-transition: all 0.3s ease-out; -ms-transition: all 0.3s ease-out; -o-transition: all 0.3s ease-out; transition: all 0.3s ease-out; }
 
-/*----------
-.newform .formlabel { float: left; display: inline; width: 110px; padding: 6px 0 0; text-align: right; font-weight: bold; font-size: 1.1em; }
-.newform .formicon { float: left; display: inline; width: 16px; height: 16px; margin: 0 7px; padding: 6px 0 0; }
-.newform input[type="text"] { float: left; display: inline; margin: 3px 0; padding: 4px 5px; border: 1px solid #E7E7E7; }
-.newform textarea { width: 300px; }
-.newform input[type="checkbox"] { float: left; display: inline; margin: 0 5px 0 0; }
-
-.newform .underneathmsg { background-color: none; float: left; display: inline; width: 100%; padding: 0 0 3px 140px; font-weight: bold; color: #cc0000; 
--moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box; }
-
-.newform .radiobox { float: left; display: inline; width: 250px; margin: 0; padding: 7px 0 0; list-style-type: none; }
-.newform .radiobox li { height: 25px; }
-.newform .radiobox input[type="radio"], .newform .radiobox input[type="checkbox"] { float: left; display: inline; margin: 0 5px 0 0; }
-.newform .radiobox label { float: left; display: inline; margin: 0 10px 0 0; }
----------*/
-
 .newform .MultiCheckbox { float: left; display: inline; width: 250px; margin: 0; padding: 7px 0 0; list-style-type: none; }
 .newform .MultiCheckbox li { height: 25px; }
 .newform .MultiCheckbox input[type="checkbox"] { float: left; display: inline; margin: 0 5px 0 0; }
 .newform .list th.MultiCheckbox label { float: left; display: inline; margin: 0 10px 0 0; }
-
-/*----------
-.newform select  { margin: 3px 0; padding: 4px 6px; border: 1px solid #E7E7E7; 
--webkit-border-radius: 5px; -moz-border-radius: 5px; border-radius: 5px; 
--moz-background-clip: padding; -webkit-background-clip: padding-box; background-clip: padding-box; }
-.newform input[type="checkbox"], .radiobox input[type="checkbox"] { margin: 5px 0 0; }
-----------*/
 
 .newform .form_list_table { float: left; display: inline; width: 250px; margin: 0; padding: 0; }
 .newform .list { width: 100%; margin: 0 0 5px 0; }
@@ -312,20 +281,11 @@ table#addMeWindow input[type="checkbox"] { margin: 7px 0; }
 -----------------*/
 
 .controlcontainer { margin-bottom: 10px; white-space: nowrap; }
-.controlcontainer .messagearea {
-	height: 205px; 
-	width: 100%
-}
+.controlcontainer .messagearea { height: 205px; width: 100%; }
+.controlcontainer .datafields { font-size: 9px; float: left; }
+.controlcontainer .datafieldsinsert { font-size: 9px; float: left; margin-top: 8px; }
 
-.controlcontainer .datafields {
-	font-size: 9px;
-	float: left;
-}
-.controlcontainer .datafieldsinsert {
-	font-size: 9px;
-	float: left;
-	margin-top: 8px;
-}
+#pagemessage .controlcontainer { width: 550px; }
 
 .maincontainerleft { float: left; display: inline; margin-right: 10px; width: 438px; }
 .maincontainerseperator { float: left; width: 15px; }
@@ -454,7 +414,6 @@ table#addMeWindow input[type="checkbox"] { margin: 7px 0; }
 
 @media only screen and (max-width: 1024px) {
 	.formcontrol .messagegrid { width: 520px; }
-	.controlcontainer { width: 550px; }
 	.maincontainerleft { width: 320px; }
 	.newform .formcontrol textarea { width: 300px; }
 	
@@ -470,7 +429,8 @@ table#addMeWindow input[type="checkbox"] { margin: 7px 0; }
 	#pagemessage_helpercell,
 	#phoneadvanced_helpercell,
 	#webfeatures_helpercell,
-	#phonesurvey_helpercell { width: 175px; }
+	#phonesurvey_helpercell,
+	#messagegroupedit_helpercell { width: 175px; }
 	.helper { width: 155px; }
 }
 
