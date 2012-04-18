@@ -26,33 +26,41 @@ form.newform {
 	margin-left: 10px; 
 }
 
-.helper { background-color: #fff; width: 200px; margin: 0; padding: 0; font-family: sans-serif; overflow: hidden; border: 4px solid rgb(150,150,255);
- display: none; z-index: 99; 
- -webkit-border-radius: 3px; -moz-border-radius: 3px; border-radius: 3px;
--moz-background-clip: padding; -webkit-background-clip: padding-box; background-clip: padding-box; }
-.helper .helpercontent { font-size: 9pt; font-family: sans-serif; padding: 5px; height: 150px; overflow: auto; }
+/*---------- Guide helper ----------*/
+
+#jobedit_helpercell,
+#emaileedit_helpercell,
+#settings_helpercell,
+#list_helpercell,
+#addressedit_helpercell,
+#phonerecord_helpercell,
+#facebookmessage_helpercell,
+#twittermessage_helpercell,
+#feedform_helpercell,
+#pagemessage_helpercell,
+#phoneadvanced_helpercell,
+#webfeatures_helpercell,
+#phonesurvey_helpercell { width: 200px; padding: 0.5em 0;  }
+
+.helper { width: 180px; margin: -6px 0 0; padding: 0 5px 0 10px; overflow: hidden; display: none; z-index: 99; }
+.helper:before { content: ''; position: absolute; top: 12px; left: -10px; display: block; width: 0; height: 0; 
+border-color: transparent #ccc transparent transparent; border-width: 10px; border-style: solid; }
+.helper:after { content: ''; position: absolute; top: 12px; left: -9px; display: block; width: 0; height: 0; 
+border-color: transparent #f0f0f0 transparent transparent; border-width: 10px; border-style: solid; }
+
+.helper .helpercontent { background: #f0f0f0; height: 150px; padding: 0 7px; font-size: 9pt; font-family: sans-serif; overflow: auto; border-right: 1px solid #ccc; border-left: 1px solid #ccc; }
 .helper .helpercontent ul { padding-left: 1.2em; margin-left: 0px; }
-.helper .toolbar { padding-bottom: 3px; border-top: 1px solid #CCCCCC; background-color: rgb(240,240,255); height: 20px; }
+.helper .helpercontent p { margin: 0 0 4px 0; }
 .helper .info { padding-top: 4pt; font-size: 8pt; text-align: center; }
 
-.helper .title {
-	border-bottom: 1px solid #CCCCCC;
-	font-size: 12pt;
-	font-weight: bold;
-	text-align: center;
-	background-color: rgb(240,240,255);
-}
+.helper .title { background: #f0f0f0; padding: 3px 0; font-size: 15px; font-weight: bold; text-align: center; border-radius: 5px 5px 0 0;
+border-top: 1px solid #ccc; border-right: 1px solid #ccc; border-bottom: none; border-left: 1px solid #ccc;}
+.helper .title img { display: block; padding: 2px 3px 0;  }
 
-.helper .title img {
-	padding-top: .1em; 
-	padding-right: 3px; 
-	padding-left: 3px; 
-	vertical-align: top;
-}
+.helper .toolbar { background: #e4e4e4; height: 20px; padding-bottom: 3px; border: 1px solid #CCCCCC; border-radius: 0 0 5px 5px; }
+.helper .toolbar img { padding: 3px 3px 0px 3px; }
 
-.helper .toolbar img {
-	padding: 3px 3px 0px 3px;
-}
+
 
 /* fieldset is a container for a set of field elements, typ associated with a help page */
 
@@ -70,7 +78,7 @@ form.newform {
 
 /*---------- New forms layout ----------*/
 
-.newform fieldset { background: #f1f1f1; width: 100%; margin-bottom: 1em; border: none; }
+.newform fieldset { background: #f1f1f1; width: 100%; margin-bottom: 1em; border: none; border-radius: 5px; }
  
 .formfieldarea { padding: 8px 10px; }
 .formfieldarea .underneathmsg { float: left; display: inline; margin: 5px 0 0 175px; padding: 0; font-weight: bold; color: #cc0000; }
@@ -174,17 +182,7 @@ form.newform {
   -webkit-box-shadow: 0px 0px 6px #9696FF; 
      -moz-box-shadow: 0px 0px 6px #9696FF; 
           box-shadow: 0px 0px 6px #9696FF;  } 
-          
-
-.newform .vertical .formcontrol {
-	float: none;
-	clear: both;
-	margin-left: 2px; }
-
-
-.newform .vertical .underneathmsg {
-	margin-left: 2px;
-}
+        
 
 .newform .formfieldarea { clear: both;
 -webkit-border-radius: 5px; -moz-border-radius: 5px; border-radius: 5px;
@@ -313,10 +311,7 @@ table#addMeWindow input[type="checkbox"] { margin: 7px 0; }
 /* common 
 -----------------*/
 
-.controlcontainer {
-	margin-bottom: 10px;
-	white-space: nowrap;
-}
+.controlcontainer { margin-bottom: 10px; white-space: nowrap; }
 .controlcontainer .messagearea {
 	height: 205px; 
 	width: 100%
@@ -347,13 +342,15 @@ table#addMeWindow input[type="checkbox"] { margin: 7px 0; }
 /* phone messages 
 -------------------*/
 
-.controlcontainer .library { padding: 2px; border: 1px dotted gray; }
-.controlcontainer .error { white-space: normal; font-style: italic; color: red; }
-.controlcontainer .uploadiframe { overflow: hidden; width: 100%; border: 0; margin: 0; padding: 0; height: 2em; }
+.phone .controlcontainer { width: 200px; }
+.phone .controlcontainer .library { padding: 2px; border: 1px dotted gray; }
+.phone .controlcontainer .error { white-space: normal; font-style: italic; color: red; }
+.phone .controlcontainer .uploadiframe { overflow: hidden; width: 100%; border: 0; margin: 0; padding: 0; height: 2em; }
+.phone .controlcontainer input[type="text"] { width: 185px; }
 
-.phone .maincontainerleft { width: 45%; }
+.phone .maincontainerleft {  }
 .phone .maincontainerseperator { margin-top: 80px; }
-.phone .maincontainerright { width: 45%; }
+.phone .maincontainerright {  }
 
 
 /* +----------------------------------------------------------------+
@@ -457,8 +454,24 @@ table#addMeWindow input[type="checkbox"] { margin: 7px 0; }
 
 @media only screen and (max-width: 1024px) {
 	.formcontrol .messagegrid { width: 520px; }
+	.controlcontainer { width: 550px; }
 	.maincontainerleft { width: 320px; }
-	.newform .formcontrol textarea { width: 308px; }
+	.newform .formcontrol textarea { width: 300px; }
+	
+	#jobedit_helpercell,
+	#emaileedit_helpercell,
+	#settings_helpercell,
+	#list_helpercell,
+	#addressedit_helpercell,
+	#phonerecord_helpercell,
+	#facebookmessage_helpercell,
+	#twittermessage_helpercell,
+	#feedform_helpercell,
+	#pagemessage_helpercell,
+	#phoneadvanced_helpercell,
+	#webfeatures_helpercell,
+	#phonesurvey_helpercell { width: 175px; }
+	.helper { width: 155px; }
 }
 
 @media only screen and (max-width: 800px) {
