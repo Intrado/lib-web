@@ -348,7 +348,7 @@ class Form {
 				<div id="'.$this->name.'_spinner" class="formspinner" style="display: none;"><img src="img/ajax-loader.gif" alt="Loading..."></div>
 				<!-- END FORM CONTENT -->
 				</td>
-				<td id="'.$this->name.'_helpercell" valign="top" width="'.($this->helpsteps ? '200px' : '0px').'">
+				<td id="'.$this->name.'_helpercell" valign="top">
 				<!-- HELPER -->
 				<div id="'.$this->name.'_startguide" style="float: right; padding-top: 3px;">'.($this->helpsteps ? icon_button("Guide","information","return form_enable_helper(event);") : "").'</div>
 				<div id="'.$this->name.'_helper" class="helper">
