@@ -234,7 +234,7 @@ table.window_body { width: 100%; }
    
 button { color: <?=$primary?>; }
 .btn { margin: 2px 5px; padding: 0; border: none; background: transparent; font-weight: bold; cursor: pointer; }
-.btn_wrap { white-space: nowrap; position: relative; } 
+.btn_wrap { white-space: nowrap; position: relative; display: block; } 
 .btn_left, 
 .btn_right, 
 .btn_middle { padding-top: 4px; display: block; height: 19px; }

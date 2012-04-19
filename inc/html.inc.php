@@ -141,13 +141,13 @@ function hidden_submit_button($value = "submit") {
 
 function submit_button($name, $value = "submit", $icon = null) {
 	$theme = getBrandTheme();
-	$btn = '<button class="btn" type="submit" name="submit" value="'.escapehtml($value).'" onclick="return form_submit(event,\''.escapehtml($value).'\');"><div class="btn_wrap cf"><span class="btn_left"></span><span class="btn_middle">';
+	$btn = '<button class="btn" type="submit" name="submit" value="'.escapehtml($value).'" onclick="return form_submit(event,\''.escapehtml($value).'\');"><span class="btn_wrap cf"><span class="btn_left"></span><span class="btn_middle">';
 	
 	if ($icon == null)
 		$btn .= '<img src="img/pixel.gif" alt="" height="16" width="1">';		
 	else
 		$btn .= '<img src="img/icons/'.$icon.'.gif" alt="">';
-	$btn .= escapehtml($name) . '</span><span class="btn_right"></span></div></button>';
+	$btn .= escapehtml($name) . '</span><span class="btn_right"></span></span></button>';
 	
 	return $btn;
 }
@@ -163,7 +163,7 @@ function icon_button($name,$icon,$onclick = NULL, $href = NULL, $extrahtml = NUL
 
 	if ($extrahtml)
 		$btn .= $extrahtml;
-	$btn .= '><div class="btn_wrap cf"><span class="btn_left"></span><span class="btn_middle"><img class="btn_middle_icon" src="img/icons/'.$icon.'.gif">' . escapehtml($name) .'</span><span class="btn_right"></span></div></button>';
+	$btn .= '><span class="btn_wrap cf"><span class="btn_left"></span><span class="btn_middle"><img class="btn_middle_icon" src="img/icons/'.$icon.'.gif">' . escapehtml($name) .'</span><span class="btn_right"></span></span></button>';
 	return $btn;
 }
 
