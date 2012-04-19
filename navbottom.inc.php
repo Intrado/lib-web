@@ -1,8 +1,5 @@
-</div> <!--  .maincontent -->
 
-</div>
-
-</div><!-- content_wrap -->
+</div><!-- end for content_wrap starts in nav.inc.php -->
 
 <div id="footer" class="cf">
 
@@ -49,7 +46,7 @@ if (isset($TIPS) && is_array($TIPS) ) {
 }
 ?>
 </script>
-<img id="state" src="img/spacer.gif" width="1" height="1">
+<img id="state" src="img/spacer.gif" width="1" height="1" alt="">
 <? if (isset($PAGETIME)) printf("<!-- %0.2f -->", microtime(true) - $PAGETIME) ?>
 <!-- <?=$LOCALE ?> -->
 </body>
