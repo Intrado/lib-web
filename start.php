@@ -554,7 +554,7 @@ function activityfeed($mergeditems,$ajax = false) {
 			}
 		}
 	} else {
-		$activityfeed .= '<tr>
+		$activityfeed .= '<table><tr>
 									<td valign="top" width="60px"><img src="img/ajax-loader.gif" /></td>
 									<td >
 											<div class="feedtitle">
@@ -562,7 +562,7 @@ function activityfeed($mergeditems,$ajax = false) {
 												' . _L("Loading Recent Activity") . '</a>
 											</div>
 									</td>
-									</tr>';
+									</tr></table>';
 		$activityfeed .= "
 				<script>
 				var actionids = $actioncount;
@@ -604,12 +604,12 @@ function activityfeed($mergeditems,$ajax = false) {
 										var item = result[i];
 										html += '<div class=\"content_row cf\"><div class=\"content_feed_left\"><a href=\"' + item.defaultlink + '\" ' + item.defaultonclick + '><img src=\"img/' + item.icon + '\" /></a></div><div class=\"content_feed_right\"><div class=\"feedtitle\"><a href=\"' + item.defaultlink + '\" ' + item.defaultonclick + '>' + item.title + '</a></div><div class=\"feed_content\">' + item.content + '</div></div>';
 										if(item.tools) {
-											html += '<div id=\"actionlink_' + actionids + '\" class=\"actionlink_tools\" ><img src=\"img/largeicons/tiny20x20/tools.jpg\"/>&nbsp;Tools</div><div id=\"actions_' + actionids + '\" class=\"hidden\">' + item.tools + '</div></div>';
+											html += '<div id=\"actionlink_' + actionids + '\" class=\"actionlink_tools\" ><img src=\"img/largeicons/tiny20x20/tools.jpg\"/>&nbsp;Tools</div><div id=\"actions_' + actionids + '\" class=\"hidden\">' + item.tools + '</div>';
 											actionids++;
 										} else {
 											html += '<td width=\"100px\">&nbsp;</td>'
 										}
-										html += '</tr>';
+										html += '</div>';
 									}
 									$('feeditems').update(html);
 									addfeedtools();
@@ -665,18 +665,18 @@ include_once("nav.inc.php");
 <link href='css/timeline.css' type='text/css' rel='stylesheet' media='screen'>
 
 <div class="csec sectitle">
-<div class="pagetitle"><? if(isset($ICON)) print '<img src="img/themes/' .getBrandTheme() . '/icon_' . $ICON . '" align="absmiddle">'; ?> <?= $TITLE ?></div>
-			<div class="pagetitlesubtext"><?= (isset($DESCRIPTION) ? $DESCRIPTION : "") ?></div>
-		</div>
+	<div class="pagetitle"><? if(isset($ICON)) print '<img src="img/themes/' .getBrandTheme() . '/icon_' . $ICON . '" align="absmiddle">'; ?> <?= $TITLE ?></div>
+	<div class="pagetitlesubtext"><?= (isset($DESCRIPTION) ? $DESCRIPTION : "") ?></div>
+</div><!-- end sectitle -->
 	
-		<div class="csec secbutton">
+<div class="csec secbutton">
 <?
 			if ($USER->authorize('sendphone') || $USER->authorize('sendemail') || $USER->authorize('sendsms')) {
 				$allowedjobtypes = QuickQueryRow("select sum(jt.systempriority = 1) as Emergency, sum(jt.systempriority != 1) as Other from jobtype jt where jt.deleted = 0 and jt.issurvey = 0",true);
 				$jobtypes = QuickQueryList("select jt.systempriority from jobtype jt,userjobtypes ujt where ujt.jobtypeid = jt.id and ujt.userid=? and jt.deleted=0 and jt.issurvey = 0",false,false,array($USER->id));
 				$jobtypescount = count($jobtypes);
 ?>
-			<div class="big_button_wrap">
+		<div class="big_button_wrap">
 			<?
 				$hasnewjob = false;
 				if($allowedjobtypes["Other"] > 0) {
@@ -707,40 +707,41 @@ include_once("nav.inc.php");
 					<div class="emrjob"><a href="jobwizard.php?new&jobtype=emergency">Emergency</a></div>
 					
 			<? } ?>
-				</div> <!-- /.big_button_wrap -->
-			</div><!-- .csec .secbutton-->
+			</div> <!-- /.big_button_wrap -->
+</div><!-- .csec .secbutton-->
 <?			}
 			if ($USER->authorize("startstats")) {
 ?>
-		<div class="csec sectimeline"> <? // NOTE: if the timeline isn't showing, check the style.php (css) for the theme to see if .sectimeline is set to display: none; ?>
+<div class="csec sectimeline"> <? // NOTE: if the timeline isn't showing, check the style.php (css) for the theme to see if .sectimeline is set to display: none; ?>
 <?
 	startWindow(_L("Jobs Timeline"));
 		include_once("inc/timeline.inc.php");
 	endWindow();
 ?>
-		</div><!-- .csec .sectimelime -->
-		<div class="csec secwindow"> <!-- contains recent activity -->
+</div><!-- .csec .sectimelime -->
+
+<div class="csec secwindow"> <!-- contains recent activity -->
 <?
 			startWindow(_L('Recent Activity'));
 $activityfeed = '
 			<div class="csec window_aside" name="recentactivity"> 
 				<div class="feedfilter">
-					<a id="nonefilter" href="start.php?filter=none" onclick="applyfilter(\'none\'); return false;"><img src="img/largeicons/tiny20x20/globe.jpg">Show&nbsp;All</a><br />
+					<a id="nonefilter" href="start.php?filter=none" onclick="applyfilter(\'none\'); return false;"><img src="img/largeicons/tiny20x20/globe.jpg" alt="">Show&nbsp;All</a><br />
 				</div>
 				<h3 id="filterby">Filter By:</h3>
 				<div id="allfilters" class="feedfilter">
-					<a id="jobsfilter" href="start.php?filter=jobs" onclick="applyfilter(\'jobs\'); $(\'jobsubfilters\').toggle(); return false;"><img src="img/largeicons/tiny20x20/ping.jpg">Jobs</a>
+					<a id="jobsfilter" href="start.php?filter=jobs" onclick="applyfilter(\'jobs\'); $(\'jobsubfilters\').toggle(); return false;"><img src="img/largeicons/tiny20x20/ping.jpg" alt="">Jobs</a>
 					<div id="jobsubfilters" style="' . (in_array($filter,array("savedjobs","scheduledjobs","activejobs","completedjobs","repeatingjobs"))?"display:block":"display:none") . ';padding-left:20px;">
-						<a id="savedjobsfilter" href="start.php?filter=savedjobs" onclick="applyfilter(\'savedjobs\'); return false;"><img src="img/largeicons/tiny20x20/folderandfiles.jpg">Saved</a>
+						<a id="savedjobsfilter" href="start.php?filter=savedjobs" onclick="applyfilter(\'savedjobs\'); return false;"><img src="img/largeicons/tiny20x20/folderandfiles.jpg" alt="">Saved</a>
 						<a id="scheduledjobsfilter" href="start.php?filter=scheduledjobs" onclick="applyfilter(\'scheduledjobs\'); return false;"><img src="img/largeicons/tiny20x20/clock.jpg">Scheduled</a>
 						<a id="activejobsfilter" href="start.php?filter=activejobs" onclick="applyfilter(\'activejobs\'); return false;"><img src="img/largeicons/tiny20x20/ping.jpg">Active</a>
 						<a id="completedjobsfilter" href="start.php?filter=completedjobs" onclick="applyfilter(\'completedjobs\'); return false;"><img src="img/largeicons/tiny20x20/checkedgreen.jpg">Completed</a>
 						<a id="repeatingjobsfilter" href="start.php?filter=repeatingjobs" onclick="applyfilter(\'repeatingjobs\'); return false;"><img src="img/largeicons/tiny20x20/calendar.jpg">Repeating</a>
 					</div>
-					<a id="messagesfilter" href="start.php?filter=messages" onclick="applyfilter(\'messages\'); return false;"><img src="img/largeicons/tiny20x20/letter.jpg">Messages</a>
-					<a id="listsfilter" href="start.php?filter=lists" onclick="applyfilter(\'lists\'); return false;"><img src="img/largeicons/tiny20x20/addrbook.jpg">Lists</a>
-					<a id="savedreportsfilter" href="start.php?filter=savedreports" onclick="applyfilter(\'savedreports\'); return false;"><img src="img/largeicons/tiny20x20/savedreport.jpg">Reports</a>
-					<a id="systemmessagesfilter" href="start.php?filter=systemmessages" onclick="applyfilter(\'systemmessages\'); return false;"><img src="img/largeicons/tiny20x20/news.jpg">System&nbsp;Messages</a>
+					<a id="messagesfilter" href="start.php?filter=messages" onclick="applyfilter(\'messages\'); return false;"><img src="img/largeicons/tiny20x20/letter.jpg" alt="">Messages</a>
+					<a id="listsfilter" href="start.php?filter=lists" onclick="applyfilter(\'lists\'); return false;"><img src="img/largeicons/tiny20x20/addrbook.jpg" alt="">Lists</a>
+					<a id="savedreportsfilter" href="start.php?filter=savedreports" onclick="applyfilter(\'savedreports\'); return false;"><img src="img/largeicons/tiny20x20/savedreport.jpg" alt="">Reports</a>
+					<a id="systemmessagesfilter" href="start.php?filter=systemmessages" onclick="applyfilter(\'systemmessages\'); return false;"><img src="img/largeicons/tiny20x20/news.jpg" alt="">System&nbsp;Messages</a>
 				</div>
 			</div> <!-- .csec .window_aside -->
 			
@@ -755,7 +756,7 @@ $activityfeed .= '</div> <!-- .csec .window_main -->';
 			?> <?
 			}
 	?>
-		</div><!-- .csec .secwindow -->
+</div><!-- .csec .secwindow -->
 	
 <?
 include_once("navbottom.inc.php");
