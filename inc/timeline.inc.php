@@ -201,7 +201,7 @@ $minhight = $minhight * $jobhight + $minhight*$jobspacing ;
 				echo '<a class="zoom_in" href="start.php?timelinerange=' .  ($range-1) . '">Zoom in</a> |';
 			}
 			?>
-			<a class="reset" href="start.php?timelinerange=1&timelineday=0">Reset</a>
+			<a class="reset" href="start.php?timelinerange=1&amp;timelineday=0">Reset</a>
 			<?
 			if($range < 5 ) {
 				echo '| <a class="zoom_out" href="start.php?timelinerange=' .  ($range+1) . '">Zoom out</a>';
