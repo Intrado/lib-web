@@ -272,11 +272,21 @@ table_left and table_right have the arrow controls, set to 8% width for 1024 scr
 -----*/
 
 .timeline_table { width: 100%; margin-bottom: 3em; }
-.timeline_table_middle { width: 84%; }
-.timeline_table_left, .timeline_table_right { width: 8%; }
+.timeline_table_middle .canvasleft,
+.timeline_table_middle .canvasright { height: 72px; width: 2%; }
+.timeline_table_left, .timeline_table_right { width: 51px; }
 #_backward, #_forward { display: block; width: 51px; height: 53px; margin: 9px 0 0; }
 #_backward { background: url('img/timelinearrowleft.gif') no-repeat; }
 #_forward { background: url('img/timelinearrowright.gif') no-repeat; }
+
+#t_refresh { float: left; display: inline; width: 25%; }
+#t_zoom { float: left; display: inline; width: 46%; margin: 0 2%; padding: 10px 0 0; text-align: center; }
+#t_zoom .zoom_in { background: url('img/icons/fugue/magnifier_zoom.gif') left center no-repeat; padding: 0 0 0 19px; }
+#t_zoom .reset { background: url('img/icons/fugue/arrow_circle_225.gif') left center no-repeat; padding: 0 0 0 19px; }
+#t_zoom .zoom_out { background: url('img/icons/fugue/magnifier_zoom_out.gif') left center no-repeat; padding: 0 0 0 19px; }
+#t_legend { float: right; display: inline; width: 25%; padding: 7px 0 0; text-align: right; }
+#t_legend span { background: url('img/largeicons/tiny20x20/flag.jpg') left center no-repeat; padding: 0 0 0 23px; }
+
 
 /*----- actionlinks control the tooltip links found on recent activity next to the message -----*/
 
@@ -286,10 +296,6 @@ table_left and table_right have the arrow controls, set to 8% width for 1024 scr
 .content_feed_notification { margin: 10px 10px 0 0; }
 .content_feed_left, .content_feed_right { display: block; float: left; }
 .content_feed_left { overflow: hidden; margin-right: 10px; }
-
-#t_refresh { float: left; display: inline; width: 25%; }
-#t_zoom { float: left; display: inline; width: 46%; margin: 0 2%; padding: 10px 0 0; text-align: center; }
-#t_legend { float: right; display: inline; width: 25%; padding: 7px 0 0; text-align: right; }
 
 
 /* +----------------------------------------------------------------+
