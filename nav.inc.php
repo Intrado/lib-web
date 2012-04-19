@@ -267,7 +267,7 @@ header('Content-type: text/html; charset=UTF-8') ;
 	</div>
 </div> <!--  /#top_banner -->
 
-<script type="text/javascript" language="javascript">
+<script type="text/javascript">
 Event.observe(window, 'load', function() {
 	new Tip('shortcutmenu', $('shortcuts'), {
 		style: 'default',
@@ -308,7 +308,7 @@ Event.observe(window, 'load', function() {
 		</script>
 	
 	<? } ?>
-	</div>
+	</div><!-- navshortcut -->
 	
 	
 	<ul class="navtabs">
