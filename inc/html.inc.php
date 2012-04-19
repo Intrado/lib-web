@@ -25,7 +25,7 @@ function help($title, $extrahtml = NULL, $style = NULL) {
 	$GLOBALS['TIPS'][] = array($tipid,$contents); //navbotom.inc will load these for us
 
 	$hover = '<span id="'.$tipid.'" class="hoverhelpicon ' . ($link != "" ? "helpclick" : "") . '" ' . $extrahtml . '>';
-	$hover .= '<img src="img/helpcenter' . ($style ? '_' . $style : "") . '.png"';
+	$hover .= '<img src="img/helpcenter' . ($style ? '_' . $style : "") . '.png" alt=""';
 	if ($link != "")
 		$hover .= " onclick=\"window.open('$link', '_blank', 'width=750,height=500,location=no,menubar=yes,resizable=yes,scrollbars=yes,status=no,titlebar=no,toolbar=yes');\"";
 	$hover .= '></span>';	
@@ -163,7 +163,7 @@ function icon_button($name,$icon,$onclick = NULL, $href = NULL, $extrahtml = NUL
 
 	if ($extrahtml)
 		$btn .= $extrahtml;
-	$btn .= '><span class="btn_wrap cf"><span class="btn_left"></span><span class="btn_middle"><img class="btn_middle_icon" src="img/icons/'.$icon.'.gif">' . escapehtml($name) .'</span><span class="btn_right"></span></span></button>';
+	$btn .= '><span class="btn_wrap cf"><span class="btn_left"></span><span class="btn_middle"><img class="btn_middle_icon" src="img/icons/'.$icon.'.gif" alt="">' . escapehtml($name) .'</span><span class="btn_right"></span></span></button>';
 	return $btn;
 }
 
