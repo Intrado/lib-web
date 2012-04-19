@@ -36,10 +36,10 @@ a:hover { color: <?=$theme1?>; }
 
 /*----- Content sections, section widths set up here for layout design -----*/
 
-.content_wrap { margin-top: 15px; }
+.content_wrap { position: relative; margin-top: 15px; }
 .sectitle { width: 100%; }
-.secbutton { width: 15%; }
-.sectimeline { width: 85%; }
+.secbutton { position: absolute; top: 36px; left: 0; width: 150px; }
+.sectimeline { width: 100%; padding: 0 0 0 150px; -moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box; }
 
 .pagetitle { font-weight: bold; color: <?=$primary?>;  }
 
