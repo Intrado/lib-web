@@ -31,7 +31,7 @@ switch ($_REQUEST["type"]) {
 					
 				case "exec":
 					if (isset($_REQUEST['op'])) {
-						if (isset($_REQUEST['args']))
+						if (isset($_REQUEST['args']) && $_REQUEST['args'])
 							$jmxresult = $jmxClient->exec($_REQUEST['mbean'], $_REQUEST['op'], explode(",",$_REQUEST['args']));
 						else
 							$jmxresult = $jmxClient->exec($_REQUEST['mbean'], $_REQUEST['op']);

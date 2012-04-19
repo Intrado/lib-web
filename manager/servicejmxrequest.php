@@ -48,7 +48,7 @@ class JmxRequestFormItem extends FormItem {
 			<div style="float:left">&nbsp;commsuite:type=config,name=properties</div>
 			<div style="clear:both;"></div>
 			<input type=text id="'.$n.'-mbean"></input>
-			<div style="font-weight:bold;">'._L("Operation").'</div>
+			<div style="font-weight:bold;">'._L("Request").'</div>
 			<select id="'.$n.'-menu" onchange="jmxRequestTypeMenuChange(this, \''.$n.'-options\')">
 				<option value="0">'._L("-- Select one --").'</option>
 				<option value="read">'._L("Read").'</option>
@@ -181,6 +181,7 @@ $url = "http://".$server->hostname.":".$service->getAttribute("jettyport");
 $formdata = array(_L('Host: %1$s, Service: %2$s, Mode: %3$s', $server->hostname, $service->type, $service->runmode));
 $formdata["jmxrequest"] = array( 
 		"label" => _L('Request Parameters'),
+		"fieldhelp" => _L("To get a list of mBeans, MBean: jolokia:type=ServerHandler Request: Execute Operation: mBeanServersInfo."),
 		"value" => "",
 		"validators" => array(),
 		"control" => array("JmxRequestFormItem", "url" => $url),
