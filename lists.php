@@ -234,8 +234,8 @@ startWindow('My Lists&nbsp;' . help('Lists_MyLists'));
 			
 			<h3 id="filterby">Sort By:</h3>
 			<ul id="allfilters" class="feedfilter">
-				<li><a id="namefilter" href="#" onclick="applyfilter('name'); return false;"><img src="img/largeicons/tiny20x20/pencil.jpg" />Name</a></li>
-				<li><a id="datefilter" href="#" onclick="applyfilter('date'); return false;"><img src="img/largeicons/tiny20x20/clock.jpg" />Modify Date</a></li>
+				<li><a id="namefilter" href="#" onclick="applyfilter('name'); return false;"><img src="img/largeicons/tiny20x20/pencil.jpg" alt=""/>Name</a></li>
+				<li><a id="datefilter" href="#" onclick="applyfilter('date'); return false;"><img src="img/largeicons/tiny20x20/clock.jpg" alt=""/>Modify Date</a></li>
 			</ul>
 			
 		</div><!-- .csec .window_aside -->
@@ -248,7 +248,7 @@ startWindow('My Lists&nbsp;' . help('Lists_MyLists'));
 		<div id="feeditems" class="content_feed">
 			<table><tbody>
 				<tr>
-					<td class=""><img src='img/ajax-loader.gif' /></td>
+					<td class=""><img src='img/ajax-loader.gif' alt="loading"/></td>
 					<td>
 					<div class='feedtitle'>
 					<a href=''><?= _L("Loading Lists") ?></a>

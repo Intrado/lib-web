@@ -181,8 +181,8 @@ startWindow(_L('My Posts'));
 		<div class="feed">
 			<h1 id="filterby">Sort By:</h1>
 			<div id="allfilters" class="feedfilter">
-				<a id="namefilter" href="#" onclick="applyfilter('name'); return false;"><img src="img/largeicons/tiny20x20/pencil.jpg" />Name</a><br />
-				<a id="datefilter" href="#" onclick="applyfilter('date'); return false;"><img src="img/largeicons/tiny20x20/clock.jpg" />Modify Date</a><br />
+				<a id="namefilter" href="#" onclick="applyfilter('name'); return false;"><img src="img/largeicons/tiny20x20/pencil.jpg" alt="" />Name</a><br />
+				<a id="datefilter" href="#" onclick="applyfilter('date'); return false;"><img src="img/largeicons/tiny20x20/clock.jpg" alt="" />Modify Date</a><br />
 			</div>
 		</div>
 	</td>
