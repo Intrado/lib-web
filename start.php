@@ -556,8 +556,8 @@ function activityfeed($mergeditems,$ajax = false) {
 	} else {
 		$activityfeed .= '<table>
 											<tr>
-											<td valign="top" width="60px"><img src="img/ajax-loader.gif" alt="loading"/></td>
-											<td >
+											<td><img src="img/ajax-loader.gif" alt="loading"/></td>
+											<td>
 											<div class="feedtitle">
 												<a href="">
 												' . _L("Loading Recent Activity") . '</a>
@@ -691,7 +691,7 @@ include_once("nav.inc.php");
 				if($hasnewjob) {
 ?>
 						
-						<div class="newjob"><a href="jobwizard.php?new&jobtype=normal">New Notification</a></div>
+						<div class="newjob"><a href="jobwizard.php?new&amp;jobtype=normal">New Notification</a></div>
 <?
 				}
 
@@ -706,7 +706,7 @@ include_once("nav.inc.php");
 				if($hasemergency) {
 			 ?>
 			
-					<div class="emrjob"><a href="jobwizard.php?new&jobtype=emergency">Emergency</a></div>
+					<div class="emrjob"><a href="jobwizard.php?new&amp;jobtype=emergency">Emergency</a></div>
 					
 			<? } ?>
 			</div> <!-- /.big_button_wrap -->
@@ -727,7 +727,7 @@ include_once("nav.inc.php");
 <?
 			startWindow(_L('Recent Activity'));
 $activityfeed = '
-			<div class="csec window_aside" name="recentactivity"> 
+			<div class="csec window_aside" id="recentactivity"> 
 				<div class="feedfilter">
 					<a id="nonefilter" href="start.php?filter=none" onclick="applyfilter(\'none\'); return false;"><img src="img/largeicons/tiny20x20/globe.jpg" alt="">Show&nbsp;All</a><br />
 				</div>
