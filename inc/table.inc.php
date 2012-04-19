@@ -161,15 +161,15 @@ function endWindow() {
 	$theme = getBrandTheme();
 
 ?>
-		</div>
+		</div><!-- window_body -->
 		<div class="window_body_r"></div>
-	</div>
+	</div><!-- window_body_wrap -->
 	<div class="window_foot_wrap">  
 		<div class="window_foot_l"></div>
 		<div class="window_foot"></div>
 		<div class="window_foot_r"></div>
 	</div>
-</div>
+</div><!-- window cf -->
 <?
 }
 
