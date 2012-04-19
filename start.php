@@ -554,15 +554,17 @@ function activityfeed($mergeditems,$ajax = false) {
 			}
 		}
 	} else {
-		$activityfeed .= '<table><tr>
-									<td valign="top" width="60px"><img src="img/ajax-loader.gif" /></td>
-									<td >
+		$activityfeed .= '<table>
+											<tr>
+											<td valign="top" width="60px"><img src="img/ajax-loader.gif" alt="loading"/></td>
+											<td >
 											<div class="feedtitle">
 												<a href="">
 												' . _L("Loading Recent Activity") . '</a>
 											</div>
-									</td>
-									</tr></table>';
+											</td>
+											</tr>
+											</table>';
 		$activityfeed .= "
 				<script>
 				var actionids = $actioncount;
@@ -602,9 +604,9 @@ function activityfeed($mergeditems,$ajax = false) {
 									actionids = 0;
 									for(i=0;i<size;i++){
 										var item = result[i];
-										html += '<div class=\"content_row cf\"><div class=\"content_feed_left\"><a href=\"' + item.defaultlink + '\" ' + item.defaultonclick + '><img src=\"img/' + item.icon + '\" /></a></div><div class=\"content_feed_right\"><div class=\"feedtitle\"><a href=\"' + item.defaultlink + '\" ' + item.defaultonclick + '>' + item.title + '</a></div><div class=\"feed_content\">' + item.content + '</div></div>';
+										html += '<div class=\"content_row cf\"><div class=\"content_feed_left\"><a href=\"' + item.defaultlink + '\" ' + item.defaultonclick + '><img src=\"img/' + item.icon + '\" alt=\"\" /></a></div><div class=\"content_feed_right\"><div class=\"feedtitle\"><a href=\"' + item.defaultlink + '\" ' + item.defaultonclick + '>' + item.title + '</a></div><div class=\"feed_content\">' + item.content + '</div></div>';
 										if(item.tools) {
-											html += '<div id=\"actionlink_' + actionids + '\" class=\"actionlink_tools\" ><img src=\"img/largeicons/tiny20x20/tools.jpg\"/>&nbsp;Tools</div><div id=\"actions_' + actionids + '\" class=\"hidden\">' + item.tools + '</div>';
+											html += '<div id=\"actionlink_' + actionids + '\" class=\"actionlink_tools\" ><img src=\"img/largeicons/tiny20x20/tools.jpg\" alt=\"edit tools\"/>&nbsp;Tools</div><div id=\"actions_' + actionids + '\" class=\"hidden\">' + item.tools + '</div>';
 											actionids++;
 										} else {
 											html += '<td width=\"100px\">&nbsp;</td>'
@@ -708,6 +710,7 @@ include_once("nav.inc.php");
 					
 			<? } ?>
 			</div> <!-- /.big_button_wrap -->
+			
 </div><!-- .csec .secbutton-->
 <?			}
 			if ($USER->authorize("startstats")) {
@@ -720,7 +723,7 @@ include_once("nav.inc.php");
 ?>
 </div><!-- .csec .sectimelime -->
 
-<div class="csec secwindow"> <!-- contains recent activity -->
+<div class="csec secwindow"><!-- contains recent activity -->
 <?
 			startWindow(_L('Recent Activity'));
 $activityfeed = '
@@ -733,10 +736,10 @@ $activityfeed = '
 					<a id="jobsfilter" href="start.php?filter=jobs" onclick="applyfilter(\'jobs\'); $(\'jobsubfilters\').toggle(); return false;"><img src="img/largeicons/tiny20x20/ping.jpg" alt="">Jobs</a>
 					<div id="jobsubfilters" style="' . (in_array($filter,array("savedjobs","scheduledjobs","activejobs","completedjobs","repeatingjobs"))?"display:block":"display:none") . ';padding-left:20px;">
 						<a id="savedjobsfilter" href="start.php?filter=savedjobs" onclick="applyfilter(\'savedjobs\'); return false;"><img src="img/largeicons/tiny20x20/folderandfiles.jpg" alt="">Saved</a>
-						<a id="scheduledjobsfilter" href="start.php?filter=scheduledjobs" onclick="applyfilter(\'scheduledjobs\'); return false;"><img src="img/largeicons/tiny20x20/clock.jpg">Scheduled</a>
-						<a id="activejobsfilter" href="start.php?filter=activejobs" onclick="applyfilter(\'activejobs\'); return false;"><img src="img/largeicons/tiny20x20/ping.jpg">Active</a>
-						<a id="completedjobsfilter" href="start.php?filter=completedjobs" onclick="applyfilter(\'completedjobs\'); return false;"><img src="img/largeicons/tiny20x20/checkedgreen.jpg">Completed</a>
-						<a id="repeatingjobsfilter" href="start.php?filter=repeatingjobs" onclick="applyfilter(\'repeatingjobs\'); return false;"><img src="img/largeicons/tiny20x20/calendar.jpg">Repeating</a>
+						<a id="scheduledjobsfilter" href="start.php?filter=scheduledjobs" onclick="applyfilter(\'scheduledjobs\'); return false;"><img src="img/largeicons/tiny20x20/clock.jpg" alt="">Scheduled</a>
+						<a id="activejobsfilter" href="start.php?filter=activejobs" onclick="applyfilter(\'activejobs\'); return false;"><img src="img/largeicons/tiny20x20/ping.jpg" alt="">Active</a>
+						<a id="completedjobsfilter" href="start.php?filter=completedjobs" onclick="applyfilter(\'completedjobs\'); return false;"><img src="img/largeicons/tiny20x20/checkedgreen.jpg" alt="">Completed</a>
+						<a id="repeatingjobsfilter" href="start.php?filter=repeatingjobs" onclick="applyfilter(\'repeatingjobs\'); return false;"><img src="img/largeicons/tiny20x20/calendar.jpg" alt="">Repeating</a>
 					</div>
 					<a id="messagesfilter" href="start.php?filter=messages" onclick="applyfilter(\'messages\'); return false;"><img src="img/largeicons/tiny20x20/letter.jpg" alt="">Messages</a>
 					<a id="listsfilter" href="start.php?filter=lists" onclick="applyfilter(\'lists\'); return false;"><img src="img/largeicons/tiny20x20/addrbook.jpg" alt="">Lists</a>
