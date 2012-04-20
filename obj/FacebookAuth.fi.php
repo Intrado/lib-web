@@ -20,6 +20,7 @@ class FacebookAuth extends FormItem {
 		$perms = "publish_stream,manage_pages";
 		
 		$str .= '<div id="'. $n. 'fbdetails">
+					<a NAME="facebookauth"></a>
 					<!-- Facebook JS api loads into this div -->
 					<div id="fb-root"></div>
 					<!-- When connected to facebook, show these options -->

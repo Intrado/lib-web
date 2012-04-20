@@ -35,6 +35,12 @@ if($USER->authorize("leavemessage")){
 	$count = QuickQuery("select count(*) from voicereply where userid = '$USER->id' and listened = '0'");
 }
 
+// get the facebook token's expiration date
+if (getSystemSetting("_hasfacebook") && $ACCESS->getPermission("facebookpost"))
+	$fbtokenexpires = $USER->getSetting("fb_expires_on");
+else
+	$fbtokenexpires = false;
+
 function itemcmp($a, $b) {
 	if ($a["date"] == $b["date"]) {
         return 0;
@@ -652,11 +658,26 @@ $PAGE = 'start:start';
 $TITLE = _L('Welcome %1$s %2$s',
 	escapehtml($USER->firstname),
 	escapehtml($USER->lastname));
+$DESCRIPTION = "";
 
 if($USER->authorize("leavemessage")){
 	if($count > 0){
 		$DESCRIPTION = "<img src=\"img/bug_important.gif\"> You have unplayed responses to your notifications..." .
 				"<a href=\"replies.php?jobid=all&showonlyunheard=true\">click to view</a>";
+	}
+}
+
+// display a reminder to renew their facebook authorization token
+if ($fbtokenexpires) {
+	if ($DESCRIPTION)
+		$DESCRIPTION .= "<br>";
+	$timeleft = $fbtokenexpires - strtotime("now");
+	if ($timeleft < 0) {
+		$DESCRIPTION .= "<img src=\"img/bug_important.gif\"> ". _L("Your Facebook authorization has expired!") .
+			'<a href="account.php#facebookauth">  click to renew</a>';
+	} else if ($timeleft < 59*24*60*60) {
+		$DESCRIPTION .= "<img src=\"img/bug_important.gif\"> ". _L("Your Facebook authorization will expire on: %s...", date("M, jS", $fbtokenexpires)).
+			'<a href="account.php#facebookauth">  click to renew</a>';
 	}
 }
 
