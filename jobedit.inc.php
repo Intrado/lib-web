@@ -829,6 +829,7 @@ if ($submittedmode || $completedmode) {
 	}
 	
 	// if the account may post to facebook. show facebook page selection formitem
+	$showrenew = (floor(($USER->getSetting("fb_expires_on", 0) - strtotime("now")) / (24*60*60)) < 59);
 	if (getSystemSetting("_hasfacebook") && $USER->authorize("facebookpost")) {
 		
 		// see if any of the pages are the user's wall
@@ -847,7 +848,7 @@ if ($submittedmode || $completedmode) {
 			"value" => (count($fbpages)?json_encode($fbpages):""),
 			"validators" => array(
 				array("ValFacebookPageWithMessage", "authpages" => getFbAuthorizedPages(), "authwall" => getSystemSetting("fbauthorizewall"))),
-			"control" => array("FacebookPage", "access_token" => $USER->getSetting("fb_access_token", false), "show_renew" => true),
+			"control" => array("FacebookPage", "access_token" => $USER->getSetting("fb_access_token", false), "show_renew" => $showrenew),
 			"requires" => array("message"),
 			"helpstep" => ++$helpstepnum);
 			
