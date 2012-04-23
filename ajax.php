@@ -124,9 +124,9 @@ function handleRequest() {
 			if (!isset($_GET['messagetype']) && !isset($_GET['messageid']))
 				return false;
 			if (isset($_GET['messagetype']))
-				return QuickQuery("select count(id) from message where userid=? and not deleted and type=?", false, array($USER->id, $_GET['messagetype']))?true:false;
+				return QuickQuery("select count(id) from message where userid=? and type=?", false, array($USER->id, $_GET['messagetype']))?true:false;
 			if (isset($_GET['messageid']))
-				return QuickQuery("select count(id) from message where userid=? and not deleted and id=?", false, array($USER->id, $_GET['messageid']))?true:false;
+				return QuickQuery("select count(id) from message where userid=? and id=?", false, array($USER->id, $_GET['messageid']))?true:false;
 
 		// Returns an array of id,name,messagegroupid for audiofiles either belonging to this messagegroup or referenced by messages in this messagegroup.
 		case 'getaudiolibrary':
