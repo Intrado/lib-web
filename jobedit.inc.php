@@ -293,8 +293,6 @@ class ValDateWithFacebookLimiter extends Validator {
 	function validate ($value, $args, $requiredvalues) {
 		global $USER;
 		
-		error_log("ValDate");
-		
 		if (strtotime($value) < strtotime($args['min']))
 			return $this->label. " ". _L('cannot be a date earlier than %s', $args['min']);
 		if (isset($args['max'])) {
@@ -303,16 +301,15 @@ class ValDateWithFacebookLimiter extends Validator {
 		}
 		
 		if (isset($requiredvalues['message']) && $requiredvalues['message']) {
-			error_log("mgid: ".$requiredvalues['message']);
 			// check the message group for facebook content
 			$mg = new MessageGroup($requiredvalues['message']);
 			if ($mg->hasMessage("post", "facebook")) {
 				$fbexpireson = $USER->getSetting("fb_expires_on", false);
 				if (strtotime($value) > $fbexpireson) {
 					if ($fbexpireson)
-						return $this->label. " ". _L('cannot be a date later than %s, due to your current facebook authentication token. Renew your token below to get more time. Note: facebook authentications are good for a MAXIMUM of 60 days.', date('m/d/Y', $fbexpireson));
+						return $this->label. " ". _L('cannot be a date later than %s, due to your current Facebook authentication token. Renew your token below to get more time. Note: Facebook authentications are good for a MAXIMUM of 60 days.', date('m/d/Y', $fbexpireson));
 					else
-						return $this->label. " ". _L('cannot pick a valid date without a facebook athentication token. Please authorize facebook below.');
+						return $this->label. " ". _L('cannot pick a valid date without a Facebook authentication token. Please authorize Facebook below.');
 				}
 			}
 		}

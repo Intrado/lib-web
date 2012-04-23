@@ -75,7 +75,7 @@ class FacebookAuth extends FormItem {
 						method:"post",
 						parameters: {
 							"type": "get",
-							"formatdate": "M, jS"},
+							"formatdate": "F jS"},
 						onSuccess: function(response) {
 							//showDebugData("'.$n.'", response.responseJSON);
 							fbLoadUserData("'.$n.'", response.responseJSON.expires_on);
