@@ -29,8 +29,11 @@ class MessageGroupSelectMenu extends FormItem {
 		
 		
 		$str = '
-			$("'.$n.'").observe("change", loadMessageGroupPreview.curry('.$jobtypeid.'));
-			getMessageGroupPreviewGrid($("'.$n.'").value, $("'.$n.'_preview"), '.$jobtypeid.');
+			$("'.$n.'").observe("change", function (event) {
+				loadMessageGroupPreview.curry('.$jobtypeid.');
+				getMessageGroupPreviewGrid($("'.$n.'").value, $("'.$n.'_preview"), '.$jobtypeid.');
+				Event.fire($("'.$this->form->name.'"), "MessageGroup:Change", $("'.$n.'").value);
+			});
 		';
 		
 		if (isset($this->args["jobtypeidtarget"])) {
