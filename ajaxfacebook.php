@@ -38,6 +38,14 @@ switch ($type) {
 				'expires_on' => $expiresOn));
 		break;
 	
+	case "getexpiredays":
+		$expiresOn = $USER->getSetting('fb_expires_on', false);
+		if ($expiresOn)
+			echo json_encode(array('expires_in' => floor(($expiresOn - strtotime("now")) / (24*60*60))));
+		else
+			echo json_encode(array('expires_in' => 0));
+		break;
+		
 	case "delete":
 		$USER->setSetting("fb_user_id", false);
 		$USER->setSetting("fb_access_token", false);
