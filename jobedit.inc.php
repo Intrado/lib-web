@@ -288,6 +288,38 @@ class ValTwitterAccountWithMessage extends Validator {
 }
 
 
+class ValDateWithFacebookLimiter extends Validator {
+	var $onlyserverside = true;
+	function validate ($value, $args, $requiredvalues) {
+		global $USER;
+		
+		error_log("ValDate");
+		
+		if (strtotime($value) < strtotime($args['min']))
+			return $this->label. " ". _L('cannot be a date earlier than %s', $args['min']);
+		if (isset($args['max'])) {
+			if (strtotime($value) > strtotime($args['max']))
+				return $this->label. " ". _L('cannot be a date later than %s', $args['max']);
+		}
+		
+		if (isset($requiredvalues['message']) && $requiredvalues['message']) {
+			error_log("mgid: ".$requiredvalues['message']);
+			// check the message group for facebook content
+			$mg = new MessageGroup($requiredvalues['message']);
+			if ($mg->hasMessage("post", "facebook")) {
+				$fbexpireson = $USER->getSetting("fb_expires_on", false);
+				if (strtotime($value) > $fbexpireson) {
+					if ($fbexpireson)
+						return $this->label. " ". _L('cannot be a date later than %s, due to your current facebook authentication token. Renew your token below to get more time. Note: facebook authentications are good for a MAXIMUM of 60 days.', date('m/d/Y', $fbexpireson));
+					else
+						return $this->label. " ". _L('cannot pick a valid date without a facebook athentication token. Please authorize facebook below.');
+				}
+			}
+		}
+		return true;
+	}
+}
+
 // requires the message form item and validates that there are valid pages selected... but only if the message has facebook
 class ValFacebookPageWithMessage extends Validator {
 	var $onlyserverside = true;
@@ -524,9 +556,10 @@ if ($JOBTYPE == "repeating") {
 			"value" => isset($job->startdate)?$job->startdate:"now + $dayoffset days",
 			"validators" => array(
 				array("ValRequired"),
-				array("ValDate", "min" => date("m/d/Y", strtotime("now + $dayoffset days")))
+				array("ValDateWithFacebookLimiter", "min" => date("m/d/Y", strtotime("now + $dayoffset days")))
 			),
 			"control" => array("TextDate", "size"=>12, "nodatesbefore" => $dayoffset),
+			"requires" => array("message"),
 			"helpstep" => ++$helpstepnum
 		);
 		if (!$submittedmode)
@@ -1160,7 +1193,8 @@ Validator::load_validators(array("ValDuplicateNameCheck",
 								"ValFacebookPageWithMessage",
 								"ValTwitterAccountWithMessage",
 								"ValCallerID",
-								"ValFeedCategoryWithMessage"));
+								"ValFeedCategoryWithMessage",
+								"ValDateWithFacebookLimiter"));
 ?>
 </script>
 <script src="script/niftyplayer.js.php" type="text/javascript"></script>

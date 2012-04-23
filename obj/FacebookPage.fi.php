@@ -12,6 +12,7 @@ class FacebookPage extends FormItem {
 		// keeping track of the authorized pages
 		$pages = array("pages" => getFbAuthorizedPages(), "wall" => getSystemSetting("fbauthorizewall"));
 		$showconnectbutton = ($this->args['access_token']?false:true);
+		$showrenewbutton = (!$showconnectbutton && isset($this->args['show_renew']) && $this->args['show_renew']);
 		
 		// main details div
 		$str = '
@@ -37,15 +38,15 @@ class FacebookPage extends FormItem {
 			<div id="'. $n. 'connect" style="display:'. ($showconnectbutton?"block":"none"). '">
 				'. icon_button(_L("Add Facebook Account"), "custom/facebook", "popup('popupfacebookauth.php', 640, 400)").'
 			</div>
-			<div id="'. $n. 'renew" style="display:'. (!$showconnectbutton && $this->args['show_renew']?"block":"none"). '">
+			<div id="'. $n. 'renew" style="display:'. ($showrenewbutton?"block":"none"). '">
 				'. icon_button(_L("Renew Facebook Authorization"), "custom/facebook", "popup('popupfacebookauth.php', 640, 400)").'
 			</div>
-			<div id="'.$n.'actionlinks" style="display:'. ($showconnectbutton?"none":"block"). '">
+			<div id="'.$n.'actionlinks" style="display:'. (($showconnectbutton || $showrenewbutton)?"none":"block"). '">
 				<a id="'. $n. 'all" class="actionlink">'._L("Select All").'</a>
 				&nbsp;|&nbsp;
 				<a id="'. $n. 'none" class="actionlink">'._L("Remove All").'</a>
 			</div>
-			<div id="'. $n. 'fbpages" class="fbpagelist" style="display:'. ($showconnectbutton?"none":"block"). '">
+			<div id="'. $n. 'fbpages" class="fbpagelist" style="display:'. (($showconnectbutton || $showrenewbutton)?"none":"block"). '">
 				<img src="img/ajax-loader.gif" alt="'. escapehtml(_L("Loading")). '"/>
 			</div>';
 		
@@ -55,6 +56,8 @@ class FacebookPage extends FormItem {
 	function renderJavascript($value) {
 		global $SETTINGS;
 		$n = $this->form->name."_".$this->name;
+		
+		$showrenewbutton = ($this->args['access_token'] && isset($this->args['show_renew']) && $this->args['show_renew']);
 		
 		$str = '// Facebook javascript API initialization, pulled from facebook documentation
 				window.fbAsyncInit = function() {
@@ -66,7 +69,7 @@ class FacebookPage extends FormItem {
 					});
 					
 					// load the initial list of pages if possible
-					updateFbPages("'.$this->args['access_token'].'", "'.$n.'", "'.$n.'fbpages", "'.$this->args['show_renew'].'");
+					'.($showrenewbutton?'':'updateFbPages("'.$this->args['access_token'].'", "'.$n.'", "'.$n.'fbpages", "'.$showrenewbutton.'");').'
 				};
 				(function() {
 					var e = document.createElement("script");
@@ -77,7 +80,7 @@ class FacebookPage extends FormItem {
 				}());
 				// Observe an authentication update on the document (the auth popup fires this event)
 				document.observe("FbAuth:update", function (res) {
-					updateFbPages(res.memo.access_token, "'.$n.'", "'.$n.'fbpages", "'.$this->args['show_renew'].'");
+					updateFbPages(res.memo.access_token, "'.$n.'", "'.$n.'fbpages", "'.$showrenewbutton.'");
 				});
 				// Observe a click on the action links
 				$("'. $n. 'all").observe("click", handleActionLink.curry("'.$n.'", true));
