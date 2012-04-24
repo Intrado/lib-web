@@ -137,8 +137,7 @@ class FacebookPage extends FormItem {
 					container.show();
 					actionlinks.show();
 					connectdiv.hide();
-					if (showrenew)
-						renewdiv.show();
+					renewdiv.hide();
 					
 					// get the authorized pages
 					var authpages = $(formitem + "authpages").value.evalJSON();
