@@ -654,6 +654,8 @@ function activityfeed($mergeditems,$ajax = false) {
 ////////////////////////////////////////////////////////////////////////////////
 // Display
 ////////////////////////////////////////////////////////////////////////////////
+
+$THEME = $_SESSION['colorscheme']['_brandtheme'];
 $PAGE = 'start:start';
 $TITLE = _L('Welcome %1$s %2$s',
 	escapehtml($USER->firstname),
@@ -710,10 +712,11 @@ include_once("nav.inc.php");
 					}
 				}
 				if($hasnewjob) {
-?>
-						
-						<div class="newjob"><a href="jobwizard.php?new&amp;jobtype=normal">New Notification</a></div>
-<?
+					if ($THEME == 'newui') { 
+					?> <div class="newjob"><a href="message_sender.php">New Notification</a></div> <?
+					} else {
+					?> <div class="newjob"><a href="jobwizard.php?new&amp;jobtype=normal">New Notification</a></div> <?	
+					}
 				}
 
 				$hasemergency = false;
@@ -726,13 +729,11 @@ include_once("nav.inc.php");
 				}
 				if($hasemergency) {
 			 ?>
-			
 					<div class="emrjob"><a href="jobwizard.php?new&amp;jobtype=emergency">Emergency</a></div>
-					
 			<? } ?>
 			</div> <!-- /.big_button_wrap -->
 			
-</div><!-- .csec .secbutton-->
+</div><!-- .csec .secbutton -->
 <?			}
 			if ($USER->authorize("startstats")) {
 ?>
