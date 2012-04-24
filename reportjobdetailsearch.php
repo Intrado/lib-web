@@ -589,31 +589,31 @@ endWindow();
 			$('<?=$form->name?>_radioselect').select('input').invoke('observe', 'click', function(event) {
 				var radio = event.element();
 				if (radio.value == 'job') {
-					$('<?=$form->name?>_dateoptions').up('div').hide();
-					$('<?=$form->name?>_checkarchived').up('div').show();
+					$('<?=$form->name?>_dateoptions_fieldarea').hide();
+					$('<?=$form->name?>_checkarchived_fieldarea').show();
 
-					if ($('<?=$form->name?>_checkarchived').checked) {
-						$('<?=$form->name?>_jobid').up('div').hide();
-						$('<?=$form->name?>_jobidarchived').up('div').show();
+					if ($('<?=$form->name?>_checkarchived_fieldarea').checked) {
+						$('<?=$form->name?>_jobid_fieldarea').hide();
+						$('<?=$form->name?>_jobidarchived_fieldarea').show();
 					} else {
 						$('<?=$form->name?>_jobid').up('div').show();
 						$('<?=$form->name?>_jobidarchived').up('div').hide();
 					}
 				} else if (radio.value == 'date') {
-					$('<?=$form->name?>_dateoptions').up('div').show();
-					$('<?=$form->name?>_jobid').up('div').hide();
-					$('<?=$form->name?>_jobidarchived').up('div').hide();
-					$('<?=$form->name?>_checkarchived').up('div').hide();
+					$('<?=$form->name?>_dateoptions_fieldarea').show();
+					$('<?=$form->name?>_jobid_fieldarea').hide();
+					$('<?=$form->name?>_jobidarchived_fieldarea').hide();
+					$('<?=$form->name?>_checkarchived_fieldarea').hide();
 				}
 			});
 
 			$('<?=$form->name?>_checkarchived').observe('click', function(event) {
 				if (event.element().checked) {
-					$('<?=$form->name?>_jobid').up('div').hide();
-					$('<?=$form->name?>_jobidarchived').up('div').show();
+					$('<?=$form->name?>_jobid_fieldarea').hide();
+					$('<?=$form->name?>_jobidarchived_fieldarea').show();
 				} else {
-					$('<?=$form->name?>_jobid').up('div').show();
-					$('<?=$form->name?>_jobidarchived').up('div').hide();
+					$('<?=$form->name?>_jobid_fieldarea').show();
+					$('<?=$form->name?>_jobidarchived_fieldarea').hide();
 				}
 			});
 
@@ -643,22 +643,22 @@ endWindow();
 
 			var radioselectchoice = $('<?=$form->name?>_radioselect').down('input:checked');
 			if (radioselectchoice.value == 'job') {
-				$('<?=$form->name?>_dateoptions').up('div').hide();
-				$('<?=$form->name?>_checkarchived').up('div').show();
+				$('<?=$form->name?>_dateoptions_fieldarea').hide();
+				$('<?=$form->name?>_checkarchived_fieldarea').show();
 
-				if ($('<?=$form->name?>_checkarchived').checked) {
-					$('<?=$form->name?>_jobid').up('div').hide();
-					$('<?=$form->name?>_jobidarchived').up('div').show();
+				if ($('<?=$form->name?>_checkarchived_fieldarea').checked) {
+					$('<?=$form->name?>_jobid_fieldarea').hide();
+					$('<?=$form->name?>_jobidarchived_fieldarea').show();
 				} else {
-					$('<?=$form->name?>_jobid').up('div').show();
-					$('<?=$form->name?>_jobidarchived').up('div').hide();
+					$('<?=$form->name?>_jobid_fieldarea').show();
+					$('<?=$form->name?>_jobidarchived_fieldarea').hide();
 				}
 			} else if (radioselectchoice.value == 'date') {
-				$('<?=$form->name?>_dateoptions').up('div').show();
-				$('<?=$form->name?>_checkarchived').up('div').hide();
-				$('<?=$form->name?>_jobid').up('div').hide();
-				$('<?=$form->name?>_jobidarchived').up('div').hide();
-				$('<?=$form->name?>_checkarchived').up('div').hide();
+				$('<?=$form->name?>_dateoptions_fieldarea').show();
+				$('<?=$form->name?>_checkarchived_fieldarea').hide();
+				$('<?=$form->name?>_jobid_fieldarea').hide();
+				$('<?=$form->name?>_jobidarchived_fieldarea').hide();
+				$('<?=$form->name?>_checkarchived_fieldarea').hide();
 			}
 
 			$('metadataDiv').update($('metadataTempDiv').innerHTML);
