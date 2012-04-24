@@ -596,8 +596,8 @@ endWindow();
 						$('<?=$form->name?>_jobid_fieldarea').hide();
 						$('<?=$form->name?>_jobidarchived_fieldarea').show();
 					} else {
-						$('<?=$form->name?>_jobid').up('div').show();
-						$('<?=$form->name?>_jobidarchived').up('div').hide();
+						$('<?=$form->name?>_jobid_fieldarea').show();
+						$('<?=$form->name?>_jobidarchived_fieldarea').hide();
 					}
 				} else if (radio.value == 'date') {
 					$('<?=$form->name?>_dateoptions_fieldarea').show();
