@@ -123,7 +123,7 @@ class FacebookAuth extends FormItem {
 								"type": "save",
 								"access_token": access_token,
 								"fb_user_id": user_id,
-								"formatdate": "M, jS"},
+								"formatdate": "F jS"},
 							onSuccess: function(response) {
 								//showDebugData(formitem, response.responseJSON);
 								$(formitem + "fbconnected").setStyle({display: "block"});
