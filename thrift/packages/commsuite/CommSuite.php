@@ -20,9 +20,11 @@ interface CommSuiteIf {
   public function expireFeedCategories($urlcomponent, $categoryIds);
   public function customerIdLookupForUrl($urlcomponent);
   public function contentGet($sessionid, $contentId);
-  public function contentGetForCustomerId($customerid, $contentId);
+  public function contentGetForCustomerId($customerid, $contentid);
   public function contentPut($sessionid, $content);
   public function contentPutForCustomerId($customerid, $content);
+  public function contentDelete($sessionid, $contentid);
+  public function contentDeleteForCustomerId($customerid, $contentid);
 }
 
 class CommSuiteClient implements CommSuiteIf {
@@ -562,9 +564,6 @@ class CommSuiteClient implements CommSuiteIf {
     if ($result->nfe !== null) {
       throw $result->nfe;
     }
-    if ($result->nae !== null) {
-      throw $result->nae;
-    }
     throw new Exception("customerIdLookupForUrl failed: unknown result");
   }
 
@@ -623,20 +622,23 @@ class CommSuiteClient implements CommSuiteIf {
     if ($result->nae !== null) {
       throw $result->nae;
     }
+    if ($result->sie !== null) {
+      throw $result->sie;
+    }
     throw new Exception("contentGet failed: unknown result");
   }
 
-  public function contentGetForCustomerId($customerid, $contentId)
+  public function contentGetForCustomerId($customerid, $contentid)
   {
-    $this->send_contentGetForCustomerId($customerid, $contentId);
+    $this->send_contentGetForCustomerId($customerid, $contentid);
     return $this->recv_contentGetForCustomerId();
   }
 
-  public function send_contentGetForCustomerId($customerid, $contentId)
+  public function send_contentGetForCustomerId($customerid, $contentid)
   {
     $args = new commsuite_CommSuite_contentGetForCustomerId_args();
     $args->customerid = $customerid;
-    $args->contentId = $contentId;
+    $args->contentid = $contentid;
     $bin_accel = ($this->output_ instanceof TProtocol::$TBINARYPROTOCOLACCELERATED) && function_exists('thrift_protocol_write_binary');
     if ($bin_accel)
     {
@@ -733,11 +735,11 @@ class CommSuiteClient implements CommSuiteIf {
     if ($result->success !== null) {
       return $result->success;
     }
-    if ($result->nfe !== null) {
-      throw $result->nfe;
-    }
     if ($result->nae !== null) {
       throw $result->nae;
+    }
+    if ($result->sie !== null) {
+      throw $result->sie;
     }
     throw new Exception("contentPut failed: unknown result");
   }
@@ -791,13 +793,117 @@ class CommSuiteClient implements CommSuiteIf {
     if ($result->success !== null) {
       return $result->success;
     }
-    if ($result->nfe !== null) {
-      throw $result->nfe;
-    }
     if ($result->nae !== null) {
       throw $result->nae;
     }
     throw new Exception("contentPutForCustomerId failed: unknown result");
+  }
+
+  public function contentDelete($sessionid, $contentid)
+  {
+    $this->send_contentDelete($sessionid, $contentid);
+    $this->recv_contentDelete();
+  }
+
+  public function send_contentDelete($sessionid, $contentid)
+  {
+    $args = new commsuite_CommSuite_contentDelete_args();
+    $args->sessionid = $sessionid;
+    $args->contentid = $contentid;
+    $bin_accel = ($this->output_ instanceof TProtocol::$TBINARYPROTOCOLACCELERATED) && function_exists('thrift_protocol_write_binary');
+    if ($bin_accel)
+    {
+      thrift_protocol_write_binary($this->output_, 'contentDelete', TMessageType::CALL, $args, $this->seqid_, $this->output_->isStrictWrite());
+    }
+    else
+    {
+      $this->output_->writeMessageBegin('contentDelete', TMessageType::CALL, $this->seqid_);
+      $args->write($this->output_);
+      $this->output_->writeMessageEnd();
+      $this->output_->getTransport()->flush();
+    }
+  }
+
+  public function recv_contentDelete()
+  {
+    $bin_accel = ($this->input_ instanceof TProtocol::$TBINARYPROTOCOLACCELERATED) && function_exists('thrift_protocol_read_binary');
+    if ($bin_accel) $result = thrift_protocol_read_binary($this->input_, 'commsuite_CommSuite_contentDelete_result', $this->input_->isStrictRead());
+    else
+    {
+      $rseqid = 0;
+      $fname = null;
+      $mtype = 0;
+
+      $this->input_->readMessageBegin($fname, $mtype, $rseqid);
+      if ($mtype == TMessageType::EXCEPTION) {
+        $x = new TApplicationException();
+        $x->read($this->input_);
+        $this->input_->readMessageEnd();
+        throw $x;
+      }
+      $result = new commsuite_CommSuite_contentDelete_result();
+      $result->read($this->input_);
+      $this->input_->readMessageEnd();
+    }
+    if ($result->nae !== null) {
+      throw $result->nae;
+    }
+    if ($result->sie !== null) {
+      throw $result->sie;
+    }
+    return;
+  }
+
+  public function contentDeleteForCustomerId($customerid, $contentid)
+  {
+    $this->send_contentDeleteForCustomerId($customerid, $contentid);
+    $this->recv_contentDeleteForCustomerId();
+  }
+
+  public function send_contentDeleteForCustomerId($customerid, $contentid)
+  {
+    $args = new commsuite_CommSuite_contentDeleteForCustomerId_args();
+    $args->customerid = $customerid;
+    $args->contentid = $contentid;
+    $bin_accel = ($this->output_ instanceof TProtocol::$TBINARYPROTOCOLACCELERATED) && function_exists('thrift_protocol_write_binary');
+    if ($bin_accel)
+    {
+      thrift_protocol_write_binary($this->output_, 'contentDeleteForCustomerId', TMessageType::CALL, $args, $this->seqid_, $this->output_->isStrictWrite());
+    }
+    else
+    {
+      $this->output_->writeMessageBegin('contentDeleteForCustomerId', TMessageType::CALL, $this->seqid_);
+      $args->write($this->output_);
+      $this->output_->writeMessageEnd();
+      $this->output_->getTransport()->flush();
+    }
+  }
+
+  public function recv_contentDeleteForCustomerId()
+  {
+    $bin_accel = ($this->input_ instanceof TProtocol::$TBINARYPROTOCOLACCELERATED) && function_exists('thrift_protocol_read_binary');
+    if ($bin_accel) $result = thrift_protocol_read_binary($this->input_, 'commsuite_CommSuite_contentDeleteForCustomerId_result', $this->input_->isStrictRead());
+    else
+    {
+      $rseqid = 0;
+      $fname = null;
+      $mtype = 0;
+
+      $this->input_->readMessageBegin($fname, $mtype, $rseqid);
+      if ($mtype == TMessageType::EXCEPTION) {
+        $x = new TApplicationException();
+        $x->read($this->input_);
+        $this->input_->readMessageEnd();
+        throw $x;
+      }
+      $result = new commsuite_CommSuite_contentDeleteForCustomerId_result();
+      $result->read($this->input_);
+      $this->input_->readMessageEnd();
+    }
+    if ($result->nae !== null) {
+      throw $result->nae;
+    }
+    return;
   }
 
 }
@@ -2840,7 +2946,6 @@ class commsuite_CommSuite_customerIdLookupForUrl_result {
 
   public $success = null;
   public $nfe = null;
-  public $nae = null;
 
   public function __construct($vals=null) {
     if (!isset(self::$_TSPEC)) {
@@ -2854,11 +2959,6 @@ class commsuite_CommSuite_customerIdLookupForUrl_result {
           'type' => TType::STRUCT,
           'class' => 'commsuite_NotFoundException',
           ),
-        2 => array(
-          'var' => 'nae',
-          'type' => TType::STRUCT,
-          'class' => 'commsuite_NotAvailableException',
-          ),
         );
     }
     if (is_array($vals)) {
@@ -2867,9 +2967,6 @@ class commsuite_CommSuite_customerIdLookupForUrl_result {
       }
       if (isset($vals['nfe'])) {
         $this->nfe = $vals['nfe'];
-      }
-      if (isset($vals['nae'])) {
-        $this->nae = $vals['nae'];
       }
     }
   }
@@ -2908,14 +3005,6 @@ class commsuite_CommSuite_customerIdLookupForUrl_result {
             $xfer += $input->skip($ftype);
           }
           break;
-        case 2:
-          if ($ftype == TType::STRUCT) {
-            $this->nae = new commsuite_NotAvailableException();
-            $xfer += $this->nae->read($input);
-          } else {
-            $xfer += $input->skip($ftype);
-          }
-          break;
         default:
           $xfer += $input->skip($ftype);
           break;
@@ -2937,11 +3026,6 @@ class commsuite_CommSuite_customerIdLookupForUrl_result {
     if ($this->nfe !== null) {
       $xfer += $output->writeFieldBegin('nfe', TType::STRUCT, 1);
       $xfer += $this->nfe->write($output);
-      $xfer += $output->writeFieldEnd();
-    }
-    if ($this->nae !== null) {
-      $xfer += $output->writeFieldBegin('nae', TType::STRUCT, 2);
-      $xfer += $this->nae->write($output);
       $xfer += $output->writeFieldEnd();
     }
     $xfer += $output->writeFieldStop();
@@ -3049,6 +3133,7 @@ class commsuite_CommSuite_contentGet_result {
   public $success = null;
   public $nfe = null;
   public $nae = null;
+  public $sie = null;
 
   public function __construct($vals=null) {
     if (!isset(self::$_TSPEC)) {
@@ -3068,6 +3153,11 @@ class commsuite_CommSuite_contentGet_result {
           'type' => TType::STRUCT,
           'class' => 'commsuite_NotAvailableException',
           ),
+        3 => array(
+          'var' => 'sie',
+          'type' => TType::STRUCT,
+          'class' => 'commsuite_SessionInvalidException',
+          ),
         );
     }
     if (is_array($vals)) {
@@ -3079,6 +3169,9 @@ class commsuite_CommSuite_contentGet_result {
       }
       if (isset($vals['nae'])) {
         $this->nae = $vals['nae'];
+      }
+      if (isset($vals['sie'])) {
+        $this->sie = $vals['sie'];
       }
     }
   }
@@ -3126,6 +3219,14 @@ class commsuite_CommSuite_contentGet_result {
             $xfer += $input->skip($ftype);
           }
           break;
+        case 3:
+          if ($ftype == TType::STRUCT) {
+            $this->sie = new commsuite_SessionInvalidException();
+            $xfer += $this->sie->read($input);
+          } else {
+            $xfer += $input->skip($ftype);
+          }
+          break;
         default:
           $xfer += $input->skip($ftype);
           break;
@@ -3157,6 +3258,11 @@ class commsuite_CommSuite_contentGet_result {
       $xfer += $this->nae->write($output);
       $xfer += $output->writeFieldEnd();
     }
+    if ($this->sie !== null) {
+      $xfer += $output->writeFieldBegin('sie', TType::STRUCT, 3);
+      $xfer += $this->sie->write($output);
+      $xfer += $output->writeFieldEnd();
+    }
     $xfer += $output->writeFieldStop();
     $xfer += $output->writeStructEnd();
     return $xfer;
@@ -3168,7 +3274,7 @@ class commsuite_CommSuite_contentGetForCustomerId_args {
   static $_TSPEC;
 
   public $customerid = null;
-  public $contentId = null;
+  public $contentid = null;
 
   public function __construct($vals=null) {
     if (!isset(self::$_TSPEC)) {
@@ -3178,7 +3284,7 @@ class commsuite_CommSuite_contentGetForCustomerId_args {
           'type' => TType::I32,
           ),
         2 => array(
-          'var' => 'contentId',
+          'var' => 'contentid',
           'type' => TType::I64,
           ),
         );
@@ -3187,8 +3293,8 @@ class commsuite_CommSuite_contentGetForCustomerId_args {
       if (isset($vals['customerid'])) {
         $this->customerid = $vals['customerid'];
       }
-      if (isset($vals['contentId'])) {
-        $this->contentId = $vals['contentId'];
+      if (isset($vals['contentid'])) {
+        $this->contentid = $vals['contentid'];
       }
     }
   }
@@ -3221,7 +3327,7 @@ class commsuite_CommSuite_contentGetForCustomerId_args {
           break;
         case 2:
           if ($ftype == TType::I64) {
-            $xfer += $input->readI64($this->contentId);
+            $xfer += $input->readI64($this->contentid);
           } else {
             $xfer += $input->skip($ftype);
           }
@@ -3244,9 +3350,9 @@ class commsuite_CommSuite_contentGetForCustomerId_args {
       $xfer += $output->writeI32($this->customerid);
       $xfer += $output->writeFieldEnd();
     }
-    if ($this->contentId !== null) {
-      $xfer += $output->writeFieldBegin('contentId', TType::I64, 2);
-      $xfer += $output->writeI64($this->contentId);
+    if ($this->contentid !== null) {
+      $xfer += $output->writeFieldBegin('contentid', TType::I64, 2);
+      $xfer += $output->writeI64($this->contentid);
       $xfer += $output->writeFieldEnd();
     }
     $xfer += $output->writeFieldStop();
@@ -3478,8 +3584,8 @@ class commsuite_CommSuite_contentPut_result {
   static $_TSPEC;
 
   public $success = null;
-  public $nfe = null;
   public $nae = null;
+  public $sie = null;
 
   public function __construct($vals=null) {
     if (!isset(self::$_TSPEC)) {
@@ -3489,14 +3595,14 @@ class commsuite_CommSuite_contentPut_result {
           'type' => TType::I64,
           ),
         1 => array(
-          'var' => 'nfe',
-          'type' => TType::STRUCT,
-          'class' => 'commsuite_NotFoundException',
-          ),
-        2 => array(
           'var' => 'nae',
           'type' => TType::STRUCT,
           'class' => 'commsuite_NotAvailableException',
+          ),
+        2 => array(
+          'var' => 'sie',
+          'type' => TType::STRUCT,
+          'class' => 'commsuite_SessionInvalidException',
           ),
         );
     }
@@ -3504,11 +3610,11 @@ class commsuite_CommSuite_contentPut_result {
       if (isset($vals['success'])) {
         $this->success = $vals['success'];
       }
-      if (isset($vals['nfe'])) {
-        $this->nfe = $vals['nfe'];
-      }
       if (isset($vals['nae'])) {
         $this->nae = $vals['nae'];
+      }
+      if (isset($vals['sie'])) {
+        $this->sie = $vals['sie'];
       }
     }
   }
@@ -3541,16 +3647,16 @@ class commsuite_CommSuite_contentPut_result {
           break;
         case 1:
           if ($ftype == TType::STRUCT) {
-            $this->nfe = new commsuite_NotFoundException();
-            $xfer += $this->nfe->read($input);
+            $this->nae = new commsuite_NotAvailableException();
+            $xfer += $this->nae->read($input);
           } else {
             $xfer += $input->skip($ftype);
           }
           break;
         case 2:
           if ($ftype == TType::STRUCT) {
-            $this->nae = new commsuite_NotAvailableException();
-            $xfer += $this->nae->read($input);
+            $this->sie = new commsuite_SessionInvalidException();
+            $xfer += $this->sie->read($input);
           } else {
             $xfer += $input->skip($ftype);
           }
@@ -3573,14 +3679,14 @@ class commsuite_CommSuite_contentPut_result {
       $xfer += $output->writeI64($this->success);
       $xfer += $output->writeFieldEnd();
     }
-    if ($this->nfe !== null) {
-      $xfer += $output->writeFieldBegin('nfe', TType::STRUCT, 1);
-      $xfer += $this->nfe->write($output);
+    if ($this->nae !== null) {
+      $xfer += $output->writeFieldBegin('nae', TType::STRUCT, 1);
+      $xfer += $this->nae->write($output);
       $xfer += $output->writeFieldEnd();
     }
-    if ($this->nae !== null) {
-      $xfer += $output->writeFieldBegin('nae', TType::STRUCT, 2);
-      $xfer += $this->nae->write($output);
+    if ($this->sie !== null) {
+      $xfer += $output->writeFieldBegin('sie', TType::STRUCT, 2);
+      $xfer += $this->sie->write($output);
       $xfer += $output->writeFieldEnd();
     }
     $xfer += $output->writeFieldStop();
@@ -3691,7 +3797,6 @@ class commsuite_CommSuite_contentPutForCustomerId_result {
   static $_TSPEC;
 
   public $success = null;
-  public $nfe = null;
   public $nae = null;
 
   public function __construct($vals=null) {
@@ -3702,11 +3807,6 @@ class commsuite_CommSuite_contentPutForCustomerId_result {
           'type' => TType::I64,
           ),
         1 => array(
-          'var' => 'nfe',
-          'type' => TType::STRUCT,
-          'class' => 'commsuite_NotFoundException',
-          ),
-        2 => array(
           'var' => 'nae',
           'type' => TType::STRUCT,
           'class' => 'commsuite_NotAvailableException',
@@ -3716,9 +3816,6 @@ class commsuite_CommSuite_contentPutForCustomerId_result {
     if (is_array($vals)) {
       if (isset($vals['success'])) {
         $this->success = $vals['success'];
-      }
-      if (isset($vals['nfe'])) {
-        $this->nfe = $vals['nfe'];
       }
       if (isset($vals['nae'])) {
         $this->nae = $vals['nae'];
@@ -3754,14 +3851,6 @@ class commsuite_CommSuite_contentPutForCustomerId_result {
           break;
         case 1:
           if ($ftype == TType::STRUCT) {
-            $this->nfe = new commsuite_NotFoundException();
-            $xfer += $this->nfe->read($input);
-          } else {
-            $xfer += $input->skip($ftype);
-          }
-          break;
-        case 2:
-          if ($ftype == TType::STRUCT) {
             $this->nae = new commsuite_NotAvailableException();
             $xfer += $this->nae->read($input);
           } else {
@@ -3786,13 +3875,362 @@ class commsuite_CommSuite_contentPutForCustomerId_result {
       $xfer += $output->writeI64($this->success);
       $xfer += $output->writeFieldEnd();
     }
-    if ($this->nfe !== null) {
-      $xfer += $output->writeFieldBegin('nfe', TType::STRUCT, 1);
-      $xfer += $this->nfe->write($output);
+    if ($this->nae !== null) {
+      $xfer += $output->writeFieldBegin('nae', TType::STRUCT, 1);
+      $xfer += $this->nae->write($output);
       $xfer += $output->writeFieldEnd();
     }
+    $xfer += $output->writeFieldStop();
+    $xfer += $output->writeStructEnd();
+    return $xfer;
+  }
+
+}
+
+class commsuite_CommSuite_contentDelete_args {
+  static $_TSPEC;
+
+  public $sessionid = null;
+  public $contentid = null;
+
+  public function __construct($vals=null) {
+    if (!isset(self::$_TSPEC)) {
+      self::$_TSPEC = array(
+        1 => array(
+          'var' => 'sessionid',
+          'type' => TType::STRING,
+          ),
+        2 => array(
+          'var' => 'contentid',
+          'type' => TType::I64,
+          ),
+        );
+    }
+    if (is_array($vals)) {
+      if (isset($vals['sessionid'])) {
+        $this->sessionid = $vals['sessionid'];
+      }
+      if (isset($vals['contentid'])) {
+        $this->contentid = $vals['contentid'];
+      }
+    }
+  }
+
+  public function getName() {
+    return 'CommSuite_contentDelete_args';
+  }
+
+  public function read($input)
+  {
+    $xfer = 0;
+    $fname = null;
+    $ftype = 0;
+    $fid = 0;
+    $xfer += $input->readStructBegin($fname);
+    while (true)
+    {
+      $xfer += $input->readFieldBegin($fname, $ftype, $fid);
+      if ($ftype == TType::STOP) {
+        break;
+      }
+      switch ($fid)
+      {
+        case 1:
+          if ($ftype == TType::STRING) {
+            $xfer += $input->readString($this->sessionid);
+          } else {
+            $xfer += $input->skip($ftype);
+          }
+          break;
+        case 2:
+          if ($ftype == TType::I64) {
+            $xfer += $input->readI64($this->contentid);
+          } else {
+            $xfer += $input->skip($ftype);
+          }
+          break;
+        default:
+          $xfer += $input->skip($ftype);
+          break;
+      }
+      $xfer += $input->readFieldEnd();
+    }
+    $xfer += $input->readStructEnd();
+    return $xfer;
+  }
+
+  public function write($output) {
+    $xfer = 0;
+    $xfer += $output->writeStructBegin('CommSuite_contentDelete_args');
+    if ($this->sessionid !== null) {
+      $xfer += $output->writeFieldBegin('sessionid', TType::STRING, 1);
+      $xfer += $output->writeString($this->sessionid);
+      $xfer += $output->writeFieldEnd();
+    }
+    if ($this->contentid !== null) {
+      $xfer += $output->writeFieldBegin('contentid', TType::I64, 2);
+      $xfer += $output->writeI64($this->contentid);
+      $xfer += $output->writeFieldEnd();
+    }
+    $xfer += $output->writeFieldStop();
+    $xfer += $output->writeStructEnd();
+    return $xfer;
+  }
+
+}
+
+class commsuite_CommSuite_contentDelete_result {
+  static $_TSPEC;
+
+  public $nae = null;
+  public $sie = null;
+
+  public function __construct($vals=null) {
+    if (!isset(self::$_TSPEC)) {
+      self::$_TSPEC = array(
+        1 => array(
+          'var' => 'nae',
+          'type' => TType::STRUCT,
+          'class' => 'commsuite_NotAvailableException',
+          ),
+        2 => array(
+          'var' => 'sie',
+          'type' => TType::STRUCT,
+          'class' => 'commsuite_SessionInvalidException',
+          ),
+        );
+    }
+    if (is_array($vals)) {
+      if (isset($vals['nae'])) {
+        $this->nae = $vals['nae'];
+      }
+      if (isset($vals['sie'])) {
+        $this->sie = $vals['sie'];
+      }
+    }
+  }
+
+  public function getName() {
+    return 'CommSuite_contentDelete_result';
+  }
+
+  public function read($input)
+  {
+    $xfer = 0;
+    $fname = null;
+    $ftype = 0;
+    $fid = 0;
+    $xfer += $input->readStructBegin($fname);
+    while (true)
+    {
+      $xfer += $input->readFieldBegin($fname, $ftype, $fid);
+      if ($ftype == TType::STOP) {
+        break;
+      }
+      switch ($fid)
+      {
+        case 1:
+          if ($ftype == TType::STRUCT) {
+            $this->nae = new commsuite_NotAvailableException();
+            $xfer += $this->nae->read($input);
+          } else {
+            $xfer += $input->skip($ftype);
+          }
+          break;
+        case 2:
+          if ($ftype == TType::STRUCT) {
+            $this->sie = new commsuite_SessionInvalidException();
+            $xfer += $this->sie->read($input);
+          } else {
+            $xfer += $input->skip($ftype);
+          }
+          break;
+        default:
+          $xfer += $input->skip($ftype);
+          break;
+      }
+      $xfer += $input->readFieldEnd();
+    }
+    $xfer += $input->readStructEnd();
+    return $xfer;
+  }
+
+  public function write($output) {
+    $xfer = 0;
+    $xfer += $output->writeStructBegin('CommSuite_contentDelete_result');
     if ($this->nae !== null) {
-      $xfer += $output->writeFieldBegin('nae', TType::STRUCT, 2);
+      $xfer += $output->writeFieldBegin('nae', TType::STRUCT, 1);
+      $xfer += $this->nae->write($output);
+      $xfer += $output->writeFieldEnd();
+    }
+    if ($this->sie !== null) {
+      $xfer += $output->writeFieldBegin('sie', TType::STRUCT, 2);
+      $xfer += $this->sie->write($output);
+      $xfer += $output->writeFieldEnd();
+    }
+    $xfer += $output->writeFieldStop();
+    $xfer += $output->writeStructEnd();
+    return $xfer;
+  }
+
+}
+
+class commsuite_CommSuite_contentDeleteForCustomerId_args {
+  static $_TSPEC;
+
+  public $customerid = null;
+  public $contentid = null;
+
+  public function __construct($vals=null) {
+    if (!isset(self::$_TSPEC)) {
+      self::$_TSPEC = array(
+        1 => array(
+          'var' => 'customerid',
+          'type' => TType::I32,
+          ),
+        2 => array(
+          'var' => 'contentid',
+          'type' => TType::I64,
+          ),
+        );
+    }
+    if (is_array($vals)) {
+      if (isset($vals['customerid'])) {
+        $this->customerid = $vals['customerid'];
+      }
+      if (isset($vals['contentid'])) {
+        $this->contentid = $vals['contentid'];
+      }
+    }
+  }
+
+  public function getName() {
+    return 'CommSuite_contentDeleteForCustomerId_args';
+  }
+
+  public function read($input)
+  {
+    $xfer = 0;
+    $fname = null;
+    $ftype = 0;
+    $fid = 0;
+    $xfer += $input->readStructBegin($fname);
+    while (true)
+    {
+      $xfer += $input->readFieldBegin($fname, $ftype, $fid);
+      if ($ftype == TType::STOP) {
+        break;
+      }
+      switch ($fid)
+      {
+        case 1:
+          if ($ftype == TType::I32) {
+            $xfer += $input->readI32($this->customerid);
+          } else {
+            $xfer += $input->skip($ftype);
+          }
+          break;
+        case 2:
+          if ($ftype == TType::I64) {
+            $xfer += $input->readI64($this->contentid);
+          } else {
+            $xfer += $input->skip($ftype);
+          }
+          break;
+        default:
+          $xfer += $input->skip($ftype);
+          break;
+      }
+      $xfer += $input->readFieldEnd();
+    }
+    $xfer += $input->readStructEnd();
+    return $xfer;
+  }
+
+  public function write($output) {
+    $xfer = 0;
+    $xfer += $output->writeStructBegin('CommSuite_contentDeleteForCustomerId_args');
+    if ($this->customerid !== null) {
+      $xfer += $output->writeFieldBegin('customerid', TType::I32, 1);
+      $xfer += $output->writeI32($this->customerid);
+      $xfer += $output->writeFieldEnd();
+    }
+    if ($this->contentid !== null) {
+      $xfer += $output->writeFieldBegin('contentid', TType::I64, 2);
+      $xfer += $output->writeI64($this->contentid);
+      $xfer += $output->writeFieldEnd();
+    }
+    $xfer += $output->writeFieldStop();
+    $xfer += $output->writeStructEnd();
+    return $xfer;
+  }
+
+}
+
+class commsuite_CommSuite_contentDeleteForCustomerId_result {
+  static $_TSPEC;
+
+  public $nae = null;
+
+  public function __construct($vals=null) {
+    if (!isset(self::$_TSPEC)) {
+      self::$_TSPEC = array(
+        1 => array(
+          'var' => 'nae',
+          'type' => TType::STRUCT,
+          'class' => 'commsuite_NotAvailableException',
+          ),
+        );
+    }
+    if (is_array($vals)) {
+      if (isset($vals['nae'])) {
+        $this->nae = $vals['nae'];
+      }
+    }
+  }
+
+  public function getName() {
+    return 'CommSuite_contentDeleteForCustomerId_result';
+  }
+
+  public function read($input)
+  {
+    $xfer = 0;
+    $fname = null;
+    $ftype = 0;
+    $fid = 0;
+    $xfer += $input->readStructBegin($fname);
+    while (true)
+    {
+      $xfer += $input->readFieldBegin($fname, $ftype, $fid);
+      if ($ftype == TType::STOP) {
+        break;
+      }
+      switch ($fid)
+      {
+        case 1:
+          if ($ftype == TType::STRUCT) {
+            $this->nae = new commsuite_NotAvailableException();
+            $xfer += $this->nae->read($input);
+          } else {
+            $xfer += $input->skip($ftype);
+          }
+          break;
+        default:
+          $xfer += $input->skip($ftype);
+          break;
+      }
+      $xfer += $input->readFieldEnd();
+    }
+    $xfer += $input->readStructEnd();
+    return $xfer;
+  }
+
+  public function write($output) {
+    $xfer = 0;
+    $xfer += $output->writeStructBegin('CommSuite_contentDeleteForCustomerId_result');
+    if ($this->nae !== null) {
+      $xfer += $output->writeFieldBegin('nae', TType::STRUCT, 1);
       $xfer += $this->nae->write($output);
       $xfer += $output->writeFieldEnd();
     }
