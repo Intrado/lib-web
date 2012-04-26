@@ -665,7 +665,7 @@ endWindow();
 		});
 
 		function rulewidget_add_rule(event) {
-			$('<?=$form->name?>_ruledata').value = event.memo.ruledata.toJSON();
+			$('<?=$form->name?>_ruledata').value = Object.toJSON(event.memo.ruledata); 
 			form_submit(event, 'addrule');
 		}
 

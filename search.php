@@ -116,7 +116,7 @@ require_once("nav.inc.php");
 		<? Validator::load_validators(array("ValSections", "ValRules")); ?>
 
 		function rulewidget_add_rule(event) {
-			$('listsearch_ruledata').value = event.memo.ruledata.toJSON();
+			$('listsearch_ruledata').value = Object.toJSON(event.memo.ruledata);
 			form_submit(event, 'addrule');
 		}
 
