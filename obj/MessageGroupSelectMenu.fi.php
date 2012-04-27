@@ -34,6 +34,7 @@ class MessageGroupSelectMenu extends FormItem {
 				getMessageGroupPreviewGrid($("'.$n.'").value, $("'.$n.'_preview"), '.$jobtypeid.');
 				Event.fire($("'.$this->form->name.'"), "MessageGroup:Change", $("'.$n.'").value);
 			});
+			getMessageGroupPreviewGrid($("'.$n.'").value, $("'.$n.'_preview"), '.$jobtypeid.');
 		';
 		
 		if (isset($this->args["jobtypeidtarget"])) {
