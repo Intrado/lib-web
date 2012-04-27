@@ -97,27 +97,33 @@ if (count($fields) > 0) {
 if ($dopreview) {
 
 ?>
-<table>
-	<tr><td>
-	<div align="center">
-
-	<OBJECT ID="MediaPlayer" WIDTH=320 HEIGHT=42
-	CLASSID="CLSID:22D6F312-B0F6-11D0-94AB-0080C74C7E95"
-	STANDBY="Loading Windows Media Player components..."
-	TYPE="application/x-oleobject">
-
-	<PARAM NAME="FileName" VALUE="preview.wav.php/mediaplayer_preview.wav?id=<?= $messageid ?><?= $previewdata ?>&customerid=<?=$_SESSION['previewmessage_customerid']?>">
-	<param name="controller" value="true">
-	<EMBED SRC="preview.wav.php/embed_preview.wav?id=<?= $messageid ?><?= $previewdata ?>&customerid=<?=$_SESSION['previewmessage_customerid']?>" AUTOSTART="TRUE"></EMBED>
-	</OBJECT>
-
-
-	<br><a href="preview.wav.php/download_preview.wav?id=<?= $messageid ?>&download=true<?= $previewdata ?>&customerid=<?=$_SESSION['previewmessage_customerid']?>">Click here to download</a>
-	</div>
-	</td></tr>
-</table>
+<!DOCTYPE html>
+<html>
+<head></head>
+<body>
+	<table>
+		<tr><td>
+		<div align="center">
+	
+		<OBJECT ID="MediaPlayer" WIDTH=320 HEIGHT=42
+		CLASSID="CLSID:22D6F312-B0F6-11D0-94AB-0080C74C7E95"
+		STANDBY="Loading Windows Media Player components..."
+		TYPE="application/x-oleobject">
+	
+		<PARAM NAME="FileName" VALUE="preview.wav.php/mediaplayer_preview.wav?id=<?= $messageid ?><?= $previewdata ?>&customerid=<?=$_SESSION['previewmessage_customerid']?>">
+		<param name="controller" value="true">
+		<EMBED SRC="preview.wav.php/embed_preview.wav?id=<?= $messageid ?><?= $previewdata ?>&customerid=<?=$_SESSION['previewmessage_customerid']?>" AUTOSTART="TRUE" />
+		</OBJECT>
+	
+	
+		<br><a href="preview.wav.php/download_preview.wav?id=<?= $messageid ?>&download=true<?= $previewdata ?>&customerid=<?=$_SESSION['previewmessage_customerid']?>">Click here to download</a>
+		</div>
+		</td></tr>
+	</table>
 <?
 } else if($questionnaireid){
 	echo "This is a survey job";
 }
 ?>
+</body>
+</html>
