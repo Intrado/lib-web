@@ -64,7 +64,7 @@ tinydomain[]="4mes.gs"
 tinydomain[]="4msg.es"
 
 [content]
-tts="10.25.25.232,8080,/ttsserver/tts"
+tts="10.25.25.232,8080,/tts/ttsserver"
 
 [servermanagement]
 manageservers=true
