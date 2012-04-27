@@ -678,7 +678,7 @@ if ($fbtokenexpires) {
 		$DESCRIPTION .= "<img src=\"img/bug_important.gif\"> ". _L("Your Facebook authorization has expired!") .
 			'<a href="account.php#facebookauth">  click to renew</a>';
 	} else if ($timeleft < 59*24*60*60) {
-		$DESCRIPTION .= "<img src=\"img/bug_important.gif\"> ". _L("Your Facebook authorization will expire on: %s...", date("M, jS", $fbtokenexpires)).
+		$DESCRIPTION .= "<img src=\"img/bug_important.gif\"> ". _L("Your Facebook authorization will expire on: %s...", date("F jS", $fbtokenexpires)).
 			'<a href="account.php#facebookauth">  click to renew</a>';
 	}
 }
