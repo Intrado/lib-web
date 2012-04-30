@@ -595,5 +595,24 @@ ALTER TABLE `portaluser`
   DROP `salt`,
   DROP `passwordversion`;
 
-  
-  
+-- customer product association
+CREATE TABLE `customerproduct` (
+`customerid` INT NOT NULL ,
+`product` ENUM( 'cs', 'tai' ) NOT NULL ,
+`createdtimestamp` INT NOT NULL COMMENT 'when product was added',
+`modifiedtimestamp` INT NOT NULL ,
+`enabled` TINYINT NOT NULL ,
+PRIMARY KEY ( `customerid` , `product` )
+) ENGINE = InnoDB;
+
+-- all existing customers of commsuite product
+INSERT INTO customerproduct
+    SELECT id, 'cs', unix_timestamp(), unix_timestamp(), enabled from customer;
+
+-- add local user id, note existing portaluser for contact manager do not have commsuite users so default=0 is fine
+ALTER TABLE `portalcustomer` 
+ADD `userid` INT NULL COMMENT 'local userid',
+DROP PRIMARY KEY ,
+ADD PRIMARY KEY ( `portaluserid` , `customerid` , `userid` )
+;
+
