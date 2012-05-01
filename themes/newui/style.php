@@ -60,12 +60,17 @@ a:hover { color: #26477d; }
 
 /*----- Content sections -----*/
 
-.content_wrap { position: relative; margin: 10px 0 0 0; padding: 15px; }
+.content_wrap { position: relative; max-width: 1200px; margin: 0 auto; margin-top: 10px; padding: 15px; }
 .sectitle { width: 100%; }
 .secbutton { position: absolute; top: -62px; right: 15px; }
 .sectimeline { display: none; }
 
 .pagetitle { font-family: Verdana, Arial, sans-serif; margin: 0.5em 0; color: #333; text-shadow: 0 1px 0 #fff; }
+
+.messagescreen { float: left; display: inline; }
+.messageside { float: left; display: inline; background: rgba(255,255,255,0.2); width: 300px; margin: 0 0 0 20px; padding: 6px 12px; border: 1px solid #D6CEC2; border-radius: 5px; }
+.messageside p { font-size: 14px; }
+.messageside a { color: #0088CC; }
 
 
 /*----- Notification button -----*/

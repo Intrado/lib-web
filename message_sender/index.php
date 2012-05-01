@@ -362,6 +362,12 @@ require_once("obj/Validator.obj.php");
 
 </div><!-- end window messagescreen-->
 
+
+<div class="messageside">
+	<h2>Need Help?</h2>
+	<p>Visit the <a href="/">help section</a> or call (800) 920-3897. Also be sure to <a href="/">give us feedback</a> about the new version.</p>
+</div><!-- end messageside-->
+
 <script src="script/jquery.1.7.2.min.js"></script>
 <script src="script/bootstrap-modal.js"></script>
 <script src="themes/newui/message_sender.js"></script>
