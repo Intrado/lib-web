@@ -10,6 +10,7 @@ require_once("inc/utils.inc.php");
 require_once("obj/Validator.obj.php");
 require_once("obj/Form.obj.php");
 require_once("obj/FormItem.obj.php");
+require_once('inc/appserver.inc.php');
 require_once('inc/content.inc.php');
 require_once("obj/Content.obj.php");
 require_once("obj/Message.obj.php");
