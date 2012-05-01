@@ -3,6 +3,7 @@
 // Includes
 ////////////////////////////////////////////////////////////////////////////////
 require_once("obj/Validator.obj.php");
+
 ?>
 
 
@@ -25,17 +26,17 @@ require_once("obj/Validator.obj.php");
 	<form>
 	
 	<fieldset>
-	<label for="form_subject">Subject</label>
+	<label for="msgsndr_form_subject">Subject</label>
 		<div class="controls">
-		<input type="text" id="form_subject" name="subject"/>
+		<input type="text" id="msgsndr_form_subject" name="subject"/>
 		<p>e.g. "PTA Meeting Reminder"</p>
 		</div>
 	</fieldset>
 	
 	<fieldset class="cf">
-		<label for="form_type">Type</label>
+		<label for="msgsndr_form_type">Type</label>
 		<div class="controls">
-		<select id="form_type" name="type">
+		<select id="msgsndr_form_type" name="type">
 			<option value="general">General Announcement</option>
 			<option value="attend">Attendance</option>
 			<option value="emergency">Emergency</option>
@@ -48,12 +49,12 @@ require_once("obj/Validator.obj.php");
 	
 	<div class="add_recipients">	
 		<div class="add_btn">
-		<a class="btn" href="#choose_list" data-toggle="modal">Pick from Existing Lists</a>
+		<a class="btn" href="#msgsndr_choose_list" data-toggle="modal">Pick from Existing Lists</a>
 		or
-		<a class="btn" href="#build_list" data-toggle="modal">Build a List Using Rules</a>
+		<a class="btn" href="#msgsndr_build_list" data-toggle="modal">Build a List Using Rules</a>
 		</div>
 		
-		<div id="choose_list" class="modal hide">
+		<div id="msgsndr_choose_list" class="modal hide">
 			<h3>Add existing list <a href="#" class="close" data-dismiss="modal">x</a></h3>
 			<ul>
 				<li><input type="checkbox"/><label>Grandparents</label></li>
@@ -64,7 +65,7 @@ require_once("obj/Validator.obj.php");
 			<div class="msg_confirm"><a class="btn" href="#" data-dismiss="modal">Cancel</a> <a class="btn btn_confirm" href="#">Add Lists</a></div>
 		</div>
 		
-		<div id="build_list" class="modal hide">
+		<div id="msgsndr_build_list" class="modal hide">
 			<h3>Add Recipients Using Rules <a href="#" class="close" data-dismiss="modal">x</a></h3>
 			<p>Use filters to match a group of entries in your Address Book</p>
 			<div class="msg_confirm"><a class="btn" href="#" data-dismiss="modal">Cancel</a> <a class="btn btn_confirm" href="#">Add Lists</a></div>
@@ -102,7 +103,7 @@ require_once("obj/Validator.obj.php");
 		</table>
 	
 		<form class="cf">
-		<input class="addme" type="checkbox" id="form_myself"/><label class="addme" for="form_myself">Add Myself</label>
+		<input class="addme" type="checkbox" id="msgsndr_form_myself"/><label class="addme" for="msgsndr_form_myself">Add Myself</label>
 		</form>
 	</div><!-- end add_recipients -->
 	
@@ -114,7 +115,7 @@ require_once("obj/Validator.obj.php");
 	<div id="msg_section_2" class="window_panel">
 	<p>Create the content for this message, or <a href="#saved_message" data-toggle="modal">load a saved message</a></p>
 	
-		<div id="saved_message" class="modal hide">
+		<div id="msgsndr_saved_message" class="modal hide">
 			<h3>Load a Saved Message <a href="#" class="close" data-dismiss="modal">x</a></h3>
 			<div class="modal_content">
 			<input type="text"/><input class="btn" type="submit" value="Search"/>
@@ -148,7 +149,7 @@ require_once("obj/Validator.obj.php");
 					</tr>
 					<tr>
 					<td>Star Wars Day Fancy Dress</td>
-					<td>19/3/12</td>
+					<td>04/05/12</td>
 					<td></td>
 					<td>y</td>
 					<td>y</td>
@@ -161,35 +162,35 @@ require_once("obj/Validator.obj.php");
 		</div>
 		
 	<ul class="msg_content_nav cf">
-	<li><a id="ctrl_phone" href="#"><span class="icon"></span> Add <span>Phone</span></a></li>
-	<li><a id="ctrl_email" href="#"><span class="icon"></span> Add <span>Email</span></a></li>
-	<li><a id="ctrl_sms" href="#"><span class="icon"></span> Add <span>SMS</span></a></li>
-	<li><a id="ctrl_social" href="#"><span class="icon"></span> Add <span>Social</span></a></li>
+	<li><a id="msgsndr_ctrl_phone" href="#"><span class="icon"></span> Add <span>Phone</span></a></li>
+	<li><a id="msgsndr_ctrl_email" href="#"><span class="icon"></span> Add <span>Email</span></a></li>
+	<li><a id="msgsndr_ctrl_sms" href="#"><span class="icon"></span> Add <span>SMS</span></a></li>
+	<li><a id="msgsndr_ctrl_social" href="#"><span class="icon"></span> Add <span>Social</span></a></li>
 	</ul>
 	
 	<div class="tab_content">
 		<!-- Add the phone panel -->
-		<div id="tab_phone" class="tab_panel">
+		<div id="msgsndr_tab_phone" class="tab_panel">
 		<form>
 		<fieldset class="check">
-			<label for="form_type">Switch Audio Type</label>
+			<label for="msgsndr_form_type">Switch Audio Type</label>
 			<div class="controls">
 			<a class="btn audioleft" href="#">Call Me to Record</a><a class="btn audioright" href="#">Text-to-Speech</a>
 			</div>
 		</fieldset>
 		
 		<fieldset>
-			<label for="form_number">Number to Call</label>
+			<label for="msgsndr_form_number">Number to Call</label>
 			<div class="controls">
-			<input class="small" type="text" id="form_number" name="form_number"/>
+			<input class="small" type="text" id="msgsndr_form_number" name="msgsndr_form_number"/>
 			<a class="btn record" href="#"><span class="icon"></span> Call Now to Record</a>
 			</div>
 		</fieldset>
 		
 		<fieldset>
-			<label for="form_scratch">Scratch Pad <span>(optional)</span></label>
+			<label for="msgsndr_form_scratch">Scratch Pad <span>(optional)</span></label>
 			<div class="controls">
-			<textarea id="form_scratch" name="form_scratch"></textarea>
+			<textarea id="msgsndr_form_scratch" name="msgsndr_form_scratch"></textarea>
 			<p>You can use this to write notes about what you'd like to say. This information isn't saved anywhere.</p>
 			</div>
 		</fieldset>
@@ -201,18 +202,18 @@ require_once("obj/Validator.obj.php");
 		</fieldset>
 		
 		<fieldset>
-			<label for="form_callid">Caller ID</label>
+			<label for="msgsndr_form_callid">Caller ID</label>
 			<div class="controls">
-			<select id="form_callid" name="type">
+			<select id="msgsndr_form_callid" name="type">
 			<option value="general">(651) 323-2003</option>
 			</select>
 			</div>
 		</fieldset>
 		
 		<fieldset>
-			<label for="form_days">Days to Run</label>
+			<label for="msgsndr_form_days">Days to Run</label>
 			<div class="controls">
-			<select id="form_days" name="type">
+			<select id="msgsndr_form_days" name="type">
 			<option value="1">1</option>
 			<option value="2">2</option>
 			<option value="3">3</option>
@@ -240,39 +241,39 @@ require_once("obj/Validator.obj.php");
 		</div>
 		
 		<!-- Add the email panel -->
-		<div id="tab_email" class="tab_panel">
+		<div id="msgsndr_tab_email" class="tab_panel">
 		<form>
 		<fieldset>
-			<label for="form_name">From Name</label>
+			<label for="msgsndr_form_name">From Name</label>
 			<div class="controls">
-			<input type="text" id="form_name" name="from_name"/>
+			<input type="text" id="msgsndr_form_name" name="from_name"/>
 			</div>
 		</fieldset>
 		
 		<fieldset>
-			<label for="form_email">From Email</label>
+			<label for="msgsndr_form_email">From Email</label>
 			<div class="controls">
-			<input type="text" id="form_email" name="from_email"/>
+			<input type="text" id="msgsndr_form_email" name="from_email"/>
 			</div>
 		</fieldset>
 		
 		<fieldset>
-			<label for="form_mailsubject">Subject</label>
+			<label for="msgsndr_form_mailsubject">Subject</label>
 			<div class="controls">
-			<input type="text" id="form_mailsubject" name="form_mailsubject"/>
+			<input type="text" id="msgsndr_form_mailsubject" name="msgsndr_form_mailsubject"/>
 			</div>
 		</fieldset>
 		
 		<fieldset>
-			<label for="form_body">Body</label>
+			<label for="msgsndr_form_body">Body</label>
 			<div class="controls">
-			<textarea id="form_body" name="form_body"></textarea>
+			<textarea id="msgsndr_form_body" name="msgsndr_form_body"></textarea>
 			</div>
 		</fieldset>
 		
 		<fieldset>
-			<label for="form_translate">Translate</label>
-			<input type="checkbox" id="form_translate" value=""/>
+			<label for="msgsndr_form_translate">Translate</label>
+			<input type="checkbox" id="msgsndr_form_translate" value=""/>
 			<a href="">Show Translations</a>
 		</fieldset>
 		
@@ -286,12 +287,12 @@ require_once("obj/Validator.obj.php");
 		</div>
 		
 		<!-- Add the sms panel -->
-		<div id="tab_sms" class="tab_panel">
+		<div id="msgsndr_tab_sms" class="tab_panel">
 		<form>
 		<fieldset>
-			<label for="form_sms">SMS Text</label>
+			<label for="msgsndr_form_sms">SMS Text</label>
 			<div class="controls">
-			<textarea id="form_sms" name="form_sms"></textarea>
+			<textarea id="msgsndr_form_sms" name="msgsndr_form_sms"></textarea>
 			<p><a href="#">Spell Check</a> <span>160 Characters left</span></p>
 			</div>
 		</fieldset>
@@ -306,33 +307,33 @@ require_once("obj/Validator.obj.php");
 		</div>
 		
 		<!-- Add the social network panel -->
-		<div id="tab_social" class="tab_panel">
+		<div id="msgsndr_tab_social" class="tab_panel">
 		<form>
 		<fieldset class="check">
 			<div class="controls">
-			<input class="addme" type="checkbox" id="form_audio" name="form_audio" />
-			<label class="addme" for="form_audio">Include a link to the audio message</label>
+			<input class="addme" type="checkbox" id="msgsndr_form_audio" name="msgsndr_form_audio" />
+			<label class="addme" for="msgsndr_form_audio">Include a link to the audio message</label>
 			</div>
 		</fieldset>
 		
 		<fieldset class="check">
 			<div class="controls">
-			<input class="addme" type="checkbox" id="form_facebook" name="form_facebook" />
-			<label class="addme" for="form_facebook"><strong>Post to Facebook</strong></label>
+			<input class="addme" type="checkbox" id="msgsndr_form_facebook" name="msgsndr_form_facebook" />
+			<label class="addme" for="msgsndr_form_facebook"><strong>Post to Facebook</strong></label>
 			</div>
 		</fieldset>
 		
 		<fieldset class="check">
 			<div class="controls">
-			<input class="addme" type="checkbox" id="form_twitter" name="form_twitter" />
-			<label class="addme" for="form_twitter"><strong>Post to Twitter</strong></label>
+			<input class="addme" type="checkbox" id="msgsndr_form_twitter" name="msgsndr_form_twitter" />
+			<label class="addme" for="msgsndr_form_twitter"><strong>Post to Twitter</strong></label>
 			</div>
 		</fieldset>
 		
 		<fieldset class="checklast">
 			<div class="controls">
-			<input class="addme" type="checkbox" id="form_feed" name="form_feed" />
-			<label class="addme" for="form_feed"><strong>Post to Feeds</strong></label>
+			<input class="addme" type="checkbox" id="msgsndr_form_feed" name="msgsndr_form_feed" />
+			<label class="addme" for="msgsndr_form_feed"><strong>Post to Feeds</strong></label>
 			</div>
 		</fieldset>
 		
@@ -367,6 +368,6 @@ require_once("obj/Validator.obj.php");
 
 <!-- Optional Load Custom Form Validators --> 
 <script type="text/javascript">
-<? Validator::load_validators(array()); ?>
+<? Validator::load_validators(array('ValRequired')); ?>
 </script>
 

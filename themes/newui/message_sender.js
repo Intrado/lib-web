@@ -17,7 +17,6 @@ jQuery.noConflict();
 		$('#tab1').live("click", function(){
 			$('ul.msg_steps').children().removeClass();
 			$('#tab1').parent().addClass("active");
-			
 			$('#msg_section_1').show();
 			$('#msg_section_2','#msg_section_3').hide();
 			return false;
@@ -44,63 +43,63 @@ jQuery.noConflict();
 			});
 		
 		// hide the +Add ... content for the message content section 
-		$('#tab_phone').hide();
-		$('#tab_email').hide();
-		$('#tab_sms').hide();
-		$('#tab_social').hide();
+		$('#msgsndr_tab_phone').hide();
+		$('#msgsndr_tab_email').hide();
+		$('#msgsndr_tab_sms').hide();
+		$('#msgsndr_tab_social').hide();
 		
 		// Add phone tab
-		$('#ctrl_phone').live("click", function(){
+		$('#msgsndr_ctrl_phone').live("click", function(){
 			$('ul.msg_content_nav').children().removeClass();
-			$('#ctrl_phone').parent().addClass("active");
-			$('#tab_email').hide();
-			$('#tab_sms').hide();
-			$('#tab_social').hide();
-			$('#tab_phone').show();
+			$('#msgsndr_ctrl_phone').parent().addClass("active");
+			$('#msgsndr_tab_email').hide();
+			$('#msgsndr_tab_sms').hide();
+			$('#msgsndr_tab_social').hide();
+			$('#msgsndr_tab_phone').show();
 			return false;
 		});
 		
 		// Add email tab
-		$('#ctrl_email').live("click", function(){
+		$('#msgsndr_ctrl_email').live("click", function(){
 			$('ul.msg_content_nav').children().removeClass();
-			$('#ctrl_email').parent().addClass("active");
-			$('#tab_phone').hide();
-			$('#tab_sms').hide();
-			$('#tab_social').hide();
-			$('#tab_email').show();
+			$('#msgsndr_ctrl_email').parent().addClass("active");
+			$('#msgsndr_tab_phone').hide();
+			$('#msgsndr_tab_sms').hide();
+			$('#msgsndr_tab_social').hide();
+			$('#msgsndr_tab_email').show();
 			return false;
 		});
 		
 		// Add sms tab
-		$('#ctrl_sms').live("click", function(){
+		$('#msgsndr_ctrl_sms').live("click", function(){
 			$('ul.msg_content_nav').children().removeClass();
-			$('#ctrl_sms').parent().addClass("active");
-			$('#tab_phone').hide();
-			$('#tab_email').hide();
-			$('#tab_social').hide();
-			$('#tab_sms').show();
+			$('#msgsndr_ctrl_sms').parent().addClass("active");
+			$('#msgsndr_tab_phone').hide();
+			$('#msgsndr_tab_email').hide();
+			$('#msgsndr_tab_social').hide();
+			$('#msgsndr_tab_sms').show();
 			return false;
 		});
 		
 		// Add social tab
-		$('#ctrl_social').live("click", function() {
+		$('#msgsndr_ctrl_social').live("click", function() {
 			$('ul.msg_content_nav').children().removeClass();
-			$('#ctrl_social').parent().addClass("active");
-			$('#tab_phone').hide();
-			$('#tab_email').hide();
-			$('#tab_sms').hide();
-			$('#tab_social').show();
+			$('#msgsndr_ctrl_social').parent().addClass("active");
+			$('#msgsndr_tab_phone').hide();
+			$('#msgsndr_tab_email').hide();
+			$('#msgsndr_tab_sms').hide();
+			$('#msgsndr_tab_social').show();
 			return false;
 		});
 	
 		// modal windows -- script/bootstrap-modal.js
-		$('#choose_list').modal({
+		$('#msgsndr_choose_list').modal({
 			show: false
 			})		
-		$('#build_list').modal({
+		$('#msgsndr_build_list').modal({
 			show: false
 			})	
-		$('#saved_message').modal({
+		$('#msgsndr_saved_message').modal({
 			show: false
 			})	
 		});
