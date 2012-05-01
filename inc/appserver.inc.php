@@ -609,6 +609,7 @@ function commsuite_contentDelete ($contentid) {
 			$appserverCommsuiteTransport->open();
 			
 			$client->contentDelete(session_id(), $contentid);
+			return true;
 		} catch (commsuite_SessionInvalidException $e) {
 			error_log("contentDelete: Invalid Sessionid");
 			return false;

@@ -101,7 +101,7 @@ if(isset($_GET['deleteplayed']) && $_GET['deleteplayed']){
 	Query("BEGIN");
 		foreach($voicereplies as $voicereply){
 			$content = new Content($voicereply->contentid);
-			contentDelete($vr->contentid);
+			contentDelete($voicereply->contentid);
 			$voicereply->destroy();
 		}
 	Query("COMMIT");
