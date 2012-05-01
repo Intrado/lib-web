@@ -1,3 +1,12 @@
+<?
+////////////////////////////////////////////////////////////////////////////////
+// Includes
+////////////////////////////////////////////////////////////////////////////////
+require_once("obj/Validator.obj.php");
+?>
+
+
+
 <div class="window messagescreen cf">
 
 	<div class="window_title_wrap">
@@ -27,9 +36,9 @@
 		<label for="form_type">Type</label>
 		<div class="controls">
 		<select id="form_type" name="type">
-		<option value="general">General Announcement</option>
-		<option value="attend">Attendance</option>
-		<option value="emergency">Emergency</option>
+			<option value="general">General Announcement</option>
+			<option value="attend">Attendance</option>
+			<option value="emergency">Emergency</option>
 		</select>
 		</div>
 	</fieldset>
@@ -47,10 +56,10 @@
 		<div id="choose_list" class="modal hide">
 			<h3>Add existing list <a href="#" class="close" data-dismiss="modal">x</a></h3>
 			<ul>
-			<li><input type="checkbox"/><label>Grandparents</label></li>
-			<li><input type="checkbox"/><label>First Year Students</label></li>
-			<li><input type="checkbox"/><label>Second Year Students</label></li>
-			<li><input type="checkbox"/><label>Teachers</label></li>
+				<li><input type="checkbox"/><label>Grandparents</label></li>
+				<li><input type="checkbox"/><label>First Year Students</label></li>
+				<li><input type="checkbox"/><label>Second Year Students</label></li>
+				<li><input type="checkbox"/><label>Teachers</label></li>
 			</ul>
 			<div class="msg_confirm"><a class="btn" href="#" data-dismiss="modal">Cancel</a> <a class="btn btn_confirm" href="#">Add Lists</a></div>
 		</div>
@@ -354,105 +363,10 @@
 
 <script src="script/jquery.1.7.2.min.js"></script>
 <script src="script/bootstrap-modal.js"></script>
+<script src="themes/newui/message_sender.js"></script>
+
+<!-- Optional Load Custom Form Validators --> 
 <script type="text/javascript">
-jQuery.noConflict();
-(function($) { 
-  $(function() {
-		$(document).ready(function() {
-			
-		$('#msg_section_2').hide();
-		$('#msg_section_3').hide();
-		$('#tab1').parent().addClass("active");
-	
-		$('#tab1').click(function(){
-			$('ul.msg_steps').children().removeClass();
-			$('#tab1').parent().addClass("active");
-			
-			$('#msg_section_1').show();
-			$('#msg_section_2').hide();
-			$('#msg_section_3').hide();
-			return false;
-			});
-	
-		$('#tab2').click(function(){
-			$('ul.msg_steps').children().removeClass();
-			$('#tab2').parent().addClass("active");
-			
-			$('#msg_section_1').hide();
-			$('#msg_section_2').show();
-			$('#msg_section_3').hide();
-			return false;
-			});
-	
-		$('#tab3').click(function(){
-			$('ul.msg_steps').children().removeClass();
-			$('#tab3').parent().addClass("active");
-			
-			$('#msg_section_1').hide();
-			$('#msg_section_2').hide();
-			$('#msg_section_3').show();
-			return false;
-			});
-	
-		$('#tab_phone').hide();
-		$('#tab_email').hide();
-		$('#tab_sms').hide();
-		$('#tab_social').hide();
-	
-		$('#ctrl_phone').click(function(){
-			$('ul.msg_content_nav').children().removeClass();
-			$('#ctrl_phone').parent().addClass("active");
-			$('#tab_phone').show();
-			$('#tab_email').hide();
-			$('#tab_sms').hide();
-			$('#tab_social').hide();
-			return false;
-		});
-	
-		$('#ctrl_email').click(function(){
-			$('ul.msg_content_nav').children().removeClass();
-			$('#ctrl_email').parent().addClass("active");
-			$('#tab_phone').hide();
-			$('#tab_email').show();
-			$('#tab_sms').hide();
-			$('#tab_social').hide();
-			return false;
-		});
-	
-		$('#ctrl_sms').click(function(){
-			$('ul.msg_content_nav').children().removeClass();
-			$('#ctrl_sms').parent().addClass("active");
-			$('#tab_phone').hide();
-			$('#tab_email').hide();
-			$('#tab_sms').show();
-			$('#tab_social').hide();
-			return false;
-		});
-	
-		$('#ctrl_social').click(function(){
-			$('ul.msg_content_nav').children().removeClass();
-			$('#ctrl_social').parent().addClass("active");
-			$('#tab_phone').hide();
-			$('#tab_email').hide();
-			$('#tab_sms').hide();
-			$('#tab_social').show();
-			return false;
-		});
-	
-		$('#choose_list').modal({
-			show: false
-			})
-
-		$('#build_list').modal({
-			show: false
-			})
-
-		$('#saved_message').modal({
-			show: false
-			})
-		
-		});
-  });
-}) (jQuery);
+<? Validator::load_validators(array()); ?>
 </script>
 
