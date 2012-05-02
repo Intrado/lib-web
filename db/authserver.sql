@@ -573,7 +573,7 @@ CREATE TABLE `portaluseridentification` (
 `portaluserid` INT NOT NULL ,
 `type` ENUM( 'local', 'facebook', 'twitter', 'google', 'yahoo' ) NOT NULL ,
 `username` VARCHAR( 255 ) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL ,
-`secret` VARCHAR( 120 ) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL ,
+`secret` VARCHAR( 120 ) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT '',
 `createdtimestamp` INT NOT NULL ,
 `modifiedtimestamp` INT NOT NULL ,
 PRIMARY KEY ( `portaluserid` , `type` )
