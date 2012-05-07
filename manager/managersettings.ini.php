@@ -26,6 +26,14 @@ user="root"
 pass=""
 db="disk"
 
+;db for aspcalls
+[aspcalls]
+host="localhost"
+user=rppt
+pass=
+db=aspcalls
+callstable=aspcalls2
+
 ;diskserver to query active agent status
 [diskserver]
 host="localhost:8082"
@@ -46,6 +54,7 @@ has_ssl=true
 force_ssl=true
 should_grant_local=false
 query_trace=true
+autologoutminutes=60
 
 ; server to redirect customer link to
 customer_url_prefix=https://localhost

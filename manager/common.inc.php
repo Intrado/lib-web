@@ -59,4 +59,28 @@ if(!isset($isasplogin)){
 	$_SESSION['expiretime'] = time() + 60*$autologoutminutes; //30 minutes
 }
 
+
+function SetUpASPDB(){
+    global $SETTINGS, $ASPCALLSDBCONN;
+
+    $ASPCALLSDBCONN = mysql_connect($SETTINGS['aspcalls']['host'],$SETTINGS['aspcalls']['user'],$SETTINGS['aspcalls']['pass']);
+    mysql_select_db($SETTINGS['aspcalls']['db']);
+    return $ASPCALLSDBCONN;
+}
+
+function QueryAll($query, $conn) {
+
+	$res = mysql_query($query, $conn);
+	if (!$res) {
+		echo mysql_error();
+		return false;
+	}
+	$data = array();
+	while ($row = mysql_fetch_row($res)) {
+		$data[] = $row;
+	}
+	return $data;
+}
+
+
 ?>

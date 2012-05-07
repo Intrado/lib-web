@@ -124,7 +124,9 @@ $advancedroles = array(
 	"bouncedemailsearch" => "Bounced email search",
 	"passwordcheck" => "Check for bad/similar passwords",
 	"emergencyjobs" => "List of Recent Emergency Jobs",
-	"tollfreenumbers" => "Add Toll Free Numbers"
+	"tollfreenumbers" => "Add Toll Free Numbers",
+	"aspcallgraphs" => "View ASP Graphs",
+	"logcollector" => "Run Log Collector"
 );
 
 $superroles = array(
