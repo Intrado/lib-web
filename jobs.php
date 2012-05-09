@@ -83,7 +83,7 @@ if (isset($_GET['unarchive'])) {
 	redirectToReferrer();
 }
 
-if (isset($_GET['runrepeating'])) {
+if (isset($_GET['runrepeating']) && isset($_GET['uuid'])) {
 	$runnow = $_GET['runrepeating'] + 0;
 	// don't re-run a repeating job from the same link
 	if (isset($_SESSION['lastrunrepeatingjob'][$runnow]) && $_GET['uuid'] == $_SESSION['lastrunrepeatingjob'][$runnow]) {
