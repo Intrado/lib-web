@@ -1,16 +1,24 @@
 <?
 //Used only in portal
-include_once("common.inc.php");
+require_once("common.inc.php");
 
-include_once('../inc/securityhelper.inc.php');
-include_once('../inc/content.inc.php');
-include_once("../obj/Content.obj.php");
-include_once("../obj/Message.obj.php");
-include_once("../obj/MessagePart.obj.php");
-include_once("../obj/AudioFile.obj.php");
-include_once("../obj/Voice.obj.php");
-include_once("../obj/FieldMap.obj.php");
+require_once('../inc/securityhelper.inc.php');
+require_once('../inc/content.inc.php');
+require_once("../obj/Content.obj.php");
+require_once("../obj/Message.obj.php");
+require_once("../obj/MessagePart.obj.php");
+require_once("../obj/AudioFile.obj.php");
+require_once("../obj/Voice.obj.php");
+require_once("../obj/FieldMap.obj.php");
 require_once("../inc/reportutils.inc.php");
+require_once("../inc/appserver.inc.php");
+
+require_once('../thrift/Thrift.php');
+require_once $GLOBALS['THRIFT_ROOT'].'/protocol/TBinaryProtocol.php';
+require_once $GLOBALS['THRIFT_ROOT'].'/transport/TSocket.php';
+require_once $GLOBALS['THRIFT_ROOT'].'/transport/TBufferedTransport.php';
+require_once $GLOBALS['THRIFT_ROOT'].'/transport/TFramedTransport.php';
+require_once($GLOBALS['THRIFT_ROOT'].'/packages/commsuite/CommSuite.php');
 
 session_write_close();//WARNING: we don't keep a lock on the session file, any changes to session data are ignored past this point
 
