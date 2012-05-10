@@ -1928,3 +1928,30 @@ $$$
 update setting set value='8.3/6' where name='_dbversion'
 $$$
 -- END 8.3/6
+
+ALTER TABLE user 
+    ADD globaluserid int DEFAULT NULL,
+    ADD personid int DEFAULT NULL
+$$$
+ 
+CREATE TABLE `role` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `userid` int(11) NOT NULL,
+  `profileid` int(11) NOT NULL,
+  `organizationid` int(11) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8
+$$$
+ 
+ALTER TABLE `organization` 
+    ADD `parentorganizationid` INT NULL AFTER `id`,
+    ADD `createdtimestamp` INT DEFAULT NULL ,
+    ADD `modifiedtimestamp` INT DEFAULT NULL
+$$$
+ 
+ALTER TABLE `setting` ADD `organizationid` INT NULL AFTER `id`
+$$$
+
+update setting set value='8.3/7' where name='_dbversion'
+$$$
+-- END 8.3/7
