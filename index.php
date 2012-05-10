@@ -102,7 +102,7 @@ if ($userid && $userid != -1) {
 		}
 		loadDisplaySettings();
 		
-		$redirpage = isset($_GET['last']) ? $_GET['last'] : 'start.php';
+		$redirpage = isset($_POST['last']) ? $_POST['last'] : 'start.php';
 		redirect($redirpage);
 	}
 }
@@ -115,8 +115,8 @@ include_once("logintop.inc.php");
 
 
 ?>
-	<form action="index.php<?= (isset($_GET['last']) ? "?last=" . $_GET['last'] : '') ?>" method="POST">
-
+	<form action="index.php" method="POST">
+		<input type="hidden" name="last" id="lasturl" value="<?= (isset($_GET['last']) ? "?last=" . $_GET['last'] : '') ?>" />
 <? if ($custname) { ?>
 
 		<noscript><p><?=_L("It looks like you don't have JavaScript enabled! You must have JavaScript enabled for full use of this system. Please enable JavaScript in your browser or contact your system administrator for assistance.")?></p></noscript>

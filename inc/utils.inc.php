@@ -53,8 +53,17 @@ function redirectToReferrer($fallbackUrl = NULL) {
 	if (!$fallbackUrl) {
 		$fallbackUrl = $_SERVER['SCRIPT_NAME'];
 	}
-
-	header('Location: ' . ($_SERVER['HTTP_REFERER'] ? $_SERVER['HTTP_REFERER'] : $fallbackUrl) );
+	if ($_SERVER['HTTP_REFERER']) {
+		if (strpos($_SERVER['HTTP_REFERER'], "index.php") === false) {
+			$url = $_SERVER['HTTP_REFERER'];
+		} else {
+			$url = "index.php";
+		}
+	} else {
+		$url = $fallbackUrl;
+	}
+	
+	header('Location: ' . $url );
 	exit();
 }
 
