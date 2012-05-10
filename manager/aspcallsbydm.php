@@ -1,10 +1,8 @@
 <?
 
 require_once("common.inc.php");
-
 include ("../jpgraph/jpgraph.php");
 include ("../jpgraph/jpgraph_bar.php");
-
 if(!$MANAGERUSER->authorized("aspcallgraphs"))
 	exit("Not Authorized");
 
@@ -12,7 +10,6 @@ $startdate = isset($_GET['startdate']) ? $_GET['startdate'] : date("Y-m-d", time
 $enddate = isset($_GET['enddate']) ? $_GET['enddate'] : date("Y-m-d");
 
 $table =  $SETTINGS['aspcalls']['callstable'];
-
 $query = "
 select (select dm from dms where dms.id=dmid) as dm,
 sum(result='answered') as answered,
@@ -31,7 +28,6 @@ group by dmid
 
 $conn = SetupASPDB();
 $qdata = QueryAll($query, $conn);
-
 $data = array();
 $titles = array();
 $x = 0;

@@ -1,15 +1,12 @@
 <?
 
 require_once("common.inc.php");
-
 include ("../jpgraph/jpgraph.php");
 include ("../jpgraph/jpgraph_bar.php");
-
 if(!$MANAGERUSER->authorized("aspcallgraphs"))
 	exit("Not Authorized");
 
 $table = $SETTINGS[aspcalls][callstable];
-
 $query = "
 select hour(startdate),
 sum(result='answered') as answered,
@@ -29,7 +26,6 @@ group by hour(startdate)
 
 $conn = SetupASPDB();
 $qdata = QueryAll($query, $conn);
-
 $data = array();
 $titles = array();
 $x = 0;

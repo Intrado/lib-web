@@ -1,9 +1,7 @@
 <?
 require_once("common.inc.php");
-
 if(!$MANAGERUSER->authorized("aspcallgraphs"))
 	exit("Not Authorized");
-
 ?>
 <form method="GET" >
 

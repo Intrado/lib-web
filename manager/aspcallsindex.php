@@ -1,9 +1,7 @@
 <?
 require_once("common.inc.php");
-
 if(!$MANAGERUSER->authorizedAny(array("aspcallgraphs", "logcollector")))
 	exit("Not Authorized");
-
 ?>
 
 <? if($MANAGERUSER->authorized("aspcallgraphs")) { ?>

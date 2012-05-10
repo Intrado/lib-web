@@ -1,11 +1,9 @@
 <?
 
 require_once("common.inc.php");
-
 include ("../jpgraph/jpgraph.php");
 include ("../jpgraph/jpgraph_line.php");
 include ("../jpgraph/jpgraph_log.php"); 
-
 if(!$MANAGERUSER->authorized("aspcallgraphs"))
 	exit("Not authorized");
 
@@ -17,8 +15,9 @@ $enddate = isset($_GET['enddate']) ? $_GET['enddate'] : date("Y-m-d");
 $dm = isset($_GET['dm']) ? $_GET['dm'] : ""; 
 
 $dmid = false;
+$conn = SetupASPDB();
 if ($dm) {
-	$res = mysql_query("select id from dms where dm='". mysql_real_escape_string($dm) . "'");
+	$res = mysql_query("select id from dms where dm='". mysql_real_escape_string($dm) . "'", $conn);
 	while ($row = mysql_fetch_row($res)) {
 		$dmid = $row[0];
 	}
@@ -29,7 +28,6 @@ $days = (strtotime($enddate) - strtotime($startdate))/(60*60*24);
 $dmfiltersql = $dmid ? "and dmid='".mysql_real_escape_string($dmid)."'" : "";
 
 $table = $SETTINGS['aspcalls']['callstable']; 
-
 $query = "
 select round(minute(startdate) + hour(startdate) *60) as minofday,
 sum(result='answered') as answered,
@@ -48,12 +46,8 @@ $dmfiltersql
 group by minofday
 ";
 
-$conn = SetupASPDB();
 $qdata = QueryAll($query, $conn);
-
 $data = array();
-
-
 $titles = array();
 foreach ($qdata as $row) {
 	$data["A"][$row[0]] = $row[1] / $days;

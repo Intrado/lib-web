@@ -1,9 +1,7 @@
 <?
 require_once("common.inc.php");
-
 if(!$MANAGERUSER->authorized("logcollector"))
 	exit("Not Authorized");
-
 $conn = SetupASPDB();
 
 if (isset($_GET['run'])) {

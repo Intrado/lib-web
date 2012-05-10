@@ -1,10 +1,8 @@
 <?
 
 require_once("common.inc.php");
-
 include ("../jpgraph/jpgraph.php");
 include ("../jpgraph/jpgraph_bar.php");
-
 if(!$MANAGEUSER->authorized("aspcallgraphs"))
 	exit("Not Authorized");
 
@@ -16,7 +14,6 @@ group by year, month
 
 $conn = SetupASPDB();
 $qdata = QueryAll($query, $conn);
-
 $data = array();
 $titles = array();
 $x = 0;

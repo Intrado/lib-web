@@ -1,15 +1,12 @@
 <?
 
 require_once("common.inc.php");
-
 include ("../jpgraph/jpgraph.php");
 include ("../jpgraph/jpgraph_bar.php");
-
 if(!$MANAGERUSER->authorized("aspcallgraphs"))
 	exit("Not Authorized");
 
 $table = $SETTINGS['aspcalls']['callstable'];
-
 $query = "
 select left(startdate,10) as day,
 sum(result='answered') as answered,
@@ -30,7 +27,6 @@ group by day
 
 $conn = SetupASPDB();
 $qdata = QueryAll($query, $conn);
-
 $data = array();
 $titles = array();
 $x = 0;
