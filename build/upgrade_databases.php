@@ -50,6 +50,15 @@ $versions = array (
 $targetversion = $versions[count($versions)-1];
 list($targetversion, $targetrev) = explode("/",$targetversion);
 
+$tai_versions = array (
+	"0.1/0", //this is the assumed version when no _dbtaiversion exists. it is special
+	"0.1/1"
+//etc
+);
+
+$tai_targetversion = $tai_versions[count($tai_versions)-1];
+list($tai_targetversion, $tai_targetrev) = explode("/",$tai_targetversion);
+
 $usage = "
 Description:
 This script will upgrade customers or entire shards databases
@@ -158,6 +167,11 @@ if ($mode == 'csimport') {
 		$_dbcon = $db = $shards[$customer['shardid']];
 		QuickUpdate("use c_$customerid",$db);
 		update_customer($db, $customerid, $customer['shardid']);
+		
+		$hastai = QuickQuery("select 1 from setting where name='_hastai' and value=1",$db);
+		if ($hastai) {
+			update_taicustomer($db, $customerid, $customer['shardid']);
+		}
 	}
 }
 
@@ -288,6 +302,94 @@ function update_customer($db, $customerid, $shardid) {
 	QuickUpdate("delete from setting where name='_dbupgrade_inprogress'",$db);
 	Query("commit",$db);
 	
+	echo "\n";
+}
+
+
+function update_taicustomer($db, $customerid, $shardid) {
+	global $tai_versions;
+	global $tai_targetversion;
+	global $tai_targetrev;
+	global $updater;
+
+	Query("begin",$db);
+
+	$version = QuickQuery("select value from setting where name='_dbtaiversion' for update",$db);
+	if ($version == null)
+	$version = "0.1/0"; //assume last known version with no _dbversion support
+
+	list($version, $rev) = explode("/",$version);
+
+	if ($version === $tai_targetversion && $rev == $tai_targetrev) {
+		Query("commit",$db);
+		echo "already up to date, skipping\n";
+		return;
+	}
+
+	//only allow one instance of the updater per customer to run at a time
+	//try to insert our updater code, it should either error out due to duplicate key, or return 1
+	//indicating 1 row was modified.
+	if (QuickUpdate("insert into setting (name,value) values ('_dbtaiupgrade_inprogress','$updater')",$db)) {
+		Query("commit",$db);
+		Query("begin",$db);
+	} else {
+		Query("rollback",$db);
+		echo "an upgrade is already in process, skipping\n";
+		return;
+	}
+
+
+	// require the necessary version upgrade scripts
+	require_once("taiupgrades/db_0-1.php");
+
+	// for each version, upgrade to the next
+	$foundstartingversion = false;
+	foreach ($tai_versions as $vr) {
+		list($tai_targetversion, $tai_targetrev) = explode("/",$vr); //WARNING: $tai_targetversion and $tai_targetrev are used outside of for loop
+		// skip past versions, find our current version to start the upgrade
+		if (!$foundstartingversion && $version != $tai_targetversion)
+		continue;
+			
+		if ($version == $tai_targetversion && $rev <= $tai_targetrev)
+		$foundstartingversion = true;
+
+		//check to see that we are already on the latest rev, then skip upgrading current version, go to next version
+		if ($version == $tai_targetversion && $rev == $tai_targetrev)
+		continue;
+
+		echo "upgrading tai from $version/$rev to $tai_targetversion/$tai_targetrev\n";
+
+
+		/* if we are looking at same major version, check for revs
+		 * otherwise skip to next target version and start at rev zero (since we obviously moved major versions)
+		* in either case we run the targetversion upgrade script, difference is same version we use current rev,
+		* different version we set rev to zero (to indicate that upgrade should take it to rev1)
+		*/
+
+		if ($version != $tai_targetversion)
+		$rev = 0;
+			
+		switch ($tai_targetversion) {
+			case "0.1":
+				if (!tai_upgrade_0_1($rev, $shardid, $customerid, $db)) {
+					exit("Error upgrading DB");
+				}
+				break;
+		}
+
+		$version = $tai_targetversion;
+		$rev = $tai_targetrev;
+	}
+
+	if ($foundstartingversion !== false) {
+		// upgrade success
+		QuickUpdate("insert into setting (name,value) values ('_dbtaiversion','$tai_targetversion/$tai_targetrev') on duplicate key update value=values(value)", $db);
+	} else {
+		//TODO ERROR !!!! running ancient upgrade_databases on newer db? didnt find current version
+	}
+	QuickUpdate("delete from setting where name='_dbtaiupgrade_inprogress'",$db);
+	Query("commit",$db);
+
 	echo "\n";
 }
 
