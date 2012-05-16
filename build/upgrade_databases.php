@@ -163,12 +163,12 @@ if ($mode == 'csimport') {
 		$customers[$row['id']] = $row;
 		
 	foreach ($customers as  $customerid => $customer) {
-		echo "doing $customerid ";
+		echo "doing $customerid \n";
 		$_dbcon = $db = $shards[$customer['shardid']];
 		QuickUpdate("use c_$customerid",$db);
 		update_customer($db, $customerid, $customer['shardid']);
 		
-		$hastai = QuickQuery("select 1 from setting where name='_hastai' and value=1",$db);
+		$hastai = QuickQuery("select 1 from customerproduct where customerid=? and product='tai' and enabled=1",$authdb,array($customerid));
 		if ($hastai) {
 			update_taicustomer($db, $customerid, $customer['shardid']);
 		}
@@ -192,7 +192,7 @@ function update_customer($db, $customerid, $shardid) {
 	
 	if ($version === $targetversion && $rev == $targetrev) {
 		Query("commit",$db);
-		echo "already up to date, skipping\n";
+		echo "already up to date, skipping commsuite upgrade\n";
 		return;
 	}
 	
@@ -234,7 +234,7 @@ function update_customer($db, $customerid, $shardid) {
 		if ($version == $targetversion && $rev == $targetrev)
 			continue;
 
-		echo "upgrading from $version/$rev to $targetversion/$targetrev\n";
+		echo "upgrading commsuite from $version/$rev to $targetversion/$targetrev\n";
 		
 		
 		/* if we are looking at same major version, check for revs
@@ -322,7 +322,7 @@ function update_taicustomer($db, $customerid, $shardid) {
 
 	if ($version === $tai_targetversion && $rev == $tai_targetrev) {
 		Query("commit",$db);
-		echo "already up to date, skipping\n";
+		echo "already up to date, skipping tai upgrade\n";
 		return;
 	}
 
