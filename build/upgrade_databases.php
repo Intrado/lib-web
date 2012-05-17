@@ -50,8 +50,7 @@ $versions = array (
 	),
 	
 	"tai" => array (
-		"0.1/0", //this is the assumed version when no _dbtaiversion exists. it is special
-		"0.1/1"
+		"0.1/2"
 		//etc
 	)
 	
@@ -149,7 +148,7 @@ foreach ($customers as  $customerid => $customer) {
 
 	foreach ($versions as $product => $productversions) {
 
-		$targetversion = $productversions[count($versions)-1];
+		$targetversion = $productversions[count($productversions)-1];
 		list($targetversion, $targetrev) = explode("/",$targetversion);
 		
 		switch ($product) {
@@ -213,7 +212,7 @@ function update_customer($db, $customerid, $shardid) {
 	
 	// for each version, upgrade to the next
 	$foundstartingversion = false;
-	foreach ($versions as $vr) {
+	foreach ($versions["cs"] as $vr) {
 		list($targetversion, $targetrev) = explode("/",$vr); //WARNING: $targetversion and $targetrev are used outside of for loop
 		// skip past versions, find our current version to start the upgrade
 		if (!$foundstartingversion && $version != $targetversion)
@@ -299,9 +298,9 @@ function update_customer($db, $customerid, $shardid) {
 
 
 function update_taicustomer($db, $customerid, $shardid) {
-	global $tai_versions;
-	global $tai_targetversion;
-	global $tai_targetrev;
+	global $versions;
+	global $targetversion;
+	global $targetrev;
 	global $updater;
 
 	Query("begin",$db);
@@ -312,7 +311,7 @@ function update_taicustomer($db, $customerid, $shardid) {
 
 	list($version, $rev) = explode("/",$version);
 
-	if ($version === $tai_targetversion && $rev == $tai_targetrev) {
+	if ($version === $targetversion && $rev == $targetrev) {
 		Query("commit",$db);
 		echo "already up to date, skipping tai upgrade\n";
 		return;
@@ -336,46 +335,46 @@ function update_taicustomer($db, $customerid, $shardid) {
 
 	// for each version, upgrade to the next
 	$foundstartingversion = false;
-	foreach ($tai_versions as $vr) {
-		list($tai_targetversion, $tai_targetrev) = explode("/",$vr); //WARNING: $tai_targetversion and $tai_targetrev are used outside of for loop
+	foreach ($versions["tai"] as $vr) {
+		list($targetversion, $targetrev) = explode("/",$vr); //WARNING: $targetversion and $targetrev are used outside of for loop
 		// skip past versions, find our current version to start the upgrade
-		if (!$foundstartingversion && $version != $tai_targetversion)
-		continue;
+		if (!$foundstartingversion && $version != $targetversion)
+			continue;
 			
-		if ($version == $tai_targetversion && $rev <= $tai_targetrev)
-		$foundstartingversion = true;
-
+		if ($version == $targetversion && $rev <= $targetrev)
+			$foundstartingversion = true;
+		
 		//check to see that we are already on the latest rev, then skip upgrading current version, go to next version
-		if ($version == $tai_targetversion && $rev == $tai_targetrev)
-		continue;
-
-		echo "upgrading tai from $version/$rev to $tai_targetversion/$tai_targetrev\n";
-
-
+		if ($version == $targetversion && $rev == $targetrev)
+			continue;
+		
+		echo "upgrading tai from $version/$rev to $targetversion/$targetrev\n";
+		
+		
 		/* if we are looking at same major version, check for revs
 		 * otherwise skip to next target version and start at rev zero (since we obviously moved major versions)
 		* in either case we run the targetversion upgrade script, difference is same version we use current rev,
 		* different version we set rev to zero (to indicate that upgrade should take it to rev1)
 		*/
-
-		if ($version != $tai_targetversion)
-		$rev = 0;
+		
+		if ($version != $targetversion)
+			$rev = 0;
 			
-		switch ($tai_targetversion) {
+		switch ($targetversion) {
 			case "0.1":
 				if (!tai_upgrade_0_1($rev, $shardid, $customerid, $db)) {
-					exit("Error upgrading DB");
+					exit("Error upgrading DB; Shard: $shardid, Customer: $customerid, Rev: " . $rev);
 				}
 				break;
 		}
 
-		$version = $tai_targetversion;
-		$rev = $tai_targetrev;
+		$version = $targetversion;
+		$rev = $targetrev;
 	}
 
 	if ($foundstartingversion !== false) {
 		// upgrade success
-		QuickUpdate("insert into setting (name,value) values ('_dbtaiversion','$tai_targetversion/$tai_targetrev') on duplicate key update value=values(value)", $db);
+		QuickUpdate("insert into setting (name,value) values ('_dbtaiversion','$targetversion/$targetrev') on duplicate key update value=values(value)", $db);
 	} else {
 		//TODO ERROR !!!! running ancient upgrade_databases on newer db? didnt find current version
 	}

@@ -99,3 +99,17 @@ CREATE TABLE `tai_news` (
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8
 $$$
 
+-- $rev 2
+
+CREATE TABLE `tai_cannedresponses` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `topicid` int(11) NOT NULL,
+  `title` varchar(50) NOT NULL,
+  `description` varchar(255) NOT NULL,
+  `modifiedtimestamp` int(11) NOT NULL,
+  `body` text NOT NULL,
+  `enabled` TINYINT NOT NULL DEFAULT '1',
+  `deleted` TINYINT NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
+$$$
