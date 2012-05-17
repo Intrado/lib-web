@@ -74,7 +74,7 @@ a:hover { color: #005580; text-decoration: underline; }
 h1, h2, h3, h4, h5, h6 { font-family: "Helvetica Neue",helvetica,Arial,sans-serif; color: #333333; font-weight: bold; margin: 0; text-rendering: optimizelegibility; }
 h2 { font-size: 24px; line-height: 44px; }
 h3 { line-height: 33px; }
-h4 { font-size: 12px; line-height: 22px; color: #235563; }
+h4 { font-size: 12px; line-height: 22px; color: #235563; text-shadow: 0 1px 0 #fff; }
 
 .container { position: relative; max-width: 75em; margin: 0 auto; }
 .wrapper { position: relative; margin: 0 250px 0 0; }
@@ -166,6 +166,7 @@ border-top: 1px solid #bbb; border-right: 1px solid #bbb; border-bottom: 1px sol
 
 .summary section { background: #DFEFF3; padding: 20px 0; border: 1px solid #93C9D9; -webkit-border-radius: 0 0 5px 5px; border-radius: 0 0 5px 5px; }
 .summary .col { float: left; display: inline; width: 23%; margin: 0 0 0 1%; padding: 7px 14px; text-align: center; }
+.summary strong { font-size: 52px; }
 .summary .bloc { background: #fff; height: 125px; text-align: left; border: 1px solid #93C9D9; -webkit-border-radius: 5px; border-radius: 5px; }
 
 .broadcasts header { padding: 5px 22px; border: 1px solid #222; -webkit-border-radius: 5px 5px 0 0; border-radius: 5px 5px 0 0;
