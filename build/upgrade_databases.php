@@ -34,30 +34,28 @@ if (!$authhost || !$authuser || !$authpass)
 //list supported versons here in order of upgrade
 //format is major.minor.point/revision
 //rev is mainly for internal dev where we may have already deployed that version, but made some changes (rev starts at 1)
+
 $versions = array (
-	"7.1.5/0",	//this is the assumed version when no _dbversion exists. it is special
-	"7.5/14",
-	"7.6/1",	//rev 1 is always the first complete revision (not zero)
-	"7.7/6",
-	"7.8/7",
-	"8.0/6",
-	"8.1/11",
-	"8.2/12",
-	"8.3/7"
-	//etc
+	"cs" => array (
+		"7.1.5/0",	//this is the assumed version when no _dbversion exists. it is special
+		"7.5/14",
+		"7.6/1",	//rev 1 is always the first complete revision (not zero)
+		"7.7/6",
+		"7.8/7",
+		"8.0/6",
+		"8.1/11",
+		"8.2/12",
+		"8.3/7"
+		//etc
+	),
+	
+	"tai" => array (
+		"0.1/0", //this is the assumed version when no _dbtaiversion exists. it is special
+		"0.1/1"
+		//etc
+	)
+	
 );
-
-$targetversion = $versions[count($versions)-1];
-list($targetversion, $targetrev) = explode("/",$targetversion);
-
-$tai_versions = array (
-	"0.1/0", //this is the assumed version when no _dbtaiversion exists. it is special
-	"0.1/1"
-//etc
-);
-
-$tai_targetversion = $tai_versions[count($tai_versions)-1];
-list($tai_targetversion, $tai_targetrev) = explode("/",$tai_targetversion);
 
 $usage = "
 Description:
@@ -71,7 +69,6 @@ php upgrade_database.php -i
 -a : run on everything
 -s : shard mode, specific shards
 -c : customer mode, specific customers
--i : commsuite import mode, upgrade 7.1.5 commsuite-flex migration to 7.5 on 'csimport' database
 ";
 
 $opts = array();
@@ -90,9 +87,6 @@ foreach ($argv as $arg) {
 					break;
 				case "c":
 					$mode = "customer";
-					break;
-				case "i":
-					$mode = "csimport";
 					break;
 				default:
 					echo "Unknown option " . $arg[$x] . "\n";
@@ -123,54 +117,52 @@ require_once("../inc/DBRelationMap.php");
 $updater = mt_rand();
 echo "Updater id: $updater\n";
 
-// if $mode == 'csimport' skip the authserver/shard/customer lookup and simply connect to 'csimport' database
-if ($mode == 'csimport') {
-	
-	//connect to csimport db
-	echo "connecting to csimport db\n";
-	$authdb = DBConnect($authhost,$authuser,$authpass,"csimport");
-	
-	$_dbcon = $db = $authdb;
-	QuickUpdate("use csimport",$db);
-	
-	// customerid=0, shardid=0 just dummy placeholders that are not really used
-	update_customer($db, 0, 0);
-	
-	// set systemmessages in time order
-	QuickUpdate("update systemmessages set modifydate = now() + interval id second", $db);
-} else {
-	//connect to authserver db
-	echo "connecting to authserver db\n";
-	$authdb = DBConnect($authhost,$authuser,$authpass,"authserver");
-	
-	$res = Query("select id,dbhost,dbusername,dbpassword from shard", $authdb)
-		or exit(mysql_error());
-	$shards = array();
-	while ($row = DBGetRow($res, true))
-		$shards[$row['id']] = DBConnect($row['dbhost'],$row['dbusername'],$row['dbpassword'], "aspshard")
-			or exit(mysql_error());
 
-	switch ($mode) {
-		case "all": $optsql = ""; break;
-		case "customer": $optsql = "and id in (" . implode(",",$ids) . ")"; break;
-		case "shard": $optsql = "and shardid in (" . implode(",",$ids) . ")"; break;
-	}
+//connect to authserver db
+echo "connecting to authserver db\n";
+$authdb = DBConnect($authhost,$authuser,$authpass,"authserver");
 
-	$res = Query("select id, shardid, urlcomponent, dbusername, dbpassword from customer where 1 $optsql order by id", $authdb)
+$res = Query("select id,dbhost,dbusername,dbpassword from shard", $authdb)
+	or exit(mysql_error());
+$shards = array();
+while ($row = DBGetRow($res, true))
+	$shards[$row['id']] = DBConnect($row['dbhost'],$row['dbusername'],$row['dbpassword'], "aspshard")
 		or exit(mysql_error());
-	$customers = array();
-	while ($row = DBGetRow($res, true))
-		$customers[$row['id']] = $row;
+
+switch ($mode) {
+	case "all": $optsql = ""; break;
+	case "customer": $optsql = "and id in (" . implode(",",$ids) . ")"; break;
+	case "shard": $optsql = "and shardid in (" . implode(",",$ids) . ")"; break;
+}
+
+$res = Query("select id, shardid, urlcomponent, dbusername, dbpassword from customer where 1 $optsql order by id", $authdb)
+	or exit(mysql_error());
+$customers = array();
+while ($row = DBGetRow($res, true))
+	$customers[$row['id']] = $row;
+
+
+foreach ($customers as  $customerid => $customer) {
+	echo "doing $customerid \n";
+	$_dbcon = $db = $shards[$customer['shardid']];
+	QuickUpdate("use c_$customerid",$db);
+
+	foreach ($versions as $product => $productversions) {
+
+		$targetversion = $productversions[count($versions)-1];
+		list($targetversion, $targetrev) = explode("/",$targetversion);
 		
-	foreach ($customers as  $customerid => $customer) {
-		echo "doing $customerid \n";
-		$_dbcon = $db = $shards[$customer['shardid']];
-		QuickUpdate("use c_$customerid",$db);
-		update_customer($db, $customerid, $customer['shardid']);
-		
-		$hastai = QuickQuery("select 1 from customerproduct where customerid=? and product='tai' and enabled=1",$authdb,array($customerid));
-		if ($hastai) {
-			update_taicustomer($db, $customerid, $customer['shardid']);
+		switch ($product) {
+			case "cs" :
+				//technically we should check if they have commsuite, but this is always true right now
+				update_customer($db, $customerid, $customer['shardid']);
+				break;
+			case "tai":
+				$hastai = QuickQuery("select 1 from customerproduct where customerid=? and product='tai' and enabled=1",$authdb,array($customerid));
+				if ($hastai) {
+					update_taicustomer($db, $customerid, $customer['shardid']);
+				}
+				break;
 		}
 	}
 }
