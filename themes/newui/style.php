@@ -382,7 +382,7 @@ border-color: #222222 transparent transparent; border-style: solid; border-width
 .msg_content_nav li.active a span.icon { background: url(themes/newui/pencil.png) 0 center no-repeat; }
 
 .tab_content { margin: 0 0 20px 0; }
-.tab_panel { background: #fafafa; padding: 20px 15px 0 15px; border: 1px solid #ccc; border-radius: 8px; }
+.tab_panel form { border-radius: 8px; }
 
 .msg_confirm { background: #F9F8F6; margin: 0 -15px -22px -15px; padding: 22px 15px; text-align: right; border-radius: 0 0 5px 5px; border-top: 1px solid #DDDDDD; }
 
