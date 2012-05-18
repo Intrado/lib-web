@@ -420,7 +420,7 @@ table#addMeWindow input[type="checkbox"] { margin: 7px 0; }
 .window_panel form .addme { float: left; display: inline; text-align: left; width: inherit; }
 .window_panel form p { margin: 0; padding: 4px 0; color: #888; }
 .window_panel form .controls { margin: 0 0 0 150px; }
-.window_panel form .form_actions { background: #ededed; margin: 0 -15px -20px -15px; padding: 15px; border-radius: 0 0 8px 8px; }
+.window_panel form .form_actions { background: #ededed; margin: 0 0 -20px; padding: 15px; border-radius: 0 0 8px 8px; }
 
 
 /*---------- Media queries for form elements ----------*/
