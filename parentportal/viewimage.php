@@ -3,6 +3,15 @@ include_once("common.inc.php");
 include_once("../inc/content.inc.php");
 include_once("../inc/appserver.inc.php");
 include_once("../obj/Content.obj.php");
+require_once('../inc/appserver.inc.php');
+
+// load the thrift api requirements.
+require_once('thrift/Thrift.php');
+require_once $GLOBALS['THRIFT_ROOT'].'/protocol/TBinaryProtocol.php';
+require_once $GLOBALS['THRIFT_ROOT'].'/transport/TSocket.php';
+require_once $GLOBALS['THRIFT_ROOT'].'/transport/TBufferedTransport.php';
+require_once $GLOBALS['THRIFT_ROOT'].'/transport/TFramedTransport.php';
+require_once($GLOBALS['THRIFT_ROOT'].'/packages/commsuite/CommSuite.php');
 
 // required content id
 if (!isset($_GET['id']))
