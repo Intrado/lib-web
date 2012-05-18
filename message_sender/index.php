@@ -77,7 +77,7 @@ require_once("obj/Validator.obj.php");
 				<div class="msg_confirm"><a class="btn" href="#" data-dismiss="modal">Cancel</a> <a class="btn btn_confirm" href="#">Add Lists</a></div>
 			</div>
 		
-			<table class="recipient_lists">
+			<table class="info">
 				<thead>
 					<tr>
 						<th colspan="2">List Name</th>
