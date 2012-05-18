@@ -245,6 +245,7 @@ header('Content-type: text/html; charset=UTF-8') ;
 <!-- ********************************************************************* -->
 
 <div id="top_banner" class="banner cf">
+<div class="container">
 
 	<div class="banner_logo">
 		<? doLogo() ?>
@@ -265,7 +266,9 @@ header('Content-type: text/html; charset=UTF-8') ;
 			<li class="bl_right"></li>
 		</ul>
 	</div>
-</div> <!--  /#top_banner -->
+
+</div><!-- /container -->	
+</div><!--  end top_banner -->
 
 <script type="text/javascript">
 Event.observe(window, 'load', function() {
@@ -286,6 +289,7 @@ Event.observe(window, 'load', function() {
 </script>
 
 <div class="primary_nav cf">
+<div class="container">
 
 	<div class="navshortcut">
 	<? 	if ($USER->authorize("startshort")) { ?>
@@ -315,6 +319,7 @@ Event.observe(window, 'load', function() {
 	<?= $MAINTABS ?>
 	</ul>
 
+</div><!-- /container -->
 </div><!-- primary_nav -->
 
 
