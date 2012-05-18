@@ -3,7 +3,6 @@ include_once("common.inc.php");
 include_once("../inc/content.inc.php");
 include_once("../inc/appserver.inc.php");
 include_once("../obj/Content.obj.php");
-require_once('../inc/appserver.inc.php');
 
 // load the thrift api requirements.
 require_once('thrift/Thrift.php');
