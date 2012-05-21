@@ -9,6 +9,9 @@ header('Content-type: text/html; charset=UTF-8') ;
     
 	<link href='../css/css.inc.php' type='text/css' rel='stylesheet' media='screen'>
 	<link href='../css/login.css' type='text/css' rel='stylesheet' media='screen'>
+
+	<script src="../script/prototype.js" type="text/javascript" ></script>
+	<script src="../script/utils.js" type="text/javascript" ></script>
 </head>
 
 <?

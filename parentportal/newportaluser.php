@@ -178,13 +178,13 @@ if(!$success){
 			</fieldset>
 			
 			<fieldset>
-				<input type="checkbox" id="form_textme" name="notifysms" value="1" <?=$notifysms ? "checked" : "" ?> onclick="document.getElementById('smsbox').disabled=!this.checked"/>
+				<input type="checkbox" id="form_textme" name="notifysms" value="1" <?=$notifysms ? "checked" : "" ?> onclick="document.getElementById('form_phone').disabled=!this.checked"/>
 				<label for="form_textme" class="check">&nbsp;<?=_L("Text me when I have a new phone message.")?></label>
 			</fieldset>
 			
 			<fieldset>
 				<label for="form_phone"><?=_L("Mobile Phone for SMS Text")?>:</label>
-				<input type="text" id="form_phone" name="sms" id="smsbox" value="<?=Phone::format($sms)?>" size="20" maxlength="20" <?=$notifysms ? "" : "disabled=\"true\"" ?>/>
+				<input type="text" id="form_phone" name="sms" value="<?=Phone::format($sms)?>" size="20" maxlength="20" <?=$notifysms ? "" : "disabled=\"true\"" ?>/>
 			</fieldset>
 			
 			<fieldset>

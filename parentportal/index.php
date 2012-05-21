@@ -163,7 +163,7 @@ include_once("cmlogintop.inc.php");
 include("cmloginbottom.inc.php");
 ?>
 <script type="text/javascript">
-document.getElementById('logintext').focus();
+document.getElementById('form_email').focus();
 
 function capslockCheck(e){
 		var keypressed;
@@ -184,9 +184,9 @@ function capslockCheck(e){
 			}
 		}
 		if(((keypressed >= 65 && keypressed <= 90) && !shiftkey) || ((keypressed >= 97 && keypressed <= 122) && shiftkey)){
-			new getObj('capslockwarning').style.display = 'block';
+			$('capslockwarning').style.display = 'block';
 		} else
-			new getObj('capslockwarning').style.display = 'none';
+			$('capslockwarning').style.display = 'none';
 	}
 
 </script>
