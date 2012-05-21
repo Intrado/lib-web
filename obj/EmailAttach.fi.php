@@ -80,7 +80,7 @@ class EmailAttach extends FormItem {
 					uploadedfiles.insert(downloadlink).insert(sizeinfo).insert(removelink).insert("<br/>");				 		
 				}
 			
-				fieldelement.value = $H(values).toJSON();
+				fieldelement.value = Object.toJSON( $H(values) );
 				
 				if (errormessage) {
 					form_validation_display($(itemname), "blank", errormessage);
