@@ -15,16 +15,16 @@ require_once("obj/Validator.obj.php");
 	<div class="main_activity">
 
 	<div class="window newbroadcast">
-		<header>
+		<div class="window_title_wrap">
 		<h2>New Broadcast</h2>
 		<ul class="msg_steps cf">
 		<li><a id="tab1" class="" href=""><span class="icon">1</span> Subject &amp; Recipients</a></li>
 		<li><a id="tab2" class="" href=""><span class="icon">2</span> Message Content</a></li>
 		<li><a id="tab3" class="" href=""><span class="icon">3</span> Review &amp; Send</a></li>
 		</ul>
-		</header>
+		</div>
 		
-		<section>
+		<div class="window_body_wrap">
 		<div id="msg_section_1" class="window_panel">
 		
 		<h3 class="flag">Notification Info</h3>
@@ -365,7 +365,7 @@ require_once("obj/Validator.obj.php");
 		
 		<div class="msg_confirm"><a href="#">save for later</a> or <a class="btn btn_confirm" href="#">Send Message <span class="icon"></span></a></div>
 		</div><!-- end window_panel -->
-		</section>
+		</div><!-- /window_body_wrap -->
 		
 	</div><!-- endwindow newbroadcast -->
 	
