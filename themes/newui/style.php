@@ -43,7 +43,7 @@ q:before, q:after {
 	content: none;
 }
 table {
-	border-collapse: separate;
+	border-collapse: collapse;
 	border-spacing: 0;
 }
 
@@ -115,13 +115,15 @@ h4 { font-size: 12px; line-height: 22px; color: #235563; text-shadow: 0 1px 0 #f
 .navtabs li.navtab_active a { background: #f7f7f7; color: #222; text-shadow: 0 1px 0 #fff; border: 1px solid #2a4470; border-bottom: 1px solid #f7f7f7; }
 
 .subnavtabs { background: #f7f7f7; padding: 5px 0; border-bottom: 1px solid #b6b6b6; }
-.subnavtabs li { margin: 5px 0 5px 25px; }
+.subnavtabs li { position: relative; margin: 5px 10px; }
 .subnavtabs a { display: block; margin: 0; padding: 5px 11px; font-size: 14px; color: #26477d; 
 -webkit-border-radius: 5px; -moz-border-radius: 5px; border-radius: 5px; 
 -moz-background-clip: padding; -webkit-background-clip: padding-box; background-clip: padding-box; }
 .subnavtabs a:hover,
 .subnavtabs a:active,
 .subnavtabs .navtab_active a { background: #e2e2e2; color: #242424; text-decoration: none; }
+.subnavtabs .navtab_active:after { content: ''; position: absolute; bottom: -30px; left: 50%; margin-left: -10px; border-color: #f7f7f7 transparent transparent transparent; border-width: 10px; border-style: solid; }
+.subnavtabs .navtab_active:before { content: ''; position: absolute; bottom: -32px; left: 50%; margin-left: -11px; border-color: #B6B6B6 transparent transparent transparent; border-width: 11px; border-style: solid; }
 
 
 /*----- Content sections -----*/
@@ -141,7 +143,7 @@ h4 { font-size: 12px; line-height: 22px; color: #235563; text-shadow: 0 1px 0 #f
 
 /*----- Activity summary -----*/
 
-.summary header { position: relative; padding: 5px 22px; border: 1px solid #2A6576; -webkit-border-radius: 5px 5px 0 0; border-radius: 5px 5px 0 0;
+.window_title_wrap { position: relative; padding: 5px 22px; border: 1px solid #2A6576; -webkit-border-radius: 5px 5px 0 0; border-radius: 5px 5px 0 0;
 -webkit-box-shadow: inset 0px 1px 1px 0 rgba(255,255,255,0.5); box-shadow: inset 0px 1px 1px 0 rgba(255,255,255,0.5);
 	background-color: #3F90A9;
 	background-image: -webkit-gradient(linear, left top, left bottom, from(#48A3BE), to(#317589)); 
@@ -150,7 +152,8 @@ h4 { font-size: 12px; line-height: 22px; color: #235563; text-shadow: 0 1px 0 #f
   background-image:     -ms-linear-gradient(top, #48A3BE, #317589); 
   background-image:      -o-linear-gradient(top, #48A3BE, #317589); 
   background-image:         linear-gradient(top, #48A3BE, #317589); }
-.summary h2 { display: inline-block; color: #fff; text-shadow: 0 1px 1px rgba(0,0,0,0.7); }
+.window_title_wrap h2 { display: inline-block; color: #fff; text-shadow: 0 1px 1px rgba(0,0,0,0.7); }
+.window_title_wrap h3 { display: inline-block; color: #fff; text-shadow: 0 1px 1px rgba(0,0,0,0.7); }
 
 .btngroup { position: absolute; right: 22px; top: 13px; }
 .btngroup button { background: #f1f1f1; float: left; display: inline; color: #444; padding: 5px 8px; font-size: 13px; text-shadow: 0 1px 0 #fff; 
@@ -161,7 +164,7 @@ border-top: 1px solid #bbb; border-right: 1px solid #bbb; border-bottom: 1px sol
 .btngroup button:hover { background: #e7e7e7; }
 .btngroup button.active { background: #e4e4e4; -webkit-box-shadow: inset 0px 1px 4px 0 rgba(0,0,0,0.2); box-shadow: inset 0px 1px 4px 0 rgba(0,0,0,0.2); }
 
-.summary section { background: #DFEFF3; padding: 20px 0; border: 1px solid #93C9D9; -webkit-border-radius: 0 0 5px 5px; border-radius: 0 0 5px 5px; }
+.summary .window_body_wrap { background: #DFEFF3; padding: 20px 0; border: 1px solid #93C9D9; -webkit-border-radius: 0 0 5px 5px; border-radius: 0 0 5px 5px; }
 .summary .col { float: left; display: inline; width: 23%; margin: 0 0 0 1%; padding: 7px 14px; text-align: center; }
 .summary .col p { margin: 0; }
 .summary .col li { font-size: 14px; line-height: 22px; }
@@ -173,7 +176,7 @@ border-top: 1px solid #bbb; border-right: 1px solid #bbb; border-bottom: 1px sol
 
 /*----- Broadcasts -----*/
 
-.broadcasts header { padding: 5px 22px; border: 1px solid #222; -webkit-border-radius: 5px 5px 0 0; border-radius: 5px 5px 0 0;
+.broadcasts .window_title_wrap { padding: 5px 22px; border: 1px solid #222; -webkit-border-radius: 5px 5px 0 0; border-radius: 5px 5px 0 0;
 -webkit-box-shadow: inset 0px 1px 1px 0 rgba(255,255,255,0.5); box-shadow: inset 0px 1px 1px 0 rgba(255,255,255,0.5);
 	background-color: #363636;
 	background-image: -webkit-gradient(linear, left top, left bottom, from(#444), to(#222)); 
@@ -182,8 +185,8 @@ border-top: 1px solid #bbb; border-right: 1px solid #bbb; border-bottom: 1px sol
   background-image:     -ms-linear-gradient(top, #444, #222); 
   background-image:      -o-linear-gradient(top, #444, #222); 
   background-image:         linear-gradient(top, #444, #222); }
-.broadcasts h2 { display: inline-block; color: #fff; text-shadow: 0 1px 1px rgba(0,0,0,0.7); }
-.broadcasts section { background: #fff; padding: 15px 20px; border: 1px solid #eee; -webkit-border-radius: 0 0 5px 5px; border-radius: 0 0 5px 5px; }
+.broadcasts .window_title_wrap h2 { display: inline-block; color: #fff; text-shadow: 0 1px 1px rgba(0,0,0,0.7); }
+.broadcasts .window_body_wrap { background: #fff; padding: 15px 20px; border: 1px solid #eee; -webkit-border-radius: 0 0 5px 5px; border-radius: 0 0 5px 5px; }
 .broadcasts h3 span { font-weight: normal; color: #ccc; }
 
 
@@ -233,7 +236,7 @@ background-image: -webkit-gradient(linear, left top, left bottom, from(#F5F3F0),
 
 /*------ Message sender ----- */
 
-.newbroadcast header { padding: 0 22px 15px 22px; border: 1px solid #2A6576; -webkit-border-radius: 5px 5px 0 0; border-radius: 5px 5px 0 0;
+.newbroadcast .window_title_wrap { padding: 0 22px 15px 22px; border: 1px solid #2A6576; -webkit-border-radius: 5px 5px 0 0; border-radius: 5px 5px 0 0;
 -webkit-box-shadow: inset 0px 1px 1px 0 rgba(255,255,255,0.5); box-shadow: inset 0px 1px 1px 0 rgba(255,255,255,0.5); 
 	background-color: #3F90A9;
 	background-image: -webkit-gradient(linear, left top, left bottom, from(#48A3BE), to(#317589)); 
@@ -345,15 +348,13 @@ h3.flag { padding: 5px 22px; font-size: 18px; color: #fff; border: 1px solid #22
 
 /*----- Information tables -----*/
 
-table.info { background: #fff; width: 100%; margin: 0 0 20px 0; font-size: 14px; line-height: 36px; -webkit-border-radius: 5px; border-radius: 5px; }
+table.info { background: #fff; width: 100%; margin: 0 0 20px 0; font-size: 14px; line-height: 36px; }
 table.info th { background: #eee; padding: 0 8px; font-weight: bold; text-align: left; border-bottom: 1px solid #ccc; border-top: 1px solid #ccc; }
-table.info th:first-child { border-left: 1px solid #ccc; -webkit-border-radius: 5px 0 0 0; border-radius: 5px 0 0 0; }
-table.info th:last-child { border-right: 1px solid #ccc; -webkit-border-radius: 0 5px 0 0; border-radius: 0 5px 0 0; }
+table.info th:first-child { border-left: 1px solid #ccc; }
+table.info th:last-child { border-right: 1px solid #ccc; }
 table.info td { padding: 0 8px; border-bottom: 1px solid #ccc; }
 table.info td:first-child { border-left: 1px solid #ccc; }
 table.info td:last-child { border-right: 1px solid #ccc; }
-table.info tr:last-child td:first-child { -webkit-border-radius: 0 0 0 5px; border-radius: 0 0 0 5px; }
-table.info tr:last-child td:last-child { -webkit-border-radius: 0 0 5px 0; border-radius: 0 0 5px 0; }
 table.info tr:hover td { background: #f5fafb; color: #0064cd; cursor: pointer; }
 table.info a.removelist { background: url(themes/newui/removelist.png) left 0 no-repeat; display: inline-block; width: 18px; height: 18px; vertical-align: middle; }
 table.info a.savelist { background: url(themes/newui/savelist.png) left 0 no-repeat; display: inline-block; width: 18px; height: 18px; vertical-align: middle; }
@@ -389,7 +390,9 @@ border-color: #222222 transparent transparent; border-style: solid; border-width
 
 /*----- table overrides for list styles -----*/
 
-table.list { width: 100%; margin: 0; }
+table.list { background: #fff; width: 100%; margin: 0 0 20px 0; font-size: 14px; line-height: 36px; }
+table.list th { background: #eee; padding: 0 8px; font-weight: bold; text-align: left; border-bottom: 1px solid #ccc; border-top: 1px solid #ccc; }
+table.list td { padding: 0 8px; border-bottom: 1px solid #ccc; }
 
 .bottomBorder { border-bottom: 1px solid #ccc; }
 .windowRowHeader { color: #484848; width: 115px; }
