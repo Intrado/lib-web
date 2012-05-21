@@ -368,7 +368,7 @@ div.scrollTableContainer {
 /*----- action links - edit, copy etc used througout site -----*/
 
 ul.actionlinks { padding: 0; margin: 0; list-style-type: none; }
-ul.actionlinks li { float: left; display: inline; padding: 0 4px 0 0; border-right: 1px solid #aaa; }
+ul.actionlinks li { display: inline-block; padding: 0 4px 0 0; border-right: 1px solid #aaa; }
 ul.actionlinks li:last-child { border: none; }
 ul.actionlinks li a { display: block; font-size: 11px; line-height: 18px; border: 0px; cursor: pointer; color: #484848; }
 ul.actionlinks li a:hover { color: #000; }
@@ -380,7 +380,7 @@ ul.actionlinks li img { padding: 0 4px; }
 
 /*----- removed the padding and background colour set elsewhere -----*/
 
-table.list ul.actionlinks li { margin: 0 0 4px 0; padding: 0 4px 0 0; }
+table.list ul.actionlinks li { padding: 0 4px 0 0; }
 table.list ul.actionlinks li:nth-child(2n) { background: transparent; }
 
 
