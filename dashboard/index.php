@@ -12,7 +12,7 @@
 		</div>
 		
 		<div class="window summary">
-			<header>
+			<div class="window_title_wrap">
 			<h2>Activity Summary</h2>
 			<div class="btngroup">
 				<button class="active">7 Days</button>
@@ -20,9 +20,9 @@
 				<button>Year</button>
 				<button>Range</button>
 			</div>
-			</header>
+			</div>
 			
-			<section class="cf">
+			<div class="window_body_wrap cf">
 			<div class="col">
 				<h4>Broadcasts</h4>
 				<p><strong>231</strong></p>
@@ -59,13 +59,13 @@
 				<li><span>12</span> <a href="">Davey Jones</a></li>
 				</ul>
 			</div>
-			</section>
+			</div><!-- /window_body_wrap -->
 		</div>
 		
 		<div class="window broadcasts">
-			<header><h2>Broadcasts</h2></header>
+			<div class="window_title_wrap"><h2>Broadcasts</h2></div>
 			
-			<section>
+			<div class="window_body_wrap">
 			<h3>In Progress <span>(Sending Now)</span></h3>
 			<table class="info">
 				<thead>
@@ -155,7 +155,7 @@
 					</tr>
 				</tbody>
 			</table>
-			</section>
+			</div><!-- /window_body_wrap -->
 		</div>
 	</div><!-- end main_activity -->
 	
