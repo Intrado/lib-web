@@ -7,8 +7,8 @@ header('Content-type: text/html; charset=UTF-8') ;
 	<meta http-equiv="Content-type" value="text/html; charset=UTF-8" />
 	<title>Contact Manager<?=isset($TITLE) ? ": " . $TITLE : ""?></title>
     
-	<link href='css/css.inc.php' type='text/css' rel='stylesheet' media='screen'>
-	<link href='css/login.css.php' type='text/css' rel='stylesheet' media='screen'>
+	<link href='../css/css.inc.php' type='text/css' rel='stylesheet' media='screen'>
+	<link href='../css/login.css' type='text/css' rel='stylesheet' media='screen'>
 </head>
 
 <?
