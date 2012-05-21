@@ -322,13 +322,17 @@ Event.observe(window, 'load', function() {
 </div><!-- /container -->
 </div><!-- primary_nav -->
 
-
-<ul class="subnavtabs cf">
-	<?= $SUBTABS ?>
-</ul>
+<div class="subnavtabs">
+	<div class="container">
+		<ul class="cf">
+			<?= $SUBTABS ?>
+		</ul>
+	</div>
+</div>
 
 
 <div class="content_wrap cf"><!-- tag ends in footer -->
+<div class="container cf">
 
 	<?= $SYSTEMALERT ?>
 
