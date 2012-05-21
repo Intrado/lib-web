@@ -1,7 +1,9 @@
 
+</div><!-- end for container starts in nav.inc.php -->
 </div><!-- end for content_wrap starts in nav.inc.php -->
 
 <div id="footer" class="cf">
+<div class="container">
 
 <div id="termsinfo">
 Service &amp; Support:&nbsp;<a href="mailto:<?=$_SESSION['_supportemail']?>"><?=$_SESSION['_supportemail']?></a>&nbsp;|&nbsp;<?=substr($_SESSION['_supportphone'],0,3) . "." . substr($_SESSION['_supportphone'],3,3) . "." . substr($_SESSION['_supportphone'],6,4);?>
@@ -15,6 +17,7 @@ Use of this system is subject to the <a href="privacy.html" target="_blank">Priv
 print "<div id='logininfo' class='noprint' >Logged in as ".escapehtml($USER->firstname)." ".escapehtml($USER->lastname)." (".escapehtml($USER->login).")<br>Current system time is " . date("F jS, Y h:i a (e)") . "</div>";
 ?>
 
+</div>
 </div><!-- #footer -->
 
 <!-- div class="branding"><? dologo() ?></div-->
