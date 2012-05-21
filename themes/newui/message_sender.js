@@ -6,102 +6,108 @@
 jQuery.noConflict();
 (function($) { 
   $(function() {
-		$(document).ready(function() {
 		
 		// hide tabs two and three by default and make step one the active tab
 		$('#msg_section_2').hide();
-		$('#msg_section_3').hide();
-		$('#tab1').parent().addClass("active");
-		
-		// subject and recipients tab
-		$('#tab1').live("click", function(){
-			$('ul.msg_steps').children().removeClass();
-			$('#tab1').parent().addClass("active");
-			$('#msg_section_1').show();
-			$('#msg_section_2','#msg_section_3').hide();
-			return false;
-			});
-		
-		// message content tab
-		$('#tab2').live("click", function(){
-			$('ul.msg_steps').children().removeClass();
-			$('#tab2').parent().addClass("active");
-			$('#msg_section_1').hide();
-			$('#msg_section_3').hide();
-			$('#msg_section_2').show();
-			return false;
-			});
-		
-		// review and send tab
-		$('#tab3').live("click", function(){
-			$('ul.msg_steps').children().removeClass();
-			$('#tab3').parent().addClass("active");
-			$('#msg_section_1').hide();
-			$('#msg_section_2').hide();
-			$('#msg_section_3').show();
-			return false;
-			});
-		
+		$('#msg_section_3, .close').hide();
+
+
+		// Tab Hide/Show Logic
+
+		$('.msg_steps a').on('click', function(event) {
+			event.preventDefault();
+			// Get the clicked elements id
+			var elm = $(this).attr('id');
+			// Gives me the number from the circle so can use it later on 
+			var tabn = $('#' + elm + ' span').text();
+			// Remove active class from tabs, and set selected one to have active class
+			$('.msg_steps li').removeClass('active');
+			$(this).parent().addClass('active');
+			// Hide panels then show the one relevant to the users selection
+			$('.window_panel').hide();
+			$('#msg_section_'+tabn).show();
+		});
+
+
 		// hide the +Add ... content for the message content section 
-		$('#msgsndr_tab_phone').hide();
-		$('#msgsndr_tab_email').hide();
-		$('#msgsndr_tab_sms').hide();
-		$('#msgsndr_tab_social').hide();
-		
-		// Add phone tab
-		$('#msgsndr_ctrl_phone').live("click", function(){
-			$('ul.msg_content_nav').children().removeClass();
-			$('#msgsndr_ctrl_phone').parent().addClass("active");
-			$('#msgsndr_tab_email').hide();
-			$('#msgsndr_tab_sms').hide();
-			$('#msgsndr_tab_social').hide();
-			$('#msgsndr_tab_phone').show();
-			return false;
+		$('div[id^="msgsndr_tab"]').hide();
+
+		$('.msg_content_nav a').on('click', function(event) {
+			event.preventDefault();
+
+			var elm = $(this).attr('id');
+			var elm = elm.split('_');  			// I need number elm[2]
+
+			$('.msg_content_nav li').removeClass('active');
+			$('.tab_panel').hide();
+			$('#msgsndr_tab_'+elm[2]).show();
+			$(this).parent().addClass('active');
+		});
+
+
+		// Switch Audio 
+		$('.switchaudio a').on('click', function(event) {
+			event.preventDefault();
+			var type = $(this).attr('data-type');
+			
+			$('form.audio').hide();
+			$('#'+type+'').show();
+			$('.switchaudio a').removeClass('active');
+			$(this).addClass('active');
 		});
 		
-		// Add email tab
-		$('#msgsndr_ctrl_email').live("click", function(){
-			$('ul.msg_content_nav').children().removeClass();
-			$('#msgsndr_ctrl_email').parent().addClass("active");
-			$('#msgsndr_tab_phone').hide();
-			$('#msgsndr_tab_sms').hide();
-			$('#msgsndr_tab_social').hide();
-			$('#msgsndr_tab_email').show();
-			return false;
+
+		// Toggle Collapse - Generic 
+		$('.toggle-more').on('click', function(event) {
+			event.preventDefault();
+
+			var etarget = $(this).attr('data-target');
+			$(etarget).slideToggle();
+
+			offset = $(this).offset();
+				$('html, body').animate({scrollTop: offset.top },2000);
+
 		});
-		
-		// Add sms tab
-		$('#msgsndr_ctrl_sms').live("click", function(){
-			$('ul.msg_content_nav').children().removeClass();
-			$('#msgsndr_ctrl_sms').parent().addClass("active");
-			$('#msgsndr_tab_phone').hide();
-			$('#msgsndr_tab_email').hide();
-			$('#msgsndr_tab_social').hide();
-			$('#msgsndr_tab_sms').show();
-			return false;
+
+		// Hide Social Extras
+		$('.facebook, .twitter, .feed').hide();
+
+		// Social Inputs hide show
+		$('input.social').on('click', function(event) {
+
+			var elem = $(this).attr('id');
+			var elem = elem.split('_') 				// Going to be using elem[2]
+
+			$('.'+elem[2]).slideToggle('slow', function() { 
+
+				if (elem[2] == 'feed') { // if Post to Feeds set focus to the Post title input
+					$('#msgsndr_form_rsstitle').focus();
+				} else { // Set focus to the textarea
+					$('.'+elem[2]+' textarea').focus();
+				}
+				
+			});
+
+			// This scrolls the page up to bring the element that has just opened into view
+			offset = $(this).offset();
+			$('html, body').animate({scrollTop: offset.top },2000);
+
 		});
-		
-		// Add social tab
-		$('#msgsndr_ctrl_social').live("click", function() {
-			$('ul.msg_content_nav').children().removeClass();
-			$('#msgsndr_ctrl_social').parent().addClass("active");
-			$('#msgsndr_tab_phone').hide();
-			$('#msgsndr_tab_email').hide();
-			$('#msgsndr_tab_sms').hide();
-			$('#msgsndr_tab_social').show();
-			return false;
-		});
-	
+
+
+
 		// modal windows -- script/bootstrap-modal.js
 		$('#msgsndr_choose_list').modal({
 			show: false
-			})		
+		});
+		
 		$('#msgsndr_build_list').modal({
 			show: false
-			})	
+		});	
+		
 		$('#msgsndr_saved_message').modal({
 			show: false
-			})	
 		});
+
   });
 }) (jQuery);

@@ -3,6 +3,8 @@
 // Includes
 ////////////////////////////////////////////////////////////////////////////////
 require_once("obj/Validator.obj.php");
+require_once("obj/ValDuplicateNameCheck.val.php");
+require_once("obj/Phone.obj.php");
 
 ?>
 
@@ -12,13 +14,13 @@ require_once("obj/Validator.obj.php");
 
 	<div class="wrapper">
 	
-	<div class="main_activity">
+	<!--- <div class="main_activity"> --->
 
 	<div class="window newbroadcast">
 		<div class="window_title_wrap">
 		<h2>New Broadcast</h2>
 		<ul class="msg_steps cf">
-		<li><a id="tab1" class="" href=""><span class="icon">1</span> Subject &amp; Recipients</a></li>
+		<li class="active"><a id="tab1" class="" href=""><span class="icon">1</span> Subject &amp; Recipients</a></li>
 		<li><a id="tab2" class="" href=""><span class="icon">2</span> Message Content</a></li>
 		<li><a id="tab3" class="" href=""><span class="icon">3</span> Review &amp; Send</a></li>
 		</ul>
@@ -34,7 +36,7 @@ require_once("obj/Validator.obj.php");
 		<fieldset>
 		<label for="msgsndr_form_subject">Subject</label>
 			<div class="controls">
-			<input type="text" id="msgsndr_form_subject" name="subject"/>
+			<input type="text" id="msgsndr_form_subject" name="notification_subject" data-ajax="true" /> <span class="error"></span>
 			<p>e.g. "PTA Meeting Reminder"</p>
 			</div>
 		</fieldset>
@@ -177,19 +179,21 @@ require_once("obj/Validator.obj.php");
 		<div class="tab_content">
 			<!-- Add the phone panel -->
 			<div id="msgsndr_tab_phone" class="tab_panel">
-			<form>
+			<form class="switchaudio">
 			<fieldset class="check">
 				<label for="msgsndr_form_type">Switch Audio Type</label>
 				<div class="controls">
-				<a class="btn audioleft" href="#">Call Me to Record</a><a class="btn audioright" href="#">Text-to-Speech</a>
+					<a class="btn audioleft active" href="#" data-type="call-me">Call Me to Record</a><a class="btn audioright" href="#" data-type="text-to-speech">Text-to-Speech</a>
 				</div>
 			</fieldset>
+			</form>
 			
+		<form id="call-me" class="audio">
 			<fieldset>
 				<label for="msgsndr_form_number">Number to Call</label>
 				<div class="controls">
-				<input class="small" type="text" id="msgsndr_form_number" name="msgsndr_form_number"/>
-				<a class="btn record" href="#"><span class="icon"></span> Call Now to Record</a>
+				<input class="small" type="text" id="msgsndr_form_number" name="phone_number" /> <span class="error"></span>
+				<a class="btn record" href="#" id="ctrecord"><span class="icon"></span> Call Now to Record</a>
 				</div>
 			</fieldset>
 			
@@ -203,10 +207,11 @@ require_once("obj/Validator.obj.php");
 			
 			<fieldset>
 				<div class="controls">
-				<a href="#">Advanced Options (caller ID, etc.)</a>
+					<a href="#" class="toggle-more" data-target="#advanced-opts">Advanced Options (caller ID, etc.)</a>
 				</div>
 			</fieldset>
 			
+			<div id="advanced-opts" class="close">
 			<fieldset>
 				<label for="msgsndr_form_callid">Caller ID</label>
 				<div class="controls">
@@ -236,6 +241,7 @@ require_once("obj/Validator.obj.php");
 				<div class="cf"><input class="addme" type="checkbox" /><label class="addme">Skip Duplicate Phones</label></div>
 				</div>
 			</fieldset>
+		</div><!-- #advanced-opts -->
 			
 			<fieldset class="form_actions">
 				<div class="controls">
@@ -244,6 +250,29 @@ require_once("obj/Validator.obj.php");
 				</div>
 			</fieldset>
 			</form>
+
+
+			<form id="text-to-speech" style="display: none;" class="audio">
+
+				<fieldset>
+					<label for="msgsndr_tts_message">Message</label>
+					<div class="controls">
+						<a href="#" class="btn btn-small paste-from">Paste text from email</a>
+						<textarea id="msgsndr_tts_message"></textarea>
+						<a href="#" class="btn"><span class="icon play"></span> Play Audio</a>
+						<span class="characters">160 Characters Left</span>
+					</div>
+				</fieldset>
+
+				<fieldset class="form_actions">
+					<div class="controls">
+					<a class="btn btn_save" href="#">Save TTS Message</a>
+					<a class="btn" href="#">Cancel</a>
+					</div>
+				</fieldset>
+
+			</form>
+
 			</div>
 			
 			<!-- Add the email panel -->
@@ -252,28 +281,28 @@ require_once("obj/Validator.obj.php");
 			<fieldset>
 				<label for="msgsndr_form_name">From Name</label>
 				<div class="controls">
-				<input type="text" id="msgsndr_form_name" name="from_name"/>
+				<input type="text" id="msgsndr_form_name" name="email_name"/> <span class="error"></span>
 				</div>
 			</fieldset>
 			
 			<fieldset>
 				<label for="msgsndr_form_email">From Email</label>
 				<div class="controls">
-				<input type="text" id="msgsndr_form_email" name="from_email"/>
+				<input type="text" id="msgsndr_form_email" name="email_address"/> <span class="error"></span>
 				</div>
 			</fieldset>
 			
 			<fieldset>
 				<label for="msgsndr_form_mailsubject">Subject</label>
 				<div class="controls">
-				<input type="text" id="msgsndr_form_mailsubject" name="msgsndr_form_mailsubject"/>
+				<input type="text" id="msgsndr_form_mailsubject" name="email_subject"/> <span class="error"></span>
 				</div>
 			</fieldset>
 			
 			<fieldset>
 				<label for="msgsndr_form_body">Body</label>
 				<div class="controls">
-				<textarea id="msgsndr_form_body" name="msgsndr_form_body"></textarea>
+				<textarea id="msgsndr_form_body" name="email_body"></textarea> <span class="error"></span>
 				</div>
 			</fieldset>
 			
@@ -298,8 +327,8 @@ require_once("obj/Validator.obj.php");
 			<fieldset>
 				<label for="msgsndr_form_sms">SMS Text</label>
 				<div class="controls">
-				<textarea id="msgsndr_form_sms" name="msgsndr_form_sms"></textarea>
-				<p><a href="#">Spell Check</a> <span>160 Characters left</span></p>
+				<textarea id="msgsndr_form_sms" name="sms_text"></textarea> <span class="error"></span>
+				<p><a href="#">Spell Check</a> <span class="sms characters">160 Characters left</span></p>
 				</div>
 			</fieldset>
 			
@@ -324,24 +353,83 @@ require_once("obj/Validator.obj.php");
 			
 			<fieldset class="check">
 				<div class="controls">
-				<input class="addme" type="checkbox" id="msgsndr_form_facebook" name="msgsndr_form_facebook" />
+				<input class="addme social" type="checkbox" id="msgsndr_form_facebook" name="msgsndr_form_facebook" />
 				<label class="addme" for="msgsndr_form_facebook"><strong>Post to Facebook</strong></label>
 				</div>
 			</fieldset>
+
+			<div class="facebook">
+
+				<!--- <form> --->
+					<fieldset>
+						<label for="msgsndr_form_fbmsg">Message</label>
+						<div class="controls">
+						<textarea id="msgsndr_form_fbmsg" name="facebook_message"></textarea> <span class="error"></span>
+						<p><a href="#">Spell Check</a> <span class="fb characters">420 Characters left</span></p>
+						</div>
+					</fieldset>
+				<!--- </form> --->
+
+			</div><!-- facebook -->
 			
 			<fieldset class="check">
 				<div class="controls">
-				<input class="addme" type="checkbox" id="msgsndr_form_twitter" name="msgsndr_form_twitter" />
+				<input class="addme social" type="checkbox" id="msgsndr_form_twitter" name="msgsndr_form_twitter" />
 				<label class="addme" for="msgsndr_form_twitter"><strong>Post to Twitter</strong></label>
 				</div>
 			</fieldset>
+
+			<div class="twitter">
+
+				<!--- <form> --->
+					<fieldset>
+						<label for="msgsndr_form_tmsg">Message</label>
+						<div class="controls">
+						<textarea id="msgsndr_form_tmsg" name="twitter_message"></textarea> <span class="error"></span>
+						<p><a href="#">Spell Check</a> <span class="twit characters">140 Characters left</span></p>
+						</div>
+					</fieldset>
+				<!--- </form> --->
+
+			</div><!-- twitter -->
 			
-			<fieldset class="checklast">
+			<fieldset class="check">
 				<div class="controls">
-				<input class="addme" type="checkbox" id="msgsndr_form_feed" name="msgsndr_form_feed" />
+				<input class="addme social" type="checkbox" id="msgsndr_form_feed" name="msgsndr_form_feed" />
 				<label class="addme" for="msgsndr_form_feed"><strong>Post to Feeds</strong></label>
 				</div>
 			</fieldset>
+
+
+			<div class="feed">
+
+					<fieldset>
+						<label for="msgsndr_form_rsstitle">Post Title</label>
+						<div class="controls">
+							<input type="text" id="msgsndr_form_rsstitle" name="rss_title" />
+						</div>
+					</fieldset>
+
+					<fieldset>
+						<label for="msgsndr_form_rssmsg">Message</label>
+						<div class="controls">
+						<textarea id="msgsndr_form_fbmsg" name="facebook_message"></textarea> <span class="error"></span>
+						<p><a href="#">Spell Check</a></p>
+						</div>
+					</fieldset>
+
+					<fieldset>
+						<label class="control-label" for="">Post to Feeds</label>
+						<div class="controls">
+							<p><input type="checkbox" checked="checked"><label class="checkbox">Groveland Elementary</label></p>
+							<p><input type="checkbox" checked="checked"><label class="checkbox">Sprinfield High School</label></p>
+							<p><input type="checkbox" checked="checked"><label class="checkbox">District Website</label></p>
+							<p><input type="checkbox" checked="checked"><label class="checkbox">Live Oak High - Athletics</label></p>
+						</div>
+					</fieldset>
+
+			</div><!-- rss -->
+
 			
 			<fieldset class="form_actions">
 				<div class="controls">
@@ -369,7 +457,7 @@ require_once("obj/Validator.obj.php");
 		
 	</div><!-- endwindow newbroadcast -->
 	
-	</div><!-- end main_activity -->
+	<!--- </div><!-- end main_activity --->
 
 
 	<div class="main_aside">
@@ -384,11 +472,8 @@ require_once("obj/Validator.obj.php");
 </div><!-- end container cf -->
 
 <script src="script/jquery.1.7.2.min.js"></script>
+<script src="script/jquery.json-2.3.min.js"></script>
 <script src="script/bootstrap-modal.js"></script>
+
 <script src="themes/newui/message_sender.js"></script>
-
-<!-- Optional Load Custom Form Validators --> 
-<script type="text/javascript">
-<? Validator::load_validators(array('ValRequired')); ?>
-</script>
-
+<script src="themes/newui/notification_validation.js"></script>

@@ -404,8 +404,9 @@ table#addMeWindow input[type="checkbox"] { margin: 7px 0; }
 
 .window_panel form { margin: 0 0 20px 0; }
 .window_panel form fieldset { margin: 0 0 15px 0; }
-.window_panel form fieldset.check { padding: 6px 0 15px 0px; border-bottom: 1px solid #ccc; }
-.window_panel form fieldset.checklast { margin: 0; padding: 6px 0 16px 0px; border-bottom: none; }
+.window_panel form fieldset.check { padding: 15px 0 0 0; border-top: 1px solid #ccc; }
+.window_panel form fieldset.check:first-child { border-top: none; }
+/*.window_panel form fieldset.checklast { margin: 0; padding: 6px 0 16px 0px; }*/
 .window_panel form input[type="text"],
 .window_panel form select,
 .window_panel form textarea { display: inline-block; width: 300px; padding: 5px; font-size: 14px; line-height: 18px; border: 1px solid #ccc; border-radius: 5px; }
@@ -414,7 +415,7 @@ table#addMeWindow input[type="checkbox"] { margin: 7px 0; }
 .window_panel form textarea:focus { border: 1px solid #58acef; outline: 0px; box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075) inset, 0 0 8px rgba(82, 168, 236, 0.6); }
 .window_panel form label { float: left; display: inline; width: 140px; margin: 0 10px 0 0; padding: 6px 0; font-size: 14px; text-align: right; }
 .window_panel form input.small { float: left; width: 135px; }
-.window_panel form textarea { max-width: 300px; min-width: 300px; min-height: 100px; }
+.window_panel form textarea { /*max-width: 300px; min-width: 300px;*/ width: 96%; min-height: 100px; }
 .window_panel form select { font-size: 14px; width: 310px; padding: 5px; }
 .window_panel form input[type="checkbox"] { margin: 5px 5px 5px 0; }
 .window_panel form .addme { float: left; display: inline; text-align: left; width: inherit; }
@@ -422,6 +423,36 @@ table#addMeWindow input[type="checkbox"] { margin: 7px 0; }
 .window_panel form .controls { margin: 0 0 0 150px; }
 .window_panel form .form_actions { background: #ededed; margin: 0 0 -20px; padding: 15px; border-radius: 0 0 8px 8px; }
 
+.characters {
+	float: right;
+	margin: 0 4% 0 0;
+	padding: 5px 0 0 0;
+}
+
+.window_panel form input.ok {
+	border: 1px solid rgb(75,149,35);
+}
+.window_panel form input.ok[type="text"]:focus { 
+	border: 1px solid rgb(75,149,35);
+	box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075) inset, 0 0 8px rgba(75,149,35, 0.6);
+}
+
+.window_panel form input.er, .window_panel form textarea.er {
+	border: 1px solid rgb(219,30,30);
+}
+.window_panel form input.er[type="text"]:focus, .window_panel form textarea.er:focus { 
+	border: 1px solid rgb(219,30,30);
+	box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075) inset, 0 0 8px rgba(219,30,30, 0.6);
+}
+
+
+span.error {
+	color: rgb(219,30,30);
+/*	display: inline-block;
+	float: right;*/
+	font-size: 0.9em;
+/*	width: 270px;*/
+}
 
 /*---------- Media queries for form elements ----------*/
 

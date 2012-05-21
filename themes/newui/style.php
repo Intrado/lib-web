@@ -106,6 +106,7 @@ h4 { font-size: 12px; line-height: 22px; color: #235563; text-shadow: 0 1px 0 #f
   
 .navshortcut { display: none; }
 	
+.navtabs { margin: 0 0 0 25px; }
 .navtabs li { margin: 0 2px -1px 0;}
 .navtabs li a { display: block; padding: 14px 18px; font-size: 16px; font-weight: bold; color: #fff; text-decoration: none; text-shadow: 0 1px 0 #444; border: 1px solid transparent;
 -webkit-border-radius: 5px 5px 0 0; -moz-border-radius: 5px 5px 0 0; border-radius: 5px 5px 0 0; 
@@ -422,7 +423,7 @@ table.list td { padding: 0 8px; border-bottom: 1px solid #ccc; }
   background-image:      -o-linear-gradient(top, #f2f2f2, #dedede); 
   background-image:         linear-gradient(top, #f2f2f2, #dedede); }
 	        
-.btn:active { background-color: #d9d9d9;  
+.btn:active, .btn.active { background-color: #d9d9d9;  
   background-image: -webkit-gradient(linear, left top, left bottom, from(#e9e9e9), to(#dedede)); 
   background-image: -webkit-linear-gradient(top, #e9e9e9, #dedede); 
   background-image:    -moz-linear-gradient(top, #e9e9e9, #dedede); 
