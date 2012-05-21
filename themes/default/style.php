@@ -27,7 +27,8 @@ a:hover { color: <?=$theme1?>; }
 .shortcutmenu { margin: 2px; border: 1px outset; width: 100px; text-align: left; font-size: 10px; }
 .shortcutmenu img { margin-right: 5px; margin-left: 5px; }
 
-.subnavtabs { height: 22px; background: url(themes/<?=$theme?>/chrome.png); }
+.subnavtabs { background: url(themes/<?=$theme?>/chrome.png); }
+.subnavtabs ul { margin: 0 0 20px 0; }
 .subnavtabs li { margin-left: 10px; }
 .subnavtabs a { height: 18px; padding: 4px 10px 0; }
 .subnavtabs a:link, .subnavtabs a:active, .subnavtabs a:visited { color: <?=$primary?>; }
