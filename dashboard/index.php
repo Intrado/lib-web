@@ -1,4 +1,3 @@
-<div class="container cf">
 
 	<div class="wrapper">
 	
@@ -179,5 +178,3 @@
 	</div><!-- end main_aside -->
 	
 	</div><!-- end wrapper -->
-
-</div><!-- end container -->
