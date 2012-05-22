@@ -107,7 +107,7 @@ showObjects($data, $titles, $actions, count($data) > 8, true);
 
 endWindow();
 
-echo "<br>";
+
 
 startWindow('My Completed Surveys '  . help('SurveyBuilder_MyCompleted'),'padding: 3px;',true, true);
 

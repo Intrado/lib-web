@@ -196,7 +196,6 @@ showObjects($data, $titles, $formatters, $scroll, true);
 endWindow();
 
 // Repeating Jobs
-print '<br>';
 if ($USER->authorize('createrepeat')) {
 
 	$data = DBFindMany("Job",", name + 0 as foo from job where userid=$USER->id and status = 'repeating' and type not in ('survey', 'alert') order by foo,name ");
@@ -224,7 +223,6 @@ if ($USER->authorize('createrepeat')) {
 
 	showObjects($data, $titles, array("startdate" => "fmt_nextrun", "type" => "fmt_obj_delivery_type_list","finishdate" => "fmt_obj_date", "Actions" => "fmt_jobs_actions"), $scroll, true);
 	endWindow();
-	print '<br>';
 }
 
 // Completed Jobs

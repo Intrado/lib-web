@@ -197,7 +197,8 @@ startWindow("Display Options" . help('Replies_DisplayOptions'), "padding: 3px;")
 
 <?
 endWindow();
-echo "<br>";
+
+
 startWindow("Responses"  . help('Replies_Responses'), "padding: 3px;");
 
 ?>
