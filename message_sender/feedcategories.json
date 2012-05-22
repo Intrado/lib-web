@@ -1,14 +1,10 @@
+[{
+  "id": 531,
+  "name": "Sporting events",
+  "description": "Sporting events happening at this campus"
+},
 {
-  feedCategories: [
-    {
-      id: 531,
-      name: "Sporting events",
-      description: "Sporting events happening at this campus"
-    },
-    {
-      id: 532,
-      name: "Campus news",
-      description: "What's new at your campus?!"
-    }
-  ]
-}
+  "id": 532,
+  "name": "Campus news",
+  "description": "What's new at your campus?!"
+}]
