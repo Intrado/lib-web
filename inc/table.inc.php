@@ -145,10 +145,11 @@ function startWindow($title) {
 	$theme = getBrandTheme();
 
 ?>
+
 <div class="window cf">
 	<div class="window_title_wrap cf">
 		<div class="window_title_l"></div>
-		<h3 class="window_title"><?= $title ?></h3>
+		<h2 class="window_title"><?= $title ?></h2>
 		<div class="window_title_r"></div>
 	</div>
 	<div class="window_body_wrap cf">
@@ -170,6 +171,7 @@ function endWindow() {
 		<div class="window_foot_r"></div>
 	</div>
 </div><!-- window cf -->
+
 <?
 }
 
