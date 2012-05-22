@@ -143,7 +143,10 @@ startWindow("Select a Template"  . help('Reports_SelectATemplate'), 'padding: 3p
 <?
 endWindow();
 
-?><br><?
+?>
+
+
+<?
 
 $data = DBFindMany("ReportSubscription", "from reportsubscription where userid = ?", false, array($USER->id));
 
