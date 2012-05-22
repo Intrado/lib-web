@@ -106,7 +106,6 @@ h4 { font-size: 12px; line-height: 22px; color: #235563; text-shadow: 0 1px 0 #f
   
 .navshortcut { display: none; }
 	
-.navtabs { margin: 0 0 0 25px; }
 .navtabs li { margin: 0 2px -1px 0;}
 .navtabs li a { display: block; padding: 14px 18px; font-size: 16px; font-weight: bold; color: #fff; text-decoration: none; text-shadow: 0 1px 0 #444; border: 1px solid transparent;
 -webkit-border-radius: 5px 5px 0 0; -moz-border-radius: 5px 5px 0 0; border-radius: 5px 5px 0 0; 
@@ -389,11 +388,23 @@ border-color: #222222 transparent transparent; border-style: solid; border-width
 .msg_confirm { background: #F9F8F6; margin: 0 -15px -22px -15px; padding: 22px 15px; text-align: right; border-radius: 0 0 5px 5px; border-top: 1px solid #DDDDDD; }
 
 
+/*----- List page styles -----*/
+
+.feed_btn_wrap { position: absolute; top: -63px; right: 0; margin: 0; padding: 0; border: none; }
+.feed_btn_wrap .btn { float: left; display: inline; margin: 0; -webkit-border-radius: 0; border-radius: 0; border-top: 1px solid #bbb; border-right: 1px solid #bbb; border-bottom: 1px solid #bbb; border-left: none; }
+.feed_btn_wrap .btn:first-child { border-left: 1px solid #bbb; -webkit-border-radius: 4px 0 0 4px; border-radius: 4px 0 0 4px; }
+.feed_btn_wrap .btn:last-child { -webkit-border-radius: 0 4px 4px 0; border-radius: 0 4px 4px 0; }
+.feed_btn_wrap .btn:hover { background: #e7e7e7; }
+.feed_btn_wrap .btn.active { background: #e4e4e4; -webkit-box-shadow: inset 0px 1px 4px 0 rgba(0,0,0,0.2); box-shadow: inset 0px 1px 4px 0 rgba(0,0,0,0.2); }
+.btn_middle img { display: none; }
+
+
 /*----- table overrides for list styles -----*/
 
 table.list { background: #fff; width: 100%; margin: 0 0 20px 0; font-size: 14px; line-height: 36px; }
 table.list th { background: #eee; padding: 0 8px; font-weight: bold; text-align: left; border-bottom: 1px solid #ccc; border-top: 1px solid #ccc; }
 table.list td { padding: 0 8px; border-bottom: 1px solid #ccc; }
+table.list ul li { padding: 0; }
 
 .bottomBorder { border-bottom: 1px solid #ccc; }
 .windowRowHeader { color: #484848; width: 115px; }
