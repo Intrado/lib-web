@@ -8,11 +8,7 @@ require_once("obj/Phone.obj.php");
 
 ?>
 
-
-
-<div class="container cf">
-
-	<div class="wrapper">
+<div class="wrapper">
 	
 	<!--- <div class="main_activity"> --->
 
@@ -418,13 +414,13 @@ require_once("obj/Phone.obj.php");
 						</div>
 					</fieldset>
 
-					<fieldset>
+					<fieldset class="check">
 						<label class="control-label" for="">Post to Feeds</label>
 						<div class="controls">
-							<p><input type="checkbox" checked="checked"><label class="checkbox">Groveland Elementary</label></p>
-							<p><input type="checkbox" checked="checked"><label class="checkbox">Sprinfield High School</label></p>
-							<p><input type="checkbox" checked="checked"><label class="checkbox">District Website</label></p>
-							<p><input type="checkbox" checked="checked"><label class="checkbox">Live Oak High - Athletics</label></p>
+							<span class="cf"><input type="checkbox" checked="checked" class="addme"><label class="addme">Groveland Elementary</label></span>
+							<span class="cf"><input type="checkbox" checked="checked" class="addme"><label class="addme">Sprinfield High School</label></span>
+							<span class="cf"><input type="checkbox" checked="checked" class="addme"><label class="addme">District Website</label></span>
+							<span class="cf"><input type="checkbox" checked="checked" class="addme"><label class="addme">Live Oak High - Athletics</label></span>
 						</div>
 					</fieldset>
 
@@ -467,9 +463,8 @@ require_once("obj/Phone.obj.php");
 		</div>
 	</div><!-- end main_aside-->
 	
-	</div><!-- end wrapper -->
+</div><!-- end wrapper -->
 	
-</div><!-- end container cf -->
 
 <script src="script/jquery.1.7.2.min.js"></script>
 <script src="script/jquery.json-2.3.min.js"></script>
