@@ -12,10 +12,10 @@ jQuery.noConflict();
 		// }
 
     document.formvars = { 
-      notification: {
+      broadcast: {
         subject:[
-          new document.validators["ValRequired"]("notification_subject","Subject",{}), 
-          new document.validators["ValLength"]("notification_subject","Subject",{min:7,max:30})
+          new document.validators["ValRequired"]("broadcast_subject","Subject",{}), 
+          new document.validators["ValLength"]("broadcast_subject","Subject",{min:7,max:30})
         ]
       },
       phone: {
@@ -111,7 +111,7 @@ jQuery.noConflict();
 
 				$.ajax({
 					type: 'POST',
-					url: "_template-aw.php?form=notification&ajaxvalidator=true&formitem=notification_subject",
+					url: "_template-aw.php?form=broadcast&ajaxvalidator=true&formitem=broadcast_subject",
 					data: {json: $.toJSON(postData) },
 
 					success: function(response) {

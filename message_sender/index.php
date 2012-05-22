@@ -7,10 +7,6 @@ require_once("obj/ValDuplicateNameCheck.val.php");
 require_once("obj/Phone.obj.php");
 ?>
 
-<pre> <? print_r($_SESSION['access']->permissions['165']->value); ?> </pre> 
-
-<pre> <? print_r($_SESSION); ?> </pre> 
-
 <script> 
 	orgid = 123;
 	userid = <? print_r($_SESSION['user']->id); ?>;
@@ -300,12 +296,12 @@ require_once("obj/Phone.obj.php");
 		
 		<h3 class="flag">Notification Info</h3>
 		
-		<form>
+		<form id="msgsndr" name="broadcast" method="POST">
 		
 		<fieldset>
 		<label for="msgsndr_form_subject">Subject</label>
 			<div class="controls">
-			<input type="text" id="msgsndr_form_subject" name="notification_subject" /> <span class="error"></span>
+			<input type="text" id="msgsndr_form_subject" name="broadcast_subject" /> <span class="error"></span>
 			<p>e.g. "PTA Meeting Reminder"</p>
 			</div>
 		</fieldset>
@@ -320,7 +316,7 @@ require_once("obj/Phone.obj.php");
 			</select>
 			</div>
 		</fieldset>
-		</form>
+		
 		
 		<h3 class="flag">Recipient Lists</h3>
 		
@@ -381,7 +377,7 @@ require_once("obj/Phone.obj.php");
 		
 			<form class="cf">
 			<input class="addme" type="checkbox" id="msgsndr_form_myself"/><label class="addme" for="msgsndr_form_myself">Add Myself</label>
-			</form>
+
 		</div><!-- end add_recipients -->
 		
 		<div class="msg_confirm"><a class="btn btn_confirm" href="#">Continue <span class="icon"></span></a></div>
@@ -455,7 +451,7 @@ require_once("obj/Phone.obj.php");
 					<a class="btn audioleft active" href="#" data-type="call-me">Call Me to Record</a><a class="btn audioright" href="#" data-type="text-to-speech">Text-to-Speech</a>
 				</div>
 			</fieldset>
-			</form>
+
 			
 		<form id="call-me" class="audio">
 			<fieldset>
@@ -518,7 +514,7 @@ require_once("obj/Phone.obj.php");
 				<a class="btn" href="#">Cancel</a>
 				</div>
 			</fieldset>
-			</form>
+
 
 
 			<form id="text-to-speech" style="display: none;" class="audio">
@@ -540,13 +536,11 @@ require_once("obj/Phone.obj.php");
 					</div>
 				</fieldset>
 
-			</form>
-
 			</div>
 			
 			<!-- Add the email panel -->
 			<div id="msgsndr_tab_email" class="tab_panel">
-			<form>
+
 			<fieldset>
 				<label for="msgsndr_form_name">From Name</label>
 				<div class="controls">
@@ -587,12 +581,12 @@ require_once("obj/Phone.obj.php");
 				<a class="btn" href="#">Cancel</a>
 				</div>
 			</fieldset>
-			</form>
+
 			</div>
 			
 			<!-- Add the sms panel -->
 			<div id="msgsndr_tab_sms" class="tab_panel">
-			<form>
+
 			<fieldset>
 				<label for="msgsndr_form_sms">SMS Text</label>
 				<div class="controls">
@@ -607,12 +601,12 @@ require_once("obj/Phone.obj.php");
 				<a class="btn" href="#">Cancel</a>
 				</div>
 			</fieldset>
-			</form>
+
 			</div>
 			
 			<!-- Add the social network panel -->
 			<div id="msgsndr_tab_social" class="tab_panel">
-			<form>
+	
 			<fieldset class="check">
 				<div class="controls">
 				<input class="addme" type="checkbox" id="msgsndr_form_audio" name="msgsndr_form_audio" />
@@ -629,7 +623,6 @@ require_once("obj/Phone.obj.php");
 
 			<div class="facebook">
 
-				<!--- <form> --->
 					<fieldset>
 						<label for="msgsndr_form_fbmsg">Message</label>
 						<div class="controls">
@@ -637,7 +630,7 @@ require_once("obj/Phone.obj.php");
 						<p><a href="#">Spell Check</a> <span class="fb characters">420 Characters left</span></p>
 						</div>
 					</fieldset>
-				<!--- </form> --->
+
 
 			</div><!-- facebook -->
 			
@@ -650,7 +643,6 @@ require_once("obj/Phone.obj.php");
 
 			<div class="twitter">
 
-				<!--- <form> --->
 					<fieldset>
 						<label for="msgsndr_form_tmsg">Message</label>
 						<div class="controls">
@@ -658,7 +650,7 @@ require_once("obj/Phone.obj.php");
 						<p><a href="#">Spell Check</a> <span class="twit characters">140 Characters left</span></p>
 						</div>
 					</fieldset>
-				<!--- </form> --->
+
 
 			</div><!-- twitter -->
 			
@@ -706,7 +698,7 @@ require_once("obj/Phone.obj.php");
 				<a class="btn" href="#">Cancel</a>
 				</div>
 			</fieldset>
-			</form>
+
 			</div>
 		</div><!-- end tab_content -->
 		
@@ -721,6 +713,9 @@ require_once("obj/Phone.obj.php");
 		<p><strong>Recipients 2000</strong></p>
 		
 		<div class="msg_confirm"><a href="#">save for later</a> or <a class="btn btn_confirm" href="#">Send Message <span class="icon"></span></a></div>
+		
+		</form>
+
 		</div><!-- end window_panel -->
 		</div><!-- /window_body_wrap -->
 		
