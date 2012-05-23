@@ -15,6 +15,7 @@ require_once("inc/form.inc.php");
 require_once("inc/table.inc.php");
 require_once("inc/utils.inc.php");
 require_once("inc/formatters.inc.php");
+require_once("inc/feed.inc.php");
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -268,155 +269,26 @@ $TITLE = "Message Builder";
 include_once("nav.inc.php");
 
 startWindow(_L('My Messages'), 'padding: 3px;', false, true);
+$feedButtons = array(icon_button(_L('Create a Message'),"add","location.href='mgeditor.php?id=new'"));
+if ($USER->authorize('subscribe') && userCanSubscribe('messagegroup'))
+	$feedButtons[] = icon_button(_L('Subscribe to a Message'),"fugue/star", "document.location='messagegroupsubscribe.php'");
 
+$feedFilters = array(
+	"name" => array("icon" => "img/largeicons/tiny20x20/pencil.jpg", "name" => "Name"),
+	"date" => array("icon" => "img/largeicons/tiny20x20/clock.jpg", "name" => "Date")
+);
+
+feed($feedButtons,$feedFilters);
 ?>
 
-	<div class="feed_btn_wrap cf">
-	<?= icon_button(_L('Create a Message'),"add","location.href='mgeditor.php?id=new'") ?>
-	
-	<?=(($USER->authorize('subscribe') && userCanSubscribe('messagegroup'))?icon_button(_L('Subscribe to a Message'),"fugue/star", "document.location='messagegroupsubscribe.php'"):'') ?>
-	</div>
 
-
-<div class="csec window_aside">
-		<h3 id="filterby">Sort By:</h3>
-		<ul id="allfilters" class="feedfilter">
-			<li><a id="namefilter" href="#" onclick="applyfilter('name'); return false;"><img src="img/largeicons/tiny20x20/pencil.jpg" />Name</a></li>
-			<li><a id="datefilter" href="#" onclick="applyfilter('date'); return false;"><img src="img/largeicons/tiny20x20/clock.jpg" />Modify Date</a></li>
-		</ul>
-</div><!-- .cesc .window_aside -->
-	
-
-<div class="csec window_main">
-	
-	<div id="pagewrappertop" class="content_recordcount_top"></div>
-
-	<div id="feeditems" class="content_feed">
-			<table><tbody>
-				<tr>
-					<td class=""><img src='img/ajax-loader.gif' /></td>
-					<td>
-						<div class='feedtitle'>
-							<a href=''><?//= _L("Loading Lists") ?></a>
-						</div>
-					</td>
-				</tr>
-			</tbody></table>
-		</div>
-	<div id="pagewrapperbottom" class="content_recordcount_btm"></div>
-	
-</div><!-- .cesc .window_main -->
-
-
+<script type="text/javascript" src="script/feed.js.php"></script>
 <script type="text/javascript">
-var filtes = Array('date','name');
+var filtes = <?= json_encode(array_keys($feedFilters))?>;
 var activepage = 0;
 var currentfilter = 'date';
-
-function page(event) {
-	activepage = event.element().value;
-	applyfilter(currentfilter);
-}
-
-function applyfilter(filter) {
-	new Ajax.Request('messages.php', {
-		method:'get',
-		parameters:{ajax:true,filter:filter,pagestart:activepage},
-		onSuccess: function (response) {
-			var result = response.responseJSON;
-			if(result) {
-				$('feeditems').update(new Element('div', {'class': 'content_feed'}));
-				var size = result.list.length;
-
-				for(var i=0;i<size;i++){
-					var item = result.list[i];
-					var msg = new Element('div', {'class': 'feed_item cf'});
-
-					// insert icon
-					msg.insert(
-								new Element('a', {'class': 'msg_icon', 'href': item.defaultlink}).insert(
-									new Element('img', {'src': item.icon})
-								)
-						);
-
-					var feedWrap = new Element('div', {'class': 'feed_wrap'});
-
-					
-					// insert title and content details
-					feedWrap.insert(
-						new Element('a', {'class': 'feed_title', 'href': item.defaultlink}).insert(
-							item.title
-							)
-						);
-
-					feedWrap.insert(
-							new Element('div', {'class': 'feed_detail'}).insert(
-								item.content
-							)
-						);
-
-					feedWrap.insert(
-							((item.publishmessage)?
-									new Element('a', {'class': 'feed_subtitle', 'href': item.defaultlink}).insert(
-										new Element('img', {'src': 'img/icons/diagona/10/031.gif'})
-									).insert(
-										item.publishmessage
-									):
-								''
-							)
-						);
-
-					msg.insert(feedWrap);
-					
-
-					// insert tools (if there are any)
-					if (item.tools) {
-						msg.insert(
-								item.tools
-						);
-					}
-					
-					$('feeditems').down('div').insert(msg);
-				}
-				
-				var pagetop = new Element('div',{'class':'content_recordcount'}).update(result.pageinfo[3]);
-				var pagebottom = new Element('div',{'class':'content_recordcount'}).update(result.pageinfo[3]);
-
-				var selecttop = new Element('select', {'id':'selecttop'});
-				var selectbottom = new Element('select', {'id':'selectbottom'});
-				for (var x = 0; x < result.pageinfo[0]; x++) {
-					var offset = x * result.pageinfo[1];
-					var selected = (result.pageinfo[2] == x+1);
-					selecttop.insert(new Element('option', {'value': offset,selected:selected}).update('Page ' + (x+1)));
-					selectbottom.insert(new Element('option', {'value': offset,selected:selected}).update('Page ' + (x+1)));
-				}
-				pagetop.insert(selecttop);
-				pagebottom.insert(selectbottom);
-				$('pagewrappertop').update(pagetop);
-				$('pagewrapperbottom').update(pagebottom);
-
-				currentfilter = filter
-				$('selecttop').observe('change',page);
-				$('selectbottom').observe('change',page);
-
-				var filtercolor = $('filterby').getStyle('color');
-				if(!filtercolor)
-					filtercolor = '#000';
-
-				size = filtes.length;
-				for(i=0;i<size;i++){
-					$(filtes[i] + 'filter').setStyle({color: filtercolor, fontWeight: 'normal'});
-				}
-				$(filter + 'filter').setStyle({
-					 color: '#000000',
-					 fontWeight: 'bold'
-				});
-			}
-		}
-	});
-}
 document.observe('dom:loaded', function() {
-	applyfilter('name');
+	feed_applyfilter('<?=$_SERVER["REQUEST_URI"]?>','name');
 });
 </script>
 <?

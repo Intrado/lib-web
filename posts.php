@@ -16,6 +16,7 @@ require_once("inc/form.inc.php");
 require_once("inc/table.inc.php");
 require_once("inc/utils.inc.php");
 require_once("inc/formatters.inc.php");
+require_once("inc/feed.inc.php");
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -168,154 +169,23 @@ include_once("nav.inc.php");
 
 startWindow(_L('My Posts'));
 
+$feedButtons = array(icon_button(_L('Generate Feed URL/Widget'),"add","location.href='feedurlwiz.php?new'"));
+
+$feedFilters = array(
+	"name" => array("icon" => "img/largeicons/tiny20x20/pencil.jpg", "name" => "Name"),
+	"date" => array("icon" => "img/largeicons/tiny20x20/clock.jpg", "name" => "Date")
+);
+
+feed($feedButtons,$feedFilters);
+
 ?>
-<table width="100%" style="padding-top: 7px;">
-<tr>
-	<td style="width: 180px;vertical-align: top;font-size: 12px;" >
-		<div class="feedbuttoncontainer">
-			<?= icon_button(_L('Generate Feed URL/Widget'),"add","location.href='feedurlwiz.php?new'") ?>
-			<div style="clear:both;"></div>
-		</div>
-		<div style="clear:both;"></div>
-		<br />
-		<div class="feed">
-			<h1 id="filterby">Sort By:</h1>
-			<div id="allfilters" class="feedfilter">
-				<a id="namefilter" href="#" onclick="applyfilter('name'); return false;"><img src="img/largeicons/tiny20x20/pencil.jpg" alt="" />Name</a><br />
-				<a id="datefilter" href="#" onclick="applyfilter('date'); return false;"><img src="img/largeicons/tiny20x20/clock.jpg" alt="" />Modify Date</a><br />
-			</div>
-		</div>
-	</td>
-	<td width="10px" style="border-left: 1px dotted gray;" >&nbsp;</td>
-	<td class="feed" valign="top" >
-		<div id="pagewrappertop"></div>
-		<table id="feeditems">
-			<tr>
-				<td valign='top' width='60px'><img src='img/ajax-loader.gif' /></td>
-				<td >
-					<div class='feedtitle'>
-						<a href=''>
-						<?= _L("Loading Posts") ?></a>
-					</div>
-				</td>
-			</tr>
-		</table>
-		<br />
-		<div id="pagewrapperbottom"></div>
-	</td>
-</tr>
-</table>
-
-
-<script type="text/javascript" language="javascript">
-var filtes = Array('date','name');
+<script type="text/javascript" src="script/feed.js.php"></script>
+<script type="text/javascript">
+var filtes = <?= json_encode(array_keys($feedFilters))?>;
 var activepage = 0;
 var currentfilter = 'date';
-
-function page(event) {
-	activepage = event.element().value;
-	applyfilter(currentfilter);
-}
-
-function applyfilter(filter) {
-	new Ajax.Request('posts.php', {
-		method:'get',
-		parameters:{ajax:true,filter:filter,pagestart:activepage},
-		onSuccess: function (response) {
-			var result = response.responseJSON;
-			if(result) {
-				$('feeditems').update(new Element('tbody'));
-				var size = result.list.length;
-
-				for(var i=0;i<size;i++){
-					var item = result.list[i];
-					var msg = new Element('tr');
-
-					// insert icon
-					msg.insert(
-							new Element('td', {'valign': 'top', width: '60px'}).insert(
-								new Element('a', {'href': item.defaultlink}).insert(
-									new Element('img', {'src': item.icon})
-								)
-							)
-						);
-					// insert title and content details
-					msg.insert(
-							new Element('td').insert(
-								new Element('div', {'class': 'feedtitle'}).insert(
-									new Element('a', {'href': item.defaultlink}).insert(
-										item.title
-									)
-								)
-							).insert(
-								((item.details)?
-									new Element('div', {'class': 'feedsubtitle'}).insert(
-										new Element('a', {'href': item.defaultlink}).insert(
-											item.details
-										)
-									):
-									''
-								)
-							).insert(
-								new Element('div', {'style': 'clear: both'})
-							).insert(
-								new Element('div').insert(
-									item.content
-								)
-							)
-						);
-					// insert tools (if there are any)
-					if (item.tools) {
-						msg.insert(
-							new Element('td', {'valign': 'middle', 'width': '100px'}).insert(
-								new Element('div').insert(
-									item.tools
-								)
-							)
-						);
-					}
-					
-					$('feeditems').down('tbody').insert(msg);
-				}
-				
-				var pagetop = new Element('div',{style: 'float:right;'}).update(result.pageinfo[3]);
-				var pagebottom = new Element('div',{style: 'float:right;'}).update(result.pageinfo[3]);
-
-				var selecttop = new Element('select', {id:'selecttop'});
-				var selectbottom = new Element('select', {id:'selectbottom'});
-				for (var x = 0; x < result.pageinfo[0]; x++) {
-					var offset = x * result.pageinfo[1];
-					var selected = (result.pageinfo[2] == x+1);
-					selecttop.insert(new Element('option', {value: offset,selected:selected}).update('Page ' + (x+1)));
-					selectbottom.insert(new Element('option', {value: offset,selected:selected}).update('Page ' + (x+1)));
-				}
-				pagetop.insert(selecttop);
-				pagebottom.insert(selectbottom);
-				$('pagewrappertop').update(pagetop);
-				$('pagewrapperbottom').update(pagebottom);
-
-				currentfilter = filter
-				$('selecttop').observe('change',page);
-				$('selectbottom').observe('change',page);
-
-				var filtercolor = $('filterby').getStyle('color');
-				if(!filtercolor)
-					filtercolor = '#000';
-
-				size = filtes.length;
-				for(i=0;i<size;i++){
-					$(filtes[i] + 'filter').setStyle({color: filtercolor, fontWeight: 'normal'});
-				}
-				$(filter + 'filter').setStyle({
-					 color: '#000000',
-					 fontWeight: 'bold'
-				});
-			}
-		}
-	});
-}
 document.observe('dom:loaded', function() {
-	applyfilter('name');
+	feed_applyfilter('<?=$_SERVER["REQUEST_URI"]?>','name');
 });
 </script>
 <?

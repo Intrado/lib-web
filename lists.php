@@ -15,6 +15,7 @@ require_once("obj/FieldMap.obj.php");
 require_once("obj/RenderedList.obj.php");
 require_once("obj/Person.obj.php");
 require_once("obj/Publish.obj.php");
+require_once("inc/feed.inc.php");
 
 ////////////////////////////////////////////////////////////////////////////////
 // Authorization
@@ -180,7 +181,7 @@ if (isset($_GET['ajax'])) {
 				$content .= 'This list has never been used';
 			$content .= '</a>';
 			
-			$icon = 'largeicons/addrbook.jpg';
+			$icon = 'img/largeicons/addrbook.jpg';
 
 			$data->list[] = array("itemid" => $itemid,
 										"defaultlink" => $defaultlink,
@@ -216,125 +217,32 @@ include_once("nav.inc.php");
 
 startWindow('My Lists&nbsp;' . help('Lists_MyLists'));
 
+$feedButtons = array();
+if ($USER->authorize('createlist')) {
+	$feedButtons[] = icon_button(_L('Create a List'),"add","location.href='editlistrules.php?id=new'");
+	if (getSystemSetting('_hasenrollment')) {
+		$feedButtons[] = icon_button(_L('Create a List by Section'),"add","location.href='editlistsections.php?id=new'");
+	}
+	if ($USER->authorize('subscribe') && userCanSubscribe('list')) {
+		$feedButtons[] = icon_button(_L('Subscribe to a List'),"fugue/star", "document.location='listsubscribe.php'");
+	}
+}
+
+
+$feedFilters = array(
+	"name" => array("icon" => "img/largeicons/tiny20x20/pencil.jpg", "name" => "Name"),
+	"date" => array("icon" => "img/largeicons/tiny20x20/clock.jpg", "name" => "Date")
+);
+
+feed($feedButtons,$feedFilters);
 ?>
-	
-	<? if ($USER->authorize('createlist')) { ?>
-		<div class="feed_btn_wrap cf">
-		<?= icon_button(_L('Create a List'),"add","location.href='editlistrules.php?id=new'") ?>
-		<? if (getSystemSetting('_hasenrollment')) {
-					echo icon_button(_L('Create a List by Section'),"add","location.href='editlistsections.php?id=new'");
-				} ?>
-				
-				<?=(($USER->authorize('subscribe') && userCanSubscribe('list'))?icon_button(_L('Subscribe to a List'),"fugue/star", "document.location='listsubscribe.php'"):'') ?>
-		</div>
-	<? } ?>
-
-	
-		<div class="csec window_aside">
-			
-			<h3 id="filterby">Sort By:</h3>
-			<ul id="allfilters" class="feedfilter">
-				<li><a id="namefilter" href="#" onclick="applyfilter('name'); return false;"><img src="img/largeicons/tiny20x20/pencil.jpg" alt=""/>Name</a></li>
-				<li><a id="datefilter" href="#" onclick="applyfilter('date'); return false;"><img src="img/largeicons/tiny20x20/clock.jpg" alt=""/>Modify Date</a></li>
-			</ul>
-			
-		</div><!-- .csec .window_aside -->
-
-		
-		<div class="csec window_main">
-		
-		<div id="pagewrappertop" class="content_recordcount_top"></div>
-
-		<div id="feeditems" class="content_feed">
-			<table><tbody>
-				<tr>
-					<td class=""><img src='img/ajax-loader.gif' alt="loading"/></td>
-					<td>
-					<div class='feedtitle'>
-					<a href=''><?= _L("Loading Lists") ?></a>
-					</div>
-					</td>
-				</tr>
-			</tbody></table>
-		</div>
-		<div id="pagewrapperbottom" class="content_recordcount_btm"></div>
-		
-		</div><!-- .csec .window_main -->
-
-
-
-<script type="text/javascript" >
-var filtes = Array('date','name');
+<script type="text/javascript" src="script/feed.js.php"></script>
+<script type="text/javascript">
+var filtes = <?= json_encode(array_keys($feedFilters))?>;
 var activepage = 0;
 var currentfilter = 'date';
-
-function page(event) {
-	activepage = event.element().value;
-	applyfilter(currentfilter);
-}
-
-function applyfilter(filter) {
-		new Ajax.Request('lists.php', {
-			method:'get',
-			parameters:{ajax:true,filter:filter,pagestart:activepage},
-			onSuccess: function (response) {
-				var result = response.responseJSON;
-				if(result) {
-					var html = '';
-					var size = result.list.length;
-					
-					for(i=0;i<size;i++){
-						var item = result.list[i];
-						html += '<div class=\"feed_item cf\"><a class=\"msg_icon\" href=\"' + item.defaultlink + '\"><img src=\"img/' + item.icon + '\" /></a><div class="feed_wrap"><a class=\"feed_title\" href=\"' + item.defaultlink + '\">' + item.title + '</a>';
-						if(item.publishmessage) {
-							html += '<div class=\"feedsubtitle cf\"><a href=\"' + item.defaultlink + '\"><img src=\"img/icons/diagona/10/031.gif\" />' + item.publishmessage + '</div>';
-						}
-						html += '<div class=\"feed_detail\">' + item.content + '</div></div>';
-						if(item.tools) {
-							html += item.tools;
-						}
-						html += '</div>';
-					}
-					$('feeditems').update(html);
-					var pagetop = new Element('div',{'class': 'content_recordcount'}).update(result.pageinfo[3]);
-					var pagebottom = new Element('div',{'class': 'content_recordcount'}).update(result.pageinfo[3]);
-
-					var selecttop = new Element('select', {'id':'selecttop'});
-					var selectbottom = new Element('select', {'id':'selectbottom'});
-					for (var x = 0; x < result.pageinfo[0]; x++) {
-						var offset = x * result.pageinfo[1];
-						var selected = (result.pageinfo[2] == x+1);
-						selecttop.insert(new Element('option', {'value': offset,selected:selected}).update('Page ' + (x+1)));
-						selectbottom.insert(new Element('option', {'value': offset,selected:selected}).update('Page ' + (x+1)));
-					}
-					pagetop.insert(selecttop);
-					pagebottom.insert(selectbottom);
-					$('pagewrappertop').update(pagetop);
-					$('pagewrapperbottom').update(pagebottom);
-
-					currentfilter = filter
-					$('selecttop').observe('change',page);
-					$('selectbottom').observe('change',page);
-
-					var filtercolor = $('filterby').getStyle('color');
-					if(!filtercolor)
-						filtercolor = '#000';
-
-					size = filtes.length;
-					for(i=0;i<size;i++){
-						$(filtes[i] + 'filter').setStyle({color: filtercolor, fontWeight: 'normal'});
-					}
-					$(filter + 'filter').setStyle({
-						 color: '#000000',
-						 fontWeight: 'bold'
-					});
-
-				}
-			}
-		});
-}
 document.observe('dom:loaded', function() {
-	applyfilter('name');
+	feed_applyfilter('<?=$_SERVER["REQUEST_URI"]?>','name');
 });
 </script>
 <?
