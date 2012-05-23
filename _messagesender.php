@@ -9,9 +9,18 @@ require_once("inc/html.inc.php");
 require_once("inc/utils.inc.php");
 require_once("obj/Form.obj.php");
 require_once("obj/FormItem.obj.php");
+require_once("obj/RenderedList.obj.php");
+require_once("obj/Phone.obj.php");
 
 // DBMO
 require_once("obj/JobType.obj.php");
+require_once("obj/PeopleList.obj.php");
+require_once("obj/AudioFile.obj.php");
+require_once("obj/Voice.obj.php");
+require_once("obj/Message.obj.php");
+require_once("obj/FieldMap.obj.php");
+require_once("obj/MessagePart.obj.php");
+require_once("obj/FeedCategory.obj.php");
 
 // Validators
 require_once("obj/Validator.obj.php");
@@ -48,7 +57,7 @@ class ValEasycall extends Validator {
 		if (!$USER->authorize("starteasy"))
 			return "$this->label "._L("is not allowed for this user account");
 		$values = json_decode($value);
-		if ($values == json_decode("{}"))
+		if (!$values || $values == json_decode("{}"))
 			return "$this->label "._L("has messages that are not recorded");
 		foreach ($values as $langcode => $afid) {
 			$audiofile = DBFind("AudioFile", "from audiofile where id = ? and userid = ?", false, array($afid, $USER->id));
@@ -157,9 +166,13 @@ $userjobtypes = JobType::getUserJobTypes(false);
 // need to reserve some characters for the link url and the six byte code. (http://smalldomain.com/<code>)
 $twitterreservedchars = mb_strlen(" http://". getSystemSetting("tinydomain"). "/") + 6;
 
+//Get available languages
+$translationlanguages = Voice::getTTSLanguageMap();
+unset($translationlanguages['en']);
+
 $formdata = array(
 	"name" => array(
-		"label" => _L('name'),
+		"label" => "name",
 		"value" => "",
 		"validators" => array(
 			array("ValJobName"),
@@ -169,7 +182,7 @@ $formdata = array(
 		"helpstep" => 1
 	),
 	"jobtype" => array(
-		"label" => _L('jobtype'),
+		"label" => "jobtype",
 		"value" => "",
 		"validators" => array(
 			array("ValInArray", "values" => array_keys($userjobtypes))
@@ -178,7 +191,7 @@ $formdata = array(
 		"helpstep" => 1
 	),
 	"package" => array(
-		"label" => _L('package'),
+		"label" => "package",
 		"value" => "",
 		"validators" => array(
 			array("ValInArray", "values" => array('easycall', 'express', 'personalized', 'custom'))
@@ -190,7 +203,7 @@ $formdata = array(
 	"LIST DATA",
 	//=========================================================================================
 	"addmephone" => array(
-		"label" => _L('addmephone'),
+		"label" => "addmephone",
 		"value" => "",
 		"validators" => array(
 			array("ValPhone")
@@ -199,7 +212,7 @@ $formdata = array(
 		"helpstep" => 1
 	),
 	"addmeemail" => array(
-		"label" => _L('addmeemail'),
+		"label" => "addmeemail",
 		"value" => "",
 		"validators" => array(
 			array("ValEmail")
@@ -208,7 +221,7 @@ $formdata = array(
 		"helpstep" => 1
 	),
 	"addmesms" => array(
-		"label" => _L('addmesms'),
+		"label" => "addmesms",
 		"value" => "",
 		"validators" => array(
 			array("ValPhone")
@@ -217,7 +230,7 @@ $formdata = array(
 		"helpstep" => 1
 	),
 	"listids" => array(
-		"label" => _L('listids'),
+		"label" => "listids",
 		"value" => "",
 		"validators" => array(
 			array("ValLists")
@@ -229,7 +242,7 @@ $formdata = array(
 	"PHONE MESSAGE",
 	//=========================================================================================
 	"phonemessagecallme" => array(
-		"label" => _L('phonemessagecallme'),
+		"label" => "phonemessagecallme",
 		"value" => "",
 		"validators" => array(
 			array("ValEasycall")
@@ -238,7 +251,7 @@ $formdata = array(
 		"helpstep" => 1
 	),
 	"phonemessagetext" => array(
-		"label" => _L('phonemessagetext'),
+		"label" => "phonemessagetext",
 		"value" => "",
 		"validators" => array(
 			array("ValTextAreaPhone"),
@@ -249,28 +262,34 @@ $formdata = array(
 		"helpstep" => 1
 	),
 	"phonemessagetexttranslate" => array(
-		"label" => _L('phonemessagetexttranslate'),
+		"label" => "phonemessagetexttranslate",
 		"value" => "",
 		"validators" => array(
-			array("ValTranslationCharacterLimit", "field" => "message")
+			array("ValTranslationCharacterLimit", "field" => "phonemessagetext")
 		),
 		"control" => array("TextField"),
 		"helpstep" => 1
-	),
-	"phonemessagetexttranslatetext" => array(
-		"label" => _L('phonemessagetexttranslatetext'),
+	)
+);
+
+foreach ($translationlanguages as $code => $language) {
+	$formdata["phonemessagetexttranslate". $code. "text"] = array(
+		"label" => "phonemessagetexttranslate". $code. "text",
 		"value" => "",
 		"validators" => array(
 			array("ValTranslation")
 		),
 		"control" => array("TextField"),
 		"helpstep" => 1
-	),
+	);
+}
+
+$formdata = array_merge($formdata, array(
 	//=========================================================================================
 	"EMAIL MESSAGE",
 	//=========================================================================================
 	"emailmessagefromname" => array(
-		"label" => _L('emailmessagefromname'),
+		"label" => "emailmessagefromname",
 		"value" => "",
 		"validators" => array(
 			array("ValLength","max" => 50)
@@ -279,7 +298,7 @@ $formdata = array(
 		"helpstep" => 1
 	),
 	"emailmessagefromemail" => array(
-		"label" => _L('emailmessagefromemail'),
+		"label" => "emailmessagefromemail",
 		"value" => "",
 		"validators" => array(
 			array("ValLength","max" => 255),
@@ -289,7 +308,7 @@ $formdata = array(
 		"helpstep" => 1
 	),
 	"emailmessagesubject" => array(
-		"label" => _L('emailmessagesubject'),
+		"label" => "emailmessagesubject",
 		"value" => "",
 		"validators" => array(
 			array("ValLength","max" => 255)
@@ -298,7 +317,7 @@ $formdata = array(
 		"helpstep" => 1
 	),
 	"emailmessageattachment" => array(
-		"label" => _L('emailmessageattachment'),
+		"label" => "emailmessageattachment",
 		"value" => "",
 		"validators" => array(
 			array("ValEmailAttach")
@@ -307,7 +326,7 @@ $formdata = array(
 		"helpstep" => 1
 	),
 	"emailmessagetext" => array(
-		"label" => _L('emailmessagetext'),
+		"label" => "emailmessagetext",
 		"value" => "",
 		"validators" => array(
 			array("ValMessageBody"),
@@ -317,7 +336,7 @@ $formdata = array(
 		"helpstep" => 1
 	),
 	"emailmessagetexttranslate" => array(
-		"label" => _L('emailmessagetexttranslate'),
+		"label" => "emailmessagetexttranslate",
 		"value" => "",
 		"validators" => array(
 			array("ValTranslationCharacterLimit", "field" => "emailmessagetext")
@@ -325,21 +344,27 @@ $formdata = array(
 		"control" => array("TextField"),
 		"requires" => array("emailmessagetext"),
 		"helpstep" => 1
-	),
-	"emailmessagetexttranslatetext" => array(
-		"label" => _L('emailmessagetexttranslatetext'),
+	)
+));
+
+foreach ($translationlanguages as $code => $language) {
+	$formdata["phonemessageemailtranslate". $code. "text"] = array(
+		"label" => "phonemessageemailtranslate". $code. "text",
 		"value" => "",
 		"validators" => array(
-			// NOTE: there are currently no validators on this data
+			array("ValTranslation")
 		),
 		"control" => array("TextField"),
 		"helpstep" => 1
-	),
+	);
+}
+
+$formdata = array_merge($formdata, array(
 	//=========================================================================================
 	"SMS MESSAGE",
 	//=========================================================================================
 	"smsmessagetext" => array(
-		"label" => _L('smsmessagetext'),
+		"label" => "smsmessagetext",
 		"value" => "",
 		"validators" => array(
 			array("ValLength","max"=>160),
@@ -352,7 +377,7 @@ $formdata = array(
 	"SOCIAL MESSAGE",
 	//=========================================================================================
 	"socialmediafacebookmessage" => array(
-		"label" => _L('socialmediafacebookmessage'),
+		"label" => "socialmediafacebookmessage",
 		"value" => "",
 		"validators" => array(
 			array("ValLength","max"=>420)
@@ -361,7 +386,7 @@ $formdata = array(
 		"helpstep" => 1
 	),
 	"socialmediatwittermessage" => array(
-		"label" => _L('socialmediatwittermessage'),
+		"label" => "socialmediatwittermessage",
 		"value" => "",
 		"validators" => array(
 			array("ValLength","max"=>(140 - $twitterreservedchars))
@@ -370,7 +395,7 @@ $formdata = array(
 		"helpstep" => 1
 	),
 	"socialmediafeedmessage" => array(
-		"label" => _L('socialmediafeedmessage'),
+		"label" => "socialmediafeedmessage",
 		"value" => "",
 		"validators" => array(
 			array("ValTextAreaAndSubjectWithCheckbox","requiresubject" => true),
@@ -380,10 +405,19 @@ $formdata = array(
 		"helpstep" => 1
 	),
 	"socialmediafacebookpage" => array(
-		"label" => _L('socialmediafacebookpage'),
+		"label" => "socialmediafacebookpage",
 		"value" => "",
 		"validators" => array(
 			array("ValFacebookPage", "authpages" => getFbAuthorizedPages(), "authwall" => getSystemSetting("fbauthorizewall"))
+		),
+		"control" => array("TextField"),
+		"helpstep" => 1
+	),
+	"socialmediafeedcategory" => array( // TODO: this is currently a multi-checkbox
+		"label" => "socialmediafeedcategory",
+		"value" => "",
+		"validators" => array(
+			array("ValInArray", "values" => array_keys(FeedCategory::getAllowedFeedCategories()))
 		),
 		"control" => array("TextField"),
 		"helpstep" => 1
@@ -392,7 +426,7 @@ $formdata = array(
 	"JOB OPTIONS",
 	//=========================================================================================
 	"optionmaxjobdays" => array(
-		"label" => _L('optionmaxjobdays'),
+		"label" => "optionmaxjobdays",
 		"value" => "",
 		"validators" => array(
 			array("ValInArray", "values" => range(1,$ACCESS->getValue('maxjobdays', 7)))
@@ -401,7 +435,7 @@ $formdata = array(
 		"helpstep" => 1
 	),
 	"optionleavemessage" => array(
-		"label" => _L('optionleavemessage'),
+		"label" => "optionleavemessage",
 		"value" => "",
 		"validators" => array(
 			// NOTE: no validation, will be ignored if the user can't use this option
@@ -410,7 +444,7 @@ $formdata = array(
 		"helpstep" => 1
 	),
 	"optionmessageconfirmation" => array(
-		"label" => _L('optionmessageconfirmation'),
+		"label" => "optionmessageconfirmation",
 		"value" => "",
 		"validators" => array(
 			// NOTE: no validation, will be ignored if the user can't use this option
@@ -419,7 +453,7 @@ $formdata = array(
 		"helpstep" => 1
 	),
 	"optionskipduplicate" => array( // NOTE: using same setting for both skipduplicates and skipemailduplicates?
-		"label" => _L('optionskipduplicate'),
+		"label" => "optionskipduplicate",
 		"value" => "",
 		"validators" => array(
 			// NOTE: no validation, will be ignored if the user can't use this option
@@ -428,7 +462,7 @@ $formdata = array(
 		"helpstep" => 1
 	),
 	"optioncallerid" => array(
-		"label" => _L('optioncallerid'),
+		"label" => "optioncallerid",
 		"value" => "",
 		"validators" => array(
 			array("ValLength","min" => 0,"max" => 20),
@@ -442,7 +476,7 @@ $formdata = array(
 	"SCHEDULE OPTIONS",
 	//=========================================================================================
 	"scheduledate" => array(
-		"label" => _L('scheduledate'),
+		"label" => "scheduledate",
 		"value" => "",
 		"validators" => array(
 			// TODO: date validation
@@ -451,32 +485,34 @@ $formdata = array(
 		"helpstep" => 1
 	),
 	"schedulecallearly" => array(
-		"label" => _L('schedulecallearly'),
+		"label" => "schedulecallearly",
 		"value" => "",
 		"validators" => array(
 			array("ValTimeCheck", "min" => $ACCESS->getValue('callearly'), "max" => $ACCESS->getValue('calllate')),
-			array("ValTimeWindowCallEarly")
+			array("ValTimeWindowCallEarly", "calllatefield" => "schedulecalllate")
 		),
 		"control" => array("TextField"),
+		"requires" => array("schedulecalllate", "scheduledate"),
 		"helpstep" => 1
 	),
 	"schedulecalllate" => array(
-		"label" => _L('schedulecalllate'),
+		"label" => "schedulecalllate",
 		"value" => "",
 		"validators" => array(
 			array("ValTimeCheck", "min" => $ACCESS->getValue('callearly'), "max" => $ACCESS->getValue('calllate')),
-			array("ValTimeWindowCallLate"),
-			array("ValTimePassed", "field" => "date")
+			array("ValTimeWindowCallLate", "callearlyfield" => "schedulecallearly"),
+			array("ValTimePassed", "field" => "scheduledate")
 		),
 		"control" => array("TextField"),
+		"requires" => array("schedulecallearly", "scheduledate"),
 		"helpstep" => 1
-	),
-);
+	)
+));
 
 
 $buttons = array(submit_button(_L('Save'),"submit","tick"),
 		icon_button(_L('Cancel'),"cross",null,"start.php"));
-$form = new Form("messagesender",$formdata,array(),$buttons, "vertical");
+$form = new Form("msgsndr",$formdata,array(),$buttons, "vertical");
 
 ////////////////////////////////////////////////////////////////////////////////
 // Form Data Handling
