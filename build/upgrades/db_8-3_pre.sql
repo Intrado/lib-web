@@ -94,3 +94,7 @@ $$$
 ALTER TABLE `setting` ADD `organizationid` INT NULL AFTER `id`
 $$$
 
+-- $rev 8
+
+ALTER TABLE `job` CHANGE `status` `status` ENUM( 'new', 'scheduled', 'processing', 'procactive', 'active', 'complete', 'cancelled', 'cancelling', 'repeating', 'template' ) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT 'new'
+$$$

@@ -1955,3 +1955,11 @@ $$$
 update setting set value='8.3/7' where name='_dbversion'
 $$$
 -- END 8.3/7
+
+ALTER TABLE `job` CHANGE `status` `status` ENUM( 'new', 'scheduled', 'processing', 'procactive', 'active', 'complete', 'cancelled', 'cancelling', 'repeating', 'template' ) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT 'new'
+$$$
+
+update setting set value='8.3/8' where name='_dbversion'
+$$$
+-- END 8.3/8
+
