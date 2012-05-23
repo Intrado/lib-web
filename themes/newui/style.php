@@ -416,7 +416,7 @@ table.list ul li { padding: 0; }
 
 /*----- Buttons, changes to the basic buttons featured across the site -----*/
 
-button { margin: 0 5px 5px 0; padding: 5px 10px; color: #333; font-size: 14px; font-weight: normal; text-shadow: 0 1px 0 0 #fff; border: 1px solid #ccc;
+button, .btn { margin: 0 5px 5px 0; padding: 5px 10px; color: #333; font-size: 14px; font-weight: normal; text-shadow: 0 1px 0 0 #fff; border: 1px solid #ccc;
 	background-color: #f5f5f5;  
   background-image: -webkit-gradient(linear, left top, left bottom, from(#fbfbfb), to(#e4e4e4)); 
   background-image: -webkit-linear-gradient(top, #fbfbfb, #e4e4e4); 
@@ -430,7 +430,7 @@ button { margin: 0 5px 5px 0; padding: 5px 10px; color: #333; font-size: 14px; f
 -webkit-border-radius: 5px; -moz-border-radius: 5px; border-radius: 5px; 
 -moz-background-clip: padding; -webkit-background-clip: padding-box; background-clip: padding-box; }
 
-button:hover { background-color: #e7e7e7;
+button:hover, .btn:hover { background-color: #e7e7e7;
 	background-image: -webkit-gradient(linear, left top, left bottom, from(#f2f2f2), to(#dedede)); 
   background-image: -webkit-linear-gradient(top, #f2f2f2, #dedede); 
   background-image:    -moz-linear-gradient(top, #f2f2f2, #dedede); 
@@ -438,7 +438,7 @@ button:hover { background-color: #e7e7e7;
   background-image:      -o-linear-gradient(top, #f2f2f2, #dedede); 
   background-image:         linear-gradient(top, #f2f2f2, #dedede); }
 	        
-button:active, button.active { background-color: #d9d9d9;  
+button:active, button.active, .btn:active, .btn.active { background-color: #d9d9d9;  
   background-image: -webkit-gradient(linear, left top, left bottom, from(#e9e9e9), to(#dedede)); 
   background-image: -webkit-linear-gradient(top, #e9e9e9, #dedede); 
   background-image:    -moz-linear-gradient(top, #e9e9e9, #dedede); 
