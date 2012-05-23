@@ -90,44 +90,42 @@ include("nav.inc.php");
 		<ul class="msg_steps cf">
 		<li class="active"><a id="tab1" ><span class="icon">1</span> Subject &amp; Recipients</a></li>
 		<li><a id="tab2" data-active="true"><span class="icon">2</span> Message Content</a></li>
-		<li><a id="tab3" data-active="true"><span class="icon">3</span> Review &amp; Send</a></li>
+		<li><a id="tab3" data-active="false"><span class="icon">3</span> Review &amp; Send</a></li>
 		</ul>
 		</div>
 		
 		<div class="window_body_wrap">
+
+		<form name="broadcast">
+			
 		<div id="msg_section_1" class="window_panel">
 		
 		<h3 class="flag">Notification Info</h3>
 		
-		<form name="broadcast">
-		
-		<fieldset>
-		<label for="msgsndr_form_subject">Subject</label>
-			<div class="controls">
-			<input type="text" id="msgsndr_form_subject" name="broadcast_subject" data-ajax="true" /> <span class="error"></span>
-			<p>e.g. "PTA Meeting Reminder"</p>
-			</div>
-		</fieldset>
-		
-		<fieldset class="cf">
-			<label for="msgsndr_form_type">Type</label>
-			<div class="controls">
-			<select id="msgsndr_form_type" name="type">
-<!-- 				<option value="general">General Announcement</option>
-				<option value="attend">Attendance</option>
-				<option value="emergency">Emergency</option> -->
-			</select>
-			</div>
-		</fieldset>
+			<fieldset>
+			<label for="msgsndr_form_subject">Subject</label>
+				<div class="controls">
+					<input type="text" id="msgsndr_form_subject" name="broadcast_subject" data-ajax="true" /> 
+					<span class="error"></span>
+					<p>e.g. "PTA Meeting Reminder"</p>
+				</div>
+			</fieldset>
+			
+			<fieldset class="cf">
+				<label for="msgsndr_form_type">Type</label>
+				<div class="controls">
+					<select id="msgsndr_form_type" name="type"></select>
+				</div>
+			</fieldset>
 		
 		
 		<h3 class="flag">Recipient Lists</h3>
 		
 		<div class="add_recipients">	
 			<div class="add_btn">
-			<button href="#msgsndr_choose_list" data-toggle="modal">Pick from Existing Lists</button>
-			or
-			<button href="#msgsndr_build_list" data-toggle="modal">Build a List Using Rules</button>
+				<button href="#msgsndr_choose_list" data-toggle="modal">Pick from Existing Lists</button>
+				or
+				<button href="#msgsndr_build_list" data-toggle="modal">Build a List Using Rules</button>
 			</div>
 			
 			<div id="msgsndr_choose_list" class="modal hide">
@@ -138,13 +136,18 @@ include("nav.inc.php");
 					<li><input type="checkbox"/><label>Second Year Students</label></li>
 					<li><input type="checkbox"/><label>Teachers</label></li>
 				</ul>
-				<div class="msg_confirm"><button data-dismiss="modal">Cancel</button> <button class="btn_confirm" href="#">Add Lists</button></div>
+				<div class="msg_confirm">
+					<button data-dismiss="modal">Cancel</button><button class="btn_confirm" href="#">Add Lists</button>
+				</div>
 			</div>
 			
 			<div id="msgsndr_build_list" class="modal hide">
 				<h3>Add Recipients Using Rules <a href="#" class="close" data-dismiss="modal">x</a></h3>
 				<p>Use filters to match a group of entries in your Address Book</p>
-				<div class="msg_confirm"><button data-dismiss="modal">Cancel</button> <button class="btn_confirm">Add Lists</button></div>
+				<div class="msg_confirm">
+					<button data-dismiss="modal">Cancel</button> 
+					<button class="btn_confirm">Add Lists</button>
+				</div>
 			</div>
 		
 			<table class="info">
@@ -182,7 +185,9 @@ include("nav.inc.php");
 
 		</div><!-- end add_recipients -->
 		
-		<div class="msg_confirm"><button class="btn_confirm" disabled="disabled">Continue <span class="icon"></span></button></div>
+		<div class="msg_confirm">
+				<button class="btn_confirm" disabled="disabled">Continue <span class="icon"></span></button>
+		</div>
 		
 		</div><!-- end window_panel -->
 		
