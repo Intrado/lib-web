@@ -65,9 +65,16 @@ $SHORTCUTS['Help'] = "javascript: popup('help/index.php',750,500);";
 //tree format:
 //[[title,default link,access,selected,[[sub title,sub link,sub access,sub selected],...],...]
 
+// set the tab name for start.php depending on theme ...
+	if ($_SESSION['colorscheme']['_brandtheme'] == "newui") {
+		$starttab = array("Dashboard","start.php",NULL,$MAINTAB=="start",array());
+	} else {
+		$starttab = array("Start","start.php",NULL,$MAINTAB=="start",array());
+	}
+
 $NAVTREE = array (
-	array("Start","start.php",NULL,$MAINTAB=="start",array()),
-	array("Notifications",NULL,array("createlist","sendphone","sendprint","sendemail", "sendsms",getSystemSetting("_hastargetedmessage", false) ? "targetedmessage" : "dummy"),$MAINTAB=="notifications",array(
+		$starttab,
+		array("Notifications",NULL,array("createlist","sendphone","sendprint","sendemail", "sendsms",getSystemSetting("_hastargetedmessage", false) ? "targetedmessage" : "dummy"),$MAINTAB=="notifications",array(
 		array("Lists","lists.php",array("createlist","subscribe"),$SUBTAB=="lists"),
 		array("Messages","messages.php",array('sendemail', 'sendphone', "sendsms","subscribe"),$SUBTAB=="messages"),
 		array("Jobs","jobs.php",array('sendemail', 'sendphone', "sendsms"),$SUBTAB=="jobs"),

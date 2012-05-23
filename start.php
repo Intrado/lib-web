@@ -2,6 +2,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 // Includes
 ////////////////////////////////////////////////////////////////////////////////
+
 require_once("inc/common.inc.php");
 require_once("inc/date.inc.php");
 require_once("inc/securityhelper.inc.php");
@@ -19,7 +20,11 @@ require_once("inc/formatters.inc.php");
 require_once("obj/Person.obj.php");
 require_once("obj/RenderedList.obj.php");
 
-
+// Redirect to dashboard for 'newui' theme ...
+if ( $_SESSION['colorscheme']['_brandtheme'] == "newui") {
+	include_once("dashboard.php");
+	exit();
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 // Data Handling
