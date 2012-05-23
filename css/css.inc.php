@@ -233,7 +233,7 @@ table.window_body { width: 100%; }
 /*----- Buttons, for buttons within the windows and tables, further styling is in the specific theme file for each theme -----*/
    
 button { color: <?=$primary?>; }
-.btn { margin: 2px 5px; padding: 0; border: none; background: transparent; font-weight: bold; cursor: pointer; }
+.btn { margin: 2px 5px; padding: 0; border: none;/* background: transparent;*/ font-weight: bold; cursor: pointer; }
 .btn_wrap { white-space: nowrap; position: relative; display: block; } 
 .btn_left, 
 .btn_right, 
