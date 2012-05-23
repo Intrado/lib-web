@@ -47,6 +47,10 @@ table {
 	border-spacing: 0;
 }
 
+a:hover {
+  cursor: pointer;
+}
+
 /* Padding is not added to width of elements, so you can set div etc to the size you want */
 * { -moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box; }
 
@@ -291,8 +295,8 @@ border-color: transparent transparent #2A6576 transparent; border-width: 13px; b
 .window_panel a { color: #0088CC; }
 .window_panel a:hover { color: #005580; text-decoration: underline; }
 .window_panel .icon { display: inline-block; height: 14px; width: 14px; }
-.window_panel .btn { display: inline-block; padding: 5px 10px; margin: 0; color: #333; }
-.window_panel .btn:hover { color: #222; text-decoration: none; }
+.window_panel .button { display: inline-block; padding: 5px 10px; margin: 0; color: #333; }
+.window_panel .button:hover { color: #222; text-decoration: none; }
 .window_panel .record { float: left; display: inline; line-height: 17px; margin: 0 0 0 5px; color: #fff; border: 1px solid #9f320f; 
 	background-color: #CF451A;
 	background-image: -webkit-gradient(linear, left top, left bottom, from(#E84F1F), to(#A93611)); 
@@ -391,11 +395,11 @@ border-color: #222222 transparent transparent; border-style: solid; border-width
 /*----- List page styles -----*/
 
 .feed_btn_wrap { position: absolute; top: -63px; right: 0; margin: 0; padding: 0; border: none; }
-.feed_btn_wrap .btn { float: left; display: inline; margin: 0; -webkit-border-radius: 0; border-radius: 0; border-top: 1px solid #bbb; border-right: 1px solid #bbb; border-bottom: 1px solid #bbb; border-left: none; }
-.feed_btn_wrap .btn:first-child { border-left: 1px solid #bbb; -webkit-border-radius: 4px 0 0 4px; border-radius: 4px 0 0 4px; }
-.feed_btn_wrap .btn:last-child { -webkit-border-radius: 0 4px 4px 0; border-radius: 0 4px 4px 0; }
-.feed_btn_wrap .btn:hover { background: #e7e7e7; }
-.feed_btn_wrap .btn.active { background: #e4e4e4; -webkit-box-shadow: inset 0px 1px 4px 0 rgba(0,0,0,0.2); box-shadow: inset 0px 1px 4px 0 rgba(0,0,0,0.2); }
+.feed_btn_wrap button { float: left; display: inline; margin: 0; -webkit-border-radius: 0; border-radius: 0; border-top: 1px solid #bbb; border-right: 1px solid #bbb; border-bottom: 1px solid #bbb; border-left: none; }
+.feed_btn_wrap button:first-child { border-left: 1px solid #bbb; -webkit-border-radius: 4px 0 0 4px; border-radius: 4px 0 0 4px; }
+.feed_btn_wrap button:last-child { -webkit-border-radius: 0 4px 4px 0; border-radius: 0 4px 4px 0; }
+.feed_btn_wrap button:hover { background: #e7e7e7; }
+.feed_btn_wrap button.active { background: #e4e4e4; -webkit-box-shadow: inset 0px 1px 4px 0 rgba(0,0,0,0.2); box-shadow: inset 0px 1px 4px 0 rgba(0,0,0,0.2); }
 .btn_middle img { display: none; }
 
 
@@ -412,7 +416,7 @@ table.list ul li { padding: 0; }
 
 /*----- Buttons, changes to the basic buttons featured across the site -----*/
 
-.btn { margin: 0 5px 5px 0; padding: 5px 10px; color: #333; font-size: 14px; font-weight: normal; text-shadow: 0 1px 0 0 #fff; border: 1px solid #ccc;
+button { margin: 0 5px 5px 0; padding: 5px 10px; color: #333; font-size: 14px; font-weight: normal; text-shadow: 0 1px 0 0 #fff; border: 1px solid #ccc;
 	background-color: #f5f5f5;  
   background-image: -webkit-gradient(linear, left top, left bottom, from(#fbfbfb), to(#e4e4e4)); 
   background-image: -webkit-linear-gradient(top, #fbfbfb, #e4e4e4); 
@@ -426,7 +430,7 @@ table.list ul li { padding: 0; }
 -webkit-border-radius: 5px; -moz-border-radius: 5px; border-radius: 5px; 
 -moz-background-clip: padding; -webkit-background-clip: padding-box; background-clip: padding-box; }
 
-.btn:hover { background-color: #e7e7e7;
+button:hover { background-color: #e7e7e7;
 	background-image: -webkit-gradient(linear, left top, left bottom, from(#f2f2f2), to(#dedede)); 
   background-image: -webkit-linear-gradient(top, #f2f2f2, #dedede); 
   background-image:    -moz-linear-gradient(top, #f2f2f2, #dedede); 
@@ -434,7 +438,7 @@ table.list ul li { padding: 0; }
   background-image:      -o-linear-gradient(top, #f2f2f2, #dedede); 
   background-image:         linear-gradient(top, #f2f2f2, #dedede); }
 	        
-.btn:active, .btn.active { background-color: #d9d9d9;  
+button:active, button.active { background-color: #d9d9d9;  
   background-image: -webkit-gradient(linear, left top, left bottom, from(#e9e9e9), to(#dedede)); 
   background-image: -webkit-linear-gradient(top, #e9e9e9, #dedede); 
   background-image:    -moz-linear-gradient(top, #e9e9e9, #dedede); 
@@ -444,6 +448,19 @@ table.list ul li { padding: 0; }
 	-webkit-box-shadow: inset 0px 2px 3px 0px rgba(0,0,0,0.25); 
 		 -moz-box-shadow: inset 0px 2px 3px 0px rgba(0,0,0,0.25); 
 	        box-shadow: inset 0px 2px 3px 0px rgba(0,0,0,0.25);  }
+
+.window_panel button[disabled], .window_panel button[disabled]:hover {
+  background-color: rgb(100,100,100);
+  background-image: -webkit-gradient(linear, left top, left bottom, from(#999), to(#AAA)); 
+  background-image: -webkit-linear-gradient(top, #999, #AAA); 
+  background-image:    -moz-linear-gradient(top, #999, #AAA); 
+  background-image:     -ms-linear-gradient(top, #999, #AAA); 
+  background-image:      -o-linear-gradient(top, #999, #AAA); 
+  background-image:         linear-gradient(top, #999, #AAA);
+  border: 1px solid #eee;
+  color: rgb(240,240,240);
+  cursor: default;
+}
 
 .btn_left, .btn_middle, .btn_right { background: none; margin: 0; padding: 0; }
 

@@ -17,15 +17,17 @@ jQuery.noConflict();
 		$('.msg_steps a').on('click', function(event) {
 			event.preventDefault();
 			// Get the clicked elements id
-			var elm = $(this).attr('id');
-			// Gives me the number from the circle so can use it later on 
-			var tabn = $('#' + elm + ' span').text();
-			// Remove active class from tabs, and set selected one to have active class
-			$('.msg_steps li').removeClass('active');
-			$(this).parent().addClass('active');
-			// Hide panels then show the one relevant to the users selection
-			$('.window_panel').hide();
-			$('#msg_section_'+tabn).show();
+			if ($(this).attr('data-active') != "false") {
+				var elm = $(this).attr('id');
+				// Gives me the number from the circle so can use it later on 
+				var tabn = $('#' + elm + ' span').text();
+				// Remove active class from tabs, and set selected one to have active class
+				$('.msg_steps li').removeClass('active');
+				$(this).parent().addClass('active');
+				// Hide panels then show the one relevant to the users selection
+				$('.window_panel').hide();
+				$('#msg_section_'+tabn).show();
+			}
 		});
 
 
@@ -46,13 +48,13 @@ jQuery.noConflict();
 
 
 		// Switch Audio 
-		$('.switchaudio a').on('click', function(event) {
+		$('#switchaudio button').on('click', function(event) {
 			event.preventDefault();
 			var type = $(this).attr('data-type');
 			
-			$('form.audio').hide();
+			$('div.audio').hide();
 			$('#'+type+'').show();
-			$('.switchaudio a').removeClass('active');
+			$('#switchaudio button').removeClass('active');
 			$(this).addClass('active');
 		});
 		

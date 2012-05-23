@@ -2,278 +2,81 @@
 ////////////////////////////////////////////////////////////////////////////////
 // Includes
 ////////////////////////////////////////////////////////////////////////////////
+// require_once("obj/Validator.obj.php");
+// require_once("obj/ValDuplicateNameCheck.val.php");
+// require_once("obj/Phone.obj.php");
+// require_once("obj/Form.obj.php");
+// require_once("obj/FormItem.obj.php");
+
+require_once("inc/common.inc.php");
+require_once("inc/securityhelper.inc.php");
+require_once("inc/table.inc.php");
+require_once("inc/html.inc.php");
+require_once("inc/utils.inc.php");
 require_once("obj/Validator.obj.php");
 require_once("obj/ValDuplicateNameCheck.val.php");
-require_once("obj/Phone.obj.php");
+require_once("obj/Form.obj.php");
+require_once("obj/FormItem.obj.php");
+
+////////////////////////////////////////////////////////////////////////////////
+// Form Data
+////////////////////////////////////////////////////////////////////////////////
+
+$formdata = array(
+	"subject" => array(
+		"label" => _L('TextField'),
+		"value" => "a",
+		"validators" => array(
+			array("ValRequired"),
+			array("ValLength","min" => 3, "max" => 30),
+			array("ValDuplicateNameCheck","type"=> "job")
+		)
+	)
+);
+
+
+$buttons = array();
+$form = new Form("broadcast",$formdata,$buttons, "vertical");
+
+////////////////////////////////////////////////////////////////////////////////
+// Form Data Handling
+////////////////////////////////////////////////////////////////////////////////
+
+//check and handle an ajax request (will exit early)
+//or merge in related post data
+$form->handleRequest();
+
+$datachange = false;
+$errors = false;
+//check for form submission
+if ($button = $form->getSubmit()) { //checks for submit and merges in post data
+	$ajax = $form->isAjaxSubmit(); //whether or not this requires an ajax response	
+	
+	if ($form->checkForDataChange()) {
+		$datachange = true;
+	} else if (($errors = $form->validate()) === false) { //checks all of the items in this form
+		$postdata = $form->getData(); //gets assoc array of all values {name:value,...}
+		Query("BEGIN");
+		
+		//save data here	
+		error_log('Data Saved');
+		
+		Query("COMMIT");
+		if ($ajax)
+			$form->sendTo("start.php");
+		else
+			redirect("start.php");
+	}
+}
+
+
+// Moved from message_sender.php 
+
+include("nav.inc.php");
+
 ?>
 
-<script> 
-	orgid = 123;
-	userid = <? print_r($_SESSION['user']->id); ?>;
-	roles = [
-		{
-      id: 789,
-      accessProfile: {
-        id: 135,
-        name: "all",
-        permissions: [
-          { name: "loginweb", value: "1" },
-          { name: "loginphone", value: "1" },
-          { name: "startstats", value: "1" },
-          { name: "startshort", value: "1" },
-          { name: "starteasy", value: "1" },
-          { name: "sendphone", value: "1" },
-          { name: "callmax", value: "5" },
-          { name: "sendemail", value: "1" },
-          { name: "sendmulti", value: "1" },
-          { name: "createlist", value: "1" },
-          { name: "listuploadids", value: "1" },
-          { name: "listuploadcontacts", value: "1" },
-          { name: "createrepeat", value: "1" },
-          { name: "setcallerid", value: "1" },
-          { name: "maxjobdays", value: "2" },
-          { name: "blocknumbers", value: "1" },
-          { name: "callblockingperms", value: "editall" },
-          { name: "createreport", value: "1" },
-          { name: "viewsystemreports", value: "1" },
-          { name: "viewusagestats", value: "1" },
-          { name: "viewcalldistribution", value: "1" },
-          { name: "managemyaccount", value: "1" },
-          { name: "viewcontacts", value: "1" },
-          { name: "managecontactdetailsettings", value: "1" },
-          { name: "viewsystemactive", value: "1" },
-          { name: "viewsystemrepeating", value: "1" },
-          { name: "viewsystemcompleted", value: "1" },
-          { name: "leavemessage", value: "1" },
-          { name: "messageconfirmation", value: "1" },
-          { name: "survey", value: "1" },
-          { name: "sendsms", value: "1" },
-          { name: "managesystemjobs", value: "1" },
-          { name: "manageaccount", value: "1" },
-          { name: "manageprofile", value: "1" },
-          { name: "managesystem", value: "1" },
-          { name: "metadata", value: "1" },
-          { name: "managetasks", value: "1" },
-          { name: "publishmessagegroup", value: "1" },
-          { name: "subscribemessagegroup", value: "1" },
-          { name: "targetedmessage", value: "1" },
-          { name: "targetedcomment", value: "1" },
-          { name: "manageclassroommessaging", value: "1" },
-          { name: "facebookpost", value: "1" },
-          { name: "twitterpost", value: "1" },
-          { name: "publish", value: "messagegroup|list" },
-          { name: "feedpost", value: "1" },
-          { name: "monitorevent", value: "1" },
-          { name: "monitorsystemwideevent", value: "1" },
-          { name: "subscribe", value: "messagegroup|list" },
-          { name: "datafields", value: "f04|f05|f06|f20|g02|c02|c03|c04|c05|c06|c07" },
-          { name: "portalaccess", value: "1" },
-          { name: "generatebulktokens", value: "1" }
-        ]
-      },
-      organization: {
-        id: 123,
-        name: "James Woods High"
-      }
-    },
-    {
-      id: 790,
-      accessProfile: {
-        id: 136,
-        name: "no sendphone or sendsms",
-        permissions: [
-          { name: "loginweb", value: "1" },
-          { name: "loginphone", value: "1" },
-          { name: "startstats", value: "1" },
-          { name: "startshort", value: "1" },
-          { name: "starteasy", value: "1" },
-          { name: "sendphone", value: "0" },
-          { name: "callmax", value: "0" },
-          { name: "sendemail", value: "1" },
-          { name: "sendmulti", value: "1" },
-          { name: "createlist", value: "1" },
-          { name: "listuploadids", value: "1" },
-          { name: "listuploadcontacts", value: "1" },
-          { name: "createrepeat", value: "1" },
-          { name: "setcallerid", value: "1" },
-          { name: "maxjobdays", value: "2" },
-          { name: "blocknumbers", value: "1" },
-          { name: "callblockingperms", value: "editall" },
-          { name: "createreport", value: "1" },
-          { name: "viewsystemreports", value: "1" },
-          { name: "viewusagestats", value: "1" },
-          { name: "viewcalldistribution", value: "1" },
-          { name: "managemyaccount", value: "1" },
-          { name: "viewcontacts", value: "1" },
-          { name: "managecontactdetailsettings", value: "1" },
-          { name: "viewsystemactive", value: "1" },
-          { name: "viewsystemrepeating", value: "1" },
-          { name: "viewsystemcompleted", value: "1" },
-          { name: "leavemessage", value: "1" },
-          { name: "messageconfirmation", value: "1" },
-          { name: "survey", value: "1" },
-          { name: "sendsms", value: "0" },
-          { name: "managesystemjobs", value: "1" },
-          { name: "manageaccount", value: "1" },
-          { name: "manageprofile", value: "1" },
-          { name: "managesystem", value: "1" },
-          { name: "metadata", value: "1" },
-          { name: "managetasks", value: "1" },
-          { name: "publishmessagegroup", value: "1" },
-          { name: "subscribemessagegroup", value: "1" },
-          { name: "targetedmessage", value: "1" },
-          { name: "targetedcomment", value: "1" },
-          { name: "manageclassroommessaging", value: "1" },
-          { name: "facebookpost", value: "1" },
-          { name: "twitterpost", value: "1" },
-          { name: "publish", value: "messagegroup|list" },
-          { name: "feedpost", value: "1" },
-          { name: "monitorevent", value: "1" },
-          { name: "monitorsystemwideevent", value: "1" },
-          { name: "subscribe", value: "messagegroup|list" },
-          { name: "datafields", value: "f04|f05|f06|f20|g02|c02|c03|c04|c05|c06|c07" },
-          { name: "portalaccess", value: "1" },
-          { name: "generatebulktokens", value: "1" }
-        ]
-      },
-      organization: {
-        id: 123,
-        name: "James Woods High"
-      }
-    },
-    {
-      id: 791,
-      accessProfile: {
-        id: 137,
-        name: "no sendemail",
-        permissions: [
-          { name: "loginweb", value: "1" },
-          { name: "loginphone", value: "1" },
-          { name: "startstats", value: "1" },
-          { name: "startshort", value: "1" },
-          { name: "starteasy", value: "1" },
-          { name: "sendphone", value: "1" },
-          { name: "callmax", value: "10" },
-          { name: "sendemail", value: "0" },
-          { name: "sendmulti", value: "1" },
-          { name: "createlist", value: "1" },
-          { name: "listuploadids", value: "1" },
-          { name: "listuploadcontacts", value: "1" },
-          { name: "createrepeat", value: "1" },
-          { name: "setcallerid", value: "1" },
-          { name: "maxjobdays", value: "2" },
-          { name: "blocknumbers", value: "1" },
-          { name: "callblockingperms", value: "editall" },
-          { name: "createreport", value: "1" },
-          { name: "viewsystemreports", value: "1" },
-          { name: "viewusagestats", value: "1" },
-          { name: "viewcalldistribution", value: "1" },
-          { name: "managemyaccount", value: "1" },
-          { name: "viewcontacts", value: "1" },
-          { name: "managecontactdetailsettings", value: "1" },
-          { name: "viewsystemactive", value: "1" },
-          { name: "viewsystemrepeating", value: "1" },
-          { name: "viewsystemcompleted", value: "1" },
-          { name: "leavemessage", value: "1" },
-          { name: "messageconfirmation", value: "1" },
-          { name: "survey", value: "0" },
-          { name: "sendsms", value: "1" },
-          { name: "managesystemjobs", value: "1" },
-          { name: "manageaccount", value: "1" },
-          { name: "manageprofile", value: "1" },
-          { name: "managesystem", value: "1" },
-          { name: "metadata", value: "1" },
-          { name: "managetasks", value: "1" },
-          { name: "publishmessagegroup", value: "1" },
-          { name: "subscribemessagegroup", value: "1" },
-          { name: "targetedmessage", value: "1" },
-          { name: "targetedcomment", value: "1" },
-          { name: "manageclassroommessaging", value: "1" },
-          { name: "facebookpost", value: "1" },
-          { name: "twitterpost", value: "1" },
-          { name: "publish", value: "messagegroup|list" },
-          { name: "feedpost", value: "1" },
-          { name: "monitorevent", value: "1" },
-          { name: "monitorsystemwideevent", value: "1" },
-          { name: "subscribe", value: "messagegroup|list" },
-          { name: "datafields", value: "f04|f05|f06|f20|g02|c02|c03|c04|c05|c06|c07" },
-          { name: "portalaccess", value: "1" },
-          { name: "generatebulktokens", value: "1" }
-        ]
-      },
-      organization: {
-        id: 123,
-        name: "James Woods High"
-      }
-    },
-        {
-      id: 791,
-      accessProfile: {
-        id: 137,
-        name: "no facebookpost",
-        permissions: [
-          { name: "loginweb", value: "1" },
-          { name: "loginphone", value: "1" },
-          { name: "startstats", value: "1" },
-          { name: "startshort", value: "1" },
-          { name: "starteasy", value: "1" },
-          { name: "sendphone", value: "1" },
-          { name: "callmax", value: "5" },
-          { name: "sendemail", value: "0" },
-          { name: "sendmulti", value: "1" },
-          { name: "createlist", value: "1" },
-          { name: "listuploadids", value: "1" },
-          { name: "listuploadcontacts", value: "1" },
-          { name: "createrepeat", value: "1" },
-          { name: "setcallerid", value: "1" },
-          { name: "maxjobdays", value: "2" },
-          { name: "blocknumbers", value: "1" },
-          { name: "callblockingperms", value: "editall" },
-          { name: "createreport", value: "1" },
-          { name: "viewsystemreports", value: "1" },
-          { name: "viewusagestats", value: "1" },
-          { name: "viewcalldistribution", value: "1" },
-          { name: "managemyaccount", value: "1" },
-          { name: "viewcontacts", value: "1" },
-          { name: "managecontactdetailsettings", value: "1" },
-          { name: "viewsystemactive", value: "1" },
-          { name: "viewsystemrepeating", value: "1" },
-          { name: "viewsystemcompleted", value: "1" },
-          { name: "leavemessage", value: "1" },
-          { name: "messageconfirmation", value: "1" },
-          { name: "survey", value: "0" },
-          { name: "sendsms", value: "1" },
-          { name: "managesystemjobs", value: "1" },
-          { name: "manageaccount", value: "1" },
-          { name: "manageprofile", value: "1" },
-          { name: "managesystem", value: "1" },
-          { name: "metadata", value: "1" },
-          { name: "managetasks", value: "1" },
-          { name: "publishmessagegroup", value: "1" },
-          { name: "subscribemessagegroup", value: "1" },
-          { name: "targetedmessage", value: "1" },
-          { name: "targetedcomment", value: "1" },
-          { name: "manageclassroommessaging", value: "1" },
-          { name: "facebookpost", value: "0" },
-          { name: "twitterpost", value: "1" },
-          { name: "publish", value: "messagegroup|list" },
-          { name: "feedpost", value: "1" },
-          { name: "monitorevent", value: "1" },
-          { name: "monitorsystemwideevent", value: "1" },
-          { name: "subscribe", value: "messagegroup|list" },
-          { name: "datafields", value: "f04|f05|f06|f20|g02|c02|c03|c04|c05|c06|c07" },
-          { name: "portalaccess", value: "1" },
-          { name: "generatebulktokens", value: "1" }
-        ]
-      },
-      organization: {
-        id: 123,
-        name: "James Woods High"
-      }
-    }
-  ];
 
-</script>
 
 <div class="container cf">
 
@@ -285,9 +88,9 @@ require_once("obj/Phone.obj.php");
 		<div class="window_title_wrap">
 		<h2>New Broadcast</h2>
 		<ul class="msg_steps cf">
-		<li class="active"><a id="tab1" class="" href=""><span class="icon">1</span> Subject &amp; Recipients</a></li>
-		<li><a id="tab2" class="" href=""><span class="icon">2</span> Message Content</a></li>
-		<li><a id="tab3" class="" href=""><span class="icon">3</span> Review &amp; Send</a></li>
+		<li class="active"><a id="tab1" ><span class="icon">1</span> Subject &amp; Recipients</a></li>
+		<li><a id="tab2" data-active="false"><span class="icon">2</span> Message Content</a></li>
+		<li><a id="tab3" data-active="false"><span class="icon">3</span> Review &amp; Send</a></li>
 		</ul>
 		</div>
 		
@@ -296,12 +99,12 @@ require_once("obj/Phone.obj.php");
 		
 		<h3 class="flag">Notification Info</h3>
 		
-		<form id="msgsndr" name="broadcast" method="POST">
+		<form name="broadcast">
 		
 		<fieldset>
 		<label for="msgsndr_form_subject">Subject</label>
 			<div class="controls">
-			<input type="text" id="msgsndr_form_subject" name="broadcast_subject" /> <span class="error"></span>
+			<input type="text" id="msgsndr_form_subject" name="broadcast_subject" data-ajax="true" /> <span class="error"></span>
 			<p>e.g. "PTA Meeting Reminder"</p>
 			</div>
 		</fieldset>
@@ -310,9 +113,9 @@ require_once("obj/Phone.obj.php");
 			<label for="msgsndr_form_type">Type</label>
 			<div class="controls">
 			<select id="msgsndr_form_type" name="type">
-				<option value="general">General Announcement</option>
+<!-- 				<option value="general">General Announcement</option>
 				<option value="attend">Attendance</option>
-				<option value="emergency">Emergency</option>
+				<option value="emergency">Emergency</option> -->
 			</select>
 			</div>
 		</fieldset>
@@ -322,9 +125,9 @@ require_once("obj/Phone.obj.php");
 		
 		<div class="add_recipients">	
 			<div class="add_btn">
-			<a class="btn" href="#msgsndr_choose_list" data-toggle="modal">Pick from Existing Lists</a>
+			<button href="#msgsndr_choose_list" data-toggle="modal">Pick from Existing Lists</button>
 			or
-			<a class="btn" href="#msgsndr_build_list" data-toggle="modal">Build a List Using Rules</a>
+			<button href="#msgsndr_build_list" data-toggle="modal">Build a List Using Rules</button>
 			</div>
 			
 			<div id="msgsndr_choose_list" class="modal hide">
@@ -335,13 +138,13 @@ require_once("obj/Phone.obj.php");
 					<li><input type="checkbox"/><label>Second Year Students</label></li>
 					<li><input type="checkbox"/><label>Teachers</label></li>
 				</ul>
-				<div class="msg_confirm"><a class="btn" href="#" data-dismiss="modal">Cancel</a> <a class="btn btn_confirm" href="#">Add Lists</a></div>
+				<div class="msg_confirm"><button data-dismiss="modal">Cancel</button> <button class="btn_confirm" href="#">Add Lists</button></div>
 			</div>
 			
 			<div id="msgsndr_build_list" class="modal hide">
 				<h3>Add Recipients Using Rules <a href="#" class="close" data-dismiss="modal">x</a></h3>
 				<p>Use filters to match a group of entries in your Address Book</p>
-				<div class="msg_confirm"><a class="btn" href="#" data-dismiss="modal">Cancel</a> <a class="btn btn_confirm" href="#">Add Lists</a></div>
+				<div class="msg_confirm"><button data-dismiss="modal">Cancel</button> <button class="btn_confirm">Add Lists</button></div>
 			</div>
 		
 			<table class="info">
@@ -375,12 +178,11 @@ require_once("obj/Phone.obj.php");
 				</tbody>
 			</table>
 		
-			<form class="cf">
 			<input class="addme" type="checkbox" id="msgsndr_form_myself"/><label class="addme" for="msgsndr_form_myself">Add Myself</label>
 
 		</div><!-- end add_recipients -->
 		
-		<div class="msg_confirm"><a class="btn btn_confirm" href="#">Continue <span class="icon"></span></a></div>
+		<div class="msg_confirm"><button class="btn_confirm" disabled="disabled">Continue <span class="icon"></span></button></div>
 		
 		</div><!-- end window_panel -->
 		
@@ -431,34 +233,32 @@ require_once("obj/Phone.obj.php");
 					</tbody>
 				</table>
 				</div>
-				<div class="msg_confirm"><a class="btn" href="#" data-dismiss="modal">Cancel</a> <a class="btn btn_confirm" href="#">Load Selected Message</a></div>
+				<div class="msg_confirm"><button data-dismiss="modal">Cancel</button> <button class="btn_confirm">Load Selected Message</button></div>
 			</div>
 			
 		<ul class="msg_content_nav cf">
-		<li><a id="msgsndr_ctrl_phone" href="#"><span class="icon"></span> Add <span>Phone</span></a></li>
-		<li><a id="msgsndr_ctrl_email" href="#"><span class="icon"></span> Add <span>Email</span></a></li>
-		<li><a id="msgsndr_ctrl_sms" href="#"><span class="icon"></span> Add <span>SMS</span></a></li>
-		<li><a id="msgsndr_ctrl_social" href="#"><span class="icon"></span> Add <span>Social</span></a></li>
+		<li class="notactive ophone"><a id="msgsndr_ctrl_phone" href="#"><span class="icon"></span> Add <span>Phone</span></a></li>
+		<li class="notactive oemail"><a id="msgsndr_ctrl_email" href="#"><span class="icon"></span> Add <span>Email</span></a></li>
+		<li class="notactive osms"><a id="msgsndr_ctrl_sms" href="#"><span class="icon"></span> Add <span>SMS</span></a></li>
+		<li class="notactive osocial"><a id="msgsndr_ctrl_social" href="#"><span class="icon"></span> Add <span>Social</span></a></li>
 		</ul>
 		
 		<div class="tab_content">
 			<!-- Add the phone panel -->
 			<div id="msgsndr_tab_phone" class="tab_panel">
-			<form class="switchaudio">
 			<fieldset class="check">
 				<label for="msgsndr_form_type">Switch Audio Type</label>
-				<div class="controls">
-					<a class="btn audioleft active" href="#" data-type="call-me">Call Me to Record</a><a class="btn audioright" href="#" data-type="text-to-speech">Text-to-Speech</a>
+				<div id="switchaudio" class="controls">
+					<button class="audioleft active" data-type="call-me">Call Me to Record</button><button class="audioright" href="#" data-type="text-to-speech">Text-to-Speech</button>
 				</div>
 			</fieldset>
 
-			
-		<form id="call-me" class="audio">
+			<div id="call-me" class="audio">
 			<fieldset>
 				<label for="msgsndr_form_number">Number to Call</label>
 				<div class="controls">
 				<input class="small" type="text" id="msgsndr_form_number" name="phone_number" /> <span class="error"></span>
-				<a class="btn record" href="#" id="ctrecord"><span class="icon"></span> Call Now to Record</a>
+				<button class="record" id="ctrecord"><span class="icon"></span> Call Now to Record</button>
 				</div>
 			</fieldset>
 			
@@ -510,33 +310,35 @@ require_once("obj/Phone.obj.php");
 			
 			<fieldset class="form_actions">
 				<div class="controls">
-				<a class="btn btn_save" href="#">Save Phone Message</a>
-				<a class="btn" href="#">Cancel</a>
+				<button class="btn_save" href="#">Save Phone Message</button>
+				<button href="#">Cancel</button>
 				</div>
 			</fieldset>
 
+		</div><!-- #call-me -->
 
+		<div id="text-to-speech" class="audio hide">
 
-			<form id="text-to-speech" style="display: none;" class="audio">
+			<fieldset>
+				<label for="msgsndr_tts_message">Message</label>
+				<div class="controls">
+					<button class="btn-small paste-from">Paste text from email</button>
+					<textarea id="msgsndr_tts_message"></textarea>
+					<button><span class="icon play"></span> Play Audio</button>
+					<span class="characters">160 Characters Left</span>
+				</div>
+			</fieldset>
 
-				<fieldset>
-					<label for="msgsndr_tts_message">Message</label>
-					<div class="controls">
-						<a href="#" class="btn btn-small paste-from">Paste text from email</a>
-						<textarea id="msgsndr_tts_message"></textarea>
-						<a href="#" class="btn"><span class="icon play"></span> Play Audio</a>
-						<span class="characters">160 Characters Left</span>
-					</div>
-				</fieldset>
+			<fieldset class="form_actions">
+				<div class="controls">
+				<button class="btn_save">Save TTS Message</button>
+				<button>Cancel</button>
+				</div>
+			</fieldset>
 
-				<fieldset class="form_actions">
-					<div class="controls">
-					<a class="btn btn_save" href="#">Save TTS Message</a>
-					<a class="btn" href="#">Cancel</a>
-					</div>
-				</fieldset>
+		</div><!-- #text-to-speech -->
 
-			</div>
+		</div><!-- #msgsndr_tab_phone -->
 			
 			<!-- Add the email panel -->
 			<div id="msgsndr_tab_email" class="tab_panel">
@@ -577,8 +379,8 @@ require_once("obj/Phone.obj.php");
 			
 			<fieldset class="form_actions">
 				<div class="controls">
-				<a class="btn btn_save" href="#">Save Email Message</a>
-				<a class="btn" href="#">Cancel</a>
+				<button class="btn_save" href="#">Save Email Message</button>
+				<button>Cancel</a>
 				</div>
 			</fieldset>
 
@@ -597,8 +399,8 @@ require_once("obj/Phone.obj.php");
 			
 			<fieldset class="form_actions">
 				<div class="controls">
-				<a class="btn btn_save" href="#">Save SMS Message</a>
-				<a class="btn" href="#">Cancel</a>
+				<button class="btn_save" href="#">Save SMS Message</button>
+				<button>Cancel</button>
 				</div>
 			</fieldset>
 
@@ -662,7 +464,7 @@ require_once("obj/Phone.obj.php");
 			</fieldset>
 
 
-			<div class="feed">
+			<div class="feed">bt
 
 					<fieldset>
 						<label for="msgsndr_form_rsstitle">Post Title</label>
@@ -694,15 +496,15 @@ require_once("obj/Phone.obj.php");
 			
 			<fieldset class="form_actions">
 				<div class="controls">
-				<a class="btn btn_save" href="#">Save Social Messages</a>
-				<a class="btn" href="#">Cancel</a>
+				<button class="btn_save">Save Social Messages</button>
+				<button>Cancel</button>
 				</div>
 			</fieldset>
 
 			</div>
 		</div><!-- end tab_content -->
 		
-		<div class="msg_confirm"><a class="btn btn_confirm" href="#">Continue <span class="icon"></span></a></div>
+		<div class="msg_confirm"><button class="btn_confirm" href="#">Continue <span class="icon"></span></button></div>
 		
 		</div><!-- end window_panel -->
 		

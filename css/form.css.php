@@ -402,6 +402,8 @@ table#addMeWindow input[type="checkbox"] { margin: 7px 0; }
 
 /*---------- Message sender form ----------*/
 
+.msg_content_nav li.notactive { display: none; }
+
 .window_panel form { margin: 0 0 20px 0; }
 .window_panel form fieldset { margin: 0 0 15px 0; }
 .window_panel form fieldset.check { padding: 15px 0 0 0; border-top: 1px solid #ccc; }
