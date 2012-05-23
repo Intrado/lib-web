@@ -138,7 +138,7 @@ border-top: 1px solid #ccc; border-right: 1px solid #ccc; border-bottom: none; b
 .newform fieldset#AddRuleValue { width: 60px; padding: 0; margin: 0; background: none; }
 .newform fieldset#AddRuleValue input { width: 50px; }
 .newform fieldset#AddRuleAction { width: 75px; padding: 0; margin: 0; background: none; } 
- 
+
 .newform select, .newform input { -webkit-transition: all 0.3s ease-out; -moz-transition: all 0.3s ease-out; -ms-transition: all 0.3s ease-out; -o-transition: all 0.3s ease-out; transition: all 0.3s ease-out; }
 
 .newform .MultiCheckbox { float: left; display: inline; width: 250px; margin: 0; padding: 7px 0 0; list-style-type: none; }
@@ -169,6 +169,17 @@ border-top: 1px solid #ccc; border-right: 1px solid #ccc; border-bottom: none; b
 .newform .formfieldarea { clear: both;
 -webkit-border-radius: 5px; -moz-border-radius: 5px; border-radius: 5px;
  -moz-background-clip: padding; -webkit-background-clip: padding-box; background-clip: padding-box; }
+ 
+ 
+ /* ----------------- rule widget --------------------*/
+ 
+.newform .ruleHelperContentDiv	{ padding: 3px; background-color: #ffcccc; border-radius: 3px;}
+.newform .rulesTable 						{ margin-bottom: 10px; }
+.newform .ruleWarningDiv 				{ padding: 2px; color: red; }
+
+.newform .multiCheckBox_checkAll { float: left; white-space: nowrap; }
+.newform .multiCheckBox_clear		 { float: right; white-space: nowrap; }
+.newform .multiCheckBox_selectOptions	{ width:130px; height:1px; clear:both; }
 
 
 /* ----------------- Form Validation --------------------- */
@@ -404,26 +415,26 @@ table#addMeWindow input[type="checkbox"] { margin: 7px 0; }
 
 .msg_content_nav li.notactive { display: none; }
 
-.window_panel form { margin: 0 0 20px 0; }
-.window_panel form fieldset { margin: 0 0 15px 0; }
-.window_panel form fieldset.check { padding: 15px 0 0 0; border-top: 1px solid #ccc; }
-.window_panel form fieldset.check:first-child { border-top: none; }
-/*.window_panel form fieldset.checklast { margin: 0; padding: 6px 0 16px 0px; }*/
-.window_panel form input[type="text"],
-.window_panel form select,
-.window_panel form textarea { display: inline-block; width: 300px; padding: 5px; font-size: 14px; line-height: 18px; border: 1px solid #ccc; border-radius: 5px; }
-.window_panel form input[type="text"]:focus,
-.window_panel form select:focus,
-.window_panel form textarea:focus { border: 1px solid #58acef; outline: 0px; box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075) inset, 0 0 8px rgba(82, 168, 236, 0.6); }
-.window_panel form label { float: left; display: inline; width: 140px; margin: 0 10px 0 0; padding: 6px 0; font-size: 14px; text-align: right; }
-.window_panel form input.small { float: left; width: 135px; }
-.window_panel form textarea { /*max-width: 300px; min-width: 300px;*/ width: 96%; min-height: 100px; }
-.window_panel form select { font-size: 14px; width: 310px; padding: 5px; }
-.window_panel form input[type="checkbox"] { margin: 5px 5px 5px 0; }
-.window_panel form .addme { float: left; display: inline; text-align: left; width: inherit; }
-.window_panel form p { margin: 0; padding: 4px 0; color: #888; }
-.window_panel form .controls { margin: 0 0 0 150px; }
-.window_panel form .form_actions { background: #ededed; margin: 0 0 -20px; padding: 15px; border-radius: 0 0 8px 8px; }
+.window_panel { margin: 0 0 20px 0; }
+.window_panel fieldset { margin: 0 0 15px 0; }
+.window_panel fieldset.check { padding: 15px 0 0 0; border-top: 1px solid #ccc; }
+.window_panel fieldset.check:first-child { border-top: none; }
+/*.window_panel fieldset.checklast { margin: 0; padding: 6px 0 16px 0px; }*/
+.window_panel input[type="text"],
+.window_panel select,
+.window_panel textarea { display: inline-block; width: 300px; padding: 5px; font-size: 14px; line-height: 18px; border: 1px solid #ccc; border-radius: 5px; }
+.window_panel input[type="text"]:focus,
+.window_panel select:focus,
+.window_panel textarea:focus { border: 1px solid #58acef; outline: 0px; box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075) inset, 0 0 8px rgba(82, 168, 236, 0.6); }
+.window_panel label { float: left; display: inline; width: 140px; margin: 0 10px 0 0; padding: 6px 0; font-size: 14px; text-align: right; }
+.window_panel input.small { float: left; width: 135px; }
+.window_panel textarea { /*max-width: 300px; min-width: 300px;*/ width: 96%; min-height: 100px; }
+.window_panel select { font-size: 14px; width: 310px; padding: 5px; }
+.window_panel input[type="checkbox"] { margin: 5px 5px 5px 0; }
+.window_panel .addme { float: left; display: inline; text-align: left; width: inherit; }
+.window_panel p { margin: 0; padding: 4px 0; color: #888; }
+.window_panel .controls { margin: 0 0 0 150px; }
+.window_panel .form_actions { background: #ededed; margin: 0 0 -20px; padding: 15px; border-radius: 0 0 8px 8px; }
 
 .characters {
 	float: right;
