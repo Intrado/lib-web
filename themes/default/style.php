@@ -1,7 +1,7 @@
 /*----- Default theme for site, uses css.inc.php as basic layout example can be seen in example.css -----*/
 
-a, a:visited { color: #484848; }
-a:hover { color: <?=$theme1?>; }
+a { color: <?=$theme1?>; }
+a:hover { text-decoration: underline; }
 
 /*----- Banner, adds in the logo background and moves the client name to sit above the account navigation -----*/
 
@@ -57,6 +57,14 @@ a:hover { color: <?=$theme1?>; }
 -webkit-border-radius: 8px 8px 0 0 ; -moz-border-radius: 8px 8px 0 0 ; border-radius: 8px 8px 0 0 ; }
 
 .feedfilter a { display: block; margin: 0 0 0 12px; padding: 5px 4px; }
+.feed_content a,
+.feed_wrap a { color: #484848; }
+
+/*----- Table list styling -----*/
+
+table.list tr.listHeader { background-color: #a0a9a0; vertical-align: top; }
+table.list th { color: #fff; }
+table.list td { color: #444; }
 
 
 /*----- Prototip styles for shortcut menu, further styling for this is in the prototip.css.php file in the css folder -----*/
