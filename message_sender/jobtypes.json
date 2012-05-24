@@ -1,25 +1,23 @@
-[{
-  "jobTypes": [
-    {
-      "id": 654,
-      "priority": 3,
-      "name": "General",
-      "info": "General announcements",
-      "isSurvey":false
-    },
-    {
-      "id": 655,
-      "priority": 1,
-      "name": "Emergency",
-      "info": "Emergency announcements",
-      "isSurvey":false
-    },
-    {
-      "id": 656,
-      "priority": 2,
-      "name": "Attendance",
-      "info": "Attendance Announcements",
-      "isSurvey":false
-    }
-  ]
-}]
+[
+  {
+    "id": 654,
+    "priority": 3,
+    "name": "General",
+    "info": "General announcements",
+    "isSurvey":false
+  },
+  {
+    "id": 655,
+    "priority": 1,
+    "name": "Emergency",
+    "info": "Emergency announcements",
+    "isSurvey":false
+  },
+  {
+    "id": 656,
+    "priority": 2,
+    "name": "Attendance",
+    "info": "Attendance Announcements",
+    "isSurvey":false
+  }
+]

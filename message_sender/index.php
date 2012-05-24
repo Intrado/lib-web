@@ -102,7 +102,6 @@ include("nav.inc.php");
 		<form name="broadcast">
 
 			<!-- Message sender section 1, Subject and Recipients -->
-			<!-- ------------------------------------------------ -->
 				
 			<div id="msg_section_1" class="window_panel">
 			
@@ -195,7 +194,6 @@ include("nav.inc.php");
 			</div><!-- end window_panel -->
 			
 			<!-- Message sender section 2, Message Content -->
-			<!-- ----------------------------------------- -->
 
 			<div id="msg_section_2" class="window_panel">
 			<p>Create the content for this message, or <a href="#saved_message" data-toggle="modal">load a saved message</a></p>
@@ -243,14 +241,27 @@ include("nav.inc.php");
 						</tbody>
 					</table>
 					</div>
-					<div class="msg_confirm"><button data-dismiss="modal">Cancel</button> <button class="btn_confirm">Load Selected Message</button></div>
+					
+					<div class="msg_confirm">
+						<button data-dismiss="modal">Cancel</button> 
+						<button class="btn_confirm">Load Selected Message</button>
+					</div>
+
 				</div>
 				
 			<ul class="msg_content_nav cf">
-			<li class="notactive ophone"><a id="msgsndr_ctrl_phone" href="#"><span class="icon"></span> Add <span>Phone</span></a></li>
-			<li class="notactive oemail"><a id="msgsndr_ctrl_email" href="#"><span class="icon"></span> Add <span>Email</span></a></li>
-			<li class="notactive osms"><a id="msgsndr_ctrl_sms" href="#"><span class="icon"></span> Add <span>SMS</span></a></li>
-			<li class="notactive osocial"><a id="msgsndr_ctrl_social" href="#"><span class="icon"></span> Add <span>Social</span></a></li>
+				<li class="notactive ophone">
+					<a id="msgsndr_ctrl_phone" href="#"><span class="icon"></span> Add <span>Phone</span></a>
+				</li>
+				<li class="notactive oemail">
+					<a id="msgsndr_ctrl_email" href="#"><span class="icon"></span> Add <span>Email</span></a>
+				</li>
+				<li class="notactive osms">
+					<a id="msgsndr_ctrl_sms" href="#"><span class="icon"></span> Add <span>SMS</span></a>
+				</li>
+				<li class="notactive osocial">
+					<a id="msgsndr_ctrl_social" href="#"><span class="icon"></span> Add <span>Social</span></a>
+				</li>
 			</ul>
 			
 			<div class="tab_content">
@@ -350,8 +361,8 @@ include("nav.inc.php");
 
 			</div><!-- #msgsndr_tab_phone -->
 				
-				<!-- Add the email panel -->
-				<div id="msgsndr_tab_email" class="tab_panel">
+			<!-- Add the email panel -->
+			<div id="msgsndr_tab_email" class="tab_panel">
 
 				<fieldset>
 					<label for="msgsndr_form_name">From Name</label>
@@ -377,7 +388,7 @@ include("nav.inc.php");
 				<fieldset>
 					<label for="msgsndr_form_body">Body</label>
 					<div class="controls">
-					<textarea id="msgsndr_form_body" name="email_body"></textarea> <span class="error"></span>
+					<textarea id="msgsndr_form_body" name="email_body" data-ajax="true"></textarea> <span class="error"></span>
 					</div>
 				</fieldset>
 				
@@ -394,10 +405,10 @@ include("nav.inc.php");
 					</div>
 				</fieldset>
 
-				</div>
+			</div><!-- tab_panel -->
 				
-				<!-- Add the sms panel -->
-				<div id="msgsndr_tab_sms" class="tab_panel">
+			<!-- Add the sms panel -->
+			<div id="msgsndr_tab_sms" class="tab_panel">
 
 				<fieldset>
 					<label for="msgsndr_form_sms">SMS Text</label>
@@ -409,51 +420,55 @@ include("nav.inc.php");
 				
 				<fieldset class="form_actions">
 					<div class="controls">
-					<button class="btn_save" href="#">Save SMS Message</button>
-					<button>Cancel</button>
+						<button class="btn_save" href="#">Save SMS Message</button>
+						<button>Cancel</button>
 					</div>
 				</fieldset>
 
-				</div>
+			</div>
 				
-				<!-- Add the social network panel -->
-				<div id="msgsndr_tab_social" class="tab_panel">
+			<!-- Add the social network panel -->
+			<div id="msgsndr_tab_social" class="tab_panel">
 		
 				<fieldset class="check">
 					<div class="controls">
-					<input class="addme" type="checkbox" id="msgsndr_form_audio" name="msgsndr_form_audio" />
-					<label class="addme" for="msgsndr_form_audio">Include a link to the audio message</label>
+						<input class="addme" type="checkbox" id="msgsndr_form_audio" name="msgsndr_form_audio" />
+						<label class="addme" for="msgsndr_form_audio">Include a link to the audio message</label>
 					</div>
 				</fieldset>
-				
-				<fieldset class="check">
-					<div class="controls">
-					<input class="addme social" type="checkbox" id="msgsndr_form_facebook" name="msgsndr_form_facebook" />
-					<label class="addme" for="msgsndr_form_facebook"><strong>Post to Facebook</strong></label>
-					</div>
-				</fieldset>
+			
+				<div class="hidden" data-social="facebook">
+					<fieldset class="check">
+						<div class="controls">
+							<input class="addme social" type="checkbox" id="msgsndr_form_facebook" name="msgsndr_form_facebook" />
+							<label class="addme" for="msgsndr_form_facebook"><strong>Post to Facebook</strong></label>
+						</div>
+					</fieldset>
 
-				<div class="facebook">
+					<div class="facebook">
 
 						<fieldset>
 							<label for="msgsndr_form_fbmsg">Message</label>
 							<div class="controls">
-							<textarea id="msgsndr_form_fbmsg" name="facebook_message"></textarea> <span class="error"></span>
-							<p><a href="#">Spell Check</a> <span class="fb characters">420 Characters left</span></p>
+								<textarea id="msgsndr_form_fbmsg" name="facebook_message"></textarea> <span class="error"></span>
+								<p><a href="#">Spell Check</a> <span class="fb characters">420 Characters left</span></p>
 							</div>
 						</fieldset>
 
+					</div><!-- facebook -->
+				</div><!-- data-social= facebook -->
 
-				</div><!-- facebook -->
-				
-				<fieldset class="check">
-					<div class="controls">
-					<input class="addme social" type="checkbox" id="msgsndr_form_twitter" name="msgsndr_form_twitter" />
-					<label class="addme" for="msgsndr_form_twitter"><strong>Post to Twitter</strong></label>
-					</div>
-				</fieldset>
 
-				<div class="twitter">
+
+				<div class="hidden" data-social="twitter">
+					<fieldset class="check">
+						<div class="controls">
+							<input class="addme social" type="checkbox" id="msgsndr_form_twitter" name="msgsndr_form_twitter" />
+							<label class="addme" for="msgsndr_form_twitter"><strong>Post to Twitter</strong></label>
+						</div>
+					</fieldset>
+
+					<div class="twitter">
 
 						<fieldset>
 							<label for="msgsndr_form_tmsg">Message</label>
@@ -463,18 +478,20 @@ include("nav.inc.php");
 							</div>
 						</fieldset>
 
-
-				</div><!-- twitter -->
-				
-				<fieldset class="check">
-					<div class="controls">
-					<input class="addme social" type="checkbox" id="msgsndr_form_feed" name="msgsndr_form_feed" />
-					<label class="addme" for="msgsndr_form_feed"><strong>Post to Feeds</strong></label>
-					</div>
-				</fieldset>
+					</div><!-- twitter -->
+				</div><!-- data-social= twitter -->
 
 
-				<div class="feed">
+
+				<div class="hidden" data-social="feed">				
+					<fieldset class="check">
+						<div class="controls">
+							<input class="addme social" type="checkbox" id="msgsndr_form_feed" name="msgsndr_form_feed" />
+							<label class="addme" for="msgsndr_form_feed"><strong>Post to Feeds</strong></label>
+						</div>
+					</fieldset>
+
+					<div class="feed">
 
 						<fieldset>
 							<label for="msgsndr_form_rsstitle">Post Title</label>
@@ -494,41 +511,58 @@ include("nav.inc.php");
 						<fieldset class="check">
 							<label class="control-label" for="">Post to Feeds</label>
 							<div class="controls">
-								<span class="cf"><input type="checkbox" checked="checked" class="addme"><label class="addme">Groveland Elementary</label></span>
-								<span class="cf"><input type="checkbox" checked="checked" class="addme"><label class="addme">Sprinfield High School</label></span>
-								<span class="cf"><input type="checkbox" checked="checked" class="addme"><label class="addme">District Website</label></span>
-								<span class="cf"><input type="checkbox" checked="checked" class="addme"><label class="addme">Live Oak High - Athletics</label></span>
+								<span class="cf">
+									<input type="checkbox" checked="checked" class="addme">
+									<label class="addme">Groveland Elementary</label>
+								</span>
+								<span class="cf">
+									<input type="checkbox" checked="checked" class="addme">
+									<label class="addme">Sprinfield High School</label>
+								</span>
+								<span class="cf">
+									<input type="checkbox" checked="checked" class="addme">
+									<label class="addme">District Website</label>
+								</span>
+								<span class="cf">
+									<input type="checkbox" checked="checked" class="addme">
+									<label class="addme">Live Oak High - Athletics</label>
+								</span>
 							</div>
 						</fieldset>
 
-				</div><!-- rss -->
+					</div><!-- rss -->
+				</div><!-- data-social= feed -->
 
 				
 				<fieldset class="form_actions">
 					<div class="controls">
-					<button class="btn_save">Save Social Messages</button>
-					<button>Cancel</button>
+						<button class="btn_save">Save Social Messages</button>
+						<button>Cancel</button>
 					</div>
 				</fieldset>
 
-				</div>
+			</div>
+
 			</div><!-- end tab_content -->
 			
-			<div class="msg_confirm"><button class="btn_confirm" href="#">Continue <span class="icon"></span></button></div>
+			<div class="msg_confirm">
+				<button class="btn_confirm" href="#">Continue <span class="icon"></span></button>
+			</div>
 			
 			</div><!-- end window_panel -->
 			
 			<!-- Message sender section 3, Review and Send -->
-			<!-- ----------------------------------------- -->
 
 			<div id="msg_section_3" class="window_panel">
-			<p><strong>Subject</strong> Holidays Reminder</p>
-			<p><strong>Type</strong> General Annoucement</p>
-			<p><strong>Recipients 2000</strong></p>
+				<p><strong>Subject</strong> Holidays Reminder</p>
+				<p><strong>Type</strong> General Annoucement</p>
+				<p><strong>Recipients 2000</strong></p>
 			
-			<div class="msg_confirm"><a href="#">save for later</a> or <a class="btn btn_confirm" href="#">Send Message <span class="icon"></span></a></div>
+			<div class="msg_confirm">
+				<a href="#">save for later</a> or 
+				<a class="btn btn_confirm" href="#">Send Message <span class="icon"></span></a>
+			</div>
 			
-
 			</div><!-- end window_panel -->
 		</form>
 		

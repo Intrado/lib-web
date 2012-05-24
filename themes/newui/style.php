@@ -47,10 +47,6 @@ table {
 	border-spacing: 0;
 }
 
-a:hover {
-  cursor: pointer;
-}
-
 /* Padding is not added to width of elements, so you can set div etc to the size you want */
 * { -moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box; }
 

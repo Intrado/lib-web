@@ -414,6 +414,7 @@ table#addMeWindow input[type="checkbox"] { margin: 7px 0; }
 /*---------- Message sender form ----------*/
 
 .msg_content_nav li.notactive { display: none; }
+.hidden { display: none;}
 
 .window_panel { margin: 0 0 20px 0; }
 .window_panel fieldset { margin: 0 0 15px 0; }
@@ -442,18 +443,18 @@ table#addMeWindow input[type="checkbox"] { margin: 7px 0; }
 	padding: 5px 0 0 0;
 }
 
-.window_panel form input.ok {
+.window_panel input.ok {
 	border: 1px solid rgb(75,149,35);
 }
-.window_panel form input.ok[type="text"]:focus { 
+.window_panel input.ok[type="text"]:focus { 
 	border: 1px solid rgb(75,149,35);
 	box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075) inset, 0 0 8px rgba(75,149,35, 0.6);
 }
 
-.window_panel form input.er, .window_panel form textarea.er {
+.window_panel input.er, .window_panel textarea.er {
 	border: 1px solid rgb(219,30,30);
 }
-.window_panel form input.er[type="text"]:focus, .window_panel form textarea.er:focus { 
+.window_panel input.er[type="text"]:focus, .window_panel textarea.er:focus { 
 	border: 1px solid rgb(219,30,30);
 	box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075) inset, 0 0 8px rgba(219,30,30, 0.6);
 }
@@ -461,10 +462,7 @@ table#addMeWindow input[type="checkbox"] { margin: 7px 0; }
 
 span.error {
 	color: rgb(219,30,30);
-/*	display: inline-block;
-	float: right;*/
 	font-size: 0.9em;
-/*	width: 270px;*/
 }
 
 /*---------- Media queries for form elements ----------*/
