@@ -113,3 +113,15 @@ CREATE TABLE `tai_cannedresponse` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 $$$
+
+-- $rev 3
+CREATE TABLE `tai_survey` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `organizationid` int(11) NOT NULL,
+  `title` varchar(50) NOT NULL,
+  `url` varchar(255) NOT NULL,
+  `modifiedtimestamp` int(11) NOT NULL,
+  `deleted` tinyint(4) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
+$$$
