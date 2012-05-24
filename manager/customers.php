@@ -44,7 +44,7 @@ function fmt_custurl($row, $index){
 		return escapehtml($row[1]);
 	
 	if ($MANAGERUSER->authorized("logincustomer"))
-		return escapehtml($row[2]) . " (<a href='customerlink.php?id=" . $row[0] ."' target=\"_blank\">" . escapehtml($row[1]) . "</a>)";
+		return escapehtml($row[2]) . " (<a class='cust_link' href='customerlink.php?id=" . $row[0] ."' target=\"_blank\">" . escapehtml($row[1]) . "</a>)";
 	else
 		return escapehtml($row[2] . " (" . $row[1] . ")");
 }
