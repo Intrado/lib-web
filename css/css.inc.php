@@ -56,7 +56,6 @@ body { margin: 0; font-size: 0.75em; line-height: 1.231; }
 body, input, select, textarea, button { font-family: Verdana, "Helvetica Neue", helvetica,  Arial, sans-serif; color: #444 /* <?=$primary?> */ ; }
 
 a { color: <?=$primary?>; text-decoration: none; }
-a:visited { color: <?=$primary?>; }
 a:hover { color: <?=$theme1?>; }
 a:focus { outline: thin dotted; }
 a:hover, a:active { outline: 0; }
@@ -237,14 +236,14 @@ button { color: <?=$primary?>; }
 .btn_wrap { white-space: nowrap; position: relative; display: block; } 
 .btn_left, 
 .btn_right, 
-.btn_middle { padding-top: 4px; display: block; height: 19px; }
+.btn_middle { display: block; height: 23px; line-height: 23px; }
 .btn_left, 
 .btn_right { position: absolute; top: 0; }
 .btn_left { left: 0; background: url(themes/<?=$theme?>/button_left.gif) no-repeat center center; width: 9px; }
 .btn_right { right: 0; background: url(themes/<?=$theme?>/button_right.gif) repeat-x center center; width: 9px;}
 .btn_middle { margin: 0 9px; padding-right: 2px;  background: url(themes/<?=$theme?>/button_mid.gif) repeat-x center center;}
 			
-.btn_middle img { margin-top: -3px; padding: 0 3px 0 0; }
+.btn_middle img { margin-top: -4px; padding: 0 3px 0 0; }
 
 .btn:hover .btn_left { background: url(themes/<?=$theme?>/button_left_over.gif) no-repeat center center; }
 .btn:hover .btn_middle { background: url(themes/<?=$theme?>/button_mid_over.gif) repeat-x center center; }
@@ -419,6 +418,8 @@ table.list tr.listHeader { background-color: #d4d4d4; vertical-align: top; }
 table.list tr.listAlt { background-color: #f1f1f1; }
 table.list th, table.list td { text-align: left; border-right: 1px solid #ccc; color: #484848; }
 table.list td { padding: 5px; }
+table.list a.cust_link { color: #1e7398; }
+table.list a.cust_link:hover { color: #56a8cc; text-decoration: underline; }
 table.list ul { list-style: none; padding: 0; margin: 0; }
 table.list ul li { padding: 6px 8px; }
 
@@ -446,8 +447,8 @@ table > .listHeader > th 	{ text-align: left;  color: white; }
 .hovertitle { font-weight: bold; }
 
 #footer { padding: 15px 0; margin: 0 1%; }
-#logininfo { float: left; display: inline; text-align: left; font-size: 9px; color: gray; }
-#termsinfo { float: right; display: inline; text-align: right; font-size: 9px; color: gray; }
+#logininfo { float: left; display: inline; text-align: left; font-size: 9px; line-height: 13px; color: gray; }
+#termsinfo { float: right; display: inline; text-align: right; font-size: 9px; line-height: 13px; color: gray; }
 
 .alertmessage {
 	margin-left: 25%;
