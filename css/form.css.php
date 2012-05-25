@@ -81,7 +81,7 @@ border-top: 1px solid #ccc; border-right: 1px solid #ccc; border-bottom: none; b
 	padding: 0.3125em 0.625em 0 ;
 	/*background: transparent url('../img/header_bg.gif') repeat-x 0 0 ;*/
 	/*border-bottom: 1px dotted #A4C8E9;*/
-	color: /* #87AFD4 */ #999; font-weight: normal;
+	color: /* #87AFD4 */ #222; font-weight: normal;
 	-webkit-border-radius: 10px 10px 0 0; 
      -moz-border-radius: 10px 10px 0 0; 
           border-radius: 10px 10px 0 0; 
@@ -229,8 +229,8 @@ border-top: 1px solid #ccc; border-right: 1px solid #ccc; border-bottom: none; b
 .newform .htmlradiobuttonbigcheck, 
 .newform .htmlradiobuttonbigcheck div, 
 .newform .htmlradiobuttonbigcheck table, 
-.newform .htmlradiobuttonbigcheck td, 
-.newform .htmlradiobuttonbigcheck button 	{ border: none;	padding: 0;	margin: 0; }
+.newform .htmlradiobuttonbigcheck td { border: none;	padding: 0;	margin: 0; }
+.newform .htmlradiobuttonbigcheck button 	{ border: none;	margin: 0; }
 	
 .newform .htmlradiobuttonbigcheck td 			{ color: black; }
 .newform .htmlradiobuttonbigcheck button 	{ background: none; }
@@ -266,9 +266,9 @@ ol.wiznav_2 { padding: 0px; margin: 0px; list-style: none; }
 li.wiznav_2 { padding: 7px 0 0; margin: 0px; }
 
 li.wizbuttonlist {
-	list-style-type: circle;
+	/*list-style-type: circle;
 	list-style-image: url(../img/icons/bullet_blue.gif);
-	list-style-position: outside;
+	list-style-position: outside;*/
 }
 
 /*-------- New job accordion ---------*/
