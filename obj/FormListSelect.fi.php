@@ -42,7 +42,7 @@ class FormListSelect extends FormItem {
 			}
 		}
 		
-		$str .= '<ul id='.$n.' class="radiobox">';
+		$str = '<ul id='.$n.' class="radiobox">';
 		
 		// add a checkbox for every list this user can use and check ones already selected
 		foreach ($lists as $id => $name) {
