@@ -190,15 +190,6 @@ $formdata = array(
 		"control" => array("TextField"),
 		"helpstep" => 1
 	),
-	"package" => array(
-		"label" => "package",
-		"value" => "",
-		"validators" => array(
-			array("ValInArray", "values" => array('easycall', 'express', 'personalized', 'custom'))
-		),
-		"control" => array("TextField"),
-		"helpstep" => 1
-	),
 	//=========================================================================================
 	"LIST DATA",
 	//=========================================================================================
