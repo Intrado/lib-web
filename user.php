@@ -612,6 +612,21 @@ $formdata["datarules"] = array(
 	"helpstep" => 1
 );
 
+$linkusers = QuickQueryList("select id, concat(firstname,' ', lastname) from user where id!=? and enabled=1 and login!='schoolmessenger' order by firstname,lastname",true,false,array($edituser->id));
+$userlinks = QuickQueryList("select subordinateuserid from userlink where userid=?",false,false,array($edituser->id));
+
+$formdata["userlinks"] = array(
+	"label" => "Viewable Users",
+	"fieldhelp" => _L('Add user link'),
+	"value" => $userlinks,
+	"validators" => array(
+		array("ValInArray","values" => array_keys($linkusers))
+	),
+	"control" => array("MultiCheckBox","values" => $linkusers, "height" => "300px"),
+	"helpstep" => 2
+);
+
+
 // if user has a staff ID then only f and g field restrictions can be used.
 if ($hasstaffid) {
 	$formdata["datarules"]["validators"][0]["allowedFieldTypes"] = array('f', 'g');
@@ -880,6 +895,28 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 			foreach ($postdata['organizationids'] as $orgid)
 				QuickUpdate("insert into userassociation (userid, type, organizationid) values (?, 'organization', ?)", false, array($edituser->id, $orgid));
 
+		if (isset($postdata["userlinks"])) {
+			$userLinksAdded = array_diff($postdata["userlinks"],$userlinks);
+			$userLinksRemoved = array_diff($userlinks,$postdata["userlinks"]);
+			$batchargs = array();
+			$batchsql = "";
+			foreach ($userLinksAdded as $id) {
+				$batchsql .= "(?,?),";
+				$batchargs[] = $edituser->id;
+				$batchargs[] = $id;
+			}
+			if ($batchsql) {
+				QuickUpdate("insert into userlink (userid, subordinateuserid) values " . trim($batchsql,","), false, $batchargs);
+			}
+			
+			$removeCount = count($userLinksRemoved);
+			if (count($userLinksRemoved) != 0) {
+				$args = array_merge(array($edituser->id),$userLinksRemoved);
+				QuickUpdate("delete from userlink where userid=? and subordinateuserid in (" . DBParamListString($removeCount) . ")",false,$args);
+			}
+		}
+		
+		
 		Query("COMMIT");
 		
 		// MUST set password outside of the transaction or the authserver will get a lock timeout on the user object

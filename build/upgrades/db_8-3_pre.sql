@@ -98,3 +98,12 @@ $$$
 
 ALTER TABLE `job` CHANGE `status` `status` ENUM( 'new', 'scheduled', 'processing', 'procactive', 'active', 'complete', 'cancelled', 'cancelling', 'repeating', 'template' ) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT 'new'
 $$$
+
+-- $rev 9
+
+CREATE TABLE `userlink` (
+  `userid` int(11) NOT NULL,
+  `subordinateuserid` int(11) NOT NULL,
+  PRIMARY KEY (`userid`,`subordinateuserid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8
+$$$

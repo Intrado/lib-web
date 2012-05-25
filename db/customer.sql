@@ -1963,3 +1963,13 @@ update setting set value='8.3/8' where name='_dbversion'
 $$$
 -- END 8.3/8
 
+CREATE TABLE `userlink` (
+  `userid` int(11) NOT NULL,
+  `subordinateuserid` int(11) NOT NULL,
+  PRIMARY KEY (`userid`,`subordinateuserid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8
+$$$
+
+update setting set value='8.3/9' where name='_dbversion'
+$$$
+-- END 8.3/9
