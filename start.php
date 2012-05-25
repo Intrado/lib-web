@@ -694,10 +694,7 @@ include_once("nav.inc.php");
 
 <link href='css/timeline.css' type='text/css' rel='stylesheet' media='screen'>
 
-<div class="csec sectitle">
-	<div class="pagetitle"><? if(isset($ICON)) print '<img src="img/themes/' .getBrandTheme() . '/icon_' . $ICON . '" align="absmiddle">'; ?> <?= $TITLE ?></div>
-	<div class="pagetitlesubtext"><?= (isset($DESCRIPTION) ? $DESCRIPTION : "") ?></div>
-</div><!-- end sectitle -->
+
 	
 <div class="csec secbutton">
 <?
