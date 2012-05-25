@@ -128,7 +128,7 @@ h4 { font-size: 12px; line-height: 22px; color: #235563; text-shadow: 0 1px 0 #f
 
 /*----- Content sections -----*/
 
-.sectitle { width: 100%; }
+.sectitle { display: none; }
 .secbutton { position: absolute; top: -62px; right: 15px; }
 .sectimeline { display: none; }
 
