@@ -759,11 +759,12 @@ div.autocomplete ul li {
 
 /*----- New Job and Emergency job table styles -----*/
 
-.htmlradiobuttonbigcheck img { width: 34px; height: 34px; margin-left: -17px; padding: 0 0 0 50%; }
+.htmlradiobuttonbigcheck img { position: absolute; left: 0; top: 25px; /*width: 34px; height: 34px; margin-left: -17px; padding: 0 0 0 50%;*/ }
 .htmlradiobuttonbigcheck ol { list-style-type: none; margin: 0; padding: 0 0 0 5px; }
 .htmlradiobuttonbigcheck ol li { background: url(img/icons/bullet_blue.gif) center left no-repeat; padding: 0 0 0 20px; line-height: 21px; }
+.htmlradiobuttonbigcheck button { padding: 0 0 0 35px; }
 
-.creation_method { float: left; display: inline; width: 94px; }
+.creation_method { position: relative; float: left; display: inline; /*width: 94px;*/ }
 
 
 /*----- Survey styles -----*/
