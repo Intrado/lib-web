@@ -369,7 +369,7 @@ function keyuptimer (e, t, ignoreenterkey, fn, args) {
 
 <?
 if (!isset($_GET["showall"]))
-	print "<a href='customers.php?showall'>Show All Customers</a> ";
+	print "<a class='cust_link' href='customers.php?showall'>Show All Customers</a> ";
 else if ($MANAGERUSER->preference("favcustomers")) {
 	echo "<a href='customers.php'> <img src='mimg/fav.png' border=0/>Show Favorites</a>";
 	echo "<a style='margin-left: 4px' href='?clearfavorites'><i>Clear Favorites</i></a>";
