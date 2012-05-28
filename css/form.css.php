@@ -93,7 +93,7 @@ border-top: 1px solid #ccc; border-right: 1px solid #ccc; border-bottom: none; b
 .newform fieldset { background: #f1f1f1; width: 100%; margin-bottom: 1em; border: none; border-radius: 5px; }
  
 .formfieldarea { padding: 8px 10px; }
-.formfieldarea .underneathmsg { float: left; display: inline; margin: 5px 0 0 175px; padding: 0; font-weight: bold; color: #cc0000; }
+.formfieldarea .underneathmsg { float: left; display: inline; width: 100%; margin: 5px 0 0 175px; padding: 0; font-weight: bold; color: #cc0000; }
 
 .newform .formtitle { float: left; display: inline; width: 165px; padding: 2px 0 5px 0; text-align: right; }
 .newform .formtitle .formlabel { font-weight: bold; font-size: 1.1em; line-height: 16px; }
@@ -110,6 +110,8 @@ border-top: 1px solid #ccc; border-right: 1px solid #ccc; border-bottom: none; b
 .newform .formcontrol input#account_brandthemecustomize { float: left; display: inline; margin: 0 5px 0 0; }
 .newform .formcontrol .social_note { width: 350px; margin: 2px 0; font-size: 1.1em; line-height: 16px; }
 .newform .formcontrol .confirm_note { width: 430px; margin: 2px 0; font-size: 1.1em; line-height: 16px; }
+
+.newform .formcontrol ul { margin: 0; padding: 3px 0 0 15px;  }
 
 .newform .formcontrol .translate { max-height: 150px; overflow: auto; }
 .newform .formcontrol .gBranding {}
