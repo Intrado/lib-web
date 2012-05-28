@@ -463,7 +463,8 @@ button:active, button.active, .btn:active, .btn.active { background-color: #d9d9
   cursor: default;
 }
 
-.btn_left, .btn_middle, .btn_right { background: none; margin: 0; padding: 0; }
+.btn_left, .btn_right { display: none; }
+.btn_left, .btn_middle, .btn_right { background: none; height: 20px; margin: 0; padding: 0 5px; line-height: 20px; }
 
 
 /*----- Bootstrap modal styles -----*/
