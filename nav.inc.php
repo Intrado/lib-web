@@ -344,7 +344,11 @@ Event.observe(window, 'load', function() {
 
 
 <div class="content_wrap cf"><!-- tag ends in footer -->
-<div class="container cf">
+	<div class="container cf">
+		
+		<div class="pagetitle"><? if(isset($ICON)) print '<img src="img/themes/' .getBrandTheme() . '/icon_' . $ICON . '" align="absmiddle">'; ?> <?= $TITLE ?></div>
+		<div class="pagetitlesubtext"><?= (isset($DESCRIPTION) ? $DESCRIPTION : "") ?></div>
+
 
 <div class="sectitle">
 	<div class="pagetitle"><? if(isset($ICON)) print '<img src="img/themes/' .getBrandTheme() . '/icon_' . $ICON . '" align="absmiddle">'; ?> <?= $TITLE ?></div>
