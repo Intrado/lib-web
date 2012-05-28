@@ -274,6 +274,11 @@ border-color: transparent transparent transparent #4B9523; border-width: 25px; b
 .msg_steps li.active + li a:before { content: ''; position: absolute; top: 50%; left: 0; display: block; margin-top: -26px; 
 border-color: transparent transparent transparent #2C5715; border-width: 26px; border-style: solid; }
 
+.msg_steps li.edit a { background: #4B9523; color: #fff; border-color: #2C5715; text-shadow: 0 1px 1px #222; }
+.msg_steps li.edit span.icon { background: rgba(85,170,40,0.5);  text-shadow: none; }
+.msg_steps li.edit + li a:after { content: ''; position: absolute; top: 50%; left: 0; display: block; margin-top: -25px; 
+border-color: transparent transparent transparent #4B9523; border-width: 25px; border-style: solid; }
+
 .msg_steps li.complete a { background: #3A5F27; color: #C9E3BB; border-color: #111111; text-shadow: 0 1px 1px #222; }
 .msg_steps li.complete span.icon { background: #4B9523 url(themes/newui/tick.png) 7px 7px no-repeat; color: #4B9523; text-shadow: none; text-indent: -9999px; }
 .msg_steps li.complete + li a:after { content: ''; position: absolute; top: 50%; left: 0; display: block; margin-top: -25px; 

@@ -91,9 +91,9 @@ include("nav.inc.php");
 		<div class="window_title_wrap">
 		<h2>New Broadcast</h2>
 		<ul class="msg_steps cf">
-		<li class="active"><a id="tab1" ><span class="icon">1</span> Subject &amp; Recipients</a></li>
-		<li><a id="tab2" data-active="true"><span class="icon">2</span> Message Content</a></li>
-		<li><a id="tab3" data-active="false"><span class="icon">3</span> Review &amp; Send</a></li>
+		<li class="active"><a id="tab_1" ><span class="icon">1</span> Subject &amp; Recipients</a></li>
+		<li><a id="tab_2" data-active="true"><span class="icon">2</span> Message Content</a></li>
+		<li><a id="tab_3" data-active="true"><span class="icon">3</span> Review &amp; Send</a></li>
 		</ul>
 		</div>
 		
@@ -110,7 +110,7 @@ include("nav.inc.php");
 				<fieldset>
 				<label for="msgsndr_form_subject">Subject</label>
 					<div class="controls">
-						<input type="text" id="msgsndr_form_subject" name="broadcast_subject" data-ajax="true" /> 
+						<input type="text" id="msgsndr_form_subject" name="broadcast_subject" data-ajax="true" class="required" /> 
 						<span class="error"></span>
 						<p>e.g. "PTA Meeting Reminder"</p>
 					</div>
@@ -183,12 +183,41 @@ include("nav.inc.php");
 					</tbody>
 				</table>
 			
-				<input class="addme" type="checkbox" id="msgsndr_form_myself"/><label class="addme" for="msgsndr_form_myself">Add Myself</label>
+				<fieldset>
+					<input class="addme" type="checkbox" id="msgsndr_form_myself"/>
+					<label class="addme" for="msgsndr_form_myself">Add Myself</label>
+				</fieldset>
+
+				<div id="addme" class="hide">
+
+					<fieldset>
+						<label for="msgsndr_form_mephone">Phone</label>
+						<div class="controls">
+							<input type="text" id="msgsndr_form_mephone" name="me_phone" />
+						</div>
+					</fieldset>
+
+					<fieldset>
+						<label for="msgsndr_form_meemail">Email</label>
+						<div class="controls">
+							<input type="text" id="msgsndr_form_meemail" name="me_email" />
+						</div>
+					</fieldset>
+
+					<fieldset>
+						<label for="msgsndr_form_mesms">SMS</label>
+						<div class="controls">
+							<input type="text" id="msgsndr_form_mesms" name="me_sms" />
+						</div>
+					</fieldset>
+
+				</div><!-- #addme -->
+
 
 			</div><!-- end add_recipients -->
 			
 			<div class="msg_confirm">
-					<button class="btn_confirm" disabled="disabled">Continue <span class="icon"></span></button>
+					<button class="btn_confirm" disabled="disabled" data-next="2">Continue <span class="icon"></span></button>
 			</div>
 			
 			</div><!-- end window_panel -->
@@ -324,7 +353,6 @@ include("nav.inc.php");
 					<div class="controls">
 					<div class="cf"><input class="addme" type="checkbox" /><label class="addme">Voice Response</label></div>
 					<div class="cf"><input class="addme" type="checkbox" /><label class="addme">Call Confirmation</label></div>
-					<div class="cf"><input class="addme" type="checkbox" /><label class="addme">Skip Duplicate Phones</label></div>
 					</div>
 				</fieldset>
 			</div><!-- #advanced-opts -->
@@ -348,6 +376,12 @@ include("nav.inc.php");
 						<button><span class="icon play"></span> Play Audio</button>
 						<span class="tts characters">160 Characters Left</span>
 					</div>
+				</fieldset>
+
+				<fieldset>
+					<label for="msgsndr_form_translate">Translate</label>
+					<input type="checkbox" id="msgsndr_form_translate" value=""/>
+					<a href="">Show Translations</a>
 				</fieldset>
 
 				<fieldset class="form_actions">
@@ -381,7 +415,7 @@ include("nav.inc.php");
 				<fieldset>
 					<label for="msgsndr_form_mailsubject">Subject</label>
 					<div class="controls">
-					<input type="text" id="msgsndr_form_mailsubject" name="email_subject"/> <span class="error"></span>
+					<input type="text" id="msgsndr_form_mailsubject" name="email_subject" disabled="disabled" /> <span class="error"></span>
 					</div>
 				</fieldset>
 				
@@ -557,6 +591,12 @@ include("nav.inc.php");
 				<p><strong>Subject</strong> Holidays Reminder</p>
 				<p><strong>Type</strong> General Annoucement</p>
 				<p><strong>Recipients 2000</strong></p>
+
+				<fieldset>
+					<div class="controls">
+					<div class="cf"><input class="addme" type="checkbox" /><label class="addme">Skip Duplicate Phones</label></div>
+					</div>
+				</fieldset>
 			
 			<div class="msg_confirm">
 				<a href="#">save for later</a> or 
