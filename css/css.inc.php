@@ -59,6 +59,8 @@ a { color: <?=$primary?>; text-decoration: none; }
 a:hover { color: <?=$theme1?>; }
 a:focus { outline: thin dotted; }
 a:hover, a:active { outline: 0; }
+a.cust_link { color: #1e7398; }
+a.cust_link:hover { color: #56a8cc; text-decoration: underline; }
 
 b, strong { font-weight: bold; }
 blockquote { margin: 1em 40px; }
@@ -99,7 +101,7 @@ input:valid, textarea:valid {  }
 input:invalid, textarea:invalid { background-color: #f0dddd; }
 */
 table { border-collapse: collapse; border-spacing: 0; }
-td, th { vertical-align: top; padding: .5em; }
+td, th { vertical-align: middle; padding: .5em; }
 
 
 /*----- Basic stylesheet for all themes, each theme has it's own specific styles in the theme folder. See example.css for guide and ideas -----*/
@@ -418,8 +420,6 @@ table.list tr.listHeader { background-color: #d4d4d4; vertical-align: top; }
 table.list tr.listAlt { background-color: #f1f1f1; }
 table.list th, table.list td { text-align: left; border-right: 1px solid #ccc; color: #484848; }
 table.list td { padding: 5px; }
-table.list a.cust_link { color: #1e7398; }
-table.list a.cust_link:hover { color: #56a8cc; text-decoration: underline; }
 table.list ul { list-style: none; padding: 0; margin: 0; }
 table.list ul li { padding: 6px 8px; }
 
@@ -446,7 +446,7 @@ table > .listHeader > th 	{ text-align: left;  color: white; }
 
 .hovertitle { font-weight: bold; }
 
-#footer { padding: 15px 0; margin: 0 1%; }
+#footer { padding: 0 0 15px 0; margin: 0 1%; }
 #logininfo { float: left; display: inline; text-align: left; font-size: 9px; line-height: 13px; color: gray; }
 #termsinfo { float: right; display: inline; text-align: right; font-size: 9px; line-height: 13px; color: gray; }
 
@@ -511,12 +511,8 @@ table > .listHeader > th 	{ text-align: left;  color: white; }
 	border-bottom: solid 1px white;
 }
 
-.horizontaltabstitledivexpanded td.middle {
-	background: <?=$theme2?> url('img/horizontaltab_middle.gif') repeat-x;
-	font-weight: bold;
-	color: <?=$primary?>;
-	font-size: 110%;
-}
+.horizontaltabstitledivexpanded td.middle { background: <?=$theme2?> url('img/horizontaltab_middle.gif') repeat-x; padding: 5px 0 0; font-weight: bold; color: <?=$primary?>; font-size: 110%; }
+	
 .horizontaltabstitledivexpanded td.left {
 	background: <?=$theme2?> url('img/horizontaltab_left.gif') repeat-x;
 }
@@ -760,11 +756,12 @@ div.autocomplete ul li {
 /*----- New Job and Emergency job table styles -----*/
 
 .htmlradiobuttonbigcheck img { position: absolute; left: 0; top: 25px; /*width: 34px; height: 34px; margin-left: -17px; padding: 0 0 0 50%;*/ }
-.htmlradiobuttonbigcheck ol { list-style-type: none; margin: 0; padding: 0 0 0 5px; }
-.htmlradiobuttonbigcheck ol li { background: url(img/icons/bullet_blue.gif) center left no-repeat; padding: 0 0 0 20px; line-height: 21px; }
-.htmlradiobuttonbigcheck button { padding: 0 0 0 35px; }
+.htmlradiobuttonbigcheck ol { list-style-type: none; float: left; display: inline; margin: 0; padding: 0 0 0 5px; }
+.htmlradiobuttonbigcheck ol li { background: url(img/icons/bullet_blue.gif) center left no-repeat; padding: 0 0 0 20px; line-height: 21px; text-align: left; }
+.htmlradiobuttonbigcheck button { padding: 0 0 10px 35px; }
+.htmlradiobuttonbigcheck .create_btn { float: left; width: 94px; height: 88px; }
 
-.creation_method { position: relative; float: left; display: inline; /*width: 94px;*/ }
+.creation_method { position: relative; /*float: left; display: inline; width: 94px;*/ }
 
 
 /*----- Survey styles -----*/
