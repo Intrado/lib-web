@@ -238,7 +238,7 @@ button { color: <?=$primary?>; }
 .btn_wrap { white-space: nowrap; position: relative; display: block; } 
 .btn_left, 
 .btn_right, 
-.btn_middle { display: block; height: 23px; line-height: 23px; }
+.btn_middle { display: block; height: 23px; line-height: 23px; font-size: 11px; }
 .btn_left, 
 .btn_right { position: absolute; top: 0; }
 .btn_left { left: 0; background: url(themes/<?=$theme?>/button_left.gif) no-repeat center center; width: 9px; }
