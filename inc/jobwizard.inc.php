@@ -562,9 +562,14 @@ class JobWiz_start extends WizStep {
 		foreach ($packageDetails as $package => $details) {
 			if ($details['enabled'])
 				$packages[$package] = '
-					<div style="width: 94px; height: 88px; background: url('.$details['icon'].') no-repeat;">
+					<div class="create_btn" style="background: url('.$details['icon'].') no-repeat;">
 						<div style="position: relative; top: 67px; width: 100%; font-size: 10px">'.escapehtml($details['label']).'</div>
-					</div>';
+					</div>
+					<ol>
+             '.(($details[0])?'<li>'.escapehtml($details[0]).'</li>':'').'
+             '.(($details[1])?'<li>'.escapehtml($details[1]).'</li>':'').'
+             '.(($details[2])?'<li>'.escapehtml($details[2]).'</li>':'').'
+          </ol>';
 		}
 
 		$helpstepnum = 1;
