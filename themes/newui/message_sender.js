@@ -7,20 +7,18 @@ jQuery.noConflict();
 (function($) { 
   $(function() {
 		
-		// hide tabs two and three by default and make step one the active tab
-		$('#msg_section_2').hide();
-		$('#msg_section_3, .close').hide();
+		// Hiding stuf which is not needed
+		$('#msg_section_2, #msg_section_3, .close, .facebook, .twitter, .feed').hide();
 
 
 		// Tab Hide/Show Logic
-
 		$('.msg_steps a').on('click', function(event) {
 			event.preventDefault();
 			// Get the clicked elements id
 			if ($(this).attr('data-active') != "false") {
 				var elm = $(this).attr('id');
 				// Gives me the number from the circle so can use it later on 
-				var tabn = $('#' + elm + ' span').text();
+				var tabn = elm.split('_')[1];
 				// Remove active class from tabs, and set selected one to have active class
 				$('.msg_steps li').removeClass('active');
 				$(this).parent().addClass('active');
@@ -44,6 +42,10 @@ jQuery.noConflict();
 			$('.tab_panel').hide();
 			$('#msgsndr_tab_'+elm[2]).show();
 			$(this).parent().addClass('active');
+
+			if (elm[2] == 'email') {
+				$('#msgsndr_form_mailsubject').val($('#msgsndr_form_subject').val());
+			}
 		});
 
 
@@ -57,6 +59,17 @@ jQuery.noConflict();
 			$('#switchaudio button').removeClass('active');
 			$(this).addClass('active');
 		});
+
+
+		// Add myself toggle 
+		$('#msgsndr_form_myself').on('click', function() {
+
+			$('#addme').slideToggle('slow', function() {
+				$('#msgsndr_form_mephone').focus();
+			});
+
+		});
+
 		
 
 		// Toggle Collapse - Generic 
@@ -68,11 +81,10 @@ jQuery.noConflict();
 
 			offset = $(this).offset();
 				$('html, body').animate({scrollTop: offset.top },2000);
-
+				
 		});
 
-		// Hide Social Extras
-		$('.facebook, .twitter, .feed').hide();
+
 
 		// Social Inputs hide show
 		$('input.social').on('click', function(event) {

@@ -17,15 +17,16 @@ jQuery.noConflict();
 
     // Inital Call
     $.ajax({
-        url: "message_sender/roles.json",
+        url: '/jwhigh/api/2/users/'+userid+'/roles',
         type: "GET",
         isLocal: true,
         dataType: "json",
         success: function(data) {
           //dd = data;
-          setUp(data); // Send Data over to the function setUp();
+          setUp(data.roles); // Send Data over to the function setUp();
        }
     });
+
 
     /* --
       The setUp function will do alot of the inital work, and call other functions based on users roles
@@ -33,13 +34,15 @@ jQuery.noConflict();
 
     function setUp(data) {
 
+      dd = data;
+
       // Setting variables from data passed through from the initial ajax call above ^
-      var sPhone      = data[0].accessProfile.permissions[5].sendphone;
-      var sEmail      = data[0].accessProfile.permissions[7].sendemail;
-      var sSMS        = data[0].accessProfile.permissions[30].sendsms;
-      var sFacebook   = data[0].accessProfile.permissions[42].facebookpost;
-      var sTwitter    = data[0].accessProfile.permissions[43].twiiterpost;
-      var sFeed       = data[0].accessProfile.permissions[45].feedpost;
+      var sPhone      = data[0].accessProfile.permissions[11]['value'];
+      var sEmail      = data[0].accessProfile.permissions[10]['value'];
+      var sSMS        = data[0].accessProfile.permissions[12]['value'];
+      var sFacebook   = data[0].accessProfile.permissions[44]['value'];
+      var sTwitter    = data[0].accessProfile.permissions[45]['value'];
+      var sFeed       = data[0].accessProfile.permissions[46]['value'];
 
 
       // Get Type for drop down on inital page
@@ -136,10 +139,6 @@ jQuery.noConflict();
           new document.validators["ValRequired"]("email_address","Email Address",{}), 
           new document.validators["ValEmail"]("email_address","Email Address",{min:7,max:30})
         ],
-        subject: [
-          new document.validators["ValRequired"]("email_subject","Subject",{}), 
-          new document.validators["ValLength"]("email_subject","Subject",{min:7,max:30})
-        ],
         body: [
           new document.validators["ValRequired"]("email_body","Subject",{}), 
           new document.validators["ValLength"]("email_body","Subject",{min:7,max:30})
@@ -197,6 +196,45 @@ jQuery.noConflict();
     }
 
 
+    $('#msg_section_1').on('keyup', function() {
+
+      reqFields   = $('#msg_section_1 .required');
+
+      var reqCount    = 0;
+      var reqAmount   = parseInt(reqFields.length);
+
+      $.each(reqFields, function(index, ele) {
+        //console.log($(ele).hasClass('ok'));
+        if ($(ele).hasClass('ok')) {
+          console.log('hasClass OK');
+          reqCount++;
+        } else {
+          reqCount--;
+        }
+
+      });
+
+      if (reqCount == reqAmount) {
+        $('#msg_section_1 button.btn_confirm').removeAttr('disabled');
+      } else {
+        $('#msg_section_1 button.btn_confirm').attr('disabled','disabled');
+      }
+
+    });
+
+
+    $('button.btn_confirm').on('click', function(e) {
+      e.preventDefault();
+      var tabn = $(this).attr('data-next');
+      var tabp = tabn-1;
+      $('.msg_steps li').removeClass('active');
+      $('a#tab_'+tabn).parent().addClass('active');
+      $('a#tab_'+tabp).parent().addClass('edit');
+
+      $('.window_panel').hide();
+      $('#msg_section_'+tabn).show();
+
+    });
   
 
 
@@ -206,12 +244,12 @@ jQuery.noConflict();
 
   	  $(watch).on('keyup', function() {
 		    var elem	=	$(this);
-			  form_val(elem);
+			  formVal(elem);
 		  });
 
     }
 
-		function form_val(element) {
+		function formVal(element) {
 
 			var name  = element.attr('name');
       var form  = name.split("_")[0];
@@ -290,7 +328,6 @@ jQuery.noConflict();
       }
 
     }
-
 
 
 
