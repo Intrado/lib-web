@@ -108,7 +108,7 @@ if (isset($_GET['ajax'])) {
 	if(empty($mergeditems)) {
 			$data->list[] = array("itemid" => "",
 										"defaultlink" => "",
-										"icon" => "largeicons/information.jpg",
+										"icon" => "img/largeicons/information.jpg",
 										"title" => _L("No Lists."),
 										"content" => "",
 										"tools" => "");
