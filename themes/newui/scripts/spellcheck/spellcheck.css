@@ -4,7 +4,6 @@
 	z-index: 9999;
 	overflow: none;
 	padding: 0px 9px 9px 0px;
-	background: transparent url(../img/spellchecker_shadow.png) no-repeat scroll right bottom;
 	font: normal 13px arial;
 }
 .spellcheck-suggestbox em {
