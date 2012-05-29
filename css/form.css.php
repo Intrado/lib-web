@@ -428,11 +428,11 @@ table#addMeWindow input[type="checkbox"] { margin: 7px 0; }
 .window_panel input[type="text"]:focus,
 .window_panel select:focus,
 .window_panel textarea:focus { border: 1px solid #58acef; outline: 0px; box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075) inset, 0 0 8px rgba(82, 168, 236, 0.6); }
-.window_panel label { float: left; display: inline; width: 140px; margin: 0 10px 0 0; padding: 6px 0; font-size: 14px; text-align: right; }
+.window_panel label { float: left; display: inline; width: 140px; margin: 0 10px 0 0; padding: 6px 0; font-size: 14px; line-height: 19px; text-align: right; }
 .window_panel input.small { float: left; width: 135px; }
 .window_panel textarea { /*max-width: 300px; min-width: 300px;*/ width: 96%; min-height: 100px; }
 .window_panel select { font-size: 14px; padding: 5px; }
-.window_panel input[type="checkbox"] { margin: 5px 5px 5px 0; }
+.window_panel input[type="checkbox"] { margin: 9px 5px 0 0; }
 .window_panel .addme { float: left; display: inline; text-align: left; width: inherit; }
 .window_panel p { margin: 0; padding: 4px 0; color: #888; }
 .window_panel .controls { margin: 0 0 0 150px; }
