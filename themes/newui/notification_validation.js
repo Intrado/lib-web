@@ -235,7 +235,7 @@ jQuery.noConflict();
       var tabp = tabn-1;
       $('.msg_steps li').removeClass('active');
       $('a#tab_'+tabn).parent().addClass('active');
-      $('a#tab_'+tabp).parent().addClass('edit');
+      $('a#tab_'+tabp).parent().addClass('complete');
 
       $('.window_panel').hide();
       $('#msg_section_'+tabn).show();
