@@ -81,6 +81,7 @@ h4 { font-size: 12px; line-height: 22px; color: #235563; text-shadow: 0 1px 0 #f
 .wrapper { position: relative; margin: 0 250px 0 0; }
 .main_activity { width: 100%; }
 .main_aside { position: absolute; top: 0; right: -250px; width: 225px; }
+.window_body_wrap { padding: 20px 10px; }
 
 
 /*----- Banner -----*/
@@ -252,7 +253,7 @@ background-image: -webkit-gradient(linear, left top, left bottom, from(#F5F3F0),
 .hide { display: none; }
 
 .msg_steps { list-style-type: none; padding: 0; }
-.msg_steps li { position: relative; float: left; display: inline; width: 34%; }
+.msg_steps li { position: relative; float: left; display: inline; width: 34%; cursor: pointer; }
 .msg_steps li:first-child { width: 32%; }
 .msg_steps li a { background: #f1f1f1; display: block; padding: 10px 11px 10px 40px; color: #777; font-size: 14px; line-height: 30px; font-weight: bold; text-transform: uppercase; text-shadow: 0 1px 0 #fdfdfd; 
 border-bottom: 1px solid #2A6576; border-top: 1px solid #2A6576; outline: 0px; text-decoration: none; -webkit-box-shadow: 0 1px 0 0 rgba(255,255,255,0.4); box-shadow: 0 1px 0 0 rgba(255,255,255,0.4); }
@@ -274,11 +275,6 @@ border-color: transparent transparent transparent #4B9523; border-width: 25px; b
 .msg_steps li.active + li a:before { content: ''; position: absolute; top: 50%; left: 0; display: block; margin-top: -26px; 
 border-color: transparent transparent transparent #2C5715; border-width: 26px; border-style: solid; }
 
-.msg_steps li.edit a { background: #4B9523; color: #fff; border-color: #2C5715; text-shadow: 0 1px 1px #222; }
-.msg_steps li.edit span.icon { background: rgba(85,170,40,0.5);  text-shadow: none; }
-.msg_steps li.edit + li a:after { content: ''; position: absolute; top: 50%; left: 0; display: block; margin-top: -25px; 
-border-color: transparent transparent transparent #4B9523; border-width: 25px; border-style: solid; }
-
 .msg_steps li.complete a { background: #3A5F27; color: #C9E3BB; border-color: #111111; text-shadow: 0 1px 1px #222; }
 .msg_steps li.complete span.icon { background: #4B9523 url(themes/newui/tick.png) 7px 7px no-repeat; color: #4B9523; text-shadow: none; text-indent: -9999px; }
 .msg_steps li.complete + li a:after { content: ''; position: absolute; top: 50%; left: 0; display: block; margin-top: -25px; 
@@ -292,7 +288,7 @@ border-color: transparent transparent #FFFFFF transparent; border-width: 12px; b
 .msg_steps li.active:before { content: ''; position: absolute; bottom: -16px; left: 50%; display: block; margin-left: -13px; 
 border-color: transparent transparent #2A6576 transparent; border-width: 13px; border-style: solid; }
 
-.window_panel { padding: 22px 15px; font-size: 14px; }
+.window_panel { padding: 0 15px; font-size: 14px; }
 .window_panel a { color: #0088CC; }
 .window_panel a:hover { color: #005580; text-decoration: underline; }
 .window_panel .icon { display: inline-block; height: 14px; width: 14px; }
@@ -346,8 +342,12 @@ h3.flag { padding: 5px 22px; font-size: 18px; color: #fff; border: 1px solid #22
   
 .window_panel form { padding: 20px 0; border: 1px solid #ccc; -webkit-border-radius: 0 0 5px 5px; border-radius: 0 0 5px 5px; }
 
+.field_wrapper { padding: 20px 0; }
 .add_recipients { margin: 0 0 20px 0; padding: 20px; border: 1px solid #ccc; -webkit-border-radius: 0 0 5px 5px; border-radius: 0 0 5px 5px; }
 .add_recipients form { border: none; }
+.tab_panel { background: #fafafa; padding: 5px 0 0; border: 1px solid #ccc; -webkit-border-radius: 8px; border-radius: 8px; }
+.social_tab { border-top: 1px solid #ddd; }
+.social_tab:first-child { border: none; }
 .add_btn { margin: 0 0 20px 0; }
 
 
@@ -387,10 +387,15 @@ border-color: #222222 transparent transparent; border-style: solid; border-width
 .msg_content_nav li.active a span { color: #f9f9f9; }
 .msg_content_nav li.active a span.icon { background: url(themes/newui/pencil.png) 0 center no-repeat; }
 
+.msg_content_nav li.complete a { background: #499122; color: #f9f9f9; border-color: #3a7a17; 
+-webkit-box-shadow: inset 0px 1px 1px 0px rgba(255,255,255,0.5); 
+   -moz-box-shadow: inset 0px 1px 1px 0px rgba(255,255,255,0.5); 
+        box-shadow: inset 0px 1px 1px 0px rgba(255,255,255,0.5); }
+
 .tab_content { margin: 0 0 20px 0; }
 .tab_panel form { border-radius: 8px; }
 
-.msg_confirm { background: #F9F8F6; margin: 0 -15px -22px -15px; padding: 22px 15px; text-align: right; border-radius: 0 0 5px 5px; border-top: 1px solid #DDDDDD; }
+.msg_confirm { background: #F9F8F6; margin: 0 -25px -20px -25px; padding: 22px 21px; text-align: right; border-radius: 0 0 5px 5px; border-top: 1px solid #DDDDDD; }
 
 
 /*----- List page styles -----*/
@@ -417,7 +422,7 @@ table.list ul li { padding: 0; }
 
 /*----- Buttons, changes to the basic buttons featured across the site -----*/
 
-button, .btn { margin: 0 5px 5px 0; padding: 5px 10px; color: #333; font-size: 14px; font-weight: normal; text-shadow: 0 1px 0 0 #fff; border: 1px solid #ccc;
+button, .btn { margin: 0 5px 0 0; padding: 5px 10px; color: #333; font-size: 14px; font-weight: normal; text-shadow: 0 1px 0 0 #fff; border: 1px solid #ccc;
 	background-color: #f5f5f5;  
   background-image: -webkit-gradient(linear, left top, left bottom, from(#fbfbfb), to(#e4e4e4)); 
   background-image: -webkit-linear-gradient(top, #fbfbfb, #e4e4e4); 
