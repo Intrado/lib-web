@@ -73,8 +73,9 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 // Moved from message_sender.php 
 
 include("nav.inc.php");
-?> <!-- pre> <? print_r($_SESSION); ?> </pre --> 
 
+
+?>
 
 <script> 
 	orgid = 123;
@@ -203,10 +204,10 @@ include("nav.inc.php");
 			
 			</div><!-- end window_panel -->
 			
-			<!-- ============== Message sender section 2, Message Content ============== -->
+			<!-- Message sender section 2, Message Content -->
 
 			<div id="msg_section_2" class="window_panel">
-			<p>Create the content for this message, or <a href="#msgsndr_saved_message" data-toggle="modal">load a saved message</a></p>
+			<p>Create the content for this message, or <a href="#saved_message" data-toggle="modal">load a saved message</a></p>
 			
 				
 				
@@ -292,7 +293,7 @@ include("nav.inc.php");
 				<fieldset class="form_actions">
 					<div class="controls">
 					<button class="btn_save" href="#">Save Phone Message</button>
-					<button href="#">Cancel</button>
+					<button>Cancel</button>
 					</div>
 				</fieldset>
 
@@ -379,7 +380,7 @@ include("nav.inc.php");
 				<fieldset class="check">
 					<label for="msgsndr_form_sms">SMS Text</label>
 					<div class="controls">
-					<textarea id="msgsndr_form_sms" name="sms_text"></textarea> <span class="error"></span>
+					<textarea id="msgsndr_form_sms" name="sms_text"></textarea> <!-- <span class="error"></span> -->
 					<div>
 					<p><a href="#" id="sms_sc">Spell Check</a> <span class="sms characters">160 Characters left</span></p>
 					<span class="loading">loading..</span>
@@ -390,7 +391,7 @@ include("nav.inc.php");
 				
 				<fieldset class="form_actions">
 					<div class="controls">
-						<button class="btn_save" href="#">Save SMS Message</button>
+						<button class="btn_save">Save SMS Message</button>
 						<button>Cancel</button>
 					</div>
 				</fieldset>
@@ -482,23 +483,7 @@ include("nav.inc.php");
 
 						<fieldset class="check">
 							<label class="control-label" for="">Post to Feeds</label>
-							<div class="controls">
-								<span class="cf">
-									<input type="checkbox" checked="checked" class="addme">
-									<label class="addme">Groveland Elementary</label>
-								</span>
-								<span class="cf">
-									<input type="checkbox" checked="checked" class="addme">
-									<label class="addme">Sprinfield High School</label>
-								</span>
-								<span class="cf">
-									<input type="checkbox" checked="checked" class="addme">
-									<label class="addme">District Website</label>
-								</span>
-								<span class="cf">
-									<input type="checkbox" checked="checked" class="addme">
-									<label class="addme">Live Oak High - Athletics</label>
-								</span>
+							<div class="controls" id="feed_categories">
 							</div>
 						</fieldset>
 
@@ -518,12 +503,12 @@ include("nav.inc.php");
 			</div><!-- end tab_content -->
 			
 			<div class="msg_confirm">
-				<button class="btn_confirm" href="#">Continue <span class="icon"></span></button>
+				<button class="btn_confirm">Continue <span class="icon"></span></button>
 			</div>
 			
 			</div><!-- end window_panel -->
 			
-			<!-- ============== Message sender section 3, Review and Send ============== -->
+			<!-- Message sender section 3, Review and Send -->
 
 			<div id="msg_section_3" class="window_panel">
 				<p><strong>Subject</strong> Holidays Reminder</p>
@@ -559,7 +544,7 @@ include("nav.inc.php");
 	</div><!-- end main_aside-->
 	
 </div><!-- end wrapper -->
-
+	
 
 <!-- ============== Modal windows and mini forms ================ -->
 
@@ -637,12 +622,12 @@ include("nav.inc.php");
 </div>
 	
 
-<script src="script/jquery.1.7.2.min.js"></script>
-<script src="script/jquery.json-2.3.min.js"></script>
-<script src="script/bootstrap-modal.js"></script>
+<script src="script/jquery.1.7.2.min.js" type="text/javascript"></script>
+<script src="script/jquery.json-2.3.min.js" type="text/javascript"></script>
+<script src="script/bootstrap-modal.js" type="text/javascript"></script>
 
 <link href="themes/newui/scripts/spellcheck/spellcheck.css" type="text/css" rel="stylesheet">
 
-<script src="themes/newui/message_sender.js"></script>
-<script src="themes/newui/notification_validation.js"></script>
-<script src="themes/newui/scripts/spellcheck/spellcheck.js"></script>
+<script src="themes/newui/message_sender.js" type="text/javascript"></script>
+<script src="themes/newui/notification_validation.js" type="text/javascript"></script>
+<script src="themes/newui/scripts/spellcheck/spellcheck.js" type="text/javascript"></script>

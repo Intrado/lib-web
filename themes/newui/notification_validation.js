@@ -6,8 +6,6 @@ jQuery.noConflict();
 
     orgPath     = window.location.pathname.split('/')[1]; // This gives us the the URL path needed for first part of AJAX call
 
-
-
     $('.error, #ctrecord').hide();
 
     document.formvars = {
@@ -24,7 +22,6 @@ jQuery.noConflict();
     $.ajax({
         url: '/'+orgPath+'/api/2/users/'+userid+'/roles',
         type: "GET",
-        isLocal: true,
         dataType: "json",
         success: function(data) {
           //dd = data;
@@ -42,19 +39,34 @@ jQuery.noConflict();
       dd = data;
 
       // Setting variables from data passed through from the initial ajax call above ^
-      var sPhone      = data[0].accessProfile.permissions[11]['value'];
-      var sEmail      = data[0].accessProfile.permissions[10]['value'];
-      var sSMS        = data[0].accessProfile.permissions[12]['value'];
-      var sFacebook   = data[0].accessProfile.permissions[44]['value'];
-      var sTwitter    = data[0].accessProfile.permissions[45]['value'];
-      var sFeed       = data[0].accessProfile.permissions[46]['value'];
+      loopData = data[0].accessProfile.permissions;
+
+      for (i=0;i<loopData.length;i++) {
+        if (loopData[i]['name'] == 'sendphone') {
+          var sPhone = loopData[i]['value'];
+        }
+        if (loopData[i]['name'] == 'sendemail') {
+          var sEmail = loopData[i]['value'];
+        }
+        if (loopData[i]['name'] == 'sendsms') {
+          var sSMS = loopData[i]['value'];
+        }
+        if (loopData[i]['name'] == 'facebookpost') {
+          var sFacebook = loopData[i]['value'];
+        }
+        if (loopData[i]['name'] == 'twitterpost') {
+          var sTwitter = loopData[i]['value'];
+        }
+        if (loopData[i]['name'] == 'feedpost') {
+          var sFeed = loopData[i]['value'];
+        }
+      }
 
 
       // Get Type for drop down on inital page
       $.ajax({
         url: '/'+orgPath+'/api/2/users/'+userid+'/roles/1/settings/jobtypes',
         type: "GET",
-        isLocal: true,
         dataType: "json",
         success: function(data) {
           
@@ -165,6 +177,8 @@ jQuery.noConflict();
         ]
       };
 
+      watchFields('#msgsndr_form_sms');
+
       // Character Count
       $('#msgsndr_form_sms').on('keyup', function() {
         charCount(this, '160', '.sms.characters');
@@ -198,18 +212,36 @@ jQuery.noConflict();
 
       $('div[data-social=feed]').removeClass('hidden');
 
+      $.ajax({
+        url: '/'+orgPath+'/api/2/users/'+userid+'/roles/1/settings/feedcategories',
+        type: "GET",
+        dataType: "json",
+        success: function(data) {
+          
+          feedCats = data.feedCategories;
+
+          $.each(feedCats, function(index, feedCat) {  
+            var name = feedCat.name.toLowerCase().replace(" ","_");
+            $('#feed_categories').append('<span class="cf"><input type="checkbox" class="addme" name="" id="'+name+'" /><label class="addme" for="'+name+'">'+feedCat.name+'</label></span>');
+          });
+
+          step1();
+        } // success
+ 
+      });   
+
+
     }
 
     // Section 1 - Form Watch
     $('#msg_section_1').on('focusout', function() {
 
-      reqFields   = $('#msg_section_1 .required');
+      var reqFields   = $('#msg_section_1 .required');
 
-       reqCount    = 0;
+      var reqCount    = 0;
       var reqAmount   = parseInt(reqFields.length);
 
       $.each(reqFields, function(index, ele) {
-        //console.log($(ele).hasClass('ok'));
         if ($(ele).hasClass('ok')) {
           reqCount++;
         } else if (reqCount != 0) {
@@ -306,7 +338,11 @@ jQuery.noConflict();
 						res = validator.validate(validator.name,validator.label,value,validator.args,requiredvalues); 
 						if (res != true) {  
 							isValid = false;  
-              element.removeClass('ok').addClass('er').next('.error').show().text(res);
+              if (name == 'sms_text') {
+                element.removeClass('ok').addClass('er'); 
+              } else {
+                element.removeClass('ok').addClass('er').next('.error').show().text(res);
+              }
 							break; 
 						} else {
               element.removeClass('er').addClass('ok').next('.error').hide();
@@ -335,7 +371,7 @@ jQuery.noConflict();
 
       if (remaining < 0) {
         e.addClass('er');
-        status.text("Too many characters " + (0 - remaining));
+        status.html('<span class="error">'+(0 - remaining) + " too many characters</span>");
       } else {
         status.text(remaining + " Characters left");
       }

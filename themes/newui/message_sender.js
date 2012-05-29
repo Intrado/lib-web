@@ -73,7 +73,14 @@ jQuery.noConflict();
 
 		
 
-		// Toggle Collapse - Generic 
+		/* 	Toggle Collapse - Generic 
+
+				This works by having a class of toggle-more and a data attribute of data-target
+				In the data-target you specific the element you wish to hide/show ie: data-target="#test" 
+				would target an element with an id of test ie: <div id="test"></div>
+
+		*/
+
 		$('.toggle-more').on('click', function(event) {
 			event.preventDefault();
 
@@ -156,7 +163,6 @@ jQuery.noConflict();
         type: 'GET',
         url: "lists.php?ajax=true&filter=filter&pagestart=activepage",
         success: function(response) {
-            console.log(response.list);
             var lists = response.list;
             // var list = response[list];
             
