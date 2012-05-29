@@ -2,11 +2,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // Includes
 ////////////////////////////////////////////////////////////////////////////////
-// require_once("obj/Validator.obj.php");
-// require_once("obj/ValDuplicateNameCheck.val.php");
-// require_once("obj/Phone.obj.php");
-// require_once("obj/Form.obj.php");
-// require_once("obj/FormItem.obj.php");
 
 require_once("inc/common.inc.php");
 require_once("inc/securityhelper.inc.php");
@@ -14,22 +9,38 @@ require_once("inc/table.inc.php");
 require_once("inc/html.inc.php");
 require_once("inc/utils.inc.php");
 require_once("obj/Validator.obj.php");
-require_once("obj/ValDuplicateNameCheck.val.php");
 require_once("obj/Form.obj.php");
 require_once("obj/FormItem.obj.php");
+
+////////////////////////////////////////////////////////////////////////////////
+// Validators
+////////////////////////////////////////////////////////////////////////////////
+
+class ValJobName extends Validator {
+	var $onlyserverside = true;
+
+	function validate ($value, $args) {
+		global $USER;
+		$jobcount = QuickQuery("select count(id) from job where not deleted and userid=? and name=? and status in ('new','scheduled','processing','procactive','active')", false, array($USER->id, $value));
+		if ($jobcount)
+			return "$this->label: ". _L('There is already an active notification with this name. Please choose another.');
+		return true;
+	}
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 // Form Data
 ////////////////////////////////////////////////////////////////////////////////
 
 $formdata = array(
+	_L('Template Section 1'), // Optional
 	"subject" => array(
 		"label" => _L('TextField'),
 		"value" => "a",
 		"validators" => array(
 			array("ValRequired"),
 			array("ValLength","min" => 3, "max" => 30),
-			array("ValDuplicateNameCheck","type"=> "job")
+			array("ValJobName","type"=> "job")
 		)
 	)
 );
@@ -380,7 +391,7 @@ include("nav.inc.php");
 				<fieldset class="check">
 					<label for="msgsndr_form_sms">SMS Text</label>
 					<div class="controls">
-					<textarea id="msgsndr_form_sms" name="sms_text"></textarea> <!-- <span class="error"></span> -->
+					<textarea id="msgsndr_form_sms" name="sms_text"></textarea>
 					<div>
 					<p><a href="#" id="sms_sc">Spell Check</a> <span class="sms characters">160 Characters left</span></p>
 					<span class="loading">loading..</span>
@@ -391,7 +402,7 @@ include("nav.inc.php");
 				
 				<fieldset class="form_actions">
 					<div class="controls">
-						<button class="btn_save">Save SMS Message</button>
+						<button class="btn_save" disabled="disabled">Save SMS Message</button>
 						<button>Cancel</button>
 					</div>
 				</fieldset>
