@@ -2,6 +2,11 @@ jQuery.noConflict();
 (function($) { 
   $(function() {
 
+    // Some Global variables
+
+    orgPath     = window.location.pathname.split('/')[1]; // This gives us the the URL path needed for first part of AJAX call
+
+
 
     $('.error, #ctrecord').hide();
 
@@ -17,7 +22,7 @@ jQuery.noConflict();
 
     // Inital Call
     $.ajax({
-        url: '/jwhigh/api/2/users/'+userid+'/roles',
+        url: '/'+orgPath+'/api/2/users/'+userid+'/roles',
         type: "GET",
         isLocal: true,
         dataType: "json",
@@ -47,7 +52,7 @@ jQuery.noConflict();
 
       // Get Type for drop down on inital page
       $.ajax({
-        url: '/jwhigh/api/2/users/'+userid+'/roles/1/settings/jobtypes',
+        url: '/'+orgPath+'/api/2/users/'+userid+'/roles/1/settings/jobtypes',
         type: "GET",
         isLocal: true,
         dataType: "json",
