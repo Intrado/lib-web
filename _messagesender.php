@@ -7,19 +7,38 @@ require_once("inc/securityhelper.inc.php");
 require_once("inc/table.inc.php");
 require_once("inc/html.inc.php");
 require_once("inc/utils.inc.php");
+require_once("inc/date.inc.php");
 require_once("obj/Form.obj.php");
 require_once("obj/FormItem.obj.php");
+require_once("inc/translate.inc.php");
+require_once("inc/facebook.php");
+require_once("inc/facebookEnhanced.inc.php");
+require_once("inc/facebook.inc.php");
+require_once("obj/TwitterAuth.fi.php");
+require_once("inc/twitteroauth/OAuth.php");
+require_once("inc/twitteroauth/twitteroauth.php");
 require_once("obj/RenderedList.obj.php");
-require_once("obj/Phone.obj.php");
+require_once("obj/ListForm.obj.php");
+require_once("obj/Twitter.obj.php");
 
 // DBMO
+require_once("obj/Content.obj.php");
+require_once("obj/Phone.obj.php");
+require_once("obj/Sms.obj.php");
+require_once("obj/Email.obj.php");
+require_once("obj/Job.obj.php");
 require_once("obj/JobType.obj.php");
-require_once("obj/PeopleList.obj.php");
+require_once("obj/Schedule.obj.php");
 require_once("obj/AudioFile.obj.php");
 require_once("obj/Voice.obj.php");
-require_once("obj/Message.obj.php");
 require_once("obj/FieldMap.obj.php");
+require_once("obj/Language.obj.php");
+require_once("obj/PeopleList.obj.php");
+require_once("obj/ListEntry.obj.php");
+require_once("obj/MessageGroup.obj.php");
+require_once("obj/Message.obj.php");
 require_once("obj/MessagePart.obj.php");
+require_once("obj/MessageAttachment.obj.php");
 require_once("obj/FeedCategory.obj.php");
 
 // Validators
@@ -160,6 +179,11 @@ $twitterreservedchars = mb_strlen(" http://". getSystemSetting("tinydomain"). "/
 $translationlanguages = Voice::getTTSLanguageMap();
 unset($translationlanguages['en']);
 
+$fcids = array_keys(FeedCategory::getAllowedFeedCategories());
+$feedcategoryids = array();
+foreach ($fcids as $fcid)
+	$feedcategoryids[$fcid] = $fcid;
+
 $formdata = array(
 	"name" => array(
 		"label" => "name",
@@ -183,6 +207,15 @@ $formdata = array(
 	//=========================================================================================
 	"LIST DATA",
 	//=========================================================================================
+	"addme" => array(
+		"label" => "addme",
+		"value" => "",
+		"validators" => array(
+			// None, just toggles logic for addme fields
+		),
+		"control" => array("CheckBox"),
+		"helpstep" => 1
+	),
 	"addmephone" => array(
 		"label" => "addmephone",
 		"value" => "",
@@ -238,6 +271,15 @@ $formdata = array(
 			array("ValInArray", "values" => array("callme","text"))
 		),
 		"control" => array("RadioButton", "values" => array("callme" => "callme", "text" => "text")),
+		"helpstep" => 1
+	),
+	"phonemessagepost" => array(
+		"label" => "phonemessagepost",
+		"value" => "",
+		"validators" => array(
+			// NOTE: Will need complicated validation based on user permissions and message contents (has dynamic parts?)
+		),
+		"control" => array("CheckBox"),
 		"helpstep" => 1
 	),
 	"phonemessagecallme" => array(
@@ -356,13 +398,13 @@ $formdata = array_merge($formdata, array(
 ));
 
 foreach ($translationlanguages as $code => $language) {
-	$formdata["phonemessageemailtranslate". $code. "text"] = array(
-		"label" => "phonemessageemailtranslate". $code. "text",
+	$formdata["emailmessagetexttranslate". $code. "text"] = array(
+		"label" => "emailmessagetexttranslate". $code. "text",
 		"value" => "",
 		"validators" => array(
-			array("ValTranslation")
+			// Note: No validation, just a toggle to enable this translation or not
 		),
-		"control" => array("TextField"),
+		"control" => array("CheckBox"),
 		"helpstep" => 1
 	);
 }
@@ -461,9 +503,9 @@ $formdata = array_merge($formdata, array(
 		"label" => "socialmediafeedcategory",
 		"value" => "",
 		"validators" => array(
-			array("ValInArray", "values" => array_keys(FeedCategory::getAllowedFeedCategories()))
+			array("ValInArray", "values" => array_keys($feedcategoryids))
 		),
-		"control" => array("MultiCheckBox", "values" => array_keys(FeedCategory::getAllowedFeedCategories())),
+		"control" => array("MultiCheckBox", "values" => $feedcategoryids),
 		"helpstep" => 1
 	),
 	//=========================================================================================
@@ -577,10 +619,388 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 	} else if (($errors = $form->validate()) === false) { //checks all of the items in this form
 		$postdata = $form->getData(); //gets assoc array of all values {name:value,...}
 		Query("BEGIN");
+		
+		// ============================================================================================================================
+		// Job, create a new one
+		// ============================================================================================================================
+		$job = Job::jobWithDefaults();
+		
+		$job->userid = $USER->id;
+		$job->jobtypeid = $postdata["jobtype"];
+		$job->name = $postdata["name"];
+		$job->description = "Created with MessageSender";
+		
+		$job->type = 'notification';
+		$job->modifydate = $job->createdate = date("Y-m-d H:i:s");
+		
+		$job->scheduleid = null;
+		$job->startdate = date("Y-m-d", $postdata['scheduledate']);
+		$job->enddate = date("Y-m-d", strtotime($job->startdate) + (($postdata["optionmaxjobdays"] - 1) * 86400));
+		$job->starttime = date("H:i", strtotime($postdata['optioncallearly']));
+		$job->endtime = date("H:i", strtotime($postdata['optioncalllate']));
+		$job->finishdate = null;
+		$job->status = "new";
+		$job->create();
+		
+		$job->setSetting('translationexpire', date("Y-m-d", strtotime("+15 days"))); // now plus 15 days
+		
+		// for all the job settings on the "Advanced" step. set some advanced options that will get stuffed into the job
+		$job->setSetting("leavemessage", (isset($postdata["optionleavemessage"]) && $postdata["optionleavemessage"])?1:0);
+		$job->setSetting("messageconfirmation", (isset($postdata["optionmessageconfirmation"]) && $postdata["optionmessageconfirmation"])?1:0);
+		$job->setSetting("skipduplicates", (isset($postdata["optionskipduplicate"]) && $postdata["optionskipduplicate"])?1:0);
+		$job->setSetting("skipemailduplicates", (isset($postdata["optionskipduplicate"]) && $postdata["optionskipduplicate"])?1:0);
+		
+		// set jobsetting 'callerid'
+		$job->setSetting('callerid', $postdata["optioncallerid"]);
+		
+		$job->update();
+		
+		// ============================================================================================================================
+		// Lists, get listids and create an addme list
+		// ============================================================================================================================
+		$joblists = json_decode($postdata["listids"]);
+		
+		// if there is "addme" data in the list selection, create a person and list with the contact details
+		if (isset($postdata['addme']) && $postdata['addme']) {
+			$addmelist = new PeopleList(null);
+			$addmelist->userid = $USER->id;
+			$addmelist->name = _L("Me");
+			$addmelist->description = _L("JobWizard, addme");
+			$addmelist->deleted = 1;
+			$addmelist->create();
+			
+			// List was created, so add the "addme" person to it
+			if ($addmelist->id) {
+				// Constants
+				$langfield = FieldMap::getLanguageField();
+				$fnamefield = FieldMap::getFirstNameField();
+				$lnamefield = FieldMap::getLastNameField();
 
-		//save data here
+				// New Person
+				$person = new Person();
+				$person->userid = $USER->id;
+				$person->deleted = 0; // NOTE: This person must not be set as deleted, otherwise the list will not include him/her.
+				$person->type = "manualadd";
+				$person->$fnamefield = $USER->firstname;
+				$person->$lnamefield = $USER->lastname;
+				$person->$langfield = "en";
+				$person->create();
+				
+				// get the contact details out of postdata
+				$deliveryTypes = array();
+				if (isset($postdata['addmephone']) && $postdata['addmephone']) {
+					$deliveryTypes["phone"] = new Phone();
+					$deliveryTypes["phone"]->phone = $postdata['addmephone'];
+				}
+				if (isset($postdata['addmeemail']) && $postdata['addmeemail']) {
+					$deliveryTypes["email"] = new Email();
+					$deliveryTypes["email"]->email = $postdata['addmeemail'];
+				}
+				if (isset($postdata['addmesms']) && $postdata['addmesms']) {
+					$deliveryTypes["sms"] = new Sms();
+					$deliveryTypes["sms"]->sms = $postdata['addmesms'];
+				}
 
+				// Delivery Types and Job Types
+				foreach ($deliveryTypes as $deliveryTypeName => $deliveryTypeObject) {
+					$deliveryTypeObject->personid = $person->id;
+					$deliveryTypeObject->sequence = 0;
+					$deliveryTypeObject->editlock = 0;
+					$deliveryTypeObject->update();
+					
+					// NOTE: getUserJobTypes() automatically applies user jobType restrictions
+					$jobTypes = JobType::getUserJobTypes(false);
+					
+					// For each job type, assume sequence = 0, enabled = 1
+					foreach ($jobTypes as $jobType) {
+						// NOTE: $person->id is assumed to be a new id, so no need to worry about duplicate keys
+						$query = "insert into contactpref (personid, jobTypeid, type, sequence, enabled) values (?, ?, ?, 0, 1)";
+						QuickUpdate($query, false, array($person->id, $jobType->id, $deliveryTypeName));
+					}
+				}
 
+				// New List Entry
+				$le = new ListEntry();
+				$le->type = "add";
+				$le->listid = $addmelist->id;
+				$le->personid = $person->id;
+				$le->create();
+
+				// Include this single-person list in the job.
+				$joblists[] = $addmelist->id;
+			}
+		} //end addme
+		
+		// store job lists
+		foreach ($joblists as $listid)
+			QuickUpdate("insert into joblist (jobid,listid) values (?,?)", false, array($job->id, $listid));
+		
+		// create a new message group
+		$messagegroup = new MessageGroup();
+		$messagegroup->userid = $USER->id;
+		$messagegroup->name = $job->name;
+		$messagegroup->description = "Created in MessageSender";
+		$messagegroup->modified = $job->modifydate;
+		$messagegroup->deleted = 1;
+		$messagegroup->create();
+		
+		$job->messagegroupid = $messagegroup->id;
+		$job->update();
+		
+		// keep track of the text message data we are going to create messages for
+		// format $messages[<type>][<subtype>][<langcode>][<autotranslate>] => array($msgdata)
+		$messages = array(
+			'phone' => array(),
+			'email' => array(),
+			'sms' => array(),
+			'post' => array()
+		);
+		
+		// ============================================================================================================================
+		// Phone Message (callme, text, translations)
+		// ============================================================================================================================
+		if (isset($postdata["hasphone"]) && $postdata["hasphone"]) {
+			switch ($postdata["phonemessagetype"]) {
+				case "callme":
+					$audiofileidmap = json_decode($postdata["phonemessagecallme"]);
+					foreach ($audiofileidmap as $langcode => $audiofileid) {
+						$message = new Message();
+						$message->messagegroupid = $messagegroup->id;
+						$message->type = 'phone';
+						$message->subtype = 'voice';
+						$message->autotranslate = 'none';
+	
+						$message->name = $messagegroup->name;
+						$message->description = Language::getName($langcode);
+						$message->userid = $USER->id;
+						$message->modifydate = $messagegroup->modified;
+						$message->languagecode = $langcode;
+						$message->stuffHeaders();
+						$message->create();
+						
+						$part = new MessagePart();
+						$part->messageid = $message->id;
+						$part->type = "A";
+						$part->audiofileid = $audiofileid;
+						$part->sequence = 0;
+						$part->create();
+					}
+					// create a post voice message (if it's enabled)
+					if (isset($postdata["phonemessagepost"]) && $postdata["phonemessagepost"]) {
+						$message = new Message();
+						$message->messagegroupid = $messagegroup->id;
+						$message->type = 'post';
+						$message->subtype = 'voice';
+						$message->autotranslate = 'none';
+	
+						$message->name = $messagegroup->name;
+						$message->description = Language::getName($langcode);
+						$message->userid = $USER->id;
+						$message->modifydate = $messagegroup->modified;
+						$message->languagecode = "en";
+						$message->stuffHeaders();
+						$message->create();
+						
+						$part = new MessagePart();
+						$part->messageid = $message->id;
+						$part->type = "A";
+						$part->audiofileid = $audiofileidmap->en;
+						$part->sequence = 0;
+						$part->create();
+						
+						$jobpostmessage[] = "voice";
+					}
+					break;
+				case "text":
+					$sourcemessage = json_decode($postdata["phonemessagetext"]);
+				
+					// this is the default 'en' message so it's autotranslate value is 'none'
+					$messages['phone']['voice']['en']['none']['text'] = $sourcemessage->text;
+					$messages['phone']['voice']['en']['none']['gender'] = $sourcemessage->gender;
+				
+					//also set the messagegroup preferred gender
+					$messagegroup->preferredgender = $sourcemessage->gender;
+					$messagegroup->stuffHeaders();
+					$messagegroup->update(array("data"));
+				
+					// create a post voice (provided that's enabled)
+					if (isset($postdata["phonemessagepost"]) && $postdata["phonemessagepost"])
+						$messages['post']['voice']['en']['none'] = $messages['phone']['voice']['en']['none'];
+					
+					// check for and retrieve translations
+					foreach ($translationlanguages as $code => $language) {
+						if (isset($postdata["phonemessagetexttranslate". $code. "text"]))
+						$translatedmessagedata = json_decode($postdata["phonemessagetexttranslate". $code. "text"], true);
+						$translatedmessage = $translatedmessage[$code];
+						if ($translatedmessage["enabled"]) {
+							// if the translation text is overridden, don't attach a source message
+							// it isn't applicable since we have no way to know what they changed the text to.
+							if ($translatedmessage["override"]) {
+								$messages['phone']['voice'][$code]['overridden']['text'] = $translatedmessage["text"];
+								$messages['phone']['voice'][$code]['overridden']['gender'] = $translatedmessage["gender"];
+							} else {
+								$messages['phone']['voice'][$code]['translated']['text'] = $translatedmessage["text"];
+								$messages['phone']['voice'][$code]['translated']['gender'] = $translatedmessage["gender"];
+								$messages['phone']['voice'][$code]['source'] = $messages['phone']['voice']['en']['none'];
+							}
+						}
+					}
+			} // end switch phone message type
+		} // end if hasphone
+		
+		// ============================================================================================================================
+		// Email Message (text, translations)
+		// ============================================================================================================================
+		if (isset($postdata["hasemail"]) && $postdata["hasemail"]) {
+			// this is the default 'en' message so it's autotranslate value is 'none'
+			$messages['email']['html']['en']['none']['text'] = $postdata["emailmessagetext"];
+			$messages['email']['html']['en']['none']["fromname"] = $postdata["emailmessagefromname"];
+			$messages['email']['html']['en']['none']["from"] = $postdata["emailmessagefromemail"];
+			$messages['email']['html']['en']['none']["subject"] = $postdata["emailmessagesubject"];
+			$attachments = isset($postdata["emailmessageattachment"])?json_decode($postdata["emailmessageattachment"]):array();
+			$messages['email']['html']['en']['none']['attachments'] = $attachments;
+			
+			// check for and retrieve translations
+			if (isset($postdata["emailmessagetexttranslate"]) && $postdata["emailmessagetexttranslate"]) {
+				$translationselections = array();
+				foreach ($translationlanguages as $code => $language) {
+					if (isset($postdata["emailmessagetexttranslate". $code. "text"]) && $postdata["emailmessagetexttranslate". $code. "text"])
+						$translationselections[] = $code;
+				}
+				$translations = translate_fromenglish($messages['email']['html']['en']['none']['text'],$translationselections);
+				$translationsindex = 0;
+				foreach ($translationselections as $langcode) {
+					$messages['email']['html'][$langcode]['source'] = $messages['email']['html']['en']['none'];
+					$messages['email']['html'][$langcode]['translated'] = $messages['email']['html']['en']['none'];
+					if ($translations[$translationsindex] !== false)
+						$messages['email']['html'][$langcode]['translated']['text'] = $translations[$translationsindex];
+					$translationsindex++;
+				}
+			}
+		}
+		
+		// ============================================================================================================================
+		// SMS Message
+		// ============================================================================================================================
+		if (isset($postdata["hassms"]) && $postdata["hassms"])
+			$messages['sms']['plain']['en']['none']['text'] = $postdata["smsmessagetext"];
+		
+		// ============================================================================================================================
+		// Social Media Message(s)
+		// ============================================================================================================================
+		if (isset($postdata["hasfacebook"]) && $postdata["hasfacebook"])
+			$messages['post']['facebook']['en']['none']['text'] = $postdata["socialmediafacebookmessage"];
+		
+		if (isset($postdata["hasfacebook"]) && $postdata["hasfacebook"])
+			$messages['post']['twitter']['en']['none']['text'] = $postdata["socialmediatwittermessage"];
+		
+		if (isset($postdata["hasfeed"]) && $postdata["hasfeed"]) {
+			$feeddata = json_decode($postdata["socialmediatwittermessage"]);
+			$messages['post']['feed']['en']['none']['subject'] = $feeddata->subject;
+			$messages['post']['feed']['en']['none']['text'] = $feeddata->message;
+		}
+		
+		
+		// #################################################################
+		// create a message for each type/subtype/languagecode
+		// for each message type
+		foreach ($messages as $type => $msgdata) {
+			// for each subtype
+			foreach ($msgdata as $subtype => $msglang) {
+				// for each language code
+				foreach ($msglang as $langcode => $autotranslatevalues) {
+					// for each autotranslate value
+					foreach ($autotranslatevalues as $autotranslate => $data) {
+						if ($data["text"]) {
+							$message = new Message();
+							$message->messagegroupid = $messagegroup->id;
+							$message->type = $type;
+							$message->subtype = $subtype;
+							$message->autotranslate = $autotranslate;
+							$message->name = $messagegroup->name;
+							$message->description = Language::getName($langcode);
+							$message->userid = $USER->id;
+		
+							// if this is an autotranslated message and an email. set the modify date in the past
+							// this way re-translate will populate the message parts for us
+							if ($autotranslate == 'translated' && $type == 'email')
+								$message->modifydate = date("Y-m-d H:i:s", '1');
+							else
+								$message->modifydate = $messagegroup->modified;
+		
+							$message->languagecode = $langcode;
+		
+							if ($type == 'email' || ($type == "post" && $subtype == 'feed'))
+								$message->subject = $data["subject"];
+							if ($type == 'email') {
+								$message->fromname = $data["fromname"];
+								$message->fromemail = $data["from"];
+							}
+		
+							$message->stuffHeaders();
+							$message->create();
+		
+							// keep track of any post type messages for adding to jobpost table later
+							if ($type == "post")
+								$jobpostmessage[] = $subtype;
+		
+							// create the message parts
+							$message->recreateParts($data['text'], null, isset($data['gender'])?$data['gender']:false);
+		
+							// if there are message attachments, attach them
+							if (isset($data['attachments']) && $data['attachments']) {
+								foreach ($data['attachments'] as $cid => $details) {
+									$msgattachment = new MessageAttachment();
+									$msgattachment->messageid = $message->id;
+									$msgattachment->contentid = $cid;
+									$msgattachment->filename = $details->name;
+									$msgattachment->size = $details->size;
+									$msgattachment->create();
+								}
+							} // end if there are attachments
+						} // end if this message has a body
+					} // end for each autotranslate value
+				} // for each language code
+			} // for each subtype
+		} // for each message type
+		
+		// ============================================================================================================================
+		// Job Post Destinations (facebook, twitter, feed, page)
+		// ============================================================================================================================
+		// store the jobpost messages
+		$createdpostpage = false;
+		foreach ($jobpostmessage as $subtype) {
+			switch ($subtype) {
+				case "facebook":
+					// get the destinations for facebook
+					foreach (json_decode($postdata["socialmediafacebookpage"]) as $pageid) {
+						if ($pageid == "me")
+							$pageid = $USER->getSetting("fb_user_id");
+						$job->updateJobPost("facebook", $pageid);
+					}
+					break;
+				case "twitter":
+					$twitterauth = json_decode($USER->getSetting("tw_access_token"));
+					$job->updateJobPost("twitter", $twitterauth->user_id);
+					break;
+				case "page":
+					if (!$createdpostpage) {
+						$createdpostpage = true;
+						$job->updateJobPost("page", "");
+					}
+				case "voice":
+					if (!$createdpostpage) {
+						$createdpostpage = true;
+						$job->updateJobPost("page", "");
+					}
+				case "feed":
+					$job->updateJobPost("feed", $postdata["socialmediafeedcategory"]);
+			}
+		}
+		
+		// run the job
+		$job->runNow();
+		
 		Query("COMMIT");
 		if ($ajax)
 			$form->sendTo("start.php");
