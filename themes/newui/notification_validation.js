@@ -24,11 +24,9 @@ jQuery.noConflict();
         type: "GET",
         dataType: "json",
         success: function(data) {
-          //dd = data;
           setUp(data.roles); // Send Data over to the function setUp();
        }
     });
-
 
     /* --
       The setUp function will do alot of the inital work, and call other functions based on users roles
@@ -37,6 +35,9 @@ jQuery.noConflict();
     function setUp(data) {
 
       dd = data;
+      
+      // it's likely this function will need to work out what role has seniority in a case where a user has more than one role.
+      roleid = data[0].accessProfile.id;
 
       // Setting variables from data passed through from the initial ajax call above ^
       loopData = data[0].accessProfile.permissions;
@@ -65,7 +66,7 @@ jQuery.noConflict();
 
       // Get Type for drop down on inital page
       $.ajax({
-        url: '/'+orgPath+'/api/2/users/'+userid+'/roles/1/settings/jobtypes',
+        url: '/'+orgPath+'/api/2/users/'+userid+'/roles/'+roleid+'/settings/jobtypes',
         type: "GET",
         dataType: "json",
         success: function(data) {
@@ -216,7 +217,7 @@ jQuery.noConflict();
       $('div[data-social=feed]').removeClass('hidden');
 
       $.ajax({
-        url: '/'+orgPath+'/api/2/users/'+userid+'/roles/1/settings/feedcategories',
+        url: '/'+orgPath+'/api/2/users/'+userid+'/roles/'+roleid+'/settings/feedcategories',
         type: "GET",
         dataType: "json",
         success: function(data) {
@@ -381,6 +382,59 @@ jQuery.noConflict();
 
     }
 
+
+  /*
+   Message Groups, messages and message parts
+  \******************************************/
+
+    function getMessageGroups() {
+      $.ajax({
+        url: '/'+orgPath+'/api/2/users/'+userid+'/messagegroups',
+        type: "GET",
+        dataType: "json",
+        success: function(data) {
+          // console.log(data);
+          var msgGroups = data.messageGroups;
+          console.log(msgGroups);
+
+          $.each(msgGroups, function(index, msgGroup) {
+            // format the date from the modifiedTimestamp value 
+            var fullDate = new Date(msgGroup.modifiedTimestamp*1000);
+            var DD = fullDate.getDate();
+            var MM = fullDate.getMonth();
+            var YY = fullDate.getFullYear();
+            var msgDate = MM+1 + '/' + DD + '/' + YY;
+            
+            var msgTypes = msgGroup.typeSummary;
+            // loop through the typeSummary array to see what message parts are included
+            var msgPhone = '';
+            var msgEmail = '';
+            var msgSms = '';
+            var msgPost = '';
+            $.each(msgTypes, function(index, msgType) {
+              if (msgType.type == 'phone') {
+                msgPhone = 'x';
+              }
+              if (msgType.type == 'email') {
+                msgEmail = 'x';
+              }
+              if (msgType.type == 'sms') {
+                msgSms = 'x';
+              }
+              if (msgType.type == 'post') {
+                msgPost = 'x';
+              }
+            });
+
+            $('#messages_list').append('<tr id="msgsndr_msggroup_'+msgGroup.id+'"><td>'+msgGroup.name+'</td><td>'+msgDate+'</td><td>'+msgPhone+'</td><td>'+msgEmail+'</td><td>'+msgSms+'</td><td>'+msgPost+'</td></tr>')  
+
+          });
+        } 
+      });   
+    };
+
+    // load the messages into the modal dialog.
+    getMessageGroups();
 
 
 	});

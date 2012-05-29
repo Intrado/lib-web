@@ -214,10 +214,10 @@ include("nav.inc.php");
 			
 			</div><!-- end window_panel -->
 			
-			<!-- Message sender section 2, Message Content -->
+			<!-- ============== Message sender section 2, Message Content ============== -->
 
 			<div id="msg_section_2" class="window_panel">
-			<p>Create the content for this message, or <a href="#saved_message" data-toggle="modal">load a saved message</a></p>
+			<p>Create the content for this message, or <a href="#msgsndr_saved_message" data-toggle="modal">load a saved message</a></p>
 			
 				
 				
@@ -518,7 +518,7 @@ include("nav.inc.php");
 			
 			</div><!-- end window_panel -->
 			
-			<!-- Message sender section 3, Review and Send -->
+			<!-- ============== Message sender section 3, Review and Send ============== -->
 
 			<div id="msg_section_3" class="window_panel">
 				<p><strong>Subject</strong> Holidays Reminder</p>
@@ -582,7 +582,7 @@ include("nav.inc.php");
 
 <!-- load saved message modal -->
 <div id="msgsndr_saved_message" class="modal hide">
-	<h3>Load a Saved Message <a href="#" class="close" data-dismiss="modal">x</a></h3>
+	<h3>Load a Saved Message <a href="" class="close" data-dismiss="modal">x</a></h3>
 	<div class="modal_content">
 	<input type="text"/><input class="btn" type="submit" value="Search"/>
 	<table class="messages">
@@ -596,31 +596,15 @@ include("nav.inc.php");
 			<th><img src="themes/newui/social.png" alt=""/></th>
 			</tr>
 		</thead>
-		<tbody>
-			<tr>
-			<td>Valentines Dance Cancelled</td>
-			<td>4/2/12</td>
-			<td></td>
-			<td>y</td>
-			<td>y</td>
-			<td></td>
-			</tr>
-			<tr>
-			<td>Xmas Holidays Announcement</td>
-			<td>13/11/11</td>
-			<td>y</td>
-			<td>y</td>
-			<td>y</td>
-			<td>y</td>
-			</tr>
-			<tr>
-			<td>Star Wars Day Fancy Dress</td>
-			<td>04/05/12</td>
-			<td></td>
-			<td>y</td>
-			<td>y</td>
-			<td>y</td>
-			</tr>
+		<tbody id="messages_list">
+			<!--tr>
+				<td>Example</td>
+				<td>[mm/dd/yyyy]</td>
+				<td>[p]</td>
+				<td>[e]</td>
+				<td>[t]</td>
+				<td>[s]</td>
+			</tr-->
 		</tbody>
 	</table>
 	</div>
