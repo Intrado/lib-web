@@ -205,9 +205,11 @@ jQuery.noConflict();
     			listHtml.attr('disabled', true);	
     		}
     	});
-    	// shut that modal down ...
+    	// shut that modal down and make sure the first panel is open...
     	$('#msgsndr_choose_list').modal('hide');
-    	   
+    	$('.msg_steps').find('li:eq(0)').addClass('active');
+    	$('#msg_section_1').show();
+
     });
    
 
