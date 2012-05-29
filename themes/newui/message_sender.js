@@ -46,6 +46,7 @@ jQuery.noConflict();
 			if (elm[2] == 'email') {
 				$('#msgsndr_form_mailsubject').val($('#msgsndr_form_subject').val());
 			}
+
 		});
 
 
@@ -81,7 +82,7 @@ jQuery.noConflict();
 
 			offset = $(this).offset();
 				$('html, body').animate({scrollTop: offset.top },2000);
-				
+
 		});
 
 
@@ -108,6 +109,31 @@ jQuery.noConflict();
 
 		});
 
+
+		// Spell Checker
+		$(".loading").hide();
+
+		$("#sms_sc").click(function(e){
+			e.preventDefault();
+			$(".loading").show();
+
+			$("#msgsndr_form_sms")
+			.spellchecker({
+				lang: "en",
+				engine: "google",
+				suggestBoxPosition: "above"
+			})
+			.spellchecker("check", function(result){
+
+				// spell checker has finished checking words
+				$(".loading").hide();
+
+				// if result is true then there are no badly spelt words
+				if (result) {
+					alert('There are no incorrectly spelt words.');
+				}
+			});
+		});
 
 
 		// modal windows -- script/bootstrap-modal.js

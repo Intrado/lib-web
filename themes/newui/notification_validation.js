@@ -47,13 +47,13 @@ jQuery.noConflict();
 
       // Get Type for drop down on inital page
       $.ajax({
-        url: "message_sender/jobtypes.json",
+        url: '/jwhigh/api/2/users/'+userid+'/roles/1/settings/jobtypes',
         type: "GET",
         isLocal: true,
         dataType: "json",
         success: function(data) {
           
-          var jobTypes = data;
+          jobTypes = data.jobTypes;
 
           $.each(jobTypes, function(index, jobType) {  
             $('#msgsndr_form_type').append('<option value='+jobType.id+'>'+jobType.info+'</option');
@@ -90,7 +90,7 @@ jQuery.noConflict();
           socialFB();
         }
         if (sTwitter == 1) {
-          socailTwitter();
+          socialTwitter();
         }
         if (sFeed == 1) {
           socialFeed();
@@ -195,20 +195,19 @@ jQuery.noConflict();
 
     }
 
-
-    $('#msg_section_1').on('keyup', function() {
+    // Section 1 - Form Watch
+    $('#msg_section_1').on('focusout', function() {
 
       reqFields   = $('#msg_section_1 .required');
 
-      var reqCount    = 0;
+       reqCount    = 0;
       var reqAmount   = parseInt(reqFields.length);
 
       $.each(reqFields, function(index, ele) {
         //console.log($(ele).hasClass('ok'));
         if ($(ele).hasClass('ok')) {
-          console.log('hasClass OK');
           reqCount++;
-        } else {
+        } else if (reqCount != 0) {
           reqCount--;
         }
 
@@ -222,6 +221,13 @@ jQuery.noConflict();
 
     });
 
+
+    $('#send_new_broadcast').on('click', function(e) {
+      e.preventDefault();
+
+      console.log($('form[name=broadcast]').serializeArray());
+
+    })
 
     $('button.btn_confirm').on('click', function(e) {
       e.preventDefault();
@@ -238,6 +244,7 @@ jQuery.noConflict();
   
 
 
+    // Set keyup event to the fields that need validating - These feilds passed through from functions above
     function watchFields(fieldId) {
 
       var watch = watch + ', ' + fieldId;
@@ -311,6 +318,7 @@ jQuery.noConflict();
 			} // if ajax
 
 		} // form_val function
+
 
 
 

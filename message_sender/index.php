@@ -415,7 +415,7 @@ include("nav.inc.php");
 				<fieldset>
 					<label for="msgsndr_form_mailsubject">Subject</label>
 					<div class="controls">
-					<input type="text" id="msgsndr_form_mailsubject" name="email_subject" disabled="disabled" /> <span class="error"></span>
+					<input type="text" id="msgsndr_form_mailsubject" name="email_subject" /> <span class="error"></span>
 					</div>
 				</fieldset>
 				
@@ -448,7 +448,11 @@ include("nav.inc.php");
 					<label for="msgsndr_form_sms">SMS Text</label>
 					<div class="controls">
 					<textarea id="msgsndr_form_sms" name="sms_text"></textarea> <span class="error"></span>
-					<p><a href="#">Spell Check</a> <span class="sms characters">160 Characters left</span></p>
+					<div>
+					<p><a href="#" id="sms_sc">Spell Check</a> <span class="sms characters">160 Characters left</span></p>
+					<span class="loading">loading..</span>
+					</div>
+					
 					</div>
 				</fieldset>
 				
@@ -600,7 +604,7 @@ include("nav.inc.php");
 			
 			<div class="msg_confirm">
 				<a href="#">save for later</a> or 
-				<a class="btn btn_confirm" href="#">Send Message <span class="icon"></span></a>
+				<button class="btn_confirm" id="send_new_broadcast">Send Message <span class="icon"></span></button>
 			</div>
 			
 			</div><!-- end window_panel -->
@@ -627,5 +631,8 @@ include("nav.inc.php");
 <script src="script/jquery.json-2.3.min.js"></script>
 <script src="script/bootstrap-modal.js"></script>
 
+<link href="themes/newui/scripts/spellcheck/spellcheck.css" type="text/css" rel="stylesheet">
+
 <script src="themes/newui/message_sender.js"></script>
 <script src="themes/newui/notification_validation.js"></script>
+<script src="themes/newui/scripts/spellcheck/spellcheck.js"></script>
