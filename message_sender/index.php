@@ -144,7 +144,11 @@ include("nav.inc.php");
 					or
 					<button href="#msgsndr_build_list" data-toggle="modal">Build a List Using Rules</button>
 				</div>
-			
+
+				<fieldset id="msgsndr_list_choices"class="hidden">
+					<!-- hidden inputs for each selected list get appended here -->	
+				</fieldset>
+							
 				<table id="msgsndr_list_info" class="info">
 					<thead>
 						<tr>
@@ -152,29 +156,24 @@ include("nav.inc.php");
 							<th>Count</th>
 						</tr>
 					</thead>
-					<tbody>
-						<tr>
-							<td>
-							<a class="removelist" href="" title="Remove List"></a>
-							<a class="savelist" href="" title="Save List"></a>
-							</td>
-							<td>List name goes here</td>
-							<td>1000</td>
-						</tr>
-						<tr>
-							<td>
-							<a class="removelist" href="" title="Remove List"></a>
-							<a class="savelist" href="" title="Save List"></a>
-							</td>
-							<td>List name goes here</td>
-							<td>1000</td>
-						</tr>
+					<tfoot>
 						<tr>
 							<td colspan="2">Total</td>
-							<td>2000</td>
+							<td>[total]</td>
 						</tr>
+					</tfoot>
+					<tbody id="msgsndr_list_info_tbody">
+						<!--tr>
+							<td>
+							<a class="removelist" href="" title="Remove List"></a>
+							<a class="savelist" href="" title="Save List"></a>
+							</td>
+							<td>List name goes here</td>
+							<td>1000</td>
+						</tr-->
 					</tbody>
 				</table>
+
 			
 				<fieldset>
 					<input class="addme" type="checkbox" id="msgsndr_form_myself"/>
@@ -561,12 +560,13 @@ include("nav.inc.php");
 
 <!-- choose list modal -->
 <div id="msgsndr_choose_list" class="modal hide">
-	<h3>Add existing list <a href="#" class="close" data-dismiss="modal">x</a></h3>
+	<h3>Add existing list <a href="" class="close" data-dismiss="modal">x</a></h3>
 	<ul id="lists_list">
 		<!--li><input type="checkbox"/><label>Exampke</label></li-->
 	</ul>
 	<div class="msg_confirm">
-		<button data-dismiss="modal">Cancel</button><button class="btn_confirm" href="#">Add Lists</button>
+		<button data-dismiss="modal">Cancel</button>
+		<button id="choose_list_add_btn" class="btn_confirm" href="">Add Lists</button>
 	</div>
 </div>
 
@@ -576,7 +576,7 @@ include("nav.inc.php");
 	<p>Use filters to match a group of entries in your Address Book</p>
 	<div class="msg_confirm">
 		<button data-dismiss="modal">Cancel</button> 
-		<button class="btn_confirm">Add Lists</button>
+		<button class="btn_confirm" data-dismiss="modal">Add Lists</button>
 	</div>
 </div>
 

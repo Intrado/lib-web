@@ -7,7 +7,7 @@ jQuery.noConflict();
 (function($) { 
   $(function() {
 		
-		// Hiding stuf which is not needed
+		// Hiding stuff which is not needed
 		$('#msg_section_2, #msg_section_3, .close, .facebook, .twitter, .feed').hide();
 
 
@@ -73,14 +73,7 @@ jQuery.noConflict();
 
 		
 
-		/* 	Toggle Collapse - Generic 
-
-				This works by having a class of toggle-more and a data attribute of data-target
-				In the data-target you specific the element you wish to hide/show ie: data-target="#test" 
-				would target an element with an id of test ie: <div id="test"></div>
-
-		*/
-
+		// Toggle Collapse - Generic 
 		$('.toggle-more').on('click', function(event) {
 			event.preventDefault();
 
@@ -121,7 +114,7 @@ jQuery.noConflict();
 		$(".loading").hide();
 
 		$("#sms_sc").click(function(e){
-			e.preventDefault();
+			event.preventDefault();
 			$(".loading").show();
 
 			$("#msgsndr_form_sms")
@@ -164,10 +157,8 @@ jQuery.noConflict();
         url: "lists.php?ajax=true&filter=filter&pagestart=activepage",
         success: function(response) {
             var lists = response.list;
-            // var list = response[list];
-            
             $.each(lists, function(index, list) {
-              $('#lists_list').append('<li id="' + list.itemid + '"><input type="checkbox"/><label>' + list.title + '</label></li>');
+            	$('#lists_list').append('<li class="choose_lists_row"><input type="checkbox" id="' + list.itemid + '" name="choose_list_add" value="' + list.itemid + '" data-title="' + list.title + '"/><label for="choose_list_add">' + list.title + '</label></li>');       
             });
           }
       });
@@ -175,16 +166,50 @@ jQuery.noConflict();
     
     // load the lists into the modal window ...
     loadLists();
-    
 
-    $('#choose_list_add_btn').live("click", function() {
-      addLists($(this).attr('id'));
+    
+    // remove lists from the table of recipients
+		$('.removelist').live("click", function(){
+			var listId 			= $(this).attr('id');
+			var listRow 		= $(this).closest('.list_row');
+			var listsHidden	= $('#msgsndr_list_choices').children();
+			if ( listRow.attr('data-id') == listId ) {
+				listRow.remove();
+			}
+			$.each( listsHidden, function(index, listHidden) {
+				console.log(listHidden);
+				if ( $(this).attr('id') == listId ) {
+					// remove the input from the hidden fieldset
+					$('#msgsndr_list_choices > input[name=choose_list_add][id=' + listId +']').remove();
+					// revert the list item in the modal to its unchosen state
+					$('.choose_lists_row > input[name=choose_list_add][id=' + listId +']').attr('disabled', false).attr('checked', false);
+				}
+			});
+			
+		});
+ 
+ 		// add lists to the table of recipients, and add a hidden checkbox to the form for submission
+ 		$('#choose_list_add_btn').live("click", function() {
+    	var listItems = $('.choose_lists_row > input:checkbox[name=choose_list_add]:checked');
+    	$.each(listItems, function(index, listItem) {
+    		var listHtml	= $(this);
+    		var listTitle = $(this).attr('data-title');
+    		var listId 		= $(this).attr('value');
+    		console.log(listHtml);
+    		// check if the list has been chosen already, if not, add it in...
+    		if ( listHtml.attr('disabled') != 'disabled') {
+    			$('#msgsndr_list_info_tbody').append('<tr class="list_row" data-id="' + listId + '"><td><a id="' + listId + '" class="removelist" title="Remove List"></a><a id="' + listId + '" class="savelist" title="Save List"></a></td><td>' + listTitle + '</td><td>[count]</td></tr>');
+    			// clone the input in the msgsndr_list_choices fieldset 
+    			listHtml.clone().appendTo('#msgsndr_list_choices');
+    			// set the checkbox to disabled so users can't choose a list twice
+    			listHtml.attr('disabled', true);	
+    		}
+    	});
+    	// shut that modal down ...
+    	$('#msgsndr_choose_list').modal('hide');
+    	   
     });
-    
-
-    function addLists(listId) {
-
-    };
+   
 
 
   });
