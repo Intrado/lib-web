@@ -121,6 +121,8 @@ border-top: 1px solid #ccc; border-right: 1px solid #ccc; border-bottom: none; b
 .newform .formcontrol .radiobox li { padding: 2px 0; }
 .newform .formcontrol .radiobox input[type="radio"],
 .newform .formcontrol .radiobox input[type="checkbox"] { margin: 0 5px 0 0; }
+.newform .formcontrol #accessprofile_publish { float: none; display: block; }
+.newform .formcontrol #accessprofile_subscribe { float: none; display: block; }
 
 .newform .formcontrol select  { margin: 0; padding: 4px 6px; border: 1px solid #E7E7E7; 
 -webkit-border-radius: 5px; -moz-border-radius: 5px; border-radius: 5px; 
