@@ -330,7 +330,7 @@ include("nav.inc.php");
 			<!-- Add the email panel -->
 			<div id="msgsndr_tab_email" class="tab_panel">
 
-				<fieldset>
+				<fieldset class="check">
 					<label for="msgsndr_form_name">From Name</label>
 					<div class="controls">
 					<input type="text" id="msgsndr_form_name" name="email_name"/> <span class="error"></span>
@@ -367,7 +367,7 @@ include("nav.inc.php");
 				<fieldset class="form_actions">
 					<div class="controls">
 					<button class="btn_save" href="#">Save Email Message</button>
-					<button>Cancel</a>
+					<button>Cancel</button>
 					</div>
 				</fieldset>
 
@@ -376,7 +376,7 @@ include("nav.inc.php");
 			<!-- Add the sms panel -->
 			<div id="msgsndr_tab_sms" class="tab_panel">
 
-				<fieldset>
+				<fieldset class="check">
 					<label for="msgsndr_form_sms">SMS Text</label>
 					<div class="controls">
 					<textarea id="msgsndr_form_sms" name="sms_text"></textarea> <span class="error"></span>
@@ -400,14 +400,16 @@ include("nav.inc.php");
 			<!-- Add the social network panel -->
 			<div id="msgsndr_tab_social" class="tab_panel">
 		
-				<fieldset class="check">
-					<div class="controls">
-						<input class="addme" type="checkbox" id="msgsndr_form_audio" name="msgsndr_form_audio" />
-						<label class="addme" for="msgsndr_form_audio">Include a link to the audio message</label>
-					</div>
-				</fieldset>
+				<div class="social_tab">
+					<fieldset class="check">
+						<div class="controls">
+							<input class="addme" type="checkbox" id="msgsndr_form_audio" name="msgsndr_form_audio" />
+							<label class="addme" for="msgsndr_form_audio">Include a link to the audio message</label>
+						</div>
+					</fieldset>
+				</div><!--  -->
 			
-				<div class="hidden" data-social="facebook">
+				<div class="social_tab hidden" data-social="facebook">
 					<fieldset class="check">
 						<div class="controls">
 							<input class="addme social" type="checkbox" id="msgsndr_form_facebook" name="msgsndr_form_facebook" />
@@ -430,7 +432,7 @@ include("nav.inc.php");
 
 
 
-				<div class="hidden" data-social="twitter">
+				<div class="social_tab hidden" data-social="twitter">
 					<fieldset class="check">
 						<div class="controls">
 							<input class="addme social" type="checkbox" id="msgsndr_form_twitter" name="msgsndr_form_twitter" />
@@ -453,7 +455,7 @@ include("nav.inc.php");
 
 
 
-				<div class="hidden" data-social="feed">				
+				<div class="social_tab hidden" data-social="feed">				
 					<fieldset class="check">
 						<div class="controls">
 							<input class="addme social" type="checkbox" id="msgsndr_form_feed" name="msgsndr_form_feed" />
