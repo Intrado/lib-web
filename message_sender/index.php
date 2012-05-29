@@ -73,8 +73,8 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 // Moved from message_sender.php 
 
 include("nav.inc.php");
+?> <!-- pre> <? print_r($_SESSION); ?> </pre --> 
 
-?>
 
 <script> 
 	orgid = 123;
@@ -101,7 +101,7 @@ include("nav.inc.php");
 
 		<form name="broadcast">
 
-			<!-- Message sender section 1, Subject and Recipients -->
+			<!-- ============== Message sender section 1, Subject and Recipients ============== -->
 				
 			<div id="msg_section_1" class="window_panel">
 			
@@ -132,27 +132,8 @@ include("nav.inc.php");
 					or
 					<button href="#msgsndr_build_list" data-toggle="modal">Build a List Using Rules</button>
 				</div>
-				
-				<div id="msgsndr_choose_list" class="modal hide">
-					<h3>Add existing list <a href="#" class="close" data-dismiss="modal">x</a></h3>
-					<ul id="lists_list">
-						<!--li><input type="checkbox"/><label>Exampke</label></li-->
-					</ul>
-					<div class="msg_confirm">
-						<button data-dismiss="modal">Cancel</button><button class="btn_confirm" href="#">Add Lists</button>
-					</div>
-				</div>
-				
-				<div id="msgsndr_build_list" class="modal hide">
-					<h3>Add Recipients Using Rules <a href="#" class="close" data-dismiss="modal">x</a></h3>
-					<p>Use filters to match a group of entries in your Address Book</p>
-					<div class="msg_confirm">
-						<button data-dismiss="modal">Cancel</button> 
-						<button class="btn_confirm">Add Lists</button>
-					</div>
-				</div>
 			
-				<table class="info">
+				<table id="msgsndr_list_info" class="info">
 					<thead>
 						<tr>
 							<th colspan="2">List Name</th>
@@ -222,61 +203,12 @@ include("nav.inc.php");
 			
 			</div><!-- end window_panel -->
 			
-			<!-- Message sender section 2, Message Content -->
+			<!-- ============== Message sender section 2, Message Content ============== -->
 
 			<div id="msg_section_2" class="window_panel">
-			<p>Create the content for this message, or <a href="#saved_message" data-toggle="modal">load a saved message</a></p>
+			<p>Create the content for this message, or <a href="#msgsndr_saved_message" data-toggle="modal">load a saved message</a></p>
 			
-				<div id="msgsndr_saved_message" class="modal hide">
-					<h3>Load a Saved Message <a href="#" class="close" data-dismiss="modal">x</a></h3>
-					<div class="modal_content">
-					<input type="text"/><input class="btn" type="submit" value="Search"/>
-					<table class="messages">
-						<thead>
-							<tr>
-							<th>Title</th>
-							<th>Created</th>
-							<th><img src="themes/newui/phone.png" alt=""/></th>
-							<th><img src="themes/newui/email.png" alt=""/></th>
-							<th><img src="themes/newui/sms.png" alt=""/></th>
-							<th><img src="themes/newui/social.png" alt=""/></th>
-							</tr>
-						</thead>
-						<tbody>
-							<tr>
-							<td>Valentines Dance Cancelled</td>
-							<td>4/2/12</td>
-							<td></td>
-							<td>y</td>
-							<td>y</td>
-							<td></td>
-							</tr>
-							<tr>
-							<td>Xmas Holidays Announcement</td>
-							<td>13/11/11</td>
-							<td>y</td>
-							<td>y</td>
-							<td>y</td>
-							<td>y</td>
-							</tr>
-							<tr>
-							<td>Star Wars Day Fancy Dress</td>
-							<td>04/05/12</td>
-							<td></td>
-							<td>y</td>
-							<td>y</td>
-							<td>y</td>
-							</tr>
-						</tbody>
-					</table>
-					</div>
-					
-					<div class="msg_confirm">
-						<button data-dismiss="modal">Cancel</button> 
-						<button class="btn_confirm">Load Selected Message</button>
-					</div>
-
-				</div>
+				
 				
 			<ul class="msg_content_nav cf">
 				<li class="notactive ophone">
@@ -589,7 +521,7 @@ include("nav.inc.php");
 			
 			</div><!-- end window_panel -->
 			
-			<!-- Message sender section 3, Review and Send -->
+			<!-- ============== Message sender section 3, Review and Send ============== -->
 
 			<div id="msg_section_3" class="window_panel">
 				<p><strong>Subject</strong> Holidays Reminder</p>
@@ -625,6 +557,82 @@ include("nav.inc.php");
 	</div><!-- end main_aside-->
 	
 </div><!-- end wrapper -->
+
+
+<!-- ============== Modal windows and mini forms ================ -->
+
+<!-- choose list modal -->
+<div id="msgsndr_choose_list" class="modal hide">
+	<h3>Add existing list <a href="#" class="close" data-dismiss="modal">x</a></h3>
+	<ul id="lists_list">
+		<!--li><input type="checkbox"/><label>Exampke</label></li-->
+	</ul>
+	<div class="msg_confirm">
+		<button data-dismiss="modal">Cancel</button><button class="btn_confirm" href="#">Add Lists</button>
+	</div>
+</div>
+
+<!-- build list modal -->				
+<div id="msgsndr_build_list" class="modal hide">
+	<h3>Add Recipients Using Rules <a href="#" class="close" data-dismiss="modal">x</a></h3>
+	<p>Use filters to match a group of entries in your Address Book</p>
+	<div class="msg_confirm">
+		<button data-dismiss="modal">Cancel</button> 
+		<button class="btn_confirm">Add Lists</button>
+	</div>
+</div>
+
+<!-- load saved message modal -->
+<div id="msgsndr_saved_message" class="modal hide">
+	<h3>Load a Saved Message <a href="#" class="close" data-dismiss="modal">x</a></h3>
+	<div class="modal_content">
+	<input type="text"/><input class="btn" type="submit" value="Search"/>
+	<table class="messages">
+		<thead>
+			<tr>
+			<th>Title</th>
+			<th>Created</th>
+			<th><img src="themes/newui/phone.png" alt=""/></th>
+			<th><img src="themes/newui/email.png" alt=""/></th>
+			<th><img src="themes/newui/sms.png" alt=""/></th>
+			<th><img src="themes/newui/social.png" alt=""/></th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr>
+			<td>Valentines Dance Cancelled</td>
+			<td>4/2/12</td>
+			<td></td>
+			<td>y</td>
+			<td>y</td>
+			<td></td>
+			</tr>
+			<tr>
+			<td>Xmas Holidays Announcement</td>
+			<td>13/11/11</td>
+			<td>y</td>
+			<td>y</td>
+			<td>y</td>
+			<td>y</td>
+			</tr>
+			<tr>
+			<td>Star Wars Day Fancy Dress</td>
+			<td>04/05/12</td>
+			<td></td>
+			<td>y</td>
+			<td>y</td>
+			<td>y</td>
+			</tr>
+		</tbody>
+	</table>
+	</div>
+	
+	<div class="msg_confirm">
+		<button data-dismiss="modal">Cancel</button> 
+		<button class="btn_confirm">Load Selected Message</button>
+	</div>
+
+</div>
 	
 
 <script src="script/jquery.1.7.2.min.js"></script>

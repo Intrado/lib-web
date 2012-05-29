@@ -149,5 +149,37 @@ jQuery.noConflict();
 			show: false
 		});
 
+
+		// get the available lists from lists.php
+    loadLists = function() {
+      $.ajax({
+        type: 'GET',
+        url: "lists.php?ajax=true&filter=filter&pagestart=activepage",
+        success: function(response) {
+            console.log(response.list);
+            var lists = response.list;
+            // var list = response[list];
+            
+            $.each(lists, function(index, list) {
+              $('#lists_list').append('<li id="' + list.itemid + '"><input type="checkbox"/><label>' + list.title + '</label></li>');
+            });
+          }
+      });
+    };
+    
+    // load the lists into the modal window ...
+    loadLists();
+    
+
+    $('#choose_list_add_btn').live("click", function() {
+      addLists($(this).attr('id'));
+    });
+    
+
+    function addLists(listId) {
+
+    };
+
+
   });
 }) (jQuery);
