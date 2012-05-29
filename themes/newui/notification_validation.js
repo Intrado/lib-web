@@ -225,7 +225,7 @@ jQuery.noConflict();
 
           $.each(feedCats, function(index, feedCat) {  
             var name = feedCat.name.toLowerCase().replace(" ","_");
-            $('#feed_categories').append('<span class="cf"><input type="checkbox" class="addme" name="" id="'+name+'" /><label class="addme" for="'+name+'">'+feedCat.name+'</label></span>');
+            $('#feed_categories').append('<div class="cf"><input type="checkbox" class="addme" name="" id="'+name+'" /><label class="addme" for="'+name+'">'+feedCat.name+'</label></div>');
           });
 
           step1();
