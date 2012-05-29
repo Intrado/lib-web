@@ -201,9 +201,12 @@ jQuery.noConflict();
 
       $('div[data-social=twitter]').removeClass('hidden');
 
+      var twitterCharCount = 140 - twitterReservedChars;
+
+      $('.twit.characters').prepend(twitterCharCount);
       // Character Count
       $('#msgsndr_form_tmsg').on('keyup', function() {
-        charCount(this, '140', '.twit.characters');
+        charCount(this, twitterCharCount, '.twit.characters');
       });
 
     }

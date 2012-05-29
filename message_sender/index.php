@@ -35,8 +35,8 @@ class ValJobName extends Validator {
 $formdata = array(
 	_L('Template Section 1'), // Optional
 	"subject" => array(
-		"label" => _L('TextField'),
-		"value" => "a",
+		"label" => "Subject",
+		"value" => "",
 		"validators" => array(
 			array("ValRequired"),
 			array("ValLength","min" => 3, "max" => 30),
@@ -85,12 +85,12 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 
 include("nav.inc.php");
 
-
 ?>
 
 <script> 
 	orgid = 123;
 	userid = <? print_r($_SESSION['user']->id); ?>;
+	twitterReservedChars = <? print_r(mb_strlen(" http://". getSystemSetting("tinydomain"). "/") + 6); ?>;
 </script>
 
 <div class="container cf">
@@ -457,7 +457,7 @@ include("nav.inc.php");
 							<label for="msgsndr_form_tmsg">Message</label>
 							<div class="controls">
 							<textarea id="msgsndr_form_tmsg" name="twitter_message"></textarea> <span class="error"></span>
-							<p><a href="#">Spell Check</a> <span class="twit characters">140 Characters left</span></p>
+							<p><a href="#">Spell Check</a> <span class="twit characters"> Characters left</span></p>
 							</div>
 						</fieldset>
 
