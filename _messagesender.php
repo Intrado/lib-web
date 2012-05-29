@@ -37,6 +37,8 @@ require_once("obj/EmailAttach.val.php");
 require_once("obj/TextAreaPhone.val.php");
 require_once("obj/TraslationItem.fi.php");
 require_once("obj/CallerID.fi.php");
+require_once("obj/ValDuplicateNameCheck.val.php");
+require_once("obj/ValPermission.val.php");
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -64,18 +66,6 @@ class ValEasycall extends Validator {
 			if (!$audiofile)
 				return "$this->label "._L("has invalid or missing messages");
 		}
-		return true;
-	}
-}
-
-class ValJobName extends Validator {
-	var $onlyserverside = true;
-
-	function validate ($value, $args) {
-		global $USER;
-		$jobcount = QuickQuery("select count(id) from job where not deleted and userid=? and name=? and status in ('new','scheduled','processing','procactive','active')", false, array($USER->id, $value));
-		if ($jobcount)
-			return "$this->label: ". _L('There is already an active notification with this name. Please choose another.');
 		return true;
 	}
 }
@@ -175,7 +165,7 @@ $formdata = array(
 		"label" => "name",
 		"value" => "",
 		"validators" => array(
-			array("ValJobName"),
+			array("ValDuplicateNameCheck", "type" => "job"),
 			array("ValLength","max" => 30)
 		),
 		"control" => array("TextField"),
@@ -232,6 +222,24 @@ $formdata = array(
 	//=========================================================================================
 	"PHONE MESSAGE",
 	//=========================================================================================
+	"hasphone" => array(
+		"label" => "hasphone",
+		"value" => "",
+		"validators" => array(
+			array("ValPermission", "name" => "sendphone")
+		),
+		"control" => array("CheckBox"),
+		"helpstep" => 1
+	),
+	"phonemessagetype" => array(
+		"label" => "phonemessagetype",
+		"value" => "",
+		"validators" => array(
+			array("ValInArray", "values" => array("callme","text"))
+		),
+		"control" => array("RadioButton", "values" => array("callme" => "callme", "text" => "text")),
+		"helpstep" => 1
+	),
 	"phonemessagecallme" => array(
 		"label" => "phonemessagecallme",
 		"value" => "",
@@ -279,6 +287,15 @@ $formdata = array_merge($formdata, array(
 	//=========================================================================================
 	"EMAIL MESSAGE",
 	//=========================================================================================
+	"hasemail" => array(
+		"label" => "hasemail",
+		"value" => "",
+		"validators" => array(
+			array("ValPermission", "name" => "sendemail")
+		),
+		"control" => array("CheckBox"),
+		"helpstep" => 1
+	),
 	"emailmessagefromname" => array(
 		"label" => "emailmessagefromname",
 		"value" => "",
@@ -354,6 +371,15 @@ $formdata = array_merge($formdata, array(
 	//=========================================================================================
 	"SMS MESSAGE",
 	//=========================================================================================
+	"hassms" => array(
+		"label" => "hassms",
+		"value" => "",
+		"validators" => array(
+			array("ValPermission", "name" => "sendsms")
+		),
+		"control" => array("CheckBox"),
+		"helpstep" => 1
+	),
 	"smsmessagetext" => array(
 		"label" => "smsmessagetext",
 		"value" => "",
@@ -367,6 +393,15 @@ $formdata = array_merge($formdata, array(
 	//=========================================================================================
 	"SOCIAL MESSAGE",
 	//=========================================================================================
+	"hasfacebook" => array(
+		"label" => "hasfacebook",
+		"value" => "",
+		"validators" => array(
+			array("ValPermission", "name" => "facebookpost")
+		),
+		"control" => array("CheckBox"),
+		"helpstep" => 1
+	),
 	"socialmediafacebookmessage" => array(
 		"label" => "socialmediafacebookmessage",
 		"value" => "",
@@ -376,6 +411,15 @@ $formdata = array_merge($formdata, array(
 		"control" => array("TextField"),
 		"helpstep" => 1
 	),
+	"hastwitter" => array(
+		"label" => "hastwitter",
+		"value" => "",
+		"validators" => array(
+			array("ValPermission", "name" => "twitterpost")
+		),
+		"control" => array("CheckBox"),
+		"helpstep" => 1
+	),
 	"socialmediatwittermessage" => array(
 		"label" => "socialmediatwittermessage",
 		"value" => "",
@@ -383,6 +427,15 @@ $formdata = array_merge($formdata, array(
 			array("ValLength","max"=>(140 - $twitterreservedchars))
 		),
 		"control" => array("TextField"),
+		"helpstep" => 1
+	),
+	"hasfeed" => array(
+		"label" => "hasfeed",
+		"value" => "",
+		"validators" => array(
+			array("ValPermission", "name" => "feedpost")
+		),
+		"control" => array("CheckBox"),
 		"helpstep" => 1
 	),
 	"socialmediafeedmessage" => array(
@@ -410,7 +463,7 @@ $formdata = array_merge($formdata, array(
 		"validators" => array(
 			array("ValInArray", "values" => array_keys(FeedCategory::getAllowedFeedCategories()))
 		),
-		"control" => array("TextField"),
+		"control" => array("MultiCheckBox", "values" => array_keys(FeedCategory::getAllowedFeedCategories())),
 		"helpstep" => 1
 	),
 	//=========================================================================================
@@ -547,12 +600,12 @@ include_once("nav.inc.php");
 // Load Custom Form Validators
 ?>
 <script type="text/javascript">
-<?Validator::load_validators(array("ValInArray", "ValJobName", "ValHasMessage",
+<?Validator::load_validators(array("ValInArray", "ValDuplicateNameCheck", "ValHasMessage",
 	"ValTextAreaPhone", "ValEasycall", "ValLists", "ValTranslation", "ValEmailAttach",
 	"ValTimeWindowCallLate", "ValTimeWindowCallEarly", "ValSmsText", "valPhone",
 	"ValMessageBody", "ValMessageGroup", "ValMessageTypeSelect", "ValFacebookPage",
 	"ValTranslationCharacterLimit","ValTimePassed","ValTtsText","ValCallerID",
-	"ValTextAreaAndSubjectWithCheckbox"));?>
+	"ValTextAreaAndSubjectWithCheckbox", "ValPermission"));?>
 </script>
 <?
 
