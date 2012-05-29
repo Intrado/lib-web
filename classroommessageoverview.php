@@ -134,14 +134,14 @@ startWindow(_L('My Classroom Messages'));
 		<div style="clear:both;"></div>
 		<h3 id="view">View By:</h3>
 		<div id="alloptions" class="feedfilter">
-			<a href="classroommessageoverview.php?mode=contacts" style="font-weight:<?= $mode=='contacts'?'bold':'normal' ?>"><img src="img/largeicons/tiny20x20/addresscard.jpg" />&nbsp;Contacts</a><br />
-			<a href="classroommessageoverview.php?mode=comments" style="font-weight:<?= $mode=='comments'?'bold':'normal' ?>"><img src="img/largeicons/tiny20x20/clipboard.jpg" />&nbsp;Comments</a><br />
+			<a href="classroommessageoverview.php?mode=contacts" style="font-weight:<?= $mode=='contacts'?'bold':'normal' ?>"><img src="img/largeicons/tiny20x20/addresscard.jpg" />&nbsp;Contacts</a>
+			<a href="classroommessageoverview.php?mode=comments" style="font-weight:<?= $mode=='comments'?'bold':'normal' ?>"><img src="img/largeicons/tiny20x20/clipboard.jpg" />&nbsp;Comments</a>
 		</div>
-		<br />
+
 		<h3 id="view">View</h3>
 		<div id="alloptions" class="feedfilter">
-			<a id="collapseall" href="#" onclick="collapseall();return false;" style="font-weight:bold"><img src="img/icons/magifier_zoom_out.gif" />&nbsp;Compact</a><br />
-			<a id="expandall" href="#" onclick="expandall();return false;" ><img src="img/icons/magnifier_zoom_in.gif" />&nbsp;Expanded</a><br />
+			<a id="collapseall" href="#" onclick="collapseall();return false;" style="font-weight:bold"><img src="img/icons/magifier_zoom_out.gif" />&nbsp;Compact</a>
+			<a id="expandall" href="#" onclick="expandall();return false;" ><img src="img/icons/magnifier_zoom_in.gif" />&nbsp;Expanded</a>
 		</div>
 
 	</div><!-- .csec .window_aside -->
