@@ -313,7 +313,7 @@ include("nav.inc.php");
 				<fieldset>
 					<label for="msgsndr_form_translate">Translate</label>
 					<input type="checkbox" id="msgsndr_form_translate" value=""/>
-					<a href="">Show Translations</a>
+					<a class="toggle-more" href="">Show Translations</a>
 				</fieldset>
 
 				<fieldset class="form_actions">
@@ -361,7 +361,7 @@ include("nav.inc.php");
 				<fieldset>
 					<label for="msgsndr_form_translate">Translate</label>
 					<input type="checkbox" id="msgsndr_form_translate" value=""/>
-					<a href="">Show Translations</a>
+					<a class="toggle-more" href="">Show Translations</a>
 				</fieldset>
 				
 				<fieldset class="form_actions">
