@@ -304,7 +304,7 @@ border-color: transparent transparent #2A6576 transparent; border-width: 13px; b
   background-image:         linear-gradient(top, #E84F1F, #A93611); }
 .window_panel .record:hover { background: #a93611; color: #fff; }
 .window_panel .record span.icon { background: url(themes/newui/record.png) 0 center no-repeat; }
-.window_panel .audioleft { border-radius: 5px 0 0 5px; }
+.window_panel .audioleft { border-radius: 5px 0 0 5px; margin: 0; }
 .window_panel .audioright { border-radius: 0 5px 5px 0; margin-left: -1px; }
 
 .window_panel .btn_confirm { color: #fff; border: 1px solid #0039ab; 
@@ -377,7 +377,7 @@ table.messages tr:hover td { background: #e1eaf4; border-top: 1px solid #8cb2e0;
 .msg_content_nav li a:hover { background: #ededed; color: #888; text-decoration: none; }
 .msg_content_nav li a span { color: #444; font-weight: bold; }
 
-.msg_content_nav li a span.icon { background: url(themes/newui/add.png) 0 center no-repeat; }
+.msg_content_nav li a span.icon { background: url(themes/newui/add.png) 0 center no-repeat; width: 16px; }
 .msg_content_nav li.active a { background: #363636; color: #f9f9f9; border-color: #222; 
 -webkit-box-shadow: inset 0px 1px 3px 0px #111; 
    -moz-box-shadow: inset 0px 1px 3px 0px #111; 
@@ -387,10 +387,12 @@ border-color: #222222 transparent transparent; border-style: solid; border-width
 .msg_content_nav li.active a span { color: #f9f9f9; }
 .msg_content_nav li.active a span.icon { background: url(themes/newui/pencil.png) 0 center no-repeat; }
 
-.msg_content_nav li.complete a { background: #499122; color: #f9f9f9; border-color: #3a7a17; 
+.msg_content_nav li.complete a { background: #499122; color: #fbfbfb; text-shadow: 0 1px 1px #222; border-color: #3a7a17; 
 -webkit-box-shadow: inset 0px 1px 1px 0px rgba(255,255,255,0.5); 
    -moz-box-shadow: inset 0px 1px 1px 0px rgba(255,255,255,0.5); 
         box-shadow: inset 0px 1px 1px 0px rgba(255,255,255,0.5); }
+.msg_content_nav li.complete a span { color: #fbfbfb; }
+.msg_content_nav li.complete a span.icon { background: url(themes/newui/pencil.png) 0 center no-repeat; }
 
 .tab_content { margin: 0 0 20px 0; }
 .tab_panel form { border-radius: 8px; }
@@ -422,7 +424,7 @@ table.list ul li { padding: 0; }
 
 /*----- Buttons, changes to the basic buttons featured across the site -----*/
 
-button, .btn { margin: 0 5px 0 0; padding: 5px 10px; color: #333; font-size: 14px; font-weight: normal; text-shadow: 0 1px 0 0 #fff; border: 1px solid #ccc;
+button, .btn { margin: 0 5px 0 0; padding: 5px 10px; color: #333; font-size: 14px; line-height: 19px; font-weight: normal; text-shadow: 0 1px 0 0 #fff; border: 1px solid #ccc;
 	background-color: #f5f5f5;  
   background-image: -webkit-gradient(linear, left top, left bottom, from(#fbfbfb), to(#e4e4e4)); 
   background-image: -webkit-linear-gradient(top, #fbfbfb, #e4e4e4); 
@@ -467,6 +469,9 @@ button:active, button.active, .btn:active, .btn.active { background-color: #d9d9
   color: rgb(240,240,240);
   cursor: default;
 }
+
+.window_panel button .play { background: url(themes/newui/play.png) 0 center no-repeat; }
+.window_panel a.toggle-more { background: url(themes/newui/bluearo.png) 2px 4px no-repeat; padding: 0 0 0 15px; }
 
 .btn_left, .btn_right { display: none; }
 .btn_left, .btn_middle, .btn_right { background: none; height: 20px; margin: 0; padding: 0 5px; line-height: 20px; }
