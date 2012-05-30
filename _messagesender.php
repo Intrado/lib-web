@@ -400,13 +400,13 @@ $formdata = array_merge($formdata, array(
 ));
 
 foreach ($translationlanguages as $code => $language) {
-	$formdata["emailmessagetexttranslate". $code] = array(
-		"label" => "emailmessagetexttranslate". $code,
+	$formdata["emailmessagetexttranslate". $code. "text"] = array(
+		"label" => "emailmessagetexttranslate". $code. "text",
 		"value" => "",
 		"validators" => array(
-			// Note: No validation, just a toggle to enable this translation or not
+			array("ValTranslation") // NOTE: I "think" this will work for email. May need to write a new validator...
 		),
-		"control" => array("CheckBox"),
+		"control" => array("TextField"),
 		"helpstep" => 1
 	);
 }
@@ -863,19 +863,24 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 			
 			// check for and retrieve translations
 			if (isset($postdata["emailmessagetexttranslate"]) && $postdata["emailmessagetexttranslate"]) {
-				$translationselections = array();
 				foreach ($translationlanguages as $code => $language) {
-					if (isset($postdata["emailmessagetexttranslate". $code]) && $postdata["emailmessagetexttranslate". $code])
-						$translationselections[$code] = $postdata["emailmessagetexttranslate". $code];
-				}
-				$translations = translate_fromenglish($messages['email']['html']['en']['none']['text'],array_keys($translationselections));
-				$translationsindex = 0;
-				foreach ($translationselections as $langcode) {
-					$messages['email']['html'][$langcode]['source'] = $messages['email']['html']['en']['none'];
-					$messages['email']['html'][$langcode]['translated'] = $messages['email']['html']['en']['none'];
-					if ($translations[$translationsindex] !== false)
-						$messages['email']['html'][$langcode]['translated']['text'] = $translations[$translationsindex];
-					$translationsindex++;
+					if (isset($postdata["emailmessagetexttranslate". $code. "text"])) {
+						$translatedmessage = json_decode($postdata["phonemessagetexttranslate". $code. "text"], true);
+						if ($translatedmessage["enabled"]) {
+							// if the translation text is overridden, don't attach a source message
+							// it isn't applicable since we have no way to know what they changed the text to.
+							if ($translatedmessage["override"]) {
+								// initially set the email to the english version, then overwrite the text. All other data is shared
+								$messages['email']['html'][$code]['overridden'] = $messages['email']['html']['en']['none'];
+								$messages['email']['html'][$code]['overridden']['text'] = $translatedmessage["text"];
+							} else {
+								// initially set the email to the english version, then overwrite the text. All other data is shared
+								$messages['email']['html'][$code]['translated'] = $messages['email']['html']['en']['none'];
+								$messages['email']['html'][$code]['translated']['text'] = $translatedmessage["text"];
+								$messages['email']['html'][$code]['source'] = $messages['email']['html']['en']['none'];
+							}
+						}
+					}
 				}
 			}
 		}
