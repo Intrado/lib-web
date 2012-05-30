@@ -104,8 +104,8 @@ include("nav.inc.php");
 		<h2>New Broadcast</h2>
 		<ul class="msg_steps cf">
 		<li class="active"><a id="tab_1" ><span class="icon">1</span> Subject &amp; Recipients</a></li>
-		<li><a id="tab_2" data-active="true"><span class="icon">2</span> Message Content</a></li>
-		<li><a id="tab_3" data-active="true"><span class="icon">3</span> Review &amp; Send</a></li>
+		<li><a id="tab_2" data-active="false"><span class="icon">2</span> Message Content</a></li>
+		<li><a id="tab_3" data-active="false"><span class="icon">3</span> Review &amp; Send</a></li>
 		</ul>
 		</div>
 		
@@ -402,7 +402,7 @@ include("nav.inc.php");
 				
 				<fieldset class="form_actions">
 					<div class="controls">
-						<button class="btn_save" disabled="disabled">Save SMS Message</button>
+						<button class="btn_save" disabled="disabled" data-nav=".osms">Save SMS Message</button>
 						<button>Cancel</button>
 					</div>
 				</fieldset>
@@ -514,7 +514,7 @@ include("nav.inc.php");
 			</div><!-- end tab_content -->
 			
 			<div class="msg_confirm">
-				<button class="btn_confirm">Continue <span class="icon"></span></button>
+				<button class="btn_confirm" disabled="disabled" data-next="3">Continue <span class="icon"></span></button>
 			</div>
 			
 			</div><!-- end window_panel -->

@@ -262,8 +262,39 @@ jQuery.noConflict();
 
     });
 
+    // Save SMS Message
+    $('#msgsndr_tab_sms .btn_save').on('click', function(e) {
+      e.preventDefault();
+
+      var nav = $(this).attr('data-nav');
+
+      $('.msg_content_nav '+nav).removeClass('active').addClass('complete');
+      $('#msgsndr_tab_sms').hide();
+
+      checkContent();
+
+    });
 
 
+
+
+    /* 
+      Function to run once Save Message button click, this is check if any Add buttons have class 
+      of complete if so then enable the button continue to allow user to move to step 3
+    
+    */
+
+    function checkContent() {
+
+      var items = $('.msg_content_nav li');
+
+      $.each(items, function(index, item) {
+        if ( $(item).hasClass('complete') ) {
+          $('#msg_section_2 .btn_confirm').removeAttr('disabled');
+        }
+      });
+
+    }
 
 
     $('#send_new_broadcast').on('click', function(e) {
