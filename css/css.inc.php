@@ -430,6 +430,8 @@ table > .listHeader > th 	{ text-align: left;  color: white; }
 .listHeader > .label { padding: 2px; font-weight: normal; }
 
 table td.feed_preview { vertical-align: top; }
+table.schedule { width: 218px; }
+table.schedule th, table.schedule td { width: 30px; padding: 5px 0; text-align: center; }
 
 .form_table { width: 100%; }
 
