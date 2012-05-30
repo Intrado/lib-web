@@ -6,7 +6,7 @@ class WeekRepeatItem extends FormItem {
 		
 		$str = '
 				<input id="'.$n.'" name="'.$n.'" type="hidden" value="' . escapehtml(json_encode($value)) . '"/>
-				<table border="0" cellpadding="2" cellspacing="1" class="list">
+				<table border="0" cellpadding="2" cellspacing="1" class="list repeatjob">
 					<tr class="listHeader" align="left" valign="bottom">
 						<th>Su</th>
 						<th>Mo</th>
