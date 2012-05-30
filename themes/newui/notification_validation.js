@@ -163,7 +163,7 @@ jQuery.noConflict();
         ]
       }
 
-      watchFields('#msgsndr_form_name, #msgsndr_form_email, #msgsndr_form_mailsubject, #msgsndr_form_body');
+      watchFields('#msgsndr_form_name, #msgsndr_form_email, #msgsndr_form_body');
 
     }
 
@@ -279,11 +279,10 @@ jQuery.noConflict();
 
 
     /* 
-      Function to run once Save Message button click, this is check if any Add buttons have class 
-      of complete if so then enable the button continue to allow user to move to step 3
+      checkContent() Function to run once Save Message button click, this is check if any Add buttons 
+      have class of complete if so then enable the button continue to allow user to move to step 3
     
     */
-
     function checkContent() {
 
       var items = $('.msg_content_nav li');
@@ -295,6 +294,7 @@ jQuery.noConflict();
       });
 
     }
+
 
 
     $('#send_new_broadcast').on('click', function(e) {
@@ -317,6 +317,10 @@ jQuery.noConflict();
 
     });
   
+    
+
+
+
 
 
     // Set keyup event to the fields that need validating - These feilds passed through from functions above

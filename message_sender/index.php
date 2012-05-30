@@ -300,7 +300,7 @@ include("nav.inc.php");
 				
 				<fieldset class="form_actions">
 					<div class="controls">
-					<button class="btn_save" href="#">Save Phone Message</button>
+					<button class="btn_save" disabled="disabled">Save Phone Message</button>
 					<button>Cancel</button>
 					</div>
 				</fieldset>
@@ -327,7 +327,7 @@ include("nav.inc.php");
 
 				<fieldset class="form_actions">
 					<div class="controls">
-					<button class="btn_save">Save TTS Message</button>
+					<button class="btn_save" disabled="disabled">Save TTS Message</button>
 					<button>Cancel</button>
 					</div>
 				</fieldset>
@@ -377,7 +377,7 @@ include("nav.inc.php");
 				
 				<fieldset class="form_actions">
 					<div class="controls">
-					<button class="btn_save" href="#">Save Email Message</button>
+					<button class="btn_save" disabled="disabled">Save Email Message</button>
 					<button>Cancel</button>
 					</div>
 				</fieldset>
@@ -504,7 +504,7 @@ include("nav.inc.php");
 				
 				<fieldset class="form_actions">
 					<div class="controls">
-						<button class="btn_save">Save Social Messages</button>
+						<button class="btn_save" disabled="disabled">Save Social Messages</button>
 						<button>Cancel</button>
 					</div>
 				</fieldset>

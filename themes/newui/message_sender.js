@@ -11,6 +11,10 @@ jQuery.noConflict();
 		$('#msg_section_2, #msg_section_3, .close, .facebook, .twitter, .feed').hide();
 
 
+		// Email Flag
+		emailSubject 	= "";
+
+
 		// Tab Hide/Show Logic
 		$('.msg_steps a').on('click', function(event) {
 			event.preventDefault();
@@ -43,8 +47,8 @@ jQuery.noConflict();
 			$('#msgsndr_tab_'+elm[2]).show();
 			$(this).parent().addClass('active');
 
-			if (elm[2] == 'email') {
-				$('#msgsndr_form_mailsubject').val($('#msgsndr_form_subject').val());
+			if (elm[2] == "email") {
+				emSubject();
 			}
 
 		});
@@ -108,6 +112,22 @@ jQuery.noConflict();
 			$('html, body').animate({scrollTop: offset.top },2000);
 
 		});
+
+
+
+		function emSubject() {
+
+			if ( emailSubject == '') {
+				$('#msgsndr_form_mailsubject').val($('#msgsndr_form_subject').val());
+			} else {
+				$('#msgsndr_form_mailsubject').val(emailSubject);
+			}
+
+			$('#msgsndr_form_mailsubject').on('change', function() {
+				emailSubject = $(this).val();
+			});
+
+		}
 
 
 		// modal windows -- script/bootstrap-modal.js
