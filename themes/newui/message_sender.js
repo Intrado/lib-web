@@ -110,32 +110,6 @@ jQuery.noConflict();
 		});
 
 
-		// Spell Checker
-		$(".loading").hide();
-
-		$("#sms_sc").click(function(e){
-			event.preventDefault();
-			$(".loading").show();
-
-			$("#msgsndr_form_sms")
-			.spellchecker({
-				lang: "en",
-				engine: "google",
-				suggestBoxPosition: "above"
-			})
-			.spellchecker("check", function(result){
-
-				// spell checker has finished checking words
-				$(".loading").hide();
-
-				// if result is true then there are no badly spelt words
-				if (result) {
-					alert('There are no incorrectly spelt words.');
-				}
-			});
-		});
-
-
 		// modal windows -- script/bootstrap-modal.js
 		$('#msgsndr_choose_list').modal({
 			show: false

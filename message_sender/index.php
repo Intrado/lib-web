@@ -393,7 +393,6 @@ include("nav.inc.php");
 					<textarea id="msgsndr_form_sms" name="sms_text"></textarea>
 					<div>
 					<p><a href="#" id="sms_sc">Spell Check</a> <span class="sms characters">160 Characters left</span></p>
-					<span class="loading">loading..</span>
 					</div>
 					
 					</div>
@@ -621,8 +620,5 @@ include("nav.inc.php");
 <script src="script/jquery.json-2.3.min.js" type="text/javascript"></script>
 <script src="script/bootstrap-modal.js" type="text/javascript"></script>
 
-<link href="themes/newui/scripts/spellcheck/spellcheck.css" type="text/css" rel="stylesheet">
-
 <script src="themes/newui/message_sender.js" type="text/javascript"></script>
 <script src="themes/newui/notification_validation.js" type="text/javascript"></script>
-<script src="themes/newui/scripts/spellcheck/spellcheck.js" type="text/javascript"></script>
