@@ -199,7 +199,7 @@ function form_validation_display(element,style, msgtext) {
 			icon.alt = icon.title = "Validation Error";
 		}
 	} else if (style == "valid") {
-		css = 'background: rgb(255,255,255);'; //rgb(225,255,225)
+		css = 'background: #f1f1f1;'; //rgb(225,255,225)
 		if (icon) {
 			icon.src = "img/icons/accept.gif";
 			icon.alt = icon.title = "Valid";
