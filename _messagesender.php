@@ -400,8 +400,8 @@ $formdata = array_merge($formdata, array(
 ));
 
 foreach ($translationlanguages as $code => $language) {
-	$formdata["emailmessagetexttranslate". $code. "text"] = array(
-		"label" => "emailmessagetexttranslate". $code. "text",
+	$formdata["emailmessagetexttranslate". $code] = array(
+		"label" => "emailmessagetexttranslate". $code,
 		"value" => "",
 		"validators" => array(
 			// Note: No validation, just a toggle to enable this translation or not
@@ -865,8 +865,8 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 			if (isset($postdata["emailmessagetexttranslate"]) && $postdata["emailmessagetexttranslate"]) {
 				$translationselections = array();
 				foreach ($translationlanguages as $code => $language) {
-					if (isset($postdata["emailmessagetexttranslate". $code. "text"]) && $postdata["emailmessagetexttranslate". $code. "text"])
-						$translationselections[$code] = $postdata["emailmessagetexttranslate". $code. "text"];
+					if (isset($postdata["emailmessagetexttranslate". $code]) && $postdata["emailmessagetexttranslate". $code])
+						$translationselections[$code] = $postdata["emailmessagetexttranslate". $code];
 				}
 				$translations = translate_fromenglish($messages['email']['html']['en']['none']['text'],array_keys($translationselections));
 				$translationsindex = 0;
