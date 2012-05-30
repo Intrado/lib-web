@@ -33,6 +33,7 @@ require_once("obj/AudioFile.obj.php");
 require_once("obj/Voice.obj.php");
 require_once("obj/FieldMap.obj.php");
 require_once("obj/Language.obj.php");
+require_once("obj/Person.obj.php");
 require_once("obj/PeopleList.obj.php");
 require_once("obj/ListEntry.obj.php");
 require_once("obj/MessageGroup.obj.php");
@@ -308,7 +309,8 @@ $formdata = array(
 		"validators" => array(
 			array("ValTranslationCharacterLimit", "field" => "phonemessagetext")
 		),
-		"control" => array("TextField"),
+		"control" => array("CheckBox"),
+		"requires" => array("phonemessagetext"),
 		"helpstep" => 1
 	)
 );
@@ -391,7 +393,7 @@ $formdata = array_merge($formdata, array(
 		"validators" => array(
 			array("ValTranslationCharacterLimit", "field" => "emailmessagetext")
 		),
-		"control" => array("TextField"),
+		"control" => array("CheckBox"),
 		"requires" => array("emailmessagetext"),
 		"helpstep" => 1
 	)
@@ -526,7 +528,7 @@ $formdata = array_merge($formdata, array(
 		"validators" => array(
 			// NOTE: no validation, will be ignored if the user can't use this option
 		),
-		"control" => array("TextField"),
+		"control" => array("CheckBox"),
 		"helpstep" => 1
 	),
 	"optionmessageconfirmation" => array(
@@ -535,7 +537,7 @@ $formdata = array_merge($formdata, array(
 		"validators" => array(
 			// NOTE: no validation, will be ignored if the user can't use this option
 		),
-		"control" => array("TextField"),
+		"control" => array("CheckBox"),
 		"helpstep" => 1
 	),
 	"optionskipduplicate" => array( // NOTE: using same setting for both skipduplicates and skipemailduplicates?
@@ -544,7 +546,7 @@ $formdata = array_merge($formdata, array(
 		"validators" => array(
 			// NOTE: no validation, will be ignored if the user can't use this option
 		),
-		"control" => array("TextField"),
+		"control" => array("CheckBox"),
 		"helpstep" => 1
 	),
 	"optioncallerid" => array(
@@ -634,10 +636,10 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		$job->modifydate = $job->createdate = date("Y-m-d H:i:s");
 		
 		$job->scheduleid = null;
-		$job->startdate = date("Y-m-d", $postdata['scheduledate']);
+		$job->startdate = date("Y-m-d", strtotime($postdata['scheduledate']));
 		$job->enddate = date("Y-m-d", strtotime($job->startdate) + (($postdata["optionmaxjobdays"] - 1) * 86400));
-		$job->starttime = date("H:i", strtotime($postdata['optioncallearly']));
-		$job->endtime = date("H:i", strtotime($postdata['optioncalllate']));
+		$job->starttime = date("H:i", strtotime($postdata['schedulecallearly']));
+		$job->endtime = date("H:i", strtotime($postdata['schedulecalllate']));
 		$job->finishdate = null;
 		$job->status = "new";
 		$job->create();
@@ -830,8 +832,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 					// check for and retrieve translations
 					foreach ($translationlanguages as $code => $language) {
 						if (isset($postdata["phonemessagetexttranslate". $code. "text"]))
-						$translatedmessagedata = json_decode($postdata["phonemessagetexttranslate". $code. "text"], true);
-						$translatedmessage = $translatedmessage[$code];
+						$translatedmessage = json_decode($postdata["phonemessagetexttranslate". $code. "text"], true);
 						if ($translatedmessage["enabled"]) {
 							// if the translation text is overridden, don't attach a source message
 							// it isn't applicable since we have no way to know what they changed the text to.
@@ -895,9 +896,9 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 			$messages['post']['twitter']['en']['none']['text'] = $postdata["socialmediatwittermessage"];
 		
 		if (isset($postdata["hasfeed"]) && $postdata["hasfeed"]) {
-			$feeddata = json_decode($postdata["socialmediatwittermessage"]);
-			$messages['post']['feed']['en']['none']['subject'] = $feeddata->subject;
-			$messages['post']['feed']['en']['none']['text'] = $feeddata->message;
+			$feeddata = json_decode($postdata["socialmediafeedmessage"], true);
+			$messages['post']['feed']['en']['none']['subject'] = $feeddata["subject"];
+			$messages['post']['feed']['en']['none']['text'] = $feeddata["message"];
 		}
 		
 		
