@@ -384,7 +384,7 @@ table#addMeWindow input[type="checkbox"] { margin: 7px 0; }
 .newui .formsectionheader { margin: 5px 0 10px 0; padding: 0; font-size: 14px; line-height: 21px; font-weight: bold; color: #444; text-transform: uppercase; border-bottom: 1px dashed #999; }
  
 .newui .formfieldarea { padding: 8px 10px; }
-.newui .formfieldarea .underneathmsg { display: block; margin: 32px 0 0 140px; padding: 0; font-size: 14px; font-weight: normal; color: #cc0000; }
+.newui .formfieldarea .underneathmsg { display: block; font-size: 14px; font-weight: normal; color: #cc0000; }
 
 .newui .newform .formtitle { float: left; display: inline; width: 140px; margin: 0; padding: 0; }
 .newui .newform .formtitle .formlabel { float: none; display: block; padding: 5px 10px 5px 0; font-size: 14px; line-height: 18px; font-weight: normal; text-align: right; }
