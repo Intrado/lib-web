@@ -99,7 +99,8 @@ border-top: 1px solid #ccc; border-right: 1px solid #ccc; border-bottom: none; b
 .newform .formtitle .formlabel { font-weight: bold; font-size: 1.1em; line-height: 16px; }
 .newform .formtitle .formicon {  }
 
-.newform .formcontrol { float: left; display: inline; margin: 0 0 0 10px; }
+.newform .formcontrol { margin: 0 0 0 175px; }
+.newform .formcontrol h3 { margin: 0 0 15px 0; }
 .newform .formcontrol input[type="text"] { width: 250px; padding: 4px 5px; border: 1px solid #E7E7E7; overflow: hidden; 
 -webkit-border-radius: 5px; -moz-border-radius: 5px; border-radius: 5px; 
 -moz-background-clip: padding; -webkit-background-clip: padding-box; background-clip: padding-box; }
@@ -131,6 +132,8 @@ border-top: 1px solid #ccc; border-right: 1px solid #ccc; border-bottom: none; b
 
 .newform .formcontrol .datafields input { width: 140px; }
 
+.newform .introwidget select { float: left; display: inline; margin: 0 5px 0 0; }
+
 
 /* -------- CSS redesign ------- */
 
@@ -152,7 +155,8 @@ border-top: 1px solid #ccc; border-right: 1px solid #ccc; border-bottom: none; b
 .newform .list th.MultiCheckbox label { float: left; display: inline; margin: 0 10px 0 0; }
 
 .newform .form_list_table { float: left; display: inline; width: 250px; margin: 0; padding: 0; }
-.newform .list { width: 100%; margin: 0 0 5px 0; }
+.newform .list { margin: 0 0 5px 0; }
+.newform .repeatjob { width: 350px; }
 
 #cke_reusableckeditor { float: left; }
   
