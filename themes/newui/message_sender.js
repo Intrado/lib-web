@@ -164,9 +164,11 @@ jQuery.noConflict();
     
     // remove lists from the table of recipients
 		$('.removelist').live("click", function(){
+
 			var listId 			= $(this).attr('id');
 			var listRow 		= $(this).closest('.list_row');
 			var listsHidden	= $('#msgsndr_list_choices').children();
+
 			if ( listRow.attr('data-id') == listId ) {
 				listRow.remove();
 			}
@@ -184,22 +186,21 @@ jQuery.noConflict();
  
  		// add lists to the table of recipients, and add a hidden checkbox to the form for submission
  		$('#choose_list_add_btn').live("click", function() {
+
     	var listItems = $('.choose_lists_row > input:checkbox[name=choose_list_add]:checked');
+
     	$.each(listItems, function(index, listItem) {
     		var listHtml	= $(this);
     		var listTitle = $(this).attr('data-title');
     		var listId 		= $(this).attr('value');
-    		console.log(listHtml);
-    		// check if the list has been chosen already, if not, add it in...
-    		if ( listHtml.attr('disabled') != 'disabled') {
+    		
+    		if ( listHtml.attr('disabled') != 'disabled') { // check if the list has been chosen already, if not, add it in...
     			$('#msgsndr_list_info_tbody').append('<tr class="list_row" data-id="' + listId + '"><td><a id="' + listId + '" class="removelist" title="Remove List"></a><a id="' + listId + '" class="savelist" title="Save List"></a></td><td>' + listTitle + '</td><td>[count]</td></tr>');
-    			// clone the input in the msgsndr_list_choices fieldset 
-    			listHtml.clone().appendTo('#msgsndr_list_choices');
-    			// set the checkbox to disabled so users can't choose a list twice
-    			listHtml.attr('disabled', true);	
+    			listHtml.clone().appendTo('#msgsndr_list_choices'); // clone the input in the msgsndr_list_choices fieldset 
+    			listHtml.attr('disabled', true); // set the checkbox to disabled so users can't choose a list twice
     		}
     	});
-    	// shut that modal down and make sure the first panel is open...
+    	// close the modal and make sure the first panel and section is open...
     	$('#msgsndr_choose_list').modal('hide');
     	$('.msg_steps').find('li:eq(0)').addClass('active');
     	$('#msg_section_1').show();
@@ -209,9 +210,11 @@ jQuery.noConflict();
 
     // ckeditor for the email message body ...
     chooseCkButtons = function(type){ // pass in 'basic' or 'advanced'
+
     	var toolbarBasic = [
 					['Bold', 'Italic','NumberedList','BulletedList','Link']
 				];
+
 			var toolbarAdvanced = [
 					['Print','Source'],
 					['Undo','Redo','-','PasteFromWord', 'SpellCheck'],
@@ -223,7 +226,7 @@ jQuery.noConflict();
 					['Link', 'Image','Table','HorizontalRule']
 				];
 
-				choice = toolbarBasic;
+			var choice = toolbarBasic;
 				if ( typeof(type) != undefined ){
 					if (type == 'basic'){
 					choice = toolbarBasic;
@@ -234,46 +237,133 @@ jQuery.noConflict();
 					// default to basic toolbar ...
 					choice = toolbarBasic;
 				}
-			
 			return choice;
     };
     
     // set the toolbar choice variable before calling the ckeditor function
-    toolbarChoice = chooseCkButtons();
+    toolbarChoice = chooseCkButtons('basic');
 
-    $('#editor_basic').live("click", function(){
-    		var toolbarChoice = chooseCkButtons('basic');
-	    	CKEDITOR.replace('msgsndr_form_body', {
-					'customConfig': '', // Prevent ckeditor from trying to load an external configuration file, should improve startup time.
-					'disableNativeSpellChecker': false,
-					'browserContextMenuOnCtrl': true,
-					'extraPlugins': 'aspell', //enable aspell port
-					'removePlugins': 'wsc,scayt,smiley,showblocks,flash,elementspath,save',
-					'toolbar': toolbarChoice,
-					'disableObjectResizing': true,
-					'resize_enabled': false,
-					'width': '100%',
-					'filebrowserImageUploadUrl' : 'uploadimage.php'
-				});
- 			});
-
- 			$('#editor_advanced').live("click", function(){
-    		var toolbarChoice = chooseCkButtons('advanced');
-	    	CKEDITOR.replace('msgsndr_form_body', {
-					'customConfig': '', // Prevent ckeditor from trying to load an external configuration file, should improve startup time.
-					'disableNativeSpellChecker': false,
-					'browserContextMenuOnCtrl': true,
-					'extraPlugins': 'aspell', //enable aspell port
-					'removePlugins': 'wsc,scayt,smiley,showblocks,flash,elementspath,save',
-					'toolbar': toolbarChoice,
-					'disableObjectResizing': true,
-					'resize_enabled': false,
-					'width': '100%',
-					'filebrowserImageUploadUrl' : 'uploadimage.php'
-				});
-	    });
-   
-		
+  	CKEDITOR.replace('msgsndr_form_body', {
+			'customConfig': '', // Prevent ckeditor from trying to load an external configuration file, should improve startup time.
+			'disableNativeSpellChecker': false,
+			'browserContextMenuOnCtrl': true,
+			'extraPlugins': 'aspell', //enable aspell port
+			'removePlugins': 'wsc,scayt,smiley,showblocks,flash,elementspath,save',
+			'toolbar': toolbarChoice,
+			'disableObjectResizing': true,
+			'resize_enabled': false,
+			'width': '100%',
+			'filebrowserImageUploadUrl' : 'uploadimage.php'
+		});
 
   });
 }) (jQuery);
+
+
+
+/*                                     *\
+  email attachment code (prototype.js)
+\***************************************/
+
+function startUpload(){
+	$('upload_process').show();	
+	return true;
+}
+
+function stopUpload(id,name,size,errormessage, formname, itemname) {
+	if (!formname || !itemname) {
+		return;
+	}
+	// stopUpload() is called automatically when the iframe is loaded, which may be before document.formvars is initialized by form_load().
+	// In that case, just return.
+	if (!document.formvars || !document.formvars[formname])
+		return;
+		
+	setTimeout ("var uploadprocess = $(\'upload_process\'); if (uploadprocess) uploadprocess.hide();", 500 );
+	
+	
+	var values = {};
+	var fieldelement = $(itemname);
+	var uploadedfiles = $("uploadedfiles");
+	
+	if (!fieldelement)
+		return;
+	var field = fieldelement.value;
+	if(field != "") 
+		values = field.evalJSON();
+	if(id && name && size && !errormessage) {
+		values[id] = {"size":size,"name":name};
+	}
+	
+	// if there are attachments display the div that shows them
+	if (Object.keys(values).length > 0)
+		uploadedfiles.setStyle({"display":"block"}).update();
+	else
+		uploadedfiles.update().setStyle({"display":"none"});
+	
+	var str = "";
+	for(var contentid in values) {
+		var content = values[contentid];
+		
+		var downloadlink = new Element("a", {"href": "emailattachment.php?id="  + contentid +  "&name=" + encodeURIComponent(encodeURIComponent(content.name))});
+		
+		downloadlink.update(content.name);
+		
+		var sizeinfo = "&nbsp;(Size: " + Math.round(content.size/1024) + "k)&nbsp;";
+		
+		var removelink = new Element("a", {"href":"#"});
+		
+		removelink.update("Remove");
+		
+		removelink.observe("click", function(event, contentid, formname, itemname) {
+			event.stop();
+			removeAttachment(contentid, formname, itemname);
+		}.bindAsEventListener(uploadedfiles, contentid, formname, itemname));
+		uploadedfiles.insert(downloadlink).insert(sizeinfo).insert(removelink).insert("<br/>");				 		
+	}
+
+	fieldelement.value = Object.toJSON( $H(values) );
+	
+	if (errormessage) {
+		form_validation_display($(itemname), "blank", errormessage);
+	} else {
+		form_do_validation($(formname), fieldelement);
+	}
+	return true;
+}
+
+function removeAttachment(id, formname, itemname) {
+	if (!formname || !itemname)
+		return;
+	var values = $(itemname).value.evalJSON();
+	delete values[id];
+	
+	// if there are attachments display the div that shows them
+	var uploadedfiles = $("uploadedfiles");
+	if (Object.keys(values).length > 0) {
+		console.log('hi');
+		uploadedfiles.setStyle({"display":"block"}).update();
+	} else {
+		uploadedfiles.update().setStyle({"display":"none"});
+		console.log('hello');
+	}
+	Object.keys(values).each(function (contentid) {
+		var content = values[contentid];
+		var contentname = content.name;
+		
+		uploadedfiles.insert(
+			new Element("a", {"href": "emailattachment.php?id=" + contentid + "&name=" + encodeURIComponent(encodeURIComponent(contentname))}).insert(contentname)
+		).insert(
+			"&nbsp;(Size: " + Math.round(content.size / 1024) + "k)&nbsp;"
+		).insert(
+			new Element("a", {"href": "#"}).insert("Remove").observe("click", function(event, contentid, formname, itemname) {
+				event.stop();
+				removeAttachment(contentid, formname, itemname);
+			}.bindAsEventListener(uploadedfiles, contentid, formname, itemname))
+		).insert(
+			"<br/>"
+		);
+	});
+	$(itemname).value = Object.toJSON(values);
+	form_do_validation($(formname), $(itemname));
+}

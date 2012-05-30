@@ -157,13 +157,17 @@ jQuery.noConflict();
           new document.validators["ValRequired"]("email_address","Email Address",{}), 
           new document.validators["ValEmail"]("email_address","Email Address",{min:7,max:30})
         ],
+        subject: [
+          new document.validators["ValRequired"]("email_subject","Subject",{}), 
+          new document.validators["ValLength"]("email_subject","Subject",{min:4})
+        ],
         body: [
-          new document.validators["ValRequired"]("email_body","Subject",{}), 
-          new document.validators["ValLength"]("email_body","Subject",{min:7,max:30})
+          new document.validators["ValRequired"]("email_body","Body",{}), 
+          new document.validators["ValLength"]("email_body","Body",{min:4})
         ]
       }
 
-      watchFields('#msgsndr_form_name, #msgsndr_form_email, #msgsndr_form_body');
+      watchFields('#msgsndr_form_name, #msgsndr_form_email, #msgsndr_form_mailsubject, #msgsndr_form_body');
 
     }
 
@@ -323,7 +327,7 @@ jQuery.noConflict();
 
 
 
-    // Set keyup event to the fields that need validating - These feilds passed through from functions above
+    // Set keyup event to the fields that need validating - These fields passed through from functions above
     function watchFields(fieldId) {
 
       var watch = watch + ', ' + fieldId;
@@ -439,9 +443,7 @@ jQuery.noConflict();
         type: "GET",
         dataType: "json",
         success: function(data) {
-          // console.log(data);
           var msgGroups = data.messageGroups;
-          console.log(msgGroups);
 
           $.each(msgGroups, function(index, msgGroup) {
             // format the date from the modifiedTimestamp value 

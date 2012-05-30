@@ -342,30 +342,39 @@ include("nav.inc.php");
 				<fieldset class="check">
 					<label for="msgsndr_form_name">From Name</label>
 					<div class="controls">
-					<input type="text" id="msgsndr_form_name" name="email_name"/> <span class="error"></span>
+						<input type="text" id="msgsndr_form_name" name="email_name"/> <span class="error"></span>
 					</div>
 				</fieldset>
 				
 				<fieldset>
 					<label for="msgsndr_form_email">From Email</label>
 					<div class="controls">
-					<input type="text" id="msgsndr_form_email" name="email_address"/> <span class="error"></span>
+						<input type="text" id="msgsndr_form_email" name="email_address"/> <span class="error"></span>
 					</div>
 				</fieldset>
 				
 				<fieldset>
 					<label for="msgsndr_form_mailsubject">Subject</label>
 					<div class="controls">
-					<input type="text" id="msgsndr_form_mailsubject" name="email_subject" /> <span class="error"></span>
+						<input type="text" id="msgsndr_form_mailsubject" name="email_subject" /> <span class="error"></span>
+					</div>
+				</fieldset>
+
+				<fieldset>
+					<label for="msgsndr_form_attachment">Attachments</label>
+					<input id="msgsndr_form_attachment" name="msgsndr_form_attachment" type="hidden" value="{}">
+					<div class="controls" style="overflow: hidden;">
+						<div id="uploadedfiles" style="display: none; "></div>
+						<div id="upload_process" style="display: none; "><img src="img/ajax-loader.gif"></div>
+						<iframe id="msgsndr_form_attachment_my_attach" class="attach_file" src="_emailattachment.php?formname=broadcast&amp;itemname=msgsndr_form_attachment"></iframe>
 					</div>
 				</fieldset>
 				
 				<fieldset>
-					<a id="editor_basic" href="javascript:void(null);">basic</a>
-					<a id="editor_advanced" href="javascript:void(null);">advanced</a>
+					<!--a id="editor_basic" href="javascript:void(null);">basic</a> | <a id="editor_advanced" href="javascript:void(null);">advanced</a-->
 					<label for="msgsndr_form_body">Body</label>
 					<div class="controls">
-					<textarea id="msgsndr_form_body" name="email_body" data-ajax="true"></textarea> <span class="error"></span>
+					<textarea id="msgsndr_form_body" name="email_body" data-ajax="true"></textarea><span class="error"></span>
 					</div>
 				</fieldset>
 				
@@ -625,6 +634,111 @@ include("nav.inc.php");
 <script src="script/niftyplayer.js.php"></script>
 <script src="script/ckeditor/ckeditor_basic.js"></script>
 <script src="script/htmleditor.js"></script>
+<script>
+function startUpload(){
+	$('upload_process').show();	
+	return true;
+}
+
+function stopUpload(id,name,size,errormessage, formname, itemname) {
+	if (!formname || !itemname) {
+		return;
+	}
+	// stopUpload() is called automatically when the iframe is loaded, which may be before document.formvars is initialized by form_load().
+	// In that case, just return.
+	if (!document.formvars || !document.formvars[formname])
+		return;
+		
+	setTimeout ("var uploadprocess = $(\'upload_process\'); if (uploadprocess) uploadprocess.hide();", 500 );
+	
+	
+	var values = {};
+	var fieldelement = $(itemname);
+	var uploadedfiles = $("uploadedfiles");
+	
+	if (!fieldelement)
+		return;
+	var field = fieldelement.value;
+	if(field != "") 
+		values = field.evalJSON();
+	if(id && name && size && !errormessage) {
+		values[id] = {"size":size,"name":name};
+	}
+	
+	// if there are attachments display the div that shows them
+	if (Object.keys(values).length > 0)
+		uploadedfiles.setStyle({"display":"block"}).update();
+	else
+		uploadedfiles.update().setStyle({"display":"none"});
+	
+	var str = "";
+	for(var contentid in values) {
+		var content = values[contentid];
+		
+		var downloadlink = new Element("a", {"href": "emailattachment.php?id="  + contentid +  "&name=" + encodeURIComponent(encodeURIComponent(content.name))});
+		
+		downloadlink.update(content.name);
+		
+		var sizeinfo = "&nbsp;(Size: " + Math.round(content.size/1024) + "k)&nbsp;";
+		
+		var removelink = new Element("a", {"href":"#"});
+		
+		removelink.update("Remove");
+		
+		removelink.observe("click", function(event, contentid, formname, itemname) {
+			event.stop();
+			removeAttachment(contentid, formname, itemname);
+		}.bindAsEventListener(uploadedfiles, contentid, formname, itemname));
+		uploadedfiles.insert(downloadlink).insert(sizeinfo).insert(removelink).insert("<br/>");				 		
+	}
+
+	fieldelement.value = Object.toJSON( $H(values) );
+	
+	if (errormessage) {
+		form_validation_display($(itemname), "blank", errormessage);
+	} else {
+		form_do_validation($(formname), fieldelement);
+	}
+	return true;
+}
+
+function removeAttachment(id, formname, itemname) {
+	if (!formname || !itemname)
+		return;
+	var values = $(itemname).value.evalJSON();
+	delete values[id];
+	
+	// if there are attachments display the div that shows them
+	var uploadedfiles = $("uploadedfiles");
+	if (Object.keys(values).length > 0) {
+		console.log('hi');
+		uploadedfiles.setStyle({"display":"block"}).update();
+	} else {
+		uploadedfiles.update().setStyle({"display":"none"});
+		console.log('hello');
+	}
+	Object.keys(values).each(function (contentid) {
+		var content = values[contentid];
+		var contentname = content.name;
+		
+		uploadedfiles.insert(
+			new Element("a", {"href": "emailattachment.php?id=" + contentid + "&name=" + encodeURIComponent(encodeURIComponent(contentname))}).insert(contentname)
+		).insert(
+			"&nbsp;(Size: " + Math.round(content.size / 1024) + "k)&nbsp;"
+		).insert(
+			new Element("a", {"href": "#"}).insert("Remove").observe("click", function(event, contentid, formname, itemname) {
+				event.stop();
+				removeAttachment(contentid, formname, itemname);
+			}.bindAsEventListener(uploadedfiles, contentid, formname, itemname))
+		).insert(
+			"<br/>"
+		);
+	});
+	$(itemname).value = Object.toJSON(values);
+	form_do_validation($(formname), $(itemname));
+}
+
+</script>
 
 <script src="themes/newui/message_sender.js"></script>
 <script src="themes/newui/notification_validation.js"></script>
