@@ -69,6 +69,7 @@ table.list td { color: #444; }
 /*----- Button styling -----*/
 
 .import_file_data .btn_middle { height: 20px; padding: 3px 5px 0; line-height: 20px; }
+.btn { margin: 0 5px 5px 0; }
 
 
 /*----- Prototip styles for shortcut menu, further styling for this is in the prototip.css.php file in the css folder -----*/
