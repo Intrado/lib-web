@@ -79,8 +79,6 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 			redirect("start.php");
 	}
 }
-
-
 // Moved from message_sender.php 
 
 include("nav.inc.php");
@@ -363,6 +361,8 @@ include("nav.inc.php");
 				</fieldset>
 				
 				<fieldset>
+					<a id="editor_basic" href="javascript:void(null);">basic</a>
+					<a id="editor_advanced" href="javascript:void(null);">advanced</a>
 					<label for="msgsndr_form_body">Body</label>
 					<div class="controls">
 					<textarea id="msgsndr_form_body" name="email_body" data-ajax="true"></textarea> <span class="error"></span>
@@ -616,12 +616,15 @@ include("nav.inc.php");
 	</div>
 
 </div>
-	
 
 <script src="script/jquery.1.7.2.min.js"></script>
 <script src="script/jquery.json-2.3.min.js"></script>
 <script src="script/bootstrap-modal.js"></script>
+<script src="script/speller/spellChecker.js"></script>
+<script src="script/easycall.js.php"></script>
+<script src="script/niftyplayer.js.php"></script>
+<script src="script/ckeditor/ckeditor_basic.js"></script>
+<script src="script/htmleditor.js"></script>
 
 <script src="themes/newui/message_sender.js"></script>
 <script src="themes/newui/notification_validation.js"></script>
-<script src="script/speller/spellChecker.js"></script>

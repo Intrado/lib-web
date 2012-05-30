@@ -185,8 +185,75 @@ jQuery.noConflict();
     	$('#msg_section_1').show();
 
     });
-   
 
+
+    // ckeditor for the email message body ...
+    chooseCkButtons = function(type){ // pass in 'basic' or 'advanced'
+    	var toolbarBasic = [
+					['Bold', 'Italic','NumberedList','BulletedList','Link']
+				];
+			var toolbarAdvanced = [
+					['Print','Source'],
+					['Undo','Redo','-','PasteFromWord', 'SpellCheck'],
+					'/',
+					['Styles','Format'],
+					['NumberedList','BulletedList','JustifyLeft','JustifyCenter','JustifyRight','JustifyBlock','Outdent','Indent'],
+					'/',
+					['Font','FontSize','Bold', 'Italic', 'Underline','Strike','TextColor','BGColor', 'RemoveFormat'],
+					['Link', 'Image','Table','HorizontalRule']
+				];
+
+				choice = toolbarBasic;
+				if ( typeof(type) != undefined ){
+					if (type == 'basic'){
+					choice = toolbarBasic;
+					} else if (type == 'advanced'){
+						choice = toolbarAdvanced;
+					}
+				} else {
+					// default to basic toolbar ...
+					choice = toolbarBasic;
+				}
+			
+			return choice;
+    };
+    
+    // set the toolbar choice variable before calling the ckeditor function
+    toolbarChoice = chooseCkButtons();
+
+    $('#editor_basic').live("click", function(){
+    		var toolbarChoice = chooseCkButtons('basic');
+	    	CKEDITOR.replace('msgsndr_form_body', {
+					'customConfig': '', // Prevent ckeditor from trying to load an external configuration file, should improve startup time.
+					'disableNativeSpellChecker': false,
+					'browserContextMenuOnCtrl': true,
+					'extraPlugins': 'aspell', //enable aspell port
+					'removePlugins': 'wsc,scayt,smiley,showblocks,flash,elementspath,save',
+					'toolbar': toolbarChoice,
+					'disableObjectResizing': true,
+					'resize_enabled': false,
+					'width': '100%',
+					'filebrowserImageUploadUrl' : 'uploadimage.php'
+				});
+ 			});
+
+ 			$('#editor_advanced').live("click", function(){
+    		var toolbarChoice = chooseCkButtons('advanced');
+	    	CKEDITOR.replace('msgsndr_form_body', {
+					'customConfig': '', // Prevent ckeditor from trying to load an external configuration file, should improve startup time.
+					'disableNativeSpellChecker': false,
+					'browserContextMenuOnCtrl': true,
+					'extraPlugins': 'aspell', //enable aspell port
+					'removePlugins': 'wsc,scayt,smiley,showblocks,flash,elementspath,save',
+					'toolbar': toolbarChoice,
+					'disableObjectResizing': true,
+					'resize_enabled': false,
+					'width': '100%',
+					'filebrowserImageUploadUrl' : 'uploadimage.php'
+				});
+	    });
+   
+		
 
   });
 }) (jQuery);
