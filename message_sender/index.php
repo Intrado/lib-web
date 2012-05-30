@@ -104,8 +104,8 @@ include("nav.inc.php");
 		<h2>New Broadcast</h2>
 		<ul class="msg_steps cf">
 		<li class="active"><a id="tab_1" ><span class="icon">1</span> Subject &amp; Recipients</a></li>
-		<li><a id="tab_2" data-active="false"><span class="icon">2</span> Message Content</a></li>
-		<li><a id="tab_3" data-active="false"><span class="icon">3</span> Review &amp; Send</a></li>
+		<li><a id="tab_2" data-active="true"><span class="icon">2</span> Message Content</a></li>
+		<li><a id="tab_3" data-active="true"><span class="icon">3</span> Review &amp; Send</a></li>
 		</ul>
 		</div>
 		
