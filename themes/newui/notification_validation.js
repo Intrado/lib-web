@@ -263,6 +263,9 @@ jQuery.noConflict();
     });
 
 
+
+
+
     $('#send_new_broadcast').on('click', function(e) {
       e.preventDefault();
 
@@ -342,14 +345,22 @@ jQuery.noConflict();
 						res = validator.validate(validator.name,validator.label,value,validator.args,requiredvalues); 
 						if (res != true) {  
 							isValid = false;  
+              // If SMS - add class er to textarea and disable save button
               if (name == 'sms_text') {
                 element.removeClass('ok').addClass('er'); 
+                $('#msgsndr_tab_sms .btn_save').attr('disabled','disabled');
               } else {
                 element.removeClass('ok').addClass('er').next('.error').show().text(res);
               }
 							break; 
 						} else {
-              element.removeClass('er').addClass('ok').next('.error').hide();
+              // If SMS - add class ok to textarea and remove disabled from save button
+              if (name == 'sms_text') {
+                element.removeClass('er').addClass('ok'); 
+                $('#msgsndr_tab_sms .btn_save').removeAttr('disabled');
+              } else {
+                element.removeClass('er').addClass('ok').next('.error').hide();
+              }
             }
 					} 
 

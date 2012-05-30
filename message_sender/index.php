@@ -387,12 +387,14 @@ include("nav.inc.php");
 			<!-- Add the sms panel -->
 			<div id="msgsndr_tab_sms" class="tab_panel">
 
+				<input type="hidden" name="has_sms" value="" />
+
 				<fieldset class="check">
 					<label for="msgsndr_form_sms">SMS Text</label>
 					<div class="controls">
 					<textarea id="msgsndr_form_sms" name="sms_text"></textarea>
 					<div>
-					<p><a href="#" id="sms_sc">Spell Check</a> <span class="sms characters">160 Characters left</span></p>
+					<p><a href="javascript:void(null);" id="sms_sc" onclick="(new spellChecker($('msgsndr_form_sms')) ).openChecker();">Spell Check</a> <span class="sms characters">160 Characters left</span></p>
 					</div>
 					
 					</div>
@@ -433,7 +435,7 @@ include("nav.inc.php");
 							<label for="msgsndr_form_fbmsg">Message</label>
 							<div class="controls">
 								<textarea id="msgsndr_form_fbmsg" name="facebook_message"></textarea> <span class="error"></span>
-								<p><a href="#">Spell Check</a> <span class="fb characters">420 Characters left</span></p>
+								<p><a href="javascript:void(null);" id="sms_sc" onclick="(new spellChecker($('msgsndr_form_fbmsg')) ).openChecker();">Spell Check</a> <span class="fb characters">420 Characters left</span></p>
 							</div>
 						</fieldset>
 
@@ -456,7 +458,7 @@ include("nav.inc.php");
 							<label for="msgsndr_form_tmsg">Message</label>
 							<div class="controls">
 							<textarea id="msgsndr_form_tmsg" name="twitter_message"></textarea> <span class="error"></span>
-							<p><a href="#">Spell Check</a> <span class="twit characters"> Characters left</span></p>
+							<p><a href="javascript:void(null);" id="sms_sc" onclick="(new spellChecker($('msgsndr_form_tmsg')) ).openChecker();">Spell Check</a> <span class="twit characters"> Characters left</span></p>
 							</div>
 						</fieldset>
 
@@ -616,9 +618,10 @@ include("nav.inc.php");
 </div>
 	
 
-<script src="script/jquery.1.7.2.min.js" type="text/javascript"></script>
-<script src="script/jquery.json-2.3.min.js" type="text/javascript"></script>
-<script src="script/bootstrap-modal.js" type="text/javascript"></script>
+<script src="script/jquery.1.7.2.min.js"></script>
+<script src="script/jquery.json-2.3.min.js"></script>
+<script src="script/bootstrap-modal.js"></script>
 
-<script src="themes/newui/message_sender.js" type="text/javascript"></script>
-<script src="themes/newui/notification_validation.js" type="text/javascript"></script>
+<script src="themes/newui/message_sender.js"></script>
+<script src="themes/newui/notification_validation.js"></script>
+<script src="script/speller/spellChecker.js"></script>
