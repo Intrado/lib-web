@@ -9,22 +9,22 @@ class WeekRepeatItem extends FormItem {
 				<table border="0" cellpadding="2" cellspacing="1" class="list">
 					<tr class="listHeader" align="left" valign="bottom">
 						<th>Su</th>
-						<th>M</th>
+						<th>Mo</th>
 						<th>Tu</th>
-						<th>W</th>
+						<th>We</th>
 						<th>Th</th>
-						<th>F</th>
+						<th>Fr</th>
 						<th>Sa</th>
 						' . ($hastime?'<th>Time</th>':'') . '
 					</tr>
 					<tr>
-						<td><input id="itm0_'.$n.'" type="checkbox" '. ($value[0] ? 'checked' : '').' /></td>
-						<td><input id="itm1_'.$n.'" type="checkbox" '. ($value[1] ? 'checked' : '').' /></td>
-						<td><input id="itm2_'.$n.'" type="checkbox" '. ($value[2] ? 'checked' : '').' /></td>
-						<td><input id="itm3_'.$n.'" type="checkbox" '. ($value[3] ? 'checked' : '').' /></td>
-						<td><input id="itm4_'.$n.'" type="checkbox" '. ($value[4] ? 'checked' : '').' /></td>
-						<td><input id="itm5_'.$n.'" type="checkbox" '. ($value[5] ? 'checked' : '').' /></td>
-						<td><input id="itm6_'.$n.'" type="checkbox" '. ($value[6] ? 'checked' : '').' /></td>
+						<td class="day"><input id="itm0_'.$n.'" type="checkbox" '. ($value[0] ? 'checked' : '').' /></td>
+						<td class="day"><input id="itm1_'.$n.'" type="checkbox" '. ($value[1] ? 'checked' : '').' /></td>
+						<td class="day"><input id="itm2_'.$n.'" type="checkbox" '. ($value[2] ? 'checked' : '').' /></td>
+						<td class="day"><input id="itm3_'.$n.'" type="checkbox" '. ($value[3] ? 'checked' : '').' /></td>
+						<td class="day"><input id="itm4_'.$n.'" type="checkbox" '. ($value[4] ? 'checked' : '').' /></td>
+						<td class="day"><input id="itm5_'.$n.'" type="checkbox" '. ($value[5] ? 'checked' : '').' /></td>
+						<td class="day"><input id="itm6_'.$n.'" type="checkbox" '. ($value[6] ? 'checked' : '').' /></td>
 					';
 		
 		if ($hastime) {
