@@ -251,14 +251,14 @@ startWindow("Report Details ".help('ReportEdit_ReportDetails'));
 								<td>
 									<div style="display:<?if($radio=="runonce"){echo('block');}else{echo('none');}?>" id='date2'><? NewFormItem($f, $s, 'date', 'text', '25',NULL,"onfocus=\"this.select();pickDate(this,false,true)\" onclick=\"event.cancelBubble=true;\"")?></div>
 									<div style="display:<?if($radio=="dow"){echo('block');}else{echo('none');}?>" id='weekly2'>
-										<table border="0" cellpadding="2" cellspacing="1" class="list">
+										<table border="0" cellpadding="2" cellspacing="1" class="list schedule">
 											<tr class="listHeader" align="left" valign="bottom">
 												<th>Su</th>
-												<th>M</th>
+												<th>Mo</th>
 												<th>Tu</th>
-												<th>W</th>
+												<th>We</th>
 												<th>Th</th>
-												<th>F</th>
+												<th>Fr</th>
 												<th>Sa</th>
 											</tr>
 											<tr>
