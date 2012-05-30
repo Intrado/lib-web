@@ -394,7 +394,7 @@ border-color: #222222 transparent transparent; border-style: solid; border-width
    -moz-box-shadow: inset 0px 1px 1px 0px rgba(255,255,255,0.5); 
         box-shadow: inset 0px 1px 1px 0px rgba(255,255,255,0.5); }
 .msg_content_nav li.complete a span { color: #fbfbfb; }
-.msg_content_nav li.complete a span.icon { background: url(themes/newui/pencil.png) 0 center no-repeat; }
+.msg_content_nav li.complete a span.icon { background: url(themes/newui/tick.png) 0 center no-repeat; }
 
 .tab_content { margin: 0 0 20px 0; }
 .tab_panel form { border-radius: 8px; }
