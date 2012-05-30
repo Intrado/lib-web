@@ -93,7 +93,7 @@ border-top: 1px solid #ccc; border-right: 1px solid #ccc; border-bottom: none; b
 .newform fieldset { background: #f1f1f1; width: 100%; margin-bottom: 1em; border: none; border-radius: 5px; }
  
 .formfieldarea { padding: 8px 10px; }
-.formfieldarea .underneathmsg { float: left; display: inline; width: 100%; padding: 5px 0 0 175px; font-weight: bold; color: #cc0000; -moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box; }
+.formfieldarea .underneathmsg { float: left; display: inline; width: 100%; padding: 0 0 0 175px; font-weight: bold; color: #cc0000; line-height: 22px; -moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box; }
 
 .newform .formtitle { float: left; display: inline; width: 165px; padding: 2px 0 5px 0; text-align: right; }
 .newform .formtitle .formlabel { font-weight: bold; font-size: 1.1em; line-height: 16px; }
@@ -388,7 +388,7 @@ table#addMeWindow input[type="checkbox"] { margin: 7px 0; }
 .newui .formsectionheader { margin: 5px 0 10px 0; padding: 0; font-size: 14px; line-height: 21px; font-weight: bold; color: #444; text-transform: uppercase; border-bottom: 1px dashed #999; }
  
 .newui .formfieldarea { padding: 8px 10px; }
-.newui .formfieldarea .underneathmsg { display: block; font-size: 14px; font-weight: normal; color: #cc0000; }
+.newui .formfieldarea .underneathmsg { padding: 0 0 0 140px; font-size: 14px; font-weight: normal; color: #cc0000; }
 
 .newui .newform .formtitle { float: left; display: inline; width: 140px; margin: 0; padding: 0; }
 .newui .newform .formtitle .formlabel { float: none; display: block; padding: 5px 10px 5px 0; font-size: 14px; line-height: 18px; font-weight: normal; text-align: right; }
