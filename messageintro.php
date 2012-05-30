@@ -40,11 +40,11 @@ class IntroSelect extends FormItem {
 		$count = 0;
 		$str .= '<input id="'.$n.'" name="'.$n.'" type="hidden" value="'.escapehtml(json_encode($value)).'"/>';
 		
-		$str .= '<div id="introwidgetedit'.$n.'">';
+		$str .= '<div class="introwidget" id="introwidgetedit'.$n.'">';
 		
-		$str .= '<table><tr>';
+
 		foreach ($this->args['values'] as $key => $selectbox) {
-			$str .= '<td>';
+			
 			if($key == "user")
 				$str .= '<select  id="' . $n . $key .'" '.$size .' onchange="loaduser(\'' . $n . '\',\'' . $this->args['languagecode'] . '\');updatemessage($(\''.$n.'\'));">';
 			else if($key == "message")
@@ -55,12 +55,12 @@ class IntroSelect extends FormItem {
 				$checked = (isset($value[$key]) && $value[$key] == $selectvalue);
 				$str .= '<option value="'.escapehtml($selectvalue).'" '.($checked ? 'selected' : '').' >'.escapehtml($selectname).'</option>';
 			}
-			$str .= '</select></td>';
+			$str .= '</select>';
 			$count++;
 		}	
-		$str .= '<td>';
+
 		$defaultrequest = isset($this->args['defaultfile']) ? ''.$this->args['defaultfile'].'' : "";		
-		$str .= '<div>' 
+		$str .= '<span>' 
 				. icon_button(_L("Play"),"fugue/control","
 				var content = $('" . $n . "message').getValue();
 					if(content.substring(0,5) == 'intro') {
@@ -68,8 +68,8 @@ class IntroSelect extends FormItem {
 					} else if(content != '')
 						popup('previewmessage.php?id=' + content, 400, 400,'preview');
 					else
-						popup('previewmessage.php?mediafile=" . urlencode($defaultrequest) . "', 400, 400,'preview');") . '</div>';
-		$str .= '</td></tr></table>';
+						popup('previewmessage.php?mediafile=" . urlencode($defaultrequest) . "', 400, 400,'preview');") . '</span>';
+
 		$str .= '</div>';
 		
 		if($renderscript) {
