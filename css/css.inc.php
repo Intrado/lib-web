@@ -234,7 +234,7 @@ table.window_body { width: 100%; }
 /*----- Buttons, for buttons within the windows and tables, further styling is in the specific theme file for each theme -----*/
    
 button { color: <?=$primary?>; }
-.btn { margin: 2px 5px; padding: 0; border: none;/* background: transparent;*/ font-weight: bold; cursor: pointer; }
+.btn { padding: 0; border: none;/* background: transparent;*/ font-weight: bold; cursor: pointer; }
 .btn_wrap { white-space: nowrap; position: relative; display: block; } 
 .btn_left, 
 .btn_right, 
@@ -419,6 +419,7 @@ table.list tr.listHeader { background-color: #d4d4d4; vertical-align: top; }
 table.list tr.listAlt { background-color: #f1f1f1; }
 table.list th, table.list td { text-align: left; border-right: 1px solid #ccc; color: #484848; }
 table.list td { padding: 5px; }
+table.list td.day { text-align: center; vertical-align: middle; }
 table.list ul { list-style: none; padding: 0; margin: 0; }
 table.list ul li { padding: 6px 8px; }
 
