@@ -411,23 +411,23 @@ jQuery.noConflict();
             var msgEmail = '';
             var msgSms = '';
             var msgPost = '';
+            var tickHtml = '<span class="icon">x</span>';
             $.each(msgTypes, function(index, msgType) {
               if (msgType.type == 'phone') {
-                msgPhone = 'x';
+                msgPhone = tickHtml;
               }
               if (msgType.type == 'email') {
-                msgEmail = 'x';
+                msgEmail = tickHtml;
               }
               if (msgType.type == 'sms') {
-                msgSms = 'x';
+                msgSms = tickHtml;
               }
               if (msgType.type == 'post') {
-                msgPost = 'x';
+                msgPost = tickHtml;
               }
             });
 
-            $('#messages_list').append('<tr id="msgsndr_msggroup_'+msgGroup.id+'"><td>'+msgGroup.name+'</td><td>'+msgDate+'</td><td>'+msgPhone+'</td><td>'+msgEmail+'</td><td>'+msgSms+'</td><td>'+msgPost+'</td></tr>')  
-
+            $('#messages_list').append('<tr id="msgsndr_msggroup_'+msgGroup.id+'"><td>'+msgGroup.name+'</td><td>'+msgDate+'</td><td>'+msgPhone+'</td><td>'+msgEmail+'</td><td>'+msgSms+'</td><td>'+msgPost+'</td></tr>');
           });
         } 
       });   
