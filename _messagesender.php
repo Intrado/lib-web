@@ -866,9 +866,9 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 				$translationselections = array();
 				foreach ($translationlanguages as $code => $language) {
 					if (isset($postdata["emailmessagetexttranslate". $code. "text"]) && $postdata["emailmessagetexttranslate". $code. "text"])
-						$translationselections[] = $code;
+						$translationselections[$code] = $postdata["emailmessagetexttranslate". $code. "text"];
 				}
-				$translations = translate_fromenglish($messages['email']['html']['en']['none']['text'],$translationselections);
+				$translations = translate_fromenglish($messages['email']['html']['en']['none']['text'],array_keys($translationselections));
 				$translationsindex = 0;
 				foreach ($translationselections as $langcode) {
 					$messages['email']['html'][$langcode]['source'] = $messages['email']['html']['en']['none'];
