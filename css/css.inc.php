@@ -281,9 +281,9 @@ table_left and table_right have the arrow controls, set to 8% width for 1024 scr
 
 #t_refresh { float: left; display: inline; width: 25%; }
 #t_zoom { float: left; display: inline; width: 46%; margin: 0 2%; padding: 10px 0 0; text-align: center; }
-#t_zoom .zoom_in { background: url('img/icons/fugue/magnifier_zoom.gif') left center no-repeat; padding: 0 0 0 19px; }
-#t_zoom .reset { background: url('img/icons/fugue/arrow_circle_225.gif') left center no-repeat; padding: 0 0 0 19px; }
-#t_zoom .zoom_out { background: url('img/icons/fugue/magnifier_zoom_out.gif') left center no-repeat; padding: 0 0 0 19px; }
+#t_zoom .zoom_in { background: url('img/icons/fugue/magnifier_zoom.gif') left center no-repeat; padding: 2px 0 2px 19px; }
+#t_zoom .reset { background: url('img/icons/fugue/arrow_circle_225.gif') left center no-repeat; padding: 2px 0 2px 19px; }
+#t_zoom .zoom_out { background: url('img/icons/fugue/magnifier_zoom_out.gif') left center no-repeat; padding: 2px 0 2px 19px; }
 #t_legend { float: right; display: inline; width: 25%; padding: 7px 0 0; text-align: right; }
 #t_legend span { background: url('img/largeicons/tiny20x20/flag.jpg') left center no-repeat; padding: 0 0 0 23px; }
 
