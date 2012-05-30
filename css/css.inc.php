@@ -429,6 +429,8 @@ table.usagelist tr:nth-child(even) { background-color: #f1f1f1; }
 table > .listHeader > th 	{ text-align: left;  color: white; }
 .listHeader > .label { padding: 2px; font-weight: normal; }
 
+table td.feed_preview { vertical-align: top; }
+
 .form_table { width: 100%; }
 
 .tcol10		{ width: 10%; }
