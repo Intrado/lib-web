@@ -61,7 +61,7 @@ class RestrictedValues extends FormItem {
 		$str = '<input type="checkbox" id="'.$n.'-restrict" '.$restrictchecked .' onclick="restrictcheck(\''.$n.'-restrict\', \''.$n.'\')"><label for="'.$n.'-restrict">'.$label.'</label>';
 
 		
-		$style = count($this->args['values'])>10 ? ('height: 100px; overflow: auto;') : '';
+		$style = count($this->args['values'])>5 ? ('height: 100px; overflow: auto;') : '';
 		$str .= '<div id='.$n.' class="radio_box" style="' . $style . 'margin-left: 1em;">';
 
 		$counter = 1;
