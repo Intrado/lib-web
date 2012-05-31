@@ -37,8 +37,6 @@ jQuery.noConflict();
 
     function setUp(data) {
 
-      dd = data;
-      
       // it's likely this function will need to work out what role has seniority in a case where a user has more than one role.
       roleid = data[0].accessProfile.id;
 
@@ -244,14 +242,21 @@ jQuery.noConflict();
 
     }
 
+
+
     // Section 1 - Form Watch
     $('#msg_section_1').on('focusout', function() {
       notVal.watchSection('msg_section_1');
     });
 
 
+    // Wathc Email Form
+    $('#msgsndr_tab_email .required').on('keyup', function() {
+      notVal.watchContent('msgsndr_tab_email');
+    });
+
     // Save SMS Message
-    $('#msgsndr_tab_sms .btn_save').on('click', function(e) {
+    $('.btn_save').on('click', function(e) {
       e.preventDefault();
 
       notVal.saveBtn(this);
@@ -262,27 +267,13 @@ jQuery.noConflict();
 
 
 
-
+    // Send Message Button
     $('#send_new_broadcast').on('click', function(e) {
       e.preventDefault();
 
       console.log($('form[name=broadcast]').serializeArray());
 
     })
-
-    $('button.btn_confirm').on('click', function(e) {
-      e.preventDefault();
-      var tabn = $(this).attr('data-next');
-      var tabp = tabn-1;
-      $('.msg_steps li').removeClass('active');
-      $('a#tab_'+tabn).parent().addClass('active');
-      $('a#tab_'+tabp).parent().addClass('complete');
-
-      $('.window_panel').hide();
-      $('#msg_section_'+tabn).show();
-
-    });
-  
     
 
 
@@ -307,13 +298,16 @@ jQuery.noConflict();
       var form  = name.split("_")[0];
       var field = name.split("_")[1];
 
-			var value = element.val();
+      var value = element.val();
+
+      var ajax  = element.attr('data-ajax');
+
 
       var isValid = true;
 			var validators = document.formvars[form][field];
 			requiredvalues = [];
 
-			if (element.attr('data-ajax') == 'true') {
+			if (ajax == 'true') {
 
 				var postData = {
 					value: value,
@@ -376,6 +370,41 @@ jQuery.noConflict();
 
 		} // form_val function
 
+
+    function emailVal(element,emailData) {
+
+      var form  = element.split("_")[0];
+      var field = element.split("_")[1];
+
+      var value = emailData;
+
+      var isValid = true;
+      var validators = document.formvars[form][field];
+      requiredvalues = [];
+
+
+      // Loop validation
+      for (var i = 0; i < validators.length; i++) {  
+        var validator = validators[i];  
+        if (value.length > 0 || validator.isrequired || validator.conditionalrequired || value.length == 0) {  
+          res = validator.validate(validator.name,validator.label,value,validator.args,requiredvalues); 
+          if (res != true) {  
+            isValid = false;  
+
+            $('#cke_msgsndr_form_body').removeClass('ok').addClass('er');
+            $('#emailBodyError').text(res).show();
+
+          } else {
+            $('#cke_msgsndr_form_body').removeClass('er').addClass('ok');
+            $('#emailBodyError').hide();
+          }
+            break; 
+        } 
+
+      } // for
+        
+
+    } // form_val function
 
 
 
@@ -445,6 +474,79 @@ jQuery.noConflict();
 
     // load the messages into the modal dialog.
     getMessageGroups();
+
+
+
+
+
+    // ckeditor for the email message body ...
+    chooseCkButtons = function(type){ // pass in 'basic' or 'advanced'
+
+      var toolbarBasic = [
+          ['Bold', 'Italic','NumberedList','BulletedList','Link']
+        ];
+
+      var toolbarAdvanced = [
+          ['Print','Source'],
+          ['Undo','Redo','-','PasteFromWord', 'SpellCheck'],
+          '/',
+          ['Styles','Format'],
+          ['NumberedList','BulletedList','JustifyLeft','JustifyCenter','JustifyRight','JustifyBlock','Outdent','Indent'],
+          '/',
+          ['Font','FontSize','Bold', 'Italic', 'Underline','Strike','TextColor','BGColor', 'RemoveFormat'],
+          ['Link', 'Image','Table','HorizontalRule']
+        ];
+
+      var choice = toolbarBasic;
+        if ( typeof(type) != undefined ){
+          if (type == 'basic'){
+          choice = toolbarBasic;
+          } else if (type == 'advanced'){
+            choice = toolbarAdvanced;
+          }
+        } else {
+          // default to basic toolbar ...
+          choice = toolbarBasic;
+        }
+      return choice;
+    };
+    
+    // set the toolbar choice variable before calling the ckeditor function
+    toolbarChoice = chooseCkButtons('basic');
+
+    CKEDITOR.replace('msgsndr_form_body', {
+      'customConfig': '', // Prevent ckeditor from trying to load an external configuration file, should improve startup time.
+      'disableNativeSpellChecker': false,
+      'browserContextMenuOnCtrl': true,
+      'extraPlugins': 'aspell', //enable aspell port
+      'removePlugins': 'wsc,scayt,smiley,showblocks,flash,elementspath,save',
+      'toolbar': toolbarChoice,
+      'disableObjectResizing': true,
+      'resize_enabled': false,
+      'width': '100%',
+      'filebrowserImageUploadUrl' : 'uploadimage.php'
+    });
+
+    CKEDITOR.on('instanceCreated', function(e) {
+      e.editor.on('contentDom', function() {
+        e.editor.document.on('keyup', function(event) {
+
+          emailData = e.editor.document.$.body.innerText;
+          //console.log(e);
+  
+          emailVal('email_body', emailData );
+        });
+      });
+    }); 
+
+
+
+
+
+
+
+
+
 
 
 	});

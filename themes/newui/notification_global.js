@@ -29,6 +29,32 @@
     } // this.watchSection
 
 
+    this.watchContent = function(section) {
+
+      var reqFields   = j('#'+section+' .required');
+
+      console.log('test');
+
+      var reqCount    = 0;
+      var reqAmount   = parseInt(reqFields.length);
+
+      j.each(reqFields, function(index, ele) {
+        if (j(ele).hasClass('ok')) {
+          reqCount++;
+        } else if (reqCount != 0) {
+          reqCount--;
+        }
+
+      });
+
+      if (reqCount == reqAmount) {
+        j('#'+section+' button.btn_save').removeAttr('disabled');
+      } else {
+        j('#'+section+' button.btn_save').attr('disabled','disabled');
+      }
+
+    } // this.watchContent
+
     /* 
       checkContent() Function to run once Save Message button is clicked, this is check if any Add buttons 
       have class of complete if so then enable the button continue to allow user to move to step 3

@@ -455,7 +455,7 @@ table#addMeWindow input[type="checkbox"] { margin: 7px 0; }
 	padding: 5px 0 0 0;
 }
 
-.window_panel input.ok, .window_panel textarea.ok {
+.window_panel input.ok, .window_panel textarea.ok, span.ok {
 	border: 1px solid rgb(75,149,35);
 }
 .window_panel input.ok[type="text"]:focus, .window_panel textarea.ok:focus { 
@@ -463,7 +463,7 @@ table#addMeWindow input[type="checkbox"] { margin: 7px 0; }
 	box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075) inset, 0 0 8px rgba(75,149,35, 0.6);
 }
 
-.window_panel input.er, .window_panel textarea.er {
+.window_panel input.er, .window_panel textarea.er, span.er {
 	border: 1px solid rgb(219,30,30);
 }
 .window_panel input.er[type="text"]:focus, .window_panel textarea.er:focus { 

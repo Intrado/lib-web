@@ -344,21 +344,21 @@ include("nav.inc.php");
 				<fieldset class="check">
 					<label for="msgsndr_form_name">From Name</label>
 					<div class="controls">
-						<input type="text" id="msgsndr_form_name" name="email_name"/> <span class="error"></span>
+						<input type="text" id="msgsndr_form_name" name="email_name" class="required" /> <span class="error"></span>
 					</div>
 				</fieldset>
 				
 				<fieldset>
 					<label for="msgsndr_form_email">From Email</label>
 					<div class="controls">
-						<input type="text" id="msgsndr_form_email" name="email_address"/> <span class="error"></span>
+						<input type="text" id="msgsndr_form_email" name="email_address" class="required" /> <span class="error"></span>
 					</div>
 				</fieldset>
 				
 				<fieldset>
 					<label for="msgsndr_form_mailsubject">Subject</label>
 					<div class="controls">
-						<input type="text" id="msgsndr_form_mailsubject" name="email_subject" /> <span class="error"></span>
+						<input type="text" id="msgsndr_form_mailsubject" name="email_subject" class="required" /> <span class="error"></span>
 					</div>
 				</fieldset>
 
@@ -376,7 +376,7 @@ include("nav.inc.php");
 					<!--a id="editor_basic" href="javascript:void(null);">basic</a> | <a id="editor_advanced" href="javascript:void(null);">advanced</a-->
 					<label for="msgsndr_form_body">Body</label>
 					<div class="controls">
-					<textarea id="msgsndr_form_body" name="email_body" data-ajax="true"></textarea><span class="error"></span>
+					<textarea id="msgsndr_form_body" name="email_body" data-ajax="true"></textarea><span id="emailBodyError" class="error"></span>
 					</div>
 				</fieldset>
 				
@@ -388,7 +388,7 @@ include("nav.inc.php");
 				
 				<fieldset class="form_actions">
 					<div class="controls">
-					<button class="btn_save" disabled="disabled">Save Email Message</button>
+					<button class="btn_save" disabled="disabled"  data-nav=".oemail">Save Email Message</button>
 					<button>Cancel</button>
 					</div>
 				</fieldset>

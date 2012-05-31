@@ -114,6 +114,24 @@ jQuery.noConflict();
 
 
 
+		// Continue Button to move to next section
+    $('button.btn_confirm').on('click', function(e) {
+      e.preventDefault();
+      var tabn = $(this).attr('data-next');
+      var tabp = tabn-1;
+      $('.msg_steps li').removeClass('active');
+      $('a#tab_'+tabn).parent().addClass('active');
+      $('a#tab_'+tabp).parent().addClass('complete');
+
+      $('.window_panel').hide();
+      $('#msg_section_'+tabn).show();
+
+    });
+  
+
+
+
+
 		function emSubject() {
 
 			if ( emailSubject == '') {
@@ -216,54 +234,6 @@ jQuery.noConflict();
 
     });
 
-
-    // ckeditor for the email message body ...
-    chooseCkButtons = function(type){ // pass in 'basic' or 'advanced'
-
-    	var toolbarBasic = [
-					['Bold', 'Italic','NumberedList','BulletedList','Link']
-				];
-
-			var toolbarAdvanced = [
-					['Print','Source'],
-					['Undo','Redo','-','PasteFromWord', 'SpellCheck'],
-					'/',
-					['Styles','Format'],
-					['NumberedList','BulletedList','JustifyLeft','JustifyCenter','JustifyRight','JustifyBlock','Outdent','Indent'],
-					'/',
-					['Font','FontSize','Bold', 'Italic', 'Underline','Strike','TextColor','BGColor', 'RemoveFormat'],
-					['Link', 'Image','Table','HorizontalRule']
-				];
-
-			var choice = toolbarBasic;
-				if ( typeof(type) != undefined ){
-					if (type == 'basic'){
-					choice = toolbarBasic;
-					} else if (type == 'advanced'){
-						choice = toolbarAdvanced;
-					}
-				} else {
-					// default to basic toolbar ...
-					choice = toolbarBasic;
-				}
-			return choice;
-    };
-    
-    // set the toolbar choice variable before calling the ckeditor function
-    toolbarChoice = chooseCkButtons('basic');
-
-  	CKEDITOR.replace('msgsndr_form_body', {
-			'customConfig': '', // Prevent ckeditor from trying to load an external configuration file, should improve startup time.
-			'disableNativeSpellChecker': false,
-			'browserContextMenuOnCtrl': true,
-			'extraPlugins': 'aspell', //enable aspell port
-			'removePlugins': 'wsc,scayt,smiley,showblocks,flash,elementspath,save',
-			'toolbar': toolbarChoice,
-			'disableObjectResizing': true,
-			'resize_enabled': false,
-			'width': '100%',
-			'filebrowserImageUploadUrl' : 'uploadimage.php'
-		});
 
   });
 }) (jQuery);
