@@ -151,7 +151,7 @@ $TITLE = "Monitors";
 include_once("nav.inc.php");
 
 startWindow('Monitors');
-echo "<div style='padding:10px'>" . icon_button("Add Monitor", "add",null,"monitoredit.php?id=new") . "</div><br /><hr />";
+echo "<div style='padding:10px'>" . icon_button("Add Monitor", "add",null,"monitoredit.php?id=new") . "</div><hr />";
 echo '<table width="100%" cellpadding="3" cellspacing="1" class="list">';
 showTable($data, $titles,$formatters);
 echo "</table>";
