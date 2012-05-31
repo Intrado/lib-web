@@ -219,8 +219,11 @@ include("nav.inc.php");
 			<div id="msg_section_2" class="window_panel">
 			<p>Create the content for this message, or <a href="#msgsndr_saved_message" data-toggle="modal">load a saved message</a></p>
 			
-				
-				
+			<div id="msgsndr_loaded_message" style="display:none;">
+				<input type="hidden" id="loaded_message_id" name="message_loaded" value="" />
+				<p>Message content loaded from saved message: <span id="loaded_message_name" class=""></span></p>
+			</div>
+
 			<ul class="msg_content_nav cf">
 				<li class="notactive ophone">
 					<a id="msgsndr_ctrl_phone" href="#"><span class="icon"></span> Add <span>Phone</span></a>
@@ -623,7 +626,7 @@ include("nav.inc.php");
 	
 	<div class="msg_confirm">
 		<button data-dismiss="modal">Cancel</button> 
-		<button class="btn_confirm">Load Selected Message</button>
+		<button id="msgsndr_load_saved_msg" class="btn_confirm">Load Selected Message</button>
 	</div>
 
 </div>

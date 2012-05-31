@@ -274,7 +274,7 @@ jQuery.noConflict();
       console.log($('form[name=broadcast]').serializeArray());
 
     })
-    
+
 
 
 
@@ -466,7 +466,7 @@ jQuery.noConflict();
               }
             });
 
-            $('#messages_list').append('<tr id="msgsndr_msggroup_'+msgGroup.id+'"><td>'+msgGroup.name+'</td><td>'+msgDate+'</td><td>'+msgPhone+'</td><td>'+msgEmail+'</td><td>'+msgSms+'</td><td>'+msgPost+'</td></tr>');
+            $('#messages_list').append('<tr id="msgsndr_msggroup-'+msgGroup.id+'" class="msgsndr_msggroup"><td><input type="radio" name="msgsndr_msggroup" value="'+msgGroup.id+'"/>'+msgGroup.name+'</td><td>'+msgDate+'</td><td>'+msgPhone+'</td><td>'+msgEmail+'</td><td>'+msgSms+'</td><td>'+msgPost+'</td></tr>');
           });
         } 
       });   
@@ -474,6 +474,36 @@ jQuery.noConflict();
 
     // load the messages into the modal dialog.
     getMessageGroups();
+
+    // get messages based on message id from message group (WIP)
+    function getMessages(msgid){
+      $.ajax({
+        url: '/'+orgPath+'/api/2/users/'+userid+'/messagegroups/'+msgid+'/messages',
+        type: "GET",
+        dataType: "json",
+        success: function(data) {
+          var messages = (data.messages);
+        }
+      });
+    };
+
+
+    $('#msgsndr_load_saved_msg').live("click", function(){
+      var msgGroup = $('.msgsndr_msggroup > td > input:radio[name=msgsndr_msggroup]:checked'); //input:checkbox[name=msgsndr_msggroup]:checked'
+      var grpId = msgGroup.attr('value');
+      var msgName = msgGroup.parent().text();
+
+      // put the messageGroup id in the hidden input and display the message name
+      $('#loaded_message_id').attr('value', grpId);
+      $('#loaded_message_name').text(msgName);
+      $('#msgsndr_loaded_message').fadeIn(300);
+
+      // make sure the correct tab is shown
+      $('#msgsndr_saved_message').modal('hide');
+      $('.msg_steps').find('li:eq(1)').addClass('active');
+      $('#msg_section_2').show();  
+    });
+    
 
 
 
