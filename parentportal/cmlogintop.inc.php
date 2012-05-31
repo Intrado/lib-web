@@ -2,7 +2,7 @@
 header('Content-type: text/html; charset=UTF-8') ;
 ?>
 
-<html>
+<!DOCTYPE html>
 <head>
 	<meta http-equiv="Content-type" value="text/html; charset=UTF-8" />
 	<title>Contact Manager<?=isset($TITLE) ? ": " . $TITLE : ""?></title>
