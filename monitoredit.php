@@ -62,7 +62,7 @@ class RestrictedValues extends FormItem {
 
 		
 		$style = count($this->args['values'])>10 ? ('height: 100px; overflow: auto;') : '';
-		$str .= '<div id='.$n.' class="radiobox" style="' . $style . 'margin-left: 1em;">';
+		$str .= '<div id='.$n.' class="radio_box" style="' . $style . 'margin-left: 1em;">';
 
 		$counter = 1;
 		foreach ($this->args['values'] as $checkvalue => $checkname) {
