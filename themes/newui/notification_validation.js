@@ -2,6 +2,9 @@ jQuery.noConflict();
 (function($) { 
   $(function() {
 
+    // Global Functions
+    var notVal = new globalValidationFunctions();
+
     // Some Global variables
 
     orgPath     = window.location.pathname.split('/')[1]; // This gives us the the URL path needed for first part of AJAX call
@@ -151,11 +154,11 @@ jQuery.noConflict();
       document.formvars['email'] = {
         name: [
           new document.validators["ValRequired"]("email_name","Name",{}), 
-          new document.validators["ValLength"]("email_name","Name",{min:7,max:30})
+          new document.validators["ValLength"]("email_name","Name",{max:30})
         ],
         address: [
           new document.validators["ValRequired"]("email_address","Email Address",{}), 
-          new document.validators["ValEmail"]("email_address","Email Address",{min:7,max:30})
+          new document.validators["ValEmail"]("email_address","Email Address",{min:7,max:60})
         ],
         subject: [
           new document.validators["ValRequired"]("email_subject","Subject",{}), 
@@ -243,61 +246,20 @@ jQuery.noConflict();
 
     // Section 1 - Form Watch
     $('#msg_section_1').on('focusout', function() {
-
-      var reqFields   = $('#msg_section_1 .required');
-
-      var reqCount    = 0;
-      var reqAmount   = parseInt(reqFields.length);
-
-      $.each(reqFields, function(index, ele) {
-        if ($(ele).hasClass('ok')) {
-          reqCount++;
-        } else if (reqCount != 0) {
-          reqCount--;
-        }
-
-      });
-
-      if (reqCount == reqAmount) {
-        $('#msg_section_1 button.btn_confirm').removeAttr('disabled');
-      } else {
-        $('#msg_section_1 button.btn_confirm').attr('disabled','disabled');
-      }
-
+      notVal.watchSection('msg_section_1');
     });
+
 
     // Save SMS Message
     $('#msgsndr_tab_sms .btn_save').on('click', function(e) {
       e.preventDefault();
 
-      var nav = $(this).attr('data-nav');
-
-      $('.msg_content_nav '+nav).removeClass('active').addClass('complete');
-      $('#msgsndr_tab_sms').hide();
-
-      checkContent();
+      notVal.saveBtn(this);
+      notVal.checkContent();
 
     });
 
 
-
-
-    /* 
-      checkContent() Function to run once Save Message button click, this is check if any Add buttons 
-      have class of complete if so then enable the button continue to allow user to move to step 3
-    
-    */
-    function checkContent() {
-
-      var items = $('.msg_content_nav li');
-
-      $.each(items, function(index, item) {
-        if ( $(item).hasClass('complete') ) {
-          $('#msg_section_2 .btn_confirm').removeAttr('disabled');
-        }
-      });
-
-    }
 
 
 

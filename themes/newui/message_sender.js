@@ -6,10 +6,12 @@
 jQuery.noConflict();
 (function($) { 
   $(function() {
+
+    // Global Functions
+    var notVal = new globalValidationFunctions();
 		
 		// Hiding stuff which is not needed
-		$('#msg_section_2, #msg_section_3, .close, .facebook, .twitter, .feed').hide();
-
+		$('#msg_section_2, #msg_section_3, .close, .facebook, .twitter, .feed, div[id^="msgsndr_tab"]').hide();
 
 		// Email Flag
 		emailSubject 	= "";
@@ -32,9 +34,6 @@ jQuery.noConflict();
 			}
 		});
 
-
-		// hide the +Add ... content for the message content section 
-		$('div[id^="msgsndr_tab"]').hide();
 
 		$('.msg_content_nav a').on('click', function(event) {
 			event.preventDefault();
@@ -181,6 +180,8 @@ jQuery.noConflict();
 					$('.choose_lists_row > input[name=choose_list_add][id=' + listId +']').attr('disabled', false).attr('checked', false);
 				}
 			});
+
+			notVal.watchSection('msg_section_1');
 			
 		});
  
@@ -196,10 +197,18 @@ jQuery.noConflict();
     		
     		if ( listHtml.attr('disabled') != 'disabled') { // check if the list has been chosen already, if not, add it in...
     			$('#msgsndr_list_info_tbody').append('<tr class="list_row" data-id="' + listId + '"><td><a id="' + listId + '" class="removelist" title="Remove List"></a><a id="' + listId + '" class="savelist" title="Save List"></a></td><td>' + listTitle + '</td><td>[count]</td></tr>');
-    			listHtml.clone().appendTo('#msgsndr_list_choices'); // clone the input in the msgsndr_list_choices fieldset 
+    			// listHtml.clone().appendTo('#msgsndr_list_choices'); // clone the input in the msgsndr_list_choices fieldset 
+
+    			$('#list_ids').val(listId);
+
     			listHtml.attr('disabled', true); // set the checkbox to disabled so users can't choose a list twice
     		}
+
+    		$('#list_ids').addClass('ok');
+
     	});
+
+    	notVal.watchSection('msg_section_1');
     	// close the modal and make sure the first panel and section is open...
     	$('#msgsndr_choose_list').modal('hide');
     	$('.msg_steps').find('li:eq(0)').addClass('active');
