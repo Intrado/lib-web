@@ -616,3 +616,6 @@ DROP PRIMARY KEY ,
 ADD PRIMARY KEY ( `portaluserid` , `customerid` , `userid` )
 ;
 
+-- data not stored in database anymore, either file system, or mcache
+ALTER TABLE  `sessiondata` DROP  `data`;
+
