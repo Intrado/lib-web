@@ -62,6 +62,13 @@ jQuery.noConflict();
 			$('#'+type+'').show();
 			$('#switchaudio button').removeClass('active');
 			$(this).addClass('active');
+
+			// Show paste from email button if text-to-speech is clicked and emailData is not empty
+			if (type == "text-to-speech" && emailData != "") {
+				console.log('ya');
+				$('#paste_from_email').removeClass('hidden');
+			}
+
 		});
 
 

@@ -242,10 +242,13 @@ include("nav.inc.php");
 			<div class="tab_content">
 				<!-- Add the phone panel -->
 				<div id="msgsndr_tab_phone" class="tab_panel">
+
+				<input type="hidden" name="has_phone" value="" />
+
 				<fieldset class="check">
 					<label for="msgsndr_form_type">Switch Audio Type</label>
 					<div id="switchaudio" class="controls">
-						<button class="audioleft active" data-type="call-me">Call Me to Record</button><button class="audioright" href="#" data-type="text-to-speech">Text-to-Speech</button>
+						<button class="audioleft active" data-type="call-me">Call Me to Record</button><button class="audioright" data-type="text-to-speech">Text-to-Speech</button>
 					</div>
 				</fieldset>
 
@@ -317,7 +320,7 @@ include("nav.inc.php");
 				<fieldset>
 					<label for="msgsndr_tts_message">Message</label>
 					<div class="controls">
-						<button class="btn-small paste-from">Paste text from email</button>
+						<button class="btn-small paste-from hidden" id="paste_from_email">Paste text from email</button>
 						<textarea id="msgsndr_tts_message"></textarea>
 						<button><span class="icon play"></span> Play Audio</button>
 						<span class="tts characters">160 Characters Left</span>
@@ -343,6 +346,8 @@ include("nav.inc.php");
 				
 			<!-- Add the email panel -->
 			<div id="msgsndr_tab_email" class="tab_panel">
+
+				<input type="hidden" name="has_email" value="" />
 
 				<fieldset class="check">
 					<label for="msgsndr_form_name">From Name</label>

@@ -9,6 +9,10 @@ jQuery.noConflict();
 
     orgPath     = window.location.pathname.split('/')[1]; // This gives us the the URL path needed for first part of AJAX call
 
+    // Email Body Text
+    emailData = "";
+
+
     $('.error, #ctrecord').hide();
 
     document.formvars = {
@@ -49,6 +53,7 @@ jQuery.noConflict();
         }
         if (loopData[i]['name'] == 'sendemail') {
           var sEmail = loopData[i]['value'];
+          //var sEmail = '0'
         }
         if (loopData[i]['name'] == 'sendsms') {
           var sSMS = loopData[i]['value'];
@@ -466,7 +471,7 @@ jQuery.noConflict();
               }
             });
 
-            $('#messages_list').append('<tr class="msgsndr_msggroup"><td><input type="radio" id="msgsndr_msggroup_'+msgGroup.id+'" name="msgsndr_msggroup" value="'+msgGroup.id+'" data-name="'+msgGroup.name+'" /><label for="msgsndr_msggroup_'+msgGroup.id+'">'+msgGroup.name+'</label></td><td>'+msgDate+'</td><td>'+msgPhone+'</td><td>'+msgEmail+'</td><td>'+msgSms+'</td><td>'+msgPost+'</td></tr>');
+            $('#messages_list').append('<tr id="msgsndr_msggroup-'+msgGroup.id+'" class="msgsndr_msggroup"><td><input type="radio" name="msgsndr_msggroup" value="'+msgGroup.id+'"/>'+msgGroup.name+'</td><td>'+msgDate+'</td><td>'+msgPhone+'</td><td>'+msgEmail+'</td><td>'+msgSms+'</td><td>'+msgPost+'</td></tr>');
           });
         } 
       });   
@@ -487,14 +492,14 @@ jQuery.noConflict();
       });
     };
 
-    $('.msgsndr_msggroup').live("click", function(){
+    $('#messages_list').on('click', 'tr', function(){
       $('td:first input:radio[name=msgsndr_msggroup]', this).attr('checked', 'checked');
     });
 
-    $('#msgsndr_load_saved_msg').on("click", function(){
+    $('#msgsndr_load_saved_msg').on('click', function(){
       var msgGroup = $('.msgsndr_msggroup > td > input:radio[name=msgsndr_msggroup]:checked'); //input:checkbox[name=msgsndr_msggroup]:checked'
       var grpId = msgGroup.attr('value');
-      var msgName = msgGroup.attr('data-name');
+      var msgName = msgGroup.parent().text();
 
       // put the messageGroup id in the hidden input and display the message name
       $('#loaded_message_id').attr('value', grpId);
@@ -560,24 +565,27 @@ jQuery.noConflict();
       'filebrowserImageUploadUrl' : 'uploadimage.php'
     });
 
-    CKEDITOR.on('instanceCreated', function(e) {
+    
+
+    CKEDITOR.on('instanceCreated', function(e) {  
       e.editor.on('contentDom', function() {
+        $('#cke_msgsndr_form_body').addClass('required');
         e.editor.document.on('keyup', function(event) {
 
           emailData = e.editor.document.$.body.innerText;
-          //console.log(e);
-  
+
           emailVal('email_body', emailData );
+          notVal.watchContent('msgsndr_tab_email');
+
+          if (emailData != "" ) {
+            $('#paste_from_email').removeClass('hidden');
+          } else {
+            $('#paste_from_email').addClass('hidden');
+          }
+          
         });
       });
     }); 
-
-
-
-
-
-
-
 
 
 

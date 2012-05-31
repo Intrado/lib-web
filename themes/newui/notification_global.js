@@ -33,8 +33,6 @@
 
       var reqFields   = j('#'+section+' .required');
 
-      console.log('test');
-
       var reqCount    = 0;
       var reqAmount   = parseInt(reqFields.length);
 
@@ -81,6 +79,8 @@
 
       j('.msg_content_nav '+nav).removeClass('active').addClass('complete');
       j('#msgsndr_tab_'+el).hide();
+
+      j('input[name=has_'+el+']').val(1);
 
 
     } // saveBtn
