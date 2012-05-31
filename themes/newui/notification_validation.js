@@ -466,7 +466,7 @@ jQuery.noConflict();
               }
             });
 
-            $('#messages_list').append('<tr id="msgsndr_msggroup-'+msgGroup.id+'" class="msgsndr_msggroup"><td><input type="radio" name="msgsndr_msggroup" value="'+msgGroup.id+'"/>'+msgGroup.name+'</td><td>'+msgDate+'</td><td>'+msgPhone+'</td><td>'+msgEmail+'</td><td>'+msgSms+'</td><td>'+msgPost+'</td></tr>');
+            $('#messages_list').append('<tr class="msgsndr_msggroup"><td><input type="radio" id="msgsndr_msggroup_'+msgGroup.id+'" name="msgsndr_msggroup" value="'+msgGroup.id+'" data-name="'+msgGroup.name+'" /><label for="msgsndr_msggroup_'+msgGroup.id+'">'+msgGroup.name+'</label></td><td>'+msgDate+'</td><td>'+msgPhone+'</td><td>'+msgEmail+'</td><td>'+msgSms+'</td><td>'+msgPost+'</td></tr>');
           });
         } 
       });   
@@ -487,11 +487,14 @@ jQuery.noConflict();
       });
     };
 
+    $('.msgsndr_msggroup').live("click", function(){
+      $('td:first input:radio[name=msgsndr_msggroup]', this).attr('checked', 'checked');
+    });
 
-    $('#msgsndr_load_saved_msg').live("click", function(){
+    $('#msgsndr_load_saved_msg').on("click", function(){
       var msgGroup = $('.msgsndr_msggroup > td > input:radio[name=msgsndr_msggroup]:checked'); //input:checkbox[name=msgsndr_msggroup]:checked'
       var grpId = msgGroup.attr('value');
-      var msgName = msgGroup.parent().text();
+      var msgName = msgGroup.attr('data-name');
 
       // put the messageGroup id in the hidden input and display the message name
       $('#loaded_message_id').attr('value', grpId);
