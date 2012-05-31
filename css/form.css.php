@@ -91,7 +91,8 @@ border-top: 1px solid #ccc; border-right: 1px solid #ccc; border-bottom: none; b
 /*---------- New forms layout ----------*/
 
 .newform fieldset { background: #f1f1f1; width: 100%; margin-bottom: 1em; border: none; border-radius: 5px; }
- 
+.newform label { line-height: 16px; }
+
 .formfieldarea { padding: 8px 10px; }
 .formfieldarea .underneathmsg { float: left; display: inline; width: 100%; padding: 0 0 0 175px; font-weight: bold; color: #cc0000; line-height: 22px; -moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box; }
 
@@ -119,8 +120,8 @@ border-top: 1px solid #ccc; border-right: 1px solid #ccc; border-bottom: none; b
 .newform .formcontrol .gBranding {}
 .newform .formcontrol .gBrandingText { font-size: 11px; }
 
-.newform .formcontrol .radiobox { float: left; display: inline; width: 250px; list-style-type: none; padding: 0; margin: 0 20px 0 0; }
-.newform .formcontrol .radiobox li { padding: 2px 0; }
+.newform .formcontrol .radiobox { float: left; display: inline; width: 250px; list-style-type: none; padding: 3px 0 0 0; margin: 0 20px 0 0; }
+.newform .formcontrol .radiobox li { padding: 4px 0; }
 .newform .formcontrol .radiobox input[type="radio"],
 .newform .formcontrol .radiobox input[type="checkbox"] { margin: 0 5px 0 0; }
 .newform .formcontrol #accessprofile_publish { float: none; display: block; }
@@ -136,6 +137,8 @@ border-top: 1px solid #ccc; border-right: 1px solid #ccc; border-bottom: none; b
 
 .newform .introwidget select { float: left; display: inline; margin: 0 5px 0 0; }
 
+.newform .signup_settings label { display: inline-block; width: 160px; }
+.newform .signup_settings input { margin: 0 5px 5px 0; }
 
 /* -------- CSS redesign ------- */
 
@@ -146,7 +149,7 @@ border-top: 1px solid #ccc; border-right: 1px solid #ccc; border-bottom: none; b
 .newform fieldset#AddRuleFieldmap select { width: 120px; padding: 4px; }
 .newform fieldset#AddRuleCriteria { width: 100px; padding: 0; margin: 0; background: none; }
 .newform fieldset#AddRuleValue { width: 60px; padding: 0; margin: 0; background: none; }
-.newform fieldset#AddRuleValue input { width: 50px; }
+.newform fieldset#AddRuleValue input[type="text"] { width: 50px; }
 .newform fieldset#AddRuleAction { width: 75px; padding: 0; margin: 0; background: none; } 
 
 .newform select, .newform input { -webkit-transition: all 0.3s ease-out; -moz-transition: all 0.3s ease-out; -ms-transition: all 0.3s ease-out; -o-transition: all 0.3s ease-out; transition: all 0.3s ease-out; }
@@ -337,7 +340,7 @@ table#addMeWindow input[type="checkbox"] { margin: 7px 0; }
 /* phone messages 
 -------------------*/
 
-.phone .controlcontainer { width: 200px; }
+.phone .controlcontainer { width: 215px; }
 .phone .controlcontainer .library { padding: 2px; border: 1px dotted gray; }
 .phone .controlcontainer .error { white-space: normal; font-style: italic; color: red; }
 .phone .controlcontainer .uploadiframe { overflow: hidden; width: 100%; border: 0; margin: 0; padding: 0; height: 2em; }
@@ -517,7 +520,8 @@ span.error {
 @media only screen and (max-width: 800px) {
 	.newform .formtitle { float: none; display: block; width: inherit; text-align: left; }
 	.newform .formcontrol { float: none; display: block; margin: 0; }
-	
+	.formfieldarea .underneathmsg { float: none; display: block; padding: 0px; }
+
 	.newform .form_list_table { width: 195px; }
 	.formcontrol .messagegrid { width: inherit; }
 	.formcontrol .messagegrid th { font-size: 11px; }
@@ -625,5 +629,3 @@ border-top: 1px solid #ccc; border-right: 1px solid #ccc; border-bottom: none; b
 .newform fieldset { background: #f1f1f1; width: 100%; margin-bottom: 1em; border: none; border-radius: 5px; }
  
 .formfieldarea { padding: 8px 10px; }
-.formfieldarea .underneathmsg { float: left; display: inline; width: 100%; padding: 0 0 0 175px; font-weight: bold; color: #cc0000; line-height: 22px; -moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box; }
-
