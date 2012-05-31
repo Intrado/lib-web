@@ -245,11 +245,11 @@ class Form {
 
 				$str.= '
 						<div class="formfieldarea cf ' . $this->rendermode . '" id="'.$n.'_fieldarea" '.$style.'>
-							<div class="formtitle cf">
+							<div class="formtitle">
 								<span class="formlabel">'.$l.'</span>
 							</div>
 							<!--div class="formicon"></div-->
-							<div class="formcontrol">'.$item->render("").'</div>
+							<div class="formcontrol cf">'.$item->render("").'</div>
 						</div>
 						';
 				
@@ -297,11 +297,11 @@ class Form {
 			
 				$str.= '
 					<div class="formfieldarea cf ' . $this->rendermode . '" id="'.$n.'_fieldarea" '.$style.'>
-						<div class="formtitle cf">
+						<div class="formtitle">
 							<label class="formlabel" for="'.$n.'" >'.$l.'</label>
 							<img class="formicon" alt="'.$alt.'" title="'.$alt.'" id="'.$n.'_icon" src="'.$i.'" />
 						</div>
-						<div class="formcontrol">
+						<div class="formcontrol cf">
 											'.$item->render($value).'
 						</div>
 						<div id="'.$n.'_msg" class="underneathmsg cf">'.($msg ? $msg : "").'</div>
