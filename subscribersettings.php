@@ -43,20 +43,20 @@ class SubscriberExpirationField extends FormItem {
 		// Hidden input item to store values in
 		$str  = '<input id="'.$n.'" name="'.$n.'" type="hidden" value="'.escapehtml($valueJSON).'" />';
 		// GUI table
-		$str .= "<table>";
-		$str .= "<tr><td>Automatic Close After</td><td>";
+		$str .= "<div class='signup_settings'>";
+		$str .= "<div><label>Automatic Close After</label>";
 		$str .= '<input id="'.$n.'expiredays" name="'.$n.'expiredays" type="text" value="'.$data['expiredays'].'" size="5" onchange="storeValue();" />';
-		$str .= "days since last login</td></tr>";
-		$str .= "<tr><td>First Reminder</td><td>";
+		$str .= "days since last login</div>";
+		$str .= "<div><label>First Reminder</label>";
 		$str .= '<input id="'.$n.'reminder1" name="'.$n.'reminder1" type="text" value="'.$data['reminder1'].'" size="5" onchange="storeValue();" />';
-		$str .= "days before automatic closure</td></tr>";
-		$str .= "<tr><td>Second Reminder</td><td>";
+		$str .= "days before automatic closure</div>";
+		$str .= "<div><label>Second Reminder</label>";
 		$str .= '<input id="'.$n.'reminder2" name="'.$n.'reminder2" type="text" value="'.$data['reminder2'].'" size="5" onchange="storeValue();" />';
-		$str .= "days before automatic closure</td></tr>";
-		$str .= "<tr><td>Final Reminder</td><td>";
+		$str .= "days before automatic closure</div>";
+		$str .= "<div><label>Final Reminder</label>";
 		$str .= '<input id="'.$n.'reminder3" name="'.$n.'reminder3" type="text" value="'.$data['reminder3'].'" size="5" onchange="storeValue();" />';
-		$str .= "days before automatic closure</td></tr>";
-		$str .= "</table>";
+		$str .= "days before automatic closure</div>";
+		$str .= "</div>";
 		// javascript
 		$str .= '<script type="text/javascript">
 			themeformname = "'.$this->form->name.'";
