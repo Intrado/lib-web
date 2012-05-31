@@ -127,9 +127,6 @@ border-top: 1px solid #ccc; border-right: 1px solid #ccc; border-bottom: none; b
 .newform .formcontrol #accessprofile_subscribe { float: none; display: block; }
 
 .newform .formcontrol .radio_box { width: 250px; list-style-type: none; padding: 0; margin: 0 20px 0 0; }
-.newform .formcontrol .radio_box li { padding: 2px 0; }
-.newform .formcontrol .radio_box input[type="radio"],
-.newform .formcontrol .radio_box input[type="checkbox"] { margin: 0 5px 0 0; }
 
 .newform .formcontrol select  { margin: 0; padding: 4px 6px; border: 1px solid #E7E7E7; 
 -webkit-border-radius: 5px; -moz-border-radius: 5px; border-radius: 5px; 
