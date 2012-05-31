@@ -139,6 +139,7 @@ border-top: 1px solid #ccc; border-right: 1px solid #ccc; border-bottom: none; b
 
 .newform .signup_settings label { display: inline-block; width: 160px; }
 .newform .signup_settings input { margin: 0 5px 5px 0; }
+.newform .searchoption { padding: 6px 0 0; }
 
 /* -------- CSS redesign ------- */
 
