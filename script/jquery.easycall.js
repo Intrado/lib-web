@@ -64,8 +64,9 @@
 			// create a container for the passed language
 			createCallMeContainer: function(hasmenu) {
 				var container = $('<div />', { "class": "easycallcallmecontainer"});
-				var phoneinput = $('<input />', { "class": "easycallphoneinput", "type": "text" });
-				var callbutton = $('<input />', { "class": "easycallcallnowbutton", "type": "button", "value": "Call Now to Record" });
+				var phoneinput = $('<input />', { "class": "easycallphoneinput small", "type": "text" });
+				var callbutton = $('<input />', { "class": "easycallcallnowbutton record", "type": "button", "value": "Call Now to Record" });
+				callbutton.append($('<span />', { "class": "icon" })).append("Call Now to Record");
 				
 				if (hasmenu) {
 					// create a multiselect with remaining languages in it.
@@ -155,7 +156,8 @@
 			
 			createProgressContainer: function() {
 				var container = $('<div />', { "class": "easycallprogresscontainer"});
-				var progresstext = $('<span />', { "class": "easycallprogresstext" });
+				var progresstext = $('<div />', { "class": "call-progress" });
+				progresstext.append($('<span />', { "class": "icon" })).append($('<span />', { "class": "easycallprogresstext" }))
 				
 				container.append(progresstext);
 				
@@ -179,7 +181,7 @@
 					return;
 				}
 				var progresscontainer = method.createProgressContainer();
-				var progresstext = progresscontainer.children(".easycallprogresstext");
+				var progresstext = progresscontainer.find(".easycallprogresstext");
 				
 				progresstext.empty().append("Calling: " + phone);
 				
