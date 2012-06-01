@@ -148,6 +148,8 @@ jQuery.noConflict();
       ];
 
       watchFields('#msgsndr_form_number');
+
+      $("#msgsndr_form_number").attachEasyCall({"languages": {"en":"English","es":"Spanish","ca":"Catalan"}});
     }
 
     function sendEmail() {

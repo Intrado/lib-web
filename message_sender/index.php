@@ -645,6 +645,9 @@ include("nav.inc.php");
 <script src="script/message_sender.validation.js"></script>
 <script src="script/message_sender.global.js"></script>
 
+<script type="text/javascript" src="script/jquery.timer.js"></script>
+<script type="text/javascript" src="script/jquery.easycall.js"></script>
+
 
 <script src="script/bootstrap-modal.js"></script>
 <script src="script/speller/spellChecker.js"></script>

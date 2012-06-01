@@ -66,7 +66,7 @@
     this.unwatchSocial = function(section) {
 
       console.log('unwatchSocial');
-      j('div[data-social='+section+'] input, div[data-social='+section+'] textarea').off()
+      //j('div[data-social='+section+'] input, div[data-social='+section+'] textarea').off()
       
       clearSocial(section);
     
