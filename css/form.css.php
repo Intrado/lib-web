@@ -123,9 +123,10 @@ border-top: 1px solid #ccc; border-right: 1px solid #ccc; border-bottom: none; b
 .newform .formcontrol .radiobox { float: left; display: inline; width: 250px; list-style-type: none; padding: 3px 0 0 0; margin: 0 20px 0 0; }
 .newform .formcontrol .radiobox li { padding: 4px 0; }
 .newform .formcontrol .radiobox input[type="radio"],
-.newform .formcontrol .radiobox input[type="checkbox"] { margin: 0 5px 0 0; }
-.newform .formcontrol #accessprofile_publish { float: none; display: block; }
-.newform .formcontrol #accessprofile_subscribe { float: none; display: block; }
+.newform .formcontrol .radiobox input[type="checkbox"] { margin: 5px 5px 0 0; }
+.newform .formcontrol #accessprofile_publish,
+.newform .formcontrol #accessprofile_subscribe,
+.newform .formcontrol #accessprofile_datafields { float: none; display: block; }
 
 .newform .formcontrol .radio_box { width: 250px; list-style-type: none; padding: 0; margin: 0 20px 0 0; }
 
