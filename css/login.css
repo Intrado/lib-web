@@ -81,8 +81,11 @@ p { margin: 0 0 10px 0; font-size: 12px; line-height: 19px; }
 .window_body form fieldset { margin: 0 0 10px 0; }
 .window_body form label, .window_body form input { display: block; width: 98%; font-size: 14px; line-height: 23px; }
 .window_body form label.check { float: left; display: inline; font-size: 12px; line-height: 17px; width: auto; }
+.window_body form label.disabled { color: #999; }
+.window_body form input[type=text], .window_body form input[type=password] { background: #fff; padding: 3px 5px; border: 1px solid #a7a7a7; -webkit-border-radius: 3px; border-radius: 3px; }
 .window_body form input[type=submit] { float: right; width: 100px; }
 .window_body form input[type=checkbox] { float: left; width: 15px; }
+.window_body form input.disabled { background: #ddd; border: 1px solid #b5b5b5; }
 .window_body form a { color: #00aeef; font-size: 13px; }
 .indexdisplayname { font-size: 1.6em; margin: 0; padding: 0 0 10px 0;  }
 .right { text-align: right; }
