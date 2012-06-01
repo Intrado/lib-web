@@ -12,12 +12,13 @@ jQuery.noConflict();
 		
 		// Hiding stuff which is not needed
 		$('#msg_section_2, #msg_section_3, .close, .facebook, .twitter, .feed, div[id^="msgsndr_tab"]').hide();
+		$('#audiolink').hide();
 
 		// Email Flag
 		emailSubject 	= "";
 
 
-		// Tab Hide/Show Logic
+		//  Hide/Show Logic
 		$('.msg_steps a').on('click', function(event) {
 			event.preventDefault();
 			// Get the clicked elements id
@@ -50,6 +51,10 @@ jQuery.noConflict();
 				emSubject();
 			}
 
+			if (elm[2] == 'social' && $('#msgsndr_ctrl_phone').parent().hasClass('complete')) {
+				$('#audiolink').show();
+			}
+
 		});
 
 
@@ -65,7 +70,6 @@ jQuery.noConflict();
 
 			// Show paste from email button if text-to-speech is clicked and emailData is not empty
 			if (type == "text-to-speech" && emailData != "") {
-				console.log('ya');
 				$('#paste_from_email').removeClass('hidden');
 			}
 
@@ -92,30 +96,6 @@ jQuery.noConflict();
 
 			offset = $(this).offset();
 				$('html, body').animate({scrollTop: offset.top },2000);
-
-		});
-
-
-
-		// Social Inputs hide show
-		$('input.social').on('click', function(event) {
-
-			var elem = $(this).attr('id');
-			var elem = elem.split('_') 				// Going to be using elem[2]
-
-			$('.'+elem[2]).slideToggle('slow', function() { 
-
-				if (elem[2] == 'feed') { // if Post to Feeds set focus to the Post title input
-					$('#msgsndr_form_rsstitle').focus();
-				} else { // Set focus to the textarea
-					$('.'+elem[2]+' textarea').focus();
-				}
-				
-			});
-
-			// This scrolls the page up to bring the element that has just opened into view
-			offset = $(this).offset();
-			$('html, body').animate({scrollTop: offset.top },2000);
 
 		});
 
@@ -166,6 +146,12 @@ jQuery.noConflict();
 		$('#msgsndr_saved_message').modal({
 			show: false
 		});
+
+
+
+
+
+
 
 
 		// get the available lists from lists.php
