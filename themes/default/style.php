@@ -74,7 +74,7 @@ table.list td { color: #444; }
 
 /*----- Button styling -----*/
 
-.import_file_data .btn_middle { height: 20px; padding: 3px 5px 0; line-height: 20px; }
+.import_file_data .btn_middle {  }
 .btn { margin: 0 5px 5px 0; }
 
 /*----- Admin settings list styles -----*/
