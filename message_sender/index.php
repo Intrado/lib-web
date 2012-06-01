@@ -100,23 +100,25 @@ include("nav.inc.php");
 
 	<div class="window newbroadcast">
 		<div class="window_title_wrap">
-		<h2>New Broadcast</h2>
-		<ul class="msg_steps cf">
-		<li class="active"><a id="tab_1" ><span class="icon">1</span> Subject &amp; Recipients</a></li>
-		<li><a id="tab_2" data-active="true"><span class="icon">2</span> Message Content</a></li>
-		<li><a id="tab_3" data-active="true"><span class="icon">3</span> Review &amp; Send</a></li>
-		</ul>
+
+			<h2>New Broadcast</h2>
+			<ul class="msg_steps cf">
+				<li class="active"><a id="tab_1" ><span class="icon">1</span> Subject &amp; Recipients</a></li>
+				<li><a id="tab_2" data-active="true"><span class="icon">2</span> Message Content</a></li>
+				<li><a id="tab_3" data-active="true"><span class="icon">3</span> Review &amp; Send</a></li>
+			</ul>
+
 		</div>
 		
 		<div class="window_body_wrap">
 
 		<form name="broadcast">
 
-<? include("message_sender/section_one.inc.php"); ?>
+			<? include("message_sender/section_one.inc.php"); ?>
 
-<? include("message_sender/section_two.inc.php"); ?>
+			<? include("message_sender/section_two.inc.php"); ?>
 
-<? include("message_sender/section_three.inc.php"); ?>
+			<? include("message_sender/section_three.inc.php"); ?>
 
 		</form>
 		
@@ -135,6 +137,12 @@ include("nav.inc.php");
 </div><!-- end wrapper -->
 
 <? include("message_sender/modals.inc.php"); ?>
+<script type="text/javascript">
+<?
+// Some of these are defined in jobwizard.inc.php 
+Validator::load_validators(array("ValSmsText"));
+?>
+</script>
 
 
 <script src="script/jquery.1.7.2.min.js"></script>
@@ -145,8 +153,8 @@ include("nav.inc.php");
 <script src="script/message_sender.validation.js"></script>
 <script src="script/message_sender.global.js"></script>
 
-<script type="text/javascript" src="script/jquery.timer.js"></script>
-<script type="text/javascript" src="script/jquery.easycall.js"></script>
+<script src="script/jquery.timer.js"></script>
+<script src="script/jquery.easycall.js"></script>
 
 
 <script src="script/bootstrap-modal.js"></script>
