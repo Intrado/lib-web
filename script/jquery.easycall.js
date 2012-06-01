@@ -33,7 +33,7 @@
 			// DOM rendering methods
 			// set up the easycall elements, hiding the intial input element
 			init: function () {
-				$this.hide();
+				//$this.hide();
 				// destroy all the easycall DOM containers (if there are any)
 				if (easycalldata.maincontainer !== false)
 					$("." + easycalldata.maincontainer).detach();
@@ -60,7 +60,8 @@
 			createCallMeContainer: function(hasmenu) {
 				var container = $('<div />', { "class": "easycallcallmecontainer"});
 				var phoneinput = $('<input />', { "class": "easycallphoneinput", "type": "text" });
-				var callbutton = $('<a />', { "class": "easycallcallnowbutton", "href": "#", "text": "Call Now to Record" });
+				//var callbutton = $('<a />', { "class": "easycallcallnowbutton", "href": "#", "text": "Call Now to Record" });
+				var callbutton = $('#ctrecord');
 				
 				if (hasmenu) {
 					// create a multiselect with remaining languages in it.
@@ -79,7 +80,8 @@
 					container.append(selectmenu);
 				}
 
-				callbutton.click(function(){
+				callbutton.click(function(e){
+					e.preventDefault();
 					var code = easycalldata.default;
 					if (hasmenu)
 						code = selectmenu.val();
@@ -87,7 +89,7 @@
 					method.doCall(code);
 				});
 				
-				container.append(phoneinput).append(callbutton);
+				//container.append(phoneinput).append(callbutton);
 				return container;
 			},
 			
@@ -144,7 +146,8 @@
 			doCall: function (code) {
 				var langdiv = easycalldata.subcontainer[code];
 				// get the phone number
-				var phone = langdiv.children(".easycallphoneinput").val();
+				//var phone = langdiv.children(".easycallphoneinput").val();
+				var phone = $this.val();
 				
 				// validate the phone
 				var valid = method.validatePhone(phone);
@@ -157,6 +160,8 @@
 				var progresstext = progresscontainer.children(".easycallprogresstext");
 				
 				progresstext.empty().append("Calling: " + phone);
+
+				$('#ctrecord').hide();
 				
 				langdiv.empty();
 				langdiv.append(progresscontainer);
