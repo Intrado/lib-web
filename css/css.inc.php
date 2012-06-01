@@ -763,12 +763,8 @@ div.autocomplete ul li {
 .messagegrid th { color: #484848; font-size: 12px; text-align: left; }
 .messagegrid td { color: #484848; text-align: center; }
 .messagegrid .messagegridheader { padding: 2px; }
-.messagegrid .messagegridheader img{
-	margin-bottom: -3px;
-}
-.messagegrid .messagegridlanguage{
-	text-align: right;
-}
+.messagegrid .messagegridheader img { margin: -3px 0 0 0; }
+.messagegrid .messagegridlanguage{ text-align: right; }
 
 .messagegrid .tinybutton{
 	margin:0 auto;
