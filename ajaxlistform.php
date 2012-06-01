@@ -79,6 +79,23 @@ function handleRequest() {
 	global $RULE_OPERATORS;
 	
 	switch($_GET['type']) {
+		
+		case 'saveandrename':
+			if (!$USER->authorize('createlist') || !isset($_GET['listid']))
+				return false;
+			
+			$listid = $_GET['listid']+0;
+
+			if (!userOwns('list', $listid))
+				return false;
+			
+			$list = new PeopleList($listid);
+
+			$list->deleted = 0;
+			$list->name = substr($_REQUEST['name'],0,50);
+			$list->update();
+			return true;
+			break;
 		case 'createlist': // returns $list->id
 			if (!$USER->authorize('createlist'))
 				return false;
