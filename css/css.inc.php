@@ -378,27 +378,29 @@ ul.actionlinks li img { padding: 0 4px; }
 .actionlinks a { display: inline-block; }
 .actionlinks a:last-child { border: none; }
 .actionlinks a:hover { color: #000; }
-.actionlink { padding: 0 5px; font-size: 11px; line-height: 18px; cursor: pointer; color: #484848; }
-.actionlink img { padding: 0 4px 0 0; }
+.actionlink { padding: 0 5px 0 20px; font-size: 11px; line-height: 18px; cursor: pointer; color: #484848; }
+.actionlink img { display: none; padding: 0 4px 0 0; }
 
-.Edit_link { background: url(img/icons/pencil.png) 0 0 no-repeat; width: 16px; height: 16px; text-indent: -9999px; }
-.Preview_link { background: url(img/icons/application_view_list.png) 0 0 no-repeat; width: 16px; height: 16px; text-indent: -9999px; }
-.Publish_link { background: url(img/icons/fugue/star__plus.png) 0 0 no-repeat; width: 16px; height: 16px; text-indent: -9999px; }
-.Delete_link { background: url(img/icons/cross.png) 0 0 no-repeat; width: 16px; height: 16px; text-indent: -9999px; }
-.Copy_link { background: url(img/icons/page_copy.png) 0 0 no-repeat; width: 16px; height: 16px; text-indent: -9999px; }
-.Cancel_link { background: url(img/icons/stop.png) 0 0 no-repeat; width: 16px; height: 16px; text-indent: -9999px; }
-.Report_link { background: url(img/icons/layout.png) 0 0 no-repeat; width: 16px; height: 16px; text-indent: -9999px; }
-.Monitor_link { background: url(img/icons/chart_pie.png) 0 0 no-repeat; width: 16px; height: 16px; text-indent: -9999px; }
-.Responses_link { background: url(img/icons/comment.png) 0 0 no-repeat; width: 16px; height: 16px; text-indent: -9999px; }
-.Graph_link { background: url(img/icons/chart_pie.png) 0 0 no-repeat; width: 16px; height: 16px; text-indent: -9999px; }
-.Archive_link { background: url(img/icons/fugue/broom.png) 0 0 no-repeat; width: 16px; height: 16px; text-indent: -9999px; }
-.Upload_link { background: url(img/icons/folder.png) 0 0 no-repeat; width: 16px; height: 16px; text-indent: -9999px; }
-.Download_link { background: url(img/icons/disk.png) 0 0 no-repeat; width: 16px; height: 16px; text-indent: -9999px; }
-.Now_link { background: url(img/icons/database_go.png) 0 0 no-repeat; width: 16px; height: 16px; text-indent: -9999px; }
-.Log_link { background: url(img/icons/application_view_list.png) 0 0 no-repeat; width: 16px; height: 16px; text-indent: -9999px; }
-.user_link { background: url(img/icons/key_go.png) 0 0 no-repeat; width: 16px; height: 16px; text-indent: -9999px; }
-.Password_link { background: url(img/icons/fugue/lock__pencil.png) 0 0 no-repeat; width: 16px; height: 16px; text-indent: -9999px; }
-.Disable_link { background: url(img/icons/user_delete.png) 0 0 no-repeat; width: 16px; height: 16px; text-indent: -9999px; }
+.Edit_link { background: url(img/icons/pencil.png) 0 0 no-repeat; }
+.Preview_link { background: url(img/icons/application_view_list.png) 0 0 no-repeat; }
+.Publish_link { background: url(img/icons/fugue/star__plus.png) 0 0 no-repeat; }
+.Delete_link { background: url(img/icons/cross.png) 0 0 no-repeat; }
+.Copy_link { background: url(img/icons/page_copy.png) 0 0 no-repeat; }
+.Cancel_link { background: url(img/icons/stop.png) 0 0 no-repeat; }
+.Report_link { background: url(img/icons/layout.png) 0 0 no-repeat; }
+.Monitor_link { background: url(img/icons/chart_pie.png) 0 0 no-repeat; }
+.Responses_link { background: url(img/icons/comment.png) 0 0 no-repeat; }
+.Graph_link { background: url(img/icons/chart_pie.png) 0 0 no-repeat; }
+.Archive_link { background: url(img/icons/fugue/broom.png) 0 0 no-repeat; }
+.Upload_link { background: url(img/icons/folder.png) 0 0 no-repeat; }
+.Download_link { background: url(img/icons/disk.png) 0 0 no-repeat; }
+.Now_link { background: url(img/icons/database_go.png) 0 0 no-repeat; }
+.Log_link { background: url(img/icons/application_view_list.png) 0 0 no-repeat; }
+.user_link { background: url(img/icons/key_go.png) 0 0 no-repeat; }
+.Password_link { background: url(img/icons/fugue/lock__pencil.png) 0 0 no-repeat; }
+.Disable_link { background: url(img/icons/user_delete.png) 0 0 no-repeat; }
+.Data_link { background: url(img/icons/lightning.png) 0 0 no-repeat; }
+.Values_link { background: url(img/icons/pencil.png) 0 0 no-repeat; }
 
 
 /*----- items need to appear in vertical list on homepage -----*/
@@ -905,4 +907,11 @@ if ( is_readable($themecssfilename) ) {
   @page { margin: 0.5cm; }
   p, h2, h3 { orphans: 3; widows: 3; }
   h2, h3 { page-break-after: avoid; }
+}
+
+
+/*----- Media Queries -------*/
+
+@media only screen and (max-width: 980px) {
+	.content_feed .feed_wrap { width: 300px; }
 }
