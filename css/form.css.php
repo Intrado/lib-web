@@ -127,6 +127,7 @@ border-top: 1px solid #ccc; border-right: 1px solid #ccc; border-bottom: none; b
 .newform .formcontrol #accessprofile_publish,
 .newform .formcontrol #accessprofile_subscribe,
 .newform .formcontrol #accessprofile_datafields { float: none; display: block; }
+.newform .formcontrol #listsearch_quickaddsearch { width: 280px; }
 
 .newform .formcontrol .radio_box { width: 250px; list-style-type: none; padding: 0; margin: 0 20px 0 0; }
 
