@@ -35,44 +35,42 @@ jQuery.noConflict();
        }
     });
 
+    
+
     /* --
       The setUp function will do alot of the inital work, and call other functions based on users roles
     -- */
 
-    function setUp(data) {
+    function setUp(roleData) {
+      if(!$.isArray(roleData)) {
+        alert("error");
+        return false;
+      }
 
-      // it's likely this function will need to work out what role has seniority in a case where a user has more than one role.
-      roleid = data[0].accessProfile.id;
+      userPermissions = {};
+      userRoleId = false;
+      $.each(roleData, function(rIndex, rItem) {
+        //ideally match organization for rols here
+        //if(rItem.organization.id == [orgVariable]) {
+          userRoleId = rItem.id;
+          $.each(rItem.accessProfile.permissions, function(pIndex, pItem) {
+            userPermissions[pItem.name] = pItem.value;
+          });
+        //}
+      });
 
-      // Setting variables from data passed through from the initial ajax call above ^
-      loopData = data[0].accessProfile.permissions;
+      console.log("userRoleID: " + userRoleId);
+      console.log("userPermissions: " + userPermissions);
 
-      for (i=0;i<loopData.length;i++) {
-        if (loopData[i]['name'] == 'sendphone') {
-          var sPhone = loopData[i]['value'];
-        }
-        if (loopData[i]['name'] == 'sendemail') {
-          var sEmail = loopData[i]['value'];
-          //var sEmail = '0'
-        }
-        if (loopData[i]['name'] == 'sendsms') {
-          var sSMS = loopData[i]['value'];
-        }
-        if (loopData[i]['name'] == 'facebookpost') {
-          var sFacebook = loopData[i]['value'];
-        }
-        if (loopData[i]['name'] == 'twitterpost') {
-          var sTwitter = loopData[i]['value'];
-        }
-        if (loopData[i]['name'] == 'feedpost') {
-          var sFeed = loopData[i]['value'];
-        }
+      if(userRoleId == false) {
+        alert("error: user doesnt have permissions for current organization");
+        return false;
       }
 
 
       // Get Type for drop down on inital page
       $.ajax({
-        url: '/'+orgPath+'/api/2/users/'+userid+'/roles/'+roleid+'/settings/jobtypes',
+        url: '/'+orgPath+'/api/2/users/'+userid+'/roles/'+userRoleId+'/settings/jobtypes',
         type: "GET",
         dataType: "json",
         success: function(data) {
@@ -94,29 +92,31 @@ jQuery.noConflict();
         * 1 = true - user has this option
       -- */
 
-      if (sPhone == 1) {
+      if (userPermissions.sendphone == 1) {
         sendPhone();
       }
 
-      if (sEmail == 1 ) {
+      if (userPermissions.sendemail == 1) {
         sendEmail();
       }
 
-      if (sSMS == 1) {
+      if (userPermissions.sendsms == 1) {
         sendSMS();
       }
 
-      if (sFacebook == 1 || sTwitter == 1 || sFeed == 1) {
+      if (userPermissions.facebookpost == 1 || userPermissions.twitterpost == 1 || userPermissions.feedpost == 1) {
 
         $('li.osocial').removeClass('notactive');
 
-        if (sFacebook == 1) {
+        if(userPermissions.facebookpost == 1) {
           socialFB();
         }
-        if (sTwitter == 1) {
+
+        if(userPermissions.twitterpost == 1) {
           socialTwitter();
         }
-        if (sFeed == 1) {
+
+        if(userPermissions.feedpost == 1) {
           socialFeed();
         }
 
@@ -228,7 +228,7 @@ jQuery.noConflict();
       $('div[data-social=feed]').removeClass('hidden');
 
       $.ajax({
-        url: '/'+orgPath+'/api/2/users/'+userid+'/roles/'+roleid+'/settings/feedcategories',
+        url: '/'+orgPath+'/api/2/users/'+userid+'/roles/'+userRoleId+'/settings/feedcategories',
         type: "GET",
         dataType: "json",
         success: function(data) {
