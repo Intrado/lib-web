@@ -76,7 +76,7 @@ p { margin: 0 0 10px 0; font-size: 12px; line-height: 19px; }
 -moz-background-clip: padding; -webkit-background-clip: padding-box; background-clip: padding-box; }
 
 .window_body div { float: left; display: inline; width: 48%; }
-.window_body .section1 { width: 100%; }
+.window_body div.section1 { width: 100%; }
 .window_body form { float: right; display: inline; width: 48%; }
 .window_body form fieldset { margin: 0 0 10px 0; }
 .window_body form label, .window_body form input { display: block; width: 98%; font-size: 14px; line-height: 23px; }
