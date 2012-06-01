@@ -370,9 +370,27 @@ div.scrollTableContainer {
 ul.actionlinks { padding: 0; margin: 0; list-style-type: none; }
 ul.actionlinks li { display: inline-block; padding: 0 4px 0 0; border-right: 1px solid #aaa; }
 ul.actionlinks li:last-child { border: none; }
-ul.actionlinks li a { display: block; font-size: 11px; line-height: 18px; border: 0px; cursor: pointer; color: #484848; }
+ul.actionlinks li a { display: block; font-size: 11px; line-height: 16px; border: 0px; cursor: pointer; color: #484848; }
 ul.actionlinks li a:hover { color: #000; }
 ul.actionlinks li img { padding: 0 4px; }
+
+.actionlinks { padding: 0; margin: 0; list-style-type: none; }
+.actionlinks a { display: inline-block; }
+.actionlinks a:last-child { border: none; }
+.actionlinks a:hover { color: #000; }
+.actionlink { padding: 0 5px; font-size: 11px; line-height: 18px; cursor: pointer; color: #484848; }
+.actionlink img { padding: 0 4px 0 0; }
+
+.Edit_link { background: url(img/icons/pencil.png) 0 0 no-repeat; width: 16px; height: 16px; text-indent: -9999px; }
+.Preview_link { background: url(img/icons/application_view_list.png) 0 0 no-repeat; width: 16px; height: 16px; text-indent: -9999px; }
+.Publish_link { background: url(img/icons/fugue/star__plus.png) 0 0 no-repeat; width: 16px; height: 16px; text-indent: -9999px; }
+.Delete_link { background: url(img/icons/cross.png) 0 0 no-repeat; width: 16px; height: 16px; text-indent: -9999px; }
+.Copy_link { background: url(img/icons/page_copy.png) 0 0 no-repeat; width: 16px; height: 16px; text-indent: -9999px; }
+.Cancel_link { background: url(img/icons/stop.png) 0 0 no-repeat; width: 16px; height: 16px; text-indent: -9999px; }
+.Report_link { background: url(img/icons/layout.png) 0 0 no-repeat; width: 16px; height: 16px; text-indent: -9999px; }
+.Monitor_link { background: url(img/icons/chart_pie.png) 0 0 no-repeat; width: 16px; height: 16px; text-indent: -9999px; }
+.Responses_link { background: url(img/icons/comment.png) 0 0 no-repeat; width: 16px; height: 16px; text-indent: -9999px; }
+
 
 /*----- items need to appear in vertical list on homepage -----*/
 
@@ -812,8 +830,8 @@ input.submit_survey:active {
 	
 /*----- Admin settings list styles -----*/
 
-.linkslist { float: left; display: inline; list-style-type: none; margin: 0; padding: 0 15px; }
-.linkslist li { font-size: 13px; padding: 5px 0; }
+.linkslist { float: left; display: inline; width: 24%; list-style-type: none; margin: 0; padding: 0; border-top: 1px solid #ccc; border-bottom: 1px solid #ccc; border-left: 1px solid #ccc;-moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box; }
+.linkslist li { font-size: 13px; padding: 5px; }
 .linkslist li.heading { font-size: 14px; font-weight: bold; border-bottom: 1px solid #ccc; }
 
 /* +----------------------------------------------------------------+
