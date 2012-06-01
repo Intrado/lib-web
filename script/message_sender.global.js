@@ -1,3 +1,4 @@
+  function globalValidationFunctions() {
 
     // Instead of using $ we use j
     j = jQuery;
@@ -51,6 +52,64 @@
       }
 
     } // this.watchContent
+
+
+    this.watchSocial = function(section) {
+
+      console.log('watchSocial');
+      j('div[data-social='+section+'] input, div[data-social='+section+'] textarea').on('keyup', function() {
+        checkSocial(section);
+      });
+
+    }
+
+    this.unwatchSocial = function(section) {
+
+      console.log('unwatchSocial');
+      j('div[data-social='+section+'] input, div[data-social='+section+'] textarea').off()
+      
+      clearSocial(section);
+    
+
+    }
+
+    checkSocial = function(section) {
+
+      var reqFields   = j('div[data-social='+section+'] .required');
+
+      var reqCount    = 0;
+      var reqAmount   = parseInt(reqFields.length);
+
+      j.each(reqFields, function(index, ele) {
+        if (j(ele).val() != "") {
+          reqCount++;
+        } else if (reqCount != 0) {
+          reqCount--;
+        }
+
+      });
+
+      if (reqCount == reqAmount) {
+        j('#msgsndr_tab_social button.btn_save').removeAttr('disabled');
+      } else {
+        j('#msgsndr_tab_social button.btn_save').attr('disabled','disabled');
+      }
+
+    }
+
+    clearSocial = function(section) {
+
+      var reqFields   = j('div[data-social='+section+'] .required');
+
+      j.each(reqFields, function(index, ele) {
+        console.log(j(ele).val());
+        j(ele).val('');
+
+      });
+
+
+    }
+
 
     /* 
       checkContent() Function to run once Save Message button is clicked, this is check if any Add buttons 

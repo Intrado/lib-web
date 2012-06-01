@@ -184,7 +184,8 @@ jQuery.noConflict();
       document.formvars['sms'] = {
         text: [
           new document.validators["ValRequired"]("sms_text","SMS",{}),
-          new document.validators["ValLength"]("sms_text","SMS",{max:160})
+          new document.validators["ValLength"]("sms_text","SMS",{max:160}),
+          //new document.validators["ValSmsText"]("sms_text","sms_text",{})
         ]
       };
 
@@ -270,6 +271,25 @@ jQuery.noConflict();
     });
 
 
+    $('input.social').on('click', function() {
+
+      var itemName = $(this).attr('id').split('_')[2];
+      console.log(itemName);
+
+      if ($(this).attr('checked')) {
+
+        notVal.watchSocial(itemName);
+
+      } else {
+
+        notVal.unwatchSocial(itemName);
+      }
+
+
+    });
+
+
+
 
 
     // Send Message Button
@@ -290,16 +310,16 @@ jQuery.noConflict();
 
       var watch = watch + ', ' + fieldId;
 
-  	  $(watch).on('keyup', function() {
-		    var elem	=	$(this);
-			  formVal(elem);
-		  });
+      $(watch).on('keyup', function() {
+        var elem  = $(this);
+        formVal(elem);
+      });
 
     }
 
-		function formVal(element) {
+    function formVal(element) {
 
-			var name  = element.attr('name');
+      var name  = element.attr('name');
       var form  = name.split("_")[0];
       var field = name.split("_")[1];
 
@@ -309,42 +329,42 @@ jQuery.noConflict();
 
 
       var isValid = true;
-			var validators = document.formvars[form][field];
-			requiredvalues = [];
+      var validators = document.formvars[form][field];
+      requiredvalues = [];
 
-			if (ajax == 'true') {
+      if (ajax == 'true') {
 
-				var postData = {
-					value: value,
-					requiredvalues: ""
-				}
+        var postData = {
+          value: value,
+          requiredvalues: ""
+        }
 
         var ajaxurl = "message_sender.php?form=broadcast&ajaxvalidator=true&formitem=" + name;
 
-				$.ajax({
-					type: 'POST',
-					url: ajaxurl,
-					data: {json: $.toJSON(postData) },
+        $.ajax({
+          type: 'POST',
+          url: ajaxurl,
+          data: {json: $.toJSON(postData) },
 
-					success: function(response) {
-							var res = response;
-							if (res.vres != true) {
+          success: function(response) {
+              var res = response;
+              if (res.vres != true) {
                 element.removeClass('ok').addClass('er').next('.error').show().text(res.vmsg);
-							} else {
-								element.removeClass('er').addClass('ok').next('.error').hide();
-							}
-					}
-				});
+              } else {
+                element.removeClass('er').addClass('ok').next('.error').hide();
+              }
+          }
+        });
 
-			} else { // None AJAX validation
+      } else { // None AJAX validation
 
-				// Loop validation
-				for (var i = 0; i < validators.length; i++) {  
-					var validator = validators[i];  
-					if (value.length > 0 || validator.isrequired || validator.conditionalrequired || value.length == 0) {  
-						res = validator.validate(validator.name,validator.label,value,validator.args,requiredvalues); 
-						if (res != true) {  
-							isValid = false;  
+        // Loop validation
+        for (var i = 0; i < validators.length; i++) {  
+          var validator = validators[i];  
+          if (value.length > 0 || validator.isrequired || validator.conditionalrequired || value.length == 0) {  
+            res = validator.validate(validator.name,validator.label,value,validator.args,requiredvalues); 
+            if (res != true) {  
+              isValid = false;  
               // If SMS - add class er to textarea and disable save button
               if (name == 'sms_text') {
                 element.removeClass('ok').addClass('er'); 
@@ -352,8 +372,8 @@ jQuery.noConflict();
               } else {
                 element.removeClass('ok').addClass('er').next('.error').show().text(res);
               }
-							break; 
-						} else {
+              break; 
+            } else {
               // If SMS - add class ok to textarea and remove disabled from save button
               if (name == 'sms_text') {
                 element.removeClass('er').addClass('ok'); 
@@ -362,18 +382,18 @@ jQuery.noConflict();
                 element.removeClass('er').addClass('ok').next('.error').hide();
               }
             }
-					} 
+          } 
 
-				} // for
+        } // for
 
           if (res == true && field == "number") {
             $('#ctrecord').show();
           } 
           
 
-			} // if ajax
+      } // if ajax
 
-		} // form_val function
+    } // form_val function
 
 
     function emailVal(element,emailData) {
@@ -407,7 +427,8 @@ jQuery.noConflict();
         } 
 
       } // for
-      
+        
+
     } // form_val function
 
 
@@ -589,5 +610,5 @@ jQuery.noConflict();
 
 
 
-	});
+  });
 }) (jQuery);

@@ -9,6 +9,7 @@ require_once("inc/table.inc.php");
 require_once("inc/html.inc.php");
 require_once("inc/utils.inc.php");
 require_once("obj/Validator.obj.php");
+require_once("obj/ValSmsText.val.php");
 require_once("obj/Form.obj.php");
 require_once("obj/FormItem.obj.php");
 
@@ -453,7 +454,7 @@ include("nav.inc.php");
 						<fieldset>
 							<label for="msgsndr_form_fbmsg">Message</label>
 							<div class="controls">
-								<textarea id="msgsndr_form_fbmsg" name="facebook_message"></textarea> <span class="error"></span>
+								<textarea id="msgsndr_form_fbmsg" name="facebook_message" class="required"></textarea> <span class="error"></span>
 								<p><a href="javascript:void(null);" id="sms_sc" onclick="(new spellChecker($('msgsndr_form_fbmsg')) ).openChecker();">Spell Check</a> <span class="fb characters">420 Characters left</span></p>
 							</div>
 						</fieldset>
