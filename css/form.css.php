@@ -453,6 +453,10 @@ table#addMeWindow input[type="checkbox"] { margin: 7px 0; }
 .window_panel .controls { margin: 0 0 0 150px; }
 .window_panel .form_actions { background: #ededed; margin: 0; padding: 15px 0; border-radius: 0 0 8px 8px; border-top: 1px solid #ccc; }
 
+#msgsndr_tab_social .form_actions { 
+	border: none;
+}
+
 .window_panel iframe { height: 3em; padding-top: 3px; }
 
 .characters {
