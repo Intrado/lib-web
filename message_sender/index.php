@@ -92,7 +92,7 @@ include("nav.inc.php");
 	twitterReservedChars = <? print_r(mb_strlen(" http://". getSystemSetting("tinydomain"). "/") + 6); ?>;
 </script>
 
-<div class="container cf">
+
 
 	<div class="wrapper">
 	
