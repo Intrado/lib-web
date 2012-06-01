@@ -342,7 +342,7 @@ h3.flag { padding: 5px 22px; font-size: 18px; color: #fff; border: 1px solid #22
   
 .window_panel form { padding: 20px 0; border: 1px solid #ccc; -webkit-border-radius: 0 0 5px 5px; border-radius: 0 0 5px 5px; }
 
-.field_wrapper { padding: 20px 0; }
+.field_wrapper { margin: 0 0 20px 0; padding: 20px 0; border: 1px solid #ccc; -webkit-border-radius: 0 0 5px 5px; border-radius: 0 0 5px 5px; }
 .add_recipients { margin: 0 0 20px 0; padding: 20px; border: 1px solid #ccc; -webkit-border-radius: 0 0 5px 5px; border-radius: 0 0 5px 5px; }
 .add_recipients form { border: none; }
 .tab_panel { background: #fafafa; padding: 5px 0 0; border: 1px solid #ccc; -webkit-border-radius: 8px; border-radius: 8px; }
@@ -398,6 +398,15 @@ border-color: #222222 transparent transparent; border-style: solid; border-width
 
 .tab_content { margin: 0 0 20px 0; }
 .tab_panel form { border-radius: 8px; }
+
+.msg_complete { list-style-type: none; margin: 5px 0; padding: 0; }
+.msg_complete li { position: relative; float: left; display: inline; width: 24%; opacity: 0.5; }
+.msg_complete li:hover { opacity: 1; }
+.msg_complete li a { display: block; background: #f5f5f5; margin: 0 10px 0 0; padding: 9px 14px; font-size: 20px; font-weight: bold; color: #444; border-radius: 5px; border: 1px solid #ccc; }
+.msg_complete li a:hover { color: #444; text-decoration: none; }
+.msg_complete li.complete a { background: #499122; color: #fbfbfb; text-shadow: 0 1px 1px #222; border: 1px solid #3A7A17; 
+-webkit-box-shadow: inset 0 1px 1px 0 rgba(255, 255, 255, 0.5); box-shadow: inset 0 1px 1px 0 rgba(255, 255, 255, 0.5); }
+.msg_complete li a span.icon { background: url(themes/newui/remove.png) 0 center no-repeat; width: 16px; }
 
 .msg_confirm { background: #F9F8F6; margin: 0 -25px -20px -25px; padding: 22px 21px; text-align: right; border-radius: 0 0 5px 5px; border-top: 1px solid #DDDDDD; }
 
