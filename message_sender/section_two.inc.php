@@ -40,8 +40,8 @@
 				<fieldset>
 					<label for="msgsndr_form_number">Number to Call</label>
 					<div class="controls">
-					<input class="small" type="text" id="msgsndr_form_number" name="phone_number" /> <span class="error"></span>
-					<button class="record" id="ctrecord"><span class="icon"></span> Call Now to Record</button>
+						<input class="small" type="hidden" id="msgsndr_form_number" name="phone_number" /> <span class="error"></span>
+						<!-- <button class="record" id="ctrecord"><span class="icon"></span> Call Now to Record</button> -->
 					</div>
 				</fieldset>
 				
@@ -215,7 +215,7 @@
 			<!-- Add the social network panel -->
 			<div id="msgsndr_tab_social" class="tab_panel">
 		
-				<div class="social_tab">
+				<div class="social_tab" id="audiolink">
 					<fieldset class="check">
 						<div class="controls">
 							<input class="addme" type="checkbox" id="msgsndr_form_audio" name="msgsndr_form_audio" />
@@ -260,7 +260,7 @@
 						<fieldset>
 							<label for="msgsndr_form_tmsg">Message</label>
 							<div class="controls">
-							<textarea id="msgsndr_form_tmsg" name="twitter_message"></textarea> <span class="error"></span>
+							<textarea id="msgsndr_form_tmsg" name="twitter_message" class="required"></textarea> <span class="error"></span>
 							<p><a href="javascript:void(null);" id="sms_sc" onclick="(new spellChecker($('msgsndr_form_tmsg')) ).openChecker();">Spell Check</a> <span class="twit characters"> Characters left</span></p>
 							</div>
 						</fieldset>
@@ -283,14 +283,14 @@
 						<fieldset>
 							<label for="msgsndr_form_rsstitle">Post Title</label>
 							<div class="controls">
-								<input type="text" id="msgsndr_form_rsstitle" name="rss_title" />
+								<input type="text" id="msgsndr_form_rsstitle" name="rss_title" class="required" />
 							</div>
 						</fieldset>
 
 						<fieldset>
 							<label for="msgsndr_form_rssmsg">Message</label>
 							<div class="controls">
-							<textarea id="msgsndr_form_fbmsg" name="facebook_message"></textarea> <span class="error"></span>
+							<textarea id="msgsndr_form_fbmsg" name="facebook_message" class="required"></textarea> <span class="error"></span>
 							<p><a href="#">Spell Check</a></p>
 							</div>
 						</fieldset>
@@ -307,7 +307,7 @@
 				
 				<fieldset class="form_actions">
 					<div class="controls">
-						<button class="btn_save" disabled="disabled">Save Social Messages</button>
+						<button class="btn_save" disabled="disabled" data-nav=".osocial">Save Social Messages</button>
 						<button>Cancel</button>
 					</div>
 				</fieldset>
