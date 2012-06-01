@@ -42,6 +42,12 @@ a:hover { text-decoration: underline; }
 .secbutton { position: absolute; top: 36px; left: 0; width: 150px; }
 .sectimeline { width: 100%; padding: 0 0 0 150px; -moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box; }
 
+
+/*------ An idea for layout
+.window_aside { position: absolute; left: 0; width: 225px; margin: 0; z-index: 99; }
+.window_main { position: relative; min-height: 250px; width: 100%; margin: 0; padding: 0 0 0 250px; -moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box; }
+---------------------------*/
+
 .pagetitle { font-weight: bold; color: <?=$primary?>;  }
 
 .newjob a { background: url(img/newjob.jpg) center top no-repeat; display: block; width: 100%; height: 122px; text-indent: -9999px; }
@@ -70,6 +76,12 @@ table.list td { color: #444; }
 
 .import_file_data .btn_middle { height: 20px; padding: 3px 5px 0; line-height: 20px; }
 .btn { margin: 0 5px 5px 0; }
+
+/*----- Admin settings list styles -----*/
+
+.linkslist {  }
+.linkslist li { padding: 5px; }
+.linkslist li.heading { background: #a0a9a0; color: #fff; }
 
 
 /*----- Prototip styles for shortcut menu, further styling for this is in the prototip.css.php file in the css folder -----*/
