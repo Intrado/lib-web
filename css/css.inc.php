@@ -390,6 +390,15 @@ ul.actionlinks li img { padding: 0 4px; }
 .Report_link { background: url(img/icons/layout.png) 0 0 no-repeat; width: 16px; height: 16px; text-indent: -9999px; }
 .Monitor_link { background: url(img/icons/chart_pie.png) 0 0 no-repeat; width: 16px; height: 16px; text-indent: -9999px; }
 .Responses_link { background: url(img/icons/comment.png) 0 0 no-repeat; width: 16px; height: 16px; text-indent: -9999px; }
+.Graph_link { background: url(img/icons/chart_pie.png) 0 0 no-repeat; width: 16px; height: 16px; text-indent: -9999px; }
+.Archive_link { background: url(img/icons/fugue/broom.png) 0 0 no-repeat; width: 16px; height: 16px; text-indent: -9999px; }
+.Upload_link { background: url(img/icons/folder.png) 0 0 no-repeat; width: 16px; height: 16px; text-indent: -9999px; }
+.Download_link { background: url(img/icons/disk.png) 0 0 no-repeat; width: 16px; height: 16px; text-indent: -9999px; }
+.Now_link { background: url(img/icons/database_go.png) 0 0 no-repeat; width: 16px; height: 16px; text-indent: -9999px; }
+.Log_link { background: url(img/icons/application_view_list.png) 0 0 no-repeat; width: 16px; height: 16px; text-indent: -9999px; }
+.user_link { background: url(img/icons/key_go.png) 0 0 no-repeat; width: 16px; height: 16px; text-indent: -9999px; }
+.Password_link { background: url(img/icons/fugue/lock__pencil.png) 0 0 no-repeat; width: 16px; height: 16px; text-indent: -9999px; }
+.Disable_link { background: url(img/icons/user_delete.png) 0 0 no-repeat; width: 16px; height: 16px; text-indent: -9999px; }
 
 
 /*----- items need to appear in vertical list on homepage -----*/
