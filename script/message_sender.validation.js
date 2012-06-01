@@ -13,7 +13,7 @@ jQuery.noConflict();
     emailData = "";
 
 
-    $('.error, #ctrecord').hide();
+    $('.error').hide();
 
     document.formvars = {
       broadcast: {
@@ -59,8 +59,8 @@ jQuery.noConflict();
         //}
       });
 
-      console.log("userRoleID: " + userRoleId);
-      console.log("userPermissions: " + userPermissions);
+      // console.log("userRoleID: " + userRoleId);
+      // console.log("userPermissions: " + userPermissions);
 
       if(userRoleId == false) {
         alert("error: user doesnt have permissions for current organization");
@@ -149,7 +149,9 @@ jQuery.noConflict();
 
       watchFields('#msgsndr_form_number');
 
+      // Easy Call jQuery Plugin
       $("#msgsndr_form_number").attachEasyCall({"languages": {"en":"English","es":"Spanish","ca":"Catalan"}});
+
     }
 
     function sendEmail() {
@@ -187,7 +189,7 @@ jQuery.noConflict();
         text: [
           new document.validators["ValRequired"]("sms_text","SMS",{}),
           new document.validators["ValLength"]("sms_text","SMS",{max:160}),
-          //new document.validators["ValSmsText"]("sms_text","sms_text",{})
+          new document.validators["ValSmsText"]("sms_text","sms_text")
         ]
       };
 
@@ -276,21 +278,29 @@ jQuery.noConflict();
     $('input.social').on('click', function() {
 
       var itemName = $(this).attr('id').split('_')[2];
-      console.log(itemName);
+
+       $('.'+itemName).slideToggle('slow', function() { 
+
+         if (itemName == 'feed') { // if Post to Feeds set focus to the Post title input
+           $('#msgsndr_form_rsstitle').focus();
+         } else { // Set focus to the textarea
+           $('.'+itemName+' textarea').focus();
+         }
+          
+       });
+
+       // This scrolls the page up to bring the element that has just opened into view
+       offset = $(this).offset();
+       $('html, body').animate({scrollTop: offset.top },2000);
 
       if ($(this).attr('checked')) {
-
         notVal.watchSocial(itemName);
-
       } else {
-
         notVal.unwatchSocial(itemName);
       }
 
 
     });
-
-
 
 
 

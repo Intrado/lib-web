@@ -3,6 +3,8 @@
     // Instead of using $ we use j
     j = jQuery;
 
+    var self = this;
+
     this.watchSection = function(section) {
 
       var reqFields   = j('#'+section+' .required');
@@ -56,7 +58,8 @@
 
     this.watchSocial = function(section) {
 
-      console.log('watchSocial');
+        checkSocial(section);
+
       j('div[data-social='+section+'] input, div[data-social='+section+'] textarea').on('keyup', function() {
         checkSocial(section);
       });
@@ -65,31 +68,47 @@
 
     this.unwatchSocial = function(section) {
 
-      console.log('unwatchSocial');
-      //j('div[data-social='+section+'] input, div[data-social='+section+'] textarea').off()
-      
-      clearSocial(section);
-    
+      var reqFields   = j('div[data-social='+section+'] .required');
+
+      j.each(reqFields, function(index, ele) {
+        j(ele).val('');
+
+      });
+
+      checkSocial(section);
 
     }
 
     checkSocial = function(section) {
 
-      var reqFields   = j('div[data-social='+section+'] .required');
+      // for each input.social thats checked run test
+      var socialInputs  = j('input.social:checked');
 
       var reqCount    = 0;
-      var reqAmount   = parseInt(reqFields.length);
+      var reqAmount   = 0;
 
-      j.each(reqFields, function(index, ele) {
-        if (j(ele).val() != "") {
-          reqCount++;
-        } else if (reqCount != 0) {
-          reqCount--;
-        }
+      j.each(socialInputs, function(sIndex, sEle) {
+
+        var itemName = j(sEle).attr('id').split('_')[2];
+
+        var reqFields   = j('div[data-social='+itemName+'] .required');
+
+        reqAmount = reqAmount + reqFields.length;
+
+
+        j.each(reqFields, function(index, ele) {
+          if (j(ele).val() != "") {
+            reqCount++;
+          } else if (reqCount != 0) {
+            reqCount--;
+          }
+
+        });
 
       });
 
-      if (reqCount == reqAmount) {
+
+      if (reqCount > 0 && reqAmount > 0 && reqCount == reqAmount) {
         j('#msgsndr_tab_social button.btn_save').removeAttr('disabled');
       } else {
         j('#msgsndr_tab_social button.btn_save').attr('disabled','disabled');
@@ -97,18 +116,6 @@
 
     }
 
-    clearSocial = function(section) {
-
-      var reqFields   = j('div[data-social='+section+'] .required');
-
-      j.each(reqFields, function(index, ele) {
-        console.log(j(ele).val());
-        j(ele).val('');
-
-      });
-
-
-    }
 
 
     /* 
@@ -139,6 +146,10 @@
       j('#msgsndr_tab_'+el).hide();
 
       j('input[name=has_'+el+']').val(1);
+
+
+      // Set Message tabs on review tab
+      j('#msgsndr_review_'+el).parent().addClass('complete');
 
 
     } // saveBtn
