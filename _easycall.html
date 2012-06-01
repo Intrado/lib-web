@@ -44,11 +44,16 @@
 		<script type="text/javascript">
 			$(document).ready(function(){
 				$("#easycall").attachEasyCall({"languages": {"en":"Default","es":"Spanish","ca":"Catalan"}});
+				
+				$("#easycall").change(function (event) {
+					$("#validationdata").empty().append($(this).val());
+				});
 			});
 		</script>
 		<title>Demo</title>
 	</head>
 	<body>
-		<input type="text" id="easycall" />
+		<input type="hidden" value="{}" id="easycall" />
+		<pre id="validationdata"></pre>
 	</body>
 </html>
