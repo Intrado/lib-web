@@ -42,5 +42,23 @@ if(isset($ERRORS) && is_array($ERRORS)) {
 }
 ?>
 
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js" type="text/javascript" ></script>
+<script>
+jQuery(function() {
+	jQuery("#form_textme").click(function() {
+		if(jQuery(this).is(":checked")) {
+			jQuery("#form_phone").removeAttr("disabled");
+			jQuery("#form_phone").removeClass("disabled");
+			jQuery("#label_phone").removeClass("disabled");
+		} else {
+			jQuery("#form_phone").attr("disabled", "true");
+			jQuery("#form_phone").addClass("disabled");
+			jQuery("#label_phone").addClass("disabled");
+		}
+	});
+})
+</script>
+
 </body>
 </html>
