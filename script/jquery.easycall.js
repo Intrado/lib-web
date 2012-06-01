@@ -33,7 +33,7 @@
 			// DOM rendering methods
 			// set up the easycall elements, hiding the intial input element
 			init: function () {
-				//$this.hide();
+				$this.hide();
 				// destroy all the easycall DOM containers (if there are any)
 				if (easycalldata.maincontainer !== false)
 					$("." + easycalldata.maincontainer).detach();
@@ -60,8 +60,7 @@
 			createCallMeContainer: function(hasmenu) {
 				var container = $('<div />', { "class": "easycallcallmecontainer"});
 				var phoneinput = $('<input />', { "class": "easycallphoneinput", "type": "text" });
-				//var callbutton = $('<a />', { "class": "easycallcallnowbutton", "href": "#", "text": "Call Now to Record" });
-				var callbutton = $('#ctrecord');
+				var callbutton = $('<a />', { "class": "easycallcallnowbutton", "href": "#", "text": "Call Now to Record" });
 				
 				if (hasmenu) {
 					// create a multiselect with remaining languages in it.
@@ -89,7 +88,7 @@
 					method.doCall(code);
 				});
 				
-				//container.append(phoneinput).append(callbutton);
+				container.append(phoneinput).append(callbutton);
 				return container;
 			},
 			
@@ -106,28 +105,36 @@
 				
 				
 				rerecordbutton.click(function(){
-					var subcontainer = easycalldata.subcontainer[code];
+					// clean up the old subcontainers
+					easycalldata.subcontainer[code].remove();
 					easycalldata.subcontainer[code] = false;
+					
+					// remove existing call containers, we can only have one shown at a time
+					var callmecontainers = easycalldata.maincontainer.children(".easycallcallmecontainer");
+					var hasdefaultcallmecontainer = false;
+					$.each(callmecontainers, function (index) {
+						// leave behind the default... remember that it exists
+						if ($(callmecontainers[index]).children(".easycallselectmenu").length == 0)
+							hasdefaultcallmecontainer = true;
+						else
+							$(callmecontainers[index]).remove();
+					});
 					
 					// get a new callme container!
 					var callmecontainer = false;
-					if (code == easycalldata.default)
+					if (code == easycalldata.default) {
 						callmecontainer = method.createCallMeContainer(false);
-					else
-						callmecontainer = method.createCallMeContainer(true);
-					
-					// above HAS to return a container, we just invalidated one!
-					callmecontainer.insertAfter(subcontainer);
-					
-					// clean up the old subcontainers
-					subcontainer.remove();
-
+						easycalldata.subcontainer[code] = callmecontainer;
+						easycalldata.maincontainer.prepend(callmecontainer);
+					} else {
+						if (!hasdefaultcallmecontainer)
+							easycalldata.maincontainer.append(method.createCallMeContainer(true));
+					}
 				});
 				
 				container.append(languagetitle).append(previewbutton).append(rerecordbutton);
 				
 				return container;
-				
 			},
 			
 			createProgressContainer: function() {
@@ -146,8 +153,7 @@
 			doCall: function (code) {
 				var langdiv = easycalldata.subcontainer[code];
 				// get the phone number
-				//var phone = langdiv.children(".easycallphoneinput").val();
-				var phone = $this.val();
+				var phone = langdiv.children(".easycallphoneinput").val();
 				
 				// validate the phone
 				var valid = method.validatePhone(phone);
@@ -160,8 +166,6 @@
 				var progresstext = progresscontainer.children(".easycallprogresstext");
 				
 				progresstext.empty().append("Calling: " + phone);
-
-				$('#ctrecord').hide();
 				
 				langdiv.empty();
 				langdiv.append(progresscontainer);
