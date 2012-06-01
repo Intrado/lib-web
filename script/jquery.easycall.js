@@ -24,6 +24,11 @@
 					easycalldata.specialtaskid[code] = false;
 					easycalldata.timer[code] = false;
 				});
+				if (options.phonemindigits)
+					easycalldata.phonemindigits = options.phonemindigits;
+
+				if (options.phonemaxdigits)
+					easycalldata.phonemaxdigits = options.phonemaxdigits;
 			}
 		}
 		// TODO: load existing values from attached input
@@ -92,12 +97,14 @@
 				return container;
 			},
 			
-			createPreviewContainer: function(code, audiofileid) {
+			createPreviewContainer: function(code) {
 				var container = $('<div />', { "class": "easycallpreviewcontainer"});
 				var languagetitle = $('<div />', { "class": "easycalllanguagetitle", "text": easycalldata.language[code] });
 				var previewbutton = $('<input />', { "class": "easycallpreviewbutton", "type": "button", "value": "Preview" });
 				var rerecordbutton = $('<input />', { "class": "easycallrerecordbutton", "type": "button" });
-
+				
+				var audiofileid = easycalldata.recording[code];
+				
 				if (code == easycalldata.default)
 					rerecordbutton.val("Re-record");
 				else
@@ -110,9 +117,13 @@
 				
 				
 				rerecordbutton.click(function(){
-					// clean up the old subcontainers
+					// TODO: Confirm deletion of message
+					
+					// clean up the old data for this code
 					easycalldata.subcontainer[code].remove();
 					easycalldata.subcontainer[code] = false;
+					easycalldata.recording[code] = false;
+					method.updateParentElement();
 					
 					// remove existing call containers, we can only have one shown at a time
 					var callmecontainers = easycalldata.maincontainer.children(".easycallcallmecontainer");
@@ -190,6 +201,17 @@
 								easycalldata.timer.stop();
 								// save audiofile
 								method.doSaveAudioFile(code);
+								
+								// create and load the preview container
+								var previewcontainer = method.createPreviewContainer(code);
+								previewcontainer.insertAfter(easycalldata.subcontainer[code]);
+								easycalldata.subcontainer[code].remove();
+								easycalldata.subcontainer[code] = previewcontainer;
+								
+								// create a new call me container 
+								var callmecontainer = method.createCallMeContainer(true);
+								if (callmecontainer !== false)
+									easycalldata.maincontainer.append(callmecontainer);
 							}
 							if (status.error) {
 								easycalldata.timer.stop();
@@ -213,18 +235,23 @@
 					var audiofileid = data.audiofileid;
 					easycalldata.recording[code] = audiofileid;
 					
-					// TODO: update json data in parent input field
+					method.updateParentElement();
 					
-					var previewcontainer = method.createPreviewContainer(code, audiofileid);
-					previewcontainer.insertAfter(easycalldata.subcontainer[code]);
-					easycalldata.subcontainer[code].remove();
-					easycalldata.subcontainer[code] = previewcontainer;
-					
-					// create a new call me container 
-					var callmecontainer = method.createCallMeContainer(true);
-					if (callmecontainer !== false)
-						easycalldata.maincontainer.append(callmecontainer);
 				},"json");
+			},
+			
+			updateParentElement: function () {
+				// update json data in parent input field
+				var itemdata = {};
+				$.each(easycalldata.recording, function (code) {
+					if (easycalldata.recording[code] !== false)
+						itemdata[code] = easycalldata.recording[code]
+				});
+				easycalldata.element.val($.toJSON(itemdata));
+				
+				// data was changed. trigger a change event on the parent element
+				var updateevent = jQuery.Event("change");
+				easycalldata.element.trigger(updateevent);
 			},
 			
 			// read the return status and provide appropriate error handling messages
