@@ -98,7 +98,7 @@ border-top: 1px solid #ccc; border-right: 1px solid #ccc; border-bottom: none; b
 
 .newform .formtitle { float: left; display: inline; width: 165px; padding: 4px 0; text-align: right; }
 .newform .formtitle .formlabel { font-weight: bold; font-size: 1.1em; line-height: 16px; }
-.newform .formtitle .formicon {  }
+.newform .formtitle .formicon { margin: -3px 0 0; }
 
 .newform .formcontrol { margin: 0 0 0 175px; }
 .newform .formcontrol h3 { margin: 0 0 15px 0; }
