@@ -346,8 +346,8 @@ h3.flag { padding: 5px 22px; font-size: 18px; color: #fff; border: 1px solid #22
 .add_recipients { margin: 0 0 20px 0; padding: 20px; border: 1px solid #ccc; -webkit-border-radius: 0 0 5px 5px; border-radius: 0 0 5px 5px; }
 .add_recipients form { border: none; }
 .tab_panel { background: #fafafa; padding: 5px 0 0; border: 1px solid #ccc; -webkit-border-radius: 8px; border-radius: 8px; }
-.social_tab { border-top: 1px solid #ddd; }
-.social_tab:first-child { border: none; }
+.social_tab { border-bottom: 1px solid #ddd; }
+.social_tab:last-child { border: none; }
 .add_btn { margin: 0 0 20px 0; }
 
 
@@ -400,8 +400,8 @@ border-color: #222222 transparent transparent; border-style: solid; border-width
 .tab_panel form { border-radius: 8px; }
 
 .msg_complete { list-style-type: none; margin: 5px 0; padding: 0; }
-.msg_complete li { position: relative; float: left; display: inline; width: 24%; opacity: 0.5; }
-.msg_complete li:hover { opacity: 1; }
+.msg_complete li { position: relative; float: left; display: inline; width: 24%; opacity: 1; }
+.msg_complete li:hover { opacity: 0.8; }
 .msg_complete li a { display: block; background: #f5f5f5; margin: 0 10px 0 0; padding: 9px 14px; font-size: 20px; font-weight: bold; color: #444; border-radius: 5px; border: 1px solid #ccc; }
 .msg_complete li a:hover { color: #444; text-decoration: none; }
 .msg_complete li.complete a { background: #499122; color: #fbfbfb; text-shadow: 0 1px 1px #222; border: 1px solid #3A7A17; 
@@ -511,6 +511,9 @@ button:active, button.active, .btn:active, .btn.active { background-color: #d9d9
   background-size: 40px 40px;
   width: 223px;
   color: #fff;
+  padding: 5px 10px; 
+  line-height: 19px;
+  text-align: center;
 }
 
 .call-progress:hover {
