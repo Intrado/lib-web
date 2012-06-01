@@ -1,4 +1,3 @@
-  function globalValidationFunctions() {
 
     // Instead of using $ we use j
     j = jQuery;

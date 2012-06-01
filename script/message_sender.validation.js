@@ -407,8 +407,7 @@ jQuery.noConflict();
         } 
 
       } // for
-        
-
+      
     } // form_val function
 
 

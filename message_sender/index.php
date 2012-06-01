@@ -640,9 +640,9 @@ include("nav.inc.php");
 <script src="script/jquery.json-2.3.min.js"></script>
 
 
-<script src="themes/newui/message_sender.js"></script>
-<script src="themes/newui/notification_validation.js"></script>
-<script src="themes/newui/notification_global.js"></script>
+<script src="script/message_sender.js"></script>
+<script src="script/message_sender.validation.js"></script>
+<script src="script/message_sender.global.js"></script>
 
 
 <script src="script/bootstrap-modal.js"></script>
