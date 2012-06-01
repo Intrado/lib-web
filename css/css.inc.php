@@ -378,7 +378,7 @@ ul.actionlinks li img { padding: 0 4px; }
 .actionlinks a { display: inline-block; }
 .actionlinks a:last-child { border: none; }
 .actionlinks a:hover { color: #000; }
-.actionlink { padding: 0 5px 0 20px; font-size: 11px; line-height: 18px; cursor: pointer; color: #484848; }
+.actionlink { padding: 1px 5px 1px 20px; font-size: 11px; line-height: 18px; cursor: pointer; color: #484848; }
 .actionlink img { display: none; padding: 0 4px 0 0; }
 
 .Edit_link { background: url(img/icons/pencil.png) 0 0 no-repeat; }
