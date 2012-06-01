@@ -60,7 +60,7 @@
 			createCallMeContainer: function(hasmenu) {
 				var container = $('<div />', { "class": "easycallcallmecontainer"});
 				var phoneinput = $('<input />', { "class": "easycallphoneinput", "type": "text" });
-				var callbutton = $('<a />', { "class": "easycallcallnowbutton", "href": "#", "text": "Call Now to Record" });
+				var callbutton = $('<input />', { "class": "easycallcallnowbutton", "type": "button", "value": "Call Now to Record" });
 				
 				if (hasmenu) {
 					// create a multiselect with remaining languages in it.
@@ -95,9 +95,14 @@
 			createPreviewContainer: function(code, audiofileid) {
 				var container = $('<div />', { "class": "easycallpreviewcontainer"});
 				var languagetitle = $('<div />', { "class": "easycalllanguagetitle", "text": easycalldata.language[code] });
-				var previewbutton = $('<a />', { "class": "easycallpreviewbutton", "href": "#", "text": "Preview" });
-				var rerecordbutton = $('<a />', { "class": "easycallrerecordbutton", "href": "#", "text": "Re-Record" });
+				var previewbutton = $('<input />', { "class": "easycallpreviewbutton", "type": "button", "value": "Preview" });
+				var rerecordbutton = $('<input />', { "class": "easycallrerecordbutton", "type": "button" });
 
+				if (code == easycalldata.default)
+					rerecordbutton.val("Re-record");
+				else
+					rerecordbutton.val("Remove");
+				
 				// TODO: functional preview button
 				previewbutton.click(function(){
 					alert("AUDIOFILEID " + audiofileid + " PREVIEW!!!");
