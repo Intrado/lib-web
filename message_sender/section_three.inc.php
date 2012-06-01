@@ -6,25 +6,19 @@
 			
 			<h3 class="flag">Review Message</h3>			
 			<div class="field_wrapper">
-				<fieldset>
-				<label>Subject</label>
-					<div class="controls">
-						<p>Holidays Reminder</p>
-					</div>
+				<fieldset class="review_subject">
+					<label>Subject</label>
+					<p>Holidays Reminder</p>
 				</fieldset>
 				
-				<fieldset>
+				<fieldset class="review_type">
 					<label>Type</label>
-					<div class="controls">
-						<p>General Annoucement</p>
-					</div>
+					<p>General Annoucement</p>
 				</fieldset>
 				
-				<fieldset>
+				<fieldset class="review_count">
 					<label>Recipients</label>
-					<div class="controls">
-						<p>2000</p>
-					</div>
+					<p>2000</p>
 				</fieldset>
 				
 				<fieldset>
@@ -32,16 +26,16 @@
 					<div class="controls">
 						<ul class="msg_complete cf">
 							<li class="none">
-								<a id="msgsndr_ctrl_phone" href="#"><span class="icon"></span> Phone</a>
+								<a id="msgsndr_review_phone" href="#"><span class="icon"></span> Phone</a>
 							</li>
 							<li class="none">
-								<a id="msgsndr_ctrl_email" href="#"><span class="icon"></span> Email</a>
+								<a id="msgsndr_review_email" href="#"><span class="icon"></span> Email</a>
 							</li>
 							<li class="none">
-								<a id="msgsndr_ctrl_sms" href="#"><span class="icon"></span> SMS</a>
+								<a id="msgsndr_review_sms" href="#"><span class="icon"></span> SMS</a>
 							</li>
 							<li class="none">
-								<a id="msgsndr_ctrl_social" href="#"><span class="icon"></span> Social</a>
+								<a id="msgsndr_review_social" href="#"><span class="icon"></span> Social</a>
 							</li>
 						</ul>
 					</div>
@@ -71,18 +65,16 @@
 			<h3 class="flag">Schedule Message</h3>			
 			<div class="field_wrapper">
 				<fieldset class="cf">
-					<label for="msgsndr_form_type">Start Date</label>
+					<label for="msgsndr_form_startdate">Start Date</label>
 					<div class="controls">
-						<select id="msgsndr_form_type" name="type">
-							<option>05/30/2012</option>
-						</select>
+						<input type="text" name="msgsndr_form_startdate" id="msgsndr_form_startdate" />
 					</div>
 				</fieldset>
 				
 				<fieldset class="cf">
-					<label for="form_days">Days to run</label>
+					<label for="msgsndr_form_daystorun">Days to run</label>
 					<div class="controls">
-						<select id="form_days" name="type">
+						<select id="msgsndr_form_daystorun" name="type">
 							<option>1</option>
 							<option>2</option>
 							<option>3</option>
@@ -95,9 +87,9 @@
 				</fieldset>
 				
 				<fieldset class="cf">
-					<label for="msgsndr_form_type">Start Time</label>
+					<label for="msgsndr_form_starttime">Start Time</label>
 					<div class="controls">
-						<select id="msgsndr_form_type" name="type">
+						<select id="msgsndr_form_starttime" name="type">
 							<option>8.00am</option>
 							<option>10.00am</option>
 							<option>12.00am</option>
@@ -108,9 +100,9 @@
 				</fieldset>
 				
 				<fieldset class="cf">
-					<label for="msgsndr_form_type">End Time</label>
+					<label for="msgsndr_form_endtime">End Time</label>
 					<div class="controls">
-						<select id="msgsndr_form_type" name="type">
+						<select id="msgsndr_form_endtime" name="type">
 							<option>8.00pm</option>
 							<option>9.00pm</option>
 							<option>10.00pm</option>
