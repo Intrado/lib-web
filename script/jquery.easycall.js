@@ -3,7 +3,7 @@
 		var $this = this;
 		var easycalldata = $this.data('easyCall');
 
-		// NOTE: re-init with different language list will cause them to be ignored
+		// NOTE: re-init with different options will ignore new options
 		if (!easycalldata) {
 			easycalldata = {
 				"element": this,
@@ -15,7 +15,8 @@
 				"timer": false,
 				"default": "en",
 				"phonemindigits": 10,
-				"phonemaxdigits": 10};
+				"phonemaxdigits": 10,
+				"defaultphone": ""};
 			if (options.languages) {
 				$.each(options.languages, function(code) {
 					easycalldata.subcontainer[code] = false;
@@ -24,14 +25,29 @@
 					easycalldata.specialtaskid[code] = false;
 					easycalldata.timer[code] = false;
 				});
-				if (options.phonemindigits)
-					easycalldata.phonemindigits = options.phonemindigits;
-
-				if (options.phonemaxdigits)
-					easycalldata.phonemaxdigits = options.phonemaxdigits;
 			}
+			if (options.phonemindigits)
+				easycalldata.phonemindigits = options.phonemindigits;
+			if (options.phonemaxdigits)
+				easycalldata.phonemaxdigits = options.phonemaxdigits;
+			if (options.defaultphone)
+				easycalldata.defaultphone = options.defaultphone;
 		}
-		// TODO: load existing values from attached input
+		
+		// load existing values from attached input
+		var elementval = this.val();
+		if (elementval == "")
+			elementdata = {};
+		else
+			elementdata = $.secureEvalJSON(elementval);
+		$.each(elementdata, function (code) {
+			// do a sanity check, then stuff the value in the recordings list
+			if (easycalldata.language[code])
+				easycalldata.recording[code] = elementdata[code];
+		});
+		
+		// debug data
+		$("#validationdata").empty().append($.toJSON(easycalldata));
 
 		var method = {
 			//============================================================================================
@@ -50,13 +66,29 @@
 				
 				var initdiv = $('<div />', { "class": "easycallmaincontainer" });
 				easycalldata.maincontainer = initdiv;
-				
-				// TODO: add sub-containers for pre-recorded languages
-				
-				// add the default call container
-				var subcontainer = method.createCallMeContainer(false);
+
+				// add sub-containers for pre-recorded languages
+				var subcontainer = false;
+				// always add the default first
+				if (easycalldata.recording[easycalldata.default] !== false) {
+					subcontainer = method.createPreviewContainer(easycalldata.default);
+					// added the default preview, so add a new call me container with menu also
+					initdiv.append(method.createCallMeContainer(true));
+				} else {
+					// add the default callme container
+					subcontainer = method.createCallMeContainer(false);
+				}
 				easycalldata.subcontainer[easycalldata.default] = subcontainer;
-				initdiv.append(subcontainer);
+				initdiv.prepend(subcontainer);
+				
+				// add all others which have recordings
+				$.each(easycalldata.recording, function (code) {
+					if (code != easycalldata.default && easycalldata.recording[code] !== false) {
+						subcontainer = method.createPreviewContainer(code);
+						easycalldata.subcontainer[code] = subcontainer;
+						initdiv.append(subcontainer);
+					}
+				});
 				
 				initdiv.insertAfter(easycalldata.element);
 			},
@@ -65,7 +97,7 @@
 			createCallMeContainer: function(hasmenu) {
 				var container = $('<div />', { "class": "easycallcallmecontainer"});
 				var phoneinput = $('<input />', { "class": "easycallphoneinput small", "type": "text" });
-				var callbutton = $('<input />', { "class": "easycallcallnowbutton record", "type": "button", "value": "Call Now to Record" });
+				var callbutton = $('<button />', { "class": "easycallcallnowbutton record", "value": "Call Now to Record" });
 				callbutton.append($('<span />', { "class": "icon" })).append("Call Now to Record");
 				
 				if (hasmenu) {
@@ -101,15 +133,16 @@
 			createPreviewContainer: function(code) {
 				var container = $('<div />', { "class": "easycallpreviewcontainer"});
 				var languagetitle = $('<div />', { "class": "easycalllanguagetitle", "text": easycalldata.language[code] });
-				var previewbutton = $('<input />', { "class": "easycallpreviewbutton", "type": "button", "value": "Preview" });
-				var rerecordbutton = $('<input />', { "class": "easycallrerecordbutton", "type": "button" });
+				var previewbutton = $('<button />', { "class": "easycallpreviewbutton" });
+				previewbutton.append($('<span />', { "text": "Preview" }))
+				var removebutton = $('<button />', { "class": "easycallrerecordbutton" });
 				
 				var audiofileid = easycalldata.recording[code];
 				
 				if (code == easycalldata.default)
-					rerecordbutton.val("Re-record");
+					removebutton.append($('<span />', { "text": "Re-record" }));
 				else
-					rerecordbutton.val("Remove");
+					removebutton.append($('<span />', { "text": "Remove" }));
 				
 				// TODO: functional preview button
 				previewbutton.click(function(){
@@ -117,7 +150,7 @@
 				});
 				
 				
-				rerecordbutton.click(function(){
+				removebutton.click(function(){
 					// TODO: Confirm deletion of message
 					
 					// clean up the old data for this code
@@ -149,7 +182,7 @@
 					}
 				});
 				
-				container.append(languagetitle).append(previewbutton).append(rerecordbutton);
+				container.append(languagetitle).append(previewbutton).append(removebutton);
 				
 				return container;
 			},
