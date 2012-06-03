@@ -43,8 +43,13 @@
 		<script type="text/javascript" src="script/jquery.easycall.js"></script>
 		<script type="text/javascript">
 			$(document).ready(function(){
+				// stuff some example data into the element
+				$("#easycall").val($.toJSON({"en":"456"}));
+				
+				// attach the easycall plugin
 				$("#easycall").attachEasyCall({"languages": {"en":"Default","es":"Spanish","ca":"Catalan"}});
 				
+				// observe change events on the value of the element and stick the value into a debug area
 				$("#easycall").change(function (event) {
 					$("#validationdata").empty().append($(this).val());
 				});
@@ -53,7 +58,7 @@
 		<title>Demo</title>
 	</head>
 	<body>
-		<input type="hidden" value="{}" id="easycall" />
+		<input type="hidden" value="" id="easycall" />
 		<pre id="validationdata"></pre>
 	</body>
 </html>
