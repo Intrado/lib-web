@@ -79,6 +79,9 @@ jQuery.noConflict();
 		// Add myself toggle 
 		$('#msgsndr_form_myself').on('click', function() {
 
+			// call the populate lists function to add the lists id's in
+			populateRecipientIdList();
+
 			$('#addme').slideToggle('slow', function() {
 				$('#msgsndr_form_mephone').focus();
 			});
@@ -152,6 +155,26 @@ jQuery.noConflict();
 
 
 
+/*                                       *\
+  lists -- to be replaced by listbuilder
+\*****************************************/
+
+
+    // list id populator ...
+    function populateRecipientIdList() {
+      var listContainer = [];
+
+      $(".list_row", "#msgsndr_list_info_tbody").each(function() {
+        listContainer.push($(this).attr("data-id"));
+      });
+
+      if($("#msgsndr_form_myself").is(":checked")) {
+        listContainer.push("addme");
+      }
+
+      var listStr = listContainer.join(",");
+      $("#list_ids").val(listStr);
+    };
 
 
 		// get the available lists from lists.php
@@ -210,7 +233,7 @@ jQuery.noConflict();
     			$('#msgsndr_list_info_tbody').append('<tr class="list_row" data-id="' + listId + '"><td><a id="' + listId + '" class="removelist" title="Remove List"></a><a id="' + listId + '" class="savelist" title="Save List"></a></td><td>' + listTitle + '</td><td>[count]</td></tr>');
     			// listHtml.clone().appendTo('#msgsndr_list_choices'); // clone the input in the msgsndr_list_choices fieldset 
 
-    			$('#list_ids').val(listId);
+    			//$('#list_ids').val(listId);
 
     			listHtml.attr('disabled', true); // set the checkbox to disabled so users can't choose a list twice
     		}

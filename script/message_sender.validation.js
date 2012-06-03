@@ -25,7 +25,7 @@ jQuery.noConflict();
       social:{ }
     };
 
-    // Inital Call
+    // Initial Call
     $.ajax({
         url: '/'+orgPath+'/api/2/users/'+userid+'/roles',
         type: "GET",
@@ -40,6 +40,8 @@ jQuery.noConflict();
     /* --
       The setUp function will do alot of the inital work, and call other functions based on users roles
     -- */
+
+
 
     function setUp(roleData) {
       if(!$.isArray(roleData)) {
@@ -63,7 +65,7 @@ jQuery.noConflict();
       // console.log("userPermissions: " + userPermissions);
 
       if(userRoleId == false) {
-        alert("error: user doesnt have permissions for current organization");
+        alert("error: user doesn't have permissions for current organization");
         return false;
       }
 
@@ -122,8 +124,9 @@ jQuery.noConflict();
 
       }
 
-    }
+    }; 
 
+  
 
     function step1() {
       
@@ -136,7 +139,7 @@ jQuery.noConflict();
 
       watchFields('#msgsndr_form_subject');
 
-    }
+    };
 
     function sendPhone() {
 
@@ -150,9 +153,9 @@ jQuery.noConflict();
       watchFields('#msgsndr_form_number');
 
       // Easy Call jQuery Plugin
-      $("#msgsndr_form_number").attachEasyCall({"languages": {"en":"English","es":"Spanish","ca":"Catalan"}});
+      $("#msgsndr_form_number").attachEasyCall({"languages": {"en":"English","es":"Spanish","ca":"Catalan"}});   
 
-    }
+    };
 
     function sendEmail() {
 
@@ -179,7 +182,7 @@ jQuery.noConflict();
 
       watchFields('#msgsndr_form_name, #msgsndr_form_email, #msgsndr_form_mailsubject, #msgsndr_form_body');
 
-    }
+    };
 
     function sendSMS() {
 
@@ -200,7 +203,7 @@ jQuery.noConflict();
         charCount(this, '160', '.sms.characters');
       });
 
-    }
+    };
 
     function socialFB() {
 
@@ -211,7 +214,7 @@ jQuery.noConflict();
         charCount(this, '420', '.fb.characters');
       });
 
-    }
+    };
 
     function socialTwitter() {
 
@@ -225,7 +228,7 @@ jQuery.noConflict();
         charCount(this, twitterCharCount, '.twit.characters');
       });
 
-    }
+    };
 
     function socialFeed() {
 
@@ -250,7 +253,7 @@ jQuery.noConflict();
       });   
 
 
-    }
+    };
 
 
 
@@ -260,7 +263,7 @@ jQuery.noConflict();
     });
 
 
-    // Wathc Email Form
+    // Watch Email Form
     $('#msgsndr_tab_email .required').on('keyup', function() {
       notVal.watchContent('msgsndr_tab_email');
     });
@@ -310,7 +313,7 @@ jQuery.noConflict();
 
       console.log($('form[name=broadcast]').serializeArray());
 
-    })
+    });
 
 
 
@@ -327,7 +330,7 @@ jQuery.noConflict();
         formVal(elem);
       });
 
-    }
+    };
 
     function formVal(element) {
 
@@ -441,7 +444,7 @@ jQuery.noConflict();
       } // for
         
 
-    } // form_val function
+    }; // form_val function
 
 
 
@@ -461,10 +464,46 @@ jQuery.noConflict();
     }
 
 
-  /*
-   Message Groups, messages and message parts
-  \******************************************/
+    // get user preferences ...
+    function getUserPrefs(){
+      var userPrefs = {};
+       $.ajax({
+        url: '/'+orgPath+'/api/2/users/'+userid+'/preferences',
+        type: "GET",
+        dataType: "json",
+        success: function(data) {
+          $.each(data.preferences, function(uIndex, uPrefs){
+            userPrefs[uPrefs.name] = uPrefs.value;
+          });
+        }
+      });
+      return userPrefs;
+    };
 
+    
+
+    // get caller id's ... WIP -- userRoleId not defined outside the setUp function
+    /*
+    function getCallerIds(){
+      var callerIds = {};
+       $.ajax({
+        url: '/'+orgPath+'/api/2/users/'+userid+'/roles/'+userRoleId+'/settings/callerids/',
+        type: "GET",
+        dataType: "json",
+        success: function(data) {
+          $.each(data.callerids, function(cIndex, cIds){
+            callerIds[cIds.name] = cIds.value;
+          });
+        }
+      });
+      return callerIds;
+    };  
+
+    console.log(getCallerIds());
+    */
+
+
+    // get message group data ...
     function getMessageGroups() {
       $.ajax({
         url: '/'+orgPath+'/api/2/users/'+userid+'/messagegroups',
@@ -509,21 +548,82 @@ jQuery.noConflict();
       });   
     };
 
+
     // load the messages into the modal dialog.
     getMessageGroups();
 
-    // get messages based on message id from message group (WIP)
-    function getMessages(msgid){
+
+
+    // get messages based on message id from message group
+    function getMessages(msgGrpId){
+      var messages = {};
       $.ajax({
-        url: '/'+orgPath+'/api/2/users/'+userid+'/messagegroups/'+msgid+'/messages',
+        url: '/'+orgPath+'/api/2/users/'+userid+'/messagegroups/'+msgGrpId+'/messages',
         type: "GET",
         dataType: "json",
         success: function(data) {
-          var messages = (data.messages);
+          $.each(data.messages, function(mIndex, mData){
+            messages[mData.name] = mData.value;
+          });
         }
       });
+      return messages;
     };
 
+    
+    // get message parts based on message id from message group
+    function getMessageParts(msgGrpId){
+      var parts = {};
+      $.ajax({
+        url: '/'+orgPath+'/api/2/users/'+userid+'/messagegroups/'+msgGrpId+'/messageparts',
+        type: "GET",
+        dataType: "json",
+        success: function(data) {
+          $.each(data.messageparts, function(mIndex, mData){
+            parts[mData.name] = mData.value;
+          });
+        }
+      });
+      return parts;
+    };
+
+
+    // get formatted message parts based on message id from message group
+    function getMessagePartsFormatted(msgGrpId){
+      var partsFormatted = false;
+      $.ajax({
+        url: '/'+orgPath+'/api/2/users/'+userid+'/messagegroups/'+msgGrpId+'/messageparts/formatted',
+        type: "GET",
+        dataType: "json",
+        success: function(data) {
+          $.each(data.messageparts, function(mIndex, mData){
+            partsFormatted[mData.name] = mData.value;
+          });
+        }
+      });
+      return partsFormatted;
+    };
+
+
+    // get message attachments based on message group id and message id
+    function getMessageAttachment(msgGrpId, msgId){
+      var attachments = {};
+      $.ajax({
+        url: '/'+orgPath+'/api/2/users/'+userid+'/messagegroups/'+msgGrpId+'/message/'+msgId+'/messageattachments',
+        type: "GET",
+        dataType: "json",
+        success: function(data) {
+          $.each(data.messageAttachments, function(mIndex, mData){
+            attachments[mData.name] = mData.value;
+          });
+        }
+      });
+      return attachments;
+    };
+
+
+
+    // load the message ... (WIP: currently this only displays the messagegroup name on the page and closes the modal)
     $('#messages_list').on('click', 'tr', function(){
       $('td:first input:radio[name=msgsndr_msggroup]', this).attr('checked', 'checked');
     });
