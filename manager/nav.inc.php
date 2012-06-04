@@ -1,4 +1,10 @@
 <?
+
+if (isset($_SESSION["newnav"])) {
+	include("newnav.inc.php");
+	return;
+}
+
 header('Content-type: text/html; charset=UTF-8') ;
 
 if ($MANAGERUSER->preference("favcustomers"))
@@ -28,11 +34,11 @@ if (isset($_GET['monitor'])) {
 	<script src="script/utils.js"></script>
 	<script src="script/sorttable.js"></script>
 	<script src="script/form.js.php" type="text/javascript"></script>
-	<link href="css.php" type="text/css" rel="stylesheet" media="screen, print">
-	<link href="css/form.css.php" type="text/css" rel="stylesheet">
-	<link href="css/datepicker.css.php" type="text/css" rel="stylesheet">
-	<link href="css/prototip.css.php" type="text/css" rel="stylesheet">
-	<link href="css/style_print.css" type="text/css" rel="stylesheet" media="print">
+	<link href="css.php" type="text/css" rel="stylesheet" media="screen, print" />
+	<link href="css/form.css.php" type="text/css" rel="stylesheet" />
+	<link href="css/datepicker.css.php" type="text/css" rel="stylesheet" />
+	<link href="css/prototip.css.php" type="text/css" rel="stylesheet" />
+	<link href="css/style_print.css" type="text/css" rel="stylesheet" media="print" />
 	
 
 	<!--[if lte IE 6]>
@@ -56,7 +62,7 @@ if (isset($_GET['monitor'])) {
 <!-- ********************************************************************* -->
 
 <div class="manager_logo">
-	<image src="manager.png" alt="ASP Manager"/>
+	<img src="manager.png" alt="ASP Manager"  onclick="window.location='allcustomers.php?newnav=true'"/>
 </div>
 
 
