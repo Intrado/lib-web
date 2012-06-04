@@ -430,7 +430,7 @@ table#addMeWindow input[type="checkbox"] { margin: 7px 0; }
 
 /*---------- Message sender form ----------*/
 
-.msg_content_nav li.notactive { display: none; }
+li.notactive { display: none; }
 .hidden { display: none;}
 
 .window_panel {  }
