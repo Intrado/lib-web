@@ -167,22 +167,27 @@
 				return container;
 			},
 			
-			createProgressContainer: function() {
+			createProgressContainer: function(code) {
 				var container = $('<div />', { "class": "easycallprogresscontainer"});
+				var languagetitle = $('<div />', { "class": "easycalllanguagetitle", "text": easycalldata.language[code] });
 				var progresstext = $('<div />', { "class": "call-progress" });
 				progresstext.append($('<span />', { "class": "icon" })).append($('<span />', { "class": "easycallprogresstext" }))
 				
-				container.append(progresstext);
+				container.append(languagetitle).append(progresstext);
 				
 				return container;
 			},
 			
 			// create a container for error states with a reset button
-			createErrorContainer: function(code) {
+			createErrorContainer: function(code, errortext) {
 				var container = $('<div />', { "class": "easycallerrorcontainer"});
+				var languagetitle = $('<div />', { "class": "easycalllanguagetitle", "text": easycalldata.language[code] });
 				var resetbutton = $('<button />', { "class": "easycallerrorbutton" });
 				resetbutton.append($('<span />', { "class": "icon" })).append($('<span />').append("Retry"));
-				container.append($('<span />', { "class": "icon" })).append($('<span />', { "class": "easycallerrortext" })).append(resetbutton);
+				container.append(languagetitle)
+						.append($('<span />', { "class": "icon" }))
+						.append($('<span />', { "class": "easycallerrortext" }).append(errortext))
+						.append(resetbutton);
 				
 				resetbutton.click(function () {
 					method.resetToCallMeContainer(code);
@@ -222,6 +227,13 @@
 				}
 			},
 			
+			// replace the existing container with the new one
+			replaceContainer: function(code, newcontainer) {
+				newcontainer.insertAfter(easycalldata.subcontainer[code]);
+				easycalldata.subcontainer[code].remove();
+				easycalldata.subcontainer[code] = newcontainer;
+			},
+			
 			
 			//============================================================================================
 			// Application logic
@@ -239,17 +251,14 @@
 				}
 				easycalldata.defaultphone = phone;
 				
-				var progresscontainer = method.createProgressContainer();
+				var progresscontainer = method.createProgressContainer(code);
 				var progresstext = progresscontainer.find(".easycallprogresstext");
 				
 				progresstext.empty().append("Calling: " + phone);
 				
-				progresscontainer.insertAfter(easycalldata.subcontainer[code]);
-				easycalldata.subcontainer[code].remove();
-				easycalldata.subcontainer[code] = progresscontainer;
+				method.replaceContainer(code, progresscontainer);
 				
 				$.post("ajaxeasycall.php", {"action":"new","phone":phone}, function(data){
-					// TODO: handle returned errors
 					progresstext.empty().append("Initiated...");
 					
 					easycalldata.specialtaskid = data.id;
@@ -263,33 +272,25 @@
 								easycalldata.timer.stop();
 								// save audiofile
 								method.doSaveAudioFile(code);
-								
-								// create and load the preview container
-								var previewcontainer = method.createPreviewContainer(code);
-								previewcontainer.insertAfter(easycalldata.subcontainer[code]);
-								easycalldata.subcontainer[code].remove();
-								easycalldata.subcontainer[code] = previewcontainer;
-								
-								// create a new call me container 
-								var callmecontainer = method.createCallMeContainer(true);
-								if (callmecontainer !== false)
-									easycalldata.maincontainer.append(callmecontainer);
 							}
 							if (status.error) {
 								easycalldata.timer.stop();
 								
 								// transition to error mode
-								var errorcontainer = method.createErrorContainer(code)
-								var errortext = errorcontainer.find(".easycallerrortext");
-								errortext.empty().append(status.message);
-								
-								errorcontainer.insertAfter(easycalldata.subcontainer[code]);
-								easycalldata.subcontainer[code].remove();
-								easycalldata.subcontainer[code] = errorcontainer;
+								method.replaceContainer(code, method.createErrorContainer(code, status.message));
 							}
-						},"json");
+						},"json")
+						.error(function() {
+							easycalldata.timer.stop();
+							// transition to error mode
+							method.replaceContainer(code, method.createErrorContainer(code, "An error occured while getting the status of a call."));
+						});
 					}).set({time: 2000, autostart: true});
-				},"json");
+				},"json")
+				.error(function() {
+					// transition to error mode
+					method.replaceContainer(code, method.createErrorContainer(code, "An error occured while attempting a new call."));
+				});
 			},
 			
 			// save the audiofile and get the audiofileid
@@ -299,15 +300,28 @@
 						"id": easycalldata.specialtaskid,
 						"name": easycalldata.language[code]},
 						function(data){
-							
-					// TODO: handle errors
-							
-					var audiofileid = data.audiofileid;
-					easycalldata.recording[code] = audiofileid;
 					
-					method.updateParentElement();
-					
-				},"json");
+					if (data.audiofileid) {
+						easycalldata.recording[code] = data.audiofileid;
+						
+						// create and load the preview container
+						method.replaceContainer(code, method.createPreviewContainer(code));
+						
+						// create a new call me container 
+						var callmecontainer = method.createCallMeContainer(true);
+						if (callmecontainer !== false)
+							easycalldata.maincontainer.append(callmecontainer);
+						
+						method.updateParentElement();
+					} else {
+						// transition to error mode
+						method.replaceContainer(code, method.createErrorContainer(code, "An error occured while attempting to save audio."));
+					}
+				},"json")
+				.error(function() {
+					// transition to error mode
+					method.replaceContainer(code, method.createErrorContainer(code, "An error occured while requesting save audio."));
+				});
 			},
 			
 			// save the current recording data into the parent element
