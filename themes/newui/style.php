@@ -545,6 +545,25 @@ button:active, button.active, .btn:active, .btn.active { background-color: #d9d9
   }
 }
 
+// Easycall styles so it's less broken. TODO: these are not final!
+.easycallmaincontainer {}
+.easycallmaincontainer div {
+	margin-bottom: 5px;
+}
+.easycallmaincontainer select {
+	float: left;
+	margin-right: 5px;
+	width: auto !important;
+}
+.easycalllanguagetitle {
+	float: left;
+	margin-right: 5px;
+	margin-top: 6px;
+	margin-left: 2px;
+	font-size: 1.5em;
+	font-weight: bold;
+	font-style: italic;
+}
 
 
 

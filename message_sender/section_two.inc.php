@@ -38,7 +38,7 @@
 
 				<div id="call-me" class="audio">
 				<fieldset>
-					<label for="msgsndr_form_number">Number to Call</label>
+					<label for="msgsndr_form_number">Recording</label>
 					<div class="controls">
 						<input class="small" type="hidden" id="msgsndr_form_number" name="phone_number" /> <span class="error"></span>
 						<!-- <button class="record" id="ctrecord"><span class="icon"></span> Call Now to Record</button> -->
