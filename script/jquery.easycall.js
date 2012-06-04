@@ -131,7 +131,7 @@
 					method.doCall(code);
 				});
 				
-				container.append(phoneinput).append(callbutton);
+				container.append(phoneinput).append(callbutton).append($('<div style="clear:both"/>'));
 				return container;
 			},
 			
@@ -167,7 +167,7 @@
 						method.resetToCallMeContainer(code);
 				});
 				
-				container.append(languagetitle).append(previewbutton).append(removebutton);
+				container.append(languagetitle).append(previewbutton).append(removebutton).append($('<div style="clear:both"/>'));
 				
 				return container;
 			},
@@ -178,7 +178,7 @@
 				var progresstext = $('<div />', { "class": "call-progress" });
 				progresstext.append($('<span />', { "class": "icon" })).append($('<span />', { "class": "easycallprogresstext" }))
 				
-				container.append(languagetitle).append(progresstext);
+				container.append(languagetitle).append(progresstext).append($('<div style="clear:both"/>'));
 				
 				return container;
 			},
@@ -192,7 +192,8 @@
 				container.append(languagetitle)
 						.append($('<span />', { "class": "icon" }))
 						.append($('<span />', { "class": "easycallerrortext" }).append(errortext))
-						.append(resetbutton);
+						.append(resetbutton)
+						.append($('<div style="clear:both"/>'));
 				
 				resetbutton.click(function () {
 					method.resetToCallMeContainer(code);
