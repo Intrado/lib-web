@@ -25,6 +25,8 @@ jQuery.noConflict();
       social:{ }
     };
 
+
+
     // Initial Call
     $.ajax({
         url: '/'+orgPath+'/api/2/users/'+userid+'/roles',
@@ -48,6 +50,7 @@ jQuery.noConflict();
         alert("error");
         return false;
       }
+
 
       userPermissions = {};
       userRoleId = false;
@@ -137,7 +140,7 @@ jQuery.noConflict();
         new document.validators["ValLength"]("broadcast_subject","Subject",{min:7,max:30})
       ];
 
-      watchFields('#msgsndr_form_subject');
+      notVal.watchFields('#msgsndr_form_subject');
 
     };
 
@@ -150,7 +153,13 @@ jQuery.noConflict();
         new document.validators["ValPhone"]("content_phone","Number to Call",{})
       ];
 
-      watchFields('#msgsndr_form_number');
+      notVal.watchFields('#msgsndr_form_number');
+
+      // Build up select box based on the maxjobdays user permission
+      var daysToRun = userPermissions.maxjobdays;
+      for(i=1;i<=daysToRun;i++) {
+        $('#msgsndr_form_days').append('<option value="'+i+'">'+i+'</option>');
+      };
 
       // Easy Call jQuery Plugin
       $("#msgsndr_form_number").attachEasyCall({"languages": {"en":"English","es":"Spanish","ca":"Catalan"}});   
@@ -180,7 +189,7 @@ jQuery.noConflict();
         ]
       }
 
-      watchFields('#msgsndr_form_name, #msgsndr_form_email, #msgsndr_form_mailsubject, #msgsndr_form_body');
+      notVal.watchFields('#msgsndr_form_name, #msgsndr_form_email, #msgsndr_form_mailsubject, #msgsndr_form_body');
 
     };
 
@@ -196,7 +205,7 @@ jQuery.noConflict();
         ]
       };
 
-      watchFields('#msgsndr_form_sms');
+      notVal.watchFields('#msgsndr_form_sms');
 
       // Character Count
       $('#msgsndr_form_sms').on('keyup', function() {
@@ -268,7 +277,7 @@ jQuery.noConflict();
       notVal.watchContent('msgsndr_tab_email');
     });
 
-    // Save SMS Message
+    // Save Button for message content
     $('.btn_save').on('click', function(e) {
       e.preventDefault();
 
@@ -278,6 +287,9 @@ jQuery.noConflict();
     });
 
 
+
+
+    // Social Input Buttons
     $('input.social').on('click', function() {
 
       var itemName = $(this).attr('id').split('_')[2];
@@ -307,11 +319,32 @@ jQuery.noConflict();
 
 
 
+
+
+
+
+
     // Send Message Button
     $('#send_new_broadcast').on('click', function(e) {
       e.preventDefault();
 
-      console.log($('form[name=broadcast]').serializeArray());
+      var formData = $('form[name=broadcast]').serializeArray();
+
+      $.ajax({
+        type: 'POST',
+        url: '?form=broadcast&ajax=true',
+        data: formData,
+
+        success: function(response) {
+          console.log(response);
+            var res = response;
+            if (res.vres != true) {
+              console.log(res);
+            } else {
+              console.log(res);
+            }
+        }
+      });
 
     });
 
@@ -320,95 +353,15 @@ jQuery.noConflict();
 
 
 
-    // Set keyup event to the fields that need validating - These fields passed through from functions above
-    function watchFields(fieldId) {
-
-      var watch = watch + ', ' + fieldId;
-
-      $(watch).on('keyup', function() {
-        var elem  = $(this);
-        formVal(elem);
-      });
-
-    };
-
-    function formVal(element) {
-
-      var name  = element.attr('name');
-      var form  = name.split("_")[0];
-      var field = name.split("_")[1];
-
-      var value = element.val();
-
-      var ajax  = element.attr('data-ajax');
 
 
-      var isValid = true;
-      var validators = document.formvars[form][field];
-      requiredvalues = [];
 
-      if (ajax == 'true') {
 
-        var postData = {
-          value: value,
-          requiredvalues: ""
-        }
 
-        var ajaxurl = "message_sender.php?form=broadcast&ajaxvalidator=true&formitem=" + name;
 
-        $.ajax({
-          type: 'POST',
-          url: ajaxurl,
-          data: {json: $.toJSON(postData) },
 
-          success: function(response) {
-              var res = response;
-              if (res.vres != true) {
-                element.removeClass('ok').addClass('er').next('.error').show().text(res.vmsg);
-              } else {
-                element.removeClass('er').addClass('ok').next('.error').hide();
-              }
-          }
-        });
 
-      } else { // None AJAX validation
 
-        // Loop validation
-        for (var i = 0; i < validators.length; i++) {  
-          var validator = validators[i];  
-          if (value.length > 0 || validator.isrequired || validator.conditionalrequired || value.length == 0) {  
-            res = validator.validate(validator.name,validator.label,value,validator.args,requiredvalues); 
-            if (res != true) {  
-              isValid = false;  
-              // If SMS - add class er to textarea and disable save button
-              if (name == 'sms_text') {
-                element.removeClass('ok').addClass('er'); 
-                $('#msgsndr_tab_sms .btn_save').attr('disabled','disabled');
-              } else {
-                element.removeClass('ok').addClass('er').next('.error').show().text(res);
-              }
-              break; 
-            } else {
-              // If SMS - add class ok to textarea and remove disabled from save button
-              if (name == 'sms_text') {
-                element.removeClass('er').addClass('ok'); 
-                $('#msgsndr_tab_sms .btn_save').removeAttr('disabled');
-              } else {
-                element.removeClass('er').addClass('ok').next('.error').hide();
-              }
-            }
-          } 
-
-        } // for
-
-          if (res == true && field == "number") {
-            $('#ctrecord').show();
-          } 
-          
-
-      } // if ajax
-
-    } // form_val function
 
 
     function emailVal(element,emailData) {
@@ -463,22 +416,6 @@ jQuery.noConflict();
 
     }
 
-
-    // get user preferences ...
-    function getUserPrefs(){
-      var userPrefs = {};
-       $.ajax({
-        url: '/'+orgPath+'/api/2/users/'+userid+'/preferences',
-        type: "GET",
-        dataType: "json",
-        success: function(data) {
-          $.each(data.preferences, function(uIndex, uPrefs){
-            userPrefs[uPrefs.name] = uPrefs.value;
-          });
-        }
-      });
-      return userPrefs;
-    };
 
     
 

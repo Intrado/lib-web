@@ -18,7 +18,7 @@ jQuery.noConflict();
 		emailSubject 	= "";
 
 
-		//  Hide/Show Logic
+		//  Hide/Show Logic - for message steps 
 		$('.msg_steps a').on('click', function(event) {
 			event.preventDefault();
 			// Get the clicked elements id
@@ -32,6 +32,11 @@ jQuery.noConflict();
 				// Hide panels then show the one relevant to the users selection
 				$('.window_panel').hide();
 				$('#msg_section_'+tabn).show();
+
+		      if (tabn == "3") {
+		      	notVal.reviewSend();
+		      }
+
 			}
 		});
 
@@ -54,6 +59,7 @@ jQuery.noConflict();
 			if (elm[2] == 'social' && $('#msgsndr_ctrl_phone').parent().hasClass('complete')) {
 				$('#audiolink').show();
 			}
+
 
 		});
 
@@ -82,8 +88,11 @@ jQuery.noConflict();
 			// call the populate lists function to add the lists id's in
 			populateRecipientIdList();
 
+			$('#list_ids').val('[addme]').addClass('ok');
+
 			$('#addme').slideToggle('slow', function() {
 				$('#msgsndr_form_mephone').focus();
+				notVal.watchSection('msg_section_1');
 			});
 
 		});
@@ -104,9 +113,10 @@ jQuery.noConflict();
 
 
 
-		// Continue Button to move to next section
+		// Continue Buttons to move to next section
     $('button.btn_confirm').on('click', function(e) {
       e.preventDefault();
+
       var tabn = $(this).attr('data-next');
       var tabp = tabn-1;
       $('.msg_steps li').removeClass('active');
@@ -115,6 +125,10 @@ jQuery.noConflict();
 
       $('.window_panel').hide();
       $('#msg_section_'+tabn).show();
+
+      if (tabn == "3") {
+      	notVal.reviewSend();
+      }
 
     });
   
