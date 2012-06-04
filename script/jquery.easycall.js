@@ -151,7 +151,7 @@
 				
 				// TODO: functional preview button
 				previewbutton.click(function(){
-					alert("AUDIOFILEID " + audiofileid + " PREVIEW!!!");
+					popup("previewaudio.php?close=1&id="+audiofileid, 400, 500);
 				});
 				
 				
