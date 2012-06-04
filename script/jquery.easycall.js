@@ -101,6 +101,7 @@
 			createCallMeContainer: function(hasmenu) {
 				var container = $('<div />', { "class": "easycallcallmecontainer"});
 				var phoneinput = $('<input />', { "class": "easycallphoneinput small", "type": "text" });
+				phoneinput.val(easycalldata.defaultphone);
 				var callbutton = $('<button />', { "class": "easycallcallnowbutton record", "value": "Call Now to Record" });
 				callbutton.append($('<span />', { "class": "icon" })).append("Call Now to Record");
 				
@@ -158,33 +159,7 @@
 					// TODO: Disallow message deletion if there is a call in progress
 					// TODO: Confirm deletion of message
 					
-					// clean up the old data for this code
-					easycalldata.subcontainer[code].remove();
-					easycalldata.subcontainer[code] = false;
-					easycalldata.recording[code] = false;
-					method.updateParentElement();
-					
-					// remove existing call containers, we can only have one shown at a time
-					var callmecontainers = easycalldata.maincontainer.children(".easycallcallmecontainer");
-					var hasdefaultcallmecontainer = false;
-					$.each(callmecontainers, function (index) {
-						// leave behind the default... remember that it exists
-						if ($(callmecontainers[index]).children(".easycallselectmenu").length == 0)
-							hasdefaultcallmecontainer = true;
-						else
-							$(callmecontainers[index]).remove();
-					});
-					
-					// get a new callme container!
-					var callmecontainer = false;
-					if (code == easycalldata.default) {
-						callmecontainer = method.createCallMeContainer(false);
-						easycalldata.subcontainer[code] = callmecontainer;
-						easycalldata.maincontainer.prepend(callmecontainer);
-					} else {
-						if (!hasdefaultcallmecontainer)
-							easycalldata.maincontainer.append(method.createCallMeContainer(true));
-					}
+					method.resetToCallMeContainer(code);
 				});
 				
 				container.append(languagetitle).append(previewbutton).append(removebutton);
@@ -202,29 +177,76 @@
 				return container;
 			},
 			
+			// create a container for error states with a reset button
+			createErrorContainer: function(code) {
+				var container = $('<div />', { "class": "easycallerrorcontainer"});
+				var resetbutton = $('<button />', { "class": "easycallerrorbutton" });
+				resetbutton.append($('<span />', { "class": "icon" })).append($('<span />').append("Retry"));
+				container.append($('<span />', { "class": "icon" })).append($('<span />', { "class": "easycallerrortext" })).append(resetbutton);
+				
+				resetbutton.click(function () {
+					method.resetToCallMeContainer(code);
+				});
+				
+				return container;
+			},
+			
+			// intelegently replace the current container with a callme container
+			resetToCallMeContainer: function(code) {
+				// clean up the old data for this code
+				easycalldata.subcontainer[code].remove();
+				easycalldata.subcontainer[code] = false;
+				easycalldata.recording[code] = false;
+				method.updateParentElement();
+				
+				// remove existing call containers, we can only have one shown at a time
+				var callmecontainers = easycalldata.maincontainer.children(".easycallcallmecontainer");
+				var hasdefaultcallmecontainer = false;
+				$.each(callmecontainers, function (index) {
+					// leave behind the default... remember that it exists
+					if ($(callmecontainers[index]).children(".easycallselectmenu").length == 0)
+						hasdefaultcallmecontainer = true;
+					else
+						$(callmecontainers[index]).remove();
+				});
+				
+				// get a new callme container!
+				var callmecontainer = false;
+				if (code == easycalldata.default) {
+					callmecontainer = method.createCallMeContainer(false);
+					easycalldata.subcontainer[code] = callmecontainer;
+					easycalldata.maincontainer.prepend(callmecontainer);
+				} else {
+					if (!hasdefaultcallmecontainer)
+						easycalldata.maincontainer.append(method.createCallMeContainer(true));
+				}
+			},
+			
 			
 			//============================================================================================
 			// Application logic
 			// start the process by making a phone call to the provided number
 			doCall: function (code) {
-				var langdiv = easycalldata.subcontainer[code];
 				// get the phone number
-				var phone = langdiv.children(".easycallphoneinput").val();
+				var phone = easycalldata.subcontainer[code].children(".easycallphoneinput").val();
 				
 				// validate the phone
 				var valid = method.validatePhone(phone);
 				if (valid !== true) {
-					langdiv.children(".easycallphoneinvalid").detach();
-					langdiv.append($('<div />', { "class": "easycallphoneinvalid", "text": phone + ": " + valid }));
+					easycalldata.subcontainer[code].children(".easycallphoneinvalid").remove();
+					easycalldata.subcontainer[code].append($('<div />', { "class": "easycallphoneinvalid", "text": phone + ": " + valid }));
 					return;
 				}
+				easycalldata.defaultphone = phone;
+				
 				var progresscontainer = method.createProgressContainer();
 				var progresstext = progresscontainer.find(".easycallprogresstext");
 				
 				progresstext.empty().append("Calling: " + phone);
 				
-				langdiv.empty();
-				langdiv.append(progresscontainer);
+				progresscontainer.insertAfter(easycalldata.subcontainer[code]);
+				easycalldata.subcontainer[code].remove();
+				easycalldata.subcontainer[code] = progresscontainer;
 				
 				$.post("ajaxeasycall.php", {"action":"new","phone":phone}, function(data){
 					// TODO: handle returned errors
@@ -237,7 +259,7 @@
 							// get the status
 							var status = method.handleStatus(data);
 							progresstext.empty().append(status.message);
-							if (status.complete) {
+							if (!status.error && status.complete) {
 								easycalldata.timer.stop();
 								// save audiofile
 								method.doSaveAudioFile(code);
@@ -255,7 +277,15 @@
 							}
 							if (status.error) {
 								easycalldata.timer.stop();
-								// TODO: transition to error mode
+								
+								// transition to error mode
+								var errorcontainer = method.createErrorContainer(code)
+								var errortext = errorcontainer.find(".easycallerrortext");
+								errortext.empty().append(status.message);
+								
+								errorcontainer.insertAfter(easycalldata.subcontainer[code]);
+								easycalldata.subcontainer[code].remove();
+								easycalldata.subcontainer[code] = errorcontainer;
 							}
 						},"json");
 					}).set({time: 2000, autostart: true});
@@ -300,10 +330,9 @@
 				var complete = false;
 				var error = false;
 				var message = "";
-				switch(data.status) {
-					case "done":
-						complete = true;
-						break;
+				if (data.status == "done")
+					complete = true;
+				switch(data.error) {
 					case "notask":
 						error = true;
 						message = "No valid request was found";

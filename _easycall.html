@@ -11,9 +11,17 @@
 				padding: 5px;
 				background: lightgray;
 			}
+			.easycallprogresscontainer {
+				padding: 5px;
+				background: lightblue;
+			}
 			.easycallpreviewcontainer {
 				padding: 5px;
 				background: lightgray;
+			}
+			.easycallerrorcontainer {
+				padding: 5px;
+				background: pink;
 			}
 			.easycallphoneinput {
 				background: white;
@@ -36,6 +44,10 @@
 				margin-left: 5px;
 				color: black;
 			}
+			.easycallerrorbutton {
+				margin-left: 5px;
+				color: black;
+			}
 		</style>
 		<script type="text/javascript" src="script/jquery.1.7.2.min.js"></script>
 		<script type="text/javascript" src="script/jquery.json-2.3.min.js"></script>
@@ -47,7 +59,9 @@
 				$("#easycall").val($.toJSON({"en":"456"}));
 				
 				// attach the easycall plugin
-				$("#easycall").attachEasyCall({"languages": {"en":"Default","es":"Spanish","ca":"Catalan"}});
+				$("#easycall").attachEasyCall({
+						"languages": {"en":"Default","es":"Spanish","ca":"Catalan"},
+						"defaultphone":"4172140239"});
 				
 				// observe change events on the value of the element and stick the value into a debug area
 				$("#easycall").change(function (event) {
