@@ -154,7 +154,7 @@ function startWindow($title) {
 	</div>
 	<div class="window_body_wrap cf">
 		<div class="window_body_l"></div>
-		<div id="window_<?= $id ?>" class="window_body cf">
+		<div class="window_body cf">
 <?
 }
 
