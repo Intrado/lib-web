@@ -8,8 +8,12 @@ require_once("inc/securityhelper.inc.php");
 require_once("inc/table.inc.php");
 require_once("inc/html.inc.php");
 require_once("inc/utils.inc.php");
+
 require_once("obj/Validator.obj.php");
 require_once("obj/ValSmsText.val.php");
+require_once("obj/ValTimeWindowCallEarly.val.php");
+require_once("obj/ValTimeWindowCallLate.val.php");
+
 require_once("obj/Form.obj.php");
 require_once("obj/FormItem.obj.php");
 
@@ -29,6 +33,16 @@ class ValJobName extends Validator {
 	}
 }
 
+class ValTimePassed extends Validator {
+	var $onlyserverside = true;
+	function validate ($value, $args, $requiredvalues) {
+		$timediff = (time() - strtotime($requiredvalues[$args['field']] . " " . $value));
+		if ($timediff > 0)
+			return "$this->label: ". _L('Must be in the future.');
+		return true;
+	}
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 // Form Data
 ////////////////////////////////////////////////////////////////////////////////
@@ -43,7 +57,45 @@ $formdata = array(
 			array("ValLength","min" => 3, "max" => 30),
 			array("ValJobName","type"=> "job")
 		)
+	),
+
+
+	//=========================================================================================
+	"SCHEDULE OPTIONS",
+	//=========================================================================================
+	"scheduledate" => array(
+		"label" => "scheduledate",
+		"value" => "",
+		"validators" => array(
+			// TODO: date validation
+		),
+		"control" => array("TextField"),
+		"helpstep" => 1
+	),
+	"schedulecallearly" => array(
+		"label" => "Start Time",
+		"value" => "",
+		"validators" => array(
+			array("ValTimeCheck", "min" => $ACCESS->getValue('callearly'), "max" => $ACCESS->getValue('calllate')),
+			array("ValTimeWindowCallEarly", "calllatefield" => "schedulecalllate")
+		),
+		"control" => array("TextField"),
+		"requires" => array("schedulecalllate", "scheduledate"),
+		"helpstep" => 1
+	),
+	"schedulecalllate" => array(
+		"label" => "End Time",
+		"value" => "",
+		"validators" => array(
+			array("ValTimeCheck", "min" => $ACCESS->getValue('callearly'), "max" => $ACCESS->getValue('calllate')),
+			array("ValTimeWindowCallLate", "callearlyfield" => "schedulecallearly"),
+			array("ValTimePassed", "field" => "scheduledate")
+		),
+		"control" => array("TextField"),
+		"requires" => array("schedulecallearly", "scheduledate"),
+		"helpstep" => 1
 	)
+
 );
 
 
@@ -140,7 +192,7 @@ include("nav.inc.php");
 <script type="text/javascript">
 <?
 // Some of these are defined in jobwizard.inc.php 
-Validator::load_validators(array("ValSmsText"));
+Validator::load_validators(array("ValSmsText","ValTimeWindowCallEarly","ValTimeWindowCallLate","ValTimePassed"));
 ?>
 </script>
 
@@ -158,6 +210,21 @@ Validator::load_validators(array("ValSmsText"));
 
 
 <script src="script/bootstrap-modal.js"></script>
+
+
+<script src="script/datepicker.js"></script>
+<script type="text/javascript">
+var dpck_fieldname = new DatePicker({
+	relative:"scheduledate",
+	keepFieldEmpty:true,
+	language:"en",
+	enableCloseOnBlur:1,
+	topOffset:20,
+	zindex: 99999
+	,dateFilter:DatePickerUtils.noDatesBefore(0)
+});
+</script>
+
 <script src="script/speller/spellChecker.js"></script>
 <script src="script/easycall.js.php"></script>
 <script src="script/niftyplayer.js.php"></script>
