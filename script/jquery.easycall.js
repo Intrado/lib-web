@@ -45,9 +45,6 @@
 			if (easycalldata.language[code])
 				easycalldata.recording[code] = elementdata[code];
 		});
-		
-		// debug data
-		$("#validationdata").empty().append($.toJSON(easycalldata));
 
 		var method = {
 			//============================================================================================
@@ -105,7 +102,7 @@
 					var selectmenu = $('<select />', { "class": "easycallselectmenu" })
 					var hasitems = false;
 					$.each(easycalldata.subcontainer, function (code) {
-						if (easycalldata.subcontainer[code] == false) {
+						if (easycalldata.subcontainer[code] == false && code != easycalldata.default) {
 							// insert item into selector
 							var option = $('<option />', { "value": code, "text": easycalldata.language[code]});
 							selectmenu.append(option);
@@ -151,6 +148,7 @@
 				
 				
 				removebutton.click(function(){
+					// TODO: Disallow message deletion if there is a call in progress
 					// TODO: Confirm deletion of message
 					
 					// clean up the old data for this code
@@ -275,6 +273,7 @@
 				},"json");
 			},
 			
+			// save the current recording data into the parent element
 			updateParentElement: function () {
 				// update json data in parent input field
 				var itemdata = {};
@@ -337,7 +336,6 @@
 
 					// based on North American Numbering Plan
 					// read more at en.wikipedia.org/wiki/List_of_NANP_area_codes
-
 					if ((phone.charAt(0) == "0" || phone.charAt(0) == "1") || // areacode cannot start with 0 or 1
 						(phone.charAt(3) == "0" || phone.charAt(3) == "1") || // prefix cannot start with 0 or 1
 						(phone.charAt(1) == "1" && phone.charAt(2) == "1") || // areacode cannot be N11
