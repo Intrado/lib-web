@@ -9,6 +9,7 @@ $TITLE = "Welcome";
 
 include("nav.inc.php");
 
+//FIXME why not just inline this here? don't need a subdir for every page.
 include("dashboard/index.php");
 
 include("navbottom.inc.php"); ?>
