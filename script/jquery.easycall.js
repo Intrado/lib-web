@@ -64,16 +64,16 @@
 				var initdiv = $('<div />', { "class": "easycallmaincontainer" });
 				easycalldata.maincontainer = initdiv;
 
-				// add sub-containers for pre-recorded languages
+				// add sub-containers for the pre-recorded languages
 				var subcontainer = false;
+				var needscallmecontainer = true;
 				// always add the default first
 				if (easycalldata.recording[easycalldata.default] !== false) {
 					subcontainer = method.createPreviewContainer(easycalldata.default);
-					// added the default preview, so add a new call me container with menu also
-					initdiv.append(method.createCallMeContainer(true));
 				} else {
 					// add the default callme container
 					subcontainer = method.createCallMeContainer(false);
+					needscallmecontainer = false;
 				}
 				easycalldata.subcontainer[easycalldata.default] = subcontainer;
 				initdiv.prepend(subcontainer);
@@ -86,6 +86,13 @@
 						initdiv.append(subcontainer);
 					}
 				});
+
+				// add a new call me container with menu
+				if (needscallmecontainer) {
+				subcontainer = method.createCallMeContainer(true);
+					if (subcontainer !== false)
+						initdiv.append(subcontainer);
+				}
 				
 				initdiv.insertAfter(easycalldata.element);
 			},
