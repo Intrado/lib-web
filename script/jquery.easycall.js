@@ -149,17 +149,22 @@
 				else
 					removebutton.append($('<span />', { "text": "Remove" }));
 				
-				// TODO: functional preview button
 				previewbutton.click(function(){
+					// Old school preview, loads in a popup
 					popup("previewaudio.php?close=1&id="+audiofileid, 400, 500);
 				});
 				
 				
 				removebutton.click(function(){
-					// TODO: Disallow message deletion if there is a call in progress
-					// TODO: Confirm deletion of message
-					
-					method.resetToCallMeContainer(code);
+					// Disallow message deletion if there is a call in progress
+					if (easycalldata.specialtaskid !== false) {
+						alert("Cannot remove a recording while a calling session is active.");
+						return;
+					}
+					// Confirm deletion of recording
+					var removerecording = confirm("Are you sure you want to delete this recording?");
+					if (removerecording)
+						method.resetToCallMeContainer(code);
 				});
 				
 				container.append(languagetitle).append(previewbutton).append(removebutton);
@@ -274,6 +279,7 @@
 								method.doSaveAudioFile(code);
 							}
 							if (status.error) {
+								easycalldata.specialtaskid = false;
 								easycalldata.timer.stop();
 								
 								// transition to error mode
@@ -281,6 +287,7 @@
 							}
 						},"json")
 						.error(function() {
+							easycalldata.specialtaskid = false;
 							easycalldata.timer.stop();
 							// transition to error mode
 							method.replaceContainer(code, method.createErrorContainer(code, "An error occured while getting the status of a call."));
@@ -288,6 +295,7 @@
 					}).set({time: 2000, autostart: true});
 				},"json")
 				.error(function() {
+					easycalldata.specialtaskid = false;
 					// transition to error mode
 					method.replaceContainer(code, method.createErrorContainer(code, "An error occured while attempting a new call."));
 				});
@@ -322,6 +330,7 @@
 					// transition to error mode
 					method.replaceContainer(code, method.createErrorContainer(code, "An error occured while requesting save audio."));
 				});
+				easycalldata.specialtaskid = false;
 			},
 			
 			// save the current recording data into the parent element
