@@ -149,13 +149,15 @@
 				else
 					removebutton.append($('<span />', { "text": "Remove" }));
 				
-				previewbutton.click(function(){
+				previewbutton.click(function(e){
+					e.preventDefault();
 					// Old school preview, loads in a popup
 					popup("previewaudio.php?close=1&id="+audiofileid, 400, 500);
 				});
 				
 				
-				removebutton.click(function(){
+				removebutton.click(function(e){
+					e.preventDefault();
 					// Disallow message deletion if there is a call in progress
 					if (easycalldata.specialtaskid !== false) {
 						alert("Cannot remove a recording while a calling session is active.");
@@ -196,6 +198,7 @@
 						.append($('<div style="clear:both"/>'));
 				
 				resetbutton.click(function () {
+					e.preventDefault();
 					method.resetToCallMeContainer(code);
 				});
 				

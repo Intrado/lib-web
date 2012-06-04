@@ -550,7 +550,7 @@ button:active, button.active, .btn:active, .btn.active { background-color: #d9d9
 // Easycall styles so it's less broken. TODO: these are not final!
 .easycallmaincontainer {}
 .easycallmaincontainer div {
-	margin-bottom: 5px;
+	margin-bottom: 3px;
 }
 .easycallmaincontainer select {
 	float: left;
