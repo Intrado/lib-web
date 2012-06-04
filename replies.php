@@ -49,7 +49,7 @@ if(isset($_GET['delete'])){
 		Query("COMMIT");
 		
 		$job = new Job($vr->jobid);
-		notice(_L("The response from %1s for the job, %2s, is now deleted.", escapehtml(Person::getFullName($vr->personid)), escapehtml($job->name)));
+		notice(_L("The response from %s for the %s, %s, is now deleted.", escapehtml(Person::getFullName($vr->personid)), getJobTitle(), escapehtml($job->name)));
 
 		$reload=1;
 	}
@@ -151,11 +151,11 @@ function fmt_replies_status($row, $index){
 
 $PAGE = "notifications:responses";
 if(isset($job)){
-	$TITLE = "Responses to: " . escapehtml($job->name);
-	$warning = "Are you sure you want to delete all played messages for: " . $job->name . "?";
+	$TITLE = _L("Responses to: %s", escapehtml($job->name));
+	$warning = _L("Are you sure you want to delete all played messages for: %s?", $job->name);
 } else {
-	$TITLE = "Responses to: All Jobs";
-	$warning = "Are you sure you want to delete all played messages for all jobs?";
+	$TITLE = _L("Responses to: All %s",getJobsTitle());
+	$warning = _L("Are you sure you want to delete all played messages for all %s?",getJobsTitle());
 }
 include_once("nav.inc.php");
 
@@ -169,7 +169,7 @@ startWindow("Display Options" . help('Replies_DisplayOptions'), "padding: 3px;")
 
 <table class="usagelist">
 <tr>
-	<th align="right" class="windowRowHeader" valign="top" style="padding-top: 6px;">Job:</th>
+	<th align="right" class="windowRowHeader" valign="top" style="padding-top: 6px;"><?=getJobsTitle()?>:</th>
 	<td>
 <?
 	NewFormItem($f, $s, 'jobselect', 'selectstart', NULL, NULL, "onchange=\"location.href='?jobid=' + this.value\"");
@@ -230,15 +230,15 @@ while($row = DBGetRow($responses)){
 }
 
 $titles = array(
-					"0" => "ID#",
-					"1" => "First Name",
-					"2" => "Last Name",
-					"3" => "Phone",
-					"4" => "Message Name",
-					"5" => "Job Name",
-					"6" => "Date",
-					"9" => "Status",
-					"Actions" => "Actions"
+					"0" => _L("ID#"),
+					"1" => _L("First Name"),
+					"2" => _L("Last Name"),
+					"3" => _L("Phone"),
+					"4" => _L("Message Name"),
+					"5" => _L("%s Name", getJobTitle()),
+					"6" => _L("Date"),
+					"9" => _L("Status"),
+					"Actions" => _L("Actions")
 					);
 $formatters = array(
 					"Actions" => "fmt_replies_actions",

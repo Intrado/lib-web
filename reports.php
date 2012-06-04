@@ -71,10 +71,10 @@ startWindow("Select a Template"  . help('Reports_SelectATemplate'), 'padding: 3p
 	<table class="list" >
 	<thead>
 		<tr class="listHeader">
-			<th align="left" class="nosort">Job and Date Range</th>
-			<th align="left" class="nosort">Individual</th>
+			<th align="left" class="nosort"><?= _L("%s and Date Range", getJobsTitle()) ?></th>
+			<th align="left" class="nosort"><?= _L("Individual")?></th>
 <? if ($USER->authorize('viewsystemreports')) { ?>
-			<th align="left" class="nosort">Other</th>
+			<th align="left" class="nosort"><?= _L("Other")?></th>
 <? } ?>
 		</tr>
 	</thead>

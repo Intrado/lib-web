@@ -445,7 +445,7 @@ function activityfeed($mergeditems,$ajax = false) {
 					$tools = fmt_jobs_actions ($job,$item["name"]);
 					$tools = str_replace("&nbsp;|&nbsp;","<br />",$tools);
 
-					$jobtype = $item["jobtype"] == "survey" ? _L("Survey") : _L("Job");
+					$jobtype = $item["jobtype"] == "survey" ? _L("Survey") : getJobTitle();
 					switch($status) {
 						case "new":
 							$title = _L('%1$s Saved',$jobtype);
@@ -455,9 +455,9 @@ function activityfeed($mergeditems,$ajax = false) {
 							break;
 						case "repeating":
 							if($item["datetype"]=="finishdate")
-								$title = _L("Running Repeating Job");
+								$title = _L("Running Repeating " . getJobTitle());
 							else
-								$title = _L('Repeating Job Saved');
+								$title = _L('Repeating ' . getJobTitle() . ' Saved');
 							$icon = 'largeicons/calendar.jpg';
 							$defaultlink = "jobrepeating.php?id=$itemid";
 							$jobcontent = typestring($item["jobtype"]) . "&nbsp;message&nbsp;with&nbsp;" . listcontacts($job,"job");
@@ -501,7 +501,7 @@ function activityfeed($mergeditems,$ajax = false) {
 							$jobcontent = typestring($item["jobtype"]) . "&nbsp;message&nbsp;with&nbsp;" . listcontacts($job,"job");
 							break;
 						default:
-							$title = _L('Job %1$s',escapehtml(fmt_status($job,$item["name"])));
+							$title = getJobTitle(). ' ' . escapehtml(fmt_status($job,$item["name"]));
 							break;
 					}
 					$content = '<div class="content_feed_row"><a href="' . $defaultlink . '" ' . $defaultonclick . '>' .
@@ -741,7 +741,7 @@ include_once("nav.inc.php");
 ?>
 <div class="csec sectimeline"> <? // NOTE: if the timeline isn't showing, check the style.php (css) for the theme to see if .sectimeline is set to display: none; ?>
 <?
-	startWindow(_L("Jobs Timeline"));
+	startWindow(_L("%s Timeline", getJobTitle()));
 		include_once("inc/timeline.inc.php");
 	endWindow();
 ?>
@@ -757,7 +757,7 @@ $activityfeed = '
 				</div>
 				<h3 id="filterby">Filter By:</h3>
 				<div id="allfilters" class="feedfilter">
-					<a id="jobsfilter" href="start.php?filter=jobs" onclick="applyfilter(\'jobs\'); $(\'jobsubfilters\').toggle(); return false;"><img src="img/largeicons/tiny20x20/ping.jpg" alt="">Jobs</a>
+					<a id="jobsfilter" href="start.php?filter=jobs" onclick="applyfilter(\'jobs\'); $(\'jobsubfilters\').toggle(); return false;"><img src="img/largeicons/tiny20x20/ping.jpg" alt="">' . getJobsTitle() . '</a>
 					<div id="jobsubfilters" style="' . (in_array($filter,array("savedjobs","scheduledjobs","activejobs","completedjobs","repeatingjobs"))?"display:block":"display:none") . ';padding-left:20px;">
 						<a id="savedjobsfilter" href="start.php?filter=savedjobs" onclick="applyfilter(\'savedjobs\'); return false;"><img src="img/largeicons/tiny20x20/folderandfiles.jpg" alt="">Saved</a>
 						<a id="scheduledjobsfilter" href="start.php?filter=scheduledjobs" onclick="applyfilter(\'scheduledjobs\'); return false;"><img src="img/largeicons/tiny20x20/clock.jpg" alt="">Scheduled</a>

@@ -124,7 +124,7 @@ if($isajax === true) {
 ////////////////////////////////////////////////////////////////////////////////
 
 $PAGE = "notifications:templates";
-$TITLE = "Broadcast Templates";
+$TITLE = _L("%s Templates", getJobTitle());
 
 include_once("nav.inc.php");
 

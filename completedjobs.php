@@ -37,13 +37,13 @@ $limit = 100;
 ////////////////////////////////////////////////////////////////////////////////
 
 $PAGE = "system:completedjobs";
-$TITLE = "Completed Jobs";
+$TITLE = _L("Completed %s", getJobsTitle());
 
 include_once("nav.inc.php");
 
 session_write_close();//WARNING: we don't keep a lock on the session file, any changes to session data are ignored past this point
 
-startWindow('Completed Notification Jobs ' . help('System_CompletedJobs'), 'padding: 3px;');
+startWindow(_L('Completed Notification %s ',getJobsTitle()) . help('System_CompletedJobs'), 'padding: 3px;');
 
 
 //get this page's worth of jobs
@@ -136,16 +136,16 @@ function fmt_jobmode ($obj,$name) {
 	return escapehtml($jobtypes[$obj->jobtypeid]->name . " " . ucfirst($obj->type));
 }
 
-$titles = array ("Owner" => "Submitted by",
-				"name" => 'Job Name',
-				"Mode" => "Mode",
-				"status" => 'Status',
-				"Total" => 'Total',
-				"Rate" => '% Contacted',
-				"startdate" => 'Start Date',
-				"enddate" => 'End Date',
-				"responses" => "Responses",
-				"Actions" => 'Actions');
+$titles = array ("Owner" => _L("Submitted by"),
+				"name" => _L('%s Name', getJobTitle()),
+				"Mode" => _L("Mode"),
+				"status" => _L('Status'),
+				"Total" => _L('Total'),
+				"Rate" => _L('% Contacted'),
+				"startdate" => _L('Start Date'),
+				"enddate" => _L('End Date'),
+				"responses" => _L("Responses"),
+				"Actions" => _L('Actions'));
 $formatters = array(
 				"Mode" => "fmt_jobmode",
 				"Owner" => 'fmt_job_owner',

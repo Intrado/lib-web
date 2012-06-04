@@ -21,15 +21,15 @@ if (isset($_GET['timer']) || isset($_SESSION['timer'])) {
 }
 
 if ($USER->authorize(array('starteasy', 'sendemail', 'sendphone', 'sendsms'))) {
-	$SHORTCUTS['<b>Jobs & Messages</b>'] = "false;";
+	$SHORTCUTS['<b>' . getJobsTitle() . ' & Messages</b>'] = "false;";
 	if ($USER->authorize("starteasy")) {
 		$SHORTCUTS['EasyStart'] = "jobwizard.php?new";
 	}
 	if ($USER->authorize(array('sendemail', 'sendphone', 'sendsms'))) {
 		$SHORTCUTS['My Messages'] = "messages.php";
-		$SHORTCUTS['My Jobs'] = "jobs.php";
-		$SHORTCUTS['My Archived Jobs'] = "jobsarchived.php";
-		$SHORTCUTS['New Job'] = "job.php?id=new";
+		$SHORTCUTS['My ' . getJobsTitle()] = "jobs.php";
+		$SHORTCUTS['My Archived ' . getJobsTitle()] = "jobsarchived.php";
+		$SHORTCUTS['New ' . getJobTitle()] = "job.php?id=new";
 	}
 	if ($USER->authorize("leavemessage")){
 		$SHORTCUTS['View Responses'] = "replies.php?reset=1";
@@ -40,7 +40,7 @@ if ($USER->authorize(array('createreport', 'viewsystemreports'))) {
 	$SHORTCUTS['<b>Reports & Status</b>'] = "false;";
 	if ($USER->authorize('createreport') || $USER->authorize('viewsystemreports')) {
 		$SHORTCUTS['Create a Report'] = "reports.php";
-		$SHORTCUTS['View Job Summary'] = "reportjobsearch.php";
+		$SHORTCUTS['View ' . getJobsTitle() . ' Summary'] = "reportjobsearch.php";
 	}
 	if ($USER->authorize('viewusagestats')) {
 		$SHORTCUTS['Usage Stats'] = "reportsystem.php?clear=1";
@@ -81,7 +81,7 @@ $NAVTREE = array (
 		array($maintabtitle,NULL,array("createlist","sendphone","sendprint","sendemail", "sendsms",getSystemSetting("_hastargetedmessage", false) ? "targetedmessage" : "dummy"),$MAINTAB==$maintabname,array(
 		array("Lists","lists.php",array("createlist","subscribe"),$SUBTAB=="lists"),
 		array("Messages","messages.php",array('sendemail', 'sendphone', "sendsms","subscribe"),$SUBTAB=="messages"),
-		array("Jobs","jobs.php",array('sendemail', 'sendphone', "sendsms"),$SUBTAB=="jobs"),
+		array(getJobsTitle(),"jobs.php",array('sendemail', 'sendphone', "sendsms"),$SUBTAB=="jobs"),
 		array("Templates","jobtemplates.php",array('sendemail', 'sendphone', "sendsms"),$SUBTAB=="templates"),
 		array("Posts","posts.php",getSystemSetting("_hasfeed", false) ? "feedpost" : "dummy",$SUBTAB=="post"),
 		array("Classroom","classroommessageoverview.php",getSystemSetting("_hastargetedmessage", false) ? "targetedmessage" : "dummy",$SUBTAB=="classroom"),
@@ -95,9 +95,9 @@ $NAVTREE = array (
 		)),
 	array("System",NULL,array('viewsystemactive', 'viewsystemcompleted',
 						'viewsystemrepeating','viewcontacts','blocknumbers','monitorevent'),$MAINTAB=="system",array(
-		array("Active Jobs","activejobs.php","viewsystemactive",$SUBTAB=="activejobs"),
-		array("Completed Jobs","completedjobs.php","viewsystemcompleted",$SUBTAB=="completedjobs"),
-		array("Repeating Jobs","repeatingjobs.php","viewsystemrepeating",$SUBTAB=="repeatingjobs"),
+		array("Active " . getJobsTitle(),"activejobs.php","viewsystemactive",$SUBTAB=="activejobs"),
+		array("Completed " . getJobsTitle(),"completedjobs.php","viewsystemcompleted",$SUBTAB=="completedjobs"),
+		array("Repeating " . getJobsTitle(),"repeatingjobs.php","viewsystemrepeating",$SUBTAB=="repeatingjobs"),
 		array("Contacts","contacts.php","viewcontacts",$SUBTAB=="contacts"),
 		array("Blocked Lists","blocked.php","blocknumbers",$SUBTAB=="blocknumbers"),
 		array("Monitors","monitors.php","monitorevent",$SUBTAB=="monitors")

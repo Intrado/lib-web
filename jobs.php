@@ -37,7 +37,7 @@ if (isset($_GET['cancel'])) {
 	if (userOwns("job",$cancelid) || $USER->authorize('managesystemjobs')) {
 		$job = new Job($cancelid);
 		if ($job->cancel())
-			notice(_L("The job, %s, is now cancelled.", escapehtml($job->name)));
+			notice(_L("The %s, %s, is now cancelled.", getJobTitle() ,escapehtml($job->name)));
 	}
 
 	redirectToReferrer();
@@ -48,7 +48,7 @@ if (isset($_GET['delete'])) {
 	if (userOwns("job",$deleteid) || $USER->authorize('managesystemjobs')) {
 		$job = new Job($deleteid);
 		if ($job->softDelete())
-			notice(_L("The job, %s, is now deleted.", escapehtml($job->name)));
+			notice(_L("The %s, %s, is now deleted.", getJobTitle(), escapehtml($job->name)));
 	}
 	redirectToReferrer();
 }
@@ -58,7 +58,7 @@ if (isset($_GET['archive'])) {
 	if (userOwns("job",$archiveid) || $USER->authorize('managesystemjobs')) {
 		$job = new Job($archiveid);
 		if ($job->archive())
-			notice(_L("The job, %s, is now archived.", escapehtml($job->name)));
+			notice(_L("The %s, %s, is now archived.", getJobTitle(), escapehtml($job->name)));
 	}
 	redirectToReferrer();
 }
@@ -74,10 +74,10 @@ if (isset($_GET['unarchive'])) {
 				$job->update();
 			Query('COMMIT');
 
-			notice(_L("The job, %s, is now unarchived.", escapehtml($job->name)));
+			notice(_L("The %s, %s, is now unarchived.",getJobTitle(), escapehtml($job->name)));
 		}
 	} else {
-		notice(_L("You do not have permission to unarchive this job."));
+		notice(_L("You do not have permission to unarchive this %.",getJobTitle()));
 	}
 
 	redirectToReferrer();
@@ -93,19 +93,19 @@ if (isset($_GET['runrepeating']) && isset($_GET['uuid'])) {
 		if (userOwns("job",$runnow) || $USER->authorize('managesystemjobs')) {
 			$job = new Job($runnow);
 			if ($job->status != 'repeating') {
-				notice(_L("The job, %s, is not a repeating job.", escapehtml($job->name)));
+				notice(_L("The %s, %s, is not a repeating job.", getJobTitle(), escapehtml($job->name)));
 			} else {
 				Query('BEGIN');
 					$job->runNow();
 				Query('COMMIT');
 			
-				notice(_L("The repeating job, %s, will now run.", escapehtml($job->name)));
+				notice(_L("The repeating %s, %s, will now run.", getJobTitle(), escapehtml($job->name)));
 				
 				// this repeating job has been run
 				$_SESSION['lastrunrepeatingjob'][$runnow] = $_GET['uuid'];
 			}
 		} else {
-			notice(_L("You do not have permission to run this repeating job."));
+			notice(_L("You do not have permission to run this repeating %s.", getJobTitle()));
 		}
 	}
 	redirectToReferrer();
@@ -116,7 +116,7 @@ if (isset($_GET['copy'])) {
 	if (userOwns("job",$copyid) || $USER->authorize('managesystemjobs')) {
 		$job = new Job($copyid);
 		if ($job->type != 'notification') {
-			notice(_L("Unable to copy this job"));
+			notice(_L("Unable to copy this %s",getJobTitle()));
 		} else if ($job->userid !== null) {
 			 Query('BEGIN');
 				$newjob = $job->copyNew();
@@ -125,10 +125,10 @@ if (isset($_GET['copy'])) {
 			notice(_L("%s has been copied.", escapehtml($job->name)));
 			redirect('job.php?id='.$newjob->id);
 		} else {
-			notice(_L("You do not have permission to copy this job."));
+			notice(_L("You do not have permission to copy this %s.", getJobTitle()));
 		}
 	} else {
-		notice(_L("You do not have permission to copy this job."));
+		notice(_L("You do not have permission to copy this %s.", getJobTitle()));
 	}
 
 	redirectToReferrer();
@@ -140,7 +140,7 @@ if (isset($_GET['copy'])) {
 ////////////////////////////////////////////////////////////////////////////////
 
 $PAGE = "notifications:jobs";
-$TITLE = "Notification Jobs";
+$TITLE = "Notification " . getJobsTitle();
 
 include_once("nav.inc.php");
 
@@ -162,7 +162,7 @@ if (count($jobids) > 0) {
 	}
 }
 
-$titles = array(	"name" => "#Job Name",
+$titles = array(	"name" => "#" . getJobTitle() . " Name",
 					"description" => "#Description",
 					"type" => "#Type",
 					"startdate" => "Start Date",
@@ -188,9 +188,9 @@ $scroll = false;
 if (count($data) > $scrollThreshold) {
 	$scroll = true;
 }
-startWindow('My Jobs ' . help('Jobs_MyActiveJobs'), 'padding: 3px;', true, true);
+startWindow('My ' . getJobsTitle() . ' ' . help('Jobs_MyActiveJobs'), 'padding: 3px;', true, true);
 
-button_bar(button('Create New Job', NULL,"job.php?id=new") . help('Jobs_AddStandardJob'),button('Refresh', 'window.location.reload()'));
+button_bar(button(_L('Create New %s',getJobTitle()), NULL,"job.php?id=new") . help('Jobs_AddStandardJob'),button('Refresh', 'window.location.reload()'));
 
 showObjects($data, $titles, $formatters, $scroll, true);
 endWindow();
@@ -199,7 +199,7 @@ endWindow();
 if ($USER->authorize('createrepeat')) {
 
 	$data = DBFindMany("Job",", name + 0 as foo from job where userid=$USER->id and status = 'repeating' and type not in ('survey', 'alert') order by foo,name ");
-	$titles = array(	"name" => "#Job Name",
+	$titles = array(	"name" => "#" . getJobTitle() . " Name",
 						"description" => "#Description",
 						"type" => "#Type",
 						"startdate" => "Next Scheduled Run",
@@ -211,14 +211,14 @@ if ($USER->authorize('createrepeat')) {
 	if (count($data) > $scrollThreshold) {
 		$scroll = true;
 	}
-	startWindow('My Repeating Jobs ' . help('Jobs_MyRepeatingJobs'), 'padding: 3px;', true, true);
+	startWindow(_L('My Repeating %s ', getJobsTitle()) . help('Jobs_MyRepeatingJobs'), 'padding: 3px;', true, true);
 	if (count($data) > 0 && getSystemSetting("disablerepeat") ) {
 ?>
 		<table width="100%" border="0" cellpadding="0" cellspacing="0"><tr><td align=center><div class='alertmessage noprint'>The System Administrator has disabled all Repeating Jobs. <br>No Repeating Jobs can be run while this setting remains in effect.</div></td></tr></table>
 <?
 	}
 
-	button_bar(button('Create Repeating Job', NULL,"jobrepeating.php?id=new") . help('Jobs_AddRepeatingJob'));
+	button_bar(button(_L('Create Repeating %s ', getJobTitle()), NULL,"jobrepeating.php?id=new") . help('Jobs_AddRepeatingJob'));
 
 
 	showObjects($data, $titles, array("startdate" => "fmt_nextrun", "type" => "fmt_obj_delivery_type_list","finishdate" => "fmt_obj_date", "Actions" => "fmt_jobs_actions"), $scroll, true);
@@ -245,7 +245,7 @@ if (count($jobids) > 0) {
 	}
 }
 
-$titles = array(	"name" => "#Job Name",
+$titles = array(	"name" => "#" . getJobTitle() . " Name",
 					"description" => "#Description",
 					"type" => "#Type",
 					"startdate" => "Start Date",
@@ -272,7 +272,7 @@ $scroll = false;
 if (count($data) > $scrollThreshold) {
 	$scroll = true;
 }
-startWindow('My Completed Jobs ' . help('Jobs_MyCompletedJobs'),'padding: 3px;', true, true);
+startWindow(_L('My Completed %s ', getJobsTitle()) . help('Jobs_MyCompletedJobs'),'padding: 3px;', true, true);
 showObjects($data, $titles, $formatters, $scroll, true);
 ?>
 	<table style="margin-top: 5px;" border="0" cellpadding="0" cellspacing="0">
@@ -284,7 +284,7 @@ showObjects($data, $titles, $formatters, $scroll, true);
 			&nbsp;
 		</td>
 			<td>
-				<div style="text-align:right; white-space:nowrap"><a href="jobscompleted.php">More Completed Jobs...</a></div>
+				<div style="text-align:right; white-space:nowrap"><a href="jobscompleted.php"><?= _L('More Completed %s...',getJobsTitle())?></a></div>
 			</td>
 		</tr>
 <?
@@ -295,7 +295,7 @@ showObjects($data, $titles, $formatters, $scroll, true);
 			&nbsp;
 		</td>
 			<td>
-				<div style="text-align:right; white-space:nowrap"><a href="jobsarchived.php">Archived Jobs...</a></div>
+				<div style="text-align:right; white-space:nowrap"><a href="jobsarchived.php"><?= _L('Archived %s...',getJobsTitle())?></a></div>
 			</td>
 		</tr>
 	</table>

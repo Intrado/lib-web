@@ -61,7 +61,7 @@ button_bar(button('Create New Survey Template', null,"surveytemplatewiz.php?id=n
 
 $questionnaires = DBFindMany("SurveyQuestionnaire", "from surveyquestionnaire where userid=$USER->id and deleted = 0 order by name");
 
-$titles = array("name" => "#Name",
+$titles = array("name" => "#Survey Template Name",
 				"description" => "#Description",
 				"Type" => "#Type",
 				"Questions" => "#Questions",
@@ -82,7 +82,7 @@ button_bar(button('Schedule Survey', null,"survey.php?id=new") );
 
 $data = DBFindMany("Job","from job where userid=$USER->id and type='survey' and (status='new' or status='scheduled' or status='processing' or status='procactive' or status='active' or status='cancelling') and deleted=0 order by id desc");
 
-$titles = array(	"name" => "#Job Name",
+$titles = array(	"name" => "#Survey Name",
 					"description" => "#Description",
 					"Type" => "#Type",
 					"startdate" => "Start date",
@@ -113,7 +113,7 @@ startWindow('My Completed Surveys '  . help('SurveyBuilder_MyCompleted'),'paddin
 
 $data = DBFindMany("Job","from job where userid=$USER->id and type='survey' and (status='complete' or status='cancelled') and deleted=0 order by id desc");
 
-$titles = array(	"name" => "#Job Name",
+$titles = array(	"name" => "#Survey Name",
 					"description" => "#Description",
 					"Type" => "#Type",
 					"startdate" => "Start date",

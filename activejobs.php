@@ -33,13 +33,13 @@ $jobtypes = DBFindMany("JobType","from jobtype");
 ////////////////////////////////////////////////////////////////////////////////
 
 $PAGE = "system:activejobs";
-$TITLE = "Active & Pending Jobs";
+$TITLE = _L("Active & Pending %s", getJobsTitle());
 
 include_once("nav.inc.php");
 
 session_write_close();//WARNING: we don't keep a lock on the session file, any changes to session data are ignored past this point
 
-startWindow('Active & Pending Notification Jobs ' . help('System_ActiveJobs'),NULL);
+startWindow(_L('Active & Pending Notification %s ', getJobsTitle()) . help('System_ActiveJobs'),NULL);
 
 $start = 0 + (isset($_GET['pagestart']) ? $_GET['pagestart'] : 0);
 $limit = 100;
@@ -128,14 +128,14 @@ function fmt_status_index($row, $index) {
 }
 
 $titles = array(
-				"0" => 'Submitted by',
-				"1" => 'Job Name',
-				"21" => "Mode",
-				"2" => 'Status',
-				"3" => 'Total',
-				"11" => 'Remaining',
-				"15" => 'Scheduled Start',
-				"16" => 'Actions');
+				"0" => _L('Submitted by'),
+				"1" => _L('%s Name', getJobTitle()),
+				"21" => _L("Mode"),
+				"2" => _L('Status'),
+				"3" => _L('Total'),
+				"11" => _L('Remaining'),
+				"15" => _L('Scheduled Start'),
+				"16" => _L('Actions'));
 $formatters = array(
 				"21" => "fmt_job_type",
 				"2" => 'fmt_status_index',

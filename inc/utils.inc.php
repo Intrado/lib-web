@@ -689,4 +689,15 @@ function array_to_csv($arr) {
 	return implode(",",array_map("escape_csvfield",$arr));
 }
 
+
+function getJobTitle() {
+	$job = "Broadcast";
+	return $job;
+}
+
+function getJobsTitle() {
+	$job = "Broadcasts";
+	return $job;
+}
+
 ?>

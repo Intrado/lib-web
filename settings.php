@@ -71,11 +71,11 @@ startWindow("Options", 'padding: 3px;');
 
 				<ul class="linkslist">
 				
-					<li class="heading">Job</li>
+					<li class="heading"><?= getJobTitle()?></li>
 				
-					<li><a href='disablerepeatingjobs.php'>Enable/Disable Repeating Jobs</a></li>
-					<li><a href='jobsettings.php'>Job Settings</a></li>
-					<li><a href='jobtypemanagement.php'>Job Types</a></li>
+					<li><a href='disablerepeatingjobs.php'><?= _L("Enable/Disable Repeating %s",getJobsTitle())?></a></li>
+					<li><a href='jobsettings.php'><?= _L("%s Settings",getJobTitle())?></a></li>
+					<li><a href='jobtypemanagement.php'><?= _L("%s Types",getJobTitle())?></a></li>
 <?
 		if (getSystemSetting("_amdtype","ivr") == "ivr") {
 ?>

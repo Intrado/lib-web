@@ -31,15 +31,15 @@ if (!$USER->authorize('viewsystemrepeating')) {
 ////////////////////////////////////////////////////////////////////////////////
 
 $PAGE = "system:repeatingjobs";
-$TITLE = "Repeating Jobs";
+$TITLE = _L("Repeating %s", getJobsTitle());
 
 include_once("nav.inc.php");
 
-startWindow('Repeating Notification Jobs ' . help('System_RepeatingJobs'), 'padding: 3px;');
+startWindow(_L('Repeating Notification %s ', getJobsTitle()) . help('System_RepeatingJobs'), 'padding: 3px;');
 
 	if (getSystemSetting("disablerepeat") ) {
 ?>
-		<table width="100%" border="0" cellpadding="0" cellspacing="0"><tr><td align=center><div class='alertmessage noprint'>The System Administrator has disabled all Repeating Jobs. <br>No Repeating Jobs can be run while this setting remains in effect.</div></td></tr></table>
+		<table width="100%" border="0" cellpadding="0" cellspacing="0"><tr><td align=center><div class='alertmessage noprint'><?= _L("The System Administrator has disabled all Repeating %s. <br>No Repeating %s can be run while this setting remains in effect.", getJobsTitle(), getJobsTitle()) ?></div></td></tr></table>
 <?
 	}
 
@@ -66,12 +66,12 @@ while ($row = DBGetRow($result)) {
 }
 
 $titles = array(
-				"0" => 'Submitted by',
-				"1" => 'Job Name',
-				"8" => "Type",
-				"2" => 'Next Scheduled Run',
-				"9" => "Last Run",
-				"3" => 'Actions');
+				"0" => _L('Submitted by'),
+				"1" => _L('%s Name', getJobTitle()),
+				"8" => _L("Type"),
+				"2" => _L('Next Scheduled Run'),
+				"9" => _L("Last Run"),
+				"3" => _L('Actions'));
 $formatters = array(
 				"8" => "fmt_delivery_type_list",
 				"2" => 'fmt_next_repeat',

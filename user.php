@@ -412,7 +412,7 @@ if (!getSystemSetting('_hascallback', false)) {
 	$authorizedcallerids = QuickQueryList("select callerid,callerid from authorizedcallerid",true);
 	$formdata["callerid"] = array(
 				"label" => _L("Caller ID"),
-				"fieldhelp" => _L('This is the default Caller ID phone number for jobs sent by the user.'),
+				"fieldhelp" => _L('This is the default Caller ID phone number for %s sent by the user.', getJobsTitle()),
 				"value" => ($edituser->id +0 > 0)?$edituser->getSetting("callerid", ""):"",
 				"validators" => array(
 					array("ValLength","min" => 0,"max" => 20),
@@ -454,8 +454,8 @@ $formdata["accessid"] = array(
 );
 
 $formdata["jobtypes"] = array(
-	"label" => _L("Job Type Restriction"),
-	"fieldhelp" => _L('If the user should only be able to send certain types of jobs, check the job types here. Checking nothing will allow the user to send any job type.'),
+	"label" => _L("%s Type Restriction", getJobTitle()),
+	"fieldhelp" => _L('If the user should only be able to send certain types of %s, check the %s types here. Checking nothing will allow the user to send any %s type.', getJobsTitle(), getJobTitle(), getJobTitle()),
 	"value" => $userjobtypeids,
 	"validators" => array(
 		array("ValInArray", "values" => array_keys($jobtypes))
