@@ -406,7 +406,9 @@ border-color: #222222 transparent transparent; border-style: solid; border-width
 .msg_complete li a:hover { color: #444; text-decoration: none; }
 .msg_complete li.complete a { background: #499122; color: #fbfbfb; text-shadow: 0 1px 1px #222; border: 1px solid #3A7A17; 
 -webkit-box-shadow: inset 0 1px 1px 0 rgba(255, 255, 255, 0.5); box-shadow: inset 0 1px 1px 0 rgba(255, 255, 255, 0.5); }
-.msg_complete li a span.icon { background: url(themes/newui/remove.png) 0 center no-repeat; width: 16px; }
+
+.msg_complete li a span.icon { display: none; }
+.msg_complete li.complete a span.icon { background: url(themes/newui/tick.png) 0 center no-repeat; width: 16px; display: inline-block; }
 
 .msg_confirm { background: #F9F8F6; margin: 0 -25px -20px -25px; padding: 22px 21px; text-align: right; border-radius: 0 0 5px 5px; border-top: 1px solid #DDDDDD; }
 
