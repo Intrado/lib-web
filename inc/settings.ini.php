@@ -49,9 +49,6 @@ referer="http://asp.schoolmessenger.com"
 disableAutoTranslate=false
 
 
-[txtreply]
-txt_datfile="/usr/commsuite/cache/txtreply.dat"
-
 [facebook]
 appid="170562026304359"
 appsecret="3cf7cbf09b579450f5761e46c14a655c"
