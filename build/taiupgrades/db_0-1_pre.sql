@@ -125,3 +125,20 @@ CREATE TABLE `tai_survey` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 $$$
+
+-- $rev 4
+CREATE TABLE `tai_lockout` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `organizationid` int(11) NOT NULL,
+  `title` text NOT NULL,
+  `type` enum('hard','soft') NOT NULL DEFAULT 'hard',
+  `starttimestamp` time NOT NULL,
+  `endtimestamp` time NOT NULL,
+  `days` varchar(255) NOT NULL,
+  `messagebody` text NOT NULL,
+  `deleted` TINYINT NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
+$$$
+
+
