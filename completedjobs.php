@@ -43,7 +43,7 @@ include_once("nav.inc.php");
 
 session_write_close();//WARNING: we don't keep a lock on the session file, any changes to session data are ignored past this point
 
-startWindow(_L('Completed Notification %s ',getJobsTitle()) . help('System_CompletedJobs'), 'padding: 3px;');
+startWindow(_L('Completed %s ',getJobsTitle()) . help('System_CompletedJobs'), 'padding: 3px;');
 
 
 //get this page's worth of jobs

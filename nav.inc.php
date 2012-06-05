@@ -72,7 +72,7 @@ $SHORTCUTS['Help'] = "javascript: popup('help/index.php',750,500);";
 		$maintabname = "notifications";
 	} else {
 		$starttab = array("Start","start.php",NULL,$MAINTAB=="start",array());
-		$maintabtitle = "Notifications";
+		$maintabtitle = getJobsTitle();
 		$maintabname = "notifications";
 	}
 

@@ -82,7 +82,7 @@ startWindow("Select a Template"  . help('Reports_SelectATemplate'), 'padding: 3p
 		<tr align="left" valign="top">
 			<td>
 				<ul>
-					<li><a href='reportjobsearch.php?clear=1' >Notification Summary</a></li>
+					<li><a href='reportjobsearch.php?clear=1' ><?= _L("%s Summary", getJobTitle()) ?></a></li>
 <? if($USER->authorize('viewsystemreports') || $USER->authorize("sendphone")){ ?>
 					<li><a href='reportjobdetailsearch.php?clear=1&type=phone' >Phone Log</a></li>
 <?

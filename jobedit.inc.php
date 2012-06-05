@@ -434,14 +434,14 @@ $helpsteps = array();
 $helpstepnum = 1;
 $formdata = array();
 
-$formdata[] = _L('Job');
+$jobTitle = getJobTitle();
 
-$helpsteps[] = _L("Enter a name for your job. " .
-					"Using a descriptive name that indicates the message content will make it easier to find the job later. " .
-					"You may also optionally enter a description of the the job.");
+$helpsteps[] = _L("Enter a name for your %s. " .
+					"Using a descriptive name that indicates the message content will make it easier to find the %s later. " .
+					"You may also optionally enter a description of the the %s.", $jobTitle, $jobTitle, $jobTitle);
 $formdata["name"] = array(
 	"label" => _L('Name'),
-	"fieldhelp" => _L('Enter a name for your job.'),
+	"fieldhelp" => _L('Enter a name for your %s.',$jobTitle),
 	"value" => isset($job->name)?$job->name:"",
 	"validators" => array(
 		array("ValRequired"),
@@ -453,7 +453,7 @@ $formdata["name"] = array(
 );
 $formdata["description"] = array(
 	"label" => _L('Description'),
-	"fieldhelp" => _L('Enter a description of the job. This is optional, but can help identify the job later.'),
+	"fieldhelp" => _L('Enter a description of the %s. This is optional, but can help identify the %s later.',$jobTitle,$jobTitle),
 	"value" => isset($job->description)?$job->description:"",
 	"validators" => array(
 		array("ValLength","min" => 0,"max" => 50)
@@ -508,17 +508,17 @@ if ($JOBTYPE == "repeating") {
 
 	$timevalues = newform_time_select(NULL, $ACCESS->getValue('callearly'), $ACCESS->getValue('calllate'), $USER->getCallLate());
 
-	$helpsteps[] = _L("The options in this section create a delivery window for your job. ".
+	$helpsteps[] = _L("The options in this section create a delivery window for your %s. ".
 						"It's important that you leave enough time for the system to contact everyone in your list. ".
 						"The options are:".
 							"<ul>".
-								"<li>Repeat - This is the day(s) of the week and the time of day the job will start running.".
-								"<li>Days to Run - The number of days the job should run within the times you select.".
-								"<li>Start Time and End Time - These represent the time the job should start and stop.".
-							"</ul>");
+								"<li>Repeat - This is the day(s) of the week and the time of day the %s will start running.".
+								"<li>Days to Run - The number of days the %s should run within the times you select.".
+								"<li>Start Time and End Time - These represent the time the %s should start and stop.".
+							"</ul>",$jobTitle,$jobTitle,$jobTitle,$jobTitle);
 	$formdata["repeat"] = array(
 		"label" => _L("Repeat"),
-		"fieldhelp" => _L("Select which days this job should run."),
+		"fieldhelp" => _L("Select which days this %s should run.",$jobTitle),
 		"value" => $repeatvalues,
 		"validators" => array(
 			array("ValRequired"),
@@ -531,25 +531,25 @@ if ($JOBTYPE == "repeating") {
 		"helpstep" => ++$helpstepnum
 	);
 } else {
-	$helpsteps[] = _L("The options in this section create a delivery window for your job. ".
+	$helpsteps[] = _L("The options in this section create a delivery window for your %s. ".
 						"It's important that you leave enough time for the system to contact everyone in your list. ".
 						"The options are:".
 							"<ul>".
-								"<li>Start Date - This is the day the job will start running.".
-								"<li>Days to Run - The number of days the job should run within the times you select.".
-								"<li>Start Time and End Time - These represent the time the job should start and stop.".
-							"</ul>");
+								"<li>Start Date - This is the day the %s will start running.".
+								"<li>Days to Run - The number of days the %s should run within the times you select.".
+								"<li>Start Time and End Time - These represent the time the %s should start and stop.".
+							"</ul>",$jobTitle,$jobTitle,$jobTitle,$jobTitle);
 	if ($completedmode) {
 		$formdata["date"] = array(
 			"label" => _L("Start Date"),
-			"fieldhelp" => _L("Notification will begin on the selected date."),
+			"fieldhelp" => _L("%s will begin on the selected date.",$jobTitle),
 			"control" => array("FormHtml","html" => date("m/d/Y", strtotime($job->startdate))),
 			"helpstep" => ++$helpstepnum
 		);
 	} else {
 		$formdata["date"] = array(
 			"label" => _L("Start Date"),
-			"fieldhelp" => _L("Notification will begin on the selected date."),
+			"fieldhelp" => _L("%s will begin on the selected date.",$jobTitle),
 			"value" => isset($job->startdate)?$job->startdate:"now + $dayoffset days",
 			"validators" => array(
 				array("ValRequired"),
@@ -567,7 +567,7 @@ if ($JOBTYPE == "repeating") {
 if ($completedmode) {
 	$formdata["days"] = array(
 		"label" => _L("Days to Run"),
-		"fieldhelp" => _L("Select the number of days this job should run."),
+		"fieldhelp" => _L("Select the number of days this %s should run.",$jobTitle),
 		"control" => array("FormHtml","html" => (86400 + strtotime($job->enddate) - strtotime($job->startdate) ) / 86400),
 		"helpstep" => $helpstepnum
 	);
@@ -589,7 +589,7 @@ if ($completedmode) {
 	$numdays = array_combine(range(1,$maxdays),range(1,$maxdays));
 	$formdata["days"] = array(
 		"label" => _L("Days to Run"),
-		"fieldhelp" => _L("Select the number of days this job should run."),
+		"fieldhelp" => _L("Select the number of days this %s should run.",$jobTitle),
 		"value" => (86400 + strtotime($job->enddate) - strtotime($job->startdate) ) / 86400,
 		"validators" => array(
 			array("ValRequired"),
@@ -675,7 +675,7 @@ if ($submittedmode || $completedmode) {
 		$formdata[] = _L('Social Media Options');
 		// facebook (readonly)
 		if (count($job->getJobPosts("facebook"))) {
-			$helpsteps[] = _L("This section contains a list of the Facebook Pages which are associated with this job.");
+			$helpsteps[] = _L("This section contains a list of the Facebook Pages which are associated with this %s.",$jobTitle);
 			$formdata["fbpages"] = array(
 				"label" => _L('Facebook Page(s)'),
 				"fieldhelp" => _L('This is a list of the Facebook Pages associated with this job.'),
@@ -713,7 +713,7 @@ if ($submittedmode || $completedmode) {
 		}
 	}
 	$helpsteps[] = _L("<ul><li>Auto Report - Selecting this option causes the system to email ".
-					"a report to the email address associated with your account when the job ".
+					"a report to the email address associated with your account when the %s ".
 					"is finished.<li>Max Attempts - This option lets you select the maximum ".
 					"number of times the system should try to contact a recipient. ".
 					"<li>Allow Reply - Check this if you want recipients to be able to ".
@@ -722,7 +722,7 @@ if ($submittedmode || $completedmode) {
 					"<li>Allow Confirmation - Select this option if you would like recipients ".
 					"to give a 'yes' or 'no' response to your message.<br><br> ".
 					"<b>Note:</b>You will need to include instructions ".
-					"to press '1' for 'yes' and '2' for 'no' in your message.</ul>");
+					"to press '1' for 'yes' and '2' for 'no' in your message.</ul>",$jobTitle);
 	
 	$formdata[] = _L('Advanced Options ');
 	$formdata["report"] = array(
@@ -899,7 +899,7 @@ if ($submittedmode || $completedmode) {
 	$formdata[] = _L('Advanced Options ');
 	$formdata["report"] = array(
 		"label" => _L('Auto Report'),
-		"fieldhelp" => _L("Select this option if you would like the system to email you when the job has finished running."),
+		"fieldhelp" => _L("Select this option if you would like the system to email you when the %s has finished running.",$jobTitle),
 		"value" => $job->isOption("sendreport"),
 		"validators" => array(),
 		"control" => array("CheckBox"),
@@ -1173,8 +1173,8 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 ////////////////////////////////////////////////////////////////////////////////
 $PAGE = "notifications:jobs";
 
-$TITLE = ($JOBTYPE == 'repeating' ? _L('Repeating Job Editor: ') : _L('Job Editor: '));
-$TITLE .= ($jobid == NULL ? _L("New Job") : escapehtml($job->name));
+$TITLE = ($JOBTYPE == 'repeating' ? _L('Repeating %s Editor: ',$jobTitle) : _L('%s Editor: ',$jobTitle));
+$TITLE .= ($jobid == NULL ? _L("New %s",$jobTitle) : escapehtml($job->name));
 
 include_once("nav.inc.php");
 
@@ -1199,15 +1199,15 @@ Validator::load_validators(array("ValDuplicateNameCheck",
 <?
 PreviewModal::includePreviewScript();
 
-startWindow(_L('Job Information'));
+startWindow(_L('%s Information',$jobTitle));
 if ($JOBTYPE == "repeating" && getSystemSetting("disablerepeat") ) {
 ?>
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
 	<tr>
 		<td align="center">
 			<div class='alertmessage noprint'>
-				The System Administrator has disabled all Repeating Jobs. <br>
-				No Repeating Jobs can be run while this setting remains in effect.
+				<?= _L("The System Administrator has disabled all Repeating %s. <br>
+				No Repeating %s can be run while this setting remains in effect.",getJobsTitle(),getJobsTitle())?>
 			</div></td>
 	</tr>
 </table>

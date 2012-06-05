@@ -39,7 +39,7 @@ include_once("nav.inc.php");
 
 session_write_close();//WARNING: we don't keep a lock on the session file, any changes to session data are ignored past this point
 
-startWindow(_L('Active & Pending Notification %s ', getJobsTitle()) . help('System_ActiveJobs'),NULL);
+startWindow(_L('Active & Pending %s ', getJobsTitle()) . help('System_ActiveJobs'),NULL);
 
 $start = 0 + (isset($_GET['pagestart']) ? $_GET['pagestart'] : 0);
 $limit = 100;

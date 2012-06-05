@@ -35,7 +35,7 @@ $TITLE = _L("Repeating %s", getJobsTitle());
 
 include_once("nav.inc.php");
 
-startWindow(_L('Repeating Notification %s ', getJobsTitle()) . help('System_RepeatingJobs'), 'padding: 3px;');
+startWindow(_L('Repeating %s ', getJobsTitle()) . help('System_RepeatingJobs'), 'padding: 3px;');
 
 	if (getSystemSetting("disablerepeat") ) {
 ?>
