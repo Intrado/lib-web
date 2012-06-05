@@ -244,7 +244,7 @@ class Form {
 			if ($formclass == "FormHtml") {
 
 				$str.= '
-						<div class="formfieldarea cf ' . $this->rendermode . '" id="'.$n.'_fieldarea" '.$style.'>
+						<div class="formfieldarea cf ' . $this->rendermode . '" id="'.$n.'_fieldarea" >
 							<div class="formtitle">
 								<span class="formlabel">'.$l.'</span>
 							</div>
