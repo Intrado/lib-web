@@ -560,6 +560,25 @@ $formdata = array_merge($formdata, array(
 		"control" => array("TextField"),
 		"helpstep" => 1
 	),
+	"optionsavemessage" => array(
+		"label" => "optionsavemessage",
+		"value" => "",
+		"validators" => array(
+			// NOTE: no validation. just toggles save message mode
+		),
+		"control" => array("CheckBox"),
+		"helpstep" => 1
+	),
+	"optionsavemessagename" => array(
+		"label" => "optionsavemessagename",
+		"value" => "",
+		"validators" => array(
+			array("ValDuplicateNameCheck", "type" => "messagegroup"),
+			array("ValLength","max" => 30)
+		),
+		"control" => array("TextField"),
+		"helpstep" => 1
+	),
 	//=========================================================================================
 	"SCHEDULE OPTIONS",
 	//=========================================================================================
