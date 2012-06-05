@@ -45,9 +45,9 @@ foreach ($archivedjobs as $job) {
 $formdata = array();
 $formdata["searchby"] = array(
 	"label" => _L("Search By"),
-	"fieldhelp" => _L("Search by job name or the date it was sent."),
+	"fieldhelp" => _L("Search by %s name or the date it was sent.",getJobTitle()),
 	"value" => "date",
-	"control" => array("RadioButton", "values" => array("date" => _L("Date"),"job" => _L("Job"),"archivedjob" => _L("Archived Job"))),
+	"control" => array("RadioButton", "values" => array("date" => _L("Date"),"job" => getJobTitle(),"archivedjob" => _L("Archived %s",getJobTitle()))),
 	"validators" => array(array("ValRequired"), array("ValInArray", "values" => array("date", "job", "archivedjob"))),
 	"helpstep" => 1
 );
@@ -59,7 +59,7 @@ $formdata["dateoptions"] = array(
 	"helpstep" => 1
 );
 $formdata["jobid"] = array(
-	"label" => _L("Jobs"),
+	"label" => getJobsTitle(),
 	"value" => '',
 	"control" => array("SelectMenu", "values" => $joblist),
 	"validators" => array(array("ValInArray", "values" => array_keys($joblist))),
@@ -67,7 +67,7 @@ $formdata["jobid"] = array(
 );
 
 $formdata["archivedjobid"] = array(
-	"label" => _L("Archived Jobs"),
+	"label" => _L("Archived %s",getJobsTitle()),
 	"value" => '',
 	"control" => array("SelectMenu", "values" => $archivedjoblist),
 	"validators" => array(array("ValInArray", "values" => array_keys($archivedjoblist))),
@@ -157,7 +157,7 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 // Prepare Report Data
 ////////////////////////////////////////////////////////////////////////////////
 $titles = array(
-	"jobname" => _L("Job Name"),
+	"jobname" => _L("%s Name",getJobTitle()),
 	"user" =>  _L("Submitted by"),
 	"date" => _L("Post Date")
 );

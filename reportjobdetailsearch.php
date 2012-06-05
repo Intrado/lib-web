@@ -266,16 +266,16 @@ foreach ($jobsarchived as $job) {
 $formdata = array();
 $formdata["radioselect"] = array(
 	"label" => _L("Search By"),
-	"fieldhelp" => _L("Search by job name or the date it was sent."),
+	"fieldhelp" => _L("Search by %s name or the date it was sent.",getJobTitle()),
 	"value" => isset($options['jobid']) ? 'job' : 'date',
-	"control" => array("RadioButton", "values" => array("job" => _L("Job"), "date" => _L("Date"))),
+	"control" => array("RadioButton", "values" => array("job" => getJobTitle(), "date" => _L("Date"))),
 	"validators" => array(array("ValRequired"), array("ValInArray", "values" => array('job', 'date'))),
 	"helpstep" => 1
 );
 
 $formdata["jobid"] = array(
-	"label" => _L("Jobs"),
-	"fieldhelp" => _L("Select a previously sent job from the menu."),
+	"label" => getJobsTitle(),
+	"fieldhelp" => _L("Select a previously sent %s from the menu.",getJobTitle()),
 	"value" => !empty($options['archived']) ? '' : $jobid,
 	"control" => array("SelectMenu", "values" => $jobids),
 	"validators" => array(array("ValInArray", "values" => array_keys($jobids))),
@@ -283,8 +283,8 @@ $formdata["jobid"] = array(
 );
 
 $formdata["jobidarchived"] = array(
-	"label" => _L("Archived Jobs"),
-	"fieldhelp" => _L("Choose an archived job from the menu."),
+	"label" => _L("Archived %s", getJobsTitle()),
+	"fieldhelp" => _L("Choose an archived %s from the menu.",getJobTitle()),
 	"value" => !empty($options['archived']) ? $jobid : '',
 	"control" => array("SelectMenu", "values" => $jobidsarchived),
 	"validators" => array(array("ValInArray", "values" => array_keys($jobidsarchived))),
@@ -292,8 +292,8 @@ $formdata["jobidarchived"] = array(
 );
 
 $formdata["checkarchived"] = array(
-	"label" => _L("Search Archived Jobs"),
-	"fieldhelp" => _L("Select this option if you need to search for a job that has been archived."),
+	"label" => _L("Search Archived %s",getJobsTitle()),
+	"fieldhelp" => _L("Select this option if you need to search for a %s that has been archived.",getJobTitle()),
 	"value" => !empty($options['archived']) ? 1 : 0,
 	"control" => array("CheckBox"),
 	"validators" => array(),
@@ -302,7 +302,7 @@ $formdata["checkarchived"] = array(
 
 $formdata["dateoptions"] = array(
 	"label" => _L("Date Options"),
-	"fieldhelp" => _L("Use this menu to search by the date the job was sent."),
+	"fieldhelp" => _L("Use this menu to search by the date the %s was sent.",getJobTitle()),
 	"value" => json_encode(array(
 		"reldate" => isset($options['reldate']) ? $options['reldate'] : 'today',
 		"xdays" => isset($options['lastxdays']) ? $options['lastxdays'] : '',
@@ -326,8 +326,8 @@ $formdata["ruledata"] = array(
 );
 
 $formdata["jobtype"] = array(
-	"label" => _L("Filter by job type"),
-	"fieldhelp" => _L("Use these options if you want to show reports only for certain job types."),
+	"label" => _L("Filter by %s type",getJobTitle()),
+	"fieldhelp" => _L("Use these options if you want to show reports only for certain %s types.",getJobTitle()),
 	"value" => isset($options['jobtypes']) ? 1 : 0,
 	"control" => array("CheckBox"),
 	"validators" => array(),
@@ -335,7 +335,7 @@ $formdata["jobtype"] = array(
 );
 
 $formdata["jobtypes"] = array(
-	"label" => _L("Job Types"),
+	"label" => _L("%s Types",getJobTitle()),
 	"value" => $savedjobtypes,
 	"control" => array("MultiCheckBox", "values" => $jobtypenames),
 	"validators" => array(array("ValInArray", "values" => array_keys($jobtypenames))),

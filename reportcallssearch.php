@@ -212,7 +212,7 @@ $formdata["dateoptions"] = array(
 );
 
 $formdata["jobtype"] = array(
-	"label" => _L("Filter by job type"),
+	"label" => _L("Filter by %s type",getJobTitle()),
 	"fieldhelp" => _L("If you would like to filter report results by job type, select the type here."),
 	"value" => isset($options['jobtypes']) ? 1 : 0,
 	"control" => array("CheckBox"),
@@ -221,7 +221,7 @@ $formdata["jobtype"] = array(
 );
 
 $formdata["jobtypes"] = array(
-	"label" => _L("Job Types"),
+	"label" => _L("%s Types",getJobTitle()),
 	"value" => $savedjobtypes,
 	"control" => array("MultiCheckBox", "values" => $jobtypenames),
 	"validators" => array(array("ValInArray", "values" => array_keys($jobtypenames))),

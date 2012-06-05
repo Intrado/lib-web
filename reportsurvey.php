@@ -164,7 +164,7 @@ startWindow("Select ".help('ReportSurvey_Select'), NULL, false);
 						?>
 						</td>
 						<td align="left"><? NewFormItem($f, $s, "check_archived", "checkbox", null, null, "id='check_archived' onclick = \"setHiddenIfChecked(this, 'jobid'); setVisibleIfChecked(this, 'jobid_archived');\"") ?>
-						Show archived jobs</td>
+						Show archived Surveys</td>
 					</tr>
 				</table>
 			</td>
