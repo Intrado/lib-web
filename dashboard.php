@@ -44,14 +44,6 @@ function generateStats($useridList, $start_datetime, $end_datetime) {
 		
 	$stats["total_jobs"] = QuickQuery($query, null, $params);
 
-	// senders
-	$query = "select count(distinct(j.userid)) from job j " .
-		"where j.status in ('procactive','active','complete','cancelled','cancelling') and " .
-		"j.activedate >= ? and j.activedate <= ? and " .
-		"j.userid in (" . repeatWithSeparator("?", ",", count($useridList)) . ")";
-		
-	$stats["total_users"] = QuickQuery($query, null, $params);
-	
 	// languages
 	$query = "select count(distinct(m.languagecode)) from message m " .
 		"join messagegroup mg on (mg.id = m.messagegroupid) " .
@@ -62,49 +54,34 @@ function generateStats($useridList, $start_datetime, $end_datetime) {
 		
 	$stats["total_languages"] = QuickQuery($query, null, $params);
 	
-	// phone messages
-	$query = "select count(*) from message m " .
+	// total of each message type
+	$query = "select m.type as type, count(*) as total from message m " .
 		"join messagegroup mg on (mg.id = m.messagegroupid) " .
 		"join job j on (j.messagegroupid = mg.id) " .
-		"where m.type = 'phone' and " .
+		"where  " .
 		"j.status in ('procactive','active','complete','cancelled','cancelling') and " .
 		"j.activedate >= ? and j.activedate <= ? and " .
-		"j.userid in (" . repeatWithSeparator("?", ",", count($useridList)) . ")";
-		
-	$stats["total_phones"] = QuickQuery($query, null, $params);
+		"j.userid in (" . repeatWithSeparator("?", ",", count($useridList)) . ") " .
+		"group by m.type";
 	
-	// email messages
-	$query = "select count(*) from message m " .
-		"join messagegroup mg on (mg.id = m.messagegroupid) " .
-		"join job j on (j.messagegroupid = mg.id) " .
-		"where m.type = 'email' and " .
-		"j.status in ('procactive','active','complete','cancelled','cancelling') and " .
-		"j.activedate >= ? and j.activedate <= ? and " .
-		"j.userid in (" . repeatWithSeparator("?", ",", count($useridList)) . ")";
-		
-	$stats["total_emails"] = QuickQuery($query, null, $params);
+	// init to zero, in case none found in query
+	$stats["total_phones"] = 0;
+	$stats["total_emails"] = 0;
+	$stats["total_sms"] = 0;
+	$stats["total_posts"] = 0;
 	
-	// sms messages
-	$query = "select count(*) from message m " .
-		"join messagegroup mg on (mg.id = m.messagegroupid) " .
-		"join job j on (j.messagegroupid = mg.id) " .
-		"where m.type = 'sms' and " .
-		"j.status in ('procactive','active','complete','cancelled','cancelling') and " .
-		"j.activedate >= ? and j.activedate <= ? and " .
-		"j.userid in (" . repeatWithSeparator("?", ",", count($useridList)) . ")";
-		
-	$stats["total_sms"] = QuickQuery($query, null, $params);
-
-	// post messages
-	$query = "select count(*) from message m " .
-		"join messagegroup mg on (mg.id = m.messagegroupid) " .
-		"join job j on (j.messagegroupid = mg.id) " .
-		"where m.type = 'post' and " .
-		"j.status in ('procactive','active','complete','cancelled','cancelling') and " .
-		"j.activedate >= ? and j.activedate <= ? and " .
-		"j.userid in (" . repeatWithSeparator("?", ",", count($useridList)) . ")";
-		
-	$stats["total_posts"] = QuickQuery($query, null, $params);
+	$rows = QuickQueryMultiRow($query, true, null, $params);
+	foreach ($rows as $row) {
+		if (!strcmp("phone", $row['type']))
+			$stats['total_phones'] = $row['total'];
+		if (!strcmp("email", $row['type']))
+			$stats['total_emails'] = $row['total'];
+		if (!strcmp("sms", $row['type']))
+			$stats['total_sms'] = $row['total'];
+		if (!strcmp("post", $row['type']))
+			$stats['total_posts'] = $row['total'];
+	}
+	
 	
 	// top jobtypes
 	$query = "select jt.name as name, count(*) as total from job j " .
@@ -128,7 +105,8 @@ function generateStats($useridList, $start_datetime, $end_datetime) {
 		
 	$stats["top_users"] = QuickQueryMultiRow($query, true, null, $params);
 
-	
+	$stats["total_users"] = count($stats["top_users"]);
+
 	error_log("STATS CALC"); // TODO remove
 	return $stats;
 }
@@ -137,9 +115,9 @@ function generateStats($useridList, $start_datetime, $end_datetime) {
 // Data
 ////////////////////////////////////////////////////////////////////////////////
 
+// sql explained key useraccess
 $query = "select max(j.activedate) from job j " .
-	"where j.status in ('procactive','active','complete','cancelled','cancelling') and " .
-	"j.userid in (" . repeatWithSeparator("?", ",", count($useridList)) . ")";
+	"where j.userid in (" . repeatWithSeparator("?", ",", count($useridList)) . ")";
 	
 $expect = QuickQuery($query, null, $useridList);
 // keep one day, key generated
