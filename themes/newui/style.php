@@ -26,7 +26,7 @@ time, mark, audio, video {
 
 /* redo image align center - this is used by all the actionlinks and icon buttons and set this way in the main css file */
 img {
-	vertical-align: center;
+	vertical-align: middle;
 }
 
 /* HTML5 display-role reset for older browsers */
