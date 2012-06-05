@@ -14,6 +14,7 @@ require_once("obj/Job.obj.php");
 require_once("inc/date.inc.php");
 require_once("inc/formatters.inc.php");
 require_once("inc/facebook.php");
+require_once("inc/facebookEnhanced.inc.php");
 require_once("inc/facebook.inc.php");
 
 ////////////////////////////////////////////////////////////////////////////////
