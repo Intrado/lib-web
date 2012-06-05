@@ -292,6 +292,9 @@
 					if (phone == "")
 						phone = easycalldata.emptyphonetext;
 					easycalldata.subcontainer[code].append($('<div />', { "class": "easycallphoneinvalid", "text": phone + " " + valid }));
+					// if this isn't the record area for the default, clear the container association
+					if (code != easycalldata.default)
+						easycalldata.subcontainer[code] = false;
 					return;
 				}
 				easycalldata.defaultphone = phone;
