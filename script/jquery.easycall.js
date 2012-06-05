@@ -123,6 +123,18 @@
 						phoneinput.removeClass("blank");
 					}
 				});
+				// observe the enter keypress inside the phone input field.
+				phoneinput.keydown(function(e) {
+					// enter was pressed?
+					if (e.which == 13) {
+						e.preventDefault();
+						var code = easycalldata.default;
+						if (hasmenu)
+							code = selectmenu.val();
+						easycalldata.subcontainer[code] = container;
+						method.doCall(code);
+					}
+				});
 				
 				// button to start the calling session
 				var callbutton = $('<button />', { "class": "easycallcallnowbutton record", "value": "Call Now to Record" });
@@ -215,12 +227,11 @@
 				var resetbutton = $('<button />', { "class": "easycallerrorbutton" });
 				resetbutton.append($('<span />', { "class": "icon" })).append($('<span />').append("Retry"));
 				container.append(languagetitle)
-						.append($('<span />', { "class": "icon" }))
 						.append($('<span />', { "class": "easycallerrortext" }).append(errortext))
 						.append(resetbutton)
 						.append($('<div style="clear:both"/>'));
 				
-				resetbutton.click(function () {
+				resetbutton.click(function (e) {
 					e.preventDefault();
 					method.resetToCallMeContainer(code);
 				});
@@ -278,7 +289,9 @@
 				var valid = method.validatePhone(phone);
 				if (valid !== true) {
 					easycalldata.subcontainer[code].children(".easycallphoneinvalid").remove();
-					easycalldata.subcontainer[code].append($('<div />', { "class": "easycallphoneinvalid", "text": phone + ": " + valid }));
+					if (phone == "")
+						phone = easycalldata.emptyphonetext;
+					easycalldata.subcontainer[code].append($('<div />', { "class": "easycallphoneinvalid", "text": phone + " " + valid }));
 					return;
 				}
 				easycalldata.defaultphone = phone;

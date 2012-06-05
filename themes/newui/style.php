@@ -570,6 +570,19 @@ button:active, button.active, .btn:active, .btn.active { background-color: #d9d9
 	font-weight: bold;
 	font-style: italic;
 }
+.easycallerrorcontainer {
+	padding: 2px;
+	background: pink;
+}
+.easycallerrorcontainer span.easycallerrortext {
+	margin-right: 5px;
+	margin-left: 2px;
+	font-size: 1.2em;
+	font-weight: bold;
+}
+.easycallerrorcontainer span.icon {
+	background: url(img/icons/error.png) 0 center no-repeat;
+}
 
 
 
