@@ -385,16 +385,17 @@ class ReldateOptions extends FormItem {
 
 		$onchange = "if (this.value != \"xdays\") {
 						 $(\"{$n}_xdaysContainer\").hide();
-					 } else {
+					} else {
 						$(\"{$n}_xdaysContainer\").show();
-					 }
-					 if (this.value != \"daterange\") {
+					}
+					if (this.value != \"daterange\") {
 						$(\"{$n}_dateContainer\").hide();
-					 } else {
+					} else {
 						$(\"{$n}_dateContainer\").show();
-					 }
-					$(\"$n\").value = \$H({\"reldate\":this.value}).toJSON();
-				    $(\"{$n}_xdays\").value = \"$defaultxdays\";
+					}
+					
+					$(\"$n\").value = Object.toJSON({\"reldate\":this.value});
+					$(\"{$n}_xdays\").value = \"$defaultxdays\";
 					$(\"{$n}_startdate\").value = \"\";
 					$(\"{$n}_enddate\").value = \"\";";
 
@@ -426,7 +427,7 @@ class ReldateOptions extends FormItem {
 		$selectbox .= "</select>";
 
 		$xdaysValue = isset($data['xdays']) ? $data['xdays'] : $defaultxdays;
-		$xdaysChange = "$(\"$n\").value = \$H({\"reldate\":$(\"{$n}_reldate\").value, \"xdays\":this.value}).toJSON();";
+		$xdaysChange = "$(\"$n\").value = Object.toJSON({\"reldate\":$(\"{$n}_reldate\").value, \"xdays\":this.value});";
 		$xdays = _L("Days: ") . "<input type='text' size='3' id='{$n}_xdays' value='$xdaysValue' onclick='$xdaysChange' onfocus='$xdaysChange' onblur='$xdaysChange' onchange='$xdaysChange'/>";
 
 		$startdateValue = !empty($data['startdate']) ? $data['startdate'] : '';
@@ -446,7 +447,7 @@ class ReldateOptions extends FormItem {
 			<script type='text/javascript' src='script/datepicker.js'></script>
 			<script type='text/javascript'>
 				function {$n}_datechange() {
-					$(\"$n\").value = \$H({\"reldate\":$(\"{$n}_reldate\").value, \"startdate\":$(\"{$n}_startdate\").value, \"enddate\":$(\"{$n}_enddate\").value}).toJSON(); 
+					$(\"$n\").value = Object.toJSON({\"reldate\":$(\"{$n}_reldate\").value, \"startdate\":$(\"{$n}_startdate\").value, \"enddate\":$(\"{$n}_enddate\").value}); 
 					form_do_validation($('{$this->form->name}'), $('$n'));
 				}
 				function {$n}_datepick(element) {

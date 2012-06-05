@@ -46,7 +46,7 @@ if(isset($options['reldate']) && $options['reldate'] != ""){
 	$enddate = date("Y-m-d", $enddate);
 	$datesql = " AND (a.date >= '$startdate' and a.date < date_add('$enddate',interval 1 day) )";
 } else {
-	$datesql = " AND Date(a.occurence) = CURDATE()";
+	$datesql = " AND Date(e.occurence) = CURDATE()";
 }
 
 $query = "SELECT p.pkey,
