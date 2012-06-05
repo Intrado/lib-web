@@ -284,7 +284,7 @@
 						<fieldset>
 							<label for="msgsndr_form_rssmsg">Message</label>
 							<div class="controls">
-							<textarea id="msgsndr_form_fbmsg" name="facebook_message" class="required"></textarea> <span class="error"></span>
+							<textarea id="msgsndr_form_rssmsg" name="rss_message" class="required"></textarea> <span class="error"></span>
 							<p><a href="#">Spell Check</a></p>
 							</div>
 						</fieldset>
