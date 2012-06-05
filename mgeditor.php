@@ -326,7 +326,7 @@ function showActionGrid ($columnlabels, $rowlabels, $links) {
 					
 					// Attach action menu script for this item
 					if (isset($link["actions"])) {
-						$actionmenues[] = "createactionmenu('gridmenu-$row-$col','" . implode("<br />",$link["actions"]) . "','{$link["title"]}');";
+						$actionmenues[] = "createactionmenu('gridmenu-$row-$col','" . action_links_vertical($link["actions"]) . "','{$link["title"]}');";
 					}
 				} elseif (isset($link['button'])) {
 					echo "<td>

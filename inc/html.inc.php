@@ -52,6 +52,14 @@ function action_link ($title, $icon, $href = "#", $onclick = null) {
 	return $str;
 }
 
+function action_links_vertical ($array) {
+	$links = is_array($array) ? $array : func_get_args();
+	foreach ($links as $key => $link)
+		if ($link == "")
+			unset($links[$key]);
+	return "<div class=\"actionlinks\">" . implode("</div><div class=\"actionlinks\">", $links) . "</div>";
+}
+
 function action_links ($array) {
 	$links = is_array($array) ? $array : func_get_args();
 	foreach ($links as $key => $link)

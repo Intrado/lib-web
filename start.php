@@ -525,8 +525,7 @@ function activityfeed($mergeditems,$ajax = false) {
 					else
 						$content .= 'This list has never been used ';
 					$content .= " and has " . listcontacts($itemid,"list") . '</a></div>';
-					$tools = action_links (action_link("Edit", "pencil", "list.php?id=$itemid"),action_link("Preview", "application_view_list", "showlist.php?id=$itemid"));
-					$tools = str_replace("&nbsp;|&nbsp;","<br />",$tools);
+					$tools = action_links_vertical(action_link("Edit", "pencil", "list.php?id=$itemid"),action_link("Preview", "application_view_list", "showlist.php?id=$itemid"));
 					$icon = 'largeicons/addrbook.jpg';
 				} else if($item["type"] == "message") {
 					$defaultlink = "mgeditor.php?id=$itemid";
@@ -542,7 +541,7 @@ function activityfeed($mergeditems,$ajax = false) {
 					$content = '<div class="content_feed_row cf"><a href="' . $defaultlink . '" ' . $defaultonclick . '>' . $time .  ' - <b>' .  escapehtml($item["name"]) . "</b>" . ($item["description"] != ""?" - " . escapehtml($item["description"]):"") . '</a></div>';
 
 					$icon = 'largeicons/letter.jpg';
-					$tools = action_links (action_link("Edit", "pencil", 'mgeditor.php?id=' . $itemid));
+					$tools = action_links_vertical(action_link("Edit", "pencil", 'mgeditor.php?id=' . $itemid));
 				} else if($item["type"] == "report" ) {
 					$title = "Report " . escapehtml($title);
 					$content = '<div class="content_feed_row"><a href="' . $defaultlink . '" ' . $defaultonclick . '>' .
