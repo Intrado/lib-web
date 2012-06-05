@@ -759,10 +759,15 @@ if ($button = $form->getSubmit()) { //checks for submit and merges in post data
 		// create a new message group
 		$messagegroup = new MessageGroup();
 		$messagegroup->userid = $USER->id;
-		$messagegroup->name = $job->name;
+		if (isset($postdata["optionsavemessage"]) && $postdata["optionsavemessage"]) {
+			$messagegroup->name = $postdata["optionsavemessagename"];
+			$messagegroup->deleted = 0;
+		} else {
+			$messagegroup->name = $job->name;
+			$messagegroup->deleted = 1;
+		}
 		$messagegroup->description = "Created in MessageSender";
 		$messagegroup->modified = $job->modifydate;
-		$messagegroup->deleted = 1;
 		$messagegroup->create();
 		
 		$job->messagegroupid = $messagegroup->id;
