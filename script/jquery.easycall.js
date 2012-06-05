@@ -13,7 +13,7 @@
 				"recording": {"en": false},
 				"specialtaskid": false,
 				"timer": false,
-				"default": "en",
+				"defaultcode": "en",
 				"phonemindigits": 10,
 				"phonemaxdigits": 10,
 				"defaultphone": "",
@@ -69,19 +69,19 @@
 				var subcontainer = false;
 				var needscallmecontainer = true;
 				// always add the default first
-				if (easycalldata.recording[easycalldata.default] !== false) {
-					subcontainer = method.createPreviewContainer(easycalldata.default);
+				if (easycalldata.recording[easycalldata.defaultcode] !== false) {
+					subcontainer = method.createPreviewContainer(easycalldata.defaultcode);
 				} else {
 					// add the default callme container
 					subcontainer = method.createCallMeContainer(false);
 					needscallmecontainer = false;
 				}
-				easycalldata.subcontainer[easycalldata.default] = subcontainer;
+				easycalldata.subcontainer[easycalldata.defaultcode] = subcontainer;
 				initdiv.prepend(subcontainer);
 				
 				// add all others which have recordings
 				$.each(easycalldata.recording, function (code) {
-					if (code != easycalldata.default && easycalldata.recording[code] !== false) {
+					if (code != easycalldata.defaultcode && easycalldata.recording[code] !== false) {
 						subcontainer = method.createPreviewContainer(code);
 						easycalldata.subcontainer[code] = subcontainer;
 						initdiv.append(subcontainer);
@@ -128,7 +128,7 @@
 					// enter was pressed?
 					if (e.which == 13) {
 						e.preventDefault();
-						var code = easycalldata.default;
+						var code = easycalldata.defaultcode;
 						if (hasmenu)
 							code = selectmenu.val();
 						easycalldata.subcontainer[code] = container;
@@ -145,7 +145,7 @@
 					var selectmenu = $('<select />', { "class": "easycallselectmenu" })
 					var hasitems = false;
 					$.each(easycalldata.subcontainer, function (code) {
-						if (easycalldata.subcontainer[code] == false && code != easycalldata.default) {
+						if (easycalldata.subcontainer[code] == false && code != easycalldata.defaultcode) {
 							// insert item into selector
 							var option = $('<option />', { "value": code, "text": easycalldata.language[code]});
 							selectmenu.append(option);
@@ -159,7 +159,7 @@
 
 				callbutton.click(function(e){
 					e.preventDefault();
-					var code = easycalldata.default;
+					var code = easycalldata.defaultcode;
 					if (hasmenu)
 						code = selectmenu.val();
 					easycalldata.subcontainer[code] = container;
@@ -179,7 +179,7 @@
 				
 				var audiofileid = easycalldata.recording[code];
 				
-				if (code == easycalldata.default)
+				if (code == easycalldata.defaultcode)
 					removebutton.append($('<span />', { "text": "Re-record" }));
 				else
 					removebutton.append($('<span />', { "text": "Remove" }));
@@ -260,7 +260,7 @@
 				
 				// get a new callme container!
 				var callmecontainer = false;
-				if (code == easycalldata.default) {
+				if (code == easycalldata.defaultcode) {
 					callmecontainer = method.createCallMeContainer(false);
 					easycalldata.subcontainer[code] = callmecontainer;
 					easycalldata.maincontainer.prepend(callmecontainer);
@@ -293,7 +293,7 @@
 						phone = easycalldata.emptyphonetext;
 					easycalldata.subcontainer[code].append($('<div />', { "class": "easycallphoneinvalid", "text": phone + " " + valid }));
 					// if this isn't the record area for the default, clear the container association
-					if (code != easycalldata.default)
+					if (code != easycalldata.defaultcode)
 						easycalldata.subcontainer[code] = false;
 					return;
 				}
