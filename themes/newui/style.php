@@ -23,6 +23,12 @@ time, mark, audio, video {
 	font: inherit;
 	vertical-align: baseline;
 }
+
+/* redo image align center - this is used by all the actionlinks and icon buttons and set this way in the main css file */
+img {
+	vertical-align: center;
+}
+
 /* HTML5 display-role reset for older browsers */
 article, aside, details, figcaption, figure, 
 footer, header, hgroup, menu, nav, section {
@@ -421,8 +427,6 @@ border-color: #222222 transparent transparent; border-style: solid; border-width
 .feed_btn_wrap .btn:last-child { -webkit-border-radius: 0 4px 4px 0; border-radius: 0 4px 4px 0; }
 .feed_btn_wrap .btn:hover { background: #e7e7e7; }
 .feed_btn_wrap .btn.active { background: #e4e4e4; -webkit-box-shadow: inset 0px 1px 4px 0 rgba(0,0,0,0.2); box-shadow: inset 0px 1px 4px 0 rgba(0,0,0,0.2); }
-.btn_middle img { display: none; }
-
 
 /*----- table overrides for list styles -----*/
 
