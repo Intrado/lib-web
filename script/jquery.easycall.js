@@ -16,7 +16,8 @@
 				"default": "en",
 				"phonemindigits": 10,
 				"phonemaxdigits": 10,
-				"defaultphone": ""};
+				"defaultphone": "",
+				"emptyphonetext": "Number to Call"};
 			if (options.languages) {
 				$.each(options.languages, function(code) {
 					easycalldata.subcontainer[code] = false;
@@ -100,8 +101,30 @@
 			// create a container for the passed language
 			createCallMeContainer: function(hasmenu) {
 				var container = $('<div />', { "class": "easycallcallmecontainer"});
+				
+				// phone number input field
 				var phoneinput = $('<input />', { "class": "easycallphoneinput small", "type": "text" });
-				phoneinput.val(easycalldata.defaultphone);
+				if (easycalldata.defaultphone) {
+					phoneinput.val(easycalldata.defaultphone);
+				} else {
+					phoneinput.addClass("blank");
+					phoneinput.val(easycalldata.emptyphonetext);
+				}
+				// populate the phone input area with some instructional text when empty
+				phoneinput.blur(function(e) {
+					if (phoneinput.val() == "") {
+						phoneinput.addClass("blank");
+						phoneinput.val(easycalldata.emptyphonetext);
+					}
+				});
+				phoneinput.focus(function(e) {
+					if (phoneinput.val() == easycalldata.emptyphonetext) {
+						phoneinput.val("");
+						phoneinput.removeClass("blank");
+					}
+				});
+				
+				// button to start the calling session
 				var callbutton = $('<button />', { "class": "easycallcallnowbutton record", "value": "Call Now to Record" });
 				callbutton.append($('<span />', { "class": "icon" })).append("Call Now to Record");
 				

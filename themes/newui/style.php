@@ -557,6 +557,10 @@ button:active, button.active, .btn:active, .btn.active { background-color: #d9d9
 	margin-right: 5px;
 	width: auto !important;
 }
+.easycallmaincontainer input.blank {
+	color: gray;
+	font-style: italic;
+}
 .easycalllanguagetitle {
 	float: left;
 	margin-right: 5px;
