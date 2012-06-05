@@ -53,7 +53,7 @@ function generateStats($useridList, $start_datetime, $end_datetime) {
 		"j.activedate >= ? and j.activedate <= ? and " .
 		"j.userid in (" . repeatWithSeparator("?", ",", count($useridList)) . ")";
 		
-	$stats["total_senders"] = QuickQuery($query, null, $params);
+	$stats["total_users"] = QuickQuery($query, null, $params);
 	
 	// languages
 	$query = "select count(distinct(m.languagecode)) from message m " .
@@ -65,6 +65,73 @@ function generateStats($useridList, $start_datetime, $end_datetime) {
 		
 	$stats["total_languages"] = QuickQuery($query, null, $params);
 	
+	// phone messages
+	$query = "select count(*) from message m " .
+		"join messagegroup mg on (mg.id = m.messagegroupid) " .
+		"join job j on (j.messagegroupid = mg.id) " .
+		"where m.type = 'phone' and " .
+		"j.status in ('procactive','active','complete','cancelled','cancelling') and " .
+		"j.activedate >= ? and j.activedate <= ? and " .
+		"j.userid in (" . repeatWithSeparator("?", ",", count($useridList)) . ")";
+		
+	$stats["total_phones"] = QuickQuery($query, null, $params);
+	
+	// email messages
+	$query = "select count(*) from message m " .
+		"join messagegroup mg on (mg.id = m.messagegroupid) " .
+		"join job j on (j.messagegroupid = mg.id) " .
+		"where m.type = 'email' and " .
+		"j.status in ('procactive','active','complete','cancelled','cancelling') and " .
+		"j.activedate >= ? and j.activedate <= ? and " .
+		"j.userid in (" . repeatWithSeparator("?", ",", count($useridList)) . ")";
+		
+	$stats["total_emails"] = QuickQuery($query, null, $params);
+	
+	// sms messages
+	$query = "select count(*) from message m " .
+		"join messagegroup mg on (mg.id = m.messagegroupid) " .
+		"join job j on (j.messagegroupid = mg.id) " .
+		"where m.type = 'sms' and " .
+		"j.status in ('procactive','active','complete','cancelled','cancelling') and " .
+		"j.activedate >= ? and j.activedate <= ? and " .
+		"j.userid in (" . repeatWithSeparator("?", ",", count($useridList)) . ")";
+		
+	$stats["total_sms"] = QuickQuery($query, null, $params);
+
+	// post messages
+	$query = "select count(*) from message m " .
+		"join messagegroup mg on (mg.id = m.messagegroupid) " .
+		"join job j on (j.messagegroupid = mg.id) " .
+		"where m.type = 'post' and " .
+		"j.status in ('procactive','active','complete','cancelled','cancelling') and " .
+		"j.activedate >= ? and j.activedate <= ? and " .
+		"j.userid in (" . repeatWithSeparator("?", ",", count($useridList)) . ")";
+		
+	$stats["total_posts"] = QuickQuery($query, null, $params);
+	
+	// top jobtypes
+	$query = "select jt.name as name, count(*) as total from job j " .
+		"left join jobtype jt on (jt.id = j.jobtypeid) " .
+		"where j.status in ('procactive','active','complete','cancelled','cancelling') and " .
+		"j.activedate >= ? and j.activedate <= ? and " .
+		"j.userid in (" . repeatWithSeparator("?", ",", count($useridList)) . ") " .
+		"group by j.jobtypeid " .
+		"order by total desc";
+		
+	$stats["top_jobtypes"] = QuickQueryMultiRow($query, true, null, $params);
+
+	// top senders
+	$query = "select concat_ws(' ', u.firstname, u.lastname) as name, count(*) as total from job j " .
+		"left join user u on (u.id = j.userid) " .
+		"where j.status in ('procactive','active','complete','cancelled','cancelling') and " .
+		"j.activedate >= ? and j.activedate <= ? and " .
+		"j.userid in (" . repeatWithSeparator("?", ",", count($useridList)) . ") " .
+		"group by j.userid " .
+		"order by total desc";
+		
+	$stats["top_users"] = QuickQueryMultiRow($query, true, null, $params);
+
+	
 	error_log("STATS CALC"); // TODO remove
 	return $stats;
 }
@@ -73,13 +140,13 @@ function generateStats($useridList, $start_datetime, $end_datetime) {
 // Data
 ////////////////////////////////////////////////////////////////////////////////
 
-//memcache exptime is in seconds up to 30 days, then becomes a timestamp of a date to expire.
-//since completed jobs don't change, we can cache it for a really long time.
-//we could have used "QuickQueryRow" as a callback directly, however the key would contain the sql
-//which would be too long, and the jobid (the important part) would be lost in the tail hash of automatic key generation
-//wrapping the large, static argument in a function shortens key length and increases readability
-
-$stats = gen2cache(time() + 60*60*24*365, null, null, "generateStats", $useridList, $start_datetime, $end_datetime);
+$query = "select max(j.activedate) from job j " .
+	"where j.status in ('procactive','active','complete','cancelled','cancelling') and " .
+	"j.userid in (" . repeatWithSeparator("?", ",", count($useridList)) . ")";
+	
+$expect = QuickQuery($query, null, $useridList);
+// keep one day, key generated
+$stats = gen2cache(60*60*24, $expect, null, "generateStats", $useridList, $start_datetime, $end_datetime);
 
 
 
@@ -119,36 +186,46 @@ include("nav.inc.php");
 				<h4>Broadcasts</h4>
 				<p><strong><?=$stats["total_jobs"]?></strong></p>
 				<p><?=$stats["total_languages"]?> Languages</p>
-				<p><?=$stats["total_senders"]?> Senders</p>
+				<p><?=$stats["total_users"]?> Senders</p>
 			</div>
 			
 			<div class="col bloc">
 				<h4>Message Content</h4>
 				<ul>
-				<li><img src="themes/newui/phone-blue.png"/> 62</li>
-				<li><img src="themes/newui/email-red.png"/> 22</li>
-				<li><img src="themes/newui/sms-orange.png"/> 13</li>
-				<li><img src="themes/newui/social-green.png"/> 3</li>
+				<li><img src="themes/newui/phone-blue.png"/><?=$stats["total_phones"]?></li>
+				<li><img src="themes/newui/email-red.png"/><?=$stats["total_emails"]?></li>
+				<li><img src="themes/newui/sms-orange.png"/><?=$stats["total_sms"]?></li>
+				<li><img src="themes/newui/social-green.png"/><?=$stats["total_posts"]?></li>
 				</ul>
 			</div>
 			
 			<div class="col bloc">
 				<h4>Top Types</h4>
 				<ul>
-				<li><span>412</span> General Outre&hellip;</li>
-				<li><span>365</span> Attendance</li>
-				<li><span>91</span> Newsletter</li>
-				<li><span>32</span> PTO</li>
+<?
+				for ($i = 0; $i < 4; $i++) {
+					if (!isset($stats['top_jobtypes'][$i]))
+						break;
+?>
+					<li><span><?=$stats["top_jobtypes"][$i]['total']?></span><?=$stats["top_jobtypes"][$i]['name']?></li>
+<?
+				}
+?>
 				</ul>
 			</div>
 			
 			<div class="col bloc">
 				<h4>Top Senders</h4>
 				<ul>
-				<li><span>188</span> <a href="">Stevie Smith</a></li>
-				<li><span>32</span> <a href="">Gary Baldi</a></li>
-				<li><span>19</span> <a href="">Robyn Banks</a></li>
-				<li><span>12</span> <a href="">Davey Jones</a></li>
+<?
+				for ($i = 0; $i < 4; $i++) {
+					if (!isset($stats['top_users'][$i]))
+						break;
+?>
+					<li><span><?=$stats["top_users"][$i]['total']?></span><?=$stats["top_users"][$i]['name']?></li>
+<?
+				}
+?>
 				</ul>
 			</div>
 			</div><!-- /window_body_wrap -->
