@@ -72,7 +72,7 @@ function showRenderedListTable($renderedlist, $list = false) {
 		
 	$tableid = "renderedlist". $tableidcounter++;
 	$optionalfields = array_merge(FieldMap::getOptionalAuthorizedFieldMapsLike('f'), FieldMap::getAuthorizedFieldMapsLike('g'));
-	$optionalfieldstart = $showinlist ? 6 : 5; //table col of last non optional field
+	$optionalfieldstart = $showinlist ? 5 : 4; //table col of last non optional field
 		
 ?>
 	<div class="table_controls cf">
