@@ -43,7 +43,7 @@ function action_link ($title, $icon, $href = "#", $onclick = null) {
 	$href = $href == null ? "#" : $href;
 	$onclick = $onclick == null ? "" : 'onclick="'.$onclick.'"';
 	$autoid = autoID("action_link", $title, $icon);	
-	$str = '<a id="' . $autoid . '" href="'.$href.'" '.$onclick.' class="actionlink '.escapehtml($title).'_link" title="'.escapehtml($title).'">';
+	$str = '<a id="' . $autoid . '" href="'.$href.'" '.$onclick.' class="actionlink" title="'.escapehtml($title).'">';
 	if ($actionlinkmode == "both" || $actionlinkmode == "icons")
 		$str .= '<img src="img/icons/'.$icon.'.png" alt="'.escapehtml($title).'">';
 	if ($actionlinkmode == "both" || $actionlinkmode == "text")
@@ -57,7 +57,7 @@ function action_links ($array) {
 	foreach ($links as $key => $link)
 		if ($link == "")
 			unset($links[$key]);
-	return '<div class="actionlinks">' . implode($links).'</div>';
+	return '<div class="actionlinks">' . implode("",$links).'</div>';
 }
 
 

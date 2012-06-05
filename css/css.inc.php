@@ -367,41 +367,39 @@ div.scrollTableContainer {
 
 /*----- action links - edit, copy etc used througout site -----*/
 
-ul.actionlinks { padding: 0; margin: 0; list-style-type: none; }
-ul.actionlinks li { display: inline-block; padding: 0 4px 0 0; border-right: 1px solid #aaa; }
-ul.actionlinks li:last-child { border: none; }
-ul.actionlinks li a { display: block; font-size: 11px; line-height: 16px; border: 0px; cursor: pointer; color: #484848; }
-ul.actionlinks li a:hover { color: #000; }
-ul.actionlinks li img { padding: 0 4px; }
+.actionlink {
+	padding: 1px 5px 1px 5px; font-size: 11px;
+	white-space: nowrap;
+	text-decoration: none;
+	cursor: pointer;
+	font-size: 11px;
 
-.actionlinks { padding: 0; margin: 0; list-style-type: none; }
-.actionlinks a { display: inline-block; }
-.actionlinks a:last-child { border: none; }
-.actionlinks a:hover { color: #000; }
-.actionlink { padding: 1px 5px 1px 20px; font-size: 11px; line-height: 18px; cursor: pointer; color: #484848; }
-.actionlink img { display: none; padding: 0 4px 0 0; }
+	color: <?=$primary?>;;
+}
 
-.Edit_link { background: url(img/icons/pencil.png) 0 0 no-repeat; }
-.Preview_link { background: url(img/icons/application_view_list.png) 0 0 no-repeat; }
-.Publish_link { background: url(img/icons/fugue/star__plus.png) 0 0 no-repeat; }
-.Delete_link { background: url(img/icons/cross.png) 0 0 no-repeat; }
-.Copy_link { background: url(img/icons/page_copy.png) 0 0 no-repeat; }
-.Cancel_link { background: url(img/icons/stop.png) 0 0 no-repeat; }
-.Report_link { background: url(img/icons/layout.png) 0 0 no-repeat; }
-.Monitor_link { background: url(img/icons/chart_pie.png) 0 0 no-repeat; }
-.Responses_link { background: url(img/icons/comment.png) 0 0 no-repeat; }
-.Graph_link { background: url(img/icons/chart_pie.png) 0 0 no-repeat; }
-.Archive_link { background: url(img/icons/fugue/broom.png) 0 0 no-repeat; }
-.Upload_link { background: url(img/icons/folder.png) 0 0 no-repeat; }
-.Download_link { background: url(img/icons/disk.png) 0 0 no-repeat; }
-.Now_link { background: url(img/icons/database_go.png) 0 0 no-repeat; }
-.Log_link { background: url(img/icons/application_view_list.png) 0 0 no-repeat; }
-.user_link { background: url(img/icons/key_go.png) 0 0 no-repeat; }
-.Password_link { background: url(img/icons/fugue/lock__pencil.png) 0 0 no-repeat; }
-.Disable_link { background: url(img/icons/user_delete.png) 0 0 no-repeat; }
-.Data_link { background: url(img/icons/lightning.png) 0 0 no-repeat; }
-.Values_link { background: url(img/icons/pencil.png) 0 0 no-repeat; }
+a.actionlink {
+	border-right: 1px solid #aaa;
+}
+.actionlinks a.actionlink:last-child {
+	border: none;
+}
 
+
+.actionlink:hover{
+	text-decoration: underline;
+}
+
+.actionlink img {
+	border: 0px;
+	padding: 0px;
+	padding-right: 3px;
+	margin: 0px;
+	vertical-align: middle;
+}
+
+.actionlinks {
+	white-space: nowrap;
+}
 
 /*----- items need to appear in vertical list on homepage -----*/
 
