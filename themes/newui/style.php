@@ -376,7 +376,14 @@ table.messages th { background: #eee; padding: 0 8px; }
 table.messages th, table.messages td { font-size: 14px; text-align: left; border-top: 1px solid #ddd; cursor: pointer; }
 table.messages td { padding: 0 8px; border-bottom: 1px solid #ccc; }
 table.messages tr:hover td { background: #e1eaf4; border-top: 1px solid #8cb2e0; }
+tr.selected { background: rgb(228, 225, 153); }
+table.messages tr.selected:hover td { background: rgb(228, 224, 187);  }
 table.messages span.icon { background: url(themes/newui/dktick.png) 0 11px no-repeat; display: block; text-indent: -9999px; }
+
+input[name=msgsndr_msggroup] { 
+  display: none;
+}
+
 
 .msg_content_nav { list-style-type: none; margin: 15px 0; padding: 0; }
 .msg_content_nav li { position: relative; float: left; display: inline; width: 25%; }
@@ -399,6 +406,16 @@ border-color: #222222 transparent transparent; border-style: solid; border-width
 -webkit-box-shadow: inset 0px 1px 1px 0px rgba(255,255,255,0.5); 
    -moz-box-shadow: inset 0px 1px 1px 0px rgba(255,255,255,0.5); 
         box-shadow: inset 0px 1px 1px 0px rgba(255,255,255,0.5); }
+
+.msg_content_nav li.complete.active a {
+  border-bottom-color: #499122;
+}
+.msg_content_nav li.complete.active a:after { 
+  content: ""; position: absolute; bottom: -12px; left: 50%; margin-left: -12px; display: block; width: 0; height: 0; 
+border-color: #499122 transparent transparent; border-style: solid; border-width: 12px 12px 0;
+   
+
+}
 .msg_content_nav li.complete a span { color: #fbfbfb; }
 .msg_content_nav li.complete a span.icon { background: url(themes/newui/tick.png) 0 center no-repeat; }
 
