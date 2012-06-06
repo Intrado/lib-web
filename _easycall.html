@@ -84,6 +84,15 @@
 						"languages": {"en":"Default","es":"Spanish","ca":"Catalan"},
 						"defaultphone":"4172140239"});
 				
+				// example reload from other message
+				$("#reload").click(function(e) {
+					// new message loaded from "save" or w/e has new message content, so put it in the input
+					$("#easycall").val($.toJSON({"en":"987","es":"988","ca":"989"}));
+					// now, reattach the easycall
+					$("#easycall").attachEasyCall({
+						"languages": {"en":"Default","es":"Spanish","ca":"Catalan"},
+						"defaultphone":"4172140239"});
+				});
 				// observe change events on the value of the element and stick the value into a debug area
 				$("#easycall").change(function (event) {
 					$("#validationdata").empty().append($(this).val());
@@ -94,6 +103,7 @@
 	</head>
 	<body>
 		<input type="hidden" value="" id="easycall" />
+		<input type="button" value="load saved" id="reload" />
 		<pre id="validationdata"></pre>
 	</body>
 </html>
