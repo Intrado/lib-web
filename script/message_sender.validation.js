@@ -155,12 +155,6 @@ jQuery.noConflict();
 
       notVal.watchFields('#msgsndr_form_number');
 
-      // Build up select box based on the maxjobdays user permission
-      var daysToRun = userPermissions.maxjobdays;
-      for(i=1;i<=daysToRun;i++) {
-        $('#msgsndr_form_days').append('<option value="'+i+'">'+i+'</option>');
-      };
-
       // Easy Call jQuery Plugin
       $("#msgsndr_form_number").attachEasyCall({"languages": {"en":"English","es":"Spanish","ca":"Catalan"}});   
 
@@ -286,6 +280,13 @@ jQuery.noConflict();
 
     });
 
+    $('.btn_cancel').on('click', function(e) {
+      e.preventDefault();
+
+      notVal.cancelBtn(this);
+      notVal.checkContent();
+      
+    });
 
 
 
@@ -623,36 +624,73 @@ jQuery.noConflict();
 
 
     // get messages based on message id from message group
-    function getMessages(msgGrpId){
-      var messages = {};
+    function getMessages(msgGrpId, callback){
+
       $.ajax({
         url: '/'+orgPath+'/api/2/users/'+userid+'/messagegroups/'+msgGrpId+'/messages',
         type: "GET",
         dataType: "json",
         success: function(data) {
-          $.each(data.messages, function(mIndex, mData){
-            messages[mData.name] = mData.value;
+
+          allMessages = data.messages;
+          messages = {};
+
+          $.each(allMessages, function(mIndex, mData) {
+
+            var msgParts = getMessageParts(msgGrpId,mData.id);
+            
+            mData['msgparts'] = msgParts;
+
           });
+
+
+          $.each(allMessages, function(mIndex, mData) {
+            if(typeof(mData.type) != "undefined" && mData.type.length > 0) { 
+
+
+              if(mData.type == "post") {
+                if(typeof(messages[mData.type]) == "undefined") {
+                  messages[mData.type] = {};
+                }
+                if(typeof(messages[mData.type][mData.subType]) == "undefined") {
+                  messages[mData.type][mData.subType] = mData;
+                }
+              } else if(typeof(messages[mData.type]) == "undefined" && (mData.type != "email" || mData.subType != "plain")) {
+                messages[mData.type] = mData;
+              }
+
+            }
+          });
+
+          // console.log(messages);
+
+          callback();
         }
       });
-      return messages;
+
+      //return messages;
     };
 
     
     // get message parts based on message id from message group
-    function getMessageParts(msgGrpId){
+    function getMessageParts(msgGrpId,msgId){
+
       var parts = {};
+
       $.ajax({
-        url: '/'+orgPath+'/api/2/users/'+userid+'/messagegroups/'+msgGrpId+'/messageparts',
+        url: '/'+orgPath+'/api/2/users/'+userid+'/messagegroups/'+msgGrpId+'/messages/'+msgId+'/messageparts',
+        async: false,
         type: "GET",
         dataType: "json",
         success: function(data) {
-          $.each(data.messageparts, function(mIndex, mData){
-            parts[mData.name] = mData.value;
-          });
+          
+          parts = data.messageParts;
+
         }
       });
+
       return parts;
+
     };
 
 
@@ -691,11 +729,24 @@ jQuery.noConflict();
 
 
 
-    // load the message ... (WIP: currently this only displays the messagegroup name on the page and closes the modal)
+    // load the message ...
+
+    // This makes the whole table row clickable to select the message ready for loading into content
     $('#messages_list').on('click', 'tr', function(){
+      // Unset all inputs
+      $('input[name=msgsndr_msggroup]').removeAttr('checked');
+      // Remove selected class from all tr's
+      $('#messages_list tr').removeClass('selected');
+
+      // Set radio button to checked for selected message
       $('td:first input:radio[name=msgsndr_msggroup]', this).attr('checked', 'checked');
+      // Add class selected to tr
+      $(this).addClass('selected');
     });
 
+    
+
+    // Load Saved Message button in saved message modal window
     $('#msgsndr_load_saved_msg').on('click', function(){
       var msgGroup = $('.msgsndr_msggroup > td > input:radio[name=msgsndr_msggroup]:checked'); //input:checkbox[name=msgsndr_msggroup]:checked'
       var grpId = msgGroup.attr('value');
@@ -704,19 +755,118 @@ jQuery.noConflict();
       // put the messageGroup id in the hidden input and display the message name
       $('#loaded_message_id').attr('value', grpId);
       $('#loaded_message_name').text(msgName);
-      $('#msgsndr_loaded_message').fadeIn(300);
+      $('#msgsndr_loaded_message').fadeIn(300).fadeOut(7000);
 
       // make sure the correct tab is shown
       $('#msgsndr_saved_message').modal('hide');
-      $('.msg_steps').find('li:eq(1)').addClass('active');
+      $('.msg_steps li:eq(1)').addClass('active');
       $('#msg_section_2').show();  
+
+
+      clearForm(); 
+      getMessages(grpId, doLoadMessage);
+
     });
     
+    /*
+      function used to empty all form data in section 2 - Message content, this is used when loading a
+      previous message, as can not assume a user will only load one
+    */
+
+
+    function clearForm() {
+
+      $('.msg_content_nav li').removeClass('complete');
+
+
+      var allDataInputs = $('#msg_section_2 input, textarea');
+
+      $('.facebook, .twitter, .feed').hide();
+
+      $.each(allDataInputs, function(aIndex, aData) {
+
+        if ($(aData).attr('type') == 'checkbox') {
+          $(aData).removeAttr('checked');
+        }
+        $(aData).val('');
+
+      });
+
+      var reviewTabs = $('.msg_complete li');
+      $.each(reviewTabs, function(tIndex, tData) {
+        $(tData).removeClass('complete');
+      });
+
+    }
+
+
+    // This will contain the logic to populate message content from a loaded message
+    function doLoadMessage() {
+
+      if (typeof messages.sms != "undefined") {
+        $('li.osms').addClass('complete');
+
+        $('input[name=has_sms]').val('1');
+        $('#msgsndr_form_sms').val(messages.sms.msgparts[0].txt);
+      }
+
+      if (typeof messages.email != "undefined") {
+        $('li.oemail').addClass('complete');
+
+        emailSubject = messages.email.subject;
+
+        $('input[name=has_email').val('1');
+        $('#msgsndr_form_name').val(messages.email.fromName.replace("+"," "));
+        $('#msgsndr_form_email').val(messages.email.fromEmail.replace("%40","@"));
+        $('#msgsndr_form_mailsubject').val(emailSubject);
+
+        $('iframe[name^=Ric]').contents().find('body').append(messages.email.msgparts[0].txt);
+        // Message HTML content == messages.email.msgparts[0].txt
+      }
+
+      if (typeof messages.post != "undefined") {
+        $('li.osocial').addClass('complete');
+
+
+        if (typeof messages.post.facebook  != "undefined") {
+          $('#msgsndr_form_facebook').attr('checked','checked');
+          $('div.facebook').show();
+
+          $('#msgsndr_form_fbmsg').val(messages.post.facebook.msgparts[0].txt);
+        }
+
+        if (typeof messages.post.twitter != "undefined") {
+          $('#msgsndr_form_twitter').attr('checked','checked');
+          $('div.twitter').show();
+
+          $('#msgsndr_form_tmsg').val(messages.post.twitter.msgparts[0].txt);
+        }
+
+        if (typeof messages.post.feed != "undefined") {
+          $('#msgsndr_form_feed').attr('checked','checked');
+          $('div.feed').show();
+
+          $('#msgsndr_form_rsstitle').val(messages.post.feed.subject.replace("+"," "));
+          $('#msgsndr_form_rssmsg').val(messages.post.feed.msgparts[0].txt);
+        }
+
+      }
+
+      notVal.checkContent();
+
+    }
 
 
 
-// CK Editor ...
-/////////////////
+
+
+
+
+
+
+
+
+
 
     // ckeditor for the email message body ...
     chooseCkButtons = function(type){ // pass in 'basic' or 'advanced'
@@ -787,6 +937,7 @@ jQuery.noConflict();
         });
       });
     }); 
+
 
 
 

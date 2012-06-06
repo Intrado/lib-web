@@ -604,7 +604,7 @@ function form_handle_submit(form,event) {
 					window.location=formvars.scriptname;
 				}
 			} else if ("success" == res.status && res.nexturl) {
-					window.location=res.nexturl;
+					//window.location=res.nexturl;
 			} else if ("modify" == res.status) {
 				$(res.name).update(res.content);
 			} else if ("fireevent" == res.status) {

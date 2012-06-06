@@ -70,12 +70,6 @@
 					</div>
 				</fieldset>
 				
-				<!--fieldset>
-					<label for="msgsndr_form_days">Days to Run</label>
-					<div class="controls">
-						<select id="msgsndr_form_days" name="type">		</select>
-					</div>
-				</fieldset-->
 				
 				<fieldset>
 					<div class="controls">
@@ -93,8 +87,8 @@
 				
 				<fieldset class="form_actions">
 					<div class="controls">
-					<button class="btn_save" disabled="disabled">Save Phone Message</button>
-					<button>Cancel</button>
+					<button class="btn_save" disabled="disabled" data-nav=".ophone">Save Phone Message</button>
+					<button class="btn_cancel" data-nav=".ophone">Cancel</button>
 					</div>
 				</fieldset>
 
@@ -120,8 +114,8 @@
 
 				<fieldset class="form_actions">
 					<div class="controls">
-					<button class="btn_save" disabled="disabled">Save TTS Message</button>
-					<button>Cancel</button>
+					<button class="btn_save" disabled="disabled" data-nav=".ophone">Save TTS Message</button>
+					<button class="btn_cancel" data-nav=".ophone">Cancel</button>
 					</div>
 				</fieldset>
 
@@ -181,8 +175,8 @@
 				
 				<fieldset class="form_actions">
 					<div class="controls">
-					<button class="btn_save" disabled="disabled"  data-nav=".oemail">Save Email Message</button>
-					<button>Cancel</button>
+					<button class="btn_save" disabled="disabled" data-nav=".oemail">Save Email Message</button>
+					<button class="btn_cancel" data-nav=".oemail">Cancel</button>
 					</div>
 				</fieldset>
 
@@ -207,7 +201,7 @@
 				<fieldset class="form_actions">
 					<div class="controls">
 						<button class="btn_save" disabled="disabled" data-nav=".osms">Save SMS Message</button>
-						<button>Cancel</button>
+						<button class="btn_cancel" data-nav=".osms">Cancel</button>
 					</div>
 				</fieldset>
 
@@ -309,7 +303,7 @@
 				<fieldset class="form_actions">
 					<div class="controls">
 						<button class="btn_save" disabled="disabled" data-nav=".osocial">Save Social Messages</button>
-						<button>Cancel</button>
+						<button class="btn_cancel" data-nav=".osocial">Cancel</button>
 					</div>
 				</fieldset>
 

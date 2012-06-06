@@ -153,6 +153,23 @@
 
     } // saveBtn
 
+    this.cancelBtn = function(ele) {
+
+      console.log(ele);
+      var nav = j(ele).attr('data-nav');
+      var el  = nav.substr(2);
+
+      j('.msg_content_nav '+nav).removeClass('active').removeClass('complete');
+      j('#msgsndr_tab_'+el).hide();
+
+      j('input[name=has_'+el+']').empty();
+
+
+      // Set Message tabs on review tab
+      j('#msgsndr_review_'+el).parent().removeClass('complete');
+
+    } // saveBtn
+
 
 
 
@@ -163,20 +180,20 @@
       j('.review_type p').text(j('#msgsndr_form_type option:selected').text());
       j('.review_count p').text('Insert Number here from list builder');
 
+      // Build up select box based on the maxjobdays user permission
+      var daysToRun = userPermissions.maxjobdays;
+      j('#msgsndr_form_daystorun').empty();
+      for(i=1;i<=daysToRun;i++) {
+        j('#msgsndr_form_daystorun').append('<option value="'+i+'">'+i+'</option>');
+      };
+
       afterGetPrefs = function() {
 
-        // document.formvars['broadcast']['date'] = {
-        //   date: [
-
-        //   ]
-        // }
         document.formvars['broadcast']['schedulecallearly'] = [
-            // new document.validators["ValRequired"]("schedule_late","schedule_date"),
-            new document.validators["ValTimeCheck"]("schedulecallearly","Early",{min:userPrefs.callearly,max:userPrefs.calllate}), 
-            new document.validators["ValTimeWindowCallEarly"]("schedulecallearly")
+          new document.validators["ValTimeCheck"]("schedulecallearly","Early",{min:userPrefs.callearly,max:userPrefs.calllate}), 
+          new document.validators["ValTimeWindowCallEarly"]("schedulecallearly")
         ];
         document.formvars['broadcast']['schedulecalllate'] = [
-          // new document.validators["ValRequired"]("schedule_early","schedule_date"),
           new document.validators["ValTimeCheck"]("schedulecalllate","Late",{min:userPrefs.callearly,max:userPrefs.calllate}), 
           new document.validators["ValTimeWindowCallEarly"]("schedulecalllate"),
           new document.validators["ValTimePassed"]("scheduledate")
