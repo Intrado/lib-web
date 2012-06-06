@@ -707,8 +707,8 @@
 
 			
 			<div class="msg_confirm">
-				<a href="#" class="toggle-more" data-target="#schedule_options">Schedule Options</a> or 
-				<button class="btn_confirm" id="send_new_broadcast">Send Message <span class="icon"></span></button>
+				<a href="#" class="toggle-more" data-target="#schedule_options">Schedule</a> or 
+				<button class="btn_confirm" id="send_new_broadcast">Send Now <span class="icon"></span></button>
 			</div>
 			
 		</div><!-- end window_panel -->
